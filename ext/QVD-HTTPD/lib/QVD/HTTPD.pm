@@ -43,7 +43,7 @@ sub process_request {
 		}
 		elsif (/^$/) {
 		    # end of headers
-		    $self->process_http_request($method, \@headers);
+		    $self->process_http_request($method, $url, \@headers);
 		    last;
 		}
 		else {
