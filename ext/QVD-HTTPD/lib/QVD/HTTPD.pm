@@ -60,12 +60,41 @@ sub process_request {
     print STDERR "connection closed\n";
 }
 
+sub set_http_request_processor {
+    my ($self, $plugin, $url) = @_;
+    my $children_also = $url =~ s|/\*$||;
+    my $url_re = quotemeta($url);
+    $url_re .= "(?:/.*)?" if $children_also;
+    $url_re = qr/^$url_re$/;
+    my $p = $self->{_http_request_processor} ||= [];
+    @$p = sort { length $_->[1] } @$p, [$plugin, $url, $url_re];
+    my $c = $self->{_http_request_processor_cache} ||= {};
+    delete $$c{$_} for (grep /$url_re/, keys %$c);
+    1
+}
+
+sub get_http_request_processor {
+    my $self = shift;
+    my $url = shift;
+    my $c = $self->{_http_request_processor_cache} ||= {};
+    $c->{$url} ||= do {
+	my $p = $self->{_http_request_processor} ||= [];
+	(grep $url =~ $_->[2], @$p)[0];
+    }
+}
+
 sub process_http_request {
     my $self = shift;
-    my ($method, $headers) = @_;
-    use Data::Dumper;
-    my $text = Dumper \@_;
-    $self->send_http_response(200, 'text/plain', $text);
+    my ($method, $url, $headers) = @_;
+    my $processor = $self->get_http_request_processor($url);
+    if ($processor) {
+	$processor->process_http_request($self, $method, $url, $headers);
+    }
+    else {
+	use Data::Dumper;
+	my $text = Dumper \@_;
+	$self->send_http_error(HTTP_NOT_FOUND);
+    }
 }
 
 sub send_http_response {
