@@ -1,0 +1,10 @@
+Changes
+lib/QVD/HTTP.pm
+lib/QVD/HTTP/StatusCodes.pm
+Makefile.PL
+MANIFEST
+README
+t/00-load.t
+t/boilerplate.t
+t/pod-coverage.t
+t/pod.t
