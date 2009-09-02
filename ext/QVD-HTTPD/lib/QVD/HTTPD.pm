@@ -7,6 +7,8 @@ our $VERSION = '0.01';
 
 use parent qw(Net::Server);
 
+use QVD::HTTP::StatusCodes qw(:all);
+
 # token          = 1*<any CHAR except CTLs or separators>
 # separators     = "(" | ")" | "<" | ">" | "@"
 #                | "," | ";" | ":" | "\" | <">
@@ -19,41 +21,43 @@ sub process_request {
     while (<>) {
 	s/\r?\n$//;
 	next if /^\s*$/;
-	if (my ($method, $url) = m|^(\w+)\s+(.*?)\s+HTTP/1\.1$|) {
+	if (my ($method, $url, $version) = m|^(\w+)\s+(.*?)\s*((?:\bHTTP/\d+\.\d+)?)$|) {
+	    if ($version ne 'HTTP/1.1') {
+		$self->send_http_error(HTTP_VERSION_NOT_SUPPORTED);
+		return;
+	    }
 	    my @headers;
 	    while(<>) {
-		s/\r?\n$//;
-		if (/^$/) {
+		s/\r?\n$//; # HTTP chomp
+		if (my ($name, $value) = /^($token_re)\s*:\s*(.*?)\s*$/o) {
+		    # new header
+		    push @headers, "${name}:${value}";
+		}
+		elsif (/^\s+(.*?)\s+$/) {
+		    # header continuation
+		    unless (@headers) {
+			$self->send_http_error(HTTP_BAD_REQUEST);
+			return;
+		    }
+		    $headers[-1] .= " " . $1;
+		}
+		elsif (/^$/) {
 		    # end of headers
 		    $self->process_http_request($method, \@headers);
 		    last;
 		}
-		elsif (/^\s+(.*?)\s+$/) {
-		    # header continuation
-		    @headers or goto ERROR;
-		    $headers[-1] .= " " . $1;
-		}
-		elsif (my ($name, $value) = /^\s*($token_re)\s*:\s*(.*?)\s*$/o) {
-		    # new header
-		    push @headers, "${name}:${value}";
-		}
 		else {
-		    goto ERROR;
+		    $self->send_http_error(HTTP_BAD_REQUEST);
+		    return;
 		}
 	    }
 	}
 	else {
-	    goto ERROR;
+	    $self->send_http_error(HTTP_BAD_REQUEST);
+	    return;
 	}
     }
- OK:
     print STDERR "connection closed\n";
-    return;
-
- ERROR:
-    $self->send_http_error(500, "bad request",
-			   "bad HTTP request\n\nline:\n$_\n\n");
-    goto OK;
 }
 
 sub process_http_request {
@@ -61,27 +65,27 @@ sub process_http_request {
     my ($method, $headers) = @_;
     use Data::Dumper;
     my $text = Dumper \@_;
-    $self->send_http_response(200, 'Ok', ['Content-Type: text/plain'], $text);
+    $self->send_http_response(200, 'text/plain', $text);
 }
 
 sub send_http_response {
     my $self = shift;
-    my $code = shift;
-    my $msg = shift;
-    my $headers = shift;
+    my $code = int shift;
+    my $content_type = shift;
     my $content = join('', @_);
     print join("\r\n",
-	       "HTTP/1.1 $code $msg",
-	       @$headers,
-	       sprintf('Content-Length: %d', length $content),
+	       "HTTP/1.1 $code ". http_status_message($code),
+	       "Content-Type: $content_type",
+	       "Content-Length: " . length($content),
 	       '',
 	       $content);
 }
 
 sub send_http_error {
-    my ($self, $code, $msg, $text) = @_;
-    $text =~ s/\r?\n/\r\n/g;
-    $self->send_http_request($code, $msg, ['Content-Type: text/plain'], $text);
+    my ($self, $code) = @_;
+    $code ||= HTTP_INTERNAL_SERVER_ERROR;
+    my $text = http_status_description($code);
+    $self->send_http_response($code, 'text/plain', $text);
 }
 
 __PACKAGE__->run(port => 8080);
