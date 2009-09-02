@@ -12,7 +12,7 @@ require QVD::Frontend::Plugin::VMAS;
 
 sub postconfigure_hook {
     my $self = shift;
-    QVD::Frontend::Plugin::L7R->set_http_processors($self, '/');
+    QVD::Frontend::Plugin::L7R->set_http_processors($self, '/qvd/');
     QVD::Frontend::Plugin::VMAS->set_http_processors($self, '/vmas/');
 }
 
