@@ -79,7 +79,8 @@ sub get_http_request_processor {
     my $c = $self->{_http_request_processor_cache} ||= {};
     $c->{$url} ||= do {
 	my $p = $self->{_http_request_processor} ||= [];
-	(grep $url =~ $_->[2], @$p)[0];
+	my $h = (grep $url =~ $_->[2], @$p)[0]
+	    or return undef;
     }
 }
 
@@ -88,11 +89,9 @@ sub process_http_request {
     my ($method, $url, $headers) = @_;
     my $processor = $self->get_http_request_processor($url);
     if ($processor) {
-	$processor->process_http_request($self, $method, $url, $headers);
+	$processor->($self, $method, $url, $headers);
     }
     else {
-	use Data::Dumper;
-	my $text = Dumper \@_;
 	$self->send_http_error(HTTP_NOT_FOUND);
     }
 }
