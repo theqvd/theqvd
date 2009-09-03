@@ -4,12 +4,12 @@ use strict;
 use warnings;
 
 use parent 'Exporter';
-our @EXPORT_OK = qw(header_loopup);
+our @EXPORT_OK = qw(header_lookup header_eq_check);
 
 my %re;
 
 sub header_lookup {
-    my ($key, $headers) = @_;
+    my ($headers, $key) = @_;
     my $matcher = $re{$key} ||= do {
 	my $m = '^' . quotemeta($key) . '\\s*:\\s*(.*)$';
 	qr/$m/;
@@ -19,5 +19,10 @@ sub header_lookup {
 	: (map $_ =~ $matcher, @$headers)[0];
 }
 
+sub header_eq_check {
+    my ($headers, $key, $value) = @_;
+    my $found = header_lookup($headers, $key);
+    defined $found and $found eq $value;
+}
 
 1;
