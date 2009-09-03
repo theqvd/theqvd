@@ -10,10 +10,10 @@ use parent 'QVD::HTTPD';
 require QVD::Frontend::Plugin::L7R;
 require QVD::Frontend::Plugin::VMAS;
 
-sub postconfigure_hook {
+sub post_configure_hook {
     my $self = shift;
-    QVD::Frontend::Plugin::L7R->set_http_processors($self, '/qvd/');
-    QVD::Frontend::Plugin::VMAS->set_http_processors($self, '/vmas/');
+    QVD::Frontend::Plugin::L7R->set_http_request_processors($self, '/qvd/');
+    QVD::Frontend::Plugin::VMAS->set_http_request_processors($self, '/vmas/');
 }
 
 
