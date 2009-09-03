@@ -274,6 +274,7 @@ my %msg;
 my @status_codes;
 
 for (split "\n\n", $codes) {
+    s/(?:\r?\n)*$/\n/;
     if (my ($code, $msg) = /^(\d+)\s+(.*?)\s*(?:\(.*)?(?:$)/m) {
 	my $name = uc "HTTP_$msg";
 	$name =~ tr/- /__/;
