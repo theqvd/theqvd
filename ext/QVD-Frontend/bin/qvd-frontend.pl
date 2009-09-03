@@ -5,5 +5,5 @@ use warnings;
 
 use QVD::Frontend;
 
-my $fe = QVD::Frontend->new;
+my $fe = QVD::Frontend->new(port => 8080);
 $fe->run();
