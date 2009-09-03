@@ -9,6 +9,7 @@ use URI::Split qw(uri_split);
 use QVD::L7R::Forwarder;
 use QVD::VMAS::Client;
 use QVD::HTTP::StatusCodes qw(:status_codes);
+use QVD::HTTP::Headers qw(header_eq_check);
 use QVD::URI qw(uri_query_split);
 
 sub set_http_request_processors {
@@ -20,12 +21,8 @@ sub set_http_request_processors {
 sub _connect_to_vm_processor {
     my ($server, $method, $url, $headers) = @_;
 
-    my $header_connection = header_loopup('Connection', $headers);
-    my $header_upgrade = header_loopup('Upgrade', $headers);
-
-    # ensure that the client wants to upgrade the connection
-    unless ($header_connection eq 'Upgrade' and
-	    $header_upgrade eq 'QVD/1.0') {
+    unless (header_eq_check($headers, Connection => 'Upgrade') and
+	    header_eq_check($headers, Upgrade => 'QVD/1.0')) {
 	$server->send_http_error(HTTP_UPGRADE_REQUIRED);
 	return;
     }
