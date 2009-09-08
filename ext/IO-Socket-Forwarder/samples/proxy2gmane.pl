@@ -4,7 +4,7 @@ use strict;
 use warnings;
 
 use IO::Socket::INET;
-use Net::Forwarder;
+use IO::Socket::Forwarder qw(forward_sockets);
 
 my $port = $ARGV[0] || 3333;
 
@@ -16,9 +16,7 @@ my $listener = IO::Socket::INET->new(LocalPort => $port,
 while (1) {
     my $local = $listener->accept();
     my $yahoo = IO::Socket::INET->new('news.gmane.org:nntp');
-
-    my $fwd = Net::Forwarder->new($local, $yahoo);
-    $fwd->run;
+    forward_sockets($local, $yahoo);
 }
 
 

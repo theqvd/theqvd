@@ -167,12 +167,44 @@ IO::Socket::Forwarder - bidirectionally forward data between two sockets
 
   use IO::Socket::Forwarder qw(foward_sockets);
 
-  forward_sockets($sock1, $sock2, %opts);
+  forward_sockets($sock1, $sock2);
+
+  forward_sockets($sock3, $sock4, debug => 1);
 
 
 =head1 DESCRIPTION
 
-This module can forward data between two sockets bidirectionally.
+This module allows to forward data between two sockets bidirectionally.
+
+=head2 FUNCTIONS
+
+=over 4
+
+=item forward_sockets($sock1, $sock2, %opts)
+
+Reads and writes data from both sockets simultaneously forwarding it.
+
+On return both sockets will be closed.
+
+The following options are accepted:
+
+=over 4
+
+=item debug => 1
+
+turn on debugging. I
+
+=item io_chunk_size => $size
+
+maximun number of bytes allowed in IO operations
+
+=item io_buffer_size => $size
+
+size of the buffers used internally to transfer data between both sockets
+
+=back
+
+=back
 
 =head1 BUGS AND SUPPORT
 
