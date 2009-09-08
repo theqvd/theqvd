@@ -1,55 +1,158 @@
-package Net::Forwarder;
-
-use warnings;
-use strict;
+package IO::Socket::Forwarder;
 
 our $VERSION = '0.01';
 
-use constant default_buffer_size => 64 * 1024;
+use warnings;
+use strict;
+use Carp;
+
+use Fcntl qw(F_GETFL F_SETFL O_NONBLOCK);
+
+require Exporter;
+our @ISA = qw(Exporter);
+our @EXPORT_OK = qw(forward_sockets);
+
+use constant default_io_buffer_size => 64 * 1024;
 use constant default_io_chunk_size => 16 * 1024;
 
-sub new {
-    my ($class, $s1, $s2, %opts) = @_;
+sub forward_sockets {
 
-    my $self = { s1 => $s1,
-		 s2 => $s2,
-		 opts => \%opts };
-    bless $self, $class;
-    $self;
-}
+    my ($s1, $s2, %opts) = @_;
 
-sub run {
-    my $self = shift;
-    my $s1 = $self->{s1};
-    my $s2 = $self->{s2};
+    my $debug = delete $opts{debug};
+    my $io_buffer_size = delete $opts{io_buffer_size} || default_io_buffer_size;
+    my $io_chunk_size = delete $opts{io_chunk_size} || default_io_chunk_size;
+
     my $fn1 = fileno $s1;
+    defined $fn1 or croak "socket 1 is not a valid file handle";
     my $fn2 = fileno $s2;
+    defined $fn1 or croak "socket 2 is not a valid file handle";
+
     my $b1to2 = '';
     my $b2to1 = '';
-    my $buffer_size = $self->{buffer_size} || default_buffer_size;
-    my $io_chunk_size = $self->{io_chunk_size} || default_io_chunk_size;
+
+    my $s1_in_closed;
+    my $s1_out_closed;
+    my $s2_in_closed;
+    my $s2_out_closed;
+
+    fcntl($s1, F_SETFL, fcntl($s1, F_GETFL, 0) | O_NONBLOCK)
+	or croak "unable to make socket 1 non-blocking";
+    fcntl($s2, F_SETFL, fcntl($s2, F_GETFL, 0) | O_NONBLOCK)
+	or croak "unable to make socket 2 non-blocking";
 
     while (1) {
-	my $wtr1 = length $b1to2 < $buffer_size;
-	my $wtr2 = length $b2to1 < $buffer_size;
-	my $wtw1 = length $b2to1;
-	my $wrw2 = length $b1to2;
+	my $wtr1 = (not $s1_in_closed and length $b1to2 < $io_buffer_size);
+	my $wtr2 = (not $s2_in_closed and length $b2to1 < $io_buffer_size);
+	my $wtw1 = (not $s1_out_closed and length $b2to1);
+	my $wtw2 = (not $s2_out_closed and length $b1to2);
+
+	$debug and warn "wtr1: $wtr1, wtr2: $wtr2, wtw1: $wtw1, wtw2: $wtw2\n";
+
+	$wtr1 or $wtr2 or $wtw1 or $wtw2 or last;
 
 	my $bitsr = '';
 	vec($bitsr, $fn1, 1) = 1 if $wtr1;
 	vec($bitsr, $fn2, 1) = 1 if $wtr2;
 	my $bitsw = '';
-	vec($bitsw, $fn1, 1) = 1 if $wrw1;
+	vec($bitsw, $fn1, 1) = 1 if $wtw1;
 	vec($bitsw, $fn2, 1) = 1 if $wtw2;
 
+	$debug and warn "calling select...\n";
+
 	my $n = select($bitsr, $bitsw, undef, undef);
+
+	$debug and warn "select done, n: $n\n";
+
 	if ($n > 0) {
-	    if (vec($bitsr, $fn1, 1)) {
-		sysread($s1, $b1to2, $io_chunk_size, length $b1to2);
-		# working here!!!
+	    if ($wtr1 and vec($bitsr, $fn1, 1)) {
+		$debug and warn "reading from s1...\n";
+		my $bytes = sysread($s1, $b1to2, $io_chunk_size, length $b1to2);
+		$debug and warn "bytes: $bytes\n";
+		if ($bytes) {
+		    $debug and warn "s1 read:\n" . substr($b1to2, -$bytes) . "*\n";
+		}
+		else {
+		    $debug and warn "shutting down s1-in\n";
+		    shutdown($s1, 0);
+		    $s1_in_closed = 1;
+		    unless ($s2_out_closed or length $b1to2) {
+			$debug and warn "shutting down s2-out\n";
+			shutdown($s2, 1);
+			$s2_out_closed = 1;
+		    }
+		}
+	    }
+	    if ($wtr2 and vec($bitsr, $fn2, 1)) {
+		$debug and warn "reading from s2...\n";
+		my $bytes = sysread($s2, $b2to1, $io_chunk_size, length $b2to1);
+		$debug and warn "bytes: $bytes\n";
+		if ($bytes) {
+		    $debug and warn "s2 read:\n" . substr($b2to1, -$bytes) . "*\n";
+		}
+		else {
+		    $debug and warn "shutting down s2-in\n";
+		    shutdown($s2, 0);
+		    $s2_in_closed = 1;
+		    unless ($s1_out_closed or length $b2to1) {
+			$debug and warn "shutting down s1-out\n";
+			shutdown($s1, 1);
+			$s1_out_closed = 1;
+		    }
+		}
+	    }
+	    if ($wtw1 and vec $bitsw, $fn1, 1) {
+		$debug and warn "writting to s1...\n";
+		my $bytes = syswrite($s1, $b2to1, $io_chunk_size);
+		$debug and warn "bytes: $bytes\n";
+		if ($bytes) {
+		    $debug and warn "s1 wrote...\n" . substr($b2to1, 0, $bytes) . "*\n";
+		    substr($b2to1, 0, $bytes, "");
+		    if ($s2_in_closed and !length $b2to1) {
+			$debug and warn "buffer exhausted and s2-in is closed, shutting down s1-out\n";
+			shutdown($s1, 1);
+			$s1_out_closed = 1;
+		    }
+		}
+		else {
+		    $debug and warn "shutting down s1-out\n";
+		    shutdown($s1, 1);
+		    $s1_out_closed = 1;
+		    unless ($s2_in_closed) {
+			$debug and warn "shutting down s2-in\n";
+			shutdown($s2, 0);
+			$s2_in_closed = 1;
+		    }
+		}
+	    }
+	    if ($wtw2 and vec $bitsw, $fn2, 1) {
+		$debug and warn "writting to s2...\n";
+		my $bytes = syswrite($s2, $b1to2, $io_chunk_size);
+		$debug and warn "bytes: $bytes\n";
+		if ($bytes) {
+		    $debug and warn "s2 wrote...\n" . substr($b1to2, 0, $bytes) . "*\n";
+		    substr($b1to2, 0, $bytes, "");
+		    if ($s1_in_closed and length $b1to2) {
+			$debug and warn "buffer exhausted and s2-in is closed, shutting down s1-out\n";
+			shutdown($s2, 1);
+			$s2_out_closed = 1;
+		    }
+		}
+		else {
+		    $debug and warn "shutting down s2-in\n";
+		    shutdown($s2, 1);
+		    $s2_out_closed = 1;
+		    unless ($s1_in_closed) {
+			$debug and warn "shutting down s1-out\n";
+			shutdown($s1, 0);
+			$s1_in_closed = 1;
+		    }
+		}
 	    }
 	}
-
+    }
+    shutdown($s1, 2);
+    shutdown($s2, 2);
 }
 
 1;
@@ -58,14 +161,14 @@ __END__
 
 =head1 NAME
 
-Net::Forwarder - bidirectionally forward data between two sockets
+IO::Socket::Forwarder - bidirectionally forward data between two sockets
 
 =head1 SYNOPSIS
 
-  use Net::Forwarder;
+  use IO::Socket::Forwarder qw(foward_sockets);
 
-  my $fwd = Net::Forwarder->new($sock1, $sock2, %opts);
-  $fwd->run();
+  forward_sockets($sock1, $sock2, %opts);
+
 
 =head1 DESCRIPTION
 
@@ -74,8 +177,9 @@ This module can forward data between two sockets bidirectionally.
 =head1 BUGS AND SUPPORT
 
 Please report any bugs or feature requests through the web interface
-at L<http://rt.cpan.org/NoAuth/ReportBug.html?Queue=Net-Forwarder> or
-just send my an email with the details.
+at
+L<http://rt.cpan.org/NoAuth/ReportBug.html?Queue=IO-Socket-Forwarder>
+or just send my an email with the details.
 
 =head1 AUTHOR
 
