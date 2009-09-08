@@ -21,8 +21,10 @@ sub connect_to_vm {
 
 	$http->add_req_header ("Upgrade", $protocol);
 
-	my $req = $http->request($host)
+ 	my $req = $http->request($host)
 	or die "Unable to get host: $!";
+
+	print $host."\n";
 
 	if ($http->status() == 101) {
 		print "OK";
@@ -33,6 +35,6 @@ sub connect_to_vm {
 
 }
 
-connect_to_vm("http://127.0.0.1/");
+connect_to_vm("http://127.0.0.1:8080/");
 
 
