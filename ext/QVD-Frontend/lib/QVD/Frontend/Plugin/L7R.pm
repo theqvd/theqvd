@@ -6,7 +6,8 @@ use warnings;
 use IO::Socket::INET;
 use URI::Split qw(uri_split);
 
-use QVD::L7R::Forwarder;
+# use QVD::L7R::Forwarder;
+use IO::Socket::Forwarder qw(forward_sockets);
 use QVD::VMAS::Client;
 use QVD::HTTP::StatusCodes qw(:status_codes);
 use QVD::HTTP::Headers qw(header_eq_check);
@@ -60,8 +61,7 @@ sub _connect_to_vm_processor {
     $server->send_http_response(HTTP_SWITCHING_PROTOCOLS,
 				'X-QVD-VM-Status: Connected to VM');
 
-    my $forwarder = QVD::L7R::Forwarder->new($socket);
-    $forwarder->run();
+    forward_sockets(\*STDIN, $socket);
 }
 
 1;
