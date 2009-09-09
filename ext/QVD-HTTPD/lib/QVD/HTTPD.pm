@@ -23,7 +23,7 @@ my $token_re = qr/[!#\$%&'*+\-\.0-9a-zA-Z]+/;
 sub process_request {
     my $self = shift;
     while (<>) {
-	s/\r?\n$//;
+	s/\r?\n$//; # HTTP chomp
 	next if /^\s*$/;
 	if (my ($method, $url, $version) = m|^(\w+)\s+(.*?)\s*((?:\bHTTP/\d+\.\d+)?)$|) {
 	    if ($version ne 'HTTP/1.1') {
@@ -128,6 +128,24 @@ sub send_http_error {
     $code ||= HTTP_INTERNAL_SERVER_ERROR;
     my $text = http_status_description($code);
     $self->send_http_response_with_body($code, 'text/plain', $text);
+}
+
+sub json {
+    my $self = shift;
+    $self->{_json} ||= do {
+	require JSON;
+	JSON->new->ascii->pretty;
+    }
+}
+
+sub send_http_response_json {
+    my $self = shift;
+    my $code = shift;
+    my @headers =  (@_ > 1 ? @{shift()} : ());
+    my $data = shift;
+    $self->send_http_response_with_body($code, 'application/json',
+					\@headers,
+					$self->json->encode($data));
 }
 
 1;
