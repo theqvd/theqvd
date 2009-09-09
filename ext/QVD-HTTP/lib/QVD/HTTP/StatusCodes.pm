@@ -270,7 +270,6 @@ my $codes = <<'EOC';
 652 Bad response
     The response contains bad syntax
 
-
 EOC
 
 use Scalar::Util qw(dualvar);
