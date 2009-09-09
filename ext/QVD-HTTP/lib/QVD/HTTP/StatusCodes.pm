@@ -264,6 +264,13 @@ my $codes = <<'EOC';
     Further extensions to the request are required for the server to
     fulfil it.
 
+651 HTTP Version Not Supported By Client
+    The client does not the HTTP protocol version used in the response
+
+652 Bad response
+    The response contains bad syntax
+
+
 EOC
 
 use Scalar::Util qw(dualvar);
