@@ -15,11 +15,13 @@ sub header_lookup {
 	    my $m = '^' . quotemeta($key) . '\\s*:\\s*(.*)$';
 	    qr/$m/;
 	};
-	wantarray
+	return wantarray
 	    ? (map $_ =~ $matcher, @$headers)
 	    : (map $_ =~ $matcher, @$headers)[0];
     }
-    return ();
+    else {
+	return ();
+    }
 }
 
 sub header_eq_check {
