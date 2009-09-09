@@ -6,7 +6,6 @@ use warnings;
 use IO::Socket::INET;
 use URI::Split qw(uri_split);
 
-# use QVD::L7R::Forwarder;
 use IO::Socket::Forwarder qw(forward_sockets);
 use QVD::VMAS::Client;
 use QVD::HTTP::StatusCodes qw(:status_codes);
