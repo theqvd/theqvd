@@ -10,13 +10,16 @@ my %re;
 
 sub header_lookup {
     my ($headers, $key) = @_;
-    my $matcher = $re{$key} ||= do {
-	my $m = '^' . quotemeta($key) . '\\s*:\\s*(.*)$';
-	qr/$m/;
-    };
-    wantarray
-	? (map $_ =~ $matcher, @$headers)
-	: (map $_ =~ $matcher, @$headers)[0];
+    if ($headers) {
+	my $matcher = $re{$key} ||= do {
+	    my $m = '^' . quotemeta($key) . '\\s*:\\s*(.*)$';
+	    qr/$m/;
+	};
+	wantarray
+	    ? (map $_ =~ $matcher, @$headers)
+	    : (map $_ =~ $matcher, @$headers)[0];
+    }
+    return ();
 }
 
 sub header_eq_check {
