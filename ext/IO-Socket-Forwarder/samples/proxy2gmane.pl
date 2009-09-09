@@ -15,8 +15,8 @@ my $listener = IO::Socket::INET->new(LocalPort => $port,
 
 while (1) {
     my $local = $listener->accept();
-    my $yahoo = IO::Socket::INET->new('news.gmane.org:nntp');
-    forward_sockets($local, $yahoo);
+    my $nntp = IO::Socket::INET->new('news.gmane.org:nntp');
+    forward_sockets($local, $nntp);
 }
 
 
