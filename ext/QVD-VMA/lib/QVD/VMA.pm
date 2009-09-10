@@ -5,7 +5,40 @@ our $VERSION = '0.01';
 use warnings;
 use strict;
 
+use Proc::ProcessTable;
 
+use parent QVD::HTTPD;
+
+sub _start_vm_listener {
+    my $self = shift;
+    my $pt = Proc::ProcessTable->new;
+    my $nxagent_pid;
+    for my $process (@{$t->table}) {
+	my $cmd = $process->cmdline;
+	if ($cmd =~ /\bnxagent\b/) {
+	    $nxagent_pid = $process->pid;
+	}
+    }
+
+    die "nxagent seems to be already running, pid: $nxagent_pid"
+	if defined $nxagent_pid;
+
+    my $pid = fork;
+    if (!$pid) {
+	defined $pid or die "fork failed";
+	exec "xinit -- /usr/bin/nxagent :1000 -display nx/nx,link=modem:1000 -ac";
+	exec "/bin/false";
+	require POSIX;
+	POSIX::_exit(-1);
+    }
+}
+
+
+sub post_configure_hook {
+    my $self = shift;
+    $self->set_http_request_processor('/vma/start_vm_listener',
+				      \&_start_vm_listener);
+}
 
 1;
 
