@@ -222,7 +222,7 @@ my $codes = <<'EOC';
     Collections Protocol" (RFC 3648 ).
 
 426 Upgrade Required (RFC 2817 )
-    The client should switch to TLS/1.0.
+    The client should switch to some specific protocol.
 
 449 Retry With
 
