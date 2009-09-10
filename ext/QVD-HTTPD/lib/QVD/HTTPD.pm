@@ -140,10 +140,10 @@ sub json {
 
 sub send_http_response_json {
     my $self = shift;
-    my $code = shift;
     my @headers =  (@_ > 1 ? @{shift()} : ());
     my $data = shift;
-    $self->send_http_response_with_body($code, 'application/json',
+    $self->send_http_response_with_body(HTTP_OK,
+					'application/json',
 					\@headers,
 					$self->json->encode($data));
 }
