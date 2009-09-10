@@ -2,7 +2,7 @@ package QVD::HTTPC;
 
 our $VERSION = '0.01';
 
-use 5.10;
+use 5.010;
 
 use warnings;
 use strict;
@@ -10,8 +10,10 @@ use Carp;
 
 use IO::Socket::INET;
 use URI::Escape qw(uri_escape);
-use QVD::HTTP::StatusCodes qw(:status_codes);
 use Errno qw(EINTR);
+
+use QVD::HTTP::StatusCodes qw(:status_codes);
+use QVD::HTTP::Headers qw(header_lookup);
 
 my $CRLF = "\r\n";
 
@@ -20,8 +22,9 @@ sub new {
     my $socket = IO::Socket::INET->new($target)
 	or die "Unable to connect to $target";
     my $self = { target => $target,
-		 socket => $socket }
-    bless $self, $class
+		 socket => $socket };
+    bless $self, $class;
+    $self;
 }
 
 sub _print {
@@ -113,6 +116,7 @@ sub read_response_head {
 
 sub _atomic_read {
     my ($fh, $length) = @_[0,2];
+    $_[1] //= '';
     while ($length) {
 	my $bytes = read($fh, $_[1], $length, length $_[1]);
 	if ($bytes) {
@@ -128,7 +132,7 @@ sub _atomic_read {
 sub read_http_response {
     my $self = shift;
     my ($code, $msg, $headers) = $self->read_response_head();
-    my $content_length = header_loopup($headers, 'Content-Length');
+    my $content_length = header_lookup($headers, 'Content-Length');
     my $body;
     if ($content_length) {
 	_atomic_read($self->{socket}, $body, $content_length);
