@@ -31,6 +31,8 @@ sub _start_vm_listener {
 	require POSIX;
 	POSIX::_exit(-1);
     }
+    $self->send_http_response_json({host => 'localhost', port => 5000});
+    return ('localhost', 5000);
 }
 
 
