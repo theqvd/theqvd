@@ -1,7 +1,13 @@
 package JSON::SimpleRPC;
 
+our $VERSION = '0.01';
+
 use warnings;
 use strict;
+
+1;
+
+__END__
 
 =head1 NAME
 
@@ -13,7 +19,7 @@ Version 0.01
 
 =cut
 
-our $VERSION = '0.01';
+
 
 
 =head1 SYNOPSIS
@@ -50,7 +56,7 @@ sub function2 {
 
 =head1 AUTHOR
 
-Salvador Fandiño, C<< <sfandino at yahoo.com> >>
+Salvador FandiE<ntilde>o (sfandino at yahoo.com).
 
 =head1 BUGS
 
@@ -59,49 +65,9 @@ the web interface at L<http://rt.cpan.org/NoAuth/ReportBug.html?Queue=JSON-Simpl
 automatically be notified of progress on your bug as I make changes.
 
 
-
-
-=head1 SUPPORT
-
-You can find documentation for this module with the perldoc command.
-
-    perldoc JSON::SimpleRPC
-
-
-You can also look for information at:
-
-=over 4
-
-=item * RT: CPAN's request tracker
-
-L<http://rt.cpan.org/NoAuth/Bugs.html?Dist=JSON-SimpleRPC>
-
-=item * AnnoCPAN: Annotated CPAN documentation
-
-L<http://annocpan.org/dist/JSON-SimpleRPC>
-
-=item * CPAN Ratings
-
-L<http://cpanratings.perl.org/d/JSON-SimpleRPC>
-
-=item * Search CPAN
-
-L<http://search.cpan.org/dist/JSON-SimpleRPC>
-
-=back
-
-
-=head1 ACKNOWLEDGEMENTS
-
-
 =head1 COPYRIGHT & LICENSE
 
-Copyright 2009 Salvador Fandiño, all rights reserved.
+Copyright C<copy> 2009 Qindel Formacion y Servicios S.L., all rights reserved.
 
 This program is free software; you can redistribute it and/or modify it
 under the same terms as Perl itself.
-
-
-=cut
-
-1; # End of JSON::SimpleRPC

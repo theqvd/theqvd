@@ -20,16 +20,12 @@ Quick summary of what the module does.
 
 Perhaps a little code snippet.
 
-    use QVD::SimpleRPC;
+    use QVD::SimpleRPC::Client;
 
-    my $foo = QVD::SimpleRPC->new();
-    ...
+    use QVD::SimpleRPC::Server;
+
 
 =head1 DESCRIPTION
-
-=head2 FUNCTIONS
-
-
 
 =head1 AUTHOR
 
