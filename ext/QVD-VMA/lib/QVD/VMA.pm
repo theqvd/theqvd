@@ -7,15 +7,29 @@ use strict;
 
 use Proc::ProcessTable;
 
-use parent QVD::HTTPD;
+use parent 'QVD::HTTPD';
 
-sub _start_vm_listener {
+sub post_configure_hook {
     my $self = shift;
+    my $impl = QVD::VMA::Impl->new();
+    $impl->set_http_request_processors($self, '/vma/*');
+}
+
+package QVD::VMA::Impl;
+
+use parent 'QVD::SimpleRPC::Server';
+
+sub SimpleRPC_start_vm_listener {
+    my $self = shift;
+
+    warn "killing any running nxagent...\n";
+    system "pkill nxagent";
+
     my $pt = Proc::ProcessTable->new;
     my $nxagent_pid;
-    for my $process (@{$t->table}) {
-	my $cmd = $process->cmdline;
-	if ($cmd =~ /\bnxagent\b/) {
+    for my $process (@{$pt->table}) {
+	my $cmnd = $process->cmndline;
+	if ($cmnd =~ /\bnxagent\b/) {
 	    $nxagent_pid = $process->pid;
 	}
     }
@@ -26,20 +40,15 @@ sub _start_vm_listener {
     my $pid = fork;
     if (!$pid) {
 	defined $pid or die "fork failed";
-	exec "xinit -- /usr/bin/nxagent :1000 -display nx/nx,link=modem:1000 -ac";
-	exec "/bin/false";
+	{ exec "xinit lxsession -- /usr/bin/nxagent :1000 -display nx/nx,link=lan:1000 -ac" };
+	{ exec "/bin/false" };
 	require POSIX;
 	POSIX::_exit(-1);
     }
-    $self->send_http_response_json({host => 'localhost', port => 5000});
+    # sleep 3;
+    {host => 'localhost', port => 5000};
 }
 
-
-sub post_configure_hook {
-    my $self = shift;
-    $self->set_http_request_processor('/vma/start_vm_listener',
-				      \&_start_vm_listener);
-}
 
 1;
 

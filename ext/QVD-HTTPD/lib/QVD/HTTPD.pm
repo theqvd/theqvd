@@ -134,7 +134,7 @@ sub json {
     my $self = shift;
     $self->{_json} ||= do {
 	require JSON;
-	JSON->new->ascii->pretty;
+	JSON->new->ascii->pretty->allow_nonref;
     }
 }
 
