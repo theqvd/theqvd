@@ -2,6 +2,7 @@ package QVD::URI;
 
 use warnings;
 use strict;
+use Carp;
 
 our $VERSION = '0.01';
 
@@ -17,7 +18,10 @@ sub uri_unescape_plus {
 }
 
 sub uri_query_split {
-    map uri_unescape_plus($_), map /^(.*?)(?:=(.*))?$/, split /\&/, shift
+    my $query = shift;
+    ( defined $query
+      ? map uri_unescape_plus($_), map /^(.*?)(?:=(.*))?$/, split /\&/, $query
+      : () )
 }
 
 1;
