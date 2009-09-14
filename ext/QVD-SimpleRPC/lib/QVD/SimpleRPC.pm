@@ -3,18 +3,16 @@ package QVD::SimpleRPC;
 use warnings;
 use strict;
 
+our $VERSION = '0.01';
+
+
+1;
+
+__END__
+
 =head1 NAME
 
 QVD::SimpleRPC - The great new QVD::SimpleRPC!
-
-=head1 VERSION
-
-Version 0.01
-
-=cut
-
-our $VERSION = '0.01';
-
 
 =head1 SYNOPSIS
 
@@ -27,30 +25,15 @@ Perhaps a little code snippet.
     my $foo = QVD::SimpleRPC->new();
     ...
 
-=head1 EXPORT
+=head1 DESCRIPTION
 
-A list of functions that can be exported.  You can delete this section
-if you don't export anything, such as for a purely object-oriented module.
+=head2 FUNCTIONS
 
-=head1 FUNCTIONS
 
-=head2 function1
-
-=cut
-
-sub function1 {
-}
-
-=head2 function2
-
-=cut
-
-sub function2 {
-}
 
 =head1 AUTHOR
 
-Salvador Fandiño, C<< <sfandino at yahoo.com> >>
+Salvador FandiE<ntilde>o, C<< <sfandino at yahoo.com> >>
 
 =head1 BUGS
 
@@ -58,50 +41,11 @@ Please report any bugs or feature requests to C<bug-qvd-simplerpc at rt.cpan.org
 the web interface at L<http://rt.cpan.org/NoAuth/ReportBug.html?Queue=QVD-SimpleRPC>.  I will be notified, and then you'll
 automatically be notified of progress on your bug as I make changes.
 
-
-
-
-=head1 SUPPORT
-
-You can find documentation for this module with the perldoc command.
-
-    perldoc QVD::SimpleRPC
-
-
-You can also look for information at:
-
-=over 4
-
-=item * RT: CPAN's request tracker
-
-L<http://rt.cpan.org/NoAuth/Bugs.html?Dist=QVD-SimpleRPC>
-
-=item * AnnoCPAN: Annotated CPAN documentation
-
-L<http://annocpan.org/dist/QVD-SimpleRPC>
-
-=item * CPAN Ratings
-
-L<http://cpanratings.perl.org/d/QVD-SimpleRPC>
-
-=item * Search CPAN
-
-L<http://search.cpan.org/dist/QVD-SimpleRPC>
-
-=back
-
-
-=head1 ACKNOWLEDGEMENTS
-
-
 =head1 COPYRIGHT & LICENSE
 
-Copyright 2009 Salvador Fandiño, all rights reserved.
+Copyright E<copy> 2009 Qindel Formacion y Servicios S.L., all rights
+reserved.
 
 This program is free software; you can redistribute it and/or modify it
 under the same terms as Perl itself.
 
-
-=cut
-
-1; # End of QVD::SimpleRPC
