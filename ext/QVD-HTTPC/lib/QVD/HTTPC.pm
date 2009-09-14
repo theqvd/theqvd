@@ -27,6 +27,8 @@ sub new {
     $self;
 }
 
+sub get_socket { shift->{socket} }
+
 sub _print {
     my $socket = shift->{socket};
     print {$socket} @_
