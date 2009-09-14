@@ -39,28 +39,35 @@ sub _connect_to_vm_processor {
 				'X-QVD-VM-Status: Checking VM');
 
     my $vmas = QVD::VMAS::Client->new;
-    my ($host, $port) = $vmas->start_vm_listener($id)
+    my $r = $vmas->start_vm_listener($id)
 	or do {
 	    $server->send_http_error(HTTP_BAD_GATEWAY);
 	    return;
 	};
 
-    $server->send_http_response(HTTP_PROCESSING,
-				'X-QVD-VM-Status: Connecting to VM',
-				"X-QVD-VM-Info: host=$host, port=$port");
+    for (1..4) {
+	sleep $_;
+	$server->send_http_response(HTTP_PROCESSING,
+				    'X-QVD-VM-Status: Connecting to VM',
+				    "X-QVD-VM-Info: host=$r->{host}, port=$r->{port}");
 
-    my $socket = IO::Socket::INET->new(PeerAddr => $host,
-				       PeerPort => $port,
-				       Proto => 'tcp');
-    unless ($socket) {
-	$server->send_http_error(HTTP_BAD_GATEWAY);
-	return;
+	my $socket = IO::Socket::INET->new(PeerAddr => $r->{host},
+					   PeerPort => $r->{port},
+					   Proto => 'tcp');
+	unless ($socket) {
+	    $server->send_http_response(HTTP_PROCESSING,
+					'X-QVD-VM-Status: Retry connection',
+					"X-QVD-VM-Info: Connection to vm failed");
+
+	    next;
+	}
+
+	$server->send_http_response(HTTP_SWITCHING_PROTOCOLS,
+					'X-QVD-VM-Status: Connected to VM');
+
+	forward_sockets(\*STDIN, $socket);
     }
-
-    $server->send_http_response(HTTP_SWITCHING_PROTOCOLS,
-				'X-QVD-VM-Status: Connected to VM');
-
-    forward_sockets(\*STDIN, $socket);
+    $server->send_http_error(HTTP_BAD_GATEWAY);
 }
 
 1;
