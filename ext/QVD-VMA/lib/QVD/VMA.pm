@@ -34,6 +34,7 @@ sub _is_nxagent_running {
 
 sub _is_nxagent_suspended {
     my $status = `cat /var/run/qvd/state`;
+    chomp($status);
     return $status eq 'suspended';
 }
 
