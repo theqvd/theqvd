@@ -22,33 +22,45 @@ use parent 'QVD::SimpleRPC::Server';
 sub SimpleRPC_start_vm_listener {
     my $self = shift;
 
-    warn "killing any running nxagent...\n";
-    system "pkill nxagent";
+    start_or_resume_session;
 
-    my $pt = Proc::ProcessTable->new;
-    my $nxagent_pid;
-    for my $process (@{$pt->table}) {
-	my $cmnd = $process->cmndline;
-	if ($cmnd =~ /\bnxagent\b/) {
-	    $nxagent_pid = $process->pid;
-	}
-    }
-
-    die "nxagent seems to be already running, pid: $nxagent_pid"
-	if defined $nxagent_pid;
-
-    my $pid = fork;
-    if (!$pid) {
-	defined $pid or die "fork failed";
-	{ exec "xinit lxsession -- /usr/bin/nxagent :1000 -display nx/nx,link=lan:1000 -ac" };
-	{ exec "/bin/false" };
-	require POSIX;
-	POSIX::_exit(-1);
-    }
     # sleep 3;
     {host => 'localhost', port => 5000};
 }
 
+sub get_nxagent_pid {
+    return `cat /var/run/qvd/nxagent-pid`;
+}
+
+sub start_or_resume_session {
+    my $pid = get_nxagent_pid;
+    if (is_nxagent_running) {
+	kill('HUP', $pid);
+	while (! is_nxagent_suspended) {
+	    # FIXME: timeout
+	    sleep 1;
+	}
+    } else {
+	my $pid = fork;
+	if (!$pid) {
+	    defined $pid or die "fork failed";
+	    { exec "xinit gnome-session -- QVD-VMA/bin/nxagent-monitor.pl :1000 -display nx/nx,link=lan:1000 -ac" };
+	    { exec "/bin/false" };
+	    require POSIX;
+	    POSIX::_exit(-1);
+	}
+    }
+}
+
+sub is_nxagent_running {
+    my $pid = get_nxagent_pid;
+    kill 0, $pid;
+}
+
+sub is_nxagent_suspended {
+    my $status = `cat /var/run/qvd/state`;
+    return $status == 'suspended';
+}
 
 1;
 
