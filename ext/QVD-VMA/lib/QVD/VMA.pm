@@ -75,6 +75,10 @@ sub SimpleRPC_start_vm_listener {
     {host => 'localhost', port => 5000};
 }
 
+sub SimpleRPC_status {
+    {status => 'ok'};
+}
+
 1;
 
 __END__
