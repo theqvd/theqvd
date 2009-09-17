@@ -40,10 +40,18 @@ sub _is_nxagent_suspended {
 sub _start_or_resume_session {
     my $pid = _get_nxagent_pid;
     if (_is_nxagent_running) {
-	kill('HUP', $pid);
-	while (! _is_nxagent_suspended) {
-	    # FIXME: timeout
-	    sleep 1;
+	if (_is_nxagent_suspended) {
+	    warn "Waking up suspended nxagent..";
+	    kill('HUP', $pid);
+	} else {
+	    warn "Suspending active nxagent to steal session..";
+	    kill('HUP', $pid);
+	    while (! _is_nxagent_suspended) {
+		# FIXME: timeout
+		sleep 1;
+	    }
+	    warn "Waking up suspended nxagent to steal session..";
+	    kill('HUP', $pid);
 	}
     } else {
 	my $pid = fork;
