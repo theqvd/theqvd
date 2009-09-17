@@ -6,7 +6,7 @@ use Fcntl ':flock';
 
 my $QVD_SESSION_STATUS_FILE = "/var/run/qvd/state";
 my $QVD_SESSION_PID_FILE = "/var/run/qvd/nxagent-pid";
-my $APPEND = 1;
+my $APPEND = 0;
 my $PASSTHROUGH = 0;
 my $NXAGENT = "nxagent";
 my @NXAGENT_OPTS = @ARGV;
