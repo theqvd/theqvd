@@ -19,24 +19,29 @@ package QVD::VMA::Impl;
 
 use parent 'QVD::SimpleRPC::Server';
 
-sub SimpleRPC_start_vm_listener {
-    my $self = shift;
-
-    start_or_resume_session;
-
-    # sleep 3;
-    {host => 'localhost', port => 5000};
-}
-
-sub get_nxagent_pid {
+sub _get_nxagent_pid {
     return `cat /var/run/qvd/nxagent-pid`;
 }
 
-sub start_or_resume_session {
-    my $pid = get_nxagent_pid;
-    if (is_nxagent_running) {
+sub _is_nxagent_running {
+    my $pid = _get_nxagent_pid;
+    if ($pid) {
+	return kill 0, $pid;
+    } else {
+	return 0;
+    }
+}
+
+sub _is_nxagent_suspended {
+    my $status = `cat /var/run/qvd/state`;
+    return $status eq 'suspended';
+}
+
+sub _start_or_resume_session {
+    my $pid = _get_nxagent_pid;
+    if (_is_nxagent_running) {
 	kill('HUP', $pid);
-	while (! is_nxagent_suspended) {
+	while (! _is_nxagent_suspended) {
 	    # FIXME: timeout
 	    sleep 1;
 	}
@@ -44,7 +49,7 @@ sub start_or_resume_session {
 	my $pid = fork;
 	if (!$pid) {
 	    defined $pid or die "fork failed";
-	    { exec "xinit gnome-session -- QVD-VMA/bin/nxagent-monitor.pl :1000 -display nx/nx,link=lan:1000 -ac" };
+	    { exec "xinit gnome-session -- /home/qvd/QVD/ext/QVD-VMA/bin/nxagent-monitor.pl :1000 -display nx/nx,link=lan:1000 -ac" };
 	    { exec "/bin/false" };
 	    require POSIX;
 	    POSIX::_exit(-1);
@@ -52,14 +57,13 @@ sub start_or_resume_session {
     }
 }
 
-sub is_nxagent_running {
-    my $pid = get_nxagent_pid;
-    kill 0, $pid;
-}
+sub SimpleRPC_start_vm_listener {
+    my $self = shift;
 
-sub is_nxagent_suspended {
-    my $status = `cat /var/run/qvd/state`;
-    return $status == 'suspended';
+    _start_or_resume_session;
+
+    # sleep 3;
+    {host => 'localhost', port => 5000};
 }
 
 1;
