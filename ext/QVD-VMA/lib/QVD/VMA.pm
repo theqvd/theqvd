@@ -1,19 +1,18 @@
 =head1 NAME
 
-QVD::VMA - The great new QVD::VMA!
+QVD::VMA - The QVD Virtual Machine Agent
 
 =head1 SYNOPSIS
 
-Quick summary of what the module does.
-
-Perhaps a little code snippet.
-
     use QVD::VMA;
 
-    my $foo = QVD::VMA->new();
-    ...
+    my $vma = QVD::VMA->new(port => 3030);
+    $vma->run();
 
 =head1 DESCRIPTION
+
+The VMA runs on virtual machines and implements an RPC interface to control
+them. 
 
 =head2 FUNCTIONS
 
@@ -48,6 +47,7 @@ Returns the last recorded pid of nxagent.
 =cut
 
 sub _get_nxagent_pid {
+    my $self = shift;
     return `cat /var/run/qvd/nxagent-pid`;
 }
 
@@ -85,6 +85,7 @@ I<last_status> is the previous recorded status (likely terminated or aborted).
 =cut
 
 sub _get_nxagent_status {
+    my $self = shift;
     my $status = `cat /var/run/qvd/state`;
     chomp($status);
     return $status;
@@ -97,7 +98,8 @@ Checks if nxagent is running by getting its pid and checking if it exists.
 =cut
 
 sub _is_nxagent_running {
-    my $pid = _get_nxagent_pid;
+    my $self = shift;
+    my $pid = $self->_get_nxagent_pid;
     if ($pid) {
 	# FIXME Who says that no other process can take the pid?
 	return kill 0, $pid;
@@ -113,7 +115,8 @@ Checks if nxagent is in suspended state.
 =cut
 
 sub _is_nxagent_suspended {
-    my $status = _get_nxagent_status;
+    my $self = shift;
+    my $status = $self->_get_nxagent_status;
     return $status eq 'suspended';
 }
 
@@ -125,7 +128,8 @@ started or resumed.
 =cut
 
 sub _is_nxagent_started {
-    my $status = _get_nxagent_status;
+    my $self = shift;
+    my $status = $self->_get_nxagent_status;
     return $status eq 'started' || $status eq 'resumed';
 }
 
@@ -137,15 +141,16 @@ automatically attempted.
 =cut
 
 sub _start_or_resume_session {
-    my $pid = _get_nxagent_pid;
-    if (_is_nxagent_running) {
-	if (_is_nxagent_suspended) {
+    my $self = shift;
+    my $pid = $self->_get_nxagent_pid;
+    if ($self->_is_nxagent_running) {
+	if ($self->_is_nxagent_suspended) {
 	    warn "Waking up suspended nxagent..";
 	    kill('HUP', $pid);
-	} elsif (_is_nxagent_started) {
+	} elsif ($self->_is_nxagent_started) {
 	    warn "Suspending active nxagent to steal session..";
 	    kill('HUP', $pid);
-	    while (! _is_nxagent_suspended) {
+	    while (! $self->_is_nxagent_suspended) {
 		# FIXME: timeout
 		sleep 1;
 	    }
@@ -186,6 +191,7 @@ Returns 1 if the shutdown was started succesfully, 0 in other case.
 =cut
 
 sub _shutdown {
+    my $self = shift;
     my $type = shift;
     my $minutes = shift;
     my $pid = fork;
@@ -210,7 +216,7 @@ Returns a hash with host and port to connect to.
 sub SimpleRPC_start_vm_listener {
     my $self = shift;
 
-    _start_or_resume_session;
+    $self->_start_or_resume_session;
 
     # sleep 3;
     {host => 'localhost', port => 5000};
@@ -239,8 +245,9 @@ C<undef> if scheduling power off failed.
 =cut
 
 sub SimpleRPC_poweroff {
+    my $self = shift;
     my $mins = 1;
-    if (_shutdown('P', $mins)) {
+    if ($self->_shutdown('P', $mins)) {
 	{'poweroff' => $mins};
     } else {
 	{'poweroff' => undef};
