@@ -23,6 +23,12 @@ sub _get_nxagent_pid {
     return `cat /var/run/qvd/nxagent-pid`;
 }
 
+sub _get_nxagent_status {
+    my $status = `cat /var/run/qvd/state`;
+    chomp($status);
+    return $status;
+}
+
 sub _is_nxagent_running {
     my $pid = _get_nxagent_pid;
     if ($pid) {
@@ -33,9 +39,13 @@ sub _is_nxagent_running {
 }
 
 sub _is_nxagent_suspended {
-    my $status = `cat /var/run/qvd/state`;
-    chomp($status);
+    my $status = _get_nxagent_status;
     return $status eq 'suspended';
+}
+
+sub _is_nxagent_started {
+    my $status = _get_nxagent_status;
+    return $status eq 'started' || $status eq 'resumed';
 }
 
 sub _start_or_resume_session {
@@ -44,7 +54,7 @@ sub _start_or_resume_session {
 	if (_is_nxagent_suspended) {
 	    warn "Waking up suspended nxagent..";
 	    kill('HUP', $pid);
-	} else {
+	} elsif (_is_nxagent_started) {
 	    warn "Suspending active nxagent to steal session..";
 	    kill('HUP', $pid);
 	    while (! _is_nxagent_suspended) {
@@ -53,6 +63,9 @@ sub _start_or_resume_session {
 	    }
 	    warn "Waking up suspended nxagent to steal session..";
 	    kill('HUP', $pid);
+	} else {
+	    # FIXME: Need to process the *ing-states+aborted+exited
+	    die "Nxagent is running but not started nor suspended!";
 	}
     } else {
 	my $pid = fork;
