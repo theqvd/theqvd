@@ -66,6 +66,20 @@ sub _start_or_resume_session {
     }
 }
 
+sub _shutdown {
+    my $type = shift;
+    my $minutes = shift;
+    my $pid = fork;
+    if (!$pid) {
+	defined $pid or die "Shutdown: fork failed: $!";
+	{ exec "shutdown -$type +$minutes" };
+	die "Shutdown: exec failed: $!";
+    }
+    # Wait 2 seconds and check the presence of pid file
+    sleep 2;
+    return -e "/var/run/shutdown.pid";
+}
+
 sub SimpleRPC_start_vm_listener {
     my $self = shift;
 
@@ -77,6 +91,15 @@ sub SimpleRPC_start_vm_listener {
 
 sub SimpleRPC_status {
     {status => 'ok'};
+}
+
+sub SimpleRPC_poweroff {
+    my $mins = 1;
+    if (_shutdown('P', $mins)) {
+	{'poweroff' => $mins};
+    } else {
+	{'poweroff' => undef};
+    }
 }
 
 1;
