@@ -1,3 +1,25 @@
+=head1 NAME
+
+QVD::VMA - The great new QVD::VMA!
+
+=head1 SYNOPSIS
+
+Quick summary of what the module does.
+
+Perhaps a little code snippet.
+
+    use QVD::VMA;
+
+    my $foo = QVD::VMA->new();
+    ...
+
+=head1 DESCRIPTION
+
+=head2 FUNCTIONS
+
+=over
+=cut
+
 package QVD::VMA;
 
 our $VERSION = '0.01';
@@ -19,9 +41,48 @@ package QVD::VMA::Impl;
 
 use parent 'QVD::SimpleRPC::Server';
 
+=item _get_nxagent_pid
+
+Returns the last recorded pid of nxagent.
+
+=cut
+
 sub _get_nxagent_pid {
     return `cat /var/run/qvd/nxagent-pid`;
 }
+
+=item _get_nxagent_status
+
+Returns the last recorded nxagent status. While nxagent is running it is one of
+
+=over
+
+=item starting,
+
+=item started,
+
+=item suspending,
+
+=item suspended,
+
+=item resuming,
+
+=item resumed,
+
+=item terminating,
+
+=item terminated,
+
+=item aborting, or
+
+=item aborted.
+
+=back
+
+When nxagent exits, the status becomes "exited I<last_status>", where
+I<last_status> is the previous recorded status (likely terminated or aborted).
+
+=cut
 
 sub _get_nxagent_status {
     my $status = `cat /var/run/qvd/state`;
@@ -29,24 +90,51 @@ sub _get_nxagent_status {
     return $status;
 }
 
+=item _is_nxagent_running
+
+Checks if nxagent is running by getting its pid and checking if it exists.
+
+=cut
+
 sub _is_nxagent_running {
     my $pid = _get_nxagent_pid;
     if ($pid) {
+	# FIXME Who says that no other process can take the pid?
 	return kill 0, $pid;
     } else {
 	return 0;
     }
 }
 
+=item _is_nxagent_suspended
+
+Checks if nxagent is in suspended state.
+
+=cut
+
 sub _is_nxagent_suspended {
     my $status = _get_nxagent_status;
     return $status eq 'suspended';
 }
 
+=item _is_nxagent_started
+
+Checks if nxagent is in "started" state. In a started state the status can be
+started or resumed.
+
+=cut
+
 sub _is_nxagent_started {
     my $status = _get_nxagent_status;
     return $status eq 'started' || $status eq 'resumed';
 }
+
+=item _start_or_resume_session
+
+Performs the necessary steps to start a session. Resuming existing sessions is
+automatically attempted.
+
+=cut
 
 sub _start_or_resume_session {
     my $pid = _get_nxagent_pid;
@@ -79,6 +167,24 @@ sub _start_or_resume_session {
     }
 }
 
+=item _shutdown($type, $minutes)
+
+Power off, reboot, or halt the system using C<shutdown(8)>.  Successful
+shutdown is verified by checking the existence of the pid file
+F</var/run/shutdown.pid>.
+
+=over
+
+=item $type: Options to pass to shutdown: 'P' to power off, 'r' to reboot, etc.
+
+=item $minutes: Number of minutes to wait before shutting down.
+
+=back
+
+Returns 1 if the shutdown was started succesfully, 0 in other case.
+
+=cut
+
 sub _shutdown {
     my $type = shift;
     my $minutes = shift;
@@ -93,6 +199,14 @@ sub _shutdown {
     return -e "/var/run/shutdown.pid";
 }
 
+=item SimpleRPC_start_vm_listener
+
+Respond to the RPC C<start_vm_listener> by starting or resuming an nx session.
+
+Returns a hash with host and port to connect to.
+
+=cut
+
 sub SimpleRPC_start_vm_listener {
     my $self = shift;
 
@@ -102,9 +216,27 @@ sub SimpleRPC_start_vm_listener {
     {host => 'localhost', port => 5000};
 }
 
+=item SimpleRPC_status
+
+Respond to the RPC C<status>.
+
+Returns a hash with the status of the VMA (always 'ok').
+
+=cut
+
 sub SimpleRPC_status {
     {status => 'ok'};
 }
+
+=item SimpleRPC_poweroff
+
+Respond to the RPC C<poweroff> by scheduling the shutdown of the machine. By
+default the shutdown is scheduled within 1 minute.
+
+Returns a hash with the key C<poweroff> and the value minutes until shutdown or
+C<undef> if scheduling power off failed.
+
+=cut
 
 sub SimpleRPC_poweroff {
     my $mins = 1;
@@ -118,32 +250,6 @@ sub SimpleRPC_poweroff {
 1;
 
 __END__
-
-=head1 NAME
-
-QVD::VMA - The great new QVD::VMA!
-
-
-=head1 SYNOPSIS
-
-Quick summary of what the module does.
-
-Perhaps a little code snippet.
-
-    use QVD::VMA;
-
-    my $foo = QVD::VMA->new();
-    ...
-
-=head1 DESCRIPTION
-
-=head2 FUNCTIONS
-
-=over
-
-=item function1
-
-=item function2
 
 =back
 
