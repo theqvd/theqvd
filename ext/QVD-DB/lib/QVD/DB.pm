@@ -37,6 +37,16 @@ if you don't export anything, such as for a purely object-oriented module.
 
 =head1 FUNCTIONS
 
+=cut
+
+sub new {
+    my $class = shift;
+    my @conn_info = ('dbi:SQLite:example.db');
+    my $self = { conn_info => @conn_info };
+    bless $self, $class;
+    $self->connect(@conn_info);
+}
+
 =head1 AUTHOR
 
 Joni Salonen, C<< <jsalonen at qindel.es> >>
