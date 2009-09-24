@@ -6,7 +6,7 @@ use warnings;
 use URI::Split qw(uri_split);
 
 use QVD::HTTP::StatusCodes qw(:status_codes);
-use QVD::VMAS::Client;
+use QVD::VMA::Client;
 use QVD::URI qw(uri_query_split);
 
 use QVD::DB;
@@ -39,17 +39,28 @@ sub _start_vm {
 	return;
     }
     
+    my $vma_port = 3030+$id;
     my $pid = fork;
     if (!$pid) {
 	defined $pid or die "Couldn't fork process for vm: $!";
-	{ exec "kvm -redir tcp:2222::22 -redir tcp:3030::3030 -redir tcp:5000::5000 -pidfile /var/run/qvd/vm-$id.pid -hda ".$osi->disk_image };
+	my $agent_port = 5000+$id;
+	my $cmd = "kvm";
+	$cmd .= " -redir tcp:".$agent_port."::5000";
+	$cmd .= " -redir tcp:".$vma_port."::3030";
+	$cmd .= " -hda ".$osi->disk_image;
+	$cmd .= " -hdb ".$vm->storage if -e $vm->storage;
+	$cmd .= " -pidfile /var/run/qvd/vm-$id.pid";
+	{ exec $cmd };
 	die "Couldn't exec process for vm: $!";
     }
+# Allow 2 seconds for generation of pid file
+    sleep 2;
     unless (-e "/var/run/qvd/vm-$id.pid") {
 	$server->send_http_error(HTTP_INTERNAL_SERVER_ERROR);
+	return;
     }
 
-    my $vma_client = QVD::VMAS::Client->new;
+    my $vma_client = QVD::VMA::Client->new('localhost', $vma_port);
     until ($vma_client->is_connected) {
 	$server->send_http_response(HTTP_PROCESSING,
 		'X-QVD-VM-Status: starting');
@@ -81,7 +92,9 @@ sub _stop_vm {
 	return;
     }
 
-    my $vma_client = QVD::VMAS::Client->new;
+    my $vma_port = 3030+$id;
+
+    my $vma_client = QVD::VMA::Client->new('localhost', $vma_port);
     unless ($vma_client->is_connected) {
 	$server->send_http_error(HTTP_UNPROCESSABLE_ENTITY);
 	return;
