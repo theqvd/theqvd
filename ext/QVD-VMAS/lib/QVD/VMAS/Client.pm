@@ -11,3 +11,17 @@ sub new {
 }
 
 1;
+
+__END__
+
+=head1 NAME
+
+QVD::VMAS::Client - client side for VMAS service
+
+=head1 DESCRIPTION
+
+Currently this class is just a hack that calls the VMA service directly
+
+=cut
+
+

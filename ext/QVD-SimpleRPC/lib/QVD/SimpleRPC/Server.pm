@@ -54,7 +54,6 @@ sub _process_request {
 
 1;
 
-
 __END__
 
 =head1 NAME
@@ -69,7 +68,7 @@ QVD::SimpleRPC::Server - QVD internal RPC mechanism, server side
 
   sub post_configure_hook {
     my $self = shift;
-    My::Server::Impl->new()->set_htto_request_processor($self, '/base/path/*');
+    My::Server::Impl->new()->set_http_request_processor($self, '/base/path/*');
   }
 
   package My::Server::Impl;
@@ -85,6 +84,32 @@ QVD::SimpleRPC::Server - QVD internal RPC mechanism, server side
   ...
 
 =head1 DESCRIPTION
+
+This module implements the SimpleRPC server side.
+
+To use it you have to create a new class (the implementation class)
+derived from it with the implementation of the methods to be accesible
+via RPC.
+
+RPC callable methods are denoted by the prefix C<SimpleRPC_>.
+
+=head2 API
+
+=item QVD::SimplRPC::Server->new
+
+is a dummy constructor that just returns a blessed hash reference.
+
+Note that calling this method on the C<QVD::SimpleRPC::Server> class
+is useless. Commonly you want to call it on some derived class
+implementing some RPC callable methods.
+
+=item $rpc_server->set_http_request_processors($httpd, $base_url)
+
+Attachs the SimpleRPC server to the given $base_url in the HTTP daemon
+object C<$httpd>.
+
+$base_url should end in C</*> in order to expose all the RPC methods
+in the implementation class.
 
 =head1 AUTHOR
 

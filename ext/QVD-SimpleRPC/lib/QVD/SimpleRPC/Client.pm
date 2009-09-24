@@ -66,3 +66,50 @@ sub AUTOLOAD {
 sub DESTROY {}
 
 1;
+
+__END__
+
+=head1 NAME
+
+QVD::SimpleRPC::Client - QVD internal RPC mechanism, client side
+
+=head1 SYNOPSIS
+
+  use QVD::SimpleRPC::Client;
+
+  my $cl = QVD::SimpleRPC::Client->new('http://host:6060/some/path/');
+  my $r = $cl->some_remote_method(foo => $bar, doz => $doz);
+
+=head1 DESCRIPTION
+
+This module implements the client side of the SimpleRPC protocol.
+
+=head2 API
+
+The following methods are available:
+
+=over
+
+=item $rpcc = QVD::SimpleRPC::Client->new($base_url)
+
+Creates a new client object and stablishes the HTTP connection to the
+remote server.
+
+=item $rpcc->$method(@ARGS)
+
+calls the method of the given name on the remote side and returns the
+result.
+
+=back
+
+=head1 AUTHOR
+
+Salvador FandiE<ntilde>o (sfandino@yahoo.com).
+
+=head1 COPYRIGHT & LICENSE
+
+Copyright C<copy> 2009 Qindel Formacion y Servicios S.L., all rights reserved.
+
+This program is free software; you can redistribute it and/or modify it
+under the same terms as Perl itself.
+

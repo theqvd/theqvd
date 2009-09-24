@@ -12,11 +12,12 @@ QVD::VMA - The QVD Virtual Machine Agent
 =head1 DESCRIPTION
 
 The VMA runs on virtual machines and implements an RPC interface to control
-them. 
+them.
 
 =head2 FUNCTIONS
 
 =over
+
 =cut
 
 package QVD::VMA;
@@ -73,7 +74,7 @@ Returns the last recorded nxagent status. While nxagent is running it is one of
 
 =item terminated,
 
-=item aborting, or
+=item aborting or
 
 =item aborted.
 
@@ -260,9 +261,11 @@ __END__
 
 =back
 
-=head1 AUTHOR
+=head1 AUTHORS
 
 Salvador FandiE<ntilde>o (sfandino@yahoo.com)
+
+Joni Salonen
 
 =head1 BUGS
 
