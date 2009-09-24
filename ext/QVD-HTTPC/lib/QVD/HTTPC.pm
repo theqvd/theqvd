@@ -65,13 +65,6 @@ sub send_http_request {
     $self->_print($body) if defined $body;
 }
 
-sub send_http_query_json {
-    my ($self, $url, %params) = @_;
-    $self->send_http_request(GET => $url,
-			     params => \%params,
-			     headers => ['Accept: application/json']);
-}
-
 # token          = 1*<any CHAR except CTLs or separators>
 # separators     = "(" | ")" | "<" | ">" | "@"
 #                | "," | ";" | ":" | "\" | <">
@@ -79,7 +72,7 @@ sub send_http_query_json {
 #                | "{" | "}" | SP | HT
 my $token_re = qr/[!#\$%&'*+\-\.0-9a-zA-Z]+/;
 
-sub read_response_head {
+sub read_http_response_head {
     my $self = shift;
     my $socket = $self->{socket};
     while (<$socket>) {
@@ -133,7 +126,7 @@ sub _atomic_read {
 
 sub read_http_response {
     my $self = shift;
-    my ($code, $msg, $headers) = $self->read_response_head();
+    my ($code, $msg, $headers) = $self->read_http_response_head();
     my $content_length = header_lookup($headers, 'Content-Length');
     my $body;
     if ($content_length) {
@@ -177,7 +170,7 @@ __END__
 
 =head1 NAME
 
-QVD::HTTPC - The great new QVD::HTTPC!
+QVD::HTTPC - QVD HTTP client package
 
 =head1 SYNOPSIS
 
@@ -197,6 +190,52 @@ QVD::HTTPC - The great new QVD::HTTPC!
 
 
 =head1 DESCRIPTION
+
+=head2 API
+
+=over
+
+=item $httpc = QVD::HTTPC->new($targe_host)
+
+Creates a new object and connects it to the given host.
+
+=item $httpc->get_socket
+
+Returns the handle for the TCP connection to the remote host.
+
+=item $httpc->send_http_request($method, $url, %opts)
+
+Sends a new HTTP request to the remote server.
+
+The accepted options are as follows:
+
+=over
+
+=item params => \%params
+
+list of key/value pairs to be added to the given URL.
+
+=item headers => \@headers
+
+extra headers to include in the HTTP request
+
+=item body => $data
+
+data load to use as the request body
+
+=back
+
+=item ($code, $msg, $headers) = $httpc->read_http_response_head()
+
+reads an HTTP response header from the socket
+
+=item ($code, $msg, $headers, $body) = $httpc->read_http_response()
+
+reads an HTTP response from the socket
+
+=item ($code, $msg, $headers) = $httpc->make_http_request($method, $url, \%opts)
+
+=back
 
 =head1 AUTHOR
 

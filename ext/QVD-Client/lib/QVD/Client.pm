@@ -11,7 +11,7 @@ __END__
 
 =head1 NAME
 
-QVD::Client - The great new QVD::Client!
+QVD::Client - QVD client library
 
 =head1 SYNOPSIS
 
@@ -23,6 +23,14 @@ Perhaps a little code snippet.
 
     my $foo = QVD::Client->new();
     ...
+
+
+=head1 DESCRIPTION
+
+Currently this module does nothing!
+
+The client functionality is in available from the script L<qvd-client>
+also included in this package.
 
 =head1 AUTHOR
 

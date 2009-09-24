@@ -34,3 +34,15 @@ while (1) {
 	die "unable to connect to remote vm: $code";
     }
 }
+
+__END__
+
+=head1 NAME
+
+qvd-client.pl
+
+=head1 DESCRIPTION
+
+probe of concept client for the new QVD
+
+=cut
