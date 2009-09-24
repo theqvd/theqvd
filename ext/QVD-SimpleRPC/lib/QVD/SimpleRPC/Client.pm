@@ -14,14 +14,29 @@ sub new {
     my ($scheme, $host, $base, $query, $frag) = uri_split($url_base);
     croak "bad URL base for SimpleRPC client"
 	unless ($scheme eq 'http' and !defined($query) and !defined($frag));
-    my $httpc = QVD::HTTPC->new($host);
+    my $httpc = eval { QVD::HTTPC->new($host) };
+    warn $@ if $@;
     $base //= '/';
     $base .= '/' unless $base =~ m|/$|;
     my $self = { httpc => $httpc,
+    		 host => $host,
 		 base => $base
 	       };
     bless $self, $class;
     $self
+}
+
+sub is_connected {
+    my $self = shift;
+    $self->{httpc}
+}
+
+sub connect {
+    my $self = shift;
+    my $httpc = eval { QVD::HTTPC->new($self->{host}) };
+    warn $@ if $@;
+    $self->{httpc} = $httpc;
+    $self->{httpc}
 }
 
 sub _json {
@@ -34,6 +49,7 @@ sub _json {
 
 sub _make_request {
     my $self = shift;
+    return undef unless $self->{httpc};
     my $method = shift;
     my @query;
     for (@_) {
