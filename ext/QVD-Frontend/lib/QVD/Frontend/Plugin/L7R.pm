@@ -39,7 +39,7 @@ sub _connect_to_vm_processor {
 				'X-QVD-VM-Status: Checking VM');
 
     my $vmas = QVD::VMAS::Client->new;
-    my $r = $vmas->start_vm_listener($id)
+    my $r = $vmas->start_vm_listener(id => $id)
 	or do {
 	    $server->send_http_error(HTTP_BAD_GATEWAY);
 	    return;
