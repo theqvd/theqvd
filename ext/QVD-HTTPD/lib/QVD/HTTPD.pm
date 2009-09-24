@@ -202,6 +202,12 @@ Sends an HTTP response with the given status code, header and body.
 
 Sends the error response associated to the given status code
 
+=item $httpd->json
+
+This is a commodity method that creates, caches an returns an object
+of class JSON for encoding/decoding. Probably this functionality
+should be moved to a singleton class.
+
 =back
 
 
