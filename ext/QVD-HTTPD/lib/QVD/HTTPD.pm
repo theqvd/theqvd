@@ -47,7 +47,7 @@ sub process_request {
 		}
 		elsif (/^$/) {
 		    # end of headers
-		    $self->process_http_request($method, $url, \@headers);
+		    $self->_process_http_request($method, $url, \@headers);
 		    last;
 		}
 		else {
@@ -77,7 +77,7 @@ sub set_http_request_processor {
     1
 }
 
-sub get_http_request_processor {
+sub _get_http_request_processor {
     my ($self, $method, $url) = @_;
     my $c = $self->{_http_request_processor_cache} ||= {};
     my $pair = "$method $url";
@@ -89,11 +89,11 @@ sub get_http_request_processor {
     }
 }
 
-sub process_http_request {
+sub _process_http_request {
     my $self = shift;
     my ($method, $url, $headers) = @_;
     my $path = (uri_split $url)[2];
-    my $processor = $self->get_http_request_processor($method, $path);
+    my $processor = $self->_get_http_request_processor($method, $path);
     if ($processor) {
 	$processor->($self, $method, $url, $headers);
     }
@@ -138,16 +138,6 @@ sub json {
     }
 }
 
-sub send_http_response_json {
-    my $self = shift;
-    my @headers =  (@_ > 1 ? @{shift()} : ());
-    my $data = shift;
-    $self->send_http_response_with_body(HTTP_OK,
-					'application/json',
-					\@headers,
-					$self->json->encode($data));
-}
-
 1;
 
 __END__
@@ -159,25 +149,61 @@ QVD::HTTPD - The great new QVD::HTTPD!
 
 =head1 SYNOPSIS
 
-Quick summary of what the module does.
-
-Perhaps a little code snippet.
 
     use QVD::HTTPD;
-
     my $foo = QVD::HTTPD->new();
     ...
 
-=head1 FUNCTIONS
+=head1 DESCRIPTION
+
+This module based on L<Net::Server> creates an HTTP daemon
+
+=head2 API
+
+=over
+
+=item $httpd->process_request
+
+Internal method that is called by L<Net::Server> for every new TCP
+connection stablished to the server.
+
+It handles the basic HTTP protocol parsing and calls
+L</_process_http_request> for every HTTP request received over the
+socket.
+
+=item $httpd->_process_http_request($method, $url, $headers)
+
+Internal method that performs the dispatching of the HTTP request to
+the registered callbacks.
 
 
-=head1 BUGS
+=item $httpd->set_http_request_processor($callback, $method, $url)
 
-Please report any bugs or feature requests to C<bug-qvd-httpd at rt.cpan.org>, or through
-the web interface at L<http://rt.cpan.org/NoAuth/ReportBug.html?Queue=QVD-HTTPD>.  I will be notified, and then you'll
-automatically be notified of progress on your bug as I make changes.
+registers the given callback C<$callback> to be called when a request
+for the given method C<$method> and url C<$url> is received.
+
+The C<$url> parameter can have and asterisk at the end meaning that
+the callback will also accept urls pointing to places below the given
+path.
+
+=item $httpd->send_http_response($status_code, \@headers)
+
+Sends an HTTP response with the given status code and headers.
+
+This method can not send responses with a body (see
+L</send_http_response_with_body>).
+
+=item $httpd->send_http_response_with_body($status_code, $content_type,
+                                           \@headers, @body);
+
+Sends an HTTP response with the given status code, header and body.
+
+=item $httpd->send_http_error($code)
+
+Sends the error response associated to the given status code
 
 =back
+
 
 =head1 AUTHORS
 
