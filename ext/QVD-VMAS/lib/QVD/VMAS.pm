@@ -48,6 +48,7 @@ sub SimpleRPC_start_vm {
     my $cmd = "kvm";
     $cmd .= " -redir tcp:".$agent_port."::5000";
     $cmd .= " -redir tcp:".$vma_port."::3030";
+    $cmd .= " -redir tcp:2222::22º";
     $cmd .= " -hda ".$osi->disk_image;
     $cmd .= " -hdb ".$vm->storage if -e $vm->storage;
     $cmd .= " -pidfile /var/run/qvd/vm-$id.pid";
@@ -59,9 +60,21 @@ sub SimpleRPC_start_vm {
     sleep 2;
     my $pid = `cat /var/run/qvd/vm-$id.pid`;
     if (kill 0, $pid) {
+	my $cd = $schema->resultset('VM_Runtime')->update_or_create(
+	{
+		vm_id => $id,
+		state => 'starting',
+	}	
+	);
 	return { vm_status => 'starting' };
     } else {
 # FIXME how to capture error message from kvm?
+	my $cd = $schema->resultset('VM_Runtime')->update_or_create(
+	{
+		vm_id => $id,
+		state => 'aborted',
+	}	
+	);
 	return { vm_status => 'aborted', error => 'vm exited' };
     }
 }
@@ -74,7 +87,7 @@ sub SimpleRPC_stop_vm {
     }
     
     my $schema = QVD::DB->new();
-    my $vm = $schema->resultset('VM')->find({id => $id});
+    my $vm = $schema->resultset('VM_Runtime')->find({id => $id});
     unless (defined $vm) {
 	return { request => 'error', error => 'invalid id: '.$id };
     }
@@ -88,6 +101,12 @@ sub SimpleRPC_stop_vm {
 
     my $r = $vma_client->poweroff();
     if (defined $r->{poweroff}) {
+	my $cd = $schema->resultset('VM_Runtime')->update_or_create(
+	{
+		vm_id => $id,
+		state => 'stopping',
+	}	
+	);
 	return { request => 'success', vm_status => 'stopping' };
     } else {
 	return { request => 'error', error => "agent can't poweroff vm" };
