@@ -9,7 +9,7 @@ use URI::Split qw(uri_split);
 
 use QVD::HTTP::StatusCodes qw(:all);
 
-use parent qw(Net::Server);
+use parent qw(Net::Server::Fork);
 
 
 
