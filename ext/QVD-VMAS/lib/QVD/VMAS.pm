@@ -88,7 +88,7 @@ sub SimpleRPC_stop_vm {
     }
     
     my $schema = QVD::DB->new();
-    my $vm = $schema->resultset('VM_Runtime')->find({id => $id});
+    my $vm = $schema->resultset('VM')->find({id => $id});
     unless (defined $vm) {
 	return { request => 'error', error => 'invalid id: '.$id };
     }
