@@ -3,6 +3,9 @@ package QVD::VMAS;
 use warnings;
 use strict;
 
+use QVD::DB;
+use QVD::VMA::Client;
+
 =head1 NAME
 
 QVD::VMAS - The great new QVD::VMAS!
@@ -88,15 +91,15 @@ sub SimpleRPC_stop_vm {
     my $vma_port = 3030+$id;
 
     my $vma_client = QVD::VMA::Client->new('localhost', $vma_port);
-    unless ($vma_client->is_connected) {
-	return { request => 'error', error => "Can't connect to VMA" };
+    unless ($vma_client->is_connected()) {
+	return { request => 'error', error => "Can't connect to agent" };
     }
 
-    my %r = $vma_client->poweroff;
-    if (defined $r{poweroff}) {
-	return { vm_status => 'stopping' };
+    my $r = $vma_client->poweroff();
+    if (defined $r->{poweroff}) {
+	return { request => 'success', vm_status => 'stopping' };
     } else {
-	return { request => 'error', error => "VMA can't poweroff vm" };
+	return { request => 'error', error => "agent can't poweroff vm" };
     }
 }
 

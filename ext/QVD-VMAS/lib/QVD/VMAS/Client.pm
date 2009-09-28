@@ -7,7 +7,7 @@ use parent 'QVD::SimpleRPC::Client';
 
 sub new {
     my $class = shift;
-    $class->SUPER::new('http://localhost:3030/vma/');
+    $class->SUPER::new('http://localhost:8080/vmas/');
 }
 
 1;
