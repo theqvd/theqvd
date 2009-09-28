@@ -48,7 +48,8 @@ sub SimpleRPC_start_vm {
     my $cmd = "kvm";
     $cmd .= " -redir tcp:".$agent_port."::5000";
     $cmd .= " -redir tcp:".$vma_port."::3030";
-    $cmd .= " -redir tcp:2222::22º";
+    # Next line activates SSH
+    #$cmd .= " -redir tcp:2222::22";
     $cmd .= " -hda ".$osi->disk_image;
     $cmd .= " -hdb ".$vm->storage if -e $vm->storage;
     $cmd .= " -pidfile /var/run/qvd/vm-$id.pid";
