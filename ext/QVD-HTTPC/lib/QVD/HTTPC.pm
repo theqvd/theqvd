@@ -10,7 +10,7 @@ use Carp;
 
 use IO::Socket::INET;
 use URI::Escape qw(uri_escape);
-use Errno qw(EINTR);
+use Errno;
 
 use QVD::HTTP::StatusCodes qw(:status_codes);
 use QVD::HTTP::Headers qw(header_lookup);
@@ -18,11 +18,17 @@ use QVD::HTTP::Headers qw(header_lookup);
 my $CRLF = "\r\n";
 
 sub new {
-    my ($class, $target) = @_;
+    my ($class, $target, %opts) = @_;
+    my $timeout = delete $opts{timeout};
+
+    keys %opts and
+	croak "unknown constructor option(s) " . join(', ', keys %opts);
+
     my $socket = IO::Socket::INET->new($target)
 	or die "Unable to connect to $target";
     my $self = { target => $target,
-		 socket => $socket };
+		 socket => $socket,
+		 buffer => '' };
     bless $self, $class;
     $self;
 }
@@ -75,31 +81,29 @@ my $token_re = qr/[!#\$%&'*+\-\.0-9a-zA-Z]+/;
 sub read_http_response_head {
     my $self = shift;
     my $socket = $self->{socket};
-    while (<$socket>) {
-	s/\r?\n$//;
-	next if /^\s*$/;
+    while (defined(my $line = $self->_readline)) {
+	next if $line =~ /^\s*$/;
 	if (my ($version, $code, $msg) =
-	    m{^(HTTP/\S+)\s+(\d+)(?:\s+(\S.*?))?\s*$}) {
+	    $line =~ m{^(HTTP/\S+)\s+(\d+)(?:\s+(\S.*?))?\s*$}) {
 	    $version eq 'HTTP/1.1'
 		or return HTTP_VERSION_NOT_SUPPORTED_BY_CLIENT;
 	    my @headers;
-	    while (<$socket>) {
-		s/\r?\n$//; # HTTP chomp
-		if (my ($name, $value) = /^($token_re)\s*:\s*(.*?)\s*$/o) {
-		    # new header
-		    push @headers, "${name}:${value}";
-		}
-		elsif (/^\s+(.*?)\s+$/) {
-		    # header continuation
-		    @headers or return HTTP_BAD_RESPONSE;
-		    $headers[-1] .= " " . $1;
-		}
-		elsif (/^$/) {
-		    # end of headers
-		    last;
-		}
-		else {
-		    return HTTP_BAD_RESPONSE;
+	    while (defined(my $line = $self->_readline)) {
+		given($line) {
+		    when (/^($token_re)\s*:\s*(.*?)\s*$/o) {
+			push @headers, "${1}:${2}";
+		    }
+		    when (/^\s+(.*?)\s+$/) {
+			@headers or return HTTP_BAD_RESPONSE;
+			$headers[-1] .= " " . $1;
+		    }
+		    when (/^$/) {
+			# end of headers
+			last;
+		    }
+		    default {
+			return HTTP_BAD_RESPONSE;
+		    }
 		}
 	    }
 	    return ($code, $msg, \@headers);
@@ -109,19 +113,45 @@ sub read_http_response_head {
     return HTTP_BAD_RESPONSE;
 }
 
-sub _atomic_read {
-    my ($fh, $length) = @_[0,2];
-    $_[1] //= '';
-    while ($length) {
-	my $bytes = read($fh, $_[1], $length, length $_[1]);
-	if ($bytes) {
-	    $length -= $bytes;
+sub _sysread {
+    my ($self, $length, $timeout) = @_;
+    $timeout //= $self->{timeout};
+    my $buffer = \$self->{buffer};
+    return if length($$buffer) >= $length;
+    my $socket = $self->{socket};
+    my $fn = fileno $socket;
+    $fn >= 0 or croak "bad file handle $socket";
+    while (length $$buffer < $length) {
+	my $rv = '';
+	vec($rv, $fn, 1) = 1;
+	my $n = select($rv, undef, undef, $timeout);
+	if ($n > 0) {
+	    if (vec($rv, $fn, 1)) {
+		my $bytes = sysread ($socket, $$buffer, 16 * 1024, length $$buffer);
+		unless ($bytes) {
+		    die "socket closed unexpectedly";
+		}
+	    }
 	}
-	elsif ($! != EINTR) {
-	    return undef;
+	else {
+	    next if $! == Errno::EINTR;
+	    die "connection timed out";
 	}
     }
-    1;
+}
+
+sub _readline {
+    my $self = shift;
+    my $buffer = \$self->{buffer};
+    while (1) {
+	my $eol = index($$buffer, "\n");
+	if ($eol >= 0) {
+	    my $line = substr($$buffer, 0, $eol + 1, "");
+	    $line =~ s/\r?\n$//;
+	    return $line;
+	}
+	$self->_sysread(length($$buffer) + 1024);
+    }
 }
 
 sub read_http_response {
@@ -130,7 +160,8 @@ sub read_http_response {
     my $content_length = header_lookup($headers, 'Content-Length');
     my $body;
     if ($content_length) {
-	_atomic_read($self->{socket}, $body, $content_length);
+	$self->_sysread($content_length);
+	$body = substr $self->{buffer}, 0, $content_length, "";
     }
     ($code, $msg, $headers, $body);
 }
@@ -195,9 +226,19 @@ QVD::HTTPC - QVD HTTP client package
 
 =over
 
-=item $httpc = QVD::HTTPC->new($targe_host)
+=item $httpc = QVD::HTTPC->new($targe_host, %opts)
 
 Creates a new object and connects it to the given host.
+
+The accepted options are:
+
+=over
+
+=item timeout => $seconds
+
+Sets default timeout for the client
+
+=back
 
 =item $httpc->get_socket
 
