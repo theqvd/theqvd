@@ -43,13 +43,13 @@ sub new {
 
 sub _get_nxagent_pid {
     my $self = shift;
-    return `cat /var/tmp/qvd/nxagent.pid`;
+    return `cat /var/run/qvd/nxagent.pid`;
 }
 
 
 sub _get_nxagent_status {
     my $self = shift;
-    my $status = `cat /var/tmp/qvd/state`;
+    my $status = `cat /var/run/qvd/state`;
     chomp($status);
     return $status;
 }
