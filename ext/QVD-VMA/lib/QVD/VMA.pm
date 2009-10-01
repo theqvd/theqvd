@@ -101,7 +101,7 @@ sub _start_or_resume_session {
 	my $pid = fork;
 	if (!$pid) {
 	    defined $pid or die "fork failed";
-	    { exec "sudo -u qvd xinit /usr/bin/gnome-session -- ./QVD-VMA/bin/nxagent-monitor.pl :1000 -display nx/nx,link=lan:1000 -ac" };
+	    { exec "su - qvd -c \"xinit /usr/bin/gnome-session -- /home/qvd/QVD/ext/QVD-VMA/bin/nxagent-monitor.pl :1000 -display nx/nx,link=lan:1000 -ac\"" };
 	    { exec "/bin/false" };
 	    require POSIX;
 	    POSIX::_exit(-1);
