@@ -20,6 +20,8 @@ sub set_http_request_processors {
 
 sub _connect_to_vm_processor {
     my ($server, $method, $url, $headers) = @_;
+    # FIXME Move this to a configuration file
+    my $vm_start_timeout = 10;
 
     unless (header_eq_check($headers, Connection => 'Upgrade') and
 	    header_eq_check($headers, Upgrade => 'QVD/1.0')) {
@@ -38,23 +40,27 @@ sub _connect_to_vm_processor {
     $server->send_http_response(HTTP_PROCESSING,
 				'X-QVD-VM-Status: Checking VM');
 
-    my $vmas = QVD::VMAS::Client->new;
+    my $vmas = QVD::VMAS::Client->new();
     my $r = $vmas->start_vm(id => $id);
-    # The VM was just started or there was some error
+    # The VM was not already running or there was some error
     unless ($r->{vm_status} eq 'started') {
 	# FIXME Pass the error message to the client?
 	$server->send_http_error(HTTP_BAD_GATEWAY), return
 		if exists $r->{error};
 
 	# Wait for the VMA to come online
-	# FIXME implement timeout
-	for (;;) {
+	my $timeout_counter = $vm_start_timeout/5;
+	while ($timeout_counter --> 0) {
 	    $server->send_http_response(HTTP_PROCESSING,
 	    	'X-QVD-VM-Status: Starting VM');
 	    $r = $vmas->get_vm_status(id => $id);
 	    last if exists $r->{vma_status};
 	    sleep 5;
 	}
+	# Timed out
+	# FIXME Pass the error message to the client?
+	$server->send_http_error(HTTP_BAD_GATEWAY), return
+		if $timeout_counter < 0;
     }
     $r = $vmas->start_vm_listener(id => $id)
 	or do {
