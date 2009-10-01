@@ -41,8 +41,9 @@ if you don't export anything, such as for a purely object-oriented module.
 
 sub new {
     my $class = shift;
-    my @conn_info = ('dbi:SQLite:example.db');
-    my $self = { conn_info => @conn_info };
+    my @conn_info = ('dbi:SQLite:example.db', undef, undef, 
+    			{ RaiseError => 1, AutoCommit => 0 });
+    my $self = { conn_info => \@conn_info };
     bless $self, $class;
     $self->connect(@conn_info);
 }
@@ -50,6 +51,7 @@ sub new {
 =head1 AUTHOR
 
 Joni Salonen, C<< <jsalonen at qindel.es> >>
+Nicolas Arenas, C<< <narenas at qindel.es> >> 
 
 =head1 BUGS
 
