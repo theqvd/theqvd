@@ -39,7 +39,24 @@ sub _connect_to_vm_processor {
 				'X-QVD-VM-Status: Checking VM');
 
     my $vmas = QVD::VMAS::Client->new;
-    my $r = $vmas->start_vm_listener(id => $id)
+    my $r = $vmas->start_vm(id => $id);
+    # The VM was just started or there was some error
+    unless ($r->{vm_status} eq 'started') {
+	# FIXME Pass the error message to the client?
+	$server->send_http_error(HTTP_BAD_GATEWAY), return
+		if exists $r->{error};
+
+	# Wait for the VMA to come online
+	# FIXME implement timeout
+	for (;;) {
+	    $server->send_http_response(HTTP_PROCESSING,
+	    	'X-QVD-VM-Status: Starting VM');
+	    $r = $vmas->get_vm_status(id => $id);
+	    last if exists $r->{vma_status};
+	    sleep 5;
+	}
+    }
+    $r = $vmas->start_vm_listener(id => $id)
 	or do {
 	    $server->send_http_error(HTTP_BAD_GATEWAY);
 	    return;

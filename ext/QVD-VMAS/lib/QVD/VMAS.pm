@@ -41,7 +41,7 @@ sub SimpleRPC_start_vm_listener {
     my $agent_port = 5000+$id;
     my $vma_client = $self->_get_vma_client_for_vm($id);
     if ($vma_client->start_vm_listener) {
-	return { host => 'localhost', 'port' => $agent_port };
+	return { request => 'success', host => 'localhost', 'port' => $agent_port };
     }
 }
 
@@ -49,20 +49,20 @@ sub SimpleRPC_start_vm {
     my ($self, %params) = @_;
     my $id = $params{id};
 
-    unless (defined $id) {
-	return { vm_status => 'aborted', error => 'invalid id: '.$id };
-    }
+    return { vm_status => 'aborted', error => 'invalid id: '.$id } 
+    	unless defined $id;
     
     my $schema = QVD::DB->new();
     my $vm = $schema->resultset('VM')->find({id => $id});
-    unless (defined $vm) {
-	return { vm_status => 'aborted', error => 'invalid id: '.$id };
-    }
+    return { vm_status => 'aborted', error => 'invalid id: '.$id } 
+    	unless defined $vm;
     my $osi = $vm->osi;
-    unless (defined $osi) {
-	return { vm_status => 'aborted', error => 'no osi' };
-    }
+    return { vm_status => 'aborted', error => 'no osi' }
+    	unless defined $osi;
     
+    #  Try to start the VM only if it's not already running
+    return { vm_status => 'started' } if $self->_is_kvm_running($id);
+
     my $vma_port = 3030+$id;
     my $agent_port = 5000+$id;
     my $cmd = "kvm";
