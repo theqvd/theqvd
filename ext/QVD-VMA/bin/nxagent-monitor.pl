@@ -4,37 +4,46 @@ use strict;
 use warnings;
 use Fcntl ':flock';
 
-my $QVD_SESSION_STATUS_FILE = "/var/run/qvd/state";
-my $QVD_SESSION_PID_FILE = "/var/run/qvd/nxagent-pid";
+my $QVD_SESSION_DIR = "/var/run/qvd";
+my $QVD_SESSION_STATUS_FILE = $QVD_SESSION_DIR."/state";
+my $QVD_SESSION_PID_FILE = $QVD_SESSION_DIR."/nxagent.pid";
+my $QVD_SESSION_LOG_FILE = $QVD_SESSION_DIR."/nxagent.log";
 my $APPEND = 0;
-my $PASSTHROUGH = 0;
 my $NXAGENT = "nxagent";
 my @NXAGENT_OPTS = @ARGV;
 
-sub openStatusFile {
+sub open_status_file {
     my $mode = $APPEND eq 1 ? ">>" : ">";
     open(QVD_SESSION_STATUS_FH, $mode, $QVD_SESSION_STATUS_FILE);
 }
 
-sub unbufferStatusFile {
+sub setup_environment {
+    $ENV{NX_CLIENT} = '/usr/lib/nx/nxdialog';
+}
+
+sub unbuffer_status_file {
     my $prev = select(QVD_SESSION_STATUS_FH);
     $| = 1;
     select($prev);
 }
 
-sub lockStatusFile {
+sub lock_status_file {
     flock(QVD_SESSION_STATUS_FH, LOCK_EX | LOCK_NB);
 }
 
-sub unlockStatusFile {
+sub unlock_status_file {
     flock(QVD_SESSION_STATUS_FH, LOCK_UN | LOCK_NB);
 }
 
-sub closeStatusFile {
+sub close_status_file {
     close QVD_SESSION_STATUS_FH;
 }
 
-sub handleStatus {
+sub close_log_file {
+    close QVD_SESSION_LOG_FH;
+}
+
+sub handle_status {
     my $status = shift;
     if (! $APPEND eq 1) {
         truncate QVD_SESSION_STATUS_FH, 0;
@@ -43,18 +52,22 @@ sub handleStatus {
     print QVD_SESSION_STATUS_FH $status."\n";
 }
 
-sub openPidFile {
+sub open_pid_file {
     open(QVD_SESSION_PID_FH, ">", $QVD_SESSION_PID_FILE);
 }
 
-sub handlePid {
+sub open_log_file {
+    open(QVD_SESSION_LOG_FH, ">", $QVD_SESSION_LOG_FILE);
+}
+
+sub handle_pid {
     my $pid = shift;
     print QVD_SESSION_PID_FH $pid."\n";
     close QVD_SESSION_PID_FH
     	or die "Can't write to pid file: $!";
 }
 
-sub launchNxagent {
+sub launch_nxagent {
     my $status = '';
     my $cmd = $NXAGENT.' "'.join('" "', @NXAGENT_OPTS).'"';
     open(NXAGENT_FH, $cmd.' 2>&1 |')
@@ -63,35 +76,36 @@ sub launchNxagent {
 	chomp;
 	# Error message from shell
 	if (/sh: (.+)$/) {
-	    handleStatus "exited aborted";
+	    handle_status "exited aborted";
 	    die "Can't execute nxagent: $1";
 	}
 	# Save agent pid, not necessarily pid of the opened cmd
 	if (/Info: Agent running with pid '(\d+)'/) {
-	    handlePid $1;
+	    handle_pid $1;
 	}
 	# Handle Starting, Suspending, Terminating, Aborting
 	if (/Session: (\w+) session at/) {
 	    $status = lc($1);
-	    handleStatus $status;
+	    handle_status $status;
 	}
 	# Handle started, suspended, terminated, aborted
 	if (/Session: Session (\w+) at/) {
 	    $status = $1;
-	    handleStatus $status;
+	    handle_status $status;
 	}
-	if ("$PASSTHROUGH" eq 1) {
-	    print $_."\n";
-	}
+	print QVD_SESSION_LOG_FH $_."\n";
     }
     close NXAGENT_FH;
-    handleStatus "exited $status"
+    handle_status "exited $status"
 }
 
-openPidFile or die "Can't open pid file: $!";
-openStatusFile or die "Can't open status file: $!";
-lockStatusFile or die "Can't lock status file: $!";
-unbufferStatusFile;
-launchNxagent;
-unlockStatusFile;
-closeStatusFile;
+open_pid_file or die "Can't open pid file: $!";
+open_log_file or die "Can't open log file: $!";
+open_status_file or die "Can't open status file: $!";
+lock_status_file or die "Can't lock status file: $!";
+unbuffer_status_file;
+setup_environment;
+launch_nxagent;
+unlock_status_file;
+close_status_file;
+close_log_file;

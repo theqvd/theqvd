@@ -19,16 +19,37 @@ package QVD::VMA::Impl;
 
 use parent 'QVD::SimpleRPC::Server';
 
+# FIXME Move session dir and un-priviledged user name to config file
+
+sub qvd_touch {
+    my $fname = shift;
+    open FH, ">>", $fname or die "Couldn't create $fname: $!";
+    close FH;
+    chmod 0666, $fname or die "Couldn't set permissions for $fname: $!";
+}
+
+sub new {
+    my $class = shift;
+    my $self = $class->SUPER::new();
+    bless $self, $class;
+    my $QVD_SESSION_DIR = '/var/run/qvd';
+    mkdir $QVD_SESSION_DIR or die "Couldn't create run directory: $!"
+    	unless -e $QVD_SESSION_DIR;
+    qvd_touch $QVD_SESSION_DIR.'/state';
+    qvd_touch $QVD_SESSION_DIR.'/nxagent.pid';
+    qvd_touch $QVD_SESSION_DIR.'/nxagent.log';
+    $self
+}
 
 sub _get_nxagent_pid {
     my $self = shift;
-    return `cat /var/run/qvd/nxagent-pid`;
+    return `cat /var/tmp/qvd/nxagent.pid`;
 }
 
 
 sub _get_nxagent_status {
     my $self = shift;
-    my $status = `cat /var/run/qvd/state`;
+    my $status = `cat /var/tmp/qvd/state`;
     chomp($status);
     return $status;
 }
@@ -80,7 +101,7 @@ sub _start_or_resume_session {
 	my $pid = fork;
 	if (!$pid) {
 	    defined $pid or die "fork failed";
-	    { exec "xinit /usr/bin/gnome-session -- ./QVD-VMA/bin/nxagent-monitor.pl :1000 -display nx/nx,link=lan:1000 -ac" };
+	    { exec "sudo -u qvd xinit /usr/bin/gnome-session -- ./QVD-VMA/bin/nxagent-monitor.pl :1000 -display nx/nx,link=lan:1000 -ac" };
 	    { exec "/bin/false" };
 	    require POSIX;
 	    POSIX::_exit(-1);
