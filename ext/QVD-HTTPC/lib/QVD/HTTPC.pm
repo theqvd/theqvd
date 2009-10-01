@@ -24,7 +24,7 @@ sub new {
     keys %opts and
 	croak "unknown constructor option(s) " . join(', ', keys %opts);
 
-    my $socket = IO::Socket::INET->new($target)
+    my $socket = IO::Socket::INET->new(PeerAddr => $target, Timeout => 10)
 	or die "Unable to connect to $target";
     my $self = { target => $target,
 		 socket => $socket,
@@ -150,7 +150,7 @@ sub _readline {
 	    $line =~ s/\r?\n$//;
 	    return $line;
 	}
-	$self->_sysread(length($$buffer) + 1024);
+	$self->_sysread(length($$buffer) + 1);
     }
 }
 
