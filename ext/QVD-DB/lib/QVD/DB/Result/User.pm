@@ -10,6 +10,7 @@ __PACKAGE__->add_columns(
 	},
 	qw/login/);
 __PACKAGE__->set_primary_key('id');
+__PACKAGE__->add_unique_constraint(['login']);
 __PACKAGE__->has_many(vms => 'QVD::DB::Result::VM', 'user_id');
 
 1;
