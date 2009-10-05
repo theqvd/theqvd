@@ -7,7 +7,9 @@ use Data::Dumper;
 
 sub new {
 	my $class=shift;
+	my %opts = @_;
 	my $schema = QVD::DB->new(); 
+	$schema->deploy({add_drop_table => 1}) if $opts{deploy};
 	my $self = {schema => $schema};
 	bless $self, $class;
 	return $self; 
@@ -28,6 +30,14 @@ sub add_user {
         my $schema = $self->{schema};
         my $login = $opts{'login'};
 	$schema->resultset('User')->create({login => $login});
+	$schema->txn_commit;
+}
+
+sub add_host {
+	my ($self, %opts) = @_;
+        my $schema = $self->{schema};
+        my $farm = $opts{'farm'};
+	$schema->resultset('Host')->create({farm_id => $farm});
 	$schema->txn_commit;
 }
 

@@ -2,38 +2,20 @@
 
 use strict;
 use warnings;
-use QVD::DB;
+use QVD::DB::Provisioning;
 
-my @sqlt_args = { add_drop_table => 1 };
-
-my $schema = QVD::DB->new();
-$schema->deploy(@sqlt_args);
-$schema->resultset('Farm')->create({name => 'Granja de pruebas'});
-$schema->resultset('User')->create({login => 'qvd'});
-$schema->resultset('Host')->create({
-	farm_id => 1,
-	});
-$schema->populate('OSI', [
-	[ qw/name disk_image/ ], 
-	[ 'Test image', 'qvd-guest.img' ],
-	]);
-$schema->populate('VM', [
-	[ qw/name osi_id farm_id user_id ip storage/ ], 
-	[ 'Test VM 1', 1, 1, 1, '', '' ],
-	[ 'Test VM 2', 1, 1, 1, '', '' ],
-	[ 'Test VM 3', 1, 1, 1, '', '' ],
-	[ 'Test VM 4', 1, 1, 1, '', '' ],
-	[ 'Test VM 5', 1, 1, 1, '', '' ],
-	[ 'Test VM 6', 1, 1, 1, '', '' ],
-	[ 'Test VM 7', 1, 1, 1, '', '' ],
-	]);
-$schema->populate('VM_Runtime', [
-	[ qw/vm_id state host_id state_x state_user user_ip real_user_id/ ], 
-	[ 1, 'stopped', 1, '', '', '', 1],
-	[ 2, 'stopped', 1, '', '', '', 1],
-	[ 3, 'stopped', 1, '', '', '', 1],
-	[ 4, 'stopped', 1, '', '', '', 1],
-	[ 5, 'stopped', 1, '', '', '', 1],
-	[ 6, 'stopped', 1, '', '', '', 1],
-	[ 7, 'stopped', 1, '', '', '', 1],
-	]);
+my $db = QVD::DB::Provisioning->new(deploy => 1);
+$db->add_farm(name => 'Granja de pruebas');
+$db->add_user(login => 'qvd');
+$db->add_host(farm => 1);
+$db->add_osi(name => 'Test image', path => 'qvd-guest.img');
+foreach my $i (1..7) {
+    $db->add_vm(
+	    name => 'Test VM '.$i,
+	    osi => 1,
+	    farm => 1, 
+	    user => 1,
+	    ip => '',
+	    storage => ''
+	    );
+}
