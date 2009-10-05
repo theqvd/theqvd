@@ -80,21 +80,19 @@ sub SimpleRPC_start_vm {
 # Allow a timeout for generation of pid file
     sleep 2;
     if ($self->_is_kvm_running($id)) {
-	my $cd = $schema->resultset('VM_Runtime')->update_or_create(
-	{
-		vm_id => $id,
-		state => 'starting',
-	}	
-	);
+      my $cd = $schema->resultset('VM_Runtime')
+	->update_or_create({ vm_id => $id,
+			     state => 'starting',
+			   });
+	$schema->txn_commit;
 	return { vm_status => 'starting' };
     } else {
 # FIXME how to capture error message from kvm?
-	my $cd = $schema->resultset('VM_Runtime')->update_or_create(
-	{
-		vm_id => $id,
-		state => 'aborted',
-	}	
-	);
+	my $cd = $schema->resultset('VM_Runtime')
+	  ->update_or_create({ vm_id => $id,
+			       state => 'aborted',
+			     });
+	$schema->txn_commit;
 	return { vm_status => 'aborted', error => 'vm exited' };
     }
 }
@@ -119,12 +117,11 @@ sub SimpleRPC_stop_vm {
 
     my $r = $vma_client->poweroff();
     if (defined $r->{poweroff}) {
-	my $cd = $schema->resultset('VM_Runtime')->update_or_create(
-	{
-		vm_id => $id,
-		state => 'stopping',
-	}	
-	);
+	my $cd = $schema->resultset('VM_Runtime')
+	  ->update_or_create({ vm_id => $id,
+			       state => 'stopping',
+			     });
+	$schema->txn_commit;
 	return { request => 'success', vm_status => 'stopping' };
     } else {
 	return { request => 'error', error => "agent can't poweroff vm" };
