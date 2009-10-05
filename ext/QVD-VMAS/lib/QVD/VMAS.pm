@@ -82,8 +82,6 @@ sub SimpleRPC_start_vm {
     if ($self->_is_kvm_running($id)) {
 	my $cd = $schema->resultset('VM_Runtime')->update_or_create(
 	{
-# FIXME only one runtime per vm
-		id => $id,
 		vm_id => $id,
 		state => 'starting',
 	}	
@@ -93,8 +91,6 @@ sub SimpleRPC_start_vm {
 # FIXME how to capture error message from kvm?
 	my $cd = $schema->resultset('VM_Runtime')->update_or_create(
 	{
-# FIXME only one runtime per vm
-		id => $id,
 		vm_id => $id,
 		state => 'aborted',
 	}	
@@ -125,8 +121,6 @@ sub SimpleRPC_stop_vm {
     if (defined $r->{poweroff}) {
 	my $cd = $schema->resultset('VM_Runtime')->update_or_create(
 	{
-# FIXME only one runtime per vm
-		id => $id,
 		vm_id => $id,
 		state => 'stopping',
 	}	
