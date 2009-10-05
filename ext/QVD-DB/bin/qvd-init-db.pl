@@ -19,3 +19,5 @@ foreach my $i (1..7) {
 	    storage => ''
 	    );
 }
+
+$db->schema->txn_commit;
