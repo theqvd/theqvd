@@ -8,9 +8,16 @@ __PACKAGE__->add_columns(
 	    data_type => 'integer',
 	    is_auto_increment => 1
 	},
-	qw/login/);
+	login =>  {
+	    data_type => 'varchar(64)'
+	},
+#	uid => {
+#	    data_type => 'integer'
+#	}
+	);
 __PACKAGE__->set_primary_key('id');
 __PACKAGE__->add_unique_constraint(['login']);
+#__PACKAGE__->add_unique_constraint(['uid']);
 __PACKAGE__->has_many(vms => 'QVD::DB::Result::VM', 'user_id');
 
 1;
