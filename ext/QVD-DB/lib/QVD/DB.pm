@@ -5,6 +5,8 @@ use strict;
 
 use parent qw/DBIx::Class::Schema/;
 
+use Config::Tiny;
+
 =head1 NAME
 
 QVD::DB - The great new QVD::DB!
@@ -41,7 +43,12 @@ if you don't export anything, such as for a purely object-oriented module.
 
 sub new {
     my $class = shift;
-    my @conn_info = ('dbi:SQLite:example.db', undef, undef, 
+    
+    my $config = Config::Tiny->new();
+    $config = Config::Tiny->read('config.ini');
+    my $conn_string = $config->{database}->{connectionstring};
+    
+    my @conn_info = ($conn_string, undef, undef, 
     			{ RaiseError => 1, AutoCommit => 0 });
     my $self = { conn_info => \@conn_info };
     bless $self, $class;
