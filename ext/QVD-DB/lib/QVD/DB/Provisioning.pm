@@ -26,14 +26,6 @@ sub new {
     return $self;
 }
 
-sub add_farm {
-    my ($self, %opts) = @_;
-    my $schema = $self->{schema};
-    my $name = delete $opts{name};
-    _die_on_too_many_opts(%opts);
-    $schema->resultset('Farm')->create({name => $name});
-}
-
 sub add_user {
     my ($self, %opts) = @_;
     my $schema = $self->{schema};
@@ -41,21 +33,22 @@ sub add_user {
     _die_on_too_many_opts(%opts);
 
     $schema->resultset('User')->create({login => $login});
+        
+    print "Invocado con, $login\n";
 }
 
 sub add_host {
     my ($self, %opts) = @_;
     my $schema = $self->{schema};
-    my $farm = delete $opts{farm};
     _die_on_too_many_opts(%opts);
 
-    $schema->resultset('Host')->create({farm_id => $farm});
+    $schema->resultset('Host')->create({});
 }
 
 sub add_osi {
     my ($self, %opts) = @_;
     my $schema = $self->{schema};
-    my $disk_image = $opts{path};
+    my $disk_image = delete $opts{path};
     my $name = delete $opts{name};
     _die_on_too_many_opts(%opts);
 
@@ -66,27 +59,22 @@ sub add_osi {
 sub add_vm {
     my ($self, %opts) = @_;
     my $schema = $self->{schema};
-
     my $name = delete $opts{name}; 
-    my $farm = delete $opts{farm}; 
     my $user = delete $opts{user}; 
     my $osi = delete $opts{osi}; 
     my $ip = delete $opts{ip}; 
     my $storage = delete $opts{storage}; 
     _die_on_too_many_opts(%opts);
 
+    my $vm_runtime=$schema->resultset('VM_Runtime')->create({});
+
     my $row = $schema->resultset('VM')->create({name => $name,
-					farm_id => $farm, 
 		 			user_id => $user,
 					osi_id => $osi,
 					ip => $ip,
-					vm_runtime => {},
+					vm_runtime => $vm_runtime,
 					storage => $storage });
-
-    my $vm_runtime=$schema->resultset('VM_Runtime');
-
-    # FIXME print de depurado
-    print "Row $row->id\n";
+ 
 
 }
 
