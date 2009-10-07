@@ -8,7 +8,25 @@ __PACKAGE__->add_columns(
 	    data_type => 'integer',
 	    is_auto_increment => 1
 	},
-	qw/name farm_id user_id osi_id ip storage/ );
+	name => {
+	    data_type => 'varchar(64)'
+	},
+	user_id => {
+	    data_type => 'integer',
+	    is_auto_increment => 1
+	},
+	osi_id => {
+	    data_type => 'integer',
+	    is_auto_increment => 1
+	},
+	ip => {
+	    data_type => 'varchar(15)'
+	},
+	storage  => {
+	# Valor tomado de la variable PATH_MAX de /usr/src/linux-headers-2.6.28-15/include/linux/limits.h
+	    data_type => 'varchar(4096)'
+	}
+	);
 __PACKAGE__->set_primary_key('id');
 __PACKAGE__->belongs_to(user => 'QVD::DB::Result::User', 'user_id');
 __PACKAGE__->belongs_to(osi => 'QVD::DB::Result::OSI', 'osi_id');

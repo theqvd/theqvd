@@ -28,8 +28,6 @@ for (my $i=1;$i<=5;$i++){
 						 });
 }
 
-$schema->resultset('Farm')->create({name => 'Qindel'});
-
 $schema->resultset('Host')->create({farm_id => 1});
 
 $schema->resultset('OSI')->create({name => 'test',
