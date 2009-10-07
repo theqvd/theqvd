@@ -45,10 +45,13 @@ sub new {
     my $class = shift;
     
     my $config = Config::Tiny->new();
+    # Carga los parámetros necesarios desde el fichero de configuración
     $config = Config::Tiny->read('config.ini');
     my $conn_string = $config->{database}->{connectionstring};
+    my $conn_username = $config->{database}->{username};
+    my $conn_password = $config->{database}->{password};
     
-    my @conn_info = ($conn_string, undef, undef, 
+    my @conn_info = ($conn_string, $conn_username, $conn_password, 
     			{ RaiseError => 1, AutoCommit => 0 });
     my $self = { conn_info => \@conn_info };
     bless $self, $class;
