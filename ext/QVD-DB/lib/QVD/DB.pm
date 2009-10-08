@@ -59,7 +59,7 @@ sub new {
 }
 
 sub DESTROY {
-    $self->disconnect();
+    self->disconnect();
 }
 
 =head1 AUTHOR
