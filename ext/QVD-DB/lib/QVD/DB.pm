@@ -58,10 +58,6 @@ sub new {
     $self->connect(@conn_info);
 }
 
-sub DESTROY {
-    self->disconnect();
-}
-
 =head1 AUTHOR
 
 Joni Salonen, C<< <jsalonen at qindel.es> >>
