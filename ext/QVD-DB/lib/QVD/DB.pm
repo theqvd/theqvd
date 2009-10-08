@@ -58,6 +58,7 @@ sub new {
     $self->connect(@conn_info);
 }
 
+
 =head1 AUTHOR
 
 Joni Salonen, C<< <jsalonen at qindel.es> >>
