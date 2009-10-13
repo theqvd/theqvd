@@ -2,7 +2,7 @@ package QVD::DB::Result::Host;
 use base qw/DBIx::Class/;
 
 __PACKAGE__->load_components(qw/Core/);
-__PACKAGE__->table('host');
+__PACKAGE__->table('hosts');
 __PACKAGE__->add_columns(
 	id => {
 	    data_type => 'integer',

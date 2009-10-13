@@ -2,7 +2,7 @@ package QVD::DB::Result::VM;
 use base qw/DBIx::Class/;
 
 __PACKAGE__->load_components(qw/Core/);
-__PACKAGE__->table('vm');
+__PACKAGE__->table('vms');
 __PACKAGE__->add_columns(
 	id => {
 	    data_type => 'integer',

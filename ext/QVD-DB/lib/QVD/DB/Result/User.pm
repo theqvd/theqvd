@@ -2,7 +2,7 @@ package QVD::DB::Result::User;
 use base qw/DBIx::Class/;
 
 __PACKAGE__->load_components(qw/Core/);
-__PACKAGE__->table('user');
+__PACKAGE__->table('users');
 __PACKAGE__->add_columns(
 	id => {
 	    data_type => 'integer',

@@ -2,7 +2,7 @@ package QVD::DB::Result::VM_Runtime;
 use base qw/DBIx::Class/;
 
 __PACKAGE__->load_components(qw/Core/);
-__PACKAGE__->table('vm_runtime');
+__PACKAGE__->table('vm_runtimes');
 __PACKAGE__->add_columns(
 	vm_id => {
 	    data_type => 'integer'

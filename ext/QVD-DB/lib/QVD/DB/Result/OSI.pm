@@ -2,7 +2,7 @@ package QVD::DB::Result::OSI;
 use base qw/DBIx::Class/;
 
 __PACKAGE__->load_components(qw/Core/);
-__PACKAGE__->table('osi');
+__PACKAGE__->table('osis');
 __PACKAGE__->add_columns(
 	id => {
 	    data_type => 'integer',
