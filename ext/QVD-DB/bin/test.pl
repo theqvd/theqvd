@@ -28,7 +28,7 @@ for (my $i=1;$i<=5;$i++){
 						 });
 }
 
-$schema->resultset('Host')->create({farm_id => 1});
+$schema->resultset('Host')->create({});
 
 $schema->resultset('OSI')->create({name => 'test',
 				   disk_image => '/var/local/img'});
