@@ -16,6 +16,11 @@ sub schema {
     $self->{schema};
 }
 
+sub storage {
+    my $self = shift;
+    $self->{storage};
+}
+
 sub new {
     my $class=shift;
     my %opts = @_;
@@ -36,6 +41,13 @@ sub add_user {
         
     print "Invocado con, $login\n";
 }
+
+#~ sub del_user {
+    #~ my ($self, %opts) = @_;
+    #~ my $schema = $self->{schema};
+#~ 
+    #~ $schema->resultset('User')->delete());
+#~ }
 
 sub add_host {
     my ($self, %opts) = @_;
