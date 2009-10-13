@@ -6,17 +6,17 @@ use QVD::DB::Provisioning;
 
 my $db = QVD::DB->new;
 
-$db->storage->dbh->do("DROP TABLE osi CASCADE");
+$db->sth->do("DROP TABLE osi CASCADE");
 $db->schema->txn_commit;
 
-$db->storage->dbh->do("DROP TABLE vm_runtime CASCADE");
+$db->sth->do("DROP TABLE vm_runtime CASCADE");
 $db->schema->txn_commit;
 
-$db->storage->dbh->do("DROP TABLE vm_ CASCADE");
+$db->sth->do("DROP TABLE vm_ CASCADE");
 $db->schema->txn_commit;
 
-$db->storage->dbh->do("DROP TABLE host CASCADE");
+$db->sth->do("DROP TABLE host CASCADE");
 $db->schema->txn_commit;
 
-$db->storage->dbh->do("DROP TABLE user CASCADE");
+$db->sth->do("DROP TABLE user CASCADE");
 $db->schema->txn_commit;
