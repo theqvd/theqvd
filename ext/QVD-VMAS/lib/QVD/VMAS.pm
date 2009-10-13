@@ -74,6 +74,7 @@ sub start_vm {
     $cmd .= " -hda '".$osi->disk_image."'";
     $cmd .= " -hdb '".$vm->storage."'" if -e $vm->storage;
     $cmd .= " -pidfile '".$self->_get_kvm_pid_file_path($id)."'";
+    $cmd .= " -vnc none";
     $cmd .= " &";
 # FIXME executing a program in background doesn't fail even if program doesn't exist
     system($cmd) == 0 or 
