@@ -78,16 +78,16 @@ sub add_vm {
     my $storage = delete $opts{storage}; 
     _die_on_too_many_opts(%opts);
 
-    my $vm_runtime=$schema->resultset('VM_Runtime')->create({state => "stopped"});
 
     my $row = $schema->resultset('VM')->create({name => $name,
 		 			user_id => $user,
 					osi_id => $osi,
 					ip => $ip,
-					vm_runtime => $vm_runtime,
 					storage => $storage });
  
 
+    my $vm_runtime=$schema->resultset('VM_Runtime')->create({vm_id => $row->id,
+							state => "stopped"});
 }
 
 1;
