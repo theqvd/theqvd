@@ -8,12 +8,12 @@ our $VERSION = '0.01';
 use parent 'QVD::HTTPD';
 
 require QVD::Frontend::Plugin::L7R;
-require QVD::Frontend::Plugin::VMAS;
+require QVD::Frontend::Plugin::RC;
 
 sub post_configure_hook {
     my $self = shift;
     QVD::Frontend::Plugin::L7R->set_http_request_processors($self, '/qvd/');
-    QVD::Frontend::Plugin::VMAS->set_http_request_processors($self, '/vmas/');
+    QVD::Frontend::Plugin::RC->set_http_request_processors($self, '/rc/');
 }
 
 
