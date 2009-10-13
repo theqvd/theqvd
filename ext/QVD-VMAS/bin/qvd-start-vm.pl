@@ -2,14 +2,14 @@
 
 use strict;
 use warnings;
-use QVD::VMAS::Client;
-use QVD::VMA::Client;
+use QVD::VMAS;
 
 my $vm_id = 1;
-my $client = QVD::VMAS::Client->new;
+my $client = QVD::VMAS->new();
 
 print "Starting VM $vm_id...\n";
 my $r = $client->start_vm(id => $vm_id);
+die "VM $vm_id is already running" if $r->{vm_status} eq 'started';
 die "Couldn't start VM $vm_id: $r->{error}" unless $r->{vm_status} eq 'starting';
 
 $r = $client->get_vm_status(id => $vm_id);

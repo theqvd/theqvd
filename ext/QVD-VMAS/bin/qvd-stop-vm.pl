@@ -2,10 +2,10 @@
 
 use strict;
 use warnings;
-use QVD::VMAS::Client;
+use QVD::VMAS;
 
 my $vm_id=1;
-my $client = QVD::VMAS::Client->new;
+my $client = QVD::VMAS->new;
 print "Stopping VM $vm_id...\n";
 my $r = $client->stop_vm(id => $vm_id);
 die "Couldn't stop VM $vm_id: $r->{error}" unless $r->{request} eq 'success';

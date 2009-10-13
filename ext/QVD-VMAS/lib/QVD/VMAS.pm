@@ -6,13 +6,14 @@ use strict;
 use QVD::DB;
 use QVD::VMA::Client;
 
-
 our $VERSION = '0.01';
 
-
-package QVD::VMAS::Impl;
-
-use parent 'QVD::SimpleRPC::Server';
+sub new {
+    my $class = shift;
+    my $self = { };
+    bless $self, $class;
+    $self;
+}
 
 sub _get_kvm_pid_file_path {
     my ($self, $id) = @_;
@@ -34,7 +35,7 @@ sub _get_vma_client_for_vm {
 }
 
 
-sub SimpleRPC_start_vm_listener {
+sub start_vm_listener {
     my ($self, %params) = @_;
     my $id = $params{id};
     my $vma_port = 3030+$id;
@@ -45,7 +46,7 @@ sub SimpleRPC_start_vm_listener {
     }
 }
 
-sub SimpleRPC_start_vm {
+sub start_vm {
     my ($self, %params) = @_;
     my $id = $params{id};
 
@@ -97,7 +98,7 @@ sub SimpleRPC_start_vm {
     }
 }
 
-sub SimpleRPC_stop_vm {
+sub stop_vm {
     my ($self, %params) = @_;
     my $id = $params{id};
     unless (defined $id) {
@@ -128,7 +129,7 @@ sub SimpleRPC_stop_vm {
     }
 }
 
-sub SimpleRPC_get_vm_status {
+sub get_vm_status {
     my ($self, %params) = @_;
     my $id = $params{id};
     unless (defined $id) {
@@ -165,23 +166,21 @@ __END__
 
 =head1 NAME
 
-QVD::VMAS - QVD Virtual Machine Administration Services
+QVD::VMAS - API to QVD Virtual Machine Administration Services
 
 =head1 SYNOPSIS
 
-    use QVD::VMAS::Client;
-    my $vmas_client = QVD::VMAS::Client->new();
-    $vmas_client->start_vm(id => 42);
-    $vmas_client->stop_vm(id => 21);
+    use QVD::VMAS;
+    my $vmas= QVD::VMAS->new();
+    $vmas->start_vm(id => 42);
+    $vmas->stop_vm(id => 21);
     ...
 
 =head1 DESCRIPTION
 
-This module implements the VMAS RPC server.
+This module implements the VMAS API.
 
 =head2 API
-
-The following RPC calls are available.
 
 =over
 

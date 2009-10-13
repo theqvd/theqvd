@@ -7,7 +7,7 @@ use IO::Socket::INET;
 use URI::Split qw(uri_split);
 
 use IO::Socket::Forwarder qw(forward_sockets);
-use QVD::VMAS::Client;
+use QVD::VMAS;
 use QVD::HTTP::StatusCodes qw(:status_codes);
 use QVD::HTTP::Headers qw(header_eq_check);
 use QVD::URI qw(uri_query_split);
@@ -40,7 +40,7 @@ sub _connect_to_vm_processor {
     $server->send_http_response(HTTP_PROCESSING,
 				'X-QVD-VM-Status: Checking VM');
 
-    my $vmas = QVD::VMAS::Client->new();
+    my $vmas = QVD::VMAS->new();
     my $r = $vmas->start_vm(id => $id);
     # The VM was not already running or there was some error
     unless ($r->{vm_status} eq 'started') {
