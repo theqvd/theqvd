@@ -4,14 +4,17 @@ use warnings;
 use strict;
 
 use Log::Log4perl qw/:easy/;
+use QVD::VMAS;
 
 our $VERSION = '0.01';
 
 sub new {
     my ($class, %opts) = @_;
     $loop_wait_time = delete $opts{loop_wait_time};
+    my $vmas = QVD::VMAS->new;
     my $self = { 
 	loop_wait_time => $loop_wait_time,
+	vmas => $vmas,
     };
     bless $self, $class;
 }
@@ -27,6 +30,7 @@ sub _install_signals {
 
 sub _do_actions {
     my $self = shift;
+    my $vmas = $self->{vmas};
 }
 
 sub run {
@@ -66,7 +70,7 @@ Construct a new HKD.
 
 =item run
 
-Run the HKD.
+Run the HKD processing loop.
 
 =back
 
