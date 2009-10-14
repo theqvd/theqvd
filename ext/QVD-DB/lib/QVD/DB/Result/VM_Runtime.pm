@@ -86,14 +86,13 @@ __PACKAGE__->add_columns(
 	});
 __PACKAGE__->set_primary_key('vm_id');
 __PACKAGE__->belongs_to(host => 'QVD::DB::Result::Host', 'host_id');
-#__PACKAGE__->has_one(vm => 'QVD::DB::Result::VM', 'vm_id');
 __PACKAGE__->has_one('vm_id' => 'QVD::DB::Result::VM');
 
-__PACKAGE__->has_one('x_state' => 'QVD::DB::Result::X_state');
-__PACKAGE__->has_one('vm_state' => 'QVD::DB::Result::VM_state');
-__PACKAGE__->has_one('user_state' => 'QVD::DB::Result::User_state');
+__PACKAGE__->belongs_to('x_state' => 'QVD::DB::Result::X_state');
+__PACKAGE__->belongs_to('vm_state' => 'QVD::DB::Result::VM_state', 'vm_state');
+__PACKAGE__->belongs_to('user_state' => 'QVD::DB::Result::User_state');
 
-__PACKAGE__->has_one('x_cmd' => 'QVD::DB::Result::X_cmd');
-__PACKAGE__->has_one('vm_cmd' => 'QVD::DB::Result::VM_cmd');
-__PACKAGE__->has_one('user_cmd' => 'QVD::DB::Result::User_cmd');
+__PACKAGE__->belongs_to('x_cmd' => 'QVD::DB::Result::X_cmd');
+__PACKAGE__->belongs_to('vm_cmd' => 'QVD::DB::Result::VM_cmd');
+__PACKAGE__->belongs_to('user_cmd' => 'QVD::DB::Result::User_cmd');
 
