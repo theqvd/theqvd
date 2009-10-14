@@ -2,7 +2,7 @@ package QVD::DB::Result::User_state;
 use base qw/DBIx::Class/;
 
 __PACKAGE__->load_components(qw/Core/);
-__PACKAGE__->table('user_state');
+__PACKAGE__->table('user_states');
 __PACKAGE__->add_columns(
 	name => {
 	    data_type => 'varchar(12)'
