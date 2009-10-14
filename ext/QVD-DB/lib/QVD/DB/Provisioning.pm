@@ -25,7 +25,7 @@ sub new {
     my $class=shift;
     my %opts = @_;
     my $schema = QVD::DB->new();  
-    if $opts{deploy} {
+    if ($opts{deploy}) {
 	$schema->erase;
 	$schema->deploy;
     }
@@ -41,17 +41,8 @@ sub add_user {
     my $login = delete $opts{login};
     _die_on_too_many_opts(%opts);
 
-    $schema->resultset('User')->create({login => $login});
-        
-    print "Invocado con, $login\n";
+    $schema->resultset('User')->create({login => $login});        
 }
-
-#~ sub del_user {
-    #~ my ($self, %opts) = @_;
-    #~ my $schema = $self->{schema};
-#~ 
-    #~ $schema->resultset('User')->delete());
-#~ }
 
 sub add_host {
     my ($self, %opts) = @_;
