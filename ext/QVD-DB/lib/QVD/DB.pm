@@ -81,6 +81,29 @@ sub erase {
     warn $@ if $@;
     $db->txn_commit;
 
+    eval { $db->storage->dbh->do('DROP TABLE x_state CASCADE') };
+    warn $@ if $@;
+    $db->txn_commit;
+    
+    eval { $db->storage->dbh->do('DROP TABLE vm_state CASCADE') };
+    warn $@ if $@;
+    $db->txn_commit;
+    
+    eval { $db->storage->dbh->do('DROP TABLE user_state CASCADE') };
+    warn $@ if $@;
+    $db->txn_commit;
+    
+    eval { $db->storage->dbh->do('DROP TABLE x_cmd CASCADE') };
+    warn $@ if $@;
+    $db->txn_commit;    
+    
+    eval { $db->storage->dbh->do('DROP TABLE vm_cmd CASCADE') };
+    warn $@ if $@;
+    $db->txn_commit;
+    
+    eval { $db->storage->dbh->do('DROP TABLE user_cmd CASCADE') };
+    warn $@ if $@;
+    $db->txn_commit;    
 }
 
 =head1 AUTHOR
