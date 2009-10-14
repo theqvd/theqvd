@@ -24,8 +24,12 @@ sub storage {
 sub new {
     my $class=shift;
     my %opts = @_;
-    my $schema = QVD::DB->new(); 
-    $schema->deploy({add_drop_table => 1}) if $opts{deploy};
+    my $schema = QVD::DB->new();  
+    if $opts{deploy} {
+	$schema->erase;
+	$schema->deploy;
+    }
+
     my $self = {schema => $schema};
     bless $self, $class;
     return $self;
