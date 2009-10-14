@@ -17,7 +17,12 @@ __PACKAGE__->add_columns(
         },
 	vm_state => {
 	    data_type => 'varchar(12)',
-	    is_nullable => 1
+	    is_nullable => 1,
+	    is_enum => 1,
+            extra => {
+                list => [qw/stopped assigned starting running stopping zombie failed/]
+            }
+
 	},
 	vm_state_ts => {
 	    data_type => 'timestamp',
@@ -25,7 +30,11 @@ __PACKAGE__->add_columns(
 	},
 	vm_cmd => {
 	    data_type => 'varchar(12)',
-	    is_nullable => 1
+	    is_nullable => 1,
+	    is_enum => 1,
+            extra => {
+                list => [qw/start stop/]
+            }
 	},	
 	vm_failures => {
 	    data_type => 'integer',
@@ -33,7 +42,10 @@ __PACKAGE__->add_columns(
 	},	
 	x_state => {
 	    data_type => 'varchar(12)',
-            is_nullable => 1
+            is_nullable => 1,
+	    extra => {
+                list => [qw/stopped disconnected connecting connected/]
+            }
         },
 	x_state_ts => {
 	    data_type => 'timestamp',
@@ -41,7 +53,10 @@ __PACKAGE__->add_columns(
 	},
 	x_cmd => {
 	    data_type => 'varchar(12)',
-	    is_nullable => 1
+	    is_nullable => 1,
+	    extra => {
+                list => [qw/start stop/]
+            }
 	},
 	x_failures => {
 	    data_type => 'integer',
@@ -49,7 +64,10 @@ __PACKAGE__->add_columns(
 	},
 	user_state => {
 	    data_type => 'varchar(12)',
-            is_nullable => 1
+            is_nullable => 1,
+	    extra => {
+                list => [qw/disconnected connecting connected disconnecting abroting/]
+            }
         },
 	user_state_ts => {
 	    data_type => 'timestamp',
@@ -57,7 +75,10 @@ __PACKAGE__->add_columns(
 	},
 	user_cmd => {
 	    data_type => 'varchar(12)',
-	    is_nullable => 1
+	    is_nullable => 1,
+	    extra => {
+                list => [qw/abort/]
+            }
 	},
 	real_user_id => {
 	    data_type => 'integer',

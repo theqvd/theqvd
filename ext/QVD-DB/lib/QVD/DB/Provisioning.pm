@@ -82,7 +82,7 @@ sub add_vm {
  
 
     my $vm_runtime=$schema->resultset('VM_Runtime')->create({vm_id => $row->id,
-							state => "stopped"});
+							vm_state => "stopped"});
 }
 
 1;
