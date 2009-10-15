@@ -47,7 +47,7 @@ sub get_vms_for_host {
 
 sub push_vm_state {
     my ($self, $vm, $vm_state) = @_;
-    $vm->update({vm_state => $vm_state});
+    $vm->update({vm_state => $vm_state, vm_state_ts => scalar gmtime});
 }
 
 
@@ -123,7 +123,7 @@ sub stop_vm {
 	return { request => 'error', error => "Can't connect to agent" };
     }
 
-    my $r = $vma_client->poweroff();
+    my $r = eval { $vma_client->poweroff() };
     if (defined $r->{poweroff}) {
 	my $cd = $schema->resultset('VM_Runtime')
 	  ->update_or_create({ vm_id => $id,
@@ -149,8 +149,11 @@ sub get_vm_status {
 
     if ($self->_is_kvm_running($id)) {
 	my $vma = $self->_get_vma_client_for_vm($id);
+	my $r;
 	if ($vma->is_connected()) {
-	    my $r = $vma->status();
+	    $r = eval { $vma->status() };
+	}
+	if (defined $r) {
 	    return { request => 'success', vm_status => 'started',
 	    last_vm_status => $last_status, vma_status => $r->{status}};
 	} else {
@@ -193,6 +196,11 @@ sub update_vma_ok_ts {
 sub clear_vma_ok_ts {
     my ($self, $vm) = @_;
     $vm->update({vma_ok_ts => undef});
+}
+
+sub clear_vm_host {
+    my ($self, $vm) = @_;
+    $vm->update({host_id => undef});
 }
 
 1;

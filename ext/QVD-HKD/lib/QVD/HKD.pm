@@ -18,6 +18,7 @@ sub new {
     my $state_map = {
     	stopped => {
 	    start 	=> {action => 'start_vm'},
+	    _enter	=> {action => 'enter_stopped'},
 	},
 	starting => {
 	    _fail 	=> {action => 'state_failed'},
@@ -32,7 +33,7 @@ sub new {
 	},
 	stopping => {
 	    _enter 	=> {action => 'enter_stopping'},
-	    _fail 	=> {action => 'state_stopped'},
+	    _fail 	=> {action => 'vm_stopped'},
 	    _timeout 	=> {action => 'state_zombie'},
 	},
 	zombie => {
@@ -67,17 +68,28 @@ sub _install_signals {
 
 sub _next_event {
     my ($self, $vm) = @_;
+    my @events = ();
+# Push monitoring events
     my $vm_state = $self->{vmas}->get_vm_status(id => $vm->vm_id);
-    if ($vm->vm_state ne 'stopped' && $vm_state->{vm_status} eq 'stopped') {
-        return '_fail';
+    if ($vm->vm_state ne 'stopped' 
+		&& $vm_state->{vm_status} eq 'stopped') {
+        push @events, '_fail';
     }
     if (! defined $vm->vma_ok_ts 
 		&& exists $vm_state->{vma_status} 
 		&& $vm_state->{vma_status} eq 'ok') {
-	return '_vma_start';
+	push @events, '_vma_start';
     }
+# Push timeout event
+
+# Push command event
     my $event = $vm->vm_cmd;
-    return $event;
+    push @events, $event if defined $event;
+
+# Push default "_do" event
+    push @events, '_do';
+
+    @events
 }
 
 sub _do_actions {
@@ -89,27 +101,29 @@ sub _do_actions {
     foreach my $vm (@vms) {
 	my $vm_id = $vm->vm_id;
 	my $vm_state = $vm->vm_state;
-	DEBUG "_do_actions: Handling VM ".$vm_id." in state ".$vm_state;
-	my $event = $self->_next_event($vm);
-	next unless defined $event;
-	DEBUG "_do_actions: Got event ".$event;
-	my $cmd_map = $self->{state_map}{$vm_state};
-	if (exists $cmd_map->{$event}) {
-	    my $attrs = $cmd_map->{$event};
-	    if (exists $attrs->{action}) {
-		DEBUG "_do_actions: performing action ".$attrs->{action};
-		my $method = $self->can('hkd_action_'.$attrs->{action});
-		my $new_state;
-		if (defined $method) {
-		    $new_state = $self->$method($vm, $vm_state, $event);
-		} else {
-		    ERROR "_do_actions: action not implemented: "
-			.$attrs->{action};
-		}
-		if (defined $new_state) {
-		    DEBUG "_do_actions: changing VM state to $new_state";
-		    $vmas->push_vm_state($vm, $new_state);
-		}
+	my @events = $self->_next_event($vm);
+	while (my $event = shift @events) {
+	    my $event_map = $self->{state_map}{$vm_state};
+	    unless (exists $event_map->{$event}) {
+		DEBUG "VM($vm_id,$vm_state,$event) - event ignored";
+		next;
+	    }
+	    my $action = $event_map->{$event}{action};
+	    DEBUG "_do_actions: Handling VM($vm_id,$vm_state,$event) with $action";
+	    my $method = $self->can('hkd_action_'.$action);
+	    my $new_state;
+	    if (defined $method) {
+		$new_state = $self->$method($vm, $vm_state, $event);
+	    } else {
+		ERROR "_do_actions: not implemented: $action";
+	    }
+# Change state and handle the _enter event.
+# Following events are handled in the new state.
+	    if (defined $new_state && $new_state ne $vm_state) {
+		DEBUG "_do_actions: VM $vm_id: new state $new_state";
+		$vmas->push_vm_state($vm, $new_state);
+		$vm_state = $new_state;
+		unshift @events, '_enter';
 	    }
 	}
     }
@@ -142,7 +156,9 @@ sub hkd_action_start_vm {
     }
 }
 
-sub hkd_action_state_stopped {
+sub hkd_action_vm_stopped {
+    my ($self, $vm, $state, $event) = @_;
+    $self->{vmas}->clear_vma_ok_ts($vm);
     'stopped'
 }
 
@@ -168,7 +184,7 @@ sub hkd_action_update_ok_ts {
 
 sub hkd_action_stop_vm {
     my ($self, $vm, $state, $event) = @_;
-    INFO "Stopping VM";
+    INFO "Stopping VM ".$vm->vm_id;
     my $r = $self->{vmas}->stop_vm(id => $vm->vm_id);
     $self->consume_cmd($vm);
     if ($r->{vm_status} eq 'stopping') {
@@ -176,6 +192,12 @@ sub hkd_action_stop_vm {
     } else {
 	return 'zombie';
     }
+}
+
+sub hkd_action_enter_stopped {
+    my ($self, $vm, $state, $event) = @_;
+    $self->{vmas}->clear_vm_host($vm);
+    undef
 }
 
 sub hkd_action_signal_zombie_vm {
