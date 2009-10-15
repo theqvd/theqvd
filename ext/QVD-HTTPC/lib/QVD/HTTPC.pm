@@ -51,7 +51,7 @@ sub _print {
 	    if (vec($wv, $fn, 1)) {
 		my $bytes = syswrite($socket, $buffer, 16 * 1024);
 		if ($bytes) {
-		    susbtr($buffer, 0, $bytes, '');
+		    substr($buffer, 0, $bytes, '');
 		}
 		else {
 		    die "socket closed unexpectedly";
