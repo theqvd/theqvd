@@ -24,10 +24,11 @@ sub new {
     keys %opts and
 	croak "unknown constructor option(s) " . join(', ', keys %opts);
 
-    my $socket = IO::Socket::INET->new(PeerAddr => $target, Timeout => 10)
-	or die "Unable to connect to $target";
+    my $socket = IO::Socket::INET->new(PeerAddr => $target, Timeout => $timeout)
+	or croak "Unable to connect to $target";
     my $self = { target => $target,
 		 socket => $socket,
+		 timeout => $timeout,
 		 buffer => '' };
     bless $self, $class;
     $self;
@@ -36,13 +37,37 @@ sub new {
 sub get_socket { shift->{socket} }
 
 sub _print {
-    my $socket = shift->{socket};
-    print {$socket} @_
+    my $self = shift;
+    my $socket = $self->{socket};
+    my $timeout = $self->{timeout};
+    my $buffer = join('', @_);
+    my $fn = fileno $socket;
+    $fn >= 0 or croak "bad file handle $socket";
+    while (length $buffer) {
+	my $wv = '';
+	vec($wv, $fn, 1) = 1;
+	my $n = select(undef, $wv, undef, $timeout);
+	if ($n > 0) {
+	    if (vec($wv, $fn, 1)) {
+		my $bytes = syswrite($socket, $buffer, 16 * 1024);
+		if ($bytes) {
+		    susbtr($buffer, 0, $bytes, '');
+		}
+		else {
+		    die "socket closed unexpectedly";
+		}
+	    }
+	}
+	else {
+	    next if $! == Errno::EINTR;
+	    die "connection timed out";
+	}
+    }
 }
 
 sub _print_lines {
-    my $socket = shift->{socket};
-    print {$socket} join $CRLF, @_, '';
+    my $self = shift;
+    $self->_print(join $CRLF, @_, '');
 }
 
 sub send_http_request {
@@ -292,4 +317,3 @@ reserved.
 
 This program is free software; you can redistribute it and/or modify it
 under the same terms as Perl itself.
-

@@ -2,7 +2,9 @@ package QVD::SimpleRPC::Client;
 
 use strict;
 use warnings;
+
 use Carp;
+our @CARP_NOT = qw(QVD::HTTPC);
 
 use URI::Split qw(uri_split);
 use URI::Escape qw(uri_unescape uri_escape);
@@ -10,11 +12,11 @@ use QVD::HTTPC;
 use QVD::HTTP::StatusCodes qw(:status_codes);
 
 sub new {
-    my ($class, $url_base) = @_;
+    my ($class, $url_base, %opts) = @_;
     my ($scheme, $host, $base, $query, $frag) = uri_split($url_base);
     croak "bad URL base for SimpleRPC client"
 	unless ($scheme eq 'http' and !defined($query) and !defined($frag));
-    my $httpc = eval { QVD::HTTPC->new($host) };
+    my $httpc = QVD::HTTPC->new($host, %opts);
     warn $@ if $@;
     $base //= '/';
     $base .= '/' unless $base =~ m|/$|;
@@ -129,4 +131,3 @@ Copyright C<copy> 2009 Qindel Formacion y Servicios S.L., all rights reserved.
 
 This program is free software; you can redistribute it and/or modify it
 under the same terms as Perl itself.
-
