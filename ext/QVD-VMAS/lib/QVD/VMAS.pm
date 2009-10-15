@@ -10,7 +10,11 @@ our $VERSION = '0.01';
 
 sub new {
     my $class = shift;
-    my $self = { };
+    my $db = shift || QVD::DB->new();
+    my $self = {
+	db => $db,
+	last_error => undef,
+    };
     bless $self, $class;
     $self;
 }
@@ -34,6 +38,18 @@ sub _get_vma_client_for_vm {
     QVD::VMA::Client->new('localhost', 3030+$id)
 }
 
+sub get_vms_for_host {
+    my ($self, $host_id) = @_;
+    my @vms = $self->{db}->resultset('VM_Runtime')
+    		->search({host_id => $host_id});
+    return @vms;
+}
+
+sub push_vm_state {
+    my ($self, $vm, $vm_state) = @_;
+    $vm->update({vm_state => $vm_state});
+}
+
 
 sub start_vm_listener {
     my ($self, %params) = @_;
@@ -50,15 +66,15 @@ sub start_vm {
     my ($self, %params) = @_;
     my $id = $params{id};
 
-    return { vm_status => 'aborted', error => 'invalid id: '.$id } 
+    return { error => 'invalid id: '.$id } 
     	unless defined $id;
     
-    my $schema = QVD::DB->new();
+    my $schema = $self->{db};
     my $vm = $schema->resultset('VM')->find({id => $id});
-    return { vm_status => 'aborted', error => 'invalid id: '.$id } 
+    return { error => 'invalid id: '.$id } 
     	unless defined $vm;
     my $osi = $vm->osi;
-    return { vm_status => 'aborted', error => 'no osi' }
+    return { error => 'no osi' }
     	unless defined $osi;
     
     #  Try to start the VM only if it's not already running
@@ -78,24 +94,14 @@ sub start_vm {
     $cmd .= " &";
 # FIXME executing a program in background doesn't fail even if program doesn't exist
     system($cmd) == 0 or 
-    	return { vm_status => 'aborted', error => "Couldn't exec kvm: $!" };
+    	return { vm_status => 'stopped', error => "Couldn't exec kvm: $!" };
 # Allow a timeout for generation of pid file
     sleep 2;
     if ($self->_is_kvm_running($id)) {
-      my $cd = $schema->resultset('VM_Runtime')
-	->update_or_create({ vm_id => $id,
-			     state => 'starting',
-			   });
-	$schema->txn_commit;
 	return { vm_status => 'starting' };
     } else {
 # FIXME how to capture error message from kvm?
-	my $cd = $schema->resultset('VM_Runtime')
-	  ->update_or_create({ vm_id => $id,
-			       state => 'aborted',
-			     });
-	$schema->txn_commit;
-	return { vm_status => 'aborted', error => 'vm exited' };
+	return { vm_status => 'stopped', error => 'vm exited' };
     }
 }
 
@@ -106,7 +112,7 @@ sub stop_vm {
 	return { request => 'error', error => 'invalid id: '.$id };
     }
     
-    my $schema = QVD::DB->new();
+    my $schema = $self->{db};
     my $vm = $schema->resultset('VM')->find({id => $id});
     unless (defined $vm) {
 	return { request => 'error', error => 'invalid id: '.$id };
@@ -121,7 +127,7 @@ sub stop_vm {
     if (defined $r->{poweroff}) {
 	my $cd = $schema->resultset('VM_Runtime')
 	  ->update_or_create({ vm_id => $id,
-			       state => 'stopping',
+			       vm_state => 'stopping',
 			     });
 	$schema->txn_commit;
 	return { request => 'success', vm_status => 'stopping' };
@@ -137,12 +143,9 @@ sub get_vm_status {
 	return { request => 'error', error => 'invalid id: '.$id };
     }
 
-    my $schema = QVD::DB->new();
-    my $vm = $schema->resultset('VM')->find({id => $id});
-    unless (defined $vm) {
-	return { request => 'error', error => 'invalid id: '.$id };
-    }
-    my $last_status = $vm->vm_runtime->state;
+    my $schema = $self->{db};
+    my $vm_runtime = $schema->resultset('VM_Runtime')->find({vm_id => $id});
+    my $last_status = $vm_runtime->vm_state;
 
     if ($self->_is_kvm_running($id)) {
 	my $vma = $self->_get_vma_client_for_vm($id);
@@ -159,6 +162,37 @@ sub get_vm_status {
 	return { request => 'success', vm_status => 'stopped', 
 	last_vm_status => $last_status};
     }
+}
+
+sub get_vma_status {
+    my ($self, $id) = @_;
+    my $vma = $self->_get_vma_client_for_vm($id);
+    if ($vma->is_connected()) {
+	my $r = $vma->status();
+	return $r->{status};
+    } else {
+	$self->{last_error} = 'VMA not connected';
+	return undef;
+    }
+}
+
+sub last_error {
+    shift->{last_error}
+}
+
+sub clear_vm_cmd {
+    my ($self, $vm) = @_;
+    $vm->update({vm_cmd => undef});
+}
+
+sub update_vma_ok_ts {
+    my ($self, $vm) = @_;
+    $vm->update({vma_ok_ts => scalar gmtime});
+}
+
+sub clear_vma_ok_ts {
+    my ($self, $vm) = @_;
+    $vm->update({vma_ok_ts => undef});
 }
 
 1;
