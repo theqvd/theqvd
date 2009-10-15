@@ -109,10 +109,18 @@ The following methods are available:
 
 =over
 
-=item $rpcc = QVD::SimpleRPC::Client->new($base_url)
+=item $rpcc = QVD::SimpleRPC::Client->new($base_url, %opts)
 
 Creates a new client object and stablishes the HTTP connection to the
 remote server.
+
+The accepted options are:
+
+=over
+
+=item Timeout => $timeout
+
+=back
 
 =item $rpcc->$method(@ARGS)
 
