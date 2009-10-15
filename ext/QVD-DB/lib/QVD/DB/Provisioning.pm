@@ -43,7 +43,6 @@ sub _deploy {
     $db->schema->deploy;
     
     $db->add_vm_state(name => 'stopped');
-    $db->add_vm_state(name => 'assigned');
     $db->add_vm_state(name => 'starting');
     $db->add_vm_state(name => 'running');
     $db->add_vm_state(name => 'stopping');

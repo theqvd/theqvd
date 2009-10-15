@@ -24,7 +24,7 @@ __PACKAGE__->add_columns(
 	    is_nullable => 1,
 	    is_enum => 1,
             extra => {
-                list => [qw/stopped assigned starting running stopping zombie failed/]
+                list => [qw/stopped starting running stopping zombie failed/]
             }
 	},
 	vm_state_ts => {
