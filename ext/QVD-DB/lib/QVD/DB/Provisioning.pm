@@ -127,7 +127,7 @@ sub add_vm_state {
     my $name = delete $opts{name};
     _die_on_too_many_opts(%opts);
     
-    $schema->resultset('VM_state')->create({name => $name});
+    $schema->resultset('VM_State')->create({name => $name});
     
 }
 
@@ -137,7 +137,7 @@ sub add_vm_cmd {
     my $name = delete $opts{name};
     _die_on_too_many_opts(%opts);
     
-    $schema->resultset('VM_cmd')->create({name => $name});
+    $schema->resultset('VM_Cmd')->create({name => $name});
     
 }
 
@@ -147,7 +147,7 @@ sub add_user_state {
     my $name = delete $opts{name};
     _die_on_too_many_opts(%opts);
     
-    $schema->resultset('User_state')->create({name => $name});
+    $schema->resultset('User_State')->create({name => $name});
     
 }
 
@@ -157,7 +157,7 @@ sub add_user_cmd {
     my $name = delete $opts{name};
     _die_on_too_many_opts(%opts);
     
-    $schema->resultset('User_cmd')->create({name => $name});
+    $schema->resultset('User_Cmd')->create({name => $name});
     
 }
 
@@ -167,7 +167,7 @@ sub add_x_state {
     my $name = delete $opts{name};
     _die_on_too_many_opts(%opts);
     
-    $schema->resultset('X_state')->create({name => $name});
+    $schema->resultset('X_State')->create({name => $name});
     
 }
 
@@ -177,7 +177,7 @@ sub add_x_cmd {
     my $name = delete $opts{name};
     _die_on_too_many_opts(%opts);
     
-    $schema->resultset('X_cmd')->create({name => $name});
+    $schema->resultset('X_Cmd')->create({name => $name});
     
 }
 
