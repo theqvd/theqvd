@@ -15,6 +15,10 @@ __PACKAGE__->add_columns(
 	    data_type => 'varchar(15)',
             is_nullable => 1
         },
+	real_user_id => {
+	    data_type => 'integer',
+	    is_nullable => 1
+	},
 	vm_state => {
 	    data_type => 'varchar(12)',
 	    is_nullable => 1,
@@ -22,7 +26,6 @@ __PACKAGE__->add_columns(
             extra => {
                 list => [qw/stopped assigned starting running stopping zombie failed/]
             }
-
 	},
 	vm_state_ts => {
 	    data_type => 'timestamp',
@@ -80,20 +83,30 @@ __PACKAGE__->add_columns(
                 list => [qw/abort/]
             }
 	},
-	real_user_id => {
+	vma_ok_ts => {
+	    data_type => 'timestamp',
+	    is_nullable => 1
+	},
+	l7r_host  => {
+	    data_type => 'varchar(15)',
+            is_nullable => 1
+        },
+	l7r_pid => {
 	    data_type => 'integer',
 	    is_nullable => 1
-	});
+	}
+	);
 	
 __PACKAGE__->set_primary_key('vm_id');
+
 __PACKAGE__->belongs_to(host => 'QVD::DB::Result::Host', 'host_id');
-__PACKAGE__->has_one('vm_id' => 'QVD::DB::Result::VM');
+__PACKAGE__->belongs_to('rel_vm_id' => 'QVD::DB::Result::VM', 'vm_id');
 
-__PACKAGE__->belongs_to('x_state' => 'QVD::DB::Result::X_state');
-__PACKAGE__->belongs_to('vm_state' => 'QVD::DB::Result::VM_state');
-__PACKAGE__->belongs_to('user_state' => 'QVD::DB::Result::User_state');
+__PACKAGE__->belongs_to('rel_x_state' => 'QVD::DB::Result::X_state', 'x_state');
+__PACKAGE__->belongs_to('rel_vm_state' => 'QVD::DB::Result::VM_state', 'vm_state');
+__PACKAGE__->belongs_to('rel_user_state' => 'QVD::DB::Result::User_state', 'user_state');
 
-__PACKAGE__->belongs_to('x_cmd' => 'QVD::DB::Result::X_cmd');
-__PACKAGE__->belongs_to('vm_cmd' => 'QVD::DB::Result::VM_cmd');
-__PACKAGE__->belongs_to('user_cmd' => 'QVD::DB::Result::User_cmd');
+__PACKAGE__->belongs_to('rel_x_cmd' => 'QVD::DB::Result::X_cmd', 'x_cmd');
+__PACKAGE__->belongs_to('rel_vm_cmd' => 'QVD::DB::Result::VM_cmd', 'vm_cmd');
+__PACKAGE__->belongs_to('rel_user_cmd' => 'QVD::DB::Result::User_cmd', 'user_cmd');
 
