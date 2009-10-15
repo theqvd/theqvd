@@ -7,7 +7,7 @@ use parent 'QVD::SimpleRPC::Client';
 
 sub new {
     my ($class, $host, $port) = @_;
-    $class->SUPER::new("http://$host:$port/vma/");
+    $class->SUPER::new("http://$host:$port/vma/", timeout => 5);
 }
 
 1;
