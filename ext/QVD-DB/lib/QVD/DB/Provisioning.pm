@@ -102,6 +102,7 @@ sub add_vm {
     my ($self, %opts) = @_;
     my $schema = $self->{schema};
     my $name = delete $opts{name}; 
+    my $host = delete $opts{host}; 
     my $user = delete $opts{user}; 
     my $osi = delete $opts{osi}; 
     my $ip = delete $opts{ip}; 
@@ -117,6 +118,7 @@ sub add_vm {
  
 
     my $vm_runtime=$schema->resultset('VM_Runtime')->create({vm_id => $row->id,
+							host_id => $host,
 							vm_state => "stopped"});
 }
 
