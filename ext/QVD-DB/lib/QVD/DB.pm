@@ -81,27 +81,27 @@ sub erase {
     warn $@ if $@;
     $db->txn_commit;
 
-    eval { $db->storage->dbh->do('DROP TABLE x_state CASCADE') };
+    eval { $db->storage->dbh->do('DROP TABLE x_states CASCADE') };
     warn $@ if $@;
     $db->txn_commit;
     
-    eval { $db->storage->dbh->do('DROP TABLE vm_state CASCADE') };
+    eval { $db->storage->dbh->do('DROP TABLE vm_states CASCADE') };
     warn $@ if $@;
     $db->txn_commit;
     
-    eval { $db->storage->dbh->do('DROP TABLE user_state CASCADE') };
+    eval { $db->storage->dbh->do('DROP TABLE user_states CASCADE') };
     warn $@ if $@;
     $db->txn_commit;
     
-    eval { $db->storage->dbh->do('DROP TABLE x_cmd CASCADE') };
+    eval { $db->storage->dbh->do('DROP TABLE x_cmds CASCADE') };
     warn $@ if $@;
     $db->txn_commit;    
     
-    eval { $db->storage->dbh->do('DROP TABLE vm_cmd CASCADE') };
+    eval { $db->storage->dbh->do('DROP TABLE vm_cmds CASCADE') };
     warn $@ if $@;
     $db->txn_commit;
     
-    eval { $db->storage->dbh->do('DROP TABLE user_cmd CASCADE') };
+    eval { $db->storage->dbh->do('DROP TABLE user_cmds CASCADE') };
     warn $@ if $@;
     $db->txn_commit;    
 }

@@ -5,7 +5,7 @@ __PACKAGE__->load_components(qw/Core/);
 __PACKAGE__->table('user_cmds');
 __PACKAGE__->add_columns(
 	name => {
-	    data_type => 'varchar(12)'
+	    data_type => 'varchar(20)'
 	}
 	);
 __PACKAGE__->set_primary_key('name');

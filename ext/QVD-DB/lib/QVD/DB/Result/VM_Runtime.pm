@@ -66,7 +66,7 @@ __PACKAGE__->add_columns(
 	    data_type => 'varchar(12)',
             is_nullable => 1,
 	    extra => {
-                list => [qw/disconnected connecting connected disconnecting abroting/]
+                list => [qw/disconnected connecting connected disconnecting aborting/]
             }
         },
 	user_state_ts => {
@@ -84,12 +84,13 @@ __PACKAGE__->add_columns(
 	    data_type => 'integer',
 	    is_nullable => 1
 	});
+	
 __PACKAGE__->set_primary_key('vm_id');
 __PACKAGE__->belongs_to(host => 'QVD::DB::Result::Host', 'host_id');
 __PACKAGE__->has_one('vm_id' => 'QVD::DB::Result::VM');
 
 __PACKAGE__->belongs_to('x_state' => 'QVD::DB::Result::X_state');
-__PACKAGE__->belongs_to('vm_state' => 'QVD::DB::Result::VM_state', 'vm_state');
+__PACKAGE__->belongs_to('vm_state' => 'QVD::DB::Result::VM_state');
 __PACKAGE__->belongs_to('user_state' => 'QVD::DB::Result::User_state');
 
 __PACKAGE__->belongs_to('x_cmd' => 'QVD::DB::Result::X_cmd');
