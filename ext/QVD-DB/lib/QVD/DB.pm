@@ -72,6 +72,10 @@ sub erase {
     eval { $db->storage->dbh->do("DROP TABLE vms CASCADE") };
     warn $@ if $@;
     $db->txn_commit;
+    
+    eval { $db->storage->dbh->do('DROP TABLE host_runtimes CASCADE') };
+    warn $@ if $@;
+    $db->txn_commit;        
 
     eval { $db->storage->dbh->do("DROP TABLE hosts CASCADE") };
     warn $@ if $@;
@@ -104,6 +108,7 @@ sub erase {
     eval { $db->storage->dbh->do('DROP TABLE user_cmds CASCADE') };
     warn $@ if $@;
     $db->txn_commit;    
+    
 }
 
 =head1 AUTHOR
