@@ -1,4 +1,4 @@
-package QVD::DB::Result::User_cmd;
+package QVD::DB::Result::User_Cmd;
 use base qw/DBIx::Class/;
 
 __PACKAGE__->load_components(qw/Core/);

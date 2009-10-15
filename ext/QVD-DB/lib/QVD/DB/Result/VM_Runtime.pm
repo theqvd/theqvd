@@ -102,11 +102,11 @@ __PACKAGE__->set_primary_key('vm_id');
 __PACKAGE__->belongs_to(host => 'QVD::DB::Result::Host', 'host_id');
 __PACKAGE__->belongs_to('rel_vm_id' => 'QVD::DB::Result::VM', 'vm_id');
 
-__PACKAGE__->belongs_to('rel_x_state' => 'QVD::DB::Result::X_state', 'x_state');
-__PACKAGE__->belongs_to('rel_vm_state' => 'QVD::DB::Result::VM_state', 'vm_state');
-__PACKAGE__->belongs_to('rel_user_state' => 'QVD::DB::Result::User_state', 'user_state');
+__PACKAGE__->belongs_to('rel_x_state' => 'QVD::DB::Result::X_State', 'x_state');
+__PACKAGE__->belongs_to('rel_vm_state' => 'QVD::DB::Result::VM_State', 'vm_state');
+__PACKAGE__->belongs_to('rel_user_state' => 'QVD::DB::Result::User_State', 'user_state');
 
-__PACKAGE__->belongs_to('rel_x_cmd' => 'QVD::DB::Result::X_cmd', 'x_cmd');
-__PACKAGE__->belongs_to('rel_vm_cmd' => 'QVD::DB::Result::VM_cmd', 'vm_cmd');
-__PACKAGE__->belongs_to('rel_user_cmd' => 'QVD::DB::Result::User_cmd', 'user_cmd');
+__PACKAGE__->belongs_to('rel_x_cmd' => 'QVD::DB::Result::X_Cmd', 'x_cmd');
+__PACKAGE__->belongs_to('rel_vm_cmd' => 'QVD::DB::Result::VM_Cmd', 'vm_cmd');
+__PACKAGE__->belongs_to('rel_user_cmd' => 'QVD::DB::Result::User_Cmd', 'user_cmd');
 

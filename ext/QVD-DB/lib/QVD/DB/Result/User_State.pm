@@ -1,4 +1,4 @@
-package QVD::DB::Result::User_state;
+package QVD::DB::Result::User_State;
 use base qw/DBIx::Class/;
 
 __PACKAGE__->load_components(qw/Core/);

@@ -1,4 +1,4 @@
-package QVD::DB::Result::VM_state;
+package QVD::DB::Result::VM_State;
 use base qw/DBIx::Class/;
 
 __PACKAGE__->load_components(qw/Core/);
