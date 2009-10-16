@@ -28,7 +28,7 @@ __PACKAGE__->add_columns(
             }
 	},
 	vm_state_ts => {
-	    data_type => 'timestamp',
+	    data_type => 'integer',
 	    is_nullable => 1
 	},
 	vm_cmd => {
@@ -51,7 +51,7 @@ __PACKAGE__->add_columns(
             }
         },
 	x_state_ts => {
-	    data_type => 'timestamp',
+	    data_type => 'integer',
 	    is_nullable => 1
 	},
 	x_cmd => {
@@ -73,7 +73,7 @@ __PACKAGE__->add_columns(
             }
         },
 	user_state_ts => {
-	    data_type => 'timestamp',
+	    data_type => 'integer',
 	    is_nullable => 1
 	},
 	user_cmd => {
@@ -84,7 +84,7 @@ __PACKAGE__->add_columns(
             }
 	},
 	vma_ok_ts => {
-	    data_type => 'timestamp',
+	    data_type => 'integer',
 	    is_nullable => 1
 	},
 	l7r_host  => {

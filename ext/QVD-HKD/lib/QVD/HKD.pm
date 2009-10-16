@@ -53,6 +53,13 @@ sub new {
 	db => $db,
 	state_map => $state_map,
     };
+    
+# FIXME get this values from config file
+    my $vm_state_starting_timeout = 30;
+    my $vm_state_running_vma_timeout = 30;
+    my $vm_state_stopping_timeout = 30;
+    my $vm_state_zombie_sigkill_timeout = 30;
+    
     bless $self, $class;
 }
 
@@ -66,7 +73,7 @@ sub _install_signals {
     $SIG{USR1} = \&_handle_signal;
 }
 
-sub _next_event {
+sub _get_events {
     my ($self, $vm) = @_;
     my @events = ();
 # Push monitoring events
@@ -81,6 +88,10 @@ sub _next_event {
 	push @events, '_vma_start';
     }
 # Push timeout event
+
+# Get TIMESTAMP
+    #$vm
+# if (scalar gmtime > $ + self->$vm_state_starting_timeout )
 
 # Push command event
     my $event = $vm->vm_cmd;
@@ -101,7 +112,7 @@ sub _do_actions {
     foreach my $vm (@vms) {
 	my $vm_id = $vm->vm_id;
 	my $vm_state = $vm->vm_state;
-	my @events = $self->_next_event($vm);
+	my @events = $self->_get_events($vm);
 	while (my $event = shift @events) {
 	    my $event_map = $self->{state_map}{$vm_state};
 	    unless (exists $event_map->{$event}) {

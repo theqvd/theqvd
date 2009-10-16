@@ -47,7 +47,7 @@ sub get_vms_for_host {
 
 sub push_vm_state {
     my ($self, $vm, $vm_state) = @_;
-    $vm->update({vm_state => $vm_state, vm_state_ts => scalar gmtime});
+    $vm->update({vm_state => $vm_state, vm_state_ts => time});
 }
 
 
@@ -86,7 +86,7 @@ sub start_vm {
     $cmd .= " -redir tcp:".$agent_port."::5000";
     $cmd .= " -redir tcp:".$vma_port."::3030";
     # Next line activates SSH
-    #$cmd .= " -redir tcp:2222::22";
+    $cmd .= " -redir tcp:2222::22";
     $cmd .= " -hda '".$osi->disk_image."'";
     $cmd .= " -hdb '".$vm->storage."'" if -e $vm->storage;
     $cmd .= " -pidfile '".$self->_get_kvm_pid_file_path($id)."'";
@@ -189,7 +189,7 @@ sub clear_vm_cmd {
 
 sub update_vma_ok_ts {
     my ($self, $vm) = @_;
-    $vm->update({vma_ok_ts => scalar gmtime});
+    $vm->update({vma_ok_ts => time});
 }
 
 sub clear_vma_ok_ts {
