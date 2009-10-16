@@ -7,7 +7,7 @@ use QVD::DB::Provisioning;
 my $db = QVD::DB::Provisioning->new(deploy => 1);
 
 $db->add_user(login => 'qvd');
-$db->add_osi(name => 'Test image', path => '/var/local/QVD/discos/qvd-guest.img');
+$db->add_osi(name => 'Test image', path => 'qvd-guest.img');
 $db->add_host();
 foreach my $i (1..7) {
     $db->add_vm(
