@@ -120,19 +120,18 @@ sub stop_vm {
 
     my $vma_client = $self->_get_vma_client_for_vm($id);
     unless ($vma_client->is_connected()) {
-	return { request => 'error', error => "Can't connect to agent" };
+	return { request => 'error', error => "can't connect to agent" };
     }
 
     my $r = eval { $vma_client->poweroff() };
-    if (defined $r->{poweroff}) {
-	my $cd = $schema->resultset('VM_Runtime')
-	  ->update_or_create({ vm_id => $id,
-			       vm_state => 'stopping',
-			     });
-	$schema->txn_commit;
-	return { request => 'success', vm_status => 'stopping' };
+    if (defined $r) {
+	if (defined $r->{poweroff}) {
+	    return { request => 'success', vm_status => 'stopping' };
+	} else {
+	    return { request => 'error', error => "agent can't poweroff vm" };
+	}
     } else {
-	return { request => 'error', error => "agent can't poweroff vm" };
+	return { request => 'error', error => "rpc failed: $@" };
     }
 }
 
