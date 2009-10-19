@@ -39,7 +39,7 @@ sub new {
 	},
 	stopping => {
 	    _enter 	=> {action => 'enter_stopping'},
-	    _fail 	=> {action => 'vm_stopped'},
+	    _fail 	=> {action => 'state_stopped'},
 	    _timeout 	=> {action => 'state_zombie'},
 	},
 	zombie => {
@@ -195,9 +195,7 @@ sub hkd_action_start_vm {
     }
 }
 
-sub hkd_action_vm_stopped {
-    my ($self, $vm, $state, $event) = @_;
-    $self->{vmas}->clear_vma_ok_ts($vm);
+sub hkd_action_state_stopped {
     'stopped'
 }
 
@@ -210,13 +208,11 @@ sub hkd_action_state_zombie {
 }
 
 sub hkd_action_enter_zombie {
+    # Siempre que se pase a este estado desde cualquier otro...
+    # * se elimina cualquier comando de vm_cmd
+    # * se elimina cualquier comando de x_cmd
+    # * se cambia el estado x_state a "Disconnected" 
     my ($self, $vm, $state, $event) = @_;
-#Siempre que se pase a este estado desde cualquier otro...
-#
-#    * se elimina cualquier comando de vm_cmd
-#    * se elimina cualquier comando de x_cmd
-#    * se cambia el estado x_state a "Disconnected" 
-
     $self->consume_cmd($vm);
     $self->{vmas}->clear_x_cmd($vm);
     $self->{vmas}->disconnect_x($vm);
@@ -264,24 +260,36 @@ sub hkd_action_stop_vm {
 }
 
 sub hkd_action_enter_stopped {
+    # Siempre que se entre en este estado desde cualquier otro...
+    # * se borrara la entrada vm_runtime.host de la base de datos
     my ($self, $vm, $state, $event) = @_;
     $self->{vmas}->clear_vm_host($vm);
-    undef
-}
-
-sub hkd_action_signal_zombie_vm {
-    undef
-}
-
-sub hkd_action_kill_vm {
+    $self->{vmas}->clear_vma_ok_ts($vm);
     undef
 }
 
 sub hkd_action_enter_stopping {
+    # Siempre que se pase a este estado desde cualquier otro...
+    # * se eliminara cualquier comando de x_cmd
+    # * se pone x_state a "Disconnected"
+    my ($self, $vm, $state, $event) = @_;
+    $self->{vmas}->clear_x_cmd($vm);
+    $self->{vmas}->disconnect_x($vm);
     undef
 }
 
 sub hkd_action_enter_failed {
+    # Acciones de entrada
+    # * se elimina cualquier comando de vm_cmd
+    # * se elimina cualquier comando de x_cmd
+    # * se cambia el estado x_state a "Disconnected"
+    # * se elimina la entrada vm_runtime.host de la base de datos
+    my ($self, $vm, $state, $event) = @_;
+    $self->{vmas}->clear_vm_cmd($vm);
+    $self->{vmas}->clear_x_cmd($vm);
+    $self->{vmas}->disconnect_x($vm);
+    $self->{vmas}->clear_vm_host($vm);
+    $self->{vmas}->clear_vma_ok_ts($vm);
     undef
 }
 
