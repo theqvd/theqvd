@@ -21,7 +21,7 @@ sub set_http_request_processors {
 sub _connect_to_vm_processor {
     my ($server, $method, $url, $headers) = @_;
     # FIXME Move this to a configuration file
-    my $vm_start_timeout = 10;
+    my $vm_start_timeout = 60;
 
     unless (header_eq_check($headers, Connection => 'Upgrade') and
 	    header_eq_check($headers, Upgrade => 'QVD/1.0')) {
@@ -31,8 +31,8 @@ sub _connect_to_vm_processor {
 
     my ($path, $query) = (uri_split $url)[2, 3];
     my %params = uri_query_split $query;
-    my $id = $params{id};
-    unless (defined $id) {
+    my $user_id = $params{user_id};
+    unless (defined $user_id) {
 	$server->send_http_error(HTTP_UNPROCESSABLE_ENTITY);
 	return;
     }
@@ -41,7 +41,15 @@ sub _connect_to_vm_processor {
 				'X-QVD-VM-Status: Checking VM');
 
     my $vmas = QVD::VMAS->new();
-    my $r = $vmas->start_vm(id => $id);
+    my @vms = $vmas->get_vms_for_user($user_id);
+    # FIXME limits number of VMs per user to 1
+    my $vm = $vms[0];
+    unless ($vmas->assign_host_for_vm($vm)) {
+	# FIXME VM could not be assigned to a host, send error to client?
+	$server->send_http_error(HTTP_BAD_GATEWAY);
+	return;
+    }
+    my $r = $vmas->start_vm($vm);
     # The VM was not already running or there was some error
     unless ($r->{vm_status} eq 'started') {
 	# FIXME Pass the error message to the client?
@@ -49,20 +57,21 @@ sub _connect_to_vm_processor {
 		if exists $r->{error};
 
 	# Wait for the VMA to come online
+	# FIXME use time() for checking timeout
 	my $timeout_counter = $vm_start_timeout/5;
 	while ($timeout_counter --> 0) {
 	    $server->send_http_response(HTTP_PROCESSING,
-	    	'X-QVD-VM-Status: Starting VM');
-	    $r = $vmas->get_vm_status(id => $id);
-	    last if exists $r->{vma_status};
+		'X-QVD-VM-Status: Starting VM');
+	    $r = $vmas->get_vm_status($vm);
+	    last if $r->{vma_status} eq 'ok';
 	    sleep 5;
 	}
 	# Timed out
 	# FIXME Pass the error message to the client?
-	$server->send_http_error(HTTP_BAD_GATEWAY), return
+	do {$server->send_http_error(HTTP_BAD_GATEWAY), return}
 		if $timeout_counter < 0;
     }
-    $r = $vmas->start_vm_listener(id => $id)
+    $r = $vmas->start_vm_listener($vm)
 	or do {
 	    $server->send_http_error(HTTP_BAD_GATEWAY);
 	    return;

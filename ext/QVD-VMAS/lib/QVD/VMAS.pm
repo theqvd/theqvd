@@ -50,6 +50,24 @@ sub get_vms_for_host {
     return @vms;
 }
 
+sub get_vms_for_user {
+    my ($self, $user_id) = @_;
+    my @vms = $self->{db}->resultset('VM')
+    		->search({'user_id' => $user_id});
+    return map { $_->vm_runtime } @vms;
+}
+
+sub _get_free_host {
+    # FIXME Implement some kind of load balancing algorithm
+    shift->{db}->resultset('Host')->first->id;
+}
+
+sub assign_host_for_vm {
+    my ($self, $vm) = @_;
+    my $host_id = $self->_get_free_host();
+    $vm->update({ host_id => $host_id });
+}
+
 sub push_vm_state {
     my ($self, $vm, $vm_state) = @_;
     $vm->update({vm_state => $vm_state, vm_state_ts => time});
@@ -57,19 +75,21 @@ sub push_vm_state {
 
 
 sub start_vm_listener {
-    my ($self, %params) = @_;
-    my $id = $params{id};
+    my ($self, $vm) = @_;
+    my $id = $vm->vm_id;
     my $vma_port = 3030+$id;
     my $agent_port = 5000+$id;
     my $vma_client = $self->_get_vma_client_for_vm($id);
-    if ($vma_client->start_vm_listener) {
+    eval { $vma_client->start_vm_listener };
+    if ($@) {
+	return { request => 'error', 'error' => $@ };
+    } else {
 	return { request => 'success', host => 'localhost', 'port' => $agent_port };
     }
 }
 
 sub start_vm {
     my ($self, $vm) = @_;
-    
     my $id = $vm->vm_id;
     my $osi = $vm->rel_vm_id->osi;
     #  Try to start the VM only if it's not already running
