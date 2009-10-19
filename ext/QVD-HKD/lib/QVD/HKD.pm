@@ -94,13 +94,28 @@ sub _get_events {
 	    if (time > ($vm->vm_state_ts + $vm_state_starting_timeout)) {
 		push @events, '_timeout';
 	    }
-#	    DEBUG "Time to timeout ".(($vm->vm_state_ts + $vm_state_starting_timeout) - time);
 	}
     }
     
     if ($vm->vm_state eq 'running') {
 	if (defined $vm->vma_ok_ts) {
 	    if (time > ($vm->vma_ok_ts + $vm_state_running_vma_timeout)) {
+		push @events, '_timeout';
+	    }
+	}
+    }
+    
+    if ($vm->vm_state eq 'stopping') {
+	if (defined $vm->vm_state_ts) {
+	    if (time > ($vm->vm_state_ts + $vm_state_stopping_timeout)) {
+		push @events, '_timeout';
+	    }
+	}
+    }
+    
+    if ($vm->vm_state eq 'zombie') {
+	if (defined $vm->vm_state_ts) {
+	    if (time > ($vm->vm_state_ts + $vm_state_zombie_sigkill_timeout)) {
 		push @events, '_timeout';
 	    }
 	}
@@ -209,7 +224,7 @@ sub hkd_action_kill_vm {
 sub hkd_action_vm_running {
     my ($self, $vm, $state, $event) = @_;
     $self->{vmas}->update_vma_ok_ts($vm);
-    undef
+    'running'
 }
 
 sub hkd_action_update_ok_ts {
@@ -237,6 +252,14 @@ sub hkd_action_stop_vm {
 sub hkd_action_enter_stopped {
     my ($self, $vm, $state, $event) = @_;
     $self->{vmas}->clear_vm_host($vm);
+    undef
+}
+
+sub hkd_action_signal_zombie_vm {
+    undef
+}
+
+sub hkd_action_kill_vm {
     undef
 }
 
