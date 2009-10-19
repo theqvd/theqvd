@@ -7,13 +7,17 @@ use Log::Log4perl qw/:easy/;
 use QVD::VMAS;
 use QVD::DB;
 
+use Config::Tiny;
+
 our $VERSION = '0.01';
 
-# FIXME get this values from config file
-my $vm_state_starting_timeout = 60;
-my $vm_state_running_vma_timeout = 15;
-my $vm_state_stopping_timeout = 15;
-my $vm_state_zombie_sigkill_timeout = 15;
+# Carga los parámetros necesarios desde el fichero de configuración
+my $config = Config::Tiny->new();
+$config = Config::Tiny->read('config.ini');
+my $vm_state_starting_timeout = $config->{timeouts}->{vm_state_starting_timeout};
+my $vm_state_running_vma_timeout = $config->{timeouts}->{vm_state_running_vma_timeout};
+my $vm_state_stopping_timeout = $config->{timeouts}->{vm_state_stopping_timeout};
+my $vm_state_zombie_sigkill_timeout = $config->{timeouts}->{vm_state_zombie_sigkill_timeout};
 
 sub new {
     my ($class, %opts) = @_;
@@ -73,6 +77,17 @@ sub _install_signals {
     $SIG{USR1} = \&_handle_signal;
 }
 
+sub _check_timeout {
+    my ($state, $statestring, $ts, $timeout) = @_;
+    if ($state eq $statestring) {
+	if (defined $ts and time > $ts + $timeout) {
+		return '_timeout';
+	    
+	}
+    }
+    undef
+}
+
 sub _get_events {
     my ($self, $vm) = @_;
     my @events = ();
@@ -88,41 +103,20 @@ sub _get_events {
 	push @events, '_vma_start';
     }
 # Push timeout event
-
-    if ($vm->vm_state eq 'starting') {
-	if (defined $vm->vm_state_ts) {
-	    if (time > ($vm->vm_state_ts + $vm_state_starting_timeout)) {
-		push @events, '_timeout';
-	    }
-	}
-    }
+    my $event = _check_timeout($vm->vm_state, 'starting', $vm->vm_state_ts, $vm_state_starting_timeout);
+    push @events, $event if defined $event;
     
-    if ($vm->vm_state eq 'running') {
-	if (defined $vm->vma_ok_ts) {
-	    if (time > ($vm->vma_ok_ts + $vm_state_running_vma_timeout)) {
-		push @events, '_timeout';
-	    }
-	}
-    }
+    $event = _check_timeout($vm->vm_state, 'running', $vm->vma_ok_ts, $vm_state_running_vma_timeout);
+    push @events, $event if defined $event;
     
-    if ($vm->vm_state eq 'stopping') {
-	if (defined $vm->vm_state_ts) {
-	    if (time > ($vm->vm_state_ts + $vm_state_stopping_timeout)) {
-		push @events, '_timeout';
-	    }
-	}
-    }
+    $event = _check_timeout($vm->vm_state, 'stopping', $vm->vm_state_ts, $vm_state_stopping_timeout);
+    push @events, $event if defined $event;
     
-    if ($vm->vm_state eq 'zombie') {
-	if (defined $vm->vm_state_ts) {
-	    if (time > ($vm->vm_state_ts + $vm_state_zombie_sigkill_timeout)) {
-		push @events, '_timeout';
-	    }
-	}
-    }
+    $event = _check_timeout($vm->vm_state, 'zombie', $vm->vm_state_ts, $vm_state_zombie_sigkill_timeout);
+    push @events, $event if defined $event;
 
 # Push command event
-    my $event = $vm->vm_cmd;
+    $event = $vm->vm_cmd;
     push @events, $event if defined $event;
 
 # Push default "_do" event
@@ -141,7 +135,7 @@ sub _do_actions {
 	my $vm_id = $vm->vm_id;
 	my $vm_state = $vm->vm_state;
 	my @events = $self->_get_events($vm);
-	while (my $event = shift @events) {
+	while (defined (my $event = shift @events)) {
 	    my $event_map = $self->{state_map}{$vm_state};
 	    unless (exists $event_map->{$event}) {
 		DEBUG "VM($vm_id,$vm_state,$event) - event ignored";
