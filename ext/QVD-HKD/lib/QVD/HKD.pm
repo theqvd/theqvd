@@ -194,10 +194,22 @@ sub hkd_action_state_zombie {
     'zombie'
 }
 
+sub hkd_action_signal_zombie_vm {
+    my ($self, $vm, $state, $event) = @_;
+    $self->{vmas}->terminate_vm($vm);
+    undef
+}
+
+sub hkd_action_kill_vm {
+    my ($self, $vm, $state, $event) = @_;
+    $self->{vmas}->kill_vm($vm);
+    undef
+}
+
 sub hkd_action_vm_running {
     my ($self, $vm, $state, $event) = @_;
     $self->{vmas}->update_vma_ok_ts($vm);
-    'running'
+    undef
 }
 
 sub hkd_action_update_ok_ts {

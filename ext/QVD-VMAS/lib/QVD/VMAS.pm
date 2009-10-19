@@ -24,13 +24,18 @@ sub _get_kvm_pid_file_path {
     "/var/run/qvd/vm-$id.pid"
 }
 
-sub _is_kvm_running {
-    my ($self, $id) = @_;
+sub _signal_kvm {
+    my ($self, $id, $signal) = @_;
     my $pidFile = $self->_get_kvm_pid_file_path($id);
     my $pid = `cat $pidFile` if -e $pidFile;
 # FIXME need to check if the process with this PID is actually KVM!
-    return kill(0, $pid) if defined $pid;
+    return kill($signal, $pid) if defined $pid;
     0
+}
+
+sub _is_kvm_running {
+    my ($self, $id) = @_;
+    $self->_signal_kvm($id, 0)
 }
 
 sub _get_vma_client_for_vm {
@@ -201,6 +206,17 @@ sub clear_vm_host {
     my ($self, $vm) = @_;
     $vm->update({host_id => undef});
 }
+
+sub terminate_vm {
+    my ($self, $vm) = @_;
+    $self->_signal_kvm($vm->vm_id, 15);
+}
+
+sub kill_vm {
+    my ($self, $vm) = @_;
+    $self->_signal_kvm($vm->vm_id, 9);
+}
+
 
 1;
 
