@@ -9,6 +9,12 @@ use QVD::DB;
 
 our $VERSION = '0.01';
 
+# FIXME get this values from config file
+my $vm_state_starting_timeout = 30;
+my $vm_state_running_vma_timeout = 30;
+my $vm_state_stopping_timeout = 30;
+my $vm_state_zombie_sigkill_timeout = 30;
+
 sub new {
     my ($class, %opts) = @_;
     my $loop_wait_time = delete $opts{loop_wait_time};
@@ -26,8 +32,8 @@ sub new {
 	    _vma_start 	=> {action => 'vm_running'},
 	},
 	running => {
-	    _fail 	=> {state => 'state_failed'},
-	    _timeout 	=> {state => 'state_zombie'},
+	    _fail 	=> {action => 'state_failed'},
+	    _timeout 	=> {action => 'state_zombie'},
 	    _do 	=> {action => 'update_ok_ts'},
 	    stop 	=> {action => 'stop_vm'},
 	},
@@ -53,13 +59,7 @@ sub new {
 	db => $db,
 	state_map => $state_map,
     };
-    
-# FIXME get this values from config file
-    my $vm_state_starting_timeout = 30;
-    my $vm_state_running_vma_timeout = 30;
-    my $vm_state_stopping_timeout = 30;
-    my $vm_state_zombie_sigkill_timeout = 30;
-    
+      
     bless $self, $class;
 }
 
@@ -90,8 +90,11 @@ sub _get_events {
 # Push timeout event
 
 # Get TIMESTAMP
-    #$vm
-# if (scalar gmtime > $ + self->$vm_state_starting_timeout )
+    if (defined $vm->vma_ok_ts) {
+	if (time > ($vm->vma_ok_ts + $vm_state_starting_timeout)) {
+	    DEBUG "Timeout ".$vm->vma_ok_ts;
+	}
+    }
 
 # Push command event
     my $event = $vm->vm_cmd;
