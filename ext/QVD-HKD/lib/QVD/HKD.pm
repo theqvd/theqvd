@@ -77,7 +77,7 @@ sub _get_events {
     my ($self, $vm) = @_;
     my @events = ();
 # Push monitoring events
-    my $vm_state = $self->{vmas}->get_vm_status(id => $vm->vm_id);
+    my $vm_state = $self->{vmas}->get_vm_status($vm);
     if ($vm->vm_state ne 'stopped' 
 		&& $vm_state->{vm_status} eq 'stopped') {
         push @events, '_fail';
@@ -189,7 +189,7 @@ sub hkd_action_start_vm {
     my ($self, $vm, $state, $event) = @_;
     INFO "Starting VM ".$vm->vm_id;
     $self->consume_cmd($vm);
-    my $r = $self->{vmas}->start_vm(id => $vm->vm_id);
+    my $r = $self->{vmas}->start_vm($vm);
     if (! exists $r->{error} && $r->{vm_status} eq 'starting') {
 	return 'starting';
     } else {
@@ -242,7 +242,7 @@ sub hkd_action_vm_started_running {
 sub hkd_action_update_ok_ts {
     my ($self, $vm, $state, $event) = @_;
     
-    my $vm_state = $self->{vmas}->get_vm_status(id => $vm->vm_id);
+    my $vm_state = $self->{vmas}->get_vm_status($vm);
     if ($vm_state->{vma_status} eq "ok") {
     	$self->{vmas}->update_vma_ok_ts($vm);
     }
@@ -252,7 +252,7 @@ sub hkd_action_update_ok_ts {
 sub hkd_action_stop_vm {
     my ($self, $vm, $state, $event) = @_;
     INFO "Stopping VM ".$vm->vm_id;
-    my $r = $self->{vmas}->stop_vm(id => $vm->vm_id);
+    my $r = $self->{vmas}->stop_vm($vm);
     $self->consume_cmd($vm);
     if ($r->{vm_status} eq 'stopping') {
 	return 'stopping';

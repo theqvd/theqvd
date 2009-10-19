@@ -68,20 +68,10 @@ sub start_vm_listener {
 }
 
 sub start_vm {
-    my ($self, %params) = @_;
-    my $id = $params{id};
-
-    return { error => 'invalid id: '.$id } 
-    	unless defined $id;
+    my ($self, $vm) = @_;
     
-    my $schema = $self->{db};
-    my $vm = $schema->resultset('VM')->find({id => $id});
-    return { error => 'invalid id: '.$id } 
-    	unless defined $vm;
-    my $osi = $vm->osi;
-    return { error => 'no osi' }
-    	unless defined $osi;
-    
+    my $id = $vm->vm_id;
+    my $osi = $vm->rel_vm_id->osi;
     #  Try to start the VM only if it's not already running
     return { vm_status => 'started' } if $self->_is_kvm_running($id);
 
@@ -93,7 +83,7 @@ sub start_vm {
     # Next line activates SSH
     $cmd .= " -redir tcp:2222::22";
     $cmd .= " -hda '".$osi->disk_image."'";
-    $cmd .= " -hdb '".$vm->storage."'" if -e $vm->storage;
+    $cmd .= " -hdb '".$vm->rel_vm_id->storage."'" if -e $vm->rel_vm_id->storage;
     $cmd .= " -pidfile '".$self->_get_kvm_pid_file_path($id)."'";
     $cmd .= " -vnc none";
     $cmd .= " &";
@@ -111,19 +101,9 @@ sub start_vm {
 }
 
 sub stop_vm {
-    my ($self, %params) = @_;
-    my $id = $params{id};
-    unless (defined $id) {
-	return { request => 'error', error => 'invalid id: '.$id };
-    }
-    
-    my $schema = $self->{db};
-    my $vm = $schema->resultset('VM')->find({id => $id});
-    unless (defined $vm) {
-	return { request => 'error', error => 'invalid id: '.$id };
-    }
+    my ($self, $vm) = @_;
 
-    my $vma_client = $self->_get_vma_client_for_vm($id);
+    my $vma_client = $self->_get_vma_client_for_vm($vm->vm_id);
     unless ($vma_client->is_connected()) {
 	return { request => 'error', error => "can't connect to agent" };
     }
@@ -141,18 +121,12 @@ sub stop_vm {
 }
 
 sub get_vm_status {
-    my ($self, %params) = @_;
-    my $id = $params{id};
-    unless (defined $id) {
-	return { request => 'error', error => 'invalid id: '.$id };
-    }
+    my ($self, $vm) = @_;
 
-    my $schema = $self->{db};
-    my $vm_runtime = $schema->resultset('VM_Runtime')->find({vm_id => $id});
-    my $last_status = $vm_runtime->vm_state;
+    my $last_status = $vm->vm_state;
 
-    if ($self->_is_kvm_running($id)) {
-	my $vma = $self->_get_vma_client_for_vm($id);
+    if ($self->_is_kvm_running($vm->vm_id)) {
+	my $vma = $self->_get_vma_client_for_vm($vm->vm_id);
 	my $r;
 	if ($vma->is_connected()) {
 	    $r = eval { $vma->status() };
@@ -226,7 +200,6 @@ sub kill_vm {
     my ($self, $vm) = @_;
     $self->_signal_kvm($vm->vm_id, 9);
 }
-
 
 1;
 
