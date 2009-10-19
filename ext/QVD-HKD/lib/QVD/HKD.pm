@@ -240,14 +240,6 @@ sub hkd_action_enter_stopped {
     undef
 }
 
-sub hkd_action_signal_zombie_vm {
-    undef
-}
-
-sub hkd_action_kill_vm {
-    undef
-}
-
 sub hkd_action_enter_stopping {
     undef
 }
