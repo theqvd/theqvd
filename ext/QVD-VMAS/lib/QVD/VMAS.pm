@@ -232,10 +232,15 @@ QVD::VMAS - API to QVD Virtual Machine Administration Services
 =head1 SYNOPSIS
 
     use QVD::VMAS;
+
+    # Start the first VM of host 42 on this host
     my $vmas= QVD::VMAS->new();
-    $vmas->start_vm(id => 42);
-    $vmas->stop_vm(id => 21);
-    ...
+    my @vms = $vmas->get_vms_for_host(42);
+    $vmas->start_vm(@vms[0]);
+
+    # Stop the user 31's first VM, assuming it is running on this host
+    @vms = $vmas->get_vms_for_user(31);
+    $vmas->stop_vm(@vms[0]);
 
 =head1 DESCRIPTION
 
@@ -245,26 +250,48 @@ This module implements the VMAS API.
 
 =over
 
-=item start_vm(id => $id)
+=item assign_host_for_vm($vm_runtime)
 
-Starts the virtual machine with the given id. Returns vm_status = starting on
-success.
+Assigns the given virtual machine runtime to a QVD host. This may use some kind
+of a load balancing algorithm to determine the best host.
 
-=item stop_vm(id => $id)
+Returns true if a host could be assigned, false if no host was available.
 
-Asks the virtual machine with the given id to stop by connecting to its VMA.
-Returns poweroff = 1 on success.
+=back
 
-=item start_vm_listener(id => $id) 
+The methods below operate only on the virtual machines of the current host.
 
-Asks the virtual machine with the given id to start nxagent.
+=over
 
-=item get_vm_status(id => $id)
+=item start_vm($vm_runtime)
 
-Consults the status of the virtual machine with the given id. The status of the
-virtual machine is returned as "vm_status". It is either started or stopped. If
-the machine is started an attempt is made to get the status of the VMA. The VMA
-status is returned as vma_status.
+Starts the given virtual machine runtime on the current host. Returns vm_status
+= starting on success.
+
+=item stop_vm($vm_runtime)
+
+Asks the virtual machine to stop by connecting to its VMA.  Returns a hash with
+poweroff = 1 on success.
+
+=item terminate_vm($vm_runtime) 
+
+Asks the virtual machine process to terminate. This can be implemented by
+sending SIGTERM to the process.
+
+=item kill_vm($vm_runtime) 
+
+Forces the virtual machine process to terminate.
+
+=item start_vm_listener($vm_runtime) 
+
+Asks the given virtual machine to start nxagent.
+
+=item get_vm_status($vm_runtime)
+
+Consults the status of the virtual machine. The status of the virtual machine
+is returned as "vm_status". It is either started or stopped. If the machine is
+started an attempt is made to get the status of the VMA. The VMA status is
+returned as vma_status.
 
 =back
 
