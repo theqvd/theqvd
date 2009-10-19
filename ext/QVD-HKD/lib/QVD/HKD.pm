@@ -10,10 +10,10 @@ use QVD::DB;
 our $VERSION = '0.01';
 
 # FIXME get this values from config file
-my $vm_state_starting_timeout = 30;
-my $vm_state_running_vma_timeout = 30;
-my $vm_state_stopping_timeout = 30;
-my $vm_state_zombie_sigkill_timeout = 30;
+my $vm_state_starting_timeout = 60;
+my $vm_state_running_vma_timeout = 15;
+my $vm_state_stopping_timeout = 15;
+my $vm_state_zombie_sigkill_timeout = 15;
 
 sub new {
     my ($class, %opts) = @_;
@@ -89,10 +89,20 @@ sub _get_events {
     }
 # Push timeout event
 
-# Get TIMESTAMP
-    if (defined $vm->vma_ok_ts) {
-	if (time > ($vm->vma_ok_ts + $vm_state_starting_timeout)) {
-	    DEBUG "Timeout ".$vm->vma_ok_ts;
+    if ($vm->vm_state eq 'starting') {
+	if (defined $vm->vm_state_ts) {
+	    if (time > ($vm->vm_state_ts + $vm_state_starting_timeout)) {
+		push @events, '_timeout';
+	    }
+#	    DEBUG "Time to timeout ".(($vm->vm_state_ts + $vm_state_starting_timeout) - time);
+	}
+    }
+    
+    if ($vm->vm_state eq 'running') {
+	if (defined $vm->vma_ok_ts) {
+	    if (time > ($vm->vma_ok_ts + $vm_state_running_vma_timeout)) {
+		push @events, '_timeout';
+	    }
 	}
     }
 
@@ -192,7 +202,11 @@ sub hkd_action_vm_running {
 
 sub hkd_action_update_ok_ts {
     my ($self, $vm, $state, $event) = @_;
-    $self->{vmas}->update_vma_ok_ts($vm);
+    
+    my $vm_state = $self->{vmas}->get_vm_status(id => $vm->vm_id);
+    if ($vm_state->{vma_status} eq "ok") {
+    	$self->{vmas}->update_vma_ok_ts($vm);
+    }
     undef
 }
 
