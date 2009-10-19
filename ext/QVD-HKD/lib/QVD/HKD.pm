@@ -209,6 +209,20 @@ sub hkd_action_state_zombie {
     'zombie'
 }
 
+sub hkd_action_enter_zombie {
+    my ($self, $vm, $state, $event) = @_;
+#Siempre que se pase a este estado desde cualquier otro...
+#
+#    * se elimina cualquier comando de vm_cmd
+#    * se elimina cualquier comando de x_cmd
+#    * se cambia el estado x_state a "Disconnected" 
+
+    $self->consume_cmd($vm);
+    $self->{vmas}->clear_x_cmd($vm);
+    $self->{vmas}->disconnect_x($vm);
+    undef
+}
+
 sub hkd_action_signal_zombie_vm {
     my ($self, $vm, $state, $event) = @_;
     $self->{vmas}->terminate_vm($vm);

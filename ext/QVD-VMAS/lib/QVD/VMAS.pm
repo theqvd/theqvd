@@ -192,6 +192,16 @@ sub clear_vm_cmd {
     $vm->update({vm_cmd => undef});
 }
 
+sub clear_x_cmd {
+    my ($self, $vm) = @_;
+    $vm->update({x_cmd => undef});
+}
+
+sub disconnect_x {
+    my ($self, $vm) = @_;
+    $vm->update({x_state => 'disconnected'});
+}
+
 sub update_vma_ok_ts {
     my ($self, $vm) = @_;
     $vm->update({vma_ok_ts => time});
