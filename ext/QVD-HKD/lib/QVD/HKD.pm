@@ -29,7 +29,7 @@ sub new {
 	starting => {
 	    _fail 	=> {action => 'state_failed'},
 	    _timeout 	=> {action => 'state_zombie'},
-	    _vma_start 	=> {action => 'vm_running'},
+	    _vma_start 	=> {action => 'vm_started_running'},
 	},
 	running => {
 	    _fail 	=> {action => 'state_failed'},
@@ -156,12 +156,14 @@ sub _do_actions {
 	    } else {
 		ERROR "_do_actions: not implemented: $action";
 	    }
-# Change state and handle the _enter event.
-# Following events are handled in the new state.
+            # Change state and handle the _enter event.
+            # Clear the timeout event and handle the
+            # rest from the new state.
 	    if (defined $new_state && $new_state ne $vm_state) {
 		DEBUG "_do_actions: VM $vm_id: new state $new_state";
 		$vmas->push_vm_state($vm, $new_state);
 		$vm_state = $new_state;
+		@events = grep !/^_timeout$/, @events;
 		unshift @events, '_enter';
 	    }
 	}
@@ -231,7 +233,7 @@ sub hkd_action_kill_vm {
     undef
 }
 
-sub hkd_action_vm_running {
+sub hkd_action_vm_started_running {
     my ($self, $vm, $state, $event) = @_;
     $self->{vmas}->update_vma_ok_ts($vm);
     'running'
