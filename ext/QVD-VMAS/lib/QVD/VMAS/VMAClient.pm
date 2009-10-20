@@ -1,4 +1,4 @@
-package QVD::VMA::Client;
+package QVD::VMAS::VMAClient;
 
 use strict;
 use warnings;
@@ -16,12 +16,12 @@ __END__
 
 =head1 NAME
 
-QVD::VMA::Client - RPC client for the Virtual Machine Agent.
+QVD::VMAS::VMAClient - RPC client for the Virtual Machine Agent.
 
 =head1 SYNOPSIS
 
-	use QVD::VMA::Client;
-	my $vma_client = QVD::VMA::Client->new('localhost', 3030);
+	use QVD::VMAS::VMAClient;
+	my $vma_client = QVD::VMAS::VMAClient->new('localhost', 3030);
 
 =head1 DESCRIPTION
 
