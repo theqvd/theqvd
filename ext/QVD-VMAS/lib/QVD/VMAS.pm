@@ -70,7 +70,7 @@ sub assign_host_for_vm {
 
 sub push_vm_state {
     my ($self, $vm, $vm_state) = @_;
-    $vm->update({vm_state => $vm_state, vm_state_ts => time});
+    $vm->update({ vm_state => $vm_state, vm_state_ts => time });
 }
 
 
@@ -88,6 +88,18 @@ sub start_vm_listener {
     }
 }
 
+sub schedule_start_vm {
+    my ($self, $vm) = @_;
+    unless (defined $vm->vm_cmd && $vm->vm_cmd ne 'start') {
+	my $r = $vm->update({vm_cmd => 'start'});
+	$self->{db}->txn_commit;
+	# FIXME Ping the RC running on remote host
+	return $r;
+    } else {
+	return undef;
+    }
+}
+
 sub start_vm {
     my ($self, $vm) = @_;
     my $id = $vm->vm_id;
@@ -98,6 +110,7 @@ sub start_vm {
     my $vma_port = 3030+$id;
     my $agent_port = 5000+$id;
     my $cmd = "kvm";
+    $cmd .= " -m 512M";
     $cmd .= " -redir tcp:".$agent_port."::5000";
     $cmd .= " -redir tcp:".$vma_port."::3030";
     # Next line activates SSH
@@ -256,6 +269,14 @@ Assigns the given virtual machine runtime to a QVD host. This may use some kind
 of a load balancing algorithm to determine the best host.
 
 Returns true if a host could be assigned, false if no host was available.
+
+=item schedule_start_vm($vm_runtime)
+
+Sets the start command for the given virtual machine and pings the remote
+control running on its host so that the VM starts.
+
+Returns true if the command could be set and the RC pinged, false otherwise.
+Note that at most one command can be set at a time.
 
 =back
 

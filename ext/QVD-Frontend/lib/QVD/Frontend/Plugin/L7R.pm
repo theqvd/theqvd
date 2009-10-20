@@ -40,42 +40,44 @@ sub _connect_to_vm_processor {
     $server->send_http_response(HTTP_PROCESSING,
 				'X-QVD-VM-Status: Checking VM');
 
-    my $vmas = QVD::VMAS->new();
+    my $db = QVD::DB->new();
+    my $vmas = QVD::VMAS->new($db);
     my @vms = $vmas->get_vms_for_user($user_id);
-    # FIXME limits number of VMs per user to 1
+    # FIXME this limits number of VMs per user to 1
     my $vm = $vms[0];
     unless ($vmas->assign_host_for_vm($vm)) {
-	# FIXME VM could not be assigned to a host, send error to client?
+	# FIXME VM could not be assigned to a host, notify client?
 	$server->send_http_error(HTTP_BAD_GATEWAY);
 	return;
     }
-    my $r = $vmas->start_vm($vm);
-    # The VM was not already running or there was some error
-    unless ($r->{vm_status} eq 'started') {
+    my $r = $vmas->schedule_start_vm($vm);
+    $db->txn_commit();
+    unless ($r) {
+	# The VM couldn't be scheduled for starting
 	# FIXME Pass the error message to the client?
-	$server->send_http_error(HTTP_BAD_GATEWAY), return
-		if exists $r->{error};
-
-	# Wait for the VMA to come online
-	# FIXME use time() for checking timeout
-	my $timeout_counter = $vm_start_timeout/5;
-	while ($timeout_counter --> 0) {
-	    $server->send_http_response(HTTP_PROCESSING,
-		'X-QVD-VM-Status: Starting VM');
-	    $r = $vmas->get_vm_status($vm);
-	    last if $r->{vma_status} eq 'ok';
-	    sleep 5;
-	}
-	# Timed out
-	# FIXME Pass the error message to the client?
-	do {$server->send_http_error(HTTP_BAD_GATEWAY), return}
-		if $timeout_counter < 0;
+	$server->send_http_error(HTTP_BAD_GATEWAY);
+	return;
     }
-    $r = $vmas->start_vm_listener($vm)
-	or do {
-	    $server->send_http_error(HTTP_BAD_GATEWAY);
-	    return;
-	};
+    # Wait for the VMA to come online
+    # FIXME use time() for checking timeout
+    my $timeout_counter = $vm_start_timeout/5;
+    while ($timeout_counter --> 0) {
+	$server->send_http_response(HTTP_PROCESSING,
+	    'X-QVD-VM-Status: Starting VM');
+	$r = $vmas->get_vm_status($vm);
+	last if exists $r->{vma_status} && $r->{vma_status} eq 'ok';
+	sleep 5;
+    }
+    # Start timed out
+    # FIXME Pass the error message to the client?
+    $server->send_http_error(HTTP_BAD_GATEWAY), return
+	    if $timeout_counter < 0;
+
+    $r = $vmas->start_vm_listener($vm);
+    unless ($r) {
+	$server->send_http_error(HTTP_BAD_GATEWAY);
+	return;
+    }
 
     for (1..4) {
 	sleep $_;
