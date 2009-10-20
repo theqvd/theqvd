@@ -4,7 +4,8 @@ use warnings;
 use strict;
 
 use QVD::DB;
-use QVD::VMA::Client;
+use QVD::VMAS::VMAClient;
+use QVD::VMAS::RCClient;
 
 our $VERSION = '0.01';
 
@@ -30,7 +31,7 @@ sub _signal_kvm {
     my $pid = `cat $pidFile` if -e $pidFile;
 # FIXME need to check if the process with this PID is actually KVM!
     return kill($signal, $pid) if defined $pid;
-    0
+    undef
 }
 
 sub _is_kvm_running {
@@ -40,7 +41,7 @@ sub _is_kvm_running {
 
 sub _get_vma_client_for_vm {
     my ($self, $id) = @_;
-    QVD::VMA::Client->new('localhost', 3030+$id)
+    QVD::VMAS::VMAClient->new('localhost', 3030+$id)
 }
 
 sub get_vms_for_host {
@@ -93,11 +94,16 @@ sub schedule_start_vm {
     unless (defined $vm->vm_cmd && $vm->vm_cmd ne 'start') {
 	my $r = $vm->update({vm_cmd => 'start'});
 	$self->{db}->txn_commit;
-	# FIXME Ping the RC running on remote host
-	return $r;
-    } else {
-	return undef;
+	# FIXME Add host name or IP to the host table in database so we can
+	# connect somewhere!
+	my $host = 'localhost';
+	my $rc = QVD::VMAS::RCClient->new($host);
+	$r = eval { $rc->ping_hkd() };
+	if (defined $r && $r->{request} eq 'success') {
+	    return 1;
+	}
     }
+    return undef;
 }
 
 sub start_vm {
