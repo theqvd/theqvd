@@ -65,7 +65,7 @@ sub get_vms_for_host {
 
 sub get_vm_ids_for_host_txn {
     my $self = shift;
-    @ids = map $_->vm_id, $self->get_vms_for_host(@_);
+    my @ids = map $_->vm_id, $self->get_vms_for_host(@_);
     $self->txn_commit;
     @ids
 }
