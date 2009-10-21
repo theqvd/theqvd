@@ -20,6 +20,11 @@ sub new {
     $self;
 }
 
+sub txn_commit {
+    my $self = shift;
+    $self->{db}->txn_commit;
+}
+
 sub _get_kvm_pid_file_path {
     my ($self, $id) = @_;
     "/var/run/qvd/vm-$id.pid"
@@ -44,11 +49,25 @@ sub _get_vma_client_for_vm {
     QVD::VMAS::VMAClient->new('localhost', 3030+$id)
 }
 
+sub get_vm_runtime_for_vm_id {
+    my ($self, $vm_id) = @_;
+    my $vms = $self->{db}->resultset('VM_Runtime')
+    		->search({host_id => $vm_id})->first;
+    return $vms;
+}
+
 sub get_vms_for_host {
     my ($self, $host_id) = @_;
     my @vms = $self->{db}->resultset('VM_Runtime')
     		->search({host_id => $host_id});
     return @vms;
+}
+
+sub get_vm_ids_for_host_txn {
+    my $self = shift;
+    @ids = map $_->vm_id, $self->get_vms_for_host(@_);
+    $self->txn_commit;
+    @ids
 }
 
 sub get_vms_for_user {
@@ -69,6 +88,7 @@ sub assign_host_for_vm {
     my $r = $vm->update({ host_id => $host_id });
     $self->commit;
     return $r;
+    
 }
 
 sub push_vm_state {
@@ -193,41 +213,10 @@ sub stop_vm {
     }
 }
 
-sub get_vm_status {
-    my ($self, $vm) = @_;
-
-    my $last_status = $vm->vm_state;
-
-    if ($self->_is_kvm_running($vm->vm_id)) {
-	my $vma = $self->_get_vma_client_for_vm($vm->vm_id);
-	my $r;
-	if ($vma->is_connected()) {
-	    $r = eval { $vma->status() };
-	}
-	if (defined $r) {
-	    return { request => 'success', vm_status => 'started',
-	    last_vm_status => $last_status, vma_status => $r->{status}};
-	} else {
-	    return { request => 'success', vm_status => 'started',
-	    last_vm_status => $last_status, vma_status => 'error', 
-	    vma_error => "Can't connect to agent"};
-	}
-    } else {
-	return { request => 'success', vm_status => 'stopped', 
-	last_vm_status => $last_status};
-    }
-}
-
 sub get_vma_status {
-    my ($self, $id) = @_;
-    my $vma = $self->_get_vma_client_for_vm($id);
-    if ($vma->is_connected()) {
-	my $r = $vma->status();
-	return $r->{status};
-    } else {
-	$self->{last_error} = 'VMA not connected';
-	return undef;
-    }
+    my ($self, $vm) = @_;
+    my $vma = $self->_get_vma_client_for_vm($vm->vm_id);
+    eval { $vma->status() };
 }
 
 sub last_error {
