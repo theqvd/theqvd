@@ -66,14 +66,46 @@ sub _get_free_host {
 sub assign_host_for_vm {
     my ($self, $vm) = @_;
     my $host_id = $self->_get_free_host();
-    $vm->update({ host_id => $host_id });
+    my $r = $vm->update({ host_id => $host_id });
+    $self->commit;
+    return $r;
 }
 
 sub push_vm_state {
     my ($self, $vm, $vm_state) = @_;
     $vm->update({ vm_state => $vm_state, vm_state_ts => time });
+    $self->commit;
 }
 
+sub push_user_state {
+    my ($self, $vm, $state) = @_;
+    $vm->update({ user_state => $state, user_state_ts => time });
+    $self->commit;
+}
+
+sub commit {
+    shift->{db}->txn_commit;
+}
+
+sub _schedule_cmd {
+    my ($self, $vm, $cmd_type, $cmd) = @_;
+    unless (defined $vm->$cmd_type && $vm->$cmd_type ne $cmd) {
+	my $r = $vm->update({$cmd_type  => $cmd});
+	$self->commit;
+	return 1;
+    }
+    undef;
+}
+
+sub schedule_x_cmd {
+    my ($self, $vm, $cmd) = @_;
+    return $self->_schedule_cmd($vm, 'x_cmd', $cmd);
+}
+
+sub schedule_user_cmd {
+    my ($self, $vm, $cmd) = @_;
+    return $self->_schedule_cmd($vm, 'user_cmd', $cmd);
+}
 
 sub start_vm_listener {
     my ($self, $vm) = @_;
@@ -83,24 +115,26 @@ sub start_vm_listener {
     my $vma_client = $self->_get_vma_client_for_vm($id);
     eval { $vma_client->start_vm_listener };
     if ($@) {
+	$self->schedule_user_cmd($vm, 'Abort');
 	return { request => 'error', 'error' => $@ };
     } else {
+	$self->schedule_user_cmd($vm, 'Forward');
 	return { request => 'success', host => 'localhost', 'port' => $agent_port };
     }
 }
 
 sub schedule_start_vm {
     my ($self, $vm) = @_;
-    unless (defined $vm->vm_cmd && $vm->vm_cmd ne 'start') {
-	my $r = $vm->update({vm_cmd => 'start'});
-	$self->{db}->txn_commit;
+    if ($self->_schedule_cmd($vm, 'vm_cmd', 'start')) {
 	# FIXME Add host name or IP to the host table in database so we can
 	# connect somewhere!
 	my $host = 'localhost';
 	my $rc = QVD::VMAS::RCClient->new($host);
-	$r = eval { $rc->ping_hkd() };
+	my $r = eval { $rc->ping_hkd() };
 	if (defined $r && $r->{request} eq 'success') {
 	    return 1;
+	} else {
+	    $self->clear_vm_cmd($vm);
 	}
     }
     return undef;
@@ -200,34 +234,49 @@ sub last_error {
     shift->{last_error}
 }
 
+sub _clear_cmd {
+    my ($self, $vm, $cmd_type) = @_;
+    $vm->update({$cmd_type => undef});
+    $self->commit;
+}
+
 sub clear_vm_cmd {
     my ($self, $vm) = @_;
-    $vm->update({vm_cmd => undef});
+    $self->_clear_cmd($vm, 'vm_cmd');
 }
 
 sub clear_x_cmd {
     my ($self, $vm) = @_;
-    $vm->update({x_cmd => undef});
+    $self->_clear_cmd($vm, 'x_cmd');
+}
+
+sub clear_user_cmd {
+    my ($self, $vm) = @_;
+    $self->_clear_cmd($vm, 'user_cmd');
 }
 
 sub disconnect_x {
     my ($self, $vm) = @_;
     $vm->update({x_state => 'disconnected'});
+    $self->commit;
 }
 
 sub update_vma_ok_ts {
     my ($self, $vm) = @_;
     $vm->update({vma_ok_ts => time});
+    $self->commit;
 }
 
 sub clear_vma_ok_ts {
     my ($self, $vm) = @_;
     $vm->update({vma_ok_ts => undef});
+    $self->commit;
 }
 
 sub clear_vm_host {
     my ($self, $vm) = @_;
     $vm->update({host_id => undef});
+    $self->commit;
 }
 
 sub terminate_vm {

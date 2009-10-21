@@ -45,13 +45,32 @@ sub _connect_to_vm_processor {
     my @vms = $vmas->get_vms_for_user($user_id);
     # FIXME this limits number of VMs per user to 1
     my $vm = $vms[0];
+
+#: El L7R solo puede iniciar una sesion desde el estado Disconnected, en
+#: cualquier otro estado tendra que usar el comando Abort para cerrar la
+#: sesion actual, esperar a que el estado cambie a Disconnected y entonces
+#: empezar la sesion de la manera normal. 
+
+    if (defined $vm->user_state && $vm->user_state ne 'disconnected') {
+	# FIXME There is no timeout???
+	$vmas->schedule_user_cmd($vm, 'abort');
+	while (defined $vm->user_state && $vm->user_state ne 'disconnected') {
+	    $vm->discard_changes;
+	    sleep 5;
+	}
+    }
+
+#: Connecting: el usuario ha iniciado sesión y ha pedido ser conectado a una
+#: maquina virtual, pero aun no se ha podido cerrar el bucle (por ejemplo,
+#: porque hay que esperar a que la VM se levante). 
+
+    $vmas->push_user_state($vm, 'connecting');
     unless ($vmas->assign_host_for_vm($vm)) {
 	# FIXME VM could not be assigned to a host, notify client?
 	$server->send_http_error(HTTP_BAD_GATEWAY);
 	return;
     }
     my $r = $vmas->schedule_start_vm($vm);
-    $db->txn_commit();
     unless ($r) {
 	# The VM couldn't be scheduled for starting
 	# FIXME Pass the error message to the client?
@@ -73,35 +92,54 @@ sub _connect_to_vm_processor {
     $server->send_http_error(HTTP_BAD_GATEWAY), return
 	    if $timeout_counter < 0;
 
-    $r = $vmas->start_vm_listener($vm);
-    unless ($r) {
-	$server->send_http_error(HTTP_BAD_GATEWAY);
+    # Send 'connect' x_cmd
+    $vmas->schedule_x_cmd($vm, 'connect') or
+	$server->send_http_error(HTTP_BAD_GATEWAY), return;
+
+    # Monitor for Forward or Abort commands
+    # FIXME There really is no timeout???
+    for (;;) {
+	if (defined $vm->user_cmd) {
+	    if ($vm->user_cmd eq 'Forward') {
+		$vmas->clear_user_cmd($vm);
+		last;
+	    }
+	    if ($vm->user_cmd eq 'Abort') {
+		$vmas->clear_user_cmd($vm);
+                # FIXME Pass the message to the client?
+		$server->send_http_error(HTTP_BAD_GATEWAY);
+		return;
+	    }
+	} else {
+	    sleep 5;
+	    $vm->discard_changes;
+	}
+    }
+
+    # FIXME sleep is to allow nxagent time to start, should poll for status
+    # instead.
+    sleep 20;
+    $server->send_http_response(HTTP_PROCESSING,
+				'X-QVD-VM-Status: Connecting to VM');
+
+    # FIXME Obtain host:port from $vm and $vm->rel_host_id
+    my $socket = IO::Socket::INET->new(PeerAddr => 'localhost',
+				       PeerPort => 5000+$vm->vm_id,
+				       Proto => 'tcp');
+    unless ($socket) {
+	$server->send_http_response(HTTP_PROCESSING,
+				    'X-QVD-VM-Status: Retry connection',
+				    "X-QVD-VM-Info: Connection to vm failed");
 	return;
     }
 
-    for (1..4) {
-	sleep $_;
-	$server->send_http_response(HTTP_PROCESSING,
-				    'X-QVD-VM-Status: Connecting to VM',
-				    "X-QVD-VM-Info: host=$r->{host}, port=$r->{port}");
+    $server->send_http_response(HTTP_SWITCHING_PROTOCOLS,
+				    'X-QVD-VM-Status: Connected to VM');
 
-	my $socket = IO::Socket::INET->new(PeerAddr => $r->{host},
-					   PeerPort => $r->{port},
-					   Proto => 'tcp');
-	unless ($socket) {
-	    $server->send_http_response(HTTP_PROCESSING,
-					'X-QVD-VM-Status: Retry connection',
-					"X-QVD-VM-Info: Connection to vm failed");
-
-	    next;
-	}
-
-	$server->send_http_response(HTTP_SWITCHING_PROTOCOLS,
-					'X-QVD-VM-Status: Connected to VM');
-
-	forward_sockets(\*STDIN, $socket);
-    }
-    $server->send_http_error(HTTP_BAD_GATEWAY);
+    $vmas->push_user_state($vm, 'connected');
+    # TODO Fork here in order to monitor the DB for Abort cmd?
+    forward_sockets(\*STDIN, $socket);
+    $vmas->push_user_state($vm, 'disconnected');
 }
 
 1;
