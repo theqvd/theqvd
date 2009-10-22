@@ -33,15 +33,18 @@ sub _get_kvm_pid_file_path {
 sub _signal_kvm {
     my ($self, $id, $signal) = @_;
     my $pidFile = $self->_get_kvm_pid_file_path($id);
-    my $pid = `cat $pidFile` if -e $pidFile;
+    my $pid;
+    $pid = `cat $pidFile` if -e $pidFile;
+    chomp $pid;
+    warn "killing process $pid with signal $signal\n";
 # FIXME need to check if the process with this PID is actually KVM!
     return kill($signal, $pid) if defined $pid;
     undef
 }
 
-sub _is_kvm_running {
-    my ($self, $id) = @_;
-    $self->_signal_kvm($id, 0)
+sub is_vm_running {
+    my ($self, $vm) = @_;
+    $self->_signal_kvm($vm->vm_id, 0)
 }
 
 sub _get_vma_client_for_vm {
@@ -52,7 +55,7 @@ sub _get_vma_client_for_vm {
 sub get_vm_runtime_for_vm_id {
     my ($self, $vm_id) = @_;
     my $vms = $self->{db}->resultset('VM_Runtime')
-    		->search({host_id => $vm_id})->first;
+    		->search({vm_id => $vm_id})->first;
     return $vms;
 }
 
@@ -164,33 +167,37 @@ sub start_vm {
     my ($self, $vm) = @_;
     my $id = $vm->vm_id;
     my $osi = $vm->rel_vm_id->osi;
-    #  Try to start the VM only if it's not already running
-    return { vm_status => 'started' } if $self->_is_kvm_running($id);
-
+    # FIXME: check the machine is not already running
     my $vma_port = 3030+$id;
     my $agent_port = 5000+$id;
-    my $cmd = "kvm";
-    $cmd .= " -m 512M";
-    $cmd .= " -redir tcp:".$agent_port."::5000";
-    $cmd .= " -redir tcp:".$vma_port."::3030";
-    # Next line activates SSH
-    $cmd .= " -redir tcp:2222::22";
-    $cmd .= " -hda '".$osi->disk_image."'";
-    $cmd .= " -hdb '".$vm->rel_vm_id->storage."'" if -e $vm->rel_vm_id->storage;
-    $cmd .= " -pidfile '".$self->_get_kvm_pid_file_path($id)."'";
-    $cmd .= " -vnc none";
-    $cmd .= " &";
-# FIXME executing a program in background doesn't fail even if program doesn't exist
-    system($cmd) == 0 or 
-    	return { vm_status => 'stopped', error => "Couldn't exec kvm: $!" };
-# Allow a timeout for generation of pid file
-    sleep 2;
-    if ($self->_is_kvm_running($id)) {
-	return { vm_status => 'starting' };
-    } else {
-# FIXME how to capture error message from kvm?
-	return { vm_status => 'stopped', error => 'vm exited' };
+    my $ssh_port = 2022+$id;
+    my $vnc_port = 5900+$id;
+    my @cmd = (kvm => (-m => '512M',
+		       -vnc, "none",
+		       -redir => "tcp:${agent_port}::5000",
+		       -redir => "tcp:${vma_port}::3030",
+                       -redir => "tcp:${ssh_port}::22",
+		       -redir => "tcp:${vnc_port}::5900",
+                       -hda => $osi->disk_image,
+		       (-e $vm->rel_vm_id->storage
+			? (-hdb => $vm->rel_vm_id->storage)
+			: ())));
+
+    my $pid = fork;
+    if (!$pid) {
+	unless (defined $pid) {
+	    die "unable to fork virtual machine process";
+	}
+	{ exec  @cmd };
+	warn "exec @cmd failed\n";
+	require POSIX;
+	POSIX::_exit(1);
     }
+    warn "kvm pid: $pid\n";
+    open my $pfh, '>', $self->_get_kvm_pid_file_path($id) or die "unable to create pid file";
+    print $pfh $pid;
+    close $pfh;
+    return { vm_status => 'starting' };
 }
 
 sub stop_vm {
@@ -350,6 +357,10 @@ Forces the virtual machine process to terminate.
 =item start_vm_listener($vm_runtime) 
 
 Asks the given virtual machine to start nxagent.
+
+=item is_vm_running($vm_runtime)
+
+Returns a true value if the VM process is running on the host.
 
 =item get_vm_status($vm_runtime)
 
