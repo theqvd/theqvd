@@ -15,8 +15,7 @@ die "Couldn't stop VM $vm_id: $r->{error}" unless $r->{request} eq 'success';
 
 for (;;) {
     print "Waiting for VM $vm_id to stop...\n";
-    my $vm_status = $vmas->get_vm_status($vm)->{vm_status};
-    last if $vm_status eq 'stopped';
+    last if not $vmas->_is_kvm_running($vm_id);
     sleep 10;
 }
 print "VM $vm_id stopped.\n";
