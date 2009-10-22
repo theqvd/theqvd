@@ -61,9 +61,8 @@ sub get_vm_runtime_for_vm_id {
 
 sub get_vms_for_host {
     my ($self, $host_id) = @_;
-    my @vms = $self->{db}->resultset('VM_Runtime')
+    return $self->{db}->resultset('VM_Runtime')
     		->search({host_id => $host_id});
-    return @vms;
 }
 
 sub get_vm_ids_for_host_txn {
@@ -165,9 +164,13 @@ sub schedule_start_vm {
 
 sub start_vm {
     my ($self, $vm) = @_;
+
+    if ($self->is_vm_running($vm)) {
+	return {vm_status => 'started'};
+    }
+
     my $id = $vm->vm_id;
     my $osi = $vm->rel_vm_id->osi;
-    # FIXME: check the machine is not already running
     my $vma_port = 3030+$id;
     my $agent_port = 5000+$id;
     my $ssh_port = 2022+$id;

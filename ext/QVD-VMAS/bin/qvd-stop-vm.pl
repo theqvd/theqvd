@@ -18,3 +18,7 @@ for (;;) {
     sleep 10;
 }
 print "VM $vm_id stopped.\n";
+
+END {
+    $vmas->txn_commit;
+}
