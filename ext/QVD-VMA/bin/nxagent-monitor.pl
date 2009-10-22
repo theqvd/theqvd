@@ -71,7 +71,8 @@ sub launch_nxagent {
     my $status = '';
     my $cmd = $NXAGENT.' "'.join('" "', @NXAGENT_OPTS).'"';
     open(NXAGENT_FH, $cmd.' 2>&1 |')
-	or die "Can't execute nxagent: $!";
+	or handle_status "exited aborted", die "Can't execute nxagent: $!";
+    handle_status "initiated";
     while (<NXAGENT_FH>) {
 	chomp;
 	# Error message from shell

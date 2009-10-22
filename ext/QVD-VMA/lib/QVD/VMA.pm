@@ -134,7 +134,25 @@ sub SimpleRPC_start_vm_listener {
 
 
 sub SimpleRPC_status {
-    {status => 'ok'};
+    my $self = shift;
+    my $nx_state = $self->_get_nxagent_status();
+
+    my $x_state;
+    if ($nx_state ~= /initiated/) {
+	$x_state = 'connecting';
+    } elsif ($nx_state ~= /starting|resuming/) {
+	$x_state = 'listening';
+    } elsif ($nx_state ~= /started|resumed/) {
+	$x_state = 'connected';
+    } elsif ($nx_state ~= /suspending|terminating|aborting/) {
+	$x_state = 'disconnecting';
+    } elsif ($nx_state ~= /suspended|terminated|aborted|exited .*/) {
+	$x_state = 'disconnected';
+    }
+    # FIXME log unknown nx state as an internal error
+    my $x_state //= 'disconnected';
+
+    {status => 'ok', x_state => $x_state}
 }
 
 
@@ -184,7 +202,9 @@ Returns a hash with host and port to connect to.
 
 Respond to the RPC C<status>.
 
-Returns a hash with the status of the VMA (always 'ok').
+Returns a hash with the state of the VMA (always 'ok') and the state of
+nxagent. The state of nxagent is given as one of disconnected, connecting,
+listening, connected, and disconnecting.
 
 =item poweroff()
 
