@@ -99,6 +99,12 @@ sub push_vm_state {
     $self->commit;
 }
 
+sub push_nx_state {
+    my ($self, $vm, $vm_state) = @_;
+    $vm->update({ vm_state => $vm_state, vm_state_ts => time });
+    $self->commit;
+}
+
 sub push_user_state {
     my ($self, $vm, $state) = @_;
     $vm->update({ user_state => $state, user_state_ts => time });

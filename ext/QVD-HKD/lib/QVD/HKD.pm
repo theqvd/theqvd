@@ -18,6 +18,7 @@ my $vm_state_starting_timeout = $config->{timeouts}->{vm_state_starting_timeout}
 my $vm_state_running_vma_timeout = $config->{timeouts}->{vm_state_running_vma_timeout};
 my $vm_state_stopping_timeout = $config->{timeouts}->{vm_state_stopping_timeout};
 my $vm_state_zombie_sigkill_timeout = $config->{timeouts}->{vm_state_zombie_sigkill_timeout};
+my $x_state_connecting_timeout = $config->{timeouts}->{x_state_connecting_timeout};
 
 sub new {
     my ($class, %opts) = @_;
@@ -25,7 +26,7 @@ sub new {
     my $host_id = delete $opts{host_id};
     my $db = QVD::DB->new();
     my $vmas = QVD::VMAS->new($db);
-    my $state_map = {
+    my $vm_state_map = {
     	stopped => {
 	    start 	=> {new_state => 'starting',
 			    action => 'start_vm'},
@@ -60,25 +61,29 @@ sub new {
     };
     my $nx_state_map = {
     	disconnected => {
-	    connect 	=> {action => 'start_nx'}, # Irá a connecting o disconnected según toque
-	    _fail	=> {action => 'abort'}, # Mandará abort al L7R y luego pasará a disconnected
+	    connect 	=> {new_state => 'connecting',
+			    action => 'start_nx'},
 	},
 	connecting => {
-	    disconnect	=> {action => 'state_disconnecting'},
-	    _timeout 	=> {action => 'state_disconnecting'},
-	    _do		=> {action => 'state_listening'},
+	    disconnect	=> {new_state => 'disconnecting'},
+	    _timeout 	=> {new_state => 'disconnecting'},
+	    _do		=> {new_state => 'listening'},
+	    _fail	=> {new_state => 'disconnected',
+			    action => 'abort'},
 	},
 	listening => {
-	    disconnect	=> {action => 'state_disconnecting'},
-	    _do 	=> {action => 'state_connected'},
-	    _fail	=> {action => 'abort'},
+	    disconnect	=> {new_state => 'disconnecting'},
+	    _do 	=> {new_state => 'connected'},
+	    _fail	=> {new_state => 'disconnected',
+			    action => 'abort'},
 	},
 	connected => {
-	    disconnect	=> {action => 'state_disconnecting'},
-	    _fail	=> {action => 'abort'},
+	    disconnect	=> {new_state => 'disconnecting'},
+	    _fail	=> {new_state => 'disconnected',
+			    action => 'abort'},
 	},
 	disconnecting => {
-	    _fail 	=> {action => 'state_disconnected'},
+	    _fail 	=> {new_state => 'disconnected'},
 	},
     };
     my $self = { 
@@ -86,7 +91,8 @@ sub new {
 	host_id => $host_id,
 	vmas => $vmas,
 	db => $db,
-	state_map => $state_map,
+	vm_state_map => $vm_state_map,
+	nx_state_map => $nx_state_map,
     };
       
     bless $self, $class;
@@ -114,29 +120,45 @@ sub _check_timeout {
     undef
 }
 
+sub _do_vm_action {
+    shift->_do_action('vm', @_)
+}
+
+sub _do_nx_action {
+    shift->_do_action('nx', @_)
+}
+
 sub _do_action {
-    my ($self, $event, $vm) = @_;
+    my ($self, $mode, $event, $vm) = @_;
     my $vmas = $self->{vmas};
     my $vm_id = $vm->vm_id;
     my $vm_state = $vm->vm_state;
     DEBUG "VM($vm_id,$vm_state,$event) - do_action";
-    my $event_map = $self->{state_map}{$vm_state};
-    unless (exists $event_map->{$event}) {
+    my $event_map = $self->{$mode."_state_map"}{$vm_state};
+        unless (exists $event_map->{$event}) {
 	# DEBUG "VM($vm_id,$vm_state,$event) - event ignored";
 	return;
     }
     my $new_state = $event_map->{$event}{new_state};
     if (defined $new_state) {
-	my $enter = $self->{state_map}{$new_state}{_enter}{action};
+	my $enter = $self->{$mode."_state_map"}{$new_state}{_enter}{action};
 	if ($enter) {
 	    my $method = $self->can('hkd_action_'.$enter);
 	    unless ($method) {
-		ERROR "_do_actions: not implemented: $method";
+		ERROR "_do_action: not implemented: $method";
 		return;
 	    }
 	    $self->$method($vm, $vm_state, $event);
 	}
-	$vmas->push_vm_state($vm, $new_state);
+	# This allows to call push_vm_state or push_nx_state based on
+	# $mode value
+	my $method = $vmas->can('push_'.$mode.'_state');
+	unless ($method) {
+		ERROR "_do_action: not implemented: $method";
+		return;
+	    }
+	$vmas->$method($vm, $new_state);
+	
 	$vmas->txn_commit;
     }
     my $action = $event_map->{$event}{action};
@@ -165,17 +187,41 @@ sub run {
 		$vm_state ne 'failed') {
 		# Process monitoring
 		if (! $vmas->is_vm_running($vm_runtime)) {
-		    $self->_do_action(_fail => $vm_runtime);
+		    $self->_do_vm_action(_fail => $vm_runtime);
 		    next;
 		}
 		if ($vm_state ne 'zombie' and
 		    $vm_state ne 'stopping') {
+		    # This condition structure assures here vm_state eq running
+			
 		    # Check VMA responds
 		    my $vma_status = $vmas->get_vma_status($vm_runtime);
 		    if (defined $vma_status and $vma_status->{status} eq 'ok') {
-			$self->_do_action(_vma_ok => $vm_runtime);
+			$self->_do_vm_action(_vma_ok => $vm_runtime);
 
 			# put nxagent event generation here!!!
+			my $old_x_state = $vm_runtime->x_state;
+			my $new_x_state = $vma_status->{x_state};
+			
+			if (grep $old_x_state eq $_, qw(connecting listening connected)
+			    and ($new_x_state eq 'disconnected')) {
+			    $self->_do_nx_action(_fail => $vm_runtime);
+			}
+			
+			if (_check_timeout($old_x_state, 'starting',
+				   $vm_runtime->x_state_ts, $x_state_connecting_timeout)) {
+			    $self->_do_nx_action(_timeout => $vm_runtime);
+			    
+			}
+
+			my $cmd = $vm_runtime->x_cmd;
+			if (defined $cmd) {
+			    $self->_do_nx_action($cmd => $vm_runtime);
+			    $vmas->txn_commit;
+			}
+			
+			$self->_do_nx_action(_do => $vm_runtime);
+						
 		    }
 		}
 		
@@ -192,16 +238,16 @@ sub run {
 		    _check_timeout($vm_runtime->vm_state, 'zombie',
 				   $vm_runtime->vm_state_ts, $vm_state_zombie_sigkill_timeout)) {
 		    
-		    $self->_do_action(_timeout => $vm_runtime);	
+		    $self->_do_vm_action(_timeout => $vm_runtime);	
 		}
 		
-		$self->_do_action( _do => $vm_runtime);
+		$self->_do_vm_action( _do => $vm_runtime);
 	    }
 	    # Command event
 	    my $cmd = $vm_runtime->vm_cmd;
 	    
 	    if (defined $cmd) {
-		$self->_do_action($cmd => $vm_runtime);
+		$self->_do_vm_action($cmd => $vm_runtime);
 		
 		# The commit below forces to close the transaction before the
 		# next loop, just in case!
@@ -289,6 +335,16 @@ sub hkd_action_enter_failed {
     $self->{vmas}->disconnect_x($vm);
     $self->{vmas}->clear_vm_host($vm);
     $self->{vmas}->clear_vma_ok_ts($vm);
+}
+
+sub hkd_action_abort {
+    my ($self, $vm, $state, $event) = @_;
+    $self->{vmas}->schedule_user_cmd($vm, 'Abort');
+}
+
+sub hkd_action_start_nx {
+    my ($self, $vm, $state, $event) = @_;
+    $self->{vmas}->start_vm_listener($vm);
 }
 
 1;
