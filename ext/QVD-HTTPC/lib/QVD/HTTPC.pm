@@ -24,7 +24,8 @@ sub new {
     keys %opts and
 	croak "unknown constructor option(s) " . join(', ', keys %opts);
 
-    my $socket = IO::Socket::INET->new(PeerAddr => $target, Timeout => $timeout)
+    my $socket = IO::Socket::INET->new(PeerAddr => $target,
+				       Blocking => 0)
 	or croak "Unable to connect to $target";
     my $self = { target => $target,
 		 socket => $socket,
