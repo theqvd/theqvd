@@ -33,7 +33,7 @@ sub new {
 	},
 	starting => {
 	    _fail 	=> {new_state => 'failed'},
-	    _timeout 	=> {action => 'state_zombie'},
+	    _timeout 	=> {new_state => 'zombie'},
 	    _vma_ok 	=> {new_state => 'running',
 			    action => 'update_vma_ok_ts'},
 	},
@@ -100,6 +100,7 @@ sub _handle_SIGUSR1 {
 sub _install_signals {
     my $self = shift;
     $SIG{USR1} = \&_handle_SIGUSR1;
+    $SIG{CHLD} = 'IGNORE';
 }
 
 sub _check_timeout {
@@ -118,24 +119,25 @@ sub _do_action {
     my $vmas = $self->{vmas};
     my $vm_id = $vm->vm_id;
     my $vm_state = $vm->vm_state;
+    DEBUG "VM($vm_id,$vm_state,$event) - do_action";
     my $event_map = $self->{state_map}{$vm_state};
     unless (exists $event_map->{$event}) {
 	# DEBUG "VM($vm_id,$vm_state,$event) - event ignored";
 	return;
     }
-    my $new_state = $event_map->{$event}{new_state}
+    my $new_state = $event_map->{$event}{new_state};
     if (defined $new_state) {
 	my $enter = $self->{state_map}{$new_state}{_enter}{action};
 	if ($enter) {
 	    my $method = $self->can('hkd_action_'.$enter);
 	    unless ($method) {
-		ERROR "_do_actions: not implemented: $action";
+		ERROR "_do_actions: not implemented: $method";
 		return;
 	    }
 	    $self->$method($vm, $vm_state, $event);
 	}
 	$vmas->push_vm_state($vm, $new_state);
-	$self->txn_commit;
+	$vmas->txn_commit;
     }
     my $action = $event_map->{$event}{action};
     if (defined $action) {
@@ -153,58 +155,60 @@ sub run {
     my $self = shift;
     $self->_install_signals;
     my $vmas = $self->{vmas};
-    my @vms = $vmas->get_vms_for_host($self->{host_id});
-    my @events = ();
-    foreach my $vm (@vms) {
-	for (;;) {
-	    my @vm_ids = $vmas->get_vm_ids_for_host_txn($self->{host_id});
-	    foreach my $vm_id (@vm_ids) {
-		$vm_runtime = $vmas->get_vm_runtime_for_vm_id($vm_id);
-		
-		if ($vm_runtime->vm_state ne 'stopped') {
-		    # Monitoring process
-		    
-		    if (! $vmas->_is_kvm_running($vm_id)) {
-			$self->_do_action(_fail => $vm_runtime)
-			next;
-		    }
-		    if ($vm_runtime->vm_state ne 'zombie') {
-			my $vma_status = $vmas->get_vma_status($vm_id);
-			if (defined $vma_status and $vma_status->{status} eq 'ok') {
-			    $self->_do_action(_vma_ok => $vm_runtime);
-			}
-		    }
-		    
-		    # Timeout events
-		    if (_check_timeout($vm_runtime->vm_state, 'starting',
-			    $vm_runtime->vm_state_ts, $vm_state_starting_timeout) or
-		    
-			_check_timeout($vm_runtime->vm_state, 'running',
-			    $vm_runtime->vma_ok_ts, $vm_state_running_vma_timeout) or
-				
-			_check_timeout($vm_runtime->vm_state, 'stopping',
-			    $vm_runtime->vm_state_ts, $vm_state_stopping_timeout) or
-				
-			_check_timeout($vm_runtime->vm_state, 'zombie',
-			    $vm_runtime->vm_state_ts, $vm_state_zombie_sigkill_timeout)) {
-			
-			$self->_do_action(_timeout => $vm_runtime);	
-		    }
-		    
-		    $self->_do_action( _do => $vm_runtime);
+    while (1) {
+	my @vm_ids = $vmas->get_vm_ids_for_host_txn($self->{host_id});
+	foreach my $vm_id (@vm_ids) {
+	    my $vm_runtime = $vmas->get_vm_runtime_for_vm_id($vm_id);
+	    
+	    my $vm_state = $vm_runtime->vm_state;
+	    if ($vm_state ne 'stopped' and
+		$vm_state ne 'failed') {
+		# Process monitoring
+		if (! $vmas->is_vm_running($vm_runtime)) {
+		    $self->_do_action(_fail => $vm_runtime);
+		    next;
 		}
-		# Command event
-		my $cmd = $vm_runtime->vm_cmd;
+		if ($vm_state ne 'zombie' and
+		    $vm_state ne 'stopping') {
+		    # Check VMA responds
+		    my $vma_status = $vmas->get_vma_status($vm_runtime);
+		    if (defined $vma_status and $vma_status->{status} eq 'ok') {
+			$self->_do_action(_vma_ok => $vm_runtime);
+
+			# put nxagent event generation here!!!
+		    }
+		}
 		
-		if (length $cmd) {
-		    $vm_runtime->_do_action($cmd => $vm_runtime);
+		# Timeout events
+		if (_check_timeout($vm_runtime->vm_state, 'starting',
+				   $vm_runtime->vm_state_ts, $vm_state_starting_timeout) or
+		    
+		    _check_timeout($vm_runtime->vm_state, 'running',
+				   $vm_runtime->vma_ok_ts, $vm_state_running_vma_timeout) or
+		    
+		    _check_timeout($vm_runtime->vm_state, 'stopping',
+				   $vm_runtime->vm_state_ts, $vm_state_stopping_timeout) or
+		    
+		    _check_timeout($vm_runtime->vm_state, 'zombie',
+				   $vm_runtime->vm_state_ts, $vm_state_zombie_sigkill_timeout)) {
+		    
+		    $self->_do_action(_timeout => $vm_runtime);	
+		}
+		
+		$self->_do_action( _do => $vm_runtime);
+	    }
+	    # Command event
+	    my $cmd = $vm_runtime->vm_cmd;
+	    
+	    if (defined $cmd) {
+		$self->_do_action($cmd => $vm_runtime);
 		
 		# The commit below forces to close the transaction before the
 		# next loop, just in case!
 		$vmas->txn_commit;
 	    }
-	    sleep $self->{loop_wait_time};
 	}
+	sleep $self->{loop_wait_time};
     }
 }
 
@@ -241,7 +245,7 @@ sub hkd_action_kill_vm {
     $self->{vmas}->kill_vm($vm);
 }
 
-sub hkd_action_vm_update_vma_ok_ts {
+sub hkd_action_update_vma_ok_ts {
     my ($self, $vm, $state, $event) = @_;
     $self->{vmas}->update_vma_ok_ts($vm);
 }
@@ -250,7 +254,7 @@ sub hkd_action_stop_vm {
     my ($self, $vm, $state, $event) = @_;
     INFO "Stopping VM ".$vm->vm_id;
     my $r = $self->{vmas}->stop_vm($vm);
-    if ($r->request eq 'success') {
+    if ($r and $r->{request} eq 'success') {
 	$self->consume_cmd($vm);
 	$self->{vmas}->push_vm_state($vm, 'stopping');
     }
