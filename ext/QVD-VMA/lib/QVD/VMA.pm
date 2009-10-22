@@ -138,19 +138,19 @@ sub SimpleRPC_status {
     my $nx_state = $self->_get_nxagent_status();
 
     my $x_state;
-    if ($nx_state ~= /initiated/) {
+    if ($nx_state =~ /initiated/) {
 	$x_state = 'connecting';
-    } elsif ($nx_state ~= /starting|resuming/) {
+    } elsif ($nx_state =~ /starting|resuming/) {
 	$x_state = 'listening';
-    } elsif ($nx_state ~= /started|resumed/) {
+    } elsif ($nx_state =~ /started|resumed/) {
 	$x_state = 'connected';
-    } elsif ($nx_state ~= /suspending|terminating|aborting/) {
+    } elsif ($nx_state =~ /suspending|terminating|aborting/) {
 	$x_state = 'disconnecting';
-    } elsif ($nx_state ~= /suspended|terminated|aborted|exited .*/) {
+    } elsif ($nx_state =~ /suspended|terminated|aborted|exited .*/) {
 	$x_state = 'disconnected';
     }
     # FIXME log unknown nx state as an internal error
-    my $x_state //= 'disconnected';
+    $x_state //= 'disconnected';
 
     {status => 'ok', x_state => $x_state}
 }
