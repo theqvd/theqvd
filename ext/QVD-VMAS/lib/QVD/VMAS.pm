@@ -100,8 +100,8 @@ sub push_vm_state {
 }
 
 sub push_nx_state {
-    my ($self, $vm, $vm_state) = @_;
-    $vm->update({ vm_state => $vm_state, vm_state_ts => time });
+    my ($self, $vm, $x_state) = @_;
+    $vm->update({ x_state => $x_state, x_state_ts => time });
     $self->commit;
 }
 
@@ -117,12 +117,13 @@ sub commit {
 
 sub _schedule_cmd {
     my ($self, $vm, $cmd_type, $cmd) = @_;
-    unless (defined $vm->$cmd_type && $vm->$cmd_type ne $cmd) {
+    # FIXME This test is needed to not schedule a command when one is already scheduled!!!    
+    #unless (defined $vm->$cmd_type && $vm->$cmd_type ne $cmd) {
 	my $r = $vm->update({$cmd_type  => $cmd});
 	$self->commit;
 	return 1;
-    }
-    undef;
+    #}
+    #undef;
 }
 
 sub schedule_x_cmd {
@@ -132,6 +133,7 @@ sub schedule_x_cmd {
 
 sub schedule_user_cmd {
     my ($self, $vm, $cmd) = @_;
+    warn "*** SENDING CMD COMMAND $cmd";
     return $self->_schedule_cmd($vm, 'user_cmd', $cmd);
 }
 

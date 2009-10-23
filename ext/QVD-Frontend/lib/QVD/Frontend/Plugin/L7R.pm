@@ -51,10 +51,12 @@ sub _connect_to_vm_processor {
 #: sesion actual, esperar a que el estado cambie a Disconnected y entonces
 #: empezar la sesion de la manera normal. 
 
+    warn "L7R: user_state is ".$vm->user_state;
     if (defined $vm->user_state && $vm->user_state ne 'disconnected') {
 	# FIXME There is no timeout???
-	$vmas->schedule_user_cmd($vm, 'abort');
+	$vmas->schedule_user_cmd($vm, 'Abort');
 	while (defined $vm->user_state && $vm->user_state ne 'disconnected') {
+	    warn "L7R: user_state is ".$vm->user_state." Waiting for 'disconnected'";
 	    $vm->discard_changes;
 	    sleep 5;
 	}
@@ -70,6 +72,7 @@ sub _connect_to_vm_processor {
 	$server->send_http_error(HTTP_BAD_GATEWAY);
 	return;
     }
+    warn "L7R: Got host ".$vm->host_id;
     my $r = $vmas->schedule_start_vm($vm);
     unless ($r) {
 	# The VM couldn't be scheduled for starting
@@ -77,14 +80,16 @@ sub _connect_to_vm_processor {
 	$server->send_http_error(HTTP_BAD_GATEWAY);
 	return;
     }
+    warn "L7R: VM ".$vm->vm_id." started!";
     # Wait for the VMA to come online
     # FIXME use time() for checking timeout
     my $timeout_counter = $vm_start_timeout/5;
     while ($timeout_counter --> 0) {
 	$server->send_http_response(HTTP_PROCESSING,
 	    'X-QVD-VM-Status: Starting VM');
-	$r = $vmas->get_vm_status($vm);
-	last if exists $r->{vma_status} && $r->{vma_status} eq 'ok';
+	warn "L7R: Waiting for VMA to start on VM ".$vm->vm_id.", $timeout_counter";
+	$r = $vmas->get_vma_status($vm);
+	last if exists $r->{status} && $r->{status} eq 'ok';
 	sleep 5;
     }
     # Start timed out
@@ -95,10 +100,12 @@ sub _connect_to_vm_processor {
     # Send 'connect' x_cmd
     $vmas->schedule_x_cmd($vm, 'connect') or
 	$server->send_http_error(HTTP_BAD_GATEWAY), return;
-
+    warn "L7R: Sent connect";
+    
     # Monitor for Forward or Abort commands
     # FIXME There really is no timeout???
     for (;;) {
+	warn "L7R: Waiting for user cmd, now it's ".$vm->user_cmd;
 	if (defined $vm->user_cmd) {
 	    if ($vm->user_cmd eq 'Forward') {
 		$vmas->clear_user_cmd($vm);
@@ -106,6 +113,7 @@ sub _connect_to_vm_processor {
 	    }
 	    if ($vm->user_cmd eq 'Abort') {
 		$vmas->clear_user_cmd($vm);
+		$vmas->push_user_state($vm, 'disconnected');
                 # FIXME Pass the message to the client?
 		$server->send_http_error(HTTP_BAD_GATEWAY);
 		return;
@@ -115,10 +123,9 @@ sub _connect_to_vm_processor {
 	    $vm->discard_changes;
 	}
     }
+    
+    warn "L7R: Got Forward";
 
-    # FIXME sleep is to allow nxagent time to start, should poll for status
-    # instead.
-    sleep 20;
     $server->send_http_response(HTTP_PROCESSING,
 				'X-QVD-VM-Status: Connecting to VM');
 

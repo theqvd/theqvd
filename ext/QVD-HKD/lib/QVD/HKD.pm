@@ -132,9 +132,9 @@ sub _do_action {
     my ($self, $mode, $event, $vm) = @_;
     my $vmas = $self->{vmas};
     my $vm_id = $vm->vm_id;
-    my $vm_state = $vm->vm_state;
-    DEBUG "VM($vm_id,$vm_state,$event) - do_action";
-    my $event_map = $self->{$mode."_state_map"}{$vm_state};
+    my $state = $mode eq "nx" ? $vm->x_state : $vm->vm_state;
+    DEBUG "VM($vm_id,$state,$event) - do_action";
+    my $event_map = $self->{$mode."_state_map"}{$state};
         unless (exists $event_map->{$event}) {
 	# DEBUG "VM($vm_id,$vm_state,$event) - event ignored";
 	return;
@@ -148,7 +148,7 @@ sub _do_action {
 		ERROR "_do_action: not implemented: $method";
 		return;
 	    }
-	    $self->$method($vm, $vm_state, $event);
+	    $self->$method($vm, $state, $event);
 	}
 	# This allows to call push_vm_state or push_nx_state based on
 	# $mode value
@@ -163,13 +163,13 @@ sub _do_action {
     }
     my $action = $event_map->{$event}{action};
     if (defined $action) {
-	DEBUG "_do_actions: Handling VM($vm_id,$vm_state,$event) with $action";
+	DEBUG "_do_actions: Handling VM($vm_id,$state,$event) with $action";
 	my $method = $self->can('hkd_action_'.$action);
 	unless ($method) {
 	    ERROR "_do_actions: not implemented: $action";
 	    return;
 	}
-	$self->$method($vm, $vm_state, $event);
+	$self->$method($vm, $state, $event);
     }
 }
 
@@ -202,6 +202,8 @@ sub run {
 			# put nxagent event generation here!!!
 			my $old_x_state = $vm_runtime->x_state;
 			my $new_x_state = $vma_status->{x_state};
+			
+			$old_x_state = $old_x_state // 'disconnected';
 			
 			if (grep $old_x_state eq $_, qw(connecting listening connected)
 			    and ($new_x_state eq 'disconnected')) {
@@ -258,15 +260,20 @@ sub run {
     }
 }
 
-sub consume_cmd {
+sub _consume_vm_cmd {
     my ($self, $vm) = @_;
     $self->{vmas}->clear_vm_cmd($vm);
+}
+
+sub _consume_nx_cmd {
+    my ($self, $vm) = @_;
+    $self->{vmas}->clear_x_cmd($vm);
 }
 
 sub hkd_action_start_vm {
     my ($self, $vm, $state, $event) = @_;
     INFO "Starting VM ".$vm->vm_id;
-    $self->consume_cmd($vm);
+    $self->_consume_vm_cmd($vm);
     $self->{vmas}->start_vm($vm);
 }
 
@@ -276,7 +283,7 @@ sub hkd_action_enter_zombie {
     # * se elimina cualquier comando de x_cmd
     # * se cambia el estado x_state a "Disconnected" 
     my ($self, $vm, $state, $event) = @_;
-    $self->consume_cmd($vm);
+    $self->_consume_vm_cmd($vm);
     $self->{vmas}->clear_x_cmd($vm);
     $self->{vmas}->disconnect_x($vm);
 }
@@ -301,7 +308,7 @@ sub hkd_action_stop_vm {
     INFO "Stopping VM ".$vm->vm_id;
     my $r = $self->{vmas}->stop_vm($vm);
     if ($r and $r->{request} eq 'success') {
-	$self->consume_cmd($vm);
+	$self->_consume_vm_cmd($vm);
 	$self->{vmas}->push_vm_state($vm, 'stopping');
     }
 }
@@ -340,11 +347,15 @@ sub hkd_action_enter_failed {
 sub hkd_action_abort {
     my ($self, $vm, $state, $event) = @_;
     $self->{vmas}->schedule_user_cmd($vm, 'Abort');
+    # FIXME This state change must be done by L7R, but 
+    # it can't until we rewrite it entirely
+    $self->{vmas}->push_user_state($vm, 'disconnected');
 }
 
 sub hkd_action_start_nx {
     my ($self, $vm, $state, $event) = @_;
     $self->{vmas}->start_vm_listener($vm);
+    $self->_consume_nx_cmd($vm);
 }
 
 1;
