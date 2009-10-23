@@ -52,13 +52,14 @@ sub _deploy {
     $db->add_vm_cmd(name => 'start');
     $db->add_vm_cmd(name => 'stop');
 
-    $db->add_x_state(name => 'stopped');
     $db->add_x_state(name => 'disconnected');
     $db->add_x_state(name => 'connecting');
+    $db->add_x_state(name => 'listening');
     $db->add_x_state(name => 'connected');
+    $db->add_x_state(name => 'disconnecting');
 
-    $db->add_x_cmd(name => 'start');
-    $db->add_x_cmd(name => 'stop');
+    $db->add_x_cmd(name => 'connect');
+    $db->add_x_cmd(name => 'disconnect');
 
     $db->add_user_state(name => 'disconnected');
     $db->add_user_state(name => 'connecting');
@@ -66,7 +67,8 @@ sub _deploy {
     $db->add_user_state(name => 'disconnecting');
     $db->add_user_state(name => 'aborting');
 
-    $db->add_user_cmd(name => 'abort');
+    $db->add_user_cmd(name => 'Abort');
+    $db->add_user_cmd(name => 'Forward');
 
 }
 
@@ -119,7 +121,8 @@ sub add_vm {
 
     my $vm_runtime=$schema->resultset('VM_Runtime')->create({vm_id => $row->id,
 							host_id => $host,
-							vm_state => "stopped"});
+							vm_state => "stopped",
+							x_state => "disconnected"});
 }
 
 sub add_vm_state {
