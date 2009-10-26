@@ -78,7 +78,7 @@ sub new {
 			    action => 'abort'},
 	},
 	connected => {
-	    disconnect	=> {new_state => 'disconnecting'},
+	    disconnect	=> {new_state => 'disconnected'},
 	    _fail	=> {new_state => 'disconnected',
 			    action => 'abort'},
 	},
@@ -199,16 +199,20 @@ sub run {
 		    if (defined $vma_status and $vma_status->{status} eq 'ok') {
 			$self->_do_vm_action(_vma_ok => $vm_runtime);
 
-			# put nxagent event generation here!!!
 			my $old_x_state = $vm_runtime->x_state;
 			my $new_x_state = $vma_status->{x_state};
 			
 			$old_x_state = $old_x_state // 'disconnected';
 			
-			if (grep $old_x_state eq $_, qw(connecting listening connected)
+			if (grep $old_x_state eq $_, qw(connecting listening)
 			    and ($new_x_state eq 'disconnected')) {
 			    $self->_do_nx_action(_fail => $vm_runtime);
 			}
+			
+			if (($old_x_state eq 'connected')
+			    and ($new_x_state eq 'disconnected')) {
+			    $self->_do_nx_action(disconnect => $vm_runtime);
+			}			
 			
 			if (_check_timeout($old_x_state, 'starting',
 				   $vm_runtime->x_state_ts, $x_state_connecting_timeout)) {
