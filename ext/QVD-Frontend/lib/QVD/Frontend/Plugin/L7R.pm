@@ -94,8 +94,11 @@ sub _connect_to_vm_processor {
     }
     # Start timed out
     # FIXME Pass the error message to the client?
-    $server->send_http_error(HTTP_BAD_GATEWAY), return
-	    if $timeout_counter < 0;
+    if ($timeout_counter < 0) {
+	$server->send_http_error(HTTP_BAD_GATEWAY);
+	$vmas->push_user_state($vm, 'disconnected');
+	return;
+    }
 
     # Send 'connect' x_cmd
     $vmas->schedule_x_cmd($vm, 'connect') or
@@ -144,9 +147,21 @@ sub _connect_to_vm_processor {
 				    'X-QVD-VM-Status: Connected to VM');
 
     $vmas->push_user_state($vm, 'connected');
-    # TODO Fork here in order to monitor the DB for Abort cmd?
+
+    # TODO Fork here in order to monitor the DB for Abort cmd while forwarding?
     forward_sockets(\*STDIN, $socket);
-    $vmas->push_user_state($vm, 'disconnected');
+
+    for (;;) {
+	warn "L7R: Waiting for user cmd Abort";
+	if (defined $vm->user_cmd and $vm->user_cmd eq 'Abort') {
+	    $vmas->clear_user_cmd($vm);
+	    $vmas->push_user_state($vm, 'disconnected');
+	    last;
+	} else {
+	    sleep 5;
+	    $vm->discard_changes;
+	}
+    }
 }
 
 1;
