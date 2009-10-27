@@ -7,6 +7,12 @@ __PACKAGE__->add_columns(
 	id => {
 	    data_type => 'integer',
 	    is_auto_increment => 1
+	},
+	name => {
+	    data_type => 'varchar(127)',
+	},
+	address => {
+	    data_type => 'varchar(127)',
 	}
 	);
 __PACKAGE__->set_primary_key('id');

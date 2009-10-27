@@ -94,7 +94,27 @@ __PACKAGE__->add_columns(
 	l7r_pid => {
 	    data_type => 'integer',
 	    is_nullable => 1
-	}
+	},
+        vm_address => {
+            data_type => 'varchar(127)',
+            is_nullable => 1
+        },
+        vm_vma_port => {
+            data_type => 'integer',
+            is_nullable => 1,
+        },
+        vm_x_port => {
+            data_type => 'integer',
+            is_nullable => 1,
+        },
+        vm_ssh_port => {
+            data_type => 'integer',
+            is_nullable => 1,
+        },
+        vm_vnc_port => {
+            data_type => 'integer',
+            is_nullable => 1,
+        },
 	);
 	
 __PACKAGE__->set_primary_key('vm_id');

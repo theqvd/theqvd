@@ -93,7 +93,9 @@ sub add_host {
     my $schema = $self->{schema};
     _die_on_too_many_opts(%opts);
 # FIXME PostgreSQL driver doesn't like empty hashes so we use a fixed id!
-    $schema->resultset('Host')->create({id => 1});
+    $schema->resultset('Host')->create({id => 1, 
+    					name => 'localhost', 
+					address => 'localhost'});
 }
 
 sub add_osi {
