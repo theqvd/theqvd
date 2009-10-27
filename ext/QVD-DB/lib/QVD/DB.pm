@@ -109,7 +109,7 @@ sub erase {
     warn $@ if $@;
     $db->txn_commit;    
     
-    eval { $db->storage->dbh->do('DROP TABLE config CASCADE') };
+    eval { $db->storage->dbh->do('DROP TABLE configs CASCADE') };
     warn $@ if $@;
     $db->txn_commit;   
     
