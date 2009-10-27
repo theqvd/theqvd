@@ -109,6 +109,10 @@ sub erase {
     warn $@ if $@;
     $db->txn_commit;    
     
+    eval { $db->storage->dbh->do('DROP TABLE config CASCADE') };
+    warn $@ if $@;
+    $db->txn_commit;   
+    
 }
 
 =head1 AUTHOR

@@ -69,6 +69,13 @@ sub _deploy {
 
     $db->add_user_cmd(name => 'Abort');
     $db->add_user_cmd(name => 'Forward');
+    
+    $db->add_config(key => 'vm_state_starting_timeout', value => '60');
+    $db->add_config(key => 'vm_state_running_vma_timeout', value => '15');
+    $db->add_config(key => 'vm_state_stopping_timeout', value => '90');
+    $db->add_config(key => 'vm_state_zombie_sigkill_timeout', value => '30');
+    $db->add_config(key => 'x_state_connecting_timeout', value => '15');    
+    $db->add_config(key => 'vma_response_timeout', value => '15');        
 
 }
 
@@ -183,6 +190,16 @@ sub add_x_cmd {
     
     $schema->resultset('X_Cmd')->create({name => $name});
     
+}
+
+sub add_config {
+    my ($self, %opts) = @_;
+    my $schema = $self->{schema};
+    my $key = delete $opts{key};
+    my $value = delete $opts{value};
+    _die_on_too_many_opts(%opts);
+
+    $schema->resultset('Config')->create({key => $key, value => $value});        
 }
 
 1;

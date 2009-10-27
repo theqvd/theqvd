@@ -8,7 +8,7 @@ use QVD::HTTP::StatusCodes qw(:status_codes);
 use IO::Socket::Forwarder qw(forward_sockets);
 
 my $user_id = 1;
-my $httpc = QVD::HTTPC->new('localhost:8080');
+my $httpc = QVD::HTTPC->new('aguila:8080');
 
 $httpc->send_http_request(GET => '/qvd/connect_to_vm?user_id='.$user_id,
 			  headers => [ 'Connection: Upgrade',
