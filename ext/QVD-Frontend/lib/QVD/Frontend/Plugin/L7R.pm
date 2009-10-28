@@ -132,9 +132,8 @@ sub _connect_to_vm_processor {
     $server->send_http_response(HTTP_PROCESSING,
 				'X-QVD-VM-Status: Connecting to VM');
 
-    # FIXME Obtain host:port from $vm and $vm->rel_host_id
-    my $socket = IO::Socket::INET->new(PeerAddr => 'localhost',
-				       PeerPort => 5000+$vm->vm_id,
+    my $socket = IO::Socket::INET->new(PeerAddr => $vm->vm_address,
+				       PeerPort => $vm->vm_x_port,
 				       Proto => 'tcp');
     unless ($socket) {
 	$server->send_http_response(HTTP_PROCESSING,

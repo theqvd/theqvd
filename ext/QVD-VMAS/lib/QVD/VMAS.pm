@@ -35,10 +35,11 @@ sub _signal_kvm {
     my $pidFile = $self->_get_kvm_pid_file_path($id);
     my $pid;
     $pid = `cat $pidFile` if -e $pidFile;
-    chomp $pid;
-    warn "killing process $pid with signal $signal\n";
+    if (defined $pid) {
+	chomp $pid;
 # FIXME need to check if the process with this PID is actually KVM!
-    return kill($signal, $pid) if defined $pid;
+	return kill($signal, $pid) if defined $pid;
+    }
     undef
 }
 
@@ -48,8 +49,8 @@ sub is_vm_running {
 }
 
 sub _get_vma_client_for_vm {
-    my ($self, $id) = @_;
-    QVD::VMAS::VMAClient->new('localhost', 3030+$id)
+    my ($self, $vm_runtime) = @_;
+    QVD::VMAS::VMAClient->new($vm_runtime->vm_address, $vm_runtime->vm_vma_port)
 }
 
 sub get_vm_runtime_for_vm_id {
@@ -80,17 +81,32 @@ sub get_vms_for_user {
 }
 
 sub _get_free_host {
-    # FIXME Implement some kind of load balancing algorithm
-    shift->{db}->resultset('Host')->first->id;
+# FIXME Implement other load-balancing algorithms and make them configurable
+    my $host_rs = shift->{db}->resultset('Host');
+    my $host_id_col = $host_rs->get_column('id');
+    my ($min, $max) = ($host_id_col->min, $host_id_col->max);
+    my $host = undef;
+    until (defined $host) {
+	my $host_id = $min + int(rand($max-$min+1));
+	$host = $host_rs->find($host_id);
+    }
+    $host
 }
 
 sub assign_host_for_vm {
     my ($self, $vm) = @_;
-    my $host_id = $self->_get_free_host();
-    my $r = $vm->update({ host_id => $host_id });
+    my $vm_id = $vm->vm_id;
+    my $host = $self->_get_free_host();
+    my $r = $vm->update({ 
+		host_id => $host->id, 
+		vm_address => $host->address,
+		vm_vma_port => 3030+$vm_id,
+		vm_x_port => 5000+$vm_id,
+		vm_ssh_port => 2022+$vm_id,
+		vm_vnc_port => 5900+$vm_id,
+		});
     $self->commit;
-    return $r;
-    
+    $r
 }
 
 sub push_vm_state {
@@ -133,21 +149,19 @@ sub schedule_x_cmd {
 
 sub schedule_user_cmd {
     my ($self, $vm, $cmd) = @_;
-    warn "*** SENDING CMD COMMAND $cmd";
     return $self->_schedule_cmd($vm, 'user_cmd', $cmd);
 }
 
 sub start_vm_listener {
     my ($self, $vm) = @_;
     my $id = $vm->vm_id;
-    my $vma_port = 3030+$id;
-    my $agent_port = 5000+$id;
-    my $vma_client = $self->_get_vma_client_for_vm($id);
+    my $vma_client = $self->_get_vma_client_for_vm($vm);
     eval { $vma_client->start_vm_listener };
     if ($@) {
 	$self->schedule_user_cmd($vm, 'Abort');
 	return { request => 'error', 'error' => $@ };
     } else {
+	my $agent_port = $vm->vm_x_port;
 	$self->schedule_user_cmd($vm, 'Forward');
 	return { request => 'success', host => 'localhost', 'port' => $agent_port };
     }
@@ -156,9 +170,7 @@ sub start_vm_listener {
 sub schedule_start_vm {
     my ($self, $vm) = @_;
     if ($self->_schedule_cmd($vm, 'vm_cmd', 'start')) {
-	# FIXME Add host name or IP to the host table in database so we can
-	# connect somewhere!
-	my $host = 'localhost';
+	my $host = $vm->rel_host->address;
 	my $rc = QVD::VMAS::RCClient->new($host);
 	my $r = eval { $rc->ping_hkd() };
 	if (defined $r && $r->{request} eq 'success') {
@@ -179,16 +191,15 @@ sub start_vm {
 
     my $id = $vm->vm_id;
     my $osi = $vm->rel_vm_id->osi;
-    my $vma_port = 3030+$id;
-    my $agent_port = 5000+$id;
-    my $ssh_port = 2022+$id;
-    my $vnc_port = 5900+$id;
+    my $vma_port = $vm->vm_vma_port;
+    my $x_port = $vm->vm_x_port;
+    my $ssh_port = $vm->vm_ssh_port;
+    my $vnc_display = $vm->vm_vnc_port - 5900;
     my @cmd = (kvm => (-m => '512M',
-		       -vnc, "none",
-		       -redir => "tcp:${agent_port}::5000",
+		       -vnc => ":${vnc_display}",
+		       -redir => "tcp:${x_port}::5000",
 		       -redir => "tcp:${vma_port}::3030",
                        -redir => "tcp:${ssh_port}::22",
-		       -redir => "tcp:${vnc_port}::5900",
                        -hda => $osi->disk_image,
 		       (-e $vm->rel_vm_id->storage
 			? (-hdb => $vm->rel_vm_id->storage)
@@ -214,7 +225,7 @@ sub start_vm {
 sub stop_vm {
     my ($self, $vm) = @_;
 
-    my $vma_client = $self->_get_vma_client_for_vm($vm->vm_id);
+    my $vma_client = $self->_get_vma_client_for_vm($vm);
     unless ($vma_client->is_connected()) {
 	return { request => 'error', error => "can't connect to agent" };
     }
@@ -233,7 +244,7 @@ sub stop_vm {
 
 sub get_vma_status {
     my ($self, $vm) = @_;
-    my $vma = $self->_get_vma_client_for_vm($vm->vm_id);
+    my $vma = $self->_get_vma_client_for_vm($vm);
     eval { $vma->status() };
 }
 
@@ -282,7 +293,14 @@ sub clear_vma_ok_ts {
 
 sub clear_vm_host {
     my ($self, $vm) = @_;
-    $vm->update({host_id => undef});
+    $vm->update({
+	host_id => undef,
+	vm_address => undef,
+	vm_vma_port => undef,
+	vm_x_port => undef,
+	vm_ssh_port => undef,
+	vm_vnc_port => undef,
+	});
     $self->commit;
 }
 
