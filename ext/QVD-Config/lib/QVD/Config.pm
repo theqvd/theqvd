@@ -20,10 +20,6 @@ Version 0.01
 
 our $VERSION = '0.01';
 
-use base 'Exporter';
-
-our @EXPORT = qw(get);
-
 
 =head1 SYNOPSIS
 
@@ -45,15 +41,25 @@ if you don't export anything, such as for a purely object-oriented module.
 
 =cut
 
+my %cache;
+my $yet_readed = 0;
+
 sub get {
     my $class = shift;
     my $key = shift;
-    my $db = QVD::DB->new();
-      
-    my $value = $db->resultset('Config')->search({key => $key})->first->value;
-    $db->txn_commit;
     
-    $value;
+    if (!$yet_readed) {
+	my $db = QVD::DB->new();  
+	%cache = map {$_->key => $_->value} $db->resultset('Config')->all;
+	
+	$db->txn_commit;
+	$yet_readed = 1;
+	
+    }
+    
+    if (exists $cache{$key}) {
+	$cache{$key};
+    }
 }
 
 =head1 AUTHOR
