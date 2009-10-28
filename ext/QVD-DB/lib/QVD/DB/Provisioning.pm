@@ -91,10 +91,11 @@ sub add_user {
 sub add_host {
     my ($self, %opts) = @_;
     my $schema = $self->{schema};
+    my $name = delete $opts{name};
+    my $address = delete $opts{address};
     _die_on_too_many_opts(%opts);
-    $schema->resultset('Host')->create({id => 1, 
-    					name => 'localhost', 
-					address => 'localhost'});
+    $schema->resultset('Host')->create({name => $name,
+					address => $address});
 }
 
 sub add_osi {
