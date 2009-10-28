@@ -10,7 +10,7 @@ $db->add_user(login => 'qvd');
 $db->add_osi(name => 'Test image', path => 'qvd-guest.img');
 $db->add_host(name => 'localhost', address => 'localhost');
 $db->add_vm(
-	name => 'Test VM '.$i,
+	name => 'Test VM 1',
 	osi => 1,
 	host => 1,
 	user => 1,
