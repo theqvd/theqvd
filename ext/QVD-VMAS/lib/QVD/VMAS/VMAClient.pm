@@ -4,12 +4,10 @@ use strict;
 use warnings;
 
 use parent 'QVD::SimpleRPC::Client';
-use Config::Tiny;
+use QVD::Config;
 
 sub new {
-    my $config = Config::Tiny->new();
-    $config = Config::Tiny->read('config.ini');
-    my $vm_state_starting_timeout = $config->{timeouts}->{vma_response_timeout};
+    my $vm_state_starting_timeout = QVD::Config->get('vma_response_timeout');
 
     my ($class, $host, $port) = @_;
     $class->SUPER::new("http://$host:$port/vma/", timeout => $vm_state_starting_timeout);
