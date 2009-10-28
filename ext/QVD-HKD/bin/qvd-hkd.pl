@@ -8,7 +8,7 @@ use QVD::HKD;
 
 my $PID_FILE = '/var/run/qvd/hkd.pid';
 
-my $hkd = QVD::HKD->new(host_id => 1, loop_wait_time => 5);
+my $hkd = QVD::HKD->new(loop_wait_time => 5);
 
 $App::Daemon::pidfile = $PID_FILE;
 daemonize;

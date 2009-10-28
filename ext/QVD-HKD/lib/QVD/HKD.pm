@@ -3,6 +3,7 @@ package QVD::HKD;
 use warnings;
 use strict;
 
+use Sys::Hostname;
 use Log::Log4perl qw/:easy/;
 use QVD::VMAS;
 use QVD::DB;
@@ -21,9 +22,9 @@ my $x_state_connecting_timeout = QVD::Config->get('x_state_connecting_timeout');
 sub new {
     my ($class, %opts) = @_;
     my $loop_wait_time = delete $opts{loop_wait_time};
-    my $host_id = delete $opts{host_id};
     my $db = QVD::DB->new();
     my $vmas = QVD::VMAS->new($db);
+    my $host_id = $db->resultset('Host')->search(name => hostname)->first->id;
     my $vm_state_map = {
     	stopped => {
 	    start 	=> {new_state => 'starting',
