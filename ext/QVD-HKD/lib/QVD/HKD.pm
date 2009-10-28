@@ -6,19 +6,17 @@ use strict;
 use Log::Log4perl qw/:easy/;
 use QVD::VMAS;
 use QVD::DB;
+use QVD::Config;
 
-use Config::Tiny;
 
 our $VERSION = '0.01';
 
 # Carga los parámetros necesarios desde el fichero de configuración
-my $config = Config::Tiny->new();
-$config = Config::Tiny->read('config.ini');
-my $vm_state_starting_timeout = $config->{timeouts}->{vm_state_starting_timeout};
-my $vm_state_running_vma_timeout = $config->{timeouts}->{vm_state_running_vma_timeout};
-my $vm_state_stopping_timeout = $config->{timeouts}->{vm_state_stopping_timeout};
-my $vm_state_zombie_sigkill_timeout = $config->{timeouts}->{vm_state_zombie_sigkill_timeout};
-my $x_state_connecting_timeout = $config->{timeouts}->{x_state_connecting_timeout};
+my $vm_state_starting_timeout = QVD::Config->get('vm_state_starting_timeout');
+my $vm_state_running_vma_timeout = QVD::Config->get('vm_state_running_vma_timeout');
+my $vm_state_stopping_timeout = QVD::Config->get('vm_state_stopping_timeout');
+my $vm_state_zombie_sigkill_timeout = QVD::Config->get('vm_state_zombie_sigkill_timeout');
+my $x_state_connecting_timeout = QVD::Config->get('x_state_connecting_timeout');
 
 sub new {
     my ($class, %opts) = @_;

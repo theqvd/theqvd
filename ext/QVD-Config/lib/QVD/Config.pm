@@ -46,10 +46,12 @@ if you don't export anything, such as for a purely object-oriented module.
 =cut
 
 sub get {
+    my $class = shift;
     my $key = shift;
     my $db = QVD::DB->new();
-    
-    my $value = $db->resultset('Config')->search({key => $key})->first;
+      
+    my $value = $db->resultset('Config')->search({key => $key})->first->value;
+    $db->txn_commit;
     
     $value;
 }
