@@ -7,6 +7,7 @@ use QVD::VMAS;
 my $host_id = 1;
 my $vmas = QVD::VMAS->new();
 my $vm = $vmas->get_vms_for_host($host_id)->first;
+$vmas->assign_host_for_vm($vm);
 my $vm_id = $vm->vm_id;
 print "Starting VM $vm_id...\n";
 my $r = $vmas->start_vm($vm);

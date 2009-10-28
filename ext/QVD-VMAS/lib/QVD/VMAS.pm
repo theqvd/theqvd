@@ -170,7 +170,7 @@ sub start_vm_listener {
 sub schedule_start_vm {
     my ($self, $vm) = @_;
     if ($self->_schedule_cmd($vm, 'vm_cmd', 'start')) {
-	my $host = $vm->rel_host->address;
+	my $host = $vm->host->address;
 	my $rc = QVD::VMAS::RCClient->new($host);
 	my $r = eval { $rc->ping_hkd() };
 	if (defined $r && $r->{request} eq 'success') {
