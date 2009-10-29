@@ -64,20 +64,23 @@ sub new {
 			    action => 'start_nx'},
 	},
 	connecting => {
-	    disconnect	=> {new_state => 'disconnecting'},
+	    disconnect	=> {new_state => 'disconnecting',
+	    		    action => 'disconnect_nx'},
 	    _timeout 	=> {new_state => 'disconnecting'},
 	    _do		=> {new_state => 'listening'},
 	    _fail	=> {new_state => 'disconnected',
 			    action => 'abort'},
 	},
 	listening => {
-	    disconnect	=> {new_state => 'disconnecting'},
+	    disconnect	=> {new_state => 'disconnecting',
+	    		    action => 'disconnect_nx'},
 	    _do 	=> {new_state => 'connected'},
 	    _fail	=> {new_state => 'disconnected',
 			    action => 'abort'},
 	},
 	connected => {
-	    disconnect	=> {new_state => 'disconnected'},
+	    disconnect	=> {new_state => 'disconnected',
+	    		    action => 'disconnect_nx'},
 	    _fail	=> {new_state => 'disconnected',
 			    action => 'abort'},
 	},
@@ -288,7 +291,7 @@ sub hkd_action_enter_zombie {
     my ($self, $vm, $state, $event) = @_;
     $self->_consume_vm_cmd($vm);
     $self->{vmas}->clear_x_cmd($vm);
-    $self->{vmas}->disconnect_x($vm);
+    $self->{vmas}->push_nx_state($vm, 'disconnected');
 }
 
 sub hkd_action_signal_zombie_vm {
@@ -330,7 +333,7 @@ sub hkd_action_enter_stopping {
     # * se pone x_state a "Disconnected"
     my ($self, $vm, $state, $event) = @_;
     $self->{vmas}->clear_x_cmd($vm);
-    $self->{vmas}->disconnect_x($vm);
+    $self->{vmas}->push_nx_state($vm, 'disconnected');
 }
 
 sub hkd_action_enter_failed {
@@ -342,7 +345,7 @@ sub hkd_action_enter_failed {
     my ($self, $vm, $state, $event) = @_;
     $self->{vmas}->clear_vm_cmd($vm);
     $self->{vmas}->clear_x_cmd($vm);
-    $self->{vmas}->disconnect_x($vm);
+    $self->{vmas}->push_nx_state($vm, 'disconnected');
     $self->{vmas}->clear_vm_host($vm);
     $self->{vmas}->clear_vma_ok_ts($vm);
 }
@@ -350,14 +353,18 @@ sub hkd_action_enter_failed {
 sub hkd_action_abort {
     my ($self, $vm, $state, $event) = @_;
     $self->{vmas}->schedule_user_cmd($vm, 'Abort');
-    # FIXME This state change must be done by L7R, but 
-    # it can't until we rewrite it entirely
     $self->{vmas}->push_user_state($vm, 'disconnected');
 }
 
 sub hkd_action_start_nx {
     my ($self, $vm, $state, $event) = @_;
     $self->{vmas}->start_vm_listener($vm);
+    $self->_consume_nx_cmd($vm);
+}
+
+sub hkd_action_disconnect_nx {
+    my ($self, $vm, $state, $event) = @_;
+    $self->{vmas}->disconnect_nx($vm);
     $self->_consume_nx_cmd($vm);
 }
 

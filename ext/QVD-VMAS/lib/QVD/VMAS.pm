@@ -274,10 +274,10 @@ sub clear_user_cmd {
     $self->_clear_cmd($vm, 'user_cmd');
 }
 
-sub disconnect_x {
+sub disconnect_nx {
     my ($self, $vm) = @_;
-    $vm->update({x_state => 'disconnected'});
-    $self->commit;
+    my $vma = $self->_get_vma_client_for_vm($vm);
+    $vma->disconnect_session;
 }
 
 sub update_vma_ok_ts {

@@ -77,22 +77,27 @@ sub _is_nxagent_started {
     return $status eq 'started' || $status eq 'resumed';
 }
 
-sub _start_or_resume_session {
+sub _suspend_or_wakeup_session {
     my $self = shift;
     my $pid = $self->_get_nxagent_pid;
+    kill('HUP', $pid);
+}
+
+sub _start_or_resume_session {
+    my $self = shift;
     if ($self->_is_nxagent_running) {
 	if ($self->_is_nxagent_suspended) {
 	    warn "Waking up suspended nxagent..";
-	    kill('HUP', $pid);
+	    $self->_suspend_or_wakeup_session;
 	} elsif ($self->_is_nxagent_started) {
 	    warn "Suspending active nxagent to steal session..";
-	    kill('HUP', $pid);
+	    $self->_suspend_or_wakeup_session;
 	    while (! $self->_is_nxagent_suspended) {
 		# FIXME: timeout
 		sleep 1;
 	    }
 	    warn "Waking up suspended nxagent to steal session..";
-	    kill('HUP', $pid);
+	    $self->_suspend_or_wakeup_session;
 	} else {
 	    # FIXME: Need to process the *ing-states+aborted+exited
 	    die "Nxagent is running but not started nor suspended!";
@@ -166,6 +171,16 @@ sub SimpleRPC_poweroff {
     }
 }
 
+sub SimpleRPC_disconnect_session {
+    my $self = shift;
+    if ($self->_is_nxagent_running) {
+	$self->_suspend_or_wakeup;
+	{disconnect => 1};
+    } else {
+	{disconnect => undef};
+    }
+}
+
 1;
 
 __END__
@@ -213,6 +228,13 @@ default the shutdown is scheduled within 1 minute.
 
 Returns a hash with the key C<poweroff> and the value minutes until shutdown or
 C<undef> if scheduling power off failed.
+
+=item disconnect_session()
+
+Disconnect the user session if it is running.
+
+Returns a hash with the key C<disconnect> having a true value if the session
+was disconnected and undef if the session wasn't running in the first place.
 
 =back
 
