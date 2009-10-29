@@ -6,6 +6,7 @@ use strict;
 use QVD::DB;
 use QVD::VMAS::VMAClient;
 use QVD::VMAS::RCClient;
+use QVD::Config;
 
 our $VERSION = '0.01';
 
@@ -100,10 +101,10 @@ sub assign_host_for_vm {
     my $r = $vm->update({ 
 		host_id => $host->id, 
 		vm_address => $host->address,
-		vm_vma_port => 3030+$vm_id,
-		vm_x_port => 5000+$vm_id,
-		vm_ssh_port => 2022+$vm_id,
-		vm_vnc_port => 5900+$vm_id,
+		vm_vma_port => QVD::Config->get('vm_vma_port')+$vm_id,
+		vm_x_port => QVD::Config->get('vm_x_port')+$vm_id,
+		vm_ssh_port => QVD::Config->get('vm_ssh_port')+$vm_id,
+		vm_vnc_port => QVD::Config->get('vm_vnc_port')+$vm_id,
 		});
     $self->commit;
     $r

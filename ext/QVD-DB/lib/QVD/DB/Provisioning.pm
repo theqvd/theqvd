@@ -76,7 +76,14 @@ sub _deploy {
     $db->add_config(key => 'vm_state_zombie_sigkill_timeout', value => '30');
     $db->add_config(key => 'x_state_connecting_timeout', value => '15');    
     $db->add_config(key => 'vma_response_timeout', value => '15');        
-
+    
+    $db->add_config(key => 'vm_start_timeout', value => '60');        
+    
+    $db->add_config(key => 'vm_vma_port', value => '3030');
+    $db->add_config(key => 'vm_x_port', value => '5000');
+    $db->add_config(key => 'vm_ssh_port', value => '2022');
+    $db->add_config(key => 'vm_vnc_port', value => '5900');    
+    
 }
 
 sub add_user {

@@ -11,6 +11,7 @@ use QVD::VMAS;
 use QVD::HTTP::StatusCodes qw(:status_codes);
 use QVD::HTTP::Headers qw(header_eq_check);
 use QVD::URI qw(uri_query_split);
+use QVD::Config;
 
 sub set_http_request_processors {
     my ($class, $server, $url_base) = @_;
@@ -20,8 +21,7 @@ sub set_http_request_processors {
 
 sub _connect_to_vm_processor {
     my ($server, $method, $url, $headers) = @_;
-    # FIXME Move this to a configuration file
-    my $vm_start_timeout = 60;
+    my $vm_start_timeout = QVD::Config->get('vm_start_timeout');
 
     unless (header_eq_check($headers, Connection => 'Upgrade') and
 	    header_eq_check($headers, Upgrade => 'QVD/1.0')) {
