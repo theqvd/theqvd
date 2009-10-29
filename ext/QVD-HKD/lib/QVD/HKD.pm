@@ -316,6 +316,8 @@ sub hkd_action_stop_vm {
     if ($r and $r->{request} eq 'success') {
 	$self->_consume_vm_cmd($vm);
 	$self->{vmas}->push_vm_state($vm, 'stopping');
+	$self->{vmas}->push_nx_state($vm, 'disconnected');
+	$self->{vmas}->push_user_state($vm, 'disconnected');
     }
 }
 

@@ -163,7 +163,6 @@ sub start_vm_listener {
 	return { request => 'error', 'error' => $@ };
     } else {
 	my $agent_port = $vm->vm_x_port;
-	$self->schedule_user_cmd($vm, 'Forward');
 	return { request => 'success', host => 'localhost', 'port' => $agent_port };
     }
 }
@@ -277,7 +276,7 @@ sub clear_user_cmd {
 sub disconnect_nx {
     my ($self, $vm) = @_;
     my $vma = $self->_get_vma_client_for_vm($vm);
-    $vma->disconnect_session;
+    eval { $vma->disconnect_session };
 }
 
 sub update_vma_ok_ts {
