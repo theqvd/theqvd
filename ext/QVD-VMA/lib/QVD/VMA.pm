@@ -77,9 +77,16 @@ sub _is_nxagent_started {
     return $status eq 'started' || $status eq 'resumed';
 }
 
+sub _is_nxagent_starting {
+    my $self = shift;
+    my $status = $self->_get_nxagent_status;
+    return $status eq 'starting' || $status eq 'resuming';
+}
+
 sub _suspend_or_wakeup_session {
     my $self = shift;
     my $pid = $self->_get_nxagent_pid;
+    warn "Trying to suspend / wakeup nxagent";
     kill('HUP', $pid);
 }
 
@@ -98,9 +105,16 @@ sub _start_or_resume_session {
 	    }
 	    warn "Waking up suspended nxagent to steal session..";
 	    $self->_suspend_or_wakeup_session;
+	} elsif ($self->_is_nxagent_starting) {
+	    until ($self->_is_nxagent_started) {
+		warn "Waiting for starting nxagent to become ready..";
+		sleep 1;
+	    }
 	} else {
-	    # FIXME: Need to process the *ing-states+aborted+exited
-	    die "Nxagent is running but not started nor suspended!";
+	    # nxagent is aborting, terminating, suspending or stopped
+	    warn "Waiting for ".$self->_get_nxagent_status." nxagent to stop..";
+	    sleep 2;
+	    $self->_start_or_resume_session;
 	}
     } else {
 	my $pid = fork;
@@ -173,7 +187,8 @@ sub SimpleRPC_poweroff {
 
 sub SimpleRPC_disconnect_session {
     my $self = shift;
-    if ($self->_is_nxagent_running) {
+    if ($self->_is_nxagent_started) {
+	warn "Trying to disconnect the session that is already started";
 	$self->_suspend_or_wakeup_session;
 	{disconnect => 1};
     } else {
