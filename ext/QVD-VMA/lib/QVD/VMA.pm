@@ -174,7 +174,7 @@ sub SimpleRPC_poweroff {
 sub SimpleRPC_disconnect_session {
     my $self = shift;
     if ($self->_is_nxagent_running) {
-	$self->_suspend_or_wakeup;
+	$self->_suspend_or_wakeup_session;
 	{disconnect => 1};
     } else {
 	{disconnect => undef};
