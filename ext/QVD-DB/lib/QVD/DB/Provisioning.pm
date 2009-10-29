@@ -64,7 +64,6 @@ sub _deploy {
     $db->add_user_state(name => 'disconnected');
     $db->add_user_state(name => 'connecting');
     $db->add_user_state(name => 'connected');
-    $db->add_user_state(name => 'disconnecting');
     $db->add_user_state(name => 'aborting');
 
     $db->add_user_cmd(name => 'Abort');
