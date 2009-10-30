@@ -16,82 +16,90 @@ sub post_configure_hook {
 }
 
 package QVD::VMA::Impl;
-
+use Carp;
+use File::Slurp qw(slurp);
 use parent 'QVD::SimpleRPC::Server';
 
-# FIXME Move session dir and un-priviledged user name to config file
-
-sub qvd_touch {
+sub _slurp_line {
     my $fname = shift;
-    open FH, ">>", $fname or die "Couldn't create $fname: $!";
-    close FH;
-    chmod 0666, $fname or die "Couldn't set permissions for $fname: $!";
+    my $txt = slurp $fname;
+    chomp $txt;
+    $txt;
 }
+
+sub _touch {
+    my $fname = shift;
+    open FH, ">>", $fname or carp "Couldn't create $fname: $!";
+    close FH;
+    chmod 0660, $fname or carp "Couldn't set permissions for $fname: $!";
+}
+
+# FIXME
+# fix status/state dichotomy
 
 sub new {
     my $class = shift;
     my $self = $class->SUPER::new();
-    bless $self, $class;
-    my $QVD_SESSION_DIR = '/var/run/qvd';
-    mkdir $QVD_SESSION_DIR or die "Couldn't create run directory: $!"
-    	unless -e $QVD_SESSION_DIR;
-    qvd_touch $QVD_SESSION_DIR.'/state';
-    qvd_touch $QVD_SESSION_DIR.'/nxagent.pid';
-    qvd_touch $QVD_SESSION_DIR.'/nxagent.log';
+    my $config = Config::Tiny->read("vma.ini")
+      or croak "unable to read configuration file 'vma.ini'";
+
+    my $run_dir = $config->{vma}{run_dir};
+    $run_dir = '/var/run/qvd' unless defined $run_dir;
+    $self->{_run_dir} = $run_dir;
+    $self->{_run_state_fn} = "$run_dir/state";
+    $self->{_run_nxagent_pid_fn} = "$run_dir/nxagent.pid";
+    $self->{_run_nxagent_log_fn} = "$run_dir/nxagent.log";
+
+
+    -e $run_dir or mkdir $run_dir;
+    -d $run_dir or croak "Couldn't create run directory: $!"
+    _touch $self->{_run_state_fn};
+    _touch $self->{_run_nxagent_pid_fn};
+    _touch $self->{_run_nxagent_log_fn};
     $self
 }
 
-sub _get_nxagent_pid {
-    my $self = shift;
-    return `cat /var/run/qvd/nxagent.pid`;
-}
+sub _get_nxagent_pid { _slurp_line shift->{_run_nxagent_pid_fn} }
 
-
-sub _get_nxagent_status {
-    my $self = shift;
-    my $status = `cat /var/run/qvd/state`;
-    chomp($status);
-    return $status;
-}
+sub _get_nxagent_status { _slurp_line shift->{_run_state_fn} }
 
 sub _is_nxagent_running {
     my $self = shift;
     my $pid = $self->_get_nxagent_pid;
-    if ($pid) {
-	# FIXME Who says that no other process can take the pid?
-	return kill 0, $pid;
-    } else {
-	return 0;
-    }
+    # FIXME Who says that no other process can take the pid?
+    # Very unlikely, Linux does not reuse PIDs lightly --Salva
+    $pid and kill(0, $pid);
 }
 
 sub _is_nxagent_suspended {
     my $self = shift;
     my $status = $self->_get_nxagent_status;
-    return $status eq 'suspended';
+    $status eq 'suspended';
 }
 
 sub _is_nxagent_started {
     my $self = shift;
     my $status = $self->_get_nxagent_status;
-    return $status eq 'started' || $status eq 'resumed';
+    $status eq 'started' or $status eq 'resumed';
 }
 
 sub _is_nxagent_starting {
     my $self = shift;
     my $status = $self->_get_nxagent_status;
-    return $status eq 'starting' || $status eq 'resuming';
+    $status eq 'starting' or $status eq 'resuming';
 }
 
 sub _suspend_or_wakeup_session {
     my $self = shift;
     my $pid = $self->_get_nxagent_pid;
     warn "Trying to suspend / wakeup nxagent";
-    kill('HUP', $pid);
+    kill(HUP => $pid);
 }
 
 sub _start_or_resume_session {
     my $self = shift;
+    # FIXME: cache state and don't read it repeatly from an external
+    # file.
     if ($self->_is_nxagent_running) {
 	if ($self->_is_nxagent_suspended) {
 	    warn "Waking up suspended nxagent..";
@@ -99,8 +107,8 @@ sub _start_or_resume_session {
 	} elsif ($self->_is_nxagent_started) {
 	    warn "Suspending active nxagent to steal session..";
 	    $self->_suspend_or_wakeup_session;
+	    # FIXME: this method shouldn't block!
 	    while (! $self->_is_nxagent_suspended) {
-		# FIXME: timeout
 		sleep 1;
 	    }
 	    warn "Waking up suspended nxagent to steal session..";
@@ -119,7 +127,7 @@ sub _start_or_resume_session {
     } else {
 	my $pid = fork;
 	if (!$pid) {
-	    defined $pid or die "fork failed";
+	    defined $pid or carp "fork failed";
 	    { exec "su - qvd -c \"xinit /usr/bin/gnome-session -- /home/qvd/QVD/ext/QVD-VMA/bin/nxagent-monitor.pl :1000 -display nx/nx,link=lan:1000 -ac\"" };
 	    { exec "/bin/false" };
 	    require POSIX;
@@ -128,16 +136,15 @@ sub _start_or_resume_session {
     }
 }
 
-
 sub _shutdown {
     my $self = shift;
     my $type = shift;
     my $minutes = shift;
     my $pid = fork;
     if (!$pid) {
-	defined $pid or die "Shutdown: fork failed: $!";
+	defined $pid or carp "Shutdown: fork failed: $!";
 	{ exec "shutdown -$type +$minutes" };
-	die "Shutdown: exec failed: $!";
+	carp "Shutdown: exec failed: $!";
     }
     # Wait 2 seconds and check the presence of pid file
     sleep 2;
@@ -165,7 +172,7 @@ sub SimpleRPC_status {
 	$x_state = 'connected';
     } elsif ($nx_state =~ /suspending|terminating|aborting/) {
 	$x_state = 'disconnecting';
-    } elsif ($nx_state =~ /suspended|terminated|aborted|exited .*/) {
+    } elsif ($nx_state =~ /suspended|terminated|aborted|exited/) {
 	$x_state = 'disconnected';
     }
     # FIXME log unknown nx state as an internal error
