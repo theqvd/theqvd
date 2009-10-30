@@ -9,7 +9,7 @@ use QVD::URI qw(uri_query_split);
 use QVD::HTTP::StatusCodes qw(:status_codes);
 
 sub new {
-    my ($class) = @_;
+    my $class = shift;
     my $self = {};
     bless $self, $class;
     $self;

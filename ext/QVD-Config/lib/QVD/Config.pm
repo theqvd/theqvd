@@ -36,9 +36,16 @@ if you don't export anything, such as for a purely object-oriented module.
 
 =head1 FUNCTIONS
 
-=head2 QVD::Config->get($key)
+=over
 
-Returns the configuration associated to the given key
+=item QVD::Config->get($key)
+
+=item QVD::Config->get($key, $default)
+
+Returns the configuration associated to the given key.
+
+If no entry exist on the database it returns the default value if
+given or otherwise undef.
 
 =cut
 
@@ -46,14 +53,15 @@ my %cache;
 my $cached;
 
 sub get {
-    my ($class, $key) = @_;
+    my ($class, $key, $default) = @_;
     unless ($cached) {
 	my $db = QVD::DB->new();
 	%cache = map { $_->key => $_->value} $db->resultset('Config')->all;
 	$db->txn_commit;
 	$cached = 1;
     }
-    $cache{$key};
+    my $value = $cache{$key};
+    defined $value ? $value : $default
 }
 
 =head1 AUTHOR
@@ -62,9 +70,11 @@ Hugo Cornejo, C<< <hcornejo at qindel.com> >>
 
 =head1 BUGS
 
-Please report any bugs or feature requests to C<bug-qvd-config at rt.cpan.org>, or through
-the web interface at L<http://rt.cpan.org/NoAuth/ReportBug.html?Queue=QVD-Config>.  I will be notified, and then you'll
-automatically be notified of progress on your bug as I make changes.
+Please report any bugs or feature requests to C<bug-qvd-config at
+rt.cpan.org>, or through the web interface at
+L<http://rt.cpan.org/NoAuth/ReportBug.html?Queue=QVD-Config>.  I will
+be notified, and then you'll automatically be notified of progress on
+your bug as I make changes.
 
 
 
