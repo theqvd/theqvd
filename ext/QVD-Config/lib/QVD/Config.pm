@@ -38,6 +38,8 @@ if you don't export anything, such as for a purely object-oriented module.
 
 =head2 QVD::Config->get($key)
 
+Returns the configuration associated to the given key
+
 =cut
 
 my %cache;
