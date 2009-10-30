@@ -5,8 +5,7 @@ use strict;
 
 use Config::Tiny;
 
-my $config = Config::Tiny->new();
-$config = Config::Tiny->read('config.ini');
+my $config = Config::Tiny->read('config.ini');
 
 =head1 NAME
 
@@ -37,29 +36,22 @@ if you don't export anything, such as for a purely object-oriented module.
 
 =head1 FUNCTIONS
 
-=head2 get
+=head2 QVD::Config->get($key)
 
 =cut
 
 my %cache;
-my $yet_readed = 0;
+my $cached;
 
 sub get {
-    my $class = shift;
-    my $key = shift;
-    
-    if (!$yet_readed) {
-	my $db = QVD::DB->new();  
-	%cache = map {$_->key => $_->value} $db->resultset('Config')->all;
-	
+    my ($class, $key) = @_;
+    unless ($cached) {
+	my $db = QVD::DB->new();
+	%cache = map { $_->key => $_->value} $db->resultset('Config')->all;
 	$db->txn_commit;
-	$yet_readed = 1;
-	
+	$cached = 1;
     }
-    
-    if (exists $cache{$key}) {
-	$cache{$key};
-    }
+    $cache{$key};
 }
 
 =head1 AUTHOR
