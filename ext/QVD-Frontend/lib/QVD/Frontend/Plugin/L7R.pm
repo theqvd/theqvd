@@ -23,7 +23,7 @@ sub _abort_session {
     my ($vm, $vmas) = @_;
     $vmas->push_user_state($vm, 'aborting');
     $vmas->disconnect_nx($vm);
-    while ($vm->x_state ne 'disconnected') {
+    while (defined $vm->x_state and $vm->x_state ne 'disconnected') {
 	sleep 5;
 	$vm->discard_changes;
     }
@@ -71,11 +71,13 @@ sub _connect_to_vm_processor {
 	} else {
 	    $vmas->schedule_user_cmd($vm, 'Abort');
 	}
+	$vmas->txn_commit;
 	sleep 5;
 	warn "L7R: user_state is ".$vm->user_state." Waiting for 'disconnected'";
 	$vm->discard_changes;
     }
     $vmas->push_user_state($vm, 'connecting');
+    $vmas->txn_commit;
 
 #: Connecting: el usuario ha iniciado sesión y ha pedido ser conectado a una
 #: maquina virtual, pero aun no se ha podido cerrar el bucle (por ejemplo,
@@ -89,8 +91,10 @@ sub _connect_to_vm_processor {
 	    $server->send_http_error(HTTP_BAD_GATEWAY);
 	    return;
 	}
+	$vmas->txn_commit;
 	warn "L7R: starting vm ".$vm->vm_id." on host ".$vm->host_id;
 	my $r = $vmas->schedule_start_vm($vm);
+	$vmas->txn_commit;
 	unless ($r) {
 # The VM couldn't be scheduled for starting
 # FIXME Pass the error message to the client?
@@ -122,6 +126,7 @@ sub _connect_to_vm_processor {
     $vmas->schedule_x_cmd($vm, 'connect') or
 	$server->send_http_error(HTTP_BAD_GATEWAY), return;
     warn "L7R: Sent x connect";
+    $vmas->txn_commit;
     
 # FIXME timeout?
     while (1) {
@@ -130,6 +135,7 @@ sub _connect_to_vm_processor {
 	    _abort_session($vm, $vmas);
 	    $vmas->clear_user_cmd($vm);
 	    $vmas->push_user_state($vm, 'disconnected');
+	    $vmas->txn_commit;
 # FIXME Pass the message to the client?
 	    $server->send_http_error(HTTP_BAD_GATEWAY);
 	    return;
@@ -151,6 +157,7 @@ sub _connect_to_vm_processor {
 	_abort_session($vm, $vmas);
 	$vmas->clear_user_cmd($vm);
 	$vmas->push_user_state($vm, 'disconnected');
+	$vmas->txn_commit;
 # FIXME Pass the message to the client?
 	$server->send_http_error(HTTP_BAD_GATEWAY);
 	return;
@@ -173,11 +180,12 @@ sub _connect_to_vm_processor {
 				    'X-QVD-VM-Status: Connected to VM');
 
     $vmas->push_user_state($vm, 'connected');
+    $vmas->txn_commit;
 
-    # TODO Fork here in order to monitor the DB for Abort cmd while forwarding?
     forward_sockets(\*STDIN, $socket);
 
     $vmas->push_user_state($vm, 'disconnected');
+    $vmas->txn_commit;
 }
 
 1;

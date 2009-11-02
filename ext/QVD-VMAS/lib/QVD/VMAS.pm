@@ -108,41 +108,32 @@ sub assign_host_for_vm {
 		vm_ssh_port => QVD::Config->get('vm_ssh_port')+$vm_id,
 		vm_vnc_port => QVD::Config->get('vm_vnc_port')+$vm_id,
 		});
-    $self->commit;
     $r
 }
 
 sub push_vm_state {
     my ($self, $vm, $vm_state) = @_;
     $vm->update({ vm_state => $vm_state, vm_state_ts => time });
-    $self->commit;
 }
 
 sub push_nx_state {
     my ($self, $vm, $x_state) = @_;
     $vm->update({ x_state => $x_state, x_state_ts => time });
-    $self->commit;
 }
 
 sub push_user_state {
     my ($self, $vm, $state) = @_;
     $vm->update({ user_state => $state, user_state_ts => time });
-    $self->commit;
-}
-
-sub commit {
-    shift->{db}->txn_commit;
 }
 
 sub _schedule_cmd {
     my ($self, $vm, $cmd_type, $cmd) = @_;
-    # FIXME This test is needed to not schedule a command when one is already scheduled!!!    
-    #unless (defined $vm->$cmd_type && $vm->$cmd_type ne $cmd) {
+    $vm->discard_changes;
+    unless (defined $vm->$cmd_type && $vm->$cmd_type ne $cmd) {
 	my $r = $vm->update({$cmd_type  => $cmd});
-	$self->commit;
 	return 1;
-    #}
-    #undef;
+    }
+    undef;
 }
 
 sub schedule_x_cmd {
@@ -257,7 +248,6 @@ sub last_error {
 sub _clear_cmd {
     my ($self, $vm, $cmd_type) = @_;
     $vm->update({$cmd_type => undef});
-    $self->commit;
 }
 
 sub clear_vm_cmd {
@@ -284,13 +274,11 @@ sub disconnect_nx {
 sub update_vma_ok_ts {
     my ($self, $vm) = @_;
     $vm->update({vma_ok_ts => time});
-    $self->commit;
 }
 
 sub clear_vma_ok_ts {
     my ($self, $vm) = @_;
     $vm->update({vma_ok_ts => undef});
-    $self->commit;
 }
 
 sub clear_vm_host {
@@ -303,7 +291,6 @@ sub clear_vm_host {
 	vm_ssh_port => undef,
 	vm_vnc_port => undef,
 	});
-    $self->commit;
 }
 
 sub terminate_vm {

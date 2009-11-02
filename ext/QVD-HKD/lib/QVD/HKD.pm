@@ -357,18 +357,21 @@ sub hkd_action_abort {
     my ($self, $vm, $state, $event) = @_;
     $self->{vmas}->schedule_user_cmd($vm, 'Abort');
     $self->{vmas}->push_user_state($vm, 'disconnected');
+    $self->{vmas}->txn_commit;
 }
 
 sub hkd_action_start_nx {
     my ($self, $vm, $state, $event) = @_;
     $self->{vmas}->start_vm_listener($vm);
     $self->_consume_nx_cmd($vm);
+    $self->{vmas}->txn_commit;
 }
 
 sub hkd_action_disconnect_nx {
     my ($self, $vm, $state, $event) = @_;
     $self->{vmas}->disconnect_nx($vm);
     $self->_consume_nx_cmd($vm);
+    $self->{vmas}->txn_commit;
 }
 
 1;
