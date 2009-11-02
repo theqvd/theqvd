@@ -8,6 +8,8 @@ use QVD::VMAS::VMAClient;
 use QVD::VMAS::RCClient;
 use QVD::Config;
 
+use Log::Log4perl qw/:easy/;
+
 our $VERSION = '0.01';
 
 sub new {
@@ -312,6 +314,11 @@ sub terminate_vm {
 sub kill_vm {
     my ($self, $vm) = @_;
     $self->_signal_kvm($vm->vm_id, 9);
+}
+
+sub DESTROY {
+    my $self = shift;
+    $self->txn_commit;
 }
 
 1;

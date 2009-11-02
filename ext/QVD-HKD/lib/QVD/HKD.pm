@@ -4,11 +4,12 @@ use warnings;
 use strict;
 
 use Sys::Hostname;
-use Log::Log4perl qw/:easy/;
+
 use QVD::VMAS;
 use QVD::DB;
 use QVD::Config;
 
+use Log::Log4perl qw/:easy/;
 
 our $VERSION = '0.01';
 

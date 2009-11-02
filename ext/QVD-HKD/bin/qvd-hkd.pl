@@ -8,8 +8,15 @@ use QVD::HKD;
 
 my $PID_FILE = '/var/run/qvd/hkd.pid';
 
-my $hkd = QVD::HKD->new(loop_wait_time => 5);
-
 $App::Daemon::pidfile = $PID_FILE;
+$App::Daemon::logfile = "/var/log/qvd.log";
+
+use Log::Log4perl qw(:levels);
+$App::Daemon::loglevel = $DEBUG;
+$App::Daemon::as_user = "root";
+
 daemonize;
+my $hkd = QVD::HKD->new(loop_wait_time => 5);
 $hkd->run;
+
+

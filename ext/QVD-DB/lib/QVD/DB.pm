@@ -4,6 +4,7 @@ use warnings;
 use strict;
 
 use parent qw/DBIx::Class::Schema/;
+use DBIx::Class::Exception;
 
 use Config::Tiny;
 
@@ -20,6 +21,7 @@ Version 0.01
 our $VERSION = '0.01';
 
 __PACKAGE__->load_namespaces(result_namespace => 'Result');
+__PACKAGE__->exception_action(sub { warn @_ ; DBIx::Class::Exception::throw(@_);});
 
 =head1 SYNOPSIS
 
