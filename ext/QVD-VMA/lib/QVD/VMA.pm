@@ -18,6 +18,7 @@ sub post_configure_hook {
 package QVD::VMA::Impl;
 use Carp;
 use File::Slurp qw(slurp);
+use Config::Tiny;
 use parent 'QVD::SimpleRPC::Server';
 
 sub _slurp_line {
@@ -31,7 +32,7 @@ sub _touch {
     my $fname = shift;
     open FH, ">>", $fname or carp "Couldn't create $fname: $!";
     close FH;
-    chmod 0660, $fname or carp "Couldn't set permissions for $fname: $!";
+    chmod 0666, $fname or carp "Couldn't set permissions for $fname: $!";
 }
 
 # FIXME
@@ -52,7 +53,7 @@ sub new {
 
 
     -e $run_dir or mkdir $run_dir;
-    -d $run_dir or croak "Couldn't create run directory: $!"
+    -d $run_dir or croak "Couldn't create run directory: $!";
     _touch $self->{_run_state_fn};
     _touch $self->{_run_nxagent_pid_fn};
     _touch $self->{_run_nxagent_log_fn};
@@ -194,8 +195,9 @@ sub SimpleRPC_poweroff {
 
 sub SimpleRPC_disconnect_session {
     my $self = shift;
-    if ($self->_is_nxagent_started) {
-	warn "Trying to disconnect the session that is already started";
+    warn "Trying to disconnect session in state ".$self->_get_nxagent_status;
+    if ($self->_is_nxagent_started or $self->_is_nxagent_starting) {
+	warn "Trying to disconnect the session that is already started or starting";
 	$self->_suspend_or_wakeup_session;
 	{disconnect => 1};
     } else {
