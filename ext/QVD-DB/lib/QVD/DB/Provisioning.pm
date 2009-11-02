@@ -83,6 +83,9 @@ sub _deploy {
     $db->add_config(key => 'vm_ssh_port', value => '2022');
     $db->add_config(key => 'vm_vnc_port', value => '5900');    
     
+    $db->add_config(key => 'hkd_pid_file', value => '/var/run/qvd/hkd.pid');
+    $db->add_config(key => 'hkd_log_file', value => '/var/log/qvd.log');
+    
 }
 
 sub add_user {
