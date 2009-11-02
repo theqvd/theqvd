@@ -214,7 +214,7 @@ sub run {
 			
 			if (($old_x_state eq 'connected')
 			    and ($new_x_state eq 'disconnected')) {
-			    $self->_do_nx_action(disconnect => $vm_runtime);
+			    $self->_do_nx_action(_fail => $vm_runtime);
 			}			
 			
 			if (_check_timeout($old_x_state, 'starting',
@@ -355,7 +355,6 @@ sub hkd_action_enter_failed {
 
 sub hkd_action_abort {
     my ($self, $vm, $state, $event) = @_;
-    $self->{vmas}->schedule_user_cmd($vm, 'Abort');
     $self->{vmas}->push_user_state($vm, 'disconnected');
     $self->{vmas}->txn_commit;
 }
@@ -363,6 +362,7 @@ sub hkd_action_abort {
 sub hkd_action_start_nx {
     my ($self, $vm, $state, $event) = @_;
     $self->{vmas}->start_vm_listener($vm);
+    $vm->discard_changes;
     $self->_consume_nx_cmd($vm);
     $self->{vmas}->txn_commit;
 }
@@ -370,8 +370,11 @@ sub hkd_action_start_nx {
 sub hkd_action_disconnect_nx {
     my ($self, $vm, $state, $event) = @_;
     $self->{vmas}->disconnect_nx($vm);
-    $self->_consume_nx_cmd($vm);
-    $self->{vmas}->txn_commit;
+    $vm->discard_changes;
+    if (defined $vm->x_cmd and $vm->x_cmd eq 'disconnect') {
+	$self->_consume_nx_cmd($vm);
+	$self->{vmas}->txn_commit;
+    }
 }
 
 1;
