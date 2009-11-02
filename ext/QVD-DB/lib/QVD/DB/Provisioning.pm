@@ -69,14 +69,14 @@ sub _deploy {
     $db->add_user_cmd(name => 'Abort');
     $db->add_user_cmd(name => 'Forward');
     
-    $db->add_config(key => 'vm_state_starting_timeout', value => '60');
-    $db->add_config(key => 'vm_state_running_vma_timeout', value => '15');
-    $db->add_config(key => 'vm_state_stopping_timeout', value => '90');
-    $db->add_config(key => 'vm_state_zombie_sigkill_timeout', value => '30');
-    $db->add_config(key => 'x_state_connecting_timeout', value => '15');    
-    $db->add_config(key => 'vma_response_timeout', value => '15');        
+    $db->add_config(key => 'vm_state_starting_timeout', value => '6000');
+    $db->add_config(key => 'vm_state_running_vma_timeout', value => '1500');
+    $db->add_config(key => 'vm_state_stopping_timeout', value => '9000');
+    $db->add_config(key => 'vm_state_zombie_sigkill_timeout', value => '3000');
+    $db->add_config(key => 'x_state_connecting_timeout', value => '1500');    
+    $db->add_config(key => 'vma_response_timeout', value => '1500');        
     
-    $db->add_config(key => 'vm_start_timeout', value => '60');        
+    $db->add_config(key => 'vm_start_timeout', value => '6000');        
     
     $db->add_config(key => 'vm_vma_port', value => '3030');
     $db->add_config(key => 'vm_x_port', value => '5000');
