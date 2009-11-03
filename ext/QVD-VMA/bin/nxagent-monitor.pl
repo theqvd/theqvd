@@ -3,6 +3,8 @@
 use strict;
 use warnings;
 use Fcntl ':flock';
+use File::Spec::Functions qw(rel2abs);
+use File::Basename;
 
 my $QVD_SESSION_DIR = "/var/run/qvd";
 my $QVD_SESSION_STATUS_FILE = $QVD_SESSION_DIR."/state";
@@ -18,7 +20,7 @@ sub open_status_file {
 }
 
 sub setup_environment {
-    $ENV{NX_CLIENT} = '/usr/lib/nx/nxdialog';
+    $ENV{NX_CLIENT} = dirname(rel2abs($0))."/nxdiag.pl";
 }
 
 sub unbuffer_status_file {
