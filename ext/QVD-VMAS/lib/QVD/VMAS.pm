@@ -40,7 +40,7 @@ sub _signal_kvm {
     $pid = `cat $pidFile` if -e $pidFile;
     if (defined $pid) {
 	chomp $pid;
-# FIXME need to check if the process with this PID is actually KVM!
+	# FIXME need to check if the process with this PID is actually KVM!
 	return kill($signal, $pid) if defined $pid;
     }
     undef

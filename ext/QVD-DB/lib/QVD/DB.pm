@@ -27,26 +27,31 @@ sub new {
 
 sub erase {
     my $db = shift;
-    for my $table (qw(osis
-		      vm_runtimes
-		      vms
-		      host_runtimes
-		      hosts
-		      users
-		      x_states
-		      vm_states
-		      user_states
-		      x_cmds
-		      vm_cmds
-		      user_cmds
-		      configs)) {
+    for my $table (qw( vm_runtimes
+		       vms
+		       osis
+		       host_runtimes
+		       hosts
+		       users
+		       x_states
+		       vm_states
+		       user_states
+		       x_cmds
+		       vm_cmds
+		       user_cmds
+		       configs )
+		  ) {
 
 	eval {
-	    $db->txn_do( sub { $_[1]->do("DROP TABLE $table CASCADE") } );
+	    warn "DROPPING $table\n";
+	    $db->storage->dbh->do("DROP TABLE $table CASCADE");
+	    $db->txn_commit;
 	};
-	warn $@ if $@;
+	warn "Error (DROP $table): $@" if $@;
     }
 }
+
+sub disconnect { shift->storage->disconnect }
 
 1;
 
