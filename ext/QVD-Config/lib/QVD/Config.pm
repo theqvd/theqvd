@@ -1,40 +1,52 @@
 package QVD::Config;
 
+our $VERSION = '0.01';
+
 use warnings;
 use strict;
 
 use Config::Tiny;
+use QVD::DB;
 
-my $config = Config::Tiny->read('config.ini');
+my %cache;
+{
+    my $db = QVD::DB->new();
+    $db->txn_do(
+		sub {
+		    %cache = map { $_->key => $_->value}
+			$db->resultset('Config')->all;
+		}
+	       );
+}
+
+sub get {
+    my ($class, $key, $default) = @_;
+    my $value = $cache{$key};
+    defined $value ? $value : $default
+}
+
+1;
+
+__END__
 
 =head1 NAME
 
-QVD::Config - The great new QVD::Config!
-
-=head1 VERSION
-
-Version 0.01
-
-=cut
-
-our $VERSION = '0.01';
-
+QVD::Config - Retrieve QVD configuration from database.
 
 =head1 SYNOPSIS
 
-This module encapsulate configuration parameteres access.
+This module encapsulate configuration access.
 
     use QVD::Config;
-
     my $foo = QVD::Config->get('field');
-    ...
+    my $bar = QVD::Config->get('bar', $default_bar);
 
-=head1 EXPORT
+=head1 DESCRIPTION
 
 A list of functions that can be exported.  You can delete this section
 if you don't export anything, such as for a purely object-oriented module.
 
-=head1 FUNCTIONS
+=head2 FUNCTIONS
 
 =over
 
@@ -47,26 +59,13 @@ Returns the configuration associated to the given key.
 If no entry exist on the database it returns the default value if
 given or otherwise undef.
 
-=cut
+=back
 
-my %cache;
-my $cached;
+=head1 AUTHORS
 
-sub get {
-    my ($class, $key, $default) = @_;
-    unless ($cached) {
-	my $db = QVD::DB->new();
-	%cache = map { $_->key => $_->value} $db->resultset('Config')->all;
-	$db->txn_commit;
-	$cached = 1;
-    }
-    my $value = $cache{$key};
-    defined $value ? $value : $default
-}
+Hugo Cornejo (hcornejo at qindel.com)
 
-=head1 AUTHOR
-
-Hugo Cornejo, C<< <hcornejo at qindel.com> >>
+Salvador FandiE<ntilde>o (sfandino@yahoo.com)
 
 =head1 BUGS
 
@@ -76,45 +75,9 @@ L<http://rt.cpan.org/NoAuth/ReportBug.html?Queue=QVD-Config>.  I will
 be notified, and then you'll automatically be notified of progress on
 your bug as I make changes.
 
-
-
-
-=head1 SUPPORT
-
-You can find documentation for this module with the perldoc command.
-
-    perldoc QVD::Config
-
-
-You can also look for information at:
-
-=over 4
-
-=item * RT: CPAN's request tracker
-
-L<http://rt.cpan.org/NoAuth/Bugs.html?Dist=QVD-Config>
-
-=item * AnnoCPAN: Annotated CPAN documentation
-
-L<http://annocpan.org/dist/QVD-Config>
-
-=item * CPAN Ratings
-
-L<http://cpanratings.perl.org/d/QVD-Config>
-
-=item * Search CPAN
-
-L<http://search.cpan.org/dist/QVD-Config/>
-
-=back
-
-
-=head1 ACKNOWLEDGEMENTS
-
-
 =head1 COPYRIGHT & LICENSE
 
-Copyright 2009 Hugo Cornejo.
+Copyright 2009 Qindel Formacion y Servicios S.L.
 
 This program is free software; you can redistribute it and/or modify it
 under the terms of either: the GNU General Public License as published
@@ -122,7 +85,4 @@ by the Free Software Foundation; or the Artistic License.
 
 See http://dev.perl.org/licenses/ for more information.
 
-
 =cut
-
-1; # End of QVD::Config
