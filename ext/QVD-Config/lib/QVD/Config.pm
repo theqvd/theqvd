@@ -17,6 +17,7 @@ my %cache;
 			$db->resultset('Config')->all;
 		}
 	       );
+    $db->storage->disconnect;
 }
 
 sub get {
