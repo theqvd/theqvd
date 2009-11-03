@@ -54,13 +54,9 @@ __END__
 
 =head1 NAME
 
-QVD::DB - The great new QVD::DB!
+QVD::DB - ORM for QVD entities
 
 =head1 SYNOPSIS
-
-Quick summary of what the module does.
-
-Perhaps a little code snippet.
 
     use QVD::DB;
 
