@@ -152,7 +152,6 @@ sub start_vm_listener {
     my $vma_client = $self->_get_vma_client_for_vm($vm);
     eval { $vma_client->start_vm_listener };
     if ($@) {
-	$self->schedule_user_cmd($vm, 'Abort');
 	return { request => 'error', 'error' => $@ };
     } else {
 	my $agent_port = $vm->vm_x_port;

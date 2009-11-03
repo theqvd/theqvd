@@ -65,19 +65,24 @@ sub _connect_to_vm_processor {
 
     # FIXME timeout?
     # Is there an open session?
-    while (defined $vm->user_state && $vm->user_state ne 'disconnected') {
-	if ($vm->user_state eq 'connected') {
-	    $vmas->disconnect_nx($vm);
-	} else {
-	    $vmas->schedule_user_cmd($vm, 'Abort');
-	}
-	$vmas->txn_commit;
-	sleep 5;
-	warn "L7R: user_state is ".$vm->user_state." Waiting for 'disconnected'";
+    while (1) {
 	$vm->discard_changes;
+	if (! defined $vm->user_state || $vm->user_state eq 'disconnected') {
+	    $vmas->push_user_state($vm, 'connecting');
+	    $vmas->txn_commit;
+	    last;
+	} else {
+	    if ($vm->user_state eq 'connected') {
+		$vmas->disconnect_nx($vm);
+	    } else {
+		$vmas->schedule_user_cmd($vm, 'Abort');
+		$vmas->txn_commit;
+	    }
+	    sleep 5;
+	    warn "L7R: user_state is ".$vm->user_state." Waiting for 'disconnected'";
+	    $db->txn_rollback;
+	}
     }
-    $vmas->push_user_state($vm, 'connecting');
-    $vmas->txn_commit;
 
 #: Connecting: el usuario ha iniciado sesión y ha pedido ser conectado a una
 #: maquina virtual, pero aun no se ha podido cerrar el bucle (por ejemplo,
@@ -130,6 +135,7 @@ sub _connect_to_vm_processor {
     
 # FIXME timeout?
     while (1) {
+	$vm->discard_changes;
 	# abort?
 	if (defined $vm->user_cmd && $vm->user_cmd eq 'Abort') {
 	    _abort_session($vm, $vmas);
@@ -147,8 +153,8 @@ sub _connect_to_vm_processor {
 	} else {
 	    $server->send_http_response(HTTP_PROCESSING,
 		    'X-QVD-VM-Status: Starting VM');
+	    $db->txn_rollback;
 	    sleep 5;
-	    $vm->discard_changes;
 	}
     }
 
