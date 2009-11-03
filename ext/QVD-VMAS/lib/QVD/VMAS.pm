@@ -255,7 +255,7 @@ sub clear_vm_cmd {
     $self->_clear_cmd($vm, 'vm_cmd');
 }
 
-sub clear_x_cmd {
+sub clear_nx_cmd {
     my ($self, $vm) = @_;
     $self->_clear_cmd($vm, 'x_cmd');
 }

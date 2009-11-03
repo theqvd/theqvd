@@ -131,6 +131,10 @@ sub _do_nx_action {
     shift->_do_action('nx', @_)
 }
 
+sub _is_command {
+    shift =~ /^[^-]/;
+}
+
 sub _do_action {
     my ($self, $mode, $event, $vm) = @_;
     my $vmas = $self->{vmas};
@@ -144,6 +148,20 @@ sub _do_action {
     }
     my $new_state = $event_map->{$event}{new_state};
     if (defined $new_state) {
+	# This allows to call push_vm_state or push_nx_state based on
+	# $mode value
+	my $push_state = $vmas->can('push_'.$mode.'_state');
+	unless ($push_state) {
+	    ERROR "_do_action: not implemented: push_${mode}_state";
+	    return;
+	}
+	if (_is_command($event)) {
+	    my $clear_cmd = $vmas->can('clear_'.$mode.'_cmd');
+	    $vmas->$clear_cmd($vm);
+	}
+	$vmas->$push_state($vm, $new_state);
+	$vmas->txn_commit;
+
 	my $enter = $self->{$mode."_state_map"}{$new_state}{_enter}{action};
 	if ($enter) {
 	    my $method = $self->can('hkd_action_'.$enter);
@@ -153,16 +171,6 @@ sub _do_action {
 	    }
 	    $self->$method($vm, $state, $event);
 	}
-	# This allows to call push_vm_state or push_nx_state based on
-	# $mode value
-	my $method = $vmas->can('push_'.$mode.'_state');
-	unless ($method) {
-		ERROR "_do_action: not implemented: $method";
-		return;
-	    }
-	$vmas->$method($vm, $new_state);
-	
-	$vmas->txn_commit;
     }
     my $action = $event_map->{$event}{action};
     if (defined $action) {
@@ -267,21 +275,14 @@ sub run {
     }
 }
 
-sub _consume_vm_cmd {
-    my ($self, $vm) = @_;
-    $self->{vmas}->clear_vm_cmd($vm);
-}
-
-sub _consume_nx_cmd {
-    my ($self, $vm) = @_;
-    $self->{vmas}->clear_x_cmd($vm);
-}
-
 sub hkd_action_start_vm {
     my ($self, $vm, $state, $event) = @_;
-    INFO "Starting VM ".$vm->vm_id;
-    $self->_consume_vm_cmd($vm);
-    $self->{vmas}->start_vm($vm);
+    my $r = $self->{vmas}->start_vm($vm);
+    if ($r->{request} eq 'error') {
+	ERROR "Starting VM ".$vm->vm_id." error: ".$r->{error};
+    } else {
+	ERROR "Starting VM ".$vm->vm_id." success";
+    }
 }
 
 sub hkd_action_enter_zombie {
@@ -290,9 +291,10 @@ sub hkd_action_enter_zombie {
     # * se elimina cualquier comando de x_cmd
     # * se cambia el estado x_state a "Disconnected" 
     my ($self, $vm, $state, $event) = @_;
-    $self->_consume_vm_cmd($vm);
-    $self->{vmas}->clear_x_cmd($vm);
+    $self->{vmas}->clear_vm_cmd($vm);
+    $self->{vmas}->clear_nx_cmd($vm);
     $self->{vmas}->push_nx_state($vm, 'disconnected');
+    $self->{vmas}->txn_commit;
 }
 
 sub hkd_action_signal_zombie_vm {
@@ -308,17 +310,16 @@ sub hkd_action_kill_vm {
 sub hkd_action_update_vma_ok_ts {
     my ($self, $vm, $state, $event) = @_;
     $self->{vmas}->update_vma_ok_ts($vm);
+    $self->{vmas}->txn_commit;
 }
 
 sub hkd_action_stop_vm {
     my ($self, $vm, $state, $event) = @_;
-    INFO "Stopping VM ".$vm->vm_id;
     my $r = $self->{vmas}->stop_vm($vm);
-    if ($r and $r->{request} eq 'success') {
-	$self->_consume_vm_cmd($vm);
-	$self->{vmas}->push_vm_state($vm, 'stopping');
-	$self->{vmas}->push_nx_state($vm, 'disconnected');
-	$self->{vmas}->push_user_state($vm, 'disconnected');
+    if ($r->{request} eq 'error') {
+	ERROR "Stopping VM ".$vm->vm_id." error: ".$r->{error};
+    } else {
+	INFO "Stopping VM ".$vm->vm_id." success";
     }
 }
 
@@ -327,7 +328,7 @@ sub hkd_action_enter_stopped {
     # * se borrara la entrada vm_runtime.host de la base de datos
     my ($self, $vm, $state, $event) = @_;
     $self->{vmas}->clear_vm_host($vm);
-    $self->{vmas}->clear_vma_ok_ts($vm);
+    $self->{vmas}->txn_commit;
 }
 
 sub hkd_action_enter_stopping {
@@ -335,8 +336,9 @@ sub hkd_action_enter_stopping {
     # * se eliminara cualquier comando de x_cmd
     # * se pone x_state a "Disconnected"
     my ($self, $vm, $state, $event) = @_;
-    $self->{vmas}->clear_x_cmd($vm);
     $self->{vmas}->push_nx_state($vm, 'disconnected');
+    $self->{vmas}->clear_nx_cmd($vm);
+    $self->{vmas}->txn_commit;
 }
 
 sub hkd_action_enter_failed {
@@ -347,34 +349,25 @@ sub hkd_action_enter_failed {
     # * se elimina la entrada vm_runtime.host de la base de datos
     my ($self, $vm, $state, $event) = @_;
     $self->{vmas}->clear_vm_cmd($vm);
-    $self->{vmas}->clear_x_cmd($vm);
+    $self->{vmas}->clear_nx_cmd($vm);
     $self->{vmas}->push_nx_state($vm, 'disconnected');
     $self->{vmas}->clear_vm_host($vm);
-    $self->{vmas}->clear_vma_ok_ts($vm);
+    $self->{vmas}->txn_commit;
 }
 
 sub hkd_action_abort {
     my ($self, $vm, $state, $event) = @_;
     $self->{vmas}->push_user_state($vm, 'disconnected');
-    $self->{vmas}->txn_commit;
 }
 
 sub hkd_action_start_nx {
     my ($self, $vm, $state, $event) = @_;
     $self->{vmas}->start_vm_listener($vm);
-    $vm->discard_changes;
-    $self->_consume_nx_cmd($vm);
-    $self->{vmas}->txn_commit;
 }
 
 sub hkd_action_disconnect_nx {
     my ($self, $vm, $state, $event) = @_;
     $self->{vmas}->disconnect_nx($vm);
-    $vm->discard_changes;
-    if (defined $vm->x_cmd and $vm->x_cmd eq 'disconnect') {
-	$self->_consume_nx_cmd($vm);
-	$self->{vmas}->txn_commit;
-    }
 }
 
 1;
