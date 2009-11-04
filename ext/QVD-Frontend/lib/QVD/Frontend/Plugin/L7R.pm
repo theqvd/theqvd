@@ -13,6 +13,9 @@ use QVD::HTTP::Headers qw(header_eq_check);
 use QVD::URI qw(uri_query_split);
 use QVD::Config;
 
+use Log::Log4perl qw/:easy/;
+Log::Log4perl::init('log4perl.conf');
+
 sub set_http_request_processors {
     my ($class, $server, $url_base) = @_;
     $server->set_http_request_processor( \&_connect_to_vm_processor,

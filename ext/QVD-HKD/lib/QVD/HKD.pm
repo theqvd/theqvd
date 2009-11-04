@@ -9,7 +9,8 @@ use QVD::VMAS;
 use QVD::DB;
 use QVD::Config;
 
-use Log::Log4perl qw/:easy/;
+use Log::Log4perl qw(:levels :easy);
+Log::Log4perl::init('log4perl.conf');
 
 our $VERSION = '0.01';
 
@@ -103,7 +104,7 @@ sub new {
 
 sub _handle_SIGUSR1 {
     my $signame = shift;
-    INFO "Received $signame";
+    INFO ("Received $signame");
 }
 
 sub _install_signals {
@@ -140,7 +141,7 @@ sub _do_action {
     my $vmas = $self->{vmas};
     my $vm_id = $vm->vm_id;
     my $state = $mode eq "nx" ? $vm->x_state : $vm->vm_state;
-    DEBUG "VM($vm_id,$state,$event) - do_action";
+    DEBUG ("VM($vm_id,$state,$event) - do_action");
     my $event_map = $self->{$mode."_state_map"}{$state};
         unless (exists $event_map->{$event}) {
 	# DEBUG "VM($vm_id,$vm_state,$event) - event ignored";
@@ -152,7 +153,7 @@ sub _do_action {
 	# $mode value
 	my $push_state = $vmas->can('push_'.$mode.'_state');
 	unless ($push_state) {
-	    ERROR "_do_action: not implemented: push_${mode}_state";
+	    ERROR ("_do_action: not implemented: push_${mode}_state");
 	    return;
 	}
 	if (_is_command($event)) {
@@ -166,7 +167,7 @@ sub _do_action {
 	if ($enter) {
 	    my $method = $self->can('hkd_action_'.$enter);
 	    unless ($method) {
-		ERROR "_do_action: not implemented: $method";
+		ERROR ("_do_action: not implemented: $method");
 		return;
 	    }
 	    $self->$method($vm, $state, $event);
@@ -174,10 +175,10 @@ sub _do_action {
     }
     my $action = $event_map->{$event}{action};
     if (defined $action) {
-	DEBUG "_do_actions: Handling VM($vm_id,$state,$event) with $action";
+	DEBUG ("_do_actions: Handling VM($vm_id,$state,$event) with $action");
 	my $method = $self->can('hkd_action_'.$action);
 	unless ($method) {
-	    ERROR "_do_actions: not implemented: $action";
+	    ERROR ("_do_actions: not implemented: $action");
 	    return;
 	}
 	$self->$method($vm, $state, $event);
@@ -279,9 +280,9 @@ sub hkd_action_start_vm {
     my ($self, $vm, $state, $event) = @_;
     my $r = $self->{vmas}->start_vm($vm);
     if ($r->{request} eq 'error') {
-	ERROR "Starting VM ".$vm->vm_id." error: ".$r->{error};
+	ERROR ("Starting VM ".$vm->vm_id." error: ".$r->{error});
     } else {
-	ERROR "Starting VM ".$vm->vm_id." success";
+	ERROR ("Starting VM ".$vm->vm_id." success");
     }
 }
 
@@ -317,9 +318,9 @@ sub hkd_action_stop_vm {
     my ($self, $vm, $state, $event) = @_;
     my $r = $self->{vmas}->stop_vm($vm);
     if ($r->{request} eq 'error') {
-	ERROR "Stopping VM ".$vm->vm_id." error: ".$r->{error};
+	ERROR ("Stopping VM ".$vm->vm_id." error: ".$r->{error});
     } else {
-	INFO "Stopping VM ".$vm->vm_id." success";
+	INFO ("Stopping VM ".$vm->vm_id." success");
     }
 }
 
