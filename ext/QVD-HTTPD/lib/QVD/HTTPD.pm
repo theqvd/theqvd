@@ -61,7 +61,6 @@ sub process_request {
 	    return;
 	}
     }
-    print STDERR "connection closed\n";
 }
 
 sub set_http_request_processor {

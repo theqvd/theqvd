@@ -17,6 +17,7 @@ sub new {
     croak "bad URL base for SimpleRPC client"
 	unless ($scheme eq 'http' and !defined($query) and !defined($frag));
     my $httpc = QVD::HTTPC->new($host, %opts);
+    # FIXME use Log4perl
     warn $@ if $@;
     $base //= '/';
     $base .= '/' unless $base =~ m|/$|;
@@ -36,6 +37,7 @@ sub is_connected {
 sub connect {
     my $self = shift;
     my $httpc = eval { QVD::HTTPC->new($self->{host}) };
+    # FIXME use Log4perl
     warn $@ if $@;
     $self->{httpc} = $httpc;
     $self->{httpc}
@@ -63,12 +65,11 @@ sub _make_request {
     my ($code, $msg, $headers, $body) =
 	$self->{httpc}->make_http_request(GET => "$self->{base}/$method$query");
     unless ($code == HTTP_OK) {
+    # FIXME use Log4perl
 	warn "HTTP request failed: $code - $msg";
 	return undef;
     }
     my $data = $self->_json->decode("[$body]");
-    use Data::Dumper;
-    print STDERR Dumper [JSON_response => @$data];
 
     die $data->[1] if @$data >= 2;
     $data->[0];

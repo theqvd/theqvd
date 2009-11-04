@@ -30,14 +30,10 @@ sub _process_request {
     my @params = uri_query_split $query;
     $function = "SimpleRPC_$function";
 
-    use Data::Dumper;
-    print STDERR Dumper [$function, @params];
-
     local $SIG{__DIE__};
 
     my $data = eval { $self->$function(@params) };
     if ($@) {
-	print STDERR Dumper \$@;
 	$httpd->send_http_response_with_body(HTTP_OK,
 					     'application/json-simplerpc',
 					     [],
