@@ -5,13 +5,14 @@ our $VERSION = '0.01';
 use warnings;
 use strict;
 
+use Carp;
 use DBIx::Class::Exception;
 use Config::Tiny;
 
 use parent qw(DBIx::Class::Schema);
 
 __PACKAGE__->load_namespaces(result_namespace => 'Result');
-__PACKAGE__->exception_action(sub { warn @_ ; DBIx::Class::Exception::throw(@_);});
+__PACKAGE__->exception_action(sub { croak @_ ; DBIx::Class::Exception::throw(@_);});
 
 sub new {
     my $class = shift;
@@ -22,7 +23,7 @@ sub new {
     my $conn_username = $cdb->{username};
     my $conn_password = $cdb->{password};
     $class->SUPER::connect($conn_data_source, $conn_username, $conn_password,
-				  { RaiseError => 1, AutoCommit => 0 });
+				  { RaiseError => 1, AutoCommit => 1 });
 }
 
 sub erase {
