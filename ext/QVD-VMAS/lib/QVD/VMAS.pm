@@ -17,7 +17,6 @@ sub new {
     my $db = shift || QVD::DB->new();
     my $self = {
 	db => $db,
-	last_error => undef,
     };
     bless $self, $class;
     $self;
@@ -25,7 +24,13 @@ sub new {
 
 sub txn_commit {
     my $self = shift;
+    DEBUG "Please use VMAS::txn_do instead of VMAS::txn_commit (see #116)";
     $self->{db}->txn_commit;
+}
+
+sub txn_do {
+    my ($self, $coderef) = @_;
+    $self->{db}->txn_do($coderef);
 }
 
 sub _get_kvm_pid_file_path {
@@ -238,10 +243,6 @@ sub get_vma_status {
     my ($self, $vm) = @_;
     my $vma = $self->_get_vma_client_for_vm($vm);
     eval { $vma->status() };
-}
-
-sub last_error {
-    shift->{last_error}
 }
 
 sub _clear_cmd {
