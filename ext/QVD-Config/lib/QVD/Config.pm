@@ -13,8 +13,6 @@ my %cache;
     my $db = QVD::DB->new();
     %cache = map { $_->key => $_->value}
 	$db->resultset('Config')->all;
-    $db->txn_rollback;
-    # $db->storage->disconnect;
 }
 
 sub get {
