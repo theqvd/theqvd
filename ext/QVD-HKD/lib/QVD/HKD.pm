@@ -43,7 +43,8 @@ sub new {
 	    _fail 	=> {new_state => 'failed'},
 	    _timeout 	=> {new_state => 'zombie'},
 	    _vma_ok 	=> {action => 'update_vma_ok_ts'},
-	    stop 	=> {action => 'stop_vm'},
+	    stop 	=> {new_state => 'stopping',
+	    		    action => 'stop_vm'},
 	},
 	stopping => {
 	    _enter 	=> {action => 'enter_stopping'},
@@ -279,7 +280,7 @@ sub run {
 sub hkd_action_start_vm {
     my ($self, $vm, $state, $event) = @_;
     my $r = $self->{vmas}->start_vm($vm);
-    if ($r->{request} eq 'error') {
+    if (defined $r->{request} && $r->{request} eq 'error') {
 	ERROR ("Starting VM ".$vm->vm_id." error: ".$r->{error});
     } else {
 	ERROR ("Starting VM ".$vm->vm_id." success");
