@@ -24,6 +24,9 @@ use File::Slurp qw(slurp);
 use Config::Tiny;
 use parent 'QVD::SimpleRPC::Server';
 
+use Log::Log4perl qw(:levels :easy);
+Log::Log4perl::init('log4perl.conf');
+
 sub _slurp_line {
     my $fname = shift;
     my $txt = slurp $fname;
@@ -96,7 +99,7 @@ sub _is_nxagent_starting {
 sub _suspend_or_wakeup_session {
     my $self = shift;
     my $pid = $self->_get_nxagent_pid;
-    warn "Trying to suspend / wakeup nxagent";
+    DEBUG ("Trying to suspend / wakeup nxagent");
     kill(HUP => $pid);
 }
 
@@ -106,25 +109,25 @@ sub _start_or_resume_session {
     # file.
     if ($self->_is_nxagent_running) {
 	if ($self->_is_nxagent_suspended) {
-	    warn "Waking up suspended nxagent..";
+	    DEBUG ("Waking up suspended nxagent..");
 	    $self->_suspend_or_wakeup_session;
 	} elsif ($self->_is_nxagent_started) {
-	    warn "Suspending active nxagent to steal session..";
+	    DEBUG ("Suspending active nxagent to steal session..");
 	    $self->_suspend_or_wakeup_session;
 	    # FIXME: this method shouldn't block!
 	    while (! $self->_is_nxagent_suspended) {
 		sleep 1;
 	    }
-	    warn "Waking up suspended nxagent to steal session..";
+	    DEBUG ("Waking up suspended nxagent to steal session..");
 	    $self->_suspend_or_wakeup_session;
 	} elsif ($self->_is_nxagent_starting) {
 	    until ($self->_is_nxagent_started) {
-		warn "Waiting for starting nxagent to become ready..";
+		DEBUG ("Waiting for starting nxagent to become ready..");
 		sleep 1;
 	    }
 	} else {
 	    # nxagent is aborting, terminating, suspending or stopped
-	    warn "Waiting for ".$self->_get_nxagent_status." nxagent to stop..";
+	    DEBUG ("Waiting for ".$self->_get_nxagent_status." nxagent to stop..");
 	    sleep 2;
 	    $self->_start_or_resume_session;
 	}
@@ -198,9 +201,9 @@ sub SimpleRPC_poweroff {
 
 sub SimpleRPC_disconnect_session {
     my $self = shift;
-    warn "Trying to disconnect session in state ".$self->_get_nxagent_status;
+    DEBUG "Trying to disconnect session in state ".$self->_get_nxagent_status;
     if ($self->_is_nxagent_started or $self->_is_nxagent_starting) {
-	warn "Trying to disconnect the session that is already started or starting";
+	DEBUG ("Trying to disconnect the session that is already started or starting");
 	$self->_suspend_or_wakeup_session;
 	{disconnect => 1};
     } else {
