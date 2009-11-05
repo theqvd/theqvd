@@ -37,6 +37,12 @@ sub _check_abort_session {
 	}
     });
     return 0 unless $abort_session;
+    _abort_session ($vm, $vmas);
+}
+
+sub _abort_session {
+    my ($vm, $vmas) = @_;
+    
     DEBUG "Abort session: aborting";
     if ($vm->x_state ne 'disconnected') {
 	DEBUG "Session abort: disconnect session";
