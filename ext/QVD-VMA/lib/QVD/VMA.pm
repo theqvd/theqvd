@@ -9,9 +9,6 @@ use Proc::ProcessTable;
 
 use parent 'QVD::HTTPD';
 
-use Log::Log4perl qw(:levels :easy);
-Log::Log4perl::init('log4perl.conf');
-
 sub post_configure_hook {
     my $self = shift;
     my $impl = QVD::VMA::Impl->new();
@@ -107,6 +104,7 @@ sub _start_or_resume_session {
     my $self = shift;
     # FIXME: cache state and don't read it repeatly from an external
     # file.
+    INFO("start or resume session");
     if ($self->_is_nxagent_running) {
 	if ($self->_is_nxagent_suspended) {
 	    DEBUG ("Waking up suspended nxagent..");
@@ -114,8 +112,10 @@ sub _start_or_resume_session {
 	} elsif ($self->_is_nxagent_started) {
 	    DEBUG ("Suspending active nxagent to steal session..");
 	    $self->_suspend_or_wakeup_session;
+	    DEBUG "Waiting for session to suspend..";
 	    # FIXME: this method shouldn't block!
 	    while (! $self->_is_nxagent_suspended) {
+		DEBUG "Still waiting to session to suspend..";
 		sleep 1;
 	    }
 	    DEBUG ("Waking up suspended nxagent to steal session..");
@@ -132,6 +132,7 @@ sub _start_or_resume_session {
 	    $self->_start_or_resume_session;
 	}
     } else {
+	INFO("nxagent wasn't running, starting it");
 	my $pid = fork;
 	if (!$pid) {
 	    defined $pid or carp "fork failed";
@@ -171,18 +172,19 @@ sub SimpleRPC_status {
     my $nx_state = $self->_get_nxagent_status();
 
     my $x_state;
-    if ($nx_state =~ /initiated/) {
+    if ($nx_state eq 'initiated') {
 	$x_state = 'connecting';
-    } elsif ($nx_state =~ /starting|resuming/) {
+    } elsif (grep $nx_state eq $_, qw(starting resuming)) {
 	$x_state = 'listening';
-    } elsif ($nx_state =~ /started|resumed/) {
+    } elsif (grep $nx_state eq $_, qw(started resumed)) {
 	$x_state = 'connected';
-    } elsif ($nx_state =~ /suspending|terminating|aborting/) {
+    } elsif (grep $nx_state eq $_, qw(suspending terminating aborting)) {
 	$x_state = 'disconnecting';
-    } elsif ($nx_state =~ /suspended|terminated|aborted|exited/) {
+    } elsif (grep $nx_state eq $_, qw(suspended terminated aborted 
+    					'exited terminated' 'exited aborted')) {
 	$x_state = 'disconnected';
     }
-    # FIXME log unknown nx state as an internal error
+    # FIXME log unknown nx state as an internal or NX error
     $x_state //= 'disconnected';
 
     {status => 'ok', x_state => $x_state}
