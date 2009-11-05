@@ -231,7 +231,6 @@ sub run {
 			my $cmd = $vm_runtime->x_cmd;
 			if (defined $cmd) {
 			    $self->_do_nx_action($cmd => $vm_runtime);
-			    $vmas->txn_commit;
 			}
 			
 			$self->_do_nx_action(_do => $vm_runtime);
@@ -261,10 +260,6 @@ sub run {
 	    
 	    if (defined $cmd) {
 		$self->_do_vm_action($cmd => $vm_runtime);
-		
-		# The commit below forces to close the transaction before the
-		# next loop, just in case!
-		$vmas->txn_commit;
 	    }
 	}
 	sleep $self->{loop_wait_time};
@@ -287,10 +282,11 @@ sub hkd_action_enter_zombie {
     # * se elimina cualquier comando de x_cmd
     # * se cambia el estado x_state a "Disconnected" 
     my ($self, $vm, $state, $event) = @_;
-    $self->{vmas}->clear_vm_cmd($vm);
-    $self->{vmas}->clear_nx_cmd($vm);
-    $self->{vmas}->push_nx_state($vm, 'disconnected');
-    $self->{vmas}->txn_commit;
+    $self->{vmas}->txn_do(sub {
+	$self->{vmas}->clear_vm_cmd($vm);
+	$self->{vmas}->clear_nx_cmd($vm);
+	$self->{vmas}->push_nx_state($vm, 'disconnected');
+    });
 }
 
 sub hkd_action_signal_zombie_vm {
@@ -305,8 +301,7 @@ sub hkd_action_kill_vm {
 
 sub hkd_action_update_vma_ok_ts {
     my ($self, $vm, $state, $event) = @_;
-    $self->{vmas}->update_vma_ok_ts($vm);
-    $self->{vmas}->txn_commit;
+    eval {$self->{vmas}->update_vma_ok_ts($vm)}; DEBUG $@ if $@;
 }
 
 sub hkd_action_stop_vm {
@@ -324,7 +319,6 @@ sub hkd_action_enter_stopped {
     # * se borrara la entrada vm_runtime.host de la base de datos
     my ($self, $vm, $state, $event) = @_;
     $self->{vmas}->clear_vm_host($vm);
-    $self->{vmas}->txn_commit;
 }
 
 sub hkd_action_enter_stopping {
@@ -332,9 +326,10 @@ sub hkd_action_enter_stopping {
     # * se eliminara cualquier comando de x_cmd
     # * se pone x_state a "Disconnected"
     my ($self, $vm, $state, $event) = @_;
-    $self->{vmas}->push_nx_state($vm, 'disconnected');
-    $self->{vmas}->clear_nx_cmd($vm);
-    $self->{vmas}->txn_commit;
+    $self->{vmas}->txn_do(sub {
+	$self->{vmas}->push_nx_state($vm, 'disconnected');
+	$self->{vmas}->clear_nx_cmd($vm);
+    });
 }
 
 sub hkd_action_enter_failed {
@@ -344,11 +339,12 @@ sub hkd_action_enter_failed {
     # * se cambia el estado x_state a "Disconnected"
     # * se elimina la entrada vm_runtime.host de la base de datos
     my ($self, $vm, $state, $event) = @_;
-    $self->{vmas}->clear_vm_cmd($vm);
-    $self->{vmas}->clear_nx_cmd($vm);
-    $self->{vmas}->push_nx_state($vm, 'disconnected');
-    $self->{vmas}->clear_vm_host($vm);
-    $self->{vmas}->txn_commit;
+    $self->{vmas}->txn_do(sub {
+	$self->{vmas}->clear_vm_cmd($vm);
+	$self->{vmas}->clear_nx_cmd($vm);
+	$self->{vmas}->push_nx_state($vm, 'disconnected');
+	$self->{vmas}->clear_vm_host($vm);
+    });
 }
 
 sub hkd_action_abort {
