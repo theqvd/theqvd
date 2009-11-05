@@ -22,20 +22,39 @@ sub set_http_request_processors {
 					 GET => $url_base . "connect_to_vm");
 }
 
-sub _abort_session {
-    my ($vm, $vmas) = @_;
-    $vmas->push_user_state($vm, 'aborting');
-    $vmas->disconnect_nx($vm);
-    while (defined $vm->x_state and $vm->x_state ne 'disconnected') {
-	sleep 5;
+# FIXME separate checking abort and the necessary actions to different methods
+sub _check_abort_session {
+    my ($vm, $vmas, $coderef) = @_;
+    my $abort_session = $vmas->txn_do(sub {
 	$vm->discard_changes;
+	if (defined $vm->user_cmd && $vm->user_cmd eq 'Abort') {
+	    $vmas->push_user_state($vm, 'aborting');
+	    $vmas->clear_user_cmd($vm);
+	    1;
+	} else {
+	    &$coderef if defined $coderef;
+	    0;
+	}
+    });
+    return 0 unless $abort_session;
+    DEBUG "Abort session: aborting";
+    if ($vm->x_state ne 'disconnected') {
+	DEBUG "Session abort: disconnect session";
+	my $r = $vmas->disconnect_nx($vm);
+	while ($vm->x_state ne 'disconnected') {
+	    DEBUG "x_state is ".$vm->x_state.", waiting for disconnected";
+	    sleep 5;
+	    $vm->discard_changes;
+	}
     }
     $vmas->push_user_state($vm, 'disconnected');
-    warn "L7R: aborting session";
+    INFO "Session abort completed";
+    1
 }
 
 sub _connect_to_vm_processor {
     my ($server, $method, $url, $headers) = @_;
+    INFO "Accepted connection";
     my $vm_start_timeout = QVD::Config->get('vm_start_timeout');
 
     unless (header_eq_check($headers, Connection => 'Upgrade') and
@@ -69,22 +88,24 @@ sub _connect_to_vm_processor {
     # FIXME timeout?
     # Is there an open session?
     while (1) {
-	$vm->discard_changes;
-	if (! defined $vm->user_state || $vm->user_state eq 'disconnected') {
-	    $vmas->push_user_state($vm, 'connecting');
-	    $vmas->txn_commit;
-	    last;
-	} else {
-	    if ($vm->user_state eq 'connected') {
-		$vmas->disconnect_nx($vm);
-	    } else {
-		$vmas->schedule_user_cmd($vm, 'Abort');
-		$vmas->txn_commit;
+	my $session_is_open = $vmas->txn_do(sub {
+	    $vm->discard_changes;
+	    if ($vm->user_state eq 'disconnected') {
+		DEBUG "user_state is ".$vm->user_state.", set 'connecting'";
+		$vmas->push_user_state($vm, 'connecting');
+		return 0;
 	    }
-	    sleep 5;
-	    warn "L7R: user_state is ".$vm->user_state." Waiting for 'disconnected'";
-	    $db->txn_rollback;
+	    if ($vm->user_state ne 'connected' and $vm->user_state ne 'aborting') {
+		$vmas->schedule_user_cmd($vm, 'Abort');
+	    }
+	    1;
+	});
+	last unless $session_is_open;
+	if ($vm->user_state eq 'connected') {
+	    $vmas->disconnect_nx($vm);
 	}
+	DEBUG "user_state is ".$vm->user_state." Waiting for 'disconnected'";
+	sleep 5;
     }
 
 #: Connecting: el usuario ha iniciado sesión y ha pedido ser conectado a una
@@ -93,84 +114,71 @@ sub _connect_to_vm_processor {
 
     # start the vm if it's not running already
     if ($vm->vm_state ne 'running') {
-
+	DEBUG "VM not running, trying to start it";
 	unless ($vmas->assign_host_for_vm($vm)) {
 # FIXME VM could not be assigned to a host, notify client?
+	    $vmas->push_user_state($vm, 'disconnected');
 	    $server->send_http_error(HTTP_BAD_GATEWAY);
 	    return;
 	}
-	$vmas->txn_commit;
-	warn "L7R: starting vm ".$vm->vm_id." on host ".$vm->host_id;
 	my $r = $vmas->schedule_start_vm($vm);
-	$vmas->txn_commit;
 	unless ($r) {
-# The VM couldn't be scheduled for starting
+	    # The VM couldn't be scheduled for starting
 # FIXME Pass the error message to the client?
+	    ERROR "VM ".$vm->vm_id." couldn't be started on host ".$vm->host_id;
+	    $vmas->push_user_state($vm, 'disconnected');
 	    $server->send_http_error(HTTP_BAD_GATEWAY);
 	    return;
 	}
-	warn "L7R: VM ".$vm->vm_id." started!";
-# Wait for the VMA to come online
-# FIXME use time() for checking timeout
-	my $timeout_counter = $vm_start_timeout/5;
-	while ($timeout_counter --> 0) {
+	INFO "Started VM ".$vm->vm_id." on host ".$vm->host_id;
+
+	# Wait for the VMA to come online
+	my $timeout_time = time + $vm_start_timeout;
+	while (time < $timeout_time) {
 	    $server->send_http_response(HTTP_PROCESSING,
 		    'X-QVD-VM-Status: Starting VM');
-	    warn "L7R: Waiting for VMA to start on VM ".$vm->vm_id.", $timeout_counter";
+	    DEBUG "Waiting for VMA to start on VM ".$vm->vm_id;
 	    $r = $vmas->get_vma_status($vm);
 	    last if exists $r->{status} && $r->{status} eq 'ok';
 	    sleep 5;
 	}
-# Start timed out
 # FIXME Pass the error message to the client?
-	if ($timeout_counter < 0) {
-	    $server->send_http_error(HTTP_BAD_GATEWAY);
+	if (time > $timeout_time) {
+	    INFO "VM ".$vm->vm_id." start timed out ";
 	    $vmas->push_user_state($vm, 'disconnected');
+	    $server->send_http_error(HTTP_BAD_GATEWAY);
 	    return;
 	}
     }
 
     # Send 'connect' x_cmd
-    $vmas->schedule_x_cmd($vm, 'connect') or
-	$server->send_http_error(HTTP_BAD_GATEWAY), return;
-    warn "L7R: Sent x connect";
-    $vmas->txn_commit;
+    unless ($vmas->schedule_x_cmd($vm, 'connect')) {
+	$vmas->push_user_state($vm, 'disconnected');
+	$server->send_http_error(HTTP_BAD_GATEWAY);
+	return;
+    }
+    DEBUG "Sent x connect";
     
 # FIXME timeout?
     while (1) {
 	$vm->discard_changes;
 	# abort?
-	if (defined $vm->user_cmd && $vm->user_cmd eq 'Abort') {
-	    _abort_session($vm, $vmas);
-	    $vmas->clear_user_cmd($vm);
-	    $vmas->push_user_state($vm, 'disconnected');
-	    $vmas->txn_commit;
+	if (_check_abort_session($vm, $vmas)) {
 # FIXME Pass the message to the client?
 	    $server->send_http_error(HTTP_BAD_GATEWAY);
 	    return;
 	}
 
-	warn "L7R: x_state is ".$vm->x_state." Waiting for 'listening'";
+	DEBUG "x_state is ".$vm->x_state." Waiting for 'listening'";
 	if ($vm->x_state eq 'listening') {
 	    last;
 	} else {
 	    $server->send_http_response(HTTP_PROCESSING,
 		    'X-QVD-VM-Status: Starting VM');
-	    $db->txn_rollback;
 	    sleep 5;
 	}
     }
 
-    # abort?
-    if (defined $vm->user_cmd && $vm->user_cmd eq 'Abort') {
-	_abort_session($vm, $vmas);
-	$vmas->clear_user_cmd($vm);
-	$vmas->push_user_state($vm, 'disconnected');
-	$vmas->txn_commit;
-# FIXME Pass the message to the client?
-	$server->send_http_error(HTTP_BAD_GATEWAY);
-	return;
-    }
     
     $server->send_http_response(HTTP_PROCESSING,
 				'X-QVD-VM-Status: Connecting to VM');
@@ -179,6 +187,7 @@ sub _connect_to_vm_processor {
 				       PeerPort => $vm->vm_x_port,
 				       Proto => 'tcp');
     unless ($socket) {
+	$vmas->push_user_state($vm, 'disconnected');
 	$server->send_http_response(HTTP_PROCESSING,
 				    'X-QVD-VM-Status: Retry connection',
 				    "X-QVD-VM-Info: Connection to vm failed");
@@ -188,13 +197,22 @@ sub _connect_to_vm_processor {
     $server->send_http_response(HTTP_SWITCHING_PROTOCOLS,
 				    'X-QVD-VM-Status: Connected to VM');
 
-    $vmas->push_user_state($vm, 'connected');
-    $vmas->txn_commit;
+    my $check_abort = _check_abort_session($vm, $vmas, sub {
+	$vmas->push_user_state($vm, 'connected');
+    });
 
+    if ($check_abort) {
+	DEBUG "Received Abort command";
+# FIXME Pass the message to the client?
+	$server->send_http_error(HTTP_BAD_GATEWAY);
+	return;
+    }
+
+    DEBUG "Start socket forwarder";
     forward_sockets(\*STDIN, $socket);
 
     $vmas->push_user_state($vm, 'disconnected');
-    $vmas->txn_commit;
+    INFO "Session terminated";
 }
 
 1;
