@@ -134,7 +134,7 @@ sub _do_nx_action {
 }
 
 sub _is_command {
-    shift =~ /^[^-]/;
+    shift =~ /^[^_]/;
 }
 
 sub _do_action {
@@ -142,7 +142,6 @@ sub _do_action {
     my $vmas = $self->{vmas};
     my $vm_id = $vm->vm_id;
     my $state = $mode eq "nx" ? $vm->x_state : $vm->vm_state;
-    DEBUG ("VM($vm_id,$state,$event) - do_action");
     my $event_map = $self->{$mode."_state_map"}{$state};
         unless (exists $event_map->{$event}) {
 	# DEBUG "VM($vm_id,$vm_state,$event) - event ignored";
@@ -157,12 +156,13 @@ sub _do_action {
 	    ERROR ("_do_action: not implemented: push_${mode}_state");
 	    return;
 	}
-	if (_is_command($event)) {
-	    my $clear_cmd = $vmas->can('clear_'.$mode.'_cmd');
-	    $vmas->$clear_cmd($vm);
-	}
-	$vmas->$push_state($vm, $new_state);
-	$vmas->txn_commit;
+	$vmas->txn_do(sub {
+	    if (_is_command($event)) {
+		my $clear_cmd = $vmas->can('clear_'.$mode.'_cmd');
+		$vmas->$clear_cmd($vm);
+	    }
+	    $vmas->$push_state($vm, $new_state);
+	});
 
 	my $enter = $self->{$mode."_state_map"}{$new_state}{_enter}{action};
 	if ($enter) {
@@ -217,15 +217,10 @@ sub run {
 			
 			$old_x_state = $old_x_state // 'disconnected';
 			
-			if (grep $old_x_state eq $_, qw(connecting listening)
+			if (grep $old_x_state eq $_, qw(connecting listening connected)
 			    and ($new_x_state eq 'disconnected')) {
 			    $self->_do_nx_action(_fail => $vm_runtime);
 			}
-			
-			if (($old_x_state eq 'connected')
-			    and ($new_x_state eq 'disconnected')) {
-			    $self->_do_nx_action(_fail => $vm_runtime);
-			}			
 			
 			if (_check_timeout($old_x_state, 'starting',
 				   $vm_runtime->x_state_ts, $x_state_connecting_timeout)) {
@@ -240,7 +235,6 @@ sub run {
 			}
 			
 			$self->_do_nx_action(_do => $vm_runtime);
-						
 		    }
 		}
 		
@@ -359,7 +353,7 @@ sub hkd_action_enter_failed {
 
 sub hkd_action_abort {
     my ($self, $vm, $state, $event) = @_;
-    $self->{vmas}->push_user_state($vm, 'disconnected');
+    # FIXME What's this method supposed to do? See [wiki:NxagentStates]
 }
 
 sub hkd_action_start_nx {
