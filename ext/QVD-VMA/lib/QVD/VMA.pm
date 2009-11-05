@@ -9,6 +9,9 @@ use Proc::ProcessTable;
 
 use parent 'QVD::HTTPD';
 
+use Log::Log4perl qw(:levels :easy);
+Log::Log4perl::init('log4perl.conf');
+
 sub post_configure_hook {
     my $self = shift;
     my $impl = QVD::VMA::Impl->new();
