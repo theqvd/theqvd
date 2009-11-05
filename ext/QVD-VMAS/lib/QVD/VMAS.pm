@@ -24,7 +24,6 @@ sub new {
 
 sub txn_commit {
     my $self = shift;
-    DEBUG "Please use VMAS::txn_do instead of VMAS::txn_commit (see #116)";
     $self->{db}->txn_commit;
 }
 
@@ -77,7 +76,7 @@ sub get_vms_for_host {
 sub get_vm_ids_for_host_txn {
     my $self = shift;
     my @ids = map $_->vm_id, $self->get_vms_for_host(@_);
-    $self->txn_commit;
+    $self->{db}->txn_commit;
     @ids
 }
 
@@ -133,12 +132,15 @@ sub push_user_state {
 
 sub _schedule_cmd {
     my ($self, $vm, $cmd_type, $cmd) = @_;
-    $vm->discard_changes;
-    unless (defined $vm->$cmd_type && $vm->$cmd_type ne $cmd) {
-	my $r = $vm->update({$cmd_type  => $cmd});
-	return 1;
-    }
-    undef;
+    return $self->txn_do(sub {
+	$vm->discard_changes;
+	unless (defined $vm->$cmd_type && $vm->$cmd_type ne $cmd) {
+	    my $r = $vm->update({$cmd_type  => $cmd});
+	    DEBUG "Accepted command $cmd_type $cmd for VM ".$vm->vm_id;
+	    return 1;
+	}
+	undef;
+    });
 }
 
 sub schedule_x_cmd {
@@ -173,10 +175,11 @@ sub schedule_start_vm {
 	if (defined $r && $r->{request} eq 'success') {
 	    return 1;
 	} else {
+	    INFO "Couldn't notify hkd on ".$host." to start VM ".$vm->vm_id." error: ".$r->{error};
 	    $self->clear_vm_cmd($vm);
 	}
     }
-    return undef;
+    undef;
 }
 
 sub start_vm {
@@ -247,6 +250,7 @@ sub get_vma_status {
 
 sub _clear_cmd {
     my ($self, $vm, $cmd_type) = @_;
+    DEBUG "Clearing command $cmd_type for VM ".$vm->vm_id;
     $vm->update({$cmd_type => undef});
 }
 
@@ -305,7 +309,7 @@ sub kill_vm {
 
 sub DESTROY {
     my $self = shift;
-    $self->txn_commit;
+    $self->{db}->txn_commit;
 }
 
 1;
