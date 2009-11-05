@@ -22,7 +22,6 @@ sub set_http_request_processors {
 					 GET => $url_base . "connect_to_vm");
 }
 
-# FIXME separate checking abort and the necessary actions to different methods
 sub _check_abort_session {
     my ($vm, $vmas, $coderef) = @_;
     my $abort_session = $vmas->txn_do(sub {
@@ -58,6 +57,7 @@ sub _abort_session {
     1
 }
 
+# FIXME refactor this method into smaller ones
 sub _connect_to_vm_processor {
     my ($server, $method, $url, $headers) = @_;
     INFO "Accepted connection";
@@ -86,33 +86,8 @@ sub _connect_to_vm_processor {
     # FIXME this limits number of VMs per user to 1
     my $vm = $vms[0];
 
-#: El L7R solo puede iniciar una sesion desde el estado Disconnected, en
-#: cualquier otro estado tendra que usar el comando Abort para cerrar la
-#: sesion actual, esperar a que el estado cambie a Disconnected y entonces
-#: empezar la sesion de la manera normal. 
-
-    # FIXME timeout?
-    # Is there an open session?
-    while (1) {
-	my $session_is_open = $vmas->txn_do(sub {
-	    $vm->discard_changes;
-	    if ($vm->user_state eq 'disconnected') {
-		DEBUG "user_state is ".$vm->user_state.", set 'connecting'";
-		$vmas->push_user_state($vm, 'connecting');
-		return 0;
-	    }
-	    if ($vm->user_state ne 'connected' and $vm->user_state ne 'aborting') {
-		$vmas->schedule_user_cmd($vm, 'Abort');
-	    }
-	    1;
-	});
-	last unless $session_is_open;
-	if ($vm->user_state eq 'connected') {
-	    $vmas->disconnect_nx($vm);
-	}
-	DEBUG "user_state is ".$vm->user_state." Waiting for 'disconnected'";
-	sleep 5;
-    }
+    # transición disconnected -> connected
+    _connect_session($vmas, $vm);
 
 #: Connecting: el usuario ha iniciado sesión y ha pedido ser conectado a una
 #: maquina virtual, pero aun no se ha podido cerrar el bucle (por ejemplo,
@@ -219,6 +194,37 @@ sub _connect_to_vm_processor {
 
     $vmas->push_user_state($vm, 'disconnected');
     INFO "Session terminated";
+}
+
+#: El L7R solo puede iniciar una sesion desde el estado Disconnected, en
+#: cualquier otro estado tendra que usar el comando Abort para cerrar la
+#: sesion actual, esperar a que el estado cambie a Disconnected y entonces
+#: empezar la sesion de la manera normal. 
+sub _connect_session {
+    my ($vmas, $vm) = @_;
+
+    # FIXME timeout?
+    # Is there an open session?
+    while (1) {
+	my $session_is_open = $vmas->txn_do(sub {
+	    $vm->discard_changes;
+	    if ($vm->user_state eq 'disconnected') {
+		DEBUG "user_state is ".$vm->user_state.", set 'connecting'";
+		$vmas->push_user_state($vm, 'connecting');
+		return 0;
+	    }
+	    if ($vm->user_state ne 'connected' and $vm->user_state ne 'aborting') {
+		$vmas->schedule_user_cmd($vm, 'Abort');
+	    }
+	    1;
+	});
+	last unless $session_is_open;
+	if ($vm->user_state eq 'connected') {
+	    $vmas->disconnect_nx($vm);
+	}
+	DEBUG "user_state is ".$vm->user_state." Waiting for 'disconnected'";
+	sleep 5;
+    }
 }
 
 1;
