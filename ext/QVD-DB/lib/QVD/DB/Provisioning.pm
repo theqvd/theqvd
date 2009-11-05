@@ -139,6 +139,7 @@ sub add_vm {
 
     my $vm_runtime=$schema->resultset('VM_Runtime')->create({vm_id => $row->id,
 							host_id => $host,
+							user_state => "disconnected",
 							vm_state => "stopped",
 							x_state => "disconnected"});
 }
