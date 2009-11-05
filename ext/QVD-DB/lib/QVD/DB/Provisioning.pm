@@ -68,6 +68,8 @@ sub _deploy {
 
     $db->add_user_cmd(name => 'Abort');
     $db->add_user_cmd(name => 'Forward');
+
+    $db->add_config(key => 'vmas_load_balance_algorithm', value => 'random');
     
     $db->add_config(key => 'vm_state_starting_timeout', value => '6000');
     $db->add_config(key => 'vm_state_running_vma_timeout', value => '1500');

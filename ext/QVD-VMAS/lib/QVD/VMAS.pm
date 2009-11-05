@@ -87,8 +87,7 @@ sub get_vms_for_user {
     return map { $_->vm_runtime } @vms;
 }
 
-sub _get_free_host {
-# FIXME Implement other load-balancing algorithms and make them configurable
+sub _load_balance_random {
     my $host_rs = shift->{db}->resultset('Host');
     my $host_id_col = $host_rs->get_column('id');
     my ($min, $max) = ($host_id_col->min, $host_id_col->max);
@@ -100,10 +99,22 @@ sub _get_free_host {
     $host
 }
 
+sub _get_free_host {
+    my ($self, $vm) = @_;
+    my $algorithm = QVD::Config->get('vmas_load_balance_algorithm');
+    my $load_balancer = $self->can('_load_balance_'.$algorithm);
+    unless ($load_balancer) {
+	ERROR "Load balance algorithm '$algorithm' is not implemented";
+	return undef;
+    }
+    $self->$load_balancer($vm)
+}
+
 sub assign_host_for_vm {
     my ($self, $vm) = @_;
     my $vm_id = $vm->vm_id;
-    my $host = $self->_get_free_host();
+    my $host = $self->_get_free_host($vm);
+    return undef unless $host;
     my $r = $vm->update({ 
 		host_id => $host->id, 
 		vm_address => $host->address,
