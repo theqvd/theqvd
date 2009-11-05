@@ -183,9 +183,10 @@ sub SimpleRPC_status {
     } elsif (grep $nx_state eq $_, qw(suspended terminated aborted 
     					'exited terminated' 'exited aborted')) {
 	$x_state = 'disconnected';
+    } else {
+	ERROR "No mapping for nxagent state '".$nx_state."'";
+	$x_state = 'disconnected';
     }
-    # FIXME log unknown nx state as an internal or NX error
-    $x_state //= 'disconnected';
 
     {status => 'ok', x_state => $x_state}
 }
