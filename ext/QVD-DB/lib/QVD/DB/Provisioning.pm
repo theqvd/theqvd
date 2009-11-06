@@ -94,11 +94,11 @@ sub add_user {
     my ($self, %opts) = @_;
     my $schema = $self->{schema};
     my $login = delete $opts{login};
-    my $paswd = delete $opts{password};
+    my $passwd = delete $opts{password};
     _die_on_too_many_opts(%opts);
 
     $schema->resultset('User')->create({login => $login, 
-    					password => $password});        
+    					password => $passwd});        
 }
 
 sub add_host {
