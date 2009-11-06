@@ -8,15 +8,16 @@ use QVD::HTTP::StatusCodes qw(:status_codes);
 use IO::Socket::Forwarder qw(forward_sockets);
 use MIME::Base64 qw(encode_base64);
 
-my $user_id = 1;
-my $username = "qvd";
-my $password = "passw0rd";
+my $username = shift @ARGV;
+my $password = shift @ARGV;
+my $host = shift @ARGV;
+my $port = shift @ARGV // "8080";
 
 my $authorization = 'Basic '.encode_base64("$username:$password", '');
 
-my $httpc = QVD::HTTPC->new('localhost:8080');
+my $httpc = QVD::HTTPC->new($host.":".$port);
 
-$httpc->send_http_request(GET => '/qvd/connect_to_vm?user_id='.$user_id,
+$httpc->send_http_request(GET => '/qvd/connect_to_vm',
 			  headers => [ 'Connection: Upgrade',
 			  	       'Authorization: '.$authorization,
 				       'Upgrade: QVD/1.0' ]);
