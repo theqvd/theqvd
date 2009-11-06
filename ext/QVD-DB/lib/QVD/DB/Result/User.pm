@@ -10,7 +10,10 @@ __PACKAGE__->add_columns(
 	},
 	login =>  {
 	    data_type => 'varchar(64)'
-	}
+	},
+	password => {
+	    data_type => 'varchar(64)'
+	},
 #	uid => {
 #	    data_type => 'integer'
 #	}

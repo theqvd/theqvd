@@ -7,7 +7,7 @@ use Sys::Hostname;
 
 my $db = QVD::DB::Provisioning->new(deploy => 1);
 
-$db->add_user(login => 'qvd');
+$db->add_user(login => 'qvd', password => 'passw0rd');
 $db->add_osi(name => 'Test image', path => 'qvd-guest.img');
 $db->add_host(name => hostname, address => '127.0.0.1');
 $db->add_vm(
