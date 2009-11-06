@@ -17,6 +17,13 @@ use QVD::HTTP::Headers qw(header_lookup);
 
 my $CRLF = "\r\n";
 
+sub _create_socket {
+    my $self = shift;
+    my $target = $self->{target};
+    $self->{socket} = IO::Socket::INET->new(PeerAddr => $target, Blocking => 0)
+	or croak "Unable to connect to $target";
+}
+
 sub new {
     my ($class, $target, %opts) = @_;
     my $timeout = delete $opts{timeout};
@@ -24,14 +31,11 @@ sub new {
     keys %opts and
 	croak "unknown constructor option(s) " . join(', ', keys %opts);
 
-    my $socket = IO::Socket::INET->new(PeerAddr => $target,
-				       Blocking => 0)
-	or croak "Unable to connect to $target";
     my $self = { target => $target,
-		 socket => $socket,
 		 timeout => $timeout,
 		 buffer => '' };
     bless $self, $class;
+    $self->_create_socket();
     $self;
 }
 
