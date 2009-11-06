@@ -60,16 +60,26 @@ sub _abort_session {
 # FIXME refactor this method into smaller ones
 sub _connect_to_vm_processor {
     my ($server, $method, $url, $headers) = @_;
+    my $db = QVD::DB->new();
+    my $user;
     my $authorization = header_lookup($headers, 'Authorization');
     if ($authorization =~ /^Basic (.*)$/) {
 	use MIME::Base64 'decode_base64';
 	my @user_pwd = split /:/, decode_base64($1);
-	INFO "User $user_pwd[0] Password $user_pwd[1]";
+	my $user_rs = $db->resultset('User')->search({login => $user_pwd[0],
+						password => $user_pwd[1]});
+	if ($user_rs->count == 1) {
+	    INFO "Accepted connection from user $user_pwd[0]";
+	    $user = $user_rs->first;
+	} else {
+	    INFO "Failed login attempt from user $user_pwd[0]";
+	    $server->send_http_error(HTTP_FORBIDDEN);
+	    return;
+	}
     } else {
 	$server->send_http_error(HTTP_UNAUTHORIZED);
 	return;
     }
-    INFO "Accepted connection";
     my $vm_start_timeout = QVD::Config->get('vm_start_timeout');
 
     unless (header_eq_check($headers, Connection => 'Upgrade') and
@@ -78,20 +88,11 @@ sub _connect_to_vm_processor {
 	return;
     }
 
-    my ($path, $query) = (uri_split $url)[2, 3];
-    my %params = uri_query_split $query;
-    my $user_id = $params{user_id};
-    unless (defined $user_id) {
-	$server->send_http_error(HTTP_UNPROCESSABLE_ENTITY);
-	return;
-    }
-
     $server->send_http_response(HTTP_PROCESSING,
 				'X-QVD-VM-Status: Checking VM');
 
-    my $db = QVD::DB->new();
     my $vmas = QVD::VMAS->new($db);
-    my @vms = $vmas->get_vms_for_user($user_id);
+    my @vms = $vmas->get_vms_for_user($user->id);
     # FIXME this limits number of VMs per user to 1
     my $vm = $vms[0];
 
