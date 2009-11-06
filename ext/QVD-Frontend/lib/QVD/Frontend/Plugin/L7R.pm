@@ -9,7 +9,7 @@ use URI::Split qw(uri_split);
 use IO::Socket::Forwarder qw(forward_sockets);
 use QVD::VMAS;
 use QVD::HTTP::StatusCodes qw(:status_codes);
-use QVD::HTTP::Headers qw(header_eq_check);
+use QVD::HTTP::Headers qw(header_lookup header_eq_check);
 use QVD::URI qw(uri_query_split);
 use QVD::Config;
 
@@ -60,6 +60,15 @@ sub _abort_session {
 # FIXME refactor this method into smaller ones
 sub _connect_to_vm_processor {
     my ($server, $method, $url, $headers) = @_;
+    my $authorization = header_lookup($headers, 'Authorization');
+    if ($authorization =~ /^Basic (.*)$/) {
+	use MIME::Base64 'decode_base64';
+	my @user_pwd = split /:/, decode_base64($1);
+	INFO "User $user_pwd[0] Password $user_pwd[1]";
+    } else {
+	$server->send_http_error(HTTP_UNAUTHORIZED);
+	return;
+    }
     INFO "Accepted connection";
     my $vm_start_timeout = QVD::Config->get('vm_start_timeout');
 
@@ -97,7 +106,7 @@ sub _connect_to_vm_processor {
     if ($vm->vm_state ne 'running') {
 	DEBUG "VM not running, trying to start it";
 	unless ($vmas->assign_host_for_vm($vm)) {
-# FIXME VM could not be assigned to a host, notify client?
+	    # FIXME VM could not be assigned to a host, notify client?
 	    $vmas->push_user_state($vm, 'disconnected');
 	    $server->send_http_error(HTTP_BAD_GATEWAY);
 	    return;
@@ -105,7 +114,7 @@ sub _connect_to_vm_processor {
 	my $r = $vmas->schedule_start_vm($vm);
 	unless ($r) {
 	    # The VM couldn't be scheduled for starting
-# FIXME Pass the error message to the client?
+	    # FIXME Pass the error message to the client
 	    ERROR "VM ".$vm->vm_id." couldn't be started on host ".$vm->host_id;
 	    $vmas->push_user_state($vm, 'disconnected');
 	    $server->send_http_error(HTTP_BAD_GATEWAY);
@@ -123,8 +132,8 @@ sub _connect_to_vm_processor {
 	    last if exists $r->{status} && $r->{status} eq 'ok';
 	    sleep 5;
 	}
-# FIXME Pass the error message to the client?
 	if (time > $timeout_time) {
+	    # FIXME Pass the error message to the client
 	    INFO "VM ".$vm->vm_id." start timed out ";
 	    $vmas->push_user_state($vm, 'disconnected');
 	    $server->send_http_error(HTTP_BAD_GATEWAY);
@@ -184,7 +193,7 @@ sub _connect_to_vm_processor {
 
     if ($check_abort) {
 	DEBUG "Received Abort command";
-# FIXME Pass the message to the client?
+	# FIXME Pass the message to the client
 	$server->send_http_error(HTTP_BAD_GATEWAY);
 	return;
     }
