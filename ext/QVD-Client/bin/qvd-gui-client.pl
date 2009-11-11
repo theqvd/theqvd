@@ -20,7 +20,12 @@ sub new {
 				 wxCAPTION
 
                                  );
-    $this->SetIcon( Wx::GetWxPerlIcon() );
+# FIXME Hardcoded path!
+
+    my $icon = Wx::Icon->new();
+    $icon->CopyFromBitmap(Wx::Bitmap->new("QVD-Client/bin/qvd.xpm", wxBITMAP_TYPE_XPM));
+    $self->SetIcon($icon);
+
 
     my $panel = Wx::Panel->new( $self,            # parent window
                                 -1,               # ID
