@@ -20,6 +20,7 @@ sub new {
 				 wxCAPTION
 
                                  );
+    $this->SetIcon( Wx::GetWxPerlIcon() );
 
     my $panel = Wx::Panel->new( $self,            # parent window
                                 -1,               # ID
