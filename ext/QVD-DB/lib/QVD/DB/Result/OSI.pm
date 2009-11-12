@@ -11,6 +11,12 @@ __PACKAGE__->add_columns(
 	name => {
 	    data_type => 'varchar(64)'
 	},
+	memory => {
+	    data_type => 'integer',
+	},
+	use_overlay => {
+	    data_type => 'boolean'
+	},
 	disk_image => {
 	# Valor tomado de la variable PATH_MAX de /usr/src/linux-headers-2.6.28-15/include/linux/limits.h
 	    data_type => 'varchar(4096)'

@@ -88,6 +88,10 @@ sub _deploy {
     $db->add_config(key => 'hkd_pid_file', value => '/var/run/qvd/hkd.pid');
     $db->add_config(key => 'hkd_log_file', value => '/var/log/qvd.log');
     
+    $db->add_config(key => 'base_storage_path', value => '/var/lib/qvd/storage');
+    $db->add_config(key => 'ro_storage_path', value => '/var/lib/qvd/storage/images');
+    $db->add_config(key => 'rw_storage_path', value => '/var/lib/qvd/storage/overlays');
+    $db->add_config(key => 'home_storage_path', value => '/var/lib/qvd/storage/homes');
 }
 
 sub add_user {
@@ -115,11 +119,15 @@ sub add_osi {
     my ($self, %opts) = @_;
     my $schema = $self->{schema};
     my $disk_image = delete $opts{path};
+    my $use_overlay = delete $opts{use_overlay};
+    my $memory = delete $opts{memory};
     my $name = delete $opts{name};
     _die_on_too_many_opts(%opts);
 
     $schema->resultset('OSI')->create({disk_image => $disk_image,
-			    name => $name});
+			    name => $name,
+			    memory => $memory,
+			    use_overlay => $use_overlay});
 }
 
 sub add_vm {
