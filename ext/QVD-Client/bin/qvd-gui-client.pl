@@ -26,7 +26,8 @@ sub new {
 		unless defined $style;
 
 	$self = $self->SUPER::new( $parent, $id, $title, $pos, $size, $style, $name );
-	$self->{logo} = Wx::StaticBitmap->new($self, -1, Wx::Bitmap->new("/home/hcornejo/Code/QVD/trunk/ext/QVD-Client/bin/qvd-logo.png", wxBITMAP_TYPE_ANY), wxDefaultPosition, wxDefaultSize, );
+	# FIXME Hardcoded path!
+	$self->{logo} = Wx::StaticBitmap->new($self, -1, Wx::Bitmap->new("QVD-Client/bin/qvd-logo.png", wxBITMAP_TYPE_ANY), wxDefaultPosition, wxDefaultSize, );
 	$self->{m_staticText1} = Wx::StaticText->new($self, -1, "Usuario", wxDefaultPosition, wxDefaultSize, );
 	$self->{username} = Wx::TextCtrl->new($self, -1, "qvd", wxDefaultPosition, wxDefaultSize, );
 	$self->{m_staticText11} = Wx::StaticText->new($self, -1, "Contraseña", wxDefaultPosition, wxDefaultSize, );
@@ -54,7 +55,8 @@ sub __set_properties {
 
 	$self->SetTitle("QVD");
 	my $icon = Wx::Icon->new();
-	$icon->CopyFromBitmap(Wx::Bitmap->new("/home/hcornejo/Code/QVD/trunk/ext/QVD-Client/bin/qvd.xpm", wxBITMAP_TYPE_ANY));
+	# FIXME Hardcoded path!
+	$icon->CopyFromBitmap(Wx::Bitmap->new("QVD-Client/bin/qvd.xpm", wxBITMAP_TYPE_ANY));
 	$self->SetIcon($icon);
 	$self->{connect_button}->SetDefault();
 
