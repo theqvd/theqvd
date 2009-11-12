@@ -217,7 +217,8 @@ sub _get_disk_image_for_vm {
 		'-f' => 'qcow2',
 		'-b' => $base_img_rel,
 		$disk_image);
-	    system(@cmd) == 0 or die "Unable to create overlay image: $?";
+	    # FIXME handle overlay disk creation errors, e.g. no space left
+	    system(@cmd);
 	    INFO "Created overlay image $disk_image";
 	    chdir $curdir;
 	}
