@@ -193,6 +193,32 @@ sub schedule_start_vm {
     undef;
 }
 
+sub _get_disk_image_for_vm {
+    my ($self, $vm) = @_;
+    my $osi = $vm->rel_vm_id->osi;
+    my $overlay_base = QVD::Config->get('rw_storage_path');
+    my $image_base = QVD::Config->get('ro_storage_path');
+    my $disk_image = undef;
+    unless ($osi->use_overlay) {
+	$disk_image = $image_base.'/'.$osi->disk_image;
+    } else {
+	$disk_image = $overlay_base.'/'.$osi->id.'-'.$vm->vm_id.'-overlay.qcow2';
+	unless (-f $disk_image) {
+	    my $base_image = $image_base.'/'.$osi->disk_image;
+	    # FIXME use a relative path to base image for easier migration
+	    my @cmd = (
+	    	'qemu-img', 
+		'create', 
+		'-f' => 'qcow2',
+		'-b' => $base_image,
+		$disk_image);
+	    system @cmd;
+	    # FIXME handle overlay disk creation errors, e.g. no space left
+	}
+    }
+    $disk_image
+}
+
 sub start_vm {
     my ($self, $vm) = @_;
 
@@ -200,20 +226,23 @@ sub start_vm {
 	return {vm_status => 'started'};
     }
 
+    my $home_base= QVD::Config->get('home_storage_path');
+
     my $id = $vm->vm_id;
     my $osi = $vm->rel_vm_id->osi;
+    my $disk_image = $self->_get_disk_image_for_vm($vm);
     my $vma_port = $vm->vm_vma_port;
     my $x_port = $vm->vm_x_port;
     my $ssh_port = $vm->vm_ssh_port;
     my $vnc_display = $vm->vm_vnc_port - 5900;
-    my @cmd = (kvm => (-m => '512M',
+    my @cmd = (kvm => (-m => $osi->memory.'M',
 		       -vnc => ":${vnc_display}",
 		       -redir => "tcp:${x_port}::5000",
 		       -redir => "tcp:${vma_port}::3030",
                        -redir => "tcp:${ssh_port}::22",
-                       -hda => $osi->disk_image,
+                       -hda => $disk_image,
 		       (-e $vm->rel_vm_id->storage
-			? (-hdb => $vm->rel_vm_id->storage)
+			? (-hdb => $home_base.'/'.$vm->rel_vm_id->storage)
 			: ())));
 
     my $pid = fork;
