@@ -196,24 +196,30 @@ sub schedule_start_vm {
 sub _get_disk_image_for_vm {
     my ($self, $vm) = @_;
     my $osi = $vm->rel_vm_id->osi;
-    my $overlay_base = QVD::Config->get('rw_storage_path');
-    my $image_base = QVD::Config->get('ro_storage_path');
+    my $rw_dir = QVD::Config->get('rw_storage_path');
+    my $ro_dir = QVD::Config->get('ro_storage_path');
+    my $img_cmd = QVD::Config->get('kvm_img_command', 'kvm-img');
     my $disk_image = undef;
     unless ($osi->use_overlay) {
-	$disk_image = $image_base.'/'.$osi->disk_image;
+	$disk_image = $ro_dir.'/'.$osi->disk_image;
     } else {
-	$disk_image = $overlay_base.'/'.$osi->id.'-'.$vm->vm_id.'-overlay.qcow2';
+	$disk_image = $rw_dir.'/'.$osi->id.'-'.$vm->vm_id.'-overlay.qcow2';
 	unless (-f $disk_image) {
-	    my $base_image = $image_base.'/'.$osi->disk_image;
-	    # FIXME use a relative path to base image for easier migration
+	    use File::Spec qw/abs2rel curdir/;
+	    my $base_img_abs = $ro_dir.'/'.$osi->disk_image;
+	    my $base_img_rel = File::Spec->abs2rel($base_img_abs, $rw_dir);
+	    my $curdir = File::Spec->curdir;
+	    chdir $rw_dir or die "Unable to enter rw_storage_path: $!";
+	    # FIXME use fork/exec/wait instead of system?
 	    my @cmd = (
-	    	'qemu-img', 
+	    	$img_cmd, 
 		'create', 
 		'-f' => 'qcow2',
-		'-b' => $base_image,
+		'-b' => $base_img_rel,
 		$disk_image);
-	    system @cmd;
-	    # FIXME handle overlay disk creation errors, e.g. no space left
+	    system(@cmd) == 0 or die "Unable to create overlay image: $?";
+	    INFO "Created overlay image $disk_image";
+	    chdir $curdir;
 	}
     }
     $disk_image
@@ -231,6 +237,7 @@ sub start_vm {
     my $id = $vm->vm_id;
     my $osi = $vm->rel_vm_id->osi;
     my $disk_image = $self->_get_disk_image_for_vm($vm);
+    DEBUG "Using disk $disk_image for VM ".$id;
     my $vma_port = $vm->vm_vma_port;
     my $x_port = $vm->vm_x_port;
     my $ssh_port = $vm->vm_ssh_port;
