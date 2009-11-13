@@ -103,6 +103,11 @@ sub new {
     bless $self, $class;
 }
 
+sub _reap_children {
+    use POSIX ":sys_wait_h";
+    1 while (waitpid(-1, WNOHANG) > 0);
+}
+
 sub _handle_SIGUSR1 {
     my $signame = shift;
     INFO ("Received $signame");
@@ -111,7 +116,6 @@ sub _handle_SIGUSR1 {
 sub _install_signals {
     my $self = shift;
     $SIG{USR1} = \&_handle_SIGUSR1;
-    $SIG{CHLD} = 'IGNORE';
 }
 
 sub _check_timeout {
@@ -191,6 +195,7 @@ sub run {
     $self->_install_signals;
     my $vmas = $self->{vmas};
     while (1) {
+	$self->_reap_children;
 	my @vm_ids = $vmas->get_vm_ids_for_host_txn($self->{host_id});
 	foreach my $vm_id (@vm_ids) {
 	    my $vm_runtime = $vmas->get_vm_runtime_for_vm_id($vm_id);

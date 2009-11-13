@@ -193,37 +193,44 @@ sub schedule_start_vm {
     undef;
 }
 
-sub _get_disk_image_for_vm {
+sub _get_image_for_vm {
     my ($self, $vm) = @_;
     my $osi = $vm->rel_vm_id->osi;
     my $rw_dir = QVD::Config->get('rw_storage_path');
     my $ro_dir = QVD::Config->get('ro_storage_path');
-    my $img_cmd = QVD::Config->get('kvm_img_command', 'kvm-img');
     my $disk_image = undef;
     unless ($osi->use_overlay) {
 	$disk_image = $ro_dir.'/'.$osi->disk_image;
     } else {
 	$disk_image = $rw_dir.'/'.$osi->id.'-'.$vm->vm_id.'-overlay.qcow2';
-	unless (-f $disk_image) {
-	    use File::Spec qw/abs2rel curdir/;
-	    my $base_img_abs = $ro_dir.'/'.$osi->disk_image;
-	    my $base_img_rel = File::Spec->abs2rel($base_img_abs, $rw_dir);
-	    my $curdir = File::Spec->curdir;
-	    chdir $rw_dir or die "Unable to enter rw_storage_path: $!";
-	    # FIXME use fork/exec/wait instead of system?
-	    my @cmd = (
-	    	$img_cmd, 
-		'create', 
-		'-f' => 'qcow2',
-		'-b' => $base_img_rel,
-		$disk_image);
-	    # FIXME handle overlay disk creation errors, e.g. no space left
-	    system(@cmd);
-	    INFO "Created overlay image $disk_image";
-	    chdir $curdir;
-	}
     }
     $disk_image
+}
+
+sub _ensure_image_exists {
+    my ($self, $vm) = @_;
+    my $osi = $vm->rel_vm_id->osi;
+    my $rw_dir = QVD::Config->get('rw_storage_path');
+    my $ro_dir = QVD::Config->get('ro_storage_path');
+    my $img_cmd = QVD::Config->get('kvm_img_command', 'kvm-img');
+    my $disk_image = $self->_get_image_for_vm($vm);
+    if ($osi->use_overlay and not -f $disk_image) {
+	# If the overlay is created using a relative path
+	# you can move the images around.
+	use File::Spec qw/abs2rel curdir/;
+	my $base_img_abs = $ro_dir.'/'.$osi->disk_image;
+	my $base_img_rel = File::Spec->abs2rel($base_img_abs, $rw_dir);
+	my $curdir = File::Spec->curdir;
+	chdir $rw_dir or die "Unable to enter rw_storage_path: $!";
+	my @cmd = ($img_cmd => ('create', 
+				'-f' => 'qcow2',
+				'-b' => $base_img_rel,
+				$disk_image));
+	system(@cmd) == 0 or die "Unable to create overlay image $disk_image";
+	INFO "Created overlay image $disk_image for VM ".$vm->vm_id;
+	chdir $curdir;
+    }
+    -f $disk_image
 }
 
 sub start_vm {
@@ -237,8 +244,10 @@ sub start_vm {
 
     my $id = $vm->vm_id;
     my $osi = $vm->rel_vm_id->osi;
-    my $disk_image = $self->_get_disk_image_for_vm($vm);
+    my $disk_image = $self->_get_image_for_vm($vm);
     DEBUG "Using disk $disk_image for VM ".$id;
+    $self->_ensure_image_exists($vm) 
+    	or die "Disk image $disk_image doesn't exist";
     my $vma_port = $vm->vm_vma_port;
     my $x_port = $vm->vm_x_port;
     my $ssh_port = $vm->vm_ssh_port;

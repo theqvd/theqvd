@@ -3,9 +3,7 @@
 use strict;
 use warnings;
 use QVD::VMAS;
-
-# Allow kvm child process to exit
-$SIG{CHLD} = 'IGNORE';
+use POSIX ":sys_wait_h";
 
 my $user_id = 1;
 my $vmas = QVD::VMAS->new();
@@ -21,13 +19,10 @@ $r = $vmas->is_vm_running($vm);
 die "VM $vm_id wasn't started" unless $r;
 
 for (;;) {
+    die "VM stopped" if waitpid(-1, WNOHANG) > 0;
     print "Connecting to agent...\n";
     my $vma_status = $vmas->get_vma_status($vm);
     last if defined $vma_status and $vma_status->{status} eq 'ok';
     sleep 10;
 }
 print "VM $vm_id started, agent ready.\n";
-
-END {
-    $vmas->txn_commit;
-}
