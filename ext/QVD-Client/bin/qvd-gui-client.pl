@@ -22,7 +22,7 @@ sub new {
 
 # begin wxGlade: MyFrame::new
 
-	$style = wxICONIZE|wxCAPTION|wxMINIMIZE 
+	$style = wxICONIZE|wxCAPTION|wxMINIMIZE|wxCLOSE_BOX  
 		unless defined $style;
 
 	$self = $self->SUPER::new( $parent, $id, $title, $pos, $size, $style, $name );
@@ -58,6 +58,7 @@ sub __set_properties {
 	# FIXME Hardcoded path!
 	$icon->CopyFromBitmap(Wx::Bitmap->new("QVD-Client/bin/qvd.xpm", wxBITMAP_TYPE_ANY));
 	$self->SetIcon($icon);
+	$self->{port}->Show(0);
 	$self->{connect_button}->SetDefault();
 
 # end wxGlade
