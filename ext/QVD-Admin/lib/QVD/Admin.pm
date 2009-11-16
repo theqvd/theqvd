@@ -73,6 +73,14 @@ sub cmd_host_add {
     $rs->create($params);
 }
 
+sub cmd_user_add {
+    my ($self, $rs, @args) = @_;
+    my $params = _split_on_equals @args;
+    my @required_params = ('login', 'password');
+    die "Invalid parameters" if keys %$params != @required_params;
+    $rs->create($params);
+}
+
 sub cmd_host_del {
     my ($self, $rs, @args) = @_;
     # FIXME Ask for confirmation if try to delete all without filter?
