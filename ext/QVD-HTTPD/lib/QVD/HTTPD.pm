@@ -11,7 +11,15 @@ use QVD::HTTP::StatusCodes qw(:all);
 
 use parent qw(Net::Server::Fork);
 
+sub default_values { return { no_client_stdout => 1 } }
 
+sub options {
+    my ($self, $template) = @_;
+    my $prop = $self->{server};
+    $self->SUPER::options($template);
+    $prop->{SSL} ||= undef;
+    $template->{SSL} = \$prop->{SSL}
+}
 
 # token          = 1*<any CHAR except CTLs or separators>
 # separators     = "(" | ")" | "<" | ">" | "@"
@@ -22,7 +30,15 @@ my $token_re = qr/[!#\$%&'*+\-\.0-9a-zA-Z]+/;
 
 sub process_request {
     my $self = shift;
-    while (<>) {
+    my $socket = $self->{server}{client};
+
+    if ($self->{server}{SSL}) {
+	require IO::Socket::SSL;
+	IO::Socket::SSL->start_ssl($socket, SSL_server => 1);
+	die "SSL negotiation failed" unless $socket->isa('IO::Socket::SSL');
+    }
+
+    while (<$socket>) {
 	s/\r?\n$//; # HTTP chomp
 	next if /^\s*$/;
 	if (my ($method, $url, $version) = m|^(\w+)\s+(.*?)\s*((?:\bHTTP/\d+\.\d+)?)$|) {
@@ -31,7 +47,7 @@ sub process_request {
 		return;
 	    }
 	    my @headers;
-	    while(<>) {
+	    while(<$socket>) {
 		s/\r?\n$//; # HTTP chomp
 		if (my ($name, $value) = /^($token_re)\s*:\s*(.*?)\s*$/o) {
 		    # new header
@@ -104,9 +120,10 @@ sub _process_http_request {
 sub send_http_response {
     my $self = shift;
     my $code = int shift;
-    print join("\r\n",
-	       "HTTP/1.1 $code ". http_status_message($code),
-	       @_, '', '');
+    my $socket = $self->{server}{client};
+    print $socket join("\r\n",
+		       "HTTP/1.1 $code ". http_status_message($code),
+		       @_, '', '');
 }
 
 sub send_http_response_with_body {
@@ -119,7 +136,8 @@ sub send_http_response_with_body {
 			      @headers,
 			      "Content-Type: $content_type",
 			      "Content-Length: " . length($content));
-    print $content;
+    my $socket = $self->{server}{client};
+    print $socket $content;
 }
 
 sub send_http_error {
