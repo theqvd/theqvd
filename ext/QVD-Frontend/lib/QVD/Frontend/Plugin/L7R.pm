@@ -201,7 +201,7 @@ sub _connect_to_vm_processor {
     }
 
     DEBUG "Start socket forwarder";
-    forward_sockets(\*STDIN, $socket);
+    forward_sockets($server->{server}{client}, $socket);
 
     $vmas->push_user_state($vm, 'disconnected');
     INFO "Session terminated";
