@@ -14,5 +14,5 @@ my $command = shift @ARGV;
 my @args = @ARGV;
 
 my $admin = QVD::Admin->new;
-$admin->set_filter($filter);
+$admin->set_filter($filter) if $filter;
 $admin->dispatch_command($object, $command, @args);

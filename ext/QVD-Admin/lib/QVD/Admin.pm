@@ -21,20 +21,35 @@ sub new {
     bless $self, $class;
 }
 
+sub _split_on_equals {
+    my %r = map { my @a = split /=/; $a[0] => $a[1] } @_;
+    \%r
+}
+
+sub _query_to_hash {
+    # 'a=b,c=d' -> {'a' => 'b', 'c' => 'd}
+    _split_on_equals split(/,\s*/, shift);
+}
+
 sub set_filter {
     my ($self, $filter_string) = @_;
-    my %filter_conditions = 
-    	map { my @a = split /=/; $a[0] => $a[1] } split(/,\s*/, $filter_string);
-    $self->{filter} = \%filter_conditions;
+    $self->{filter} = _query_to_hash $filter_string;
+}
+
+sub _get_result_set {
+    my ($self, $obj) = @_;
+    my $db_object = $self->{objects}{$obj};
+    die "$obj: unsupported object" unless defined $db_object;
+    if ($self->{filter}) {
+    	$self->{db}->resultset($db_object)->search($self->{filter});
+    } else {
+    	$self->{db}->resultset($db_object);
+    }
 }
 
 sub dispatch_command {
     my ($self, $object, $command, @args) = @_;
-    
-    my $db_object = $self->{objects}{$object};
-    die "$object: unsupported object" unless defined $db_object;
-
-    my $rs = $self->{db}->resultset($db_object)->search($self->{filter});
+    my $rs = $self->_get_result_set($object);
     my $method = $self->can("cmd_${object}_${command}");
     if (defined $method) {
 	$self->$method($rs, @args);
@@ -48,6 +63,14 @@ sub cmd_host_list {
     while (my $host = $rs->next) {
 	printf "%s\t%s\t%s\n", $host->id, $host->name, $host->address;
     }
+}
+
+sub cmd_host_add {
+    my ($self, $rs, @args) = @_;
+    my $params = _split_on_equals @args;
+    my @required_params = ('name', 'address');
+    die "Invalid parameters" if keys %$params != @required_params;
+    $rs->create($params);
 }
 
 1;
