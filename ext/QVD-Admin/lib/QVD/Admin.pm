@@ -88,6 +88,13 @@ sub cmd_host_del {
     $rs->delete;
 }
 
+sub cmd_user_del {
+    my ($self, $rs, @args) = @_;
+    # FIXME Ask for confirmation if try to delete all without filter?
+    # To delete with cascade you would have to use delete_all.
+    $rs->delete;
+}
+
 sub cmd_host_setprop {
     my ($self, $rs, @args) = @_;
     my $params = _split_on_equals @args;
