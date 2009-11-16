@@ -80,6 +80,23 @@ sub cmd_host_del {
     $rs->delete;
 }
 
+sub cmd_host_setprop {
+    my ($self, $rs, @args) = @_;
+    my $params = _split_on_equals @args;
+    # In principle you should be able to avoid looping over the result set using
+    # search_related but the PostgreSQL driver doesn't let us
+    while (my $host = $rs->next) {
+	foreach my $key (keys %$params) {
+	    $host->properties->search({key => $key})->update_or_create({
+		    key => $key,
+		    value => $params->{$key}
+		    }
+		    , {key => 'primary'}
+		    );
+	}
+    }
+}
+
 1;
 
 __END__

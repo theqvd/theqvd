@@ -16,6 +16,7 @@ __PACKAGE__->add_columns(
 	}
 	);
 __PACKAGE__->set_primary_key('id');
+__PACKAGE__->has_many(properties => 'QVD::DB::Result::Host_Property', 'host_id');
 __PACKAGE__->has_many(runtime => 'QVD::DB::Result::VM_Runtime', 'host_id');
 
 1;
