@@ -24,7 +24,7 @@ $httpc->send_http_request(GET => '/qvd/connect_to_vm',
 while (1) {
     my ($code, $msg, $headers, $body) = $httpc->read_http_response;
     use Data::Dumper;
-    print STDERR Dumper [http_response => $code, $msg, $headers, $body];
+    print Dumper [http_response => $code, $msg, $headers, $body];
     if ($code == HTTP_SWITCHING_PROTOCOLS) {
 	my $ll = IO::Socket::INET->new(LocalPort => 4040,
 				       ReuseAddr => 1,
@@ -37,7 +37,7 @@ while (1) {
 	last;
     }
     elsif ($code >= 100 and $code < 200) {
-	print STDERR "$code\ncontinuing...\n"
+	print "$code\ncontinuing...\n"
     }
     else {
 	die "unable to connect to remote vm: $code";

@@ -36,6 +36,8 @@ sub new {
 	$self->{host} = Wx::TextCtrl->new($self, -1, "aguila", wxDefaultPosition, wxDefaultSize, );
 	$self->{port} = Wx::TextCtrl->new($self, -1, "8080", wxDefaultPosition, wxDefaultSize, );
 	$self->{connect_button} = Wx::Button->new($self, -1, "Conectar");
+	$self->{console} = Wx::TextCtrl->new($self, -1, "", wxDefaultPosition, wxDefaultSize, wxTE_MULTILINE);
+	$self->{progress_bar} = Wx::Gauge->new($self, -1, 5, wxDefaultPosition,     wxDefaultSize, wxGA_HORIZONTAL|wxGA_SMOOTH);	
 
 	$self->__set_properties();
 	$self->__do_layout();
@@ -59,7 +61,9 @@ sub __set_properties {
 	$icon->CopyFromBitmap(Wx::Bitmap->new("QVD-Client/bin/qvd.xpm", wxBITMAP_TYPE_ANY));
 	$self->SetIcon($icon);
 	$self->{port}->Show(0);
+	$self->{console}->SetEditable(0);
 	$self->{connect_button}->SetDefault();
+	$self->{console}->SetMinSize(Wx::Size->new(-1, 300));
 
 # end wxGlade
 }
@@ -83,6 +87,8 @@ sub __do_layout {
 	$self->{object_2}->Add($self->{object_3}, 1, wxEXPAND, 5);
 	$self->{object_1}->Add($self->{object_2}, 1, wxALL|wxEXPAND, 20);
 	$self->{object_1}->Add($self->{connect_button}, 0, wxLEFT|wxRIGHT|wxBOTTOM|wxEXPAND, 20);
+	$self->{object_1}->Add($self->{console}, 0, wxEXPAND, 0);
+	$self->{object_1}->Add($self->{progress_bar}, 0, wxEXPAND, 0);	
 	$self->SetSizer($self->{object_1});
 	$self->{object_1}->Fit($self);
 	$self->Layout();
@@ -91,12 +97,39 @@ sub __do_layout {
 # end wxGlade
 }
 
-sub OnClick {
+sub OnClick {   
     my( $self, $event ) = @_;
-    @ARGV = ($self->{username}->GetValue, $self->{password}->GetValue, $self->{host}->GetValue, $self->{port}->GetValue);
-    do "QVD-Client/bin/qvd-client.pl";
     
-    $self->SetTitle($@." | ".$!);
+    $self->{username}->SetEditable(0);
+    $self->{password}->SetEditable(0);
+    $self->{host}->SetEditable(0);
+    $self->{port}->SetEditable(0);
+    
+    @ARGV = ($self->{username}->GetValue, $self->{password}->GetValue, $self->{host}->GetValue, $self->{port}->GetValue);
+    #do "QVD-Client/bin/qvd-client.pl";
+    my @cmd = qw(perl -Mlib::glob=*/lib QVD-Client/bin/qvd-client.pl);
+      
+    my $pid = open my $pipe, '-|', @cmd, @ARGV or die "...";
+    
+    $self->{progress_bar}->SetValue(1);
+    
+    while (<$pipe>) {
+	if ($_ =~ m/X-QVD-VM-Status:Checking VM/){
+	    $self->{console}->AppendText("X-QVD-VM-Status:Checking VM\n");
+	    $self->{progress_bar}->SetValue(2);
+	} elsif ($_ =~ m/X-QVD-VM-Status:Starting VM/) {
+	    $self->{console}->AppendText("X-QVD-VM-Status:Starting VM\n");
+	    $self->{progress_bar}->SetValue(3);
+	} elsif ($_ =~ m/X-QVD-VM-Status:Connecting to VM/) {
+	    $self->{console}->AppendText("X-QVD-VM-Status:Connecting to VM\n");
+	    $self->{progress_bar}->SetValue(4);
+	} elsif ($_ =~ m/X-QVD-VM-Status:Connected to VM/) {
+	    $self->{console}->AppendText("X-QVD-VM-Status:Connected to VM\n");
+	    $self->{progress_bar}->SetValue(5);
+	}
+	Wx::Yield;	
+    }
+   
 }
 
 
