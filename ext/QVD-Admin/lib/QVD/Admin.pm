@@ -73,6 +73,13 @@ sub cmd_host_add {
     $rs->create($params);
 }
 
+sub cmd_host_del {
+    my ($self, $rs, @args) = @_;
+    # FIXME Ask for confirmation if try to delete all without filter?
+    # To delete with cascade you would have to use delete_all.
+    $rs->delete;
+}
+
 1;
 
 __END__
