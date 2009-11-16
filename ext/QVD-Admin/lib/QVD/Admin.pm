@@ -97,6 +97,15 @@ sub cmd_host_setprop {
     }
 }
 
+sub cmd_host_getprop {
+    my ($self, $rs, @args) = @_;
+    foreach my $key (@args) {
+	my @props = $rs->search_related('properties', {key => $key});
+	print join "\n", map { $_->host->name."\t".$_->key.'='.$_->value } @props;
+	print "\n";
+    }
+}
+
 1;
 
 __END__
