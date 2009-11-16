@@ -65,6 +65,13 @@ sub cmd_host_list {
     }
 }
 
+sub cmd_user_list {
+    my ($self, $rs, @args) = @_;
+    while (my $user = $rs->next) {
+	printf "%s\t%s\n", $user->id, $user->login;
+    }
+}
+
 sub cmd_host_add {
     my ($self, $rs, @args) = @_;
     my $params = _split_on_equals @args;
