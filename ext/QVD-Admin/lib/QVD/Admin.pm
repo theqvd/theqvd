@@ -3,6 +3,57 @@ package QVD::Admin;
 use warnings;
 use strict;
 
+use QVD::DB;
+
+sub new {
+    my $class = shift;
+    my $db = shift // QVD::DB->new();
+    my $self = {db => $db,
+		filter => {},
+		objects => {
+		    host => 'Host',
+		    vm => 'VM',
+		    user => 'User',
+		    conf => 'Config',
+		    osi => 'OSI',
+		},
+    };
+    bless $self, $class;
+}
+
+sub set_filter {
+    my ($self, $filter_string) = @_;
+    my %filter_conditions = 
+    	map { my @a = split /=/; $a[0] => $a[1] } split(/,\s*/, $filter_string);
+    $self->{filter} = \%filter_conditions;
+}
+
+sub dispatch_command {
+    my ($self, $object, $command, @args) = @_;
+    
+    my $db_object = $self->{objects}{$object};
+    die "$object: unsupported object" unless defined $db_object;
+
+    my $rs = $self->{db}->resultset($db_object)->search($self->{filter});
+    my $method = $self->can("cmd_${object}_${command}");
+    if (defined $method) {
+	$self->$method($rs, @args);
+    } else {
+	die "$object: $command not implemented";
+    }
+}
+
+sub cmd_host_list {
+    my ($self, $rs, @args) = @_;
+    while (my $host = $rs->next) {
+	printf "%s\t%s\t%s\n", $host->id, $host->name, $host->address;
+    }
+}
+
+1;
+
+__END__
+
 =head1 NAME
 
 QVD::Admin - The great new QVD::Admin!
@@ -10,11 +61,6 @@ QVD::Admin - The great new QVD::Admin!
 =head1 VERSION
 
 Version 0.01
-
-=cut
-
-our $VERSION = '0.01';
-
 
 =head1 SYNOPSIS
 
@@ -27,71 +73,9 @@ Perhaps a little code snippet.
     my $foo = QVD::Admin->new();
     ...
 
-=head1 EXPORT
-
-A list of functions that can be exported.  You can delete this section
-if you don't export anything, such as for a purely object-oriented module.
-
-=head1 FUNCTIONS
-
-=head2 function1
-
-=cut
-
-sub function1 {
-}
-
-=head2 function2
-
-=cut
-
-sub function2 {
-}
-
 =head1 AUTHOR
 
 Qindel Formacion y Servicios S.L., C<< <joni.salonen at qindel.es> >>
-
-=head1 BUGS
-
-Please report any bugs or feature requests to C<bug-qvd-admin at rt.cpan.org>, or through
-the web interface at L<http://rt.cpan.org/NoAuth/ReportBug.html?Queue=QVD-Admin>.  I will be notified, and then you'll
-automatically be notified of progress on your bug as I make changes.
-
-
-
-
-=head1 SUPPORT
-
-You can find documentation for this module with the perldoc command.
-
-    perldoc QVD::Admin
-
-
-You can also look for information at:
-
-=over 4
-
-=item * RT: CPAN's request tracker
-
-L<http://rt.cpan.org/NoAuth/Bugs.html?Dist=QVD-Admin>
-
-=item * AnnoCPAN: Annotated CPAN documentation
-
-L<http://annocpan.org/dist/QVD-Admin>
-
-=item * CPAN Ratings
-
-L<http://cpanratings.perl.org/d/QVD-Admin>
-
-=item * Search CPAN
-
-L<http://search.cpan.org/dist/QVD-Admin>
-
-=back
-
-
-=head1 ACKNOWLEDGEMENTS
 
 
 =head1 COPYRIGHT & LICENSE
@@ -100,8 +84,3 @@ Copyright 2009 Qindel Formacion y Servicios S.L., all rights reserved.
 
 This program is free software; you can redistribute it and/or modify it
 under the same terms as Perl itself.
-
-
-=cut
-
-1; # End of QVD::Admin

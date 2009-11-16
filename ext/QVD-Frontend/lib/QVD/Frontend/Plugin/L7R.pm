@@ -182,6 +182,7 @@ sub _connect_to_vm_processor {
 	$server->send_http_response(HTTP_PROCESSING,
 				    'X-QVD-VM-Status: Retry connection',
 				    "X-QVD-VM-Info: Connection to vm failed");
+	INFO "NX connection to VM ".$vm->vm_id." (".$vm->vm_address.":".$vm->vm_x_port.") failed";
 	return;
     }
 
