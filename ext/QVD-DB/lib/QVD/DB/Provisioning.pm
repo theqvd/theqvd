@@ -154,7 +154,8 @@ sub add_vm {
 							host_id => $host,
 							user_state => "disconnected",
 							vm_state => "stopped",
-							x_state => "disconnected"});
+							x_state => "disconnected",
+							osi_actual_id => $osi});
 }
 
 sub add_vm_state {

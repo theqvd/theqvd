@@ -115,6 +115,10 @@ __PACKAGE__->add_columns(
             data_type => 'integer',
             is_nullable => 1,
         },
+	osi_actual_id => {
+            data_type => 'integer',
+            is_nullable => 1,
+        }
 	);
 	
 __PACKAGE__->set_primary_key('vm_id');
@@ -129,4 +133,6 @@ __PACKAGE__->belongs_to('rel_user_state' => 'QVD::DB::Result::User_State', 'user
 __PACKAGE__->belongs_to('rel_x_cmd' => 'QVD::DB::Result::X_Cmd', 'x_cmd');
 __PACKAGE__->belongs_to('rel_vm_cmd' => 'QVD::DB::Result::VM_Cmd', 'vm_cmd');
 __PACKAGE__->belongs_to('rel_user_cmd' => 'QVD::DB::Result::User_Cmd', 'user_cmd');
+
+__PACKAGE__->belongs_to(osi => 'QVD::DB::Result::OSI', 'osi_actual_id');
 
