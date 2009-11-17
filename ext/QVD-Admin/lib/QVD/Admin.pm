@@ -128,15 +128,19 @@ sub cmd_osi_add {
 sub cmd_host_del {
     my ($self, $rs, @args) = @_;
     # FIXME Ask for confirmation if try to delete all without filter?
-    # To delete with cascade you would have to use delete_all.
-    $rs->delete;
+    $rs->delete_all;
 }
 
 sub cmd_user_del {
     my ($self, $rs, @args) = @_;
     # FIXME Ask for confirmation if try to delete all without filter?
-    # To delete with cascade you would have to use delete_all.
-    $rs->delete;
+    $rs->delete_all;
+}
+
+sub cmd_osi_del {
+    my ($self, $rs, @args) = @_;
+    # FIXME Ask for confirmation if try to delete all without filter?
+    $rs->delete_all;
 }
 
 sub _obj_setprop {
