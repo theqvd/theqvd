@@ -15,7 +15,7 @@ sub new {
 		    host => 'Host',
 		    vm => 'VM',
 		    user => 'User',
-		    conf => 'Config',
+		    config => 'Config',
 		    osi => 'OSI',
 		},
     };
@@ -206,6 +206,25 @@ sub cmd_host_getprop {
 
 sub cmd_user_getprop {
     shift->_obj_getprop(sub { $_->user->login }, @_);
+}
+
+
+sub cmd_config_set {
+    my ($self, $rs, @args) = @_;
+    my $params = _split_on_equals @args;
+    foreach my $key (keys %$params) {
+	$rs->update_or_create({
+		key => $key,
+		value => $params->{$key}
+	    });
+    }
+}
+
+sub cmd_config_get {
+    my ($self, $rs, @args) = @_;
+    my $condition = scalar @args > 0 ? {key => [@args]} : {};
+    my @configs = $rs->search($condition);
+    print map { $_->key.'='.$_->value."\n" } @configs;
 }
 
 1;
