@@ -59,10 +59,30 @@ sub dispatch_command {
     }
 }
 
+sub _format_timespan {
+    my $seconds = shift;
+    my $secs = $seconds%60;
+    my $mins = ($seconds /= 60) % 60;
+    return sprintf "%02dm %02ds", $mins, $secs if $seconds == 0;
+    my $hours = ($seconds /= 60) % 24;
+    return sprintf "%02dh %02dm", $hours, $mins if $seconds == 0;
+    my $days = ($seconds /= 24) % 365;
+    return sprintf "%02dd %02dh", $days, $hours if $seconds == 0;
+    my $years = $seconds / 365;
+    return sprintf "%02da %02dd", $years, $days;
+
+}
+
 sub cmd_host_list {
     my ($self, $rs, @args) = @_;
     while (my $host = $rs->next) {
-	printf "%s\t%s\t%s\n", $host->id, $host->name, $host->address;
+	# FIXME proper formatting
+	my $hkd_ts = defined $host->runtime ? $host->runtime->hkd_ok_ts : undef;
+	my $mins = defined $hkd_ts ? _format_timespan(time - $hkd_ts) : '-';
+	print join "\t", $host->id, $host->name, $host->address, $mins,
+			    $host->vms->count;
+	print "\n";
+
     }
 }
 
@@ -93,7 +113,10 @@ sub _obj_add {
 }
 
 sub cmd_host_add {
-    shift->_obj_add([qw/name address/], @_);
+    my $self = shift;
+    my $row = $self->_obj_add([qw/name address/], @_);
+    my $rs = $self->{db}->resultset('Host_Runtime')
+			    ->create({host_id => $row->id});
 }
 
 sub cmd_user_add {
@@ -117,6 +140,7 @@ sub cmd_osi_add {
 	[qw/name memory use_overlay disk_image/]);
 
     # Copy image to ro-directory
+    # FIXME Overwriting existing image should be an error
     die "disk_image is not optional" unless defined $params->{disk_image};
     my $destination = QVD::Config->get('ro_storage_path');
     use File::Copy qw/copy/;
@@ -140,6 +164,7 @@ sub cmd_user_del {
 sub cmd_osi_del {
     my ($self, $rs, @args) = @_;
     # FIXME Ask for confirmation if try to delete all without filter?
+    # FIXME Should we delete the actual image file?
     $rs->delete_all;
 }
 
