@@ -163,7 +163,7 @@ sub cmd_osi_add {
 
     my $row = $rs->create($params);
 
-    print "User added with id ".$row->id."\n" unless $self->{quiet};
+    print "OSI added with id ".$row->id."\n" unless $self->{quiet};
 }
 
 sub cmd_host_del {
@@ -185,44 +185,42 @@ sub cmd_osi_del {
     $rs->delete_all;
 }
 
-sub _obj_setprop {
+sub _obj_propset {
     my ($self, $rs, @args) = @_;
     my $params = _split_on_equals @args;
     # In principle you should be able to avoid looping over the result set using
     # search_related but the PostgreSQL driver doesn't let us
     while (my $obj = $rs->next) {
 	foreach my $key (keys %$params) {
-	    $obj->properties->search({key => $key})->update_or_create({
-		    key => $key,
-		    value => $params->{$key}
-		    }
-		    , {key => 'primary'}
-		    );
+	    $obj->properties->search({key => $key})->update_or_create(
+		{ key => $key, value => $params->{$key} },
+		{ key => 'primary' }
+	    );
 	}
     }
 }
 
-sub cmd_host_setprop {
-    shift->_obj_setprop(@_);
+sub cmd_host_propset {
+    shift->_obj_propset(@_);
 }
 
-sub cmd_user_setprop {
-    shift->_obj_setprop(@_);
+sub cmd_user_propset {
+    shift->_obj_propset(@_);
 }
 
-sub _obj_getprop {
+sub _obj_propget {
     my ($self, $display_cb, $rs, @args) = @_;
     my $condition = scalar @args > 0 ? {key => [@args]} : {};
     my @props = $rs->search_related('properties', $condition);
     print map { &$display_cb($_)."\t".$_->key.'='.$_->value."\n" } @props;
 }
 
-sub cmd_host_getprop {
-    shift->_obj_getprop(sub { $_->host->name }, @_);
+sub cmd_host_propget {
+    shift->_obj_propget(sub { $_->host->name }, @_);
 }
 
-sub cmd_user_getprop {
-    shift->_obj_getprop(sub { $_->user->login }, @_);
+sub cmd_user_propget {
+    shift->_obj_propget(sub { $_->user->login }, @_);
 }
 
 
