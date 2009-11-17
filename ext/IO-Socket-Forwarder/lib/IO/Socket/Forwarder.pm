@@ -62,17 +62,12 @@ sub forward_sockets {
 
 	$wtr1 or $wtr2 or $wtw1 or $wtw2 or last;
 
-	$wtr1 ||= $ssl_wtr1;
-	$wtr2 ||= $ssl_wtr2;
-	$wtw1 ||= $ssl_wtw1;
-	$wtw2 ||= $ssl_wtw2;
-
 	my $bitsr = '';
-	vec($bitsr, $fn1, 1) = 1 if $wtr1;
-	vec($bitsr, $fn2, 1) = 1 if $wtr2;
+	vec($bitsr, $fn1, 1) = 1 if ($wtr1 || $ssl_wtr1);
+	vec($bitsr, $fn2, 1) = 1 if ($wtr2 || $ssl_wtr2);
 	my $bitsw = '';
-	vec($bitsw, $fn1, 1) = 1 if $wtw1;
-	vec($bitsw, $fn2, 1) = 1 if $wtw2;
+	vec($bitsw, $fn1, 1) = 1 if ($wtw1 || $ssl_wtw1);
+	vec($bitsw, $fn2, 1) = 1 if ($wtw2 || $ssl_wtw2);
 
 	$debug and warn "calling select...\n";
 
