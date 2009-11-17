@@ -113,14 +113,14 @@ sub cmd_user_del {
     $rs->delete;
 }
 
-sub cmd_host_setprop {
+sub _obj_setprop {
     my ($self, $rs, @args) = @_;
     my $params = _split_on_equals @args;
     # In principle you should be able to avoid looping over the result set using
     # search_related but the PostgreSQL driver doesn't let us
-    while (my $host = $rs->next) {
+    while (my $obj = $rs->next) {
 	foreach my $key (keys %$params) {
-	    $host->properties->search({key => $key})->update_or_create({
+	    $obj->properties->search({key => $key})->update_or_create({
 		    key => $key,
 		    value => $params->{$key}
 		    }
@@ -130,13 +130,27 @@ sub cmd_host_setprop {
     }
 }
 
+sub cmd_host_setprop {
+    shift->_obj_setprop(@_);
+}
+
+sub cmd_user_setprop {
+    shift->_obj_setprop(@_);
+}
+
+sub _obj_getprop {
+    my ($self, $display_cb, $rs, @args) = @_;
+    my $condition = scalar @args > 0 ? {key => [@args]} : {};
+    my @props = $rs->search_related('properties', $condition);
+    print map { &$display_cb($_)."\t".$_->key.'='.$_->value."\n" } @props;
+}
+
 sub cmd_host_getprop {
-    my ($self, $rs, @args) = @_;
-    foreach my $key (@args) {
-	my @props = $rs->search_related('properties', {key => $key});
-	print join "\n", map { $_->host->name."\t".$_->key.'='.$_->value } @props;
-	print "\n";
-    }
+    shift->_obj_getprop(sub { $_->host->name }, @_);
+}
+
+sub cmd_user_getprop {
+    shift->_obj_getprop(sub { $_->user->login }, @_);
 }
 
 1;
