@@ -4,6 +4,7 @@ use warnings;
 use strict;
 
 use QVD::DB;
+use QVD::Config;
 
 sub new {
     my $class = shift;
@@ -97,6 +98,31 @@ sub cmd_host_add {
 
 sub cmd_user_add {
     shift->_obj_add([qw/login password/], @_);
+}
+
+sub cmd_osi_add {
+    my ($self, $rs, @args) = @_;
+    my $params = _split_on_equals @args;
+
+    # Default OSI parameters
+    # FIXME Detect type of image and set use_overlay accordingly, iso=no overlay
+    $params->{memory} //= 256;
+    $params->{use_overlay} //= 1;
+    
+    use File::Basename qw/basename/;
+    my $img = $params->{disk_image};
+    $params->{disk_image} = basename($img);
+
+    die "Invalid parameters" unless _set_equals([keys %$params],
+	[qw/name memory use_overlay disk_image/]);
+
+    # Copy image to ro-directory
+    die "disk_image is not optional" unless defined $params->{disk_image};
+    my $destination = QVD::Config->get('ro_storage_path');
+    use File::Copy qw/copy/;
+    copy($img, $destination) or die "Unable to copy $img to storage: $^E";
+
+    $rs->create($params);
 }
 
 sub cmd_host_del {
