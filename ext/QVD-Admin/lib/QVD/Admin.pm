@@ -72,20 +72,31 @@ sub cmd_user_list {
     }
 }
 
-sub cmd_host_add {
-    my ($self, $rs, @args) = @_;
+sub _set_equals {
+    my ($a, $b) = @_;
+    return 0 if scalar @$a != scalar @$b;
+    my @a = sort @$a;
+    my @b = sort @$b;
+    foreach my $i (0 .. @a-1) {
+	return 0 if $a[$i] ne $b[$i];
+    }
+    return 1;
+}
+
+sub _obj_add {
+    my ($self, $required_params, $rs, @args) = @_;
     my $params = _split_on_equals @args;
-    my @required_params = ('name', 'address');
-    die "Invalid parameters" if keys %$params != @required_params;
+    die "Invalid parameters" 
+    	unless _set_equals([keys %$params], $required_params);
     $rs->create($params);
 }
 
+sub cmd_host_add {
+    shift->_obj_add([qw/name address/], @_);
+}
+
 sub cmd_user_add {
-    my ($self, $rs, @args) = @_;
-    my $params = _split_on_equals @args;
-    my @required_params = ('login', 'password');
-    die "Invalid parameters" if keys %$params != @required_params;
-    $rs->create($params);
+    shift->_obj_add([qw/login password/], @_);
 }
 
 sub cmd_host_del {
