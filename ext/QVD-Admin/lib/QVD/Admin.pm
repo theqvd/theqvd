@@ -8,9 +8,11 @@ use QVD::Config;
 
 sub new {
     my $class = shift;
+    my $quiet = shift;
     my $db = shift // QVD::DB->new();
     my $self = {db => $db,
 		filter => {},
+		quiet => $quiet,
 		objects => {
 		    host => 'Host',
 		    vm => 'VM',
@@ -73,8 +75,17 @@ sub _format_timespan {
 
 }
 
+sub _print_header {
+    my @titles = @_;
+    print join("\t", @titles)."\n";
+    print join("\t", map { s/./-/g; $_ } @titles)."\n";
+}
+
 sub cmd_host_list {
     my ($self, $rs, @args) = @_;
+    _print_header "Id", "Name", "Address ","HKD", "VMs assigned"
+	    unless $self->{quiet};
+
     while (my $host = $rs->next) {
 	# FIXME proper formatting
 	my $hkd_ts = defined $host->runtime ? $host->runtime->hkd_ok_ts : undef;
@@ -88,6 +99,7 @@ sub cmd_host_list {
 
 sub cmd_user_list {
     my ($self, $rs, @args) = @_;
+    _print_header "Id","Login" unless $self->{quiet};
     while (my $user = $rs->next) {
 	printf "%s\t%s\n", $user->id, $user->login;
     }
@@ -115,12 +127,15 @@ sub _obj_add {
 sub cmd_host_add {
     my $self = shift;
     my $row = $self->_obj_add([qw/name address/], @_);
-    my $rs = $self->{db}->resultset('Host_Runtime')
+    $self->{db}->resultset('Host_Runtime')
 			    ->create({host_id => $row->id});
+    print "Host added with id ".$row->id."\n" unless $self->{quiet};
 }
 
 sub cmd_user_add {
-    shift->_obj_add([qw/login password/], @_);
+    my $self = shift;
+    my $row = $self->_obj_add([qw/login password/], @_);
+    print "User added with id ".$row->id."\n" unless $self->{quiet};
 }
 
 sub cmd_osi_add {
@@ -146,7 +161,9 @@ sub cmd_osi_add {
     use File::Copy qw/copy/;
     copy($img, $destination) or die "Unable to copy $img to storage: $^E";
 
-    $rs->create($params);
+    my $row = $rs->create($params);
+
+    print "User added with id ".$row->id."\n" unless $self->{quiet};
 }
 
 sub cmd_host_del {
