@@ -111,8 +111,9 @@ sub add_host {
     my $name = delete $opts{name};
     my $address = delete $opts{address};
     _die_on_too_many_opts(%opts);
-    $schema->resultset('Host')->create({name => $name,
+    my $r = $schema->resultset('Host')->create({name => $name,
 					address => $address});
+    $r = $schema->resultset('Host_Runtime')->create({host_id => $r->id});
 }
 
 sub add_osi {

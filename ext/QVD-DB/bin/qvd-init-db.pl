@@ -18,7 +18,6 @@ $db->add_host(name => hostname, address => '127.0.0.1');
 $db->add_vm(
 	name => 'Test VM 1',
 	osi => 1,
-	host => 1,
 	user => 1,
 	ip => '',
 	storage => ''
