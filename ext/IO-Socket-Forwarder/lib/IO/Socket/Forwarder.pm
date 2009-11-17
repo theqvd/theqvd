@@ -63,11 +63,11 @@ sub forward_sockets {
 	$wtr1 or $wtr2 or $wtw1 or $wtw2 or last;
 
 	my $bitsr = '';
-	vec($bitsr, $fn1, 1) = 1 if ($wtr1 || $ssl_wtr1);
-	vec($bitsr, $fn2, 1) = 1 if ($wtr2 || $ssl_wtr2);
+	vec($bitsr, $fn1, 1) = 1 if (($wtr1 && !$ssl_wtw1) || $ssl_wtr1);
+	vec($bitsr, $fn2, 1) = 1 if (($wtr2 && !$ssl_wtw2) || $ssl_wtr2);
 	my $bitsw = '';
-	vec($bitsw, $fn1, 1) = 1 if ($wtw1 || $ssl_wtw1);
-	vec($bitsw, $fn2, 1) = 1 if ($wtw2 || $ssl_wtw2);
+	vec($bitsw, $fn1, 1) = 1 if (($wtw1 && !$ssl_wtr1) || $ssl_wtw1);
+	vec($bitsw, $fn2, 1) = 1 if (($wtw2 && !$ssl_wtr2) || $ssl_wtw2);
 
 	$debug and warn "calling select...\n";
 
@@ -76,7 +76,8 @@ sub forward_sockets {
 	$debug and warn "select done, n: $n\n";
 
 	if ($n > 0) {
-	    if ($wtr1 and vec($bitsr, $fn1, 1)) {
+	    if ($wtr1 and vec(($ssl_wtw1 ? $bitsw : $bitsr), $fn1, 1)) {
+		# FIXME, replicate this structure up in the other action handlers
 		undef $ssl_wtr1;
 		$debug and warn "reading from s1...\n";
 		my $bytes = sysread($s1, $b1to2, $io_chunk_size, length $b1to2);
