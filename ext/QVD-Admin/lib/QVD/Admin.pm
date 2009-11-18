@@ -66,14 +66,8 @@ sub _format_timespan {
     my $seconds = shift;
     my $secs = $seconds%60;
     my $mins = ($seconds /= 60) % 60;
-    return sprintf "%02dm %02ds", $mins, $secs if $seconds == 0;
-    my $hours = ($seconds /= 60) % 24;
-    return sprintf "%02dh %02dm", $hours, $mins if $seconds == 0;
-    my $days = ($seconds /= 24) % 365;
-    return sprintf "%02dd %02dh", $days, $hours if $seconds == 0;
-    my $years = $seconds / 365;
-    return sprintf "%02da %02dd", $years, $days;
-
+    my $hours = ($seconds /= 60);
+    return sprintf "%02d:%02d:%02d", $hours, $mins, $secs;
 }
 
 sub _print_header {
@@ -190,7 +184,7 @@ sub _obj_propset {
     my ($self, $rs, @args) = @_;
     my $params = _split_on_equals @args;
     # In principle you should be able to avoid looping over the result set using
-    # search_related but the PostgreSQL driver doesn't let us
+    # search_related but the PostgreSQL driver doesn't seem to let us
     while (my $obj = $rs->next) {
 	foreach my $key (keys %$params) {
 	    $obj->properties->search({key => $key})->update_or_create(
@@ -209,6 +203,10 @@ sub cmd_user_propset {
     shift->_obj_propset(@_);
 }
 
+sub cmd_vm_propset {
+    shift->_obj_propset(@_);
+}
+
 sub _obj_propget {
     my ($self, $display_cb, $rs, @args) = @_;
     my $condition = scalar @args > 0 ? {key => [@args]} : {};
@@ -224,6 +222,9 @@ sub cmd_user_propget {
     shift->_obj_propget(sub { $_->user->login }, @_);
 }
 
+sub cmd_vm_propget {
+    shift->_obj_propget(sub { $_->vm->name }, @_);
+}
 
 sub cmd_config_set {
     my ($self, $rs, @args) = @_;
