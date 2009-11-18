@@ -228,4 +228,15 @@ sub add_config {
     $schema->resultset('Config')->create({key => $key, value => $value});        
 }
 
+sub add_ssl_config {
+    my ($self, %opts) = @_;
+    my $schema = $self->{schema};
+    my $key = delete $opts{key};
+    my $value = delete $opts{value};
+    _die_on_too_many_opts(%opts);
+
+    $schema->resultset('SSL_Config')->create({key => $key, value => $value});        
+}
+
+
 1;

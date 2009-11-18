@@ -43,7 +43,8 @@ sub erase {
 		       x_cmds
 		       vm_cmds
 		       user_cmds
-		       configs )
+		       configs
+		       ssl_configs )
 		  ) {
 
 	eval {
