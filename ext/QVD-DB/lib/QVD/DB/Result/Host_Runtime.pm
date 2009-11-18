@@ -7,17 +7,17 @@ __PACKAGE__->add_columns(
 	host_id => {
 	    data_type => 'integer'
 	},
-	hkd  => {
+	hkd_pid  => {
 	    data_type => 'integer',
 	    is_nullable => 1
 	},
 	hkd_ok_ts => {
-	    data_type => 'timestamp',
+	    data_type => 'integer',
 	    is_nullable => 1
 	}
 	);
 	
 __PACKAGE__->set_primary_key('host_id');
 
-__PACKAGE__->belongs_to('rel_host_id' => 'QVD::DB::Result::Host', 'host_id');
+__PACKAGE__->belongs_to('host' => 'QVD::DB::Result::Host', 'host_id');
 
