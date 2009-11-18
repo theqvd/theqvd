@@ -53,6 +53,7 @@ sub _get_result_set {
 sub dispatch_command {
     my ($self, $object, $command, @args) = @_;
     my $rs = $self->_get_result_set($object);
+    die "$object: Valid command expected" unless defined $command;
     my $method = $self->can("cmd_${object}_${command}");
     if (defined $method) {
 	$self->$method($rs, @args);
