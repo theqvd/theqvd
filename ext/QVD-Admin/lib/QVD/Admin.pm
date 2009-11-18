@@ -25,13 +25,13 @@ sub new {
 }
 
 sub _split_on_equals {
-    my %r = map { my @a = split /=/; $a[0] => $a[1] } @_;
+    my %r = map { my @a = split /=/, $_, 2; $a[0] => $a[1] } @_;
     \%r
 }
 
 sub _query_to_hash {
     # 'a=b,c=d' -> {'a' => 'b', 'c' => 'd}
-    _split_on_equals split(/,\s*/, shift);
+    _split_on_equals split(/,\s*/, shift, 2);
 }
 
 sub set_filter {
