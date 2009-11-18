@@ -34,9 +34,13 @@ sub set_filter {
     # 'a=b,c=d' -> {'a' => 'b', 'c' => 'd}
     my $conditions = _split_on_equals split /,\s*/, $filter_string;
     while (my ($k, $v) = each %$conditions) {
-	$v =~ s/(%|_)/\\$1/g;
-	$v =~ tr/*?/%_/;
-	$self->{filter}{$k} = {like => $v};
+	if ($v =~ /[*?]/) {
+	    $v =~ s/([_%])/\\$1/g;
+	    $v =~ tr/*?/%_/;
+	    $self->{filter}{$k} = {like => $v};
+	} else {
+	    $self->{filter}{$k} = $v;
+	}
     }
 }
 
@@ -98,6 +102,18 @@ sub cmd_user_list {
     _print_header "Id","Login" unless $self->{quiet};
     while (my $user = $rs->next) {
 	printf "%s\t%s\n", $user->id, $user->login;
+    }
+}
+
+sub cmd_vm_list {
+    my ($self, $rs, @args) = @_;
+    _print_header "Id","Name","State","Host" unless $self->{quiet};
+    while (my $vm = $rs->next) {
+	my $vm_runtime = $vm->vm_runtime;
+	my $host = $vm_runtime->host;
+	my $host_name = defined $host ? $host->name : '-';
+	print join "\t", $vm->id, $vm->name, $vm_runtime->vm_state, $host_name;
+	print "\n";
     }
 }
 
