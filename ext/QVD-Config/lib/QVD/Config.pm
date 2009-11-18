@@ -5,7 +5,6 @@ our $VERSION = '0.01';
 use warnings;
 use strict;
 
-use Config::Tiny;
 use QVD::DB;
 
 my %cache;
