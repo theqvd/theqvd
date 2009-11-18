@@ -29,14 +29,15 @@ sub _split_on_equals {
     \%r
 }
 
-sub _query_to_hash {
-    # 'a=b,c=d' -> {'a' => 'b', 'c' => 'd}
-    _split_on_equals split(/,\s*/, shift, 2);
-}
-
 sub set_filter {
     my ($self, $filter_string) = @_;
-    $self->{filter} = _query_to_hash $filter_string;
+    # 'a=b,c=d' -> {'a' => 'b', 'c' => 'd}
+    my $conditions = _split_on_equals split /,\s*/, $filter_string;
+    while (my ($k, $v) = each %$conditions) {
+	$v =~ s/(%|_)/\\$1/g;
+	$v =~ tr/*?/%_/;
+	$self->{filter}{$k} = {like => $v};
+    }
 }
 
 sub _get_result_set {
