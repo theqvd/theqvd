@@ -20,19 +20,31 @@ my $CRLF = "\r\n";
 sub _create_socket {
     my $self = shift;
     my $target = $self->{target};
-    $self->{socket} = IO::Socket::INET->new(PeerAddr => $target, Blocking => 0)
+    my $SSL = $self->{SSL};
+    my $class;
+    if ($SSL) {
+	require IO::Socket::SSL;
+	$class = 'IO::Socket::SSL';
+    }
+    else {
+	$class = 'IO::Socket::INET'
+    }
+
+    $self->{socket} = $class->new(PeerAddr => $target, Blocking => 0)
 	or croak "Unable to connect to $target";
 }
 
 sub new {
     my ($class, $target, %opts) = @_;
     my $timeout = delete $opts{timeout};
+    my $ssl = delete $opts{SSL};
 
     keys %opts and
 	croak "unknown constructor option(s) " . join(', ', keys %opts);
 
     my $self = { target => $target,
 		 timeout => $timeout,
+		 SSL => $ssl,
 		 buffer => '' };
     bless $self, $class;
     $self->_create_socket();
@@ -45,6 +57,7 @@ sub _print {
     my $self = shift;
     my $socket = $self->{socket};
     my $timeout = $self->{timeout};
+    my $SSL = $self->{SSL};
     my $buffer = join('', @_);
     my $fn = fileno $socket;
     $fn >= 0 or croak "bad file handle $socket";
@@ -58,15 +71,19 @@ sub _print {
 		if ($bytes) {
 		    substr($buffer, 0, $bytes, '');
 		}
+		elsif ($SSL and defined $bytes) {
+		    $IO::Socket::SSL::SSL_ERROR == IO::Socket::SSL::SSL_WANT_READ()
+			or die "internal error: unexpected SSL error: " . IO::Socket::SSL::errstr();
+		    my $rv = '';
+		    vec($rv, $fn, 1) = 1;
+		    $n = select($rv, undef, undef, $timeout);
+		}
 		else {
-		    die "socket closed unexpectedly";
+		    die "socket closed unexpectedly"
 		}
 	    }
 	}
-	else {
-	    next if $! == Errno::EINTR;
-	    die "connection timed out";
-	}
+	$n > 0 or $! == Errno::EINTR or die "connection timed out";
     }
 }
 
@@ -149,6 +166,7 @@ sub _sysread {
     my $buffer = \$self->{buffer};
     return if length($$buffer) >= $length;
     my $socket = $self->{socket};
+    my $SSL = $self->{SSL};
     my $fn = fileno $socket;
     $fn >= 0 or croak "bad file handle $socket";
     while (length $$buffer < $length) {
@@ -159,14 +177,20 @@ sub _sysread {
 	    if (vec($rv, $fn, 1)) {
 		my $bytes = sysread ($socket, $$buffer, 16 * 1024, length $$buffer);
 		unless ($bytes) {
-		    die "socket closed unexpectedly";
+		    if ($SSL and defined $bytes) {
+			$IO::Socket::SSL::SSL_ERROR == IO::Socket::SSL::SSL_WANT_WRITE()
+			    or die "internal error: unexpected SSL error: " . IO::Socket::SSL::errstr();
+			my $wv = '';
+			vec($wv, $fn, 1) = 1;
+			$n = select(undef, $wv, undef, $timeout);
+		    }
+		    else {
+			die "socket closed unexpectedly";
+		    }
 		}
 	    }
 	}
-	else {
-	    next if $! == Errno::EINTR;
-	    die "connection timed out";
-	}
+	$n > 0 or $! == Errno::EINTR or die "connection timed out";
     }
 }
 

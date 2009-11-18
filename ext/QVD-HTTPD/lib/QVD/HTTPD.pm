@@ -34,8 +34,10 @@ sub process_request {
 
     if ($self->{server}{SSL}) {
 	require IO::Socket::SSL;
-	IO::Socket::SSL->start_ssl($socket, SSL_server => 1);
-	die "SSL negotiation failed" unless $socket->isa('IO::Socket::SSL');
+	IO::Socket::SSL->start_SSL($socket, SSL_server => 1, NonBlocking => 1);
+	$socket->isa('IO::Socket::SSL')
+	    or die "SSL negotiation failed: " . IO::Socket::SSL::errstr()
+
     }
 
     while (<$socket>) {
