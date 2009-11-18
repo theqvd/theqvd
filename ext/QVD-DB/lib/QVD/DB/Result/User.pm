@@ -22,6 +22,7 @@ __PACKAGE__->set_primary_key('id');
 __PACKAGE__->add_unique_constraint(['login']);
 #__PACKAGE__->add_unique_constraint(['uid']);
 __PACKAGE__->has_many(vms => 'QVD::DB::Result::VM', 'user_id');
-__PACKAGE__->has_many(properties => 'QVD::DB::Result::User_Property', 'user_id');
+__PACKAGE__->has_many(properties => 'QVD::DB::Result::User_Property',
+			'user_id', {join_type => 'INNER'});
 
 1;
