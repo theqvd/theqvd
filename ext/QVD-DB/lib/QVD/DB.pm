@@ -30,10 +30,13 @@ sub erase {
     my $db = shift;
     for my $table (qw( vm_runtimes
 		       vms
+		       vm_properties
 		       osis
 		       host_runtimes
 		       hosts
+		       host_properties
 		       users
+		       user_properties
 		       x_states
 		       vm_states
 		       user_states
