@@ -8,6 +8,7 @@ use strict;
 package MyFrame;
 
 use Wx qw[:everything];
+use IO::Handle;
 use base qw(Wx::Frame);
 use strict;
 
@@ -43,6 +44,11 @@ sub new {
 	$self->__do_layout();
 
 	Wx::Event::EVT_BUTTON($self, $self->{connect_button}->GetId, \&OnClick);
+	Wx::Event::EVT_TIMER($self, -1, \&OnTimer);
+
+	$self->{timer} = Wx::Timer->new($self);
+	$self->{proc} = undef;
+	$self->{proc_pid} = undef;
 
 # end wxGlade
 	return $self;
@@ -104,33 +110,49 @@ sub OnClick {
     $self->{password}->SetEditable(0);
     $self->{host}->SetEditable(0);
     $self->{port}->SetEditable(0);
-    
+       
     @ARGV = ($self->{username}->GetValue, $self->{password}->GetValue, $self->{host}->GetValue, $self->{port}->GetValue);
-    #do "QVD-Client/bin/qvd-client.pl";
+
     my @cmd = qw(perl -Mlib::glob=*/lib QVD-Client/bin/qvd-client.pl);
-      
-    my $pid = open my $pipe, '-|', @cmd, @ARGV or die "...";
     
-    $self->{progress_bar}->SetValue(1);
+    $self->{proc} = Wx::Process::Open(join(" ", @cmd,@ARGV));
+    $self->{proc_pid} = $self->{proc}->GetPid;
     
-    while (<$pipe>) {
-	if ($_ =~ m/X-QVD-VM-Status:Checking VM/){
-	    $self->{console}->AppendText("X-QVD-VM-Status:Checking VM\n");
-	    $self->{progress_bar}->SetValue(2);
-	} elsif ($_ =~ m/X-QVD-VM-Status:Starting VM/) {
-	    $self->{console}->AppendText("X-QVD-VM-Status:Starting VM\n");
-	    $self->{progress_bar}->SetValue(3);
-	} elsif ($_ =~ m/X-QVD-VM-Status:Connecting to VM/) {
-	    $self->{console}->AppendText("X-QVD-VM-Status:Connecting to VM\n");
-	    $self->{progress_bar}->SetValue(4);
-	} elsif ($_ =~ m/X-QVD-VM-Status:Connected to VM/) {
-	    $self->{console}->AppendText("X-QVD-VM-Status:Connected to VM\n");
-	    $self->{progress_bar}->SetValue(5);
-	}
-	Wx::Yield;	
-    }
+   
+    $self->{timer}->Start(100, 0);
    
 }
+
+sub OnTimer {
+    my $self = shift;
+    
+    if (Wx::Process::Exists($self->{proc_pid})) {
+	while ($self->{proc}->IsInputAvailable) {
+	    my $response = "";
+	    my $bytesread = $self->{proc}->GetInputStream->read($response, 1000,0);
+	    if (defined ($bytesread) and ($bytesread != 0)) {
+		#$self->{console}->AppendText($response);
+		
+	    if ($response =~ m/X-QVD-VM-Status:Checking VM/){
+		$self->{console}->AppendText("X-QVD-VM-Status:Checking VM\n");
+		$self->{progress_bar}->SetValue(2);
+	    } elsif ($response =~ m/X-QVD-VM-Status:Starting VM/) {
+		$self->{console}->AppendText("X-QVD-VM-Status:Starting VM\n");
+		$self->{progress_bar}->SetValue(3);
+	    } elsif ($response =~ m/X-QVD-VM-Status:Connecting to VM/) {
+		$self->{console}->AppendText("X-QVD-VM-Status:Connecting to VM\n");
+		$self->{progress_bar}->SetValue(4);
+	    } elsif ($response =~ m/X-QVD-VM-Status:Connected to VM/) {
+		$self->{console}->AppendText("X-QVD-VM-Status:Connected to VM\n");
+		$self->{progress_bar}->SetValue(5);
+	    }
+		
+	    }
+	    
+	}
+    }
+}
+
 
 
 # end of class MyFrame

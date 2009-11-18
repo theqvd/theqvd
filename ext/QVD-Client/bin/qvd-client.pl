@@ -8,6 +8,9 @@ use QVD::HTTP::StatusCodes qw(:status_codes);
 use IO::Socket::Forwarder qw(forward_sockets);
 use MIME::Base64 qw(encode_base64);
 
+# Forces a flush
+$| = 1;
+
 my $username = shift @ARGV;
 my $password = shift @ARGV;
 my $host = shift @ARGV;
