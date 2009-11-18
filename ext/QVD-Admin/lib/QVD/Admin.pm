@@ -42,7 +42,7 @@ sub set_filter {
 sub _get_result_set {
     my ($self, $obj) = @_;
     my $db_object = $self->{objects}{$obj};
-    die "$obj: unsupported object" unless defined $db_object;
+    die_and_help ("$obj: Unsupported object") unless defined $db_object;
     if ($self->{filter}) {
     	$self->{db}->resultset($db_object)->search($self->{filter});
     } else {
@@ -53,12 +53,12 @@ sub _get_result_set {
 sub dispatch_command {
     my ($self, $object, $command, @args) = @_;
     my $rs = $self->_get_result_set($object);
-    die "$object: Valid command expected" unless defined $command;
+    die_and_help ("$object: Valid command expected") unless defined $command;
     my $method = $self->can("cmd_${object}_${command}");
     if (defined $method) {
 	$self->$method($rs, @args);
     } else {
-	die "$object: $command not implemented";
+	die_and_help ("$object: $command not implemented");
     }
 }
 
@@ -242,6 +242,27 @@ sub cmd_config_get {
     my $condition = scalar @args > 0 ? {key => [@args]} : {};
     my @configs = $rs->search($condition);
     print map { $_->key.'='.$_->value."\n" } @configs;
+}
+
+sub die_and_help {
+    my ($message) = @_;
+    
+    $message = "Unknown error" unless defined($message);
+    
+    my @funcs = do {
+	no strict;
+	grep exists &{"QVD::Admin::$_"}, keys %{"QVD::Admin::"};
+    };
+    #@funcs = grep {/^cmd/} @funcs;
+    @funcs = grep {s/^cmd_//} @funcs;
+    @funcs = grep {s/_/ > /} @funcs;
+    
+    print $message.", try one of this commands:\n\n";
+    
+    print join "\n", sort @funcs;
+    print "\n\n";
+    
+    die;
 }
 
 1;
