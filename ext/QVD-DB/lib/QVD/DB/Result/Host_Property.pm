@@ -4,10 +4,6 @@ use base qw/DBIx::Class/;
 __PACKAGE__->load_components(qw/Core/);
 __PACKAGE__->table('host_properties');
 __PACKAGE__->add_columns(
-#	id => {
-#	    data_type => 'integer',
-#	    is_auto_increment => 1,
-#	},
 	host_id => {
 	    data_type => 'integer',
 	},
