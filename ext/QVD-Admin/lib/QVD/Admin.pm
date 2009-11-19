@@ -198,6 +198,12 @@ sub cmd_user_del {
     $rs->delete_all;
 }
 
+sub cmd_vm_del {
+    my ($self, $rs, @args) = @_;
+    # FIXME Ask for confirmation if try to delete all without filter?
+    $rs->delete_all;
+}
+
 sub cmd_osi_del {
     my ($self, $rs, @args) = @_;
     # FIXME Ask for confirmation if try to delete all without filter?
