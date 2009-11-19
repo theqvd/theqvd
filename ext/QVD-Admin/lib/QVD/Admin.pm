@@ -275,6 +275,21 @@ sub cmd_config_get {
     print map { $_->key.'='.$_->value."\n" } @configs;
 }
 
+sub cmd_vm_disconnect_user {
+    my ($self, $rs, @args) = @_;
+    use QVD::VMAS;
+    my $vmas = QVD::VMAS->new($self->{db});
+    while (my $vm = $rs->next) {
+	my $vm_runtime = $vm->vm_runtime;
+	if ($vm_runtime->user_state eq 'connected') {
+	    print "Disconnecting user on VM ".$vm->id,"\n";
+	    $vmas->disconnect_nx($vm_runtime);
+	} else {
+	    print "No user connected on VM ".$vm->id,"\n";
+	}
+    }
+}
+
 # FIXME Refactor to remove duplication between ssh and vnc connections
 sub cmd_vm_ssh {
     my ($self, $rs, @args) = @_;
