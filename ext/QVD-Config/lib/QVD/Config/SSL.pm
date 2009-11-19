@@ -10,7 +10,7 @@ use QVD::DB;
 sub get {
     my ($class, $key) = @_;
     my $db = QVD::DB->new();
-    return $db->resultset('SSL_Config')->search({ key => $key })->first;
+    return $db->resultset('SSL_Config')->search({ key => $key })->first->value;
 }
 
 1;
