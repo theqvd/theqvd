@@ -21,8 +21,8 @@ mkdir 'certs', 0700;
 my ($mode, $uid) = (stat 'certs')[2, 4];
 $uid == $> or die "bad owner for directory 'certs'\n";
 $mode & 0077 and die "bad permissions for directory 'certs'\n";
-write_file('certs/server_cert', $server_cert);
-write_file('certs/server_key', $server_key);
+write_file('certs/server-cert.pem', $server_cert);
+write_file('certs/server-key.pem', $server_key);
 
 my $l7r = QVD::L7R->new(port => 8443, SSL => 1);
 $l7r->run();
