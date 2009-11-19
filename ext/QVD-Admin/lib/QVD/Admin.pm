@@ -275,6 +275,37 @@ sub cmd_config_get {
     print map { $_->key.'='.$_->value."\n" } @configs;
 }
 
+# FIXME Refactor to remove duplication between ssh and vnc connections
+sub cmd_vm_ssh {
+    my ($self, $rs, @args) = @_;
+    if ($rs->count > 1) {
+	die 'Filter matches more than one VM';
+    }
+    my $vm = $rs->single;
+    die 'No matching VMs' unless defined $vm;
+    my $vm_runtime = $vm->vm_runtime;
+    die 'VM is not running' unless $vm_runtime->vm_state eq 'running';
+    my $ssh_port = $vm_runtime->vm_ssh_port;
+    die 'ssh access is disabled' unless defined $ssh_port;
+    my @cmd = (ssh => ($vm_runtime->vm_address, -p => $ssh_port, @args));
+    exec @cmd;
+}
+
+sub cmd_vm_vnc {
+    my ($self, $rs, @args) = @_;
+    if ($rs->count > 1) {
+	die 'Filter matches more than one VM';
+    }
+    my $vm = $rs->single;
+    die 'No matching VMs' unless defined $vm;
+    my $vm_runtime = $vm->vm_runtime;
+    die 'VM is not running' unless $vm_runtime->vm_state eq 'running';
+    my $vnc_port = $vm_runtime->vm_vnc_port;
+    die 'vnc access is disabled' unless defined $vnc_port;
+    my @cmd = (vncviewer => ($vm_runtime->vm_address.'::'.$vnc_port, @args));
+    exec @cmd;
+}
+
 sub die_and_help {
     my ($message) = @_;
     
