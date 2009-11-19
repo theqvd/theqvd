@@ -275,6 +275,47 @@ sub cmd_config_get {
     print map { $_->key.'='.$_->value."\n" } @configs;
 }
 
+sub cmd_vm_start {
+    my ($self, $rs, @args) = @_;
+    use QVD::VMAS;
+    my $vmas = QVD::VMAS->new($self->{db});
+    while (my $vm = $rs->next) {
+	my $vm_runtime = $vm->vm_runtime;
+	if ($vm_runtime->vm_state eq 'stopped') {
+	    unless ($vmas->assign_host_for_vm($vm_runtime)) {
+		print "Unable to assign VM ".$vm->id." to a host\n";
+		next;
+	    }
+	    unless ($vmas->schedule_start_vm($vm_runtime)) {
+		print "Unable to start VM ".$vm->id." on host "
+			.$vm_runtime->host->name."\n";
+		next;
+	    }
+	    print "Scheduled the start of VM ".$vm->id." on host ".
+		$vm_runtime->host->name."\n" unless $self->{quiet};
+	} else {
+	    print "VM ".$vm->id." is not in the 'stopped' state\n" unless $self->{quiet};
+	}
+    }
+}
+
+sub cmd_vm_stop {
+    my ($self, $rs, @args) = @_;
+    use QVD::VMAS;
+    my $vmas = QVD::VMAS->new($self->{db});
+    while (my $vm = $rs->next) {
+	my $vm_runtime = $vm->vm_runtime;
+	if ($vm_runtime->vm_state eq 'running') {
+	    $vmas->schedule_stop_vm($vm_runtime);
+	    print "Scheduled the stop of VM ".$vm->id." on host ".
+		$vm_runtime->host->name."\n" unless $self->{quiet};
+	} else {
+	    print "VM ".$vm->id." is not in the 'running' state\n"
+		unless $self->{quiet};
+	}
+    }
+}
+
 sub cmd_vm_disconnect_user {
     my ($self, $rs, @args) = @_;
     use QVD::VMAS;
