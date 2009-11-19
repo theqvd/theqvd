@@ -144,6 +144,14 @@ sub cmd_host_add {
     print "Host added with id ".$row->id."\n" unless $self->{quiet};
 }
 
+sub cmd_vm_add {
+    my $self = shift;
+    my $row = $self->_obj_add([qw/name user_id osi_id ip/], @_);
+    $self->{db}->resultset('VM_Runtime')
+			    ->create({vm_id => $row->id});
+    print "VM added with id ".$row->id."\n" unless $self->{quiet};
+}
+
 sub cmd_user_add {
     my $self = shift;
     my $row = $self->_obj_add([qw/login password/], @_);
