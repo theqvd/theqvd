@@ -38,8 +38,9 @@ sub new {
 	$self->{port} = Wx::TextCtrl->new($self, -1, "8080", wxDefaultPosition, wxDefaultSize, );
 	$self->{connect_button} = Wx::Button->new($self, -1, "Conectar");
 	$self->{console} = Wx::TextCtrl->new($self, -1, "", wxDefaultPosition, wxDefaultSize, wxTE_MULTILINE);
-	$self->{progress_bar} = Wx::Gauge->new($self, -1, 5, wxDefaultPosition,     wxDefaultSize, wxGA_HORIZONTAL|wxGA_SMOOTH);	
-
+	$self->{progress_bar} = Wx::Gauge->new($self, -1, 100, wxDefaultPosition,     wxDefaultSize, wxGA_HORIZONTAL|wxGA_SMOOTH);	
+	$self->{progress_bar}->SetValue(0);
+    
 	$self->__set_properties();
 	$self->__do_layout();
 
@@ -49,6 +50,7 @@ sub new {
 	$self->{timer} = Wx::Timer->new($self);
 	$self->{proc} = undef;
 	$self->{proc_pid} = undef;
+	$self->{state} = "";
 
 # end wxGlade
 	return $self;
@@ -67,6 +69,7 @@ sub __set_properties {
 	$icon->CopyFromBitmap(Wx::Bitmap->new("QVD-Client/bin/qvd.xpm", wxBITMAP_TYPE_ANY));
 	$self->SetIcon($icon);
 	$self->{port}->Show(0);
+	$self->{console}->Show(0);
 	$self->{console}->SetEditable(0);
 	$self->{connect_button}->SetDefault();
 	$self->{console}->SetMinSize(Wx::Size->new(-1, 300));
@@ -106,6 +109,8 @@ sub __do_layout {
 sub OnClick {   
     my( $self, $event ) = @_;
     
+    $self->{state} = "";
+    
     $self->{username}->SetEditable(0);
     $self->{password}->SetEditable(0);
     $self->{host}->SetEditable(0);
@@ -116,43 +121,53 @@ sub OnClick {
     my @cmd = qw(perl -Mlib::glob=*/lib QVD-Client/bin/qvd-client.pl);
     
     $self->{proc} = Wx::Process::Open(join(" ", @cmd,@ARGV));
+    $self->{proc}->Redirect;
     $self->{proc_pid} = $self->{proc}->GetPid;
     
-   
     $self->{timer}->Start(100, 0);
    
+    
+    
+    #warn join " ", @cmd,@ARGV;
 }
 
 sub OnTimer {
     my $self = shift;
-    
+    $self->{progress_bar}->Pulse;
     if (Wx::Process::Exists($self->{proc_pid})) {
 	while ($self->{proc}->IsInputAvailable) {
 	    my $response = "";
+	    my $state = $self->{console}->GetValue;
 	    my $bytesread = $self->{proc}->GetInputStream->read($response, 1000,0);
+	    warn $response;
 	    if (defined ($bytesread) and ($bytesread != 0)) {
-		#$self->{console}->AppendText($response);
 		
-	    if ($response =~ m/X-QVD-VM-Status:Checking VM/){
-		$self->{console}->AppendText("X-QVD-VM-Status:Checking VM\n");
-		$self->{progress_bar}->SetValue(2);
-	    } elsif ($response =~ m/X-QVD-VM-Status:Starting VM/) {
-		$self->{console}->AppendText("X-QVD-VM-Status:Starting VM\n");
-		$self->{progress_bar}->SetValue(3);
-	    } elsif ($response =~ m/X-QVD-VM-Status:Connecting to VM/) {
-		$self->{console}->AppendText("X-QVD-VM-Status:Connecting to VM\n");
-		$self->{progress_bar}->SetValue(4);
-	    } elsif ($response =~ m/X-QVD-VM-Status:Connected to VM/) {
-		$self->{console}->AppendText("X-QVD-VM-Status:Connected to VM\n");
-		$self->{progress_bar}->SetValue(5);
-	    }
+		$self->{console}->AppendText($response);
+		$self->{state} .= $response;
 		
+		if ($self->{state} =~ m/X-QVD-VM-Status:Connected to VM/) {
+		    $self->Hide;
+		} elsif ($self->{state} =~ m/X-QVD-VM-Status:Connecting to VM/) {
+		} elsif ($self->{state} =~ m/X-QVD-VM-Status:Starting VM/) {
+		} elsif ($self->{state} =~ m/X-QVD-VM-Status:Checking VM/){
+		} 	
 	    }
 	    
 	}
+    } else {
+	$self->{timer}->Stop;
+	$self->{console}->SetValue("");
+	$self->{progress_bar}->SetValue(0);
+	$self->{progress_bar}->SetRange(100);
+	
+	$self->{username}->SetEditable(1);
+	$self->{password}->SetEditable(1);
+	$self->{host}->SetEditable(1);
+	$self->{port}->SetEditable(1);
+	
+	$self->Show;
     }
 }
-
 
 
 # end of class MyFrame
