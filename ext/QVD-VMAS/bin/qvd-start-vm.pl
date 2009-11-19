@@ -8,7 +8,7 @@ use POSIX ":sys_wait_h";
 my $user_id = 1;
 my $vmas = QVD::VMAS->new();
 my $vm = ($vmas->get_vms_for_user($user_id))[0];
-$vmas->assign_host_for_vm($vm);
+$vmas->assign_host_for_vm($vm, 1);
 my $vm_id = $vm->vm_id;
 print "Starting VM $vm_id...\n";
 my $r = $vmas->start_vm($vm);

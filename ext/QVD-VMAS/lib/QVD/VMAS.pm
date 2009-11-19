@@ -111,9 +111,13 @@ sub _get_free_host {
 }
 
 sub assign_host_for_vm {
-    my ($self, $vm) = @_;
+    my ($self, $vm, $preferred_host) = @_;
     my $vm_id = $vm->vm_id;
-    my $host = $self->_get_free_host($vm);
+    my $host;
+    if (defined $preferred_host) {
+	$host = $self->{db}->resultset('Host')->find($preferred_host); 
+    }
+    $host //= $self->_get_free_host($vm);
     return undef unless $host;
     my $r = $vm->update({ 
 		host_id => $host->id, 
@@ -186,11 +190,26 @@ sub schedule_start_vm {
 	if (defined $r && $r->{request} eq 'success') {
 	    return 1;
 	} else {
-	    INFO "Couldn't notify hkd on ".$host." to start VM ".$vm->vm_id." error: ".$r->{error};
+	    ERROR "Couldn't notify hkd on ".$host." to start VM ".$vm->vm_id." error: ".($r->{error} // $@);
 	    $self->clear_vm_cmd($vm);
 	}
     }
     undef;
+}
+
+sub schedule_stop_vm {
+    my ($self, $vm) = @_;
+    if ($self->_schedule_cmd($vm, 'vm_cmd', 'stop')) {
+	my $host = $vm->host->address;
+	my $rc = QVD::VMAS::RCClient->new($host);
+	my $r = eval { $rc->ping_hkd() };
+	if (defined $r && $r->{request} eq 'success') {
+	    return 1;
+	} else {
+	    INFO "Couldn't notify hkd on ".$host." to stop VM ".$vm->vm_id." error: ".$r->{error};
+	    $self->clear_vm_cmd($vm);
+	}
+    }
 }
 
 sub _get_image_for_vm {
@@ -398,10 +417,12 @@ This module implements the VMAS API.
 
 =over
 
-=item assign_host_for_vm($vm_runtime)
+=item assign_host_for_vm($vm_runtime, $preferred_host = undef)
 
-Assigns the given virtual machine runtime to a QVD host. This may use some kind
-of a load balancing algorithm to determine the best host.
+Assigns the given virtual machine runtime to a QVD host. The machine is
+assigned to the preferred host, if specified. Otherwise the 
+load balancing algorithm specified by the configuration key
+C<vmas_load_balance_algorithm> is used to determine the best host.
 
 Returns true if a host could be assigned, false if no host was available.
 
