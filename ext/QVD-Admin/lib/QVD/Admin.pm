@@ -191,6 +191,16 @@ sub cmd_host_add {
     print "Host added with id ".$row->id."\n" unless $self->{quiet};
 }
 
+sub help_host_add {
+    print <<EOT
+host add: Adds hosts.
+usage: host add name=value address=value
+       
+Valid options:
+    -q [--quiet]         : don't print the header
+EOT
+}
+
 sub cmd_vm_add {
     my ($self,$rs,@args) = @_;
     my $params = _split_on_equals @args;
@@ -223,10 +233,30 @@ sub cmd_vm_add {
     print "VM added with id ".$row->id."\n" unless $self->{quiet};
 }
 
+sub help_vm_add {
+    print <<EOT
+vm add: Adds virtual machines.
+usage: vm add name=value user_id=value osi_id=value ip=value storage=value
+       
+Valid options:
+    -q [--quiet]         : don't print the header
+EOT
+}
+
 sub cmd_user_add {
     my $self = shift;
     my $row = $self->_obj_add([qw/login password/], @_);
     print "User added with id ".$row->id."\n" unless $self->{quiet};
+}
+
+sub help_user_add {
+    print <<EOT
+user add: Adds users.
+usage: user add login=value password=value
+       
+Valid options:
+    -q [--quiet]         : don't print the header
+EOT
 }
 
 sub cmd_osi_add {
@@ -257,6 +287,16 @@ sub cmd_osi_add {
     print "OSI added with id ".$row->id."\n" unless $self->{quiet};
 }
 
+sub help_osi_add {
+    print <<EOT
+osi add: Adds operating systems images.
+usage: osi add name=value memory=value use_overlay=value disk_image=value
+       
+Valid options:
+    -q [--quiet]         : don't print the header
+EOT
+}
+
 sub _obj_del {
     my ($self, $obj, $rs) = @_;
     unless ($self->{quiet}) {
@@ -274,18 +314,62 @@ sub cmd_host_del {
     shift->_obj_del('host', @_);
 }
 
+sub help_host_del {
+    print <<EOT
+host del: Deletes hosts.
+usage: host del
+       
+Valid options:
+    -f [--filter] FILTER : deletes hosts matched by FILTER
+    -q [--quiet]         : don't print the header
+EOT
+}
+
 sub cmd_user_del {
     shift->_obj_del('user', @_);
+}
+
+sub help_user_del {
+    print <<EOT
+user del: Deletes users.
+usage: user del
+       
+Valid options:
+    -f [--filter] FILTER : deletes users matched by FILTER
+    -q [--quiet]         : don't print the header
+EOT
 }
 
 sub cmd_vm_del {
     shift->_obj_del('vm', @_);
 }
 
+sub help_vm_del {
+    print <<EOT
+vm del: Deletes virtual machines.
+usage: vm del
+       
+Valid options:
+    -f [--filter] FILTER : deletes virtual machines matched by FILTER
+    -q [--quiet]         : don't print the header
+EOT
+}
+
 sub cmd_osi_del {
     my ($self, $rs, @args) = @_;
     $self->_obj_del('OSI', $rs);
     # FIXME Should we delete the actual image file?
+}
+
+sub help_osi_del {
+    print <<EOT
+osi del: Deletes operating systems images.
+usage: osi del
+       
+Valid options:
+    -f [--filter] FILTER : deletes operating systems images matched by FILTER
+    -q [--quiet]         : don't print the header
+EOT
 }
 
 sub _obj_propset {
@@ -385,10 +469,10 @@ sub cmd_user_propget {
 sub help_user_propget {
     print <<EOT
 user propget: Gets user property.
-usage: host propget [key...]
+usage: user propget [key...]
       
   Example:
-  host propget genre timezone
+  user propget genre timezone
       
 Valid options:
     -f [--filter] FILTER : sets host property to hosts matched by FILTER
@@ -423,11 +507,31 @@ sub cmd_config_set {
     }
 }
 
+sub help_cmd_config_set {
+    print <<EOT
+config set: Sets config property.
+usage: config set [key=value ...]
+      
+  Example:
+  config set vm_ssh_port=2022 base_storage_path=/var/run/qvd/storage
+EOT
+}
+
 sub cmd_config_get {
     my ($self, $rs, @args) = @_;
     my $condition = scalar @args > 0 ? {key => [@args]} : {};
     my @configs = $rs->search($condition);
     print map { $_->key.'='.$_->value."\n" } @configs;
+}
+
+sub help_cmd_config_get {
+    print <<EOT
+config get: Gets config property.
+usage: config get [key...]
+      
+  Example:
+  config get vm_ssh_port base_storage_path
+EOT
 }
 
 sub cmd_vm_start {
