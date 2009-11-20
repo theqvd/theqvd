@@ -507,7 +507,7 @@ sub cmd_config_set {
     }
 }
 
-sub help_cmd_config_set {
+sub help_config_set {
     print <<EOT
 config set: Sets config property.
 usage: config set [key=value ...]
@@ -524,7 +524,7 @@ sub cmd_config_get {
     print map { $_->key.'='.$_->value."\n" } @configs;
 }
 
-sub help_cmd_config_get {
+sub help_config_get {
     print <<EOT
 config get: Gets config property.
 usage: config get [key...]
