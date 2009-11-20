@@ -169,7 +169,7 @@ sub _set_equals {
 
 sub _obj_add {
     my ($self, $required_params, $rs, @args) = @_;
-    my $params = _split_on_equals @args;
+    my $params = ref $args[0] ? $args[0] : _split_on_equals @args;
     die "Invalid parameters" 
     	unless _set_equals([keys %$params], $required_params);
     $rs->create($params);
@@ -184,10 +184,33 @@ sub cmd_host_add {
 }
 
 sub cmd_vm_add {
-    my $self = shift;
-    my $row = $self->_obj_add([qw/name user_id osi_id ip/], @_);
-    $self->{db}->resultset('VM_Runtime')
-			    ->create({vm_id => $row->id});
+    my ($self,$rs,@args) = @_;
+    my $params = _split_on_equals @args;
+    if (exists $params->{osi}) {
+	my $key = $params->{osi};
+	my $rs = $self->{db}->resultset('OSI')
+				->search({name => $key});
+	die "$key: No such OSI" if ($rs->count() < 1);
+	$params->{osi_id} = $rs->single->id;
+	delete $params->{osi};
+    }
+    if (exists $params->{user}) {
+	my $key = $params->{user};
+	my $rs = $self->{db}->resultset('User')
+				->search({login => $key});
+	die "$key: No such user" if ($rs->count() < 1);
+	$params->{user_id} = $rs->single->id;
+	delete $params->{user};
+    }
+    $params->{storage} = '';
+    my $row = $self->_obj_add([qw/name user_id osi_id ip storage/], 
+				$rs, $params);
+    $self->{db}->resultset('VM_Runtime')->create({
+	    vm_id => $row->id,
+	    vm_state => 'stopped',
+	    x_state => 'disconnected',
+	    user_state => 'disconnected',
+	});
     print "VM added with id ".$row->id."\n" unless $self->{quiet};
 }
 
