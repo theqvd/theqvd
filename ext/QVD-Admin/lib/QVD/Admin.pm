@@ -56,10 +56,10 @@ sub _get_result_set {
 }
 
 sub dispatch_command {
-    my ($self, $object, $command, @args) = @_;
+    my ($self, $object, $command, $help, @args) = @_;
     my $rs = $self->_get_result_set($object);
     $self->die_and_help ("$object: Valid command expected", $object) unless defined $command;
-    my $method = $self->can("cmd_${object}_${command}");
+    my $method = $self->can($help ? "cmd_${object}_${command}_help" : "cmd_${object}_${command}");
     if (defined $method) {
 	$self->$method($rs, @args);
     } else {
@@ -97,12 +97,38 @@ sub cmd_host_list {
     }
 }
 
+sub cmd_host_list_help {
+    print <<EOT
+host list: Returns a list with the virtual machines.
+usage: host list
+    
+  Lists consists of Id, Name, Address, HKD and VMs assigned, separated by tabs.
+    
+Valid options:
+    -f [--filter] FILTER : list only host matched by FILTER
+    -q [--quiet]         : don't print the header
+EOT
+}
+
 sub cmd_user_list {
     my ($self, $rs, @args) = @_;
     _print_header "Id","Login" unless $self->{quiet};
     while (my $user = $rs->next) {
 	printf "%s\t%s\n", $user->id, $user->login;
     }
+}
+
+sub cmd_user_list_help {
+    print <<EOT
+user list: Returns a list with the users.
+usage: user list
+    
+  Lists consists of Id and Login, separated by tabs.
+    
+Valid options:
+    -f [--filter] FILTER : list only user matched by FILTER
+    -q [--quiet]         : don't print the header
+EOT
 }
 
 sub cmd_vm_list {
@@ -115,6 +141,19 @@ sub cmd_vm_list {
 	print join "\t", $vm->id, $vm->name, $vm_runtime->vm_state, $host_name;
 	print "\n";
     }
+}
+
+sub cmd_vm_list_help {
+    print <<EOT
+vm list: Returns a list with the virtual machines.
+usage: vm list
+    
+  Lists consists of Id, Name, State and Host, separated by tabs.
+    
+Valid options:
+    -f [--filter] FILTER : list only vm matched by FILTER
+    -q [--quiet]         : don't print the header
+EOT
 }
 
 sub _set_equals {
@@ -347,6 +386,22 @@ sub cmd_vm_ssh {
     exec @cmd;
 }
 
+sub cmd_vm_ssh_help {
+    print <<EOT
+vm ssh: Connects to the virtual machine SSH server.
+usage: vm ssh
+
+  To pass aditional parameters to SSH add them to the command line after --
+  
+  Example:
+  vm ssh -- -l qvd
+       
+Valid options:
+    -f [--filter] FILTER : connect to the virtual machine matched by FILTER
+    -q [--quiet]         : don't print the header
+EOT
+}
+
 sub cmd_vm_vnc {
     my ($self, $rs, @args) = @_;
     if ($rs->count > 1) {
@@ -360,6 +415,22 @@ sub cmd_vm_vnc {
     die 'vnc access is disabled' unless defined $vnc_port;
     my @cmd = (vncviewer => ($vm_runtime->vm_address.'::'.$vnc_port, @args));
     exec @cmd;
+}
+
+sub cmd_vm_vnc_help {
+    print <<EOT
+vm ssh: Connects to the virtual machine VNC server.
+usage: vm vnc
+
+  To pass aditional parameters to VNC add them to the command line after --
+  
+  Example:
+  vm vnc -- --depth 8
+       
+Valid options:
+    -f [--filter] FILTER : connect to the virtual machine matched by FILTER
+    -q [--quiet]         : don't print the header
+EOT
 }
 
 sub die_and_help {
