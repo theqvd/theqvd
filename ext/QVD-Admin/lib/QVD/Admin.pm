@@ -215,6 +215,7 @@ sub cmd_vm_add {
 				$rs, $params);
     $self->{db}->resultset('VM_Runtime')->create({
 	    vm_id => $row->id,
+	    osi_actual_id => $row->osi_id,
 	    vm_state => 'stopped',
 	    x_state => 'disconnected',
 	    user_state => 'disconnected',
