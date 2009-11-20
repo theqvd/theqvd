@@ -256,29 +256,35 @@ sub cmd_osi_add {
     print "OSI added with id ".$row->id."\n" unless $self->{quiet};
 }
 
-sub cmd_host_del {
-    my ($self, $rs, @args) = @_;
-    # FIXME Ask for confirmation if try to delete all without filter?
+sub _obj_del {
+    my ($self, $obj, $rs) = @_;
+    unless ($self->{quiet}) {
+	if (scalar %{$self->{filter}} eq 0) {
+	    print "Are you sure you want to delete all ${obj}s? [y/N] ";
+	    my $answer = <>;
+	    exit 0 unless $answer =~ /^y/i;
+	}
+    }
+    print "Deleting ".$rs->count." ${obj}(s)\n" unless $self->{quiet};
     $rs->delete_all;
+}
+
+sub cmd_host_del {
+    shift->_obj_del('host', @_);
 }
 
 sub cmd_user_del {
-    my ($self, $rs, @args) = @_;
-    # FIXME Ask for confirmation if try to delete all without filter?
-    $rs->delete_all;
+    shift->_obj_del('user', @_);
 }
 
 sub cmd_vm_del {
-    my ($self, $rs, @args) = @_;
-    # FIXME Ask for confirmation if try to delete all without filter?
-    $rs->delete_all;
+    shift->_obj_del('vm', @_);
 }
 
 sub cmd_osi_del {
     my ($self, $rs, @args) = @_;
-    # FIXME Ask for confirmation if try to delete all without filter?
+    $self->_obj_del('OSI', $rs);
     # FIXME Should we delete the actual image file?
-    $rs->delete_all;
 }
 
 sub _obj_propset {
