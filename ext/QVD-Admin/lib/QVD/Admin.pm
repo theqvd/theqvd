@@ -46,8 +46,16 @@ sub set_filter {
 
 sub _get_result_set {
     my ($self, $obj) = @_;
-    my $db_object = $self->{objects}{$obj};
-    $self->die_and_help ("$obj: Unsupported object", $obj) unless defined $db_object;
+    my $db_object;
+    
+    if (defined $obj) {
+	$db_object = $self->{objects}{$obj};
+	if (!defined $db_object) {
+	    $self->die_and_help ("$obj: Unsupported object", $obj);
+	}
+    } else {
+	$self->die_and_help ("Void object", $obj);
+    }
     if ($self->{filter}) {
     	$self->{db}->resultset($db_object)->search($self->{filter});
     } else {
@@ -59,7 +67,7 @@ sub dispatch_command {
     my ($self, $object, $command, $help, @args) = @_;
     my $rs = $self->_get_result_set($object);
     $self->die_and_help ("$object: Valid command expected", $object) unless defined $command;
-    my $method = $self->can($help ? "cmd_${object}_${command}_help" : "cmd_${object}_${command}");
+    my $method = $self->can($help ? "help_${object}_${command}" : "cmd_${object}_${command}");
     if (defined $method) {
 	$self->$method($rs, @args);
     } else {
@@ -97,7 +105,7 @@ sub cmd_host_list {
     }
 }
 
-sub cmd_host_list_help {
+sub help_host_list {
     print <<EOT
 host list: Returns a list with the virtual machines.
 usage: host list
@@ -118,7 +126,7 @@ sub cmd_user_list {
     }
 }
 
-sub cmd_user_list_help {
+sub help_user_list {
     print <<EOT
 user list: Returns a list with the users.
 usage: user list
@@ -143,7 +151,7 @@ sub cmd_vm_list {
     }
 }
 
-sub cmd_vm_list_help {
+sub help_vm_list {
     print <<EOT
 vm list: Returns a list with the virtual machines.
 usage: vm list
@@ -292,12 +300,51 @@ sub cmd_host_propset {
     shift->_obj_propset(@_);
 }
 
+sub help_host_propset {
+    print <<EOT
+host propset: Sets host property.
+usage: host propset [key=value...]
+      
+  Example:
+  host propset weight=50kg maxtemp=56º
+      
+Valid options:
+    -f [--filter] FILTER : sets host property to hosts matched by FILTER
+EOT
+}
+
 sub cmd_user_propset {
     shift->_obj_propset(@_);
 }
 
+sub help_user_propset {
+    print <<EOT
+user propset: Sets user property.
+usage: user propset [key=value...]
+      
+  Example:
+  user propset genre=male timezone=+1
+      
+Valid options:
+    -f [--filter] FILTER : sets host property to hosts matched by FILTER
+EOT
+}
+
 sub cmd_vm_propset {
     shift->_obj_propset(@_);
+}
+
+sub help_vm_propset {
+    print <<EOT
+vm propset: Sets vm property.
+usage: vm propset [key=value...]
+      
+  Example:
+  vm propset usage=accounting priority=critical
+      
+Valid options:
+    -f [--filter] FILTER : sets host property to hosts matched by FILTER
+EOT
 }
 
 sub _obj_propget {
@@ -311,12 +358,51 @@ sub cmd_host_propget {
     shift->_obj_propget(sub { $_->host->name }, @_);
 }
 
+sub help_host_propget {
+    print <<EOT
+host propget: Gets host property.
+usage: host propget [key...]
+      
+  Example:
+  host propget usage priority
+      
+Valid options:
+    -f [--filter] FILTER : sets host property to hosts matched by FILTER
+EOT
+}
+
 sub cmd_user_propget {
     shift->_obj_propget(sub { $_->user->login }, @_);
 }
 
+sub help_user_propget {
+    print <<EOT
+user propget: Gets user property.
+usage: host propget [key...]
+      
+  Example:
+  host propget genre timezone
+      
+Valid options:
+    -f [--filter] FILTER : sets host property to hosts matched by FILTER
+EOT
+}
+
 sub cmd_vm_propget {
     shift->_obj_propget(sub { $_->vm->name }, @_);
+}
+
+sub help_vm_propget {
+    print <<EOT
+vm propget: Gets vm property.
+usage: vm propget [key...]
+      
+  Example:
+  vm propget usage priority
+      
+Valid options:
+    -f [--filter] FILTER : sets host property to hosts matched by FILTER
+EOT
 }
 
 sub cmd_config_set {
@@ -361,6 +447,17 @@ sub cmd_vm_start {
     }
 }
 
+sub help_vm_start {
+    print <<EOT
+vm start: Starts virtual machine.
+usage: vm start
+      
+Valid options:
+    -f [--filter] FILTER : starts virtual machine matched by FILTER
+    -q [--quiet]         : don't print the command message
+EOT
+}
+
 sub cmd_vm_stop {
     my ($self, $rs, @args) = @_;
     use QVD::VMAS;
@@ -378,6 +475,17 @@ sub cmd_vm_stop {
     }
 }
 
+sub help_vm_stop {
+    print <<EOT
+vm stop: Stops virtual machine.
+usage: vm stop
+      
+Valid options:
+    -f [--filter] FILTER : stops virtual machine matched by FILTER
+    -q [--quiet]         : don't print the command message
+EOT
+}
+
 sub cmd_vm_disconnect_user {
     my ($self, $rs, @args) = @_;
     use QVD::VMAS;
@@ -391,6 +499,17 @@ sub cmd_vm_disconnect_user {
 	    print "No user connected on VM ".$vm->id,"\n";
 	}
     }
+}
+
+sub help_vm_disconnect_user{
+    print <<EOT
+vm disconnect_user: Disconnects user.
+usage: vm disconnect_user
+      
+Valid options:
+    -f [--filter] FILTER : disconnects user filter by FILTER
+    -q [--quiet]         : don't print the command message
+EOT
 }
 
 # FIXME Refactor to remove duplication between ssh and vnc connections
@@ -409,7 +528,7 @@ sub cmd_vm_ssh {
     exec @cmd;
 }
 
-sub cmd_vm_ssh_help {
+sub help_vm_ssh {
     print <<EOT
 vm ssh: Connects to the virtual machine SSH server.
 usage: vm ssh
@@ -440,7 +559,7 @@ sub cmd_vm_vnc {
     exec @cmd;
 }
 
-sub cmd_vm_vnc_help {
+sub help_vm_vnc {
     print <<EOT
 vm ssh: Connects to the virtual machine VNC server.
 usage: vm vnc
