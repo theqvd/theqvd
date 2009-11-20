@@ -197,7 +197,7 @@ host add: Adds hosts.
 usage: host add name=value address=value
        
 Valid options:
-    -q [--quiet]         : don't print the header
+    -q [--quiet]         : don't print the command message
 EOT
 }
 
@@ -239,7 +239,7 @@ vm add: Adds virtual machines.
 usage: vm add name=value user_id=value osi_id=value ip=value storage=value
        
 Valid options:
-    -q [--quiet]         : don't print the header
+    -q [--quiet]         : don't print the command message
 EOT
 }
 
@@ -255,7 +255,7 @@ user add: Adds users.
 usage: user add login=value password=value
        
 Valid options:
-    -q [--quiet]         : don't print the header
+    -q [--quiet]         : don't print the command message
 EOT
 }
 
@@ -293,7 +293,7 @@ osi add: Adds operating systems images.
 usage: osi add name=value memory=value use_overlay=value disk_image=value
        
 Valid options:
-    -q [--quiet]         : don't print the header
+    -q [--quiet]         : don't print the command message
 EOT
 }
 
@@ -321,7 +321,7 @@ usage: host del
        
 Valid options:
     -f [--filter] FILTER : deletes hosts matched by FILTER
-    -q [--quiet]         : don't print the header
+    -q [--quiet]         : don't print the command message
 EOT
 }
 
@@ -336,7 +336,7 @@ usage: user del
        
 Valid options:
     -f [--filter] FILTER : deletes users matched by FILTER
-    -q [--quiet]         : don't print the header
+    -q [--quiet]         : don't print the command message
 EOT
 }
 
@@ -351,7 +351,7 @@ usage: vm del
        
 Valid options:
     -f [--filter] FILTER : deletes virtual machines matched by FILTER
-    -q [--quiet]         : don't print the header
+    -q [--quiet]         : don't print the command message
 EOT
 }
 
@@ -368,7 +368,7 @@ usage: osi del
        
 Valid options:
     -f [--filter] FILTER : deletes operating systems images matched by FILTER
-    -q [--quiet]         : don't print the header
+    -q [--quiet]         : don't print the command message
 EOT
 }
 
@@ -651,7 +651,6 @@ usage: vm ssh
        
 Valid options:
     -f [--filter] FILTER : connect to the virtual machine matched by FILTER
-    -q [--quiet]         : don't print the header
 EOT
 }
 
@@ -682,7 +681,6 @@ usage: vm vnc
        
 Valid options:
     -f [--filter] FILTER : connect to the virtual machine matched by FILTER
-    -q [--quiet]         : don't print the header
 EOT
 }
 
