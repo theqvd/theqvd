@@ -46,25 +46,24 @@ sub set_filter {
 
 sub _get_result_set {
     my ($self, $obj) = @_;
-    my $db_object;
-    
-    if (defined $obj) {
-	$db_object = $self->{objects}{$obj};
-	if (!defined $db_object) {
-	    $self->die_and_help ("$obj: Unsupported object", $obj);
-	}
-    } else {
-	$self->die_and_help ("Void object", $obj);
+    my $db_object = $self->{objects}{$obj};
+    if (!defined $db_object) {
+	$self->die_and_help ("$obj: Unsupported object", $obj);
     }
-    if ($self->{filter}) {
-    	$self->{db}->resultset($db_object)->search($self->{filter});
+    my $method = $self->can("get_result_set_for_${obj}");
+    if ($method) {
+	$self->$method;
+    }
+    elsif ($self->{filter}) {
+	$self->{db}->resultset($db_object)->search($self->{filter});
     } else {
-    	$self->{db}->resultset($db_object);
+	$self->{db}->resultset($db_object);
     }
 }
 
 sub dispatch_command {
     my ($self, $object, $command, $help, @args) = @_;
+    $self->die_and_help ("Valid command expected") unless defined $object;
     $self->die_and_help ("$object: Valid command expected", $object) unless defined $command;
     my $method = $self->can($help ? "help_${object}_${command}" : "cmd_${object}_${command}");
     if (defined $method) {
@@ -141,9 +140,17 @@ Valid options:
 EOT
 }
 
-sub cmd_vm_list {
+sub _filter_obj {
+    my ($self, $term_map) = @_;
+    my $filter = $self->{filter};
+    while (my ($src,$dst) = each %$term_map) {
+	$filter->{$dst} = delete $filter->{$src} if exists $filter->{$src}
+    }
+    $filter
+}
+
+sub get_result_set_for_vm {
     my ($self, @args) = @_;
-    _print_header "Id","Name","State","Host" unless $self->{quiet};
     my %term_map = (
 	name => 'me.name',
 	osi => 'osi.name',
@@ -151,13 +158,16 @@ sub cmd_vm_list {
 	host => 'host.name',
 	state => 'vm_runtime.vm_state',
     );
-    my $filter = $self->{filter};
-    while (my ($src,$dst) = each %term_map) {
-	$filter->{$dst} = delete $filter->{$src} if exists $filter->{$src}
-    }
-    my $rs = $self->{db}->resultset('VM')->search($filter, {
+    my $filter = $self->_filter_obj(\%term_map);
+    $self->{db}->resultset('VM')->search($filter, {
 	    join => ['osi', 'user', { vm_runtime => 'host'}],
 	});
+}
+
+sub cmd_vm_list {
+    my ($self, @args) = @_;
+    _print_header "Id","Name","State","Host" unless $self->{quiet};
+    my $rs = $self->_get_result_set('vm');
     while (my $vm = $rs->next) {
 	my $vm_runtime = $vm->vm_runtime;
 	my $host = $vm_runtime->host;
@@ -194,8 +204,12 @@ sub _set_equals {
 sub _obj_add {
     my ($self, $required_params, @args) = @_;
     my $params = ref $args[0] ? $args[0] : _split_on_equals @args;
-    die "Invalid parameters" 
-    	unless _set_equals([keys %$params], $required_params);
+    unless (_set_equals([keys %$params], $required_params)) {
+	print "The required parameters are: ",
+	    join(", ", @$required_params),
+	    "\n";
+	exit 1;
+    }
     my $rs = $self->_get_result_set($self->{current_object});
     $rs->create($params);
 }
@@ -721,7 +735,7 @@ sub die_and_help {
     };
     
     @funcs = grep {s/^cmd_([a-z]+)_(\w+)/$1 $2/} @funcs;
-    @funcs = grep {m/^${obj}/} @funcs if exists $self->{objects}{$obj};
+    @funcs = grep {m/^${obj}/} @funcs if defined $obj and exists $self->{objects}{$obj};
     
     print $message.", available subcommands:\n   ";
     print join "\n   ", sort @funcs;
