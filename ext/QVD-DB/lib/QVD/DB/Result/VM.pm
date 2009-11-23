@@ -25,6 +25,7 @@ __PACKAGE__->add_columns(
 	storage  => {
 	# Valor tomado de la variable PATH_MAX de /usr/src/linux-headers-2.6.28-15/include/linux/limits.h
 	    data_type => 'varchar(4096)'
+	    is_nullable => 1,
 	}
 	);
 __PACKAGE__->set_primary_key('id');
