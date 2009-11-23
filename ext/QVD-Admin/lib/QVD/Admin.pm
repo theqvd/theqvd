@@ -144,19 +144,18 @@ EOT
 sub cmd_vm_list {
     my ($self, @args) = @_;
     _print_header "Id","Name","State","Host" unless $self->{quiet};
+    my %term_map = (
+	name => 'me.name',
+	osi => 'osi.name',
+	user => 'user.login',
+	host => 'host.name',
+	state => 'vm_runtime.vm_state',
+    );
     my $filter = $self->{filter};
-    my %search = ();
-    my $get = sub {
-	my ($src, $dst) = @_;
-	$search{$dst} = delete $filter->{$src} if exists $filter->{$src}
-    };
-    &$get(name => 'me.name');
-    &$get(osi => 'osi.name');
-    &$get(user => 'user.login');
-    &$get(host => 'host.name');
-    &$get(state => 'vm_runtime.vm_state');
-    @search{keys %$filter} = values %$filter;
-    my $rs = $self->{db}->resultset('VM')->search(\%search, {
+    while (my ($src,$dst) = each %term_map) {
+	$filter->{$dst} = delete $filter->{$src} if exists $filter->{$src}
+    }
+    my $rs = $self->{db}->resultset('VM')->search($filter, {
 	    join => ['osi', 'user', { vm_runtime => 'host'}],
 	});
     while (my $vm = $rs->next) {
