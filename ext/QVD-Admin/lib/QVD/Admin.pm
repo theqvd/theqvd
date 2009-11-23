@@ -65,11 +65,11 @@ sub _get_result_set {
 
 sub dispatch_command {
     my ($self, $object, $command, $help, @args) = @_;
-    my $rs = $self->_get_result_set($object);
     $self->die_and_help ("$object: Valid command expected", $object) unless defined $command;
     my $method = $self->can($help ? "help_${object}_${command}" : "cmd_${object}_${command}");
     if (defined $method) {
-	$self->$method($rs, @args);
+	$self->{current_object} = $object;
+	$self->$method(@args);
     } else {
 	$self->die_and_help ("$object: $command not implemented", $object);
     }
@@ -90,10 +90,11 @@ sub _print_header {
 }
 
 sub cmd_host_list {
-    my ($self, $rs, @args) = @_;
+    my ($self, @args) = @_;
     _print_header "Id", "Name", "Address ","HKD", "VMs assigned"
 	    unless $self->{quiet};
 
+    my $rs = $self->_get_result_set($self->{current_object});
     while (my $host = $rs->next) {
 	# FIXME proper formatting
 	my $hkd_ts = defined $host->runtime ? $host->runtime->hkd_ok_ts : undef;
@@ -119,8 +120,9 @@ EOT
 }
 
 sub cmd_user_list {
-    my ($self, $rs, @args) = @_;
+    my ($self, @args) = @_;
     _print_header "Id","Login" unless $self->{quiet};
+    my $rs = $self->_get_result_set($self->{current_object});
     while (my $user = $rs->next) {
 	printf "%s\t%s\n", $user->id, $user->login;
     }
@@ -140,8 +142,9 @@ EOT
 }
 
 sub cmd_vm_list {
-    my ($self, $rs, @args) = @_;
+    my ($self, @args) = @_;
     _print_header "Id","Name","State","Host" unless $self->{quiet};
+    my $rs = $self->_get_result_set($self->{current_object});
     while (my $vm = $rs->next) {
 	my $vm_runtime = $vm->vm_runtime;
 	my $host = $vm_runtime->host;
@@ -176,10 +179,11 @@ sub _set_equals {
 }
 
 sub _obj_add {
-    my ($self, $required_params, $rs, @args) = @_;
+    my ($self, $required_params, @args) = @_;
     my $params = ref $args[0] ? $args[0] : _split_on_equals @args;
     die "Invalid parameters" 
     	unless _set_equals([keys %$params], $required_params);
+    my $rs = $self->_get_result_set($self->{current_object});
     $rs->create($params);
 }
 
@@ -202,7 +206,7 @@ EOT
 }
 
 sub cmd_vm_add {
-    my ($self,$rs,@args) = @_;
+    my ($self,@args) = @_;
     my $params = _split_on_equals @args;
     if (exists $params->{osi}) {
 	my $key = $params->{osi};
@@ -222,7 +226,7 @@ sub cmd_vm_add {
     }
     $params->{storage} = '';
     my $row = $self->_obj_add([qw/name user_id osi_id ip storage/], 
-				$rs, $params);
+				$params);
     $self->{db}->resultset('VM_Runtime')->create({
 	    vm_id => $row->id,
 	    osi_actual_id => $row->osi_id,
@@ -260,7 +264,7 @@ EOT
 }
 
 sub cmd_osi_add {
-    my ($self, $rs, @args) = @_;
+    my ($self, @args) = @_;
     my $params = _split_on_equals @args;
 
     # Default OSI parameters
@@ -282,6 +286,7 @@ sub cmd_osi_add {
     use File::Copy qw/copy/;
     copy($img, $destination) or die "Unable to copy $img to storage: $^E";
 
+    my $rs = $self->_get_result_set($self->{current_object});
     my $row = $rs->create($params);
 
     print "OSI added with id ".$row->id."\n" unless $self->{quiet};
@@ -298,7 +303,7 @@ EOT
 }
 
 sub _obj_del {
-    my ($self, $obj, $rs) = @_;
+    my ($self, $obj) = @_;
     unless ($self->{quiet}) {
 	if (scalar %{$self->{filter}} eq 0) {
 	    print "Are you sure you want to delete all ${obj}s? [y/N] ";
@@ -306,6 +311,7 @@ sub _obj_del {
 	    exit 0 unless $answer =~ /^y/i;
 	}
     }
+    my $rs = $self->_get_result_set($self->{current_object});
     print "Deleting ".$rs->count." ${obj}(s)\n" unless $self->{quiet};
     $rs->delete_all;
 }
@@ -356,8 +362,8 @@ EOT
 }
 
 sub cmd_osi_del {
-    my ($self, $rs, @args) = @_;
-    $self->_obj_del('OSI', $rs);
+    my ($self, @args) = @_;
+    $self->_obj_del('OSI', @args);
     # FIXME Should we delete the actual image file?
 }
 
@@ -373,8 +379,9 @@ EOT
 }
 
 sub _obj_propset {
-    my ($self, $rs, @args) = @_;
+    my ($self, @args) = @_;
     my $params = _split_on_equals @args;
+    my $rs = $self->_get_result_set($self->{current_object});
     # In principle you should be able to avoid looping over the result set using
     # search_related but the PostgreSQL driver doesn't seem to let us
     while (my $obj = $rs->next) {
@@ -439,7 +446,8 @@ EOT
 }
 
 sub _obj_propget {
-    my ($self, $display_cb, $rs, @args) = @_;
+    my ($self, $display_cb, @args) = @_;
+    my $rs = $self->_get_result_set($self->{current_object});
     my $condition = scalar @args > 0 ? {key => [@args]} : {};
     my @props = $rs->search_related('properties', $condition);
     print map { &$display_cb($_)."\t".$_->key.'='.$_->value."\n" } @props;
@@ -497,8 +505,9 @@ EOT
 }
 
 sub cmd_config_set {
-    my ($self, $rs, @args) = @_;
+    my ($self, @args) = @_;
     my $params = _split_on_equals @args;
+    my $rs = $self->_get_result_set($self->{current_object});
     foreach my $key (keys %$params) {
 	$rs->update_or_create({
 		key => $key,
@@ -518,8 +527,9 @@ EOT
 }
 
 sub cmd_config_get {
-    my ($self, $rs, @args) = @_;
+    my ($self, @args) = @_;
     my $condition = scalar @args > 0 ? {key => [@args]} : {};
+    my $rs = $self->_get_result_set($self->{current_object});
     my @configs = $rs->search($condition);
     print map { $_->key.'='.$_->value."\n" } @configs;
 }
@@ -535,7 +545,8 @@ EOT
 }
 
 sub cmd_vm_start {
-    my ($self, $rs, @args) = @_;
+    my ($self, @args) = @_;
+    my $rs = $self->_get_result_set($self->{current_object});
     use QVD::VMAS;
     my $vmas = QVD::VMAS->new($self->{db});
     while (my $vm = $rs->next) {
@@ -570,7 +581,8 @@ EOT
 }
 
 sub cmd_vm_stop {
-    my ($self, $rs, @args) = @_;
+    my ($self, @args) = @_;
+    my $rs = $self->_get_result_set($self->{current_object});
     use QVD::VMAS;
     my $vmas = QVD::VMAS->new($self->{db});
     while (my $vm = $rs->next) {
@@ -598,7 +610,8 @@ EOT
 }
 
 sub cmd_vm_disconnect_user {
-    my ($self, $rs, @args) = @_;
+    my ($self, @args) = @_;
+    my $rs = $self->_get_result_set($self->{current_object});
     use QVD::VMAS;
     my $vmas = QVD::VMAS->new($self->{db});
     while (my $vm = $rs->next) {
@@ -625,7 +638,8 @@ EOT
 
 # FIXME Refactor to remove duplication between ssh and vnc connections
 sub cmd_vm_ssh {
-    my ($self, $rs, @args) = @_;
+    my ($self, @args) = @_;
+    my $rs = $self->_get_result_set($self->{current_object});
     if ($rs->count > 1) {
 	die 'Filter matches more than one VM';
     }
@@ -655,7 +669,8 @@ EOT
 }
 
 sub cmd_vm_vnc {
-    my ($self, $rs, @args) = @_;
+    my ($self, @args) = @_;
+    my $rs = $self->_get_result_set($self->{current_object});
     if ($rs->count > 1) {
 	die 'Filter matches more than one VM';
     }
@@ -686,28 +701,20 @@ EOT
 
 sub die_and_help {
     my ($self, $message, $obj) = @_;
-    
     $message = "Unknown error" unless defined($message);
-    
     my @funcs = do {
 	no strict;
 	grep exists &{"QVD::Admin::$_"}, keys %{"QVD::Admin::"};
     };
     
-    @funcs = grep {s/^cmd_//} @funcs;
-    @funcs = grep {m/^${obj}_/} @funcs if exists $self->{objects}{$obj};
-    @funcs = grep {s/_/ /} @funcs;
-
+    @funcs = grep {s/^cmd_([a-z]+)_(\w+)/$1 $2/} @funcs;
+    @funcs = grep {m/^${obj}/} @funcs if exists $self->{objects}{$obj};
     
     print $message.", available subcommands:\n   ";
-    
     print join "\n   ", sort @funcs;
     print "\n\n";
     
-    
-    
-    
-    exit;
+    exit 1;
 }
 
 1;
