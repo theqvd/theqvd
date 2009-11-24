@@ -123,7 +123,9 @@ __PACKAGE__->add_columns(
 	
 __PACKAGE__->set_primary_key('vm_id');
 
-__PACKAGE__->belongs_to(host => 'QVD::DB::Result::Host', 'host_id');
+__PACKAGE__->belongs_to(host => 'QVD::DB::Result::Host', 'host_id', {
+    join_type => 'LEFT',
+});
 __PACKAGE__->belongs_to('rel_vm_id' => 'QVD::DB::Result::VM', 'vm_id');
 
 __PACKAGE__->belongs_to('rel_x_state' => 'QVD::DB::Result::X_State', 'x_state');
