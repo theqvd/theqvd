@@ -666,19 +666,23 @@ Valid options:
 EOT
 }
 
-# FIXME Refactor to remove duplication between ssh and vnc connections
-sub cmd_vm_ssh {
-    my ($self, @args) = @_;
-    my $rs = $self->_get_result_set($self->{current_object});
+sub _get_single_running_vm_runtime {
+    my $self = shift;
+    my $rs = $self->_get_result_set('vm');
     if ($rs->count > 1) {
 	die 'Filter matches more than one VM';
     }
     my $vm = $rs->single;
     die 'No matching VMs' unless defined $vm;
     my $vm_runtime = $vm->vm_runtime;
-    die 'VM is not running' unless $vm_runtime->vm_state eq 'running';
+    die 'The VM is not running' unless $vm_runtime->vm_state eq 'running';
+}
+
+sub cmd_vm_ssh {
+    my ($self, @args) = @_;
+    my $vm_runtime = $self->_get_single_running_vm_runtime;
     my $ssh_port = $vm_runtime->vm_ssh_port;
-    die 'ssh access is disabled' unless defined $ssh_port;
+    die 'SSH access is disabled' unless defined $ssh_port;
     my @cmd = (ssh => ($vm_runtime->vm_address, -p => $ssh_port, @args));
     exec @cmd;
 }
@@ -700,16 +704,9 @@ EOT
 
 sub cmd_vm_vnc {
     my ($self, @args) = @_;
-    my $rs = $self->_get_result_set($self->{current_object});
-    if ($rs->count > 1) {
-	die 'Filter matches more than one VM';
-    }
-    my $vm = $rs->single;
-    die 'No matching VMs' unless defined $vm;
-    my $vm_runtime = $vm->vm_runtime;
-    die 'VM is not running' unless $vm_runtime->vm_state eq 'running';
+    my $vm_runtime = $self->_get_single_running_vm_runtime;
     my $vnc_port = $vm_runtime->vm_vnc_port;
-    die 'vnc access is disabled' unless defined $vnc_port;
+    die 'VNC access is disabled' unless defined $vnc_port;
     my @cmd = (vncviewer => ($vm_runtime->vm_address.'::'.$vnc_port, @args));
     exec @cmd;
 }
@@ -719,7 +716,7 @@ sub help_vm_vnc {
 vm ssh: Connects to the virtual machine VNC server.
 usage: vm vnc
 
-  To pass aditional parameters to VNC add them to the command line after --
+  To pass aditional parameters to vncviewer add them to the command line after --
   
   Example:
   vm vnc -- --depth 8
