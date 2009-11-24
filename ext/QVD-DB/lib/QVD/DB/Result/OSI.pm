@@ -20,7 +20,11 @@ __PACKAGE__->add_columns(
 	disk_image => {
 	# Valor tomado de la variable PATH_MAX de /usr/src/linux-headers-2.6.28-15/include/linux/limits.h
 	    data_type => 'varchar(4096)'
-	}
+	},
+	data_image => {
+	    data_type => 'varchar(4096)',
+	    is_nullable => 1,
+	},
 	);
 __PACKAGE__->set_primary_key('id');
 __PACKAGE__->add_unique_constraint(['name']);
