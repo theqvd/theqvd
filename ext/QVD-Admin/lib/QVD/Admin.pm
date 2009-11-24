@@ -641,15 +641,18 @@ sub cmd_vm_disconnect_user {
     my $rs = $self->_get_result_set($self->{current_object});
     use QVD::VMAS;
     my $vmas = QVD::VMAS->new($self->{db});
+    my $counter = 0;
     while (my $vm = $rs->next) {
 	my $vm_runtime = $vm->vm_runtime;
 	if ($vm_runtime->user_state eq 'connected') {
-	    print "Disconnecting user on VM ".$vm->id,"\n";
+	    print "Disconnecting user on VM ".$vm->id,"\n" unless $self->{quiet};
 	    $vmas->disconnect_nx($vm_runtime);
+	    $counter++;
 	} else {
-	    print "No user connected on VM ".$vm->id,"\n";
+	    print "No user connected on VM ".$vm->id,"\n" unless $self->{quiet};
 	}
     }
+    print "Disconnected $counter users.\n" unless $self->{quiet};
 }
 
 sub help_vm_disconnect_user{
@@ -658,7 +661,7 @@ vm disconnect_user: Disconnects user.
 usage: vm disconnect_user
       
 Valid options:
-    -f [--filter] FILTER : disconnects user filter by FILTER
+    -f [--filter] FILTER : disconnects users on VMs matched by FILTER
     -q [--quiet]         : don't print the command message
 EOT
 }
