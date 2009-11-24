@@ -23,7 +23,12 @@ sub new {
     my $conn_username = $cdb->{username};
     my $conn_password = $cdb->{password};
     $class->SUPER::connect($conn_data_source, $conn_username, $conn_password,
-				  { RaiseError => 1, AutoCommit => 1 });
+				{
+				    RaiseError => 1,
+				    AutoCommit => 1,
+				    quote_char => '"',
+				    name_sep   => '.',
+				});
 }
 
 sub erase {
