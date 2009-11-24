@@ -13,7 +13,10 @@ __PACKAGE__->add_columns(
 	},
 	address => {
 	    data_type => 'varchar(127)',
-	}
+	},
+	maintenance => {
+	    data_type => 'integer',
+	},
 	);
 __PACKAGE__->set_primary_key('id');
 __PACKAGE__->has_many(properties => 'QVD::DB::Result::Host_Property', 
