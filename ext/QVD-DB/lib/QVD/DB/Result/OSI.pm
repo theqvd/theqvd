@@ -14,6 +14,10 @@ __PACKAGE__->add_columns(
 	memory => {
 	    data_type => 'integer',
 	},
+	user_storage_size => {
+	    data_type => 'integer',
+	    is_nullable => 1,
+	},
 	use_overlay => {
 	    data_type => 'boolean'
 	},
