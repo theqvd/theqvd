@@ -298,30 +298,20 @@ sub cmd_osi_add {
     # FIXME Detect type of image and set use_overlay accordingly, iso=no overlay
     $params->{memory} //= 256;
     $params->{use_overlay} //= 1;
-    $params->{data_image} //= undef;
+    
+    use File::Basename qw/basename/;
+    my $img = $params->{disk_image};
+    $params->{disk_image} = basename($img);
 
     die "Invalid parameters" unless _set_equals([keys %$params],
-	[qw/name memory use_overlay disk_image data_image/]);
+	[qw/name memory use_overlay disk_image/]);
 
     # Copy image to ro-directory
-    # FIXME Overwriting existing image files should be an error.
-    #  * Maybe osis should be able to share images? 
-    #  * What if you have uploaded an image file that has an error and want to
-    #  upload the new version with the same name?
-    #
-    # FIXME Is image management important enough to warrant a (sub)module?
+    # FIXME Overwriting existing image should be an error
+    die "disk_image is not optional" unless defined $params->{disk_image};
     my $destination = QVD::Config->get('ro_storage_path');
-    use File::Basename qw/basename/;
     use File::Copy qw/copy/;
-    copy($params->{disk_image}, $destination) 
-	or die "Unable to copy ".$params->{disk_image}." to storage: $^E";
-    $params->{disk_image} = basename($params->{disk_image};
-
-    if (defined $params->{data_image}) {
-	copy($params->{data_image}, $destination) 
-	    or die "Unable to copy ".$params->{data_image}." to storage: $^E";
-	$params->{data_image} = basename($params->{data_image});
-    }
+    copy($img, $destination) or die "Unable to copy $img to storage: $^E";
 
     my $rs = $self->_get_result_set($self->{current_object});
     my $row = $rs->create($params);
@@ -333,8 +323,7 @@ sub help_osi_add {
     print <<EOT
 osi add: Adds operating systems images.
 usage: osi add name=value memory=value use_overlay=value disk_image=value
-		[data_image=value]
-
+       
 Valid options:
     -q [--quiet]         : don't print the command message
 EOT
