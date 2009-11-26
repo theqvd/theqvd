@@ -676,6 +676,7 @@ sub _get_single_running_vm_runtime {
     die 'No matching VMs' unless defined $vm;
     my $vm_runtime = $vm->vm_runtime;
     die 'The VM is not running' unless $vm_runtime->vm_state eq 'running';
+    $vm_runtime
 }
 
 sub cmd_vm_ssh {
