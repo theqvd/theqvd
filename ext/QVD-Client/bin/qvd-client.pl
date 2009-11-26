@@ -8,6 +8,8 @@ use QVD::HTTP::StatusCodes qw(:status_codes);
 use IO::Socket::Forwarder qw(forward_sockets);
 use MIME::Base64 qw(encode_base64);
 
+# $IO::Socket::Forwarder::debug = 1;
+
 # Forces a flush
 $| = 1;
 
@@ -34,7 +36,9 @@ while (1) {
 				       Listen => 1);
 
 	system "nxproxy -S localhost:40 &";
-	my $s1 = $ll->accept();
+	my $s1 = $ll->accept()
+	    or die "connection from nxproxy failed";
+	undef $ll; # close the listening socket
 	my $s2 = $httpc->get_socket;
 	forward_sockets($s1, $s2);
 	last;
