@@ -107,7 +107,7 @@ sub cmd_host_list {
 
 sub help_host_list {
     print <<EOT
-host list: Returns a list with the virtual machines.
+host list: list the hosts registered on the platform
 usage: host list
     
   Lists consists of Id, Name, Address, HKD and VMs assigned, separated by tabs.
@@ -287,6 +287,33 @@ usage: user add login=value password=value
        
 Valid options:
     -q [--quiet]         : don't print the command message
+EOT
+}
+
+sub cmd_osi_list {
+    my ($self, @args) = @_;
+    _print_header qw(Id Name RAM UserHD Image)
+	unless $self->{quiet};
+    my $rs = $self->_get_result_set($self->{current_object});
+    while (my $osi = $rs->next) {
+	print(join("\t",
+		   map { defined($_) ? $_ : '-' }
+		   map { $osi->$_ } qw(id name memory user_storage_size disk_image)),
+	      "\n");
+    }
+}
+
+sub help_osi_list {
+    print <<EOT;
+osi list: list the Operative System Images (OSI) configured.
+usage: osi list
+
+  Lists consists of Id, Name, RAM size, Home partition size and image
+  file name separated by tabs.
+
+Valid options:
+    -f [--filter] FILTER : list only OSIs matched by FILTER
+    -q [--quiet]         : don't print the header
 EOT
 }
 
