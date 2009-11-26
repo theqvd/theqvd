@@ -226,6 +226,17 @@ sub _get_image_for_vm {
     $disk_image
 }
 
+sub _get_user_storage_for_vm {
+    my ($self, $vm) = @_;
+    my $osi = $vm->rel_vm_id->osi;
+    my $disk_image = undef;
+    if (defined $osi->user_storage_size) {
+	my $home = QVD::Config->get('home_storage_path');
+	$disk_image = $home.'/'.$vm->vm_id.'-data.qcow2';
+    }
+    $disk_image
+}
+
 sub _ensure_image_exists {
     my ($self, $vm) = @_;
     my $osi = $vm->rel_vm_id->osi;
@@ -252,6 +263,22 @@ sub _ensure_image_exists {
     -f $disk_image
 }
 
+sub _ensure_user_storage_exists {
+    my ($self, $vm) = @_;
+    my $osi = $vm->rel_vm_id->osi;
+    my $dir = QVD::Config->get('home_storage_path');
+    my $img_cmd = QVD::Config->get('kvm_img_command', 'kvm-img');
+    my $disk_image = $self->_get_user_storage_for_vm($vm);
+    return 1 if -f $disk_image;
+    my @cmd = ($img_cmd => ('create', 
+			    '-f' => 'qcow2',
+			    $disk_image,
+			    $osi->user_storage_size.'M'));
+    system(@cmd) == 0 or die "Unable to create image $disk_image for user data";
+    INFO "Created overlay image $disk_image for VM ".$vm->vm_id;
+}
+
+
 sub start_vm {
     my ($self, $vm) = @_;
 
@@ -264,9 +291,16 @@ sub start_vm {
     my $id = $vm->vm_id;
     my $osi = $vm->rel_vm_id->osi;
     my $disk_image = $self->_get_image_for_vm($vm);
-    DEBUG "Using disk $disk_image for VM ".$id;
     $self->_ensure_image_exists($vm) 
     	or die "Disk image $disk_image doesn't exist";
+    DEBUG "Using disk $disk_image for VM ".$id;
+
+    my $user_storage = $self->_get_user_storage_for_vm($vm);
+    if (defined $user_storage) {
+	$self->_ensure_user_storage_exists($vm)
+	    or die "Disk image $user_storage doesn't exist";
+	DEBUG "Using user storage $user_storage for VM ".$id;
+    }
     my $vma_port = $vm->vm_vma_port;
     my $x_port = $vm->vm_x_port;
     my $ssh_port = $vm->vm_ssh_port;
@@ -277,9 +311,9 @@ sub start_vm {
 		       -redir => "tcp:${vma_port}::3030",
                        -redir => "tcp:${ssh_port}::22",
                        -hda => $disk_image,
-		       (-e $vm->rel_vm_id->storage
-			? (-hdb => $home_base.'/'.$vm->rel_vm_id->storage)
-			: ())));
+		       (-e $user_storage
+			   ? (-hdb => $user_storage)
+			   : ())));
 
     my $pid = fork;
     if (!$pid) {

@@ -298,13 +298,14 @@ sub cmd_osi_add {
     # FIXME Detect type of image and set use_overlay accordingly, iso=no overlay
     $params->{memory} //= 256;
     $params->{use_overlay} //= 1;
+    $params->{user_storage_size} //= undef;
     
     use File::Basename qw/basename/;
     my $img = $params->{disk_image};
     $params->{disk_image} = basename($img);
 
     die "Invalid parameters" unless _set_equals([keys %$params],
-	[qw/name memory use_overlay disk_image/]);
+	[qw/name memory use_overlay user_storage_size disk_image/]);
 
     # Copy image to ro-directory
     # FIXME Overwriting existing image should be an error
