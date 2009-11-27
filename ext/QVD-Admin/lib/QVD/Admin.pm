@@ -170,8 +170,6 @@ sub cmd_vm_list {
     my $rs = $self->_get_result_set('vm');
     while (my $vm = $rs->next) {
 	my $vmr = $vm->vm_runtime;
-	my $host = $vm_runtime->host;
-	my $host_name = defined $host ? $host->name : '-';
 	print(join("\t",
 		   map { defined $_ ? $_ : '-' } ( $vm->id,
 						   $vm->name,
