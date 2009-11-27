@@ -166,14 +166,20 @@ sub get_result_set_for_vm {
 
 sub cmd_vm_list {
     my ($self, @args) = @_;
-    _print_header "Id","Name","State","Host" unless $self->{quiet};
+    _print_header "Id","Name","User","Host","State","UserState" unless $self->{quiet};
     my $rs = $self->_get_result_set('vm');
     while (my $vm = $rs->next) {
-	my $vm_runtime = $vm->vm_runtime;
+	my $vmr = $vm->vm_runtime;
 	my $host = $vm_runtime->host;
 	my $host_name = defined $host ? $host->name : '-';
-	print join "\t", $vm->id, $vm->name, $vm_runtime->vm_state, $host_name;
-	print "\n";
+	print(join("\t",
+		   map { defined $_ ? $_ : '-' } ( $vm->id,
+						   $vm->name,
+						   $vm->user->login,
+						   $vmr->host->name,
+						   $vmr->vm_state,
+						   $vmr->user_state )),
+	      "\n");
     }
 }
 
