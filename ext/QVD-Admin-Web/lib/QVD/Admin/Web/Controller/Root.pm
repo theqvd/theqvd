@@ -38,6 +38,7 @@ sub propget :Local {
     # Should be a result of propget, and not implemented here
     # TODO
     my $admin = $c->model('QVD::Admin::Web')->admin;
+    $admin->reset_filter();
     my $rs = $admin->_get_result_set('user');
     my @props = $rs->search_related('properties', {});
     my @var = map { { login => $_->user->login, key => $_->key, value => $_->value } } @props;
@@ -74,6 +75,7 @@ sub propsetButton :Local {
     $admin->set_filter("login=$login");
     $admin->{current_object} = 'user';
     $admin->cmd_user_propset("$key=$value");
+    $admin->reset_filter();
 }
 
 
