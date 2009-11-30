@@ -1,0 +1,6 @@
+<h1>Bienvenido a QVD-Admin-Web</h1>
+<ul>
+    <li><a href="propget">User Propget</a></li>
+    <li><a href="propset">Add property</a></li>
+    <li><a href="about">About</a></li>
+</ul>

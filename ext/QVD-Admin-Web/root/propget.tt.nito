@@ -1,0 +1,11 @@
+<h1>propget</h1>
+<table>
+<tr><th>login</th><th>key</th><th>value</th></tr>
+[% FOREACH p IN propgetvar %]
+<tr>
+<td>[% p.login %]</td>
+<td>[% p.key %]</td>
+<td>[% p.value %]</td>
+</tr>
+[% END %]
+</table>

@@ -1,0 +1,4 @@
+<h1>Acerca de...</h1>
+<p>
+Quality Virtual Desktop Web Admin Tool version [% data.version %]
+</p>

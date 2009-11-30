@@ -1,0 +1,137 @@
+body {
+	font-family: sans-serif;
+	background: #eee;
+	color: #333;
+	font-size: 11px;
+	padding: 20px 0 40px;
+}
+
+a {
+	color: #ff8d13;
+	text-decoration: none;
+	font-weight: bold;
+}
+
+a:hover {
+	text-decoration: underline;
+}
+
+
+p {
+	/* Use this line ON or OFF as grid guide 
+	background-color: lime;*/
+	overflow: hidden;
+	padding: 10px 0;
+	
+}
+
+.response_error {
+	border-color: #8C0000;
+	border-width: 1px;
+	border-style: solid;
+	margin-right: 20px;
+	color: #8C0000;
+	padding: 5px 5px 5px 25px;
+	font-weight: bold;
+	background-color: #FFBDBD;
+	background-image: url(../images/icons/cross.png);
+	background-repeat: no-repeat;
+	background-position: 5px 5px;
+}
+
+.response_warning {
+	border-color: black;
+	border-width: 1px;
+	border-style: solid;
+	margin-right: 20px;
+	color: black;
+	padding: 5px 5px 5px 25px;
+	font-weight: bold;
+	background-color: #F3F317;
+	background-image: url(../images/icons/error.png);
+	background-repeat: no-repeat;
+	background-position: 5px 5px;
+}
+
+.response_info {
+	border-color: #224;
+	border-width: 1px;
+	border-style: solid;
+	margin-right: 20px;
+	color: #224;
+	padding: 5px 5px 5px 25px;
+	font-weight: bold;
+	background-color: #D3DEFF;
+	background-image: url(../images/icons/information.png);
+	background-repeat: no-repeat;
+	background-position: 5px 5px;
+}
+
+.response_success {
+	border-color: green;
+	border-width: 1px;
+	border-style: solid;
+	margin-right: 20px;
+	color: green;
+	padding: 5px 5px 5px 25px;
+	font-weight: bold;
+	background-color: #AAFFAA;
+	background-image: url(../images/icons/tick.png);
+	background-repeat: no-repeat;
+	background-position: 5px 5px;
+}
+
+#header {
+	height: 20px;
+	background: #eee url(../images/header.gif) no-repeat;
+}
+
+#content {
+	background: #eee url(../images/content.gif) repeat-y;
+	padding: 0;
+	margin: 0;
+}
+
+#bottom {
+	background: #eee url(../images/bottom.gif) no-repeat;
+	padding: 10px 0;
+}
+
+#footer {
+	font-size: 11px;
+	color: #999;
+	text-align: center;
+	background: #eee;
+	
+}
+
+.container_12 {
+	background: #fff url(../../img/12_col.gif) repeat-y;
+	margin-bottom: 20px;
+}
+
+.container_16 {
+	background: #fff url(../../img/16_col.gif) repeat-y;
+}
+
+.container_24 {
+	background: #fff url(../../img/24_col.gif) repeat-y;
+}
+
+#login-box {
+	margin-top: 60px;
+}
+
+#top-logo {
+	text-align: center;
+}
+
+#top-menu p {
+	text-align: right;
+	padding-top: 0;
+	padding-right: 10px;
+}
+
+#menu ul {
+	border-right: solid #999 1px;
+}

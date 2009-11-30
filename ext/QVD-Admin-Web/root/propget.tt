@@ -1,0 +1,35 @@
+
+
+
+[% META title = 'PropGet' -%]
+<table id="props" class="sortable resizable editable">
+    <thead>
+        <tr>
+            <th id="login" class="sortfirstasc noedit">Login</th>
+            <th id="key">Key</th>
+            <th id="value">Value</th>
+        </tr>
+    </thead>
+    <tfoot>
+        <tr>
+            <th>Login</th>
+            <th>Key</th>
+            <th>Value</th>
+        </tr>
+    </tfoot>
+    <tbody>
+        [% FOREACH p IN propgetvar -%]
+        <tr id="[% p.login %]">
+            <td>[% p.login %]</td>
+            <td>[% p.key %]</td>
+            <td>[% p.value %]</td>
+        </tr>
+        [% END -%]
+    </tbody>
+</table>
+
+<script type="text/javascript" charset="utf-8">
+    var comments_table = new TableKit( 'props', {
+        editAjaxURI: '[% update_uri %]'
+    });
+</script>

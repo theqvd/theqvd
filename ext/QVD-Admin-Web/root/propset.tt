@@ -1,0 +1,32 @@
+<h1>propset</h1>
+<form name="propset" action="propsetButton" method="post">
+  <div>
+    <table>
+      <tr>
+	<td>
+	  <label>username:</label>
+	</td>
+	<td>
+	  <input type="text" name="login" id="login"/>
+	</td>
+      </tr>
+      <tr>
+	<td>
+	  <label>property:</label>
+	</td>
+	<td>
+	  <input type="text" name="key" id="key"/>
+	</td>
+      </tr>
+      <tr>
+	<td>
+	  <label>value:</label>
+	</td>
+	<td>
+	  <input type="text" name="value" id="value"/>
+	</td>
+      </tr>
+    </table>
+    <input type="submit" value="add" />
+  </div>
+</form>

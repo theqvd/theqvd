@@ -14,7 +14,8 @@ use Catalyst::Runtime 5.70;
 #                 directory
 
 use parent qw/Catalyst/;
-use Catalyst qw/ConfigLoader
+use Catalyst qw/-Debug
+                ConfigLoader
                 Static::Simple
                 StackTrace
                 Unicode

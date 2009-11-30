@@ -3,7 +3,6 @@ package QVD::Admin::Web::Controller::Root;
 use strict;
 use warnings;
 use parent 'Catalyst::Controller';
-use Data::Dumper;
 
 #
 # Sets the actions in this controller to be registered with no prefix
@@ -36,14 +35,29 @@ sub about :Local {
 
 sub propget :Local {
     my ( $self, $c ) = @_;
-
-    my $db = $c->model('QVD::Admin::Web')->db;
-    my $rs = $db->resultset('User');
+    # Should be a result of propget, and not implemented here
+    # TODO
+    my $admin = $c->model('QVD::Admin::Web')->admin;
+    my $rs = $admin->_get_result_set('user');
     my @props = $rs->search_related('properties', {});
     my @var = map { { login => $_->user->login, key => $_->key, value => $_->value } } @props;
-
     $c->stash->{propgetvar} = \@var;
+    $c->stash->{update_uri} = $c->uri_for('/_update_propget');
 }
+
+
+sub _update_propget : Local {
+    my ($self, $c) = @_;
+ 
+    $c->model('QVD::Admin::Web')
+      ->find({ login => $c->req->params->{login} })
+      ->update({
+        $c->req->params->{field} => $c->req->params->{value}
+      });
+ 
+    $c->res->body( $c->req->params->{value} );
+}
+
 
 sub propset :Local {
     my ( $self, $c ) = @_;
@@ -51,7 +65,8 @@ sub propset :Local {
 
 sub propsetButton :Local {
     my ( $self, $c ) = @_;
-
+    # Should be a result of propget, and not implemented here
+    # TODO
     my $admin = $c->model('QVD::Admin::Web')->admin;
     my $login = $c->req->body_params->{login}; # only for a POST request
     my $key = $c->req->body_params->{key};
