@@ -30,6 +30,6 @@
 
 <script type="text/javascript" charset="utf-8">
     var comments_table = new TableKit( 'props', {
-        editAjaxURI: '[% update_uri %]'
+        editable: false
     });
 </script>
