@@ -4,7 +4,7 @@ use strict;
 use warnings;
 
 use Getopt::Long;
-use QVD::Admin;
+use QVD::AdminCLI;
 
 my $filter = '';
 my $quiet = '';
@@ -15,6 +15,6 @@ my $object = shift @ARGV;
 my $command = shift @ARGV;
 my @args = @ARGV;
 
-my $admin = QVD::Admin->new($quiet);
+my $admin = QVD::AdminCLI->new($quiet);
 $admin->set_filter($filter) if $filter;
 $admin->dispatch_command($object, $command, $help, @args);
