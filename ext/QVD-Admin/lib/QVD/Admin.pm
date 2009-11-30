@@ -99,10 +99,8 @@ sub _obj_add {
     my ($self, $required_params, @args) = @_;
     my $params = ref $args[0] ? $args[0] : _split_on_equals @args;
     unless (_set_equals([keys %$params], $required_params)) {
-	print "The required parameters are: ",
-	    join(", ", @$required_params),
-	    "\n";
-	exit 1;
+	die "The required parameters are: ",
+	    join(", ", @$required_params);
     }
     my $rs = $self->_get_result_set($self->{current_object});
     $rs->create($params);
@@ -113,7 +111,7 @@ sub cmd_host_add {
     my $row = $self->_obj_add([qw/name address/], @_);
     $self->{db}->resultset('Host_Runtime')
 			    ->create({host_id => $row->id});
-    print "Host added with id ".$row->id."\n" unless $self->{quiet};
+    $row->id
 }
 
 sub cmd_vm_add {
@@ -182,7 +180,7 @@ sub cmd_osi_add {
     my $rs = $self->_get_result_set($self->{current_object});
     my $row = $rs->create($params);
 
-    print "OSI added with id ".$row->id."\n" unless $self->{quiet};
+    $row->id;
 }
 
 sub _obj_del {
@@ -274,50 +272,40 @@ sub cmd_config_get {
     my $condition = scalar @args > 0 ? {key => [@args]} : {};
     my $rs = $self->_get_result_set($self->{current_object});
     my @configs = $rs->search($condition);
-    print map { $_->key.'='.$_->value."\n" } @configs;
+    return \@configs;
 }
 
 sub cmd_vm_start {
     my ($self, @args) = @_;
     my $rs = $self->_get_result_set($self->{current_object});
+    my $counter = 0;
     use QVD::VMAS;
     my $vmas = QVD::VMAS->new($self->{db});
     while (my $vm = $rs->next) {
 	my $vm_runtime = $vm->vm_runtime;
 	if ($vm_runtime->vm_state eq 'stopped') {
-	    unless ($vmas->assign_host_for_vm($vm_runtime)) {
-		print "Unable to assign VM ".$vm->id." to a host\n";
-		next;
-	    }
-	    unless ($vmas->schedule_start_vm($vm_runtime)) {
-		print "Unable to start VM ".$vm->id." on host "
-			.$vm_runtime->host->name."\n";
-		next;
-	    }
-	    print "Scheduled the start of VM ".$vm->id." on host ".
-		$vm_runtime->host->name."\n" unless $self->{quiet};
-	} else {
-	    print "VM ".$vm->id." is not in the 'stopped' state\n" unless $self->{quiet};
+	    next unless $vmas->assign_host_for_vm($vm_runtime);
+	    next unless $vmas->schedule_start_vm($vm_runtime);
+	    $counter++;
 	}
     }
+    $counter
 }
 
 sub cmd_vm_stop {
     my ($self, @args) = @_;
     my $rs = $self->_get_result_set($self->{current_object});
+    my $counter = 0;
     use QVD::VMAS;
     my $vmas = QVD::VMAS->new($self->{db});
     while (my $vm = $rs->next) {
 	my $vm_runtime = $vm->vm_runtime;
 	if ($vm_runtime->vm_state eq 'running') {
 	    $vmas->schedule_stop_vm($vm_runtime);
-	    print "Scheduled the stop of VM ".$vm->id." on host ".
-		$vm_runtime->host->name."\n" unless $self->{quiet};
-	} else {
-	    print "VM ".$vm->id." is not in the 'running' state\n"
-		unless $self->{quiet};
+	    $counter++;
 	}
     }
+    $counter
 }
 
 sub cmd_vm_disconnect_user {
@@ -329,14 +317,11 @@ sub cmd_vm_disconnect_user {
     while (my $vm = $rs->next) {
 	my $vm_runtime = $vm->vm_runtime;
 	if ($vm_runtime->user_state eq 'connected') {
-	    print "Disconnecting user on VM ".$vm->id,"\n" unless $self->{quiet};
 	    $vmas->disconnect_nx($vm_runtime);
 	    $counter++;
-	} else {
-	    print "No user connected on VM ".$vm->id,"\n" unless $self->{quiet};
 	}
     }
-    print "Disconnected $counter users.\n" unless $self->{quiet};
+    $counter
 }
 
 sub _get_single_running_vm_runtime {

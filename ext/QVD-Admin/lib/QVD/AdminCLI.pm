@@ -109,12 +109,12 @@ sub cmd_vm_list {
     while (my $vm = $rs->next) {
 	my $vmr = $vm->vm_runtime;
 	print(join("\t",
-		   map { defined $_ ? $_ : '-' } ( $vm->id,
-						   $vm->name,
-						   $vm->user->login,
-						   defined $vmr->host ? $vmr->host->name : undef,
-						   $vmr->vm_state,
-						   $vmr->user_state )),
+		   map { $_ // '-' } ( $vm->id,
+				       $vm->name,
+				       $vm->user->login,
+				       defined $vmr->host ? $vmr->host->name : undef,
+				       $vmr->vm_state,
+				       $vmr->user_state )),
 	      "\n");
     }
 }
@@ -426,7 +426,8 @@ EOT
 }
 
 sub cmd_config_get {
-    shift->{admin}->cmd_config_get(@_)
+    my $configs = shift->{admin}->cmd_config_get(@_);
+    print map { $_->key.'='.$_->value."\n" } @$configs;
 }
 
 sub help_config_get {
@@ -441,7 +442,9 @@ EOT
 
 
 sub cmd_vm_start {
-    shift->{admin}->cmd_vm_start(@_)
+    my ($self, @args) = @_;
+    my $count = $self->{admin}->cmd_vm_start();
+    $self->_print("Started ".$count." VMs.");
 }
 
 sub help_vm_start {
@@ -456,7 +459,9 @@ EOT
 }
 
 sub cmd_vm_stop {
-    shift->{admin}->cmd_vm_stop(@_)
+    my ($self, @args) = @_;
+    my $count = $self->{admin}->cmd_vm_stop();
+    $self->_print("Stopped ".$count." VMs.");
 }
 
 sub help_vm_stop {
@@ -471,7 +476,9 @@ EOT
 }
 
 sub cmd_vm_disconnect_user {
-    shift->{admin}->cmd_vm_disconnect_user(@_)
+    my ($self, @args) = @_;
+    my $count = $self->{admin}->cmd_vm_disconnect_user();
+    $self->_print("Disconnected ".$count." users.");
 }
 
 sub help_vm_disconnect_user{
