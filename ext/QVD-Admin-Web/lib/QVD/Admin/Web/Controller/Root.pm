@@ -39,7 +39,7 @@ sub propget :Local {
     # TODO
     my $admin = $c->model('QVD::Admin::Web')->admin;
     $admin->reset_filter();
-    my $rs = $admin->_get_result_set('user');
+    my $rs = $admin->get_resultset('user');
     my @props = $rs->search_related('properties', {});
     my @var = map { { login => $_->user->login, key => $_->key, value => $_->value } } @props;
     $c->stash->{propgetvar} = \@var;
