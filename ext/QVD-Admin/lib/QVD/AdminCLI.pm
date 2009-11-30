@@ -19,8 +19,8 @@ sub set_filter {
     $self->{admin}->set_filter($filter_string);
 }
 
-sub _get_result_set {
-    shift->{admin}->_get_result_set(@_);
+sub get_resultset {
+    shift->{admin}->get_resultset(@_);
 }
 
 sub dispatch_command {
@@ -55,7 +55,7 @@ sub cmd_host_list {
     _print_header "Id", "Name", "Address ","HKD", "VMs assigned"
 	    unless $self->{quiet};
 
-    my $rs = $self->_get_result_set('host');
+    my $rs = $self->get_resultset('host');
     while (my $host = $rs->next) {
 	# FIXME proper formatting
 	my $hkd_ts = defined $host->runtime ? $host->runtime->hkd_ok_ts : undef;
@@ -83,7 +83,7 @@ EOT
 sub cmd_user_list {
     my ($self, @args) = @_;
     _print_header "Id","Login" unless $self->{quiet};
-    my $rs = $self->_get_result_set('user');
+    my $rs = $self->get_resultset('user');
     while (my $user = $rs->next) {
 	printf "%s\t%s\n", $user->id, $user->login;
     }
@@ -105,7 +105,7 @@ EOT
 sub cmd_vm_list {
     my ($self, @args) = @_;
     _print_header "Id","Name","User","Host","State","UserState" unless $self->{quiet};
-    my $rs = $self->_get_result_set('vm');
+    my $rs = $self->get_resultset('vm');
     while (my $vm = $rs->next) {
 	my $vmr = $vm->vm_runtime;
 	print(join("\t",
@@ -189,7 +189,7 @@ sub cmd_osi_list {
     my ($self, @args) = @_;
     _print_header qw(Id Name RAM UserHD Image)
 	unless $self->{quiet};
-    my $rs = $self->_get_result_set('osi');
+    my $rs = $self->get_resultset('osi');
     while (my $osi = $rs->next) {
 	print(join("\t",
 		   map { defined($_) ? $_ : '-' }
@@ -237,7 +237,7 @@ sub _obj_del {
 	    exit 0 unless $answer =~ /^y/i;
 	}
     }
-    my $count = $self->_get_result_set($obj)->count();
+    my $count = $self->get_resultset($obj)->count();
     $self->_print("Deleting ".$count." ${obj}(s)");
     $self->{admin}->_obj_del;
 }

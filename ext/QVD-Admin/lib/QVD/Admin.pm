@@ -44,7 +44,11 @@ sub set_filter {
     }
 }
 
-sub _get_result_set {
+sub reset_filter {
+    shift->{filter} = {}
+}
+
+sub get_resultset {
     my ($self, $obj) = @_;
     my $db_object = $self->{objects}{$obj};
     if (!defined $db_object) {
@@ -102,7 +106,7 @@ sub _obj_add {
 	die "The required parameters are: ",
 	    join(", ", @$required_params);
     }
-    my $rs = $self->_get_result_set($self->{current_object});
+    my $rs = $self->get_resultset($self->{current_object});
     $rs->create($params);
 }
 
@@ -177,7 +181,7 @@ sub cmd_osi_add {
     use File::Copy qw/copy/;
     copy($img, $destination) or die "Unable to copy $img to storage: $^E";
 
-    my $rs = $self->_get_result_set($self->{current_object});
+    my $rs = $self->get_resultset($self->{current_object});
     my $row = $rs->create($params);
 
     $row->id;
@@ -185,7 +189,7 @@ sub cmd_osi_add {
 
 sub _obj_del {
     my ($self, $obj) = @_;
-    my $rs = $self->_get_result_set($self->{current_object});
+    my $rs = $self->get_resultset($self->{current_object});
     $rs->delete_all;
 }
 
@@ -210,7 +214,7 @@ sub cmd_osi_del {
 sub _obj_propset {
     my ($self, @args) = @_;
     my $params = _split_on_equals @args;
-    my $rs = $self->_get_result_set($self->{current_object});
+    my $rs = $self->get_resultset($self->{current_object});
     # In principle you should be able to avoid looping over the result set using
     # search_related but the PostgreSQL driver doesn't seem to let us
     while (my $obj = $rs->next) {
@@ -237,7 +241,7 @@ sub cmd_vm_propset {
 
 sub _obj_propget {
     my ($self, @args) = @_;
-    my $rs = $self->_get_result_set($self->{current_object});
+    my $rs = $self->get_resultset($self->{current_object});
     my $condition = scalar @args > 0 ? {key => [@args]} : {};
     my @props = $rs->search_related('properties', $condition);
     return \@props;
@@ -258,7 +262,7 @@ sub cmd_vm_propget {
 sub cmd_config_set {
     my ($self, @args) = @_;
     my $params = _split_on_equals @args;
-    my $rs = $self->_get_result_set($self->{current_object});
+    my $rs = $self->get_resultset($self->{current_object});
     foreach my $key (keys %$params) {
 	$rs->update_or_create({
 		key => $key,
@@ -270,14 +274,14 @@ sub cmd_config_set {
 sub cmd_config_get {
     my ($self, @args) = @_;
     my $condition = scalar @args > 0 ? {key => [@args]} : {};
-    my $rs = $self->_get_result_set($self->{current_object});
+    my $rs = $self->get_resultset($self->{current_object});
     my @configs = $rs->search($condition);
     return \@configs;
 }
 
 sub cmd_vm_start {
     my ($self, @args) = @_;
-    my $rs = $self->_get_result_set($self->{current_object});
+    my $rs = $self->get_resultset($self->{current_object});
     my $counter = 0;
     use QVD::VMAS;
     my $vmas = QVD::VMAS->new($self->{db});
@@ -294,7 +298,7 @@ sub cmd_vm_start {
 
 sub cmd_vm_stop {
     my ($self, @args) = @_;
-    my $rs = $self->_get_result_set($self->{current_object});
+    my $rs = $self->get_resultset($self->{current_object});
     my $counter = 0;
     use QVD::VMAS;
     my $vmas = QVD::VMAS->new($self->{db});
@@ -310,7 +314,7 @@ sub cmd_vm_stop {
 
 sub cmd_vm_disconnect_user {
     my ($self, @args) = @_;
-    my $rs = $self->_get_result_set($self->{current_object});
+    my $rs = $self->get_resultset($self->{current_object});
     use QVD::VMAS;
     my $vmas = QVD::VMAS->new($self->{db});
     my $counter = 0;
@@ -326,7 +330,7 @@ sub cmd_vm_disconnect_user {
 
 sub _get_single_running_vm_runtime {
     my $self = shift;
-    my $rs = $self->_get_result_set('vm');
+    my $rs = $self->get_resultset('vm');
     if ($rs->count > 1) {
 	die 'Filter matches more than one VM';
     }
