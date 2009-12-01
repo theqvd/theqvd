@@ -88,6 +88,7 @@ p {
 
 #content {
 	background: #eee url(../images/content.gif) repeat-y;
+	min-height: 700px;
 	padding: 0;
 	margin: 0;
 }
