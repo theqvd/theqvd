@@ -14,6 +14,10 @@ sub new {
     bless $self, $class;
 }
 
+sub _split_on_equals {
+    map { my @a = split /=/, $_, 2; $a[0] => $a[1] } @_;
+}
+
 sub set_filter {
     my ($self, $filter_string) = @_;
     $self->{admin}->set_filter($filter_string);
@@ -139,7 +143,8 @@ sub _print {
 
 sub cmd_host_add {
     my $self = shift;
-    my $id = $self->{admin}->cmd_host_add(@_);
+    my %args = _split_on_equals(@_);
+    my $id = $self->{admin}->cmd_host_add(%args);
     $self->_print("Host added with id ".$id);
 }
 
@@ -155,7 +160,8 @@ EOT
 
 sub cmd_vm_add {
     my $self = shift;
-    my $id = $self->{admin}->cmd_vm_add(@_);
+    my %args = _split_on_equals(@_);
+    my $id = $self->{admin}->cmd_vm_add(%args);
     $self->_print( "VM added with id ".$id);
 }
 
@@ -171,7 +177,8 @@ EOT
 
 sub cmd_user_add {
     my $self = shift;
-    my $id = $self->{admin}->cmd_user_add(@_);
+    my %args = _split_on_equals(@_);
+    my $id = $self->{admin}->cmd_user_add(%args);
     $self->_print( "User added with id ".$id);
 }
 
@@ -214,7 +221,8 @@ EOT
 
 sub cmd_osi_add {
     my $self = shift;
-    my $id = $self->{admin}->cmd_osi_add(@_);
+    my %args = _split_on_equals(@_);
+    my $id = $self->{admin}->cmd_osi_add(%args);
     $self->_print( "OSI added with id ".$id);
 }
 
@@ -239,7 +247,7 @@ sub _obj_del {
     }
     my $count = $self->get_resultset($obj)->count();
     $self->_print("Deleting ".$count." ${obj}(s)");
-    $self->{admin}->_obj_del;
+    $self->{admin}->_obj_del($obj);
 }
 
 sub cmd_host_del {
@@ -289,7 +297,7 @@ EOT
 
 sub cmd_osi_del {
     my ($self, @args) = @_;
-    $self->_obj_del('OSI', @args);
+    $self->_obj_del('osi', @args);
 }
 
 sub help_osi_del {
@@ -304,7 +312,7 @@ EOT
 }
 
 sub cmd_host_propset {
-    shift->{admin}->cmd_host_propset(@_)
+    shift->{admin}->cmd_host_propset(_split_on_equals @_)
 }
 
 sub help_host_propset {
@@ -321,7 +329,7 @@ EOT
 }
 
 sub cmd_user_propset {
-    shift->{admin}->cmd_user_propset(@_)
+    shift->{admin}->cmd_user_propset(_split_on_equals @_)
 }
 
 sub help_user_propset {
@@ -338,7 +346,7 @@ EOT
 }
 
 sub cmd_vm_propset {
-    shift->{admin}->cmd_vm_propset(@_)
+    shift->{admin}->cmd_vm_propset(_split_on_equals @_)
 }
 
 sub help_vm_propset {
@@ -361,7 +369,7 @@ sub _obj_propget {
 }
 
 sub cmd_host_propget {
-    shift->_obj_propget(sub { $_->host->name }, @_);
+    shift->_obj_propget(sub { $_->host->name }, 'host', @_);
 }
 
 sub help_host_propget {
@@ -378,7 +386,7 @@ EOT
 }
 
 sub cmd_user_propget {
-    shift->_obj_propget(sub { $_->user->login }, @_);
+    shift->_obj_propget(sub { $_->user->login }, 'user', @_);
 }
 
 sub help_user_propget {
@@ -395,7 +403,7 @@ EOT
 }
 
 sub cmd_vm_propget {
-    shift->_obj_propget(sub { $_->vm->name }, @_);
+    shift->_obj_propget(sub { $_->vm->name }, 'vm', @_);
 }
 
 sub help_vm_propget {
@@ -412,7 +420,9 @@ EOT
 }
 
 sub cmd_config_set {
-    shift->{admin}->cmd_config_set(@_)
+    my $self = shift;
+    my %args = _split_on_equals(@_);
+    $self->{admin}->cmd_config_set(%args)
 }
 
 sub help_config_set {
