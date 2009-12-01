@@ -231,15 +231,15 @@ sub _obj_propset {
 }
 
 sub cmd_host_propset {
-    shift->_obj_propset(@_, 'host');
+    shift->_obj_propset('host', @_);
 }
 
 sub cmd_user_propset {
-    shift->_obj_propset(@_, 'user');
+    shift->_obj_propset('user', @_);
 }
 
 sub cmd_vm_propset {
-    shift->_obj_propset(@_, 'vm');
+    shift->_obj_propset('vm', @_);
 }
 
 sub _obj_propget {
@@ -263,13 +263,12 @@ sub cmd_vm_propget {
 }
 
 sub cmd_config_set {
-    my ($self, @args) = @_;
-    my $params = {@args};
+    my ($self, %args) = @_;
     my $rs = $self->get_resultset('config');
-    foreach my $key (keys %$params) {
+    foreach my $key (keys %args) {
 	$rs->update_or_create({
 		key => $key,
-		value => $params->{$key}
+		value => $args{$key}
 	    });
     }
 }
