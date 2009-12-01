@@ -56,8 +56,11 @@ sub host_add {
     my $result;
     
     $self->reset_status;
-    
-    if (!eval{$result = $self->admin->cmd_host_add("name=$name", "address=$address"); 1}) {
+ 
+# old API   
+#    if (!eval{$result = $self->admin->cmd_host_add("name=$name", "address=$address"); 1}) {
+
+    if (!eval{$result = $self->admin->cmd_host_add(name=>$name, address=>$address); 1}) {
 	$self->set_error($@);
     } 
     
