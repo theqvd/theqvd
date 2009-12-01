@@ -2,21 +2,14 @@
 
 
 [% META title = 'PropGet' -%]
-<table id="props" class="sortable resizable resultset">
+<table id="props" class="tablesorter resultset">
     <thead>
         <tr>
-            <th id="login" class="sortfirstasc noedit">Login</th>
+            <th id="login">Login</th>
             <th id="key">Key</th>
             <th id="value">Value</th>
         </tr>
     </thead>
-    <tfoot>
-        <tr>
-            <th>Login</th>
-            <th>Key</th>
-            <th>Value</th>
-        </tr>
-    </tfoot>
     <tbody>
         [% FOREACH p IN propgetvar -%]
         <tr id="[% p.login %]">
@@ -28,8 +21,31 @@
     </tbody>
 </table>
 
+<div id="pager" class="pager">
+	<form>
+		<img src="/static/icons/first.png" class="first"/>
+		<img src="/static/icons/prev.png" class="prev"/>
+		<input type="text" class="pagedisplay"/>
+		<img src="/static/icons/next.png" class="next"/>
+		<img src="/static/icons/last.png" class="last"/>
+		<select class="pagesize">
+			<option selected="selected"  value="10">10</option>
+			<option value="20">20</option>
+			<option value="30">30</option>
+			<option  value="40">40</option>
+		</select>
+
+	</form>
+</div>
+
 <script type="text/javascript" charset="utf-8">
-    var comments_table = new TableKit( 'props', {
-        editable: false
-    });
+$(document).ready(function() 
+    { 
+	$("#props")
+	.tablesorter({widthFixed: true} )
+	.tablesorterPager({container: $("#pager")});
+
+    } 
+);
+
 </script>
