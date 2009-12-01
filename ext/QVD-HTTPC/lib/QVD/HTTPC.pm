@@ -79,7 +79,7 @@ sub _print {
 		    $n = select($rv, undef, undef, $timeout);
 		}
 		else {
-		    die "socket closed unexpectedly"
+		    die "socket closed unexpectedly: $!"
 		}
 	    }
 	}
