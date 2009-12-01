@@ -8,7 +8,7 @@ use QVD::HTTP::StatusCodes qw(:status_codes);
 use IO::Socket::Forwarder qw(forward_sockets);
 use MIME::Base64 qw(encode_base64);
 
-# $IO::Socket::Forwarder::debug = 1;
+$IO::Socket::Forwarder::debug = 1;
 
 # Forces a flush
 $| = 1;
@@ -20,7 +20,10 @@ my $port = shift @ARGV // "8080";
 
 my $authorization = 'Basic '.encode_base64("$username:$password", '');
 
-my $httpc = QVD::HTTPC->new($host.":".$port);
+# FIXME: do not use a heuristic but some command line flag for that
+my $ssl = ($port =~ /43$/ ? 1 : undef);
+
+my $httpc = QVD::HTTPC->new($host.":".$port, SSL => $ssl);
 
 $httpc->send_http_request(GET => '/qvd/connect_to_vm',
 			  headers => [ 'Connection: Upgrade',
