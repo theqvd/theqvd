@@ -47,8 +47,8 @@ sub new {
     my $config = Config::Tiny->read("vma.ini")
       or croak "unable to read configuration file 'vma.ini'";
 
-    my $run_dir = $config->{vma}{run_dir};
-    $run_dir = '/var/run/qvd' unless defined $run_dir;
+    my $run_dir = $config->{vma}{run_dir} // '/var/run/qvd';
+    $self->{_desktop} = $config->{x_session}{desktop} // '/etc/X11/Xsession';
     $self->{_run_dir} = $run_dir;
     $self->{_run_state_fn} = "$run_dir/state";
     $self->{_run_nxagent_pid_fn} = "$run_dir/nxagent.pid";
@@ -132,11 +132,12 @@ sub _start_or_resume_session {
 	    $self->_start_or_resume_session;
 	}
     } else {
-	INFO("nxagent wasn't running, starting it");
+	my $xsession = $self->{_desktop};
+	INFO("nxagent wasn't running, starting it with session $xsession");
 	my $pid = fork;
 	if (!$pid) {
 	    defined $pid or carp "fork failed";
-	    { exec "su - qvd -c \"xinit /usr/bin/gnome-session -- /home/qvd/QVD/ext/QVD-VMA/bin/nxagent-monitor.pl :1000 -display nx/nx,link=lan:1000 -ac\"" };
+	    { exec "su - qvd -c \"xinit $xsession -- /home/qvd/QVD/ext/QVD-VMA/bin/nxagent-monitor.pl :1000 -display nx/nx,link=lan:1000 -ac\"" };
 	    { exec "/bin/false" };
 	    require POSIX;
 	    POSIX::_exit(-1);
@@ -181,7 +182,7 @@ sub SimpleRPC_status {
     } elsif (grep $nx_state eq $_, qw(suspending terminating aborting)) {
 	$x_state = 'disconnecting';
     } elsif (grep $nx_state eq $_, qw(suspended terminated aborted 
-    					'exited terminated' 'exited aborted')) {
+					'exited terminated' 'exited aborted')) {
 	$x_state = 'disconnected';
     } else {
 	ERROR "No mapping for nxagent state '".$nx_state."'";
