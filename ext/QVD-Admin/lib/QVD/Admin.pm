@@ -100,21 +100,20 @@ sub _set_equals {
 }
 
 sub _obj_add {
-    my ($self, $required_params, @args) = @_;
+    my ($self, $obj, $required_params, @args) = @_;
     my $params = ref $args[0] ? $args[0] : {@args};
     unless (_set_equals([keys %$params], $required_params)) {
 	die "The required parameters are: ",
 	    join(", ", @$required_params), " (you supplied ",
 	    join(", ", keys %$params), ")";
     }
-    my $rs = $self->get_resultset($self->{current_object});
+    my $rs = $self->get_resultset($obj);
     $rs->create($params);
 }
 
 sub cmd_host_add {
     my $self = shift;
-    $self->{current_object} = 'host';
-    my $row = $self->_obj_add([qw/name address/], @_);
+    my $row = $self->_obj_add('host', [qw/name address/], @_);
     $self->{db}->resultset('Host_Runtime')
 			    ->create({host_id => $row->id});
     $row->id
@@ -122,7 +121,6 @@ sub cmd_host_add {
 
 sub cmd_vm_add {
     my ($self,@args) = @_;
-    $self->{current_object} = 'vm';
     my $params = {@args};
     if (exists $params->{osi}) {
 	my $key = $params->{osi};
@@ -141,7 +139,7 @@ sub cmd_vm_add {
 	delete $params->{user};
     }
     $params->{storage} = '';
-    my $row = $self->_obj_add([qw/name user_id osi_id ip storage/], 
+    my $row = $self->_obj_add('vm', [qw/name user_id osi_id ip storage/], 
 				$params);
     $self->{db}->resultset('VM_Runtime')->create({
 	    vm_id => $row->id,
@@ -156,14 +154,12 @@ sub cmd_vm_add {
 
 sub cmd_user_add {
     my $self = shift;
-    $self->{current_object} = 'user';
-    my $row = $self->_obj_add([qw/login password/], @_);
+    my $row = $self->_obj_add('user', [qw/login password/], @_);
     $row->id
 }
 
 sub cmd_osi_add {
     my ($self, @args) = @_;
-    $self->{current_object} = 'osi';
     my $params = {@args};
 
     # Default OSI parameters
@@ -219,9 +215,9 @@ sub cmd_osi_del {
 }
 
 sub _obj_propset {
-    my ($self, @args) = @_;
+    my ($self, $obj, @args) = @_;
     my $params = {@args};
-    my $rs = $self->get_resultset($self->{current_object});
+    my $rs = $self->get_resultset($obj);
     # In principle you should be able to avoid looping over the result set using
     # search_related but the PostgreSQL driver doesn't seem to let us
     while (my $obj = $rs->next) {
@@ -235,15 +231,15 @@ sub _obj_propset {
 }
 
 sub cmd_host_propset {
-    shift->_obj_propset(@_);
+    shift->_obj_propset(@_, 'host');
 }
 
 sub cmd_user_propset {
-    shift->_obj_propset(@_);
+    shift->_obj_propset(@_, 'user');
 }
 
 sub cmd_vm_propset {
-    shift->_obj_propset(@_);
+    shift->_obj_propset(@_, 'vm');
 }
 
 sub _obj_propget {
@@ -305,7 +301,7 @@ sub cmd_vm_start {
 
 sub cmd_vm_stop {
     my ($self, @args) = @_;
-    my $rs = $self->get_resultset($self->{current_object});
+    my $rs = $self->get_resultset('vm');
     my $counter = 0;
     use QVD::VMAS;
     my $vmas = QVD::VMAS->new($self->{db});
@@ -321,7 +317,7 @@ sub cmd_vm_stop {
 
 sub cmd_vm_disconnect_user {
     my ($self, @args) = @_;
-    my $rs = $self->get_resultset($self->{current_object});
+    my $rs = $self->get_resultset('vm');
     use QVD::VMAS;
     my $vmas = QVD::VMAS->new($self->{db});
     my $counter = 0;
