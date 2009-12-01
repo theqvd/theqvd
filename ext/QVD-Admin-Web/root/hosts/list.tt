@@ -1,0 +1,48 @@
+<h1>Listado de hosts</h1>
+
+<div id="pager" class="pager">
+	<form>
+		<img src="/static/icons/first.png" class="first"/>
+		<img src="/static/icons/prev.png" class="prev"/>
+		<input type="text" class="pagedisplay" size="3" disabled/>
+		<img src="/static/icons/next.png" class="next"/>
+		<img src="/static/icons/last.png" class="last"/>
+		<select class="pagesize" style="display:none">
+			<option selected="selected" value="20">20</option>
+		</select>
+
+	</form>
+</div>
+[% META title = 'PropGet' -%]
+<table id="props" class="tablesorter resultset">
+    <thead>
+        <tr>
+            <th id="id">id</th>
+            <th id="name">Name</th>
+            <th id="address">Address</th>
+	    <th>Opciones</th>
+        </tr>
+    </thead>
+    <tbody>
+        [% FOREACH host IN host_list -%]
+        <tr id="[% host.id %]">
+            <td>[% host.id %]</td>
+            <td>[% host.name %]</td>
+            <td><a href="#">[% host.address %]</a></td>
+	    <td><a href="del_submit/[% host.id %]">Eliminar</a></td>
+        </tr>
+        [% END -%]
+    </tbody>
+</table>
+
+<script type="text/javascript" charset="utf-8">
+$(document).ready(function() 
+    { 
+	$("#props")
+	.tablesorter({widthFixed: true} )
+	.tablesorterPager({container: $("#pager")});
+
+    } 
+);
+
+</script>

@@ -1,0 +1,24 @@
+<h1>Añadir host</h1>
+<form name="addhost" action="add_submit" method="post">
+  <div>
+    <table>
+      <tr>
+	<td>
+	  <label>Nombre:</label>
+	</td>
+	<td>
+	  <input type="text" name="name" id="name"/>
+	</td>
+      </tr>
+      <tr>
+	<td>
+	  <label>Dirección:</label>
+	</td>
+	<td>
+	  <input type="text" name="address" id="address"/>
+	</td>
+      </tr>
+    </table>
+    <input type="submit" value="add" />
+  </div>
+</form>
