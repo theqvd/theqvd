@@ -26,7 +26,7 @@ Catalyst Controller.
 sub index :Path :Args(0) {
     my ( $self, $c ) = @_;
 
-    $c->response->body('Matched QVD::Admin::Web::Controller::Hosts in Hosts.');
+    $c->go('list');
 }
 
 sub list :Local {
@@ -34,7 +34,6 @@ sub list :Local {
  
     my $model = $c->model('QVD::Admin::Web');
     my $rs = $model->host_list("");
-    print STDERR Dumper($rs);
     $c->stash->{host_list} = $rs;
 }
 
@@ -84,4 +83,6 @@ it under the same terms as Perl itself.
 
 =cut
 
+no Moose;
+__PACKAGE__->meta->make_immutable;
 1;
