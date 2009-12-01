@@ -5,8 +5,6 @@ our $VERSION = '0.01';
 use warnings;
 use strict;
 
-use Proc::ProcessTable;
-
 use parent 'QVD::HTTPD';
 
 sub post_configure_hook {
@@ -18,6 +16,7 @@ sub post_configure_hook {
 package QVD::VMA::Impl;
 use Carp;
 use File::Slurp qw(slurp);
+use File::Spec;
 use Config::Tiny;
 use parent 'QVD::SimpleRPC::Server';
 
@@ -54,6 +53,8 @@ sub new {
     $self->{_run_nxagent_pid_fn} = "$run_dir/nxagent.pid";
     $self->{_run_nxagent_log_fn} = "$run_dir/nxagent.log";
 
+    my ($vol,$dir) = File::Spec->splitpath(File::Spec->rel2abs($0));
+    $self->{_xagent} = File::Spec->catpath($vol,$dir,'nxagent-monitor.pl');
 
     -e $run_dir or mkdir $run_dir;
     -d $run_dir or croak "Couldn't create run directory: $!";
@@ -132,12 +133,13 @@ sub _start_or_resume_session {
 	    $self->_start_or_resume_session;
 	}
     } else {
-	my $xsession = $self->{_desktop};
-	INFO("nxagent wasn't running, starting it with session $xsession");
+	my $desktop = $self->{_desktop};
+	my $xagent = $self->{_xagent};
+	INFO("nxagent wasn't running, starting it with session $desktop");
 	my $pid = fork;
 	if (!$pid) {
 	    defined $pid or carp "fork failed";
-	    { exec "su - qvd -c \"xinit $xsession -- /home/qvd/QVD/ext/QVD-VMA/bin/nxagent-monitor.pl :1000 -display nx/nx,link=lan:1000 -ac\"" };
+	    { exec "su - qvd -c \"xinit $desktop -- $xagent :1000 -display nx/nx,link=lan:1000 -ac\"" };
 	    { exec "/bin/false" };
 	    require POSIX;
 	    POSIX::_exit(-1);
@@ -181,8 +183,8 @@ sub SimpleRPC_status {
 	$x_state = 'connected';
     } elsif (grep $nx_state eq $_, qw(suspending terminating aborting)) {
 	$x_state = 'disconnecting';
-    } elsif (grep $nx_state eq $_, qw(suspended terminated aborted 
-					'exited terminated' 'exited aborted')) {
+    } elsif (grep $nx_state eq $_, qw(suspended terminated aborted),
+					'exited terminated','exited aborted') {
 	$x_state = 'disconnected';
     } else {
 	ERROR "No mapping for nxagent state '".$nx_state."'";
