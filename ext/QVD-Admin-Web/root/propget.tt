@@ -24,7 +24,7 @@
 	<form>
 		<img src="/static/icons/first.png" class="first"/>
 		<img src="/static/icons/prev.png" class="prev"/>
-		<input type="text" class="pagedisplay" size="3"/>
+		<input type="text" class="pagedisplay" size="3" disabled/>
 		<img src="/static/icons/next.png" class="next"/>
 		<img src="/static/icons/last.png" class="last"/>
 		<select class="pagesize" style="display:none">

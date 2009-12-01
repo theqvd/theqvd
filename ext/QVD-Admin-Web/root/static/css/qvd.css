@@ -135,9 +135,3 @@ p {
 #menu ul {
 	border-right: solid #DDD 1px;
 }
-
-.resultset2 {
-	border-collapse: collapse;
-	display:block;
-	min-height:600px;
-}
