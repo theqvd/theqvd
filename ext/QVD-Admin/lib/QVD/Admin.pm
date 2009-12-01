@@ -52,7 +52,7 @@ sub get_resultset {
     my ($self, $obj) = @_;
     my $db_object = $self->{objects}{$obj};
     if (!defined $db_object) {
-	$self->die_and_help ("$obj: Unsupported object", $obj);
+	die("$obj: Unsupported object");
     }
     my $method = $self->can("get_result_set_for_${obj}");
     if ($method) {
@@ -101,10 +101,11 @@ sub _set_equals {
 
 sub _obj_add {
     my ($self, $required_params, @args) = @_;
-    my $params = ref $args[0] ? $args[0] : _split_on_equals @args;
+    my $params = ref $args[0] ? $args[0] : {@args};
     unless (_set_equals([keys %$params], $required_params)) {
 	die "The required parameters are: ",
-	    join(", ", @$required_params);
+	    join(", ", @$required_params), " (you supplied ",
+	    join(", ", keys %$params), ")";
     }
     my $rs = $self->get_resultset($self->{current_object});
     $rs->create($params);
@@ -112,6 +113,7 @@ sub _obj_add {
 
 sub cmd_host_add {
     my $self = shift;
+    $self->{current_object} = 'host';
     my $row = $self->_obj_add([qw/name address/], @_);
     $self->{db}->resultset('Host_Runtime')
 			    ->create({host_id => $row->id});
@@ -120,7 +122,8 @@ sub cmd_host_add {
 
 sub cmd_vm_add {
     my ($self,@args) = @_;
-    my $params = _split_on_equals @args;
+    $self->{current_object} = 'vm';
+    my $params = {@args};
     if (exists $params->{osi}) {
 	my $key = $params->{osi};
 	my $rs = $self->{db}->resultset('OSI')
@@ -153,13 +156,15 @@ sub cmd_vm_add {
 
 sub cmd_user_add {
     my $self = shift;
+    $self->{current_object} = 'user';
     my $row = $self->_obj_add([qw/login password/], @_);
     $row->id
 }
 
 sub cmd_osi_add {
     my ($self, @args) = @_;
-    my $params = _split_on_equals @args;
+    $self->{current_object} = 'osi';
+    my $params = {@args};
 
     # Default OSI parameters
     # FIXME Detect type of image and set use_overlay accordingly, iso=no overlay
@@ -181,7 +186,7 @@ sub cmd_osi_add {
     use File::Copy qw/copy/;
     copy($img, $destination) or die "Unable to copy $img to storage: $^E";
 
-    my $rs = $self->get_resultset($self->{current_object});
+    my $rs = $self->get_resultset('osi');
     my $row = $rs->create($params);
 
     $row->id;
@@ -189,7 +194,7 @@ sub cmd_osi_add {
 
 sub _obj_del {
     my ($self, $obj) = @_;
-    my $rs = $self->get_resultset($self->{current_object});
+    my $rs = $self->get_resultset($obj);
     $rs->delete_all;
 }
 
@@ -199,10 +204,12 @@ sub cmd_host_del {
 
 sub cmd_user_del {
     shift->_obj_del('user', @_);
+    # FIXME Should we delete the overlay image and home disk files?
 }
 
 sub cmd_vm_del {
     shift->_obj_del('vm', @_);
+    # FIXME Should we delete the overlay image and home disk file?
 }
 
 sub cmd_osi_del {
@@ -213,7 +220,7 @@ sub cmd_osi_del {
 
 sub _obj_propset {
     my ($self, @args) = @_;
-    my $params = _split_on_equals @args;
+    my $params = {@args};
     my $rs = $self->get_resultset($self->{current_object});
     # In principle you should be able to avoid looping over the result set using
     # search_related but the PostgreSQL driver doesn't seem to let us
@@ -240,29 +247,29 @@ sub cmd_vm_propset {
 }
 
 sub _obj_propget {
-    my ($self, @args) = @_;
-    my $rs = $self->get_resultset($self->{current_object});
+    my ($self, $obj, @args) = @_;
+    my $rs = $self->get_resultset($obj);
     my $condition = scalar @args > 0 ? {key => [@args]} : {};
     my @props = $rs->search_related('properties', $condition);
     return \@props;
 }
 
 sub cmd_host_propget {
-    shift->_obj_propget(sub { $_->host->name }, @_);
+    shift->_obj_propget(sub { $_->host->name }, 'host', @_);
 }
 
 sub cmd_user_propget {
-    shift->_obj_propget(sub { $_->user->login }, @_);
+    shift->_obj_propget(sub { $_->user->login }, 'user', @_);
 }
 
 sub cmd_vm_propget {
-    shift->_obj_propget(sub { $_->vm->name }, @_);
+    shift->_obj_propget(sub { $_->vm->name }, 'vm', @_);
 }
 
 sub cmd_config_set {
     my ($self, @args) = @_;
-    my $params = _split_on_equals @args;
-    my $rs = $self->get_resultset($self->{current_object});
+    my $params = {@args};
+    my $rs = $self->get_resultset('config');
     foreach my $key (keys %$params) {
 	$rs->update_or_create({
 		key => $key,
@@ -274,14 +281,14 @@ sub cmd_config_set {
 sub cmd_config_get {
     my ($self, @args) = @_;
     my $condition = scalar @args > 0 ? {key => [@args]} : {};
-    my $rs = $self->get_resultset($self->{current_object});
+    my $rs = $self->get_resultset('config');
     my @configs = $rs->search($condition);
     return \@configs;
 }
 
 sub cmd_vm_start {
     my ($self, @args) = @_;
-    my $rs = $self->get_resultset($self->{current_object});
+    my $rs = $self->get_resultset('vm');
     my $counter = 0;
     use QVD::VMAS;
     my $vmas = QVD::VMAS->new($self->{db});
@@ -365,7 +372,7 @@ __END__
 
 =head1 NAME
 
-QVD::Admin - The great new QVD::Admin!
+QVD::Admin - QVD Administration API
 
 =head1 VERSION
 
@@ -373,19 +380,55 @@ Version 0.01
 
 =head1 SYNOPSIS
 
-Quick summary of what the module does.
-
-Perhaps a little code snippet.
-
     use QVD::Admin;
+    my $admin = QVD::Admin->new();
+    my $id = $admin->cmd_osi_add("name=Ubuntu 9.10 (x86)", "memory=512",
+			"use_overlay=1", "disk_image=/var/tmp/U910_x86.img");
+    print "OSI added with id $id\n";
 
-    my $foo = QVD::Admin->new();
-    ...
+    $admin->set_filter('user=qvd');
+    my $count = $admin->cmd_vm_start();
+    print "Started $count virtual machines.\n";
+
+=head1 DESCRIPTION
+
+This module implements the QVD Administration API.
+
+=head2 API
+
+=over
+
+=item set_filter($filter_string)
+
+Add conditions to the current filter. The filter is applied to all subsequent
+operations. The keys that can be used depend on the object in question.  The
+syntax of the filter string is "key=value,key2=value2".
+
+=item reset_filter()
+
+Removed all conditions from the filter.
+
+=item get_resultset($object)
+
+Return the DBIx::Class result set for the given object type. The valid object
+types are listed in the "objects" member hash. They are host, vm, uesr, config,
+and osi.
+
+=item cmd_host_add(@values)
+
+Add a host. The parameters are name and address. 
+
+=item cmd_vm_add(@values)
+
+Add a virtual machine. The obligatory parameters are name, user, osi, and ip.
+OSI and user can be specified by name (login) or by id. The optional parameter
+is storage.
+
+=back
 
 =head1 AUTHOR
 
-Qindel Formacion y Servicios S.L., C<< <joni.salonen at qindel.es> >>
-
+Qindel Formacion y Servicios S.L.
 
 =head1 COPYRIGHT & LICENSE
 
