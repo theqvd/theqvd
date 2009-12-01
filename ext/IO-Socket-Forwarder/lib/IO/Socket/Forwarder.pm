@@ -83,7 +83,7 @@ sub forward_sockets {
 		my $bytes = sysread($s1, $b1to2, $io_chunk_size, length $b1to2);
 		$debug and warn "bytes: $bytes\n";
 		if ($bytes) {
-		    $debug and warn "s1 read:\n" . substr($b1to2, -$bytes) . "*\n";
+		    # $debug and warn "s1 read:\n" . substr($b1to2, -$bytes) . "\n";
 		}
 		elsif ($ssl1 and not defined $bytes) {
 		    $ssl_wtw1 ||= (_ssl_error == _ssl_want_write);
@@ -105,7 +105,7 @@ sub forward_sockets {
 		my $bytes = sysread($s2, $b2to1, $io_chunk_size, length $b2to1);
 		$debug and warn "bytes: $bytes\n";
 		if ($bytes) {
-		    $debug and warn "s2 read:\n" . substr($b2to1, -$bytes) . "*\n";
+		    # $debug and warn "s2 read:\n" . substr($b2to1, -$bytes) . "*\n";
 		}
 		elsif ($ssl2 and not defined $bytes) {
 		    $ssl_wtw2 ||= (_ssl_error == _ssl_want_write);
@@ -127,7 +127,7 @@ sub forward_sockets {
 		my $bytes = syswrite($s1, $b2to1, $io_chunk_size);
 		$debug and warn "bytes: $bytes\n";
 		if ($bytes) {
-		    $debug and warn "s1 wrote...\n" . substr($b2to1, 0, $bytes) . "*\n";
+		    # $debug and warn "s1 wrote...\n" . substr($b2to1, 0, $bytes) . "*\n";
 		    substr($b2to1, 0, $bytes, "");
 		    if ($s2_in_closed and !length $b2to1) {
 			$debug and warn "buffer exhausted and s2-in is closed, shutting down s1-out\n";
@@ -155,7 +155,7 @@ sub forward_sockets {
 		my $bytes = syswrite($s2, $b1to2, $io_chunk_size);
 		$debug and warn "bytes: $bytes\n";
 		if ($bytes) {
-		    $debug and warn "s2 wrote...\n" . substr($b1to2, 0, $bytes) . "*\n";
+		    # $debug and warn "s2 wrote...\n" . substr($b1to2, 0, $bytes) . "*\n";
 		    substr($b1to2, 0, $bytes, "");
 		    if ($s1_in_closed and length $b1to2) {
 			$debug and warn "buffer exhausted and s2-in is closed, shutting down s1-out\n";
