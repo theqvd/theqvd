@@ -1,8 +1,8 @@
-
+<h1>Propget</h1>
 
 
 [% META title = 'PropGet' -%]
-<table id="props" class="sortable resizable editable">
+<table id="props" class="sortable resizable resultset">
     <thead>
         <tr>
             <th id="login" class="sortfirstasc noedit">Login</th>
@@ -22,7 +22,7 @@
         <tr id="[% p.login %]">
             <td>[% p.login %]</td>
             <td>[% p.key %]</td>
-            <td>[% p.value %]</td>
+            <td><a href="#">[% p.value %]</a></td>
         </tr>
         [% END -%]
     </tbody>

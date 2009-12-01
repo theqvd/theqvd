@@ -1,58 +1,58 @@
-table {
+.resultset table {
 	border-collapse: collapse;
 }
 
-td, th {
-	padding: 0.5em;
-	border: 1px solid #CCC;
+.resultset td, .resultset th {
+	padding: 2px 3px;
+	border-bottom: 1px solid #CCC;
 }
 
-thead, tfoot {
+.resultset thead, tfoot {
 	background-color: #DDD;
 }
 
-thead {
+.resultset thead {
   border-bottom: 2px solid #f08900;
 }
 
-tfoot {
+.resultset tfoot {
   border-top: 2px solid #f08900;
 }
 
-tr.rowodd {
+.resultset tr.rowodd {
 	background-color: #FFF;
 }
 
-tr.roweven {
+.resultset tr.roweven {
 	background-color: #F2F2F2;
 }
 
-.sortcol {
+.resultset .sortcol {
 	cursor: pointer;
 	padding-right: 20px;
 	background-repeat: no-repeat;
 	background-position: right center;
 }
 
-.sortasc {
-	background-color: #DDFFAC;
-	background-image: url('/images/up.gif');
+.resultset .sortasc {
+	background-color: #FFB769;
+	background-image: url('../images/up.gif');
 }
 
-.sortdesc {
-	background-color: #B9DDFF;
-	background-image: url('/images/down.gif');
+.resultset .sortdesc {
+	background-color: #FFB769;
+	background-image: url('../images/down.gif');
 }
 
-.nosort {
+.resultset .nosort {
 	cursor: default;
 }
 
-th.resize-handle-active {
+.resultset th.resize-handle-active {
 	cursor: e-resize;
 }
 
-div.resize-handle {
+.resultset div.resize-handle {
 	cursor: e-resize;
 	width: 2px;
 	border-right: 1px dashed #1E90FF;
