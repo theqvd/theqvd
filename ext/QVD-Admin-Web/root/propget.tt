@@ -20,24 +20,19 @@
         [% END -%]
     </tbody>
 </table>
-
 <div id="pager" class="pager">
 	<form>
 		<img src="/static/icons/first.png" class="first"/>
 		<img src="/static/icons/prev.png" class="prev"/>
-		<input type="text" class="pagedisplay"/>
+		<input type="text" class="pagedisplay" size="3"/>
 		<img src="/static/icons/next.png" class="next"/>
 		<img src="/static/icons/last.png" class="last"/>
-		<select class="pagesize">
-			<option selected="selected"  value="10">10</option>
-			<option value="20">20</option>
-			<option value="30">30</option>
-			<option  value="40">40</option>
+		<select class="pagesize" style="display:none">
+			<option selected="selected" value="20">20</option>
 		</select>
 
 	</form>
 </div>
-
 <script type="text/javascript" charset="utf-8">
 $(document).ready(function() 
     { 

@@ -19,12 +19,12 @@
 				var c = table.config;
 				if(!c.pagerPositionSet && c.positionFixed) {
 					var c = table.config, o = $(table);
-					if(o.offset) {
-						c.container.css({
-							top: o.offset().top + o.height() + 'px',
-							position: 'absolute'
-						});
-					}
+					//if(o.offset) {
+						//c.container.css({
+							//top: o.offset().top + o.height() + 'px',
+							//position: 'absolute'
+						//});
+					//}
 					c.pagerPositionSet = true;
 				}
 			}
@@ -122,7 +122,7 @@
 			};
 			
 			this.defaults = {
-				size: 10,
+				size: 20,
 				offset: 0,
 				page: 0,
 				totalRows: 0,

@@ -1,5 +1,6 @@
 .resultset table {
 	border-collapse: collapse;
+	min-height: 1000px;
 }
 
 .resultset td, .resultset th {
@@ -42,6 +43,14 @@
 .resultset .sortdesc {
 	background-color: #FFB769;
 	background-image: url('../images/down.gif');
+}
+
+.resulset .headerSortUp {
+	background-color: #FFB769;
+}
+
+.resulset .headerSortDown {
+	background-color: #FFB769;
 }
 
 .resultset .nosort {
