@@ -39,7 +39,7 @@
 		<div class="clear"></div>
 		<div class="grid_3" id="menu">
 			<ul>
-				<li><a href="/hosts">Nodos</a></li>
+				<li><a href="/hosts/">Nodos</a></li>
 				<li><a href="#">M&aacute;quinas virtuales</a></li>
 				<li><a href="#">Usuarios</a></li>
 				<li><a href="#">Im&aacute;genes</a></li>															

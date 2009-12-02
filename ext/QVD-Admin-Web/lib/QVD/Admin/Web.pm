@@ -18,6 +18,7 @@ use Catalyst qw/ConfigLoader
                 Static::Simple
                 StackTrace
                 Unicode
+                FormValidator
                /;
 our $VERSION = sprintf "1.%04d", q$Revision: 6173 $ =~ /(\d+)/xg;
 #our $VERSION = '0.01';

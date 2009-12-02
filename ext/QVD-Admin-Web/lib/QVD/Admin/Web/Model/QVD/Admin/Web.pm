@@ -5,6 +5,7 @@ use QVD::DB;
 use QVD::Admin;
 use QVD::Config;
 use Log::Log4perl qw(:easy);
+use Readonly;
 extends 'Catalyst::Model';
 with 'MooseX::Log::Log4perl';
 
@@ -95,6 +96,37 @@ sub host_del {
     return $result;   
 }
 
+
+=head 2 build_form_error_msg
+
+Simple method that receives as input a Data::FormValidator::Results object
+and returns a simple string with errors
+
+=cut
+sub build_form_error_msg {
+    my ($self, $results) = @_;
+    my $result_msg = '';
+    if ( $results->has_missing ) {
+	for my $f ( $results->missing ) {
+	    $result_msg .= "$f is missing<br>\n";
+	}
+    }
+
+    # Print the name of invalid fields
+    if ( $results->has_invalid ) {
+	for my $f ( $results->invalid ) {
+	    $result_msg .= "$f is invalid: ".$results->invalid($f)." <br>\n";
+	}
+    }
+    
+    # Print unknown fields
+    if ( $results->has_unknown ) {
+	for my $f ( $results->unknown ) {
+	    $result_msg .= "$f is unknown<br>\n";
+	}
+    }
+    return $result_msg;
+}
 =head1 NAME
 
 QVD::Admin::Web::Model::QVD::Admin::Web - Catalyst Model
