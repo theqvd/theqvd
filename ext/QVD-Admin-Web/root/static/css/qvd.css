@@ -136,3 +136,31 @@ p {
 #menu ul {
 	border-right: solid #DDD 1px;
 }
+
+button {
+	overflow: visible;
+	width: auto;
+}
+
+button.link {
+	color: #ff8d13;
+	text-decoration: none;
+	font-weight: bold;
+	font-family: "Verdana" sans-serif;
+	font-size: 1em;
+	text-align: left;
+	background: none;
+	margin: 0;
+	padding: 0;
+	border: none;
+	cursor: pointer;
+}
+
+button.link span {
+	text-decoration: none;
+}
+button.link:hover span,
+button.link:focus span {
+	text-decoration: underline;
+}
+
