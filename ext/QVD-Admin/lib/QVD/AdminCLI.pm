@@ -20,7 +20,8 @@ sub _split_on_equals {
 
 sub set_filter {
     my ($self, $filter_string) = @_;
-    $self->{admin}->set_filter($filter_string);
+    my %conditions = _split_on_equals($filter_string);
+    $self->{admin}->set_filter(%conditions);
 }
 
 sub get_resultset {

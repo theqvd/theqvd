@@ -30,10 +30,8 @@ sub _split_on_equals {
 }
 
 sub set_filter {
-    my ($self, $filter_string) = @_;
-    # 'a=b,c=d' -> {'a' => 'b', 'c' => 'd}
-    my $conditions = _split_on_equals split /,\s*/, $filter_string;
-    while (my ($k, $v) = each %$conditions) {
+    my ($self, %conditions) = @_;
+    while (my ($k, $v) = each %conditions) {
 	if ($v =~ /[*?]/) {
 	    $v =~ s/([_%])/\\$1/g;
 	    $v =~ tr/*?/%_/;
@@ -381,7 +379,7 @@ Version 0.01
 			"use_overlay=1", "disk_image=/var/tmp/U910_x86.img");
     print "OSI added with id $id\n";
 
-    $admin->set_filter('user=qvd');
+    $admin->set_filter(user=> 'qvd');
     my $count = $admin->cmd_vm_start();
     print "Started $count virtual machines.\n";
 
@@ -393,11 +391,10 @@ This module implements the QVD Administration API.
 
 =over
 
-=item set_filter($filter_string)
+=item set_filter(%conditions)
 
 Add conditions to the current filter. The filter is applied to all subsequent
-operations. The keys that can be used depend on the object in question.  The
-syntax of the filter string is "key=value,key2=value2".
+operations. The keys that can be used depend on the object in question. 
 
 =item reset_filter()
 
