@@ -97,6 +97,18 @@ sub host_del {
 }
 
 
+sub user_list {
+    my ($self, $filter) = @_;
+    
+    $self->reset_status;
+    my $rs = $self->db->resultset('User');
+    return [$rs->search];
+        
+    #my @var = map { { id => $_->id, name => $_->name, address => $_->address } } ;
+
+}
+
+
 =head 2 build_form_error_msg
 
 Simple method that receives as input a Data::FormValidator::Results object

@@ -27,6 +27,13 @@ sub index :Path :Args(0) {
     $c->response->body('Matched QVD::Admin::Web::Controller::Users in Users.');
 }
 
+sub list :Local {
+    my ( $self, $c ) = @_;
+ 
+    my $model = $c->model('QVD::Admin::Web');
+    my $rs = $model->user_list("");
+    $c->stash->{user_list} = $rs;
+}
 
 =head1 AUTHOR
 
