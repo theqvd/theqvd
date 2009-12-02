@@ -6,7 +6,6 @@ use parent 'Catalyst::Controller';
 use Data::FormValidator::Constraints qw(:closures);
 use Data::Dumper;
 
-
 =head1 NAME
 
 QVD::Admin::Web::Controller::Hosts - Catalyst Controller
@@ -19,65 +18,64 @@ Catalyst Controller.
 
 =cut
 
-
 =head2 index
 
 =cut
 
-sub index :Path :Args(0) {
+sub index : Path : Args(0) {
     my ( $self, $c ) = @_;
 
     $c->go('list');
 }
 
-sub list :Local {
+sub list : Local {
     my ( $self, $c ) = @_;
- 
+
     my $model = $c->model('QVD::Admin::Web');
-    my $rs = $model->host_list("");
+    my $rs    = $model->host_list("");
     $c->stash->{host_list} = $rs;
 }
 
-sub view :Local {
+sub view : Local {
     my ( $self, $c ) = @_;
 }
 
-sub add :Local {
+sub add : Local {
     my ( $self, $c ) = @_;
 }
 
-sub add_submit :Local {
+sub add_submit : Local {
     my ( $self, $c ) = @_;
     my $model = $c->model('QVD::Admin::Web');
 
     my $result = $c->form(
-	required => ['name', 'address'],
-	constraint_methods => {
-	    'name' => qr/^..*$/,
-	    'address' => ip_address()
-	}
-	);
+        required           => [ 'name', 'address' ],
+        constraint_methods => {
+            'name'    => qr/^..*$/,
+            'address' => ip_address()
+        }
+    );
 
-    if (!$result->success || $result->has_unknown) {
-	$c->flash->{response_type} = "error";
-	$c->flash->{response_msg} = "Error in parameters: ".$model->build_form_error_msg($result);
-	$c->go('list');
+    if ( !$result->success || $result->has_unknown ) {
+        $c->flash->{response_type} = "error";
+        $c->flash->{response_msg} =
+          "Error in parameters: " . $model->build_form_error_msg($result);
+        $c->response->redirect( $c->uri_for( $self->action_for('list') ) );
     }
 
-    my $name = $c->req->body_params->{name}; # only for a POST request
+    my $name    = $c->req->body_params->{name};      # only for a POST request
     my $address = $c->req->body_params->{address};
 
-    
-    if (my $id = $model->host_add($name, $address)) {
-	$c->flash->{response_type} = "success";
-	$c->flash->{response_msg} = "$name añadido correctamente con id $id";
-    } else {
-# FIXME response_type must be an enumerated	
-	$c->flash->{response_type} = "error";
-	$c->flash->{response_msg} = $model->error_msg;
+    if ( my $id = $model->host_add( $name, $address ) ) {
+        $c->flash->{response_type} = "success";
+        $c->flash->{response_msg}  = "$name añadido correctamente con id $id";
     }
-    $c->go('list');
-    # $c->
+    else {
+        # FIXME response_type must be an enumerated
+        $c->flash->{response_type} = "error";
+        $c->flash->{response_msg}  = $model->error_msg;
+    }
+    $c->response->redirect( $c->uri_for( $self->action_for('list') ) );
 }
 
 #sub add_submit_json :Local {
@@ -92,33 +90,36 @@ sub add_submit :Local {
 #        );
 #}
 
-sub del_submit :Local {
+sub del_submit : Local {
     my ( $self, $c ) = @_;
     my $model = $c->model('QVD::Admin::Web');
 
     my $result = $c->form(
-	   required => ['id'],
-       constraint_methods => {
-	      'id' => qr/^\d+$/,
-	 }  
-	 );
+        required           => ['id'],
+        constraint_methods => { 'id' => qr/^\d+$/, }
+    );
 
-    if (!$result->success) {
-       $c->flash->{response_type} = "error";
-	   $c->flash->{response_msg} = "Error in parameters: ".$model->build_form_error_msg($result);
-    } else { 
-       my $id = $c->req->body_params->{id}; # only for a POST request
-       if (my $countdel = $model->host_del($id)) {
-	      $c->flash->{response_type} = "success";
-	      $c->flash->{response_msg} = "$id eliminado correctamente";
-       } else {
-          # FIXME response_type must be an enumerated	
-	      $c->flash->{response_type} = "error";
-	      $c->flash->{response_msg} = $model->error_msg;
-       }
+    if ( !$result->success ) {
+        $c->flash->{response_type} = "error";
+        $c->flash->{response_msg} =
+          "Error in parameters: " . $model->build_form_error_msg($result);
     }
+    else {
+        my $id = $c->req->body_params->{id};    # only for a POST request
+        if ( my $countdel = $model->host_del($id) ) {
+            $c->flash->{response_type} = "success";
+            $c->flash->{response_msg}  = "$id eliminado correctamente";
+        }
+        else {
+
+            # FIXME response_type must be an enumerated
+            $c->flash->{response_type} = "error";
+            $c->flash->{response_msg}  = $model->error_msg;
+        }
+    }
+
     #$c->forward('list');
-    $c->response->redirect($c->uri_for($self->action_for('list')));
+    $c->response->redirect( $c->uri_for( $self->action_for('list') ) );
 }
 
 =head1 AUTHOR

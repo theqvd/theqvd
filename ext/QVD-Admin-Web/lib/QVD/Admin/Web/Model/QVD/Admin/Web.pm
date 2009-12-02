@@ -10,29 +10,33 @@ extends 'Catalyst::Model';
 with 'MooseX::Log::Log4perl';
 
 BEGIN {
-    if(!(Log::Log4perl->initialized())) {
-	Log::Log4perl->easy_init('log4perl.conf');
+    if ( !( Log::Log4perl->initialized() ) ) {
+        Log::Log4perl->easy_init('log4perl.conf');
     }
 }
 
+has 'version' => (
+    is      => 'ro',
+    isa     => 'Str',
+    default => sub { return "$QVD::Admin::Web::VERSION"; }
+);
 
-has 'version' => (is => 'ro', isa => 'Str',
-    default => sub { return "$QVD::Admin::Web::VERSION";  }
-    );
+has 'admin' => (
+    is      => 'ro',
+    isa     => 'QVD::Admin',
+    default => sub { return QVD::Admin->new(); },
+);
 
-has 'admin' => (is => 'ro', isa => 'QVD::Admin',
-		default => sub { return QVD::Admin->new(); },
-    );
+has 'db' => (
+    is      => 'ro',
+    isa     => 'QVD::DB',
+    default => sub { return QVD::DB->new(); },
+);
 
-has 'db' => (is => 'ro', isa => 'QVD::DB',
-		default => sub { return QVD::DB->new(); },
-    );
+# status 1 means Ok, and 0 means error, detail in error_msg
+has 'status' => ( is => 'ro', isa => 'Int', default => 1 );
 
-# status 1 means Ok, and 0 means error, detail in error_msg 
-has 'status' => (is => 'ro', isa => 'Int', default => 1 );
-    
-has 'error_msg' => (is => 'ro', isa => 'Str', default => undef );
-    
+has 'error_msg' => ( is => 'ro', isa => 'Str', default => undef );
 
 #sub BUILD {
 #    my $self = shift;
@@ -46,81 +50,98 @@ sub reset_status {
 }
 
 sub set_error {
-    my ($self, $msg) = @_;
-    $self->{status} = 0;
+    my ( $self, $msg ) = @_;
+    $self->{status}    = 0;
     $self->{error_msg} = $msg;
     $self->log->error($msg);
-} 
+}
 
 sub host_add {
-    my ($self, $name, $address) = @_;
+    my ( $self, $name, $address ) = @_;
     my $result;
-    
+
     $self->reset_status;
- 
-# old API   
+
+# old API
 #    if (!eval{$result = $self->admin->cmd_host_add("name=$name", "address=$address"); 1}) {
 
-    if (!eval{$result = $self->admin->cmd_host_add(name=>$name, address=>$address); 1}) {
-	$self->set_error($@);
-    } 
-    
-    return $result;   
+    if (
+        !eval {
+            $result =
+              $self->admin->cmd_host_add( name => $name, address => $address );
+            1;
+        }
+      )
+    {
+        $self->set_error($@);
+    }
+
+    return $result;
 }
 
 sub host_list {
-    my ($self, $filter) = @_;
-    
+    my ( $self, $filter ) = @_;
+
     $self->reset_status;
     my $rs = $self->db->resultset('Host');
-    return [$rs->search];
-        
-    #my @var = map { { id => $_->id, name => $_->name, address => $_->address } } ;
+    return [ $rs->search ];
+
+ #my @var = map { { id => $_->id, name => $_->name, address => $_->address } } ;
 
 }
 
 sub host_del {
-    my ($self, $id) = @_;
+    my ( $self, $id ) = @_;
     my $result;
-    
-    $self->reset_status;
-    
-    if (!eval{
-	    $self->admin->set_filter(id=>$id);
-	    $result = $self->admin->cmd_host_del;
-	    1
-	    }) {
-	$self->set_error($@);
-    } 
-    
-    return $result;   
-}
 
+    $self->reset_status;
+
+    if (
+        !eval {
+            $self->admin->set_filter( id => $id );
+            $result = $self->admin->cmd_host_del;
+            1;
+        }
+      )
+    {
+        $self->set_error($@);
+    }
+
+    return $result;
+}
 
 sub user_list {
-    my ($self, $filter) = @_;
-    
+    my ( $self, $filter ) = @_;
+
     $self->reset_status;
     my $rs = $self->db->resultset('User');
-    return [$rs->search];
-        
-    #my @var = map { { id => $_->id, name => $_->name, address => $_->address } } ;
+    return [ $rs->search ];
+
+ #my @var = map { { id => $_->id, name => $_->name, address => $_->address } } ;
 
 }
+
 sub user_add {
-    my ($self, $login, $password) = @_;
+    my ( $self, $login, $password ) = @_;
     my $result;
-    
+
     $self->reset_status;
- 
-    if (!eval{$result = $self->admin->cmd_user_add(login=>$login, password=>$password); 1}) {
-	$self->set_error($@);
-    } 
-    
-    return $result;   
+
+    if (
+        !eval {
+            $result = $self->admin->cmd_user_add(
+                login    => $login,
+                password => $password
+            );
+            1;
+        }
+      )
+    {
+        $self->set_error($@);
+    }
+
+    return $result;
 }
-
-
 
 =head 2 build_form_error_msg
 
@@ -128,30 +149,33 @@ Simple method that receives as input a Data::FormValidator::Results object
 and returns a simple string with errors
 
 =cut
+
 sub build_form_error_msg {
-    my ($self, $results) = @_;
+    my ( $self, $results ) = @_;
     my $result_msg = '';
     if ( $results->has_missing ) {
-	for my $f ( $results->missing ) {
-	    $result_msg .= "$f is missing<br>\n";
-	}
+        for my $f ( $results->missing ) {
+            $result_msg .= "$f is missing<br>\n";
+        }
     }
 
     # Print the name of invalid fields
     if ( $results->has_invalid ) {
-	for my $f ( $results->invalid ) {
-	    $result_msg .= "$f is invalid: ".$results->invalid($f)." <br>\n";
-	}
+        for my $f ( $results->invalid ) {
+            $result_msg .=
+              "$f is invalid: " . $results->invalid($f) . " <br>\n";
+        }
     }
-    
+
     # Print unknown fields
     if ( $results->has_unknown ) {
-	for my $f ( $results->unknown ) {
-	    $result_msg .= "$f is unknown<br>\n";
-	}
+        for my $f ( $results->unknown ) {
+            $result_msg .= "$f is unknown<br>\n";
+        }
     }
     return $result_msg;
 }
+
 =head1 NAME
 
 QVD::Admin::Web::Model::QVD::Admin::Web - Catalyst Model
