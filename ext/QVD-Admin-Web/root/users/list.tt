@@ -1,5 +1,17 @@
-<h1>Listado de users</h1>
+<script LANGUAGE="JavaScript">
+<!--
+function confirm_submit()
+{
+var agree=confirm("¿Está seguro?");
+if (agree)
+	return true ;
+else
+	return false ;
+}
+</script>
 
+<h1>Usuarios</h1>
+<div class="side_add"><a href="[% c.uri_for('/users/add') %]">Nuevo</a></div>
 <div id="pager" class="pager">
 	<form>
 		<img src="/static/icons/first.png" class="first"/>
@@ -18,27 +30,18 @@
     <thead>
         <tr>
             <th id="id">id</th>
-            <th id="name">Name</th>
-            <th id="disk_image">Address</th>
-            <th id="use_overlay">Address</th>
-            <th id="memory">Address</th>
-	    <th>Opciones</th>
+            <th id="login">Login</th>
+            <th id="password">Contraseña</th>
+	    <th class="options">Opciones</th>
         </tr>
     </thead>
     <tbody>
         [% FOREACH user IN user_list -%]
         <tr id="[% user.id %]">
             <td>[% user.id %]</td>
-            <td>[% user.name %]</td>
-			<td>[% user.disk_image %]</td>
-			<td>[% user.use_overlay %]</td>
-			<td>[% user.memory %]</td>
-	    <td>
-	      <form action="del_submit" method="post">
-		<input type="hidden" name="id" value="[% host.id %]"/>
-		<input type="submit" value="Eliminar"/>
-	      </form>
-	    </td>
+            <td>[% user.login %]</td>
+            <td>[% user.password %]</td>
+            <td></td>
         </tr>
         [% END -%]
     </tbody>
@@ -47,11 +50,15 @@
 <script type="text/javascript" charset="utf-8">
 $(document).ready(function() 
     { 
-	$("#props")
-	.tablesorter({widthFixed: true} )
-	.tablesorterPager({container: $("#pager")});
+	$("#props").tablesorter({
+	widthFixed: true,
+	headers: { 
+            3: { 
+                sorter: false 
+            }
+	}}); 
+	$("#props").tablesorterPager({container: $("#pager")});
 
     } 
 );
-
 </script>
