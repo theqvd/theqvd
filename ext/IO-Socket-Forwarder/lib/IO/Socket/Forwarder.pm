@@ -34,8 +34,11 @@ sub forward_sockets {
     my $fn2 = fileno $s2;
     defined $fn1 or croak "socket 2 is not a valid file handle";
 
-    my $ssl1 = IO::Socket::SSL->isa($s1);
-    my $ssl2 = IO::Socket::SSL->isa($s2);
+    my $ssl1 = $s1->isa('IO::Socket::SSL');
+    my $ssl2 = $s2->isa('IO::Socket::SSL');
+
+    $debug and $ssl1 and warn "s1 is SSL\n";
+    $debug and $ssl2 and warn "s2 is SSL\n";
 
     my $b1to2 = '';
     my $b2to1 = '';
@@ -87,6 +90,7 @@ sub forward_sockets {
 		}
 		elsif ($ssl1 and not defined $bytes) {
 		    $ssl_wtw1 ||= (_ssl_error == _ssl_want_write);
+		    $debug and warn "s1 wants to write for SSL";
 		}
 		else {
 		    $debug and warn "shutting down s1-in\n";
@@ -109,6 +113,7 @@ sub forward_sockets {
 		}
 		elsif ($ssl2 and not defined $bytes) {
 		    $ssl_wtw2 ||= (_ssl_error == _ssl_want_write);
+		    $debug and warn "s2 wants to write for SSL";
 		}
 		else {
 		    $debug and warn "shutting down s2-in\n";
@@ -137,6 +142,7 @@ sub forward_sockets {
 		}
 		elsif ($ssl1 and not defined $bytes) {
 		    $ssl_wtr1 ||= (_ssl_error == _ssl_want_read);
+		    $debug and warn "s1 wants to read for SSL";
 		}
 		else {
 		    $debug and warn "shutting down s1-out\n";
@@ -165,6 +171,7 @@ sub forward_sockets {
 		}
 		elsif ($ssl2 and not defined $bytes) {
 		    $ssl_wtr2 ||= (_ssl_error == _ssl_want_read);
+		    $debug and warn "s2 wants to read for SSL";
 		}
 		else {
 		    $debug and warn "shutting down s2-in\n";
