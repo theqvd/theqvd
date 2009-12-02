@@ -5,7 +5,7 @@ table.tablesorter {
 	text-align: left;
 }
 table.tablesorter thead tr th, table.tablesorter tfoot tr th {
-	background-color: #e6EEEE;
+	background-color: #EFEFEF;
 	border: 1px solid #FFF;
 	padding: 4px;
 }

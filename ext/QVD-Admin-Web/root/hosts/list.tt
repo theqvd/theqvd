@@ -1,5 +1,17 @@
-<h1>Listado de hosts</h1>
+<script LANGUAGE="JavaScript">
+<!--
+function confirm_submit()
+{
+var agree=confirm("¿Está seguro?");
+if (agree)
+	return true ;
+else
+	return false ;
+}
+</script>
 
+<h1>Nodos</h1>
+<div class="side_add"><a href="[% c.uri_for('/hosts/add') %]">Nuevo nodo</a></div>
 <div id="pager" class="pager">
 	<form>
 		<img src="/static/icons/first.png" class="first"/>
@@ -18,9 +30,9 @@
     <thead>
         <tr>
             <th id="id">id</th>
-            <th id="name">Name</th>
-            <th id="address">Address</th>
-	    <th>Opciones</th>
+            <th id="name">Nombre</th>
+            <th id="address">Dirección</th>
+	    <th class="options">Opciones</th>
         </tr>
     </thead>
     <tbody>
@@ -28,12 +40,13 @@
         <tr id="[% host.id %]">
             <td>[% host.id %]</td>
             <td>[% host.name %]</td>
-            <td><a href="[% c.uri_for('/hosts/add') %]">[% host.address %]</a></td>
-	    <td>
+            <td>[% host.address %]</td>
+	    <td class="options">
 	      <form action="[% c.uri_for('/hosts/del_submit') %]" method="post">
 		<input type="hidden" name="id" value="[% host.id %]"/>
-		<input type="submit" value="Eliminar"/>
+		<button type="submit" class="link" onClick="return confirm_submit()"><span class="option_del"></span></button><span><a class="option_edit" href="#"></a></span>
 	      </form>
+	    
 	    </td>
         </tr>
         [% END -%]
@@ -43,16 +56,14 @@
 <script type="text/javascript" charset="utf-8">
 $(document).ready(function() 
     { 
-	$("#props")
-	.tablesorter({ 
-        headers: { 
+	$("#props").tablesorter({
+	widthFixed: true,
+	headers: { 
             3: { 
                 sorter: false 
-            },
-	widthFixed: true
-        } 
-    }); 
-	.tablesorterPager({container: $("#pager")});
+            }
+	}}); 
+	$("#props").tablesorterPager({container: $("#pager")});
 
     } 
 );

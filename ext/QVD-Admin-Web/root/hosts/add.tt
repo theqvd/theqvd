@@ -1,4 +1,4 @@
-<h1>Añadir host</h1>
+<h1>Nuevo nodo</h1>
 <form name="addhost" action="add_submit" method="post">
   <div>
     <table>
@@ -19,6 +19,6 @@
 	</td>
       </tr>
     </table>
-    <input type="submit" value="add" />
+    <input type="submit" value="Añadir" />
   </div>
 </form>

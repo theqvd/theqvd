@@ -164,3 +164,29 @@ button.link:focus span {
 	text-decoration: underline;
 }
 
+.side_add {
+	float: left;
+	padding: 5px 5px 5px 25px;
+	background-image: url(../images/icons/add.png);
+	background-repeat: no-repeat;
+	background-position: 5px 5px;	
+}
+
+.options {
+	text-align: right;
+}
+
+.option_del {
+	padding: 5px 5px 5px 25px;
+	background-image: url(../images/icons/cross.png);
+	background-repeat: no-repeat;
+	background-position: 5px 5px;
+}
+
+.option_edit {
+	padding: 5px 5px 5px 25px;
+	background-image: url(../images/icons/pencil.png);
+	background-repeat: no-repeat;
+	background-position: 5px 5px;
+}
+
