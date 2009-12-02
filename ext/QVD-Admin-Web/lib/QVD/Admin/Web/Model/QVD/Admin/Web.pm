@@ -86,7 +86,7 @@ sub host_del {
     $self->reset_status;
     
     if (!eval{
-	    $self->admin->set_filter("id=$id");
+	    $self->admin->set_filter(id=>$id);
 	    $result = $self->admin->cmd_host_del;
 	    1
 	    }) {
@@ -107,6 +107,19 @@ sub user_list {
     #my @var = map { { id => $_->id, name => $_->name, address => $_->address } } ;
 
 }
+sub user_add {
+    my ($self, $login, $password) = @_;
+    my $result;
+    
+    $self->reset_status;
+ 
+    if (!eval{$result = $self->admin->cmd_user_add(login=>$login, password=>$password); 1}) {
+	$self->set_error($@);
+    } 
+    
+    return $result;   
+}
+
 
 
 =head 2 build_form_error_msg

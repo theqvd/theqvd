@@ -38,7 +38,7 @@ else
     <tbody>
         [% FOREACH host IN host_list -%]
         <tr id="[% host.id %]">
-            <td>[% host.id %]</td>
+            <td><a href="[% c.uri_for('/hosts/view/') %][% host.id %]">[% host.id %]</a></td>
             <td>[% host.name %]</td>
             <td>[% host.address %]</td>
 	    <td class="options">

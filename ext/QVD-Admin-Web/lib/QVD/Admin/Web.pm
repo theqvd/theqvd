@@ -19,6 +19,10 @@ use Catalyst qw/ConfigLoader
                 StackTrace
                 Unicode
                 FormValidator
+		Session
+		Session::Store::FastMmap
+		Session::State::Cookie
+		FormBuilder
                /;
 our $VERSION = sprintf "1.%04d", q$Revision: 6173 $ =~ /(\d+)/xg;
 #our $VERSION = '0.01';
@@ -32,7 +36,10 @@ our $VERSION = sprintf "1.%04d", q$Revision: 6173 $ =~ /(\d+)/xg;
 # with an external configuration file acting as an override for
 # local deployment.
 
-__PACKAGE__->config( name => 'QVD::Admin::Web' );
+__PACKAGE__->config( 
+	name => 'QVD::Admin::Web',
+	session => {flash_to_stash => 1}
+     );
 
 # Start the application
 __PACKAGE__->setup();

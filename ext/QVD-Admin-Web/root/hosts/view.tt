@@ -1,0 +1,1 @@
+<h1><a href="[% c.uri_for('/hosts') %]">Nodos</a> » [% host.name %]</h1>

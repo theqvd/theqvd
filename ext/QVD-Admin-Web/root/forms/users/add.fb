@@ -1,0 +1,20 @@
+    name: user_add
+    method: post
+    fields:
+        login:
+            label: Login
+            type:  text
+            size:  40
+            validate: NAME
+            required: 1
+        password:
+            label: Password
+            type:  password
+            size:  20
+            required: 1
+	confirm_password:
+	    label: Confirm  Password
+	    type: password
+            size: 20
+            required: 1
+    submit: adduser

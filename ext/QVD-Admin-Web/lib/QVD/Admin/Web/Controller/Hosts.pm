@@ -38,6 +38,10 @@ sub list :Local {
     $c->stash->{host_list} = $rs;
 }
 
+sub view :Local {
+    my ( $self, $c ) = @_;
+}
+
 sub add :Local {
     my ( $self, $c ) = @_;
 }
@@ -55,8 +59,8 @@ sub add_submit :Local {
 	);
 
     if (!$result->success || $result->has_unknown) {
-	$c->stash->{response_type} = "error";
-	$c->stash->{response_msg} = "Error in parameters: ".$model->build_form_error_msg($result);
+	$c->flash->{response_type} = "error";
+	$c->flash->{response_msg} = "Error in parameters: ".$model->build_form_error_msg($result);
 	$c->go('list');
     }
 
@@ -65,12 +69,12 @@ sub add_submit :Local {
 
     
     if (my $id = $model->host_add($name, $address)) {
-	$c->stash->{response_type} = "success";
-	$c->stash->{response_msg} = "$name añadido correctamente con id $id";
+	$c->flash->{response_type} = "success";
+	$c->flash->{response_msg} = "$name añadido correctamente con id $id";
     } else {
 # FIXME response_type must be an enumerated	
-	$c->stash->{response_type} = "error";
-	$c->stash->{response_msg} = $model->error_msg;
+	$c->flash->{response_type} = "error";
+	$c->flash->{response_msg} = $model->error_msg;
     }
     $c->go('list');
     # $c->
@@ -96,24 +100,25 @@ sub del_submit :Local {
 	   required => ['id'],
        constraint_methods => {
 	      'id' => qr/^\d+$/,
-	   
+	 }  
 	 );
 
     if (!$result->success) {
-       $c->stash->{response_type} = "error";
-	   $c->stash->{response_msg} = "Error in parameters: ".$model->build_form_error_msg($result);
+       $c->flash->{response_type} = "error";
+	   $c->flash->{response_msg} = "Error in parameters: ".$model->build_form_error_msg($result);
     } else { 
        my $id = $c->req->body_params->{id}; # only for a POST request
        if (my $countdel = $model->host_del($id)) {
-	      $c->stash->{response_type} = "success";
-	      $c->stash->{response_msg} = "$id eliminado correctamente";
+	      $c->flash->{response_type} = "success";
+	      $c->flash->{response_msg} = "$id eliminado correctamente";
        } else {
           # FIXME response_type must be an enumerated	
-	      $c->stash->{response_type} = "error";
-	      $c->stash->{response_msg} = $model->error_msg;
+	      $c->flash->{response_type} = "error";
+	      $c->flash->{response_msg} = $model->error_msg;
        }
     }
-    $c->forward('list');
+    #$c->forward('list');
+    $c->response->redirect($c->uri_for($self->action_for('list')));
 }
 
 =head1 AUTHOR
