@@ -1,4 +1,4 @@
-<h1><a href="[% c.uri_for('/hosts') %]">Nodos</a> &rarr; Nuevo</h1>
+<h1><a href="[% c.uri_for('/hosts') %]">Nodos</a> » Nuevo</h1>
 <form name="addhost" action="add_submit" method="post">
   <div>
     <table>
