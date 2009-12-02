@@ -70,14 +70,14 @@ sub new {
 	    disconnect	=> {new_state => 'disconnecting',
 	    		    action => 'disconnect_nx'},
 	    _timeout 	=> {new_state => 'disconnecting'},
-	    _do		=> {new_state => 'listening'},
+	    _detect_listening => {new_state => 'listening'},
 	    _fail	=> {new_state => 'disconnected',
 			    action => 'abort'},
 	},
 	listening => {
 	    disconnect	=> {new_state => 'disconnecting',
 	    		    action => 'disconnect_nx'},
-	    _do 	=> {new_state => 'connected'},
+	    _detect_connected => {new_state => 'connected'},
 	    _fail	=> {new_state => 'disconnected',
 			    action => 'abort'},
 	},
@@ -234,6 +234,12 @@ sub run {
 			if (grep $old_x_state eq $_, qw(connecting listening connected)
 			    and ($new_x_state eq 'disconnected')) {
 			    $self->_do_nx_action(_fail => $vm_runtime);
+			} 
+			elsif ($old_x_state eq 'connecting' and $new_x_state eq 'listening') {
+			    $self->_do_nx_action(_detect_listening => $vm_runtime);
+			}
+			elsif ($old_x_state eq 'listening' and $new_x_state eq 'connected') {
+			    $self->_do_nx_action(_detect_connected => $vm_runtime);
 			}
 			
 			if (_check_timeout($old_x_state, 'starting',
