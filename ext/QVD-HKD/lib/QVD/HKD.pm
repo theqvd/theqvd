@@ -160,13 +160,20 @@ sub _do_action {
 	    ERROR ("_do_action: not implemented: push_${mode}_state");
 	    return;
 	}
-	$vmas->txn_do(sub {
-	    if (_is_command($event)) {
-		my $clear_cmd = $vmas->can('clear_'.$mode.'_cmd');
-		$vmas->$clear_cmd($vm);
-	    }
-	    $vmas->$push_state($vm, $new_state);
-	});
+	eval {
+	    $vmas->txn_do(sub {
+		    if (_is_command($event)) {
+			my $clear_cmd = $vmas->can('clear_'.$mode.'_cmd');
+			$vmas->$clear_cmd($vm);
+		    }
+		    $vmas->$push_state($vm, $new_state);
+		});
+	};
+	if ($@) {
+	    # If state change failed no actions should be performed
+	    WARN("Unable to change state of VM $vm_id from $state to $new_state");
+	    return;
+	}
 
 	my $enter = $self->{$mode."_state_map"}{$new_state}{_enter}{action};
 	if ($enter) {
@@ -175,7 +182,8 @@ sub _do_action {
 		ERROR ("_do_action: not implemented: $method");
 		return;
 	    }
-	    $self->$method($vm, $state, $event);
+	    eval { $self->$method($vm, $state, $event) };
+	    WARN "Caught from hkd_action_$method($vm_id, $state, $event): $@" if $@;
 	}
     }
     my $action = $event_map->{$event}{action};
@@ -186,7 +194,8 @@ sub _do_action {
 	    ERROR ("_do_actions: not implemented: $action");
 	    return;
 	}
-	$self->$method($vm, $state, $event);
+	eval { $self->$method($vm, $state, $event) };
+	WARN "Caught from hkd_action_$action($vm_id, $state, $event): $@" if $@;
     }
 }
 
