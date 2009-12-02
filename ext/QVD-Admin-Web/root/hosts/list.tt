@@ -28,9 +28,9 @@
         <tr id="[% host.id %]">
             <td>[% host.id %]</td>
             <td>[% host.name %]</td>
-            <td><a href="#">[% host.address %]</a></td>
+            <td><a href="[% c.uri_for('/hosts/add') %]">[% host.address %]</a></td>
 	    <td>
-	      <form action="del_submit" method="post">
+	      <form action="[% c.uri_for('/hosts/del_submit') %]" method="post">
 		<input type="hidden" name="id" value="[% host.id %]"/>
 		<input type="submit" value="Eliminar"/>
 	      </form>
@@ -44,7 +44,14 @@
 $(document).ready(function() 
     { 
 	$("#props")
-	.tablesorter({widthFixed: true} )
+	.tablesorter({ 
+        headers: { 
+            3: { 
+                sorter: false 
+            },
+	widthFixed: true
+        } 
+    }); 
 	.tablesorterPager({container: $("#pager")});
 
     } 
