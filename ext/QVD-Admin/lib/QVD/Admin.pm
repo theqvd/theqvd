@@ -331,7 +331,7 @@ sub cmd_vm_disconnect_user {
     $counter
 }
 
-sub _get_single_running_vm_runtime {
+sub _get_single_vm_runtime {
     my $self = shift;
     my $rs = $self->get_resultset('vm');
     if ($rs->count > 1) {
@@ -339,14 +339,12 @@ sub _get_single_running_vm_runtime {
     }
     my $vm = $rs->single;
     die 'No matching VMs' unless defined $vm;
-    my $vm_runtime = $vm->vm_runtime;
-    die 'The VM is not running' unless $vm_runtime->vm_state eq 'running';
-    $vm_runtime
+    $vm->vm_runtime
 }
 
 sub cmd_vm_ssh {
     my ($self, @args) = @_;
-    my $vm_runtime = $self->_get_single_running_vm_runtime;
+    my $vm_runtime = $self->_get_single_vm_runtime;
     my $ssh_port = $vm_runtime->vm_ssh_port;
     die 'SSH access is disabled' unless defined $ssh_port;
     my @cmd = (ssh => ($vm_runtime->vm_address, -p => $ssh_port, @args));
@@ -355,7 +353,7 @@ sub cmd_vm_ssh {
 
 sub cmd_vm_vnc {
     my ($self, @args) = @_;
-    my $vm_runtime = $self->_get_single_running_vm_runtime;
+    my $vm_runtime = $self->_get_single_vm_runtime;
     my $vnc_port = $vm_runtime->vm_vnc_port;
     die 'VNC access is disabled' unless defined $vnc_port;
     my @cmd = (vncviewer => ($vm_runtime->vm_address.'::'.$vnc_port, @args));
