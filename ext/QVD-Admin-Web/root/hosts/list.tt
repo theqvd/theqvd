@@ -11,7 +11,7 @@ else
 </script>
 
 <h1>Nodos</h1>
-<div class="side_add"><a href="[% c.uri_for('/hosts/add') %]">Nuevo nodo</a></div>
+<div class="side_add"><a href="[% c.uri_for('/hosts/add') %]">Nuevo</a></div>
 <div id="pager" class="pager">
 	<form>
 		<img src="/static/icons/first.png" class="first"/>
