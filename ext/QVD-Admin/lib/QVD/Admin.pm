@@ -32,7 +32,10 @@ sub _split_on_equals {
 sub set_filter {
     my ($self, %conditions) = @_;
     while (my ($k, $v) = each %conditions) {
-	if ($v =~ /[*?]/) {
+	$k = 'me.id' if $k eq 'id';
+	if (ref $v) {
+	    $self->{filter}{$k} = $v;
+	} elsif ($v =~ /[*?]/) {
 	    $v =~ s/([_%])/\\$1/g;
 	    $v =~ tr/*?/%_/;
 	    $self->{filter}{$k} = {like => $v};
