@@ -208,7 +208,7 @@ sub cmd_osi_list {
 
 sub help_osi_list {
     print <<EOT;
-osi list: list the Operative System Images (OSI) configured.
+osi list: lists the installed Operating System Images (OSI)
 usage: osi list
 
   Lists consists of Id, Name, RAM size, Home partition size and image
@@ -230,8 +230,15 @@ sub cmd_osi_add {
 sub help_osi_add {
     print <<EOT
 osi add: Adds operating systems images.
-usage: osi add name=value memory=value use_overlay=value disk_image=value
-       
+usage: osi add name=string disk_image=path [memory=size] [use_overlay=boolean]
+		[user_storage_size=size]
+
+    The disk_image is copied to the read-only storage area.
+    The default values for the optional parameters are:
+	memory=256 
+	use_overlay=y
+	user_storage_size=undef (no user storage)
+
 Valid options:
     -q [--quiet]         : don't print the command message
 EOT

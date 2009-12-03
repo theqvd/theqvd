@@ -162,23 +162,23 @@ sub cmd_user_add {
 sub cmd_osi_add {
     my ($self, @args) = @_;
     my $params = {@args};
+    my @required_params = qw/name memory use_overlay user_storage_size disk_image/;
 
     # Default OSI parameters
     # FIXME Detect type of image and set use_overlay accordingly, iso=no overlay
     $params->{memory} //= 256;
     $params->{use_overlay} //= 1;
     $params->{user_storage_size} //= undef;
-    
+
+    die "The required parameters are ".join(", ", @required_params)
+	unless _set_equals([keys %$params], \@required_params);
+
     use File::Basename qw/basename/;
     my $img = $params->{disk_image};
     $params->{disk_image} = basename($img);
 
-    die "Invalid parameters" unless _set_equals([keys %$params],
-	[qw/name memory use_overlay user_storage_size disk_image/]);
-
     # Copy image to ro-directory
     # FIXME Overwriting existing image should be an error
-    die "disk_image is not optional" unless defined $params->{disk_image};
     my $destination = QVD::Config->get('ro_storage_path');
     use File::Copy qw/copy/;
     copy($img, $destination) or die "Unable to copy $img to storage: $^E";
