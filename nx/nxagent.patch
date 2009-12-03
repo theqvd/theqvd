@@ -15,7 +15,7 @@ diff -Naur nx-orig/nx-X11/programs/Xserver/hw/nxagent/qvd.xpm nx-new/nx-X11/prog
 +++ nx-new/nx-X11/programs/Xserver/hw/nxagent/qvd.xpm	2009-12-03 13:10:41.000000000 +0100
 @@ -0,0 +1,36 @@
 +/* XPM */
-+static char * qvd_xpm[] = {
++static char * nxagentIconData[] = {
 +"16 16 17 1",
 +" 	c None",
 +".	c #231401",
