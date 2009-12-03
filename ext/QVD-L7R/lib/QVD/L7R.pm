@@ -175,6 +175,9 @@ sub _connect_to_vm_processor {
 	} else {
 	    $server->send_http_response(HTTP_PROCESSING,
 		    'X-QVD-VM-Status: Starting VM');
+	    # FIXME Make the sleep amount configurable
+	    # The sleep amount should never be greater than 30 seconds
+	    # or we might miss nxagent's "listening" state!
 	    sleep 5;
 	}
     }
