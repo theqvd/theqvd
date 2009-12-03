@@ -31,6 +31,7 @@ else
         <tr>
             <th id="id">id</th>
             <th id="login">Nombre</th>
+	    <th id="disco">Disco</th>
 	    <th class="options">Opciones</th>
         </tr>
     </thead>
@@ -39,7 +40,14 @@ else
         <tr id="[% user.id %]">
             <td>[% user.id %]</td>
             <td>[% user.login %]</td>
-            <td></td>
+	    <td><img src="http://chart.apis.google.com/chart?cht=bhs&chs=50x12&chd=t:33|100&chco=4d89f9,c6d9fd" /> 4,43 GB</td>
+	    <td class="options">
+	      <form action="[% c.uri_for('/users/del_submit') %]" method="post">
+		<input type="hidden" name="id" value="[% user.id %]"/>
+		<button type="submit" class="link" onClick="return confirm_submit()"><span class="option_del"></span></button>
+	      </form>
+	    
+	    </td>
         </tr>
         [% END -%]
     </tbody>
@@ -52,6 +60,9 @@ $(document).ready(function()
 	widthFixed: true,
 	headers: { 
             2: { 
+                sorter: false 
+            },
+	    3: { 
                 sorter: false 
             }
 	}}); 
