@@ -135,6 +135,11 @@ p {
 
 #menu ul {
 	border-right: solid #DDD 1px;
+	list-style-type: none;
+}
+
+#menu ul li {
+	margin-bottom:6px;
 }
 
 button {
@@ -186,6 +191,34 @@ button.link:focus span {
 .option_edit {
 	padding: 5px 5px 5px 25px;
 	background-image: url(../images/icons/pencil.png);
+	background-repeat: no-repeat;
+	background-position: 5px 5px;
+}
+
+.menu_host {
+	padding: 5px 5px 5px 25px;
+	background-image: url(../images/icons/server.png);
+	background-repeat: no-repeat;
+	background-position: 5px 5px;
+}
+
+.menu_vm {
+	padding: 5px 5px 5px 25px;
+	background-image: url(../images/icons/computer.png);
+	background-repeat: no-repeat;
+	background-position: 5px 5px;
+}
+
+.menu_user {
+	padding: 5px 5px 5px 25px;
+	background-image: url(../images/icons/user_female.png);
+	background-repeat: no-repeat;
+	background-position: 5px 5px;
+}
+
+.menu_osi {
+	padding: 5px 5px 5px 25px;
+	background-image: url(../images/icons/cd.png);
 	background-repeat: no-repeat;
 	background-position: 5px 5px;
 }
