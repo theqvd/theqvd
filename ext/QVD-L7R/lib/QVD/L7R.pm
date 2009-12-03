@@ -98,6 +98,13 @@ sub _connect_to_vm_processor {
     # FIXME this limits number of VMs per user to 1
     my $vm = $vms[0];
 
+    unless defined ($vm) {
+	INFO "User " . $user->id . " does not have any virtual machine";
+	# FIXME handle this situation in a better way, for instance:
+	# - allow automatic provisioning
+	# - report the problem to the client
+	die;
+    }
     # transición disconnected -> connected
     _connect_session($vmas, $vm);
 
