@@ -40,9 +40,9 @@
 		<div class="grid_3" id="menu">
 			<ul>
 				<li><a href="/users/" class="menu_user">Usuarios</a></li>
-				<li><a href="#" class="menu_vm">M&aacute;quinas virtuales</a></li>
+				<li><a href="/vm/" class="menu_vm">M&aacute;quinas virtuales</a></li>
 				<li><a href="/hosts/" class="menu_host">Nodos</a></li>
-				<li><a href="#" class="menu_osi">Im&aacute;genes</a></li>															
+				<li><a href="/osi/" class="menu_osi">Im&aacute;genes</a></li>															
 			</ul>
 		</div>
 		<div class="grid_9">
