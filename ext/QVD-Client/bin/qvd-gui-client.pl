@@ -13,7 +13,7 @@ use base qw(Wx::Frame);
 use strict;
 
 sub new {
-	my( $self, $parent, $id, $title, $pos, $size, $style, $name ) = @_;
+	my( $class, $parent, $id, $title, $pos, $size, $style, $name ) = @_;
 	$parent = undef              unless defined $parent;
 	$id     = -1                 unless defined $id;
 	$title  = ""                 unless defined $title;
@@ -23,26 +23,74 @@ sub new {
 
 # begin wxGlade: MyFrame::new
 
-	$style = wxICONIZE|wxCAPTION|wxMINIMIZE|wxCLOSE_BOX  
+	$style = wxICONIZE|wxCAPTION|wxMINIMIZE|wxCLOSE_BOX
 		unless defined $style;
 
-	$self = $self->SUPER::new( $parent, $id, $title, $pos, $size, $style, $name );
+	my $self = $class->SUPER::new( $parent, $id, $title, $pos, $size, $style, $name );
+
+	my $panel = $self->{panel} = Wx::Panel->new($self, -1,
+						    wxDefaultPosition, wxDefaultSize,
+						    wxTAB_TRAVERSAL );
+
+	my $ver_sizer  = Wx::BoxSizer->new(wxVERTICAL);
+	# $self->SetSizer($ver_sizer);
+
 	# FIXME Hardcoded path!
-	$self->{logo} = Wx::StaticBitmap->new($self, -1, Wx::Bitmap->new("QVD-Client/bin/qvd-logo.png", wxBITMAP_TYPE_ANY), wxDefaultPosition, wxDefaultSize, );
-	$self->{m_staticText1} = Wx::StaticText->new($self, -1, "Usuario", wxDefaultPosition, wxDefaultSize, );
-	$self->{username} = Wx::TextCtrl->new($self, -1, "qvd", wxDefaultPosition, wxDefaultSize, );
-	$self->{m_staticText11} = Wx::StaticText->new($self, -1, "Contraseña", wxDefaultPosition, wxDefaultSize, );
-	$self->{password} = Wx::TextCtrl->new($self, -1, "passw0rd", wxDefaultPosition, wxDefaultSize, wxTE_PASSWORD);
-	$self->{m_staticText12} = Wx::StaticText->new($self, -1, "Servidor", wxDefaultPosition, wxDefaultSize, );
-	$self->{host} = Wx::TextCtrl->new($self, -1, "aguila", wxDefaultPosition, wxDefaultSize, );
-	$self->{port} = Wx::TextCtrl->new($self, -1, "8080", wxDefaultPosition, wxDefaultSize, );
-	$self->{connect_button} = Wx::Button->new($self, -1, "Conectar");
-	$self->{console} = Wx::TextCtrl->new($self, -1, "", wxDefaultPosition, wxDefaultSize, wxTE_MULTILINE);
-	$self->{progress_bar} = Wx::Gauge->new($self, -1, 100, wxDefaultPosition,     wxDefaultSize, wxGA_HORIZONTAL|wxGA_SMOOTH);	
+	# logo image
+	$ver_sizer->Add(Wx::StaticBitmap->new($panel, -1,
+					      Wx::Bitmap->new("QVD-Client/bin/qvd-logo.png",
+							      wxBITMAP_TYPE_ANY)),
+			0, wxLEFT|wxRIGHT|wxTOP|wxALIGN_CENTER_HORIZONTAL, 20);
+
+	my $grid_sizer = Wx::GridSizer->new(1, 2, 0, 0);
+	$ver_sizer->Add($grid_sizer, 1, wxALL|wxEXPAND, 20);
+
+	$grid_sizer->Add(Wx::StaticText->new($panel, -1, "Usuario"),
+			 0, wxALL, 5);
+
+	$self->{username} = Wx::TextCtrl->new($panel, -1, "qvd");
+	$grid_sizer->Add($self->{username},
+			 1, wxALL|wxEXPAND, 5);
+	$self->{username}->SetFocus();
+	$grid_sizer->Add(Wx::StaticText->new($panel, -1, "Contraseña"),
+			 0, wxALL, 5);
+	$self->{password} = Wx::TextCtrl->new($panel, -1, "passw0rd",
+					      wxDefaultPosition, wxDefaultSize,
+					      wxTE_PASSWORD);
+	$grid_sizer->Add($self->{password},
+			 1, wxALL|wxEXPAND, 5);
+	$grid_sizer->Add(Wx::StaticText->new($panel, -1, "Servidor"),
+			 0, wxALL, 5);
+	$self->{host} = Wx::TextCtrl->new($panel, -1, "aguila");
+	$grid_sizer->Add($self->{host},
+			 1, wxALL|wxEXPAND, 5);
+
+	# port goes here!
+	$self->{connect_button} = Wx::Button->new($panel, -1, "Conectar");
+	$ver_sizer->Add($self->{connect_button},
+			0, wxLEFT|wxRIGHT|wxBOTTOM|wxEXPAND, 20);
+	$self->{connect_button}->SetDefault;
+
+	$self->{progress_bar} = Wx::Gauge->new($panel, -1, 100,
+					       wxDefaultPosition, wxDefaultSize,
+					       wxGA_HORIZONTAL|wxGA_SMOOTH);
 	$self->{progress_bar}->SetValue(0);
-    
-	$self->__set_properties();
-	$self->__do_layout();
+	$ver_sizer->Add($self->{progress_bar},
+			 0, wxEXPAND, 0);
+
+	$self->SetTitle("QVD");
+	my $icon = Wx::Icon->new();
+	# FIXME Hardcoded path!
+	$icon->CopyFromBitmap(Wx::Bitmap->new("QVD-Client/bin/qvd.xpm", wxBITMAP_TYPE_ANY));
+	$self->SetIcon($icon);
+
+	# $panel->SetAutoLayout(1);
+	$panel->SetSizer($ver_sizer);
+
+	$ver_sizer->Fit($self);
+	$self->Center;
+	$self->Show(1);
+
 
 	Wx::Event::EVT_BUTTON($self, $self->{connect_button}->GetId, \&OnClick);
 	Wx::Event::EVT_TIMER($self, -1, \&OnTimer);
@@ -50,85 +98,29 @@ sub new {
 	$self->{timer} = Wx::Timer->new($self);
 	$self->{proc} = undef;
 	$self->{proc_pid} = undef;
-	$self->{state} = "";
+	$self->{log} = "";
 
-# end wxGlade
 	return $self;
-
 }
 
-
-sub __set_properties {
-	my $self = shift;
-
-# begin wxGlade: MyFrame::__set_properties
-
-	$self->SetTitle("QVD");
-	my $icon = Wx::Icon->new();
-	# FIXME Hardcoded path!
-	$icon->CopyFromBitmap(Wx::Bitmap->new("QVD-Client/bin/qvd.xpm", wxBITMAP_TYPE_ANY));
-	$self->SetIcon($icon);
-	$self->{port}->Show(0);
-	$self->{console}->Show(0);
-	$self->{console}->SetEditable(0);
-	$self->{connect_button}->SetDefault();
-	$self->{console}->SetMinSize(Wx::Size->new(-1, 300));
-
-# end wxGlade
-}
-
-sub __do_layout {
-	my $self = shift;
-
-# begin wxGlade: MyFrame::__do_layout
-
-	$self->{object_1} = Wx::BoxSizer->new(wxVERTICAL);
-	$self->{object_2} = Wx::GridSizer->new(1, 2, 0, 0);
-	$self->{object_3} = Wx::BoxSizer->new(wxHORIZONTAL);
-	$self->{object_1}->Add($self->{logo}, 0, wxLEFT|wxRIGHT|wxTOP|wxALIGN_CENTER_HORIZONTAL, 20);
-	$self->{object_2}->Add($self->{m_staticText1}, 0, wxALL, 5);
-	$self->{object_2}->Add($self->{username}, 1, wxALL|wxEXPAND, 5);
-	$self->{object_2}->Add($self->{m_staticText11}, 0, wxALL, 5);
-	$self->{object_2}->Add($self->{password}, 1, wxALL|wxEXPAND, 5);
-	$self->{object_2}->Add($self->{m_staticText12}, 0, wxALL, 5);
-	$self->{object_3}->Add($self->{host}, 1, wxALL|wxEXPAND, 5);
-	$self->{object_3}->Add($self->{port}, 1, wxALL|wxEXPAND, 5);
-	$self->{object_2}->Add($self->{object_3}, 1, wxEXPAND, 5);
-	$self->{object_1}->Add($self->{object_2}, 1, wxALL|wxEXPAND, 20);
-	$self->{object_1}->Add($self->{connect_button}, 0, wxLEFT|wxRIGHT|wxBOTTOM|wxEXPAND, 20);
-	$self->{object_1}->Add($self->{console}, 0, wxEXPAND, 0);
-	$self->{object_1}->Add($self->{progress_bar}, 0, wxEXPAND, 0);	
-	$self->SetSizer($self->{object_1});
-	$self->{object_1}->Fit($self);
-	$self->Layout();
-	$self->Centre();
-
-# end wxGlade
-}
-
-sub OnClick {   
+sub OnClick {
     my( $self, $event ) = @_;
-    
     $self->{state} = "";
-    
-    $self->{username}->SetEditable(0);
-    $self->{password}->SetEditable(0);
-    $self->{host}->SetEditable(0);
-    $self->{port}->SetEditable(0);
-       
-    @ARGV = ($self->{username}->GetValue, $self->{password}->GetValue, $self->{host}->GetValue, $self->{port}->GetValue);
+    $self->{$_}->SetEditable(0) for (qw(username password host));
 
-    my @cmd = qw(perl -Mlib::glob=*/lib QVD-Client/bin/qvd-client.pl);
-    
-    $self->{proc} = Wx::Process::Open(join(" ", @cmd,@ARGV));
+    my @cmd = (qw(perl -Mlib::glob=*/lib QVD-Client/bin/qvd-client.pl),
+	       map $self->{$_}->GetValue, qw(username password host));
+
+    # FIXME, properly escape arguments.  We don't want the user to
+    # write ";rm -Rf ~/" on some field and get it executed by the
+    # shell!
+    # Does Wx support something execve(2) alike?
+    my $cmd = join(" ", @cmd);
+    print STDERR "running cmd: $cmd\n";
+    $self->{proc} = Wx::Process::Open($cmd);
     $self->{proc}->Redirect;
     $self->{proc_pid} = $self->{proc}->GetPid;
-    
     $self->{timer}->Start(100, 0);
-   
-    
-    
-    #warn join " ", @cmd,@ARGV;
 }
 
 sub OnTimer {
@@ -137,34 +129,26 @@ sub OnTimer {
     if (Wx::Process::Exists($self->{proc_pid})) {
 	while ($self->{proc}->IsInputAvailable) {
 	    my $response = "";
-	    my $state = $self->{console}->GetValue;
 	    my $bytesread = $self->{proc}->GetInputStream->read($response, 1000,0);
-	    warn $response;
 	    if (defined ($bytesread) and ($bytesread != 0)) {
-		
-		$self->{console}->AppendText($response);
-		$self->{state} .= $response;
-		
-		if ($self->{state} =~ m/X-QVD-VM-Status:Connected to VM/) {
-		    $self->Hide;
-		} elsif ($self->{state} =~ m/X-QVD-VM-Status:Connecting to VM/) {
-		} elsif ($self->{state} =~ m/X-QVD-VM-Status:Starting VM/) {
-		} elsif ($self->{state} =~ m/X-QVD-VM-Status:Checking VM/){
-		} 	
+		print STDERR $response;
+		$self->{log} .= $response;
+		for (reverse split /\r?\n/, $self->{log}) {
+		    # print STDERR "line: >$_<\n";
+		    if (my ($status) = m/X-QVD-VM-Status:(.*)/) {
+			print "Status: $status\n";
+			$self->Hide if $status =~ /\bConnected\b/;
+			last;
+		    }
+		}
 	    }
-	    
 	}
     } else {
+	print STDERR "child exited\n";
 	$self->{timer}->Stop;
-	$self->{console}->SetValue("");
 	$self->{progress_bar}->SetValue(0);
 	$self->{progress_bar}->SetRange(100);
-	
-	$self->{username}->SetEditable(1);
-	$self->{password}->SetEditable(1);
-	$self->{host}->SetEditable(1);
-	$self->{port}->SetEditable(1);
-	
+	$self->{$_}->SetEditable(1) for (qw(username password host));
 	$self->Show;
     }
 }
@@ -172,23 +156,16 @@ sub OnTimer {
 
 # end of class MyFrame
 
-1;
-
-1;
-
 package main;
 
-unless(caller){
-	local *Wx::App::OnInit = sub{1};
-	my $app = Wx::App->new();
-	Wx::InitAllImageHandlers();
+local *Wx::App::OnInit = sub{1};
+my $app = Wx::App->new();
+Wx::InitAllImageHandlers();
 
-	my $panel = MyFrame->new();
+my $frame = MyFrame->new();
 
-	$app->SetTopWindow($panel);
-	$panel->Show(1);
-	$app->MainLoop();
-}
+$app->SetTopWindow($frame);
+$app->MainLoop();
 
 
 __END__
