@@ -3,7 +3,7 @@
 use strict;
 use warnings;
 
-use QVD::L7R;
+use QVD::RC;
 
 # FIXME: make listening port configurable via DB
 my $rc = QVD::RC->new(port => 8080);
