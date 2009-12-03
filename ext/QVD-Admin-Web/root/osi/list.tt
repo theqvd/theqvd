@@ -9,8 +9,8 @@ else
 }
 </script>
 
-<h1>Nodos</h1>
-<div class="side_add"><a href="[% c.uri_for('/hosts/add') %]">Nuevo</a></div>
+<h1>Imágenes</h1>
+<div class="side_add"><a href="[% c.uri_for('/osi/add') %]">Nuevo</a></div>
 <div id="pager" class="pager">
 	<form>
 		<img src="/static/icons/first.png" class="first"/>
@@ -30,19 +30,24 @@ else
         <tr>
             <th id="id"></th>
             <th id="name">Nombre</th>
-            <th id="address">Dirección</th>
+            <th id="disk_image">Imagen Disco</th>
+            <th id="use_overlay">Overlay</th>
+            <th id="memory">Memoria</th>
 	    <th class="options">Opciones</th>
         </tr>
     </thead>
     <tbody>
-        [% FOREACH host IN host_list -%]
-        <tr id="[% host.id %]">
-            <td><a href="[% c.uri_for('/hosts/view/') %][% host.id %]" class="option_view">[% host.id %]</a></td>
-            <td>[% host.name %]</td>
-            <td>[% host.address %]</td>
+        [% FOREACH osi IN osi_list -%]
+        <tr id="[% osi.id %]">
+            <td><a href="[% c.uri_for('/osi/view/') %][% osi.id %]" class="option_view">[% osi.id %]</a></td>
+            <td>[% osi.name %]</td>
+            <td>[% osi.disk_image %]</td>
+			<td>[% osi.use_overlay %]</td>
+			<td>[% osi.memory %]</td>
+			
 	    <td class="options">
-	      <form action="[% c.uri_for('/hosts/del_submit') %]" method="post">
-		<input type="hidden" name="id" value="[% host.id %]"/>
+	      <form action="[% c.uri_for('/osi/del_submit') %]" method="post">
+		<input type="hidden" name="id" value="[% osi.id %]"/>
 		<button type="submit" class="link" onClick="return confirm_submit()"><span class="option_del"></span></button>
 	      </form>
 	    
@@ -58,7 +63,7 @@ $(document).ready(function()
 	$("#props").tablesorter({
 	widthFixed: true,
 	headers: { 
-            3: { 
+            5: { 
                 sorter: false 
             }
 	}}); 

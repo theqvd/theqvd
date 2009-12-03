@@ -1,0 +1,16 @@
+name: add
+method: post
+fields:
+    name:
+        label: Nombre
+        type:  text
+        size:  40
+        validate: NAME
+        required: 1
+    address:
+        label: Direccion IP
+        type:  text
+        size:  20
+        validate: IPV4
+        required: 1
+submit: addhost

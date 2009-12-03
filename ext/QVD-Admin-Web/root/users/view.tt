@@ -1,2 +1,75 @@
-[% META title = "Edit a person" %]
-[% FormBuilder.render %]
+<h1><a href="[% c.uri_for('/users') %]">Usuarios</a> &raquo; [% user.login %]</h1>
+
+<div class="view">
+    <table class="tablesorter resultset">
+	<tr>
+	    <td>Identificador</td>
+	    <td>[% user.id %]</td>
+	</tr>
+	<tr>
+	    <td>Nombre</td>
+	    <td>[% user.login %]</td>
+	</tr>
+	<tr>
+	    <td>Departamento</td>
+	    <td>[% user.department %]</td>
+	</tr>
+	<tr>
+	    <td>Número de teléfono</td>
+	    <td>[% user.telephone %]</td>
+	</tr>
+	<tr>
+	    <td>Correo electrónico</td>
+	    <td>[% user.email %]</td>
+	</tr>	
+    </table>
+</div>
+
+<table id="props" class="tablesorter resultset">
+    <thead>
+        <tr>
+            <th id="id"></th>
+            <th id="user">Usuario</th>
+            <th id="osi">Imagen Disco</th>
+            <th id="name">Nombre</th>
+            <th id="storage">Almacenamiento</th>
+	    <th class="options">Opciones</th>
+        </tr>
+    </thead>
+    <tbody>
+        [% FOREACH vm IN vm_list -%]
+        <tr id="[% vm.id %]">
+            <td><a href="[% c.uri_for('/vm/view/') %][% vm.id %]" class="option_view">[% vm.id %]</a></td>
+            <td>[% vm.user.login %]</td>
+            <td>[% vm.osi.name %]</td>
+			<td>[% vm.name %]</td>
+			<td>[% vm.storage %]</td>
+			
+	    <td class="options">
+	      <form action="[% c.uri_for('/vm/del_submit') %]" method="post">
+		<input type="hidden" name="id" value="[% vm.id %]"/>
+		<button type="submit" class="link" onClick="return confirm_submit()"><span class="option_del"></span></button>
+	      </form>
+	    
+	    </td>
+        </tr>
+        [% END -%]
+    </tbody>
+</table>
+
+<script type="text/javascript" charset="utf-8">
+$(document).ready(function() 
+    { 
+	$("#props").tablesorter({
+	widthFixed: true,
+	headers: { 
+            5: { 
+                sorter: false 
+            }
+	}}); 
+	$("#props").tablesorterPager({container: $("#pager")});
+
+    } 
+);
+
+</script>

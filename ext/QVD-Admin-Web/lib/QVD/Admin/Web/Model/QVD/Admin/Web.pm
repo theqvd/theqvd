@@ -62,9 +62,6 @@ sub host_add {
 
     $self->reset_status;
 
-# old API
-#    if (!eval{$result = $self->admin->cmd_host_add("name=$name", "address=$address"); 1}) {
-
     if (
         !eval {
             $result =
@@ -84,10 +81,18 @@ sub host_list {
 
     $self->reset_status;
     my $rs = $self->db->resultset('Host');
-    return [ $rs->search ];
+    return [ $rs->search($filter) ];
 
  #my @var = map { { id => $_->id, name => $_->name, address => $_->address } } ;
 
+}
+
+sub host_find {
+	my ( $self, $filter ) = @_;
+
+    $self->reset_status;
+    my $rs = $self->db->resultset('Host');
+    return   $rs->find($filter)  ;
 }
 
 sub host_del {
@@ -115,10 +120,16 @@ sub user_list {
 
     $self->reset_status;
     my $rs = $self->db->resultset('User');
-    return [ $rs->search ];
+    return [ $rs->search($filter) ];
 
- #my @var = map { { id => $_->id, name => $_->name, address => $_->address } } ;
+}
 
+sub user_find {
+	my ( $self, $filter ) = @_;
+
+    $self->reset_status;
+    my $rs = $self->db->resultset('User');
+    return   $rs->find($filter)  ;
 }
 
 sub user_add {
@@ -141,6 +152,49 @@ sub user_add {
     }
 
     return $result;
+}
+
+sub osi_list {
+    my ( $self, $filter ) = @_;
+    $self->reset_status;
+    my $rs = $self->db->resultset('OSI');
+    return [ $rs->search($filter) ];
+}
+
+sub osi_find {
+	my ( $self, $filter ) = @_;
+
+    $self->reset_status;
+    my $rs = $self->db->resultset('OSI');
+    return   $rs->find($filter)  ;
+}
+
+sub vm_list {
+    my ( $self, $filter ) = @_;
+    $self->reset_status;
+    my $rs = $self->db->resultset('VM');
+    return [ $rs->search($filter) ];
+}
+
+sub vm_find {
+    my ( $self, $filter ) = @_;
+    $self->reset_status;
+    my $rs = $self->db->resultset('VM');
+    return $rs->find($filter);
+}
+
+sub vmrt_list {
+	my ( $self, $filter ) = @_;
+    $self->reset_status;
+    my $rs = $self->db->resultset('VM_Runtime');
+    return [ $rs->search($filter) ]  ;
+}
+
+sub vmrt_find {
+	my ( $self, $filter ) = @_;
+    $self->reset_status;
+    my $rs = $self->db->resultset('VM_Runtime');
+    return   $rs->find($filter)  ;
 }
 
 =head 2 build_form_error_msg

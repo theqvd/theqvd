@@ -1,4 +1,4 @@
-    name: user_add
+    name: add
     method: post
     fields:
         login:
@@ -12,9 +12,11 @@
             type:  password
             size:  20
             required: 1
-	confirm_password:
-	    label: Confirm  Password
-	    type: password
+		confirm_password:
+	        label: Confirm  Password
+	        type: password
             size: 20
             required: 1
     submit: adduser
+
+

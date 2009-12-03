@@ -1,0 +1,93 @@
+<script LANGUAGE="JavaScript">
+function confirm_submit()
+{
+var agree=confirm("¿Está seguro?");
+if (agree)
+	return true ;
+else
+	return false ;
+}
+</script>
+
+<h1>Máquinas virtuales</h1>
+<div class="side_add"><a href="[% c.uri_for('/vm/add') %]">Nuevo</a></div>
+<div id="pager" class="pager">
+	<form>
+		<img src="/static/icons/first.png" class="first"/>
+		<img src="/static/icons/prev.png" class="prev"/>
+		<input type="text" class="pagedisplay" size="3" disabled/>
+		<img src="/static/icons/next.png" class="next"/>
+		<img src="/static/icons/last.png" class="last"/>
+		<select class="pagesize" style="display:none">
+			<option selected="selected" value="20">20</option>
+		</select>
+
+	</form>
+</div>
+[% META title = 'PropGet' -%]
+<table id="props" class="tablesorter resultset">
+    <thead>
+        <tr>
+            <th id="id"></th>
+            <th id="name">Nombre</th>
+            <th id="user">Usuario</th>
+            <th id="osi">Imagen Disco</th>
+	    <th id="status">Estado</th>
+            <th id="storage">Almacenamiento</th>
+	    <th class="options">Opciones</th>
+        </tr>
+    </thead>
+    <tbody>
+        [% FOREACH vm IN vm_list -%]
+        <tr id="[% vm.id %]">
+            <td><a href="[% c.uri_for('/vm/view/') %][% vm.id %]" class="option_view">[% vm.id %]</a></td>
+	    <td>[% vm.name %]</td>
+            <td>[% vm.user.login %]</td>
+            <td><a href="[% c.uri_for('/osi/view/') %][% vm.osi_id %]">[% vm.osi.name %]</a></td>
+	    <td>[% vm.vm_runtime.vm_state %]</td>
+	    <td>[% vm.storage %]</td>
+	    <td class="options">
+	      [% IF vm.vm_runtime.vm_state == 'stopped' -%]
+	      <form action="#" method="post">
+		<input type="hidden" name="id" value="[% vm.id %]"/>
+		<button type="submit" class="link" onClick="return confirm_submit()"><span class="option_startvm"></span></button>
+	      </form>
+	      [% ELSIF vm.vm_runtime.vm_state == 'running' %]
+	      <form action="#" method="post">
+		<input type="hidden" name="id" value="[% vm.id %]"/>
+		<button type="submit" class="link" onClick="return confirm_submit()"><span class="option_stopvm"></span></button>
+	      </form>    
+	      [% END %]
+	      [% IF vm.vm_runtime.user_state == 'connected' -%]
+	      <form action="#" method="post">
+		<input type="hidden" name="id" value="[% vm.id %]"/>
+		<button type="submit" class="link" onClick="return confirm_submit()"><span class="option_disconnect"></span></button>
+	      </form>
+	      [% END %]	      
+	      <form action="[% c.uri_for('/vm/del_submit') %]" method="post">
+		<input type="hidden" name="id" value="[% vm.id %]"/>
+		<button type="submit" class="link" onClick="return confirm_submit()"><span class="option_del"></span></button>
+	      </form>
+	    
+	    </td>
+        </tr>
+        [% END -%]
+    </tbody>
+</table>
+
+<script type="text/javascript" charset="utf-8">
+$(document).ready(function() 
+    { 
+	$("#props").tablesorter({
+	widthFixed: true,
+	headers: { 
+            6: { 
+                sorter: false 
+            }
+	}}); 
+	$("#props").tablesorterPager({container: $("#pager")});
+
+    } 
+);
+
+</script>

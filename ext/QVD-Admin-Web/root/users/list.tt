@@ -1,5 +1,4 @@
 <script LANGUAGE="JavaScript">
-<!--
 function confirm_submit()
 {
 var agree=confirm("¿Está seguro?");
@@ -29,8 +28,9 @@ else
 <table id="props" class="tablesorter resultset">
     <thead>
         <tr>
-            <th id="id">id</th>
+            <th id="id"></th>
             <th id="login">Nombre</th>
+            <th id="department">Departamento</th>	    
 	    <th id="disco">Disco</th>
 	    <th class="options">Opciones</th>
         </tr>
@@ -38,8 +38,9 @@ else
     <tbody>
         [% FOREACH user IN user_list -%]
         <tr id="[% user.id %]">
-            <td>[% user.id %]</td>
+            <td><a href="[% c.uri_for('/users/view/') %][% user.id %]" class="option_view">[% user.id %]</a></td>
             <td>[% user.login %]</td>
+            <td>[% user.department %]</td>	    
 	    <td><img src="http://chart.apis.google.com/chart?cht=bhs&chs=50x12&chd=t:33|100&chco=4d89f9,c6d9fd" /> 4,43 GB</td>
 	    <td class="options">
 	      <form action="[% c.uri_for('/users/del_submit') %]" method="post">
@@ -59,10 +60,10 @@ $(document).ready(function()
 	$("#props").tablesorter({
 	widthFixed: true,
 	headers: { 
-            2: { 
+            3: { 
                 sorter: false 
             },
-	    3: { 
+	    4: { 
                 sorter: false 
             }
 	}}); 

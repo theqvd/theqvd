@@ -1,0 +1,6 @@
+<h1><a href="[% c.uri_for('/vm') %]">Máquinas virtuales</a> &raquo; [% vm.name %]</h1>
+
+<p>[% vm.id %]</p>
+<p>[% vm.name %]</p>
+<p>[% vm.user.login %]</p>
+<p>[% vm.vm_runtime.vm_address %]</p>

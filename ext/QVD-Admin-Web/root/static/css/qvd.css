@@ -181,6 +181,10 @@ button.link:focus span {
 	text-align: right;
 }
 
+.options form {
+	display: inline;
+}
+
 .option_del {
 	padding: 5px 5px 5px 25px;
 	background-image: url(../images/icons/cross.png);
@@ -188,9 +192,37 @@ button.link:focus span {
 	background-position: 5px 5px;
 }
 
+.option_view {
+	padding: 5px 5px 5px 25px;
+	background-image: url(../images/icons/magnifier.png);
+	background-repeat: no-repeat;
+	background-position: 5px 5px;
+}
+
 .option_edit {
 	padding: 5px 5px 5px 25px;
 	background-image: url(../images/icons/pencil.png);
+	background-repeat: no-repeat;
+	background-position: 5px 5px;
+}
+
+.option_disconnect {
+	padding: 5px 5px 5px 25px;
+	background-image: url(../images/icons/disconnect.png);
+	background-repeat: no-repeat;
+	background-position: 5px 5px;
+}
+
+.option_startvm {
+	padding: 5px 5px 5px 25px;
+	background-image: url(../images/icons/control_play_blue.png);
+	background-repeat: no-repeat;
+	background-position: 5px 5px;
+}
+
+.option_stopvm {
+	padding: 5px 5px 5px 25px;
+	background-image: url(../images/icons/control_stop_blue.png);
 	background-repeat: no-repeat;
 	background-position: 5px 5px;
 }
@@ -223,3 +255,23 @@ button.link:focus span {
 	background-position: 5px 5px;
 }
 
+.fb_label span {
+	margin-right: 10px;
+}
+
+.fb_required {
+	font-weight: bold;
+}
+
+.fb_submit {
+	padding-top: 40px;
+	text-align: right;
+}
+
+.fb tbody tr {
+	padding-bottom: 40px;
+}
+
+.pager img {
+	vertical-align: sub;
+}

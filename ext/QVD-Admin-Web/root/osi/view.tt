@@ -1,0 +1,4 @@
+<h1><a href="[% c.uri_for('/osi') %]">Imágenes</a> &raquo; [% osi.name %]</h1>
+
+<p>[% osi.disk_image %]</p>
+
