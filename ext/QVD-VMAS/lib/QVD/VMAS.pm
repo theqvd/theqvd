@@ -84,7 +84,11 @@ sub get_vms_for_user {
     my ($self, $user_id) = @_;
     my @vms = $self->{db}->resultset('VM')
     		->search({'user_id' => $user_id});
-    return map { $_->vm_runtime } @vms;
+    my @vmrs = map { $_->vm_runtime } @vms;
+    if (grep !defined($_), @vmrs) {
+	ERROR "Database is corrupted, virtual machine misses virtual machine runtime entry";
+    }
+    return @vmrs;
 }
 
 sub _load_balance_random {
