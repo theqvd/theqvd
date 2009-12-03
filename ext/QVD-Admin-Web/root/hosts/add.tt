@@ -1,24 +1,3 @@
+[% META title = "Añadir Nodo" %]
 <h1><a href="[% c.uri_for('/hosts') %]">Nodos</a> » Nuevo</h1>
-<form name="addhost" action="add_submit" method="post">
-  <div>
-    <table>
-      <tr>
-	<td>
-	  <label>Nombre:</label>
-	</td>
-	<td>
-	  <input type="text" name="name" id="name"/>
-	</td>
-      </tr>
-      <tr>
-	<td>
-	  <label>Dirección:</label>
-	</td>
-	<td>
-	  <input type="text" name="address" id="address"/>
-	</td>
-      </tr>
-    </table>
-    <input type="submit" value="Añadir" />
-  </div>
-</form>
+[% FormBuilder.render %]
