@@ -49,6 +49,7 @@ sub forward_sockets {
     my $s2_out_closed;
 
     my ($ssl_wtr1, $ssl_wtw1, $ssl_wtr2, $ssl_wtw2);
+    my %close;
 
     fcntl($s1, F_SETFL, fcntl($s1, F_GETFL, 0) | O_NONBLOCK)
 	or croak "unable to make socket 1 non-blocking";
@@ -80,11 +81,10 @@ sub forward_sockets {
 
 	if ($n > 0) {
 	    if ($wtr1 and vec(($ssl_wtw1 ? $bitsw : $bitsr), $fn1, 1)) {
-		# FIXME, replicate this structure up in the other action handlers
 		undef $ssl_wtr1;
 		$debug and warn "reading from s1...\n";
 		my $bytes = sysread($s1, $b1to2, $io_chunk_size, length $b1to2);
-		$debug and warn "bytes: $bytes\n";
+		$debug and warn "bytes: " . ($bytes // '<undef>') . "\n";
 		if ($bytes) {
 		    # $debug and warn "s1 read:\n" . substr($b1to2, -$bytes) . "\n";
 		}
@@ -93,21 +93,14 @@ sub forward_sockets {
 		    $debug and warn "s1 wants to write for SSL";
 		}
 		else {
-		    $debug and warn "shutting down s1-in\n";
-		    shutdown($s1, 0) unless $ssl1;
-		    $s1_in_closed = 1;
-		    unless ($s2_out_closed or length $b1to2) {
-			$debug and warn "shutting down s2-out\n";
-			shutdown($s2, 1) unless $ssl2;
-			$s2_out_closed = 1;
-		    }
+		    $close{s1in} = 1;
 		}
 	    }
-	    if ($wtr2 and vec($bitsr, $fn2, 1)) {
+	    if ($wtr2 and vec(($ssl_wtw2 ? $bitsw : $bitsr), $fn2, 1)) {
 		undef $ssl_wtr2;
 		$debug and warn "reading from s2...\n";
 		my $bytes = sysread($s2, $b2to1, $io_chunk_size, length $b2to1);
-		$debug and warn "bytes: $bytes\n";
+		$debug and warn "bytes: " . ($bytes // '<undef>') . "\n";
 		if ($bytes) {
 		    # $debug and warn "s2 read:\n" . substr($b2to1, -$bytes) . "*\n";
 		}
@@ -116,21 +109,14 @@ sub forward_sockets {
 		    $debug and warn "s2 wants to write for SSL";
 		}
 		else {
-		    $debug and warn "shutting down s2-in\n";
-		    shutdown($s2, 0) unless $ssl2;
-		    $s2_in_closed = 1;
-		    unless ($s1_out_closed or length $b2to1) {
-			$debug and warn "shutting down s1-out\n";
-			shutdown($s1, 1) unless $ssl1;
-			$s1_out_closed = 1;
-		    }
+		    $close{s2in} = 1;
 		}
 	    }
-	    if ($wtw1 and vec $bitsw, $fn1, 1) {
+	    if ($wtw1 and vec(($ssl_wtr1 ? $bitsr : $bitsw), $fn1, 1)) {
 		undef $ssl_wtw1;
 		$debug and warn "writting to s1...\n";
 		my $bytes = syswrite($s1, $b2to1, $io_chunk_size);
-		$debug and warn "bytes: $bytes\n";
+		$debug and warn "bytes: " . ($bytes // '<undef>') . "\n";
 		if ($bytes) {
 		    # $debug and warn "s1 wrote...\n" . substr($b2to1, 0, $bytes) . "*\n";
 		    substr($b2to1, 0, $bytes, "");
@@ -145,21 +131,14 @@ sub forward_sockets {
 		    $debug and warn "s1 wants to read for SSL";
 		}
 		else {
-		    $debug and warn "shutting down s1-out\n";
-		    shutdown($s1, 1) unless $ssl1;
-		    $s1_out_closed = 1;
-		    unless ($s2_in_closed) {
-			$debug and warn "shutting down s2-in\n";
-			shutdown($s2, 0) unless $ssl2;
-			$s2_in_closed = 1;
-		    }
+		    $close{s1out} = 1;
 		}
 	    }
-	    if ($wtw2 and vec $bitsw, $fn2, 1) {
+	    if ($wtw2 and vec(($ssl_wtr2 ? $bitsr : $bitsw), $fn2, 1)) {
 		undef $ssl_wtw2;
 		$debug and warn "writting to s2...\n";
 		my $bytes = syswrite($s2, $b1to2, $io_chunk_size);
-		$debug and warn "bytes: $bytes\n";
+		$debug and warn "bytes: " . ($bytes // '<undef>') . "\n";
 		if ($bytes) {
 		    # $debug and warn "s2 wrote...\n" . substr($b1to2, 0, $bytes) . "*\n";
 		    substr($b1to2, 0, $bytes, "");
@@ -174,16 +153,46 @@ sub forward_sockets {
 		    $debug and warn "s2 wants to read for SSL";
 		}
 		else {
-		    $debug and warn "shutting down s2-in\n";
-		    shutdown($s2, 1) unless $ssl2;
-		    $s2_out_closed = 1;
-		    unless ($s1_in_closed) {
-			$debug and warn "shutting down s1-out\n";
-			shutdown($s1, 0) unless $ssl1;
-			$s1_in_closed = 1;
-		    }
+		    $close{s2out} = 1;
 		}
 	    }
+	    if (%close) {
+		for (1, 2, 3) { # propagate close flag to dependants
+		    if ($ssl1 and ($close{s1in} or $close{s1out})) {
+			$close{s1in} = $close{s1out} = 1;
+		    }
+		    if ($ssl2 and ($close{s2in} or $close{s2out})) {
+			$close{s2in} = $close{s2out} = 1;
+		    }
+		    if ($close{s1in} and !length $b1to2) {
+			$close{s2out} = 1;
+		    }
+		    if ($close{s2in} and !length $b2to1) {
+			$close{s1out} = 1;
+		    }
+		}
+		if ($close{s1in}) {
+		    $debug and warn "shutdown s1 in\n";
+		    shutdown($s1, 0);
+		    $s1_in_closed = 1;
+		}
+		if ($close{s2in}) {
+		    $debug and warn "shutdown s2 in\n";
+		    shutdown($s2, 0);
+		    $s2_in_closed = 1;
+		}
+		if ($close{s1out}) {
+		    $debug and warn "shutdown s1 out\n";
+		    shutdown($s1, 1);
+		    $s1_out_closed = 1;
+		}
+		if ($close{s2out}) {
+		    $debug and warn "shutdown s1 out\n";
+		    shutdown($s2, 1);
+		    $s2_out_closed = 1;
+		}
+	    }
+	    %close = ();
 	}
     }
     shutdown($s1, 2);
