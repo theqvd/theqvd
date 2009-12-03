@@ -15,7 +15,7 @@ use parent qw(QVD::HTTPD);
 
 sub post_configure_hook {
     my $server = shift;
-    my $impl = QVD::Frontend::Plugin::RC::Impl->new();
+    my $impl = QVD::RC::Impl->new();
     $impl->set_http_request_processors($server, '/qvd/rc/*');
 }
 
