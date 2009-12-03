@@ -57,8 +57,8 @@ QVD::RC - Remote control service
 =head1 SYNOPSIS
 
   use QVD::RC;
-  QVD::RC->set_http_request_processors($httpd, $base_url);
-
+  my $rc = QVD::RC->new(port => 8080);
+  $rc->run();
 
 =head1 DESCRIPTION
 
