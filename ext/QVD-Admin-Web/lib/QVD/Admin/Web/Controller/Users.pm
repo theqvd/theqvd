@@ -2,7 +2,20 @@ package QVD::Admin::Web::Controller::Users;
 
 use strict;
 use warnings;
-use parent 'Catalyst::Controller::FormBuilder';
+use base 'Catalyst::Controller::FormBuilder';
+
+__PACKAGE__->config(
+    'Controller::FormBuilder' => {
+        new => {
+            method     => 'post',
+            stylesheet => 1,
+            #messages   => '/locale/fr_FR/form_messages.txt',
+			messages => ':es_ES'
+        },
+        #template_type => 'HTML::Template',
+        #source_type   => 'CGI::FormBuilder::Source::File',
+    }
+);
 
 #use parent 'Catalyst::Controller';
 
@@ -36,10 +49,26 @@ sub list : Local {
     $c->stash->{user_list} = $rs;
 }
 
+sub view : Local :Args(1){
+	my ( $self, $c, $userid) = @_;
+	my $model = $c->model('QVD::Admin::Web');
+	my $rs = $model->vm_list({user_id => $userid});
+	$c->stash->{vm_list} = $rs;
+	
+	my $user = $model->user_find($userid );
+	$c->stash(user => $user);
+}
+
 sub add : Local Form {
     my ( $self, $c ) = @_;
     my $form  = $self->formbuilder;
     my $model = $c->model('QVD::Admin::Web');
+
+	$form->field(
+		name => 'confirm_password',
+		validate => {javascript => '!= form.password.value'},
+	);
+
 
     if ( $form->submitted ) {
         if ( $form->validate ) {
