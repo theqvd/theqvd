@@ -15,13 +15,16 @@ __PACKAGE__->add_columns(
 	    data_type => 'varchar(64)'
 	},
 	department => {
-	    data_type => 'varchar(64)'
+	    data_type => 'varchar(64)',
+	    is_nullable => 1,
 	},
 	telephone => {
-	    data_type => 'varchar(64)'
+	    data_type => 'varchar(64)',
+	    is_nullable => 1,
 	},
 	email => {
-	    data_type => 'varchar(64)'
+	    data_type => 'varchar(64)',
+	    is_nullable => 1,
 	},
 #	uid => {
 #	    data_type => 'integer'
