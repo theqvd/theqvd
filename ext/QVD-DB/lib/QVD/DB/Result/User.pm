@@ -14,6 +14,15 @@ __PACKAGE__->add_columns(
 	password => {
 	    data_type => 'varchar(64)'
 	},
+	department => {
+	    data_type => 'varchar(64)'
+	},
+	telephone => {
+	    data_type => 'varchar(64)'
+	},
+	email => {
+	    data_type => 'varchar(64)'
+	},
 #	uid => {
 #	    data_type => 'integer'
 #	}
