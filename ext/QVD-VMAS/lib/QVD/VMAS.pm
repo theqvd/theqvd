@@ -194,8 +194,10 @@ sub schedule_start_vm {
 	if (defined $r && $r->{request} eq 'success') {
 	    return 1;
 	} else {
-	    ERROR "Couldn't notify hkd on ".$host." to start VM ".$vm->vm_id." error: ".($r->{error} // $@);
+	    my $err = $@ // $r->{error};
 	    $self->clear_vm_cmd($vm);
+	    die "Unable to notify hkd on ".$host
+			." to start VM ".$vm->vm_id.": ".$err;
 	}
     }
     undef;
@@ -210,10 +212,13 @@ sub schedule_stop_vm {
 	if (defined $r && $r->{request} eq 'success') {
 	    return 1;
 	} else {
-	    INFO "Couldn't notify hkd on ".$host." to stop VM ".$vm->vm_id." error: ".$r->{error};
+	    my $err = $@ // $r->{error};
 	    $self->clear_vm_cmd($vm);
+	    die "Unable to notify hkd on ".$host
+			." to stop VM ".$vm->vm_id.": ".$err;
 	}
     }
+    undef;
 }
 
 sub _get_image_for_vm {

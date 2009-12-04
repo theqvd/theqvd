@@ -65,8 +65,7 @@ sub _make_request {
     my ($code, $msg, $headers, $body) =
 	$self->{httpc}->make_http_request(GET => "$self->{base}/$method$query");
     unless ($code == HTTP_OK) {
-    # FIXME use Log4perl
-	warn "HTTP request failed: $code - $msg";
+	die "HTTP request failed: $code - $msg";
 	return undef;
     }
     my $data = $self->_json->decode("[$body]");
