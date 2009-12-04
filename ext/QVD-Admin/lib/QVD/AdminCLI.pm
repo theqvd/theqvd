@@ -419,7 +419,7 @@ sub cmd_vm_propget {
 
 sub help_vm_propget {
     print <<EOT
-vm propget: Gets vm property.
+vm propget: Lists vm properties
 usage: vm propget [key...]
       
   Example:
@@ -427,6 +427,63 @@ usage: vm propget [key...]
       
 Valid options:
     -f [--filter] FILTER : sets VM properties on VMs matched by FILTER
+EOT
+}
+
+sub cmd_host_propdel {
+    shift->{admin}->propdel('host', @_);
+}
+
+sub help_host_propdel {
+    print <<EOT
+vm propdel: Deletes host properties.
+usage: host propdel [key...]
+
+    Only the properties with the listed keys are deleted. If no keys are listed
+    all properties are deleted.
+    Example:
+	host propdel priority -f address=198.168.1.??
+      
+Valid options:
+    -f [--filter] FILTER : Delete properties of hosts matched by FILTER
+EOT
+}
+
+sub cmd_user_propdel {
+    shift->{admin}->propdel('user', @_);
+}
+
+sub help_user_propdel {
+    print <<EOT
+vm propdel: Deletes user properties
+usage: user propdel [key...]
+      
+    Only the properties with the listed keys are deleted. If no keys are listed
+    all properties are deleted.
+    Example:
+	user propdel timezone -f login=M*,department=sales
+      
+Valid options:
+    -f [--filter] FILTER : Delete properties of users matched by FILTER
+EOT
+}
+
+sub cmd_vm_propdel {
+    shift->{admin}->propdel('vm', @_);
+}
+
+sub help_vm_propdel {
+    print <<EOT
+vm propdel: Deletes VM properties
+usage: vm propdel [key...]
+      
+    Only the properties with the listed keys are deleted. If no keys are listed
+    all properties are deleted.
+    Example:
+	vm propdel priority -f user=nobody
+      
+Valid options:
+    -f [--filter] FILTER : sets VM properties of VMs matched by FILTER
 EOT
 }
 

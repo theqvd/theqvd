@@ -236,10 +236,6 @@ sub _obj_propset {
     }
 }
 
-sub propdel {
-    my ($self, $object, @args) = @_;
-}
-
 sub propset {
     my ($self, $object, @args) = @_;
     $self->_obj_propset($object, @args);
@@ -280,6 +276,13 @@ sub cmd_user_propget {
 
 sub cmd_vm_propget {
     shift->_obj_propget(sub { $_->vm->name }, 'vm', @_);
+}
+
+sub propdel {
+    my ($self, $obj, @args) = @_;
+    my $rs = $self->get_resultset($obj);
+    my $condition = scalar @args > 0 ? {key => [@args]} : {};
+    $rs->search_related('properties', $condition)->delete;
 }
 
 sub cmd_config_set {
