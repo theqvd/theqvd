@@ -64,9 +64,9 @@ sub add : Local Form {
     my $form  = $self->formbuilder;
     my $model = $c->model('QVD::Admin::Web');
 
-	$form->field(
-		name => 'confirm_password',
-		validate => {javascript => '!= form.password.value'},
+    $form->field(
+	name => 'confirm_password',
+	validate => {javascript => '!= form.password.value'},
 	);
 
 
@@ -75,8 +75,12 @@ sub add : Local Form {
             my $login = $form->field('login');
             my $pass  = $form->field('password');
             my $pass2 = $form->field('confirm_password');
+	    my $department = $form->field('department');
+	    my $telephone = $form->field('telephone');
+	    my $email = $form->field('email');
 
-            if ( my $id = $model->user_add( $login, $pass ) ) {
+            if ( my $id = $model->user_add( $login, $pass, $department, $telephone, $email))
+	    {
                 $c->flash->{response_type} = "success";
                 $c->flash->{response_msg} = "$login añadido correctamente con id $id";
             }
@@ -92,6 +96,43 @@ sub add : Local Form {
             $c->stash->{invalid_fields} = [ grep { !$_->validate } $form->fields ];
         }
     }
+}
+
+
+sub del_submit : Local {
+    my ( $self, $c ) = @_;
+    my $model = $c->model('QVD::Admin::Web');
+
+    my $result = $c->form(
+        required           => ['id'],
+        constraint_methods => { 'id' => qr/^\d+$/, }
+    );
+
+    if ( !$result->success ) 
+    {
+        $c->flash->{response_type} = "error";
+        $c->flash->{response_msg} =
+          "Error in parameters: " . $model->build_form_error_msg($result);
+    } else 
+    {
+        my $id = $c->req->body_params->{id};    # only for a POST request
+	my $user = $model->user_find($id );
+	my $login = $user->login; 
+        if ( my $countdel = $model->user_del($id) ) 
+	{
+            $c->flash->{response_type} = "success";
+            $c->flash->{response_msg}  = "$login ($id) eliminado correctamente";
+        }
+        else {
+
+            # FIXME response_type must be an enumerated
+            $c->flash->{response_type} = "error";
+            $c->flash->{response_msg}  = $model->error_msg;
+        }
+    }
+
+    #$c->forward('list');
+    $c->response->redirect( $c->uri_for( $self->action_for('list') ) );
 }
 
 =head1 AUTHOR

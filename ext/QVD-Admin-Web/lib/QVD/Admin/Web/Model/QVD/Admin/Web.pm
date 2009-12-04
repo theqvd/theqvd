@@ -133,17 +133,25 @@ sub user_find {
 }
 
 sub user_add {
-    my ( $self, $login, $password ) = @_;
+    my ( $self, $login, $password, $department, $telephone, $email ) = @_;
     my $result;
+
+    my %add_params = (
+                login    => $login,
+                password => $password,
+	);
+    $add_params{department} = $department
+	if (defined($department) && $department != '');
+    $add_params{telephone} = $telephone
+	if (defined($telephone) && $telephone != '');
+    $add_params{email} = $email
+	if (defined($email) && $email != '');
 
     $self->reset_status;
 
     if (
         !eval {
-            $result = $self->admin->cmd_user_add(
-                login    => $login,
-                password => $password
-            );
+            $result = $self->admin->cmd_user_add(%add_params);
             1;
         }
       )
@@ -153,6 +161,28 @@ sub user_add {
 
     return $result;
 }
+
+sub user_del {
+    my ( $self, $id ) = @_;
+    my $result;
+
+    $self->reset_status;
+
+    if (
+        !eval {
+            $self->admin->set_filter( id => $id );
+            $result = $self->admin->cmd_user_del;
+            1;
+        }
+      )
+    {
+        $self->set_error($@);
+    }
+
+    return $result;
+}
+
+
 
 sub osi_list {
     my ( $self, $filter ) = @_;
