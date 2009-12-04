@@ -6,6 +6,11 @@ body {
 	padding: 20px 0 40px;
 }
 
+h2 {
+    margin-top: 20px;
+    font-size: 15px;
+}
+
 a {
 	color: #ff8d13;
 	text-decoration: none;
@@ -169,6 +174,14 @@ button.link:focus span {
 	text-decoration: underline;
 }
 
+.field {
+	font-weight: bold;
+}
+
+.field, .value {
+	background-color: #EFEFEF !important;
+}
+
 .side_add {
 	float: left;
 	padding: 5px 5px 5px 25px;
@@ -223,6 +236,13 @@ button.link:focus span {
 .option_stopvm {
 	padding: 5px 5px 5px 25px;
 	background-image: url(../images/icons/control_stop_blue.png);
+	background-repeat: no-repeat;
+	background-position: 5px 5px;
+}
+
+.option_true {
+	padding: 5px 5px 5px 25px;
+	background-image: url(../images/icons/tick.png);
 	background-repeat: no-repeat;
 	background-position: 5px 5px;
 }

@@ -1,6 +1,25 @@
 <h1><a href="[% c.uri_for('/vm') %]">Máquinas virtuales</a> &raquo; [% vm.name %]</h1>
 
-<p>[% vm.id %]</p>
-<p>[% vm.name %]</p>
-<p>[% vm.user.login %]</p>
-<p>[% vm.vm_runtime.vm_address %]</p>
+<div class="view">
+    <table class="tablesorter resultset">
+	<tr>
+	    <td class="field">Identificador</td>
+	    <td class="value">[% vm.id %]</td>
+	</tr>
+	<tr>
+	    <td class="field">Nombre</td>
+	    <td class="value">[% vm.name %]</td>
+	</tr>
+	<tr>
+	    <td class="field">Usuario</td>
+	    <td class="value">[% vm.user.login %]</td>
+	</tr>
+	<tr>
+	    <td class="field">Dirección IP</td>
+	    <td class="value">[% vm.vm_runtime.vm_address %]</td>
+	</tr>
+    </table>
+</div>
+
+<a href="[% c.uri_for('/vm/vnc/') %][% vm.id %]" target="_blank">Conectar por VNC</a>
+

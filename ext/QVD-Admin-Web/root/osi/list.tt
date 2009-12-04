@@ -10,7 +10,7 @@ else
 </script>
 
 <h1>Imágenes</h1>
-<div class="side_add"><a href="[% c.uri_for('/osi/add') %]">Nuevo</a></div>
+<div class="side_add"><a href="[% c.uri_for('/osi/add') %]">Nueva</a></div>
 <div id="pager" class="pager">
 	<form>
 		<img src="/static/icons/first.png" class="first"/>
@@ -30,7 +30,7 @@ else
         <tr>
             <th id="id"></th>
             <th id="name">Nombre</th>
-            <th id="disk_image">Imagen Disco</th>
+            <th id="disk_image">Imagen de disco</th>
             <th id="use_overlay">Overlay</th>
             <th id="memory">Memoria</th>
 	    <th class="options">Opciones</th>
@@ -42,8 +42,10 @@ else
             <td><a href="[% c.uri_for('/osi/view/') %][% osi.id %]" class="option_view">[% osi.id %]</a></td>
             <td>[% osi.name %]</td>
             <td>[% osi.disk_image %]</td>
-			<td>[% osi.use_overlay %]</td>
-			<td>[% osi.memory %]</td>
+	    <td>[% IF osi.use_overlay -%]<span class="option_true"></span>
+	    [% END %]
+	    </td>
+	    <td>[% osi.memory %]</td>
 			
 	    <td class="options">
 	      <form action="[% c.uri_for('/osi/del_submit') %]" method="post">
