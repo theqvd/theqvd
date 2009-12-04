@@ -236,6 +236,15 @@ sub _obj_propset {
     }
 }
 
+sub propdel {
+    my ($self, $object, @args) = @_;
+}
+
+sub propset {
+    my ($self, $object, @args) = @_;
+    $self->_obj_propset($object, @args);
+}
+
 sub cmd_host_propset {
     shift->_obj_propset('host', @_);
 }
@@ -254,6 +263,11 @@ sub _obj_propget {
     my $condition = scalar @args > 0 ? {key => [@args]} : {};
     my @props = $rs->search_related('properties', $condition);
     return \@props;
+}
+
+sub propget {
+    my $self = shift;
+    $self->_obj_propget(@_);
 }
 
 sub cmd_host_propget {
