@@ -375,7 +375,7 @@ EOT
 
 sub _obj_propget {
     my ($self, $display_cb, @args) = @_;
-    my $props = $self->{admin}->_obj_propget(@args);
+    my $props = $self->{admin}->propget(@args);
     print map { &$display_cb($_)."\t".$_->key.'='.$_->value."\n" } @$props;
 }
 
