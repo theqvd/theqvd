@@ -5,7 +5,7 @@
             label: Login
             type:  text
             size:  40
-            validate: NAME
+            validate: WORD
             required: 1
         password:
             label: Password
