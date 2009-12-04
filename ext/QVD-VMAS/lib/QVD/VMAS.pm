@@ -320,7 +320,7 @@ sub start_vm {
 		       -redir => "tcp:${vma_port}::3030",
                        -redir => "tcp:${ssh_port}::22",
                        -hda => $disk_image,
-		       (-e $user_storage
+		       (defined $user_storage
 			   ? (-hdb => $user_storage)
 			   : ())));
 
