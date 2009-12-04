@@ -53,8 +53,8 @@ sub list : Local {
 sub view : Local :Args(1){
 	my ( $self, $c, $id) = @_;
 	my $model = $c->model('QVD::Admin::Web');
-	my $host = $model->osi_find($id);
-	$c->stash(host => $host);
+	my $osi = $model->osi_find($id);
+	$c->stash(osi => $osi);
 }
 
 =head1 AUTHOR
