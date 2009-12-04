@@ -136,6 +136,21 @@ sub stop_vm : Local {
    
 }
 
+sub add_vm_st1 : Local {
+    my ( $self, $c ) = @_;
+    $c->go('list');
+}
+
+sub add_vm_st2 : Local {
+    my ( $self, $c ) = @_;
+    $c->go('list');
+}
+
+sub add_vm_st3 : Local {
+    my ( $self, $c ) = @_;
+    $c->go('list');
+}
+
 =head1 AUTHOR
 
 QVD,,,
