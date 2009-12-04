@@ -1,0 +1,18 @@
+<h1><a href="[% c.uri_for('/vm') %]">Máquinas virtuales</a> &raquo; Nueva</h1>
+
+<p>
+Paso 1/3
+</p>
+
+<form action="[% c.uri_for('/vm/add_vm_st2') %]" class="fb_form" id="add" method="post" name="add">
+    <table class="fb" id="add_body">
+    <tr id="add_login_row">
+      <td class="fb_label" id="add_login_label"><span class="fb_required">Nombre</span></td>
+      <td class="fb_field" id="add_login_field"><input class="fb_input" id="name" name="name" size="40" type="text" /></td>
+    </tr>
+
+    <tr id="add_submit_row">
+      <td class="fb_submit" colspan="2" id="add_submit_field"><input class="fb_button" id="add_submit" name="_submit" type="submit" value="Continuar" /></td>
+    </tr>
+    </table>
+</form>

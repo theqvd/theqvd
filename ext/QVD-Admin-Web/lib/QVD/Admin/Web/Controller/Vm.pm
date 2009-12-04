@@ -136,19 +136,124 @@ sub stop_vm : Local {
    
 }
 
-sub add_vm_st1 : Local {
+
+sub del : Local {
     my ( $self, $c ) = @_;
-    $c->go('list');
+    my $model = $c->model('QVD::Admin::Web');
+
+    my $result = $c->form(
+        required           => ['id'],
+        constraint_methods => { 'id' => qr/^\d+$/, }
+    );
+
+    if ( !$result->success ) {
+        $c->flash->{response_type} = "error";
+        $c->flash->{response_msg} =
+          "Error in parameters: " . $model->build_form_error_msg($result);
+    }
+    else {
+        my $id = $c->req->body_params->{id};    # only for a POST request
+	my $vm = $model->vm_find($id );
+	my $vm_name = $vm->name; 
+        if ( my $countdel = $model->vm_del($id) ) {
+            $c->flash->{response_type} = "success";
+            $c->flash->{response_msg}  = "$vm_name ($id) eliminado correctamente";
+        }
+        else {
+
+            # FIXME response_type must be an enumerated
+            $c->flash->{response_type} = "error";
+            $c->flash->{response_msg}  = $model->error_msg;
+        }
+    }
+
+    $c->response->redirect( $c->uri_for( $self->action_for('list') ) );
 }
 
-sub add_vm_st2 : Local {
+
+sub add : Local {
     my ( $self, $c ) = @_;
-    $c->go('list');
+    my $model = $c->model('QVD::Admin::Web');
+
+    my $vm_name = $c->req->body_params->{vm_name};
+    my $vm_ip = $c->req->body_params->{vm_ip};
+    my $vm_storage = $c->req->body_params->{vm_storage};
+    my $user_id = $c->req->body_params->{user_id};
+    my $osi_id = $c->req->body_params->{osi_id};
+
+    # If any parameter is defined we skip that step
+    my @steps;
+    push @steps, 'add_vm_name' 
+	if (!defined($vm_name) || $vm_name eq ''
+	  || !defined($vm_ip) || $vm_ip eq '');
+    push @steps, 'add_vm_user_id' if (!defined($user_id) || $user_id eq '');
+    push @steps, 'add_vm_osi_id' if (!defined($osi_id) || $osi_id eq '');
+
+    if ( $#steps == -1 ) 
+    {
+	# No extra steps needed, create the user
+	print STDERR "steps is 0\n";
+	my %parameters = (
+	    name => $vm_name,
+	    user_id => $user_id,
+	    osi_id => $osi_id,
+	    ip => $vm_ip
+	    );
+	$parameters{storage} = $vm_storage if (defined($vm_storage) && $vm_storage ne '');
+	if (my $id = $model->vm_add(\%parameters))
+	{
+	    print STDERR "called vm_add ".Dumper($id).Dumper(\%parameters);
+	    $c->flash->{response_type} = "success";
+	    $c->flash->{response_msg} = "$vm_name añadido correctamente con id $id";
+	}
+	else 
+	{
+	    print STDERR "vm_add called with error".Dumper($id);
+	    # FIXME response_type must be an enumerated
+	    $c->flash->{response_type} = "error";
+	    $c->flash->{response_msg}  = $model->error_msg;
+	}
+	$c->response->redirect( $c->uri_for( $self->action_for('list') ) );
+    }
+    else 
+    {
+	$c->flash->{steps} = \@steps;
+	$c->flash->{num_steps} = $#steps + 1;
+	$c->flash->{current_step} = 1;
+	$c->response->redirect( $c->uri_for( $self->action_for($steps[0]) ) );
+    }
 }
 
-sub add_vm_st3 : Local {
+sub add_vm_name : Local {
     my ( $self, $c ) = @_;
-    $c->go('list');
+    
+}
+
+
+sub add_vm_user_id : Local {
+    my ( $self, $c ) = @_;
+}
+
+sub add_vm_osi_id :Local {
+    my ( $self, $c ) = @_;
+}
+
+sub vnc : Local :Args(1){
+    my ( $self, $c, $id) = @_;
+
+    my $model = $c->model('QVD::Admin::Web');
+
+    if ( !defined($id) ) 
+    {
+        $c->flash->{response_type} = "error";
+        $c->flash->{response_msg} = "Error in parameters.";
+    } else 
+    {
+	my $vm = $model->vm_find($id);
+	my $name = $vm->name; 
+	$c->stash(vm_runtime => $vm->vm_runtime);
+    }   
+
 }
 
 =head1 AUTHOR
