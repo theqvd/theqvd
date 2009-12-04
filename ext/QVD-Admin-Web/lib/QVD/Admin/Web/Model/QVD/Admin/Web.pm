@@ -6,6 +6,7 @@ use QVD::Admin;
 use QVD::Config;
 use Log::Log4perl qw(:easy);
 use Readonly;
+use Data::Dumper;
 extends 'Catalyst::Model';
 with 'MooseX::Log::Log4perl';
 
@@ -133,25 +134,14 @@ sub user_find {
 }
 
 sub user_add {
-    my ( $self, $login, $password, $department, $telephone, $email ) = @_;
+    my ( $self, $params ) = @_;
     my $result;
-
-    my %add_params = (
-                login    => $login,
-                password => $password,
-	);
-    $add_params{department} = $department
-	if (defined($department) && $department != '');
-    $add_params{telephone} = $telephone
-	if (defined($telephone) && $telephone != '');
-    $add_params{email} = $email
-	if (defined($email) && $email != '');
 
     $self->reset_status;
 
     if (
         !eval {
-            $result = $self->admin->cmd_user_add(%add_params);
+            $result = $self->admin->cmd_user_add(%$params);
             1;
         }
       )
@@ -248,6 +238,48 @@ sub vm_stop {
 
     return $result;
 }
+
+sub vm_add {
+    my ($self, $params) = @_;
+    
+    my $result;
+    $self->reset_status;
+
+    
+    print STDERR "vm_add ".Dumper($params);
+    if (
+        !eval {
+            $result = $self->admin->cmd_vm_add(%$params);
+            1;
+        }
+	)
+    {
+        $self->set_error($@);
+    }
+
+    return $result;
+}
+
+sub vm_del {
+    my ( $self, $id ) = @_;
+    my $result;
+
+    $self->reset_status;
+
+    if (
+        !eval {
+            $self->admin->set_filter( id => $id );
+            $result = $self->admin->cmd_vm_del;
+            1;
+        }
+      )
+    {
+        $self->set_error($@);
+    }
+
+    return $result;
+}
+
 
 sub vmrt_list {
 	my ( $self, $filter ) = @_;

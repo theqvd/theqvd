@@ -3,27 +3,29 @@
 <div class="view">
     <table class="tablesorter resultset">
 	<tr>
-	    <td>Identificador</td>
-	    <td>[% user.id %]</td>
+	    <td class="field">Identificador</td>
+	    <td class="value">[% user.id %]</td>
 	</tr>
 	<tr>
-	    <td>Nombre</td>
-	    <td>[% user.login %]</td>
+	    <td class="field">Nombre</td>
+	    <td class="value">[% user.login %]</td>
 	</tr>
 	<tr>
-	    <td>Departamento</td>
-	    <td>[% user.department %]</td>
+	    <td class="field">Departamento</td>
+	    <td class="value">[% user.department %]</td>
 	</tr>
 	<tr>
-	    <td>Número de teléfono</td>
-	    <td>[% user.telephone %]</td>
+	    <td class="field">Número de teléfono</td>
+	    <td class="value">[% user.telephone %]</td>
 	</tr>
 	<tr>
-	    <td>Correo electrónico</td>
-	    <td>[% user.email %]</td>
+	    <td class="field">Correo electrónico</td>
+	    <td class="value">[% user.email %]</td>
 	</tr>	
     </table>
 </div>
+
+<h2>Máquinas virtuales asignadas</h2>
 
 <table id="props" class="tablesorter resultset">
     <thead>

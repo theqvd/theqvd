@@ -3,6 +3,7 @@ package QVD::Admin::Web::Controller::Users;
 use strict;
 use warnings;
 use base 'Catalyst::Controller::FormBuilder';
+use Data::Dumper;
 
 __PACKAGE__->config(
     'Controller::FormBuilder' => {
@@ -78,8 +79,19 @@ sub add : Local Form {
 	    my $department = $form->field('department');
 	    my $telephone = $form->field('telephone');
 	    my $email = $form->field('email');
+	    my %params = (
+		login => $login,
+		password => $pass,
+		);
+	    $params{department} = $department
+		if (defined($department) && $department ne '');
+	    $params{telephone} = $telephone
+		if (defined($telephone) && $telephone ne '');
+	    $params{email} = $email
+		if (defined($email) && $email ne '');
+	    print STDERR  Dumper(\%params);
 
-            if ( my $id = $model->user_add( $login, $pass, $department, $telephone, $email))
+            if ( my $id = $model->user_add(\%params))
 	    {
                 $c->flash->{response_type} = "success";
                 $c->flash->{response_msg} = "$login añadido correctamente con id $id";
@@ -99,7 +111,7 @@ sub add : Local Form {
 }
 
 
-sub del_submit : Local {
+sub del : Local {
     my ( $self, $c ) = @_;
     my $model = $c->model('QVD::Admin::Web');
 
