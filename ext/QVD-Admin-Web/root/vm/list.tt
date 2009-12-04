@@ -48,12 +48,12 @@ else
 	    <td>[% vm.storage %]</td>
 	    <td class="options">
 	      [% IF vm.vm_runtime.vm_state == 'stopped' -%]
-	      <form action="#" method="post">
+	      <form action="[% c.uri_for('/vm/start_vm') %]" method="post">
 		<input type="hidden" name="id" value="[% vm.id %]"/>
 		<button type="submit" class="link" onClick="return confirm_submit()"><span class="option_startvm"></span></button>
 	      </form>
 	      [% ELSIF vm.vm_runtime.vm_state == 'running' %]
-	      <form action="#" method="post">
+	      <form action="[% c.uri_for('/vm/stop_vm') %]" method="post">
 		<input type="hidden" name="id" value="[% vm.id %]"/>
 		<button type="submit" class="link" onClick="return confirm_submit()"><span class="option_stopvm"></span></button>
 	      </form>    

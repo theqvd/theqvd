@@ -213,6 +213,42 @@ sub vm_find {
     return $rs->find($filter);
 }
 
+sub vm_start {
+    my ( $self, $id ) = @_;
+    my $result;
+    $self->reset_status;
+
+    if (
+        !eval {
+            $result = $self->admin->cmd_vm_start(id=>$id);
+            1;
+        }
+	)
+    {
+        $self->set_error($@);
+    }
+
+    return $result;
+}
+
+sub vm_stop {
+    my ( $self, $id ) = @_;
+    my $result;
+    $self->reset_status;
+
+    if (
+        !eval {
+            $result = $self->admin->cmd_vm_stop(id=>$id);
+            1;
+        }
+	)
+    {
+        $self->set_error($@);
+    }
+
+    return $result;
+}
+
 sub vmrt_list {
 	my ( $self, $filter ) = @_;
     $self->reset_status;
@@ -226,6 +262,7 @@ sub vmrt_find {
     my $rs = $self->db->resultset('VM_Runtime');
     return   $rs->find($filter)  ;
 }
+
 
 =head 2 build_form_error_msg
 
