@@ -9,15 +9,15 @@ use Data::Dumper;
 
 BEGIN { use_ok 'Catalyst::Test', 'QVD::Admin::Web' }
 
-my $request = GET('/hosts/list');
+my $request = GET('/users/list');
 my $response = request($request);
 ok( $response->is_success, 'Request should succeed' );
 is( $response->content_type, 'text/html', "Check for html content");
-like( $response->content, qr/Nodos/, "Check for listado de hosts");
+like( $response->content, qr/Usuarios/, "Check for listado de usuarios");
 
 
 # Add a host form
-$request = GET('/hosts/add');
+$request = GET('/users/add');
 $response = request($request);
 ok( $response->is_success, 'Request should succeed' );
 is( $response->content_type, 'text/html', "Check for html content");
