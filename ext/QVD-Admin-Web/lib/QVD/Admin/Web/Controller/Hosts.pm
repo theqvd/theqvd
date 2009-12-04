@@ -98,9 +98,11 @@ sub del_submit : Local {
     }
     else {
         my $id = $c->req->body_params->{id};    # only for a POST request
+	my $host = $model->host_find($id );
+	my $hostname = $host->name; 
         if ( my $countdel = $model->host_del($id) ) {
             $c->flash->{response_type} = "success";
-            $c->flash->{response_msg}  = "$id eliminado correctamente";
+            $c->flash->{response_msg}  = "$hostname ($id) eliminado correctamente";
         }
         else {
 
