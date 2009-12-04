@@ -155,7 +155,12 @@ sub cmd_vm_add {
 
 sub cmd_user_add {
     my $self = shift;
-    my $row = $self->_obj_add('user', [qw/login password/], @_);
+    my %params = @_;
+    $params{department} //= undef;
+    $params{telephone} //= undef;
+    $params{email} //= undef;
+    my $row = $self->_obj_add('user', 
+	[qw/login password department telephone email/], %params);
     $row->id
 }
 

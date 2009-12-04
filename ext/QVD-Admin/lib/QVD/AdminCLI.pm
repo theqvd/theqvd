@@ -87,19 +87,22 @@ EOT
 
 sub cmd_user_list {
     my ($self, @args) = @_;
-    _print_header "Id","Login" unless $self->{quiet};
+    _print_header qw(Id Login Department Telephone Email)
+	unless $self->{quiet};
     my $rs = $self->get_resultset('user');
     while (my $user = $rs->next) {
-	printf "%s\t%s\n", $user->id, $user->login;
+	print join("\t", map {$user->$_ // '-'} 
+		    qw(id login department telephone email)), "\n";
     }
 }
 
 sub help_user_list {
     print <<EOT
-user list: Returns a list with the users.
+user list: list the registered users
 usage: user list
     
-  Lists consists of Id and Login, separated by tabs.
+    Lists consists of the users' id, login, department, telephone and email
+    separated by tabs.
     
 Valid options:
     -f [--filter] FILTER : list only user matched by FILTER
