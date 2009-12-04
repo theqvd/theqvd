@@ -41,7 +41,7 @@ else
             <td>[% host.name %]</td>
             <td>[% host.address %]</td>
 	    <td class="options">
-	      <form action="[% c.uri_for('/hosts/del_submit') %]" method="post">
+	      <form action="[% c.uri_for('/hosts/del') %]" method="post">
 		<input type="hidden" name="id" value="[% host.id %]"/>
 		<button type="submit" class="link" onClick="return confirm_submit()"><span class="option_del"></span></button>
 	      </form>

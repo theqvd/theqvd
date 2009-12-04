@@ -10,7 +10,7 @@ else
 </script>
 
 <h1>Máquinas virtuales</h1>
-<div class="side_add"><a href="[% c.uri_for('/vm/add') %]">Nuevo</a></div>
+<div class="side_add"><a href="[% c.uri_for('/vm/add') %]">Nueva</a></div>
 <div id="pager" class="pager">
 	<form>
 		<img src="/static/icons/first.png" class="first"/>
@@ -64,7 +64,7 @@ else
 		<button type="submit" class="link" onClick="return confirm_submit()"><span class="option_disconnect"></span></button>
 	      </form>
 	      [% END %]	      
-	      <form action="[% c.uri_for('/vm/del_submit') %]" method="post">
+	      <form action="[% c.uri_for('/vm/del') %]" method="post">
 		<input type="hidden" name="id" value="[% vm.id %]"/>
 		<button type="submit" class="link" onClick="return confirm_submit()"><span class="option_del"></span></button>
 	      </form>

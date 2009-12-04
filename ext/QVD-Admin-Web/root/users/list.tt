@@ -43,7 +43,7 @@ else
             <td>[% user.department %]</td>	    
 	    <td><img src="http://chart.apis.google.com/chart?cht=bhs&chs=50x12&chd=t:33|100&chco=4d89f9,c6d9fd" /> 4,43 GB</td>
 	    <td class="options">
-	      <form action="[% c.uri_for('/users/del_submit') %]" method="post">
+	      <form action="[% c.uri_for('/users/del') %]" method="post">
 		<input type="hidden" name="id" value="[% user.id %]"/>
 		<button type="submit" class="link" onClick="return confirm_submit()"><span class="option_del"></span></button>
 	      </form>
