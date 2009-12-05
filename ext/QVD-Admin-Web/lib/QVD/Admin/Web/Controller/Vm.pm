@@ -178,6 +178,44 @@ sub _get_add_param {
     $c->session->{vm_add}->{$param} = $result;
     return $result;
 }
+
+=head2
+
+add:
+
+Input:
+
+=over 4
+
+=item * First iteraction. Might optionally receive one of the following
+POST parameters:
+
+=over 4
+
+=item - vm_name and vm_ip and vm_storage: 
+        If vm_name and vm_ip are not defined then the url /vm/add_vm_name is added as a step to gather that info.
+
+=item - user_id:
+        If user_id is not defined then the url /vm/add_vm_user_id is added as a step to gather the user_id
+
+=item - osi_id
+        If osi_id is not defined then the url /vm/add_vm_osi_id is added as a step to gather the osi_id
+
+=back
+
+Depending on the POST parameters received the session information stores the number of steps needed
+to get more information, and the url to get that information.
+
+=item * Next interactions. The step number is increaded and the next url is called to get further parameters
+In the last step the VM is added
+
+=back
+
+Output:
+
+The virtual machine is added
+
+=cut
 sub add : Local {
     my ( $self, $c ) = @_;
     my $model = $c->model('QVD::Admin::Web');
@@ -202,6 +240,8 @@ sub add : Local {
     }
     else
     {
+	# No previous session info found
+	# New session, define the steps needed.
 	my @a;
 	$steps_array = \@a;
 	push @{$steps_array}, 'add_vm_name' 
@@ -222,6 +262,10 @@ sub add : Local {
     {
 	# Last step
 	# No extra steps needed, create the user
+
+	# TODO
+	# Validate all the parameters confirming that they exist
+
 	print STDERR "End step:".Dumper($c->session->{vm_add});
 	# Delete the session parameters
 	delete($c->session->{vm_add});
@@ -269,7 +313,7 @@ sub add_vm_name : Local Form {
     $self->formbuilder->action('/vm/add');
 #    $self->formbuilder->{action}= $c->uri_for( $self->action_for('add'));
 #    $self->formbuilder->script_name($c->uri_for( $self->action_for('add')));
-    print STDERR "add_vm_name:".Dumper($c->session->{vm_add}, $self->formbuilder);
+    print STDERR "add_vm_name:".Dumper($c->session->{vm_add});
     # TODO Check if this should be a pre action
     # To avoid browser refresh or reload
     $c->response->redirect( $c->uri_for( $self->action_for('list') ) )
