@@ -1,0 +1,12 @@
+name: add_vm_osi_id
+method: post
+fields:
+  osi_id:
+    label: Osi id
+    type:  text
+    size:  40
+    validate: WORD
+    required: 1
+submit: add osi id
+
+

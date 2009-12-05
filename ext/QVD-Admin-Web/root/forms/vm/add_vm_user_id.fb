@@ -1,0 +1,12 @@
+name: add_vm_user_id
+method: post
+fields:
+  user_id:
+    label: User id
+    type:  text
+    size:  40
+    validate: WORD
+    required: 1
+submit: add user id
+
+

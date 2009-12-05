@@ -171,28 +171,61 @@ sub del : Local {
 }
 
 
+sub _get_add_param {
+    my ($self, $c, $param) = @_;
+    my $result = defined($c->req->body_params->{$param}) ?
+	$c->req->body_params->{$param} : $c->session->{vm_add}->{$param};
+    $c->session->{vm_add}->{$param} = $result;
+    return $result;
+}
 sub add : Local {
     my ( $self, $c ) = @_;
     my $model = $c->model('QVD::Admin::Web');
+    my $form  = $self->formbuilder;
 
-    my $vm_name = $c->req->body_params->{vm_name};
-    my $vm_ip = $c->req->body_params->{vm_ip};
-    my $vm_storage = $c->req->body_params->{vm_storage};
-    my $user_id = $c->req->body_params->{user_id};
-    my $osi_id = $c->req->body_params->{osi_id};
+    # Body parameters take precedence over session params
+    my $vm_name = $self->_get_add_param($c, 'vm_name');
+    my $vm_ip = $self->_get_add_param($c, 'vm_ip');
+    my $vm_storage = $self->_get_add_param($c, 'vm_storage');
+    my $user_id = $self->_get_add_param($c, 'user_id');
+    my $osi_id = $self->_get_add_param($c, 'osi_id');
 
-    # If any parameter is defined we skip that step
-    my @steps;
-    push @steps, 'add_vm_name' 
-	if (!defined($vm_name) || $vm_name eq ''
-	  || !defined($vm_ip) || $vm_ip eq '');
-    push @steps, 'add_vm_user_id' if (!defined($user_id) || $user_id eq '');
-    push @steps, 'add_vm_osi_id' if (!defined($osi_id) || $osi_id eq '');
-
-    if ( $#steps == -1 ) 
+    my ($steps_array, $num_steps, $current_step);
+    if (exists($c->session->{vm_add}->{steps}))
     {
+	#We are already in a session
+	# Next step, define our local vars
+	$steps_array = $c->session->{vm_add}->{steps};
+	$num_steps = $c->session->{vm_add}->{num_steps};
+	$current_step = $c->session->{vm_add}->{current_step};
+	print STDERR "Current session:".Dumper($c->session->{vm_add});
+    }
+    else
+    {
+	my @a;
+	$steps_array = \@a;
+	push @{$steps_array}, 'add_vm_name' 
+	    if (!defined($vm_name) || $vm_name eq ''
+		|| !defined($vm_ip) || $vm_ip eq '');
+	push @{$steps_array}, 'add_vm_user_id' if (!defined($user_id) || $user_id eq '');
+	push  @{$steps_array}, 'add_vm_osi_id' if (!defined($osi_id) || $osi_id eq '');
+	$num_steps = $#{$steps_array} + 1;
+	$current_step = 0;
+	$c->session->{vm_add}->{steps} = $steps_array;
+	$c->session->{vm_add}->{num_steps} = $num_steps;
+	$c->session->{vm_add}->{current_step} = 1; # For the next iteration, our loop counter is $current_step
+	print STDERR "New session:".Dumper($c->session->{vm_add});
+    }
+    
+
+    if ( $current_step == $num_steps ) 
+    {
+	# Last step
 	# No extra steps needed, create the user
-	print STDERR "steps is 0\n";
+	print STDERR "End step:".Dumper($c->session->{vm_add});
+	# Delete the session parameters
+	delete($c->session->{vm_add});
+
 	my %parameters = (
 	    name => $vm_name,
 	    user_id => $user_id,
@@ -200,6 +233,8 @@ sub add : Local {
 	    ip => $vm_ip
 	    );
 	$parameters{storage} = $vm_storage if (defined($vm_storage) && $vm_storage ne '');
+
+
 	if (my $id = $model->vm_add(\%parameters))
 	{
 	    print STDERR "called vm_add ".Dumper($id).Dumper(\%parameters);
@@ -214,28 +249,57 @@ sub add : Local {
 	    $c->flash->{response_msg}  = $model->error_msg;
 	}
 	$c->response->redirect( $c->uri_for( $self->action_for('list') ) );
+
     }
     else 
     {
-	$c->flash->{steps} = \@steps;
-	$c->flash->{num_steps} = $#steps + 1;
-	$c->flash->{current_step} = 1;
-	$c->response->redirect( $c->uri_for( $self->action_for($steps[0]) ) );
+	print STDERR "New step:".Dumper($c->session->{vm_add});
+	$c->flash->{current_step} = $current_step + 1;
+	$c->flash->{num_steps} = $num_steps;
+	# Invoke next step
+	$c->session->{vm_add}->{current_step} = $current_step + 1;
+	print STDERR "New step2:".Dumper($c->session->{vm_add});
+	$c->response->redirect( $c->uri_for( $self->action_for($$steps_array[$current_step]) ) );
     }
 }
 
-sub add_vm_name : Local {
+sub add_vm_name : Local Form {
     my ( $self, $c ) = @_;
+
+    $self->formbuilder->action('/vm/add');
+#    $self->formbuilder->{action}= $c->uri_for( $self->action_for('add'));
+#    $self->formbuilder->script_name($c->uri_for( $self->action_for('add')));
+    print STDERR "add_vm_name:".Dumper($c->session->{vm_add}, $self->formbuilder);
+    # TODO Check if this should be a pre action
+    # To avoid browser refresh or reload
+    $c->response->redirect( $c->uri_for( $self->action_for('list') ) )
+	if (!exists($c->flash->{current_step}));
     
 }
 
 
-sub add_vm_user_id : Local {
+sub add_vm_user_id : Local Form {
     my ( $self, $c ) = @_;
+
+    $self->formbuilder->action('/vm/add');
+    print STDERR "add_vm_user_id:".Dumper($c->session->{vm_add});
+    # TODO Check if this should be a pre action
+    # To avoid browser refresh or reload
+    $c->response->redirect( $c->uri_for( $self->action_for('list') ) )
+	if (!exists($c->flash->{current_step}));
+    
 }
 
-sub add_vm_osi_id :Local {
+sub add_vm_osi_id :Local Form {
     my ( $self, $c ) = @_;
+
+    $self->formbuilder->action('/vm/add');
+    print STDERR "add_vm_osi_id:".Dumper($c->session->{vm_add});
+    # TODO Check if this should be a pre action
+    # To avoid browser refresh or reload
+    $c->response->redirect( $c->uri_for( $self->action_for('list') ) )
+	if (!exists($c->flash->{current_step}));
+    
 }
 
 sub vnc : Local :Args(1){
