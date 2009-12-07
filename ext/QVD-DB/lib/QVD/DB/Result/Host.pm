@@ -19,6 +19,7 @@ __PACKAGE__->set_primary_key('id');
 __PACKAGE__->has_many(properties => 'QVD::DB::Result::Host_Property', 
 			'host_id', { join_type => 'INNER'});
 __PACKAGE__->has_one(runtime => 'QVD::DB::Result::Host_Runtime', 'host_id');
-__PACKAGE__->has_many(vms => 'QVD::DB::Result::VM_Runtime', 'host_id');
+__PACKAGE__->has_many(vms => 'QVD::DB::Result::VM_Runtime', 'host_id', 
+			{ cascade_delete => 0 });
 
 1;
