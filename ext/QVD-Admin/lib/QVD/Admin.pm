@@ -304,6 +304,17 @@ sub cmd_config_get {
     return \@configs;
 }
 
+sub cmd_vm_start_by_id {
+    my ($self, $id) = @_;
+    die "Missing parameter id" unless defined $id;
+    use QVD::VMAS;
+    my $vmas = QVD::VMAS->new($self->{db});
+    my $vm = $self->get_resultset('vm')->find($id);
+    die "Unable to assign VM $id to a host"
+	unless $vmas->assign_host_for_vm($vm_runtime);
+    $vmas->schedule_start_vm($vm_runtime);
+}
+
 sub cmd_vm_start {
     my ($self, @args) = @_;
     my $rs = $self->get_resultset('vm');
@@ -319,6 +330,15 @@ sub cmd_vm_start {
 	}
     }
     $counter
+}
+
+sub cmd_vm_stop_by_id {
+    my ($self, $id) = @_;
+    die "Missing parameter id" unless defined $id;
+    use QVD::VMAS;
+    my $vmas = QVD::VMAS->new($self->{db});
+    my $vm = $self->get_resultset('vm')->find($id);
+    $vmas->schedule_stop_vm($vm_runtime);
 }
 
 sub cmd_vm_stop {
