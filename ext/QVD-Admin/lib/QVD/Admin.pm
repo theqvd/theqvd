@@ -310,9 +310,10 @@ sub cmd_vm_start_by_id {
     use QVD::VMAS;
     my $vmas = QVD::VMAS->new($self->{db});
     my $vm = $self->get_resultset('vm')->find($id);
+    die "VM $id doesn't exist" unless defined $vm;
     die "Unable to assign VM $id to a host"
-	unless $vmas->assign_host_for_vm($vm_runtime);
-    $vmas->schedule_start_vm($vm_runtime);
+	unless $vmas->assign_host_for_vm($vm->vm_runtime);
+    $vmas->schedule_start_vm($vm->vm_runtime);
 }
 
 sub cmd_vm_start {
@@ -338,7 +339,8 @@ sub cmd_vm_stop_by_id {
     use QVD::VMAS;
     my $vmas = QVD::VMAS->new($self->{db});
     my $vm = $self->get_resultset('vm')->find($id);
-    $vmas->schedule_stop_vm($vm_runtime);
+    die "VM $id doesn't exist" unless defined $vm;
+    $vmas->schedule_stop_vm($vm->vm_runtime);
 }
 
 sub cmd_vm_stop {
