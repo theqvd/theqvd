@@ -254,9 +254,9 @@ sub cmd_vm_propset {
 }
 
 sub _obj_propget {
-    my ($self, $obj, @args) = @_;
+    my ($self, $obj, @keys) = @_;
     my $rs = $self->get_resultset($obj);
-    my $condition = scalar @args > 0 ? {key => [@args]} : {};
+    my $condition = scalar @keys > 0 ? {key => \@keys} : {};
     my @props = $rs->search_related('properties', $condition);
     return \@props;
 }
@@ -267,21 +267,21 @@ sub propget {
 }
 
 sub cmd_host_propget {
-    shift->_obj_propget(sub { $_->host->name }, 'host', @_);
+    shift->_obj_propget('host', @_);
 }
 
 sub cmd_user_propget {
-    shift->_obj_propget(sub { $_->user->login }, 'user', @_);
+    shift->_obj_propget('user', @_);
 }
 
 sub cmd_vm_propget {
-    shift->_obj_propget(sub { $_->vm->name }, 'vm', @_);
+    shift->_obj_propget('vm', @_);
 }
 
 sub propdel {
-    my ($self, $obj, @args) = @_;
+    my ($self, $obj, @keys) = @_;
     my $rs = $self->get_resultset($obj);
-    my $condition = scalar @args > 0 ? {key => [@args]} : {};
+    my $condition = scalar @keys > 0 ? {key => \@keys} : {};
     $rs->search_related('properties', $condition)->delete;
 }
 
@@ -326,7 +326,7 @@ sub cmd_vm_start {
 	my $vm_runtime = $vm->vm_runtime;
 	if ($vm_runtime->vm_state eq 'stopped') {
 	    next unless $vmas->assign_host_for_vm($vm_runtime);
-	    next unless $vmas->schedule_start_vm($vm_runtime);
+	    next unless eval { $vmas->schedule_start_vm($vm_runtime); };
 	    $counter++;
 	}
     }
@@ -352,7 +352,7 @@ sub cmd_vm_stop {
     while (my $vm = $rs->next) {
 	my $vm_runtime = $vm->vm_runtime;
 	if ($vm_runtime->vm_state eq 'running') {
-	    $vmas->schedule_stop_vm($vm_runtime);
+	    next unless eval { $vmas->schedule_stop_vm($vm_runtime); };
 	    $counter++;
 	}
     }
@@ -373,35 +373,6 @@ sub cmd_vm_disconnect_user {
 	}
     }
     $counter
-}
-
-sub _get_single_vm_runtime {
-    my $self = shift;
-    my $rs = $self->get_resultset('vm');
-    if ($rs->count > 1) {
-	die 'Filter matches more than one VM';
-    }
-    my $vm = $rs->single;
-    die 'No matching VMs' unless defined $vm;
-    $vm->vm_runtime
-}
-
-sub cmd_vm_ssh {
-    my ($self, @args) = @_;
-    my $vm_runtime = $self->_get_single_vm_runtime;
-    my $ssh_port = $vm_runtime->vm_ssh_port;
-    die 'SSH access is disabled' unless defined $ssh_port;
-    my @cmd = (ssh => ($vm_runtime->vm_address, -p => $ssh_port, @args));
-    exec @cmd;
-}
-
-sub cmd_vm_vnc {
-    my ($self, @args) = @_;
-    my $vm_runtime = $self->_get_single_vm_runtime;
-    my $vnc_port = $vm_runtime->vm_vnc_port;
-    die 'VNC access is disabled' unless defined $vnc_port;
-    my @cmd = (vncviewer => ($vm_runtime->vm_address.'::'.$vnc_port, @args));
-    exec @cmd;
 }
 
 1;
@@ -443,7 +414,7 @@ operations. The keys that can be used depend on the object in question.
 
 =item reset_filter()
 
-Removed all conditions from the filter.
+Removes all conditions from the filter.
 
 =item get_resultset($object)
 
@@ -451,17 +422,143 @@ Return the DBIx::Class result set for the given object type. The valid object
 types are listed in the "objects" member hash. They are host, vm, uesr, config,
 and osi.
 
-=item cmd_host_add(@values)
+=item cmd_host_add(%parameters)
 
-Add a host. The parameters are name and address. 
+Add a host. The required parameters are name and address. 
 
-=item cmd_vm_add(@values)
+Returns the id of the new host. 
 
-Add a virtual machine. The obligatory parameters are name, user, osi, and ip.
-OSI and user can be specified by name (login) or by id. The optional parameter
-is storage.
+=item cmd_vm_add(%parameters)
 
-=back
+Add a virtual machine. The required parameters are name, user, osi, and ip.
+OSI and user can be specified by name (login) or by id (osi_id, user_id). The
+optional parameter is storage.
+
+Returns the id of the new virtual machine. 
+
+=item cmd_user_add(%parameters)
+
+Adds a user. The required parameters are login and password. You can optionally
+specify the user's department, telephone, and email.
+
+Returns the id of the new user.
+
+=item cmd_osi_add(%parameters)
+
+Adds an operating system image. The required parameters are name and
+disk_image. The value of disk_image should be the path of a disk image file 
+which is copied to the shared storage area. The optional parameters are memory
+(megabytes), user_storage_size (megabytes), and use_overlay (y/n).
+
+=item cmd_host_del()
+
+Deletes all hosts that match the current filter.
+
+=item cmd_user_del()
+
+Deletes all users that match the current filter.
+
+=item cmd_vm_del()
+
+Deletes all virtual machines that match the current filter.
+
+=item cmd_osi_del()
+
+Deletes all OSIs that match the current filter.
+
+=item propset($object, %properties)
+
+Set the given properties on all $objects (hosts, vms, users) that are matched
+by the current filter.
+
+The parameter $object must be either "host", "vm", or "user".
+
+=item cmd_host_propset(%properties)
+
+Wrapper for propset('host', %properties).
+
+=item cmd_vm_propset(%properties)
+
+Wrapper for propset('vm', %properties).
+
+=item cmd_user_propset(%properties)
+
+Wrapper for propset('user', %properties).
+
+=item propget($object, @keys)
+
+Returns the properties with given keys for the $objects that are matched by the
+current filter. 
+
+The parameter $object must be either "host", "vm", or "user".
+
+The return value is a reference to a list of the DBIx::Class::Row objects that
+represent the individual property entries.
+
+=item cmd_host_propget(@keys)
+
+Wrappper for propget('host', @keys).
+
+=item cmd_vm_propget(@keys)
+
+Wrappper for propget('vm', @keys).
+
+=item cmd_user_propget(@keys)
+
+Wrappper for propget('user', @keys).
+
+=item propdel($object, @keys)
+
+Deletes the properties with the given keys for the $objects that are matched by
+the current filter.
+
+The parameter $object must be either "host", "vm", or "user".
+
+Returns whatever the DBIx::Class::Resultset->delete call returns.
+
+=item cmd_config_set(%configs)
+
+Sets configuration keys to values.
+
+=item cmd_config_get(@keys)
+
+Returns the configuration table entries with the given keys.
+
+The return value is a reference to a list of the DBIx::Class::Row objects that
+represent the individual configuration entries.
+
+=item cmd_vm_start_by_id($id)
+
+Assigns the virtual machine with id $id to a host and starts it.
+
+Throws an exception using "die" if it wasn't possible to start the vm.
+
+=item cmd_vm_start()
+
+Assigns the virtual machines matched by the current filter to hosts and starts
+them. Any errors that ocurred are ignored. 
+
+Returns the number of virtual machines that were succesfully started.
+
+=item cmd_vm_stop_by_id($id)
+
+Schedules the stopping of the virtua machine with the given id.
+
+Throws an exception using "die" if it wasn't possible to stop the vm.
+
+=item cmd_vm_stop()
+
+Schedules the stopping of the virtual machines matched by the current filter.
+Any errors that ocurred are ignored. 
+
+Returns the number of virtual machines that were succesfully scheduled to stop.
+
+=item cmd_vm_disconnect_user()
+
+Disconnects the users connected to the virtual machines matched by the current
+filter.
+
+Returns the number of users that were disconnected.
 
 =head1 AUTHOR
 

@@ -570,9 +570,24 @@ Valid options:
 EOT
 }
 
+sub _get_single_vm_runtime {
+    my $self = shift;
+    my $rs = $self->get_resultset('vm');
+    if ($rs->count > 1) {
+	die 'Filter matches more than one VM';
+    }
+    my $vm = $rs->single;
+    die 'No matching VMs' unless defined $vm;
+    $vm->vm_runtime
+}
 
 sub cmd_vm_ssh {
-    shift->{admin}->cmd_vm_ssh(@_)
+    my ($self, @args) = @_;
+    my $vm_runtime = $self->_get_single_vm_runtime;
+    my $ssh_port = $vm_runtime->vm_ssh_port;
+    die 'SSH access is disabled' unless defined $ssh_port;
+    my @cmd = (ssh => ($vm_runtime->vm_address, -p => $ssh_port, @args));
+    exec @cmd or die "Unable to exec ssh: $^E";
 }
 
 sub help_vm_ssh {
@@ -591,7 +606,13 @@ EOT
 }
 
 sub cmd_vm_vnc {
-    shift->{admin}->cmd_vm_vnc(@_)
+    my ($self, @args) = @_;
+    my $vm_runtime = $self->_get_single_vm_runtime;
+    my $vnc_port = $vm_runtime->vm_vnc_port;
+    die 'VNC access is disabled' unless defined $vnc_port;
+    # FIXME Make the vnc client configurable
+    my @cmd = (vncviewer => ($vm_runtime->vm_address.'::'.$vnc_port, @args));
+    exec @cmd or die "Unable to exec vncviewer: $^E";
 }
 
 sub help_vm_vnc {
