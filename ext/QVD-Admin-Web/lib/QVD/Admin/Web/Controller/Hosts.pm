@@ -11,14 +11,15 @@ __PACKAGE__->config(
         new => {
             method     => 'post',
             stylesheet => 1,
+
             #messages   => '/locale/fr_FR/form_messages.txt',
-			messages => ':es_ES'
+            messages => ':es_ES'
         },
+
         #template_type => 'HTML::Template',
         #source_type   => 'CGI::FormBuilder::Source::File',
     }
 );
-
 
 =head1 NAME
 
@@ -41,11 +42,11 @@ sub index : Path : Args(0) {
     $c->go('list');
 }
 
-sub view : Local :Args(1){
-	my ( $self, $c, $id) = @_;
-	my $model = $c->model('QVD::Admin::Web');
-	my $host = $model->host_find($id );
-	$c->stash(host => $host);
+sub view : Local : Args(1) {
+    my ( $self, $c, $id ) = @_;
+    my $model = $c->model('QVD::Admin::Web');
+    my $host  = $model->host_find($id);
+    $c->stash( host => $host );
 }
 
 sub list : Local {
@@ -57,18 +58,20 @@ sub list : Local {
 
 sub add : Local Form {
     my ( $self, $c ) = @_;
-    my $form  = $self->formbuilder;
+    my $form = $self->formbuilder;
 
     my $model = $c->model('QVD::Admin::Web');
-	if ( $form->submitted ) {
+    if ( $form->submitted ) {
         if ( $form->validate ) {
-            my $name = $form->field('name');
-            my $address  = $form->field('address');
+            my $name    = $form->field('name');
+            my $address = $form->field('address');
             if ( my $id = $model->host_add( $name, $address ) ) {
                 $c->flash->{response_type} = "success";
-                $c->flash->{response_msg} = "$name añadido correctamente con id $id";
+                $c->flash->{response_msg} =
+                  "$name añadido correctamente con id $id";
             }
             else {
+
                 # FIXME response_type must be an enumerated
                 $c->flash->{response_type} = "error";
                 $c->flash->{response_msg}  = $model->error_msg;
@@ -77,12 +80,13 @@ sub add : Local Form {
         }
         else {
             $c->stash->{ERROR} = "INVALID FORM";
-            $c->stash->{invalid_fields} = [ grep { !$_->validate } $form->fields ];
+            $c->stash->{invalid_fields} =
+              [ grep { !$_->validate } $form->fields ];
         }
     }
 }
 
-sub del_submit : Local {
+sub del : Local {
     my ( $self, $c ) = @_;
     my $model = $c->model('QVD::Admin::Web');
 
@@ -97,12 +101,13 @@ sub del_submit : Local {
           "Error in parameters: " . $model->build_form_error_msg($result);
     }
     else {
-        my $id = $c->req->body_params->{id};    # only for a POST request
-	my $host = $model->host_find($id );
-	my $hostname = $host->name; 
+        my $id       = $c->req->body_params->{id};    # only for a POST request
+        my $host     = $model->host_find($id);
+        my $hostname = $host->name;
         if ( my $countdel = $model->host_del($id) ) {
             $c->flash->{response_type} = "success";
-            $c->flash->{response_msg}  = "$hostname ($id) eliminado correctamente";
+            $c->flash->{response_msg} =
+              "$hostname ($id) eliminado correctamente";
         }
         else {
 
@@ -115,7 +120,6 @@ sub del_submit : Local {
     #$c->forward('list');
     $c->response->redirect( $c->uri_for( $self->action_for('list') ) );
 }
-
 
 #sub add_submit_json :Local {
 #    $c->stash->{current_view} = 'JSON';
@@ -139,6 +143,5 @@ This library is free software. You can redistribute it and/or modify
 it under the same terms as Perl itself.
 
 =cut
-
 
 1;

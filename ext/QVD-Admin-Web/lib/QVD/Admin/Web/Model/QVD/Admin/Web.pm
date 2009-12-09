@@ -207,17 +207,16 @@ sub vm_start {
     my ( $self, $id ) = @_;
     my $result;
     $self->reset_status;
-
     if (
         !eval {
-            $result = $self->admin->cmd_vm_start(id=>$id);
-            1;
+            $result = $self->admin->cmd_vm_start_by_id($id);
         }
 	)
     {
-        $self->set_error($@);
+        unless (defined $result) { $self->set_error($@); }
+		else { $self->set_error("no vms started"); }
     }
-
+	print STDERR "filter ".Dumper($self->admin->{filter});
     return $result;
 }
 
@@ -228,14 +227,14 @@ sub vm_stop {
 
     if (
         !eval {
-            $result = $self->admin->cmd_vm_stop(id=>$id);
-            1;
+            $result = $self->admin->cmd_vm_stop_by_id($id);
         }
 	)
     {
-        $self->set_error($@);
+        unless (defined $result) { $self->set_error($@); }
+		else { $self->set_error("no vms stopped"); }
     }
-
+	print STDERR "filter ".Dumper($self->admin);
     return $result;
 }
 

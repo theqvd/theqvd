@@ -3,4 +3,69 @@
 <p>
 Paso [% current_step %]/[% num_steps %]
 </p>
-[% FormBuilder.render %]
+
+
+
+<h1>Imágenes</h1>
+<div id="pager" class="pager">
+	<form>
+		<img src="/static/icons/first.png" class="first"/>
+		<img src="/static/icons/prev.png" class="prev"/>
+		<input type="text" class="pagedisplay" size="3" disabled/>
+		<img src="/static/icons/next.png" class="next"/>
+		<img src="/static/icons/last.png" class="last"/>
+		<select class="pagesize" style="display:none">
+			<option selected="selected" value="20">20</option>
+		</select>
+
+	</form>
+</div>
+[% META title = 'PropGet' -%]
+<table id="props" class="tablesorter resultset">
+    <thead>
+        <tr>
+            <th id="id"></th>
+            <th id="name">Nombre</th>
+            <th id="disk_image">Imagen de disco</th>
+            <th id="use_overlay">Overlay</th>
+            <th id="memory">Memoria</th>
+        </tr>
+    </thead>
+    <tbody>
+        [% FOREACH osi IN osi_list -%]
+        <tr id="[% osi.id %]">
+            <td>
+				<form action="[% c.uri_for('/vm/add') %]" method="post">
+					<input type="hidden" name="osi_id" value ="[% osi.id %]"/>
+					<button type="submit" class="link">[% osi.id %]</button>
+				</form>
+			</td>
+            <td>[% osi.name %]</td>
+            <td>[% osi.disk_image %]</td>
+	    <td>[% IF osi.use_overlay -%]<span class="option_true"></span>
+	    [% END %]
+	    </td>
+	    <td>[% osi.memory %]</td>
+
+        </tr>
+        [% END -%]
+    </tbody>
+</table>
+
+<script type="text/javascript" charset="utf-8">
+$(document).ready(function() 
+    { 
+	$("#props").tablesorter({
+	widthFixed: true,
+	headers: { 
+            5: { 
+                sorter: false 
+            }
+	}}); 
+	$("#props").tablesorterPager({container: $("#pager")});
+
+    } 
+);
+
+</script>
+

@@ -37,6 +37,7 @@ Catalyst Controller.
 
 sub index : Path : Args(0) {
     my ( $self, $c ) = @_;
+	delete($c->session->{vm_add});
     $c->go('list');
 }
 
@@ -92,7 +93,6 @@ sub start_vm : Local {
             $c->flash->{response_msg}  = $model->error_msg;
         }
     }
-
     #$c->forward('list');
     $c->response->redirect( $c->uri_for( $self->action_for('list') ) );
    
@@ -130,7 +130,6 @@ sub stop_vm : Local {
             $c->flash->{response_msg}  = $model->error_msg;
         }
     }
-
     #$c->forward('list');
     $c->response->redirect( $c->uri_for( $self->action_for('list') ) );
    
@@ -316,16 +315,18 @@ sub add_vm_name : Local Form {
     print STDERR "add_vm_name:".Dumper($c->session->{vm_add});
     # TODO Check if this should be a pre action
     # To avoid browser refresh or reload
-    $c->response->redirect( $c->uri_for( $self->action_for('list') ) )
-	if (!exists($c->flash->{current_step}));
+    $c->response->redirect( $c->uri_for( $self->action_for('list') ) ) if (!exists($c->flash->{current_step}));
     
 }
 
 
-sub add_vm_user_id : Local Form {
+sub add_vm_user_id : Local {
     my ( $self, $c ) = @_;
 
-    $self->formbuilder->action('/vm/add');
+#    $self->formbuilder->action('/vm/add');
+	my $model = $c->model('QVD::Admin::Web');
+	my $rs    = $model->user_list("");
+	$c->stash->{user_list} = $rs;
     print STDERR "add_vm_user_id:".Dumper($c->session->{vm_add});
     # TODO Check if this should be a pre action
     # To avoid browser refresh or reload
@@ -334,10 +335,13 @@ sub add_vm_user_id : Local Form {
     
 }
 
-sub add_vm_osi_id :Local Form {
+sub add_vm_osi_id :Local {
     my ( $self, $c ) = @_;
 
-    $self->formbuilder->action('/vm/add');
+#    $self->formbuilder->action('/vm/add');
+my $model = $c->model('QVD::Admin::Web');
+my $rs    = $model->osi_list("");
+$c->stash->{osi_list} = $rs;
     print STDERR "add_vm_osi_id:".Dumper($c->session->{vm_add});
     # TODO Check if this should be a pre action
     # To avoid browser refresh or reload
