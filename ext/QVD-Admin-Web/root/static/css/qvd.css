@@ -227,22 +227,43 @@ button.link:focus span {
 }
 
 .option_startvm {
-	padding: 5px 5px 5px 25px;
-	background-image: url(../images/icons/control_play_blue.png);
+	padding: 6px 5px 5px 65px;
+	background-image: url(../images/icons/switch_off.png);
 	background-repeat: no-repeat;
 	background-position: 5px 5px;
 }
 
 .option_stopvm {
-	padding: 5px 5px 5px 25px;
-	background-image: url(../images/icons/control_stop_blue.png);
+	padding: 6px 5px 5px 65px;
+	background-image: url(../images/icons/switch_on.png);
 	background-repeat: no-repeat;
 	background-position: 5px 5px;
 }
 
+.option_failedvm {
+	padding: 6px 12px 5px 45px;
+	background-image: url(../images/icons/exclamation.png);
+	background-repeat: no-repeat;
+	background-position: 5px 5px;
+}
+
+.option_waitvm {
+	padding: 5px 5px 5px 75px;
+	background-image: url(../images/icons/loading.gif);
+	background-repeat: no-repeat;
+	background-position:25px -8px;
+    }
+
 .option_true {
 	padding: 5px 5px 5px 25px;
 	background-image: url(../images/icons/tick.png);
+	background-repeat: no-repeat;
+	background-position: 5px 5px;
+}
+
+.option_next {
+	padding: 5px 5px 5px 25px;
+	background-image: url(../images/icons/arrow_right.png);
 	background-repeat: no-repeat;
 	background-position: 5px 5px;
 }
@@ -273,6 +294,67 @@ button.link:focus span {
 	background-image: url(../images/icons/cd.png);
 	background-repeat: no-repeat;
 	background-position: 5px 5px;
+}
+
+.step_1_on {
+	background-image: url(../images/icons/step_1_on.png);
+	background-repeat: no-repeat;
+	height: 50px;
+	width: 50px;
+	margin-right: 10px;
+	display:inline-block;
+	margin-bottom: 20px;	
+}
+
+.step_1_off {
+	background-image: url(../images/icons/step_1_off.png);
+	background-repeat: no-repeat;
+	height: 50px;
+	width: 50px;
+	margin-right: 10px;
+	display:inline-block;
+	margin-bottom: 20px;
+}
+
+.step_2_on {
+	background-image: url(../images/icons/step_2_on.png);
+	background-repeat: no-repeat;
+	height: 50px;
+	width: 50px;
+	margin-right: 10px;
+	display:inline-block;
+	margin-bottom: 20px;	
+}
+
+.step_2_off {
+	background-image: url(../images/icons/step_2_off.png);
+	background-repeat: no-repeat;
+	height: 50px;
+	width: 50px;display:inline-block;
+height:16px;
+	margin-right: 10px;
+	display:inline-block;
+	margin-bottom: 20px;	
+}
+
+.step_3_on {
+	background-image: url(../images/icons/step_3_on.png);
+	background-repeat: no-repeat;
+	height: 50px;
+	width: 50px;
+	margin-right: 10px;
+	display:inline-block;
+	margin-bottom: 20px;	
+}
+
+.step_3_off {
+	background-image: url(../images/icons/step_3_off.png);
+	background-repeat: no-repeat;
+	height: 50px;
+	width: 50px;
+	margin-right: 10px;
+	display:inline-block;
+	margin-bottom: 20px;	
 }
 
 .fb_label span {
