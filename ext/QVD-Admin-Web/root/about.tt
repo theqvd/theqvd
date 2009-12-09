@@ -1,4 +1,9 @@
 <h1>Acerca de...</h1>
 <p>
-Quality Virtual Desktop Web Admin Tool version [% data.version %]
+Quality Virtual Desktop Web Admin Tool, versión [% data.version %]
 </p>
+<h2>Soporte técnico</h2>
+<ul>
+<li>E-mail: <a href="mailto:servicedesk@qindel.es">servicedesk@qindel.es</a></li>
+<li>Teléfono: <strong>637 82 55 53</strong></li>
+</ul>
