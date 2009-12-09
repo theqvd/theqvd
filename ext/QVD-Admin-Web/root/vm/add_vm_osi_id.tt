@@ -1,8 +1,6 @@
 [% META title = "Añadir Uvm" %]
 <h1><a href="[% c.uri_for('/vm') %]">Máquinas virtuales</a> &raquo; Nueva</h1>
-<p>
-Paso [% current_step %]/[% num_steps %]
-</p>
+<span class="step_1_off"></span><span class="step_2_off"></span><span class="step_3_on"></span>
 
 
 
@@ -29,23 +27,27 @@ Paso [% current_step %]/[% num_steps %]
             <th id="disk_image">Imagen de disco</th>
             <th id="use_overlay">Overlay</th>
             <th id="memory">Memoria</th>
+	    <th class="options">Seleccionar</th>
+	    
         </tr>
     </thead>
     <tbody>
         [% FOREACH osi IN osi_list -%]
         <tr id="[% osi.id %]">
-            <td>
-				<form action="[% c.uri_for('/vm/add') %]" method="post">
-					<input type="hidden" name="osi_id" value ="[% osi.id %]"/>
-					<button type="submit" class="link">[% osi.id %]</button>
-				</form>
-			</td>
+            <td>[% osi.id %]</td>
             <td>[% osi.name %]</td>
             <td>[% osi.disk_image %]</td>
 	    <td>[% IF osi.use_overlay -%]<span class="option_true"></span>
 	    [% END %]
 	    </td>
 	    <td>[% osi.memory %]</td>
+	    <td class="options">
+	      <form action="[% c.uri_for('/vm/add') %]" method="post">
+		<input type="hidden" name="osi_id" value ="[% osi.id %]"/>
+		<button type="submit" class="link"><span class="option_next"></span></button>
+	      </form>
+	    
+	    </td>
 
         </tr>
         [% END -%]

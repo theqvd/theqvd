@@ -1,6 +1,5 @@
 [% META title = "Añadir Uvm" %]
 <h1><a href="[% c.uri_for('/vm') %]">M&aacute;quinas virtuales</a> &raquo; Nueva</h1>
-<p>
-Paso [% current_step %]/[% num_steps %]
-</p>
+<span class="step_1_on"></span><span class="step_2_off"></span><span class="step_3_off"></span>
+
 [% FormBuilder.render %]
