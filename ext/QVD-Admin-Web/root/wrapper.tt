@@ -32,7 +32,7 @@
 		</div>
 		<div class="grid_9" id="top-menu">
 			<p>
-				Administrador | <a href="#">Preferencias</a> | <a href="#">Salir</a>
+				Administrador | <a href="#">Preferencias</a> | <a href="/about">Acerca de...</a> | <a href="#">Salir</a>
 
 			</p>
 		</div>				
