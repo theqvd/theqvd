@@ -222,7 +222,6 @@ sub add : Local {
 
     # Body parameters take precedence over session params
     my $vm_name = $self->_get_add_param($c, 'vm_name');
-    my $vm_ip = $self->_get_add_param($c, 'vm_ip');
     my $vm_storage = $self->_get_add_param($c, 'vm_storage');
     my $user_id = $self->_get_add_param($c, 'user_id');
     my $osi_id = $self->_get_add_param($c, 'osi_id');
@@ -244,8 +243,7 @@ sub add : Local {
 	my @a;
 	$steps_array = \@a;
 	push @{$steps_array}, 'add_vm_name' 
-	    if (!defined($vm_name) || $vm_name eq ''
-		|| !defined($vm_ip) || $vm_ip eq '');
+	    if (!defined($vm_name) || $vm_name eq '');
 	push @{$steps_array}, 'add_vm_user_id' if (!defined($user_id) || $user_id eq '');
 	push  @{$steps_array}, 'add_vm_osi_id' if (!defined($osi_id) || $osi_id eq '');
 	$num_steps = $#{$steps_array} + 1;
@@ -273,7 +271,7 @@ sub add : Local {
 	    name => $vm_name,
 	    user_id => $user_id,
 	    osi_id => $osi_id,
-	    ip => $vm_ip
+	    ip => "",
 	    );
 	$parameters{storage} = $vm_storage if (defined($vm_storage) && $vm_storage ne '');
 

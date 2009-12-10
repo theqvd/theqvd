@@ -31,7 +31,6 @@ else
             <th id="id"></th>
             <th id="name">Nombre</th>
             <th id="address">Dirección</th>
-	    <th class="options">Opciones</th>
         </tr>
     </thead>
     <tbody>
@@ -40,13 +39,7 @@ else
             <td><a href="[% c.uri_for('/hosts/view/') %][% host.id %]" class="option_view">[% host.id %]</a></td>
             <td>[% host.name %]</td>
             <td>[% host.address %]</td>
-	    <td class="options">
-	      <form action="[% c.uri_for('/hosts/del') %]" method="post">
-		<input type="hidden" name="id" value="[% host.id %]"/>
-		<button type="submit" class="link" onClick="return confirm_submit()"><span class="option_del"></span></button>
-	      </form>
-	    
-	    </td>
+
         </tr>
         [% END -%]
     </tbody>
@@ -56,12 +49,8 @@ else
 $(document).ready(function() 
     { 
 	$("#props").tablesorter({
-	widthFixed: true,
-	headers: { 
-            3: { 
-                sorter: false 
-            }
-	}}); 
+	widthFixed: true
+	}); 
 	$("#props").tablesorterPager({container: $("#pager")});
 
     } 

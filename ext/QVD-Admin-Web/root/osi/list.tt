@@ -10,7 +10,7 @@ else
 </script>
 
 <h1>Imágenes</h1>
-<div class="side_add"><a href="[% c.uri_for('/osi/add') %]">Nueva</a></div>
+<!--<div class="side_add"><a href="[% c.uri_for('/osi/add') %]">Nueva</a></div>-->
 <div id="pager" class="pager">
 	<form>
 		<img src="/static/icons/first.png" class="first"/>

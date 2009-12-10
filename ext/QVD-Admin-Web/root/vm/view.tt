@@ -21,5 +21,27 @@
     </table>
 </div>
 
-<a href="[% c.uri_for('/vm/vnc/') %][% vm.id %]" target="_blank">Conectar por VNC</a>
+<script>
+
+function vnc() {
+    var appletcode = '<applet code="VncViewer" width="100%" height="100%" archive="/static/jar/VncViewer.jar">'
+    + '<param name="HOST" value="[% vm.vm_runtime.host.address %]">'
+    + '<param name="PORT" value="[% vm.vm_runtime.vm_vnc_port %]">'
+    + '<param name="PASSWORD" value="">'
+    + '</applet>';
+    
+    var windowid = window.open('','VNC','width=1040,height=810,scrollbars=no,toolbar=no,location=no,status=no,menubar=no');
+    
+    windowid.document.write(appletcode);
+    
+    return 1;
+}
+
+</script>
+
+<h2>Administración remota</h2>
+<ul class="intermenu">
+<li><a href="#" onClick="vnc();" class="option_vnc">Visor VNC</a></li>
+<li><a href="vnc://[% vm.vm_runtime.host.address %]:[% vm.vm_runtime.vm_vnc_port %]" class="option_vnclocal">Cliente local VNC</a></li>
+</ul>
 

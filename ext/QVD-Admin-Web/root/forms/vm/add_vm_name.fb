@@ -7,12 +7,6 @@ fields:
     size:  40
     validate: WORD
     required: 1
-  vm_ip:
-    label: Direccion IP
-    type:  text
-    size:  20
-    validate: IPV4
-    required: 1
-submit: Next
+submit: Continuar
 
 

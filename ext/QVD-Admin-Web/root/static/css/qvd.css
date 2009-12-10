@@ -126,6 +126,7 @@ p {
 
 #login-box {
 	margin-top: 60px;
+	text-align:center;
 }
 
 #top-logo {
@@ -268,6 +269,29 @@ button.link:focus span {
 	background-position: 5px 5px;
 }
 
+.option_vnc {
+	padding: 5px 5px 5px 25px;
+	background-image: url(../images/icons/mouse.png);
+	background-repeat: no-repeat;
+	background-position: 5px 5px;
+}
+
+.option_vnclocal {
+	padding: 5px 5px 5px 25px;
+	background-image: url(../images/icons/brick.png);
+	background-repeat: no-repeat;
+	background-position: 5px 5px;
+}
+
+.intermenu {
+	border-right: solid #DDD 1px;
+	list-style-type: none;
+}
+
+.intermenu li {
+	margin-bottom:6px;
+}
+
 .menu_host {
 	padding: 5px 5px 5px 25px;
 	background-image: url(../images/icons/server.png);
@@ -331,7 +355,6 @@ button.link:focus span {
 	background-repeat: no-repeat;
 	height: 50px;
 	width: 50px;display:inline-block;
-height:16px;
 	margin-right: 10px;
 	display:inline-block;
 	margin-bottom: 20px;	

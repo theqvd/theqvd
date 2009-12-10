@@ -90,6 +90,19 @@ sub default :Path {
     $c->response->status(404);
 }
 
+sub login :Local {
+    my ( $self, $c ) = @_;
+    
+    if (($c->req->params->{log} eq $c->req->params->{pwd}) and $c->req->params->{log} ne '') {
+	
+	$c->res->redirect('/');
+    } else {
+	$c->stash->{current_view}='TTMin';
+    }
+
+    
+}
+
 =head2 end
 
 Attempt to render a view, if needed.
