@@ -139,7 +139,7 @@ sub _start_or_resume_session {
 	my $pid = fork;
 	if (!$pid) {
 	    defined $pid or carp "fork failed";
-	    { exec "su - qvd -c \"xinit $desktop -- $xagent :1000 -display nx/nx,link=lan:1000 -ac\"" };
+	    { exec "su - qvd -c \"xinit $desktop -- $xagent -name QVD :1000 -display nx/nx,link=lan:1000 -ac\"" };
 	    { exec "/bin/false" };
 	    require POSIX;
 	    POSIX::_exit(-1);
