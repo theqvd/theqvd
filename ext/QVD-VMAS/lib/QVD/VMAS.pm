@@ -265,7 +265,7 @@ sub _ensure_image_exists {
 				'-f' => 'qcow2',
 				'-b' => $base_img_rel,
 				$disk_image));
-	system(@cmd) == 0 or die "Unable to create overlay image $disk_image";
+	system(@cmd) == 0 or die "Unable to create overlay image $disk_image: $^E";
 	INFO "Created overlay image $disk_image for VM ".$vm->vm_id;
 	chdir $curdir;
     }
