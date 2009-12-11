@@ -81,6 +81,28 @@ sub propsetButton :Local {
 
 sub index :Path :Args(0) {
     my ( $self, $c ) = @_;
+    
+    my $model = $c->model('QVD::Admin::Web');
+    
+    my $rs = $model->vm_stats("");
+    $c->stash('vm_stats_fields' => join ('|', map {$_->vm_state." (".$_->get_column('vm_count').")"} @$rs));
+    $c->stash('vm_stats_values' => join (',', map {$_->get_column('vm_count')} @$rs));
+    
+    $rs = $model->user_total_stats("");
+    $c->stash('user_total_stats' => $rs);
+    
+    $rs = $model->vm_total_stats("");
+    $c->stash('vm_total_stats' => $rs);
+    
+    $rs = $model->host_total_stats("");
+    $c->stash('host_total_stats' => $rs);
+    
+    $rs = $model->osi_total_stats("");
+    $c->stash('osi_total_stats' => $rs);
+    
+    $rs = $model->session_connected_stats();
+    $c->stash('session_connected_stats' => $rs);
+
 
 }
 

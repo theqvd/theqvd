@@ -281,19 +281,71 @@ sub vm_del {
 
 
 sub vmrt_list {
-	my ( $self, $filter ) = @_;
+    my ( $self, $filter ) = @_;
     $self->reset_status;
     my $rs = $self->db->resultset('VM_Runtime');
     return [ $rs->search($filter) ]  ;
 }
 
 sub vmrt_find {
-	my ( $self, $filter ) = @_;
+    my ( $self, $filter ) = @_;
     $self->reset_status;
     my $rs = $self->db->resultset('VM_Runtime');
-    return   $rs->find($filter)  ;
+    return $rs->find($filter)  ;
 }
 
+sub vm_stats {
+    my ($self, $filter) = @_;
+    
+    my $rs = $self->db->resultset('VM_Runtime');
+    my $result = [ $rs->search($filter,{ group_by => ['vm_state'],
+				   select => ['vm_state',
+					      { count => '*'}],
+				   as => ['vm_state', 'vm_count']
+				 }) ];   
+    return $result;
+}
+
+sub user_total_stats {
+    my ($self, $filter) = @_;
+    
+    my $rs = $self->db->resultset('User');
+    my $result = $rs->search($filter)->count;
+    return $result;
+}
+
+sub vm_total_stats {
+    my ($self, $filter) = @_;
+    
+    my $rs = $self->db->resultset('VM');
+    my $result = $rs->search($filter)->count;
+    return $result;
+}
+
+sub host_total_stats {
+    my ($self, $filter) = @_;
+    
+    my $rs = $self->db->resultset('Host');
+    my $result = $rs->search($filter)->count;
+    return $result;
+}
+
+sub osi_total_stats {
+    my ($self, $filter) = @_;
+    
+    my $rs = $self->db->resultset('OSI');
+    my $result = $rs->search($filter)->count;
+    return $result;
+}
+
+sub session_connected_stats {
+    my ($self, $filter) = @_;
+    
+    my $rs = $self->db->resultset('VM_Runtime');
+    $filter->{user_state} = 'connected';
+    my $result = $rs->search($filter)->count;   
+    return $result;
+}
 
 =head 2 build_form_error_msg
 

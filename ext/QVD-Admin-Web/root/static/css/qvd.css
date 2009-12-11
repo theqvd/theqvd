@@ -400,3 +400,12 @@ button.link:focus span {
 .pager img {
 	vertical-align: sub;
 }
+
+.big_count {
+	font-size: 32px;
+	font-weight: bold;
+}
+
+.center {
+	text-align: center;
+}

@@ -1,0 +1,20 @@
+<div id="login-box" class="grid_12">
+
+<p>
+    <img src="/static/images/qvd-logo.png" alt="Quality Virtual Desktop logo" />
+</p>
+<form method="post" action="/login" id="loginform" name="loginform">
+	<p>
+		<label>Nombre de usuario<br/>
+		<input type="text" tabindex="10" size="20" value="" class="input" id="user_login" name="log"/></label>
+	<br/>
+		<label>Contraseña<br/>
+		<input type="password" tabindex="20" size="20" value="" class="input" id="user_pass" name="pwd"/></label>
+	</p>
+	<p class="submit">
+		<input type="submit" tabindex="100" value="Iniciar sesión" id="submit" name="submit"/>
+	</p>
+
+</form>
+
+</div>
