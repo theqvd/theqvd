@@ -199,8 +199,9 @@ sub schedule_start_vm {
 	    die "Unable to notify hkd on ".$host
 			." to start VM ".$vm->vm_id.": ".$err;
 	}
+    } else {
+	die "Unable to schedule start command";
     }
-    undef;
 }
 
 sub schedule_stop_vm {
@@ -217,8 +218,9 @@ sub schedule_stop_vm {
 	    die "Unable to notify hkd on ".$host
 			." to stop VM ".$vm->vm_id.": ".$err;
 	}
+    } else {
+	die "Unable to schedule start command";
     }
-    undef;
 }
 
 sub _get_image_for_vm {
