@@ -47,6 +47,7 @@ else
 	    <td>[% vm.vm_runtime.vm_state %][% IF vm.vm_runtime.vm_state == 'running' %] (<a href="[% c.uri_for('/hosts/view') %]/[% vm.vm_runtime.host.id %]">[% vm.vm_runtime.host.name %]</a>)[% END %]</td>
 	    <td>[% vm.storage %]</td>
 	    <td class="options">
+	      [% IF vm.vm_runtime.vm_cmd == '' -%]
 	      [% IF vm.vm_runtime.vm_state == 'stopped' -%]
 	      <form action="[% c.uri_for('/vm/start_vm') %]" method="post">
 		<input type="hidden" name="id" value="[% vm.id %]"/>
@@ -67,7 +68,10 @@ else
 		<input type="hidden" name="id" value="[% vm.id %]"/>
 		<button type="submit" class="link" onClick="return confirm_submit()"><span class="option_disconnect"></span></button>
 	      </form>
-	      [% END %]	      
+	      [% END %]
+	      [% ELSE %]    
+	      <span class="option_waitvm"></span>      
+	      [% END %]
 	      <form action="[% c.uri_for('/vm/del') %]" method="post">
 		<input type="hidden" name="id" value="[% vm.id %]"/>
 		<button type="submit" class="link" onClick="return confirm_submit()"><span class="option_del"></span></button>
