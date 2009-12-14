@@ -219,7 +219,7 @@ sub schedule_stop_vm {
 			." to stop VM ".$vm->vm_id.": ".$err;
 	}
     } else {
-	die "Unable to schedule start command";
+	die "Unable to schedule stop command";
     }
 }
 
