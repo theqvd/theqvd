@@ -311,11 +311,10 @@ sub cmd_vm_start_by_id {
     my $vmas = QVD::VMAS->new($self->{db});
     my $vm = $self->get_resultset('vm')->find($id);
     die "VM $id doesn't exist" unless defined $vm;
-    die "Unable to assign VM $id to a host"
-	unless $vmas->assign_host_for_vm($vm->vm_runtime);
-
     $vmas->txn_do(sub {
 	if ($vm->vm_runtime->vm_state eq 'stopped') {
+	    die "Unable to assign VM $id to a host"
+		unless $vmas->assign_host_for_vm($vm->vm_runtime);
 	    $vmas->schedule_start_vm($vm->vm_runtime)
 	} else {
 	    die "Unable to start VM: VM is not stopped";
@@ -330,12 +329,17 @@ sub cmd_vm_start {
     use QVD::VMAS;
     my $vmas = QVD::VMAS->new($self->{db});
     while (my $vm = $rs->next) {
-	my $vm_runtime = $vm->vm_runtime;
-	if ($vm_runtime->vm_state eq 'stopped') {
-	    next unless $vmas->assign_host_for_vm($vm_runtime);
-	    next unless eval { $vmas->schedule_start_vm($vm_runtime); };
-	    $counter++;
-	}
+	eval {
+	    $vmas->txn_do(sub {
+		    my $vm_runtime = $vm->vm_runtime;
+		    if ($vm_runtime->vm_state eq 'stopped') {
+			die unless $vmas->assign_host_for_vm($vm_runtime);
+			$vmas->schedule_start_vm($vm_runtime);
+			$counter++;
+		    }
+		});
+	    1
+	};
     }
     $counter
 }
