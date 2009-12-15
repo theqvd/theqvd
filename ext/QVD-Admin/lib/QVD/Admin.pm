@@ -320,6 +320,7 @@ sub cmd_vm_start_by_id {
 	    die "Unable to start VM: VM is not stopped";
 	}
     });
+    $vmas->notify_hkd($vm->vm_runtime);
 }
 
 sub cmd_vm_start {
@@ -358,6 +359,7 @@ sub cmd_vm_stop_by_id {
 	    die "Unable to stop VM: VM is not running";
 	}
     });
+    $vmas->notify_hkd($vm->vm_runtime);
 }
 
 sub cmd_vm_stop {

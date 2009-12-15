@@ -185,42 +185,30 @@ sub start_vm_listener {
     }
 }
 
+sub notify_hkd {
+    my ($self, $vm) = @_;
+    my $host = $vm->host->address;
+    my $rc = QVD::VMAS::RCClient->new($host);
+    my $r = eval { $rc->ping_hkd() };
+    if (defined $r && $r->{request} eq 'success') {
+	return 1;
+    } else {
+	my $err = $@ // $r->{error};
+	die "Unable to notify hkd on ".$host
+	." to start VM ".$vm->vm_id.": ".$err;
+    }
+}
+
 sub schedule_start_vm {
     my ($self, $vm) = @_;
-    if ($self->_schedule_cmd($vm, 'vm_cmd', 'start')) {
-	my $host = $vm->host->address;
-	my $rc = QVD::VMAS::RCClient->new($host);
-	my $r = eval { $rc->ping_hkd() };
-	if (defined $r && $r->{request} eq 'success') {
-	    return 1;
-	} else {
-	    my $err = $@ // $r->{error};
-	    $self->clear_vm_cmd($vm);
-	    die "Unable to notify hkd on ".$host
-			." to start VM ".$vm->vm_id.": ".$err;
-	}
-    } else {
-	die "Unable to schedule start command";
-    }
+    $self->_schedule_cmd($vm, 'vm_cmd', 'start')
+       	or die "Unable to schedule start command";
 }
 
 sub schedule_stop_vm {
     my ($self, $vm) = @_;
-    if ($self->_schedule_cmd($vm, 'vm_cmd', 'stop')) {
-	my $host = $vm->host->address;
-	my $rc = QVD::VMAS::RCClient->new($host);
-	my $r = eval { $rc->ping_hkd() };
-	if (defined $r && $r->{request} eq 'success') {
-	    return 1;
-	} else {
-	    my $err = $@ // $r->{error};
-	    $self->clear_vm_cmd($vm);
-	    die "Unable to notify hkd on ".$host
-			." to stop VM ".$vm->vm_id.": ".$err;
-	}
-    } else {
-	die "Unable to schedule stop command";
-    }
+    $self->_schedule_cmd($vm, 'vm_cmd', 'stop')
+	or die "Unable to schedule stop command";
 }
 
 sub _get_image_for_vm {
