@@ -18,6 +18,14 @@
 	    <td class="field">Dirección IP</td>
 	    <td class="value">[% vm.vm_runtime.vm_address %]</td>
 	</tr>
+	<tr>
+	    <td class="field">Estado</td>
+	    <td class="value">[% vm.vm_runtime.vm_state %]</td>
+	</tr>	
+	<tr>
+	    <td class="field">Nodo</td>
+	    <td class="value"><a href="[% c.uri_for('/hosts/view/') %][% vm.vm_runtime.host_id %]">[% vm.vm_runtime.host.name %]</a></td>
+	</tr>		
     </table>
 </div>
 
