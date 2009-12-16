@@ -115,23 +115,29 @@ sub _get_free_host {
 }
 
 sub assign_host_for_vm {
-    my ($self, $vm, $preferred_host) = @_;
+    my ($self, $vm, $preferred_host_id) = @_;
     my $vm_id = $vm->vm_id;
     my $host;
-    if (defined $preferred_host) {
-	$host = $self->{db}->resultset('Host')->find($preferred_host); 
+    if (defined $preferred_host_id) {
+	$host = $self->{db}->resultset('Host')->find($preferred_host_id); 
     }
     $host //= $self->_get_free_host($vm);
-    return undef unless $host;
-    my $r = $vm->update({ 
-		host_id => $host->id, 
-		vm_address => $host->address,
-		vm_vma_port => QVD::Config->get('vm_vma_port')+$vm_id,
-		vm_x_port => QVD::Config->get('vm_x_port')+$vm_id,
-		vm_ssh_port => QVD::Config->get('vm_ssh_port')+$vm_id,
-		vm_vnc_port => QVD::Config->get('vm_vnc_port')+$vm_id,
-		});
-    $r
+    die "Unable to assign VM $vm_id a host" unless defined $host;
+    return $self->txn_do(sub {
+	    if (defined $vm->host_id) {
+		die "VM $vm_id is already assigned to a host";
+	    } else {
+		my $r = $vm->update({ 
+			host_id => $host->id, 
+			vm_address => $host->address,
+			vm_vma_port => QVD::Config->get('vm_vma_port')+$vm_id,
+			vm_x_port => QVD::Config->get('vm_x_port')+$vm_id,
+			vm_ssh_port => QVD::Config->get('vm_ssh_port')+$vm_id,
+			vm_vnc_port => QVD::Config->get('vm_vnc_port')+$vm_id,
+		    });
+		return $r;
+	    }
+	});
 }
 
 sub push_vm_state {
@@ -201,8 +207,16 @@ sub notify_hkd {
 
 sub schedule_start_vm {
     my ($self, $vm) = @_;
-    $self->_schedule_cmd($vm, 'vm_cmd', 'start')
-       	or die "Unable to schedule start command";
+    my $vm_id = $vm->vm_id;
+    $self->txn_do(sub {
+	    if (defined ($vm->host_id)) {
+		$self->_schedule_cmd($vm, 'vm_cmd', 'start')
+		    or die "Unable to schedule start command";
+	    } else {
+		die "Unable to schedule start command: VM ".$vm_id
+		." is not assigned to any host";
+	    }
+	});
 }
 
 sub schedule_stop_vm {
@@ -450,7 +464,7 @@ This module implements the VMAS API.
 
 =over
 
-=item assign_host_for_vm($vm_runtime, $preferred_host = undef)
+=item assign_host_for_vm($vm_runtime, $preferred_host_id = undef)
 
 Assigns the given virtual machine runtime to a QVD host. The machine is
 assigned to the preferred host, if specified. Otherwise the 
