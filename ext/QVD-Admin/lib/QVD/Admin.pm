@@ -313,9 +313,9 @@ sub cmd_vm_start_by_id {
     die "VM $id doesn't exist" unless defined $vm;
     $vmas->txn_do(sub {
 	if ($vm->vm_runtime->vm_state eq 'stopped') {
-	    die "Unable to assign VM $id to a host"
-		unless $vmas->assign_host_for_vm($vm->vm_runtime);
-	    $vmas->schedule_start_vm($vm->vm_runtime)
+	    $vmas->assign_host_for_vm($vm->vm_runtime)
+		or die "Unable to assign VM $id to a host";
+	    $vmas->schedule_start_vm($vm->vm_runtime);
 	} else {
 	    die "Unable to start VM: VM is not stopped";
 	}
@@ -339,8 +339,8 @@ sub cmd_vm_start {
 			$counter++;
 		    }
 		});
-	    1
 	};
+	# TODO Log error messages ($@) in some way
     }
     $counter
 }
