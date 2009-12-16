@@ -409,3 +409,11 @@ button.link:focus span {
 .center {
 	text-align: center;
 }
+
+.clickable_row {
+	cursor: pointer;
+}
+
+.clickable_row:hover td {
+	background-color: #F0F0F0;
+}

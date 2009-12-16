@@ -6,7 +6,7 @@
 
 <h1>Usuarios</h1>
 <div id="pager" class="pager">
-	<form>
+	<form id="pager_form" name="pager_form">
 		<img src="/static/icons/first.png" class="first"/>
 		<img src="/static/icons/prev.png" class="prev"/>
 		<input type="text" class="pagedisplay" size="3" disabled/>
@@ -18,31 +18,23 @@
 	</form>
 </div>
 
-
 <table id="props" class="tablesorter resultset">
     <thead>
         <tr>
             <th id="id"></th>
             <th id="login">Nombre</th>
             <th id="department">Departamento</th>	    
-	    <th class="options">Seleccionar</th>
-	    
         </tr>
     </thead>
     <tbody>
         [% FOREACH user IN user_list -%]
-        <tr id="[% user.id %]">
-            <td>[% user.id %]</td>
-            <td>[% user.login %]</td>
-            <td>[% user.department %]</td>	    
-	    <td class="options">
-	      <form action="[% c.uri_for('/vm/add') %]" method="post">
-		<input type="hidden" name="user_id" value="[% user.id %]"/>
-		<button type="submit" class="link"><span class="option_next"></span></button>
-	      </form>
-	    
-	    </td>
-        </tr>
+	<tr id="[% user.id %]" class="clickable_row" onClick="document.form[% user.id %].submit();">
+	    <td>[% user.id %]<form id="form[% user.id %]" name="form[% user.id %]" action="[% c.uri_for('/vm/add') %]" method="post">
+	    <input type="hidden" name="user_id" value="[% user.id %]"/>
+	</form></td>
+	    <td>[% user.login %]</td>
+	    <td>[% user.department %]</td>
+	</tr>
         [% END -%]
     </tbody>
 </table>

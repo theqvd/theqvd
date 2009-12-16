@@ -6,7 +6,7 @@
 
 <h1>Imágenes</h1>
 <div id="pager" class="pager">
-	<form>
+	<form id="pager_form" name="pager_form">
 		<img src="/static/icons/first.png" class="first"/>
 		<img src="/static/icons/prev.png" class="prev"/>
 		<input type="text" class="pagedisplay" size="3" disabled/>
@@ -27,27 +27,22 @@
             <th id="disk_image">Imagen de disco</th>
             <th id="use_overlay">Overlay</th>
             <th id="memory">Memoria</th>
-	    <th class="options">Seleccionar</th>
-	    
+    
         </tr>
     </thead>
     <tbody>
         [% FOREACH osi IN osi_list -%]
-        <tr id="[% osi.id %]">
-            <td>[% osi.id %]</td>
+        <tr id="[% osi.id %]" class="clickable_row" onClick="document.form[% user.id %].submit();">
+            <td>[% osi.id %]<form id="form[% user.id %]" name="form[% user.id %]" action="[% c.uri_for('/vm/add') %]" method="post">
+		<input type="hidden" name="osi_id" value ="[% osi.id %]"/>
+	      </form></td>
             <td>[% osi.name %]</td>
             <td>[% osi.disk_image %]</td>
 	    <td>[% IF osi.use_overlay -%]<span class="option_true"></span>
 	    [% END %]
 	    </td>
 	    <td>[% osi.memory %]</td>
-	    <td class="options">
-	      <form action="[% c.uri_for('/vm/add') %]" method="post">
-		<input type="hidden" name="osi_id" value ="[% osi.id %]"/>
-		<button type="submit" class="link"><span class="option_next"></span></button>
-	      </form>
-	    
-	    </td>
+	      
 
         </tr>
         [% END -%]
