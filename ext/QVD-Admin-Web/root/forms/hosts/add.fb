@@ -5,7 +5,7 @@ fields:
         label: Nombre
         type:  text
         size:  40
-        validate: WORD
+        validate: NAME
         required: 1
     address:
         label: Direccion IP

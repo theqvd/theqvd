@@ -1,7 +1,7 @@
 /* tables */
 table.tablesorter {
 	margin:10px 0pt 15px;
-	width: 680px;
+	width: 880px;
 	text-align: left;
 }
 table.tablesorter thead tr th, table.tablesorter tfoot tr th {
@@ -41,6 +41,6 @@ table.tablesorter thead tr .headerSortDown, table.tablesorter thead tr .headerSo
 }
 
 .pager {
-	margin-right:20px;
+	margin-right:60px;
 	text-align:right;
 }

@@ -28,24 +28,24 @@ else
 <table id="props" class="tablesorter resultset">
     <thead>
         <tr>
+	    <th />
             <th id="id"></th>
             <th id="name">Nombre</th>
             <th id="user">Usuario</th>
             <th id="osi">Imagen Disco</th>
 	    <th id="status">Estado</th>
-            <th id="storage">Disco</th>
 	    <th class="options">Opciones</th>
         </tr>
     </thead>
     <tbody>
         [% FOREACH vm IN vm_list -%]
         <tr id="[% vm.id %]">
+	    <td><input type="checkbox" name="pr" value="pr"></td>
             <td><a href="[% c.uri_for('/vm/view/') %][% vm.id %]" class="option_view">[% vm.id %]</a></td>
 	    <td>[% vm.name %]</td>
             <td>[% vm.user.login %]</td>
             <td><a href="[% c.uri_for('/osi/view/') %][% vm.osi_id %]">[% vm.osi.name %]</a></td>
 	    <td>[% vm.vm_runtime.vm_state %][% IF vm.vm_runtime.vm_state == 'running' %] (<a href="[% c.uri_for('/hosts/view') %]/[% vm.vm_runtime.host.id %]">[% vm.vm_runtime.host.name %]</a>)[% END %]</td>
-	    <td>[% vm.storage %]</td>
 	    <td class="options">
 	      [% IF vm.vm_runtime.vm_cmd == '' -%]
 	      [% IF vm.vm_runtime.vm_state == 'stopped' -%]
@@ -72,16 +72,12 @@ else
 	      [% ELSE %]    
 	      <span class="option_waitvm"></span>      
 	      [% END %]
-	      <form action="[% c.uri_for('/vm/del') %]" method="post">
-		<input type="hidden" name="id" value="[% vm.id %]"/>
-		<button type="submit" class="link" onClick="return confirm_submit()"><span class="option_del"></span></button>
-	      </form>
-	    
 	    </td>
         </tr>
         [% END -%]
     </tbody>
 </table>
+<input type="submit" value="Arrancar"/> <input type="submit" value="Detener"/> <input type="submit" value="Eliminar"/>
 
 <script type="text/javascript" charset="utf-8">
 $(document).ready(function() 
@@ -89,7 +85,10 @@ $(document).ready(function()
 	$("#props").tablesorter({
 	widthFixed: true,
 	headers: { 
-            6: { 
+            0: { 
+                sorter: false 
+            },
+	    6: { 
                 sorter: false 
             }
 	}}); 

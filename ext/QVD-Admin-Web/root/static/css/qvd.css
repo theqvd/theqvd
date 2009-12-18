@@ -34,7 +34,7 @@ p {
 	border-color: #8C0000;
 	border-width: 1px;
 	border-style: solid;
-	margin-right: 20px;
+	margin-right: 60px;
 	color: #8C0000;
 	padding: 5px 5px 5px 25px;
 	font-weight: bold;
@@ -48,7 +48,7 @@ p {
 	border-color: black;
 	border-width: 1px;
 	border-style: solid;
-	margin-right: 20px;
+	margin-right: 60px;
 	color: black;
 	padding: 5px 5px 5px 25px;
 	font-weight: bold;
@@ -62,7 +62,7 @@ p {
 	border-color: #224;
 	border-width: 1px;
 	border-style: solid;
-	margin-right: 20px;
+	margin-right: 60px;
 	color: #224;
 	padding: 5px 5px 5px 25px;
 	font-weight: bold;
@@ -76,7 +76,7 @@ p {
 	border-color: green;
 	border-width: 1px;
 	border-style: solid;
-	margin-right: 20px;
+	margin-right: 60px;
 	color: green;
 	padding: 5px 5px 5px 25px;
 	font-weight: bold;
@@ -96,6 +96,12 @@ p {
 	min-height: 700px;
 	padding: 0;
 	margin: 0;
+}
+
+.maincontent {
+	margin-left: 40px;
+	margin-top: 40px;
+	padding-right:40px;
 }
 
 #bottom {
@@ -129,8 +135,8 @@ p {
 	text-align:center;
 }
 
-#top-logo {
-	text-align: center;
+#top-logo img{
+	margin-left: 30px;
 }
 
 #top-menu p {
@@ -139,13 +145,28 @@ p {
 	padding-right: 10px;
 }
 
+
 #menu ul {
-	border-right: solid #DDD 1px;
 	list-style-type: none;
 }
 
 #menu ul li {
 	margin-bottom:6px;
+	display: inline;
+	
+}
+
+#menu ul li a{
+	border:1px solid #eee;
+	padding-top: 10px;
+	padding-bottom: 10px;
+	padding-right: 10px;
+	padding-left: 35px;
+	
+}
+
+#menu ul li a:hover {
+	background-color: #eee;	
 }
 
 button {
@@ -296,28 +317,28 @@ button.link:focus span {
 	padding: 5px 5px 5px 25px;
 	background-image: url(../images/icons/server.png);
 	background-repeat: no-repeat;
-	background-position: 5px 5px;
+	background-position: 10px 8px;
 }
 
 .menu_vm {
 	padding: 5px 5px 5px 25px;
 	background-image: url(../images/icons/computer.png);
 	background-repeat: no-repeat;
-	background-position: 5px 5px;
+	background-position: 10px 8px;
 }
 
 .menu_user {
 	padding: 5px 5px 5px 25px;
 	background-image: url(../images/icons/user_female.png);
 	background-repeat: no-repeat;
-	background-position: 5px 5px;
+	background-position: 10px 8px;
 }
 
 .menu_osi {
 	padding: 5px 5px 5px 25px;
 	background-image: url(../images/icons/cd.png);
 	background-repeat: no-repeat;
-	background-position: 5px 5px;
+	background-position: 10px 8px;
 }
 
 .step_1_on {

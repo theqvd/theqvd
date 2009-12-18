@@ -13,11 +13,11 @@
 }
 
 .resultset thead {
-  border-bottom: 2px solid #f08900;
+	border-bottom: 2px solid #f08900;
 }
 
 .resultset tfoot {
-  border-top: 2px solid #f08900;
+	border-top: 2px solid #f08900;
 }
 
 .resultset tr.rowodd {
