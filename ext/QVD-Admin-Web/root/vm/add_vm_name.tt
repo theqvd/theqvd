@@ -2,4 +2,6 @@
 <h1><a href="[% c.uri_for('/vm') %]">M&aacute;quinas virtuales</a> &raquo; Nueva</h1>
 <span class="step_1_on"></span><span class="step_2_off"></span><span class="step_3_off"></span>
 
+<div><a href="[% c.uri_for('/vm') %]">Cancelar</a></div>
+
 [% FormBuilder.render %]
