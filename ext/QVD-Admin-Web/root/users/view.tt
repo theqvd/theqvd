@@ -24,7 +24,8 @@
 	</tr>	
     </table>
 </div>
-
+[% FOREACH vm IN vm_list -%]
+[% IF loop.first %]
 <h2>Máquinas virtuales asignadas</h2>
 
 <table id="props" class="tablesorter resultset">
@@ -39,7 +40,7 @@
         </tr>
     </thead>
     <tbody>
-        [% FOREACH vm IN vm_list -%]
+[% END %]
         <tr id="[% vm.id %]">
             <td><a href="[% c.uri_for('/vm/view/') %][% vm.id %]" class="option_view">[% vm.id %]</a></td>
             <td>[% vm.user.login %]</td>
@@ -55,9 +56,12 @@
 	    
 	    </td>
         </tr>
-        [% END -%]
+[% IF loop.last %]
     </tbody>
 </table>
+[% END %]
+[% END %]
+
 
 <script type="text/javascript" charset="utf-8">
 $(document).ready(function() 
