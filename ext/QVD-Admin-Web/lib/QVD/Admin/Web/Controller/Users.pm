@@ -46,7 +46,6 @@ sub index : Path : Args(0) {
 
 sub list : Local {
     my ( $self, $c ) = @_;
-
     my $model = $c->model('QVD::Admin::Web');
     my $rs    = $model->user_list("");
     $c->stash->{user_list} = $rs;

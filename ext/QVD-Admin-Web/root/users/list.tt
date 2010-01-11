@@ -10,7 +10,7 @@ else
 </script>
 
 <h1>Usuarios</h1>
-<div class="side_add"><a href="[% c.uri_for('/users/add') %]">Nuevo</a></div>
+<a class="side_add" href="[% c.uri_for('/users/add') %]">Nuevo</a>
 <div id="pager" class="pager">
 	<form>
 		<img src="/static/icons/first.png" class="first"/>
@@ -32,6 +32,7 @@ else
             <th id="login">Nombre</th>
             <th id="department">Departamento</th>	    
 	    <!--<th id="disco">Disco</th>-->
+	    <th id="state">Estado</th>
 	    <th class="options">Opciones</th>
         </tr>
     </thead>
@@ -42,6 +43,7 @@ else
             <td>[% user.login %]</td>
             <td>[% user.department %]</td>	    
 	    <!--<td><img src="http://chart.apis.google.com/chart?cht=bhs&chs=50x12&chd=t:33|100&chco=4d89f9,c6d9fd" /> 4,43 GB</td>-->
+	    <td>[% user.vms.size %]</td>
 	    <td class="options">
 	      <form action="[% c.uri_for('/users/del') %]" method="post">
 		<input type="hidden" name="id" value="[% user.id %]"/>

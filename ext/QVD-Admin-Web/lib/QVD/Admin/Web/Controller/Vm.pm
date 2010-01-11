@@ -63,8 +63,8 @@ sub list : Local {
 }
 
 sub start_vm : Local {
-   my ( $self, $c ) = @_;
-   my $model = $c->model('QVD::Admin::Web');
+    my ( $self, $c ) = @_;
+    my $model = $c->model('QVD::Admin::Web');
 
     my $result = $c->form(
         required           => ['id'],

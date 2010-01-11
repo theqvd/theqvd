@@ -126,7 +126,7 @@ sub user_list {
 }
 
 sub user_find {
-	my ( $self, $filter ) = @_;
+    my ( $self, $filter ) = @_;
 
     $self->reset_status;
     my $rs = $self->db->resultset('User');
