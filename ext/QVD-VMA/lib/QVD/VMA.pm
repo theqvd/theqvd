@@ -139,9 +139,9 @@ sub _start_or_resume_session {
 	my $pid = fork;
 	if (!$pid) {
 	    defined $pid or carp "fork failed";
-	    my $displayn = 1000
+	    my $displayn = 1000;
 	    $ENV{PULSE_SERVER} = "tcp:localhost:".$displayn+7000;
-	    { exec "su - qvd -c \"xinit $desktop -- $xagent :$display -name QVD -display nx/nx,link=lan,media=1:$display -ac\"" };
+	    { exec "su - qvd -c \"xinit $desktop -- $xagent :$displayn -name QVD -display nx/nx,link=lan,media=1:$displayn -ac\"" };
 	    { exec "/bin/false" };
 	    require POSIX;
 	    POSIX::_exit(-1);
