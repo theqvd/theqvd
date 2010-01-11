@@ -36,7 +36,8 @@ while (1) {
 				       ReuseAddr => 1,
 				       Listen => 1);
 
-	system "nxproxy -S localhost:40 &";
+	# XXX: make media port configurable (4713 for pulseaudio)
+	system "nxproxy -S localhost:40 media=4713 &";
 	my $s1 = $ll->accept()
 	    or die "connection from nxproxy failed";
 	undef $ll; # close the listening socket
