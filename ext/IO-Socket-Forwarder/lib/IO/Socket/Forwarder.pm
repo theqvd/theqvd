@@ -26,6 +26,8 @@ sub forward_sockets {
     my ($s1, $s2, %opts) = @_;
 
     my $debug = delete $opts{debug};
+    $debug = $IO::Socket::Forwarder::debug unless defined $debug;
+
     my $io_buffer_size = delete $opts{io_buffer_size} || default_io_buffer_size;
     my $io_chunk_size = delete $opts{io_chunk_size} || default_io_chunk_size;
 
