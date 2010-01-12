@@ -33,6 +33,7 @@ sub new {
 
 sub erase {
     my $db = shift;
+    my $dbh = $db->storage->dbh;
     for my $table (qw( vm_runtimes
 		       vms
 		       vm_properties
@@ -54,14 +55,11 @@ sub erase {
 
 	eval {
 	    warn "DROPPING $table\n";
-	    $db->storage->dbh->do("DROP TABLE $table CASCADE");
-	    $db->txn_commit;
+	    $dbh->do("DROP TABLE $table CASCADE");
 	};
 	warn "Error (DROP $table): $@" if $@;
     }
 }
-
-sub disconnect { shift->storage->disconnect }
 
 1;
 
@@ -113,7 +111,8 @@ your bug as I make changes.
 
 =head1 COPYRIGHT & LICENSE
 
-Copyright 2009 Qindel Formacion y Servicios S.L., all rights reserved.
+Copyright 2009, 2010 Qindel Formacion y Servicios S.L., all rights
+reserved.
 
 This program is free software; you can redistribute it and/or modify it
 under the same terms as Perl itself.
