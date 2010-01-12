@@ -322,9 +322,9 @@ sub add_vm_user_id : Local {
     my ( $self, $c ) = @_;
 
 #    $self->formbuilder->action('/vm/add');
-	my $model = $c->model('QVD::Admin::Web');
-	my $rs    = $model->user_list("");
-	$c->stash->{user_list} = $rs;
+    my $model = $c->model('QVD::Admin::Web');
+    my $rs    = $model->user_list("");
+    $c->stash->{user_list} = $rs;
     print STDERR "add_vm_user_id:".Dumper($c->session->{vm_add});
     # TODO Check if this should be a pre action
     # To avoid browser refresh or reload
@@ -337,9 +337,9 @@ sub add_vm_osi_id :Local {
     my ( $self, $c ) = @_;
 
 #    $self->formbuilder->action('/vm/add');
-my $model = $c->model('QVD::Admin::Web');
-my $rs    = $model->osi_list("");
-$c->stash->{osi_list} = $rs;
+    my $model = $c->model('QVD::Admin::Web');
+    my $rs    = $model->osi_list("");
+    $c->stash->{osi_list} = $rs;
     print STDERR "add_vm_osi_id:".Dumper($c->session->{vm_add});
     # TODO Check if this should be a pre action
     # To avoid browser refresh or reload

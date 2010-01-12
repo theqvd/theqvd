@@ -10,7 +10,6 @@ else
 </script>
 
 <h1>Máquinas virtuales</h1>
-<a class="side_add" href="[% c.uri_for('/vm/add') %]">Nueva</a>
 <div id="pager" class="pager">
 	<form>
 		<img src="/static/icons/first.png" class="first"/>

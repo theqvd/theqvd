@@ -24,6 +24,7 @@
 	</tr>	
     </table>
 </div>
+<p><a class="side_add" href="[% c.uri_for('/users/new_vm') %]/[% user.id %]">Nueva máquina virtual</a></p>
 [% FOREACH vm IN vm_list -%]
 [% IF loop.first %]
 <h2>Máquinas virtuales asignadas</h2>

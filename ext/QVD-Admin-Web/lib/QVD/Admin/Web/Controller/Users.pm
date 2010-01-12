@@ -61,6 +61,19 @@ sub view : Local : Args(1) {
     $c->stash( user => $user );
 }
 
+sub new_vm : Local : Args(1) {
+    my ( $self, $c, $userid ) = @_;
+    my $model = $c->model('QVD::Admin::Web');
+    my $rs = $model->vm_list( { user_id => $userid } );
+    $c->stash->{vm_list} = $rs;
+
+    my $user = $model->user_find($userid);
+    $c->stash( user => $user );
+    
+    my $rs    = $model->osi_list("");
+    $c->stash->{osi_list} = $rs;
+}
+
 sub add : Local Form {
     my ( $self, $c ) = @_;
     my $form  = $self->formbuilder;
