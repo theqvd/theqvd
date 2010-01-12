@@ -36,6 +36,7 @@
             <th id="osi">Imagen Disco</th>
             <th id="name">Nombre</th>
             <th id="storage">Almacenamiento</th>
+	    <th id="state">Estado</th>
 	    <th class="options">Opciones</th>
         </tr>
     </thead>
@@ -45,8 +46,9 @@
             <td><a href="[% c.uri_for('/vm/view/') %][% vm.id %]" class="option_view">[% vm.id %]</a></td>
             <td>[% vm.user.login %]</td>
             <td>[% vm.osi.name %]</td>
-			<td>[% vm.name %]</td>
-			<td>[% vm.storage %]</td>
+	    <td>[% vm.name %]</td>
+	    <td>[% vm.storage %]</td>
+	    <td>[% vm.vm_runtime.user_state %]</td>
 			
 	    <td class="options">
 	      <form action="[% c.uri_for('/vm/del_submit') %]" method="post">
@@ -69,11 +71,10 @@ $(document).ready(function()
 	$("#props").tablesorter({
 	widthFixed: true,
 	headers: { 
-            5: { 
+            6: { 
                 sorter: false 
             }
 	}}); 
-	$("#props").tablesorterPager({container: $("#pager")});
 
     } 
 );

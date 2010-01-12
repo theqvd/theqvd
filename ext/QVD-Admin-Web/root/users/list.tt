@@ -43,7 +43,7 @@ else
             <td>[% user.login %]</td>
             <td>[% user.department %]</td>	    
 	    <!--<td><img src="http://chart.apis.google.com/chart?cht=bhs&chs=50x12&chd=t:33|100&chco=4d89f9,c6d9fd" /> 4,43 GB</td>-->
-	    <td>[% user.vms.size %]</td>
+	    <td>[% connected = 0 %][% FOREACH vm IN user.vms %][% IF (vm.vm_runtime.user_state == 'connected') %][% connected = connected + 1 %][% END %][% END %] [% connected %] / [% IF (user.vms.size > 0) %][% user.vms.size %][% ELSE %]0[% END %]</td>
 	    <td class="options">
 	      <form action="[% c.uri_for('/users/del') %]" method="post">
 		<input type="hidden" name="id" value="[% user.id %]"/>
@@ -62,9 +62,6 @@ $(document).ready(function()
 	$("#props").tablesorter({
 	widthFixed: true,
 	headers: { 
-            3: { 
-                sorter: false 
-            },
 	    4: { 
                 sorter: false 
             }
