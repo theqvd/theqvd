@@ -1,0 +1,66 @@
+<script type="text/javascript" charset="utf-8">
+function submitvm(a) {
+    document.forms[a].vm_name.value = document.forms["vmname"].vm_name.value;
+    if (document.forms[a].vm_name.value.length > 0) {
+	document.forms[a].submit();
+    }
+    
+}
+
+</script>
+
+<h1><a href="[% c.uri_for('/users') %]">Usuarios</a> &raquo; <a href="[% c.uri_for('/users/view') %]/[% user.id %]">[% user.login %]</a> &raquo; Nueva m&aacute;quina virtual</h1>
+
+<h2>Nombre</h2>
+
+<tr id="add_vm_name_vm_name_row">
+   <td class="fb_field" id="add_vm_name_vm_name_field"><form name="vmname" id="vmname" ><input class="fb_input" id="vm_name" name="vm_name" size="40" type="text" /></form></td>
+</tr>
+
+
+<h2>Imagen</h2>
+
+<table id="props" class="tablesorter resultset">
+    <thead>
+        <tr>
+            <th id="id"></th>
+            <th id="name">Nombre</th>
+            <th id="disk_image">Imagen de disco</th>
+            <th id="use_overlay">Overlay</th>
+            <th id="memory">Memoria</th>
+        </tr>
+    </thead>
+    <tbody>
+        [% FOREACH osi IN osi_list -%]
+        <tr id="[% osi.id %]" class="clickable_row" onClick="submitvm([% osi.id %]);">
+            <td>[% osi.id %]<form id="form[% osi.id %]" name="form[% osi.id %]" action="[% c.uri_for('/vm/add') %]" method="post">
+		<input type="hidden" name="osi_id" value ="[% osi.id %]"/>
+		<input type="hidden" name="user_id" value ="[% user.id %]"/>
+		<input type="hidden" name="vm_name" value ="[% user.id %]"/>
+	      </form></td>
+            <td>[% osi.name %]</td>
+            <td>[% osi.disk_image %]</td>
+	    <td>[% IF osi.use_overlay -%]<span class="option_true"></span>
+	    [% END %]
+	    </td>
+	    <td>[% osi.memory %]</td>
+	      
+
+        </tr>
+        [% END -%]
+    </tbody>
+</table>
+
+<script type="text/javascript" charset="utf-8">
+$(document).ready(function() 
+    { 
+	$("#props").tablesorter({
+	widthFixed: true,
+	}); 
+	
+
+    } 
+);
+
+</script>
+
