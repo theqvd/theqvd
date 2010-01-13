@@ -10,11 +10,11 @@ our @EXPORT = qw(db txn_do rs);
 
 my $db;
 
-sub db {
+sub db () {
     $db ||= QVD::DB->new()
 }
 
-sub txn_do {
+sub txn_do (&) {
     $db ||= QVD::DB->new();
     $db->txn_do(@_);
 }
