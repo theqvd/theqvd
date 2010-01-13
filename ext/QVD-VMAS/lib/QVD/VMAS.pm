@@ -3,10 +3,11 @@ package QVD::VMAS;
 use warnings;
 use strict;
 
-use QVD::DB;
+use QVD::DB::Simple;
 use QVD::VMAS::VMAClient;
 use QVD::VMAS::RCClient;
 use QVD::Config;
+use File::Slurp qw(slurp);
 
 use Log::Log4perl qw/:easy/;
 
@@ -14,40 +15,22 @@ our $VERSION = '0.01';
 
 sub new {
     my $class = shift;
-    my $db = shift || QVD::DB->new();
-    my $self = {
-	db => $db,
-    };
-    bless $self, $class;
-    $self;
-}
-
-sub txn_commit {
-    my $self = shift;
-    $self->{db}->txn_commit;
-}
-
-sub txn_do {
-    my ($self, $coderef) = @_;
-    $self->{db}->txn_do($coderef);
+    bless {}, $class;
 }
 
 sub _get_kvm_pid_file_path {
     my ($self, $id) = @_;
+    # FIXME: no hard coded paths
     "/var/run/qvd/vm-$id.pid"
 }
 
 sub _signal_kvm {
     my ($self, $id, $signal) = @_;
-    my $pidFile = $self->_get_kvm_pid_file_path($id);
-    my $pid;
-    $pid = `cat $pidFile` if -e $pidFile;
-    if (defined $pid) {
-	chomp $pid;
-	# FIXME need to check if the process with this PID is actually KVM!
-	return kill($signal, $pid) if defined $pid;
-    }
-    undef
+    # FIXME: get the pid from the database!
+    my $pid = eval { slurp $self->_get_kvm_pid_file_path($id) };
+    return undef unless defined $pid;
+    chomp $pid;
+    kill($signal, $pid);
 }
 
 sub is_vm_running {
@@ -62,45 +45,33 @@ sub _get_vma_client_for_vm {
 
 sub get_vm_runtime_for_vm_id {
     my ($self, $vm_id) = @_;
-    my $vms = $self->{db}->resultset('VM_Runtime')
-    		->search({vm_id => $vm_id})->first;
+    my $vms = rs(VM_Runtime)->search({vm_id => $vm_id})->first;
     return $vms;
 }
 
 sub get_vms_for_host {
     my ($self, $host_id) = @_;
-    return $self->{db}->resultset('VM_Runtime')
-    		->search({host_id => $host_id});
+    return rs(VM_Runtime)->search({host_id => $host_id});
 }
 
-sub get_vm_ids_for_host_txn {
+sub get_vm_ids_for_host {
     my $self = shift;
-    my @ids = map $_->vm_id, $self->get_vms_for_host(@_);
-    $self->{db}->txn_commit;
-    @ids
+    map $_->vm_id, $self->get_vms_for_host(@_);
 }
 
 sub get_vms_for_user {
     my ($self, $user_id) = @_;
-    my @vms = $self->{db}->resultset('VM')
-    		->search({'user_id' => $user_id});
-    my @vmrs = map { $_->vm_runtime } @vms;
-    if (grep !defined($_), @vmrs) {
-	ERROR "Database is corrupted, virtual machine misses virtual machine runtime entry";
-    }
-    return @vmrs;
+    map {
+	my $rt = $_->vm_runtime;
+	ERROR "Corrupted database: virtual machine misses entry at vm_runtime"
+	    unless defined $rt;
+	$rt;
+    } rs(VM)->search({'user_id' => $user_id});
 }
 
 sub _load_balance_random {
-    my $host_rs = shift->{db}->resultset('Host');
-    my $host_id_col = $host_rs->get_column('id');
-    my ($min, $max) = ($host_id_col->min, $host_id_col->max);
-    my $host = undef;
-    until (defined $host) {
-	my $host_id = $min + int(rand($max-$min+1));
-	$host = $host_rs->find($host_id);
-    }
-    $host
+    my @hosts = rs(Host);
+    $hosts[rand @hosts];
 }
 
 sub _get_free_host {
@@ -118,26 +89,22 @@ sub assign_host_for_vm {
     my ($self, $vm, $preferred_host_id) = @_;
     my $vm_id = $vm->vm_id;
     my $host;
-    if (defined $preferred_host_id) {
-	$host = $self->{db}->resultset('Host')->find($preferred_host_id); 
-    }
-    $host //= $self->_get_free_host($vm);
-    die "Unable to assign VM $vm_id a host" unless defined $host;
-    return $self->txn_do(sub {
-	    if (defined $vm->host_id) {
-		die "VM $vm_id is already assigned to a host";
-	    } else {
-		my $r = $vm->update({ 
-			host_id => $host->id, 
-			vm_address => $host->address,
-			vm_vma_port => QVD::Config->get('vm_vma_port')+$vm_id,
-			vm_x_port => QVD::Config->get('vm_x_port')+$vm_id,
-			vm_ssh_port => QVD::Config->get('vm_ssh_port')+$vm_id,
-			vm_vnc_port => QVD::Config->get('vm_vnc_port')+$vm_id,
-		    });
-		return $r;
-	    }
-	});
+    $host = rs(Host)->find($preferred_host_id)
+	if defined $preferred_host_id;
+    $host //= $self->_get_free_host($vm) // die "Unable to assign VM $vm_id a host";
+    # txn_do {
+	# FIXME: this is the wrong place to start the transaction
+	# as $vm has probably been already retrieved from the
+	# database
+	defined $vm->host_id
+	    and die "VM $vm_id is already assigned to a host";
+	$vm->update({host_id => $host->id, 
+		     vm_address => $host->address,
+		     vm_vma_port => QVD::Config->get('vm_vma_port')+$vm_id,
+		     vm_x_port => QVD::Config->get('vm_x_port')+$vm_id,
+		     vm_ssh_port => QVD::Config->get('vm_ssh_port')+$vm_id,
+		     vm_vnc_port => QVD::Config->get('vm_vnc_port')+$vm_id });
+    # };
 }
 
 sub push_vm_state {
@@ -157,15 +124,13 @@ sub push_user_state {
 
 sub _schedule_cmd {
     my ($self, $vm, $cmd_type, $cmd) = @_;
-    return $self->txn_do(sub {
+    txn_do {
 	$vm->discard_changes;
-	unless (defined $vm->$cmd_type && $vm->$cmd_type ne $cmd) {
-	    my $r = $vm->update({$cmd_type  => $cmd});
-	    DEBUG "Accepted command $cmd_type $cmd for VM ".$vm->vm_id;
-	    return 1;
-	}
-	undef;
-    });
+	return undef if (defined $vm->$cmd_type and $vm->$cmd_type ne $cmd);
+	$vm->update({$cmd_type => $cmd});
+	DEBUG "Accepted command $cmd_type $cmd for VM " . $vm->vm_id;
+	return 1;
+    };
 }
 
 sub schedule_x_cmd {
@@ -207,16 +172,14 @@ sub notify_hkd {
 
 sub schedule_start_vm {
     my ($self, $vm) = @_;
-    my $vm_id = $vm->vm_id;
-    $self->txn_do(sub {
-	    if (defined ($vm->host_id)) {
-		$self->_schedule_cmd($vm, 'vm_cmd', 'start')
-		    or die "Unable to schedule start command";
-	    } else {
-		die "Unable to schedule start command: VM ".$vm_id
-		." is not assigned to any host";
-	    }
-	});
+    txn_do {
+	$vm->discard_changes;
+	my $vm_id = $vm->vm_id;
+	defined $vm->host_id
+	    or die "Unable to schedule start command: VM $vm_id is not assigned to any host";
+	$self->_schedule_cmd($vm, 'vm_cmd', 'start')
+		or die "Unable to schedule start command";
+    };
 }
 
 sub schedule_stop_vm {
@@ -428,11 +391,6 @@ sub terminate_vm {
 sub kill_vm {
     my ($self, $vm) = @_;
     $self->_signal_kvm($vm->vm_id, 9);
-}
-
-sub DESTROY {
-    my $self = shift;
-    $self->{db}->txn_commit;
 }
 
 1;
