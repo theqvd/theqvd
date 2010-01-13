@@ -2,8 +2,6 @@
 
 use strict;
 use warnings;
-use QVD::DB;
+use QVD::DB::Simple;
 
-my $db = QVD::DB->new;
-$db->erase;
-$db->txn_commit;
+db->erase;

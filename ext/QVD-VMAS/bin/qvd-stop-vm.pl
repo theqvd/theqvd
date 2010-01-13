@@ -15,10 +15,6 @@ die "Couldn't stop VM $vm_id: $r->{error}" unless $r->{request} eq 'success';
 for (;;) {
     print "Waiting for VM $vm_id to stop...\n";
     last if not $vmas->is_vm_running($vm);
-    sleep 10;
+    sleep 3;
 }
 print "VM $vm_id stopped.\n";
-
-END {
-    $vmas->txn_commit;
-}

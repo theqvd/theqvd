@@ -37,5 +37,3 @@ my %options;
 GetOptions (\%options, @{$template{$command}}) or die "Parametros Incorrectos";
 my $method_name = $method{$command};
 $provision->$method_name(%options);
-
-$provision->schema->txn_commit;
