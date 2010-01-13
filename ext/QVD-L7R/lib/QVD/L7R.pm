@@ -12,6 +12,7 @@ use QVD::HTTP::StatusCodes qw(:status_codes);
 use QVD::HTTP::Headers qw(header_lookup header_eq_check);
 use QVD::URI qw(uri_query_split);
 use QVD::Config;
+use QVD::DB::Simple;
 
 use Log::Log4perl qw(:easy);
 Log::Log4perl::init('log4perl.conf');
@@ -26,7 +27,7 @@ sub post_configure_hook {
 
 sub _check_abort_session {
     my ($vm, $vmas, $coderef) = @_;
-    my $abort_session = $vmas->txn_do(sub {
+    my $abort_session = txn_do {
 	$vm->discard_changes;
 	if (defined $vm->user_cmd and $vm->user_cmd eq 'Abort') {
 	    $vmas->push_user_state($vm, 'aborting');
@@ -36,7 +37,7 @@ sub _check_abort_session {
 	    $coderef->() if defined $coderef;
 	    0;
 	}
-    });
+    };
     return 0 unless $abort_session;
     _abort_session($vm, $vmas);
 }
@@ -62,14 +63,13 @@ sub _abort_session {
 # FIXME refactor this method into smaller ones
 sub _connect_to_vm_processor {
     my ($server, $method, $url, $headers) = @_;
-    my $db = QVD::DB->new();
     my $user;
     my $authorization = header_lookup($headers, 'Authorization');
     if ($authorization =~ /^Basic (.*)$/) {
 	use MIME::Base64 'decode_base64';
 	my @user_pwd = split /:/, decode_base64($1);
-	my $user_rs = $db->resultset('User')->search({login => $user_pwd[0],
-						password => $user_pwd[1]});
+	my $user_rs = rs(User)->search({login => $user_pwd[0],
+					password => $user_pwd[1]});
 	if ($user_rs->count == 1) {
 	    INFO "Accepted connection from user $user_pwd[0]";
 	    $user = $user_rs->first;
@@ -93,7 +93,7 @@ sub _connect_to_vm_processor {
     $server->send_http_response(HTTP_PROCESSING,
 				'X-QVD-VM-Status: Checking VM');
 
-    my $vmas = QVD::VMAS->new($db);
+    my $vmas = QVD::VMAS->new();
     my @vms = $vmas->get_vms_for_user($user->id);
     # FIXME this limits number of VMs per user to 1
     my $vm = $vms[0];
@@ -229,7 +229,7 @@ sub _connect_session {
     # FIXME timeout?
     # Is there an open session?
     while (1) {
-	my $session_is_open = $vmas->txn_do(sub {
+	my $session_is_open = txn_do {
 	    $vm->discard_changes;
 	    if ($vm->user_state eq 'disconnected') {
 		DEBUG "user_state is ".$vm->user_state.", set 'connecting'";
@@ -240,7 +240,7 @@ sub _connect_session {
 		$vmas->schedule_user_cmd($vm, 'Abort');
 	    }
 	    1;
-	});
+	};
 	last unless $session_is_open;
 	if ($vm->user_state eq 'connected') {
 	    $vmas->disconnect_nx($vm);
