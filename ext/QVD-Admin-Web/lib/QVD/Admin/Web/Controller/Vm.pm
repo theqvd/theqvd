@@ -300,7 +300,7 @@ sub add : Local {
 	# Invoke next step
 	$c->session->{vm_add}->{current_step} = $current_step + 1;
 	print STDERR "New step2:".Dumper($c->session->{vm_add});
-	$c->response->redirect( $c->uri_for( $self->action_for($$steps_array[$current_step]) ) );
+	$c->response->redirect($c->uri_for($self->action_for($steps_array->[$current_step]) ) );
     }
 }
 
@@ -308,20 +308,19 @@ sub add_vm_name : Local Form {
     my ( $self, $c ) = @_;
 
     $self->formbuilder->action('/vm/add');
-#    $self->formbuilder->{action}= $c->uri_for( $self->action_for('add'));
-#    $self->formbuilder->script_name($c->uri_for( $self->action_for('add')));
+    #    $self->formbuilder->{action}= $c->uri_for( $self->action_for('add'));
+    #    $self->formbuilder->script_name($c->uri_for( $self->action_for('add')));
     print STDERR "add_vm_name:".Dumper($c->session->{vm_add});
     # TODO Check if this should be a pre action
     # To avoid browser refresh or reload
-    $c->response->redirect( $c->uri_for( $self->action_for('list') ) ) if (!exists($c->flash->{current_step}));
-    
+    $c->response->redirect( $c->uri_for( $self->action_for('list') ) )
+	unless exists($c->flash->{current_step});
 }
-
 
 sub add_vm_user_id : Local {
     my ( $self, $c ) = @_;
 
-#    $self->formbuilder->action('/vm/add');
+    #    $self->formbuilder->action('/vm/add');
     my $model = $c->model('QVD::Admin::Web');
     my $rs    = $model->user_list("");
     $c->stash->{user_list} = $rs;
@@ -329,14 +328,13 @@ sub add_vm_user_id : Local {
     # TODO Check if this should be a pre action
     # To avoid browser refresh or reload
     $c->response->redirect( $c->uri_for( $self->action_for('list') ) )
-	if (!exists($c->flash->{current_step}));
-    
+	unless exists($c->flash->{current_step});
 }
 
-sub add_vm_osi_id :Local {
+sub add_vm_osi_id : Local {
     my ( $self, $c ) = @_;
 
-#    $self->formbuilder->action('/vm/add');
+    #    $self->formbuilder->action('/vm/add');
     my $model = $c->model('QVD::Admin::Web');
     my $rs    = $model->osi_list("");
     $c->stash->{osi_list} = $rs;
@@ -345,25 +343,21 @@ sub add_vm_osi_id :Local {
     # To avoid browser refresh or reload
     $c->response->redirect( $c->uri_for( $self->action_for('list') ) )
 	if (!exists($c->flash->{current_step}));
-    
 }
 
-sub vnc : Local :Args(1){
-    my ( $self, $c, $id) = @_;
-
+sub vnc : Local Args(1) {
+    my ($self, $c, $id) = @_;
     my $model = $c->model('QVD::Admin::Web');
 
-    if ( !defined($id) ) 
-    {
+    if (defined $id) {
         $c->flash->{response_type} = "error";
         $c->flash->{response_msg} = "Error in parameters.";
-    } else 
-    {
+    }
+    else {
 	my $vm = $model->vm_find($id);
 	my $name = $vm->name; 
 	$c->stash(vm_runtime => $vm->vm_runtime);
-    }   
-
+    }
 }
 
 =head1 AUTHOR
