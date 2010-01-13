@@ -8,6 +8,7 @@ use QVD::Admin;
 sub new {
     my $class = shift;
     my $admin = QVD::Admin->new;
+    # FIXME: should we just inherit this class from QVD::Admin?
     my $self = {
 	admin => $admin,
     };
@@ -15,6 +16,7 @@ sub new {
 }
 
 sub _split_on_equals {
+    # FIXME: actually, improve me!
     map { my @a = split /=/, $_, 2; $a[0] => $a[1] } @_;
 }
 
