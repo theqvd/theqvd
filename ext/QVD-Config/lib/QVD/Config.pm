@@ -5,14 +5,9 @@ our $VERSION = '0.01';
 use warnings;
 use strict;
 
-use QVD::DB;
+use QVD::DB::Simple;
 
-my %cache;
-{
-    my $db = QVD::DB->new();
-    %cache = map { $_->key => $_->value}
-	$db->resultset('Config')->all;
-}
+my %cache = map { $_->key => $_->value } rs(Config)->all;
 
 sub get {
     my ($class, $key, $default) = @_;
