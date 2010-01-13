@@ -27,8 +27,8 @@ sub _get_kvm_pid_file_path {
 sub _signal_kvm {
     my ($self, $id, $signal) = @_;
     # FIXME: get the pid from the database!
-    my $pid = eval { slurp $self->_get_kvm_pid_file_path($id) };
-    return undef unless defined $pid;
+    my $pid = eval { slurp $self->_get_kvm_pid_file_path($id) }
+	or return undef;
     chomp $pid;
     kill($signal, $pid);
 }
