@@ -3,30 +3,23 @@ package QVD::Admin;
 use warnings;
 use strict;
 
-use QVD::DB;
+use QVD::DB::Simple;
 use QVD::Config;
 
 sub new {
     my $class = shift;
     my $quiet = shift;
-    my $db = shift // QVD::DB->new();
-    my $self = {db => $db,
-		filter => {},
-		quiet => $quiet,
-		objects => {
-		    host => 'Host',
-		    vm => 'VM',
-		    user => 'User',
-		    config => 'Config',
-		    osi => 'OSI',
-		},
-    };
+    my $self = { filter => {},
+		 quiet => $quiet,
+		 objects => {
+			     host => 'Host',
+			     vm => 'VM',
+			     user => 'User',
+			     config => 'Config',
+			     osi => 'OSI',
+			    },
+	       };
     bless $self, $class;
-}
-
-sub _split_on_equals {
-    my %r = map { my @a = split /=/, $_, 2; $a[0] => $a[1] } @_;
-    \%r
 }
 
 sub set_filter {
@@ -59,11 +52,10 @@ sub get_resultset {
     if ($method) {
 	$self->$method;
     }
-    elsif ($self->{filter}) {
-	$self->{db}->resultset($db_object)->search($self->{filter});
-    } else {
-	$self->{db}->resultset($db_object);
-    }
+    my $rs = rs($db_object);
+    $rs = $rs->search($self->{filter})
+	if defined $self->{filter};
+    $rs
 }
 
 sub _filter_obj {
@@ -85,9 +77,9 @@ sub get_result_set_for_vm {
 	state => 'vm_runtime.vm_state',
     );
     my $filter = $self->_filter_obj(\%term_map);
-    $self->{db}->resultset('VM')->search($filter, {
-	    join => ['osi', 'user', { vm_runtime => 'host'}],
-	});
+    rs(VM)->search($filter,
+		   { join => ['osi', 'user',
+			      { vm_runtime => 'host'}] });
 }
 sub _set_equals {
     my ($a, $b) = @_;
@@ -115,8 +107,7 @@ sub _obj_add {
 sub cmd_host_add {
     my $self = shift;
     my $row = $self->_obj_add('host', [qw/name address/], @_);
-    $self->{db}->resultset('Host_Runtime')
-			    ->create({host_id => $row->id});
+    rs(Host_Runtime)->create({host_id => $row->id});
     $row->id
 }
 
@@ -125,16 +116,14 @@ sub cmd_vm_add {
     my $params = {@args};
     if (exists $params->{osi}) {
 	my $key = $params->{osi};
-	my $rs = $self->{db}->resultset('OSI')
-				->search({name => $key});
+	my $rs = rs(OSI)->search({name => $key});
 	die "$key: No such OSI" if ($rs->count() < 1);
 	$params->{osi_id} = $rs->single->id;
 	delete $params->{osi};
     }
     if (exists $params->{user}) {
 	my $key = $params->{user};
-	my $rs = $self->{db}->resultset('User')
-				->search({login => $key});
+	my $rs = rs(User)->search({login => $key});
 	die "$key: No such user" if ($rs->count() < 1);
 	$params->{user_id} = $rs->single->id;
 	delete $params->{user};
@@ -142,14 +131,11 @@ sub cmd_vm_add {
     $params->{storage} = '';
     my $row = $self->_obj_add('vm', [qw/name user_id osi_id ip storage/], 
 				$params);
-    $self->{db}->resultset('VM_Runtime')->create({
-	    vm_id => $row->id,
-	    osi_actual_id => $row->osi_id,
-	    vm_state => 'stopped',
-	    x_state => 'disconnected',
-	    user_state => 'disconnected',
-	});
-
+    rs(VM_Runtime)->create({ vm_id => $row->id,
+			     osi_actual_id => $row->osi_id,
+			     vm_state => 'stopped',
+			     x_state => 'disconnected',
+			     user_state => 'disconnected' });
     $row->id
 }
 
@@ -308,10 +294,10 @@ sub cmd_vm_start_by_id {
     my ($self, $id) = @_;
     die "Missing parameter id" unless defined $id;
     use QVD::VMAS;
-    my $vmas = QVD::VMAS->new($self->{db});
+    my $vmas = QVD::VMAS->new;
     my $vm = $self->get_resultset('vm')->find($id);
     die "VM $id doesn't exist" unless defined $vm;
-    $vmas->txn_do(sub {
+    txn_do {
 	if ($vm->vm_runtime->vm_state eq 'stopped') {
 	    $vmas->assign_host_for_vm($vm->vm_runtime)
 		or die "Unable to assign VM $id to a host";
@@ -319,7 +305,7 @@ sub cmd_vm_start_by_id {
 	} else {
 	    die "Unable to start VM: VM is not stopped";
 	}
-    });
+    };
     $vmas->notify_hkd($vm->vm_runtime);
 }
 
@@ -328,17 +314,17 @@ sub cmd_vm_start {
     my $rs = $self->get_resultset('vm');
     my $counter = 0;
     use QVD::VMAS;
-    my $vmas = QVD::VMAS->new($self->{db});
+    my $vmas = QVD::VMAS->new;
     while (my $vm = $rs->next) {
 	eval {
-	    $vmas->txn_do(sub {
-		    my $vm_runtime = $vm->vm_runtime;
-		    if ($vm_runtime->vm_state eq 'stopped') {
-			die unless $vmas->assign_host_for_vm($vm_runtime);
-			$vmas->schedule_start_vm($vm_runtime);
-			$counter++;
-		    }
-		});
+	    txn_do {
+		my $vm_runtime = $vm->vm_runtime;
+		if ($vm_runtime->vm_state eq 'stopped') {
+		    die unless $vmas->assign_host_for_vm($vm_runtime);
+		    $vmas->schedule_start_vm($vm_runtime);
+		    $counter++;
+		}
+	    };
 	};
 	# TODO Log error messages ($@) in some way
     }
@@ -349,16 +335,16 @@ sub cmd_vm_stop_by_id {
     my ($self, $id) = @_;
     die "Missing parameter id" unless defined $id;
     use QVD::VMAS;
-    my $vmas = QVD::VMAS->new($self->{db});
+    my $vmas = QVD::VMAS->new;
     my $vm = $self->get_resultset('vm')->find($id);
     die "VM $id doesn't exist" unless defined $vm;
-    $vmas->txn_do(sub {
+    txn_do {
 	if ($vm->vm_runtime->vm_state eq 'running') {
 	    $vmas->schedule_stop_vm($vm->vm_runtime);
 	} else {
 	    die "Unable to stop VM: VM is not running";
 	}
-    });
+    };
     $vmas->notify_hkd($vm->vm_runtime);
 }
 
@@ -367,7 +353,7 @@ sub cmd_vm_stop {
     my $rs = $self->get_resultset('vm');
     my $counter = 0;
     use QVD::VMAS;
-    my $vmas = QVD::VMAS->new($self->{db});
+    my $vmas = QVD::VMAS->new;
     while (my $vm = $rs->next) {
 	my $vm_runtime = $vm->vm_runtime;
 	if ($vm_runtime->vm_state eq 'running') {
@@ -382,7 +368,7 @@ sub cmd_vm_disconnect_user {
     my ($self, @args) = @_;
     my $rs = $self->get_resultset('vm');
     use QVD::VMAS;
-    my $vmas = QVD::VMAS->new($self->{db});
+    my $vmas = QVD::VMAS->new;
     my $counter = 0;
     while (my $vm = $rs->next) {
 	my $vm_runtime = $vm->vm_runtime;
@@ -409,7 +395,7 @@ Version 0.01
 =head1 SYNOPSIS
 
     use QVD::Admin;
-    my $admin = QVD::Admin->new();
+    my $admin = QVD::Admin->new;
     my $id = $admin->cmd_osi_add("name=Ubuntu 9.10 (x86)", "memory=512",
 			"use_overlay=1", "disk_image=/var/tmp/U910_x86.img");
     print "OSI added with id $id\n";
