@@ -6,7 +6,7 @@ use strict;
 use Sys::Hostname;
 
 use QVD::VMAS;
-use QVD::DB;
+use QVD::DB::Simple;
 use QVD::Config;
 
 use Log::Log4perl qw(:levels :easy);
@@ -24,9 +24,8 @@ my $x_state_connecting_timeout = QVD::Config->get('x_state_connecting_timeout');
 sub new {
     my ($class, %opts) = @_;
     my $loop_wait_time = delete $opts{loop_wait_time};
-    my $db = QVD::DB->new();
-    my $vmas = QVD::VMAS->new($db);
-    my $host_id = $db->resultset('Host')->search(name => hostname)->first->id;
+    my $vmas = QVD::VMAS->new();
+    my $host_id = rs(Host)->search(name => hostname)->first->id;
     my $vm_state_map = {
     	stopped => {
 	    start 	=> {new_state => 'starting',
@@ -95,7 +94,6 @@ sub new {
 	loop_wait_time => $loop_wait_time,
 	host_id => $host_id,
 	vmas => $vmas,
-	db => $db,
 	vm_state_map => $vm_state_map,
 	nx_state_map => $nx_state_map,
     };
@@ -161,13 +159,15 @@ sub _do_action {
 	    return;
 	}
 	eval {
-	    $vmas->txn_do(sub {
-		    if (_is_command($event)) {
-			my $clear_cmd = $vmas->can('clear_'.$mode.'_cmd');
-			$vmas->$clear_cmd($vm);
-		    }
-		    $vmas->$push_state($vm, $new_state);
-		});
+	    txn_do {
+		# FIXME: $vm comes from outside the transaction
+		# $vm->discard_changes?
+		if (_is_command($event)) {
+		    my $clear_cmd = $vmas->can('clear_'.$mode.'_cmd');
+		    $vmas->$clear_cmd($vm);
+		}
+		$vmas->$push_state($vm, $new_state);
+	    };
 	};
 	if ($@) {
 	    # If state change failed no actions should be performed
@@ -205,10 +205,9 @@ sub run {
     my $vmas = $self->{vmas};
     while (1) {
 	$self->_reap_children;
-	my @vm_ids = $vmas->get_vm_ids_for_host_txn($self->{host_id});
+	my @vm_ids = $vmas->get_vm_ids_for_host($self->{host_id});
 	foreach my $vm_id (@vm_ids) {
 	    my $vm_runtime = $vmas->get_vm_runtime_for_vm_id($vm_id);
-	    
 	    my $vm_state = $vm_runtime->vm_state;
 	    if ($vm_state ne 'stopped' and
 		$vm_state ne 'failed') {
@@ -302,11 +301,12 @@ sub hkd_action_enter_zombie {
     # * se elimina cualquier comando de x_cmd
     # * se cambia el estado x_state a "Disconnected" 
     my ($self, $vm, $state, $event) = @_;
-    $self->{vmas}->txn_do(sub {
+    txn_do {
+	# FIXME: $vm comes from outside the transaction!
 	$self->{vmas}->clear_vm_cmd($vm);
 	$self->{vmas}->clear_nx_cmd($vm);
 	$self->{vmas}->push_nx_state($vm, 'disconnected');
-    });
+    };
 }
 
 sub hkd_action_signal_zombie_vm {
@@ -346,10 +346,11 @@ sub hkd_action_enter_stopping {
     # * se eliminara cualquier comando de x_cmd
     # * se pone x_state a "Disconnected"
     my ($self, $vm, $state, $event) = @_;
-    $self->{vmas}->txn_do(sub {
+    txn_do {
+	# FIXME: $vm comes from the outside!
 	$self->{vmas}->push_nx_state($vm, 'disconnected');
 	$self->{vmas}->clear_nx_cmd($vm);
-    });
+    };
 }
 
 sub hkd_action_enter_failed {
@@ -359,12 +360,13 @@ sub hkd_action_enter_failed {
     # * se cambia el estado x_state a "Disconnected"
     # * se elimina la entrada vm_runtime.host de la base de datos
     my ($self, $vm, $state, $event) = @_;
-    $self->{vmas}->txn_do(sub {
+    txn_do {
+	# FIXME: $vm comes from the outside!
 	$self->{vmas}->clear_vm_cmd($vm);
 	$self->{vmas}->clear_nx_cmd($vm);
 	$self->{vmas}->push_nx_state($vm, 'disconnected');
 	$self->{vmas}->clear_vm_host($vm);
-    });
+    };
 }
 
 sub hkd_action_abort {
