@@ -1,38 +1,22 @@
 package QVD::Admin::Web::Model::QVD::Admin::Web;
 
 use Moose;
-use QVD::DB;
+use QVD::DB::Simple;
 use QVD::Admin;
 use QVD::Config;
 use Log::Log4perl qw(:easy);
-use Readonly;
 use Data::Dumper;
 extends 'Catalyst::Model';
 with 'MooseX::Log::Log4perl';
 
 BEGIN {
-    if ( !( Log::Log4perl->initialized() ) ) {
-        Log::Log4perl->easy_init('log4perl.conf');
-    }
+    Log::Log4perl->easy_init('log4perl.conf')
+	unless Log::Log4perl->initialized;
 }
 
-has 'version' => (
-    is      => 'ro',
-    isa     => 'Str',
-    default => sub { return "$QVD::Admin::Web::VERSION"; }
-);
+sub version { $QVD::Admin::Web::VERSION }
 
-has 'admin' => (
-    is      => 'ro',
-    isa     => 'QVD::Admin',
-    default => sub { return QVD::Admin->new(); },
-);
-
-has 'db' => (
-    is      => 'ro',
-    isa     => 'QVD::DB',
-    default => sub { return QVD::DB->new(); },
-);
+sub admin { shift->{admin} ||= QVD::Admin->new }
 
 # status 1 means Ok, and 0 means error, detail in error_msg
 has 'status' => ( is => 'ro', isa => 'Int', default => 1 );
@@ -59,292 +43,189 @@ sub set_error {
 
 sub host_add {
     my ( $self, $name, $address ) = @_;
-    my $result;
+
 
     $self->reset_status;
-
-    if (
-        !eval {
-            $result =
-              $self->admin->cmd_host_add( name => $name, address => $address );
-            1;
-        }
-      )
-    {
-        $self->set_error($@);
-    }
-
-    return $result;
+    my $id = eval { $self->admin->cmd_host_add( name => $name, address => $address ) };
+    defined $id or $self->set_error($@);
+    $id;
 }
 
 sub host_list {
     my ( $self, $filter ) = @_;
 
     $self->reset_status;
-    my $rs = $self->db->resultset('Host');
-    return [ $rs->search($filter) ];
-
- #my @var = map { { id => $_->id, name => $_->name, address => $_->address } } ;
-
+    # FIXME later, please!
+    # AFAIK, there is not need for the array ref
+    # check also similar subs below
+    return [rs(Host)->search($filter)];
 }
 
+# FIXME: it doesn't makes sense to pass a generic filter to find, just
+# the row id should be given!
 sub host_find {
-	my ( $self, $filter ) = @_;
-
+    my ($self, $filter) = @_;
     $self->reset_status;
-    my $rs = $self->db->resultset('Host');
-    return   $rs->find($filter)  ;
+    rs(Host)->find($filter);
 }
 
 sub host_del {
     my ( $self, $id ) = @_;
-    my $result;
-
     $self->reset_status;
-
-    if (
-        !eval {
-            $self->admin->set_filter( id => $id );
-            $result = $self->admin->cmd_host_del;
-            1;
-        }
-      )
-    {
-        $self->set_error($@);
-    }
-
-    return $result;
+    my $ok = eval {
+	$self->admin->set_filter( id => $id );
+	$self->admin->cmd_host_del;
+    };
+    $self->set_error($@) unless defined $ok;
+    $ok;
 }
 
 sub user_list {
     my ( $self, $filter ) = @_;
-
     $self->reset_status;
-    my $rs = $self->db->resultset('User');
-    return [ $rs->search($filter) ];
-
+    [rs(User)->search($filter)];
 }
 
 sub user_find {
     my ( $self, $filter ) = @_;
-
     $self->reset_status;
-    my $rs = $self->db->resultset('User');
-    return   $rs->find($filter)  ;
+    rs(User)->find($filter);
 }
 
 sub user_add {
     my ( $self, $params ) = @_;
-    my $result;
-
     $self->reset_status;
-
-    if (
-        !eval {
-            $result = $self->admin->cmd_user_add(%$params);
-            1;
-        }
-      )
-    {
-        $self->set_error($@);
-    }
-
-    return $result;
+    my $id = eval { $self->admin->cmd_user_add(%$params) };
+    $self->set_error($@) unless defined $id;
+    $id;
 }
 
 sub user_del {
     my ( $self, $id ) = @_;
-    my $result;
-
     $self->reset_status;
-
-    if (
-        !eval {
-            $self->admin->set_filter( id => $id );
-            $result = $self->admin->cmd_user_del;
-            1;
-        }
-      )
-    {
-        $self->set_error($@);
-    }
-
-    return $result;
+    my $ok = eval {
+	$self->admin->set_filter( id => $id );
+	$self->admin->cmd_user_del;
+    };
+    $self->set_error($@) unless $ok;
+    $ok;
 }
-
-
 
 sub osi_list {
     my ( $self, $filter ) = @_;
     $self->reset_status;
-    my $rs = $self->db->resultset('OSI');
-    return [ $rs->search($filter) ];
+    [rs(OSI)->search($filter)];
 }
 
 sub osi_find {
-	my ( $self, $filter ) = @_;
-
+    my ( $self, $filter ) = @_;
     $self->reset_status;
-    my $rs = $self->db->resultset('OSI');
-    return   $rs->find($filter)  ;
+    rs(OSI)->find($filter)  ;
 }
 
 sub vm_list {
     my ( $self, $filter ) = @_;
     $self->reset_status;
-    my $rs = $self->db->resultset('VM');
-    return [ $rs->search($filter) ];
+    [rs(VM)->search($filter)];
 }
 
 sub vm_find {
     my ( $self, $filter ) = @_;
     $self->reset_status;
-    my $rs = $self->db->resultset('VM');
-    return $rs->find($filter);
+    rs(VM)->find($filter);
 }
 
 sub vm_start {
     my ( $self, $id ) = @_;
-    my $result;
     $self->reset_status;
-    if (
-        !eval {
-            $result = $self->admin->cmd_vm_start_by_id($id);
-        }
-	)
-    {
-        unless (defined $result) { $self->set_error($@); }
-		else { $self->set_error("no vms started"); }
+    eval { $self->admin->cmd_vm_start_by_id($id) };
+    if ($@) {
+	$self->set_error($@);
+	return undef;
     }
-	print STDERR "filter ".Dumper($self->admin->{filter});
-    return $result;
+    1;
 }
 
 sub vm_stop {
     my ( $self, $id ) = @_;
-    my $result;
     $self->reset_status;
-
-    if (
-        !eval {
-            $result = $self->admin->cmd_vm_stop_by_id($id);
-        }
-	)
-    {
-        unless (defined $result) { $self->set_error($@); }
-		else { $self->set_error("no vms stopped"); }
+    eval { $self->admin->cmd_vm_stop_by_id($id) };
+    if ($@) {
+	$self->set_error($@);
+	return undef;
     }
-	print STDERR "filter ".Dumper($self->admin);
-    return $result;
+    1;
 }
 
 sub vm_add {
     my ($self, $params) = @_;
-    
-    my $result;
     $self->reset_status;
-
-    
-    print STDERR "vm_add ".Dumper($params);
-    if (
-        !eval {
-            $result = $self->admin->cmd_vm_add(%$params);
-            1;
-        }
-	)
-    {
-        $self->set_error($@);
-    }
-
-    return $result;
+    my $id = eval { $self->admin->cmd_vm_add(%$params) };
+    $self->set_error($@) unless defined $id;
+    $id;
 }
 
 sub vm_del {
     my ( $self, $id ) = @_;
-    my $result;
-
     $self->reset_status;
-
-    if (
-        !eval {
-            $self->admin->set_filter( id => $id );
-            $result = $self->admin->cmd_vm_del;
-            1;
-        }
-      )
-    {
-        $self->set_error($@);
+    eval {
+	$self->admin->set_filter( id => $id );
+	$self->admin->cmd_vm_del;
+    };
+    if ($@) {
+	$self->set_error($@);
+	return undef;
     }
-
-    return $result;
+    1;
 }
 
 
 sub vmrt_list {
     my ( $self, $filter ) = @_;
     $self->reset_status;
-    my $rs = $self->db->resultset('VM_Runtime');
-    return [ $rs->search($filter) ]  ;
+    return [ rs(VM_Runtime)->search($filter) ]  ;
 }
 
 sub vmrt_find {
     my ( $self, $filter ) = @_;
     $self->reset_status;
-    my $rs = $self->db->resultset('VM_Runtime');
-    return $rs->find($filter)  ;
+    return rs(VM_Runtime)->find($filter);
 }
 
 sub vm_stats {
     my ($self, $filter) = @_;
-    
-    my $rs = $self->db->resultset('VM_Runtime');
-    my $result = [ $rs->search($filter,{ group_by => ['vm_state'],
-				   select => ['vm_state',
-					      { count => '*'}],
-				   as => ['vm_state', 'vm_count']
-				 }) ];   
-    return $result;
+    [ rs(VM_Runtime)->search($filter,{ group_by => ['vm_state'],
+				       select => ['vm_state',
+						  { count => '*'}],
+				       as => ['vm_state', 'vm_count'] }) ];
 }
 
+# FIXME: use better names for these *_total_stats subs or just remove
+# then and inline the ->count method call into the caller
 sub user_total_stats {
     my ($self, $filter) = @_;
-    
-    my $rs = $self->db->resultset('User');
-    my $result = $rs->search($filter)->count;
-    return $result;
+    rs(User)->search($filter)->count;
 }
 
 sub vm_total_stats {
     my ($self, $filter) = @_;
-    
-    my $rs = $self->db->resultset('VM');
-    my $result = $rs->search($filter)->count;
-    return $result;
+    rs(VM)->search($filter)->count;
 }
 
 sub host_total_stats {
     my ($self, $filter) = @_;
-    
-    my $rs = $self->db->resultset('Host');
-    my $result = $rs->search($filter)->count;
-    return $result;
+    rs(Host)->search($filter)->count;
 }
 
 sub osi_total_stats {
     my ($self, $filter) = @_;
-    
-    my $rs = $self->db->resultset('OSI');
-    my $result = $rs->search($filter)->count;
-    return $result;
+    rs(OSI)->search($filter)->count;
 }
 
 sub session_connected_stats {
     my ($self, $filter) = @_;
-    
-    my $rs = $self->db->resultset('VM_Runtime');
-    $filter->{user_state} = 'connected';
-    my $result = $rs->search($filter)->count;   
-    return $result;
+    local $filter->{user_state} = 'connected';
+    rs(VM_Runtime)->search($filter)->count;
 }
 
 =head 2 build_form_error_msg
@@ -354,11 +235,14 @@ and returns a simple string with errors
 
 =cut
 
+# FIXME: it is not clear where this method belongs to the Model class
+# as it generates presentation mark up.
 sub build_form_error_msg {
     my ( $self, $results ) = @_;
     my $result_msg = '';
     if ( $results->has_missing ) {
         for my $f ( $results->missing ) {
+	    # FIXME: no HTML in the model, please!
             $result_msg .= "$f is missing<br>\n";
         }
     }
@@ -366,6 +250,7 @@ sub build_form_error_msg {
     # Print the name of invalid fields
     if ( $results->has_invalid ) {
         for my $f ( $results->invalid ) {
+	    # FIXME: no HTML in the model, please!
             $result_msg .=
               "$f is invalid: " . $results->invalid($f) . " <br>\n";
         }
@@ -374,11 +259,19 @@ sub build_form_error_msg {
     # Print unknown fields
     if ( $results->has_unknown ) {
         for my $f ( $results->unknown ) {
-            $result_msg .= "$f is unknown<br>\n";
+	    # FIXME: no HTML in the model, please!
+	    $result_msg .= "$f is unknown<br>\n";
         }
     }
     return $result_msg;
 }
+
+no Moose;
+__PACKAGE__->meta->make_immutable;
+
+1;
+
+__END__
 
 =head1 NAME
 
@@ -390,16 +283,14 @@ Catalyst Model.
 
 =head1 AUTHOR
 
-Nito Martinez,,,
+Nito Martinez
 
 =head1 LICENSE
 
 This library is free software. You can redistribute it and/or modify
 it under the same terms as Perl itself.
 
-=cut
 
-no Moose;
-__PACKAGE__->meta->make_immutable;
+
 
 1;
