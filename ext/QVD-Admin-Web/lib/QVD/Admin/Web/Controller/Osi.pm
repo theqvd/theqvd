@@ -5,6 +5,7 @@ use warnings;
 use parent 'Catalyst::Controller::FormBuilder';
 use Data::FormValidator::Constraints qw(:closures);
 use Data::Dumper;
+use QVD::Config;
 
 __PACKAGE__->config(
     'Controller::FormBuilder' => {
@@ -51,10 +52,52 @@ sub list : Local {
 }
 
 sub view : Local :Args(1){
-	my ( $self, $c, $id) = @_;
-	my $model = $c->model('QVD::Admin::Web');
-	my $osi = $model->osi_find($id);
-	$c->stash(osi => $osi);
+    my ( $self, $c, $id) = @_;
+    my $model = $c->model('QVD::Admin::Web');
+    my $osi = $model->osi_find($id);
+    $c->stash(osi => $osi);
+}
+
+sub add : Local Form {
+    my ( $self, $c ) = @_;
+
+    my $model = $c->model('QVD::Admin::Web');
+    
+    my $path = QVD::Config->get('shared_storage_path');
+    my @file_list = split("\n",qx/ls -1 $path/);
+    $c->stash->{osi_file_list} = \@file_list;
+    
+    if ($c->request->param('_submitted_add')) {
+	  
+	my $name              = $c->request->param('name');
+	my $memory            = $c->request->param('memory');
+	my $use_overlay       = $c->request->param('use_overlay');
+	my $user_storage_size = $c->request->param('user_storage_size');
+	my $disk_image        = $path."/".$c->request->param('disk_image');
+	
+	my %params     = (
+	    name => $name,
+	    disk_image => $disk_image,
+	    memory => $memory,
+	    use_overlay => $use_overlay,
+	    user_storage_size => $user_storage_size
+	);
+	
+	
+	
+	if ( my $id = $model->osi_add( \%params ) ) {
+		$c->flash->{response_type} = "success";
+		$c->flash->{response_msg} =
+		  "$name añadido correctamente";
+	    }
+	    else {
+
+		# FIXME response_type must be an enumerated
+		$c->flash->{response_type} = "error";
+		$c->flash->{response_msg}  = $model->error_msg;
+	    }
+	    $c->response->redirect( $c->uri_for( $self->action_for('list') ) );
+    }
 }
 
 =head1 AUTHOR

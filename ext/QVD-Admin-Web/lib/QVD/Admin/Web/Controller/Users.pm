@@ -70,7 +70,7 @@ sub new_vm : Local : Args(1) {
     my $user = $model->user_find($userid);
     $c->stash( user => $user );
     
-    my $rs    = $model->osi_list("");
+    $rs    = $model->osi_list("");
     $c->stash->{osi_list} = $rs;
 }
 

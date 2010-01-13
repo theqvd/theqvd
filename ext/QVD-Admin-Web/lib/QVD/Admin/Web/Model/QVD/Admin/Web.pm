@@ -123,6 +123,14 @@ sub osi_find {
     rs(OSI)->find($filter)  ;
 }
 
+sub osi_add {
+    my ( $self, $params ) = @_;
+    $self->reset_status;
+    my $id = eval { $self->admin->cmd_osi_add(%$params) };
+    $self->set_error($@) unless defined $id;
+    $id;
+}
+
 sub vm_list {
     my ( $self, $filter ) = @_;
     $self->reset_status;

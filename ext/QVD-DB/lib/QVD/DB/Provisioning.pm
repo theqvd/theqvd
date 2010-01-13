@@ -86,6 +86,7 @@ sub _deploy {
     $prov->add_config(key => 'ro_storage_path', value => '/var/lib/qvd/storage/images');
     $prov->add_config(key => 'rw_storage_path', value => '/var/lib/qvd/storage/overlays');
     $prov->add_config(key => 'home_storage_path', value => '/var/lib/qvd/storage/homes');
+    $prov->add_config(key => 'shared_storage_path', value => '/var/lib/qvd/storage/shared');
 }
 
 sub add_user {

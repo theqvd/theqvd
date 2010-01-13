@@ -1,0 +1,36 @@
+<h1><a href="[% c.uri_for('/osi') %]">Imágenes</a> &raquo; Nueva</h1>
+
+<form action="/osi/add" class="fb_form" id="add" method="post" name="add">
+<div class="fb_state" id="add_state"><input id="_submitted_add" name="_submitted_add" type="hidden" value="1" /></div>
+<table class="fb" id="add_body">
+<tr id="add_name_row">
+  <td class="fb_label" id="add_name_label"><span class="fb_required">Nombre</span></td>
+  <td class="fb_field" id="add_name_field"><input class="fb_input" id="name" name="name" size="40" type="text" /></td>
+</tr>
+<tr id="add_memory_row">
+  <td class="fb_label" id="add_memory_label"><span class="fb_required">Memoria</span></td>
+  <td class="fb_field" id="add_memory_field"><input class="fb_input" id="memory" name="memory" size="8" type="text" /></td>
+</tr>
+<tr id="add_user_storage_size_row">
+  <td class="fb_label" id="add_user_storage_size_label"><span class="fb_required">Espacio de usuario</span></td>
+  <td class="fb_field" id="add_user_storage_size_field"><input class="fb_input" id="user_storage_size" name="user_storage_size" size="40" type="text" /></td>
+</tr>
+<tr id="add_use_overlay_row">
+  <td class="fb_label" id="add_use_overlay_label"><span class="fb_required">Overlay</span></td>
+  <td class="fb_field" id="add_use_overlay_field"><input class="fb_input" id="use_overlay" name="use_overlay" size="40" type="text" /></td>
+</tr>
+<tr id="add_disk_image_row">
+  <td class="fb_label" id="add_disk_image_label"><span class="fb_required">Imagen</span></td>
+  <td class="fb_field" id="add_disk_image_field"><SELECT NAME="disk_image" SIZE=6 style="width: 385px;">
+[% FOREACH osi_file IN osi_file_list %]
+<OPTION VALUE="[% osi_file %]">[% osi_file %]
+[% END %]
+</SELECT></td>
+</tr>
+<tr id="add_submit_row">
+  <td class="fb_submit" colspan="2" id="add_submit_field"><input class="fb_button" id="add_submit" name="_submit" type="submit" value="Crear" /></td>
+</tr>
+</table>
+</form>
+
+
