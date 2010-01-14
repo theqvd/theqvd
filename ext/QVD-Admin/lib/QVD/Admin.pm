@@ -202,7 +202,7 @@ sub cmd_vm_del {
 
 sub cmd_osi_del {
     my ($self, @args) = @_;
-    $self->_obj_del('OSI', @args);
+    $self->_obj_del('osi', @args);
     # FIXME Should we delete the actual image file?
 }
 

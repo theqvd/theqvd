@@ -118,6 +118,39 @@ sub add : Local Form {
 
 }
 
+sub del : Local {
+    my ( $self, $c ) = @_;
+    my $model = $c->model('QVD::Admin::Web');
+
+    my $result = $c->form(
+        required           => ['id'],
+        constraint_methods => { 'id' => qr/^\d+$/, }
+    );
+    
+    if ( !$result->success ) {
+        $c->flash->{response_type} = "error";
+        $c->flash->{response_msg} =
+          "Error in parameters: " . $model->build_form_error_msg($result);
+    }
+    else {
+        my $id      = $c->req->body_params->{id};    # only for a POST request
+        my $osi     = $model->osi_find($id);
+        my $osiname = $osi->name;
+	
+        if ( my $countdel = $model->osi_del($id) ) {
+            $c->flash->{response_type} = "success";
+            $c->flash->{response_msg} = "$osiname ($id) eliminado correctamente";
+        }
+        else {
+            # FIXME response_type must be an enumerated
+            $c->flash->{response_type} = "error";
+            $c->flash->{response_msg}  = $model->error_msg;
+        }
+    }
+
+    $c->response->redirect( $c->uri_for( $self->action_for('list') ) );
+}
+
 =head1 AUTHOR
 
 QVD,,,

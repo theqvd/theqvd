@@ -131,6 +131,17 @@ sub osi_add {
     $id;
 }
 
+sub osi_del {
+    my ( $self, $id ) = @_;
+    $self->reset_status;
+    my $ok = eval {
+	$self->admin->set_filter( id => $id );
+	$self->admin->cmd_osi_del;
+    };
+    $self->set_error($@) unless defined $ok;
+    $ok;
+}
+
 sub vm_list {
     my ( $self, $filter ) = @_;
     $self->reset_status;
