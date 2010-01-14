@@ -75,6 +75,18 @@ sub add : Local Form {
 	my $user_storage_size = $c->request->param('user_storage_size');
 	my $disk_image        = $path."/".$c->request->param('disk_image');
 	
+	# Validations
+	$memory = undef if ($memory eq "");
+	$user_storage_size = undef if ($user_storage_size eq "");
+	
+	if ($use_overlay eq "on") {
+	    $use_overlay = 1;
+	} else {
+	    $use_overlay = 0;
+	}
+	
+
+	
 	my %params     = (
 	    name => $name,
 	    disk_image => $disk_image,
@@ -83,7 +95,7 @@ sub add : Local Form {
 	    user_storage_size => $user_storage_size
 	);
 	
-	
+	#print Dumper %params;
 	
 	if ( my $id = $model->osi_add( \%params ) ) {
 		$c->flash->{response_type} = "success";
@@ -91,13 +103,19 @@ sub add : Local Form {
 		  "$name añadido correctamente";
 	    }
 	    else {
-
 		# FIXME response_type must be an enumerated
 		$c->flash->{response_type} = "error";
 		$c->flash->{response_msg}  = $model->error_msg;
 	    }
-	    $c->response->redirect( $c->uri_for( $self->action_for('list') ) );
+	
+	# Delete osi
+	if ($c->request->param('delete') eq "on") {
+	    qx/rm $disk_image /;
+	}
+	$c->response->redirect( $c->uri_for( $self->action_for('list') ) );
+	    
     }
+
 }
 
 =head1 AUTHOR

@@ -1,6 +1,39 @@
 <h1><a href="[% c.uri_for('/osi') %]">Imágenes</a> &raquo; Nueva</h1>
 
-<form action="/osi/add" class="fb_form" id="add" method="post" name="add">
+<script type="text/javascript"><!-- hide from old browsers
+function validate_add (form) {
+    var alertstr = '';
+    var invalid  = 0;
+    var invalid_fields = new Array();
+
+    var name = form.elements['name'].value;
+    if (name == null || ! name.match(/^[a-zA-Z]+$/)) {
+        alertstr += 'Introduzca un valor válido para el campo: "Nombre"\n';
+        invalid++;
+        invalid_fields.push('name');
+    }
+    
+    var disk_image = form.elements['disk_image'].value;
+    if (disk_image == null || disk_image == '') {
+        alertstr += 'Seleccione un valor válido para el campo: "Imagen"\n';
+        invalid++;
+        invalid_fields.push('disk_image');
+    }
+
+    if (invalid > 0 || alertstr != '') {
+        if (! invalid) invalid = 'The following';   // catch for programmer error
+        alert(''+invalid+' error(es) fueron encontrados en su formulario:'+'\n\n'
+                +alertstr+'\n'+'Por favor corrija en el/los campo(s) e intente de nuevo\n');
+        return false;
+    }
+    return true;  // all checked ok
+}
+//-->
+</script>
+
+<p>Los campos <span class="fb_required">resaltados</span> son obligatorios</p>
+
+<form action="/osi/add" class="fb_form" id="add" method="post" name="add" onsubmit="return validate_add(this);">
 <div class="fb_state" id="add_state"><input id="_submitted_add" name="_submitted_add" type="hidden" value="1" /></div>
 <table class="fb" id="add_body">
 <tr id="add_name_row">
@@ -8,16 +41,16 @@
   <td class="fb_field" id="add_name_field"><input class="fb_input" id="name" name="name" size="40" type="text" /></td>
 </tr>
 <tr id="add_memory_row">
-  <td class="fb_label" id="add_memory_label"><span class="fb_required">Memoria</span></td>
-  <td class="fb_field" id="add_memory_field"><input class="fb_input" id="memory" name="memory" size="8" type="text" /></td>
+  <td class="fb_label" id="add_memory_label">Memoria</td>
+  <td class="fb_field" id="add_memory_field"><input class="fb_input" id="memory" name="memory" size="4" type="text" /> MB</td>
 </tr>
 <tr id="add_user_storage_size_row">
-  <td class="fb_label" id="add_user_storage_size_label"><span class="fb_required">Espacio de usuario</span></td>
-  <td class="fb_field" id="add_user_storage_size_field"><input class="fb_input" id="user_storage_size" name="user_storage_size" size="40" type="text" /></td>
+  <td class="fb_label" id="add_user_storage_size_label">Espacio de usuario</td>
+  <td class="fb_field" id="add_user_storage_size_field"><input class="fb_input" id="user_storage_size" name="user_storage_size" size="4" type="text" /> MB</td>
 </tr>
 <tr id="add_use_overlay_row">
-  <td class="fb_label" id="add_use_overlay_label"><span class="fb_required">Overlay</span></td>
-  <td class="fb_field" id="add_use_overlay_field"><input class="fb_input" id="use_overlay" name="use_overlay" size="40" type="text" /></td>
+  <td class="fb_label" id="add_use_overlay_label">Overlay</td>
+  <td class="fb_field" id="add_use_overlay_field"><input class="fb_input" type="checkbox" id="use_overlay" name="use_overlay"></td>
 </tr>
 <tr id="add_disk_image_row">
   <td class="fb_label" id="add_disk_image_label"><span class="fb_required">Imagen</span></td>
@@ -26,6 +59,10 @@
 <OPTION VALUE="[% osi_file %]">[% osi_file %]
 [% END %]
 </SELECT></td>
+</tr>
+<tr id="add_use_overlay_row">
+  <td class="fb_label" id="add_delete_label">Eliminar tras la operación</td>
+  <td class="fb_field" id="add_delete_field"><input class="fb_input" type="checkbox" id="delete" name="delete"></td>
 </tr>
 <tr id="add_submit_row">
   <td class="fb_submit" colspan="2" id="add_submit_field"><input class="fb_button" id="add_submit" name="_submit" type="submit" value="Crear" /></td>
