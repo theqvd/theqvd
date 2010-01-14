@@ -71,7 +71,7 @@ sub _print {
 		if ($bytes) {
 		    substr($buffer, 0, $bytes, '');
 		}
-		elsif ($SSL and defined $bytes) {
+		elsif ($SSL and not defined $bytes) {
 		    $IO::Socket::SSL::SSL_ERROR == IO::Socket::SSL::SSL_WANT_READ()
 			or die "internal error: unexpected SSL error: " . IO::Socket::SSL::errstr();
 		    my $rv = '';
