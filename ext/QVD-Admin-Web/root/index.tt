@@ -11,7 +11,9 @@
 
 <div class="grid_5 omega">
 <h2>Sesiones</h2>
+[% IF vm_total_stats != 0 %]
 <a href="/users/"><img border="0" alt="Gráfico de barras de usuarios en QVD" src="http://chart.apis.google.com/chart?cht=bhs&chs=225x25&chd=t:[% 100*(session_connected_stats / vm_total_stats) -%]&chco=FF8D13"/></a>
+[% END %]
 </div>
 
 <div class="grid_2 center">
