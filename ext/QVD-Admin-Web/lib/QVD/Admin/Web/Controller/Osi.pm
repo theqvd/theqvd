@@ -49,6 +49,9 @@ sub list : Local {
     my $model = $c->model('QVD::Admin::Web');
     my $rs    = $model->osi_list("");
     $c->stash->{osi_list} = $rs;
+    
+    $rs = $model->vm_list("");
+    $c->stash->{vm_list} = $rs;
 }
 
 sub view : Local :Args(1){

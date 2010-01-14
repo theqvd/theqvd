@@ -48,10 +48,18 @@ else
 	    <td>[% osi.memory %]</td>
 			
 	    <td class="options">
-	      <form action="[% c.uri_for('/osi/del') %]" method="post">
-		<input type="hidden" name="id" value="[% osi.id %]"/>
-		<button type="submit" class="link" onClick="return confirm_submit()"><span class="option_del"></span></button>
-	      </form>
+		[% showdel = 1 %]
+		[% FOREACH vm IN vm_list %]
+		    [% IF vm.osi.id == osi.id %]
+			[% showdel = 0 %]
+		    [% END %]
+		[% END %]
+		[% IF showdel == 1 %]
+		  <form action="[% c.uri_for('/osi/del') %]" method="post">
+		    <input type="hidden" name="id" value="[% osi.id %]"/>
+		    <button type="submit" class="link" onClick="return confirm_submit()"><span class="option_del"></span></button>
+		  </form>
+		[% END %]
 	    
 	    </td>
         </tr>
