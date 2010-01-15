@@ -5,8 +5,6 @@ our $VERSION = '0.01';
 use warnings;
 use strict;
 
-use QVD::Config;
-
 use Log::Log4perl qw(:easy);
 Log::Log4perl::init('log4perl.conf');
 

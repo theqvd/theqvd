@@ -3,7 +3,6 @@ package QVD::Admin::Web::Model::QVD::Admin::Web;
 use Moose;
 use QVD::DB::Simple;
 use QVD::Admin;
-use QVD::Config;
 use Log::Log4perl qw(:easy);
 use Data::Dumper;
 extends 'Catalyst::Model';

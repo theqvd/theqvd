@@ -82,7 +82,7 @@ sub _connect_to_vm_processor {
 	$server->send_http_error(HTTP_UNAUTHORIZED);
 	return;
     }
-    my $vm_start_timeout = QVD::Config->get('vm_start_timeout');
+    my $vm_start_timeout = cfg('vm_start_timeout');
 
     unless (header_eq_check($headers, Connection => 'Upgrade') and
 	    header_eq_check($headers, Upgrade => 'QVD/1.0')) {

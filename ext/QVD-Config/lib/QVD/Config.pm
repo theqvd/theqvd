@@ -7,13 +7,12 @@ use strict;
 
 use QVD::DB::Simple;
 
+use Exporter qw(import);
+our @EXPORT = qw(cfg);
+
 my %cache = map { $_->key => $_->value } rs(Config)->all;
 
-sub get {
-    my ($class, $key, $default) = @_;
-    my $value = $cache{$key};
-    defined $value ? $value : $default
-}
+sub cfg (*;@) { $cache{$_[0]} // $_[1] }
 
 1;
 
@@ -28,8 +27,8 @@ QVD::Config - Retrieve QVD configuration from database.
 This module encapsulate configuration access.
 
     use QVD::Config;
-    my $foo = QVD::Config->get('field');
-    my $bar = QVD::Config->get('bar', $default_bar);
+    my $foo = cfg('field');
+    my $bar = cfg('bar', $default_bar);
 
 =head1 DESCRIPTION
 
@@ -40,9 +39,9 @@ if you don't export anything, such as for a purely object-oriented module.
 
 =over
 
-=item QVD::Config->get($key)
+=item cfg($key)
 
-=item QVD::Config->get($key, $default)
+=item cfg($key, $default)
 
 Returns the configuration associated to the given key.
 
@@ -67,7 +66,7 @@ your bug as I make changes.
 
 =head1 COPYRIGHT & LICENSE
 
-Copyright 2009 Qindel Formacion y Servicios S.L.
+Copyright 2009, 2010 Qindel Formacion y Servicios S.L.
 
 This program is free software; you can redistribute it and/or modify it
 under the terms of either: the GNU General Public License as published

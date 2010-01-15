@@ -14,12 +14,12 @@ Log::Log4perl::init('log4perl.conf');
 
 our $VERSION = '0.01';
 
-# Carga los parámetros necesarios desde el fichero de configuración
-my $vm_state_starting_timeout = QVD::Config->get('vm_state_starting_timeout');
-my $vm_state_running_vma_timeout = QVD::Config->get('vm_state_running_vma_timeout');
-my $vm_state_stopping_timeout = QVD::Config->get('vm_state_stopping_timeout');
-my $vm_state_zombie_sigkill_timeout = QVD::Config->get('vm_state_zombie_sigkill_timeout');
-my $x_state_connecting_timeout = QVD::Config->get('x_state_connecting_timeout');
+# Load parameters from configuration file
+my $vm_state_starting_timeout = cfg('vm_state_starting_timeout');
+my $vm_state_running_vma_timeout = cfg('vm_state_running_vma_timeout');
+my $vm_state_stopping_timeout = cfg('vm_state_stopping_timeout');
+my $vm_state_zombie_sigkill_timeout = cfg('vm_state_zombie_sigkill_timeout');
+my $x_state_connecting_timeout = cfg('x_state_connecting_timeout');
 
 sub new {
     my ($class, %opts) = @_;
@@ -120,8 +120,7 @@ sub _check_timeout {
     my ($state, $statestring, $ts, $timeout) = @_;
     if ($state eq $statestring) {
 	if (defined $ts and time > $ts + $timeout) {
-		return '_timeout';
-	    
+	    return '_timeout';
 	}
     }
     undef
@@ -219,7 +218,6 @@ sub run {
 		if ($vm_state ne 'zombie' and
 		    $vm_state ne 'stopping') {
 		    # This condition structure assures here vm_state eq running
-			
 		    # Check VMA responds
 		    my $vma_status = $vmas->get_vma_status($vm_runtime);
 		    if (defined $vma_status and $vma_status->{status} eq 'ok') {
@@ -227,9 +225,7 @@ sub run {
 
 			my $old_x_state = $vm_runtime->x_state;
 			my $new_x_state = $vma_status->{x_state};
-			
 			$old_x_state = $old_x_state // 'disconnected';
-			
 			if (grep $old_x_state eq $_, qw(connecting listening connected)
 			    and ($new_x_state eq 'disconnected')) {
 			    $self->_do_nx_action(_fail => $vm_runtime);
@@ -240,43 +236,33 @@ sub run {
 			elsif ($old_x_state eq 'listening' and $new_x_state eq 'connected') {
 			    $self->_do_nx_action(_detect_connected => $vm_runtime);
 			}
-			
 			if (_check_timeout($old_x_state, 'starting',
 				   $vm_runtime->x_state_ts, $x_state_connecting_timeout)) {
 			    $self->_do_nx_action(_timeout => $vm_runtime);
-			    
 			}
 
 			my $cmd = $vm_runtime->x_cmd;
 			if (defined $cmd) {
 			    $self->_do_nx_action($cmd => $vm_runtime);
 			}
-			
 			$self->_do_nx_action(_do => $vm_runtime);
 		    }
 		}
-		
 		# Timeout events
 		if (_check_timeout($vm_runtime->vm_state, 'starting',
 				   $vm_runtime->vm_state_ts, $vm_state_starting_timeout) or
-		    
 		    _check_timeout($vm_runtime->vm_state, 'running',
 				   $vm_runtime->vma_ok_ts, $vm_state_running_vma_timeout) or
-		    
 		    _check_timeout($vm_runtime->vm_state, 'stopping',
 				   $vm_runtime->vm_state_ts, $vm_state_stopping_timeout) or
-		    
 		    _check_timeout($vm_runtime->vm_state, 'zombie',
 				   $vm_runtime->vm_state_ts, $vm_state_zombie_sigkill_timeout)) {
-		    
-		    $self->_do_vm_action(_timeout => $vm_runtime);	
+		    $self->_do_vm_action(_timeout => $vm_runtime);
 		}
-		
 		$self->_do_vm_action( _do => $vm_runtime);
 	    }
 	    # Command event
 	    my $cmd = $vm_runtime->vm_cmd;
-	    
 	    if (defined $cmd) {
 		$self->_do_vm_action($cmd => $vm_runtime);
 	    }

@@ -170,7 +170,7 @@ sub cmd_osi_add {
 
     # Copy image to ro-directory
     # FIXME Overwriting existing image should be an error
-    my $destination = QVD::Config->get('ro_storage_path');
+    my $destination = cfg('ro_storage_path');
     use File::Copy qw/copy/;
     copy($img, $destination) or die "Unable to copy $img to storage: $^E";
 

@@ -10,8 +10,8 @@ use File::Slurp qw(write_file);
 
 # retrieve SSL certificates from the database and install them locally
 
-my $server_cert = QVD::Config::SSL->get('ssl_server_cert');
-my $server_key = QVD::Config::SSL->get('ssl_server_key');
+my $server_cert = ssl_cfg('ssl_server_cert');
+my $server_key = ssl_cfg('ssl_server_key');
 
 defined $server_cert or die "ssl_server_cert not available from database\n";
 defined $server_key or die "ssl_server_key not available from database\n";

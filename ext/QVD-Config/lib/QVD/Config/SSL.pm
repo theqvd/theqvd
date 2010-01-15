@@ -7,9 +7,11 @@ use strict;
 
 use QVD::DB::Simple;
 
-sub get {
-    my ($class, $key) = @_;
-    my $slot = rs(SSL_Config)->search({ key => $key })->first;
+use Exporter qw(import);
+our @EXPORT = qw(ssl_cfg);
+
+sub ssl_cfg {
+    my $slot = rs(SSL_Config)->search({ key => $_[0] })->first;
     defined $slot ? $slot->value : undef;
 }
 

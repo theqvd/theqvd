@@ -7,7 +7,7 @@ use parent 'QVD::SimpleRPC::Client';
 use QVD::Config;
 
 sub new {
-    my $vm_state_starting_timeout = QVD::Config->get('vma_response_timeout');
+    my $vm_state_starting_timeout = cfg('vma_response_timeout');
 
     my ($class, $host, $port) = @_;
     $class->SUPER::new("http://$host:$port/vma/", timeout => $vm_state_starting_timeout);

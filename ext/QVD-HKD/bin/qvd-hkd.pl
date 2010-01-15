@@ -7,10 +7,10 @@ use App::Daemon qw/daemonize/;
 use QVD::HKD;
 use QVD::Config;
 
-my $PID_FILE = QVD::Config->get('hkd_pid_file');
+my $PID_FILE = cfg('hkd_pid_file');
 
 $App::Daemon::pidfile = $PID_FILE;
-$App::Daemon::logfile = QVD::Config->get('hkd_log_file');
+$App::Daemon::logfile = cfg('hkd_log_file');
 
 use Log::Log4perl qw(:levels);
 Log::Log4perl::init('log4perl.conf');

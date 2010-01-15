@@ -76,7 +76,7 @@ sub _load_balance_random {
 
 sub _get_free_host {
     my ($self, $vm) = @_;
-    my $algorithm = QVD::Config->get('vmas_load_balance_algorithm');
+    my $algorithm = cfg('vmas_load_balance_algorithm');
     my $load_balancer = $self->can('_load_balance_'.$algorithm);
     unless ($load_balancer) {
 	ERROR "Load balance algorithm '$algorithm' is not implemented";
@@ -100,10 +100,10 @@ sub assign_host_for_vm {
 	    and die "VM $vm_id is already assigned to a host";
 	$vm->update({host_id => $host->id, 
 		     vm_address => $host->address,
-		     vm_vma_port => QVD::Config->get('vm_vma_port')+$vm_id,
-		     vm_x_port => QVD::Config->get('vm_x_port')+$vm_id,
-		     vm_ssh_port => QVD::Config->get('vm_ssh_port')+$vm_id,
-		     vm_vnc_port => QVD::Config->get('vm_vnc_port')+$vm_id });
+		     vm_vma_port => cfg('vm_vma_port')+$vm_id,
+		     vm_x_port => cfg('vm_x_port')+$vm_id,
+		     vm_ssh_port => cfg('vm_ssh_port')+$vm_id,
+		     vm_vnc_port => cfg('vm_vnc_port')+$vm_id });
     # };
 }
 
@@ -191,8 +191,8 @@ sub schedule_stop_vm {
 sub _get_image_for_vm {
     my ($self, $vm) = @_;
     my $osi = $vm->rel_vm_id->osi;
-    my $rw_dir = QVD::Config->get('rw_storage_path');
-    my $ro_dir = QVD::Config->get('ro_storage_path');
+    my $rw_dir = cfg('rw_storage_path');
+    my $ro_dir = cfg('ro_storage_path');
     my $disk_image = undef;
     unless ($osi->use_overlay) {
 	$disk_image = $ro_dir.'/'.$osi->disk_image;
@@ -207,7 +207,7 @@ sub _get_user_storage_for_vm {
     my $osi = $vm->rel_vm_id->osi;
     my $disk_image = undef;
     if (defined $osi->user_storage_size) {
-	my $home = QVD::Config->get('home_storage_path');
+	my $home = cfg('home_storage_path');
 	$disk_image = $home.'/'.$vm->vm_id.'-data.qcow2';
     }
     $disk_image
@@ -216,9 +216,9 @@ sub _get_user_storage_for_vm {
 sub _ensure_image_exists {
     my ($self, $vm) = @_;
     my $osi = $vm->rel_vm_id->osi;
-    my $rw_dir = QVD::Config->get('rw_storage_path');
-    my $ro_dir = QVD::Config->get('ro_storage_path');
-    my $img_cmd = QVD::Config->get('kvm_img_command', 'kvm-img');
+    my $rw_dir = cfg('rw_storage_path');
+    my $ro_dir = cfg('ro_storage_path');
+    my $img_cmd = cfg('kvm_img_command', 'kvm-img');
     my $disk_image = $self->_get_image_for_vm($vm);
     if ($osi->use_overlay and not -f $disk_image) {
 	# If the overlay is created using a relative path
@@ -242,8 +242,8 @@ sub _ensure_image_exists {
 sub _ensure_user_storage_exists {
     my ($self, $vm) = @_;
     my $osi = $vm->rel_vm_id->osi;
-    my $dir = QVD::Config->get('home_storage_path');
-    my $img_cmd = QVD::Config->get('kvm_img_command', 'kvm-img');
+    my $dir = cfg('home_storage_path');
+    my $img_cmd = cfg('kvm_img_command', 'kvm-img');
     my $disk_image = $self->_get_user_storage_for_vm($vm);
     return 1 if -f $disk_image;
     my @cmd = ($img_cmd => ('create', 
@@ -262,7 +262,7 @@ sub start_vm {
 	return {vm_status => 'started'};
     }
 
-    my $home_base= QVD::Config->get('home_storage_path');
+    my $home_base= cfg('home_storage_path');
 
     my $id = $vm->vm_id;
     my $osi = $vm->rel_vm_id->osi;
