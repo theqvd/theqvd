@@ -7,6 +7,7 @@ if (agree)
 else
 	return false ;
 }
+
 </script>
 
 <h1>Máquinas virtuales</h1>
@@ -23,6 +24,7 @@ else
 
 	</form>
 </div>
+<form action="[% c.uri_for('/vm/start_vm') %]" method="post">
 [% META title = 'PropGet' -%]
 <table id="props" class="tablesorter resultset">
     <thead>
@@ -38,8 +40,8 @@ else
     </thead>
     <tbody>
         [% FOREACH vm IN vm_list -%]
-        <tr id="[% vm.id %]">
-	    <td><input type="checkbox" name="pr" value="pr"></td>
+        <tr>
+	    <td><input type="checkbox" name="arrayselection" value="[% vm.id %]"></td>
             <td><a href="[% c.uri_for('/vm/view/') %][% vm.id %]" class="option_view">[% vm.id %]</a></td>
 	    <td>[% vm.name %]</td>
             <td>[% vm.user.login %]</td>
@@ -48,24 +50,16 @@ else
 	    <td class="options">
 	      [% IF vm.vm_runtime.vm_cmd == '' -%]
 	      [% IF vm.vm_runtime.vm_state == 'stopped' -%]
-	      <form action="[% c.uri_for('/vm/start_vm') %]" method="post">
-		<input type="hidden" name="id" value="[% vm.id %]"/>
-		<button type="submit" class="link"><span class="option_startvm"></span></button>
-	      </form>
+	      <span class="option_startvm"></span>
 	      [% ELSIF vm.vm_runtime.vm_state == 'running' %]
-	      <form action="[% c.uri_for('/vm/stop_vm') %]" method="post">
-		<input type="hidden" name="id" value="[% vm.id %]"/>
-		<button type="submit" class="link" onClick="return confirm_submit()"><span class="option_stopvm"></span></button>
-	      </form>
+	      <span class="option_stopvm"></span>
 	      [% ELSIF vm.vm_runtime.vm_state == 'failed' %]
 	      <span class="option_failedvm"></span>
 	      [% ELSE %]
 	      <span class="option_waitvm"></span>
 	      [% END %]
 	      [% IF vm.vm_runtime.user_state == 'connected' -%]
-	      <form action="#" method="post">
-		<input type="hidden" name="id" value="[% vm.id %]"/>
-		<button type="submit" class="link" onClick="return confirm_submit()"><span class="option_disconnect"></span></button>
+	      <span class="option_disconnect"></span>
 	      </form>
 	      [% END %]
 	      [% ELSE %]    
@@ -77,7 +71,7 @@ else
     </tbody>
 </table>
 <input type="submit" value="Arrancar"/> <input type="submit" value="Detener"/> <input type="submit" value="Eliminar"/>
-
+</form>
 <script type="text/javascript" charset="utf-8">
 $(document).ready(function() 
     { 

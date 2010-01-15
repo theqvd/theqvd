@@ -67,9 +67,10 @@ sub start_vm : Local {
     my $model = $c->model('QVD::Admin::Web');
 
     my $result = $c->form(
-        required           => ['id'],
-        constraint_methods => { 'id' => qr/^\d+$/, }
+        required           => ['arrayselection']
     );
+
+    #print Dumper $c->req->body_params;
 
     if ( !$result->success ) 
     {
@@ -78,22 +79,22 @@ sub start_vm : Local {
           "Error in parameters: " . $model->build_form_error_msg($result);
     } else 
     {
-        my $id = $c->req->body_params->{id};    # only for a POST request
-	my $vm = $model->vm_find($id );
-	my $name = $vm->name; 
-        if ( my $countstart = $model->vm_start($id) ) 
-	{
-            $c->flash->{response_type} = "success";
-            $c->flash->{response_msg}  = "$name ($id) arrancando";
-        }
-        else {
-
-            # FIXME response_type must be an enumerated
-            $c->flash->{response_type} = "error";
-            $c->flash->{response_msg}  = $model->error_msg;
-        }
+	my @arraylist = $c->req->body_params->{arrayselection};
+	for (@arraylist) {
+	    my $vm = $model->vm_find($_);
+	    my $name = $vm->name; 
+	    if ( my $countstart = $model->vm_start($_) ) 
+	    {
+		#$c->flash->{response_type} = "success";
+		#$c->flash->{response_msg}  .= "$name ($_) arrancando ";
+	    }
+	    else {
+		# FIXME response_type must be an enumerated
+		#$c->flash->{response_type} = "error";
+		#$c->flash->{response_msg}  = $model->error_msg;
+	    }
+	}
     }
-    #$c->forward('list');
     $c->response->redirect( $c->uri_for( $self->action_for('list') ) );
    
 }
