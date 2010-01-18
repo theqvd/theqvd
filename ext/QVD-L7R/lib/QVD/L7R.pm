@@ -138,8 +138,8 @@ sub _connect_to_vm_processor {
 	    $server->send_http_response(HTTP_PROCESSING,
 		    'X-QVD-VM-Status: Starting VM');
 	    DEBUG "Waiting for VMA to start on VM ".$vm->vm_id;
-	    $r = $vmas->get_vma_status($vm);
-	    last if exists $r->{status} && $r->{status} eq 'ok';
+	    $vm->discard_changes;
+	    last if defined $vm->vma_ok_ts;
 	    sleep 5;
 	}
 	if (time > $timeout_time) {
