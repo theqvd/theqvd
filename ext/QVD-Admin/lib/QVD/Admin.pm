@@ -151,31 +151,30 @@ sub cmd_user_add {
 }
 
 sub cmd_osi_add {
-    my ($self, @args) = @_;
-    my $params = {@args};
+    my ($self, %params) = @_;
     my @required_params = qw/name memory use_overlay user_storage_size disk_image/;
 
     # Default OSI parameters
     # FIXME Detect type of image and set use_overlay accordingly, iso=no overlay
-    $params->{memory} //= 256;
-    $params->{use_overlay} //= 1;
-    $params->{user_storage_size} //= undef;
+    $params{memory} //= 256;
+    $params{use_overlay} //= 1;
+    $params{user_storage_size} //= undef;
 
     die "The required parameters are ".join(", ", @required_params)
-	unless _set_equals([keys %$params], \@required_params);
+	unless _set_equals([keys %params], \@required_params);
 
     use File::Basename qw/basename/;
-    my $img = $params->{disk_image};
-    $params->{disk_image} = basename($img);
+    my $img = $params{disk_image};
+    $params{disk_image} = basename($img);
 
-    # Copy image to ro-directory
-    # FIXME Overwriting existing image should be an error
     my $destination = cfg('ro_storage_path');
-    use File::Copy qw/copy/;
-    copy($img, $destination) or die "Unable to copy $img to storage: $^E";
+    unless (-f $destination.'/'.$params{disk_image}) {
+	use File::Copy qw/copy/;
+	copy($img, $destination) or die "Unable to copy $img to storage: $^E";
+    }
 
     my $rs = $self->get_resultset('osi');
-    my $row = $rs->create($params);
+    my $row = $rs->create(\%params);
 
     $row->id;
 }
@@ -396,8 +395,10 @@ Version 0.01
 
     use QVD::Admin;
     my $admin = QVD::Admin->new;
-    my $id = $admin->cmd_osi_add("name=Ubuntu 9.10 (x86)", "memory=512",
-			"use_overlay=1", "disk_image=/var/tmp/U910_x86.img");
+    my $id = $admin->cmd_osi_add(name => "Ubuntu 9.10 (x86)", 
+				 memory => 512,
+				 use_overlay => 1,
+				 disk_image => "/var/tmp/U910_x86.img");
     print "OSI added with id $id\n";
 
     $admin->set_filter(user=> 'qvd');
@@ -451,9 +452,10 @@ Returns the id of the new user.
 =item cmd_osi_add(%parameters)
 
 Adds an operating system image. The required parameters are name and
-disk_image. The value of disk_image should be the path of a disk image file 
-which is copied to the shared storage area. The optional parameters are memory
-(megabytes), user_storage_size (megabytes), and use_overlay (y/n).
+disk_image. The value of disk_image should be the path of a disk image file.
+The image file is copied to the read only storage area.  The optional
+parameters are memory (megabytes), user_storage_size (megabytes), and
+use_overlay (y/n).
 
 =item cmd_host_del()
 
