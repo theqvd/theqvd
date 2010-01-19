@@ -45,7 +45,8 @@ sub new {
     my $self = { target => $target,
 		 timeout => $timeout,
 		 SSL => $ssl,
-		 buffer => '' };
+		 bin => '',
+		 bout => '' };
     bless $self, $class;
     $self->_create_socket();
     $self;
@@ -55,21 +56,34 @@ sub get_socket { shift->{socket} }
 
 sub _print {
     my $self = shift;
+    $self->_queue(@_);
+    $self->_send_queued;
+}
+
+sub _queue {
+    my $self = shift;
+    my $bout = \$self->{bout};
+    $bout .= join('', @_);
+}
+
+sub _send_queued {
+    my $self = shift;
     my $socket = $self->{socket};
     my $timeout = $self->{timeout};
     my $SSL = $self->{SSL};
-    my $buffer = join('', @_);
+    my $bout = \$self->{bout};
+
     my $fn = fileno $socket;
     $fn >= 0 or croak "bad file handle $socket";
-    while (length $buffer) {
+    while (length $$bout) {
 	my $wv = '';
 	vec($wv, $fn, 1) = 1;
 	my $n = select(undef, $wv, undef, $timeout);
 	if ($n > 0) {
 	    if (vec($wv, $fn, 1)) {
-		my $bytes = syswrite($socket, $buffer, 16 * 1024);
+		my $bytes = syswrite($socket, $$bout, 16 * 1024);
 		if ($bytes) {
-		    substr($buffer, 0, $bytes, '');
+		    substr($$bout, 0, $bytes, '');
 		}
 		elsif ($SSL and not defined $bytes) {
 		    $IO::Socket::SSL::SSL_ERROR == IO::Socket::SSL::SSL_WANT_READ()
@@ -163,19 +177,19 @@ sub read_http_response_head {
 sub _sysread {
     my ($self, $length, $timeout) = @_;
     $timeout //= $self->{timeout};
-    my $buffer = \$self->{buffer};
-    return if length($$buffer) >= $length;
+    my $bin = \$self->{bin};
+    return if length($$bin) >= $length;
     my $socket = $self->{socket};
     my $SSL = $self->{SSL};
     my $fn = fileno $socket;
     $fn >= 0 or croak "bad file handle $socket";
-    while (length $$buffer < $length) {
+    while (length $$bin < $length) {
 	my $rv = '';
 	vec($rv, $fn, 1) = 1;
 	my $n = select($rv, undef, undef, $timeout);
 	if ($n > 0) {
 	    if (vec($rv, $fn, 1)) {
-		my $bytes = sysread ($socket, $$buffer, 16 * 1024, length $$buffer);
+		my $bytes = sysread ($socket, $$bin, 16 * 1024, length $$bin);
 		unless ($bytes) {
 		    if ($SSL and defined $bytes) {
 			$IO::Socket::SSL::SSL_ERROR == IO::Socket::SSL::SSL_WANT_WRITE()
@@ -196,15 +210,15 @@ sub _sysread {
 
 sub _readline {
     my $self = shift;
-    my $buffer = \$self->{buffer};
+    my $bin = \$self->{bin};
     while (1) {
-	my $eol = index($$buffer, "\n");
+	my $eol = index($$bin, "\n");
 	if ($eol >= 0) {
-	    my $line = substr($$buffer, 0, $eol + 1, "");
+	    my $line = substr($$bin, 0, $eol + 1, "");
 	    $line =~ s/\r?\n$//;
 	    return $line;
 	}
-	$self->_sysread(length($$buffer) + 1);
+	$self->_sysread(length($$bin) + 1);
     }
 }
 
@@ -215,7 +229,7 @@ sub read_http_response {
     my $body;
     if ($content_length) {
 	$self->_sysread($content_length);
-	$body = substr $self->{buffer}, 0, $content_length, "";
+	$body = substr $self->{bin}, 0, $content_length, "";
     }
     ($code, $msg, $headers, $body);
 }
