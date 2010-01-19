@@ -31,6 +31,26 @@ sub new {
 				});
 }
 
+sub deploy {
+    my $db = shift;
+    $db->SUPER::deploy(@_);
+
+    my %initial_values = (
+	VM_State => [qw(stopped starting running stopping zombie failed)],
+	VM_Cmd => [qw(start stop)],
+	X_State => [qw(disconnected connecting listening connected disconnecting)],
+	X_Cmd => [qw(connect disconnect)],
+	User_State => [qw(disconnected connecting connected aborting)],
+	User_Cmd => [qw(Abort Forward)],
+    );
+
+    while (my ($rs, $values) = each %initial_values) {
+	foreach my $name (@$values) {
+	    $db->resultset($rs)->create({name => $name});
+	}
+    }
+}
+
 sub erase {
     my $db = shift;
     my $dbh = $db->storage->dbh;
