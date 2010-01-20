@@ -49,3 +49,5 @@ $admin->cmd_vm_add(name => 'Test VM 1',
 	      user => 'qvd',
 	      ip => '',
 	      );
+$admin->cmd_config_ssl(key => 'certs/server-key.pem',
+		    cert => 'certs/server-cert.pem');
