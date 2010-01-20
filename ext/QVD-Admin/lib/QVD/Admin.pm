@@ -400,6 +400,27 @@ sub cmd_vm_disconnect_user {
     $counter
 }
 
+sub cmd_config_ssl {
+    my ($self, %args) = @_;
+    # FIXME: Is using File::Slurp the best way?
+    use File::Slurp; 
+    my $cert = eval { read_file($args{cert}) } 
+	or die "$args{cert}: Unable to read cert file: $^E";
+    my $key = eval { read_file($args{key}) }  
+	or die "$args{key}: Unable to read key file: $^E";
+
+    rs(SSL_Config)->update_or_create({
+	    key => 'ssl_server_cert',
+	    value => $cert,
+	});
+
+    rs(SSL_Config)->update_or_create({
+	    key => 'ssl_server_key',
+	    value => $key,
+	});
+    1
+}
+
 1;
 
 __END__
@@ -587,6 +608,11 @@ Disconnects the users connected to the virtual machines matched by the current
 filter.
 
 Returns the number of users that were disconnected.
+
+=item cmd_config_ssl(cert => mycert.pem, key => mykey.key)
+
+Sets the SSL certificate to the one read from mycert.pem and the private key to
+the one read from mykey.key. Returns 1 on success.
 
 =head1 AUTHOR
 

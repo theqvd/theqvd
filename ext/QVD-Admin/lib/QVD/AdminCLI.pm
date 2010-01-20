@@ -617,6 +617,30 @@ sub cmd_vm_vnc {
     exec @cmd or die "Unable to exec vncviewer: $^E";
 }
 
+sub help_config_ssl {
+    print <<EOT
+config ssl: Sets the SSL certificate and private key
+usage: config ssl key=mykey.key cert=mycert.pem
+
+    Sets the SSL certificate to the one read from the file mycert.pem, and the
+    private key to the one read from mykey.key.
+EOT
+}
+
+
+sub cmd_config_ssl {
+    my $self = shift;
+    my %args = _split_on_equals(@_);
+    my $key = delete $args{key};
+    my $cert = delete $args{cert};
+    if (%args or !$key or !$cert) {
+	help_config_ssl;
+	exit 1;
+    }
+    $self->{admin}->cmd_config_ssl(key => $key, cert => $cert) 
+	and print "SSL certificate and private keys set.\n";
+}
+
 sub help_vm_vnc {
     print <<EOT
 vm ssh: Connects to the virtual machine VNC server.
