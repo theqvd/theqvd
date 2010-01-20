@@ -640,7 +640,7 @@ sub cmd_config_ssl {
 	exit 1;
     }
     $self->{admin}->cmd_config_ssl(key => $key, cert => $cert) 
-	and print "SSL certificate and private keys set.\n";
+	and print "SSL certificate and private key set.\n";
 }
 
 sub help_vm_vnc {
