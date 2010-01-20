@@ -620,10 +620,12 @@ sub cmd_vm_vnc {
 sub help_config_ssl {
     print <<EOT
 config ssl: Sets the SSL certificate and private key
-usage: config ssl key=mykey.key cert=mycert.pem
+usage: config ssl key=mykey.pem cert=mycert.pem
 
     Sets the SSL certificate to the one read from the file mycert.pem, and the
-    private key to the one read from mykey.key.
+    private key to the one read from mykey.pem.
+
+    Example: config ssl key=certs/server-key.pem cert=certs/server-cert.pem
 EOT
 }
 
