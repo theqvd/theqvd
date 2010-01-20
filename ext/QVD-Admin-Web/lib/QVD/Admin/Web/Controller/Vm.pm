@@ -67,10 +67,8 @@ sub start_vm : Local {
     my $model = $c->model('QVD::Admin::Web');
 
     my $result = $c->form(
-        required           => ['arrayselection']
+        required           => ['selected']
     );
-
-    #print Dumper $c->req->body_params;
 
     if ( !$result->success ) 
     {
@@ -79,19 +77,21 @@ sub start_vm : Local {
           "Error in parameters: " . $model->build_form_error_msg($result);
     } else 
     {
-	my @arraylist = $c->req->body_params->{arrayselection};
-	for (@arraylist) {
+	my $list = $c->req->body_params->{selected};
+	for (ref $list ? @$list : $list) {
 	    my $vm = $model->vm_find($_);
 	    my $name = $vm->name; 
 	    if ( my $countstart = $model->vm_start($_) ) 
 	    {
-		#$c->flash->{response_type} = "success";
-		#$c->flash->{response_msg}  .= "$name ($_) arrancando ";
+		if ($c->flash->{response_type} ne "error") {
+		    $c->flash->{response_type} = "success";
+		}
+		$c->flash->{response_msg}  .= "$name ($_) arrancando. ";
 	    }
 	    else {
 		# FIXME response_type must be an enumerated
-		#$c->flash->{response_type} = "error";
-		#$c->flash->{response_msg}  = $model->error_msg;
+		$c->flash->{response_type} = "error";
+		$c->flash->{response_msg}  .= $model->error_msg;
 	    }
 	}
     }
@@ -105,9 +105,9 @@ sub stop_vm : Local {
    my $model = $c->model('QVD::Admin::Web');
 
     my $result = $c->form(
-        required           => ['id'],
-        constraint_methods => { 'id' => qr/^\d+$/, }
+        required           => ['selected']
     );
+
 
     if ( !$result->success ) 
     {
@@ -116,20 +116,24 @@ sub stop_vm : Local {
           "Error in parameters: " . $model->build_form_error_msg($result);
     } else 
     {
-        my $id = $c->req->body_params->{id};    # only for a POST request
-	my $vm = $model->vm_find($id );
-	my $name = $vm->name; 
-        if ( my $countstop = $model->vm_stop($id) ) 
-	{
-            $c->flash->{response_type} = "success";
-            $c->flash->{response_msg}  = "$name ($id) parando";
-        }
-        else {
+        my $list = $c->req->body_params->{selected};
+	for (ref $list ? @$list : $list) {
+	    my $vm = $model->vm_find($_);
+	    my $name = $vm->name; 
+	    if ( my $countstop = $model->vm_stop($_) ) 
+	    {
+		if ($c->flash->{response_type} ne "error") {
+			$c->flash->{response_type} = "success";
+		    }
+		$c->flash->{response_msg}  .= "$name ($_) parando. ";
+	    }
+	    else {
 
-            # FIXME response_type must be an enumerated
-            $c->flash->{response_type} = "error";
-            $c->flash->{response_msg}  = $model->error_msg;
-        }
+		# FIXME response_type must be an enumerated
+		$c->flash->{response_type} = "error";
+		$c->flash->{response_msg} .= $model->error_msg;
+	    }
+	}
     }
     #$c->forward('list');
     $c->response->redirect( $c->uri_for( $self->action_for('list') ) );
@@ -142,8 +146,7 @@ sub del : Local {
     my $model = $c->model('QVD::Admin::Web');
 
     my $result = $c->form(
-        required           => ['id'],
-        constraint_methods => { 'id' => qr/^\d+$/, }
+        required           => ['selected']
     );
 
     if ( !$result->success ) {
@@ -152,24 +155,63 @@ sub del : Local {
           "Error in parameters: " . $model->build_form_error_msg($result);
     }
     else {
-        my $id = $c->req->body_params->{id};    # only for a POST request
-	my $vm = $model->vm_find($id );
-	my $vm_name = $vm->name; 
-        if ( my $countdel = $model->vm_del($id) ) {
-            $c->flash->{response_type} = "success";
-            $c->flash->{response_msg}  = "$vm_name ($id) eliminado correctamente";
-        }
-        else {
+        my $list = $c->req->body_params->{selected};
+	for (ref $list ? @$list : $list) {
+	    my $vm = $model->vm_find($_);
+	    my $vm_name = $vm->name; 
+	    if ( my $countdel = $model->vm_del($_) ) {
+		if ($c->flash->{response_type} ne "error") {
+		    $c->flash->{response_type} = "success";
+		}
+		$c->flash->{response_msg}  .= "$vm_name ($_) eliminado correctamente. ";
+	    }
+	    else {
 
-            # FIXME response_type must be an enumerated
-            $c->flash->{response_type} = "error";
-            $c->flash->{response_msg}  = $model->error_msg;
-        }
+		# FIXME response_type must be an enumerated
+		$c->flash->{response_type} = "error";
+		$c->flash->{response_msg}  .= $model->error_msg;
+	    }
+	}
     }
 
     $c->response->redirect( $c->uri_for( $self->action_for('list') ) );
 }
 
+sub disconnect_user : Local {
+    my ( $self, $c ) = @_;
+    my $model = $c->model('QVD::Admin::Web');
+
+    my $result = $c->form(
+        required           => ['selected']
+    );
+
+    if ( !$result->success ) {
+        $c->flash->{response_type} = "error";
+        $c->flash->{response_msg} =
+          "Error in parameters: " . $model->build_form_error_msg($result);
+    }
+    else {
+        my $list = $c->req->body_params->{selected};
+	for (ref $list ? @$list : $list) {
+	    my $vm = $model->vm_find($_);
+	    my $vm_name = $vm->name; 
+	    if ( my $countdel = $model->vm_disconnect_user($_) ) {
+		if ($c->flash->{response_type} ne "error") {
+		    $c->flash->{response_type} = "success";
+		}
+		$c->flash->{response_msg}  .= "$vm_name ($_) desconectado correctamente. ";
+	    }
+	    else {
+
+		# FIXME response_type must be an enumerated
+		$c->flash->{response_type} = "error";
+		$c->flash->{response_msg}  .= $model->error_msg;
+	    }
+	}
+    }
+
+    $c->response->redirect( $c->uri_for( $self->action_for('list') ) );
+}
 
 sub _get_add_param {
     my ($self, $c, $param) = @_;

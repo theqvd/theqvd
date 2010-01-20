@@ -70,7 +70,7 @@ sub get_vms_for_user {
 }
 
 sub _load_balance_random {
-    my @hosts = rs(Host);
+    my @hosts = rs(Host)->all;
     $hosts[rand @hosts];
 }
 

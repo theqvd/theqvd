@@ -7,6 +7,18 @@ if (agree)
 else
 	return false ;
 }
+
+function on_submit()
+{
+    if (confirm_submit()) {
+      if(document.pressed == 'delete')
+      {
+	document.propos.action ="[% c.uri_for('/osi/del') %]";
+      }
+      return true;
+    }
+}
+
 </script>
 
 <h1>Imágenes</h1>
@@ -24,30 +36,23 @@ else
 
 	</form>
 </div>
+<form onSubmit="return on_submit();" method="post" name="propos" id="propos">
 [% META title = 'PropGet' -%]
 <table id="props" class="tablesorter resultset">
     <thead>
         <tr>
+	    <th />
             <th id="id"></th>
             <th id="name">Nombre</th>
             <th id="disk_image">Imagen de disco</th>
             <th id="use_overlay">Overlay</th>
             <th id="memory">Memoria</th>
-	    <th class="options">Opciones</th>
         </tr>
     </thead>
     <tbody>
         [% FOREACH osi IN osi_list -%]
         <tr id="[% osi.id %]">
-            <td><a href="[% c.uri_for('/osi/view/') %][% osi.id %]" class="option_view">[% osi.id %]</a></td>
-            <td>[% osi.name %]</td>
-            <td>[% osi.disk_image %]</td>
-	    <td>[% IF osi.use_overlay -%]<span class="option_true"></span>
-	    [% END %]
-	    </td>
-	    <td>[% osi.memory %]</td>
-			
-	    <td class="options">
+	    <td>
 		[% showdel = 1 %]
 		[% FOREACH vm IN vm_list %]
 		    [% IF vm.osi.id == osi.id %]
@@ -55,17 +60,22 @@ else
 		    [% END %]
 		[% END %]
 		[% IF showdel == 1 %]
-		  <form action="[% c.uri_for('/osi/del') %]" method="post">
-		    <input type="hidden" name="id" value="[% osi.id %]"/>
-		    <button type="submit" class="link" onClick="return confirm_submit()"><span class="option_del"></span></button>
-		  </form>
+		  <input type="checkbox" name="selected" value="[% osi.id %]">
 		[% END %]
-	    
+	    </td>	
+            <td><a href="[% c.uri_for('/osi/view/') %][% osi.id %]" class="option_view">[% osi.id %]</a></td>
+            <td>[% osi.name %]</td>
+            <td>[% osi.disk_image %]</td>
+	    <td>[% IF osi.use_overlay -%]<span class="option_true"></span>
+	    [% END %]
 	    </td>
+	    <td>[% osi.memory %]</td>
         </tr>
         [% END -%]
     </tbody>
 </table>
+<input type="submit" onClick="document.pressed='delete'" value="Eliminar"/>
+</form>
 
 <script type="text/javascript" charset="utf-8">
 $(document).ready(function() 
@@ -73,7 +83,7 @@ $(document).ready(function()
 	$("#props").tablesorter({
 	widthFixed: true,
 	headers: { 
-            5: { 
+            0: { 
                 sorter: false 
             }
 	}}); 

@@ -201,7 +201,7 @@ button.link:focus span {
 }
 
 .side_add {
-	float: left;
+/*	float: left;*/
 	padding: 5px 5px 5px 25px;
 	background-image: url(../images/icons/add.png);
 	background-repeat: no-repeat;
@@ -244,32 +244,32 @@ button.link:focus span {
 	background-position: 5px 5px;
 }
 
-.option_startvm {
-	padding: 6px 5px 5px 65px;
-	background-image: url(../images/icons/switch_off.png);
+.option_stopped {
+	padding: 5px 5px 5px 25px;
+	background-image: url(../images/icons/bullet_red.png);
 	background-repeat: no-repeat;
 	background-position: 5px 5px;
 }
 
-.option_stopvm {
-	padding: 6px 5px 5px 65px;
-	background-image: url(../images/icons/switch_on.png);
+.option_started {
+	padding: 5px 5px 5px 25px;
+	background-image: url(../images/icons/bullet_green.png);
 	background-repeat: no-repeat;
 	background-position: 5px 5px;
 }
 
 .option_failedvm {
-	padding: 6px 12px 5px 45px;
+	padding: 5px 5px 5px 25px;
 	background-image: url(../images/icons/exclamation.png);
 	background-repeat: no-repeat;
 	background-position: 5px 5px;
 }
 
 .option_waitvm {
-	padding: 5px 5px 5px 75px;
-	background-image: url(../images/icons/loading.gif);
+	padding: 5px 5px 5px 25px;
+	background-image: url(../images/icons/bullet_orange.png);
 	background-repeat: no-repeat;
-	background-position:25px -8px;
+	background-position: 5px 5px;
     }
 
 .option_true {

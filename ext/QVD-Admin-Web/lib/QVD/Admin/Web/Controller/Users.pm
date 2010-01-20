@@ -130,29 +130,31 @@ sub del : Local {
     my $model = $c->model('QVD::Admin::Web');
 
     my $result = $c->form(
-        required           => ['id'],
-        constraint_methods => { 'id' => qr/^\d+$/, }
+        required           => ['selected']
     );
-
+    
     if ( !$result->success ) {
         $c->flash->{response_type} = "error";
         $c->flash->{response_msg} =
           "Error in parameters: " . $model->build_form_error_msg($result);
     }
     else {
-        my $id    = $c->req->body_params->{id};    # only for a POST request
-        my $user  = $model->user_find($id);
-        my $login = $user->login;
-        if ( my $countdel = $model->user_del($id) ) {
-            $c->flash->{response_type} = "success";
-            $c->flash->{response_msg}  = "$login ($id) eliminado correctamente";
-        }
-        else {
+	my $list = $c->req->body_params->{selected};
+	for (ref $list ? @$list : $list) {
+       
+	    my $user  = $model->user_find($_);
+	    my $login = $user->login;
+	    if ( my $countdel = $model->user_del($_) ) {
+		$c->flash->{response_type} = "success";
+		$c->flash->{response_msg}  .= "$login ($_) eliminado correctamente. ";
+	    }
+	    else {
 
-            # FIXME response_type must be an enumerated
-            $c->flash->{response_type} = "error";
-            $c->flash->{response_msg}  = $model->error_msg;
-        }
+		# FIXME response_type must be an enumerated
+		$c->flash->{response_type} = "error";
+		$c->flash->{response_msg}  .= $model->error_msg;
+	    }
+	}
     }
 
     #$c->forward('list');

@@ -8,6 +8,32 @@ else
 	return false ;
 }
 
+
+function on_submit()
+{
+    if (confirm_submit()) {
+      if(document.pressed == 'start')
+      {
+	document.propos.action ="[% c.uri_for('/vm/start_vm') %]";
+      }
+	else
+	if(document.pressed == 'stop')
+      {
+	document.propos.action ="[% c.uri_for('/vm/stop_vm') %]";
+      } else
+	if(document.pressed == 'disconnect')
+      {
+	document.propos.action ="[% c.uri_for('/vm/disconnect_user') %]";
+      }
+	else
+	if(document.pressed == 'delete')
+      {
+	document.propos.action ="[% c.uri_for('/vm/del') %]";
+      }
+      return true;
+    }
+}
+
 </script>
 
 <h1>Máquinas virtuales</h1>
@@ -24,7 +50,7 @@ else
 
 	</form>
 </div>
-<form action="[% c.uri_for('/vm/start_vm') %]" method="post">
+<form onSubmit="return on_submit();" method="post" name="propos" id="propos">
 [% META title = 'PropGet' -%]
 <table id="props" class="tablesorter resultset">
     <thead>
@@ -35,42 +61,35 @@ else
             <th id="user">Usuario</th>
             <th id="osi">Imagen Disco</th>
 	    <th id="status">Estado</th>
-	    <th class="options">Opciones</th>
         </tr>
     </thead>
     <tbody>
         [% FOREACH vm IN vm_list -%]
         <tr>
-	    <td><input type="checkbox" name="arrayselection" value="[% vm.id %]"></td>
+	    <td><input type="checkbox" name="selected" value="[% vm.id %]"></td>
             <td><a href="[% c.uri_for('/vm/view/') %][% vm.id %]" class="option_view">[% vm.id %]</a></td>
 	    <td>[% vm.name %]</td>
-            <td>[% vm.user.login %]</td>
+            <td>[% IF vm.vm_runtime.user_state == 'connected' %]<span class="option_started"></span>[% ELSIF vm.vm_runtime.user_state == 'connecting' %]<span class="option_waitvm"></span>[% ELSE %]<span class="option_stopped"></span>[% END %][% vm.user.login %]</td>
             <td><a href="[% c.uri_for('/osi/view/') %][% vm.osi_id %]">[% vm.osi.name %]</a></td>
-	    <td>[% vm.vm_runtime.vm_state %][% IF vm.vm_runtime.vm_state == 'running' %] (<a href="[% c.uri_for('/hosts/view') %]/[% vm.vm_runtime.host.id %]">[% vm.vm_runtime.host.name %]</a>)[% END %]</td>
-	    <td class="options">
-	      [% IF vm.vm_runtime.vm_cmd == '' -%]
+	    <td>[% IF vm.vm_runtime.vm_cmd == '' -%]
 	      [% IF vm.vm_runtime.vm_state == 'stopped' -%]
-	      <span class="option_startvm"></span>
+	      <span class="option_stopped"></span>
 	      [% ELSIF vm.vm_runtime.vm_state == 'running' %]
-	      <span class="option_stopvm"></span>
+	      <span class="option_started"></span>
 	      [% ELSIF vm.vm_runtime.vm_state == 'failed' %]
 	      <span class="option_failedvm"></span>
 	      [% ELSE %]
 	      <span class="option_waitvm"></span>
 	      [% END %]
-	      [% IF vm.vm_runtime.user_state == 'connected' -%]
-	      <span class="option_disconnect"></span>
-	      </form>
-	      [% END %]
 	      [% ELSE %]    
 	      <span class="option_waitvm"></span>      
-	      [% END %]
-	    </td>
+	      [% END %][% vm.vm_runtime.vm_state %][% IF vm.vm_runtime.vm_state == 'running' %] (<a href="[% c.uri_for('/hosts/view') %]/[% vm.vm_runtime.host.id %]">[% vm.vm_runtime.host.name %]</a>)[% END %]</td>
+
         </tr>
         [% END -%]
     </tbody>
 </table>
-<input type="submit" value="Arrancar"/> <input type="submit" value="Detener"/> <input type="submit" value="Eliminar"/>
+<input type="submit" onClick="document.pressed='start'" value="Arrancar"/> <input type="submit" onClick="document.pressed='disconnect'" value="Desconectar usuario"/> <input type="submit" onClick="document.pressed='stop'" value="Detener"/> | <input type="submit" onClick="document.pressed='delete'" value="Eliminar"/>
 </form>
 <script type="text/javascript" charset="utf-8">
 $(document).ready(function() 
@@ -79,9 +98,6 @@ $(document).ready(function()
 	widthFixed: true,
 	headers: { 
             0: { 
-                sorter: false 
-            },
-	    6: { 
                 sorter: false 
             }
 	}}); 

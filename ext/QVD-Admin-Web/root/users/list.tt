@@ -7,6 +7,18 @@ if (agree)
 else
 	return false ;
 }
+
+function on_submit()
+{
+    if (confirm_submit()) {
+      if(document.pressed == 'delete')
+      {
+	document.propos.action ="[% c.uri_for('/users/del') %]";
+      }
+      return true;
+    }
+}
+
 </script>
 
 <h1>Usuarios</h1>
@@ -24,37 +36,35 @@ else
 
 	</form>
 </div>
+<form onSubmit="return on_submit();" method="post" name="propos" id="propos">
 [% META title = 'PropGet' -%]
 <table id="props" class="tablesorter resultset">
     <thead>
         <tr>
+	    <th />	
             <th id="id"></th>
             <th id="login">Nombre</th>
             <th id="department">Departamento</th>	    
 	    <!--<th id="disco">Disco</th>-->
 	    <th id="state">Estado</th>
-	    <th class="options">Opciones</th>
         </tr>
     </thead>
     <tbody>
         [% FOREACH user IN user_list -%]
         <tr id="[% user.id %]">
+	    <td><input type="checkbox" name="selected" value="[% user.id %]"></td>	
             <td><a href="[% c.uri_for('/users/view/') %][% user.id %]" class="option_view">[% user.id %]</a></td>
             <td>[% user.login %]</td>
             <td>[% user.department %]</td>	    
 	    <!--<td><img src="http://chart.apis.google.com/chart?cht=bhs&chs=50x12&chd=t:33|100&chco=4d89f9,c6d9fd" /> 4,43 GB</td>-->
 	    <td>[% connected = 0 %][% FOREACH vm IN user.vms %][% IF (vm.vm_runtime.user_state == 'connected') %][% connected = connected + 1 %][% END %][% END %] [% connected %] / [% IF (user.vms.size > 0) %][% user.vms.size %][% ELSE %]0[% END %]</td>
-	    <td class="options">
-	      <form action="[% c.uri_for('/users/del') %]" method="post">
-		<input type="hidden" name="id" value="[% user.id %]"/>
-		<button type="submit" class="link" onClick="return confirm_submit()"><span class="option_del"></span></button>
-	      </form>
-	    
-	    </td>
+
         </tr>
         [% END -%]
     </tbody>
 </table>
+<input type="submit" onClick="document.pressed='delete'" value="Eliminar"/>
+</form>
 
 <script type="text/javascript" charset="utf-8">
 $(document).ready(function() 
@@ -62,7 +72,7 @@ $(document).ready(function()
 	$("#props").tablesorter({
 	widthFixed: true,
 	headers: { 
-	    4: { 
+	    0: { 
                 sorter: false 
             }
 	}}); 

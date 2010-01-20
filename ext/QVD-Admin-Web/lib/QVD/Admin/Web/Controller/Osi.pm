@@ -126,8 +126,7 @@ sub del : Local {
     my $model = $c->model('QVD::Admin::Web');
 
     my $result = $c->form(
-        required           => ['id'],
-        constraint_methods => { 'id' => qr/^\d+$/, }
+        required           => ['selected']
     );
     
     if ( !$result->success ) {
@@ -136,19 +135,21 @@ sub del : Local {
           "Error in parameters: " . $model->build_form_error_msg($result);
     }
     else {
-        my $id      = $c->req->body_params->{id};    # only for a POST request
-        my $osi     = $model->osi_find($id);
-        my $osiname = $osi->name;
-	
-        if ( my $countdel = $model->osi_del($id) ) {
-            $c->flash->{response_type} = "success";
-            $c->flash->{response_msg} = "$osiname ($id) eliminado correctamente";
-        }
-        else {
-            # FIXME response_type must be an enumerated
-            $c->flash->{response_type} = "error";
-            $c->flash->{response_msg}  = $model->error_msg;
-        }
+	my $list = $c->req->body_params->{selected};
+	for (ref $list ? @$list : $list) {
+	    my $osi     = $model->osi_find($_);
+	    my $osiname = $osi->name;
+	    
+	    if ( my $countdel = $model->osi_del($_) ) {
+		$c->flash->{response_type} = "success";
+		$c->flash->{response_msg} .= "$osiname ($_) eliminado correctamente ";
+	    }
+	    else {
+		# FIXME response_type must be an enumerated
+		$c->flash->{response_type} = "error";
+		$c->flash->{response_msg}  .= $model->error_msg;
+	    }
+	}
     }
 
     $c->response->redirect( $c->uri_for( $self->action_for('list') ) );
