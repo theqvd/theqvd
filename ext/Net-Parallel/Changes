@@ -1,0 +1,6 @@
+Revision history for Perl extension Net::Parallel.
+
+0.01  Thu Jan 21 17:21:58 2010
+	- original version; created by h2xs 1.23 with options
+		-AXn Net::Parallel
+

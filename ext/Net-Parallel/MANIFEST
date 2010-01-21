@@ -1,0 +1,6 @@
+Changes
+Makefile.PL
+MANIFEST
+README
+t/Net-Parallel.t
+lib/Net/Parallel.pm
