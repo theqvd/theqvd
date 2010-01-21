@@ -61,9 +61,7 @@ sub _print {
 }
 
 sub _queue {
-    my $self = shift;
-    my $bout = \$self->{bout};
-    $bout .= join('', @_);
+    shift->{bout} .= join('', @_);
 }
 
 sub _send_queued {
