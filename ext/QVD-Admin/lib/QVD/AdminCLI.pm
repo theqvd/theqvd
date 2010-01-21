@@ -633,12 +633,19 @@ EOT
 sub cmd_config_ssl {
     my $self = shift;
     my %args = _split_on_equals(@_);
-    my $key = delete $args{key};
-    my $cert = delete $args{cert};
-    if (%args or !$key or !$cert) {
+    my $key_file = delete $args{key};
+    my $cert_file = delete $args{cert};
+    if (%args or !$key_file or !$cert_file) {
 	help_config_ssl;
 	exit 1;
     }
+    # FIXME: Is using File::Slurp the best way?
+    use File::Slurp; 
+    my $cert = eval { read_file($cert_file) } 
+	or die "$cert_file: Unable to read cert file: $^E";
+    my $key = eval { read_file($key_file) }  
+	or die "$key_file: Unable to read key file: $^E";
+
     $self->{admin}->cmd_config_ssl(key => $key, cert => $cert) 
 	and print "SSL certificate and private key set.\n";
 }
