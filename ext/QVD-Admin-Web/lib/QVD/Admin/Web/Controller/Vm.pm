@@ -62,6 +62,20 @@ sub list : Local {
     $c->stash->{vm_list} = $rs;
 }
 
+sub jlist : Local {
+    my ( $self, $c ) = @_;
+    my $model = $c->model('QVD::Admin::Web');
+    my $rs    = $model->vm_list("");
+    
+    my @list;
+    for (@$rs) {
+	push(@list, [$_->vm_runtime->vm_id , $_->vm_runtime->vm_state , $_->vm_runtime->vm_cmd , $_->vm_runtime->x_state , $_->vm_runtime->x_cmd , $_->vm_runtime->user_state , $_->vm_runtime->user_cmd]);
+
+    }
+    $c->stash->{vm_list} = \@list;
+    $c->stash->{current_view} = 'JSON';
+}
+
 sub start_vm : Local {
     my ( $self, $c ) = @_;
     my $model = $c->model('QVD::Admin::Web');
