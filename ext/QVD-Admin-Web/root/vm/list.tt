@@ -34,6 +34,7 @@ function on_submit()
     }
 }
 
+
 </script>
 
 <h1>Máquinas virtuales</h1>
@@ -71,7 +72,7 @@ function on_submit()
 	    <td>[% vm.name %]</td>
             <td>[% IF vm.vm_runtime.user_state == 'connected' %]<span class="option_started"></span>[% ELSIF vm.vm_runtime.user_state == 'connecting' %]<span class="option_waitvm"></span>[% ELSE %]<span class="option_stopped"></span>[% END %][% vm.user.login %]</td>
             <td><a href="[% c.uri_for('/osi/view/') %][% vm.osi_id %]">[% vm.osi.name %]</a></td>
-	    <td>[% IF vm.vm_runtime.vm_cmd == '' -%]
+	    <td id="vm_state[% vm.id %]">[% IF vm.vm_runtime.vm_cmd == '' -%]
 	      [% IF vm.vm_runtime.vm_state == 'stopped' -%]
 	      <span class="option_stopped"></span>
 	      [% ELSIF vm.vm_runtime.vm_state == 'running' %]
@@ -105,5 +106,28 @@ $(document).ready(function()
 
     } 
 );
+
+function load() {
+    $.ajax({
+	type: "POST",
+	url: "[% c.uri_for('/vm/jlist') %]",
+	dataType: "json",
+	success: function(msg){
+	    var i=0;
+	    for (i=0;i<msg.vm_list.length;i++) {
+		var s = "#vm_state" + msg.vm_list[i][0];
+		if ($(s).text() != msg.vm_list[i][1]) {
+		    $(s).effect("highlight", {}, 5000);
+		}
+		$(s).text(msg.vm_list[i][1]);
+	    }
+	    t=setTimeout("load()",1000);
+	}
+
+    });
+}
+
+load();
+
 
 </script>
