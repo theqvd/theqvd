@@ -7,14 +7,15 @@ use strict;
 use Carp;
 
 use IO::Socket::Forwarder qw(forward_sockets);
-use QVD::VMAS;
-use QVD::HTTP::StatusCodes qw(:status_codes);
-use QVD::HTTP::Headers qw(header_lookup header_eq_check);
-use QVD::URI qw(uri_query_split);
+use Log::Log4perl qw(:easy);
 use QVD::Config;
 use QVD::DB::Simple;
+use QVD::HTTP::Headers qw(header_lookup header_eq_check);
+use QVD::HTTP::StatusCodes qw(:status_codes);
+use QVD::URI qw(uri_query_split);
+use QVD::VMAS;
+use URI::Split qw(uri_split);
 
-use Log::Log4perl qw(:easy);
 Log::Log4perl::init('log4perl.conf');
 
 use parent qw(QVD::HTTPD);
@@ -23,6 +24,8 @@ sub post_configure_hook {
     my $self = shift;
     $self->set_http_request_processor(\&_connect_to_vm_processor,
 				       GET => '/qvd/connect_to_vm');
+    $self->set_http_request_processor(\&_list_of_vm_processor,
+				       GET => '/qvd/list_of_vm');
 }
 
 sub _check_abort_session {
@@ -61,9 +64,8 @@ sub _abort_session {
 }
 
 # FIXME refactor this method into smaller ones
-sub _connect_to_vm_processor {
+sub _authorize_user {
     my ($server, $method, $url, $headers) = @_;
-    my $user;
     my $authorization = header_lookup($headers, 'Authorization');
     if ($authorization =~ /^Basic (.*)$/) {
 	use MIME::Base64 'decode_base64';
@@ -72,16 +74,22 @@ sub _connect_to_vm_processor {
 					password => $user_pwd[1]});
 	if ($user_rs->count == 1) {
 	    INFO "Accepted connection from user $user_pwd[0]";
-	    $user = $user_rs->first;
+	    return $user_rs->first;
 	} else {
 	    INFO "Failed login attempt from user $user_pwd[0]";
 	    $server->send_http_error(HTTP_FORBIDDEN);
 	    return;
 	}
     } else {
-	$server->send_http_error(HTTP_UNAUTHORIZED);
+	$server->send_http_error(HTTP_UNAUTHORIZED,
+	    [ 'WWW-Authenticate: Basic realm="QVD"' ]);
 	return;
     }
+}
+
+sub _connect_to_vm_processor {
+    my ($server, $method, $url, $headers) = @_;
+    my $user = $server->_authorize_user($method, $url, $headers) or return;
     my $vm_start_timeout = cfg('vm_start_timeout');
 
     unless (header_eq_check($headers, Connection => 'Upgrade') and
@@ -90,21 +98,25 @@ sub _connect_to_vm_processor {
 	return;
     }
 
-    $server->send_http_response(HTTP_PROCESSING,
-				'X-QVD-VM-Status: Checking VM');
+    my $query = (uri_split $url)[3];
+    my %params = uri_query_split  $query;
+    my $vm_id = $params{id};
+    unless (defined $vm_id) {
+	$server->send_http_error(HTTP_UNPROCESSABLE_ENTITY);
+	return;
+    }
 
     my $vmas = QVD::VMAS->new();
-    my @vms = $vmas->get_vms_for_user($user->id);
-    # FIXME this limits number of VMs per user to 1
-    my $vm = $vms[0];
+    my $vm = $vmas->get_vm_runtime_for_vm_id($vm_id);
 
-    unless (defined $vm) {
-	INFO "User " . $user->id . " does not have any virtual machine";
-	# FIXME handle this situation in a better way, for instance:
-	# - allow automatic provisioning
-	# - report the problem to the client
-	die;
+    if ($vm->rel_vm_id->user_id == $user->id) {
+	$server->send_http_response(HTTP_PROCESSING,
+	    'X-QVD-VM-Status: Checking VM');
+    } else { 
+	$server->send_http_error(HTTP_NOT_FOUND);
+	return;
     }
+
     # transición disconnected -> connected
     _connect_session($vmas, $vm);
 
@@ -249,6 +261,36 @@ sub _connect_session {
 	sleep 5;
     }
 }
+
+sub _list_of_vm_processor {
+    my ($server, $method, $url, $headers) = @_;
+    my $user = $server->_authorize_user($method, $url, $headers) or return;
+
+    my $vmas = QVD::VMAS->new();
+    my @vms = $vmas->get_vms_for_user($user->id);
+
+    unless (@vms) {
+	INFO "User " . $user->id . " does not have any virtual machine";
+	# FIXME handle this situation in a better way, for instance:
+	# - allow automatic provisioning
+	# - report the problem to the client
+	die;
+    }
+
+    my @vm_data = map { 
+	{
+	    id => $_->vm_id,
+	    state => $_->vm_state,
+	    name => $_->rel_vm_id->name
+	}
+    } @vms;
+
+    $server->send_http_response_with_body(
+	HTTP_OK, 'application/json', [],
+	$server->json->encode(\@vm_data)
+    );
+}
+
 
 1;
 

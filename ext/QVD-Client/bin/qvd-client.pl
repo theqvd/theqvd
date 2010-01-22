@@ -4,6 +4,7 @@ use strict;
 use warnings;
 
 use QVD::HTTPC;
+use QVD::HTTP::Headers qw(header_lookup header_eq_check);
 use QVD::HTTP::StatusCodes qw(:status_codes);
 use IO::Socket::Forwarder qw(forward_sockets);
 use MIME::Base64 qw(encode_base64);
@@ -11,6 +12,7 @@ use MIME::Base64 qw(encode_base64);
 # Forces a flush
 $| = 1;
 
+my $vm_id;
 my $username = shift @ARGV;
 my $password = shift @ARGV;
 my $host = shift @ARGV;
@@ -23,7 +25,18 @@ my $ssl = ($port =~ /43$/ ? 1 : undef);
 
 my $httpc = QVD::HTTPC->new($host.":".$port, SSL => $ssl);
 
-$httpc->send_http_request(GET => '/qvd/connect_to_vm',
+$httpc->send_http_request(GET => '/qvd/list_of_vm',
+			  headers => [ 'Accept: application/json',
+			  	       'Authorization: '.$authorization ]);
+my ($code, $msg, $headers, $body) = $httpc->read_http_response;
+if ($code != HTTP_OK) {
+   die "Unable to get list of vm";
+} 
+my $json_body = $httpc->json->decode($body);
+print "Connecting to ".$json_body->[0]{name}."\n";
+$vm_id = $json_body->[0]{id};
+
+$httpc->send_http_request(GET => '/qvd/connect_to_vm?id='.$vm_id,
 			  headers => [ 'Connection: Upgrade',
 			  	       'Authorization: '.$authorization,
 				       'Upgrade: QVD/1.0' ]);
@@ -36,6 +49,10 @@ while (1) {
 				       ReuseAddr => 1,
 				       Listen => 1);
 
+	# FIXME NX_CLIENT is used for showing the user information on things
+	# like broken connection, perhaps we should show them to the user
+	# instead of ignoring them? 
+	$ENV{NX_CLIENT} = '/bin/false';
 	# XXX: make media port configurable (4713 for pulseaudio)
 	system "nxproxy -S localhost:40 media=4713 &";
 	my $s1 = $ll->accept()
