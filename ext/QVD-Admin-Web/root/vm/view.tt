@@ -47,7 +47,7 @@ function vnc() {
 
 </script>
 
-[% IF vm.vm_runtime.vm_state == 'running' %]
+[% IF vm.vm_runtime.vm_state == 'running' OR vm.vm_runtime.vm_state == 'starting'  OR vm.vm_runtime.vm_state == 'stopping' %]
 
 <h2>Administración remota</h2>
 <ul class="intermenu">
