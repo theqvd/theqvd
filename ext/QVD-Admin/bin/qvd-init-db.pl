@@ -5,6 +5,7 @@ use warnings;
 use QVD::Admin;
 use QVD::DB::Simple;
 use Sys::Hostname;
+use File::Slurp;
 
 db->erase;
 db->deploy;
@@ -49,5 +50,6 @@ $admin->cmd_vm_add(name => 'Test VM 1',
 	      user => 'qvd',
 	      ip => '',
 	      );
-$admin->cmd_config_ssl(key => 'certs/server-key.pem',
-		    cert => 'certs/server-cert.pem');
+
+$admin->cmd_config_ssl(key => scalar read_file('certs/server-key.pem'),
+		    cert => scalar read_file('certs/server-cert.pem'));
