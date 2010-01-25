@@ -4,29 +4,63 @@ our $VERSION = '0.01';
 
 use strict;
 use warnings;
+use Carp;
+use Time::Hires qw(time);
 
 use Net::Parallel::Constants;
 
 sub new {
     my ($class, %opts) = @_;
     my $self = { opts => \%opts,
-		 children => {} };
+                 sockets => {} };
     bless $self, $class;
     $self;
 }
 
 sub register {
     my ($self, $id, $child) = @_;
-    $self->{children}{$id} = $child;
+    $self->{sockets}{$id} = $child;
 }
 
 sub unregister {
     my ($self, $id) = @_;
-    delete $self->{children}{$id};
+    delete $self->{sockets}{$id};
 }
 
 sub run {
     my ($self, %opts) = @_;
+
+    my $time = delete $opts{time};
+
+    my @s = values %{$self->{sockets}};
+    my @fn = map fileno($_), @s;
+    my $start = time
+    while (1) {
+        my $delta = time - $start;
+        if ($delta < $time) {
+            # set error
+            last;
+        }
+        my $rv = '';
+        my $wv = '';
+
+        
+
+        vec($rv, $fn[$_], 1) = 1 for grep $s[$_]->wants_to_read, 0..$#s;
+        vec($wv, $fn[$_], 1) = 1 for grep $s[$_]->wants_to_write, 0..$#s;
+        my $n = select ($rv, $wv, undef, $delta);
+        if (defined $n and $n > 0) {
+            for (0..$#s) {
+                my $fn = $fn[$_];
+                my $s = $s[$_];
+                if (vec($rv, $fn, 1)) {
+                    $s->do_read;
+                }
+                if (vec($wv, $fn, 1)) {
+                    $s->do_write;
+                }
+            }
+        }
 }
 
 

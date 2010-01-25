@@ -9,22 +9,24 @@ sub reset {
     my $self = shift;
     $self->{input} = '';
     $self->{output} = '';
-    $self->{sock} = undef;
     $self->{error} = NETPAR_OK;
+    $self->{done} = undef;
 }
 
 sub new {
     my ($class, %opts) = @_;
 
-    my $id = delete $opts{Id};
-    my $sock_class = delete $opts{SockClass};
-    my $sock_opts = delete $opts{SockOpts};
-    my %sock_opts = (defined $sock_opts ? %$sock_opts : ());
+    my $id = delete $opts{id};
+    my $sock = delete $opts{sock};
+    my $sock_class = delete $opts{sock_class} // "IO::Socket::INET";
+    my %sock_opts = %{ delete $opts{sock_opts} // {} };
     %opts and croak "Unsupported option(s) ", join(", ", keys %opts), "found";
 
     my $self = { sock_opts => \%sock_opts,
 		 sock_class => $sock_class,
-		 id => $id };
+		 id => $id,
+                 sock => $sock
+               };
     bless $self, $class;
     $self->reset;
     $self;
@@ -42,9 +44,9 @@ sub connect {
     $self->{sock} //= $self->{$sock_class}->new(%{$self->{sock_opts}});
 }
 
+sub wants_to_read { 1 }
 
-
-sub want_to_read
+sub wants_to_write { lengt
 
 sub run {
     my $self = shift;
