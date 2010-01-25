@@ -7,46 +7,50 @@ use Net::Parallel::Constants qw(:error);
 
 sub reset {
     my $self = shift;
-    $self->{input} = '';
-    $self->{output} = '';
-    $self->{error} = NETPAR_OK;
-    $self->{done} = undef;
+    $self->{_nps_input} = '';
+    $self->{_nps_output} = '';
+    $self->{_nps_error} = NETPAR_OK;
+    undef $self->{_nps_closed}
 }
 
 sub new {
-    my ($class, %opts) = @_;
-
-    my $id = delete $opts{id};
-    my $sock = delete $opts{sock};
-    my $sock_class = delete $opts{sock_class} // "IO::Socket::INET";
-    my %sock_opts = %{ delete $opts{sock_opts} // {} };
-    %opts and croak "Unsupported option(s) ", join(", ", keys %opts), "found";
-
-    my $self = { sock_opts => \%sock_opts,
-		 sock_class => $sock_class,
-		 id => $id,
-                 sock => $sock
-               };
+    my ($class, $sock) = @_;
+    my $self = { _nps_sock => $sock };
     bless $self, $class;
     $self->reset;
     $self;
 }
 
-sub append_input { shift->{input} .= join('', @_);
-}
+sub append_input { shift->{_nps_input} .= join('', @_) }
 
-sub output { shift->{output} }
+sub output { shift->{_nps_output} }
 
-sub sock { shift->{sock} }
+sub sock { shift->{_nps_sock} }
 
-sub connect {
+sub _nps_wants_to_read { 1 }
+
+sub _nps_wants_to_write { length shift->{_nps_input} }
+
+sub _nps_done { shift->{_nps_closed} }
+
+sub _nps_do_read {
     my $self = shift;
-    $self->{sock} //= $self->{$sock_class}->new(%{$self->{sock_opts}});
+    my $bout = \$self->{_nps_output};
+    my $bytes = sysread($self->{_nps_sock}, $$bout, 16*1024, length $$bout);
+    $self->{_nps_closed} = 1 if (not $bytes and (defined $bytes or $! != Errno::EINTR));
 }
 
-sub wants_to_read { 1 }
-
-sub wants_to_write { lengt
+sub _nps_do_write {
+    my $self = shift;
+    my $bin = \$self->{_nps_input};
+    my $bytes = syswrite($self->{_nps_sock}, $$bout, 16*1024);
+    if ($bytes) {
+        substr($$bout, 0, $bytes, "");
+    }
+    else {
+        $self->{_nps_closed} = 1 if (defined $bytes or $! != Errno::EINTR);
+    }
+}
 
 sub run {
     my $self = shift;
