@@ -8,6 +8,7 @@ use QVD::HTTP::Headers qw(header_lookup header_eq_check);
 use QVD::HTTP::StatusCodes qw(:status_codes);
 use IO::Socket::Forwarder qw(forward_sockets);
 use MIME::Base64 qw(encode_base64);
+use JSON;
 
 # Forces a flush
 $| = 1;
@@ -24,6 +25,7 @@ my $authorization = 'Basic '.encode_base64("$username:$password", '');
 my $ssl = ($port =~ /43$/ ? 1 : undef);
 
 my $httpc = QVD::HTTPC->new($host.":".$port, SSL => $ssl);
+my $json = JSON->new->ascii->pretty;
 
 $httpc->send_http_request(GET => '/qvd/list_of_vm',
 			  headers => [ 'Accept: application/json',
@@ -32,7 +34,7 @@ my ($code, $msg, $headers, $body) = $httpc->read_http_response;
 if ($code != HTTP_OK) {
    die "Unable to get list of vm";
 } 
-my $json_body = $httpc->json->decode($body);
+my $json_body = $json->decode($body);
 print "Connecting to ".$json_body->[0]{name}."\n";
 $vm_id = $json_body->[0]{id};
 
