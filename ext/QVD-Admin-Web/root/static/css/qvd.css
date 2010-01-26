@@ -244,28 +244,28 @@ button.link:focus span {
 	background-position: 5px 5px;
 }
 
-.option_stopped {
+.option_stopped, .option_user_disconnected {
 	padding: 5px 5px 5px 25px;
 	background-image: url(../images/icons/bullet_red.png);
 	background-repeat: no-repeat;
 	background-position: 5px 5px;
 }
 
-.option_started, .option_running {
+.option_started, .option_running, .option_user_connected {
 	padding: 5px 5px 5px 25px;
 	background-image: url(../images/icons/bullet_green.png);
 	background-repeat: no-repeat;
 	background-position: 5px 5px;
 }
 
-.option_failedvm {
+.option_failedvm, .option_failed {
 	padding: 5px 5px 5px 25px;
-	background-image: url(../images/icons/exclamation.png);
+	background-image: url(../images/icons/error.png);
 	background-repeat: no-repeat;
 	background-position: 5px 5px;
 }
 
-.option_waitvm, .option_starting, .option_stopping {
+.option_waitvm, .option_starting, .option_stopping, .option_user_connecting {
 	padding: 5px 5px 5px 25px;
 	background-image: url(../images/icons/bullet_orange.png);
 	background-repeat: no-repeat;
