@@ -72,19 +72,10 @@ function on_submit()
 	    <td>[% vm.name %]</td>
             <td>[% IF vm.vm_runtime.user_state == 'connected' %]<span class="option_started"></span>[% ELSIF vm.vm_runtime.user_state == 'connecting' %]<span class="option_waitvm"></span>[% ELSE %]<span class="option_stopped"></span>[% END %][% vm.user.login %]</td>
             <td><a href="[% c.uri_for('/osi/view/') %][% vm.osi_id %]">[% vm.osi.name %]</a></td>
-	    <td id="vm_state[% vm.id %]">[% IF vm.vm_runtime.vm_cmd == '' -%]
-	      [% IF vm.vm_runtime.vm_state == 'stopped' -%]
-	      <span class="option_stopped"></span>
-	      [% ELSIF vm.vm_runtime.vm_state == 'running' %]
-	      <span class="option_started"></span>
-	      [% ELSIF vm.vm_runtime.vm_state == 'failed' %]
-	      <span class="option_failedvm"></span>
-	      [% ELSE %]
-	      <span class="option_waitvm"></span>
-	      [% END %]
-	      [% ELSE %]    
-	      <span class="option_waitvm"></span>      
-	      [% END %]<span id="vm_statetext[% vm.id %]">[% vm.vm_runtime.vm_state %][% IF vm.vm_runtime.vm_state == 'running' %] (<a href="[% c.uri_for('/hosts/view') %]/[% vm.vm_runtime.host.id %]">[% vm.vm_runtime.host.name %]</a>)[% END %]</span></td>
+	    <td id="vm_state[% vm.id %]">
+		<span id="vm_statebullet[% vm.id %]" class="option_[% vm.vm_runtime.vm_state %]"></span>
+		<span id="vm_statetext[% vm.id %]">[% vm.vm_runtime.vm_state %]</span>
+	    </td>
 
         </tr>
         [% END -%]
@@ -117,9 +108,12 @@ function load() {
 	    for (i=0;i<msg.vm_list.length;i++) {
 		var s = "#vm_state" + msg.vm_list[i][0];
 		var r = "#vm_statetext" + msg.vm_list[i][0];
+		var x = "#vm_statebullet" + msg.vm_list[i][0];
 		if ($(r).text() != msg.vm_list[i][1]) {
 		    $(s).effect("highlight", {color:"#FF8D13"}, 4000);
 		    $(r).text(msg.vm_list[i][1]);
+		    $(x).removeClass();    
+		    $(x).addClass("option_" + msg.vm_list[i][1]);
 		}
 	    }
 	    t=setTimeout("load()",4000);

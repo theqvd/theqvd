@@ -251,7 +251,7 @@ button.link:focus span {
 	background-position: 5px 5px;
 }
 
-.option_started {
+.option_started, .option_running {
 	padding: 5px 5px 5px 25px;
 	background-image: url(../images/icons/bullet_green.png);
 	background-repeat: no-repeat;
@@ -265,7 +265,7 @@ button.link:focus span {
 	background-position: 5px 5px;
 }
 
-.option_waitvm {
+.option_waitvm, .option_starting, .option_stopping {
 	padding: 5px 5px 5px 25px;
 	background-image: url(../images/icons/bullet_orange.png);
 	background-repeat: no-repeat;
