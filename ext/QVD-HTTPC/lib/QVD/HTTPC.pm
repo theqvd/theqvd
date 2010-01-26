@@ -238,29 +238,6 @@ sub make_http_request {
     $self->read_http_response;
 }
 
-sub json {
-    my $self = shift;
-    $self->{_json} ||= do {
-	require JSON;
-	JSON->new->ascii->pretty;
-    }
-}
-
-sub read_http_response_json {
-    my $self = shift;
-    my ($code, $msg, $headers, $body) = $self->read_http_response;
-    my $data;
-    $data = $self->json->decode($body)
-	if defined $body;
-    ($code, $msg, $headers, $data);
-}
-
-sub make_http_query_json {
-    my $self = shift;
-    $self->send_http_query_json(@_);
-    $self->read_http_response_json();
-}
-
 1;
 
 __END__
@@ -276,15 +253,9 @@ QVD::HTTPC - QVD HTTP client package
     my $client = QVD::HTTPC->new("www.qvd.org:3333");
 
     my ($code, $msg, $headers, $data) =
-        $client->make_http_query_json(GET => '/where_is_my_car',
-                                      maker => 'Volkswagen',
-                                      color => 'red',
-                                      model => 'Polo');
+        $client->make_http_query(GET => '/where_is_my_car');
 
-    if (defined $data) {
-        print Dumper $data;
-    }
-
+    defined $data and print $data;
 
 =head1 DESCRIPTION
 
@@ -353,8 +324,8 @@ Salvador FandiE<ntilde>o (sfandino@yahoo.com).
 
 =head1 COPYRIGHT & LICENSE
 
-Copyright C<copy> 2009 Qindel Formacion y Servicios S.L., all rights
-reserved.
+Copyright C<copy> 2009, 2010 Qindel Formacion y Servicios S.L., all
+rights reserved.
 
 This program is free software; you can redistribute it and/or modify it
 under the same terms as Perl itself.
