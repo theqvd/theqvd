@@ -265,12 +265,19 @@ button.link:focus span {
 	background-position: 5px 5px;
 }
 
-.option_waitvm, .option_starting, .option_stopping, .option_user_connecting {
+.option_waitvm, .option_user_connecting {
 	padding: 5px 5px 5px 25px;
 	background-image: url(../images/icons/bullet_orange.png);
 	background-repeat: no-repeat;
 	background-position: 5px 5px;
-    }
+}
+
+.option_starting, .option_stopping {
+	padding: 5px 5px 5px 25px;
+	background-image: url(../images/icons/ajaxloading.gif);
+	background-repeat: no-repeat;
+	background-position: 5px 8px;
+}
 
 .option_true {
 	padding: 5px 5px 5px 25px;
