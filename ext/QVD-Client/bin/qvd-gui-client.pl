@@ -22,11 +22,8 @@ use strict;
 
 my $EVT_LIST_OF_VM_LOADED :shared = Wx::NewEventType;
 my $EVT_CONNECTION_ERROR :shared = Wx::NewEventType;
-my $EVT_CONNECTING_TO_VM :shared = Wx::NewEventType;
-my $EVT_CONNECTED_TO_VM :shared = Wx::NewEventType;
-my $EVT_CONNECTION_CLOSED :shared = Wx::NewEventType;
+my $EVT_CONN_STATUS :shared = Wx::NewEventType;
 
-my $httpc_thread_lock :shared;
 my $vm_id :shared;
 
 sub new {
@@ -113,9 +110,7 @@ sub new {
 
 	Wx::Event::EVT_COMMAND($self, -1, $EVT_CONNECTION_ERROR, \&OnConnectionError);
 	Wx::Event::EVT_COMMAND($self, -1, $EVT_LIST_OF_VM_LOADED, \&OnListOfVMLoaded);
-	Wx::Event::EVT_COMMAND($self, -1, $EVT_CONNECTING_TO_VM, \&OnConnectingToVM);
-	Wx::Event::EVT_COMMAND($self, -1, $EVT_CONNECTED_TO_VM, \&OnConnectedToVM);
-	Wx::Event::EVT_COMMAND($self, -1, $EVT_CONNECTION_CLOSED, \&OnConnectionClosed);
+	Wx::Event::EVT_COMMAND($self, -1, $EVT_CONN_STATUS, \&OnConnectionStatusChanged);
 
 	$self->{timer} = Wx::Timer->new($self);
 	$self->{proc} = undef;
@@ -128,24 +123,9 @@ sub new {
 sub OnClickConnect {
     my( $self, $event ) = @_;
     $self->{state} = "";
-    #$self->{$_}->SetEnabled(0) for (qw(username password host));
-
-    #my @cmd = (qw(perl -Mlib::glob=*/lib QVD-Client/bin/qvd-client.pl),
-    #           map $self->{$_}->GetValue, qw(username password host));
-
-    ## FIXME, properly escape arguments.  We don't want the user to
-    ## write ";rm -Rf ~/" on some field and get it executed by the
-    ## shell!
-    ## Does Wx support something execve(2) alike?
-    #my $cmd = join(" ", @cmd);
-    #print STDERR "running cmd: $cmd\n";
-    #$self->{proc} = Wx::Process::Open($cmd);
-    #$self->{proc}->Redirect;
-    #$self->{proc_pid} = $self->{proc}->GetPid;
-
     my ($host, $user, $passwd) = map { $self->{$_}->GetValue } qw(host username password);
     @_ = ();
-    $self->{httpc_thread} = threads->create(\&GetListOfVM, $self, $host, $user, $passwd);
+    $self->{httpc_thread} = threads->create(\&ConnectToVM, $self, $host, $user, $passwd);
 }
 
 sub _shared_clone {
@@ -165,7 +145,7 @@ sub _shared_clone {
     }
 }
 
-sub GetListOfVM {
+sub ConnectToVM {
     my ($self, $host, $user, $passwd) = @_;
     my $port = 8443;
 
@@ -199,14 +179,16 @@ sub GetListOfVM {
     my $json = JSON->new->ascii->pretty;
     my $vm_data :shared = $self->_shared_clone($json->decode($body));
 
-    {
-	lock($httpc_thread_lock);
+    if (@$vm_data > 1) {
+	lock($vm_id);
 	my $evt = new Wx::PlThreadEvent(-1, $EVT_LIST_OF_VM_LOADED, $vm_data);
 	Wx::PostEvent($self, $evt);
-	cond_wait($httpc_thread_lock);
+	cond_wait($vm_id);
+    } else {
+	$vm_id = $vm_data->[0]{id};
     }
 
-    Wx::PostEvent($self, new Wx::PlThreadEvent(-1, $EVT_CONNECTING_TO_VM, ''));
+    Wx::PostEvent($self, new Wx::PlThreadEvent(-1, $EVT_CONN_STATUS, 'CONNECTING'));
 
     $httpc->send_http_request(GET => '/qvd/connect_to_vm?id='.$vm_id,
 	headers => [
@@ -218,7 +200,7 @@ sub GetListOfVM {
     while (1) {
 	my ($code, $msg, $headers, $body) = $httpc->read_http_response;
 	if ($code == HTTP_SWITCHING_PROTOCOLS) {
-	    Wx::PostEvent($self, new Wx::PlThreadEvent(-1, $EVT_CONNECTED_TO_VM, ''));
+	    Wx::PostEvent($self, new Wx::PlThreadEvent(-1, $EVT_CONN_STATUS, 'CONNECTED'));
 	    my $ll = IO::Socket::INET->new(LocalPort => 4040,
 		ReuseAddr => 1,
 		Listen => 1);
@@ -246,7 +228,7 @@ sub GetListOfVM {
 	    return;
 	}
     }
-    Wx::PostEvent($self, new Wx::PlThreadEvent(-1, $EVT_CONNECTION_CLOSED, ''));
+    Wx::PostEvent($self, new Wx::PlThreadEvent(-1, $EVT_CONN_STATUS, 'CLOSED'));
 }
 
 sub OnConnectionError {
@@ -261,7 +243,7 @@ sub OnListOfVMLoaded {
     my ($self, $event) = @_;
     my $vm_data = $event->GetData;
     {
-	lock($httpc_thread_lock);
+	lock($vm_id);
 	my $dialog = new Wx::SingleChoiceDialog(
 	    $self, 
 	    "Seleccionar máquina virtual:", 
@@ -272,55 +254,30 @@ sub OnListOfVMLoaded {
 	$dialog->ShowModal();
 	$vm_id = $dialog->GetSelectionClientData();
 
-	cond_signal($httpc_thread_lock);
+	cond_signal($vm_id);
     }
 }
 
-sub OnConnectingToVM {
-    my ($self, $event) = @_;
-    $self->{timer}->Start(100, 0);
-}
 
-sub OnConnectedToVM {
+sub OnConnectionStatusChanged {
     my ($self, $event) = @_;
-    $self->{timer}->Stop();
-    $self->Hide();
-}
-
-sub OnConnectionClosed {
-    my ($self, $event) = @_;
-    $self->{progress_bar}->SetValue(0);
-    $self->{progress_bar}->SetRange(100);
-    $self->Show;
+    my $status = $event->GetData();
+    if ($status eq 'CONNECTING') {
+	$self->{timer}->Start(50, 0);
+    } elsif ($status eq 'CONNECTED') {
+	$self->{timer}->Stop();
+	$self->Hide();
+    } elsif ($status eq 'CLOSED') {
+	$self->{httpc_thread}->join();
+	$self->{progress_bar}->SetValue(0);
+	$self->{progress_bar}->SetRange(100);
+	$self->Show;
+    }
 }
 
 sub OnTimer {
     my $self = shift;
     $self->{progress_bar}->Pulse;
-    #if (Wx::Process::Exists($self->{proc_pid})) {
-    #    while ($self->{proc}->IsInputAvailable) {
-    #        my $response = "";
-    #        my $bytesread = $self->{proc}->GetInputStream->read($response, 1000,0);
-    #        if (defined ($bytesread) and ($bytesread != 0)) {
-    #    	print STDERR $response;
-    #    	$self->{log} .= $response;
-    #    	for (reverse split /\r?\n/, $self->{log}) {
-    #    	    if (my ($status) = m/X-QVD-VM-Status:(.*)/) {
-    #    		print "Status: $status\n";
-    #    		$self->Hide if $status =~ /\bConnected\b/;
-    #    		last;
-    #    	    }
-    #    	}
-    #        }
-    #    }
-    #} else {
-    #    print STDERR "child exited\n";
-    #    $self->{timer}->Stop;
-    #    $self->{progress_bar}->SetValue(0);
-    #    $self->{progress_bar}->SetRange(100);
-    #    $self->{$_}->SetEditable(1) for (qw(username password host));
-    #    $self->Show;
-    #}
 }
 
 
