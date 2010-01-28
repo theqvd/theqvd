@@ -4,6 +4,7 @@ use warnings;
 use strict;
 
 use QVD::Admin;
+use Text::Table;
 
 sub new {
     my $class = shift;
@@ -57,21 +58,34 @@ sub _print_header {
     print join("\t", map { s/./-/g; $_ } @titles)."\n";
 }
 
+sub _print_table {
+    my ($header, $body) = @_;
+    
+    my $tb = Text::Table->new(@$header);
+    $tb->load(@$body);
+    
+    print $tb->title;
+    print $tb->rule( '-', '+');
+    print $tb->body;
+}
+
 sub cmd_host_list {
     my ($self, @args) = @_;
-    _print_header "Id", "Name", "Address ","HKD", "VMs assigned"
-	    unless $self->{quiet};
 
     my $rs = $self->get_resultset('host');
+    my @header = ("Id", "Name", "Address ","HKD", "VMs assigned");
+    my @body;
+
+    
     while (my $host = $rs->next) {
-	# FIXME proper formatting
 	my $hkd_ts = defined $host->runtime ? $host->runtime->hkd_ok_ts : undef;
 	my $mins = defined $hkd_ts ? _format_timespan(time - $hkd_ts) : '-';
-	print join "\t", $host->id, $host->name, $host->address, $mins,
-			    $host->vms->count;
-	print "\n";
-
+	my @row = ($host->id, $host->name, $host->address, $mins,
+			    $host->vms->count);
+	push(@body, \@row);
     }
+    
+    _print_table(\@header, \@body) unless $self->{quiet};
 }
 
 sub help_host_list {
@@ -89,13 +103,16 @@ EOT
 
 sub cmd_user_list {
     my ($self, @args) = @_;
-    _print_header qw(Id Login Department Telephone Email)
-	unless $self->{quiet};
     my $rs = $self->get_resultset('user');
+    my @header = qw(Id Login Department Telephone Email);
+    my @body;
     while (my $user = $rs->next) {
-	print join("\t", map {$user->$_ // '-'} 
-		    qw(id login department telephone email)), "\n";
+	my @row = map {$user->$_ // '-'} 
+		    qw(id login department telephone email);
+	push(@body, \@row);
     }
+    
+    _print_table(\@header, \@body) unless $self->{quiet};
 }
 
 sub help_user_list {
@@ -114,19 +131,21 @@ EOT
 
 sub cmd_vm_list {
     my ($self, @args) = @_;
-    _print_header "Id","Name","User","Host","State","UserState" unless $self->{quiet};
     my $rs = $self->get_resultset('vm');
+    my @header = ("Id","Name","User","Host","State","UserState");
+    my @body;
     while (my $vm = $rs->next) {
 	my $vmr = $vm->vm_runtime;
-	print(join("\t",
-		   map { $_ // '-' } ( $vm->id,
+	my @row = map { $_ // '-' } ( $vm->id,
 				       $vm->name,
 				       $vm->user->login,
 				       defined $vmr->host ? $vmr->host->name : undef,
 				       $vmr->vm_state,
-				       $vmr->user_state )),
-	      "\n");
+				       $vmr->user_state );
+	push(@body, \@row);
     }
+    
+    _print_table(\@header, \@body) unless $self->{quiet};
 }
 
 sub help_vm_list {
@@ -200,15 +219,15 @@ EOT
 
 sub cmd_osi_list {
     my ($self, @args) = @_;
-    _print_header qw(Id Name RAM UserHD Image)
-	unless $self->{quiet};
-    my $rs = $self->get_resultset('osi');
+    my $rs = $self->get_resultset('osi');   
+    my @header = qw(Id Name RAM UserHD Image);
+    my @body;
     while (my $osi = $rs->next) {
-	print(join("\t",
-		   map { defined($_) ? $_ : '-' }
-		   map { $osi->$_ } qw(id name memory user_storage_size disk_image)),
-	      "\n");
+	my @row = map { defined($_) ? $_ : '-' } map { $osi->$_ } qw(id name memory user_storage_size disk_image);
+	push(@body, \@row);
     }
+    
+    _print_table(\@header, \@body) unless $self->{quiet};
 }
 
 sub help_osi_list {
