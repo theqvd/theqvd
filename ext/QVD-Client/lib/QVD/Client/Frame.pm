@@ -26,8 +26,6 @@ sub new {
 	$size   = wxDefaultSize      unless defined $size;
 	$name   = ""                 unless defined $name;
 
-# begin wxGlade: MyFrame::new
-
 	$style = wxICONIZE|wxCAPTION|wxMINIMIZE|wxCLOSE_BOX
 		unless defined $style;
 
@@ -38,7 +36,6 @@ sub new {
 						    wxTAB_TRAVERSAL );
 
 	my $ver_sizer  = Wx::BoxSizer->new(wxVERTICAL);
-	# $self->SetSizer($ver_sizer);
 
 	# FIXME Hardcoded path!
 	# logo image
@@ -89,7 +86,6 @@ sub new {
 	$icon->CopyFromBitmap(Wx::Bitmap->new("QVD-Client/bin/qvd.xpm", wxBITMAP_TYPE_ANY));
 	$self->SetIcon($icon);
 
-	# $panel->SetAutoLayout(1);
 	$panel->SetSizer($ver_sizer);
 
 	$ver_sizer->Fit($self);
@@ -143,6 +139,7 @@ sub ConnectToVM {
     use MIME::Base64 qw(encode_base64);
     my $auth = encode_base64("$user:$passwd", '');
 
+    Wx::PostEvent($self, new Wx::PlThreadEvent(-1, $EVT_CONN_STATUS, 'CONNECTING'));
     my $httpc = eval { new QVD::HTTPC("$host:$port", SSL => 1) };
     if ($@) {
 	my $message :shared = $@;
@@ -158,8 +155,6 @@ sub ConnectToVM {
 	]);
 
     my ($code, $msg, $response_headers, $body) = $httpc->read_http_response();
-    use Data::Dumper;
-    print Dumper [$code, $msg, $response_headers, $body];
     if ($code != HTTP_OK) {
 	my $message :shared = "$host replied with $msg";
 	my $evt = new Wx::PlThreadEvent(-1, $EVT_CONNECTION_ERROR, $message);
@@ -178,8 +173,6 @@ sub ConnectToVM {
     } else {
 	$vm_id = $vm_data->[0]{id};
     }
-
-    Wx::PostEvent($self, new Wx::PlThreadEvent(-1, $EVT_CONN_STATUS, 'CONNECTING'));
 
     $httpc->send_http_request(GET => '/qvd/connect_to_vm?id='.$vm_id,
 	headers => [
@@ -224,6 +217,9 @@ sub ConnectToVM {
 
 sub OnConnectionError {
     my ($self, $event) = @_;
+    $self->{timer}->Stop();
+    $self->{progress_bar}->SetValue(0);
+    $self->{progress_bar}->SetRange(100);
     my $message = $event->GetData;
     new Wx::MessageDialog($self, $message, "Error de conexión",
 			    wxOK | wxICON_ERROR)->ShowModal;
@@ -242,8 +238,10 @@ sub OnListOfVMLoaded {
 	    [map { $_->{name} } @$vm_data],
 	    [map { $_->{id} } @$vm_data]
 	);
+	$self->{timer}->Stop();
 	$dialog->ShowModal();
 	$vm_id = $dialog->GetSelectionClientData();
+	$self->{timer}->Start();
 
 	cond_signal($vm_id);
     }
@@ -257,11 +255,11 @@ sub OnConnectionStatusChanged {
 	$self->{timer}->Start(50, 0);
     } elsif ($status eq 'CONNECTED') {
 	$self->{timer}->Stop();
+	$self->{progress_bar}->SetValue(0);
+	$self->{progress_bar}->SetRange(100);
 	$self->Hide();
     } elsif ($status eq 'CLOSED') {
 	$self->{httpc_thread}->join();
-	$self->{progress_bar}->SetValue(0);
-	$self->{progress_bar}->SetRange(100);
 	$self->Show;
     }
 }
@@ -270,5 +268,6 @@ sub OnTimer {
     my $self = shift;
     $self->{progress_bar}->Pulse;
 }
+
 
 1;
