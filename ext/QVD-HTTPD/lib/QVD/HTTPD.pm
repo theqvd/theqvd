@@ -143,9 +143,9 @@ sub send_http_response_with_body {
 }
 
 sub send_http_error {
-    my ($self, $code) = @_;
+    my ($self, $code, $text) = @_;
     $code ||= HTTP_INTERNAL_SERVER_ERROR;
-    my $text = http_status_description($code);
+    $text ||= http_status_description($code);
     $self->send_http_response_with_body($code, 'text/plain', $text);
 }
 
