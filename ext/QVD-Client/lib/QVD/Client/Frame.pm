@@ -17,6 +17,8 @@ my $EVT_CONN_STATUS :shared = Wx::NewEventType;
 
 my $vm_id :shared;
 
+my $DEFAULT_PORT = 8443;
+
 sub new {
 	my( $class, $parent, $id, $title, $pos, $size, $style, $name ) = @_;
 	$parent = undef              unless defined $parent;
@@ -111,8 +113,9 @@ sub OnClickConnect {
     my( $self, $event ) = @_;
     $self->{state} = "";
     my ($host, $user, $passwd) = map { $self->{$_}->GetValue } qw(host username password);
+    my $port = $DEFAULT_PORT;
     @_ = ();
-    my $thr = threads->create(\&ConnectToVM, $self, $host, $user, $passwd);
+    my $thr = threads->create(\&ConnectToVM, $self, $host, $port, $user, $passwd);
     $thr->detach();
 }
 
@@ -134,8 +137,7 @@ sub _shared_clone {
 }
 
 sub ConnectToVM {
-    my ($self, $host, $user, $passwd) = @_;
-    my $port = 8443;
+    my ($self, $host, $port, $user, $passwd) = @_;
 
     use MIME::Base64 qw(encode_base64);
     my $auth = encode_base64("$user:$passwd", '');
@@ -158,7 +160,11 @@ sub ConnectToVM {
 
     my ($code, $msg, $response_headers, $body) = $httpc->read_http_response();
     if ($code != HTTP_OK) {
-	my $message :shared = "$host replied with $msg";
+	my $message :shared;
+	if ($code == HTTP_UNAUTHORIZED) {
+	    $message = "Error de login. Verifique su usuario y contraseña.";
+	}
+        $message ||= "$host replied with $msg";
 	my $evt = new Wx::PlThreadEvent(-1, $EVT_CONNECTION_ERROR, $message);
 	Wx::PostEvent($self, $evt);
 	return;
@@ -204,14 +210,25 @@ sub ConnectToVM {
 	    forward_sockets($s1, $s2); # , debug => 1);
 	    last;
 	}
-	elsif ($code >= 100 and $code < 200) {
-	    print "$code\ncontinuing...\n"
+	elsif ($code == HTTP_PROCESSING) {
+	    # Server is starting the virtual machine and connecting to the VMA
 	}
 	else {
-	    my $message :shared = "Unable to connect to remote vm: $code $msg";
+	    # Fatal error
+	    my $message :shared;
+	    if ($code == HTTP_NOT_FOUND) {
+		$message = "Su máquina virtual ya no existe.";
+	    } elsif ($code == HTTP_UPGRADE_REQUIRED) {
+		$message = "El servidor requiere una versión más moderna del cliente.";
+	    } elsif ($code == HTTP_UNAUTHORIZED) {
+		$message = "Error de login. Verifique su usuario y contraseña.";
+	    } elsif ($code == HTTP_BAD_GATEWAY) {
+		$message = "Error de servidor: ".$body;
+	    }
+	    $message ||= "Unable to connect to remote vm: $code $msg";
 	    my $evt = new Wx::PlThreadEvent(-1, $EVT_CONNECTION_ERROR, $message);
 	    Wx::PostEvent($self, $evt);
-	    return;
+	    last;
 	}
     }
     Wx::PostEvent($self, new Wx::PlThreadEvent(-1, $EVT_CONN_STATUS, 'CLOSED'));
