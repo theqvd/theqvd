@@ -112,7 +112,8 @@ sub OnClickConnect {
     $self->{state} = "";
     my ($host, $user, $passwd) = map { $self->{$_}->GetValue } qw(host username password);
     @_ = ();
-    $self->{httpc_thread} = threads->create(\&ConnectToVM, $self, $host, $user, $passwd);
+    my $thr = threads->create(\&ConnectToVM, $self, $host, $user, $passwd);
+    $thr->detach();
 }
 
 sub _shared_clone {
@@ -221,9 +222,10 @@ sub OnConnectionError {
     $self->{progress_bar}->SetValue(0);
     $self->{progress_bar}->SetRange(100);
     my $message = $event->GetData;
-    new Wx::MessageDialog($self, $message, "Error de conexión",
-			    wxOK | wxICON_ERROR)->ShowModal;
-    $self->{httpc_thread}->join();
+    my $dialog = Wx::MessageDialog->new($self, $message, "Error de conexión",
+			    wxOK | wxICON_ERROR);
+    $dialog->ShowModal();
+    $dialog->Destroy();
 }
 
 sub OnListOfVMLoaded {
@@ -259,7 +261,6 @@ sub OnConnectionStatusChanged {
 	$self->{progress_bar}->SetRange(100);
 	$self->Hide();
     } elsif ($status eq 'CLOSED') {
-	$self->{httpc_thread}->join();
 	$self->Show;
     }
 }
