@@ -63,9 +63,8 @@ sub _abort_session {
     1
 }
 
-# FIXME refactor this method into smaller ones
 sub _authorize_user {
-    my ($server, $method, $url, $headers) = @_;
+    my ($self, $method, $url, $headers) = @_;
     my $authorization = header_lookup($headers, 'Authorization');
     if ($authorization =~ /^Basic (.*)$/) {
 	use MIME::Base64 'decode_base64';
@@ -77,16 +76,18 @@ sub _authorize_user {
 	    return $user_rs->first;
 	} else {
 	    INFO "Failed login attempt from user $user_pwd[0]";
-	    $server->send_http_error(HTTP_FORBIDDEN);
+	    $self->send_http_error(HTTP_UNAUTHORIZED,
+		[ 'WWW-Authenticate: Basic realm="QVD"' ]);
 	    return;
 	}
     } else {
-	$server->send_http_error(HTTP_UNAUTHORIZED,
+	$self->send_http_error(HTTP_UNAUTHORIZED,
 	    [ 'WWW-Authenticate: Basic realm="QVD"' ]);
 	return;
     }
 }
 
+# FIXME refactor this method into smaller ones
 sub _connect_to_vm_processor {
     my ($server, $method, $url, $headers) = @_;
     my $user = $server->_authorize_user($method, $url, $headers) or return;
@@ -109,7 +110,7 @@ sub _connect_to_vm_processor {
     my $vmas = QVD::VMAS->new();
     my $vm = $vmas->get_vm_runtime_for_vm_id($vm_id);
 
-    if ($vm->rel_vm_id->user_id == $user->id) {
+    if ($vm and $vm->rel_vm_id->user_id == $user->id) {
 	$server->send_http_response(HTTP_PROCESSING,
 	    'X-QVD-VM-Status: Checking VM');
     } else { 
@@ -128,18 +129,16 @@ sub _connect_to_vm_processor {
     if ($vm->vm_state ne 'running') {
 	DEBUG "VM not running, trying to start it";
 	unless ($vmas->assign_host_for_vm($vm)) {
-	    # FIXME VM could not be assigned to a host, notify client?
 	    $vmas->push_user_state($vm, 'disconnected');
-	    $server->send_http_error(HTTP_BAD_GATEWAY);
+	    $server->send_http_error(HTTP_BAD_GATEWAY, "The server was unable to assign host for the virtual machine");
 	    return;
 	}
 	my $r = $vmas->schedule_start_vm($vm);
 	unless ($r) {
 	    # The VM couldn't be scheduled for starting
-	    # FIXME Pass the error message to the client
 	    ERROR "VM ".$vm->vm_id." couldn't be started on host ".$vm->host_id;
 	    $vmas->push_user_state($vm, 'disconnected');
-	    $server->send_http_error(HTTP_BAD_GATEWAY);
+	    $server->send_http_error(HTTP_BAD_GATEWAY, "The server was unable to start the virtual machine");
 	    return;
 	}
 	INFO "Started VM ".$vm->vm_id." on host ".$vm->host_id;
@@ -158,7 +157,7 @@ sub _connect_to_vm_processor {
 	    # FIXME Pass the error message to the client
 	    INFO "VM ".$vm->vm_id." start timed out ";
 	    $vmas->push_user_state($vm, 'disconnected');
-	    $server->send_http_error(HTTP_BAD_GATEWAY);
+	    $server->send_http_error(HTTP_BAD_GATEWAY, "Starting the virtual machine timed out");
 	    return;
 	}
     }
@@ -166,7 +165,7 @@ sub _connect_to_vm_processor {
     # Send 'connect' x_cmd
     unless ($vmas->schedule_x_cmd($vm, 'connect')) {
 	$vmas->push_user_state($vm, 'disconnected');
-	$server->send_http_error(HTTP_BAD_GATEWAY);
+	$server->send_http_error(HTTP_BAD_GATEWAY, "Unable to send connect command to virtual machine");
 	return;
     }
     DEBUG "Sent x connect";
@@ -176,8 +175,7 @@ sub _connect_to_vm_processor {
 	$vm->discard_changes;
 	# abort?
 	if (_check_abort_session($vm, $vmas)) {
-# FIXME Pass the message to the client?
-	    $server->send_http_error(HTTP_BAD_GATEWAY);
+	    $server->send_http_error(HTTP_BAD_GATEWAY, "The session was aborted by another connection");
 	    return;
 	}
 
@@ -220,7 +218,7 @@ sub _connect_to_vm_processor {
     if ($check_abort) {
 	DEBUG "Received Abort command";
 	# FIXME Pass the message to the client
-	$server->send_http_error(HTTP_BAD_GATEWAY);
+	$server->send_http_error(HTTP_BAD_GATEWAY, "The session was aborted by another connection");
 	return;
     }
 
@@ -263,8 +261,8 @@ sub _connect_session {
 }
 
 sub _list_of_vm_processor {
-    my ($server, $method, $url, $headers) = @_;
-    my $user = $server->_authorize_user($method, $url, $headers) or return;
+    my ($self, $method, $url, $headers) = @_;
+    my $user = $self->_authorize_user($method, $url, $headers) or return;
 
     my $vmas = QVD::VMAS->new();
     my @vms = $vmas->get_vms_for_user($user->id);
@@ -274,7 +272,6 @@ sub _list_of_vm_processor {
 	# FIXME handle this situation in a better way, for instance:
 	# - allow automatic provisioning
 	# - report the problem to the client
-	die;
     }
 
     my @vm_data = map { 
@@ -285,9 +282,9 @@ sub _list_of_vm_processor {
 	}
     } @vms;
 
-    $server->send_http_response_with_body(
+    $self->send_http_response_with_body(
 	HTTP_OK, 'application/json', [],
-	$server->json->encode(\@vm_data)
+	$self->json->encode(\@vm_data)
     );
 }
 
