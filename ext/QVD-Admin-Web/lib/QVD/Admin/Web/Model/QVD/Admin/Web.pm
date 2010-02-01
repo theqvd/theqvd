@@ -175,6 +175,17 @@ sub vm_stop {
     1;
 }
 
+sub vm_reset {
+    my ( $self, $id ) = @_;
+    $self->reset_status;
+    eval { $self->admin->cmd_vm_reset_by_id($id) };
+    if ($@) {
+	$self->set_error($@);
+	return undef;
+    }
+    1;
+}
+
 sub vm_disconnect_user {
     my ( $self, $id ) = @_;
     $self->reset_status;

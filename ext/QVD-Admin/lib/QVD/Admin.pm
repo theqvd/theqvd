@@ -365,6 +365,41 @@ sub cmd_vm_stop {
     $counter
 }
 
+sub cmd_vm_reset_by_id {
+    my ($self, $id) = @_;
+    die "Missing parameter id" unless defined $id;
+    use QVD::VMAS;
+    my $vmas = QVD::VMAS->new;
+    my $vm;
+    txn_do {
+	$vm = $self->get_resultset('vm')->find($id);
+	die "VM $id doesn't exist" unless defined $vm;
+	
+	if ($vm->vm_runtime->vm_state eq 'running') {
+	    $vmas->schedule_stop_vm($vm->vm_runtime);
+	} else {
+	    die "Unable to stop VM: VM is not running";
+	}
+    };
+    $vmas->notify_hkd($vm->vm_runtime);
+}
+
+sub cmd_vm_reset {
+    my ($self, @args) = @_;
+    my $rs = $self->get_resultset('vm');
+    my $counter = 0;
+    use QVD::VMAS;
+    my $vmas = QVD::VMAS->new;
+    while (my $vm = $rs->next) {
+	my $vm_runtime = $vm->vm_runtime;
+	if ($vm_runtime->vm_state eq 'failed') {
+	    next unless eval { $vmas->schedule_stop_vm($vm_runtime); };
+	    $counter++;
+	}
+    }
+    $counter
+}
+
 sub cmd_vm_disconnect_user_by_id {
     my ($self, $id) = @_;
     die "Missing parameter id" unless defined $id;
