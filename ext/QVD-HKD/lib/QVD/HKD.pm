@@ -21,6 +21,9 @@ my $vm_state_stopping_timeout = cfg('vm_state_stopping_timeout');
 my $vm_state_zombie_sigkill_timeout = cfg('vm_state_zombie_sigkill_timeout');
 my $x_state_connecting_timeout = cfg('x_state_connecting_timeout');
 
+my $VM_PORT_POOL_BEGIN = cfg('hkd_port_pool_begin', 9000);
+my $VM_PORT_POOL_END = cfg('hkd_port_pool_end', 9999);
+
 sub new {
     my ($class, %opts) = @_;
     my $loop_wait_time = delete $opts{loop_wait_time};
@@ -97,8 +100,9 @@ sub new {
 	vm_state_map => $vm_state_map,
 	nx_state_map => $nx_state_map,
     };
-      
     bless $self, $class;
+    $self->_init_port_pool();
+    $self
 }
 
 sub _reap_children {
@@ -271,8 +275,56 @@ sub run {
     }
 }
 
+sub _init_port_pool {
+    my $self = shift;
+    my %free_ports = ();
+    @{$self->{free_ports}}{$VM_PORT_POOL_BEGIN..$VM_PORT_POOL_END} = undef;
+}
+
+sub _allocate_port {
+    my $self = shift;
+    my $port = (keys %{$self->{free_ports}})[0];
+    delete $self->{free_ports}{$port};
+    $port
+}
+
+sub _free_port {
+    my ($self, $port) = @_;
+    $self->{free_ports}{$port} = 1;
+}
+
+sub _assign_vm_ports {
+    my ($self, $vm) = @_;
+    my @ports = ();
+    unshift @ports, $self->_allocate_port for 1..3;
+    my ($vma_port, $x_port, $ssh_port) = @ports;
+    unless ($vma_port && $x_port && $ssh_port) {
+	return 0;
+    }
+    $self->{vmas}->set_vm_runtime_fields($vm, 
+	{
+	    vm_address => $vm->host->address,
+	    vm_vma_port => $vma_port,
+	    vm_x_port => $x_port,
+	    vm_ssh_port => $ssh_port,
+	    vm_vnc_port => 5900 + $vm->vm_id,
+	});
+    1;
+}
+
+sub _free_vm_ports {
+    my ($self, $vm) = @_;
+    $self->_free_port($vm->vm_vma_port);
+    $self->_free_port($vm->vm_x_port);
+    $self->_free_port($vm->vm_ssh_port);
+}
+
 sub hkd_action_start_vm {
     my ($self, $vm, $state, $event) = @_;
+    unless ($self->_assign_vm_ports($vm)) {
+	ERROR "Unable to start VM ".$vm->vm_id.": Out of free ports";
+	return;
+    }
     my $r = $self->{vmas}->start_vm($vm);
     if (defined $r->{request} && $r->{request} eq 'error') {
 	ERROR ("Starting VM ".$vm->vm_id." error: ".$r->{error});
@@ -324,6 +376,7 @@ sub hkd_action_enter_stopped {
     # Siempre que se entre en este estado desde cualquier otro...
     # * se borrara la entrada vm_runtime.host de la base de datos
     my ($self, $vm, $state, $event) = @_;
+    $self->_free_vm_ports($vm);
     $self->{vmas}->clear_vm_host($vm);
 }
 

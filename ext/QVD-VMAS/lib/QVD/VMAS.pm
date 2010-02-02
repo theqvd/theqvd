@@ -85,6 +85,11 @@ sub _get_free_host {
     $self->$load_balancer($vm)
 }
 
+sub set_vm_runtime_fields {
+    my ($self, $runtime, $update) = @_;
+    $runtime->update($update);
+}
+
 sub assign_host_for_vm {
     my ($self, $vm, $preferred_host_id) = @_;
     my $vm_id = $vm->vm_id;
@@ -98,12 +103,7 @@ sub assign_host_for_vm {
 	# database
 	defined $vm->host_id
 	    and die "VM $vm_id is already assigned to a host";
-	$vm->update({host_id => $host->id, 
-		     vm_address => $host->address,
-		     vm_vma_port => cfg('vm_vma_port')+$vm_id,
-		     vm_x_port => cfg('vm_x_port')+$vm_id,
-		     vm_ssh_port => cfg('vm_ssh_port')+$vm_id,
-		     vm_vnc_port => cfg('vm_vnc_port')+$vm_id });
+	$vm->update({host_id => $host->id});
     # };
 }
 
@@ -253,7 +253,6 @@ sub _ensure_user_storage_exists {
     system(@cmd) == 0 or die "Unable to create image $disk_image for user data";
     INFO "Created overlay image $disk_image for VM ".$vm->vm_id;
 }
-
 
 sub start_vm {
     my ($self, $vm) = @_;
@@ -430,6 +429,11 @@ load balancing algorithm specified by the configuration key
 C<vmas_load_balance_algorithm> is used to determine the best host.
 
 Returns true if a host could be assigned, false if no host was available.
+
+=item set_vm_runtime_fields($vm_runtime, $fields)
+
+Sets the given properties on the given virtual machine. This method is used for
+things like setting ports for virtual machines that are about to be started.
 
 =item schedule_start_vm($vm_runtime)
 
