@@ -23,11 +23,6 @@ my %default_config = (
 
     vm_start_timeout => 6000,
     
-    vm_vma_port => 3030,
-    vm_x_port => 5000,
-    vm_ssh_port => 2022,
-    vm_vnc_port => 5900,
-
     hkd_pid_file => '/var/run/qvd/hkd.pid',
     hkd_log_file => '/var/log/qvd.log',
 
