@@ -441,3 +441,7 @@ button.link:focus span {
 .clickable_row:hover td {
 	background-color: #F0F0F0;
 }
+
+.graphs {
+    margin-left: 70px;
+}

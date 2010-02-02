@@ -1,0 +1,104 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta http-equiv="content-type" content="text/html; charset=utf-8" />
+<title>Quality Virtual Desktop</title>
+
+<link rel="stylesheet" href="static/css/reset.css" />
+<link rel="stylesheet" href="static/css/text.css" />
+<link rel="stylesheet" href="static/css/960.css" />
+<link rel="stylesheet" href="static/css/qvd.css" />
+<link rel="stylesheet" href="static/css/table.css" />
+<link rel="stylesheet" href="static/css/themes/blue/style.css" type="text/css" />
+<link rel="stylesheet" href="static/css/jquery.tablesorter.pager.css" type="text/css" />
+<script type="text/javascript" src="/static/js/jquery.tablesorter.js"></script> 
+<script type="text/javascript" src="/static/js/jquery.tablesorter.pager.js"></script> 
+<script type="text/javascript">
+  $(document).ready(function() {});
+</script>
+</head>
+<body>
+<div class="container_12">
+	<div id="header">
+	</div>
+
+	<div id="content">
+		<div class="grid_3" id="top-logo">
+			<p>
+				<a href="/"><img src="static/images/qvd-logo-header.png" alt="Quality Virtual Desktop logo" /></a>
+			</p>
+		</div>
+		<div class="grid_9" id="top-menu">
+			<p>
+				Administrador | <a href="#">Preferencias</a> | <a href="/about">Acerca de...</a> | <a href="/login">Salir</a>
+
+			</p>
+		</div>				
+		<div class="clear"></div>
+		<div class="grid_12" id="menu">
+			<ul>
+				<li><a href="/users/" class="menu_user">Usuarios</a></li>
+				<li><a href="/vm/" class="menu_vm">M&aacute;quinas virtuales</a></li>
+				<li><a href="/hosts/" class="menu_host">Nodos</a></li>
+				<li><a href="/osi/" class="menu_osi">Im&aacute;genes</a></li>															
+			</ul>
+		</div>
+		<div class="clear"></div>
+		<div class="grid_12 maincontent">
+			<h1>Bienvenido a Quality Virtual Desktop</h1>
+
+			<p>Desde esta herramienta puede controlar los principales aspectos de su instalación de la plataforma QVD, <a href="/users/">Usuarios</a>, <a href="/vm/">M&aacute;quinas virtuales</a>, 
+			<a href="/hosts/">Nodos</a> e <a href="/osi/">Im&aacute;genes</a>
+			</p>
+
+			<div class="grid_5 alpha graphs">
+			<h2>Máquinas virtuales</h2>
+			<a href="/vm/"><img border="0" alt="Gráfico circular de máquinas virtuales en QVD" src="http://chart.apis.google.com/chart?cht=p&amp;chd=t:42,13&amp;chs=280x150&amp;chl=Running|Stopped"/></a>
+			</div>
+
+			<div class="grid_4 omega">
+			<h2>Sesiones</h2>
+			<a href="/users/"><img border="0" alt="Gráfico de barras de usuarios en QVD" src="http://chart.apis.google.com/chart?cht=bhs&chs=225x25&chd=t:75&chco=FF8D13"/></a>
+			</div>
+
+			<div class="grid_2 center">
+			    <p><span class="big_count">48</span><br/>establecidas</p>
+			</div>
+
+			<div class="grid_2 center">
+			    <p><span class="big_count">27</span><br/>potenciales</p>
+			</div>
+
+			<div class="clear"></div>
+
+			<h2 class="grid_12">Totales</h2>
+
+			<div class="grid_2 center">
+			    <p><span class="big_count">22</span><br/>usuarios</p>
+			</div>
+
+			<div class="grid_2 center">
+			    <p><span class="big_count">8</span><br/>máquinas virtuales</p>
+			</div>
+
+			<div class="grid_2 center">
+			    <p><span class="big_count">4</span><br/>nodos</p>
+			</div>
+
+			<div class="grid_2 center">
+			    <p><span class="big_count">11</span><br/>imágenes</p>
+			</div>
+
+
+		</div>
+		<div class="clear"></div>
+	</div>
+	<div id="bottom"> </div>
+	<div id="footer">
+		Quality Virtual Desktop Web Admin Tool, by <a href="http://qindel.es">QindelGroup</a>
+	</div>	
+
+</div>
+
+</body>
+</html>
