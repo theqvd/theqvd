@@ -17,6 +17,7 @@ use QVD::VMAS;
 use URI::Split qw(uri_split);
 
 Log::Log4perl::init('log4perl.conf');
+my $POLL_TIME = cfg('l7r_poll_time', 5);
 
 use parent qw(QVD::HTTPD);
 
@@ -54,7 +55,7 @@ sub _abort_session {
 	my $r = $vmas->disconnect_nx($vm);
 	while ($vm->x_state ne 'disconnected') {
 	    DEBUG "x_state is ".$vm->x_state.", waiting for disconnected";
-	    sleep 5;
+	    sleep $POLL_TIME;
 	    $vm->discard_changes;
 	}
     }
@@ -151,7 +152,7 @@ sub _connect_to_vm_processor {
 	    DEBUG "Waiting for VMA to start on VM ".$vm->vm_id;
 	    $vm->discard_changes;
 	    last if defined $vm->vma_ok_ts;
-	    sleep 5;
+	    sleep $POLL_TIME;
 	}
 	if (time > $timeout_time) {
 	    # FIXME Pass the error message to the client
@@ -188,7 +189,7 @@ sub _connect_to_vm_processor {
 	    # FIXME Make the sleep amount configurable
 	    # The sleep amount should never be greater than 30 seconds
 	    # or we might miss nxagent's "listening" state!
-	    sleep 5;
+	    sleep $POLL_TIME;
 	}
     }
 
@@ -256,7 +257,7 @@ sub _connect_session {
 	    $vmas->disconnect_nx($vm);
 	}
 	DEBUG "user_state is ".$vm->user_state." Waiting for 'disconnected'";
-	sleep 5;
+	sleep $POLL_TIME;
     }
 }
 
