@@ -8,6 +8,7 @@ use QVD::HKD;
 use QVD::Config;
 
 my $PID_FILE = cfg('hkd_pid_file');
+my $POLL_TIME = cfg('hkd_poll_time');
 
 $App::Daemon::pidfile = $PID_FILE;
 $App::Daemon::logfile = cfg('hkd_log_file');
@@ -19,7 +20,7 @@ $App::Daemon::loglevel = $DEBUG;
 $App::Daemon::as_user = "root";
 
 daemonize;
-my $hkd = QVD::HKD->new(loop_wait_time => 5);
+my $hkd = QVD::HKD->new(loop_wait_time => $POLL_TIME);
 $hkd->run;
 
 
