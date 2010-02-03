@@ -201,8 +201,17 @@ sub cmd_vm_del {
 
 sub cmd_osi_del {
     my ($self, @args) = @_;
-    $self->_obj_del('osi', @args);
-    # FIXME Should we delete the actual image file?
+    my $counter = 0;
+    my $rs = $self->get_resultset('osi');
+    while (my $osi = $rs->next) {
+	if ($osi->vms->count == 0) {
+	    warn "deleting osi ".$osi->id;
+	    $osi->delete;
+	    $counter++;
+	    # FIXME Should we delete the actual image file?
+	}
+    }
+    $counter
 }
 
 sub _obj_propset {
@@ -544,7 +553,8 @@ Deletes all virtual machines that match the current filter.
 
 =item cmd_osi_del()
 
-Deletes all OSIs that match the current filter.
+Deletes all OSIs that match the current filter. Only OSIs that have no virtual
+machines assigned are deleted. Returns the number of OSIs that were deleted.
 
 =item propset($object, %properties)
 

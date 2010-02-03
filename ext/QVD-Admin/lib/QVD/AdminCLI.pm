@@ -279,11 +279,12 @@ sub _obj_del {
     }
     my $count = $self->get_resultset($obj)->count();
     $self->_print("Deleting ".$count." ${obj}(s)");
-    $self->{admin}->_obj_del($obj);
 }
 
 sub cmd_host_del {
-    shift->_obj_del('host', @_);
+    my $self = shift;
+    $self->_obj_del('host', @_);
+    $self->{admin}->cmd_host_del();
 }
 
 sub help_host_del {
@@ -298,7 +299,9 @@ EOT
 }
 
 sub cmd_user_del {
-    shift->_obj_del('user', @_);
+    my $self = shift;
+    $self->_obj_del('user', @_);
+    $self->{admin}->cmd_user_del();
 }
 
 sub help_user_del {
@@ -313,7 +316,9 @@ EOT
 }
 
 sub cmd_vm_del {
-    shift->_obj_del('vm', @_);
+    my $self = shift;
+    $self->_obj_del('vm', @_);
+    $self->{admin}->cmd_vm_del();
 }
 
 sub help_vm_del {
@@ -328,8 +333,10 @@ EOT
 }
 
 sub cmd_osi_del {
-    my ($self, @args) = @_;
-    $self->_obj_del('osi', @args);
+    my $self = shift;
+    $self->_obj_del('osi', @_);
+    my $count = $self->{admin}->cmd_osi_del();
+    $self->_print("$count osis deleted.");
 }
 
 sub help_osi_del {
