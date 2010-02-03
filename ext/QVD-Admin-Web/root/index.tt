@@ -4,12 +4,12 @@
 <a href="/hosts/">Nodos</a> e <a href="/osi/">Im&aacute;genes</a>
 </p>
 
-<div class="grid_5 alpha">
+<div class="grid_5 alpha graphs">
 <h2>Máquinas virtuales</h2>
 <a href="/vm/"><img border="0" alt="Gráfico circular de máquinas virtuales en QVD" src="http://chart.apis.google.com/chart?cht=p&amp;chd=t:[% vm_stats_values -%]&amp;chs=280x150&amp;chl=[% vm_stats_fields -%]"/></a>
 </div>
 
-<div class="grid_5 omega">
+<div class="grid_5 omega graphstwo">
 <h2>Sesiones</h2>
 [% IF vm_total_stats != 0 %]
 <a href="/users/"><img border="0" alt="Gráfico de barras de usuarios en QVD" src="http://chart.apis.google.com/chart?cht=bhs&chs=225x25&chd=t:[% 100*(session_connected_stats / vm_total_stats) -%]&chco=FF8D13"/></a>
@@ -26,9 +26,9 @@
 
 <div class="clear"></div>
 
-<h2 class="grid_12">Totales</h2>
+<h2 class="grid_12 graphs">Totales</h2>
 
-<div class="grid_2 center">
+<div class="grid_2 center totals">
     <p><span class="big_count">[% user_total_stats -%]</span><br/>usuarios</p>
 </div>
 
