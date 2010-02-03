@@ -673,7 +673,26 @@ sub cmd_config_ssl {
 	or die "$key_file: Unable to read key file: $^E";
 
     $self->{admin}->cmd_config_ssl(key => $key, cert => $cert) 
-	and print "SSL certificate and private key set.\n";
+	and $self->_print("SSL certificate and private key set.\n");
+}
+
+sub help_user_passwd {
+    print <<EOT
+user passwd: Sets the password of a user
+usage: user passwd username
+
+    Prompts the user for the new password for the user with login "username"
+    and sets it.
+
+    Example: user passwd qvd
+EOT
+}
+
+sub cmd_user_passwd {
+    my ($self, $user) = @_;
+    print "New password for $user: ";
+    my $passwd = <STDIN>;
+    $self->{admin}->set_password($user, $passwd);
 }
 
 sub help_vm_vnc {

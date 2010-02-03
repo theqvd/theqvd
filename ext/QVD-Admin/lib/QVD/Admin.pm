@@ -461,6 +461,12 @@ sub cmd_config_ssl {
     1
 }
 
+sub set_password {
+    my ($self, $user, $password) = @_;
+    my $row = rs('User')->find({login => $user}) or die "No such user: $user";
+    $row->update({password => $password});
+}
+
 1;
 
 __END__
