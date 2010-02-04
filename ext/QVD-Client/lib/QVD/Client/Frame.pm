@@ -4,7 +4,6 @@ use threads;
 use threads::shared;
 use Wx qw[:everything];
 use QVD::HTTP::StatusCodes qw(:status_codes);
-use QVD::HTTPC;
 use IO::Handle;
 use IO::Socket::Forwarder qw(forward_sockets);
 use JSON;
@@ -16,6 +15,7 @@ my $EVT_CONNECTION_ERROR :shared = Wx::NewEventType;
 my $EVT_CONN_STATUS :shared = Wx::NewEventType;
 
 my $vm_id :shared;
+my %connect_info :shared;
 
 my $DEFAULT_PORT = 8443;
 
@@ -112,11 +112,17 @@ sub new {
 sub OnClickConnect {
     my( $self, $event ) = @_;
     $self->{state} = "";
-    my ($host, $user, $passwd) = map { $self->{$_}->GetValue } qw(host username password);
-    my $port = $DEFAULT_PORT;
-    @_ = ();
-    my $thr = threads->create(\&ConnectToVM, $self, $host, $port, $user, $passwd);
-    $thr->detach();
+    %connect_info = map { $_ => $self->{$_}->GetValue } qw(host username password);
+    $connect_info{port} = $DEFAULT_PORT;
+    if (!$self->{worker_thread}) {
+	@_ = ();
+	my $thr = threads->create(\&RunWorkerThread, $self);
+	$thr->detach();
+	$self->{worker_thread} = $thr;
+    } else {
+	lock(%connect_info);
+	cond_signal(%connect_info);
+    }
 }
 
 sub _shared_clone {
@@ -136,14 +142,25 @@ sub _shared_clone {
     }
 }
 
+sub RunWorkerThread {
+    my $self = shift;
+    while (1) {
+	lock(%connect_info);
+	$self->ConnectToVM(@_);
+	cond_wait(%connect_info);
+    }
+}
+
 sub ConnectToVM {
-    my ($self, $host, $port, $user, $passwd) = @_;
+    my $self = shift;
+    my ($host, $port, $user, $passwd) = @connect_info{qw/host port username password/};
 
     use MIME::Base64 qw(encode_base64);
     my $auth = encode_base64("$user:$passwd", '');
 
     Wx::PostEvent($self, new Wx::PlThreadEvent(-1, $EVT_CONN_STATUS, 'CONNECTING'));
     # FIXME Random segfaul on connection refused - ticket #273
+    require QVD::HTTPC;
     my $httpc = eval { new QVD::HTTPC("$host:$port", SSL => 1) };
     if ($@) {
 	my $message :shared = $@;
@@ -244,6 +261,7 @@ sub OnConnectionError {
 			    wxOK | wxICON_ERROR);
     $dialog->ShowModal();
     $dialog->Destroy();
+    $self->EnableControls(1);
 }
 
 sub OnListOfVMLoaded {
@@ -272,6 +290,7 @@ sub OnConnectionStatusChanged {
     my ($self, $event) = @_;
     my $status = $event->GetData();
     if ($status eq 'CONNECTING') {
+	$self->EnableControls(0);
 	$self->{timer}->Start(50, 0);
     } elsif ($status eq 'CONNECTED') {
 	$self->{timer}->Stop();
@@ -279,14 +298,19 @@ sub OnConnectionStatusChanged {
 	$self->{progress_bar}->SetRange(100);
 	$self->Hide();
     } elsif ($status eq 'CLOSED') {
+	$self->EnableControls(1);
 	$self->Show;
     }
+}
+
+sub EnableControls {
+    my ($self, $enabled) = @_;
+    $self->{$_}->Enable($enabled) for qw(connect_button host username password);
 }
 
 sub OnTimer {
     my $self = shift;
     $self->{progress_bar}->Pulse;
 }
-
 
 1;
