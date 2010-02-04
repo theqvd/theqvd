@@ -7,8 +7,8 @@ use App::Daemon qw/daemonize/;
 use QVD::HKD;
 use QVD::Config;
 
-my $PID_FILE = cfg('hkd_pid_file');
-my $POLL_TIME = cfg('hkd_poll_time');
+my $PID_FILE = cfg('hkd_pid_file', '/var/run/qvd/hkd.pid');
+my $POLL_TIME = cfg('hkd_poll_time', 5);
 
 $App::Daemon::pidfile = $PID_FILE;
 $App::Daemon::logfile = cfg('hkd_log_file');
