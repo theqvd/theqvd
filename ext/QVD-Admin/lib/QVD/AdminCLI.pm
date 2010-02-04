@@ -692,6 +692,7 @@ sub cmd_user_passwd {
     my ($self, $user) = @_;
     print "New password for $user: ";
     my $passwd = <STDIN>;
+    chomp $passwd;
     $self->{admin}->set_password($user, $passwd);
 }
 
