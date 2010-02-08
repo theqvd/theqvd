@@ -97,14 +97,9 @@ sub assign_host_for_vm {
     $host = rs(Host)->find($preferred_host_id)
 	if defined $preferred_host_id;
     $host //= $self->_get_free_host($vm) // die "Unable to assign VM $vm_id a host";
-    # txn_do {
-	# FIXME: this is the wrong place to start the transaction
-	# as $vm has probably been already retrieved from the
-	# database
-	defined $vm->host_id
-	    and die "VM $vm_id is already assigned to a host";
-	$vm->update({host_id => $host->id});
-    # };
+    defined $vm->host_id
+	and die "VM $vm_id is already assigned to a host";
+    $vm->update({host_id => $host->id});
 }
 
 sub push_vm_state {
@@ -124,13 +119,10 @@ sub push_user_state {
 
 sub _schedule_cmd {
     my ($self, $vm, $cmd_type, $cmd) = @_;
-    txn_do {
-	$vm->discard_changes;
-	return undef if (defined $vm->$cmd_type and $vm->$cmd_type ne $cmd);
-	$vm->update({$cmd_type => $cmd});
-	DEBUG "Accepted command $cmd_type $cmd for VM " . $vm->vm_id;
-	return 1;
-    };
+    return undef if (defined $vm->$cmd_type and $vm->$cmd_type ne $cmd);
+    $vm->update({$cmd_type => $cmd});
+    DEBUG "Accepted command $cmd_type $cmd for VM " . $vm->vm_id;
+    return 1;
 }
 
 sub schedule_x_cmd {
@@ -172,14 +164,12 @@ sub notify_hkd {
 
 sub schedule_start_vm {
     my ($self, $vm) = @_;
-    txn_do {
-	$vm->discard_changes;
-	my $vm_id = $vm->vm_id;
-	defined $vm->host_id
-	    or die "Unable to schedule start command: VM $vm_id is not assigned to any host";
-	$self->_schedule_cmd($vm, 'vm_cmd', 'start')
-		or die "Unable to schedule start command";
-    };
+    $vm->discard_changes;
+    my $vm_id = $vm->vm_id;
+    defined $vm->host_id
+	or die "Unable to schedule start command: VM $vm_id is not assigned to any host";
+    $self->_schedule_cmd($vm, 'vm_cmd', 'start')
+	    or die "Unable to schedule start command";
 }
 
 sub schedule_stop_vm {
@@ -428,6 +418,9 @@ assigned to the preferred host, if specified. Otherwise the
 load balancing algorithm specified by the configuration key
 C<vmas_load_balance_algorithm> is used to determine the best host.
 
+Calls to this method MUST be made in the same transaction that fetches
+$vm_runtime.
+
 Returns true if a host could be assigned, false if no host was available.
 
 =item set_vm_runtime_fields($vm_runtime, $fields)
@@ -435,13 +428,41 @@ Returns true if a host could be assigned, false if no host was available.
 Sets the given properties on the given virtual machine. This method is used for
 things like setting ports for virtual machines that are about to be started.
 
+=item notify_hkd($vm_runtime)
+
+Notifies the HKD running on the host of the given VM runtime that it should
+wake up and scan the database for commands.
+
 =item schedule_start_vm($vm_runtime)
 
-Sets the start command for the given virtual machine and pings the remote
-control running on its host so that the VM starts.
+Sets the start command for the given virtual machine.
 
 Returns true if the command could be set and the RC pinged, false otherwise.
 Note that at most one command can be set at a time.
+
+Calls to this method MUST be made in the same transaction that fetches
+$vm_runtime.
+
+=item schedule_stop_vm($vm_runtime)
+
+Sets the stop command for the given virtual machine.
+
+Calls to this method MUST be made in the same transaction that fetches
+$vm_runtime.
+
+=item schedule_x_cmd($vm_runtime, $cmd)
+
+Sets the given X command on the given virtual machine.
+
+Calls to this method MUST be made in the same transaction that fetches
+$vm_runtime.
+
+=item schedule_user_cmd($vm_runtime, $cmd)
+
+Sets the given user command on the given virtual machine.
+
+Calls to this method MUST be made in the same transaction that fetches
+$vm_runtime.
 
 =back
 

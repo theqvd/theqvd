@@ -9,7 +9,6 @@ use Text::Table;
 sub new {
     my $class = shift;
     my $admin = QVD::Admin->new;
-    # FIXME: should we just inherit this class from QVD::Admin?
     my $self = {
 	admin => $admin,
     };

@@ -142,6 +142,14 @@ sub _is_command {
     shift =~ /^[^_]/;
 }
 
+sub _discard_changes {
+    my ($self, $vm, $message) = @_;
+    if ($vm->is_changed()) {
+	DEBUG "Detected uncommitted changes in VM ".$vm->vm_id." while $message";
+    }
+    $vm->discard_changes();
+}
+
 sub _do_action {
     my ($self, $mode, $event, $vm) = @_;
     my $vmas = $self->{vmas};
@@ -163,8 +171,7 @@ sub _do_action {
 	}
 	eval {
 	    txn_do {
-		# FIXME: $vm comes from outside the transaction
-		# $vm->discard_changes?
+		$self->_discard_changes($vm, 'changing state');
 		if (_is_command($event)) {
 		    my $clear_cmd = $vmas->can('clear_'.$mode.'_cmd');
 		    $vmas->$clear_cmd($vm);
@@ -340,7 +347,7 @@ sub hkd_action_enter_zombie {
     # * se cambia el estado x_state a "Disconnected" 
     my ($self, $vm, $state, $event) = @_;
     txn_do {
-	# FIXME: $vm comes from outside the transaction!
+	$self->_discard_changes($vm, 'entering state "zombie"');
 	$self->{vmas}->clear_vm_cmd($vm);
 	$self->{vmas}->clear_nx_cmd($vm);
 	$self->{vmas}->push_nx_state($vm, 'disconnected');
@@ -386,7 +393,7 @@ sub hkd_action_enter_stopping {
     # * se pone x_state a "Disconnected"
     my ($self, $vm, $state, $event) = @_;
     txn_do {
-	# FIXME: $vm comes from the outside!
+	$self->_discard_changes($vm, 'entering state "stopping"');
 	$self->{vmas}->push_nx_state($vm, 'disconnected');
 	$self->{vmas}->clear_nx_cmd($vm);
     };
@@ -400,7 +407,7 @@ sub hkd_action_enter_failed {
     # * se elimina la entrada vm_runtime.host de la base de datos
     my ($self, $vm, $state, $event) = @_;
     txn_do {
-	# FIXME: $vm comes from the outside!
+	$self->_discard_changes($vm, 'entering state "failed"');
 	$self->{vmas}->clear_vm_cmd($vm);
 	$self->{vmas}->clear_nx_cmd($vm);
 	$self->{vmas}->push_nx_state($vm, 'disconnected');
