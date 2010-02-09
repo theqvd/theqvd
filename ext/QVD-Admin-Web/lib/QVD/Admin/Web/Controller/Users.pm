@@ -74,6 +74,37 @@ sub new_vm : Local : Args(1) {
     $c->stash->{osi_list} = $rs;
 }
 
+sub passwd : Local : Args(1) {
+    my ( $self, $c, $userid ) = @_;
+    my $model = $c->model('QVD::Admin::Web');
+
+    my $user = $model->user_find($userid);
+    $c->stash( user => $user );
+}
+
+sub change_passwd : Local : Args(1) {
+    my ( $self, $c, $userid ) = @_;
+    my $model = $c->model('QVD::Admin::Web');
+    
+    my $passwd = $c->req->body_params->{passwd};
+    
+    my $user = $model->user_find($userid);
+    
+    if ( my $id = $model->user_passwd($user->login,  $passwd)) {
+	$c->flash->{response_type} = "success";
+	$c->flash->{response_msg} =
+	  "Contraseña modificada correctamente";
+    }
+    else {
+
+	# FIXME response_type must be an enumerated
+	$c->flash->{response_type} = "error";
+	$c->flash->{response_msg}  = $model->error_msg;
+    }
+
+    $c->response->redirect( $c->uri_for( $self->action_for('list') ) );
+}
+
 sub add : Local Form {
     my ( $self, $c ) = @_;
     my $form  = $self->formbuilder;

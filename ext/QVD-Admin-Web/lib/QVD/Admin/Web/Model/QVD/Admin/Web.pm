@@ -110,6 +110,16 @@ sub user_del {
     $ok;
 }
 
+sub user_passwd {
+    my ( $self, $user, $passwd ) = @_;
+    $self->reset_status;
+    my $ok = eval {
+	$self->{admin}->set_password($user, $passwd);
+    };
+    $self->set_error($@) unless $ok;
+    $ok;
+}
+
 sub osi_list {
     my ( $self, $filter ) = @_;
     $self->reset_status;
