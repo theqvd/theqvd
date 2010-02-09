@@ -83,7 +83,10 @@ function on_submit()
         [% END -%]
     </tbody>
 </table>
-<input type="submit" onClick="document.pressed='start'" value="Arrancar"/> <input type="submit" onClick="document.pressed='disconnect'" value="Desconectar usuario"/> <input type="submit" onClick="document.pressed='stop'" value="Detener"/> | <input type="submit" onClick="document.pressed='delete'" value="Eliminar"/>
+<input type="submit" onClick="document.pressed='start'" value="Arrancar"/> <input type="submit" onClick="document.pressed='stop'" value="Detener"/>
+ | <input type="submit" onClick="document.pressed='disconnect'" value="Desconectar usuario"/> 
+ | <input type="submit" onClick="" value="Bloquear"/> <input type="submit" onClick="" value="Desbloquear"/>
+ | <input type="submit" onClick="document.pressed='delete'" value="Eliminar"/>
 </form>
 <script type="text/javascript" charset="utf-8">
 $(document).ready(function() 
