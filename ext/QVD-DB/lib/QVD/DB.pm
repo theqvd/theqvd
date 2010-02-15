@@ -28,6 +28,7 @@ sub new {
 				    AutoCommit => 1,
 				    quote_char => '"',
 				    name_sep   => '.',
+				    pg_enable_utf8 => 1
 				});
 }
 

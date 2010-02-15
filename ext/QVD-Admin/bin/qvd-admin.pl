@@ -1,5 +1,7 @@
 #!/usr/bin/perl
 
+# Use "-CSL" for utf8 encoding
+
 use strict;
 use warnings;
 
