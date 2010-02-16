@@ -460,3 +460,9 @@ button.link:focus span {
 .totals {
     margin-left:110px;
 }
+
+.search {
+    text-align: right;
+    margin-bottom: 20px;
+    margin-top: -50px;
+}

@@ -38,6 +38,12 @@ function on_submit()
 </script>
 
 <h1>Máquinas virtuales</h1>
+<div class="search">
+<form action="[% c.uri_for('/vm/list/') %]" method="get">
+    <input name="s" type="text" size="18" value="[% s %]"/>
+    <input type="submit" value="Buscar"/> 
+</form>
+</div>
 <div id="pager" class="pager">
 	<form>
 		<img src="/static/icons/first.png" class="first"/>

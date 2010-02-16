@@ -35,31 +35,37 @@ Catalyst Controller.
 
 =cut
 
-sub index : Path : Args(0) {
+sub index : Path  {
     my ( $self, $c ) = @_;
 	delete($c->session->{vm_add});
-    $c->go('list');
+    $c->go('list', @_);
 }
 
 sub view : Local :Args(1){
-	my ( $self, $c, $id) = @_;
-	my $model = $c->model('QVD::Admin::Web');
-	
-	my $vm = $model->vm_find($id);
-	$c->stash(vm => $vm);
-	
-	#my $vm = $model->vmrt_find($id);
-	$c->stash->{vmrt => $vm->vm_runtime};
-	#die();
-
+    my ( $self, $c, $id) = @_;
+    my $model = $c->model('QVD::Admin::Web');
+    
+    my $vm = $model->vm_find($id);
+    $c->stash(vm => $vm);
+    
+    $c->stash->{vmrt => $vm->vm_runtime};
 }
 
-
 sub list : Local {
-    my ( $self, $c ) = @_;
+    my ( $self, $c, $s ) = @_;
     my $model = $c->model('QVD::Admin::Web');
-    my $rs    = $model->vm_list("");
+      
+    $s = $c->req->parameters->{s};
+
+   
+    my $filter = "";
+    if ((defined $s) && !($s eq "")) {
+	$filter = {name => $s};
+    }
+    
+    my $rs = $model->vm_list($filter);
     $c->stash->{vm_list} = $rs;
+    $c->stash->{s} = $s;
 }
 
 sub jlist : Local {
