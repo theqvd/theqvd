@@ -60,7 +60,7 @@ sub list : Local {
    
     my $filter = "";
     if ((defined $s) && !($s eq "")) {
-	$filter = {name => $s};
+	$filter = {name => { like => "%".$s."%" }};
     }
     
     my $rs = $model->vm_list($filter);
