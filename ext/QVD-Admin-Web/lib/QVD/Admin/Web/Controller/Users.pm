@@ -50,7 +50,6 @@ sub list : Local {
     
     $s = $c->req->parameters->{s};
 
-   
     my $filter = "";
     if ((defined $s) && !($s eq "")) {
 	$filter = {-or => [{login => { ilike => "%".$s."%" }}, \['cast(id as text) = ?', [id => $s]]]};

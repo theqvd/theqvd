@@ -41,17 +41,28 @@ Catalyst Controller.
 
 sub index : Path : Args(0) {
     my ( $self, $c ) = @_;
-    $c->go('list');
+    $c->go('list', @_);
 }
 
 sub list : Local {
-    my ( $self, $c ) = @_;
+    my ( $self, $c, $s ) = @_;
     my $model = $c->model('QVD::Admin::Web');
-    my $rs    = $model->osi_list("");
+    
+    $s = $c->req->parameters->{s};
+    
+    my $filter = "";
+    if ((defined $s) && !($s eq "")) {
+	$filter = {-or => [{name => { ilike => "%".$s."%" }}, {disk_image => { ilike => "%".$s."%" }}]};
+    }
+    
+    my $rs = $model->osi_list($filter);
     $c->stash->{osi_list} = $rs;
     
-    $rs = $model->vm_list("");
+    $rs = $model->vm_list("", {join => ["user"]});
     $c->stash->{vm_list} = $rs;
+    
+    $c->stash->{s} = $s;
+
 }
 
 sub view : Local :Args(1){

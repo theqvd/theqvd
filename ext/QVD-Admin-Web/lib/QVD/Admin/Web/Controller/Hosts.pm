@@ -39,7 +39,7 @@ Catalyst Controller.
 
 sub index : Path : Args(0) {
     my ( $self, $c ) = @_;
-    $c->go('list');
+    $c->go('list', @_);
 }
 
 sub view : Local : Args(1) {
@@ -54,7 +54,6 @@ sub list : Local {
     my $model = $c->model('QVD::Admin::Web');
     
     $s = $c->req->parameters->{s};
-
    
     my $filter = "";
     if ((defined $s) && !($s eq "")) {
