@@ -22,6 +22,12 @@ function on_submit()
 </script>
 
 <h1>Imágenes</h1>
+<div class="search">
+<form action="[% c.uri_for('/osi/list/') %]" method="get">
+    <input name="s" type="text" size="18" value="[% s %]"/>
+    <input type="submit" value="Buscar"/> 
+</form>
+</div>
 <a class="side_add" href="[% c.uri_for('/osi/add') %]">Nueva</a>
 <div id="pager" class="pager">
 	<form>

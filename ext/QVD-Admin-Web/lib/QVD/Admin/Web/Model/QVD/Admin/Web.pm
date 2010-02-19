@@ -80,7 +80,7 @@ sub host_del {
 }
 
 sub user_list {
-    my ( $self, $filter ) = @_;
+    my ( $self, $filter) = @_;
     $self->reset_status;
     [rs(User)->search($filter)];
 }
@@ -152,9 +152,9 @@ sub osi_del {
 }
 
 sub vm_list {
-    my ( $self, $filter ) = @_;
+    my ( $self, $filter, $attrs) = @_;
     $self->reset_status;
-    [rs(VM)->search($filter)];
+    [rs(VM)->search($filter, $attrs)];
 }
 
 sub vm_find {

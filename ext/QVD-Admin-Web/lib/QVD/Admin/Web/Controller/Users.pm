@@ -40,15 +40,25 @@ Catalyst Controller.
 
 sub index : Path : Args(0) {
     my ( $self, $c ) = @_;
-    $c->go('list');
+    $c->go('list', @_);
 
 }
 
 sub list : Local {
-    my ( $self, $c ) = @_;
+    my ( $self, $c, $s ) = @_;
     my $model = $c->model('QVD::Admin::Web');
-    my $rs    = $model->user_list("");
+    
+    $s = $c->req->parameters->{s};
+
+   
+    my $filter = "";
+    if ((defined $s) && !($s eq "")) {
+	$filter = {-or => [{login => { ilike => "%".$s."%" }}, \['cast(id as text) = ?', [id => $s]]]};
+    }
+    
+    my $rs    = $model->user_list($filter);
     $c->stash->{user_list} = $rs;
+    $c->stash->{s} = $s;
 }
 
 sub view : Local : Args(1) {

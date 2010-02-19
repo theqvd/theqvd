@@ -60,10 +60,11 @@ sub list : Local {
    
     my $filter = "";
     if ((defined $s) && !($s eq "")) {
-	$filter = {name => { ilike => "%".$s."%" }};
+	$filter = {-or => [{name => { ilike => "%".$s."%" }}, {"user.login" => { ilike => "%".$s."%" }}]};
+
     }
     
-    my $rs = $model->vm_list($filter);
+    my $rs = $model->vm_list($filter, {join => ["user"]});
     $c->stash->{vm_list} = $rs;
     $c->stash->{s} = $s;
 }
