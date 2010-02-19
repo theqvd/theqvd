@@ -50,10 +50,21 @@ sub view : Local : Args(1) {
 }
 
 sub list : Local {
-    my ( $self, $c ) = @_;
+    my ( $self, $c, $s ) = @_;
     my $model = $c->model('QVD::Admin::Web');
-    my $rs    = $model->host_list("");
+    
+    $s = $c->req->parameters->{s};
+
+   
+    my $filter = "";
+    if ((defined $s) && !($s eq "")) {
+	$filter = {-or => [{name => { ilike => "%".$s."%" }}, {address => { ilike => "%".$s."%" }}]};
+    }
+    
+    my $rs = $model->host_list($filter);
+    
     $c->stash->{host_list} = $rs;
+    $c->stash->{s} = $s;
 }
 
 sub add : Local Form {
