@@ -31,6 +31,8 @@ my %default_config = (
     rw_storage_path => '/var/lib/qvd/storage/overlays',
     home_storage_path => '/var/lib/qvd/storage/homes',
     shared_storage_path => '/var/lib/qvd/storage/shared',
+    
+    auth_ldap_host => 'yourLDAPhost.yourCompany.com',
 );
 $admin->cmd_config_set(%default_config);
 

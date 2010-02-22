@@ -3,6 +3,23 @@ package QVD::Auth::LDAP;
 use warnings;
 use strict;
 
+use QVD::Config;
+
+use NET::LDAP;
+
+sub new {
+    $ldap = Net::LDAP->new ( cfg('auth_ldap_host') ) or die "$@";
+}
+
+sub login {
+    my $user = shift;
+    my $passwd = shift;
+    
+    $mesg = $ldap->bind ($user,           
+			password => $passwd,
+			version  => 3); 
+}
+
 =head1 NAME
 
 QVD::Auth::LDAP - The great new QVD::Auth::LDAP!
@@ -12,8 +29,6 @@ QVD::Auth::LDAP - The great new QVD::Auth::LDAP!
 Version 0.01
 
 =cut
-
-our $VERSION = '0.01';
 
 
 =head1 SYNOPSIS
