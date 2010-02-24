@@ -1,0 +1,6 @@
+Revision history for Perl extension QVD::ParallelNet.
+
+0.01  Wed Feb 24 13:24:04 2010
+	- original version; created by h2xs 1.23 with options
+		-AXn QVD::ParallelNet
+
