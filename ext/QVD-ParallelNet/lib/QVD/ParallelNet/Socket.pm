@@ -1,9 +1,9 @@
-package Net::Parallel::Socket;
+package QVD::ParallelNet::Socket;
 
 use strict;
 use warnings;
 
-use Net::Parallel::Constants qw(:error);
+use QVD::ParallelNet::Constants qw(:error);
 
 sub reset {
     my $self = shift;
@@ -34,7 +34,7 @@ sub _nps_done { shift->{_nps_closed} }
 
 sub run {
     my $self = shift;
-    my $par = Net::Parallel->new(@_);
+    my $par = QVD::ParallelNet->new(@_);
     $par->register($self);
     $par->run;
 }

@@ -1,4 +1,4 @@
-package Net::Parallel::Constants;
+package QVD::ParallelNet::Constants;
 
 use strict;
 use warnings;

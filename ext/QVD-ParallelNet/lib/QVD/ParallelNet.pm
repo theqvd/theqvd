@@ -1,4 +1,4 @@
-package Net::Parallel;
+package QVD::ParallelNet;
 
 our $VERSION = '0.01';
 
@@ -8,7 +8,7 @@ use warnings;
 use Carp;
 use Time::HiRes qw(time);
 
-use Net::Parallel::Constants;
+use QVD::ParallelNet::Constants;
 
 our $debug;
 

@@ -1,11 +1,11 @@
-package Net::Parallel::SimpleRPC::Client;
+package QVD::SimpleRPC::Client::Parallel;
 
 use strict;
 use warnings;
 
 use URI::Escape;
 
-use parent qw(Net::Parallel::HTTP);
+use parent qw(QVD::HTTPC::Parallel);
 
 my $json
 

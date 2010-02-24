@@ -1,11 +1,11 @@
-package Net::Parallel::HTTP;
+package QVD::ParallelNet::HTTP;
 
 use strict;
 use warnings;
 use URI::Escape qw(uri_escape);
 use QVD::HTTP::StatusCodes qw(:status_codes);
 
-use parent qw(Net::Parallel::Socket);
+use parent qw(QVD::ParallelNet::Socket);
 
 BEGIN { *debug = \$Net::Parallel::debug }
 our $debug;
