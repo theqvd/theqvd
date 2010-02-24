@@ -5,13 +5,14 @@ use strict;
 
 use QVD::Config;
 
-use NET::LDAP;
+use Net::LDAP;
 
 sub login {
+    my $self = shift;
     my $user = shift;
     my $passwd = shift;
     
-    my $ldap = Net::LDAP->new (cfg('auth_ldap_host')) or die "$@";
+    my $ldap = Net::LDAP->new (cfg('auth_ldap_host')) or return 0;
     
     my $mesg = $ldap->bind; 
     
@@ -20,8 +21,8 @@ sub login {
                       );
     
     if ($mesg->code != 0) {
-	print $mesg->error;
-	die;
+	warn $mesg->error;
+	return 0;
     }
     
     my $dn;
@@ -30,8 +31,8 @@ sub login {
     $mesg = $ldap->bind( $dn, password => $passwd);
     
     if ($mesg->code != 0) {
-	print $mesg->error;
-	die;
+	warn $mesg->error;
+	return 0;
     }
     
     1

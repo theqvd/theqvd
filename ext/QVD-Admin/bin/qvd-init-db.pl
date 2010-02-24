@@ -33,6 +33,7 @@ my %default_config = (
     shared_storage_path => '/var/lib/qvd/storage/shared',
     
     auth_ldap_host => 'yourLDAPhost.yourCompany.com',
+    auth_ldap_base = > 'dc=example,dc=com',
 );
 $admin->cmd_config_set(%default_config);
 
