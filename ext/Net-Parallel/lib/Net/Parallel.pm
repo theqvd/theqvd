@@ -10,6 +10,8 @@ use Time::HiRes qw(time);
 
 use Net::Parallel::Constants;
 
+our $debug;
+
 sub _ssl_want_to_write {  $IO::Socket::SSL::SSL_ERROR == IO::Socket::SSL::SSL_WANT_WRITE() }
 sub _ssl_want_to_read {  $IO::Socket::SSL::SSL_ERROR == IO::Socket::SSL::SSL_WANT_READ() }
 
@@ -87,7 +89,7 @@ sub run {
                 if ($wtr[$_] and ($canr && !$ssl_wtw[$_] or
                                   $canw && $ssl_wtw[$_])) {
 		    undef $ssl_wtw[$_];
-                    my $bout = \$sock->{_nps_output};
+                    my $bout = \$nps->{_nps_output};
                     my $bytes = sysread($sock, $$bout, 16*1024, length $$bout);
 		    unless ($bytes) {
 			if (defined $bytes) {
@@ -105,7 +107,7 @@ sub run {
                 }
                 elsif ($wtw[$_] and ($canw && !$ssl_wtr[$_] or
                                      $canr && $ssl_wtr[$_])) {
-		    my $bin = \$sock->{_nps_input};
+		    my $bin = \$nps->{_nps_input};
 		    my $bytes = syswrite($sock, $$bin, 16*1024);
 		    if ($bytes) {
 			substr($$bin, 0, $bytes, '');
