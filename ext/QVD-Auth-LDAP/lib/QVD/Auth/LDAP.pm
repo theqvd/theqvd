@@ -7,17 +7,34 @@ use QVD::Config;
 
 use NET::LDAP;
 
-sub new {
-    $ldap = Net::LDAP->new ( cfg('auth_ldap_host') ) or die "$@";
-}
-
 sub login {
     my $user = shift;
     my $passwd = shift;
     
-    $mesg = $ldap->bind ($user,           
-			password => $passwd,
-			version  => 3); 
+    my $ldap = Net::LDAP->new (cfg('auth_ldap_host')) or die "$@";
+    
+    my $mesg = $ldap->bind; 
+    
+    $mesg = $ldap->search(base   => cfg('auth_ldap_base'),
+                          filter => "(uid=$user)"
+                      );
+    
+    if ($mesg->code != 0) {
+	print $mesg->error;
+	die;
+    }
+    
+    my $dn;
+    foreach my $entry ($mesg->entries) { $dn = $entry->dn; }
+    
+    $mesg = $ldap->bind( $dn, password => $passwd);
+    
+    if ($mesg->code != 0) {
+	print $mesg->error;
+	die;
+    }
+    
+    1
 }
 
 =head1 NAME
