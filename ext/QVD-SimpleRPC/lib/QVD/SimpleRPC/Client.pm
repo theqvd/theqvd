@@ -11,6 +11,9 @@ use URI::Escape qw(uri_unescape uri_escape);
 use QVD::HTTPC;
 use QVD::HTTP::StatusCodes qw(:status_codes);
 
+use JSON;
+my $json = JSON->new->ascii->pretty;
+
 sub new {
     my ($class, $url_base, %opts) = @_;
     my ($scheme, $host, $base, $query, $frag) = uri_split($url_base);
@@ -43,14 +46,6 @@ sub connect {
     $self->{httpc}
 }
 
-sub _json {
-    my $self = shift;
-    $self->{_json} ||= do {
-	require JSON;
-	JSON->new->ascii->pretty;
-    }
-}
-
 sub _make_request {
     my $self = shift;
     return undef unless $self->{httpc};
@@ -64,11 +59,10 @@ sub _make_request {
     my $query = (@query ? '?'.join('&', @query) : '');
     my ($code, $msg, $headers, $body) =
 	$self->{httpc}->make_http_request(GET => "$self->{base}/$method$query");
-    unless ($code == HTTP_OK) {
-	die "HTTP request failed: $code - $msg";
-	return undef;
-    }
-    my $data = $self->_json->decode("[$body]");
+    die "HTTP request failed: $code - $msg"
+	unless $code == HTTP_OK;
+
+    my $data = $json->decode("[$body]");
 
     die $data->[1] if @$data >= 2;
     $data->[0];
