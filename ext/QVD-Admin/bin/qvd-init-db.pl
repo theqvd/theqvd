@@ -32,6 +32,7 @@ my %default_config = (
     home_storage_path => '/var/lib/qvd/storage/homes',
     shared_storage_path => '/var/lib/qvd/storage/shared',
     
+    auth_mode => 'basic'
     auth_ldap_host => 'yourLDAPhost.yourCompany.com',
     auth_ldap_base = > 'dc=example,dc=com',
 );
