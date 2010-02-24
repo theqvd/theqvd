@@ -1,4 +1,4 @@
-package QVD::ParallelNet::HTTP;
+package QVD::HTTPC::Parallel;
 
 use strict;
 use warnings;
@@ -53,10 +53,10 @@ sub unqueue_response {
     my $headers = delete $self->{_nph_headers};
     my $content = delete $self->{_nph_content};
     $self->{_nph_state} = 'done';
-    $state eq 'done' or return BAD_RESPONSE;
+    $state eq 'done' or return HTTP_BAD_RESPONSE;
     my ($version, $code, $msg) =
 	$status_line =~ m{^HTTP/(\S+)\s+(\d+)\s+(?:\s+(\S.*?))?\s*$}
-	    or return BAD_RESPONSE;
+	    or return HTTP_BAD_RESPONSE;
     wantarray ? ($code, $headers, $content) : $code;
 }
 

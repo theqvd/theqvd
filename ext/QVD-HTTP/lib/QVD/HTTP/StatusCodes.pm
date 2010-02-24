@@ -267,7 +267,7 @@ my $codes = <<'EOC';
 651 HTTP Version Not Supported By Client
     The client does not the HTTP protocol version used in the response
 
-652 Bad response
+652 Bad Response
     The response contains bad syntax
 
 EOC

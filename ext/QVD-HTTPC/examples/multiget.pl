@@ -3,20 +3,20 @@
 use strict;
 use warnings;
 
-use Net::Parallel;
-use Net::Parallel::HTTP;
+use QVD::ParallelNet;
+use QVD::HTTPC::Parallel;
 use URI;
 use IO::Socket::INET;
 use Data::Dumper;
 
 $Net::Parallel::debug = -1;
 
-my $np = Net::Parallel->new();
+my $par = QVD::ParallelNet->new();
 my @httpc;
 
 for (@ARGV) {
     my $uri = URI->new($_);
-    my $scheme = $uri->scheme;
+    my $scheme = $uri->scheme // 'http';
     $scheme =~ /^http(s)?$/ or die "bad scheme";
     my $ssl = $1 and die "SSL support not implemented yet";
     my $host = $uri->host;
@@ -24,12 +24,12 @@ for (@ARGV) {
     my $path = $uri->path_query;
     my $socket = IO::Socket::INET->new(PeerAddr => $host, PeerPort => $port,
 				       Proto => 'tcp', Blocking => 0);
-    my $httpc = Net::Parallel::HTTP->new($socket);
+    my $httpc = QVD::HTTPC::Parallel->new($socket);
     $httpc->queue_request(GET => $_, headers => ["Host: $host"]);
-    $np->register($httpc);
+    $par->register($httpc);
     push @httpc, $httpc;
 }
 
-$np->run;
+$par->run;
 
 print Dumper \@httpc;
