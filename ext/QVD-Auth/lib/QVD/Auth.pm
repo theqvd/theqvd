@@ -3,6 +3,21 @@ package QVD::Auth;
 use warnings;
 use strict;
 
+use QVD::Auth::Basic;
+use QVD::Auth::LDAP;
+
+use QVD::Config;
+
+sub login {
+    if (cfg('auth_mode') eq "basic") {
+	QVD::Auth::Basic::login(@_);
+    } elsif (cfg('auth_mode') eq "ldap") {
+	QVD::Auth::LDAP::login(@_);
+    } else {
+	0;
+    }
+}
+
 =head1 NAME
 
 QVD::Auth - The great new QVD::Auth!

@@ -3,7 +3,6 @@ package QVD::Auth::Basic;
 use warnings;
 use strict;
 
-use QVD::Config;
 use QVD::DB::Simple;
 
 use Net::LDAP;
