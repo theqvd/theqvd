@@ -14,6 +14,7 @@ use QVD::HTTP::Headers qw(header_lookup header_eq_check);
 use QVD::HTTP::StatusCodes qw(:status_codes);
 use QVD::URI qw(uri_query_split);
 use QVD::VMAS;
+use QVD::Auth;
 use URI::Split qw(uri_split);
 
 Log::Log4perl::init('log4perl.conf');
@@ -70,9 +71,10 @@ sub _authorize_user {
     if ($authorization =~ /^Basic (.*)$/) {
 	use MIME::Base64 'decode_base64';
 	my @user_pwd = split /:/, decode_base64($1);
-	my $user_rs = rs(User)->search({login => $user_pwd[0],
-					password => $user_pwd[1]});
-	if ($user_rs->count == 1) {
+	my $user_login = QVD::Auth::login($user_pwd[0], $user_pwd[1]);
+
+	if ($user_login == 1) {
+	    my $user_rs = rs(User)->search({login => $user_pwd[0]});
 	    INFO "Accepted connection from user $user_pwd[0]";
 	    return $user_rs->first;
 	} else {
