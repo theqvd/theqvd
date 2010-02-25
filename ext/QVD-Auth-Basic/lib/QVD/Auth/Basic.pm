@@ -3,6 +3,24 @@ package QVD::Auth::Basic;
 use warnings;
 use strict;
 
+use QVD::Config;
+use QVD::DB::Simple;
+
+use Net::LDAP;
+
+sub login {
+    my $self = shift;
+    my $user = shift;
+    my $passwd = shift;
+    
+    my $rs = rs(User)->search({login => $user,
+			      password => $passwd});
+
+    print $rs;
+
+    $rs->count; # Must be 1 if login is OK
+}
+
 =head1 NAME
 
 QVD::Auth::Basic - The great new QVD::Auth::Basic!
