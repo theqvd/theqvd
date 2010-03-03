@@ -17,7 +17,7 @@ package QVD::VMA::Impl;
 use Carp;
 use File::Slurp qw(slurp);
 use File::Spec;
-use Config::Tiny;
+use QVD::VMA::Config;
 use parent 'QVD::SimpleRPC::Server';
 
 use Log::Log4perl qw(:levels :easy);
@@ -43,11 +43,9 @@ sub _touch {
 sub new {
     my $class = shift;
     my $self = $class->SUPER::new();
-    my $config = Config::Tiny->read("vma.ini")
-      or croak "unable to read configuration file 'vma.ini'";
 
-    my $run_dir = $config->{vma}{run_dir} // '/var/run/qvd';
-    $self->{_desktop} = $config->{x_session}{desktop} // '/etc/X11/Xsession';
+    my $run_dir = cfg('vma.run_dir', '/var/run/qvd');
+    $self->{_desktop} = cfg('x_session.desktop', '/etc/X11/Xsession');
     $self->{_run_dir} = $run_dir;
     $self->{_run_state_fn} = "$run_dir/state";
     $self->{_run_nxagent_pid_fn} = "$run_dir/nxagent.pid";
