@@ -23,6 +23,7 @@ use Catalyst qw/ConfigLoader
 		Session::Store::FastMmap
 		Session::State::Cookie
 		FormBuilder
+		Authentication
                /;
 our $VERSION = sprintf "1.%04d", q$Revision: 6173 $ =~ /(\d+)/xg;
 #our $VERSION = '0.01';
@@ -40,6 +41,28 @@ __PACKAGE__->config(
 	name => 'QVD::Admin::Web',
 	session => {flash_to_stash => 1}
      );
+
+__PACKAGE__->config( 'Plugin::Authentication' =>
+	    {
+		default => {
+		    credential => {
+			class => 'Password',
+			password_field => 'password',
+			password_type => 'clear'
+		    },
+		    store => {
+			class => 'Minimal',
+			users => {
+			    admin => {
+				password => "LpwdeQND",
+				editor => 'yes',
+				roles => [qw/admin/],
+			    }
+			}
+		    }
+		}
+	    }
+);
 
 # Start the application
 __PACKAGE__->setup();

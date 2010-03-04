@@ -115,14 +115,21 @@ sub default :Path {
 sub login :Local {
     my ( $self, $c ) = @_;
     
-    if (($c->req->params->{log} eq $c->req->params->{pwd}) and $c->req->params->{log} ne '') {
-	
-	$c->res->redirect('/');
-    } else {
-	$c->stash->{current_view}='TTMin';
+    if (    my $user     = $c->req->param("log")
+	and my $password = $c->req->param("pwd") )
+    {
+	if ( $c->authenticate( { username => $user,
+				 password => $password } ) ) {
+	    $c->res->redirect('/');
+	} else {
+	    $c->stash->{current_view}='TTMin';
+	    # login incorrect
+	}
     }
-
-    
+    else {
+	$c->stash->{current_view}='TTMin';
+	# invalid form input
+    }
 }
 
 =head2 end
