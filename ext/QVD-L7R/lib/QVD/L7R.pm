@@ -121,6 +121,14 @@ sub _connect_to_vm_processor {
 	return;
     }
 
+    # Solo aceptamos conexiones en estados stopped, starting y started - #310
+    unless (grep $vm->vm_state, qw/stopped starting started/) {
+	DEBUG "User tries to connect to a VM that is not stopped, starting or started";
+	$server->send_http_error(HTTP_BAD_GATEWAY,
+	    "Virtual machine is in state ".$vm->vm_state);
+	return;
+    }
+
     # transición disconnected -> connected
     _connect_session($vmas, $vm);
 
