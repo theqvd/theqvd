@@ -71,7 +71,7 @@ sub list : Local {
 sub jlist : Local {
     my ( $self, $c ) = @_;
     my $model = $c->model('QVD::Admin::Web');
-    my $rs    = $model->vm_list("");
+    my $rs    = $model->vm_list("", {join => ["user"]});
     
     my @list;
     for (@$rs) {
