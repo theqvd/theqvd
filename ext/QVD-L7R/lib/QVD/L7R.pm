@@ -121,9 +121,9 @@ sub _connect_to_vm_processor {
 	return;
     }
 
-    # Solo aceptamos conexiones en estados stopped, starting y started - #310
-    unless (grep $vm->vm_state, qw/stopped starting started/) {
-	DEBUG "User tries to connect to a VM that is not stopped, starting or started";
+    # Solo aceptamos conexiones en estados stopped, starting y running - #310
+    unless (grep {$_ eq $vm->vm_state} qw/stopped starting running/) {
+	DEBUG "User tries to connect to a VM that is not stopped, starting or running";
 	$server->send_http_error(HTTP_BAD_GATEWAY,
 	    "Virtual machine is in state ".$vm->vm_state);
 	return;
@@ -137,7 +137,7 @@ sub _connect_to_vm_processor {
 #: porque hay que esperar a que la VM se levante). 
 
     # start the vm if it's not running already
-    if ($vm->vm_state ne 'running') {
+    if ($vm->vm_state eq 'stopped') {
 	DEBUG "VM not running, trying to start it";
 	unless ($vmas->assign_host_for_vm($vm)) {
 	    $vmas->push_user_state($vm, 'disconnected');
