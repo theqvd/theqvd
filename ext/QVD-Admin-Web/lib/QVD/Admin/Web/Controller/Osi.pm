@@ -41,11 +41,15 @@ Catalyst Controller.
 
 sub index : Path : Args(0) {
     my ( $self, $c ) = @_;
+    $c->go('Root', 'login', @_) unless $c->user_exists;
+    
     $c->go('list', @_);
 }
 
 sub list : Local {
     my ( $self, $c, $s ) = @_;
+    $c->go('Root', 'login', @_) unless $c->user_exists;
+    
     my $model = $c->model('QVD::Admin::Web');
     
     $s = $c->req->parameters->{s};
@@ -67,6 +71,8 @@ sub list : Local {
 
 sub view : Local :Args(1){
     my ( $self, $c, $id) = @_;
+    $c->go('Root', 'login', @_) unless $c->user_exists;
+    
     my $model = $c->model('QVD::Admin::Web');
     my $osi = $model->osi_find($id);
     $c->stash(osi => $osi);
@@ -74,6 +80,7 @@ sub view : Local :Args(1){
 
 sub add : Local Form {
     my ( $self, $c ) = @_;
+    $c->go('Root', 'login', @_) unless $c->user_exists;
 
     my $model = $c->model('QVD::Admin::Web');
     
@@ -134,6 +141,8 @@ sub add : Local Form {
 
 sub del : Local {
     my ( $self, $c ) = @_;
+    $c->go('Root', 'login', @_) unless $c->user_exists;
+    
     my $model = $c->model('QVD::Admin::Web');
 
     my $result = $c->form(

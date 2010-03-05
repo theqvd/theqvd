@@ -28,7 +28,8 @@ QVD::Admin::Web::Controller::Root - Root Controller for QVD::Admin::Web
 
 sub about :Local {
     my ( $self, $c ) = @_;
-    # Hello World
+    $c->go('login', @_) unless $c->user_exists;
+    
     $c->stash->{data} = $c->model('QVD::Admin::Web');
 
 }
@@ -80,7 +81,9 @@ sub propsetButton :Local {
 
 
 sub index :Path :Args(0) {
-    my ( $self, $c ) = @_;
+    my ( $self, $c ) = @_;   
+    $c->go('login', @_) unless $c->user_exists;
+
     
     my $model = $c->model('QVD::Admin::Web');
     
@@ -130,6 +133,14 @@ sub login :Local {
 	$c->stash->{current_view}='TTMin';
 	# invalid form input
     }
+}
+
+sub logout :Local {
+    my ( $self, $c ) = @_;
+    
+    $c->logout;
+    
+    $c->go('login', @_);
 }
 
 =head2 end

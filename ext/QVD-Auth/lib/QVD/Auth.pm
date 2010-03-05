@@ -9,7 +9,7 @@ use QVD::Auth::LDAP;
 use QVD::Config;
 
 sub login {
-    my $mode = cfg('auth_mode', 'basic');
+    my $mode = cfg('auth_mode');
     if ($mode eq "basic") {
 	QVD::Auth::Basic::login(@_);
     } elsif ($mode eq "ldap") {

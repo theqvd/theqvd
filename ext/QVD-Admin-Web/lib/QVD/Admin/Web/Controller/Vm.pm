@@ -37,12 +37,16 @@ Catalyst Controller.
 
 sub index : Path  {
     my ( $self, $c ) = @_;
+    $c->go('Root', 'login', @_) unless $c->user_exists;
+    
 	delete($c->session->{vm_add});
     $c->go('list', @_);
 }
 
 sub view : Local :Args(1){
     my ( $self, $c, $id) = @_;
+    $c->go('Root', 'login', @_) unless $c->user_exists;
+    
     my $model = $c->model('QVD::Admin::Web');
     
     my $vm = $model->vm_find($id);
@@ -53,6 +57,8 @@ sub view : Local :Args(1){
 
 sub list : Local {
     my ( $self, $c, $s ) = @_;
+    $c->go('Root', 'login', @_) unless $c->user_exists;
+    
     my $model = $c->model('QVD::Admin::Web');
       
     $s = $c->req->parameters->{s};
@@ -70,6 +76,8 @@ sub list : Local {
 
 sub jlist : Local {
     my ( $self, $c ) = @_;
+    $c->go('Root', 'login', @_) unless $c->user_exists;
+    
     my $model = $c->model('QVD::Admin::Web');
     my $rs    = $model->vm_list("", {join => ["user"]});
     
@@ -84,6 +92,8 @@ sub jlist : Local {
 
 sub start_vm : Local {
     my ( $self, $c ) = @_;
+    $c->go('Root', 'login', @_) unless $c->user_exists;
+    
     my $model = $c->model('QVD::Admin::Web');
 
     my $result = $c->form(
@@ -122,6 +132,8 @@ sub start_vm : Local {
 
 sub stop_vm : Local {
    my ( $self, $c ) = @_;
+   $c->go('Root', 'login', @_) unless $c->user_exists;
+   
    my $model = $c->model('QVD::Admin::Web');
 
     my $result = $c->form(
@@ -163,6 +175,8 @@ sub stop_vm : Local {
 
 sub del : Local {
     my ( $self, $c ) = @_;
+    $c->go('Root', 'login', @_) unless $c->user_exists;
+    
     my $model = $c->model('QVD::Admin::Web');
 
     my $result = $c->form(
@@ -199,6 +213,8 @@ sub del : Local {
 
 sub disconnect_user : Local {
     my ( $self, $c ) = @_;
+    $c->go('Root', 'login', @_) unless $c->user_exists;
+    
     my $model = $c->model('QVD::Admin::Web');
 
     my $result = $c->form(
@@ -235,6 +251,8 @@ sub disconnect_user : Local {
 
 sub _get_add_param {
     my ($self, $c, $param) = @_;
+    $c->go('Root', 'login', @_) unless $c->user_exists;
+    
     my $result = defined($c->req->body_params->{$param}) ?
 	$c->req->body_params->{$param} : $c->session->{vm_add}->{$param};
     $c->session->{vm_add}->{$param} = $result;

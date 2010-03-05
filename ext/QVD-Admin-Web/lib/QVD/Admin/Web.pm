@@ -25,6 +25,9 @@ use Catalyst qw/ConfigLoader
 		FormBuilder
 		Authentication
                /;
+	       
+use QVD::Config;      
+	       
 our $VERSION = sprintf "1.%04d", q$Revision: 6173 $ =~ /(\d+)/xg;
 #our $VERSION = '0.01';
 
@@ -42,6 +45,9 @@ __PACKAGE__->config(
 	session => {flash_to_stash => 1}
      );
 
+my $username = cfg('auth_basic_adminusername');
+my $password = cfg('auth_basic_adminpassword');
+
 __PACKAGE__->config( 'Plugin::Authentication' =>
 	    {
 		default => {
@@ -53,8 +59,8 @@ __PACKAGE__->config( 'Plugin::Authentication' =>
 		    store => {
 			class => 'Minimal',
 			users => {
-			    admin => {
-				password => "LpwdeQND",
+			    $username => {
+				password => $password,
 				editor => 'yes',
 				roles => [qw/admin/],
 			    }

@@ -40,12 +40,16 @@ Catalyst Controller.
 
 sub index : Path : Args(0) {
     my ( $self, $c ) = @_;
+    $c->go('Root', 'login', @_) unless $c->user_exists;
+    
     $c->go('list', @_);
 
 }
 
 sub list : Local {
     my ( $self, $c, $s ) = @_;
+    $c->go('Root', 'login', @_) unless $c->user_exists;
+    
     my $model = $c->model('QVD::Admin::Web');
     
     $s = $c->req->parameters->{s};
@@ -62,6 +66,8 @@ sub list : Local {
 
 sub view : Local : Args(1) {
     my ( $self, $c, $userid ) = @_;
+    $c->go('Root', 'login', @_) unless $c->user_exists;
+    
     my $model = $c->model('QVD::Admin::Web');
     my $rs = $model->vm_list( { user_id => $userid } );
     $c->stash->{vm_list} = $rs;
@@ -72,6 +78,8 @@ sub view : Local : Args(1) {
 
 sub new_vm : Local : Args(1) {
     my ( $self, $c, $userid ) = @_;
+    $c->go('Root', 'login', @_) unless $c->user_exists;
+    
     my $model = $c->model('QVD::Admin::Web');
     my $rs = $model->vm_list( { user_id => $userid } );
     $c->stash->{vm_list} = $rs;
@@ -85,6 +93,8 @@ sub new_vm : Local : Args(1) {
 
 sub passwd : Local : Args(1) {
     my ( $self, $c, $userid ) = @_;
+    $c->go('Root', 'login', @_) unless $c->user_exists;
+    
     my $model = $c->model('QVD::Admin::Web');
 
     my $user = $model->user_find($userid);
@@ -93,6 +103,8 @@ sub passwd : Local : Args(1) {
 
 sub change_passwd : Local : Args(1) {
     my ( $self, $c, $userid ) = @_;
+    $c->go('Root', 'login', @_) unless $c->user_exists;
+    
     my $model = $c->model('QVD::Admin::Web');
     
     my $passwd = $c->req->body_params->{passwd};
@@ -116,6 +128,8 @@ sub change_passwd : Local : Args(1) {
 
 sub add : Local Form {
     my ( $self, $c ) = @_;
+    $c->go('Root', 'login', @_) unless $c->user_exists;
+    
     my $form  = $self->formbuilder;
     my $model = $c->model('QVD::Admin::Web');
 
@@ -167,6 +181,8 @@ sub add : Local Form {
 
 sub del : Local {
     my ( $self, $c ) = @_;
+    $c->go('Root', 'login', @_) unless $c->user_exists;
+    
     my $model = $c->model('QVD::Admin::Web');
 
     my $result = $c->form(
