@@ -35,6 +35,8 @@ my %default_config = (
     auth_mode => 'basic'
     auth_ldap_host => 'yourLDAPhost.yourCompany.com',
     auth_ldap_base = > 'dc=example,dc=com',
+    auth_basic_adminusername => 'admin',
+    auth_basic_adminpassword => 'LpwdeQND',
 );
 $admin->cmd_config_set(%default_config);
 
