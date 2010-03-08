@@ -26,8 +26,14 @@ sub new {
     $self;
 }
 
+my %timeout = (starting => cfg(vm_state_starting_timeout),
+	       stopping => cfg(vm_state_stopping_timeout),
+	       zombie   => cfg(vm_state_zombie_sigkill_timeout) );
+
 sub run {
     my $self = shift;
+
+    my %timeout_ = vm
 
     $self->_reset_timestamps;
 
@@ -67,6 +73,21 @@ sub run {
 		my $new_state = ($state eq 'stopping' ? 'stopped' : 'failed');
 		$self->_set_vm_state($new_state => $vmrt);
 		next;
+	    }
+
+	    if (defined(my $timeout = $timeout{$state})) {
+		my $state_ts = $vmrt->vm_state_ts;
+		if ($state_ts + $timeout < time) {
+		    ERROR "vm staled in state $state,".
+			" id: $id, state_ts: $state_ts, time: ".time;
+		    if ($state eq 'zombie') {
+			$self->_kill_zombie_vm;
+		    }
+		    else {
+			$self->_set_vm_state(zombie => $vrmt);
+		    }
+		    next;
+		}
 	    }
 
 	    if ($state eq 'starting' or $state eq 'running') {
@@ -128,10 +149,8 @@ sub run {
 		    ERROR "machine has not responded for a long time, going zombie!".
 		    " id: $id, vma_ok_ts: $vma_ok_ts, time: ".time;
 		    $self->_set_vm_state(zombie => $vmrt);
-
-		    next;
 		}
-		# handle timeouts and consecutive failures.
+		# else just go on until timeout or ok
 	    }
 	    else {
 		$self->_set_vm_state(running => $vmrt)
@@ -181,20 +200,6 @@ sub run {
 			}
 		    };
 		}
-
-
-		$self->_update_x_timers($vrmt);
-
-		# FIXME: anything else to do? (was x _do event in HKD)
-
-		# FIXME: anything else to do? (was vm _do event in HKD)
-
-		$self->_check_vm_timers($vrmt);
-
-		$self->_check_vm_cmd($vrmt);
-	    }
-	    else {
-		# FIXME: vm is not responding, do something, whatever!!!
 	    }
 	}
     }
@@ -210,8 +215,8 @@ sub _discard_changes {
 
 sub _set_state {
     my ($self, $type, $state, $vmrt) = @_;
+    my $method = $self->can("enter_${type}_state_${state}");
     txn_do {
-	my $method = $self->can("enter_${type}_state_${state}");
 	$self->_discard_changes($vmrt, "changing to ${type} state $state");
 	$method->($self, $vmrt) if $method;
 	$vmrt->update({"${type}_state" => $x_state,
@@ -222,4 +227,28 @@ sub _set_state {
 sub _set_vm_state { shift->_set_state(vm => @_) }
 sub _set_x_state { shift->_set_state(x => @_) }
 sub _set_user_state { shift->_set_state(user => @_) }
+
+sub _enter_vm_state_stopped {
+    # FIXME!
+}
+
+sub _enter_vm_state_starting {
+    # FIXME!
+}
+
+sub _enter_vm_state_running {
+    # FIXME!
+}
+
+sub _enter_vm_state_stopping {
+    # FIXME!
+}
+
+sub _enter_vm_state_zombie {
+    # FIXME!
+}
+
+sub _enter_vm_state_failed {
+    # FIXME!
+}
 
