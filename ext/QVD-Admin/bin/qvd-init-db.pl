@@ -2,13 +2,14 @@
 
 use strict;
 use warnings;
-use QVD::Admin;
 use QVD::DB::Simple;
 use Sys::Hostname;
 use File::Slurp;
 
 db->erase;
 db->deploy;
+
+require QVD::Admin;
 
 my $admin = QVD::Admin->new;
 
@@ -39,6 +40,7 @@ my %default_config = (
     auth_basic_adminpassword => 'LpwdeQND',
 );
 $admin->cmd_config_set(%default_config);
+QVD::Config->reload;
 
 $admin->cmd_user_add(login => 'qvd', password => 'passw0rd');
 $admin->cmd_osi_add(name => 'Test image',

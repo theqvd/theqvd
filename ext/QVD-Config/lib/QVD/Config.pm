@@ -10,7 +10,16 @@ use QVD::DB::Simple;
 use Exporter qw(import);
 our @EXPORT = qw(cfg);
 
-my %cache = map { $_->key => $_->value } rs(Config)->all;
+my %cache;
+
+use Data::Dumper;
+
+sub reload {
+    %cache = map { $_->key => $_->value } rs(Config)->all;
+    warn "config cache reloaded:\n" .Dumper \%cache;
+}
+
+reload();
 
 sub cfg (*;@) { $cache{$_[0]} // $_[1] }
 
