@@ -5,7 +5,7 @@
 <tr id="add_vm_name_vm_name_row">
    <td class="fb_field" id="add_vm_name_vm_name_field">
    <form name="vmname" id="vmname" action="[% c.uri_for('/users/change_passwd') %]/[% user.id %]" method="POST">
-   <input class="fb_input" id="passwd" name="passwd" size="40" type="text" />
+   <input class="fb_input" id="passwd" name="passwd" size="40" type="password" />
    <input type="submit" value="Cambiar" name="_submit" id="add_submit" class="fb_button">
    </form></td>
 </tr>
