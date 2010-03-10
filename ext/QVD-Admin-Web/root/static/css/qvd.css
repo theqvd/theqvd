@@ -251,11 +251,21 @@ button.link:focus span {
 	background-position: 5px 5px;
 }
 
+.option_user_disconnected {
+	background-image: url(../images/icons/user_red.png);
+
+}
+
 .option_started, .option_running, .option_user_connected {
 	padding: 5px 5px 5px 25px;
 	background-image: url(../images/icons/bullet_green.png);
 	background-repeat: no-repeat;
 	background-position: 5px 5px;
+}
+
+.option_user_connected {
+	padding: 5px 5px 5px 25px;
+	background-image: url(../images/icons/user_green.png);
 }
 
 .option_failedvm, .option_failed {
@@ -270,6 +280,10 @@ button.link:focus span {
 	background-image: url(../images/icons/bullet_orange.png);
 	background-repeat: no-repeat;
 	background-position: 5px 5px;
+}
+
+.option_user_connecting {
+	background-image: url(../images/icons/user_orange.png);
 }
 
 .option_starting, .option_stopping {
