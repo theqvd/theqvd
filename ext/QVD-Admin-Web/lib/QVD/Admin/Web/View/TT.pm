@@ -6,6 +6,7 @@ with 'Catalyst::View::Component::jQuery';
 
 __PACKAGE__->config
     (
+     ENCODING   => 'utf-8',
      TEMPLATE_EXTENSION => '.tt',
      WRAPPER => 'wrapper.tt',
      'JavaScript::Framework::jQuery' =>
