@@ -165,7 +165,6 @@ sub ConnectToVM {
     my $auth = encode_base64("$user:$passwd", '');
 
     Wx::PostEvent($self, new Wx::PlThreadEvent(-1, $EVT_CONN_STATUS, 'CONNECTING'));
-    # FIXME Random segfaul on connection refused - ticket #273
     require QVD::HTTPC;
     my $httpc = eval { new QVD::HTTPC("$host:$port", SSL => 1) };
     if ($@) {
