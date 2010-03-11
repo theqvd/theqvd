@@ -114,7 +114,7 @@ sub OnClickConnect {
     $self->{state} = "";
     %connect_info = map { $_ => $self->{$_}->GetValue } qw(host username password);
     $connect_info{port} = $DEFAULT_PORT;
-    if (!$self->{worker_thread}) {
+    if (!$self->{worker_thread} || !$self->{worker_thread}->is_running()) {
 	@_ = ();
 	my $thr = threads->create(\&RunWorkerThread, $self);
 	$thr->detach();
@@ -144,9 +144,15 @@ sub _shared_clone {
 
 sub RunWorkerThread {
     my $self = shift;
+    my @args = @_;
     while (1) {
 	lock(%connect_info);
-	$self->ConnectToVM(@_);
+	local $@;
+	eval { $self->ConnectToVM(@args) };
+	if ($@) {
+	    my $evt = new Wx::PlThreadEvent(-1, $EVT_CONNECTION_ERROR, $@);
+	    Wx::PostEvent($self, $evt);
+	}
 	cond_wait(%connect_info);
     }
 }
