@@ -29,6 +29,9 @@ my %default_config = (
     
     l7r_pid_file => '/var/run/qvd/l7r.pid',
     l7r_log_file => '/var/log/qvd.log',
+    
+    rc_pid_file => '/var/run/qvd/rc.pid',
+    rc_log_file => '/var/log/qvd.log',
 
     base_storage_path => '/var/lib/qvd/storage',
     ro_storage_path => '/var/lib/qvd/storage/images',
