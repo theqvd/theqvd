@@ -21,7 +21,7 @@ function on_submit()
 
 </script>
 
-<h1>Imágenes</h1>
+<h1>Images</h1>
 <div class="search">
 <form action="[% c.uri_for('/osi/list/') %]" method="get">
     <input name="s" type="text" size="18" value="[% s %]"/>
