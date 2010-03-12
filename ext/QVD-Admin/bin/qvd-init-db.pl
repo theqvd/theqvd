@@ -48,7 +48,11 @@ my %default_config = (
 $admin->cmd_config_set(%default_config);
 QVD::Config->reload;
 
-$admin->cmd_user_add(login => 'qvd', password => 'passw0rd');
+$admin->cmd_user_add(login => 'qvd', 
+		password => 'passw0rd', 
+		department => 'I+D',
+	       	email => 'qvd@qindel.com',
+	       	telephone => '914 44 44 44');
 $admin->cmd_osi_add(name => 'Test image',
 	       memory => '256',
 	       use_overlay => 1,
