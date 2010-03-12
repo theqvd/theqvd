@@ -9,7 +9,7 @@ function submitvm(a) {
 
 </script>
 
-<h1><a href="[% c.uri_for('/users') %]">Usuarios</a> &raquo; <a href="[% c.uri_for('/users/view') %]/[% user.id %]">[% user.login %]</a> &raquo; Nueva m&aacute;quina virtual</h1>
+<h1><a href="[% c.uri_for('/users') %]">Users</a> &raquo; <a href="[% c.uri_for('/users/view') %]/[% user.id %]">[% user.login %]</a> &raquo; New virtual machine</h1>
 
 <h2>Nombre</h2>
 
@@ -24,10 +24,10 @@ function submitvm(a) {
     <thead>
         <tr>
             <th id="id"></th>
-            <th id="name">Nombre</th>
-            <th id="disk_image">Imagen de disco</th>
+            <th id="name">Name</th>
+            <th id="disk_image">Disk image</th>
             <th id="use_overlay">Overlay</th>
-            <th id="memory">Memoria</th>
+            <th id="memory">Memory</th>
         </tr>
     </thead>
     <tbody>

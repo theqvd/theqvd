@@ -1,7 +1,7 @@
 <script LANGUAGE="JavaScript">
 function confirm_submit()
 {
-var agree=confirm("¿Está seguro?");
+var agree=confirm("Are you sure?");
 if (agree)
 	return true ;
 else
@@ -25,10 +25,10 @@ function on_submit()
 <div class="search">
 <form action="[% c.uri_for('/users/list/') %]" method="get">
     <input name="s" type="text" size="18" value="[% s %]"/>
-    <input type="submit" value="Buscar"/> 
+    <input type="submit" value="Search"/> 
 </form>
 </div>
-<a class="side_add" href="[% c.uri_for('/users/add') %]">Nuevo</a>
+<a class="side_add" href="[% c.uri_for('/users/add') %]">New</a>
 <div id="pager" class="pager">
 	<form>
 		<img src="/static/icons/first.png" class="first"/>
@@ -49,9 +49,9 @@ function on_submit()
         <tr>
 	    <th />	
             <th id="id"></th>
-            <th id="login">Nombre</th>
-	    <!--<th id="disco">Disco</th>-->
-	    <th id="state">Estado</th>
+            <th id="login">Name</th>
+	    <!--<th id="disco">Disk</th>-->
+	    <th id="state">State</th>
         </tr>
     </thead>
     <tbody>
@@ -67,7 +67,7 @@ function on_submit()
         [% END -%]
     </tbody>
 </table>
-<input type="submit" onClick="document.pressed='delete'" value="Eliminar"/>
+<input type="submit" onClick="document.pressed='delete'" value="Delete"/>
 </form>
 
 <script type="text/javascript" charset="utf-8">

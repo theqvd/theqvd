@@ -2,13 +2,13 @@ name: add
 method: post
 fields:
     name:
-        label: Nombre
+        label: Name
         type:  text
         size:  40
         validate: NAME
         required: 1
     address:
-        label: Direccion IP
+        label: IP Address
         type:  text
         size:  20
         validate: IPV4

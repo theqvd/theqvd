@@ -1,7 +1,7 @@
 <script LANGUAGE="JavaScript">
 function confirm_submit()
 {
-var agree=confirm("¿Está seguro?");
+var agree=confirm("Are you sure?");
 if (agree)
 	return true ;
 else
@@ -9,14 +9,14 @@ else
 }
 </script>
 
-<h1>Nodos</h1>
+<h1>Nodes</h1>
 <div class="search">
 <form action="[% c.uri_for('/hosts/list/') %]" method="get">
     <input name="s" type="text" size="18" value="[% s %]"/>
-    <input type="submit" value="Buscar"/> 
+    <input type="submit" value="Search"/> 
 </form>
 </div>
-<a class="side_add" href="[% c.uri_for('/hosts/add') %]">Nuevo</a>
+<a class="side_add" href="[% c.uri_for('/hosts/add') %]">New</a>
 <div id="pager" class="pager">
 	<form>
 		<img src="/static/icons/first.png" class="first"/>
@@ -35,8 +35,8 @@ else
     <thead>
         <tr>
             <th id="id"></th>
-            <th id="name">Nombre</th>
-            <th id="address">Dirección</th>
+            <th id="name">Name</th>
+            <th id="address">Address</th>
         </tr>
     </thead>
     <tbody>

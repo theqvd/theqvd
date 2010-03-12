@@ -1,4 +1,4 @@
-<h1><a href="[% c.uri_for('/vm') %]">Máquinas virtuales</a> &raquo; <a href="[% c.uri_for('/vm/view') %]/[% vm_runtime.vm_id %]">[% vm_runtime.rel_vm_id.name %]</a> &raquo; VNC</h1>
+<h1><a href="[% c.uri_for('/vm') %]">Virtual machines</a> &raquo; <a href="[% c.uri_for('/vm/view') %]/[% vm_runtime.vm_id %]">[% vm_runtime.rel_vm_id.name %]</a> &raquo; VNC</h1>
 
 <div class="view">
 	<applet code="VncViewer" width="100%" height="100%" archive="/static/jar/VncViewer.jar">

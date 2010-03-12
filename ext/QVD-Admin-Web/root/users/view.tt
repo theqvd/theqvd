@@ -1,13 +1,13 @@
-<h1><a href="[% c.uri_for('/users') %]">Usuarios</a> &raquo; [% user.login %]</h1>
+<h1><a href="[% c.uri_for('/users') %]">Users</a> &raquo; [% user.login %]</h1>
 
 <div class="view">
     <table class="tablesorter resultset">
 	<tr>
-	    <td class="field">Identificador</td>
+	    <td class="field">Identifier</td>
 	    <td class="value">[% user.id %]</td>
 	</tr>
 	<tr>
-	    <td class="field">Nombre</td>
+	    <td class="field">Name</td>
 	    <td class="value">[% user.login %]</td>
 	</tr>
 [% FOREACH pair = user.extra.get_columns.hash.pairs %]
@@ -20,21 +20,21 @@
 [% END %]
     </table>
 </div>
-<p><a class="side_add" href="[% c.uri_for('/users/new_vm') %]/[% user.id %]">Nueva máquina virtual</a> | <a class="option_passwd" href="[% c.uri_for('/users/passwd') %]/[% user.id %]">Cambiar contrase&ntilde;a</a></p>
+<p><a class="side_add" href="[% c.uri_for('/users/new_vm') %]/[% user.id %]">New virtual machine</a> | <a class="option_passwd" href="[% c.uri_for('/users/passwd') %]/[% user.id %]">Change password</a></p>
 [% FOREACH vm IN vm_list -%]
 [% IF loop.first %]
-<h2>Máquinas virtuales asignadas</h2>
+<h2>Assigned virtual machines</h2>
 
 <table id="props" class="tablesorter resultset">
     <thead>
         <tr>
             <th id="id"></th>
-            <th id="user">Usuario</th>
-            <th id="osi">Imagen Disco</th>
-            <th id="name">Nombre</th>
-            <th id="storage">Almacenamiento</th>
-	    <th id="state">Estado</th>
-	    <th class="options">Opciones</th>
+            <th id="user">User</th>
+            <th id="osi">Image disk</th>
+            <th id="name">Name</th>
+            <th id="storage">Storage</th>
+	    <th id="state">State</th>
+	    <th class="options">Options</th>
         </tr>
     </thead>
     <tbody>

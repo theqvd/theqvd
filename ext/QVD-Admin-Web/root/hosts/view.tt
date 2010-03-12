@@ -1,17 +1,17 @@
-<h1><a href="[% c.uri_for('/hosts') %]">Nodos</a> &raquo; [% host.name %]</h1>
+<h1><a href="[% c.uri_for('/hosts') %]">Nodes</a> &raquo; [% host.name %]</h1>
 
 <div class="view">
     <table class="tablesorter resultset">
 	<tr>
-	    <td class="field">Identificador</td>
+	    <td class="field">Identifier</td>
 	    <td class="value">[% host.id %]</td>
 	</tr>
 	<tr>
-	    <td class="field">Nombre</td>
+	    <td class="field">Name</td>
 	    <td class="value">[% host.name %]</td>
 	</tr>
 	<tr>
-	    <td class="field">Dirección IP</td>
+	    <td class="field">IP address</td>
 	    <td class="value">[% host.address %]</td>
 	</tr>
     </table>

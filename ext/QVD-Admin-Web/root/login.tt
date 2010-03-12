@@ -5,14 +5,14 @@
 </p>
 <form method="post" action="/login" id="loginform" name="loginform">
 	<p>
-		<label>Nombre de usuario<br/>
+		<label>User name<br/>
 		<input type="text" tabindex="10" size="20" value="" class="input" id="user_login" name="log"/></label>
 	<br/>
-		<label>Contraseña<br/>
+		<label>Password<br/>
 		<input type="password" tabindex="20" size="20" value="" class="input" id="user_pass" name="pwd"/></label>
 	</p>
 	<p class="submit">
-		<input type="submit" tabindex="100" value="Iniciar sesión" id="submit" name="submit"/>
+		<input type="submit" tabindex="100" value="Init session" id="submit" name="submit"/>
 	</p>
 
 </form>

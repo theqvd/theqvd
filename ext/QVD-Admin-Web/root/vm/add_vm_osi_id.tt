@@ -1,10 +1,10 @@
-[% META title = "Añadir Uvm" %]
-<h1><a href="[% c.uri_for('/vm') %]">Máquinas virtuales</a> &raquo; Nueva</h1>
+[% META title = "Adding vm" %]
+<h1><a href="[% c.uri_for('/vm') %]">Virtual Machines</a> &raquo; New</h1>
 <span class="step_1_off"></span><span class="step_2_off"></span><span class="step_3_on"></span>
 
-<div><a href="[% c.uri_for('/vm') %]">Cancelar</a></div>
+<div><a href="[% c.uri_for('/vm') %]">Cancel</a></div>
 
-<h1>Imágenes</h1>
+<h1>Images</h1>
 <div id="pager" class="pager">
 	<form id="pager_form" name="pager_form">
 		<img src="/static/icons/first.png" class="first"/>
@@ -22,10 +22,10 @@
     <thead>
         <tr>
             <th id="id"></th>
-            <th id="name">Nombre</th>
-            <th id="disk_image">Imagen de disco</th>
+            <th id="name">Name</th>
+            <th id="disk_image">Image disk</th>
             <th id="use_overlay">Overlay</th>
-            <th id="memory">Memoria</th>
+            <th id="memory">Memory</th>
     
         </tr>
     </thead>

@@ -1,29 +1,29 @@
-<h1><a href="[% c.uri_for('/vm') %]">Máquinas virtuales</a> &raquo; [% vm.name %]</h1>
+<h1><a href="[% c.uri_for('/vm') %]">Virtual machines</a> &raquo; [% vm.name %]</h1>
 
 <div class="view">
     <table class="tablesorter resultset">
 	<tr>
-	    <td class="field">Identificador</td>
+	    <td class="field">Identifier</td>
 	    <td class="value">[% vm.id %]</td>
 	</tr>
 	<tr>
-	    <td class="field">Nombre</td>
+	    <td class="field">Name</td>
 	    <td class="value">[% vm.name %]</td>
 	</tr>
 	<tr>
-	    <td class="field">Usuario</td>
+	    <td class="field">User</td>
 	    <td class="value">[% vm.user.login %]</td>
 	</tr>
 	<tr>
-	    <td class="field">Dirección IP</td>
+	    <td class="field">IP address</td>
 	    <td class="value">[% vm.vm_runtime.vm_address %]</td>
 	</tr>
 	<tr>
-	    <td class="field">Estado</td>
+	    <td class="field">State</td>
 	    <td class="value">[% vm.vm_runtime.vm_state %]</td>
 	</tr>	
 	<tr>
-	    <td class="field">Nodo</td>
+	    <td class="field">Node</td>
 	    <td class="value"><a href="[% c.uri_for('/hosts/view/') %][% vm.vm_runtime.host_id %]">[% vm.vm_runtime.host.name %]</a></td>
 	</tr>		
     </table>
@@ -49,10 +49,10 @@ function vnc() {
 
 [% IF vm.vm_runtime.vm_state == 'running' OR vm.vm_runtime.vm_state == 'starting'  OR vm.vm_runtime.vm_state == 'stopping' %]
 
-<h2>Administración remota</h2>
+<h2>Remote administration</h2>
 <ul class="intermenu">
-<li><a href="[% c.uri_for('/vm/view') %]/[% vm.id %]" onClick="vnc();" class="option_vnc">Visor VNC</a></li>
-<li><a href="vnc://[% vm.vm_runtime.host.address %]:[% vm.vm_runtime.vm_vnc_port %]" class="option_vnclocal">Cliente local VNC</a></li>
+<li><a href="[% c.uri_for('/vm/view') %]/[% vm.id %]" onClick="vnc();" class="option_vnc">VNC viewer</a></li>
+<li><a href="vnc://[% vm.vm_runtime.host.address %]:[% vm.vm_runtime.vm_vnc_port %]" class="option_vnclocal">VNC local client</a></li>
 </ul>
 
 [% END %]

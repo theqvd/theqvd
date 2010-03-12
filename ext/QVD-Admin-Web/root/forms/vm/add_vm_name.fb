@@ -2,11 +2,11 @@ name: add_vm_name
 method: post
 fields:
   vm_name:
-    label: Nombre
+    label: Name
     type:  text
     size:  40
     validate: NAME
     required: 1
-submit: Continuar
+submit: Continue
 
 

@@ -1,46 +1,46 @@
-<h1>Bienvenido a Quality Virtual Desktop</h1>
+<h1>Welcome to Quality Virtual Desktop</h1>
 
-<p>Desde esta herramienta puede controlar los principales aspectos de su instalación de la plataforma QVD, <a href="/users/">Usuarios</a>, <a href="/vm/">M&aacute;quinas virtuales</a>, 
-<a href="/hosts/">Nodos</a> e <a href="/osi/">Im&aacute;genes</a>
+<p>This web lets you manage the main issues of the QVD platform, <a href="/users/">Users</a>, <a href="/vm/">Virtual machines</a>, 
+<a href="/hosts/">Nodes</a>  and <a href="/osi/">Images</a>
 </p>
 
 <div class="grid_5 alpha graphs">
-<h2>Máquinas virtuales</h2>
-<a href="/vm/"><img border="0" alt="Gráfico circular de máquinas virtuales en QVD" src="http://chart.apis.google.com/chart?cht=p&amp;chd=t:[% vm_stats_values -%]&amp;chs=280x150&amp;chl=[% vm_stats_fields -%]"/></a>
+<h2>Virtual machines</h2>
+<a href="/vm/"><img border="0" alt="QVD virtual machines pie chart" src="http://chart.apis.google.com/chart?cht=p&amp;chd=t:[% vm_stats_values -%]&amp;chs=280x150&amp;chl=[% vm_stats_fields -%]"/></a>
 </div>
 
 <div class="grid_5 omega graphstwo">
-<h2>Sesiones</h2>
+<h2>Sessions</h2>
 [% IF vm_total_stats != 0 %]
-<a href="/users/"><img border="0" alt="Gráfico de barras de usuarios en QVD" src="http://chart.apis.google.com/chart?cht=bhs&chs=225x25&chd=t:[% 100*(session_connected_stats / vm_total_stats) -%]&chco=FF8D13"/></a>
+<a href="/users/"><img border="0" alt="QVD users bar chart" src="http://chart.apis.google.com/chart?cht=bhs&chs=225x25&chd=t:[% 100*(session_connected_stats / vm_total_stats) -%]&chco=FF8D13"/></a>
 [% END %]
 </div>
 
 <div class="grid_2 center">
-    <p><span class="big_count">[% session_connected_stats -%]</span><br/>establecidas</p>
+    <p><span class="big_count">[% session_connected_stats -%]</span><br/>established</p>
 </div>
 
 <div class="grid_2 center">
-    <p><span class="big_count">[% vm_total_stats -%]</span><br/>potenciales</p>
+    <p><span class="big_count">[% vm_total_stats -%]</span><br/>potential</p>
 </div>
 
 <div class="clear"></div>
 
-<h2 class="grid_12 graphs">Totales</h2>
+<h2 class="grid_12 graphs">Totals</h2>
 
 <div class="grid_2 center totals">
-    <p><span class="big_count">[% user_total_stats -%]</span><br/>usuarios</p>
+    <p><span class="big_count">[% user_total_stats -%]</span><br/>users</p>
 </div>
 
 <div class="grid_2 center">
-    <p><span class="big_count">[% vm_total_stats -%]</span><br/>máquinas virtuales</p>
+    <p><span class="big_count">[% vm_total_stats -%]</span><br/>virtual machines</p>
 </div>
 
 <div class="grid_2 center">
-    <p><span class="big_count">[% host_total_stats -%]</span><br/>nodos</p>
+    <p><span class="big_count">[% host_total_stats -%]</span><br/>nodes</p>
 </div>
 
 <div class="grid_2 center">
-    <p><span class="big_count">[% osi_total_stats -%]</span><br/>imágenes</p>
+    <p><span class="big_count">[% osi_total_stats -%]</span><br/>images</p>
 </div>
 

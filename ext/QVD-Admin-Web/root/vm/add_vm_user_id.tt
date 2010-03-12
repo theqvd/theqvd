@@ -1,8 +1,8 @@
-[% META title = "Añadir Uvm" %]
-<h1><a href="[% c.uri_for('/vm') %]">Máquinas virtuales</a> &raquo; Nueva</h1>
+[% META title = "Adding vm" %]
+<h1><a href="[% c.uri_for('/vm') %]">Virtual machines</a> &raquo; New</h1>
 <span class="step_1_off"></span><span class="step_2_on"></span><span class="step_3_off"></span>
 
-<div><a href="[% c.uri_for('/vm') %]">Cancelar</a></div>
+<div><a href="[% c.uri_for('/vm') %]">Cancel</a></div>
 
 <h1>Usuarios</h1>
 <div id="pager" class="pager">
@@ -22,7 +22,7 @@
     <thead>
         <tr>
             <th id="id"></th>
-            <th id="login">Nombre</th>
+            <th id="login">Name</th>
         </tr>
     </thead>
     <tbody>

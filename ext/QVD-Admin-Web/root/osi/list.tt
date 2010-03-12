@@ -1,7 +1,7 @@
 <script LANGUAGE="JavaScript">
 function confirm_submit()
 {
-var agree=confirm("¿Está seguro?");
+var agree=confirm("Are you sure?");
 if (agree)
 	return true ;
 else
@@ -25,10 +25,10 @@ function on_submit()
 <div class="search">
 <form action="[% c.uri_for('/osi/list/') %]" method="get">
     <input name="s" type="text" size="18" value="[% s %]"/>
-    <input type="submit" value="Buscar"/> 
+    <input type="submit" value="Search"/> 
 </form>
 </div>
-<a class="side_add" href="[% c.uri_for('/osi/add') %]">Nueva</a>
+<a class="side_add" href="[% c.uri_for('/osi/add') %]">New</a>
 <div id="pager" class="pager">
 	<form>
 		<img src="/static/icons/first.png" class="first"/>
@@ -49,10 +49,10 @@ function on_submit()
         <tr>
 	    <th />
             <th id="id"></th>
-            <th id="name">Nombre</th>
-            <th id="disk_image">Imagen de disco</th>
+            <th id="name">Name</th>
+            <th id="disk_image">Disk image</th>
             <th id="use_overlay">Overlay</th>
-            <th id="memory">Memoria</th>
+            <th id="memory">Memory</th>
         </tr>
     </thead>
     <tbody>
@@ -80,7 +80,7 @@ function on_submit()
         [% END -%]
     </tbody>
 </table>
-<input type="submit" onClick="document.pressed='delete'" value="Eliminar"/>
+<input type="submit" onClick="document.pressed='delete'" value="Delete"/>
 </form>
 
 <script type="text/javascript" charset="utf-8">
