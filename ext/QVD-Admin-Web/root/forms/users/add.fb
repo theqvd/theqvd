@@ -17,19 +17,6 @@
 	        type: password
             size: 20
             required: 1
-        department:
-            label: Departamento	
-            type:  text
-            size:  40
-        telephone:
-            label: Teléfono	
-            type:  text
-            size:  40
-        email:
-            label: email
-            type:  text
-            size:  40
-	    validate: EMAIL
     submit: adduser
 
 

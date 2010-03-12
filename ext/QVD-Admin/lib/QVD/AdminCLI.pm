@@ -103,14 +103,27 @@ EOT
 sub cmd_user_list {
     my ($self, @args) = @_;
     my $rs = $self->get_resultset('user');
-    my @header = qw(Id Login Department Telephone Email);
+    my @header = qw(Id Login);
     my @body;
+    my $first = 1;
+    my @extra_cols;
     while (my $user = $rs->next) {
 	my @row = map {$user->$_ // '-'} 
-		    qw(id login department telephone email);
+		    qw(id login);
+
+	if (defined $user->extra) {
+	    my $xtra = $user->extra;
+	    if ($first) {
+		$first = 0;
+		my %tmphash = $xtra->get_columns();
+		@extra_cols = grep {$_ ne 'id'} keys %tmphash;
+	    }
+	    push @row, map {$xtra->$_} @extra_cols;
+	}
 	push(@body, \@row);
     }
     
+    push @header, map ucfirst, @extra_cols;
     _print_table(\@header, \@body) unless $self->{quiet};
 }
 

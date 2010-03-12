@@ -142,11 +142,16 @@ sub cmd_vm_add {
 sub cmd_user_add {
     my $self = shift;
     my %params = @_;
-    $params{department} //= undef;
-    $params{telephone} //= undef;
-    $params{email} //= undef;
+    my %core_params = (
+	login => delete $params{login},
+	password => delete $params{password},
+    );
     my $row = $self->_obj_add('user', 
-	[qw/login password department telephone email/], %params);
+	[qw/login password/], %core_params);
+    if ($row) {
+	$params{id} = $row->id;
+	rs(User_Extra)->create(\%params);
+    }
     $row->id
 }
 
@@ -533,7 +538,8 @@ Returns the id of the new virtual machine.
 =item cmd_user_add(%parameters)
 
 Adds a user. The required parameters are login and password. You can optionally
-specify the user's department, telephone, and email.
+specify the extra data that can be stored in the user_extras table, for example
+the user's department, telephone, or email.
 
 Returns the id of the new user.
 

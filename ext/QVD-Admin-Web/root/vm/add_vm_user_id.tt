@@ -23,7 +23,6 @@
         <tr>
             <th id="id"></th>
             <th id="login">Nombre</th>
-            <th id="department">Departamento</th>	    
         </tr>
     </thead>
     <tbody>
@@ -33,7 +32,6 @@
 	    <input type="hidden" name="user_id" value="[% user.id %]"/>
 	</form></td>
 	    <td>[% user.login %]</td>
-	    <td>[% user.department %]</td>
 	</tr>
         [% END -%]
     </tbody>
