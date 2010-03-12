@@ -63,6 +63,7 @@ sub erase {
 		       hosts
 		       host_properties
 		       users
+		       user_extras
 		       user_properties
 		       x_states
 		       vm_states

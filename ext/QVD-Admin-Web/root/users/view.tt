@@ -10,18 +10,14 @@
 	    <td class="field">Nombre</td>
 	    <td class="value">[% user.login %]</td>
 	</tr>
+[% FOREACH pair = user.extra.get_columns.hash.pairs %]
+[% IF pair.key != 'id' %]
 	<tr>
-	    <td class="field">Departamento</td>
-	    <td class="value">[% user.department %]</td>
+	    <td class="field">[% pair.key FILTER ucfirst %]</td>
+	    <td class="value">[% pair.value %]</td>
 	</tr>
-	<tr>
-	    <td class="field">Número de teléfono</td>
-	    <td class="value">[% user.telephone %]</td>
-	</tr>
-	<tr>
-	    <td class="field">Correo electrónico</td>
-	    <td class="value">[% user.email %]</td>
-	</tr>	
+[% END %]
+[% END %]
     </table>
 </div>
 <p><a class="side_add" href="[% c.uri_for('/users/new_vm') %]/[% user.id %]">Nueva máquina virtual</a> | <a class="option_passwd" href="[% c.uri_for('/users/passwd') %]/[% user.id %]">Cambiar contrase&ntilde;a</a></p>

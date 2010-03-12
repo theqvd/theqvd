@@ -143,19 +143,10 @@ sub add : Local Form {
             my $login      = $form->field('login');
             my $pass       = $form->field('password');
             my $pass2      = $form->field('confirm_password');
-            my $department = $form->field('department');
-            my $telephone  = $form->field('telephone');
-            my $email      = $form->field('email');
             my %params     = (
                 login    => $login,
                 password => $pass,
             );
-            $params{department} = $department
-              if ( defined($department) && $department ne '' );
-            $params{telephone} = $telephone
-              if ( defined($telephone) && $telephone ne '' );
-            $params{email} = $email
-              if ( defined($email) && $email ne '' );
             print STDERR Dumper( \%params );
 
             if ( my $id = $model->user_add( \%params ) ) {
