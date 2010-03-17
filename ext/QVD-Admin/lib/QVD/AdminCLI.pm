@@ -23,7 +23,9 @@ sub _split_on_equals {
 sub set_filter {
     my ($self, $filter_string) = @_;
     my %conditions = _split_on_equals($filter_string);
+    
     $self->{admin}->set_filter(%conditions);
+
 }
 
 sub get_resultset {
@@ -75,14 +77,16 @@ sub cmd_host_list {
     my @header = ("Id", "Name", "Address ","HKD", "VMs assigned");
     my @body;
 
-    
-    while (my $host = $rs->next) {
-	my $hkd_ts = defined $host->runtime ? $host->runtime->hkd_ok_ts : undef;
-	my $mins = defined $hkd_ts ? _format_timespan(time - $hkd_ts) : '-';
-	my @row = ($host->id, $host->name, $host->address, $mins,
-			    $host->vms->count);
-	push(@body, \@row);
-    }
+    eval {
+	while (my $host = $rs->next) {
+	    my $hkd_ts = defined $host->runtime ? $host->runtime->hkd_ok_ts : undef;
+	    my $mins = defined $hkd_ts ? _format_timespan(time - $hkd_ts) : '-';
+	    my @row = ($host->id, $host->name, $host->address, $mins,
+				$host->vms->count);
+	    push(@body, \@row);
+	}
+    };
+    print "Wrong filter definition.\n" if $@;
     
     _print_table(\@header, \@body) unless $self->{quiet};
 }
@@ -105,8 +109,10 @@ sub cmd_user_list {
     my $rs = $self->get_resultset('user');
     my @header = qw(Id Login);
     my @body;
+
     my $first = 1;
     my @extra_cols;
+    eval {
     while (my $user = $rs->next) {
 	my @row = map {$user->$_ // '-'} 
 		    qw(id login);
@@ -122,6 +128,7 @@ sub cmd_user_list {
 	}
 	push(@body, \@row);
     }
+    print "Wrong filter definition.\n" if $@;
     
     push @header, map ucfirst, @extra_cols;
     _print_table(\@header, \@body) unless $self->{quiet};
@@ -143,19 +150,25 @@ EOT
 
 sub cmd_vm_list {
     my ($self, @args) = @_;
+    
     my $rs = $self->get_resultset('vm');
+    
     my @header = ("Id","Name","User","Host","State","UserState");
     my @body;
-    while (my $vm = $rs->next) {
-	my $vmr = $vm->vm_runtime;
-	my @row = map { $_ // '-' } ( $vm->id,
-				       $vm->name,
-				       $vm->user->login,
-				       defined $vmr->host ? $vmr->host->name : undef,
-				       $vmr->vm_state,
-				       $vmr->user_state );
-	push(@body, \@row);
-    }
+	
+    eval { 
+	while (my $vm = $rs->next) {
+	    my $vmr = $vm->vm_runtime;
+	    my @row = map { $_ // '-' } ( $vm->id,
+					   $vm->name,
+					   $vm->user->login,
+					   defined $vmr->host ? $vmr->host->name : undef,
+					   $vmr->vm_state,
+					   $vmr->user_state );
+	    push(@body, \@row);
+	}
+    };
+    print "Wrong filter definition.\n" if $@;
     
     _print_table(\@header, \@body) unless $self->{quiet};
 }
@@ -234,10 +247,14 @@ sub cmd_osi_list {
     my $rs = $self->get_resultset('osi');   
     my @header = qw(Id Name RAM UserHD Image);
     my @body;
-    while (my $osi = $rs->next) {
-	my @row = map { defined($_) ? $_ : '-' } map { $osi->$_ } qw(id name memory user_storage_size disk_image);
-	push(@body, \@row);
-    }
+    
+    eval {
+	while (my $osi = $rs->next) {
+	    my @row = map { defined($_) ? $_ : '-' } map { $osi->$_ } qw(id name memory user_storage_size disk_image);
+	    push(@body, \@row);
+	}
+    };
+    print "Wrong filter definition.\n" if $@;
     
     _print_table(\@header, \@body) unless $self->{quiet};
 }
@@ -295,8 +312,11 @@ sub _obj_del {
 
 sub cmd_host_del {
     my $self = shift;
-    $self->_obj_del('host', @_);
-    $self->{admin}->cmd_host_del();
+    eval {
+	$self->_obj_del('host', @_);
+	$self->{admin}->cmd_host_del();
+    };
+    print "Wrong filter definition.\n" if $@;
 }
 
 sub help_host_del {
@@ -312,8 +332,11 @@ EOT
 
 sub cmd_user_del {
     my $self = shift;
-    $self->_obj_del('user', @_);
-    $self->{admin}->cmd_user_del();
+    eval {
+	$self->_obj_del('user', @_);
+	$self->{admin}->cmd_user_del();
+    };
+    print "Wrong filter definition.\n" if $@;
 }
 
 sub help_user_del {
@@ -329,8 +352,11 @@ EOT
 
 sub cmd_vm_del {
     my $self = shift;
-    $self->_obj_del('vm', @_);
-    $self->{admin}->cmd_vm_del();
+    eval {
+	$self->_obj_del('vm', @_);
+	$self->{admin}->cmd_vm_del();
+    };
+    print "Wrong filter definition.\n" if $@;
 }
 
 sub help_vm_del {
@@ -346,9 +372,13 @@ EOT
 
 sub cmd_osi_del {
     my $self = shift;
-    $self->_obj_del('osi', @_);
-    my $count = $self->{admin}->cmd_osi_del();
-    $self->_print("$count osis deleted.");
+    eval {
+	$self->_obj_del('osi', @_);
+	my $count = $self->{admin}->cmd_osi_del();
+	$self->_print("$count osis deleted.");
+    };
+    print "Wrong filter definition.\n" if $@;
+    
 }
 
 sub help_osi_del {
@@ -544,8 +574,11 @@ EOT
 }
 
 sub cmd_config_get {
-    my $configs = shift->{admin}->cmd_config_get(@_);
-    print map { $_->key.'='.$_->value."\n" } @$configs;
+    eval {
+	my $configs = shift->{admin}->cmd_config_get(@_);
+	print map { $_->key.'='.$_->value."\n" } @$configs;
+    };
+    print "Wrong filter definition.\n" if $@;
 }
 
 sub help_config_get {
@@ -561,8 +594,11 @@ EOT
 
 sub cmd_vm_start {
     my ($self, @args) = @_;
-    my $count = $self->{admin}->cmd_vm_start();
-    $self->_print("Started ".$count." VMs.");
+    eval {
+	my $count = $self->{admin}->cmd_vm_start();
+	$self->_print("Started ".$count." VMs.");
+    };
+    print "Wrong filter definition.\n" if $@;
 }
 
 sub help_vm_start {
@@ -578,8 +614,11 @@ EOT
 
 sub cmd_vm_stop {
     my ($self, @args) = @_;
-    my $count = $self->{admin}->cmd_vm_stop();
-    $self->_print("Stopped ".$count." VMs.");
+    eval {
+	my $count = $self->{admin}->cmd_vm_stop();
+	$self->_print("Stopped ".$count." VMs.");
+    };
+    print "Wrong filter definition.\n" if $@;
 }
 
 sub help_vm_stop {
@@ -595,8 +634,11 @@ EOT
 
 sub cmd_vm_disconnect_user {
     my ($self, @args) = @_;
-    my $count = $self->{admin}->cmd_vm_disconnect_user();
-    $self->_print("Disconnected ".$count." users.");
+    eval {
+	my $count = $self->{admin}->cmd_vm_disconnect_user();
+	$self->_print("Disconnected ".$count." users.");
+    };
+    print "Wrong filter definition.\n" if $@;
 }
 
 sub help_vm_disconnect_user{
@@ -623,11 +665,14 @@ sub _get_single_vm_runtime {
 
 sub cmd_vm_ssh {
     my ($self, @args) = @_;
-    my $vm_runtime = $self->_get_single_vm_runtime;
-    my $ssh_port = $vm_runtime->vm_ssh_port;
-    die 'SSH access is disabled' unless defined $ssh_port;
-    my @cmd = (ssh => ($vm_runtime->vm_address, -p => $ssh_port, @args));
-    exec @cmd or die "Unable to exec ssh: $^E";
+    eval {
+	my $vm_runtime = $self->_get_single_vm_runtime;
+	my $ssh_port = $vm_runtime->vm_ssh_port;
+	die 'SSH access is disabled' unless defined $ssh_port;
+	my @cmd = (ssh => ($vm_runtime->vm_address, -p => $ssh_port, @args));
+	exec @cmd or die "Unable to exec ssh: $^E";
+    };
+    print "Wrong filter definition.\n" if $@;
 }
 
 sub help_vm_ssh {
@@ -647,12 +692,14 @@ EOT
 
 sub cmd_vm_vnc {
     my ($self, @args) = @_;
-    my $vm_runtime = $self->_get_single_vm_runtime;
-    my $vnc_port = $vm_runtime->vm_vnc_port;
-    die 'VNC access is disabled' unless defined $vnc_port;
-    # FIXME Make the vnc client configurable
-    my @cmd = (vncviewer => ($vm_runtime->vm_address.'::'.$vnc_port, @args));
-    exec @cmd or die "Unable to exec vncviewer: $^E";
+    eval {
+	my $vm_runtime = $self->_get_single_vm_runtime;
+	my $vnc_port = $vm_runtime->vm_vnc_port;
+	die 'VNC access is disabled' unless defined $vnc_port;
+	# FIXME Make the vnc client configurable
+	my @cmd = (vncviewer => ($vm_runtime->vm_address.'::'.$vnc_port, @args));
+	exec @cmd or die "Unable to exec vncviewer: $^E";
+    }
 }
 
 sub help_config_ssl {

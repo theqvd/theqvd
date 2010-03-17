@@ -26,14 +26,16 @@ sub set_filter {
     my ($self, %conditions) = @_;
     while (my ($k, $v) = each %conditions) {
 	$k = 'me.id' if $k eq 'id';
-	if (ref $v) {
-	    $self->{filter}{$k} = $v;
-	} elsif ($v =~ /[*?]/) {
-	    $v =~ s/([_%])/\\$1/g;
-	    $v =~ tr/*?/%_/;
-	    $self->{filter}{$k} = {like => $v};
-	} else {
-	    $self->{filter}{$k} = $v;
+	if (defined($v)) {
+	    if (ref $v) {
+		$self->{filter}{$k} = $v;
+	    } elsif ($v =~ /[*?]/) {
+		$v =~ s/([_%])/\\$1/g;
+		$v =~ tr/*?/%_/;
+		$self->{filter}{$k} = {like => $v};
+	    } else {
+		$self->{filter}{$k} = $v;
+	    }
 	}
     }
 }
@@ -55,6 +57,7 @@ sub get_resultset {
     my $rs = rs($db_object);
     $rs = $rs->search($self->{filter})
 	if defined $self->{filter};
+
     $rs
 }
 
