@@ -4,7 +4,7 @@
 
 <div><a href="[% c.uri_for('/vm') %]">Cancel</a></div>
 
-<h1>Usuarios</h1>
+<h1>Users</h1>
 <div id="pager" class="pager">
 	<form id="pager_form" name="pager_form">
 		<img src="/static/icons/first.png" class="first"/>
