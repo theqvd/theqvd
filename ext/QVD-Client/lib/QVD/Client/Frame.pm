@@ -49,28 +49,28 @@ sub new {
 	my $grid_sizer = Wx::GridSizer->new(1, 2, 0, 0);
 	$ver_sizer->Add($grid_sizer, 1, wxALL|wxEXPAND, 20);
 
-	$grid_sizer->Add(Wx::StaticText->new($panel, -1, "Usuario"),
+	$grid_sizer->Add(Wx::StaticText->new($panel, -1, "User"),
 			 0, wxALL, 5);
 
 	$self->{username} = Wx::TextCtrl->new($panel, -1, "qvd");
 	$grid_sizer->Add($self->{username},
 			 1, wxALL|wxEXPAND, 5);
 	$self->{username}->SetFocus();
-	$grid_sizer->Add(Wx::StaticText->new($panel, -1, "Contraseña"),
+	$grid_sizer->Add(Wx::StaticText->new($panel, -1, "Password"),
 			 0, wxALL, 5);
 	$self->{password} = Wx::TextCtrl->new($panel, -1, "passw0rd",
 					      wxDefaultPosition, wxDefaultSize,
 					      wxTE_PASSWORD);
 	$grid_sizer->Add($self->{password},
 			 1, wxALL|wxEXPAND, 5);
-	$grid_sizer->Add(Wx::StaticText->new($panel, -1, "Servidor"),
+	$grid_sizer->Add(Wx::StaticText->new($panel, -1, "Server"),
 			 0, wxALL, 5);
 	$self->{host} = Wx::TextCtrl->new($panel, -1, "localhost");
 	$grid_sizer->Add($self->{host},
 			 1, wxALL|wxEXPAND, 5);
 
 	# port goes here!
-	$self->{connect_button} = Wx::Button->new($panel, -1, "Conectar");
+	$self->{connect_button} = Wx::Button->new($panel, -1, "Connect");
 	$ver_sizer->Add($self->{connect_button},
 			0, wxLEFT|wxRIGHT|wxBOTTOM|wxEXPAND, 20);
 	$self->{connect_button}->SetDefault;
@@ -184,7 +184,7 @@ sub ConnectToVM {
     if ($code != HTTP_OK) {
 	my $message :shared;
 	if ($code == HTTP_UNAUTHORIZED) {
-	    $message = "Error de login. Verifique su usuario y contraseña.";
+	    $message = "The server has rejected your login. Please verify that your username and password are correct.";
 	}
         $message ||= "$host replied with $msg";
 	my $evt = new Wx::PlThreadEvent(-1, $EVT_CONNECTION_ERROR, $message);
@@ -239,13 +239,13 @@ sub ConnectToVM {
 	    # Fatal error
 	    my $message :shared;
 	    if ($code == HTTP_NOT_FOUND) {
-		$message = "Su máquina virtual ya no existe.";
+		$message = "Your virtual machine does not exist any more.";
 	    } elsif ($code == HTTP_UPGRADE_REQUIRED) {
-		$message = "El servidor requiere una versión más moderna del cliente.";
+		$message = "The server requires a more up-to-date client version.";
 	    } elsif ($code == HTTP_UNAUTHORIZED) {
-		$message = "Error de login. Verifique su usuario y contraseña.";
+		$message = "Login error. Please verify your user and password.";
 	    } elsif ($code == HTTP_BAD_GATEWAY) {
-		$message = "Error de servidor: ".$body;
+		$message = "Server error: ".$body;
 	    }
 	    $message ||= "Unable to connect to remote vm: $code $msg";
 	    my $evt = new Wx::PlThreadEvent(-1, $EVT_CONNECTION_ERROR, $message);
@@ -262,7 +262,7 @@ sub OnConnectionError {
     $self->{progress_bar}->SetValue(0);
     $self->{progress_bar}->SetRange(100);
     my $message = $event->GetData;
-    my $dialog = Wx::MessageDialog->new($self, $message, "Error de conexión",
+    my $dialog = Wx::MessageDialog->new($self, $message, "Connection error.",
 			    wxOK | wxICON_ERROR);
     $dialog->ShowModal();
     $dialog->Destroy();
@@ -276,8 +276,8 @@ sub OnListOfVMLoaded {
 	lock($vm_id);
 	my $dialog = new Wx::SingleChoiceDialog(
 	    $self, 
-	    "Seleccionar máquina virtual:", 
-	    "Seleccionar máquina virtual", 
+	    "Select virtual machine:", 
+	    "Select virtual machine", 
 	    [map { $_->{name} } @$vm_data],
 	    [map { $_->{id} } @$vm_data]
 	);
