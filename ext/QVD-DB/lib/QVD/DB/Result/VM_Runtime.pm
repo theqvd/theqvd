@@ -42,7 +42,11 @@ __PACKAGE__->add_columns(
 	vm_failures => {
 	    data_type => 'integer',
 	    is_nullable => 1
-	},	
+	},
+	vm_pid => {
+	    data_type => 'integer',
+	    is_nullable => 1
+	},
 	x_state => {
 	    data_type => 'varchar(12)',
             is_nullable => 1,
