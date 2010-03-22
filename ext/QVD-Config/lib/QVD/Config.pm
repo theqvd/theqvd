@@ -12,11 +12,11 @@ our @EXPORT = qw(cfg);
 
 my %cache;
 
-use Data::Dumper;
-
 sub reload {
     %cache = map { $_->key => $_->value } rs(Config)->all;
-    warn "config cache reloaded:\n" .Dumper \%cache;
+    # FIXME: remove this...
+    # use Data::Dumper;
+    # warn "config cache reloaded:\n" .Dumper \%cache;
 }
 
 reload();
