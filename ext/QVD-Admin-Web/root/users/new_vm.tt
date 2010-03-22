@@ -11,14 +11,14 @@ function submitvm(a) {
 
 <h1><a href="[% c.uri_for('/users') %]">Users</a> &raquo; <a href="[% c.uri_for('/users/view') %]/[% user.id %]">[% user.login %]</a> &raquo; New virtual machine</h1>
 
-<h2>Nombre</h2>
+<h2>Name</h2>
 
 <tr id="add_vm_name_vm_name_row">
    <td class="fb_field" id="add_vm_name_vm_name_field"><form name="vmname" id="vmname" ><input class="fb_input" id="vm_name" name="vm_name" size="40" type="text" /></form></td>
 </tr>
 
 
-<h2>Imagen</h2>
+<h2>Image</h2>
 
 <table id="props" class="tablesorter resultset">
     <thead>
