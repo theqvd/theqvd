@@ -7,7 +7,7 @@ use QVD::HTTP::StatusCodes qw(:status_codes);
 
 use parent qw(QVD::ParallelNet::Socket);
 
-BEGIN { *debug = \$Net::Parallel::debug }
+BEGIN { *debug = \$QVD::ParallelNet::debug }
 our $debug;
 
 
@@ -52,10 +52,14 @@ sub unqueue_response {
     my $status_line = delete $self->{_nph_status_line};
     my $headers = delete $self->{_nph_headers};
     my $content = delete $self->{_nph_content};
+    # FIXME: remove this...
+    # use Data::Dumper;
+    # warn Dumper "response: " . Dump $self;
+    # warn "status_line:\n".Dumper $status_line;
     $self->{_nph_state} = 'done';
     $state eq 'done' or return HTTP_BAD_RESPONSE;
     my ($version, $code, $msg) =
-	$status_line =~ m{^HTTP/(\S+)\s+(\d+)\s+(?:\s+(\S.*?))?\s*$}
+	$status_line =~ m{^HTTP/(\S+)\s+(\d+)(?:\s+(\S.*?))?\s*$}
 	    or return HTTP_BAD_RESPONSE;
     wantarray ? ($code, $headers, $content) : $code;
 }
@@ -63,12 +67,15 @@ sub unqueue_response {
 sub _nps_done {
     my $self = shift;
     my $state = $self->{_nph_state};
-    $debug and warn "state is $state";
+    # FIXME: remove this...
+    # use Data::Dumper;
+    # warn Dumper $self;
+    # $debug and warn "state is $state";
     while (1) {
         return 1 if $state eq 'done';
         my $method = "_nph_advance_on_$state";
 	$state = $self->$method or return undef;
-	$debug and warn "state changed $self->{_nph_state} --> $state";
+	# $debug and warn "state changed $self->{_nph_state} --> $state";
 	$self->{_nph_state} = $state;
     }
 }
