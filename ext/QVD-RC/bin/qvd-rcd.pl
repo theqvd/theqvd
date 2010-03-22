@@ -29,22 +29,22 @@ __END__
 
 =head1 NAME
 
-qvd-rc - The QVD remote control service
+qvd-rcd - The QVD remote control service
 
 =head1 SYNOPSIS
 
-qvd-rc -h
+qvd-rcd -h
 
-qvd-rc start [-X]
+qvd-rcd start [-X]
 
-qvd-rc stop
+qvd-rcd stop
 
-qvd-rc status
+qvd-rcd status
 
 =head1 DESCRIPTION
 
-B<qvd-rc> can be used to start and stop the QVD remote control service, and to check if
-it's running. The QVD remote control is a network service for the QVD
+B<qvd-rcd> can be used to start and stop the QVD remote control service, and to
+check if it's running. The QVD remote control is a network service for the QVD
 house-keeping daemon.
 
 =head1 OPTIONS
