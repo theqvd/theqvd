@@ -3,6 +3,9 @@ package QVD::DB::Simple;
 use strict;
 use warnings;
 
+use Log::Log4perl qw(:levels :easy);
+Log::Log4perl::init('log4perl.conf');
+
 use QVD::DB;
 
 use Exporter qw(import);
@@ -21,8 +24,8 @@ sub txn_do (&) {
 
 sub txn_eval (&) {
     $db ||= QVD::DB->new();
-    local $@;
-    eval { $db->txn_do(@_) }
+    eval { $db->txn_do(@_) };
+    WARN $@ if $@;
 }
 
 sub rs (*) {
