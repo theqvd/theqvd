@@ -94,6 +94,7 @@ sub _authorize_user {
 sub _connect_to_vm_processor {
     my ($server, $method, $url, $headers) = @_;
     my $user = $server->_authorize_user($method, $url, $headers) or return;
+    # FIXME: use vm_starting_timeout cfg instead of this
     my $vm_start_timeout = cfg('vm_start_timeout');
 
     unless (header_eq_check($headers, Connection => 'Upgrade') and
@@ -161,7 +162,7 @@ sub _connect_to_vm_processor {
 		    'X-QVD-VM-Status: Starting VM');
 	    DEBUG "Waiting for VMA to start on VM ".$vm->vm_id;
 	    $vm->discard_changes;
-	    last if defined $vm->vma_ok_ts;
+	    last if $vm->vm_state eq 'running';
 	    sleep $POLL_TIME;
 	}
 	if (time > $timeout_time) {
