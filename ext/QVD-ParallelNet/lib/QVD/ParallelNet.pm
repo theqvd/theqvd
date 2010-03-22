@@ -8,9 +8,9 @@ use warnings;
 use Carp;
 use Time::HiRes qw(time);
 
-use QVD::ParallelNet::Constants;
+use Log::Log4perl qw/:easy/;
 
-our $debug;
+use QVD::ParallelNet::Constants;
 
 sub _ssl_want_to_write {  $IO::Socket::SSL::SSL_ERROR == IO::Socket::SSL::SSL_WANT_WRITE() }
 sub _ssl_want_to_read {  $IO::Socket::SSL::SSL_ERROR == IO::Socket::SSL::SSL_WANT_READ() }
@@ -41,11 +41,16 @@ sub run {
 
     my $time = delete $opts{time};
 
+    DEBUG "entering QVD::ParallelNet::run(" . scalar(@{$self->{sockets}}) . ")";
+
+    # FIXME: remove this;
+    # use Data::Dumper;
+    # warn Dumper $self;
+
     my $npss = $self->{sockets};
     my @socks = map $_->{_nps_sock}, @$npss;
     my @fn = map fileno($_), @socks;
     my @ssl = map UNIVERSAL::isa($_, "IO::Socket::SSL"), @socks;
-
 
     my (@ssl_wtr, @ssl_wtw);
     while (1) {
@@ -74,6 +79,7 @@ sub run {
 	    $delta = time - $start;
 	    if ($delta < $time) {
 		# set error
+		DEBUG "exiting QVD::ParallelNet::run() - timeout";
 		return 1;
 	    }
         }
@@ -124,6 +130,7 @@ sub run {
             }
         }
     }
+    DEBUG "exiting QVD::ParallelNet::run() - ok";
     return 0;
 }
 
