@@ -53,7 +53,7 @@ function validate_add (form) {
   <td class="fb_field" id="add_use_overlay_field"><input class="fb_input" type="checkbox" id="use_overlay" name="use_overlay"></td>
 </tr>
 <tr id="add_disk_image_row">
-  <td class="fb_label" id="add_disk_image_label"><span class="fb_required">Imagen</span></td>
+  <td class="fb_label" id="add_disk_image_label"><span class="fb_required">Image</span></td>
   <td class="fb_field" id="add_disk_image_field"><SELECT NAME="disk_image" SIZE=6 style="width: 385px;">
 [% FOREACH osi_file IN osi_file_list %]
 <OPTION VALUE="[% osi_file %]">[% osi_file %]
