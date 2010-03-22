@@ -7,6 +7,8 @@ use QVD::DB::Simple;
 use QVD::VMAS::VMAClient;
 use QVD::VMAS::RCClient;
 use QVD::Config;
+use QVD::ParallelNet;
+use QVD::SimpleRPC::Client::Parallel;
 use File::Slurp qw(slurp);
 
 use Log::Log4perl qw/:easy/;
@@ -33,9 +35,14 @@ sub _signal_kvm {
     kill($signal, $pid);
 }
 
-sub is_vm_running {
+sub check_vm_process {
     my ($self, $vm) = @_;
     $self->_signal_kvm($vm->vm_id, 0)
+}
+
+sub is_vm_running {
+    WARN "deprecated is_vm_running method called, use check_vm_process instead";
+    shift->check_vm_process(@_);
 }
 
 sub _get_vma_client_for_vm {
@@ -245,11 +252,12 @@ sub _ensure_user_storage_exists {
 }
 
 sub start_vm {
+    # FIXME: move this to HKD
     my ($self, $vm) = @_;
 
-    if ($self->is_vm_running($vm)) {
-	return {vm_status => 'started'};
-    }
+    # if ($self->check_vm_process($vm)) {
+    #	return {vm_status => 'started'};
+    # }
 
     my $home_base= cfg('home_storage_path');
 
@@ -282,15 +290,16 @@ sub start_vm {
 
     my $pid = fork;
     if (!$pid) {
-	unless (defined $pid) {
-	    die "unable to fork virtual machine process";
-	}
+	die "unable to fork virtual machine process"
+	    unless (defined $pid);
 	{ exec  @cmd };
 	warn "exec @cmd failed\n";
 	require POSIX;
 	POSIX::_exit(1);
     }
     warn "kvm pid: $pid\n";
+    # FIXME: remove this, use the database only.
+    $vm->update({vm_pid => $pid});
     open my $pfh, '>', $self->_get_kvm_pid_file_path($id) or die "unable to create pid file";
     print $pfh $pid;
     close $pfh;
@@ -321,6 +330,33 @@ sub get_vma_status {
     my ($self, $vm) = @_;
     my $vma = $self->_get_vma_client_for_vm($vm);
     eval { $vma->status() };
+}
+
+$QVD::ParallelNet::debug = -1;
+
+sub vma_status_parallel {
+    my $self = shift;
+    my @vmac;
+    my $par = QVD::ParallelNet->new;
+    for my $vmrt (@_) {
+	# use Data::Dumper; # FIXME: remove me!
+	# WARN "vmrt:\n" . Dumper $vmrt;
+	my $host = $vmrt->vm_address;
+	my $port = $vmrt->vm_vma_port;
+	my $url = "http://$host:$port/vma/";
+	my $vmac = QVD::SimpleRPC::Client::Parallel->new($url);
+	$vmac->queue_request('status');
+	push @vmac, $vmac;
+	$par->register($vmac);
+    }
+    $par->run(time => 2); # FIXME, get timeout from database
+    use Data::Dumper; # FIXME: remove this!
+    # WARN "vma status query results:\n" . Dumper \@vmac;
+    map {
+	my $r = eval { $_->unqueue_response };
+	WARN "VMA failed: $@" if $@;
+	$r;
+    } @vmac
 }
 
 sub _clear_cmd {
@@ -361,6 +397,8 @@ sub clear_vma_ok_ts {
 }
 
 sub clear_vm_host {
+    # FIXME: this is a bad name for this method. Besides unassigning
+    # the vm to the host it also clears other fields. Break in two.
     my ($self, $vm) = @_;
     $vm->update({
 	host_id => undef,
@@ -369,8 +407,11 @@ sub clear_vm_host {
 	vm_x_port => undef,
 	vm_ssh_port => undef,
 	vm_vnc_port => undef,
+        vm_pid => undef,
 	});
 }
+
+
 
 sub terminate_vm {
     my ($self, $vm) = @_;
