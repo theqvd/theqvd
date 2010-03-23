@@ -25,10 +25,17 @@ __END__
 
 =head1 NAME
 
-qvd-gui-client.pl
+qvd-client - The QVD GUI Client
 
 =head1 DESCRIPTION
 
-Proof of concept GUI QVD-client
+B<qvd-client> is a graphic client that lets a user to connect to a virtual machine and take control of the remote desktop.
 
-=cut
+=back
+
+=head1 COPYRIGHT AND LICENSE
+
+Copyright 2010 by Qindel Formacion y Servicios S.L., 
+
+This program is free software; you may redistribute it and/or modify it under
+the same terms as Perl itself.
