@@ -34,12 +34,13 @@ qvd-admin I<object> I<command> [I<options>] [I<arguments>]
 =head1 DESCRIPTION
 
 B<qvd-admin> is the command line tool for administrating a QVD installation.
-The basic interface is structured around the idea of performing commands to
+The basic interface is structured around the idea of performing commands on
 objects that the QVD platform manages. The objects are things like virtual
 machines, virtualization hosts, operating system images (OSI) and users.
 
-Run 'qvd-admin -h' and 'qvd-admin I<object> help' to access the online
-documentation.
+Run 'qvd-admin -h' to list the available objects and commands. Run 'qvd-admin
+I<object> -h' to list the commands that an object accepts. Each command has
+online help that can be viewed using the option B<-h>.
 
 =head1 COMMON OPTIONS
 
@@ -47,13 +48,33 @@ documentation.
 
 =item -h
 
-Print the help text and exit.
+Print the command's built-in help and exit.
 
 =item -f I<filter>
 
-Apply the command only to the objects matched by the given filter.
+Apply the command only to the objects matched by the given filter. The filter
+is specified using the syntax I<key1=value1,key2=value2,...>.
 
 =back
+
+=head1 EXAMPLES
+
+Add a user with user name 'jrh':
+
+    qvd-admin user add login=jrh password=secret
+
+Add a virtual machine called 'test' for the user 'jrh', using the OSI 1:
+
+    qvd-admin vm add name=test user=jrh osi_id=1 ip=''
+
+Access the SSH server on the virtual machine of the user 'jrh', assuming he has only one:
+
+    qvd-admin vm ssh -f user=jrh
+
+List all virtual machines running on host 'bootes':
+
+    qvd-admin vm list -f host=bootes
+
 
 =head1 FILES
 
