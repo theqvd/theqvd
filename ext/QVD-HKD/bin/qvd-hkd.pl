@@ -21,7 +21,7 @@ $App::Daemon::as_user = "root";
 
 daemonize;
 my $hkd = QVD::HKD->new(loop_wait_time => $POLL_TIME);
-
+$hkd->run();
 
 __END__
 
@@ -66,7 +66,8 @@ Start the HKD in foreground and log messages to screen. Useful for debugging.
 
 =item F</etc/qvd/config.ini>
 
-The main configuration file. 
+The main configuration file. The details of the QVD database connection are
+specified here.
 
 =item F</etc/qvd/log4perl.conf>
 
