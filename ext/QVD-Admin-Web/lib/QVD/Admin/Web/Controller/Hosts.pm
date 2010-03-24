@@ -85,7 +85,7 @@ sub add : Local Form {
             if ( my $id = $model->host_add( $name, $address ) ) {
                 $c->flash->{response_type} = "success";
                 $c->flash->{response_msg} =
-                  "$name añadido correctamente con id $id";
+                  "$name added succesfully with id $id";
             }
             else {
 
@@ -126,7 +126,7 @@ sub del : Local {
         if ( my $countdel = $model->host_del($id) ) {
             $c->flash->{response_type} = "success";
             $c->flash->{response_msg} =
-              "$hostname ($id) eliminado correctamente";
+              "$hostname ($id) succesfully deleted";
         }
         else {
 

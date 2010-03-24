@@ -121,7 +121,7 @@ sub add : Local Form {
 	if ( my $id = $model->osi_add( \%params ) ) {
 		$c->flash->{response_type} = "success";
 		$c->flash->{response_msg} =
-		  "$name añadido correctamente";
+		  "$name added successfully";
 	    }
 	    else {
 		# FIXME response_type must be an enumerated
@@ -162,7 +162,7 @@ sub del : Local {
 	    
 	    if ( my $countdel = $model->osi_del($_) ) {
 		$c->flash->{response_type} = "success";
-		$c->flash->{response_msg} .= "$osiname ($_) eliminado correctamente ";
+		$c->flash->{response_msg} .= "$osiname ($_) successfully deleted";
 	    }
 	    else {
 		# FIXME response_type must be an enumerated

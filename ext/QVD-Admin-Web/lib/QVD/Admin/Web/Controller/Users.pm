@@ -114,7 +114,7 @@ sub change_passwd : Local : Args(1) {
     if ( my $id = $model->user_passwd($user->login,  $passwd)) {
 	$c->flash->{response_type} = "success";
 	$c->flash->{response_msg} =
-	  "Contraseña modificada correctamente";
+	  "Password successfully modified.";
     }
     else {
 
@@ -152,7 +152,7 @@ sub add : Local Form {
             if ( my $id = $model->user_add( \%params ) ) {
                 $c->flash->{response_type} = "success";
                 $c->flash->{response_msg} =
-                  "$login añadido correctamente con id $id";
+                  "$login added successfully with id $id";
             }
             else {
 
@@ -193,7 +193,7 @@ sub del : Local {
 	    my $login = $user->login;
 	    if ( my $countdel = $model->user_del($_) ) {
 		$c->flash->{response_type} = "success";
-		$c->flash->{response_msg}  .= "$login ($_) eliminado correctamente. ";
+		$c->flash->{response_msg}  .= "$login ($_) successfully deleted. ";
 	    }
 	    else {
 

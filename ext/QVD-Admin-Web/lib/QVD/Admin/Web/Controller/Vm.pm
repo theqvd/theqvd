@@ -116,7 +116,7 @@ sub start_vm : Local {
 		if ($c->flash->{response_type} ne "error") {
 		    $c->flash->{response_type} = "success";
 		}
-		$c->flash->{response_msg}  .= "$name ($_) arrancando. ";
+		$c->flash->{response_msg}  .= "$name ($_) starting. ";
 	    }
 	    else {
 		# FIXME response_type must be an enumerated
@@ -157,7 +157,7 @@ sub stop_vm : Local {
 		if ($c->flash->{response_type} ne "error") {
 			$c->flash->{response_type} = "success";
 		    }
-		$c->flash->{response_msg}  .= "$name ($_) parando. ";
+		$c->flash->{response_msg}  .= "$name ($_) stopping. ";
 	    }
 	    else {
 
@@ -197,7 +197,7 @@ sub del : Local {
 		if ($c->flash->{response_type} ne "error") {
 		    $c->flash->{response_type} = "success";
 		}
-		$c->flash->{response_msg}  .= "$vm_name ($_) eliminado correctamente. ";
+		$c->flash->{response_msg}  .= "$vm_name ($_) successfully deleted. ";
 	    }
 	    else {
 
@@ -235,7 +235,7 @@ sub disconnect_user : Local {
 		if ($c->flash->{response_type} ne "error") {
 		    $c->flash->{response_type} = "success";
 		}
-		$c->flash->{response_msg}  .= "$vm_name ($_) desconectado correctamente. ";
+		$c->flash->{response_msg}  .= "$vm_name ($_) successfully disconnected. ";
 	    }
 	    else {
 
@@ -361,7 +361,7 @@ sub add : Local {
 	{
 	    print STDERR "called vm_add ".Dumper($id).Dumper(\%parameters);
 	    $c->flash->{response_type} = "success";
-	    $c->flash->{response_msg} = "$vm_name añadido correctamente con id $id";
+	    $c->flash->{response_msg} = "$vm_name added successfully with id $id";
 	}
 	else 
 	{
