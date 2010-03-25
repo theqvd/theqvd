@@ -122,7 +122,11 @@ __PACKAGE__->add_columns(
 	osi_actual_id => {
             data_type => 'integer',
             is_nullable => 1,
-        }
+        },
+	blocked => {
+	    data_type => 'boolean',
+	    is_nullable => 1,
+	}
 	);
 	
 __PACKAGE__->set_primary_key('vm_id');
