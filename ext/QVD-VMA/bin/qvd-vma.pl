@@ -3,6 +3,8 @@
 use strict;
 use warnings;
 
+$ENV{PATH} = join(':', $ENV{PATH}, '/sbin/');
+
 use App::Daemon qw/daemonize/;
 use QVD::VMA;
 use QVD::VMA::Config;
