@@ -452,6 +452,25 @@ sub cmd_vm_disconnect_user {
     $counter
 }
 
+sub cmd_vm_block {
+    my ($self, @args) = @_;
+    my $rs = $self->get_resultset('vm');
+    while (my $vm = $rs->next) {
+	my $vm_runtime = $vm->vm_runtime;
+	$vm_runtime->update({blocked => 1});
+    }
+}
+
+sub cmd_vm_unblock {
+    my ($self, @args) = @_;
+    my $rs = $self->get_resultset('vm');
+    while (my $vm = $rs->next) {
+	my $vm_runtime = $vm->vm_runtime;
+	$vm_runtime->update({blocked => 0});
+    }
+}
+
+
 sub cmd_config_ssl {
     my ($self, %args) = @_;
     my $cert = delete $args{cert} or die "Certificate is required";

@@ -154,7 +154,7 @@ sub cmd_vm_list {
     
     my $rs = $self->get_resultset('vm');
     
-    my @header = ("Id","Name","User","Host","State","UserState");
+    my @header = ("Id","Name","User","Host","State","UserState","Blocked");
     my @body;
 	
     eval { 
@@ -165,7 +165,8 @@ sub cmd_vm_list {
 					   $vm->user->login,
 					   defined $vmr->host ? $vmr->host->name : undef,
 					   $vmr->vm_state,
-					   $vmr->user_state );
+					   $vmr->user_state,
+					   $vmr->blocked  );
 	    push(@body, \@row);
 	}
     };
@@ -205,6 +206,45 @@ host add: Adds hosts.
 usage: host add name=value address=value
        
 Valid options:
+    -q [--quiet]         : don't print the command message
+EOT
+}
+
+sub cmd_vm_block {
+    my $self = shift;
+    
+    eval {
+    	$self->{admin}->cmd_vm_block();
+    };
+    print "Wrong filter definition.\n" if $@;
+}
+
+sub help_vm_block {
+    print <<EOT
+vm block: Excludes the matched virtual machines from the production environment.
+usage: vm block
+       
+Valid options:
+    -f [--filter] FILTER : block only vm matched by FILTER
+    -q [--quiet]         : don't print the command message
+EOT
+}
+
+sub cmd_vm_unblock {
+    my $self = shift;
+    eval {
+	$self->{admin}->cmd_vm_unblock();
+    };
+    print "Wrong filter definition.\n" if $@;
+}
+
+sub help_vm_unblock {
+    print <<EOT
+vm unblock: Includes the matched virtual machines from the production environment.
+usage: vm unblock
+       
+Valid options:
+    -f [--filter] FILTER : unblock only vm matched by FILTER
     -q [--quiet]         : don't print the command message
 EOT
 }
