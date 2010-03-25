@@ -10,6 +10,7 @@ WriteMakefile(
     PL_FILES            => {},
     PREREQ_PM => {
 	'App::Daemon' => 0,
+	'Config::Tiny' => 0,
 	'File::Slurp' => 0,
 	'Log::Log4perl' => 0,
 	'parent' => 0,
