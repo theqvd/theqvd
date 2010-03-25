@@ -101,9 +101,10 @@ function on_submit()
     </tbody>
 </table>
 <input type="submit" onClick="document.pressed='start'" value="Start"/> <input type="submit" onClick="document.pressed='stop'" value="Stop"/>
- | <input type="submit" onClick="document.pressed='disconnect'" value="Disconnect user"/> 
- | <input type="submit" onClick="document.pressed='block'" value="Block"/> <input type="submit" onClick="document.pressed='unblock'" value="Unblock"/>
- | <input type="submit" onClick="document.pressed='delete'" value="Delete"/>
+<span class="separator"/>
+<input type="submit" onClick="document.pressed='block'" value="Block"/> <input type="submit" onClick="document.pressed='unblock'" value="Unblock"/>
+<span class="separator"/>
+<input type="submit" onClick="document.pressed='disconnect'" value="Disconnect user"/> or <input class="delete" type="submit" onClick="document.pressed='delete'" value="Delete"/>
 </form>
 <script type="text/javascript" charset="utf-8">
 $(document).ready(function() 

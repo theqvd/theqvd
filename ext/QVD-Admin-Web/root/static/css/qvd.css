@@ -480,3 +480,24 @@ button.link:focus span {
     margin-bottom: 20px;
     margin-top: -50px;
 }
+
+.separator {
+    margin-left: 20px;
+}
+
+.delete {
+    font-size: 11px;
+    cursor: pointer;
+    cursor: hand;
+    background-color: transparent;
+    color: #ff8d13;
+    text-decoration: none;
+    font-weight: bold;
+    border: none;
+    padding:0px;
+    margin:0px;
+}
+
+.delete:hover {
+	text-decoration: underline;
+}

@@ -25,7 +25,12 @@
 	<tr>
 	    <td class="field">Node</td>
 	    <td class="value"><a href="[% c.uri_for('/hosts/view/') %][% vm.vm_runtime.host_id %]">[% vm.vm_runtime.host.name %]</a></td>
-	</tr>		
+	</tr>	
+	<tr>
+	    <td class="field">Blocked</td>
+	    <td class="value">[% IF vm.vm_runtime.blocked -%]<span class="option_true"></span>
+	    [% END %]</td>
+	</tr>	
     </table>
 </div>
 
