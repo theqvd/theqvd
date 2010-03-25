@@ -9,6 +9,10 @@ WriteMakefile(
 	ABSTRACT_FROM       => 'lib/QVD/DB.pm',
 	PL_FILES            => {},
 	PREREQ_PM => {
+		'Config::Tiny' => 0,
+		'DBIx::Class' => 0,
+		'Log::Log4perl' => 0,
+		'parent' => 0,
 		'Test::More' => 0,
 	},
 	dist                => { COMPRESS => 'gzip -9f', SUFFIX => 'gz', },
