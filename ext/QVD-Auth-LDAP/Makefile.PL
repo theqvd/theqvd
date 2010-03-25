@@ -12,6 +12,8 @@ WriteMakefile(
       : ()),
     PL_FILES            => {},
     PREREQ_PM => {
+	'Net::LDAP' => 0,
+	'QVD::Config' => 0,
         'Test::More' => 0,
     },
     dist                => { COMPRESS => 'gzip -9f', SUFFIX => 'gz', },
