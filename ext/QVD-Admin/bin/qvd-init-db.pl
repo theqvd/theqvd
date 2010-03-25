@@ -14,9 +14,9 @@ require QVD::Admin;
 my $admin = QVD::Admin->new;
 
 my %default_config = ( vmas_load_balance_algorithm => 'random',
-		       vm_state_starting_timeout => 60,
+		       vm_state_starting_timeout => 180,
 		       vm_state_running_vma_timeout => 20,
-		       vm_state_stopping_timeout => 20,
+		       vm_state_stopping_timeout => 100,
 		       vm_state_zombie_sigkill_timeout => 15,
 		       x_state_connecting_timeout => 15,
 		       vma_response_timeout => 5,
