@@ -249,6 +249,83 @@ sub disconnect_user : Local {
     $c->response->redirect( $c->uri_for( $self->action_for('list') ) );
 }
 
+sub block : Local {
+    my ( $self, $c ) = @_;
+    $c->go('Root', 'login', @_) unless $c->user_exists;
+    
+    my $model = $c->model('QVD::Admin::Web');
+
+    my $result = $c->form(
+        required           => ['selected']
+    );
+
+    if ( !$result->success ) {
+        $c->flash->{response_type} = "error";
+        $c->flash->{response_msg} =
+          "Error in parameters: " . $model->build_form_error_msg($result);
+    }
+    else {
+        my $list = $c->req->body_params->{selected};
+	for (ref $list ? @$list : $list) {
+	    my $vm = $model->vm_find($_);
+	    my $vm_name = $vm->name; 
+	    if ( my $countdel = $model->vm_block($_) ) {
+		if ($c->flash->{response_type} ne "error") {
+		    $c->flash->{response_type} = "success";
+		}
+		$c->flash->{response_msg}  .= "$vm_name ($_) blocked. ";
+	    }
+	    else {
+
+		# FIXME response_type must be an enumerated
+		$c->flash->{response_type} = "error";
+		$c->flash->{response_msg}  .= $model->error_msg;
+	    }
+	}
+    }
+
+    $c->response->redirect( $c->uri_for( $self->action_for('list') ) );
+}
+
+sub unblock : Local {
+    my ( $self, $c ) = @_;
+    $c->go('Root', 'login', @_) unless $c->user_exists;
+    
+    my $model = $c->model('QVD::Admin::Web');
+
+    my $result = $c->form(
+        required           => ['selected']
+    );
+
+    if ( !$result->success ) {
+        $c->flash->{response_type} = "error";
+        $c->flash->{response_msg} =
+          "Error in parameters: " . $model->build_form_error_msg($result);
+    }
+    else {
+        my $list = $c->req->body_params->{selected};
+	for (ref $list ? @$list : $list) {
+	    my $vm = $model->vm_find($_);
+	    my $vm_name = $vm->name; 
+	    if ( my $countdel = $model->vm_unblock($_) ) {
+		if ($c->flash->{response_type} ne "error") {
+		    $c->flash->{response_type} = "success";
+		}
+		$c->flash->{response_msg}  .= "$vm_name ($_) unblocked. ";
+	    }
+	    else {
+
+		# FIXME response_type must be an enumerated
+		$c->flash->{response_type} = "error";
+		$c->flash->{response_msg}  .= $model->error_msg;
+	    }
+	}
+    }
+
+    $c->response->redirect( $c->uri_for( $self->action_for('list') ) );
+}
+
+
 sub _get_add_param {
     my ($self, $c, $param) = @_;
     $c->go('Root', 'login', @_) unless $c->user_exists;

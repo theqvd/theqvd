@@ -20,7 +20,8 @@ function on_submit()
 	if(document.pressed == 'stop')
       {
 	document.propos.action ="[% c.uri_for('/vm/stop_vm') %]";
-      } else
+      } 
+	else
 	if(document.pressed == 'disconnect')
       {
 	document.propos.action ="[% c.uri_for('/vm/disconnect_user') %]";
@@ -29,6 +30,16 @@ function on_submit()
 	if(document.pressed == 'delete')
       {
 	document.propos.action ="[% c.uri_for('/vm/del') %]";
+      } 
+	else
+	if(document.pressed == 'block')
+      {
+	document.propos.action ="[% c.uri_for('/vm/block') %]";
+      } 
+	else
+	if(document.pressed == 'unblock')
+      {
+	document.propos.action ="[% c.uri_for('/vm/unblock') %]";
       }
       return true;
     }
@@ -91,7 +102,7 @@ function on_submit()
 </table>
 <input type="submit" onClick="document.pressed='start'" value="Start"/> <input type="submit" onClick="document.pressed='stop'" value="Stop"/>
  | <input type="submit" onClick="document.pressed='disconnect'" value="Disconnect user"/> 
- <!--| <input type="submit" onClick="" value="Block"/> <input type="submit" onClick="" value="Unblock"/>-->
+ | <input type="submit" onClick="document.pressed='block'" value="Block"/> <input type="submit" onClick="document.pressed='unblock'" value="Unblock"/>
  | <input type="submit" onClick="document.pressed='delete'" value="Delete"/>
 </form>
 <script type="text/javascript" charset="utf-8">

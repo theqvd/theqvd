@@ -207,6 +207,28 @@ sub vm_disconnect_user {
     1;
 }
 
+sub vm_block {
+    my ( $self, $id ) = @_;
+    $self->reset_status;
+    eval { $self->admin->cmd_vm_block($id) };
+    if ($@) {
+	$self->set_error($@);
+	return undef;
+    }
+    1;
+}
+
+sub vm_unblock {
+    my ( $self, $id ) = @_;
+    $self->reset_status;
+    eval { $self->admin->cmd_vm_unblock($id) };
+    if ($@) {
+	$self->set_error($@);
+	return undef;
+    }
+    1;
+}
+
 sub vm_add {
     my ($self, $params) = @_;
     $self->reset_status;
