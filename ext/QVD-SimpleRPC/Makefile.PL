@@ -9,6 +9,10 @@ WriteMakefile(
     ABSTRACT_FROM       => 'lib/QVD/SimpleRPC.pm',
     PL_FILES            => {},
     PREREQ_PM => {
+	'JSON' => 0,
+	'QVD::HTTPC' => 0,
+	'QVD::HTTPD' => 0,
+	'QVD::URI' => 0,
         'Test::More' => 0,
     },
     dist                => { COMPRESS => 'gzip -9f', SUFFIX => 'gz', },
