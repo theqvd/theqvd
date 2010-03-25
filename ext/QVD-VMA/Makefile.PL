@@ -11,7 +11,6 @@ WriteMakefile(
     PREREQ_PM => {
 	'App::Daemon' => 0,
 	'File::Slurp' => 0,
-	'JSON' => 0,
 	'Log::Log4perl' => 0,
 	'parent' => 0,
 	'QVD::SimpleRPC' => 0,
