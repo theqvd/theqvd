@@ -45,6 +45,15 @@ function on_submit()
     }
 }
 
+function check_all(field) {
+    var iform = field.form, z = 0;
+    for(i=0; i < iform.length; i++) {
+	if(iform[i].type == 'checkbox' && iform[i].name != 'check'){
+	    iform[i].checked = field.checked;
+	}
+    }
+}
+
 
 </script>
 
@@ -73,7 +82,7 @@ function on_submit()
 <table id="props" class="tablesorter resultset">
     <thead>
         <tr>
-	    <th />
+	    <th><input type="checkbox" name="check" onclick="check_all(this);"/></th>
             <th id="id"></th>
             <th id="name">Name</th>
             <th id="user">User</th>
