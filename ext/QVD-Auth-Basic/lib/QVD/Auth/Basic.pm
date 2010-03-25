@@ -5,8 +5,6 @@ use strict;
 
 use QVD::DB::Simple;
 
-use Net::LDAP;
-
 sub login {
     my $self = shift;
     my $user = shift;
