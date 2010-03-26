@@ -461,6 +461,12 @@ sub cmd_vm_block {
     }
 }
 
+sub cmd_vm_block_by_id {
+    my ($self, $id) = @_;
+    my $rs = $self->get_resultset('vm')->find($id);
+    $rs->vm_runtime->update({blocked => 1});
+}
+
 sub cmd_vm_unblock {
     my ($self, @args) = @_;
     my $rs = $self->get_resultset('vm');
@@ -468,6 +474,12 @@ sub cmd_vm_unblock {
 	my $vm_runtime = $vm->vm_runtime;
 	$vm_runtime->update({blocked => 0});
     }
+}
+
+sub cmd_vm_unblock_by_id {
+    my ($self, $id) = @_;
+    my $rs = $self->get_resultset('vm')->find($id);
+    $rs->vm_runtime->update({blocked => 0});
 }
 
 

@@ -210,7 +210,7 @@ sub vm_disconnect_user {
 sub vm_block {
     my ( $self, $id ) = @_;
     $self->reset_status;
-    eval { $self->admin->cmd_vm_block($id) };
+    eval { $self->admin->cmd_vm_block_by_id($id) };
     if ($@) {
 	$self->set_error($@);
 	return undef;
@@ -221,7 +221,7 @@ sub vm_block {
 sub vm_unblock {
     my ( $self, $id ) = @_;
     $self->reset_status;
-    eval { $self->admin->cmd_vm_unblock($id) };
+    eval { $self->admin->cmd_vm_unblock_by_id($id) };
     if ($@) {
 	$self->set_error($@);
 	return undef;
