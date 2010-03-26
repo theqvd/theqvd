@@ -50,7 +50,7 @@ function validate_add (form) {
 </tr>
 <tr id="add_use_overlay_row">
   <td class="fb_label" id="add_use_overlay_label">Overlay</td>
-  <td class="fb_field" id="add_use_overlay_field"><input disabled="disabled" checked="checked" class="fb_input" type="checkbox" id="use_overlay" name="use_overlay"></td>
+  <td class="fb_field" id="add_use_overlay_field"><input checked="checked" class="fb_input" type="checkbox" id="use_overlay" name="use_overlay" onchange="$(this).attr('checked', true);"></td>
 </tr>
 <tr id="add_disk_image_row">
   <td class="fb_label" id="add_disk_image_label"><span class="fb_required">Image</span></td>
