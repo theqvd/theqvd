@@ -28,7 +28,7 @@
 	</tr>	
 	<tr>
 	    <td class="field">Blocked</td>
-	    <td class="value">[% IF vm.vm_runtime.blocked -%]<span class="option_true"></span>
+	    <td class="value">[% IF vm.vm_runtime.blocked -%]<span class="option_blocked"></span>
 	    [% END %]</td>
 	</tr>	
     </table>

@@ -275,6 +275,13 @@ button.link:focus span {
 	background-position: 5px 5px;
 }
 
+.option_blocked {
+	padding: 5px 5px 5px 25px;
+	background-image: url(../images/icons/error.png);
+	background-repeat: no-repeat;
+	background-position: 5px 5px;
+}
+
 .option_waitvm, .option_user_connecting {
 	padding: 5px 5px 5px 25px;
 	background-image: url(../images/icons/bullet_orange.png);
