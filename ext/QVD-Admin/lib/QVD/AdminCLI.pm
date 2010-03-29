@@ -213,6 +213,12 @@ EOT
 sub cmd_vm_block {
     my $self = shift;
     
+    if (scalar %{$self->{admin}{filter}} eq 0) {
+	print "Are you sure you want to block all machines? [y/N] ";
+	my $answer = <>;
+	exit 0 unless $answer =~ /^y/i;
+    }   
+    
     eval {
     	$self->{admin}->cmd_vm_block();
     };
@@ -232,6 +238,12 @@ EOT
 
 sub cmd_vm_unblock {
     my $self = shift;
+    if (scalar %{$self->{admin}{filter}} eq 0) {
+	print "Are you sure you want to unblock all machines? [y/N] ";
+	my $answer = <>;
+	exit 0 unless $answer =~ /^y/i;
+    }   
+    
     eval {
 	$self->{admin}->cmd_vm_unblock();
     };
@@ -635,6 +647,13 @@ EOT
 
 sub cmd_vm_start {
     my ($self, @args) = @_;
+    
+    if (scalar %{$self->{admin}{filter}} eq 0) {
+	print "Are you sure you want to start all machines? [y/N] ";
+	my $answer = <>;
+	exit 0 unless $answer =~ /^y/i;
+    }   
+     
     eval {
 	my $count = $self->{admin}->cmd_vm_start();
 	$self->_print("Started ".$count." VMs.");
@@ -655,6 +674,13 @@ EOT
 
 sub cmd_vm_stop {
     my ($self, @args) = @_;
+    
+    if (scalar %{$self->{admin}{filter}} eq 0) {
+	print "Are you sure you want to stop all machines? [y/N] ";
+	my $answer = <>;
+	exit 0 unless $answer =~ /^y/i;
+    }   
+    
     eval {
 	my $count = $self->{admin}->cmd_vm_stop();
 	$self->_print("Stopped ".$count." VMs.");
@@ -675,6 +701,12 @@ EOT
 
 sub cmd_vm_disconnect_user {
     my ($self, @args) = @_;
+    if (scalar %{$self->{admin}{filter}} eq 0) {
+	print "Are you sure you want to disconnect all users? [y/N] ";
+	my $answer = <>;
+	exit 0 unless $answer =~ /^y/i;
+    }   
+    
     eval {
 	my $count = $self->{admin}->cmd_vm_disconnect_user();
 	$self->_print("Disconnected ".$count." users.");
