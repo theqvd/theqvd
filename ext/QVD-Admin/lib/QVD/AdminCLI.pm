@@ -281,8 +281,11 @@ EOT
 sub cmd_user_add {
     my $self = shift;
     my %args = _split_on_equals(@_);
-    my $id = $self->{admin}->cmd_user_add(%args);
-    $self->_print( "User added with id ".$id);
+    eval {
+	my $id = $self->{admin}->cmd_user_add(%args);
+	$self->_print( "User added with id ".$id);
+    };
+    print "Wrong syntax or user already exists.\n" if $@;
 }
 
 sub help_user_add {
@@ -822,10 +825,16 @@ EOT
 
 sub cmd_user_passwd {
     my ($self, $user) = @_;
+    exit 0 unless $user;
+    
     print "New password for $user: ";
     my $passwd = <STDIN>;
     chomp $passwd;
-    $self->{admin}->set_password($user, $passwd);
+    eval {
+	$self->{admin}->set_password($user, $passwd);
+    };
+    print "User does not exist.\n" if $@;
+
 }
 
 sub help_vm_vnc {
