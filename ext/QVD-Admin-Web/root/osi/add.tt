@@ -48,7 +48,7 @@ function validate_add (form) {
   <td class="fb_label" id="add_user_storage_size_label">User space</td>
   <td class="fb_field" id="add_user_storage_size_field"><input class="fb_input" id="user_storage_size" name="user_storage_size" size="4" type="text" /> MB</td>
 </tr>
-<tr id="add_use_overlay_row">
+<tr id="add_use_overlay_row" style="display:none">
   <td class="fb_label" id="add_use_overlay_label">Overlay</td>
   <td class="fb_field" id="add_use_overlay_field"><input checked="checked" class="fb_input" type="checkbox" id="use_overlay" name="use_overlay" onchange="$(this).attr('checked', true);"></td>
 </tr>
