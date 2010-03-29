@@ -463,7 +463,7 @@ usage: user propset [key=value...]
   user propset genre=male timezone=+1
       
 Valid options:
-    -f [--filter] FILTER : sets host property to hosts matched by FILTER
+    -f [--filter] FILTER : sets user property to users matched by FILTER
 EOT
 }
 
