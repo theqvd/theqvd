@@ -1,5 +1,6 @@
 Changes
 lib/QVD/HTTP.pm
+lib/QVD/HTTP/Headers.pm
 lib/QVD/HTTP/StatusCodes.pm
 Makefile.PL
 MANIFEST
