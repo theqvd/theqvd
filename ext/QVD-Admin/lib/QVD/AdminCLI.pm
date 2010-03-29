@@ -535,7 +535,7 @@ usage: user propget [key...]
   user propget genre timezone
       
 Valid options:
-    -f [--filter] FILTER : sets host property to hosts matched by FILTER
+    -f [--filter] FILTER : sets user property to users matched by FILTER
 EOT
 }
 
