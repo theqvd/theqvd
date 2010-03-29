@@ -32,7 +32,7 @@
 		</div>
 		<div class="grid_9" id="top-menu">
 			<p>
-				Administrator | <a href="#">Preferences</a> | <a href="/about">About</a> | <a href="/logout">Log out</a>
+				<a href="/about">About</a> | <a href="/logout">Log out</a>
 
 			</p>
 		</div>				
@@ -56,7 +56,7 @@
 	</div>
 	<div id="bottom"> </div>
 	<div id="footer">
-		Quality Virtual Desktop Web Admin Tool, by <a href="http://qindel.es">QindelGroup</a>
+		Quality Virtual Desktop Web Admin Tool, by <a href="http://www.qindel.es">QindelGroup</a>
 	</div>	
 
 </div>
