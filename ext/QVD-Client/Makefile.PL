@@ -8,8 +8,9 @@ WriteMakefile(
     VERSION_FROM        => 'lib/QVD/Client.pm',
     ABSTRACT_FROM       => 'lib/QVD/Client.pm',
     PL_FILES            => {},
+    EXE_FILES           => [ qw(bin/qvd-client.pl bin/qvd-gui-client.pl bin/qvd-logo.png bin/qvd.xpm) ],
     PREREQ_PM => {
-	'IO::Sokcet::Forwarder' => 0,
+	'IO::Socket::Forwarder' => 0,
 	'JSON' => 0,
 	'MIME::Base64' => 0,
 	'parent' => 0,

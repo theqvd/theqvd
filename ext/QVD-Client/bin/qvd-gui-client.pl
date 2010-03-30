@@ -31,8 +31,6 @@ qvd-client - The QVD GUI Client
 
 B<qvd-client> is a graphic client that lets a user to connect to a virtual machine and take control of the remote desktop.
 
-=back
-
 =head1 COPYRIGHT AND LICENSE
 
 Copyright 2010 by Qindel Formacion y Servicios S.L., 

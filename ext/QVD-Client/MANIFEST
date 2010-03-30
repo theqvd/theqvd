@@ -1,8 +1,12 @@
+bin/qvd-client.pl
+bin/qvd-gui-client.pl
+bin/qvd-logo.png
+bin/qvd.xpm
 Changes
-MANIFEST
-Makefile.PL
-README
 lib/QVD/Client.pm
+lib/QVD/Client/Frame.pm
+Makefile.PL
+MANIFEST
+README
 t/00-load.t
-t/pod-coverage.t
 t/pod.t
