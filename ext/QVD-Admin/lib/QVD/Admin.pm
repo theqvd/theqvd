@@ -228,14 +228,22 @@ sub _obj_propset {
     my $rs = $self->get_resultset($obj);
     # In principle you should be able to avoid looping over the result set using
     # search_related but the PostgreSQL driver doesn't seem to let us
+    my $ci = 0;
+    my $success = 0;
     while (my $obj = $rs->next) {
 	foreach my $key (keys %$params) {
 	    $obj->properties->search({key => $key})->update_or_create(
 		{ key => $key, value => $params->{$key} },
 		{ key => 'primary' }
 	    );
+	    $success = 1;
 	}
+	$ci = $ci + 1;
     }
+    if (!$success) {
+	$ci = -1;
+    }
+    $ci;
 }
 
 sub propset {

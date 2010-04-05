@@ -449,7 +449,8 @@ EOT
 }
 
 sub cmd_host_propset {
-    shift->{admin}->cmd_host_propset(_split_on_equals @_)
+    my $ci = shift->{admin}->cmd_host_propset(_split_on_equals @_);
+    print "propset in $ci hosts.\n" if ($ci != -1);
 }
 
 sub help_host_propset {
@@ -466,7 +467,9 @@ EOT
 }
 
 sub cmd_user_propset {
-    shift->{admin}->cmd_user_propset(_split_on_equals @_)
+    my $ci = shift->{admin}->cmd_user_propset(_split_on_equals @_);
+    print "propset in $ci users.\n" if ($ci != -1);
+
 }
 
 sub help_user_propset {
@@ -483,7 +486,9 @@ EOT
 }
 
 sub cmd_vm_propset {
-    shift->{admin}->cmd_vm_propset(_split_on_equals @_)
+    my $ci = shift->{admin}->cmd_vm_propset(_split_on_equals @_);
+    print "propset in $ci virtual machines.\n" if ($ci != -1);    
+    
 }
 
 sub help_vm_propset {
@@ -560,7 +565,13 @@ EOT
 }
 
 sub cmd_host_propdel {
-    shift->{admin}->propdel('host', @_);
+    my $self = shift;
+    if (scalar %{$self->{admin}{filter}} eq 0) {
+	print "Are you sure you want to delete the prop in all hosts? [y/N] ";
+	my $answer = <>;
+	exit 0 unless $answer =~ /^y/i;
+    }
+    $self->{admin}->propdel('host', @_);	
 }
 
 sub help_host_propdel {
@@ -579,6 +590,12 @@ EOT
 }
 
 sub cmd_user_propdel {
+    my $self = shift;
+    if (scalar %{$self->{admin}{filter}} eq 0) {
+	print "Are you sure you want to delete the prop in all users? [y/N] ";
+	my $answer = <>;
+	exit 0 unless $answer =~ /^y/i;
+    }    
     shift->{admin}->propdel('user', @_);
 }
 
@@ -598,6 +615,12 @@ EOT
 }
 
 sub cmd_vm_propdel {
+    my $self = shift;
+    if (scalar %{$self->{admin}{filter}} eq 0) {
+	print "Are you sure you want to delete the prop in all virtual machines? [y/N] ";
+	my $answer = <>;
+	exit 0 unless $answer =~ /^y/i;
+    }
     shift->{admin}->propdel('vm', @_);
 }
 
@@ -619,7 +642,10 @@ EOT
 sub cmd_config_set {
     my $self = shift;
     my %args = _split_on_equals(@_);
-    $self->{admin}->cmd_config_set(%args)
+    eval {
+	$self->{admin}->cmd_config_set(%args);
+    };
+    print "Wrong syntax.\n" if ($@ || (scalar keys %args == 0));
 }
 
 sub help_config_set {
