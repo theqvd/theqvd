@@ -501,8 +501,11 @@ EOT
 
 sub _obj_propget {
     my ($self, $display_cb, @args) = @_;
-    my $props = $self->{admin}->propget(@args);
-    print map { &$display_cb($_)."\t".$_->key.'='.$_->value."\n" } @$props;
+    eval {
+	my $props = $self->{admin}->propget(@args);
+	print map { &$display_cb($_)."\t".$_->key.'='.$_->value."\n" } @$props;
+    };
+    print "Wrong syntax.\n" if $@;
 }
 
 sub cmd_host_propget {
