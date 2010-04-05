@@ -88,7 +88,7 @@ sub cmd_host_list {
     };
     print "Wrong filter definition.\n" if $@;
     
-    _print_table(\@header, \@body) unless $self->{quiet};
+    _print_table(\@header, \@body) unless ($self->{quiet} || $@);
 }
 
 sub help_host_list {
@@ -132,7 +132,7 @@ sub cmd_user_list {
     print "Wrong filter definition.\n" if $@;
     
     push @header, map ucfirst, @extra_cols;
-    _print_table(\@header, \@body) unless $self->{quiet};
+    _print_table(\@header, \@body) unless ($self->{quiet} || $@);
 }
 
 sub help_user_list {
@@ -172,7 +172,7 @@ sub cmd_vm_list {
     };
     print "Wrong filter definition.\n" if $@;
     
-    _print_table(\@header, \@body) unless $self->{quiet};
+    _print_table(\@header, \@body) unless ($self->{quiet} || $@);
 }
 
 sub help_vm_list {
@@ -312,7 +312,7 @@ sub cmd_osi_list {
     };
     print "Wrong filter definition.\n" if $@;
     
-    _print_table(\@header, \@body) unless $self->{quiet};
+    _print_table(\@header, \@body) unless ($self->{quiet} || $@);
 }
 
 sub help_osi_list {
