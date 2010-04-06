@@ -86,7 +86,10 @@ sub cmd_host_list {
 	    push(@body, \@row);
 	}
     };
-    print "Wrong filter definition.\n" if $@;
+    if ($@) {
+	$self->_print("Wrong syntax, check the command help:\n");
+	$self->help_host_list;
+    }
     
     _print_table(\@header, \@body) unless ($self->{quiet} || $@);
 }
@@ -196,8 +199,14 @@ sub _print {
 sub cmd_host_add {
     my $self = shift;
     my %args = _split_on_equals(@_);
-    my $id = $self->{admin}->cmd_host_add(%args);
-    $self->_print("Host added with id ".$id);
+    eval {
+	my $id = $self->{admin}->cmd_host_add(%args);
+	$self->_print("Host added with id ".$id);
+    };
+    if ($@) {
+	$self->_print("Wrong syntax, check the command help:\n");
+	$self->help_host_add;	
+    }
 }
 
 sub help_host_add {
@@ -310,9 +319,12 @@ sub cmd_osi_list {
 	    push(@body, \@row);
 	}
     };
-    print "Wrong filter definition.\n" if $@;
-    
-    _print_table(\@header, \@body) unless ($self->{quiet} || $@);
+    if ($@) {
+	$self->_print("Wrong syntax, check the command help:\n");
+	$self->help_osi_list;
+    } else {
+	_print_table(\@header, \@body) unless $self->{quiet};
+    }
 }
 
 sub help_osi_list {
@@ -331,9 +343,16 @@ EOT
 
 sub cmd_osi_add {
     my $self = shift;
-    my %args = _split_on_equals(@_);
-    my $id = $self->{admin}->cmd_osi_add(%args);
-    $self->_print( "OSI added with id ".$id);
+    eval {
+	my %args = _split_on_equals(@_);
+	my $id = $self->{admin}->cmd_osi_add(%args);
+	$self->_print("OSI added with id ".$id);	
+    };
+    
+    if ($@) {
+	$self->_print("Wrong syntax, check the command help:\n");
+	$self->help_osi_add;
+    }
 }
 
 sub help_osi_add {
@@ -372,7 +391,10 @@ sub cmd_host_del {
 	$self->_obj_del('host', @_);
 	$self->{admin}->cmd_host_del();
     };
-    print "Wrong filter definition.\n" if $@;
+    if ($@) {
+	$self->_print("Wrong syntax, check the command help:\n");
+	$self->help_host_del;
+    }
 }
 
 sub help_host_del {
@@ -433,7 +455,10 @@ sub cmd_osi_del {
 	my $count = $self->{admin}->cmd_osi_del();
 	$self->_print("$count osis deleted.");
     };
-    print "Wrong filter definition.\n" if $@;
+    if ($@) {
+	$self->_print("Wrong syntax, check the command help:\n");
+	$self->help_osi_del;
+    }
     
 }
 
@@ -449,8 +474,17 @@ EOT
 }
 
 sub cmd_host_propset {
-    my $ci = shift->{admin}->cmd_host_propset(_split_on_equals @_);
-    print "propset in $ci hosts.\n" if ($ci != -1);
+    my $self = shift;
+    my $ci = 0;
+    eval {
+	$ci = $self->{admin}->cmd_host_propset(_split_on_equals @_);
+    };
+    if (($ci == -1) || $@) {
+	$self->_print("Wrong syntax, check the command help:\n");
+	$self->help_host_propset;
+    } else {
+	$self->_print("propset in $ci hosts.\n");
+    }
 }
 
 sub help_host_propset {
@@ -510,7 +544,10 @@ sub _obj_propget {
 	my $props = $self->{admin}->propget(@args);
 	print map { &$display_cb($_)."\t".$_->key.'='.$_->value."\n" } @$props;
     };
-    print "Wrong syntax.\n" if $@;
+
+    if ($@) {
+	$self->_print("Wrong syntax, check the command help.\n");
+    }
 }
 
 sub cmd_host_propget {
@@ -571,7 +608,13 @@ sub cmd_host_propdel {
 	my $answer = <>;
 	exit 0 unless $answer =~ /^y/i;
     }
-    $self->{admin}->propdel('host', @_);	
+    eval {
+	$self->{admin}->propdel('host', @_);	
+    };
+    if ($@) {
+	$self->_print("Wrong syntax, check the command help:\n");
+	$self->help_host_propdel;
+    }
 }
 
 sub help_host_propdel {
@@ -645,7 +688,10 @@ sub cmd_config_set {
     eval {
 	$self->{admin}->cmd_config_set(%args);
     };
-    print "Wrong syntax.\n" if ($@ || (scalar keys %args == 0));
+    if ($@ || (scalar keys %args == 0)) {
+	$self->_print("Wrong syntax, check the command help:\n");
+	$self->help_config_set;
+    }
 }
 
 sub help_config_set {
@@ -659,11 +705,15 @@ EOT
 }
 
 sub cmd_config_get {
+    my $self = shift;
     eval {
-	my $configs = shift->{admin}->cmd_config_get(@_);
+	my $configs = $self->{admin}->cmd_config_get(@_);
 	print map { $_->key.'='.$_->value."\n" } @$configs;
     };
-    print "Wrong filter definition.\n" if $@;
+    if ($@) {
+	$self->_print("Wrong syntax, check the command help:\n");
+	$self->help_config_get;	
+    }
 }
 
 sub help_config_get {
