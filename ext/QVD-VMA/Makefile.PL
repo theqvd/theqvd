@@ -7,6 +7,12 @@ WriteMakefile(
     AUTHOR              => 'Salvador Fandiño <sfandino@yahoo.com>',
     VERSION_FROM        => 'lib/QVD/VMA.pm',
     ABSTRACT_FROM       => 'lib/QVD/VMA.pm',
+    EXE_FILES		=> [
+	'bin/nxagent-monitor.pl',
+	'bin/nxdiag.pl',
+	'bin/qvd-initialize-user-storage.pl',
+	'bin/qvd-vma.pl',
+    ],
     PL_FILES            => {},
     PREREQ_PM => {
 	'App::Daemon' => 0,
