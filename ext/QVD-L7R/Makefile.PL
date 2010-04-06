@@ -7,6 +7,9 @@ WriteMakefile(
     AUTHOR              => 'Salvador Fandiño <sfandino@yahoo.com>',
     VERSION_FROM        => 'lib/QVD/L7R.pm',
     ABSTRACT_FROM       => 'lib/QVD/L7R.pm',
+    EXE_FILES		=> [
+	'bin/qvd-l7rd.pl',
+    ],
     PL_FILES            => {},
     PREREQ_PM => {
 	'File::Slurp' => 0,
