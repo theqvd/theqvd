@@ -13,6 +13,7 @@ WriteMakefile(
     PL_FILES            => {},
     PREREQ_PM => {
 	'Net::LDAP' => 0,
+	'QVD::Auth' => 0,
 	'QVD::Config' => 0,
         'Test::More' => 0,
     },
