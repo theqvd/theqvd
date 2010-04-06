@@ -132,10 +132,15 @@ sub cmd_user_list {
 	    push(@body, \@row);
 	}
     };
-    print "Wrong filter definition.\n" if $@;
+    if ($@) {
+	$self->_print("Wrong syntax, check the command help:\n");
+	$self->help_user_list;
+    } else {
+	push @header, map ucfirst, @extra_cols;
+	_print_table(\@header, \@body) unless ($self->{quiet});
+    }
     
-    push @header, map ucfirst, @extra_cols;
-    _print_table(\@header, \@body) unless ($self->{quiet} || $@);
+    
 }
 
 sub help_user_list {
@@ -294,7 +299,10 @@ sub cmd_user_add {
 	my $id = $self->{admin}->cmd_user_add(%args);
 	$self->_print( "User added with id ".$id);
     };
-    print "Wrong syntax or user already exists.\n" if $@;
+    if ($@) {
+	$self->_print("Wrong syntax or user already exists, check the command help:\n");
+	$self->help_user_add;
+    }
 }
 
 sub help_user_add {
@@ -414,7 +422,10 @@ sub cmd_user_del {
 	$self->_obj_del('user', @_);
 	$self->{admin}->cmd_user_del();
     };
-    print "Wrong filter definition.\n" if $@;
+    if ($@) {
+	$self->_print("Wrong syntax, check the command help:\n");
+	$self->help_user_del;
+    }
 }
 
 sub help_user_del {
@@ -501,9 +512,17 @@ EOT
 }
 
 sub cmd_user_propset {
-    my $ci = shift->{admin}->cmd_user_propset(_split_on_equals @_);
-    print "propset in $ci users.\n" if ($ci != -1);
-
+    my $self = shift;
+    my $ci = 0;
+    eval {
+	$ci = $self->{admin}->cmd_user_propset(_split_on_equals @_);
+    };
+    if (($ci == -1) || $@) {
+	$self->_print("Wrong syntax, check the command help:\n");
+	$self->help_host_propset;
+    } else {
+	$self->_print("propset in $ci users.\n");
+    }    
 }
 
 sub help_user_propset {
@@ -638,8 +657,14 @@ sub cmd_user_propdel {
 	print "Are you sure you want to delete the prop in all users? [y/N] ";
 	my $answer = <>;
 	exit 0 unless $answer =~ /^y/i;
-    }    
-    shift->{admin}->propdel('user', @_);
+    } 
+    eval {
+	$self->{admin}->propdel('user', @_);
+    };
+    if ($@) {
+	$self->_print("Wrong syntax, check the command help:\n");
+	$self->help_user_propdel;
+    }
 }
 
 sub help_user_propdel {
@@ -904,15 +929,21 @@ EOT
 
 sub cmd_user_passwd {
     my ($self, $user) = @_;
-    exit 0 unless $user;
-    
-    print "New password for $user: ";
-    my $passwd = <STDIN>;
-    chomp $passwd;
-    eval {
-	$self->{admin}->set_password($user, $passwd);
-    };
-    print "User does not exist.\n" if $@;
+    if ($user) {
+    	print "New password for $user: ";
+	my $passwd = <STDIN>;
+	chomp $passwd;
+	eval {
+	    $self->{admin}->set_password($user, $passwd);
+	};
+	if ($@) {
+	    $self->_print("Wrong syntax or user does not exist, check the command help:\n");
+	    $self->help_user_passwd;    
+	}
+    } else {
+	    $self->_print("Wrong syntax, check the command help:\n");
+	    $self->help_user_passwd;    	
+    }
 
 }
 
