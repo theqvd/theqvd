@@ -561,7 +561,7 @@ sub cmd_vm_propset {
     my $self = shift;
     my $ci = 0;
     eval {
-	$ci = shift->{admin}->cmd_vm_propset(_split_on_equals @_);
+	$ci = $self->{admin}->cmd_vm_propset(_split_on_equals @_);
     };    
 
     if (($ci == -1) || $@) {
@@ -719,7 +719,7 @@ sub cmd_vm_propdel {
 	exit 0 unless $answer =~ /^y/i;
     }
     eval {
-	shift->{admin}->propdel('vm', @_);
+	$self->{admin}->propdel('vm', @_);
     };
     if ($@) {
 	$self->_print("Wrong syntax, check the command help:\n");
