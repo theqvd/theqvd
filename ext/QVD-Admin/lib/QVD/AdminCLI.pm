@@ -177,10 +177,14 @@ sub cmd_vm_list {
 					   $vmr->blocked  );
 	    push(@body, \@row);
 	}
-    };
-    print "Wrong filter definition.\n" if $@;
+    };  
     
-    _print_table(\@header, \@body) unless ($self->{quiet} || $@);
+    if ($@) {
+	$self->_print("Wrong syntax, check the command help:\n");
+	$self->help_vm_list;
+    } else {
+	_print_table(\@header, \@body) unless ($self->{quiet});
+    }
 }
 
 sub help_vm_list {
@@ -236,7 +240,10 @@ sub cmd_vm_block {
     eval {
     	$self->{admin}->cmd_vm_block();
     };
-    print "Wrong filter definition.\n" if $@;
+    if ($@) {
+	$self->_print("Wrong syntax, check the command help:\n");
+	$self->help_vm_block;
+    }      
 }
 
 sub help_vm_block {
@@ -261,7 +268,10 @@ sub cmd_vm_unblock {
     eval {
 	$self->{admin}->cmd_vm_unblock();
     };
-    print "Wrong filter definition.\n" if $@;
+    if ($@) {
+	$self->_print("Wrong syntax, check the command help:\n");
+	$self->help_vm_unblock;
+    }    
 }
 
 sub help_vm_unblock {
@@ -278,8 +288,14 @@ EOT
 sub cmd_vm_add {
     my $self = shift;
     my %args = _split_on_equals(@_);
-    my $id = $self->{admin}->cmd_vm_add(%args);
-    $self->_print( "VM added with id ".$id);
+    eval {
+	my $id = $self->{admin}->cmd_vm_add(%args);
+	$self->_print( "VM added with id ".$id);
+    };
+    if ($@) {
+	$self->_print("Wrong syntax, check the command help:\n");
+	$self->help_vm_add;
+    }  
 }
 
 sub help_vm_add {
@@ -445,7 +461,10 @@ sub cmd_vm_del {
 	$self->_obj_del('vm', @_);
 	$self->{admin}->cmd_vm_del();
     };
-    print "Wrong filter definition.\n" if $@;
+    if ($@) {
+	$self->_print("Wrong syntax, check the command help:\n");
+	$self->help_vm_del;
+    }  
 }
 
 sub help_vm_del {
@@ -519,7 +538,7 @@ sub cmd_user_propset {
     };
     if (($ci == -1) || $@) {
 	$self->_print("Wrong syntax, check the command help:\n");
-	$self->help_host_propset;
+	$self->help_user_propset;
     } else {
 	$self->_print("propset in $ci users.\n");
     }    
@@ -539,8 +558,18 @@ EOT
 }
 
 sub cmd_vm_propset {
-    my $ci = shift->{admin}->cmd_vm_propset(_split_on_equals @_);
-    print "propset in $ci virtual machines.\n" if ($ci != -1);    
+    my $self = shift;
+    my $ci = 0;
+    eval {
+	$ci = shift->{admin}->cmd_vm_propset(_split_on_equals @_);
+    };    
+
+    if (($ci == -1) || $@) {
+	$self->_print("Wrong syntax, check the command help:\n");
+	$self->help_vm_propset;
+    } else {
+	$self->_print("propset in $ci virtual machines.\n");
+    }       
     
 }
 
@@ -689,7 +718,13 @@ sub cmd_vm_propdel {
 	my $answer = <>;
 	exit 0 unless $answer =~ /^y/i;
     }
-    shift->{admin}->propdel('vm', @_);
+    eval {
+	shift->{admin}->propdel('vm', @_);
+    };
+    if ($@) {
+	$self->_print("Wrong syntax, check the command help:\n");
+	$self->help_vm_propdel;
+    }
 }
 
 sub help_vm_propdel {
@@ -764,8 +799,11 @@ sub cmd_vm_start {
     eval {
 	my $count = $self->{admin}->cmd_vm_start();
 	$self->_print("Started ".$count." VMs.");
-    };
-    print "Wrong filter definition.\n" if $@;
+    };   
+    if ($@) {
+	$self->_print("Wrong syntax, check the command help:\n");
+	$self->help_vm_start;
+    }
 }
 
 sub help_vm_start {
@@ -792,7 +830,10 @@ sub cmd_vm_stop {
 	my $count = $self->{admin}->cmd_vm_stop();
 	$self->_print("Stopped ".$count." VMs.");
     };
-    print "Wrong filter definition.\n" if $@;
+    if ($@) {
+	$self->_print("Wrong syntax, check the command help:\n");
+	$self->help_vm_stop;
+    }    
 }
 
 sub help_vm_stop {
@@ -818,7 +859,10 @@ sub cmd_vm_disconnect_user {
 	my $count = $self->{admin}->cmd_vm_disconnect_user();
 	$self->_print("Disconnected ".$count." users.");
     };
-    print "Wrong filter definition.\n" if $@;
+    if ($@) {
+	$self->_print("Wrong syntax, check the command help:\n");
+	$self->help_vm_disconnect_user;
+    }  
 }
 
 sub help_vm_disconnect_user{
@@ -852,7 +896,11 @@ sub cmd_vm_ssh {
 	my @cmd = (ssh => ($vm_runtime->vm_address, -p => $ssh_port, @args));
 	exec @cmd or die "Unable to exec ssh: $^E";
     };
-    print "Wrong filter definition.\n" if $@;
+    
+    if ($@) {
+	$self->_print("Wrong syntax, check the command help:\n");
+	$self->help_vm_ssh;
+    }    
 }
 
 sub help_vm_ssh {
@@ -879,7 +927,11 @@ sub cmd_vm_vnc {
 	# FIXME Make the vnc client configurable
 	my @cmd = (vncviewer => ($vm_runtime->vm_address.'::'.$vnc_port, @args));
 	exec @cmd or die "Unable to exec vncviewer: $^E";
-    }
+    };
+    if ($@) {
+	$self->_print("Wrong syntax, check the command help:\n");
+	$self->help_vm_vnc;
+    }    
 }
 
 sub help_config_ssl {
