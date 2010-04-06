@@ -7,6 +7,9 @@ WriteMakefile(
     AUTHOR              => 'Salvador Fandiño <sfandino@yahoo.com>',
     VERSION_FROM        => 'lib/QVD/RC.pm',
     ABSTRACT_FROM       => 'lib/QVD/RC.pm',
+    EXE_FILES		=> [
+	'bin/qvd-rcd.pl',
+    ],
     PL_FILES            => {},
     PREREQ_PM => {
 	'App::Daemon' => 0,
