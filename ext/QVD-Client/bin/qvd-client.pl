@@ -9,11 +9,9 @@ use QVD::HTTP::StatusCodes qw(:status_codes);
 use IO::Socket::Forwarder qw(forward_sockets);
 use MIME::Base64 qw(encode_base64);
 use JSON;
+use Proc::Background; 
 
-if ($^O -eq 'MSWin32'){
-    require Win32::Process;
-    require Win32;
-}
+
 
 
 # Forces a flush
@@ -24,8 +22,8 @@ my $username = shift @ARGV;
 my $password = shift @ARGV;
 my $host = shift @ARGV;
 my $port = shift @ARGV // "8443";
-my $cmd = "C:\\WINDOWS\\system32\\nxproxy.exe";
-my $line = "nxproxy.exe -S localhost:40 media=4713 kbtype=pc105/es client=windows";
+#my $cmd = "C:\\WINDOWS\\system32\\nxproxy.exe";
+my $cmd_win = "C:\\WINDOWS\\system32\\nxproxy.exe -S localhost:40 media=4713 kbtype=pc105/es client=windows";
 my $child_pid;
 my $child_proc;
 my $nonblocking=1;
@@ -39,10 +37,6 @@ my $ssl = ($port =~ /43$/ ? 1 : undef);
 my $httpc = QVD::HTTPC->new($host.":".$port, SSL => $ssl);
 my $json = JSON->new->ascii->pretty;
 
-
-sub ErrorReport {
-	print Win32::FormatMessage ( Win32::GetLastError () );
-}
 
 $httpc->send_http_request(GET => '/qvd/list_of_vm',
 			  headers => [ 'Accept: application/json',
@@ -75,10 +69,12 @@ while (1) {
 	# XXX: make media port configurable (4713 for pulseaudio)
 	
 	if ($^O eq 'linux'){
-	    system "nxproxy -S localhost:40 media=4713 &";
+	    my $cmd_linux="nxproxy -S localhost:40 media=4713";
+	    #system "nxproxy -S localhost:40 media=4713 &";
+	    my $proc1 = Proc::Background->new ($cmd_linux);
 	}
 	else{		
-	    Win32::Process::Create( $child_proc, $cmd, $line, 0, 0, ".") || die ErrorReport();
+	    my $proc1 = Proc::Background->new ($cmd_win);
 	}
 	my $s1 = $ll->accept()
 	    or die "connection from nxproxy failed";
@@ -87,7 +83,7 @@ while (1) {
 	if ($^O eq 'MSWin32'){		
 	    ioctl ($s1, 0x8004667e, \$nonblocking);
 	}
-	forward_sockets($s1, $s2); #, debug => 1);
+	forward_sockets($s1, $s2, debug => 1);
 	last;
     }
     elsif ($code >= 100 and $code < 200) {
