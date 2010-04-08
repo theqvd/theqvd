@@ -9,9 +9,11 @@ use QVD::HTTP::StatusCodes qw(:status_codes);
 use IO::Socket::Forwarder qw(forward_sockets);
 use MIME::Base64 qw(encode_base64);
 use JSON;
-use Win32::Process;
-use Win32;
 
+if ($^O -eq 'MSWin32'){
+    require Win32::Process;
+    require Win32;
+}
 
 
 # Forces a flush
