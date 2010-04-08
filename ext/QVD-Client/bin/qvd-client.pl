@@ -73,7 +73,7 @@ while (1) {
 	    #system "nxproxy -S localhost:40 media=4713 &";
 	    my $proc1 = Proc::Background->new ($cmd_linux);
 	}
-	else{		
+	else{	
 	    my $proc1 = Proc::Background->new ($cmd_win);
 	}
 	my $s1 = $ll->accept()
@@ -83,7 +83,7 @@ while (1) {
 	if ($^O eq 'MSWin32'){		
 	    ioctl ($s1, 0x8004667e, \$nonblocking);
 	}
-	forward_sockets($s1, $s2, debug => 1);
+	forward_sockets($s1, $s2); #, debug => 1);
 	last;
     }
     elsif ($code >= 100 and $code < 200) {
