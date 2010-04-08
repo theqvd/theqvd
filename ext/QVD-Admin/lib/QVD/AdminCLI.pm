@@ -22,7 +22,8 @@ sub _split_on_equals {
 
 sub set_filter {
     my ($self, $filter_string) = @_;
-    my %conditions = _split_on_equals($filter_string);
+    my @filter_array = split /,/, $filter_string; 
+    my %conditions = _split_on_equals(@filter_array);
     
     $self->{admin}->set_filter(%conditions);
 
@@ -416,7 +417,7 @@ sub cmd_host_del {
 	$self->{admin}->cmd_host_del();
     };
     if ($@) {
-	$self->_print("Wrong syntax, check the command help:\n");
+	$self->_print("Wrong syntax or host assigned to virtual machines, check the command help:\n");
 	$self->help_host_del;
     }
 }
