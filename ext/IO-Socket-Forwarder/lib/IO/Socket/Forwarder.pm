@@ -4,7 +4,7 @@ our $VERSION = '0.02';
 
 use warnings;
 use strict;
-use Carp;
+use Carp; 
 
 use Fcntl qw(F_GETFL F_SETFL O_NONBLOCK);
 
@@ -52,12 +52,14 @@ sub forward_sockets {
 
     my ($ssl_wtr1, $ssl_wtw1, $ssl_wtr2, $ssl_wtw2);
     my %close;
-
+    
+    if ($^O eq 'linux'){
     fcntl($s1, F_SETFL, fcntl($s1, F_GETFL, 0) | O_NONBLOCK)
 	or croak "unable to make socket 1 non-blocking";
     fcntl($s2, F_SETFL, fcntl($s2, F_GETFL, 0) | O_NONBLOCK)
 	or croak "unable to make socket 2 non-blocking";
-
+    }
+    
     while (1) {
 	my $wtr1 = (not $s1_in_closed and length $b1to2 < $io_buffer_size);
 	my $wtr2 = (not $s2_in_closed and length $b2to1 < $io_buffer_size);
@@ -79,7 +81,7 @@ sub forward_sockets {
 
 	my $n = select($bitsr, $bitsw, undef, undef);
 
-	$debug and warn "select done, n: $n\n";
+	$debug and warn "selllamaect done, n: $n\n";
 
 	if ($n > 0) {
 	    if ($wtr1 and vec(($ssl_wtw1 ? $bitsw : $bitsr), $fn1, 1)) {
