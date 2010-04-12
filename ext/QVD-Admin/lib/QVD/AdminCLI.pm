@@ -714,11 +714,11 @@ EOT
 
 sub cmd_vm_propdel {
     my $self = shift;
-    if (scalar %{$self->{admin}{filter}} eq 0) {
-	print "Are you sure you want to delete the prop in all virtual machines? [y/N] ";
-	my $answer = <>;
-	exit 0 unless $answer =~ /^y/i;
-    }
+#   if (scalar %{$self->{admin}{filter}} eq 0) {
+#	print "Are you sure you want to delete the prop in all virtual machines? [y/N] ";
+#	my $answer = <>;
+#	exit 0 unless $answer =~ /^y/i;
+#    }
     eval {
 	$self->{admin}->propdel('vm', @_);
     };

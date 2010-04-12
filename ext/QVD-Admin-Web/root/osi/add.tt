@@ -7,7 +7,7 @@ function validate_add (form) {
     var invalid_fields = new Array();
 
     var name = form.elements['name'].value;
-    if (name == null || ! name.match(/^[a-zA-Z]+$/)) {
+    if (name == null || name == '') {
         alertstr += 'Please, introduce a valid value for: "Name"\n';
         invalid++;
         invalid_fields.push('name');
