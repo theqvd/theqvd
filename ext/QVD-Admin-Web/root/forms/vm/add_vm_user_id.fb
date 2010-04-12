@@ -5,7 +5,7 @@ fields:
     label: User id
     type:  text
     size:  40
-    validate: WORD
+    validate: VALUE
     required: 1
 submit: add user id
 

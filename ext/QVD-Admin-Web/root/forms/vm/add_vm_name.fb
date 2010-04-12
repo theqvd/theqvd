@@ -5,7 +5,7 @@ fields:
     label: Name
     type:  text
     size:  40
-    validate: NAME
+    validate: VALUE
     required: 1
 submit: Continue
 
