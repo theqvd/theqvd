@@ -1,10 +1,10 @@
 #!/bin/sh
 
 pkill perl
-pkill kvm
+#pkill kvm
 sleep 2
 
-perl -Mlib::glob=*/lib QVD-Admin/bin/qvd-init-db.pl
+#perl -Mlib::glob=*/lib QVD-Admin/bin/qvd-init-db.pl
 
 if [ ! -d /var/run/qvd ]
 then 
@@ -14,4 +14,3 @@ fi
 perl -Mlib::glob=*/lib QVD-L7R/bin/qvd-l7rd.pl -X &
 perl -Mlib::glob=*/lib QVD-RC/bin/qvd-rcd.pl -X &
 perl -Mlib::glob=*/lib QVD-HKD/bin/qvd-hkd.pl -X &
-
