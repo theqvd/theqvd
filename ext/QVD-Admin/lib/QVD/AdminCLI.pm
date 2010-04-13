@@ -234,7 +234,7 @@ sub cmd_vm_block {
     
     if (scalar %{$self->{admin}{filter}} eq 0) {
 	print "Are you sure you want to block all machines? [y/N] ";
-	my $answer = <>;
+	my $answer = <STDIN>;
 	exit 0 unless $answer =~ /^y/i;
     }   
     
@@ -262,7 +262,7 @@ sub cmd_vm_unblock {
     my $self = shift;
     if (scalar %{$self->{admin}{filter}} eq 0) {
 	print "Are you sure you want to unblock all machines? [y/N] ";
-	my $answer = <>;
+	my $answer = <STDIN>;
 	exit 0 unless $answer =~ /^y/i;
     }   
     
@@ -402,10 +402,10 @@ sub _obj_del {
     unless ($self->{quiet}) {
 	if (scalar %{$self->{admin}{filter}} eq 0) {
 	    print "Are you sure you want to delete all ${obj}s? [y/N] ";
-	    my $answer = <>;
+	    my $answer = <STDIN>;
 	    exit 0 unless $answer =~ /^y/i;
 	}
-    }
+   }
     my $count = $self->get_resultset($obj)->count();
     $self->_print("Deleting ".$count." ${obj}(s)");
 }
@@ -654,7 +654,7 @@ sub cmd_host_propdel {
     my $self = shift;
     if (scalar %{$self->{admin}{filter}} eq 0) {
 	print "Are you sure you want to delete the prop in all hosts? [y/N] ";
-	my $answer = <>;
+	my $answer = <STDIN>;
 	exit 0 unless $answer =~ /^y/i;
     }
     eval {
@@ -685,7 +685,7 @@ sub cmd_user_propdel {
     my $self = shift;
     if (scalar %{$self->{admin}{filter}} eq 0) {
 	print "Are you sure you want to delete the prop in all users? [y/N] ";
-	my $answer = <>;
+	my $answer = <STDIN>;
 	exit 0 unless $answer =~ /^y/i;
     } 
     eval {
@@ -714,11 +714,11 @@ EOT
 
 sub cmd_vm_propdel {
     my $self = shift;
-#   if (scalar %{$self->{admin}{filter}} eq 0) {
-#	print "Are you sure you want to delete the prop in all virtual machines? [y/N] ";
-#	my $answer = <>;
-#	exit 0 unless $answer =~ /^y/i;
-#    }
+    if (scalar %{$self->{admin}{filter}} eq 0) {
+	print "Are you sure you want to delete the prop in all virtual machines? [y/N] ";
+	my $answer = <STDIN>;
+ 	exit 0 unless $answer =~ /^y/i;
+    }
     eval {
 	$self->{admin}->propdel('vm', @_);
     };
@@ -793,7 +793,7 @@ sub cmd_vm_start {
     
     if (scalar %{$self->{admin}{filter}} eq 0) {
 	print "Are you sure you want to start all machines? [y/N] ";
-	my $answer = <>;
+	my $answer = <STDIN>;
 	exit 0 unless $answer =~ /^y/i;
     }   
      
@@ -823,7 +823,7 @@ sub cmd_vm_stop {
     
     if (scalar %{$self->{admin}{filter}} eq 0) {
 	print "Are you sure you want to stop all machines? [y/N] ";
-	my $answer = <>;
+	my $answer = <STDIN>;
 	exit 0 unless $answer =~ /^y/i;
     }   
     
@@ -852,7 +852,7 @@ sub cmd_vm_disconnect_user {
     my ($self, @args) = @_;
     if (scalar %{$self->{admin}{filter}} eq 0) {
 	print "Are you sure you want to disconnect all users? [y/N] ";
-	my $answer = <>;
+	my $answer = <STDIN>;
 	exit 0 unless $answer =~ /^y/i;
     }   
     
@@ -935,15 +935,18 @@ sub cmd_vm_vnc {
     }    
 }
 
-sub help_config_ssl {
+sub help_vm_vnc {
     print <<EOT
-config ssl: Sets the SSL certificate and private key
-usage: config ssl key=mykey.pem cert=mycert.pem
+vm ssh: Connects to the virtual machine VNC server.
+usage: vm vnc
 
-    Sets the SSL certificate to the one read from the file mycert.pem, and the
-    private key to the one read from mykey.pem.
-
-    Example: config ssl key=certs/server-key.pem cert=certs/server-cert.pem
+  To pass aditional parameters to vncviewer add them to the command line after --
+  
+  Example:
+  vm vnc -- --depth 8
+       
+Valid options:
+    -f [--filter] FILTER : connect to the virtual machine matched by FILTER
 EOT
 }
 
@@ -954,7 +957,7 @@ sub cmd_config_ssl {
     my $key_file = delete $args{key};
     my $cert_file = delete $args{cert};
     if (%args or !$key_file or !$cert_file) {
-	help_config_ssl;
+	$self->help_config_ssl;
 	exit 1;
     }
     # FIXME: Is using File::Slurp the best way?
@@ -968,17 +971,41 @@ sub cmd_config_ssl {
 	and $self->_print("SSL certificate and private key set.\n");
 }
 
-sub help_user_passwd {
+sub help_config_ssl {
     print <<EOT
-user passwd: Sets the password of a user
-usage: user passwd username
+config ssl: Sets the SSL certificate and private key
+usage: config ssl key=mykey.pem cert=mycert.pem
 
-    Prompts the user for the new password for the user with login "username"
-    and sets it.
+    Sets the SSL certificate to the one read from the file mycert.pem, and the
+    private key to the one read from mykey.pem.
 
-    Example: user passwd qvd
+    Example: config ssl key=certs/server-key.pem cert=certs/server-cert.pem
 EOT
 }
+
+
+sub cmd_config_del {
+    my $self = shift;
+    eval {
+	$self->_obj_del('config', @_);
+	$self->{admin}->cmd_config_del();
+    };
+    if ($@) {
+	$self->_print("Wrong syntax, check the command help:\n");
+	$self->help_config_del;
+    }
+}
+
+sub help_config_del {
+    print <<EOT
+host del: Deletes config properties.
+usage: condif del
+       
+Valid options:
+    -q [--quiet]         : don't print the command message
+EOT
+}
+
 
 sub cmd_user_passwd {
     my ($self, $user) = @_;
@@ -1000,20 +1027,19 @@ sub cmd_user_passwd {
 
 }
 
-sub help_vm_vnc {
+sub help_user_passwd {
     print <<EOT
-vm ssh: Connects to the virtual machine VNC server.
-usage: vm vnc
+user passwd: Sets the password of a user
+usage: user passwd username
 
-  To pass aditional parameters to vncviewer add them to the command line after --
-  
-  Example:
-  vm vnc -- --depth 8
-       
-Valid options:
-    -f [--filter] FILTER : connect to the virtual machine matched by FILTER
+    Prompts the user for the new password for the user with login "username"
+    and sets it.
+
+    Example: user passwd qvd
 EOT
 }
+
+
 
 sub die_and_help {
     my ($self, $message, $obj) = @_;

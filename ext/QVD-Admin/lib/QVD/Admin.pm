@@ -510,6 +510,10 @@ sub cmd_config_ssl {
     1
 }
 
+sub cmd_config_del {
+    shift->_obj_del('config', @_);
+}
+
 sub set_password {
     my ($self, $user, $password) = @_;
     my $row = rs('User')->find({login => $user}) or die "No such user: $user";

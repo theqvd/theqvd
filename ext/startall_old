@@ -1,10 +1,10 @@
 #!/bin/sh
 
 pkill perl
-#pkill kvm
+pkill kvm
 sleep 2
 
-#perl -Mlib::glob=*/lib QVD-Admin/bin/qvd-init-db.pl
+perl -Mlib::glob=*/lib QVD-Admin/bin/qvd-init-db.pl
 
 if [ ! -d /var/run/qvd ]
 then 
