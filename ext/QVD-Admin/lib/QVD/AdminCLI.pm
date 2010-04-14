@@ -987,8 +987,7 @@ EOT
 sub cmd_config_del {
     my $self = shift;
     eval {
-	$self->_obj_del('config', @_);
-	$self->{admin}->cmd_config_del();
+	$self->{admin}->cmd_config_del(@_);
     };
     if ($@) {
 	$self->_print("Wrong syntax, check the command help:\n");
@@ -999,7 +998,7 @@ sub cmd_config_del {
 sub help_config_del {
     print <<EOT
 host del: Deletes config properties.
-usage: condif del
+usage: condif del [key...]
        
 Valid options:
     -q [--quiet]         : don't print the command message

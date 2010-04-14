@@ -511,7 +511,13 @@ sub cmd_config_ssl {
 }
 
 sub cmd_config_del {
-    shift->_obj_del('config', @_);
+    my ($self, @keys) = @_;
+
+    my $rs = $self->get_resultset("config");
+    my $condition = scalar @keys > 0 ? {key => \@keys} : {};
+
+    $rs->search($condition)->delete;
+    
 }
 
 sub set_password {
