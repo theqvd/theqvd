@@ -986,18 +986,21 @@ EOT
 
 sub cmd_config_del {
     my $self = shift;
+    my $ci = 0;
     if (scalar @_ eq 0) {
 	print "Are you sure you want to block all machines? [y/N] ";
 	my $answer = <STDIN>;
 	exit 0 unless $answer =~ /^y/i;
     } 
     eval {
-	$self->{admin}->cmd_config_del(@_);
+	$ci = $self->{admin}->cmd_config_del(@_);
     };
     if ($@) {
 	$self->_print("Wrong syntax, check the command help:\n");
 	$self->help_config_del;
     }
+    $self->_print("$ci config entry deleted.\n");
+
 }
 
 sub help_config_del {

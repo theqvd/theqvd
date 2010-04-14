@@ -516,7 +516,10 @@ sub cmd_config_del {
     my $rs = $self->get_resultset("config");
     my $condition = scalar @keys > 0 ? {key => \@keys} : {};
 
+    my $ci = $rs->search($condition)->count;
     $rs->search($condition)->delete;
+    
+    $ci;
     
 }
 
