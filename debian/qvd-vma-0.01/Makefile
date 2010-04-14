@@ -6,5 +6,6 @@ clean:
 
 install:
 	mkdir -p $(SHARE)/config
-	install config/* $(SHARE)/config
+	cp config/vma.ini $(SHARE)/config
+	cp config/log4perl.conf $(SHARE)/config
 

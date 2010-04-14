@@ -2,8 +2,8 @@
 
 ### BEGIN INIT INFO
 # Provides:          qvd-l7r
-# Required-Start:    $local_fs $syslog $network
-# Required-Stop:     $local_fs $syslog $network
+# Required-Start:    $local_fs $remote_fs $syslog $network
+# Required-Stop:     $local_fs $remote_fs $syslog $network
 # Default-Start:     2 3 4 5
 # Default-Stop:      0 1 6
 # Short-Description: QVD Level 7 Router
@@ -39,7 +39,7 @@ case "$1" in
         echo -n "Stopping $DESC: "
 	"$DAEMON" stop
         ;;
-  restart)
+  restart|force-reload)
 	echo -n "Restarting $DESC: "
 	"$DAEMON" stop
 	"$DAEMON" start
@@ -49,7 +49,7 @@ case "$1" in
 	;;
   *)
     N=/etc/init.d/$NAME
-    echo "Usage: $N {start|stop|restart|status}" >&2
+    echo "Usage: $N {start|stop|restart|force-reload|status}" >&2
     exit 1
     ;;
 esac
