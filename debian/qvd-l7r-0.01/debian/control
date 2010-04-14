@@ -1,0 +1,14 @@
+Source: qvd-l7r
+Section: perl
+Priority: optional
+Maintainer: qvd-team <qvd@qindel.com>
+Build-Depends: debhelper (>= 7)
+Standards-Version: 3.8.4
+Homepage: http://qvdblog.qindel.com
+
+Package: qvd-l7r
+Architecture: all
+Depends: ${shlibs:Depends}, ${misc:Depends}, libqvd-l7r-perl
+Description: The QVD Level 7 Router
+ QVD Level 7 Router accepts connections from clients and forwards them to
+ virtual machines.
