@@ -1,0 +1,14 @@
+Source: qvd-vma
+Section: perl
+Priority: optional
+Maintainer: qvd-team <qvd@qindel.com>
+Build-Depends: debhelper (>= 7)
+Standards-Version: 3.8.4
+Homepage: http://qvdblog.qindel.com
+
+Package: qvd-vma
+Architecture: all
+Depends: ${shlibs:Depends}, ${misc:Depends}, libqvd-vma-perl, nxagent
+Description: The QVD Virtual Machine Agent
+ The VMA runs on virtual machines on the QVD platform. It allows remote control
+ through an RPC interface.
