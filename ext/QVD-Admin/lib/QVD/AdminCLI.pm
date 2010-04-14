@@ -986,6 +986,11 @@ EOT
 
 sub cmd_config_del {
     my $self = shift;
+    if (scalar @_ eq 0) {
+	print "Are you sure you want to block all machines? [y/N] ";
+	my $answer = <STDIN>;
+	exit 0 unless $answer =~ /^y/i;
+    } 
     eval {
 	$self->{admin}->cmd_config_del(@_);
     };
