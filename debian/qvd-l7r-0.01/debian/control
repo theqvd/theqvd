@@ -8,7 +8,7 @@ Homepage: http://qvdblog.qindel.com
 
 Package: qvd-l7r
 Architecture: all
-Depends: ${shlibs:Depends}, ${misc:Depends}, libqvd-l7r-perl
+Depends: ${shlibs:Depends}, ${misc:Depends}, libqvd-l7r-perl, qvd-sample-config
 Description: The QVD Level 7 Router
  QVD Level 7 Router accepts connections from clients and forwards them to
  virtual machines.
