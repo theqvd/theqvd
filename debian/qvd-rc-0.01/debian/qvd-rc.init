@@ -1,0 +1,57 @@
+#! /bin/sh
+
+### BEGIN INIT INFO
+# Provides:          qvd-rc
+# Required-Start:    $local_fs $remote_fs $syslog $network
+# Required-Stop:     $local_fs $remote_fs $syslog $network
+# Default-Start:     2 3 4 5
+# Default-Stop:      0 1 6
+# Short-Description: QVD Level 7 Router
+### END INIT INFO
+
+PATH=/bin:/usr/bin
+DAEMON=/usr/bin/qvd-rc.pl
+NAME=qvd-rc
+DESC="QVD Level 7 Router"
+
+test -x $DAEMON || exit 0
+
+LOGDIR=/var/log/qvd
+PIDFILE=/var/run/$NAME.pid
+DODTIME=1                   # Time to wait for the server to die, in seconds
+                            # If this value is set too low you might not
+                            # let some servers to die gracefully and
+                            # 'restart' will not work
+
+# Include qvd-rc defaults if available
+if [ -f /etc/default/qvd-rc ] ; then
+    . /etc/default/qvd-rc
+fi
+
+set -e
+
+case "$1" in
+  start)
+        echo "Starting $DESC: "
+	"$DAEMON" start
+        ;;
+  stop)
+        echo "Stopping $DESC: "
+	"$DAEMON" stop
+        ;;
+  restart|force-reload)
+	echo "Restarting $DESC: "
+	"$DAEMON" stop
+	"$DAEMON" start
+        ;;
+  status)
+	"$DAEMON" status
+	;;
+  *)
+    N=/etc/init.d/$NAME
+    echo "Usage: $N {start|stop|restart|force-reload|status}" >&2
+    exit 1
+    ;;
+esac
+
+exit 0
