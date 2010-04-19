@@ -29,6 +29,7 @@ __PACKAGE__->add_columns(
 	}
 	);
 __PACKAGE__->set_primary_key('id');
+__PACKAGE__->add_unique_constraint(['name']);
 __PACKAGE__->belongs_to(user => 'QVD::DB::Result::User', 'user_id');
 __PACKAGE__->belongs_to(osi => 'QVD::DB::Result::OSI', 'osi_id');
 __PACKAGE__->has_one(vm_runtime => 'QVD::DB::Result::VM_Runtime', 'vm_id');
