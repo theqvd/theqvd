@@ -1,0 +1,13 @@
+Source: qvd-client
+Section: perl
+Priority: optional
+Maintainer: qvd-team <qvd@qindel.com>
+Build-Depends: debhelper (>= 7)
+Standards-Version: 3.8.4
+Homepage: http://qvdblog.qindel.com
+
+Package: qvd-client
+Architecture: all
+Depends: ${shlibs:Depends}, ${misc:Depends}, libqvd-client-perl
+Description: The QVD client
+ The QVD client allows establishin a virtual desktop session on a QVD server.
