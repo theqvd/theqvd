@@ -46,7 +46,7 @@ my %default_config = ( vmas_load_balance_algorithm => 'random',
 		       auth_ldap_host => 'yourLDAPhost.yourCompany.com',
 		       auth_ldap_base => 'dc=example,dc=com',
 		       auth_basic_adminusername => 'admin',
-		       auth_basic_adminpassword => 'LpwdeQND' );
+		       auth_basic_adminpassword => 'admin' );
 
 $admin->cmd_config_set(%default_config);
 QVD::Config->reload;
