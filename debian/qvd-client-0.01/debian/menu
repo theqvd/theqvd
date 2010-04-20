@@ -1,4 +1,4 @@
 ?package(qvd-client): needs="X11" \
-	section="Internet" \
+	section="Applications/Internet" \
 	title="QVD Client" command="qvd-gui-client.pl" \
-	icon="qvd.xpm"
+	icon="/usr/share/pixmaps/qvd.xpm"
