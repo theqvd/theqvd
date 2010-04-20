@@ -1,4 +1,4 @@
 ?package(qvd-client): needs="X11" \
 	section="Internet" \
-	title="QVD Client" command="qvd-client.pl" \
+	title="QVD Client" command="qvd-gui-client.pl" \
 	icon="qvd.xpm"
