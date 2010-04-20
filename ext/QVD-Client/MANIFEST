@@ -1,7 +1,5 @@
 bin/qvd-client.pl
 bin/qvd-gui-client.pl
-bin/qvd-logo.png
-bin/qvd.xpm
 Changes
 lib/QVD/Client.pm
 lib/QVD/Client/Frame.pm
