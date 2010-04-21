@@ -52,20 +52,20 @@ sub new {
 	$grid_sizer->Add(Wx::StaticText->new($panel, -1, "User"),
 			 0, wxALL, 5);
 
-	$self->{username} = Wx::TextCtrl->new($panel, -1, "qvd");
+	$self->{username} = Wx::TextCtrl->new($panel, -1, "");
 	$grid_sizer->Add($self->{username},
 			 1, wxALL|wxEXPAND, 5);
 	$self->{username}->SetFocus();
 	$grid_sizer->Add(Wx::StaticText->new($panel, -1, "Password"),
 			 0, wxALL, 5);
-	$self->{password} = Wx::TextCtrl->new($panel, -1, "passw0rd",
+	$self->{password} = Wx::TextCtrl->new($panel, -1, "",
 					      wxDefaultPosition, wxDefaultSize,
 					      wxTE_PASSWORD);
 	$grid_sizer->Add($self->{password},
 			 1, wxALL|wxEXPAND, 5);
 	$grid_sizer->Add(Wx::StaticText->new($panel, -1, "Server"),
 			 0, wxALL, 5);
-	$self->{host} = Wx::TextCtrl->new($panel, -1, "localhost");
+	$self->{host} = Wx::TextCtrl->new($panel, -1, "");
 	$grid_sizer->Add($self->{host},
 			 1, wxALL|wxEXPAND, 5);
 
