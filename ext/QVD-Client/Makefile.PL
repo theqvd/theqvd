@@ -14,6 +14,7 @@ WriteMakefile(
 	'JSON' => 0,
 	'MIME::Base64' => 0,
 	'parent' => 0,
+	'Proc::Background' => 0,
 	'QVD::HTTP' => 0,
 	'QVD::HTTPC' => 0,
         'Test::More' => 0,
