@@ -140,7 +140,8 @@ sub cmd_vm_add {
 			     osi_actual_id => $row->osi_id,
 			     vm_state => 'stopped',
 			     x_state => 'disconnected',
-			     user_state => 'disconnected' });
+			     user_state => 'disconnected',
+			     blocked => 'false' });
     $row->id
 }
 
