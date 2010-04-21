@@ -9,10 +9,8 @@ use QVD::HTTP::StatusCodes qw(:status_codes);
 use IO::Socket::Forwarder qw(forward_sockets);
 use MIME::Base64 qw(encode_base64);
 use JSON;
+use Socket qw(:all);
 use Proc::Background; 
-
-
-
 
 # Forces a flush
 $| = 1;
@@ -62,6 +60,8 @@ while (1) {
 				       ReuseAddr => 1,
 				       Listen => 1);
 	
+	setsockopt($ll, IPPROTO_TCP, TCP_NODELAY, 1);
+
 	# FIXME NX_CLIENT is used for showing the user information on things
 	# like broken connection, perhaps we should show them to the user
 	# instead of ignoring them? 
