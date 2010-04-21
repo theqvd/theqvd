@@ -10,4 +10,4 @@ Package: qvd-client
 Architecture: all
 Depends: ${shlibs:Depends}, ${misc:Depends}, libqvd-client-perl
 Description: The QVD client
- The QVD client allows establishin a virtual desktop session on a QVD server.
+ The QVD client allows establishing a virtual desktop session on a QVD server.
