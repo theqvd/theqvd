@@ -113,6 +113,11 @@ sub _connect_to_vm_processor {
 
     my $vmas = QVD::VMAS->new();
     my $vm = $vmas->get_vm_runtime_for_vm_id($vm_id);
+    
+    if ($vm->blocked) {
+	$server->send_http_error(HTTP_FORBIDDEN);	
+	return;
+    }
 
     if ($vm and $vm->rel_vm_id->user_id == $user->id) {
 	$server->send_http_response(HTTP_PROCESSING,
