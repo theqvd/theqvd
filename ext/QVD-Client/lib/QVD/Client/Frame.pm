@@ -246,6 +246,8 @@ sub ConnectToVM {
 		$message = "Login error. Please verify your user and password.";
 	    } elsif ($code == HTTP_BAD_GATEWAY) {
 		$message = "Server error: ".$body;
+	    } elsif ($code == HTTP_FORBIDDEN) {
+		$message = "Your virtual machine is under maintenance.";
 	    }
 	    $message ||= "Unable to connect to remote vm: $code $msg";
 	    my $evt = new Wx::PlThreadEvent(-1, $EVT_CONNECTION_ERROR, $message);
@@ -278,7 +280,14 @@ sub OnListOfVMLoaded {
 	    $self, 
 	    "Select virtual machine:", 
 	    "Select virtual machine", 
-	    [map { $_->{name} } @$vm_data],
+	    [map { 
+		if ($_->{blocked}) {
+		    $_->{name}." (blocked)";
+		} else {
+		    $_->{name};
+		}
+		
+	    } @$vm_data],
 	    [map { $_->{id} } @$vm_data]
 	);
 	$self->{timer}->Stop();
