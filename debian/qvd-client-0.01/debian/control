@@ -8,6 +8,6 @@ Homepage: http://qvdblog.qindel.com
 
 Package: qvd-client
 Architecture: all
-Depends: ${shlibs:Depends}, ${misc:Depends}, libqvd-client-perl
+Depends: ${shlibs:Depends}, ${misc:Depends}, libqvd-client-perl, nxproxy
 Description: The QVD client
  The QVD client allows establishing a virtual desktop session on a QVD server.
