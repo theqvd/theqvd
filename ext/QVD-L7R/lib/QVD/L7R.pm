@@ -290,7 +290,7 @@ sub _list_of_vm_processor {
 	{
 	    id => $_->vm_id,
 	    state => $_->vm_state,
-	    name => $_->rel_vm_id->name
+	    name => $_->rel_vm_id->name,
 	    blocked => $_->blocked
 	}
     } @vms;
