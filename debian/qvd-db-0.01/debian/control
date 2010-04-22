@@ -8,6 +8,6 @@ Homepage: http://qvdblog.qindel.com
 
 Package: qvd-db
 Architecture: all
-Depends: ${shlibs:Depends}, ${misc:Depends}, postgresql
+Depends: ${shlibs:Depends}, ${misc:Depends}, postgresql, qvd-admin
 Description: The QVD database
  The QVD database maintains the current state of the platform.
