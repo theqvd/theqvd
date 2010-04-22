@@ -41,7 +41,8 @@ sub run {
 
     my $time = delete $opts{time};
 
-    DEBUG "entering QVD::ParallelNet::run(" . scalar(@{$self->{sockets}}) . ")";
+    DEBUG "entering QVD::ParallelNet::run(" . scalar(@{$self->{sockets}}) .
+        ") timeout: " . ($time // '<undef>') . " start: $start";
 
     # FIXME: remove this;
     # use Data::Dumper;
@@ -77,9 +78,9 @@ sub run {
 	my $delta;
 	if (defined $time) {
 	    $delta = time - $start;
-	    if ($delta < $time) {
+	    if ($delta > $time) {
 		# set error
-		DEBUG "exiting QVD::ParallelNet::run() - timeout";
+		DEBUG "exiting QVD::ParallelNet::run() - timeout - delta: $delta exit: " . time;
 		return 1;
 	    }
         }
