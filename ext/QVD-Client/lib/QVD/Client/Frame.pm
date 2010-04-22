@@ -200,8 +200,14 @@ sub ConnectToVM {
 	my $evt = new Wx::PlThreadEvent(-1, $EVT_LIST_OF_VM_LOADED, $vm_data);
 	Wx::PostEvent($self, $evt);
 	cond_wait($vm_id);
-    } else {
+    } elsif (@$vm_data == 1) {
 	$vm_id = $vm_data->[0]{id};
+    } else {
+	my $message :shared;
+	$message = "You don't have any virtual machine available";
+	my $evt = new Wx::PlThreadEvent(-1, $EVT_CONNECTION_ERROR, $message);
+	Wx::PostEvent($self, $evt);
+	return;
     }
 
     $httpc->send_http_request(GET => '/qvd/connect_to_vm?id='.$vm_id,
