@@ -162,13 +162,19 @@ sub _shutdown {
     return -e "/var/run/shutdown.pid";
 }
 
-
 sub SimpleRPC_start_vm_listener {
+    # FIXME: remove this method
+    my $self = shift;
+    WARN "deprecated RPC method called";
+    $self->_start_or_resume_session;
+    {host => 'localhost', port => 5000, __deprecated__ => 1};
+}
+
+sub SimpleRPC_start_x_listener {
     my $self = shift;
     $self->_start_or_resume_session;
     {host => 'localhost', port => 5000};
 }
-
 
 sub SimpleRPC_status {
     my $self = shift;
