@@ -4,11 +4,22 @@ use strict;
 use warnings;
 use QVD::DB::Simple;
 
+use Log::Log4perl;
+
+
+my $log4perlConf = (grep { -f $_ } qw(log4perl.conf /etc/qvd/log4perl.conf
+			/usr/share/qvd/config/log4perl.conf))[0] || {};
+Log::Log4perl::init($log4perlConf);
+
+
 my @sqlt_args = ({}); #{ add_drop_table => 0 };
 my $dir = '.';
 
-db->erase;
-db->deploy(@sqlt_args, $dir);
+# FIXME parse command line arguments properly
+my $db = $#ARGV ? db(data_source => $ARGV[0], username => $ARGV[1], password => $ARGV[2])
+		: db(); 
+$db->erase;
+$db->deploy(@sqlt_args, $dir);
 
 require QVD::Admin;
 
@@ -50,5 +61,3 @@ my %default_config = ( vmas_load_balance_algorithm => 'random',
 		       auth_basic_adminpassword => 'admin' );
 
 $admin->cmd_config_set(%default_config);
-QVD::Config->reload;
-
