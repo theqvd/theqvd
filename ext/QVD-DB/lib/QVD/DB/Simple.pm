@@ -4,7 +4,6 @@ use strict;
 use warnings;
 
 use Log::Log4perl qw(:levels :easy);
-Log::Log4perl::init('log4perl.conf');
 
 use QVD::DB;
 
@@ -13,8 +12,8 @@ our @EXPORT = qw(db txn_do txn_eval rs);
 
 my $db;
 
-sub db () {
-    $db ||= QVD::DB->new()
+sub db (%) {
+    $db ||= QVD::DB->new(@_)
 }
 
 sub txn_do (&) {

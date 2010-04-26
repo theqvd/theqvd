@@ -16,9 +16,15 @@ __PACKAGE__->exception_action(sub { croak @_ ; DBIx::Class::Exception::throw(@_)
 
 sub new {
     my $class = shift;
-    # Load database configuration from file
-    my $config = Config::Tiny->read('config.ini');
-    my $cdb = $config->{database};
+    my %params = @_;
+    my $cdb = {};
+    if (%params) {
+	$cdb = \%params;
+    } else {
+	# Load database configuration from file
+	my $config = Config::Tiny->read('config.ini');
+	$cdb = $config->{database};
+    }
     my $conn_data_source = $cdb->{data_source};
     my $conn_username = $cdb->{username};
     my $conn_password = $cdb->{password};
@@ -104,10 +110,14 @@ QVD::DB - ORM for QVD entities
 
 =over 4
 
-=item $db = QVD::DB->new()
+=item $db = QVD::DB->new([data_source => $source, username => $user, password => $pw])
 
-Opens a new connection to the database using the configuration from
-the file 'config.ini'
+Opens a new connection to the database. Uses configuration from the file
+F<config.ini> if the data source, username and password are not given.
+
+=item $db->deploy() 
+
+Creates the tables needed for QVD.
 
 =item $db->erase()
 
