@@ -4,8 +4,8 @@ use ExtUtils::MakeMaker;
 
 WriteMakefile(
     NAME                => 'QVD::Admin',
-    AUTHOR              => 'Qindel Formacion y Servicios S.L. <joni.salonen at qindel.es>',
-    VERSION_FROM        => 'lib/QVD/Admin.pm',
+    AUTHOR              => 'QVD Team <qvd@qindel.es>',
+    VERSION	        => '0.01.'.$ENV{SVN_REVISION},
     ABSTRACT_FROM       => 'lib/QVD/Admin.pm',
     EXE_FILES		=> [
 	'bin/qvd-admin.pl',
