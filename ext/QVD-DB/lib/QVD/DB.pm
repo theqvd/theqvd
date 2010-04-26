@@ -1,6 +1,6 @@
 package QVD::DB;
 
-our $VERSION = '0.01.'.$ENV{SVN_REVISION};
+our $VERSION = '0.01';
 
 use warnings;
 use strict;

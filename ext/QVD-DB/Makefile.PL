@@ -4,8 +4,8 @@ use ExtUtils::MakeMaker;
 
 WriteMakefile(
 	NAME                => 'QVD::DB',
-	AUTHOR              => 'Joni Salonen <jsalonen@qindel.es>',
-	VERSION_FROM        => 'lib/QVD/DB.pm',
+	AUTHOR              => 'QVD Team <qvd@qindel.es>',
+	VERSION	            => '0.01.'.$ENV{SVN_REVISION},
 	ABSTRACT_FROM       => 'lib/QVD/DB.pm',
 	PL_FILES            => {},
 	PREREQ_PM => {
