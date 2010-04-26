@@ -5,7 +5,7 @@ use ExtUtils::MakeMaker;
 WriteMakefile(
     NAME                => 'QVD::VMA',
     AUTHOR              => 'Salvador Fandiño <sfandino@yahoo.com>',
-    VERSION_FROM        => 'lib/QVD/VMA.pm',
+    VERSION             => '0.01.'.$ENV{SVN_REVISION},
     ABSTRACT_FROM       => 'lib/QVD/VMA.pm',
     EXE_FILES		=> [
 	'bin/nxagent-monitor.pl',

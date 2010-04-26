@@ -5,7 +5,7 @@ use ExtUtils::MakeMaker;
 WriteMakefile(
     NAME                => 'QVD::HTTPC',
     AUTHOR              => 'Salvador Fandiño <sfandino@yahoo.com>',
-    VERSION_FROM        => 'lib/QVD/HTTPC.pm',
+    VERSION             => '0.01.'.$ENV{SVN_REVISION},
     ABSTRACT_FROM       => 'lib/QVD/HTTPC.pm',
     PL_FILES            => {},
     PREREQ_PM => {

@@ -5,7 +5,7 @@ use ExtUtils::MakeMaker;
 WriteMakefile(
     NAME                => 'QVD::L7R',
     AUTHOR              => 'Salvador Fandiño <sfandino@yahoo.com>',
-    VERSION_FROM        => 'lib/QVD/L7R.pm',
+    VERSION             => '0.01.'.$ENV{SVN_REVISION},
     ABSTRACT_FROM       => 'lib/QVD/L7R.pm',
     EXE_FILES		=> [
 	'bin/qvd-l7rd.pl',

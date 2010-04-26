@@ -5,7 +5,7 @@ use ExtUtils::MakeMaker;
 WriteMakefile(
     NAME                => 'QVD::Client',
     AUTHOR              => 'Salvador Fandiño <sfandino@yahoo.com>',
-    VERSION_FROM        => 'lib/QVD/Client.pm',
+    VERSION             => '0.01.'.$ENV{SVN_REVISION},
     ABSTRACT_FROM       => 'lib/QVD/Client.pm',
     PL_FILES            => {},
     EXE_FILES           => [ qw(bin/qvd-client.pl bin/qvd-gui-client.pl) ],

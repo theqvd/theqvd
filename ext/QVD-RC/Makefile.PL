@@ -5,7 +5,7 @@ use ExtUtils::MakeMaker;
 WriteMakefile(
     NAME                => 'QVD::RC',
     AUTHOR              => 'Salvador Fandiño <sfandino@yahoo.com>',
-    VERSION_FROM        => 'lib/QVD/RC.pm',
+    VERSION             => '0.01.'.$ENV{SVN_REVISION},
     ABSTRACT_FROM       => 'lib/QVD/RC.pm',
     EXE_FILES		=> [
 	'bin/qvd-rcd.pl',
