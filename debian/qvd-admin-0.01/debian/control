@@ -9,5 +9,6 @@ Homepage: http://qvdblog.qindel.com
 Package: qvd-admin
 Architecture: all
 Depends: ${shlibs:Depends}, ${misc:Depends}, libqvd-admin-perl, qvd-sample-config
-Description: The command line QVD administration tools
- Command lines tools for administering the QVD platform.
+Description: Command line tools for administering the QVD platform
+ Command line tools for managing the users, virtual machines and operating
+ system images on the QVD platform.
