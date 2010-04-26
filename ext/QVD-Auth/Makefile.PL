@@ -5,7 +5,7 @@ use ExtUtils::MakeMaker;
 WriteMakefile(
     NAME                => 'QVD::Auth',
     AUTHOR              => q{Hugo Cornejo <hcornejo@qindel.com>},
-    VERSION_FROM        => 'lib/QVD/Auth.pm',
+    VERSION	        => '0.01.'.$ENV{SVN_REVISION},
     ABSTRACT_FROM       => 'lib/QVD/Auth.pm',
     ($ExtUtils::MakeMaker::VERSION >= 6.3002
       ? ('LICENSE'=> 'perl')
