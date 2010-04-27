@@ -10,7 +10,7 @@
 ### END INIT INFO
 
 PATH=/bin:/usr/bin
-DAEMON=/usr/bin/qvd-l7r.pl
+DAEMON=/usr/bin/qvd-l7rd.pl
 NAME=qvd-l7r
 DESC="QVD Level 7 Router"
 
