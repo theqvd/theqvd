@@ -155,15 +155,18 @@ sub _shutdown {
     my $self = shift;
     my $type = shift;
     my $minutes = shift;
-    my $pid = fork;
-    if (!$pid) {
-	defined $pid or carp "Shutdown: fork failed: $!";
-	{ exec "shutdown -$type +$minutes" };
-	carp "Shutdown: exec failed: $!";
-    }
-    # Wait 2 seconds and check the presence of pid file
-    sleep 2;
-    return -e "/var/run/shutdown.pid";
+    system "init 0";
+    return 1;
+
+    #my $pid = fork;
+    #if (!$pid) {
+    #	defined $pid or carp "Shutdown: fork failed: $!";
+    #   { exec "shutdown -$type +$minutes" };
+    #	carp "Shutdown: exec failed: $!";
+    #}
+    ## Wait 2 seconds and check the presence of pid file
+    #sleep 2;
+    #return -e "/var/run/shutdown.pid";
 }
 
 sub SimpleRPC_start_vm_listener {
@@ -389,4 +392,3 @@ reserved.
 
 This program is free software; you can redistribute it and/or modify it
 under the same terms as Perl itself.
-
