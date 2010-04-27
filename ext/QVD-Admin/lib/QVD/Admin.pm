@@ -320,7 +320,7 @@ sub cmd_config_get {
 sub cmd_vm_start_by_id {
     my ($self, $id) = @_;
     die "Missing parameter id" unless defined $id;
-    use QVD::VMAS;
+    require QVD::VMAS;
     my $vmas = QVD::VMAS->new;
     my $vm = $self->get_resultset('vm')->find($id);
     die "VM $id doesn't exist" unless defined $vm;
@@ -340,7 +340,7 @@ sub cmd_vm_start {
     my ($self, @args) = @_;
     my $rs = $self->get_resultset('vm');
     my $counter = 0;
-    use QVD::VMAS;
+    require QVD::VMAS;
     my $vmas = QVD::VMAS->new;
     while (my $vm = $rs->next) {
 	eval {
@@ -361,7 +361,7 @@ sub cmd_vm_start {
 sub cmd_vm_stop_by_id {
     my ($self, $id) = @_;
     die "Missing parameter id" unless defined $id;
-    use QVD::VMAS;
+    require QVD::VMAS;
     my $vmas = QVD::VMAS->new;
     my $vm;
     txn_do {
@@ -381,7 +381,7 @@ sub cmd_vm_stop {
     my ($self, @args) = @_;
     my $rs = $self->get_resultset('vm');
     my $counter = 0;
-    use QVD::VMAS;
+    require QVD::VMAS;
     my $vmas = QVD::VMAS->new;
     while (my $vm = $rs->next) {
 	my $vm_runtime = $vm->vm_runtime;
@@ -396,7 +396,7 @@ sub cmd_vm_stop {
 sub cmd_vm_reset_by_id {
     my ($self, $id) = @_;
     die "Missing parameter id" unless defined $id;
-    use QVD::VMAS;
+    require QVD::VMAS;
     my $vmas = QVD::VMAS->new;
     my $vm;
     txn_do {
@@ -416,7 +416,7 @@ sub cmd_vm_reset {
     my ($self, @args) = @_;
     my $rs = $self->get_resultset('vm');
     my $counter = 0;
-    use QVD::VMAS;
+    require QVD::VMAS;
     my $vmas = QVD::VMAS->new;
     while (my $vm = $rs->next) {
 	my $vm_runtime = $vm->vm_runtime;
@@ -431,7 +431,7 @@ sub cmd_vm_reset {
 sub cmd_vm_disconnect_user_by_id {
     my ($self, $id) = @_;
     die "Missing parameter id" unless defined $id;
-    use QVD::VMAS;
+    require QVD::VMAS;
     my $vmas = QVD::VMAS->new;
     my $vm;
     txn_do {
@@ -450,7 +450,7 @@ sub cmd_vm_disconnect_user_by_id {
 sub cmd_vm_disconnect_user {
     my ($self, @args) = @_;
     my $rs = $self->get_resultset('vm');
-    use QVD::VMAS;
+    require QVD::VMAS;
     my $vmas = QVD::VMAS->new;
     my $counter = 0;
     while (my $vm = $rs->next) {
