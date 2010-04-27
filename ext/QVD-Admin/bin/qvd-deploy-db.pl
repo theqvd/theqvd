@@ -3,14 +3,7 @@
 use strict;
 use warnings;
 use QVD::DB::Simple;
-
 use Log::Log4perl;
-
-
-my $log4perlConf = (grep { -f $_ } qw(log4perl.conf /etc/qvd/log4perl.conf
-			/usr/share/qvd/config/log4perl.conf))[0] || {};
-Log::Log4perl::init($log4perlConf);
-
 
 my @sqlt_args = ({}); #{ add_drop_table => 0 };
 my $dir = '.';
