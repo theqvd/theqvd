@@ -6,6 +6,9 @@ use Carp;
 use QVD::HTTP::StatusCodes qw(:status_codes);
 use URI::Split qw(uri_split);
 use URI::Escape;
+use Log::Log4perl qw(:easy);
+
+Log::Log4perl::init('log4perl.conf');
 
 use parent qw(QVD::HTTPC::Parallel);
 
@@ -49,7 +52,9 @@ sub queue_request {
     }
     my $base = $self->{_npr_base};
     my $host = $self->{_npr_host};
-    $self->SUPER::queue_request(GET => join('', $base, $method, $query),
+    my $url = join('', $base, $method, $query);
+    DEBUG "SimpleRPC parallel request: $url";
+    $self->SUPER::queue_request(GET => $url,
 				headers => ["Host: $host"]);
 }
 

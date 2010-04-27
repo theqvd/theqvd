@@ -10,8 +10,11 @@ use URI::Split qw(uri_split);
 use URI::Escape qw(uri_unescape uri_escape);
 use QVD::HTTPC;
 use QVD::HTTP::StatusCodes qw(:status_codes);
-
 use JSON;
+use Log::Log4perl qw(:easy);
+
+Log::Log4perl::init('log4perl.conf');
+
 my $json = JSON->new->ascii->pretty;
 
 sub new {
@@ -57,12 +60,18 @@ sub _make_request {
 	push @query, uri_escape($key).'='.uri_escape($value);
     }
     my $query = (@query ? '?'.join('&', @query) : '');
+
+    DEBUG "SimpleRPC request: $self->{base}/$method$query";
     my ($code, $msg, $headers, $body) =
 	$self->{httpc}->make_http_request(GET => "$self->{base}/$method$query");
     die "HTTP request failed: $code - $msg"
 	unless $code == HTTP_OK;
 
     my $data = $json->decode("[$body]");
+
+    use Data::Dumper;
+    
+    warn "remote JSON response\n" . Dumper $data;
 
     die $data->[1] if @$data >= 2;
     $data->[0];

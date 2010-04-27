@@ -8,6 +8,9 @@ use URI::Split qw(uri_split);
 use QVD::URI qw(uri_query_split);
 use QVD::HTTP::StatusCodes qw(:status_codes);
 
+use Log::Log4perl qw(:easy);
+Log::Log4perl::init('log4perl.conf');
+
 sub new {
     my $class = shift;
     my $self = {};
@@ -34,10 +37,11 @@ sub _process_request {
 
     my $data = eval { $self->$function(@params) };
     if ($@) {
+	DEBUG "SimpleRPC call $function failed: $@";
 	$httpd->send_http_response_with_body(HTTP_OK,
 					     'application/json-simplerpc',
 					     [],
-					     '"",'.$httpd->json->encode("$@")."\r\n");
+					     '"",'.$httpd->json->encode($@)."\r\n");
     }
     else {
 	$httpd->send_http_response_with_body(HTTP_OK,
