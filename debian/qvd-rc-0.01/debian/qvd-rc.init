@@ -6,22 +6,20 @@
 # Required-Stop:     $local_fs $remote_fs $syslog $network
 # Default-Start:     2 3 4 5
 # Default-Stop:      0 1 6
-# Short-Description: QVD Level 7 Router
+# Short-Description: QVD remote control
 ### END INIT INFO
 
 PATH=/bin:/usr/bin
-DAEMON=/usr/bin/qvd-rc.pl
+DAEMON=/usr/bin/qvd-rcd.pl
 NAME=qvd-rc
-DESC="QVD Level 7 Router"
+DESC="QVD remote control"
 
 test -x $DAEMON || exit 0
 
 LOGDIR=/var/log/qvd
-PIDFILE=/var/run/$NAME.pid
-DODTIME=1                   # Time to wait for the server to die, in seconds
-                            # If this value is set too low you might not
-                            # let some servers to die gracefully and
-                            # 'restart' will not work
+RUNDIR=/var/run/qvd
+
+mkdir -p "$RUNDIR"
 
 # Include qvd-rc defaults if available
 if [ -f /etc/default/qvd-rc ] ; then

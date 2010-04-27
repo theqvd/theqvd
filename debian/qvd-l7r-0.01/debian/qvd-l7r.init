@@ -17,11 +17,9 @@ DESC="QVD Level 7 Router"
 test -x $DAEMON || exit 0
 
 LOGDIR=/var/log/qvd
-PIDFILE=/var/run/$NAME.pid
-DODTIME=1                   # Time to wait for the server to die, in seconds
-                            # If this value is set too low you might not
-                            # let some servers to die gracefully and
-                            # 'restart' will not work
+RUNDIR=/var/run/qvd
+
+mkdir -p "$RUNDIR"
 
 # Include qvd-l7r defaults if available
 if [ -f /etc/default/qvd-l7r ] ; then
