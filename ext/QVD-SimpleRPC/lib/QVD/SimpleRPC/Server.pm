@@ -8,7 +8,7 @@ use URI::Split qw(uri_split);
 use QVD::URI qw(uri_query_split);
 use QVD::HTTP::StatusCodes qw(:status_codes);
 
-use Log::Log4perl qw(:easy);
+use Log::Log4perl qw(:easy :levels);
 Log::Log4perl::init('log4perl.conf');
 
 sub new {
@@ -34,7 +34,7 @@ sub _process_request {
     $function = "SimpleRPC_$function";
 
     local $SIG{__DIE__};
-    DEBUG "SimpleRPC serving $funcion";
+    DEBUG "SimpleRPC serving $function";
     my $data = eval { $self->$function(@params) };
     if ($@) {
 	DEBUG "SimpleRPC call $function failed: $@";
