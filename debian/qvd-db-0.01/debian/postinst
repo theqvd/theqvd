@@ -29,7 +29,7 @@ case "$1" in
 	# and deploy the database schema as qvd
 	PASSWORD="tmp$RANDOM"
 	sudo -u postgres psql -c "ALTER ROLE qvd PASSWORD '$PASSWORD';"
-	/usr/bin/qvd-deploy-db.pl 'dbi:Pg:dbname=qvd;host=120.0.0.1' qvd "$PASSWORD"
+	/usr/bin/qvd-deploy-db.pl 'dbi:Pg:dbname=qvd;host=127.0.0.1' qvd "$PASSWORD"
     fi
     ;;
 
