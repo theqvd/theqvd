@@ -13,12 +13,18 @@ sub post_configure_hook {
     $impl->set_http_request_processors($self, '/vma/*');
 }
 
+
 package QVD::VMA::Impl;
+
 use Carp;
 use File::Slurp qw(slurp);
 use File::Spec;
+use POSIX;
 use QVD::VMA::Config;
+use feature qw(switch);
+
 use parent 'QVD::SimpleRPC::Server';
+
 
 use Log::Log4perl qw(:levels :easy);
 Log::Log4perl::init('log4perl.conf');
@@ -139,9 +145,7 @@ sub _start_or_resume_session {
 	    defined $pid or carp "fork failed";
 	    my $displayn = 1000;
 	    $ENV{PULSE_SERVER} = "tcp:localhost:".($displayn+7000);
-	    { exec "su - qvd -c \"xinit $desktop -- $xagent :$displayn -name QVD -display nx/nx,link=lan,media=1:$displayn -ac\"" };
-	    { exec "/bin/false" };
-	    require POSIX;
+	    { exec "su - qvd -c \"xinit $desktop -- $xagent :$displayn -name QVD -display nx/nx,link=lan,media=1:$displayn -ac\"" }
 	    POSIX::_exit(-1);
 	}
     }
@@ -176,7 +180,22 @@ sub SimpleRPC_start_x_listener {
     {host => 'localhost', port => 5000};
 }
 
+sub SimpleRPC_x_state {
+    my $self = shift;
+    my $nx_state =  $self->_get_nxagent_status();
+    given ($nx_state) {
+	when ('initiated')                               { return 'connecting'    }
+	when (['starting', 'resuming'])                  { return 'listening'     }
+	when (['started', 'resumed'])                    { return 'connected'     }
+ 	when (['suspending', 'terminating', 'aborting']) { return 'disconnecting' }
+	when (['suspended', 'terminated', 'aborted',
+	       'exited terminated','exited aborted'])    { return 'disconnected'  }
+    }
+    die "Internal error: no mapping for nxagent state $nx_state";
+}
+
 sub SimpleRPC_status {
+    # FIXME: remove this method
     my $self = shift;
     my $nx_state = $self->_get_nxagent_status();
 
@@ -197,7 +216,7 @@ sub SimpleRPC_status {
 	$x_state = 'disconnected';
     }
 
-    {status => 'ok', x_state => $x_state}
+    {status => 'ok', x_state => $x_state, __deprecated__ => 1}
 }
 
 
