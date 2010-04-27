@@ -34,7 +34,7 @@ sub _process_request {
     $function = "SimpleRPC_$function";
 
     local $SIG{__DIE__};
-
+    DEBUG "SimpleRPC serving $funcion";
     my $data = eval { $self->$function(@params) };
     if ($@) {
 	DEBUG "SimpleRPC call $function failed: $@";
@@ -44,6 +44,7 @@ sub _process_request {
 					     '"",'.$httpd->json->encode($@)."\r\n");
     }
     else {
+	DEBUG "SimpleRPC call ok";
 	$httpd->send_http_response_with_body(HTTP_OK,
 					     'application/json-simplerpc',
 					     [],
