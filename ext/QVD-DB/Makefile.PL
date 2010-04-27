@@ -10,6 +10,7 @@ WriteMakefile(
 	PL_FILES            => {},
 	PREREQ_PM => {
 		'Config::Tiny' => 0,
+		'DBD::Pg' => 0,
 		'DBIx::Class' => 0,
 		'Log::Log4perl' => 0,
 		'parent' => 0,
