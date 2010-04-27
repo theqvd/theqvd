@@ -61,17 +61,18 @@ sub _make_request {
     }
     my $query = (@query ? '?'.join('&', @query) : '');
 
-    DEBUG "SimpleRPC request: $self->{base}/$method$query";
+    my $url = "$self->{base}$method$query";
+    DEBUG "SimpleRPC request: $url";
     my ($code, $msg, $headers, $body) =
-	$self->{httpc}->make_http_request(GET => "$self->{base}/$method$query");
+	$self->{httpc}->make_http_request(GET => $url);
     die "HTTP request failed: $code - $msg"
 	unless $code == HTTP_OK;
 
     my $data = $json->decode("[$body]");
 
+    # FIXME: remove this:
     use Data::Dumper;
-    
-    warn "remote JSON response\n" . Dumper $data;
+    DEBUG "remote JSON response\n" . Dumper $data;
 
     die $data->[1] if @$data >= 2;
     $data->[0];
