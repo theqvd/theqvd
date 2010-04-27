@@ -25,9 +25,12 @@ case "$1" in
     fi
     if su postgres -c "createdb -O qvd qvd"; then
 	echo "postgres database qvd added"
+	# set a temporary password for installation
+	# and deploy the database schema as qvd
+	PASSWORD="tmp$RANDOM"
+	sudo -u postgres psql -c "ALTER ROLE qvd PASSWORD '$PASSWORD';"
+	/usr/bin/qvd-deploy-db.pl 'dbi:Pg:dbname=qvd;host=120.0.0.1' qvd "$PASSWORD"
     fi
-    # deploy the database schema using the postgres user
-    su postgres -c "qvd-deploy-db.pl dbi:Pg:dbname=qvd postgres"
     ;;
 
     abort-upgrade|abort-remove|abort-deconfigure)
