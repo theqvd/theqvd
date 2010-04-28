@@ -22,6 +22,7 @@ WriteMakefile(
 	'QVD::HTTP' => 0,
 	'QVD::HTTPD' => 0,
 	'QVD::URI' => 0,
+	'QVD::VMAS' => 0,
         'Test::More' => 0,
     },
     dist                => { COMPRESS => 'gzip -9f', SUFFIX => 'gz', },
