@@ -16,12 +16,8 @@ DESC="QVD Virtual Machine Agent"
 
 test -x $DAEMON || exit 0
 
-LOGDIR=/var/log/qvd-vma
-PIDFILE=/var/run/$NAME.pid
-DODTIME=1                   # Time to wait for the server to die, in seconds
-                            # If this value is set too low you might not
-                            # let some servers to die gracefully and
-                            # 'restart' will not work
+RUNDIR=/var/run/qvd
+mkdir -p "$RUNDIR"
 
 # Include qvd-vma defaults if available
 if [ -f /etc/default/qvd-vma ] ; then
@@ -32,15 +28,16 @@ set -e
 
 case "$1" in
   start)
-        echo -n "Starting $DESC: "
+        echo "Starting $DESC: "
+	/usr/bin/qvd-initialize-user-storage.pl
 	"$DAEMON" start
         ;;
   stop)
-        echo -n "Stopping $DESC: "
+        echo "Stopping $DESC: "
 	"$DAEMON" stop
         ;;
   restart|force-reload)
-	echo -n "Restarting $DESC: "
+	echo "Restarting $DESC: "
 	"$DAEMON" stop
 	"$DAEMON" start
         ;;
