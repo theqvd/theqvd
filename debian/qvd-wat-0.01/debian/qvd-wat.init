@@ -46,6 +46,13 @@ LOGFILE=$LOGDIR/$NAME.log  # Server logfile
 #DAEMONUSER=test   # Users to run the daemons as. If this value
                         # is set start-stop-daemon will chuid the server
 
+CONFDIR=/etc/qvd
+if [ ! -d "$CONFDIR" ]; then
+   echo "Configuration directory $CONFDIR doesn't exist. Copying it from /usr/share/qvd/config"
+   cp /usr/share/qvd/config "$CONFDIR"
+fi
+
+
 # Include defaults if available
 if [ -f /etc/default/$NAME ] ; then
     . /etc/default/$NAME

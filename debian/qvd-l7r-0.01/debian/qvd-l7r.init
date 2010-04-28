@@ -16,9 +16,13 @@ DESC="QVD Level 7 Router"
 
 test -x $DAEMON || exit 0
 
-LOGDIR=/var/log/qvd
-RUNDIR=/var/run/qvd
+CONFDIR=/etc/qvd
+if [ ! -d "$CONFDIR" ]; then
+   echo "Configuration directory $CONFDIR doesn't exist. Copying it from /usr/share/qvd/config"
+   cp /usr/share/qvd/config "$CONFDIR"
+fi
 
+RUNDIR=/var/run/qvd
 mkdir -p "$RUNDIR"
 
 # Include qvd-l7r defaults if available
