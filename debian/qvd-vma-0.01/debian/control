@@ -8,7 +8,7 @@ Homepage: http://qvdblog.qindel.com
 
 Package: qvd-vma
 Architecture: all
-Depends: ${shlibs:Depends}, ${misc:Depends}, libqvd-vma-perl, nxagent
+Depends: ${shlibs:Depends}, ${misc:Depends}, libqvd-vma-perl, nxagent, util-linux
 Description: The QVD Virtual Machine Agent
  The VMA runs on virtual machines on the QVD platform. It allows remote control
  through an RPC interface.

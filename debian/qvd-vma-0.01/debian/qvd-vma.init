@@ -9,7 +9,7 @@
 # Short-Description: QVD Virtual Machine Agent
 ### END INIT INFO
 
-PATH=/bin:/usr/bin
+PATH=/sbin:/bin:/usr/bin
 DAEMON=/usr/bin/qvd-vma.pl
 NAME=qvd-vma
 DESC="QVD Virtual Machine Agent"
