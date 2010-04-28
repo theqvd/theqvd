@@ -17,6 +17,8 @@ WriteMakefile(
 	'Log::Log4perl' => 0,
 	'parent' => 0,
 	'QVD::Auth' => 0,
+	'QVD::Auth::Basic' => 0,
+	'QVD::Auth::LDAP' => 0,
 	'QVD::Config' => 0,
 	'QVD::DB' => 0,
 	'QVD::HTTP' => 0,
