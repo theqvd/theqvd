@@ -8,7 +8,7 @@ use Config::Tiny;
 use Exporter qw/import/;
 our @EXPORT = qw(cfg);
 
-my $ini = Config::Tiny->read("vma.ini")
+my $ini = Config::Tiny->read("/etc/qvd/vma.ini")
     or croak "Unable to read configuration file 'vma.ini'";
 
 sub cfg {

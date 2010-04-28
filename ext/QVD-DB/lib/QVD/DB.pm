@@ -22,7 +22,7 @@ sub new {
 	$cdb = \%params;
     } else {
 	# Load database configuration from file
-	my $config = Config::Tiny->read('config.ini');
+	my $config = Config::Tiny->read('/etc/qvd/config.ini');
 	$cdb = $config->{database};
     }
     my $conn_data_source = $cdb->{data_source};
