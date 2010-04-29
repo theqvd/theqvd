@@ -70,6 +70,7 @@ sub run {
 				when ('stopped') {
 				    $self->_assign_vm_ports($vm);
 				    $self->_move_vm_to_state(starting => $vm);
+                                    $self->clear_vm_cmd;
 				    $start = 1;
 				}
 				default {
@@ -80,7 +81,10 @@ sub run {
 			}
 			when('stop') {
 			    given($vm->vm_state) {
-				when ('running')  { $self->_move_vm_to_state(stopping_1 => $vm) }
+				when ('running')  {
+                                    $self->_move_vm_to_state(stopping_1 => $vm);
+                                    $vm->clear_vm_cmd;
+                                }
 				when ('starting') { } # stop is delayed!
 				default {
 				    ERROR "unexpected VM command stop received in state $_";
@@ -93,6 +97,7 @@ sub run {
 			}
 			default {
 			    ERROR "unexpected VM command $_ received in state " . $vm->vm_state;
+                            $vm->clear_vm_cmd;
 			}
 		    }
 		};
@@ -252,57 +257,19 @@ sub _leave_vm_state_running {
     $vm->clear_vma_ok_ts;
 }
 
-### do-nothing callbacks commented out:
-
-# sub _enter_vm_state_starting {
-#     my ($self, $vm) = @_;
-#     # FIXME!
-# }
-# sub _enter_vm_state_running {
-#     my ($self, $vm) = @_;
-#     # FIXME!
-# }
-
-sub _enter_vm_state_stopping {
+sub _enter_vm_state_stopping_1 {
     my ($self, $vm) = @_;
-    # Siempre que se pase a este estado desde cualquier otro...
-    # * se eliminara cualquier comando de x_cmd
-    # * se pone x_state a "Disconnected"
-    $vm->set_x_state('disconnected');
-    $vm->clear_x_cmd;
+    $vm->send_user_cmd('abort') if $vm->user_state eq 'connecting';
 }
 
 sub _enter_vm_state_stopped {
     my ($self, $vm) = @_;
-    $vm->set_x_state('disconnected');
-    $vm->clear_x_cmd($vm);
-    $vm->clear_vm_cmd;
     $vm->clear_host_id;
 }
 
-sub _enter_vm_state_zombie {
+sub _enter_vm_state_zombie_1 {
     my ($self, $vm) = @_;
-    # Siempre que se pase a este estado desde cualquier otro...
-    # * se elimina cualquier comando de vm_cmd
-    # * se elimina cualquier comando de x_cmd
-    # * se cambia el estado x_state a "Disconnected" 
-    $vm->set_x_state('disconnected');
-    $vm->clear_vm_cmd;
-    $vm->clear_x_cmd;
-}
-
-sub _enter_vm_state_failed {
-    my ($self, $vm) = @_;
-    DEBUG "vm enter state failed";
-    # Acciones de entrada
-    # * se elimina cualquier comando de vm_cmd
-    # * se elimina cualquier comando de x_cmd
-    # * se cambia el estado x_state a "Disconnected"
-    # * se elimina la entrada vm_runtime.host de la base de datos
-    $vm->set_x_state('disconnected');
-    $vm->clear_x_cmd;
-    $vm->clear_vm_cmd;
-    $vm->clear_host_id;
+    $vm->send_user_cmd('abort') if $vm->user_state eq 'connecting';
 }
 
 sub _start_vm {
@@ -413,7 +380,7 @@ sub _vm_user_storage_path {
 sub _signal_vm {
     my ($self, $vm, $signal) = @_;
     my $pid = $vm->vm_pid;
-    DEBUG "kill process $pid with signal $signal";
+    DEBUG "kill VM process $pid with signal $signal";
     kill($signal, $pid);
 }
 
@@ -425,6 +392,7 @@ sub _check_vm_process {
 sub _check_l7r_process {
     my ($self, $vm) = @_;
     my $pid = $vm->l7r_pid;
+    DEBUG "kill L7R process $pid with signal 0";
     kill(0, $pid);
 }
 
