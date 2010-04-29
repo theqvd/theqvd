@@ -114,9 +114,15 @@ sub run {
 	    next if $vm->vm_state eq 'stopped';
 
 	    unless ($self->_check_vm_process($vm)) {
-		if ($vm->vm_state ne 'stopping_2') {
-		    ERROR "vm process has disappeared!, id: $id";
-		    $vm->block;
+                given ($vm->vm_state) {
+                    when ('stopping_1') {}
+                    when ('stopping_2') {
+                        WARN "vm process exited without passing through stopping_2"
+                    }
+                    default {
+                        ERROR "vm process has disappeared!, id: $id";
+                        $vm->block;
+                    }
 		}
 		txn_eval { $self->_move_vm_to_state(stopped => $vm) };
 		$@ and ERROR "unable to move VM $id to state stopped";
