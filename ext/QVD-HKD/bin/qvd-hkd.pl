@@ -20,8 +20,7 @@ $App::Daemon::loglevel = $DEBUG;
 $App::Daemon::as_user = "root";
 
 daemonize;
-my $hkd = QVD::HKD->new(loop_wait_time => $POLL_TIME);
-$hkd->run();
+QVD::HKD->new->run;
 
 __END__
 
