@@ -70,7 +70,7 @@ sub run {
 				when ('stopped') {
 				    $self->_assign_vm_ports($vm);
 				    $self->_move_vm_to_state(starting => $vm);
-                                    $self->clear_vm_cmd;
+                                    $vm->clear_vm_cmd;
 				    $start = 1;
 				}
 				default {
@@ -165,8 +165,8 @@ sub run {
 			    ERROR "machine has not responded for a long time (" .
 				(time - $vma_ok_ts) . " seconds), going zombie!" .
 				    " id: $id, vma_ok_ts: $vma_ok_ts, time: " . time;
-			    txn_eval { $self->_move_vm_to_state(zombie => $vm) };
-			    $@ and ERROR "unable to move VM to state zombie";
+			    txn_eval { $self->_move_vm_to_state(zombie_1 => $vm) };
+			    $@ and ERROR "unable to move VM to state zombie_1";
 			}
 		    }
 		    default {
