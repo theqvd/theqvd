@@ -9,7 +9,9 @@ use URI::Split qw(uri_split);
 
 use QVD::HTTP::StatusCodes qw(:all);
 
+# FIXME: allow forking!
 use parent qw(Net::Server::Fork);
+# use parent qw(Net::Server);
 
 sub default_values { return { no_client_stdout => 1 } }
 
@@ -122,10 +124,16 @@ sub _process_http_request {
 sub send_http_response {
     my $self = shift;
     my $code = int shift;
+    my @headers;
+    for (@_) {
+	my @lines = /^(.*)$/g;
+	chomp @lines;
+	push @headers, join("\r\n  ", @lines);
+    }
     my $socket = $self->{server}{client};
     print $socket join("\r\n",
 		       "HTTP/1.1 $code ". http_status_message($code),
-		       @_, '', '');
+		       @headers, '', '');
 }
 
 sub send_http_response_with_body {
