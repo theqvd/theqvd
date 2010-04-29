@@ -12,23 +12,23 @@ our @EXPORT = qw(db txn_do txn_eval rs);
 
 my $db;
 
-sub db (%) {
-    $db ||= QVD::DB->new(@_)
+sub db () {
+    $db //= QVD::DB->new()
 }
 
 sub txn_do (&) {
-    $db ||= QVD::DB->new();
+    $db //= QVD::DB->new();
     $db->txn_do(@_);
 }
 
 sub txn_eval (&) {
-    $db ||= QVD::DB->new();
+    $db //= QVD::DB->new();
     eval { $db->txn_do(@_) };
-    WARN $@ if $@;
+    DEBUG "txn_eval failed: $@" if $@;
 }
 
 sub rs (*) {
-    ($db ||= QVD::DB->new())->resultset($_[0]);
+    ($db //= QVD::DB->new())->resultset($_[0]);
 }
 
 1;
