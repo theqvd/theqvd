@@ -1,5 +1,17 @@
 package QVD::DB::Result::VM_Runtime;
-use base qw/DBIx::Class/;
+
+use strict;
+use warnings;
+
+use parent qw(DBIx::Class);
+
+use Log::Log4perl qw(:levels :easy);
+Log::Log4perl::init('log4perl.conf');
+
+# FIXME: rename rows and accessors:
+#   user_* => l7r_*
+#   user_ip => l7r_client_ip
+
 
 __PACKAGE__->load_components(qw/Core/);
 __PACKAGE__->table('vm_runtimes');
@@ -24,7 +36,9 @@ __PACKAGE__->add_columns(
 	    is_nullable => 1,
 	    is_enum => 1,
             extra => {
-                list => [qw/stopped starting running stopping zombie failed/]
+                list => [qw(stopped starting running
+			    stopping_1 stopping_2
+			    zombie_1 zombie_2)]
             }
 	},
 	vm_state_ts => {
@@ -92,7 +106,7 @@ __PACKAGE__->add_columns(
 	    is_nullable => 1
 	},
 	l7r_host  => {
-	    data_type => 'varchar(15)',
+	    data_type => 'integer',
             is_nullable => 1
         },
 	l7r_pid => {
@@ -128,14 +142,11 @@ __PACKAGE__->add_columns(
 	    is_nullable => 1,
 	}
 	);
-	
+
 __PACKAGE__->set_primary_key('vm_id');
 
-__PACKAGE__->belongs_to(host => 'QVD::DB::Result::Host', 'host_id', {
-    join_type => 'LEFT',
-});
-__PACKAGE__->belongs_to('rel_vm_id' => 'QVD::DB::Result::VM', 'vm_id', 
-			    { cascade_delete => 1 }); 
+__PACKAGE__->belongs_to(host => 'QVD::DB::Result::Host', 'host_id', { join_type => 'LEFT' });
+__PACKAGE__->belongs_to('rel_vm_id' => 'QVD::DB::Result::VM', 'vm_id', { cascade_delete => 1 });
 
 __PACKAGE__->belongs_to('rel_x_state' => 'QVD::DB::Result::X_State', 'x_state');
 __PACKAGE__->belongs_to('rel_vm_state' => 'QVD::DB::Result::VM_State', 'vm_state');
@@ -147,3 +158,73 @@ __PACKAGE__->belongs_to('rel_user_cmd' => 'QVD::DB::Result::User_Cmd', 'user_cmd
 
 __PACKAGE__->belongs_to(osi => 'QVD::DB::Result::OSI', 'osi_actual_id');
 
+sub set_vm_state {
+    my $self = shift;
+    my $state = shift;
+    $self->update({ vm_state => $state, vm_state_ts => time, @_ });
+}
+
+sub set_x_state {
+    my $self = shift;
+    my $state = shift;
+    $self->update({ x_state => $state, x_state_ts => time, @_ });
+}
+
+sub set_user_state {
+    my $self = shift;
+    my $state = shift;
+    $self->update({ user_state => $state, user_state_ts => time, @_ });
+}
+
+sub _clear_cmd {
+    my ($self, $type) = @_;
+    DEBUG "Clearing $type command for VM ".$self->vm_id;
+    $self->update({"${type}_cmd" => undef});
+}
+
+sub clear_vm_cmd { shift->_clear_cmd('vm') }
+sub clear_x_cmd { shift->_clear_cmd('x') }
+sub clear_user_cmd { shift->_clear_cmd('user') }
+
+sub send_vm_cmd {
+    my ($self, $cmd) = @_;
+    shift->update({vm_cmd => $cmd});
+}
+
+sub send_user_cmd {
+    my ($self, $cmd) = @_;
+    shift->update({user_cmd => $cmd});
+}
+
+sub send_x_cmd {
+    die "obsolete method called";
+}
+
+sub update_vma_ok_ts { shift->update({vma_ok_ts => time}) }
+sub clear_vma_ok_ts { shift->update({vma_ok_ts => undef}) }
+
+sub clear_host_id { shift->update({host_id => undef}) }
+
+sub set_vm_pid {
+    my ($self, $pid) = @_;
+    $self->update({vm_pid => $pid })
+}
+
+sub set_host_id {
+    my ($self, $host_id) = @_;
+    $self->update({host_id => $host_id});
+}
+
+sub clear_l7r_all {
+    shift->update({ user_state => 'disconnected',
+                    user_cmd => undef,
+                    l7r_host => undef,
+                    l7r_pid => undef })
+}
+
+sub block { shift->update({ blocked => 1 }) }
+
+sub vma_url {
+    my $self = shift;
+    sprintf("http://%s:%d/vma", $self->vm_address, $self->vm_vma_port);
+}
