@@ -28,28 +28,26 @@ sub new {
     my $conn_data_source = $cdb->{data_source};
     my $conn_username = $cdb->{username};
     my $conn_password = $cdb->{password};
-    $class->SUPER::connect($conn_data_source, $conn_username, $conn_password,
-				{
-				    RaiseError => 1,
-				    AutoCommit => 1,
-				    quote_char => '"',
-				    name_sep   => '.',
-				    pg_enable_utf8 => 1
-				});
+    $class->SUPER::connect($conn_data_source,
+                           $conn_username, $conn_password,
+                           { RaiseError => 1,
+                             AutoCommit => 1,
+                             quote_char => '"',
+                             name_sep   => '.',
+                             pg_enable_utf8 => 1 });
 }
 
 sub deploy {
     my $db = shift;
     $db->SUPER::deploy(@_);
 
-    my %initial_values = (
-	VM_State => [qw(stopped starting running stopping zombie failed)],
-	VM_Cmd => [qw(start stop)],
-	X_State => [qw(disconnected connecting listening connected disconnecting)],
-	X_Cmd => [qw(connect disconnect)],
-	User_State => [qw(disconnected connecting connected aborting)],
-	User_Cmd => [qw(Abort Forward)],
-    );
+    my %initial_values = ( VM_State   => [qw(stopped starting running
+                                             stopping_1 stopping_2
+                                             zombie_1 zombie_2)],
+                           VM_Cmd     => [qw(start stop)],
+                           User_State => [qw(disconnected connecting
+                                             connected aborting)],
+                           User_Cmd   => [qw(abort)] );
 
     while (my ($rs, $values) = each %initial_values) {
 	foreach my $name (@$values) {
@@ -71,10 +69,8 @@ sub erase {
 		       users
 		       user_extras
 		       user_properties
-		       x_states
 		       vm_states
 		       user_states
-		       x_cmds
 		       vm_cmds
 		       user_cmds
 		       configs

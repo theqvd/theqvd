@@ -52,34 +52,12 @@ __PACKAGE__->add_columns(
             extra => {
                 list => [qw/start stop/]
             }
-	},	
+	},
 	vm_failures => {
 	    data_type => 'integer',
 	    is_nullable => 1
 	},
 	vm_pid => {
-	    data_type => 'integer',
-	    is_nullable => 1
-	},
-	x_state => {
-	    data_type => 'varchar(12)',
-            is_nullable => 1,
-	    extra => {
-                list => [qw/stopped disconnected connecting connected/]
-            }
-        },
-	x_state_ts => {
-	    data_type => 'integer',
-	    is_nullable => 1
-	},
-	x_cmd => {
-	    data_type => 'varchar(12)',
-	    is_nullable => 1,
-	    extra => {
-                list => [qw/start stop/]
-            }
-	},
-	x_failures => {
 	    data_type => 'integer',
 	    is_nullable => 1
 	},
@@ -148,11 +126,9 @@ __PACKAGE__->set_primary_key('vm_id');
 __PACKAGE__->belongs_to(host => 'QVD::DB::Result::Host', 'host_id', { join_type => 'LEFT' });
 __PACKAGE__->belongs_to('rel_vm_id' => 'QVD::DB::Result::VM', 'vm_id', { cascade_delete => 1 });
 
-__PACKAGE__->belongs_to('rel_x_state' => 'QVD::DB::Result::X_State', 'x_state');
 __PACKAGE__->belongs_to('rel_vm_state' => 'QVD::DB::Result::VM_State', 'vm_state');
 __PACKAGE__->belongs_to('rel_user_state' => 'QVD::DB::Result::User_State', 'user_state');
 
-__PACKAGE__->belongs_to('rel_x_cmd' => 'QVD::DB::Result::X_Cmd', 'x_cmd');
 __PACKAGE__->belongs_to('rel_vm_cmd' => 'QVD::DB::Result::VM_Cmd', 'vm_cmd');
 __PACKAGE__->belongs_to('rel_user_cmd' => 'QVD::DB::Result::User_Cmd', 'user_cmd');
 
@@ -162,12 +138,6 @@ sub set_vm_state {
     my $self = shift;
     my $state = shift;
     $self->update({ vm_state => $state, vm_state_ts => time, @_ });
-}
-
-sub set_x_state {
-    my $self = shift;
-    my $state = shift;
-    $self->update({ x_state => $state, x_state_ts => time, @_ });
 }
 
 sub set_user_state {
@@ -183,7 +153,6 @@ sub _clear_cmd {
 }
 
 sub clear_vm_cmd { shift->_clear_cmd('vm') }
-sub clear_x_cmd { shift->_clear_cmd('x') }
 sub clear_user_cmd { shift->_clear_cmd('user') }
 
 sub send_vm_cmd {
@@ -194,10 +163,6 @@ sub send_vm_cmd {
 sub send_user_cmd {
     my ($self, $cmd) = @_;
     shift->update({user_cmd => $cmd});
-}
-
-sub send_x_cmd {
-    die "obsolete method called";
 }
 
 sub update_vma_ok_ts { shift->update({vma_ok_ts => time}) }
