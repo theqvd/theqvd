@@ -107,8 +107,6 @@ sub _suspend_or_wakeup_session {
 
 sub _start_or_resume_session {
     my $self = shift;
-    # FIXME: cache state and don't read it repeatly from an external
-    # file.
     INFO("start or resume session");
     if ($self->_is_nxagent_running) {
 	if ($self->_is_nxagent_suspended) {
@@ -127,12 +125,16 @@ sub _start_or_resume_session {
 	    $self->_suspend_or_wakeup_session;
 	} elsif ($self->_is_nxagent_starting) {
 	    until ($self->_is_nxagent_started) {
+		# FIXME: remove this sleep
+		# let the L7R take care of this
 		DEBUG ("Waiting for starting nxagent to become ready..");
 		sleep 1;
 	    }
 	} else {
 	    # nxagent is aborting, terminating, suspending or stopped
 	    DEBUG ("Waiting for ".$self->_get_nxagent_status." nxagent to stop..");
+	    # FIXME: remove this sleep
+	    # let the L7R take care of this
 	    sleep 2;
 	    $self->_start_or_resume_session;
 	}
@@ -149,41 +151,25 @@ sub _start_or_resume_session {
 	    POSIX::_exit(-1);
 	}
     }
+    1;
 }
 
 sub _shutdown {
     my $self = shift;
     my $type = shift;
-    my $minutes = shift;
-    system "init 0";
-    return 1;
-
-    #my $pid = fork;
-    #if (!$pid) {
-    #	defined $pid or carp "Shutdown: fork failed: $!";
-    #   { exec "shutdown -$type +$minutes" };
-    #	carp "Shutdown: exec failed: $!";
-    #}
-    ## Wait 2 seconds and check the presence of pid file
-    #sleep 2;
-    #return -e "/var/run/shutdown.pid";
-}
-
-sub SimpleRPC_start_vm_listener {
-    # FIXME: remove this method
-    my $self = shift;
-    WARN "deprecated RPC method called";
-    $self->_start_or_resume_session;
-    {host => 'localhost', port => 5000, __deprecated__ => 1};
+    DEBUG "shutting system down";
+    system("init 0") == 0
 }
 
 sub SimpleRPC_start_x_listener {
     my $self = shift;
+    INFO "starting X listener";
     $self->_start_or_resume_session;
-    {host => 'localhost', port => 5000};
 }
 
-sub SimpleRPC_x_state {
+sub SimpleRPC_x_state { shift->_x_state }
+
+sub _x_state {
     my $self = shift;
     my $nx_state =  $self->_get_nxagent_status();
     given ($nx_state) {
@@ -226,6 +212,7 @@ sub SimpleRPC_status {
 sub SimpleRPC_poweroff {
     my $self = shift;
     my $mins = 1;
+    # FIXME: shutdown arguments have changed
     if ($self->_shutdown('P', $mins)) {
 	{'poweroff' => $mins};
     } else {
@@ -234,6 +221,7 @@ sub SimpleRPC_poweroff {
 }
 
 sub SimpleRPC_disconnect_session {
+    # FIXME: this method should return nothing and die on failure
     my $self = shift;
     DEBUG "Trying to disconnect session in state ".$self->_get_nxagent_status;
     if ($self->_is_nxagent_started or $self->_is_nxagent_starting) {
