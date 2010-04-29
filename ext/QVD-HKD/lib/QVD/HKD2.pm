@@ -44,6 +44,9 @@ sub run {
     my $round = 0;
 
     while (1) {
+        # FIXME: make this block into another method and wrap it
+        # inside an eval
+
 	DEBUG "HKD run, round: $round";
 
 	$self->_reap_children;
