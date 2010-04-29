@@ -32,7 +32,7 @@ qvd-hkd - The QVD house-keeping daemon
 
 qvd-hkd -h
 
-qvd-hkd start [-X] 
+qvd-hkd start [-X]
 
 qvd-hkd stop
 
