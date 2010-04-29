@@ -136,12 +136,10 @@ sub cmd_vm_add {
     $params->{storage} = '';
     my $row = $self->_obj_add('vm', [qw/name user_id osi_id ip storage/], 
 				$params);
-    rs(VM_Runtime)->create({ vm_id => $row->id,
-			     osi_actual_id => $row->osi_id,
-			     vm_state => 'stopped',
-			     x_state => 'disconnected',
-			     user_state => 'disconnected',
-			     blocked => 'false' });
+    rs(VM_Runtime)->create({vm_id => $row->id,
+                            osi_actual_id => $row->osi_id,
+                            vm_state => 'stopped',
+                            user_state => 'disconnected'})
     $row->id
 }
 
