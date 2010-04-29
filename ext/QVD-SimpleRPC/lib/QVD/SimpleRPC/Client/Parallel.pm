@@ -61,7 +61,7 @@ sub queue_request {
 sub unqueue_response {
     my $self = shift;
     my ($code, $headers, $body) = $self->SUPER::unqueue_response;
-    warn "response code: $code";
+    DEBUG "response code: $code";
     die "HTTP request failed: $code"
 	unless $code == HTTP_OK;
     # FIXME: remove this...
