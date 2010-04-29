@@ -20,7 +20,7 @@ Log::Log4perl::init('log4perl.conf');
 
 my %timeout = ( starting   => cfg(vm_state_starting_timeout,   200),
 	        stopping_1 => cfg(vm_state_stopping_1_timeout,  30),
-		stopping_2 => cfg(vm_state_stopping_1_timeout, 200),
+		stopping_2 => cfg(vm_state_stopping_2_timeout, 200),
 		zombie_1   => cfg(vm_state_zombie_1_timeout,    30) );
 
 # FIXME: read nodename from configuration file!
@@ -38,8 +38,7 @@ sub new {
 sub run {
     my $self = shift;
 
-    my $vma_ok_timeout = cfg(vm_state_running_vma_timeout); 
-    my $x_connecting_timeout = cfg(x_state_connecting_timeout);
+    my $vma_ok_timeout = cfg(vm_state_running_vma_timeout);
 
     my $round = 0;
 
@@ -115,7 +114,7 @@ sub run {
 	    next if $vm->vm_state eq 'stopped';
 
 	    unless ($self->_check_vm_process($vm)) {
-		if ($vm->vm_state ne 'stopping') {
+		if ($vm->vm_state ne 'stopping_2') {
 		    ERROR "vm process has disappeared!, id: $id";
 		    $vm->block;
 		}
