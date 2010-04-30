@@ -163,7 +163,7 @@ sub send_vm_cmd {
     my ($vm, $cmd) = @_;
     my $id = $vm->vm_id;
     my $state = $vm->vm_state;
-    $valid_cmd{$cmd}{$state} or
+    $valid_vm_cmd{$cmd}{$state} or
 	die "Can't send command $cmd to VM $id in state $state";
     defined $vm->host_id or
 	die "Can't send command $cmd to VM $id until it has a host assigned";
