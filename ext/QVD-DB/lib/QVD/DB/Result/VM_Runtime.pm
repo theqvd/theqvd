@@ -210,6 +210,7 @@ sub clear_l7r_all {
 }
 
 sub block { shift->update({ blocked => 1 }) }
+sub unblock { shift->update({ blocked => 0 }) }
 
 sub vma_url {
     my $vm = shift;
