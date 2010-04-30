@@ -20,7 +20,7 @@ $App::Daemon::loglevel = $DEBUG;
 $App::Daemon::as_user = "root";
 
 daemonize;
-QVD::HKD->new->run;
+QVD::HKD->run;
 
 __END__
 
