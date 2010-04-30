@@ -135,35 +135,57 @@ __PACKAGE__->belongs_to('rel_user_cmd' => 'QVD::DB::Result::User_Cmd', 'user_cmd
 __PACKAGE__->belongs_to(osi => 'QVD::DB::Result::OSI', 'osi_actual_id');
 
 sub set_vm_state {
-    my $self = shift;
+    my $vm = shift;
     my $state = shift;
-    $self->update({ vm_state => $state, vm_state_ts => time, @_ });
+    $vm->update({ vm_state => $state, vm_state_ts => time, @_ });
 }
 
 sub set_user_state {
-    my $self = shift;
+    my $vm = shift;
     my $state = shift;
-    $self->update({ user_state => $state, user_state_ts => time, @_ });
+    $vm->update({ user_state => $state, user_state_ts => time, @_ });
 }
 
 sub _clear_cmd {
-    my ($self, $type) = @_;
-    DEBUG "Clearing $type command for VM ".$self->vm_id;
-    $self->update({"${type}_cmd" => undef});
+    my ($vm, $type) = @_;
+    DEBUG "Clearing $type command for VM ".$vm->vm_id;
+    $vm->update({"${type}_cmd" => undef});
 }
 
 sub clear_vm_cmd { shift->_clear_cmd('vm') }
 sub clear_user_cmd { shift->_clear_cmd('user') }
 
+my %valid_vm_cmd = ( start => { stopped  => 1},
+		     stop =>  { starting => 1,
+				running  => 1 } );
+
 sub send_vm_cmd {
-    my ($self, $cmd) = @_;
-    shift->update({vm_cmd => $cmd});
+    my ($vm, $cmd) = @_;
+    my $id = $vm->vm_id;
+    my $state = $vm->vm_state;
+    $valid_cmd{$cmd}{$state} or
+	die "Can't send command $cmd to VM $id in state $state";
+    defined $vm->host_id or
+	die "Can't send command $cmd to VM $id until it has a host assigned";
+    $vm->update({vm_cmd => $cmd});
 }
 
+sub send_vm_start { shift->send_vm_cmd('start') }
+sub send_vm_stop { shift->send_vm_cmd('stop') }
+
+my %valid_user_cmd = ( abort => { connecting => 1,
+				  connected  => 1 } );
+
 sub send_user_cmd {
-    my ($self, $cmd) = @_;
-    shift->update({user_cmd => $cmd});
+    my ($vm, $cmd) = @_;
+    my $id = $vm->id;
+    my $state = $vm->user_state;
+    $valid_user_cmd{$cmd}{$state} or
+	die "Can't send command $cmd to L7R in state $state for VM $id";
+    $vm->update({user_cmd => $cmd});
 }
+
+sub send_user_abort { shift->send_user_cmd('abort') }
 
 sub update_vma_ok_ts { shift->update({vma_ok_ts => time}) }
 sub clear_vma_ok_ts { shift->update({vma_ok_ts => undef}) }
@@ -171,13 +193,13 @@ sub clear_vma_ok_ts { shift->update({vma_ok_ts => undef}) }
 sub clear_host_id { shift->update({host_id => undef}) }
 
 sub set_vm_pid {
-    my ($self, $pid) = @_;
-    $self->update({vm_pid => $pid })
+    my ($vm, $pid) = @_;
+    $vm->update({vm_pid => $pid })
 }
 
 sub set_host_id {
-    my ($self, $host_id) = @_;
-    $self->update({host_id => $host_id});
+    my ($vm, $host_id) = @_;
+    $vm->update({host_id => $host_id});
 }
 
 sub clear_l7r_all {
@@ -190,6 +212,7 @@ sub clear_l7r_all {
 sub block { shift->update({ blocked => 1 }) }
 
 sub vma_url {
-    my $self = shift;
-    sprintf("http://%s:%d/vma", $self->vm_address, $self->vm_vma_port);
+    my $vm = shift;
+    sprintf("http://%s:%d/vma", $vm->vm_address, $vm->vm_vma_port);
 }
+

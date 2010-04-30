@@ -24,6 +24,9 @@ my %timeout = ( starting    => cfg(vm_state_starting_timeout,    200),
 		zombie_1    => cfg(vm_state_zombie_1_timeout,     30),
 		vma         => cfg(vm_state_running_vma_timeout, 120) );
 
+my $cmd = ( kvm     => cfg(shell_command_kvm     => 'kvm'    ),
+	    kvm_img => cfg(shell_command_kvm_img => 'kvm-img') );
+
 # FIXME: read nodename from configuration file!
 my $this_host_id = rs(Host)->search(name => hostname)->first->id;
 
@@ -281,7 +284,7 @@ sub _leave_vm_state_running {
 
 sub _enter_vm_state_stopping_1 {
     my ($hkd, $vm) = @_;
-    $vm->send_user_cmd('abort') if $vm->user_state eq 'connecting';
+    $vm->send_user_abort if $vm->user_state eq 'connecting';
 }
 
 sub _enter_vm_state_stopped {
@@ -291,7 +294,7 @@ sub _enter_vm_state_stopped {
 
 sub _enter_vm_state_zombie_1 {
     my ($hkd, $vm) = @_;
-    $vm->send_user_cmd('abort') if $vm->user_state eq 'connecting';
+    $vm->send_user_abort if $vm->user_state eq 'connecting';
 }
 
 sub _start_vm {
@@ -305,7 +308,7 @@ sub _start_vm {
 
     INFO "starting VM $id";
 
-    my @cmd = ('kvm',
+    my @cmd = ($cmd{kvm},
                -m => $osi->memory.'M',
                -vnc => ":${vnc_display}",
                -redir => "tcp:${x_port}::5000",
@@ -362,8 +365,7 @@ sub _vm_image_path {
 
     # FIXME: use a relative path to the base image?
     #my $image_relative = File::Spec->abs2rel($image, $overlay_dir);
-    my @cmd = (cfg(kvm_img_command => 'kvm-img'),
-               'create',
+    my @cmd = ($cmd{kvm_img}, 'create',
                -f => 'qcow2',
                -b => $image,
                $overlay);
@@ -389,8 +391,7 @@ sub _vm_user_storage_path {
         return undef;
     }
 
-    my @cmd = (cfg(kvm_img_command => 'kvm-img'),
-               'create',
+    my @cmd = ($cmd{kvm_img}, 'create',
                -f => 'qcow2',
                $image, "${size}M");
     system(@cmd) == 0 and -f $image and return $image;

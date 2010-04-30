@@ -172,7 +172,7 @@ sub _takeover_vm {
 	}
 
 	$l7r->_tell_client("Aborting contending session");
-	$vm->send_user_cmd('abort');
+	$vm->send_user_abort;
 	sleep 1;
 	# FIXME: check timeout
 	# FIXME: check the VM has not left the state running
@@ -215,7 +215,7 @@ sub _start_and_wait_for_vm {
 
     if ($vm_state eq 'stopped') {
 	$l7r->_tell_client("Starting virtual machine");
-	$vm->send_vm_cmd('start');
+	$vm->send_vm_start;
     }
 
     return if $vm_state eq 'running';
