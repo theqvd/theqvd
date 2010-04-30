@@ -177,7 +177,7 @@ sub _x_state {
 	when (['starting', 'resuming'])                  { return 'listening'     }
 	when (['started', 'resumed'])                    { return 'connected'     }
  	when (['suspending', 'terminating', 'aborting']) { return 'disconnecting' }
-	when (['suspended', 'terminated', 'aborted',
+	when (['', 'suspended', 'terminated', 'aborted',
 	       'exited terminated','exited aborted'])    { return 'disconnected'  }
     }
     die "Internal error: no mapping for nxagent state $nx_state";
