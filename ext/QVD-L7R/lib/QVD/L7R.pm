@@ -156,35 +156,26 @@ sub connect_to_vm_processor {
 sub _takeover_vm {
     my ($l7r, $vm) = @_;
 
-    my ($user_state, $done);
     while(1) {
 	txn_eval {
 	    $vm->discard_changes;
-	    $user_state = $vm->user_state;
-	    if ($user_state eq 'disconnected') {
+	    if ($vm->user_state eq 'disconnected') {
 		$vm->set_user_state('connecting',
 				    l7r_pid => $$,
 				    l7r_host => $this_host_id,
 				    user_cmd => undef);
-		$done = 1;
 	    }
 	};
-	if ($done) {
+	unless ($@) {
 	    $l7r->_tell_client("Session acquired");
 	    return;
 	}
 
-	if ($user_state eq 'connected') {
-	    $l7r->_tell_client("Disconnecting contending session");
-	    my $vma = $l7r->_vma_client($vm);
-	    eval { $vma->disconnect_session };
-	}
-	else {
-	    $l7r->_tell_client("Aborting contending session");
-	    $vm->send_user_cmd('abort');
-	}
+	$l7r->_tell_client("Aborting contending session");
+	$vm->send_user_cmd('abort');
 	sleep 1;
 	# FIXME: check timeout
+	# FIXME: check the VM has not left the state running
     }
 }
 
@@ -252,7 +243,7 @@ sub _start_x {
     my ($l7r, $vm) = @_;
     $l7r->_tell_client("Starting X session");
     my $resp;
-    for (0..5) { # FIXME: make number of retries configurable?
+    for (0..3) { # FIXME: make number of retries configurable?
 	my $vma = $l7r->_vma_client($vm);
 	$resp = eval {
 	    # FIXME: use start_x_listener method instead of
@@ -260,7 +251,7 @@ sub _start_x {
 	    $vma->start_x_listener;
 	};
 	last unless $@;
-	sleep 1;
+	sleep 2;
 	$l7r->_check_abort($vm, 1);
     }
     $resp or die "Unable to start X server on VM: $@";
