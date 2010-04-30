@@ -26,7 +26,6 @@ WriteMakefile(
 	'QVD::ParallelNet' => 0,
 	'QVD::SimpleRPC' => 0,
 	'QVD::URI' => 0,
-	'QVD::VMAS' => 0,
         'Test::More' => 0,
     },
     dist                => { COMPRESS => 'gzip -9f', SUFFIX => 'gz', },
