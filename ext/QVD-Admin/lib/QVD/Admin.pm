@@ -315,180 +315,156 @@ sub cmd_config_get {
     return \@configs;
 }
 
+sub _get_free_host {
+    my ($self, $vm) = @_;
+    # FIXME: implement some plugin-based load balancer algorithm and
+    # share it with the L7R package
+    my @hosts = map $_->id, rs(Host)->all;
+    $hosts[rand @hosts];
+}
+
+sub _start_vm {
+    my ($self, $vmrt) = @_;
+    $vmrt->vm_state eq 'stopped'
+	or die "Unable to start machine, already running";
+    defined $vmrt->host_id or
+	$vmrt->assign_host($self->_get_free_host);
+    $vmrt->send_vm_start;
+}
+
 sub cmd_vm_start_by_id {
     my ($self, $id) = @_;
-    die "Missing parameter id" unless defined $id;
-    require QVD::VMAS;
-    my $vmas = QVD::VMAS->new;
-    my $vm = $self->get_resultset('vm')->find($id);
-    die "VM $id doesn't exist" unless defined $vm;
+    $id // die "Missing parameter id";
     txn_do {
-	if ($vm->vm_runtime->vm_state eq 'stopped') {
-	    $vmas->assign_host_for_vm($vm->vm_runtime)
-		or die "Unable to assign VM $id to a host";
-	    $vmas->schedule_start_vm($vm->vm_runtime);
-	} else {
-	    die "Unable to start VM: VM is not stopped";
-	}
+	my $vmrt = rs(VM_Runtime)->find($id) //
+	    die "VM $id doesn't exist";
+	$self->_start_vm($vmrt);
     };
-    $vmas->notify_hkd($vm->vm_runtime);
 }
 
 sub cmd_vm_start {
     my ($self, @args) = @_;
-    my $rs = $self->get_resultset('vm');
     my $counter = 0;
-    require QVD::VMAS;
-    my $vmas = QVD::VMAS->new;
-    while (my $vm = $rs->next) {
-	eval {
-	    txn_do {
-		my $vm_runtime = $vm->vm_runtime;
-		if ($vm_runtime->vm_state eq 'stopped') {
-		    die unless $vmas->assign_host_for_vm($vm_runtime);
-		    $vmas->schedule_start_vm($vm_runtime);
-		    $counter++;
-		}
-	    };
+    my $rs = $self->get_resultset('vm');
+    while (defined(my $vm = $rs->next)) {
+	txn_eval {
+	    $vm->discard_changes;
+	    $self->_start_vm($vm->vm_runtime);
+	    $counter++;
 	};
 	# TODO Log error messages ($@) in some way
     }
     $counter
 }
 
+sub _stop_vm {
+    my ($self, $vmrt) = @_;
+    $vmrt->send_vm_stop;
+}
+
 sub cmd_vm_stop_by_id {
     my ($self, $id) = @_;
-    die "Missing parameter id" unless defined $id;
-    require QVD::VMAS;
-    my $vmas = QVD::VMAS->new;
-    my $vm;
+    $id or die "Missing parameter id" unless defined $id;
     txn_do {
-	$vm = $self->get_resultset('vm')->find($id);
-	die "VM $id doesn't exist" unless defined $vm;
-	
-	if ($vm->vm_runtime->vm_state eq 'running') {
-	    $vmas->schedule_stop_vm($vm->vm_runtime);
-	} else {
-	    die "Unable to stop VM: VM is not running";
-	}
+	my $vm = rs(VM_Runtime)->find($id) //
+	    die "VM $id doesn't exist";
+	$self->_stop_vm($vm);
     };
-    $vmas->notify_hkd($vm->vm_runtime);
 }
 
 sub cmd_vm_stop {
     my ($self, @args) = @_;
-    my $rs = $self->get_resultset('vm');
     my $counter = 0;
-    require QVD::VMAS;
-    my $vmas = QVD::VMAS->new;
-    while (my $vm = $rs->next) {
-	my $vm_runtime = $vm->vm_runtime;
-	if ($vm_runtime->vm_state eq 'running') {
-	    next unless eval { $vmas->schedule_stop_vm($vm_runtime); };
+    my $rs = $self->get_resultset('vm');
+    while (defined(my $vm = $rs->next)) {
+	txn_eval {
+	    $vm->discard_changes;
+	    $self->_stop_vm($vm->vm_runtime);
 	    $counter++;
-	}
+	};
+	# TODO Log error messages ($@) in some way
     }
     $counter
 }
 
-sub cmd_vm_reset_by_id {
-    my ($self, $id) = @_;
-    die "Missing parameter id" unless defined $id;
-    require QVD::VMAS;
-    my $vmas = QVD::VMAS->new;
-    my $vm;
-    txn_do {
-	$vm = $self->get_resultset('vm')->find($id);
-	die "VM $id doesn't exist" unless defined $vm;
-	
-	if ($vm->vm_runtime->vm_state eq 'running') {
-	    $vmas->schedule_stop_vm($vm->vm_runtime);
-	} else {
-	    die "Unable to stop VM: VM is not running";
-	}
-    };
-    $vmas->notify_hkd($vm->vm_runtime);
-}
-
-sub cmd_vm_reset {
-    my ($self, @args) = @_;
-    my $rs = $self->get_resultset('vm');
-    my $counter = 0;
-    require QVD::VMAS;
-    my $vmas = QVD::VMAS->new;
-    while (my $vm = $rs->next) {
-	my $vm_runtime = $vm->vm_runtime;
-	if ($vm_runtime->vm_state eq 'failed') {
-	    next unless eval { $vmas->schedule_stop_vm($vm_runtime); };
-	    $counter++;
-	}
-    }
-    $counter
+sub _disconnect_user {
+    my ($self, $vmrt) = @_;
+    $vmrt->send_user_abort;
 }
 
 sub cmd_vm_disconnect_user_by_id {
     my ($self, $id) = @_;
-    die "Missing parameter id" unless defined $id;
-    require QVD::VMAS;
-    my $vmas = QVD::VMAS->new;
-    my $vm;
+    $id // die "Missing parameter id";
     txn_do {
-	$vm = $self->get_resultset('vm')->find($id);
-	die "VM $id doesn't exist" unless defined $vm;
-	
-	if ($vm->vm_runtime->user_state eq 'connected') {
-	    $vmas->disconnect_nx($vm->vm_runtime);
-	} else {
-	    die "Unable to disconnect user: user is not connected";
-	}
+	my $vmrt = rs(VM_Runtime)->find($id) //
+	    die "VM $id doesn't exist";
+	$self->_disconnect_user($vmrt);
     };
-    $vmas->notify_hkd($vm->vm_runtime);
 }
 
 sub cmd_vm_disconnect_user {
     my ($self, @args) = @_;
-    my $rs = $self->get_resultset('vm');
-    require QVD::VMAS;
-    my $vmas = QVD::VMAS->new;
     my $counter = 0;
-    while (my $vm = $rs->next) {
-	my $vm_runtime = $vm->vm_runtime;
-	if ($vm_runtime->user_state eq 'connected') {
-	    $vmas->disconnect_nx($vm_runtime);
+    my $rs = $self->get_resultset('vm');
+    while (defined(my $vm = $rs->next)) {
+	txn_eval {
+	    $vm->discard_changes;
+	    $self->_disconnect_user($vm->vm_runtime);
 	    $counter++;
-	}
+	};
+	# FIXME: report errors
     }
     $counter
 }
 
 sub cmd_vm_block {
     my ($self, @args) = @_;
+    my $counter = 0;
     my $rs = $self->get_resultset('vm');
-    while (my $vm = $rs->next) {
-	my $vm_runtime = $vm->vm_runtime;
-	$vm_runtime->update({blocked => 1});
+    while (defined(my $vm = $rs->next)) {
+	txn_eval {
+	    $vm->discard_changes;
+	    $vm->vm_runtime->block;
+	    $counter++;
+	};
+	# FIXME: report errors
     }
+    $counter
 }
 
 sub cmd_vm_block_by_id {
     my ($self, $id) = @_;
-    my $rs = $self->get_resultset('vm')->find($id);
-    $rs->vm_runtime->update({blocked => 1});
+    $id // die "Missing parameter id";
+    txn_do {
+	my $vmrt = rs(VM_Runtime)->find($id) //
+	    die "VM $id doesn't exist";
+	$vmrt->block;
+    };
 }
 
 sub cmd_vm_unblock {
     my ($self, @args) = @_;
+    my $counter = 0;
     my $rs = $self->get_resultset('vm');
-    while (my $vm = $rs->next) {
-	my $vm_runtime = $vm->vm_runtime;
-	$vm_runtime->update({blocked => 0});
+    while (defined(my $vm = $rs->next)) {
+	txn_eval {
+	    $vm->discard_changes;
+	    $vm->vm_runtime->unblock;
+	    $counter++;
+	};
+    # FIXME: report errors
     }
+    $counter
 }
 
 sub cmd_vm_unblock_by_id {
     my ($self, $id) = @_;
-    my $rs = $self->get_resultset('vm')->find($id);
-    $rs->vm_runtime->update({blocked => 0});
+    $id // die "Missing parameter id";
+    txn_do {
+	my $vmrt = rs(VM_Runtime)->find($id) //
+	    die "VM $id doesn't exist";
+	$vmrt->unblock;
+    };
 }
 
 
