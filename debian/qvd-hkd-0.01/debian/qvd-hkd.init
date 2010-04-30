@@ -6,13 +6,13 @@
 # Required-Stop:     $local_fs $remote_fs $syslog $network
 # Default-Start:     2 3 4 5
 # Default-Stop:      0 1 6
-# Short-Description: QVD Level 7 Router
+# Short-Description: QVD house keeping daemon
 ### END INIT INFO
 
 PATH=/bin:/usr/bin
 DAEMON=/usr/bin/qvd-hkd.pl
 NAME=qvd-hkd
-DESC="QVD Level 7 Router"
+DESC="QVD house keeping daemon"
 
 test -x $DAEMON || exit 0
 
