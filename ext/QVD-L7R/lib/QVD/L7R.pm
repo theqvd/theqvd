@@ -328,7 +328,7 @@ sub _check_abort {
 
 sub _get_free_host {
     my ($self, $vm) = @_;
-    # FIXME: implement some plugin-based load balancer
+    # FIXME: implement some plugin-based load balancer and share it with the Admin package
     my @hosts = map $_->id, rs(Host)->all;
     $hosts[rand @hosts];
 }
