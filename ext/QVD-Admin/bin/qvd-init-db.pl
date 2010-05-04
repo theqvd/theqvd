@@ -2,6 +2,7 @@
 
 use strict;
 use warnings;
+use QVD::Log;
 use QVD::DB::Simple;
 use Sys::Hostname;
 use File::Slurp;

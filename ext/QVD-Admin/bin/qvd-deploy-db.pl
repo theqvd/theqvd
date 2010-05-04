@@ -2,8 +2,8 @@
 
 use strict;
 use warnings;
+use QVD::Log;
 use QVD::DB::Simple;
-use Log::Log4perl;
 
 my @sqlt_args = ({}); #{ add_drop_table => 0 };
 my $dir = '.';
