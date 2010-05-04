@@ -7,6 +7,7 @@ use warnings;
 
 use Getopt::Long;
 use QVD::AdminCLI;
+use QVD::Log;
 
 my $filter = '';
 my $quiet = '';

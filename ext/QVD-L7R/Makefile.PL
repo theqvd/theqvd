@@ -23,6 +23,7 @@ WriteMakefile(
 	'QVD::DB' => 0,
 	'QVD::HTTP' => 0,
 	'QVD::HTTPD' => 0,
+	'QVD::Log' => 0,
 	'QVD::ParallelNet' => 0,
 	'QVD::SimpleRPC' => 0,
 	'QVD::URI' => 0,

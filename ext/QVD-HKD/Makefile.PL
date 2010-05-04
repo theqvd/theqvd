@@ -15,6 +15,7 @@ WriteMakefile(
 	'Log::Log4perl' => 0,
 	'QVD::Config' => 0,
 	'QVD::DB' => 0,
+	'QVD::Log' => 0,
 	'QVD::ParallelNet' => 0,
 	'QVD::SimpleRPC' => 0,
         'Test::More' => 0,

@@ -15,6 +15,7 @@ requires 'Catalyst::View::Component::jQuery';
 requires 'parent';
 requires 'QVD::Admin';
 requires 'QVD::Config';
+requires 'QVD::Log';
 requires 'Config::General'; # This should reflect the config file format you've chosen
                  # See Catalyst::Plugin::ConfigLoader for supported formats
 catalyst;

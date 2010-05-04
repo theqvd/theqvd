@@ -17,6 +17,7 @@ WriteMakefile(
 	'parent' => 0,
 	'QVD::Config' => 0,
 	'QVD::HTTPD' => 0,
+	'QVD::Log' => 0,
 	'QVD::SimpleRPC' => 0,
         'Test::More' => 0,
     },
