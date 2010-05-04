@@ -11,6 +11,7 @@ requires 'Catalyst::Plugin::Static::Simple';
 requires 'Catalyst::Action::RenderView';
 requires 'Catalyst::Plugin::FormValidator';
 requires 'Catalyst::Plugin::FormBuilder';
+requires 'Catalyst::View::Component::jQuery';
 requires 'parent';
 requires 'QVD::Admin';
 requires 'QVD::Config';
