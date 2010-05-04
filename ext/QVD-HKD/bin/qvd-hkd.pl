@@ -14,7 +14,7 @@ $App::Daemon::pidfile = $PID_FILE;
 $App::Daemon::logfile = cfg('hkd_log_file');
 
 use Log::Log4perl qw(:levels);
-Log::Log4perl::init('log4perl.conf');
+use QVD::Log;
 
 $App::Daemon::loglevel = $DEBUG;
 $App::Daemon::as_user = "root";

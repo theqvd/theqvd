@@ -8,8 +8,6 @@ use URI::Split qw(uri_split);
 use URI::Escape;
 use Log::Log4perl qw(:easy);
 
-Log::Log4perl::init('log4perl.conf');
-
 use parent qw(QVD::HTTPC::Parallel);
 
 sub new {

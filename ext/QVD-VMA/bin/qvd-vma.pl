@@ -16,7 +16,7 @@ $App::Daemon::logfile = cfg('vma.log_file', '/var/log/qvd/vma.log');
 $App::Daemon::as_user = 'root';
 
 use Log::Log4perl qw(:levels);
-Log::Log4perl::init('log4perl.conf');
+use QVD::Log;
 
 daemonize();
 my $vma = QVD::VMA->new(port => 3030);

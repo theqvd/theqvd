@@ -13,8 +13,6 @@ use QVD::HTTP::StatusCodes qw(:status_codes);
 use JSON;
 use Log::Log4perl qw(:easy);
 
-Log::Log4perl::init('log4perl.conf');
-
 my $json = JSON->new->ascii->pretty;
 
 sub new {

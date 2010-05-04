@@ -18,7 +18,6 @@ use QVD::SimpleRPC::Client;
 use URI::Split qw(uri_split);
 use Sys::Hostname;
 
-Log::Log4perl::init('log4perl.conf');
 my $POLL_TIME = cfg('l7r_poll_time', 5);
 
 use parent qw(QVD::HTTPD);

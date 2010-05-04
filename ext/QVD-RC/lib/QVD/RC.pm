@@ -6,8 +6,6 @@ use warnings;
 use strict;
 
 use Log::Log4perl qw(:easy);
-Log::Log4perl::init('log4perl.conf');
-
 use parent qw(QVD::HTTPD);
 
 

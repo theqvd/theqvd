@@ -25,9 +25,7 @@ use feature qw(switch);
 
 use parent 'QVD::SimpleRPC::Server';
 
-
 use Log::Log4perl qw(:levels :easy);
-Log::Log4perl::init('log4perl.conf');
 
 sub _slurp_line {
     my $fname = shift;
