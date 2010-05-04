@@ -4,14 +4,10 @@ use Moose;
 use QVD::DB::Simple;
 use QVD::Admin;
 use Log::Log4perl qw(:easy);
+use QVD::Log;
 use Data::Dumper;
 extends 'Catalyst::Model';
 with 'MooseX::Log::Log4perl';
-
-BEGIN {
-    Log::Log4perl->easy_init('log4perl.conf')
-	unless Log::Log4perl->initialized;
-}
 
 sub version { $QVD::Admin::Web::VERSION }
 
