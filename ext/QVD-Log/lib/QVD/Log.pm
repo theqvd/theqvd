@@ -1,6 +1,7 @@
 package QVD::Log;
 
-use Log::Log4perl;
+use Config::Tiny;
+use Log::Log4perl qw(:easy);
 
 use warnings;
 use strict;
@@ -8,7 +9,7 @@ use strict;
 our $VERSION = '0.01';
 
 my $config = {
-    'log4perl.rootLogger' => 'DEBUG, LOGFILE',
+    'log4perl.rootLogger' => 'INFO, LOGFILE',
     'log4perl.appender.LOGFILE' => 'Log::Log4perl::Appender::File',
     'log4perl.appender.LOGFILE.filename' => '/var/log/qvd.log',
     'log4perl.appender.LOGFILE.mode' => 'append',
@@ -16,8 +17,21 @@ my $config = {
     'log4perl.appender.LOGFILE.layout.ConversionPattern' => '%d %P %F %L %c - %m%n',
 };
 
-print "Init'ing Log::Log4perl\n";
-Log::Log4perl::init_once($config);
+if (! Log::Log4perl->initialized()) {
+    my $ini = Config::Tiny->read('/etc/qvd/config.ini');
+    if (defined $ini and defined $ini->{logging}) {
+	$config->{'log4perl.appender.LOGFILE.filename'} 
+	    //= $ini->{logging}{filename};
+
+	if (defined $ini->{logging}{level}) {
+	    $config->{'log4perl.rootLogger'} 
+		= $ini->{logging}{level}.', LOGFILE'
+	}
+    }
+    Log::Log4perl::init_once($config);
+} else {
+    DEBUG 'Refusing to initialize Log4perl for the second time';
+}
 
 1;
 
