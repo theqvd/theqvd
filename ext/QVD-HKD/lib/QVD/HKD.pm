@@ -22,7 +22,7 @@ my %timeout = ( starting    => cfg(vm_state_starting_timeout,    200),
 		zombie_1    => cfg(vm_state_zombie_1_timeout,     30),
 		vma         => cfg(vm_state_running_vma_timeout, 120) );
 
-my $cmd = ( kvm     => cfg(shell_command_kvm     => 'kvm'    ),
+my %cmd = ( kvm     => cfg(shell_command_kvm     => 'kvm'    ),
 	    kvm_img => cfg(shell_command_kvm_img => 'kvm-img') );
 
 # FIXME: read nodename from configuration file!
