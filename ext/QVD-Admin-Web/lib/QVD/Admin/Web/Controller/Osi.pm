@@ -12,8 +12,7 @@ __PACKAGE__->config(
         new => {
             method     => 'post',
             stylesheet => 1,
-            #messages   => '/locale/fr_FR/form_messages.txt',
-			messages => ':es_ES'
+
         },
         #template_type => 'HTML::Template',
         #source_type   => 'CGI::FormBuilder::Source::File',

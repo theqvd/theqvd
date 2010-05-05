@@ -11,8 +11,7 @@ __PACKAGE__->config(
             method     => 'post',
             stylesheet => 1,
 
-            #messages   => '/locale/fr_FR/form_messages.txt',
-            messages => ':es_ES'
+
         },
 
         #template_type => 'HTML::Template',
