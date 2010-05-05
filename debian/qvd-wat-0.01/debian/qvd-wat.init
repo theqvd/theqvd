@@ -55,7 +55,7 @@ PORT=3000
 if [ -f /etc/default/$NAME ] ; then
     . /etc/default/$NAME
 fi
-DAEMON_OPTS="-port $PORT -background"
+DAEMON_OPTS="-port $PORT -background -pidfile $PIDFILE"
 
 # Use this if you want the user to explicitly set 'RUN' in
 # /etc/default/
@@ -87,7 +87,8 @@ running_pid() {
     name=$2
     [ -z "$pid" ] && return 1
     [ ! -d /proc/$pid ] &&  return 1
-    cmd=`cat /proc/$pid/cmdline | tr "\000" "\n"|head -n 1 |cut -d : -f 1`
+    # The first entry in cmdline is perl, the second one the name of the script
+    cmd=`cat /proc/$pid/cmdline | awk -F '\000' '{print $2}' |cut -d : -f 1`
     # Is this the expected server
     [ "$cmd" != "$name" ] &&  return 1
     return 0
