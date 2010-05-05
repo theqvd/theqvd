@@ -82,7 +82,7 @@ sub jlist : Local {
     
     my @list;
     for (@$rs) {
-	push(@list, [$_->vm_runtime->vm_id , $_->vm_runtime->vm_state , $_->vm_runtime->vm_cmd , $_->vm_runtime->x_state , $_->vm_runtime->x_cmd , $_->vm_runtime->user_state , $_->vm_runtime->user_cmd, $_->vm_runtime->blocked]);
+	push(@list, [$_->vm_runtime->vm_id , $_->vm_runtime->vm_state , $_->vm_runtime->vm_cmd , '' , '' , $_->vm_runtime->user_state , $_->vm_runtime->user_cmd, $_->vm_runtime->blocked]);
 
     }
     $c->stash->{vm_list} = \@list;

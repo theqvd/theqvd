@@ -139,7 +139,8 @@ sub cmd_vm_add {
     rs(VM_Runtime)->create({vm_id => $row->id,
                             osi_actual_id => $row->osi_id,
                             vm_state => 'stopped',
-                            user_state => 'disconnected'});
+                            user_state => 'disconnected',
+                            blocked => 'false'});
     $row->id
 }
 

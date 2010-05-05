@@ -105,7 +105,7 @@ function check_all(field) {
 		<span id="vm_statebullet[% vm.id %]" class="option_[% vm.vm_runtime.vm_state %]"></span>
 		<span id="vm_statetext[% vm.id %]">[% vm.vm_runtime.vm_state %]</span>
 	    </td>
-	    <td><span id="vm_blocked[% vm.id %]" class="[% IF vm.vm_runtime.blocked %]option_blocked[% END %]" /></td>
+	    <td><span id="vm_blocked[% vm.id %]" class="[% IF vm.vm_runtime.blocked == true %]option_blocked[% END %]" /></td>
 
         </tr>
         [% END -%]
@@ -155,7 +155,7 @@ function load() {
 		    $(w).removeClass();    
 		    $(w).addClass("option_user_" + msg.vm_list[i][5]);
 		}
-		if (msg.vm_list[i][7] == 0) {
+		if ((msg.vm_list[i][7] == 0) || (msg.vm_list[i][7] == null)) {
 		    $(z).removeClass();
 		} else {
 		    $(z).addClass("option_blocked");
