@@ -328,7 +328,7 @@ sub _start_vm {
     $vmrt->vm_state eq 'stopped'
 	or die "Unable to start machine, already running";
     defined $vmrt->host_id or
-	$vmrt->assign_host($self->_get_free_host);
+	$vmrt->set_host_id($self->_get_free_host);
     $vmrt->send_vm_start;
 }
 
