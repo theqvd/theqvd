@@ -13,6 +13,7 @@ requires 'Catalyst::Action::RenderView';
 requires 'Catalyst::Plugin::FormValidator';
 requires 'Catalyst::Plugin::FormBuilder';
 requires 'Catalyst::View::Component::jQuery';
+requires 'MooseX::Log::Log4perl';
 requires 'parent';
 requires 'QVD::Admin';
 requires 'QVD::Config';
