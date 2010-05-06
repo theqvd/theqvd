@@ -9,9 +9,10 @@ my @sqlt_args = ({}); #{ add_drop_table => 0 };
 my $dir = '.';
 
 # FIXME parse command line arguments properly
-my $db = @ARGV ? db(data_source => $ARGV[0], username => $ARGV[1], password => $ARGV[2])
+my $db = @ARGV ? db(data_source => $ARGV[0], 
+		    username => $ARGV[1], 
+		    password => $ARGV[2])
 		: db(); 
-$db->erase;
 $db->deploy(@sqlt_args, $dir);
 
 require QVD::Admin;
