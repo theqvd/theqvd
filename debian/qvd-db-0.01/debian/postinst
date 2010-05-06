@@ -20,17 +20,29 @@ set -e
 
 case "$1" in
     configure)
-    if su postgres -c "createuser -SDRl qvd"; then
-	echo "postgres user qvd added"
-    fi
-    if su postgres -c "createdb -O qvd qvd"; then
-	echo "postgres database qvd added"
+    if su postgres -c "createuser -SDRl qvd" > /dev/null; then
 	# set a temporary password for installation
 	# and deploy the database schema as qvd
 	PASSWORD="tmp$RANDOM"
 	sudo -u postgres psql -c "ALTER ROLE qvd PASSWORD '$PASSWORD';"
-	/usr/bin/qvd-deploy-db.pl 'dbi:Pg:dbname=qvd;host=127.0.0.1' qvd "$PASSWORD"
+	echo "PostgreSQL user 'qvd' added"
+	if su postgres -c "createdb -O qvd qvd" > /dev/null; then
+	    echo "PostgreSQL database 'qvd' added"
+	    # Default configuration of PostgreSQL allows 
+	    # md5-authentication from 127.0.0.1
+	    /usr/bin/qvd-deploy-db.pl 'dbi:Pg:dbname=qvd;host=127.0.0.1' qvd "$PASSWORD"
+	    echo "QVD schema deployed"
+	else
+	    echo "ERROR: PostgreSQL database 'qvd' already exists"
+	    echo "Remove it or install the QVD database manually."
+	    exit 1
+	fi
+    else
+	echo "ERROR: PostgreSQL user 'qvd' already exists"
+	echo "Remove it or install the QVD database manually."
+	exit 1
     fi
+
     ;;
 
     abort-upgrade|abort-remove|abort-deconfigure)
