@@ -8,6 +8,6 @@ Homepage: http://qvdblog.qindel.com
 
 Package: qvd-hkd
 Architecture: all
-Depends: ${shlibs:Depends}, ${misc:Depends}, libqvd-hkd-perl, qvd-sample-config
+Depends: ${shlibs:Depends}, ${misc:Depends}, libqvd-hkd-perl, qvd-sample-config, qemu-kvm
 Description: The QVD house keeping daemon
  The QVD house keeping daemon manages the virtual machines assigned to host.
