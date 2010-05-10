@@ -401,6 +401,10 @@ sub _vm_user_storage_path {
 sub _signal_vm {
     my ($hkd, $vm, $signal) = @_;
     my $pid = $vm->vm_pid;
+    unless ($pid) {
+	DEBUG "later detection of failed VM execution";
+	return;
+    }
     DEBUG "kill VM process $pid with signal $signal" if $signal;
     kill($signal, $pid);
 }
@@ -413,6 +417,10 @@ sub _check_vm_process {
 sub _check_l7r_process {
     my ($hkd, $vm) = @_;
     my $pid = $vm->l7r_pid;
+    unless ($pid) {
+	ERROR "internal error, killing process " . ($pid // '<undef>');
+	return;
+    }
     # DEBUG "kill L7R process $pid with signal 0";
     kill(0, $pid);
 }
