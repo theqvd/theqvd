@@ -135,9 +135,10 @@ result.
 
 Salvador FandiE<ntilde>o (sfandino@yahoo.com).
 
-=head1 COPYRIGHT & LICENSE
+=head1 COPYRIGHT
 
-Copyright C<copy> 2009 Qindel Formacion y Servicios S.L., all rights reserved.
+Copyright 2009-2010 by Qindel Formacion y Servicios S.L.
 
 This program is free software; you can redistribute it and/or modify it
-under the same terms as Perl itself.
+under the terms of the GNU GPL version 3 as published by the Free
+Software Foundation.

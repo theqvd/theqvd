@@ -28,10 +28,15 @@ Run a Catalyst application as a cgi script.
 
 Catalyst Contributors, see Catalyst.pm
 
+Qindel Formacion y Servicios S.L.
+
 =head1 COPYRIGHT
 
+Modifications by the QVD team are copyright 2009-2010 by Qindel Formacion y
+Servicios S.L.
 
-This library is free software. You can redistribute it and/or modify
-it under the same terms as Perl itself.
+This program is free software; you can redistribute it and/or modify it
+under the terms of the GNU GPL version 3 as published by the Free
+Software Foundation.
 
 =cut
