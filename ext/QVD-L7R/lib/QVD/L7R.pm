@@ -7,7 +7,7 @@ use strict;
 use Carp;
 
 use IO::Socket::Forwarder qw(forward_sockets);
-use Log::Log4perl qw(:easy);
+use QVD::Log;
 use QVD::Config;
 use QVD::DB::Simple;
 use QVD::HTTP::Headers qw(header_lookup header_eq_check);

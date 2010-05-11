@@ -15,7 +15,6 @@ $App::Daemon::pidfile = cfg('vma.pid_file', '/var/run/qvd/vma.pid');
 $App::Daemon::logfile = cfg('vma.log_file', '/var/log/qvd/vma.log');
 $App::Daemon::as_user = 'root';
 
-use Log::Log4perl qw(:levels);
 use QVD::Log;
 
 daemonize();

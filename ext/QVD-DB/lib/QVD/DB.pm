@@ -7,7 +7,7 @@ use strict;
 
 use Carp;
 use DBIx::Class::Exception;
-use Config::Tiny;
+use QVD::Config;
 
 use parent qw(DBIx::Class::Schema);
 
@@ -16,43 +16,30 @@ __PACKAGE__->exception_action(sub { croak @_ ; DBIx::Class::Exception::throw(@_)
 
 sub new {
     my $class = shift;
-    my %params = @_;
-    my $cdb = {};
-    if (%params) {
-	$cdb = \%params;
-    } else {
-	# Load database configuration from file
-	my $config = Config::Tiny->read('/etc/qvd/config.ini');
-	$cdb = $config->{database};
-    }
-    my $conn_data_source = $cdb->{data_source};
-    my $conn_username = $cdb->{username};
-    my $conn_password = $cdb->{password};
-    $class->SUPER::connect($conn_data_source,
-                           $conn_username, $conn_password,
+    my $name = core_cfg(database_name);
+    my $user = core_cfg(database_username);
+    my $passwd = core_cfg(database_password);
+    $class->SUPER::connect("dbi:Pg:dbname=$name",
+			   $user, $passwd,
                            { RaiseError => 1,
-                             AutoCommit => 1,
+			     AutoCommit => 1,
                              quote_char => '"',
-                             name_sep   => '.',
-                             pg_enable_utf8 => 1 });
+			     name_sep   => '.' });
 }
+
+my %initial_values = ( VM_State   => [qw(stopped starting running
+					 stopping_1 stopping_2
+					 zombie_1 zombie_2)],
+		       VM_Cmd     => [qw(start stop)],
+		       User_State => [qw(disconnected connecting
+					 connected aborting)],
+		       User_Cmd   => [qw(abort)] );
 
 sub deploy {
     my $db = shift;
     $db->SUPER::deploy(@_);
-
-    my %initial_values = ( VM_State   => [qw(stopped starting running
-                                             stopping_1 stopping_2
-                                             zombie_1 zombie_2)],
-                           VM_Cmd     => [qw(start stop)],
-                           User_State => [qw(disconnected connecting
-                                             connected aborting)],
-                           User_Cmd   => [qw(abort)] );
-
-    while (my ($rs, $values) = each %initial_values) {
-	foreach my $name (@$values) {
-	    $db->resultset($rs)->create({name => $name});
-	}
+    while (my ($rs, $names) = each %initial_values) {
+	$db->resultset($rs)->create({name => $_}) for @$names;
     }
 }
 
@@ -67,7 +54,6 @@ sub erase {
 		       hosts
 		       host_properties
 		       users
-		       user_extras
 		       user_properties
 		       vm_states
 		       user_states
@@ -106,14 +92,10 @@ QVD::DB - ORM for QVD entities
 
 =over 4
 
-=item $db = QVD::DB->new([data_source => $source, username => $user, password => $pw])
+=item $db = QVD::DB->new()
 
-Opens a new connection to the database. Uses configuration from the file
-F<config.ini> if the data source, username and password are not given.
-
-=item $db->deploy() 
-
-Creates the tables needed for QVD.
+Opens a new connection to the database using the configuration from
+the file 'config.ini'
 
 =item $db->erase()
 
@@ -129,10 +111,18 @@ Nicolas Arenas (narenas at qindel.es)
 
 Salvador FandiE<ntilde>o (sfandino@yahoo.com)
 
-=head1 COPYRIGHT
+=head1 BUGS
 
-Copyright 2009-2010 by Qindel Formacion y Servicios S.L.
+Please report any bugs or feature requests to C<bug-qvd-db at
+rt.cpan.org>, or through the web interface at
+L<http://rt.cpan.org/NoAuth/ReportBug.html?Queue=QVD-DB>.  I will be
+notified, and then you'll automatically be notified of progress on
+your bug as I make changes.
+
+=head1 COPYRIGHT & LICENSE
+
+Copyright 2009, 2010 Qindel Formacion y Servicios S.L., all rights
+reserved.
 
 This program is free software; you can redistribute it and/or modify it
-under the terms of the GNU GPL version 3 as published by the Free
-Software Foundation.
+under the same terms as Perl itself.

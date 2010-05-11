@@ -20,12 +20,10 @@ use Carp;
 use File::Slurp qw(slurp);
 use File::Spec;
 use POSIX;
+use QVD::Log;
 use QVD::VMA::Config;
 use feature qw(switch);
-
 use parent 'QVD::SimpleRPC::Server';
-
-use Log::Log4perl qw(:levels :easy);
 
 sub _slurp_line {
     my $fname = shift;

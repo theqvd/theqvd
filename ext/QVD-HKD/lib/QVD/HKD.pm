@@ -14,7 +14,7 @@ use Sys::Hostname;
 use POSIX qw(:sys_wait_h SIGTERM SIGKILL);
 use List::Util qw(max);
 use POSIX;
-use Log::Log4perl qw(:levels :easy);
+use QVD::Log;
 
 my %timeout = ( starting    => cfg(vm_state_starting_timeout,    200),
 	        stopping_1  => cfg(vm_state_stopping_1_timeout,   30),

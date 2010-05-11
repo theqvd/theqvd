@@ -4,7 +4,7 @@ use strict;
 use warnings;
 
 use parent qw(DBIx::Class);
-use Log::Log4perl qw(:levels :easy);
+use QVD::Log;
 
 # FIXME: rename rows and accessors:
 #   user_* => l7r_*

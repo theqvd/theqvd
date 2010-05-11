@@ -3,11 +3,10 @@ package QVD::Admin::Web::Model::QVD::Admin::Web;
 use Moose;
 use QVD::DB::Simple;
 use QVD::Admin;
-use Log::Log4perl qw(:easy);
 use QVD::Log;
 use Data::Dumper;
+
 extends 'Catalyst::Model';
-with 'MooseX::Log::Log4perl';
 
 sub version { $QVD::Admin::Web::VERSION }
 
@@ -33,7 +32,7 @@ sub set_error {
     my ( $self, $msg ) = @_;
     $self->{status}    = 0;
     $self->{error_msg} = $msg;
-    $self->log->error($msg);
+    DEBUG "$self->set_error($msg)";
 }
 
 sub host_add {

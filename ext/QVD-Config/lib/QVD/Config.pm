@@ -5,23 +5,32 @@ our $VERSION = '0.01';
 use warnings;
 use strict;
 
+use Config::Properties::Simple;
 use QVD::DB::Simple;
 
 use Exporter qw(import);
-our @EXPORT = qw(cfg);
+our @EXPORT = qw(core_cfg cfg ssl_cfg);
 
-my %cache;
+my $core_cfg = Config::Properies::Simple->new(file => '/etc/qvd/node.conf',
+					      required => [qw( database.host
+							       database.password)]);
 
-sub reload {
-    %cache = map { $_->key => $_->value } rs(Config)->all;
-    # FIXME: remove this...
-    # use Data::Dumper;
-    # warn "config cache reloaded:\n" .Dumper \%cache;
+sub core_cfg (*;@) { $core_cfg->{$_[0]} // $_[1] }
+
+sub core_cfg_all { $core_cfg->properties }
+
+my $cfg;
+sub cfg (*;@) {
+    ($cfg //= { map { $_->key => $_->value } rs(Config)->all })
+	->{$_[0]} // $core_cfg->getProperty($_[0] => $_[1]);
 }
 
-reload();
+sub reload { undef $cfg }
 
-sub cfg (*;@) { $cache{$_[0]} // $_[1] }
+sub ssl_cfg {
+    my $slot = rs(SSL_Config)->search({ key => $_[0] })->first;
+    defined $slot ? $slot->value : undef;
+}
 
 1;
 
@@ -57,6 +66,18 @@ Returns the configuration associated to the given key.
 If no entry exist on the database it returns the default value if
 given or otherwise undef.
 
+=item core_cfg($key)
+
+=item core_cfg($key, $default)
+
+Returns configuration entries from the local file config.ini
+
+Mostly used to configure database access and bootstrap the configuration system.
+
+=item ssl_cfg($key)
+
+Return SSL configuration data that is lazy-loaded from the database.
+
 =back
 
 =head1 AUTHORS
@@ -65,10 +86,22 @@ Hugo Cornejo (hcornejo at qindel.com)
 
 Salvador FandiE<ntilde>o (sfandino@yahoo.com)
 
-=head1 COPYRIGHT
+=head1 BUGS
 
-Copyright 2009-2010 by Qindel Formacion y Servicios S.L.
+Please report any bugs or feature requests to C<bug-qvd-config at
+rt.cpan.org>, or through the web interface at
+L<http://rt.cpan.org/NoAuth/ReportBug.html?Queue=QVD-Config>.  I will
+be notified, and then you'll automatically be notified of progress on
+your bug as I make changes.
+
+=head1 COPYRIGHT & LICENSE
+
+Copyright 2009, 2010 Qindel Formacion y Servicios S.L.
 
 This program is free software; you can redistribute it and/or modify it
-under the terms of the GNU GPL version 3 as published by the Free
-Software Foundation.
+under the terms of either: the GNU General Public License as published
+by the Free Software Foundation; or the Artistic License.
+
+See http://dev.perl.org/licenses/ for more information.
+
+=cut

@@ -8,7 +8,7 @@ use warnings;
 use Carp;
 use Time::HiRes qw(time);
 
-use Log::Log4perl qw/:easy/;
+use QVD::Log;
 
 use QVD::ParallelNet::Constants;
 

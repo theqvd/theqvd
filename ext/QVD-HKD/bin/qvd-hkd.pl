@@ -13,7 +13,6 @@ my $POLL_TIME = cfg('hkd_poll_time', 5);
 $App::Daemon::pidfile = $PID_FILE;
 $App::Daemon::logfile = cfg('hkd_log_file');
 
-use Log::Log4perl qw(:levels);
 use QVD::Log;
 
 $App::Daemon::loglevel = $DEBUG;

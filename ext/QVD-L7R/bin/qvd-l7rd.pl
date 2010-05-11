@@ -6,7 +6,7 @@ use warnings;
 use App::Daemon qw/daemonize/;
 use QVD::L7R;
 use QVD::Config;
-use QVD::Config::SSL;
+use QVD::Log;
 use File::Slurp qw(write_file);
 
 my $PID_FILE = cfg('l7r_pid_file', '/var/run/qvd/l7r.pid');
@@ -14,8 +14,6 @@ my $PID_FILE = cfg('l7r_pid_file', '/var/run/qvd/l7r.pid');
 $App::Daemon::pidfile = $PID_FILE;
 $App::Daemon::logfile = cfg('l7r_log_file');
 
-use Log::Log4perl qw(:levels);
-use QVD::Log;
 
 $App::Daemon::loglevel = $DEBUG;
 $App::Daemon::as_user = "root";

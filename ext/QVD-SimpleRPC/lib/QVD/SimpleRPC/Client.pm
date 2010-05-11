@@ -11,7 +11,7 @@ use URI::Escape qw(uri_unescape uri_escape);
 use QVD::HTTPC;
 use QVD::HTTP::StatusCodes qw(:status_codes);
 use JSON;
-use Log::Log4perl qw(:easy);
+use QVD::Log;
 
 my $json = JSON->new->ascii->pretty;
 
@@ -21,8 +21,7 @@ sub new {
     croak "bad URL base for SimpleRPC client"
 	unless ($scheme eq 'http' and !defined($query) and !defined($frag));
     my $httpc = QVD::HTTPC->new($host, %opts);
-    # FIXME use Log4perl
-    warn $@ if $@;
+    WARN $@ if $@;
     $base //= '/';
     $base .= '/' unless $base =~ m|/$|;
     my $self = { httpc => $httpc,
@@ -41,8 +40,7 @@ sub is_connected {
 sub connect {
     my $self = shift;
     my $httpc = eval { QVD::HTTPC->new($self->{host}) };
-    # FIXME use Log4perl
-    warn $@ if $@;
+    WARN $@ if $@;
     $self->{httpc} = $httpc;
     $self->{httpc}
 }

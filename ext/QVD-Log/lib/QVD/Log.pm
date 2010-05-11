@@ -1,37 +1,28 @@
 package QVD::Log;
 
-use Config::Tiny;
-use Log::Log4perl qw(:easy);
+use QVD::Config;
+use QVD::Log;
 
 use warnings;
 use strict;
 
 our $VERSION = '0.01';
 
-my $config = {
-    'log4perl.rootLogger' => 'INFO, LOGFILE',
-    'log4perl.appender.LOGFILE' => 'Log::Log4perl::Appender::File',
-    'log4perl.appender.LOGFILE.filename' => '/var/log/qvd.log',
-    'log4perl.appender.LOGFILE.mode' => 'append',
-    'log4perl.appender.LOGFILE.layout' => 'PatternLayout',
-    'log4perl.appender.LOGFILE.layout.ConversionPattern' => '%d %P %F %L %c - %m%n',
-};
+my %config = ( 'log4perl.appender.LOGFILE'          => 'Log::Log4perl::Appender::File',
+	       'log4perl.appender.LOGFILE.mode'     => 'append',
+	       'log4perl.appender.LOGFILE.layout'   => 'PatternLayout',
+	       'log4perl.appender.LOGFILE.layout.ConversionPattern'
+                                                    => '%d %P %F %L %c - %m%n',
+	       'log4perl.appender.LOGFILE.filename' => core_cfg('log.filename', '/var/log/qvd.log'),
+	       'log4perl.rootLogger'                => core_cfg('log.level', 'INFO') . ", LOGFILE",
 
-if (! Log::Log4perl->initialized()) {
-    my $ini = Config::Tiny->read('/etc/qvd/config.ini');
-    if (defined $ini and defined $ini->{logging}) {
-	$config->{'log4perl.appender.LOGFILE.filename'} 
-	    //= $ini->{logging}{filename};
+	       grep /^log4perl./, core_cfg_all );
 
-	if (defined $ini->{logging}{level}) {
-	    $config->{'log4perl.rootLogger'} 
-		= $ini->{logging}{level}.', LOGFILE'
-	}
-    }
-    Log::Log4perl::init_once($config);
-} else {
-    DEBUG 'Refusing to initialize Log4perl for the second time';
-}
+Log::Log4perl::init_once($config);
+
+use Exporter qw(import);
+
+our @EXPORT = qw(DEBUG WARN INFO ERROR);
 
 1;
 
