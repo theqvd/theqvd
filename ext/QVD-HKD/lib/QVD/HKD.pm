@@ -220,8 +220,10 @@ sub _check_l7rs {
     my $hkd = shift;
     # check for dissapearing L7Rs processes
     for my $l7r (rs(VM_Runtime)->search({l7r_host => $this_host_id})) {
-	$l7r->clear_l7r_all
-	    unless $hkd->_check_l7r_process($l7r);
+	unless ($hkd->_check_l7r_process($l7r)) {
+	    WARN "clean dead L7R process for VM " . $l7r->id;
+	    $l7r->clear_l7r_all;
+	}
     }
 }
 

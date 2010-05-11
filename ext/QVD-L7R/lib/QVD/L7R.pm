@@ -41,7 +41,6 @@ sub _authorize_user {
 	use MIME::Base64 'decode_base64';
 	my @user_pwd = split /:/, decode_base64($1);
 	my $user_login = QVD::Auth->login($user_pwd[0], $user_pwd[1]);
-	
 	if ($user_login == 1) {
 	    my $user_rs = rs(User)->search({login => $user_pwd[0]});
 	    INFO "Accepted connection from user $user_pwd[0]";
@@ -155,20 +154,26 @@ sub connect_to_vm_processor {
 sub _takeover_vm {
     my ($l7r, $vm) = @_;
 
+    DEBUG "Taking over session for VM " . $vm->id;
     while(1) {
 	txn_eval {
+	    DEBUG "txn_eval in _takeover_vm";
 	    $vm->discard_changes;
-	    if ($vm->user_state eq 'disconnected') {
-		$vm->set_user_state('connecting',
-				    l7r_pid => $$,
-				    l7r_host => $this_host_id,
-				    user_cmd => undef);
-	    }
+	    $vm->user_state eq 'disconnected' or die "user is connected from another L7R instance yet";
+	    $vm->set_user_state('connecting',
+				l7r_pid => $$,
+				l7r_host => $this_host_id,
+				user_cmd => undef);
 	};
+
 	unless ($@) {
 	    $l7r->_tell_client("Session acquired");
 	    return;
 	}
+
+	$vm->discard_changes;
+	DEBUG sprintf("Session acquisition failed: L7R state %s for VM %d, pid: %d, host: %d, cmd: %s, my pid: %d, \$\@: %s",
+		      $vm->user_state, $vm->id, $vm->l7r_pid, $vm->l7r_host, $vm->user_cmd, $$, $@);
 
 	$l7r->_tell_client("Aborting contending session");
 	$vm->send_user_abort;
@@ -188,6 +193,7 @@ sub _release_vm {
 	    if (defined $pid  and $pid  == $$  and
 		defined $host and $host == $this_host_id);
     };
+    $@ and DEBUG "L7R release failed but don't bother, HKD will cleanup the mesh: $@";
 }
 
 sub _assign_vm {
@@ -244,13 +250,9 @@ sub _start_x {
     my $resp;
     for (0..3) { # FIXME: make number of retries configurable?
 	my $vma = $l7r->_vma_client($vm);
-	$resp = eval {
-	    # FIXME: use start_x_listener method instead of
-	    # obsolete...
-	    $vma->start_x_listener;
-	};
+	$resp = eval { $vma->start_x_listener };
 	last unless $@;
-	sleep 2;
+	sleep 1;
 	$l7r->_check_abort($vm, 1);
     }
     $resp or die "Unable to start X server on VM: $@";
