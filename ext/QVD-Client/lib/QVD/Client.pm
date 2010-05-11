@@ -15,38 +15,16 @@ QVD::Client - QVD client library
 
 =head1 SYNOPSIS
 
-Quick summary of what the module does.
-
-Perhaps a little code snippet.
-
-    use QVD::Client;
-
-    my $foo = QVD::Client->new();
-    ...
-
+FIXME write the synopsis
 
 =head1 DESCRIPTION
 
-Currently this module does nothing!
+FIXME write the description
 
-The client functionality is in available from the script L<qvd-client>
-also included in this package.
+=head1 COPYRIGHT
 
-=head1 AUTHOR
-
-Salvador FandiE<ntilde>o, C<< <sfandino at yahoo.com> >>
-
-=head1 BUGS
-
-Please report any bugs or feature requests to C<bug-qvd-client at rt.cpan.org>, or through
-the web interface at L<http://rt.cpan.org/NoAuth/ReportBug.html?Queue=QVD-Client>.  I will be notified, and then you'll
-automatically be notified of progress on your bug as I make changes.
-
-=head1 COPYRIGHT & LICENSE
-
-Copyright E<copy> 2009 Qindel Formacion y Servicios S.L., all rights
-reserved.
+Copyright 2009-2010 by Qindel Formacion y Servicios S.L.
 
 This program is free software; you can redistribute it and/or modify it
-under the same terms as Perl itself.
-
+under the terms of the GNU GPL version 3 as published by the Free
+Software Foundation.

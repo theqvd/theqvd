@@ -176,13 +176,10 @@ If you have a web site set up for your module, mention it here.
 
 Salvador Fandino, E<lt>salva@E<gt>
 
-=head1 COPYRIGHT AND LICENSE
+=head1 COPYRIGHT
 
-Copyright (C) 2010 by Salvador Fandino
+Copyright 2009-2010 by Qindel Formacion y Servicios S.L.
 
-This library is free software; you can redistribute it and/or modify
-it under the same terms as Perl itself, either Perl version 5.10.0 or,
-at your option, any later version of Perl 5 you may have available.
-
-
-=cut
+This program is free software; you can redistribute it and/or modify it
+under the terms of the GNU GPL version 3 as published by the Free
+Software Foundation.

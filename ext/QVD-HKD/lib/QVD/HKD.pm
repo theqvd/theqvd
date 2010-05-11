@@ -439,15 +439,16 @@ QVD::HKD - The QVD house keeping daemon
 
 =head1 SYNOPSIS
 
-TBD
+FIXME write the synopsis
 
 =head1 DESCRIPTION
 
 The house keeping daemon manages the virtual machines running on a host.
 
-=head1 AUTHOR
+=head1 COPYRIGHT
 
-=head1 COPYRIGHT & LICENSE
+Copyright 2009-2010 by Qindel Formacion y Servicios S.L.
 
-Copyright 2009 Qindel Formacion y Servicios S.L., all rights reserved.
-
+This program is free software; you can redistribute it and/or modify it
+under the terms of the GNU GPL version 3 as published by the Free
+Software Foundation.

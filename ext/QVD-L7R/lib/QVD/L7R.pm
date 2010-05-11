@@ -359,18 +359,10 @@ if you don't export anything, such as for a purely object-oriented module.
 
 Salvador Fandiño, C<< <sfandino at yahoo.com> >>
 
-=head1 BUGS
+=head1 COPYRIGHT
 
-Please report any bugs or feature requests to C<bug-qvd-l7r at
-rt.cpan.org>, or through the web interface at
-L<http://rt.cpan.org/NoAuth/ReportBug.html?Queue=QVD-L7R>.  I will be
-notified, and then you'll automatically be notified of progress on
-your bug as I make changes.
-
-=head1 COPYRIGHT & LICENSE
-
-Copyright 2009 Qindel Formacion y Servicios S.L., all rights reserved.
+Copyright 2009-2010 by Qindel Formacion y Servicios S.L.
 
 This program is free software; you can redistribute it and/or modify it
-under the same terms as Perl itself.
-
+under the terms of the GNU GPL version 3 as published by the Free
+Software Foundation.
