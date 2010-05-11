@@ -42,11 +42,11 @@ You can also look for information at:
     Search CPAN
         http://search.cpan.org/dist/IO-Socket-Forwarder
 
+COPYRIGHT AND LICENSE
 
-COPYRIGHT AND LICENCE
-
-Copyright (C) 2009 Salvador Fandiño
+Copyright 2009-2010 by Qindel Formacion y Servicios S.L.
 
 This program is free software; you can redistribute it and/or modify it
-under the same terms as Perl itself.
+under the terms of the GNU GPL version 3 as published by the Free
+Software Foundation.
 

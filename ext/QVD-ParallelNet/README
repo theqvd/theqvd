@@ -27,14 +27,11 @@ This module requires these other modules and libraries:
 
   blah blah blah
 
-COPYRIGHT AND LICENCE
+COPYRIGHT AND LICENSE
 
-Put the correct copyright and licence information here.
+Copyright 2009-2010 by Qindel Formacion y Servicios S.L.
 
-Copyright (C) 2010 by Salvador Fandino
-
-This library is free software; you can redistribute it and/or modify
-it under the same terms as Perl itself, either Perl version 5.10.1 or,
-at your option, any later version of Perl 5 you may have available.
-
+This program is free software; you can redistribute it and/or modify it
+under the terms of the GNU GPL version 3 as published by the Free
+Software Foundation.
 
