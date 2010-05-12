@@ -25,7 +25,7 @@ SUPPORT AND DOCUMENTATION
 After installing you can find documentation of this module with the perldoc
 command.
 
-    perldoc 
+    perldoc QVD::ParallelNet
     
 You can also look for information at:
 
