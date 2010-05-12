@@ -1,4 +1,29 @@
-Run script/qvd_admin_web_server.pl to test the application.
+QVD::Admin::Web
+
+This module provides a web interface for the QVD administration tools.
+
+INSTALLATION
+
+To install this module, run the following commands:
+
+    perl Makefile.PL
+    make
+    make test
+    make install
+
+SUPPORT AND DOCUMENTATION
+
+After installing you can find documentation of this module with the perldoc command.
+
+    perldoc QVD::Admin::Web
+    
+You can also look for information at:
+
+      QVD home page
+          %MORFEOURL%
+      
+      QVD blog
+          http://qvdblog.qindel.com
 
 COPYRIGHT AND LICENSE
 

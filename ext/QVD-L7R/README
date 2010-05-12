@@ -1,16 +1,8 @@
 QVD-L7R
 
-The README is used to introduce the module and provide instructions on
-how to install the module, any machine dependencies it may have (for
-example C compilers and installed libraries) and any other information
-that should be provided before the module is installed.
-
-A README file is required for CPAN modules since CPAN extracts the README
-file from a module distribution so that people browsing the archive
-can use it to get an idea of the module's uses. It is usually a good idea
-to provide version information here so that people can decide whether
-fixes for the module are worth downloading.
-
+The QVD L7R ("level-7 router") is a network server that accepts connections
+from QVD clients and forwards them to desktop sessions that run on virtual
+machines.
 
 INSTALLATION
 
@@ -30,18 +22,11 @@ perldoc command.
 
 You can also look for information at:
 
-    RT, CPAN's request tracker
-        http://rt.cpan.org/NoAuth/Bugs.html?Dist=QVD-L7R
-
-    AnnoCPAN, Annotated CPAN documentation
-        http://annocpan.org/dist/QVD-L7R
-
-    CPAN Ratings
-        http://cpanratings.perl.org/d/QVD-L7R
-
-    Search CPAN
-        http://search.cpan.org/dist/QVD-L7R
-
+      QVD home page
+          %MORFEOURL%
+      
+      QVD blog
+          http://qvdblog.qindel.com
 
 COPYRIGHT AND LICENSE
 
