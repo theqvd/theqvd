@@ -2,21 +2,25 @@ package QVD::Auth;
 
 use warnings;
 use strict;
-
+use Carp;
 use QVD::Config;
 
 our $VERSION = '0.01';
 
 sub login {
-    my $mode = cfg('auth_mode', 'basic');
-    if ($mode eq "basic") {
-	require QVD::Auth::Basic;
-	QVD::Auth::Basic::login(@_);
-    } elsif ($mode eq "ldap") {
-	require QVD::Auth::LDAP;
-	QVD::Auth::LDAP::login(@_);
-    } else {
-	0;
+    my $mode = cfg('l7r.auth.mode');
+    given ($mode) {
+	when('basic') {
+	    require QVD::Auth::Basic;
+	    QVD::Auth::Basic::login(@_);
+	}
+	when('ldap') {
+	    require QVD::Auth::LDAP;
+	    QVD::Auth::LDAP::login(@_);
+	}
+	default {
+	    croak "bad authentication mode $_ (l7r.auth.mode)";
+	}
     }
 }
 
