@@ -43,7 +43,7 @@ sub cfg {
 	# SSL keys are only loaded on demand.
 	require QVD::DB::Simple;
 	my $slot = QVD::DB::Simple::rs('SSL_Config')->search({ key => $key })->first;
-	return $slot if defined $slot;
+	return $slot->value if defined $slot;
     }
     $cfg // reload;
     my $value = $cfg->{$key} // $core_cfg->getProperty($key, @_) //

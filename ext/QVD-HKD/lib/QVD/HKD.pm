@@ -22,6 +22,8 @@ my %timeout = ( starting    => cfg('internal.hkd.timeout.state.starting'),
 		zombie_1    => cfg('internal.hkd.timeout.state.zombie_1'),
 		vma         => cfg('internal.hkd.timeout.state.running') );
 
+my $parallel_net_timeout = cfg('internal.hkd.timeout.vma');
+
 my %cmd = ( kvm     => cfg('command.kvm'),
 	    kvm_img => cfg('command.kvm-img') );
 
@@ -170,7 +172,7 @@ sub _check_vms {
 	}
     }
 
-    $par->run(time => 2) if @active_vms;
+    $par->run(time => $parallel_net_timeout) if @active_vms;
 
     while (@active_vms) {
 	my $vm = shift @active_vms;

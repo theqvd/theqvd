@@ -6,7 +6,7 @@ use strict;
 our $VERSION = '0.01';
 
 use URI::Split qw(uri_split);
-
+use QVD::Log;
 use QVD::HTTP::StatusCodes qw(:all);
 
 # FIXME: allow forking!
@@ -20,7 +20,11 @@ sub options {
     my $prop = $self->{server};
     $self->SUPER::options($template);
     $prop->{SSL} ||= undef;
-    $template->{SSL} = \$prop->{SSL}
+    $template->{SSL} = \$prop->{SSL};
+    $prop->{SSL_key} //= {};
+    $template->{SSL_key} = \$prop->{SSL_key};
+    $prop->{SSL_cert} //= {};
+    $template->{SSL_cert} = \$prop->{SSL_cert};
 }
 
 # token          = 1*<any CHAR except CTLs or separators>
@@ -36,7 +40,16 @@ sub process_request {
 
     if ($self->{server}{SSL}) {
 	require IO::Socket::SSL;
-	IO::Socket::SSL->start_SSL($socket, SSL_server => 1, NonBlocking => 1);
+	DEBUG "SSL_cert:\n$self->{server}{SSL_cert}\n\nSSL_key:\n$self->{server}{SSL_key}\n\n";
+
+	use Data::Dumper;
+	DEBUG Dumper([$socket, SSL_server => 1, NonBlocking => 1,
+		      SSL_cert => $self->{server}{SSL_cert},
+		      SSL_key  => $self->{server}{SSL_key}]);
+
+	IO::Socket::SSL->start_SSL($socket, SSL_server => 1, NonBlocking => 1,
+				   SSL_cert => $self->{server}{SSL_cert},
+				   SSL_key  => $self->{server}{SSL_key});
 	$socket->isa('IO::Socket::SSL')
 	    or die "SSL negotiation failed: " . IO::Socket::SSL::errstr()
 

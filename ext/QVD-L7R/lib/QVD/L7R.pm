@@ -30,8 +30,6 @@ sub post_configure_hook {
 				     GET => '/qvd/list_of_vm');
 }
 
-# FIXME: replace $vm by $vmrt all over the module!
-
 sub _authorize_user {
     my ($l7r, $method, $url, $headers) = @_;
     my $authorization = header_lookup($headers, 'Authorization');
@@ -92,8 +90,6 @@ sub _user_vms {
 sub connect_to_vm_processor {
     my ($l7r, $method, $url, $headers) = @_;
     my $user = $l7r->_authorize_user($method, $url, $headers) or return;
-    # FIXME: use vm_starting_timeout cfg instead of this
-    my $vm_start_timeout = cfg('internal.l7r.timeout.vm_start');
 
     unless (header_eq_check($headers, Connection => 'Upgrade') and
 	    header_eq_check($headers, Upgrade => 'QVD/1.0')) {
@@ -151,8 +147,10 @@ sub connect_to_vm_processor {
 # first if needed
 sub _takeover_vm {
     my ($l7r, $vm) = @_;
-
     DEBUG "Taking over session for VM " . $vm->id;
+
+    my $timeout = time + cfg('internal.l7r.timeout.takeover');
+
     while(1) {
 	txn_eval {
 	    DEBUG "txn_eval in _takeover_vm";
@@ -175,8 +173,10 @@ sub _takeover_vm {
 
 	$l7r->_tell_client("Aborting contending session");
 	$vm->send_user_abort;
+
+	die "Unable to acquire VM, close other clients\n" if time > $timeout;
 	sleep 1;
-	# FIXME: check timeout
+
 	# FIXME: check the VM has not left the state running
     }
 }
@@ -214,6 +214,9 @@ sub _assign_vm {
 
 sub _start_and_wait_for_vm {
     my ($l7r, $vm) = @_;
+
+    my $timeout = time + cfg('internal.l7r.timeout.vm_start');
+
     my $vm_state = $vm->vm_state;
 
     if ($vm_state eq 'stopped') {
@@ -234,7 +237,8 @@ sub _start_and_wait_for_vm {
 	if (( $vm_state eq 'stopped' and
 	      defined $vm->vm_cmd ) or
 	    $vm_state eq 'starting') {
-	    # FIXME: check timeout!
+	    die "Unable to start VM, operation timed out!\n"
+		if time > $timeout;
 	}
 	else {
 	    die "Unable to start VM in state $vm_state";
@@ -246,7 +250,7 @@ sub _start_x {
     my ($l7r, $vm) = @_;
     $l7r->_tell_client("Starting X session");
     my $resp;
-    for (0..3) { # FIXME: make number of retries configurable?
+    for (0..cfg('internal.l7r.retry.x_start')) {
 	my $vma = $l7r->_vma_client($vm);
 	$resp = eval { $vma->start_x_listener };
 	last unless $@;
@@ -258,12 +262,15 @@ sub _start_x {
 
 sub _wait_for_x {
     my ($l7r, $vm) = @_;
+    my $timeout = time + cfg('internal.l7r.timeout.x_start');
     $l7r->_tell_client("Waiting for X session to come up");
     my $x_state;
-    for (0..10) { # FIXME: make number of retries configurable?
+    while (1) {
 	my $vma = $l7r->_vma_client($vm);
 	$x_state = eval { $vma->x_state };
 	return if (defined $x_state and $x_state eq 'listening');
+	die "Unable to start VM X server, operation timed out!\n"
+	    if time > $timeout;
 	sleep 1;
 	$l7r->_check_abort($vm, 1);
     }
@@ -286,7 +293,6 @@ sub _run_forwarder {
 
     DEBUG "Socket connected to X server";
 
-    # FIXME: check abort!
     txn_do {
 	$vm->discard_changes;
 	$l7r->_check_abort($vm);
