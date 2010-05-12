@@ -16,11 +16,11 @@ use List::Util qw(max);
 use POSIX;
 use QVD::Log;
 
-my %timeout = ( starting    => cfg(vm_state_starting_timeout,    200),
-	        stopping_1  => cfg(vm_state_stopping_1_timeout,   30),
-		stopping_2  => cfg(vm_state_stopping_2_timeout,  200),
-		zombie_1    => cfg(vm_state_zombie_1_timeout,     30),
-		vma         => cfg(vm_state_running_vma_timeout, 120) );
+my %timeout = ( starting    => cfg('vm_state_starting_timeout',    200),
+	        stopping_1  => cfg('vm_state_stopping_1_timeout',   30),
+		stopping_2  => cfg('vm_state_stopping_2_timeout',  200),
+		zombie_1    => cfg('vm_state_zombie_1_timeout',     30),
+		vma         => cfg('vm_state_running_vma_timeout', 120) );
 
 my %cmd = ( kvm     => cfg(shell_command_kvm     => 'kvm'    ),
 	    kvm_img => cfg(shell_command_kvm_img => 'kvm-img') );
@@ -345,7 +345,7 @@ sub _vm_image_path {
     my $id = $vm->id;
     my $osi = $vm->rel_vm_id->osi;
     my $osiid = $osi->id;
-    my $image = cfg(ro_storage_path).'/'.$osi->disk_image;
+    my $image = cfg('ro_storage_path').'/'.$osi->disk_image;
 
     unless (-f $image) {
 	ERROR "Image $image attached to VM $id does not exist on disk";
@@ -354,7 +354,7 @@ sub _vm_image_path {
     return $image unless $osi->use_overlay;
 
     # FIXME: use a better policy for overlay allocation
-    my $overlay_dir = cfg(rw_storage_path);
+    my $overlay_dir = cfg('rw_storage_path');
     my $overlay = "$overlay_dir/$osiid-$id-overlay.qcow2";
     return $overlay if -f $overlay;
 

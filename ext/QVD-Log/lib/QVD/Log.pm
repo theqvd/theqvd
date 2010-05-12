@@ -1,7 +1,6 @@
 package QVD::Log;
 
 use QVD::Config;
-use QVD::Log;
 
 use warnings;
 use strict;
@@ -18,7 +17,9 @@ my %config = ( 'log4perl.appender.LOGFILE'          => 'Log::Log4perl::Appender:
 
 	       grep /^log4perl./, core_cfg_all );
 
-Log::Log4perl::init_once($config);
+Log::Log4perl::init_once(\%config);
+
+use Log::Log4perl qw(:levels :easy);
 
 use Exporter qw(import);
 

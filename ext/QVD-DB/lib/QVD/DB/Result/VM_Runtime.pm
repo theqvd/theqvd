@@ -146,7 +146,7 @@ sub set_user_state {
 
 sub _clear_cmd {
     my ($vm, $type) = @_;
-    DEBUG "Clearing $type command for VM ".$vm->vm_id;
+    # DEBUG "Clearing $type command for VM ".$vm->vm_id;
     $vm->update({"${type}_cmd" => undef});
 }
 

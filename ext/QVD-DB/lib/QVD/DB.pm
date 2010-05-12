@@ -7,7 +7,8 @@ use strict;
 
 use Carp;
 use DBIx::Class::Exception;
-use QVD::Config;
+
+require QVD::Config;
 
 use parent qw(DBIx::Class::Schema);
 
@@ -16,10 +17,11 @@ __PACKAGE__->exception_action(sub { croak @_ ; DBIx::Class::Exception::throw(@_)
 
 sub new {
     my $class = shift;
-    my $name = core_cfg(database_name);
-    my $user = core_cfg(database_username);
-    my $passwd = core_cfg(database_password);
-    $class->SUPER::connect("dbi:Pg:dbname=$name",
+    my $name = QVD::Config::core_cfg('database.name', 'qvd');
+    my $user = QVD::Config::core_cfg('database.username', 'qvd');
+    my $host = QVD::Config::core_cfg('database.host', 'localhost');
+    my $passwd = QVD::Config::core_cfg('database.password');
+    $class->SUPER::connect("dbi:Pg:dbname=$name;host=$host",
 			   $user, $passwd,
                            { RaiseError => 1,
 			     AutoCommit => 1,

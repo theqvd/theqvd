@@ -12,8 +12,8 @@ our @EXPORT = qw(db txn_do txn_eval rs);
 
 my $db;
 
-sub db (%) {
-    $db //= QVD::DB->new(@_)
+sub db {
+    $db //= QVD::DB->new
 }
 
 sub txn_do (&) {

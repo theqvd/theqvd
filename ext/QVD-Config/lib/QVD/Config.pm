@@ -6,29 +6,39 @@ use warnings;
 use strict;
 
 use Config::Properties::Simple;
-use QVD::DB::Simple;
 
-use Exporter qw(import);
-our @EXPORT = qw(core_cfg cfg ssl_cfg);
+require Exporter;
+our @ISA = qw(Exporter);
+our @EXPORT_OK = qw(core_cfg core_cfg_all cfg ssl_cfg);
+our @EXPORT = @EXPORT_OK;
 
-my $core_cfg = Config::Properies::Simple->new(file => '/etc/qvd/node.conf',
-					      required => [qw( database.host
-							       database.password)]);
+my $core_cfg = Config::Properties::Simple->new(file => '/etc/qvd/node.conf',
+					       required => [qw( nodename
+								database.password)]);
 
-sub core_cfg (*;@) { $core_cfg->{$_[0]} // $_[1] }
+
+sub core_cfg { $core_cfg->requireProperty(@_) }
 
 sub core_cfg_all { $core_cfg->properties }
 
 my $cfg;
-sub cfg (*;@) {
-    ($cfg //= { map { $_->key => $_->value } rs(Config)->all })
-	->{$_[0]} // $core_cfg->getProperty($_[0] => $_[1]);
+
+sub reload {
+    # we load the database module on demand in order to avoid circular
+    # dependencies
+    require QVD::DB::Simple;
+    $cfg = { map { $_->key => $_->value } QVD::DB::Simple::rs('Config')->all }
 }
 
-sub reload { undef $cfg }
+sub cfg {
+    $cfg // reload;
+    $cfg->{$_[0]} // $core_cfg->getProperty(@_);
+}
+
 
 sub ssl_cfg {
-    my $slot = rs(SSL_Config)->search({ key => $_[0] })->first;
+    require QVD::DB::Simple;
+    my $slot = QVD::DB::Simple::rs('SSL_Config')->search({ key => $_[0] })->first;
     defined $slot ? $slot->value : undef;
 }
 

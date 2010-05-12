@@ -6,17 +6,10 @@ use warnings;
 use App::Daemon qw/daemonize/;
 use QVD::HKD;
 use QVD::Config;
-
-my $PID_FILE = cfg('hkd_pid_file', '/var/run/qvd/hkd.pid');
-my $POLL_TIME = cfg('hkd_poll_time', 5);
-
-$App::Daemon::pidfile = $PID_FILE;
-$App::Daemon::logfile = cfg('hkd_log_file');
-
 use QVD::Log;
 
-$App::Daemon::loglevel = $DEBUG;
-$App::Daemon::as_user = "root";
+$App::Daemon::pidfile = cfg('hkd.pid_file', '/var/run/qvd/hkd.pid');
+$App::Daemon::as_user = cfg('hkd.as_user', 'qvd');
 
 daemonize;
 QVD::HKD->run;

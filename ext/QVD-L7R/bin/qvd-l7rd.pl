@@ -9,14 +9,8 @@ use QVD::Config;
 use QVD::Log;
 use File::Slurp qw(write_file);
 
-my $PID_FILE = cfg('l7r_pid_file', '/var/run/qvd/l7r.pid');
-
-$App::Daemon::pidfile = $PID_FILE;
-$App::Daemon::logfile = cfg('l7r_log_file');
-
-
-$App::Daemon::loglevel = $DEBUG;
-$App::Daemon::as_user = "root";
+$App::Daemon::pidfile = cfg('l7r.pid_file', '/var/run/qvd/l7r.pid');
+$App::Daemon::as_user = cfg('l7r.as_user', 'qvd');
 
 # retrieve SSL certificates from the database and install them locally
 
