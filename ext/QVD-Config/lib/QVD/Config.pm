@@ -5,17 +5,18 @@ our $VERSION = '0.01';
 use warnings;
 use strict;
 
-use Config::Properties::Simple;
+use Config::Properties;
 use QVD::Config::Defaults;
 
 use Exporter qw(import);
 our @EXPORT = qw(core_cfg core_cfg_all cfg ssl_cfg);
 
-my $core_cfg = Config::Properties::Simple->new(file => '/etc/qvd/node.conf',
-					       required => [qw( nodename
-								database.password)],
-					       defaults => $QVD::Config::defaults);
+my $core_cfg = Config::Properties->new($QVD::Config::defaults);
 
+open my $cfg_fh, '<', '/etc/qvd/node.conf'
+    or die "unable to read configuration file /etc/qvd/node.conf'\n";
+$core_cfg->load($cfg_fh);
+close $cfg_fh;
 
 sub core_cfg {
     my $value = $core_cfg->requireProperty(@_);
