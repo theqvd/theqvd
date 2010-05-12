@@ -16,17 +16,14 @@ use List::Util qw(max);
 use POSIX;
 use QVD::Log;
 
-my %timeout = ( starting    => cfg('vm_state_starting_timeout',    200),
-	        stopping_1  => cfg('vm_state_stopping_1_timeout',   30),
-		stopping_2  => cfg('vm_state_stopping_2_timeout',  200),
-		zombie_1    => cfg('vm_state_zombie_1_timeout',     30),
-		vma         => cfg('vm_state_running_vma_timeout', 120) );
+my %timeout = ( starting    => cfg('internal.hkd.timeout.state.starting'),
+	        stopping_1  => cfg('internal.hkd.timeout.state.stopping_1'),
+		stopping_2  => cfg('internal.hkd.timeout.state.stopping_2'),
+		zombie_1    => cfg('internal.hkd.timeout.state.zombie_1'),
+		vma         => cfg('internal.hkd.timeout.state.running') );
 
-my %cmd = ( kvm     => cfg(shell_command_kvm     => 'kvm'    ),
-	    kvm_img => cfg(shell_command_kvm_img => 'kvm-img') );
-
-# FIXME: read nodename from configuration file!
-my $this_host_id = rs(Host)->search(name => hostname)->first->id;
+my %cmd = ( kvm     => cfg('command.kvm'),
+	    kvm_img => cfg('command.kvm-img') );
 
 # The class QVD::HKD does not have state so we use the class name as
 # the object.
@@ -61,7 +58,7 @@ sub _check_vms {
     my (@active_vms, @vmas);
     my $par = QVD::ParallelNet->new;
 
-    for my $vm (rs(VM_Runtime)->search({host_id => $this_host_id})) {
+    for my $vm (rs(VM_Runtime)->search({host_id => this_host_id})) {
 	my $id = $vm->id;
 
 	# Command processing...
@@ -219,7 +216,7 @@ sub _check_vms {
 sub _check_l7rs {
     my $hkd = shift;
     # check for dissapearing L7Rs processes
-    for my $l7r (rs(VM_Runtime)->search({l7r_host => $this_host_id})) {
+    for my $l7r (rs(VM_Runtime)->search({l7r_host => this_host_id})) {
 	unless ($hkd->_check_l7r_process($l7r)) {
 	    WARN "clean dead L7R process for VM " . $l7r->id;
 	    $l7r->clear_l7r_all;
@@ -345,7 +342,7 @@ sub _vm_image_path {
     my $id = $vm->id;
     my $osi = $vm->rel_vm_id->osi;
     my $osiid = $osi->id;
-    my $image = cfg('ro_storage_path').'/'.$osi->disk_image;
+    my $image = cfg('path.storage.images').'/'.$osi->disk_image;
 
     unless (-f $image) {
 	ERROR "Image $image attached to VM $id does not exist on disk";
@@ -354,7 +351,7 @@ sub _vm_image_path {
     return $image unless $osi->use_overlay;
 
     # FIXME: use a better policy for overlay allocation
-    my $overlay_dir = cfg('rw_storage_path');
+    my $overlay_dir = cfg('path.storage.overlays');
     my $overlay = "$overlay_dir/$osiid-$id-overlay.qcow2";
     return $overlay if -f $overlay;
 
@@ -382,7 +379,7 @@ sub _vm_user_storage_path {
     my $osi = $vm->rel_vm_id->osi;
     my $size = $osi->user_storage_size // return undef;
 
-    my $home = cfg('home_storage_path');
+    my $home = cfg('path.storage.overlays');
     my $image = "$home/$id-data.qcow2";
     return $image if -f $image;
 

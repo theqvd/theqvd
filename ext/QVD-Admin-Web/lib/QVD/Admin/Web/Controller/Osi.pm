@@ -83,7 +83,7 @@ sub add : Local Form {
 
     my $model = $c->model('QVD::Admin::Web');
     
-    my $path = cfg('shared_storage_path');
+    my $path = cfg('path.storage.staging');
     my @file_list = split("\n",qx/ls -1 $path/);
     $c->stash->{osi_file_list} = \@file_list;
     

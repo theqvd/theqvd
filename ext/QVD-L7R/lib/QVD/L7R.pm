@@ -7,8 +7,8 @@ use strict;
 use Carp;
 
 use IO::Socket::Forwarder qw(forward_sockets);
-use QVD::Log;
 use QVD::Config;
+use QVD::Log;
 use QVD::DB::Simple;
 use QVD::HTTP::Headers qw(header_lookup header_eq_check);
 use QVD::HTTP::StatusCodes qw(:status_codes);
@@ -18,11 +18,9 @@ use QVD::SimpleRPC::Client;
 use URI::Split qw(uri_split);
 use Sys::Hostname;
 
-my $POLL_TIME = cfg('l7r_poll_time', 5);
+my $POLL_TIME = cfg('internal.l7r.poll_time');
 
 use parent qw(QVD::HTTPD);
-
-my $this_host_id = rs(Host)->search(name => hostname)->first->id;
 
 sub post_configure_hook {
     my $l7r = shift;
@@ -95,7 +93,7 @@ sub connect_to_vm_processor {
     my ($l7r, $method, $url, $headers) = @_;
     my $user = $l7r->_authorize_user($method, $url, $headers) or return;
     # FIXME: use vm_starting_timeout cfg instead of this
-    my $vm_start_timeout = cfg('vm_start_timeout');
+    my $vm_start_timeout = cfg('internal.l7r.timeout.vm_start');
 
     unless (header_eq_check($headers, Connection => 'Upgrade') and
 	    header_eq_check($headers, Upgrade => 'QVD/1.0')) {
@@ -162,7 +160,7 @@ sub _takeover_vm {
 	    $vm->user_state eq 'disconnected' or die "user is connected from another L7R instance yet";
 	    $vm->set_user_state('connecting',
 				l7r_pid => $$,
-				l7r_host => $this_host_id,
+				l7r_host => this_host_id,
 				user_cmd => undef);
 	};
 
@@ -191,7 +189,7 @@ sub _release_vm {
 	my $host = $vm->l7r_host;
 	$vm->clear_l7r_all
 	    if (defined $pid  and $pid  == $$  and
-		defined $host and $host == $this_host_id);
+		defined $host and $host == this_host_id);
     };
     $@ and DEBUG "L7R release failed but don't bother, HKD will cleanup the mesh: $@";
 }
@@ -310,7 +308,7 @@ sub _vma_client {
     my $host = $vm->vm_address;
     my $port = $vm->vm_vma_port;
     QVD::SimpleRPC::Client->new("http://$host:$port/vma",
-				timeout => cfg(vma_response_timeout => 3));
+				timeout => cfg('internal.l7r.timeout.vma'));
 }
 
 sub _tell_client {

@@ -6,20 +6,26 @@ use warnings;
 use strict;
 
 use Config::Properties::Simple;
+use QVD::Config::Defaults;
 
-require Exporter;
-our @ISA = qw(Exporter);
-our @EXPORT_OK = qw(core_cfg core_cfg_all cfg ssl_cfg);
-our @EXPORT = @EXPORT_OK;
+use Exporter qw(import);
+our @EXPORT = qw(core_cfg core_cfg_all cfg ssl_cfg);
 
 my $core_cfg = Config::Properties::Simple->new(file => '/etc/qvd/node.conf',
 					       required => [qw( nodename
-								database.password)]);
+								database.password)],
+					       defaults => $QVD::Config::defaults);
 
 
-sub core_cfg { $core_cfg->requireProperty(@_) }
+sub core_cfg {
+    my $value = $core_cfg->requireProperty(@_);
+    $value =~ s/\$\{(.*?)\}/core_cfg($1)/ge;
+    $value;
+}
 
-sub core_cfg_all { $core_cfg->properties }
+sub core_cfg_all {
+    map { $_ => core_cfg($_) } $core_cfg->propertyNames
+}
 
 my $cfg;
 
@@ -31,15 +37,18 @@ sub reload {
 }
 
 sub cfg {
+    my $key = shift;
+    if ($key =~ /^l7r\.ssl\./) {
+	# SSL keys are only loaded on demand.
+	require QVD::DB::Simple;
+	my $slot = QVD::DB::Simple::rs('SSL_Config')->search({ key => $key })->first;
+	return $slot if defined $slot;
+    }
     $cfg // reload;
-    $cfg->{$_[0]} // $core_cfg->getProperty(@_);
-}
-
-
-sub ssl_cfg {
-    require QVD::DB::Simple;
-    my $slot = QVD::DB::Simple::rs('SSL_Config')->search({ key => $_[0] })->first;
-    defined $slot ? $slot->value : undef;
+    my $value = $cfg->{$key} // $core_cfg->getProperty($key, @_) //
+	die "Configuration entry for $key missing\n";
+    $value =~ s/\$\{(.*?)\}/cfg($1)/ge;
+    $value;
 }
 
 1;
@@ -83,10 +92,6 @@ given or otherwise undef.
 Returns configuration entries from the local file config.ini
 
 Mostly used to configure database access and bootstrap the configuration system.
-
-=item ssl_cfg($key)
-
-Return SSL configuration data that is lazy-loaded from the database.
 
 =back
 

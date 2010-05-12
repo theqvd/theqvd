@@ -6,9 +6,10 @@ use warnings;
 use Log::Log4perl qw(:levels :easy);
 
 use QVD::DB;
+use QVD::Config;
 
 use Exporter qw(import);
-our @EXPORT = qw(db txn_do txn_eval rs);
+our @EXPORT = qw(db txn_do txn_eval rs this_host_id);
 
 my $db;
 
@@ -29,6 +30,21 @@ sub txn_eval (&) {
 
 sub rs (*) {
     ($db //= QVD::DB->new())->resultset($_[0]);
+}
+
+my $this_host_id;
+
+sub this_host_id {
+    $this_host_id //= do {
+	my $nodename = core_cfg('nodename');
+	my $this_host = rs(Host)->search(name => $nodename)->first;
+	unless (defined $this_host) {
+	    my $msg = "This node $nodename is not registered in the database";
+	    ERROR $msg;
+	    die "$msg\n";
+	}
+	$this_host->id;
+    };
 }
 
 1;

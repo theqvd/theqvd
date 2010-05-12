@@ -12,17 +12,14 @@ my %config = ( 'log4perl.appender.LOGFILE'          => 'Log::Log4perl::Appender:
 	       'log4perl.appender.LOGFILE.layout'   => 'PatternLayout',
 	       'log4perl.appender.LOGFILE.layout.ConversionPattern'
                                                     => '%d %P %F %L %c - %m%n',
-	       'log4perl.appender.LOGFILE.filename' => core_cfg('log.filename', '/var/log/qvd.log'),
-	       'log4perl.rootLogger'                => core_cfg('log.level', 'INFO') . ", LOGFILE",
-
-	       grep /^log4perl./, core_cfg_all );
-
-Log::Log4perl::init_once(\%config);
+	       'log4perl.appender.LOGFILE.filename' => core_cfg('log.filename'),
+	       'log4perl.rootLogger'                => core_cfg('log.level') . ", LOGFILE",
+	       grep /^log4perl\./, core_cfg_all );
 
 use Log::Log4perl qw(:levels :easy);
+Log::Log4perl::init_once(\%config);
 
 use Exporter qw(import);
-
 our @EXPORT = qw(DEBUG WARN INFO ERROR);
 
 1;

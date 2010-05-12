@@ -177,7 +177,7 @@ sub cmd_osi_add {
     my $img = $params{disk_image};
     $params{disk_image} = basename($img);
 
-    my $destination = cfg('ro_storage_path');
+    my $destination = cfg('path.storage.images');
     unless (-f $destination.'/'.$params{disk_image}) {
 	use File::Copy qw/copy/;
 	copy($img, $destination) or die "Unable to copy $img to storage: $^E";
@@ -473,16 +473,10 @@ sub cmd_config_ssl {
     my ($self, %args) = @_;
     my $cert = delete $args{cert} or die "Certificate is required";
     my $key = delete $args{key} or die "Private key is required";
-
-    rs(SSL_Config)->update_or_create({
-	    key => 'ssl_server_cert',
-	    value => $cert,
-	});
-
-    rs(SSL_Config)->update_or_create({
-	    key => 'ssl_server_key',
-	    value => $key,
-	});
+    rs(SSL_Config)->update_or_create({ key => 'l7r.ssl.cert',
+				       value => $cert });
+    rs(SSL_Config)->update_or_create({ key => 'l7r.ssl.key',
+				       value => $key });
     1
 }
 

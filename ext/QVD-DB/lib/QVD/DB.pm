@@ -17,9 +17,9 @@ __PACKAGE__->exception_action(sub { croak @_ ; DBIx::Class::Exception::throw(@_)
 
 sub new {
     my $class = shift;
-    my $name = QVD::Config::core_cfg('database.name', 'qvd');
-    my $user = QVD::Config::core_cfg('database.username', 'qvd');
-    my $host = QVD::Config::core_cfg('database.host', 'localhost');
+    my $name = QVD::Config::core_cfg('database.name');
+    my $user = QVD::Config::core_cfg('database.user');
+    my $host = QVD::Config::core_cfg('database.host');
     my $passwd = QVD::Config::core_cfg('database.password');
     $class->SUPER::connect("dbi:Pg:dbname=$name;host=$host",
 			   $user, $passwd,

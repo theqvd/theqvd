@@ -45,8 +45,8 @@ __PACKAGE__->config(
 	session => {flash_to_stash => 1}
      );
 
-my $username = cfg('auth_basic_adminusername');
-my $password = cfg('auth_basic_adminpassword');
+my $username = core_cfg('wat.admin.login');
+my $password = core_cfg('wat.admin.password');
 
 __PACKAGE__->config( 'Plugin::Authentication' =>
 	    {
