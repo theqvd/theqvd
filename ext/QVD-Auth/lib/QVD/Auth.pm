@@ -5,6 +5,8 @@ use strict;
 use Carp;
 use QVD::Config;
 
+use feature 'switch';
+
 our $VERSION = '0.01';
 
 sub login {
