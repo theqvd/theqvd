@@ -18,9 +18,14 @@ use QVD::SimpleRPC::Client;
 use URI::Split qw(uri_split);
 use Sys::Hostname;
 
-my $POLL_TIME = cfg('internal.l7r.poll_time');
-
 use parent qw(QVD::HTTPD);
+
+my $poll_time        = cfg('internal.l7r.poll_time');
+my $takeover_timeout = cfg('internal.l7r.timeout.takeover');
+my $vm_start_timeout = cfg('internal.l7r.timeout.vm_start');
+my $x_start_retry    = cfg('internal.l7r.retry.x_start');
+my $x_start_timeout  = cfg('internal.l7r.timeout.x_start');
+my $vma_timeout      = cfg('internal.l7r.timeout.vma');
 
 sub post_configure_hook {
     my $l7r = shift;
@@ -149,7 +154,7 @@ sub _takeover_vm {
     my ($l7r, $vm) = @_;
     DEBUG "Taking over session for VM " . $vm->id;
 
-    my $timeout = time + cfg('internal.l7r.timeout.takeover');
+    my $timeout = time + $takeover_timeout;
 
     while(1) {
 	txn_eval {
@@ -175,7 +180,7 @@ sub _takeover_vm {
 	$vm->send_user_abort;
 
 	die "Unable to acquire VM, close other clients\n" if time > $timeout;
-	sleep 1;
+	sleep($poll_time);
 
 	# FIXME: check the VM has not left the state running
     }
@@ -215,8 +220,7 @@ sub _assign_vm {
 sub _start_and_wait_for_vm {
     my ($l7r, $vm) = @_;
 
-    my $timeout = time + cfg('internal.l7r.timeout.vm_start');
-
+    my $timeout = time + $vm_start_timeout;
     my $vm_state = $vm->vm_state;
 
     if ($vm_state eq 'stopped') {
@@ -250,7 +254,7 @@ sub _start_x {
     my ($l7r, $vm) = @_;
     $l7r->_tell_client("Starting X session");
     my $resp;
-    for (0..cfg('internal.l7r.retry.x_start')) {
+    for (0..$x_start_retry) {
 	my $vma = $l7r->_vma_client($vm);
 	$resp = eval { $vma->start_x_listener };
 	last unless $@;
@@ -262,7 +266,7 @@ sub _start_x {
 
 sub _wait_for_x {
     my ($l7r, $vm) = @_;
-    my $timeout = time + cfg('internal.l7r.timeout.x_start');
+    my $timeout = time + $x_start_timeout;
     $l7r->_tell_client("Waiting for X session to come up");
     my $x_state;
     while (1) {
@@ -313,8 +317,7 @@ sub _vma_client {
     my ($l7r, $vm) = @_;
     my $host = $vm->vm_address;
     my $port = $vm->vm_vma_port;
-    QVD::SimpleRPC::Client->new("http://$host:$port/vma",
-				timeout => cfg('internal.l7r.timeout.vma'));
+    QVD::SimpleRPC::Client->new("http://$host:$port/vma", timeout => $vma_timeout);
 }
 
 sub _tell_client {

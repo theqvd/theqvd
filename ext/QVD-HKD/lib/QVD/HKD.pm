@@ -16,6 +16,9 @@ use List::Util qw(max);
 use POSIX;
 use QVD::Log;
 
+my %cmd = ( kvm     => cfg('command.kvm'),
+	    kvm_img => cfg('command.kvm-img') );
+
 my %timeout = ( starting    => cfg('internal.hkd.timeout.state.starting'),
 	        stopping_1  => cfg('internal.hkd.timeout.state.stopping_1'),
 		stopping_2  => cfg('internal.hkd.timeout.state.stopping_2'),
@@ -24,8 +27,12 @@ my %timeout = ( starting    => cfg('internal.hkd.timeout.state.starting'),
 
 my $parallel_net_timeout = cfg('internal.hkd.timeout.vma');
 
-my %cmd = ( kvm     => cfg('command.kvm'),
-	    kvm_img => cfg('command.kvm-img') );
+my $pool_time     = cfg('internal.hkd.poll_time');
+my $pool_all_mod  = cfg('internal.hkd.poll_all_mod');
+
+my $images_path   = cfg('path.storage.images');
+my $overlays_path = cfg('path.storage.overlays');
+my $homes_path    = cfg('path.storage.homes');
 
 # The class QVD::HKD does not have state so we use the class name as
 # the object.
@@ -43,12 +50,12 @@ sub run {
 
 	$hkd->_reap_children;
 
-	my $check_all = not $round++ % 12;
+	my $check_all = not $round++ % $pool_all_mod;
 	$hkd->_check_vms($check_all);
 
 	$hkd->_check_l7rs;
 
-	sleep 2;
+	sleep $pool_time;
     }
 }
 
@@ -344,7 +351,7 @@ sub _vm_image_path {
     my $id = $vm->id;
     my $osi = $vm->rel_vm_id->osi;
     my $osiid = $osi->id;
-    my $image = cfg('path.storage.images').'/'.$osi->disk_image;
+    my $image = "$images_path/".$osi->disk_image;
 
     unless (-f $image) {
 	ERROR "Image $image attached to VM $id does not exist on disk";
@@ -353,8 +360,7 @@ sub _vm_image_path {
     return $image unless $osi->use_overlay;
 
     # FIXME: use a better policy for overlay allocation
-    my $overlay_dir = cfg('path.storage.overlays');
-    my $overlay = "$overlay_dir/$osiid-$id-overlay.qcow2";
+    my $overlay = "$overlays_path/$osiid-$id-overlay.qcow2";
     return $overlay if -f $overlay;
 
     unless ($create_if_needed) {
@@ -363,7 +369,7 @@ sub _vm_image_path {
     }
 
     # FIXME: use a relative path to the base image?
-    #my $image_relative = File::Spec->abs2rel($image, $overlay_dir);
+    #my $image_relative = File::Spec->abs2rel($image, $overlays_path);
     my @cmd = ($cmd{kvm_img}, 'create',
                -f => 'qcow2',
                -b => $image,
@@ -381,8 +387,7 @@ sub _vm_user_storage_path {
     my $osi = $vm->rel_vm_id->osi;
     my $size = $osi->user_storage_size // return undef;
 
-    my $home = cfg('path.storage.overlays');
-    my $image = "$home/$id-data.qcow2";
+    my $image = "$homes_path/$id-data.qcow2";
     return $image if -f $image;
 
     unless ($create_if_needed) {

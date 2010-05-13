@@ -46,12 +46,12 @@ log.filename = ${path.log}/qvd.log
 log.level = INFO
 
 # internal parameters, do not change!!!
-internal.l7r.poll_time = 2
 internal.l7r.timeout.vm_start = 270
 internal.l7r.timeout.x_start = 10
 internal.l7r.timeout.vma = 4
 internal.l7r.timeout.takeover = 30
 internal.l7r.retry.x_start = 5
+internal.l7r.poll_time = 2
 
 internal.hkd.timeout.state.starting = 240
 internal.hkd.timeout.state.stopping_1 = 30
@@ -59,3 +59,5 @@ internal.hkd.timeout.state.stopping_2 = 240
 internal.hkd.timeout.state.zombie_1 = 30
 internal.hkd.timeout.state.running = 120
 internal.hkd.timeout.vma = 4
+internal.hkd.poll_time = 2
+internal.hkd.poll_all_mod = 10
