@@ -49,6 +49,8 @@ wat.admin.login = admin
 log.filename = ${path.log}/qvd.log
 log.level = INFO
 
+vm.overlay.persistent = 0
+
 # internal parameters, do not change!!!
 internal.l7r.timeout.vm_start = 270
 internal.l7r.timeout.x_start = 10
@@ -70,4 +72,4 @@ internal.vm.port.x = 5000
 internal.vm.port.vma = 3030
 internal.vm.port.ssh = 22
 
-vm.overlay.persistent = 0
+
