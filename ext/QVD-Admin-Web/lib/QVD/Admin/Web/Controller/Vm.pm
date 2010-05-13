@@ -444,7 +444,7 @@ sub add : Local {
 	    print STDERR "vm_add called with error".Dumper($id);
 	    # FIXME response_type must be an enumerated
 	    $c->flash->{response_type} = "error";
-	    $c->flash->{response_msg}  = $model->error_msg;
+	    $c->flash->{response_msg}  = "A virtual machine of same name already exists.";
 	}
 	$c->response->redirect( $c->uri_for( $self->action_for('list') ) );
 
