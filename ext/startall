@@ -1,10 +1,9 @@
 #!/bin/sh
 
 pkill perl
-pkill kvm
 sleep 2
 
-perl -Mlib::glob=*/lib QVD-Admin/bin/qvd-init-db.pl
 perl -Mlib::glob=*/lib QVD-L7R/bin/qvd-l7rd.pl
-perl -Mlib::glob=*/lib QVD-HKD/bin/qvd-hkd.pl &
+perl -Mlib::glob=*/lib QVD-HKD/bin/qvd-hkd.pl
+perl -Mlib::glob=*/lib QVD-Admin-Web/script/qvd_admin_web_server.pl &
 

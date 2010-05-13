@@ -301,10 +301,14 @@ sub cmd_config_set {
     my ($self, %args) = @_;
     my $rs = $self->get_resultset('config');
     foreach my $key (keys %args) {
-	$rs->update_or_create({
-		key => $key,
-		value => $args{$key}
-	    });
+        if ($key =~ /^l7r\.ssl\./) {
+            warn "to set SSL keys and certificates use the 'config ssl' command\n";
+        }
+	else {
+            $rs->update_or_create({ key => $key,
+                                    value => $args{$key}
+                                  });
+        }
     }
 }
 
