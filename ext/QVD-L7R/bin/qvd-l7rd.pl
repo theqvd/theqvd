@@ -12,24 +12,34 @@ use File::Slurp qw(write_file);
 $App::Daemon::pidfile = cfg('l7r.pid_file');
 $App::Daemon::as_user = cfg('l7r.as_user');
 
-# retrieve SSL certificates from the database and install them locally
-my $certs_path = cfg('path.ssl.certs');
-mkdir $certs_path, 0700;
--d $certs_path or die "unable to create directory $certs_path\n";
-my ($mode, $uid) = (stat $certs_path)[2, 4];
-$uid == $> or $uid == 0 or die "bad owner for directory $certs_path\n";
-$mode & 0077 and die "bad permissions for directory $certs_path\n";
-my $cert_fn = "$certs_path/l7r-cert.pem";
-my $key_fn  = "$certs_path/l7r-key.pem";
-write_file($cert_fn, cfg('l7r.ssl.cert'))
-    or die "unable to write L7R SSL certificate to $cert_fn";
-write_file($key_fn, cfg('l7r.ssl.key'))
-    or die "unable to write L7R SSL key to $key_fn";
+my @args = (host => cfg('l7r.address'));
+
+if (cfg('l7r.use_ssl')) {
+    # retrieve SSL certificates from the database and install them locally
+    my $certs_path = cfg('path.ssl.certs');
+    mkdir $certs_path, 0700;
+    -d $certs_path or die "unable to create directory $certs_path\n";
+    my ($mode, $uid) = (stat $certs_path)[2, 4];
+    $uid == $> or $uid == 0 or die "bad owner for directory $certs_path\n";
+    $mode & 0077 and die "bad permissions for directory $certs_path\n";
+    my $cert_fn = "$certs_path/l7r-cert.pem";
+    my $key_fn  = "$certs_path/l7r-key.pem";
+    write_file($cert_fn, cfg('l7r.ssl.cert'))
+        or die "unable to write L7R SSL certificate to $cert_fn";
+    write_file($key_fn, cfg('l7r.ssl.key'))
+        or die "unable to write L7R SSL key to $key_fn";
+    push @args, (port => cfg('l7r.ssl_port'),
+                 SSL => 1,
+                 SSL_key_file => $key_fn,
+                 SSL_cert_file => $cert_fn);
+}
+else {
+    push @args, (port => cfg('l7r.port'));
+}
 
 daemonize;
-my $l7r = QVD::L7R->new(port => 8443, SSL => 1,
-                        SSL_key_file => $key_fn,
-                        SSL_cert_file => $cert_fn);
+my $l7r = QVD::L7R->new(@args);
+
 $l7r->run();
 
 __END__
