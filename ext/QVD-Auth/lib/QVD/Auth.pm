@@ -14,11 +14,11 @@ sub login {
     given ($mode) {
 	when('basic') {
 	    require QVD::Auth::Basic;
-	    QVD::Auth::Basic::login(@_);
+	    return QVD::Auth::Basic::login(@_);
 	}
 	when('ldap') {
 	    require QVD::Auth::LDAP;
-	    QVD::Auth::LDAP::login(@_);
+	    return QVD::Auth::LDAP::login(@_);
 	}
 	default {
 	    croak "bad authentication mode $_ (l7r.auth.mode)";

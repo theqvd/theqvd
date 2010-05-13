@@ -12,13 +12,24 @@ use File::Slurp qw(write_file);
 $App::Daemon::pidfile = cfg('l7r.pid_file');
 $App::Daemon::as_user = cfg('l7r.as_user');
 
-my $server_cert = cfg('l7r.ssl.cert');
-my $server_key = cfg('l7r.ssl.key');
+# retrieve SSL certificates from the database and install them locally
+my $certs_path = cfg('path.ssl.certs');
+mkdir $certs_path, 0700;
+-d $certs_path or die "unable to create directory $certs_path\n";
+my ($mode, $uid) = (stat $certs_path)[2, 4];
+$uid == $> or $uid == 0 or die "bad owner for directory $certs_path\n";
+$mode & 0077 and die "bad permissions for directory $certs_path\n";
+my $cert_fn = "$certs_path/l7r-cert.pem";
+my $key_fn  = "$certs_path/l7r-key.pem";
+write_file($cert_fn, cfg('l7r.ssl.cert'))
+    or die "unable to write L7R SSL certificate to $cert_fn";
+write_file($key_fn, cfg('l7r.ssl.key'))
+    or die "unable to write L7R SSL key to $key_fn";
 
 daemonize;
 my $l7r = QVD::L7R->new(port => 8443, SSL => 1,
-			SSL_key  => $server_key,
-			SSL_cert => $server_cert);
+                        SSL_key_file => $key_fn,
+                        SSL_cert_file => $cert_fn);
 $l7r->run();
 
 __END__

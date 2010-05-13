@@ -21,10 +21,10 @@ sub options {
     $self->SUPER::options($template);
     $prop->{SSL} ||= undef;
     $template->{SSL} = \$prop->{SSL};
-    $prop->{SSL_key} //= {};
-    $template->{SSL_key} = \$prop->{SSL_key};
-    $prop->{SSL_cert} //= {};
-    $template->{SSL_cert} = \$prop->{SSL_cert};
+    $prop->{SSL_key_file} //= undef;
+    $template->{SSL_key_file} = \$prop->{SSL_key_file};
+    $prop->{SSL_cert_file} //= undef;
+    $template->{SSL_cert_file} = \$prop->{SSL_cert_file};
 }
 
 # token          = 1*<any CHAR except CTLs or separators>
@@ -40,16 +40,9 @@ sub process_request {
 
     if ($self->{server}{SSL}) {
 	require IO::Socket::SSL;
-	DEBUG "SSL_cert:\n$self->{server}{SSL_cert}\n\nSSL_key:\n$self->{server}{SSL_key}\n\n";
-
-	use Data::Dumper;
-	DEBUG Dumper([$socket, SSL_server => 1, NonBlocking => 1,
-		      SSL_cert => $self->{server}{SSL_cert},
-		      SSL_key  => $self->{server}{SSL_key}]);
-
 	IO::Socket::SSL->start_SSL($socket, SSL_server => 1, NonBlocking => 1,
-				   SSL_cert => $self->{server}{SSL_cert},
-				   SSL_key  => $self->{server}{SSL_key});
+				   SSL_cert_file => $self->{server}{SSL_cert_file},
+				   SSL_key_file  => $self->{server}{SSL_key_file});
 	$socket->isa('IO::Socket::SSL')
 	    or die "SSL negotiation failed: " . IO::Socket::SSL::errstr()
 
