@@ -65,3 +65,9 @@ internal.hkd.timeout.state.running = 120
 internal.hkd.timeout.vma = 4
 internal.hkd.poll_time = 2
 internal.hkd.poll_all_mod = 10
+
+internal.vm.port.x = 5000
+internal.vm.port.vma = 3030
+internal.vm.port.ssh = 22
+
+vm.overlay.persistent = 0

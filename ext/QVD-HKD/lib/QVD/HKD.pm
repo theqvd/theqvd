@@ -34,6 +34,10 @@ my $images_path   = cfg('path.storage.images');
 my $overlays_path = cfg('path.storage.overlays');
 my $homes_path    = cfg('path.storage.homes');
 
+my $vm_port_x     = cfg('internal.vm.port.x');
+my $vm_port_vma   = cfg('internal.vm.port.vma');
+my $vm_port_ssh   = cfg('internal.vm.port.ssh');
+
 # The class QVD::HKD does not have state so we use the class name as
 # the object.
 #
@@ -317,9 +321,9 @@ sub _start_vm {
     my @cmd = ($cmd{kvm},
                -m => $osi->memory.'M',
                -vnc => ":${vnc_display}",
-               -redir => "tcp:${x_port}::5000",
-               -redir => "tcp:${vma_port}::3030",
-               -redir => "tcp:${ssh_port}::22");
+               -redir => "tcp:${x_port}::${vm_port_x}",
+               -redir => "tcp:${vma_port}::${vm_port_vma}",
+               -redir => "tcp:${ssh_port}::${vm_port_ssh}");
 
     my $image = $hkd->_vm_image_path($vm, 1) //
 	die "no disk image for vm $id";
