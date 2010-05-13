@@ -38,6 +38,8 @@ my $vm_port_x     = cfg('internal.vm.port.x');
 my $vm_port_vma   = cfg('internal.vm.port.vma');
 my $vm_port_ssh   = cfg('internal.vm.port.ssh');
 
+my $persistent_overlay = cfg('vm.overlay.persistent');
+
 # The class QVD::HKD does not have state so we use the class name as
 # the object.
 #
@@ -325,14 +327,14 @@ sub _start_vm {
                -redir => "tcp:${vma_port}::${vm_port_vma}",
                -redir => "tcp:${ssh_port}::${vm_port_ssh}");
 
-    my $image = $hkd->_vm_image_path($vm, 1) //
+    my $image = $hkd->_vm_image_path($vm) //
 	die "no disk image for vm $id";
 
     DEBUG "Using image $image for VM $id";
     push @cmd, -hda => $image;
 
     if (defined $osi->user_storage_size) {
-        my $user_storage = $hkd->_vm_user_storage_path($vm, 1) //
+        my $user_storage = $hkd->_vm_user_storage_path($vm) //
             die "no user storage for vm $id";
 
 	DEBUG "Using user storage $user_storage for VM $id";
@@ -351,7 +353,7 @@ sub _start_vm {
 }
 
 sub _vm_image_path {
-    my ($hkd, $vm, $create_if_needed) = @_;
+    my ($hkd, $vm) = @_;
     my $id = $vm->id;
     my $osi = $vm->rel_vm_id->osi;
     my $osiid = $osi->id;
@@ -365,11 +367,10 @@ sub _vm_image_path {
 
     # FIXME: use a better policy for overlay allocation
     my $overlay = "$overlays_path/$osiid-$id-overlay.qcow2";
-    return $overlay if -f $overlay;
-
-    unless ($create_if_needed) {
-        ERROR "Image overlay $overlay attached to VM $id does not exist on disk";
-        return undef;
+    if (-f $overlay) {
+        return $overlay if ($persistent_overlay);
+        # FIXME: save old overlay for later inspection
+        unlink $overlay;
     }
 
     # FIXME: use a relative path to the base image?
@@ -386,18 +387,13 @@ sub _vm_image_path {
 }
 
 sub _vm_user_storage_path {
-    my ($hkd, $vm, $create_if_needed) = @_;
+    my ($hkd, $vm) = @_;
     my $id = $vm->id;
     my $osi = $vm->rel_vm_id->osi;
     my $size = $osi->user_storage_size // return undef;
 
     my $image = "$homes_path/$id-data.qcow2";
     return $image if -f $image;
-
-    unless ($create_if_needed) {
-        ERROR "User storage $image attached to VM $id does not exist on disk";
-        return undef;
-    }
 
     my @cmd = ($cmd{kvm_img}, 'create',
                -f => 'qcow2',
