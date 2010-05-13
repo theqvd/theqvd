@@ -9,12 +9,12 @@ $defaults->load(*DATA);
 
 __DATA__
 
-# nodename = blas
+# nodename =
 
 database.host = localhost
 database.user = qvd
 database.name = qvd
-# database.password = passw0rd
+# database.password =
 
 path.run = /var/run/qvd
 path.log = /var/log
@@ -44,7 +44,7 @@ hkd.as_user = qvd
 hkd.pid_file = ${path.run}/hkd.pid
 
 wat.admin.login = admin
-# wat.admin.password = foobar
+# wat.admin.password =
 
 log.filename = ${path.log}/qvd.log
 log.level = INFO
