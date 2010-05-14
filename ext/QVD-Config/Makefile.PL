@@ -12,6 +12,7 @@ WriteMakefile(
       : ()),
     PL_FILES            => {},
     PREREQ_PM => {
+	'Config::Properties' => 0,
 	'QVD::DB' => 0,
         'Test::More' => 0,
     },
