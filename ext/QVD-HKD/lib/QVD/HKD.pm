@@ -27,16 +27,25 @@ my %timeout = ( starting    => cfg('internal.hkd.timeout.state.starting'),
 
 my $parallel_net_timeout = cfg('internal.hkd.timeout.vma');
 
-my $pool_time     = cfg('internal.hkd.poll_time');
-my $pool_all_mod  = cfg('internal.hkd.poll_all_mod');
+my $pool_time       = cfg('internal.hkd.poll_time');
+my $pool_all_mod    = cfg('internal.hkd.poll_all_mod');
 
-my $images_path   = cfg('path.storage.images');
-my $overlays_path = cfg('path.storage.overlays');
-my $homes_path    = cfg('path.storage.homes');
+my $images_path     = cfg('path.storage.images');
+my $overlays_path   = cfg('path.storage.overlays');
+my $homes_path      = cfg('path.storage.homes');
+my $captures_path   = cfg('path.serial.captures');
 
-my $vm_port_x     = cfg('internal.vm.port.x');
-my $vm_port_vma   = cfg('internal.vm.port.vma');
-my $vm_port_ssh   = cfg('internal.vm.port.ssh');
+my $vm_port_x       = cfg('internal.vm.port.x');
+my $vm_port_vma     = cfg('internal.vm.port.vma');
+my $vm_port_ssh     = cfg('internal.vm.port.ssh');
+
+my $ssh_redirect    = cfg('vm.ssh.redirect');
+
+my $vnc_redirect    = cfg('vm.vnc.redirect');
+my $vnc_opts        = cfg('vm.vnc.opts');
+
+my $serial_redirect = cfg('vm.serial.redirect');
+my $serial_capture  = cfg('vm.serial.capture');
 
 my $persistent_overlay = cfg('vm.overlay.persistent');
 
@@ -265,11 +274,15 @@ sub _allocate_port { $port++ }
 
 sub _assign_vm_ports {
     my ($hkd, $vm) = @_;
-    $vm->update({vm_address => $vm->host->address,
-		 vm_vma_port => $hkd->_allocate_port,
-		 vm_x_port => $hkd->_allocate_port,
-		 vm_ssh_port => $hkd->_allocate_port,
-		 vm_vnc_port => 5900 + $vm->vm_id });
+
+    my @ports = (vm_vma_port => $hkd->_allocate_port,
+		 vm_x_port => $hkd->_allocate_port);
+
+    push @ports, vm_ssh_port => $hkd->_allocate_port if $ssh_redirect;
+    push @ports, vm_vnc_port => $hkd->_allocate_port if $vnc_redirect;
+    push @ports, vm_serial_port => $hkd->_allocate_port if $serial_redirect;
+
+    $vm->update({vm_address => $vm->host->address, @ports });
 }
 
 # this method must always be called from inside a txn_eval block!!!
@@ -301,7 +314,7 @@ sub _enter_vm_state_stopping_1 {
 
 sub _enter_vm_state_stopped {
     my ($hkd, $vm) = @_;
-    $vm->clear_host_id;
+    $vm->unassign;
 }
 
 sub _enter_vm_state_zombie_1 {
@@ -314,18 +327,43 @@ sub _start_vm {
     my $id = $vm->vm_id;
     my $vma_port = $vm->vm_vma_port;
     my $x_port = $vm->vm_x_port;
+    my $vnc_port = $vm->vm_vnc_port;
     my $ssh_port = $vm->vm_ssh_port;
-    my $vnc_display = $vm->vm_vnc_port - 5900;
+    my $serial_port = $vm->vm_serial_port;
     my $osi = $vm->rel_vm_id->osi;
+    my $address = $vm->vm_address;
+    my $name = rs(VM)->find($vm->vm_id)->name;
 
     INFO "starting VM $id";
 
     my @cmd = ($cmd{kvm},
                -m => $osi->memory.'M',
-               -vnc => ":${vnc_display}",
                -redir => "tcp:${x_port}::${vm_port_x}",
                -redir => "tcp:${vma_port}::${vm_port_vma}",
                -redir => "tcp:${ssh_port}::${vm_port_ssh}");
+
+    my $redirect_io = $serial_capture;
+    if ($vm->vm_serial_port) {
+        push @cmd, -serial => "telnet:${address}:$serial_port,server,nowait,nodelay";
+        undef $redirect_io;
+    }
+
+    if ($redirect_io) {
+        mkdir $captures_path, 0700;
+        -d $captures_path or die "directory $captures_path does not exist\n";
+        my @t = gmtime; $t[5] += 1900; $t[4] += 1;
+        my $ts = sprintf("%04d-%02d-%02d-%02d:%02d:%2d-GMT0", @t[5,4,3,2,1,0]);
+        push @cmd, -serial => "file:$captures_path/capture-$name-$ts.txt";
+    }
+
+    if ($vnc_port) {
+        my $vnc_display = $vnc_port - 5900;
+        $vnc_display .= ",$vnc_opts" if $vnc_opts =~ /\S/;
+        push @cmd, -vnc => ":$vnc_display";
+    }
+    else {
+        push @cmd, '-nographic';
+    }
 
     my $image = $hkd->_vm_image_path($vm) //
 	die "no disk image for vm $id";
@@ -341,11 +379,17 @@ sub _start_vm {
         push @cmd, -hdb => $user_storage;
     }
 
+
     my $pid = fork;
     unless ($pid) {
 	$pid // die "unable to fork virtual machine process";
-	do { exec  @cmd };
-	ERROR "exec @cmd failed\n";
+        eval {
+            open STDOUT, '>', '/dev/null' or die "can't redirect STDOUT to /dev/null\n";
+            open STDERR, '>&', STDOUT or die "can't redirect STDERR to STDOUT\n";
+            open STDIN, '<', '/dev/null' or die "can't open /dev/null\n";
+            exec @cmd or die "exec failed\n";
+        };
+	ERROR "Unable to start VM: $@";
 	POSIX::_exit(1);
     }
     DEBUG "kvm pid: $pid\n";

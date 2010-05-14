@@ -18,12 +18,14 @@ database.name = qvd
 
 path.run = /var/run/qvd
 path.log = /var/log
+path.tmp = /var/tmp
 path.storage.root = /var/lib/qvd/storage
 path.storage.staging = ${path.storage.root}/staging
 path.storage.images = ${path.storage.root}/images
 path.storage.overlays = ${path.storage.root}/overlays
 path.storage.homes = ${path.storage.root}/homes
 path.ssl.certs = ${path.run}/ssl
+path.serial.captures = ${path.tmp}/qvd
 
 command.kvm = kvm
 command.kvm-img = kvm-img
@@ -50,6 +52,12 @@ log.filename = ${path.log}/qvd.log
 log.level = INFO
 
 vm.overlay.persistent = 0
+
+vm.vnc.redirect = 0
+vm.vnc.opts =
+vm.serial.redirect = 1
+vm.serial.capture = 0
+vm.ssh.redirect = 1
 
 # internal parameters, do not change!!!
 internal.l7r.timeout.vm_start = 270

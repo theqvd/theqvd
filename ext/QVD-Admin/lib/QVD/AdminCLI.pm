@@ -919,6 +919,35 @@ Valid options:
 EOT
 }
 
+sub cmd_vm_console {
+    my ($self, @args) = @_;
+    eval {
+	my $vm_runtime = $self->_get_single_vm_runtime;
+	my $serial_port = $vm_runtime->vm_serial_port;
+	die 'Console access is disabled' unless defined $serial_port;
+	exec telnet => $vm_runtime->vm_address, $serial_port, @args
+            or die "Unable to exec ssh: $^E";
+    };
+    if ($@) {
+	$self->_print("Wrong syntax, check the command help:\n");
+	$self->help_vm_console;
+    }
+}
+
+sub help_vm_console {
+    print <<EOT
+vm ssh: Connects to the virtual machine console
+usage: vm console
+
+  Example:
+  vm console -f id=42
+
+Valid options:
+    -f [--filter] FILTER : connect to the virtual machine matched by FILTER
+EOT
+}
+
+
 sub cmd_vm_vnc {
     my ($self, @args) = @_;
     eval {

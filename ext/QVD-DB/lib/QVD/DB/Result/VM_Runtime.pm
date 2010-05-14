@@ -109,6 +109,10 @@ __PACKAGE__->add_columns(
             data_type => 'integer',
             is_nullable => 1,
         },
+        vm_serial_port => {
+            data_type => 'integer',
+            is_nullable => 1,
+        },
 	osi_actual_id => {
             data_type => 'integer',
             is_nullable => 1,
@@ -188,7 +192,16 @@ sub send_user_abort { shift->send_user_cmd('abort') }
 sub update_vma_ok_ts { shift->update({vma_ok_ts => time}) }
 sub clear_vma_ok_ts { shift->update({vma_ok_ts => undef}) }
 
-sub clear_host_id { shift->update({host_id => undef}) }
+sub unassign {
+    shift->update({host_id => undef,
+                   vm_vma_port => undef,
+                   vm_x_port => undef,
+                   vm_vnc_port => undef,
+                   vm_ssh_port => undef,
+                   vm_serial_port => undef,
+                   vm_address => undef,
+                   vma_ok_ts => undef});
+}
 
 sub set_vm_pid {
     my ($vm, $pid) = @_;
