@@ -70,8 +70,7 @@ This module encapsulate configuration access.
 
 =head1 DESCRIPTION
 
-A list of functions that can be exported.  You can delete this section
-if you don't export anything, such as for a purely object-oriented module.
+FIXME Write the description
 
 =head2 FUNCTIONS
 
@@ -102,22 +101,10 @@ Hugo Cornejo (hcornejo at qindel.com)
 
 Salvador FandiE<ntilde>o (sfandino@yahoo.com)
 
-=head1 BUGS
+=head1 COPYRIGHT
 
-Please report any bugs or feature requests to C<bug-qvd-config at
-rt.cpan.org>, or through the web interface at
-L<http://rt.cpan.org/NoAuth/ReportBug.html?Queue=QVD-Config>.  I will
-be notified, and then you'll automatically be notified of progress on
-your bug as I make changes.
-
-=head1 COPYRIGHT & LICENSE
-
-Copyright 2009, 2010 Qindel Formacion y Servicios S.L.
+Copyright 2009-2010 by Qindel Formacion y Servicios S.L.
 
 This program is free software; you can redistribute it and/or modify it
-under the terms of either: the GNU General Public License as published
-by the Free Software Foundation; or the Artistic License.
-
-See http://dev.perl.org/licenses/ for more information.
-
-=cut
+under the terms of the GNU GPL version 3 as published by the Free
+Software Foundation.
