@@ -1,7 +1,6 @@
 # this package is named QVD::VMA::Config but it supplants QVD::Config;
 
-package QVD::Config;
-$INC{'QVD/Config.pm'} = "Supplanted by QVD::VMA::Config";
+package QVD::VMA::Config;
 
 use strict;
 use warnings;
@@ -32,6 +31,16 @@ sub core_cfg_all {
 }
 
 *cfg = \&core_cfg;
+
+# supplant QVD::Config:
+$INC{'QVD/Config.pm'} = "Supplanted by QVD::VMA::Config";
+
+*QVD::Config::import = \&import;
+*QVD::Config::EXPORT = \@EXPORT;
+
+*QVD::Config::core_cfg = \&core_cfg;
+*QVD::Config::core_cfg_all = \&core_cfg_all;
+*QVD::Config::cfg = \&cfg;
 
 1;
 
