@@ -20,9 +20,10 @@ use Carp;
 use File::Slurp qw(slurp);
 use File::Spec;
 use POSIX;
+use QVD::Config;
 use QVD::Log;
-use QVD::VMA::Config;
 use feature qw(switch);
+
 use parent 'QVD::SimpleRPC::Server';
 
 sub _slurp_line {

@@ -6,11 +6,17 @@ use Fcntl ':flock';
 use File::Spec::Functions qw(rel2abs);
 use File::Basename;
 
-my $QVD_SESSION_DIR = "/var/run/qvd";
+use QVD::VMA::Config;
+
+# FIXME: DO NOT SHOUT!!!
+# use lexical file handlers and simplify
+
+my $QVD_SESSION_DIR = cfg('path.run');
 my $QVD_SESSION_STATUS_FILE = $QVD_SESSION_DIR."/state";
 my $QVD_SESSION_PID_FILE = $QVD_SESSION_DIR."/nxagent.pid";
 my $QVD_SESSION_LOG_FILE = $QVD_SESSION_DIR."/nxagent.log";
-my $NXAGENT = "nxagent";
+my $NXAGENT = cfg('command.nxagent');
+
 my @NXAGENT_OPTS = @ARGV;
 
 sub open_status_file {
@@ -18,7 +24,10 @@ sub open_status_file {
 }
 
 sub setup_environment {
+
+    # FIXME: rename nxdiag.pl to qvd-nxdiag and let nxagent find it on the $PATH
     $ENV{NX_CLIENT} = dirname(rel2abs($0))."/nxdiag.pl";
+
     # Something occasionally sends a SIGTERM to the monitor and makes it die
     # FIXME Find out why we receive SIGTERM and how we should deal with it
     $SIG{TERM} = 'IGNORE';
@@ -100,6 +109,9 @@ sub launch_nxagent {
     close NXAGENT_FH;
     handle_status "exited $status"
 }
+
+mkdir $QVD_SESSION_DIR, 755;
+-d $QVD_SESSION_DIR or die "Directory $QVD_SESSION_DIR does not exist";
 
 open_pid_file or die "Can't open pid file: $!";
 open_log_file or die "Can't open log file: $!";

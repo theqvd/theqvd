@@ -111,7 +111,7 @@ sub connect_to_vm_processor {
     }
     my %x_params;
     for (qw(keyboard client)) {
-	$x_params = $params{$_} if defined $params{$_};
+	$x_params{$_} = $params{$_} if defined $params{$_};
     }
 
     my $vm = rs(VM_Runtime)->search({vm_id => $vm_id})->first;
