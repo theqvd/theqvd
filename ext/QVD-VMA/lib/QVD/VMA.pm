@@ -147,10 +147,16 @@ sub _start_or_resume_session {
 	    my $displayn = 1000;
 	    $ENV{PULSE_SERVER} = "tcp:localhost:".($displayn+7000);
 
-	    my $extra_args = join ',', map "$_=$x_args{$_}", keys %x_args;
+	    my $display = join(',', 'nx/nx', 'link=lan',
+			       (map "$_=$x_args{$_}", keys %x_args),
+			       'media=1') . ":$displayn";
+			    
 	    # FIXME: remove su, do it in perl
+
 	    # FIXME: remove shell call to invoke xinit
-	    { exec "su - qvd -c \"xinit $desktop -- $xagent :$displayn -name QVD -display nx/nx,link=lan,media=1:$displayn -ac\"" }
+
+	    # FIXME: remove -ac as we are not certain this does not impact on the security of the platform
+	    { exec "su - qvd -c \"xinit $desktop -- $xagent :$displayn -name QVD -display $display -ac\"" }
 	    POSIX::_exit(-1);
 	}
     }
