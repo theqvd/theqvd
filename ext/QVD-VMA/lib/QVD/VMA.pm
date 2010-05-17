@@ -102,7 +102,8 @@ sub _suspend_or_wakeup_session {
 }
 
 sub _start_or_resume_session {
-    my $self = shift;
+    # FIXME: fully rewrite this method!
+    my ($self, %x_args) = @_;
     INFO("start or resume session");
     if ($self->_is_nxagent_running) {
 	if ($self->_is_nxagent_suspended) {
@@ -143,6 +144,10 @@ sub _start_or_resume_session {
 	    defined $pid or carp "fork failed";
 	    my $displayn = 1000;
 	    $ENV{PULSE_SERVER} = "tcp:localhost:".($displayn+7000);
+
+	    my $extra_args = join ',', map "$_=$x_args{$_}", keys %x_args;
+	    # FIXME: remove su, do it in perl
+	    # FIXME: remove shell call to invoke xinit
 	    { exec "su - qvd -c \"xinit $desktop -- $xagent :$displayn -name QVD -display nx/nx,link=lan,media=1:$displayn -ac\"" }
 	    POSIX::_exit(-1);
 	}
@@ -158,9 +163,17 @@ sub _shutdown {
 }
 
 sub SimpleRPC_start_x_listener {
-    my $self = shift;
+    my ($self, %x_args) = shift;
     INFO "starting X listener";
-    $self->_start_or_resume_session;
+
+    while (my ($k, $v) = each %x_args) {
+	$k =~ m{^(?:keyboard|system)$}
+	    or die "invalid parameter $k";
+	$v =~ m{^[\w/\-\+]$}
+	    or die "invalid characters in parameter $k";
+    }
+
+    $self->_start_or_resume_session(%x_args);
 }
 
 sub SimpleRPC_x_state { shift->_x_state }

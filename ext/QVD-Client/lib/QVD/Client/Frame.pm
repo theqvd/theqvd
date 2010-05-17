@@ -210,7 +210,8 @@ sub ConnectToVM {
 	return;
     }
 
-    $httpc->send_http_request(GET => '/qvd/connect_to_vm?id='.$vm_id,
+    # FIXME: get real keyboard mapping instead of using a hardcoded one
+    $httpc->send_http_request(GET => '/qvd/connect_to_vm?id=$vm_id&keyboard=pc105/es&client=linux'
 	headers => [
 	"Authorization: Basic $auth",
 	'Connection: Upgrade',

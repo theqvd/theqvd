@@ -109,6 +109,10 @@ sub connect_to_vm_processor {
 	$l7r->send_http_error(HTTP_UNPROCESSABLE_ENTITY);
 	return;
     }
+    my %x_params;
+    for (qw(keyboard client)) {
+	$x_params = $params{$_} if defined $params{$_};
+    }
 
     my $vm = rs(VM_Runtime)->search({vm_id => $vm_id})->first;
 
@@ -132,7 +136,7 @@ sub connect_to_vm_processor {
 	$l7r->_takeover_vm($vm);
 	$l7r->_assign_vm($vm);
 	$l7r->_start_and_wait_for_vm($vm);
-	$l7r->_start_x($vm);
+	$l7r->_start_x($vm, %x_params);
 	$l7r->_wait_for_x($vm);
 	$l7r->_run_forwarder($vm);
     };
@@ -251,12 +255,12 @@ sub _start_and_wait_for_vm {
 }
 
 sub _start_x {
-    my ($l7r, $vm) = @_;
+    my ($l7r, $vm, @x_params) = @_;
     $l7r->_tell_client("Starting X session");
     my $resp;
     for (0..$x_start_retry) {
 	my $vma = $l7r->_vma_client($vm);
-	$resp = eval { $vma->start_x_listener };
+	$resp = eval { $vma->start_x_listener(@x_params) };
 	last unless $@;
 	sleep 1;
 	$l7r->_check_abort($vm, 1);
