@@ -175,7 +175,7 @@ sub SimpleRPC_start_x_listener {
     INFO "starting X listener";
 
     while (my ($k, $v) = each %x_args) {
-	$k =~ m{^(?:keyboard|system)$}
+	$k =~ m{^(?:keyboard|client)$}
 	    or die "invalid parameter $k";
 	$v =~ m{^[\w/\-\+]$}
 	    or die "invalid characters in parameter $k";
