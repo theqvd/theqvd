@@ -9,9 +9,6 @@ WriteMakefile(
     ABSTRACT_FROM       => 'lib/QVD/Admin.pm',
     EXE_FILES		=> [
 	'bin/qvd-admin.pl',
-	'bin/qvd-delete-db.pl',
-	'bin/qvd-deploy-db.pl',
-	'bin/qvd-init-db.pl',
     ],
     PL_FILES            => {},
     PREREQ_PM => {

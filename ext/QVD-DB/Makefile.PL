@@ -7,6 +7,9 @@ WriteMakefile(
 	AUTHOR              => 'QVD Team <qvd@qindel.es>',
 	VERSION	            => '0.01.'.$ENV{SVN_REVISION},
 	ABSTRACT_FROM       => 'lib/QVD/DB.pm',
+	EXE_FILES => [
+		'bin/qvd-deploy-db.pl',
+	],
 	PL_FILES            => {},
 	PREREQ_PM => {
 		'DBD::Pg' => 0,
