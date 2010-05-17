@@ -5,19 +5,15 @@ use warnings;
 
 # ensure we load the VMA configuration package supplanting VMA::Config
 use QVD::VMA::Config;
+
 use QVD::VMA;
 
 $ENV{PATH} = join(':', $ENV{PATH}, '/sbin/');
 
-use App::Daemon qw/daemonize/;
-
-my $rundir = cfg('vma.run_dir', '/var/run/qvd');
--d $rundir or mkdir $rundir;
+use App::Daemon qw(daemonize);
 
 $App::Daemon::pidfile = cfg('vma.pid_file');
 $App::Daemon::as_user = cfg('vma.as_user');
-
-use QVD::Log;
 
 daemonize();
 my $vma = QVD::VMA->new(port => 3030);
