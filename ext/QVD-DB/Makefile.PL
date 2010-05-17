@@ -17,6 +17,7 @@ WriteMakefile(
 		'Log::Log4perl' => 0,
 		'parent' => 0,
 		'QVD::Config' => 0,
+		'QVD::Log' => 0,
 		'SQL::Translator' => 0,
 		'Test::More' => 0,
 	},
