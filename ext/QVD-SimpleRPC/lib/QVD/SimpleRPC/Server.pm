@@ -32,7 +32,7 @@ sub _process_request {
     $function = "SimpleRPC_$function";
 
     local $SIG{__DIE__};
-    DEBUG "SimpleRPC serving $function";
+    DEBUG "SimpleRPC serving $function(". join(', ', @params).')';
     my $data = eval { $self->$function(@params) };
     if ($@) {
 	my $saved_err = $@;
