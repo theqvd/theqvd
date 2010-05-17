@@ -20,7 +20,7 @@ use Carp;
 use File::Slurp qw(slurp);
 use File::Spec;
 use POSIX;
-use QVD::Config;
+use QVD::VMA::Config;
 use QVD::Log;
 use feature qw(switch);
 
