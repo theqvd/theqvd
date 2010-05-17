@@ -936,7 +936,7 @@ sub cmd_vm_console {
 
 sub help_vm_console {
     print <<EOT
-vm ssh: Connects to the virtual machine console
+vm console: Connects to the virtual machine console
 usage: vm console
 
   Example:
