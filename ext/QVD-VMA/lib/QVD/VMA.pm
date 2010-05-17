@@ -106,7 +106,7 @@ sub _suspend_or_wakeup_session {
 sub _start_or_resume_session {
     # FIXME: fully rewrite this method!
     my ($self, %x_args) = @_;
-    INFO("start or resume session");
+    INFO("start or resume session with @_";
     if ($self->_is_nxagent_running) {
 	if ($self->_is_nxagent_suspended) {
 	    DEBUG("Waking up suspended nxagent..");
@@ -135,7 +135,7 @@ sub _start_or_resume_session {
 	    # FIXME: remove this sleep
 	    # let the L7R take care of this
 	    sleep 2;
-	    $self->_start_or_resume_session;
+	    $self->_start_or_resume_session(%x_args);
 	}
     } else {
 	my $desktop = $self->{_desktop};
