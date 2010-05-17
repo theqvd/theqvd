@@ -106,7 +106,7 @@ sub _suspend_or_wakeup_session {
 sub _start_or_resume_session {
     # FIXME: fully rewrite this method!
     my ($self, %x_args) = @_;
-    INFO("start or resume session with @_";
+    INFO("start or resume session with @_");
     if ($self->_is_nxagent_running) {
 	if ($self->_is_nxagent_suspended) {
 	    DEBUG("Waking up suspended nxagent..");
