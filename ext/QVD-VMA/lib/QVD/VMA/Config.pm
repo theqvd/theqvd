@@ -28,7 +28,7 @@ sub core_cfg {
 }
 
 sub core_cfg_all {
-    map { $_ => vma_cfg($_) } $vma_cfg->propertyNames
+    map { $_ => core_cfg($_) } $vma_cfg->propertyNames
 }
 
 *cfg = \&core_cfg;
