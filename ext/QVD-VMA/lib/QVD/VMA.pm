@@ -5,6 +5,7 @@ our $VERSION = '0.01';
 use warnings;
 use strict;
 
+use QVD::VMA::Config;
 use parent 'QVD::HTTPD';
 
 sub post_configure_hook {
@@ -20,7 +21,7 @@ use Carp;
 use File::Slurp qw(slurp);
 use File::Spec;
 use POSIX;
-use QVD::VMA::Config;
+use QVD::Config;
 use QVD::Log;
 use feature qw(switch);
 
@@ -108,7 +109,7 @@ sub _start_or_resume_session {
     INFO("start or resume session");
     if ($self->_is_nxagent_running) {
 	if ($self->_is_nxagent_suspended) {
-	    DEBUG ("Waking up suspended nxagent..");
+	    DEBUG("Waking up suspended nxagent..");
 	    $self->_suspend_or_wakeup_session;
 	} elsif ($self->_is_nxagent_started) {
 	    DEBUG ("Suspending active nxagent to steal session..");
