@@ -171,7 +171,7 @@ sub _shutdown {
 }
 
 sub SimpleRPC_start_x_listener {
-    my ($self, %x_args) = shift;
+    my ($self, %x_args) = @_;
     INFO "starting X listener";
 
     while (my ($k, $v) = each %x_args) {
