@@ -1,7 +1,7 @@
 # this package is named QVD::VMA::Config but it supplants QVD::Config;
 
 package QVD::Config;
-$INC{QVD/Config.pm} = $INC{QVD/VMA/Config.pm};
+$INC{'QVD/Config.pm'} = $INC{'QVD/VMA/Config.pm'};
 
 use strict;
 use warnings;
