@@ -10,4 +10,4 @@ Package: qvd-sample-config
 Architecture: all
 Depends: ${shlibs:Depends}, ${misc:Depends}
 Description: The QVD sample configuration
- The QVD sample configuration includes the sample config.ini and log4perl.conf files.
+ The QVD sample configuration includes the sample node.conf file.

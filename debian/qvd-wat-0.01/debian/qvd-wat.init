@@ -44,7 +44,7 @@ DIETIME=10              # Time to wait for the server to die, in seconds
 CONFDIR=/etc/qvd
 if [ ! -d "$CONFDIR" ]; then
     echo "Configuration directory $CONFDIR doesn't exist."
-    echo "Create it with 'cp -R /usr/share/qvd/config $CONFDIR' and edit config.ini."
+    echo "Create it with 'cp -R /usr/share/qvd/config $CONFDIR' and edit node.conf."
     exit 0
 fi
 
