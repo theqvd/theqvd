@@ -11,6 +11,7 @@ WriteMakefile(
     EXE_FILES           => [ qw(bin/qvd-client.pl bin/qvd-gui-client.pl) ],
     PREREQ_PM => {
 	'IO::Socket::Forwarder' => 0,
+	'IO::Socket::SSL' => 0,
 	'JSON' => 0,
 	'MIME::Base64' => 0,
 	'parent' => 0,
