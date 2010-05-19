@@ -9,12 +9,15 @@ use Config::Properties;
 use QVD::Config::Defaults;
 
 use Exporter qw(import);
-our @EXPORT = qw(core_cfg core_cfg_all cfg ssl_cfg);
+our @EXPORT = qw(core_cfg core_cfg_all core_cfg_keys cfg ssl_cfg);
+
+our $USE_DB //= 1;
+our $FILE   //= '/etc/qvd/node.conf';
 
 my $core_cfg = Config::Properties->new($QVD::Config::defaults);
 
-open my $cfg_fh, '<', '/etc/qvd/node.conf'
-    or die "unable to read configuration file /etc/qvd/node.conf'\n";
+open my $cfg_fh, '<', $FILE
+    or die "unable to read configuration file $FILE\n";
 $core_cfg->load($cfg_fh);
 close $cfg_fh;
 
@@ -28,28 +31,37 @@ sub core_cfg_all {
     map { $_ => core_cfg($_) } $core_cfg->propertyNames
 }
 
+sub core_cfg_keys { $core_cfg->propertyNames }
+
 my $cfg;
 
 sub reload {
-    # we load the database module on demand in order to avoid circular
-    # dependencies
-    require QVD::DB::Simple;
-    $cfg = { map { $_->key => $_->value } QVD::DB::Simple::rs('Config')->all }
+    if ($USE_DB) {
+	# we load the database module on demand in order to avoid circular
+	# dependencies
+	require QVD::DB::Simple;
+	$cfg = { map { $_->key => $_->value } QVD::DB::Simple::rs('Config')->all }
+    }
 }
 
 sub cfg {
-    my $key = shift;
-    if ($key =~ /^l7r\.ssl\./) {
-	# SSL keys are only loaded on demand.
-	require QVD::DB::Simple;
-	my $slot = QVD::DB::Simple::rs('SSL_Config')->search({ key => $key })->first;
-	return $slot->value if defined $slot;
+    if ($USE_DB) {
+	my $key = shift;
+	if ($key =~ /^l7r\.ssl\./) {
+	    # SSL keys are only loaded on demand.
+	    require QVD::DB::Simple;
+	    my $slot = QVD::DB::Simple::rs('SSL_Config')->search({ key => $key })->first;
+	    return $slot->value if defined $slot;
+	}
+	$cfg // reload;
+	my $value = $cfg->{$key} // $core_cfg->getProperty($key, @_) //
+	    die "Configuration entry for $key missing\n";
+	$value =~ s/\$\{(.*?)\}/cfg($1)/ge;
+	$value;
     }
-    $cfg // reload;
-    my $value = $cfg->{$key} // $core_cfg->getProperty($key, @_) //
-	die "Configuration entry for $key missing\n";
-    $value =~ s/\$\{(.*?)\}/cfg($1)/ge;
-    $value;
+    else {
+	goto &core_cfg;
+    }
 }
 
 1;
