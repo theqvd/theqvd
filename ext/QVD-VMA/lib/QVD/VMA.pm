@@ -5,7 +5,6 @@ our $VERSION = '0.02';
 use warnings;
 use strict;
 
-use QVD::VMA;
 use parent 'QVD::HTTPD';
 
 sub post_configure_hook {
@@ -23,9 +22,10 @@ sub post_child_cleanup_hook {
 package QVD::VMA::Impl;
 
 use POSIX;
+use Fcntl qw(:flock);
+use feature qw(switch);
 use QVD::Config;
 use QVD::Log;
-use feature qw(switch);
 
 use parent 'QVD::SimpleRPC::Server';
 
@@ -48,8 +48,8 @@ our $nxagent_pid_fn   = "$run_path/nxagent.pid";
 
 my %x_env;
 for (core_cfg_keys) {
-    /^vma\.x-session\.env\.(.*)/
-	and $x_env{$1} = core_cfg $1;
+    /^(vma\.x-session\.env\.(.*))$/
+	and $x_env{$2} = core_cfg $1;
 }
 
 my %nx2x = ( initiating  => 'starting',
@@ -94,9 +94,9 @@ sub _become_user {
 sub _read_line {
     my $fn = shift;
     open my $fh, '<', $fn or return '';
-    lock $fh, LOCK_SH;
+    flock $fh, LOCK_SH;
     my $line = <$fh>;
-    lock $fh, LOCK_UN;
+    flock $fh, LOCK_UN;
     close $fh;
     chomp $line;
     $line;
@@ -105,11 +105,11 @@ sub _read_line {
 sub _write_line {
     my ($fn, $line) = @_;
     sysopen my $fh, $fn, O_CREAT|O_RDWR, 644;
-    lock $fh, LOCK_EX;
+    flock $fh, LOCK_EX;
     seek($fh, 0, 0);
     truncate $fh, 0;
     print $fh $line, "\n";
-    lock $fh, LOCK_UN;
+    flock $fh, LOCK_UN;
     close $fh;
 }
 
@@ -128,15 +128,16 @@ sub _timestamp {
 
 sub _open_log {
     my $log_fn = "$log_path/nxagent-" . _timestamp . ".log";
-    open my $log, '>>' $log_fn or die "unable to open nxagent log file $log_fn\n";
+    open my $log, '>>', $log_fn or die "unable to open nxagent log file $log_fn\n";
     return $log;
 }
 
 sub _fork_monitor {
+    my %x_args = @_;
     my $log = _open_log;
     print $log _timestamp . " :Starting nxagent";
 
-    save_nxagent_state 'initiating';
+    _save_nxagent_state 'initiating';
 
     my $pid = fork;
     if (!$pid) {
@@ -198,13 +199,13 @@ sub _state {
     my $state_line = _read_line $nxagent_state_fn;
     my ($nxstate, $timestamp) = $state_line =~ /^(.*?)(?:(.*))?$/;
 
-    my $state = $nx2x{$state};
+    my $state = $nx2x{$nxstate};
     my $timeout = $timeout{$state};
     my $pid = _read_line $nxagent_pid_fn;
 
     if ($timeout and $timestamp) {
 	if (time > $timestamp + $timeout) {
-	    $pid amd kill TERM => $pid;
+	    $pid and kill TERM => $pid;
 	    return 'stopping';
 	}
     }
@@ -215,7 +216,7 @@ sub _state {
 	}
     }
 
-    delete_nxagent_state_and_pid if $state eq 'stopped';
+    _delete_nxagent_state_and_pid if $state eq 'stopped';
 
     return wantarray ? ($state, $pid) : $state;
 }
@@ -223,7 +224,7 @@ sub _state {
 sub _suspend_session {
     my ($state, $pid) = _state;
     if ($pid and $connected{$state}) {
-	kill HUP, $pid
+	kill HUP => $pid;
 	return 'starting';
     }
     $state;
@@ -232,7 +233,7 @@ sub _suspend_session {
 sub _stop_session {
     my ($state, $pid) = _state;
     if ($pid) {
-	kill TERM, $pid;
+	kill TERM => $pid;
 	return 'stopping'
     }
     $state;
@@ -240,7 +241,7 @@ sub _stop_session {
 
 sub _start_session {
     my %x_args = @_;
-    my ($state, $pid) = _nxagent_state;
+    my ($state, $pid) = _state;
     given ($state) {
 	when ('suspended') {
 	    DEBUG "awaking nxagent";
@@ -252,7 +253,7 @@ sub _start_session {
 	    die "Can't connect to X session in state connected, suspending it, retry later\n";
 	}
 	when ('stopped') {
-	    fork_monitor;
+	    _fork_monitor;
 	}
 	default {
 	    die "Unable to start/resume X session in state $_";
@@ -271,17 +272,17 @@ sub SimpleRPC_poweroff {
     system(init => 0);
 }
 
-sub SimpleRPC_suspend_x {
-    INFO "suspending X session"
+sub SimpleRPC_x_suspend {
+    INFO "suspending X session";
     _suspend_session
 }
 
-sub SimpleRPC_stop_x {
-    INFO "stopping X session"
+sub SimpleRPC_x_stop {
+    INFO "stopping X session";
     _stop_session
 }
 
-sub SimpleRPC_start_x {
+sub SimpleRPC_x_start {
     my ($self, %x_args) = @_;
     INFO "starting/resuming X session";
 
