@@ -1,25 +1,27 @@
 package QVD::VMA;
 
-our $VERSION = '0.01';
+our $VERSION = '0.02';
 
 use warnings;
 use strict;
 
-use QVD::VMA::Config;
+use QVD::VMA;
 use parent 'QVD::HTTPD';
 
 sub post_configure_hook {
     my $self = shift;
     my $impl = QVD::VMA::Impl->new();
     $impl->set_http_request_processors($self, '/vma/*');
+    QVD::VMA::Impl::_delete_nxagent_state_and_pid();
 }
 
+sub post_child_cleanup_hook {
+    QVD::VMA::Impl::_kill_x();
+    QVD::VMA::Impl::_delete_nxagent_state_and_pid();
+}
 
 package QVD::VMA::Impl;
 
-use Carp;
-use File::Slurp qw(slurp);
-use File::Spec;
 use POSIX;
 use QVD::Config;
 use QVD::Log;
@@ -27,153 +29,263 @@ use feature qw(switch);
 
 use parent 'QVD::SimpleRPC::Server';
 
-sub _slurp_line {
-    my $fname = shift;
-    my $txt = slurp $fname;
-    chomp $txt;
-    $txt;
+my $log_path  = cfg('path.log');
+my $run_path  = cfg('path.run');
+my $nxagent   = cfg('command.nxagent');
+my $x_session = cfg('command.x-session');
+my $as_user   = cfg('vma.nxagent.as_user');
+
+my $display   = cfg('internal.nxagent.display');
+
+
+my %timeout = ( initiating => cfg('internal.nxagent.timeout.initiating'),
+		listening  => cfg('internal.nxagent.timeout.listening'),
+		suspending => cfg('internal.nxagent.timeout.suspending'),
+		stopping   => cfg('internal.nxagent.timeout.stopping') );
+
+our $nxagent_state_fn = "$run_path/state";
+our $nxagent_pid_fn   = "$run_path/nxagent.pid";
+
+my %x_env;
+for (core_cfg_keys) {
+    /^vma\.x-session\.env\.(.*)/
+	and $x_env{$1} = core_cfg $1;
 }
 
-sub _touch {
-    my $fname = shift;
-    open FH, ">>", $fname or carp "Couldn't create $fname: $!";
-    close FH;
-    chmod 0666, $fname or carp "Couldn't set permissions for $fname: $!";
+my %nx2x = ( initiating  => 'starting',
+	     starting    => 'listening',
+	     resuming    => 'listening',
+	     started     => 'connected',
+	     resumed     => 'connected',
+	     suspending  => 'suspending',
+	     suspended   => 'suspended',
+	     terminating => 'stopping',
+	     aborting    => 'stopping',
+	     suspended   => 'stopped',
+	     aborted     => 'stopped',
+	     stopped     => 'stopped',
+	     ''          => 'stopped');
+
+my %running   = map { $_ => 1 } qw(listening connected suspending suspended);
+my %connected = map { $_ => 1 } qw(listening connected);
+
+sub _become_user {
+    # Formerly copied from cftools http://sourceforge.net/projects/cftools/
+    # Copyright 2003-2005 Martin Andrews
+    my $user = shift;
+    my ($login, $pass, $uid, $gid, $quota, $comment, $gcos, $home, $shell) =
+	($user =~ /^[0-9]+$/ ? getpwuid($user) : getpwnam($user))
+	    or die "Unknown user $user";
+
+    my @groups = ($gid, $gid);
+    setgrent();
+    my $quser = quotemeta $user;
+    my $re = qr/\b$quser\b/;
+    while( my (undef, undef, $gid2, $members) = getgrent() ) {
+	push @groups, $gid2 if $members =~ $re;
+    }
+
+    ($(, $)) = ($gid, join(' ', @groups));
+    ($<, $>) = ($uid, $uid);
+    $ENV{'HOME'} = $home;
+    $ENV{'LOGNAME'} = $user;
 }
 
-# FIXME
-# fix status/state dichotomy
-
-sub new {
-    my $class = shift;
-    my $self = $class->SUPER::new();
-
-    my $run_dir = cfg('vma.run_dir', '/var/run/qvd');
-    $self->{_desktop} = cfg('x_session.desktop', '/etc/X11/Xsession');
-    $self->{_run_dir} = $run_dir;
-    $self->{_run_state_fn} = "$run_dir/state";
-    $self->{_run_nxagent_pid_fn} = "$run_dir/nxagent.pid";
-    $self->{_run_nxagent_log_fn} = "$run_dir/nxagent.log";
-
-    my ($vol,$dir) = File::Spec->splitpath(File::Spec->rel2abs($0));
-    $self->{_xagent} = File::Spec->catpath($vol,$dir,'nxagent-monitor.pl');
-
-    -e $run_dir or mkdir $run_dir;
-    -d $run_dir or croak "Couldn't create run directory: $!";
-    _touch $self->{_run_state_fn};
-    _touch $self->{_run_nxagent_pid_fn};
-    _touch $self->{_run_nxagent_log_fn};
-    $self
+sub _read_line {
+    my $fn = shift;
+    open my $fh, '<', $fn or return '';
+    lock $fh, LOCK_SH;
+    my $line = <$fh>;
+    lock $fh, LOCK_UN;
+    close $fh;
+    chomp $line;
+    $line;
 }
 
-sub _get_nxagent_pid { _slurp_line shift->{_run_nxagent_pid_fn} }
-
-sub _get_nxagent_status { _slurp_line shift->{_run_state_fn} }
-
-sub _is_nxagent_running {
-    my $self = shift;
-    my $pid = $self->_get_nxagent_pid;
-    # FIXME Who says that no other process can take the pid?
-    # Very unlikely, Linux does not reuse PIDs lightly --Salva
-    $pid and kill(0, $pid);
+sub _write_line {
+    my ($fn, $line) = @_;
+    sysopen my $fh, $fn, O_CREAT|O_RDWR, 644;
+    lock $fh, LOCK_EX;
+    seek($fh, 0, 0);
+    truncate $fh, 0;
+    print $fh $line, "\n";
+    lock $fh, LOCK_UN;
+    close $fh;
 }
 
-sub _is_nxagent_suspended {
-    my $self = shift;
-    my $status = $self->_get_nxagent_status;
-    $status eq 'suspended';
+sub _save_nxagent_state { _write_line($nxagent_state_fn, join(':', shift, time) ) }
+sub _save_nxagent_pid   { _write_line($nxagent_pid_fn, shift) }
+
+sub _delete_nxagent_state_and_pid {
+    unlink $nxagent_pid_fn;
+    unlink $nxagent_state_fn;
 }
 
-sub _is_nxagent_started {
-    my $self = shift;
-    my $status = $self->_get_nxagent_status;
-    $status eq 'started' or $status eq 'resumed';
+sub _timestamp {
+    my @t = gmtime; $t[5] += 1900; $t[4] += 1;
+    sprintf("%04d%02d%02d%02d%02d%02d", @t[5, 4, 3, 2, 1, 0]);
 }
 
-sub _is_nxagent_starting {
-    my $self = shift;
-    my $status = $self->_get_nxagent_status;
-    $status eq 'starting' or $status eq 'resuming';
+sub _open_log {
+    my $log_fn = "$log_path/nxagent-" . _timestamp . ".log";
+    open my $log, '>>' $log_fn or die "unable to open nxagent log file $log_fn\n";
+    return $log;
 }
 
-sub _suspend_or_wakeup_session {
-    my $self = shift;
-    my $pid = $self->_get_nxagent_pid;
-    DEBUG ("Trying to suspend / wakeup nxagent");
-    kill(HUP => $pid);
-}
+sub _fork_monitor {
+    my $log = _open_log;
+    print $log _timestamp . " :Starting nxagent";
 
-sub _start_or_resume_session {
-    # FIXME: fully rewrite this method!
-    my ($self, %x_args) = @_;
-    INFO("start or resume session with @_");
-    if ($self->_is_nxagent_running) {
-	if ($self->_is_nxagent_suspended) {
-	    DEBUG("Waking up suspended nxagent..");
-	    $self->_suspend_or_wakeup_session;
-	} elsif ($self->_is_nxagent_started) {
-	    DEBUG ("Suspending active nxagent to steal session..");
-	    $self->_suspend_or_wakeup_session;
-	    DEBUG "Waiting for session to suspend..";
-	    # FIXME: this method shouldn't block!
-	    while (! $self->_is_nxagent_suspended) {
-		DEBUG "Still waiting to session to suspend..";
-		sleep 1;
+    save_nxagent_state 'initiating';
+
+    my $pid = fork;
+    if (!$pid) {
+	defined $pid or die "Unable to start monitor, fork failed: $!\n";
+	eval {
+	    mkdir $run_path, 755;
+	    -d $run_path or die "Directory $run_path does not exist\n";
+
+	    # detach from stdio and from process group so it is not killed by Net::Server
+	    open STDIN,  '<', '/dev/null';
+	    open STDOUT, '>', '/dev/null';
+	    open STDERR, '>', '/dev/null';
+	    setpgrp(0, 0);
+
+	    $SIG{CHLD} = 'IGNORE';
+
+	    _save_nxagent_state 'initiating';
+
+	    my $pid = open(my $out, '-|');
+	    if (!$pid) {
+		defined $pid or die ERROR "unable to start X server, fork failed: $!\n";
+
+		eval {
+		    my $nx_display = join(',', 'nx/nx', 'link=lan', 'media=1',
+					  map "$_=$x_args{$_}", keys %x_args) . ":$display";
+		    _become_user($as_user);
+
+		    $ENV{PULSE_SERVER} = "tcp:localhost:".($display+7000);
+
+		    # FIXME: reimplement xinit in Perl in order to allow capturing nxagent ouput alone
+		    exec(xinit => $x_session, '--', $nxagent, ":$display", '-ac', '-name', 'QVD', '-display', $nx_display)
+		};
+		print $log "Unable to start X server: " .($@ || $!);
+		POSIX::_exit(1);
 	    }
-	    DEBUG ("Waking up suspended nxagent to steal session..");
-	    $self->_suspend_or_wakeup_session;
-	} elsif ($self->_is_nxagent_starting) {
-	    until ($self->_is_nxagent_started) {
-		# FIXME: remove this sleep
-		# let the L7R take care of this
-		DEBUG ("Waiting for starting nxagent to become ready..");
-		sleep 1;
+
+	    while(defined (my $line = <$out>)) {
+		given ($line) {
+		    when (/Info: Agent running with pid '(\d+)'/) {
+			_save_nxagent_pid $1;
+		    }
+		    when (/Session: (\w+) session at/) {
+			_save_nxagent_state lc $1;
+		    }
+		    when (/Session: Session (\w+) at/) {
+			_save_nxagent_state lc $1;
+		    }
+		}
+		print $log, $line;
 	    }
-	} else {
-	    # nxagent is aborting, terminating, suspending or stopped
-	    DEBUG ("Waiting for ".$self->_get_nxagent_status." nxagent to stop..");
-	    # FIXME: remove this sleep
-	    # let the L7R take care of this
-	    sleep 2;
-	    $self->_start_or_resume_session(%x_args);
-	}
-    } else {
-	my $desktop = $self->{_desktop};
-	my $xagent = $self->{_xagent};
-	INFO("nxagent ($xagent) wasn't running, starting it with session $desktop");
-	my $pid = fork;
-	if (!$pid) {
-	    defined $pid or carp "fork failed";
-	    my $displayn = 1000;
-	    $ENV{PULSE_SERVER} = "tcp:localhost:".($displayn+7000);
+	};
+	_delete_nxagent_state_and_pid;
+    }
+}
 
-	    my $display = join(',', 'nx/nx', 'link=lan',
-			       (map "$_=$x_args{$_}", keys %x_args),
-			       'media=1') . ":$displayn";
-			    
-	    # FIXME: remove su, do it in perl
+sub _state {
+    -f $nxagent_state_fn or return 'stopped'; # shortcut!
 
-	    # FIXME: remove shell call to invoke xinit
+    my $state_line = _read_line $nxagent_state_fn;
+    my ($nxstate, $timestamp) = $state_line =~ /^(.*?)(?:(.*))?$/;
 
-	    # FIXME: remove -ac as we are not certain this does not impact on the security of the platform
-	    { exec "su - qvd -c \"xinit $desktop -- $xagent :$displayn -name QVD -display $display -ac\"" }
-	    POSIX::_exit(-1);
+    my $state = $nx2x{$state};
+    my $timeout = $timeout{$state};
+    my $pid = _read_line $nxagent_pid_fn;
+
+    if ($timeout and $timestamp) {
+	if (time > $timestamp + $timeout) {
+	    $pid amd kill TERM => $pid;
+	    return 'stopping';
 	}
     }
-    1;
+
+    if ($running{$state}) {
+	unless ($pid and kill 0, $pid) {
+	    $state = 'stopped';
+	}
+    }
+
+    delete_nxagent_state_and_pid if $state eq 'stopped';
+
+    return wantarray ? ($state, $pid) : $state;
 }
 
-sub _shutdown {
-    my $self = shift;
-    my $type = shift;
+sub _suspend_session {
+    my ($state, $pid) = _state;
+    if ($pid and $connected{$state}) {
+	kill HUP, $pid
+	return 'starting';
+    }
+    $state;
+}
+
+sub _stop_session {
+    my ($state, $pid) = _state;
+    if ($pid) {
+	kill TERM, $pid;
+	return 'stopping'
+    }
+    $state;
+}
+
+sub _start_session {
+    my %x_args = @_;
+    my ($state, $pid) = _nxagent_state;
+    given ($state) {
+	when ('suspended') {
+	    DEBUG "awaking nxagent";
+	    _save_nxagent_state 'initiating';
+	    kill HUP => $pid;
+	}
+	when ('connected') {
+	    kill HUP => $pid;
+	    die "Can't connect to X session in state connected, suspending it, retry later\n";
+	}
+	when ('stopped') {
+	    fork_monitor;
+	}
+	default {
+	    die "Unable to start/resume X session in state $_";
+	}
+    }
+    'starting';
+}
+
+
+################################ RPC methods ######################################
+
+sub SimpleRPC_x_state { _state }
+
+sub SimpleRPC_poweroff {
     DEBUG "shutting system down";
-    system("init 0") == 0
+    system(init => 0);
 }
 
-sub SimpleRPC_start_x_listener {
-    my ($self, %x_args) = @_;
-    INFO "starting X listener";
+sub SimpleRPC_suspend_x {
+    INFO "suspending X session"
+    _suspend_session
+}
 
+sub SimpleRPC_stop_x {
+    INFO "stopping X session"
+    _stop_session
+}
+
+sub SimpleRPC_start_x {
+    my ($self, %x_args) = @_;
+    INFO "starting/resuming X session";
+
+    # check args:
     while (my ($k, $v) = each %x_args) {
 	$k =~ m{^(?:keyboard|client)$}
 	    or die "invalid parameter $k";
@@ -181,73 +293,7 @@ sub SimpleRPC_start_x_listener {
 	    or die "invalid characters in parameter $k";
     }
 
-    $self->_start_or_resume_session(%x_args);
-}
-
-sub SimpleRPC_x_state { shift->_x_state }
-
-sub _x_state {
-    my $self = shift;
-    my $nx_state =  $self->_get_nxagent_status();
-    given ($nx_state) {
-	when ('initiated')                               { return 'connecting'    }
-	when (['starting', 'resuming'])                  { return 'listening'     }
-	when (['started', 'resumed'])                    { return 'connected'     }
- 	when (['suspending', 'terminating', 'aborting']) { return 'disconnecting' }
-	when (['', 'suspended', 'terminated', 'aborted',
-	       'exited terminated','exited aborted'])    { return 'disconnected'  }
-    }
-    die "Internal error: no mapping for nxagent state $nx_state";
-}
-
-sub SimpleRPC_status {
-    # FIXME: remove this method
-    my $self = shift;
-    my $nx_state = $self->_get_nxagent_status();
-
-    my $x_state;
-    if ($nx_state eq 'initiated') {
-	$x_state = 'connecting';
-    } elsif (grep $nx_state eq $_, qw(starting resuming)) {
-	$x_state = 'listening';
-    } elsif (grep $nx_state eq $_, qw(started resumed)) {
-	$x_state = 'connected';
-    } elsif (grep $nx_state eq $_, qw(suspending terminating aborting)) {
-	$x_state = 'disconnecting';
-    } elsif (grep $nx_state eq $_, qw(suspended terminated aborted),
-					'exited terminated','exited aborted') {
-	$x_state = 'disconnected';
-    } else {
-	ERROR "No mapping for nxagent state '".$nx_state."'";
-	$x_state = 'disconnected';
-    }
-
-    {status => 'ok', x_state => $x_state, __deprecated__ => 1}
-}
-
-
-sub SimpleRPC_poweroff {
-    my $self = shift;
-    my $mins = 1;
-    # FIXME: shutdown arguments have changed
-    if ($self->_shutdown('P', $mins)) {
-	{'poweroff' => $mins};
-    } else {
-	{'poweroff' => undef};
-    }
-}
-
-sub SimpleRPC_disconnect_session {
-    # FIXME: this method should return nothing and die on failure
-    my $self = shift;
-    DEBUG "Trying to disconnect session in state ".$self->_get_nxagent_status;
-    if ($self->_is_nxagent_started or $self->_is_nxagent_starting) {
-	DEBUG ("Trying to disconnect the session that is already started or starting");
-	$self->_suspend_or_wakeup_session;
-	{disconnect => 1};
-    } else {
-	{disconnect => undef};
-    }
+    _start_session(%x_args);
 }
 
 1;

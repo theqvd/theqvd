@@ -3,20 +3,27 @@
 use strict;
 use warnings;
 
-# ensure we load the VMA configuration package supplanting VMA::Config
-use QVD::VMA::Config;
+# ensure we load the VMA configuration
+
+BEGIN {
+    $QVD::Config::USE_DB = 0;
+    $QVD::Config::FILE = '/etc/qvd/vma.conf';
+}
+use QVD::Config;
 
 use QVD::VMA;
+use App::Daemon qw(daemonize);
+$App::Daemon::pidfile = cfg('vma.pid_file');
 
 $ENV{PATH} = join(':', $ENV{PATH}, '/sbin/');
 
-use App::Daemon qw(daemonize);
+my $port = cfg('internal.vm.port.vma');
 
-$App::Daemon::pidfile = cfg('vma.pid_file');
-$App::Daemon::as_user = cfg('vma.as_user');
+
+
 
 daemonize();
-my $vma = QVD::VMA->new(port => 3030);
+my $vma = QVD::VMA->new(port => $port);
 $vma->run();
 
 __END__
