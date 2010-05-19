@@ -14,7 +14,6 @@ WriteMakefile(
     PREREQ_PM => {
 	'File::Slurp' => 0,
 	'IO::Socket::Forwarder' => 0,
-	'Log::Log4perl' => 0,
 	'parent' => 0,
 	'QVD::Auth' => 0,
 	'QVD::Auth::Basic' => 0,

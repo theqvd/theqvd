@@ -12,7 +12,6 @@ WriteMakefile(
     PREREQ_PM => {
 	'App::Daemon' => 0,
 	'List::Util' => 0,
-	'Log::Log4perl' => 0,
 	'QVD::Config' => 0,
 	'QVD::DB' => 0,
 	'QVD::Log' => 0,

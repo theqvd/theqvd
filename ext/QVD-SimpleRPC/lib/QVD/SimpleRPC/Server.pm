@@ -7,7 +7,7 @@ use Carp;
 use URI::Split qw(uri_split);
 use QVD::URI qw(uri_query_split);
 use QVD::HTTP::StatusCodes qw(:status_codes);
-use Log::Log4perl qw(:easy :levels);
+use QVD::Log;
 
 sub new {
     my $class = shift;

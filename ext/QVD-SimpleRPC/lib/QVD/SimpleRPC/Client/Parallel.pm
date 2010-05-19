@@ -6,7 +6,7 @@ use Carp;
 use QVD::HTTP::StatusCodes qw(:status_codes);
 use URI::Split qw(uri_split);
 use URI::Escape;
-use Log::Log4perl qw(:easy);
+use QVD::Log;
 
 use parent qw(QVD::HTTPC::Parallel);
 

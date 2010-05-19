@@ -3,10 +3,9 @@ package QVD::DB::Simple;
 use strict;
 use warnings;
 
-use Log::Log4perl qw(:levels :easy);
-
 use QVD::DB;
 use QVD::Config;
+use QVD::Log;
 
 use Exporter qw(import);
 our @EXPORT = qw(db txn_do txn_eval rs this_host_id);
