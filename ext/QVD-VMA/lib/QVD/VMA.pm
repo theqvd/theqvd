@@ -23,7 +23,7 @@ package QVD::VMA::Impl;
 
 use POSIX;
 use Fcntl qw(:flock);
-use feature qw(switch);
+use feature qw(switch say);
 use QVD::Config;
 use QVD::Log;
 
@@ -43,7 +43,7 @@ my %timeout = ( initiating => cfg('internal.nxagent.timeout.initiating'),
 		suspending => cfg('internal.nxagent.timeout.suspending'),
 		stopping   => cfg('internal.nxagent.timeout.stopping') );
 
-our $nxagent_state_fn = "$run_path/state";
+our $nxagent_state_fn = "$run_path/nxagent.state";
 our $nxagent_pid_fn   = "$run_path/nxagent.pid";
 
 my %x_env;
@@ -108,7 +108,7 @@ sub _write_line {
     flock $fh, LOCK_EX;
     seek($fh, 0, 0);
     truncate $fh, 0;
-    print $fh $line, "\n";
+    say $fh $line;
     flock $fh, LOCK_UN;
     close $fh;
 }
@@ -127,7 +127,7 @@ sub _timestamp {
 }
 
 sub _open_log {
-    my $log_fn = "$log_path/nxagent-" . _timestamp . ".log";
+    my $log_fn = "$log_path/nxagent.log"; # -" . _timestamp . ".log";
     open my $log, '>>', $log_fn or die "unable to open nxagent log file $log_fn\n";
     return $log;
 }
@@ -135,7 +135,10 @@ sub _open_log {
 sub _fork_monitor {
     my %x_args = @_;
     my $log = _open_log;
-    print $log _timestamp . " :Starting nxagent";
+    select $log;
+    $| = 1;
+
+    say _timestamp . ": Starting nxagent";
 
     _save_nxagent_state 'initiating';
 
@@ -148,8 +151,8 @@ sub _fork_monitor {
 
 	    # detach from stdio and from process group so it is not killed by Net::Server
 	    open STDIN,  '<', '/dev/null';
-	    open STDOUT, '>', '/dev/null';
-	    open STDERR, '>', '/dev/null';
+	    open STDOUT, '>', '/tmp/xinit-out'; #/dev/null';
+	    open STDERR, '>', '/tmp/xinit-err'; #/dev/null';
 	    setpgrp(0, 0);
 
 	    $SIG{CHLD} = 'IGNORE';
@@ -161,16 +164,20 @@ sub _fork_monitor {
 		defined $pid or die ERROR "unable to start X server, fork failed: $!\n";
 
 		eval {
-		    my $nx_display = join(',', 'nx/nx', 'link=lan', 'media=1',
-					  map "$_=$x_args{$_}", keys %x_args) . ":$display";
+		    POSIX::dup2(1, 2); # equivalent to shell 2>&1
 		    _become_user($as_user);
 
 		    $ENV{PULSE_SERVER} = "tcp:localhost:".($display+7000);
 
+		    my $nx_display = join(',', 'nx/nx', 'link=lan', 'media=1',
+					  map "$_=$x_args{$_}", keys %x_args) . ":$display";
+
 		    # FIXME: reimplement xinit in Perl in order to allow capturing nxagent ouput alone
-		    exec(xinit => $x_session, '--', $nxagent, ":$display", '-ac', '-name', 'QVD', '-display', $nx_display)
+		    my @cmd = (qw(strace -o /tmp/strace.out -f), xinit => $x_session, '--', $nxagent, ":$display", '-ac', '-name', 'QVD', '-display', $nx_display);
+		    say "running @cmd";
+		    exec @cmd;
 		};
-		print $log "Unable to start X server: " .($@ || $!);
+		say "Unable to start X server: " .($@ || $!);
 		POSIX::_exit(1);
 	    }
 
@@ -186,7 +193,8 @@ sub _fork_monitor {
 			_save_nxagent_state lc $1;
 		    }
 		}
-		print $log, $line;
+		print $line;
+		print STDOUT $line;
 	    }
 	};
 	_delete_nxagent_state_and_pid;

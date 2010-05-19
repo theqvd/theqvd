@@ -29,7 +29,7 @@ path.serial.captures = ${path.tmp}/qvd
 
 command.kvm = kvm
 command.kvm-img = kvm-img
-command.nxagent = nxagent
+command.nxagent = /usr/bin/nxagent
 command.x-session = /etc/X11/Xsession
 
 l7r.use_ssl = 1
