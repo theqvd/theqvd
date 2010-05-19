@@ -328,6 +328,13 @@ button.link:focus span {
 	background-position: 5px 5px;
 }
 
+.option_telnet {
+	padding: 5px 5px 5px 25px;
+	background-image: url(../images/icons/application_xp_terminal.png);
+	background-repeat: no-repeat;
+	background-position: 5px 5px;
+}
+
 .option_passwd {
 	padding: 5px 5px 5px 25px;
 	background-image: url(../images/icons/key.png);
