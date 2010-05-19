@@ -29,6 +29,8 @@ path.serial.captures = ${path.tmp}/qvd
 
 command.kvm = kvm
 command.kvm-img = kvm-img
+command.nxagent = nxagent
+command.x-session = /etc/X11/Xsession
 
 l7r.use_ssl = 1
 l7r.ssl_port = 8443
@@ -59,6 +61,11 @@ vm.serial.redirect = 1
 vm.serial.capture = 0
 vm.ssh.redirect = 1
 
+vma.pid_file = /var/run/qvd/vma.pid
+vma.nxagent.as_user = qvd
+
+vma.x-session.env.QVD_SESSION = 1
+
 # internal parameters, do not change!!!
 internal.l7r.timeout.vm_start = 270
 internal.l7r.timeout.x_start = 10
@@ -79,5 +86,12 @@ internal.hkd.poll_all_mod = 10
 internal.vm.port.x = 5000
 internal.vm.port.vma = 3030
 internal.vm.port.ssh = 22
+
+internal.nxagent.display = 100
+
+internal.nxagent.timeout.initiating = 20
+internal.nxagent.timeout.listening = 10
+internal.nxagent.timeout.suspending = 20
+internal.nxagent.timeout.stopping = 20
 
 
