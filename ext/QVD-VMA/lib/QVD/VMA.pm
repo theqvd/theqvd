@@ -15,7 +15,7 @@ sub post_configure_hook {
 }
 
 sub post_child_cleanup_hook {
-    QVD::VMA::Impl::_kill_x();
+    QVD::VMA::Impl::_stop_session();
     QVD::VMA::Impl::_delete_nxagent_state_and_pid();
 }
 
@@ -258,7 +258,6 @@ sub _stop_session {
 }
 
 sub _start_session {
-    my %x_args = @_;
     my ($state, $pid) = _state;
     DEBUG "starting session in state $state, pid $pid";
     given ($state) {
@@ -273,7 +272,7 @@ sub _start_session {
 	    die "Can't connect to X session in state connected, suspending it, retry later\n";
 	}
 	when ('stopped') {
-	    _fork_monitor;
+	    _fork_monitor(@_);
 	}
 	default {
 	    die "Unable to start/resume X session in state $_";
