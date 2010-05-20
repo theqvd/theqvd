@@ -140,6 +140,7 @@ sub _open_log {
 sub _fork_monitor {
     my %x_args = @_;
     my $log = _open_log;
+    my $logfd = fileno $log;
     select $log;
     $| = 1;
 
@@ -156,8 +157,10 @@ sub _fork_monitor {
 
 	    # detach from stdio and from process group so it is not killed by Net::Server
 	    open STDIN,  '<', '/dev/null';
-	    open STDOUT, '>', '/tmp/xinit-out'; #/dev/null';
-	    open STDERR, '>', '/tmp/xinit-err'; #/dev/null';
+	    POSIX::dup($logfd, 1);
+	    POSIX::dup($logfd, 2);
+	    # open STDOUT, '>', '/tmp/xinit-out'; #/dev/null';
+	    # open STDERR, '>', '/tmp/xinit-err'; #/dev/null';
 	    setpgrp(0, 0);
 
 	    $SIG{CHLD} = 'IGNORE';
@@ -197,9 +200,7 @@ sub _fork_monitor {
 		    when (/Session: Session (\w+) at/) {
 			_save_nxagent_state lc $1;
 		    }
-
 		    print $line;
-		    print STDOUT $line;
 		}
 	    }
 	};
