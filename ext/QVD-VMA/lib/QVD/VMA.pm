@@ -32,6 +32,7 @@ use parent 'QVD::SimpleRPC::Server';
 my $log_path  = cfg('path.log');
 my $run_path  = cfg('path.run');
 my $nxagent   = cfg('command.nxagent');
+my $nxdiag  = cfg('command.nxdiag');
 my $x_session = cfg('command.x-session');
 my $as_user   = cfg('vma.nxagent.as_user');
 
@@ -176,7 +177,7 @@ sub _fork_monitor {
 		    _become_user($as_user);
 
 		    $ENV{PULSE_SERVER} = "tcp:localhost:".($display+7000);
-
+		    $ENV{NX_CLIENT} = $nxdiag;
 		    my $nx_display = join(',', 'nx/nx', 'link=lan', 'media=1',
 					  map "$_=$x_args{$_}", keys %x_args) . ":$display";
 
