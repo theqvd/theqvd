@@ -273,6 +273,8 @@ sub _start_session {
 
 ################################ RPC methods ######################################
 
+sub SimpleRPC_ping { 1 }
+
 sub SimpleRPC_x_state { _state }
 
 sub SimpleRPC_poweroff {

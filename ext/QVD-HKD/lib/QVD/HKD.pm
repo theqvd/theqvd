@@ -170,13 +170,13 @@ sub _check_vms {
 		    # before the message is delivered the new one will
 		    # be aborted. This is very unlikely and mostly
 		    # harmless, so we didn't care!
-		    $vma_method = 'disconnect_session';
+		    $vma_method = 'x_suspend';
 		}
 		elsif ($check_all) {
 		    $vma_method = 'status';
 		}
 	    }
-	    when('starting'  ) { $vma_method = 'status' }
+	    when('starting'  ) { $vma_method = 'ping' }
 	    when('stopping_1') { $vma_method = 'poweroff' }
 	    when('zombie_1'  ) { $hkd->_signal_vm($vm, SIGTERM) }
 	    when('zombie_2'  ) { $hkd->_signal_vm($vm, SIGKILL) }

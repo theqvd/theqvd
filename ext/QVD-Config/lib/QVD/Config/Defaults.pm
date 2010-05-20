@@ -72,7 +72,8 @@ internal.l7r.timeout.x_start = 10
 internal.l7r.timeout.vma = 4
 internal.l7r.timeout.takeover = 30
 internal.l7r.retry.x_start = 5
-internal.l7r.poll_time = 2
+internal.l7r.poll_time.vm = 3
+internal.l7r.poll_time.x = 1
 
 internal.hkd.timeout.state.starting = 240
 internal.hkd.timeout.state.stopping_1 = 30

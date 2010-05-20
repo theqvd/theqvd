@@ -20,7 +20,8 @@ use Sys::Hostname;
 
 use parent qw(QVD::HTTPD);
 
-my $poll_time        = cfg('internal.l7r.poll_time');
+my $vm_poll_time     = cfg('internal.l7r.poll_time.vm');
+my $x_poll_time      = cfg('internal.l7r.poll_time.x');
 my $takeover_timeout = cfg('internal.l7r.timeout.takeover');
 my $vm_start_timeout = cfg('internal.l7r.timeout.vm_start');
 my $x_start_retry    = cfg('internal.l7r.retry.x_start');
@@ -152,8 +153,8 @@ sub connect_to_vm_processor {
     DEBUG "Session ended";
 }
 
-# Take the machine for this L7R process disconnected others
-# first if needed
+# Take the machine for this L7R process disconnecting others first
+# when needed
 sub _takeover_vm {
     my ($l7r, $vm) = @_;
     DEBUG "Taking over session for VM " . $vm->id;
@@ -170,7 +171,6 @@ sub _takeover_vm {
 				l7r_host => this_host_id,
 				user_cmd => undef);
 	};
-
 	unless ($@) {
 	    $l7r->_tell_client("Session acquired");
 	    return;
@@ -184,7 +184,7 @@ sub _takeover_vm {
 	$vm->send_user_abort;
 
 	die "Unable to acquire VM, close other clients\n" if time > $timeout;
-	sleep($poll_time);
+	sleep($vm_poll_time);
 
 	# FIXME: check the VM has not left the state running
     }
@@ -237,7 +237,7 @@ sub _start_and_wait_for_vm {
     $l7r->_tell_client("Waiting for VM to start");
     while (1) {
 	DEBUG "waiting for VM to come up";
-	sleep 1;
+	sleep($vm_pool_time);
 	$vm->discard_changes;
 	$l7r->_check_abort($vm);
 	my $vm_state = $vm->vm_state;
@@ -260,9 +260,9 @@ sub _start_x {
     my $resp;
     for (0..$x_start_retry) {
 	my $vma = $l7r->_vma_client($vm);
-	$resp = eval { $vma->start_x_listener(@x_params) };
+	$resp = eval { $vma->x_start(@x_params) };
 	last unless $@;
-	sleep 1;
+	sleep($x_pool_time);
 	$l7r->_check_abort($vm, 1);
     }
     $resp or die "Unable to start X server on VM: $@";
@@ -276,14 +276,21 @@ sub _wait_for_x {
     while (1) {
 	my $vma = $l7r->_vma_client($vm);
 	$x_state = eval { $vma->x_state };
-	return if (defined $x_state and $x_state eq 'listening');
-	die "Unable to start VM X server, operation timed out!\n"
-	    if time > $timeout;
-	sleep 1;
+	given ($x_state) {
+	    when ('listening') {
+		return
+	    }
+	    when ([undef, 'starting']) {
+		die "Unable to start VM X server, operation timed out!\n"
+		    if time > $timeout;
+	    }
+	    default {
+		die "Unable to start XV X server, state went to $_\n"
+	    }
+	}
+	sleep($x_pool_time);
 	$l7r->_check_abort($vm, 1);
     }
-    my $reason = ( defined $x_state ? " in state $x_state" : ": $@");
-    die "Unable to connect to VM X server$reason";
 }
 
 sub _run_forwarder {
