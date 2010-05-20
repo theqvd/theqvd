@@ -106,7 +106,9 @@ sub _read_line {
 
 sub _write_line {
     my ($fn, $line) = @_;
-    sysopen my $fh, $fn, O_CREAT|O_RDWR, 644;
+    DEBUG "_write_line($fn, $line)";
+    sysopen my $fh, $fn, O_CREAT|O_RDWR, 644
+	or die "sysopen $fn failed";
     flock $fh, LOCK_EX;
     seek($fh, 0, 0);
     truncate $fh, 0;
@@ -119,6 +121,7 @@ sub _save_nxagent_state { _write_line($nxagent_state_fn, join(':', shift, time) 
 sub _save_nxagent_pid   { _write_line($nxagent_pid_fn, shift) }
 
 sub _delete_nxagent_state_and_pid {
+    DEBUG "deleting pid and state files";
     unlink $nxagent_pid_fn;
     unlink $nxagent_state_fn;
 }
@@ -194,11 +197,13 @@ sub _fork_monitor {
 		    when (/Session: Session (\w+) at/) {
 			_save_nxagent_state lc $1;
 		    }
+
+		    print $line;
+		    print STDOUT $line;
 		}
-		print $line;
-		print STDOUT $line;
 	    }
 	};
+	DEBUG $@ if $@;
 	_delete_nxagent_state_and_pid;
     }
 }
@@ -212,9 +217,11 @@ sub _state {
     my $state = $nx2x{$nxstate};
     my $timeout = $timeout{$state};
     my $pid = _read_line $nxagent_pid_fn;
+    DEBUG ("_state: $state, nxstate: $nxstate, ts: $ts, timeout: $timeout");
 
     if ($timeout and $timestamp) {
 	if (time > $timestamp + $timeout) {
+	    DEBUG "timeout!";
 	    $pid and kill TERM => $pid;
 	    return 'stopping';
 	}
@@ -222,6 +229,7 @@ sub _state {
 
     if ($running{$state}) {
 	unless ($pid and kill 0, $pid) {
+	    DEBUG "nxagent disappeared, pid $pid";
 	    $state = 'stopped';
 	}
     }
@@ -252,6 +260,7 @@ sub _stop_session {
 sub _start_session {
     my %x_args = @_;
     my ($state, $pid) = _state;
+    DEBUG "starting session in state $state, pid $pid";
     given ($state) {
 	when ('suspended') {
 	    DEBUG "awaking nxagent";
@@ -259,6 +268,7 @@ sub _start_session {
 	    kill HUP => $pid;
 	}
 	when ('connected') {
+	    DEBUG "suspend and fail";
 	    kill HUP => $pid;
 	    die "Can't connect to X session in state connected, suspending it, retry later\n";
 	}
@@ -275,12 +285,18 @@ sub _start_session {
 
 ################################ RPC methods ######################################
 
-sub SimpleRPC_ping { 1 }
+sub SimpleRPC_ping {
+    DEBUG "pinged";
+    1
+}
 
-sub SimpleRPC_x_state { _state }
+sub SimpleRPC_x_state {
+    DEBUG "x_state called";
+    _state
+}
 
 sub SimpleRPC_poweroff {
-    DEBUG "shutting system down";
+    INFO "shutting system down";
     system(init => 0);
 }
 
