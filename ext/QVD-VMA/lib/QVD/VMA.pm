@@ -132,7 +132,7 @@ sub _timestamp {
 }
 
 sub _open_log {
-    my $log_fn = "$log_path/nxagent.log"; # -" . _timestamp . ".log";
+    my $log_fn = "$log_path/qvd-nxagent.log"; # -" . _timestamp . ".log";
     open my $log, '>>', $log_fn or die "unable to open nxagent log file $log_fn\n";
     return $log;
 }
