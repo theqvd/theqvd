@@ -4,8 +4,9 @@ our $VERSION = '0.01';
 
 use warnings;
 use strict;
-use Carp;
 
+use Carp;
+use feature 'switch';
 use IO::Socket::Forwarder qw(forward_sockets);
 use QVD::Config;
 use QVD::Log;
@@ -153,8 +154,7 @@ sub connect_to_vm_processor {
     DEBUG "Session ended";
 }
 
-# Take the machine for this L7R process disconnecting others first
-# when needed
+# Take the machine for this L7R process meybe disconnecting others
 sub _takeover_vm {
     my ($l7r, $vm) = @_;
     DEBUG "Taking over session for VM " . $vm->id;
@@ -237,7 +237,7 @@ sub _start_and_wait_for_vm {
     $l7r->_tell_client("Waiting for VM to start");
     while (1) {
 	DEBUG "waiting for VM to come up";
-	sleep($vm_pool_time);
+	sleep($vm_poll_time);
 	$vm->discard_changes;
 	$l7r->_check_abort($vm);
 	my $vm_state = $vm->vm_state;
@@ -262,7 +262,7 @@ sub _start_x {
 	my $vma = $l7r->_vma_client($vm);
 	$resp = eval { $vma->x_start(@x_params) };
 	last unless $@;
-	sleep($x_pool_time);
+	sleep($x_poll_time);
 	$l7r->_check_abort($vm, 1);
     }
     $resp or die "Unable to start X server on VM: $@";
@@ -288,7 +288,7 @@ sub _wait_for_x {
 		die "Unable to start XV X server, state went to $_\n"
 	    }
 	}
-	sleep($x_pool_time);
+	sleep($x_poll_time);
 	$l7r->_check_abort($vm, 1);
     }
 }
