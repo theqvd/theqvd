@@ -212,7 +212,7 @@ sub _state {
     -f $nxagent_state_fn or return 'stopped'; # shortcut!
 
     my $state_line = _read_line $nxagent_state_fn;
-    my ($nxstate, $timestamp) = $state_line =~ /^(.*?)(?:(.*))?$/;
+    my ($nxstate, $timestamp) = $state_line =~ /^(.*?)(?::(.*))?$/;
 
     my $state = $nx2x{$nxstate};
     my $timeout = $timeout{$state};
