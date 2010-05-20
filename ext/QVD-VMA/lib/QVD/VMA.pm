@@ -217,7 +217,7 @@ sub _state {
     my $state = $nx2x{$nxstate};
     my $timeout = $timeout{$state};
     my $pid = _read_line $nxagent_pid_fn;
-    DEBUG ("_state: $state, nxstate: $nxstate, ts: $ts, timeout: $timeout");
+    DEBUG ("_state: $state, nxstate: $nxstate, ts: $timestamp, timeout: $timeout");
 
     if ($timeout and $timestamp) {
 	if (time > $timestamp + $timeout) {
