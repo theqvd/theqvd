@@ -157,8 +157,8 @@ sub _fork_monitor {
 
 	    # detach from stdio and from process group so it is not killed by Net::Server
 	    open STDIN,  '<', '/dev/null';
-	    POSIX::dup($logfd, 1);
-	    POSIX::dup($logfd, 2);
+	    POSIX::dup2($logfd, 1);
+	    POSIX::dup2($logfd, 2);
 	    # open STDOUT, '>', '/tmp/xinit-out'; #/dev/null';
 	    # open STDERR, '>', '/tmp/xinit-err'; #/dev/null';
 	    setpgrp(0, 0);
