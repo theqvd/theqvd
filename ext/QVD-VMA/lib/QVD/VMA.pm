@@ -93,12 +93,14 @@ sub _become_user {
 
 sub _read_line {
     my $fn = shift;
+    DEBUG "_read_line($fn)";
     open my $fh, '<', $fn or return '';
     flock $fh, LOCK_SH;
     my $line = <$fh>;
     flock $fh, LOCK_UN;
     close $fh;
     chomp $line;
+    DEBUG "  => $line";
     $line;
 }
 
@@ -173,7 +175,7 @@ sub _fork_monitor {
 					  map "$_=$x_args{$_}", keys %x_args) . ":$display";
 
 		    # FIXME: reimplement xinit in Perl in order to allow capturing nxagent ouput alone
-		    my @cmd = (qw(strace -o /tmp/strace.out -f), xinit => $x_session, '--', $nxagent, ":$display", '-ac', '-name', 'QVD', '-display', $nx_display);
+		    my @cmd = (xinit => $x_session, '--', $nxagent, ":$display", '-ac', '-name', 'QVD', '-display', $nx_display);
 		    say "running @cmd";
 		    exec @cmd;
 		};
