@@ -65,7 +65,7 @@ function validate_add (form) {
   <td class="fb_field" id="add_delete_field"><input class="fb_input" type="checkbox" id="delete" name="delete"></td>
 </tr>
 <tr id="add_submit_row">
-  <td class="fb_submit" colspan="2" id="add_submit_field"><input class="fb_button" id="add_submit" name="_submit" type="submit" value="Create" /></td>
+  <td class="fb_submit" colspan="2" id="add_submit_field">(This operation could take a couple of minutes to complete) <input class="fb_button" id="add_submit" name="_submit" type="submit" value="Create" /></td>
 </tr>
 </table>
 </form>
