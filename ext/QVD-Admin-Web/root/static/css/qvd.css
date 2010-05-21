@@ -515,3 +515,36 @@ button.link:focus span {
 .delete:hover {
 	text-decoration: underline;
 }
+
+.loader {
+    width:100%;
+    height:100%;
+    position:fixed;
+    top:0;
+    left:0;
+    background-color: gray;
+    background-color: rgba(0,0,0,0.8);
+    color: white;
+    font-size: 14px;
+    font-weight:bold;
+    vertical-align: middle;
+    display:none;
+    
+    background-image: url(../images/icons/bigloading.gif);
+    background-repeat: no-repeat;
+    background-position: center center;
+}
+
+.loader p {
+    text-align:center;
+    top:50%;
+    position:relative;
+
+}
+
+.loader h2 {
+    text-align:center;
+    top:35%;
+    position:relative;
+
+}
