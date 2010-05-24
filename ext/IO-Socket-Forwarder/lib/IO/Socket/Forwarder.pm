@@ -22,7 +22,6 @@ sub _ssl_want_read { IO::Socket::SSL::SSL_WANT_READ() }
 sub _ssl_want_write { IO::Socket::SSL::SSL_WANT_WRITE() }
 
 sub forward_sockets {
-
     my ($s1, $s2, %opts) = @_;
 
     my $debug = delete $opts{debug};
