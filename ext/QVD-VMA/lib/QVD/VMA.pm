@@ -32,7 +32,7 @@ use parent 'QVD::SimpleRPC::Server';
 my $log_path  = cfg('path.log');
 my $run_path  = cfg('path.run');
 my $nxagent   = cfg('command.nxagent');
-my $nxdiag  = cfg('command.nxdiag');
+my $nxdiag    = cfg('command.nxdiag');
 my $x_session = cfg('command.x-session');
 my $as_user   = cfg('vma.nxagent.as_user');
 
