@@ -1,3 +1,66 @@
 [% META title = "Adding user" %]
 <h1><a href="[% c.uri_for('/users') %]">Users</a> &raquo; New</h1>
-[% FormBuilder.render %]
+
+<script type="text/javascript"><!-- hide from old browsers
+function validate_add (form) {
+    var alertstr = '';
+    var invalid  = 0;
+    var invalid_fields = new Array();
+
+    // login: standard text, hidden, password, or textarea box
+    var login = form.elements['login'].value;
+    if (login == null || login === "") {
+        alertstr += '- Invalid entry for the "Login" field\n';
+        invalid++;
+        invalid_fields.push('login');
+    }
+    // password: standard text, hidden, password, or textarea box
+    var password = form.elements['password'].value;
+    if (password == null || password === "") {
+        alertstr += '- Invalid entry for the "Password" field\n';
+        invalid++;
+        invalid_fields.push('password');
+    }
+    // confirm_password: standard text, hidden, password, or textarea box
+    var confirm_password = form.elements['confirm_password'].value;
+    if (confirm_password == null || confirm_password != form.password.value) {
+        alertstr += '- Invalid entry for the "Confirm Password" field\n';
+        invalid++;
+        invalid_fields.push('confirm_password');
+    }
+    if (invalid > 0 || alertstr != '') {
+        if (! invalid) invalid = 'The following';   // catch for programmer error
+        alert(''+invalid+' error(s) were encountered with your submission:'+'\n\n'
+                +alertstr+'\n'+'Please correct these fields and try again.');
+        return false;
+    }
+    return true;  // all checked ok
+}
+//-->
+
+</script>
+<noscript><span class="fb_invalid">Please enable Javascript or use a newer browser.</span></noscript>
+<p>Fields that are <span class="fb_required">highlighted</span> are required.</p>
+
+<form action="/users/add" class="fb_form" id="add" method="post" name="add" onsubmit="return validate_add(this);" autocomplete="off">
+<div class="fb_state" id="add_state"><input id="_submitted_add" name="_submitted_add" type="hidden" value="1" /></div>
+<table class="fb" id="add_body">
+<tr id="add_login_row">
+  <td class="fb_label" id="add_login_label"><span class="fb_required">Login</span></td>
+
+  <td class="fb_field" id="add_login_field"><input class="fb_input" id="login" name="login" size="40" type="text" /></td>
+</tr>
+<tr id="add_password_row">
+  <td class="fb_label" id="add_password_label"><span class="fb_required">Password</span></td>
+  <td class="fb_field" id="add_password_field"><input class="fb_password" id="password" name="password" size="20" type="password" /></td>
+</tr>
+<tr id="add_confirm_password_row">
+  <td class="fb_label" id="add_confirm_password_label"><span class="fb_required">Confirm Password</span></td>
+  <td class="fb_field" id="add_confirm_password_field"><input class="fb_password" id="confirm_password" name="confirm_password" size="20" type="password" /></td>
+</tr>
+
+<tr id="add_submit_row">
+  <td class="fb_submit" colspan="2" id="add_submit_field"><input class="fb_button" id="add_submit" name="_submit" type="submit" value="Submit" /></td>
+</tr>
+</table>
+</form>
