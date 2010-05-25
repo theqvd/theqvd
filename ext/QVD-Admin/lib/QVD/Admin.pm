@@ -205,7 +205,14 @@ sub cmd_user_del {
 }
 
 sub cmd_vm_del {
-    shift->_obj_del('vm', @_);
+    my ($self, @args) = @_;
+    my $rs = $self->get_resultset('vm');
+    # Checks if vm is running
+    while (my $vm = $rs->next) {
+	if ($vm->vm_runtime->vm_state eq 'stopped') {
+	    $vm->delete;
+	}
+    }
     # FIXME Should we delete the overlay image and home disk file?
 }
 
