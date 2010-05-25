@@ -144,6 +144,7 @@ function load() {
 		var r = "#vm_statetext" + msg.vm_list[i][0];
 		var x = "#vm_statebullet" + msg.vm_list[i][0];
 		var w = "#user_statebullet" + msg.vm_list[i][0];
+		var y = "#user_state" + msg.vm_list[i][0];		
 		var z = "#vm_blocked" + msg.vm_list[i][0];
 		if ($(r).text() != msg.vm_list[i][1]) {
 		    $(s).effect("highlight", {color:"#FF8D13"}, 4000);
@@ -154,6 +155,7 @@ function load() {
 		if ($(w).attr("class") != ("option_user_" + msg.vm_list[i][5])) {
 		    $(w).removeClass();    
 		    $(w).addClass("option_user_" + msg.vm_list[i][5]);
+		    $(y).effect("highlight", {color:"#FF8D13"}, 4000);
 		}
 		if ((msg.vm_list[i][7] == 0) || (msg.vm_list[i][7] == null)) {
 		    $(z).removeClass();
