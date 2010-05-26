@@ -35,7 +35,7 @@ my $overlays_path   = cfg('path.storage.overlays');
 my $homes_path      = cfg('path.storage.homes');
 my $captures_path   = cfg('path.serial.captures');
 
-my $vm_port_x       = cfg('internal.nxagent.display') + 6000;
+my $vm_port_x       = cfg('internal.nxagent.display') + 4000;
 my $vm_port_vma     = cfg('internal.vm.port.vma');
 my $vm_port_ssh     = cfg('internal.vm.port.ssh');
 
