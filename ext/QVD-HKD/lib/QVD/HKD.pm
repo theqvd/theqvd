@@ -173,7 +173,7 @@ sub _check_vms {
 		    $vma_method = 'x_suspend';
 		}
 		elsif ($check_all) {
-		    $vma_method = 'status';
+		    $vma_method = 'ping';
 		}
 	    }
 	    when('starting'  ) { $vma_method = 'ping' }
