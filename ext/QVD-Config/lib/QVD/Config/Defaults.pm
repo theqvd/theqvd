@@ -54,6 +54,9 @@ wat.admin.login = admin
 log.filename = ${path.log}/qvd.log
 log.level = INFO
 
+admin.ssh.opt.StrictHostKeyChecking = no
+admin.ssh.opt.UserKnownHostsFile = /dev/null
+
 vm.overlay.persistent = 0
 
 vm.vnc.redirect = 0

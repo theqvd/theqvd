@@ -3,6 +3,7 @@ package QVD::AdminCLI;
 use warnings;
 use strict;
 
+use QVD::Config;
 use QVD::Admin;
 use Text::Table;
 
@@ -24,9 +25,7 @@ sub set_filter {
     my ($self, $filter_string) = @_;
     my @filter_array = split /,/, $filter_string; 
     my %conditions = _split_on_equals(@filter_array);
-    
     $self->{admin}->set_filter(%conditions);
-
 }
 
 sub get_resultset {
@@ -894,14 +893,20 @@ sub cmd_vm_ssh {
 	my $vm_runtime = $self->_get_single_vm_runtime;
 	my $ssh_port = $vm_runtime->vm_ssh_port;
 	die 'SSH access is disabled' unless defined $ssh_port;
-	my @cmd = (ssh => ($vm_runtime->vm_address, -p => $ssh_port, @args));
+	my @extra_opts;
+	for (cfg_keys) {
+	    if (my ($key, $opt) = /^(admin\.ssh\.opt\.(.*))$/) {
+		my $value = cfg($key);
+		push @extra_opts, -o => "$opt=$value" if length $value;
+	    }
+	}
+	my @cmd = (ssh => ($vm_runtime->vm_address, -p => $ssh_port, @extra_opts, @args));
 	exec @cmd or die "Unable to exec ssh: $^E";
     };
-    
     if ($@) {
 	$self->_print("Wrong syntax, check the command help:\n");
 	$self->help_vm_ssh;
-    }    
+    }
 }
 
 sub help_vm_ssh {

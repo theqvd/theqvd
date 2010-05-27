@@ -9,7 +9,7 @@ use Config::Properties;
 use QVD::Config::Defaults;
 
 use Exporter qw(import);
-our @EXPORT = qw(core_cfg core_cfg_all core_cfg_keys cfg ssl_cfg);
+our @EXPORT = qw(core_cfg core_cfg_all core_cfg_keys cfg ssl_cfg cfg_keys);
 
 our $USE_DB //= 1;
 our @FILES;
@@ -65,6 +65,12 @@ sub cfg {
     else {
 	goto &core_cfg;
     }
+}
+
+sub cfg_keys {
+    $cfg // reload;
+    my %keys = map { $_ => 1 } core_cfg_keys, keys %$cfg;
+    return keys %keys;
 }
 
 1;
