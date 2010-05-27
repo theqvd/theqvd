@@ -63,7 +63,6 @@ my %nx2x = ( initiating  => 'starting',
 	     suspended   => 'suspended',
 	     terminating => 'stopping',
 	     aborting    => 'stopping',
-	     suspended   => 'stopped',
 	     aborted     => 'stopped',
 	     stopped     => 'stopped',
 	     ''          => 'stopped');
