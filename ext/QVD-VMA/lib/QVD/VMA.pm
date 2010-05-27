@@ -373,9 +373,9 @@ sub SimpleRPC_x_stop {
 }
 
 sub SimpleRPC_x_start {
-    my ($self, %args) = @_;
+    my $self = shift;
     INFO "starting/resuming X session";
-    _start_session(%x_args);
+    _start_session(@_);
 }
 
 1;
