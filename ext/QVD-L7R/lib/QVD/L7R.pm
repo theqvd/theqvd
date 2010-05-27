@@ -106,7 +106,7 @@ sub connect_to_vm_processor {
 
     my $query = (uri_split $url)[3];
     my %params = uri_query_split  $query;
-    my $vm_id = delete $params{'vm.id'};
+    my $vm_id = delete $params{id};
     unless (defined $vm_id) {
 	$l7r->send_http_error(HTTP_UNPROCESSABLE_ENTITY);
 	return;
