@@ -17,16 +17,13 @@ our @FILES;
 push @FILES, '/etc/qvd/node.conf' unless @FILES;
 
 my $core_cfg = $QVD::Config::defaults;
-my $core_cfg_path;
 
 for my $FILE (@FILES) {
     open my $cfg_fh, '<', $FILE or next;
     $core_cfg = Config::Properties->new($core_cfg);
     $core_cfg->load($cfg_fh);
-    $core_cfg_path = $FILE;
     close $cfg_fh;
 }
-warn $core_cfg_path;
 
 sub core_cfg {
     my $value = $core_cfg->requireProperty(@_);
@@ -82,8 +79,9 @@ sub set_core_cfg {
 }
 
 sub save_core_cfg {
-    open my $cfg_fh, '>', $core_cfg_path
-	or die "Unable to save configuration: $^E";
+    my $path = shift;
+    open my $cfg_fh, '>', $path
+	or die "Unable to save configuration to '$path': $^E";
     $core_cfg->save($cfg_fh);
     close $cfg_fh;
 }
