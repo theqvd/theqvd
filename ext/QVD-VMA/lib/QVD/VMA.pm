@@ -92,13 +92,13 @@ sub _call_hook {
 
 sub _call_action_hook {
     my $action = shift;
-    my $state = _state;
+    my $state = _state();
     _call_hook("action $action on state $state", $on_action{$action},
 	       @_, 'session.state', $state, 'hook.on_action', $action);
 }
 
 sub _call_state_hook {
-    my $state = _state;
+    my $state = _state();
     _call_hook("state $state", $on_state{$state}, @_, 'hook.on_state', $state);
 }
 
