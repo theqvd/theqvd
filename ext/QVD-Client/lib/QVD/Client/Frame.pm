@@ -18,7 +18,7 @@ my $EVT_CONN_STATUS :shared = Wx::NewEventType;
 my $vm_id :shared;
 my %connect_info :shared;
 
-my $DEFAULT_PORT = 8443;
+my $DEFAULT_PORT = cfg('host.port', 0) // 8443;
 
 sub new {
 	my( $class, $parent, $id, $title, $pos, $size, $style, $name ) = @_;
@@ -53,7 +53,7 @@ sub new {
 	$grid_sizer->Add(Wx::StaticText->new($panel, -1, "User"),
 			 0, wxALL, 5);
 
-	$self->{username} = Wx::TextCtrl->new($panel, -1, "");
+	$self->{username} = Wx::TextCtrl->new($panel, -1, cfg('username', 0) // '');
 	$grid_sizer->Add($self->{username},
 			 1, wxALL|wxEXPAND, 5);
 	$self->{username}->SetFocus();
@@ -66,7 +66,7 @@ sub new {
 			 1, wxALL|wxEXPAND, 5);
 	$grid_sizer->Add(Wx::StaticText->new($panel, -1, "Server"),
 			 0, wxALL, 5);
-	$self->{host} = Wx::TextCtrl->new($panel, -1, cfg('host', 0) // '');
+	$self->{host} = Wx::TextCtrl->new($panel, -1, cfg('host.name', 0) // '');
 	$grid_sizer->Add($self->{host},
 			 1, wxALL|wxEXPAND, 5);
 
@@ -225,8 +225,12 @@ sub ConnectToVM {
 	my ($code, $msg, $headers, $body) = $httpc->read_http_response;
 	if ($code == HTTP_SWITCHING_PROTOCOLS) {
 	    Wx::PostEvent($self, new Wx::PlThreadEvent(-1, $EVT_CONN_STATUS, 'CONNECTED'));
-	    my $proxy = new QVD::Client::Proxy($httpc->get_socket);
-	    $proxy->run();
+	    my $proxy = new QVD::Client::Proxy(
+		media => 4713,
+		cups => 631,
+		link => 'adsl'
+	    );
+	    $proxy->run($httpc->get_socket);
 	    last;
 	}
 	elsif ($code == HTTP_PROCESSING) {
@@ -332,7 +336,8 @@ sub OnExit {
 
 sub SaveConfiguration {
     my $self = shift;
-    set_core_cfg('host', $self->{host}->GetValue());
+    set_core_cfg('host.name', $self->{host}->GetValue());
+    set_core_cfg('username', $self->{username}->GetValue());
     local $@;
     eval {
 	my $qvd_dir = $ENV{HOME}.'/.qvd';
@@ -341,8 +346,8 @@ sub SaveConfiguration {
     };
     if ($@) {
 	my $message = $@;
-	my $dialog = Wx::MessageDialog->new($self, $message, "Error saving configuration",
-				wxOK | wxICON_ERROR);
+	my $dialog = Wx::MessageDialog->new($self, $message, 
+	    "Error saving configuration", wxOK | wxICON_ERROR);
 	$dialog->ShowModal();
 	$dialog->Destroy();
     }
