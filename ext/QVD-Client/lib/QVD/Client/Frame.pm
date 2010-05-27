@@ -66,7 +66,7 @@ sub new {
 			 1, wxALL|wxEXPAND, 5);
 	$grid_sizer->Add(Wx::StaticText->new($panel, -1, "Server"),
 			 0, wxALL, 5);
-	$self->{host} = Wx::TextCtrl->new($panel, -1, cfg('host', ''));
+	$self->{host} = Wx::TextCtrl->new($panel, -1, cfg('host', 0) // '');
 	$grid_sizer->Add($self->{host},
 			 1, wxALL|wxEXPAND, 5);
 
