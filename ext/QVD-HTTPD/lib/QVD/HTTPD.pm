@@ -117,6 +117,7 @@ sub _get_http_request_processor {
 sub _process_http_request {
     my $self = shift;
     my ($method, $url, $headers) = @_;
+    DEBUG "processing request $method $url";
     my $path = (uri_split $url)[2];
     my $processor = $self->_get_http_request_processor($method, $path);
     if ($processor) {
