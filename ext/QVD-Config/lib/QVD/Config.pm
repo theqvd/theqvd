@@ -9,18 +9,21 @@ use Config::Properties;
 use QVD::Config::Defaults;
 
 use Exporter qw(import);
-our @EXPORT = qw(core_cfg core_cfg_all core_cfg_keys cfg ssl_cfg cfg_keys);
+our @EXPORT = qw(core_cfg core_cfg_all core_cfg_keys cfg ssl_cfg cfg_keys 
+		 save_core_cfg set_core_cfg);
 
 our $USE_DB //= 1;
 our @FILES;
 push @FILES, '/etc/qvd/node.conf' unless @FILES;
 
 my $core_cfg = $QVD::Config::defaults;
+my $core_cfg_path;
 
 for my $FILE (@FILES) {
     open my $cfg_fh, '<', $FILE or next;
     $core_cfg = Config::Properties->new($core_cfg);
     $core_cfg->load($cfg_fh);
+    $core_cfg_path = $FILE;
     close $cfg_fh;
 }
 
@@ -71,6 +74,14 @@ sub cfg_keys {
     $cfg // reload;
     my %keys = map { $_ => 1 } core_cfg_keys, keys %$cfg;
     return keys %keys;
+}
+
+sub set_core_cfg {
+    $core_cfg->changeProperty(@_);
+}
+
+sub save_core_cfg {
+    $core_cfg->save($core_cfg_path);
 }
 
 1;
