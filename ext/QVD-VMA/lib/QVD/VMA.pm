@@ -78,28 +78,71 @@ my %nx2x = ( initiating  => 'starting',
 my %running   = map { $_ => 1 } qw(listening connected suspending suspended);
 my %connected = map { $_ => 1 } qw(listening connected);
 
+sub _open_log {
+    my $name = shift;
+    my $log_fn = "$log_path/qvd-$name.log";
+    open my $log, '>>', $log_fn or die "unable to open $name log file $log_fn\n";
+    return $log;
+}
+
 sub _call_hook {
     my $name = shift;
     my $file = shift;
+    my $detach = shift;
     if (length $file) {
 	DEBUG "calling hook $file for $name with args @_";
-	-x $file
-	    or die "hook file $file for $name does not exist or is not executable\n";
-	system $file, @_
-	    and die "execution of hook $file for $name failed with rc " . ($! >> 8) ."\n";
+	my $pid = fork;
+	if (!$pid) {
+	    defined $pid or die "fork failed: $!\n";
+	    eval {
+		my $log = _open_log('hooks');
+		POSIX::dup(fileno($log), 1);
+		POSIX::dup(fileno($log), 2);
+		open STDIN, '<', '/dev/null';
+		if ($detach) {
+		    local $SIG{CHLD};
+		    my $pid2 = fork;
+		    if (!$pid2) {
+			defined $pid2 and exec $file, @_;
+			DEBUG "execution of hook $file for $name failed: $!";
+			# defined $pid2 and POSIX::_exit(0); # grandchild just fallbacks to...
+		    }
+		    POSIX::_exit(0);
+		}
+		else {
+		    do {exec $file, @_ };
+		    die "exec failed: $!\n";
+		}
+	    };
+	    DEBUG "execution of hook $file for $name failed: $@" if $@;
+	    POSIX::_exit(1);
+	}
+	while (1) {
+	    # FIXME: implement timeout for hooks
+	    my $kid = waitpid($pid, 0);
+	    if ($kid < 0) die "hook process $pid disappeared";
+	    if ($kid == $pid) {
+		$? and die "hook $file for $name failed, rc: ". ($? >> 8);
+		return;
+	    }
+	    DEBUG "waitpid returned $kid unexpectedly";
+	    sleep 1;
+	}
     }
 }
 
 sub _call_action_hook {
     my $action = shift;
     my $state = _state();
-    _call_hook("action $action on state $state", $on_action{$action},
+    _call_hook("action $action on state $state", $on_action{$action}, 0,
 	       @_, 'session.state', $state, 'hook.on_action', $action);
 }
 
 sub _call_state_hook {
     my $state = _state();
-    _call_hook("state $state", $on_state{$state}, @_, 'hook.on_state', $state);
+    local $@;
+    # state hooks are called detached and may not fail:
+    eval { _call_hook("state $state", $on_state{$state}, 1, @_, 'hook.on_state', $state) };
 }
 
 sub _become_user {
@@ -168,19 +211,13 @@ sub _timestamp {
     sprintf("%04d%02d%02d%02d%02d%02d", @t[5, 4, 3, 2, 1, 0]);
 }
 
-sub _open_log {
-    my $log_fn = "$log_path/qvd-nxagent.log"; # -" . _timestamp . ".log";
-    open my $log, '>>', $log_fn or die "unable to open nxagent log file $log_fn\n";
-    return $log;
-}
-
 my %props2nx = ( 'client.keyboard' => 'keyboard',
 		 'client.os'       => 'client',
 		 'client.link'     => 'link' );
 
 sub _fork_monitor {
     my %props = @_;
-    my $log = _open_log;
+    my $log = _open_log('nxagent');
     my $logfd = fileno $log;
     select $log;
     $| = 1;
