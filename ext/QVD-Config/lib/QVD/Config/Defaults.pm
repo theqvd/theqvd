@@ -72,6 +72,18 @@ vma.nxagent.as_user = qvd
 
 vma.x-session.env.QVD_SESSION = 1
 
+vma.on_action.connect =
+vma.on_action.disconnect =
+vma.on_action.suspend =
+vma.on_action.poweroff =
+
+vma.on_state.connected =
+vma.on_state.suspended =
+vma.on_state.disconnected =
+
+vma.default.client.keyboard = pc105/en
+vma.default.client.link = adsl
+
 # internal parameters, do not change!!!
 internal.l7r.timeout.vm_start = 270
 internal.l7r.timeout.x_start = 10
