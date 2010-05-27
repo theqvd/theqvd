@@ -6,7 +6,8 @@ use strict;
 use warnings;
 BEGIN {
     $QVD::Config::USE_DB = 0;
-    @QVD::Config::FILES = ('~/.qvd/client.conf', 
+    @QVD::Config::FILES = ('/etc/qvd/client.conf',
+			   $ENV{HOME}.'/.qvd/client.conf',
 			   'qvd-client.conf');
 
     # FIXME NX_CLIENT is used for showing the user information on things

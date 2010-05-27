@@ -5,8 +5,8 @@ use threads::shared;
 use Wx qw[:everything];
 use QVD::Config;
 use QVD::HTTP::StatusCodes qw(:status_codes);
+use QVD::Client::Proxy;
 use IO::Handle;
-use IO::Socket::Forwarder qw(forward_sockets);
 use JSON;
 use base qw(Wx::Frame);
 use strict;
@@ -128,7 +128,6 @@ sub OnClickConnect {
 	lock(%connect_info);
 	cond_signal(%connect_info);
     }
-    $self->SaveConfiguration();
 }
 
 sub _shared_clone {
@@ -226,17 +225,8 @@ sub ConnectToVM {
 	my ($code, $msg, $headers, $body) = $httpc->read_http_response;
 	if ($code == HTTP_SWITCHING_PROTOCOLS) {
 	    Wx::PostEvent($self, new Wx::PlThreadEvent(-1, $EVT_CONN_STATUS, 'CONNECTED'));
-	    my $ll = IO::Socket::INET->new(LocalPort => 4040,
-		ReuseAddr => 1,
-		Listen => 1);
-
-	    # XXX: make media port configurable (4713 for pulseaudio)
-	    system "nxproxy -S localhost:40 media=4713 &";
-	    my $s1 = $ll->accept()
-		or die "connection from nxproxy failed";
-	    undef $ll; # close the listening socket
-	    my $s2 = $httpc->get_socket;
-	    forward_sockets($s1, $s2); # , debug => 1);
+	    my $proxy = new QVD::Client::Proxy($httpc->get_socket);
+	    $proxy->run();
 	    last;
 	}
 	elsif ($code == HTTP_PROCESSING) {
@@ -342,7 +332,20 @@ sub OnExit {
 
 sub SaveConfiguration {
     my $self = shift;
-    warn "Automatic saving of changed configuration not implemented yet";
+    set_core_cfg('host', $self->{host}->GetValue());
+    local $@;
+    eval {
+	my $qvd_dir = $ENV{HOME}.'/.qvd';
+	mkdir $qvd_dir unless -e $qvd_dir;
+	save_core_cfg($qvd_dir.'/client.conf'); 
+    };
+    if ($@) {
+	my $message = $@;
+	my $dialog = Wx::MessageDialog->new($self, $message, "Error saving configuration",
+				wxOK | wxICON_ERROR);
+	$dialog->ShowModal();
+	$dialog->Destroy();
+    }
 }
 
 1;
