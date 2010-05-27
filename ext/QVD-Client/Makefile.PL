@@ -10,6 +10,7 @@ WriteMakefile(
     PL_FILES            => {},
     EXE_FILES           => [ qw(bin/qvd-client.pl bin/qvd-gui-client.pl) ],
     PREREQ_PM => {
+	'Config::Properties' => 0,
 	'IO::Socket::Forwarder' => 0,
 	'IO::Socket::SSL' => 0,
 	'JSON' => 0,

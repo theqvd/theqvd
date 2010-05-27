@@ -12,14 +12,17 @@ use Exporter qw(import);
 our @EXPORT = qw(core_cfg core_cfg_all core_cfg_keys cfg ssl_cfg);
 
 our $USE_DB //= 1;
-our $FILE   //= '/etc/qvd/node.conf';
+our @FILES;
+push @FILES, '/etc/qvd/node.conf' unless @FILES;
 
-my $core_cfg = Config::Properties->new($QVD::Config::defaults);
+my $core_cfg = $QVD::Config::defaults;
 
-open my $cfg_fh, '<', $FILE
-    or die "unable to read configuration file $FILE\n";
-$core_cfg->load($cfg_fh);
-close $cfg_fh;
+for my $FILE (@FILES) {
+    open my $cfg_fh, '<', $FILE or next;
+    $core_cfg = Config::Properties->new($core_cfg);
+    $core_cfg->load($cfg_fh);
+    close $cfg_fh;
+}
 
 sub core_cfg {
     my $value = $core_cfg->requireProperty(@_);
