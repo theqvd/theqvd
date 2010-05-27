@@ -9,7 +9,7 @@ use Config::Properties;
 use QVD::Config::Defaults;
 
 use Exporter qw(import);
-our @EXPORT = qw(core_cfg core_cfg_all core_cfg_keys cfg ssl_cfg cfg_keys 
+our @EXPORT = qw(core_cfg core_cfg_all core_cfg_keys cfg ssl_cfg cfg_keys
 		 save_core_cfg set_core_cfg);
 
 our $USE_DB //= 1;
@@ -26,8 +26,15 @@ for my $FILE (@FILES) {
 }
 
 sub core_cfg {
-    my $value = $core_cfg->requireProperty(@_);
-    $value =~ s/\$\{(.*?)\}/core_cfg($1)/ge;
+    my $key = shift;
+    my $mandatory = shift // 1;
+    my $value = $core_cfg->getProperty($key);
+    if (defined $value) {
+	$value =~ s/\$\{(.*?)\}/core_cfg($1)/ge;
+    }
+    elsif ($mandatory) {
+	die "Configuration entry for $key missing\n";
+    }
     $value;
 }
 
@@ -49,8 +56,9 @@ sub reload {
 }
 
 sub cfg {
+    my $key = shift;
+    my $mandatory = shift // 1;
     if ($USE_DB) {
-	my $key = shift;
 	if ($key =~ /^l7r\.ssl\./) {
 	    # SSL keys are only loaded on demand.
 	    require QVD::DB::Simple;
@@ -58,14 +66,13 @@ sub cfg {
 	    return $slot->value if defined $slot;
 	}
 	$cfg // reload;
-	my $value = $cfg->{$key} // $core_cfg->getProperty($key, @_) //
-	    die "Configuration entry for $key missing\n";
-	$value =~ s/\$\{(.*?)\}/cfg($1)/ge;
-	$value;
+	my $value = $cfg->{$key};
+	if (defined $value) {
+	    $value =~ s/\$\{(.*?)\}/cfg($1)/ge;
+	    return $value;
+	}
     }
-    else {
-	goto &core_cfg;
-    }
+    core_cfg($key, $mandatory);
 }
 
 sub cfg_keys {
