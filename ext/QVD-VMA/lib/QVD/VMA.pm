@@ -96,8 +96,9 @@ sub _call_hook {
 	    defined $pid or die "fork failed: $!\n";
 	    eval {
 		my $log = _open_log('hooks');
-		POSIX::dup(fileno($log), 1);
-		POSIX::dup(fileno($log), 2);
+		my $logfd = fileno $log;
+		POSIX::dup2($logfd, 1);
+		POSIX::dup2($logfd, 2);
 		open STDIN, '<', '/dev/null';
 		if ($detach) {
 		    local $SIG{CHLD};
