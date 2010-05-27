@@ -102,6 +102,8 @@ sub new {
 	Wx::Event::EVT_COMMAND($self, -1, $EVT_LIST_OF_VM_LOADED, \&OnListOfVMLoaded);
 	Wx::Event::EVT_COMMAND($self, -1, $EVT_CONN_STATUS, \&OnConnectionStatusChanged);
 
+	Wx::Event::EVT_CLOSE($self, \&OnExit);
+
 	$self->{timer} = Wx::Timer->new($self);
 	$self->{proc} = undef;
 	$self->{proc_pid} = undef;
@@ -115,6 +117,8 @@ sub OnClickConnect {
     $self->{state} = "";
     %connect_info = map { $_ => $self->{$_}->GetValue } qw(host username password);
     $connect_info{port} = $DEFAULT_PORT;
+    # Start or notify worker thread; will result in the execution 
+    # of the loop in RunWorkerThread.
     if (!$self->{worker_thread} || !$self->{worker_thread}->is_running()) {
 	@_ = ();
 	my $thr = threads->create(\&RunWorkerThread, $self);
@@ -124,6 +128,7 @@ sub OnClickConnect {
 	lock(%connect_info);
 	cond_signal(%connect_info);
     }
+    $self->SaveConfiguration();
 }
 
 sub _shared_clone {
@@ -225,10 +230,6 @@ sub ConnectToVM {
 		ReuseAddr => 1,
 		Listen => 1);
 
-	    # FIXME NX_CLIENT is used for showing the user information on things
-	    # like broken connection, perhaps we should show them to the user
-	    # instead of ignoring them? 
-	    $ENV{NX_CLIENT} = '/bin/false';
 	    # XXX: make media port configurable (4713 for pulseaudio)
 	    system "nxproxy -S localhost:40 media=4713 &";
 	    my $s1 = $ll->accept()
@@ -331,6 +332,17 @@ sub EnableControls {
 sub OnTimer {
     my $self = shift;
     $self->{progress_bar}->Pulse;
+}
+
+sub OnExit {
+    my $self = shift;
+    $self->SaveConfiguration();
+    $self->Destroy();
+}
+
+sub SaveConfiguration {
+    my $self = shift;
+    warn "Automatic saving of changed configuration not implemented yet";
 }
 
 1;

@@ -8,6 +8,11 @@ BEGIN {
     $QVD::Config::USE_DB = 0;
     @QVD::Config::FILES = ('~/.qvd/client.conf', 
 			   'qvd-client.conf');
+
+    # FIXME NX_CLIENT is used for showing the user information on things
+    # like broken connection, perhaps we should show them to the user
+    # instead of ignoring them? 
+    $ENV{NX_CLIENT} = '/bin/false';
 }
 use QVD::Client::Frame;
 use parent 'Wx::App';
