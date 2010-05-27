@@ -177,7 +177,7 @@ sub _fork_monitor {
 		    POSIX::dup2(1, 2); # equivalent to shell 2>&1
 		    _become_user($as_user);
 
-		    my @nx_args = 'nx/nx', 'link=lan', map "$_=$x_args{$_}", keys %x_args;
+		    my @nx_args = ('nx/nx', 'link=lan', map "$_=$x_args{$_}", keys %x_args);
 		    if ($enable_audio) {
 			push @nx_args, 'media=1';
 			$ENV{PULSE_SERVER} = "tcp:localhost:".($display+7000);
