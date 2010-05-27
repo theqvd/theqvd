@@ -9,12 +9,12 @@ my $mount_point;
 my $user;
 
 GetOptions('type|t=s' =>  \$fstype, 
-	'user|u=s' => \$user,
-	'mount-point=s' => \$mount_point);
+	   'user|u=s' => \$user,
+	   'mount-point=s' => \$mount_point);
 
-$fstype //= 'ext3';
+$fstype      //= 'ext4';
 $mount_point //= '/home';
-$user //= 'qvd';
+$user        //= 'qvd';
 
 unless (system ("mount", "/dev/sdb1", $mount_point) == 0) {
     die 'Unable to mount user storage' if -e '/dev/sdb1';
