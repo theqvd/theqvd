@@ -205,8 +205,8 @@ sub _fork_monitor {
 		    when (/Session: Session (\w+) at/) {
 			_save_nxagent_state lc $1;
 		    }
-		    print $line;
 		}
+		print $line;
 	    }
 	    print "out closed";
 	};
