@@ -51,6 +51,7 @@ sub process_request {
     while (<$socket>) {
 	s/\r?\n$//; # HTTP chomp
 	next if /^\s*$/;
+	DEBUG "processing request $_";
 	if (my ($method, $url, $version) = m|^(\w+)\s+(.*?)\s*((?:\bHTTP/\d+\.\d+)?)$|) {
 	    if ($version ne 'HTTP/1.1') {
 		$self->send_http_error(HTTP_VERSION_NOT_SUPPORTED);
