@@ -11,12 +11,12 @@ sub post_configure_hook {
     my $self = shift;
     my $impl = QVD::VMA::Impl->new();
     $impl->set_http_request_processors($self, '/vma/*');
-    QVD::VMA::Impl::_delete_nxagent_state_and_pid();
+    QVD::VMA::Impl::_delete_nxagent_state_and_pid_and_call_hook();
 }
 
 sub post_child_cleanup_hook {
     QVD::VMA::Impl::_stop_session();
-    QVD::VMA::Impl::_delete_nxagent_state_and_pid();
+    QVD::VMA::Impl::_delete_nxagent_state_and_pid_and_call_hook();
 }
 
 package QVD::VMA::Impl;
@@ -37,8 +37,16 @@ my $x_session    = cfg('command.x-session');
 my $as_user      = cfg('vma.nxagent.as_user');
 my $enable_audio = cfg('vma.audio.enable');
 
-my $display   = cfg('internal.nxagent.display');
+my %on_action = ( connect    => cfg('vma.on_action.connect'),
+		  disconnect => cfg('vma.on_action.disconnect'),
+		  suspend    => cfg('vma.on_action.suspend'),
+		  poweroff   => cfg('vma.on_action.poweroff') );
 
+my %on_state = ( connected => cfg('vma.on_state.connected'),
+		 suspended => cfg('vma.on_state.suspended'),
+		 stopped   => cfg('vma.on_state.disconnected') );
+
+my $display   = cfg('internal.nxagent.display');
 
 my %timeout = ( initiating => cfg('internal.nxagent.timeout.initiating'),
 		listening  => cfg('internal.nxagent.timeout.listening'),
@@ -118,13 +126,17 @@ sub _write_line {
     close $fh;
 }
 
-sub _save_nxagent_state { _write_line($nxagent_state_fn, join(':', shift, time) ) }
+sub _save_nxagent_state_and_call_hook {
+    _write_line($nxagent_state_fn, join(':', shift, time) );
+    _call_state_hook;
+}
 sub _save_nxagent_pid   { _write_line($nxagent_pid_fn, shift) }
 
-sub _delete_nxagent_state_and_pid {
+sub _delete_nxagent_state_and_pid_and_call_hook {
     DEBUG "deleting pid and state files";
     unlink $nxagent_pid_fn;
     unlink $nxagent_state_fn;
+    _call_state_hook;
 }
 
 sub _timestamp {
@@ -138,8 +150,12 @@ sub _open_log {
     return $log;
 }
 
+my %props2nx = ( 'client.keyboard' => 'keyboard',
+		 'client.os'       => 'client',
+		 'client.link'     => 'link' );
+
 sub _fork_monitor {
-    my %x_args = @_;
+    my %props = @_;
     my $log = _open_log;
     my $logfd = fileno $log;
     select $log;
@@ -147,7 +163,7 @@ sub _fork_monitor {
 
     say _timestamp . ": Starting nxagent";
 
-    _save_nxagent_state 'initiating';
+    _save_nxagent_state_and_call_hook 'initiating';
 
     my $pid = fork;
     if (!$pid) {
@@ -166,7 +182,7 @@ sub _fork_monitor {
 
 	    $SIG{CHLD} = 'IGNORE';
 
-	    _save_nxagent_state 'initiating';
+	    _save_nxagent_state_and_call_hook 'initiating';
 
 	    my $pid = open(my $out, '-|');
 	    if (!$pid) {
@@ -176,7 +192,16 @@ sub _fork_monitor {
 		    POSIX::dup2(1, 2); # equivalent to shell 2>&1
 		    _become_user($as_user);
 
-		    my @nx_args = ('nx/nx', 'link=lan', map "$_=$x_args{$_}", keys %x_args);
+		    my @nx_args = ('nx/nx');
+		    for my $key (keys %props2nx) {
+			my $val = $props{$key} // cfg("vma.default.$key", 0);
+			if (defined $val) {
+			    $val =~ m{^[\w/\-\+]+$}
+				or die "invalid characters in parameter $key";
+			    push @nx_args "$props2nx{$key}=$val";
+			}
+		    }
+
 		    if ($enable_audio) {
 			push @nx_args, 'media=1';
 			$ENV{PULSE_SERVER} = "tcp:localhost:".($display+7000);
@@ -199,10 +224,10 @@ sub _fork_monitor {
 			_save_nxagent_pid $1;
 		    }
 		    when (/Session: (\w+) session at/) {
-			_save_nxagent_state lc $1;
+			_save_nxagent_state_and_call_hook lc $1;
 		    }
 		    when (/Session: Session (\w+) at/) {
-			_save_nxagent_state lc $1;
+			_save_nxagent_state_and_call_hook lc $1;
 		    }
 		}
 		print $line;
@@ -210,7 +235,7 @@ sub _fork_monitor {
 	    print "out closed";
 	};
 	DEBUG $@ if $@;
-	_delete_nxagent_state_and_pid;
+	_delete_nxagent_state_and_pid_and_call_hook;
     }
 }
 
@@ -240,14 +265,39 @@ sub _state {
 	}
     }
 
-    _delete_nxagent_state_and_pid if $state eq 'stopped';
+    _delete_nxagent_state_and_pid_and_call_hook if $state eq 'stopped';
 
     return wantarray ? ($state, $pid) : $state;
+}
+
+sub _call_hook {
+    my $name = shift;
+    my $file = shift;
+    if (length $file) {
+	DEBUG "calling hook $file for $name with args @_";
+	-x $file
+	    or die "hook file $file for $name does not exist or is not executable\n";
+	system $file, @_
+	    and die "execution of hook $file for $name failed with rc " . ($! >> 8) ."\n";
+    }
+}
+
+sub _call_action_hook {
+    my $action = shift;
+    my $state = _state;
+    _call_hook("action $action on state $state", $on_action{$action},
+	       @_, 'session.state', $state, 'hook.on_action', $action);
+}
+
+sub _call_state_hook {
+    my $state = _state;
+    _call_hook("state $state", $on_state{$state}, @_, 'hook.on_state', $state);
 }
 
 sub _suspend_session {
     my ($state, $pid) = _state;
     if ($pid and $connected{$state}) {
+	_call_action_hook('suspend', @_);
 	kill HUP => $pid;
 	return 'starting';
     }
@@ -257,6 +307,7 @@ sub _suspend_session {
 sub _stop_session {
     my ($state, $pid) = _state;
     if ($pid) {
+	_call_action_hook('stop', @_);
 	kill TERM => $pid;
 	return 'stopping'
     }
@@ -268,8 +319,9 @@ sub _start_session {
     DEBUG "starting session in state $state, pid $pid";
     given ($state) {
 	when ('suspended') {
+	    _call_action_hook('connect',  @_);
 	    DEBUG "awaking nxagent";
-	    _save_nxagent_state 'initiating';
+	    _save_nxagent_state_and_call_hook 'initiating';
 	    kill HUP => $pid;
 	}
 	when ('connected') {
@@ -278,6 +330,7 @@ sub _start_session {
 	    die "Can't connect to X session in state connected, suspending it, retry later\n";
 	}
 	when ('stopped') {
+	    _call_action_hook('connect', @_);
 	    _fork_monitor(@_);
 	}
 	default {
@@ -287,6 +340,10 @@ sub _start_session {
     'starting';
 }
 
+sub _poweroff {
+    _call_action_hook('poweroff', @_);
+    system(init => 0);
+}
 
 ################################ RPC methods ######################################
 
@@ -302,7 +359,7 @@ sub SimpleRPC_x_state {
 
 sub SimpleRPC_poweroff {
     INFO "shutting system down";
-    system(init => 0);
+    _poweroff;
 }
 
 sub SimpleRPC_x_suspend {
@@ -316,17 +373,8 @@ sub SimpleRPC_x_stop {
 }
 
 sub SimpleRPC_x_start {
-    my ($self, %x_args) = @_;
+    my ($self, %args) = @_;
     INFO "starting/resuming X session";
-
-    # check args:
-    while (my ($k, $v) = each %x_args) {
-	$k =~ m{^(?:keyboard|client)$}
-	    or die "invalid parameter $k";
-	$v =~ m{^[\w/\-\+]+$}
-	    or die "invalid characters in parameter $k";
-    }
-
     _start_session(%x_args);
 }
 
