@@ -26,7 +26,7 @@ sub run {
     } else {
 	@cmd= qw(nxproxy -S localhost:40 media=4713);
     }
-    my $proc1 = Proc::Background->new(@cmd);
+    $self->{process} = Proc::Background->new(@cmd);
 
     my $ll = IO::Socket::INET->new(LocalPort => 4040,
 	ReuseAddr => 1,
