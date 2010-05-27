@@ -4,6 +4,11 @@ package QVD::Client::App;
 
 use strict;
 use warnings;
+BEGIN {
+    $QVD::Config::USE_DB = 0;
+    @QVD::Config::FILES = ('~/.qvd/client.conf', 
+			   'qvd-client.conf');
+}
 use QVD::Client::Frame;
 use parent 'Wx::App';
 
