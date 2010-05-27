@@ -78,6 +78,30 @@ my %nx2x = ( initiating  => 'starting',
 my %running   = map { $_ => 1 } qw(listening connected suspending suspended);
 my %connected = map { $_ => 1 } qw(listening connected);
 
+sub _call_hook {
+    my $name = shift;
+    my $file = shift;
+    if (length $file) {
+	DEBUG "calling hook $file for $name with args @_";
+	-x $file
+	    or die "hook file $file for $name does not exist or is not executable\n";
+	system $file, @_
+	    and die "execution of hook $file for $name failed with rc " . ($! >> 8) ."\n";
+    }
+}
+
+sub _call_action_hook {
+    my $action = shift;
+    my $state = _state;
+    _call_hook("action $action on state $state", $on_action{$action},
+	       @_, 'session.state', $state, 'hook.on_action', $action);
+}
+
+sub _call_state_hook {
+    my $state = _state;
+    _call_hook("state $state", $on_state{$state}, @_, 'hook.on_state', $state);
+}
+
 sub _become_user {
     # Formerly copied from cftools http://sourceforge.net/projects/cftools/
     # Copyright 2003-2005 Martin Andrews
@@ -268,30 +292,6 @@ sub _state {
     _delete_nxagent_state_and_pid_and_call_hook if $state eq 'stopped';
 
     return wantarray ? ($state, $pid) : $state;
-}
-
-sub _call_hook {
-    my $name = shift;
-    my $file = shift;
-    if (length $file) {
-	DEBUG "calling hook $file for $name with args @_";
-	-x $file
-	    or die "hook file $file for $name does not exist or is not executable\n";
-	system $file, @_
-	    and die "execution of hook $file for $name failed with rc " . ($! >> 8) ."\n";
-    }
-}
-
-sub _call_action_hook {
-    my $action = shift;
-    my $state = _state;
-    _call_hook("action $action on state $state", $on_action{$action},
-	       @_, 'session.state', $state, 'hook.on_action', $action);
-}
-
-sub _call_state_hook {
-    my $state = _state;
-    _call_hook("state $state", $on_state{$state}, @_, 'hook.on_state', $state);
 }
 
 sub _suspend_session {
