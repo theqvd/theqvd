@@ -26,6 +26,7 @@ for my $FILE (@FILES) {
     $core_cfg_path = $FILE;
     close $cfg_fh;
 }
+warn $core_cfg_path;
 
 sub core_cfg {
     my $value = $core_cfg->requireProperty(@_);
@@ -81,7 +82,10 @@ sub set_core_cfg {
 }
 
 sub save_core_cfg {
-    $core_cfg->save($core_cfg_path);
+    open my $cfg_fh, '>', $core_cfg_path
+	or die "Unable to save configuration: $^E";
+    $core_cfg->save($cfg_fh);
+    close $cfg_fh;
 }
 
 1;
