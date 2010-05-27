@@ -3,9 +3,10 @@ package QVD::Client::Proxy;
 use strict;
 use warnings;
 
-use QVD::Config;
 use IO::Socket::Forwarder qw(forward_sockets);
 use Proc::Background;
+
+my $WINDOWS = ($^O eq 'MSWin32');
 
 sub new {
     my $class = shift;
@@ -20,10 +21,10 @@ sub run {
     my $self = shift;
 
     my @cmd;
-    if ($^O eq 'linux') {
-	@cmd= qw(nxproxy -S localhost:40 media=4713);
-    } else {	
+    if ($WINDOWS) {
 	@cmd = qw(C:/WINDOWS/system32/nxproxy.exe -S localhost:40 media=4713 kbtype=pc105/es client=windows);
+    } else {
+	@cmd= qw(nxproxy -S localhost:40 media=4713);
     }
     my $proc1 = Proc::Background->new(@cmd);
 
@@ -36,11 +37,11 @@ sub run {
     undef $ll; # close the listening socket
 
     my $s2 = $self->{socket};
-    if ($^O eq 'MSWin32'){
+    if ($WINDOWS) {
 	my $nonblocking = 1;
 	ioctl ($s1, 0x8004667e, \$nonblocking);
     }
-    forward_sockets($s1, $s2); #, debug => 1);
+    forward_sockets($s1, $s2);
 }
 
 1;
