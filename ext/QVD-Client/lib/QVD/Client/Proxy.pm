@@ -10,27 +10,22 @@ my $WINDOWS = ($^O eq 'MSWin32');
 
 sub new {
     my $class = shift;
-    my %opts = @_;
+    my $socket = shift;
     my $self = {
-	proxy_options => \%opts,
+	socket => $socket,
     };
     bless $self, $class;
 }
 
 sub run {
     my $self = shift;
-    my $socket = shift;
 
     my @cmd;
     if ($WINDOWS) {
-	push @cmd, "C:/WINDOWS/system32/nxproxy.exe";
+	@cmd = qw(C:/WINDOWS/system32/nxproxy.exe -S localhost:40 media=4713 kbtype=pc105/es client=windows);
     } else {
-	push @cmd, "nxproxy";
+	@cmd= qw(nxproxy -S localhost:40 media=4713);
     }
-    push @cmd, qw(-S localhost:40);
-    push @cmd, map { $_."=".$self->{proxy_options}{$_} } 
-			    keys %{$self->{proxy_options}};
-    warn 'Going to exec ',@cmd;
     $self->{process} = Proc::Background->new(@cmd);
 
     my $ll = IO::Socket::INET->new(LocalPort => 4040,
@@ -40,12 +35,12 @@ sub run {
     my $s1 = $ll->accept()
 	or die "connection from nxproxy failed";
     undef $ll; # close the listening socket
+
+    my $s2 = $self->{socket};
     if ($WINDOWS) {
 	my $nonblocking = 1;
 	ioctl ($s1, 0x8004667e, \$nonblocking);
     }
-
-    my $s2 = $socket;
     forward_sockets($s1, $s2);
 }
 

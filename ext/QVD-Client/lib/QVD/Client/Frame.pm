@@ -18,7 +18,7 @@ my $EVT_CONN_STATUS :shared = Wx::NewEventType;
 my $vm_id :shared;
 my %connect_info :shared;
 
-my $DEFAULT_PORT = cfg('host.port', 0) // 8443;
+my $DEFAULT_PORT = 8443;
 
 sub new {
 	my( $class, $parent, $id, $title, $pos, $size, $style, $name ) = @_;
@@ -66,8 +66,7 @@ sub new {
 			 1, wxALL|wxEXPAND, 5);
 	$grid_sizer->Add(Wx::StaticText->new($panel, -1, "Server"),
 			 0, wxALL, 5);
-	$self->{host} = Wx::TextCtrl->new($panel, -1, 
-					    cfg('host.name', 0) // '');
+	$self->{host} = Wx::TextCtrl->new($panel, -1, cfg('host', 0) // '');
 	$grid_sizer->Add($self->{host},
 			 1, wxALL|wxEXPAND, 5);
 
@@ -226,10 +225,8 @@ sub ConnectToVM {
 	my ($code, $msg, $headers, $body) = $httpc->read_http_response;
 	if ($code == HTTP_SWITCHING_PROTOCOLS) {
 	    Wx::PostEvent($self, new Wx::PlThreadEvent(-1, $EVT_CONN_STATUS, 'CONNECTED'));
-	    my $proxy = new QVD::Client::Proxy(
-		media => 4713
-	    );
-	    $proxy->run($httpc->get_socket);
+	    my $proxy = new QVD::Client::Proxy($httpc->get_socket);
+	    $proxy->run();
 	    last;
 	}
 	elsif ($code == HTTP_PROCESSING) {
