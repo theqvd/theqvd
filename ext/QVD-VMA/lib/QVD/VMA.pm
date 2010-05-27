@@ -198,7 +198,7 @@ sub _fork_monitor {
 			if (defined $val) {
 			    $val =~ m{^[\w/\-\+]+$}
 				or die "invalid characters in parameter $key";
-			    push @nx_args "$props2nx{$key}=$val";
+			    push @nx_args, "$props2nx{$key}=$val";
 			}
 		    }
 
