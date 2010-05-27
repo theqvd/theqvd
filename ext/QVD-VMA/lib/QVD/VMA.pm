@@ -29,12 +29,13 @@ use QVD::Log;
 
 use parent 'QVD::SimpleRPC::Server';
 
-my $log_path  = cfg('path.log');
-my $run_path  = cfg('path.run');
-my $nxagent   = cfg('command.nxagent');
-my $nxdiag    = cfg('command.nxdiag');
-my $x_session = cfg('command.x-session');
-my $as_user   = cfg('vma.nxagent.as_user');
+my $log_path     = cfg('path.log');
+my $run_path     = cfg('path.run');
+my $nxagent      = cfg('command.nxagent');
+my $nxdiag       = cfg('command.nxdiag');
+my $x_session    = cfg('command.x-session');
+my $as_user      = cfg('vma.nxagent.as_user');
+my $enable_audio = cfg('vma.audio.enable');
 
 my $display   = cfg('internal.nxagent.display');
 
@@ -176,10 +177,13 @@ sub _fork_monitor {
 		    POSIX::dup2(1, 2); # equivalent to shell 2>&1
 		    _become_user($as_user);
 
-		    $ENV{PULSE_SERVER} = "tcp:localhost:".($display+7000);
+		    my @nx_args = 'nx/nx', 'link=lan', map "$_=$x_args{$_}", keys %x_args;
+		    if ($enable_audio) {
+			push @nx_args, 'media=1';
+			$ENV{PULSE_SERVER} = "tcp:localhost:".($display+7000);
+		    }
+		    my $nx_display = join(',', @nx_args) . ":$display";
 		    $ENV{NX_CLIENT} = $nxdiag;
-		    my $nx_display = join(',', 'nx/nx', 'link=lan', 'media=1',
-					  map "$_=$x_args{$_}", keys %x_args) . ":$display";
 
 		    # FIXME: reimplement xinit in Perl in order to allow capturing nxagent ouput alone
 		    my @cmd = (xinit => $x_session, '--', $nxagent, ":$display", '-ac', '-name', 'QVD', '-display', $nx_display);
@@ -204,6 +208,7 @@ sub _fork_monitor {
 		    print $line;
 		}
 	    }
+	    print "out closed";
 	};
 	DEBUG $@ if $@;
 	_delete_nxagent_state_and_pid;

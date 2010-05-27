@@ -62,6 +62,8 @@ vm.serial.redirect = 1
 vm.serial.capture = 0
 vm.ssh.redirect = 1
 
+vma.audio.enable = 0
+
 vma.pid_file = /var/run/qvd/vma.pid
 vma.nxagent.as_user = qvd
 
