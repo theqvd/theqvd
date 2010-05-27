@@ -28,6 +28,7 @@ sub _process_request {
     my ($scheme, $host, $path, $query, $frag) = uri_split($url);
     my ($function) = $path =~ /(\w+)$/
 	or die "bad url";
+    DEBUG "SimpleRPC function: $function, query: $query";
     my @params = uri_query_split $query;
     $function = "SimpleRPC_$function";
 
