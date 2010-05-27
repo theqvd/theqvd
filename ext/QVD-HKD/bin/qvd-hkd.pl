@@ -8,8 +8,8 @@ use QVD::HKD;
 use QVD::Config;
 use QVD::Log;
 
-$App::Daemon::pidfile = cfg('hkd.pid_file', '/var/run/qvd/hkd.pid');
-$App::Daemon::as_user = cfg('hkd.as_user', 'qvd');
+$App::Daemon::pidfile = cfg('hkd.pid_file');
+$App::Daemon::as_user = cfg('hkd.as_user');
 
 daemonize;
 QVD::HKD->run;
