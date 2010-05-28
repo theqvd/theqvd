@@ -117,6 +117,11 @@ sub OnClickConnect {
     $self->{state} = "";
     %connect_info = map { $_ => $self->{$_}->GetValue } qw(host username password);
     $connect_info{port} = $DEFAULT_PORT;
+
+    # FIXME Configure "link" and "print" from GUI
+    $connect_info{link} = 'modem';
+    $connect_info{print} = 1;
+    
     # Start or notify worker thread; will result in the execution 
     # of the loop in RunWorkerThread.
     if (!$self->{worker_thread} || !$self->{worker_thread}->is_running()) {
@@ -216,7 +221,16 @@ sub ConnectToVM {
     }
 
     # FIXME: get real keyboard mapping instead of using a hardcoded one
-    $httpc->send_http_request(GET => "/qvd/connect_to_vm?id=$vm_id&client.keyboard=pc105/es&client.os=linux",
+    my %o = (
+	id => $vm_id,
+	'client.keyboard' => 'pc105/es',
+	'client.os' => ($^O eq 'MSWin32') ? 'windows' : 'linux';
+	'client.link' => $connect_info{link};
+    );
+    $o{print} = defined $connect_info{print};
+
+    my $q = join '&',(map "$_=$o{$_}", keys %o);
+    $httpc->send_http_request(GET => "/qvd/connect_to_vm?$q",
 			      headers => [ "Authorization: Basic $auth",
 					   'Connection: Upgrade',
 					   'Upgrade: QVD/1.0' ]);
@@ -225,11 +239,7 @@ sub ConnectToVM {
 	my ($code, $msg, $headers, $body) = $httpc->read_http_response;
 	if ($code == HTTP_SWITCHING_PROTOCOLS) {
 	    Wx::PostEvent($self, new Wx::PlThreadEvent(-1, $EVT_CONN_STATUS, 'CONNECTED'));
-	    my $proxy = new QVD::Client::Proxy(
-		media => 4713,
-		cups => 631,
-		link => 'adsl'
-	    );
+	    my $proxy = new QVD::Client::Proxy(%connect_info);
 	    $proxy->run($httpc->get_socket);
 	    last;
 	}

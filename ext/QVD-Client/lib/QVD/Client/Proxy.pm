@@ -12,7 +12,9 @@ sub new {
     my $class = shift;
     my %opts = @_;
     my $self = {
-	proxy_options => \%opts,
+	audio => delete $opts{audio},
+	extra => delete $opts{extra},
+	print => delete $opts{print},
     };
     bless $self, $class;
 }
@@ -28,8 +30,19 @@ sub run {
 	push @cmd, "nxproxy";
     }
     push @cmd, qw(-S localhost:40);
-    push @cmd, map { $_."=".$self->{proxy_options}{$_} } 
-			    keys %{$self->{proxy_options}};
+
+    my %o = ();
+    $o{media} = 4713 if $self->{audio};
+    if ($self->{print}) {
+	if ($WINDOWS) {
+	    $o{smb} = 445;
+	} else {
+	    $o{cups} = 631;
+	}
+    }
+    @o{keys %{$self->{extra}}} = values %{$self->{extra}};
+
+    push @cmd, (map "$_=$o{$_}", keys %o);
 
     $self->{process} = Proc::Background->new(@cmd);
 

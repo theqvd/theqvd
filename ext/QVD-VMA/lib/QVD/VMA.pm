@@ -36,6 +36,7 @@ my $nxdiag       = cfg('command.nxdiag');
 my $x_session    = cfg('command.x-session');
 my $as_user      = cfg('vma.nxagent.as_user');
 my $enable_audio = cfg('vma.audio.enable');
+my $enable_printing = cfg('vma.print.enable');
 
 my %on_action = ( connect    => cfg('vma.on_action.connect'),
 		  disconnect => cfg('vma.on_action.disconnect'),
@@ -269,6 +270,17 @@ sub _fork_monitor {
 		    if ($enable_audio) {
 			push @nx_args, 'media=1';
 			$ENV{PULSE_SERVER} = "tcp:localhost:".($display+7000);
+		    }
+		    # FIXME launch a private cupsd like in ImpresionFreeNx
+		    if ($enable_printing) {
+			if ($props{client.os} eq 'windows') {
+			    push @nx_args, 'smb=1';
+			    # FIXME configure smb printers for windows clients
+			    # The server will be on port ($display+3000)
+			} else {
+			    push @nx_args, 'cups=1';
+			    $ENV{CUPS_SERVER} = "localhost:".($display+2000);
+			}
 		    }
 		    my $nx_display = join(',', @nx_args) . ":$display";
 		    $ENV{NX_CLIENT} = $nxdiag;
