@@ -118,9 +118,12 @@ sub OnClickConnect {
     %connect_info = map { $_ => $self->{$_}->GetValue } qw(host username password);
     $connect_info{port} = $DEFAULT_PORT;
 
-    # FIXME Configure "link" and "print" from GUI
-    $connect_info{link} = 'modem';
-    $connect_info{print} = 1;
+    # FIXME Configure from GUI
+    $connect_info{link} = cfg('link', 0);
+    $connect_info{audio} = cfg('audio.enable', 0);
+    $connect_info{print} = cfg('printing.enable', 0);
+    $connect_info{geometry} = cfg('session.geometry', 0) // '1024x768';
+    $connect_info{fullscreen} = cfg('session.fullscreen', 0);
     
     # Start or notify worker thread; will result in the execution 
     # of the loop in RunWorkerThread.
@@ -224,8 +227,10 @@ sub ConnectToVM {
     my %o = (
 	id => $vm_id,
 	'client.keyboard' => 'pc105/es',
-	'client.os' => ($^O eq 'MSWin32') ? 'windows' : 'linux';
-	'client.link' => $connect_info{link};
+	'client.os' => ($^O eq 'MSWin32') ? 'windows' : 'linux',
+	'client.link' => $connect_info{link},
+	'client.geometry' => $connect_info{geometry},
+	'client.fullscreen' => $connect_info{fullscreen},
     );
     $o{print} = defined $connect_info{print};
 
@@ -346,8 +351,15 @@ sub OnExit {
 
 sub SaveConfiguration {
     my $self = shift;
-    set_core_cfg('host.name', $self->{host}->GetValue());
     set_core_cfg('username', $self->{username}->GetValue());
+    set_core_cfg('host.name', $self->{host}->GetValue());
+    #set_core_cfg('host.port', $self->{port}->GetValue());
+    #set_core_cfg('link', $self->{link}->GetValue());
+    #set_core_cfg('audio.enable', $self->{audio}->GetValue());
+    #set_core_cfg('printing.enable', $self->{printing}->GetValue());
+    #set_core_cfg('session.fullscreen', $self->{fullscreen}->GetValue());
+    #set_core_cfg('session.geometry', $self->{geometry}->GetValue());
+
     local $@;
     eval {
 	my $qvd_dir = $ENV{HOME}.'/.qvd';

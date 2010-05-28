@@ -217,7 +217,9 @@ sub _timestamp {
 
 my %props2nx = ( 'client.keyboard' => 'keyboard',
 		 'client.os'       => 'client',
-		 'client.link'     => 'link' );
+		 'client.link'     => 'link',
+		 'client.geometry' => 'geometry',
+		 'client.fullscreen' => 'fullscreen' );
 
 sub _fork_monitor {
     my %props = @_;
