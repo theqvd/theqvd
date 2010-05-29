@@ -18,5 +18,5 @@ __PACKAGE__->set_primary_key('id');
 __PACKAGE__->add_unique_constraint(['name']);
 __PACKAGE__->has_many(vms => 'QVD::DB::Result::VM', 'osi_id');
 __PACKAGE__->has_many(properties => 'QVD::DB::Result::OSI_Property',
-                      'host_id', { join_type => 'INNER' });
+                      'osi_id', { join_type => 'INNER' });
 1;
