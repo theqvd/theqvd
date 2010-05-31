@@ -215,11 +215,11 @@ sub _timestamp {
     sprintf("%04d%02d%02d%02d%02d%02d", @t[5, 4, 3, 2, 1, 0]);
 }
 
-my %props2nx = ( 'client.keyboard' => 'keyboard',
-		 'client.os'       => 'client',
-		 'client.link'     => 'link',
-		 'client.geometry' => 'geometry',
-		 'client.fullscreen' => 'fullscreen' );
+my %props2nx = ( 'qvd.client.keyboard'   => 'keyboard',
+		 'qvd.client.os'         => 'client',
+		 'qvd.client.link'       => 'link',
+		 'qvd.client.geometry'   => 'geometry',
+		 'qvd.client.fullscreen' => 'fullscreen' );
 
 sub _fork_monitor {
     my %props = @_;
@@ -273,17 +273,22 @@ sub _fork_monitor {
 			push @nx_args, 'media=1';
 			$ENV{PULSE_SERVER} = "tcp:localhost:".($display+7000);
 		    }
-		    # FIXME launch a private cupsd like in ImpresionFreeNx
+
 		    if ($enable_printing) {
-			if ($props{client.os} eq 'windows') {
+			if ($props{'qvd.client.os'} eq 'windows') {
 			    push @nx_args, 'smb=1';
 			    # FIXME configure smb printers for windows clients
 			    # The server will be on port ($display+3000)
 			} else {
 			    push @nx_args, 'cups=1';
 			    $ENV{CUPS_SERVER} = "localhost:".($display+2000);
+			    # FIXME launch a private cupsd like in
+			    # ImpresionFreeNx.
+			    # That should be configurable or scriptable
+			    # for instance in $x_session -- Salva
 			}
 		    }
+
 		    my $nx_display = join(',', @nx_args) . ":$display";
 		    $ENV{NX_CLIENT} = $nxdiag;
 
