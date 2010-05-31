@@ -50,7 +50,7 @@ sub _make_request {
     return undef unless $self->{httpc};
     my $method = shift;
     my @query;
-    for (@_) {
+    while (@_) {
 	my $key = shift;
 	my $value = shift;
 	push @query, uri_escape($key).'='.uri_escape($value);
