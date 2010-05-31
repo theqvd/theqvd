@@ -262,7 +262,7 @@ sub _fork_monitor {
 		    my @nx_args = ('nx/nx');
 		    for my $key (keys %props2nx) {
 			my $val = $props{$key} // cfg("vma.default.$key", 0);
-			if (defined $val) {
+			if (defined $val and length $val) {
 			    $val =~ m{^[\w/\-\+]+$}
 				or die "invalid characters in parameter $key";
 			    push @nx_args, "$props2nx{$key}=$val";
