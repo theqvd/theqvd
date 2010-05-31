@@ -134,6 +134,7 @@ sub connect_to_vm_processor {
 	$l7r->_takeover_vm($vm);
 	$l7r->_assign_vm($vm);
 	$l7r->_start_and_wait_for_vm($vm);
+	%params = (%params, $vm->properties);
 	$l7r->_start_x($vm, %params);
 	$l7r->_wait_for_x($vm);
 	$l7r->_run_forwarder($vm);

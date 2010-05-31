@@ -228,3 +228,4 @@ sub vma_url {
     sprintf("http://%s:%d/vma", $vm->vm_address, $vm->vm_vma_port);
 }
 
+sub properties { shift->rel_vm_id->properties }

@@ -29,14 +29,14 @@ use QVD::Log;
 
 use parent 'QVD::SimpleRPC::Server';
 
-my $log_path     = cfg('path.log');
-my $run_path     = cfg('path.run');
-my $nxagent      = cfg('command.nxagent');
-my $nxdiag       = cfg('command.nxdiag');
-my $x_session    = cfg('command.x-session');
-my $as_user      = cfg('vma.nxagent.as_user');
-my $enable_audio = cfg('vma.audio.enable');
-my $enable_printing = cfg('vma.print.enable');
+my $log_path        = cfg('path.log');
+my $run_path        = cfg('path.run');
+my $nxagent         = cfg('command.nxagent');
+my $nxdiag          = cfg('command.nxdiag');
+my $x_session       = cfg('command.x-session');
+my $as_user         = cfg('vma.nxagent.as_user');
+my $enable_audio    = cfg('vma.audio.enable');
+my $enable_printing = cfg('vma.printing.enable');
 
 my %on_action = ( connect    => cfg('vma.on_action.connect'),
 		  disconnect => cfg('vma.on_action.disconnect'),

@@ -36,4 +36,9 @@ __PACKAGE__->has_one(vm_runtime => 'QVD::DB::Result::VM_Runtime', 'vm_id');
 __PACKAGE__->has_many(properties => 'QVD::DB::Result::VM_Property', 
 			'vm_id', {join_type => 'INNER'});
 
+sub properties {
+    my $vm = shift;
+    map { $_->key, $_->value } map { $vm->$_->properties } qw(osi user vm);
+}
+
 1;
