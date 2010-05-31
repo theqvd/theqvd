@@ -127,9 +127,10 @@ sub _process_http_request {
 	};
 	if ($@) {
 	    if (ref $@ and $@->isa('QVD::HTTPD::Exception')) {
-		$self->_send_http_error(@{$@});
+		$self->send_http_error(@{$@});
 	    }
 	    else {
+		ERROR "unexpected error: $@";
 		$self->send_http_error(HTTP_INTERNAL_SERVER_ERROR, $@);
 	    }
 	}
