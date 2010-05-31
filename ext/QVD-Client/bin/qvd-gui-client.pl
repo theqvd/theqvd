@@ -7,13 +7,13 @@ use warnings;
 BEGIN {
     $QVD::Config::USE_DB = 0;
     @QVD::Config::FILES = ('/etc/qvd/client.conf',
-			   $ENV{HOME}.'/.qvd/client.conf',
+			   ($ENV{HOME} || $ENV{APPDATA}).'/.qvd/client.conf',
 			   'qvd-client.conf');
 
     # FIXME NX_CLIENT is used for showing the user information on things
     # like broken connection, perhaps we should show them to the user
     # instead of ignoring them? 
-    $ENV{NX_CLIENT} = '/bin/false';
+    $ENV{NX_CLIENT} = ($^O eq 'MSWin32') ? 'cmd.exe /c :' : '/bin/false';
 }
 use QVD::Client::Frame;
 use parent 'Wx::App';

@@ -360,7 +360,7 @@ sub SaveConfiguration {
 
     local $@;
     eval {
-	my $qvd_dir = $ENV{HOME}.'/.qvd';
+	my $qvd_dir = ($ENV{HOME} || $ENV{APPDATA}).'/.qvd';
 	mkdir $qvd_dir unless -e $qvd_dir;
 	save_core_cfg($qvd_dir.'/client.conf');
     };
