@@ -19,7 +19,7 @@ my $EVT_CONN_STATUS :shared = Wx::NewEventType;
 my $vm_id :shared;
 my %connect_info :shared;
 
-my $DEFAULT_PORT = cfg('host.port', 0) // 8443;
+my $DEFAULT_PORT = cfg('client.host.port');
 
 sub new {
 	my( $class, $parent, $id, $title, $pos, $size, $style, $name ) = @_;
@@ -54,7 +54,7 @@ sub new {
 	$grid_sizer->Add(Wx::StaticText->new($panel, -1, "User"),
 			 0, wxALL, 5);
 
-	$self->{username} = Wx::TextCtrl->new($panel, -1, cfg('username', 0) // '');
+	$self->{username} = Wx::TextCtrl->new($panel, -1, cfg('client.user.name'));
 	$grid_sizer->Add($self->{username},
 			 1, wxALL|wxEXPAND, 5);
 	$self->{username}->SetFocus();
@@ -67,7 +67,7 @@ sub new {
 			 1, wxALL|wxEXPAND, 5);
 	$grid_sizer->Add(Wx::StaticText->new($panel, -1, "Server"),
 			 0, wxALL, 5);
-	$self->{host} = Wx::TextCtrl->new($panel, -1, cfg('host.name', 0) // '');
+	$self->{host} = Wx::TextCtrl->new($panel, -1, cfg('client.host.name'));
 	$grid_sizer->Add($self->{host},
 			 1, wxALL|wxEXPAND, 5);
 
@@ -116,17 +116,15 @@ sub new {
 sub OnClickConnect {
     my( $self, $event ) = @_;
     $self->{state} = "";
-    %connect_info = map { $_ => $self->{$_}->GetValue } qw(host username password);
-    $connect_info{port} = $DEFAULT_PORT;
+    %connect_info = ( link       => cfg('client.link'),
+		      audio      => cfg('client.audio.enable'),
+		      printing   => cfg('client.printing.enable'),
+		      geometry   => cfg('client.geometry'),
+		      fullscreen => cfg('client.fullscreen'),
+		      port       => $DEFAULT_PORT,
+		      map { $_ => $self->{$_}->GetValue } qw(host username password) );
 
-    # FIXME Configure from GUI
-    $connect_info{link} = cfg('link', 0);
-    $connect_info{audio} = cfg('audio.enable', 0);
-    $connect_info{print} = cfg('printing.enable', 0);
-    $connect_info{geometry} = cfg('session.geometry', 0) // '1024x768';
-    $connect_info{fullscreen} = cfg('session.fullscreen', 0);
-    
-    # Start or notify worker thread; will result in the execution 
+    # Start or notify worker thread; will result in the execution
     # of the loop in RunWorkerThread.
     if (!$self->{worker_thread} || !$self->{worker_thread}->is_running()) {
 	@_ = ();
@@ -350,14 +348,14 @@ sub OnExit {
 
 sub SaveConfiguration {
     my $self = shift;
-    set_core_cfg('username', $self->{username}->GetValue());
-    set_core_cfg('host.name', $self->{host}->GetValue());
-    #set_core_cfg('host.port', $self->{port}->GetValue());
-    #set_core_cfg('link', $self->{link}->GetValue());
-    #set_core_cfg('audio.enable', $self->{audio}->GetValue());
-    #set_core_cfg('printing.enable', $self->{printing}->GetValue());
-    #set_core_cfg('session.fullscreen', $self->{fullscreen}->GetValue());
-    #set_core_cfg('session.geometry', $self->{geometry}->GetValue());
+    set_core_cfg('client.user.name', $self->{username}->GetValue());
+    set_core_cfg('client.host.name', $self->{host}->GetValue());
+    #set_core_cfg('client.host.port', $self->{port}->GetValue());
+    #set_core_cfg('client.link', $self->{link}->GetValue());
+    #set_core_cfg('client.audio.enable', $self->{audio}->GetValue());
+    #set_core_cfg('client.printing.enable', $self->{printing}->GetValue());
+    #set_core_cfg('client.fullscreen', $self->{fullscreen}->GetValue());
+    #set_core_cfg('client.geometry', $self->{geometry}->GetValue());
 
     local $@;
     eval {
