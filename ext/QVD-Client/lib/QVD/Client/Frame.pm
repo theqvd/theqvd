@@ -124,6 +124,8 @@ sub OnClickConnect {
 		      port       => $DEFAULT_PORT,
 		      map { $_ => $self->{$_}->GetValue } qw(host username password) );
 
+    $self->SaveConfiguration();
+
     # Start or notify worker thread; will result in the execution
     # of the loop in RunWorkerThread.
     if (!$self->{worker_thread} || !$self->{worker_thread}->is_running()) {
@@ -342,7 +344,6 @@ sub OnTimer {
 
 sub OnExit {
     my $self = shift;
-    $self->SaveConfiguration();
     $self->Destroy();
 }
 
@@ -361,7 +362,7 @@ sub SaveConfiguration {
     eval {
 	my $qvd_dir = $ENV{HOME}.'/.qvd';
 	mkdir $qvd_dir unless -e $qvd_dir;
-	save_core_cfg($qvd_dir.'/client.conf'); 
+	save_core_cfg($qvd_dir.'/client.conf');
     };
     if ($@) {
 	my $message = $@;
