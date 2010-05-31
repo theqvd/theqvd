@@ -139,14 +139,14 @@ sub _call_action_hook {
     my $action = shift;
     my $state = _state();
     _call_hook("action $action on state $state", $on_action{$action}, 0,
-	       @_, 'session.state', $state, 'hook.on_action', $action);
+	       @_, 'qvd.session.state', $state, 'qvd.hook.on_action', $action);
 }
 
 sub _call_state_hook {
     my $state = _state();
     local $@;
     # state hooks are called detached and may not fail:
-    eval { _call_hook("state $state", $on_state{$state}, 1, @_, 'hook.on_state', $state) };
+    eval { _call_hook("state $state", $on_state{$state}, 1, @_, 'qvd.hook.on_state', $state) };
 }
 
 sub _become_user {
