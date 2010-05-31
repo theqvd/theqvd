@@ -57,7 +57,7 @@ sub list_of_vm_processor {
 
 sub connect_to_vm_processor {
     my ($l7r, $method, $url, $headers) = @_;
-    my $auth = $l7r->_authorize_user($method, $headers);
+    my $auth = $l7r->_authenticate_user($headers);
 
     header_eq_check($headers, Connection => 'Upgrade') &&
     header_eq_check($headers, Upgrade => 'QVD/1.0')
@@ -105,8 +105,10 @@ sub connect_to_vm_processor {
 sub _authenticate_user {
     my ($l7r, $headers) = @_;
     if (my ($credentials) = header_lookup($headers, 'Authorization')) {
+	# DEBUG "auth credentials: $credentials";
 	if (my ($basic) = $credentials =~ /^Basic (.*)$/) {
-	    if (my ($user, $passwd) = decode_base64($1) =~ /^([\:]+):(.*)$/) {
+	    # DEBUG "auth basic: $basic";
+	    if (my ($user, $passwd) = decode_base64($basic) =~ /^([^:]+):(.*)$/) {
 		my $auth = QVD::L7R::Authenticator->new;
 		if ($auth->authenticate_basic($user, $passwd)) {
 		    INFO "Accepted connection from user $user";
