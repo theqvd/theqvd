@@ -38,7 +38,9 @@ __PACKAGE__->has_many(properties => 'QVD::DB::Result::VM_Property',
 
 sub combined_properties {
     my $vm = shift;
-    map { $_->key, $_->value } map { $vm->$_->properties } qw(osi user vm);
+    map { $_->key, $_->value } ( $vm->osi->properties,
+				 $vm->user->properties,
+				 $vm->properties );
 }
 
 1;
