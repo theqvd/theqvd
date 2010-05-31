@@ -16,14 +16,17 @@ our $USE_DB //= 1;
 our @FILES;
 push @FILES, '/etc/qvd/node.conf' unless @FILES;
 
-my $core_cfg = $QVD::Config::defaults;
+my $defaults = $QVD::Config::defaults;
+my $core_cfg;
 
 for my $FILE (@FILES) {
     open my $cfg_fh, '<', $FILE or next;
-    $core_cfg = Config::Properties->new($core_cfg);
+    $core_cfg = Config::Properties->new($core_cfg // $defaults);
     $core_cfg->load($cfg_fh);
     close $cfg_fh;
 }
+
+$core_cfg //= Config::Properties->new($defaults);
 
 sub core_cfg {
     my $key = shift;
