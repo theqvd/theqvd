@@ -33,6 +33,15 @@ command.nxagent = /usr/bin/nxagent
 command.nxdiag = /usr/bin/nxdiag.pl
 command.x-session = /etc/X11/Xsession
 
+client.link = adsl
+client.geometry = 1024x768
+client.fullscreen =
+client.audio.enable =
+client.printint.enable =
+client.host.port = 8443
+client.host.name =
+client.user.name =
+
 l7r.use_ssl = 1
 l7r.ssl_port = 8443
 l7r.port = 8080
