@@ -35,7 +35,7 @@ sub run {
     $o{media} = 4713 if $self->{audio};
     if ($self->{print}) {
 	if ($WINDOWS) {
-	    $o{smb} = 445;
+	    $o{smb} = 139;
 	} else {
 	    $o{cups} = 631;
 	}
