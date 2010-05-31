@@ -1,0 +1,56 @@
+// $XKeyboardConfig: xkbdesc/xkeyboard-config/symbols/ng,v 1.2 2006-10-11 19:32:35 svu Exp $
+//
+
+partial default alphanumeric_keys  
+xkb_symbols "basic" {
+
+    include "us"
+
+    name[Group1]= "Nigeria";
+    key <AE04> { [          4, 0x010020A6,     dollar,       cent ] };
+    include "level3(ralt_switch)"
+};
+
+partial alphanumeric_keys
+xkb_symbols "yoruba" {
+    include "ng(basic)"
+
+    name[Group1]= "Nigeria - Yoruba";
+
+    key <AD01> { [ 0x01001EB9, 0x01001EB8,          q,          Q ] };
+    key <AB02> { [ 0x01001ECD, 0x01001ECC,          x,          X ] }; 
+    key <AB04> { [ 0x01001E63, 0x01001E62,          v,          V ] }; 
+};
+
+partial alphanumeric_keys
+xkb_symbols "igbo" {
+    include "ng(basic)"
+
+    name[Group1]= "Nigeria - Igbo";
+
+    key <AD01> { [ 0x01001ECB, 0x01001ECA,          q,          Q ] };
+    key <AB02> { [ 0x01001E45, 0x01001E44,          x,          X ] }; 
+    key <AC10> { [ 0x01001EE5, 0x01001EE4,   semicolon,	    colon ] };
+    key <AD11> { [ 0x01001ECD, 0x01001ECC, bracketleft, braceleft ] };		 
+};
+
+partial alphanumeric_keys
+xkb_symbols "hausa" {
+    include "ng(basic)"
+
+    name[Group1]= "Nigeria - Hausa";
+
+    key <AD01> { [ 0x01000071, 0x01000051,          q,          Q ] };
+    key <AD02> { [ udiaeresis, Udiaeresis,          w,          W ] };
+    key <AD03> { [          e,          E,   EuroSign,       cent ] };
+    key <AD11> { [ 0x010001B4, 0x010001B3,bracketleft,  braceleft ] };
+    key <AD12> { [     gcaron,     Gcaron,bracketright, braceright] };
+    key <AC03> { [ 0x01000257, 0x0100018A,         d,           D ] };
+    key <AC10> { [ 0x01000131, 0x01000130, semicolon,       colon ] };
+    key <AC11> { [ 0x010001DD, 0x0100018E,apostrophe,    quotedbl ] };
+    key <AB01> { [ 0x01000272, 0x0100019D,         z,           Z ] };
+    key <AB07> { [     ntilde,     Ntilde,         m,           M ] };
+    key <AB09> { [   ccedilla,   Ccedilla,    period,     greater ] };
+    key <AB10> { [   scedilla,   Scedilla,     slash,    question ] };
+
+};

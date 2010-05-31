@@ -1,0 +1,3098 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE xkbConfigRegistry SYSTEM "xkb.dtd">
+<xkbConfigRegistry>
+  <modelList>
+    <model>
+      <configItem>
+        <name>type4</name>
+        <name xml:lang="ko">type4</name>
+        <name xml:lang="ru">type4</name>
+        <description>Sun Type 4</description>
+        <description xml:lang="ko">썬 타입 4</description>
+        <description xml:lang="ru">Sun Type 4</description>
+      </configItem>
+    </model>
+    <model>
+      <configItem>
+        <name>type5</name>
+        <description>Sun Type 5</description>
+        <description xml:lang="ko">썬 타입 5</description>
+        <description xml:lang="ru">Sun Type 5</description>
+      </configItem>
+    </model>
+    <model>
+      <configItem>
+        <name>type5_euro</name>
+        <description>Sun Type 5 European</description>
+        <description xml:lang="ko">썬 타입 5 유럽</description>
+        <description xml:lang="ru">Sun Type 5 Европейская</description>
+      </configItem>
+    </model>
+    <model>
+      <configItem>
+        <name>type5_unix</name>
+        <description>Sun Type 5 Unix</description>
+        <description xml:lang="ko">썬 타입 5 유닉스</description>
+        <description xml:lang="ru">Sun Type 5 для Unix</description>
+      </configItem>
+    </model>
+    <model>
+      <configItem>
+        <name>type6</name>
+        <description>Sun Type 6</description>
+        <description xml:lang="ko">썬 타입 6</description>
+        <description xml:lang="ru">Sun Type 6</description>
+      </configItem>
+    </model>
+    <model>
+      <configItem>
+        <name>type6_unix</name>
+        <description>Sun Type 6 Unix</description>
+        <description xml:lang="ko">썬 타입 6 유닉스</description>
+        <description xml:lang="ru">Sun Type 6 для Unix</description>
+      </configItem>
+    </model>
+    <model>
+      <configItem>
+        <name>type6_euro</name>
+        <description>Sun Type 6 with Euro key</description>
+        <description xml:lang="ko">썬 타입 6 유로 키 포함</description>
+        <description xml:lang="ru">Sun Type 6 со знаком евро</description>
+      </configItem>
+    </model>
+  </modelList>
+  <layoutList>
+    <layout>
+      <configItem>
+        <name>be</name>
+        <shortDescription>Bel</shortDescription>
+        <shortDescription xml:lang="af">Bel</shortDescription>
+        <shortDescription xml:lang="az">Bel</shortDescription>
+        <shortDescription xml:lang="cs">Bel</shortDescription>
+        <shortDescription xml:lang="da">Bel</shortDescription>
+        <shortDescription xml:lang="el">Λευ</shortDescription>
+        <shortDescription xml:lang="en_GB">Bel</shortDescription>
+        <shortDescription xml:lang="es">Bel</shortDescription>
+        <shortDescription xml:lang="fi">Bel</shortDescription>
+        <shortDescription xml:lang="fr">Bel</shortDescription>
+        <shortDescription xml:lang="hu">Bel</shortDescription>
+        <shortDescription xml:lang="it">BEL</shortDescription>
+        <shortDescription xml:lang="ka">ბელ</shortDescription>
+        <shortDescription xml:lang="ko">벨기에</shortDescription>
+        <shortDescription xml:lang="nl">Wit</shortDescription>
+        <shortDescription xml:lang="ru">Бельг</shortDescription>
+        <shortDescription xml:lang="sk">Bel</shortDescription>
+        <shortDescription xml:lang="sl">BEL</shortDescription>
+        <shortDescription xml:lang="sq">Bel</shortDescription>
+        <shortDescription xml:lang="sr">блг</shortDescription>
+        <shortDescription xml:lang="sr@Latn">blg</shortDescription>
+        <shortDescription xml:lang="sv">Bel</shortDescription>
+        <shortDescription xml:lang="tr">Bel</shortDescription>
+        <shortDescription xml:lang="uk">Бельг</shortDescription>
+        <shortDescription xml:lang="vi">Bel</shortDescription>
+        <shortDescription xml:lang="zh_CN">Bel</shortDescription>
+        <shortDescription xml:lang="zh_TW">Bel</shortDescription>
+        <description>Belgian</description>
+        <description xml:lang="ko">벨기에</description>
+        <description xml:lang="ru">Бельгийская</description>
+      </configItem>
+      <variantList>
+        <variant>
+          <configItem>
+            <name>iso-alternate</name>
+            <description>ISO Alternate</description>
+            <description xml:lang="af">ISO Alternatief</description>
+            <description xml:lang="az">ISO Alternate</description>
+            <description xml:lang="cs">ISO alternativní</description>
+            <description xml:lang="da">ISO-alternativ</description>
+            <description xml:lang="en_GB">ISO Alternate</description>
+            <description xml:lang="es">Alternativa ISO</description>
+            <description xml:lang="fi">ISO vaihtoehtoinen</description>
+            <description xml:lang="fr">Autre ISO</description>
+            <description xml:lang="hu">ISO Alternate</description>
+            <description xml:lang="it">ISO alternativa</description>
+            <description xml:lang="ka">დამატებითი ISO</description>
+            <description xml:lang="ko">ISO 다른 버전</description>
+            <description xml:lang="nl">ISO alternatief</description>
+            <description xml:lang="ru">Дополнительная ISO</description>
+            <description xml:lang="sk">ISO alternatívne</description>
+            <description xml:lang="sl">ISO Alternirajoče</description>
+            <description xml:lang="sq">ISO Alternative</description>
+            <description xml:lang="sr">Додатни ИСО</description>
+            <description xml:lang="sr@Latn">Dodatni ISO</description>
+            <description xml:lang="sv">ISO-alternativ</description>
+            <description xml:lang="tr">ISO diğer</description>
+            <description xml:lang="uk">Додаткова ISO</description>
+            <description xml:lang="vi">ISO Xen kẽ</description>
+            <description xml:lang="zh_CN">ISO 替代</description>
+            <description xml:lang="zh_TW">ISO 替代</description>
+          </configItem>
+        </variant>
+        <variant>
+          <configItem>
+            <name>nodeadkeys</name>
+            <description>Eliminate dead keys</description>
+            <description xml:lang="af">Elimineer dooie sleutels</description>
+            <description xml:lang="az">Ölü düymələri sayma</description>
+            <description xml:lang="bg">Изключи специалните клавиши (dead keys)</description>
+            <description xml:lang="cs">Eliminovat mrtvé klávesy</description>
+            <description xml:lang="da">Slå døde taster fra</description>
+            <description xml:lang="el">Χωρίς νεκρά πλήκτρα</description>
+            <description xml:lang="en_GB">Eliminate dead keys</description>
+            <description xml:lang="es">Eliminar teclas muertas</description>
+            <description xml:lang="fi">Ei kuolleita näppäimiä</description>
+            <description xml:lang="fr">Éliminer les touches mortes</description>
+            <description xml:lang="hu">Halott billentyűk tiltása</description>
+            <description xml:lang="it">Tasti muti rimossi</description>
+            <description xml:lang="ka">სპეც ღილაკების (dead keys) გამორთვა</description>
+            <description xml:lang="ko">데드키 없음</description>
+            <description xml:lang="nl">Geen dode toetsen</description>
+            <description xml:lang="ru">Исключить специальные клавиши (dead keys)</description>
+            <description xml:lang="sk">Eliminovať mrtvé kláves</description>
+            <description xml:lang="sl">Izloči mrtve tipke</description>
+            <description xml:lang="sq">Elemino pulsantët e vdekur</description>
+            <description xml:lang="sr">Уклони акценте</description>
+            <description xml:lang="sr@Latn">Ukloni akcente</description>
+            <description xml:lang="sv">Eliminera stumma tangenter</description>
+            <description xml:lang="tr">Ölü tuşları normal yapar</description>
+            <description xml:lang="uk">Вилучити спеціальні клавіші (dead keys)</description>
+            <description xml:lang="vi">Phím chết loại trừ</description>
+            <description xml:lang="zh_CN">除去死键</description>
+            <description xml:lang="zh_TW">除去無用按鍵</description>
+          </configItem>
+        </variant>
+        <variant>
+          <configItem>
+            <name>sundeadkeys</name>
+            <description>Sun dead keys</description>
+            <description xml:lang="af">Sun (dooie sleutels)</description>
+            <description xml:lang="az">Sun ölü düymələr</description>
+            <description xml:lang="cs">Mrtvé klávesy Sun</description>
+            <description xml:lang="da">Sun døde taster</description>
+            <description xml:lang="en_GB">Sun dead keys</description>
+            <description xml:lang="es">Teclas muertas de Sun</description>
+            <description xml:lang="fi">Sunin kuolleet näppäimet</description>
+            <description xml:lang="fr">Touches mortes Sun</description>
+            <description xml:lang="hu">Sun halott billentyűk</description>
+            <description xml:lang="it">Tasti muti Sun</description>
+            <description xml:lang="ka">სპეც ღილაკები (dead keys) Sun</description>
+            <description xml:lang="ko">썬 데드키</description>
+            <description xml:lang="nl">Sun dode toetsen</description>
+            <description xml:lang="ru">Специальные клавиши (dead keys) Sun</description>
+            <description xml:lang="sk">Mŕtve klávesy Sun</description>
+            <description xml:lang="sl">Sun mrtve tipke</description>
+            <description xml:lang="sq">Pulsantë të vdekur Sun</description>
+            <description xml:lang="sr">Sun-ови акценти</description>
+            <description xml:lang="sr@Latn">Sun-ovi akcenti</description>
+            <description xml:lang="sv">Sun stumma tangenter</description>
+            <description xml:lang="tr">Sun ölü tuşlar</description>
+            <description xml:lang="uk">Спеціальні клавіші (dead keys) Sun</description>
+            <description xml:lang="vi">Phím chết Sun</description>
+            <description xml:lang="zh_CN">Sun 死键</description>
+            <description xml:lang="zh_TW">Sun 無用按鍵</description>
+          </configItem>
+        </variant>
+      </variantList>
+    </layout>
+    <layout>
+      <configItem>
+        <name>bg</name>
+        <shortDescription>Bgr</shortDescription>
+        <shortDescription xml:lang="af">Bgr</shortDescription>
+        <shortDescription xml:lang="az">Bgr</shortDescription>
+        <shortDescription xml:lang="cs">Bul</shortDescription>
+        <shortDescription xml:lang="da">Bgr</shortDescription>
+        <shortDescription xml:lang="en_GB">Bgr</shortDescription>
+        <shortDescription xml:lang="es">Bgr</shortDescription>
+        <shortDescription xml:lang="fi">Bgr</shortDescription>
+        <shortDescription xml:lang="fr">Bgr</shortDescription>
+        <shortDescription xml:lang="hu">Bgr</shortDescription>
+        <shortDescription xml:lang="it">BGR</shortDescription>
+        <shortDescription xml:lang="ka">ბოლგ</shortDescription>
+        <shortDescription xml:lang="ko">불가리아</shortDescription>
+        <shortDescription xml:lang="nl">Bgr</shortDescription>
+        <shortDescription xml:lang="ru">Болг</shortDescription>
+        <shortDescription xml:lang="sk">Bgr</shortDescription>
+        <shortDescription xml:lang="sl">BGR</shortDescription>
+        <shortDescription xml:lang="sq">Bgr</shortDescription>
+        <shortDescription xml:lang="sr">буг</shortDescription>
+        <shortDescription xml:lang="sr@Latn">bug</shortDescription>
+        <shortDescription xml:lang="sv">Bgr</shortDescription>
+        <shortDescription xml:lang="tr">Bgr</shortDescription>
+        <shortDescription xml:lang="uk">Болг</shortDescription>
+        <shortDescription xml:lang="vi">Bgr</shortDescription>
+        <shortDescription xml:lang="zh_CN">Bgr</shortDescription>
+        <shortDescription xml:lang="zh_TW">Bgr</shortDescription>
+        <description>Bulgarian</description>
+        <description xml:lang="ko">불가리아어</description>
+        <description xml:lang="ru">Болгарская</description>
+      </configItem>
+      <variantList>
+        <variant>
+          <configItem>
+            <name>phonetic</name>
+            <description>Phonetic</description>
+            <description xml:lang="af">Foneties</description>
+            <description xml:lang="az">Fonetik</description>
+            <description xml:lang="bg">фонетична</description>
+            <description xml:lang="cs">Fonetické</description>
+            <description xml:lang="da">Fonetisk</description>
+            <description xml:lang="el">Φωνητικά</description>
+            <description xml:lang="en_GB">Phonetic</description>
+            <description xml:lang="es">Fonético</description>
+            <description xml:lang="fi">Foneettinen</description>
+            <description xml:lang="fr">Phonétique</description>
+            <description xml:lang="hu">Fonetikus</description>
+            <description xml:lang="it">Fonetico</description>
+            <description xml:lang="ka">ფონეტიკური</description>
+            <description xml:lang="ko">음성 표기</description>
+            <description xml:lang="nl">Fonetisch</description>
+            <description xml:lang="ru">Фонетическая</description>
+            <description xml:lang="sk">Fonetické</description>
+            <description xml:lang="sl">Fonetična</description>
+            <description xml:lang="sq">Phonetic</description>
+            <description xml:lang="sr">фонетски</description>
+            <description xml:lang="sr@Latn">fonetski</description>
+            <description xml:lang="sv">Fonetisk</description>
+            <description xml:lang="tr">Fonetik</description>
+            <description xml:lang="uk">Фонетична</description>
+            <description xml:lang="vi">Ngữ âm</description>
+            <description xml:lang="zh_CN">Phonetic</description>
+            <description xml:lang="zh_TW">音標</description>
+          </configItem>
+        </variant>
+      </variantList>
+    </layout>
+    <layout>
+      <configItem>
+        <name>ca</name>
+        <shortDescription>Can</shortDescription>
+        <shortDescription xml:lang="af">Kan</shortDescription>
+        <shortDescription xml:lang="az">Kan</shortDescription>
+        <shortDescription xml:lang="cs">Kan</shortDescription>
+        <shortDescription xml:lang="da">Can</shortDescription>
+        <shortDescription xml:lang="el">Καν</shortDescription>
+        <shortDescription xml:lang="en_GB">Can</shortDescription>
+        <shortDescription xml:lang="es">Can</shortDescription>
+        <shortDescription xml:lang="fi">Can</shortDescription>
+        <shortDescription xml:lang="fr">Can</shortDescription>
+        <shortDescription xml:lang="hu">Can</shortDescription>
+        <shortDescription xml:lang="it">CAN</shortDescription>
+        <shortDescription xml:lang="ka">კან</shortDescription>
+        <shortDescription xml:lang="ko">캐나다</shortDescription>
+        <shortDescription xml:lang="nl">Can</shortDescription>
+        <shortDescription xml:lang="ru">Кан</shortDescription>
+        <shortDescription xml:lang="sk">Can</shortDescription>
+        <shortDescription xml:lang="sl">CAN</shortDescription>
+        <shortDescription xml:lang="sq">Can</shortDescription>
+        <shortDescription xml:lang="sr">кан</shortDescription>
+        <shortDescription xml:lang="sr@Latn">kan</shortDescription>
+        <shortDescription xml:lang="sv">Can</shortDescription>
+        <shortDescription xml:lang="tr">Kan</shortDescription>
+        <shortDescription xml:lang="uk">Кан</shortDescription>
+        <shortDescription xml:lang="vi">Can</shortDescription>
+        <shortDescription xml:lang="zh_CN">Can</shortDescription>
+        <shortDescription xml:lang="zh_TW">Can</shortDescription>
+        <description>Canadian</description>
+        <description xml:lang="ko">캐나다</description>
+        <description xml:lang="ru">Канадская</description>
+      </configItem>
+      <variantList>
+        <variant>
+          <configItem>
+	    <name>fr</name>
+	    <description>French</description>
+	    <description xml:lang="af">Frans</description>
+	    <description xml:lang="az">Fransızca</description>
+	    <description xml:lang="bg">френска</description>
+	    <description xml:lang="cs">Francouzské</description>
+	    <description xml:lang="da">Fransk</description>
+	    <description xml:lang="el">Γαλλικά</description>
+	    <description xml:lang="en_GB">French</description>
+	    <description xml:lang="es">Francés</description>
+	    <description xml:lang="fi">Ranskalainen</description>
+	    <description xml:lang="fr">Français</description>
+	    <description xml:lang="hu">Francia</description>
+	    <description xml:lang="it">Francese</description>
+	    <description xml:lang="ka">ფრანგული</description>
+	    <description xml:lang="ko">프랑스어</description>
+	    <description xml:lang="nl">Frans</description>
+	    <description xml:lang="ru">Французская</description>
+	    <description xml:lang="rw">Igifaransa</description>
+	    <description xml:lang="sk">Francúzske</description>
+	    <description xml:lang="sl">Francoska</description>
+	    <description xml:lang="sq">Frengjisht</description>
+	    <description xml:lang="sr">француски</description>
+	    <description xml:lang="sr@Latn">francuski</description>
+	    <description xml:lang="sv">Fransk</description>
+	    <description xml:lang="tr">Fransızca</description>
+	    <description xml:lang="uk">Французька</description>
+	    <description xml:lang="vi">Pháp</description>
+	    <description xml:lang="zh_CN">法语</description>
+	    <description xml:lang="zh_TW">法文</description>
+          </configItem>
+        </variant>
+        <variant>
+          <configItem>
+	    <name>fr-legacy</name>
+	    <description>French (legacy)</description>
+	    <description xml:lang="en_GB">French (legacy)</description>
+	    <description xml:lang="es">Francés (heredado)</description>
+	    <description xml:lang="fi">Ranskalainen (vanha)</description>
+	    <description xml:lang="fr">Français (obsolète)</description>
+	    <description xml:lang="hu">Francia (hagyományos)</description>
+	    <description xml:lang="it">Francese (vecchia maniera)</description>
+	    <description xml:lang="ka">ფრანგული (legacy)</description>
+	    <description xml:lang="ko">프랑스어 (구형)</description>
+	    <description xml:lang="nl">Frans (oud)</description>
+	    <description xml:lang="ru">Французская (унаследованная)</description>
+	    <description xml:lang="sl">Francoska (zapuščina)</description>
+	    <description xml:lang="sr">француски (класични)</description>
+	    <description xml:lang="sr@Latn">francuski (klasični)</description>
+	    <description xml:lang="sv">Fransk (äldre)</description>
+	    <description xml:lang="tr">Fransızca (eski)</description>
+	    <description xml:lang="uk">Французька (застаріла)</description>
+	    <description xml:lang="vi">Pháp (di sản)</description>
+	    <description xml:lang="zh_TW">法文 (傳統)</description>
+          </configItem>
+        </variant>
+	<variant>
+	  <configItem>
+	    <name>multi</name>
+	    <description>Multilingual</description>
+	    <description xml:lang="bg">многоезична</description>
+	    <description xml:lang="en_GB">Multilingual</description>
+	    <description xml:lang="es">Multilingüe</description>
+	    <description xml:lang="fi">Monikielinen</description>
+	    <description xml:lang="fr">Multilingue</description>
+	    <description xml:lang="hu">Többnyelvű</description>
+	    <description xml:lang="ka">მრავალენოვანი</description>
+	    <description xml:lang="ko">여러 언어 지원</description>
+	    <description xml:lang="nl">Meertalig</description>
+	    <description xml:lang="ru">Многоязычная</description>
+	    <description xml:lang="sl">Večjezično</description>
+	    <description xml:lang="sr">Вишејезична</description>
+	    <description xml:lang="sr@Latn">Višejezična</description>
+	    <description xml:lang="sv">Flerspråkig</description>
+	    <description xml:lang="tr">Çokdilli</description>
+	    <description xml:lang="uk">Багатомовна</description>
+	    <description xml:lang="vi">Đa ngôn ngữ</description>
+	    <description xml:lang="zh_TW">多語言</description>
+	  </configItem>
+	</variant>
+        <variant>
+          <configItem>
+            <name>multi-2gr</name>
+            <description>Multilingual, second part</description>
+            <description xml:lang="bg">многоезична, втора част</description>
+            <description xml:lang="en_GB">Multilingual, second part</description>
+            <description xml:lang="es">Multilingüe, segunda parte</description>
+            <description xml:lang="fi">Monikielinen, toinen osa</description>
+            <description xml:lang="fr">Multilingue, partie 2</description>
+            <description xml:lang="hu">Többnyelvű, második rész</description>
+            <description xml:lang="ka">მრავალენოვანი, მეორე ნაწილი</description>
+            <description xml:lang="ko">여러 언어 지원, 두번째</description>
+            <description xml:lang="nl">Meertalig, tweede deel</description>
+            <description xml:lang="ru">Многоязычная, вторая часть</description>
+            <description xml:lang="sl">Večjezično, drugi del</description>
+            <description xml:lang="sr">Вишејезична, други део</description>
+            <description xml:lang="sr@Latn">Višejezična, drugi deo</description>
+            <description xml:lang="sv">Flerspråkig, andra delen</description>
+            <description xml:lang="tr">Çokdilli, ikinci bölüm</description>
+            <description xml:lang="uk">Багатомовна, друга частина</description>
+            <description xml:lang="vi">Đa ngôn ngữ, phần hai</description>
+            <description xml:lang="zh_TW">多語言，第二部份</description>
+          </configItem>
+        </variant>
+        <variant>
+          <configItem>
+            <name>sundeadkeys</name>
+            <description>Sun dead keys</description>
+            <description xml:lang="af">Sun (dooie sleutels)</description>
+            <description xml:lang="az">Sun ölü düymələr</description>
+            <description xml:lang="cs">Mrtvé klávesy Sun</description>
+            <description xml:lang="da">Sun døde taster</description>
+            <description xml:lang="en_GB">Sun dead keys</description>
+            <description xml:lang="es">Teclas muertas de Sun</description>
+            <description xml:lang="fi">Sunin kuolleet näppäimet</description>
+            <description xml:lang="fr">Touches mortes Sun</description>
+            <description xml:lang="hu">Sun halott billentyűk</description>
+            <description xml:lang="it">Tasti muti Sun</description>
+            <description xml:lang="ka">სპეც ღილაკები (dead keys) Sun</description>
+            <description xml:lang="ko">썬 데드키</description>
+            <description xml:lang="nl">Sun dode toetsen</description>
+            <description xml:lang="ru">Специальные клавиши (dead keys) Sun</description>
+            <description xml:lang="sk">Mŕtve klávesy Sun</description>
+            <description xml:lang="sl">Sun mrtve tipke</description>
+            <description xml:lang="sq">Pulsantë të vdekur Sun</description>
+            <description xml:lang="sr">Sun-ови акценти</description>
+            <description xml:lang="sr@Latn">Sun-ovi akcenti</description>
+            <description xml:lang="sv">Sun stumma tangenter</description>
+            <description xml:lang="tr">Sun ölü tuşlar</description>
+            <description xml:lang="uk">Спеціальні клавіші (dead keys) Sun</description>
+            <description xml:lang="vi">Phím chết Sun</description>
+            <description xml:lang="zh_CN">Sun 死键</description>
+            <description xml:lang="zh_TW">Sun 無用按鍵</description>
+          </configItem>
+        </variant>
+      </variantList>
+    </layout>
+    <layout>
+      <configItem>
+        <name>cz</name>
+        <shortDescription>Cze</shortDescription>
+        <shortDescription xml:lang="af">Cze</shortDescription>
+        <shortDescription xml:lang="az">Çex</shortDescription>
+        <shortDescription xml:lang="cs">Čes</shortDescription>
+        <shortDescription xml:lang="da">Tje</shortDescription>
+        <shortDescription xml:lang="el">Τσε</shortDescription>
+        <shortDescription xml:lang="en_GB">Cze</shortDescription>
+        <shortDescription xml:lang="es">Che</shortDescription>
+        <shortDescription xml:lang="fi">Cze</shortDescription>
+        <shortDescription xml:lang="fr">Cze</shortDescription>
+        <shortDescription xml:lang="hu">Cze</shortDescription>
+        <shortDescription xml:lang="it">CZE</shortDescription>
+        <shortDescription xml:lang="ka">ჩეხ</shortDescription>
+        <shortDescription xml:lang="ko">체코</shortDescription>
+        <shortDescription xml:lang="nl">Tsj</shortDescription>
+        <shortDescription xml:lang="ru">Чех</shortDescription>
+        <shortDescription xml:lang="sk">Čes</shortDescription>
+        <shortDescription xml:lang="sl">CZE</shortDescription>
+        <shortDescription xml:lang="sq">Cze</shortDescription>
+        <shortDescription xml:lang="sr">чеш</shortDescription>
+        <shortDescription xml:lang="sr@Latn">češ</shortDescription>
+        <shortDescription xml:lang="sv">Cze</shortDescription>
+        <shortDescription xml:lang="tr">Çek</shortDescription>
+        <shortDescription xml:lang="uk">Чес</shortDescription>
+        <shortDescription xml:lang="vi">Séc</shortDescription>
+        <shortDescription xml:lang="zh_CN">Cze</shortDescription>
+        <shortDescription xml:lang="zh_TW">Cze</shortDescription>
+        <description>Czech</description>
+        <description xml:lang="ko">체코</description>
+        <description xml:lang="ru">Чешский</description>
+      </configItem>
+      <variantList>
+        <variant>
+          <configItem>
+            <name>basic</name>
+            <description>Basic</description>
+            <description xml:lang="ko">기본</description>
+            <description xml:lang="ru">Основные</description>
+            <description xml:lang="sv">Grundläggande</description>
+          </configItem>
+        </variant>
+        <variant>
+          <configItem>
+            <name>bksl</name>
+            <description>bksl</description>
+            <description xml:lang="ko">bksl</description>
+            <description xml:lang="ru">bksl</description>
+            <description xml:lang="sv">bksl</description>
+          </configItem>
+        </variant>
+      </variantList>
+    </layout>
+    <layout>
+      <configItem>
+        <name>de</name>
+        <shortDescription>Deu</shortDescription>
+        <shortDescription xml:lang="af">Deu</shortDescription>
+        <shortDescription xml:lang="az">Deu</shortDescription>
+        <shortDescription xml:lang="cs">Něm</shortDescription>
+        <shortDescription xml:lang="da">Tys</shortDescription>
+        <shortDescription xml:lang="en_GB">Deu</shortDescription>
+        <shortDescription xml:lang="es">Deu</shortDescription>
+        <shortDescription xml:lang="fi">Deu</shortDescription>
+        <shortDescription xml:lang="fr">Deu</shortDescription>
+        <shortDescription xml:lang="hu">Deu</shortDescription>
+        <shortDescription xml:lang="it">DEU</shortDescription>
+        <shortDescription xml:lang="ka">გერ</shortDescription>
+        <shortDescription xml:lang="ko">독일</shortDescription>
+        <shortDescription xml:lang="nl">Deu</shortDescription>
+        <shortDescription xml:lang="ru">Нем</shortDescription>
+        <shortDescription xml:lang="sk">Nem</shortDescription>
+        <shortDescription xml:lang="sl">DEU</shortDescription>
+        <shortDescription xml:lang="sq">Deu</shortDescription>
+        <shortDescription xml:lang="sr">нем</shortDescription>
+        <shortDescription xml:lang="sr@Latn">nem</shortDescription>
+        <shortDescription xml:lang="sv">Deu</shortDescription>
+        <shortDescription xml:lang="tr">Alm</shortDescription>
+        <shortDescription xml:lang="uk">Нім</shortDescription>
+        <shortDescription xml:lang="vi">Deu</shortDescription>
+        <shortDescription xml:lang="zh_CN">Deu</shortDescription>
+        <shortDescription xml:lang="zh_TW">Deu</shortDescription>
+        <description>German</description>
+        <description xml:lang="ko">독일어</description>
+        <description xml:lang="ru">Немецкая</description>
+      </configItem>
+      <variantList>
+        <variant>
+          <configItem>
+            <name>basic</name>
+            <description>Basic</description>
+            <description xml:lang="ko">기본</description>
+            <description xml:lang="ru">Основные</description>
+            <description xml:lang="sv">Grundläggande</description>
+          </configItem>
+        </variant>
+        <variant>
+          <configItem>
+            <name>deadacute</name>
+            <description>Dead acute</description>
+            <description xml:lang="af">Dooie akuutaksent</description>
+            <description xml:lang="az">Dead acute</description>
+            <description xml:lang="cs">Mrtvá čárka</description>
+            <description xml:lang="da">Død accent</description>
+            <description xml:lang="en_GB">Dead acute</description>
+            <description xml:lang="es">Acento muerto</description>
+            <description xml:lang="fi">Kuollut akuutti</description>
+            <description xml:lang="fr">Touche morte d'accent aigu</description>
+            <description xml:lang="hu">Halott vessző (´) ékezet</description>
+            <description xml:lang="ka">სპეც. სიმბოლო Dead acute</description>
+            <description xml:lang="ko">어큐트 데드키</description>
+            <description xml:lang="nl">Dood acutus</description>
+            <description xml:lang="ru">Спец. символ Dead acute</description>
+            <description xml:lang="sk">Mŕtva čiarka</description>
+            <description xml:lang="sl">Mrtvi ostrivec</description>
+            <description xml:lang="sq">Fund kritik</description>
+            <description xml:lang="sr">Акутски акценат</description>
+            <description xml:lang="sr@Latn">Akutski akcenat</description>
+            <description xml:lang="sv">Stum akut accent</description>
+            <description xml:lang="tr">Ölü acute (´)</description>
+            <description xml:lang="uk">Спец. символ Dead acute</description>
+            <description xml:lang="vi">Chết sâu</description>
+            <description xml:lang="zh_CN">Dead acute</description>
+            <description xml:lang="zh_TW">Dead acute</description>
+          </configItem>
+        </variant>
+        <variant>
+          <configItem>
+            <name>deadgraveacute</name>
+            <description>Dead grave acute</description>
+            <description xml:lang="af">Dooie gravisaksent</description>
+            <description xml:lang="az">Dead grave acute</description>
+            <description xml:lang="cs">Mrtvá opačná čárka</description>
+            <description xml:lang="da">Død accent grave</description>
+            <description xml:lang="en_GB">Dead grave acute</description>
+            <description xml:lang="es">Acento grave muerto</description>
+            <description xml:lang="fi">Kuollut gravis</description>
+            <description xml:lang="fr">Touche morte d'accent grave</description>
+            <description xml:lang="hu">Halott grave (`) ékezet</description>
+            <description xml:lang="ka">სპეც. სიმბოლო Dead grave acute</description>
+            <description xml:lang="ko">그레이브 어큐트 데드키</description>
+            <description xml:lang="nl">Dood gravis-acutus</description>
+            <description xml:lang="ru">Спец. символ Dead grave acute</description>
+            <description xml:lang="sk">Mŕtva opačná čiarka</description>
+            <description xml:lang="sl">Mrtvi krativec</description>
+            <description xml:lang="sq">Fund kritik serioz</description>
+            <description xml:lang="sr">Гравис акутски акценат</description>
+            <description xml:lang="sr@Latn">Gravis akutski akcenat</description>
+            <description xml:lang="sv">Stum grav och akut accent</description>
+            <description xml:lang="tr">Ölü grave acute (`)</description>
+            <description xml:lang="uk">Спец. символ Dead grave acute</description>
+            <description xml:lang="vi">Chết non sâu</description>
+            <description xml:lang="zh_CN">Dead grave acute</description>
+            <description xml:lang="zh_TW">Dead grave acute</description>
+          </configItem>
+        </variant>
+        <variant>
+          <configItem>
+            <name>nodeadkeys</name>
+            <description>Eliminate dead keys</description>
+            <description xml:lang="af">Elimineer dooie sleutels</description>
+            <description xml:lang="az">Ölü düymələri sayma</description>
+            <description xml:lang="bg">Изключи специалните клавиши (dead keys)</description>
+            <description xml:lang="cs">Eliminovat mrtvé klávesy</description>
+            <description xml:lang="da">Slå døde taster fra</description>
+            <description xml:lang="el">Χωρίς νεκρά πλήκτρα</description>
+            <description xml:lang="en_GB">Eliminate dead keys</description>
+            <description xml:lang="es">Eliminar teclas muertas</description>
+            <description xml:lang="fi">Ei kuolleita näppäimiä</description>
+            <description xml:lang="fr">Éliminer les touches mortes</description>
+            <description xml:lang="hu">Halott billentyűk tiltása</description>
+            <description xml:lang="it">Tasti muti rimossi</description>
+            <description xml:lang="ka">სპეც ღილაკების (dead keys) გამორთვა</description>
+            <description xml:lang="ko">데드키 없음</description>
+            <description xml:lang="nl">Geen dode toetsen</description>
+            <description xml:lang="ru">Исключить специальные клавиши (dead keys)</description>
+            <description xml:lang="sk">Eliminovať mrtvé kláves</description>
+            <description xml:lang="sl">Izloči mrtve tipke</description>
+            <description xml:lang="sq">Elemino pulsantët e vdekur</description>
+            <description xml:lang="sr">Уклони акценте</description>
+            <description xml:lang="sr@Latn">Ukloni akcente</description>
+            <description xml:lang="sv">Eliminera stumma tangenter</description>
+            <description xml:lang="tr">Ölü tuşları normal yapar</description>
+            <description xml:lang="uk">Вилучити спеціальні клавіші (dead keys)</description>
+            <description xml:lang="vi">Phím chết loại trừ</description>
+            <description xml:lang="zh_CN">除去死键</description>
+            <description xml:lang="zh_TW">除去無用按鍵</description>
+          </configItem>
+        </variant>
+      </variantList>
+    </layout>
+    <layout>
+      <configItem>
+        <name>de_CH</name>
+        <shortDescription>DeuCH</shortDescription>
+        <shortDescription xml:lang="ko">독일어 스위스</shortDescription>
+        <shortDescription xml:lang="ru">НемШВ</shortDescription>
+        <description>Swiss German</description>
+        <description xml:lang="ko">스위스 독일어</description>
+        <description xml:lang="ru">Швейцарская немецкая</description>
+      </configItem>
+      <variantList>
+        <variant>
+          <configItem>
+            <name>basic</name>
+            <description>Basic</description>
+            <description xml:lang="ko">기본</description>
+            <description xml:lang="ru">Основные</description>
+            <description xml:lang="sv">Grundläggande</description>
+          </configItem>
+        </variant>
+        <variant>
+          <configItem>
+            <name>deadacute</name>
+            <description>Dead acute</description>
+            <description xml:lang="af">Dooie akuutaksent</description>
+            <description xml:lang="az">Dead acute</description>
+            <description xml:lang="cs">Mrtvá čárka</description>
+            <description xml:lang="da">Død accent</description>
+            <description xml:lang="en_GB">Dead acute</description>
+            <description xml:lang="es">Acento muerto</description>
+            <description xml:lang="fi">Kuollut akuutti</description>
+            <description xml:lang="fr">Touche morte d'accent aigu</description>
+            <description xml:lang="hu">Halott vessző (´) ékezet</description>
+            <description xml:lang="ka">სპეც. სიმბოლო Dead acute</description>
+            <description xml:lang="ko">어큐트 데드키</description>
+            <description xml:lang="nl">Dood acutus</description>
+            <description xml:lang="ru">Спец. символ Dead acute</description>
+            <description xml:lang="sk">Mŕtva čiarka</description>
+            <description xml:lang="sl">Mrtvi ostrivec</description>
+            <description xml:lang="sq">Fund kritik</description>
+            <description xml:lang="sr">Акутски акценат</description>
+            <description xml:lang="sr@Latn">Akutski akcenat</description>
+            <description xml:lang="sv">Stum akut accent</description>
+            <description xml:lang="tr">Ölü acute (´)</description>
+            <description xml:lang="uk">Спец. символ Dead acute</description>
+            <description xml:lang="vi">Chết sâu</description>
+            <description xml:lang="zh_CN">Dead acute</description>
+            <description xml:lang="zh_TW">Dead acute</description>
+          </configItem>
+        </variant>
+        <variant>
+          <configItem>
+            <name>deadgraveacute</name>
+            <description>Dead grave acute</description>
+            <description xml:lang="af">Dooie gravisaksent</description>
+            <description xml:lang="az">Dead grave acute</description>
+            <description xml:lang="cs">Mrtvá opačná čárka</description>
+            <description xml:lang="da">Død accent grave</description>
+            <description xml:lang="en_GB">Dead grave acute</description>
+            <description xml:lang="es">Acento grave muerto</description>
+            <description xml:lang="fi">Kuollut gravis</description>
+            <description xml:lang="fr">Touche morte d'accent grave</description>
+            <description xml:lang="hu">Halott grave (`) ékezet</description>
+            <description xml:lang="ka">სპეც. სიმბოლო Dead grave acute</description>
+            <description xml:lang="ko">그레이브 어큐트 데드키</description>
+            <description xml:lang="nl">Dood gravis-acutus</description>
+            <description xml:lang="ru">Спец. символ Dead grave acute</description>
+            <description xml:lang="sk">Mŕtva opačná čiarka</description>
+            <description xml:lang="sl">Mrtvi krativec</description>
+            <description xml:lang="sq">Fund kritik serioz</description>
+            <description xml:lang="sr">Гравис акутски акценат</description>
+            <description xml:lang="sr@Latn">Gravis akutski akcenat</description>
+            <description xml:lang="sv">Stum grav och akut accent</description>
+            <description xml:lang="tr">Ölü grave acute (`)</description>
+            <description xml:lang="uk">Спец. символ Dead grave acute</description>
+            <description xml:lang="vi">Chết non sâu</description>
+            <description xml:lang="zh_CN">Dead grave acute</description>
+            <description xml:lang="zh_TW">Dead grave acute</description>
+          </configItem>
+        </variant>
+        <variant>
+          <configItem>
+            <name>nodeadkeys</name>
+            <description>Eliminate dead keys</description>
+            <description xml:lang="af">Elimineer dooie sleutels</description>
+            <description xml:lang="az">Ölü düymələri sayma</description>
+            <description xml:lang="bg">Изключи специалните клавиши (dead keys)</description>
+            <description xml:lang="cs">Eliminovat mrtvé klávesy</description>
+            <description xml:lang="da">Slå døde taster fra</description>
+            <description xml:lang="el">Χωρίς νεκρά πλήκτρα</description>
+            <description xml:lang="en_GB">Eliminate dead keys</description>
+            <description xml:lang="es">Eliminar teclas muertas</description>
+            <description xml:lang="fi">Ei kuolleita näppäimiä</description>
+            <description xml:lang="fr">Éliminer les touches mortes</description>
+            <description xml:lang="hu">Halott billentyűk tiltása</description>
+            <description xml:lang="it">Tasti muti rimossi</description>
+            <description xml:lang="ka">სპეც ღილაკების (dead keys) გამორთვა</description>
+            <description xml:lang="ko">데드키 없음</description>
+            <description xml:lang="nl">Geen dode toetsen</description>
+            <description xml:lang="ru">Исключить специальные клавиши (dead keys)</description>
+            <description xml:lang="sk">Eliminovať mrtvé kláves</description>
+            <description xml:lang="sl">Izloči mrtve tipke</description>
+            <description xml:lang="sq">Elemino pulsantët e vdekur</description>
+            <description xml:lang="sr">Уклони акценте</description>
+            <description xml:lang="sr@Latn">Ukloni akcente</description>
+            <description xml:lang="sv">Eliminera stumma tangenter</description>
+            <description xml:lang="tr">Ölü tuşları normal yapar</description>
+            <description xml:lang="uk">Вилучити спеціальні клавіші (dead keys)</description>
+            <description xml:lang="vi">Phím chết loại trừ</description>
+            <description xml:lang="zh_CN">除去死键</description>
+            <description xml:lang="zh_TW">除去無用按鍵</description>
+          </configItem>
+        </variant>
+      </variantList>
+    </layout>
+    <layout>
+      <configItem>
+        <name>dvorak</name>
+        <shortDescription>Dvo</shortDescription>
+        <shortDescription xml:lang="ko">드보락</shortDescription>
+        <shortDescription xml:lang="ru">Dvo</shortDescription>
+        <description>Dvorak</description>
+        <description xml:lang="af">Dvorak</description>
+        <description xml:lang="az">Dvorak</description>
+        <description xml:lang="bg">Дворак</description>
+        <description xml:lang="cs">Dvorak</description>
+        <description xml:lang="da">Dvorak</description>
+        <description xml:lang="en_GB">Dvorak</description>
+        <description xml:lang="es">Dvorak</description>
+        <description xml:lang="fi">Dvorak</description>
+        <description xml:lang="fr">Dvorak</description>
+        <description xml:lang="hu">Dvorak-féle</description>
+        <description xml:lang="it">Dvorak</description>
+        <description xml:lang="ka">დვორაკული</description>
+        <description xml:lang="ko">드보락</description>
+        <description xml:lang="nl">Dvorak</description>
+        <description xml:lang="ru">Dvorak</description>
+        <description xml:lang="sk">Dvorak</description>
+        <description xml:lang="sl">Dvorak nabor</description>
+        <description xml:lang="sq">Dvorak</description>
+        <description xml:lang="sr">дворак</description>
+        <description xml:lang="sr@Latn">dvorak</description>
+        <description xml:lang="sv">Dvorak</description>
+        <description xml:lang="tr">Dvorak</description>
+        <description xml:lang="uk">Дворак</description>
+        <description xml:lang="vi">Dvorak</description>
+        <description xml:lang="zh_CN">Dvorak</description>
+        <description xml:lang="zh_TW">Dvorak</description>
+      </configItem>
+      <variantList>
+        <variant>
+          <configItem>
+            <name>fr</name>
+            <description>French</description>
+            <description xml:lang="af">Frans</description>
+            <description xml:lang="az">Fransızca</description>
+            <description xml:lang="bg">френска</description>
+            <description xml:lang="cs">Francouzské</description>
+            <description xml:lang="da">Fransk</description>
+            <description xml:lang="el">Γαλλικά</description>
+            <description xml:lang="en_GB">French</description>
+            <description xml:lang="es">Francés</description>
+            <description xml:lang="fi">Ranskalainen</description>
+            <description xml:lang="fr">Français</description>
+            <description xml:lang="hu">Francia</description>
+            <description xml:lang="it">Francese</description>
+            <description xml:lang="ka">ფრანგული</description>
+            <description xml:lang="ko">프랑스어</description>
+            <description xml:lang="nl">Frans</description>
+            <description xml:lang="ru">Французская</description>
+            <description xml:lang="rw">Igifaransa</description>
+            <description xml:lang="sk">Francúzske</description>
+            <description xml:lang="sl">Francoska</description>
+            <description xml:lang="sq">Frengjisht</description>
+            <description xml:lang="sr">француски</description>
+            <description xml:lang="sr@Latn">francuski</description>
+            <description xml:lang="sv">Fransk</description>
+            <description xml:lang="tr">Fransızca</description>
+            <description xml:lang="uk">Французька</description>
+            <description xml:lang="vi">Pháp</description>
+            <description xml:lang="zh_CN">法语</description>
+            <description xml:lang="zh_TW">法文</description>
+          </configItem>
+        </variant>
+        <variant>
+          <configItem>
+            <name>no</name>
+            <description>Norwegian</description>
+            <description xml:lang="ko">노르웨이어</description>
+            <description xml:lang="ru">Норвежская</description>
+          </configItem>
+        </variant>
+        <variant>
+          <configItem>
+            <name>pl</name>
+            <description>Polish</description>
+            <description xml:lang="ko">폴란드어</description>
+            <description xml:lang="ru">Польская</description>
+            <description xml:lang="sv">Polsk</description>
+          </configItem>
+        </variant>
+        <variant>
+          <configItem>
+            <name>pl_altquotes</name>
+            <description>Polish with Polish quotes on key "1/!"</description>
+            <description xml:lang="ko">폴란드어, "1/!" 키에 폴란드어 따옴표 포함</description>
+            <description xml:lang="ru">Польская с польскими кавычками на клавишах "1/!"</description>
+          </configItem>
+        </variant>
+        <variant>
+          <configItem>
+            <name>se</name>
+            <description>Swedish</description>
+            <description xml:lang="ko">스웨덴어</description>
+            <description xml:lang="ru">Шведская</description>
+            <description xml:lang="sv">Svensk</description>
+          </configItem>
+        </variant>
+        <variant>
+          <configItem>
+            <name>gb</name>
+            <description>United Kingdom</description>
+            <description xml:lang="af">Vereenigde Koninkryk</description>
+            <description xml:lang="az">Birləşik Krallıq</description>
+            <description xml:lang="bg">британска</description>
+            <description xml:lang="cs">Spojené království</description>
+            <description xml:lang="da">United Kingdom</description>
+            <description xml:lang="el">Ηνωμένο Βασίλειο</description>
+            <description xml:lang="en_GB">United Kingdom</description>
+            <description xml:lang="es">Reino Unido</description>
+            <description xml:lang="fi">Iso-Britannia</description>
+            <description xml:lang="fr">Royaume-Uni</description>
+            <description xml:lang="hu">Egyesült Királyság</description>
+            <description xml:lang="it">Regno Unito</description>
+            <description xml:lang="ka">დიდი ბრიტანეთი</description>
+            <description xml:lang="ko">영국</description>
+            <description xml:lang="nl">Verenigd Koninkrijk</description>
+            <description xml:lang="ru">Английская (Великобритания)</description>
+            <description xml:lang="rw">Ubwongereza (UK)</description>
+            <description xml:lang="sk">Spojené kráľovstvo</description>
+            <description xml:lang="sl">Združeno Kraljestvo</description>
+            <description xml:lang="sq">Mbretëria e Bashkuar</description>
+            <description xml:lang="sr">Велика Британија</description>
+            <description xml:lang="sr@Latn">Velika Britanija</description>
+            <description xml:lang="sv">Storbritannien</description>
+            <description xml:lang="tr">İngiltere</description>
+            <description xml:lang="uk">Англійська (Великобританія)</description>
+            <description xml:lang="vi">Vương Quốc Anh</description>
+            <description xml:lang="zh_CN">英国</description>
+            <description xml:lang="zh_TW">英國</description>
+          </configItem>
+        </variant>
+      </variantList>
+    </layout>
+    <layout>
+      <configItem>
+        <name>dk</name>
+        <shortDescription>Dnk</shortDescription>
+        <shortDescription xml:lang="af">Dnk</shortDescription>
+        <shortDescription xml:lang="az">Dnk</shortDescription>
+        <shortDescription xml:lang="cs">Dán</shortDescription>
+        <shortDescription xml:lang="da">Dnk</shortDescription>
+        <shortDescription xml:lang="en_GB">Dnk</shortDescription>
+        <shortDescription xml:lang="es">Dnk</shortDescription>
+        <shortDescription xml:lang="fi">Dnk</shortDescription>
+        <shortDescription xml:lang="fr">Dnk</shortDescription>
+        <shortDescription xml:lang="hu">Dnk</shortDescription>
+        <shortDescription xml:lang="it">DNK</shortDescription>
+        <shortDescription xml:lang="ka">დან</shortDescription>
+        <shortDescription xml:lang="ko">덴마크</shortDescription>
+        <shortDescription xml:lang="nl">Dnk</shortDescription>
+        <shortDescription xml:lang="ru">Дат</shortDescription>
+        <shortDescription xml:lang="sk">Dán</shortDescription>
+        <shortDescription xml:lang="sl">DNK</shortDescription>
+        <shortDescription xml:lang="sq">Dnk</shortDescription>
+        <shortDescription xml:lang="sr">дан</shortDescription>
+        <shortDescription xml:lang="sr@Latn">dan</shortDescription>
+        <shortDescription xml:lang="sv">Dnk</shortDescription>
+        <shortDescription xml:lang="tr">Dnk</shortDescription>
+        <shortDescription xml:lang="uk">Дат</shortDescription>
+        <shortDescription xml:lang="vi">Dnk</shortDescription>
+        <shortDescription xml:lang="zh_CN">Dnk</shortDescription>
+        <shortDescription xml:lang="zh_TW">Dnk</shortDescription>
+        <description>Danish</description>
+        <description xml:lang="ko">덴마크어</description>
+        <description xml:lang="ru">Датский</description>
+        <description xml:lang="sv">Dansk</description>
+      </configItem>
+      <variantList>
+        <variant>
+          <configItem>
+            <name>nodeadkeys</name>
+            <description>Eliminate dead keys</description>
+            <description xml:lang="af">Elimineer dooie sleutels</description>
+            <description xml:lang="az">Ölü düymələri sayma</description>
+            <description xml:lang="bg">Изключи специалните клавиши (dead keys)</description>
+            <description xml:lang="cs">Eliminovat mrtvé klávesy</description>
+            <description xml:lang="da">Slå døde taster fra</description>
+            <description xml:lang="el">Χωρίς νεκρά πλήκτρα</description>
+            <description xml:lang="en_GB">Eliminate dead keys</description>
+            <description xml:lang="es">Eliminar teclas muertas</description>
+            <description xml:lang="fi">Ei kuolleita näppäimiä</description>
+            <description xml:lang="fr">Éliminer les touches mortes</description>
+            <description xml:lang="hu">Halott billentyűk tiltása</description>
+            <description xml:lang="it">Tasti muti rimossi</description>
+            <description xml:lang="ka">სპეც ღილაკების (dead keys) გამორთვა</description>
+            <description xml:lang="ko">데드키 없음</description>
+            <description xml:lang="nl">Geen dode toetsen</description>
+            <description xml:lang="ru">Исключить специальные клавиши (dead keys)</description>
+            <description xml:lang="sk">Eliminovať mrtvé kláves</description>
+            <description xml:lang="sl">Izloči mrtve tipke</description>
+            <description xml:lang="sq">Elemino pulsantët e vdekur</description>
+            <description xml:lang="sr">Уклони акценте</description>
+            <description xml:lang="sr@Latn">Ukloni akcente</description>
+            <description xml:lang="sv">Eliminera stumma tangenter</description>
+            <description xml:lang="tr">Ölü tuşları normal yapar</description>
+            <description xml:lang="uk">Вилучити спеціальні клавіші (dead keys)</description>
+            <description xml:lang="vi">Phím chết loại trừ</description>
+            <description xml:lang="zh_CN">除去死键</description>
+            <description xml:lang="zh_TW">除去無用按鍵</description>
+          </configItem>
+        </variant>
+      </variantList>
+    </layout>
+    <layout>
+      <configItem>
+        <name>en_US</name>
+        <shortDescription>USA</shortDescription>
+        <shortDescription xml:lang="af">VSA</shortDescription>
+        <shortDescription xml:lang="az">ABŞ</shortDescription>
+        <shortDescription xml:lang="cs">USA</shortDescription>
+        <shortDescription xml:lang="da">USA</shortDescription>
+        <shortDescription xml:lang="el">ΗΠΑ</shortDescription>
+        <shortDescription xml:lang="en_GB">USA</shortDescription>
+        <shortDescription xml:lang="es">EEUU</shortDescription>
+        <shortDescription xml:lang="fi">USA</shortDescription>
+        <shortDescription xml:lang="fr">USA</shortDescription>
+        <shortDescription xml:lang="hu">USA</shortDescription>
+        <shortDescription xml:lang="it">USA</shortDescription>
+        <shortDescription xml:lang="ka">აშშ</shortDescription>
+        <shortDescription xml:lang="ko">미국</shortDescription>
+        <shortDescription xml:lang="nl">VS</shortDescription>
+        <shortDescription xml:lang="ru">США</shortDescription>
+        <shortDescription xml:lang="rw">Amerika</shortDescription>
+        <shortDescription xml:lang="sk">USA</shortDescription>
+        <shortDescription xml:lang="sl">USA</shortDescription>
+        <shortDescription xml:lang="sq">USA</shortDescription>
+        <shortDescription xml:lang="sr">САД</shortDescription>
+        <shortDescription xml:lang="sr@Latn">SAD</shortDescription>
+        <shortDescription xml:lang="sv">USA</shortDescription>
+        <shortDescription xml:lang="tr">ABD</shortDescription>
+        <shortDescription xml:lang="uk">США</shortDescription>
+        <shortDescription xml:lang="vi">Mỹ</shortDescription>
+        <shortDescription xml:lang="zh_CN">USA</shortDescription>
+        <shortDescription xml:lang="zh_TW">USA</shortDescription>
+        <description>U.S. English w/ ISO9995-3</description>
+        <description xml:lang="ko">미국 영어, ISO9995-3 사용</description>
+        <description xml:lang="ru">Английская (США) с ISO9995-3</description>
+        <description xml:lang="sv">Engelskamerikansk med ISO9995-3</description>
+      </configItem>
+      <variantList>
+        <variant>
+          <configItem>
+            <name>nodeadkeys</name>
+            <description>Eliminate dead keys</description>
+            <description xml:lang="af">Elimineer dooie sleutels</description>
+            <description xml:lang="az">Ölü düymələri sayma</description>
+            <description xml:lang="bg">Изключи специалните клавиши (dead keys)</description>
+            <description xml:lang="cs">Eliminovat mrtvé klávesy</description>
+            <description xml:lang="da">Slå døde taster fra</description>
+            <description xml:lang="el">Χωρίς νεκρά πλήκτρα</description>
+            <description xml:lang="en_GB">Eliminate dead keys</description>
+            <description xml:lang="es">Eliminar teclas muertas</description>
+            <description xml:lang="fi">Ei kuolleita näppäimiä</description>
+            <description xml:lang="fr">Éliminer les touches mortes</description>
+            <description xml:lang="hu">Halott billentyűk tiltása</description>
+            <description xml:lang="it">Tasti muti rimossi</description>
+            <description xml:lang="ka">სპეც ღილაკების (dead keys) გამორთვა</description>
+            <description xml:lang="ko">데드키 없음</description>
+            <description xml:lang="nl">Geen dode toetsen</description>
+            <description xml:lang="ru">Исключить специальные клавиши (dead keys)</description>
+            <description xml:lang="sk">Eliminovať mrtvé kláves</description>
+            <description xml:lang="sl">Izloči mrtve tipke</description>
+            <description xml:lang="sq">Elemino pulsantët e vdekur</description>
+            <description xml:lang="sr">Уклони акценте</description>
+            <description xml:lang="sr@Latn">Ukloni akcente</description>
+            <description xml:lang="sv">Eliminera stumma tangenter</description>
+            <description xml:lang="tr">Ölü tuşları normal yapar</description>
+            <description xml:lang="uk">Вилучити спеціальні клавіші (dead keys)</description>
+            <description xml:lang="vi">Phím chết loại trừ</description>
+            <description xml:lang="zh_CN">除去死键</description>
+            <description xml:lang="zh_TW">除去無用按鍵</description>
+          </configItem>
+        </variant>
+      </variantList>
+    </layout>
+    <layout>
+      <configItem>
+        <name>es</name>
+        <shortDescription>Esp</shortDescription>
+        <shortDescription xml:lang="af">Esp</shortDescription>
+        <shortDescription xml:lang="az">İsp</shortDescription>
+        <shortDescription xml:lang="cs">Špa</shortDescription>
+        <shortDescription xml:lang="da">Esp</shortDescription>
+        <shortDescription xml:lang="en_GB">Esp</shortDescription>
+        <shortDescription xml:lang="es">Esp</shortDescription>
+        <shortDescription xml:lang="fi">Esp</shortDescription>
+        <shortDescription xml:lang="fr">Esp</shortDescription>
+        <shortDescription xml:lang="hu">Esp</shortDescription>
+        <shortDescription xml:lang="it">ESP</shortDescription>
+        <shortDescription xml:lang="ka">ესპ</shortDescription>
+        <shortDescription xml:lang="ko">스페인</shortDescription>
+        <shortDescription xml:lang="nl">Esp</shortDescription>
+        <shortDescription xml:lang="ru">Исп</shortDescription>
+        <shortDescription xml:lang="sk">Špa</shortDescription>
+        <shortDescription xml:lang="sl">ESP</shortDescription>
+        <shortDescription xml:lang="sq">Esp</shortDescription>
+        <shortDescription xml:lang="sr">шпа</shortDescription>
+        <shortDescription xml:lang="sr@Latn">špa</shortDescription>
+        <shortDescription xml:lang="sv">Esp</shortDescription>
+        <shortDescription xml:lang="tr">Esp</shortDescription>
+        <shortDescription xml:lang="uk">Ісп</shortDescription>
+        <shortDescription xml:lang="vi">Esp</shortDescription>
+        <shortDescription xml:lang="zh_CN">Esp</shortDescription>
+        <shortDescription xml:lang="zh_TW">Esp</shortDescription>
+        <description>Spanish</description>
+        <description xml:lang="ko">스페인어</description>
+        <description xml:lang="ru">Испанская</description>
+      </configItem>
+      <variantList>
+        <variant>
+          <configItem>
+            <name>nodeadkeys</name>
+            <description>Eliminate dead keys</description>
+            <description xml:lang="af">Elimineer dooie sleutels</description>
+            <description xml:lang="az">Ölü düymələri sayma</description>
+            <description xml:lang="bg">Изключи специалните клавиши (dead keys)</description>
+            <description xml:lang="cs">Eliminovat mrtvé klávesy</description>
+            <description xml:lang="da">Slå døde taster fra</description>
+            <description xml:lang="el">Χωρίς νεκρά πλήκτρα</description>
+            <description xml:lang="en_GB">Eliminate dead keys</description>
+            <description xml:lang="es">Eliminar teclas muertas</description>
+            <description xml:lang="fi">Ei kuolleita näppäimiä</description>
+            <description xml:lang="fr">Éliminer les touches mortes</description>
+            <description xml:lang="hu">Halott billentyűk tiltása</description>
+            <description xml:lang="it">Tasti muti rimossi</description>
+            <description xml:lang="ka">სპეც ღილაკების (dead keys) გამორთვა</description>
+            <description xml:lang="ko">데드키 없음</description>
+            <description xml:lang="nl">Geen dode toetsen</description>
+            <description xml:lang="ru">Исключить специальные клавиши (dead keys)</description>
+            <description xml:lang="sk">Eliminovať mrtvé kláves</description>
+            <description xml:lang="sl">Izloči mrtve tipke</description>
+            <description xml:lang="sq">Elemino pulsantët e vdekur</description>
+            <description xml:lang="sr">Уклони акценте</description>
+            <description xml:lang="sr@Latn">Ukloni akcente</description>
+            <description xml:lang="sv">Eliminera stumma tangenter</description>
+            <description xml:lang="tr">Ölü tuşları normal yapar</description>
+            <description xml:lang="uk">Вилучити спеціальні клавіші (dead keys)</description>
+            <description xml:lang="vi">Phím chết loại trừ</description>
+            <description xml:lang="zh_CN">除去死键</description>
+            <description xml:lang="zh_TW">除去無用按鍵</description>
+          </configItem>
+        </variant>
+        <variant>
+          <configItem>
+            <name>sundeadkeys</name>
+            <description>Sun dead keys</description>
+            <description xml:lang="af">Sun (dooie sleutels)</description>
+            <description xml:lang="az">Sun ölü düymələr</description>
+            <description xml:lang="cs">Mrtvé klávesy Sun</description>
+            <description xml:lang="da">Sun døde taster</description>
+            <description xml:lang="en_GB">Sun dead keys</description>
+            <description xml:lang="es">Teclas muertas de Sun</description>
+            <description xml:lang="fi">Sunin kuolleet näppäimet</description>
+            <description xml:lang="fr">Touches mortes Sun</description>
+            <description xml:lang="hu">Sun halott billentyűk</description>
+            <description xml:lang="it">Tasti muti Sun</description>
+            <description xml:lang="ka">სპეც ღილაკები (dead keys) Sun</description>
+            <description xml:lang="ko">썬 데드키</description>
+            <description xml:lang="nl">Sun dode toetsen</description>
+            <description xml:lang="ru">Специальные клавиши (dead keys) Sun</description>
+            <description xml:lang="sk">Mŕtve klávesy Sun</description>
+            <description xml:lang="sl">Sun mrtve tipke</description>
+            <description xml:lang="sq">Pulsantë të vdekur Sun</description>
+            <description xml:lang="sr">Sun-ови акценти</description>
+            <description xml:lang="sr@Latn">Sun-ovi akcenti</description>
+            <description xml:lang="sv">Sun stumma tangenter</description>
+            <description xml:lang="tr">Sun ölü tuşlar</description>
+            <description xml:lang="uk">Спеціальні клавіші (dead keys) Sun</description>
+            <description xml:lang="vi">Phím chết Sun</description>
+            <description xml:lang="zh_CN">Sun 死键</description>
+            <description xml:lang="zh_TW">Sun 無用按鍵</description>
+          </configItem>
+        </variant>
+      </variantList>
+    </layout>
+    <layout>
+      <configItem>
+        <name>fi</name>
+        <shortDescription>Fin</shortDescription>
+        <shortDescription xml:lang="af">Fin</shortDescription>
+        <shortDescription xml:lang="az">Fin</shortDescription>
+        <shortDescription xml:lang="cs">Fin</shortDescription>
+        <shortDescription xml:lang="da">Fin</shortDescription>
+        <shortDescription xml:lang="el">Φιν</shortDescription>
+        <shortDescription xml:lang="en_GB">Fin</shortDescription>
+        <shortDescription xml:lang="es">Fin</shortDescription>
+        <shortDescription xml:lang="fi">Fin</shortDescription>
+        <shortDescription xml:lang="fr">Fin</shortDescription>
+        <shortDescription xml:lang="hu">Fin</shortDescription>
+        <shortDescription xml:lang="it">FIN</shortDescription>
+        <shortDescription xml:lang="ka">ფინ</shortDescription>
+        <shortDescription xml:lang="ko">핀란드</shortDescription>
+        <shortDescription xml:lang="nl">Fin</shortDescription>
+        <shortDescription xml:lang="ru">Фин</shortDescription>
+        <shortDescription xml:lang="sk">Fín</shortDescription>
+        <shortDescription xml:lang="sl">FIN</shortDescription>
+        <shortDescription xml:lang="sq">Fin</shortDescription>
+        <shortDescription xml:lang="sr">фин</shortDescription>
+        <shortDescription xml:lang="sr@Latn">fin</shortDescription>
+        <shortDescription xml:lang="sv">Fin</shortDescription>
+        <shortDescription xml:lang="tr">Fin</shortDescription>
+        <shortDescription xml:lang="uk">Фін</shortDescription>
+        <shortDescription xml:lang="vi">Fin</shortDescription>
+        <shortDescription xml:lang="zh_CN">Fin</shortDescription>
+        <shortDescription xml:lang="zh_TW">Fin</shortDescription>
+        <description>Finnish</description>
+        <description xml:lang="ko">핀란드어</description>
+        <description xml:lang="ru">Финская</description>
+        <description xml:lang="sv">Finsk</description>
+      </configItem>
+      <variantList>
+        <variant>
+          <configItem>
+            <name>basic</name>
+            <description>Basic</description>
+            <description xml:lang="ko">기본</description>
+            <description xml:lang="ru">Основные</description>
+            <description xml:lang="sv">Grundläggande</description>
+          </configItem>
+        </variant>
+      </variantList>
+    </layout>
+    <layout>
+      <configItem>
+        <name>fr</name>
+        <shortDescription>Fra</shortDescription>
+        <shortDescription xml:lang="af">Fra</shortDescription>
+        <shortDescription xml:lang="az">Fra</shortDescription>
+        <shortDescription xml:lang="cs">Fra</shortDescription>
+        <shortDescription xml:lang="da">Fra</shortDescription>
+        <shortDescription xml:lang="el">Γαλ</shortDescription>
+        <shortDescription xml:lang="en_GB">Fra</shortDescription>
+        <shortDescription xml:lang="es">Fra</shortDescription>
+        <shortDescription xml:lang="fi">Fra</shortDescription>
+        <shortDescription xml:lang="fr">Fra</shortDescription>
+        <shortDescription xml:lang="hu">Fra</shortDescription>
+        <shortDescription xml:lang="it">FRA</shortDescription>
+        <shortDescription xml:lang="ka">ფრა</shortDescription>
+        <shortDescription xml:lang="ko">프랑스</shortDescription>
+        <shortDescription xml:lang="nl">Fra</shortDescription>
+        <shortDescription xml:lang="ru">Фр</shortDescription>
+        <shortDescription xml:lang="sk">Fra</shortDescription>
+        <shortDescription xml:lang="sl">FRA</shortDescription>
+        <shortDescription xml:lang="sq">Fra</shortDescription>
+        <shortDescription xml:lang="sr">фра</shortDescription>
+        <shortDescription xml:lang="sr@Latn">fra</shortDescription>
+        <shortDescription xml:lang="sv">Fra</shortDescription>
+        <shortDescription xml:lang="tr">Fra</shortDescription>
+        <shortDescription xml:lang="uk">Фра</shortDescription>
+        <shortDescription xml:lang="vi">Fra</shortDescription>
+        <shortDescription xml:lang="zh_CN">Fra</shortDescription>
+        <shortDescription xml:lang="zh_TW">Fra</shortDescription>
+        <description>French</description>
+        <description xml:lang="af">Frans</description>
+        <description xml:lang="az">Fransızca</description>
+        <description xml:lang="bg">френска</description>
+        <description xml:lang="cs">Francouzské</description>
+        <description xml:lang="da">Fransk</description>
+        <description xml:lang="el">Γαλλικά</description>
+        <description xml:lang="en_GB">French</description>
+        <description xml:lang="es">Francés</description>
+        <description xml:lang="fi">Ranskalainen</description>
+        <description xml:lang="fr">Français</description>
+        <description xml:lang="hu">Francia</description>
+        <description xml:lang="it">Francese</description>
+        <description xml:lang="ka">ფრანგული</description>
+        <description xml:lang="ko">프랑스어</description>
+        <description xml:lang="nl">Frans</description>
+        <description xml:lang="ru">Французская</description>
+        <description xml:lang="rw">Igifaransa</description>
+        <description xml:lang="sk">Francúzske</description>
+        <description xml:lang="sl">Francoska</description>
+        <description xml:lang="sq">Frengjisht</description>
+        <description xml:lang="sr">француски</description>
+        <description xml:lang="sr@Latn">francuski</description>
+        <description xml:lang="sv">Fransk</description>
+        <description xml:lang="tr">Fransızca</description>
+        <description xml:lang="uk">Французька</description>
+        <description xml:lang="vi">Pháp</description>
+        <description xml:lang="zh_CN">法语</description>
+        <description xml:lang="zh_TW">法文</description>
+      </configItem>
+      <variantList>
+        <variant>
+          <configItem>
+            <name>nodeadkeys</name>
+            <description>Eliminate dead keys</description>
+            <description xml:lang="af">Elimineer dooie sleutels</description>
+            <description xml:lang="az">Ölü düymələri sayma</description>
+            <description xml:lang="bg">Изключи специалните клавиши (dead keys)</description>
+            <description xml:lang="cs">Eliminovat mrtvé klávesy</description>
+            <description xml:lang="da">Slå døde taster fra</description>
+            <description xml:lang="el">Χωρίς νεκρά πλήκτρα</description>
+            <description xml:lang="en_GB">Eliminate dead keys</description>
+            <description xml:lang="es">Eliminar teclas muertas</description>
+            <description xml:lang="fi">Ei kuolleita näppäimiä</description>
+            <description xml:lang="fr">Éliminer les touches mortes</description>
+            <description xml:lang="hu">Halott billentyűk tiltása</description>
+            <description xml:lang="it">Tasti muti rimossi</description>
+            <description xml:lang="ka">სპეც ღილაკების (dead keys) გამორთვა</description>
+            <description xml:lang="ko">데드키 없음</description>
+            <description xml:lang="nl">Geen dode toetsen</description>
+            <description xml:lang="ru">Исключить специальные клавиши (dead keys)</description>
+            <description xml:lang="sk">Eliminovať mrtvé kláves</description>
+            <description xml:lang="sl">Izloči mrtve tipke</description>
+            <description xml:lang="sq">Elemino pulsantët e vdekur</description>
+            <description xml:lang="sr">Уклони акценте</description>
+            <description xml:lang="sr@Latn">Ukloni akcente</description>
+            <description xml:lang="sv">Eliminera stumma tangenter</description>
+            <description xml:lang="tr">Ölü tuşları normal yapar</description>
+            <description xml:lang="uk">Вилучити спеціальні клавіші (dead keys)</description>
+            <description xml:lang="vi">Phím chết loại trừ</description>
+            <description xml:lang="zh_CN">除去死键</description>
+            <description xml:lang="zh_TW">除去無用按鍵</description>
+          </configItem>
+        </variant>
+        <variant>
+          <configItem>
+            <name>sundeadkeys</name>
+            <description>Sun dead keys</description>
+            <description xml:lang="af">Sun (dooie sleutels)</description>
+            <description xml:lang="az">Sun ölü düymələr</description>
+            <description xml:lang="cs">Mrtvé klávesy Sun</description>
+            <description xml:lang="da">Sun døde taster</description>
+            <description xml:lang="en_GB">Sun dead keys</description>
+            <description xml:lang="es">Teclas muertas de Sun</description>
+            <description xml:lang="fi">Sunin kuolleet näppäimet</description>
+            <description xml:lang="fr">Touches mortes Sun</description>
+            <description xml:lang="hu">Sun halott billentyűk</description>
+            <description xml:lang="it">Tasti muti Sun</description>
+            <description xml:lang="ka">სპეც ღილაკები (dead keys) Sun</description>
+            <description xml:lang="ko">썬 데드키</description>
+            <description xml:lang="nl">Sun dode toetsen</description>
+            <description xml:lang="ru">Специальные клавиши (dead keys) Sun</description>
+            <description xml:lang="sk">Mŕtve klávesy Sun</description>
+            <description xml:lang="sl">Sun mrtve tipke</description>
+            <description xml:lang="sq">Pulsantë të vdekur Sun</description>
+            <description xml:lang="sr">Sun-ови акценти</description>
+            <description xml:lang="sr@Latn">Sun-ovi akcenti</description>
+            <description xml:lang="sv">Sun stumma tangenter</description>
+            <description xml:lang="tr">Sun ölü tuşlar</description>
+            <description xml:lang="uk">Спеціальні клавіші (dead keys) Sun</description>
+            <description xml:lang="vi">Phím chết Sun</description>
+            <description xml:lang="zh_CN">Sun 死键</description>
+            <description xml:lang="zh_TW">Sun 無用按鍵</description>
+          </configItem>
+        </variant>
+      </variantList>
+    </layout>
+    <layout>
+      <configItem>
+        <name>fr_CH</name>
+        <shortDescription>FraCH</shortDescription>
+        <shortDescription xml:lang="ko">프랑스어 스위스</shortDescription>
+        <shortDescription xml:lang="ru">ФраШВ</shortDescription>
+        <description>Swiss French</description>
+        <description xml:lang="ko">스위스 프랑스어</description>
+        <description xml:lang="ru">Швейцарская французская</description>
+        <description xml:lang="sv">Franskschweizisk</description>
+      </configItem>
+      <variantList>
+        <variant>
+          <configItem>
+            <name>nodeadkeys</name>
+            <description>Eliminate dead keys</description>
+            <description xml:lang="af">Elimineer dooie sleutels</description>
+            <description xml:lang="az">Ölü düymələri sayma</description>
+            <description xml:lang="bg">Изключи специалните клавиши (dead keys)</description>
+            <description xml:lang="cs">Eliminovat mrtvé klávesy</description>
+            <description xml:lang="da">Slå døde taster fra</description>
+            <description xml:lang="el">Χωρίς νεκρά πλήκτρα</description>
+            <description xml:lang="en_GB">Eliminate dead keys</description>
+            <description xml:lang="es">Eliminar teclas muertas</description>
+            <description xml:lang="fi">Ei kuolleita näppäimiä</description>
+            <description xml:lang="fr">Éliminer les touches mortes</description>
+            <description xml:lang="hu">Halott billentyűk tiltása</description>
+            <description xml:lang="it">Tasti muti rimossi</description>
+            <description xml:lang="ka">სპეც ღილაკების (dead keys) გამორთვა</description>
+            <description xml:lang="ko">데드키 없음</description>
+            <description xml:lang="nl">Geen dode toetsen</description>
+            <description xml:lang="ru">Исключить специальные клавиши (dead keys)</description>
+            <description xml:lang="sk">Eliminovať mrtvé kláves</description>
+            <description xml:lang="sl">Izloči mrtve tipke</description>
+            <description xml:lang="sq">Elemino pulsantët e vdekur</description>
+            <description xml:lang="sr">Уклони акценте</description>
+            <description xml:lang="sr@Latn">Ukloni akcente</description>
+            <description xml:lang="sv">Eliminera stumma tangenter</description>
+            <description xml:lang="tr">Ölü tuşları normal yapar</description>
+            <description xml:lang="uk">Вилучити спеціальні клавіші (dead keys)</description>
+            <description xml:lang="vi">Phím chết loại trừ</description>
+            <description xml:lang="zh_CN">除去死键</description>
+            <description xml:lang="zh_TW">除去無用按鍵</description>
+          </configItem>
+        </variant>
+        <variant>
+          <configItem>
+            <name>sundeadkeys</name>
+            <description>Sun dead keys</description>
+            <description xml:lang="af">Sun (dooie sleutels)</description>
+            <description xml:lang="az">Sun ölü düymələr</description>
+            <description xml:lang="cs">Mrtvé klávesy Sun</description>
+            <description xml:lang="da">Sun døde taster</description>
+            <description xml:lang="en_GB">Sun dead keys</description>
+            <description xml:lang="es">Teclas muertas de Sun</description>
+            <description xml:lang="fi">Sunin kuolleet näppäimet</description>
+            <description xml:lang="fr">Touches mortes Sun</description>
+            <description xml:lang="hu">Sun halott billentyűk</description>
+            <description xml:lang="it">Tasti muti Sun</description>
+            <description xml:lang="ka">სპეც ღილაკები (dead keys) Sun</description>
+            <description xml:lang="ko">썬 데드키</description>
+            <description xml:lang="nl">Sun dode toetsen</description>
+            <description xml:lang="ru">Специальные клавиши (dead keys) Sun</description>
+            <description xml:lang="sk">Mŕtve klávesy Sun</description>
+            <description xml:lang="sl">Sun mrtve tipke</description>
+            <description xml:lang="sq">Pulsantë të vdekur Sun</description>
+            <description xml:lang="sr">Sun-ови акценти</description>
+            <description xml:lang="sr@Latn">Sun-ovi akcenti</description>
+            <description xml:lang="sv">Sun stumma tangenter</description>
+            <description xml:lang="tr">Sun ölü tuşlar</description>
+            <description xml:lang="uk">Спеціальні клавіші (dead keys) Sun</description>
+            <description xml:lang="vi">Phím chết Sun</description>
+            <description xml:lang="zh_CN">Sun 死键</description>
+            <description xml:lang="zh_TW">Sun 無用按鍵</description>
+          </configItem>
+        </variant>
+      </variantList>
+    </layout>
+    <layout>
+      <configItem>
+        <name>hu</name>
+        <shortDescription>Hun</shortDescription>
+        <shortDescription xml:lang="af">Hun</shortDescription>
+        <shortDescription xml:lang="az">Mac</shortDescription>
+        <shortDescription xml:lang="cs">Maď</shortDescription>
+        <shortDescription xml:lang="da">Ung</shortDescription>
+        <shortDescription xml:lang="en_GB">Hun</shortDescription>
+        <shortDescription xml:lang="es">Hun</shortDescription>
+        <shortDescription xml:lang="fi">Hun</shortDescription>
+        <shortDescription xml:lang="fr">Hun</shortDescription>
+        <shortDescription xml:lang="hu">Hun</shortDescription>
+        <shortDescription xml:lang="it">HUN</shortDescription>
+        <shortDescription xml:lang="ka">უნგ</shortDescription>
+        <shortDescription xml:lang="ko">헝가리</shortDescription>
+        <shortDescription xml:lang="nl">Hon</shortDescription>
+        <shortDescription xml:lang="ru">Венг</shortDescription>
+        <shortDescription xml:lang="sk">Maď</shortDescription>
+        <shortDescription xml:lang="sl">HUN</shortDescription>
+        <shortDescription xml:lang="sq">Hun</shortDescription>
+        <shortDescription xml:lang="sr">мађ</shortDescription>
+        <shortDescription xml:lang="sr@Latn">mađ</shortDescription>
+        <shortDescription xml:lang="sv">Hun</shortDescription>
+        <shortDescription xml:lang="tr">Mcr</shortDescription>
+        <shortDescription xml:lang="uk">Уго</shortDescription>
+        <shortDescription xml:lang="vi">Hun</shortDescription>
+        <shortDescription xml:lang="zh_CN">Hun</shortDescription>
+        <shortDescription xml:lang="zh_TW">Hun</shortDescription>
+        <description>Hungarian</description>
+        <description xml:lang="ko">헝가리어</description>
+        <description xml:lang="ru">Венгерская</description>
+      </configItem>
+      <variantList>
+        <variant>
+          <configItem>
+	    <name>standard</name>
+	    <description>Standard</description>
+	    <description xml:lang="af">Standaard</description>
+	    <description xml:lang="az">Standart</description>
+	    <description xml:lang="cs">Standardní</description>
+	    <description xml:lang="da">Standard</description>
+	    <description xml:lang="el">Εξ ορισμού</description>
+	    <description xml:lang="en_GB">Standard</description>
+	    <description xml:lang="es">Estándar</description>
+	    <description xml:lang="fi">Tavallinen</description>
+	    <description xml:lang="fr">Standard</description>
+	    <description xml:lang="hu">Szabványos</description>
+	    <description xml:lang="it">Standard</description>
+	    <description xml:lang="ka">სტანდარტული</description>
+	    <description xml:lang="ko">표준</description>
+	    <description xml:lang="nl">Standaard</description>
+	    <description xml:lang="ru">Стандартная</description>
+	    <description xml:lang="rw">gisanzwe/kimenyerewe</description>
+	    <description xml:lang="sk">Štandardné</description>
+	    <description xml:lang="sl">Standardna</description>
+	    <description xml:lang="sq">Standart</description>
+	    <description xml:lang="sr">стандардна</description>
+	    <description xml:lang="sr@Latn">standardna</description>
+	    <description xml:lang="sv">Standard</description>
+	    <description xml:lang="tr">Standart</description>
+	    <description xml:lang="uk">Стандартна</description>
+	    <description xml:lang="vi">Tiêu chuẩn</description>
+	    <description xml:lang="zh_CN">标准</description>
+	    <description xml:lang="zh_TW">標準</description>
+          </configItem>
+        </variant>
+        <variant>
+          <configItem>
+	    <name>qwerty</name>
+	    <description>qwerty</description>
+	    <description xml:lang="af">qwerty</description>
+	    <description xml:lang="az">qwerty</description>
+	    <description xml:lang="bg">qwerty</description>
+	    <description xml:lang="cs">qwerty</description>
+	    <description xml:lang="da">qwerty</description>
+	    <description xml:lang="en_GB">qwerty</description>
+	    <description xml:lang="es">qwerty</description>
+	    <description xml:lang="fi">qwerty</description>
+	    <description xml:lang="fr">qwerty</description>
+	    <description xml:lang="hu">qwerty</description>
+	    <description xml:lang="it">querty</description>
+	    <description xml:lang="ka">qwerty</description>
+	    <description xml:lang="ko">QWERTY</description>
+	    <description xml:lang="nl">qwerty</description>
+	    <description xml:lang="ru">qwerty</description>
+	    <description xml:lang="sk">qwerty</description>
+	    <description xml:lang="sl">qwerty</description>
+	    <description xml:lang="sq">qwerty</description>
+	    <description xml:lang="sr">qwerty</description>
+	    <description xml:lang="sr@Latn">qwerty</description>
+	    <description xml:lang="sv">qwerty</description>
+	    <description xml:lang="tr">qwerty</description>
+	    <description xml:lang="uk">qwerty</description>
+	    <description xml:lang="vi">qwerty</description>
+	    <description xml:lang="zh_CN">qwerty</description>
+	    <description xml:lang="zh_TW">qwerty</description>
+          </configItem>
+        </variant>
+        <variant>
+          <configItem>
+	    <name>101_qwertz_comma_dead</name>
+	    <description>101/qwertz/comma/Dead keys</description>
+	    <description xml:lang="en_GB">101/qwertz/comma/Dead keys</description>
+	    <description xml:lang="es">101/qwertz/coma/Teclas muertas</description>
+	    <description xml:lang="fi">101/qwertz/pilkku/Kuolleet näppäimet</description>
+	    <description xml:lang="fr">101/qwertz/virgule/touches mortes</description>
+	    <description xml:lang="hu">101/qwertz/vessző/Halott billentyűk</description>
+	    <description xml:lang="it">101/qwertz/virgola/tasti muti</description>
+	    <description xml:lang="ka">pc101, qwertz, მძიმე, სპეც კლავიშები (dead keys)</description>
+	    <description xml:lang="ko">101/QWERTZ/쉼표/데드키</description>
+	    <description xml:lang="nl">101/qwertz/komma/Dode toetsen</description>
+	    <description xml:lang="ru">pc101, qwertz, запятая, специальные клавиши (dead keys)</description>
+	    <description xml:lang="sl">101/qwertz/vejica/Mrtve tipke</description>
+	    <description xml:lang="sr">101/qwertz/запета/акценти</description>
+	    <description xml:lang="sr@Latn">101/qwertz/zapeta/akcenti</description>
+	    <description xml:lang="sv">101/qwertz/komma/Stumma tangenter</description>
+	    <description xml:lang="tr">101/qwertz/virgül/Ölü tuşlar</description>
+	    <description xml:lang="uk">101/qwertz/comma/Спеціальні клавіші</description>
+	    <description xml:lang="vi">101/qwertz/dấu phẩy/Phím chết</description>
+	    <description xml:lang="zh_TW">101/qwertz/逗點/無用按鍵</description>
+          </configItem>
+        </variant>
+        <variant>
+          <configItem>
+	    <name>101_qwertz_dot_dead</name>
+	    <description>101/qwertz/dot/Dead keys</description>
+	    <description xml:lang="en_GB">101/qwertz/dot/Dead keys</description>
+	    <description xml:lang="es">101/qwertz/punto/Teclas muertas</description>
+	    <description xml:lang="fi">101/qwertz/piste/Kuolleet näppäimet</description>
+	    <description xml:lang="fr">101/qwertz/point/touches mortes</description>
+	    <description xml:lang="hu">101/qwertz/pont/Halott billentyűk</description>
+	    <description xml:lang="it">101/qwertz/punto/tasti muti</description>
+	    <description xml:lang="ka">pc101, qwertz, წერტილი, სპეც კლავიშები (dead keys)</description>
+	    <description xml:lang="ko">101/QWERTZ/점/데드키</description>
+	    <description xml:lang="nl">101/qwertz/punt/Dode toetsen</description>
+	    <description xml:lang="ru">pc101, qwertz, точка, специальные клавиши (dead keys)</description>
+	    <description xml:lang="sl">101/qwertz/pika/Mrtve tipke</description>
+	    <description xml:lang="sr">101/qwertz/тачка/акценти</description>
+	    <description xml:lang="sr@Latn">101/qwertz/tačka/akcenti</description>
+	    <description xml:lang="sv">101/qwertz/punkt/Stumma tangenter</description>
+	    <description xml:lang="tr">101/qwertz/nokta/Ölü tuşlar</description>
+	    <description xml:lang="uk">101/qwertz/dot/Спеціальні клавіші</description>
+	    <description xml:lang="vi">101/qwertz/dấu chấm/Phím chết</description>
+	    <description xml:lang="zh_TW">101/qwertz/句點/無用按鍵</description>
+          </configItem>
+        </variant>
+        <variant>
+          <configItem>
+	    <name>101_qwertz_dot_dead</name>
+	    <description>101/qwertz/dot/Dead keys</description>
+	    <description xml:lang="en_GB">101/qwertz/dot/Dead keys</description>
+	    <description xml:lang="es">101/qwertz/punto/Teclas muertas</description>
+	    <description xml:lang="fi">101/qwertz/piste/Kuolleet näppäimet</description>
+	    <description xml:lang="fr">101/qwertz/point/touches mortes</description>
+	    <description xml:lang="hu">101/qwertz/pont/Halott billentyűk</description>
+	    <description xml:lang="it">101/qwertz/punto/tasti muti</description>
+	    <description xml:lang="ka">pc101, qwertz, წერტილი, სპეც კლავიშები (dead keys)</description>
+	    <description xml:lang="ko">101/QWERTZ/점/데드키</description>
+	    <description xml:lang="nl">101/qwertz/punt/Dode toetsen</description>
+	    <description xml:lang="ru">pc101, qwertz, точка, специальные клавиши (dead keys)</description>
+	    <description xml:lang="sl">101/qwertz/pika/Mrtve tipke</description>
+	    <description xml:lang="sr">101/qwertz/тачка/акценти</description>
+	    <description xml:lang="sr@Latn">101/qwertz/tačka/akcenti</description>
+	    <description xml:lang="sv">101/qwertz/punkt/Stumma tangenter</description>
+	    <description xml:lang="tr">101/qwertz/nokta/Ölü tuşlar</description>
+	    <description xml:lang="uk">101/qwertz/dot/Спеціальні клавіші</description>
+	    <description xml:lang="vi">101/qwertz/dấu chấm/Phím chết</description>
+	    <description xml:lang="zh_TW">101/qwertz/句點/無用按鍵</description>
+          </configItem>
+        </variant>
+        <variant>
+          <configItem>
+	    <name>101_qwertz_dot_nodead</name>
+	    <description>101/qwertz/dot/Eliminate dead keys</description>
+	    <description xml:lang="en_GB">101/qwertz/dot/Eliminate dead keys</description>
+	    <description xml:lang="es">101/qwertz/punto/Eliminar teclas muertas</description>
+	    <description xml:lang="fi">101/qwertz/piste/Ei kuolleita näppäimiä</description>
+	    <description xml:lang="fr">101/qwertz/point/sans touches mortes</description>
+	    <description xml:lang="hu">101/qwertz/pont/Halott billentyűk tiltása</description>
+	    <description xml:lang="it">101/qwertz/punto/tasti muti esclusi</description>
+	    <description xml:lang="ka">pc101, qwertz, წერტილი, სპეც კლავიშების (dead keys) გარეშე</description>
+	    <description xml:lang="ko">101/QWERTZ/점/데드키 없음</description>
+	    <description xml:lang="nl">101/qwertz/punt/Dode toetsen verwijderen</description>
+	    <description xml:lang="ru">pc101, qwertz, точка, исключить специальные клавиши (dead keys)</description>
+	    <description xml:lang="sl">101/qwertz/pika/Izloči mrtve tipke</description>
+	    <description xml:lang="sr">101/qwertz/тачка/без акцената</description>
+	    <description xml:lang="sr@Latn">101/qwertz/tačka/bez akcenata</description>
+	    <description xml:lang="sv">101/qwertz/punkt/Eliminera stumma tangenter</description>
+	    <description xml:lang="tr">101/qwertz/nokta/Ölü tuşsuz</description>
+	    <description xml:lang="uk">101/qwertz/dot/Вимкнути спеціальні клавіші (dead keys)</description>
+	    <description xml:lang="vi">101/qwertz/dấu chấm/Phím chết loại trừ</description>
+	    <description xml:lang="zh_TW">101/qwertz/句點/除去無用按鍵</description>
+          </configItem>
+        </variant>
+        <variant>
+          <configItem>
+	    <name>101_qwerty_comma_dead</name>
+	    <description>101/qwerty/comma/Dead keys</description>
+	    <description xml:lang="en_GB">101/qwerty/comma/Dead keys</description>
+	    <description xml:lang="es">101/qwerty/coma/Teclas muertas</description>
+	    <description xml:lang="fi">101/qwerty/pilkku/Kuolleet näppäimet</description>
+	    <description xml:lang="fr">101/qwerty/virgule/touches mortes</description>
+	    <description xml:lang="hu">101/qwerty/vessző/Halott billentyűk</description>
+	    <description xml:lang="it">101/qwerty/virgola/tasti muti</description>
+	    <description xml:lang="ka">pc101, qwerty, მძიმე, სპეც კლავიშები (dead keys)</description>
+	    <description xml:lang="ko">101/QWERTY/쉼표/데드키</description>
+	    <description xml:lang="nl">101/qwerty/komma/Dode toetsen</description>
+	    <description xml:lang="ru">pc101, qwerty, запятая, специальные клавиши (dead keys)</description>
+	    <description xml:lang="sl">101/qwerty/vejica/Mrtve tipke</description>
+	    <description xml:lang="sr">101/qwerty/запета/акценти</description>
+	    <description xml:lang="sr@Latn">101/qwerty/zapeta/akcenti</description>
+	    <description xml:lang="sv">101/qwerty/komma/Stumma tangenter</description>
+	    <description xml:lang="tr">101/qwerty/virgül/Ölü tuşlar</description>
+	    <description xml:lang="uk">101/qwerty/comma/Спеціальні клавіші</description>
+	    <description xml:lang="vi">101/qwerty/dấu phẩy/Phím chết</description>
+	    <description xml:lang="zh_TW">101/qwerty/逗點/無用按鍵</description>
+          </configItem>
+        </variant>
+        <variant>
+          <configItem>
+	    <name>101_qwerty_comma_nodead</name>
+	    <description>101/qwerty/comma/Eliminate dead keys</description>
+	    <description xml:lang="en_GB">101/qwerty/comma/Eliminate dead keys</description>
+	    <description xml:lang="es">101/qwerty/coma/Eliminar teclas muertas</description>
+	    <description xml:lang="fi">101/qwerty/pilkku/Ei kuolleita näppäimiä</description>
+	    <description xml:lang="fr">101/qwerty/virgule/sans touches mortes</description>
+	    <description xml:lang="hu">101/qwerty/vessző/Halott billentyűk tiltása</description>
+	    <description xml:lang="it">101/qwerty/virgola/tasti muti esclusi</description>
+	    <description xml:lang="ka">pc101, qwerty, მძიმე, სპეც კლავიშების (dead keys) გარეშე</description>
+	    <description xml:lang="ko">101/QWERTY/쉼표/데드키 없음</description>
+	    <description xml:lang="nl">101/qwerty/komma/Dode toetsen verwijderen</description>
+	    <description xml:lang="ru">pc101, qwerty, запятая, исключить специальные клавиши (dead keys)</description>
+	    <description xml:lang="sl">101/qwerty/vejica/Izloči mrtve tipke</description>
+	    <description xml:lang="sr">101/qwerty/запета/без акцената</description>
+	    <description xml:lang="sr@Latn">101/qwerty/zapeta/bez akcenata</description>
+	    <description xml:lang="sv">101/qwerty/komma/Eliminera stumma tangenter</description>
+	    <description xml:lang="tr">101/qwerty/virgül/Ölü tuşları normal yapar</description>
+	    <description xml:lang="uk">101/qwerty/comma/Вимкнути спеціальні клавіші (dead keys)</description>
+	    <description xml:lang="vi">101/qwerty/dấu phẩy/Phím chết loại trừ</description>
+	    <description xml:lang="zh_TW">101/qwerty/逗點/除去無用按鍵</description>
+          </configItem>
+        </variant>
+        <variant>
+          <configItem>
+	    <name>101_qwerty_dot_dead</name>
+	    <description>101/qwerty/dot/Dead keys</description>
+	    <description xml:lang="en_GB">101/qwerty/dot/Dead keys</description>
+	    <description xml:lang="es">101/qwerty/punto/Teclas muertas</description>
+	    <description xml:lang="fi">101/qwerty/piste/Kuolleet näppäimet</description>
+	    <description xml:lang="fr">101/qwerty/point/touches mortes</description>
+	    <description xml:lang="hu">101/qwerty/pont/Halott billentyűk</description>
+	    <description xml:lang="it">101/qwerty/punto/tasti muti</description>
+	    <description xml:lang="ka">pc101, qwerty, წერტილი, სპეც კლავიშები (dead keys)</description>
+	    <description xml:lang="ko">101/QWERTY/점/데드키</description>
+	    <description xml:lang="nl">101/qwerty/punt/Dode toetsen</description>
+	    <description xml:lang="ru">pc101, qwerty, точка, исключить специальные клавиши (dead keys)</description>
+	    <description xml:lang="sl">101/qwerty/pika/Mrtve tipke</description>
+	    <description xml:lang="sr">101/qwerty/тачка/акценти</description>
+	    <description xml:lang="sr@Latn">101/qwerty/tačka/akcenti</description>
+	    <description xml:lang="sv">101/qwerty/punkt/Stumma tangenter</description>
+	    <description xml:lang="tr">101/qwerty/nokta/Ölü tuşlar</description>
+	    <description xml:lang="uk">101/qwerty/dot/Спеціальні клавіші</description>
+	    <description xml:lang="vi">101/qwerty/dấu chấm/Phím chết</description>
+	    <description xml:lang="zh_TW">101/qwerty/句點/無用按鍵</description>
+          </configItem>
+        </variant>
+        <variant>
+          <configItem>
+	    <name>101_qwerty_dot_nodead</name>
+	    <description>101/qwerty/dot/Eliminate dead keys</description>
+	    <description xml:lang="en_GB">101/qwerty/dot/Eliminate dead keys</description>
+	    <description xml:lang="es">101/qwerty/punto/Eliminar teclas muertas</description>
+	    <description xml:lang="fi">101/qwerty/piste/Ei kuolleita näppäimiä</description>
+	    <description xml:lang="fr">101/qwerty/point/sans touches mortes</description>
+	    <description xml:lang="hu">101/qwerty/pont/Halott billentyűk tiltása</description>
+	    <description xml:lang="it">101/qwerty/punto/tasti muti esclusi</description>
+	    <description xml:lang="ka">pc101, qwerty, წერტილი, სპეც კლავიშები (dead keys) გარეშე</description>
+	    <description xml:lang="ko">101/QWERTY/점/데드키 없음</description>
+	    <description xml:lang="nl">101/qwerty/punt/Dode toetsen verwijderen</description>
+	    <description xml:lang="ru">pc101, qwerty, точка, исключить специальные клавиши (dead keys)</description>
+	    <description xml:lang="sl">101/qwerty/pika/Izloči mrtve tipke</description>
+	    <description xml:lang="sr">101/qwerty/тачка/без акцената</description>
+	    <description xml:lang="sr@Latn">101/qwerty/tačka/bez akcenata</description>
+	    <description xml:lang="sv">101/qwerty/punkt/Eliminera stumma tangenter</description>
+	    <description xml:lang="tr">101/qwerty/nokta/Ölü tuşsuz</description>
+	    <description xml:lang="uk">101/qwerty/dot/Вимкнути спеціальні клавіші (dead keys)</description>
+	    <description xml:lang="vi">101/qwerty/dấu chấm/Phím chết loại trừ</description>
+	    <description xml:lang="zh_TW">101/qwerty/句點/除去無用按鍵</description>
+          </configItem>
+        </variant>
+        <variant>
+          <configItem>
+            <name>sundeadkeys</name>
+            <description>Sun dead keys</description>
+            <description xml:lang="af">Sun (dooie sleutels)</description>
+            <description xml:lang="az">Sun ölü düymələr</description>
+            <description xml:lang="cs">Mrtvé klávesy Sun</description>
+            <description xml:lang="da">Sun døde taster</description>
+            <description xml:lang="en_GB">Sun dead keys</description>
+            <description xml:lang="es">Teclas muertas de Sun</description>
+            <description xml:lang="fi">Sunin kuolleet näppäimet</description>
+            <description xml:lang="fr">Touches mortes Sun</description>
+            <description xml:lang="hu">Sun halott billentyűk</description>
+            <description xml:lang="it">Tasti muti Sun</description>
+            <description xml:lang="ka">სპეც ღილაკები (dead keys) Sun</description>
+            <description xml:lang="ko">썬 데드키</description>
+            <description xml:lang="nl">Sun dode toetsen</description>
+            <description xml:lang="ru">Специальные клавиши (dead keys) Sun</description>
+            <description xml:lang="sk">Mŕtve klávesy Sun</description>
+            <description xml:lang="sl">Sun mrtve tipke</description>
+            <description xml:lang="sq">Pulsantë të vdekur Sun</description>
+            <description xml:lang="sr">Sun-ови акценти</description>
+            <description xml:lang="sr@Latn">Sun-ovi akcenti</description>
+            <description xml:lang="sv">Sun stumma tangenter</description>
+            <description xml:lang="tr">Sun ölü tuşlar</description>
+            <description xml:lang="uk">Спеціальні клавіші (dead keys) Sun</description>
+            <description xml:lang="vi">Phím chết Sun</description>
+            <description xml:lang="zh_CN">Sun 死键</description>
+            <description xml:lang="zh_TW">Sun 無用按鍵</description>
+          </configItem>
+        </variant>
+        <variant>
+          <configItem>
+	    <name>102_qwertz_comma_dead</name>
+	    <description>102/qwertz/comma/Dead keys</description>
+	    <description xml:lang="en_GB">102/qwertz/comma/Dead keys</description>
+	    <description xml:lang="es">102/qwertz/coma/Teclas muertas</description>
+	    <description xml:lang="fi">102/qwertz/pilkku/Kuolleet näppäimet</description>
+	    <description xml:lang="fr">102/qwertz/virgule/touches mortes</description>
+	    <description xml:lang="hu">102/qwertz/vessző/Halott billentyűk</description>
+	    <description xml:lang="it">102/qwertz/virgola/tasti muti</description>
+	    <description xml:lang="ka">pc102, qwertz, მძიმე, სპეც კლავიშები (dead keys)</description>
+	    <description xml:lang="ko">102/QWERTZ/쉼표/데드키</description>
+	    <description xml:lang="nl">102/qwertz/komma/Dode toetsen</description>
+	    <description xml:lang="ru">pc102, qwertz, запятая, специальные клавиши (dead keys)</description>
+	    <description xml:lang="sl">102/qwertz/vejica/Mrtve tipke</description>
+	    <description xml:lang="sr">102/qwertz/запета/акценти</description>
+	    <description xml:lang="sr@Latn">102/qwertz/zapeta/akcenti</description>
+	    <description xml:lang="sv">102/qwertz/komma/Stumma tangenter</description>
+	    <description xml:lang="tr">102/qwertz/virgül/Ölü tuşlar</description>
+	    <description xml:lang="uk">102/qwertz/comma/Спеціальні клавіші</description>
+	    <description xml:lang="vi">102/qwertz/dấu phẩy/Phím chết</description>
+	    <description xml:lang="zh_TW">102/qwertz/逗點/無用按鍵</description>
+          </configItem>
+        </variant>
+        <variant>
+          <configItem>
+	    <name>102_qwertz_comma_nodead</name>
+	    <description>102/qwertz/comma/Eliminate dead keys</description>
+	    <description xml:lang="en_GB">102/qwertz/comma/Eliminate dead keys</description>
+	    <description xml:lang="es">102/qwertz/coma/Eliminar teclas muertas</description>
+	    <description xml:lang="fi">102/qwertz/pilkku/Ei kuolleita näppäimiä</description>
+	    <description xml:lang="fr">102/qwertz/virgule/sans touches mortes</description>
+	    <description xml:lang="hu">102/qwertz/vessző/Halott billentyűk tiltása</description>
+	    <description xml:lang="it">102/qwertz/virgola/tasti muti esclusi</description>
+	    <description xml:lang="ka">pc102, qwertz, მძიმე, სპეც კლავიშების (dead keys) გარეშე</description>
+	    <description xml:lang="ko">102/QWERTZ/쉼표/데드키 없음</description>
+	    <description xml:lang="nl">102/qwertz/komma/Dode toetsen verwijderen</description>
+	    <description xml:lang="ru">pc102, qwertz, запятая, исключить специальные клавиши (dead keys)</description>
+	    <description xml:lang="sl">102/qwertz/vejica/Izloči mrtve tipke</description>
+	    <description xml:lang="sr">102/qwertz/запета/без акцената</description>
+	    <description xml:lang="sr@Latn">102/qwertz/zapeta/bez akcenata</description>
+	    <description xml:lang="sv">102/qwertz/komma/Eliminera stumma tangenter</description>
+	    <description xml:lang="tr">102/qwertz/virgül/Ölü tuşsuz</description>
+	    <description xml:lang="uk">102/qwertz/comma/Вимкнути спеціальні клавіші (dead keys)</description>
+	    <description xml:lang="vi">102/qwertz/dấu phẩy/Phím chết loại trừ</description>
+	    <description xml:lang="zh_TW">102/qwertz/逗點/除去無用按鍵</description>
+          </configItem>
+        </variant>
+        <variant>
+          <configItem>
+	    <name>102_qwertz_dot_dead</name>
+	    <description>102/qwertz/dot/Dead keys</description>
+	    <description xml:lang="en_GB">102/qwertz/dot/Dead keys</description>
+	    <description xml:lang="es">102/qwertz/punto/Teclas muertas</description>
+	    <description xml:lang="fi">102/qwertz/piste/Kuolleet näppäimet</description>
+	    <description xml:lang="fr">102/qwertz/point/touches mortes</description>
+	    <description xml:lang="hu">102/qwertz/pont/Halott billentyűk</description>
+	    <description xml:lang="it">102/qwertyz/punto/tasti muti</description>
+	    <description xml:lang="ka">pc102, qwertz, წერტილი, სპეც კლავიშები (dead keys)</description>
+	    <description xml:lang="ko">102/QWERTZ/점/데드키</description>
+	    <description xml:lang="nl">102/qwertz/punt/Dode toetsen</description>
+	    <description xml:lang="ru">pc102, qwertz, точка, специальные клавиши (dead keys)</description>
+	    <description xml:lang="sl">102/qwertz/pika/Mrtve tipke</description>
+	    <description xml:lang="sr">102/qwertz/тачка/акценти</description>
+	    <description xml:lang="sr@Latn">102/qwertz/tačka/akcenti</description>
+	    <description xml:lang="sv">102/qwertz/punkt/Stumma tangenter</description>
+	    <description xml:lang="tr">102/qwertz/nokta/Ölü tuşlar</description>
+	    <description xml:lang="uk">102/qwertz/dot/Спеціальні клавіші</description>
+	    <description xml:lang="vi">102/qwertz/dấu chấm/Phím chết</description>
+	    <description xml:lang="zh_TW">102/qwertz/句點/無用按鍵</description>
+          </configItem>
+        </variant>
+        <variant>
+          <configItem>
+	    <name>102_qwertz_dot_nodead</name>
+	    <description>102/qwertz/dot/Eliminate dead keys</description>
+	    <description xml:lang="en_GB">102/qwertz/dot/Eliminate dead keys</description>
+	    <description xml:lang="es">102/qwertz/punto/Eliminar teclas muertas</description>
+	    <description xml:lang="fi">102/qwertz/piste/Ei kuolleita näppäimiä</description>
+	    <description xml:lang="fr">102/qwertz/point/sans touches mortes</description>
+	    <description xml:lang="hu">102/qwertz/pont/Halott billentyűk tiltása</description>
+	    <description xml:lang="it">102/qwertyz/punto/tasti muti esclusi</description>
+	    <description xml:lang="ka">pc102, qwertz, წერტილი, სპეც კლავიშების (dead keys) გარეშე</description>
+	    <description xml:lang="ko">102/QWERTZ/점/데드키 없음</description>
+	    <description xml:lang="nl">102/qwertz/punt/Dode toetsen verwijderen</description>
+	    <description xml:lang="ru">pc102, qwertz, точка, исключить специальные клавиши (dead keys)</description>
+	    <description xml:lang="sl">102/qwertz/pika/Izloči mrtve tipke</description>
+	    <description xml:lang="sr">102/qwertz/тачка/без акцената</description>
+	    <description xml:lang="sr@Latn">102/qwertz/tačka/bez akcenata</description>
+	    <description xml:lang="sv">102/qwertz/punkt/Eliminera stumma tangenter</description>
+	    <description xml:lang="tr">102/qwertz/nokta/Ölü tuşsuz</description>
+	    <description xml:lang="uk">102/qwertz/dot/Вимкнути спеціальні клавіші (dead keys)</description>
+	    <description xml:lang="vi">102/qwertz/dấu chấm/Phím chết loại trừ</description>
+	    <description xml:lang="zh_TW">102/qwertz/句點/除去無用按鍵</description>
+          </configItem>
+        </variant>
+        <variant>
+          <configItem>
+	    <name>102_qwerty_comma_dead</name>
+	    <description>102/qwerty/comma/Dead keys</description>
+	    <description xml:lang="en_GB">102/qwerty/comma/Dead keys</description>
+	    <description xml:lang="es">102/qwerty/coma/Teclas muertas</description>
+	    <description xml:lang="fi">102/qwerty/pilkku/Kuolleet näppäimet</description>
+	    <description xml:lang="fr">102/qwerty/virgule/touches mortes</description>
+	    <description xml:lang="hu">102/qwerty/vessző/Halott billentyűk</description>
+	    <description xml:lang="it">102/qwerty/virgola/tasti muti</description>
+	    <description xml:lang="ka">pc102, qwerty, მძიმე, სპეც კლავიშები (dead keys)</description>
+	    <description xml:lang="ko">102/QWERTY/쉼표/데드키</description>
+	    <description xml:lang="nl">102/qwerty/komma/Dode toetsen</description>
+	    <description xml:lang="ru">pc102, qwerty, запятая, специальные клавиши (dead keys)</description>
+	    <description xml:lang="sl">102/qwerty/vejica/Mrtve tipke</description>
+	    <description xml:lang="sr">102/qwerty/запета/акценти</description>
+	    <description xml:lang="sr@Latn">102/qwerty/zapeta/akcenti</description>
+	    <description xml:lang="sv">102/qwerty/komma/Stumma tangenter</description>
+	    <description xml:lang="tr">102/qwerty/virgül/Ölü tuşlar</description>
+	    <description xml:lang="uk">102/qwerty/comma/Спеціальні клавіші</description>
+	    <description xml:lang="vi">102/qwerty/dấu phẩy/Phím chết</description>
+	    <description xml:lang="zh_TW">102/qwerty/逗點/無用按鍵</description>
+          </configItem>
+        </variant>
+        <variant>
+          <configItem>
+	    <name>102_qwerty_comma_nodead</name>
+	    <description>102/qwerty/comma/Eliminate dead keys</description>
+	    <description xml:lang="en_GB">102/qwerty/comma/Eliminate dead keys</description>
+	    <description xml:lang="es">102/qwerty/coma/Eliminar teclas muertas</description>
+	    <description xml:lang="fi">102/qwerty/pilkku/Ei kuolleita näppäimiä</description>
+	    <description xml:lang="fr">102/qwerty/virgule/sans touches mortes</description>
+	    <description xml:lang="hu">102/qwerty/vessző/Halott billentyűk tiltása</description>
+	    <description xml:lang="it">102/qwerty/virgola/tasti muti esclusi</description>
+	    <description xml:lang="ka">pc102, qwerty, მძიმე, სპეც კლავიშების (dead keys) გარეშე</description>
+	    <description xml:lang="ko">102/QWERTY/쉼표/데드키 없음</description>
+	    <description xml:lang="nl">102/qwerty/komma/Dode toetsen verwijderen</description>
+	    <description xml:lang="ru">pc102, qwerty, запятая, исключить специальные клавиши (dead keys)</description>
+	    <description xml:lang="sl">102/qwerty/vejica/Izloči mrtve tipke</description>
+	    <description xml:lang="sr">102/qwerty/запета/без акцената</description>
+	    <description xml:lang="sr@Latn">102/qwerty/zapeta/bez akcenata</description>
+	    <description xml:lang="sv">102/qwerty/komma/Eliminera stumma tangenter</description>
+	    <description xml:lang="tr">102/qwerty/virgül/Ölü tuşsuz</description>
+	    <description xml:lang="uk">102/qwerty/comma/Вимкнути спеціальні клавіші (dead keys)</description>
+	    <description xml:lang="vi">102/qwerty/dấu phẩy/Phím chết loại trừ</description>
+	    <description xml:lang="zh_TW">102/qwerty/逗點/除去無用按鍵</description>
+          </configItem>
+        </variant>
+        <variant>
+          <configItem>
+	    <name>102_qwerty_dot_dead</name>
+	    <description>102/qwerty/dot/Dead keys</description>
+	    <description xml:lang="en_GB">102/qwerty/dot/Dead keys</description>
+	    <description xml:lang="es">102/qwerty/punto/Teclas muertas</description>
+	    <description xml:lang="fi">102/qwerty/piste/Kuolleet näppäimet</description>
+	    <description xml:lang="fr">102/qwerty/point/touches mortes</description>
+	    <description xml:lang="hu">102/qwerty/pont/Halott billentyűk</description>
+	    <description xml:lang="it">102/qwerty/punto/tasti muti</description>
+	    <description xml:lang="ka">pc102, qwertz, წერტილი, სპეც კლავიშები (dead keys)</description>
+	    <description xml:lang="ko">102/QWERTY/점/데드키</description>
+	    <description xml:lang="nl">102/qwerty/punt/Dode toetsen</description>
+	    <description xml:lang="ru">pc102, qwerty, точка, специальные клавиши (dead keys)</description>
+	    <description xml:lang="sl">102/qwerty/pika/Mrtve tipke</description>
+	    <description xml:lang="sr">102/qwerty/тачка/акценти</description>
+	    <description xml:lang="sr@Latn">102/qwerty/tačka/akcenti</description>
+	    <description xml:lang="sv">102/qwerty/punkt/Stumma tangenter</description>
+	    <description xml:lang="tr">102/qwerty/nokta/Ölü tuşlar</description>
+	    <description xml:lang="uk">102/qwerty/dot/Спеціальні клавіші</description>
+	    <description xml:lang="vi">102/qwerty/dấu chấm/Phím chết</description>
+	    <description xml:lang="zh_TW">102/qwerty/句點/無用按鍵</description>
+          </configItem>
+        </variant>
+        <variant>
+          <configItem>
+	    <name>102_qwerty_dot_nodead</name>
+	    <description>102/qwerty/dot/Eliminate dead keys</description>
+	    <description xml:lang="en_GB">102/qwerty/dot/Eliminate dead keys</description>
+	    <description xml:lang="es">102/qwerty/punto/Eliminar teclas muertas</description>
+	    <description xml:lang="fi">102/qwerty/piste/Ei kuolleita näppäimiä</description>
+	    <description xml:lang="fr">102/qwerty/point/sans touches mortes</description>
+	    <description xml:lang="hu">102/qwerty/pont/Halott billentyűk tiltása</description>
+	    <description xml:lang="it">102/qwerty/punto/tasti muti esclusi</description>
+	    <description xml:lang="ka">pc102, qwerty, წერტილი, სპეც კლავიშების (dead keys) გარეშე</description>
+	    <description xml:lang="ko">102/QWERTY/점/데드키 없음</description>
+	    <description xml:lang="nl">102/qwerty/punt/Dode toetsen verwijderen</description>
+	    <description xml:lang="ru">pc102, qwerty, точка, исключить специальные клавиши (dead keys)</description>
+	    <description xml:lang="sl">102/qwerty/pika/Izloči mrtve tipke</description>
+	    <description xml:lang="sr">102/qwerty/тачка/без акцената</description>
+	    <description xml:lang="sr@Latn">102/qwerty/tačka/bez akcenata</description>
+	    <description xml:lang="sv">102/qwerty/punkt/Eliminera stumma tangenter</description>
+	    <description xml:lang="tr">102/qwerty/nokta/Ölü tuşsuz</description>
+	    <description xml:lang="uk">102/qwerty/dot/Вимкнути спеціальні клавіші (dead keys)</description>
+	    <description xml:lang="vi">102/qwerty/dấu chấm/Phím chết loại trừ</description>
+	    <description xml:lang="zh_TW">102/qwerty/句點/除去無用按鍵</description>
+          </configItem>
+        </variant>
+      </variantList>
+    </layout>
+    <layout>
+      <configItem>
+        <name>it</name>
+        <shortDescription>Ita</shortDescription>
+        <shortDescription xml:lang="af">Ita</shortDescription>
+        <shortDescription xml:lang="az">İta</shortDescription>
+        <shortDescription xml:lang="cs">Ita</shortDescription>
+        <shortDescription xml:lang="da">Ita</shortDescription>
+        <shortDescription xml:lang="en_GB">Ita</shortDescription>
+        <shortDescription xml:lang="es">Ita</shortDescription>
+        <shortDescription xml:lang="fi">Ita</shortDescription>
+        <shortDescription xml:lang="fr">Ita</shortDescription>
+        <shortDescription xml:lang="hu">Ita</shortDescription>
+        <shortDescription xml:lang="it">ITA</shortDescription>
+        <shortDescription xml:lang="ka">იტა</shortDescription>
+        <shortDescription xml:lang="ko">이탈리아</shortDescription>
+        <shortDescription xml:lang="nl">Ita</shortDescription>
+        <shortDescription xml:lang="ru">Ит</shortDescription>
+        <shortDescription xml:lang="sk">Tal</shortDescription>
+        <shortDescription xml:lang="sl">ITA</shortDescription>
+        <shortDescription xml:lang="sq">Ita</shortDescription>
+        <shortDescription xml:lang="sr">ита</shortDescription>
+        <shortDescription xml:lang="sr@Latn">ita</shortDescription>
+        <shortDescription xml:lang="sv">Ita</shortDescription>
+        <shortDescription xml:lang="tr">İta</shortDescription>
+        <shortDescription xml:lang="uk">Іта</shortDescription>
+        <shortDescription xml:lang="vi">Ita</shortDescription>
+        <shortDescription xml:lang="zh_CN">Ita</shortDescription>
+        <shortDescription xml:lang="zh_TW">Ita</shortDescription>
+        <description>Italian</description>
+        <description xml:lang="ko">이탈리아어</description>
+        <description xml:lang="ru">Итальянская</description>
+        <description xml:lang="sv">Italiensk</description>
+      </configItem>
+      <variantList>
+        <variant>
+          <configItem>
+            <name>nodeadkeys</name>
+            <description>Eliminate dead keys</description>
+            <description xml:lang="af">Elimineer dooie sleutels</description>
+            <description xml:lang="az">Ölü düymələri sayma</description>
+            <description xml:lang="bg">Изключи специалните клавиши (dead keys)</description>
+            <description xml:lang="cs">Eliminovat mrtvé klávesy</description>
+            <description xml:lang="da">Slå døde taster fra</description>
+            <description xml:lang="el">Χωρίς νεκρά πλήκτρα</description>
+            <description xml:lang="en_GB">Eliminate dead keys</description>
+            <description xml:lang="es">Eliminar teclas muertas</description>
+            <description xml:lang="fi">Ei kuolleita näppäimiä</description>
+            <description xml:lang="fr">Éliminer les touches mortes</description>
+            <description xml:lang="hu">Halott billentyűk tiltása</description>
+            <description xml:lang="it">Tasti muti rimossi</description>
+            <description xml:lang="ka">სპეც ღილაკების (dead keys) გამორთვა</description>
+            <description xml:lang="ko">데드키 없음</description>
+            <description xml:lang="nl">Geen dode toetsen</description>
+            <description xml:lang="ru">Исключить специальные клавиши (dead keys)</description>
+            <description xml:lang="sk">Eliminovať mrtvé kláves</description>
+            <description xml:lang="sl">Izloči mrtve tipke</description>
+            <description xml:lang="sq">Elemino pulsantët e vdekur</description>
+            <description xml:lang="sr">Уклони акценте</description>
+            <description xml:lang="sr@Latn">Ukloni akcente</description>
+            <description xml:lang="sv">Eliminera stumma tangenter</description>
+            <description xml:lang="tr">Ölü tuşları normal yapar</description>
+            <description xml:lang="uk">Вилучити спеціальні клавіші (dead keys)</description>
+            <description xml:lang="vi">Phím chết loại trừ</description>
+            <description xml:lang="zh_CN">除去死键</description>
+            <description xml:lang="zh_TW">除去無用按鍵</description>
+          </configItem>
+        </variant>
+      </variantList>
+    </layout>
+    <layout>
+      <configItem>
+        <name>jp</name>
+        <shortDescription>Jpn</shortDescription>
+        <shortDescription xml:lang="af">Jpn</shortDescription>
+        <shortDescription xml:lang="az">Ypn</shortDescription>
+        <shortDescription xml:lang="cs">Jap</shortDescription>
+        <shortDescription xml:lang="da">Jpn</shortDescription>
+        <shortDescription xml:lang="el">Ιαπ</shortDescription>
+        <shortDescription xml:lang="en_GB">Jpn</shortDescription>
+        <shortDescription xml:lang="es">Jpn</shortDescription>
+        <shortDescription xml:lang="fi">Jpn</shortDescription>
+        <shortDescription xml:lang="fr">Jpn</shortDescription>
+        <shortDescription xml:lang="hu">Jpn</shortDescription>
+        <shortDescription xml:lang="it">JPN</shortDescription>
+        <shortDescription xml:lang="ka">იაპ</shortDescription>
+        <shortDescription xml:lang="ko">일본</shortDescription>
+        <shortDescription xml:lang="nl">Jpn</shortDescription>
+        <shortDescription xml:lang="ru">Яп</shortDescription>
+        <shortDescription xml:lang="sk">Jpn</shortDescription>
+        <shortDescription xml:lang="sl">JPN</shortDescription>
+        <shortDescription xml:lang="sq">Jpn</shortDescription>
+        <shortDescription xml:lang="sr">јпн</shortDescription>
+        <shortDescription xml:lang="sr@Latn">jpn</shortDescription>
+        <shortDescription xml:lang="sv">Jpn</shortDescription>
+        <shortDescription xml:lang="tr">Jpn</shortDescription>
+        <shortDescription xml:lang="uk">Япо</shortDescription>
+        <shortDescription xml:lang="vi">Jpn</shortDescription>
+        <shortDescription xml:lang="zh_CN">Jpn</shortDescription>
+        <shortDescription xml:lang="zh_TW">Jpn</shortDescription>
+        <description>Japanese</description>
+        <description xml:lang="ko">일본어</description>
+        <description xml:lang="ru">Японская</description>
+      </configItem>
+      <variantList/>
+    </layout>
+    <layout>
+      <configItem>
+        <name>no</name>
+        <shortDescription>Nor</shortDescription>
+        <shortDescription xml:lang="af">Nor</shortDescription>
+        <shortDescription xml:lang="az">Nor</shortDescription>
+        <shortDescription xml:lang="cs">Nor</shortDescription>
+        <shortDescription xml:lang="da">Nor</shortDescription>
+        <shortDescription xml:lang="en_GB">Nor</shortDescription>
+        <shortDescription xml:lang="es">Nor</shortDescription>
+        <shortDescription xml:lang="fi">Nor</shortDescription>
+        <shortDescription xml:lang="fr">Nor</shortDescription>
+        <shortDescription xml:lang="hu">Nor</shortDescription>
+        <shortDescription xml:lang="it">NOR</shortDescription>
+        <shortDescription xml:lang="ka">ნორ</shortDescription>
+        <shortDescription xml:lang="ko">노르웨이</shortDescription>
+        <shortDescription xml:lang="nl">Nor</shortDescription>
+        <shortDescription xml:lang="ru">Нор</shortDescription>
+        <shortDescription xml:lang="sk">Nor</shortDescription>
+        <shortDescription xml:lang="sl">NOR</shortDescription>
+        <shortDescription xml:lang="sq">Nor</shortDescription>
+        <shortDescription xml:lang="sr">нор</shortDescription>
+        <shortDescription xml:lang="sr@Latn">nor</shortDescription>
+        <shortDescription xml:lang="sv">Nor</shortDescription>
+        <shortDescription xml:lang="tr">Nor</shortDescription>
+        <shortDescription xml:lang="uk">Нор</shortDescription>
+        <shortDescription xml:lang="vi">Nor</shortDescription>
+        <shortDescription xml:lang="zh_CN">Nor</shortDescription>
+        <shortDescription xml:lang="zh_TW">Nor</shortDescription>
+        <description>Norwegian</description>
+        <description xml:lang="ko">노르웨이어</description>
+        <description xml:lang="ru">Норвежская</description>
+      </configItem>
+      <variantList>
+        <variant>
+          <configItem>
+            <name>basic</name>
+            <description>Basic</description>
+            <description xml:lang="ko">기본</description>
+            <description xml:lang="ru">Основные</description>
+            <description xml:lang="sv">Grundläggande</description>
+          </configItem>
+        </variant>
+        <variant>
+          <configItem>
+            <name>nodeadkeys</name>
+            <description>Eliminate dead keys</description>
+            <description xml:lang="af">Elimineer dooie sleutels</description>
+            <description xml:lang="az">Ölü düymələri sayma</description>
+            <description xml:lang="bg">Изключи специалните клавиши (dead keys)</description>
+            <description xml:lang="cs">Eliminovat mrtvé klávesy</description>
+            <description xml:lang="da">Slå døde taster fra</description>
+            <description xml:lang="el">Χωρίς νεκρά πλήκτρα</description>
+            <description xml:lang="en_GB">Eliminate dead keys</description>
+            <description xml:lang="es">Eliminar teclas muertas</description>
+            <description xml:lang="fi">Ei kuolleita näppäimiä</description>
+            <description xml:lang="fr">Éliminer les touches mortes</description>
+            <description xml:lang="hu">Halott billentyűk tiltása</description>
+            <description xml:lang="it">Tasti muti rimossi</description>
+            <description xml:lang="ka">სპეც ღილაკების (dead keys) გამორთვა</description>
+            <description xml:lang="ko">데드키 없음</description>
+            <description xml:lang="nl">Geen dode toetsen</description>
+            <description xml:lang="ru">Исключить специальные клавиши (dead keys)</description>
+            <description xml:lang="sk">Eliminovať mrtvé kláves</description>
+            <description xml:lang="sl">Izloči mrtve tipke</description>
+            <description xml:lang="sq">Elemino pulsantët e vdekur</description>
+            <description xml:lang="sr">Уклони акценте</description>
+            <description xml:lang="sr@Latn">Ukloni akcente</description>
+            <description xml:lang="sv">Eliminera stumma tangenter</description>
+            <description xml:lang="tr">Ölü tuşları normal yapar</description>
+            <description xml:lang="uk">Вилучити спеціальні клавіші (dead keys)</description>
+            <description xml:lang="vi">Phím chết loại trừ</description>
+            <description xml:lang="zh_CN">除去死键</description>
+            <description xml:lang="zh_TW">除去無用按鍵</description>
+          </configItem>
+        </variant>
+      </variantList>
+    </layout>
+    <layout>
+      <configItem>
+        <name>pl</name>
+        <shortDescription>Pol</shortDescription>
+        <shortDescription xml:lang="af">Pol</shortDescription>
+        <shortDescription xml:lang="az">Pol</shortDescription>
+        <shortDescription xml:lang="cs">Pol</shortDescription>
+        <shortDescription xml:lang="da">Pol</shortDescription>
+        <shortDescription xml:lang="el">Πολ</shortDescription>
+        <shortDescription xml:lang="en_GB">Pol</shortDescription>
+        <shortDescription xml:lang="es">Pol</shortDescription>
+        <shortDescription xml:lang="fi">Pol</shortDescription>
+        <shortDescription xml:lang="fr">Pol</shortDescription>
+        <shortDescription xml:lang="hu">Pol</shortDescription>
+        <shortDescription xml:lang="it">POL</shortDescription>
+        <shortDescription xml:lang="ka">პოლ</shortDescription>
+        <shortDescription xml:lang="ko">폴란드</shortDescription>
+        <shortDescription xml:lang="nl">Pol</shortDescription>
+        <shortDescription xml:lang="ru">Польск</shortDescription>
+        <shortDescription xml:lang="sk">Pol</shortDescription>
+        <shortDescription xml:lang="sl">POL</shortDescription>
+        <shortDescription xml:lang="sq">Pol</shortDescription>
+        <shortDescription xml:lang="sr">пољ</shortDescription>
+        <shortDescription xml:lang="sr@Latn">polj</shortDescription>
+        <shortDescription xml:lang="sv">Pol</shortDescription>
+        <shortDescription xml:lang="tr">Pol</shortDescription>
+        <shortDescription xml:lang="uk">Пол</shortDescription>
+        <shortDescription xml:lang="vi">Pol</shortDescription>
+        <shortDescription xml:lang="zh_CN">Pol</shortDescription>
+        <shortDescription xml:lang="zh_TW">Pol</shortDescription>
+        <description>Polish</description>
+        <description xml:lang="ko">폴란드어</description>
+        <description xml:lang="ru">Польская</description>
+        <description xml:lang="sv">Polsk</description>
+      </configItem>
+      <variantList/>
+    </layout>
+    <layout>
+      <configItem>
+        <name>pt</name>
+        <shortDescription>Prt</shortDescription>
+        <shortDescription xml:lang="af">Prt</shortDescription>
+        <shortDescription xml:lang="az">Prt</shortDescription>
+        <shortDescription xml:lang="cs">Prt</shortDescription>
+        <shortDescription xml:lang="da">Prt</shortDescription>
+        <shortDescription xml:lang="en_GB">Prt</shortDescription>
+        <shortDescription xml:lang="es">Prt</shortDescription>
+        <shortDescription xml:lang="fi">Prt</shortDescription>
+        <shortDescription xml:lang="fr">Prt</shortDescription>
+        <shortDescription xml:lang="hu">Prt</shortDescription>
+        <shortDescription xml:lang="it">PRT</shortDescription>
+        <shortDescription xml:lang="ka">პორტ</shortDescription>
+        <shortDescription xml:lang="ko">포르투갈</shortDescription>
+        <shortDescription xml:lang="nl">Prt</shortDescription>
+        <shortDescription xml:lang="ru">Порт</shortDescription>
+        <shortDescription xml:lang="sk">Prt</shortDescription>
+        <shortDescription xml:lang="sl">PRT</shortDescription>
+        <shortDescription xml:lang="sq">Prt</shortDescription>
+        <shortDescription xml:lang="sr">прт</shortDescription>
+        <shortDescription xml:lang="sr@Latn">prt</shortDescription>
+        <shortDescription xml:lang="sv">Prt</shortDescription>
+        <shortDescription xml:lang="tr">Prt</shortDescription>
+        <shortDescription xml:lang="uk">Порт</shortDescription>
+        <shortDescription xml:lang="vi">Prt</shortDescription>
+        <shortDescription xml:lang="zh_CN">Prt</shortDescription>
+        <shortDescription xml:lang="zh_TW">Prt</shortDescription>
+        <description>Portuguese</description>
+        <description xml:lang="ko">포르투갈어</description>
+        <description xml:lang="ru">Португальская</description>
+      </configItem>
+      <variantList>
+        <variant>
+          <configItem>
+            <name>nodeadkeys</name>
+            <description>Eliminate dead keys</description>
+            <description xml:lang="af">Elimineer dooie sleutels</description>
+            <description xml:lang="az">Ölü düymələri sayma</description>
+            <description xml:lang="bg">Изключи специалните клавиши (dead keys)</description>
+            <description xml:lang="cs">Eliminovat mrtvé klávesy</description>
+            <description xml:lang="da">Slå døde taster fra</description>
+            <description xml:lang="el">Χωρίς νεκρά πλήκτρα</description>
+            <description xml:lang="en_GB">Eliminate dead keys</description>
+            <description xml:lang="es">Eliminar teclas muertas</description>
+            <description xml:lang="fi">Ei kuolleita näppäimiä</description>
+            <description xml:lang="fr">Éliminer les touches mortes</description>
+            <description xml:lang="hu">Halott billentyűk tiltása</description>
+            <description xml:lang="it">Tasti muti rimossi</description>
+            <description xml:lang="ka">სპეც ღილაკების (dead keys) გამორთვა</description>
+            <description xml:lang="ko">데드키 없음</description>
+            <description xml:lang="nl">Geen dode toetsen</description>
+            <description xml:lang="ru">Исключить специальные клавиши (dead keys)</description>
+            <description xml:lang="sk">Eliminovať mrtvé kláves</description>
+            <description xml:lang="sl">Izloči mrtve tipke</description>
+            <description xml:lang="sq">Elemino pulsantët e vdekur</description>
+            <description xml:lang="sr">Уклони акценте</description>
+            <description xml:lang="sr@Latn">Ukloni akcente</description>
+            <description xml:lang="sv">Eliminera stumma tangenter</description>
+            <description xml:lang="tr">Ölü tuşları normal yapar</description>
+            <description xml:lang="uk">Вилучити спеціальні клавіші (dead keys)</description>
+            <description xml:lang="vi">Phím chết loại trừ</description>
+            <description xml:lang="zh_CN">除去死键</description>
+            <description xml:lang="zh_TW">除去無用按鍵</description>
+          </configItem>
+        </variant>
+        <variant>
+          <configItem>
+            <name>sundeadkeys</name>
+            <description>Sun dead keys</description>
+            <description xml:lang="af">Sun (dooie sleutels)</description>
+            <description xml:lang="az">Sun ölü düymələr</description>
+            <description xml:lang="cs">Mrtvé klávesy Sun</description>
+            <description xml:lang="da">Sun døde taster</description>
+            <description xml:lang="en_GB">Sun dead keys</description>
+            <description xml:lang="es">Teclas muertas de Sun</description>
+            <description xml:lang="fi">Sunin kuolleet näppäimet</description>
+            <description xml:lang="fr">Touches mortes Sun</description>
+            <description xml:lang="hu">Sun halott billentyűk</description>
+            <description xml:lang="it">Tasti muti Sun</description>
+            <description xml:lang="ka">სპეც ღილაკები (dead keys) Sun</description>
+            <description xml:lang="ko">썬 데드키</description>
+            <description xml:lang="nl">Sun dode toetsen</description>
+            <description xml:lang="ru">Специальные клавиши (dead keys) Sun</description>
+            <description xml:lang="sk">Mŕtve klávesy Sun</description>
+            <description xml:lang="sl">Sun mrtve tipke</description>
+            <description xml:lang="sq">Pulsantë të vdekur Sun</description>
+            <description xml:lang="sr">Sun-ови акценти</description>
+            <description xml:lang="sr@Latn">Sun-ovi akcenti</description>
+            <description xml:lang="sv">Sun stumma tangenter</description>
+            <description xml:lang="tr">Sun ölü tuşlar</description>
+            <description xml:lang="uk">Спеціальні клавіші (dead keys) Sun</description>
+            <description xml:lang="vi">Phím chết Sun</description>
+            <description xml:lang="zh_CN">Sun 死键</description>
+            <description xml:lang="zh_TW">Sun 無用按鍵</description>
+          </configItem>
+        </variant>
+      </variantList>
+    </layout>
+    <layout>
+      <configItem>
+        <name>ru</name>
+        <shortDescription>Rus</shortDescription>
+        <shortDescription xml:lang="af">Rus</shortDescription>
+        <shortDescription xml:lang="az">Rus</shortDescription>
+        <shortDescription xml:lang="cs">Rus</shortDescription>
+        <shortDescription xml:lang="da">Rus</shortDescription>
+        <shortDescription xml:lang="el">Ρωσ</shortDescription>
+        <shortDescription xml:lang="en_GB">Rus</shortDescription>
+        <shortDescription xml:lang="es">Rus</shortDescription>
+        <shortDescription xml:lang="fi">Rus</shortDescription>
+        <shortDescription xml:lang="fr">Rus</shortDescription>
+        <shortDescription xml:lang="hu">Rus</shortDescription>
+        <shortDescription xml:lang="it">RUS</shortDescription>
+        <shortDescription xml:lang="ka">რუს</shortDescription>
+        <shortDescription xml:lang="ko">러시아</shortDescription>
+        <shortDescription xml:lang="nl">Rus</shortDescription>
+        <shortDescription xml:lang="ru">Рус</shortDescription>
+        <shortDescription xml:lang="sk">Rus</shortDescription>
+        <shortDescription xml:lang="sl">RUS</shortDescription>
+        <shortDescription xml:lang="sq">Rus</shortDescription>
+        <shortDescription xml:lang="sr">рус</shortDescription>
+        <shortDescription xml:lang="sr@Latn">rus</shortDescription>
+        <shortDescription xml:lang="sv">Rus</shortDescription>
+        <shortDescription xml:lang="tr">Rus</shortDescription>
+        <shortDescription xml:lang="uk">Рос</shortDescription>
+        <shortDescription xml:lang="vi">Nga</shortDescription>
+        <shortDescription xml:lang="zh_CN">Rus</shortDescription>
+        <shortDescription xml:lang="zh_TW">Rus</shortDescription>
+        <description>Russian</description>
+        <description xml:lang="af">Russies</description>
+        <description xml:lang="az">Rusca</description>
+        <description xml:lang="bg">руска</description>
+        <description xml:lang="cs">Ruské</description>
+        <description xml:lang="da">Russisk</description>
+        <description xml:lang="el">Ρωσσικά</description>
+        <description xml:lang="en_GB">Russian</description>
+        <description xml:lang="es">Ruso</description>
+        <description xml:lang="fi">Venäläinen</description>
+        <description xml:lang="fr">Russe</description>
+        <description xml:lang="hu">Orosz</description>
+        <description xml:lang="it">Russo</description>
+        <description xml:lang="ka">რუსული</description>
+        <description xml:lang="ko">러시아어</description>
+        <description xml:lang="nl">Russisch</description>
+        <description xml:lang="ru">Русская</description>
+        <description xml:lang="rw">Ikirusiya</description>
+        <description xml:lang="sk">Ruské</description>
+        <description xml:lang="sl">Rusija</description>
+        <description xml:lang="sq">Rusisht</description>
+        <description xml:lang="sr">руски</description>
+        <description xml:lang="sr@Latn">ruski</description>
+        <description xml:lang="sv">Rysk</description>
+        <description xml:lang="tr">Rusça</description>
+        <description xml:lang="uk">Російська</description>
+        <description xml:lang="vi">Nga</description>
+        <description xml:lang="zh_CN">俄语</description>
+        <description xml:lang="zh_TW">俄文</description>
+      </configItem>
+      <variantList>
+        <variant>
+          <configItem>
+            <name>phonetic</name>
+            <description>Phonetic</description>
+            <description xml:lang="af">Foneties</description>
+            <description xml:lang="az">Fonetik</description>
+            <description xml:lang="bg">фонетична</description>
+            <description xml:lang="cs">Fonetické</description>
+            <description xml:lang="da">Fonetisk</description>
+            <description xml:lang="el">Φωνητικά</description>
+            <description xml:lang="en_GB">Phonetic</description>
+            <description xml:lang="es">Fonético</description>
+            <description xml:lang="fi">Foneettinen</description>
+            <description xml:lang="fr">Phonétique</description>
+            <description xml:lang="hu">Fonetikus</description>
+            <description xml:lang="it">Fonetico</description>
+            <description xml:lang="ka">ფონეტიკური</description>
+            <description xml:lang="ko">음성 표기</description>
+            <description xml:lang="nl">Fonetisch</description>
+            <description xml:lang="ru">Фонетическая</description>
+            <description xml:lang="sk">Fonetické</description>
+            <description xml:lang="sl">Fonetična</description>
+            <description xml:lang="sq">Phonetic</description>
+            <description xml:lang="sr">фонетски</description>
+            <description xml:lang="sr@Latn">fonetski</description>
+            <description xml:lang="sv">Fonetisk</description>
+            <description xml:lang="tr">Fonetik</description>
+            <description xml:lang="uk">Фонетична</description>
+            <description xml:lang="vi">Ngữ âm</description>
+            <description xml:lang="zh_CN">Phonetic</description>
+            <description xml:lang="zh_TW">音標</description>
+          </configItem>
+        </variant>
+        <variant>
+          <configItem>
+            <name>typewriter</name>
+            <description>"Typewriter"</description>
+            <description xml:lang="ko">"타자기"</description>
+            <description xml:lang="ru">Печатная машинка</description>
+            <description xml:lang="sv">"Skrivmaskin"</description>
+          </configItem>
+        </variant>
+      </variantList>
+    </layout>
+    <layout>
+      <configItem>
+        <name>se</name>
+        <shortDescription>Swe</shortDescription>
+        <shortDescription xml:lang="af">Swe</shortDescription>
+        <shortDescription xml:lang="az">Swe</shortDescription>
+        <shortDescription xml:lang="cs">Švé</shortDescription>
+        <shortDescription xml:lang="da">Sve</shortDescription>
+        <shortDescription xml:lang="el">Σου</shortDescription>
+        <shortDescription xml:lang="en_GB">Swe</shortDescription>
+        <shortDescription xml:lang="es">Swe</shortDescription>
+        <shortDescription xml:lang="fi">Swe</shortDescription>
+        <shortDescription xml:lang="fr">Sué</shortDescription>
+        <shortDescription xml:lang="hu">Swe</shortDescription>
+        <shortDescription xml:lang="it">SWE</shortDescription>
+        <shortDescription xml:lang="ka">შვედ</shortDescription>
+        <shortDescription xml:lang="ko">스웨덴</shortDescription>
+        <shortDescription xml:lang="nl">Swe</shortDescription>
+        <shortDescription xml:lang="ru">Швед</shortDescription>
+        <shortDescription xml:lang="sk">Swe</shortDescription>
+        <shortDescription xml:lang="sl">SWE</shortDescription>
+        <shortDescription xml:lang="sq">Swe</shortDescription>
+        <shortDescription xml:lang="sr">шве</shortDescription>
+        <shortDescription xml:lang="sr@Latn">šve</shortDescription>
+        <shortDescription xml:lang="sv">Swe</shortDescription>
+        <shortDescription xml:lang="tr">İsve</shortDescription>
+        <shortDescription xml:lang="uk">Швед</shortDescription>
+        <shortDescription xml:lang="vi">Swe</shortDescription>
+        <shortDescription xml:lang="zh_CN">Swe</shortDescription>
+        <shortDescription xml:lang="zh_TW">Swe</shortDescription>
+        <description>Swedish</description>
+        <description xml:lang="ko">스웨덴어</description>
+        <description xml:lang="ru">Шведская</description>
+        <description xml:lang="sv">Svensk</description>
+      </configItem>
+      <variantList>
+        <variant>
+          <configItem>
+            <name>basic</name>
+            <description>Basic</description>
+            <description xml:lang="ko">기본</description>
+            <description xml:lang="ru">Основные</description>
+            <description xml:lang="sv">Grundläggande</description>
+          </configItem>
+        </variant>
+        <variant>
+          <configItem>
+            <name>nodeadkeys</name>
+            <description>Eliminate dead keys</description>
+            <description xml:lang="af">Elimineer dooie sleutels</description>
+            <description xml:lang="az">Ölü düymələri sayma</description>
+            <description xml:lang="bg">Изключи специалните клавиши (dead keys)</description>
+            <description xml:lang="cs">Eliminovat mrtvé klávesy</description>
+            <description xml:lang="da">Slå døde taster fra</description>
+            <description xml:lang="el">Χωρίς νεκρά πλήκτρα</description>
+            <description xml:lang="en_GB">Eliminate dead keys</description>
+            <description xml:lang="es">Eliminar teclas muertas</description>
+            <description xml:lang="fi">Ei kuolleita näppäimiä</description>
+            <description xml:lang="fr">Éliminer les touches mortes</description>
+            <description xml:lang="hu">Halott billentyűk tiltása</description>
+            <description xml:lang="it">Tasti muti rimossi</description>
+            <description xml:lang="ka">სპეც ღილაკების (dead keys) გამორთვა</description>
+            <description xml:lang="ko">데드키 없음</description>
+            <description xml:lang="nl">Geen dode toetsen</description>
+            <description xml:lang="ru">Исключить специальные клавиши (dead keys)</description>
+            <description xml:lang="sk">Eliminovať mrtvé kláves</description>
+            <description xml:lang="sl">Izloči mrtve tipke</description>
+            <description xml:lang="sq">Elemino pulsantët e vdekur</description>
+            <description xml:lang="sr">Уклони акценте</description>
+            <description xml:lang="sr@Latn">Ukloni akcente</description>
+            <description xml:lang="sv">Eliminera stumma tangenter</description>
+            <description xml:lang="tr">Ölü tuşları normal yapar</description>
+            <description xml:lang="uk">Вилучити спеціальні клавіші (dead keys)</description>
+            <description xml:lang="vi">Phím chết loại trừ</description>
+            <description xml:lang="zh_CN">除去死键</description>
+            <description xml:lang="zh_TW">除去無用按鍵</description>
+          </configItem>
+        </variant>
+      </variantList>
+    </layout>
+    <layout>
+      <configItem>
+        <name>sk</name>
+        <shortDescription>Svk</shortDescription>
+        <shortDescription xml:lang="af">Svk</shortDescription>
+        <shortDescription xml:lang="az">Svk</shortDescription>
+        <shortDescription xml:lang="cs">Svk</shortDescription>
+        <shortDescription xml:lang="da">Svk</shortDescription>
+        <shortDescription xml:lang="en_GB">Svk</shortDescription>
+        <shortDescription xml:lang="es">Svk</shortDescription>
+        <shortDescription xml:lang="fi">Svk</shortDescription>
+        <shortDescription xml:lang="fr">Svk</shortDescription>
+        <shortDescription xml:lang="hu">Svk</shortDescription>
+        <shortDescription xml:lang="it">SVK</shortDescription>
+        <shortDescription xml:lang="ka">სლოვკ</shortDescription>
+        <shortDescription xml:lang="ko">슬로바키아</shortDescription>
+        <shortDescription xml:lang="nl">Svk</shortDescription>
+        <shortDescription xml:lang="ru">Слов</shortDescription>
+        <shortDescription xml:lang="sk">Svk</shortDescription>
+        <shortDescription xml:lang="sl">SVK</shortDescription>
+        <shortDescription xml:lang="sq">Svk</shortDescription>
+        <shortDescription xml:lang="sr">слк</shortDescription>
+        <shortDescription xml:lang="sr@Latn">slk</shortDescription>
+        <shortDescription xml:lang="sv">Svk</shortDescription>
+        <shortDescription xml:lang="tr">Svk</shortDescription>
+        <shortDescription xml:lang="uk">Словац</shortDescription>
+        <shortDescription xml:lang="vi">Svk</shortDescription>
+        <shortDescription xml:lang="zh_CN">Svk</shortDescription>
+        <shortDescription xml:lang="zh_TW">Svk</shortDescription>
+        <description>Slovak</description>
+        <description xml:lang="ko">슬로바키아어</description>
+        <description xml:lang="ru">Словацкая</description>
+      </configItem>
+      <variantList>
+        <variant>
+          <configItem>
+            <name>basic</name>
+            <description>Basic</description>
+            <description xml:lang="ko">기본</description>
+            <description xml:lang="ru">Основные</description>
+            <description xml:lang="sv">Grundläggande</description>
+          </configItem>
+        </variant>
+        <variant>
+          <configItem>
+            <name>bksl</name>
+            <description>bksl</description>
+            <description xml:lang="ko">bksl</description>
+            <description xml:lang="ru">bksl</description>
+            <description xml:lang="sv">bksl</description>
+          </configItem>
+        </variant>
+      </variantList>
+    </layout>
+    <layout>
+      <configItem>
+        <name>us</name>
+        <shortDescription>USA</shortDescription>
+        <shortDescription xml:lang="af">VSA</shortDescription>
+        <shortDescription xml:lang="az">ABŞ</shortDescription>
+        <shortDescription xml:lang="cs">USA</shortDescription>
+        <shortDescription xml:lang="da">USA</shortDescription>
+        <shortDescription xml:lang="el">ΗΠΑ</shortDescription>
+        <shortDescription xml:lang="en_GB">USA</shortDescription>
+        <shortDescription xml:lang="es">EEUU</shortDescription>
+        <shortDescription xml:lang="fi">USA</shortDescription>
+        <shortDescription xml:lang="fr">USA</shortDescription>
+        <shortDescription xml:lang="hu">USA</shortDescription>
+        <shortDescription xml:lang="it">USA</shortDescription>
+        <shortDescription xml:lang="ka">აშშ</shortDescription>
+        <shortDescription xml:lang="ko">미국</shortDescription>
+        <shortDescription xml:lang="nl">VS</shortDescription>
+        <shortDescription xml:lang="ru">США</shortDescription>
+        <shortDescription xml:lang="rw">Amerika</shortDescription>
+        <shortDescription xml:lang="sk">USA</shortDescription>
+        <shortDescription xml:lang="sl">USA</shortDescription>
+        <shortDescription xml:lang="sq">USA</shortDescription>
+        <shortDescription xml:lang="sr">САД</shortDescription>
+        <shortDescription xml:lang="sr@Latn">SAD</shortDescription>
+        <shortDescription xml:lang="sv">USA</shortDescription>
+        <shortDescription xml:lang="tr">ABD</shortDescription>
+        <shortDescription xml:lang="uk">США</shortDescription>
+        <shortDescription xml:lang="vi">Mỹ</shortDescription>
+        <shortDescription xml:lang="zh_CN">USA</shortDescription>
+        <shortDescription xml:lang="zh_TW">USA</shortDescription>
+        <description>U.S. English</description>
+        <description xml:lang="af">VSA Engels</description>
+        <description xml:lang="az">A.B.Ş. İngiliscəsi</description>
+        <description xml:lang="bg">американска английска</description>
+        <description xml:lang="cs">Anglické (US)</description>
+        <description xml:lang="da">U.S. Engelsk</description>
+        <description xml:lang="el">Αγγλικά ΗΠΑ</description>
+        <description xml:lang="en_GB">U.S. English</description>
+        <description xml:lang="es">Inglés EEUU</description>
+        <description xml:lang="fi">Amerikanenglanti</description>
+        <description xml:lang="fr">Anglais U.S.</description>
+        <description xml:lang="hu">Amerikai angol</description>
+        <description xml:lang="it">Inglese americano</description>
+        <description xml:lang="ka">ინგლისუარი ა.შ.შ</description>
+        <description xml:lang="ko">미국 영어</description>
+        <description xml:lang="nl">Amerikaans-Engels</description>
+        <description xml:lang="ru">Английская (США)</description>
+        <description xml:lang="sk">U.S.A. anglické</description>
+        <description xml:lang="sl">U.S. Angleška</description>
+        <description xml:lang="sq">U.S. Anglisht</description>
+        <description xml:lang="sr">амерички енглески</description>
+        <description xml:lang="sr@Latn">američki engleski</description>
+        <description xml:lang="sv">Engelskamerikansk</description>
+        <description xml:lang="tr">Amerikan ingilizcesi</description>
+        <description xml:lang="uk">Англійська (США)</description>
+        <description xml:lang="vi">Anh Mỹ</description>
+        <description xml:lang="zh_CN">美国英语</description>
+        <description xml:lang="zh_TW">美式英文</description>
+      </configItem>
+      <variantList>
+        <variant>
+          <configItem>
+            <name>intl</name>
+            <description>International (with dead keys)</description>
+            <description xml:lang="en_GB">International (with dead keys)</description>
+            <description xml:lang="es">Internacional (con teclas muertas)</description>
+            <description xml:lang="fi">Kansainvälinen (ilman kuolleita näppäimiä)</description>
+            <description xml:lang="fr">International (avec touches mortes)</description>
+            <description xml:lang="hu">Nemzetközi (halott billentyűkkel)</description>
+            <description xml:lang="it">Internazionale (con tasti muti)</description>
+            <description xml:lang="ka">საერთაშორისო, სპეც ღილაკებით (dead keys)</description>
+            <description xml:lang="ko">국제 버전 (데드키 포함)</description>
+            <description xml:lang="nl">Internationaal (met dode toetsen)</description>
+            <description xml:lang="ru">Международная, со спец. клавишами (dead keys)</description>
+            <description xml:lang="sl">Mednarodna (z mrtvimi tipkami)</description>
+            <description xml:lang="sr">Међународна (са акцентима)</description>
+            <description xml:lang="sr@Latn">Međunarodna (sa akcentima)</description>
+            <description xml:lang="sv">Internationell (med stumma tangenter)</description>
+            <description xml:lang="tr">Uluslararası (ölü tuşlarla)</description>
+            <description xml:lang="uk">Інтернаціональна (зі спеціальними клавішами)</description>
+            <description xml:lang="vi">Quốc tế (với phím chết)</description>
+            <description xml:lang="zh_TW">國際鍵盤 (附無用按鍵)</description>
+          </configItem>
+        </variant>
+      </variantList>
+    </layout>
+    <layout>
+      <configItem>
+        <name>tr</name>
+        <shortDescription>Tur</shortDescription>
+        <shortDescription xml:lang="af">Tur</shortDescription>
+        <shortDescription xml:lang="az">Tür</shortDescription>
+        <shortDescription xml:lang="cs">Tur</shortDescription>
+        <shortDescription xml:lang="da">Tyr</shortDescription>
+        <shortDescription xml:lang="el">Του</shortDescription>
+        <shortDescription xml:lang="en_GB">Tur</shortDescription>
+        <shortDescription xml:lang="es">Tur</shortDescription>
+        <shortDescription xml:lang="fi">Tur</shortDescription>
+        <shortDescription xml:lang="fr">Tur</shortDescription>
+        <shortDescription xml:lang="hu">Tur</shortDescription>
+        <shortDescription xml:lang="it">TUR</shortDescription>
+        <shortDescription xml:lang="ka">თურქ</shortDescription>
+        <shortDescription xml:lang="ko">터키</shortDescription>
+        <shortDescription xml:lang="nl">Tur</shortDescription>
+        <shortDescription xml:lang="ru">Тур</shortDescription>
+        <shortDescription xml:lang="sk">Tur</shortDescription>
+        <shortDescription xml:lang="sl">TUR</shortDescription>
+        <shortDescription xml:lang="sq">Tur</shortDescription>
+        <shortDescription xml:lang="sr">тур</shortDescription>
+        <shortDescription xml:lang="sr@Latn">tur</shortDescription>
+        <shortDescription xml:lang="sv">Tur</shortDescription>
+        <shortDescription xml:lang="tr">Trk</shortDescription>
+        <shortDescription xml:lang="uk">Тур</shortDescription>
+        <shortDescription xml:lang="vi">Tur</shortDescription>
+        <shortDescription xml:lang="zh_CN">Tur</shortDescription>
+        <shortDescription xml:lang="zh_TW">Tur</shortDescription>
+        <description>Turkish</description>
+        <description xml:lang="af">Turks</description>
+        <description xml:lang="az">Türkcə</description>
+        <description xml:lang="bg">турска</description>
+        <description xml:lang="cs">Turecké</description>
+        <description xml:lang="da">Tyrkisk</description>
+        <description xml:lang="el">Τουρικά</description>
+        <description xml:lang="en_GB">Turkish</description>
+        <description xml:lang="it">Turco</description>
+        <description xml:lang="ko">터키어</description>
+        <description xml:lang="nl">Turks</description>
+        <description xml:lang="ru">Турецкая</description>
+        <description xml:lang="rw">Ikinyaturukiya</description>
+        <description xml:lang="sk">Turecké</description>
+        <description xml:lang="sq">Turqisht</description>
+        <description xml:lang="sr@Latn">turski</description>
+        <description xml:lang="sv">Turkisk</description>
+        <description xml:lang="vi">Thổ Nhĩ Kỳ</description>
+        <description xml:lang="zh_CN">土耳其</description>
+        <description xml:lang="zh_TW">土耳其文</description>
+      </configItem>
+      <variantList>
+        <variant>
+          <configItem>
+            <name>tr_f</name>
+            <description>Turkish (F)</description>
+            <description xml:lang="ko">터키어 (F)</description>
+            <description xml:lang="ru">Турецкая с (F)</description>
+          </configItem>
+        </variant>
+        <variant>
+          <configItem>
+            <name>tr_alt</name>
+            <description>Turkish Alt-Q Layout</description>
+            <description xml:lang="ko">터키어 Alt-Q 배치</description>
+            <description xml:lang="ru">Турецкая раскладка с Alt-Q</description>
+            <description xml:lang="sv">Turkisk Alt-Q-layout</description>
+          </configItem>
+        </variant>
+      </variantList>
+    </layout>
+  </layoutList>
+  <optionList>
+    <group allowMultipleSelection="true">
+      <configItem>
+        <name>grp</name>
+        <description>Group Shift/Lock behavior</description>
+        <description xml:lang="af">Groep Shift/Lock gedrag</description>
+        <description xml:lang="az">Shift/Lock Qrupu Davranışı</description>
+        <description xml:lang="bg">Функции на клавишите Shift/Lock</description>
+        <description xml:lang="cs">Chování skupiny Shift/Lock</description>
+        <description xml:lang="da">Gruppeskift/-lås-opførsel</description>
+        <description xml:lang="en_GB">Group Shift/Lock behaviour</description>
+        <description xml:lang="es">Comportamiento del grupo Mayús/Bloq</description>
+        <description xml:lang="fi">Ryhmien vaihto ja lukitus</description>
+        <description xml:lang="fr">Combinaisons pour changer de groupe</description>
+        <description xml:lang="hu">Csoportváltás és -zárolás</description>
+        <description xml:lang="it">Comportamento cambio/blocco del gruppo</description>
+        <description xml:lang="ka">განლაგების შეცვლის ფუნქცია</description>
+        <description xml:lang="ko">그룹 바꾸기/고정 동작</description>
+        <description xml:lang="nl">Groepgedrag Shift/Lock</description>
+        <description xml:lang="ru">Функция смены раскладки</description>
+        <description xml:lang="sk">Zoskupiť chovanie Shift/Lock</description>
+        <description xml:lang="sl">Obnašanje Shift/lock skupine</description>
+        <description xml:lang="sq">Sjellja e grupit Shift/Lock</description>
+        <description xml:lang="sr">Понашање измене/избора групе</description>
+        <description xml:lang="sr@Latn">Ponašanje izmene/izbora grupe</description>
+        <description xml:lang="sv">Gruppbeteende för Skift/Lock</description>
+        <description xml:lang="tr">Shift/Lock Grubu davranışı</description>
+        <description xml:lang="uk">Функція зміни групи</description>
+        <description xml:lang="vi">Đặc điểm của nhóm Shift/Lock</description>
+        <description xml:lang="zh_CN">组切换/锁定行为</description>
+        <description xml:lang="zh_TW">群組 Shift/Lock 功能</description>
+      </configItem>
+      <option>
+        <configItem>
+          <name>grp:switch</name>
+          <description>Right Alt switches group while pressed</description>
+          <description xml:lang="ko">오른쪽 Alt 키를 누르면 그룹을 바꿉니다</description>
+          <description xml:lang="ru">Правая клавиша Alt переключает группу на время нажатия</description>
+        </configItem>
+      </option>
+      <option>
+        <configItem>
+          <name>grp:lswitch</name>
+          <description>Left Alt key switches group while pressed</description>
+          <description xml:lang="ko">왼쪽 Alt 키를 누르면 그룹을 바꿉니다</description>
+          <description xml:lang="ru">Левая клавиша Alt переключает группу на время нажатия</description>
+        </configItem>
+      </option>
+      <option>
+        <configItem>
+          <name>grp:toggle</name>
+          <description>Right Alt key changes group</description>
+          <description xml:lang="ko">오른쪽 Alt 키로 그룹을 바꿉니다</description>
+          <description xml:lang="ru">Правая клавиша Alt меняет группу</description>
+        </configItem>
+      </option>
+      <option>
+        <configItem>
+          <name>grp:lalt_toggle</name>
+          <description>Left Alt key changes group</description>
+          <description xml:lang="ko">왼쪽 Alt 키로 그룹을 바꿉니다</description>
+          <description xml:lang="ru">Левая клавиша Alt меняет группу</description>
+        </configItem>
+      </option>
+      <option>
+        <configItem>
+          <name>grp:caps_toggle</name>
+          <description>Caps Lock key changes group</description>
+          <description xml:lang="ko">Caps Lock 키로 그룹을 바꿉니다</description>
+          <description xml:lang="ru">Клавиша Caps Lock меняет группу</description>
+        </configItem>
+      </option>
+      <option>
+        <configItem>
+          <name>grp:shift_caps_toggle</name>
+          <description>Shift+CapsLock changes group</description>
+          <description xml:lang="ko">Shift+CapsLock으로 그룹을 바꿉니다</description>
+          <description xml:lang="ru">Клавиши Shift и Caps Lock, нажатые вместе, меняют группу</description>
+        </configItem>
+      </option>
+      <option>
+        <configItem>
+          <name>grp:shift_toggle</name>
+          <description>Both Shift keys together change group</description>
+          <description xml:lang="ko">Shift 키 두 개로 그룹을 바꿉니다</description>
+          <description xml:lang="ru">Обе клавиши Shift, нажатые вместе, меняют группу</description>
+        </configItem>
+      </option>
+      <option>
+        <configItem>
+          <name>grp:alts_toggle</name>
+          <description>Both Alt keys together change group</description>
+          <description xml:lang="ko">Alt 키 두 개로 그룹을 바꿉니다</description>
+          <description xml:lang="ru">Обе клавиши Alt, нажатые вместе, меняют группу</description>
+        </configItem>
+      </option>
+      <option>
+        <configItem>
+          <name>grp:ctrls_toggle</name>
+          <description>Both Ctrl keys together change group</description>
+          <description xml:lang="ko">Ctrl 키 두 개로 그룹을 바꿉니다</description>
+          <description xml:lang="ru">Обе клавиши Ctrl, нажатые вместе, меняют группу</description>
+        </configItem>
+      </option>
+      <option>
+        <configItem>
+          <name>grp:ctrl_shift_toggle</name>
+          <description>Control+Shift changes group</description>
+          <description xml:lang="ko">Ctrl+Shift로 그룹을 바꿉니다</description>
+          <description xml:lang="ru">Control+Shift меняют группу</description>
+        </configItem>
+      </option>
+      <option>
+        <configItem>
+          <name>grp:ctrl_alt_toggle</name>
+          <description>Alt+Control changes group</description>
+          <description xml:lang="ko">Alt+Ctrl로 그룹을 바꿉니다</description>
+          <description xml:lang="ru">Alt+Control меняют группу</description>
+        </configItem>
+      </option>
+      <option>
+        <configItem>
+          <name>grp:alt_shift_toggle</name>
+          <description>Alt+Shift changes group</description>
+          <description xml:lang="ko">Alt+Shift로 그룹을 바꿉니다</description>
+          <description xml:lang="ru">Alt+Shift меняют группу</description>
+        </configItem>
+      </option>
+      <option>
+        <configItem>
+          <name>grp:sclk_toggle</name>
+          <description>Scroll Lock changes group</description>
+          <description xml:lang="ko">Scroll Lock 키로 그룹을 바꿉니다</description>
+          <description xml:lang="ru">Scroll Lock меняет группу</description>
+        </configItem>
+      </option>
+      <option>
+        <configItem>
+          <name>grp:lshift_toggle</name>
+          <description>Left Shift key changes group</description>
+          <description xml:lang="ko">왼쪽 Shift 키로 그룹을 바꿉니다</description>
+          <description xml:lang="ru">Левая клавиша Shift меняет группу</description>
+        </configItem>
+      </option>
+      <option>
+        <configItem>
+          <name>grp:rshift_toggle</name>
+          <description>Right Shift key changes group</description>
+          <description xml:lang="ko">오른쪽 Shift 키로 그룹을 바꿉니다</description>
+          <description xml:lang="ru">Правая клавиша Shift меняет группу</description>
+        </configItem>
+      </option>
+      <option>
+        <configItem>
+          <name>grp:lctrl_toggle</name>
+          <description>Left Ctrl key changes group</description>
+          <description xml:lang="ko">왼쪽 Ctrl 키로 그룹을 바꿉니다</description>
+          <description xml:lang="ru">Левая клавиша Ctrl меняет группу</description>
+        </configItem>
+      </option>
+      <option>
+        <configItem>
+          <name>grp:rctrl_toggle</name>
+          <description>Right Ctrl key changes group</description>
+          <description xml:lang="ko">오른쪽 Ctrl 키로 그룹을 바꿉니다</description>
+          <description xml:lang="ru">Правая клавиша Ctrl меняет группу</description>
+        </configItem>
+      </option>
+    </group>
+    <group allowMultipleSelection="true">
+      <configItem>
+        <name>lv3</name>
+        <description>Third level choosers</description>
+        <description xml:lang="af">Derdevlak kiesers</description>
+        <description xml:lang="az">Üçüncü səviyyə seçicilər</description>
+        <description xml:lang="bg">Избор на третата група</description>
+        <description xml:lang="cs">Výběr třetí úrovně</description>
+        <description xml:lang="da">Tredje niveaus vælgere</description>
+        <description xml:lang="en_GB">Third level choosers</description>
+        <description xml:lang="es">Selectores de tercer nivel</description>
+        <description xml:lang="fi">Kolmannnen tason valitsimet</description>
+        <description xml:lang="fr">Sélecteur du 3e niveau</description>
+        <description xml:lang="hu">Harmadik szintű választók</description>
+        <description xml:lang="it">Selettore terzo livello</description>
+        <description xml:lang="ka">მე-3 საფეხურის ამორჩევა</description>
+        <description xml:lang="ko">세번째 단계 선택 키</description>
+        <description xml:lang="nl">3e niveau kiezers</description>
+        <description xml:lang="ru">Выбор 3-го уровня</description>
+        <description xml:lang="sk">Výber tretej úrovne</description>
+        <description xml:lang="sl">Tretje stopenjski izbor</description>
+        <description xml:lang="sq">Zgjedhësit e nivelit të tretë</description>
+        <description xml:lang="sr">Избор трећег нивоа</description>
+        <description xml:lang="sr@Latn">Izbor trećeg nivoa</description>
+        <description xml:lang="sv">Tredjenivåsväljare</description>
+        <description xml:lang="tr">3. seviye seçiciler</description>
+        <description xml:lang="uk">Вибір 3-го рівня</description>
+        <description xml:lang="vi">Trình chọn ngôn ngữ thứ ba</description>
+        <description xml:lang="zh_CN">第三级选择</description>
+        <description xml:lang="zh_TW">第三級選擇器</description>
+      </configItem>
+      <option>
+        <configItem>
+          <name>lv3:switch</name>
+          <description>Press Right Control to choose 3rd level</description>
+          <description xml:lang="ko">오른쪽 Ctrl 키를 누르면 3번째 단계를 선택합니다</description>
+          <description xml:lang="ru">Выбор 3-го уровня нажатием правой клавиши Control</description>
+        </configItem>
+      </option>
+      <option>
+        <configItem>
+          <name>lv3:alt_switch</name>
+          <description>Press any of Alt keys to choose 3rd level</description>
+          <description xml:lang="ko">아무 Alt 키를 누르면 3번째 단계를 선택합니다</description>
+          <description xml:lang="ru">Выбор 3-го уровня нажатием любой клавиши Alt</description>
+        </configItem>
+      </option>
+      <option>
+        <configItem>
+          <name>lv3:lalt_switch</name>
+          <description>Press Left Alt key to choose 3rd level</description>
+          <description xml:lang="ko">왼쪽 Alt 키를 누르면 3번째 단계를 선택합니다</description>
+          <description xml:lang="ru">Выбор 3-го уровня нажатием левой клавиши Alt</description>
+        </configItem>
+      </option>
+      <option>
+        <configItem>
+          <name>lv3:ralt_switch</name>
+          <description>Press Right Alt key to choose 3rd level</description>
+          <description xml:lang="ko">오른쪽 Alt 키를 누르면 3번째 단계를 선택합니다</description>
+          <description xml:lang="ru">Выбор 3-го уровня нажатием правой клавиши Alt</description>
+        </configItem>
+      </option>
+      <option>
+        <configItem>
+          <name>lv3:ralt_switch_multikey</name>
+          <description>Press Right Alt-key to choose 3rd level, Shift+Right Alt-key is Multi_Key</description>
+          <description xml:lang="ko">오른쪽 Alt 키를 누르면 3번째 단계를 선택합니다. Shift+오른쪽 Alt 키가 Multi_Key입니다</description>
+          <description xml:lang="ru">Выбор 3-го уровня нажатием правой клавиши Alt. Shift и правый Alt вместе работают как Multi_Key</description>
+        </configItem>
+      </option>
+      <option>
+        <configItem>
+          <name>lv3:ralt_alt</name>
+          <description>Right Alt key never chooses 3rd level.</description>
+          <description xml:lang="ko">오른쪽 Alt 키는 3번째 단계를 선택하지 않습니다.</description>
+        </configItem>
+      </option>
+    </group>
+    <group allowMultipleSelection="false">
+      <configItem>
+        <name>ctrl</name>
+        <description>Control Key Position</description>
+        <description xml:lang="ko">Ctrl 키 위치</description>
+        <description xml:lang="ru">Положение клавиши Control</description>
+      </configItem>
+      <option>
+        <configItem>
+          <name>ctrl:nocaps</name>
+          <description>Make CapsLock an additional Control</description>
+          <description xml:lang="ko">CapsLock을 또 하나의 Ctrl로 만듭니다.</description>
+          <description xml:lang="ru">Использовать CapsLock как дополнительную клавишу Control</description>
+        </configItem>
+      </option>
+      <option>
+        <configItem>
+          <name>ctrl:swapcaps</name>
+          <description>Swap Control and Caps Lock</description>
+          <description xml:lang="ko">Ctrl과 Caps Lock 키 뒤바꾸기</description>
+          <description xml:lang="ru">Поменять местами клавиши Control и Caps Lock</description>
+        </configItem>
+      </option>
+      <option>
+        <configItem>
+          <name>ctrl:ctrl_ac</name>
+          <description>Control key at left of 'A'</description>
+          <description xml:lang="it">Il tasto Control è a sinistra di «A»</description>
+          <description xml:lang="ko">'A' 왼쪽에 Ctrl 키</description>
+          <description xml:lang="nl">Control-toets links van 'A'</description>
+          <description xml:lang="ru">Клавиша Control слева от 'Ф'</description>
+          <description xml:lang="zh_TW">Control 鍵在“A”的左邊</description>
+        </configItem>
+      </option>
+      <option>
+        <configItem>
+          <name>ctrl:ctrl_aa</name>
+          <description>Control key at bottom left</description>
+          <description xml:lang="it">Il tasto Control è in basso a sinistra</description>
+          <description xml:lang="ko">맨 아래 왼쪽에 Ctrl 키</description>
+          <description xml:lang="nl">Control-toets linksonder</description>
+          <description xml:lang="ru">Клавиша Control снизу слева</description>
+          <description xml:lang="zh_TW">Control 鍵在左下方</description>
+        </configItem>
+      </option>
+      <option>
+        <configItem>
+          <name>ctrl:ctrl_ra</name>
+          <description>Right Control key works as Right Alt</description>
+          <description xml:lang="ko">오른쪽 Ctrl 키가 오른쪽 Alt로 동작합니다</description>
+          <description xml:lang="ru">Правая клавиша Control работает как правая клавиша Alt</description>
+        </configItem>
+      </option>
+    </group>
+    <group allowMultipleSelection="true">
+      <configItem>
+        <name>grp_led</name>
+        <description>Use keyboard LED to show alternative group</description>
+        <description xml:lang="ko">키보드 LED를 사용해 다른 그룹 표시</description>
+        <description xml:lang="ru">Использование клавиатурных индикаторов для отображения дополнительных групп</description>
+      </configItem>
+      <option>
+        <configItem>
+          <name>grp_led:num</name>
+          <description>Num_Lock LED shows alternative group</description>
+          <description xml:lang="ko">Num_Lock LED가 다른 그룹을 표시합니다</description>
+          <description xml:lang="ru">Индикатор Num_Lock отображает дополнительную группу</description>
+          <description xml:lang="sv">Num_Lock-lampan visar alternativ grupp</description>
+        </configItem>
+      </option>
+      <option>
+        <configItem>
+          <name>grp_led:caps</name>
+          <description>Caps_Lock LED shows alternative group</description>
+          <description xml:lang="ko">Caps_Lock LED가 다른 그룹을 표시합니다</description>
+          <description xml:lang="ru">Индикатор Caps_Lock отображает другую группу</description>
+        </configItem>
+      </option>
+      <option>
+        <configItem>
+          <name>grp_led:scroll</name>
+          <description>Scroll_Lock LED shows alternative group</description>
+          <description xml:lang="ko">Scroll_Lock LED가 다른 그룹을 표시합니다</description>
+          <description xml:lang="ru">Индикатор Scroll_Lock отображает дополнительную группу</description>
+          <description xml:lang="sv">Scroll_Lock-lampan visar alternativ grupp</description>
+        </configItem>
+      </option>
+    </group>
+    <group allowMultipleSelection="false">
+      <configItem>
+        <name>caps</name>
+        <description>CapsLock key behavior</description>
+        <description xml:lang="af">CapsLock-sleutelgedrag</description>
+        <description xml:lang="az">CapsLock düyməsinin davranışı</description>
+        <description xml:lang="bg">Поведение на CapsLock</description>
+        <description xml:lang="cs">Chování klávesy CapsLock</description>
+        <description xml:lang="da">Opførsel for Caps Lock-tast</description>
+        <description xml:lang="el">Συμπεριφορά πλήκτρου Κλείδωμα Κεφαλαίων</description>
+        <description xml:lang="en_GB">Caps Lock key behaviour</description>
+        <description xml:lang="es">Comportamiento de BloqMayús</description>
+        <description xml:lang="fi">CapsLock-näppäimen toiminta</description>
+        <description xml:lang="fr">Comportement de la touche Verrouillage majuscule</description>
+        <description xml:lang="hu">A CapsLock billentyű használati módja</description>
+        <description xml:lang="it">Comportamento tasto BlocMaiusc</description>
+        <description xml:lang="ka">CapsLock ღილაკის ქცევა</description>
+        <description xml:lang="ko">CapsLock 키 동작</description>
+        <description xml:lang="nl">CapsLock-toets gedrag</description>
+        <description xml:lang="ru">Клавиша Caps Lock</description>
+        <description xml:lang="sk">Chovanie klávesa Caps Lock</description>
+        <description xml:lang="sl">Obnašanje CapsLock Tipke</description>
+        <description xml:lang="sq">Sjellja e pulsantit CapsLock</description>
+        <description xml:lang="sr">Понашање Caps Lock тастера</description>
+        <description xml:lang="sr@Latn">Ponašanje Caps Lock tastera</description>
+        <description xml:lang="sv">Beteende för Caps Lock-tangenten</description>
+        <description xml:lang="tr">CapsLock tuşunun davranışı</description>
+        <description xml:lang="uk">Клавіша CapsLock</description>
+        <description xml:lang="vi">Đặc điểm của phím CapsLock</description>
+        <description xml:lang="zh_CN">CapsLock 键行为</description>
+        <description xml:lang="zh_TW">Caps Lock 鍵功能</description>
+      </configItem>
+      <option>
+        <configItem>
+          <name>caps:internal</name>
+          <description>Uses internal capitalization. Shift cancels Caps.</description>
+          <description xml:lang="ko">내부 대소문자 사용. Shift키가 대문자 상태를 취소.</description>
+          <description xml:lang="ru">Включает внутреннюю расстановку заглавных. Shift приостанавливает действие CapsLock.</description>
+        </configItem>
+      </option>
+      <option>
+        <configItem>
+          <name>caps:internal_nocancel</name>
+          <description>Uses internal capitalization. Shift doesn't cancel Caps.</description>
+          <description xml:lang="ko">내부 대소문자 사용. Shift키가 대문자 상태를 취소하지 않음.</description>
+          <description xml:lang="ru">Включает внутреннюю расстановку заглавных. Shift не влияет на CapsLock.</description>
+        </configItem>
+      </option>
+      <option>
+        <configItem>
+          <name>caps:shift</name>
+          <description>Acts as Shift with locking. Shift cancels Caps.</description>
+          <description xml:lang="ko">Shift처럼 동작하고 상태를 고정. Shift를 누르면 대문자 상태 취소.</description>
+          <description xml:lang="ru">Действует как Shift с блокировкой. Shift приостанавливает действие Caps.</description>
+        </configItem>
+      </option>
+      <option>
+        <configItem>
+          <name>caps:shift_nocancel</name>
+          <description>Acts as Shift with locking. Shift doesn't cancel Caps.</description>
+          <description xml:lang="ko">Shift처럼 동작하고 상태를 고정. Shift는 대문자 상태 취소하지 않음.</description>
+          <description xml:lang="ru">Действует как Shift с блокировкой. Shift не влияет на Caps.</description>
+        </configItem>
+      </option>
+    </group>
+    <group allowMultipleSelection="true">
+      <configItem>
+        <name>compat</name>
+        <description>Miscellaneous compatibility options</description>
+        <description xml:lang="af">Verskeie versoenbaarheid-opsies</description>
+        <description xml:lang="az">Müxtəlif yetişmə qabiliyyəti seçimləri</description>
+        <description xml:lang="bg">Разни настройки за съвместимост</description>
+        <description xml:lang="cs">Dodatečné volby pro kompatibilitu</description>
+        <description xml:lang="da">Diverse kompatibilitetsvalg</description>
+        <description xml:lang="en_GB">Miscellaneous compatibility options</description>
+        <description xml:lang="es">Opciones misceláneas de compatiblidad</description>
+        <description xml:lang="fi">Sekalaisia yhteensopivuusvalintoja</description>
+        <description xml:lang="fr">Diverses options de compatibilité</description>
+        <description xml:lang="hu">Egyéb kompatibilitási beállítások</description>
+        <description xml:lang="it">Opzioni varie di compatibilità</description>
+        <description xml:lang="ka">თავსებადობის სხვადასხვა პარამეტრი</description>
+        <description xml:lang="ko">기타 호환성 옵션</description>
+        <description xml:lang="nl">Overige compatibiliteitsopties</description>
+        <description xml:lang="ru">Разные параметры совместимости</description>
+        <description xml:lang="sk">Dodatočné voľby pre kompatibilitu</description>
+        <description xml:lang="sl">Možnosti ostalih združljivosti</description>
+        <description xml:lang="sq">Opcione të ndryshme kompatibiliteti</description>
+        <description xml:lang="sr">Разне могућности за сагласност</description>
+        <description xml:lang="sr@Latn">Razne mogućnosti za saglasnost</description>
+        <description xml:lang="sv">Diverse kompatibilitetsalternativ</description>
+        <description xml:lang="tr">Çeşitli uyumluluk seçenekleri</description>
+        <description xml:lang="uk">Різні параметри сумісності</description>
+        <description xml:lang="vi">Tùy chọn tương thích khác</description>
+        <description xml:lang="zh_CN">其它兼容选项</description>
+        <description xml:lang="zh_TW">其它相容選項</description>
+      </configItem>
+      <option>
+        <configItem>
+          <name>numpad:microsoft</name>
+          <description>Shift with numpad keys works as in MS Windows</description>
+          <description xml:lang="ko">Shift 키와 동시에 숫자 키를 누를 때 MS 윈도우즈와 동일하게 동작</description>
+          <description xml:lang="ru">Клавиша Shift с клавишами цифровой клавиатуры работают также как в MS Windows</description>
+        </configItem>
+      </option>
+      <option>
+        <configItem>
+          <name>srvrkeys:none</name>
+          <description>Special keys (Ctrl+Alt+&lt;key&gt;) handled in a server.</description>
+          <description xml:lang="af">Spesiale sleutels (Ctrl+Alt+&lt;sleutel&gt;) word hanteer in 'n bediener.</description>
+          <description xml:lang="az">Xüsusi düymələr (Ctrl+Alt+&lt;düyməsi&gt;) verici tərəfindən idarə edilsin.</description>
+          <description xml:lang="bg">Специалните комбинации (Control+Alt+&lt;клавиш&gt;) се обработват от сървъра.</description>
+          <description xml:lang="cs">Speciální klávesy (Ctrl+Alt+&lt;key&gt;) zpracovány v serveru.</description>
+          <description xml:lang="da">Specialtaster (Ctrl+Alt+&lt;key&gt;) håndteret i en server.</description>
+          <description xml:lang="en_GB">Special keys (Ctrl+Alt+&lt;key&gt;) handled in a server.</description>
+          <description xml:lang="es">Teclas especiales (Ctrl+Alt+«tecla») manipuladas en un servidor.</description>
+          <description xml:lang="fi">Erikoisnäppäimet (Ctrl+Alt+&lt;näppäin&gt;) käsitellään palvelimessa.</description>
+          <description xml:lang="fr">Les combinaisons spéciales (Ctrl+Alt+&lt;touche&gt;) sont traitées par un serveur.</description>
+          <description xml:lang="hu">A speciális billentyűket (Ctrl+Alt+&lt;billentyű&gt;) a kiszolgáló kezeli.</description>
+          <description xml:lang="it">Tasti speciali (Ctrl+Alt+&lt;tasto&gt;) gestiti da un server.</description>
+          <description xml:lang="ka">სპეც კლავიშებს (Ctrl+Alt+&lt;клв&gt;) სერვერი ამუშავებთ.</description>
+          <description xml:lang="ko">특수 키 조합은 (Ctrl+Alt+&lt;키&gt;) 서버에서 처리합니다.</description>
+          <description xml:lang="nl">Speciale toetsen (Ctrl+Alt+&lt;toets&gt;) afgehandeld in een server.</description>
+          <description xml:lang="ru">Специальные клавиши (Ctrl+Alt+&lt;клв&gt;) обрабатываются сервером.</description>
+          <description xml:lang="sk">Špeciálne klávesy (Ctrl+Alt+&lt;key&gt;) spracované na serveru.</description>
+          <description xml:lang="sl">Posebne tipke (Ctrl+Alt+&lt;key&gt;) določa strežnik.</description>
+          <description xml:lang="sq">Çelsa specialë (Ctrl+Alt+&lt;çelsi&gt;) të manazhuar në një server.</description>
+          <description xml:lang="sr">Нарочити тастери (Ctrl+Alt+&lt;тастер&gt;) које обрађује сервер.</description>
+          <description xml:lang="sr@Latn">Naročiti tasteri (Ctrl+Alt+&lt;taster&gt;) koje obrađuje server.</description>
+          <description xml:lang="sv">Specialtangenter (Ctrl+Alt+&lt;tangent&gt;) hanteras i en server.</description>
+          <description xml:lang="tr">Bir sunucuda elde edilen özel tuşlar (Ctrl+Alt+&lt;tuş&gt;)</description>
+          <description xml:lang="uk">Спеціальні клавіші (Ctrl+Alt+&lt;key&gt;) обробляються на сервері.</description>
+          <description xml:lang="vi">Điều khiển các phím đặt biệt (Ctrl+Alt+&lt;key&gt;) trên một máy chủ.</description>
+          <description xml:lang="zh_CN">服务器处理的特殊键 (Ctrl+Alt+&lt;key&gt;)。</description>
+          <description xml:lang="zh_TW">伺服器處理的特殊鍵 (Ctrl+Alt+&lt;key&gt;)。</description>
+        </configItem>
+      </option>
+      <option>
+        <configItem>
+          <name>compose:caps</name>
+          <description>Caps Lock is Compose</description>
+          <description xml:lang="ko">Caps Lock이 조합 키입니다</description>
+          <description xml:lang="ru">Клавиша Caps Lock соответствует клавише Compose</description>
+        </configItem>
+      </option>
+    </group>
+  </optionList>
+</xkbConfigRegistry>

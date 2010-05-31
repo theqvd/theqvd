@@ -1,0 +1,120 @@
+# Xming Server Resource File - EXAMPLE
+# Earle F. Philhower, III
+
+# Place in C:\Program Files\Xming\Xmingrc
+
+# Keywords are case insensitive, comments legal pretty much anywhere
+# you can have an end-of-line
+
+# Comments begin with "#" or "//" and go to the end-of-line
+
+# Paths to icons are **WINDOWS** based (i.e. c:\windows\icons)
+
+# Menus are defined as...
+# MENU <name> {
+#	<Menu Text>	EXEC	<command>
+#				^^ Create a process for the command without a console
+#  or	<Menu Text>	EXECD	<command>
+#				^^ Create a process for the command with a console
+#  or	<Menu Text>	MENU	<name-of-some-prior-defined-menu>
+#  or	<Menu Text>	ALWAYSONTOP
+#                         ^^ Sets the window to display above all others
+#  or   <Menu Text>	RELOAD
+#                         ^^ Causes Xmingrc file
+#                            to be reloaded and icons and menus regenerated
+#  or	SEPARATOR
+#       ...
+# }
+
+# Set the taskmar menu with
+# ROOTMENU <name-of-some-prior-defined-menu>
+
+# If you want a menu to be applied to all popup window's system menu
+# DEFAULTSYSMENU <name-of-some-prior-defined-menu> <atstart|atend>
+
+# To choose a specific menu for a specific WM_CLASS or WM_NAME use ...
+# SYSMENU {
+#	<class-or-name-of-window> <name-of-prior-defined-menu> <atstart|atend>
+#	...
+# }
+
+# When specifying an ICONFILE in the following commands several different
+# formats are allowed:
+# 1. Name of a regular Windows .ico format file
+#    (ex:  "cygwin.ico", "apple.ico")
+# 2. Name and index into a Windows .DLL
+#    (ex: "c:\windows\system32\shell32.dll,4" gives the default folder icon
+#         "c:\windows\system32\shell32.dll,5" gives the floppy drive icon)
+# 3. Index into Xming.EXE internal ICON resource
+#    (ex: ",101" is the 1st icon inside Xming.exe)
+
+# To define where ICO files live (** Windows path**)
+# ICONDIRECTORY	<windows-path i.e. c:\cygwin\usr\icons>
+# NOTE: If you specify a fully qualified path to an ICON below
+#             (i.e. "c:\xxx" or "d:\xxxx")
+#       this ICONDIRECTORY will not be prepended
+
+# To change the taskbar icon use...
+# TRAYICON       <name-of-windows-ico-file-in-icondirectory>
+
+# To define a replacement for the standard X icon for apps w/o specified icons
+# DEFAULTICON	<name-of-windows-ico-file-in-icondirectory>
+
+# To define substitute icons on a per-window basis use...
+# ICONS {
+#	<class-or-name-of-window> <icon-file-name.ico>
+#	...
+# }
+# In the case where multiple matches occur, the first listed in the ICONS
+# section will be chosen.
+
+# To disable exit confirmation dialog add the line containing SilentExit
+
+# DEBUG <string> prints out the string to the Xming log file
+
+// Make some menus...
+menu apps {
+	xeyes	exec	"xeyes -display %display%"
+	"DOS"	execd	"C:\WINDOWS\system32\cmd"
+	notepad	execd	notepad
+	cygwin	execd	"C:\cygwin\bin\bash --login -i"  # Comment
+}
+
+menu root {
+// Comments fit here, too...
+	"Reload Xmingrc"	RELOAD
+	"Applications"	menu	apps
+	SEParATOR
+}
+
+menu aot {
+	Separator
+	"Always on Top"	alwaysontop
+}
+
+menu xtermspecial {
+	"oclock"	exec	"oclock -display %display%"
+	"Always on Top"	alwaysontop
+	SepArAtor
+}
+
+RootMenu root
+
+DefaultSysMenu aot atend
+
+SysMenu {
+	"xeyes"	xtermspecial atstart
+}
+
+# IconDirectory	"c:\winnt\"
+
+# DefaultIcon	"reinstall.ico"
+
+# Icons {
+# 	"xterm"	"uninstall.ico"
+# }
+
+# SilentExit
+
+DEBUG "Done parsing the configuration file..."
+

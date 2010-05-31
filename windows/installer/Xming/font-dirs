@@ -1,0 +1,6 @@
+# font-dirs
+# comma-separated list of directories to add to the default font path
+# defaults are built-ins, misc, TTF, Type1, 75dpi, 100dpi
+# also allows entries on individual lines
+C:\Program Files\Xming\fonts\dejavu,C:\Program Files\Xming\fonts\cyrillic
+C:\WINDOWS\Fonts
