@@ -20,6 +20,7 @@ my $vm_id :shared;
 my %connect_info :shared;
 
 my $DEFAULT_PORT = cfg('client.host.port');
+my $USE_SSL      = cfg('client.use_ssl');
 
 sub new {
 	my( $class, $parent, $id, $title, $pos, $size, $style, $name ) = @_;
@@ -180,7 +181,7 @@ sub ConnectToVM {
 
     Wx::PostEvent($self, new Wx::PlThreadEvent(-1, $EVT_CONN_STATUS, 'CONNECTING'));
     require QVD::HTTPC;
-    my $httpc = eval { new QVD::HTTPC("$host:$port", SSL => 1) };
+    my $httpc = eval { new QVD::HTTPC("$host:$port", SSL => $USE_SSL) };
     if ($@) {
 	my $message :shared = $@;
 	my $evt = new Wx::PlThreadEvent(-1, $EVT_CONNECTION_ERROR, $message);

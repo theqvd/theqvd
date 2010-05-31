@@ -7,17 +7,18 @@ use strict;
 
 use Carp;
 use feature 'switch';
+use URI::Split qw(uri_split);
+use MIME::Base64 'decode_base64';
 use IO::Socket::Forwarder qw(forward_sockets);
+
 use QVD::Config;
 use QVD::Log;
 use QVD::DB::Simple;
 use QVD::HTTP::Headers qw(header_lookup header_eq_check);
 use QVD::HTTP::StatusCodes qw(:status_codes);
 use QVD::URI qw(uri_query_split);
-use QVD::Auth;
 use QVD::SimpleRPC::Client;
-use URI::Split qw(uri_split);
-use Sys::Hostname;
+use QVD::L7R::Authenticator;
 
 use parent qw(QVD::HTTPD);
 
@@ -37,104 +38,55 @@ sub post_configure_hook {
 				     GET => '/qvd/list_of_vm');
 }
 
-sub _authorize_user {
-    my ($l7r, $method, $url, $headers) = @_;
-    my $authorization = header_lookup($headers, 'Authorization');
-    if ($authorization =~ /^Basic (.*)$/) {
-	use MIME::Base64 'decode_base64';
-	my @user_pwd = split /:/, decode_base64($1);
-	my $user_login = QVD::Auth->login($user_pwd[0], $user_pwd[1]);
-	if ($user_login == 1) {
-	    my $user_rs = rs(User)->search({login => $user_pwd[0]});
-	    INFO "Accepted connection from user $user_pwd[0]";
-	    return $user_rs->first;
-	} else {
-	    INFO "Failed login attempt from user $user_pwd[0]";
-	    $l7r->send_http_error(HTTP_UNAUTHORIZED,
-		[ 'WWW-Authenticate: Basic realm="QVD"' ]);
-	    return;
-	}
-    } else {
-	$l7r->send_http_error(HTTP_UNAUTHORIZED,
-	    [ 'WWW-Authenticate: Basic realm="QVD"' ]);
-	return;
-    }
-}
-
 sub list_of_vm_processor {
     my ($l7r, $method, $url, $headers) = @_;
-    my $user = $l7r->_authorize_user($method, $url, $headers) or return;
-    my $user_id = $user->id;
+    my $auth = $l7r->_authenticate_user($headers);
+    my $user_id = $auth->user_id;
+    my @vm_list = ( map { { id      => $_->vm_id,
+			    state   => $_->vm_state,
+			    name    => $_->rel_vm_id->name,
+			    blocked => $_->blocked } }
+		    map { $_->vm_runtime }
+		    rs(VM)->search({user_id => $user_id}) );
 
-    my @vms = map $_->vm_runtime, rs(VM)->search({user_id => $user_id});
-
-    unless (@vms) {
-	INFO "User $user_id does not have any virtual machine";
-	# FIXME handle this situation in a better way, for instance:
-	# - allow automatic provisioning
-	# - report the problem to the client
-    }
-
-    my @vm_data = map { { id => $_->vm_id,
-			  state => $_->vm_state,
-			  name => $_->rel_vm_id->name,
-			  blocked => $_->blocked } } @vms;
+    @vm_list or INFO "User $user_id does not have any virtual machine";
 
     $l7r->send_http_response_with_body( HTTP_OK, 'application/json', [],
-					$l7r->json->encode(\@vm_data) );
-}
-
-sub _user_vms {
-    my ($l7r, $user_id) = @_;
-    map {
-	my $rt = $_->vm_runtime;
-	ERROR "Corrupted database: virtual machine misses entry at vm_runtime"
-	    unless defined $rt;
-	$rt;
-    } rs(VM)->search({'user_id' => $user_id});
+					$l7r->json->encode(\@vm_list) );
 }
 
 sub connect_to_vm_processor {
     my ($l7r, $method, $url, $headers) = @_;
-    my $user = $l7r->_authorize_user($method, $url, $headers) or return;
+    my $auth = $l7r->_authorize_user($method, $headers);
 
-    unless (header_eq_check($headers, Connection => 'Upgrade') and
-	    header_eq_check($headers, Upgrade => 'QVD/1.0')) {
-	$l7r->send_http_error(HTTP_UPGRADE_REQUIRED);
-	return;
-    }
+    header_eq_check($headers, Connection => 'Upgrade') &&
+    header_eq_check($headers, Upgrade => 'QVD/1.0')
+	or $l7r->throw_http_error(HTTP_UPGRADE_REQUIRED);
 
     my $query = (uri_split $url)[3];
     my %params = uri_query_split  $query;
-    my $vm_id = delete $params{id};
-    unless (defined $vm_id) {
-	$l7r->send_http_error(HTTP_UNPROCESSABLE_ENTITY);
-	return;
-    }
+    my $vm_id = delete $params{id}
+	// $l7r->throw_http_error(HTTP_UNPROCESSABLE_ENTITY, "parameter id is missing");
 
-    my $vm = rs(VM_Runtime)->search({vm_id => $vm_id})->first;
-
-    unless (defined $vm) {
-	$l7r->send_http_error(HTTP_NOT_FOUND,
+    my $vm = rs(VM_Runtime)->search({vm_id => $vm_id})->first
+	// $l7r->throw_http_error(HTTP_NOT_FOUND,
 			      "The requested virtual machine does not exists");
-	return;
-    }
-    if ($vm->rel_vm_id->user_id != $user->id) {
-	$l7r->send_http_error(HTTP_FORBIDDEN,
-			      "You are not allowed to access requested virtual machine");
-	return;
-    }
-    if ($vm->blocked) {
-	$l7r->send_http_error(HTTP_FORBIDDEN,
-			      "The requested virtual machine is offline for maintenance");
-	return;
-    }
+
+    $vm->rel_vm_id->user_id != $auth->user_id
+	and $l7r->throw_http_error(HTTP_FORBIDDEN,
+				   "You are not allowed to access requested virtual machine");
+
+    $vm->blocked
+	and $l7r->throw_http_error(HTTP_FORBIDDEN,
+				   "The requested virtual machine is offline for maintenance");
 
     eval {
 	$l7r->_takeover_vm($vm);
 	$l7r->_assign_vm($vm);
 	$l7r->_start_and_wait_for_vm($vm);
-	%params = (%params, $vm->combined_properties);
+	%params = (%params,
+		   $vm->combined_properties,
+		   $auth->params);
 	$l7r->_start_x($vm, %params);
 	$l7r->_wait_for_x($vm);
 	$l7r->_run_forwarder($vm);
@@ -143,12 +95,31 @@ sub connect_to_vm_processor {
     $l7r->_release_vm($vm);
     if ($saved_err) {
 	chomp $saved_err;
-	DEBUG "Session failed: $saved_err";
-	$l7r->send_http_error(HTTP_SERVICE_UNAVAILABLE,
-			      "The requested virtual machine is not available: ",
-			      "$saved_err, retry later");
+	$l7r->throw_http_error(HTTP_SERVICE_UNAVAILABLE,
+			  "The requested virtual machine is not available: ",
+			  "$saved_err, retry later");
     }
     DEBUG "Session ended";
+}
+
+sub _authenticate_user {
+    my ($l7r, $headers) = @_;
+    if (my ($credentials) = header_lookup($headers, 'Authorization')) {
+	if (my ($basic) = $credentials =~ /^Basic (.*)$/) {
+	    if (my ($user, $passwd) = decode_base64($1) =~ /^([\:]+):(.*)$/) {
+		my $auth = QVD::L7R::Authenticator->new;
+		if ($auth->authenticate_basic($user, $passwd)) {
+		    INFO "Accepted connection from user $user";
+		    return $auth;
+		}
+		INFO "Failed login attempt from user $user";
+	    }
+	}
+	else {
+	    WARN "unimplemented authentication mechanism";
+	}
+    }
+    $l7r->throw_http_error(HTTP_UNAUTHORIZED, ['WWW-Authenticate: Basic realm="QVD"']);
 }
 
 # Take the machine for this L7R process meybe disconnecting others

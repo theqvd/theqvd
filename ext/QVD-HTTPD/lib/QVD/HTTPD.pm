@@ -122,7 +122,17 @@ sub _process_http_request {
     my $path = (uri_split $url)[2];
     my $processor = $self->_get_http_request_processor($method, $path);
     if ($processor) {
-	$processor->($self, $method, $url, $headers);
+	eval {
+	    $processor->($self, $method, $url, $headers);
+	};
+	if ($@) {
+	    if (ref $@ and $@->isa('QVD::HTTPD::Exception')) {
+		$self->_send_http_error(@{$@});
+	    }
+	    else {
+		$self->send_http_error(HTTP_INTERNAL_SERVER_ERROR, $@);
+	    }
+	}
     }
     else {
 	$self->send_http_error(HTTP_NOT_FOUND);
@@ -159,10 +169,12 @@ sub send_http_response_with_body {
 }
 
 sub send_http_error {
-    my ($self, $code, $text) = @_;
-    $code ||= HTTP_INTERNAL_SERVER_ERROR;
-    $text ||= http_status_description($code);
-    $self->send_http_response_with_body($code, 'text/plain', $text);
+    my $self = shift;
+    my $code = shift // HTTP_INTERNAL_SERVER_ERROR;
+    my $headers = (@_ && ref $_[0] ? shift @_ : []);
+    $self->send_http_response_with_body($code, 'text/plain',
+					$headers,
+					(@_ ? @_ : http_status_description($code)))
 }
 
 sub json {
@@ -171,6 +183,20 @@ sub json {
 	require JSON;
 	JSON->new->ascii->pretty->allow_nonref;
     }
+}
+
+sub throw_http_error {
+    shift;
+    DEBUG "throwing error " . (ref $_[1] ? "$_[0] [@{$_[1]}] @_[2..$#_]" : "@_");
+    die QVD::HTTPD::Exception->new(@_);
+}
+
+package QVD::HTTPD::Exception;
+
+sub new {
+    my ($class, @args) = @_;
+    my $self = \@args;
+    bless $self, $class;
 }
 
 1;
