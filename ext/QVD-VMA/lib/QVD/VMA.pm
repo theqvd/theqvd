@@ -154,6 +154,7 @@ sub _call_state_hook {
     local $@;
     # state hooks are called detached and may not fail:
     eval { _call_hook("state $state", $on_state{$state}, 1, @_, 'qvd.hook.on_state', $state) };
+    ERROR $@ if $@;
 }
 
 sub _call_printing_hook {
