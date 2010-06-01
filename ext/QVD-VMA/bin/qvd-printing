@@ -5,18 +5,18 @@ use warnings;
 
 my %params = @ARGV;
 my $client_os = $params{'qvd.client.os'};
-my $printing_port = $params{'qvd.printing.port'};
+my $prt_port = $params{'qvd.printing.port'};
 if ($params{'qvd.client.os'} eq 'windows') {
-    my @lst = grep /^Printer/, `smbclient -L 127.0.0.1 -p $printing_port -gN`;
-    my %printers = map { $_ =~ /^Printer\|([^|]+)\|(.*)$/, $1 => $2} @lst;
+    my @lst = grep /^Printer/, `smbclient -L 127.0.0.1 -p $prt_port -gN`;
+    my %printers = map { /^Printer\|([^|]+)\|(.*)$/, $1 => $2} @lst;
     while (my ($k, $v) = each(%printers)) {
 	my $name = $k;
 	(my $descr = $v) =~ tr/[A-Za-z0-9]/_/c;
-	system("lpadmin -p $descr -v smb://127.0.0.1:$printing_port/$name -E");
+	system("lpadmin -p $descr -v smb://127.0.0.1:$prt_port/$name -E");
     }
 } else {
-    my @printers = grep s/^([^ ]+) /\1/, `lpstat -a`;
-    for my $printer (@printers) {
-	system("lpadmin -p $printer -v ipp://127.0.0.1:$printing_port/$printer -E");
+    my @printers = map { /^([^ ]+)/, $1} `lpstat -h 127.0.0.1:$prt_port -a`;
+    for my $prt (@printers) {
+	system("lpadmin -p $prt -v ipp://127.0.0.1:$prt_port/$prt -E");
     }
 }
