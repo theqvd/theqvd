@@ -41,6 +41,7 @@ sub post_configure_hook {
 sub list_of_vm_processor {
     my ($l7r, $method, $url, $headers) = @_;
     my $auth = $l7r->_authenticate_user($headers);
+    $auth->before_list_of_vms;
     my $user_id = $auth->user_id;
     my @vm_list = ( map { { id      => $_->vm_id,
 			    state   => $_->vm_state,
@@ -83,6 +84,7 @@ sub connect_to_vm_processor {
     eval {
 	$l7r->_takeover_vm($vm);
 	$l7r->_assign_vm($vm);
+	$auth->before_connect_to_vm;
 	$l7r->_start_and_wait_for_vm($vm);
 	%params = (%params,
 		   $vm->combined_properties,

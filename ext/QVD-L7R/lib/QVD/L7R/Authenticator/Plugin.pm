@@ -7,6 +7,8 @@ sub init {}
 
 sub authenticate_basic {}
 
-sub fill_params {}
+sub before_connect_to_vm {}
+
+sub before_list_of_vms {}
 
 1;

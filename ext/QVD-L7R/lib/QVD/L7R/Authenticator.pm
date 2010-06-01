@@ -42,10 +42,16 @@ sub authenticate_basic {
 
 sub user_id { shift->{user_id} // croak "internal error: user not authenticated yet!" }
 
-sub params {
+sub params { %{shift->{params}} }
+
+sub before_connect_to_vm {
     my $auth = shift;
-    $_->fill_params($auth) for @{$auth->{plugin_modules}};
-    %{$auth->{params}};
+    $_->before_connect_to_vm($auth) for @{$auth->{plugin_modules}};
+}
+
+sub before_list_of_vms {
+    my $auth = shift;
+    $_->auto_provision($auth) for @{$auth->{plugin_modules}};
 }
 
 1;
