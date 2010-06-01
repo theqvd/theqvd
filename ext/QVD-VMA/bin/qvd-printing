@@ -4,19 +4,26 @@ use strict;
 use warnings;
 
 my %params = @ARGV;
-my $client_os = $params{'qvd.client.os'};
-my $prt_port = $params{'qvd.printing.port'};
-if ($params{'qvd.client.os'} eq 'windows') {
-    my @lst = grep /^Printer/, `smbclient -L 127.0.0.1 -p $prt_port -gN`;
-    my %printers = map { /^Printer\|([^|]+)\|(.*)$/, $1 => $2} @lst;
-    while (my ($k, $v) = each(%printers)) {
-	my $name = $k;
-	(my $descr = $v) =~ tr/[A-Za-z0-9]/_/c;
-	system("lpadmin -p $descr -v smb://127.0.0.1:$prt_port/$name -E");
-    }
-} else {
-    my @printers = map { /^([^ ]+)/, $1} `lpstat -h 127.0.0.1:$prt_port -a`;
-    for my $prt (@printers) {
-	system("lpadmin -p $prt -v ipp://127.0.0.1:$prt_port/printers/$prt -E");
+
+# Remove all printers that might already be configured
+my @printers = map { /^([^ ]+)/, $1} `lpstat -a`;
+for my $prt (@printers) {
+    system("lpadmin -x $prt");
+}
+
+if ($params{'qvd.hook.on_printing'} eq 'connected') {
+    my $client_os = $params{'qvd.client.os'};
+    my $prt_port = $params{'qvd.printing.port'};
+    if ($params{'qvd.client.os'} eq 'windows') {
+	my @lst = grep /^Printer/, `smbclient -L 127.0.0.1 -p $prt_port -gN`;
+	my %printers = map { /^Printer\|([^|]+)\|(.*)$/, $1 => $2} @lst;
+	while (my ($k, $v) = each(%printers)) {
+	    system("lpadmin -p $k -D '$v' -v smb://127.0.0.1:$prt_port/$k -E");
+	}
+    } else {
+	my @printers = map { /^([^ ]+)/, $1} `lpstat -h 127.0.0.1:$prt_port -a`;
+	for my $prt (@printers) {
+	    system("lpadmin -p $prt -v ipp://127.0.0.1:$prt_port/printers/$prt -E");
+	}
     }
 }
