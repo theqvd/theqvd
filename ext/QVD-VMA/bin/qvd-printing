@@ -18,7 +18,8 @@ if ($params{'qvd.hook.on_printing'} eq 'connected') {
 	my @lst = grep /^Printer/, `smbclient -L 127.0.0.1 -p $prt_port -gN`;
 	my %printers = map { /^Printer\|([^|]+)\|(.*)$/, $1 => $2} @lst;
 	while (my ($k, $v) = each(%printers)) {
-	    system("lpadmin -p $k -D '$v' -v smb://127.0.0.1:$prt_port/$k -E");
+	    (my $d = $v) =~ tr/[A-Za-z0-9]/_/c;
+	    system("lpadmin -p $d -D '$v' -v smb://127.0.0.1:$prt_port/$k -E");
 	}
     } else {
 	my @printers = map { /^([^ ]+)/, $1} `lpstat -h 127.0.0.1:$prt_port -a`;
