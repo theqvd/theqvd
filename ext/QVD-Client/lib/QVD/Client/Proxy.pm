@@ -14,7 +14,7 @@ sub new {
     my $self = {
 	audio => delete $opts{audio},
 	extra => delete $opts{extra},
-	print => delete $opts{print},
+	printing => delete $opts{printing},
     };
     bless $self, $class;
 }
@@ -33,9 +33,9 @@ sub run {
 
     my %o = ();
     $o{media} = 4713 if $self->{audio};
-    if ($self->{print}) {
+    if ($self->{printing}) {
 	if ($WINDOWS) {
-	    $o{smb} = 139;
+	    $o{cups} = 139;
 	} else {
 	    $o{cups} = 631;
 	}

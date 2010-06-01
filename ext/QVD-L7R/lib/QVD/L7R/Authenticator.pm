@@ -21,10 +21,11 @@ for (split /\s*,\s*/, cfg('l7r.auth.plugins')) {
 }
 
 sub new {
-    my $class = shift;
-    my $auth = { modules       => [@plugin_modules],
-		 params        => {},
-		 user_id       => undef };
+    my ($class, $l7r) = @_;
+    my $auth = { modules => [@plugin_modules],
+		 l7r     => $l7r,
+		 params  => {},
+		 user_id => undef };
     bless $auth, $class;
     $_->init($auth) for @plugin_modules;
     $auth;

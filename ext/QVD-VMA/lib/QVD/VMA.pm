@@ -26,6 +26,7 @@ use Fcntl qw(:flock);
 use feature qw(switch say);
 use QVD::Config;
 use QVD::Log;
+use Config::Properties;
 
 use parent 'QVD::SimpleRPC::Server';
 
@@ -37,17 +38,23 @@ my $x_session       = cfg('command.x-session');
 my $as_user         = cfg('vma.nxagent.as_user');
 my $enable_audio    = cfg('vma.audio.enable');
 my $enable_printing = cfg('vma.printing.enable');
+my $printing_conf   = cfg('vma.printing.config');
 
-my %on_action = ( connect    => cfg('vma.on_action.connect'),
-		  disconnect => cfg('vma.on_action.disconnect'),
-		  suspend    => cfg('vma.on_action.suspend'),
-		  poweroff   => cfg('vma.on_action.poweroff') );
+my %on_action =   ( connect    => cfg('vma.on_action.connect'),
+		    disconnect => cfg('vma.on_action.disconnect'),
+		    suspend    => cfg('vma.on_action.suspend'),
+		    poweroff   => cfg('vma.on_action.poweroff') );
 
-my %on_state = ( connected => cfg('vma.on_state.connected'),
-		 suspended => cfg('vma.on_state.suspended'),
-		 stopped   => cfg('vma.on_state.disconnected') );
+my %on_state =    ( connected => cfg('vma.on_state.connected'),
+		    suspended => cfg('vma.on_state.suspended'),
+		    stopped   => cfg('vma.on_state.disconnected') );
 
-my $display   = cfg('internal.nxagent.display');
+my %on_printing = ( connected => cfg('internal.vma.on_printing.connected'),
+		    suspended => cfg('internal.vma.on_printing.suspended'),
+		    stopped   => cfg('internal.vma.on_printing.stopped'),
+
+my $display       = cfg('internal.nxagent.display');
+my $printing_port = $display + 2000;
 
 my %timeout = ( initiating => cfg('internal.nxagent.timeout.initiating'),
 		listening  => cfg('internal.nxagent.timeout.listening'),
@@ -149,6 +156,20 @@ sub _call_state_hook {
     eval { _call_hook("state $state", $on_state{$state}, 1, @_, 'qvd.hook.on_state', $state) };
 }
 
+sub _call_printing_hook {
+    my $state = _state();
+    local $@;
+    eval {
+	my $props = Config::Properties->new;
+	open my $fh, '<', $printing_conf or die "Unable to open printing configuration";
+	$props->read($fh);
+	close $fh;
+	_call_hook("printing $state", $on_printing{$state}, 1, $props->properties,
+		   'qvd.hook.on_printing', $state);
+    };
+    ERROR $@ if $@;
+}
+
 sub _become_user {
     # Formerly copied from cftools http://sourceforge.net/projects/cftools/
     # Copyright 2003-2005 Martin Andrews
@@ -199,6 +220,7 @@ sub _write_line {
 
 sub _save_nxagent_state_and_call_hook {
     _write_line($nxagent_state_fn, join(':', shift, time) );
+    _call_printing_hook;
     _call_state_hook;
 }
 sub _save_nxagent_pid   { _write_line($nxagent_pid_fn, shift) }
@@ -207,6 +229,7 @@ sub _delete_nxagent_state_and_pid_and_call_hook {
     DEBUG "deleting pid and state files";
     unlink $nxagent_pid_fn;
     unlink $nxagent_state_fn;
+    _call_printing_hook;
     _call_state_hook;
 }
 
@@ -373,6 +396,20 @@ sub _stop_session {
     $state;
 }
 
+sub _save_printing_conf {
+    my %args = @_;
+    my $props = Config::Properties->new;
+    $props->setProperty('qvd.printing.enabled' => $printing_enabled && $args{'qvd.client.printing.enabled'});
+    $props->setProperty('qvd.client.os' => $args{'qvd.client.os'});
+    $props->setProperty('qvd.printing.port' => $printing_port);
+
+    my $tmp = "$printing_conf.tmp";
+    open my $fh, '>', $tmp or die "Unable to save printing configuration to $tmp";
+    $props->save($fh);
+    close $fh or die "Unable to write printing configuration to $tmp";
+    rename $tmp, $printing_conf or die "Unable to write printing configuration to $printing_conf";
+}
+
 sub _start_session {
     my ($state, $pid) = _state;
     DEBUG "starting session in state $state, pid $pid";
@@ -380,6 +417,7 @@ sub _start_session {
 	when ('suspended') {
 	    _call_action_hook('connect',  @_);
 	    DEBUG "awaking nxagent";
+	    _save_printing_conf(@_);
 	    _save_nxagent_state_and_call_hook 'initiating';
 	    kill HUP => $pid;
 	}
@@ -390,6 +428,7 @@ sub _start_session {
 	}
 	when ('stopped') {
 	    _call_action_hook('connect', @_);
+	    _save_printing_conf(@_);
 	    _fork_monitor(@_);
 	}
 	default {

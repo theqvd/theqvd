@@ -51,6 +51,8 @@ l7r.as_user = qvd
 l7r.pid_file = ${path.run}/l7r.pid
 l7r.auth.plugins = default
 
+auth.ldap.filter = (uid=%u)
+
 # l7r.auth.mode = ldap
 # l7r.auth.ldap.host =
 # l7r.auth.ldap.base =
@@ -79,6 +81,7 @@ vma.audio.enable = 0
 vma.printing.enable = 0
 
 vma.pid_file = /var/run/qvd/vma.pid
+vma.printing_conf = /var/run/qvd/printing.conf
 vma.nxagent.as_user = qvd
 
 vma.x-session.env.QVD_SESSION = 1
@@ -124,4 +127,7 @@ internal.nxagent.timeout.listening = 10
 internal.nxagent.timeout.suspending = 20
 internal.nxagent.timeout.stopping = 20
 
+internal.vma.on_printing.connected = /usr/bin/qvd-printing
+internal.vma.on_printing.suspended = /usr/bin/qvd-printin
+internal.vma.on_printing.stopped = /usr/bin/qvd-printing
 
