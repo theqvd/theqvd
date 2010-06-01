@@ -42,7 +42,7 @@ sub list_of_vm_processor {
     my ($l7r, $method, $url, $headers) = @_;
     my $auth = $l7r->_authenticate_user($headers);
     $auth->before_list_of_vms;
-    my $user_id = $auth->user_id;
+    my $user_id = _auth2user_id($auth);
     my @vm_list = ( map { { id      => $_->vm_id,
 			    state   => $_->vm_state,
 			    name    => $_->rel_vm_id->name,
@@ -73,7 +73,7 @@ sub connect_to_vm_processor {
 	// $l7r->throw_http_error(HTTP_NOT_FOUND,
 			      "The requested virtual machine does not exists");
 
-    $vm->rel_vm_id->user_id != $auth->user_id
+    $vm->rel_vm_id->user_id != _auth2user_id($auth)
 	and $l7r->throw_http_error(HTTP_FORBIDDEN,
 				   "You are not allowed to access requested virtual machine");
 
@@ -102,6 +102,14 @@ sub connect_to_vm_processor {
 			  "$saved_err, retry later");
     }
     DEBUG "Session ended";
+}
+
+sub _auth2user_id {
+    my $auth = shift;
+    my $login = $auth->login;
+    my $user = rs(User)->search({ login => $login })->first
+	// die "Authenticated user $login does not exist in database";
+    $user->id
 }
 
 sub _authenticate_user {
