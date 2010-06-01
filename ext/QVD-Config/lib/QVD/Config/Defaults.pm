@@ -51,12 +51,6 @@ l7r.as_user = qvd
 l7r.pid_file = ${path.run}/l7r.pid
 l7r.auth.plugins = default
 
-auth.ldap.filter = (uid=%u)
-
-# l7r.auth.mode = ldap
-# l7r.auth.ldap.host =
-# l7r.auth.ldap.base =
-
 hkd.as_user = qvd
 hkd.pid_file = ${path.run}/hkd.pid
 
@@ -82,8 +76,6 @@ vma.printing.enable = 0
 vma.printing.config = /var/run/qvd/printing.conf
 vma.pid_file = /var/run/qvd/vma.pid
 vma.nxagent.as_user = qvd
-
-vma.x-session.env.QVD_SESSION = 1
 
 vma.on_action.connect =
 vma.on_action.disconnect =

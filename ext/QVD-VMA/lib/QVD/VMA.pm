@@ -64,12 +64,6 @@ my %timeout = ( initiating => cfg('internal.nxagent.timeout.initiating'),
 our $nxagent_state_fn = "$run_path/nxagent.state";
 our $nxagent_pid_fn   = "$run_path/nxagent.pid";
 
-my %x_env;
-for (core_cfg_keys) {
-    /^(vma\.x-session\.env\.(.*))$/
-	and $x_env{$2} = core_cfg $1;
-}
-
 my %nx2x = ( initiating  => 'starting',
 	     starting    => 'listening',
 	     resuming    => 'listening',
