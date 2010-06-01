@@ -162,7 +162,7 @@ sub _call_printing_hook {
     eval {
 	my $props = Config::Properties->new;
 	open my $fh, '<', $printing_conf or die "Unable to open printing configuration";
-	$props->read($fh);
+	$props->load($fh);
 	close $fh;
 	_call_hook("printing $state", $on_printing{$state}, 1, $props->properties,
 		   'qvd.hook.on_printing', $state);
