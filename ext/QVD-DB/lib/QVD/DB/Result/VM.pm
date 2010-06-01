@@ -10,9 +10,10 @@ __PACKAGE__->add_columns( id      => { data_type         => 'integer',
 				       is_auto_increment => 1 },
 			  osi_id  => { data_type         => 'integer',
 				      is_auto_increment  => 1 },
-			  ip      => { data_type         => 'varchar(15)' },
+			  ip      => { data_type         => 'varchar(15)',
+				       is_nullable       => 1 },
 			  storage => { data_type         => 'varchar(4096)',
-					is_nullable      => 1 } );
+				       is_nullable       => 1 } );
 __PACKAGE__->set_primary_key('id');
 __PACKAGE__->add_unique_constraint(['name']);
 __PACKAGE__->belongs_to(user => 'QVD::DB::Result::User', 'user_id');
