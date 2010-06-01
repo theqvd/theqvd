@@ -51,7 +51,7 @@ my %on_state =    ( connected => cfg('vma.on_state.connected'),
 
 my %on_printing = ( connected => cfg('internal.vma.on_printing.connected'),
 		    suspended => cfg('internal.vma.on_printing.suspended'),
-		    stopped   => cfg('internal.vma.on_printing.stopped'),
+		    stopped   => cfg('internal.vma.on_printing.stopped'));
 
 my $display       = cfg('internal.nxagent.display');
 my $printing_port = $display + 2000;
