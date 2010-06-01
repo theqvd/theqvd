@@ -15,5 +15,8 @@ if ($params{'qvd.client.os'} eq 'windows') {
 	system("lpadmin -p $descr -v smb://127.0.0.1:$printing_port/$name -E");
     }
 } else {
-    #TODO configure printers for Unix clients
+    my @printers = grep s/^([^ ]+) /\1/, `lpstat -a`;
+    for my $printer (@printers) {
+	system("lpadmin -p $printer -v ipp://127.0.0.1:$printing_port/$printer -E");
+    }
 }
