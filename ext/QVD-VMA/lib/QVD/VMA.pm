@@ -293,18 +293,7 @@ sub _fork_monitor {
 		    }
 
 		    if ($enable_printing) {
-			if ($props{'qvd.client.os'} eq 'windows') {
-			    push @nx_args, 'smb=1';
-			    # FIXME configure smb printers for windows clients
-			    # The server will be on port ($display+3000)
-			} else {
-			    push @nx_args, 'cups=1';
-			    $ENV{CUPS_SERVER} = "localhost:".($display+2000);
-			    # FIXME launch a private cupsd like in
-			    # ImpresionFreeNx.
-			    # That should be configurable or scriptable
-			    # for instance in $x_session -- Salva
-			}
+			push @nx_args, 'cups=1';
 		    }
 
 		    my $nx_display = join(',', @nx_args) . ":$display";
