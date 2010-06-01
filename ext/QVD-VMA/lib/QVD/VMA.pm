@@ -293,7 +293,8 @@ sub _fork_monitor {
 		    }
 
 		    if ($enable_printing) {
-			push @nx_args, 'cups=1';
+			my $channel = $props{'qvd.client.os'} eq 'windows' ? 'smb' : 'cups';
+			push @nx_args, "$channel=$printing_port" ;
 		    }
 
 		    my $nx_display = join(',', @nx_args) . ":$display";
