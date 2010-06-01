@@ -1,6 +1,9 @@
 package QVD::DB::Result::User_Extra;
 use base qw/DBIx::Class/;
 
+# FIXME: convert this table to a key/value form in order to make the slots customizable.
+# ... or remove it completely and just use the User properties
+
 __PACKAGE__->load_components(qw/Core/);
 __PACKAGE__->table('user_extras');
 __PACKAGE__->add_columns( id         => { data_type         => 'integer',
