@@ -399,7 +399,7 @@ sub _stop_session {
 sub _save_printing_conf {
     my %args = @_;
     my $props = Config::Properties->new;
-    $props->setProperty('qvd.printing.enabled' => $printing_enabled && $args{'qvd.client.printing.enabled'});
+    $props->setProperty('qvd.printing.enabled' => $enable_printing && $args{'qvd.client.printing.enabled'});
     $props->setProperty('qvd.client.os' => $args{'qvd.client.os'});
     $props->setProperty('qvd.printing.port' => $printing_port);
 
