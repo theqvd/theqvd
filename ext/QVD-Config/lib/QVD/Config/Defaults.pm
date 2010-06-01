@@ -79,9 +79,8 @@ vm.ssh.redirect = 1
 
 vma.audio.enable = 0
 vma.printing.enable = 0
-
+vma.printing.config = /var/run/qvd/printing.conf
 vma.pid_file = /var/run/qvd/vma.pid
-vma.printing_conf = /var/run/qvd/printing.conf
 vma.nxagent.as_user = qvd
 
 vma.x-session.env.QVD_SESSION = 1
