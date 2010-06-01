@@ -16,19 +16,38 @@ my $ldap_scope  = cfg('auth.ldap.scope' , 0) // 'base';
 
 $ldap_scope =~ /^(?:base|one|sub)$/ or die "bad value $ldap_scope for auth.ldap.scope";
 
+sub _escape {
+    # This sub formerly copied from Net::LDAP::Filter
+    # Copyright (c) 1997-2004 Graham Barr.
+    my $str = shift;
+    $str =~ s/([\\\(\)\*\0-\37\177-\377])/sprintf("\\%02x",ord($1))/sge;
+    $str
+}
+
 sub authenticate_basic {
     my ($class, $auth, $login, $passwd) = @_;
     my $ldap = Net::LDAP->new($ldap_host)
 	// die "Unable to connect to LDAP server\n";
     my $msg = $ldap->bind;
     $msg->code and die "LDAP bind failed: " . $msg->error . "\n";
-    $msg = $ldap->search(base   => $ldap_base,
-			 filter => "(uid=$login)");
-    $msg->code and return ();
 
-    my $entry = ($msg->entries)[0]
-    $foreach my $entry ($mesg->entries) {
+    my $escaped_login = _escape($login);
+    my $filter = $ldap_filter;
+    $filter =~ s/\%u/$escaped_login/g;
+    $msg = $ldap->search(base   => $ldap_base,
+			 filter => $filter);
+    if (!$msg->code) {
+	if (defined (my $entry = ($msg->entries)[0])) {
+	    my $dn = $entry->dn;
+	    $msg = $ldap->bind($dn, password => $passwd);
+	    if (!$msg->code) {
+		return 1;
+	    }
+	}
+    }
+    return ()
 }
+
 
 1;
 
