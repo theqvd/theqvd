@@ -119,7 +119,7 @@ sub OnClickConnect {
     $self->{state} = "";
     %connect_info = ( link       => cfg('client.link'),
 		      audio      => cfg('client.audio.enable'),
-		      print      => cfg('client.printing.enable'),
+		      printing   => cfg('client.printing.enable'),
 		      geometry   => cfg('client.geometry'),
 		      fullscreen => cfg('client.fullscreen'),
 		      port       => $DEFAULT_PORT,
@@ -232,7 +232,7 @@ sub ConnectToVM {
 	      'qvd.client.link'       => $connect_info{link},
 	      'qvd.client.geometry'   => $connect_info{geometry},
 	      'qvd.client.fullscreen' => $connect_info{fullscreen},
-	      'qvd.client.print'      => defined $connect_info{print} );
+	      'qvd.client.printing'      => defined $connect_info{printing} );
 
     my $q = join '&', map { uri_escape($_) .'='. uri_escape($o{$_}) } keys %o;
     $httpc->send_http_request(GET => "/qvd/connect_to_vm?$q",
