@@ -8,6 +8,8 @@ use strict;
 use QVD::Config;
 use Net::LDAP;
 
+use parent qw(QVD::L7R::Authenticator::Plugin);
+
 sub login {
     my ($self, $user, $passwd) = @_;
     my $ldap = Net::LDAP->new (cfg('l7r.auth.ldap.host')) or return 0;
