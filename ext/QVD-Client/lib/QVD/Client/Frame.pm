@@ -227,12 +227,12 @@ sub ConnectToVM {
 
     # FIXME: get real keyboard mapping instead of using a hardcoded one
     my %o = ( id => $vm_id,
-	      'qvd.client.keyboard'   => 'pc105/es',
-	      'qvd.client.os'         => ($^O eq 'MSWin32') ? 'windows' : 'linux',
-	      'qvd.client.link'       => $connect_info{link},
-	      'qvd.client.geometry'   => $connect_info{geometry},
-	      'qvd.client.fullscreen' => $connect_info{fullscreen},
-	      'qvd.client.printing'      => defined $connect_info{printing} );
+	      'qvd.client.keyboard'         => 'pc105/es',
+	      'qvd.client.os'               => ($^O eq 'MSWin32') ? 'windows' : 'linux',
+	      'qvd.client.link'             => $connect_info{link},
+	      'qvd.client.geometry'         => $connect_info{geometry},
+	      'qvd.client.fullscreen'       => $connect_info{fullscreen},
+	      'qvd.client.printing.enabled' => defined $connect_info{printing} );
 
     my $q = join '&', map { uri_escape($_) .'='. uri_escape($o{$_}) } keys %o;
     $httpc->send_http_request(GET => "/qvd/connect_to_vm?$q",

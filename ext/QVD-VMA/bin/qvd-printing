@@ -1,13 +1,19 @@
 #!/usr/bin/perl
 
-# FIXME: changeme to do something usefull!
-
 use strict;
 use warnings;
 
-open my $f, ">/home/qvd/Desktop/printing.txt";
-
 my %params = @ARGV;
-for (sort keys %params) {
-        print $f "$_ = $params{$_}\n";
+my $client_os = $params{'qvd.client.os'};
+my $printing_port = $params{'qvd.printing.port'};
+if ($params{'qvd.client.os'} eq 'windows') {
+    my @lst = grep /^Printer/, `smbclient -L 127.0.0.1 -p $printing_port -gN`;
+    my %printers = map { $_ =~ /^Printer\|([^|]+)\|(.*)$/, $1 => $2} @lst;
+    while (my ($k, $v) = each(%printers)) {
+	my $name = $k;
+	(my $descr = $v) =~ tr/[A-Za-z0-9]/_/c;
+	system("lpadmin -p $descr -v smb://127.0.0.1:$printing_port/$name -E");
+    }
+} else {
+    #TODO configure printers for Unix clients
 }
