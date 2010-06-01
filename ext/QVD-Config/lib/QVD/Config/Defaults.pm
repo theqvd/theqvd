@@ -119,6 +119,6 @@ internal.nxagent.timeout.suspending = 20
 internal.nxagent.timeout.stopping = 20
 
 internal.vma.on_printing.connected = /usr/bin/qvd-printing
-internal.vma.on_printing.suspended = /usr/bin/qvd-printin
+internal.vma.on_printing.suspended = /usr/bin/qvd-printing
 internal.vma.on_printing.stopped = /usr/bin/qvd-printing
 
