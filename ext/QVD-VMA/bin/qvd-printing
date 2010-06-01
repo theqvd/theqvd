@@ -1,0 +1,13 @@
+#!/usr/bin/perl
+
+# FIXME: changeme to do something usefull!
+
+use strict;
+use warnings;
+
+open my $f, ">/home/qvd/Desktop/printing.txt";
+
+my %params = @ARGV;
+for (sort keys %params) {
+        print $f "$_ = $params{$_}\n";
+}
