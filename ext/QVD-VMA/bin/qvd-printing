@@ -17,6 +17,6 @@ if ($params{'qvd.client.os'} eq 'windows') {
 } else {
     my @printers = map { /^([^ ]+)/, $1} `lpstat -h 127.0.0.1:$prt_port -a`;
     for my $prt (@printers) {
-	system("lpadmin -p $prt -v ipp://127.0.0.1:$prt_port/$prt -E");
+	system("lpadmin -p $prt -v ipp://127.0.0.1:$prt_port/printers/$prt -E");
     }
 }
