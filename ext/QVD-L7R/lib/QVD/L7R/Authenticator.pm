@@ -24,6 +24,7 @@ sub new {
     my $class = shift;
     my $auth = { modules => [@plugin_modules],
 		 params  => {},
+		 login   => undef,
 		 user_id => undef };
     bless $auth, $class;
     $_->init($auth) for @plugin_modules;
@@ -34,24 +35,28 @@ sub authenticate_basic {
     my ($auth, $login, $passwd) = @_;
     DEBUG "authenticating user $login with modules @{$auth->{modules}}";
     for (@{$auth->{modules}}) {
-	$_->authenticate_basic($auth, $login, $passwd)
-	    and return 1;
+	if ($_->authenticate_basic($auth, $login, $passwd)) {
+	    $auth->{login} = $login;
+	    return 1;
+	}
     }
     return ();
 }
 
-sub user_id { shift->{user_id} // croak "internal error: user not authenticated yet!" }
+sub login { shift->{login} // croak "internal error: user not authenticated yet!" }
 
 sub params { %{shift->{params}} }
 
 sub before_connect_to_vm {
     my $auth = shift;
-    $_->before_connect_to_vm($auth) for @{$auth->{plugin_modules}};
+    DEBUG "calling before_connect_to_vm hook";
+    $_->before_connect_to_vm($auth) for @{$auth->{modules}};
 }
 
 sub before_list_of_vms {
     my $auth = shift;
-    $_->auto_provision($auth) for @{$auth->{plugin_modules}};
+    DEBUG "calling before_list_of_vms hook";
+    $_->before_list_of_vms($auth) for @{$auth->{modules}};
 }
 
 1;
