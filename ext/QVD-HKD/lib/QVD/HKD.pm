@@ -344,14 +344,9 @@ sub _start_vm {
                -redir => "tcp:${vma_port}::${vm_port_vma}",
                -redir => "tcp:${ssh_port}::${vm_port_ssh}");
 
-    if (defined $mon_port) {
-	push @cmd, ( -chardev => "socket,id=mon1,port=$mon_port,nodelay,server,nowait,telnet",
-		     -mon => "chardev=mon1,mode=readline" );
-    }
-
     my $redirect_io = $serial_capture;
     if (defined $serial_port) {
-        push @cmd, -serial => "telnet:${address}:$serial_port,server,nowait,nodelay";
+        push @cmd, -serial => "telnet::$serial_port,server,nowait,nodelay";
         undef $redirect_io;
     }
 
@@ -370,6 +365,10 @@ sub _start_vm {
     }
     else {
         push @cmd, '-nographic';
+    }
+
+    if (defined $mon_port) {
+	push @cmd, -monitor, "telnet::$mon_port,server,nowait,nodelay";
     }
 
     my $image = $hkd->_vm_image_path($vm) //
