@@ -10,11 +10,11 @@ __PACKAGE__->add_columns( host_id => { data_type   => 'integer' },
 				       is_nullable => 1 },
 			  state   => { data_type   => 'varchar(12)',
 				       is_enum => 1,
-				       extra => { list => [qw(stopped running stopping)] } },
+				       extra => { list => [qw(stopped running blocked stopping)] } },
 			  cmd     => { data_type   => 'varchar(12)',
 				       is_nullable => 1,
 				       is_enum     => 1,
-				       extra => { list => [qw(stop)] } } );
+				       extra => { list => [qw(stop block)] } } );
 
 __PACKAGE__->set_primary_key('host_id');
 __PACKAGE__->belongs_to('host' => 'QVD::DB::Result::Host', 'host_id');
