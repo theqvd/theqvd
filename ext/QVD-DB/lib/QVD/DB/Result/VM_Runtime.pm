@@ -21,7 +21,6 @@ __PACKAGE__->add_columns( vm_id          => { data_type   => 'integer' },
 			  real_user_id   => { data_type   => 'integer',
 					      is_nullable => 1 },
 			  vm_state       => { data_type   => 'varchar(12)',
-					      is_nullable => 1,
 					      is_enum     => 1,
 					      extra       => { list => [qw(stopped starting running
 									   stopping_1 stopping_2
@@ -37,7 +36,6 @@ __PACKAGE__->add_columns( vm_id          => { data_type   => 'integer' },
 			  vm_pid         => { data_type   => 'integer',
 					      is_nullable => 1	},
 			  user_state     => { data_type   => 'varchar(12)',
-					      is_nullable => 1,
 					      extra       => { list => [qw/disconnected connecting
 									   connected disconnecting
 									   aborting/] } },
