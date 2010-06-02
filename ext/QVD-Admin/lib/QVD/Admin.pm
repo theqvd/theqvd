@@ -145,19 +145,11 @@ sub cmd_vm_add {
 }
 
 sub cmd_user_add {
-    my $self = shift;
-    my %params = @_;
-    my %core_params = (
-	login => delete $params{login},
-	password => delete $params{password},
-    );
-    my $row = $self->_obj_add('user', 
-	[qw/login password/], %core_params);
-    if ($row) {
-	$params{id} = $row->id;
-	rs(User_Extra)->create(\%params);
-    }
-    $row->id
+    my ($self, %params) = @_;
+    my %core_params = ( login    => delete $params{login},
+			password => delete $params{password} );
+    $self->_obj_add('user', [qw/login password/], %core_params)
+	-> id;
 }
 
 sub cmd_osi_add {
@@ -575,9 +567,7 @@ Returns the id of the new virtual machine.
 
 =item cmd_user_add(%parameters)
 
-Adds a user. The required parameters are login and password. You can optionally
-specify the extra data that can be stored in the user_extras table, for example
-the user's department, telephone, or email.
+Adds a user. The required parameters are login and password.
 
 Returns the id of the new user.
 

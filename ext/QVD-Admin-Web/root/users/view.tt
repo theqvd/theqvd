@@ -10,14 +10,6 @@
 	    <td class="field">Name</td>
 	    <td class="value">[% user.login %]</td>
 	</tr>
-[% FOREACH pair = user.extra.get_columns.hash.pairs %]
-[% IF pair.key != 'id' %]
-	<tr>
-	    <td class="field">[% pair.key FILTER ucfirst %]</td>
-	    <td class="value">[% pair.value %]</td>
-	</tr>
-[% END %]
-[% END %]
     </table>
 </div>
 <p><a class="side_add" href="[% c.uri_for('/users/new_vm') %]/[% user.id %]">New virtual machine</a> | <a class="option_passwd" href="[% c.uri_for('/users/passwd') %]/[% user.id %]">Change password</a></p>
