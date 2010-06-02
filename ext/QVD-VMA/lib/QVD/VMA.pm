@@ -125,7 +125,7 @@ sub _call_hook {
 	    # FIXME: implement timeout for hooks
 	    my $kid = waitpid($pid, 0);
 	    if ($kid < 0) {
-		die "hook process $pid disappeared";
+		die "hook process $pid for $name disappeared";
 	    }
 	    if ($kid == $pid) {
 		$? and die "hook $file for $name failed, rc: ". ($? >> 8);
