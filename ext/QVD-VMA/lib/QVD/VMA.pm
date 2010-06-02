@@ -367,7 +367,7 @@ sub _stop_session {
     $state;
 }
 
-sub _save_printing_conf {
+sub _save_printing_config {
     my %args = @_;
     my $props = Config::Properties->new;
     $props->setProperty('qvd.printing.enabled' => ($enable_printing && $args{'qvd.client.printing.enabled'}) // 0);
@@ -381,7 +381,7 @@ sub _save_printing_conf {
     rename $tmp, $printing_conf or die "Unable to write printing configuration to $printing_conf";
 }
 
-sub _make_nxagent_conf {
+sub _make_nxagent_config {
     my %props = @_;
     my @nx_args;
     for my $key (keys %props2nx) {
@@ -415,7 +415,7 @@ sub _start_session {
 	when ('suspended') {
 	    _call_action_hook('connect',  @_);
 	    DEBUG "awaking nxagent";
-	    _save_printing_conf(@_);
+	    _save_printing_config(@_);
 	    _save_nxagent_state_and_call_hook 'initiating';
 	    _make_nxagent_config(@_);
 	    kill HUP => $pid;
@@ -427,7 +427,7 @@ sub _start_session {
 	}
 	when ('stopped') {
 	    _call_action_hook('connect', @_);
-	    _save_printing_conf(@_);
+	    _save_printing_config(@_);
 	    _fork_monitor(@_);
 	}
 	default {
