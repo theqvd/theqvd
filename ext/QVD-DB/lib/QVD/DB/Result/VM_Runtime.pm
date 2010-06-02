@@ -13,115 +13,61 @@ use QVD::Log;
 
 __PACKAGE__->load_components(qw/Core/);
 __PACKAGE__->table('vm_runtimes');
-__PACKAGE__->add_columns(
-	vm_id => {
-	    data_type => 'integer'
-	},
-	host_id  => {
-	    data_type => 'integer',
-	    is_nullable => 1
-	},
-	user_ip  => {
-	    data_type => 'varchar(15)',
-            is_nullable => 1
-        },
-	real_user_id => {
-	    data_type => 'integer',
-	    is_nullable => 1
-	},
-	vm_state => {
-	    data_type => 'varchar(12)',
-	    is_nullable => 1,
-	    is_enum => 1,
-            extra => {
-                list => [qw(stopped starting running
-			    stopping_1 stopping_2
-			    zombie_1 zombie_2)]
-            }
-	},
-	vm_state_ts => {
-	    data_type => 'integer',
-	    is_nullable => 1
-	},
-	vm_cmd => {
-	    data_type => 'varchar(12)',
-	    is_nullable => 1,
-	    is_enum => 1,
-            extra => {
-                list => [qw/start stop/]
-            }
-	},
-	vm_failures => {
-	    data_type => 'integer',
-	    is_nullable => 1
-	},
-	vm_pid => {
-	    data_type => 'integer',
-	    is_nullable => 1
-	},
-	user_state => {
-	    data_type => 'varchar(12)',
-            is_nullable => 1,
-	    extra => {
-                list => [qw/disconnected connecting connected disconnecting aborting/]
-            }
-        },
-	user_state_ts => {
-	    data_type => 'integer',
-	    is_nullable => 1
-	},
-	user_cmd => {
-	    data_type => 'varchar(12)',
-	    is_nullable => 1,
-	    extra => {
-                list => [qw/abort/]
-            }
-	},
-	vma_ok_ts => {
-	    data_type => 'integer',
-	    is_nullable => 1
-	},
-	l7r_host  => {
-	    data_type => 'integer',
-            is_nullable => 1
-        },
-	l7r_pid => {
-	    data_type => 'integer',
-	    is_nullable => 1
-	},
-        vm_address => {
-            data_type => 'varchar(127)',
-            is_nullable => 1
-        },
-        vm_vma_port => {
-            data_type => 'integer',
-            is_nullable => 1,
-        },
-        vm_x_port => {
-            data_type => 'integer',
-            is_nullable => 1,
-        },
-        vm_ssh_port => {
-            data_type => 'integer',
-            is_nullable => 1,
-        },
-        vm_vnc_port => {
-            data_type => 'integer',
-            is_nullable => 1,
-        },
-        vm_serial_port => {
-            data_type => 'integer',
-            is_nullable => 1,
-        },
-	osi_actual_id => {
-            data_type => 'integer',
-            is_nullable => 1,
-        },
-	blocked => {
-	    data_type => 'boolean',
-	    is_nullable => 1,
-	}
-	);
+__PACKAGE__->add_columns( vm_id          => { data_type   => 'integer' },
+			  host_id        => { data_type   => 'integer',
+					      is_nullable => 1 },
+			  user_ip        => { data_type   => 'varchar(15)',
+					      is_nullable => 1 },
+			  real_user_id   => { data_type   => 'integer',
+					      is_nullable => 1 },
+			  vm_state       => { data_type   => 'varchar(12)',
+					      is_nullable => 1,
+					      is_enum     => 1,
+					      extra       => { list => [qw(stopped starting running
+									   stopping_1 stopping_2
+									   zombie_1 zombie_2)] } },
+			  vm_state_ts    => { data_type   => 'integer',
+					      is_nullable => 1 },
+			  vm_cmd         => { data_type   => 'varchar(12)',
+					      is_nullable => 1,
+					      is_enum     => 1,
+					      extra       => { list => [qw/start stop/] } },
+			  vm_failures    => { data_type   => 'integer',
+					      is_nullable => 1 },
+			  vm_pid         => { data_type   => 'integer',
+					      is_nullable => 1	},
+			  user_state     => { data_type   => 'varchar(12)',
+					      is_nullable => 1,
+					      extra       => { list => [qw/disconnected connecting
+									   connected disconnecting
+									   aborting/] } },
+			  user_state_ts  => { data_type   => 'integer',
+					      is_nullable => 1 },
+			  user_cmd       => { data_type   => 'varchar(12)',
+					      is_nullable => 1,
+					      extra       => { list => [qw/abort/] } },
+			  vma_ok_ts      => { data_type   => 'integer',
+					      is_nullable => 1 },
+			  l7r_host       => { data_type   => 'integer',
+					      is_nullable => 1 },
+			  l7r_pid        => { data_type   => 'integer',
+					      is_nullable => 1 },
+			  vm_address     => { data_type   => 'varchar(127)',
+					      is_nullable => 1 },
+			  vm_vma_port    => { data_type   => 'integer',
+					      is_nullable => 1 },
+			  vm_x_port      => { data_type   => 'integer',
+					      is_nullable => 1 },
+			  vm_ssh_port    => { data_type   => 'integer',
+					      is_nullable => 1 },
+			  vm_vnc_port    => { data_type   => 'integer',
+					      is_nullable => 1 },
+			  vm_serial_port => { data_type   => 'integer',
+					      is_nullable => 1 },
+			  osi_actual_id  => { data_type   => 'integer',
+					      is_nullable => 1, },
+			  blocked        => { data_type   => 'boolean',
+					      is_nullable => 1 } );
 
 __PACKAGE__->set_primary_key('vm_id');
 
