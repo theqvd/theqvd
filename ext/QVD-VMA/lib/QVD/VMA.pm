@@ -38,7 +38,8 @@ my $x_session       = cfg('command.x-session');
 my $as_user         = cfg('vma.nxagent.as_user');
 my $enable_audio    = cfg('vma.audio.enable');
 my $enable_printing = cfg('vma.printing.enable');
-my $printing_conf   = cfg('vma.printing.config');
+my $printing_conf   = cfg('internal.vma.printing.config');
+my $nxagent_conf    = cfg('internal.vma.nxagent.config');
 
 my %on_action =   ( connect    => cfg('vma.on_action.connect'),
 		    disconnect => cfg('vma.on_action.disconnect'),
@@ -257,6 +258,8 @@ sub _fork_monitor {
 	    mkdir $run_path, 755;
 	    -d $run_path or die "Directory $run_path does not exist\n";
 
+	    _make_nxagent_config(@_);
+
 	    # detach from stdio and from process group so it is not killed by Net::Server
 	    open STDIN,  '<', '/dev/null';
 	    POSIX::dup2($logfd, 1);
@@ -277,31 +280,14 @@ sub _fork_monitor {
 		    POSIX::dup2(1, 2); # equivalent to shell 2>&1
 		    _become_user($as_user);
 
-		    my @nx_args = ('nx/nx');
-		    for my $key (keys %props2nx) {
-			my $val = $props{$key} // cfg("vma.default.$key", 0);
-			if (defined $val and length $val) {
-			    $val =~ m{^[\w/\-\+]+$}
-				or die "invalid characters in parameter $key";
-			    push @nx_args, "$props2nx{$key}=$val";
-			}
-		    }
-
-		    if ($enable_audio) {
-			push @nx_args, 'media=1';
-			$ENV{PULSE_SERVER} = "tcp:localhost:".($display+7000);
-		    }
-
-		    if ($enable_printing) {
-			my $channel = $props{'qvd.client.os'} eq 'windows' ? 'smb' : 'cups';
-			push @nx_args, "$channel=$printing_port" ;
-		    }
-
-		    my $nx_display = join(',', @nx_args) . ":$display";
+		    $ENV{PULSE_SERVER} = "tcp:localhost:".($display+7000) if $enable_audio;
 		    $ENV{NX_CLIENT} = $nxdiag;
 
+		    # FIXME: include VM name in -name argument
 		    # FIXME: reimplement xinit in Perl in order to allow capturing nxagent ouput alone
-		    my @cmd = (xinit => $x_session, '--', $nxagent, ":$display", '-ac', '-name', 'QVD', '-display', $nx_display);
+		    my @cmd = (xinit => $x_session, '--', $nxagent, ":$display",
+			       '-ac', '-name', 'QVD',
+			       '-display', "nx/nx,options=$nxagent_conf:$display");
 		    say "running @cmd";
 		    exec @cmd;
 		};
@@ -395,6 +381,33 @@ sub _save_printing_conf {
     rename $tmp, $printing_conf or die "Unable to write printing configuration to $printing_conf";
 }
 
+sub _make_nxagent_conf {
+    my %props = @_;
+    my @nx_args;
+    for my $key (keys %props2nx) {
+	my $val = $props{$key} // cfg("vma.default.$key", 0);
+	if (defined $val and length $val) {
+	    $val =~ m{^[\w/\-\+]+$}
+		or die "invalid characters in parameter $key";
+	    push @nx_args, "$props2nx{$key}=$val";
+	}
+    }
+
+    push @nx_args, 'media=1' if $enable_audio;
+
+    if ($enable_printing) {
+	# FIXME: check that printing is also enabled on the client
+	my $channel = $props{'qvd.client.os'} eq 'windows' ? 'smb' : 'cups';
+	push @nx_args, "$channel=$printing_port" ;
+    }
+
+    my $tmp = "$nxagent_conf.tmp";
+    open my $fh, '>', $tmp or die "Unable to save nxagent configuration to $tmp";
+    print join(',', 'nx/nx', @nx_args), ":$display\n";
+    close $fh or die "Unable to write nxagent configuration to $tmp";
+    rename $tmp, $nxagent_conf or die "Unable to write nxagent configuration to $nxagent_conf";
+}
+
 sub _start_session {
     my ($state, $pid) = _state;
     DEBUG "starting session in state $state, pid $pid";
@@ -404,6 +417,7 @@ sub _start_session {
 	    DEBUG "awaking nxagent";
 	    _save_printing_conf(@_);
 	    _save_nxagent_state_and_call_hook 'initiating';
+	    _make_nxagent_config(@_);
 	    kill HUP => $pid;
 	}
 	when ('connected') {

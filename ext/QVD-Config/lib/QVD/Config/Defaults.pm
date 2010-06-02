@@ -73,7 +73,6 @@ vm.ssh.redirect = 1
 
 vma.audio.enable = 0
 vma.printing.enable = 0
-vma.printing.config = /var/run/qvd/printing.conf
 vma.pid_file = /var/run/qvd/vma.pid
 vma.nxagent.as_user = qvd
 
@@ -123,3 +122,5 @@ internal.vma.on_printing.connected = /usr/bin/qvd-printing
 internal.vma.on_printing.suspended = /usr/bin/qvd-printing
 internal.vma.on_printing.stopped = /usr/bin/qvd-printing
 
+internal.vma.printing.config = ${path.run}/printing.conf
+internal.vma.nxagent.config = ${path.run}/nxagent.conf
