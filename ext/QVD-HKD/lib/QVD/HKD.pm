@@ -66,8 +66,7 @@ sub run {
 
 	$hkd->_reap_children;
 
-	my $check_all = not $round++ % $pool_all_mod;
-	$hkd->_check_vms($check_all);
+	$hkd->_check_vms($round++);
 
 	$hkd->_check_l7rs;
 
@@ -78,7 +77,7 @@ sub run {
 sub _reap_children { 1 while (waitpid(-1, WNOHANG) > 0) }
 
 sub _check_vms {
-    my ($hkd, $check_all) = @_;
+    my ($hkd, $round) = @_;
 
     my (@active_vms, @vmas);
     my $par = QVD::ParallelNet->new;
@@ -173,7 +172,8 @@ sub _check_vms {
 		    # harmless, so we didn't care!
 		    $vma_method = 'x_suspend';
 		}
-		elsif ($check_all) {
+		elsif (($round + $id) % $pool_all_mod == 0) {
+		    # this pings a few VMs on every round
 		    $vma_method = 'ping';
 		}
 	    }
