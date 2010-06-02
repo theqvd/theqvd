@@ -62,6 +62,8 @@ __PACKAGE__->add_columns( vm_id          => { data_type   => 'integer' },
 					      is_nullable => 1 },
 			  vm_vnc_port    => { data_type   => 'integer',
 					      is_nullable => 1 },
+			  vm_mon_port    => { data_type   => 'integer',
+					      is_nullable => 1 },
 			  vm_serial_port => { data_type   => 'integer',
 					      is_nullable => 1 },
 			  osi_actual_id  => { data_type   => 'integer',
@@ -139,14 +141,15 @@ sub update_vma_ok_ts { shift->update({vma_ok_ts => time}) }
 sub clear_vma_ok_ts { shift->update({vma_ok_ts => undef}) }
 
 sub unassign {
-    shift->update({host_id => undef,
-                   vm_vma_port => undef,
-                   vm_x_port => undef,
-                   vm_vnc_port => undef,
-                   vm_ssh_port => undef,
+    shift->update({host_id        => undef,
+                   vm_vma_port    => undef,
+                   vm_x_port      => undef,
+                   vm_vnc_port    => undef,
+                   vm_ssh_port    => undef,
                    vm_serial_port => undef,
-                   vm_address => undef,
-                   vma_ok_ts => undef});
+		   vm_mon_port    => undef,
+                   vm_address     => undef,
+                   vma_ok_ts      => undef});
 }
 
 sub set_vm_pid {

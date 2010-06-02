@@ -44,6 +44,7 @@ my $ssh_redirect    = cfg('vm.ssh.redirect');
 my $vnc_redirect    = cfg('vm.vnc.redirect');
 my $vnc_opts        = cfg('vm.vnc.opts');
 
+my $mon_redirect    = cfg('internal.vm.monitor.redirect');
 my $serial_redirect = cfg('vm.serial.redirect');
 my $serial_capture  = cfg('vm.serial.capture');
 
@@ -275,13 +276,13 @@ sub _allocate_port { $port++ }
 sub _assign_vm_ports {
     my ($hkd, $vm) = @_;
 
-    my @ports = (vm_vma_port => $hkd->_allocate_port,
-		 vm_x_port => $hkd->_allocate_port);
+    my @ports = ( vm_vma_port => $hkd->_allocate_port,
+		  vm_x_port   => $hkd->_allocate_port);
 
-    push @ports, vm_ssh_port => $hkd->_allocate_port if $ssh_redirect;
-    push @ports, vm_vnc_port => $hkd->_allocate_port if $vnc_redirect;
+    push @ports, vm_ssh_port    => $hkd->_allocate_port if $ssh_redirect;
+    push @ports, vm_vnc_port    => $hkd->_allocate_port if $vnc_redirect;
     push @ports, vm_serial_port => $hkd->_allocate_port if $serial_redirect;
-
+    push @ports, vm_mon_port    => $hkd->_allocate_port if $mon_redirect;
     $vm->update({vm_address => $vm->host->address, @ports });
 }
 
@@ -330,6 +331,7 @@ sub _start_vm {
     my $vnc_port = $vm->vm_vnc_port;
     my $ssh_port = $vm->vm_ssh_port;
     my $serial_port = $vm->vm_serial_port;
+    my $mon_port = $vm->vm_mon_port;
     my $osi = $vm->rel_vm_id->osi;
     my $address = $vm->vm_address;
     my $name = rs(VM)->find($vm->vm_id)->name;
@@ -342,8 +344,13 @@ sub _start_vm {
                -redir => "tcp:${vma_port}::${vm_port_vma}",
                -redir => "tcp:${ssh_port}::${vm_port_ssh}");
 
+    if (defined $mon_port) {
+	push @cmd, ( -chardev => "socket,id=mon1,port=$mon_port,nodelay,server,nowait,telnet",
+		     -mon => "chardev=mon1,mode=readline" );
+    }
+
     my $redirect_io = $serial_capture;
-    if ($vm->vm_serial_port) {
+    if (defined $serial_port) {
         push @cmd, -serial => "telnet:${address}:$serial_port,server,nowait,nodelay";
         undef $redirect_io;
     }
@@ -379,7 +386,7 @@ sub _start_vm {
         push @cmd, -hdb => $user_storage;
     }
 
-
+    DEBUG "running @cmd";
     my $pid = fork;
     unless ($pid) {
 	$pid // die "unable to fork virtual machine process";

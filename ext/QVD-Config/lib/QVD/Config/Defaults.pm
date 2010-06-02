@@ -110,6 +110,7 @@ internal.hkd.poll_all_mod = 10
 internal.vm.port.x = 5000
 internal.vm.port.vma = 3030
 internal.vm.port.ssh = 22
+internal.vm.monitor.redirect = 0
 
 internal.nxagent.display = 100
 
