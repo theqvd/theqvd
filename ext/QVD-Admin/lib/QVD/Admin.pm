@@ -111,8 +111,10 @@ sub _obj_add {
 
 sub cmd_host_add {
     my $self = shift;
-    my $row = $self->_obj_add('host', [qw/name address/], @_);
-    rs(Host_Runtime)->create({host_id => $row->id});
+    my $row = $self->_obj_add('host', [qw/name address/],
+			      @_, frontend => 1, backend => 1);
+    rs(Host_Runtime)->create({ host_id  => $row->id,
+			       state    => 'stopped' });
     $row->id
 }
 
