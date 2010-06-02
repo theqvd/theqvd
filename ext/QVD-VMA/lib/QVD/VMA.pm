@@ -403,7 +403,7 @@ sub _make_nxagent_config {
 
     my $tmp = "$nxagent_conf.tmp";
     open my $fh, '>', $tmp or die "Unable to save nxagent configuration to $tmp";
-    print join(',', 'nx/nx', @nx_args), ":$display\n";
+    print $fh join(',', 'nx/nx', @nx_args), ":$display\n";
     close $fh or die "Unable to write nxagent configuration to $tmp";
     rename $tmp, $nxagent_conf or die "Unable to write nxagent configuration to $nxagent_conf";
 }
