@@ -79,7 +79,7 @@ sub new {
 	$grid_sizer->Add(Wx::StaticText->new($panel, -1, "Connection type"),
 			 0, wxALL, 5);			 
 			 
-	my @link_options = ("LAN", "ADSL", "Modem");
+	my @link_options = ("Local", "ADSL", "Modem");
 	$self->{link} = Wx::Choice->new($panel, -1);
 	$grid_sizer->Add($self->{link},
 			 1, wxALL|wxEXPAND, 5);
