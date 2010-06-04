@@ -79,7 +79,7 @@ sub new {
 	$grid_sizer->Add(Wx::StaticText->new($panel, -1, "Connection type"),
 			 0, wxALL, 5);			 
 			 
-	my @link_options = ("ADSL", "LAN");
+	my @link_options = ("LAN", "ADSL", "Modem");
 	$self->{link} = Wx::Choice->new($panel, -1);
 	$grid_sizer->Add($self->{link},
 			 1, wxALL|wxEXPAND, 5);
@@ -373,7 +373,8 @@ sub SaveConfiguration {
     set_core_cfg('client.user.name', $self->{username}->GetValue());
     set_core_cfg('client.host.name', $self->{host}->GetValue());
     #set_core_cfg('client.host.port', $self->{port}->GetValue());
-    #set_core_cfg('client.link', $self->{link}->GetValue());
+    set_core_cfg('client.link', lc($self->{link}->GetStringSelection()));
+        
     #set_core_cfg('client.audio.enable', $self->{audio}->GetValue());
     #set_core_cfg('client.printing.enable', $self->{printing}->GetValue());
     #set_core_cfg('client.fullscreen', $self->{fullscreen}->GetValue());
