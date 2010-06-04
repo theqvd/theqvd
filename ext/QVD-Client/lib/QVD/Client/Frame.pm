@@ -76,6 +76,17 @@ sub new {
 	$grid_sizer->Add($self->{host},
 			 1, wxALL|wxEXPAND, 5);
 
+	$grid_sizer->Add(Wx::StaticText->new($panel, -1, "Connection type"),
+			 0, wxALL, 5);			 
+			 
+	my @link_options = ("ADSL", "LAN");
+	$self->{link} = Wx::Choice->new($panel, -1);
+	$grid_sizer->Add($self->{link},
+			 1, wxALL|wxEXPAND, 5);
+	$self->{link}->AppendItems(\@link_options);
+	$self->{link}->Select(0);
+	# FIXME Introduce previous user selection here
+
 	# port goes here!
 	$self->{connect_button} = Wx::Button->new($panel, -1, "Connect");
 	$ver_sizer->Add($self->{connect_button},
