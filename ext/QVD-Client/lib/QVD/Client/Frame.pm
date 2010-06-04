@@ -44,8 +44,12 @@ sub new {
 
 	# FIXME Hardcoded path!
 	# logo image
+	my $logo_image = "QVD-Client/pixmaps/qvd-logo.png";
+	unless (-e $logo_image) {
+	    $logo_image = "/usr/share/pixmaps/qvd-logo.png";
+	}
 	$ver_sizer->Add(Wx::StaticBitmap->new($panel, -1,
-					      Wx::Bitmap->new("/usr/share/pixmaps/qvd-logo.png",
+					      Wx::Bitmap->new($logo_image,
 							      wxBITMAP_TYPE_ANY)),
 			0, wxLEFT|wxRIGHT|wxTOP|wxALIGN_CENTER_HORIZONTAL, 20);
 
@@ -88,7 +92,12 @@ sub new {
 	$self->SetTitle("QVD");
 	my $icon = Wx::Icon->new();
 	# FIXME Hardcoded path!
-	$icon->CopyFromBitmap(Wx::Bitmap->new("/usr/share/pixmaps/qvd.xpm", wxBITMAP_TYPE_ANY));
+	
+	$logo_image = "QVD-Client/pixmaps/qvd.xpm";
+	unless (-e $logo_image) {
+	    $logo_image = "/usr/share/pixmaps/qvd.xpm";
+	}
+	$icon->CopyFromBitmap(Wx::Bitmap->new($logo_image, wxBITMAP_TYPE_ANY));
 	$self->SetIcon($icon);
 
 	$panel->SetSizer($ver_sizer);
