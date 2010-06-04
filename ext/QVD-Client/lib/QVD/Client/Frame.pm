@@ -355,7 +355,7 @@ sub OnConnectionStatusChanged {
 
 sub EnableControls {
     my ($self, $enabled) = @_;
-    $self->{$_}->Enable($enabled) for qw(connect_button host username password);
+    $self->{$_}->Enable($enabled) for qw(connect_button host username password link);
 }
 
 sub OnTimer {
