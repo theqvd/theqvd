@@ -57,10 +57,7 @@ my $persistent_overlay = cfg('vm.overlay.persistent');
 
 sub run {
     my $hkd = shift;
-
-    # flag to test VMAs on running machines once every twelve runs
     my $round = 0;
-
     while (1) {
 	DEBUG "HKD run, round: $round";
 
