@@ -97,12 +97,12 @@ internal.l7r.retry.x_start = 5
 internal.l7r.poll_time.vm = 3
 internal.l7r.poll_time.x = 1
 
-internal.hkd.timeout.state.starting = 240
-internal.hkd.timeout.state.stopping_1 = 30
-internal.hkd.timeout.state.stopping_2 = 240
-internal.hkd.timeout.state.zombie_1 = 30
-internal.hkd.timeout.state.running = 120
-internal.hkd.timeout.vma = 4
+internal.hkd.timeout.vm.state.starting = 240
+internal.hkd.timeout.vm.state.stopping_1 = 30
+internal.hkd.timeout.vm.state.stopping_2 = 240
+internal.hkd.timeout.vm.state.zombie_1 = 30
+internal.hkd.timeout.vm.state.running = 120
+internal.hkd.timeout.vm.vma = 4
 internal.hkd.poll_time = 2
 internal.hkd.poll_all_mod = 10
 

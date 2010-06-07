@@ -19,11 +19,11 @@ use QVD::Log;
 my %cmd = ( kvm     => cfg('command.kvm'),
 	    kvm_img => cfg('command.kvm-img') );
 
-my %timeout = ( starting    => cfg('internal.hkd.timeout.state.starting'),
-	        stopping_1  => cfg('internal.hkd.timeout.state.stopping_1'),
-		stopping_2  => cfg('internal.hkd.timeout.state.stopping_2'),
-		zombie_1    => cfg('internal.hkd.timeout.state.zombie_1'),
-		vma         => cfg('internal.hkd.timeout.state.running') );
+my %timeout = ( starting    => cfg('internal.hkd.timeout.vm.state.starting'),
+	        stopping_1  => cfg('internal.hkd.timeout.vm.state.stopping_1'),
+		stopping_2  => cfg('internal.hkd.timeout.vm.state.stopping_2'),
+		zombie_1    => cfg('internal.hkd.timeout.vm.state.zombie_1'),
+		vma         => cfg('internal.hkd.timeout.vm.state.running') );
 
 my $parallel_net_timeout = cfg('internal.hkd.timeout.vma');
 
