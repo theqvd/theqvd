@@ -7,7 +7,8 @@ __PACKAGE__->add_columns( id         => { data_type         => 'integer',
 					  is_auto_increment => 1 },
 			  login      => { data_type         => 'varchar(64)' },
 			  # FIXME: get passwords out of this table!
-			  password   => { data_type         => 'varchar(64)' } );
+			  password   => { data_type         => 'varchar(64)',
+					  is_nullable       => 1 } );
 
 __PACKAGE__->set_primary_key('id');
 __PACKAGE__->add_unique_constraint(['login']);
