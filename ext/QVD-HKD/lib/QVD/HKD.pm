@@ -25,7 +25,7 @@ my %timeout = ( starting    => cfg('internal.hkd.timeout.vm.state.starting'),
 		zombie_1    => cfg('internal.hkd.timeout.vm.state.zombie_1'),
 		vma         => cfg('internal.hkd.timeout.vm.state.running') );
 
-my $parallel_net_timeout = cfg('internal.hkd.timeout.vma');
+my $parallel_net_timeout = cfg('internal.hkd.timeout.vm.vma');
 
 my $pool_time       = cfg('internal.hkd.poll_time');
 my $pool_all_mod    = cfg('internal.hkd.poll_all_mod');
