@@ -22,8 +22,9 @@ sub before_list_of_vms {
     }
     else {
 	INFO "Auto provisioning user $login";
-	$user_id = rs(User)->create({ login => $login })
+	my $user_id_obj = rs(User)->create({ login => $login})
 	    // die "Unable to provision user $login";
+        $user_id = $user_id_obj->id;
     }
 
     if (rs(VM)->search({user_id => $user_id})->count == 0) {
