@@ -4,6 +4,11 @@ package QVD::Client::App;
 
 use strict;
 use warnings;
+
+use Proc::Background;
+
+my $WINDOWS;
+
 BEGIN {
     $QVD::Config::USE_DB = 0;
     @QVD::Config::FILES = ('/etc/qvd/client.conf',
@@ -13,13 +18,21 @@ BEGIN {
     # FIXME NX_CLIENT is used for showing the user information on things
     # like broken connection, perhaps we should show them to the user
     # instead of ignoring them? 
-    $ENV{NX_CLIENT} = ($^O eq 'MSWin32') ? 'cmd.exe /c :' : '/bin/false';
+    $WINDOWS = ($^O eq 'MSWin32');
+    $ENV{NX_CLIENT} = $WINDOWS ? 'cmd.exe /c :' : '/bin/false';
 }
 use QVD::Client::Frame;
 use parent 'Wx::App';
 
 sub OnInit {
     my $self = shift;
+    
+    if ($WINDOWS) {
+      my @cmd;
+      push @cmd, 'Xming/Xming.exe -multiwindow';
+      Proc::Background->new(@cmd);   
+    }
+    
     my $frame = QVD::Client::Frame->new();
     $self->SetTopWindow($frame);
     $frame->Show();
