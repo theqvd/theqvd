@@ -124,3 +124,8 @@ internal.vma.on_printing.stopped = /usr/bin/qvd-printing
 
 internal.vma.printing.config = ${path.run}/printing.conf
 internal.vma.nxagent.config = ${path.run}/nxagent.conf
+
+internal.database.client.connect.timeout = 20
+internal.database.client.socket.keepidle = 20
+internal.database.client.socket.keepintvl = 5
+internal.database.client.socket.keepcnt = 4
