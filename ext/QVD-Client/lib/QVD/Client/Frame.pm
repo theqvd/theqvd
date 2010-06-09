@@ -31,7 +31,7 @@ sub new {
 	$size   = wxDefaultSize      unless defined $size;
 	$name   = ""                 unless defined $name;
 
-	$style = wxICONIZE|wxCAPTION|wxMINIMIZE|wxCLOSE_BOX
+	$style = wxCAPTION|wxCLOSE_BOX
 		unless defined $style;
 
 	my $self = $class->SUPER::new( $parent, $id, $title, $pos, $size, $style, $name );
