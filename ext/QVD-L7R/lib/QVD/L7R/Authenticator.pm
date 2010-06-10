@@ -37,6 +37,7 @@ sub authenticate_basic {
     for (@{$auth->{modules}}) {
 	if ($_->authenticate_basic($auth, $login, $passwd)) {
 	    $auth->{login} = $login;
+	    $auth->{params}{'qvd.vm.user'} = $login;
 	    return 1;
 	}
     }
