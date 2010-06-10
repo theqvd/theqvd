@@ -186,6 +186,7 @@ sub _become_user {
     ($<, $>) = ($uid, $uid);
     $ENV{'HOME'} = $home;
     $ENV{'LOGNAME'} = $user;
+    chdir $home;
 }
 
 sub _read_line {
@@ -234,6 +235,10 @@ sub _timestamp {
     sprintf("%04d%02d%02d%02d%02d%02d", @t[5, 4, 3, 2, 1, 0]);
 }
 
+sub _provisionate_user {
+    my %props = @_;
+}
+
 my %props2nx = ( 'qvd.client.keyboard'   => 'keyboard',
 		 'qvd.client.os'         => 'client',
 		 'qvd.client.link'       => 'link',
@@ -258,8 +263,6 @@ sub _fork_monitor {
 	    mkdir $run_path, 755;
 	    -d $run_path or die "Directory $run_path does not exist\n";
 
-	    _make_nxagent_config(@_);
-
 	    # detach from stdio and from process group so it is not killed by Net::Server
 	    open STDIN,  '<', '/dev/null';
 	    POSIX::dup2($logfd, 1);
@@ -278,7 +281,10 @@ sub _fork_monitor {
 
 		eval {
 		    POSIX::dup2(1, 2); # equivalent to shell 2>&1
-		    _become_user($as_user);
+
+		    _provisionate_user(@_);
+
+		    _make_nxagent_config(@_);
 
 		    $ENV{PULSE_SERVER} = "tcp:localhost:".($display+7000) if $enable_audio;
 		    $ENV{NX_CLIENT} = $nxdiag;
@@ -289,6 +295,7 @@ sub _fork_monitor {
 			       '-ac', '-name', 'QVD',
 			       '-display', "nx/nx,options=$nxagent_conf:$display");
 		    say "running @cmd";
+		    _become_user($as_user);
 		    exec @cmd;
 		};
 		say "Unable to start X server: " .($@ || $!);
