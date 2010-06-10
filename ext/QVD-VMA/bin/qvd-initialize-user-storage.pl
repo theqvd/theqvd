@@ -18,28 +18,29 @@ my $drive       = cfg('vma.user.drive');
 
 my $partition = $drive . '1';
 
-my $root_dev = (stat '/')[0];
-my $user_dev = (stat $mount_point)[0];
+my $user_home = "$mount_point/$user";
 
-if ($root_dev == $user_dev) {
-    if (-e $partition) {
+unless (-d $user_home) {
+
+    my $root_dev = (stat '/')[0];
+    my $user_dev = (stat $mount_point)[0];
+
+    if ($root_dev == $user_dev) {
+	unless (-e $partition) {
+	    system ("echo , | sfdisk $drive")
+		and die "Unable to create partition table on user storage";
+
+	    system ("mkfs.$fstype" =>  $partition)
+		and die "Unable to create file system on user storage";
+	}
+
 	system mount => $partition, $mount_point
 	    and die 'Unable to mount user storage';
     }
-    else {
-	system ("echo , | sfdisk $drive")
-	    and die "Unable to create partition table on user storage";
 
-	system ("mkfs.$fstype" =>  $partition)
-	    and die "Unable to create file system on user storage";
+    system (cp => "-a", "/etc/skel", $user_home)
+	and die "Unable to copy /etc/skel to $user_home";
 
-	system (mount => $partition, $mount_point)
-	    and die 'Unable to mount user storage';
-
-	system (cp => "-a", "/etc/skel", "$mount_point/$user")
-	    and die "Unable to copy /etc/skel to user storage";
-
-	system (chown => "-R", $user, "$mount_point/$user")
-	    and die "Unable to change the owner of user storage to $user";
-    }
+    system (chown => "-R", "$user:$user", $user_home)
+	and die "Unable to change the owner of user storage to $user";
 }
