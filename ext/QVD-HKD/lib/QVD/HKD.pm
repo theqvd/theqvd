@@ -69,9 +69,10 @@ sub run {
 	    $rt = rs(Host_Runtime)->find($id);
 	    $rt->set_state('starting');
 	    for my $vm (rs(VM_Runtime)->search({host_id => $id})) {
+		DEBUG "releasing VM " . $vm->id;
 		txn_do {
 		    $vm->discard_changes;
-		    $vm->set_state('stopped');
+		    $vm->set_vm_state('stopped');
 		    $vm->block;
 		    $vm->unassign;
 		};
