@@ -177,3 +177,5 @@ sub vma_url {
 }
 
 sub combined_properties { shift->rel_vm_id->combined_properties }
+
+1;

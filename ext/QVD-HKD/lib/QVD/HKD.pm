@@ -50,24 +50,77 @@ my $serial_capture  = cfg('vm.serial.capture');
 
 my $persistent_overlay = cfg('vm.overlay.persistent');
 
+my $database_timeout = core_cfg('internal.database.timeout');
+my $database_delay   = core_cfg('internal.database.retry_delay');
+
 # The class QVD::HKD does not have state so we use the class name as
 # the object.
 #
 # sub new { ... }
 
+my $start_time;
+
 sub run {
     my $hkd = shift;
+    my ($id, $rt);
+    for (1..10) {
+	eval {
+	    $id = this_host_id;
+	    $rt = rs(Host_Runtime)->find($id);
+	    $rt->set_state('starting');
+	    for my $vm (rs(VM_Runtime)->search({host_id => $id})) {
+		txn_do {
+		    $vm->discard_changes;
+		    $vm->block;
+		    $vm->unassign;
+		};
+	    }
+	    $rt->set_state('running');
+	};
+	if ($@) {
+	    ERROR "HKD initialization failed, retrying: $@";
+	    sleep 3;
+	    next;
+	}
+    }
+    if ($@) {
+	ERROR "HKD initialization failed, aborting: $@";
+	exit(1);
+    }
+
     my $round = 0;
+    my $ok_ts = time;
+
     while (1) {
 	DEBUG "HKD run, round: $round";
 
 	$hkd->_reap_children;
 
-	$hkd->_check_vms($round++);
+	if (eval { $rt->update_ok_ts; 1 }) {
+	    $ok_ts = time;
+	    $start_time //= $ok_ts;
+	    $hkd->_check_vms($round++);
+	    $hkd->_check_l7rs;
+	    sleep $pool_time;
+	}
+	else { # database is not available
+	    if (time > $ok_ts + $database_timeout) {
+		ERROR "HKD can not connect to database, aborting: $@";
+		$hkd->_dirty_shutdown;
+		exit 1;
+	    }
+	    INFO "HKD can not connect to database, retrying: $@";
+	    sleep $database_delay;
+	    undef $start_time;
+	}
+    }
+}
 
-	$hkd->_check_l7rs;
-
-	sleep $pool_time;
+sub _dirty_shutdown {
+    # FIXME: this is way too dirty...
+    for (1..3) {
+	system "pkill kvm";
+	sleep 1;
     }
 }
 
@@ -205,7 +258,7 @@ sub _check_vms {
 		when('running') {
 		    my $vma_ok_ts = $vm->vma_ok_ts;
 		    DEBUG "vma_timeout $timeout{vma}, elapsed " . (time - $vma_ok_ts);
-		    if (max($^T, $vma_ok_ts) + $timeout{vma} < time) {
+		    if (max($start_time, $vma_ok_ts) + $timeout{vma} < time) {
 			# FIXME: check also that the number of consecutive
 			# failed checks goes over some threshold
 			ERROR "machine has not responded for a long time (" .
@@ -255,7 +308,7 @@ sub _go_zombie_on_timeout {
 	my $vm_state_ts = $vm->vm_state_ts;
 	DEBUG "timeout in state $vm_state is $timeout, elapsed "
 	    . (time - $vm_state_ts);
-	if (max($^T, $vm_state_ts) + $timeout < time) {
+	if (max($start_time, $vm_state_ts) + $timeout < time) {
 	    ERROR "vm staled in state $vm_state,".
 		" id: $id, state_ts: $vm_state_ts, time: ".time;
 	    my $new_state = ($vm_state eq 'zombie_1' ? 'zombie_2' : 'zombie_1');
