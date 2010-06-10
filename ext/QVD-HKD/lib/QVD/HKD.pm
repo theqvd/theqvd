@@ -71,6 +71,7 @@ sub run {
 	    for my $vm (rs(VM_Runtime)->search({host_id => $id})) {
 		txn_do {
 		    $vm->discard_changes;
+		    $vm->set_state('stopped');
 		    $vm->block;
 		    $vm->unassign;
 		};
