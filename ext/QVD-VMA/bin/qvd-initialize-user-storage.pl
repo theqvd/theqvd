@@ -13,8 +13,8 @@ use QVD::Config;
 
 my $fstype      = cfg('vma.user.home.fs');
 my $mount_point = cfg('vma.user.home.path');
+my $drive       = cfg('vma.user.home.drive');
 my $user        = cfg('vma.user.name');
-my $drive       = cfg('vma.user.drive');
 
 my $partition = $drive . '1';
 
