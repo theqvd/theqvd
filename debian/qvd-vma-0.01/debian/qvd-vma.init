@@ -29,8 +29,6 @@ set -e
 case "$1" in
   start)
         echo "Starting $DESC: "
-	# FIXME This is a hack, this test should be in the perl script
-	[ -b '/dev/sdb' ] && /usr/bin/qvd-initialize-user-storage.pl
 	"$DAEMON" start
         ;;
   stop)
