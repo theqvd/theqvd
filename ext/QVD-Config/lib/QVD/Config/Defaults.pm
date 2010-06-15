@@ -74,12 +74,12 @@ vm.ssh.redirect = 1
 vma.audio.enable = 0
 vma.printing.enable = 0
 vma.pid_file = /var/run/qvd/vma.pid
-vma.nxagent.as_user = qvd
 
 vma.user.home.drive = /dev/sdb
 vma.user.home.fs = ext4
 vma.user.home.path = /home
-vma.user.name = qvd
+vma.user.default.name = qvd
+vma.user.default.groups =
 
 vma.on_action.connect =
 vma.on_action.disconnect =
