@@ -360,9 +360,9 @@ sub _fork_monitor {
 		    my $user = $props{'qvd.vm.user.name'}   //= $default_user_name;
 		    $props{'qvd.vm.user.groups'} //= $default_user_groups;
 		    $props{'qvd.vm.user.home'} = "$home_path/$user";
-		    _provisionate_user(@_);
+		    _provisionate_user(%props);
 
-		    _make_nxagent_config(@_);
+		    _make_nxagent_config(%props);
 
 		    $ENV{PULSE_SERVER} = "tcp:localhost:".($display+7000) if $enable_audio;
 		    $ENV{NX_CLIENT} = $nxdiag;
