@@ -33,6 +33,10 @@ command.nxagent = /usr/bin/nxagent
 command.nxdiag = /usr/bin/nxdiag.pl
 command.x-session = /etc/X11/Xsession
 
+command.adduser = /usr/sbin/adduser
+command.deluser = /usr/sbin/deluser
+command.usermod = /usr/sbin/usermod
+
 client.link = adsl
 client.geometry = 1024x768
 client.fullscreen =

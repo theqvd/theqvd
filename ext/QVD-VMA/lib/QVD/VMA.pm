@@ -40,6 +40,10 @@ my $enable_printing = cfg('vma.printing.enable');
 my $printing_conf   = cfg('internal.vma.printing.config');
 my $nxagent_conf    = cfg('internal.vma.nxagent.config');
 
+my $adduser         = cfg('command.adduser');
+my $deluser         = cfg('command.deluser');
+my $usermod         = cfg('command.usermod');
+
 my $default_user_name   = cfg('vma.user.default.name');
 my $default_user_groups = cfg('vma.user.default.groups');
 
@@ -66,8 +70,6 @@ my %on_provisioning = ( mount_home     => cfg('vma.on_provisioning.mount_home'),
 my %on_printing = ( connected => cfg('internal.vma.on_printing.connected'),
 		    suspended => cfg('internal.vma.on_printing.suspended'),
 		    stopped   => cfg('internal.vma.on_printing.stopped'));
-
-
 
 my $display       = cfg('internal.nxagent.display');
 my $printing_port = $display + 2000;
@@ -295,11 +297,11 @@ sub _provisionate_user {
 			    '--quiet');
 		push @args, '--uid' => $uid if $uid;
 		push @args, $user;
-		system adduser => @args
+		system $adduser => @args
 		    and die "provisioning of user $user failed, adduser\n";
 		if (length $groups) {
 		    $groups =~ s/\s*,\s*/,/g;
-		    system usermod => -G => $groups, $user
+		    system $usermod => -G => $groups, $user
 			and die "unable to add user $user to groups $groups\n";
 		}
 		_call_provisioning_hook(after_add_user => @_);
@@ -307,7 +309,7 @@ sub _provisionate_user {
 	    };
 	    if ($@) {
 		# clean up, do not left the system in an inconsistent state
-		system deluser => '--remove-all-files', '--quiet', $user;
+		system $deluser => '--remove-all-files', '--quiet', $user;
 		die $@;
 	    }
 	}
