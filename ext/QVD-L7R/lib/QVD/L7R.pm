@@ -85,6 +85,11 @@ sub connect_to_vm_processor {
 	and $l7r->throw_http_error(HTTP_FORBIDDEN,
 				   "You are not allowed to access requested virtual machine");
 
+    if (my @forbidden = grep !/^(?:qvd\.client\.|custom\.)/, keys %params) {
+	$l7r->throw_http_error(HTTP_FORBIDDEN,
+			       "Invalid parameters @forbidden");
+    }
+
     $vm->blocked
 	and $l7r->throw_http_error(HTTP_FORBIDDEN,
 				   "The requested virtual machine is offline for maintenance");
