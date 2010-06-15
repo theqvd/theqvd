@@ -262,11 +262,11 @@ sub _provisionate_user {
     my $user = $props{'qvd.vm.user.name'};
     my $uid = $props{'qvd.vm.user.uid'};
     my $groups = $props{'qvd.vm.user.groups'};
-    my $user_home = $propos{'qvd.vm.user.home'};
+    my $user_home = $props{'qvd.vm.user.home'};
 
     unless (-d $user_home) {
 	unless (_call_provisioning_hook(mount_home => @_)) {
-	    if (length $drive) {
+	    if (length $home_drive) {
 		my $root_dev = (stat '/')[0];
 		my $home_dev = (stat $user_home)[0];
 		if ($root_dev == $home_dev) {
