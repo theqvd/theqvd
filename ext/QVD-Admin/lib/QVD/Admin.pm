@@ -5,22 +5,27 @@ our $VERSION = '0.01';
 use warnings;
 use strict;
 
+use File::Copy qw(copy move);
+use File::Basename qw(basename);
+
 use QVD::DB::Simple;
 use QVD::Config;
+
+my $osi_default_memory  = cfg('osi.default.memory');
+my $osi_default_overlay = cfg('osi.default.overlay');
+
+my $images_path         = cfg('path.storage.images');
 
 sub new {
     my $class = shift;
     my $quiet = shift;
     my $self = { filter => {},
 		 quiet => $quiet,
-		 objects => {
-			     host => 'Host',
-			     vm => 'VM',
-			     user => 'User',
-			     config => 'Config',
-			     osi => 'OSI',
-			    },
-	       };
+		 objects => { host => 'Host',
+			      vm => 'VM',
+			      user => 'User',
+			      config => 'Config',
+			      osi => 'OSI' } };
     bless $self, $class;
 }
 
@@ -158,29 +163,32 @@ sub cmd_osi_add {
     my ($self, %params) = @_;
     my @required_params = qw/name memory use_overlay user_storage_size disk_image/;
 
-    # Default OSI parameters
-    # FIXME Detect type of image and set use_overlay accordingly, iso=no overlay
-    $params{memory} //= 256;
-    $params{use_overlay} //= 1;
-    $params{user_storage_size} //= undef;
+    # FIXME: detect type of image and set use_overlay accordingly, iso => no overlay
+    $params{memory}      //= $osi_default_memory;
+    $params{use_overlay} //= $osi_default_overlay;
 
     die "The required parameters are ".join(", ", @required_params)
 	unless _set_equals([keys %params], \@required_params);
 
-    use File::Basename qw/basename/;
-    my $img = $params{disk_image};
-    $params{disk_image} = basename($img);
+    mkdir $images_path, 0755;
+    -d $images_path or die "Directory $images_path does not exist";
 
-    my $destination = cfg('path.storage.images');
-    unless (-f $destination.'/'.$params{disk_image}) {
-	use File::Copy qw/copy/;
-	copy($img, $destination) or die "Unable to copy $img to storage: $^E";
-    }
+    my $src = delete $params{disk_image};
+    my $file = basename($src);
+    my $tmp = "$images_path/$file.tmp";
+    copy($src, $tmp) or die "Unable to copy $src to $tmp: $^E";
 
-    my $rs = $self->get_resultset('osi');
-    my $row = $rs->create(\%params);
-
-    $row->id;
+    $params{disk_image} = '-';
+    my $id;
+    txn_do {
+	my $rs = $self->get_resultset('osi');
+	my $row = $rs->create(\%params);
+	$id = $row->id;
+	my $disk_image = "$id-$file";
+	move($tmp, "$images_path/$disk_image");
+	$row->update({disk_image => $disk_image});
+    };
+    $id
 }
 
 sub _obj_del {
@@ -195,7 +203,7 @@ sub cmd_host_del {
 
 sub cmd_user_del {
     shift->_obj_del('user', @_);
-    # FIXME Should we delete the overlay image and home disk files?
+    # FIXME Should we delete VMs, overlay images and home disk files?
 }
 
 sub cmd_vm_del {
