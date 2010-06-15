@@ -71,6 +71,9 @@ vm.serial.redirect = 1
 vm.serial.capture = 0
 vm.ssh.redirect = 1
 
+osi.default.memory = 256
+osi.default.overlay = 1
+
 vma.audio.enable = 0
 vma.printing.enable = 0
 vma.pid_file = /var/run/qvd/vma.pid
@@ -89,6 +92,10 @@ vma.on_action.poweroff =
 vma.on_state.connected =
 vma.on_state.suspended =
 vma.on_state.disconnected =
+
+vma.on_provisioning.mount_home =
+vma.on_provisioning.add_user =
+vma.on_provisioning.after_add_user =
 
 vma.default.client.keyboard = pc105/en
 vma.default.client.link = adsl
