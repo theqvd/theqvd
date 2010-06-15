@@ -283,7 +283,7 @@ sub _provisionate_user {
 	}
     }
 
-    unless (getpwname $user) {
+    unless (getpwnam($user)) {
 	if (_call_provisioning_hook(add_user => @_)) {
 	    _call_provisioning_hook(after_add_user => @_);
 	}
@@ -410,7 +410,7 @@ sub _state {
     my $state = $nx2x{$nxstate};
     my $timeout = $timeout{$state};
     my $pid = _read_line $nxagent_pid_fn;
-    DEBUG ("_state: $state, nxstate: $nxstate, ts: $timestamp, timeout: $timeout");
+    { no warnings; DEBUG ("_state: $state, nxstate: $nxstate, ts: $timestamp, timeout: $timeout") };
 
     if ($timeout and $timestamp) {
 	if (time > $timestamp + $timeout) {
