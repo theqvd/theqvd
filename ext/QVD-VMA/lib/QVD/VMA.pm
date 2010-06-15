@@ -43,6 +43,11 @@ my $nxagent_conf    = cfg('internal.vma.nxagent.config');
 my $default_user_name   = cfg('vma.user.default.name');
 my $default_user_groups = cfg('vma.user.default.groups');
 
+my $home_fs    = cfg('vma.user.home.fs');
+my $home_path  = cfg('vma.user.home.path');
+my $home_drive = cfg('vma.user.home.drive');
+
+my $home_partition = $home_drive . '1';
 
 my %on_action =   ( connect    => cfg('vma.on_action.connect'),
 		    disconnect => cfg('vma.on_action.disconnect'),
@@ -53,9 +58,16 @@ my %on_state =    ( connected => cfg('vma.on_state.connected'),
 		    suspended => cfg('vma.on_state.suspended'),
 		    stopped   => cfg('vma.on_state.disconnected') );
 
+my %on_provisioning = ( mount_home     => cfg('vma.on_provisioning.mount_homes'),
+			add_user       => cfg('vma.on_provisioning.add_user'),
+			after_add_user => cfg('vma.on_provisioning.after_add_user') );
+
+
 my %on_printing = ( connected => cfg('internal.vma.on_printing.connected'),
 		    suspended => cfg('internal.vma.on_printing.suspended'),
 		    stopped   => cfg('internal.vma.on_printing.stopped'));
+
+
 
 my $display       = cfg('internal.nxagent.display');
 my $printing_port = $display + 2000;
@@ -132,12 +144,19 @@ sub _call_hook {
 	    }
 	    if ($kid == $pid) {
 		$? and die "hook $file for $name failed, rc: ". ($? >> 8);
-		return;
+		return 1;
 	    }
 	    DEBUG "waitpid returned $kid unexpectedly";
 	    sleep 1;
 	}
     }
+    return undef;
+}
+
+sub _call_provisioning_hook {
+    my $action = shift;
+    _call_hook("on provisioning $action", $on_provisioning{$action}, 0,
+	       @_, 'qvd.hook.on_provisioning', $action);
 }
 
 sub _call_action_hook {
@@ -240,10 +259,59 @@ sub _timestamp {
 
 sub _provisionate_user {
     my %props = @_;
-    my $user = $props{'qvd.vm.user.name'} // $default_as_user;
+    my $user = $props{'qvd.vm.user.name'};
     my $uid = $props{'qvd.vm.user.uid'};
-    my $groups = $props{'qvd.vm.user.groups'} // $default_user_groups;
-	
+    my $groups = $props{'qvd.vm.user.groups'};
+    my $user_home = $propos{'qvd.vm.user.home'};
+
+    unless (-d $user_home) {
+	unless (_call_provisioning_hook(mount_home => @_)) {
+	    if (length $drive) {
+		my $root_dev = (stat '/')[0];
+		my $home_dev = (stat $user_home)[0];
+		if ($root_dev == $home_dev) {
+		    unless (-e $home_partition) {
+			system ("echo , | sfdisk $home_drive")
+			    and die "Unable to create partition table on user storage";
+			system ("mkfs.$home_fs" =>  $home_partition)
+			    and die "Unable to create file system on user storage";
+		    }
+		    system mount => $home_partition, $home_path
+			and die 'Unable to mount user storage';
+		}
+	    }
+	}
+    }
+
+    unless (getpwname $user) {
+	if (_call_provisioning_hook(add_user => @_)) {
+	    _call_provisioning_hook(after_add_user => @_);
+	}
+	else {
+	    eval {
+		my @args = ('--home' => $user_home,
+			    '--disable-password',
+			    '--disable-login',
+			    '--quiet');
+		push @args, '--uid' => $uid if $uid;
+		push @args, $user;
+		system adduser => @args
+		    and die "provisioning of user $user failed, adduser\n";
+		if (length $groups) {
+		    $groups =~ s/\s*,\s*/,/g;
+		    system usermod => -G => $groups, $user
+			and die "unable to add user $user to groups $groups\n";
+		}
+		_call_provisioning_hook(after_add_user => @_);
+
+	    };
+	    if ($@) {
+		# clean up, do not left the system in an inconsistent state
+		system deluser => '--remove-all-files', '--quiet', $user;
+		die $@;
+	    }
+	}
+    }
 }
 
 my %props2nx = ( 'qvd.client.keyboard'   => 'keyboard',
@@ -289,7 +357,9 @@ sub _fork_monitor {
 		eval {
 		    POSIX::dup2(1, 2); # equivalent to shell 2>&1
 
-		    $props{'qvd.vm.user'} //= $default_as_user;
+		    my $user = $props{'qvd.vm.user.name'}   //= $default_user_name;
+		    $props{'qvd.vm.user.groups'} //= $default_user_groups;
+		    $props{'qvd.vm.user.home'} = "$home_path/$user";
 		    _provisionate_user(@_);
 
 		    _make_nxagent_config(@_);
@@ -303,7 +373,7 @@ sub _fork_monitor {
 			       '-ac', '-name', 'QVD',
 			       '-display', "nx/nx,options=$nxagent_conf:$display");
 		    say "running @cmd";
-		    _become_user($props{'qvd.vm.user'} // $as_user);
+		    _become_user($user);
 		    exec @cmd;
 		};
 		say "Unable to start X server: " .($@ || $!);
