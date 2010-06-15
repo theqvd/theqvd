@@ -58,7 +58,7 @@ my %on_state =    ( connected => cfg('vma.on_state.connected'),
 		    suspended => cfg('vma.on_state.suspended'),
 		    stopped   => cfg('vma.on_state.disconnected') );
 
-my %on_provisioning = ( mount_home     => cfg('vma.on_provisioning.mount_homes'),
+my %on_provisioning = ( mount_home     => cfg('vma.on_provisioning.mount_home'),
 			add_user       => cfg('vma.on_provisioning.add_user'),
 			after_add_user => cfg('vma.on_provisioning.after_add_user') );
 
