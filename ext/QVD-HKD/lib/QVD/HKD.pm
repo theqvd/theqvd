@@ -475,6 +475,12 @@ sub _vm_image_path {
         unlink $overlay;
     }
 
+    mkdir $overlays_path, 0755;
+    unless (-d $overlays_path) {
+	ERROR "Overlays directory $overlays_path does not exist";
+	return undef;
+    }
+
     # FIXME: use a relative path to the base image?
     #my $image_relative = File::Spec->abs2rel($image, $overlays_path);
     my @cmd = ($cmd{kvm_img}, 'create',
@@ -496,6 +502,12 @@ sub _vm_user_storage_path {
 
     my $image = "$homes_path/$id-data.qcow2";
     return $image if -f $image;
+
+    mkdir $homes_path, 0755;
+    unless (-d $homes_path) {
+	ERROR "Homes directory $homes_path does not exist";
+	return undef;
+    }
 
     my @cmd = ($cmd{kvm_img}, 'create',
                -f => 'qcow2',
