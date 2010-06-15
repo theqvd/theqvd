@@ -35,11 +35,14 @@ my $run_path        = cfg('path.run');
 my $nxagent         = cfg('command.nxagent');
 my $nxdiag          = cfg('command.nxdiag');
 my $x_session       = cfg('command.x-session');
-my $as_user         = cfg('vma.user.name');
 my $enable_audio    = cfg('vma.audio.enable');
 my $enable_printing = cfg('vma.printing.enable');
 my $printing_conf   = cfg('internal.vma.printing.config');
 my $nxagent_conf    = cfg('internal.vma.nxagent.config');
+
+my $default_user_name   = cfg('vma.user.default.name');
+my $default_user_groups = cfg('vma.user.default.groups');
+
 
 my %on_action =   ( connect    => cfg('vma.on_action.connect'),
 		    disconnect => cfg('vma.on_action.disconnect'),
@@ -237,6 +240,10 @@ sub _timestamp {
 
 sub _provisionate_user {
     my %props = @_;
+    my $user = $props{'qvd.vm.user.name'} // $default_as_user;
+    my $uid = $props{'qvd.vm.user.uid'};
+    my $groups = $props{'qvd.vm.user.groups'} // $default_user_groups;
+	
 }
 
 my %props2nx = ( 'qvd.client.keyboard'   => 'keyboard',
@@ -282,6 +289,7 @@ sub _fork_monitor {
 		eval {
 		    POSIX::dup2(1, 2); # equivalent to shell 2>&1
 
+		    $props{'qvd.vm.user'} //= $default_as_user;
 		    _provisionate_user(@_);
 
 		    _make_nxagent_config(@_);
@@ -295,7 +303,7 @@ sub _fork_monitor {
 			       '-ac', '-name', 'QVD',
 			       '-display', "nx/nx,options=$nxagent_conf:$display");
 		    say "running @cmd";
-		    _become_user($as_user);
+		    _become_user($props{'qvd.vm.user'} // $as_user);
 		    exec @cmd;
 		};
 		say "Unable to start X server: " .($@ || $!);
