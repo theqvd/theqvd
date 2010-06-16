@@ -41,8 +41,7 @@ my $printing_conf   = cfg('internal.vma.printing.config');
 my $nxagent_conf    = cfg('internal.vma.nxagent.config');
 
 my $useradd         = cfg('command.useradd');
-my $deluser         = cfg('command.deluser');
-my $usermod         = cfg('command.usermod');
+my $userdel         = cfg('command.userdel');
 
 my $default_user_name   = cfg('vma.user.default.name');
 my $default_user_groups = cfg('vma.user.default.groups');

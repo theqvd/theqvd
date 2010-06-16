@@ -35,7 +35,6 @@ command.x-session = /etc/X11/Xsession
 
 command.useradd = /usr/sbin/useradd
 command.userdel = /usr/sbin/userdel
-command.usermod = /usr/sbin/usermod
 
 client.link = adsl
 client.geometry = 1024x768
