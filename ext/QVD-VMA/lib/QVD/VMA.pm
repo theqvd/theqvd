@@ -339,9 +339,11 @@ sub _fork_monitor {
 
     _save_nxagent_state_and_call_hook 'initiating';
 
+    $SIG{CHLD} = 'IGNORE';
     my $pid = fork;
     if (!$pid) {
 	defined $pid or die "Unable to start monitor, fork failed: $!\n";
+	undef $SIG{CHLD};
 	eval {
 	    mkdir $run_path, 755;
 	    -d $run_path or die "Directory $run_path does not exist\n";
@@ -354,17 +356,13 @@ sub _fork_monitor {
 	    # open STDERR, '>', '/tmp/xinit-err'; #/dev/null';
 	    setpgrp(0, 0);
 
-	    $SIG{CHLD} = 'IGNORE';
-
 	    _save_nxagent_state_and_call_hook 'initiating';
 
 	    my $pid = open(my $out, '-|');
 	    if (!$pid) {
 		defined $pid or die ERROR "unable to start X server, fork failed: $!\n";
-		undef $SIG{CHLD};
 		eval {
 		    POSIX::dup2(1, 2); # equivalent to shell 2>&1
-
 		    my $user = $props{'qvd.vm.user.name'}   //= $default_user_name;
 		    $props{'qvd.vm.user.groups'} //= $default_user_groups;
 		    $props{'qvd.vm.user.home'} = "$home_path/$user";
