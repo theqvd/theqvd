@@ -25,7 +25,7 @@ sub run {
 
     my @cmd;
     if ($WINDOWS) {
-	push @cmd, "nxproxy.exe";
+	push @cmd, "C:\Archivos de programa\QVD\nxproxy.exe";
     } else {
 	push @cmd, "nxproxy";
     }
