@@ -164,7 +164,7 @@ sub _call_action_hook {
     my $action = shift;
     my $state = _state();
     _call_hook("action $action on state $state", $on_action{$action}, 0,
-	       @_, 'qvd.session.state', $state, 'qvd.hook.on_action', $action);
+	       @_, 'qvd.vm.session.state', $state, 'qvd.hook.on_action', $action);
 }
 
 sub _call_state_hook {
