@@ -272,7 +272,9 @@ sub _provisionate_user {
 		my $root_dev = (stat '/')[0];
 		my $home_dev = (stat $user_home)[0];
 		if ($root_dev == $home_dev) {
+		    DEBUG "mounting $home_partition as $home_path";
 		    unless (-e $home_partition) {
+			DEBUG "partitioning $home_drive";
 			system ("echo , | sfdisk $home_drive")
 			    and die "Unable to create partition table on user storage";
 			system ("mkfs.$home_fs" =>  $home_partition)
@@ -281,6 +283,9 @@ sub _provisionate_user {
 		    system mount => $home_partition, $home_path
 			and die 'Unable to mount user storage';
 		}
+	    }
+	    else {
+		DEBUG "using root drive also for homes";
 	    }
 	}
     }
