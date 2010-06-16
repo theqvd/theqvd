@@ -40,7 +40,7 @@ my $enable_printing = cfg('vma.printing.enable');
 my $printing_conf   = cfg('internal.vma.printing.config');
 my $nxagent_conf    = cfg('internal.vma.nxagent.config');
 
-my $adduser         = cfg('command.adduser');
+my $useradd         = cfg('command.useradd');
 my $deluser         = cfg('command.deluser');
 my $usermod         = cfg('command.usermod');
 
@@ -263,8 +263,9 @@ sub _provisionate_user {
     my %props = @_;
     my $user = $props{'qvd.vm.user.name'};
     my $uid = $props{'qvd.vm.user.uid'};
-    my $groups = $props{'qvd.vm.user.groups'};
     my $user_home = $props{'qvd.vm.user.home'};
+    my $groups = $props{'qvd.vm.user.groups'};
+    $groups =~ s/\s//g;
 
     unless (-d $user_home) {
 	unless (_call_provisioning_hook(mount_home => @_)) {
@@ -291,26 +292,24 @@ sub _provisionate_user {
 	}
 	else {
 	    eval {
-		my @args = ('--home' => $user_home,
-			    '--disabled-password',
-			    '--disabled-login',
-			    '--quiet');
-		push @args, '--uid' => $uid if $uid;
-		push @args, $user;
-		DEBUG "executing $adduser => @args";
-		system $adduser => @args
-		    and die "provisioning of user $user failed\n";
-		if (length $groups) {
-		    $groups =~ s/\s*,\s*/,/g;
-		    system $usermod => -G => $groups, $user
-			and die "unable to add user $user to groups $groups\n";
-		}
-		_call_provisioning_hook(after_add_user => @_);
+		my @args = ( '-U', # create user group
+			     '-m', # create home
+			     '-d', $user_home);
 
+		push @args, -G => $groups if length $groups;
+		push @args, -u => $uid if $uid;
+
+		push @args, $user;
+		DEBUG "executing $useradd => @args";
+		system $useradd => @args
+		    and die "provisioning of user $user failed\n";
+
+		_call_provisioning_hook(after_add_user => @_);
 	    };
 	    if ($@) {
 		# clean up, do not left the system in an inconsistent state
-		system $deluser => '--remove-all-files', '--quiet', $user;
+		DEBUG "deleting user $user";
+		system $userdel => '-rf', $user;
 		die $@;
 	    }
 	}
