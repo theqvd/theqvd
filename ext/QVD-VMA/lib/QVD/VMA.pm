@@ -292,13 +292,14 @@ sub _provisionate_user {
 	else {
 	    eval {
 		my @args = ('--home' => $user_home,
-			    '--disable-password',
-			    '--disable-login',
+			    '--disabled-password',
+			    '--disabled-login',
 			    '--quiet');
 		push @args, '--uid' => $uid if $uid;
 		push @args, $user;
+		DEBUG "executing $adduser => @args";
 		system $adduser => @args
-		    and die "provisioning of user $user failed, adduser\n";
+		    and die "provisioning of user $user failed\n";
 		if (length $groups) {
 		    $groups =~ s/\s*,\s*/,/g;
 		    system $usermod => -G => $groups, $user
