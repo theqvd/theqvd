@@ -11,6 +11,7 @@ use JSON;
 use base qw(Wx::Frame);
 use strict;
 use URI::Escape qw(uri_escape);
+use File::Spec;
 
 my $EVT_LIST_OF_VM_LOADED :shared = Wx::NewEventType;
 my $EVT_CONNECTION_ERROR :shared = Wx::NewEventType;
@@ -42,9 +43,9 @@ sub new {
 
 	my $ver_sizer  = Wx::BoxSizer->new(wxVERTICAL);
 
-	# FIXME Hardcoded path!
-	# logo image
-	my $logo_image = "QVD-Client/pixmaps/qvd-logo.png";
+	my ($volume, $directories, $file) = File::Spec->splitpath(File::Spec->rel2abs($0));
+
+	my $logo_image = "$volume$directories/../pixmaps/qvd-logo.png";
 	unless (-e $logo_image) {
 	    $logo_image = "/usr/share/pixmaps/qvd-logo.png";
 	}
@@ -102,9 +103,8 @@ sub new {
 
 	$self->SetTitle("QVD");
 	my $icon = Wx::Icon->new();
-	# FIXME Hardcoded path!
 	
-	$logo_image = "QVD-Client/pixmaps/qvd.xpm";
+	$logo_image = "$volume$directories/../pixmaps/qvd.xpm";
 	unless (-e $logo_image) {
 	    $logo_image = "/usr/share/pixmaps/qvd.xpm";
 	}
