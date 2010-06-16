@@ -36,7 +36,6 @@ sub post_configure_hook {
 				     GET => '/qvd/connect_to_vm');
     $l7r->set_http_request_processor(\&list_of_vm_processor,
 				     GET => '/qvd/list_of_vm');
-
     $l7r->set_http_request_processor(\&ping_processor,
 				     GET => '/qvd/ping');
 }

@@ -44,6 +44,8 @@ my $ssh_redirect    = cfg('vm.ssh.redirect');
 my $vnc_redirect    = cfg('vm.vnc.redirect');
 my $vnc_opts        = cfg('vm.vnc.opts');
 
+my $vm_virtio       = cfg('vm.kvm.virtio');
+my $hdb_index       = cfg('vm.kvm.home.drive.index');
 my $mon_redirect    = cfg('internal.vm.monitor.redirect');
 my $serial_redirect = cfg('vm.serial.redirect');
 my $serial_capture  = cfg('vm.serial.capture');
@@ -59,6 +61,8 @@ my $database_delay   = core_cfg('internal.database.retry_delay');
 # sub new { ... }
 
 my $start_time;
+
+END { _dirty_shutdown() }
 
 sub run {
     my $hkd = shift;
@@ -108,7 +112,7 @@ sub run {
 	else { # database is not available
 	    if (time > $ok_ts + $database_timeout) {
 		ERROR "HKD can not connect to database, aborting: $@";
-		$hkd->_dirty_shutdown;
+		# $hkd->_dirty_shutdown;
 		exit 1;
 	    }
 	    INFO "HKD can not connect to database, retrying: $@";
@@ -426,15 +430,18 @@ sub _start_vm {
     my $image = $hkd->_vm_image_path($vm) //
 	die "no disk image for vm $id";
 
-    DEBUG "Using image $image for VM $id";
-    push @cmd, -hda => $image;
+    my $hda = "file=$image,index=0,media=disk";
+    $hda .= ',if=virtio,boot=on' if $vm_virtio;
+    push @cmd, -drive => $hda;
+    DEBUG "Using image $image ($hda) for VM $id ";
 
     if (defined $osi->user_storage_size) {
         my $user_storage = $hkd->_vm_user_storage_path($vm) //
             die "no user storage for vm $id";
-
-	DEBUG "Using user storage $user_storage for VM $id";
-        push @cmd, -hdb => $user_storage;
+	my $hdb = "file=$user_storage,index=$hdb_index,media=disk";
+	$hdb .= ',if=virtio' if $vm_virtio;
+	DEBUG "Using user storage $user_storage ($hdb) for VM $id";
+        push @cmd, -drive => $hdb;
     }
 
     DEBUG "running @cmd";

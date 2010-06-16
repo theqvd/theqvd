@@ -67,6 +67,7 @@ admin.ssh.opt.StrictHostKeyChecking = no
 admin.ssh.opt.UserKnownHostsFile = /dev/null
 
 vm.overlay.persistent = 0
+vm.kvm.virtio = 1
 
 vm.vnc.redirect = 0
 vm.vnc.opts =
@@ -81,7 +82,8 @@ vma.audio.enable = 0
 vma.printing.enable = 0
 vma.pid_file = /var/run/qvd/vma.pid
 
-vma.user.home.drive = /dev/sdb
+vm.kvm.home.drive.index = 1
+vma.user.home.drive = /dev/vdb
 vma.user.home.fs = ext4
 vma.user.home.path = /home
 vma.user.default.name = qvd
