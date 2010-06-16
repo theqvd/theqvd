@@ -267,7 +267,9 @@ sub _provisionate_user {
     $groups =~ s/\s//g;
 
     unless (-d $user_home) {
+	DEBUG "user home does not exist yet";
 	unless (_call_provisioning_hook(mount_home => @_)) {
+	    DEBUG "no custom provisioning for mount_home";
 	    if (length $home_drive) {
 		my $root_dev = (stat '/')[0];
 		my $home_dev = (stat $user_home)[0];
