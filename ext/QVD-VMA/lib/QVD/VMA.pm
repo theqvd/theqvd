@@ -272,7 +272,7 @@ sub _provisionate_user {
 	    DEBUG "no custom provisioning for mount_home";
 	    if (length $home_drive) {
 		my $root_dev = (stat '/')[0];
-		my $home_dev = (stat $user_path)[0];
+		my $home_dev = (stat $home_path)[0];
 		if ($root_dev == $home_dev) {
 		    DEBUG "mounting $home_partition as $home_path";
 		    unless (-e $home_partition) {
