@@ -354,7 +354,7 @@ sub _fork_monitor {
 	    my $pid = open(my $out, '-|');
 	    if (!$pid) {
 		defined $pid or die ERROR "unable to start X server, fork failed: $!\n";
-
+		undef $SIG{CHLD};
 		eval {
 		    POSIX::dup2(1, 2); # equivalent to shell 2>&1
 
