@@ -5,6 +5,7 @@ use warnings;
 
 use IO::Socket::Forwarder qw(forward_sockets);
 use Proc::Background;
+use File::Spec;
 
 my $WINDOWS = ($^O eq 'MSWin32');
 
@@ -25,7 +26,8 @@ sub run {
 
     my @cmd;
     if ($WINDOWS) {
-	push @cmd, "nxproxy.exe";
+	my ($volume, $directories, $file) = File::Spec->splitpath(File::Spec->rel2abs($0));
+	push @cmd, "$volume$directories\\nxproxy.exe";
     } else {
 	push @cmd, "nxproxy";
     }
