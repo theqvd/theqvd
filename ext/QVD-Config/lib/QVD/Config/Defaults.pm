@@ -89,6 +89,7 @@ vma.user.home.path = /home
 vma.user.default.name = qvd
 vma.user.default.groups =
 
+vma.on_action.pre-connect =
 vma.on_action.connect =
 vma.on_action.disconnect =
 vma.on_action.suspend =
