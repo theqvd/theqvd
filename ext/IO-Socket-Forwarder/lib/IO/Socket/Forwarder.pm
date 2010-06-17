@@ -21,7 +21,7 @@ sub _debug {
     my @date = localtime $time;
     my $out = "@_";
     $out =~ s/([^ -~])/sprintf("\\x%02x", ord $1)/ge;
-    warn sprintf("%02d%02d%02d.%03d: %s\n",
+    warn sprintf("%02d:%02d:%02d.%03d: %s\n",
 		 @date[2, 1, 0], 1000 * ($time - int $time), $out);
 }
 
@@ -72,6 +72,12 @@ sub forward_sockets {
 	    or croak "unable to make socket 1 non-blocking";
 	fcntl($s2, F_SETFL, fcntl($s2, F_GETFL, 0) | O_NONBLOCK)
 	    or croak "unable to make socket 2 non-blocking";
+    }
+
+    if (0 and $debug) {
+	_debug "delaying...";
+	sleep 5;
+	_debug "starting...";
     }
 
     while (1) {
