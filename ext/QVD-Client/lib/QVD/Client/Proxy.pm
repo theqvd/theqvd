@@ -22,7 +22,7 @@ sub new {
 
 sub run {
     my $self = shift;
-    my $remote_socket = shift;
+    my $httpc = shift;
 
     my @cmd;
     if ($WINDOWS) {
@@ -49,6 +49,8 @@ sub run {
 
     push @cmd, (map "$_=$o{$_}", keys %o);
 
+    @cmd = (xterm => -e => "telnet localhost 4040"); # FIXME: only for latency testing
+
     $self->{process} = Proc::Background->new(@cmd);
 
     my $ll = IO::Socket::INET->new(LocalPort => 4040,
@@ -63,7 +65,9 @@ sub run {
 	ioctl ($local_socket, 0x8004667e, \$nonblocking);
     }
 
-    forward_sockets($local_socket, $remote_socket);
+    forward_sockets($local_socket, $httpc->get_socket,
+		    buffer_2to1 => $httpc->read_buffered,
+		    debug => 1);
 }
 
 1;
