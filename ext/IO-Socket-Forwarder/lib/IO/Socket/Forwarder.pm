@@ -96,32 +96,42 @@ sub forward_sockets {
 		my $bytes = sysread($s1, $b1to2, $io_chunk_size, length $b1to2);
 		$debug and _debug "bytes: " . ($bytes // '<undef>') . "\n";
 		if ($bytes) {
+		    undef $ssl_wtw1;
 		    # $debug and _debug "s1 read:\n" . substr($b1to2, -$bytes) . "\n";
 		}
 		elsif ($ssl1 and not defined $bytes) {
-		    $ssl_wtw1 ||= (_ssl_error == _ssl_want_write);
-		    $debug and _debug "s1 wants to write for SSL";
+		    if (_ssl_error == _ssl_want_write) {
+			$ssl_wtw1 = 1;
+			$debug and _debug "s1 wants to write for SSL";
+		    }
 		}
-		elsif (!$ssl_wtr1) {
+		elsif ($ssl_wtw1) {
+		    undef $ssl_wtw1;
+		}
+		else {
 		    $close{s1in} = 1;
 		}
-		undef $ssl_wtr1;
 	    }
 	    if ($wtr2 and vec(($ssl_wtw2 ? $bitsw : $bitsr), $fn2, 1)) {
 		$debug and _debug "reading from s2...\n";
 		my $bytes = sysread($s2, $b2to1, $io_chunk_size, length $b2to1);
 		$debug and _debug "bytes: " . ($bytes // '<undef>') . "\n";
 		if ($bytes) {
+		    undef $ssl_wtw2;
 		    # $debug and _debug "s2 read:\n" . substr($b2to1, -$bytes) . "*\n";
 		}
 		elsif ($ssl2 and not defined $bytes) {
-		    $ssl_wtw2 ||= (_ssl_error == _ssl_want_write);
-		    $debug and _debug "s2 wants to write for SSL";
+		    if (_ssl_error == _ssl_want_write) {
+			$ssl_wtw2 = 1;
+			$debug and _debug "s2 wants to write for SSL";
+		    }
 		}
-		elsif (!$ssl_wtr2) {
+		elsif ($ssl_wtw2) {
+		    undef $ssl_wtw2;
+		}
+		else {
 		    $close{s2in} = 1;
 		}
-		undef $ssl_wtr2;
 	    }
 	    if ($wtw1 and vec(($ssl_wtr1 ? $bitsr : $bitsw), $fn1, 1)) {
 		$debug and _debug "writting to s1...\n";
@@ -135,12 +145,18 @@ sub forward_sockets {
 			shutdown($s1, 1) unless $ssl1;
 			$s1_out_closed = 1;
 		    }
+		    undef $ssl_wtr1;
 		}
 		elsif ($ssl1 and not defined $bytes) {
-		    $ssl_wtr1 ||= (_ssl_error == _ssl_want_read);
-		    $debug and _debug "s1 wants to read for SSL";
+		    if (_ssl_error == _ssl_want_read) {
+			$ssl_wtr1 = 1;
+			$debug and _debug "s1 wants to read for SSL";
+		    }
 		}
-		elsif (!$ssl_wtw1) {
+		elsif ($ssl_wtr1) {
+		    undef $ssl_wtr1;
+		}
+		else {
 		    $close{s1out} = 1;
 		}
 		undef $ssl_wtw1;
@@ -157,12 +173,18 @@ sub forward_sockets {
 			shutdown($s2, 1) unless $ssl2;
 			$s2_out_closed = 1;
 		    }
+		    undef $ssl_wtr2;
 		}
 		elsif ($ssl2 and not defined $bytes) {
-		    $ssl_wtr2 ||= (_ssl_error == _ssl_want_read);
-		    $debug and _debug "s2 wants to read for SSL";
+		    if (_ssl_error == _ssl_want_read) {
+			$ssl_wtr2 = 1;
+			$debug and _debug "s2 wants to read for SSL";
+		    }
 		}
-		elsif (!$ssl_wtw2) {
+		elsif ($ssl_wtr2) {
+		    undef $ssl_wtr2;
+		}
+		else {
 		    $close{s2out} = 1;
 		}
 		undef $ssl_wtw2;
