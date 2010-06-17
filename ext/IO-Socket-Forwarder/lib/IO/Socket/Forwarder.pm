@@ -75,7 +75,10 @@ sub forward_sockets {
 
 	$debug and _debug "wtr1: $wtr1, wtr2: $wtr2, wtw1: $wtw1, wtw2: $wtw2\n";
 
-	$wtr1 or $wtr2 or $wtw1 or $wtw2 or last;
+	unless ($wtr1 or $wtr2 or $wtw1 or $wtw2) {
+	    $debug and _debug "nothing else to do, exiting...";
+	    last;
+	}
 
 	my $bitsr = '';
 	vec($bitsr, $fn1, 1) = 1 if (($wtr1 && !$ssl_wtw1) || $ssl_wtr1);
@@ -97,7 +100,7 @@ sub forward_sockets {
 		$debug and _debug "bytes: " . ($bytes // '<undef>') . "\n";
 		if ($bytes) {
 		    undef $ssl_wtw1;
-		    # $debug and _debug "s1 read:\n" . substr($b1to2, -$bytes) . "\n";
+		    $debug and _debug "s1 read:\n" . substr($b1to2, -$bytes) . "\n";
 		}
 		elsif ($ssl1 and not defined $bytes) {
 		    if (_ssl_error == _ssl_want_write) {
@@ -112,6 +115,7 @@ sub forward_sockets {
 		    undef $ssl_wtw1;
 		}
 		else {
+		    $debug and _debug "nothing read from s1, closing schedulled";
 		    $close{s1in} = 1;
 		}
 	    }
@@ -121,7 +125,7 @@ sub forward_sockets {
 		$debug and _debug "bytes: " . ($bytes // '<undef>') . "\n";
 		if ($bytes) {
 		    undef $ssl_wtw2;
-		    # $debug and _debug "s2 read:\n" . substr($b2to1, -$bytes) . "*\n";
+		    $debug and _debug "s2 read:\n" . substr($b2to1, -$bytes) . "*\n";
 		}
 		elsif ($ssl2 and not defined $bytes) {
 		    if (_ssl_error == _ssl_want_write) {
@@ -136,6 +140,7 @@ sub forward_sockets {
 		    undef $ssl_wtw2;
 		}
 		else {
+		    $debug and _debug "nothing read from s2, closing schedulled";
 		    $close{s2in} = 1;
 		}
 	    }
@@ -144,7 +149,7 @@ sub forward_sockets {
 		my $bytes = syswrite($s1, $b2to1, $io_chunk_size);
 		$debug and _debug "bytes: " . ($bytes // '<undef>') . "\n";
 		if ($bytes) {
-		    # $debug and _debug "s1 wrote...\n" . substr($b2to1, 0, $bytes) . "*\n";
+		    $debug and _debug "s1 wrote...\n" . substr($b2to1, 0, $bytes) . "*\n";
 		    substr($b2to1, 0, $bytes, "");
 		    if ($s2_in_closed and !length $b2to1) {
 			$debug and _debug "buffer exhausted and s2-in is closed, shutting down s1-out\n";
@@ -166,6 +171,7 @@ sub forward_sockets {
 		    undef $ssl_wtr1;
 		}
 		else {
+		    $debug and _debug "nothing written to s1, closing schedulled";
 		    $close{s1out} = 1;
 		}
 		undef $ssl_wtw1;
@@ -175,7 +181,7 @@ sub forward_sockets {
 		my $bytes = syswrite($s2, $b1to2, $io_chunk_size);
 		$debug and _debug "bytes: " . ($bytes // '<undef>') . "\n";
 		if ($bytes) {
-		    # $debug and _debug "s2 wrote...\n" . substr($b1to2, 0, $bytes) . "*\n";
+		    $debug and _debug "s2 wrote...\n" . substr($b1to2, 0, $bytes) . "*\n";
 		    substr($b1to2, 0, $bytes, "");
 		    if ($s1_in_closed and length $b1to2) {
 			$debug and _debug "buffer exhausted and s2-in is closed, shutting down s1-out\n";
@@ -197,6 +203,7 @@ sub forward_sockets {
 		    undef $ssl_wtr2;
 		}
 		else {
+		    $debug and _debug "nothing written to s1, closing schedulled";
 		    $close{s2out} = 1;
 		}
 		undef $ssl_wtw2;
