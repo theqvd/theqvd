@@ -60,11 +60,11 @@ sub forward_sockets {
     my ($ssl_wtr1, $ssl_wtw1, $ssl_wtr2, $ssl_wtw2);
     my %close;
 
-    if ($^O eq 'linux'){
-    fcntl($s1, F_SETFL, fcntl($s1, F_GETFL, 0) | O_NONBLOCK)
-	or croak "unable to make socket 1 non-blocking";
-    fcntl($s2, F_SETFL, fcntl($s2, F_GETFL, 0) | O_NONBLOCK)
-	or croak "unable to make socket 2 non-blocking";
+    unless ($^O =~ /Win32/) {
+	fcntl($s1, F_SETFL, fcntl($s1, F_GETFL, 0) | O_NONBLOCK)
+	    or croak "unable to make socket 1 non-blocking";
+	fcntl($s2, F_SETFL, fcntl($s2, F_GETFL, 0) | O_NONBLOCK)
+	    or croak "unable to make socket 2 non-blocking";
     }
 
     while (1) {
