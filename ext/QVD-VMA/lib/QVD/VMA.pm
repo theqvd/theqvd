@@ -52,23 +52,23 @@ my $home_drive = cfg('vma.user.home.drive');
 
 my $home_partition = $home_drive . '1';
 
-my %on_action =   ( connect    => cfg('vma.on_action.connect'),
-		    disconnect => cfg('vma.on_action.disconnect'),
-		    suspend    => cfg('vma.on_action.suspend'),
-		    poweroff   => cfg('vma.on_action.poweroff') );
+my %on_action =       ( pre_connect    => cfg('vma.on_action.pre-connect'),
+			connect        => cfg('vma.on_action.connect'),
+			disconnect     => cfg('vma.on_action.disconnect'),
+			suspend        => cfg('vma.on_action.suspend'),
+			poweroff       => cfg('vma.on_action.poweroff') );
 
-my %on_state =    ( connected => cfg('vma.on_state.connected'),
-		    suspended => cfg('vma.on_state.suspended'),
-		    stopped   => cfg('vma.on_state.disconnected') );
+my %on_state =        ( connected      => cfg('vma.on_state.connected'),
+			suspended      => cfg('vma.on_state.suspended'),
+			stopped        => cfg('vma.on_state.disconnected') );
 
 my %on_provisioning = ( mount_home     => cfg('vma.on_provisioning.mount_home'),
 			add_user       => cfg('vma.on_provisioning.add_user'),
 			after_add_user => cfg('vma.on_provisioning.after_add_user') );
 
-
-my %on_printing = ( connected => cfg('internal.vma.on_printing.connected'),
-		    suspended => cfg('internal.vma.on_printing.suspended'),
-		    stopped   => cfg('internal.vma.on_printing.stopped'));
+my %on_printing =     ( connected      => cfg('internal.vma.on_printing.connected'),
+			suspended      => cfg('internal.vma.on_printing.suspended'),
+			stopped        => cfg('internal.vma.on_printing.stopped'));
 
 my $display       = cfg('internal.nxagent.display');
 my $printing_port = $display + 2000;
@@ -367,7 +367,7 @@ sub _fork_monitor {
 		    $props{'qvd.vm.user.groups'} //= $default_user_groups;
 		    $props{'qvd.vm.user.home'} = "$home_path/$user";
 		    _provisionate_user(%props);
-
+		    _call_action_hook('connect', @_);
 		    _make_nxagent_config(%props);
 
 		    $ENV{PULSE_SERVER} = "tcp:localhost:".($display+7000) if $enable_audio;
@@ -504,12 +504,13 @@ sub _start_session {
     DEBUG "starting session in state $state, pid $pid";
     given ($state) {
 	when ('suspended') {
-	    _call_action_hook('connect',  @_);
+	    _call_action_hook(pre_connect =>  @_);
 	    DEBUG "awaking nxagent";
 	    _save_printing_config(@_);
 	    _save_nxagent_state_and_call_hook 'initiating';
 	    _make_nxagent_config(@_);
 	    kill HUP => $pid;
+	    _call_action_hook(connect => @_);
 	}
 	when ('connected') {
 	    DEBUG "suspend and fail";
@@ -517,7 +518,7 @@ sub _start_session {
 	    die "Can't connect to X session in state connected, suspending it, retry later\n";
 	}
 	when ('stopped') {
-	    _call_action_hook('connect', @_);
+	    _call_action_hook(pre_connect => @_);
 	    _save_printing_config(@_);
 	    _fork_monitor(@_);
 	}
