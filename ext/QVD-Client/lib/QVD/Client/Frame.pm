@@ -175,6 +175,8 @@ sub OnClickConnect {
 		      port       => $DEFAULT_PORT,
 		      map { $_ => $self->{$_}->GetValue } qw(host username password) );
 
+    $connect_info{port} = $1 if $connect_info{host} =~ s/:(\d+)$//;
+
     $self->SaveConfiguration();
 
     # Start or notify worker thread; will result in the execution
@@ -321,8 +323,7 @@ sub ConnectToVM {
 	my ($code, $msg, $headers, $body) = $httpc->read_http_response;
 	if ($code == HTTP_SWITCHING_PROTOCOLS) {
 	    Wx::PostEvent($self, new Wx::PlThreadEvent(-1, $EVT_CONN_STATUS, 'CONNECTED'));
-	    my $proxy = new QVD::Client::Proxy(%connect_info);
-	    $proxy->run($httpc->get_socket);
+	    QVD::Client::Proxy->new(%connect_info)->run($httpc);
 	    last;
 	}
 	elsif ($code == HTTP_PROCESSING) {
