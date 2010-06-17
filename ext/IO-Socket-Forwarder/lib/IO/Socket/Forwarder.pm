@@ -113,7 +113,7 @@ sub forward_sockets {
 		$debug and _debug "bytes: " . ($bytes // '<undef>');
 		if ($bytes) {
 		    undef $ssl_wtw1;
-		    $debug and _debug "s1 read:\n" . substr($b1to2, -$bytes);
+		    $debug and _debug "s1 read: " . substr($b1to2, -$bytes);
 		}
 		elsif ($ssl1 and not defined $bytes) {
 		    if (_ssl_error == _ssl_want_write) {
@@ -138,7 +138,7 @@ sub forward_sockets {
 		$debug and _debug "bytes: " . ($bytes // '<undef>');
 		if ($bytes) {
 		    undef $ssl_wtw2;
-		    $debug and _debug "s2 read:\n" . substr($b2to1, -$bytes);
+		    $debug and _debug "s2 read: " . substr($b2to1, -$bytes);
 		}
 		elsif ($ssl2 and not defined $bytes) {
 		    if (_ssl_error == _ssl_want_write) {
@@ -162,7 +162,7 @@ sub forward_sockets {
 		my $bytes = syswrite($s1, $b2to1, $io_chunk_size);
 		$debug and _debug "bytes: " . ($bytes // '<undef>');
 		if ($bytes) {
-		    $debug and _debug "s1 wrote...\n" . substr($b2to1, 0, $bytes);
+		    $debug and _debug "s1 wrote: " . substr($b2to1, 0, $bytes);
 		    substr($b2to1, 0, $bytes, "");
 		    if ($s2_in_closed and !length $b2to1) {
 			$debug and _debug "buffer exhausted and s2-in is closed, shutting down s1-out";
@@ -194,7 +194,7 @@ sub forward_sockets {
 		my $bytes = syswrite($s2, $b1to2, $io_chunk_size);
 		$debug and _debug "bytes: " . ($bytes // '<undef>');
 		if ($bytes) {
-		    $debug and _debug "s2 wrote...\n" . substr($b1to2, 0, $bytes);
+		    $debug and _debug "s2 wrote: " . substr($b1to2, 0, $bytes);
 		    substr($b1to2, 0, $bytes, "");
 		    if ($s1_in_closed and length $b1to2) {
 			$debug and _debug "buffer exhausted and s2-in is closed, shutting down s1-out";
