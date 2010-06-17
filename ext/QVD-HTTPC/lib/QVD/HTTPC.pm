@@ -52,6 +52,13 @@ sub new {
     $self;
 }
 
+sub read_buffered {
+    my $self = shift;
+    my $data = $self->{bin};
+    $self->{bin} = '';
+    $data;
+}
+
 sub get_socket { shift->{socket} }
 
 sub _print {
