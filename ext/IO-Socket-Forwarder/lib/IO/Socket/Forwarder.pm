@@ -20,7 +20,7 @@ sub _debug {
     my $time = Time::HiRes::time();
     my @date = localtime $time;
     my $out = "@_";
-    $out =~ s/([^[[:print:]]])/"\\x".sprintf("%x", $1)/ge;
+    $out =~ s/([^ ..~])/"\\x".sprintf("%x", $1)/ge;
     warn sprintf("%02d%02d%02d.%03d: %s\n",
 		 @date[2, 1, 0], 1000 * ($time - int $time), $out);
 }
@@ -89,7 +89,7 @@ sub forward_sockets {
 	vec($bitsw, $fn1, 1) = 1 if (($wtw1 && !$ssl_wtr1) || $ssl_wtw1);
 	vec($bitsw, $fn2, 1) = 1 if (($wtw2 && !$ssl_wtr2) || $ssl_wtw2);
 
-	$debug and _debug "calling select...";
+	$debug and _debug "calling select($bitsr, $bitsw...";
 
 	my $n = select($bitsr, $bitsw, undef, undef);
 
