@@ -38,7 +38,7 @@ sub forward_sockets {
     $debug = $IO::Socket::Forwarder::debug unless defined $debug;
 
     my $io_buffer_size = delete $opts{io_buffer_size} || default_io_buffer_size;
-    my $io_chunk_size = delete $opts{io_chunk_size} || default_io_chunk_size;
+    my $io_chunk_size  = delete $opts{io_chunk_size}  || default_io_chunk_size;
 
     my $fn1 = fileno $s1;
     defined $fn1 or croak "socket 1 is not a valid file handle";
@@ -51,8 +51,13 @@ sub forward_sockets {
     $debug and _debug "s1 fn=$fn1, ssl=$ssl1";
     $debug and _debug "s2 fn=$fn2, ssl=$ssl2";
 
-    my $b1to2 = '';
-    my $b2to1 = '';
+    my $b1to2 = delete $opts{buffer_1to2} // '';
+    my $b2to1 = delete $opts{buffer_2to1} // '';
+
+    if ($debug) {
+	_debug "b1to2: $b1to2";
+	_debug "b2to1: $b2to1";
+    }
 
     my $s1_in_closed;
     my $s1_out_closed;
