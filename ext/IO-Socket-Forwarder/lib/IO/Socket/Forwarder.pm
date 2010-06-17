@@ -15,6 +15,14 @@ our @EXPORT_OK = qw(forward_sockets);
 use constant default_io_buffer_size => 64 * 1024;
 use constant default_io_chunk_size => 16 * 1024;
 
+sub _debug {
+    require Time::HiRes;
+    my $time = Time::HiRes::time();
+    my @date = localtime $time;
+    warn sprintf("%02d%02d%02d.%03d: %s",
+		 @date[2, 1, 0], 1000 * ($time - int $time), "@_");
+}
+
 # lazy accessors to IO::Socket::SSL
 # we use it but don't depend on it!
 sub _ssl_error { $IO::Socket::SSL::SSL_ERROR }
@@ -38,8 +46,8 @@ sub forward_sockets {
     my $ssl1 = $s1->isa('IO::Socket::SSL');
     my $ssl2 = $s2->isa('IO::Socket::SSL');
 
-    $debug and $ssl1 and warn "s1 is SSL\n";
-    $debug and $ssl2 and warn "s2 is SSL\n";
+    $debug and $ssl1 and _debug "s1 is SSL\n";
+    $debug and $ssl2 and _debug "s2 is SSL\n";
 
     my $b1to2 = '';
     my $b2to1 = '';
@@ -65,7 +73,7 @@ sub forward_sockets {
 	my $wtw1 = (not $s1_out_closed and length $b2to1);
 	my $wtw2 = (not $s2_out_closed and length $b1to2);
 
-	$debug and warn "wtr1: $wtr1, wtr2: $wtr2, wtw1: $wtw1, wtw2: $wtw2\n";
+	$debug and _debug "wtr1: $wtr1, wtr2: $wtr2, wtw1: $wtw1, wtw2: $wtw2\n";
 
 	$wtr1 or $wtr2 or $wtw1 or $wtw2 or last;
 
@@ -76,24 +84,24 @@ sub forward_sockets {
 	vec($bitsw, $fn1, 1) = 1 if (($wtw1 && !$ssl_wtr1) || $ssl_wtw1);
 	vec($bitsw, $fn2, 1) = 1 if (($wtw2 && !$ssl_wtr2) || $ssl_wtw2);
 
-	$debug and warn "calling select...\n";
+	$debug and _debug "calling select...\n";
 
 	my $n = select($bitsr, $bitsw, undef, undef);
 
-	$debug and warn "selllamaect done, n: $n\n";
+	$debug and _debug "select done, n: $n\n";
 
 	if ($n > 0) {
 	    if ($wtr1 and vec(($ssl_wtw1 ? $bitsw : $bitsr), $fn1, 1)) {
 		undef $ssl_wtr1;
-		$debug and warn "reading from s1...\n";
+		$debug and _debug "reading from s1...\n";
 		my $bytes = sysread($s1, $b1to2, $io_chunk_size, length $b1to2);
-		$debug and warn "bytes: " . ($bytes // '<undef>') . "\n";
+		$debug and _debug "bytes: " . ($bytes // '<undef>') . "\n";
 		if ($bytes) {
-		    # $debug and warn "s1 read:\n" . substr($b1to2, -$bytes) . "\n";
+		    # $debug and _debug "s1 read:\n" . substr($b1to2, -$bytes) . "\n";
 		}
 		elsif ($ssl1 and not defined $bytes) {
 		    $ssl_wtw1 ||= (_ssl_error == _ssl_want_write);
-		    $debug and warn "s1 wants to write for SSL";
+		    $debug and _debug "s1 wants to write for SSL";
 		}
 		else {
 		    $close{s1in} = 1;
@@ -101,15 +109,15 @@ sub forward_sockets {
 	    }
 	    if ($wtr2 and vec(($ssl_wtw2 ? $bitsw : $bitsr), $fn2, 1)) {
 		undef $ssl_wtr2;
-		$debug and warn "reading from s2...\n";
+		$debug and _debug "reading from s2...\n";
 		my $bytes = sysread($s2, $b2to1, $io_chunk_size, length $b2to1);
-		$debug and warn "bytes: " . ($bytes // '<undef>') . "\n";
+		$debug and _debug "bytes: " . ($bytes // '<undef>') . "\n";
 		if ($bytes) {
-		    # $debug and warn "s2 read:\n" . substr($b2to1, -$bytes) . "*\n";
+		    # $debug and _debug "s2 read:\n" . substr($b2to1, -$bytes) . "*\n";
 		}
 		elsif ($ssl2 and not defined $bytes) {
 		    $ssl_wtw2 ||= (_ssl_error == _ssl_want_write);
-		    $debug and warn "s2 wants to write for SSL";
+		    $debug and _debug "s2 wants to write for SSL";
 		}
 		else {
 		    $close{s2in} = 1;
@@ -117,21 +125,21 @@ sub forward_sockets {
 	    }
 	    if ($wtw1 and vec(($ssl_wtr1 ? $bitsr : $bitsw), $fn1, 1)) {
 		undef $ssl_wtw1;
-		$debug and warn "writting to s1...\n";
+		$debug and _debug "writting to s1...\n";
 		my $bytes = syswrite($s1, $b2to1, $io_chunk_size);
-		$debug and warn "bytes: " . ($bytes // '<undef>') . "\n";
+		$debug and _debug "bytes: " . ($bytes // '<undef>') . "\n";
 		if ($bytes) {
-		    # $debug and warn "s1 wrote...\n" . substr($b2to1, 0, $bytes) . "*\n";
+		    # $debug and _debug "s1 wrote...\n" . substr($b2to1, 0, $bytes) . "*\n";
 		    substr($b2to1, 0, $bytes, "");
 		    if ($s2_in_closed and !length $b2to1) {
-			$debug and warn "buffer exhausted and s2-in is closed, shutting down s1-out\n";
+			$debug and _debug "buffer exhausted and s2-in is closed, shutting down s1-out\n";
 			shutdown($s1, 1) unless $ssl1;
 			$s1_out_closed = 1;
 		    }
 		}
 		elsif ($ssl1 and not defined $bytes) {
 		    $ssl_wtr1 ||= (_ssl_error == _ssl_want_read);
-		    $debug and warn "s1 wants to read for SSL";
+		    $debug and _debug "s1 wants to read for SSL";
 		}
 		else {
 		    $close{s1out} = 1;
@@ -139,21 +147,21 @@ sub forward_sockets {
 	    }
 	    if ($wtw2 and vec(($ssl_wtr2 ? $bitsr : $bitsw), $fn2, 1)) {
 		undef $ssl_wtw2;
-		$debug and warn "writting to s2...\n";
+		$debug and _debug "writting to s2...\n";
 		my $bytes = syswrite($s2, $b1to2, $io_chunk_size);
-		$debug and warn "bytes: " . ($bytes // '<undef>') . "\n";
+		$debug and _debug "bytes: " . ($bytes // '<undef>') . "\n";
 		if ($bytes) {
-		    # $debug and warn "s2 wrote...\n" . substr($b1to2, 0, $bytes) . "*\n";
+		    # $debug and _debug "s2 wrote...\n" . substr($b1to2, 0, $bytes) . "*\n";
 		    substr($b1to2, 0, $bytes, "");
 		    if ($s1_in_closed and length $b1to2) {
-			$debug and warn "buffer exhausted and s2-in is closed, shutting down s1-out\n";
+			$debug and _debug "buffer exhausted and s2-in is closed, shutting down s1-out\n";
 			shutdown($s2, 1) unless $ssl2;
 			$s2_out_closed = 1;
 		    }
 		}
 		elsif ($ssl2 and not defined $bytes) {
 		    $ssl_wtr2 ||= (_ssl_error == _ssl_want_read);
-		    $debug and warn "s2 wants to read for SSL";
+		    $debug and _debug "s2 wants to read for SSL";
 		}
 		else {
 		    $close{s2out} = 1;
@@ -175,22 +183,22 @@ sub forward_sockets {
 		    }
 		}
 		if ($close{s1in}) {
-		    $debug and warn "shutdown s1 in\n";
+		    $debug and _debug "shutdown s1 in\n";
 		    shutdown($s1, 0);
 		    $s1_in_closed = 1;
 		}
 		if ($close{s2in}) {
-		    $debug and warn "shutdown s2 in\n";
+		    $debug and _debug "shutdown s2 in\n";
 		    shutdown($s2, 0);
 		    $s2_in_closed = 1;
 		}
 		if ($close{s1out}) {
-		    $debug and warn "shutdown s1 out\n";
+		    $debug and _debug "shutdown s1 out\n";
 		    shutdown($s1, 1);
 		    $s1_out_closed = 1;
 		}
 		if ($close{s2out}) {
-		    $debug and warn "shutdown s1 out\n";
+		    $debug and _debug "shutdown s1 out\n";
 		    shutdown($s2, 1);
 		    $s2_out_closed = 1;
 		}
