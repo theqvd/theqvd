@@ -104,6 +104,9 @@ sub forward_sockets {
 			$ssl_wtw1 = 1;
 			$debug and _debug "s1 wants to write for SSL";
 		    }
+		    else {
+			_debug "unexpected SSL error " . _ssl_error;
+		    }
 		}
 		elsif ($ssl_wtw1) {
 		    undef $ssl_wtw1;
@@ -124,6 +127,9 @@ sub forward_sockets {
 		    if (_ssl_error == _ssl_want_write) {
 			$ssl_wtw2 = 1;
 			$debug and _debug "s2 wants to write for SSL";
+		    }
+		    else {
+			_debug "unexpected SSL error " . _ssl_error;
 		    }
 		}
 		elsif ($ssl_wtw2) {
@@ -152,6 +158,9 @@ sub forward_sockets {
 			$ssl_wtr1 = 1;
 			$debug and _debug "s1 wants to read for SSL";
 		    }
+		    else {
+			_debug "unexpected SSL error " . _ssl_error;
+		    }
 		}
 		elsif ($ssl_wtr1) {
 		    undef $ssl_wtr1;
@@ -179,6 +188,9 @@ sub forward_sockets {
 		    if (_ssl_error == _ssl_want_read) {
 			$ssl_wtr2 = 1;
 			$debug and _debug "s2 wants to read for SSL";
+		    }
+		    else {
+			_debug "unexpected SSL error " . _ssl_error;
 		    }
 		}
 		elsif ($ssl_wtr2) {
