@@ -37,10 +37,13 @@ sub run {
     $o{media} = 4713 if $self->{audio};
     if ($self->{printing}) {
 	if ($WINDOWS) {
-		$o{smb} = 139;
+	    $o{smb} = 139;
 	} else {
 	    $o{cups} = 631;
 	}
+    }
+    if ($WINDOWS) {
+	$o{root} = $ENV{APPDATA}.'/.qvd';
     }
     @o{keys %{$self->{extra}}} = values %{$self->{extra}};
 
