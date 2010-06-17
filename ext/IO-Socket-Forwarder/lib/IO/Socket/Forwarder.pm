@@ -89,7 +89,7 @@ sub forward_sockets {
 	vec($bitsw, $fn1, 1) = 1 if (($wtw1 && !$ssl_wtr1) || $ssl_wtw1);
 	vec($bitsw, $fn2, 1) = 1 if (($wtw2 && !$ssl_wtr2) || $ssl_wtw2);
 
-	$debug and _debug "calling select($bitsr, $bitsw...";
+	$debug and _debug "calling select('$bitsr', '$bitsw')...";
 
 	my $n = select($bitsr, $bitsw, undef, undef);
 
