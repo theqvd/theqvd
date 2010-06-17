@@ -48,8 +48,8 @@ sub forward_sockets {
     my $ssl1 = $s1->isa('IO::Socket::SSL');
     my $ssl2 = $s2->isa('IO::Socket::SSL');
 
-    $debug and $ssl1 and _debug "s1 is SSL";
-    $debug and $ssl2 and _debug "s2 is SSL";
+    $debug and _debug "s1 fn=$fn1, ssl=$ssl1";
+    $debug and _debug "s2 fn=$fn2, ssl=$ssl2";
 
     my $b1to2 = '';
     my $b2to1 = '';
