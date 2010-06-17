@@ -367,7 +367,7 @@ sub _fork_monitor {
 		    $props{'qvd.vm.user.groups'} //= $default_user_groups;
 		    $props{'qvd.vm.user.home'} = "$home_path/$user";
 		    _provisionate_user(%props);
-		    _call_action_hook('connect', @_);
+		    _call_action_hook(connect => %props);
 		    _make_nxagent_config(%props);
 
 		    $ENV{PULSE_SERVER} = "tcp:localhost:".($display+7000) if $enable_audio;
