@@ -20,7 +20,7 @@ sub _debug {
     my $time = Time::HiRes::time();
     my @date = localtime $time;
     my $out = "@_";
-    $out =~ s/([^ ..~])/"\\x".sprintf("%x", $1)/ge;
+    $out =~ s/([^ ..~])/"\\x".sprintf("%x", ord $1)/ge;
     warn sprintf("%02d%02d%02d.%03d: %s\n",
 		 @date[2, 1, 0], 1000 * ($time - int $time), $out);
 }
