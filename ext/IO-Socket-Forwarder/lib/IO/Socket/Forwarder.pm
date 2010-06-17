@@ -92,7 +92,6 @@ sub forward_sockets {
 
 	if ($n > 0) {
 	    if ($wtr1 and vec(($ssl_wtw1 ? $bitsw : $bitsr), $fn1, 1)) {
-		undef $ssl_wtr1;
 		$debug and _debug "reading from s1...\n";
 		my $bytes = sysread($s1, $b1to2, $io_chunk_size, length $b1to2);
 		$debug and _debug "bytes: " . ($bytes // '<undef>') . "\n";
@@ -103,12 +102,12 @@ sub forward_sockets {
 		    $ssl_wtw1 ||= (_ssl_error == _ssl_want_write);
 		    $debug and _debug "s1 wants to write for SSL";
 		}
-		else {
+		elsif (!$ssl_wtr1) {
 		    $close{s1in} = 1;
 		}
+		undef $ssl_wtr1;
 	    }
 	    if ($wtr2 and vec(($ssl_wtw2 ? $bitsw : $bitsr), $fn2, 1)) {
-		undef $ssl_wtr2;
 		$debug and _debug "reading from s2...\n";
 		my $bytes = sysread($s2, $b2to1, $io_chunk_size, length $b2to1);
 		$debug and _debug "bytes: " . ($bytes // '<undef>') . "\n";
@@ -119,12 +118,12 @@ sub forward_sockets {
 		    $ssl_wtw2 ||= (_ssl_error == _ssl_want_write);
 		    $debug and _debug "s2 wants to write for SSL";
 		}
-		else {
+		elsif (!$ssl_wtr2) {
 		    $close{s2in} = 1;
 		}
+		undef $ssl_wtr2;
 	    }
 	    if ($wtw1 and vec(($ssl_wtr1 ? $bitsr : $bitsw), $fn1, 1)) {
-		undef $ssl_wtw1;
 		$debug and _debug "writting to s1...\n";
 		my $bytes = syswrite($s1, $b2to1, $io_chunk_size);
 		$debug and _debug "bytes: " . ($bytes // '<undef>') . "\n";
@@ -141,12 +140,12 @@ sub forward_sockets {
 		    $ssl_wtr1 ||= (_ssl_error == _ssl_want_read);
 		    $debug and _debug "s1 wants to read for SSL";
 		}
-		else {
+		elsif (!$ssl_wtw1) {
 		    $close{s1out} = 1;
 		}
+		undef $ssl_wtw1;
 	    }
 	    if ($wtw2 and vec(($ssl_wtr2 ? $bitsr : $bitsw), $fn2, 1)) {
-		undef $ssl_wtw2;
 		$debug and _debug "writting to s2...\n";
 		my $bytes = syswrite($s2, $b1to2, $io_chunk_size);
 		$debug and _debug "bytes: " . ($bytes // '<undef>') . "\n";
@@ -163,9 +162,10 @@ sub forward_sockets {
 		    $ssl_wtr2 ||= (_ssl_error == _ssl_want_read);
 		    $debug and _debug "s2 wants to read for SSL";
 		}
-		else {
+		elsif (!$ssl_wtw2) {
 		    $close{s2out} = 1;
 		}
+		undef $ssl_wtw2;
 	    }
 	    if (%close) {
 		for (1, 2, 3) { # propagate close flag to dependants
