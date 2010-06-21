@@ -20,7 +20,6 @@ WriteMakefile( NAME          => 'QVD::Client',
 				  'Test::More' => 0,
 				  'Wx' => 0,
                   'X11::Protocol' => 0,
-                  'Win32::API' => 0,
 				  'URI::Escape' => 0,
 				  'File::Spec' => 0 },
 
