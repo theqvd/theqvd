@@ -37,7 +37,7 @@ sub process_request {
     my $self = shift;
     my $socket = $self->{server}{client};
 
-    setsockopt $socket, IPPROTO_TCP, TCP_NODELAY, 1);
+    setsockopt $socket, IPPROTO_TCP, TCP_NODELAY, 1;
 
     if ($self->{server}{SSL}) {
 	require IO::Socket::SSL;

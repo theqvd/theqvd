@@ -50,7 +50,7 @@ sub new {
 		 bout => '' };
     bless $self, $class;
     $self->_create_socket();
-    setsockopt($self->{socket}, IPPROTO_TCP, TCP_NODELAY, 1);
+    setsockopt $self->{socket}, IPPROTO_TCP, TCP_NODELAY, 1;
     $self;
 }
 
