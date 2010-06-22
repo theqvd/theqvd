@@ -12,8 +12,8 @@ require Exporter;
 our @ISA = qw(Exporter);
 our @EXPORT_OK = qw(forward_sockets);
 
-use constant default_io_buffer_size => 64 * 1024;
-use constant default_io_chunk_size => 16 * 1024;
+use constant _default_io_buffer_size => 64 * 1024;
+use constant _default_io_chunk_size => 16 * 1024;
 
 sub _debug {
     require Time::HiRes;
@@ -31,14 +31,16 @@ sub _ssl_error { $IO::Socket::SSL::SSL_ERROR }
 sub _ssl_want_read { IO::Socket::SSL::SSL_WANT_READ() }
 sub _ssl_want_write { IO::Socket::SSL::SSL_WANT_WRITE() }
 
+sub _min { $_[0] < $_[1] ? $_[0] : $_[1] }
+
 sub forward_sockets {
     my ($s1, $s2, %opts) = @_;
 
     my $debug = delete $opts{debug};
     $debug = $IO::Socket::Forwarder::debug unless defined $debug;
 
-    my $io_buffer_size = delete $opts{io_buffer_size} || default_io_buffer_size;
-    my $io_chunk_size  = delete $opts{io_chunk_size}  || default_io_chunk_size;
+    my $io_buffer_size = delete $opts{io_buffer_size} || _default_io_buffer_size;
+    my $io_chunk_size  = delete $opts{io_chunk_size}  || _default_io_chunk_size;
 
     my $fn1 = fileno $s1;
     defined $fn1 or croak "socket 1 is not a valid file handle";
@@ -59,13 +61,12 @@ sub forward_sockets {
 	_debug "b2to1: $b2to1";
     }
 
-    my $s1_in_closed;
-    my $s1_out_closed;
-    my $s2_in_closed;
-    my $s2_out_closed;
+    my ($write_chunk_size1, $write_chunk_size2) = ($io_chunk_size, $io_chunk_size);
 
-    my ($ssl_wtr1, $ssl_wtw1, $ssl_wtr2, $ssl_wtw2);
-    my %close;
+    my ($s1_in_closed, $s2_in_closed,
+        $s1_out_closed, $s2_out_closed,
+        $ssl_wtr1, $ssl_wtw1, $ssl_wtr2, $ssl_wtw2,
+        %close);
 
     unless ($^O =~ /Win32/) {
 	fcntl($s1, F_SETFL, fcntl($s1, F_GETFL, 0) | O_NONBLOCK)
@@ -82,7 +83,17 @@ sub forward_sockets {
 
     while (1) {
 	my $wtr1 = (not $s1_in_closed and length $b1to2 < $io_buffer_size);
+        if ($ssl1 and $wtr1 and $s1->pending) {
+            sysread($s1, $b1to2, _min($s1->pending, $io_buffer_size), length $b1to2)
+                and redo;
+        }
+
 	my $wtr2 = (not $s2_in_closed and length $b2to1 < $io_buffer_size);
+        if ($ssl2 and $wtr2 and $s2->pending) {
+            sysread($s2, $b2to1, _min($s2->pending, $io_buffer_size), length $b2to1)
+                and redo;
+        }
+
 	my $wtw1 = (not $s1_out_closed and length $b2to1);
 	my $wtw2 = (not $s2_out_closed and length $b1to2);
 
@@ -92,6 +103,8 @@ sub forward_sockets {
 	    $debug and _debug "nothing else to do, exiting...";
 	    last;
 	}
+
+
 
 	my $bitsr = '';
 	vec($bitsr, $fn1, 1) = 1 if (($wtr1 && !$ssl_wtw1) || $ssl_wtr1);
@@ -122,6 +135,7 @@ sub forward_sockets {
 		    }
 		    else {
 			_debug "unexpected SSL error " . _ssl_error;
+                        $close{slin} = 1;
 		    }
 		}
 		elsif ($ssl_wtw1) {
@@ -169,6 +183,7 @@ sub forward_sockets {
 			shutdown($s1, 1) unless $ssl1;
 			$s1_out_closed = 1;
 		    }
+                    $write_chunk_size1 = $io_chunk_size;
 		    undef $ssl_wtr1;
 		}
 		elsif ($ssl1 and not defined $bytes) {
@@ -176,22 +191,23 @@ sub forward_sockets {
 			$ssl_wtr1 = 1;
 			$debug and _debug "s1 wants to read for SSL";
 		    }
+                    elsif (_ssl_error == _ssl_want_write) {
+                        $write_chunk_size1 = length $b2to1 if length $b2to1 < $write_chunk_size1;
+			$debug and _debug "s1 wants to write more for SSL, wcs1: $write_chunk_size1";
+                    }
 		    else {
 			_debug "unexpected SSL error " . _ssl_error;
+                        $close{s1out} = 1;
 		    }
-		}
-		elsif ($ssl_wtr1) {
-		    undef $ssl_wtr1;
 		}
 		else {
 		    $debug and _debug "nothing written to s1, closing schedulled";
 		    $close{s1out} = 1;
 		}
-		undef $ssl_wtw1;
 	    }
 	    if ($wtw2 and vec(($ssl_wtr2 ? $bitsr : $bitsw), $fn2, 1)) {
 		$debug and _debug "writting to s2...";
-		my $bytes = syswrite($s2, $b1to2, $io_chunk_size);
+		my $bytes = syswrite($s2, $b1to2, $write_chunk_size2);
 		$debug and _debug "bytes: " . ($bytes // '<undef>');
 		if ($bytes) {
 		    $debug and _debug "s2 wrote: " . substr($b1to2, 0, $bytes);
@@ -201,6 +217,7 @@ sub forward_sockets {
 			shutdown($s2, 1) unless $ssl2;
 			$s2_out_closed = 1;
 		    }
+                    $write_chunk_size2 = $io_chunk_size;
 		    undef $ssl_wtr2;
 		}
 		elsif ($ssl2 and not defined $bytes) {
@@ -208,18 +225,19 @@ sub forward_sockets {
 			$ssl_wtr2 = 1;
 			$debug and _debug "s2 wants to read for SSL";
 		    }
+                    elsif (_ssl_error == _ssl_want_write) {
+                        $write_chunk_size2 = length $b1to2 if length $b1to2 < $write_chunk_size2;
+			$debug and _debug "s2 wants to write more for SSL, wcs2: $write_chunk_size2";
+                    }
 		    else {
 			_debug "unexpected SSL error " . _ssl_error;
+                        $close{s2out} = 1;
 		    }
-		}
-		elsif ($ssl_wtr2) {
-		    undef $ssl_wtr2;
 		}
 		else {
 		    $debug and _debug "nothing written to s1, closing schedulled";
 		    $close{s2out} = 1;
 		}
-		undef $ssl_wtw2;
 	    }
 	    if (%close) {
 		for (1, 2, 3) { # propagate close flag to dependants
