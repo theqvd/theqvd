@@ -66,8 +66,8 @@ sub run {
     }
 
     forward_sockets($local_socket, $httpc->get_socket,
-		    buffer_2to1 => $httpc->read_buffered,
-		    debug => 1);
+		    buffer_2to1 => $httpc->read_buffered);
+		    # debug => 1);
 }
 
 1;
