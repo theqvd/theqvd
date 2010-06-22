@@ -133,6 +133,9 @@ sub forward_sockets {
 			$ssl_wtw1 = 1;
 			$debug and _debug "s1 wants to write for SSL";
 		    }
+                    elsif (_ssl_error == _ssl_want_read) {
+			$debug and _debug "s1 wants to read more for SSL";
+                    }
 		    else {
 			_debug "unexpected SSL error " . _ssl_error;
                         $close{slin} = 1;
@@ -159,6 +162,9 @@ sub forward_sockets {
 			$ssl_wtw2 = 1;
 			$debug and _debug "s2 wants to write for SSL";
 		    }
+                    elsif (_ssl_error == _ssl_want_read) {
+			$debug and _debug "s2 wants to read more for SSL";
+                    }
 		    else {
 			_debug "unexpected SSL error " . _ssl_error;
 		    }
