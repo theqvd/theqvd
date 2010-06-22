@@ -8,10 +8,9 @@ our $VERSION = '0.01';
 use URI::Split qw(uri_split);
 use QVD::Log;
 use QVD::HTTP::StatusCodes qw(:all);
+use Socket qw(IPPROTO_TCP TCP_NODELAY);
 
-# FIXME: allow forking!
 use parent qw(Net::Server::Fork);
-# use parent qw(Net::Server);
 
 sub default_values { return { no_client_stdout => 1 } }
 
@@ -37,6 +36,8 @@ my $token_re = qr/[!#\$%&'*+\-\.0-9a-zA-Z]+/;
 sub process_request {
     my $self = shift;
     my $socket = $self->{server}{client};
+
+    setsockopt $socket, IPPROTO_TCP, TCP_NODELAY, 1);
 
     if ($self->{server}{SSL}) {
 	require IO::Socket::SSL;

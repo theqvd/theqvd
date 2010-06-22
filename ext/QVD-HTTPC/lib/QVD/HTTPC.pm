@@ -11,6 +11,7 @@ use Carp;
 use IO::Socket::INET;
 use URI::Escape qw(uri_escape);
 use Errno;
+use Socket qw(IPPROTO_TCP TCP_NODELAY);
 
 use QVD::HTTP::StatusCodes qw(:status_codes);
 use QVD::HTTP::Headers qw(header_lookup);
@@ -49,6 +50,7 @@ sub new {
 		 bout => '' };
     bless $self, $class;
     $self->_create_socket();
+    setsockopt($self->{socket}, IPPROTO_TCP, TCP_NODELAY, 1);
     $self;
 }
 
