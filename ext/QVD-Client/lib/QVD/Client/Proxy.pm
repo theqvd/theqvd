@@ -49,7 +49,7 @@ sub run {
 
     push @cmd, (map "$_=$o{$_}", keys %o);
 
-    @cmd = (xterm => -e => "telnet localhost 4040"); # FIXME: only for latency testing
+    # @cmd = (xterm => -e => "telnet localhost 4040"); # FIXME: only for latency testing
 
     $self->{process} = Proc::Background->new(@cmd);
 
