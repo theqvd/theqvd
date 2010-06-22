@@ -31,9 +31,14 @@ sub run {
     } else {
 	push @cmd, "nxproxy";
     }
-    push @cmd, qw(-S localhost:40);
+
 
     my %o = ();
+
+    if ($WINDOWS) {
+	     $o{"nx/nx,root"} = $ENV{HOMEPATH}."/QVD";
+    }  
+    
     $o{media} = 4713 if $self->{audio};
     if ($self->{printing}) {
 	if ($WINDOWS) {
@@ -42,14 +47,12 @@ sub run {
 	    $o{cups} = 631;
 	}
     }
-    if ($WINDOWS) {
-	$o{root} = $ENV{APPDATA}.'/.qvd';
-    }
-    @o{keys %{$self->{extra}}} = values %{$self->{extra}};
 
+    @o{keys %{$self->{extra}}} = values %{$self->{extra}};
+    push @cmd, ("-S");
     push @cmd, (map "$_=$o{$_}", keys %o);
 
-    # @cmd = (xterm => -e => "telnet localhost 4040"); # FIXME: only for latency testing
+    push @cmd, qw(localhost:40);
 
     $self->{process} = Proc::Background->new(@cmd);
 

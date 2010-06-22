@@ -29,7 +29,7 @@ sub OnInit {
     
     if ($WINDOWS) {
       my @cmd;
-      push @cmd, 'Xming/Xming.exe -multiwindow -notrayicon';
+      push @cmd, ($ENV{PROGRAMFILES}."/QVD/Xming/Xming.exe", "-multiwindow -notrayicon");
       Proc::Background->new(@cmd);   
     }
     
