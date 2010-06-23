@@ -13,6 +13,7 @@ AppPublisherURL=http://qvd.qindel.com/
 AppSupportURL=http://qvd.qindel.com/
 AppUpdatesURL=http://qvd.qindel.com/
 DefaultDirName={pf}\QVD
+DisableDirPage=yes
 DefaultGroupName=QVD Client
 DisableProgramGroupPage=yes
 OutputBaseFilename=setup
@@ -25,13 +26,23 @@ Name: "english"; MessagesFile: "compiler:Default.isl"
 [Tasks]
 Name: "desktopicon"; Description: "{cm:CreateDesktopIcon}"; GroupDescription: "{cm:AdditionalIcons}"; Flags: unchecked
 
+[Dirs]
+Name: "C:\Documents and Settings\{username}\QVD"; Attribs: hidden
+
 [Files]
-Source: "installer\*"; DestDir: "{app}"; Flags: ignoreversion recursesubdirs createallsubdirs
+Source: "installer\system32\*"; DestDir: "{app}"; Flags: ignoreversion recursesubdirs createallsubdirs
+Source: "installer\Xming\*"; DestDir: "{app}\Xming"; Flags: ignoreversion recursesubdirs createallsubdirs
+Source: "installer\QVD-Client\*"; DestDir: "{app}\QVD-Client"; Flags: ignoreversion recursesubdirs createallsubdirs
+Source: "installer\qvd-client.exe"; DestDir: "{app}"; Flags: ignoreversion
 ; NOTE: Don't use "Flags: ignoreversion" on any shared system files
 
 [Icons]
 Name: "{group}\QVD Client"; Filename: "{app}\qvd-client.exe"
 Name: "{commondesktop}\QVD Client"; Filename: "{app}\qvd-client.exe"; Tasks: desktopicon
+
+[Registry]
+Root: HKLM; Subkey: "SYSTEM\CurrentControlSet\Control\Session Manager\Environment"; ValueType:string; ValueName:"DISPLAY"; ValueData:"localhost:0.0"
+Root: HKLM; Subkey: "SYSTEM\CurrentControlSet\Control\Session Manager\Environment"; ValueType:string; ValueName:"QVDPATH"; ValueData:{app}
 
 [Run]
 Filename: "{app}\qvd-client.exe"; Description: "{cm:LaunchProgram,QVD}"; Flags: nowait postinstall skipifsilent
