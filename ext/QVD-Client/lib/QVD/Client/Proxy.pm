@@ -26,17 +26,15 @@ sub run {
 
     my @cmd;
     if ($WINDOWS) {
-	my ($volume, $directories, $file) = File::Spec->splitpath(File::Spec->rel2abs($0));
-	push @cmd, "$volume$directories\\nxproxy.exe";
+	push @cmd, $ENV{QVDPATH}."/nxproxy.exe";
     } else {
 	push @cmd, "nxproxy";
     }
 
-
     my %o = ();
 
     if ($WINDOWS) {
-	     $o{"nx/nx,root"} = $ENV{HOMEPATH}."/QVD";
+	$o{"nx/nx,root"} = $ENV{HOMEPATH}."/QVD";
     }  
     
     $o{media} = 4713 if $self->{audio};
