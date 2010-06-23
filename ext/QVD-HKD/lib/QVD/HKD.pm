@@ -108,8 +108,6 @@ sub run {
     while (1) {
 	DEBUG "HKD run, round: $hkd->{round}";
 
-	$hkd->_reap_children;
-
 	if (eval { $rt->update_ok_ts; 1 }) {
 	    $hkd->{round}++;
 	    $ok_ts = time;
@@ -168,8 +166,6 @@ sub _dirty_shutdown {
 	sleep 1;
     }
 }
-
-sub _reap_children { 1 while (waitpid(-1, WNOHANG) > 0) }
 
 sub _check_vms {
     my $hkd = shift;
@@ -253,12 +249,14 @@ sub _check_vms {
 
 	next if $vm->vm_state eq 'stopped';
 
-	unless ($hkd->_check_vm_process($vm)) {
+	my $vm_pid = $vm->vm_pid;
+	if (waitpid($vm_pid, WNOHANG) == $vm_pid) {
+	    DEBUG "kvm process $vm_pid reaped, \$?: $?";
 	    given ($vm->vm_state) {
-		when ('stopping_1') {}
-		when ('stopping_2') {
+		when ('stopping_1') {
 		    WARN "vm process exited without passing through stopping_2"
 		}
+		when ('stopping_2') {}
 		default {
 		    ERROR "vm process has disappeared!, id: $id";
 		    $vm->block;
@@ -592,11 +590,6 @@ sub _signal_vm {
     }
     DEBUG "kill VM process $pid with signal $signal" if $signal;
     kill($signal, $pid);
-}
-
-sub _check_vm_process {
-    my ($hkd, $vm) = @_;
-    $hkd->_signal_vm($vm, 0);
 }
 
 sub _check_l7r_process {
