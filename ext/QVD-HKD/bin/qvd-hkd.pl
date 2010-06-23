@@ -12,7 +12,7 @@ $App::Daemon::pidfile = cfg('hkd.pid_file');
 $App::Daemon::as_user = cfg('hkd.as_user');
 
 daemonize;
-QVD::HKD->run;
+QVD::HKD->new->run;
 
 __END__
 

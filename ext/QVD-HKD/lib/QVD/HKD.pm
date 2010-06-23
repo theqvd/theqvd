@@ -57,15 +57,24 @@ my $database_delay   = core_cfg('internal.database.retry_delay');
 
 # The class QVD::HKD does not have state so we use the class name as
 # the object.
-#
-# sub new { ... }
 
-my $start_time;
+sub new {
+    my $class = shift;
+    my $self = { killed => undef,
+		 stopping => undef,
+		 start_time => undef,
+		 round => 0 };
+    bless $self, $class;
+}
 
-END { _dirty_shutdown() }
+DESTROY { shift->_dirty_shutdown }
 
 sub run {
     my $hkd = shift;
+    my $stopping;
+
+    local $SIG{INT} = sub { $hkd->{killed}++ };
+
     my ($id, $rt);
     for (1..10) {
 	eval {
@@ -94,18 +103,46 @@ sub run {
 	exit(1);
     }
 
-    my $round = 0;
     my $ok_ts = time;
 
     while (1) {
-	DEBUG "HKD run, round: $round";
+	DEBUG "HKD run, round: $hkd->{round}";
 
 	$hkd->_reap_children;
 
 	if (eval { $rt->update_ok_ts; 1 }) {
+	    $hkd->{round}++;
 	    $ok_ts = time;
-	    $start_time //= $ok_ts;
-	    $hkd->_check_vms($round++);
+	    $hkd->{start_time} //= $ok_ts;
+	    if ($hkd->{killed}) {
+		DEBUG "HKD killed";
+		if ($hkd->{stopping}) {
+		    DEBUG "HKD is already stopping";
+		    undef $hkd->{killed};
+		}
+		else {
+		    txn_eval {
+			$rt->set_state('stopping');
+			$hkd->{stopping}++;
+			undef $hkd->{killed};
+			DEBUG "HKD stopping";
+		    };
+		}
+	    }
+	    $hkd->_check_vms;
+	    if ($hkd->{stopping}) {
+		txn_eval {
+		    rs(VM_Runtime)->search({host_id => this_host_id})->count and die "there are VMs still running";
+		    $rt->set_state('stopped');
+		};
+		if ($@) {
+		    DEBUG $@;
+		}
+		else {
+		    INFO "HKD exiting";
+		    exit(0);
+		}
+	    }
 	    $hkd->_check_l7rs;
 	    sleep $pool_time;
 	}
@@ -117,13 +154,15 @@ sub run {
 	    }
 	    INFO "HKD can not connect to database, retrying: $@";
 	    sleep $database_delay;
-	    undef $start_time;
+	    undef $hkd->{start_time};
 	}
     }
 }
 
 sub _dirty_shutdown {
     # FIXME: this is way too dirty...
+    local $?;
+    # DEBUG `ps -fea|grep kvm`;
     for (1..3) {
 	system "pkill kvm";
 	sleep 1;
@@ -133,57 +172,75 @@ sub _dirty_shutdown {
 sub _reap_children { 1 while (waitpid(-1, WNOHANG) > 0) }
 
 sub _check_vms {
-    my ($hkd, $round) = @_;
+    my $hkd = shift;
 
     my (@active_vms, @vmas);
     my $par = QVD::ParallelNet->new;
 
     for my $vm (rs(VM_Runtime)->search({host_id => this_host_id})) {
 	my $id = $vm->id;
-
-	# Command processing...
 	my $start;
-	if (defined $vm->vm_cmd) {
-	    txn_eval {
-		$vm->discard_changes;
-		given($vm->vm_cmd) {
-		    when('start') {
-			given($vm->vm_state) {
-			    when ('stopped') {
-				$hkd->_assign_vm_ports($vm);
-				$hkd->_move_vm_to_state(starting => $vm);
-				$vm->clear_vm_cmd;
-				$start = 1;
-			    }
-			    default {
-				ERROR "unexpected VM command start received in state $_";
-				$vm->clear_vm_cmd;
-			    }
-			}
+	if ($hkd->{stopping}) {
+	    # on clean exit, shutdown virtual machines gracefully
+	    if ($vm->vm_state eq 'running') {
+		DEBUG "stopping VM because HKD is shutting down";
+		$hkd->_move_vm_to_state(stopping_1 => $vm);
+	    }
+	    if ($vm->vm_cmd) {
+		txn_eval {
+		    $vm->discard_changes;
+		    if ($vm->vm_cmd == 'start' and $vm->vm_state eq 'stopped') {
+			$vm->unassign;
 		    }
-		    when('stop') {
-			given($vm->vm_state) {
-			    when ('running')  {
-				$hkd->_move_vm_to_state(stopping_1 => $vm);
-				$vm->clear_vm_cmd;
-			    }
-			    when ('starting') { } # stop is delayed!
-			    default {
-				ERROR "unexpected VM command stop received in state $_";
-				$vm->clear_vm_cmd;
-			    }
-			}
-		    }
-		    when(undef) {
-			DEBUG "command dissapeared";
-		    }
-		    default {
-			ERROR "unexpected VM command $_ received in state " . $vm->vm_state;
-			$vm->clear_vm_cmd;
-		    }
+		    DEBUG "VM command " . $vm->vm_cmd . " aborted because HKD is shutting down";
+		    $vm->clear_vm_cmd;
 		}
-	    };
-	    $@ and ERROR "vm_cmd processing failed: $@";
+	    }
+	}
+	else {
+	    # Command processing...
+	    if (defined $vm->vm_cmd) {
+		txn_eval {
+		    $vm->discard_changes;
+		    given($vm->vm_cmd) {
+			when('start') {
+			    given($vm->vm_state) {
+				when ('stopped') {
+				    $hkd->_assign_vm_ports($vm);
+				    $hkd->_move_vm_to_state(starting => $vm);
+				    $vm->clear_vm_cmd;
+				    $start = 1;
+				}
+				default {
+				    ERROR "unexpected VM command start received in state $_";
+				    $vm->clear_vm_cmd;
+				}
+			    }
+			}
+			when('stop') {
+			    given($vm->vm_state) {
+				when ('running')  {
+				    $hkd->_move_vm_to_state(stopping_1 => $vm);
+				    $vm->clear_vm_cmd;
+				}
+				when ('starting') { } # stop is delayed!
+				default {
+				    ERROR "unexpected VM command stop received in state $_";
+				    $vm->clear_vm_cmd;
+				}
+			    }
+			}
+			when(undef) {
+			    DEBUG "command dissapeared";
+			}
+			default {
+			    ERROR "unexpected VM command $_ received in state " . $vm->vm_state;
+			    $vm->clear_vm_cmd;
+			}
+		    }
+		};
+		$@ and ERROR "vm_cmd processing failed: $@";
+	    }
 	}
 
 	# no error checking is performed here, failed virtual
@@ -228,7 +285,7 @@ sub _check_vms {
 		    # harmless, so we didn't care!
 		    $vma_method = 'x_suspend';
 		}
-		elsif (($round + $id) % $pool_all_mod == 0) {
+		elsif (($hkd->{round} + $id) % $pool_all_mod == 0) {
 		    # this pings a few VMs on every round
 		    $vma_method = 'ping';
 		}
@@ -264,7 +321,7 @@ sub _check_vms {
 		when('running') {
 		    my $vma_ok_ts = $vm->vma_ok_ts;
 		    DEBUG "vma_timeout $timeout{vma}, elapsed " . (time - $vma_ok_ts);
-		    if (max($start_time, $vma_ok_ts) + $timeout{vma} < time) {
+		    if (max($hkd->{start_time}, $vma_ok_ts) + $timeout{vma} < time) {
 			# FIXME: check also that the number of consecutive
 			# failed checks goes over some threshold
 			ERROR "machine has not responded for a long time (" .
@@ -314,7 +371,7 @@ sub _go_zombie_on_timeout {
 	my $vm_state_ts = $vm->vm_state_ts;
 	DEBUG "timeout in state $vm_state is $timeout, elapsed "
 	    . (time - $vm_state_ts);
-	if (max($start_time, $vm_state_ts) + $timeout < time) {
+	if (max($hkd->{start_time}, $vm_state_ts) + $timeout < time) {
 	    ERROR "vm staled in state $vm_state,".
 		" id: $id, state_ts: $vm_state_ts, time: ".time;
 	    my $new_state = ($vm_state eq 'zombie_1' ? 'zombie_2' : 'zombie_1');
@@ -449,6 +506,7 @@ sub _start_vm {
     unless ($pid) {
 	$pid // die "unable to fork virtual machine process";
         eval {
+	    setpgrp; # do not kill kvm when HKD runs on terminal and user CTRL-C's it
             open STDOUT, '>', '/dev/null' or die "can't redirect STDOUT to /dev/null\n";
             open STDERR, '>&', STDOUT or die "can't redirect STDERR to STDOUT\n";
             open STDIN, '<', '/dev/null' or die "can't open /dev/null\n";
