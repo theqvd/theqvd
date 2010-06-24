@@ -100,7 +100,7 @@ sub run {
     }
     if ($@) {
 	ERROR "HKD initialization failed, aborting: $@";
-	exit(1);
+	return undef;
     }
 
     my $ok_ts = time;
@@ -138,7 +138,7 @@ sub run {
 		}
 		else {
 		    INFO "HKD exiting";
-		    exit(0);
+		    return 1;
 		}
 	    }
 	    $hkd->_check_l7rs;
@@ -148,7 +148,7 @@ sub run {
 	    if (time > $ok_ts + $database_timeout) {
 		ERROR "HKD can not connect to database, aborting: $@";
 		# $hkd->_dirty_shutdown;
-		exit 1;
+		return undef;
 	    }
 	    INFO "HKD can not connect to database, retrying: $@";
 	    sleep $database_delay;
