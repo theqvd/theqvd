@@ -30,7 +30,7 @@ sub OnInit {
     if ($WINDOWS) {
       my @cmd;
       my @opts = ("-multiwindow", "-notrayicon");
-      push @cmd, ($ENV{QVDPATH}."/QVD/Xming/Xming.exe", @opts);
+      push @cmd, ($ENV{QVDPATH}."/Xming/Xming.exe", @opts);
       #push @cmd, "-notrayicon";
       Proc::Background->new(@cmd);   
     }
