@@ -9,6 +9,7 @@ use QVD::DB::Simple;
 use QVD::ParallelNet;
 use QVD::SimpleRPC::Client;
 use QVD::SimpleRPC::Client::Parallel;
+use QVD::L7R;
 
 use Sys::Hostname;
 use POSIX qw(:sys_wait_h SIGTERM SIGKILL);
@@ -60,10 +61,13 @@ sub new {
     my $self = { killed       => undef,
 		 stopping     => undef,
 		 start_time   => undef,
+		 host         => undef,
 		 host_runtime => undef,
+		 frontend     => undef,
+		 backend      => undef,
 		 round        => 0,
-
-	         pids         => {} # VM pids are also stored locally so that
+		 my_pid       => $$,
+	         vm_pids      => {} # VM pids are also stored locally so that
                                     # in case the database becomes
                                     # inaccesible we would still be
                                     # able to kill the processes
@@ -71,7 +75,15 @@ sub new {
     bless $self, $class;
 }
 
-DESTROY { shift->_dirty_shutdown }
+sub _on_fork {
+    my $hkd = shift;
+    $hkd->{vm_pids} = {}
+}
+
+DESTROY {
+    local ($?, $!, $@);
+    shift->_shutdown
+}
 
 sub run {
     my $hkd = shift;
@@ -103,6 +115,9 @@ sub run {
 		    return 1;
 		}
 		DEBUG $@;
+
+		kill INT => $hkd->{l7r_pid}
+		    if $hkd->{l7r_pid};
 	    }
 	    $hkd->_check_l7rs;
 	    sleep $pool_time;
@@ -141,15 +156,17 @@ sub _startup {
     my $hkd = shift;
     my $retries = 10;
     while (1) {
-	my $hrt;
 	eval {
-	    $hrt = $hkd->{host_runtime} = this_host->runtime;
+	    my $host = $hkd->{host} = this_host;
+	    $hkd->{frontend} = $host->frontend;
+	    $hkd->{backend}  = $host->backend;
+	    my $hrt = $hkd->{host_runtime} = $host->runtime;
 	    $hrt->set_state('starting');
 	    $hkd->{id} = $hrt->id;
 	    $hkd->_dirty_startup;
 	    $hrt->set_state('running');
 	};
-	return $hrt unless $@;
+	return 1 unless $@;
 	if (--$retries) {
 	    ERROR "HKD initialization failed, retrying: $@";
 	    sleep 3;
@@ -162,6 +179,9 @@ sub _startup {
 }
 
 sub _dirty_startup {
+    # just in case the last run of the HKD run on this host ended
+    # abruptly, without closing some running VM and releasing it in
+    # the database, we clean everything related to this host.
     my $hkd = shift;
     my $host_id = $hkd->{id};
     for my $vm (rs(VM_Runtime)->search({host_id => $host_id})) {
@@ -170,6 +190,9 @@ sub _dirty_startup {
 	    $vm->discard_changes;
 	    if ($vm->host_id == $host_id) {
 		my $pid = $vm->vm_pid;
+		# we are conservative here: if there are some process
+		# with the same pid as the one registered in the
+		# database for the given VM we just abort
 		kill 0, $pid and
 		    die "VM ".$vm->id." may still be running as process $pid\n";
 		$vm->set_vm_state('stopped');
@@ -180,18 +203,26 @@ sub _dirty_startup {
     }
 }
 
+sub _shutdown {
+    my $hkd = shift;
+    if ($hkd->{my_pid} == $$) {
+	$hkd->_shutdown_l7r;
+	$hkd->_dirty_shutdown;
+    }
+}
+
 sub _dirty_shutdown {
     my $hkd = shift;
-    my $pids = $hkd->{pids};
+    my $vm_pids = $hkd->{vm_pids};
     for my $sig (qw(TERM TERM KILL KILL KILL KILL KILL)) {
-	last unless %$pids;
-	for my $id (keys %$pids) {
+	last unless %$vm_pids;
+	for my $id (keys %$vm_pids) {
 	    $hkd->_signal_vm_by_id($id => $sig);
 	}
 	sleep 1;
-	while (my ($id, $pid) = each %$pids) {
+	while (my ($id, $pid) = each %$vm_pids) {
 	    waitpid($pid, WNOHANG) == $pid
-		and delete $pids->{$id};
+		and delete $vm_pids->{$id};
 	}
     }
 }
@@ -278,10 +309,10 @@ sub _check_vms {
 
 	next if $vm->vm_state eq 'stopped';
 
-	my $vm_pid = $hkd->{pids}{$id};
+	my $vm_pid = $hkd->{vm_pids}{$id};
 	if (!defined($vm_pid) or waitpid($vm_pid, WNOHANG) == $vm_pid) {
 	    DEBUG "kvm process $vm_pid reaped, \$?: $?";
-	    delete $hkd->{pids}{$id};
+	    delete $hkd->{vm_pids}{$id};
 	    given ($vm->vm_state) {
 		when ('stopping_1') {
 		    WARN "vm process exited without passing through stopping_2"
@@ -375,17 +406,6 @@ sub _check_vms {
 		txn_eval { $hkd->_move_vm_to_state($new_state => $vm) };
 		$@ and ERROR "Unable to move VM $id to state $new_state: $@";
 	    }
-	}
-    }
-}
-
-sub _check_l7rs {
-    my $hkd = shift;
-    # check for dissapearing L7Rs processes
-    for my $l7r (rs(VM_Runtime)->search({l7r_host => this_host_id})) {
-	unless ($hkd->_check_l7r_process($l7r)) {
-	    WARN "clean dead L7R process for VM " . $l7r->id;
-	    $l7r->clear_l7r_all;
 	}
     }
 }
@@ -544,7 +564,7 @@ sub _start_vm {
     }
     DEBUG "kvm pid: $pid\n";
     if (defined $pid) {
-	$hkd->{pids}{$id} = $pid;
+	$hkd->{vm_pids}{$id} = $pid;
 	$vm->set_vm_pid($pid);
     }
 }
@@ -615,7 +635,7 @@ sub _vm_user_storage_path {
 
 sub _signal_vm_by_id {
     my ($hkd, $id, $signal) = @_;
-    my $pid = $hkd->{pids}{$id};
+    my $pid = $hkd->{vm_pids}{$id};
     unless ($pid) {
 	DEBUG "later detection of failed VM execution";
 	return;
@@ -624,22 +644,100 @@ sub _signal_vm_by_id {
     kill($signal, $pid);
 }
 
-sub _check_l7r_process {
-    my ($hkd, $vm) = @_;
-    my $pid = $vm->l7r_pid;
-    unless ($pid) {
-	ERROR "internal error, killing process " . ($pid // '<undef>');
-	return;
+sub _check_l7rs {
+    my $hkd = shift;
+    if ($hkd->{frontend}) {
+	# check for dissapearing L7Rs processes
+	for my $vm (rs(VM_Runtime)->search({l7r_host => this_host_id})) {
+	    my $l7r_worker_pid = $vm->l7r_pid;
+	    unless (defined $l7r_worker_pid and kill 0, $l7r_worker_pid) {
+		WARN "clean dead L7R process for VM " . $vm->id;
+		$vm->clear_l7r_all;
+	    }
+	}
+	# check for the main L7R process
+	my $l7r_pid = $hkd->{l7r_pid};
+	if (!defined $l7r_pid or waitpid($l7r_pid, WNOHANG) == $l7r_pid) {
+	    delete $hkd->{l7r_pid};
+	    unless ($hkd->{stopping}) {
+		eval { $hkd->_start_l7r };
+		ERROR $@ if $@;
+	    }
+	}
     }
-    # DEBUG "kill L7R process $pid with signal 0";
-    kill(0, $pid);
+}
+
+sub _shutdown_l7r {
+    my $hkd = shift;
+    if ($hkd->{frontend}) {
+	for my $sig (qw(INT INT INT INT KILL KILL KILL)) {
+	    my $l7r_pid = $hkd->{l7r_pid} // last;
+	    kill $sig => $l7r_pid;
+	    sleep 1;
+	    if (waitpid($l7r_pid, WNOHANG) == $l7r_pid) {
+		delete $hkd->{l7r_pid};
+		last;
+	    }
+	}
+    }
+}
+
+sub _start_l7r {
+    my $hkd = shift;
+    my @args = ( host => cfg('l7r.address'),
+		 port => cfg('l7r.port') );
+    my $ssl = cfg('l7r.use_ssl');
+    if ($ssl) {
+	my $l7r_certs_path  = cfg('path.ssl.certs');
+	my $l7r_ssl_key     = cfg('l7r.ssl.key');
+	my $l7r_ssl_cert    = cfg('l7r.ssl.cert');
+	my $l7r_ssl_cert_fn = "$l7r_certs_path/l7r-cert.pem";
+	my $l7r_ssl_key_fn  = "$l7r_certs_path/l7r-key.pem";
+	# copy the SSL certificate and key from the database to local
+	# files
+	mkdir $l7r_certs_path, 0700;
+	-d $l7r_certs_path or die "unable to create directory $l7r_certs_path\n";
+	my ($mode, $uid) = (stat $l7r_certs_path)[2, 4];
+	$uid == $> or $uid == 0 or die "bad owner for directory $l7r_certs_path\n";
+	$mode & 0077 and die "bad permissions for directory $l7r_certs_path\n";
+	_write_to_file($l7r_ssl_cert_fn, $l7r_ssl_cert);
+	_write_to_file($l7r_ssl_key_fn,  $l7r_ssl_key);
+	push @args, ( SSL           => 1,
+		      SSL_key_file  => $l7r_ssl_key_fn,
+		      SSL_cert_file => $l7r_ssl_cert_fn );
+    }
+    my $pid = fork;
+    if (!$pid) {
+	defined $pid or die "Unable to fork L7R: $!\n";
+	eval {
+	    db_release; # having two processes using the same DB handler
+	                # is definitively not a good idea!
+	    DEBUG "L7R process forked, SSL: $ssl";
+	    setpgrp;
+	    my $l7r = QVD::L7R->new(@args);
+	    $l7r->run;
+	};
+	ERROR $@ if $@;
+	exit (0);
+    }
+    $hkd->{l7r_pid} = $pid;
+}
+
+sub _write_to_file {
+    my ($fn, $data) = @_;
+    my $fh;
+    DEBUG "writting data to $fn";
+    unless ( open $fh, '>', $fn  and
+	     binmode $fh         and
+	     print $fh $data     and
+	     close $fh ) {
+	die "Unable to write $fn";
+    }
 }
 
 1;
 
 __END__
-o
-
 
 =head1 NAME
 
@@ -647,11 +745,7 @@ QVD::HKD - The QVD house keeping daemon
 
 =head1 SYNOPSIS
 
-FIXME write the synopsis
-
-=head1 DESCRIPTION
-
-The house keeping daemon manages the virtual machines running on a host.
+The HKD is the daemon that keeps QVD up and running
 
 =head1 COPYRIGHT
 

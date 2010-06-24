@@ -8,12 +8,16 @@ use QVD::Config;
 use QVD::Log;
 
 use Exporter qw(import);
-our @EXPORT = qw(db txn_do txn_eval rs this_host_id this_host);
+our @EXPORT = qw(db db_release txn_do txn_eval rs this_host_id this_host);
 
 my $db;
 
 sub db {
     $db //= QVD::DB->new
+}
+
+sub db_release {
+    undef $db;
 }
 
 sub txn_do (&) {

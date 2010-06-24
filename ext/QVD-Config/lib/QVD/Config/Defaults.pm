@@ -47,8 +47,7 @@ client.user.name =
 client.use_ssl = 1
 
 l7r.use_ssl = 1
-l7r.ssl_port = 8443
-l7r.port = 8080
+l7r.port = 8443
 l7r.address = *
 l7r.as_user = qvd
 l7r.pid_file = ${path.run}/l7r.pid
