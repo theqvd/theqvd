@@ -55,15 +55,17 @@ my $persistent_overlay = cfg('vm.overlay.persistent');
 my $database_timeout = core_cfg('internal.database.timeout');
 my $database_delay   = core_cfg('internal.database.retry_delay');
 
-# The class QVD::HKD does not have state so we use the class name as
-# the object.
-
 sub new {
     my $class = shift;
-    my $self = { killed => undef,
-		 stopping => undef,
+    my $self = { killed     => undef,
+		 stopping   => undef,
 		 start_time => undef,
-		 round => 0 };
+		 round      => 0,
+	         pids       => {} # VM pids are also stored locally so that
+                                  # in case the database becomes
+                                  # inaccesible we would still be able
+                                  # to kill the processes
+	       };
     bless $self, $class;
 }
 
@@ -71,75 +73,33 @@ DESTROY { shift->_dirty_shutdown }
 
 sub run {
     my $hkd = shift;
-    my $stopping;
-
     local $SIG{INT} = sub { $hkd->{killed}++ };
 
-    my ($id, $rt);
-    for (1..10) {
-	eval {
-	    $id = this_host_id;
-	    $rt = rs(Host_Runtime)->find($id);
-	    $rt->set_state('starting');
-	    for my $vm (rs(VM_Runtime)->search({host_id => $id})) {
-		DEBUG "releasing VM " . $vm->id;
-		txn_do {
-		    $vm->discard_changes;
-		    $vm->set_vm_state('stopped');
-		    $vm->block;
-		    $vm->unassign;
-		};
-	    }
-	    $rt->set_state('running');
-	};
-	if ($@) {
-	    ERROR "HKD initialization failed, retrying: $@";
-	    sleep 3;
-	    next;
-	}
-    }
-    if ($@) {
-	ERROR "HKD initialization failed, aborting: $@";
-	return undef;
-    }
+    my $hrt = $hkd->_startup or die "HKD startup failed";
 
     my $ok_ts = time;
 
     while (1) {
 	DEBUG "HKD run, round: $hkd->{round}";
-
-	if (eval { $rt->update_ok_ts; 1 }) {
+	if (eval { $hrt->update_ok_ts; 1 }) {
 	    $hkd->{round}++;
 	    $ok_ts = time;
 	    $hkd->{start_time} //= $ok_ts;
-	    if ($hkd->{killed}) {
-		DEBUG "HKD killed";
-		if ($hkd->{stopping}) {
-		    DEBUG "HKD is already stopping";
-		    undef $hkd->{killed};
-		}
-		else {
-		    txn_eval {
-			$rt->set_state('stopping');
-			$hkd->{stopping}++;
-			undef $hkd->{killed};
-			DEBUG "HKD stopping";
-		    };
-		}
-	    }
+
+	    $hkd->_on_killed if $hkd->{killed}
+
 	    $hkd->_check_vms;
+
 	    if ($hkd->{stopping}) {
 		txn_eval {
 		    rs(VM_Runtime)->search({host_id => this_host_id})->count and die "there are VMs still running";
-		    $rt->set_state('stopped');
+		    $hrt->set_state('stopped');
 		};
-		if ($@) {
-		    DEBUG $@;
-		}
-		else {
+		unless ($@) {
 		    INFO "HKD exiting";
 		    return 1;
 		}
+		DEBUG $@;
 	    }
 	    $hkd->_check_l7rs;
 	    sleep $pool_time;
@@ -147,7 +107,6 @@ sub run {
 	else { # database is not available
 	    if (time > $ok_ts + $database_timeout) {
 		ERROR "HKD can not connect to database, aborting: $@";
-		# $hkd->_dirty_shutdown;
 		return undef;
 	    }
 	    INFO "HKD can not connect to database, retrying: $@";
@@ -157,13 +116,79 @@ sub run {
     }
 }
 
+sub _on_killed {
+    my $hkd = shift;
+    DEBUG "HKD killed";
+    if ($hkd->{stopping}) {
+	DEBUG "HKD is already stopping";
+	undef $hkd->{killed};
+    }
+    else {
+	txn_eval {
+	    $hrt->set_state('stopping');
+	    $hkd->{stopping}++;
+	    undef $hkd->{killed};
+	    DEBUG "HKD stopping";
+	};
+    }
+}
+
+sub _dirty_startup {
+    my $hkd = shift;
+    my $host_id = $hkd->{id};
+    for my $vm (rs(VM_Runtime)->search({host_id => $host_id})) {
+	INFO "Releasing VM " . $vm->id;
+	txn_do {
+	    $vm->discard_changes;
+	    if ($vm->host_id == $host_id) {
+		my $pid = $vm->vm_pid;
+		kill 0, $pid and
+		    die "VM ".$vm->id." may still be running as process $pid\n";
+		$vm->set_vm_state('stopped');
+		$vm->block;
+		$vm->unassign;
+	    }
+	};
+    }
+}
+
+sub _startup {
+    my $hkd = shift;
+    my $hrt;
+    my $retries = 10;
+    while (1) {
+	eval {
+	    $hrt = this_host->runtime;
+	    $hrt->set_state('starting');
+	    $hkd->{id} = $hrt->id;
+	    $hkd->_dirty_startup;
+	    $hrt->set_state('running');
+	};
+	return $hrt unless $@;
+	if (--$retries) {
+	    ERROR "HKD initialization failed, retrying: $@";
+	    sleep 3;
+	}
+	else {
+	    ERROR "HKD initialization failed, aborting: $@";
+	    return;
+	}
+    }
+}
+
 sub _dirty_shutdown {
-    # FIXME: this is way too dirty...
-    local $?;
-    # DEBUG `ps -fea|grep kvm`;
-    for (1..3) {
-	system "pkill kvm";
+    my $hkd = shift;
+    my $pids = $hkd->{pids};
+    for my $sig (qw(TERM TERM KILL KILL KILL KILL KILL)) {
+	last unless %$pids;
+	for my $id (keys %$pids) {
+	    $hkd->_signal_vm_by_id($id => $sig);
+	}
 	sleep 1;
+	while (my ($id, $pid) = each %$pids) {
+	    waitpid($pid, WNOHANG) == $pid
+		and delete $pids->{$id};
+	}
     }
 }
 
@@ -249,9 +274,10 @@ sub _check_vms {
 
 	next if $vm->vm_state eq 'stopped';
 
-	my $vm_pid = $vm->vm_pid;
-	if (waitpid($vm_pid, WNOHANG) == $vm_pid) {
+	my $vm_pid = $hkd->{pids}{$id};
+	if (!defined($vm_pid) or waitpid($vm_pid, WNOHANG) == $vm_pid) {
 	    DEBUG "kvm process $vm_pid reaped, \$?: $?";
+	    delete $hkd->{pids}{$id};
 	    given ($vm->vm_state) {
 		when ('stopping_1') {
 		    WARN "vm process exited without passing through stopping_2"
@@ -290,8 +316,8 @@ sub _check_vms {
 	    }
 	    when('starting'  ) { $vma_method = 'ping' }
 	    when('stopping_1') { $vma_method = 'poweroff' }
-	    when('zombie_1'  ) { $hkd->_signal_vm($vm, SIGTERM) }
-	    when('zombie_2'  ) { $hkd->_signal_vm($vm, SIGKILL) }
+	    when('zombie_1'  ) { $hkd->_signal_vm_by_id($id => SIGTERM) }
+	    when('zombie_2'  ) { $hkd->_signal_vm_by_id($id => SIGKILL) }
 	}
 
 	if (defined $vma_method) {
@@ -514,7 +540,10 @@ sub _start_vm {
 	POSIX::_exit(1);
     }
     DEBUG "kvm pid: $pid\n";
-    $vm->set_vm_pid($pid);
+    if (defined $pid) {
+	$hkd->{pids}{$id} = $pid;
+	$vm->set_vm_pid($pid);
+    }
 }
 
 sub _vm_image_path {
@@ -581,9 +610,9 @@ sub _vm_user_storage_path {
     return undef;
 }
 
-sub _signal_vm {
-    my ($hkd, $vm, $signal) = @_;
-    my $pid = $vm->vm_pid;
+sub _signal_vm_by_id {
+    my ($hkd, $id, $signal) = @_;
+    my $pid = $hkd->{pids}{$id};
     unless ($pid) {
 	DEBUG "later detection of failed VM execution";
 	return;
