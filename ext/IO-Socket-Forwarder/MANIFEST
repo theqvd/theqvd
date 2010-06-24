@@ -1,8 +1,12 @@
 Changes
-MANIFEST
-Makefile.PL
-README
 lib/IO/Socket/Forwarder.pm
+Makefile.PL
+MANIFEST
+README
+samples/certs/server-cert.pem
+samples/certs/server-key.pem
+samples/proxy2gmane.pl
+samples/proxy2yahoo.pl
+samples/sproxy2gmane.pl
 t/00-load.t
-t/pod-coverage.t
 t/pod.t

@@ -341,6 +341,13 @@ maximun number of bytes allowed in IO operations
 
 size of the buffers used internally to transfer data between both sockets
 
+=item buffer_1to2 => $data
+
+=item buffer_2to1 => $data
+
+these options allow to preload some data into the buffers used for
+transferring data between the two sockets.
+
 =back
 
 =back
@@ -367,6 +374,6 @@ Salvador FandiE<ntilde>o (sfandino@yahoo.com).
 
 Copyright 2009-2010 by Qindel Formacion y Servicios S.L.
 
-This program is free software; you can redistribute it and/or modify it
-under the terms of the GNU GPL version 3 as published by the Free
-Software Foundation.
+This library is free software; you can redistribute it and/or modify
+it under the same terms as Perl itself, either Perl version 5.10.0 or,
+at your option, any later version of Perl 5 you may have available.
