@@ -57,14 +57,16 @@ my $database_delay   = core_cfg('internal.database.retry_delay');
 
 sub new {
     my $class = shift;
-    my $self = { killed     => undef,
-		 stopping   => undef,
-		 start_time => undef,
-		 round      => 0,
-	         pids       => {} # VM pids are also stored locally so that
-                                  # in case the database becomes
-                                  # inaccesible we would still be able
-                                  # to kill the processes
+    my $self = { killed       => undef,
+		 stopping     => undef,
+		 start_time   => undef,
+		 host_runtime => undef,
+		 round        => 0,
+
+	         pids         => {} # VM pids are also stored locally so that
+                                    # in case the database becomes
+                                    # inaccesible we would still be
+                                    # able to kill the processes
 	       };
     bless $self, $class;
 }
@@ -75,7 +77,8 @@ sub run {
     my $hkd = shift;
     local $SIG{INT} = sub { $hkd->{killed}++ };
 
-    my $hrt = $hkd->_startup or die "HKD startup failed";
+    $hkd->_startup or die "HKD startup failed";
+    my $hrt = $hkd->{host_runtime};
 
     my $ok_ts = time;
 
@@ -86,7 +89,7 @@ sub run {
 	    $ok_ts = time;
 	    $hkd->{start_time} //= $ok_ts;
 
-	    $hkd->_on_killed if $hkd->{killed}
+	    $hkd->_on_killed if $hkd->{killed};
 
 	    $hkd->_check_vms;
 
@@ -125,11 +128,36 @@ sub _on_killed {
     }
     else {
 	txn_eval {
+	    my $hrt = $hkd->{host_runtime};
 	    $hrt->set_state('stopping');
 	    $hkd->{stopping}++;
 	    undef $hkd->{killed};
 	    DEBUG "HKD stopping";
 	};
+    }
+}
+
+sub _startup {
+    my $hkd = shift;
+    my $retries = 10;
+    while (1) {
+	my $hrt;
+	eval {
+	    $hrt = $hkd->{host_runtime} = this_host->runtime;
+	    $hrt->set_state('starting');
+	    $hkd->{id} = $hrt->id;
+	    $hkd->_dirty_startup;
+	    $hrt->set_state('running');
+	};
+	return $hrt unless $@;
+	if (--$retries) {
+	    ERROR "HKD initialization failed, retrying: $@";
+	    sleep 3;
+	}
+	else {
+	    ERROR "HKD initialization failed, aborting: $@";
+	    return;
+	}
     }
 }
 
@@ -149,30 +177,6 @@ sub _dirty_startup {
 		$vm->unassign;
 	    }
 	};
-    }
-}
-
-sub _startup {
-    my $hkd = shift;
-    my $hrt;
-    my $retries = 10;
-    while (1) {
-	eval {
-	    $hrt = this_host->runtime;
-	    $hrt->set_state('starting');
-	    $hkd->{id} = $hrt->id;
-	    $hkd->_dirty_startup;
-	    $hrt->set_state('running');
-	};
-	return $hrt unless $@;
-	if (--$retries) {
-	    ERROR "HKD initialization failed, retrying: $@";
-	    sleep 3;
-	}
-	else {
-	    ERROR "HKD initialization failed, aborting: $@";
-	    return;
-	}
     }
 }
 
@@ -328,7 +332,7 @@ sub _check_vms {
 	    push @active_vms, $vm;
 	}
 	else {
-	    $hkd->_go_zombie_on_timeout($vm);
+	    $hkd->_vm_goes_zombie_on_timeout($vm);
 	}
     }
 
@@ -356,7 +360,7 @@ sub _check_vms {
 		    }
 		}
 		default {
-		    $hkd->_go_zombie_on_timeout($vm);
+		    $hkd->_vm_goes_zombie_on_timeout($vm);
 		}
 	    }
 	}
@@ -386,7 +390,7 @@ sub _check_l7rs {
     }
 }
 
-sub _go_zombie_on_timeout {
+sub _vm_goes_zombie_on_timeout {
     my ($hkd, $vm) = @_;
     my $vm_state = $vm->vm_state;
     my $id = $vm->id;
@@ -404,7 +408,6 @@ sub _go_zombie_on_timeout {
 	}
     }
 }
-
 
 # FIXME: implement a better port allocation strategy
 my $port = 2000;
@@ -504,7 +507,7 @@ sub _start_vm {
         push @cmd, '-nographic';
     }
 
-    if (defined $mon_port) {
+    if ($mon_port) {
 	push @cmd, -monitor, "telnet::$mon_port,server,nowait,nodelay";
     }
 
