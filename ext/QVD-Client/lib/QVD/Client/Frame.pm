@@ -23,6 +23,8 @@ my %connect_info :shared;
 my $DEFAULT_PORT = cfg('client.host.port');
 my $USE_SSL      = cfg('client.use_ssl');
 
+my $WINDOWS = ($^O eq 'MSWin32');
+
 ## adapted from the VB code at: 
 ## http://o-st.chat.ru/vb/keyboard/def_rask/def_rask.htm 
 my %lang_codes = qw/
@@ -73,11 +75,16 @@ sub new {
 
 	my $ver_sizer  = Wx::BoxSizer->new(wxVERTICAL);
 
-	my ($volume, $directories, $file) = File::Spec->splitpath(File::Spec->rel2abs($0));
+	my $logo_image;
 
-	my $logo_image = "$volume$directories/../pixmaps/qvd-logo.png";
-	unless (-e $logo_image) {
-	    $logo_image = "/usr/share/pixmaps/qvd-logo.png";
+	my ($volume, $directories, $file) = File::Spec->splitpath(File::Spec->rel2abs($0));
+	if ($WINDOWS) {
+	    $logo_image = $ENV{QVDPATH}."/QVD-Client/pixmaps/qvd-logo.png";
+	} else {
+	    $logo_image = "$volume$directories/../pixmaps/qvd-logo.png";
+	    unless (-e $logo_image) {
+		$logo_image = "/usr/share/pixmaps/qvd-logo.png";
+	    }
 	}
 	$ver_sizer->Add(Wx::StaticBitmap->new($panel, -1,
 					      Wx::Bitmap->new($logo_image,
@@ -134,9 +141,13 @@ sub new {
 	$self->SetTitle("QVD");
 	my $icon = Wx::Icon->new();
 	
-	$logo_image = "$volume$directories/../pixmaps/qvd.xpm";
-	unless (-e $logo_image) {
-	    $logo_image = "/usr/share/pixmaps/qvd.xpm";
+	if ($WINDOWS) {
+	    $logo_image = $ENV{QVDPATH}."/QVD-Client/pixmaps/qvd.xpm";
+	} else {
+	    $logo_image = "$volume$directories/../pixmaps/qvd.xpm";
+	    unless (-e $logo_image) {
+		$logo_image = "/usr/share/pixmaps/qvd.xpm";
+	    }
 	}
 	$icon->CopyFromBitmap(Wx::Bitmap->new($logo_image, wxBITMAP_TYPE_ANY));
 	$self->SetIcon($icon);
