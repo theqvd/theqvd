@@ -37,13 +37,9 @@ Source: "installer\qvd-client.exe"; DestDir: "{app}"; Flags: ignoreversion
 ; NOTE: Don't use "Flags: ignoreversion" on any shared system files
 
 [Icons]
-Name: "{group}\QVD Client"; Filename: "{app}\qvd-client.exe"
-Name: "{commondesktop}\QVD Client"; Filename: "{app}\qvd-client.exe"; Tasks: desktopicon
+Name: "{group}\QVD Client"; Filename: "{app}\qvd-client.exe"; WorkingDir: "{app}"
+Name: "{commondesktop}\QVD Client"; Filename: "{app}\qvd-client.exe"; WorkingDir: "{app}"; Tasks: desktopicon
 
 [Registry]
-Root: HKLM; Subkey: "SYSTEM\CurrentControlSet\Control\Session Manager\Environment"; ValueType:string; ValueName:"DISPLAY"; ValueData:"localhost:0.0"
-Root: HKLM; Subkey: "SYSTEM\CurrentControlSet\Control\Session Manager\Environment"; ValueType:string; ValueName:"QVDPATH"; ValueData:{app}
-
-[Run]
-Filename: "{app}\qvd-client.exe"; Description: "{cm:LaunchProgram,QVD}"; Flags: nowait postinstall skipifsilent
-
+Root: HKCU; Subkey: "Environment"; ValueType:string; ValueName:"DISPLAY"; ValueData:"127.0.0.1:0.0"
+Root: HKCU; Subkey: "Environment"; ValueType:string; ValueName:"QVDPATH"; ValueData:{app}
