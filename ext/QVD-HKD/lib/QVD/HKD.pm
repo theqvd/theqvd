@@ -87,7 +87,9 @@ DESTROY {
 
 sub run {
     my $hkd = shift;
-    local $SIG{INT} = sub { $hkd->{killed}++ };
+
+    $SIG{$_} =  sub { $hkd->{killed}++ }
+	for (qw(INT TERM HUP));
 
     $hkd->_startup or die "HKD startup failed";
     my $hrt = $hkd->{host_runtime};
