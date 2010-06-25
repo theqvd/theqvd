@@ -34,7 +34,7 @@ sub run {
     my %o = ();
 
     if ($WINDOWS) {
-	$o{"nx/nx,root"} = $ENV{HOMEPATH}."/QVD";
+	$o{"nx/nx,root"} = $ENV{APPDATA}.'/.qvd';
     }  
     
     $o{media} = 4713 if $self->{audio};
