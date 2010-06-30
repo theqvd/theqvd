@@ -26,45 +26,50 @@ my %timeout = ( starting    => cfg('internal.hkd.timeout.vm.state.starting'),
 		zombie_1    => cfg('internal.hkd.timeout.vm.state.zombie_1'),
 		vma         => cfg('internal.hkd.timeout.vm.state.running') );
 
-my $parallel_net_timeout = cfg('internal.hkd.timeout.vm.vma');
+my $parallel_net_timeout   = cfg('internal.hkd.timeout.vm.vma');
 
-my $pool_time       = cfg('internal.hkd.poll_time');
-my $pool_all_mod    = cfg('internal.hkd.poll_all_mod');
+my $pool_time              = cfg('internal.hkd.poll_time');
+my $pool_all_mod           = cfg('internal.hkd.poll_all_mod');
 
-my $images_path     = cfg('path.storage.images');
-my $overlays_path   = cfg('path.storage.overlays');
-my $homes_path      = cfg('path.storage.homes');
-my $captures_path   = cfg('path.serial.captures');
+my $images_path            = cfg('path.storage.images');
+my $overlays_path          = cfg('path.storage.overlays');
+my $homes_path             = cfg('path.storage.homes');
+my $captures_path          = cfg('path.serial.captures');
 
-my $vm_port_x       = cfg('internal.nxagent.display') + 4000;
-my $vm_port_vma     = cfg('internal.vm.port.vma');
-my $vm_port_ssh     = cfg('internal.vm.port.ssh');
+my $vm_port_x              = cfg('internal.nxagent.display') + 4000;
+my $vm_port_vma            = cfg('internal.vm.port.vma');
+my $vm_port_ssh            = cfg('internal.vm.port.ssh');
 
-my $ssh_redirect    = cfg('vm.ssh.redirect');
+my $ssh_redirect           = cfg('vm.ssh.redirect');
 
-my $vnc_redirect    = cfg('vm.vnc.redirect');
-my $vnc_opts        = cfg('vm.vnc.opts');
+my $vnc_redirect           = cfg('vm.vnc.redirect');
+my $vnc_opts               = cfg('vm.vnc.opts');
 
-my $vm_virtio       = cfg('vm.kvm.virtio');
-my $hdb_index       = cfg('vm.kvm.home.drive.index');
-my $mon_redirect    = cfg('internal.vm.monitor.redirect');
-my $serial_redirect = cfg('vm.serial.redirect');
-my $serial_capture  = cfg('vm.serial.capture');
+my $vm_virtio              = cfg('vm.kvm.virtio');
+my $hdb_index              = cfg('vm.kvm.home.drive.index');
+my $mon_redirect           = cfg('internal.vm.monitor.redirect');
+my $serial_redirect        = cfg('vm.serial.redirect');
+my $serial_capture         = cfg('vm.serial.capture');
 
-my $persistent_overlay = cfg('vm.overlay.persistent');
+my $persistent_overlay     = cfg('vm.overlay.persistent');
 
-my $database_timeout = core_cfg('internal.database.timeout');
-my $database_delay   = core_cfg('internal.database.retry_delay');
+my $database_timeout       = core_cfg('internal.hkd.database.timeout');
+my $database_delay         = core_cfg('internal.hkd.database.retry_delay');
+
+my $cluster_check_interval = cfg('internal.hkd.cluster.check.interval');
+my $cluster_node_timeout   = cfg('internal.hkd.cluster.node.timeout');
 
 sub new {
     my $class = shift;
     my $self = { killed       => undef,
 		 stopping     => undef,
+                 aborting     => undef,
 		 start_time   => undef,
 		 host         => undef,
 		 host_runtime => undef,
 		 frontend     => undef,
 		 backend      => undef,
+		 db_ok_ts     => undef,
 		 round        => 0,
 		 my_pid       => $$,
 	         vm_pids      => {} # VM pids are also stored locally so that
@@ -94,46 +99,77 @@ sub run {
     $hkd->_startup or die "HKD startup failed";
     my $hrt = $hkd->{host_runtime};
 
-    my $ok_ts = time;
-
     while (1) {
 	DEBUG "HKD run, round: $hkd->{round}";
-	if (eval { $hrt->update_ok_ts; 1 }) {
+	if (eval { $hkd->_check_db(1) }) {
 	    $hkd->{round}++;
-	    $ok_ts = time;
-	    $hkd->{start_time} //= $ok_ts;
+	    $hkd->{start_time} //= $hkd->{db_ok_ts};
 
 	    $hkd->_on_killed if $hkd->{killed};
 
-	    $hkd->_check_vms;
-
 	    if ($hkd->{stopping}) {
-		txn_eval {
-		    rs(VM_Runtime)->search({host_id => this_host_id})->count and die "there are VMs still running";
-		    $hrt->set_state('stopped');
-		};
-		unless ($@) {
+		kill INT => $hkd->{l7r_pid}   # kill L7R early
+		    if $hkd->{l7r_pid};
+
+                if (eval { rs(VM_Runtime)->search({host_id => this_host_id})->count == 0 }) {
 		    INFO "HKD exiting";
 		    return 1;
 		}
-		DEBUG $@;
-
-		kill INT => $hkd->{l7r_pid}
-		    if $hkd->{l7r_pid};
+		DEBUG($@ || "Can't exit yet: there are VMs running");
 	    }
-	    $hkd->_check_l7rs;
+	    eval {
+		$hkd->_check_vms;
+		$hkd->_check_l7rs;
+                $hkd->_check_hkd_cluster;
+	    };
 	    sleep $pool_time;
 	}
-	else { # database is not available
-	    if (time > $ok_ts + $database_timeout) {
-		ERROR "HKD can not connect to database, aborting: $@";
-		return undef;
-	    }
-	    INFO "HKD can not connect to database, retrying: $@";
-	    sleep $database_delay;
-	    undef $hkd->{start_time};
-	}
+        elsif ($hkd->{aborting}) { # database timeout has expired or
+                                   # other critical error happened
+            ERROR "HKD can not connect to database, aborting: $@";
+            return undef;
+        }
+        else {
+            INFO "HKD can not connect to database, retrying: $@";
+            sleep $database_delay;
+            undef $hkd->{start_time};
+        }
     }
+}
+
+sub _check_db {
+    my ($hkd, $always) = @_;
+    my $time = time;
+    $hkd->{aborting} and die "Already aborting";
+    if ($hkd->{db_ok_ts} + $database_timeout < $time) {
+        $hkd->{aborting} = 1;
+        die "Database timeout expired";
+    }
+    if ($always or ($hkd->{db_ok_ts} + 0.3 * $database_timeout) < $time) {
+	my $hrt = $hkd->{host_runtime};
+	for (1, 2) {
+	    eval {
+                alarm 5;
+		txn_eval {
+                    $hrt->discard_changes;
+                    if ($hrt->state eq 'blocked') {
+                        $hkd->{aborting} = 1;
+                        die "Host is blocked";
+                    }
+                    $time = time;
+                    $hrt->update_ok_ts($time);
+                };
+		alarm 0;
+                $@ and die $@;
+	    };
+	    unless ($@) {
+		$hkd->{db_ok_ts} = $time;
+		return 1;
+	    }
+	}
+	die "Database check failed: $@";
+    }
+    1;
 }
 
 sub _on_killed {
@@ -144,13 +180,13 @@ sub _on_killed {
 	undef $hkd->{killed};
     }
     else {
-	txn_eval {
+	eval {
 	    my $hrt = $hkd->{host_runtime};
 	    $hrt->set_state('stopping');
-	    $hkd->{stopping}++;
-	    undef $hkd->{killed};
-	    DEBUG "HKD stopping";
-	};
+            $hkd->{stopping}++;
+            undef $hkd->{killed};
+            DEBUG "HKD stopping";
+        };
     }
 }
 
@@ -166,7 +202,9 @@ sub _startup {
 	    $hrt->set_state('starting');
 	    $hkd->{id} = $hrt->id;
 	    $hkd->_dirty_startup;
-	    $hrt->set_state('running');
+	    my $time = time;
+	    $hrt->set_state('running', $time);
+	    $hkd->{db_ok_ts} = $time;
 	};
 	return 1 unless $@;
 	if (--$retries) {
@@ -210,6 +248,7 @@ sub _shutdown {
     if ($hkd->{my_pid} == $$) {
 	$hkd->_shutdown_l7r;
 	$hkd->_dirty_shutdown;
+        $hkd->{host_runtime}->set_state('stopped') unless $hkd->{aborting};
     }
 }
 
@@ -229,8 +268,31 @@ sub _dirty_shutdown {
     }
 }
 
+sub _check_hkd_cluster {
+    my $hkd = shift;
+    my $time = time;
+    my $next = ( $hkd->{next_cluster_check} //= $time + (0.5 + rand) * $cluster_check_interval );
+    if ($time > $next) {
+        undef $hkd->{next_cluster_check};
+        for my $chrt (rs(Host_Runtime)->search({state => 'running'})) {
+            if ($chrt->ok_ts + $cluster_node_timeout < $time) {
+                txn_eval {
+                    for my $vm (rs(VM_Runtime)->search({ host_id => $chrt->host_id })) {
+                        $vm->set_vm_state('stopped');
+                        $vm->block;
+                        $vm->unassing;
+                    }
+                    $chrt->set_state('blocked');
+                };
+            }
+        }
+    }
+}
+
 sub _check_vms {
     my $hkd = shift;
+
+    $hkd->_check_db;
 
     my (@active_vms, @vmas);
     my $par = QVD::ParallelNet->new;
@@ -368,6 +430,8 @@ sub _check_vms {
 	    $hkd->_vm_goes_zombie_on_timeout($vm);
 	}
     }
+
+    $hkd->_check_db;
 
     $par->run(time => $parallel_net_timeout) if @active_vms;
 
@@ -649,6 +713,7 @@ sub _signal_vm_by_id {
 sub _check_l7rs {
     my $hkd = shift;
     if ($hkd->{frontend}) {
+        $hkd->_check_db;
 	# check for dissapearing L7Rs processes
 	for my $vm (rs(VM_Runtime)->search({l7r_host => this_host_id})) {
 	    my $l7r_worker_pid = $vm->l7r_pid;

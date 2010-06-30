@@ -23,11 +23,16 @@ __PACKAGE__->belongs_to('rel_state' => 'QVD::DB::Result::Host_State', 'state');
 __PACKAGE__->belongs_to('rel_cmd' => 'QVD::DB::Result::Host_Cmd', 'cmd');
 
 
-sub update_ok_ts { shift->update({ok_ts => time}) }
+sub update_ok_ts {
+    my ($rt, $time) = @_;
+    $time //= time;
+    shift->update({ok_ts => $time})
+}
 
 sub set_state {
-    my ($rt, $state) = @_;
-    $rt->update({ state => $state, ok_ts => time });
+    my ($rt, $state, $time) = @_;
+    $time //= time;
+    $rt->update({ state => $state, ok_ts => $time });
 }
 
 1;
