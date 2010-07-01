@@ -1,0 +1,5 @@
+sercd (3.0.0~qvd1) unstable; urgency=low
+
+  * Initial debianization of sercd-3.0.0
+
+ -- QVD Team <qvd@qindel.com>  Thu, 01 Jul 2010 12:54:24 +0200
