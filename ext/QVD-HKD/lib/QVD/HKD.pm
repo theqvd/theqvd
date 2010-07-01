@@ -230,11 +230,13 @@ sub _dirty_startup {
 	    $vm->discard_changes;
 	    if ($vm->host_id == $host_id) {
 		my $pid = $vm->vm_pid;
-		# we are conservative here: if there are some process
-		# with the same pid as the one registered in the
-		# database for the given VM we just abort
-		kill 0, $pid and
-		    die "VM ".$vm->id." may still be running as process $pid\n";
+		if (defined $pid) {
+		    # we are conservative here: if there are some process
+		    # with the same pid as the one registered in the
+		    # database for the given VM we just abort
+		    kill 0, $pid and
+			die "VM ".$vm->id." may still be running as process $pid\n";
+		}
 		$vm->set_vm_state('stopped');
 		$vm->block;
 		$vm->unassign;
