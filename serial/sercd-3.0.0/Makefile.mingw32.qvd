@@ -1,0 +1,15 @@
+CC=i586-mingw32msvc-gcc
+CFLAGS=-DVERSION=\"3.0.0\"
+LDFLAGS=-lws2_32
+SOURCES=sercd.c win.c
+OBJS=$(SOURCES:.c=.obj)
+
+.SUFFIXES: .c .obj
+
+all: sercd.exe
+
+sercd.exe: $(OBJS)
+	$(CC) $(OBJS) -o $@ $(CFLAGS) $(LDFLAGS)
+
+.c.obj:
+	$(CC) $(CFLAGS) -c $< -o $@
