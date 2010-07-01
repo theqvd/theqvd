@@ -21,6 +21,7 @@ WriteMakefile( NAME          => 'QVD::Client',
 				  'Wx' => 0,
                   'X11::Protocol' => 0,
 				  'URI::Escape' => 0,
+                  'Crypt::OpenSSL::X509' => 0,
 				  'File::Spec' => 0 },
 
 	       dist            => { COMPRESS => 'gzip -9f', SUFFIX => 'gz', },

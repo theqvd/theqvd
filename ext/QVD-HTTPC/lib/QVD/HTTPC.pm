@@ -13,6 +13,7 @@ use URI::Escape qw(uri_escape);
 use Errno;
 use File::Spec;
 use Socket qw(IPPROTO_TCP TCP_NODELAY);
+use Crypt::OpenSSL::X509;
 
 use QVD::HTTP::StatusCodes qw(:status_codes);
 use QVD::HTTP::Headers qw(header_lookup);
@@ -35,12 +36,22 @@ sub ssl_cb {
     my ($ssl_thinks, $mem_addr, $attrs, $errs) = @_;
 
     $cert_pem_str = Net::SSLeay::PEM_get_string_X509 (Net::SSLeay::X509_STORE_CTX_get_current_cert ($mem_addr));
+    my $x509 = Crypt::OpenSSL::X509->new_from_string ($cert_pem_str);
 
-    $cert_hash = qx{echo "$cert_pem_str" |openssl x509 -noout -hash};
-    chomp $cert_hash;
+    $cert_hash = $x509->hash;
+    $cert_data = sprintf <<'EOF', $x509->version, (join ':', $x509->serial=~/../g), $x509->issuer, $x509->notBefore, $x509->notAfter, $x509->subject;
+Version: 0x%s
 
-    $cert_data = qx{echo "$cert_pem_str" |openssl x509 -text};
-    $cert_data =~ s/\Q$cert_pem_str\E\n*//;   ## remove certificate PEM-formatted string
+Serial: %s
+
+Issuer: %s
+
+Validity:
+    Not before: %s
+    Not after:  %s
+
+Subject: %s
+EOF
 
     #print "cert_hash ($cert_hash)\n";
     #print "ssl_thinks ($ssl_thinks) mem_addr ($mem_addr) attrs ($attrs) errs ($errs)\n";
