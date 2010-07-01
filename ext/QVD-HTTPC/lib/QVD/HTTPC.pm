@@ -11,28 +11,77 @@ use Carp;
 use IO::Socket::INET;
 use URI::Escape qw(uri_escape);
 use Errno;
+use File::Spec;
 use Socket qw(IPPROTO_TCP TCP_NODELAY);
 
 use QVD::HTTP::StatusCodes qw(:status_codes);
 use QVD::HTTP::Headers qw(header_lookup);
+use QVD::Config;
 
 my $CRLF = "\r\n";
+
+my $cert_pem_str = ''; sub cert_pem_str { $cert_pem_str; }
+my $cert_hash    = ''; sub cert_hash    { $cert_hash; }
+my $cert_data    = ''; sub cert_data    { $cert_data; }
+
+## callback receives:
+# 1) a true/false value that indicates what OpenSSL thinks of the certificate
+# 2) a C-style memory address of the certificate store
+# 3) a string containing the certificate's issuer attributes and owner attributes
+# 4) a string containing any errors encountered (0 if no errors).
+## returns:
+# 1 or 0, depending on whether it thinks the certificate is valid or invalid.
+sub ssl_cb {
+    my ($ssl_thinks, $mem_addr, $attrs, $errs) = @_;
+
+    $cert_pem_str = Net::SSLeay::PEM_get_string_X509 (Net::SSLeay::X509_STORE_CTX_get_current_cert ($mem_addr));
+
+    $cert_hash = qx{echo "$cert_pem_str" |openssl x509 -noout -hash};
+    chomp $cert_hash;
+
+    $cert_data = qx{echo "$cert_pem_str" |openssl x509 -text};
+    $cert_data =~ s/\Q$cert_pem_str\E\n*//;   ## remove certificate PEM-formatted string
+
+    #print "cert_hash ($cert_hash)\n";
+    #print "ssl_thinks ($ssl_thinks) mem_addr ($mem_addr) attrs ($attrs) errs ($errs)\n";
+    #printf "cert_pem_str (%s)\n", cert_pem_str;
+    #printf "cert_data (%s)\n", cert_data;
+
+    return $ssl_thinks;
+}
 
 sub _create_socket {
     my $self = shift;
     my $target = $self->{target};
     my $SSL = $self->{SSL};
-    my $class;
+
     if ($SSL) {
-	require IO::Socket::SSL;
-	$class = 'IO::Socket::SSL';
+        require IO::Socket::SSL;
+        require Net::SSLeay;
+        Net::SSLeay::load_error_strings();
+        my $s;
+
+        my %ssl_args = (
+            SSL_verify_mode     => 1,
+            SSL_ca_path         => File::Spec->catfile (($ENV{HOME} || $ENV{APPDATA}), cfg('path.ssl.ca.personal')),
+            SSL_verify_callback => \&ssl_cb,
+        );
+        unless ($s = IO::Socket::SSL->new(PeerAddr => $target, Blocking => 0, %ssl_args)) {
+            $ssl_args{'SSL_ca_path'} = cfg('path.ssl.ca.system');
+            $s = IO::Socket::SSL->new(PeerAddr => $target, Blocking => 0, %ssl_args);
+        }
+
+        $self->{socket} = $s or return 0;
     }
     else {
-	$class = 'IO::Socket::INET'
+        $self->{socket} = IO::Socket::INET->new(PeerAddr => $target, Blocking => 0) or do {
+            my $errmsg = "Unable to connect to $target";
+            $SSL and $errmsg .= ': ' . $IO::Socket::SSL::SSL_ERROR;
+            croak $errmsg;
+        };
     }
 
-    $self->{socket} = $class->new(PeerAddr => $target, Blocking => 0)
-	or croak "Unable to connect to $target";
+    return 1;
 }
 
 sub new {
@@ -49,7 +98,7 @@ sub new {
 		 bin => '',
 		 bout => '' };
     bless $self, $class;
-    $self->_create_socket();
+    $self->_create_socket() or return 0;
     setsockopt $self->{socket}, IPPROTO_TCP, TCP_NODELAY, 1;
     $self;
 }

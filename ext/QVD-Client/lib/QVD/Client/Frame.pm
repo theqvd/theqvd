@@ -12,13 +12,16 @@ use base qw(Wx::Frame);
 use strict;
 use URI::Escape qw(uri_escape);
 use File::Spec;
+use File::Path 'make_path';
 
 my $EVT_LIST_OF_VM_LOADED :shared = Wx::NewEventType;
 my $EVT_CONNECTION_ERROR :shared = Wx::NewEventType;
 my $EVT_CONN_STATUS :shared = Wx::NewEventType;
+my $EVT_UNKNOWN_CERT :shared = Wx::NewEventType;
 
 my $vm_id :shared;
 my %connect_info :shared;
+my $accept_cert :shared;
 
 my $DEFAULT_PORT = cfg('client.host.port');
 my $USE_SSL      = cfg('client.use_ssl');
@@ -164,6 +167,7 @@ sub new {
 	Wx::Event::EVT_COMMAND($self, -1, $EVT_CONNECTION_ERROR, \&OnConnectionError);
 	Wx::Event::EVT_COMMAND($self, -1, $EVT_LIST_OF_VM_LOADED, \&OnListOfVMLoaded);
 	Wx::Event::EVT_COMMAND($self, -1, $EVT_CONN_STATUS, \&OnConnectionStatusChanged);
+	Wx::Event::EVT_COMMAND($self, -1, $EVT_UNKNOWN_CERT, \&OnUnknownCert);
 
 	Wx::Event::EVT_CLOSE($self, \&OnExit);
 
@@ -272,12 +276,59 @@ sub ConnectToVM {
 
     Wx::PostEvent($self, new Wx::PlThreadEvent(-1, $EVT_CONN_STATUS, 'CONNECTING'));
     require QVD::HTTPC;
-    my $httpc = eval { new QVD::HTTPC("$host:$port", SSL => $USE_SSL) };
-    if ($@) {
-	my $message :shared = $@;
-	my $evt = new Wx::PlThreadEvent(-1, $EVT_CONNECTION_ERROR, $message);
-	Wx::PostEvent($self, $evt);
-	return;
+    my $httpc;
+    {
+        $httpc = eval { new QVD::HTTPC("$host:$port", SSL => $USE_SSL) };
+        if ($@) {
+            my $message :shared = $@;
+            my $evt = new Wx::PlThreadEvent(-1, $EVT_CONNECTION_ERROR, $message);
+            Wx::PostEvent($self, $evt);
+            return;
+        } else {
+            if (!$httpc) {
+                ## tried with a listref but got an error, so had to resort to this:
+                my $msg = join '__erm, tiene que haber una forma mejor de hacer esto__',
+                    QVD::HTTPC::cert_pem_str(), QVD::HTTPC::cert_data();   ## FIXME
+                my $evt = new Wx::PlThreadEvent(-1, $EVT_UNKNOWN_CERT, $msg);
+                Wx::PostEvent($self, $evt);
+
+                { lock $accept_cert; cond_wait $accept_cert; }
+
+                return unless $accept_cert;   ## volver a la ventana principal del cliente
+
+                ## crear archivos y reintentar
+                my $dir = File::Spec->catfile (($ENV{HOME} || $ENV{APPDATA}), cfg('path.ssl.ca.personal'));
+                make_path $dir, { error => \my $mkpath_err };
+                if ($mkpath_err and @$mkpath_err) {
+                    my $errs_text;
+                    for my $err (@$mkpath_err) {
+                        my ($file, $errmsg) = %$err;
+                        if ('' eq $file) {
+                            $errs_text .= "generic error: ($errmsg)\n";
+                        } else {
+                            $errs_text .= "mkpath '$file': ($errmsg)\n";
+                        }
+                    }
+
+                    my $evt = new Wx::PlThreadEvent(-1, $EVT_CONNECTION_ERROR, $errs_text);   ## not a "connection" error actually
+                    Wx::PostEvent($self, $evt);
+                    return;
+                }
+
+                my $file;
+                foreach my $idx (0..9) {
+                    my $basename = sprintf '%s.%d', QVD::HTTPC::cert_hash(), $idx;
+                    $file = File::Spec->catfile ($dir, $basename);
+                    last unless -e $file;
+                }
+
+                open my $fd, '>', $file or die "open: '$file': $!";
+                print $fd QVD::HTTPC::cert_pem_str();
+                close $fd;
+
+                redo;
+            }
+        }
     }
 
     $httpc->send_http_request(GET => '/qvd/list_of_vm', 
@@ -420,6 +471,45 @@ sub OnConnectionStatusChanged {
 	$self->EnableControls(1);
 	$self->Show;
     }
+}
+
+sub OnUnknownCert {
+    my ($self, $event) = @_;
+    $self->{timer}->Stop();
+    $self->{progress_bar}->SetValue(0);
+    $self->{progress_bar}->SetRange(100);
+    my ($cert_pem_str, $cert_data) = split '__erm, tiene que haber una forma mejor de hacer esto__', $event->GetData;  ## FIXME
+
+    my $dialog = Wx::Dialog->new($self, undef, 'Invalid certificate');
+	my $vsizer = Wx::BoxSizer->new(wxVERTICAL);
+
+	$vsizer->Add(Wx::StaticText->new($dialog, -1, 'Certificate information:'), 0, wxALL, 5); 
+    my $tc = Wx::TextCtrl->new($dialog, -1, $cert_data, wxDefaultPosition, [600,300], wxTE_MULTILINE|wxTE_READONLY);
+    $tc->SetFont (Wx::Font->new(9, wxDEFAULT, wxNORMAL, wxNORMAL, 0, 'Courier New'));
+	$vsizer->Add($tc, 1, wxALL|wxEXPAND, 5);
+
+    my $but_clicked = sub {
+        lock $accept_cert;
+        $accept_cert = shift;
+        $dialog->Destroy();
+    };
+	my $bsizer = Wx::BoxSizer->new(wxHORIZONTAL);
+    my $but_ok     = Wx::Button->new($dialog, -1, 'Ok');
+    my $but_cancel = Wx::Button->new($dialog, -1, 'Cancel');
+    Wx::Event::EVT_BUTTON($dialog, $but_ok    ->GetId, sub { $but_clicked->(1) });
+    Wx::Event::EVT_BUTTON($dialog, $but_cancel->GetId, sub { $but_clicked->(0) });
+    $bsizer->Add($but_ok);
+    $bsizer->Add($but_cancel);
+    $vsizer->Add($bsizer);
+
+    $but_ok->SetFocus;
+	$dialog->SetSizer($vsizer);
+	$vsizer->Fit($dialog);
+
+    $dialog->ShowModal();
+
+    { lock $accept_cert; cond_signal $accept_cert; }
+    $self->EnableControls(1);
 }
 
 sub EnableControls {

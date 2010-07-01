@@ -25,6 +25,8 @@ path.storage.images = ${path.storage.root}/images
 path.storage.overlays = ${path.storage.root}/overlays
 path.storage.homes = ${path.storage.root}/homes
 path.ssl.certs = ${path.run}/ssl
+path.ssl.ca.system = /etc/ssl/certs
+path.ssl.ca.personal = .qvd/certs
 path.serial.captures = ${path.tmp}/qvd
 
 command.kvm = kvm
