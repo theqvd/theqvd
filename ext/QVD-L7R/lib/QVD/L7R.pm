@@ -276,6 +276,10 @@ sub _wait_for_x {
 		die "Unable to start VM X server, operation timed out!\n"
 		    if time > $timeout;
 	    }
+	    when ('provisioning') {
+		# do not timeout while provisioning as it can be a
+		# long process
+	    }
 	    default {
 		die "Unable to start XV X server, state went to $_\n"
 	    }

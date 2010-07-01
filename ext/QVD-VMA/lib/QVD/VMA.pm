@@ -81,18 +81,19 @@ my %timeout = ( initiating => cfg('internal.nxagent.timeout.initiating'),
 our $nxagent_state_fn = "$run_path/nxagent.state";
 our $nxagent_pid_fn   = "$run_path/nxagent.pid";
 
-my %nx2x = ( initiating  => 'starting',
-	     starting    => 'listening',
-	     resuming    => 'listening',
-	     started     => 'connected',
-	     resumed     => 'connected',
-	     suspending  => 'suspending',
-	     suspended   => 'suspended',
-	     terminating => 'stopping',
-	     aborting    => 'stopping',
-	     aborted     => 'stopped',
-	     stopped     => 'stopped',
-	     ''          => 'stopped');
+my %nx2x = ( initiating   => 'starting',
+	     provisioning => 'provisioning',
+	     starting     => 'listening',
+	     resuming     => 'listening',
+	     started      => 'connected',
+	     resumed      => 'connected',
+	     suspending   => 'suspending',
+	     suspended    => 'suspended',
+	     terminating  => 'stopping',
+	     aborting     => 'stopping',
+	     aborted      => 'stopped',
+	     stopped      => 'stopped',
+	     ''           => 'stopped');
 
 my %running   = map { $_ => 1 } qw(listening connected suspending suspended);
 my %connected = map { $_ => 1 } qw(listening connected);
@@ -238,8 +239,12 @@ sub _write_line {
     close $fh;
 }
 
-sub _save_nxagent_state_and_call_hook {
+sub _save_nxagent_state {
     _write_line($nxagent_state_fn, join(':', shift, time) );
+}
+
+sub _save_nxagent_state_and_call_hook {
+    _save_nxagent_state(@_);
     _call_printing_hook;
     _call_state_hook;
 }
@@ -268,6 +273,7 @@ sub _provisionate_user {
 
     unless (-d $user_home) {
 	DEBUG "user home does not exist yet";
+	_save_nxagent_state('provisioning');
 	unless (_call_provisioning_hook(mount_home => @_)) {
 	    DEBUG "no custom provisioning for mount_home";
 	    if (length $home_drive and -e $home_drive) {
@@ -293,6 +299,7 @@ sub _provisionate_user {
     }
 
     unless (getpwnam($user)) {
+	_save_nxagent_state('provisioning');
 	if (_call_provisioning_hook(add_user => @_)) {
 	    _call_provisioning_hook(after_add_user => @_);
 	}
@@ -523,7 +530,7 @@ sub _start_session {
 	    _fork_monitor(@_);
 	}
 	default {
-	    die "Unable to start/resume X session in state $_";
+	    die "Unable to start/resume X session in state $_, try again in a few minutes\n";
 	}
     }
     'starting';
