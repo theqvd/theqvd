@@ -1,0 +1,82 @@
+.TH "cyclades-devices" "5" "" "" ""
+.SH "NAME"
+cyclades-devices \- tables for driving cyclades-serial-client
+
+.SH "DESCRIPTION"
+The cyclades-devices file supplies all mapping between Unix device
+files (/dev/*) and the addresses of serial ports of
+Cyclades Terminal Servers. It contains one entry for each serial
+port, with the following format:
+
+device:rastype:rasname:physport:type:options
+
+Note: A # character at beginning of line indicates a comment
+
+The entry fields are:
+
+.TP 
+.B devname
+\- A full pathname of the file that will be associated to
+the serial port. It must start with  a "/dev/" preffix.
+Two naming schemes may be used here:
+\- devname does not exist, and will be linked to
+a free pseudo\-tty. This is the default behavior of
+cyclades-ser-cli.
+\- devname is the name of a valid slave pseudo\-tty.
+In this case, the '\-t 1' option must be assigned
+in options field.
+(Note: this option is not supported by this release).
+
+.TP 
+.B rastype
+\- Terminal Server type:
+\- prts, for Cyclades Pr302X/TS Terminal Servers.
+\- path, for Cyclades PathRAS Terminal Server.
+
+.TP 
+.B rasname
+\- Host Name or IP Address of the Terminal Server where
+the serial port resides.
+
+.TP 
+.B physport
+\- Number of physical port in the Terminal Server. If
+'physport' is  assigned to zero, 'rasname' will be
+treated as the IP address associated with this port,
+in a IP\-based addressing scheme.
+
+.TP 
+.B type	
+\- Server type that will be contacted to handle the
+serial port:
+\- rtelnet, for Remote Telnet Server
+\- socket, for Socket Server
+
+.TP 
+.B options
+\- Per\-port specific options, passed to cyclades-ser-cli program.
+
+.SH "EXAMPLES"
+1. Device on a PR3020/TS Terminal Server pr3k Port 1, accessed
+through /dev/ctty01 device file name, using telnet protocol
+(remote telnet server)
+
+/dev/ctty01:prts:pr3k:1:rtelnet:
+
+2. The same device, but with an IP address pr3k_port1
+associated to the serial port (IP\-based port addressing)
+
+/dev/ctty01:prts:pr3k_port1:0:rtelnet:
+
+3. Device on a PathRAS Terminal Server pr3k Port 2, accessed
+through /dev/ctty02 device file name, using socket protocol
+(socket server)
+
+/dev/ctty02:path:pr3k:2:socket:
+
+.SH "FILES"
+/etc/cyclades-devices	This file
+
+.SH "SEE ALSO"
+.BR cyclades-serial-client (1),
+.BR cyclades-ser-cli (1)

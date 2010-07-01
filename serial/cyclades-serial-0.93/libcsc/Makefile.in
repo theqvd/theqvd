@@ -1,0 +1,19 @@
+
+CC=@CC@
+CCFLAGS=@CCFLAGS@ @SOCFLAGS@
+SOLFLAGS=@SOLFLAGS@ @LIBS@
+
+all: libcyclades-ser-cli.so
+
+
+libcyclades-ser-cli.so: libcyclades-ser-cli.c
+	$(CC) -c $(CCFLAGS) libcyclades-ser-cli.c -o libcyclades-ser-cli.o
+	ld libcyclades-ser-cli.o $(SOLFLAGS) -o libcyclades-ser-cli.so
+
+clean:
+	rm -f libcyclades-ser-cli.so libcyclades-ser-cli.o depends.bak
+
+dep:
+	-makedepend -Y -f depends *.c 2> /dev/null
+
+include depends

@@ -1,0 +1,88 @@
+cyclades-serial-client (0.93) unstable; urgency=low
+
+  * Fetching devices from environment variable CYCLADES_DEVICES, if
+    defined, instead from /etc/cyclades-devices.
+
+  * Support for logging to external file.
+
+  * Negioating telnet binary mode
+
+ -- Peter Astrand <astrand@lysator.liu.se> Wed, 14 Jan 2004 19:24:22 +0100
+
+cyclades-serial-client (0.92) unstable; urgency=low
+
+  * Fixed some Solaris bugs.
+
+  * Made it remove the control socket on close.
+
+ -- Russell Coker <russell@coker.com.au>  Tue, 23 Sep 2003 17:38:00 +1000
+
+cyclades-serial-client (0.91) unstable; urgency=low
+
+  * Fixed a couple of minor Solaris bugs.
+
+ -- Russell Coker <russell@coker.com.au>  Fri,  1 Aug 2003 21:26:00 +1000
+
+cyclades-serial-client (0.90) unstable; urgency=low
+
+  * Name change.
+
+  * Improved build scripts, especially dependencies.
+
+  * Fixed the -s option.
+
+ -- Russell Coker <russell@coker.com.au>  Fri, 25 Jul 2003 08:28:00 -0400
+
+tsrdev (1.3.3) unstable; urgency=low
+
+  * Added support for setting 1 or 2 stop bits in libtsrdev.so.
+
+  * Added support for changing RTS/CTS and XON/XOFF settings, although the Linux
+    stty program doesn't like the way I do it and gives an error the first
+    time RTS/CTS settings are changes - have to look at the stty source.
+
+  * Removed the "-t" option from tsrsock as it's dead code.
+
+  * Changed the "-s" option for tsrsock to mean Socket Server mode, so the
+    absense of this option means RFC2217 mode.
+
+  * Made the options for baseport work in an order-independent fashion, the
+    first priority goes to the -b option, then to the default for the protocol
+    in use.
+
+  * Added a "-f" option to tsrsock to specify running in the foreground, this
+    can be used if running from init, and can be used by programmers when
+    tracing tsrsock.
+
+ -- Russell Coker <russell@coker.com.au>  Fri, 18 Jul 2003 19:04:00 +1000
+
+tsrdev (1.3.2) unstable; urgency=low
+
+  * Better support for Solaris, including support for making Sun packages.
+
+  * Support for changing port speed, sending breaks, and changing the number of
+    data bits over the network via libtsrdev.so.
+
+ -- Russell Coker <russell@coker.com.au>  Thu, 17 Jul 2003 11:10:00 +1000
+
+tsrdev (1.3.1) unstable; urgency=low
+
+  * Added support for AIX, SCO, and Unixware to the code tree.
+
+  * Removed HP-UX man pages.
+
+  * Added a patch to sock.c for when Solaris headers don't define INADDR_NONE.
+
+  * In telnet.c made handle_com_port_command() only take one parameter as the
+    second is ignored anyway.
+
+  * Fixed many compiler warnings.
+
+ -- Russell Coker <russell@coker.com.au>  Fri,  4 Jul 2003 17:00:00 +1000
+
+tsrdev (1.3) unstable; urgency=low
+
+  * Initial Release.
+
+ -- Russell Coker <russell@coker.com.au>  Tue, 29 Oct 2002 20:23:35 +0100
+

@@ -1,0 +1,7 @@
+Solaris doesn't seem to like my grantpt() call and returns -1.  I've made
+it flag a warning on this, but we need to debug the code.
+
+Solaris stty does not work, have to get it working, this means taking over
+the ioctl() entry point in libc.  Also kermit does not work on Solaris for
+unknown reasons.
+

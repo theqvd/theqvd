@@ -1,0 +1,187 @@
+#!/bin/sh
+# chkconfig: 235 55 45
+# description:
+# description: cyclades-serial-client script controls the interfaces of \
+#              the physical ports of Cyclades Terminal Servers
+
+BASE=/etc
+DEVS=${BASE}/cyclades-devices
+BACKVARS=${BASE}/backvars$$
+FOUND=0
+BACKEXIT=0
+DEV=all
+GLOBALOPTS=""
+
+export DEV DEVS FOUND BACKEXIT BACKVARS PATH
+
+clean()
+{
+	if [ -f ${BACKVARS} ]
+	then
+		rm -f ${BACKVARS}
+	fi
+}
+
+if [ $# -lt 1 -o $# -gt 2 ]
+then
+	echo "Usage : cyclades-serial-client (start|stop|restart|status) [device]"
+	exit 2
+fi
+
+OPTION=$1
+if [ $# -eq 2 ]
+then
+	DEV=$2
+fi
+case $OPTION in
+start_msg)
+	echo "Starting Cyclades Terminal Servers Interface"
+	exit 0
+	;;
+stop_msg)
+	echo "Stopping Cyclades Terminal Servers Interface"
+	exit 0
+	;;
+esac
+
+if [ ! -f ${DEVS} ]
+then
+	echo "cyclades-serial-client : device table not found"
+	exit 1
+fi
+
+clean
+
+trap 'clean' 1 2 3 15
+
+cat ${DEVS} | grep -v "#" | while read line
+do
+	if [ -z "${line}" ]
+	then
+		continue
+	fi
+	devc=`echo ${line} | cut -f1 -d:`
+	serv=`echo ${line} | cut -f2 -d:`
+	host=`echo ${line} | cut -f3 -d:`
+	port=`echo ${line} | cut -f4 -d:`
+	type=`echo ${line} | cut -f5 -d:`
+	opts=`echo ${line} | cut -f6 -d:`
+	opts="$GLOBALOPTS $opts"
+
+	if [ -z "${devc}" -o -z "${serv}" -o -z "${host}" -o -z "${port}" ]
+	then
+		echo "cyclades-serial-client : Bad device table line"
+		BACKEXIT=3
+		echo "BACKEXIT=${BACKEXIT}" >> ${BACKVARS} 	
+		exit ${BACKEXIT}
+	fi
+
+	if [ "${DEV}" != "all" ]
+	then
+		if [ "${DEV}" != "${devc}" ]
+		then
+			continue
+		else
+			FOUND=1
+			echo "FOUND=${FOUND}" >> ${BACKVARS}
+		fi
+	fi
+
+	case ${type} in
+	rtelnet)
+		devst="${devc} (rtelnet at ${host}:${port})"
+		if [ "${serv}" = "path" ]
+		then
+			opts="-p 28672 $opts"
+		fi
+		;;
+	socket)
+		devst="${devc} ( socket at ${host}:${port})"
+		if [ "${serv}" = "path" ]
+		then
+			opts="-p 32768 $opts"
+		fi
+		opts="-s $opts"
+		;;
+	*)
+		echo "tsrport : Bad device table line"
+		BACKEXIT=2
+		echo "BACKEXIT=${BACKEXIT}" >> ${BACKVARS} 	
+		exit ${BACKEXIT}
+		;;
+	esac
+
+if [ `uname` = "Linux" ]; then
+	ppid=`ps ax | grep tsrsock | grep "${devc} " | awk '{print $1}'`
+else
+	ppid=`ps -ef | grep tsrsock | grep "${devc} " | awk '{print $2}'`
+fi
+
+	case ${OPTION} in
+	"start")
+		if [ -n "${ppid}" ]
+		then
+			echo "cyclades-serial-client : ${devc} already active"
+			continue
+		fi
+		echo "Starting ${devc} <<==>> ${host}:${port} interface"
+		tsrsock ${opts} ${devc} ${host} ${port}
+		sleep 1
+		;;
+	"stop")
+		if [ -z "${ppid}" ]
+		then
+			echo "cyclades-serial-client : ${devc} already inactive"
+			continue
+		fi
+		echo "Stopping ${devc} <<==>> ${host}:${port} interface"
+		kill ${ppid} 
+		;;
+	"restart")
+		if [ -z "${ppid}" ]
+		then
+			echo "cyclades-serial-client : ${devc} is inactive"
+			echo "Starting ${devc} <<==>> ${host}:${port} interface"
+			tsrsock ${opts} ${devc} ${host} ${port}
+			sleep 1
+		else
+			echo \
+			"Restarting ${devc} <<==>> ${host}:${port} interface"
+			kill -s USR1 ${ppid} 
+		fi
+		;;
+	"status")
+		if [ -n "${ppid}" ]
+		then
+			devst="${devst} active, pid ${ppid}"
+		else
+			devst="${devst} inactive"
+		fi
+		echo ${devst}
+		;;
+	*)
+		echo "Usage : cyclades-serial-client (start|stop|restart|status) [device]"
+		BACKEXIT=2
+		echo "BACKEXIT=${BACKEXIT}" >> ${BACKVARS} 	
+		exit ${BACKEXIT}
+		;;
+	esac
+done
+if [ -s ${BACKVARS} ]
+then
+	. ${BACKVARS}
+fi
+
+clean
+
+if [ ${BACKEXIT} -ne 0 ]
+then
+	exit ${BACKEXIT}
+fi
+
+if [ "${DEV}" != "all" -a $FOUND -eq 0 ]
+then
+	echo "cyclades-serial-client : device ${DEV} does not exist"
+	exit 3
+fi
+exit 0

@@ -1,0 +1,123 @@
+.TH "cyclades-ser-cli" "8" "" "" ""
+.SH "NAME"
+.BR cyclades-ser-cli
+Serial Port Interface for Cyclades Terminal Servers
+
+.SH "SYNOPSIS"
+.B cyclades-ser-cli
+.I [options] devname rasname physport
+
+.SH "DESCRIPTION"
+The cyclades-ser-cli program connects a Unix device file 'devname' to a
+physical port 'physport' of a Cyclades Terminal Server 'rasname'.
+cyclades-ser-cli provides the I/O interface between the device file and
+the physical port, running as an 'user\-mode device driver'.
+
+If 'physport' is assigned to 0, then 'rasname' is used as the IP
+address on an IP\-based serial port addressing.
+
+.SH "OPTIONS"
+cyclades-ser-cli may be started with the following options:
+
+.TP
+.B \-u ptyiosize
+Sets the internal device I/O size to ptyiosize (maximum 4096 bytes, default
+1024 bytes)
+
+.TP
+.B \-n netiosize
+Sets the internal socket I/O size to netiosize (maximum 512 bytes, default
+128 bytes)
+
+.TP
+.B \-i retrydelay
+Delay in seconds between connection requests (default: 60)
+
+.TP
+.B \-r retries
+Number of connection request retries before exiting. (default: infinity)
+
+.TP
+.B \-s
+Use the Socket Server protocol for talking to the server, this means just
+piping all the data down a TCP connection with no control information, so it's
+impossible to change the port speed etc.  The default is to use the RFC2217
+protocol.
+
+.TP
+.B \-m modem handling
+The default is 0 which means to check DCD state, 1 means to ignore DCD.
+
+.TP
+.B \-c close mode
+Last close handling; the default is 0 which means to hangup the modem, 1 means
+not to hangup.
+
+.TP
+.B \-p start port
+TCP base port of servers at terminal server side (defaults: 31000 for Socket
+server, 30000 for Remote Telnet Server).  Note: if 'physport' is assigned to
+zero, this option has no effect, the Telnet Server standard port (23) is used.
+
+.TP
+.B \-d debug level
+The default is debug level 0 (little debugging), level 1 debugs internal state
+changes, level 2 debugs events, and level 3 debugs IO calls.
+
+.TP
+.B \-f
+Run in foreground, this is suitable for running from init.
+
+.TP
+.B \-x
+Console mode: normally all messages are sent to syslogd (using local2
+facility). With this option, all messages will be sent to stdout and
+cyclades-ser-cli runs in the foreground.  This implies
+.B \-f
+
+.SH "USE"
+Every instance of cyclades-ser-cli will have a virtual serial device which is
+a sym-link to a pseudo-tty.  A terminal program can then talk to the virtual
+serial device and it's data transfers will be redirected across the network.
+Each virtual serial device will be accompanied by a Unix domain socket with
+the same name with the addition of ".control".  So if cyclades-ser-cli
+provides the virtual device named "/dev/modem" then it will have a control
+socket named "/dev/modem.control".  There is a shared object named
+.B libcyclades-ser-cli.so
+which intercepts calls to the tcsetattr() and tcsendbreak().  This shared
+object then sends the relevant data to the cyclades-ser-cli server via the
+control socket.  To recognise a virtual modem device it has to read
+/etc/cyclades-devices.
+
+.P
+The libcyclades-ser-cli.so shared object can be loaded per-application
+through the
+.B LD_PRELOAD
+environment variable, or for the entire system through the system shared
+object configuration (see the OS documentation).  Note that the LD_PRELOAD
+environment variable has to have the fully qualified path of the object,
+otherwise an application which changes it's current directory may fail.
+
+.SH "BUGS"
+
+In Solaris libcyclades-ser-cli.so does not work with the stty program.  stty
+uses a different interface to this and requires some extra coding.
+
+In Solaris libcyclades-ser-cli.so conflicts with some system programs such as
+.B ps
+for unknown reasons.  Just don't load it for those programs, it has no such
+problems with any serial comms programs.
+
+.SH "EXAMPLES"
+Start an interface between /dev/prt1 device and a serial
+port number 10 of a Terminal Server named pr01, without
+hangup at last close:
+
+cyclades-ser-cli \-c 1 /dev/prt1 pr01 10
+
+In general use do not start cyclades-ser-cli from the command line, start it
+through the cyclades-serial-client script or from init.
+
+.SH "SEE ALSO"
+.BR cyclades-serial-client (1),
+.BR cyclades-devices (5)

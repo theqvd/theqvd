@@ -1,0 +1,26 @@
+# DO NOT DELETE
+
+aix-dev.o: inc/cyclades-ser-cli.h inc/conf.h inc/system.h inc/tsrio.h
+aix-dev.o: inc/telnet.h inc/dev.h inc/port_speed.h
+cyclades-ser-cli.o: inc/cyclades-ser-cli.h inc/conf.h inc/system.h
+cyclades-ser-cli.o: inc/tsrio.h inc/sock.h inc/dev.h inc/misc.h
+hpux-dev.o: inc/cyclades-ser-cli.h inc/conf.h inc/system.h inc/tsrio.h
+hpux-dev.o: inc/telnet.h inc/dev.h inc/port_speed.h
+linux-dev.o: inc/cyclades-ser-cli.h inc/conf.h inc/system.h inc/tsrio.h
+linux-dev.o: inc/telnet.h inc/dev.h inc/misc.h inc/port_speed.h
+measure.o: inc/cyclades-ser-cli.h inc/conf.h inc/system.h inc/tsrmeasure.h
+misc.o: inc/cyclades-ser-cli.h inc/conf.h inc/system.h inc/tsrio.h
+misc.o: inc/telnet.h inc/sock.h inc/dev.h inc/control.h
+sco-dev.o: inc/cyclades-ser-cli.h inc/conf.h inc/system.h inc/tsrio.h
+sco-dev.o: inc/telnet.h inc/dev.h inc/port_speed.h
+sock.o: inc/cyclades-ser-cli.h inc/conf.h inc/system.h inc/tsrio.h inc/sock.h
+solaris-dev.o: inc/cyclades-ser-cli.h inc/conf.h inc/system.h inc/tsrio.h
+solaris-dev.o: inc/telnet.h inc/dev.h inc/misc.h inc/port_speed.h
+system.o: inc/cyclades-ser-cli.h inc/conf.h inc/system.h inc/tsrio.h
+system.o: inc/sock.h inc/dev.h
+telnet.o: inc/cyclades-ser-cli.h inc/conf.h inc/system.h inc/tsrio.h
+telnet.o: inc/telnet.h inc/sock.h
+tsrio.o: inc/cyclades-ser-cli.h inc/conf.h inc/system.h inc/tsrio.h
+tsrio.o: inc/telnet.h inc/misc.h inc/dev.h
+unixware-dev.o: inc/cyclades-ser-cli.h inc/conf.h inc/system.h inc/tsrio.h
+unixware-dev.o: inc/telnet.h inc/dev.h inc/port_speed.h
