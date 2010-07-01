@@ -275,6 +275,7 @@ sub _check_hkd_cluster {
     if ($time > $next) {
         undef $hkd->{next_cluster_check};
         for my $chrt (rs(Host_Runtime)->search({state => 'running'})) {
+            next if $chrt->host_id == this_host_id;
             if ($chrt->ok_ts + $cluster_node_timeout < $time) {
                 txn_eval {
                     for my $vm (rs(VM_Runtime)->search({ host_id => $chrt->host_id })) {
