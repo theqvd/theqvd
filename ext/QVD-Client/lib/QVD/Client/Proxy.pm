@@ -26,7 +26,7 @@ sub run {
 
     my @cmd;
     if ($WINDOWS) {
-	push @cmd, $ENV{QVDPATH}."/nxproxy.exe";
+	push @cmd, $ENV{QVDPATH}."/nxproxy.bat";
     } else {
 	push @cmd, "nxproxy";
     }
@@ -34,7 +34,7 @@ sub run {
     my %o = ();
 
     if ($WINDOWS) {
-	$o{"nx/nx,root"} = $ENV{APPDATA}.'/.qvd';
+	     $ENV{'NX_ROOT'} = $ENV{APPDATA}.'/.qvd';
     }  
     
     $o{media} = 4713 if $self->{audio};
