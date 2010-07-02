@@ -603,10 +603,9 @@ sub _start_vm {
     my $image = $hkd->_vm_image_path($vm) //
 	die "no disk image for vm $id";
 
-    my $hda = "file=$image,index=0,media=disk";
-    $hda .= ',if=virtio,boot=on' if $vm_virtio;
-    push @cmd, -drive => $hda;
-    DEBUG "Using image $image ($hda) for VM $id ";
+    DEBUG "Using image $image for VM $id";
+    #push @cmd, -hda => $image;
+    push @cmd, -drive => "file=$image,if=virtio,boot=on";
 
     if (defined $osi->user_storage_size) {
         my $user_storage = $hkd->_vm_user_storage_path($vm) //
