@@ -13,6 +13,8 @@ pp -x -gui -I ^
 -a system32\libssl32_.dll ^
 -a system32\mingwm10.dll ^
 -a system32\nxproxy.exe ^
+-a C:\strawberry\perl\site\lib\auto\Crypt\OpenSSL\X509\ ^
+-I C:\strawberry\perl\site\lib\auto\Crypt\OpenSSL\X509\ ^
 -I ..\..\ext\QVD-Config\lib ^
 -I ..\..\ext\QVD-Log\lib ^
 -I ..\..\ext\QVD-Client\lib ^
