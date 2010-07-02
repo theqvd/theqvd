@@ -39,9 +39,7 @@ sub ssl_cb {
     my $x509 = Crypt::OpenSSL::X509->new_from_string ($cert_pem_str);
 
     $cert_hash = $x509->hash;
-    $cert_data = sprintf <<'EOF', $x509->version, (join ':', $x509->serial=~/../g), $x509->issuer, $x509->notBefore, $x509->notAfter, $x509->subject;
-Version: 0x%s
-
+    $cert_data = sprintf <<'EOF', (join ':', $x509->serial=~/../g), $x509->issuer, $x509->notBefore, $x509->notAfter, $x509->subject;
 Serial: %s
 
 Issuer: %s
