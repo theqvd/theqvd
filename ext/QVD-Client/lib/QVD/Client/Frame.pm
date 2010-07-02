@@ -475,9 +475,6 @@ sub OnConnectionStatusChanged {
 
 sub OnUnknownCert {
     my ($self, $event) = @_;
-    $self->{timer}->Stop();
-    $self->{progress_bar}->SetValue(0);
-    $self->{progress_bar}->SetRange(100);
     my ($cert_pem_str, $cert_data) = split '__erm, tiene que haber una forma mejor de hacer esto__', $event->GetData;  ## FIXME
 
     my $dialog = Wx::Dialog->new($self, undef, 'Invalid certificate');
@@ -509,6 +506,9 @@ sub OnUnknownCert {
     $dialog->ShowModal();
 
     { lock $accept_cert; cond_signal $accept_cert; }
+    $self->{timer}->Stop();
+    $self->{progress_bar}->SetValue(0);
+    $self->{progress_bar}->SetRange(100);
     $self->EnableControls(1);
 }
 
