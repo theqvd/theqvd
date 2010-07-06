@@ -34,10 +34,13 @@ sub run {
     my %o = ();
 
     if ($WINDOWS) {
-	     $ENV{'NX_ROOT'} = $ENV{APPDATA}.'/.qvd';
+	    $ENV{'NX_ROOT'} = $ENV{APPDATA}.'/.qvd';
+      # Call pulseaudio in Windows
+      Proc::Background->new($ENV{QVDPATH}."/pulseaudio/pulseaudio.exe", "-D", "--high-priority") if $self->{audio};     
     }  
     
     $o{media} = 4713 if $self->{audio};
+
     if ($self->{printing}) {
 	if ($WINDOWS) {
 	    $o{smb} = 139;
