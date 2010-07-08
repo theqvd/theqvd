@@ -5,6 +5,8 @@ package QVD::Client::App;
 use strict;
 use warnings;
 
+use Cwd;
+use File::Spec;
 use Proc::Background;
 
 my $WINDOWS;
@@ -28,11 +30,14 @@ sub OnInit {
     my $self = shift;
     
     if ($WINDOWS) {
-      my @cmd;
-      my @opts = ("-multiwindow", "-notrayicon");
-      push @cmd, ($ENV{QVDPATH}."/Xming/Xming.exe", @opts);
-      #push @cmd, "-notrayicon";
-      Proc::Background->new(@cmd);   
+	my ($volume,$directories,$file) = File::Spec->splitpath(Cwd::realpath($0));
+	$ENV{QVDPATH} = File::Spec->catpath( $volume, $directories);	
+	
+	my @cmd;
+	my @opts = ("-multiwindow", "-notrayicon");
+	push @cmd, ($ENV{QVDPATH}."/Xming/Xming.exe", @opts);
+
+	Proc::Background->new(@cmd);   
     }
     
     my $frame = QVD::Client::Frame->new();
