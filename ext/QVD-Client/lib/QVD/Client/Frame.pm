@@ -10,6 +10,7 @@ use IO::Handle;
 use JSON;
 use base qw(Wx::Frame);
 use strict;
+use feature qw(switch);
 use URI::Escape qw(uri_escape);
 use File::Spec;
 use File::Path 'make_path';
@@ -340,8 +341,13 @@ sub ConnectToVM {
     my ($code, $msg, $response_headers, $body) = $httpc->read_http_response();
     if ($code != HTTP_OK) {
 	my $message :shared;
-	if ($code == HTTP_UNAUTHORIZED) {
-	    $message = "The server has rejected your login. Please verify that your username and password are correct.";
+	given ($code) {
+	    when (HTTP_UNAUTHORIZED) {
+		$message = "The server has rejected your login. Please verify that your username and password are correct.";
+	    }
+	    when (HTTP_SERVICE_UNAVAILABLE) {
+		$message = "The server is under maintenance. Retry later.";
+	    }
 	}
         $message ||= "$host replied with $msg";
 	my $evt = new Wx::PlThreadEvent(-1, $EVT_CONNECTION_ERROR, $message);

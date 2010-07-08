@@ -41,13 +41,21 @@ sub post_configure_hook {
 }
 
 sub ping_processor {
-    shift->send_http_response_with_body(HTTP_OK, 'text/ascii', [],
-					"I am alive!\r\n");
+    my $server_state = this_host->runtime->state;
+    if ($server_state eq 'running') {
+	shift->send_http_response_with_body(HTTP_OK, 'text/plain', [], "I am alive!\r\n");
+    } else {
+	shift->throw_http_error(HTTP_SERVICE_UNAVAILABLE, "Server is $server_state");
+    }
 }
 
 sub list_of_vm_processor {
     my ($l7r, $method, $url, $headers) = @_;
     my $auth = $l7r->_authenticate_user($headers);
+    my $server_state = this_host->runtime->state;
+    if ($server_state ne 'running') {
+	$l7r->throw_http_error(HTTP_SERVICE_UNAVAILABLE, "Server is $server_state");
+    }
     $auth->before_list_of_vms;
     my $user_id = _auth2user_id($auth);
     my @vm_list = ( map { { id      => $_->vm_id,
