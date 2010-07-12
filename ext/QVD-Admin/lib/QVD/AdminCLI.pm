@@ -910,7 +910,7 @@ sub cmd_vm_console {
 	my $vm_runtime = $self->_get_single_vm_runtime;
 	my $serial_port = $vm_runtime->vm_serial_port;
 	die 'Console access is disabled' unless defined $serial_port;
-	exec telnet => $vm_runtime->vm_address, $serial_port, @args
+	exec telnet => $vm_runtime->host->address, $serial_port, @args
             or die "Unable to exec ssh: $^E";
     };
     if ($@) {
