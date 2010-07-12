@@ -74,15 +74,15 @@ sub cmd_host_list {
     my ($self, @args) = @_;
 
     my $rs = $self->get_resultset('host');
-    my @header = ("Id", "Name", "Address ","HKD", "VMs assigned");
+    my @header = ("Id", "Name", "Address ","HKD", "VMs assigned", "State");
     my @body;
 
     eval {
 	while (my $host = $rs->next) {
-	    my $hkd_ts = defined $host->runtime ? $host->runtime->hkd_ok_ts : undef;
+	    my $hkd_ts = defined $host->runtime ? $host->runtime->update_ok_ts : undef;
 	    my $mins = defined $hkd_ts ? _format_timespan(time - $hkd_ts) : '-';
 	    my @row = ($host->id, $host->name, $host->address, $mins,
-				$host->vms->count);
+				$host->vms->count, $host->runtime->state);
 	    push(@body, \@row);
 	}
     };
