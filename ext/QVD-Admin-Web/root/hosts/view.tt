@@ -14,5 +14,9 @@
 	    <td class="field">IP address</td>
 	    <td class="value">[% host.address %]</td>
 	</tr>
+	<tr>
+	    <td class="field">State</td>
+	    <td class="value">[% host.runtime.state %]</td>
+	</tr>	
     </table>
 </div>

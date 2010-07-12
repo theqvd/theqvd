@@ -37,6 +37,7 @@ else
             <th id="id"></th>
             <th id="name">Name</th>
             <th id="address">Address</th>
+	    <th id="state">State</th>
         </tr>
     </thead>
     <tbody>
@@ -45,6 +46,7 @@ else
             <td><a href="[% c.uri_for('/hosts/view/') %][% host.id %]" class="option_view">[% host.id %]</a></td>
             <td>[% host.name %]</td>
             <td>[% host.address %]</td>
+	    <td>[% host.runtime.state %]</td>
 
         </tr>
         [% END -%]
