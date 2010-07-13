@@ -91,6 +91,10 @@ sub index :Path :Args(0) {
     $c->stash('vm_stats_fields' => join ('|', map {$_->vm_state." (".$_->get_column('vm_count').")"} @$rs));
     $c->stash('vm_stats_values' => join (',', map {$_->get_column('vm_count')} @$rs));
     
+    $rs = $model->host_stats("");
+    $c->stash('host_stats_fields' => join ('|', map {$_->get_column('host_state')." (".$_->get_column('host_count').")"} @$rs));
+    $c->stash('host_stats_values' => join (',', map {$_->get_column('host_count')} @$rs));
+    
     $rs = $model->user_total_stats("");
     $c->stash('user_total_stats' => $rs);
     

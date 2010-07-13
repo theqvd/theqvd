@@ -6,41 +6,37 @@
 
 <div class="grid_5 alpha graphs">
 <h2>Virtual machines</h2>
-<a href="/vm/"><img border="0" alt="QVD virtual machines pie chart" src="http://chart.apis.google.com/chart?cht=p&amp;chd=t:[% vm_stats_values -%]&amp;chs=280x150&amp;chl=[% vm_stats_fields -%]"/></a>
+<a href="/vm/"><img border="0" alt="QVD virtual machines pie chart" src="http://chart.apis.google.com/chart?cht=p&amp;chd=t:[% vm_stats_values -%]&amp;chs=320x150&amp;chl=[% vm_stats_fields -%]"/></a>
 </div>
 
-<div class="grid_5 omega graphstwo">
-<h2>Sessions</h2>
-[% IF vm_total_stats != 0 %]
-<a href="/users/"><img border="0" alt="QVD users bar chart" src="http://chart.apis.google.com/chart?cht=bhs&chs=225x25&chd=t:[% 100*(session_connected_stats / vm_total_stats) -%]&chco=FF8D13"/></a>
-[% END %]
-</div>
-
-<div class="grid_2 center">
-    <p><span class="big_count">[% session_connected_stats -%]</span><br/>established</p>
-</div>
-
-<div class="grid_2 center">
-    <p><span class="big_count">[% vm_total_stats -%]</span><br/>potential</p>
+<div class="grid_4 omega">
+<h2>Nodes</h2>
+<a href="/vm/"><img border="0" alt="QVD virtual machines pie chart" src="http://chart.apis.google.com/chart?cht=p&amp;chd=t:[% host_stats_values -%]&amp;chs=320x150&amp;chl=[% host_stats_fields -%]"/></a>
 </div>
 
 <div class="clear"></div>
 
 <h2 class="grid_12 graphs">Totals</h2>
 
-<div class="grid_2 center totals">
+<div class="grid_3 alpha"><p/></div>
+
+<div class="grid_1 center">
     <p><span class="big_count">[% user_total_stats -%]</span><br/>users</p>
 </div>
 
-<div class="grid_2 center">
+<div class="grid_1 center">
     <p><span class="big_count">[% vm_total_stats -%]</span><br/>virtual machines</p>
 </div>
 
-<div class="grid_2 center">
+<div class="grid_1 center">
+    <p><span class="big_count">[% session_connected_stats -%]</span><br/>sessions</p>
+</div>
+
+<div class="grid_1 center">
     <p><span class="big_count">[% host_total_stats -%]</span><br/>nodes</p>
 </div>
 
-<div class="grid_2 center">
+<div class="grid_1 center">
     <p><span class="big_count">[% osi_total_stats -%]</span><br/>images</p>
 </div>
 

@@ -262,9 +262,17 @@ sub vmrt_find {
 sub vm_stats {
     my ($self, $filter) = @_;
     [ rs(VM_Runtime)->search($filter,{ group_by => ['vm_state'],
-				       select => ['vm_state',
+				       select   => ['vm_state',
 						  { count => '*'}],
 				       as => ['vm_state', 'vm_count'] }) ];
+}
+
+sub host_stats {
+    my ($self, $filter) = @_;
+    [ rs(Host_Runtime)->search($filter,{ group_by => ['state'],
+				         select   => ['state',
+						  { count => '*'}],
+				         as => ['host_state', 'host_count'] }) ];
 }
 
 # FIXME: use better names for these *_total_stats subs or just remove
