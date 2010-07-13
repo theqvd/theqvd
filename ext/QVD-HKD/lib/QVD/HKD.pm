@@ -38,9 +38,6 @@ my $captures_path          = cfg('path.serial.captures');
 
 my $vm_port_x              = cfg('internal.nxagent.display') + 4000;
 my $vm_port_vma            = cfg('internal.vm.port.vma');
-my $vm_port_ssh            = cfg('internal.vm.port.ssh');
-
-my $ssh_redirect           = cfg('vm.ssh.redirect');
 
 my $vnc_redirect           = cfg('vm.vnc.redirect');
 my $vnc_opts               = cfg('vm.vnc.opts');
@@ -50,6 +47,10 @@ my $hdb_index              = cfg('vm.kvm.home.drive.index');
 my $mon_redirect           = cfg('internal.vm.monitor.redirect');
 my $serial_redirect        = cfg('vm.serial.redirect');
 my $serial_capture         = cfg('vm.serial.capture');
+
+my $network_bridge	   = cfg('vm.network.bridge');
+my $dhcp_range	  	   = cfg('vm.network.dhcp-range');
+my $dhcp_hostsfile	   = cfg('internal.vm.network.dhcp-hostsfile');
 
 my $persistent_overlay     = cfg('vm.overlay.persistent');
 
@@ -120,6 +121,7 @@ sub run {
 	    eval {
 		$hkd->_check_vms;
 		$hkd->_check_l7rs;
+		$hkd->_check_dhcp;
                 $hkd->_check_hkd_cluster;
 	    };
 	    sleep $pool_time;
@@ -202,6 +204,8 @@ sub _startup {
 	    $hrt->set_state('starting');
 	    $hkd->{id} = $hrt->id;
 	    $hkd->_dirty_startup;
+	    die "Bridge '$network_bridge' not found" 
+		unless -e "/sys/devices/virtual/net/$network_bridge";
 	    my $time = time;
 	    $hrt->set_state('running', $time);
 	    $hkd->{db_ok_ts} = $time;
@@ -249,6 +253,7 @@ sub _shutdown {
     my $hkd = shift;
     if ($hkd->{my_pid} == $$) {
 	$hkd->_shutdown_l7r;
+	$hkd->_shutdown_dhcp;
 	$hkd->_dirty_shutdown;
         $hkd->{host_runtime}->set_state('stopped') unless $hkd->{aborting};
     }
@@ -505,14 +510,14 @@ sub _allocate_port { $port++ }
 sub _assign_vm_ports {
     my ($hkd, $vm) = @_;
 
-    my @ports = ( vm_vma_port => $hkd->_allocate_port,
-		  vm_x_port   => $hkd->_allocate_port);
+    my @ports = ( vm_vma_port => $vm_port_vma,
+		  vm_x_port   => $vm_port_x);
 
-    push @ports, vm_ssh_port    => $hkd->_allocate_port if $ssh_redirect;
     push @ports, vm_vnc_port    => $hkd->_allocate_port if $vnc_redirect;
     push @ports, vm_serial_port => $hkd->_allocate_port if $serial_redirect;
     push @ports, vm_mon_port    => $hkd->_allocate_port if $mon_redirect;
-    $vm->update({vm_address => $vm->host->address, @ports });
+    # TODO Allocate address dynamically
+    $vm->update({vm_address => "172.26.9.102", @ports });
 }
 
 # this method must always be called from inside a txn_eval block!!!
@@ -558,7 +563,6 @@ sub _start_vm {
     my $vma_port = $vm->vm_vma_port;
     my $x_port = $vm->vm_x_port;
     my $vnc_port = $vm->vm_vnc_port;
-    my $ssh_port = $vm->vm_ssh_port;
     my $serial_port = $vm->vm_serial_port;
     my $mon_port = $vm->vm_mon_port;
     my $osi = $vm->rel_vm_id->osi;
@@ -566,12 +570,15 @@ sub _start_vm {
     my $name = rs(VM)->find($vm->vm_id)->name;
 
     INFO "starting VM $id";
+    my $mac = $hkd->_update_dhcp_server($address);
 
     my @cmd = ($cmd{kvm},
                -m => $osi->memory.'M',
-               -redir => "tcp:${x_port}::${vm_port_x}",
-               -redir => "tcp:${vma_port}::${vm_port_vma}",
-               -redir => "tcp:${ssh_port}::${vm_port_ssh}");
+	       -name => $name);
+
+    my $nic = 'nic,macaddr='.$mac;
+    $nic .= ',model=virtio' if $vm_virtio;
+    push @cmd, (-net => $nic, -net => 'tap,fd=3');
 
     my $redirect_io = $serial_capture;
     if (defined $serial_port) {
@@ -617,6 +624,8 @@ sub _start_vm {
         push @cmd, -drive => $hdb;
     }
 
+    my $tap_fh = $hkd->_open_tap;
+
     DEBUG "running @cmd";
     my $pid = fork;
     unless ($pid) {
@@ -626,16 +635,55 @@ sub _start_vm {
             open STDOUT, '>', '/dev/null' or die "can't redirect STDOUT to /dev/null\n";
             open STDERR, '>&', STDOUT or die "can't redirect STDERR to STDOUT\n";
             open STDIN, '<', '/dev/null' or die "can't open /dev/null\n";
+	    $^F = 3;
+	    POSIX::dup2(fileno $tap_fh, 3) or die "Can't dup tap file descriptor";
             exec @cmd or die "exec failed\n";
         };
 	ERROR "Unable to start VM: $@";
 	POSIX::_exit(1);
     }
+    close $tap_fh;
     DEBUG "kvm pid: $pid\n";
     if (defined $pid) {
 	$hkd->{vm_pids}{$id} = $pid;
 	$vm->set_vm_pid($pid);
     }
+}
+
+sub _open_tap {
+    use constant TUNNEL_DEV => '/dev/net/tun';
+    use constant STRUCT_IFREQ => "Z16 s";
+    use constant IFF_NO_PI => 0x1000;
+    use constant IFF_TAP => 2;
+    use constant TUNSETIFF => 0x400454ca;
+    
+    open my $tap_fh, '+<', TUNNEL_DEV or die "Can't open ".TUNNEL_DEV.": $!";
+
+    my $ifreq = pack(STRUCT_IFREQ, 'qvdtap%d', IFF_TAP|IFF_NO_PI);
+    ioctl $tap_fh, TUNSETIFF, $ifreq or die "Can't create tap interface: $!";
+
+    my $tap_if = unpack STRUCT_IFREQ, $ifreq;
+
+    # TODO Do "ifconfig" and "brctl addif" in Perl
+    system (ifconfig => ($tap_if, '0.0.0.0', 'up')) and die "ifconfig $tap_if failed: $!";
+    system (brctl => ('addif', $network_bridge, $tap_if)) and die "brctl addif br0 $tap_if failed: $!";
+    return $tap_fh;
+}
+
+sub _update_dhcp_server {
+    my ($hkd, $ip) = @_;
+    my @hexip = map {sprintf '%02x', $_} (split /\./, $ip);
+    my $mac = '54:52:00:'.join(':', @hexip[1,2,3]);
+
+    eval {
+	open my $fh, '>>', $dhcp_hostsfile or die $!;
+	print $fh "$mac,$ip\n";
+	close $fh or die $!;
+	kill 'SIGHUP', $hkd->{dhcp_pid} or die $!;
+    };
+    die "Can't update dhcp configuration: $@" if $@;
+    
+    $mac
 }
 
 sub _vm_image_path {
@@ -711,6 +759,53 @@ sub _signal_vm_by_id {
     }
     DEBUG "kill VM process $pid with signal $signal" if $signal;
     kill($signal, $pid);
+}
+
+sub _check_dhcp {
+    my $hkd = shift;
+    if ($hkd->{backend}) {
+	my $dhcp_pid = $hkd->{dhcp_pid};
+	if (!defined $dhcp_pid or waitpid($dhcp_pid, WNOHANG) == $dhcp_pid) {
+	    delete $hkd->{dhcp_pid};
+	    unless ($hkd->{stopping}) {
+		eval { $hkd->_start_dhcp };
+		ERROR $@ if $@;
+	    }
+	}
+    }
+}
+
+sub _start_dhcp {
+    my $hkd = shift;
+    my @cmd = (dnsmasq => (-p => 0, '-k', 
+	    -F => $dhcp_range, 
+	    '--dhcp-hostsfile' => $dhcp_hostsfile));
+    my $pid = fork;
+    if (!$pid) {
+	defined $pid or die "Unable to fork DHCP server: $!";
+	eval {
+	    DEBUG "DHCP server forked";
+	    exec @cmd or die "exec @cmd failed\n";
+	};
+	ERROR "Unable to start DHCP server: $@";
+	POSIX::_exit(1);
+    }
+    $hkd->{dhcp_pid} = $pid;
+}
+
+sub _shutdown_dhcp {
+    my $hkd = shift;
+    if ($hkd->{backend}) {
+	for my $sig (qw(TERM KILL)) {
+	    my $dhcp_pid = $hkd->{dhcp_pid};
+	    kill $sig, $dhcp_pid;
+	    sleep 1;
+	    if (waitpid($dhcp_pid, WNOHANG) == $dhcp_pid) {
+		delete $hkd->{dhcp_pid};
+		last;
+	    }
+	}
+    }
 }
 
 sub _check_l7rs {

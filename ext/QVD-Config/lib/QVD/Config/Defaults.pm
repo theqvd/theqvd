@@ -74,7 +74,10 @@ vm.vnc.redirect = 0
 vm.vnc.opts =
 vm.serial.redirect = 1
 vm.serial.capture = 0
-vm.ssh.redirect = 1
+
+vm.network.bridge = qvdnet0
+vm.network.dhcp-range=172.26.8.0,static
+internal.vm.network.dhcp-hostsfile=${path.run}/qvd-hosts
 
 osi.default.memory = 256
 osi.default.overlay = 1
@@ -132,7 +135,6 @@ internal.hkd.cluster.node.timeout = 600
 
 internal.vm.port.x = 5000
 internal.vm.port.vma = 3030
-internal.vm.port.ssh = 22
 internal.vm.monitor.redirect = 0
 
 internal.nxagent.display = 100
