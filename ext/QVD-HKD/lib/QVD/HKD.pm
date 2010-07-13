@@ -317,7 +317,7 @@ sub _check_vms {
 	    if ($vm->vm_cmd) {
 		txn_eval {
 		    $vm->discard_changes;
-		    if ($vm->vm_cmd == 'start' and $vm->vm_state eq 'stopped') {
+		    if ($vm->vm_cmd eq 'start' and $vm->vm_state eq 'stopped') {
 			$vm->unassign;
 		    }
 		    DEBUG "VM command " . $vm->vm_cmd . " aborted because HKD is shutting down";
@@ -516,8 +516,7 @@ sub _assign_vm_ports {
     push @ports, vm_vnc_port    => $hkd->_allocate_port if $vnc_redirect;
     push @ports, vm_serial_port => $hkd->_allocate_port if $serial_redirect;
     push @ports, vm_mon_port    => $hkd->_allocate_port if $mon_redirect;
-    # TODO Allocate address dynamically
-    $vm->update({vm_address => "172.26.9.102", @ports });
+    $vm->update({vm_address => $vm->rel_vm_id->ip, @ports });
 }
 
 # this method must always be called from inside a txn_eval block!!!
@@ -570,7 +569,7 @@ sub _start_vm {
     my $name = rs(VM)->find($vm->vm_id)->name;
 
     INFO "starting VM $id";
-    my $mac = $hkd->_update_dhcp_server($address);
+    my $mac = $hkd->_ip_to_mac($address);
 
     my @cmd = ($cmd{kvm},
                -m => $osi->memory.'M',
@@ -670,19 +669,10 @@ sub _open_tap {
     return $tap_fh;
 }
 
-sub _update_dhcp_server {
+sub _ip_to_mac {
     my ($hkd, $ip) = @_;
     my @hexip = map {sprintf '%02x', $_} (split /\./, $ip);
     my $mac = '54:52:00:'.join(':', @hexip[1,2,3]);
-
-    eval {
-	open my $fh, '>>', $dhcp_hostsfile or die $!;
-	print $fh "$mac,$ip\n";
-	close $fh or die $!;
-	kill 'SIGHUP', $hkd->{dhcp_pid} or die $!;
-    };
-    die "Can't update dhcp configuration: $@" if $@;
-    
     $mac
 }
 
@@ -768,10 +758,15 @@ sub _check_dhcp {
 	if (!defined $dhcp_pid or waitpid($dhcp_pid, WNOHANG) == $dhcp_pid) {
 	    delete $hkd->{dhcp_pid};
 	    unless ($hkd->{stopping}) {
-		eval { $hkd->_start_dhcp };
+		eval { 
+		    $hkd->_regenerate_dhcp_configuration;
+		    $hkd->_start_dhcp;
+		};
 		ERROR $@ if $@;
 	    }
 	}
+	# FIXME when new vms are added we need to regenerate the config and
+	# send HUP to dnsmasq
     }
 }
 
@@ -791,6 +786,20 @@ sub _start_dhcp {
 	POSIX::_exit(1);
     }
     $hkd->{dhcp_pid} = $pid;
+}
+
+sub _regenerate_dhcp_configuration {
+    my ($hkd) = @_;
+    eval {
+        open my $fh, '>', $dhcp_hostsfile or die $!;
+	foreach my $vm (rs(VM)->all) {
+	    my $ip = $vm->ip;
+	    my $mac = $hkd->_ip_to_mac($ip);
+	    print $fh "$mac,$ip\n";
+	}
+        close $fh or die $!;
+    };
+    die "Can't update dhcp configuration: $@" if $@;
 }
 
 sub _shutdown_dhcp {
