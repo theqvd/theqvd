@@ -142,7 +142,7 @@ sub cmd_vm_list {
     
     my $rs = $self->get_resultset('vm');
     
-    my @header = ("Id","Name","User","Host","State","UserState","Blocked");
+    my @header = ("Id","Name","User","Ip","Host","State","UserState","Blocked");
     my @body;
 	
     eval { 
@@ -151,6 +151,7 @@ sub cmd_vm_list {
 	    my @row = map { $_ // '-' } ( $vm->id,
 					   $vm->name,
 					   $vm->user->login,
+					   $vm->ip,
 					   defined $vmr->host ? $vmr->host->name : undef,
 					   $vmr->vm_state,
 					   $vmr->user_state,

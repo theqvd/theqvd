@@ -140,6 +140,14 @@ sub cmd_vm_add {
 	$params->{user_id} = $rs->single->id;
 	delete $params->{user};
     }
+    if (!exists $params->{ip}) {
+	# FIXME Ensure the addresses stay in the range
+	my $dhcp_range = cfg('vm.network.dhcp-range');
+	my ($f,$l) = split /,/, $dhcp_range;
+	# IP address = last ip of range - current maximum id
+	my $curr_max_id = rs(VM)->get_column('id')->max() || 0;
+	$params->{ip} = $self->_add_to_ip($l, -$curr_max_id);
+    }
     $params->{storage} = '';
     my $row = $self->_obj_add('vm', [qw/name user_id osi_id ip storage/], 
 				$params);
@@ -149,6 +157,21 @@ sub cmd_vm_add {
                             user_state => 'disconnected',
                             blocked => 'false'});
     $row->id
+}
+
+sub _aton {
+    unpack('N', pack('C4', split /\./, shift));
+}
+
+sub _ntoa {
+    my ($self, $num) = @_;
+    join '.', unpack('C4', pack('N', shift));
+}
+
+
+sub _add_to_ip {
+    my ($self, $ip, $offset) = @_;
+    return _ntoa($offset + _aton($ip));
 }
 
 sub cmd_user_add {
