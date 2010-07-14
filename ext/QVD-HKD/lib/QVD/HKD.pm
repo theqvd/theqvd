@@ -772,8 +772,9 @@ sub _check_dhcp {
 
 sub _start_dhcp {
     my $hkd = shift;
+    my ($f, $l) = split /,/, $dhcp_range;
     my @cmd = (dnsmasq => (-p => 0, '-k', 
-	    -F => $dhcp_range, 
+	    -F => "$f,static", 
 	    '--dhcp-hostsfile' => $dhcp_hostsfile));
     my $pid = fork;
     if (!$pid) {
