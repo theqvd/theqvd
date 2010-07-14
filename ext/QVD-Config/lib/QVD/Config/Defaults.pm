@@ -76,8 +76,9 @@ vm.serial.redirect = 1
 vm.serial.capture = 0
 
 vm.network.bridge = qvdnet0
-vm.network.dhcp-range=172.26.8.0,static
-internal.vm.network.dhcp-hostsfile=${path.run}/qvd-hosts
+# No sensible default value is possible for dhcp-range!
+# vm.network.dhcp-range=127.0.0.1,127.255.255.254
+internal.vm.network.dhcp-hostsfile=${path.run}/dhcp-hostsfile
 
 osi.default.memory = 256
 osi.default.overlay = 1
