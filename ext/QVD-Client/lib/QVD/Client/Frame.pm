@@ -487,13 +487,13 @@ sub OnUnknownCert {
 	my $vsizer = Wx::BoxSizer->new(wxVERTICAL);
 
 	$vsizer->Add(Wx::StaticText->new($dialog, -1, 'Certificate information:'), 0, wxALL, 5); 
-    my $tc = Wx::TextCtrl->new($dialog, -1, $cert_data, wxDefaultPosition, [400,200], wxTE_MULTILINE|wxTE_READONLY);
+    my $tc = Wx::TextCtrl->new($dialog, -1, $cert_data ? $cert_data : 'Certificate not found, maybe HKD component is not runnning at server side.', wxDefaultPosition, [400,200], wxTE_MULTILINE|wxTE_READONLY);
     $tc->SetFont (Wx::Font->new(9, wxDEFAULT, wxNORMAL, wxNORMAL, 0, 'Courier New'));
 	$vsizer->Add($tc, 1, wxALL|wxEXPAND, 5);
 
     my $but_clicked = sub {
         lock $accept_cert;
-        $accept_cert = shift;
+        $accept_cert = (shift and ($cert_data ne ""));
         $dialog->Destroy();
     };
 	my $bsizer = Wx::BoxSizer->new(wxHORIZONTAL);
