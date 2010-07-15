@@ -50,6 +50,8 @@ my $serial_capture         = cfg('vm.serial.capture');
 
 my $network_bridge	   = cfg('vm.network.bridge');
 my $dhcp_range	  	   = cfg('vm.network.dhcp-range');
+my $dhcp_default_route	   = cfg('vm.network.gateway');
+my $dhcp_dns_server	   = cfg('vm.network.dns_server');
 my $dhcp_hostsfile	   = cfg('internal.vm.network.dhcp-hostsfile');
 
 my $persistent_overlay     = cfg('vm.overlay.persistent');
@@ -77,6 +79,7 @@ sub new {
                                     # in case the database becomes
                                     # inaccesible we would still be
                                     # able to kill the processes
+		 ,vm_taps      => {} # Same thing for tap interfaces for FW rules
 	       };
     bless $self, $class;
 }
@@ -628,7 +631,7 @@ sub _start_vm {
         push @cmd, -drive => $hdb;
     }
 
-    my $tap_fh = $hkd->_open_tap;
+    my ($tap_fh, $tap_if) = $hkd->_open_tap;
 
     DEBUG "running @cmd";
     my $pid = fork;
@@ -649,6 +652,7 @@ sub _start_vm {
     close $tap_fh;
     DEBUG "kvm pid: $pid\n";
     if (defined $pid) {
+	$hkd->{vm_taps}{$id} = $tap_if;
 	$hkd->{vm_pids}{$id} = $pid;
 	$vm->set_vm_pid($pid);
     }
@@ -671,7 +675,7 @@ sub _open_tap {
     # TODO Do "ifconfig" and "brctl addif" in Perl
     system (ifconfig => ($tap_if, '0.0.0.0', 'up')) and die "ifconfig $tap_if failed: $!";
     system (brctl => ('addif', $network_bridge, $tap_if)) and die "brctl addif br0 $tap_if failed: $!";
-    return $tap_fh;
+    return $tap_fh, $tap_if;
 }
 
 sub _ip_to_mac {
@@ -786,8 +790,10 @@ sub _start_dhcp {
     my $hkd = shift;
     my ($f, $l) = split /,/, $dhcp_range;
     my @cmd = (dnsmasq => (-p => 0, '-k', 
-	    -F => "$f,static", 
-	    '--dhcp-hostsfile' => $dhcp_hostsfile));
+	    '--dhcp-range' 	=> "$f,static", 
+	    '--dhcp-option' 	=> "option:router,$dhcp_default_route",
+	    '--dhcp-option' 	=> "option:dns-server,$dhcp_dns_server",
+	    '--dhcp-hostsfile' 	=> $dhcp_hostsfile));
     my $pid = fork;
     if (!$pid) {
 	defined $pid or die "Unable to fork DHCP server: $!";
@@ -924,10 +930,45 @@ sub _write_to_file {
 
 sub _vm_did_start {
     my ($hkd, $vm) = @_;
+    $hkd->_fw_add_rules_for_vm($vm);
 }
 
 sub _vm_did_stop {
     my ($hkd, $vm) = @_;
+    $hkd->_fw_remove_rules_for_vm($vm);
+}
+
+sub _fw_add_rules_for_vm {
+    my ($hkd, $vm) = @_;
+    for my $rule ($hkd->_fw_rules_for_vm($vm)) {
+	my @cmd = (iptables => (-A => 'FORWARD', @$rule));
+	system @cmd and ERROR "Can't configure firewall: $!";
+    }
+}
+
+sub _fw_remove_rules_for_vm {
+    my ($hkd, $vm) = @_;
+    for my $rule ($hkd->_fw_rules_for_vm($vm)) {
+	my @cmd = (iptables => (-D => 'FORWARD', @$rule));
+	system @cmd and ERROR "Can't configure firewall: $!";
+    }
+}
+
+sub _fw_rules_for_vm {
+    my ($hkd, $vm) = @_;
+    my $tap_if = $hkd->{vm_taps}{$vm->id};
+    my $vm_ip = $vm->rel_vm_id->ip;
+    my @rules;
+    @rules = (
+	[-m => 'physdev', '--physdev-in' => $tap_if,
+	 -m => 'mac', '--mac-source' => $hkd->_ip_to_mac($vm_ip),
+	 '!', -d => '172.26.8.0/22', -s => $vm_ip,
+	 -j => 'ACCEPT'],
+
+	[-m => 'physdev', '--physdev-out' => $tap_if,
+	 '!', -s => '172.26.8.0/22', -d => $vm_ip,
+	 -j => 'ACCEPT'],
+    );
 }
 
 1;
