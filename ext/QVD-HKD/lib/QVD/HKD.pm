@@ -376,7 +376,11 @@ sub _check_vms {
 	# run:
 	if ($start) {
 	    eval { $hkd->_start_vm($vm) };
-	    $@ and ERROR "Unable to start VM: $@";
+	    if ($@) {
+		ERROR "Unable to start VM: $@";
+	    } else {
+		$hkd->_vm_did_start($vm);
+	    }
 	}
 
 	next if $vm->vm_state eq 'stopped';
@@ -384,6 +388,7 @@ sub _check_vms {
 	my $vm_pid = $hkd->{vm_pids}{$id};
 	if (!defined($vm_pid) or waitpid($vm_pid, WNOHANG) == $vm_pid) {
 	    DEBUG "kvm process $vm_pid reaped, \$?: $?";
+	    $hkd->_vm_did_stop($vm);
 	    delete $hkd->{vm_pids}{$id};
 	    given ($vm->vm_state) {
 		when ('stopping_1') {
@@ -915,6 +920,14 @@ sub _write_to_file {
 	     close $fh ) {
 	die "Unable to write $fn";
     }
+}
+
+sub _vm_did_start {
+    my ($hkd, $vm) = @_;
+}
+
+sub _vm_did_stop {
+    my ($hkd, $vm) = @_;
 }
 
 1;
