@@ -751,28 +751,28 @@ sub _signal_vm_by_id {
     kill($signal, $pid);
 }
 
+my $max_vm_id;
 sub _check_dhcp {
     my $hkd = shift;
     if ($hkd->{backend}) {
 	my $dhcp_pid = $hkd->{dhcp_pid};
+	# Force curr_max = 0 when no VMs are configured
+	my $curr_max = rs(VM)->get_column('id')->max() // 0;
 	if (!defined $dhcp_pid or waitpid($dhcp_pid, WNOHANG) == $dhcp_pid) {
 	    delete $hkd->{dhcp_pid};
 	    unless ($hkd->{stopping}) {
 		eval { 
-		    $max_vm_id = rs(VM)->get_column('id')->max();
+		    $max_vm_id = $curr_max;
 		    $hkd->_regenerate_dhcp_configuration;
 		    $hkd->_start_dhcp;
 		};
 		ERROR $@ if $@;
 	    }
-	} else {
-	    my $m = rs(VM)->get_column('id')->max();
-	    if (defined $m && $m > $max_vm_id) {
-		INFO "New virtual machines detected. Regenerating DHCP configuration.";
-		$max_vm_id = $m;
-		$hkd->_regenerate_dhcp_configuration;
-		kill 'SIGHUP', $dhcp_pid or WARN "Can't reload DHCP server: $!";
-	    }
+	} elsif ($curr_max > $max_vm_id) {
+	    INFO "New virtual machines detected. Regenerating DHCP configuration.";
+	    $max_vm_id = $curr_max;
+	    $hkd->_regenerate_dhcp_configuration;
+	    kill 'SIGHUP', $dhcp_pid or WARN "Can't reload DHCP server: $!";
 	}
     }
 }
