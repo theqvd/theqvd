@@ -3,4 +3,5 @@ Makefile.PL
 MANIFEST
 README
 t/Linux-Proc-Net-TCP.t
+t/pod.t
 lib/Linux/Proc/Net/TCP.pm
