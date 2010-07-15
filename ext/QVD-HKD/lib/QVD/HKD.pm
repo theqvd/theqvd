@@ -759,14 +759,21 @@ sub _check_dhcp {
 	    delete $hkd->{dhcp_pid};
 	    unless ($hkd->{stopping}) {
 		eval { 
+		    $max_vm_id = rs(VM)->get_column('id')->max();
 		    $hkd->_regenerate_dhcp_configuration;
 		    $hkd->_start_dhcp;
 		};
 		ERROR $@ if $@;
 	    }
+	} else {
+	    my $m = rs(VM)->get_column('id')->max();
+	    if (defined $m && $m > $max_vm_id) {
+		INFO "New virtual machines detected. Regenerating DHCP configuration.";
+		$max_vm_id = $m;
+		$hkd->_regenerate_dhcp_configuration;
+		kill 'SIGHUP', $dhcp_pid or WARN "Can't reload DHCP server: $!";
+	    }
 	}
-	# FIXME when new vms are added we need to regenerate the config and
-	# send HUP to dnsmasq
     }
 }
 
@@ -800,7 +807,7 @@ sub _regenerate_dhcp_configuration {
 	}
         close $fh or die $!;
     };
-    die "Can't update dhcp configuration: $@" if $@;
+    die "Can't update DHCP configuration: $@" if $@;
 }
 
 sub _shutdown_dhcp {
