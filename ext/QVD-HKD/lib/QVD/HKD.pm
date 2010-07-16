@@ -49,6 +49,7 @@ my $serial_redirect        = cfg('vm.serial.redirect');
 my $serial_capture         = cfg('vm.serial.capture');
 
 my $network_bridge	   = cfg('vm.network.bridge');
+my $vm_netmask		   = cfg('vm.network.netmask');
 my $dhcp_range	  	   = cfg('vm.network.dhcp-range');
 my $dhcp_default_route	   = cfg('vm.network.gateway');
 my $dhcp_dns_server	   = cfg('vm.network.dns_server');
@@ -941,7 +942,7 @@ sub _vm_did_stop {
 sub _fw_add_rules_for_vm {
     my ($hkd, $vm) = @_;
     for my $rule ($hkd->_fw_rules_for_vm($vm)) {
-	my @cmd = (iptables => (-A => 'FORWARD', @$rule));
+	my @cmd = (iptables => (-A => @$rule));
 	system @cmd and ERROR "Can't configure firewall: $!";
     }
 }
@@ -949,7 +950,7 @@ sub _fw_add_rules_for_vm {
 sub _fw_remove_rules_for_vm {
     my ($hkd, $vm) = @_;
     for my $rule ($hkd->_fw_rules_for_vm($vm)) {
-	my @cmd = (iptables => (-D => 'FORWARD', @$rule));
+	my @cmd = (iptables => (-D => @$rule));
 	system @cmd and ERROR "Can't configure firewall: $!";
     }
 }
@@ -960,14 +961,27 @@ sub _fw_rules_for_vm {
     my $vm_ip = $vm->rel_vm_id->ip;
     my @rules;
     @rules = (
-	[-m => 'physdev', '--physdev-in' => $tap_if,
-	 -m => 'mac', '--mac-source' => $hkd->_ip_to_mac($vm_ip),
-	 '!', -d => '172.26.8.0/22', -s => $vm_ip,
-	 -j => 'ACCEPT'],
-
-	[-m => 'physdev', '--physdev-out' => $tap_if,
-	 '!', -s => '172.26.8.0/22', -d => $vm_ip,
-	 -j => 'ACCEPT'],
+	# Allow forwarded traffic in and out, except for LAN
+	# TODO Allow access from LAN to VMA and X ports
+	[FORWARD => ( 
+	    -m => 'physdev', '--physdev-in' => $tap_if,
+	    -m => 'mac', '--mac-source' => $hkd->_ip_to_mac($vm_ip),
+	    '!', -d => "$vm_ip/$vm_netmask", -s => $vm_ip,
+	    -j => 'ACCEPT')],
+	[FORWARD => (
+	    -m => 'physdev', '--physdev-out' => $tap_if,
+	    '!', -s => "$vm_ip/$vm_netmask", -d => $vm_ip,
+	    -j => 'ACCEPT')],
+	# Allow returning TCP traffic to the node
+	[INPUT => (
+	    -m => 'physdev', '--physdev-in' => $tap_if,
+	    -p => 'tcp', '!', '--syn',
+	    -j => 'ACCEPT')],
+	# Allow DHCP requests to the node
+	[INPUT => (
+	    -m => 'physdev', '--physdev-in' => $tap_if,
+	    -p => 'udp', '--dport' => 67,
+	    -j => 'ACCEPT')],
     );
 }
 
