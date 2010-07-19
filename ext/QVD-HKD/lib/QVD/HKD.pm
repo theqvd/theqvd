@@ -52,7 +52,6 @@ my $network_bridge	   = cfg('vm.network.bridge');
 my $vm_netmask		   = cfg('vm.network.netmask');
 my $dhcp_range	  	   = cfg('vm.network.dhcp-range');
 my $dhcp_default_route	   = cfg('vm.network.gateway');
-my $dhcp_dns_server	   = cfg('vm.network.dns_server');
 my $dhcp_hostsfile	   = cfg('internal.vm.network.dhcp-hostsfile');
 
 my $persistent_overlay     = cfg('vm.overlay.persistent');
@@ -791,10 +790,9 @@ sub _check_dhcp {
 sub _start_dhcp {
     my $hkd = shift;
     my ($f, $l) = split /,/, $dhcp_range;
-    my @cmd = (dnsmasq => (-p => 0, '-k', 
+    my @cmd = (dnsmasq => ('-k', 
 	    '--dhcp-range' 	=> "$f,static", 
 	    '--dhcp-option' 	=> "option:router,$dhcp_default_route",
-	    '--dhcp-option' 	=> "option:dns-server,$dhcp_dns_server",
 	    '--dhcp-hostsfile' 	=> $dhcp_hostsfile));
     my $pid = fork;
     if (!$pid) {
@@ -1019,10 +1017,6 @@ sub _fw_rules_for_vm {
 
 	# Accept DHCP and DNS requests from VM, drop all other UDP from VM
 	[INPUT => (
-	    -m => 'physdev', '--physdev-in' => $tap_if,
-	    -p => 'udp', -m => 'multiport', '--dports' => '53,67',
-	    -j => 'ACCEPT')],
-	[FORWARD => (
 	    -m => 'physdev', '--physdev-in' => $tap_if,
 	    -p => 'udp', -m => 'multiport', '--dports' => '53,67',
 	    -j => 'ACCEPT')],
