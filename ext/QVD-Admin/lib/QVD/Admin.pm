@@ -146,7 +146,7 @@ sub cmd_vm_add {
 	my ($f,$l) = split /,/, $dhcp_range;
 	# IP address = last ip of range - current maximum id
 	my $curr_max_id = rs(VM)->get_column('id')->max() || 0;
-	$params->{ip} = $self->_add_to_ip($l, -$curr_max_id);
+	$params->{ip} = $self->_get_free_ip($f, $l, $curr_max_id);
     }
     $params->{storage} = '';
     my $row = $self->_obj_add('vm', [qw/name user_id osi_id ip storage/], 
@@ -169,9 +169,24 @@ sub _ntoa {
 }
 
 
-sub _add_to_ip {
-    my ($self, $ip, $offset) = @_;
-    return _ntoa($offset + _aton($ip));
+sub _get_free_ip {
+    my ($self, $ip_begin, $ip_end, $offset) = @_;
+    my $fn = _aton($ip_begin);
+    my $ln = _aton($ip_end);
+    my $range_length = $ln-$fn;
+    my %ips = ();
+    my @ips = rs(VM)->get_column('ip')->all();
+    @ips{@ips} = ();
+    if (scalar keys %ips >= $range_length) {
+	die "No free IP addresses";
+    } else {
+	# Risk of getting duplicate IPs when adding VMs concurrently
+	foreach my $i (0..$range_length) {
+	    my $new_ip = _ntoa($ln - (($offset + $i)% $range_length));
+	    return $new_ip unless exists $ips{$new_ip};
+	}
+	die "No free IP addresses";
+    }
 }
 
 sub cmd_user_add {
