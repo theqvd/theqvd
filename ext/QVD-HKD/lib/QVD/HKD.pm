@@ -520,6 +520,7 @@ sub _assign_vm_ports {
     my ($hkd, $vm) = @_;
 
     my @ports = ( vm_vma_port => $vm_port_vma,
+    		  vm_ssh_port => 22,
 		  vm_x_port   => $vm_port_x);
 
     push @ports, vm_vnc_port    => $hkd->_allocate_port if $vnc_redirect;
@@ -959,29 +960,80 @@ sub _fw_rules_for_vm {
     my ($hkd, $vm) = @_;
     my $tap_if = $hkd->{vm_taps}{$vm->id};
     my $vm_ip = $vm->rel_vm_id->ip;
+    my $x_port = $vm->vm_x_port;
+    my $ssh_port = $vm->vm_ssh_port;
+    my $vma_port = $vm->vm_vma_port;
+
     my @rules;
     @rules = (
-	# Allow forwarded traffic in and out, except for LAN
-	# TODO Allow access from LAN to VMA and X ports
+	# Drop traffic from VM if it doesn't have the correct IP and MAC
 	[FORWARD => ( 
 	    -m => 'physdev', '--physdev-in' => $tap_if,
-	    -m => 'mac', '--mac-source' => $hkd->_ip_to_mac($vm_ip),
-	    '!', -d => "$vm_ip/$vm_netmask", -s => $vm_ip,
-	    -j => 'ACCEPT')],
+	    -m => 'mac', '!', '--mac-source' => $hkd->_ip_to_mac($vm_ip),
+	    '!', -s => $vm_ip,
+	    -j => 'DROP')],
+	[INPUT => ( 
+	    -m => 'physdev', '--physdev-in' => $tap_if,
+	    -m => 'mac', '!', '--mac-source' => $hkd->_ip_to_mac($vm_ip),
+	    '!', -s => $vm_ip,
+	    -j => 'DROP')],
+
+	#
+	# TCP
+	#
+
+	# Drop TCP SYN from VM
+	[FORWARD => (
+	    -m => 'physdev', '--physdev-in' => $tap_if,
+	    -d => "$vm_ip/$vm_netmask",
+	    -p => 'tcp', '--syn',
+	    -j => 'DROP')],
+	[INPUT => (
+	    -m => 'physdev', '--physdev-in' => $tap_if,
+	    -d => "$vm_ip/$vm_netmask",
+	    -p => 'tcp', '--syn',
+	    -j => 'DROP')],
+
+	# Accept traffic SSH/VMA/NX to VM, drop all other TCP from LAN to VM
 	[FORWARD => (
 	    -m => 'physdev', '--physdev-out' => $tap_if,
-	    '!', -s => "$vm_ip/$vm_netmask", -d => $vm_ip,
+	    -s => "$vm_ip/$vm_netmask", -d => $vm_ip,
+	    -p => 'tcp', -m => 'multiport', '--dports' => "$ssh_port,$vma_port,$x_port",
 	    -j => 'ACCEPT')],
-	# Allow returning TCP traffic to the node
+	[OUTPUT => (
+	    -s => "$vm_ip/$vm_netmask", -d => $vm_ip,
+	    -p => 'tcp', -m => 'multiport', '--dports' => "$ssh_port,$vma_port,$x_port",
+	    -j => 'ACCEPT')],
+	[FORWARD => (
+	    -s => "$vm_ip/$vm_netmask", -d => $vm_ip,
+	    -p => 'tcp',
+	    -j => 'DROP')],
+	[OUTPUT => (
+	    -d => $vm_ip,
+	    -p => 'tcp',
+	    -j => 'DROP')],
+
+	#
+	# UDP
+	#
+
+	# Accept DHCP and DNS requests from VM, drop all other UDP from VM
 	[INPUT => (
 	    -m => 'physdev', '--physdev-in' => $tap_if,
-	    -p => 'tcp', '!', '--syn',
+	    -p => 'udp', -m => 'multiport', '--dports' => '53,67',
 	    -j => 'ACCEPT')],
-	# Allow DHCP requests to the node
+	[FORWARD => (
+	    -m => 'physdev', '--physdev-in' => $tap_if,
+	    -p => 'udp', -m => 'multiport', '--dports' => '53,67',
+	    -j => 'ACCEPT')],
 	[INPUT => (
 	    -m => 'physdev', '--physdev-in' => $tap_if,
-	    -p => 'udp', '--dport' => 67,
-	    -j => 'ACCEPT')],
+	    -p => 'udp',
+	    -j => 'DROP')],
+	[FORWARD => (
+	    -m => 'physdev', '--physdev-in' => $tap_if,
+	    -p => 'udp',
+	    -j => 'DROP')],
     );
 }
 
