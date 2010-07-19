@@ -992,7 +992,7 @@ sub _fw_rules_for_vm {
 	    -p => 'tcp', '--syn',
 	    -j => 'DROP')],
 
-	# Accept traffic SSH/VMA/NX to VM, drop all other TCP from LAN to VM
+	# Accept SSH/VMA/NX to VM, drop all other TCP from LAN to VM
 	[FORWARD => (
 	    -m => 'physdev', '--physdev-out' => $tap_if,
 	    -s => "$vm_ip/$vm_netmask", -d => $vm_ip,
@@ -1003,7 +1003,7 @@ sub _fw_rules_for_vm {
 	    -p => 'tcp', -m => 'multiport', '--dports' => "$ssh_port,$vma_port,$x_port",
 	    -j => 'ACCEPT')],
 	[FORWARD => (
-	    -s => "$vm_ip/$vm_netmask", -d => $vm_ip,
+	    -s => "$vm_ip/$vm_netmask", -d => $vm_ip, # -s to allow internet
 	    -p => 'tcp',
 	    -j => 'DROP')],
 	[OUTPUT => (
@@ -1015,14 +1015,10 @@ sub _fw_rules_for_vm {
 	# UDP
 	#
 
-	# Accept DHCP and DNS requests from VM, drop all other UDP from VM
+	# Accept DHCP and DNS requests from VM to node, drop all other UDP from VM
 	[INPUT => (
 	    -m => 'physdev', '--physdev-in' => $tap_if,
-	    -p => 'udp', -m => 'multiport', '--dports' => '53,67',
-	    -j => 'ACCEPT')],
-	[INPUT => (
-	    -m => 'physdev', '--physdev-in' => $tap_if,
-	    -p => 'udp',
+	    -p => 'udp', -m => 'multiport', '!', '--dports' => '53,67',
 	    -j => 'DROP')],
 	[FORWARD => (
 	    -m => 'physdev', '--physdev-in' => $tap_if,
