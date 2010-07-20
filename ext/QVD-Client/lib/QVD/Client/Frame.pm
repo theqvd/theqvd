@@ -287,9 +287,8 @@ sub ConnectToVM {
             return;
         } else {
             if (!$httpc) {
-                ## tried with a listref but got an error, so had to resort to this:
-                my $msg = join '__erm, tiene que haber una forma mejor de hacer esto__',
-                    QVD::HTTPC::cert_pem_str(), QVD::HTTPC::cert_data();   ## FIXME
+                my $msg = $self->_shared_clone([QVD::HTTPC::cert_pem_str(),
+						QVD::HTTPC::cert_data()]);
                 my $evt = new Wx::PlThreadEvent(-1, $EVT_UNKNOWN_CERT, $msg);
                 Wx::PostEvent($self, $evt);
 
@@ -481,22 +480,23 @@ sub OnConnectionStatusChanged {
 
 sub OnUnknownCert {
     my ($self, $event) = @_;
-    my ($cert_pem_str, $cert_data) = split '__erm, tiene que haber una forma mejor de hacer esto__', $event->GetData;  ## FIXME
+    my $evt_data = $event->GetData();
+    my ($cert_pem_str, $cert_data) = @$evt_data;
 
     my $dialog = Wx::Dialog->new($self, undef, 'Invalid certificate');
-	my $vsizer = Wx::BoxSizer->new(wxVERTICAL);
+    my $vsizer = Wx::BoxSizer->new(wxVERTICAL);
 
-	$vsizer->Add(Wx::StaticText->new($dialog, -1, 'Certificate information:'), 0, wxALL, 5); 
+    $vsizer->Add(Wx::StaticText->new($dialog, -1, 'Certificate information:'), 0, wxALL, 5); 
     my $tc = Wx::TextCtrl->new($dialog, -1, $cert_data ? $cert_data : 'Certificate not found, maybe HKD component is not runnning at server side.', wxDefaultPosition, [400,200], wxTE_MULTILINE|wxTE_READONLY);
     $tc->SetFont (Wx::Font->new(9, wxDEFAULT, wxNORMAL, wxNORMAL, 0, 'Courier New'));
-	$vsizer->Add($tc, 1, wxALL|wxEXPAND, 5);
+    $vsizer->Add($tc, 1, wxALL|wxEXPAND, 5);
 
     my $but_clicked = sub {
-        lock $accept_cert;
-        $accept_cert = (shift and ($cert_data ne ""));
-        $dialog->Destroy();
+	lock $accept_cert;
+	$accept_cert = (shift and ($cert_data ne ""));
+	$dialog->Destroy();
     };
-	my $bsizer = Wx::BoxSizer->new(wxHORIZONTAL);
+    my $bsizer = Wx::BoxSizer->new(wxHORIZONTAL);
     my $but_ok     = Wx::Button->new($dialog, -1, 'Ok');
     my $but_cancel = Wx::Button->new($dialog, -1, 'Cancel');
     Wx::Event::EVT_BUTTON($dialog, $but_ok    ->GetId, sub { $but_clicked->(1) });
@@ -506,8 +506,8 @@ sub OnUnknownCert {
     $vsizer->Add($bsizer);
 
     $but_ok->SetFocus;
-	$dialog->SetSizer($vsizer);
-	$vsizer->Fit($dialog);
+    $dialog->SetSizer($vsizer);
+    $vsizer->Fit($dialog);
 
     $dialog->ShowModal();
 
