@@ -3,95 +3,83 @@
 use strict;
 use warnings;
 
-use QVD::HTTPC;
-use QVD::HTTP::Headers qw(header_lookup header_eq_check);
-use QVD::HTTP::StatusCodes qw(:status_codes);
-use IO::Socket::Forwarder qw(forward_sockets);
-use MIME::Base64 qw(encode_base64);
-use JSON;
-use Socket qw(:all);
+use QVD::Client::Proxy;
 use Proc::Background; 
+use JSON;
 
-# Forces a flush
-$| = 1;
+BEGIN {
+    $QVD::Config::USE_DB = 0;
+    @QVD::Config::FILES = ('/etc/qvd/client.conf',
+			   ($ENV{HOME} || $ENV{APPDATA}).'/.qvd/client.conf',
+			   'qvd-client.conf');
 
-my $vm_id;
+    # FIXME NX_CLIENT is used for showing the user information on things
+    # like broken connection, perhaps we should show them to the user
+    # instead of ignoring them? 
+    $ENV{NX_CLIENT} = '/bin/false';
+}
+
+use QVD::Config;
+
 my $username = shift @ARGV;
 my $password = shift @ARGV;
 my $host = shift @ARGV;
-my $port = shift @ARGV // "8443";
-#my $cmd = "C:\\WINDOWS\\system32\\nxproxy.exe";
-my $cmd_win = "C:\\WINDOWS\\system32\\nxproxy.exe -S localhost:40 media=4713 kbtype=pc105/es client=windows";
-my $child_pid;
+my $port = shift @ARGV // cfg('client.host.port');
 my $child_proc;
 my $nonblocking=1;
-
-
-my $authorization = 'Basic '.encode_base64("$username:$password", '');
 
 # FIXME: do not use a heuristic but some command line flag for that
 my $ssl = ($port =~ /43$/ ? 1 : undef);
 
-my $httpc = QVD::HTTPC->new($host.":".$port, SSL => $ssl);
-my $json = JSON->new->ascii->pretty;
+my %connect_info = (
+    link		=> cfg('client.link'),
+    audio		=> cfg('client.audio.enable'),
+    printing		=> cfg('client.printing.enable'),
+    geometry		=> cfg('client.geometry'),
+    fullscreen		=> cfg('client.fullscreen'),
+    keyboard		=> 'pc105/en',
+    port		=> $port,
+    ssl			=> $ssl,
+    host		=> $host,
+    username		=> $username,
+    password		=> $password);
 
+my $delegate = QVD::Client::CLI->new();
+QVD::Client::Proxy->new($delegate, %connect_info)->connect_to_vm();
 
-$httpc->send_http_request(GET => '/qvd/list_of_vm',
-			  headers => [ 'Accept: application/json',
-			  	       'Authorization: '.$authorization ]);
-my ($code, $msg, $headers, $body) = $httpc->read_http_response;
-if ($code != HTTP_OK) {
-   die "Unable to get list of vm";
-} 
-my $json_body = $json->decode($body);
-print "Connecting to ".$json_body->[0]{name}."\n";
-$vm_id = $json_body->[0]{id};
+package QVD::Client::CLI;
 
-$httpc->send_http_request(GET => '/qvd/connect_to_vm?id='.$vm_id,
-			  headers => [ 'Connection: Upgrade',
-			  	       'Authorization: '.$authorization,
-				       'Upgrade: QVD/1.0' ]);
-while (1) {
-    my ($code, $msg, $headers, $body) = $httpc->read_http_response;
+sub new {
+    bless {}, shift;
+}
+
+sub proxy_unknown_cert {
+    my ($self, $cert_arr) = @_;
+    my ($cert_pem_str, $cert_data) = @$cert_arr;
     use Data::Dumper;
-    print Dumper [http_response => $code, $msg, $headers, $body];
-    if ($code == HTTP_SWITCHING_PROTOCOLS) {
-	my $ll = IO::Socket::INET->new(LocalPort => 4040,
-				       ReuseAddr => 1,
-				       Listen => 1);
-	
-	setsockopt($ll, IPPROTO_TCP, TCP_NODELAY, 1);
+    print "Invalid certificate: $cert_data\n";
+    print "Accepting anyway...\n";
+    return 1;
+}
 
-	# FIXME NX_CLIENT is used for showing the user information on things
-	# like broken connection, perhaps we should show them to the user
-	# instead of ignoring them? 
-	$ENV{NX_CLIENT} = '';
-	# XXX: make media port configurable (4713 for pulseaudio)
-	
-	if ($^O eq 'linux'){
-	    my $cmd_linux="nxproxy -S localhost:40 media=4713";
-	    #system "nxproxy -S localhost:40 media=4713 &";
-	    my $proc1 = Proc::Background->new ($cmd_linux);
-	}
-	else{	
-	    my $proc1 = Proc::Background->new ($cmd_win);
-	}
-	my $s1 = $ll->accept()
-	    or die "connection from nxproxy failed";
-	undef $ll; # close the listening socket
-	my $s2 = $httpc->get_socket;
-	if ($^O eq 'MSWin32'){		
-	    ioctl ($s1, 0x8004667e, \$nonblocking);
-	}
-	forward_sockets($s1, $s2); #, debug => 1);
-	last;
+sub proxy_list_of_vm_loaded {
+    my ($self, $vm_data) = @_;
+    if (@$vm_data > 0) {
+	print "You have ".@$vm_data." virtual machines.\n";
+	print "Connecting to the one called ".$vm_data->[0]{name}."\n";
     }
-    elsif ($code >= 100 and $code < 200) {
-	print "$code\ncontinuing...\n"
-    }
-    else {
-	die "unable to connect to remote vm: $code";
-    }
+    return $vm_data->[0]{id};
+}
+
+sub proxy_connection_status {
+    my ($self, $status) = @_;
+    print "Connection status $status\n";
+}
+
+sub proxy_connection_error {
+    my $self = shift;
+    my %args = @_;
+    print 'Connection error: ',$args{message},"\n";
 }
 
 __END__
@@ -102,6 +90,6 @@ qvd-client.pl
 
 =head1 DESCRIPTION
 
-probe of concept client for the new QVD
+Proof of concept command line client for QVD
 
 =cut

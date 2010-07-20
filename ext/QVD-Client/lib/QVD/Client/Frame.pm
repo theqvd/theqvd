@@ -10,15 +10,11 @@ use IO::Handle;
 use JSON;
 use base qw(Wx::Frame);
 use strict;
-use feature qw(switch);
-use URI::Escape qw(uri_escape);
-use File::Spec;
-use File::Path 'make_path';
 
-my $EVT_LIST_OF_VM_LOADED :shared = Wx::NewEventType;
-my $EVT_CONNECTION_ERROR :shared = Wx::NewEventType;
-my $EVT_CONN_STATUS :shared = Wx::NewEventType;
-my $EVT_UNKNOWN_CERT :shared = Wx::NewEventType;
+use constant EVT_LIST_OF_VM_LOADED	=> Wx::NewEventType;
+use constant EVT_CONNECTION_ERROR	=> Wx::NewEventType;
+use constant EVT_CONN_STATUS		=> Wx::NewEventType;
+use constant EVT_UNKNOWN_CERT		=> Wx::NewEventType;
 
 my $vm_id :shared;
 my %connect_info :shared;
@@ -165,10 +161,10 @@ sub new {
 	Wx::Event::EVT_BUTTON($self, $self->{connect_button}->GetId, \&OnClickConnect);
 	Wx::Event::EVT_TIMER($self, -1, \&OnTimer);
 
-	Wx::Event::EVT_COMMAND($self, -1, $EVT_CONNECTION_ERROR, \&OnConnectionError);
-	Wx::Event::EVT_COMMAND($self, -1, $EVT_LIST_OF_VM_LOADED, \&OnListOfVMLoaded);
-	Wx::Event::EVT_COMMAND($self, -1, $EVT_CONN_STATUS, \&OnConnectionStatusChanged);
-	Wx::Event::EVT_COMMAND($self, -1, $EVT_UNKNOWN_CERT, \&OnUnknownCert);
+	Wx::Event::EVT_COMMAND($self, -1, EVT_CONNECTION_ERROR, \&OnConnectionError);
+	Wx::Event::EVT_COMMAND($self, -1, EVT_LIST_OF_VM_LOADED, \&OnListOfVMLoaded);
+	Wx::Event::EVT_COMMAND($self, -1, EVT_CONN_STATUS, \&OnConnectionStatusChanged);
+	Wx::Event::EVT_COMMAND($self, -1, EVT_UNKNOWN_CERT, \&OnUnknownCert);
 
 	Wx::Event::EVT_CLOSE($self, \&OnExit);
 
@@ -180,6 +176,73 @@ sub new {
 	return $self;
 }
 
+sub RunWorkerThread {
+    my $self = shift;
+    my @args = @_;
+    while (1) {
+	lock(%connect_info);
+	local $@;
+	eval { 
+	    QVD::Client::Proxy->new($self, %connect_info)->connect_to_vm();
+	};
+	if ($@) {
+	    $self->proxy_connection_error(message => $@);
+	}
+	cond_wait(%connect_info);
+    }
+}
+
+################################################################################
+#
+# QVD::Client::Proxy callbacks
+#
+################################################################################
+
+sub proxy_unknown_cert {
+    my $self = shift;
+    my $msg :shared = $self->_shared_clone(shift);
+    my $evt = new Wx::PlThreadEvent(-1, EVT_UNKNOWN_CERT, $msg);
+    Wx::PostEvent($self, $evt);
+
+    { lock $accept_cert; cond_wait $accept_cert; }
+    return $accept_cert;
+}
+
+sub proxy_list_of_vm_loaded {
+    my $self = shift;
+    my $vm_data :shared = $self->_shared_clone(shift);
+    if (@$vm_data > 1) {
+	lock($vm_id);
+	my $evt = new Wx::PlThreadEvent(-1, EVT_LIST_OF_VM_LOADED, $vm_data);
+	Wx::PostEvent($self, $evt);
+	cond_wait($vm_id);
+    } elsif (@$vm_data == 1) {
+	$vm_id = $vm_data->[0]{id};
+    } else {
+	die "You don't have any virtual machine available";
+    }
+    return $vm_id;
+}
+
+sub proxy_connection_status {
+    my ($self, $status) = @_;
+    Wx::PostEvent($self, new Wx::PlThreadEvent(-1, EVT_CONN_STATUS, $status));
+}
+
+sub proxy_connection_error {
+    my $self = shift;
+    my %args = @_;
+    my $message :shared = $args{message};
+    my $evt = new Wx::PlThreadEvent(-1, EVT_CONNECTION_ERROR, $message);
+    Wx::PostEvent($self, $evt);
+}
+
+################################################################################
+#
+# Wx event handlers
+#
+################################################################################
+
 sub OnClickConnect {
     my( $self, $event ) = @_;
     $self->{state} = "";
@@ -188,15 +251,17 @@ sub OnClickConnect {
 		      printing   => cfg('client.printing.enable'),
 		      geometry   => cfg('client.geometry'),
 		      fullscreen => cfg('client.fullscreen'),
+		      keyboard	 => $self->DetectKeyboard,
 		      port       => $DEFAULT_PORT,
+		      ssl	 => $USE_SSL,
 		      map { $_ => $self->{$_}->GetValue } qw(host username password) );
 
     $connect_info{port} = $1 if $connect_info{host} =~ s/:(\d+)$//;
 
     $self->SaveConfiguration();
 
-    # Start or notify worker thread; will result in the execution
-    # of the loop in RunWorkerThread.
+    # Start or notify worker thread
+    # Will result in the execution of a loop in RunWorkerThread.
     if (!$self->{worker_thread} || !$self->{worker_thread}->is_running()) {
 	@_ = ();
 	my $thr = threads->create(\&RunWorkerThread, $self);
@@ -206,217 +271,6 @@ sub OnClickConnect {
 	lock(%connect_info);
 	cond_signal(%connect_info);
     }
-}
-
-sub _shared_clone {
-    my ($self, $ref) = @_;
-    my $type = ref $ref;
-    if ($type eq 'ARRAY') {
-	my @arr :shared = map { $self->_shared_clone($_); } @$ref;
-	return \@arr;
-    } elsif ($type eq 'HASH') {
-	my %hash :shared;
-	while (my ($k, $v) = each %$ref) {
-	    $hash{$k} = $self->_shared_clone($v);
-	}
-	return \%hash;
-    } else {
-	return ${share $ref};
-    }
-}
-
-sub RunWorkerThread {
-    my $self = shift;
-    my @args = @_;
-    while (1) {
-	lock(%connect_info);
-	local $@;
-	eval { $self->ConnectToVM(@args) };
-	if ($@) {
-	    my $evt = new Wx::PlThreadEvent(-1, $EVT_CONNECTION_ERROR, $@);
-	    Wx::PostEvent($self, $evt);
-	}
-	cond_wait(%connect_info);
-    }
-}
-
-sub DetectKeyboard {
-	if ($^O eq 'MSWin32') {
-        require Win32::API;
-
-        my $gkln = Win32::API->new ('user32', 'GetKeyboardLayoutName', 'P', 'I');
-        my $str = ' ' x 8;
-        $gkln->Call ($str);
-
-        my $k = substr $str, -4;
-        my $layout = $lang_codes{$k} // 'es';
-
-        ## use a hardcoded 'pc105' since windows doesn't seem to have the notion of keyboard model
-        return "pc105/$layout";
-
-    } else {
-        require X11::Protocol;
-
-        my $x11 = X11::Protocol->new;
-        my ($raw) = $x11->GetProperty ($x11->root, $x11->atom ('_XKB_RULES_NAMES'), 'AnyPropertyType', 0, 4096, 0);
-        my ($rules, $model, $layout, $variant, $options) = split /\x00/, $raw;
-
-        ## these may be comma-separated values, pick the first element
-        ($layout, $variant) = map { (split /,/)[0] // '' } $layout, $variant;
-
-        return "$model/$layout";
-    }
-}
-
-sub ConnectToVM {
-    my $self = shift;
-    my ($host, $port, $user, $passwd) = @connect_info{qw/host port username password/};
-
-    use MIME::Base64 qw(encode_base64);
-    my $auth = encode_base64("$user:$passwd", '');
-
-    Wx::PostEvent($self, new Wx::PlThreadEvent(-1, $EVT_CONN_STATUS, 'CONNECTING'));
-    require QVD::HTTPC;
-    my $httpc;
-    {
-        $httpc = eval { new QVD::HTTPC("$host:$port", SSL => $USE_SSL) };
-        if ($@) {
-            my $message :shared = $@;
-            my $evt = new Wx::PlThreadEvent(-1, $EVT_CONNECTION_ERROR, $message);
-            Wx::PostEvent($self, $evt);
-            return;
-        } else {
-            if (!$httpc) {
-                my $msg = $self->_shared_clone([QVD::HTTPC::cert_pem_str(),
-						QVD::HTTPC::cert_data()]);
-                my $evt = new Wx::PlThreadEvent(-1, $EVT_UNKNOWN_CERT, $msg);
-                Wx::PostEvent($self, $evt);
-
-                { lock $accept_cert; cond_wait $accept_cert; }
-
-                return unless $accept_cert;   ## volver a la ventana principal del cliente
-
-                ## crear archivos y reintentar
-                my $dir = File::Spec->catfile (($ENV{HOME} || $ENV{APPDATA}), cfg('path.ssl.ca.personal'));
-                make_path $dir, { error => \my $mkpath_err };
-                if ($mkpath_err and @$mkpath_err) {
-                    my $errs_text;
-                    for my $err (@$mkpath_err) {
-                        my ($file, $errmsg) = %$err;
-                        if ('' eq $file) {
-                            $errs_text .= "generic error: ($errmsg)\n";
-                        } else {
-                            $errs_text .= "mkpath '$file': ($errmsg)\n";
-                        }
-                    }
-
-                    my $evt = new Wx::PlThreadEvent(-1, $EVT_CONNECTION_ERROR, $errs_text);   ## not a "connection" error actually
-                    Wx::PostEvent($self, $evt);
-                    return;
-                }
-
-                my $file;
-                foreach my $idx (0..9) {
-                    my $basename = sprintf '%s.%d', QVD::HTTPC::cert_hash(), $idx;
-                    $file = File::Spec->catfile ($dir, $basename);
-                    last unless -e $file;
-                }
-
-                open my $fd, '>', $file or die "open: '$file': $!";
-                print $fd QVD::HTTPC::cert_pem_str();
-                close $fd;
-
-                redo;
-            }
-        }
-    }
-
-    $httpc->send_http_request(GET => '/qvd/list_of_vm', 
-	headers => [
-	"Authorization: Basic $auth",
-	"Accept: application/json"
-	]);
-
-    my ($code, $msg, $response_headers, $body) = $httpc->read_http_response();
-    if ($code != HTTP_OK) {
-	my $message :shared;
-	given ($code) {
-	    when (HTTP_UNAUTHORIZED) {
-		$message = "The server has rejected your login. Please verify that your username and password are correct.";
-	    }
-	    when (HTTP_SERVICE_UNAVAILABLE) {
-		$message = "The server is under maintenance. Retry later.";
-	    }
-	}
-        $message ||= "$host replied with $msg";
-	my $evt = new Wx::PlThreadEvent(-1, $EVT_CONNECTION_ERROR, $message);
-	Wx::PostEvent($self, $evt);
-	return;
-    }
-
-    my $json = JSON->new->ascii->pretty;
-    my $vm_data :shared = $self->_shared_clone($json->decode($body));
-
-    if (@$vm_data > 1) {
-	lock($vm_id);
-	my $evt = new Wx::PlThreadEvent(-1, $EVT_LIST_OF_VM_LOADED, $vm_data);
-	Wx::PostEvent($self, $evt);
-	cond_wait($vm_id);
-    } elsif (@$vm_data == 1) {
-	$vm_id = $vm_data->[0]{id};
-    } else {
-	my $message :shared;
-	$message = "You don't have any virtual machine available";
-	my $evt = new Wx::PlThreadEvent(-1, $EVT_CONNECTION_ERROR, $message);
-	Wx::PostEvent($self, $evt);
-	return;
-    }
-
-    my %o = ( id => $vm_id,
-	      'qvd.client.keyboard'         => DetectKeyboard,
-	      'qvd.client.os'               => ($^O eq 'MSWin32') ? 'windows' : 'linux',
-	      'qvd.client.link'             => $connect_info{link},
-	      'qvd.client.geometry'         => $connect_info{geometry},
-	      'qvd.client.fullscreen'       => $connect_info{fullscreen},
-	      'qvd.client.printing.enabled' => defined $connect_info{printing} );
-
-    my $q = join '&', map { uri_escape($_) .'='. uri_escape($o{$_}) } keys %o;
-    $httpc->send_http_request(GET => "/qvd/connect_to_vm?$q",
-			      headers => [ "Authorization: Basic $auth",
-					   'Connection: Upgrade',
-					   'Upgrade: QVD/1.0' ]);
-
-    while (1) {
-	my ($code, $msg, $headers, $body) = $httpc->read_http_response;
-	if ($code == HTTP_SWITCHING_PROTOCOLS) {
-	    Wx::PostEvent($self, new Wx::PlThreadEvent(-1, $EVT_CONN_STATUS, 'CONNECTED'));
-	    QVD::Client::Proxy->new(%connect_info)->run($httpc);
-	    last;
-	}
-	elsif ($code == HTTP_PROCESSING) {
-	    # Server is starting the virtual machine and connecting to the VMA
-	}
-	else {
-	    # Fatal error
-	    my $message :shared;
-	    if ($code == HTTP_NOT_FOUND) {
-		$message = "Your virtual machine does not exist any more.";
-	    } elsif ($code == HTTP_UPGRADE_REQUIRED) {
-		$message = "The server requires a more up-to-date client version.";
-	    } elsif ($code == HTTP_UNAUTHORIZED) {
-		$message = "Login error. Please verify your user and password.";
-	    } elsif ($code == HTTP_BAD_GATEWAY) {
-		$message = "Server error: ".$body;
-	    } elsif ($code == HTTP_FORBIDDEN) {
-		$message = "Your virtual machine is under maintenance.";
-	    }
-	    $message ||= "Unable to connect to remote vm: $code $msg";
-	    my $evt = new Wx::PlThreadEvent(-1, $EVT_CONNECTION_ERROR, $message);
-	    Wx::PostEvent($self, $evt);
-	    last;
-	}
-    }
-    Wx::PostEvent($self, new Wx::PlThreadEvent(-1, $EVT_CONN_STATUS, 'CLOSED'));
 }
 
 sub OnConnectionError {
@@ -459,7 +313,6 @@ sub OnListOfVMLoaded {
 	cond_signal($vm_id);
     }
 }
-
 
 sub OnConnectionStatusChanged {
     my ($self, $event) = @_;
@@ -518,11 +371,6 @@ sub OnUnknownCert {
     $self->EnableControls(1);
 }
 
-sub EnableControls {
-    my ($self, $enabled) = @_;
-    $self->{$_}->Enable($enabled) for qw(connect_button host username password link);
-}
-
 sub OnTimer {
     my $self = shift;
     $self->{progress_bar}->Pulse;
@@ -531,6 +379,45 @@ sub OnTimer {
 sub OnExit {
     my $self = shift;
     $self->Destroy();
+}
+
+################################################################################
+#
+# Helpers
+#
+################################################################################
+
+sub DetectKeyboard {
+    if ($^O eq 'MSWin32') {
+	require Win32::API;
+
+	my $gkln = Win32::API->new ('user32', 'GetKeyboardLayoutName', 'P', 'I');
+	my $str = ' ' x 8;
+	$gkln->Call ($str);
+
+	my $k = substr $str, -4;
+	my $layout = $lang_codes{$k} // 'es';
+
+	## use a hardcoded 'pc105' since windows doesn't seem to have the notion of keyboard model
+	return "pc105/$layout";
+
+    } else {
+	require X11::Protocol;
+
+	my $x11 = X11::Protocol->new;
+	my ($raw) = $x11->GetProperty ($x11->root, $x11->atom ('_XKB_RULES_NAMES'), 'AnyPropertyType', 0, 4096, 0);
+	my ($rules, $model, $layout, $variant, $options) = split /\x00/, $raw;
+
+	## these may be comma-separated values, pick the first element
+	($layout, $variant) = map { (split /,/)[0] // '' } $layout, $variant;
+
+	return "$model/$layout";
+    }
+}
+
+sub EnableControls {
+    my ($self, $enabled) = @_;
+    $self->{$_}->Enable($enabled) for qw(connect_button host username password link);
 }
 
 sub SaveConfiguration {
@@ -557,6 +444,24 @@ sub SaveConfiguration {
 	    "Error saving configuration", wxOK | wxICON_ERROR);
 	$dialog->ShowModal();
 	$dialog->Destroy();
+    }
+}
+
+# threads::shared doesn't have shared_clone on Ubuntu 9.10
+sub _shared_clone {
+    my ($self, $ref) = @_;
+    my $type = ref $ref;
+    if ($type eq 'ARRAY') {
+	my @arr :shared = map { $self->_shared_clone($_); } @$ref;
+	return \@arr;
+    } elsif ($type eq 'HASH') {
+	my %hash :shared;
+	while (my ($k, $v) = each %$ref) {
+	    $hash{$k} = $self->_shared_clone($v);
+	}
+	return \%hash;
+    } else {
+	return ${share $ref};
     }
 }
 
