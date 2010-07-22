@@ -7,6 +7,7 @@ use feature qw(switch);
 use File::Path 'make_path';
 use File::Spec;
 use IO::Socket::Forwarder qw(forward_sockets);
+use JSON;
 use Proc::Background;
 use QVD::HTTP::StatusCodes qw(:status_codes);
 use URI::Escape qw(uri_escape);

@@ -4,10 +4,7 @@ use threads;
 use threads::shared;
 use Wx qw[:everything];
 use QVD::Config;
-use QVD::HTTP::StatusCodes qw(:status_codes);
 use QVD::Client::Proxy;
-use IO::Handle;
-use JSON;
 use base qw(Wx::Frame);
 use strict;
 
@@ -263,7 +260,7 @@ sub OnClickConnect {
     # Start or notify worker thread
     # Will result in the execution of a loop in RunWorkerThread.
     if (!$self->{worker_thread} || !$self->{worker_thread}->is_running()) {
-	@_ = ();
+	@_ = (); # necessary to avoid "Scalars leaked," see perldoc Wx::Thread
 	my $thr = threads->create(\&RunWorkerThread, $self);
 	$thr->detach();
 	$self->{worker_thread} = $thr;
