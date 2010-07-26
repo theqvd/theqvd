@@ -15,13 +15,15 @@ __PACKAGE__->add_columns( id      => { data_type         => 'integer',
 			  storage => { data_type         => 'varchar(4096)',
 				       is_nullable       => 1 } );
 __PACKAGE__->set_primary_key('id');
+
 __PACKAGE__->add_unique_constraint(['name']);
 __PACKAGE__->add_unique_constraint(['ip']);
+
 __PACKAGE__->belongs_to(user => 'QVD::DB::Result::User', 'user_id');
-__PACKAGE__->belongs_to(osi => 'QVD::DB::Result::OSI', 'osi_id');
-__PACKAGE__->has_one(vm_runtime => 'QVD::DB::Result::VM_Runtime', 'vm_id');
-__PACKAGE__->has_many(properties => 'QVD::DB::Result::VM_Property', 
-			'vm_id', {join_type => 'INNER'});
+__PACKAGE__->belongs_to(osi  => 'QVD::DB::Result::OSI',  'osi_id' );
+
+__PACKAGE__->has_one (vm_runtime => 'QVD::DB::Result::VM_Runtime',  'vm_id');
+__PACKAGE__->has_many(properties => 'QVD::DB::Result::VM_Property', 'vm_id');
 
 sub combined_properties {
     my $vm = shift;
