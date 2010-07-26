@@ -5,17 +5,18 @@ use strict;
 
 use feature 'switch';
 use QVD::Config;
+use QVD::Log;
 use QVD::DB::Simple;
 use QVD::ParallelNet;
 use QVD::SimpleRPC::Client;
 use QVD::SimpleRPC::Client::Parallel;
-use QVD::L7R;
 
+use Proc::ProcessTable;
 use Sys::Hostname;
-use POSIX qw(:sys_wait_h SIGTERM SIGKILL);
+use POSIX qw(:sys_wait_h);
 use List::Util qw(max);
 use POSIX;
-use QVD::Log;
+use JSON;
 
 my %cmd = ( kvm     => cfg('command.kvm'),
 	    kvm_img => cfg('command.kvm-img') );
@@ -56,68 +57,62 @@ my $dhcp_hostsfile	   = cfg('internal.vm.network.dhcp-hostsfile');
 
 my $persistent_overlay     = cfg('vm.overlay.persistent');
 
-my $database_timeout       = core_cfg('internal.hkd.database.timeout');
-my $database_delay         = core_cfg('internal.hkd.database.retry_delay');
-
 my $cluster_check_interval = cfg('internal.hkd.cluster.check.interval');
 my $cluster_node_timeout   = cfg('internal.hkd.cluster.node.timeout');
 
+my $database_delay         = core_cfg('internal.hkd.database.retry_delay');
+
+
 sub new {
-    my $class = shift;
+    my ($class, $socket) = @_;
     my $self = { killed       => undef,
 		 stopping     => undef,
                  aborting     => undef,
 		 start_time   => undef,
 		 host         => undef,
 		 host_runtime => undef,
-		 frontend     => undef,
 		 backend      => undef,
 		 db_ok_ts     => undef,
-		 round        => 0,
-		 my_pid       => $$,
-	         vm_pids      => {} # VM pids are also stored locally so that
-                                    # in case the database becomes
-                                    # inaccesible we would still be
-                                    # able to kill the processes
-		 ,vm_taps      => {} # Same thing for tap interfaces for FW rules
-	       };
+		 noded_socket => $socket,
+		 round        => 0 };
     bless $self, $class;
 }
 
-sub _on_fork {
-    my $hkd = shift;
-    $hkd->{vm_pids} = {}
-}
-
-DESTROY {
-    local ($?, $!, $@);
-    shift->_shutdown
-}
-
 sub run {
-    my $hkd = shift;
+    my ($hkd, %args) = @_;
 
-    $SIG{$_} =  sub { $hkd->{killed}++ }
-	for (qw(INT TERM HUP));
+    $hkd->{stopping} = $args{stopping};
 
-    $hkd->_startup or die "HKD startup failed";
+    $SIG{HUP} = sub { $hkd->{signal} = 1 }; # perform an orderly
+                                            # shutdown on HUP
+    $hkd->_startup($args{vm_pids});
     my $hrt = $hkd->{host_runtime};
+
+    DEBUG "hkd up and running";
 
     while (1) {
 	DEBUG "HKD run, round: $hkd->{round}";
-	if (eval { $hkd->_check_db(1) }) {
+	if ($hkd->_check_db) {
 	    $hkd->{round}++;
 	    $hkd->{start_time} //= $hkd->{db_ok_ts};
 
-	    $hkd->_on_killed if $hkd->{killed};
-
+	    if (delete $hkd->{signal}) {
+		if ($hkd->{stopping}) {
+		    DEBUG "HKD is already stopping";
+		}
+		else {
+		    eval {
+			$hrt->set_state('stopping');
+			$hkd->{stopping} = 1;
+			INFO "HKD stopping";
+		    };
+		}
+	    }
 	    if ($hkd->{stopping}) {
-		kill INT => $hkd->{l7r_pid}   # kill L7R early
-		    if $hkd->{l7r_pid};
-
                 if (eval { rs(VM_Runtime)->search({host_id => this_host_id})->count == 0 }) {
-		    INFO "HKD exiting";
-		    return 1;
+		    $hrt->set_state('stopped');
+		    INFO "HKD stopped";
+		    return;
 		}
 		DEBUG($@ || "Can't exit yet: there are VMs running");
 	    }
@@ -129,11 +124,6 @@ sub run {
 	    };
 	    sleep $pool_time;
 	}
-        elsif ($hkd->{aborting}) { # database timeout has expired or
-                                   # other critical error happened
-            ERROR "HKD can not connect to database, aborting: $@";
-            return undef;
-        }
         else {
             INFO "HKD can not connect to database, retrying: $@";
             sleep $database_delay;
@@ -142,139 +132,116 @@ sub run {
     }
 }
 
-sub _check_db {
-    my ($hkd, $always) = @_;
-    my $time = time;
-    $hkd->{aborting} and die "Already aborting";
-    if ($hkd->{db_ok_ts} + $database_timeout < $time) {
-        $hkd->{aborting} = 1;
-        die "Database timeout expired";
-    }
-    if ($always or ($hkd->{db_ok_ts} + 0.3 * $database_timeout) < $time) {
-	my $hrt = $hkd->{host_runtime};
-	for (1, 2) {
-	    eval {
-                alarm 5;
-		txn_eval {
-                    $hrt->discard_changes;
-                    if ($hrt->state eq 'blocked') {
-                        $hkd->{aborting} = 1;
-                        die "Host is blocked";
-                    }
-                    $time = time;
-                    $hrt->update_ok_ts($time);
-                };
-		alarm 0;
-                $@ and die $@;
-	    };
-	    unless ($@) {
-		$hkd->{db_ok_ts} = $time;
-		return 1;
-	    }
-	}
-	die "Database check failed: $@";
-    }
-    1;
+sub _set_noded_timeouts {
+    my ($hkd, $time) = @_;
+    $time //= time;
+    $hkd->_call_noded(set_timeouts => $time);
 }
 
-sub _on_killed {
+sub _check_db {
     my $hkd = shift;
-    DEBUG "HKD killed";
-    if ($hkd->{stopping}) {
-	DEBUG "HKD is already stopping";
-	undef $hkd->{killed};
-    }
-    else {
+    my $ok;
+    my $time = time;
+    eval {
+	alarm 5;
 	eval {
-	    my $hrt = $hkd->{host_runtime};
-	    $hrt->set_state('stopping');
-            $hkd->{stopping}++;
-            undef $hkd->{killed};
-            DEBUG "HKD stopping";
-        };
-    }
+	    $hkd->{host_runtime}->update_ok_ts($time);
+	    $ok = 1;
+	};
+	alarm 0;
+    };
+    $ok or return;
+    $hkd->{db_ok_ts} = $time;
+    $hkd->_set_noded_timeouts($time);
+    return 1;
 }
 
 sub _startup {
-    my $hkd = shift;
-    my $retries = 10;
-    while (1) {
-	eval {
-	    my $host = $hkd->{host} = this_host;
-	    $hkd->{frontend} = $host->frontend;
-	    $hkd->{backend}  = $host->backend;
-	    my $hrt = $hkd->{host_runtime} = $host->runtime;
-	    $hrt->set_state('starting');
-	    $hkd->{id} = $hrt->id;
-	    $hkd->_dirty_startup;
-	    die "Bridge '$network_bridge' not found" 
-		unless -e "/sys/devices/virtual/net/$network_bridge";
-	    my $time = time;
-	    $hrt->set_state('running', $time);
-	    $hkd->{db_ok_ts} = $time;
-	};
-	return 1 unless $@;
-	if (--$retries) {
-	    ERROR "HKD initialization failed, retrying: $@";
-	    sleep 3;
-	}
-	else {
-	    ERROR "HKD initialization failed, aborting: $@";
-	    return;
-	}
-    }
+    my ($hkd, $vm_pids) = @_;
+    my $host = $hkd->{host} = this_host;
+    $hkd->{frontend} = $host->frontend;
+    $hkd->{backend}  = $host->backend;
+    my $hrt = $hkd->{host_runtime} = $host->runtime;
+    $hrt->set_state('starting');
+    $hkd->{id} = $hrt->id;
+    $hkd->_check_bridge;
+    $hkd->_reattach_vms($vm_pids);
+    my $time = time;
+    $hrt->set_state('running', $time);
+    $hkd->_set_noded_timeouts($time);
 }
 
-sub _dirty_startup {
+sub _check_bridge {
+    my $hkd = shift;
+    -e "/sys/devices/virtual/net/$network_bridge"
+	or die "$network_bridge not found\n";
+}
+
+sub _reattach_vms {
     # just in case the last run of the HKD run on this host ended
     # abruptly, without closing some running VM and releasing it in
-    # the database, we clean everything related to this host.
-    my $hkd = shift;
+    # the database, we clean everything related to this host but the
+    # VMs we get in vm_pids that are still being managed by Noded
+    my ($hkd, $vm_pids) = @_;
     my $host_id = $hkd->{id};
     for my $vm (rs(VM_Runtime)->search({host_id => $host_id})) {
-	INFO "Releasing VM " . $vm->id;
-	txn_do {
-	    $vm->discard_changes;
-	    if ($vm->host_id == $host_id) {
-		my $pid = $vm->vm_pid;
-		if (defined $pid) {
-		    # we are conservative here: if there are some process
-		    # with the same pid as the one registered in the
-		    # database for the given VM we just abort
-		    kill 0, $pid and
-			die "VM ".$vm->id." may still be running as process $pid\n";
+	my $vm_id = $vm->id;
+	my $pid_db = $vm->vm_pid;
+	my $pid_noded = $vm_pids->{$vm_id};
+	INFO "Releasing/reacquiring VM $vm_id (pid: " . ($pid_db // 'undef') . ")";
+	if ($pid_db and $pid_noded and $pid_db == $pid_noded) {
+	    # Noded is still managing it
+	    delete $vm_pids->{$vm->id};
+	}
+	else {
+	    txn_do {
+		$vm->discard_changes;
+		if ($vm->host_id == $host_id) {
+		    $pid_db = $vm->vm_pid;
+		    if ($pid_db) {
+			# we are conservative here: if there are some
+			# kvm process with the same pid as the one
+			# registered in the database for the given VM
+			# we just abort
+
+			if (kill 0, $pid_db) {
+			    my $quoted_cmd = quotemeta $cmd{kvm};
+			    my $pt = Proc::ProcessTable->new;
+			    for my $process (@{$pt->table}) {
+				$process->pid == $pid_db and
+				    $process->cmndline =~ /^$quoted_cmd\s/ and
+					die "VM $vm_id may still be running as process $pid_db\n";
+			    }
+			    $hkd->_clean_vm_fw_rules($vm);
+			}
+		    }
+		    $vm->set_vm_state('stopped');
+		    $vm->block;
+		    $vm->unassign;
 		}
-		$vm->set_vm_state('stopped');
-		$vm->block;
-		$vm->unassign;
-	    }
-	};
+	    };
+	}
     }
-}
 
-sub _shutdown {
-    my $hkd = shift;
-    if ($hkd->{my_pid} == $$) {
-	$hkd->_shutdown_l7r;
-	$hkd->_shutdown_dhcp;
-	$hkd->_dirty_shutdown;
-        $hkd->{host_runtime}->set_state('stopped') unless $hkd->{aborting};
-    }
-}
-
-sub _dirty_shutdown {
-    my $hkd = shift;
-    my $vm_pids = $hkd->{vm_pids};
+    # there may remain some VM managed by Noded but that are not
+    # registered in the database, for instance if a previous HKD was
+    # killed in the middle of a VM start operation. We just kill them.
     for my $sig (qw(TERM TERM KILL KILL KILL KILL KILL)) {
 	last unless %$vm_pids;
-	for my $id (keys %$vm_pids) {
-	    $hkd->_signal_vm_by_id($id => $sig);
+	for my $vm_id (keys %$vm_pids) {
+	    $hkd->_call_noded(kill_vm_process => $vm_id, $sig);
 	}
 	sleep 1;
-	while (my ($id, $pid) = each %$vm_pids) {
-	    waitpid($pid, WNOHANG) == $pid
-		and delete $vm_pids->{$id};
+	for my $vm_id (keys %$vm_pids) {
+	    unless ($hkd->_call_noded(check_vm_process => $vm_id)) {
+		delete $vm_pids->{$vm_id};
+	    }
 	}
+    }
+    if (%$vm_pids) {
+	ERROR "Unable to kill VMs " .
+	    join(", ", map "$_($vm_pids->{$_})", keys %$vm_pids);
+	die "unable to kill VMs managed by Noded but not in the database\n";
     }
 }
 
@@ -293,7 +260,7 @@ sub _check_hkd_cluster {
                         $vm->block;
                         $vm->unassing;
                     }
-                    $chrt->set_state('blocked');
+                    $chrt->block;
                 };
             }
         }
@@ -302,8 +269,6 @@ sub _check_hkd_cluster {
 
 sub _check_vms {
     my $hkd = shift;
-
-    $hkd->_check_db;
 
     my (@active_vms, @vmas);
     my $par = QVD::ParallelNet->new;
@@ -379,20 +344,15 @@ sub _check_vms {
 	# run:
 	if ($start) {
 	    eval { $hkd->_start_vm($vm) };
-	    if ($@) {
-		ERROR "Unable to start VM: $@";
-	    } else {
-		$hkd->_vm_did_start($vm);
-	    }
+	    $@ and ERROR "Unable to start VM: $@";
 	}
 
 	next if $vm->vm_state eq 'stopped';
 
-	my $vm_pid = $hkd->{vm_pids}{$id};
-	if (!defined($vm_pid) or waitpid($vm_pid, WNOHANG) == $vm_pid) {
-	    DEBUG "kvm process $vm_pid reaped, \$?: $?";
-	    $hkd->_vm_did_stop($vm);
+	unless ($hkd->_call_noded(check_vm_process => $id)) {
+	    DEBUG "kvm process for vm $id reaped";
 	    delete $hkd->{vm_pids}{$id};
+	    $hkd->_clean_vm_fw_rules($vm);
 	    given ($vm->vm_state) {
 		when ('stopping_1') {
 		    WARN "vm process exited without passing through stopping_2"
@@ -431,8 +391,8 @@ sub _check_vms {
 	    }
 	    when('starting'  ) { $vma_method = 'ping' }
 	    when('stopping_1') { $vma_method = 'poweroff' }
-	    when('zombie_1'  ) { $hkd->_signal_vm_by_id($id => SIGTERM) }
-	    when('zombie_2'  ) { $hkd->_signal_vm_by_id($id => SIGKILL) }
+	    when('zombie_1'  ) { $hkd->_signal_vm($id => 'TERM') }
+	    when('zombie_2'  ) { $hkd->_signal_vm($id => 'KILL') }
 	}
 
 	if (defined $vma_method) {
@@ -446,8 +406,6 @@ sub _check_vms {
 	    $hkd->_vm_goes_zombie_on_timeout($vm);
 	}
     }
-
-    $hkd->_check_db;
 
     $par->run(time => $parallel_net_timeout) if @active_vms;
 
@@ -511,20 +469,18 @@ sub _vm_goes_zombie_on_timeout {
     }
 }
 
-# FIXME: implement a better port allocation strategy
-my $port = 2000;
-sub _allocate_port { $port++ }
+sub _allocate_tcp_port { shift->_call_noded('allocate_tcp_port') }
 
 sub _assign_vm_ports {
     my ($hkd, $vm) = @_;
-
+    # FIXME: remove this ports from the database as they are fixed now:
     my @ports = ( vm_vma_port => $vm_port_vma,
-    		  vm_ssh_port => 22,
+		  vm_ssh_port => 22,
 		  vm_x_port   => $vm_port_x);
 
-    push @ports, vm_vnc_port    => $hkd->_allocate_port if $vnc_redirect;
-    push @ports, vm_serial_port => $hkd->_allocate_port if $serial_redirect;
-    push @ports, vm_mon_port    => $hkd->_allocate_port if $mon_redirect;
+    push @ports, vm_vnc_port    => $hkd->_allocate_tcp_port if $vnc_redirect;
+    push @ports, vm_serial_port => $hkd->_allocate_tcp_port if $serial_redirect;
+    push @ports, vm_mon_port    => $hkd->_allocate_tcp_port if $mon_redirect;
     $vm->update({vm_address => $vm->rel_vm_id->ip, @ports });
 }
 
@@ -565,6 +521,8 @@ sub _enter_vm_state_zombie_1 {
     $vm->send_user_abort if $vm->user_state eq 'connecting';
 }
 
+sub _signal_vm { shift->_call_noded(kill_vm_process => @_) }
+
 sub _start_vm {
     my ($hkd, $vm) = @_;
     my $id = $vm->vm_id;
@@ -584,7 +542,7 @@ sub _start_vm {
                -m => $osi->memory.'M',
 	       -name => $name);
 
-    my $nic = 'nic,macaddr='.$mac;
+    my $nic = "nic,macaddr=$mac";
     $nic .= ',model=virtio' if $vm_virtio;
     push @cmd, (-net => $nic, -net => 'tap,fd=3');
 
@@ -632,52 +590,15 @@ sub _start_vm {
         push @cmd, -drive => $hdb;
     }
 
-    my ($tap_fh, $tap_if) = $hkd->_open_tap;
+    my ($pid, $tap_if) = $hkd->_call_noded(fork_vm => $id, @cmd);
+    $vm->set_vm_pid($pid);
 
-    DEBUG "running @cmd";
-    my $pid = fork;
-    unless ($pid) {
-	$pid // die "unable to fork virtual machine process";
-        eval {
-	    setpgrp; # do not kill kvm when HKD runs on terminal and user CTRL-C's it
-            open STDOUT, '>', '/dev/null' or die "can't redirect STDOUT to /dev/null\n";
-            open STDERR, '>&', STDOUT or die "can't redirect STDERR to STDOUT\n";
-            open STDIN, '<', '/dev/null' or die "can't open /dev/null\n";
-	    $^F = 3;
-	    POSIX::dup2(fileno $tap_fh, 3) or die "Can't dup tap file descriptor";
-            exec @cmd or die "exec failed\n";
-        };
-	ERROR "Unable to start VM: $@";
-	POSIX::_exit(1);
-    }
-    close $tap_fh;
-    DEBUG "kvm pid: $pid\n";
-    if (defined $pid) {
-	$hkd->{vm_taps}{$id} = $tap_if;
-	$hkd->{vm_pids}{$id} = $pid;
-	$vm->set_vm_pid($pid);
-    }
+    # TODO: Do "ifconfig" and "brctl addif" in Perl
+    system (ifconfig => $tap_if, 'up') and die "ifconfig $tap_if for VM $id failed\n";
+    $hkd->_set_vm_fw_rules($vm, $tap_if);
+    system (brctl => 'addif', $network_bridge, $tap_if) and die "brctl addif $network_bridge $tap_if for VM $id failed\n";
 }
 
-sub _open_tap {
-    use constant TUNNEL_DEV => '/dev/net/tun';
-    use constant STRUCT_IFREQ => "Z16 s";
-    use constant IFF_NO_PI => 0x1000;
-    use constant IFF_TAP => 2;
-    use constant TUNSETIFF => 0x400454ca;
-    
-    open my $tap_fh, '+<', TUNNEL_DEV or die "Can't open ".TUNNEL_DEV.": $!";
-
-    my $ifreq = pack(STRUCT_IFREQ, 'qvdtap%d', IFF_TAP|IFF_NO_PI);
-    ioctl $tap_fh, TUNSETIFF, $ifreq or die "Can't create tap interface: $!";
-
-    my $tap_if = unpack STRUCT_IFREQ, $ifreq;
-
-    # TODO Do "ifconfig" and "brctl addif" in Perl
-    system (ifconfig => ($tap_if, '0.0.0.0', 'up')) and die "ifconfig $tap_if failed: $!";
-    system (brctl => ('addif', $network_bridge, $tap_if)) and die "brctl addif br0 $tap_if failed: $!";
-    return $tap_fh, $tap_if;
-}
 
 sub _ip_to_mac {
     my ($hkd, $ip) = @_;
@@ -748,17 +669,6 @@ sub _vm_user_storage_path {
 
     ERROR "Unable to create user storage $image for VM $id";
     return undef;
-}
-
-sub _signal_vm_by_id {
-    my ($hkd, $id, $signal) = @_;
-    my $pid = $hkd->{vm_pids}{$id};
-    unless ($pid) {
-	DEBUG "later detection of failed VM execution";
-	return;
-    }
-    DEBUG "kill VM process $pid with signal $signal" if $signal;
-    kill($signal, $pid);
 }
 
 my $max_vm_id;
@@ -839,7 +749,6 @@ sub _shutdown_dhcp {
 sub _check_l7rs {
     my $hkd = shift;
     if ($hkd->{frontend}) {
-        $hkd->_check_db;
 	# check for dissapearing L7Rs processes
 	for my $vm (rs(VM_Runtime)->search({l7r_host => this_host_id})) {
 	    my $l7r_worker_pid = $vm->l7r_pid;
@@ -848,113 +757,50 @@ sub _check_l7rs {
 		$vm->clear_l7r_all;
 	    }
 	}
-	# check for the main L7R process
-	my $l7r_pid = $hkd->{l7r_pid};
-	if (!defined $l7r_pid or waitpid($l7r_pid, WNOHANG) == $l7r_pid) {
-	    delete $hkd->{l7r_pid};
-	    unless ($hkd->{stopping}) {
-		eval { $hkd->_start_l7r };
-		ERROR $@ if $@;
-	    }
+    }
+}
+
+sub _call_noded {
+    my $self = shift;
+    my $noded_socket = $self->{noded_socket};
+    my $msg = to_json(\@_);
+    send($noded_socket, $msg, 0)
+	or die "unable to send message to noded: $!\n";
+    if (defined recv($noded_socket, my $buf, 4096, 0)) {
+	my ($ok, @response) = eval { @{from_json($buf)} };
+	given ($ok) {
+	    when ('ok')    { return (wantarray ? @response : $response[0]) }
+	    when (undef)   { die "rpc failed: $@" }
+	    when ('error') { die $response[0] }
+	    default        { die "bad response from noded: $ok" }
 	}
     }
+    die "rpc failed: $!\n";
 }
 
-sub _shutdown_l7r {
-    my $hkd = shift;
-    if ($hkd->{frontend}) {
-	for my $sig (qw(INT INT INT INT KILL KILL KILL)) {
-	    my $l7r_pid = $hkd->{l7r_pid} // last;
-	    kill $sig => $l7r_pid;
-	    sleep 1;
-	    if (waitpid($l7r_pid, WNOHANG) == $l7r_pid) {
-		delete $hkd->{l7r_pid};
-		last;
+sub _clean_vm_fw_rules {
+    my ($hkd, $vm) = @_;
+    my $vm_id = $vm->id;
+    for (qw(INPUT OUTPUT FORWARD)) {
+	my @rules = `iptables -S $_`;
+	for (@rules) {
+	    chomp;
+	    system "iptables -D $1"
+		if /^\s*-A\s+(.*--comment\s+"QVD rule for VM $vm_id".*)$/
 	    }
-	}
     }
 }
 
-sub _start_l7r {
-    my $hkd = shift;
-    my @args = ( host => cfg('l7r.address'),
-		 port => cfg('l7r.port') );
-    my $ssl = cfg('l7r.use_ssl');
-    if ($ssl) {
-	my $l7r_certs_path  = cfg('path.ssl.certs');
-	my $l7r_ssl_key     = cfg('l7r.ssl.key');
-	my $l7r_ssl_cert    = cfg('l7r.ssl.cert');
-	my $l7r_ssl_cert_fn = "$l7r_certs_path/l7r-cert.pem";
-	my $l7r_ssl_key_fn  = "$l7r_certs_path/l7r-key.pem";
-	# copy the SSL certificate and key from the database to local
-	# files
-	mkdir $l7r_certs_path, 0700;
-	-d $l7r_certs_path or die "unable to create directory $l7r_certs_path\n";
-	my ($mode, $uid) = (stat $l7r_certs_path)[2, 4];
-	$uid == $> or $uid == 0 or die "bad owner for directory $l7r_certs_path\n";
-	$mode & 0077 and die "bad permissions for directory $l7r_certs_path\n";
-	_write_to_file($l7r_ssl_cert_fn, $l7r_ssl_cert);
-	_write_to_file($l7r_ssl_key_fn,  $l7r_ssl_key);
-	push @args, ( SSL           => 1,
-		      SSL_key_file  => $l7r_ssl_key_fn,
-		      SSL_cert_file => $l7r_ssl_cert_fn );
-    }
-    my $pid = fork;
-    if (!$pid) {
-	defined $pid or die "Unable to fork L7R: $!\n";
-	eval {
-	    db_release; # having two processes using the same DB handler
-	                # is definitively not a good idea!
-	    DEBUG "L7R process forked, SSL: $ssl";
-	    setpgrp;
-	    my $l7r = QVD::L7R->new(@args);
-	    $l7r->run;
-	};
-	ERROR $@ if $@;
-	exit (0);
-    }
-    $hkd->{l7r_pid} = $pid;
-}
-
-sub _write_to_file {
-    my ($fn, $data) = @_;
-    my $fh;
-    DEBUG "writting data to $fn";
-    unless ( open $fh, '>', $fn  and
-	     binmode $fh         and
-	     print $fh $data     and
-	     close $fh ) {
-	die "Unable to write $fn";
+sub _set_vm_fw_rules {
+    my ($hkd, $vm, $tap_if) = @_;
+    my $vm_id = $vm->id;
+    for my $rule ($hkd->_fw_vm_rules($vm, $tap_if)) {
+	system (iptables => -A => @$rule, -m => 'comment', '--comment' => "QVD rule for VM $vm_id")
+	    and ERROR "Can't configure firewall: $!";
     }
 }
 
-sub _vm_did_start {
-    my ($hkd, $vm) = @_;
-    $hkd->_fw_add_rules_for_vm($vm);
-}
-
-sub _vm_did_stop {
-    my ($hkd, $vm) = @_;
-    $hkd->_fw_remove_rules_for_vm($vm);
-}
-
-sub _fw_add_rules_for_vm {
-    my ($hkd, $vm) = @_;
-    for my $rule ($hkd->_fw_rules_for_vm($vm)) {
-	my @cmd = (iptables => (-A => @$rule));
-	system @cmd and ERROR "Can't configure firewall: $!";
-    }
-}
-
-sub _fw_remove_rules_for_vm {
-    my ($hkd, $vm) = @_;
-    for my $rule ($hkd->_fw_rules_for_vm($vm)) {
-	my @cmd = (iptables => (-D => @$rule));
-	system @cmd and ERROR "Can't configure firewall: $!";
-    }
-}
-
-sub _fw_rules_for_vm {
+sub _vm_fw_rules {
     my ($hkd, $vm) = @_;
     my $tap_if = $hkd->{vm_taps}{$vm->id};
     my $vm_ip = $vm->rel_vm_id->ip;
@@ -962,17 +808,28 @@ sub _fw_rules_for_vm {
     my $ssh_port = $vm->vm_ssh_port;
     my $vma_port = $vm->vm_vma_port;
 
-    my @rules;
-    @rules = (
-	# Drop traffic from VM if it doesn't have the correct IP and MAC
+    my @rules = (
+	# Drop traffic from VM if it doesn't have the correct IP or MAC
 	[FORWARD => ( 
 	    -m => 'physdev', '--physdev-in' => $tap_if,
 	    -m => 'mac', '!', '--mac-source' => $hkd->_ip_to_mac($vm_ip),
+	    -j => 'DROP')],
+	[FORWARD => ( 
+	    -m => 'physdev', '--physdev-in' => $tap_if,
 	    '!', -s => $vm_ip,
 	    -j => 'DROP')],
-	[INPUT => ( 
+
+	[INPUT => (
 	    -m => 'physdev', '--physdev-in' => $tap_if,
 	    -m => 'mac', '!', '--mac-source' => $hkd->_ip_to_mac($vm_ip),
+	    -j => 'DROP')],
+	[INPUT => ( # allow DHCP packets from any IP,
+		    # FIXME: could it be limited to 0.0.0.0?
+	    -m => 'physdev', '--physdev-in' => $tap_if,
+	    -p => 'udp', '--dport' => '67',
+	    -j => 'ACCEPT')],
+	[INPUT => (
+	    -m => 'physdev', '--physdev-in' => $tap_if,
 	    '!', -s => $vm_ip,
 	    -j => 'DROP')],
 
@@ -1015,10 +872,10 @@ sub _fw_rules_for_vm {
 	# UDP
 	#
 
-	# Accept DHCP and DNS requests from VM to node, drop all other UDP from VM
+	# Accept DNS requests from VM to node, drop all other UDP from VM
 	[INPUT => (
 	    -m => 'physdev', '--physdev-in' => $tap_if,
-	    -p => 'udp', -m => 'multiport', '!', '--dports' => '53,67',
+	    -p => 'udp', '!', '--dport' => '53',
 	    -j => 'DROP')],
 	[FORWARD => (
 	    -m => 'physdev', '--physdev-in' => $tap_if,
