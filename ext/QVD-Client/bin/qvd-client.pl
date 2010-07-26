@@ -59,8 +59,7 @@ sub proxy_unknown_cert {
     use Data::Dumper;
     print "$cert_data\n";
     print "Accept certificate? [y/N] ";
-    return 0;
-    #return <STDIN> =~ /^y/i;
+    return <STDIN> =~ /^y/i;
 }
 
 sub proxy_list_of_vm_loaded {
