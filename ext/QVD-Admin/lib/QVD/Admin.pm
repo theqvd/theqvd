@@ -115,59 +115,57 @@ sub _obj_add {
 }
 
 sub cmd_host_add {
-    my $self = shift;
-    my $row = $self->_obj_add('host', [qw/name address frontend backend/],
-			      @_, frontend => 1, backend => 1);
-    rs(Host_Runtime)->create({ host_id  => $row->id,
-			       state    => 'stopped' });
-    $row->id
+    my ($self, @args) = @_;
+    txn_do {
+	my $row = $self->_obj_add('host',
+				  [qw/name address frontend backend/],
+				  @args, frontend => 1, backend => 1);
+	rs(Host_Runtime)->create({ host_id  => $row->id,
+				   state    => 'stopped',
+				   blocked  => 'false' });
+	$row->id
+    };
 }
 
 sub cmd_vm_add {
-    my ($self,@args) = @_;
-    my $params = {@args};
-    if (exists $params->{osi}) {
-	my $key = $params->{osi};
-	my $rs = rs(OSI)->search({name => $key});
-	die "$key: No such OSI" if ($rs->count() < 1);
-	$params->{osi_id} = $rs->single->id;
-	delete $params->{osi};
-    }
-    if (exists $params->{user}) {
-	my $key = $params->{user};
-	my $rs = rs(User)->search({login => $key});
-	die "$key: No such user" if ($rs->count() < 1);
-	$params->{user_id} = $rs->single->id;
-	delete $params->{user};
-    }
-    if (!exists $params->{ip}) {
-	# FIXME Ensure the addresses stay in the range
-	my $dhcp_range = cfg('vm.network.dhcp-range');
-	my ($f,$l) = split /,/, $dhcp_range;
-	# IP address = last ip of range - current maximum id
-	my $curr_max_id = rs(VM)->get_column('id')->max() || 0;
-	$params->{ip} = $self->_get_free_ip($f, $l, $curr_max_id);
-    }
-    $params->{storage} = '';
-    my $row = $self->_obj_add('vm', [qw/name user_id osi_id ip storage/], 
-				$params);
-    rs(VM_Runtime)->create({vm_id => $row->id,
-                            osi_actual_id => $row->osi_id,
-                            vm_state => 'stopped',
-                            user_state => 'disconnected',
-                            blocked => 'false'});
-    $row->id
+    my ($self, %params) = @_;
+    txn_do {
+	if (exists $params{osi}) {
+	    my $key = $params{osi};
+	    my $rs = rs(OSI)->search({name => $key});
+	    die "$key: No such OSI" if ($rs->count() < 1);
+	    $params{osi_id} = $rs->single->id;
+	    delete $params{osi};
+	}
+	if (exists $params{user}) {
+	    my $key = $params{user};
+	    my $rs = rs(User)->search({login => $key});
+	    die "$key: No such user" if ($rs->count() < 1);
+	    $params{user_id} = $rs->single->id;
+	    delete $params{user};
+	}
+	if (!exists $params{ip}) {
+	    # FIXME Ensure the addresses stay in the range
+	    my $dhcp_range = cfg('vm.network.dhcp-range');
+	    my ($f, $l) = split /,/, $dhcp_range;
+	    # IP address = last ip of range - current maximum id
+	    my $curr_max_id = rs(VM)->get_column('id')->max() || 0;
+	    $params{ip} = $self->_get_free_ip($f, $l, $curr_max_id);
+	}
+	$params{storage} = '';
+	my $row = $self->_obj_add('vm', [qw/name user_id osi_id ip storage/],
+				  \%params);
+	rs(VM_Runtime)->create({vm_id         => $row->id,
+				osi_actual_id => $row->osi_id,
+				vm_state      => 'stopped',
+				user_state    => 'disconnected',
+				blocked       => 'false'});
+	$row->id
+    };
 }
 
-sub _aton {
-    unpack('N', pack('C4', split /\./, shift));
-}
-
-sub _ntoa {
-    my ($self, $num) = @_;
-    join '.', unpack('C4', pack('N', shift));
-}
-
+sub _aton { unpack('N', pack('C4', split /\./, shift)) }
+sub _ntoa { join '.', unpack('C4', pack('N', shift)) }
 
 sub _get_free_ip {
     my ($self, $ip_begin, $ip_end, $offset) = @_;
