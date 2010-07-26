@@ -1,6 +1,6 @@
 package Linux::Proc::Net::TCP;
 
-our $VERSION = '0.01';
+our $VERSION = '0.02';
 
 use strict;
 use warnings;
@@ -17,18 +17,18 @@ sub read {
     <$fh>; # discard header
     while (<$fh>) {
 	my @entry = /^\s*
-		     (\d+):\s                    # sl                        -  0
-		     ([\dA-F]{8}):([\dA-F]{4})\s # local address and port    -  1 y  2
-		     ([\dA-F]{8}):([\dA-F]{4})\s # remote address and port   -  3 y  4
-		     ([\dA-F]{2})\s              # st                        -  5
-		     ([\dA-F]{8}):([\dA-F]{8})\s # tx_queue and rx_queue     -  6 y  7
-		     (\d\d):([\dA-F]{8})\s       # tr and tm->when           -  8 y  9
-		     ([\dA-F]{8})\s+             # retrnsmt                  - 10
-		     (\d+)\s+                    # uid                       - 11
-		     (\d+)\s+                    # timeout                   - 12
-		     (\d+)\s+                    # inode                     - 13
-		     (\d+)\s+                    # ref count                 - 14
-		     ((?:[\dA-F]{8}){1,2})       # memory address            - 15
+		     (\d+):\s                        # sl                        -  0
+		     ([\dA-F]{8}):([\dA-F]{4})\s     # local address and port    -  1 y  2
+		     ([\dA-F]{8}):([\dA-F]{4})\s     # remote address and port   -  3 y  4
+		     ([\dA-F]{2})\s                  # st                        -  5
+		     ([\dA-F]{8}):([\dA-F]{8})\s     # tx_queue and rx_queue     -  6 y  7
+		     (\d\d):([\dA-F]{8}|(?:F{9,}))\s # tr and tm->when           -  8 y  9
+		     ([\dA-F]{8})\s+                 # retrnsmt                  - 10
+		     (\d+)\s+                        # uid                       - 11
+		     (\d+)\s+                        # timeout                   - 12
+		     (\d+)\s+                        # inode                     - 13
+		     (\d+)\s+                        # ref count                 - 14
+		     ((?:[\dA-F]{8}){1,2})           # memory address            - 15
 		     (?:
 			 \s+
 			 (\d+)\s+                # retransmit timeout        - 16
@@ -107,7 +107,6 @@ sub st                        { _st2dual shift->[ 5] }
 sub tx_queue                  { hex      shift->[ 6] }
 sub rx_queue                  { hex      shift->[ 7] }
 sub timer                     {          shift->[ 8] }
-sub tm_when                   { hex      shift->[ 9] }
 sub retrnsmt                  { hex      shift->[10] }
 sub uid                       {          shift->[11] }
 sub timeout                   {          shift->[12] }
@@ -121,6 +120,12 @@ sub ack_pingpong              {          ( shift->[18] || 0 ) &  1 }
 sub sending_congestion_window {          shift->[19] }
 sub slow_start_size_threshold {          shift->[20] }
 sub _more                     {          shift->[21] }
+
+sub tm_when { # work around bug in Linux kernel
+    my $when = shift->[9];
+    $when =~ /^F{8,}$/ ? -1 : hex $when
+}
+
 
 1;
 __END__
