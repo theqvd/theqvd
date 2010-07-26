@@ -10,6 +10,7 @@ use File::Basename qw(basename);
 
 use QVD::DB::Simple;
 use QVD::Config;
+use QVD::Log;
 
 my $osi_default_memory  = cfg('osi.default.memory');
 my $osi_default_overlay = cfg('osi.default.overlay');
@@ -144,11 +145,12 @@ sub cmd_vm_add {
 	    $params{user_id} = $rs->single->id;
 	    delete $params{user};
 	}
-	if (!exists $params{ip}) {
+	unless ($params{ip}) {
 	    my $dhcp_range = cfg('vm.network.dhcp-range');
 	    my ($f, $l) = split /,/, $dhcp_range;
 	    my $curr_max_id = rs(VM)->get_column('id')->max() || 0;
 	    $params{ip} = $self->_get_free_ip($f, $l, $curr_max_id);
+	    warn "assigned IP: $params{ip}";
 	}
 	$params{storage} = '';
 	my $row = $self->_obj_add('vm', [qw/name user_id osi_id ip storage/],
