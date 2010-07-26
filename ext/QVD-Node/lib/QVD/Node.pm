@@ -29,7 +29,9 @@ sub new {
 		  hkd_time_limit_2 => undef,
 		  hkd_pid          => undef,
 		  hkd_socket       => undef,
-		  l7r_pid          => undef };
+		  l7r_pid          => undef,
+		  dhcpd_pid        => undef,
+		  dhcpd_cmd        => undef };
     bless $noded, $class;
     $noded;
 }
@@ -55,6 +57,7 @@ sub run {
 	    sleep 5;
 	    my $tl2 = $noded->{hkd_time_limit_2};
 	    if ($tl2 and $tl2 < time) {
+		INFO "timeout2 expired, shutting down (a)";
 		$noded->_shutdown;
 	    }
 	    next;
@@ -65,6 +68,7 @@ sub run {
 	while (1) {
 
 	    $noded->_fork_l7r unless $noded->{l7r_pid};
+	    $noded->_fork_dhcpd unless $noded->{dhcpd_pid};
 
 	    my $tl1 = $noded->{hkd_time_limit_1};
 	    my $tl2 = $noded->{hkd_time_limit_2};
@@ -100,6 +104,7 @@ sub run {
 
 	    $time = time;
 	    if ($tl2 and $tl2 < $time) {
+		INFO "timeout2 expired, shutting down (b)";
 		$noded->_shutdown;
 	    }
 	    if ($tl1 and $tl1 < $time) {
@@ -173,15 +178,37 @@ sub _fork_l7r {
     $noded->{l7r_pid} = $pid;
 }
 
+sub _fork_dhcpd {
+    my $noded = shift;
+    my $cmd = $noded->{dhcpd_cmd} or return;
+    my $pid = fork;
+    if (!$pid) {
+	unless (defined $pid) {
+	    ERROR "unable to fork dhcp server";
+	    return undef;
+	}
+	eval {
+	    setpgrp;
+	    exec @$cmd;
+	};
+	$@ and ERROR $@;
+	POSIX::_exit(0);
+    }
+    $noded->{dhcpd_pid} = $pid;
+}
+
 sub _shutdown {
     my $noded = shift;
     my @pids = ( $noded->{hkd_pid},
 		 $noded->{l7r_pid},
+		 $noded->{dhcpd_pid},
 		 values %{$noded->{hkd_pids}} );
 
     for my $sig (qw(TERM TERM KILL KILL KILL KILL)) {
-	@pids = grep $_, @pids or last;
+	@pids = grep $_, @pids;
+	@pids or last;
 	for my $pid (@pids) {
+	    DEBUG "shutdown: kill $sig, $pid";
 	    kill $sig, $pid;
 	}
 	sleep 1;
@@ -271,6 +298,19 @@ sub _rpc_allocate_tcp_port {
 	my $port = $base + $off;
 	return $port unless $used{$port};
     }
+}
+
+sub _rpc_start_dhcpd {
+    my ($noded, @cmd) = @_;
+    $noded->{dhcpd_cmd} = \@cmd;
+    kill TERM => $noded->{dhcpd_pid} if $noded->{dhcpd_pid};
+    1;
+}
+
+sub _rpc_reload_dhcpd {
+    my ($noded, @cmd) = @_;
+    $noded->{dhcpd_cmd} = \@cmd;
+    kill HUP => $noded->{dhcpd_pid};
 }
 
 1;
