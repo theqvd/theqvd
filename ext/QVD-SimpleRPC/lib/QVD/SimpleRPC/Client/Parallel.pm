@@ -17,6 +17,7 @@ sub new {
 	unless ($scheme eq 'http' and !defined($query) and !defined($frag));
     $base //= '/';
     $base .= '/' unless $base =~ m|/$|;
+    DEBUG "connecting to VMA at $host";
     my $socket = IO::Socket::INET->new(PeerAddr => $host,
 				       Blocking => 0,
 				       Proto => 'tcp');
