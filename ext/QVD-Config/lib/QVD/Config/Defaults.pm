@@ -55,8 +55,8 @@ l7r.as_user = qvd
 l7r.pid_file = ${path.run}/l7r.pid
 l7r.auth.plugins = default
 
-hkd.as_user = qvd
-hkd.pid_file = ${path.run}/hkd.pid
+noded.as_user = qvd
+noded.pid_file = ${path.run}/hkd.pid
 
 wat.admin.login = admin
 # wat.admin.password =
