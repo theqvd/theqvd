@@ -4,11 +4,13 @@ use strict;
 use warnings;
 use feature qw(switch);
 
+use Crypt::OpenSSL::X509;
 use File::Path 'make_path';
 use File::Spec;
 use IO::Socket::Forwarder qw(forward_sockets);
 use JSON;
 use Proc::Background;
+use QVD::Config;
 use QVD::HTTP::StatusCodes qw(:status_codes);
 use URI::Escape qw(uri_escape);
 
@@ -29,6 +31,73 @@ sub new {
     bless $self, $class;
 }
 
+## callback receives:
+# 1) a true/false value that indicates what OpenSSL thinks of the certificate
+# 2) a C-style memory address of the certificate store
+# 3) a string containing the certificate's issuer attributes and owner attributes
+# 4) a string containing any errors encountered (0 if no errors).
+## returns:
+# 1 or 0, depending on whether it thinks the certificate is valid or invalid.
+sub _ssl_verify_callback {
+    my ($self, $ssl_thinks, $mem_addr, $attrs, $errs) = @_;
+    return 1 if $ssl_thinks;
+
+    my $cert_pem_str = Net::SSLeay::PEM_get_string_X509 (Net::SSLeay::X509_STORE_CTX_get_current_cert ($mem_addr));
+    my $x509 = Crypt::OpenSSL::X509->new_from_string ($cert_pem_str);
+
+    my $cert_hash = $x509->hash;
+    my $cert_data = sprintf <<'EOF', (join ':', $x509->serial=~/../g), $x509->issuer, $x509->notBefore, $x509->notAfter, $x509->subject;
+Serial: %s
+
+Issuer: %s
+
+Validity:
+    Not before: %s
+    Not after:  %s
+
+Subject: %s
+EOF
+
+    #print "cert_hash ($cert_hash)\n";
+    #print "ssl_thinks ($ssl_thinks) mem_addr ($mem_addr) attrs ($attrs) errs ($errs)\n";
+    #printf "cert_pem_str (%s)\n", cert_pem_str;
+    #printf "cert_data (%s)\n", cert_data;
+
+    my $accept = $self->{client_delegate}->proxy_unknown_cert([$cert_pem_str, $cert_data]);
+
+    return unless $accept;
+
+    ## guardar certificado en archivo
+    my $dir = File::Spec->catfile (($ENV{HOME} || $ENV{APPDATA}), cfg('path.ssl.ca.personal'));
+    make_path $dir, { error => \my $mkpath_err };
+    if ($mkpath_err and @$mkpath_err) {
+	my $errs_text;
+	for my $err (@$mkpath_err) {
+	    my ($file, $errmsg) = %$err;
+	    if ('' eq $file) {
+		$errs_text .= "generic error: ($errmsg)\n";
+	    } else {
+		$errs_text .= "mkpath '$file': ($errmsg)\n";
+	    }
+	}
+
+	die $errs_text;
+    }
+
+    my $file;
+    foreach my $idx (0..9) {
+	my $basename = sprintf '%s.%d', $cert_hash, $idx;
+	$file = File::Spec->catfile ($dir, $basename);
+	last unless -e $file;
+    }
+
+    open my $fd, '>', $file or die "open: '$file': $!";
+    print $fd $cert_pem_str;
+    close $fd;
+
+    return $accept;
+}
+
 sub connect_to_vm {
     my $self = shift;
     my $cli = $self->{client_delegate};
@@ -41,50 +110,15 @@ sub connect_to_vm {
     # SSL library has to be initialized in the thread where it's used,
     # so we do a "require QVD::HTTPC" here instead of "use"ing it above
     require QVD::HTTPC;
-    my $httpc;
-    {
-        $httpc = eval { new QVD::HTTPC("$host:$port", SSL => $connect_info{ssl}) };
-        if ($@) {
-	    $cli->proxy_connection_error(message => $@);
-            return;
-        } else {
-            if (!$httpc) {
-		my $accept = $cli->proxy_unknown_cert([QVD::HTTPC::cert_pem_str(),
-						       QVD::HTTPC::cert_data()]);
-
-                return unless $accept;
-
-                ## crear archivos y reintentar
-                my $dir = File::Spec->catfile (($ENV{HOME} || $ENV{APPDATA}), cfg('path.ssl.ca.personal'));
-                make_path $dir, { error => \my $mkpath_err };
-                if ($mkpath_err and @$mkpath_err) {
-                    my $errs_text;
-                    for my $err (@$mkpath_err) {
-                        my ($file, $errmsg) = %$err;
-                        if ('' eq $file) {
-                            $errs_text .= "generic error: ($errmsg)\n";
-                        } else {
-                            $errs_text .= "mkpath '$file': ($errmsg)\n";
-                        }
-                    }
-
-		    die $errs_text;
-                }
-
-                my $file;
-                foreach my $idx (0..9) {
-                    my $basename = sprintf '%s.%d', QVD::HTTPC::cert_hash(), $idx;
-                    $file = File::Spec->catfile ($dir, $basename);
-                    last unless -e $file;
-                }
-
-                open my $fd, '>', $file or die "open: '$file': $!";
-                print $fd QVD::HTTPC::cert_pem_str();
-                close $fd;
-
-                redo;
-            }
-        }
+    my $httpc = eval { new QVD::HTTPC("$host:$port", SSL => $connect_info{ssl}, 
+			       SSL_verify_callback => sub {$self->_ssl_verify_callback(@_)}) };
+    if ($@) {
+	$cli->proxy_connection_error(message => $@);
+	return;
+    } else {
+	if (!$httpc) {
+	    die "Couldn't create httpc: unknown error";
+	}
     }
 
     use MIME::Base64 qw(encode_base64);

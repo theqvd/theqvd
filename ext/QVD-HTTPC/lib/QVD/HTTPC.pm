@@ -13,51 +13,12 @@ use URI::Escape qw(uri_escape);
 use Errno;
 use File::Spec;
 use Socket qw(IPPROTO_TCP TCP_NODELAY);
-use Crypt::OpenSSL::X509;
 
 use QVD::HTTP::StatusCodes qw(:status_codes);
 use QVD::HTTP::Headers qw(header_lookup);
 use QVD::Config;
 
 my $CRLF = "\r\n";
-
-my $cert_pem_str = ''; sub cert_pem_str { $cert_pem_str; }
-my $cert_hash    = ''; sub cert_hash    { $cert_hash; }
-my $cert_data    = ''; sub cert_data    { $cert_data; }
-
-## callback receives:
-# 1) a true/false value that indicates what OpenSSL thinks of the certificate
-# 2) a C-style memory address of the certificate store
-# 3) a string containing the certificate's issuer attributes and owner attributes
-# 4) a string containing any errors encountered (0 if no errors).
-## returns:
-# 1 or 0, depending on whether it thinks the certificate is valid or invalid.
-sub ssl_cb {
-    my ($ssl_thinks, $mem_addr, $attrs, $errs) = @_;
-
-    $cert_pem_str = Net::SSLeay::PEM_get_string_X509 (Net::SSLeay::X509_STORE_CTX_get_current_cert ($mem_addr));
-    my $x509 = Crypt::OpenSSL::X509->new_from_string ($cert_pem_str);
-
-    $cert_hash = $x509->hash;
-    $cert_data = sprintf <<'EOF', (join ':', $x509->serial=~/../g), $x509->issuer, $x509->notBefore, $x509->notAfter, $x509->subject;
-Serial: %s
-
-Issuer: %s
-
-Validity:
-    Not before: %s
-    Not after:  %s
-
-Subject: %s
-EOF
-
-    #print "cert_hash ($cert_hash)\n";
-    #print "ssl_thinks ($ssl_thinks) mem_addr ($mem_addr) attrs ($attrs) errs ($errs)\n";
-    #printf "cert_pem_str (%s)\n", cert_pem_str;
-    #printf "cert_data (%s)\n", cert_data;
-
-    return $ssl_thinks;
-}
 
 sub _create_socket {
     my $self = shift;
@@ -72,11 +33,11 @@ sub _create_socket {
 
         my %ssl_args = (
             SSL_verify_mode     => 1,
-            SSL_ca_path         => File::Spec->catfile (($ENV{HOME} || $ENV{APPDATA}), cfg('path.ssl.ca.personal')),
-            SSL_verify_callback => \&ssl_cb,
+            SSL_ca_path         => File::Spec->catfile (($ENV{HOME} || $ENV{APPDATA}), cfg('path.ssl.ca.system')),
         );
         unless ($s = IO::Socket::SSL->new(PeerAddr => $target, Blocking => 0, %ssl_args)) {
-            $ssl_args{'SSL_ca_path'} = cfg('path.ssl.ca.system');
+            $ssl_args{'SSL_ca_path'} = cfg('path.ssl.ca.personal');
+            $ssl_args{SSL_verify_callback} = $self->{SSL_verify_callback};
             $s = IO::Socket::SSL->new(PeerAddr => $target, Blocking => 0, %ssl_args);
         }
 
@@ -97,6 +58,7 @@ sub new {
     my ($class, $target, %opts) = @_;
     my $timeout = delete $opts{timeout};
     my $ssl = delete $opts{SSL};
+    my $ssl_cb = delete $opts{SSL_verify_callback};
 
     keys %opts and
 	croak "unknown constructor option(s) " . join(', ', keys %opts);
@@ -104,6 +66,7 @@ sub new {
     my $self = { target => $target,
 		 timeout => $timeout,
 		 SSL => $ssl,
+		 SSL_verify_callback => $ssl_cb,
 		 bin => '',
 		 bout => '' };
     bless $self, $class;
