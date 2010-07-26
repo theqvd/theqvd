@@ -117,7 +117,9 @@ sub connect_to_vm {
 	return;
     } else {
 	if (!$httpc) {
-	    die "Couldn't create httpc: unknown error";
+	    # User rejected the server SSL certificate. Return to main window.
+	    $cli->proxy_connection_status('CLOSED');
+	    return;
 	}
     }
 

@@ -318,11 +318,12 @@ sub OnConnectionStatusChanged {
 	$self->EnableControls(0);
 	$self->{timer}->Start(50, 0);
     } elsif ($status eq 'CONNECTED') {
+	$self->Hide();
+	$self->{timer}->Stop();
+    } elsif ($status eq 'CLOSED') {
 	$self->{timer}->Stop();
 	$self->{progress_bar}->SetValue(0);
 	$self->{progress_bar}->SetRange(100);
-	$self->Hide();
-    } elsif ($status eq 'CLOSED') {
 	$self->EnableControls(1);
 	$self->Show;
     }
@@ -359,13 +360,11 @@ sub OnUnknownCert {
     $dialog->SetSizer($vsizer);
     $vsizer->Fit($dialog);
 
+    $self->{timer}->Stop();
     $dialog->ShowModal();
+    $self->{timer}->Start();
 
     { lock $accept_cert; cond_signal $accept_cert; }
-    $self->{timer}->Stop();
-    $self->{progress_bar}->SetValue(0);
-    $self->{progress_bar}->SetRange(100);
-    $self->EnableControls(1);
 }
 
 sub OnTimer {
