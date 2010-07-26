@@ -129,10 +129,10 @@ internal.hkd.timeout.vm.vma = 4
 internal.hkd.poll_time = 2
 internal.hkd.poll_all_mod = 10
 
-internal.hkd.database.retry_delay = 15
-internal.hkd.database.timeout = 150
-internal.hkd.cluster.check.interval = 300
-internal.hkd.cluster.node.timeout = 600
+internal.hkd.database.retry_delay = 5
+internal.hkd.database.timeout = 20
+internal.hkd.cluster.check.interval = 30
+internal.hkd.cluster.node.timeout = 80
 
 internal.vm.port.x = 5000
 internal.vm.port.vma = 3030
