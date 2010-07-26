@@ -30,6 +30,45 @@ my $x_start_retry    = cfg('internal.l7r.retry.x_start');
 my $x_start_timeout  = cfg('internal.l7r.timeout.x_start');
 my $vma_timeout      = cfg('internal.l7r.timeout.vma');
 
+sub new {
+    my $class = shift;
+    my @args = ( host => cfg('l7r.address'),
+		 port => cfg('l7r.port') );
+    my $ssl = cfg('l7r.use_ssl');
+    if ($ssl) {
+	my $l7r_certs_path  = cfg('path.ssl.certs');
+ 	my $l7r_ssl_key     = cfg('l7r.ssl.key');
+ 	my $l7r_ssl_cert    = cfg('l7r.ssl.cert');
+ 	my $l7r_ssl_cert_fn = "$l7r_certs_path/l7r-cert.pem";
+ 	my $l7r_ssl_key_fn  = "$l7r_certs_path/l7r-key.pem";
+ 	# copy the SSL certificate and key from the database to local
+ 	# files
+ 	mkdir $l7r_certs_path, 0700;
+ 	-d $l7r_certs_path or die "unable to create directory $l7r_certs_path\n";
+ 	my ($mode, $uid) = (stat $l7r_certs_path)[2, 4];
+ 	$uid == $> or $uid == 0 or die "bad owner for directory $l7r_certs_path\n";
+ 	$mode & 0077 and die "bad permissions for directory $l7r_certs_path\n";
+ 	_write_to_file($l7r_ssl_cert_fn, $l7r_ssl_cert);
+ 	_write_to_file($l7r_ssl_key_fn,  $l7r_ssl_key);
+ 	push @args, ( SSL           => 1,
+ 		      SSL_key_file  => $l7r_ssl_key_fn,
+ 		      SSL_cert_file => $l7r_ssl_cert_fn );
+    }
+    $class->SUPER::new(@args);
+}
+
+sub _write_to_file {
+    my ($fn, $data) = @_;
+    my $fh;
+    DEBUG "writting data to $fn";
+    unless ( open $fh, '>', $fn  and
+ 	     binmode $fh         and
+ 	     print $fh $data     and
+ 	     close $fh ) {
+ 	die "Unable to write $fn";
+    }
+}
+
 sub post_configure_hook {
     my $l7r = shift;
     $l7r->set_http_request_processor(\&connect_to_vm_processor,
