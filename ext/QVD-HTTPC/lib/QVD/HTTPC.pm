@@ -33,10 +33,10 @@ sub _create_socket {
 
         my %ssl_args = (
             SSL_verify_mode     => 1,
-            SSL_ca_path         => File::Spec->catfile (($ENV{HOME} || $ENV{APPDATA}), cfg('path.ssl.ca.system')),
+            SSL_ca_path         => cfg('path.ssl.ca.system'),
         );
         unless ($s = IO::Socket::SSL->new(PeerAddr => $target, Blocking => 0, %ssl_args)) {
-            $ssl_args{'SSL_ca_path'} = cfg('path.ssl.ca.personal');
+            $ssl_args{'SSL_ca_path'} = File::Spec->catfile($ENV{HOME} || $ENV{APPDATA}, cfg('path.ssl.ca.personal')),
             $ssl_args{SSL_verify_callback} = $self->{SSL_verify_callback};
             $s = IO::Socket::SSL->new(PeerAddr => $target, Blocking => 0, %ssl_args);
         }
