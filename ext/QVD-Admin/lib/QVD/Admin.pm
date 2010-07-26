@@ -145,10 +145,8 @@ sub cmd_vm_add {
 	    delete $params{user};
 	}
 	if (!exists $params{ip}) {
-	    # FIXME Ensure the addresses stay in the range
 	    my $dhcp_range = cfg('vm.network.dhcp-range');
 	    my ($f, $l) = split /,/, $dhcp_range;
-	    # IP address = last ip of range - current maximum id
 	    my $curr_max_id = rs(VM)->get_column('id')->max() || 0;
 	    $params{ip} = $self->_get_free_ip($f, $l, $curr_max_id);
 	}
