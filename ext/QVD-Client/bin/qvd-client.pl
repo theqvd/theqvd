@@ -3,7 +3,6 @@
 use strict;
 use warnings;
 
-use QVD::Client::Proxy;
 use Proc::Background; 
 use JSON;
 
@@ -20,6 +19,7 @@ BEGIN {
 }
 
 use QVD::Config;
+use QVD::Client::Proxy;
 
 my $username = shift @ARGV;
 my $password = shift @ARGV;
@@ -57,9 +57,10 @@ sub proxy_unknown_cert {
     my ($self, $cert_arr) = @_;
     my ($cert_pem_str, $cert_data) = @$cert_arr;
     use Data::Dumper;
-    print "Invalid certificate: $cert_data\n";
-    print "Accepting anyway...\n";
-    return 1;
+    print "$cert_data\n";
+    print "Accept certificate? [y/N] ";
+    return 0;
+    #return <STDIN> =~ /^y/i;
 }
 
 sub proxy_list_of_vm_loaded {
