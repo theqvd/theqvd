@@ -9,7 +9,6 @@ WriteMakefile(
     ABSTRACT_FROM       => 'lib/QVD/HTTPC.pm',
     PL_FILES            => {},
     PREREQ_PM => {
-        'Crypt::OpenSSL::X509' => 0,
 	'IO::Socket::INET' => 0,
 	'parent' => 0,
 	'QVD::HTTP' => 0,
