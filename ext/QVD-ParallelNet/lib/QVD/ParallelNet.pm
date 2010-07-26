@@ -49,9 +49,21 @@ sub run {
     # warn Dumper $self;
 
     my $npss = $self->{sockets};
-    my @socks = map $_->{_nps_sock}, @$npss;
-    my @fn = map fileno($_), @socks;
-    my @ssl = map UNIVERSAL::isa($_, "IO::Socket::SSL"), @socks;
+    my (@socks, @fn, @ssl);
+    for (@$npss) {
+	my $sock = $_->{_nps_sock};
+	if ($sock) {
+	    push @socks, $sock;
+	    push @fn, fileno $sock;
+	    push @ssl, UNIVERSAL::isa($sock, "IO::Socket::SSL");
+	}
+	else {
+	    $_->{_nps_closed} = 1;
+	    push @socks, undef;
+	    push @fn, undef;
+	    push @ssl, undef;
+	}
+    }
 
     my (@ssl_wtr, @ssl_wtw);
     while (1) {
