@@ -11,10 +11,13 @@ __PACKAGE__->add_columns( id       => { data_type => 'integer',
 			  backend  => { data_type => 'boolean' } );
 
 __PACKAGE__->set_primary_key('id');
-__PACKAGE__->has_many(properties => 'QVD::DB::Result::Host_Property', 
-			'host_id', { join_type => 'INNER'});
-__PACKAGE__->has_one(runtime => 'QVD::DB::Result::Host_Runtime', 'host_id');
-__PACKAGE__->has_many(vms => 'QVD::DB::Result::VM_Runtime',
-                      'host_id', { cascade_delete => 0 });
+
+__PACKAGE__->add_unique_constraint(['name']);
+__PACKAGE__->add_unique_constraint(['address']);
+
+__PACKAGE__->has_many(properties => 'QVD::DB::Result::Host_Property', 'host_id');
+__PACKAGE__->has_many(vms        => 'QVD::DB::Result::VM_Runtime',    'host_id', { cascade_delete => 0 });
+__PACKAGE__->has_one (runtime    => 'QVD::DB::Result::Host_Runtime',  'host_id');
+
 
 1;
