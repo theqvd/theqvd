@@ -764,8 +764,7 @@ sub _set_vm_fw_rules {
 }
 
 sub _vm_fw_rules {
-    my ($hkd, $vm) = @_;
-    my $tap_if = $hkd->{vm_taps}{$vm->id};
+    my ($hkd, $vm, $tap_if) = @_;
     my $vm_ip = $vm->rel_vm_id->ip;
     my $x_port = $vm->vm_x_port;
     my $ssh_port = $vm->vm_ssh_port;
