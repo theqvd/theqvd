@@ -119,7 +119,6 @@ sub run {
 	    eval {
 		$hkd->_check_vms;
 		$hkd->_check_l7rs;
-		$hkd->_check_dhcp;
                 $hkd->_check_hkd_cluster;
 	    };
 	    sleep $pool_time;
@@ -165,6 +164,8 @@ sub _startup {
     $hrt->set_state('starting');
     $hkd->{id} = $hrt->id;
     $hkd->_check_bridge;
+    $hkd->_regenerate_dhcpd_config;
+    $hkd->_start_dhcpd;
     $hkd->_reattach_vms($vm_pids);
     my $time = time;
     $hrt->set_state('running', $time);
@@ -396,6 +397,7 @@ sub _check_vms {
 	}
 
 	if (defined $vma_method) {
+	    DEBUG "VMA URL: " . $vm->vma_url;
 	    my $vma = QVD::SimpleRPC::Client::Parallel->new($vm->vma_url);
 	    $vma->queue_request($vma_method);
 	    $par->register($vma);
@@ -407,7 +409,10 @@ sub _check_vms {
 	}
     }
 
-    $par->run(time => $parallel_net_timeout) if @active_vms;
+    eval {
+	$par->run(time => $parallel_net_timeout) if @active_vms;
+    };
+    $@ and ERROR "Parallel HTTP query failed unexpectedly: $@";
 
     while (@active_vms) {
 	my $vm = shift @active_vms;
@@ -534,6 +539,9 @@ sub _start_vm {
     my $osi = $vm->rel_vm_id->osi;
     my $address = $vm->vm_address;
     my $name = rs(VM)->find($vm->vm_id)->name;
+
+    $hkd->_regenerate_dhcpd_config;
+    $hkd->_call_noded('reload_dhcpd');
 
     INFO "starting VM $id";
     my $mac = $hkd->_ip_to_mac($address);
@@ -671,79 +679,32 @@ sub _vm_user_storage_path {
     return undef;
 }
 
-my $max_vm_id;
-sub _check_dhcp {
-    my $hkd = shift;
-    if ($hkd->{backend}) {
-	my $dhcp_pid = $hkd->{dhcp_pid};
-	# Force curr_max = 0 when no VMs are configured
-	my $curr_max = rs(VM)->get_column('id')->max() // 0;
-	if (!defined $dhcp_pid or waitpid($dhcp_pid, WNOHANG) == $dhcp_pid) {
-	    delete $hkd->{dhcp_pid};
-	    unless ($hkd->{stopping}) {
-		eval { 
-		    $max_vm_id = $curr_max;
-		    $hkd->_regenerate_dhcp_configuration;
-		    $hkd->_start_dhcp;
-		};
-		ERROR $@ if $@;
-	    }
-	} elsif ($curr_max > $max_vm_id) {
-	    INFO "New virtual machines detected. Regenerating DHCP configuration.";
-	    $max_vm_id = $curr_max;
-	    $hkd->_regenerate_dhcp_configuration;
-	    kill 'SIGHUP', $dhcp_pid or WARN "Can't reload DHCP server: $!";
-	}
-    }
-}
-
-sub _start_dhcp {
+sub _start_dhcpd {
     my $hkd = shift;
     my ($f, $l) = split /,/, $dhcp_range;
-    my @cmd = (dnsmasq => ('-k', 
-	    '--dhcp-range' 	=> "$f,static", 
-	    '--dhcp-option' 	=> "option:router,$dhcp_default_route",
-	    '--dhcp-hostsfile' 	=> $dhcp_hostsfile));
-    my $pid = fork;
-    if (!$pid) {
-	defined $pid or die "Unable to fork DHCP server: $!";
-	eval {
-	    DEBUG "DHCP server forked";
-	    exec @cmd or die "exec @cmd failed\n";
-	};
-	ERROR "Unable to start DHCP server: $@";
-	POSIX::_exit(1);
-    }
-    $hkd->{dhcp_pid} = $pid;
+    $hkd->_call_noded(start_dhcpd => 'dnsmasq',
+		                     '-k',
+		                     '--dhcp-range'     => "$f,static",
+		                     '--dhcp-option'    => "option:router,$dhcp_default_route",
+		                     '--dhcp-hostsfile' => $dhcp_hostsfile);
 }
 
-sub _regenerate_dhcp_configuration {
+sub _regenerate_dhcpd_config {
     my ($hkd) = @_;
     eval {
-        open my $fh, '>', $dhcp_hostsfile or die $!;
+	open my $fh, '>', "$dhcp_hostsfile.tmp"
+	    or die "open $dhcp_hostsfile.tmp failed: $!";
 	foreach my $vm (rs(VM)->all) {
 	    my $ip = $vm->ip;
 	    my $mac = $hkd->_ip_to_mac($ip);
 	    print $fh "$mac,$ip\n";
 	}
-        close $fh or die $!;
+	close $fh
+	    or die "close failed: $!";
+	rename "$dhcp_hostsfile.tmp", $dhcp_hostsfile
+	    or die "rename failed: $!";
     };
-    die "Can't update DHCP configuration: $@" if $@;
-}
-
-sub _shutdown_dhcp {
-    my $hkd = shift;
-    if ($hkd->{backend}) {
-	for my $sig (qw(TERM KILL)) {
-	    my $dhcp_pid = $hkd->{dhcp_pid};
-	    kill $sig, $dhcp_pid;
-	    sleep 1;
-	    if (waitpid($dhcp_pid, WNOHANG) == $dhcp_pid) {
-		delete $hkd->{dhcp_pid};
-		last;
-	    }
-	}
-    }
+    $@ and die "unable to regenerate DHCP configuration: $@";
 }
 
 sub _check_l7rs {
@@ -794,9 +755,11 @@ sub _clean_vm_fw_rules {
 sub _set_vm_fw_rules {
     my ($hkd, $vm, $tap_if) = @_;
     my $vm_id = $vm->id;
-    for my $rule ($hkd->_fw_vm_rules($vm, $tap_if)) {
-	system (iptables => -A => @$rule, -m => 'comment', '--comment' => "QVD rule for VM $vm_id")
-	    and ERROR "Can't configure firewall: $!";
+    for my $rule ($hkd->_vm_fw_rules($vm, $tap_if)) {
+	my @cmd = (iptables => -A => @$rule, -m => 'comment', '--comment' => "QVD rule for VM $vm_id");
+	DEBUG "iptables cmd: @cmd";
+	# system @cmd
+	#    and ERROR "Can't configure firewall: $!";
     }
 }
 
