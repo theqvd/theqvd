@@ -9,8 +9,9 @@ use QVD::Log;
 use parent 'QVD::L7R::LoadBalancer::Plugin';
 
 sub get_free_host {
-    my @hosts = map $_->host_id, rs(Host_Runtime)->search({state   => 'running',
-							   blocked => 'false'});
+    my @hosts = map $_->id, rs(Host)->search_related('runtime', { backend 	  => 'true',
+								'runtime.blocked' => 'false',
+								'runtime.state'   => 'running' });
     @hosts > 0 ? $hosts[rand @hosts] : undef;
 }
 
