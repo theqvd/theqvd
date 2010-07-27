@@ -54,6 +54,7 @@ l7r.address = *
 l7r.as_user = qvd
 l7r.pid_file = ${path.run}/l7r.pid
 l7r.auth.plugins = default
+l7r.loadbalancer.plugin = default
 
 noded.as_user = qvd
 noded.pid_file = ${path.run}/hkd.pid
