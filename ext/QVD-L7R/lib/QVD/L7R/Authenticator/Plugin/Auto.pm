@@ -32,6 +32,7 @@ sub before_list_of_vms {
 	for my $ix (1..5) {
 	    my $name = "$login-$ix";
 	    my $ok;
+	    #FIXME IP address unassigned. Provision with QVD::Admin.
 	    txn_do {
 		if (rs(VM)->search({name => $name})->count == 0) {
 		    my $vm = rs(VM)->create({ name    => $name,
