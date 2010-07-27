@@ -602,9 +602,11 @@ sub _start_vm {
     $vm->set_vm_pid($pid);
 
     # TODO: Do "ifconfig" and "brctl addif" in Perl
-    system (ifconfig => $tap_if, 'up') and die "ifconfig $tap_if for VM $id failed\n";
+    system (ifconfig => $tap_if, 'up')
+	and die "ifconfig $tap_if for VM $id failed\n";
     $hkd->_set_vm_fw_rules($vm, $tap_if);
-    system (brctl => 'addif', $network_bridge, $tap_if) and die "brctl addif $network_bridge $tap_if for VM $id failed\n";
+    system (brctl => 'addif', $network_bridge, $tap_if)
+	and die "brctl addif $network_bridge $tap_if for VM $id failed\n";
 }
 
 
@@ -684,6 +686,7 @@ sub _start_dhcpd {
     my ($f, $l) = split /,/, $dhcp_range;
     $hkd->_call_noded(start_dhcpd => 'dnsmasq',
 		                     '-k',
+		                     '--log-dhcp',
 		                     '--dhcp-range'     => "$f,static",
 		                     '--dhcp-option'    => "option:router,$dhcp_default_route",
 		                     '--dhcp-hostsfile' => $dhcp_hostsfile);
@@ -746,9 +749,9 @@ sub _clean_vm_fw_rules {
 	my @rules = `iptables -S $_`;
 	for (@rules) {
 	    chomp;
-	    system "iptables -D $1"
-		if /^\s*-A\s+(.*--comment\s+"QVD rule for VM $vm_id".*)$/
-	    }
+	    /^\s*-A\s+(.*--comment\s+"QVD rule for VM $vm_id".*)$/
+		and system "iptables -D $1";
+	}
     }
 }
 
