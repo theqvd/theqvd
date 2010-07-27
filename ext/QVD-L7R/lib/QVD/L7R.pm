@@ -19,6 +19,7 @@ use QVD::HTTP::StatusCodes qw(:status_codes);
 use QVD::URI qw(uri_query_split);
 use QVD::SimpleRPC::Client;
 use QVD::L7R::Authenticator;
+use QVD::L7R::LoadBalancer;
 
 use parent qw(QVD::HTTPD);
 
@@ -390,9 +391,8 @@ sub _check_abort {
 
 sub _get_free_host {
     my ($self, $vm) = @_;
-    # FIXME: implement some plugin-based load balancer and share it with the Admin package
-    my @hosts = map $_->id, rs(Host)->all;
-    $hosts[rand @hosts];
+    my $load_balancer = QVD::L7R::LoadBalancer->new;
+    $load_balancer->get_free_host();
 }
 
 1;
