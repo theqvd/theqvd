@@ -761,8 +761,8 @@ sub _set_vm_fw_rules {
     for my $rule ($hkd->_vm_fw_rules($vm, $tap_if)) {
 	my @cmd = (iptables => -A => @$rule, -m => 'comment', '--comment' => "QVD rule for VM $vm_id");
 	DEBUG "iptables cmd: @cmd";
-	# system @cmd
-	#    and ERROR "Can't configure firewall: $!";
+	system @cmd
+	    and ERROR "Can't configure firewall: $!";
     }
 }
 
