@@ -266,7 +266,7 @@ sub _check_hkd_cluster {
                     for my $vm (rs(VM_Runtime)->search({ host_id => $chrt->host_id })) {
                         $vm->set_vm_state('stopped');
                         $vm->block;
-                        $vm->unassing;
+                        $vm->unassign;
                     }
                     $chrt->block;
                 };
