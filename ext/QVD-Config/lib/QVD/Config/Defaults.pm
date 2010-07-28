@@ -55,6 +55,9 @@ l7r.as_user = qvd
 l7r.pid_file = ${path.run}/l7r.pid
 l7r.auth.plugins = default
 l7r.loadbalancer.plugin = default
+l7r.loadbalancer.plugin.default.weight.ram = 1
+l7r.loadbalancer.plugin.default.weight.cpu = 1
+l7r.loadbalancer.plugin.default.weight.random = 1
 
 noded.as_user = qvd
 noded.pid_file = ${path.run}/hkd.pid

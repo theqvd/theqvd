@@ -60,6 +60,8 @@ my $persistent_overlay     = cfg('vm.overlay.persistent');
 my $cluster_check_interval = cfg('internal.hkd.cluster.check.interval');
 my $cluster_node_timeout   = cfg('internal.hkd.cluster.node.timeout');
 
+my $bogomips_per_vm	   = 500; #FIXME Move to config
+
 my $database_delay         = core_cfg('internal.hkd.database.retry_delay');
 
 
@@ -115,6 +117,11 @@ sub run {
 		    return;
 		}
 		DEBUG($@ || "Can't exit yet: there are VMs running");
+	    }
+	    {
+		local $@;
+		eval { $hkd->_update_load_balancing_data };
+		DEBUG "Updating load balancing data: $@" if $@;
 	    }
 	    eval {
 		$hkd->_check_vms;
@@ -708,6 +715,34 @@ sub _regenerate_dhcpd_config {
 	    or die "rename failed: $!";
     };
     $@ and die "unable to regenerate DHCP configuration: $@";
+}
+
+sub _min {
+    my ($a, $b) = @_;
+    $a < $b ? $a : $b;
+}
+
+my $bogomips = 0;
+sub _update_load_balancing_data {
+    my $hkd = shift;
+
+    if ($bogomips == 0) {
+	open my $fh, '<', '/proc/cpuinfo';
+	(/^bogomips\s*: (\d*\.\d*)/ and $bogomips += $1) foreach <$fh>;
+	close $fh;
+    }
+
+    require File::Slurp;
+    my $meminfo_lines = File::Slurp::read_file('/proc/meminfo', array_ref => 1);
+    my %meminfo = map { /^([^:]+):\s*(\d+)/; $1 => $2 } @$meminfo_lines;
+    my $usable_ram = _min($meminfo{MemFree}, $meminfo{MemTotal}-2*1024*1024);
+
+    my $num_vms = $hkd->{host_runtime}->host->vms->count();
+
+    $hkd->{host_runtime}->update({
+	    usable_cpu => $bogomips - $bogomips_per_vm*$num_vms,
+	    usable_ram => $usable_ram/1000,
+	});
 }
 
 sub _check_l7rs {
