@@ -15,6 +15,7 @@ use Proc::ProcessTable;
 use Sys::Hostname;
 use POSIX qw(:sys_wait_h);
 use List::Util qw(max min);
+use File::Slurp qw(slurp);
 use POSIX;
 use JSON;
 
@@ -727,7 +728,7 @@ sub _update_load_balancing_data {
 	close $fh;
     }
 
-    my $meminfo_lines = File::Slurp::read_file('/proc/meminfo', array_ref => 1);
+    my $meminfo_lines = slurp('/proc/meminfo', array_ref => 1);
     my %meminfo = map { /^([^:]+):\s*(\d+)/; $1 => $2 } @$meminfo_lines;
     my $usable_ram = min($meminfo{MemFree}, $meminfo{MemTotal}-2*1024*1024);
 
