@@ -726,6 +726,8 @@ sub _update_load_balancing_data {
 	open my $fh, '<', '/proc/cpuinfo';
 	(/^bogomips\s*: (\d*\.\d*)/ and $bogomips += $1) foreach <$fh>;
 	close $fh;
+
+	$bogomips *= 0.80; # 20% se reserva para el hipervisor
     }
 
     my $meminfo_lines = slurp('/proc/meminfo', array_ref => 1);
