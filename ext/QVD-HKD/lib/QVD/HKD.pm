@@ -14,7 +14,7 @@ use QVD::SimpleRPC::Client::Parallel;
 use Proc::ProcessTable;
 use Sys::Hostname;
 use POSIX qw(:sys_wait_h);
-use List::Util qw(max);
+use List::Util qw(max min);
 use POSIX;
 use JSON;
 
@@ -717,11 +717,6 @@ sub _regenerate_dhcpd_config {
     $@ and die "unable to regenerate DHCP configuration: $@";
 }
 
-sub _min {
-    my ($a, $b) = @_;
-    $a < $b ? $a : $b;
-}
-
 my $bogomips = 0;
 sub _update_load_balancing_data {
     my $hkd = shift;
@@ -732,10 +727,9 @@ sub _update_load_balancing_data {
 	close $fh;
     }
 
-    require File::Slurp;
     my $meminfo_lines = File::Slurp::read_file('/proc/meminfo', array_ref => 1);
     my %meminfo = map { /^([^:]+):\s*(\d+)/; $1 => $2 } @$meminfo_lines;
-    my $usable_ram = _min($meminfo{MemFree}, $meminfo{MemTotal}-2*1024*1024);
+    my $usable_ram = min($meminfo{MemFree}, $meminfo{MemTotal}-2*1024*1024);
 
     my $num_vms = $hkd->{host_runtime}->host->vms->count();
 
