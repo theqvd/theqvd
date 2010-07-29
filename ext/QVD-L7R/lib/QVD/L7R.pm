@@ -247,7 +247,8 @@ sub _assign_vm {
     my ($l7r, $vm) = @_;
     unless (defined $vm->host_id) {
 	$l7r->_tell_client("Assigning VM to host");
-	my $host_id = $l7r->_get_free_host($vm) //
+	my $lb = QVD::L7R::LoadBalancer->new;
+	my $host_id = $lb->get_free_host($vm->rel_vm_id) //
 	    die "Unable to start VM, can't assign to any host\n";
 
 	txn_eval {
@@ -387,12 +388,6 @@ sub _check_abort {
     my $cmd = $vm->user_cmd;
     die "Aborted by contending session"
 	if (defined $cmd and $cmd eq 'abort');
-}
-
-sub _get_free_host {
-    my ($self, $vm) = @_;
-    my $load_balancer = QVD::L7R::LoadBalancer->new;
-    $load_balancer->get_free_host();
 }
 
 1;
