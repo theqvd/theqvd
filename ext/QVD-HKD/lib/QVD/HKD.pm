@@ -494,7 +494,7 @@ sub _assign_vm_ports {
     push @ports, vm_vnc_port    => $hkd->_allocate_tcp_port if $vnc_redirect;
     push @ports, vm_serial_port => $hkd->_allocate_tcp_port if $serial_redirect;
     push @ports, vm_mon_port    => $hkd->_allocate_tcp_port if $mon_redirect;
-    $vm->update({vm_address => $vm->rel_vm_id->ip, @ports });
+    $vm->update({vm_address => $vm->vm->ip, @ports });
 }
 
 # this method must always be called from inside a txn_eval block!!!
@@ -544,7 +544,7 @@ sub _start_vm {
     my $vnc_port = $vm->vm_vnc_port;
     my $serial_port = $vm->vm_serial_port;
     my $mon_port = $vm->vm_mon_port;
-    my $osi = $vm->rel_vm_id->osi;
+    my $osi = $vm->vm->osi;
     my $address = $vm->vm_address;
     my $name = rs(VM)->find($vm->vm_id)->name;
 
@@ -628,7 +628,7 @@ sub _ip_to_mac {
 sub _vm_image_path {
     my ($hkd, $vm) = @_;
     my $id = $vm->id;
-    my $osi = $vm->rel_vm_id->osi;
+    my $osi = $vm->vm->osi;
     my $osiid = $osi->id;
     my $image = "$images_path/".$osi->disk_image;
 
@@ -668,7 +668,7 @@ sub _vm_image_path {
 sub _vm_user_storage_path {
     my ($hkd, $vm) = @_;
     my $id = $vm->id;
-    my $osi = $vm->rel_vm_id->osi;
+    my $osi = $vm->vm->osi;
     my $size = $osi->user_storage_size // return undef;
 
     my $image = "$homes_path/$id-data.qcow2";
@@ -798,7 +798,7 @@ sub _set_vm_fw_rules {
 
 sub _vm_fw_rules {
     my ($hkd, $vm, $tap_if) = @_;
-    my $vm_ip = $vm->rel_vm_id->ip;
+    my $vm_ip = $vm->vm->ip;
     my $x_port = $vm->vm_x_port;
     my $ssh_port = $vm->vm_ssh_port;
     my $vma_port = $vm->vm_vma_port;

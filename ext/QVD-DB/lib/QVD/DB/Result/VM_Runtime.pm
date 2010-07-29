@@ -73,7 +73,7 @@ __PACKAGE__->add_columns( vm_id          => { data_type   => 'integer' },
 __PACKAGE__->set_primary_key('vm_id');
 
 __PACKAGE__->belongs_to(host => 'QVD::DB::Result::Host', 'host_id', { join_type => 'LEFT' });
-__PACKAGE__->belongs_to('rel_vm_id' => 'QVD::DB::Result::VM', 'vm_id', { cascade_delete => 1 });
+__PACKAGE__->belongs_to(vm   => 'QVD::DB::Result::VM', 	 'vm_id',   { cascade_delete => 1 });
 
 __PACKAGE__->belongs_to('rel_vm_state' => 'QVD::DB::Result::VM_State', 'vm_state');
 __PACKAGE__->belongs_to('rel_user_state' => 'QVD::DB::Result::User_State', 'user_state');
@@ -176,6 +176,6 @@ sub vma_url {
     sprintf("http://%s:%d/vma", $vm->vm_address, $vm->vm_vma_port);
 }
 
-sub combined_properties { shift->rel_vm_id->combined_properties }
+sub combined_properties { shift->vm->combined_properties }
 
 1;
