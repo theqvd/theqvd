@@ -112,7 +112,7 @@ sub run {
 		}
 	    }
 	    if ($hkd->{stopping}) {
-                if (eval { rs(VM_Runtime)->search({host_id => this_host_id})->count == 0 }) {
+                if (eval { $hrt->vms->count == 0 }) {
 		    $hrt->set_state('stopped');
 		    INFO "HKD stopped";
 		    return;
@@ -193,7 +193,7 @@ sub _reattach_vms {
     # VMs we get in vm_pids that are still being managed by Noded
     my ($hkd, $vm_pids) = @_;
     my $host_id = $hkd->{id};
-    for my $vm (rs(VM_Runtime)->search({host_id => $host_id})) {
+    for my $vm ($hkd->{host_runtime}->vms) {
 	my $vm_id = $vm->id;
 	my $pid_db = $vm->vm_pid;
 	my $pid_noded = $vm_pids->{$vm_id};
@@ -282,7 +282,7 @@ sub _check_vms {
     my (@active_vms, @vmas);
     my $par = QVD::ParallelNet->new;
 
-    for my $vm (rs(VM_Runtime)->search({host_id => this_host_id})) {
+    for my $vm ($hkd->{host_runtime}->vms) {
 	my $id = $vm->id;
 	my $start;
 	if ($hkd->{stopping}) {
@@ -732,7 +732,7 @@ sub _update_load_balancing_data {
     my %meminfo = map { /^([^:]+):\s*(\d+)/; $1 => $2 } @$meminfo_lines;
     my $usable_ram = min($meminfo{MemFree}, $meminfo{MemTotal}-2*1024*1024);
 
-    my $num_vms = $hkd->{host_runtime}->host->vms->count();
+    my $num_vms = $hkd->{host_runtime}->vms->count;
 
     $hkd->{host_runtime}->update({
 	    usable_cpu => $bogomips - $bogomips_per_vm*$num_vms,

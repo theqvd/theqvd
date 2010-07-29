@@ -28,6 +28,8 @@ __PACKAGE__->belongs_to('host'      => 'QVD::DB::Result::Host',       'host_id')
 __PACKAGE__->belongs_to('rel_state' => 'QVD::DB::Result::Host_State', 'state'  );
 __PACKAGE__->belongs_to('rel_cmd'   => 'QVD::DB::Result::Host_Cmd',   'cmd'    );
 
+__PACKAGE__->has_many('vms'	    => 'QVD::DB::Result::VM_Runtime', 'host_id');
+
 sub update_ok_ts {
     my ($rt, $time) = @_;
     $time //= time;
