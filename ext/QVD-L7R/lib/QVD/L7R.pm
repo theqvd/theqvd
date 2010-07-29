@@ -100,7 +100,7 @@ sub list_of_vm_processor {
     my $user_id = _auth2user_id($auth);
     my @vm_list = ( map { { id      => $_->vm_id,
 			    state   => $_->vm_state,
-			    name    => $_->rel_vm_id->name,
+			    name    => $_->vm->name,
 			    blocked => $_->blocked } }
 		    map { $_->vm_runtime }
 		    rs(VM)->search({user_id => $user_id}) );
@@ -128,7 +128,7 @@ sub connect_to_vm_processor {
 	// $l7r->throw_http_error(HTTP_NOT_FOUND,
 			      "The requested virtual machine does not exists");
 
-    $vm->rel_vm_id->user_id != _auth2user_id($auth)
+    $vm->vm->user_id != _auth2user_id($auth)
 	and $l7r->throw_http_error(HTTP_FORBIDDEN,
 				   "You are not allowed to access requested virtual machine");
 
@@ -248,7 +248,7 @@ sub _assign_vm {
     unless (defined $vm->host_id) {
 	$l7r->_tell_client("Assigning VM to host");
 	my $lb = QVD::L7R::LoadBalancer->new;
-	my $host_id = $lb->get_free_host($vm->rel_vm_id) //
+	my $host_id = $lb->get_free_host($vm->vm) //
 	    die "Unable to start VM, can't assign to any host\n";
 
 	txn_eval {
