@@ -61,7 +61,7 @@ my $persistent_overlay     = cfg('vm.overlay.persistent');
 my $cluster_check_interval = cfg('internal.hkd.cluster.check.interval');
 my $cluster_node_timeout   = cfg('internal.hkd.cluster.node.timeout');
 
-my $bogomips_per_vm	   = 500; #FIXME Move to config
+my $bogomips_per_vm	   = cfg('internal.vm.reserved_cpu');
 
 my $database_delay         = core_cfg('internal.hkd.database.retry_delay');
 

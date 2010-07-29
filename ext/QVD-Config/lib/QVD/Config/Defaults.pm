@@ -141,6 +141,7 @@ internal.hkd.cluster.node.timeout = 80
 internal.vm.port.x = 5000
 internal.vm.port.vma = 3030
 internal.vm.monitor.redirect = 0
+internal.vm.reserved_cpu = 400
 
 internal.nxagent.display = 100
 
