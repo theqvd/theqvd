@@ -6,6 +6,7 @@ use warnings;
 use QVD::Config;
 use QVD::Log;
 use QVD::DB::Simple;
+use QVD::Admin;
 
 use parent qw(QVD::L7R::Authenticator::Plugin);
 
@@ -29,22 +30,16 @@ sub before_list_of_vms {
 
     if (rs(VM)->search({user_id => $user_id})->count == 0) {
 	INFO "Auto provisioning VM for user $login ($user_id)";
+	my $admin = new QVD::Admin;
 	for my $ix (1..5) {
 	    my $name = "$login-$ix";
 	    my $ok;
-	    #FIXME IP address unassigned. Provision with QVD::Admin.
-	    txn_do {
-		if (rs(VM)->search({name => $name})->count == 0) {
-		    my $vm = rs(VM)->create({ name    => $name,
-					      user_id => $user_id,
-					      osi_id  => $osi_id });
-		    rs(VM_Runtime)->create({ vm_id => $vm->id,
-					     osi_actual_id => $osi_id,
-					     vm_state => 'stopped',
-					     user_state => 'disconnected' });
-		    $ok = 1;
-		}
-	    };
+	    if (rs(VM)->search({name => $name})->count == 0) {
+		$admin->cmd_vm_add(name    => $name,
+				   user_id => $user_id,
+				   osi_id  => $osi_id);
+		$ok = 1;
+	    }
 	    return if $ok;
 	}
 	die "Too many VM name collisions on auto provisioning for user $login";
