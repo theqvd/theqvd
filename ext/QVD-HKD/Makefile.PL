@@ -4,7 +4,7 @@ use ExtUtils::MakeMaker;
 
 WriteMakefile( NAME          => 'QVD::HKD',
 	       AUTHOR        => 'QVD Team <qvd@qindel.com>',
-	       VERSION       => '0.01.'.$ENV{SVN_REVISION},
+	       VERSION	     => '0.1'.$ENV{BUILD_NUMBER},
 	       ABSTRACT_FROM => 'lib/QVD/HKD.pm',
 	       PL_FILES      => {},
 	       EXE_FILES     => [ qw(bin/qvd-hkd.pl) ],

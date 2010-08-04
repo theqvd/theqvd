@@ -5,7 +5,7 @@ use ExtUtils::MakeMaker;
 WriteMakefile(
     NAME                => 'QVD::Config',
     AUTHOR              => q{Hugo Cornejo <hcornejo@qindel.com>},
-    VERSION             => '0.01.'.$ENV{SVN_REVISION},
+    VERSION             => '0.1'.$ENV{BUILD_NUMBER},
     ABSTRACT_FROM       => 'lib/QVD/Config.pm',
     ($ExtUtils::MakeMaker::VERSION >= 6.3002
       ? ('LICENSE'=> 'perl')

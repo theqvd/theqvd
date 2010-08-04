@@ -6,7 +6,7 @@ use ExtUtils::MakeMaker;
 
 WriteMakefile( NAME          => 'QVD::L7R::Authenticator::Plugin::LDAP',
 	       AUTHOR        => 'QVD Team <qvd@qindel.com>',
-	       VERSION_FROM  => 'lib/QVD/L7R/Authenticator/Plugin/LDAP.pm',
+	       VERSION	     => '0.1'.$ENV{BUILD_NUMBER},
 	       ABSTRACT_FROM => 'lib/QVD/L7R/Authenticator/Plugin/LDAP.pm',
 	       LICENSE       => 'GPL3',
 	       PREREQ_PM     => { 'Test::More'       => 0,

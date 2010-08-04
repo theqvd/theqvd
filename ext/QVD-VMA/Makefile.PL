@@ -2,10 +2,8 @@ use strict;
 use warnings;
 use ExtUtils::MakeMaker;
 
-my $rev = $ENV{SVN_REVISION} ? ".$ENV{SVN_REVISION}" : "";
-
 WriteMakefile( NAME => 'QVD::VMA',
-	       VERSION => "0.01$rev",
+	       VERSION => "0.1".$ENV{BUILD_NUMBER},
 	       ABSTRACT_FROM => 'lib/QVD/VMA.pm',
 	       EXE_FILES => [ 'bin/nxdiag.pl',
 			      'bin/qvd-printing',
