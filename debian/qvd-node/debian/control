@@ -1,0 +1,14 @@
+Source: qvd-node
+Section: perl
+Priority: optional
+Maintainer: qvd-team <qvd@qindel.com>
+Build-Depends: debhelper (>= 7)
+Standards-Version: 3.8.4
+Homepage: http://qvdblog.qindel.com
+
+Package: qvd-node
+Architecture: all
+Depends: ${shlibs:Depends}, ${misc:Depends}, libqvd-node-perl, qvd-sample-config
+Description: QVD server cluster
+ QVD servers handle virtual desktop connections from QVD clients and manage virtual
+ machines.

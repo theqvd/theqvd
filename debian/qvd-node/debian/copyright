@@ -1,0 +1,22 @@
+This package was debianized by qvd-team <qvd@qindel.com> on
+Tue, 3 Aug 2010 13:49:33 +0200.
+
+Copyright:
+
+    Copyright (C) 2009-2010 Qindel Formacion y Servicios S.L.
+
+License:
+
+    Copyright (C) 1998-2007  Free Software Foundation, Inc.
+
+    This program is free software: you can redistribute it and/or modify
+    it under the terms of the GNU General Public License as published by
+    the Free Software Foundation, version 3.
+
+    This program is distributed in the hope that it will be useful,
+    but WITHOUT ANY WARRANTY; without even the implied warranty of
+    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+    GNU General Public License for more details.
+
+On Debian GNU/Linux systems, the complete text of the GNU General Public
+License v3 can be found in `/usr/share/common-licenses/GPL-3'.
