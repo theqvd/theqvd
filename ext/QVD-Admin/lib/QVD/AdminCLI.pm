@@ -747,13 +747,22 @@ EOT
 
 sub cmd_config_get {
     my $self = shift;
+    my $configs;
     eval {
-	my $configs = $self->{admin}->cmd_config_get(@_);
-	print map { $_->key.'='.$_->value."\n" } @$configs;
+        $configs = $self->{admin}->cmd_config_get(@_);
     };
     if ($@) {
-	$self->_print("Wrong syntax, check the command help:\n");
-	$self->help_config_get;	
+        $self->_print("Wrong syntax, check the command help:\n");
+        $self->help_config_get;	
+    }
+    my @to_show = @_ ? @_ : sort keys %{{ $QVD::Config::defaults->properties }};
+    foreach my $k (@to_show) {
+        if (my $c = (grep { $_->key eq $k } @$configs)[0]) {
+            printf "%s=%s\n", $c->key, $c->value;
+        } else {
+            my $val;
+            eval { $val = cfg ($k); 1; } and printf "%s=%s\n", $k, $val;
+        }
     }
 }
 
