@@ -7,7 +7,8 @@ WriteMakefile(
     VERSION	      => '0.1'.$ENV{BUILD_NUMBER},
     ($] >= 5.005 ?     ## Add these new keywords supported since 5.005
       (ABSTRACT_FROM  => 'lib/QVD/Node.pm', # retrieve abstract from module
-       AUTHOR         => 'root <root@>') : ()),
+       AUTHOR         => 'QVD Team <qvd@qindel.com>') : ()),
+    EXE_FILES     => [ qw(bin/qvd-noded.pl) ],
     PREREQ_PM         => { 'App::Daemon' 		=> 0,
 			   'JSON'     			=> 0,
 			   'Linux::Proc::Net::TCP' 	=> 0.02,
