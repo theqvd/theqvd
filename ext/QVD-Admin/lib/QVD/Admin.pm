@@ -233,6 +233,56 @@ sub _obj_del {
     $rs->delete_all;
 }
 
+sub cmd_host_block {
+    my ($self, @args) = @_;
+    my $counter = 0;
+    my $rs = $self->get_resultset('host');
+    while (defined(my $host = $rs->next)) {
+	txn_eval {
+	    $host->discard_changes;
+	    $host->runtime->block;
+	    $counter++;
+	};
+	# FIXME: report errors
+    }
+    $counter
+}
+
+#sub cmd_host_block_by_id {
+#    my ($self, $id) = @_;
+#    $id // die "Missing parameter id";
+#    txn_do {
+#	my $hostrt = rs(Host_Runtime)->find($id) //
+#	    die "Host $id doesn't exist";
+#	$hostrt->block;
+#    };
+#}
+
+sub cmd_host_unblock {
+    my ($self, @args) = @_;
+    my $counter = 0;
+    my $rs = $self->get_resultset('host');
+    while (defined(my $host = $rs->next)) {
+	txn_eval {
+	    $host->discard_changes;
+	    $host->runtime->unblock;
+	    $counter++;
+	};
+    # FIXME: report errors
+    }
+    $counter
+}
+
+#sub cmd_host_unblock_by_id {
+#    my ($self, $id) = @_;
+#    $id // die "Missing parameter id";
+#    txn_do {
+#	my $hostrt = rs(Host_Runtime)->find($id) //
+#	    die "Host $id doesn't exist";
+#	$hostrt->unblock;
+#    };
+#}
+
 sub cmd_host_del {
     shift->_obj_del('host', @_);
 }
@@ -369,7 +419,7 @@ sub _get_free_host {
     my ($self, $vm) = @_;
     # FIXME: implement some plugin-based load balancer algorithm and
     # share it with the L7R package
-    my @hosts = map $_->id, rs(Host)->all;
+    my @hosts = map $_->id, grep !$_->runtime->blocked, rs(Host)->all;
     $hosts[rand @hosts];
 }
 
@@ -377,8 +427,13 @@ sub _start_vm {
     my ($self, $vmrt) = @_;
     $vmrt->vm_state eq 'stopped'
 	or die "Unable to start machine, already running";
-    defined $vmrt->host_id or
-	$vmrt->set_host_id($self->_get_free_host);
+    if (!defined $vmrt->host_id) {
+        my $free_host = ($self->_get_free_host)[0];
+        if (!defined $free_host) {
+            die "Unable to start machine, no hosts available";
+        }
+        $vmrt->set_host_id($free_host);
+    }
     $vmrt->send_vm_start;
 }
 

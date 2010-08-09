@@ -74,7 +74,7 @@ sub cmd_host_list {
     my ($self, @args) = @_;
 
     my $rs = $self->get_resultset('host');
-    my @header = ("Id", "Name", "Address ","HKD", "VMs assigned", "State");
+    my @header = ("Id", "Name", "Address ","HKD", "VMs assigned", "Blocked", "State");
     my @body;
 
     eval {
@@ -82,7 +82,7 @@ sub cmd_host_list {
 	    my $hkd_ts = defined $host->runtime ? $host->runtime->update_ok_ts : undef;
 	    my $mins = defined $hkd_ts ? _format_timespan(time - $hkd_ts) : '-';
 	    my @row = ($host->id, $host->name, $host->address, $mins,
-				$host->vms->count, $host->runtime->state);
+				$host->vms->count, $host->runtime->blocked, $host->runtime->state);
 	    push(@body, \@row);
 	}
     };
@@ -184,6 +184,63 @@ EOT
 sub _print {
     my ($self, @msg) =(@_);
     print @msg, "\n" unless $self->{quiet};
+}
+
+sub cmd_host_block {
+    my $self = shift;
+    
+    if (scalar %{$self->{admin}{filter}} eq 0) {
+	print "Are you sure you want to block all hosts? [y/N] ";
+	my $answer = <STDIN>;
+	exit 0 unless $answer =~ /^y/i;
+    }   
+    
+    eval {
+    	$self->{admin}->cmd_host_block();
+    };
+    if ($@) {
+	$self->_print("Wrong syntax, check the command help:\n");
+	$self->help_host_block;
+    }      
+}
+
+sub help_host_block {
+    print <<EOT
+host block: Excludes the matched hosts from the production environment.
+usage: host block
+       
+Valid options:
+    -f [--filter] FILTER : block only host matched by FILTER
+    -q [--quiet]         : don't print the command message
+EOT
+}
+
+sub cmd_host_unblock {
+    my $self = shift;
+    if (scalar %{$self->{admin}{filter}} eq 0) {
+	print "Are you sure you want to unblock all hosts? [y/N] ";
+	my $answer = <STDIN>;
+	exit 0 unless $answer =~ /^y/i;
+    }   
+    
+    eval {
+	$self->{admin}->cmd_host_unblock();
+    };
+    if ($@) {
+	$self->_print("Wrong syntax, check the command help:\n");
+	$self->help_host_unblock;
+    }    
+}
+
+sub help_host_unblock {
+    print <<EOT
+host unblock: Includes the matched hosts from the production environment.
+usage: host unblock
+       
+Valid options:
+    -f [--filter] FILTER : unblock only host matched by FILTER
+    -q [--quiet]         : don't print the command message
+EOT
 }
 
 sub cmd_host_add {
