@@ -43,7 +43,7 @@ sub install_wat : Test(3) {
     ok(!system('apt-get -y --force-yes install qvd-wat'), 'Installing qvd-wat') 
 	or return "qvd-wat not installed";
 
-    ok(-x '/etc/init.d/qvd-node', 'qvd-noded init script is installed');
+    ok(-x '/etc/init.d/qvd-wat', 'qvd-wat init script is installed');
 
     ok(!system('apt-get -y purge qvd-wat'), 'Purging qvd-wat');
 
