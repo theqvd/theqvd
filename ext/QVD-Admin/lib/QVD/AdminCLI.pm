@@ -814,7 +814,7 @@ sub _config_pairs {
         $self->_print("Wrong syntax, check the command help:\n");
         $self->help_config_get;	
     }
-    my @to_ret = @_ ? @_ : sort keys %{{ $QVD::Config::defaults->properties }};
+    my @to_ret = @_ ? @_ : keys %{{ $QVD::Config::defaults->properties }};
     foreach my $k (@to_ret) {
         if (my $c = (grep { $_->key eq $k } @$configs)[0]) {
             $pairs{ $c->key } = $c->value;
@@ -849,8 +849,10 @@ sub cmd_vm_net {
 
     eval {
         if ('show' eq $subcmd) {
+            my @cfg_keys = map "vm.network.$_", qw/dhcp-range netmask gateway/;
             my @header = ("DHCP range", "Netmask", "Gateway");
-            my @body = [ map { cfg $_ } qw/vm.network.dhcp-range vm.network.netmask vm.network.gateway/ ];
+            my %pairs = $self->_config_pairs (@cfg_keys);
+            my @body = [ @pairs{@cfg_keys} ];
             _print_table \@header, \@body;
 
             print $/;
