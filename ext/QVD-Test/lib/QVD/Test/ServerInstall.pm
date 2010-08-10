@@ -1,4 +1,4 @@
-package QVD::Test::NodeInstall;
+package QVD::Test::ServerInstall;
 use parent qw(QVD::Test);
 
 use strict;
@@ -26,11 +26,29 @@ sub check_environment : Test(startup => 3) {
 
 }
 
-sub install_uninstall : Test(2) {
-    my $installed = !system('apt-get install qvd-node');
+sub install_node : Test(4) {
     ok(!system('apt-get install qvd-node'), 'Installing qvd-node') 
 	or return "qvd-node not installed";
+    
+    ok(-x '/usr/bin/qvd-noded.pl', 'qvd-noded.pl is installed');
+    ok(-x '/etc/init.d/qvd-node', 'qvd-noded init script is installed');
+
     ok(!system('apt-get purge qvd-node'), 'Purging qvd-node');
+
+    # remove automatically installed dependencies
+    system('apt-get autoremove');
+}
+
+sub install_wat : Test(3) {
+    ok(!system('apt-get install qvd-wat'), 'Installing qvd-wat') 
+	or return "qvd-wat not installed";
+
+    ok(-x '/etc/init.d/qvd-node', 'qvd-noded init script is installed');
+
+    ok(!system('apt-get purge qvd-wat'), 'Purging qvd-wat');
+
+    # remove automatically installed dependencies
+    system('apt-get autoremove');
 }
 
 1;

@@ -3,8 +3,6 @@
 use strict;
 use warnings;
 
-use lib 't/lib';
-
-use Test::Class::Load 't/lib';
+use Test::Class::Load 'lib';
 
 Test::Class->runtests;
