@@ -1,0 +1,14 @@
+Changes
+ignore.txt
+lib/QVD/Test.pm
+lib/QVD/Test/ServerInstall.pm
+Makefile.PL
+MANIFEST
+README
+t/00-load.t
+t/boilerplate.t
+t/manifest.t
+t/pod-coverage.t
+t/pod.t
+t/ServerInstall.t
+t/ServerInstall/U1004.t
