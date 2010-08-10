@@ -833,6 +833,45 @@ usage: config get [key...]
 EOT
 }
 
+sub cmd_vm_net {
+    my ($self, @args) = @_;
+    my $subcmd = shift @args;
+
+    eval {
+        if ('show' eq $subcmd) {
+            my @header = ("DHCP range", "Netmask", "Gateway");
+            my @body = [ map { cfg $_ } qw/vm.network.dhcp-range vm.network.netmask vm.network.gateway/ ];
+            _print_table \@header, \@body;
+
+            print $/;
+
+            @header = ("Id", "IP");
+            undef @body;
+
+            my $data = $self->{admin}->cmd_vm_net_config_show;
+            push @body, [ $_, $data->{$_} ] for sort keys %$data;
+            _print_table \@header, \@body;
+        }
+        if ('set' eq $subcmd) {
+            my %args = _split_on_equals (@args);
+        }
+    };
+    if ($@) {
+        $self->_print("Wrong syntax, check the command help:\n");
+        $self->help_vm_net;
+    }
+}
+
+sub help_vm_net {
+    print <<EOT
+vm net: network-related commands
+usage: vm net show
+      
+Valid options:
+    -f [--filter] FILTER : starts virtual machine matched by FILTER
+    -q [--quiet]         : don't print the command message
+EOT
+}
 
 sub cmd_vm_start {
     my ($self, @args) = @_;

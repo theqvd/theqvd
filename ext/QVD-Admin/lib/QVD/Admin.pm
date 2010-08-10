@@ -572,6 +572,18 @@ sub cmd_vm_unblock_by_id {
     };
 }
 
+sub cmd_vm_net_config_show {
+    my ($self, @args) = @_;
+    my $data;
+    my $rs = $self->get_resultset('vm');
+    while (defined(my $vm = $rs->next)) {
+        txn_eval {
+            $data->{$vm->id} = $vm->ip;
+        };
+        # FIXME: report errors
+    }
+    $data;
+}
 
 sub cmd_config_ssl {
     my ($self, %args) = @_;
