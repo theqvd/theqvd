@@ -802,8 +802,10 @@ usage: config set [key=value ...]
 EOT
 }
 
-sub cmd_config_get {
+sub _config_pairs {
     my $self = shift;
+    my %pairs;
+
     my $configs;
     eval {
         $configs = $self->{admin}->cmd_config_get(@_);
@@ -812,15 +814,23 @@ sub cmd_config_get {
         $self->_print("Wrong syntax, check the command help:\n");
         $self->help_config_get;	
     }
-    my @to_show = @_ ? @_ : sort keys %{{ $QVD::Config::defaults->properties }};
-    foreach my $k (@to_show) {
+    my @to_ret = @_ ? @_ : sort keys %{{ $QVD::Config::defaults->properties }};
+    foreach my $k (@to_ret) {
         if (my $c = (grep { $_->key eq $k } @$configs)[0]) {
-            printf "%s=%s\n", $c->key, $c->value;
+            $pairs{ $c->key } = $c->value;
         } else {
             my $val;
-            eval { $val = cfg ($k); 1; } and printf "%s=%s\n", $k, $val;
+            eval { $val = cfg ($k); 1; } and $pairs{$k} = $val;
         }
     }
+
+    return %pairs;
+}
+
+sub cmd_config_get {
+    my $self = shift;
+    my %pairs = $self->_config_pairs (@_);
+    printf "%s=%s\n", $_, $pairs{$_} for sort keys %pairs;
 }
 
 sub help_config_get {
