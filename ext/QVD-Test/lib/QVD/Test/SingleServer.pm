@@ -23,7 +23,7 @@ sub check_environment : Test(startup => 6) {
     ok($bridge,				'Bridge configuration');
     ok(!system("ip addr show $bridge"), "Existence of VM network bridge $bridge");
 
-    ok($nodename,			'Node name configuration')
+    ok($nodename,			'Node name configuration');
     is(rs(Host)->find({name => $nodename})->count, 1, 
 					"Presence of node $nodename in the database");
 
