@@ -8,8 +8,8 @@ use Test::More qw(no_plan);
 use QVD::Config;
 use QVD::DB::Simple;
 
-$bridge 	= cfg('vm.network.bridge');
-$nodename 	= cfg('nodename');
+my $bridge 	= cfg('vm.network.bridge');
+my $nodename 	= cfg('nodename');
 
 sub check_environment : Test(startup => 3) {
     ok(-f '/etc/qvd/node.conf',		'Existence of QVD configuration, node.conf');
