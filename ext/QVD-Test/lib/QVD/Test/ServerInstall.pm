@@ -22,7 +22,6 @@ sub check_environment : Test(startup => 3) {
 
     my @sources = grep m!^deb http://qvd.qindel.com/debian!, slurp('/etc/apt/sources.list');
     ok(scalar @sources, 		'Presence of QVD debian repository in sources.list');
-    ok(system('dpkg -l *qvd*'),		'QVD packages not already installed');
 }
 
 sub install_node : Test(6) {
