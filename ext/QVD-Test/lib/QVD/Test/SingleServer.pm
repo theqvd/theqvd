@@ -13,7 +13,7 @@ BEGIN {
 use QVD::Config;
 use QVD::DB::Simple;
 
-my $host;
+my $node;
 
 sub check_environment : Test(startup => 6) {
     ok(-f '/etc/qvd/node.conf',		'Existence of QVD configuration, node.conf');
@@ -24,11 +24,11 @@ sub check_environment : Test(startup => 6) {
     ok(!system("ip addr show $bridge"), "Existence of VM network bridge $bridge");
 
     my $nodename = cfg('nodename');
+    my $noders = rs(Host)->search({name => $nodename});
     ok($nodename,			'Node name definition in node.conf');
-    is(rs(Host)->search({name => $nodename})->count, 1, 
-					"Presence of node $nodename in the database");
+    is($noders->count, 1, 		"Presence of node $nodename in the database");
 
-    $host = rs(Host)->search({name => $nodename})->first;
+    $node = $noders->first;
 }
 
 sub zz_start_node : Test(startup) {
