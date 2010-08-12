@@ -79,7 +79,7 @@ sub cmd_host_list {
 
     eval {
 	while (my $host = $rs->next) {
-	    my $hkd_ts = defined $host->runtime ? $host->runtime->update_ok_ts : undef;
+	    my $hkd_ts = defined $host->runtime ? $host->runtime->ok_ts : undef;
 	    my $mins = defined $hkd_ts ? _format_timespan(time - $hkd_ts) : '-';
 	    my @row = ($host->id, $host->name, $host->address, $mins,
 				$host->vms->count, $host->runtime->blocked, $host->runtime->state);
