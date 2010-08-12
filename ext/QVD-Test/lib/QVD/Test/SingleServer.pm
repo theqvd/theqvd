@@ -39,7 +39,7 @@ sub zz_start_node : Test(startup) {
     while ($nodert->ok_ts == $orig_ts) {
 	sleep 1;
 	$nodert->discard_changes;
-	$start_timeout-- or fail("Node didn't start");
+	$start_timeout-- or fail("Node didn't start"), last;
     }
 }
 
@@ -48,5 +48,9 @@ sub aa_stop_node : Test(shutdown) {
 }
 
 sub block_node : Test() {
-    warn "Hello World!";
+    # TODO check connect
+    $node->runtime->block;
+    # TODO check connect
+    $node->runtime->unblock;
+    # TODO check connect
 }
