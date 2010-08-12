@@ -13,6 +13,7 @@ $nodename 	= cfg('nodename');
 
 sub check_environment : Test(startup => 3) {
     ok(-f '/etc/qvd/node.conf',		'Existence of QVD configuration, node.conf');
+    ok(-f '/usr/bin/qvd-noded.pl',	'QVD node installation');
     ok(!system("ip addr show $bridge"), "Existence of VM network bridge $bridge");
 
     is(rs(Host)->find({name => $nodename})->count, 1, 
@@ -21,11 +22,11 @@ sub check_environment : Test(startup => 3) {
 }
 
 sub zz_start_node : Test(startup) {
-    system('/etc/init.d/qvd-node start');
+    system('/usr/bin/qvd-noded.pl start');
 }
 
 sub aa_stop_node : Test(shutdown) {
-    system('/etc/init.d/qvd-node stop');
+    system('/usr/bin/qvd-noded.pl stop');
 }
 
 sub block_node : Test() {
