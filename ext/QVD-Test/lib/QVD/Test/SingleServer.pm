@@ -23,7 +23,7 @@ my $noded_executable;
 
 sub check_environment : Test(startup => 6) {
     # FIXME better to use something derived from $0
-    $noded_executable = 'QVD-Node/bin/qvd-noded.sh';
+    $noded_executable = 'QVD-Test/bin/qvd-noded.sh';
 
     ok(-f '/etc/qvd/node.conf',		'Existence of QVD configuration, node.conf');
     ok(-x $noded_executable,		'QVD node installation');
