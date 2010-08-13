@@ -1,6 +1,8 @@
 package QVD::Test::SingleServer;
 use parent qw(QVD::Test);
 
+use lib::glob '*/lib';
+
 use strict;
 use warnings;
 
@@ -12,14 +14,19 @@ BEGIN {
 
 use QVD::Config;
 use QVD::DB::Simple;
+use QVD::HTTP::StatusCodes qw(:status_codes);
 use QVD::HTTPC;
 use MIME::Base64 qw(encode_base64);
 
 my $node;
+my $noded_executable;
 
 sub check_environment : Test(startup => 6) {
+    # FIXME better to use something derived from $0
+    $noded_executable = 'QVD-Node/bin/qvd-noded.sh';
+
     ok(-f '/etc/qvd/node.conf',		'Existence of QVD configuration, node.conf');
-    ok(-x '/usr/bin/qvd-noded.pl',	'QVD node installation');
+    ok(-x $noded_executable,		'QVD node installation');
 
     my $bridge = cfg('vm.network.bridge');
     ok($bridge,				'Bridge definition in node.conf');
@@ -37,7 +44,7 @@ sub zz_start_node : Test(startup) {
     my $nodert = $node->runtime;
     my $orig_ts = $nodert->ok_ts;
     my $start_timeout = 10;
-    system('/usr/bin/qvd-noded.pl start');
+    system($noded_executable, 'start');
     while ($nodert->ok_ts == $orig_ts) {
 	sleep 1;
 	$nodert->discard_changes;
@@ -46,16 +53,16 @@ sub zz_start_node : Test(startup) {
 }
 
 sub aa_stop_node : Test(shutdown) {
-    system('/usr/bin/qvd-noded.pl stop');
+    system($noded_executable, 'stop');
 }
 
-sub block_node : Test() {
+sub block_node : Test(3) {
     my $self = shift;
-    warn $self->_check_connect;
+    is($self->_check_connect,0+HTTP_OK,			'Connecting before block');
     $node->runtime->block;
-    warn $self->_check_connect;
+    is($self->_check_connect,0+HTTP_SERVICE_UNAVAILABLE,'Connecting after block');
     $node->runtime->unblock;
-    warn $self->_check_connect;
+    is($self->_check_connect,0+HTTP_OK,			'Connecting after unblock');
 }
 
 sub _check_connect {
@@ -63,5 +70,5 @@ sub _check_connect {
     my $auth = encode_base64('joni:joni', '');
     $httpc->send_http_request(GET => '/qvd/list_of_vm', headers => ["Authorization: Basic $auth",
 								    "Accept: application/json"]);
-    return $httpc->read_http_response();
+    return ($httpc->read_http_response())[0];
 }
