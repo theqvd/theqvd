@@ -12,6 +12,7 @@ BEGIN {
 
 use QVD::Config;
 use QVD::DB::Simple;
+use QVD::HTTPC;
 
 my $node;
 
