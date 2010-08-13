@@ -17,7 +17,7 @@ my $node;
 
 sub check_environment : Test(startup => 6) {
     ok(-f '/etc/qvd/node.conf',		'Existence of QVD configuration, node.conf');
-    ok(-f '/usr/bin/qvd-noded.pl',	'QVD node installation');
+    ok(-x '/usr/bin/qvd-noded.pl',	'QVD node installation');
 
     my $bridge = cfg('vm.network.bridge');
     ok($bridge,				'Bridge definition in node.conf');
@@ -48,9 +48,16 @@ sub aa_stop_node : Test(shutdown) {
 }
 
 sub block_node : Test() {
-    # TODO check connect
+    my $self = shift;
+    warn $self->_check_connect;
     $node->runtime->block;
-    # TODO check connect
+    warn $self->_check_connect;
     $node->runtime->unblock;
-    # TODO check connect
+    warn $self->_check_connect;
+}
+
+sub _check_connect {
+    my $httpc = new QVD::HTTPC('localhost:8443');
+    $httpc->send_http_request('GET /qvd/list_of_vm');
+    return $httpc->read_http_response();
 }
