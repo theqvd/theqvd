@@ -13,6 +13,7 @@ BEGIN {
 use QVD::Config;
 use QVD::DB::Simple;
 use QVD::HTTPC;
+use MIME::Base64 qw(encode_base64);
 
 my $node;
 
@@ -58,7 +59,9 @@ sub block_node : Test() {
 }
 
 sub _check_connect {
-    my $httpc = new QVD::HTTPC('localhost:8443');
-    $httpc->send_http_request('GET /qvd/list_of_vm');
+    my $httpc = new QVD::HTTPC('localhost:8443', SSL => 1);
+    my $auth = encode_base64('joni:joni', '');
+    $httpc->send_http_request(GET => '/qvd/list_of_vm', headers => ["Authorization: Basic $auth",
+								    "Accept: application/json"]);
     return $httpc->read_http_response();
 }
