@@ -1,0 +1,17 @@
+Patch from svn r480, fixes SMP breakage.
+
+ -- Rob Andrews <rob@choralone.org>  Sat, 26 Jan 2008 03:01:31 +0000
+
+Index: ubuntu.1.2.2-0ubuntu1/Makefile
+===================================================================
+--- ubuntu.1.2.2-0ubuntu1.orig/Makefile	2009-01-02 11:19:18.000000000 +0100
++++ ubuntu.1.2.2-0ubuntu1/Makefile	2009-03-07 18:38:33.000000000 +0100
+@@ -120,7 +120,7 @@
+ npviewer_CFLAGS += -I$(LSB_INC_DIR)/glib-2.0
+ npviewer_CFLAGS += -I$(LSB_INC_DIR)/gtk-2.0
+ npviewer_LDFLAGS = $(LDFLAGS_32) -L$(LSB_OBJ_DIR)
+-npviewer_LDFLAGS += -lgtk-x11-2.0 -lgdk-x11-2.0 -lgobject-2.0 -ldl -lglib-2.0 -lX11 -lXt
++npviewer_LDFLAGS += -lgtk-x11-2.0 -lgdk-x11-2.0 -lgobject-2.0 -ldl -lglib-2.0 -lgthread-2.0 -lX11 -lXt
+ else
+ npviewer_CFLAGS += $(GTK_CFLAGS)
+ npviewer_LDFLAGS = $(GTK_LDFLAGS) $(X_LDFLAGS)

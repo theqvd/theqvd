@@ -1,0 +1,65 @@
+.\"                                      Hey, EMACS: -*- nroff -*-
+.\" First parameter, NAME, should be all caps
+.\" Second parameter, SECTION, should be 1-8, maybe w/ subsection
+.\" other parameters are allowed: see man(7), man(1)
+.TH NSPLUGINPLAYER 1 "August 27, 2008"
+.\" Please adjust this date whenever revising the manpage.
+.\"
+.\" Some roff macros, for reference:
+.\" .nh        disable hyphenation
+.\" .hy        enable hyphenation
+.\" .ad l      left justify
+.\" .ad b      justify to both left and right margins
+.\" .nf        disable filling
+.\" .fi        enable filling
+.\" .br        insert line break
+.\" .sp <n>    insert n+1 empty lines
+.\" for manpage-specific macros, see man(7)
+.SH NAME
+nspluginplayer \- tool to play embedded web content
+.SH SYNOPSIS
+.B nspluginplayer
+.RI [ option ]\ [ \-\-plugin ]\ [ name[=value] ]
+.SH DESCRIPTION
+This manual page documents briefly the 
+.B nspluginplayer
+command.
+.PP
+\fBnspluginplayer\fP enables playing of embedded web content outside of the
+web browser.
+.SH USAGE
+Common attributes include, which are used in place of
+.RI [ name[=value] ]
+parameter:
+.TP
+.B embed
+use NP_EMBED mode
+.TP
+.B full
+use NP_FULL mode (default)
+.TP
+.B src\=URI
+location (URL) of the object to load
+.TP
+.B type\=MIME-TYPE
+MIME type of the object
+.TP
+.B width\=WIDTH
+width (in pixels)
+.TP
+.B height\=HEIGHT
+height (in pixels)
+.SH OPTIONS
+A summary of options is included below.
+.TP
+.B \-v \-\-verbose
+Enable verbose mode
+.TP
+.B \-f \-\-fullscreen
+Start in fullscreen
+
+.SH AUTHOR
+nspluginplayer was written by Gwenole Beauchesne <gb.public@free.fr>.
+.PP
+This manual page was written by Sasa Bodiroza <jazzva@gmail.com>,
+for the Ubuntu project (but may be used by others).

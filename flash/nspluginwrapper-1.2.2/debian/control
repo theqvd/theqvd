@@ -1,0 +1,19 @@
+Source: nspluginwrapper
+Section: utils
+Priority: optional
+Maintainer: Ubuntu MOTU Developers <ubuntu-motu@lists.ubuntu.com>
+XSBC-Original-Maintainer: Rob Andrews <rob@choralone.org>
+Build-Depends: debhelper (>= 5), quilt, autotools-dev, libc6-dev-i386 [ amd64 ], libxt-dev, x11proto-core-dev, x11proto-xext-dev, libx11-dev, libatk1.0-dev, libfontconfig1-dev, libgtk2.0-dev, libglib2.0-dev, libpango1.0-dev, ia32-libs [ amd64 ], gcc-multilib [ amd64 ], g++-multilib [ amd64 ], libcurl4-gnutls-dev
+Standards-Version: 3.8.0
+Xs-Vcs-Bzr: http://bazaar.launchpad.net/~ubuntu-dev/nspluginwrapper/ubuntu
+
+Package: nspluginwrapper
+Architecture: amd64 i386
+Depends: ${shlibs:Depends}
+Description: A wrapper to run Netscape plugins on other architectures
+ nspluginwrapper is an Open Source compatibility plugin for Netscape 4
+ (NPAPI) plugins. That is, it enables you to use plugins on platforms
+ they were not built for.
+ .
+ This package is built to run i386 plugins, since there are no known
+ binary-only plugins built for any other architecture.

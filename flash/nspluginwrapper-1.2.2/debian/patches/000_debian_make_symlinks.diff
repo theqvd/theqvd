@@ -1,0 +1,159 @@
+Create the plugin wrapper in a global location and install a symlink into
+the browser-specific plugin paths when installing globally.
+Also removes the symlinks on uninstallation.
+
+Commandline option "-n" or "--nosymlink" doesn't perform any operations on
+symlinks on installation and removal.
+
+ -- Rob Andrews <rob@choralone.org>  Fri, 29 Jun 2007 21:59:49 +0100
+
+Index: ubuntu.1.2.2-0ubuntu1/src/npw-config.c
+===================================================================
+--- ubuntu.1.2.2-0ubuntu1.orig/src/npw-config.c	2009-01-03 16:26:07.000000000 +0100
++++ ubuntu.1.2.2-0ubuntu1/src/npw-config.c	2009-03-07 18:38:14.000000000 +0100
+@@ -44,6 +44,16 @@
+ static bool g_allow_native = false;
+ static const char NPW_CONFIG[] = "nspluginwrapper";
+ 
++/* On Debian systems, we install/remove symlinks from these paths.
++ * This information is used twice, so declare globally */
++static bool g_dosymlink = true;
++static const char *debian_link_dirs[] = {
++  LIBDIR "/mozilla/plugins",
++  LIBDIR "/firefox/plugins",
++  NULL, /* if this isn't here, it reads into whatever data is in memory after
++           possibly differing in behaviour to the same code in functions */
++};
++
+ static void error(const char *format, ...)
+ {
+   va_list args;
+@@ -161,7 +171,7 @@
+ 	}
+ 	else if (access("/etc/debian_version", F_OK) == 0) {
+ 	  static const char *debian_dirs[] = {
+-		"/usr/lib/mozilla/plugins",				// XXX how unfortunate
++		LIBDIR "/nspluginwrapper/plugins",
+ 	  };
+ 	  dirs = debian_dirs;
+ 	}
+@@ -812,6 +822,49 @@
+ 	printf("  into %s\n", d_plugin_path);
+ 
+   free(plugin_data);
++
++  /* Install symlinks on Debian systems */
++  if (has_system_wide_wrapper_plugin(plugin_path, true)
++	  && (access("/etc/debian_version", F_OK) == 0)
++	  && (g_dosymlink == true))
++  {
++	  static const char *ldir = NULL;
++	  const char **ldirs = NULL;
++	  char *lname = NULL;
++
++	  ldirs = debian_link_dirs;
++
++	  while ((ldir = *ldirs++) != NULL)
++	  {
++		  if (access(ldir, F_OK) == 0)
++		  {
++			  /* Can write to this directory, make a symlink in it */
++			  if (g_verbose)
++				  printf("And create symlink to plugin in %s: ", ldir);
++
++			  if ((lname = malloc(strlen(ldir) + strlen(NPW_WRAPPER_BASE) + strlen(plugin_base) + 3)) != NULL)
++			  {
++				  sprintf(lname, "%s/%s.%s", ldir, NPW_WRAPPER_BASE, plugin_base);
++
++				  if (symlink(d_plugin_path, lname) == 0)
++				  {
++					  if (g_verbose)
++						  printf("done.\n");
++				  }
++				  else
++				  {
++					  if (g_verbose)
++						  printf("failed!\n");
++				  }
++
++				  free(lname);
++			  }
++			  else
++				  if (g_verbose)
++					  printf("*gulp* malloc() failed!\n");
++		  }
++	  }
++  }
+   return 0;
+ }
+ 
+@@ -871,6 +924,48 @@
+   if (unlink(plugin_path) < 0)
+ 	return 1;
+ 
++  /* Remove links to the plugin on Debian systems */
++  if ((access("/etc/debian_version", F_OK) == 0) && (g_dosymlink == true))
++  {
++	static const char *ldir = NULL;
++	const char **ldirs = NULL;
++	char *lname = NULL;
++	char *plugin_base = strrchr(plugin_path, '/');
++	char *lbuf = NULL;
++
++	if (plugin_base == NULL)
++		return 1;
++	else
++		plugin_base++;
++
++	ldirs = debian_link_dirs;
++
++	while ((ldir = *ldirs++) != NULL)
++	{
++		if ((lname = malloc(strlen(ldir) + strlen(plugin_base) + 2)) == NULL)
++			return 1;
++
++		sprintf(lname, "%s/%s", ldir, plugin_base);
++		lbuf = malloc(strlen(plugin_path) + 1);
++
++		if (readlink(lname, lbuf, strlen(plugin_path)) > 0)
++		{
++			/* readlink doesn't null terminate */
++			*(lbuf + strlen(plugin_path)) = 0;
++
++			if (strcmp(lbuf, plugin_path) == 0)
++			{
++				unlink(lname);
++				if (g_verbose)
++					printf("Deleted symlink '%s' to this plugin.\n", lname);
++			}
++		}
++
++		free(lname);
++		free(lbuf);
++	}
++  }
++
+   return 0;
+ }
+ 
+@@ -1033,6 +1128,12 @@
+   return 0;
+ }
+ 
++static int process_nolink(int argc, char *argv[])
++{
++  g_dosymlink = false;
++  return 0;
++}
++
+ static int process_list(int argvc, char *argv[])
+ {
+   const char **plugin_dirs = get_mozilla_plugin_dirs();
+@@ -1152,6 +1253,7 @@
+ 	{ 'a', "auto",		process_auto,		0 },
+ 	{ 'n', "native",	process_native,		0 },
+ 	{ 'l', "list",		process_list,		1 },
++	{ 'n', "nosymlinks",	process_nolink,		0 },
+ 	{ 'u', "update",	process_update,		1 },
+ 	{ 'i', "install",	process_install,	1 },
+ 	{ 'r', "remove",	process_remove,		1 },

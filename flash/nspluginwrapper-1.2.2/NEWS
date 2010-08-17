@@ -1,0 +1,132 @@
+nspluginwrapper NEWS -- history of user-visible changes.  2009-01-02
+Copyright (C) 2005-2009 Gwenole Beauchesne
+
+Version 1.2.2 - 02.Jan.2009
+* Fix support for the VLC plug-in
+* Fix memory deallocation in NPN_GetStringIdentifiers()
+* Fix return value if stream creation failed in standalone player
+
+Version 1.2.0 - 26.Dec.2008
+* Drop obsolete mkruntime scripts
+* Use valgrind if NPW_USE_VALGRIND=yes
+* Add support for SunStudio compilers
+* Add support for Flash Player 10 on OpenSolaris 2008.11
+* Fix build on non-Linux platforms
+* Fix NPP_Destroy() to keep NPP instances longer, but destroy window immediately
+
+Version 1.1.10 (BETA) - 08.Dec.2008
+* Fix NPPVpluginScriptableNPObject::Invalidate()
+* Fix condition for delayed NPN_ReleaseObject() call
+* Fix XEMBED (rework for lost events/focus regressions)
+* Fix RPC for calls initiated by the plugin (SYNC mode)
+* Fix invalid RPC after the plugin was NPP_Destroy()'ed
+
+Version 1.1.8 (BETA) - 01.Dec.2008
+* Delay NPN_ReleaseObject() if there is incoming RPC
+* Improve plugins restart machinery (Martin Stransky)
+* Close npviewer.bin sockets on exec()
+* Close all open files on fork() (initial patch by Dan Walsh)
+* Make `which` failures silent for soundwrappers (Stanislav Brabec)
+* Allow direct execution of native plugins if NPW_DIRECT_EXEC is set
+
+Version 1.1.6 (BETA) - 23.Nov.2008
+* Enable glib memory hooks by default
+* Lower priority of RPC events so that timeouts are triggered first
+* Fix string_of_NPVariant() that could make some plugins crash
+* Fix NPClass::Invoke(|Default)() args release
+* Fix memory leak in NPN_GetStringIdentifiers()
+* Fix NPN_ReleaseObject() that could dereference a deallocated NPObject
+* Fix (sync) NPObject referenceCount when the object is passed to the plugin
+* Fix plugin window resize in XEMBED hack mode
+* Fix "javascript:" streams requests in standalone player
+* Fix NPP_Write() and propagate negative lengths too (DiamondX plugin)
+
+Version 1.1.4 (BETA) - 07.Nov.2008
+* Fix memory leaks in NPRuntime bridge
+* Fix XEMBED support (workaround Gtk2 and Firefox bugs)
+* Fix DiamondX plugin with Konqueror4
+* Fix NPP_URLNotify() (Bennet Yee)
+* Fix NPAPI version that is exposed to the plugin
+
+Version 1.1.2 (BETA) - 12.Oct.2008
+* Add support for Open Solaris hosts
+* Add support for ARM targets (Geraint North)
+* Fix support for windowless plugins (Flash Player 10 rc)
+* Fix various bugs in RPC code (crashes and concurrent messaging)
+* Allow wrapping of native plugins through the -n|--native option
+
+Version 1.1.0 (BETA) - 06.Jul.2008
+* Add support for windowless plugins (Flash Player 10 beta 2)
+* Add standalone plugins player (nspluginplayer)
+* Restart plugins viewer on error (Martin Stransky)
+
+Version 1.0.0 - 29.Jun.2008
+* Don't wrap root plugins to system locations, keep them private
+* Fix support for Acrobat Reader 8 (focus problems)
+* Fix support for mozplugger (in full-debug mode)
+* Fix support for WebKit
+* Fix crashes with Flash Player 9 Update 3 (9.0.115)
+* Fix build with Intel compiler
+* Add support for IBM XLC compiler
+* Improve error handling during RPC initialization (memory leaks)
+* Improve error handling in NPP_WriteReady() and NPP_Write()
+
+Version 0.9.91.5 (BETA) - 26.Aug.2007
+* Fix a memory leak in NPP_Destroy()
+* Fix DiamondX XEmbed example plugin
+* Fix focus problems (Debian bug #435912)
+* Add support for 64-bit plugins (Martin Stransky)
+* Add support for newer NPAPI 0.17 functions and variables
+* Add support for broken 64-bit Konqueror versions (run-time detect)
+
+Version 0.9.91.4 (BETA) - 03.Apr.2007
+* Don't try to wrap native plugins
+* Fix build on NetBSD (David Brownlee)
+* Fix build on DragonFlyBSD (Steve O'Hara-Smith)
+* Fix build on Linux systems with SSP enabled by default (e.g. Ubuntu)
+
+Version 0.9.91.3 (BETA) - 04.Mar.2007
+* Fix printing with EMBED plugins
+* Fix build on Debian (Rob Andrews)
+* Use sound wrappers whenever possible on Linux (Flash Player 9)
+* Don't wait for dying processes (i.e. avoid hangs on NP_Shutdown)
+
+Version 0.9.91.2 (BETA) - 29.Dec.2006
+* Fix some rare RPC synchronisation issues (flashearth.com)
+* Fix hangs when the plugin exits unexpectedly (e.g. a crash)
+
+Version 0.9.91.1 (BETA) - 26.Dec.2006
+* Fix NPRuntime bridge (VLC plugin)
+* Fix Mozilla plugins dir creation on NetBSD and FreeBSD hosts
+* Fix potential buffer overflow in RPC marshalers
+* Handle empty args for plugin creation (flasharcade.com)
+
+Version 0.9.91 (BETA) - 22.Dec.2006
+* Add scripting support through the NPRuntime API
+* Add XEMBED support for e.g. MPlayer plug-in
+* Add support for NetBSD, FreeBSD and non-x86 Linux platforms
+* Fix focus problems
+* Fix some rare hangs
+* Create Mozilla plugins dir if it does not exist yet
+
+Version 0.9.90.4 (BETA) - 18.Nov.2006
+* Robustify error condition (Darryl L. Miles)
+* Reduce plugin load times
+* Fix post data to a URL
+* Add printing support
+* Add Konqueror browser support
+
+Version 0.9.90.3 (BETA) - 19.Sep.2006
+* Fix acrobat reader 7 plugin
+
+Version 0.9.90.2 (BETA) - 15.Sep.2006
+* Use a bidirectional communication channel rather than two channels +
+  a "delayed" execution engine
+
+Version 0.9.90.1 (BETA) - 05.Jun.2006
+* Handle SuSE Linux Mozilla paths
+* Don't use QEMU on IA-64 platforms
+* Portability fixes to non-Linux platforms
+
+Version 0.9.90 (BETA) - 25.Oct.2005
+* First public beta that has decent Flash Player support

@@ -1,0 +1,8 @@
+# watch control file for uscan
+# See uscan(1) for format
+
+# Compulsory line, this is a version 3 file
+version=3
+
+# <Webpage URL> <string match>
+http://gwenole.beauchesne.info/en/projects/nspluginwrapper .*/nspluginwrapper-(.*)\.tar\.bz2

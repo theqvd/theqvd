@@ -1,0 +1,28 @@
+Anti-bashism patch inherited from Ubuntu.
+Author: Anders Kaseorg <anders@kaseorg.com>
+
+ -- Rob Andrews <rob@choralone.org>  Thu, 28 Jun 2007 18:08:54 +0100
+
+Index: ubuntu.1.2.2-0ubuntu1/utils/mkruntime.sh
+===================================================================
+--- ubuntu.1.2.2-0ubuntu1.orig/utils/mkruntime.sh	2009-01-02 11:19:18.000000000 +0100
++++ ubuntu.1.2.2-0ubuntu1/utils/mkruntime.sh	2009-03-07 18:38:19.000000000 +0100
+@@ -12,15 +12,15 @@
+ # - Check acroread5, something is missing while loading a PDF
+ # - Enough for Flash Player & PluginSDK npsimple.so
+ 
+-function error() {
++error() {
+ 	echo ${1+"$@"} > /dev/stderr
+ }
+ 
+-function status() {
++status() {
+ 	echo ${1+"$@"} > /dev/stderr
+ }
+ 
+-function run() {
++run() {
+ 	status " " ${1+"$@"}
+ 	${1+"$@"}
+ }

@@ -1,0 +1,17 @@
+Fix the abstract for the '-u' option.
+
+ -- Rob Andrews <rob@choralone.org>  Sun, 02 Sep 2007 11:58:27 +0100
+
+Index: ubuntu.1.2.2-0ubuntu1/src/npw-config.c
+===================================================================
+--- ubuntu.1.2.2-0ubuntu1.orig/src/npw-config.c	2009-03-07 18:38:23.000000000 +0100
++++ ubuntu.1.2.2-0ubuntu1/src/npw-config.c	2009-03-07 18:38:28.000000000 +0100
+@@ -1102,7 +1102,7 @@
+   printf("   -a --auto               flag: set automatic mode for plugins discovery\n");
+   printf("   -n --native             flag: allow native plugin(s) to be wrapped\n");
+   printf("   -l --list               list plugins currently installed\n");
+-  printf("   -u --update             update plugin(s) currently installed\n");
++  printf("   -u --update [FILE(S)]   update plugin(s) currently installed\n");
+   printf("   -i --install [FILE(S)]  install plugin(s)\n");
+   printf("   -r --remove [FILE(S)]   remove plugin(s)\n");
+   printf("\n");

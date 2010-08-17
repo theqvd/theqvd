@@ -1,0 +1,10 @@
+LSB_DUMMY { __LSB_DUMMY; };
+GLIBC_2.0 {
+  dladdr;
+  dlclose;
+  dlerror;
+  dlsym;
+};
+GLIBC_2.1 {
+  dlopen;
+};

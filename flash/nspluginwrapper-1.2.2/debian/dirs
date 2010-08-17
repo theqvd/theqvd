@@ -1,0 +1,5 @@
+usr/bin
+usr/lib/nspluginwrapper/plugins
+usr/lib/mozilla/plugins
+usr/lib/firefox/plugins
+usr/lib/nspluginwrapper/dirs.d/
