@@ -66,7 +66,7 @@ sub block_node : Test(3) {
 }
 
 sub _check_connect {
-    my $httpc = new QVD::HTTPC('localhost:8443', SSL => 1);
+    my $httpc = new QVD::HTTPC('localhost:8443', SSL => 1, SSL_verify_callback => sub {1});
     my $auth = encode_base64('joni:joni', '');
     $httpc->send_http_request(GET => '/qvd/list_of_vm', headers => ["Authorization: Basic $auth",
 								    "Accept: application/json"]);
