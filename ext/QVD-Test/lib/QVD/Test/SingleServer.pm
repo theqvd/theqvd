@@ -72,3 +72,5 @@ sub _check_connect {
 								    "Accept: application/json"]);
     return ($httpc->read_http_response())[0];
 }
+
+1;
