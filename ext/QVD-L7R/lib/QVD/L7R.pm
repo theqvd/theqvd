@@ -45,7 +45,7 @@ sub new {
  	# copy the SSL certificate and key from the database to local
  	# files
  	mkdir $l7r_certs_path, 0700;
- 	-d $l7r_certs_path or die "unable to create directory $l7r_certs_path\n";
+ 	-d $l7r_certs_path or die "Unable to create directory $l7r_certs_path\n";
  	my ($mode, $uid) = (stat $l7r_certs_path)[2, 4];
  	$uid == $> or $uid == 0 or die "bad owner for directory $l7r_certs_path\n";
  	$mode & 0077 and die "bad permissions for directory $l7r_certs_path\n";
@@ -61,12 +61,12 @@ sub new {
 sub _write_to_file {
     my ($fn, $data) = @_;
     my $fh;
-    DEBUG "writting data to $fn";
+    DEBUG "Writing data to $fn";
     unless ( open $fh, '>', $fn  and
  	     binmode $fh         and
  	     print $fh $data     and
  	     close $fh ) {
- 	die "Unable to write $fn";
+ 	die "Unable to write to $fn";
     }
 }
 
@@ -92,6 +92,9 @@ sub ping_processor {
 sub list_of_vm_processor {
     my ($l7r, $method, $url, $headers) = @_;
     my $auth = $l7r->_authenticate_user($headers);
+    if (this_host->runtime->blocked) {
+	$l7r->throw_http_error(HTTP_SERVICE_UNAVAILABLE, "Server is blocked");
+    }
     my $server_state = this_host->runtime->state;
     if ($server_state ne 'running') {
 	$l7r->throw_http_error(HTTP_SERVICE_UNAVAILABLE, "Server is $server_state");
@@ -114,6 +117,9 @@ sub list_of_vm_processor {
 sub connect_to_vm_processor {
     my ($l7r, $method, $url, $headers) = @_;
     my $auth = $l7r->_authenticate_user($headers);
+    if (this_host->runtime->blocked) {
+	$l7r->throw_http_error(HTTP_SERVICE_UNAVAILABLE, "Server is blocked");
+    }
 
     header_eq_check($headers, Connection => 'Upgrade') &&
     header_eq_check($headers, Upgrade => 'QVD/1.0')
