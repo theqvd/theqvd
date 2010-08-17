@@ -1,11 +1,8 @@
-.cvsignore
 bin/qvd-client.pl
 bin/qvd-gui-client.pl
 Changes
 lib/QVD/Client.pm
 lib/QVD/Client/Frame.pm
-lib/QVD/Client/qvd-logo.png
-lib/QVD/Client/qvd.xpm
 Makefile.PL
 MANIFEST
 README

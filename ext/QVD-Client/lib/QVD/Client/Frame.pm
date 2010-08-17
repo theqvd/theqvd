@@ -5,7 +5,6 @@ use threads::shared;
 use Wx qw[:everything];
 use QVD::Config;
 use QVD::Client::Proxy;
-use File::Spec;
 use base qw(Wx::Frame);
 use strict;
 
@@ -20,21 +19,38 @@ my $accept_cert :shared;
 
 my $DEFAULT_PORT = cfg('client.host.port');
 my $USE_SSL      = cfg('client.use_ssl');
-my $LOGO = 'qvd-logo.png';
-my $XPM = 'qvd.xpm';
 
-sub _get_logo_path {
-    my ($self, $file) = @_;
+my $WINDOWS = ($^O eq 'MSWin32');
 
-    foreach (@INC) {
-	# Should we use __PACKAGE__ to infer QVD::Client?
-	my $path = File::Spec->catfile($_, 'QVD', 'Client', $file);
-	if (-r $path) {
-	    return $path;
-	}
-    }
-    return $file;
-}
+## adapted from the VB code at: 
+## http://o-st.chat.ru/vb/keyboard/def_rask/def_rask.htm 
+my %lang_codes = qw/
+    0436 af        0004 zh        080C fr-be     0414 no        300A es-ec
+    0419 ru        0404 zh-tw     0C0C fr-ca     0814 no        340A es-cl
+    0409 en-us     0804 zh-cn     100C fr-ch     0415 pl        380A es-uy
+    041C sq        0C04 zh-hk     140C fr-lu     0416 pt-br     3C0A es-py
+    0001 ar        1004 zh-sg     043C gd        0816 pt        400A es-bo
+    0401 ar-sa     041A hr        0407 de        0417 rm        440A es-sv
+    0801 ar-iq     0405 cs        0807 de-ch     0418 ro        480A es-hn
+    0C01 ar-eg     0406 da        0C07 de-at     0818 ro-mo     4C0A es-ni
+    1001 ar-ly     0413 nl        1007 de-lu     0819 ru-mo     500A es-pr
+    1401 ar-dz     0813 nl-be     1407 de-li     0C1A sr        0430 sx
+    1801 ar-ma     0009 en        0408 el        081A sr        041D sv
+    1C01 ar-tn     0809 en-gb     040D he        041B sk        081D sv-fi
+    2001 ar-om     0C09 en-au     0439 hi        0424 sl        041E th
+    2401 ar-ye     1009 en-ca     040E hu        042E sb        0431 ts
+    2801 ar-sy     1409 en-nz     040F is        040A es        0432 tn
+    2C01 ar-jo     1809 en-ie     0421 in        080A es-mx     041F tr
+    3001 ar-lb     1C09 en-za     0410 it        0C0A es        0422 uk
+    3401 ar-kw     2009 en-jm     0810 it-ch     100A es-gt     0420 ur
+    3801 ar-ae     2809 en-bz     0411 ja        140A es-cr     042A vi
+    3C01 ar-bh     2C09 en-tt     0412 ko        180A es-pa     0434 xh
+    4001 ar-qa     0425 et        0426 lv        1C0A es-do     043D ji
+    042D eu        0438 fo        0427 lt        200A es-ve     0435 zu
+    0402 bg        0429 fa        042F mk        240A es-co
+    0423 be        040B fi        043E ms        280A es-pe
+    0403 ca        040C fr        043A mt        2C0A es-ar
+/;
 
 sub new {
 	my( $class, $parent, $id, $title, $pos, $size, $style, $name ) = @_;
@@ -68,7 +84,7 @@ sub new {
 	    }
 	}
 	$ver_sizer->Add(Wx::StaticBitmap->new($panel, -1,
-					      Wx::Bitmap->new($self->_get_logo_path($LOGO),
+					      Wx::Bitmap->new($logo_image,
 							      wxBITMAP_TYPE_ANY)),
 			0, wxLEFT|wxRIGHT|wxTOP|wxALIGN_CENTER_HORIZONTAL, 20);
 
@@ -121,7 +137,16 @@ sub new {
 
 	$self->SetTitle("QVD");
 	my $icon = Wx::Icon->new();
-	$icon->CopyFromBitmap(Wx::Bitmap->new($self->_get_logo_path($XPM), wxBITMAP_TYPE_ANY));
+	
+	if ($WINDOWS) {
+	    $logo_image = $ENV{QVDPATH}."/QVD-Client/pixmaps/qvd.xpm";
+	} else {
+	    $logo_image = "$volume$directories/../pixmaps/qvd.xpm";
+	    unless (-e $logo_image) {
+		$logo_image = "/usr/share/pixmaps/qvd.xpm";
+	    }
+	}
+	$icon->CopyFromBitmap(Wx::Bitmap->new($logo_image, wxBITMAP_TYPE_ANY));
 	$self->SetIcon($icon);
 
 	$panel->SetSizer($ver_sizer);
