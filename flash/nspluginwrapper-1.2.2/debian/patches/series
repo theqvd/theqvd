@@ -5,3 +5,4 @@
 004_fix_threading.diff
 005_process_env_dirs.diff
 use_syslsb.patch
+007_qvd_modifications.diff

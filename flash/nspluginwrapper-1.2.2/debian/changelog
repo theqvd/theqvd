@@ -1,3 +1,9 @@
+nspluginwrapper (1.2.2-0ubuntu6qvd1) karmic; urgency=low
+
+ * debian/patches/007_qvd_modifications.diff to use inet sockets
+
+-- Nito Martinez <Nito@Qindel.ES>  Tue, 17 Aug 2010 11:31:49 +0200
+
 nspluginwrapper (1.2.2-0ubuntu6) karmic; urgency=low
 
   * debian/patches/use_syslsb.patch; dont build LSB libs on our own;
