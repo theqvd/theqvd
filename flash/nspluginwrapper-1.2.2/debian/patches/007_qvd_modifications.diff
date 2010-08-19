@@ -1,16 +1,17 @@
 Index: nspluginwrapper-1.2.2/src/rpc.c
 ===================================================================
---- nspluginwrapper-1.2.2.orig/src/rpc.c	2010-08-18 20:45:52.000000000 +0200
-+++ nspluginwrapper-1.2.2/src/rpc.c	2010-08-18 20:45:54.000000000 +0200
-@@ -42,6 +42,7 @@
+--- nspluginwrapper-1.2.2.orig/src/rpc.c	2010-08-19 08:39:22.000000000 +0200
++++ nspluginwrapper-1.2.2/src/rpc.c	2010-08-19 08:41:31.000000000 +0200
+@@ -42,6 +42,8 @@
  #include <sys/wait.h>
  #include <sys/select.h>
  #include <netinet/in.h>
++#include <netinet/tcp.h>
 +#include <arpa/inet.h>
  #include <pthread.h>
  #include <inttypes.h>
  #include <time.h>
-@@ -49,7 +50,7 @@
+@@ -49,7 +51,7 @@
  #include "rpc.h"
  #include "utils.h"
  
@@ -19,7 +20,7 @@ Index: nspluginwrapper-1.2.2/src/rpc.c
  #include "debug.h"
  
  
-@@ -71,7 +72,7 @@
+@@ -71,7 +73,7 @@
  
  // Define the maximum amount of time (in seconds) to wait for plugin connection
  #ifndef RPC_INIT_TIMEOUT
@@ -28,7 +29,7 @@ Index: nspluginwrapper-1.2.2/src/rpc.c
  #endif
  
  // Set close-on-exec flag on the newly created socket (Linux >= 2.6.27)
-@@ -140,6 +141,11 @@
+@@ -140,6 +142,11 @@
  #define USE_NANOSLEEP
  #endif
  
@@ -40,7 +41,7 @@ Index: nspluginwrapper-1.2.2/src/rpc.c
  static void rpc_delay(uint32_t usec)
  {
    int was_error;
-@@ -622,7 +628,6 @@
+@@ -622,7 +629,6 @@
  
    char *path;
    int n, len;
@@ -48,7 +49,7 @@ Index: nspluginwrapper-1.2.2/src/rpc.c
  #if USE_ANONYMOUS_SOCKETS
    n = 0;
  #else
-@@ -660,16 +665,53 @@
+@@ -660,16 +666,56 @@
    if (*pathp)
  	free(*pathp);
    *pathp = path;
@@ -91,6 +92,9 @@ Index: nspluginwrapper-1.2.2/src/rpc.c
  rpc_connection_t *rpc_init_server(const char *ident)
  {
 +  int myport;
++#if NPW_RPC_USE_TCPIP
++  int setsockoptflag = 1;
++#endif // NPW_RPC_USE_TCPIP
    D(bug("rpc_init_server ident='%s'\n", ident));
  
    rpc_connection_t *connection;
@@ -102,7 +106,7 @@ Index: nspluginwrapper-1.2.2/src/rpc.c
    socklen_t addr_len;
  
    if (ident == NULL)
-@@ -699,11 +741,34 @@
+@@ -699,11 +745,40 @@
  	return NULL;
    }
  
@@ -111,6 +115,12 @@ Index: nspluginwrapper-1.2.2/src/rpc.c
 +  D(bug("QVD: creating tcp socket on client\n"));
 +  if ((connection->server_socket = socket(PF_INET, SOCK_STREAM, IPPROTO_TCP)) < 0) {
 +	perror("server socket");
++	rpc_exit(connection);
++	return NULL;
++  }
++
++  if (setsockopt(connection->server_socket, IPPROTO_TCP, TCP_NODELAY, (char *)&setsockoptflag, sizeof(setsockoptflag)) < 0) {
++	perror("Error setting TCP_NODELAY");
 +	rpc_exit(connection);
 +	return NULL;
 +  }
@@ -137,7 +147,7 @@ Index: nspluginwrapper-1.2.2/src/rpc.c
  
    memset(&addr, 0, sizeof(addr));
    addr.sun_family = AF_UNIX;
-@@ -715,12 +780,13 @@
+@@ -715,12 +790,13 @@
    addr.sun_len = addr_len;
  #endif
  
@@ -152,7 +162,7 @@ Index: nspluginwrapper-1.2.2/src/rpc.c
    if (listen(connection->server_socket, 1) < 0) {
  	perror("server listen");
  	rpc_exit(connection);
-@@ -731,13 +797,19 @@
+@@ -731,13 +807,20 @@
    return connection;
  }
  
@@ -166,13 +176,14 @@ Index: nspluginwrapper-1.2.2/src/rpc.c
 +#if NPW_RPC_USE_TCPIP
 +  struct sockaddr_in addr;
 +  int server;
++  int setsockoptflag = 1;
 +#else
    struct sockaddr_un addr;
 +#endif // NPW_RPC_USE_TCPIP
    socklen_t addr_len;
  
    if (ident == NULL)
-@@ -765,7 +837,32 @@
+@@ -765,7 +848,37 @@
  	rpc_exit(connection);
  	return NULL;
    }
@@ -188,7 +199,12 @@ Index: nspluginwrapper-1.2.2/src/rpc.c
 +	rpc_exit(connection);
 +	return NULL;
 +  }
- 
++ 
++  if (setsockopt(connection->socket, IPPROTO_TCP, TCP_NODELAY, (char *)&setsockoptflag, sizeof(setsockoptflag)) < 0) {
++	perror("Error setting TCP_NODELAY");
++	rpc_exit(connection);
++	return NULL;
++  }
 +  memset(&addr, 0, sizeof(addr));
 +  addr.sin_family = AF_INET;
 +  addr.sin_port = htons(_rpc_get_port_from_ident(ident));
@@ -198,14 +214,14 @@ Index: nspluginwrapper-1.2.2/src/rpc.c
 +    rpc_exit(connection);
 +    return NULL;
 +  }
-+
+ 
 +  addr_len = _rpc_socket_path(&connection->socket_path, ident);
 +  addr_len = sizeof(struct sockaddr_in);
 +#else
    if ((connection->socket = socket(AF_UNIX, SOCK_STREAM|SOCK_CLOEXEC, 0)) < 0) {
  	perror("client socket");
  	rpc_exit(connection);
-@@ -788,15 +885,17 @@
+@@ -788,15 +901,17 @@
    addr.sun_len = addr_len;
  #endif
  
@@ -225,7 +241,7 @@ Index: nspluginwrapper-1.2.2/src/rpc.c
  	  perror("client_connect");
  	  rpc_exit(connection);
  	  return NULL;
-@@ -917,7 +1016,11 @@
+@@ -917,7 +1032,11 @@
    if (connection->type != RPC_CONNECTION_SERVER)
  	return RPC_ERROR_CONNECTION_TYPE_MISMATCH;
  
@@ -237,7 +253,7 @@ Index: nspluginwrapper-1.2.2/src/rpc.c
    socklen_t addr_len = sizeof(addr);
    if ((connection->socket = accept(connection->server_socket, (struct sockaddr *)&addr, &addr_len)) < 0)
  	return RPC_ERROR_ERRNO_SET;
-@@ -2534,9 +2637,13 @@
+@@ -2534,9 +2653,13 @@
  
  int main(void)
  {
@@ -254,8 +270,8 @@ Index: nspluginwrapper-1.2.2/src/rpc.c
  	if (!run_client())
 Index: nspluginwrapper-1.2.2/src/npw-wrapper.c
 ===================================================================
---- nspluginwrapper-1.2.2.orig/src/npw-wrapper.c	2010-08-18 20:45:52.000000000 +0200
-+++ nspluginwrapper-1.2.2/src/npw-wrapper.c	2010-08-18 20:45:54.000000000 +0200
+--- nspluginwrapper-1.2.2.orig/src/npw-wrapper.c	2010-08-19 08:39:22.000000000 +0200
++++ nspluginwrapper-1.2.2/src/npw-wrapper.c	2010-08-19 08:39:24.000000000 +0200
 @@ -3321,14 +3321,17 @@
  	return;
    g_plugin.initialized = -1;
@@ -329,8 +345,8 @@ Index: nspluginwrapper-1.2.2/src/npw-wrapper.c
  	npw_printf("ERROR: failed to initialize plugin-side RPC client connection\n");
 Index: nspluginwrapper-1.2.2/src/rpc.h
 ===================================================================
---- nspluginwrapper-1.2.2.orig/src/rpc.h	2010-08-18 20:45:52.000000000 +0200
-+++ nspluginwrapper-1.2.2/src/rpc.h	2010-08-18 20:45:54.000000000 +0200
+--- nspluginwrapper-1.2.2.orig/src/rpc.h	2010-08-19 08:39:22.000000000 +0200
++++ nspluginwrapper-1.2.2/src/rpc.h	2010-08-19 08:39:24.000000000 +0200
 @@ -130,4 +130,11 @@
  // Set error callback for a connection
  void rpc_connection_set_error_callback(rpc_connection_t *connection, rpc_error_callback_t callback, void *callback_data);
@@ -345,8 +361,8 @@ Index: nspluginwrapper-1.2.2/src/rpc.h
  #endif /* RPC_H */
 Index: nspluginwrapper-1.2.2/configure
 ===================================================================
---- nspluginwrapper-1.2.2.orig/configure	2010-08-18 20:45:52.000000000 +0200
-+++ nspluginwrapper-1.2.2/configure	2010-08-18 20:45:54.000000000 +0200
+--- nspluginwrapper-1.2.2.orig/configure	2010-08-19 08:39:22.000000000 +0200
++++ nspluginwrapper-1.2.2/configure	2010-08-19 08:39:24.000000000 +0200
 @@ -35,7 +35,7 @@
  host_cpu=`uname -m`
  target_os="linux"
@@ -358,8 +374,8 @@ Index: nspluginwrapper-1.2.2/configure
  case "$host_cpu" in
 Index: nspluginwrapper-1.2.2/src/debug.h
 ===================================================================
---- nspluginwrapper-1.2.2.orig/src/debug.h	2010-08-18 20:45:52.000000000 +0200
-+++ nspluginwrapper-1.2.2/src/debug.h	2010-08-18 20:45:54.000000000 +0200
+--- nspluginwrapper-1.2.2.orig/src/debug.h	2010-08-19 08:39:22.000000000 +0200
++++ nspluginwrapper-1.2.2/src/debug.h	2010-08-19 08:39:24.000000000 +0200
 @@ -37,7 +37,7 @@
  
  #if DEBUG
