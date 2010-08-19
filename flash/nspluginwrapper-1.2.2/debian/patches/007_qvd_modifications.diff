@@ -1,7 +1,7 @@
 Index: nspluginwrapper-1.2.2/src/rpc.c
 ===================================================================
---- nspluginwrapper-1.2.2.orig/src/rpc.c	2010-08-19 08:39:22.000000000 +0200
-+++ nspluginwrapper-1.2.2/src/rpc.c	2010-08-19 08:41:31.000000000 +0200
+--- nspluginwrapper-1.2.2.orig/src/rpc.c	2010-08-19 11:50:12.000000000 +0200
++++ nspluginwrapper-1.2.2/src/rpc.c	2010-08-19 11:50:40.000000000 +0200
 @@ -42,6 +42,8 @@
  #include <sys/wait.h>
  #include <sys/select.h>
@@ -49,7 +49,7 @@ Index: nspluginwrapper-1.2.2/src/rpc.c
  #if USE_ANONYMOUS_SOCKETS
    n = 0;
  #else
-@@ -660,16 +666,56 @@
+@@ -660,16 +666,98 @@
    if (*pathp)
  	free(*pathp);
    *pathp = path;
@@ -59,32 +59,74 @@ Index: nspluginwrapper-1.2.2/src/rpc.c
  
 +// Return port number in int format from a string in format "ip:port"
 +uint16_t _rpc_get_port_from_ident(const char *ident) {
-+  uint16_t port;
-+  char host[128];
-+  if (sscanf(ident, "%[^:]:%d", host, (int *)&port) < 2) {
++  uint16_t port_return;
++
++  #define MAX_HOSTPORT_LEN 128
++  char host[MAX_HOSTPORT_LEN];
++  char *colon_ptr, *port_ptr;
++  int ident_len, host_len, port_len, port;
++
++  ident_len = strlen(ident);
++
++  colon_ptr = strchr(ident, ':');
++  if (colon_ptr == NULL) {
 +    D(bug("_rpc_get_port_from_ident error parsing ident='%s'\n", ident));
 +    return -1;
 +  }
-+  D(bug("_rpc_get_port_from_ident port returned for ident='%s' is %s and %d\n", ident, host, (int)port));
-+  return port;
++  port_ptr = colon_ptr + 1;
++  host_len = colon_ptr - ident;
++  port_len = ident_len - host_len - 1;
++  if (port_len <= 0) {
++    D(bug("_rpc_get_host_from_ident error parsing ident='%s' no port specified? port_len=%d\n", ident, port_len));
++    return -1;
++  }
++
++  if ((host_len + 1) > MAX_HOSTPORT_LEN) {
++    D(bug("_rpc_get_port_from_ident error host part too long ident='%s' longer than\n", ident));
++    return -1;
++  }
++  strncpy(host, ident, host_len);
++  host[host_len] = 0;
++  D(bug("_rpc_get_port_from_ident (Joni looking) after strncpy: %s [%d] %s [%d]\n", ident, strlen(ident), host, host_len)); /*Verify why host_len does not appear*/
++  if (sscanf(port_ptr, "%d",&port) < 1) {
++    D(bug("_rpc_get_port_from_ident error parsing port from  ident='%s' and port_ptr=%s\n", ident, port_ptr));
++    return -1;
++  }
++  port_return = port;
++  D(bug("_rpc_get_port_from_ident port returned for ident='%s' is %s [%d] and %d\n", ident, host, strlen(host), (int)port_return));
++  return port_return;
 +}
 +
 +int _rpc_get_host_from_ident(const char *ident, void *ptr) {
-+  uint16_t port;
-+  char myhost[128];
-+  char *parsed_host;
-+  int server;
-+  if (sscanf(ident, "%[^:]:%d", parsed_host, (int *)&port) < 2) {
++  char host[MAX_HOSTPORT_LEN];
++  char *colon_ptr;
++  int ident_len, host_len, server;
++
++  ident_len = strlen(ident);
++  colon_ptr = strchr(ident, ':');
++  if (colon_ptr == NULL) {
 +    D(bug("_rpc_get_host_from_ident error parsing ident='%s'\n", ident));
 +    return -1;
 +  }
-+  parsed_host = NPW_RPC_TEST_SERVER;
-+
-+  D(bug("_rpc_get_host_from_ident host returned for ident = '%s' is %s:%d\n", ident, parsed_host, port));
-+  if ((server = inet_pton(AF_INET, "127.0.0.1", ptr)) < 0) {
-+    perror("error: Converting address");
++  //  port_ptr = colon_ptr + 1;
++  host_len = colon_ptr - ident;
++  //port_len = ident_len - host_len - 1;
++  //if (port_len <= 0) {
++  //  D(bug("_rpc_get_host_from_ident error parsing ident='%s' no port specified? port_len=%d\n", ident, port_len));
++  //  return -1;
++  //}
++  if ((host_len + 1) > MAX_HOSTPORT_LEN) {
++    D(bug("_rpc_get_host_from_ident error host part too long ident='%s' longer than\n", ident));
++    return -1;
 +  }
-+  D(bug("_rpc_get_host_from_ident host returned for ident = '%s' is %s, %d\n", ident, parsed_host, server));
++  strncpy(host, ident, host_len);
++  host[host_len] = 0;
++  
++  if ((server = inet_pton(AF_INET, host, ptr)) < 0) {
++    perror("error: Converting address");
++    return server;
++  }
++  D(bug("_rpc_get_host_from_ident host returned for ident = '%s' is %s, %d\n", ident, host, server));
 +  return server;
 +}
 +
@@ -106,7 +148,7 @@ Index: nspluginwrapper-1.2.2/src/rpc.c
    socklen_t addr_len;
  
    if (ident == NULL)
-@@ -699,11 +745,40 @@
+@@ -699,11 +787,40 @@
  	return NULL;
    }
  
@@ -147,7 +189,7 @@ Index: nspluginwrapper-1.2.2/src/rpc.c
  
    memset(&addr, 0, sizeof(addr));
    addr.sun_family = AF_UNIX;
-@@ -715,12 +790,13 @@
+@@ -715,12 +832,13 @@
    addr.sun_len = addr_len;
  #endif
  
@@ -162,7 +204,7 @@ Index: nspluginwrapper-1.2.2/src/rpc.c
    if (listen(connection->server_socket, 1) < 0) {
  	perror("server listen");
  	rpc_exit(connection);
-@@ -731,13 +807,20 @@
+@@ -731,13 +849,20 @@
    return connection;
  }
  
@@ -183,7 +225,7 @@ Index: nspluginwrapper-1.2.2/src/rpc.c
    socklen_t addr_len;
  
    if (ident == NULL)
-@@ -765,7 +848,37 @@
+@@ -765,7 +890,37 @@
  	rpc_exit(connection);
  	return NULL;
    }
@@ -208,8 +250,8 @@ Index: nspluginwrapper-1.2.2/src/rpc.c
 +  memset(&addr, 0, sizeof(addr));
 +  addr.sin_family = AF_INET;
 +  addr.sin_port = htons(_rpc_get_port_from_ident(ident));
-+  //  if ((server = _rpc_get_host_from_ident(ident, &addr.sin_addr)) <= 0) {
-+  if ((server = inet_pton(AF_INET, "127.0.0.1", &addr.sin_addr)) <= 0) {
++  if ((server = _rpc_get_host_from_ident(ident, &addr.sin_addr)) <= 0) {
++    //if ((server = inet_pton(AF_INET, "127.0.0.1", &addr.sin_addr)) <= 0) {
 +    perror("error: Converting address");
 +    rpc_exit(connection);
 +    return NULL;
@@ -221,7 +263,7 @@ Index: nspluginwrapper-1.2.2/src/rpc.c
    if ((connection->socket = socket(AF_UNIX, SOCK_STREAM|SOCK_CLOEXEC, 0)) < 0) {
  	perror("client socket");
  	rpc_exit(connection);
-@@ -788,15 +901,17 @@
+@@ -788,15 +943,17 @@
    addr.sun_len = addr_len;
  #endif
  
@@ -241,7 +283,7 @@ Index: nspluginwrapper-1.2.2/src/rpc.c
  	  perror("client_connect");
  	  rpc_exit(connection);
  	  return NULL;
-@@ -917,7 +1032,11 @@
+@@ -917,7 +1074,11 @@
    if (connection->type != RPC_CONNECTION_SERVER)
  	return RPC_ERROR_CONNECTION_TYPE_MISMATCH;
  
@@ -253,7 +295,7 @@ Index: nspluginwrapper-1.2.2/src/rpc.c
    socklen_t addr_len = sizeof(addr);
    if ((connection->socket = accept(connection->server_socket, (struct sockaddr *)&addr, &addr_len)) < 0)
  	return RPC_ERROR_ERRNO_SET;
-@@ -2534,9 +2653,13 @@
+@@ -2534,9 +2695,13 @@
  
  int main(void)
  {
@@ -270,8 +312,8 @@ Index: nspluginwrapper-1.2.2/src/rpc.c
  	if (!run_client())
 Index: nspluginwrapper-1.2.2/src/npw-wrapper.c
 ===================================================================
---- nspluginwrapper-1.2.2.orig/src/npw-wrapper.c	2010-08-19 08:39:22.000000000 +0200
-+++ nspluginwrapper-1.2.2/src/npw-wrapper.c	2010-08-19 08:39:24.000000000 +0200
+--- nspluginwrapper-1.2.2.orig/src/npw-wrapper.c	2010-08-19 11:50:12.000000000 +0200
++++ nspluginwrapper-1.2.2/src/npw-wrapper.c	2010-08-19 11:50:14.000000000 +0200
 @@ -3321,14 +3321,17 @@
  	return;
    g_plugin.initialized = -1;
@@ -345,8 +387,8 @@ Index: nspluginwrapper-1.2.2/src/npw-wrapper.c
  	npw_printf("ERROR: failed to initialize plugin-side RPC client connection\n");
 Index: nspluginwrapper-1.2.2/src/rpc.h
 ===================================================================
---- nspluginwrapper-1.2.2.orig/src/rpc.h	2010-08-19 08:39:22.000000000 +0200
-+++ nspluginwrapper-1.2.2/src/rpc.h	2010-08-19 08:39:24.000000000 +0200
+--- nspluginwrapper-1.2.2.orig/src/rpc.h	2010-08-19 11:50:12.000000000 +0200
++++ nspluginwrapper-1.2.2/src/rpc.h	2010-08-19 11:50:14.000000000 +0200
 @@ -130,4 +130,11 @@
  // Set error callback for a connection
  void rpc_connection_set_error_callback(rpc_connection_t *connection, rpc_error_callback_t callback, void *callback_data);
@@ -361,8 +403,8 @@ Index: nspluginwrapper-1.2.2/src/rpc.h
  #endif /* RPC_H */
 Index: nspluginwrapper-1.2.2/configure
 ===================================================================
---- nspluginwrapper-1.2.2.orig/configure	2010-08-19 08:39:22.000000000 +0200
-+++ nspluginwrapper-1.2.2/configure	2010-08-19 08:39:24.000000000 +0200
+--- nspluginwrapper-1.2.2.orig/configure	2010-08-19 11:50:12.000000000 +0200
++++ nspluginwrapper-1.2.2/configure	2010-08-19 11:50:14.000000000 +0200
 @@ -35,7 +35,7 @@
  host_cpu=`uname -m`
  target_os="linux"
@@ -374,8 +416,8 @@ Index: nspluginwrapper-1.2.2/configure
  case "$host_cpu" in
 Index: nspluginwrapper-1.2.2/src/debug.h
 ===================================================================
---- nspluginwrapper-1.2.2.orig/src/debug.h	2010-08-19 08:39:22.000000000 +0200
-+++ nspluginwrapper-1.2.2/src/debug.h	2010-08-19 08:39:24.000000000 +0200
+--- nspluginwrapper-1.2.2.orig/src/debug.h	2010-08-19 11:50:12.000000000 +0200
++++ nspluginwrapper-1.2.2/src/debug.h	2010-08-19 11:50:14.000000000 +0200
 @@ -37,7 +37,7 @@
  
  #if DEBUG
