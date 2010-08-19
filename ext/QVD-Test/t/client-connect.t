@@ -25,6 +25,7 @@ ok(StartApp($client_executable),	"Starting client");
 my ($w) = WaitWindowViewable('^QVD$');
 ok($w,					"Client window appeared");
 
+SetInputFocus($w);
 SendKeys("jonix\tjoni\tlocalhost\n");
 
 ok(!WaitWindowHidden($w, 60),		"Client window disappeared");
