@@ -44,6 +44,10 @@ sleep 2;
 
 ok(IsWindowViewable($w),		"Client window appeared");
 
-kill 'TERM', GetPIDForWindow($w);
+SetInputFocus($w);
+SendKeys("noexiste\tnoexiste\tlocalhost\n");
+ok(WaitWindowViewable('Connection error'), "Invalid user/password");
+SendKeys("\n");
 
+kill 'TERM', GetPIDForWindow($w);
 ok(WaitWindowClose($w, 60),		"Waiting for client window to close");
