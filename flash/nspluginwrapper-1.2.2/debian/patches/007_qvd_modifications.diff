@@ -1,8 +1,8 @@
 Index: nspluginwrapper-1.2.2/src/rpc.c
 ===================================================================
---- nspluginwrapper-1.2.2.orig/src/rpc.c	2010-08-19 11:50:12.000000000 +0200
-+++ nspluginwrapper-1.2.2/src/rpc.c	2010-08-19 11:50:40.000000000 +0200
-@@ -42,6 +42,8 @@
+--- nspluginwrapper-1.2.2.orig/src/rpc.c	2010-08-23 12:47:57.000000000 +0200
++++ nspluginwrapper-1.2.2/src/rpc.c	2010-08-23 12:48:00.000000000 +0200
+@@ -42,14 +42,17 @@
  #include <sys/wait.h>
  #include <sys/select.h>
  #include <netinet/in.h>
@@ -11,7 +11,8 @@ Index: nspluginwrapper-1.2.2/src/rpc.c
  #include <pthread.h>
  #include <inttypes.h>
  #include <time.h>
-@@ -49,7 +51,7 @@
+ 
++#include "npw-use-tcp-sockets.h"
  #include "rpc.h"
  #include "utils.h"
  
@@ -20,7 +21,7 @@ Index: nspluginwrapper-1.2.2/src/rpc.c
  #include "debug.h"
  
  
-@@ -71,7 +73,7 @@
+@@ -71,7 +74,7 @@
  
  // Define the maximum amount of time (in seconds) to wait for plugin connection
  #ifndef RPC_INIT_TIMEOUT
@@ -29,19 +30,7 @@ Index: nspluginwrapper-1.2.2/src/rpc.c
  #endif
  
  // Set close-on-exec flag on the newly created socket (Linux >= 2.6.27)
-@@ -140,6 +142,11 @@
- #define USE_NANOSLEEP
- #endif
- 
-+static int rpc_port = NPW_RPC_TEST_PORT;
-+int return_rpc_port() {
-+  return rpc_port++;
-+}
-+
- static void rpc_delay(uint32_t usec)
- {
-   int was_error;
-@@ -622,7 +629,6 @@
+@@ -622,7 +625,6 @@
  
    char *path;
    int n, len;
@@ -49,7 +38,7 @@ Index: nspluginwrapper-1.2.2/src/rpc.c
  #if USE_ANONYMOUS_SOCKETS
    n = 0;
  #else
-@@ -660,16 +666,98 @@
+@@ -660,17 +662,125 @@
    if (*pathp)
  	free(*pathp);
    *pathp = path;
@@ -58,12 +47,22 @@ Index: nspluginwrapper-1.2.2/src/rpc.c
  }
  
 +// Return port number in int format from a string in format "ip:port"
-+uint16_t _rpc_get_port_from_ident(const char *ident) {
-+  uint16_t port_return;
-+
++int _rpc_get_port_from_ident(const char *ident) {
++  int port;
 +  #define MAX_HOSTPORT_LEN 128
-+  char host[MAX_HOSTPORT_LEN];
-+  char *colon_ptr, *port_ptr;
++  char host[MAX_HOSTPORT_LEN],format[32];
++  // Format string to parse chars
++  sprintf(format, " %%%d[^:]:%%d", MAX_HOSTPORT_LEN);
++
++  if (sscanf(ident, format, host, &port) != 2)
++    {
++      D(bug("_rpc_get_host_from_ident error parsing ident='%s' no port specified? port=%d\n", ident));
++      return -1;
++    }
++  set_tcp_sockets();
++  D(bug("_rpc_get_port_from_ident port returned for ident='%s' is %s [%d] and %d\n", ident, host, strlen(host), port));
++  return port;
++  /*  char *colon_ptr, *port_ptr;
 +  int ident_len, host_len, port_len, port;
 +
 +  ident_len = strlen(ident);
@@ -87,7 +86,7 @@ Index: nspluginwrapper-1.2.2/src/rpc.c
 +  }
 +  strncpy(host, ident, host_len);
 +  host[host_len] = 0;
-+  D(bug("_rpc_get_port_from_ident (Joni looking) after strncpy: %s [%d] %s [%d]\n", ident, strlen(ident), host, host_len)); /*Verify why host_len does not appear*/
++  D(bug("_rpc_get_port_from_ident (Joni looking) after strncpy: %s [%d] %s [%d]\n", ident, strlen(ident), host, host_len)); // Verify why host_len does not appear
 +  if (sscanf(port_ptr, "%d",&port) < 1) {
 +    D(bug("_rpc_get_port_from_ident error parsing port from  ident='%s' and port_ptr=%s\n", ident, port_ptr));
 +    return -1;
@@ -95,11 +94,31 @@ Index: nspluginwrapper-1.2.2/src/rpc.c
 +  port_return = port;
 +  D(bug("_rpc_get_port_from_ident port returned for ident='%s' is %s [%d] and %d\n", ident, host, strlen(host), (int)port_return));
 +  return port_return;
++*/
 +}
 +
 +int _rpc_get_host_from_ident(const char *ident, void *ptr) {
-+  char host[MAX_HOSTPORT_LEN];
-+  char *colon_ptr;
++  char host[MAX_HOSTPORT_LEN],format[32];
++  int port, server;
++  /*  char host[MAX_HOSTPORT_LEN],format[32]; */
++  // Format string to parse chars
++  sprintf(format, " %%%d[^:]:%%d", MAX_HOSTPORT_LEN);
++
++  if (sscanf(ident, format, host, &port) != 2)
++    {
++      D(bug("_rpc_get_host_from_ident error parsing ident='%s' no port specified?\n", ident));
++      return -1;
++    }
++  if ((server = inet_pton(AF_INET, host, ptr)) < 0) {
++    perror("error: Converting address");
++    return server;
++  }
++
++  D(bug("_rpc_get_host_from_ident Usint tcp_sockets host returned for ident = '%s' is %s, %d\n", ident, host, server));
++  set_tcp_sockets();
++  return server;
++
++  /*  char *colon_ptr;
 +  int ident_len, host_len, server;
 +
 +  ident_len = strlen(ident);
@@ -121,90 +140,111 @@ Index: nspluginwrapper-1.2.2/src/rpc.c
 +  }
 +  strncpy(host, ident, host_len);
 +  host[host_len] = 0;
-+  
++
 +  if ((server = inet_pton(AF_INET, host, ptr)) < 0) {
 +    perror("error: Converting address");
 +    return server;
 +  }
 +  D(bug("_rpc_get_host_from_ident host returned for ident = '%s' is %s, %d\n", ident, host, server));
 +  return server;
++  */
 +}
 +
  // Initialize server-side RPC system
  rpc_connection_t *rpc_init_server(const char *ident)
  {
+-  D(bug("rpc_init_server ident='%s'\n", ident));
+-
+-  rpc_connection_t *connection;
+-  struct sockaddr_un addr;
 +  int myport;
-+#if NPW_RPC_USE_TCPIP
 +  int setsockoptflag = 1;
-+#endif // NPW_RPC_USE_TCPIP
-   D(bug("rpc_init_server ident='%s'\n", ident));
- 
-   rpc_connection_t *connection;
-+#if NPW_RPC_USE_TCPIP
-+  struct sockaddr_in addr;
-+#else
-   struct sockaddr_un addr;
-+#endif // NPW_RPC_USE_TCPIP
++  struct sockaddr_in addr_inet;
++  struct sockaddr_un addr_unix;
++  struct sockaddr *addr;
    socklen_t addr_len;
++  rpc_connection_t *connection;
++  D(bug("rpc_init_server ident='%s'\n", ident));
  
    if (ident == NULL)
-@@ -699,11 +787,40 @@
+ 	return NULL;
+@@ -699,28 +809,61 @@
  	return NULL;
    }
  
-+
-+#if NPW_RPC_USE_TCPIP
-+  D(bug("QVD: creating tcp socket on client\n"));
-+  if ((connection->server_socket = socket(PF_INET, SOCK_STREAM, IPPROTO_TCP)) < 0) {
-+	perror("server socket");
-+	rpc_exit(connection);
-+	return NULL;
-+  }
-+
-+  if (setsockopt(connection->server_socket, IPPROTO_TCP, TCP_NODELAY, (char *)&setsockoptflag, sizeof(setsockoptflag)) < 0) {
-+	perror("Error setting TCP_NODELAY");
-+	rpc_exit(connection);
-+	return NULL;
-+  }
-+  memset(&addr, 0, sizeof(addr));
-+  addr.sin_family = AF_INET;
+-  if ((connection->server_socket = socket(AF_UNIX, SOCK_STREAM|SOCK_CLOEXEC, 0)) < 0) {
++  // If we are able to parse the port then use_tcp_sockets is true
 +  myport = _rpc_get_port_from_ident(ident);
-+  addr.sin_port = htons(_rpc_get_port_from_ident(ident));
-+  D(bug("QVD: sin_port is: %d, %d\n", myport, addr.sin_port));
 +
-+  addr.sin_addr.s_addr = INADDR_ANY;
-+  addr_len = _rpc_socket_path(&connection->socket_path, ident);
-+  addr_len = sizeof(addr);
-+  D(bug("QVD: created server tcp socket on client pid: %d, socket: %d\n", getpid(), connection->server_socket));
-+
-+#else
-+
-   if ((connection->server_socket = socket(AF_UNIX, SOCK_STREAM|SOCK_CLOEXEC, 0)) < 0) {
++  if (use_tcp_sockets())
++    {
++      D(bug("QVD: creating tcp socket on client\n"));
++      if ((connection->server_socket = socket(PF_INET, SOCK_STREAM, IPPROTO_TCP)) < 0) {
  	perror("server socket");
  	rpc_exit(connection);
  	return NULL;
-   }
-+  D(bug("QVD: Unix socket on client: %d\n", NPW_RPC_USE_TCPIP));
-+
+-  }
++      }
++      if (setsockopt(connection->server_socket, IPPROTO_TCP, TCP_NODELAY, (char *)&setsockoptflag, sizeof(setsockoptflag)) < 0)
++	{
++	  perror("Error setting TCP_NODELAY");
++	  rpc_exit(connection);
++	  return NULL;
++	}
++      memset(&addr_inet, 0, sizeof(addr));
++      addr_inet.sin_family = AF_INET;
++      addr_inet.sin_port = htons(myport);
++      D(bug("QVD: sin_port is: %d, %d\n", myport, addr_inet.sin_port));
++      addr_inet.sin_addr.s_addr = INADDR_ANY;
++      addr_len = _rpc_socket_path(&connection->socket_path, ident);
++      addr_len = sizeof(addr_inet);
++      addr=(struct sockaddr *)&addr_inet;
++      D(bug("QVD: created server tcp socket on client pid: %d, socket: %d\n", getpid(), connection->server_socket));
  
-   memset(&addr, 0, sizeof(addr));
-   addr.sun_family = AF_UNIX;
-@@ -715,12 +832,13 @@
-   addr.sun_len = addr_len;
+-  memset(&addr, 0, sizeof(addr));
+-  addr.sun_family = AF_UNIX;
+-  connection->socket_path = NULL;
+-  addr_len = _rpc_socket_path(&connection->socket_path, ident);
+-  memcpy(&addr.sun_path[0], connection->socket_path, addr_len);
+-  addr_len += offsetof(struct sockaddr_un, sun_path); /* though POSIX says size of the actual sockaddr structure */
++    } // use_tcp_sockets
++  else
++    { // unix sockets
++      if ((connection->server_socket = socket(AF_UNIX, SOCK_STREAM|SOCK_CLOEXEC, 0)) < 0) {
++	perror("server socket");
++	rpc_exit(connection);
++	return NULL;
++      }
++      D(bug("QVD: Unix socket on client: %d\n", use_tcp_sockets()));
++
++
++      memset(&addr_unix, 0, sizeof(addr_unix));
++      addr_unix.sun_family = AF_UNIX;
++      connection->socket_path = NULL;
++      addr_len = _rpc_socket_path(&connection->socket_path, ident);
++      memcpy(&addr_unix.sun_path[0], connection->socket_path, addr_len);
++      addr_len += offsetof(struct sockaddr_un, sun_path); /* though POSIX says size of the actual sockaddr structure */
++      addr=(struct sockaddr *)&addr_unix;
+ #ifdef HAVE_SOCKADDR_UN_SUN_LEN
+-  addr.sun_len = addr_len;
++  addr_unix.sun_len = addr_len;
  #endif
++    } //unix_sockets
  
-+#endif // NPW_RPC_USE_TCPIP
-+
-   if (bind(connection->server_socket, (struct sockaddr *)&addr, addr_len) < 0) {
- 	perror("server bind");
- 	rpc_exit(connection);
- 	return NULL;
+-  if (bind(connection->server_socket, (struct sockaddr *)&addr, addr_len) < 0) {
+-	perror("server bind");
+-	rpc_exit(connection);
+-	return NULL;
++  if (bind(connection->server_socket, addr, addr_len) < 0) {
++    perror("server bind");
++    rpc_exit(connection);
++    return NULL;
    }
 -
    if (listen(connection->server_socket, 1) < 0) {
  	perror("server listen");
  	rpc_exit(connection);
-@@ -731,13 +849,20 @@
+@@ -731,13 +874,19 @@
    return connection;
  }
  
@@ -214,61 +254,90 @@ Index: nspluginwrapper-1.2.2/src/rpc.c
  {
    D(bug("rpc_init_client ident='%s'\n", ident));
  
-   rpc_connection_t *connection;
-+#if NPW_RPC_USE_TCPIP
-+  struct sockaddr_in addr;
 +  int server;
++  int myport;
+   rpc_connection_t *connection;
+-  struct sockaddr_un addr;
++  struct sockaddr_in addr_inet;
++  struct sockaddr_un addr_unix;
++  struct sockaddr *addr;
 +  int setsockoptflag = 1;
-+#else
-   struct sockaddr_un addr;
-+#endif // NPW_RPC_USE_TCPIP
    socklen_t addr_len;
  
    if (ident == NULL)
-@@ -765,7 +890,37 @@
+@@ -765,38 +914,72 @@
  	rpc_exit(connection);
  	return NULL;
    }
-+#if NPW_RPC_USE_TCPIP
-+  if ((connection->socket = socket(PF_INET, SOCK_STREAM, IPPROTO_TCP)) < 0) {
+-
+-  if ((connection->socket = socket(AF_UNIX, SOCK_STREAM|SOCK_CLOEXEC, 0)) < 0) {
++  // Parses ident, and if it is of the form [^:]+:\d+, then we assume TCP
++  myport = _rpc_get_port_from_ident(ident);
++  if (use_tcp_sockets())
++    {
++      if ((connection->socket = socket(PF_INET, SOCK_STREAM, IPPROTO_TCP)) < 0) {
 +	perror("server socket");
 +	rpc_exit(connection);
 +	return NULL;
-+  }
-+  D(bug("QVD: created tcp socket on client\n"));
-+  if (rpc_set_non_blocking_io(connection->socket) < 0) {
++      }
++      D(bug("QVD: created tcp socket on client\n"));
++      if (rpc_set_non_blocking_io(connection->socket) < 0) {
 +	perror("client socket set non-blocking");
 +	rpc_exit(connection);
 +	return NULL;
-+  }
-+ 
-+  if (setsockopt(connection->socket, IPPROTO_TCP, TCP_NODELAY, (char *)&setsockoptflag, sizeof(setsockoptflag)) < 0) {
++      }
++      if (setsockopt(connection->socket, IPPROTO_TCP, TCP_NODELAY, (char *)&setsockoptflag, sizeof(setsockoptflag)) < 0) {
 +	perror("Error setting TCP_NODELAY");
 +	rpc_exit(connection);
 +	return NULL;
-+  }
-+  memset(&addr, 0, sizeof(addr));
-+  addr.sin_family = AF_INET;
-+  addr.sin_port = htons(_rpc_get_port_from_ident(ident));
-+  if ((server = _rpc_get_host_from_ident(ident, &addr.sin_addr)) <= 0) {
-+    //if ((server = inet_pton(AF_INET, "127.0.0.1", &addr.sin_addr)) <= 0) {
-+    perror("error: Converting address");
-+    rpc_exit(connection);
-+    return NULL;
-+  }
- 
-+  addr_len = _rpc_socket_path(&connection->socket_path, ident);
-+  addr_len = sizeof(struct sockaddr_in);
-+#else
-   if ((connection->socket = socket(AF_UNIX, SOCK_STREAM|SOCK_CLOEXEC, 0)) < 0) {
++      }
++      memset(&addr_inet, 0, sizeof(addr));
++      addr_inet.sin_family = AF_INET;
++      addr_inet.sin_port = htons(myport);
++      if ((server = _rpc_get_host_from_ident(ident, &addr_inet.sin_addr)) <= 0) {
++	perror("error: Converting address");
++	rpc_exit(connection);
++	return NULL;
++      }
++      addr_len = _rpc_socket_path(&connection->socket_path, ident);
++      addr_len = sizeof(struct sockaddr_in);
++      addr = (struct sockaddr *)&addr_inet;
++    } // use_tcp_sockets
++  else
++    { // !use_tcp_sockets: unix sockets
++      if ((connection->socket = socket(AF_UNIX, SOCK_STREAM|SOCK_CLOEXEC, 0)) < 0) {
  	perror("client socket");
  	rpc_exit(connection);
-@@ -788,15 +943,17 @@
+ 	return NULL;
+-  }
++      }
+ 
+-  if (rpc_set_non_blocking_io(connection->socket) < 0) {
++      if (rpc_set_non_blocking_io(connection->socket) < 0) {
+ 	perror("client socket set non-blocking");
+ 	rpc_exit(connection);
+ 	return NULL;
+-  }
++      }
+ 
+-  memset(&addr, 0, sizeof(addr));
+-  addr.sun_family = AF_UNIX;
+-  connection->socket_path = NULL;
+-  addr_len = _rpc_socket_path(&connection->socket_path, ident);
+-  memcpy(&addr.sun_path[0], connection->socket_path, addr_len);
+-  addr_len += offsetof(struct sockaddr_un, sun_path); /* though POSIX says size of the actual sockaddr structure */
++      memset(&addr_unix, 0, sizeof(addr_unix));
++      addr_unix.sun_family = AF_UNIX;
++      connection->socket_path = NULL;
++      addr_len = _rpc_socket_path(&connection->socket_path, ident);
++      memcpy(&addr_unix.sun_path[0], connection->socket_path, addr_len);
++      addr_len += offsetof(struct sockaddr_un, sun_path); /* though POSIX says size of the actual sockaddr structure */
++      addr=(struct sockaddr *)&addr_unix;
+ #ifdef HAVE_SOCKADDR_UN_SUN_LEN
    addr.sun_len = addr_len;
  #endif
- 
-+#endif // NPW_RPC_USE_TCPIP
-+
+-
++    } // end use_tcp_sockets
    // Wait at most RPC_INIT_TIMEOUT seconds for server to initialize
 -  const int N_CONNECT_WAIT_DELAY = 10;
 +  const int N_CONNECT_WAIT_DELAY = 30;
@@ -276,45 +345,71 @@ Index: nspluginwrapper-1.2.2/src/rpc.c
    if (n_connect_attempts == 0)
  	n_connect_attempts = 1;
    while (n_connect_attempts > 0) {
- 	if (connect(connection->socket, (struct sockaddr *)&addr, addr_len) == 0)
+-	if (connect(connection->socket, (struct sockaddr *)&addr, addr_len) == 0)
++	if (connect(connection->socket, addr, addr_len) == 0)
  	  break;
 -	if (n_connect_attempts > 1 && errno != ECONNREFUSED && errno != ENOENT) {
 +	if (n_connect_attempts > 1 && errno != ECONNREFUSED && errno != ENOENT && errno != EINPROGRESS) {
  	  perror("client_connect");
  	  rpc_exit(connection);
  	  return NULL;
-@@ -917,7 +1074,11 @@
+@@ -917,9 +1100,23 @@
    if (connection->type != RPC_CONNECTION_SERVER)
  	return RPC_ERROR_CONNECTION_TYPE_MISMATCH;
  
-+#if NPW_RPC_USE_TCPIP
-+  struct sockaddr_in addr;
-+#else
-   struct sockaddr_un addr;
-+#endif
-   socklen_t addr_len = sizeof(addr);
-   if ((connection->socket = accept(connection->server_socket, (struct sockaddr *)&addr, &addr_len)) < 0)
+-  struct sockaddr_un addr;
+-  socklen_t addr_len = sizeof(addr);
+-  if ((connection->socket = accept(connection->server_socket, (struct sockaddr *)&addr, &addr_len)) < 0)
++  struct sockaddr_in addr_inet;
++  struct sockaddr_un addr_unix;
++  struct sockaddr *addr;
++  socklen_t addr_len;
++
++  if (use_tcp_sockets())
++    {
++      addr_len = sizeof(addr_inet);
++      addr = (struct sockaddr *) &addr_inet;
++    }
++  else // !use_tcp_sockets: unix_socket
++    {
++      addr_len = sizeof(addr_unix);
++      addr = (struct sockaddr *) &addr_unix;
++    }
++
++  if ((connection->socket = accept(connection->server_socket, addr, &addr_len)) < 0)
  	return RPC_ERROR_ERRNO_SET;
-@@ -2534,9 +2695,13 @@
+ 
+   if (rpc_set_non_blocking_io(connection->socket) < 0)
+@@ -2534,9 +2731,14 @@
  
  int main(void)
  {
-+#if NPW_RPC_USE_TCPIP
-+  sprintf(g_npn_connection_path, "%s:%d", NPW_RPC_TEST_SERVER2, NPW_RPC_TEST_PORT2);
-+  sprintf(g_npp_connection_path, "%s:%d", NPW_RPC_TEST_SERVER2, NPW_RPC_TEST_PORT2);
-+#else
++  // Need to rewrite the connection path for testing
++  if (use_tcp_sockets())
++    {
++      fprintf(stderr, "TCP sockets testing still not implemented\n");
++      return(1);
++    }
    sprintf(g_npn_connection_path, "/org/wrapper/NSPlugin/NPN/%d", getpid());
    sprintf(g_npp_connection_path, "/org/wrapper/NSPlugin/NPP/%d", getpid());
 -
-+#endif // NPW_RPC_USE_TCPIP
    g_client_pid = fork();
    if (g_client_pid == 0) {
  	if (!run_client())
 Index: nspluginwrapper-1.2.2/src/npw-wrapper.c
 ===================================================================
---- nspluginwrapper-1.2.2.orig/src/npw-wrapper.c	2010-08-19 11:50:12.000000000 +0200
-+++ nspluginwrapper-1.2.2/src/npw-wrapper.c	2010-08-19 11:50:14.000000000 +0200
-@@ -3321,14 +3321,17 @@
+--- nspluginwrapper-1.2.2.orig/src/npw-wrapper.c	2010-08-23 12:47:56.000000000 +0200
++++ nspluginwrapper-1.2.2/src/npw-wrapper.c	2010-08-23 12:48:00.000000000 +0200
+@@ -42,6 +42,8 @@
+ #include <X11/Shell.h>
+ #include <X11/StringDefs.h>
+ 
++#include "npw-use-tcp-sockets.h"
++#include "npw-remote-agent-info.h"
+ #include "utils.h"
+ #include "npw-common.h"
+ #include "npw-malloc.h"
+@@ -3321,14 +3323,17 @@
  	return;
    g_plugin.initialized = -1;
  
@@ -333,7 +428,7 @@ Index: nspluginwrapper-1.2.2/src/npw-wrapper.c
  	g_plugin.initialized = 1;
  	return;
    }
-@@ -3342,16 +3345,29 @@
+@@ -3342,16 +3347,33 @@
  		break;
  	  }
  	}
@@ -351,20 +446,25 @@ Index: nspluginwrapper-1.2.2/src/npw-wrapper.c
    char viewer_path[PATH_MAX];
    sprintf(viewer_path, "%s/%s/%s/%s", NPW_LIBDIR, NPW_Plugin.target_arch, NPW_Plugin.target_os, NPW_VIEWER);
    char connection_path[128];
+-  sprintf(connection_path, "%s/%s/%d-%d", NPW_CONNECTION_PATH, plugin_file_name, getpid(), init_count);
 +  D(bug("QVD plugin_init before setting connection_path \n"));
 +
-+#if NPW_RPC_USE_TCPIP
-+  // Use TCP sockets
-+  sprintf(connection_path, "%s:%d", NPW_RPC_TEST_SERVER, return_rpc_port());
-+  D(bug("QVD: plugin_init with test_server and test_port++ %s\n", connection_path));
-+#else
-   sprintf(connection_path, "%s/%s/%d-%d", NPW_CONNECTION_PATH, plugin_file_name, getpid(), init_count);
-+  D(bug("QVD: plugin_init without test_server and test_port %s\n", connection_path));
-+#endif // NPW_RPC_USE_TCPIP
++  verify_if_using_tcp_sockets();
++
++  if (use_tcp_sockets()) {
++      // Use TCP sockets
++      set_remote_connection_path(connection_path);
++      D(bug("QVD: plugin_init with test_server and test_port++ %s\n", connection_path));
++  } // End using tcp sockets
++  else
++    { // Using unix sockets
++      sprintf(connection_path, "%s/%s/%d-%d", NPW_CONNECTION_PATH, plugin_file_name, getpid(), init_count);
++      D(bug("QVD: plugin_init without test_server and test_port %s\n", connection_path));
++    }
  
    // Cache MIME info and plugin name/description
    if (g_plugin.name == NULL && g_plugin.description == NULL && g_plugin.formats == NULL) {
-@@ -3403,10 +3419,12 @@
+@@ -3403,10 +3425,12 @@
  	return;
  
    // Start plug-in viewer
@@ -377,7 +477,7 @@ Index: nspluginwrapper-1.2.2/src/npw-wrapper.c
  	argv[argc++] = NPW_VIEWER;
  	argv[argc++] = "--plugin";
  	argv[argc++] = (char *)plugin_path;
-@@ -3421,6 +3439,7 @@
+@@ -3421,6 +3445,7 @@
  	_Exit(255);
    }
  
@@ -385,39 +485,10 @@ Index: nspluginwrapper-1.2.2/src/npw-wrapper.c
    // Initialize browser-side RPC communication channel
    if ((g_rpc_connection = rpc_init_client(connection_path)) == NULL) {
  	npw_printf("ERROR: failed to initialize plugin-side RPC client connection\n");
-Index: nspluginwrapper-1.2.2/src/rpc.h
-===================================================================
---- nspluginwrapper-1.2.2.orig/src/rpc.h	2010-08-19 11:50:12.000000000 +0200
-+++ nspluginwrapper-1.2.2/src/rpc.h	2010-08-19 11:50:14.000000000 +0200
-@@ -130,4 +130,11 @@
- // Set error callback for a connection
- void rpc_connection_set_error_callback(rpc_connection_t *connection, rpc_error_callback_t callback, void *callback_data);
- 
-+// Use TCP/IP communication
-+#define NPW_RPC_USE_TCPIP 1
-+#define NPW_RPC_TEST_PORT 2111
-+#define NPW_RPC_TEST_PORT2 3111
-+#define NPW_RPC_TEST_SERVER "127.0.0.1"
-+#define NPW_RPC_TEST_SERVER2 "127.0.0.1"
-+extern int return_rpc_port();
- #endif /* RPC_H */
-Index: nspluginwrapper-1.2.2/configure
-===================================================================
---- nspluginwrapper-1.2.2.orig/configure	2010-08-19 11:50:12.000000000 +0200
-+++ nspluginwrapper-1.2.2/configure	2010-08-19 11:50:14.000000000 +0200
-@@ -35,7 +35,7 @@
- host_cpu=`uname -m`
- target_os="linux"
- target_cpu="i386"
--rpc_init_timeout=5
-+rpc_init_timeout=30
- malloc_hooks="glib,libc"
- use_pid_check="no"
- case "$host_cpu" in
 Index: nspluginwrapper-1.2.2/src/debug.h
 ===================================================================
---- nspluginwrapper-1.2.2.orig/src/debug.h	2010-08-19 11:50:12.000000000 +0200
-+++ nspluginwrapper-1.2.2/src/debug.h	2010-08-19 11:50:14.000000000 +0200
+--- nspluginwrapper-1.2.2.orig/src/debug.h	2010-08-23 12:47:57.000000000 +0200
++++ nspluginwrapper-1.2.2/src/debug.h	2010-08-23 12:48:00.000000000 +0200
 @@ -37,7 +37,7 @@
  
  #if DEBUG
@@ -427,3 +498,452 @@ Index: nspluginwrapper-1.2.2/src/debug.h
  #  define bug(format, ...) \
       npw_dprintf("[%-20s:%4d] " format, __FILE__, __LINE__, ##__VA_ARGS__)
  #  define bugiI(format, ...) \
+Index: nspluginwrapper-1.2.2/Makefile
+===================================================================
+--- nspluginwrapper-1.2.2.orig/Makefile	2010-08-23 12:48:00.000000000 +0200
++++ nspluginwrapper-1.2.2/Makefile	2010-08-23 12:48:00.000000000 +0200
+@@ -106,14 +106,18 @@
+ 
+ npwrapper_LIBRARY = npwrapper.so
+ npwrapper_RAWSRCS = npw-wrapper.c npw-common.c npw-malloc.c npw-rpc.c rpc.c debug.c utils.c npruntime.c
++npwrapper_RAWSRCS += npw-remote-agent-info.c npw-use-tcp-sockets.c
+ npwrapper_SOURCES = $(npwrapper_RAWSRCS:%.c=$(SRC_PATH)/src/%.c)
+ npwrapper_OBJECTS = $(npwrapper_RAWSRCS:%.c=npwrapper-%.os)
+ npwrapper_CFLAGS  = $(CFLAGS) $(X_CFLAGS) $(MOZILLA_CFLAGS) $(GLIB_CFLAGS)
++npwrapper_CFLAGS  +=  $(CURL_CFLAGS)
+ npwrapper_LDFLAGS = $(X_LDFLAGS) $(libpthread_LDFLAGS) $(libsocket_LDFLAGS)
+ npwrapper_LDFLAGS += $(GLIB_LDFLAGS)
++npwrapper_LDFLAGS += $(CURL_LDFLAGS)
+ 
+ npviewer_PROGRAM = npviewer.bin
+ npviewer_RAWSRCS = npw-viewer.c npw-common.c npw-malloc.c npw-rpc.c rpc.c debug.c utils.c npruntime.c
++npviewer_RAWSRCS += npw-use-tcp-sockets.c
+ npviewer_SOURCES = $(npviewer_RAWSRCS:%.c=$(SRC_PATH)/src/%.c)
+ npviewer_OBJECTS = $(npviewer_RAWSRCS:%.c=npviewer-%.o)
+ ifeq ($(biarch),yes)
+@@ -151,6 +155,7 @@
+ 
+ npplayer_PROGRAM  = npplayer
+ npplayer_SOURCES  = npw-player.c debug.c rpc.c utils.c glibcurl.c gtk2xtbin.c $(tidy_SOURCES)
++npplayer_SOURCES += npw-use-tcp-sockets.c
+ npplayer_OBJECTS  = $(npplayer_SOURCES:%.c=npplayer-%.o)
+ npplayer_CFLAGS   = $(GTK_CFLAGS) $(MOZILLA_CFLAGS) $(CURL_CFLAGS) $(X_CFLAGS)
+ npplayer_LDFLAGS  = $(GTK_LDFLAGS) $(CURL_LDFLAGS) $(X_LDFLAGS)
+@@ -201,7 +206,7 @@
+ nploader_RAWSRCS = npw-viewer.sh
+ nploader_SOURCES = $(nploader_RAWSRCS:%.sh=$(SRC_PATH)/src/%.sh)
+ 
+-test_rpc_RAWSRCS		 = test-rpc-common.c debug.c rpc.c
++test_rpc_RAWSRCS		 = test-rpc-common.c debug.c rpc.c npw-use-tcp-sockets.c
+ test_rpc_client_OBJECTS	 = $(test_rpc_RAWSRCS:%.c=%-client.o)
+ test_rpc_server_OBJECTS	 = $(test_rpc_RAWSRCS:%.c=%-server.o)
+ test_rpc_client_CPPFLAGS = $(CPPFLAGS) -I$(SRC_PATH)/src -DBUILD_CLIENT -DNPW_COMPONENT_NAME="\"Client\""
+Index: nspluginwrapper-1.2.2/src/npw-remote-agent-info.c
+===================================================================
+--- /dev/null	1970-01-01 00:00:00.000000000 +0000
++++ nspluginwrapper-1.2.2/src/npw-remote-agent-info.c	2010-08-23 12:52:41.000000000 +0200
+@@ -0,0 +1,266 @@
++/*
++ * npw-remote-agent-info.c
++ *
++ * We need to use libcurl to fetch a URL for the plugin, because
++ * the initialization of the RPC channel is before the plugin is initialized
++ * and we don't have the NPP instance for NPP_GetURL (or similar funcs)
++ *
++ * Description:
++ *
++ * If NPW_USE_TCPIP is defined then we use TCP sockets instead of UNIX sockets
++ *
++ * If NPW_REMOTE_AGENT_URI is defined
++ *
++ *
++ * Note: Problem in compiling npw-remote-agent-info as 64bits... in 32bit
++ *
++ * 21/8/2010 - Nito@Qindel.ES
++ *
++ *  This program is free software; you can redistribute it and/or modify
++ *  it under the terms of the GNU General Public License as published by
++ *  the Free Software Foundation; either version 2 of the License, or
++ *  (at your option) any later version.
++ *
++ *  This program is distributed in the hope that it will be useful,
++ *  but WITHOUT ANY WARRANTY; without even the implied warranty of
++ *  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
++ *  GNU General Public License for more details.
++ *
++ *  You should have received a copy of the GNU General Public License along
++ *  with this program; if not, write to the Free Software Foundation, Inc.,
++ *  51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA.
++ */
++#include "sysdeps.h"
++
++#include <stdio.h>
++#include <stdlib.h>
++#include <string.h>
++#include <curl/curl.h>
++#include <curl/types.h>
++#include <curl/easy.h>
++#include "npw-use-tcp-sockets.h"
++#include "npw-remote-agent-info.h"
++
++#define DEBUG 1
++#include "debug.h"
++
++//#define MYURL "http://localhost/port"
++#define USERAGENT "QVDnswrapper/1.0"
++#define MAXKEYS 128
++#define MAX_KEY_SIZE 10
++#define MAX_VALUE_SIZE 10
++struct MemoryStruct {
++  char *memory;
++  size_t size;
++};
++
++
++static int rpc_port = 0;
++const char *npw_agent_uri = NULL;
++
++
++
++/******************************************************************************
++ * This is a replacement for strsep which is not portable (missing on
++ Solaris).
++ */
++ static char* getToken(char** str, const char* delims)
++ {
++     char* token;
++
++     if (*str==NULL) {
++         /* No more tokens */
++         return NULL;
++     }
++
++     token=*str;
++     while (**str!='\0') {
++         if (strchr(delims,**str)!=NULL) {
++             **str='\0';
++             (*str)++;
++             return token;
++         }
++         (*str)++;
++     }
++     /* There is no other token */
++     *str=NULL;
++     return token;
++ }
++
++
++static void *myrealloc(void *ptr, size_t size)
++{
++  /* There might be a realloc() out there that doesn't like reallocing
++     NULL pointers, so we take care of it here */
++  if(ptr)
++    return realloc(ptr, size);
++  else
++    return malloc(size);
++}
++
++
++static size_t
++WriteMemoryCallback(void *ptr, size_t size, size_t nmemb, void *data)
++{
++  size_t realsize = size * nmemb;
++  struct MemoryStruct *mem = (struct MemoryStruct *)data;
++
++  mem->memory = myrealloc(mem->memory, mem->size + realsize + 1);
++  if (mem->memory) {
++    memcpy(&(mem->memory[mem->size]), ptr, realsize);
++    mem->size += realsize;
++    mem->memory[mem->size] = 0;
++  }
++  return realsize;
++}
++
++void init_array(char **array) {
++  memset(array, 0, MAXKEYS * sizeof(char *));
++}
++
++void free_array(char **array) {
++  int i;
++  char **ptr;
++  ptr=array;
++  for (i = 0; i < MAXKEYS; ++i) {
++    if (*ptr) {
++      free(*ptr);
++      *ptr=NULL;
++    }
++    ++ ptr;
++  }
++}
++
++void assign(char **ptr, const char *value) {
++  int len;
++  len = strlen(value);
++  *ptr = malloc(len + 1);
++  strncpy(*ptr, value, len);
++}
++
++//Duplicate entries ocupy space, but only the first is used
++int parse_page(struct MemoryStruct *chunk, char **keys, char **values) {
++  char *line, *copy, **copy_ptr, *copy_free_ptr, format[32],
++    key[MAX_KEY_SIZE + 1], value[MAX_VALUE_SIZE + 1];
++  int parsed_elements, keys_parsed;
++
++  // Format string to parse chars
++  sprintf(format, " %%%d[^= ] = %%%d[^#] ", MAX_KEY_SIZE, MAX_VALUE_SIZE);
++
++  // Set end of string for long keys and values
++  key[MAX_KEY_SIZE] = 0;
++  value[MAX_VALUE_SIZE] = 0 ;
++
++  // Copy the buffer to be parsed
++  copy_free_ptr = copy = malloc(chunk->size);
++  memcpy(copy, chunk->memory, chunk->size);
++  copy_ptr = &copy;
++
++
++  // Parse line by line
++  line = getToken(copy_ptr, "\n");
++  for (keys_parsed=0; *copy_ptr != NULL; line = getToken(copy_ptr, "\n")) {
++    printf("Parsing line <%s>\n", line);
++    if (line == NULL)       // Should never happen
++      break;
++
++    if (keys_parsed >= MAXKEYS) {
++      printf("Too many keys in the file. Skipping the rest\n");
++      break;
++    }
++
++    if (strlen(line) == 0) {
++      printf ("Skipped blank line\n");
++      continue;
++    }
++
++    if (line[0] == '#') {
++      printf ("Skipped comment\n");
++      continue;
++    }
++    if ((parsed_elements = sscanf(line, format, key, value)) < 2) {
++      printf ("line <%s> not recognized key=%s, value=%s, int=%d\n", line, key, value, parsed_elements);
++      continue;
++    }
++    printf("key=<%s>, value=<%s>\n", key, value);
++    assign(keys, key);
++    keys ++;
++    assign(values, value);
++    values ++;
++    keys_parsed ++;
++  }
++  free(copy_free_ptr);
++  return 0;
++}
++
++// Not defined and empty is the same
++const char * getvalue(char **keys, char**values, const char *key) {
++  int i;
++  for(i=0; i < MAXKEYS; i++) {
++    if ((*keys == NULL) || (*values == NULL)) {
++      break;
++    }
++    if (!strcmp(key, *keys)){
++      return *values;
++    }
++    keys ++;
++    values ++;
++  }
++  return "";
++}
++
++
++int fetch_remote_agent_url(const char *myurl, struct MemoryStruct *chunk) {
++  CURL *handle;
++  CURLcode res;
++  char error_buffer[CURL_ERROR_SIZE];
++
++
++  if (curl_global_init(CURL_GLOBAL_ALL)) {
++    fprintf(stderr, "Error intializing curl for url %s", myurl);
++    return -1;
++  }
++
++  handle = curl_easy_init();
++  curl_easy_setopt(handle, CURLOPT_URL, myurl);
++  curl_easy_setopt(handle, CURLOPT_WRITEFUNCTION, WriteMemoryCallback);
++  curl_easy_setopt(handle, CURLOPT_WRITEDATA, (void *)chunk);
++  curl_easy_setopt(handle, CURLOPT_USERAGENT, USERAGENT);
++  curl_easy_setopt(handle, CURLOPT_ERRORBUFFER, error_buffer);
++  res = curl_easy_perform(handle);
++  if (res) {
++    fprintf(stderr, "Error getting URL %s: %s", myurl, error_buffer);
++  }
++  curl_easy_cleanup(handle);
++  curl_global_cleanup();
++  return res;
++}
++
++
++
++int return_rpc_port() {
++  return rpc_port++;
++}
++
++int verify_if_using_tcp_sockets() {
++  //  int use_tcp = 0;
++  // If NPW_USE_TCPIP_PORT or NPW_REMOTE_AGENT_ENV is defined then use tcp_sockets
++  const char *npw_agent_uri = getenv(NPW_USE_TCPIP_PORT);
++  if (npw_agent_uri)
++    rpc_port = atoi(npw_agent_uri);
++  if (rpc_port < 1024 || rpc_port > 65535) {
++    D(bug("%s defined: %s. But the socket is < 1024 or > 65535. Not using TCP sockets\n", NPW_USE_TCPIP_PORT, npw_agent_uri));
++  }
++  set_tcp_sockets();
++  D(bug("%s defined: %s. Using tcp sockets\n", NPW_USE_TCPIP_PORT, npw_agent_uri));
++  npw_agent_uri = getenv(NPW_REMOTE_AGENT_ENV);
++  if (npw_agent_uri) {
++    set_tcp_sockets();
++    D(bug("%s defined: %s. Using tcp sockets\n", NPW_REMOTE_AGENT_ENV, npw_agent_uri));
++  }
++}
++
++void set_remote_connection_path(char *connection_path) {
++  // getenv...
++  sprintf(connection_path, "%s:%d", NPW_RPC_TEST_SERVER, return_rpc_port());
++}
+Index: nspluginwrapper-1.2.2/src/npw-remote-agent-info.h
+===================================================================
+--- /dev/null	1970-01-01 00:00:00.000000000 +0000
++++ nspluginwrapper-1.2.2/src/npw-remote-agent-info.h	2010-08-23 12:48:00.000000000 +0200
+@@ -0,0 +1,46 @@
++/*
++ * npw-agent-info.h
++ *
++ * 21/8/2010 - Nito@Qindel.ES
++ *
++ *  This program is free software; you can redistribute it and/or modify
++ *  it under the terms of the GNU General Public License as published by
++ *  the Free Software Foundation; either version 2 of the License, or
++ *  (at your option) any later version.
++ *
++ *  This program is distributed in the hope that it will be useful,
++ *  but WITHOUT ANY WARRANTY; without even the implied warranty of
++ *  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
++ *  GNU General Public License for more details.
++ *
++ *  You should have received a copy of the GNU General Public License along
++ *  with this program; if not, write to the Free Software Foundation, Inc.,
++ *  51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA.
++ */
++#ifndef NPW_AGENT_INFO_H
++#define NPW_AGENT_INFO_H
++
++#ifdef __cplusplus
++extern "C" {
++#endif
++
++// Use TCP/IP communication
++//#define NPW_RPC_USE_TCPIP 1
++//#define NPW_RPC_TEST_PORT 2111
++//#define NPW_RPC_TEST_PORT2 3111
++#define NPW_RPC_TEST_SERVER "127.0.0.1"
++//#define NPW_RPC_TEST_SERVER2 "127.0.0.1"
++#define MAX_CONNECTION_PATH 128
++  // define This environment var to 1 to use remote agent
++#define NPW_REMOTE_AGENT_ENV "NPW_REMOTE_AGENT_URI"
++  // define This environment var to 1 to use TCP sockets
++#define NPW_USE_TCPIP_PORT "NPW_USE_TCPIP_PORT"
++
++extern void set_remote_connection_path(char *connection_path);
++extern int verify_if_using_tcp_sockets();
++
++#ifdef __cplusplus
++}
++#endif
++
++#endif
+Index: nspluginwrapper-1.2.2/src/npw-use-tcp-sockets.c
+===================================================================
+--- /dev/null	1970-01-01 00:00:00.000000000 +0000
++++ nspluginwrapper-1.2.2/src/npw-use-tcp-sockets.c	2010-08-23 12:48:00.000000000 +0200
+@@ -0,0 +1,42 @@
++/*
++ * npw-use-tcp-sockets.c
++ *
++ *
++ * Note: Problem in compiling npw-remote-agent-info as 64bits... in 32bit
++ *
++ * 21/8/2010 - Nito@Qindel.ES
++ *
++ *  This program is free software; you can redistribute it and/or modify
++ *  it under the terms of the GNU General Public License as published by
++ *  the Free Software Foundation; either version 2 of the License, or
++ *  (at your option) any later version.
++ *
++ *  This program is distributed in the hope that it will be useful,
++ *  but WITHOUT ANY WARRANTY; without even the implied warranty of
++ *  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
++ *  GNU General Public License for more details.
++ *
++ *  You should have received a copy of the GNU General Public License along
++ *  with this program; if not, write to the Free Software Foundation, Inc.,
++ *  51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA.
++ */
++#include "sysdeps.h"
++
++#define DEBUG 1
++#include "debug.h"
++
++static int use_tcp_sockets_flag = 0;
++
++int use_tcp_sockets() {
++  return use_tcp_sockets_flag;
++}
++
++int set_tcp_sockets() {
++  use_tcp_sockets_flag = 1;
++  return use_tcp_sockets_flag;
++}
++
++int unset_tcp_sockets() {
++  use_tcp_sockets_flag = 0;
++  return use_tcp_sockets_flag;
++}
+Index: nspluginwrapper-1.2.2/src/npw-use-tcp-sockets.h
+===================================================================
+--- /dev/null	1970-01-01 00:00:00.000000000 +0000
++++ nspluginwrapper-1.2.2/src/npw-use-tcp-sockets.h	2010-08-23 12:48:00.000000000 +0200
+@@ -0,0 +1,35 @@
++/*
++ * use-tcp-sockets.h
++ *
++ * 23/8/2010 - Nito@Qindel.ES
++ *
++ *  This program is free software; you can redistribute it and/or modify
++ *  it under the terms of the GNU General Public License as published by
++ *  the Free Software Foundation; either version 2 of the License, or
++ *  (at your option) any later version.
++ *
++ *  This program is distributed in the hope that it will be useful,
++ *  but WITHOUT ANY WARRANTY; without even the implied warranty of
++ *  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
++ *  GNU General Public License for more details.
++ *
++ *  You should have received a copy of the GNU General Public License along
++ *  with this program; if not, write to the Free Software Foundation, Inc.,
++ *  51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA.
++ */
++#ifndef NPW_USE_TCP_SOCKETS_H
++#define NPW_USE_TCP_SOCKETS_H
++
++#ifdef __cplusplus
++extern "C" {
++#endif
++
++extern int use_tcp_sockets();
++extern int set_tcp_sockets();
++extern int unset_tcp_sockets();
++
++#ifdef __cplusplus
++}
++#endif
++
++#endif

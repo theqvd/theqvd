@@ -37,7 +37,7 @@ extern void npw_vprintf(const char *format, va_list args) attribute_hidden;
 
 #if DEBUG
 /* Very verbose mode that uses the ##__VA_ARGS__ GCC extension */
-# if 0 && (defined(__GNUC__) && (__GNUC__ >= 3 || (__GNUC__ == 2 && __GNUC_MINOR__ == 96)))
+# if (defined(__GNUC__) && (__GNUC__ >= 3 || (__GNUC__ == 2 && __GNUC_MINOR__ == 96)))
 #  define bug(format, ...) \
      npw_dprintf("[%-20s:%4d] " format, __FILE__, __LINE__, ##__VA_ARGS__)
 #  define bugiI(format, ...) \
