@@ -42,8 +42,6 @@
 #include <X11/Shell.h>
 #include <X11/StringDefs.h>
 
-#include "npw-use-tcp-sockets.h"
-#include "npw-remote-agent-info.h"
 #include "utils.h"
 #include "npw-common.h"
 #include "npw-malloc.h"
@@ -3323,17 +3321,14 @@ static void plugin_init(int is_NP_Initialize)
 	return;
   g_plugin.initialized = -1;
 
-  D(bug("QVD plugin_init for %s\n", plugin_path));
-  D(bug("QVD after plugin_init for %s\n", plugin_path));
+  D(bug("plugin_init for %s\n", plugin_path));
   if (strcmp(plugin_path, NPW_DEFAULT_PLUGIN_PATH) == 0) {
 	g_plugin.is_wrapper = 1;
 	g_plugin.initialized = 1 + is_NP_Initialize;
 	return;
   }
-  D(bug("QVD after plugin_init check for default plugin_path\n", plugin_path));
 
   if (PLUGIN_DIRECT_EXEC){
-    D(bug("plugin_init is direct_exec\n"));
 	g_plugin.initialized = 1;
 	return;
   }
@@ -3347,33 +3342,16 @@ static void plugin_init(int is_NP_Initialize)
 		break;
 	  }
 	}
-	D(bug("plugin_init \n"));
-	if (plugin_file_name == NULL) {
-	  D(bug("plugin_init plugin_file_name is NULL \n"));
+	if (plugin_file_name == NULL)
 	  return;
-	}
   }
 
-  D(bug("QVD plugin_init before setting viewer_path \n"));
   static int init_count = 0;
   ++init_count;
   char viewer_path[PATH_MAX];
   sprintf(viewer_path, "%s/%s/%s/%s", NPW_LIBDIR, NPW_Plugin.target_arch, NPW_Plugin.target_os, NPW_VIEWER);
   char connection_path[128];
-  D(bug("QVD plugin_init before setting connection_path \n"));
-
-  verify_if_using_tcp_sockets();
-
-  if (use_tcp_sockets()) {
-      // Use TCP sockets
-      set_remote_connection_path(connection_path);
-      D(bug("QVD: plugin_init with test_server and test_port++ %s\n", connection_path));
-  } // End using tcp sockets
-  else
-    { // Using unix sockets
-      sprintf(connection_path, "%s/%s/%d-%d", NPW_CONNECTION_PATH, plugin_file_name, getpid(), init_count);
-      D(bug("QVD: plugin_init without test_server and test_port %s\n", connection_path));
-    }
+  sprintf(connection_path, "%s/%s/%d-%d", NPW_CONNECTION_PATH, plugin_file_name, getpid(), init_count);
 
   // Cache MIME info and plugin name/description
   if (g_plugin.name == NULL && g_plugin.description == NULL && g_plugin.formats == NULL) {
@@ -3425,12 +3403,10 @@ static void plugin_init(int is_NP_Initialize)
 	return;
 
   // Start plug-in viewer
-  npw_printf("QVD: Before npw-wrapper fork\n");
   if ((g_plugin.viewer_pid = fork()) == 0) {
 	char *argv[8];
 	int argc = 0;
 
-	npw_printf("QVD: Inside npw-wrapper fork with connection %s\n", connection_path);
 	argv[argc++] = NPW_VIEWER;
 	argv[argc++] = "--plugin";
 	argv[argc++] = (char *)plugin_path;
@@ -3445,7 +3421,6 @@ static void plugin_init(int is_NP_Initialize)
 	_Exit(255);
   }
 
-  npw_printf("QVD: After npw-wrapper fork\n");
   // Initialize browser-side RPC communication channel
   if ((g_rpc_connection = rpc_init_client(connection_path)) == NULL) {
 	npw_printf("ERROR: failed to initialize plugin-side RPC client connection\n");

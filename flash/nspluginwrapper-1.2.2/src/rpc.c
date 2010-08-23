@@ -42,17 +42,14 @@
 #include <sys/wait.h>
 #include <sys/select.h>
 #include <netinet/in.h>
-#include <netinet/tcp.h>
-#include <arpa/inet.h>
 #include <pthread.h>
 #include <inttypes.h>
 #include <time.h>
 
-#include "npw-use-tcp-sockets.h"
 #include "rpc.h"
 #include "utils.h"
 
-#define DEBUG 1
+#define DEBUG 0
 #include "debug.h"
 
 
@@ -74,7 +71,7 @@
 
 // Define the maximum amount of time (in seconds) to wait for plugin connection
 #ifndef RPC_INIT_TIMEOUT
-#define RPC_INIT_TIMEOUT 30
+#define RPC_INIT_TIMEOUT 5
 #endif
 
 // Set close-on-exec flag on the newly created socket (Linux >= 2.6.27)
@@ -625,6 +622,7 @@ static int _rpc_socket_path(char **pathp, const char *ident)
 
   char *path;
   int n, len;
+
 #if USE_ANONYMOUS_SOCKETS
   n = 0;
 #else
@@ -662,125 +660,17 @@ static int _rpc_socket_path(char **pathp, const char *ident)
   if (*pathp)
 	free(*pathp);
   *pathp = path;
-
   return n;
-}
-
-// Return port number in int format from a string in format "ip:port"
-int _rpc_get_port_from_ident(const char *ident) {
-  int port;
-  #define MAX_HOSTPORT_LEN 128
-  char host[MAX_HOSTPORT_LEN],format[32];
-  // Format string to parse chars
-  sprintf(format, " %%%d[^:]:%%d", MAX_HOSTPORT_LEN);
-
-  if (sscanf(ident, format, host, &port) != 2)
-    {
-      D(bug("_rpc_get_host_from_ident error parsing ident='%s' no port specified? port=%d\n", ident));
-      return -1;
-    }
-  set_tcp_sockets();
-  D(bug("_rpc_get_port_from_ident port returned for ident='%s' is %s [%d] and %d\n", ident, host, strlen(host), port));
-  return port;
-  /*  char *colon_ptr, *port_ptr;
-  int ident_len, host_len, port_len, port;
-
-  ident_len = strlen(ident);
-
-  colon_ptr = strchr(ident, ':');
-  if (colon_ptr == NULL) {
-    D(bug("_rpc_get_port_from_ident error parsing ident='%s'\n", ident));
-    return -1;
-  }
-  port_ptr = colon_ptr + 1;
-  host_len = colon_ptr - ident;
-  port_len = ident_len - host_len - 1;
-  if (port_len <= 0) {
-    D(bug("_rpc_get_host_from_ident error parsing ident='%s' no port specified? port_len=%d\n", ident, port_len));
-    return -1;
-  }
-
-  if ((host_len + 1) > MAX_HOSTPORT_LEN) {
-    D(bug("_rpc_get_port_from_ident error host part too long ident='%s' longer than\n", ident));
-    return -1;
-  }
-  strncpy(host, ident, host_len);
-  host[host_len] = 0;
-  D(bug("_rpc_get_port_from_ident (Joni looking) after strncpy: %s [%d] %s [%d]\n", ident, strlen(ident), host, host_len)); // Verify why host_len does not appear
-  if (sscanf(port_ptr, "%d",&port) < 1) {
-    D(bug("_rpc_get_port_from_ident error parsing port from  ident='%s' and port_ptr=%s\n", ident, port_ptr));
-    return -1;
-  }
-  port_return = port;
-  D(bug("_rpc_get_port_from_ident port returned for ident='%s' is %s [%d] and %d\n", ident, host, strlen(host), (int)port_return));
-  return port_return;
-*/
-}
-
-int _rpc_get_host_from_ident(const char *ident, void *ptr) {
-  char host[MAX_HOSTPORT_LEN],format[32];
-  int port, server;
-  /*  char host[MAX_HOSTPORT_LEN],format[32]; */
-  // Format string to parse chars
-  sprintf(format, " %%%d[^:]:%%d", MAX_HOSTPORT_LEN);
-
-  if (sscanf(ident, format, host, &port) != 2)
-    {
-      D(bug("_rpc_get_host_from_ident error parsing ident='%s' no port specified?\n", ident));
-      return -1;
-    }
-  if ((server = inet_pton(AF_INET, host, ptr)) < 0) {
-    perror("error: Converting address");
-    return server;
-  }
-
-  D(bug("_rpc_get_host_from_ident Usint tcp_sockets host returned for ident = '%s' is %s, %d\n", ident, host, server));
-  set_tcp_sockets();
-  return server;
-
-  /*  char *colon_ptr;
-  int ident_len, host_len, server;
-
-  ident_len = strlen(ident);
-  colon_ptr = strchr(ident, ':');
-  if (colon_ptr == NULL) {
-    D(bug("_rpc_get_host_from_ident error parsing ident='%s'\n", ident));
-    return -1;
-  }
-  //  port_ptr = colon_ptr + 1;
-  host_len = colon_ptr - ident;
-  //port_len = ident_len - host_len - 1;
-  //if (port_len <= 0) {
-  //  D(bug("_rpc_get_host_from_ident error parsing ident='%s' no port specified? port_len=%d\n", ident, port_len));
-  //  return -1;
-  //}
-  if ((host_len + 1) > MAX_HOSTPORT_LEN) {
-    D(bug("_rpc_get_host_from_ident error host part too long ident='%s' longer than\n", ident));
-    return -1;
-  }
-  strncpy(host, ident, host_len);
-  host[host_len] = 0;
-
-  if ((server = inet_pton(AF_INET, host, ptr)) < 0) {
-    perror("error: Converting address");
-    return server;
-  }
-  D(bug("_rpc_get_host_from_ident host returned for ident = '%s' is %s, %d\n", ident, host, server));
-  return server;
-  */
 }
 
 // Initialize server-side RPC system
 rpc_connection_t *rpc_init_server(const char *ident)
 {
-  int myport;
-  int setsockoptflag = 1;
-  struct sockaddr_in addr_inet;
-  struct sockaddr_un addr_unix;
-  struct sockaddr *addr;
-  socklen_t addr_len;
-  rpc_connection_t *connection;
   D(bug("rpc_init_server ident='%s'\n", ident));
+
+  rpc_connection_t *connection;
+  struct sockaddr_un addr;
+  socklen_t addr_len;
 
   if (ident == NULL)
 	return NULL;
@@ -809,61 +699,28 @@ rpc_connection_t *rpc_init_server(const char *ident)
 	return NULL;
   }
 
-  // If we are able to parse the port then use_tcp_sockets is true
-  myport = _rpc_get_port_from_ident(ident);
-
-  if (use_tcp_sockets())
-    {
-      D(bug("QVD: creating tcp socket on client\n"));
-      if ((connection->server_socket = socket(PF_INET, SOCK_STREAM, IPPROTO_TCP)) < 0) {
+  if ((connection->server_socket = socket(AF_UNIX, SOCK_STREAM|SOCK_CLOEXEC, 0)) < 0) {
 	perror("server socket");
 	rpc_exit(connection);
 	return NULL;
-      }
-      if (setsockopt(connection->server_socket, IPPROTO_TCP, TCP_NODELAY, (char *)&setsockoptflag, sizeof(setsockoptflag)) < 0)
-	{
-	  perror("Error setting TCP_NODELAY");
-	  rpc_exit(connection);
-	  return NULL;
-	}
-      memset(&addr_inet, 0, sizeof(addr));
-      addr_inet.sin_family = AF_INET;
-      addr_inet.sin_port = htons(myport);
-      D(bug("QVD: sin_port is: %d, %d\n", myport, addr_inet.sin_port));
-      addr_inet.sin_addr.s_addr = INADDR_ANY;
-      addr_len = _rpc_socket_path(&connection->socket_path, ident);
-      addr_len = sizeof(addr_inet);
-      addr=(struct sockaddr *)&addr_inet;
-      D(bug("QVD: created server tcp socket on client pid: %d, socket: %d\n", getpid(), connection->server_socket));
-
-    } // use_tcp_sockets
-  else
-    { // unix sockets
-      if ((connection->server_socket = socket(AF_UNIX, SOCK_STREAM|SOCK_CLOEXEC, 0)) < 0) {
-	perror("server socket");
-	rpc_exit(connection);
-	return NULL;
-      }
-      D(bug("QVD: Unix socket on client: %d\n", use_tcp_sockets()));
-
-
-      memset(&addr_unix, 0, sizeof(addr_unix));
-      addr_unix.sun_family = AF_UNIX;
-      connection->socket_path = NULL;
-      addr_len = _rpc_socket_path(&connection->socket_path, ident);
-      memcpy(&addr_unix.sun_path[0], connection->socket_path, addr_len);
-      addr_len += offsetof(struct sockaddr_un, sun_path); /* though POSIX says size of the actual sockaddr structure */
-      addr=(struct sockaddr *)&addr_unix;
-#ifdef HAVE_SOCKADDR_UN_SUN_LEN
-  addr_unix.sun_len = addr_len;
-#endif
-    } //unix_sockets
-
-  if (bind(connection->server_socket, addr, addr_len) < 0) {
-    perror("server bind");
-    rpc_exit(connection);
-    return NULL;
   }
+
+  memset(&addr, 0, sizeof(addr));
+  addr.sun_family = AF_UNIX;
+  connection->socket_path = NULL;
+  addr_len = _rpc_socket_path(&connection->socket_path, ident);
+  memcpy(&addr.sun_path[0], connection->socket_path, addr_len);
+  addr_len += offsetof(struct sockaddr_un, sun_path); /* though POSIX says size of the actual sockaddr structure */
+#ifdef HAVE_SOCKADDR_UN_SUN_LEN
+  addr.sun_len = addr_len;
+#endif
+
+  if (bind(connection->server_socket, (struct sockaddr *)&addr, addr_len) < 0) {
+	perror("server bind");
+	rpc_exit(connection);
+	return NULL;
+  }
+
   if (listen(connection->server_socket, 1) < 0) {
 	perror("server listen");
 	rpc_exit(connection);
@@ -874,19 +731,13 @@ rpc_connection_t *rpc_init_server(const char *ident)
   return connection;
 }
 
-
 // Initialize client-side RPC system
 rpc_connection_t *rpc_init_client(const char *ident)
 {
   D(bug("rpc_init_client ident='%s'\n", ident));
 
-  int server;
-  int myport;
   rpc_connection_t *connection;
-  struct sockaddr_in addr_inet;
-  struct sockaddr_un addr_unix;
-  struct sockaddr *addr;
-  int setsockoptflag = 1;
+  struct sockaddr_un addr;
   socklen_t addr_len;
 
   if (ident == NULL)
@@ -914,72 +765,38 @@ rpc_connection_t *rpc_init_client(const char *ident)
 	rpc_exit(connection);
 	return NULL;
   }
-  // Parses ident, and if it is of the form [^:]+:\d+, then we assume TCP
-  myport = _rpc_get_port_from_ident(ident);
-  if (use_tcp_sockets())
-    {
-      if ((connection->socket = socket(PF_INET, SOCK_STREAM, IPPROTO_TCP)) < 0) {
-	perror("server socket");
-	rpc_exit(connection);
-	return NULL;
-      }
-      D(bug("QVD: created tcp socket on client\n"));
-      if (rpc_set_non_blocking_io(connection->socket) < 0) {
-	perror("client socket set non-blocking");
-	rpc_exit(connection);
-	return NULL;
-      }
-      if (setsockopt(connection->socket, IPPROTO_TCP, TCP_NODELAY, (char *)&setsockoptflag, sizeof(setsockoptflag)) < 0) {
-	perror("Error setting TCP_NODELAY");
-	rpc_exit(connection);
-	return NULL;
-      }
-      memset(&addr_inet, 0, sizeof(addr));
-      addr_inet.sin_family = AF_INET;
-      addr_inet.sin_port = htons(myport);
-      if ((server = _rpc_get_host_from_ident(ident, &addr_inet.sin_addr)) <= 0) {
-	perror("error: Converting address");
-	rpc_exit(connection);
-	return NULL;
-      }
-      addr_len = _rpc_socket_path(&connection->socket_path, ident);
-      addr_len = sizeof(struct sockaddr_in);
-      addr = (struct sockaddr *)&addr_inet;
-    } // use_tcp_sockets
-  else
-    { // !use_tcp_sockets: unix sockets
-      if ((connection->socket = socket(AF_UNIX, SOCK_STREAM|SOCK_CLOEXEC, 0)) < 0) {
+
+  if ((connection->socket = socket(AF_UNIX, SOCK_STREAM|SOCK_CLOEXEC, 0)) < 0) {
 	perror("client socket");
 	rpc_exit(connection);
 	return NULL;
-      }
+  }
 
-      if (rpc_set_non_blocking_io(connection->socket) < 0) {
+  if (rpc_set_non_blocking_io(connection->socket) < 0) {
 	perror("client socket set non-blocking");
 	rpc_exit(connection);
 	return NULL;
-      }
+  }
 
-      memset(&addr_unix, 0, sizeof(addr_unix));
-      addr_unix.sun_family = AF_UNIX;
-      connection->socket_path = NULL;
-      addr_len = _rpc_socket_path(&connection->socket_path, ident);
-      memcpy(&addr_unix.sun_path[0], connection->socket_path, addr_len);
-      addr_len += offsetof(struct sockaddr_un, sun_path); /* though POSIX says size of the actual sockaddr structure */
-      addr=(struct sockaddr *)&addr_unix;
+  memset(&addr, 0, sizeof(addr));
+  addr.sun_family = AF_UNIX;
+  connection->socket_path = NULL;
+  addr_len = _rpc_socket_path(&connection->socket_path, ident);
+  memcpy(&addr.sun_path[0], connection->socket_path, addr_len);
+  addr_len += offsetof(struct sockaddr_un, sun_path); /* though POSIX says size of the actual sockaddr structure */
 #ifdef HAVE_SOCKADDR_UN_SUN_LEN
   addr.sun_len = addr_len;
 #endif
-    } // end use_tcp_sockets
+
   // Wait at most RPC_INIT_TIMEOUT seconds for server to initialize
-  const int N_CONNECT_WAIT_DELAY = 30;
+  const int N_CONNECT_WAIT_DELAY = 10;
   int n_connect_attempts = (rpc_init_timeout() * 1000) / N_CONNECT_WAIT_DELAY;
   if (n_connect_attempts == 0)
 	n_connect_attempts = 1;
   while (n_connect_attempts > 0) {
-	if (connect(connection->socket, addr, addr_len) == 0)
+	if (connect(connection->socket, (struct sockaddr *)&addr, addr_len) == 0)
 	  break;
-	if (n_connect_attempts > 1 && errno != ECONNREFUSED && errno != ENOENT && errno != EINPROGRESS) {
+	if (n_connect_attempts > 1 && errno != ECONNREFUSED && errno != ENOENT) {
 	  perror("client_connect");
 	  rpc_exit(connection);
 	  return NULL;
@@ -1100,23 +917,9 @@ int rpc_listen_socket(rpc_connection_t *connection)
   if (connection->type != RPC_CONNECTION_SERVER)
 	return RPC_ERROR_CONNECTION_TYPE_MISMATCH;
 
-  struct sockaddr_in addr_inet;
-  struct sockaddr_un addr_unix;
-  struct sockaddr *addr;
-  socklen_t addr_len;
-
-  if (use_tcp_sockets())
-    {
-      addr_len = sizeof(addr_inet);
-      addr = (struct sockaddr *) &addr_inet;
-    }
-  else // !use_tcp_sockets: unix_socket
-    {
-      addr_len = sizeof(addr_unix);
-      addr = (struct sockaddr *) &addr_unix;
-    }
-
-  if ((connection->socket = accept(connection->server_socket, addr, &addr_len)) < 0)
+  struct sockaddr_un addr;
+  socklen_t addr_len = sizeof(addr);
+  if ((connection->socket = accept(connection->server_socket, (struct sockaddr *)&addr, &addr_len)) < 0)
 	return RPC_ERROR_ERRNO_SET;
 
   if (rpc_set_non_blocking_io(connection->socket) < 0)
@@ -2731,14 +2534,9 @@ static int run_client(void)
 
 int main(void)
 {
-  // Need to rewrite the connection path for testing
-  if (use_tcp_sockets())
-    {
-      fprintf(stderr, "TCP sockets testing still not implemented\n");
-      return(1);
-    }
   sprintf(g_npn_connection_path, "/org/wrapper/NSPlugin/NPN/%d", getpid());
   sprintf(g_npp_connection_path, "/org/wrapper/NSPlugin/NPP/%d", getpid());
+
   g_client_pid = fork();
   if (g_client_pid == 0) {
 	if (!run_client())
