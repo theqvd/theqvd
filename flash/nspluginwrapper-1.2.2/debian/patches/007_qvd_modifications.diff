@@ -1,8 +1,8 @@
 Index: nspluginwrapper-1.2.2/src/npw-remote-agent-info.c
 ===================================================================
 --- /dev/null	1970-01-01 00:00:00.000000000 +0000
-+++ nspluginwrapper-1.2.2/src/npw-remote-agent-info.c	2010-08-23 14:22:54.000000000 +0200
-@@ -0,0 +1,270 @@
++++ nspluginwrapper-1.2.2/src/npw-remote-agent-info.c	2010-08-24 10:43:29.000000000 +0200
+@@ -0,0 +1,332 @@
 +/*
 + * npw-remote-agent-info.c
 + *
@@ -98,9 +98,9 @@ Index: nspluginwrapper-1.2.2/src/npw-remote-agent-info.c
 +  /* There might be a realloc() out there that doesn't like reallocing
 +     NULL pointers, so we take care of it here */
 +  if(ptr)
-+    return realloc(ptr, size);
++      return realloc(ptr, size);
 +  else
-+    return malloc(size);
++      return malloc(size);
 +}
 +
 +
@@ -140,7 +140,7 @@ Index: nspluginwrapper-1.2.2/src/npw-remote-agent-info.c
 +  int len;
 +  len = strlen(value);
 +  *ptr = malloc(len + 1);
-+  strncpy(*ptr, value, len);
++  strncpy(*ptr, value, len+1);
 +}
 +
 +//Duplicate entries ocupy space, but only the first is used
@@ -149,6 +149,7 @@ Index: nspluginwrapper-1.2.2/src/npw-remote-agent-info.c
 +    key[MAX_KEY_SIZE + 1], value[MAX_VALUE_SIZE + 1];
 +  int parsed_elements, keys_parsed;
 +
++  D(bug("parse_page: start\n"));
 +  // Format string to parse chars
 +  sprintf(format, " %%%d[^= ] = %%%d[^#] ", MAX_KEY_SIZE, MAX_VALUE_SIZE);
 +
@@ -165,29 +166,27 @@ Index: nspluginwrapper-1.2.2/src/npw-remote-agent-info.c
 +  // Parse line by line
 +  line = getToken(copy_ptr, "\n");
 +  for (keys_parsed=0; *copy_ptr != NULL; line = getToken(copy_ptr, "\n")) {
-+    printf("Parsing line <%s>\n", line);
++    D(bug("parse_page: line %s\n", line));
 +    if (line == NULL)       // Should never happen
 +      break;
 +
 +    if (keys_parsed >= MAXKEYS) {
-+      printf("Too many keys in the file. Skipping the rest\n");
++      	npw_printf("ERROR: Too many keys in the file. Skipping the rest\n");
 +      break;
 +    }
 +
-+    if (strlen(line) == 0) {
-+      printf ("Skipped blank line\n");
++    if (strlen(line) == 0)
++      continue;
++
++    if (line[0] == '#')
++      continue;
++
++    if ((parsed_elements = sscanf(line, format, key, value)) < 2) {
++	npw_printf("ERROR: line <%s> not recognized key=%s, value=%s, int=%d\n", line, key, value, parsed_elements);
 +      continue;
 +    }
 +
-+    if (line[0] == '#') {
-+      printf ("Skipped comment\n");
-+      continue;
-+    }
-+    if ((parsed_elements = sscanf(line, format, key, value)) < 2) {
-+      printf ("line <%s> not recognized key=%s, value=%s, int=%d\n", line, key, value, parsed_elements);
-+      continue;
-+    }
-+    printf("key=<%s>, value=<%s>\n", key, value);
++    D(bug("parse_page: key %s value %s\n", key, value));
 +    assign(keys, key);
 +    keys ++;
 +    assign(values, value);
@@ -221,8 +220,9 @@ Index: nspluginwrapper-1.2.2/src/npw-remote-agent-info.c
 +  char error_buffer[CURL_ERROR_SIZE];
 +
 +
++
 +  if (curl_global_init(CURL_GLOBAL_ALL)) {
-+    fprintf(stderr, "Error intializing curl for url %s", myurl);
++    npw_printf("Error intializing curl for url %s", myurl);
 +    return -1;
 +  }
 +
@@ -234,7 +234,7 @@ Index: nspluginwrapper-1.2.2/src/npw-remote-agent-info.c
 +  curl_easy_setopt(handle, CURLOPT_ERRORBUFFER, error_buffer);
 +  res = curl_easy_perform(handle);
 +  if (res) {
-+    fprintf(stderr, "Error getting URL %s: %s", myurl, error_buffer);
++    npw_printf("Error getting URL %s: %s", myurl, error_buffer);
 +  }
 +  curl_easy_cleanup(handle);
 +  curl_global_cleanup();
@@ -250,33 +250,95 @@ Index: nspluginwrapper-1.2.2/src/npw-remote-agent-info.c
 +int verify_if_using_tcp_sockets() {
 +  //  int use_tcp = 0;
 +  // If NPW_USE_TCPIP_PORT or NPW_REMOTE_AGENT_ENV is defined then use tcp_sockets
-+  const char *npw_agent_uri = getenv(NPW_USE_TCPIP_PORT);
-+  if (!npw_agent_uri)
-+    return -1;
-+  rpc_port = atoi(npw_agent_uri);
-+  if (rpc_port < 1024 || rpc_port > 65535) {
-+    D(bug("%s defined: %s. But the socket is < 1024 or > 65535. Not using TCP sockets\n", NPW_USE_TCPIP_PORT, npw_agent_uri));
-+    return 0;
-+  }
-+  set_tcp_sockets();
-+  D(bug("%s defined: %s. Using tcp sockets\n", NPW_USE_TCPIP_PORT, npw_agent_uri));
++  const char *npw_tcp_port = getenv(NPW_USE_TCPIP_PORT);
++  if (npw_tcp_port)
++    {
++      set_tcp_sockets();
++      rpc_port = atoi(npw_tcp_port);
++      if (rpc_port >= 1024 && rpc_port <= 65535) {
++	D(bug("%s defined: %d. Using tcp sockets\n", NPW_USE_TCPIP_PORT, rpc_port));
++      }
++      else
++	{
++	  D(bug("%s defined: %s. But the socket is < 1024 or > 65535. Setting default %d\n", NPW_USE_TCPIP_PORT, npw_tcp_port, rpc_port));
++	  rpc_port = NPW_RPC_DEFAULT_PORT;
++	}
++    }
 +  npw_agent_uri = getenv(NPW_REMOTE_AGENT_ENV);
-+  if (npw_agent_uri) {
-+    set_tcp_sockets();
-+    D(bug("%s defined: %s. Using tcp sockets\n", NPW_REMOTE_AGENT_ENV, npw_agent_uri));
-+    return 0;
-+  }
-+  return 1;
++  if (npw_agent_uri) 
++    {
++      set_tcp_sockets();
++      D(bug("verify_if_using_tcp_sockets %s defined: %s. Using tcp sockets\n", NPW_REMOTE_AGENT_ENV, npw_agent_uri));
++    }
++  else
++    {
++      D(bug("verify_if_using_tcp_sockets checking for http url %s not defined\n", NPW_REMOTE_AGENT_ENV));
++    }
++  return use_tcp_sockets();
 +}
 +
++void dump_keys(char **keys, char **values) {
++  int i;
++
++  for (i=0; (i<MAXKEYS && *keys != NULL && *values != NULL); ++i) {
++    D(bug("set_remote_connection_path: key %d, %s, %s\n", i, *keys, *values));
++    keys ++;
++    values ++;
++  }
++
++}
++
++
 +void set_remote_connection_path(char *connection_path) {
-+  // getenv...
-+  sprintf(connection_path, "%s:%d", NPW_RPC_TEST_SERVER, return_rpc_port());
++  int ret_code;
++  struct MemoryStruct chunk;
++  char *keys[MAXKEYS];
++  char *values[MAXKEYS];
++  const char *host;
++  const char *port;
++
++  if (!npw_agent_uri)  // Using TCP but no remote HTTP agent
++    {
++      D(bug("set_remote_connection_path: npw_agent_uri is null\n"));
++      sprintf(connection_path, "%s:%d", NPW_RPC_DEFAULT_SERVER, return_rpc_port());
++      return;
++    }
++
++  init_array(keys);
++  init_array(values);
++  chunk.memory=NULL;
++  chunk.size=0;
++  ret_code = fetch_remote_agent_url(npw_agent_uri, &chunk);
++  if (ret_code) {
++    npw_printf("ERROR: Error fetching url %s\n", npw_agent_uri);    
++    return;
++  }
++
++  D(dump_keys(keys, values));
++  parse_page(&chunk, keys, values);
++  host = getvalue(keys, values, "host");
++  port = getvalue(keys, values, "port");
++  if (strlen(host) == 0) {
++    host = NPW_RPC_DEFAULT_SERVER;
++    npw_printf("ERROR: Error fetching key host from url %s. Setting to %s\n", npw_agent_uri, NPW_RPC_DEFAULT_SERVER);    
++  }
++  if (strlen(port) == 0) {
++    port = "2111";
++    npw_printf("ERROR: Error fetching key port from url %s. Setting to %d\n", npw_agent_uri, NPW_RPC_DEFAULT_PORT);    
++  }
++  sprintf(connection_path, "%s:%s", host, port);
++  D(bug("set_remote_connection_path from URL %s with connection_path %s\n", npw_agent_uri, connection_path));
++
++  free_array(keys);
++  free_array(values);
++  if(chunk.memory)
++    free(chunk.memory);
++  return;
 +}
 Index: nspluginwrapper-1.2.2/src/npw-remote-agent-info.h
 ===================================================================
 --- /dev/null	1970-01-01 00:00:00.000000000 +0000
-+++ nspluginwrapper-1.2.2/src/npw-remote-agent-info.h	2010-08-23 14:22:54.000000000 +0200
++++ nspluginwrapper-1.2.2/src/npw-remote-agent-info.h	2010-08-24 10:39:52.000000000 +0200
 @@ -0,0 +1,46 @@
 +/*
 + * npw-agent-info.h
@@ -306,9 +368,9 @@ Index: nspluginwrapper-1.2.2/src/npw-remote-agent-info.h
 +
 +// Use TCP/IP communication
 +//#define NPW_RPC_USE_TCPIP 1
-+//#define NPW_RPC_TEST_PORT 2111
++#define NPW_RPC_DEFAULT_PORT 2111
 +//#define NPW_RPC_TEST_PORT2 3111
-+#define NPW_RPC_TEST_SERVER "127.0.0.1"
++#define NPW_RPC_DEFAULT_SERVER "127.0.0.1"
 +//#define NPW_RPC_TEST_SERVER2 "127.0.0.1"
 +#define MAX_CONNECTION_PATH 128
 +  // define This environment var to 1 to use remote agent
@@ -327,7 +389,7 @@ Index: nspluginwrapper-1.2.2/src/npw-remote-agent-info.h
 Index: nspluginwrapper-1.2.2/src/npw-use-tcp-sockets.c
 ===================================================================
 --- /dev/null	1970-01-01 00:00:00.000000000 +0000
-+++ nspluginwrapper-1.2.2/src/npw-use-tcp-sockets.c	2010-08-23 14:22:54.000000000 +0200
++++ nspluginwrapper-1.2.2/src/npw-use-tcp-sockets.c	2010-08-24 10:39:52.000000000 +0200
 @@ -0,0 +1,42 @@
 +/*
 + * npw-use-tcp-sockets.c
@@ -374,7 +436,7 @@ Index: nspluginwrapper-1.2.2/src/npw-use-tcp-sockets.c
 Index: nspluginwrapper-1.2.2/src/npw-use-tcp-sockets.h
 ===================================================================
 --- /dev/null	1970-01-01 00:00:00.000000000 +0000
-+++ nspluginwrapper-1.2.2/src/npw-use-tcp-sockets.h	2010-08-23 14:22:54.000000000 +0200
++++ nspluginwrapper-1.2.2/src/npw-use-tcp-sockets.h	2010-08-24 10:39:52.000000000 +0200
 @@ -0,0 +1,35 @@
 +/*
 + * use-tcp-sockets.h
@@ -413,8 +475,8 @@ Index: nspluginwrapper-1.2.2/src/npw-use-tcp-sockets.h
 +#endif
 Index: nspluginwrapper-1.2.2/Makefile
 ===================================================================
---- nspluginwrapper-1.2.2.orig/Makefile	2010-08-23 14:22:54.000000000 +0200
-+++ nspluginwrapper-1.2.2/Makefile	2010-08-23 14:22:54.000000000 +0200
+--- nspluginwrapper-1.2.2.orig/Makefile	2010-08-24 10:39:52.000000000 +0200
++++ nspluginwrapper-1.2.2/Makefile	2010-08-24 10:39:52.000000000 +0200
 @@ -106,14 +106,18 @@
  
  npwrapper_LIBRARY = npwrapper.so
@@ -453,8 +515,8 @@ Index: nspluginwrapper-1.2.2/Makefile
  test_rpc_client_CPPFLAGS = $(CPPFLAGS) -I$(SRC_PATH)/src -DBUILD_CLIENT -DNPW_COMPONENT_NAME="\"Client\""
 Index: nspluginwrapper-1.2.2/src/npw-wrapper.c
 ===================================================================
---- nspluginwrapper-1.2.2.orig/src/npw-wrapper.c	2010-08-23 14:22:51.000000000 +0200
-+++ nspluginwrapper-1.2.2/src/npw-wrapper.c	2010-08-23 14:22:54.000000000 +0200
+--- nspluginwrapper-1.2.2.orig/src/npw-wrapper.c	2010-08-24 10:39:19.000000000 +0200
++++ nspluginwrapper-1.2.2/src/npw-wrapper.c	2010-08-24 10:39:52.000000000 +0200
 @@ -42,6 +42,8 @@
  #include <X11/Shell.h>
  #include <X11/StringDefs.h>
@@ -497,8 +559,8 @@ Index: nspluginwrapper-1.2.2/src/npw-wrapper.c
  	if (snprintf(command, sizeof(command), "%s --info --plugin %s", viewer_path, plugin_path) >= sizeof(command))
 Index: nspluginwrapper-1.2.2/src/rpc.c
 ===================================================================
---- nspluginwrapper-1.2.2.orig/src/rpc.c	2010-08-23 14:22:51.000000000 +0200
-+++ nspluginwrapper-1.2.2/src/rpc.c	2010-08-23 14:23:26.000000000 +0200
+--- nspluginwrapper-1.2.2.orig/src/rpc.c	2010-08-24 10:39:19.000000000 +0200
++++ nspluginwrapper-1.2.2/src/rpc.c	2010-08-24 10:39:52.000000000 +0200
 @@ -42,14 +42,17 @@
  #include <sys/wait.h>
  #include <sys/select.h>
