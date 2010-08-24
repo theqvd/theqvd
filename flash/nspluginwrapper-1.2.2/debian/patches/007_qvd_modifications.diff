@@ -1,8 +1,8 @@
 Index: nspluginwrapper-1.2.2/src/npw-remote-agent-info.c
 ===================================================================
 --- /dev/null	1970-01-01 00:00:00.000000000 +0000
-+++ nspluginwrapper-1.2.2/src/npw-remote-agent-info.c	2010-08-24 10:43:29.000000000 +0200
-@@ -0,0 +1,332 @@
++++ nspluginwrapper-1.2.2/src/npw-remote-agent-info.c	2010-08-24 16:58:14.000000000 +0200
+@@ -0,0 +1,444 @@
 +/*
 + * npw-remote-agent-info.c
 + *
@@ -54,6 +54,7 @@ Index: nspluginwrapper-1.2.2/src/npw-remote-agent-info.c
 +#define MAXKEYS 128
 +#define MAX_KEY_SIZE 10
 +#define MAX_VALUE_SIZE 10
++#define MAX_URL_SIZE 1024
 +struct MemoryStruct {
 +  char *memory;
 +  size_t size;
@@ -61,7 +62,7 @@ Index: nspluginwrapper-1.2.2/src/npw-remote-agent-info.c
 +
 +
 +static int rpc_port = 0;
-+const char *npw_agent_uri = NULL;
++char *npw_agent_uri = NULL;
 +
 +
 +
@@ -247,7 +248,7 @@ Index: nspluginwrapper-1.2.2/src/npw-remote-agent-info.c
 +  return rpc_port++;
 +}
 +
-+int verify_if_using_tcp_sockets() {
++int set_tcp_ip_and_remote_invocation_flags() {
 +  //  int use_tcp = 0;
 +  // If NPW_USE_TCPIP_PORT or NPW_REMOTE_AGENT_ENV is defined then use tcp_sockets
 +  const char *npw_tcp_port = getenv(NPW_USE_TCPIP_PORT);
@@ -255,9 +256,10 @@ Index: nspluginwrapper-1.2.2/src/npw-remote-agent-info.c
 +    {
 +      set_tcp_sockets();
 +      rpc_port = atoi(npw_tcp_port);
-+      if (rpc_port >= 1024 && rpc_port <= 65535) {
-+	D(bug("%s defined: %d. Using tcp sockets\n", NPW_USE_TCPIP_PORT, rpc_port));
-+      }
++      if (rpc_port >= 1024 && rpc_port <= 65535) 
++	{
++	  D(bug("%s defined: %d. Using tcp sockets\n", NPW_USE_TCPIP_PORT, rpc_port));
++	}
 +      else
 +	{
 +	  D(bug("%s defined: %s. But the socket is < 1024 or > 65535. Setting default %d\n", NPW_USE_TCPIP_PORT, npw_tcp_port, rpc_port));
@@ -267,7 +269,7 @@ Index: nspluginwrapper-1.2.2/src/npw-remote-agent-info.c
 +  npw_agent_uri = getenv(NPW_REMOTE_AGENT_ENV);
 +  if (npw_agent_uri) 
 +    {
-+      set_tcp_sockets();
++      set_remote_invocation();
 +      D(bug("verify_if_using_tcp_sockets %s defined: %s. Using tcp sockets\n", NPW_REMOTE_AGENT_ENV, npw_agent_uri));
 +    }
 +  else
@@ -281,21 +283,49 @@ Index: nspluginwrapper-1.2.2/src/npw-remote-agent-info.c
 +  int i;
 +
 +  for (i=0; (i<MAXKEYS && *keys != NULL && *values != NULL); ++i) {
-+    D(bug("set_remote_connection_path: key %d, %s, %s\n", i, *keys, *values));
++    D(bug("dump_keys: key %d, %s, %s\n", i, *keys, *values));
 +    keys ++;
 +    values ++;
 +  }
 +
 +}
 +
++void init_mem(char **keys, char **values,   struct MemoryStruct *chunk) {
++  init_array(keys);
++  init_array(values);
++  chunk->memory=NULL;
++  chunk->size=0;
++}
 +
-+void set_remote_connection_path(char *connection_path) {
++void free_mem(char **keys, char **values,   struct MemoryStruct *chunk) {
++  free_array(keys);
++  free_array(values);
++  if (chunk->memory)
++    free(chunk->memory);
++  chunk->size=0;
++}
++
++void build_url(char *myurl, int size, const char *baseurl, const char *op, const char *id) {
++  if (npw_agent_uri[strlen(npw_agent_uri) - 1] == '/') 
++    snprintf(myurl, size, "%s%s?%s", baseurl, op, id);
++  else
++    snprintf(myurl, size, "%s/%s?%s", baseurl, op, id);
++
++  myurl[size] = 0;
++  
++}
++
++void set_remote_connection_path(char *connection_path, const char *id) {
 +  int ret_code;
 +  struct MemoryStruct chunk;
 +  char *keys[MAXKEYS];
 +  char *values[MAXKEYS];
 +  const char *host;
 +  const char *port;
++  char myurl[MAX_URL_SIZE];
++  char parameters[MAX_URL_SIZE];
++
++  init_mem(keys, values, &chunk);
 +
 +  if (!npw_agent_uri)  // Using TCP but no remote HTTP agent
 +    {
@@ -304,20 +334,24 @@ Index: nspluginwrapper-1.2.2/src/npw-remote-agent-info.c
 +      return;
 +    }
 +
-+  init_array(keys);
-+  init_array(values);
-+  chunk.memory=NULL;
-+  chunk.size=0;
-+  ret_code = fetch_remote_agent_url(npw_agent_uri, &chunk);
++  D(bug("set_remote_connection_path from URL %s with id %s\n", npw_agent_uri, id));
++  snprintf(parameters, MAX_URL_SIZE, "id=%s", id);
++  build_url(myurl, MAX_URL_SIZE, npw_agent_uri, GET_RPC_HOST_PORT, parameters);
++
++  D(bug("set_remote_connection_path my url is \n", myurl));
++
++  ret_code = fetch_remote_agent_url(myurl, &chunk);
 +  if (ret_code) {
 +    npw_printf("ERROR: Error fetching url %s\n", npw_agent_uri);    
 +    return;
 +  }
 +
-+  D(dump_keys(keys, values));
 +  parse_page(&chunk, keys, values);
++  D(dump_keys(keys, values));
++
 +  host = getvalue(keys, values, "host");
 +  port = getvalue(keys, values, "port");
++
 +  if (strlen(host) == 0) {
 +    host = NPW_RPC_DEFAULT_SERVER;
 +    npw_printf("ERROR: Error fetching key host from url %s. Setting to %s\n", npw_agent_uri, NPW_RPC_DEFAULT_SERVER);    
@@ -329,17 +363,95 @@ Index: nspluginwrapper-1.2.2/src/npw-remote-agent-info.c
 +  sprintf(connection_path, "%s:%s", host, port);
 +  D(bug("set_remote_connection_path from URL %s with connection_path %s\n", npw_agent_uri, connection_path));
 +
-+  free_array(keys);
-+  free_array(values);
-+  if(chunk.memory)
-+    free(chunk.memory);
++  free_mem(keys, values, &chunk);
++
 +  return;
++}
++
++// Returns the remote pid, -1 if error
++// Parameters passed are the id and the execute string
++int invoke_remote_plugin(const char *exec_string, const char *id) {
++  int pid = -1, ret_code;
++  struct MemoryStruct chunk;
++  char *keys[MAXKEYS];
++  char *values[MAXKEYS];
++  const char *pid_str;
++  char myurl[MAX_URL_SIZE];
++  char parameters[MAX_URL_SIZE];
++
++  init_mem(keys, values, &chunk);
++
++  if (!npw_agent_uri)  // Using TCP but no remote HTTP agent
++    {
++      npw_printf("ERROR: invoke_remote_plugin no remote URL should never happen\n");    
++      return -1;
++    }
++
++  D(bug("invoke_remote_plugin from URL %s with id %s\n", npw_agent_uri, id));
++  snprintf(parameters, MAX_URL_SIZE, "exec=%s&id=%s", exec_string, id);
++  build_url(myurl, MAX_URL_SIZE, npw_agent_uri, EXECUTE_REMOTE_PLUGIN, parameters);
++
++  D(bug("invoke_remote_plugin url is <%s>\n", myurl));
++
++  ret_code = fetch_remote_agent_url(myurl, &chunk);
++  if (ret_code) {
++    npw_printf("ERROR: Error fetching url %s\n", npw_agent_uri);    
++    return -1;
++  }
++
++  parse_page(&chunk, keys, values);
++  D(dump_keys(keys, values));
++
++  pid_str = getvalue(keys, values, "pid");
++  pid = atoi (pid_str);
++
++  free_mem(keys, values, &chunk);
++  return pid;
++}
++
++int invoke_remote_kill(int pid, const char *id) {
++  int ret_code;
++  struct MemoryStruct chunk;
++  char *keys[MAXKEYS];
++  char *values[MAXKEYS];
++  const char *pid_str;
++  char myurl[MAX_URL_SIZE];
++  char parameters[MAX_URL_SIZE];
++
++  init_mem(keys, values, &chunk);
++
++  if (!npw_agent_uri)  // Using TCP but no remote HTTP agent
++    {
++      npw_printf("ERROR: invoke_remote_plugin no remote URL should never happen\n");    
++      return -1;
++    }
++
++  D(bug("invoke_remote_kill from URL %s with id %s and pid %d\n", npw_agent_uri, id, pid));
++  snprintf(parameters, MAX_URL_SIZE, "pid=%d&id=%s", pid, id);
++  build_url(myurl, MAX_URL_SIZE, npw_agent_uri, EXECUTE_REMOTE_PLUGIN_KILL, parameters);
++
++  D(bug("invoke_remote_plugin url is <%s>\n", myurl));
++
++  ret_code = fetch_remote_agent_url(myurl, &chunk);
++  if (ret_code) {
++    npw_printf("ERROR: Error fetching url %s\n", npw_agent_uri);    
++    return -1;
++  }
++
++  parse_page(&chunk, keys, values);
++  D(dump_keys(keys, values));
++
++  pid_str = getvalue(keys, values, "pid");
++  pid = atoi (pid_str);
++
++  free_mem(keys, values, &chunk);
++  return pid;
 +}
 Index: nspluginwrapper-1.2.2/src/npw-remote-agent-info.h
 ===================================================================
 --- /dev/null	1970-01-01 00:00:00.000000000 +0000
-+++ nspluginwrapper-1.2.2/src/npw-remote-agent-info.h	2010-08-24 10:39:52.000000000 +0200
-@@ -0,0 +1,46 @@
++++ nspluginwrapper-1.2.2/src/npw-remote-agent-info.h	2010-08-24 16:56:26.000000000 +0200
+@@ -0,0 +1,51 @@
 +/*
 + * npw-agent-info.h
 + *
@@ -377,9 +489,14 @@ Index: nspluginwrapper-1.2.2/src/npw-remote-agent-info.h
 +#define NPW_REMOTE_AGENT_ENV "NPW_REMOTE_AGENT_URI"
 +  // define This environment var to 1 to use TCP sockets
 +#define NPW_USE_TCPIP_PORT "NPW_USE_TCPIP_PORT"
++#define GET_RPC_HOST_PORT "get_rpc_host_port"
++#define EXECUTE_REMOTE_PLUGIN "execute_plugin"
++#define EXECUTE_REMOTE_PLUGIN_KILL "kill_plugin"
 +
-+extern void set_remote_connection_path(char *connection_path);
-+extern int verify_if_using_tcp_sockets();
++extern void set_remote_connection_path(char *connection_path, const char *id);
++extern int set_tcp_ip_and_remote_invocation_flags();
++extern int invoke_remote_plugin(const char *exec_string, const char *id);
++extern int invoke_remote_kill(int pid, const char *id);
 +
 +#ifdef __cplusplus
 +}
@@ -389,8 +506,8 @@ Index: nspluginwrapper-1.2.2/src/npw-remote-agent-info.h
 Index: nspluginwrapper-1.2.2/src/npw-use-tcp-sockets.c
 ===================================================================
 --- /dev/null	1970-01-01 00:00:00.000000000 +0000
-+++ nspluginwrapper-1.2.2/src/npw-use-tcp-sockets.c	2010-08-24 10:39:52.000000000 +0200
-@@ -0,0 +1,42 @@
++++ nspluginwrapper-1.2.2/src/npw-use-tcp-sockets.c	2010-08-24 16:56:26.000000000 +0200
+@@ -0,0 +1,58 @@
 +/*
 + * npw-use-tcp-sockets.c
 + *
@@ -419,6 +536,7 @@ Index: nspluginwrapper-1.2.2/src/npw-use-tcp-sockets.c
 +#include "debug.h"
 +
 +static int use_tcp_sockets_flag = 0;
++static int use_remote_invocation_flag = 0;
 +
 +int use_tcp_sockets() {
 +  return use_tcp_sockets_flag;
@@ -433,11 +551,26 @@ Index: nspluginwrapper-1.2.2/src/npw-use-tcp-sockets.c
 +  use_tcp_sockets_flag = 0;
 +  return use_tcp_sockets_flag;
 +}
++
++int use_remote_invocation() {
++  return use_remote_invocation_flag;
++}
++
++int set_remote_invocation() {
++  use_remote_invocation_flag = 1;
++  set_tcp_sockets();
++  return use_remote_invocation_flag;
++}
++
++int unset_remote_invocation() {
++  use_remote_invocation_flag = 0;
++  return use_remote_invocation_flag;
++}
 Index: nspluginwrapper-1.2.2/src/npw-use-tcp-sockets.h
 ===================================================================
 --- /dev/null	1970-01-01 00:00:00.000000000 +0000
-+++ nspluginwrapper-1.2.2/src/npw-use-tcp-sockets.h	2010-08-24 10:39:52.000000000 +0200
-@@ -0,0 +1,35 @@
++++ nspluginwrapper-1.2.2/src/npw-use-tcp-sockets.h	2010-08-24 16:56:26.000000000 +0200
+@@ -0,0 +1,39 @@
 +/*
 + * use-tcp-sockets.h
 + *
@@ -467,6 +600,10 @@ Index: nspluginwrapper-1.2.2/src/npw-use-tcp-sockets.h
 +extern int use_tcp_sockets();
 +extern int set_tcp_sockets();
 +extern int unset_tcp_sockets();
++extern int use_remote_invocation();
++extern int set_remote_invocation();
++extern int unset_remote_invocation();
++
 +
 +#ifdef __cplusplus
 +}
@@ -475,8 +612,8 @@ Index: nspluginwrapper-1.2.2/src/npw-use-tcp-sockets.h
 +#endif
 Index: nspluginwrapper-1.2.2/Makefile
 ===================================================================
---- nspluginwrapper-1.2.2.orig/Makefile	2010-08-24 10:39:52.000000000 +0200
-+++ nspluginwrapper-1.2.2/Makefile	2010-08-24 10:39:52.000000000 +0200
+--- nspluginwrapper-1.2.2.orig/Makefile	2010-08-24 16:56:26.000000000 +0200
++++ nspluginwrapper-1.2.2/Makefile	2010-08-24 16:56:26.000000000 +0200
 @@ -106,14 +106,18 @@
  
  npwrapper_LIBRARY = npwrapper.so
@@ -515,8 +652,8 @@ Index: nspluginwrapper-1.2.2/Makefile
  test_rpc_client_CPPFLAGS = $(CPPFLAGS) -I$(SRC_PATH)/src -DBUILD_CLIENT -DNPW_COMPONENT_NAME="\"Client\""
 Index: nspluginwrapper-1.2.2/src/npw-wrapper.c
 ===================================================================
---- nspluginwrapper-1.2.2.orig/src/npw-wrapper.c	2010-08-24 10:39:19.000000000 +0200
-+++ nspluginwrapper-1.2.2/src/npw-wrapper.c	2010-08-24 10:39:52.000000000 +0200
+--- nspluginwrapper-1.2.2.orig/src/npw-wrapper.c	2010-08-24 16:56:24.000000000 +0200
++++ nspluginwrapper-1.2.2/src/npw-wrapper.c	2010-08-24 16:56:26.000000000 +0200
 @@ -42,6 +42,8 @@
  #include <X11/Shell.h>
  #include <X11/StringDefs.h>
@@ -526,7 +663,15 @@ Index: nspluginwrapper-1.2.2/src/npw-wrapper.c
  #include "utils.h"
  #include "npw-common.h"
  #include "npw-malloc.h"
-@@ -3327,7 +3329,7 @@
+@@ -81,6 +83,7 @@
+   char *name;
+   char *description;
+   char *formats;
++  char *unique_id;
+ } Plugin;
+ 
+ static Plugin g_plugin = { 0, -1, 0, NULL, NULL, NULL };
+@@ -3327,7 +3330,7 @@
  	g_plugin.initialized = 1 + is_NP_Initialize;
  	return;
    }
@@ -535,17 +680,22 @@ Index: nspluginwrapper-1.2.2/src/npw-wrapper.c
    if (PLUGIN_DIRECT_EXEC){
  	g_plugin.initialized = 1;
  	return;
-@@ -3353,7 +3355,20 @@
+@@ -3350,10 +3353,25 @@
+   ++init_count;
+   char viewer_path[PATH_MAX];
+   sprintf(viewer_path, "%s/%s/%s/%s", NPW_LIBDIR, NPW_Plugin.target_arch, NPW_Plugin.target_os, NPW_VIEWER);
++  char  unique_id_path[128];
    char connection_path[128];
    sprintf(connection_path, "%s/%s/%d-%d", NPW_CONNECTION_PATH, plugin_file_name, getpid(), init_count);
  
 -  // Cache MIME info and plugin name/description
-+  verify_if_using_tcp_sockets();
++  set_tcp_ip_and_remote_invocation_flags();
 +
 +  if (use_tcp_sockets())
 +    {
 +    // Use TCP sockets
-+    set_remote_connection_path(connection_path);
++      sprintf(unique_id_path, "%s-%d-%d", plugin_file_name, getpid(), init_count);
++      set_remote_connection_path(connection_path, unique_id_path);
 +    D(bug("QVD: plugin_init with test_server and test_port++ %s\n", connection_path));
 +  } // End using tcp sockets
 +  else
@@ -557,10 +707,73 @@ Index: nspluginwrapper-1.2.2/src/npw-wrapper.c
    if (g_plugin.name == NULL && g_plugin.description == NULL && g_plugin.formats == NULL) {
  	char command[1024];
  	if (snprintf(command, sizeof(command), "%s --info --plugin %s", viewer_path, plugin_path) >= sizeof(command))
+@@ -3403,7 +3421,22 @@
+ 	return;
+ 
+   // Start plug-in viewer
+-  if ((g_plugin.viewer_pid = fork()) == 0) {
++  if (use_remote_invocation())
++    {
++      char remote_exec[PATH_MAX];
++      D(bug("Invoking remote invocation for plugin\n"));
++      snprintf(remote_exec, PATH_MAX, 
++	       "%s%%20--plugin%%20%s%%20--connection%%20%s", viewer_path, plugin_path, connection_path);
++      if ((g_plugin.viewer_pid = invoke_remote_plugin(remote_exec, unique_id_path)) < 0 )
++	{
++	  npw_printf("ERROR: failed to execute remote NSPlugin viewer\n");
++	  _Exit(255);
++	}
++      g_plugin.unique_id = strdup(unique_id_path);
++    }
++  else
++    {
++      if ((g_plugin.viewer_pid = fork()) == 0) {
+ 	char *argv[8];
+ 	int argc = 0;
+ 
+@@ -3419,7 +3452,8 @@
+ 	execv(viewer_path, argv);
+ 	npw_printf("ERROR: failed to execute NSPlugin viewer\n");
+ 	_Exit(255);
+-  }
++      }
++    }
+ 
+   // Initialize browser-side RPC communication channel
+   if ((g_rpc_connection = rpc_init_client(connection_path)) == NULL) {
+@@ -3558,6 +3592,15 @@
+   }
+ 
+   if (g_plugin.viewer_pid != -1) {
++    if (use_remote_invocation())
++      {
++	char remote_exec[PATH_MAX];
++	D(bug("Invoking remote kill plugin\n"));
++	invoke_remote_kill(g_plugin.viewer_pid, g_plugin.unique_id);
++      }
++    else
++      {
++
+ 	// let it shutdown gracefully, then kill it gently to no mercy
+ 	const int WAITPID_DELAY_TO_SIGTERM = 3;
+ 	const int WAITPID_DELAY_TO_SIGKILL = 3;
+@@ -3577,9 +3620,10 @@
+ 	  }
+ 	  sleep(1);
+ 	}
+-	g_plugin.viewer_pid = -1;
++      }
++    g_plugin.viewer_pid = -1;
+   }
+-
++  free(g_plugin.unique_id);
+   g_plugin.initialized = 0;
+ }
+ 
 Index: nspluginwrapper-1.2.2/src/rpc.c
 ===================================================================
---- nspluginwrapper-1.2.2.orig/src/rpc.c	2010-08-24 10:39:19.000000000 +0200
-+++ nspluginwrapper-1.2.2/src/rpc.c	2010-08-24 10:39:52.000000000 +0200
+--- nspluginwrapper-1.2.2.orig/src/rpc.c	2010-08-24 16:56:24.000000000 +0200
++++ nspluginwrapper-1.2.2/src/rpc.c	2010-08-24 16:56:26.000000000 +0200
 @@ -42,14 +42,17 @@
  #include <sys/wait.h>
  #include <sys/select.h>
