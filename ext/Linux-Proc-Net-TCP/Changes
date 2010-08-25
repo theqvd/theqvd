@@ -1,5 +1,8 @@
 Revision history for Perl extension Linux::Proc::Net::TCP.
 
+0.04
+        - minor doc corrections
+
 0.03  Aug 25, 2010
         - read was clobbering $_ (bug report and patch by David
           Serrano)

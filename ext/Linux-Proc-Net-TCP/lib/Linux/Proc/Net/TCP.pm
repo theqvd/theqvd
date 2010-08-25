@@ -1,6 +1,6 @@
 package Linux::Proc::Net::TCP;
 
-our $VERSION = '0.03';
+our $VERSION = '0.04';
 
 use strict;
 use warnings;
@@ -163,7 +163,7 @@ This module can read and parse the information available from
 reads C</proc/net/tcp> and returns an object representing a table of
 the connections.
 
-Individual entries in the table can be accesses just dereferencing the
+Individual entries in the table can be accessed just dereferencing the
 returned object. For instance:
 
   for my $entry (@$table) {
