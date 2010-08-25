@@ -1,5 +1,9 @@
 Revision history for Perl extension Linux::Proc::Net::TCP.
 
+0.03  Aug 25, 2010
+        - read was clobbering $_ (bug report and patch by David
+          Serrano)
+
 0.02  Jul 20, 2010
 	- sometimes the tm->when field is FFFFFFFFFFFFFFFF and does
           not match the expected eight hex digits representation

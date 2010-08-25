@@ -1,6 +1,6 @@
 package Linux::Proc::Net::TCP;
 
-our $VERSION = '0.02';
+our $VERSION = '0.03';
 
 use strict;
 use warnings;
@@ -12,6 +12,7 @@ sub read {
     my ($class, $mnt) = @_;
     my $fn = (defined $mnt ? "$mnt/net/tcp" : "/proc/net/tcp");
     my @entries;
+    local $_;
     open my $fh, '<', $fn
 	or croak "Unable to open $fn: $!";
     <$fh>; # discard header
