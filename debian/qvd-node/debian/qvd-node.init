@@ -14,7 +14,7 @@
 
 PATH=/bin:/usr/bin
 
-DAEMON=/usr/bin/qvd_noded.pl
+DAEMON=/usr/bin/qvd-noded.pl
 NAME=qvd-node
 DESC="QVD Server"
 
