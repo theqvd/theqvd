@@ -25,6 +25,7 @@ This library is free software. You can redistribute it and/or modify
 it under the same terms as Perl itself.
 
 =cut
+has windowid =>(is => 'rw', isa => 'Str', default => "0x5c0001e");
 
 has host => (is => 'rw', isa => 'Str', default => '127.0.0.1');
 has port => (is => 'rw', isa => 'Int', default => 4111);
@@ -45,6 +46,7 @@ has allowed_exec_paths =>
 	  my %map = map { $_ => 1 } @paths;
 	  return \%map; 
       });
+
 
 sub getPort {
     my ($self, $id) = @_;
@@ -67,10 +69,12 @@ sub kill_plugin {
 	print STDERR "ERROR: kill_plugin pid $pid was not registered with id %id\n";
     }
 
+    return unless (defined($pid) && $pid =~ /\d+/);
+    return;
     my $count = 0;
-    while (waitpid($pid, WNOHANG) == 0)
+    while (waitpid($pid, WNOHANG) > 0)
     {
-	while ((waitpid($pid, WNOHANG) == 0) && $count < 3)
+	while ((waitpid($pid, WNOHANG) > 0) && $count < 3)
 	{
 	 $count ++;
 	 sleep(1);
@@ -103,6 +107,9 @@ sub execute {
     }
     if ($pid == 0) 
     {
+	$ENV{NPW_MESSAGE_TIMEOUT}="30";
+	$ENV{NPW_DEBUG}="7";
+	$ENV{NPW_LOG}="/tmp/b.out";
 	exec $exec_string;
     }
 
@@ -110,5 +117,16 @@ sub execute {
     $self->portMappings->{$id}->{pid} = $pid;
     return $pid unless ($pid ==0);
 }
+
+sub translate_windowid {
+    my ($self, $id, $windowid) = @_;
+    my $newwindowid = `kdialog --inputbox "enter winid"`;
+    chomp $newwindowid;
+    $self->windowid($newwindowid);
+    return $self->windowid;
+
+}
+
+
 __PACKAGE__->meta->make_immutable;
 

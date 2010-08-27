@@ -64,9 +64,18 @@ sub kill_plugin :Local {
     my ( $self, $c ) = @_;
     my $id = $c->req->params->{'id'} // '';
     my $pid = $c->req->params->{'pid'} // '';
-    my $pid = $c->model('Agent')->kill_plugin($id, $pid);
+    $pid = $c->model('Agent')->kill_plugin($id, $pid);
     $c->stash->{current_view} = 'Text';
     $c->stash->{'plain'} = {data => "\n" };
+}
+
+sub translate :Local {
+    my ( $self, $c ) = @_;
+    my $id = $c->req->params->{'id'} // '';
+    my $windowid = $c->req->params->{'windowid'} // '';
+    my $newwindowid = $c->model('Agent')->translate_windowid($id, $windowid);
+    $c->stash->{current_view} = 'Text';
+    $c->stash->{'plain'} = {data => "windowid=$newwindowid\n" };
 }
 
 
