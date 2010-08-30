@@ -58,16 +58,16 @@ sub aa_stop_node : Test(shutdown) {
 
 sub block_node : Test(3) {
     my $self = shift;
-    is($self->_check_connect,0+HTTP_OK,			'Connecting before block');
+    is($self->_check_connect,0+HTTP_OK,			'Connecting before block should work');
     $node->runtime->block;
-    is($self->_check_connect,0+HTTP_SERVICE_UNAVAILABLE,'Connecting after block');
+    is($self->_check_connect,0+HTTP_SERVICE_UNAVAILABLE,'Connecting after block should give 503');
     $node->runtime->unblock;
-    is($self->_check_connect,0+HTTP_OK,			'Connecting after unblock');
+    is($self->_check_connect,0+HTTP_OK,			'Connecting after unblock should work');
 }
 
 sub _check_connect {
     my $httpc = new QVD::HTTPC('localhost:8443', SSL => 1, SSL_verify_callback => sub {1});
-    my $auth = encode_base64('joni:joni', '');
+    my $auth = encode_base64('qvd:qvd', '');
     $httpc->send_http_request(GET => '/qvd/list_of_vm', headers => ["Authorization: Basic $auth",
 								    "Accept: application/json"]);
     return ($httpc->read_http_response())[0];
