@@ -9,6 +9,7 @@
 <tr><td><b>Test Suite</b></td></tr>
 <tr><td><a href="Login-and-logout">Login and logout</a></td></tr>
 <tr><td><a href="Login-invalid">Login invalid</a></td></tr>
+<tr><td><a href="Create-user">Create user</a></td></tr>
 </tbody></table>
 </body>
 </html>
