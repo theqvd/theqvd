@@ -3,12 +3,12 @@
 <head profile="http://selenium-ide.openqa.org/profiles/test-case">
 <meta http-equiv="Content-Type" content="text/html; charset=UTF-8" />
 <link rel="selenium.base" href="" />
-<title>Create user</title>
+<title>Delete user</title>
 </head>
 <body>
 <table cellpadding="1" cellspacing="1" border="1">
 <thead>
-<tr><td rowspan="1" colspan="3">Create user</td></tr>
+<tr><td rowspan="1" colspan="3">Delete user</td></tr>
 </thead><tbody>
 <tr>
 	<td>open</td>
@@ -41,44 +41,34 @@
 	<td></td>
 </tr>
 <tr>
+	<td>click</td>
+	<td>//input[@name='selected'][1]</td>
+	<td></td>
+</tr>
+<tr>
 	<td>assertText</td>
 	<td>content</td>
 	<td>*Users*</td>
 </tr>
 <tr>
-	<td>clickAndWait</td>
-	<td>link=New</td>
+	<td>click</td>
+	<td>//input[@value='Delete']</td>
 	<td></td>
 </tr>
 <tr>
-	<td>assertText</td>
-	<td>content</td>
-	<td>*Users » New*</td>
-</tr>
-<tr>
-	<td>type</td>
-	<td>login</td>
-	<td>prueba</td>
-</tr>
-<tr>
-	<td>type</td>
-	<td>password</td>
-	<td>prueba</td>
-</tr>
-<tr>
-	<td>type</td>
-	<td>confirm_password</td>
-	<td>prueba</td>
-</tr>
-<tr>
-	<td>clickAndWait</td>
-	<td>add_submit</td>
+	<td>assertConfirmation</td>
+	<td>Are you sure?</td>
 	<td></td>
 </tr>
 <tr>
-	<td>assertText</td>
+	<td>waitForPageToLoad</td>
+	<td></td>
+	<td></td>
+</tr>
+<tr>
+	<td>assertTextNotPresent</td>
 	<td>content</td>
-	<td>*prueba added successfully with id*</td>
+	<td>*prueba*</td>
 </tr>
 <tr>
 	<td>clickAndWait</td>

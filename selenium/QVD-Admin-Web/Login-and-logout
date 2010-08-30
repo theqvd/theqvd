@@ -37,8 +37,8 @@
 </tr>
 <tr>
 	<td>assertText</td>
-	<td>//div[@id='content']/div[6]/h1</td>
-	<td>Welcome to Quality Virtual Desktop</td>
+	<td>content</td>
+	<td>*Welcome to Quality Virtual Desktop*</td>
 </tr>
 <tr>
 	<td>clickAndWait</td>
