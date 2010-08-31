@@ -11,6 +11,7 @@
 <tr><td><a href="Login-invalid">Login invalid</a></td></tr>
 <tr><td><a href="Create-user">Create user</a></td></tr>
 <tr><td><a href="Create-duplicate-user">Create duplicate user</a></td></tr>
+<tr><td><a href="Change-password">Change password</a></td></tr>
 <tr><td><a href="Delete-user">Delete user</a></td></tr>
 </tbody></table>
 </body>

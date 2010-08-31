@@ -70,6 +70,11 @@
 	<td>link=Log out</td>
 	<td></td>
 </tr>
+<tr>
+	<td>assertText</td>
+	<td>footer</td>
+	<td>Quality Virtual Desktop Web Admin Tool, by QindelGroup</td>
+</tr>
 
 </tbody></table>
 </body>
