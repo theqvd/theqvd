@@ -5,12 +5,14 @@ use strict;
 use warnings;
 
 use Test::More	qw(no_plan);
-use File::Slurp qw(slurp);
 
 sub check_environment : Test(startup => 3) {
     is($^O, 'linux', 'Node installation can be tested only on linux');
 
-    my $issue = slurp('/etc/issue');
+    open my $issue_fh, '<', '/etc/issue';
+    my $issue = <$issue_fh>;
+    close $issue_fh;
+
     chomp $issue;
     if ($issue =~ /Ubuntu ([.0-9]+)/) {
 	my $version = $1;
@@ -20,8 +22,11 @@ sub check_environment : Test(startup => 3) {
 	fail("Not Ubuntu linux (I read $issue from /etc/issue)");
     }
 
-    my @sources = grep m!^deb http://qvd.qindel.com/debian!, slurp('/etc/apt/sources.list');
-    ok(scalar @sources, 		'Presence of QVD debian repository in sources.list');
+    open my $sources_fh, '<', '/etc/apt/sources.list';
+    my @sources = <$sources_fh>;
+    close $sources_fh;
+    @sources = grep m!^deb http://qvd.qindel.com/debian!, @sources;
+    ok(@sources, 		'Presence of QVD debian repository in sources.list');
 }
 
 sub install_node : Test(6) {
