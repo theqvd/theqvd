@@ -26,7 +26,7 @@ my ($w) = WaitWindowViewable('^QVD$');
 ok($w,					"Client window appeared");
 
 SetInputFocus($w);
-SendKeys("jonix\tjoni\tlocalhost\n");
+SendKeys("qvd\tqvd\taltar\n");
 
 ok(!WaitWindowHidden($w, 60),		"Client window disappeared");
 
