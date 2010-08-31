@@ -61,11 +61,6 @@
 	<td></td>
 </tr>
 <tr>
-	<td>waitForPageToLoad</td>
-	<td></td>
-	<td></td>
-</tr>
-<tr>
 	<td>assertTextNotPresent</td>
 	<td>content</td>
 	<td>*prueba*</td>
