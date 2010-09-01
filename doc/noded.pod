@@ -1,0 +1,131 @@
+=head1 NAME
+
+Noded
+
+=head1 Introduccion
+
+Noded es un demonio que corre en todas las maquinas de la granja y que
+se encarga de gestionar todos los procesos de QVD.
+
+=head1 Procesos
+
+El demonio noded corre cuatro procesos principales
+
+=over 4
+
+=item El proceso master
+
+El proceso master tiene dos tareas bien diferenciadas:
+
+Por un lado es el que se encarga de la creacion de todos los demas
+procesos y de detectar cuando alguno de ellos se cae o cuando deja de
+responder.
+
+Por otro funciona como un esclavo del proceso HKD ejecutando las
+tareas que requieren interaccion con el sistema operativo, como por
+ejemplo el arranque y parada de las maquinas virtuales.
+
+El proceso master no se conecta a la base de datos en ningun caso.
+
+=item El L7R (Level 7 router)
+
+Es el servicio web accesible desde el exterior y a traves del cual los
+clientes se conectan a las maquinas virtuales
+
+Cada vez que se establece una conexion nueva el L7R crea un nuevo
+proceso para gestionarla.
+
+Dentro del L7R tambien se realizan las labores de autorizacion y
+authenticazion de usuarios, de autoprovision en caso de ser necesario
+y la logica de balanceo de carga entre los nodos de la granja.
+
+=item El HKD (House Keeping Daemon)
+
+Es el demonio que se encarga de gestionar las maquinas virtuales y la
+sincronizacion del estado de las mismas con la base de datos.
+
+=item DHCPD
+
+El servidor de DHCP que es el encargado de dar a las maquinas
+virtuales la direccion IP preasignada durante su arranque.
+
+=back
+
+=head1 Interaccion entre HKD y master
+
+El HKD no realiza directamente las tareas que requieran interactuar
+con el sistema operativo tales como crear interfaces de red o lanzar
+procesos sino que las delega al proceso master a traves de un
+mecanismo de RPC. Notese que el proceso master actua como servidor de
+RPC y el HKD como cliente.
+
+De esta manera el proceso master es el que en realidad lanza las
+maquinas virtuales corriendolas como procesos hijos suyos y mantiene
+una contabilidad de las mismas.
+
+El sistema de RPC descrito funciona a traves de un socket Unix de tipo
+datagrama (de paquetes) y para la codificacion de la informacion se
+utiliza JSON.
+
+=head1 Keek-Alive del HKD
+
+Entre el HKD y el proceso master hay tambien establecido un mecanismo
+de Keep-Alive para detectar cuando el HKD se queda enganchado en una
+conexion muerta con la base de datos (por ejemplo, cuando se cae uno
+de los nodos del cluster de base de datos). En este caso, el master
+mata al HKD y lo vuelve a lanzar (esperando que en este caso, la base
+de datos ya este operativa en el otro nodo). De hecho esta es la razon
+fundamental por la cual el HKD y el master son procesos distintos en
+vez de uno (inicialmente era así).
+
+Este mecanismo de Keep-Alive funciona en base a un timer
+(hkd_time_limit_1 = internal.hkd.database.timeout) que es iniciado por
+el HKD cuando este arranca (a traves de RPC). Periodicamente el HKD
+resetea el timer.
+
+Cuando el HKD se queda colgado deja de resetear el timer y al cabo del
+tiempo estipulado este expira, en ese momento el proceso master mata
+el proceso HKD y acto seguido lo vuelve a levantar.
+
+Para detectar el caso de multiples intentos fallidos de arranque del
+HKD existe un segundo timer (hkd_time_limit_2 =
+internal.hkd.cluster.node.timeout) de más larga duracion. Cuando este
+segundo timer expira el proceso master interpreta que hay algun
+problema fatal que no permite el funcionamiento de QVD en el
+nodo. Mata todas las maquinas virtuales (que podran ser recuperadas
+por algun otro nodo), mata el L7R y termina la ejecucion.
+
+Cuando se rearranca el HKD, el proceso master le pasa la lista de
+maquinas virtuales que el esta gestionando de manera que la caida del
+HKD no supone el reinicio de las maquinas virtuales corriendo en el
+nodo.
+
+=head1 Deteccion de nodo caido
+
+Durante su funcionamiento normal el HKD de forma periodica actualiza
+en la tabla de la base de datos Host_Runtimes la columna ok_ts con el
+tiempo actual.
+
+A la vez de forma periodica (aunque con cierta aleatoriedad) el HKD de
+cada uno de los nodos comprueba al resto para ver si alguno lleva
+demasiado tiempo sin actualizarse ($cluster_timeout =
+internal.hkd.cluster.node.timeout). En ese caso, las maquinas
+virtuales son liberadas del nodo caido con lo que podran volver a ser
+arrancadas en otro (Aunque en la actualidad se marcan como bloqueadas
+por lo que es necesaria la intervencion del administrador).
+
+=head1 Interaccion del master con el resto de procesos
+
+El L7R se levanta de forma automatica al iniciar el noded y cada vez
+que se cae.
+
+Cuando se trata de un nodo de la granja que no esta en la capa de
+frontend, el L7R se levanta igual pero responde a las peticiones HTTP
+con un error indicando que el servicio no esta disponible.
+
+El DHCPD se reinicia cada vez que se levanta una maquina virtual para
+poder hacer frente a posibles cambios en la configuracion tales como
+la provision de una nueva maquina virtual.
+
+La configuracion del DHCPD se recrea directamente por el HKD que es
+tambien el que pide al master que reinicie dicho demonio.
