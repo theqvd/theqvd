@@ -15,6 +15,8 @@
 <tr><td><a href="Change-password">Change password</a></td></tr>
 <tr><td><a href="Delete-user">Delete user</a></td></tr>
 <tr><td><a href="Create-new-virtual-machine">Create new virtual machine</a></td></tr>
+<tr><td><a href="Create-duplicate-virtual-machine">Create duplicate virtual machine</a></td></tr>
+<tr><td><a href="Delete-virtual-machine">Delete virtual machine</a></td></tr>
 </tbody></table>
 </body>
 </html>
