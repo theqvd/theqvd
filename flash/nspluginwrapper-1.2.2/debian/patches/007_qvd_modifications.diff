@@ -1,8 +1,8 @@
 Index: nspluginwrapper-1.2.2/src/npw-remote-agent-info.c
 ===================================================================
 --- /dev/null	1970-01-01 00:00:00.000000000 +0000
-+++ nspluginwrapper-1.2.2/src/npw-remote-agent-info.c	2010-08-26 11:53:33.000000000 +0200
-@@ -0,0 +1,491 @@
++++ nspluginwrapper-1.2.2/src/npw-remote-agent-info.c	2010-09-03 17:45:44.000000000 +0200
+@@ -0,0 +1,645 @@
 +/*
 + * npw-remote-agent-info.c
 + *
@@ -43,6 +43,7 @@ Index: nspluginwrapper-1.2.2/src/npw-remote-agent-info.c
 +#include <curl/curl.h>
 +#include <curl/types.h>
 +#include <curl/easy.h>
++#include <X11/Xlib.h>
 +#include "npw-use-tcp-sockets.h"
 +#include "npw-remote-agent-info.h"
 +
@@ -448,10 +449,161 @@ Index: nspluginwrapper-1.2.2/src/npw-remote-agent-info.c
 +  return pid;
 +}
 +
++Window getChild_r(Window windowid, Display *display, unsigned int width, unsigned int height)
++{
++  Window *children, root_return, parent_return, *children_ptr, child;
++  unsigned int nchildren_return, i, border_width, depth,
++    children_width, children_height;
++  int x, y;
++
++
++  Status result = XQueryTree(display,
++			     windowid,
++			     &root_return,
++			     &parent_return,
++			     &children,
++			     &nchildren_return);
++  if (!result)
++    {
++      npw_printf("Error getting XQueryTree for id 0x%lx\n", windowid);
++      return (0);
++    }
++
++  printf("Num children for window id 0x%lx (%ux%u) : %d\n", windowid, width, height, nchildren_return);
++
++  for (i=0, children_ptr = children ; i < nchildren_return ; i ++)
++    {
++      printf("Child id: 0x%lx\n", *children_ptr);
++      result = XGetGeometry(display, *children_ptr, &root_return, &x, &y,
++			    &children_width, &children_height, &border_width,
++			    &depth);
++      if (!result)
++	{
++	  npw_printf("Error getting XGetGeometry for id 0x%lx\n", windowid);
++	  return (0);
++	}
++
++      if (children_width == width && children_height == height)
++	{
++	  printf("Child 0x%lx has the same height and width ast the parent. Traversing tree\n", *children_ptr);
++	  child = getChild_r(*children_ptr, display, width, height);
++	  XFree(children);
++	  if (child)
++	    return child;
++	  else
++	    return windowid;
++	}
++      else
++	{
++	  printf("Skipping child 0x%lx because the height and width are differnt\n", *children_ptr);
++	}
++      children_ptr ++;
++    }
++
++  XFree(children);
++  // Not found;
++  return windowid;
++}
++
++/*
++ * If no child exists of the same size it returns the same windowid
++ * It returns 0 on error
++ */
++Window getChild(Window windowid)
++{
++  Display  *display;
++  Window root_return;
++  unsigned int width, height, border_width, depth;
++  int x, y;
++
++  display = XOpenDisplay(0);
++  if (!display)
++    {
++      npw_printf("can't open display\n");
++      return (0);
++    }
++
++
++  Status result = XGetGeometry(display, windowid, &root_return, &x, &y,
++			&width, &height, &border_width, &depth);
++  if (!result)
++    {
++      npw_printf("Error getting XGetGeometry for id 0x%lx\n", windowid);
++      return (0);
++    }
++
++  return getChild_r(windowid, display, width, height);
++}
++
++Window getWindowidProp(Window windowid)
++{
++  const char *property = QVD_XPROP_TRANSLATION;
++  Atom     actual_type;
++  int      actual_format;
++  unsigned long  nitems;
++  unsigned long  bytes;
++  long     *data = NULL;
++
++  Display *display = XOpenDisplay(0);
++  if (!display)
++    {
++      npw_printf("can't open display\n");
++      return (0);
++    }
++
++  D(bug("getWindowidProp, trying to get property: %s\n", property));
++  Atom propertyAtom = XInternAtom(display, property, True);
++  D(bug("getWindowidProp, after getting property: %s, %ld\n", property, propertyAtom));
++  if (propertyAtom == None)
++    {
++      npw_printf("The Xwindows property %s does not exists\n", property);
++      return 0;
++    }
++  Status result = XGetWindowProperty(
++                display,
++                windowid,
++                propertyAtom, //replace this with your property
++                0,
++                (~0L),
++                False,
++                AnyPropertyType,
++                &actual_type,
++                &actual_format,
++                &nitems,
++                &bytes,
++                (unsigned char**)&data);
++  if (result != Success)
++    {
++      npw_printf("Error getting XGetWindowProperty %s for id 0x%lx\n", property, windowid);
++      return (0);
++    }
++  D(bug ("Data actual_type: %ld, format: %d, nitems: %ld, bytes: %ld, data: 0x%lx %ld\n", actual_type, actual_format, nitems, bytes, *data, *data));
++  if (nitems < 1 || data == NULL)
++    return 0;
++  return *data;
++}
++
++
++
 +/*
 + * Receives as input the window id, and returns the same or the translated one
 + * On error the same windowid is returned. is this correct? (TODO)
 + */
++
++void *translate_parent_window_id(void *windowid, const char *id)
++{
++  Window new_windowid = getWindowidProp((Window)windowid);
++
++  if (new_windowid == 0)
++    {
++      new_windowid = (Window)windowid;
++      npw_printf("translate_parent_window_id returned null, setting the same windowid\n", new_windowid);
++    }
++
++  D(bug("translate_parent_window_id for id %s translated windowid for from %p->%p [%lx]\n", id, windowid, (void *)new_windowid, new_windowid));
++  return (void *)new_windowid;
++}
++/*
 +void *translate_parent_window_id(void *windowid, const char *id)
 +{
 +  int ret_code;
@@ -464,16 +616,14 @@ Index: nspluginwrapper-1.2.2/src/npw-remote-agent-info.c
 +  void *new_windowid;
 +
 +  npw_xwin_translate_service_uri = getenv(NPW_XWININFO_TRANSLATE_AGENT_ENV);
-+  if (!npw_xwin_translate_service_uri)
-+    {
++  if (!npw_xwin_translate_service_uri) {
 +      D(bug("translate_parent_window_id: not defined translation service env var: %s for id %s. Returning the same windowid %p", NPW_XWININFO_TRANSLATE_AGENT_ENV, id, windowid));
 +      return windowid;
-+    }
++  }
 +
 +  D(bug("translate_parent_window_id env var %s defined for id %s: %so. windowid=%p\n", NPW_XWININFO_TRANSLATE_AGENT_ENV, id, npw_xwin_translate_service_uri, windowid));
 +
 +  init_mem(keys, values, &chunk);
-+
 +  snprintf(parameters, MAX_URL_SIZE, "windowid=%p&id=%s", windowid, id);
 +  build_url(myurl, MAX_URL_SIZE, npw_xwin_translate_service_uri, TRANSLATE_WINID_OP, parameters);
 +
@@ -491,14 +641,18 @@ Index: nspluginwrapper-1.2.2/src/npw-remote-agent-info.c
 +    npw_printf("ERROR: translate_parent_window_id Unable to parse new windowid%s\n", windowid_str);
 +    return windowid;
 +  }
++
 +  D(bug("translate_parent_window_id translated windowid for id %s from %p->%p\n", id, windowid, new_windowid));
 +  return new_windowid;
++
 +}
++
++*/
 Index: nspluginwrapper-1.2.2/src/npw-remote-agent-info.h
 ===================================================================
 --- /dev/null	1970-01-01 00:00:00.000000000 +0000
-+++ nspluginwrapper-1.2.2/src/npw-remote-agent-info.h	2010-08-26 11:53:33.000000000 +0200
-@@ -0,0 +1,55 @@
++++ nspluginwrapper-1.2.2/src/npw-remote-agent-info.h	2010-09-03 17:45:44.000000000 +0200
+@@ -0,0 +1,58 @@
 +/*
 + * npw-agent-info.h
 + *
@@ -538,10 +692,12 @@ Index: nspluginwrapper-1.2.2/src/npw-remote-agent-info.h
 +#define EXECUTE_REMOTE_PLUGIN "execute_plugin"
 +#define EXECUTE_REMOTE_PLUGIN_KILL "kill_plugin"  // define the environment
 +  // define xwindow translation service
++      //NPW_XWININFO_TRANSLATE_AGENT_ENV
 +#define NPW_XWININFO_TRANSLATE_AGENT_ENV "NPW_NX_AGENT_URI"
 +#define TRANSLATE_WINID_OP "translate"
 +  // define This environment var to 1 to use TCP sockets
 +#define NPW_USE_TCPIP_PORT "NPW_USE_TCPIP_PORT"
++#define QVD_XPROP_TRANSLATION "_QVD_CLIENT_WID"
 +
 +
 +extern void set_remote_connection_path(char *connection_path, const char *id);
@@ -549,6 +705,7 @@ Index: nspluginwrapper-1.2.2/src/npw-remote-agent-info.h
 +extern int invoke_remote_plugin(const char *exec_string, const char *id);
 +extern int invoke_remote_kill(int pid, const char *id);
 +extern void *translate_parent_window_id(void *windowid, const char *id);
++
 +#ifdef __cplusplus
 +}
 +#endif
@@ -557,8 +714,8 @@ Index: nspluginwrapper-1.2.2/src/npw-remote-agent-info.h
 Index: nspluginwrapper-1.2.2/src/npw-use-tcp-sockets.c
 ===================================================================
 --- /dev/null	1970-01-01 00:00:00.000000000 +0000
-+++ nspluginwrapper-1.2.2/src/npw-use-tcp-sockets.c	2010-08-26 11:53:33.000000000 +0200
-@@ -0,0 +1,58 @@
++++ nspluginwrapper-1.2.2/src/npw-use-tcp-sockets.c	2010-09-03 17:45:44.000000000 +0200
+@@ -0,0 +1,59 @@
 +/*
 + * npw-use-tcp-sockets.c
 + *
@@ -582,7 +739,7 @@ Index: nspluginwrapper-1.2.2/src/npw-use-tcp-sockets.c
 + *  51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA.
 + */
 +#include "sysdeps.h"
-+
++#include "npw-use-tcp-sockets.h"
 +#define DEBUG 1
 +#include "debug.h"
 +
@@ -617,11 +774,12 @@ Index: nspluginwrapper-1.2.2/src/npw-use-tcp-sockets.c
 +  use_remote_invocation_flag = 0;
 +  return use_remote_invocation_flag;
 +}
++
 Index: nspluginwrapper-1.2.2/src/npw-use-tcp-sockets.h
 ===================================================================
 --- /dev/null	1970-01-01 00:00:00.000000000 +0000
-+++ nspluginwrapper-1.2.2/src/npw-use-tcp-sockets.h	2010-08-26 11:53:33.000000000 +0200
-@@ -0,0 +1,39 @@
++++ nspluginwrapper-1.2.2/src/npw-use-tcp-sockets.h	2010-09-03 17:45:44.000000000 +0200
+@@ -0,0 +1,38 @@
 +/*
 + * use-tcp-sockets.h
 + *
@@ -655,7 +813,6 @@ Index: nspluginwrapper-1.2.2/src/npw-use-tcp-sockets.h
 +extern int set_remote_invocation();
 +extern int unset_remote_invocation();
 +
-+
 +#ifdef __cplusplus
 +}
 +#endif
@@ -663,8 +820,8 @@ Index: nspluginwrapper-1.2.2/src/npw-use-tcp-sockets.h
 +#endif
 Index: nspluginwrapper-1.2.2/Makefile
 ===================================================================
---- nspluginwrapper-1.2.2.orig/Makefile	2010-08-26 11:53:33.000000000 +0200
-+++ nspluginwrapper-1.2.2/Makefile	2010-08-26 11:53:33.000000000 +0200
+--- nspluginwrapper-1.2.2.orig/Makefile	2010-09-03 17:45:44.000000000 +0200
++++ nspluginwrapper-1.2.2/Makefile	2010-09-03 17:45:44.000000000 +0200
 @@ -106,14 +106,18 @@
  
  npwrapper_LIBRARY = npwrapper.so
@@ -703,8 +860,8 @@ Index: nspluginwrapper-1.2.2/Makefile
  test_rpc_client_CPPFLAGS = $(CPPFLAGS) -I$(SRC_PATH)/src -DBUILD_CLIENT -DNPW_COMPONENT_NAME="\"Client\""
 Index: nspluginwrapper-1.2.2/src/npw-wrapper.c
 ===================================================================
---- nspluginwrapper-1.2.2.orig/src/npw-wrapper.c	2010-08-26 11:53:30.000000000 +0200
-+++ nspluginwrapper-1.2.2/src/npw-wrapper.c	2010-08-26 11:53:33.000000000 +0200
+--- nspluginwrapper-1.2.2.orig/src/npw-wrapper.c	2010-09-03 17:45:42.000000000 +0200
++++ nspluginwrapper-1.2.2/src/npw-wrapper.c	2010-09-03 17:45:44.000000000 +0200
 @@ -42,6 +42,8 @@
  #include <X11/Shell.h>
  #include <X11/StringDefs.h>
@@ -722,7 +879,7 @@ Index: nspluginwrapper-1.2.2/src/npw-wrapper.c
  } Plugin;
  
  static Plugin g_plugin = { 0, -1, 0, NULL, NULL, NULL };
-@@ -1956,6 +1959,20 @@
+@@ -1956,6 +1959,19 @@
    if (plugin == NULL)
  	return NPERR_INVALID_INSTANCE_ERROR;
  
@@ -734,16 +891,15 @@ Index: nspluginwrapper-1.2.2/src/npw-wrapper.c
 +  D(bug("NPP_SetWindow pointers plugin native_instance=%p", plugin->instance));
 +  D(bug("NPP_SetWindow pointers plugin->pdata=%p, plugin->ndata=%p\n",
 +  plugin->instance->pdata,plugin->instance->ndata));*/
-+  D(bug("NPP_SetWindow before setting window->window=%p\n",
-+	window->window));
-+  window->window = translate_parent_window_id(window->window, g_plugin.unique_id);
-+  D(bug("NPP_SetWindow after setting window->window=%p\n",
-+	window->window));
-+
++  D(bug("NPP_SetWindow before setting window->window=%p, ptr size=%d\n",
++	window->window, sizeof(window->window)));
++  //  window->window = translate_parent_window_id(window->window, g_plugin.unique_id);
++  D(bug("NPP_SetWindow after setting window->window=%p, ptr size=%d\n",
++	window->window, sizeof(window->window)));
    D(bugiI("NPP_SetWindow instance=%p\n", instance));
    NPError ret = invoke_NPP_SetWindow(plugin, window);
    D(bugiD("NPP_SetWindow return: %d [%s]\n", ret, string_of_NPError(ret)));
-@@ -3327,7 +3344,7 @@
+@@ -3327,7 +3343,7 @@
  	g_plugin.initialized = 1 + is_NP_Initialize;
  	return;
    }
@@ -752,7 +908,7 @@ Index: nspluginwrapper-1.2.2/src/npw-wrapper.c
    if (PLUGIN_DIRECT_EXEC){
  	g_plugin.initialized = 1;
  	return;
-@@ -3350,10 +3367,25 @@
+@@ -3350,10 +3366,25 @@
    ++init_count;
    char viewer_path[PATH_MAX];
    sprintf(viewer_path, "%s/%s/%s/%s", NPW_LIBDIR, NPW_Plugin.target_arch, NPW_Plugin.target_os, NPW_VIEWER);
@@ -779,7 +935,7 @@ Index: nspluginwrapper-1.2.2/src/npw-wrapper.c
    if (g_plugin.name == NULL && g_plugin.description == NULL && g_plugin.formats == NULL) {
  	char command[1024];
  	if (snprintf(command, sizeof(command), "%s --info --plugin %s", viewer_path, plugin_path) >= sizeof(command))
-@@ -3403,7 +3435,22 @@
+@@ -3403,7 +3434,22 @@
  	return;
  
    // Start plug-in viewer
@@ -789,7 +945,7 @@ Index: nspluginwrapper-1.2.2/src/npw-wrapper.c
 +      char remote_exec[PATH_MAX];
 +      D(bug("Invoking remote invocation for plugin\n"));
 +      snprintf(remote_exec, PATH_MAX,
-+	       "%s%%20--plugin%%20%s%%20--connection%%20%s", viewer_path, plugin_path, connection_path);
++	       "%s%%20--plugin%%20%s%%20--connection%%20%s%20--remote-invocation", viewer_path, plugin_path, connection_path);
 +      if ((g_plugin.viewer_pid = invoke_remote_plugin(remote_exec, unique_id_path)) < 0 )
 +	{
 +	  npw_printf("ERROR: failed to execute remote NSPlugin viewer\n");
@@ -803,7 +959,7 @@ Index: nspluginwrapper-1.2.2/src/npw-wrapper.c
  	char *argv[8];
  	int argc = 0;
  
-@@ -3419,7 +3466,8 @@
+@@ -3419,7 +3465,8 @@
  	execv(viewer_path, argv);
  	npw_printf("ERROR: failed to execute NSPlugin viewer\n");
  	_Exit(255);
@@ -813,7 +969,7 @@ Index: nspluginwrapper-1.2.2/src/npw-wrapper.c
  
    // Initialize browser-side RPC communication channel
    if ((g_rpc_connection = rpc_init_client(connection_path)) == NULL) {
-@@ -3558,6 +3606,14 @@
+@@ -3558,6 +3605,14 @@
    }
  
    if (g_plugin.viewer_pid != -1) {
@@ -828,7 +984,7 @@ Index: nspluginwrapper-1.2.2/src/npw-wrapper.c
  	// let it shutdown gracefully, then kill it gently to no mercy
  	const int WAITPID_DELAY_TO_SIGTERM = 3;
  	const int WAITPID_DELAY_TO_SIGKILL = 3;
-@@ -3577,9 +3633,10 @@
+@@ -3577,9 +3632,10 @@
  	  }
  	  sleep(1);
  	}
@@ -843,8 +999,8 @@ Index: nspluginwrapper-1.2.2/src/npw-wrapper.c
  
 Index: nspluginwrapper-1.2.2/src/rpc.c
 ===================================================================
---- nspluginwrapper-1.2.2.orig/src/rpc.c	2010-08-26 11:53:30.000000000 +0200
-+++ nspluginwrapper-1.2.2/src/rpc.c	2010-08-26 11:53:33.000000000 +0200
+--- nspluginwrapper-1.2.2.orig/src/rpc.c	2010-09-03 17:45:42.000000000 +0200
++++ nspluginwrapper-1.2.2/src/rpc.c	2010-09-03 17:45:44.000000000 +0200
 @@ -42,14 +42,17 @@
  #include <sys/wait.h>
  #include <sys/select.h>
