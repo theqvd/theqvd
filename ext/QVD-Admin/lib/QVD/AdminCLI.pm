@@ -74,7 +74,7 @@ sub cmd_host_list {
     my ($self, @args) = @_;
 
     my $rs = $self->get_resultset('host');
-    my @header = ("Id", "Name", "Address ","HKD", "VMs assigned", "Blocked", "State");
+    my @header = ("Id", "Name", "Address ","HKD", "Usable RAM", "Usable CPU", "VMs assigned", "Blocked", "State");
     my @body;
 
     eval {
@@ -82,6 +82,7 @@ sub cmd_host_list {
 	    my $hkd_ts = defined $host->runtime ? $host->runtime->ok_ts : undef;
 	    my $mins = defined $hkd_ts ? _format_timespan(time - $hkd_ts) : '-';
 	    my @row = ($host->id, $host->name, $host->address, $mins,
+				$host->runtime->usable_ram, $host->runtime->usable_cpu,
 				$host->vms->count, $host->runtime->blocked, $host->runtime->state);
 	    push(@body, \@row);
 	}
@@ -814,6 +815,8 @@ sub _config_pairs {
         $self->_print("Wrong syntax, check the command help:\n");
         $self->help_config_get;	
     }
+    ## #540: vm.network.netmask and vm.network.gateway have no
+    ## default, so they don't appear in the output of 'config get'
     my @to_ret = @_ ? @_ : keys %{{ $QVD::Config::defaults->properties }};
     foreach my $k (@to_ret) {
         if (my $c = (grep { $_->key eq $k } @$configs)[0]) {
@@ -843,30 +846,19 @@ usage: config get [key...]
 EOT
 }
 
-sub cmd_vm_net {
+sub cmd_vm_edit {
     my ($self, @args) = @_;
-    my $subcmd = shift @args;
+
+    if (scalar %{$self->{admin}{filter}} eq 0) {
+        print "Are you sure you want to edit all machines? [y/N] ";
+        my $answer = <STDIN>;
+        exit 0 if $answer !~ /^y/i;
+    }   
 
     eval {
-        if ('show' eq $subcmd) {
-            my @cfg_keys = map "vm.network.$_", qw/dhcp-range netmask gateway/;
-            my @header = ("DHCP range", "Netmask", "Gateway");
-            my %pairs = $self->_config_pairs (@cfg_keys);
-            my @body = [ @pairs{@cfg_keys} ];
-            _print_table \@header, \@body;
-
-            print $/;
-
-            @header = ("Id", "IP");
-            undef @body;
-
-            my $data = $self->{admin}->cmd_vm_net_config_show;
-            push @body, [ $_, $data->{$_} ] for sort keys %$data;
-            _print_table \@header, \@body;
-        }
-        if ('set' eq $subcmd) {
-            my %args = _split_on_equals (@args);
-        }
+        my %args = _split_on_equals (@args);
+        my $count = $self->{admin}->cmd_vm_edit (%args);
+        $self->_print("Edited ".$count." VMs.");
     };
     if ($@) {
         $self->_print("Wrong syntax, check the command help:\n");
@@ -874,10 +866,10 @@ sub cmd_vm_net {
     }
 }
 
-sub help_vm_net {
+sub help_vm_edit {
     print <<EOT
 vm net: network-related commands
-usage: vm net show
+usage: vm edit
       
 Valid options:
     -f [--filter] FILTER : starts virtual machine matched by FILTER
