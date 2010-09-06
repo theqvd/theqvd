@@ -54,6 +54,12 @@ sub zz_start_node : Test(startup) {
 
 sub aa_stop_node : Test(shutdown) {
     system($noded_executable, 'stop');
+    my $stop_timeout = 10;
+    while ($nodert->state neq 'stopped') {
+	sleep 1;
+	$nodert->discard_changes;
+	$stop_timeout-- or fail("Node didn't stop"), last;
+    }
 }
 
 sub block_node : Test(3) {
