@@ -1,0 +1,15 @@
+Build.PL
+Changes
+ignore.txt
+lib/QVD/L7R/Authenticator/Plugin/Notifybymail.pm
+Makefile.PL
+MANIFEST
+META.yml
+README
+t/00-load.t
+t/10-testsmtp.t
+t/boilerplate.t
+t/lib/defaults.pl
+t/manifest.t
+t/pod-coverage.t
+t/pod.t
