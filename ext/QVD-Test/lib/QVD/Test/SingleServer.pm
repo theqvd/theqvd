@@ -53,6 +53,7 @@ sub zz_start_node : Test(startup) {
 }
 
 sub aa_stop_node : Test(shutdown) {
+    my $nodert = $node->runtime;
     system($noded_executable, 'stop');
     my $stop_timeout = 10;
     while ($nodert->state ne 'stopped') {
