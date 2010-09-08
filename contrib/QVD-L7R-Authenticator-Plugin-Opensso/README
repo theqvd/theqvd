@@ -1,0 +1,27 @@
+QVD-L7R-Authenticator-Plugin-Opensso
+
+
+INSTALLATION
+
+Please install the package as
+
+ perl Build.PL && ./Build && ./Build test && ./Build install
+
+
+SUPPORT AND DOCUMENTATION
+
+After installing, you can find documentation for this module with the
+perldoc command.
+
+    perldoc QVD::L7R::Authenticator::Plugin::Opensso
+
+
+LICENSE AND COPYRIGHT
+
+Copyright (C) 2010 Nito Martinez
+
+This program is free software; you can redistribute it and/or modify it
+under the terms of either: the GNU General Public License as published
+by the Free Software Foundation; or the Artistic License.
+
+
