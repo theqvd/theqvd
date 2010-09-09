@@ -262,12 +262,23 @@ sub _check_hkd_cluster {
         undef $hkd->{next_cluster_check};
         for my $chrt (rs(Host_Runtime)->search({state => 'running'})) {
             next if $chrt->host_id == this_host_id;
+	    # TODO, esto esta muy justo! habria que darla algun
+	    # tiempo extra al noded del nodo caido para matar
+	    # sus maquinas virtuales.
             if ($chrt->ok_ts + $cluster_node_timeout < $time) {
                 txn_eval {
                     for my $vm (rs(VM_Runtime)->search({ host_id => $chrt->host_id })) {
                         $vm->set_vm_state('stopped');
                         $vm->block;
                         $vm->unassign;
+			# TODO: en este caso, seria interesante
+			# regenerar los overlays de la maquina que se
+			# recupera de manera que:
+			# - el filesystem puede estar corrupto, la
+			# fsck automatico podria fallar.
+			# - realmente nos aseguramos de que en ningun
+			# caso pueda haber dos maquinas virtuales
+			# corriendo contra la misma imagen.
                     }
                     $chrt->block;
                 };
