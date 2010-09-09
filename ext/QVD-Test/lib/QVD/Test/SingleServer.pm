@@ -63,6 +63,13 @@ sub aa_stop_node : Test(shutdown) {
     }
 }
 
+sub check_l7r_ping : Test(1) {
+    my $httpc = new QVD::HTTPC('localhost:8443', SSL => 1, SSL_verify_callback => sub {1});
+    $httpc->send_http_request(GET => '/qvd/ping');
+    my @response = $httpc->read_http_response();
+    is($response[0], 200, 'L7R should respond to ping');
+}
+
 sub block_node : Test(3) {
     my $self = shift;
     is($self->_check_connect,0+HTTP_OK,			'Connecting before block should work');
