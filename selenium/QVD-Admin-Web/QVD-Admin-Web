@@ -17,6 +17,8 @@
 <tr><td><a href="Create-duplicate-virtual-machine">Create duplicate virtual machine</a></td></tr>
 <tr><td><a href="Block-virtual-machine">Block virtual machine</a></td></tr>
 <tr><td><a href="Unblock-virtual-machine">Unblock virtual machine</a></td></tr>
+<tr><td><a href="Start-virtual-machine">Start virtual machine</a></td></tr>
+<tr><td><a href="Stop-virtual-machine">Stop virtual machine</a></td></tr>
 <tr><td><a href="Delete-virtual-machine">Delete virtual machine</a></td></tr>
 <tr><td><a href="Delete-user">Delete user</a></td></tr>
 </tbody></table>
