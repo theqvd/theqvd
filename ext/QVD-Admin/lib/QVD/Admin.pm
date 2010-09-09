@@ -576,12 +576,20 @@ sub cmd_vm_edit {
     my ($self, %args) = @_;
     my $counter = 0;
     my $rs = $self->get_resultset('vm');
+    my @vm_columns = $rs->result_source->columns;
     while (defined(my $vm = $rs->next)) {
 	txn_eval {
         $vm->discard_changes;
-        while (my ($k, $v) = each %args) {
-            $vm->update ({$k => $v});
+        my (%vm_args, %vm_runtime_args);
+        foreach my $k (keys %args) {
+            if (grep { $_ eq $k } @vm_columns) {
+                $vm_args{$k} = $args{$k};
+            } else {
+                $vm_runtime_args{$k} = $args{$k};
+            }
         }
+        $vm->update (\%vm_args);
+        $vm->vm_runtime->update (\%vm_runtime_args);
         $counter++;
 	};
     # FIXME: report errors

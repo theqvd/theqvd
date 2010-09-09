@@ -54,6 +54,32 @@ sub view : Local :Args(1){
     $c->stash->{vmrt => $vm->vm_runtime};
 }
 
+sub edit : Local Form :Args(1){
+    my ( $self, $c, $id) = @_;
+    $c->go('Root', 'login', @_) unless $c->user_exists;
+    
+    my $form  = $self->formbuilder;
+    my $model = $c->model('QVD::Admin::Web');
+    
+    my $vm = $model->vm_find($id);
+    $c->stash(vm => $vm);
+
+    if ( $form->submitted ) {
+        if ( $form->validate ) {
+            $model->admin->set_filter (id => $id);
+            my %params =
+                map { $_ => $c->req->body_params->{$_} }
+                grep { defined $c->req->body_params->{$_} }
+                qw/name ip vm_ssh_port vm_vnc_port vm_serial_port/;
+            my $count = $model->vm_edit (\%params);
+
+            ## I'd like to return to "/vm/view/$id" but this redirect seems to be ignored
+            ## I leave it as "/users" to show that it doesn't work
+            $c->response->redirect( $c->uri_for( $self->action_for("/users") ) );
+        }
+    }
+}
+
 sub list : Local {
     my ( $self, $c, $s ) = @_;
     $c->go('Root', 'login', @_) unless $c->user_exists;

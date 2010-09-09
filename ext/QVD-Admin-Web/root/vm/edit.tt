@@ -1,0 +1,108 @@
+<h1><a href="[% c.uri_for('/vm') %]">Virtual machines</a> &raquo; [% vm.name %]</h1>
+
+<script type="text/javascript"><!-- hide from old browsers
+function validate_edit (form) {
+    var alertstr = '';
+    var invalid  = 0;
+    var invalid_fields = new Array();
+
+    // name: standard text, hidden, password, or textarea box
+    var name = form.elements['name'].value;
+    if (name == null || name === "") {
+        alertstr += '- Invalid entry for the "Name" field\n';
+        invalid++;
+        invalid_fields.push('name');
+    }
+    // address: standard text, hidden, password, or textarea box
+    var address = form.elements['address'].value;
+    if (address != "" && !address.match(/^([0-1]??\d{1,2}|2[0-4]\d|25[0-5])\.([0-1]??\d{1,2}|2[0-4]\d|25[0-5])\.([0-1]??\d{1,2}|2[0-4]\d|25[0-5])\.([0-1]??\d{1,2}|2[0-4]\d|25[0-5])$/)) {
+        alertstr += '- Invalid entry for the "IP Address" field\n';
+        invalid++;
+        invalid_fields.push('address');
+    }
+    // ssh_port: standard text, hidden, password, or textarea box
+    var ssh_port = form.elements['ssh_port'].value;
+    if (ssh_port != "" && !ssh_port.match(/^\d+$/)) {
+        alertstr += '- Invalid entry for the "SSH port" field\n';
+        invalid++;
+        invalid_fields.push('ssh_port');
+    }
+    // vnc_port: standard text, hidden, password, or textarea box
+    var vnc_port = form.elements['vnc_port'].value;
+    if (vnc_port != "" && !vnc_port.match(/^\d+$/)) {
+        alertstr += '- Invalid entry for the "VNC port" field\n';
+        invalid++;
+        invalid_fields.push('vnc_port');
+    }
+    // serial_port: standard text, hidden, password, or textarea box
+    var serial_port = form.elements['serial_port'].value;
+    if (serial_port != "" && !serial_port.match(/^\d+$/)) {
+        alertstr += '- Invalid entry for the "Serial port" field\n';
+        invalid++;
+        invalid_fields.push('serial_port');
+    }
+    if (invalid > 0 || alertstr != '') {
+        if (! invalid) invalid = 'The following';   // catch for programmer error
+        alert(''+invalid+' error(s) were encountered with your submission:'+'\n\n'
+                +alertstr+'\n'+'Please correct these fields and try again.');
+        return false;
+    }
+    return true;  // all checked ok
+}
+//-->
+</script>
+<noscript><span class="fb_invalid">Please enable Javascript or use a newer browser.</span></noscript>
+
+<div class="view">
+    <form action="/vm/edit/[% vm.id %]" class="fb_form" id="edit" method="post" name="edit" onsubmit="return validate_edit(this);" autocomplete="off">
+    <table class="tablesorter resultset">
+	<tr>
+	    <td class="field">Identifier</td>
+	    <td class="value">[% vm.id %]</td>
+	</tr>
+	<tr>
+	    <td class="field">Name</td>
+	    <td class="value"><input name="name" value="[% vm.name %]" /></td>
+	</tr>
+	<tr>
+	    <td class="field">User</td>
+	    <td class="value">[% vm.user.login %]</td>
+	</tr>
+	<tr>
+	    <td class="field">Current IP address</td>
+	    <td class="value">[% vm.vm_runtime.vm_address %]</td>
+	</tr>
+	<tr>
+	    <td class="field">Next boot IP address</td>
+	    <td class="value"><input name="ip" value="[% vm.ip %]" /></td>
+	</tr>
+	<tr>
+	    <td class="field">State</td>
+	    <td class="value">[% vm.vm_runtime.vm_state %]</td>
+	</tr>	
+	<tr>
+	    <td class="field">Node</td>
+	    <td class="value"><a href="[% c.uri_for('/hosts/view/') %][% vm.vm_runtime.host_id %]">[% vm.vm_runtime.host.name %]</a></td>
+	</tr>	
+	<tr>
+	    <td class="field">SSH port</td>
+	    <td class="value"><input name="vm_ssh_port" value="[% vm.vm_runtime.vm_ssh_port %]" /></td>
+	</tr>
+	<tr>
+	    <td class="field">VNC port</td>
+	    <td class="value"><input name="vm_vnc_port" value="[% vm.vm_runtime.vm_vnc_port %]" /></td>
+	</tr>	
+	<tr>
+	    <td class="field">Serial port</td>
+	    <td class="value"><input name="vm_serial_port" value="[% vm.vm_runtime.vm_serial_port %]" /></td>
+	</tr>		
+	<tr>
+	    <td class="field">Blocked</td>
+	    <td class="value">[% IF vm.vm_runtime.blocked -%]<span class="option_blocked"></span>
+	    [% END %]</td>
+	</tr>	
+    </table>
+    <input type="hidden" name="_submitted" value="1" />
+    <input name="_submit" type="Submit" value="Enviar" />
+    </form>
+</div>

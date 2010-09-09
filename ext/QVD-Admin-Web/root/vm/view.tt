@@ -1,6 +1,7 @@
 <h1><a href="[% c.uri_for('/vm') %]">Virtual machines</a> &raquo; [% vm.name %]</h1>
 
 <div class="view">
+    <a class="side_edit" href="/vm/edit/[% vm.id %]">Edit</a>
     <table class="tablesorter resultset">
 	<tr>
 	    <td class="field">Identifier</td>
@@ -15,8 +16,12 @@
 	    <td class="value">[% vm.user.login %]</td>
 	</tr>
 	<tr>
-	    <td class="field">IP address</td>
+	    <td class="field">Current IP address</td>
 	    <td class="value">[% vm.vm_runtime.vm_address %]</td>
+	</tr>
+	<tr>
+	    <td class="field">Next boot IP address</td>
+	    <td class="value">[% vm.ip %]</td>
 	</tr>
 	<tr>
 	    <td class="field">State</td>

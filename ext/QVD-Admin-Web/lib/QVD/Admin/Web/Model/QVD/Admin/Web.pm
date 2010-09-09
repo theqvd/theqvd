@@ -246,6 +246,13 @@ sub vm_del {
     1;
 }
 
+sub vm_edit {
+    my ($self, $params) = @_;
+    $self->reset_status;
+    my $count = eval { $self->admin->cmd_vm_edit(%$params) };
+    $self->set_error($@) unless defined $count;
+    $count;
+}
 
 sub vmrt_list {
     my ( $self, $filter ) = @_;
