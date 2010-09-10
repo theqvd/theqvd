@@ -1,8 +1,8 @@
 Index: nspluginwrapper-1.2.2/src/npw-remote-agent-info.c
 ===================================================================
 --- /dev/null	1970-01-01 00:00:00.000000000 +0000
-+++ nspluginwrapper-1.2.2/src/npw-remote-agent-info.c	2010-09-09 21:54:10.000000000 +0200
-@@ -0,0 +1,647 @@
++++ nspluginwrapper-1.2.2/src/npw-remote-agent-info.c	2010-09-06 10:31:17.000000000 +0200
+@@ -0,0 +1,646 @@
 +/*
 + * npw-remote-agent-info.c
 + *
@@ -53,8 +53,8 @@ Index: nspluginwrapper-1.2.2/src/npw-remote-agent-info.c
 +//#define MYURL "http://localhost/port"
 +#define USERAGENT "QVDnswrapper/1.0"
 +#define MAXKEYS 128
-+#define MAX_KEY_SIZE 128
-+#define MAX_VALUE_SIZE 128
++#define MAX_KEY_SIZE 10
++#define MAX_VALUE_SIZE 10
 +#define MAX_URL_SIZE 1024
 +struct MemoryStruct {
 +  char *memory;
@@ -63,7 +63,6 @@ Index: nspluginwrapper-1.2.2/src/npw-remote-agent-info.c
 +
 +
 +static int rpc_port = 0;
-+char rpc_host[MAX_URL_SIZE];
 +char *npw_agent_uri = NULL;
 +char *npw_xwin_translate_service_uri = NULL;
 +
@@ -653,7 +652,7 @@ Index: nspluginwrapper-1.2.2/src/npw-remote-agent-info.c
 Index: nspluginwrapper-1.2.2/src/npw-remote-agent-info.h
 ===================================================================
 --- /dev/null	1970-01-01 00:00:00.000000000 +0000
-+++ nspluginwrapper-1.2.2/src/npw-remote-agent-info.h	2010-09-09 21:54:10.000000000 +0200
++++ nspluginwrapper-1.2.2/src/npw-remote-agent-info.h	2010-09-06 10:31:17.000000000 +0200
 @@ -0,0 +1,58 @@
 +/*
 + * npw-agent-info.h
@@ -716,7 +715,7 @@ Index: nspluginwrapper-1.2.2/src/npw-remote-agent-info.h
 Index: nspluginwrapper-1.2.2/src/npw-use-tcp-sockets.c
 ===================================================================
 --- /dev/null	1970-01-01 00:00:00.000000000 +0000
-+++ nspluginwrapper-1.2.2/src/npw-use-tcp-sockets.c	2010-09-09 21:54:10.000000000 +0200
++++ nspluginwrapper-1.2.2/src/npw-use-tcp-sockets.c	2010-09-06 10:31:17.000000000 +0200
 @@ -0,0 +1,59 @@
 +/*
 + * npw-use-tcp-sockets.c
@@ -780,7 +779,7 @@ Index: nspluginwrapper-1.2.2/src/npw-use-tcp-sockets.c
 Index: nspluginwrapper-1.2.2/src/npw-use-tcp-sockets.h
 ===================================================================
 --- /dev/null	1970-01-01 00:00:00.000000000 +0000
-+++ nspluginwrapper-1.2.2/src/npw-use-tcp-sockets.h	2010-09-09 21:54:10.000000000 +0200
++++ nspluginwrapper-1.2.2/src/npw-use-tcp-sockets.h	2010-09-06 10:31:17.000000000 +0200
 @@ -0,0 +1,38 @@
 +/*
 + * use-tcp-sockets.h
@@ -822,8 +821,8 @@ Index: nspluginwrapper-1.2.2/src/npw-use-tcp-sockets.h
 +#endif
 Index: nspluginwrapper-1.2.2/Makefile
 ===================================================================
---- nspluginwrapper-1.2.2.orig/Makefile	2010-09-09 21:54:10.000000000 +0200
-+++ nspluginwrapper-1.2.2/Makefile	2010-09-09 21:54:10.000000000 +0200
+--- nspluginwrapper-1.2.2.orig/Makefile	2010-09-06 10:31:17.000000000 +0200
++++ nspluginwrapper-1.2.2/Makefile	2010-09-06 10:31:17.000000000 +0200
 @@ -106,14 +106,18 @@
  
  npwrapper_LIBRARY = npwrapper.so
@@ -862,8 +861,8 @@ Index: nspluginwrapper-1.2.2/Makefile
  test_rpc_client_CPPFLAGS = $(CPPFLAGS) -I$(SRC_PATH)/src -DBUILD_CLIENT -DNPW_COMPONENT_NAME="\"Client\""
 Index: nspluginwrapper-1.2.2/src/npw-wrapper.c
 ===================================================================
---- nspluginwrapper-1.2.2.orig/src/npw-wrapper.c	2010-09-09 21:54:08.000000000 +0200
-+++ nspluginwrapper-1.2.2/src/npw-wrapper.c	2010-09-09 21:54:10.000000000 +0200
+--- nspluginwrapper-1.2.2.orig/src/npw-wrapper.c	2010-09-06 10:31:15.000000000 +0200
++++ nspluginwrapper-1.2.2/src/npw-wrapper.c	2010-09-06 10:31:17.000000000 +0200
 @@ -42,6 +42,8 @@
  #include <X11/Shell.h>
  #include <X11/StringDefs.h>
@@ -950,7 +949,7 @@ Index: nspluginwrapper-1.2.2/src/npw-wrapper.c
 +      char remote_exec[PATH_MAX];
 +      D(bug("Invoking remote invocation for plugin\n"));
 +      snprintf(remote_exec, PATH_MAX,
-+	       "%s%%20--plugin%%20%s%%20--connection%%20%s%%20--remote-invocation", viewer_path, plugin_path, connection_path);
++	       "%s%%20--plugin%%20%s%%20--connection%%20%s%20--remote-invocation", viewer_path, plugin_path, connection_path);
 +      if ((g_plugin.viewer_pid = invoke_remote_plugin(remote_exec, unique_id_path)) < 0 )
 +	{
 +	  npw_printf("ERROR: failed to execute remote NSPlugin viewer\n");
@@ -1004,9 +1003,9 @@ Index: nspluginwrapper-1.2.2/src/npw-wrapper.c
  
 Index: nspluginwrapper-1.2.2/src/rpc.c
 ===================================================================
---- nspluginwrapper-1.2.2.orig/src/rpc.c	2010-09-09 21:54:08.000000000 +0200
-+++ nspluginwrapper-1.2.2/src/rpc.c	2010-09-09 22:02:07.000000000 +0200
-@@ -42,10 +42,13 @@
+--- nspluginwrapper-1.2.2.orig/src/rpc.c	2010-09-06 10:31:15.000000000 +0200
++++ nspluginwrapper-1.2.2/src/rpc.c	2010-09-06 10:31:17.000000000 +0200
+@@ -42,14 +42,17 @@
  #include <sys/wait.h>
  #include <sys/select.h>
  #include <netinet/in.h>
@@ -1019,6 +1018,11 @@ Index: nspluginwrapper-1.2.2/src/rpc.c
 +#include "npw-use-tcp-sockets.h"
  #include "rpc.h"
  #include "utils.h"
+ 
+-#define DEBUG 0
++#define DEBUG 1
+ #include "debug.h"
+ 
  
 @@ -663,15 +666,59 @@
    return n;
@@ -1245,7 +1249,7 @@ Index: nspluginwrapper-1.2.2/src/rpc.c
 +	if (connect(connection->socket, addr, addr_len) == 0)
  	  break;
 -	if (n_connect_attempts > 1 && errno != ECONNREFUSED && errno != ENOENT) {
-+	if (n_connect_attempts > 1 && errno != ECONNREFUSED && errno != ENOENT  && errno != EINPROGRESS && errno != EALREADY) {
++	if (n_connect_attempts > 1 && errno != ECONNREFUSED && errno != ENOENT  && errno != EINPROGRESS) {
  	  perror("client_connect");
  	  rpc_exit(connection);
  	  return NULL;
@@ -1293,8 +1297,8 @@ Index: nspluginwrapper-1.2.2/src/rpc.c
  
 Index: nspluginwrapper-1.2.2/src/npw-viewer.c
 ===================================================================
---- nspluginwrapper-1.2.2.orig/src/npw-viewer.c	2010-09-09 21:54:08.000000000 +0200
-+++ nspluginwrapper-1.2.2/src/npw-viewer.c	2010-09-09 21:54:10.000000000 +0200
+--- nspluginwrapper-1.2.2.orig/src/npw-viewer.c	2010-09-06 10:31:15.000000000 +0200
++++ nspluginwrapper-1.2.2/src/npw-viewer.c	2010-09-06 10:38:39.000000000 +0200
 @@ -44,7 +44,7 @@
  #include "xembed.h"
  #include "npw-common.h"
@@ -1304,127 +1308,47 @@ Index: nspluginwrapper-1.2.2/src/npw-viewer.c
  #define DEBUG 1
  #include "debug.h"
  
-@@ -574,6 +574,192 @@
+@@ -574,6 +574,62 @@
  
    // create the new window
    if (plugin->use_xembed) {
 +    if (use_remote_invocation())
 +      {
-+	/*	void *container, *socket;
-+	printf("The window id of the parent is: %p\n", window->window);
-+	printf("Enter separated by space the windowid of the container and the windowid of the socket:");
-+	scanf("%p %p", &container, &socket);
-+	printf("The ids passed were %p and %p\n", container, socket);
-+	window->window = socket;
-+	*/
-+	/*
 +	GtkData *toolkit = calloc(1, sizeof(*toolkit));
 +	if (toolkit == NULL)
 +	  return -1;
++	D(bug("create_window Before creationg toolkit->container\n"));	
 +	toolkit->container = gtk_window_new (GTK_WINDOW_POPUP);
-+	toolkit->socket = gtk_socket_new();
-+	gtk_container_add (GTK_CONTAINER (toolkit->container), toolkit->socket);
-+	gtk_widget_set_size_request (toolkit->socket, window->width, window->height);
-+	gtk_widget_show (toolkit->socket);
-+	gtk_widget_realize (toolkit->container);
-+	GdkWindow* window_container = gdk_window_foreign_new((Window)window->window);
-+	if (GTK_WIDGET_MAPPED(toolkit->container))
-+	  gtk_widget_unmap(toolkit->container);
-+	    
-+	gdk_window_reparent(toolkit->container->window, window_container, 0, 0);
-+	gtk_widget_show (toolkit->container);
-+	
-+	window->window = (void *)gtk_socket_get_id(GTK_SOCKET(toolkit->socket));
-+	plugin->toolkit_data = toolkit;
-+#if USE_XEMBED_HACK
-+	// don't let the browser kill our window out of NPP_Destroy() scope
-+	g_signal_connect(toolkit->container, "delete-event",
-+			 G_CALLBACK(gtk_true), NULL);
-+#endif
-+	// make sure we don't try to destroy the widget again in destroy_window()
-+	g_signal_connect(toolkit->container, "destroy",
-+			 G_CALLBACK(gtk_widget_destroyed), &toolkit->container);
-+	// keep the socket as the plugin tries to destroy the widget itself
-+	g_signal_connect(toolkit->socket, "plug_removed",
-+			 G_CALLBACK(gtk_true), NULL);
-+
-+	window->window = (void *)gtk_socket_get_id(GTK_SOCKET(toolkit->socket));
-+	plugin->toolkit_data = toolkit;
-+	
-+	return(0);
-+	*/
-+	GtkData *toolkit = calloc(1, sizeof(*toolkit));
-+	if (toolkit == NULL)
-+	  return -1;
-+	D(bug("create_window Before creationg toolkit->container\n"));
-+	//toolkit->container = gtk_window_new (GTK_WINDOW_TOPLEVEL);
-+	toolkit->container = gtk_window_new (GTK_WINDOW_POPUP);
-+	// gdk_window_set_override_redirect(toolkit->container->window, TRUE);
 +	if (toolkit->container == NULL)
 +	  return -1;
 +	D(bug("create_window Before realizing toolkit->container\n"));
-+	//D(bug("can focus container: %d\n", gtk_widget_get_can_focus(toolkit->container)));
-+	//gtk_widget_set_can_focus(toolkit->container, TRUE);
-+	//D(bug("can focus container: %d\n", gtk_widget_get_can_focus(toolkit->container)));
-+	//D(bug("event mask container: 0x%x\n", gtk_widget_get_events(toolkit->container)));
-+	//gtk_widget_add_events(toolkit->container, GDK_BUTTON_PRESS_MASK | GDK_BUTTON_RELEASE_MASK);
-+	//D(bug("event mask container after adding : 0x%x\n", gtk_widget_get_events(toolkit->container)));
-+	//gtk_widget_set_events(toolkit->container, GDK_POINTER_MOTION_MASK | GDK_POINTER_MOTION_HINT_MASK | GDK_BUTTON_MOTION_MASK |  GDK_BUTTON1_MOTION_MASK | GDK_BUTTON2_MOTION_MASK | GDK_BUTTON3_MOTION_MASK | GDK_BUTTON_PRESS_MASK | GDK_BUTTON_RELEASE_MASK);
-+	//	D(bug("event mask container: %d\n", gtk_widget_get_events(toolkit->container)));
 +	gtk_widget_realize(toolkit->container);
 +	D(bug("create_window Before set size_request toolkit->container\n"));
 + 	gtk_widget_set_size_request(toolkit->container, window->width, window->height);
 +	D(bug("create_window Before gdk_window_foreign_new window %p\n", window->window));
-+	GdkWindow *parent = gdk_window_foreign_new((Window)window->window);
-+	//	D(bug("create_window Before set showing parent window \n"));
-+	//gtk_widget_show(parent);
-+	//D(bug("event mask parent: %d\n", gtk_widget_get_events(parent)));
-+	//gtk_widget_set_events(parent, 0x0fffff);
-+	//D(bug("event mask parent: %d\n", gtk_widget_get_events(parent)));
-+	D(bug("create_window Before reparent toolkit->container %p->%p\n", GDK_WINDOW_XID(toolkit->container->window), window->window));
++	GtkWindow *parent = gdk_window_foreign_new(window->window);
++	D(bug("create_window Before set showing parent window \n"));
++	gtk_widget_show(parent);
++	D(bug("create_window Before reparent toolkit->container %p->%p\n", toolkit->container, window->window));
 +	gdk_window_reparent(toolkit->container->window, parent, 0, 0);
 +	D(bug("create_window Before show toolkit->container\n"));
 +	gtk_widget_show(toolkit->container);
-+	D(bug("create_window container is: %p\n",  GDK_WINDOW_XID(toolkit->container->window)));
++	D(bug("create_window container is: %p\n",  toolkit->container->window));
 +
-+	// Test
-+	//	D(bug("create_window Create button\n"));
-+	//GtkWidget *button;
-+	//button = gtk_button_new_with_label ("Hello World");
-+	//gtk_container_add (GTK_CONTAINER(toolkit->container), button);
-+	//gtk_widget_show(button);
-+	//gtk_widget_set_sensitive(toolkit->container, TRUE);
 +	toolkit->socket = gtk_socket_new();
 +	if (toolkit->socket == NULL)
 +	  return -1;
-+	//D(bug("event mask socket: %d\n", gtk_widget_get_events(toolkit->socket)));
-+	// Careful not to pass all events -> the expose event kills the plugin
-+	//	gtk_widget_set_events(toolkit->socket, 0x0fffff);
-+	//D(bug("event mask socket: %d\n", gtk_widget_get_events(toolkit->socket)));
 +	gtk_widget_set_size_request (toolkit->socket, window->width, window->height);
 +	gtk_container_add(GTK_CONTAINER(toolkit->container), toolkit->socket);
 +	gtk_widget_show (toolkit->socket);
-+	D(bug("create_window socket is: %p\n", gtk_socket_get_id((GtkSocket *)toolkit->socket)));
-+	D(bug("can focus before parent: %d, container: %d, socket: %d\n", GTK_WIDGET_CAN_FOCUS(parent),
-+	      GTK_WIDGET_CAN_FOCUS(toolkit->container), GTK_WIDGET_CAN_FOCUS(toolkit->socket)));
-+	//	gtk_widget_set_can_focus(parent, TRUE);
-+	//	gtk_widget_set_can_focus(toolkit->container, TRUE);
-+	//	gtk_widget_set_can_focus(toolkit->socket, TRUE);
-+	D(bug("can focus after parent: %d, container: %d, socket: %d\n", GTK_WIDGET_CAN_FOCUS(parent),
-+	      GTK_WIDGET_CAN_FOCUS(toolkit->container), GTK_WIDGET_CAN_FOCUS(toolkit->socket)));
-+	D(bug("widget state parent: %d, container: %d, socket: %d\n", GTK_WIDGET_STATE(parent),
-+	      GTK_WIDGET_STATE(toolkit->container), GTK_WIDGET_STATE(toolkit->socket)));
-+	D(bug("widget sensitive parent: %d, container: %d, socket: %d\n", GTK_WIDGET_IS_SENSITIVE(parent),
-+	      GTK_WIDGET_IS_SENSITIVE(toolkit->container), GTK_WIDGET_IS_SENSITIVE(toolkit->socket)));
++	D(bug("create_window socket is: %p\n", toolkit->socket->window));
 +
-+	//	gtk_widget_grab_focus(toolkit->container);
-+	//gtk_widget_show_all(toolkit->container);
-+	//gtk_widget_grab_focus(toolkit->container);
-+	//gtk_widget_grab_focus(toolkit->container);
++	/* new begin */
++	gtk_widget_show_all(toolkit->container);
++	/* end new */
 +
-+	D(bug("create_window parent window=0x%lx, container=0x%lx, socket=0x%lx\n", window->window, GDK_WINDOW_XID(toolkit->container->window), gtk_socket_get_id((GtkSocket *)toolkit->socket)));
-+	//	D(bug("create_window parent window=0x%lx, container=0x%lx, socket=0x%lx\n", GDK_WINDOW_XID(window->window), GDK_WINDOW_XID(toolkit->container->window), GDK_WINDOW_XID(toolkit->socket->window)));
-+	//	D(bug("create_window parent window=0x%lx, container=0x%lx, socket=0x%lx\n", window->window, toolkit->container->window, GDK_WINDOW_XID(toolkit->socket->window)));
++	//	D(bug("create_window parent window=0x%lx, container=0x%lx, intermediate=0x%lx, socket=0x%lx\n", window->window, GDK_WINDOW_XID(gtk_widget_get_window(toolkit->container)), GDK_WINDOW_XID(gtk_widget_get_window(intermediate_window)), gtk_socket_get_id((GtkSocket *)toolkit->socket)));
++	D(bug("create_window parent window=0x%lx, container=0x%lx, socket=0x%lx\n", window->window, toolkit->container->window, toolkit->socket->window));
 +
 +	window->window = (void *)gtk_socket_get_id(GTK_SOCKET(toolkit->socket));
 +	plugin->toolkit_data = toolkit;
@@ -1440,64 +1364,14 @@ Index: nspluginwrapper-1.2.2/src/npw-viewer.c
 +	g_signal_connect(toolkit->socket, "plug_removed",
 +					 G_CALLBACK(gtk_true), NULL);
 +	return 0;
-+	/*	XtData *toolkit = calloc(1, sizeof(*toolkit));
-+	if (toolkit == NULL)
-+	  return -1;
 +
-+	String app_name, app_class;
-+	
-+	D(bug("Before XtGetApplicationNameAndClass\n"));
-+	XtGetApplicationNameAndClass(x_display, &app_name, &app_class);
-+	D(bug("Before top_widget\n"));
-+	Widget top_widget = XtVaAppCreateShell("drawingArea", app_class, topLevelShellWidgetClass, x_display,
-+					       XtNoverrideRedirect, True,
-+					       XtNborderWidth, 0,
-+					       XtNbackgroundPixmap, None,
-+					       XtNwidth, window->width,
-+					       XtNheight, window->height,
-+					       NULL);
-+	
-+	D(bug("Before realize top_widget\n"));
-+	XtRealizeWidget(top_widget);
-+	D(bug("Before form. top widget is 0x%x\n", XtWindow(top_widget)));
-+	Widget form = XtVaCreateManagedWidget("form", compositeWidgetClass, top_widget,
-+					      XtNdepth, ws_info->depth,
-+					      XtNvisual, ws_info->visual,
-+					      XtNcolormap, ws_info->colormap,
-+					      XtNborderWidth, 0,
-+					      XtNbackgroundPixmap, None,
-+					      XtNwidth, window->width,
-+					      XtNheight, window->height,
-+					      NULL);
-+
-+	D(bug("Before realize top_widget and form is 0x%x\n", XtWindow(form)));
-+	XtRealizeWidget(top_widget);
-+	D(bug("Before reparent window->window is 0x%x\n", window->window));
-+	XReparentWindow(x_display, XtWindow(top_widget), (Window)window->window, 0, 0);
-+	D(bug("Before realize form\n"));
-+	XtRealizeWidget(form);
-+	
-+	D(bug("Before XSelectInput\n"));
-+	XSelectInput(x_display, XtWindow(top_widget), 0x0fffff);
-+	D(bug("Before XAddEventHandler\n"));
-+	XtAddEventHandler(top_widget, (SubstructureNotifyMask|KeyPress|KeyRelease), True, xt_client_event_handler, toolkit);
-+	XtAddEventHandler(form, (ButtonReleaseMask), True, xt_client_event_handler, toolkit);
-+	xt_client_set_info(form, 0);
-+
-+	plugin->toolkit_data = toolkit;
-+	toolkit->top_widget = top_widget;
-+	toolkit->form = form;
-+	toolkit->browser_window = (Window)window->window;
-+	window->window = (void *)XtWindow(form);
-+	return 0;
-+	*/
 +      }
 +    else
 +      {
  	GtkData *toolkit = calloc(1, sizeof(*toolkit));
  	if (toolkit == NULL)
  	  return -1;
-@@ -602,6 +788,8 @@
+@@ -602,6 +658,8 @@
  	g_signal_connect(toolkit->socket, "plug_removed",
  					 G_CALLBACK(gtk_true), NULL);
  	return 0;
@@ -1506,20 +1380,7 @@ Index: nspluginwrapper-1.2.2/src/npw-viewer.c
    }
  
    XtData *toolkit = calloc(1, sizeof(*toolkit));
-@@ -679,6 +867,12 @@
- 	if (plugin->toolkit_data) {
- 	  if (plugin->use_xembed) {
- 		// window size changes are already caught per the XEMBED protocol
-+	        if (use_remote_invocation())
-+		  {
-+		    GtkData *toolkit = plugin->toolkit_data;
-+		    gtk_widget_set_size_request (toolkit->container, window->width, window->height);
-+		    gtk_widget_set_size_request (toolkit->socket, window->width, window->height);
-+		  }
- 	  }
- 	  else {
- 		XtData *toolkit = (XtData *)plugin->toolkit_data;
-@@ -4004,7 +4198,7 @@
+@@ -4004,7 +4062,7 @@
  	CMD_HELP
    };
    int cmd = CMD_RUN;
@@ -1528,7 +1389,7 @@ Index: nspluginwrapper-1.2.2/src/npw-viewer.c
    // Parse command line arguments
    for (int i = 0; i < argc; i++) {
  	const char *arg = argv[i];
-@@ -4034,6 +4228,10 @@
+@@ -4034,6 +4092,10 @@
  		argv[i] = NULL;
  	  }
  	}
