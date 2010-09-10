@@ -66,6 +66,11 @@
 	<td>*stopping*</td>
 </tr>
 <tr>
+	<td>open</td>
+	<td>/vm</td>
+	<td></td>
+</tr>
+<tr>
 	<td>waitForText</td>
 	<td>vm_statetext1</td>
 	<td>*stopped*</td>

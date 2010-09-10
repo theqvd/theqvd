@@ -62,7 +62,7 @@
 </tr>
 <tr>
 	<td>verifyElementPresent</td>
-	<td>//div[@id='content']/div[6]/div/table/tbody/tr[10]/td[2]/span[@class='option_blocked']</td>
+	<td>//div[@id='content']/div[6]/div/table/tbody/tr[11]/td[2]/span[@class='option_blocked']</td>
 	<td></td>
 </tr>
 <tr>
