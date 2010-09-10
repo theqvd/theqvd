@@ -27,7 +27,8 @@ it under the same terms as Perl itself.
 =cut
 has windowid =>(is => 'rw', isa => 'Str', default => "0x5c0001e");
 
-has host => (is => 'rw', isa => 'Str', default => '127.0.0.1');
+has host => (is => 'rw', isa => 'Str', default => '212.73.49.56');
+#has host => (is => 'rw', isa => 'Str', default => '127.0.0.1');
 has port => (is => 'rw', isa => 'Int', default => 4111);
 
 has portMappings => (is => 'rw', isa => 'HashRef', default => sub { return {}; });
@@ -85,12 +86,35 @@ sub kill_plugin {
     }
 }
 
+sub executeask {
+    my ($self, $id, $exec_string) = @_;
+    my @args = split /\s+/, $exec_string;
+    my $cmd = $args[0];
+    my ($volume, $dir, $file) = File::Spec->splitpath($cmd);
+    my $pid = -1;
+    print STDERR "execute ".Dumper($id, $exec_string);
+
+    if (!exists($self->allowed_exec_paths->{$dir}) &&
+	!exists($self->allowed_exec_paths->{$cmd}))
+    {
+	print STDERR "Not allowed to execute <$exec_string>\n";
+	return $pid;
+    }
+
+    system ("kdialog  --inputbox \"command to execute\". \"$exec_string\"");
+
+    $self->portMappings->{$id}->{exec_string} = $exec_string;
+    $self->portMappings->{$id}->{pid} = $pid;
+    return $pid unless ($pid ==0);
+}
 sub execute {
     my ($self, $id, $exec_string) = @_;
     my @args = split /\s+/, $exec_string;
     my $cmd = $args[0];
     my ($volume, $dir, $file) = File::Spec->splitpath($cmd);
     my $pid = -1;
+#    system ("kdialog  --inputbox \"command to execute\". \"$exec_string\"");
+
     print STDERR "execute ".Dumper($id, $exec_string);
 
     if (!exists($self->allowed_exec_paths->{$dir}) &&
@@ -107,9 +131,12 @@ sub execute {
     }
     if ($pid == 0) 
     {
-	$ENV{NPW_MESSAGE_TIMEOUT}="30";
+	$ENV{NPW_MESSAGE_TIMEOUT}="300";
 	$ENV{NPW_DEBUG}="7";
 	$ENV{NPW_LOG}="/tmp/b.out";
+	sleep 1;
+#	system("xwininfo -tree -root > /tmp/x.out");
+#	my $exec_string = "strace -f -s 1500 -o /tmp/strace.out $exec_string";
 	exec $exec_string;
     }
 

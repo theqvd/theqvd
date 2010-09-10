@@ -42,6 +42,8 @@
 #include <X11/Shell.h>
 #include <X11/StringDefs.h>
 
+#include "npw-use-tcp-sockets.h"
+#include "npw-remote-agent-info.h"
 #include "utils.h"
 #include "npw-common.h"
 #include "npw-malloc.h"
@@ -81,6 +83,7 @@ typedef struct {
   char *name;
   char *description;
   char *formats;
+  char *unique_id;
 } Plugin;
 
 static Plugin g_plugin = { 0, -1, 0, NULL, NULL, NULL };
@@ -1956,6 +1959,22 @@ g_NPP_SetWindow(NPP instance, NPWindow *window)
   if (plugin == NULL)
 	return NPERR_INVALID_INSTANCE_ERROR;
 
+  /*  D(bug("NPP_SetWindow instance=%p and x=%d, y=%d, w=%d, h=%d\n", instance, window->x, window->y, window->width, window->height));
+  D(bug("NPP_SetWindow pointers pdata=%p, ndata=%p\n",
+	instance->pdata,
+	instance->ndata));
+  D(bug("NPP_SetWindow pointers instance=%p", instance));
+  D(bug("NPP_SetWindow pointers plugin native_instance=%p", plugin->instance));
+  D(bug("NPP_SetWindow pointers plugin->pdata=%p, plugin->ndata=%p\n",
+  plugin->instance->pdata,plugin->instance->ndata));*/
+  if (use_remote_invocation())
+    {
+      D(bug("NPP_SetWindow remote_invocation=true before setting window->window=%p, ptr size=%d\n",
+	    window->window, sizeof(window->window)));
+      window->window = translate_parent_window_id(window->window, g_plugin.unique_id);
+      D(bug("NPP_SetWindow remote_invocation=true after setting window->window=%p, ptr size=%d\n",
+	    window->window, sizeof(window->window)));
+    }
   D(bugiI("NPP_SetWindow instance=%p\n", instance));
   NPError ret = invoke_NPP_SetWindow(plugin, window);
   D(bugiD("NPP_SetWindow return: %d [%s]\n", ret, string_of_NPError(ret)));
@@ -3327,7 +3346,7 @@ static void plugin_init(int is_NP_Initialize)
 	g_plugin.initialized = 1 + is_NP_Initialize;
 	return;
   }
-
+  D(bug("QVD after plugin_init check for default plugin_path\n", plugin_path));
   if (PLUGIN_DIRECT_EXEC){
 	g_plugin.initialized = 1;
 	return;
@@ -3350,10 +3369,25 @@ static void plugin_init(int is_NP_Initialize)
   ++init_count;
   char viewer_path[PATH_MAX];
   sprintf(viewer_path, "%s/%s/%s/%s", NPW_LIBDIR, NPW_Plugin.target_arch, NPW_Plugin.target_os, NPW_VIEWER);
+  char  unique_id_path[128];
   char connection_path[128];
   sprintf(connection_path, "%s/%s/%d-%d", NPW_CONNECTION_PATH, plugin_file_name, getpid(), init_count);
 
-  // Cache MIME info and plugin name/description
+  set_tcp_ip_and_remote_invocation_flags();
+
+  if (use_tcp_sockets())
+    {
+    // Use TCP sockets
+      sprintf(unique_id_path, "%s-%d-%d", plugin_file_name, getpid(), init_count);
+      set_remote_connection_path(connection_path, unique_id_path);
+    D(bug("QVD: plugin_init with test_server and test_port++ %s\n", connection_path));
+  } // End using tcp sockets
+  else
+    { // Using unix sockets
+      sprintf(connection_path, "%s/%s/%d-%d", NPW_CONNECTION_PATH, plugin_file_name, getpid(), init_count);
+      D(bug("QVD: plugin_init without test_server and test_port %s\n", connection_path));
+    }
+ // Cache MIME info and plugin name/description
   if (g_plugin.name == NULL && g_plugin.description == NULL && g_plugin.formats == NULL) {
 	char command[1024];
 	if (snprintf(command, sizeof(command), "%s --info --plugin %s", viewer_path, plugin_path) >= sizeof(command))
@@ -3403,7 +3437,22 @@ static void plugin_init(int is_NP_Initialize)
 	return;
 
   // Start plug-in viewer
-  if ((g_plugin.viewer_pid = fork()) == 0) {
+  if (use_remote_invocation())
+    {
+      char remote_exec[PATH_MAX];
+      D(bug("Invoking remote invocation for plugin\n"));
+      snprintf(remote_exec, PATH_MAX,
+	       "%s%%20--plugin%%20%s%%20--connection%%20%s%%20--remote-invocation", viewer_path, plugin_path, connection_path);
+      if ((g_plugin.viewer_pid = invoke_remote_plugin(remote_exec, unique_id_path)) < 0 )
+	{
+	  npw_printf("ERROR: failed to execute remote NSPlugin viewer\n");
+	  _Exit(255);
+	}
+      g_plugin.unique_id = strdup(unique_id_path);
+    }
+  else
+    {
+      if ((g_plugin.viewer_pid = fork()) == 0) {
 	char *argv[8];
 	int argc = 0;
 
@@ -3419,7 +3468,8 @@ static void plugin_init(int is_NP_Initialize)
 	execv(viewer_path, argv);
 	npw_printf("ERROR: failed to execute NSPlugin viewer\n");
 	_Exit(255);
-  }
+      }
+    }
 
   // Initialize browser-side RPC communication channel
   if ((g_rpc_connection = rpc_init_client(connection_path)) == NULL) {
@@ -3558,6 +3608,14 @@ static void plugin_exit(void)
   }
 
   if (g_plugin.viewer_pid != -1) {
+    if (use_remote_invocation())
+      {
+	D(bug("Invoking remote kill plugin\n"));
+	invoke_remote_kill(g_plugin.viewer_pid, g_plugin.unique_id);
+      }
+    else
+      {
+
 	// let it shutdown gracefully, then kill it gently to no mercy
 	const int WAITPID_DELAY_TO_SIGTERM = 3;
 	const int WAITPID_DELAY_TO_SIGKILL = 3;
@@ -3577,9 +3635,10 @@ static void plugin_exit(void)
 	  }
 	  sleep(1);
 	}
-	g_plugin.viewer_pid = -1;
+      }
+    g_plugin.viewer_pid = -1;
   }
-
+  free(g_plugin.unique_id);
   g_plugin.initialized = 0;
 }
 
