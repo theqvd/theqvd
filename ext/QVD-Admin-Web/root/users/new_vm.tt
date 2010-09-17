@@ -37,6 +37,7 @@ function submitvm(a) {
 		<input type="hidden" name="osi_id" value ="[% osi.id %]"/>
 		<input type="hidden" name="user_id" value ="[% user.id %]"/>
 		<input type="hidden" name="vm_name" value ="[% user.id %]"/>
+		<input type="hidden" name="vm_storage" value =""/>
 	      </form></td>
             <td>[% osi.name %]</td>
             <td>[% osi.disk_image %]</td>
