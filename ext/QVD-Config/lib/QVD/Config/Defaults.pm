@@ -59,7 +59,7 @@ l7r.loadbalancer.plugin.default.weight.ram = 1
 l7r.loadbalancer.plugin.default.weight.cpu = 1
 l7r.loadbalancer.plugin.default.weight.random = 1
 
-noded.as_user = qvd
+noded.as_user = root
 noded.pid_file = ${path.run}/hkd.pid
 
 wat.admin.login = admin
