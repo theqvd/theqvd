@@ -34,8 +34,13 @@ $default_attributes_uri =~ s|/[^/]+(/?)$|/attributes$1|xg;
 $default_authorize_uri =~ s|/[^/]+(/?)$|/authorize$1|xg;
 $default_target_uri =~ s|/[^/]+/[^/]+(/?)$|/console$1|xg;
 
+my ($sso_host) = ($auth_uri =~ /\/\/(.*?)(:|\/)/);
+my $default_ldap_uri = "ldap://$sso_host:389";
+
 my $attributes_uri = cfg('auth.opensso.rest_attributes_uri', 0) // $default_attributes_uri;
 my $authorize_uri = cfg('auth.opensso.rest_authorize_uri', 0) // $default_authorize_uri;
+my $ldap_uri = cfg('auth.opensso.ldap_uri', 0) // $default_ldap_uri;
+
 my $authorize_action = cfg('auth.opensso.authorize_action', 0) // 'POST';
 
 my $target_uri   = cfg('auth.opensso.target_uri', 0) // '';
@@ -304,6 +309,7 @@ sub authenticate_basic {
                 $auth->{params}->{'qvd.auth.opensso.authorize_uri'}  = $authorize_uri;
 		$auth->{params}->{'qvd.auth.opensso.cookie'}         = $cookie;
 		$auth->{params}->{'qvd.auth.opensso.cookiedomain'}   = $cookie_domain;
+		$auth->{params}->{'qvd.auth.opensso.ldap_uri'}       = $ldap_uri;
 
 		if (defined($target_uri) && $target_uri ne '') {
 		    if (!_authorize_basic($login, $cookie, $authorize_action)) {
