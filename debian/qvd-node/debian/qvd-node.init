@@ -1,4 +1,4 @@
-#!/bin/sh
+#!/bin/bash
 #
 ### BEGIN INIT INFO
 # Provides:          qvd-node
@@ -12,7 +12,7 @@
 # Description:       QVD servers handle virtual desktop connections from QVD clients and manage virtual machines.
 ### END INIT INFO
 
-PATH=/bin:/usr/bin
+PATH=/bin:/usr/bin:/sbin:/usr/sbin
 
 DAEMON=/usr/bin/qvd-noded.pl
 NAME=qvd-node
@@ -40,14 +40,20 @@ if [ -f /etc/default/$NAME ] ; then
 fi
 
 case "$1" in
-  start)
-        log_daemon_msg "Starting $DESC " "$NAME"
-	"$DAEMON" start
-	log_end_msg 0
-        ;;
-  stop)
-        log_daemon_msg "Stopping $DESC" "$NAME"
+
+  stop|restart)
+	 log_daemon_msg "Stopping $DESC" "$NAME"
 	"$DAEMON" stop
+
+	while [ -n "`pidof -x qvd-noded.pl`" ] ; do
+		log_progress_msg "."
+		sleep 1
+	done
+	log_end_msg 0
+        ;;&
+  start|restart)
+	log_daemon_msg "Starting $DESC" "$NAME"
+	"$DAEMON" start
 	log_end_msg 0
         ;;
   status)
@@ -61,7 +67,7 @@ case "$1" in
         ;;
   *)
         N=/etc/init.d/$NAME
-        echo "Usage: $N {start|stop|status}" >&2
+        echo "Usage: $N {start|stop|restart|status}" >&2
         exit 1
         ;;
 esac
