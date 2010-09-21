@@ -45,10 +45,18 @@ case "$1" in
 	 log_daemon_msg "Stopping $DESC" "$NAME"
 	"$DAEMON" stop
 
-	while [ -n "`pidof -x qvd-noded.pl`" ] ; do
+	timeout=60
+	while [ -n "`pidof -x qvd-noded.pl`" -a "$timeout" -gt 0 ] ; do
 		log_progress_msg "."
+		timeout=$(( $timeout - 1 ))
 		sleep 1
 	done
+
+	if [ "$timeout" == "0" ] ; then
+		log_end_msg 1
+		exit 1
+	fi
+
 	log_end_msg 0
         ;;&
   start|restart)
@@ -66,9 +74,11 @@ case "$1" in
         log_warning_msg "cannot re-read the config file (use restart)."
         ;;
   *)
-        N=/etc/init.d/$NAME
-        echo "Usage: $N {start|stop|restart|status}" >&2
-        exit 1
+	if [ "$1" != "stop" ] ; then
+	        N=/etc/init.d/$NAME
+        	echo "Usage: $N {start|stop|restart|status}" >&2
+	        exit 1
+	fi
         ;;
 esac
 
