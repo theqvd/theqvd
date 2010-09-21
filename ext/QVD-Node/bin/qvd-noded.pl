@@ -9,7 +9,7 @@ use QVD::Config;
 use QVD::Log;
 
 my $path_run = core_cfg('path.run');
-mkdir $path_run, 0700;
+mkdir $path_run, 0755;
 
 unless (-d $path_run) {
     ERROR "Unable to create directory $path_run";
