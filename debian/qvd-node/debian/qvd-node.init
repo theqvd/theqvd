@@ -44,6 +44,8 @@ case "$1" in
   stop|restart)
 	 log_daemon_msg "Stopping $DESC" "$NAME"
 	"$DAEMON" stop
+	# FIXME remove this when #566 is solved
+	kill `pidof -x qvd-noded.pl`
 
 	timeout=60
 	while [ -n "`pidof -x qvd-noded.pl`" -a "$timeout" -gt 0 ] ; do
