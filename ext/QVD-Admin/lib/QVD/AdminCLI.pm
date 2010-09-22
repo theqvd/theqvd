@@ -90,6 +90,7 @@ sub cmd_host_list {
     if ($@) {
 	$self->_print("Wrong syntax, check the command help:\n");
 	$self->help_host_list;
+	$self->_die($@);
     }
     
     _print_table(\@header, \@body) unless ($self->{quiet} || $@);
@@ -182,6 +183,13 @@ Valid options:
 EOT
 }
 
+sub _die {
+    my ($self, $msg) = @_;
+    chomp $msg;
+    print STDERR "(Error: $msg)\n" unless $self->{quiet};
+    exit 1;
+}
+
 sub _print {
     my ($self, @msg) =(@_);
     print @msg, "\n" unless $self->{quiet};
@@ -202,6 +210,7 @@ sub cmd_host_block {
     if ($@) {
 	$self->_print("Wrong syntax, check the command help:\n");
 	$self->help_host_block;
+	$self->_die($@);
     }      
 }
 
@@ -230,6 +239,7 @@ sub cmd_host_unblock {
     if ($@) {
 	$self->_print("Wrong syntax, check the command help:\n");
 	$self->help_host_unblock;
+	$self->_die($@);
     }    
 }
 
@@ -254,6 +264,7 @@ sub cmd_host_add {
     if ($@) {
 	$self->_print("Wrong syntax, check the command help:\n");
 	$self->help_host_add;	
+	$self->_die($@);
     }
 }
 
@@ -282,6 +293,7 @@ sub cmd_vm_block {
     if ($@) {
 	$self->_print("Wrong syntax, check the command help:\n");
 	$self->help_vm_block;
+	$self->_die($@);
     }      
 }
 
@@ -310,6 +322,7 @@ sub cmd_vm_unblock {
     if ($@) {
 	$self->_print("Wrong syntax, check the command help:\n");
 	$self->help_vm_unblock;
+	$self->_die($@);
     }    
 }
 
@@ -334,6 +347,7 @@ sub cmd_vm_add {
     if ($@) {
 	$self->_print("Wrong syntax, check the command help:\n");
 	$self->help_vm_add;
+	$self->_die($@);
     }  
 }
 
@@ -385,6 +399,7 @@ sub cmd_osi_list {
     if ($@) {
 	$self->_print("Wrong syntax, check the command help:\n");
 	$self->help_osi_list;
+	$self->_die($@);
     } else {
 	_print_table(\@header, \@body) unless $self->{quiet};
     }
@@ -415,6 +430,7 @@ sub cmd_osi_add {
     if ($@) {
 	$self->_print("Wrong syntax, check the command help:\n");
 	$self->help_osi_add;
+	$self->_die($@);
     }
 }
 
@@ -457,6 +473,7 @@ sub cmd_host_del {
     if ($@) {
 	$self->_print("Wrong syntax or host assigned to virtual machines, check the command help:\n");
 	$self->help_host_del;
+	$self->_die($@);
     }
 }
 
@@ -480,6 +497,7 @@ sub cmd_user_del {
     if ($@) {
 	$self->_print("Wrong syntax, check the command help:\n");
 	$self->help_user_del;
+	$self->_die($@);
     }
 }
 
@@ -503,6 +521,7 @@ sub cmd_vm_del {
     if ($@) {
 	$self->_print("Wrong syntax, check the command help:\n");
 	$self->help_vm_del;
+	$self->_die($@);
     }  
 }
 
@@ -527,6 +546,7 @@ sub cmd_osi_del {
     if ($@) {
 	$self->_print("Wrong syntax, check the command help:\n");
 	$self->help_osi_del;
+	$self->_die($@);
     }
     
 }
@@ -551,6 +571,7 @@ sub cmd_host_propset {
     if (($ci == -1) || $@) {
 	$self->_print("Wrong syntax, check the command help:\n");
 	$self->help_host_propset;
+	$self->_die($@);
     } else {
 	$self->_print("propset in $ci hosts.\n");
     }
@@ -578,6 +599,7 @@ sub cmd_user_propset {
     if (($ci == -1) || $@) {
 	$self->_print("Wrong syntax, check the command help:\n");
 	$self->help_user_propset;
+	$self->_die($@);
     } else {
 	$self->_print("propset in $ci users.\n");
     }    
@@ -606,6 +628,7 @@ sub cmd_vm_propset {
     if (($ci == -1) || $@) {
 	$self->_print("Wrong syntax, check the command help:\n");
 	$self->help_vm_propset;
+	$self->_die($@);
     } else {
 	$self->_print("propset in $ci virtual machines.\n");
     }       
@@ -634,6 +657,7 @@ sub _obj_propget {
 
     if ($@) {
 	$self->_print("Wrong syntax, check the command help.\n");
+	$self->_die($@);
     }
 }
 
@@ -701,6 +725,7 @@ sub cmd_host_propdel {
     if ($@) {
 	$self->_print("Wrong syntax, check the command help:\n");
 	$self->help_host_propdel;
+	$self->_die($@);
     }
 }
 
@@ -732,6 +757,7 @@ sub cmd_user_propdel {
     if ($@) {
 	$self->_print("Wrong syntax, check the command help:\n");
 	$self->help_user_propdel;
+	$self->_die($@);
     }
 }
 
@@ -763,6 +789,7 @@ sub cmd_vm_propdel {
     if ($@) {
 	$self->_print("Wrong syntax, check the command help:\n");
 	$self->help_vm_propdel;
+	$self->_die($@);
     }
 }
 
@@ -790,6 +817,7 @@ sub cmd_config_set {
     if ($@ || (scalar keys %args == 0)) {
 	$self->_print("Wrong syntax, check the command help:\n");
 	$self->help_config_set;
+	$self->_die($@);
     }
 }
 
@@ -814,6 +842,7 @@ sub _config_pairs {
     if ($@) {
         $self->_print("Wrong syntax, check the command help:\n");
         $self->help_config_get;	
+	$self->_die($@);
     }
     ## #540: vm.network.netmask and vm.network.gateway have no
     ## default, so they don't appear in the output of 'config get'
@@ -863,6 +892,7 @@ sub cmd_vm_edit {
     if ($@) {
         $self->_print("Wrong syntax, check the command help:\n");
         $self->help_vm_net;
+	$self->_die($@);
     }
 }
 
@@ -893,6 +923,7 @@ sub cmd_vm_start {
     if ($@) {
 	$self->_print("Wrong syntax, check the command help:\n");
 	$self->help_vm_start;
+	$self->_die($@);
     }
 }
 
@@ -923,6 +954,7 @@ sub cmd_vm_stop {
     if ($@) {
 	$self->_print("Wrong syntax, check the command help:\n");
 	$self->help_vm_stop;
+	$self->_die($@);
     }    
 }
 
@@ -952,6 +984,7 @@ sub cmd_vm_disconnect_user {
     if ($@) {
 	$self->_print("Wrong syntax, check the command help:\n");
 	$self->help_vm_disconnect_user;
+	$self->_die($@);
     }  
 }
 
@@ -996,6 +1029,7 @@ sub cmd_vm_ssh {
     if ($@) {
 	$self->_print("Wrong syntax, check the command help:\n");
 	$self->help_vm_ssh;
+	$self->_die($@);
     }
 }
 
@@ -1026,6 +1060,7 @@ sub cmd_vm_console {
     if ($@) {
 	$self->_print("Wrong syntax, check the command help:\n");
 	$self->help_vm_console;
+	$self->_die($@);
     }
 }
 
@@ -1056,6 +1091,7 @@ sub cmd_vm_vnc {
     if ($@) {
 	$self->_print("Wrong syntax, check the command help:\n");
 	$self->help_vm_vnc;
+	$self->_die($@);
     }    
 }
 
@@ -1082,7 +1118,7 @@ sub cmd_config_ssl {
     my $cert_file = delete $args{cert};
     if (%args or !$key_file or !$cert_file) {
 	$self->help_config_ssl;
-	exit 1;
+	$self->_die($@);
     }
     # FIXME: Is using File::Slurp the best way?
     use File::Slurp; 
@@ -1122,6 +1158,7 @@ sub cmd_config_del {
     if ($@) {
 	$self->_print("Wrong syntax, check the command help:\n");
 	$self->help_config_del;
+	$self->_die($@);
     }
     $self->_print("$ci config entry deleted.\n");
 
@@ -1150,10 +1187,12 @@ sub cmd_user_passwd {
 	if ($@) {
 	    $self->_print("Wrong syntax or user does not exist, check the command help:\n");
 	    $self->help_user_passwd;    
+	    $self->_die($@);
 	}
     } else {
 	    $self->_print("Wrong syntax, check the command help:\n");
 	    $self->help_user_passwd;    	
+	    $self->_die($@);
     }
 
 }
