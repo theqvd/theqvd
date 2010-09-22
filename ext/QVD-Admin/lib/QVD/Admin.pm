@@ -197,7 +197,7 @@ sub cmd_user_add {
 
 sub cmd_osi_add {
     my ($self, %params) = @_;
-    my @required_params = qw/name memory use_overlay user_storage_size disk_image/;
+    my @required_params = qw/name memory use_overlay disk_image/;
 
     # FIXME: detect type of image and set use_overlay accordingly, iso => no overlay
     $params{memory}      //= $osi_default_memory;
