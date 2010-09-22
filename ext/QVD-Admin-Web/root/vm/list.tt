@@ -78,7 +78,6 @@ function check_all(field) {
 	</form>
 </div>
 <form onSubmit="return on_submit();" method="post" name="propos" id="propos">
-[% META title = 'PropGet' -%]
 <table id="props" class="tablesorter resultset">
     <thead>
         <tr>

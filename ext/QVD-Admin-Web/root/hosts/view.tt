@@ -18,5 +18,10 @@
 	    <td class="field">State</td>
 	    <td class="value">[% host.runtime.state %]</td>
 	</tr>	
+	<tr>
+	    <td class="field">Blocked</td>
+	    <td class="value">[% IF host.runtime.blocked -%]<span class="option_blocked"></span>
+	    [% END %]</td>
+	</tr>		
     </table>
 </div>

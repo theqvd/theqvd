@@ -74,6 +74,28 @@ sub host_del {
     $ok;
 }
 
+sub host_block {
+    my ( $self, $id ) = @_;
+    $self->reset_status;
+    eval { $self->admin->cmd_host_block_by_id($id) };
+    if ($@) {
+	$self->set_error($@);
+	return undef;
+    }
+    1;
+}
+
+sub host_unblock {
+    my ( $self, $id ) = @_;
+    $self->reset_status;
+    eval { $self->admin->cmd_host_unblock_by_id($id) };
+    if ($@) {
+	$self->set_error($@);
+	return undef;
+    }
+    1;
+}
+
 sub user_list {
     my ( $self, $filter) = @_;
     $self->reset_status;

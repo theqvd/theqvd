@@ -7,6 +7,33 @@ if (agree)
 else
 	return false ;
 }
+
+
+function on_submit()
+{
+    if (confirm_submit()) {
+	if(document.pressed == 'block')
+      {
+	document.propos.action ="[% c.uri_for('/hosts/block') %]";
+      } 
+	else
+	if(document.pressed == 'unblock')
+      {
+	document.propos.action ="[% c.uri_for('/hosts/unblock') %]";
+      }
+      return true;
+    }
+}
+
+function check_all(field) {
+    var iform = field.form, z = 0;
+    for(i=0; i < iform.length; i++) {
+	if(iform[i].type == 'checkbox' && iform[i].name != 'check'){
+	    iform[i].checked = field.checked;
+	}
+    }
+}
+
 </script>
 
 <h1>Nodes</h1>
@@ -30,35 +57,44 @@ else
 
 	</form>
 </div>
-[% META title = 'PropGet' -%]
+<form onSubmit="return on_submit();" method="post" name="propos" id="propos">
 <table id="props" class="tablesorter resultset">
     <thead>
         <tr>
+	    <th><input type="checkbox" name="check" onclick="check_all(this);"/></th>
             <th id="id"></th>
             <th id="name">Name</th>
             <th id="address">Address</th>
 	    <th id="state">State</th>
+	    <th id="blocked">Blocked</th>	    	    
         </tr>
     </thead>
     <tbody>
         [% FOREACH host IN host_list -%]
-        <tr id="[% host.id %]">
+        <tr>
+	    <td><input type="checkbox" name="selected" value="[% host.id %]"></td>
             <td><a href="[% c.uri_for('/hosts/view/') %][% host.id %]" class="option_view">[% host.id %]</a></td>
             <td>[% host.name %]</td>
             <td>[% host.address %]</td>
 	    <td>[% host.runtime.state %]</td>
-
+	    <td><span id="host_blocked[% host.id %]" class="[% IF host.runtime.blocked -%]option_blocked[% END %]" /></td>
         </tr>
         [% END -%]
     </tbody>
 </table>
+<input type="submit" onClick="document.pressed='block'" value="Block"/> <input type="submit" onClick="document.pressed='unblock'" value="Unblock"/>
+</form>
 
 <script type="text/javascript" charset="utf-8">
 $(document).ready(function() 
     { 
 	$("#props").tablesorter({
-	widthFixed: true
-	}); 
+	widthFixed: true,
+	headers: { 
+            0: { 
+                sorter: false 
+            }
+	}});	
 	$("#props").tablesorterPager({container: $("#pager")});
 
     } 
