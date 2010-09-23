@@ -17,6 +17,7 @@ sub GetPIDForWindow {
     $net_wm_pid[2];
 }
 
+my $qvd_server = 'altar';
 my $client_executable = 'QVD-Test/bin/qvd-client.sh';
 die("QVD Window already open") if FindWindowLike('^QVD$');		
 
@@ -26,7 +27,7 @@ my ($w) = WaitWindowViewable('^QVD$');
 ok($w,					"Client window appeared");
 
 SetInputFocus($w);
-SendKeys("qvd\tqvd\taltar\n");
+SendKeys("qvd\tqvd\t$qvd_server\n");
 
 my ($cert_w) = WaitWindowViewable('^Invalid Certificate$');
 ok($cert_w,				"Certificate verification");
@@ -49,8 +50,13 @@ sleep 2;
 ok(IsWindowViewable($w),		"Client window appeared");
 
 SetInputFocus($w);
-SendKeys("noexiste\tnoexiste\tlocalhost\n");
-ok(WaitWindowViewable('Connection error'), "Invalid user/password");
+SendKeys("qvd\tnoexiste\t$qvd_server\n");
+ok(WaitWindowViewable('Connection error'), "Invalid password");
+SendKeys("\n");
+
+SetInputFocus($w);
+SendKeys("noexiste\tqvd\t$qvd_server\n");
+ok(WaitWindowViewable('Connection error'), "Invalid username");
 SendKeys("\n");
 
 kill 'TERM', GetPIDForWindow($w);
