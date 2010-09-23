@@ -28,10 +28,14 @@ ok($w,					"Client window appeared");
 SetInputFocus($w);
 SendKeys("qvd\tqvd\taltar\n");
 
+my ($cert_w) = WaitWindowViewable('^Invalid Certificate$');
+ok($cert_w,				"Certificate verification");
+SendKeys("\n");
+
 ok(!WaitWindowHidden($w, 60),		"Client window disappeared");
 
 my ($nxw) = WaitWindowViewable('^QVD$');
-ok($nxw,				"nxagent window appeared");
+ok($nxw && ($w != $nxw),		"nxagent window appeared");
 
 sleep 2;
 
