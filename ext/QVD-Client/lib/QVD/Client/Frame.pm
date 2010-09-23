@@ -325,6 +325,7 @@ sub OnConnectionStatusChanged {
 	$self->{progress_bar}->SetValue(0);
 	$self->{progress_bar}->SetRange(100);
 	$self->EnableControls(1);
+	$self->{username}->SetFocus();
 	$self->Show;
     }
 }
