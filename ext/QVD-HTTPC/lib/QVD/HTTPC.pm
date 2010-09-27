@@ -41,17 +41,19 @@ sub _create_socket {
             $s = IO::Socket::SSL->new(PeerAddr => $target, Blocking => 0, %ssl_args);
         }
 
-        $self->{socket} = $s or return 0;
+        $self->{socket} = $s;
     }
     else {
-        $self->{socket} = IO::Socket::INET->new(PeerAddr => $target, Blocking => 0) or do {
-            my $errmsg = "Unable to connect to $target";
-            $SSL and $errmsg .= ': ' . $IO::Socket::SSL::SSL_ERROR;
-            croak $errmsg;
-        };
+        $self->{socket} = IO::Socket::INET->new(PeerAddr => $target, Blocking => 0);
     }
 
-    return 1;
+    unless ($self->{socket}) {
+	my $errmsg = "Unable to connect to $target";
+	use Data::Dumper;
+	print Dumper IO::Socket::SSL::errstr();
+	$SSL and $errmsg .= ': ' . $IO::Socket::SSL::SSL_ERROR;
+	croak $errmsg;
+    } 
 }
 
 sub new {
@@ -70,7 +72,7 @@ sub new {
 		 bin => '',
 		 bout => '' };
     bless $self, $class;
-    $self->_create_socket() or return 0;
+    $self->_create_socket();
     setsockopt $self->{socket}, IPPROTO_TCP, TCP_NODELAY, 1;
     $self;
 }
