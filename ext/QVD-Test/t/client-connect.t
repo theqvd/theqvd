@@ -50,6 +50,11 @@ sleep 2;
 ok(IsWindowViewable($w),		"Client window appeared");
 
 SetInputFocus($w);
+SendKeys("qvd\tqvd\tnoexiste\n");
+ok(WaitWindowViewable('Connection error'), "Connection to server fails");
+SendKeys("\n");
+
+SetInputFocus($w);
 SendKeys("qvd\tnoexiste\t$qvd_server\n");
 ok(WaitWindowViewable('Connection error'), "Invalid password");
 SendKeys("\n");
