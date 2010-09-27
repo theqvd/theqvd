@@ -65,7 +65,7 @@ sub aa_stop_node : Test(shutdown) {
 
 sub check_l7r_ping : Test(2) {
     my $httpc = new QVD::HTTPC('localhost:8443', SSL => 1, SSL_verify_callback => sub {1});
-    ok($httpc, 			'Should be able to connect to L7R');
+    $httpc or fail('Cannot connect to L7R');
 
     $httpc->send_http_request(GET => '/qvd/ping');
     my @response = $httpc->read_http_response();
