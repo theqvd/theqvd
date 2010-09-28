@@ -165,6 +165,7 @@ sub cmd_vm_list {
     if ($@) {
 	$self->_print("Wrong syntax, check the command help:\n");
 	$self->help_vm_list;
+	$self->_die($@);
     } else {
 	_print_table(\@header, \@body) unless ($self->{quiet});
     }
