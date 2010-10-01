@@ -237,11 +237,16 @@ sub _rpc_fork_vm {
  	$pid // die "unable to fork virtual machine process: $!";
 	eval {
  	    setpgrp; # do not kill kvm when HKD runs on terminal and user CTRL-C's it
-	    POSIX::dup2(fileno $tap_fh, 3);
-	    $^F = 3;
+            if (fileno $tap_fh == 3) {
+                fcntl($tap_fh, F_SETFD, fcntl($tap_fh, F_GETFD, 0) & ~O_CLOEXEC)
+                    or die "fcntl failed: $!";
+            }
+            else {
+                POSIX::dup2(fileno $tap_fh, 3) or die "dup2 failed: $!";
+            }
 	    open STDIN, '<', '/dev/null' or die "can't open /dev/null\n";
 	    open STDOUT, '>', '/dev/null' or die "can't redirect STDOUT to /dev/null\n";
-	    POSIX::dup2(1, 2);
+	    POSIX::dup2(1, 2) or die "dup2 failed (2): $!";
 	    exec @cmd or die "exec failed\n";
 	};
  	ERROR "Unable to start VM: $@";
