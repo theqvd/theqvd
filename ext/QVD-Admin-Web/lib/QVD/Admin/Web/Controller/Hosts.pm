@@ -69,6 +69,22 @@ sub list : Local {
     $c->stash->{s} = $s;
 }
 
+sub jlist : Local {
+    my ( $self, $c ) = @_;
+    $c->go('Root', 'login', @_) unless $c->user_exists;
+    
+    my $model = $c->model('QVD::Admin::Web');
+    my $rs    = $model->host_list("");
+    
+    my @list;
+    for (@$rs) {
+	push(@list, [$_->id , $_->name , $_->address , $_->runtime->state, $_->runtime->blocked]);
+
+    }
+    $c->stash->{vm_list} = \@list;
+    $c->stash->{current_view} = 'JSON';
+}
+
 sub add : Local Form {
     my ( $self, $c ) = @_;
     $c->go('Root', 'login', @_) unless $c->user_exists;

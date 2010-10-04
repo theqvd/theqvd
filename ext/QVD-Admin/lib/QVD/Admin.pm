@@ -248,15 +248,15 @@ sub cmd_host_block {
     $counter
 }
 
-#sub cmd_host_block_by_id {
-#    my ($self, $id) = @_;
-#    $id // die "Missing parameter id";
-#    txn_do {
-#	my $hostrt = rs(Host_Runtime)->find($id) //
-#	    die "Host $id doesn't exist";
-#	$hostrt->block;
-#    };
-#}
+sub cmd_host_block_by_id {
+    my ($self, $id) = @_;
+    $id // die "Missing parameter id";
+    txn_do {
+	my $hostrt = rs(Host_Runtime)->find($id) //
+	    die "Host $id doesn't exist";
+	$hostrt->block;
+    };
+}
 
 sub cmd_host_unblock {
     my ($self, @args) = @_;
@@ -273,15 +273,15 @@ sub cmd_host_unblock {
     $counter
 }
 
-#sub cmd_host_unblock_by_id {
-#    my ($self, $id) = @_;
-#    $id // die "Missing parameter id";
-#    txn_do {
-#	my $hostrt = rs(Host_Runtime)->find($id) //
-#	    die "Host $id doesn't exist";
-#	$hostrt->unblock;
-#    };
-#}
+sub cmd_host_unblock_by_id {
+    my ($self, $id) = @_;
+    $id // die "Missing parameter id";
+    txn_do {
+	my $hostrt = rs(Host_Runtime)->find($id) //
+	    die "Host $id doesn't exist";
+	$hostrt->unblock;
+    };
+}
 
 sub cmd_host_del {
     shift->_obj_del('host', @_);
