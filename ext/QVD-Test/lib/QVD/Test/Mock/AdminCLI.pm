@@ -9,3 +9,5 @@ sub _print_table {
 
 sub table_header { $self->{table_header}; }
 sub table_body { $self->{table_body}; }
+
+1;
