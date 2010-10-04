@@ -7,7 +7,7 @@ sub _print_table {
     $self->{table_body} = $body;
 }
 
-sub table_header { $self->{table_header}; }
-sub table_body { $self->{table_body}; }
+sub table_header { shift->{table_header}; }
+sub table_body { shift->{table_body}; }
 
 1;
