@@ -42,10 +42,10 @@ sub check_environment : Test(startup => 6) {
 
 sub zz_start_node : Test(startup) {
     my $nodert = $node->runtime;
-    my $orig_ts = $nodert->ok_ts;
+    my $orig_ts = $nodert->ok_ts || 0;
     my $start_timeout = 10;
     system($noded_executable, 'start');
-    while ($nodert->ok_ts == $orig_ts) {
+    while (!defined $nodert->ok_ts or $nodert->ok_ts == $orig_ts) {
 	sleep 1;
 	$nodert->discard_changes;
 	$start_timeout-- or fail("Node didn't start"), last;
