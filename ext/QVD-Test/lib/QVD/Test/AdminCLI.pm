@@ -32,7 +32,6 @@ sub check_environment : Test(startup => 2) {
 
 sub user_add : Test(2) {
     my $adm = new QVD::Test::Mock::AdminCLI;
-    my $i;
     for my $i (0..9) {
 	$adm->cmd_user_add("login=qvd$i", "password=qvd");
 	$adm->cmd_user_add("login=xvd$i", "password=qvd");
