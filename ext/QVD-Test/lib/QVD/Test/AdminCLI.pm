@@ -16,6 +16,7 @@ use QVD::Config;
 use QVD::DB::Simple;
 use QVD::HTTP::StatusCodes qw(:status_codes);
 use QVD::HTTPC;
+use QVD::Test::Mock::AdminCLI;
 use MIME::Base64 qw(encode_base64);
 
 my $node;
@@ -61,6 +62,16 @@ sub aa_stop_node : Test(shutdown) {
 	$nodert->discard_changes;
 	$stop_timeout-- or fail("Node didn't stop"), last;
     }
+}
+
+sub user_add : Test {
+    $adm = new QVD::Test::Mock::AdminCLI;
+    $adm->cmd_user_add("login=qvd$i", "password=qvd") for my $i (0..9);
+    $adm->cmd_user_add("login=xvd$i", "password=qvd") for my $i (0..9);
+    $adm->cmd_user_list();
+    $user_list = $adm->table_body;
+    use Data::Dumper;
+    print Dumper $user_list;
 }
 
 sub check_l7r_ping : Test(2) {
