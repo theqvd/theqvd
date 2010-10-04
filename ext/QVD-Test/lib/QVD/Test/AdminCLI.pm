@@ -22,54 +22,23 @@ use MIME::Base64 qw(encode_base64);
 my $node;
 my $noded_executable;
 
-sub check_environment : Test(startup => 6) {
+sub check_environment : Test(startup => 2) {
     # FIXME better to use something derived from $0
     $noded_executable = 'QVD-Test/bin/qvd-noded.sh';
 
     ok(-f '/etc/qvd/node.conf',		'Existence of QVD configuration, node.conf');
     ok(-x $noded_executable,		'QVD node installation');
-
-    my $bridge = cfg('vm.network.bridge');
-    ok($bridge,				'Bridge definition in node.conf');
-    ok(!system("ip addr show $bridge"), "Existence of VM network bridge $bridge");
-
-    my $nodename = cfg('nodename');
-    my $noders = rs(Host)->search({name => $nodename});
-    ok($nodename,			'Node name definition in node.conf');
-    is($noders->count, 1, 		"Presence of node $nodename in the database");
-
-    $node = $noders->first;
 }
 
-sub zz_start_node : Test(startup) {
-    my $nodert = $node->runtime;
-    my $orig_ts = $nodert->ok_ts || 0;
-    my $start_timeout = 10;
-    system($noded_executable, 'start');
-    while (!defined $nodert->ok_ts or $nodert->ok_ts == $orig_ts) {
-	sleep 1;
-	$nodert->discard_changes;
-	$start_timeout-- or fail("Node didn't start"), last;
+sub user_add : Test(2) {
+    my $adm = new QVD::Test::Mock::AdminCLI;
+    my $i;
+    for my $i (0..9) {
+	$adm->cmd_user_add("login=qvd$i", "password=qvd");
+	$adm->cmd_user_add("login=xvd$i", "password=qvd");
     }
-}
-
-sub aa_stop_node : Test(shutdown) {
-    my $nodert = $node->runtime;
-    system($noded_executable, 'stop');
-    my $stop_timeout = 10;
-    while ($nodert->state ne 'stopped') {
-	sleep 1;
-	$nodert->discard_changes;
-	$stop_timeout-- or fail("Node didn't stop"), last;
-    }
-}
-
-sub user_add : Test {
-    $adm = new QVD::Test::Mock::AdminCLI;
-    $adm->cmd_user_add("login=qvd$i", "password=qvd") for my $i (0..9);
-    $adm->cmd_user_add("login=xvd$i", "password=qvd") for my $i (0..9);
     $adm->cmd_user_list();
-    $user_list = $adm->table_body;
+    my $user_list = $adm->table_body;
     use Data::Dumper;
     print Dumper $user_list;
 }
