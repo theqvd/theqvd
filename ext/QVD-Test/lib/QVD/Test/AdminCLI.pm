@@ -37,9 +37,9 @@ sub user_add : Test(2) {
 	$adm->cmd_user_add("login=xvd$i", "password=qvd");
     }
     $adm->cmd_user_list();
-    my $user_list = $adm->table_body;
-    use Data::Dumper;
-    print Dumper $user_list;
+    my %user_list = map { $_->[1] => 1 } @{$adm->table_body};
+    ok($user_list{qvd0},	'User qvd0 was created');
+    ok($user_list{xvd0},	'User xvd0 was created');
 }
 
 sub _check_connect {
