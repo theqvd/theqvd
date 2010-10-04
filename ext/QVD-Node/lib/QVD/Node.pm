@@ -238,7 +238,7 @@ sub _rpc_fork_vm {
 	eval {
  	    setpgrp; # do not kill kvm when HKD runs on terminal and user CTRL-C's it
             if (fileno $tap_fh == 3) {
-                fcntl($tap_fh, F_SETFD, fcntl($tap_fh, F_GETFD, 0) & ~O_CLOEXEC)
+                fcntl($tap_fh, F_SETFD, fcntl($tap_fh, F_GETFD, 0) & ~FD_CLOEXEC)
                     or die "fcntl failed: $!";
             }
             else {
