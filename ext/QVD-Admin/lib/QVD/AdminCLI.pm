@@ -8,10 +8,11 @@ use QVD::Admin;
 use Text::Table;
 
 sub new {
-    my $class = shift;
+    my ($class, $quiet) = @_;
     my $admin = QVD::Admin->new;
     my $self = {
 	admin => $admin,
+	quiet => $quiet,
     };
     bless $self, $class;
 }
