@@ -90,7 +90,7 @@ sub ab_user_del : Test(3) {
     my %user_list = map { $_->[1] => 1 } @{$adm->table_body};
     ok(!exists $user_list{xvd0},		'Check user xvd0 was deleted');
     ok($user_list{qvd0},			'Check user qvd0 still exists');
-    is($self->_check_login(xvd0=>'xvd0'), 403,	'Check login after account deletion');
+    is($self->_check_login(xvd0=>'xvd0'), 401,	'Check login after account deletion');
 }
 
 sub _check_login {
