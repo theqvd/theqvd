@@ -1176,13 +1176,19 @@ Valid options:
 EOT
 }
 
+sub _read_password {
+    my ($self, $for_user) = @_;
+    print "New password for $for_user: ";
+    # FIXME use a real password prompt library
+    my $password = <STDIN>;
+    chomp $password;
+    $password
+}
 
 sub cmd_user_passwd {
     my ($self, $user) = @_;
     if ($user) {
-    	print "New password for $user: ";
-	my $passwd = <STDIN>;
-	chomp $passwd;
+	my $passwd = $self->_read_password($user);
 	eval {
 	    $self->{admin}->set_password($user, $passwd);
 	};

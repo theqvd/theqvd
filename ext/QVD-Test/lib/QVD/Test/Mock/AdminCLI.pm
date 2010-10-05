@@ -10,4 +10,13 @@ sub _print_table {
 sub table_header { shift->{table_header}; }
 sub table_body { shift->{table_body}; }
 
+# Mock reading password from user
+sub _read_password { shift->{mock_password} }
+
+sub set_mock_password {
+    my ($self, $mock_password) = @_;
+    $self->{mock_password} = $mock_password;
+}
+
+
 1;
