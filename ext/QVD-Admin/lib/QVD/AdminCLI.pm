@@ -66,8 +66,8 @@ sub _print_table {
     my $tb = Text::Table->new(@$header);
     $tb->load(@$body);
     
-    print $tb->title;
-    print $tb->rule( '-', '+');
+    print $tb->title unless $self->{quiet};
+    print $tb->rule( '-', '+') unless $self->{quiet};
     print $tb->body;
 }
 
@@ -94,7 +94,7 @@ sub cmd_host_list {
 	$self->_die($@);
     }
     
-    $self->_print_table(\@header, \@body) unless ($self->{quiet} || $@);
+    $self->_print_table(\@header, \@body);
 }
 
 sub help_host_list {
@@ -118,7 +118,7 @@ sub cmd_user_list {
 	while (my $user = $rs->next) {
 	    push @body, [$user->id, $user->login];
 	}
-	$self->_print_table([qw(Id Login)], \@body) unless ($self->{quiet});
+	$self->_print_table([qw(Id Login)], \@body);
     };
     if ($@) {
 	$self->_print("Wrong syntax, check the command help:\n");
@@ -168,7 +168,7 @@ sub cmd_vm_list {
 	$self->help_vm_list;
 	$self->_die($@);
     } else {
-	$self->_print_table(\@header, \@body) unless ($self->{quiet});
+	$self->_print_table(\@header, \@body);
     }
 }
 
@@ -403,7 +403,7 @@ sub cmd_osi_list {
 	$self->help_osi_list;
 	$self->_die($@);
     } else {
-	$self->_print_table(\@header, \@body) unless $self->{quiet};
+	$self->_print_table(\@header, \@body);
     }
 }
 
