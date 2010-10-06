@@ -18,6 +18,7 @@ use QVD::HTTP::StatusCodes qw(:status_codes);
 use QVD::HTTPC;
 use QVD::Test::Mock::AdminCLI;
 use MIME::Base64 qw(encode_base64);
+use JSON;
 
 sub check_environment : Test(startup => 2) {
     # FIXME check that node is running rather than if it can be executed
@@ -157,6 +158,9 @@ sub vm_add {
 	    "Accept: application/json"]);
     use Data::Dumper;
     print Dumper $httpc->read_http_response;
+    my $response = from_json(($httpc->read_http_response)[3]);
+    is(@$response, 1,				'Check vm list length for user qvd0');
+    is($response->[0]{name}, 'vm0',		'Check creation of vm for user qvd0');
 }
 
 1;
