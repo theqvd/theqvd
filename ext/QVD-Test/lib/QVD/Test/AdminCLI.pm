@@ -100,14 +100,16 @@ sub user_del {
 
 sub _check_login {
     my ($self, $user, $pass) = @_;
+    my $response_code = 0;
     eval {
 	my $httpc = QVD::HTTPC->new('localhost:8443',SSL=>1,SSL_verify_callback=>sub {1});
 	my $auth = encode_base64("$user:$pass", '');
 	$httpc->send_http_request(GET => '/qvd/list_of_vm', headers => ["Authorization: Basic $auth",
 	    "Accept: application/json"]);
-	return ($httpc->read_http_response())[0];
+	$response_code = ($httpc->read_http_response())[0];
     };
-    return 0 if ($@);
+
+    $response_code
 }
 
 ################################################################################
