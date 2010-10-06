@@ -30,9 +30,9 @@ sub check_environment : Test(startup => 2) {
 
 sub main_test : Test(14) {
     my $self = shift;
-    my @tests = qw(user_add user_list_with_filter user_login_with_httpc 
-		   user_passwd user_del
-		   osi_add vm_add osi_del);
+    my @tests = qw(user_add user_list_with_filter user_login_with_httpc
+    user_passwd user_del osi_add vm_add vm_edit vm_del vm_delete_on_user_delete
+    vm_start osi_del);
     foreach my $test (@tests) {
 	$self->{adm} = new QVD::Test::Mock::AdminCLI(1);
 	$self->$test;
@@ -161,6 +161,77 @@ sub vm_add {
     my $response = from_json(($httpc->read_http_response)[3]);
     is(@$response, 1,				'Check vm list length for user qvd0');
     is($response->[0]{name}, 'vm0',		'Check creation of vm for user qvd0');
+}
+
+sub vm_edit {
+    my $self = shift;
+    my $adm = $self->{adm};
+    # FIXME vm edit sin documentar
+}
+
+sub vm_del {
+    my $self = shift;
+    my $adm = $self->{adm};
+    $adm->set_filter('name=vm9');
+    $adm->cmd_vm_del();
+
+    $adm = new QVD::Test::Mock::AdminCLI(1);
+    $adm->cmd_vm_list();
+    my %vm_list = map { $_->[1] => 1 } @{$adm->table_body};
+    ok(!exists $vm_list{vm9},			'Check deletion of vm "vm9"');
+}
+
+sub vm_delete_on_user_delete {
+    my $self = shift;
+    my $adm = $self->{adm};
+    $adm->set_filter('login=qvd0');
+    $adm->cmd_user_del();
+
+    $adm = new QVD::Test::Mock::AdminCLI(1);
+    $adm->cmd_vm_list();
+    my %vm_list = map { $_->[1] => 1 } @{$adm->table_body};
+    ok(!exists $vm_list{vm0},			'Check deletion of vm for "qvd0"');
+}
+
+sub vm_start {
+    my $self = shift;
+    my $adm = $self->{adm};
+    $adm->set_filter('name=vm1');
+    $adm->cmd_start_vm();
+
+    $adm = new QVD::Test::Mock::AdminCLI(1);
+    $adm->cmd_vm_list();
+    my %vm_list = map { $_->[1] => $_->[5] } @{$adm->table_body};
+    sleep 60;
+    is($vm_list{vm1}, 'running',		'Check start of vm "vm1"');
+
+    $adm = new QVD::Test::Mock::AdminCLI(1);
+    $adm->set_filter('name=vm1');
+    $adm->cmd_vm_del();
+
+    $adm = new QVD::Test::Mock::AdminCLI(1);
+    $adm->cmd_vm_list();
+    my %vm_list = map { $_->[1] => 1 } @{$adm->table_body};
+    ok(exists $vm_list{vm1},			'Check vm "vm1" still exists');
+
+    $adm = new QVD::Test::Mock::AdminCLI(1);
+    $adm->set_filter('name=qvd');
+    $adm->cmd_osi_del();
+
+    $adm = new QVD::Test::Mock::AdminCLI(1);
+    $adm->cmd_osi_list();
+    my %osi_list = map { $_->[1] => 1 } @{$adm->table_body};
+    ok(exists $osi_list{qvd},			'Check OSI "qvd" still exists');
+
+    $adm = new QVD::Test::Mock::AdminCLI(1);
+    $adm->set_filter('name=vm1');
+    $adm->cmd_stop_vm();
+
+    $adm = new QVD::Test::Mock::AdminCLI(1);
+    $adm->cmd_vm_list();
+    my %vm_list = map { $_->[1] => $_->[5] } @{$adm->table_body};
+    sleep 60;
+    is($vm_list{vm1}, 'stopped',		'Check stop of vm "vm1"');
 }
 
 1;
