@@ -617,15 +617,13 @@ sub _start_vm {
         push @cmd, -drive => $hdb;
     }
 
-    my ($pid, $tap_if) = $hkd->_call_noded(fork_vm => $id, @cmd);
+    my ($pid, $tap_if) = $hkd->_call_noded(fork_vm => $id, $network_bridge, @cmd);
     $vm->set_vm_pid($pid);
 
-    # TODO: Do "ifconfig" and "brctl addif" in Perl
+    # TODO: Do "ifconfig" in Perl
+    $hkd->_set_vm_fw_rules($vm, $tap_if);
     system (ifconfig => $tap_if, 'up')
 	and die "ifconfig $tap_if for VM $id failed\n";
-    $hkd->_set_vm_fw_rules($vm, $tap_if);
-    system (brctl => 'addif', $network_bridge, $tap_if)
-	and die "brctl addif $network_bridge $tap_if for VM $id failed\n";
 }
 
 

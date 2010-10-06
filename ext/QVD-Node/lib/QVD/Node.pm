@@ -228,8 +228,11 @@ sub _rpc_set_timeouts {
 }
 
 sub _rpc_fork_vm {
-    my ($noded, $id, @cmd) = @_;
-    my ($tap_fh, $tap_if) = $noded->_open_tap;
+    my ($noded, $id, $bridge, @cmd) = @_;
+    my ($tap_fh, $tap_if) = $noded->_open_tap($bridge);
+
+    system(brctl => 'addif', $bridge, $tap_if)
+        and die "brctl addif $bridge $tap_if failed for VM $id\n";
 
     DEBUG "forking kvm for VM $id: @cmd";
     my $pid = fork;
