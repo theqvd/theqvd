@@ -156,8 +156,6 @@ sub vm_add {
     my $auth = encode_base64("qvd0:qvd", '');
     $httpc->send_http_request(GET => '/qvd/list_of_vm', headers => ["Authorization: Basic $auth",
 	    "Accept: application/json"]);
-    use Data::Dumper;
-    print Dumper $httpc->read_http_response;
     my $response = from_json(($httpc->read_http_response)[3]);
     is(@$response, 1,				'Check vm list length for user qvd0');
     is($response->[0]{name}, 'vm0',		'Check creation of vm for user qvd0');
