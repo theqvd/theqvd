@@ -18,5 +18,10 @@ sub set_mock_password {
     $self->{mock_password} = $mock_password;
 }
 
+# Mock failed commands
+sub _die {
+    my $self = shift;
+    die @_;
+}
 
 1;
