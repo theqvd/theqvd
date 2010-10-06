@@ -209,7 +209,7 @@ sub vm_start {
 
     $adm = new QVD::Test::Mock::AdminCLI(1);
     $adm->cmd_vm_list();
-    my %vm_list = map { $_->[1] => 1 } @{$adm->table_body};
+    %vm_list = map { $_->[1] => 1 } @{$adm->table_body};
     ok(exists $vm_list{vm1},			'Check vm "vm1" still exists');
 
     $adm = new QVD::Test::Mock::AdminCLI(1);
@@ -227,7 +227,7 @@ sub vm_start {
 
     $adm = new QVD::Test::Mock::AdminCLI(1);
     $adm->cmd_vm_list();
-    my %vm_list = map { $_->[1] => $_->[5] } @{$adm->table_body};
+    %vm_list = map { $_->[1] => $_->[5] } @{$adm->table_body};
     sleep 60;
     is($vm_list{vm1}, 'stopped',		'Check stop of vm "vm1"');
 }
