@@ -28,7 +28,7 @@ sub check_environment : Test(startup => 2) {
     ok(-x $noded_executable,		'QVD node installation');
 }
 
-sub main_test : Test(14) {
+sub main_test : Test {
     my $self = shift;
     my @tests = qw(user_add user_list_with_filter user_login_with_httpc
     user_passwd user_del osi_add vm_add vm_edit vm_del vm_delete_on_user_delete
