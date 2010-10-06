@@ -27,11 +27,16 @@ sub check_environment : Test(startup => 2) {
     ok(-x $noded_executable,		'QVD node installation');
 }
 
-sub create_adm : Test(setup) {
+sub main_test : Test(14) {
     my $self = shift;
-    $self->{adm} = new QVD::Test::Mock::AdminCLI(1);
+    my @tests = qw(user_add user_list_with_filter user_login_with_httpc 
+		   user_passwd user_del
+		   osi_add vm_add osi_del);
+    foreach my $test (@tests) {
+	$self->{adm} = new QVD::Test::Mock::AdminCLI(1);
+	$self->$test;
+    }
 }
-
 
 ################################################################################
 #
@@ -43,7 +48,7 @@ sub create_adm : Test(setup) {
 #
 ################################################################################
 
-sub aa_user_add : Test(2) {
+sub user_add {
     my $self = shift;
     my $adm = $self->{adm};
     for my $i (0..9) {
@@ -56,7 +61,7 @@ sub aa_user_add : Test(2) {
     ok($user_list{xvd0},	'User xvd0 was created');
 }
 
-sub aa_user_list_with_filter : Test(1) {
+sub user_list_with_filter {
     my $self = shift;
     my $adm = $self->{adm};
     $adm->set_filter('login=qvd0');
@@ -65,13 +70,13 @@ sub aa_user_list_with_filter : Test(1) {
     is_deeply(\@user_list, ['qvd0'], 'Check user list with filter');
 }
 
-sub aa_user_login_with_httpc : Test(2) {
+sub user_login_with_httpc {
     my $self = shift;
     is($self->_check_login(qvd0=>'qvd'), 200,	'Check user qvd0 login');
     is($self->_check_login(xvd0=>'qvd'), 200,	'Check user xvd0 login');
 }
 
-sub aa_user_passwd : Test(2) {
+sub user_passwd {
     my $self = shift;
     my $adm = $self->{adm};
     $adm->set_mock_password('xvd0');
@@ -80,7 +85,7 @@ sub aa_user_passwd : Test(2) {
     is($self->_check_login(qvd0=>'qvd'), 200,	'Check user qvd0 login');
 }
 
-sub ab_user_del : Test(3) {
+sub user_del {
     my $self = shift;
     my $adm = $self->{adm};
     $adm->set_filter('login=xvd*');
@@ -95,29 +100,61 @@ sub ab_user_del : Test(3) {
 
 sub _check_login {
     my ($self, $user, $pass) = @_;
-    my $httpc = QVD::HTTPC->new('localhost:8443', SSL => 1, SSL_verify_callback => sub {1});
-    die "connect" if (!$httpc);
-    my $auth = encode_base64("$user:$pass", '');
-    $httpc->send_http_request(GET => '/qvd/list_of_vm', headers => ["Authorization: Basic $auth",
-								    "Accept: application/json"]);
-    return ($httpc->read_http_response())[0];
+    eval {
+	my $httpc = QVD::HTTPC->new('localhost:8443',SSL=>1,SSL_verify_callback=>sub {1});
+	my $auth = encode_base64("$user:$pass", '');
+	$httpc->send_http_request(GET => '/qvd/list_of_vm', headers => ["Authorization: Basic $auth",
+	    "Accept: application/json"]);
+	return ($httpc->read_http_response())[0];
+    };
+    return 0 if ($@);
 }
 
 ################################################################################
 #
 #
 #
-#	VM command tests
+#	OSI and VM command tests
 #
 #
 #
 ################################################################################
 
-sub ba_alta_osi : Test {
+sub osi_add {
     my ($self) = @_;
     my $adm = $self->{adm};
     $adm->cmd_osi_add('name=qvd',
 	'disk_image=/var/lib/qvd/storage/staging/ubuntu-10.04-i386.qcow2');
+    $adm->cmd_osi_list();
+    my %osi_list = map { $_->[1] => 1 } @{$adm->table_body};
+    ok($osi_list{qvd},				'Check creation of OSI "qvd"');
+}
+
+sub osi_del {
+    my ($self) = @_;
+    my $adm = $self->{adm};
+    $adm->set_filter('name=qvd');
+    $adm->cmd_osi_del();
+
+    $adm = new QVD::Test::Mock::AdminCLI(1);
+    $adm->cmd_osi_list();
+    my %osi_list = map { $_->[1] => 1 } @{$adm->table_body};
+    ok(!exists$osi_list{qvd},			'Check deletion of OSI "qvd"');
+}
+
+sub vm_add {
+    my $self = shift;
+    my $adm = $self->{adm};
+    foreach (0..9) {
+	$adm->cmd_vm_add("name=vm$_", "user=qvd$_", "osi=qvd");
+    }
+
+    my $httpc = QVD::HTTPC->new('localhost:8443',SSL=>1,SSL_verify_callback=>sub {1});
+    my $auth = encode_base64("qvd0:qvd", '');
+    $httpc->send_http_request(GET => '/qvd/list_of_vm', headers => ["Authorization: Basic $auth",
+	    "Accept: application/json"]);
+    use Data::Dumper;
+    print Dumper $httpc->read_http_response;
 }
 
 1;
