@@ -373,6 +373,7 @@ sub cmd_user_add {
     if ($@) {
 	$self->_print("Wrong syntax or user already exists, check the command help:\n");
 	$self->help_user_add;
+	$self->_die($@);
     }
 }
 
