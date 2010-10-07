@@ -197,10 +197,10 @@ sub vm_start {
     $adm->set_filter('name=vm1');
     $adm->cmd_vm_start();
 
+    sleep 60;
     $adm = new QVD::Test::Mock::AdminCLI(1);
     $adm->cmd_vm_list();
     my %vm_list = map { $_->[1] => $_->[5] } @{$adm->table_body};
-    sleep 60;
     is($vm_list{vm1}, 'running',		'Check start of vm "vm1"');
 
     $adm = new QVD::Test::Mock::AdminCLI(1);
@@ -223,12 +223,12 @@ sub vm_start {
 
     $adm = new QVD::Test::Mock::AdminCLI(1);
     $adm->set_filter('name=vm1');
-    $adm->cmd_stop_vm();
+    $adm->cmd_vm_stop();
 
+    sleep 60;
     $adm = new QVD::Test::Mock::AdminCLI(1);
     $adm->cmd_vm_list();
     %vm_list = map { $_->[1] => $_->[5] } @{$adm->table_body};
-    sleep 60;
     is($vm_list{vm1}, 'stopped',		'Check stop of vm "vm1"');
 }
 
