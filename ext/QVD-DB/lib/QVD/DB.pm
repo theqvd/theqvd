@@ -55,7 +55,9 @@ sub _make_pg_socket_keepalive {
     }
 }
 
-my %initial_values = ( VM_State   => [qw(stopped starting running
+my %initial_values = ( VM_State   => [qw(stopped
+                                         starting_1 starting_2
+                                         running
 					 stopping_1 stopping_2
 					 zombie_1 zombie_2)],
 		       VM_Cmd     => [qw(start stop)],
