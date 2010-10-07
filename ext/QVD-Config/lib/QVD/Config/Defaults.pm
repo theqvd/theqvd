@@ -24,6 +24,7 @@ path.storage.staging = ${path.storage.root}/staging
 path.storage.images = ${path.storage.root}/images
 path.storage.overlays = ${path.storage.root}/overlays
 path.storage.homes = ${path.storage.root}/homes
+path.storage.check = ${path.storage.homes}/.rw_check
 path.ssl.certs = ${path.run}/ssl
 path.ssl.ca.system = /etc/ssl/certs
 path.ssl.ca.personal = .qvd/certs

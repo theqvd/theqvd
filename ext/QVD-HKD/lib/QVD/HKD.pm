@@ -65,6 +65,8 @@ my $bogomips_per_vm	   = cfg('internal.vm.reserved_cpu');
 
 my $vm_starting_max        = cfg('hkd.vm.starting.max');
 
+my $storage_check_fn       = cfg('path.storage.check');
+
 my $database_delay         = core_cfg('internal.hkd.database.retry_delay');
 
 
@@ -97,7 +99,8 @@ sub run {
 
     while (1) {
 	DEBUG "HKD run, round: $hkd->{round}";
-	if ($hkd->_check_db) {
+	if ($hkd->_check_storage and
+            $hkd->_check_db) {
 	    $hkd->{round}++;
 	    $hkd->{start_time} //= $hkd->{db_ok_ts};
 
@@ -121,20 +124,17 @@ sub run {
 		}
 		DEBUG($@ || "Can't exit yet: there are VMs running");
 	    }
-	    {
-		local $@;
-		eval { $hkd->_update_load_balancing_data };
-		DEBUG "Updating load balancing data: $@" if $@;
-	    }
 	    eval {
 		$hkd->_check_vms;
 		$hkd->_check_l7rs;
+                $hkd->_update_load_balancing_data;
                 $hkd->_check_hkd_cluster;
 	    };
+            ERROR $@ if $@;
 	    sleep $pool_time;
 	}
         else {
-            INFO "HKD can not connect to database, retrying: $@";
+            INFO "HKD can not connect to database or to storage, retrying";
             sleep $database_delay;
             undef $hkd->{start_time};
         }
@@ -145,6 +145,20 @@ sub _set_noded_timeouts {
     my ($hkd, $time) = @_;
     $time //= time;
     $hkd->_call_noded(set_timeouts => $time);
+}
+
+sub _check_storage {
+    if (length $storage_check_fn) {
+        my $fh;
+        open $fh, ">", $storage_check_fn  and
+        print $fh, time, "\n"             and
+        close $fh                         and
+        return 1;
+
+        INFO "Storage has failed: $!";
+        return 0;
+    }
+    1
 }
 
 sub _check_db {
@@ -159,10 +173,13 @@ sub _check_db {
 	};
 	alarm 0;
     };
-    $ok or return;
-    $hkd->{db_ok_ts} = $time;
-    $hkd->_set_noded_timeouts($time);
-    return 1;
+    if ($ok) {
+        $hkd->{db_ok_ts} = $time;
+        $hkd->_set_noded_timeouts($time);
+        return 1;
+    }
+    INFO "Unable to connect to database";
+    return;
 }
 
 sub _startup {
@@ -171,15 +188,16 @@ sub _startup {
     $hkd->{frontend} = $host->frontend;
     $hkd->{backend}  = $host->backend;
     my $hrt = $hkd->{host_runtime} = $host->runtime;
-    $hrt->set_state('starting');
+    $hkd->_check_storage or die "HKD startup failed because of storage not being accesible\n";
     $hkd->{id} = $hrt->id;
+    $hrt->set_state('starting');
     $hkd->_check_bridge;
     $hkd->_regenerate_dhcpd_config;
     $hkd->_start_dhcpd;
     $hkd->_reattach_vms($vm_pids);
     my $time = time;
-    $hrt->set_state('running', $time);
     $hkd->_set_noded_timeouts($time);
+    $hrt->set_state('running', $time);
 }
 
 sub _check_bridge {
