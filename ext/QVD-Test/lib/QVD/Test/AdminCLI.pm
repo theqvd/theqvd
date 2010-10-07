@@ -136,7 +136,7 @@ sub osi_add {
 sub osi_del {
     my ($self) = @_;
     my $adm = $self->{adm};
-    $adm->set_filter('osi=qvd');
+    $adm->set_filter('name=vm*');
     $adm->cmd_vm_del();
 
     $adm = new QVD::Test::Mock::AdminCLI(1);
@@ -231,7 +231,7 @@ sub vm_start {
 
     $adm = new QVD::Test::Mock::AdminCLI(1);
     $adm->cmd_vm_list();
-    my %vm_list = map { $_->[1] => $_->[7] } @{$adm->table_body};
+    %vm_list = map { $_->[1] => $_->[7] } @{$adm->table_body};
     is($vm_list{vm1}, '1',			'Check vm "vm1" becomes blocked');
 
     $adm = new QVD::Test::Mock::AdminCLI(1);
