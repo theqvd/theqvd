@@ -51,7 +51,7 @@ client.use_ssl = 1
 l7r.use_ssl = 1
 l7r.port = 8443
 l7r.address = *
-l7r.as_user = root
+# l7r.as_user = root
 l7r.pid_file = ${path.run}/l7r.pid
 l7r.auth.plugins = default
 l7r.loadbalancer.plugin = default
@@ -115,6 +115,8 @@ vma.on_provisioning.after_add_user =
 vma.default.client.keyboard = pc105/en
 vma.default.client.link = adsl
 
+hkd.vm.starting.max = 6
+
 # internal parameters, do not change!!!
 internal.l7r.timeout.vm_start = 270
 internal.l7r.timeout.x_start = 10
@@ -124,7 +126,7 @@ internal.l7r.retry.x_start = 5
 internal.l7r.poll_time.vm = 3
 internal.l7r.poll_time.x = 1
 
-internal.hkd.timeout.vm.state.starting = 240
+internal.hkd.timeout.vm.state.starting_2 = 240
 internal.hkd.timeout.vm.state.stopping_1 = 30
 internal.hkd.timeout.vm.state.stopping_2 = 240
 internal.hkd.timeout.vm.state.zombie_1 = 30

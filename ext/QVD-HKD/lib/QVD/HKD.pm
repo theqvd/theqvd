@@ -22,7 +22,7 @@ use JSON;
 my %cmd = ( kvm     => cfg('command.kvm'),
 	    kvm_img => cfg('command.kvm-img') );
 
-my %timeout = ( starting    => cfg('internal.hkd.timeout.vm.state.starting'),
+my %timeout = ( starting_2  => cfg('internal.hkd.timeout.vm.state.starting_2'),
 	        stopping_1  => cfg('internal.hkd.timeout.vm.state.stopping_1'),
 		stopping_2  => cfg('internal.hkd.timeout.vm.state.stopping_2'),
 		zombie_1    => cfg('internal.hkd.timeout.vm.state.zombie_1'),
@@ -62,6 +62,8 @@ my $cluster_check_interval = cfg('internal.hkd.cluster.check.interval');
 my $cluster_node_timeout   = cfg('internal.hkd.cluster.node.timeout');
 
 my $bogomips_per_vm	   = cfg('internal.vm.reserved_cpu');
+
+my $vm_starting_max        = cfg('hkd.vm.starting.max');
 
 my $database_delay         = core_cfg('internal.hkd.database.retry_delay');
 
@@ -295,13 +297,18 @@ sub _check_vms {
 
     for my $vm ($hkd->{host_runtime}->vms) {
 	my $id = $vm->id;
-	my $start;
 	if ($hkd->{stopping}) {
 	    # on clean exit, shutdown virtual machines gracefully
-	    if ($vm->vm_state eq 'running') {
-		DEBUG "stopping VM because HKD is shutting down";
-		$hkd->_move_vm_to_state(stopping_1 => $vm);
-	    }
+            given($vm->vm_state) {
+                when ('running') {
+                    DEBUG "stopping VM because HKD is shutting down";
+                    $hkd->_move_vm_to_state(stopping_1 => $vm);
+                }
+                when ('starting_1') {
+                    DEBUG "aborting start because HKD is shutting down";
+                    $vm->unassign;
+                }
+            }
 	    if ($vm->vm_cmd) {
 		txn_eval {
 		    $vm->discard_changes;
@@ -323,9 +330,8 @@ sub _check_vms {
 			    given($vm->vm_state) {
 				when ('stopped') {
 				    $hkd->_assign_vm_ports($vm);
-				    $hkd->_move_vm_to_state(starting => $vm);
+				    $hkd->_move_vm_to_state(starting_1 => $vm);
 				    $vm->clear_vm_cmd;
-				    $start = 1;
 				}
 				default {
 				    ERROR "unexpected VM command start received in state $_";
@@ -339,7 +345,11 @@ sub _check_vms {
 				    $hkd->_move_vm_to_state(stopping_1 => $vm);
 				    $vm->clear_vm_cmd;
 				}
-				when ('starting') { } # stop is delayed!
+                                when ('starting_1') {
+                                    $vm->unassign;
+				    $vm->clear_vm_cmd;
+                                }
+				when ('starting_2') { } # stop is delayed!
 				default {
 				    ERROR "unexpected VM command stop received in state $_";
 				    $vm->clear_vm_cmd;
@@ -362,10 +372,12 @@ sub _check_vms {
 	# no error checking is performed here, failed virtual
 	# machines startings are captured later or on the next
 	# run:
-	if ($start) {
-	    eval { $hkd->_start_vm($vm) };
-	    $@ and ERROR "Unable to start VM: $@";
-	}
+	if ($vm->vm_state eq 'starting_1') {
+            next if $vm_starting_max <= $hkd->{host_runtime}->vms->search({vm_state => 'starting_2'})->count;
+            $hkd->_move_vm_to_state(starting_2 => $vm);
+            eval { $hkd->_start_vm($vm) };
+            $@ and ERROR "Unable to start VM: $@";
+        }
 
 	next if $vm->vm_state eq 'stopped';
 
@@ -409,7 +421,7 @@ sub _check_vms {
 		    $vma_method = 'ping';
 		}
 	    }
-	    when('starting'  ) { $vma_method = 'ping' }
+	    when('starting_2') { $vma_method = 'ping' }
 	    when('stopping_1') { $vma_method = 'poweroff' }
 	    when('zombie_1'  ) { $hkd->_signal_vm($id => 'TERM') }
 	    when('zombie_2'  ) { $hkd->_signal_vm($id => 'KILL') }
@@ -463,7 +475,7 @@ sub _check_vms {
 	    $vm->update_vma_ok_ts;
 	    my $new_state;
 	    given ($vm->vm_state) {
-		when ('starting')   { $new_state = 'running' }
+		when ('starting_2') { $new_state = 'running' }
 		when ('stopping_1') { $new_state = 'stopping_2' }
 	    }
 	    if (defined $new_state) {
