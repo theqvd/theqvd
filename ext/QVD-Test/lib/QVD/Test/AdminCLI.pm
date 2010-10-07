@@ -1,4 +1,4 @@
-package QVD::Test::SingleServer;
+package QVD::Test::AdminCLI;
 use parent qw(QVD::Test);
 
 use lib::glob '*/lib';
