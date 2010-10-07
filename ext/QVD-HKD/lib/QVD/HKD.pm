@@ -185,7 +185,7 @@ sub _startup {
 sub _check_bridge {
     my $hkd = shift;
     -e "/sys/devices/virtual/net/$network_bridge"
-	or die "$network_bridge not found\n";
+	or die "Network bridge $network_bridge not found\n";
 }
 
 sub _reattach_vms {
