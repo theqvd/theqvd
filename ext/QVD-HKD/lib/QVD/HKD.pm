@@ -244,9 +244,8 @@ sub _reattach_vms {
 			    $hkd->_clean_vm_fw_rules($vm);
 			}
 		    }
-		    $vm->set_vm_state('stopped');
+		    $hkd->_move_vm_state(stopped => $vm);
 		    $vm->block;
-		    $vm->unassign;
 		}
 	    };
 	}
@@ -288,9 +287,8 @@ sub _check_hkd_cluster {
             if ($chrt->ok_ts + $cluster_node_timeout < $time) {
                 txn_eval {
                     for my $vm (rs(VM_Runtime)->search({ host_id => $chrt->host_id })) {
-                        $vm->set_vm_state('stopped');
+                        $hkd->_move_vm_state(stopped => $vm);
                         $vm->block;
-                        $vm->unassign;
 			# TODO: en este caso, seria interesante
 			# regenerar los overlays de la maquina que se
 			# recupera de manera que:
@@ -325,7 +323,7 @@ sub _check_vms {
                 }
                 when ('starting_1') {
                     DEBUG "aborting start because HKD is shutting down";
-                    $vm->unassign;
+                    $hkd->_move_vm_to_state(stopped => $vm);
                 }
             }
 	    if ($vm->vm_cmd) {
@@ -365,7 +363,7 @@ sub _check_vms {
 				    $vm->clear_vm_cmd;
 				}
                                 when ('starting_1') {
-                                    $vm->unassign;
+                                    $hkd->_move_vm_to_state(stopped => $vm);
 				    $vm->clear_vm_cmd;
                                 }
 				when ('starting_2') { } # stop is delayed!

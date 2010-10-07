@@ -104,9 +104,10 @@ sub _clear_cmd {
 sub clear_vm_cmd { shift->_clear_cmd('vm') }
 sub clear_user_cmd { shift->_clear_cmd('user') }
 
-my %valid_vm_cmd = ( start => { stopped  => 1},
-		     stop =>  { starting => 1,
-				running  => 1 } );
+my %valid_vm_cmd = ( start => { stopped    => 1 },
+		     stop  => { starting_1 => 1,
+                                starting_2 => 1,
+				running    => 1 } );
 
 sub send_vm_cmd {
     my ($vm, $cmd) = @_;
