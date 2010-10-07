@@ -32,7 +32,7 @@ sub main_test : Test {
     my $self = shift;
     my @tests = qw(user_add user_list_with_filter user_login_with_httpc
     user_passwd user_del osi_add vm_add vm_edit vm_del vm_delete_on_user_delete
-    vm_start osi_del);
+    vm_start osi_del config_get);
     foreach my $test (@tests) {
 	$self->{adm} = new QVD::Test::Mock::AdminCLI(1);
 	$self->$test;
@@ -227,6 +227,15 @@ sub vm_start {
 
     $adm = new QVD::Test::Mock::AdminCLI(1);
     $adm->set_filter('name=vm1');
+    $adm->cmd_vm_block();
+
+    $adm = new QVD::Test::Mock::AdminCLI(1);
+    $adm->cmd_vm_list();
+    my %vm_list = map { $_->[1] => $_->[7] } @{$adm->table_body};
+    is($vm_list{vm1}, '1',			'Check vm "vm1" becomes blocked');
+
+    $adm = new QVD::Test::Mock::AdminCLI(1);
+    $adm->set_filter('name=vm1');
     $adm->cmd_vm_stop();
 
     sleep 60;
@@ -234,6 +243,12 @@ sub vm_start {
     $adm->cmd_vm_list();
     %vm_list = map { $_->[1] => $_->[5] } @{$adm->table_body};
     is($vm_list{vm1}, 'stopped',		'Check stop of vm "vm1"');
+}
+
+sub config_get {
+    my $self = shift;
+    my $adm = $self->{adm};
+    $adm->cmd_config_get;
 }
 
 1;
