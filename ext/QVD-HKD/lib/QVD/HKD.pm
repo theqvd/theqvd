@@ -770,6 +770,7 @@ sub _update_load_balancing_data {
 	$bogomips *= 0.80; # 20% se reserva para el hipervisor
     }
 
+    # TODO: move this code into an external module!
     my $meminfo_lines = slurp('/proc/meminfo', array_ref => 1);
     my %meminfo = map { /^([^:]+):\s*(\d+)/; $1 => $2 } @$meminfo_lines;
     my $usable_ram = min($meminfo{MemFree}, $meminfo{MemTotal}-2*1024*1024);
