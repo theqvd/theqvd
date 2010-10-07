@@ -136,6 +136,10 @@ sub osi_add {
 sub osi_del {
     my ($self) = @_;
     my $adm = $self->{adm};
+    $adm->set_filter('osi=qvd');
+    $adm->cmd_vm_del();
+
+    $adm = new QVD::Test::Mock::AdminCLI(1);
     $adm->set_filter('name=qvd');
     $adm->cmd_osi_del();
 
@@ -210,7 +214,7 @@ sub vm_start {
     $adm = new QVD::Test::Mock::AdminCLI(1);
     $adm->cmd_vm_list();
     %vm_list = map { $_->[1] => 1 } @{$adm->table_body};
-    ok(exists $vm_list{vm1},			'Check vm "vm1" still exists');
+    ok(exists $vm_list{vm1},			'Check vm del fail with vm running');
 
     $adm = new QVD::Test::Mock::AdminCLI(1);
     $adm->set_filter('name=qvd');
@@ -219,7 +223,7 @@ sub vm_start {
     $adm = new QVD::Test::Mock::AdminCLI(1);
     $adm->cmd_osi_list();
     my %osi_list = map { $_->[1] => 1 } @{$adm->table_body};
-    ok(exists $osi_list{qvd},			'Check OSI "qvd" still exists');
+    ok(exists $osi_list{qvd},			'Check osi del fail with VMs defined');
 
     $adm = new QVD::Test::Mock::AdminCLI(1);
     $adm->set_filter('name=vm1');
