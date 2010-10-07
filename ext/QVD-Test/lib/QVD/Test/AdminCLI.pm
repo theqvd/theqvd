@@ -195,7 +195,7 @@ sub vm_start {
     my $self = shift;
     my $adm = $self->{adm};
     $adm->set_filter('name=vm1');
-    $adm->cmd_start_vm();
+    $adm->cmd_vm_start();
 
     $adm = new QVD::Test::Mock::AdminCLI(1);
     $adm->cmd_vm_list();
