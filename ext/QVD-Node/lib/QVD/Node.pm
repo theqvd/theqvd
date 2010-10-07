@@ -199,10 +199,11 @@ sub _fork_dhcpd {
 
 sub _shutdown {
     my $noded = shift;
+    DEBUG "VMs to be killed: ", join(", ", map { "$_ ($noded->{vm_pids}{$_})" } keys %{$noded->{vm_pids}} );
     my @pids = ( $noded->{hkd_pid},
 		 $noded->{l7r_pid},
 		 $noded->{dhcpd_pid},
-		 values %{$noded->{hkd_pids}} );
+		 values %{$noded->{vm_pids}} );
 
     for my $sig (qw(TERM TERM KILL KILL KILL KILL)) {
 	@pids = grep $_, @pids;
