@@ -30,7 +30,7 @@ sub before_list_of_vms {
 
     if (rs(VM)->search({user_id => $user_id})->count == 0) {
 	INFO "Auto provisioning VM for user $login ($user_id)";
-	my $admin = new QVD::Admin;
+	my $admin = QVD::Admin->new;
 	for my $ix (1..5) {
 	    my $name = "$login-$ix";
 	    my $ok;
