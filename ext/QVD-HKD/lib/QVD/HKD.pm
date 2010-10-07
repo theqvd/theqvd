@@ -283,6 +283,7 @@ sub _check_hkd_cluster {
 			# corriendo contra la misma imagen.
                     }
                     $chrt->block;
+                    $chrt->set_state('lost');
                 };
             }
         }

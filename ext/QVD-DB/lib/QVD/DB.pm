@@ -64,7 +64,7 @@ my %initial_values = ( VM_State   => [qw(stopped
 		       User_State => [qw(disconnected connecting
 					 connected aborting)],
 		       User_Cmd   => [qw(abort)],
-		       Host_State => [qw(stopped starting running stopping)],
+		       Host_State => [qw(stopped starting running stopping lost)],
 		       Host_Cmd   => [qw(stop)] );
 
 sub deploy {
