@@ -1,0 +1,6 @@
+Changes
+Makefile.PL
+MANIFEST
+README
+t/QVD-VMKiller.t
+lib/QVD/VMKiller.pm

@@ -1,0 +1,6 @@
+Revision history for Perl extension QVD::VMKiller.
+
+0.01  Fri Oct  8 12:04:46 2010
+	- original version; created by h2xs 1.23 with options
+		-AXn QVD::VMKiller
+
