@@ -115,6 +115,12 @@ sub run {
 		delete $noded->{l7r_pid}
 	    }
 
+            if ($noded->{dhcpd_pid}) {
+                if (waitpid($noded->{dhcpd_pid}, WNOHANG) > 0) {
+                    delete $noded->{dhcpd_pid}
+                }
+            }
+
 	    if (waitpid($hkd_pid, WNOHANG) > 0) {
 		delete $noded->{hkd_pid};
 		$noded->{hkd_time_limit_1} = time + $database_timeout * 2;
