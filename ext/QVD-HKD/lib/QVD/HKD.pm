@@ -596,7 +596,7 @@ sub _start_vm {
 
     my @cmd = ($cmd{kvm},
                -m => $osi->memory.'M',
-	       -name => "qvd/$name");
+	       -name => "qvd/$id/$name");
 
     my $nic = "nic,macaddr=$mac";
     $nic .= ',model=virtio' if $vm_virtio;
@@ -646,15 +646,17 @@ sub _start_vm {
         push @cmd, -drive => $hdb;
     }
 
+    $hkd->_clean_vm_fw_rules($vm); # Just in case there are some
+                                   # dangling rules floating around
+
     my ($pid, $tap_if) = $hkd->_call_noded(fork_vm => $id, $network_bridge, @cmd);
     $vm->set_vm_pid($pid);
 
-    # TODO: Do "ifconfig" in Perl
     $hkd->_set_vm_fw_rules($vm, $tap_if);
+    # TODO: Do "ifconfig" in Perl
     system (ifconfig => $tap_if, 'up')
 	and die "ifconfig $tap_if for VM $id failed\n";
 }
-
 
 sub _ip_to_mac {
     my ($hkd, $ip) = @_;
