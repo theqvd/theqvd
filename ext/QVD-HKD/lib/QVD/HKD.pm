@@ -596,7 +596,7 @@ sub _start_vm {
 
     my @cmd = ($cmd{kvm},
                -m => $osi->memory.'M',
-	       -name => $name);
+	       -name => "qvd/$name");
 
     my $nic = "nic,macaddr=$mac";
     $nic .= ',model=virtio' if $vm_virtio;
