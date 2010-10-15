@@ -65,6 +65,7 @@ __PACKAGE__->add_columns( vm_id          => { data_type   => 'integer' },
 					      is_nullable => 1 },
 			  vm_serial_port => { data_type   => 'integer',
 					      is_nullable => 1 },
+                          # FIXME: replace by current_osi_id
 			  osi_actual_id  => { data_type   => 'integer',
 					      is_nullable => 1, },
 			  blocked        => { data_type   => 'boolean',
