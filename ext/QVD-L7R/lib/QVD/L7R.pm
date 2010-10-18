@@ -229,6 +229,10 @@ sub _takeover_vm {
 	$l7r->_tell_client("Aborting contending session");
 	$vm->send_user_abort;
 
+        # TODO: when contending L7R is in state "connected" this L7R
+        # could send the x_suspend message to the VMA without going
+        # through the HKD
+
 	die "Unable to acquire VM, close other clients\n" if time > $timeout;
 	sleep($vm_poll_time);
 
