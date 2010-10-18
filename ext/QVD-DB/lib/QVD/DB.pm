@@ -61,8 +61,7 @@ my %initial_values = ( VM_State   => [qw(stopped
 					 stopping_1 stopping_2
 					 zombie_1 zombie_2)],
 		       VM_Cmd     => [qw(start stop)],
-		       User_State => [qw(disconnected connecting
-					 connected aborting)],
+		       User_State => [qw(disconnected connecting connected)],
 		       User_Cmd   => [qw(abort)],
 		       Host_State => [qw(stopped starting running stopping lost)],
 		       Host_Cmd   => [qw(stop)] );

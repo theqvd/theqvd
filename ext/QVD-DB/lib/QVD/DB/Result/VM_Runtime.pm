@@ -36,9 +36,7 @@ __PACKAGE__->add_columns( vm_id          => { data_type   => 'integer' },
 			  vm_pid         => { data_type   => 'integer',
 					      is_nullable => 1	},
 			  user_state     => { data_type   => 'varchar(12)',
-					      extra       => { list => [qw/disconnected connecting
-									   connected disconnecting
-									   aborting/] } },
+					      extra       => { list => [qw/disconnected connecting connected/] } },
 			  user_state_ts  => { data_type   => 'integer',
 					      is_nullable => 1 },
 			  user_cmd       => { data_type   => 'varchar(12)',
