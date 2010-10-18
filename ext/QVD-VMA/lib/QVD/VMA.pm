@@ -600,111 +600,33 @@ The following RPC calls are available.
 
 =over
 
-=item start_vm_listener()
+=item ping
 
-Respond to the RPC C<start_vm_listener> by starting or resuming an nx session.
+This methods does nothing and always returns 1.
 
-Returns a hash with host and port to connect to.
+It can be used to check that the VM and VMA are up.
 
-=item status()
+=item x_state
 
-Respond to the RPC C<status>.
+Returns the current state of the VMA/nxagent. See
+L<https://intranet.qindel.com/trac/QVD/wiki/NxagentStates> for
+a description of the acceptable states.
 
-Returns a hash with the state of the VMA (always 'ok') and the state of
-nxagent. The state of nxagent is given as one of disconnected, connecting,
-listening, connected, and disconnecting.
+=item poweroff
 
-=item poweroff()
+Starts the machine power off process.
 
-Respond to the RPC C<poweroff> by scheduling the shutdown of the machine. By
-default the shutdown is scheduled within 1 minute.
+=item x_suspend
 
-Returns a hash with the key C<poweroff> and the value minutes until shutdown or
-C<undef> if scheduling power off failed.
+Asks the nxagent to disconnect the user and suspend itself.
 
-=item disconnect_session()
+=item x_stop
 
-Disconnect the user session if it is running.
+Asks the nxagent to stop itself.
 
-Returns a hash with the key C<disconnect> having a true value if the session
-was disconnected and undef if the session wasn't running in the first place.
+=item x_start
 
-=back
-
-=head2 Internal API
-
-These methods are for internal use.
-
-=over
-
-=item _get_nxagent_pid
-
-Returns the last recorded pid of nxagent.
-
-=item _shutdown($type, $minutes)
-
-Power off, reboot, or halt the system using C<shutdown(8)>.  Successful
-shutdown is verified by checking the existence of the pid file
-F</var/run/shutdown.pid>.
-
-=over
-
-=item $type: Options to pass to shutdown: 'P' to power off, 'r' to reboot, etc.
-
-=item $minutes: Number of minutes to wait before shutting down.
-
-=back
-
-Returns 1 if the shutdown was started succesfully, 0 in other case.
-
-=item _get_nxagent_status
-
-Returns the last recorded nxagent status. While nxagent is running it is one of
-
-=over
-
-=item starting,
-
-=item started,
-
-=item suspending,
-
-=item suspended,
-
-=item resuming,
-
-=item resumed,
-
-=item terminating,
-
-=item terminated,
-
-=item aborting or
-
-=item aborted.
-
-=back
-
-When nxagent exits, the status becomes "exited I<last_status>", where
-I<last_status> is the previous recorded status (likely terminated or aborted).
-
-=item _is_nxagent_started
-
-Checks if nxagent is in "started" state. In a started state the status can be
-started or resumed.
-
-=item _is_nxagent_suspended
-
-Checks if nxagent is in suspended state.
-
-=item _is_nxagent_running
-
-Checks if nxagent is running by getting its pid and checking if it exists.
-
-=item _start_or_resume_session
-
-Performs the necessary steps to start a session. Resuming existing sessions is
-automatically attempted.
+Runs the provisioning tasks and starts the nxagent.
 
 =back
 
@@ -712,7 +634,7 @@ automatically attempted.
 
 Salvador FandiE<ntilde>o (sfandino@yahoo.com)
 
-Joni Salonen 
+Joni Salonen
 
 =head1 COPYRIGHT
 
