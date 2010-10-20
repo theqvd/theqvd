@@ -415,20 +415,14 @@ sub cmd_config_get {
     return \@configs;
 }
 
-sub _get_free_host {
-    my ($self, $vm) = @_;
-    # FIXME: implement some plugin-based load balancer algorithm and
-    # share it with the L7R package
-    my @hosts = map $_->id, grep !$_->runtime->blocked, rs(Host)->all;
-    $hosts[rand @hosts];
-}
-
 sub _start_vm {
     my ($self, $vmrt) = @_;
     $vmrt->vm_state eq 'stopped'
 	or die "Unable to start machine, already running";
     if (!defined $vmrt->host_id) {
-        my $free_host = ($self->_get_free_host)[0];
+	require QVD::L7R::LoadBalancer;
+	$lb = new QVD::L7R::LoadBalancer();
+        my $free_host = $lb->get_free_host($vmrt->vm);
         if (!defined $free_host) {
             die "Unable to start machine, no hosts available";
         }

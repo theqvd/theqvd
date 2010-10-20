@@ -15,6 +15,7 @@ WriteMakefile(
 	'File::Slurp' => 0,
 	'QVD::Config' => 0,
 	'QVD::DB' => 0,
+	'QVD::L7R::LoadBalancer' => 0,
 	'QVD::Log' => 0,
         'Test::More' => 0,
 	'Text::Table' => 0,
