@@ -9,47 +9,61 @@ use Carp;
 use Scalar::Util;
 
 sub read {
-    my ($class, $mnt) = @_;
-    my $fn = (defined $mnt ? "$mnt/net/tcp" : "/proc/net/tcp");
+    my ($class, %opts) = @_;
+
+    my $ip4 = delete $opts{ip4};
+    my $ip6 = delete $opts{ip6};
+    my $mnt = delete $opts{mnt};
+
+    %opts and croak "Unknown option(s) ". join(", ", sort keys %opts);
+
+    $mnt = "/proc" unless defined $mnt;
+
+    my @fn;
+    push @fn, "$mnt/net/tcp"  unless (defined $ip4 and not $ip4);
+    push @fn, "$mnt/net/tcp6" unless (defined $ip6 and not $ip6);
+
     my @entries;
-    local $_;
-    open my $fh, '<', $fn
-	or croak "Unable to open $fn: $!";
-    <$fh>; # discard header
-    while (<$fh>) {
-	my @entry = /^\s*
-		     (\d+):\s                        # sl                        -  0
-		     ([\dA-F]{8}):([\dA-F]{4})\s     # local address and port    -  1 y  2
-		     ([\dA-F]{8}):([\dA-F]{4})\s     # remote address and port   -  3 y  4
-		     ([\dA-F]{2})\s                  # st                        -  5
-		     ([\dA-F]{8}):([\dA-F]{8})\s     # tx_queue and rx_queue     -  6 y  7
-		     (\d\d):([\dA-F]{8}|(?:F{9,}))\s # tr and tm->when           -  8 y  9
-		     ([\dA-F]{8})\s+                 # retrnsmt                  - 10
-		     (\d+)\s+                        # uid                       - 11
-		     (\d+)\s+                        # timeout                   - 12
-		     (\d+)\s+                        # inode                     - 13
-		     (\d+)\s+                        # ref count                 - 14
-		     ((?:[\dA-F]{8}){1,2})           # memory address            - 15
-		     (?:
-			 \s+
-			 (\d+)\s+                # retransmit timeout        - 16
-			 (\d+)\s+                # predicted tick            - 17
-			 (\d+)\s+                # ack.quick                 - 18
-			 (\d+)\s+                # sending congestion window - 19
-			 (-?\d+)                 # slow start size threshold - 20
-		     )?
-		     \s*
-                     (.*)                        # more                      - 21
-		     $
-		    /xi;
-	if (@entry) {
-	    my $entry = \@entry;
-	    bless $entry, 'Linux::Proc::Net::TCP::Entry';
-	    push @entries, $entry
-	}
-	else {
-	    warn "unparseable line: $_";
-	}
+    for my $fn (@fn) {
+        local $_;
+        open my $fh, '<', $fn
+            or croak "Unable to open $fn: $!";
+        <$fh>; # discard header
+        while (<$fh>) {
+            my @entry = /^\s*
+                         (\d+):\s                                     # sl                        -  0
+                         ([\dA-F]{8}(?:[\dA-F]{24})?):([\dA-F]{4})\s  # local address and port    -  1 y  2
+                         ([\dA-F]{8}(?:[\dA-F]{24})?):([\dA-F]{4})\s  # remote address and port   -  3 y  4
+                         ([\dA-F]{2})\s                               # st                        -  5
+                         ([\dA-F]{8}):([\dA-F]{8})\s                  # tx_queue and rx_queue     -  6 y  7
+                         (\d\d):([\dA-F]{8}|(?:F{9,}))\s              # tr and tm->when           -  8 y  9
+                         ([\dA-F]{8})\s+                              # retrnsmt                  - 10
+                         (\d+)\s+                                     # uid                       - 11
+                         (\d+)\s+                                     # timeout                   - 12
+                         (\d+)\s+                                     # inode                     - 13
+                         (\d+)\s+                                     # ref count                 - 14
+                         ((?:[\dA-F]{8}){1,2})                        # memory address            - 15
+                         (?:
+                             \s+
+                             (\d+)\s+                                 # retransmit timeout        - 16
+                             (\d+)\s+                                 # predicted tick            - 17
+                             (\d+)\s+                                 # ack.quick                 - 18
+                             (\d+)\s+                                 # sending congestion window - 19
+                             (-?\d+)                                  # slow start size threshold - 20
+                         )?
+                         \s*
+                         (.*)                                         # more                      - 21
+                         $
+                        /xi;
+            if (@entry) {
+                my $entry = \@entry;
+                bless $entry, 'Linux::Proc::Net::TCP::Entry';
+                push @entries, $entry
+            }
+            else {
+                warn "unparseable line: $_";
+            }
+        }
     }
     bless \@entries, $class;
 }
@@ -95,8 +109,15 @@ sub _st2dual {
 }
 
 sub _hex2ip {
-    shift =~ /^(..)(..)(..)(..)$/;
-    sprintf "%d.%d.%d.%d", map hex, $4, $3, $2, $1;
+    my $bin = pack "C*" => map hex, $_[0] =~ /../g;
+    my @l = unpack "L*", $bin;
+    if (@l == 4) {
+        return join ':', map { sprintf "%x:%x", $_ >> 16, $_ & 0xffff } @l;
+    }
+    elsif (@l == 1) {
+        return join '.', map { $_ >> 24, ($_ >> 16 ) & 0xff, ($_ >> 8) & 0xff, $_ & 0xff } @l;
+    }
+    else { die "internal error: bad hexadecimal encoded IP address '$_[0]'" }
 }
 
 sub sl                        {          shift->[ 0] }
@@ -121,6 +142,9 @@ sub ack_pingpong              {          ( shift->[18] || 0 ) &  1 }
 sub sending_congestion_window {          shift->[19] }
 sub slow_start_size_threshold {          shift->[20] }
 sub _more                     {          shift->[21] }
+sub ip4                       { length(shift->[ 1]) ==  8 }
+sub ip6                       { length(shift->[ 1]) == 32 }
+
 
 sub tm_when { # work around bug in Linux kernel
     my $when = shift->[9];
@@ -133,7 +157,7 @@ __END__
 
 =head1 NAME
 
-Linux::Proc::Net::TCP - Parser for Linux /proc/net/tcp
+Linux::Proc::Net::TCP - Parser for Linux /proc/net/tcp and /proc/net/tcp6
 
 =head1 SYNOPSIS
 
@@ -203,7 +227,7 @@ accessors:
    rx_queue timer tm_when retrnsmt uid timeout inode reference_count
    memory_address retransmit_timeout predicted_tick ack_quick
    ack_pingpong sending_congestion_window slow_start_size_threshold
-
+   ip4 ip6
 
 =head1 The /proc/net/tcp documentation
 

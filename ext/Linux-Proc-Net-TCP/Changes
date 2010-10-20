@@ -1,6 +1,7 @@
 Revision history for Perl extension Linux::Proc::Net::TCP.
 
-0.04
+0.04  Oct 20, 2010
+        - add support for tcp6
         - minor doc corrections
 
 0.03  Aug 25, 2010
