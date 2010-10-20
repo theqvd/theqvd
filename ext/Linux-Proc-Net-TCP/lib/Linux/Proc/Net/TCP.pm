@@ -184,8 +184,10 @@ This module can read and parse the information available from
 
 =item $table = Linux::Proc::Net::TCP->read
 
-reads C</proc/net/tcp> and returns an object representing a table of
-the connections.
+=item $table = Linux::Proc::Net::TCP->read(%opts)
+
+reads C</proc/net/tcp> and C</proc/net/tcp6> and returns an object
+representing a table of the connections.
 
 Individual entries in the table can be accessed just dereferencing the
 returned object. For instance:
@@ -194,7 +196,28 @@ returned object. For instance:
     # do something with $entry
   }
 
-The table entries are of class C<Linux::Proc::Net::TCP::Entry> described below.
+The table entries are of class C<Linux::Proc::Net::TCP::Entry>
+described below.
+
+This method accepts the following optional arguments:
+
+=over 4
+
+=item ip4 => 0
+
+disables parsing of the file /proc/net/tcp containing state
+information for TCP over IP4 connections
+
+=item ip6 => 0
+
+disables parsing of the file /proc/net/tcp6 containing state
+information for TCP over IP6 connections
+
+=item mnt => $procfs_mount_point
+
+allows to override the default mount point for the procfs at C</proc>
+
+=back
 
 =item $table->listeners
 
