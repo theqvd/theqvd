@@ -1,0 +1,36 @@
+QVD-L7R-LoadBalancer
+
+Load balancer plugins for QVD.
+
+INSTALLATION
+
+To install this module, run the following commands:
+
+	perl Makefile.PL
+	make
+	make test
+	make install
+
+SUPPORT AND DOCUMENTATION
+
+After installing, you can find documentation for this module with the
+perldoc command.
+
+    perldoc QVD::L7R::LoadBalancer
+
+You can also look for information at:
+
+    QVD home page
+	http://qvd.morfeo-project.org
+
+    QVD blog
+        http://qvdblog.qindel.com
+
+LICENSE AND COPYRIGHT
+
+Copyright 2009-2010 by Qindel Formacion y Servicios S.L.
+
+This program is free software; you can redistribute it and/or modify it
+under the terms of the GNU GPL version 3 as published by the Free
+Software Foundation.
+
