@@ -246,7 +246,13 @@ sub _rpc_fork_vm {
     unless ($pid) {
  	$pid // die "unable to fork virtual machine process: $!";
 	eval {
- 	    setpgrp; # do not kill kvm when HKD runs on terminal and user CTRL-C's it
+ 	    setpgrp; # do not kill kvm when HKD runs on terminal and
+                     # user CTRL-C's it
+            setpriority(1, 0, 10); # run VMs with low priority so in
+                                   # case the machine gets overloaded,
+                                   # the noded and hkd daemons do not
+                                   # become unresponsive.
+                                   # (PRIO_PGRP => 1, current PGRP => 0)
             if (fileno $tap_fh == 3) {
                 fcntl($tap_fh, F_SETFD, fcntl($tap_fh, F_GETFD, 0) & ~FD_CLOEXEC)
                     or die "fcntl failed: $!";
