@@ -215,9 +215,13 @@ sub _reattach_vms {
     my $host_id = $hkd->{id};
     for my $vm ($hkd->{host_runtime}->vms) {
 	my $vm_id = $vm->id;
+        my $vm_state = $vm->vm_state;
 	my $pid_db = $vm->vm_pid;
 	my $pid_noded = $vm_pids->{$vm_id};
-	INFO "Releasing/reacquiring VM $vm_id (pid: " . ($pid_db // 'undef') . ")";
+	INFO "Releasing/reacquiring VM $vm_id in state $vm_state (pid: " . ($pid_db // 'undef') . ")";
+
+        next if $vm_state eq 'starting_1';
+
 	if ($pid_db and $pid_noded and $pid_db == $pid_noded) {
 	    # Noded is still managing it
 	    delete $vm_pids->{$vm->id};
@@ -315,6 +319,7 @@ sub _check_vms {
     for my $vm ($hkd->{host_runtime}->vms) {
 	my $id = $vm->id;
 	if ($hkd->{stopping}) {
+            DEBUG "HKD is stopping!";
 	    # on clean exit, shutdown virtual machines gracefully
             given($vm->vm_state) {
                 when ('running') {
