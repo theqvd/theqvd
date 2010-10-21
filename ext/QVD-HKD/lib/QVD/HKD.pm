@@ -398,7 +398,7 @@ sub _check_vms {
 	# run:
 	if ($vm->vm_state eq 'starting_1') {
             my $heavy = $vms->search({vm_state => [qw(starting_2 stopping_2 zombie_1 zombie_2)]})->count;
-            next if $vm_starting <= $heavy;
+            next if $vm_starting_max <= $heavy;
             # next if $vm_starting_max <= $hkd->{host_runtime}->vms->search({vm_state => 'starting_2'})->count;
             $hkd->_move_vm_to_state(starting_2 => $vm);
             eval { $hkd->_start_vm($vm) };
