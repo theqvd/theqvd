@@ -4,7 +4,6 @@ our $VERSION = '0.01';
 
 use strict;
 use warnings;
-use 5.010;
 
 use Proc::ProcessTable;
 
