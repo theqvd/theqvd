@@ -84,6 +84,7 @@ vm.network.bridge = qvdnet0
 # No sensible default value is possible for dhcp-range!
 # vm.network.dhcp-range=127.0.0.1,127.255.255.254
 internal.vm.network.dhcp-hostsfile=${path.run}/dhcp-hostsfile
+internal.vm.network.firewall.enable = 1
 
 osi.default.memory = 256
 osi.default.overlay = 1

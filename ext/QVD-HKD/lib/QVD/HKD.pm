@@ -55,6 +55,7 @@ my $vm_netmask		   = cfg('vm.network.netmask');
 my $dhcp_range	  	   = cfg('vm.network.dhcp-range');
 my $dhcp_default_route	   = cfg('vm.network.gateway');
 my $dhcp_hostsfile	   = cfg('internal.vm.network.dhcp-hostsfile');
+my $use_firewall           = cfg('internal.vm.network.firewall.enable')
 
 my $persistent_overlay     = cfg('vm.overlay.persistent');
 
@@ -839,12 +840,14 @@ sub _clean_vm_fw_rules {
 
 sub _set_vm_fw_rules {
     my ($hkd, $vm, $tap_if) = @_;
-    my $vm_id = $vm->id;
-    for my $rule ($hkd->_vm_fw_rules($vm, $tap_if)) {
-	my @cmd = (iptables => -A => @$rule, -m => 'comment', '--comment' => "QVD rule for VM $vm_id");
-	DEBUG "iptables cmd: @cmd";
-	system @cmd
-	    and ERROR "Can't configure firewall: $!";
+    unless ($use_firewall) {
+        my $vm_id = $vm->id;
+        for my $rule ($hkd->_vm_fw_rules($vm, $tap_if)) {
+            my @cmd = (iptables => -A => @$rule, -m => 'comment', '--comment' => "QVD rule for VM $vm_id");
+            DEBUG "iptables cmd: @cmd";
+            system @cmd
+                and ERROR "Can't configure firewall: $!";
+        }
     }
 }
 
@@ -856,79 +859,68 @@ sub _vm_fw_rules {
     my $vma_port = $vm->vm_vma_port;
 
     my @rules = (
-	# Drop traffic from VM if it doesn't have the correct IP or MAC
-	[FORWARD => ( 
-	    -m => 'physdev', '--physdev-in' => $tap_if,
-	    -m => 'mac', '!', '--mac-source' => $hkd->_ip_to_mac($vm_ip),
-	    -j => 'DROP')],
-	[FORWARD => ( 
-	    -m => 'physdev', '--physdev-in' => $tap_if,
-	    '!', -s => $vm_ip,
-	    -j => 'DROP')],
 
-	[INPUT => (
-	    -m => 'physdev', '--physdev-in' => $tap_if,
-	    -m => 'mac', '!', '--mac-source' => $hkd->_ip_to_mac($vm_ip),
-	    -j => 'DROP')],
-	[INPUT => ( # allow DHCP packets from any IP,
-		    # FIXME: could it be limited to 0.0.0.0?
-	    -m => 'physdev', '--physdev-in' => $tap_if,
-	    -p => 'udp', '--dport' => '67',
-	    -j => 'ACCEPT')],
-	[INPUT => (
-	    -m => 'physdev', '--physdev-in' => $tap_if,
-	    '!', -s => $vm_ip,
-	    -j => 'DROP')],
+                 ### ETHERNET
 
-	#
-	# TCP
-	#
+                 # Drop traffic from VM if it doesn't have the correct IP or MAC
+                 [FORWARD => ( -m => 'physdev', '--physdev-in' => $tap_if,
+                               -m => 'mac', '!', '--mac-source' => $hkd->_ip_to_mac($vm_ip),
+                               -j => 'DROP')],
 
-	# Drop TCP SYN from VM
-	[FORWARD => (
-	    -m => 'physdev', '--physdev-in' => $tap_if,
-	    -d => "$vm_ip/$vm_netmask",
-	    -p => 'tcp', '--syn',
-	    -j => 'DROP')],
-	[INPUT => (
-	    -m => 'physdev', '--physdev-in' => $tap_if,
-	    -d => "$vm_ip/$vm_netmask",
-	    -p => 'tcp', '--syn',
-	    -j => 'DROP')],
+                 [FORWARD => ( -m => 'physdev', '--physdev-in' => $tap_if,
+                               '!', -s => $vm_ip,
+                               -j => 'DROP')],
 
-	# Accept SSH/VMA/NX to VM, drop all other TCP from LAN to VM
-	[FORWARD => (
-	    -m => 'physdev', '--physdev-out' => $tap_if,
-	    -s => "$vm_ip/$vm_netmask", -d => $vm_ip,
-	    -p => 'tcp', -m => 'multiport', '--dports' => "$ssh_port,$vma_port,$x_port",
-	    -j => 'ACCEPT')],
-	[OUTPUT => (
-	    -s => "$vm_ip/$vm_netmask", -d => $vm_ip,
-	    -p => 'tcp', -m => 'multiport', '--dports' => "$ssh_port,$vma_port,$x_port",
-	    -j => 'ACCEPT')],
-	[FORWARD => (
-	    -s => "$vm_ip/$vm_netmask", -d => $vm_ip, # -s to allow internet
-	    -p => 'tcp',
-	    -j => 'DROP')],
-	[OUTPUT => (
-	    -d => $vm_ip,
-	    -p => 'tcp',
-	    -j => 'DROP')],
+                 [INPUT   => ( -m => 'physdev', '--physdev-in' => $tap_if,
+                               -m => 'mac', '!', '--mac-source' => $hkd->_ip_to_mac($vm_ip),
+                               -j => 'DROP')],
+                 # allow DHCP packets from any IP,
+                 # FIXME: could it be limited to 0.0.0.0?
+                 [INPUT   => ( -m => 'physdev', '--physdev-in' => $tap_if,
+                               -p => 'udp', '--dport' => '67',
+                               -j => 'ACCEPT')],
+                 [INPUT   => ( -m => 'physdev', '--physdev-in' => $tap_if,
+                               '!', -s => $vm_ip,
+                               -j => 'DROP')],
 
-	#
-	# UDP
-	#
+                 ### TCP
 
-	# Accept DNS requests from VM to node, drop all other UDP from VM
-	[INPUT => (
-	    -m => 'physdev', '--physdev-in' => $tap_if,
-	    -p => 'udp', '!', '--dport' => '53',
-	    -j => 'DROP')],
-	[FORWARD => (
-	    -m => 'physdev', '--physdev-in' => $tap_if,
-	    -p => 'udp',
-	    -j => 'DROP')],
-    );
+                 # Drop TCP SYN from VM
+                 [FORWARD => ( -m => 'physdev', '--physdev-in' => $tap_if,
+                               -d => "$vm_ip/$vm_netmask",
+                               -p => 'tcp', '--syn',
+                               -j => 'DROP')],
+                 [INPUT   => ( -m => 'physdev', '--physdev-in' => $tap_if,
+                               -d => "$vm_ip/$vm_netmask",
+                               -p => 'tcp', '--syn',
+                               -j => 'DROP')],
+
+                 # Accept SSH/VMA/NX to VM, drop all other TCP from LAN to VM
+                 [FORWARD => ( -m => 'physdev', '--physdev-out' => $tap_if,
+                               -s => "$vm_ip/$vm_netmask", -d => $vm_ip,
+                               -p => 'tcp', -m => 'multiport', '--dports' => "$ssh_port,$vma_port,$x_port",
+                               -j => 'ACCEPT')],
+                 [OUTPUT  => ( -s => "$vm_ip/$vm_netmask", -d => $vm_ip,
+                               -p => 'tcp', -m => 'multiport', '--dports' => "$ssh_port,$vma_port,$x_port",
+                               -j => 'ACCEPT')],
+                 [FORWARD => ( -s => "$vm_ip/$vm_netmask", -d => $vm_ip, # -s to allow internet
+                               -p => 'tcp',
+                               -j => 'DROP')],
+                 [OUTPUT  => ( -d => $vm_ip,
+                               -p => 'tcp',
+                               -j => 'DROP')],
+
+                 ### UDP
+
+                 # Accept DNS requests from VM to node, drop all other UDP from VM
+                 [INPUT => ( -m => 'physdev', '--physdev-in' => $tap_if,
+                             -p => 'udp', '!', '--dport' => '53',
+                             -j => 'DROP')],
+                 [FORWARD => ( -m => 'physdev', '--physdev-in' => $tap_if,
+                               -p => 'udp',
+                               -j => 'DROP')],
+
+                );
 }
 
 1;
