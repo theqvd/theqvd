@@ -47,3 +47,31 @@ sub before_list_of_vms {
 }
 
 1;
+
+__END__
+
+=head1 NAME
+
+QVD::L7R::Authenticator::Plugin::Auto - qvd-l7r authentication plugin that provisions a user account and virtual machine automatically.
+
+=head1 DESCRIPTION
+
+When QVD is configured to authenticate against an external source such as LDAP,
+it is likely that QVD doesn't have any record on users who log in. If this
+plugin is enabled, the user record is created automatically. User records
+created this way are provided with a default virtual machine.
+
+To enable the plugin, add "auto" to C<l7r.auth.plugins>. Set
+C<auth.auto.osi_id> to the id to choose the OSI from which the user's virtual
+machine is created.
+
+=head1 LICENSE AND COPYRIGHT
+
+Copyright 2010 Qindel FormaciE<oacute>n y Servicios SL.
+
+This program is free software; you can redistribute it and/or modify it under
+the terms of the GNU General Public License version 3 as published by the Free
+Software Foundation.
+
+=cut
+
