@@ -97,6 +97,7 @@ $(document).ready(function()
     { 
 	$("#props").tablesorter({
 	widthFixed: true,
+	textExtraction: "complex",	
 	headers: { 
             0: { 
                 sorter: false 
