@@ -1,0 +1,9 @@
+Changes
+MANIFEST
+Makefile.PL
+README
+lib/QVD/L7R/Authenticator/Plugin/Auto.pm
+t/00-load.t
+t/manifest.t
+t/pod-coverage.t
+t/pod.t
