@@ -55,7 +55,7 @@ my $vm_netmask		   = cfg('vm.network.netmask');
 my $dhcp_range	  	   = cfg('vm.network.dhcp-range');
 my $dhcp_default_route	   = cfg('vm.network.gateway');
 my $dhcp_hostsfile	   = cfg('internal.vm.network.dhcp-hostsfile');
-my $use_firewall           = cfg('internal.vm.network.firewall.enable')
+my $use_firewall           = cfg('internal.vm.network.firewall.enable');
 
 my $persistent_overlay     = cfg('vm.overlay.persistent');
 
