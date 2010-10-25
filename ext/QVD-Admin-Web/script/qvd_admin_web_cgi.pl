@@ -1,14 +1,7 @@
 #!/usr/bin/env perl
 
-BEGIN { $ENV{CATALYST_ENGINE} ||= 'CGI' }
-
-use strict;
-use warnings;
-use FindBin;
-use lib "$FindBin::Bin/../lib";
-use QVD::Admin::Web;
-
-QVD::Admin::Web->run;
+use Catalyst::ScriptRunner;
+Catalyst::ScriptRunner->run('QVD::Admin::Web', 'CGI');
 
 1;
 
@@ -28,15 +21,10 @@ Run a Catalyst application as a cgi script.
 
 Catalyst Contributors, see Catalyst.pm
 
-Qindel Formacion y Servicios S.L.
-
 =head1 COPYRIGHT
 
-Modifications by the QVD team are copyright 2009-2010 by Qindel Formacion y
-Servicios S.L.
-
-This program is free software; you can redistribute it and/or modify it
-under the terms of the GNU GPL version 3 as published by the Free
-Software Foundation.
+This library is free software. You can redistribute it and/or modify
+it under the same terms as Perl itself.
 
 =cut
+

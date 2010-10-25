@@ -12,6 +12,10 @@ else
 function on_submit()
 {
     if (confirm_submit()) {
+	if(document.pressed == 'delete')
+      {
+	document.propos.action ="[% c.uri_for('/hosts/del') %]";
+      } else
 	if(document.pressed == 'block')
       {
 	document.propos.action ="[% c.uri_for('/hosts/block') %]";
@@ -85,7 +89,7 @@ function check_all(field) {
         [% END -%]
     </tbody>
 </table>
-<input type="submit" onClick="document.pressed='block'" value="Block"/> <input type="submit" onClick="document.pressed='unblock'" value="Unblock"/>
+<input type="submit" onClick="document.pressed='block'" value="Block"/> <input type="submit" onClick="document.pressed='unblock'" value="Unblock"/> or <input class="delete" type="submit" onClick="document.pressed='delete'" value="Delete"/>
 </form>
 
 <script type="text/javascript" charset="utf-8">
