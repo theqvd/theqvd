@@ -48,13 +48,16 @@ Existing component files are not overwritten.  If any of the component files
 to be created already exist the file will be written with a '.new' suffix.
 This behavior can be suppressed with the C<-force> option.
 
-=head1 AUTHORS
+=head1 AUTHOR
 
-Catalyst Contributors, see Catalyst.pm
+QVD,,,
 
 =head1 COPYRIGHT
 
-This library is free software. You can redistribute it and/or modify
-it under the same terms as Perl itself.
+Copyright 2009-2010 by Qindel Formacion y Servicios S.L.
+
+This program is free software; you can redistribute it and/or modify it
+under the terms of the GNU GPL version 3 as published by the Free
+Software Foundation.
 
 =cut
