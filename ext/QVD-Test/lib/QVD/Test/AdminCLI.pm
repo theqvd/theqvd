@@ -21,11 +21,15 @@ use MIME::Base64 qw(encode_base64);
 use JSON;
 
 sub check_environment : Test(startup => 2) {
-    # FIXME check that node is running rather than if it can be executed
     my $noded_executable = 'QVD-Test/bin/qvd-noded.sh';
 
     ok(-f '/etc/qvd/node.conf',		'Existence of QVD configuration, node.conf');
     ok(-x $noded_executable,		'QVD node installation');
+
+    my $httpc = QVD::HTTPC->new('localhost:8443',SSL=>1,SSL_verify_callback=>sub {1});
+    $httpc->send_http_request(GET => '/qvd/ping');
+    my $response_code = ($httpc->read_http_response())[0];
+    fail('QVD node not running') if $response_code ne 200;
 }
 
 sub main_test : Test {
