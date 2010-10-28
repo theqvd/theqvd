@@ -104,10 +104,11 @@ sub run {
 
 	    $time = time;
 	    if ($tl2 and $tl2 < $time) {
-		INFO "timeout2 expired, shutting down (b)";
+		INFO "HK2 timeout2 expired, shutting down (b)";
 		$noded->_shutdown;
 	    }
 	    if ($tl1 and $tl1 < $time) {
+                INFO "HKD timeout1 expired, killing it";
 		kill KILL => $hkd_pid;
 	    }
 

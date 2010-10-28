@@ -87,6 +87,8 @@ sub new {
 }
 
 sub run {
+    DEBUG "starting HKD";
+
     my ($hkd, %args) = @_;
 
     $hkd->{stopping} = $args{stopping};
@@ -221,7 +223,7 @@ sub _reattach_vms {
 	my $pid_noded = $vm_pids->{$vm_id};
 	INFO "Releasing/reacquiring VM $vm_id in state $vm_state (pid: " . ($pid_db // 'undef') . ")";
 
-        next if $vm_state eq 'starting_1';
+        next if ($vm_state eq 'starting_1' or $vm_state eq 'stopped');
 
 	if ($pid_db and $pid_noded and $pid_db == $pid_noded) {
 	    # Noded is still managing it
