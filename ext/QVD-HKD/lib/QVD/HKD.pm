@@ -561,7 +561,7 @@ sub _move_vm_to_state {
     my ($hkd, $vm_state, $vm) = @_;
     my $old_vm_state = $vm->vm_state;
     my $id = $vm->id;
-    DEBUG "move VM $id from state $old_vm_state to $vm_state";
+    INFO "Move VM $id from state $old_vm_state to $vm_state";
 
     my $leave = $hkd->can("_leave_vm_state_$old_vm_state");
     # or DEBUG "method _leave_vm_state_$old_vm_state does not exist";
