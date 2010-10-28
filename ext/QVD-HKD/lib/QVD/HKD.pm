@@ -321,6 +321,8 @@ sub _check_vms {
 
     my $vms = $hkd->{host_runtime}->vms;
 
+    my $heavy_vms = $vms->search({vm_state => [qw(starting_2 stopping_2 zombie_1 zombie_2)]})->count;
+
     for my $vm ($vms->all) {
 	my $id = $vm->id;
         DEBUG "First pass for VM $id";
@@ -370,6 +372,7 @@ sub _check_vms {
 			when('stop') {
 			    given($vm->vm_state) {
 				when ('running')  {
+                                    $heavy_vms++;
 				    $hkd->_move_vm_to_state(stopping_1 => $vm);
 				    $vm->clear_vm_cmd;
 				}
@@ -401,8 +404,8 @@ sub _check_vms {
 	# machines startings are captured later or on the next
 	# run:
 	if ($vm->vm_state eq 'starting_1') {
-            my $heavy = $vms->search({vm_state => [qw(starting_2 stopping_2 zombie_1 zombie_2)]})->count;
-            next if $vm_starting_max <= $heavy;
+            next if $vm_starting_max <= $heavy_vms;
+            $heavy_vms++;
             # next if $vm_starting_max <= $hkd->{host_runtime}->vms->search({vm_state => 'starting_2'})->count;
             $hkd->_move_vm_to_state(starting_2 => $vm);
             eval { $hkd->_start_vm($vm) };
