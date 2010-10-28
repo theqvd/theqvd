@@ -470,6 +470,7 @@ sub _check_vms {
     }
 
     eval {
+        DEBUG "calling ParallelNet run";
 	$par->run(time => $parallel_net_timeout) if @active_vms;
     };
     $@ and ERROR "Parallel HTTP query failed unexpectedly: $@";
