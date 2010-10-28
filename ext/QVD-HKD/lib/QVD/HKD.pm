@@ -323,6 +323,7 @@ sub _check_vms {
 
     for my $vm ($vms->all) {
 	my $id = $vm->id;
+        DEBUG "First pass for VM $id";
 	if ($hkd->{stopping}) {
             DEBUG "HKD is stopping!";
 	    # on clean exit, shutdown virtual machines gracefully
@@ -467,6 +468,8 @@ sub _check_vms {
 	else {
 	    $hkd->_vm_goes_zombie_on_timeout($vm);
 	}
+
+        DEBUG "First pass for VM $id done!";
     }
 
     eval {
