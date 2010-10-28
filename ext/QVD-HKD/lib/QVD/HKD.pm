@@ -87,7 +87,7 @@ sub new {
 }
 
 sub run {
-    DEBUG "starting HKD";
+    INFO "Starting HKD";
 
     my ($hkd, %args) = @_;
 
@@ -98,10 +98,10 @@ sub run {
     $hkd->_startup($args{vm_pids});
     my $hrt = $hkd->{host_runtime};
 
-    DEBUG "hkd up and running";
+    INFO "HKD up and running";
 
     while (1) {
-	DEBUG "HKD run, round: $hkd->{round}";
+	INFO "HKD round $hkd->{round}";
 	if ($hkd->_check_storage and
             $hkd->_check_db) {
 	    $hkd->{round}++;
@@ -610,7 +610,7 @@ sub _start_vm {
     $hkd->_regenerate_dhcpd_config;
     $hkd->_call_noded('reload_dhcpd');
 
-    INFO "starting VM $id";
+    DEBUG "starting VM $id";
     my $mac = $hkd->_ip_to_mac($address);
 
     my @cmd = ($cmd{kvm},
