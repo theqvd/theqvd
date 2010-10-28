@@ -3,7 +3,7 @@
 
 <head>
 <meta http-equiv="content-type" content="text/html; charset=utf-8" />
-<title>Quality Virtual Desktop</title>
+<title>QVD | Web Administration Tool</title>
 [% jquery.script_src_elements %]
 [% jquery.link_elements %]
 [% jquery.document_ready %]
@@ -36,7 +36,7 @@
 	</div>
 	<div id="bottom"> </div>
 	<div id="footer">
-		Quality Virtual Desktop Web Admin Tool, by <a href="http://www.qindel.es">QindelGroup</a>
+		QVD Web Administration Tool, by <a href="http://qindel.com">Qindel Group</a>
 	</div>	
 
 </div>
