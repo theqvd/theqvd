@@ -110,7 +110,7 @@ sub run {
 	    if ($tl1 and $tl1 < $time) {
                 INFO "HKD timeout1 expired, killing it";
 		kill KILL => $hkd_pid;
-                undef $tl1;
+                undef $noded->{hkd_time_limit_1};
 	    }
 
 	    if (waitpid($noded->{l7r_pid}, WNOHANG) > 0) {
