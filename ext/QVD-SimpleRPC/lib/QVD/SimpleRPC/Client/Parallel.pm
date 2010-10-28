@@ -23,6 +23,7 @@ sub new {
     DEBUG "connecting to VMA at $host";
 
     my $t0 = time;
+    DEBUG "connecting to $host";
     my $socket = IO::Socket::INET->new(PeerAddr => $host,
 				       Blocking => 0,
 				       Proto => 'tcp');
