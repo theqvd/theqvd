@@ -105,7 +105,7 @@ function check_all(field) {
 		<span id="vm_statebullet[% vm.id %]" class="option_[% vm.vm_runtime.vm_state %]"></span>
 		<span id="vm_statetext[% vm.id %]">[% vm.vm_runtime.vm_state %]</span>
 	    </td>
-            <td><a href="[% c.uri_for('/hosts/view/') %][% vm.vm_runtime.host.id %]">[% vm.vm_runtime.host.name %]</a></td>    
+            <td id="vm_node[% vm.id %]"><a href="[% c.uri_for('/hosts/view/') %][% vm.vm_runtime.host.id %]">[% vm.vm_runtime.host.name %]</a></td>    
 	    <td><span id="vm_blocked[% vm.id %]" class="[% IF vm.vm_runtime.blocked == true %]option_blocked[% END %]" /></td>
 
         </tr>
@@ -147,12 +147,13 @@ function load() {
 		var x = "#vm_statebullet" + msg.vm_list[i][0];
 		var w = "#user_statebullet" + msg.vm_list[i][0];
 		var y = "#user_state" + msg.vm_list[i][0];		
+		var n = "#vm_node" + msg.vm_list[i][0];
 		var z = "#vm_blocked" + msg.vm_list[i][0];
 		if ($(r).text() != msg.vm_list[i][1]) {
 		    $(s).effect("highlight", {color:"#FF8D13"}, 4000);
 		    $(r).text(msg.vm_list[i][1]);
 		    $(x).removeClass();    
-		    $(x).addClass("option_" + msg.vm_list[i][1]);		    
+		    $(x).addClass("option_" + msg.vm_list[i][1]);
 		}
 		if ($(w).attr("class") != ("option_user_" + msg.vm_list[i][5])) {
 		    $(w).removeClass();    
@@ -163,6 +164,10 @@ function load() {
 		    $(z).removeClass();
 		} else {
 		    $(z).addClass("option_blocked");
+		}
+		if ($(n).text() != msg.vm_list[i][9]) {
+		     $(n).html('<a href="/hosts/view/ ' + msg.vm_list[i][8] + '">' + msg.vm_list[i][9] + '</a>');
+		     $(n).effect("highlight", {color:"#FF8D13"}, 4000);
 		}
 	    }
 	    t=setTimeout("load()",4000);

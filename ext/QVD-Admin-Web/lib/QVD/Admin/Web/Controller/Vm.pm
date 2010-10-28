@@ -6,6 +6,9 @@ use parent 'Catalyst::Controller::FormBuilder';
 use Data::FormValidator::Constraints qw(:closures);
 use Data::Dumper;
 
+use QVD::DB::Simple;
+
+
 __PACKAGE__->config(
     'Controller::FormBuilder' => {
         new => {
@@ -107,9 +110,16 @@ sub jlist : Local {
     my $rs    = $model->vm_list("", {join => ["user"]});
     
     my @list;
+    my $host;
+    my $name = "";
     for (@$rs) {
-	push(@list, [$_->vm_runtime->vm_id , $_->vm_runtime->vm_state , $_->vm_runtime->vm_cmd , '' , '' , $_->vm_runtime->user_state , $_->vm_runtime->user_cmd, $_->vm_runtime->blocked]);
-
+	$host = rs('Host')->find({id => $_->vm_runtime->host_id});
+	if ($host) {
+	    $name = $host->name;
+	} else {
+	    $name = "";
+	}
+	push(@list, [$_->vm_runtime->vm_id , $_->vm_runtime->vm_state , $_->vm_runtime->vm_cmd , '' , '' , $_->vm_runtime->user_state , $_->vm_runtime->user_cmd, $_->vm_runtime->blocked, $_->vm_runtime->host_id, $name]);
     }
     $c->stash->{vm_list} = \@list;
     $c->stash->{current_view} = 'JSON';
