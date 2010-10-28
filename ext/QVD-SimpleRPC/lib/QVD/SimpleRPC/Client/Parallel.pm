@@ -8,6 +8,9 @@ use URI::Split qw(uri_split);
 use URI::Escape;
 use QVD::Log;
 
+# FIXME: remove Time::HiRes
+use Time::HiRes qw(time);
+
 use parent qw(QVD::HTTPC::Parallel);
 
 sub new {
@@ -18,9 +21,13 @@ sub new {
     $base //= '/';
     $base .= '/' unless $base =~ m|/$|;
     DEBUG "connecting to VMA at $host";
+
+    my $t0 = time;
     my $socket = IO::Socket::INET->new(PeerAddr => $host,
 				       Blocking => 0,
 				       Proto => 'tcp');
+    my $dt = time - $t0;
+    DEBUG "time elapsed in socket creation: $dt";
     my $self = $class->SUPER::new($socket);
     $self->{_npr_base} = $base;
     $host =~ s/:.*$//;
