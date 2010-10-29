@@ -532,7 +532,7 @@ sub _vm_goes_zombie_on_timeout {
 	DEBUG "timeout in state $vm_state is $timeout, elapsed "
 	    . (time - $vm_state_ts);
 	if (max($hkd->{start_time}, $vm_state_ts) + $timeout < time) {
-	    ERROR "vm staled in state $vm_state,".
+	    ERROR "VM stalled in state $vm_state,".
 		" id: $id, state_ts: $vm_state_ts, time: ".time;
 	    my $new_state = ($vm_state eq 'zombie_1' ? 'zombie_2' : 'zombie_1');
 	    eval { $hkd->_move_vm_to_state($new_state => $vm) };
