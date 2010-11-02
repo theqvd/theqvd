@@ -849,7 +849,7 @@ sub _clean_vm_fw_rules {
 
 sub _set_vm_fw_rules {
     my ($hkd, $vm, $tap_if) = @_;
-    unless ($use_firewall) {
+    if ($use_firewall) {
         my $vm_id = $vm->id;
         for my $rule ($hkd->_vm_fw_rules($vm, $tap_if)) {
             my @cmd = (iptables => -A => @$rule, -m => 'comment', '--comment' => "QVD rule for VM $vm_id");
