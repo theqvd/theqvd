@@ -69,7 +69,7 @@ my $vm_starting_max        = cfg('hkd.vm.starting.max');
 my $storage_check_fn       = cfg('path.storage.check');
 
 my $database_delay         = core_cfg('internal.hkd.database.retry_delay');
-
+my $half_database_timeout  = 0.5 * core_cfg('internal.hkd.database.timeout');
 
 sub new {
     my ($class, $socket) = @_;
@@ -316,6 +316,8 @@ sub _check_hkd_cluster {
 sub _check_vms {
     my $hkd = shift;
 
+    my $start_time = time;
+
     my (@active_vms, @vmas);
     my $par = QVD::ParallelNet->new;
 
@@ -324,6 +326,17 @@ sub _check_vms {
     my $heavy_vms = $vms->search({vm_state => [qw(starting_2 stopping_2 zombie_1 zombie_2)]})->count;
 
     for my $vm ($vms->all) {
+
+	# FIXME: make the loop go faster!
+	# sometimes this loop gets too slow so we recheck the database
+	# in the middle and reset the noded timeouts
+
+	if (time - $start_time > $half_database_timeout) {
+	    DEBUG "_check_vms is going to slow, reseting timeouts";
+	    $hkd->_check_db;
+	    $start_time = time;
+	}
+
 	my $id = $vm->id;
         DEBUG "First pass for VM $id";
 	if ($hkd->{stopping}) {
@@ -482,6 +495,13 @@ sub _check_vms {
     $@ and ERROR "Parallel HTTP query failed unexpectedly: $@";
 
     while (@active_vms) {
+
+	if (time - $start_time > $half_database_timeout) {
+	    DEBUG "_check_vms is going to slow, reseting timeouts";
+	    $hkd->_check_db;
+	    $start_time = time;
+	}
+
 	my $vm = shift @active_vms;
 	my $vma = shift @vmas;
 	my $id = $vm->id;
