@@ -57,6 +57,9 @@ my $dhcp_default_route	   = cfg('vm.network.gateway');
 my $dhcp_hostsfile	   = cfg('internal.vm.network.dhcp-hostsfile');
 my $use_firewall           = cfg('internal.vm.network.firewall.enable');
 
+my $debug_vms              = cfg('internal.vm.debug.enable');
+
+
 my $persistent_overlay     = cfg('vm.overlay.persistent');
 
 my $cluster_check_interval = cfg('internal.hkd.cluster.check.interval');
@@ -70,6 +73,7 @@ my $storage_check_fn       = cfg('path.storage.check');
 
 my $database_delay         = core_cfg('internal.hkd.database.retry_delay');
 my $half_database_timeout  = 0.5 * core_cfg('internal.hkd.database.timeout');
+
 
 sub new {
     my ($class, $socket) = @_;
@@ -343,7 +347,7 @@ sub _check_vms {
             DEBUG "HKD is stopping!";
 	    # on clean exit, shutdown virtual machines gracefully
             given($vm->vm_state) {
-                when ('running') {
+                when ([qw(running debug)]) {
                     DEBUG "stopping VM because HKD is shutting down";
                     $hkd->_move_vm_to_state(stopping_1 => $vm);
                 }
@@ -384,7 +388,7 @@ sub _check_vms {
 			}
 			when('stop') {
 			    given($vm->vm_state) {
-				when ('running')  {
+				when ([qw(running debug)])  {
                                     $heavy_vms++;
 				    $hkd->_move_vm_to_state(stopping_1 => $vm);
 				    $vm->clear_vm_cmd;
@@ -448,7 +452,7 @@ sub _check_vms {
 
 	my $vma_method;
 	given ($vm->vm_state) {
-	    when('running') {
+	    when([qw(running debug)]) {
 		no warnings 'uninitialized';
 		if ($vm->user_cmd eq 'abort' and $vm->user_state eq 'connected') {
 		    # HKD does this on behalf of the contending L7R to
@@ -531,8 +535,8 @@ sub _check_vms {
 	    $vm->update_vma_ok_ts;
 	    my $new_state;
 	    given ($vm->vm_state) {
-		when ('starting_2') { $new_state = 'running' }
-		when ('stopping_1') { $new_state = 'stopping_2' }
+		when ([qw(starting_2 debug)]) { $new_state = 'running' }
+		when ('stopping_1')           { $new_state = 'stopping_2' }
 	    }
 	    if (defined $new_state) {
 		txn_eval { $hkd->_move_vm_to_state($new_state => $vm) };
@@ -582,6 +586,11 @@ sub _move_vm_to_state {
     my $old_vm_state = $vm->vm_state;
     my $id = $vm->id;
     INFO "Move VM $id from state $old_vm_state to $vm_state";
+
+    if ($vm_state eq 'zombie_1' and $debug_vms) {
+        INFO "Moving to state debug instead";
+        $vm_state = 'debug';
+    }
 
     my $leave = $hkd->can("_leave_vm_state_$old_vm_state");
     # or DEBUG "method _leave_vm_state_$old_vm_state does not exist";

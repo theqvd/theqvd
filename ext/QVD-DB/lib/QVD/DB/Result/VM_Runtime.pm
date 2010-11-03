@@ -24,7 +24,8 @@ __PACKAGE__->add_columns( vm_id          => { data_type   => 'integer' },
 					      is_enum     => 1,
 					      extra       => { list => [qw(stopped starting running
 									   stopping_1 stopping_2
-									   zombie_1 zombie_2)] } },
+									   zombie_1 zombie_2
+                                                                           debug)] } },
 			  vm_state_ts    => { data_type   => 'integer',
 					      is_nullable => 1 },
 			  vm_cmd         => { data_type   => 'varchar(12)',

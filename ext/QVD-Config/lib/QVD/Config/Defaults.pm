@@ -86,6 +86,9 @@ vm.network.bridge = qvdnet0
 internal.vm.network.dhcp-hostsfile=${path.run}/dhcp-hostsfile
 internal.vm.network.firewall.enable = 1
 
+internal.vm.debug.enable = 0
+
+
 osi.default.memory = 256
 osi.default.overlay = 1
 
