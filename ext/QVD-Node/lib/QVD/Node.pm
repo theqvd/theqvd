@@ -73,28 +73,31 @@ sub run {
 	    my $tl1 = $noded->{hkd_time_limit_1};
 	    my $tl2 = $noded->{hkd_time_limit_2};
 	    my $time = time;
-	    my $timeout = _min($tl1, $tl2, $time + 5) - $time;
-	    my $rv1 = $rv;
 
-	    select ($rv1, undef, undef, $timeout);
+            my $check_timeout = time + 5;
 
-	    if (vec($rv1, $fn, 1)) {
-		if (defined recv($noded->{hkd_socket}, my $msg, 4096, 0)) {
-		    DEBUG "message received: $msg";
-		    my ($cmd, @args) = @{from_json($msg)};
-		    my @result;
-		    if (my $method = $noded->can("_rpc_$cmd")) {
-			eval { @result = (ok =>  $method->($noded, @args)) };
-			@result = (error => $@) unless @result;
-		    }
-		    else {
-			@result = (error => "method for $cmd not implemented");
-		    }
-		    my $response = to_json(\@result);
-		    send($noded->{hkd_socket}, $response, 0);
-		    DEBUG "message response: $response";
-		}
-	    }
+            while (1) {
+                my $timeout = _min($tl1, $tl2, $check_timeout) - $time;
+                my $rv1 = $rv;
+
+                select ($rv1, undef, undef, $timeout) > 0 or last;
+
+                if (defined recv($noded->{hkd_socket}, my $msg, 4096, 0)) {
+                    DEBUG "message received: $msg";
+                    my ($cmd, @args) = @{from_json($msg)};
+                    my @result;
+                    if (my $method = $noded->can("_rpc_$cmd")) {
+                        eval { @result = (ok =>  $method->($noded, @args)) };
+                        @result = (error => $@) unless @result;
+                    }
+                    else {
+                        @result = (error => "method for $cmd not implemented");
+                    }
+                    my $response = to_json(\@result);
+                    send($noded->{hkd_socket}, $response, 0);
+                    DEBUG "message response: $response";
+                }
+            }
 
 	    if (delete $noded->{killed}) {
 		print "killed!\n";
