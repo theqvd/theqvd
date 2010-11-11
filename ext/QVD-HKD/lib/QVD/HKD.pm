@@ -321,6 +321,7 @@ sub _check_vms {
     my $hkd = shift;
 
     my $start_time = time;
+    my $too_slow;
 
     my (@active_vms, @vmas);
     my $par = QVD::ParallelNet->new;
@@ -339,6 +340,7 @@ sub _check_vms {
 	    DEBUG "_check_vms is going to slow, reseting timeouts";
 	    $hkd->_check_db;
 	    $start_time = time;
+            $too_slow = 1;
 	}
 
 	my $id = $vm->id;
@@ -367,61 +369,59 @@ sub _check_vms {
 		}
 	    }
 	}
-	else {
+	elsif (defined $vm->vm_cmd and not $too_slow) {
 	    # Command processing...
-	    if (defined $vm->vm_cmd) {
-		txn_eval {
-		    $vm->discard_changes;
-		    given($vm->vm_cmd) {
-			when('start') {
-			    given($vm->vm_state) {
-				when ('stopped') {
-				    $hkd->_assign_vm_ports($vm);
-				    $hkd->_move_vm_to_state(starting_1 => $vm);
-				    $vm->clear_vm_cmd;
-				}
-				default {
-				    ERROR "unexpected VM command start received in state $_";
-				    $vm->clear_vm_cmd;
-				}
-			    }
-			}
-			when('stop') {
-			    given($vm->vm_state) {
-				when ([qw(running debug)])  {
-                                    $heavy_vms++;
-				    $hkd->_move_vm_to_state(stopping_1 => $vm);
-				    $vm->clear_vm_cmd;
-				}
-                                when ('starting_1') {
-                                    $hkd->_move_vm_to_state(stopped => $vm);
-				    $vm->clear_vm_cmd;
-                                }
-				when ('starting_2') { } # stop is delayed!
-				default {
-				    ERROR "unexpected VM command stop received in state $_";
-				    $vm->clear_vm_cmd;
-				}
-			    }
-			}
-			when(undef) {
-			    DEBUG "command dissapeared";
-			}
-			default {
-			    ERROR "unexpected VM command $_ received in state " . $vm->vm_state;
-			    $vm->clear_vm_cmd;
-			}
-		    }
-		};
-		$@ and ERROR "vm_cmd processing failed: $@";
-	    }
-	}
+            txn_eval {
+                $vm->discard_changes;
+                given($vm->vm_cmd) {
+                    when('start') {
+                        given($vm->vm_state) {
+                            when ('stopped') {
+                                $hkd->_assign_vm_ports($vm);
+                                $hkd->_move_vm_to_state(starting_1 => $vm);
+                                $vm->clear_vm_cmd;
+                            }
+                            default {
+                                ERROR "unexpected VM command start received in state $_";
+                                $vm->clear_vm_cmd;
+                            }
+                        }
+                    }
+                    when('stop') {
+                        given($vm->vm_state) {
+                            when ([qw(running debug)])  {
+                                $heavy_vms++;
+                                $hkd->_move_vm_to_state(stopping_1 => $vm);
+                                $vm->clear_vm_cmd;
+                            }
+                            when ('starting_1') {
+                                $hkd->_move_vm_to_state(stopped => $vm);
+                                $vm->clear_vm_cmd;
+                            }
+                            when ('starting_2') { } # stop is delayed!
+                            default {
+                                ERROR "unexpected VM command stop received in state $_";
+                                $vm->clear_vm_cmd;
+                            }
+                        }
+                    }
+                    when(undef) {
+                        DEBUG "command dissapeared";
+                    }
+                    default {
+                        ERROR "unexpected VM command $_ received in state " . $vm->vm_state;
+                        $vm->clear_vm_cmd;
+                    }
+                }
+            };
+            $@ and ERROR "vm_cmd processing failed: $@";
+        }
 
 	# no error checking is performed here, failed virtual
 	# machines startings are captured later or on the next
 	# run:
 	if ($vm->vm_state eq 'starting_1') {
-            next if $vm_starting_max <= $heavy_vms;
+            next if ($too_slow or $vm_starting_max <= $heavy_vms);
             $heavy_vms++;
             # next if $vm_starting_max <= $hkd->{host_runtime}->vms->search({vm_state => 'starting_2'})->count;
             $hkd->_move_vm_to_state(starting_2 => $vm);
@@ -504,6 +504,7 @@ sub _check_vms {
 	    DEBUG "_check_vms is going to slow, reseting timeouts";
 	    $hkd->_check_db;
 	    $start_time = time;
+            $too_slow = 1;
 	}
 
 	my $vm = shift @active_vms;
