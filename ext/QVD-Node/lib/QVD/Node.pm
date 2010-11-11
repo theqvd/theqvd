@@ -70,14 +70,14 @@ sub run {
 	    $noded->_fork_l7r unless $noded->{l7r_pid};
 	    $noded->_fork_dhcpd unless $noded->{dhcpd_pid};
 
-	    my $tl1 = $noded->{hkd_time_limit_1};
-	    my $tl2 = $noded->{hkd_time_limit_2};
-	    my $time = time;
-
+	    my ($tl1, $tl2);
             my $check_timeout = time + 5;
 
             while (1) {
-                my $timeout = _min($tl1, $tl2, $check_timeout) - $time;
+                $tl1 = $noded->{hkd_time_limit_1};
+                $tl2 = $noded->{hkd_time_limit_2};
+
+                my $timeout = _min($tl1, $tl2, $check_timeout) - time;
                 my $rv1 = $rv;
 
                 select ($rv1, undef, undef, $timeout) > 0 or last;
@@ -105,7 +105,7 @@ sub run {
 		kill HUP => $hkd_pid;
 	    }
 
-	    $time = time;
+	    my $time = time;
 	    if ($tl2 and $tl2 < $time) {
 		INFO "HK2 timeout2 expired, shutting down (b)";
 		$noded->_shutdown;
