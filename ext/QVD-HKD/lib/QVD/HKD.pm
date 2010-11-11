@@ -337,7 +337,7 @@ sub _check_vms {
 	# in the middle and reset the noded timeouts
 
 	if (time - $start_time > $half_database_timeout) {
-	    DEBUG "_check_vms is going to slow, reseting timeouts";
+	    DEBUG "_check_vms is going to slow (" . (time - $start_time) . " > $half_database_timeout), reseting timeouts";
 	    $hkd->_check_db;
 	    $start_time = time;
             $too_slow = 1;
@@ -501,7 +501,7 @@ sub _check_vms {
     while (@active_vms) {
 
 	if (time - $start_time > $half_database_timeout) {
-	    DEBUG "_check_vms is going to slow, reseting timeouts";
+	    DEBUG "_check_vms is going to slow (" . (time - $start_time) . " > $half_database_timeout), reseting timeouts";
 	    $hkd->_check_db;
 	    $start_time = time;
             $too_slow = 1;
