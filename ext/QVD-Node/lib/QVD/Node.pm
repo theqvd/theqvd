@@ -118,7 +118,9 @@ sub run {
 	    }
 
             if ($noded->{dhcpd_pid}) {
+                DEBUG "checking DHCP server (pid: $noded->{dhcpd_pid})";
                 if (waitpid($noded->{dhcpd_pid}, WNOHANG) > 0) {
+                    DEBUG "DHCP server exited";
                     delete $noded->{dhcpd_pid}
                 }
             }
@@ -202,6 +204,7 @@ sub _fork_dhcpd {
 	$@ and ERROR $@;
 	POSIX::_exit(0);
     }
+    DEBUG "DHCP daemon forked (pid: $pid)";
     $noded->{dhcpd_pid} = $pid;
 }
 
