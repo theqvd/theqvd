@@ -420,7 +420,7 @@ sub _check_vms {
 
         given ($vm->vm_state) {
             when ('stopped') { next }
-            when ('starting_1') { push @starting, $vm; next }
+            when ('starting_1') { push @starting_1, $vm; next }
             when ([qw(stopping_1 stopping_2 starting_2 zombie_1 zombie_2)]) { $heavy_vms++ }
         }
 
@@ -485,7 +485,7 @@ sub _check_vms {
         DEBUG "First pass for VM $id done!";
     }
 
-    for (@starting_1) {
+    for my $vm (@starting_1) {
         last if ($too_slow or $heavy_vms > $vm_starting_max);
         # no error checking is performed here, failed virtual
         # machines startings are captured later or on the next
