@@ -328,7 +328,8 @@ sub _check_vms {
 
     my $vms = $hkd->{host_runtime}->vms;
 
-    my $heavy_vms = $vms->search({vm_state => [qw(starting_2 stopping_2 zombie_1 zombie_2)]})->count;
+    my $heavy_vms = 0;
+    my @starting_1;
 
     for my $vm ($vms->all) {
 
@@ -391,7 +392,6 @@ sub _check_vms {
                     when('stop') {
                         given($vm->vm_state) {
                             when ([qw(running debug)])  {
-                                $heavy_vms++;
                                 $hkd->_move_vm_to_state(stopping_1 => $vm);
                                 $vm->clear_vm_cmd;
                             }
@@ -418,19 +418,11 @@ sub _check_vms {
             $@ and ERROR "vm_cmd processing failed: $@";
         }
 
-	# no error checking is performed here, failed virtual
-	# machines startings are captured later or on the next
-	# run:
-	if ($vm->vm_state eq 'starting_1') {
-            next if ($too_slow or $vm_starting_max <= $heavy_vms);
-            $heavy_vms++;
-            # next if $vm_starting_max <= $hkd->{host_runtime}->vms->search({vm_state => 'starting_2'})->count;
-            $hkd->_move_vm_to_state(starting_2 => $vm);
-            eval { $hkd->_start_vm($vm) };
-            $@ and ERROR "Unable to start VM: $@";
+        given ($vm->vm_state) {
+            when ('stopped') { next }
+            when ('starting_1') { push @starting, $vm; next }
+            when ([qw(stopping_1 stopping_2 starting_2 zombie_1 zombie_2)]) { $heavy_vms++ }
         }
-
-	next if $vm->vm_state eq 'stopped';
 
 	unless ($hkd->_call_noded(check_vm_process => $id)) {
 	    DEBUG "kvm process for vm $id reaped";
@@ -491,6 +483,24 @@ sub _check_vms {
 	}
 
         DEBUG "First pass for VM $id done!";
+    }
+
+    for (@starting_1) {
+        last if ($too_slow or $heavy_vms > $vm_starting_max);
+        # no error checking is performed here, failed virtual
+        # machines startings are captured later or on the next
+        # run:
+        $hkd->_move_vm_to_state(starting_2 => $vm);
+        eval { $hkd->_start_vm($vm) };
+        $@ and ERROR "Unable to start VM: $@";
+        $heavy_vms++;
+
+	if (time - $start_time > $half_database_timeout) {
+	    DEBUG "_check_vms is going to slow (" . (time - $start_time) . " > $half_database_timeout), reseting timeouts";
+	    $hkd->_check_db;
+	    $start_time = time;
+            $too_slow = 1;
+	}
     }
 
     eval {
