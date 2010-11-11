@@ -373,6 +373,7 @@ sub _check_vms {
 	    # Command processing...
             txn_eval {
                 $vm->discard_changes;
+                DEBUG "processing command " . $vm->vm_cmd;
                 given($vm->vm_cmd) {
                     when('start') {
                         given($vm->vm_state) {
