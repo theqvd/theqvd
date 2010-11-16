@@ -261,6 +261,9 @@ sub _assign_vm {
 	my $host_id = $lb->get_free_host($vm->vm) //
 	    die "Unable to start VM, can't assign to any host\n";
 
+        # FIXME: assigning the host and pushing the start command
+        # should go in the same transaction!
+
 	txn_eval {
 	    $vm->discard_changes;
 	    die if (defined $vm->host_id or $vm->vm_state ne 'stopped');
