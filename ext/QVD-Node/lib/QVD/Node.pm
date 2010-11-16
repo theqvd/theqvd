@@ -221,7 +221,8 @@ sub _shutdown {
 		 $noded->{dhcpd_pid},
 		 values %{$noded->{vm_pids}} );
 
-    for my $sig (qw(TERM TERM KILL KILL KILL KILL)) {
+    for my $pass (0..1000) {
+        my $sig = ($pass > 2 ? 'KILL' : 'TERM');
 	@pids = grep $_, @pids;
 	@pids or last;
 	for my $pid (@pids) {
