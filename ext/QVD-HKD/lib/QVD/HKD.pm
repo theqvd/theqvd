@@ -599,7 +599,7 @@ sub _move_vm_to_state {
     my $id = $vm->id;
     INFO "Move VM $id from state $old_vm_state to $vm_state";
 
-    if ($vm_state eq 'zombie_1' and $debug_vms) {
+    if ($vm_state eq 'zombie_1' and $debug_vms and $old_vm_state !~ /^stopping/) {
         INFO "Moving to state debug instead";
         $vm_state = 'debug';
     }
