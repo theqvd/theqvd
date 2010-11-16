@@ -113,7 +113,7 @@ sub run {
 	    if ($tl1 and $tl1 < $time) {
                 INFO "HKD timeout1 expired, killing it";
 		kill KILL => $hkd_pid;
-                undef $noded->{hkd_time_limit_1};
+                # undef $noded->{hkd_time_limit_1};
 	    }
 
 	    if (waitpid($noded->{l7r_pid}, WNOHANG) > 0) {
@@ -129,6 +129,7 @@ sub run {
             }
 
 	    if (waitpid($hkd_pid, WNOHANG) > 0) {
+                DEBUG "HKD exited!";
 		delete $noded->{hkd_pid};
 		$noded->{hkd_time_limit_1} = time + $database_timeout * 2;
 		last; # we go to the outer loop
