@@ -194,6 +194,7 @@ sub _fork_l7r {
 sub _fork_dhcpd {
     my $noded = shift;
     my $cmd = $noded->{dhcpd_cmd} or return;
+    DEBUG "forking DHCP server with command @$cmd";
     my $pid = fork;
     if (!$pid) {
 	unless (defined $pid) {
