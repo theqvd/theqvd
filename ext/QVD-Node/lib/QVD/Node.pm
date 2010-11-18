@@ -102,6 +102,7 @@ sub run {
 	    if (delete $noded->{killed}) {
 		print "killed!\n";
 		$noded->{stopping} = 1;
+                DEBUG "kill HKD with HUP (pid: $hkd_pid)";
 		kill HUP => $hkd_pid;
 	    }
 
@@ -225,10 +226,8 @@ sub _shutdown {
         my $sig = ($pass > 2 ? 'KILL' : 'TERM');
 	@pids = grep $_, @pids;
 	@pids or last;
-	for my $pid (@pids) {
-	    DEBUG "shutdown: kill $sig, $pid";
-	    kill $sig, $pid;
-	}
+        DEBUG "shutdown: kill $sig, @pids";
+        kill $sig, @pids;
 	sleep 1;
 	for my $pid (@pids) {
 	    waitpid($pid, WNOHANG) > 0
