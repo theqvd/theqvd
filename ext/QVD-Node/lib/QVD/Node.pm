@@ -80,22 +80,31 @@ sub run {
                 my $timeout = _min($tl1, $tl2, $check_timeout) - time;
                 my $rv1 = $rv;
 
-                select ($rv1, undef, undef, $timeout) > 0 or last;
+                my $n = select ($rv1, undef, undef, $timeout);
+                $n or last;
 
-                if (defined recv($noded->{hkd_socket}, my $msg, 4096, 0)) {
-                    DEBUG "message received: $msg";
-                    my ($cmd, @args) = @{from_json($msg)};
-                    my @result;
-                    if (my $method = $noded->can("_rpc_$cmd")) {
-                        eval { @result = (ok =>  $method->($noded, @args)) };
-                        @result = (error => $@) unless @result;
+                if ($n > 0) {
+                    if (defined recv($noded->{hkd_socket}, my $msg, 4096, 0)) {
+                        DEBUG "message received: $msg";
+                        my ($cmd, @args) = @{from_json($msg)};
+                        my @result;
+                        if (my $method = $noded->can("_rpc_$cmd")) {
+                            eval { @result = (ok =>  $method->($noded, @args)) };
+                            @result = (error => $@) unless @result;
+                        }
+                        else {
+                            @result = (error => "method for $cmd not implemented");
+                        }
+                        my $response = to_json(\@result);
+                        send($noded->{hkd_socket}, $response, 0);
+                        DEBUG "message response: $response";
                     }
                     else {
-                        @result = (error => "method for $cmd not implemented");
+                        DEBUG "failed to receive packed from HKD, killing it";
+                        kill KILL => $hkd_pid;
+                        sleep 1;
+                        last;
                     }
-                    my $response = to_json(\@result);
-                    send($noded->{hkd_socket}, $response, 0);
-                    DEBUG "message response: $response";
                 }
             }
 
