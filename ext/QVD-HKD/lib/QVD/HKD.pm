@@ -252,7 +252,6 @@ sub _reattach_vms {
 				    $process->cmndline =~ /^$quoted_cmd\s/ and
 					die "VM $vm_id may still be running as process $pid_db\n";
 			    }
-			    $hkd->_clean_vm_fw_rules($vm);
 			}
 		    }
 		    $hkd->_move_vm_to_state(stopped => $vm);
@@ -427,7 +426,6 @@ sub _check_vms {
 	unless ($hkd->_call_noded(check_vm_process => $id)) {
 	    DEBUG "kvm process for vm $id reaped";
 	    delete $hkd->{vm_pids}{$id};
-	    $hkd->_clean_vm_fw_rules($vm);
 	    given ($vm->vm_state) {
 		when ('stopping_1') {
 		    WARN "vm process exited without passing through stopping_2"
@@ -706,9 +704,6 @@ sub _start_vm {
         push @cmd, -drive => $hdb;
     }
 
-    $hkd->_clean_vm_fw_rules($vm); # Just in case there are some
-                                   # dangling rules floating around
-
     my ($pid, $tap_if) = $hkd->_call_noded(fork_vm => $id, $network_bridge, @cmd);
     $vm->set_vm_pid($pid);
 
@@ -875,102 +870,37 @@ sub _call_noded {
     die "rpc failed: $!\n";
 }
 
-sub _clean_vm_fw_rules {
-    my ($hkd, $vm) = @_;
-    my $vm_id = $vm->id;
-    for (qw(INPUT OUTPUT FORWARD)) {
-	my @rules = `iptables -S $_`;
-	for (@rules) {
-	    chomp;
-	    /^\s*-A\s+(.*--comment\s+"QVD rule for VM $vm_id".*)$/
-		and system "iptables -D $1";
-	}
-    }
-}
-
 sub _set_vm_fw_rules {
     my ($hkd, $vm, $tap_if) = @_;
     if ($use_firewall) {
         my $vm_id = $vm->id;
         for my $rule ($hkd->_vm_fw_rules($vm, $tap_if)) {
-            my @cmd = (iptables => -A => @$rule, -m => 'comment', '--comment' => "QVD rule for VM $vm_id");
-            DEBUG "iptables cmd: @cmd";
+            my ($chain, @args) = @$rule;
+            my @cmd = (ebtables => -A => "QVD_${chain}_${tap_if}", @args);
+            DEBUG "ebtables cmd: @cmd";
             system @cmd
-                and ERROR "Can't configure firewall: $!";
+                and ERROR "Can't configure firewall: " . ($? >> 8);
         }
+    }
+    for my $chain (qw(INPUT FORWARD)) {
+        system ebtables => -P => "QVD_${chain}_${tap_if}", "ACCEPT";
     }
 }
 
 sub _vm_fw_rules {
     my ($hkd, $vm, $tap_if) = @_;
     my $vm_ip = $vm->vm->ip;
-    my $x_port = $vm->vm_x_port;
-    my $ssh_port = $vm->vm_ssh_port;
-    my $vma_port = $vm->vm_vma_port;
+    my $vm_mac = $hkd->_ip_to_mac($vm_ip);
 
-    my @rules = (
-
-                 ### ETHERNET
-
-                 # Drop traffic from VM if it doesn't have the correct IP or MAC
-                 [FORWARD => ( -m => 'physdev', '--physdev-in' => $tap_if,
-                               -m => 'mac', '!', '--mac-source' => $hkd->_ip_to_mac($vm_ip),
-                               -j => 'DROP')],
-
-                 [FORWARD => ( -m => 'physdev', '--physdev-in' => $tap_if,
-                               '!', -s => $vm_ip,
-                               -j => 'DROP')],
-
-                 [INPUT   => ( -m => 'physdev', '--physdev-in' => $tap_if,
-                               -m => 'mac', '!', '--mac-source' => $hkd->_ip_to_mac($vm_ip),
-                               -j => 'DROP')],
-                 # allow DHCP packets from any IP,
-                 # FIXME: could it be limited to 0.0.0.0?
-                 [INPUT   => ( -m => 'physdev', '--physdev-in' => $tap_if,
-                               -p => 'udp', '--dport' => '67',
-                               -j => 'ACCEPT')],
-                 [INPUT   => ( -m => 'physdev', '--physdev-in' => $tap_if,
-                               '!', -s => $vm_ip,
-                               -j => 'DROP')],
-
-                 ### TCP
-
-                 # Drop TCP SYN from VM
-                 [FORWARD => ( -m => 'physdev', '--physdev-in' => $tap_if,
-                               -d => "$vm_ip/$vm_netmask",
-                               -p => 'tcp', '--syn',
-                               -j => 'DROP')],
-                 [INPUT   => ( -m => 'physdev', '--physdev-in' => $tap_if,
-                               -d => "$vm_ip/$vm_netmask",
-                               -p => 'tcp', '--syn',
-                               -j => 'DROP')],
-
-                 # Accept SSH/VMA/NX to VM, drop all other TCP from LAN to VM
-                 [FORWARD => ( -m => 'physdev', '--physdev-out' => $tap_if,
-                               -s => "$vm_ip/$vm_netmask", -d => $vm_ip,
-                               -p => 'tcp', -m => 'multiport', '--dports' => "$ssh_port,$vma_port,$x_port",
-                               -j => 'ACCEPT')],
-                 [OUTPUT  => ( -s => "$vm_ip/$vm_netmask", -d => $vm_ip,
-                               -p => 'tcp', -m => 'multiport', '--dports' => "$ssh_port,$vma_port,$x_port",
-                               -j => 'ACCEPT')],
-                 [FORWARD => ( -s => "$vm_ip/$vm_netmask", -d => $vm_ip, # -s to allow internet
-                               -p => 'tcp',
-                               -j => 'DROP')],
-                 [OUTPUT  => ( -d => $vm_ip,
-                               -p => 'tcp',
-                               -j => 'DROP')],
-
-                 ### UDP
-
-                 # Accept DNS requests from VM to node, drop all other UDP from VM
-                 [INPUT => ( -m => 'physdev', '--physdev-in' => $tap_if,
-                             -p => 'udp', '!', '--dport' => '53',
-                             -j => 'DROP')],
-                 [FORWARD => ( -m => 'physdev', '--physdev-in' => $tap_if,
-                               -p => 'udp',
-                               -j => 'DROP')],
-
-                );
+    # this ebrules rules are just to forbid MAC or IP spoofing
+    # everything else is done using global rules.
+    return ( [FORWARD => -s => '!', $vm_mac, -j => 'DROP'],
+             [INPUT   => -s => '!', $vm_mac, -j => 'DROP'],
+             [FORWARD => -p => '0x800', '--ip-source' => '!', $vm_ip, -j => 'DROP'],
+             [INPUT   => -p => '0x800', '--ip-protocol' => '17',   # allow DHCP requests to host
+                                        '--ip-source' => '0.0.0.0',
+                                        '--ip-destination-port' => '67', -j => 'ACCEPT'],
+             [INPUT   => -p => '0x800', '--ip-source' => '!', $vm_ip, -j => 'DROP'] );
 }
 
 1;

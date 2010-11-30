@@ -243,6 +243,11 @@ sub _shutdown {
 		and undef $pid;
 	}
     }
+
+    for my $tap_if (values %{$noded->{vm_tap}}) {
+        $noded->_delete_ebtables_tap_chain($tap_if);
+    }
+
     exit(0);
 }
 
@@ -294,20 +299,44 @@ sub _rpc_fork_vm {
     ($pid, $tap_if);
 }
 
+sub _mod_ebtables_tap_chain {
+    my ($noded, $tap_if, $recreate) = @_;
+
+    for my $chain (qw(INPUT FORWARD)) {
+        my $tap_chain = "QVD_${chain}_${tap_if}";
+        system "ebtables", -D => $chain, -i => $tap_if, -j => $tap_chain;
+        system "ebtables", -X => $tap_chain;
+
+        if ($recreate) {
+            system "ebtables", -N => $tap_chain, -P => 'DROP';
+            system "ebtables", -A => $chain, -i => $tap_if, -j => $tap_chain;
+        }
+    }
+}
+
+sub _delete_ebtables_tap_chain {
+    my ($noded, $tap_if) = @_;
+    $noded->_mod_ebtables_tap_chain($tap_if, 0);
+}
+
+sub _make_ebtables_tap_chain {
+    my ($noded, $tap_if) = @_;
+    $noded->_mod_ebtables_tap_chain($tap_if, 1);
+}
+
+use constant TUNNEL_DEV => '/dev/net/tun';
+use constant STRUCT_IFREQ => "Z16 s";
+use constant IFF_NO_PI => 0x1000;
+use constant IFF_TAP => 2;
+use constant TUNSETIFF => 0x400454ca;
+
 sub _open_tap {
-    use constant TUNNEL_DEV => '/dev/net/tun';
-    use constant STRUCT_IFREQ => "Z16 s";
-    use constant IFF_NO_PI => 0x1000;
-    use constant IFF_TAP => 2;
-    use constant TUNSETIFF => 0x400454ca;
-
+    my $noded = shift;
     open my $tap_fh, '+<', TUNNEL_DEV or die "Can't open ".TUNNEL_DEV.": $!";
-
     my $ifreq = pack(STRUCT_IFREQ, 'qvdtap%d', IFF_TAP|IFF_NO_PI);
     ioctl $tap_fh, TUNSETIFF, $ifreq or die "Can't create tap interface: $!";
-
     my $tap_if = unpack STRUCT_IFREQ, $ifreq;
-
+    $noded->_make_ebtables_tap_chain($tap_if);
     return ($tap_fh, $tap_if);
 }
 
@@ -317,6 +346,8 @@ sub _rpc_check_vm_process {
     if (defined $pid) {
 	return 1 if waitpid($pid, WNOHANG) != $pid;
 	delete $noded->{vm_pids}{$id};
+        my $tap_if = delete $noded->{vm_taps}{$id};
+        $noded->_delete_ebtables_tap_chain($tap_if);
     }
     return 0;
 }
