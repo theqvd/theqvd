@@ -51,8 +51,8 @@ The QVD components are
 *QVD-VMA*: The agent that runs in the Virtual Machine, allowing users to connect, enable printer sharing, audio, hooks, etc. +
 
 
-Architecture
-~~~~~~~~~~~~
+Network Architecture
+~~~~~~~~~~~~~~~~~~~~
 
 QVD is a 3-tier solution from a Network perspective, the QVD-Client connects to the QVD-L7R and this connection is forwarded directly to the virtual machine. Each virtual machine has is own IP Address. Each Node has an firewall running that provides security to the Virtual Machines at bridge Level. All the virtual machines must be in the same subnet, at this moment a different farm must be created if two or more networks are required. A dhcp server runs in each host to provide the correct IP to each virtual Machine.
 
@@ -92,3 +92,42 @@ QVD uses two complementing firewalls, iptables and ebtables, the reason is have 
  * ebtables QVD_INPUT_$tap -p 0x800 --ip-protocol 17 --ip-source 0.0.0.0 --ip-destination-port = 67 -j ACCEPT
  * ebtables QVD_INPUT_$tap -p 0x800 --ip-source ! $ip -j DROP 
 --------------------------------------------------------------------------------
+
+
+At Node Level these are the rules that QVD aplies
+
+
+Alternative Configuration 
+^^^^^^^^^^^^^^^^^^^^^^^^^
+
+There is another way that QVD allows, This is to use the QVD-L7R as standalone frontend. In large nodes farms, could be convenient use the L7R as frontend between the loadbalancer and the nodes. The L7R accepts the connection and forward it to another its corresponding L7R in the node where the Virtual Machine is running. 
+
+[NOTE] 
+A loadbalancer is still needed to get a unique IP address where all the clients connect. 
+
+The following diagram represents this configuration
+
+image:../dia/qvd-network-alt.png[width=300,align=right]
+
+
+Storage Architecture
+~~~~~~~~~~~~~~~~~~~~
+
+Overlays and OSIS
+^^^^^^^^^^^^^^^^^ 
+
+And overlay is an hard disk image that stores the disk changes in an external file, instead to the proper disk image. As we are talking obout enviroments with hundreds or thousands of users, is a good idea create a template that stores the information that sets of users have in common and the changes in the operating systems, (logs principally), were stored in the overlay, saving lots of disk space. 
+Therefore in QVD, every vm is composed by at least two parts, an OSI, that is common for all the users with similar characteristiques and an overlay, that contains all the information that the virtual machine modifies itself. 
+
+[NOTE]
+
+OSIS have just read only access.
+
+[NOTE]
+
+Overlays can be persistents or not, by default they are not. 
+
+[TIP]
+The user information should not be stored in the overlay, if not external storage is disposed to store the user's data an additional disk can be enabled at the osi creation time, to allow users keep their data in its home directory. 
+
+The nodes must have access to sah
