@@ -1,0 +1,29 @@
+QVD OVERVIEW
+============
+
+Introduction
+============
+
+QVD (Quality Virtual Desktop) is a *Linux* focused VDI (Virtual Desktop Infraestructure). What does it means?, that the Desktops delivered to the clients are Linux Desktops. This desktops are virtualized by kvm (Linux kernel virtual machine), and intends to be a fully integrated solution, what involves that all the components are fully integrated.
+
+Desktop Virtualization is as its early ages and the necessity for companies to keep their data under control are growing including those in the desktops users. QVD is a product that are relying at user's desktops. 
+
+QVD Fundamentals
+================
+
+QVD is written in perl and it runs such a proccess in a Linux OS. As the delivery protocol is Nx, the user desktop runs as a remote X11 session even acroos slow or low-bandwitch connections. It's possible to run the client on Windows and Linux platforms or via Thin Clients. 
+
+Basics
+~~~~~~
+
+The QVD's components are
+
+	* Users (End Users)
+	* Virtual Machines
+	* Nodes
+	* Images
+
+Users: People that works at their desks, using office packages, email, whatever. Must be identified by login and password. 
+Virtual Machines: Running Linux Desktops and owned by the users. These VM's runs under kvm on Linux Nodes. 
+ 
+

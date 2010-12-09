@@ -1,0 +1,113 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE book PUBLIC "-//OASIS//DTD DocBook XML V4.5//EN" "http://www.oasis-open.org/docbook/xml/4.5/docbookx.dtd">
+<?asciidoc-toc?>
+<?asciidoc-numbered?>
+
+<book lang="en">
+<bookinfo>
+    <title>QVD OVERVIEW</title>
+    <date>December 2010</date>
+    <author>
+        <firstname>Nicolas</firstname>
+        <surname>Arenas</surname>
+        <email>nicolas.arenas@qindel.com</email>
+    </author>
+    <authorinitials>NA</authorinitials>
+<revhistory><revision><revnumber>1.0</revnumber><date>December 2010</date><authorinitials>NA</authorinitials></revision></revhistory>
+</bookinfo>
+<chapter id="_introduction">
+<title>Introduction</title>
+<simpara>QVD (Quality Virtual Desktop) is a <emphasis role="strong">Linux</emphasis> focused VDI (Virtual Desktop Infraestructure). What does it means?, that the Desktops delivered to the clients are Linux Desktops. This desktops are virtualized by kvm (Linux kernel virtual machine), and intends to be a fully integrated solution, what involves that all the components are fully integrated.</simpara>
+<simpara>Desktop Virtualization is as its early ages and the necessity for companies to keep their data under control are growing including those in the desktops users. QVD is a product that are relying at user&#8217;s desktops.</simpara>
+</chapter>
+<chapter id="_qvd_fundamentals">
+<title>QVD Fundamentals</title>
+<simpara>QVD is written in perl and it runs such a proccess in a Linux OS. As the delivery protocol is Nx, the user desktop runs as a remote X11 session even acroos slow or low-bandwitch connections. It&#8217;s possible to run the client on Windows and Linux platforms or via Thin Clients.</simpara>
+<section id="_basics">
+<title>Basics</title>
+<simpara>QVD is composed by actors and components.</simpara>
+<simpara>The QVD&#8217;s actors are</simpara>
+<itemizedlist>
+<listitem>
+<simpara>
+Users (End Users)
+</simpara>
+</listitem>
+<listitem>
+<simpara>
+Virtual Machines
+</simpara>
+</listitem>
+<listitem>
+<simpara>
+Nodes
+</simpara>
+</listitem>
+<listitem>
+<simpara>
+Images
+</simpara>
+</listitem>
+</itemizedlist>
+<simpara>Users: People that works at their desks, using office packages, email, whatever. Must be identified by login and password.
+Virtual Machines: Running Linux Desktops and owned by the users. These VM&#8217;s runs under kvm on Linux Nodes.
+Nodes: Fisical servers where the VM&#8217;s run.
+Images: Templates with shared properties as applications installed, memory for the vm or space for the user&#8217;s home.</simpara>
+<simpara>The QVD components are</simpara>
+<itemizedlist>
+<listitem>
+<simpara>
+QVD-Client.
+</simpara>
+</listitem>
+<listitem>
+<simpara>
+QVD-L7R (Level 7 Router)
+</simpara>
+</listitem>
+<listitem>
+<simpara>
+QVD-HKD (House Keeping Daemon)
+</simpara>
+</listitem>
+<listitem>
+<simpara>
+QVD-Node
+</simpara>
+</listitem>
+<listitem>
+<simpara>
+QVD-Database
+</simpara>
+</listitem>
+<listitem>
+<simpara>
+QVD-Administration tools
+</simpara>
+</listitem>
+<listitem>
+<simpara>
+QVD-VMA (Virtual Machine Agent)
+</simpara>
+</listitem>
+</itemizedlist>
+<simpara><emphasis role="strong">QVD-Client</emphasis>: A piece of software that&#8217;s connects the user whith the virtual Machine. Able to push some user&#8217;s devices front the user physichal workstation through his virtual machines.<?asciidoc-br?>
+<emphasis role="strong">QVD-L7R</emphasis>: In charge to balance the connections from the QVD-Client to the Virtual Machines and the responsability for login user before they went into their Virtual Machines.<?asciidoc-br?>
+<emphasis role="strong">QVD-HKD</emphasis>: Responsible to interact with the Virtual Machines, starting, stopping, and update the VM&#8217;s status in the QVD Database.<?asciidoc-br?>
+<emphasis role="strong">QVD-Node</emphasis>: Daemon running at in the nodes, in charge to manage the QVD-L7R and the QVD-HKD.<?asciidoc-br?>
+<emphasis role="strong">QVD-Database</emphasis>: Holds the status for all users, Vitual Machines, images, hosts. All the platform information is holded by the database.<?asciidoc-br?>
+<emphasis role="strong">QVD-Administrative tools</emphasis>: Composed by CLI and the WAT (Web administration tool) that provides an easy and simple way to administrate the whole platform, from a couple of nodes to hundreds.<?asciidoc-br?>
+<emphasis role="strong">QVD-VMA</emphasis>: The agent that runs in the Virtual Machine, allowing users to connect, enable printer sharing, audio, hooks, etc.<?asciidoc-br?></simpara>
+</section>
+<section id="_architecture">
+<title>Architecture</title>
+<simpara>QVD is a 3-tier solution from a Network perspective, the QVD-Client connects to the QVD-L7R and this connection is forwarded directly to the virtual machine. Each virtual machine has is own IP Address. Each Node has an firewall running that provides security to the Virtual Machines at bridge Level. All the virtual machines must be in the same subnet, at this moment a different farm must be created if two or more networks are required. A dhcp server runs in each host to provide the correct IP to each virtual Machine.</simpara>
+<simpara><inlinemediaobject>
+  <imageobject>
+  <imagedata fileref="../dia/qvd-network.png"/>
+  </imageobject>
+  <textobject><phrase>scaledwidth=75%</phrase></textobject>
+</inlinemediaobject></simpara>
+</section>
+</chapter>
+</book>
