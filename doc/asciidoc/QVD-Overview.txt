@@ -81,4 +81,14 @@ The HKD calculates the MAC address for each VM from the IP address that each VM 
 Firewall
 ^^^^^^^^
 
+QVD uses two complementing firewalls, iptables and ebtables, the reason is have a firewall at bridge level ebtables and iptables at node level. 
 
+--------------------------------------------------------------------------------
+ * ebtables INPUT -i $tap -j QVD_INPUT_$tap
+ * ebtables FORWARD -i $tap -j QVD_FORWARD_$tap
+ * ebtables QVD_FORWARD_$tap -s ! $mac -j DROP
+ * ebtables QVD_INPUT_$tap -s ! $mac -j DROP
+ * ebtables QVD_FORWARD_$tap -p 0x800 --ip-source ! $ip -j DROP
+ * ebtables QVD_INPUT_$tap -p 0x800 --ip-protocol 17 --ip-source 0.0.0.0 --ip-destination-port = 67 -j ACCEPT
+ * ebtables QVD_INPUT_$tap -p 0x800 --ip-source ! $ip -j DROP 
+--------------------------------------------------------------------------------
