@@ -1,0 +1,64 @@
+GUI Client User Guide
+=====================
+
+Santiago Doblas
+v0.1, 20 december 2010
+:author initials: SD
+:email: sdoblas@qindel.com
+
+The GUI Client lets you start a session of your virtual machine in a remote server.
+
+Usage
+-----
+
+Run the client:
+
+----
+QVD-Client/bin/qvd-gui-client.pl
+----
+
+You should get a screen like this: 
+
+
+image:../images/GUI_login.png[alt="login"]
+
+Populate the "User", "Password" and "Server" fields, click "Connect" and you are done. After a little load you get a window with your remote desktop inside.
+
+Troubleshooting
+---------------
+
+Unable to connect to host:port at QVD-Client/lib/QVD/Client/Frame.pm…
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+This message appears when the server is not responding to the client petition.
+
+    * Ensure all components are running in the server side, HKD, L7R and RC.
+    * Check server logs, by default in "/var/log/qvd.log".
+    * Check exists network communication client <-> server. Do crossed pings. 
+
+The server has rejected your login. Please verify that your username and password are correct.
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+This messages occurs when exists communication between client and server but the user can't be authenticated.
+
+    * Verify username and password.
+    * Verify user exists in QVD user list:
+----
+      QVD-Admin/bin/qvd-admin.pl user list
+----
+    * If you are using LDAP authentication verify user and password in your LDAP server. 
+
+Unable to print in WindowsXP Pro
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+The Guest account must be enabled in order to print with the QVD's Windows Client.
+
+Also, the the Local Directives must allow access from the network to the Guest User. This requirements will dissappear in the nearest versions.
+
+   1. Enable the guest account
+   2. Add the guest account. Go to start, all programs, administrative tools
+   3. Select "User Rights Assignment"
+   4. Double click on "Access this computer from the network". Click on "Add User or Group". Type "guest" and then click on "Check Names". Select "guest" and click ok.
+   5. Double click on "Deny access to this computer from the network", and remove the guest account from it. 
+
+

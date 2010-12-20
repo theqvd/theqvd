@@ -1,0 +1,233 @@
+Command Line Interface (CLI)
+============================
+Santiago Doblas
+v0.1, 20 december 2010
+:author initials: SD
+:email: sdoblas@qindel.com
+
+
+
+The Command Line Interface includes the following operations:
+----
+root@altar:/home/qvd/QVD/ext# perl -Mlib::glob=*/lib QVD-Admin/bin/qvd-admin.pl --help
+Valid command expected, available subcommands:
+   config del
+   config get
+   config set
+   config ssl
+   host add
+   host del
+   host list
+   host propdel
+   host propget
+   host propset
+   osi add
+   osi del
+   osi list
+   user add
+   user del
+   user list
+   user passwd
+   user propdel
+   user propget
+   user propset
+   vm add
+   vm block
+   vm del
+   vm disconnect_user
+   vm list
+   vm propdel
+   vm propget
+   vm propset
+   vm ssh
+   vm start
+   vm stop
+   vm unblock
+   vm vnc
+----
+
+[TIP] 
+======================================================================
+In case of doubt it is convenient to check the help option (--help).
+
+Many operations admit a filter (-f option).
+======================================================================
+
+Basic Operations 
+----------------
+
+Start / stop virtual machines
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+There exists many ways to start and stop virtual machines.
+
+You can run:
+
+----
+QVD-Admin/bin/qvd-admin.pl vm stop -f "user=youruser"
+QVD-Admin/bin/qvd-admin.pl vm start -f "user=youruser"
+----
+
+And also you can do it from the Web Administration Tool, https://intranet.qindel.com/trac/QVD/wiki/WebAdminToolUserGuide#Virtualmachines
+
+Resolving a "blocked" state
+~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+
+If a VM fails HKD sets a "blocked" flag for this machine. While "blocked" flag stills active no one, except the admin, can connect to it. To set and unset the blocked state for a VM you can run:
+
+----
+QVD-Admin/bin/qvd-admin.pl vm block -f "id=yourvmid"
+QVD-Admin/bin/qvd-admin.pl vm unblock -f "id=yourvmid"
+----
+
+Backup
+~~~~~~
+
+Database
+^^^^^^^^
+
+Just run a complete dump of Postgres:
+
+----
+pg_dump -U postgres postgres > yourfile.backup
+----
+
+For advanced operations, check  http://www.postgresql.org/docs/8.1/static/backup.html
+
+Files
+^^^^^
+
+For a complete QVD backup you must save the folders defined in params:
+
+----
+rw_storage_path (/var/lib/qvd/storage/overlays by default)
+ro_storage_path (/var/lib/qvd/storage/images by default)
+home_storage_path (/var/lib/qvd/storage/homes by default)
+----
+
+Restore
+~~~~~~~
+
+Revert your backup in the database:
+
+----
+psql -U postgres postgres < yourfile.backup
+----
+
+Files
+^^^^^
+
+Copy all the files back to the original place:
+
+----
+rw_storage_path (/var/lib/qvd/storage/overlays by default)
+ro_storage_path (/var/lib/qvd/storage/images by default)
+home_storage_path (/var/lib/qvd/storage/homes by default)
+----
+
+Database
+^^^^^^^^
+
+For advanced operations, check  http://www.postgresql.org/docs/8.1/static/backup.html
+
+Other Operations
+----------------
+
+Configuration setup
+~~~~~~~~~~~~~~~~~~~
+
+It is possible to add more parameters to the system with the config set option:
+
+----
+perl -Mlib::glob=*/lib QVD-Admin/bin/qvd-admin.pl config set myproperty="this is a value"
+----
+
+It is also possible to get all the configuration:
+
+----
+perl -Mlib::glob=*/lib QVD-Admin/bin/qvd-admin.pl config get 
+----
+
+And deleting:
+
+----
+perl -Mlib::glob=*/lib QVD-Admin/bin/qvd-admin.pl config del myproperty
+----
+
+SSL
+~~~
+
+It is possible to set up an SSL connection manually via this command:
+
+----
+root@altar:/home/qvd/QVD/ext# perl -Mlib::glob=*/lib QVD-Admin/bin/qvd-admin.pl config ssl --help
+
+config ssl: Sets the SSL certificate and private key
+usage: config ssl key=mykey.pem cert=mycert.pem
+
+    Sets the SSL certificate to the one read from the file mycert.pem, and the
+    private key to the one read from mykey.pem.
+
+    Example: config ssl key=certs/server-key.pem cert=certs/server-cert.pem
+----
+
+Hosts setup
+~~~~~~~~~~~
+
+It is possible to add, delete, list and manage the hosts properties. Here we include some examples:
+
+----
+perl -Mlib::glob=*/lib QVD-Admin/bin/qvd-admin.pl host add name=myhost address=127.0.0.1
+perl -Mlib::glob=*/lib QVD-Admin/bin/qvd-admin.pl host del -f id=2 
+perl -Mlib::glob=*/lib QVD-Admin/bin/qvd-admin.pl host list 
+perl -Mlib::glob=*/lib QVD-Admin/bin/qvd-admin.pl host propdel prop1 -f id=3 
+perl -Mlib::glob=*/lib QVD-Admin/bin/qvd-admin.pl host propget
+perl -Mlib::glob=*/lib QVD-Admin/bin/qvd-admin.pl host propget -f id=3 
+perl -Mlib::glob=*/lib QVD-Admin/bin/qvd-admin.pl host propset prop2="value for 2" -f id=2 
+perl -Mlib::glob=*/lib QVD-Admin/bin/qvd-admin.pl host propset prop3="value for all"
+----
+
+OSI setup
+~~~~~~~~~
+
+There are several options to manage the Operating System Images (OSI):
+
+----
+perl -Mlib::glob=*/lib QVD-Admin/bin/qvd-admin.pl osi add name=myOSI disk_image=/var/lib/qvd/storage/shared/qvd-guest.img use_overlay=no memory=1024 user_storage_size=2048
+perl -Mlib::glob=*/lib QVD-Admin/bin/qvd-admin.pl osi del -f id=11 
+perl -Mlib::glob=*/lib QVD-Admin/bin/qvd-admin.pl osi list 
+----
+
+User management
+~~~~~~~~~~~~~~~
+
+Thete are several operations to manage users; add, delete, list, change password, get, set or delete user information:
+
+----
+perl -Mlib::glob=*/lib QVD-Admin/bin/qvd-admin.pl user add login=peter password=donttellya 
+perl -Mlib::glob=*/lib QVD-Admin/bin/qvd-admin.pl user del -f login=kk 
+perl -Mlib::glob=*/lib QVD-Admin/bin/qvd-admin.pl user list
+perl -Mlib::glob=*/lib QVD-Admin/bin/qvd-admin.pl user passwd peter  
+perl -Mlib::glob=*/lib QVD-Admin/bin/qvd-admin.pl user propdel prop1 -f user_id=4 
+perl -Mlib::glob=*/lib QVD-Admin/bin/qvd-admin.pl user propget -f user_id=3 
+perl -Mlib::glob=*/lib QVD-Admin/bin/qvd-admin.pl user propset item=red -f login=peter
+----
+
+VM management
+~~~~~~~~~~~~~
+
+----
+perl -Mlib::glob=*/lib QVD-Admin/bin/qvd-admin.pl vm add name=myhost user_id=4 osi_id=1 ip=127.0.0.2  storage=/tmp 
+perl -Mlib::glob=*/lib QVD-Admin/bin/qvd-admin.pl vm del -f name=myVM 
+perl -Mlib::glob=*/lib QVD-Admin/bin/qvd-admin.pl vm disconnect_user -f name=myhost
+perl -Mlib::glob=*/lib QVD-Admin/bin/qvd-admin.pl vm list 
+perl -Mlib::glob=*/lib QVD-Admin/bin/qvd-admin.pl vm propdel prop1 -f name="Test VM 1" 
+perl -Mlib::glob=*/lib QVD-Admin/bin/qvd-admin.pl vm propget  
+perl -Mlib::glob=*/lib QVD-Admin/bin/qvd-admin.pl vm propset prop2=otrovalor -f name=myhost 
+perl -Mlib::glob=*/lib QVD-Admin/bin/qvd-admin.pl vm ssh -f name=myhost -- -l qvd 
+perl -Mlib::glob=*/lib QVD-Admin/bin/qvd-admin.pl vm start -f id=1 
+perl -Mlib::glob=*/lib QVD-Admin/bin/qvd-admin.pl vm stop -f name=myhost
+perl -Mlib::glob=*/lib QVD-Admin/bin/qvd-admin.pl vm vnc -f id=2
+----
+
