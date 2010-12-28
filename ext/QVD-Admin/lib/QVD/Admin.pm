@@ -202,6 +202,8 @@ sub cmd_osi_add {
     # FIXME: detect type of image and set use_overlay accordingly, iso => no overlay
     $params{memory}      //= $osi_default_memory;
     $params{use_overlay} //= $osi_default_overlay;
+    
+    # Are we using user_storage_size ?
 
     die "The required parameters are ".join(", ", @required_params)
 	unless _set_equals([keys %params], \@required_params);
