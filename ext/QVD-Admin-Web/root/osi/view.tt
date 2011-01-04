@@ -22,6 +22,10 @@
 	    <td class="field">Memory</td>
 	    <td class="value">[% osi.memory %]</td>
 	</tr>	
+	<tr>
+	    <td class="field">User storage</td>
+	    <td class="value">[% osi.user_storage_size %]</td>
+	</tr>		
     </table>
 </div>
 

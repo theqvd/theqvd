@@ -53,6 +53,7 @@ function on_submit()
             <th id="disk_image">Disk image</th>
             <th id="use_overlay">Overlay</th>
             <th id="memory">Memory</th>
+            <th id="user_storage_size">User storage</th>	    
         </tr>
     </thead>
     <tbody>
@@ -76,7 +77,8 @@ function on_submit()
 	    [% END %]
 	    </td>
 	    <td>[% osi.memory %]</td>
-        </tr>
+       	    <td>[% osi.user_storage_size %]</td>
+	</tr>
         [% END -%]
     </tbody>
 </table>
