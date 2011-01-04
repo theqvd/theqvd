@@ -203,10 +203,8 @@ sub cmd_osi_add {
     $params{memory}      //= $osi_default_memory;
     $params{use_overlay} //= $osi_default_overlay;
     
-    # Are we using user_storage_size ?
-
-    die "The required parameters are ".join(", ", @required_params)
-	unless _set_equals([keys %params], \@required_params);
+    #die "The required parameters are ".join(", ", @required_params)
+	#unless _set_equals([keys %params], \@required_params);
 
     mkdir $images_path, 0755;
     -d $images_path or die "Directory $images_path does not exist";

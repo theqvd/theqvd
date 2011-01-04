@@ -109,8 +109,8 @@ sub add : Local Form {
 	    name => $name,
 	    disk_image => $disk_image,
 	    memory => $memory,
-	    use_overlay => $use_overlay
-	    #user_storage_size => $user_storage_size
+	    use_overlay => $use_overlay,
+	    user_storage_size => $user_storage_size
 	);
 	
 	#print Dumper %params;
