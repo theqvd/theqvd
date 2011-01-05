@@ -47,7 +47,7 @@ online help that can be viewed using the option B<-h>.
 
 =over
 
-=item -h
+=item -h, --help
 
 Print the command's built-in help and exit.
 
@@ -58,9 +58,156 @@ is specified using the syntax I<key1=value1,key2=value2,...>.
 
 =back
 
+=head1 OPERATIONS
+
+=over
+
+=item config del
+
+Delete a previously set property.
+
+=item config get
+
+Get all the configuration or the value for a specified property.
+
+=item config set
+
+Set a specific property.
+
+=item config ssl
+
+Set up an SSL connection.
+
+=item host add
+
+Add a physical host.
+
+=item host del
+
+Delete a physical host.
+
+=item host list
+
+List all the hosts.
+
+=item host propdel
+
+Delete a specified property.
+
+=item host propget
+
+Get a specified property or all properties.
+
+=item host propset
+
+Set a value for a property.
+
+=item host unblock
+
+Unblock a host specified by a filter.
+
+=item osi add
+
+Add an Operating System Image.
+
+=item osi del
+
+Delete a specified Operating System Image.
+
+=item osi list
+
+List all the Operating System Images.
+
+=item user add
+
+Add a specified user and a password.
+
+=item user del
+
+Delete a specified user.
+
+=item user list
+
+List users.
+
+=item user passwd
+
+Define a password for a specified user.
+
+=item user propdel
+
+Delete all or a specified user.
+
+=item user propget
+
+Get the value of a property from a virtual machine specified by a filter.
+
+=item user propset
+
+Set the value of a property for a virtual machine specified by a filter.
+
+=item vm add
+
+Add a virtual machine.
+
+=item vm block
+
+Block a virtual machine.
+
+=item vm del
+
+Delete a virtual machine.
+
+=item vm disconnect_user
+
+Disconnect a specified user from a specified virtual machine.
+
+=item vm list
+
+List the virtual machines.
+
+=item vm propdel
+
+Delete a specified property from a virtual machine.
+
+=item vm propget
+
+Get all the properties.
+
+=item vm propset
+
+Set a property for a specified virtual machine.
+
+=item vm ssh
+
+Establish the parameters for an SSH connection.
+
+=item vm start
+
+Start a virtual machine.
+
+=item vm stop
+
+Stop a virtual machine.
+
+=item vm unblock
+
+Set a virtual machine as unblocked.
+
+=item vm vnc
+
+Establish the parameters for a VNC connection.
+
+=back
+
+
+
+
+
+
 =head1 EXAMPLES
 
-Add a user with user name 'jrh':
+Add a user with user name 'jrh' and the password 'secret':
 
     qvd-admin user add login=jrh password=secret
 
@@ -76,6 +223,18 @@ List all virtual machines running on host 'bootes':
 
     qvd-admin vm list -f host=bootes
 
+List all hosts:
+
+    qvd-admin.pl host list
+
+Set a property for all the hosts:
+
+    qvd-admin.pl host propset prop3="value for all"
+
+Same for host whose id is 2:
+
+    qvd-admin.pl host propset prop2="value for 2" -f id=2 
+
 
 =head1 FILES
 
@@ -85,7 +244,13 @@ List all virtual machines running on host 'bootes':
 
 The main configuration file.
 
+
+
 =back
+
+
+
+
 
 =head1 COPYRIGHT
 
