@@ -106,7 +106,7 @@ function check_all(field) {
 		<span id="vm_statetext[% vm.id %]">[% vm.vm_runtime.vm_state %]</span>
 	    </td>
             <td id="vm_node[% vm.id %]"><a href="[% c.uri_for('/hosts/view/') %][% vm.vm_runtime.host.id %]">[% vm.vm_runtime.host.name %]</a></td>    
-	    <td><span id="vm_blocked[% vm.id %]" class="[% IF vm.vm_runtime.blocked == true %]option_blocked[% END %]" /></td>
+	    <td><span id="vm_blocked[% vm.id %]" class="[% IF vm.vm_runtime.blocked == 1 %]option_blocked[% END %]" /></td>
 
         </tr>
         [% END -%]
