@@ -54,7 +54,7 @@ my $home_partition = $home_drive . '1';
 
 my %on_action =       ( pre_connect    => cfg('vma.on_action.pre-connect'),
 			connect        => cfg('vma.on_action.connect'),
-			disconnect     => cfg('vma.on_action.disconnect'),
+			stop           => cfg('vma.on_action.stop'),
 			suspend        => cfg('vma.on_action.suspend'),
 			poweroff       => cfg('vma.on_action.poweroff') );
 
