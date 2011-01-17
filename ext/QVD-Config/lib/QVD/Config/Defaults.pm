@@ -81,8 +81,8 @@ vm.serial.redirect = 1
 vm.serial.capture = 0
 
 vm.network.bridge = qvdnet0
-# No sensible default value is possible for dhcp-range!
-# vm.network.dhcp-range=127.0.0.1,127.255.255.254
+# No sensible default value is possible for start IP!
+# vm.network.ip.start=10.0.0.100
 internal.vm.network.dhcp-hostsfile=${path.run}/dhcp-hostsfile
 internal.vm.network.firewall.enable = 1
 

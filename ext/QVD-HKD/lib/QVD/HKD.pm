@@ -51,8 +51,7 @@ my $serial_redirect        = cfg('vm.serial.redirect');
 my $serial_capture         = cfg('vm.serial.capture');
 
 my $network_bridge	   = cfg('vm.network.bridge');
-my $vm_netmask		   = cfg('vm.network.netmask');
-my $dhcp_range	  	   = cfg('vm.network.dhcp-range');
+my $dhcp_start	  	   = cfg('vm.network.ip.start');
 my $dhcp_default_route	   = cfg('vm.network.gateway');
 my $dhcp_hostsfile	   = cfg('internal.vm.network.dhcp-hostsfile');
 my $use_firewall           = cfg('internal.vm.network.firewall.enable');
@@ -790,7 +789,7 @@ sub _start_dhcpd {
     $hkd->_call_noded(start_dhcpd => 'dnsmasq',
 		                     '-k',
 		                     '--log-dhcp',
-		                     '--dhcp-range'     => "$f,static",
+		                     '--dhcp-range'     => "interface:$network_bridge,$dhcp_start,static",
 		                     '--dhcp-option'    => "option:router,$dhcp_default_route",
 		                     '--dhcp-hostsfile' => $dhcp_hostsfile);
 }
@@ -900,6 +899,8 @@ sub _vm_fw_rules {
              [INPUT   => -p => '0x800', '--ip-protocol' => '17',   # allow DHCP requests to host
                                         '--ip-source' => '0.0.0.0',
                                         '--ip-destination-port' => '67', -j => 'ACCEPT'],
+             [FORWARD => -p => '0x800', '--ip-protocol' => '17',   # do not let DHCP traffic leave the host
+                                        '--ip-destination-port' => '67', -j => 'DROP'],
              [INPUT   => -p => '0x800', '--ip-source' => '!', $vm_ip, -j => 'DROP'] );
 }
 

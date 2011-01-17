@@ -128,6 +128,7 @@ sub cmd_host_add {
     };
 }
 
+
 sub cmd_vm_add {
     my ($self, %params) = @_;
     txn_do {
@@ -146,11 +147,8 @@ sub cmd_vm_add {
 	    delete $params{user};
 	}
 	unless ($params{ip}) {
-	    my $dhcp_range = cfg('vm.network.dhcp-range');
-	    my ($f, $l) = split /,/, $dhcp_range;
-	    my $curr_max_id = rs(VM)->get_column('id')->max() || 0;
-	    $params{ip} = $self->_get_free_ip($f, $l, $curr_max_id);
-	    warn "assigned IP: $params{ip}";
+	    $params{ip} = $self->_get_free_ip;
+	    INFO "assigned IP: $params{ip}";
 	}
 	$params{storage} = '';
 	my $row = $self->_obj_add('vm', [qw/name user_id osi_id ip storage/],
@@ -167,24 +165,25 @@ sub cmd_vm_add {
 sub _aton { unpack('N', pack('C4', split /\./, shift)) }
 sub _ntoa { join '.', unpack('C4', pack('N', shift)) }
 
+sub _lenton {
+    my $len = shift;
+    my $zeros = 32 - $len;
+    return ((0xffffffff >> $zeros) << $zeros);
+}
+
 sub _get_free_ip {
-    my ($self, $ip_begin, $ip_end, $offset) = @_;
-    my $fn = _aton($ip_begin);
-    my $ln = _aton($ip_end);
-    my $range_length = $ln-$fn;
-    my %ips = ();
-    my @ips = rs(VM)->get_column('ip')->all();
-    @ips{@ips} = ();
-    if (scalar keys %ips >= $range_length) {
-	die "No free IP addresses";
-    } else {
-	# Risk of getting duplicate IPs when adding VMs concurrently
-	foreach my $i (0..$range_length) {
-	    my $new_ip = _ntoa($ln - (($offset + $i)% $range_length));
-	    return $new_ip unless exists $ips{$new_ip};
-	}
-	die "No free IP addresses";
+    my $netmask_txt = cfg('vm.network.netmask');
+    my $start_txt = cfg('vm.network.ip.start');
+    my $start = _aton($start_txt);
+    my $netmask = ($netmask_txt =~ /^\d+$/ ? _lenton($netmask_txt) : _aton($netmask_txt));
+    my $net = $start & $netmask;
+    my $top = $start | (0xffffffff & ~$netmask);
+
+    my %ips = map { _aton($_) => 1 } rs(VM)->get_column('ip')->all;
+    while ($top-- > $start) {
+        return _ntoa($top) unless $ips{$top}
     }
+    die "No free IP addresses";
 }
 
 sub cmd_user_add {
