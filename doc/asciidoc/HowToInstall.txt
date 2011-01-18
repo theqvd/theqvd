@@ -357,3 +357,52 @@ vm.network.dhcp-range:
 vm.network.dns_server:
 vm.network.gateway:
 ----
+
+
+Installing in single node  (For testing proposals)
+--------------------------------------------------
+
+Some considerations must be taken in mind if you are installing in just one node QVD. 
+
+ * If your server has a unique network card an empty bridge must be created in the server, this bridge will be used by the VM's to access the network. 
+	
+ ** This bridge must have assigned an IP address IN the same private network that your virtual machines will use, and this IP will be their gateway access. To create the bridge you need brctl installed in the server. In order to do this, you must have decided which will be your network configuration. For this example our network will be 10.3.15.0/24 and the gateway 10.3.15.1
+
+----
+
+brctl add qvdnet0
+ip addr add 10.3.15.1/24 dev qvdnet0
+
+----
+
+ ** We also need nating network traffic to allow comunication between private virtual machines network and external world. 
+
+---- 
+
+iptables -t nat -A POSTROUTING -o qvdnet0 -j SNAT --to-source 172.26.9.69
+iptables -t nat -A PREROUTING -d 172.26.9.69 -p tcp --dport 8443 -j DNAT --to-destination 10.3.15.1
+
+----
+
+ ** As last step we also need allow routing in the server. 
+
+----
+
+echo 1 > /proc/sys/net/ipv4/ip_forward
+
+----
+
+Or edit /etc/sysctl.conf and execute sysctl -p 
+
+ ** To make this configuration persistent after reboots, in Ubuntu add to /etc/network/interfaces
+
+----
+iface qvdnet0 inet static
+	pre-up brctl addbr qvdnet0
+	pre-up iptables -t nat -A POSTROUTING -o qvdnet0 -j SNAT --to-source 172.26.9.69
+	pre-up iptables -t nat -A PREROUTING -d 172.26.9.69 -p tcp --dport 8443 -j DNAT --to-destination 10.3.15.1
+	address 10.3.15.1
+	netmask 255.255.255.0
+----
+
+
