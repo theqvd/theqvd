@@ -3,7 +3,7 @@ QVD Hooks
 Salvador Fandino
 v1.0, Jan 2011
 
-Introducción
+Introduction
 ------------
 Hooks are scritps that the VMA run in the virtual machine at certain situations and that allows to modify the platform behavior with the purpose of adapt it to a concrete problematic.
 
