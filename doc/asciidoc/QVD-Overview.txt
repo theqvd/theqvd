@@ -129,5 +129,3 @@ Overlays can be persistents or not, by default they are not.
 
 [TIP]
 The user information should not be stored in the overlay, if not external storage is disposed to store the user's data an additional disk can be enabled at the osi creation time, to allow users keep their data in its home directory. 
-
-The nodes must have access to sah
