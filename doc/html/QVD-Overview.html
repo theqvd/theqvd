@@ -562,15 +562,15 @@ footnotes: function () {
 </div>
 </div>
 <div id="content">
-<h2 id="_introduction">Introduction</h2>
+<h2 id="_introduction">1. Introduction</h2>
 <div class="sectionbody">
 <div class="paragraph"><p>QVD (Quality Virtual Desktop) is a <strong>Linux</strong> focused VDI (Virtual Desktop Infraestructure). What does it means?, that the Desktops delivered to the clients are Linux Desktops. This desktops are virtualized by kvm (Linux kernel virtual machine), and intends to be a fully integrated solution, what involves that all the components are fully integrated.</p></div>
 <div class="paragraph"><p>Desktop Virtualization is as its early ages and the necessity for companies to keep their data under control are growing including those in the desktops users. QVD is a product that are relying at user&#8217;s desktops.</p></div>
 </div>
-<h2 id="_qvd_fundamentals">QVD Fundamentals</h2>
+<h2 id="_qvd_fundamentals">2. QVD Fundamentals</h2>
 <div class="sectionbody">
 <div class="paragraph"><p>QVD is written in perl and it runs such a proccess in a Linux OS. As the delivery protocol is Nx, the user desktop runs as a remote X11 session even acroos slow or low-bandwitch connections. It&#8217;s possible to run the client on Windows and Linux platforms or via Thin Clients.</p></div>
-<h3 id="_basics">Basics</h3><div style="clear:left"></div>
+<h3 id="_basics">2.1. Basics</h3><div style="clear:left"></div>
 <div class="paragraph"><p>QVD is composed by actors and components.</p></div>
 <div class="paragraph"><p>The QVD&#8217;s actors are</p></div>
 <div class="ulist"><ul>
@@ -644,7 +644,7 @@ QVD-VMA (Virtual Machine Agent)
 <strong>QVD-Database</strong>: Holds the status for all users, Vitual Machines, images, hosts. All the platform information is holded by the database.<br />
 <strong>QVD-Administrative tools</strong>: Composed by CLI and the WAT (Web administration tool) that provides an easy and simple way to administrate the whole platform, from a couple of nodes to hundreds.<br />
 <strong>QVD-VMA</strong>: The agent that runs in the Virtual Machine, allowing users to connect, enable printer sharing, audio, hooks, etc.<br /></p></div>
-<h3 id="_architecture">Architecture</h3><div style="clear:left"></div>
+<h3 id="_network_architecture">2.2. Network Architecture</h3><div style="clear:left"></div>
 <div class="paragraph"><p>QVD is a 3-tier solution from a Network perspective, the QVD-Client connects to the QVD-L7R and this connection is forwarded directly to the virtual machine. Each virtual machine has is own IP Address. Each Node has an firewall running that provides security to the Virtual Machines at bridge Level. All the virtual machines must be in the same subnet, at this moment a different farm must be created if two or more networks are required. A dhcp server runs in each host to provide the correct IP to each virtual Machine.</p></div>
 <div class="paragraph"><p><span class="image">
 <img src="../dia/qvd-network.png" alt="scaledwidth=75%" />
@@ -652,13 +652,13 @@ QVD-VMA (Virtual Machine Agent)
 <div class="paragraph"><p>The NICs for each VM are tap intefaces. Those will be briged to a specific physichal NIC of the node. So the VMs will be at the same network that the nodes.</p></div>
 <div class="paragraph"><p>The bridge <strong>MUST</strong> exist before HKD is running and it <strong>MUST</strong> be created manually, by defaul the bridge&#8217;s name will be qvdnet0.</p></div>
 <div class="paragraph"><p>Tap interfaces will be created by HKD and for the kvm perspective they will be passed as file descriptor 3.</p></div>
-<h4 id="_vm_8217_s_ip_addresses">VM&#8217;s IP Addresses</h4>
+<h4 id="_vm_8217_s_ip_addresses">2.2.1. VM&#8217;s IP Addresses</h4>
 <div class="paragraph"><p>The IP address for each VM is fixed at the vm creation and cannot be modified after that. The assigantion is implemented at the QVD/Admin.pm.
 Each VM ask for his IP via DHCP, each node runs a DHCP server managed by the HKD that just assigns static IP address.
 The DHCP server is configured to assign IP to <strong>ALL</strong> the vm&#8217;s in the cluster, inluded those that run in another node or they are not in execution.</p></div>
-<h4 id="_mac_address_for_vm_8217_s">MAC Address for VM&#8217;s.</h4>
+<h4 id="_mac_address_for_vm_8217_s">2.2.2. MAC Address for VM&#8217;s.</h4>
 <div class="paragraph"><p>The HKD calculates the MAC address for each VM from the IP address that each VM has assigned, thus the IP address is A.B.C.D is ralated to MAC 54:52:00:B:C:D (with its corresponding hexadecimal conversion).</p></div>
-<h4 id="_firewall">Firewall</h4>
+<h4 id="_firewall">2.2.3. Firewall</h4>
 <div class="paragraph"><p>QVD uses two complementing firewalls, iptables and ebtables, the reason is have a firewall at bridge level ebtables and iptables at node level.</p></div>
 <div class="listingblock">
 <div class="content">
@@ -670,13 +670,56 @@ The DHCP server is configured to assign IP to <strong>ALL</strong> the vm&#8217;
  * ebtables QVD_INPUT_$tap -p 0x800 --ip-protocol 17 --ip-source 0.0.0.0 --ip-destination-port = 67 -j ACCEPT
  * ebtables QVD_INPUT_$tap -p 0x800 --ip-source ! $ip -j DROP</tt></pre>
 </div></div>
+<div class="paragraph"><p>At Node Level these are the rules that QVD aplies</p></div>
+<h4 id="_alternative_configuration">2.2.4. Alternative Configuration</h4>
+<div class="paragraph"><p>There is another way that QVD allows, This is to use the QVD-L7R as standalone frontend. In large nodes farms, could be convenient use the L7R as frontend between the loadbalancer and the nodes. The L7R accepts the connection and forward it to another its corresponding L7R in the node where the Virtual Machine is running.</p></div>
+<div class="admonitionblock">
+<table><tr>
+<td class="icon">
+<img src="../images/icons/note.png" alt="Note" />
+</td>
+<td class="content">A loadbalancer is still needed to get a unique IP address where all the clients connect.</td>
+</tr></table>
+</div>
+<div class="paragraph"><p>The following diagram represents this configuration</p></div>
+<div class="paragraph"><p><span class="image">
+<img src="../dia/qvd-network-alt.png" alt="width=300" />
+</span></p></div>
+<h3 id="_storage_architecture">2.3. Storage Architecture</h3><div style="clear:left"></div>
+<h4 id="_overlays_and_osis">2.3.1. Overlays and OSIS</h4>
+<div class="paragraph"><p>And overlay is an hard disk image that stores the disk changes in an external file, instead to the proper disk image. As we are talking obout enviroments with hundreds or thousands of users, is a good idea create a template that stores the information that sets of users have in common and the changes in the operating systems, (logs principally), were stored in the overlay, saving lots of disk space.
+Therefore in QVD, every vm is composed by at least two parts, an OSI, that is common for all the users with similar characteristiques and an overlay, that contains all the information that the virtual machine modifies itself.</p></div>
+<div class="admonitionblock">
+<table><tr>
+<td class="icon">
+<img src="../images/icons/note.png" alt="Note" />
+</td>
+<td class="content">OSIS have just read only access.</td>
+</tr></table>
+</div>
+<div class="admonitionblock">
+<table><tr>
+<td class="icon">
+<img src="../images/icons/note.png" alt="Note" />
+</td>
+<td class="content">Overlays can be persistents or not, by default they are not.</td>
+</tr></table>
+</div>
+<div class="admonitionblock">
+<table><tr>
+<td class="icon">
+<img src="../images/icons/tip.png" alt="Tip" />
+</td>
+<td class="content">The user information should not be stored in the overlay, if not external storage is disposed to store the user&#8217;s data an additional disk can be enabled at the osi creation time, to allow users keep their data in its home directory.</td>
+</tr></table>
+</div>
 </div>
 </div>
 <div id="footnotes"><hr /></div>
 <div id="footer">
 <div id="footer-text">
 Version 1.0<br />
-Last updated 2010-12-09 13:57:00 CEST
+Last updated 2010-12-09 18:10:24 CEST
 </div>
 </div>
 </body>
