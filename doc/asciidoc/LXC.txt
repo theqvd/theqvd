@@ -1,0 +1,145 @@
+Linux Containers
+================
+David Serrano
+v0.1, Jan 2011
+
+Setup
+-----
+
+Installing lxc
+~~~~~~~~~~~~~~
+
+Just run as root:
+
+----
+# apt-get install lxc
+----
+
+Then check that the needed kernel compilation options are in place:
+
+----
+$ lxc-checkconfig 
+Kernel config /proc/config.gz not found, looking in other places...
+Found kernel config file /boot/config-2.6.32-27-generic
+--- Namespaces ---
+Namespaces: enabled
+Utsname namespace: enabled
+Ipc namespace: enabled
+Pid namespace: enabled
+User namespace: enabled
+Network namespace: enabled
+Multiple /dev/pts instances: enabled
+
+--- Control groups ---
+Cgroup: enabled
+Cgroup namespace: enabled
+Cgroup device: enabled
+Cgroup sched: enabled
+Cgroup cpu account: enabled
+Cgroup memory controller: enabled
+Cgroup cpuset: enabled
+
+--- Misc ---
+Veth pair device: enabled
+Macvlan: enabled
+Vlan: enabled
+File capabilities: enabled
+----
+
+Setting up a network bridge
+~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+In this example, we replace eth1, which has IP 10.1.0.101, with a bridge:
+
+----
+#auto eth1
+#iface eth1 inet static
+# ...
+
+auto br0
+iface br0 inet static
+    address 10.1.0.101
+    netmask 255.255.255.0
+    gateway 10.1.0.1
+    bridge_ports eth1
+    bridge_fd 0
+----
+
+Creating a new container
+~~~~~~~~~~~~~~~~~~~~~~~~
+
+General layout
+^^^^^^^^^^^^^^
+  /somewhere
+    \_ container1.conf
+    \_ container2.conf
+    \_ container1
+    |    \_ bin
+    |    \_ dev
+    |    \_ etc
+    |    \_ ...
+    \_ container2
+         \_ bin
+         \_ dev
+         \_ etc
+         \_ ...
+
+Configuration file
+^^^^^^^^^^^^^^^^^^
+----
+lxc.utsname = qvdimg
+lxc.tty = 4
+lxc.network.type = veth
+lxc.network.flags = up
+lxc.network.link = br0
+lxc.network.name = eth1
+lxc.network.mtu = 1500
+lxc.network.hwaddr = 54:52:00:42:42:42
+lxc.network.ipv4 = 0.0.0.0
+lxc.rootfs = /home/qvd/cont/qvdimg/root
+lxc.cgroup.devices.deny = a
+# /dev/null and zero
+lxc.cgroup.devices.allow = c 1:3 rwm
+lxc.cgroup.devices.allow = c 1:5 rwm
+# consoles
+lxc.cgroup.devices.allow = c 5:1 rwm
+lxc.cgroup.devices.allow = c 5:0 rwm
+lxc.cgroup.devices.allow = c 4:0 rwm
+lxc.cgroup.devices.allow = c 4:1 rwm
+# /dev/{,u}random
+lxc.cgroup.devices.allow = c 1:9 rwm
+lxc.cgroup.devices.allow = c 1:8 rwm
+# /dev/pts/* - pts namespaces are "coming soon"
+lxc.cgroup.devices.allow = c 136:* rwm
+lxc.cgroup.devices.allow = c 5:2 rwm
+# rtc
+lxc.cgroup.devices.allow = c 254:0 rwm
+----
+
+  - 'lxc.utsname' specifies the hostname of the container.
+  - 'lxc.network.type' introduces a new network interface inside the container. Everytime it appears in the configuration, a new interface is configured.
+  - 'lxc.network.link' refers to the bridge we just configured earlier.
+  - 'lxc.network.name' is the name that this network interface will have inside the container. Can be virtually any string.
+  - 'lxc.network.hwaddr' is needed for DHCP, not needed otherwise.
+  - 'lxc.network.ipv4' can be 0.0.0.0 if DHCP is going to be used.
+
+Modifications to the container filesystem
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+  /dev
+  /etc/hostname
+  /etc/hosts
+  /etc/fstab
+  init scripts (/etc/init in Ubuntu)
+    - remove
+    - add lxc
+    - modify rc-sysinit to start on startup
+
+
+Usage
+-----
+  - 'lxc-create' creates the container, which isn't more than a data structure.
+  - 'lxc-start' brings the container up.
+  - 'lxc-console' connects to one of the container's ttys.
+  - 'lxc-ps' shows processes running inside the container.
+  - 'lxc-stop' kills all processes in the container.
+  - 'lxc-destroy' just removes the data structure.
