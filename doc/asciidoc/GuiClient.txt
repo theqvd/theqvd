@@ -11,10 +11,53 @@ The GUI Client lets you start a session of your virtual machine in a remote serv
 Usage
 -----
 
+Installation
+~~~~~~~~~~~~
+
+Linux
+^^^^^
+
+On Linux systems to install on Ubuntu distros you need add qvd's repository, to do that edit as root your '/etc/apt/sources.list' and add
+
+....
+deb http://qvd.qindel.com/debian lucid main
+....
+
+Once this step is done you need update the apt cache 
+
+....
+
+sudo apt-get update
+
+....
+
+And install the qvd-client
+
+....
+
+apt-get install qvd-client
+
+....
+
+
+Windows
+^^^^^^^
+
+For Windows XP just run the setup program and follow the screen structions. 
+
+Runnin the client
+-----------------
+
+Linux
+~~~~~
+
+Ubuntu
+^^^^^^
+
 Run the client:
 
 ----
-QVD-Client/bin/qvd-gui-client.pl
+/usr/bin/qvd-gui-client.pl
 ----
 
 You should get a screen like this: 
@@ -23,6 +66,13 @@ You should get a screen like this:
 image:../images/GUI_login.png[alt="login"]
 
 Populate the "User", "Password" and "Server" fields, click "Connect" and you are done. After a little load you get a window with your remote desktop inside.
+
+Also you'll find and access via Menu-->Applications-->Internet-->QVD Client.
+
+Windows XP
+^^^^^^^^^^
+
+On XP systems you'll find and access under Start->Program Files->QVD->Qvd Client. Click it and follow the same instructions that under Linux systems. 
 
 Troubleshooting
 ---------------
@@ -47,6 +97,7 @@ This messages occurs when exists communication between client and server but the
       QVD-Admin/bin/qvd-admin.pl user list
 ----
     * If you are using LDAP authentication verify user and password in your LDAP server. 
+
 
 Unable to print in WindowsXP Pro
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
