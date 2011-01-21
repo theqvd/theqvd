@@ -617,7 +617,7 @@ iface br0 inet static
 </div></div>
 <h3 id="_creating_a_new_container">1.3. Creating a new container</h3><div style="clear:left"></div>
 <h4 id="_general_layout">1.3.1. General layout</h4>
-<div class="literalblock">
+<div class="listingblock">
 <div class="content">
 <pre><tt>/somewhere
   \_ container1.conf
@@ -697,16 +697,99 @@ lxc.cgroup.devices.allow = c 254:0 rwm</tt></pre>
 </li>
 </ul></div>
 <h3 id="_modifications_to_the_container_filesystem">1.4. Modifications to the container filesystem</h3><div style="clear:left"></div>
-<div class="literalblock">
+<h4 id="_dev">1.4.1. /dev</h4>
+<div class="paragraph"><p>Only the minimum set of devices should exist under /dev. The daemon udev doesn&#8217;t work under LXC, so the /dev management has to be done by hand. Following is a set of shell commands needed to create these devices. They assume that the root filesystem path is specified by the shell variable $ROOTFS, <strong>make sure</strong> this is the case, or the system&#8217;s /dev will be wiped clean!</p></div>
+<div class="listingblock">
 <div class="content">
-<pre><tt>/dev
-/etc/hostname
-/etc/hosts
-/etc/fstab
-init scripts (/etc/init in Ubuntu)
-  - remove
-  - add lxc
-  - modify rc-sysinit to start on startup</tt></pre>
+<pre><tt>echo $ROOTFS
+rm -rf $ROOTFS/dev
+mkdir $ROOTFS/dev
+mkdir -m 755 $ROOTFS/dev/pts
+mkdir -m 1777 $ROOTFS/dev/shm
+mknod -m 600 $ROOTFS/dev/console c 5 1
+mknod -m 666 $ROOTFS/dev/full c 1 7
+mknod -m 600 $ROOTFS/dev/initctl p
+mknod -m 666 $ROOTFS/dev/null c 1 3
+mknod -m 666 $ROOTFS/dev/ptmx c 5 2
+mknod -m 666 $ROOTFS/dev/random c 1 8
+mknod -m 666 $ROOTFS/dev/tty c 5 0
+mknod -m 666 $ROOTFS/dev/tty0 c 4 0
+mknod -m 666 $ROOTFS/dev/tty1 c 4 1
+mknod -m 666 $ROOTFS/dev/tty2 c 4 2
+mknod -m 666 $ROOTFS/dev/tty3 c 4 3
+mknod -m 666 $ROOTFS/dev/tty4 c 4 4
+mknod -m 666 $ROOTFS/dev/urandom c 1 9
+mknod -m 666 $ROOTFS/dev/zero c 1 5</tt></pre>
+</div></div>
+<h4 id="_etc_hostname_and_etc_hosts">1.4.2. /etc/hostname and /etc/hosts</h4>
+<div class="paragraph"><p>The container&#8217;s hostname must be placed in these files.</p></div>
+<h4 id="_etc_fstab">1.4.3. /etc/fstab</h4>
+<div class="paragraph"><p>(Hmmm, I&#8217;ve read something about fstab but it seems the QVD container works fine without performing any tasks in this regard - dserrano)</p></div>
+<h4 id="_init_scripts_etc_init_in_ubuntu">1.4.4. init scripts (/etc/init in Ubuntu)</h4>
+<div class="paragraph"><p>Most init scripts should be removed since they deal with daemons not needed (or even inconvenient) inside a container. For example, everything hardware-related (ACPI, ALSA, avahi, clock, IRQs, udev) must be moved out of the way. What I did is place them in $ROOTFS/etc/init.moved instead of deleting them. This is what was left:</p></div>
+<div class="paragraph"><p>(TODO: I&#8217;m not sure about dbus - dserrano)</p></div>
+<div class="paragraph"><p>(TODO: I think mountall.conf and friends can be included in some particular cases - dserrano)</p></div>
+<div class="listingblock">
+<div class="content">
+<pre><tt>anacron.conf
+atd.conf
+cron.conf
+dmesg.conf
+hostname.conf
+networking.conf
+rc.conf
+rc-sysinit.conf
+rsyslog.conf
+ssh.conf
+tty1.conf
+tty2.conf
+tty3.conf
+ufw.conf</tt></pre>
+</div></div>
+<div class="paragraph"><p>Note the absence of pretty basic stuff like rcS for example. It&#8217;s actually not needed. Another item worth mentioning is ttyS0.conf. Since it deals directly with the hardware, it shouldn&#8217;t run inside a container.</p></div>
+<div class="paragraph"><p>After the cleanup, create a small script, lxc.conf, with these contents:</p></div>
+<div class="listingblock">
+<div class="content">
+<pre><tt># LXC – Fix init sequence to have LXC containers boot with upstart
+
+# description “Fix LXC container - Lucid”
+
+start on startup
+
+task
+pre-start script
+    mount -t proc proc /proc || true
+    mount -t devpts devpts /dev/pts || true
+    mount -t sysfs sys /sys || true
+    mount -t tmpfs varrun /var/run
+    mount -t tmpfs varlock /var/lock
+    mkdir -p /var/run/network
+    touch /var/run/utmp
+    chmod 664 /var/run/utmp
+    chown root.utmp /var/run/utmp
+    if [ "$(find /etc/network/ -name upstart -type f)" ]; then
+        chmod -x /etc/network/*/upstart || true
+    fi
+end script
+
+script
+    start networking
+    initctl emit filesystem --no-wait
+    initctl emit local-filesystems --no-wait
+    initctl emit virtual-filesystems --no-wait
+    init 2
+end script</tt></pre>
+</div></div>
+<div class="paragraph"><p>(TODO: I guess the pre-start script could be dealt with elsewhere - dserrano)</p></div>
+<div class="paragraph"><p>Lastly, the script rc-sysinit.conf must be modified to run after system startup event, instead of waiting to the filesystem event. Modify the line that begins with "start on" so it reads like:</p></div>
+<div class="listingblock">
+<div class="content">
+<pre><tt>start on startup</tt></pre>
+</div></div>
+<div class="paragraph"><p>A quick sed oneliner can do this (use at your own risk):</p></div>
+<div class="listingblock">
+<div class="content">
+<pre><tt>sed -i -e '/^start on/s/\(start on\) .*/\1 startup/' /tmp/rc-sysinit.conf</tt></pre>
 </div></div>
 </div>
 <h2 id="_usage">2. Usage</h2>
@@ -714,33 +797,66 @@ init scripts (/etc/init in Ubuntu)
 <div class="ulist"><ul>
 <li>
 <p>
-<em>lxc-create</em> creates the container, which isn&#8217;t more than a data structure
+<em>lxc-create</em> creates the container, which isn&#8217;t more than a data structure.
 </p>
+<div class="literalblock">
+<div class="content">
+<pre><tt>lxc-create -n name -f /path/to/config-file</tt></pre>
+</div></div>
 </li>
 <li>
 <p>
-<em>lxc-start</em> brings the container up
+<em>lxc-ls</em> lists the existing containers.
 </p>
+<div class="literalblock">
+<div class="content">
+<pre><tt>lxc-ls</tt></pre>
+</div></div>
 </li>
 <li>
 <p>
-<em>lxc-console</em> connects to one of the container&#8217;s ttys
+<em>lxc-start</em> brings the container up.
 </p>
+<div class="literalblock">
+<div class="content">
+<pre><tt>lxc-start -n name</tt></pre>
+</div></div>
 </li>
 <li>
 <p>
-<em>lxc-ps</em> shows processes running inside the container
+<em>lxc-console</em> connects to one of the container&#8217;s ttys.
 </p>
+<div class="literalblock">
+<div class="content">
+<pre><tt>lxc-console -n name -t 1   ## connects to tty1</tt></pre>
+</div></div>
 </li>
 <li>
 <p>
-<em>lxc-stop</em> kills all processes in the container
+<em>lxc-ps</em> shows processes running inside the container.
 </p>
+<div class="literalblock">
+<div class="content">
+<pre><tt>lxc-ps -n name</tt></pre>
+</div></div>
 </li>
 <li>
 <p>
-<em>lxc-destroy</em> just removes the data structure
+<em>lxc-stop</em> kills all processes in the container, effectively stopping it.
 </p>
+<div class="literalblock">
+<div class="content">
+<pre><tt>lxc-stop -n name</tt></pre>
+</div></div>
+</li>
+<li>
+<p>
+<em>lxc-destroy</em> just removes the data structure.
+</p>
+<div class="literalblock">
+<div class="content">
+<pre><tt>lxc-destroy -n name</tt></pre>
+</div></div>
 </li>
 </ul></div>
 </div>
@@ -749,7 +865,7 @@ init scripts (/etc/init in Ubuntu)
 <div id="footer">
 <div id="footer-text">
 Version 0.1<br />
-Last updated 2011-01-20 18:03:36 CEST
+Last updated 2011-01-21 12:36:12 CEST
 </div>
 </div>
 </body>

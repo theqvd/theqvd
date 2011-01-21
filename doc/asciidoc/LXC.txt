@@ -70,19 +70,21 @@ Creating a new container
 
 General layout
 ^^^^^^^^^^^^^^
-  /somewhere
-    \_ container1.conf
-    \_ container2.conf
-    \_ container1
-    |    \_ bin
-    |    \_ dev
-    |    \_ etc
-    |    \_ ...
-    \_ container2
-         \_ bin
-         \_ dev
-         \_ etc
-         \_ ...
+----
+/somewhere
+  \_ container1.conf
+  \_ container2.conf
+  \_ container1
+  |    \_ bin
+  |    \_ dev
+  |    \_ etc
+  |    \_ ...
+  \_ container2
+       \_ bin
+       \_ dev
+       \_ etc
+       \_ ...
+----
 
 Configuration file
 ^^^^^^^^^^^^^^^^^^
@@ -125,21 +127,145 @@ lxc.cgroup.devices.allow = c 254:0 rwm
 
 Modifications to the container filesystem
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-  /dev
-  /etc/hostname
-  /etc/hosts
-  /etc/fstab
-  init scripts (/etc/init in Ubuntu)
-    - remove
-    - add lxc
-    - modify rc-sysinit to start on startup
+
+/dev
+^^^^
+Only the minimum set of devices should exist under /dev. The daemon udev doesn't work under LXC, so the /dev management has to be done by hand. Following is a set of shell commands needed to create these devices. They assume that the root filesystem path is specified by the shell variable $ROOTFS, *make sure* this is the case, or the system's /dev will be wiped clean!
+
+----
+echo $ROOTFS
+rm -rf $ROOTFS/dev
+mkdir $ROOTFS/dev
+mkdir -m 755 $ROOTFS/dev/pts
+mkdir -m 1777 $ROOTFS/dev/shm 
+mknod -m 600 $ROOTFS/dev/console c 5 1
+mknod -m 666 $ROOTFS/dev/full c 1 7
+mknod -m 600 $ROOTFS/dev/initctl p
+mknod -m 666 $ROOTFS/dev/null c 1 3 
+mknod -m 666 $ROOTFS/dev/ptmx c 5 2
+mknod -m 666 $ROOTFS/dev/random c 1 8
+mknod -m 666 $ROOTFS/dev/tty c 5 0
+mknod -m 666 $ROOTFS/dev/tty0 c 4 0
+mknod -m 666 $ROOTFS/dev/tty1 c 4 1
+mknod -m 666 $ROOTFS/dev/tty2 c 4 2
+mknod -m 666 $ROOTFS/dev/tty3 c 4 3
+mknod -m 666 $ROOTFS/dev/tty4 c 4 4
+mknod -m 666 $ROOTFS/dev/urandom c 1 9
+mknod -m 666 $ROOTFS/dev/zero c 1 5
+----
+
+/etc/hostname and /etc/hosts
+^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+The container's hostname must be placed in these files.
+
+/etc/fstab
+^^^^^^^^^^
+(Hmmm, I've read something about fstab but it seems the QVD container works fine without performing any tasks in this regard - dserrano)
+
+init scripts (/etc/init in Ubuntu)
+^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+Most init scripts should be removed since they deal with daemons not needed (or even inconvenient) inside a container. For example, everything hardware-related (ACPI, ALSA, avahi, clock, IRQs, udev) must be moved out of the way. What I did is place them in $ROOTFS/etc/init.moved instead of deleting them. This is what was left:
+
+(TODO: I'm not sure about dbus - dserrano)
+
+(TODO: I think mountall.conf and friends can be included in some particular cases - dserrano)
+
+----
+anacron.conf
+atd.conf
+cron.conf
+dmesg.conf
+hostname.conf
+networking.conf
+rc.conf
+rc-sysinit.conf
+rsyslog.conf
+ssh.conf
+tty1.conf
+tty2.conf
+tty3.conf
+ufw.conf
+----
+
+Note the absence of pretty basic stuff like rcS for example. It's actually not needed. Another item worth mentioning is ttyS0.conf. Since it deals directly with the hardware, it shouldn't run inside a container.
+
+After the cleanup, create a small script, lxc.conf, with these contents:
+
+----
+# LXC – Fix init sequence to have LXC containers boot with upstart
+
+# description “Fix LXC container - Lucid”
+
+start on startup
+
+task
+pre-start script
+    mount -t proc proc /proc || true
+    mount -t devpts devpts /dev/pts || true
+    mount -t sysfs sys /sys || true
+    mount -t tmpfs varrun /var/run
+    mount -t tmpfs varlock /var/lock
+    mkdir -p /var/run/network
+    touch /var/run/utmp
+    chmod 664 /var/run/utmp
+    chown root.utmp /var/run/utmp
+    if [ "$(find /etc/network/ -name upstart -type f)" ]; then
+        chmod -x /etc/network/*/upstart || true
+    fi
+end script
+
+script
+    start networking
+    initctl emit filesystem --no-wait
+    initctl emit local-filesystems --no-wait
+    initctl emit virtual-filesystems --no-wait
+    init 2
+end script
+----
+
+(TODO: I guess the pre-start script could be dealt with elsewhere - dserrano)
+
+Lastly, the script rc-sysinit.conf must be modified to run after system startup event, instead of waiting to the filesystem event. Modify the line that begins with "start on" so it reads like:
+
+----
+start on startup
+----
+
+A quick sed oneliner can do this (use at your own risk):
+
+----
+sed -i -e '/^start on/s/\(start on\) .*/\1 startup/' /tmp/rc-sysinit.conf
+----
 
 
 Usage
 -----
   - 'lxc-create' creates the container, which isn't more than a data structure.
+
+    lxc-create -n name -f /path/to/config-file
+
+  - 'lxc-ls' lists the existing containers.
+
+    lxc-ls
+
   - 'lxc-start' brings the container up.
+
+    lxc-start -n name
+    lxc-start -n name -d                   ## suppress output
+    lxc-start -n name -d -o /tmp/lxc.log   ## send output to a log file
+
   - 'lxc-console' connects to one of the container's ttys.
+
+    lxc-console -n name -t 1   ## connects to tty1
+
   - 'lxc-ps' shows processes running inside the container.
-  - 'lxc-stop' kills all processes in the container.
+
+    lxc-ps -n name
+
+  - 'lxc-stop' kills all processes in the container, effectively stopping it.
+
+    lxc-stop -n name
+
   - 'lxc-destroy' just removes the data structure.
+
+    lxc-destroy -n name
