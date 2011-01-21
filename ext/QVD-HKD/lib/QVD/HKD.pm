@@ -5,6 +5,7 @@ use strict;
 
 use feature 'switch';
 use QVD::Config;
+use QVD::Config::Network qw(nettop_n netstart_n network_n net_ntoa);
 use QVD::Log;
 use QVD::DB::Simple;
 use QVD::ParallelNet;
@@ -135,6 +136,7 @@ sub run {
 		$hkd->_check_l7rs;
                 $hkd->_update_load_balancing_data;
                 $hkd->_check_hkd_cluster;
+                $hkd->_set_global_fw_rules;
 	    };
             ERROR $@ if $@;
 	    sleep $pool_time;
@@ -902,6 +904,48 @@ sub _vm_fw_rules {
              [FORWARD => -p => '0x800', '--ip-protocol' => '17',   # do not let DHCP traffic leave the host
                                         '--ip-destination-port' => '67', -j => 'DROP'],
              [INPUT   => -p => '0x800', '--ip-source' => '!', $vm_ip, -j => 'DROP'] );
+}
+
+sub _global_fw_rules {
+    my $hkd = shift;
+    my $netnodes = netnodes;
+    my $netvms = netvms;
+
+    (FORWARD => [ ['-m' => 'iprange', '--src-range' => $netvms, '--dst-range' => $netnodes, '-p' => 'tcp', '--syn', 'FORBID'],
+                  ['-m' => 'iprange', '--src-range' => $netvms, '--dst-range' => $netnodes, '-p' => 'tcp', 'ALLOW'],
+                  ['-m' => 'iprange', '--src-range' => $netvms, '--dst-range' => $netnodes, 'FORBID'] # disallow non-tcp protocols.
+                ],
+     INPUT =>   [ ['-m' => 'iprange', '--src-range' => $netvms, '-p' => 'tcp', '--syn', 'FORBID'],
+                  ['-m' => 'iprange', '--src-range' => $netvms, '-p' => 'tcp', 'ALLOW'],
+                  ['-m' => 'iprange', '--src-range' => $netvms, '-p' => 'udp', '-m' => 'multiport', '--dports' => '67,53', 'ALLOW'], # allow DHCP and DNS queries to dnsmasq
+                  ['-m' => 'iprange', '--src-range' => $netvms, 'FORBID'] # disallow non-tcp protocols
+                ]
+    );
+}
+
+sub _clean_global_fw_rules {
+    my $hkd = shift;
+    my @current = `iptables -S`;
+    chomp @current;
+    for my $current (grep /^-A\s.*QVD Rule/, @current) {
+        my $del = $current;
+        $del =~ s/^-A/-D/;
+        system "iptables $del"
+            and ERROR "unable to remove firewall rule, command failed with rc: ".($? >> 8). ", cmd: iptables $del";
+    }
+}
+
+sub _set_global_fw_rules {
+    my $hkd = shift;
+    my %rules = $hkd->_global_fw_rules;
+    $hkd->_clean_global_fw_rules;
+    for my $chain (keys %rules) {
+        for my $rule (@{$rules{$chain}}) {
+            my @cmd = (iptables => -A => $chain, -m => 'comment', '--comment', 'QVD Rule', @$rule);
+            system @cmd
+                and ERROR "global fw rule failed with rc: ".($? >> 8). ", cmd: @cmd";
+        }
+    }
 }
 
 1;
