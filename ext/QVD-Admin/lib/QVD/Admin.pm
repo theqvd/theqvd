@@ -10,6 +10,7 @@ use File::Basename qw(basename);
 
 use QVD::DB::Simple;
 use QVD::Config;
+use QVD::Config::Network qw(nettop_n netstart_n net_aton net_ntoa);
 use QVD::Log;
 
 my $osi_default_memory  = cfg('osi.default.memory');
@@ -172,16 +173,12 @@ sub _lenton {
 }
 
 sub _get_free_ip {
-    my $netmask_txt = cfg('vm.network.netmask');
-    my $start_txt = cfg('vm.network.ip.start');
-    my $start = _aton($start_txt);
-    my $netmask = ($netmask_txt =~ /^\d+$/ ? _lenton($netmask_txt) : _aton($netmask_txt));
-    my $net = $start & $netmask;
-    my $top = $start | (0xffffffff & ~$netmask);
+    my $nettop = nettop_n;
+    my $netstart = netstart_n;
 
-    my %ips = map { _aton($_) => 1 } rs(VM)->get_column('ip')->all;
-    while ($top-- > $start) {
-        return _ntoa($top) unless $ips{$top}
+    my %ips = map { net_aton($_) => 1 } rs(VM)->get_column('ip')->all;
+    while ($nettop-- > $netstart) {
+        return net_ntoa($nettop) unless $ips{$nettop}
     }
     die "No free IP addresses";
 }
