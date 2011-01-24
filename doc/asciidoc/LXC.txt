@@ -99,6 +99,8 @@ lxc.network.mtu = 1500
 lxc.network.hwaddr = 54:52:00:42:42:42
 lxc.network.ipv4 = 0.0.0.0
 lxc.rootfs = /home/qvd/cont/qvdimg/root
+#lxc.mount = /path/to/fstab   ## to mount resources into the container's fs. Example of fstab contents:
+#/home/user554543 /home/qvd/cont/qvdimg/home none bind 0 0
 lxc.cgroup.devices.deny = a
 # /dev/null and zero
 lxc.cgroup.devices.allow = c 1:3 rwm
@@ -254,7 +256,7 @@ Usage
     lxc-start -n name -d                   ## suppress output
     lxc-start -n name -d -o /tmp/lxc.log   ## send output to a log file
 
-  - 'lxc-console' connects to one of the container's ttys.
+  - 'lxc-console' connects to one of the container's ttys. After closing the session, you can get out of lxc-console with the key sequence "C-A q".
 
     lxc-console -n name -t 1   ## connects to tty1
 
