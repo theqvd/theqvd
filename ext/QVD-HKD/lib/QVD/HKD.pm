@@ -914,6 +914,7 @@ sub _global_fw_rules {
     (FORWARD => [ ['-m' => 'iprange', '--src-range' => $netvms, '--dst-range' => $netnodes, '-p' => 'tcp', '--syn', 'FORBID'],
                   ['-m' => 'iprange', '--src-range' => $netvms, '--dst-range' => $netnodes, '-p' => 'tcp', 'ALLOW'],
                   ['-m' => 'iprange', '--src-range' => $netvms, '--dst-range' => $netnodes, 'FORBID'] # disallow non-tcp protocols.
+                  ['-m' => 'iprange', '--src-range' => $netvms, '--dst-range' => $netvms, 'FORBID'] # forwid traffic between virtual machines
                 ],
      INPUT =>   [ ['-m' => 'iprange', '--src-range' => $netvms, '-p' => 'tcp', '--syn', 'FORBID'],
                   ['-m' => 'iprange', '--src-range' => $netvms, '-p' => 'tcp', 'ALLOW'],
