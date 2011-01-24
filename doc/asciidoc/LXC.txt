@@ -99,8 +99,8 @@ lxc.network.mtu = 1500
 lxc.network.hwaddr = 54:52:00:42:42:42
 lxc.network.ipv4 = 0.0.0.0
 lxc.rootfs = /home/qvd/cont/qvdimg/root
-#lxc.mount = /path/to/fstab   ## to mount resources into the container's fs. Example of fstab contents:
-#/home/user554543 /home/qvd/cont/qvdimg/home none bind 0 0
+#lxc.mount.entry = /home/user554543 /home/qvd/cont/qvdimg/home none bind 0 0
+#lxc.mount = /path/to/some/specific/fstab
 lxc.cgroup.devices.deny = a
 # /dev/null and zero
 lxc.cgroup.devices.allow = c 1:3 rwm
