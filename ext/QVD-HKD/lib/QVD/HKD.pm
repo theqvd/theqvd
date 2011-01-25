@@ -5,7 +5,7 @@ use strict;
 
 use feature 'switch';
 use QVD::Config;
-use QVD::Config::Network qw(nettop_n netstart_n network_n net_ntoa);
+use QVD::Config::Network qw(nettop_n netstart_n network_n net_ntoa netnodes netvms);
 use QVD::Log;
 use QVD::DB::Simple;
 use QVD::ParallelNet;
@@ -125,6 +125,7 @@ sub run {
 	    }
 	    if ($hkd->{stopping}) {
                 if (eval { $hrt->vms->count == 0 }) {
+                    $hkd->_clean_global_fw_rules;
 		    $hrt->set_state('stopped');
 		    INFO "HKD stopped";
 		    return;
@@ -136,7 +137,6 @@ sub run {
 		$hkd->_check_l7rs;
                 $hkd->_update_load_balancing_data;
                 $hkd->_check_hkd_cluster;
-                $hkd->_set_global_fw_rules;
 	    };
             ERROR $@ if $@;
 	    sleep $pool_time;
@@ -200,6 +200,7 @@ sub _startup {
     $hkd->{id} = $hrt->id;
     $hrt->set_state('starting');
     $hkd->_check_bridge;
+    $hkd->_set_global_fw_rules;
     $hkd->_regenerate_dhcpd_config;
     $hkd->_start_dhcpd;
     $hkd->_reattach_vms($vm_pids);
@@ -787,7 +788,7 @@ sub _vm_user_storage_path {
 
 sub _start_dhcpd {
     my $hkd = shift;
-    my ($f, $l) = split /,/, $dhcp_range;
+    my ($f, $l) = split /,/, $dhcp_start;
     $hkd->_call_noded(start_dhcpd => 'dnsmasq',
 		                     '-k',
 		                     '--log-dhcp',
@@ -911,21 +912,22 @@ sub _global_fw_rules {
     my $netnodes = netnodes;
     my $netvms = netvms;
 
-    (FORWARD => [ ['-m' => 'iprange', '--src-range' => $netvms, '--dst-range' => $netnodes, '-p' => 'tcp', '--syn', 'FORBID'],
-                  ['-m' => 'iprange', '--src-range' => $netvms, '--dst-range' => $netnodes, '-p' => 'tcp', 'ALLOW'],
-                  ['-m' => 'iprange', '--src-range' => $netvms, '--dst-range' => $netnodes, 'FORBID'] # disallow non-tcp protocols.
-                  ['-m' => 'iprange', '--src-range' => $netvms, '--dst-range' => $netvms, 'FORBID'] # forbid traffic between virtual machines
+    (FORWARD => [ ['-m' => 'iprange', '--src-range' => $netvms, '--dst-range' => $netnodes, '-p' => 'tcp', '--syn', '-j' => 'DROP'],
+                  ['-m' => 'iprange', '--src-range' => $netvms, '--dst-range' => $netnodes, '-p' => 'tcp', '-j', 'ACCEPT'],
+                  ['-m' => 'iprange', '--src-range' => $netvms, '--dst-range' => $netnodes, '-j', 'DROP'], # disallow non-tcp protocols.
+                  ['-m' => 'iprange', '--src-range' => $netvms, '--dst-range' => $netvms, '-j', 'DROP'] # forbid traffic between virtual machines
                 ],
-     INPUT =>   [ ['-m' => 'iprange', '--src-range' => $netvms, '-p' => 'tcp', '--syn', 'FORBID'],
-                  ['-m' => 'iprange', '--src-range' => $netvms, '-p' => 'tcp', 'ALLOW'],
-                  ['-m' => 'iprange', '--src-range' => $netvms, '-p' => 'udp', '-m' => 'multiport', '--dports' => '67,53', 'ALLOW'], # allow DHCP and DNS queries to dnsmasq
-                  ['-m' => 'iprange', '--src-range' => $netvms, 'FORBID'] # disallow non-tcp protocols
+     INPUT =>   [ ['-m' => 'iprange', '--src-range' => $netvms, '-p' => 'tcp', '--syn', '-j', 'DROP'],
+                  ['-m' => 'iprange', '--src-range' => $netvms, '-p' => 'tcp', '-j', 'ACCEPT'],
+                  ['-m' => 'iprange', '--src-range' => $netvms, '-p' => 'udp', '-m' => 'multiport', '--dports' => '67,53', '-j', 'ACCEPT'], # allow DHCP and DNS queries to dnsmasq
+                  ['-m' => 'iprange', '--src-range' => $netvms, '-j', 'DROP'] # disallow non-tcp protocols
                 ]
     );
 }
 
 sub _clean_global_fw_rules {
     my $hkd = shift;
+    DEBUG "cleaning current global firewall rules";
     my @current = `iptables -S`;
     chomp @current;
     for my $current (grep /^-A\s.*QVD Rule/, @current) {
@@ -934,12 +936,14 @@ sub _clean_global_fw_rules {
         system "iptables $del"
             and ERROR "unable to remove firewall rule, command failed with rc: ".($? >> 8). ", cmd: iptables $del";
     }
+    DEBUG "fw rules clean";
 }
 
 sub _set_global_fw_rules {
     my $hkd = shift;
     my %rules = $hkd->_global_fw_rules;
     $hkd->_clean_global_fw_rules;
+    DEBUG "setting global fw rules";
     for my $chain (keys %rules) {
         for my $rule (@{$rules{$chain}}) {
             my @cmd = (iptables => -A => $chain, -m => 'comment', '--comment', 'QVD Rule', @$rule);
@@ -947,6 +951,7 @@ sub _set_global_fw_rules {
                 and ERROR "global fw rule failed with rc: ".($? >> 8). ", cmd: @cmd";
         }
     }
+    DEBUG "fw rules set";
 }
 
 1;
