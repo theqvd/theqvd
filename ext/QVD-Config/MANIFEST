@@ -3,6 +3,8 @@ MANIFEST
 Makefile.PL
 README
 lib/QVD/Config.pm
+lib/QVD/Config/Defaults.pm
+lib/QVD/Config/Network.pm
 t/00-load.t
 t/pod-coverage.t
 t/pod.t
