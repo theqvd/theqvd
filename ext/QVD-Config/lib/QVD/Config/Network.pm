@@ -4,10 +4,13 @@ use strict;
 use warnings;
 use 5.010;
 
+use QVD::Config;
+
 require Exporter;
 our @ISA = qw(Exporter);
 
-our @EXPORT_OK = qw(netmask_n netstart_n nettop_n network_n netnodes netvms net_aton net_ntoa)
+our @EXPORT_OK = qw(netmask_n netstart_n nettop_n network_n netnodes
+                    netvms net_aton net_ntoa);
 
 sub net_aton { unpack('N', pack('C4', split /\./, shift)) }
 sub net_ntoa { join '.', unpack('C4', pack('N', shift)) }
@@ -49,7 +52,7 @@ sub nettop_n {
     $nettop_n //= do {
         my $ns = netstart_n;
         my $nm = netmask_n;
-        $ns | (0xffffffff & ~$netmask);
+        $ns | (0xffffffff & ~$nm);
     }
 }
 
