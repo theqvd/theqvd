@@ -206,7 +206,7 @@ sub _run {
 
     my @cmd;
     if ($WINDOWS) {
-	push @cmd, $ENV{QVDPATH}."/nxproxy.exe";
+	push @cmd, $ENV{QVDPATH}."/NX/nxproxy.exe";
     } else {
 	push @cmd, "nxproxy";
     }
@@ -236,7 +236,7 @@ sub _run {
     push @cmd, qw(localhost:40);
 
     if ($WINDOWS) {
-	require Win32::Process;
+	use Win32::Process;
 	Win32::Process::Create({}, $cmd[0], "@cmd", 0, 
 	    CREATE_NO_WINDOW|NORMAL_PRIORITY_CLASS, '.');
     } else {
