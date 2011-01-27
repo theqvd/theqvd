@@ -206,7 +206,7 @@ sub _run {
 
     my @cmd;
     if ($WINDOWS) {
-	push @cmd, $ENV{QVDPATH}."/nxproxy.bat";
+	push @cmd, $ENV{QVDPATH}."/nxproxy.exe";
     } else {
 	push @cmd, "nxproxy";
     }
@@ -235,7 +235,13 @@ sub _run {
 
     push @cmd, qw(localhost:40);
 
-    $self->{process} = Proc::Background->new(@cmd);
+    if ($WINDOWS) {
+	require Win32::Process;
+	Win32::Process::Create({}, $cmd[0], "@cmd", 0, 
+	    CREATE_NO_WINDOW|NORMAL_PRIORITY_CLASS, '.');
+    } else {
+	Proc::Background->new(@cmd);
+    }
 
     my $ll = IO::Socket::INET->new(LocalPort => 4040,
 	ReuseAddr => 1,
