@@ -39,5 +39,5 @@ Name: "{group}\QVD Client"; Filename: "{app}\qvd-client.exe"; WorkingDir: "{app}
 Name: "{commondesktop}\QVD Client"; Filename: "{app}\qvd-client.exe"; WorkingDir: "{app}"; Tasks: desktopicon
 
 [Registry]
-Root: HKCU; Subkey: "Environment"; ValueType:string; ValueName:"DISPLAY"; ValueData:"127.0.0.1:0.0"
-Root: HKCU; Subkey: "Environment"; ValueType:string; ValueName:"NX_ROOT"; ValueData:{app}
+Root: HKCU; Subkey: "Environment"; ValueType:string; ValueName:"NX_ROOT"; ValueData:{app}\NX
+                                                                                                            
