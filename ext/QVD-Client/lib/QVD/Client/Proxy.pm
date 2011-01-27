@@ -215,6 +215,8 @@ sub _run {
 
     if ($WINDOWS) {
 	$ENV{'NX_ROOT'} = $ENV{APPDATA}.'/.qvd';
+	(my $cygwin_nx_root = $ENV{NX_ROOT}) =~ tr!:\\!//!;
+	$o{errors} = '/cygdrive/'.$cygwin_nx_root;
 	# Call pulseaudio in Windows
 	Proc::Background->new($ENV{QVDPATH}."/pulseaudio/pulseaudio.exe", "-D", "--high-priority") if $self->{audio};     
     }  
@@ -236,8 +238,10 @@ sub _run {
     push @cmd, qw(localhost:40);
 
     if ($WINDOWS) {
+	my $program = $cmd[0];
+	my $cmdline = join ' ', map("\"$_\"", @cmd);
 	use Win32::Process;
-	Win32::Process::Create({}, $cmd[0], "@cmd", 0, 
+	Win32::Process::Create({}, $program, $cmdline, 0, 
 	    CREATE_NO_WINDOW|NORMAL_PRIORITY_CLASS, '.');
     } else {
 	Proc::Background->new(@cmd);
