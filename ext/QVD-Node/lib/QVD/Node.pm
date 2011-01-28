@@ -38,7 +38,7 @@ sub new {
 
 sub _min {
     my $min;
-    for (@_) { $min = $_ if (!defined $min or $min > $_) }
+    for (grep defined, @_) { $min = $_ if (!defined $min or $min > $_) }
     $min;
 }
 
