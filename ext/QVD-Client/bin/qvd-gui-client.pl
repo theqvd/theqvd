@@ -31,11 +31,11 @@ sub OnInit {
     
     if ($WINDOWS) {
 	my ($volume,$directories,$file) = File::Spec->splitpath(Cwd::realpath($0));
-	$ENV{QVDPATH} = File::Spec->catpath( $volume, $directories);
-	$ENV{DISPLAY} = '127.0.0.1:0';
+	$ENV{QVDPATH} //= File::Spec->catpath( $volume, $directories);
+	$ENV{DISPLAY} //= '127.0.0.1:0';
 	
 	my @cmd;
-	my @opts = ("-multiwindow", "-notrayicon");
+	my @opts = qw(-multiwindow -notrayicon -nowinkill -clipboard +bs -wm);
 	push @cmd, ($ENV{QVDPATH}."/Xming/Xming.exe", @opts);
 
 	Proc::Background->new(@cmd);   
