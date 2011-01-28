@@ -216,7 +216,7 @@ sub _run {
     if ($WINDOWS) {
 	$ENV{'NX_ROOT'} = $ENV{APPDATA}.'/.qvd';
 	(my $cygwin_nx_root = $ENV{NX_ROOT}) =~ tr!:\\!//!;
-	$o{errors} = '/cygdrive/'.$cygwin_nx_root.'/nx-errors.txt';
+	$o{errors} = '/cygdrive/'.$cygwin_nx_root.'/proxy.log';
 	# Call pulseaudio in Windows
 	Proc::Background->new($ENV{QVDPATH}."/pulseaudio/pulseaudio.exe", "-D", "--high-priority") if $self->{audio};     
     }  

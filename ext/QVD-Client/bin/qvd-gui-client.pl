@@ -36,6 +36,7 @@ sub OnInit {
 	
 	my @cmd;
 	my @opts = qw(-multiwindow -notrayicon -nowinkill -clipboard +bs -wm);
+	push @opts, (-logfile => $ENV{APPDATA}.'/.qvd/xserver.log');
 	push @cmd, ($ENV{QVDPATH}."/Xming/Xming.exe", @opts);
 
 	Proc::Background->new(@cmd);   
