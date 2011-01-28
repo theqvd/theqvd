@@ -76,7 +76,7 @@ sub new {
 
 	my ($volume, $directories, $file) = File::Spec->splitpath(File::Spec->rel2abs($0));
 	if ($WINDOWS) {
-	    $logo_image = $ENV{QVDPATH}."/QVD-Client/pixmaps/qvd-logo.png";
+	    $logo_image = $ENV{QVDPATH}."/pixmaps/qvd-logo.png";
 	} else {
 	    $logo_image = "$volume$directories/../pixmaps/qvd-logo.png";
 	    unless (-e $logo_image) {
@@ -139,7 +139,7 @@ sub new {
 	my $icon = Wx::Icon->new();
 	
 	if ($WINDOWS) {
-	    $logo_image = $ENV{QVDPATH}."/QVD-Client/pixmaps/qvd.xpm";
+	    $logo_image = $ENV{QVDPATH}."/pixmaps/qvd.xpm";
 	} else {
 	    $logo_image = "$volume$directories/../pixmaps/qvd.xpm";
 	    unless (-e $logo_image) {
