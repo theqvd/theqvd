@@ -17,6 +17,7 @@ DisableProgramGroupPage=yes
 OutputBaseFilename=qvd-client-setup
 Compression=lzma
 SolidCompression=yes
+SetupIconFile=installer\pixmaps\qvd.ico
 
 [Languages]
 Name: "english"; MessagesFile: "compiler:Default.isl"
@@ -29,7 +30,7 @@ Source: "installer\NX\*"; DestDir: "{app}\NX"; Flags: ignoreversion recursesubdi
 Source: "installer\pulseaudio\*"; DestDir: "{app}\pulseaudio"; Flags: ignoreversion recursesubdirs createallsubdirs
 Source: "installer\system32\*"; DestDir: "{app}"; Flags: ignoreversion recursesubdirs createallsubdirs
 Source: "installer\Xming\*"; DestDir: "{app}\Xming"; Flags: ignoreversion recursesubdirs createallsubdirs
-Source: "installer\QVD-Client\*"; DestDir: "{app}\QVD-Client"; Flags: ignoreversion recursesubdirs createallsubdirs
+Source: "installer\pixmaps\*"; DestDir: "{app}\pixmaps"; Flags: ignoreversion recursesubdirs createallsubdirs
 Source: "installer\qvd-client.exe"; DestDir: "{app}"; Flags: ignoreversion
 ; NOTE: Don't use "Flags: ignoreversion" on any shared system files
 

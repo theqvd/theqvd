@@ -13,7 +13,7 @@ pp -x -gui ^
 -l C:\strawberry\perl\site\lib\auto\Net\SSLeay\libeay32.dll ^
 -l C:\strawberry\perl\site\lib\auto\Net\SSLeay\ssleay32.dll ^
 -l C:\strawberry\perl\site\lib\auto\Crypt\OpenSSL\X509\X509.dll ^
---icon QVD-Client\pixmaps\qvd.ico ^
+--icon pixmaps\qvd.ico ^
 -o qvd-client.exe ^
 ..\..\ext\QVD-Client\bin\qvd-gui-client.pl
 
