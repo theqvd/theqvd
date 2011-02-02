@@ -162,7 +162,7 @@ The container's hostname must be placed in these files.
 
 /etc/fstab
 ^^^^^^^^^^
-(Hmmm, I've read something about fstab but it seems the QVD container works fine without performing any tasks in this regard - dserrano)
+The entries for the root filesystem and the swap must be removed/commented.
 
 init scripts (/etc/init in Ubuntu)
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
@@ -255,10 +255,15 @@ Usage
     lxc-start -n name
     lxc-start -n name -d                   ## suppress output
     lxc-start -n name -d -o /tmp/lxc.log   ## send output to a log file
+    lxc-start -n name -l DEBUG -o $(tty)   ## for debugging
 
   - 'lxc-console' connects to one of the container's ttys. After closing the session, you can get out of lxc-console with the key sequence "C-A q".
 
     lxc-console -n name -t 1   ## connects to tty1
+
+  - 'lxc-info' shows information about the specified container.
+
+    lxc-info -n name
 
   - 'lxc-ps' shows processes running inside the container.
 
