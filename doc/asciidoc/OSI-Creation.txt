@@ -1,9 +1,10 @@
-OSI Creation {qvdversion} 
-=========================
+OSI Creation
+============
 Nicolas Arenas
 v0.2, 18th January 2011 
 :author initials: NA
 :email: nicolas.arenas@qindel.com
+
 
 Requirements
 ------------
@@ -20,8 +21,6 @@ Introduction
 An OSI (Operaqting Sistem Image) is a set composed by two elements, these are a disk image and some parameters as memory, user space, etc. 
 
 The main idea behind an OSI is to use an OSI for each group of users that have applications in common. For example if you have a section of users that use the same applications every day all those users would share the same OSI , in this way if you have to update an application, you will update the OSI and the OSI will be pushed for all the users that share it
-
-
 
 Package installation
 --------------------
@@ -46,7 +45,6 @@ kvm -hda example.img -cdrom ubuntu-10.10-alternate-i386.iso -m 512
 
 
 Now we just do an Ubuntu installation as standard basis, once that the server is installed, we just shutdown the server. When the installation is finished, we need 
-
 
 VMA Installation and configuration
 ----------------------------------
@@ -135,7 +133,6 @@ modem
 
 Further than this parameters the vma can have keys for hooks, this keys are covered in the next section.
 
-
 Hooks
 -----
 
@@ -166,7 +163,6 @@ Scripts can receive by the command line paramentes related to the following enti
   - Parameters supply by the client program. 
 
 Hooks have their own log file, that by default is /var/logs/qvd/qvd-hooks.log in the virtual machine. 
-
 
 Action hooks
 ~~~~~~~~~~~~
@@ -239,7 +235,6 @@ This hook is executed when the virtual machine is shuted down.
 
 There is no additional paramentes for this hook.
 
-
 State hooks
 ~~~~~~~~~~~
 
@@ -267,7 +262,6 @@ stopped
 key: *vma.on_state.disconnected*
 
 This hook executes when the X-Windows session ends.
-
 
 Provisioning hooks
 ~~~~~~~~~~~~~~~~~~

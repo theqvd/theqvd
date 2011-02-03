@@ -1,5 +1,5 @@
-How to install QVD {qvdversion} 
-===============================
+How to install QVD 
+==================
 Santiago Doblas
 v0.1, 9 december 2010
 :author initials: SD
