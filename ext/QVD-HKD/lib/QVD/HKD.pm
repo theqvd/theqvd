@@ -830,14 +830,11 @@ sub _update_load_balancing_data {
     # TODO: move this code into an external module!
     my $meminfo_lines = slurp('/proc/meminfo', array_ref => 1);
     my %meminfo = map { /^([^:]+):\s*(\d+)/; $1 => $2 } @$meminfo_lines;
-    my $usable_ram = min($meminfo{MemFree}, $meminfo{MemTotal}-2*1024*1024);
 
     my $num_vms = $hkd->{host_runtime}->vms->count;
 
-    $hkd->{host_runtime}->update({
-	    usable_cpu => $bogomips - $bogomips_per_vm*$num_vms,
-	    usable_ram => $usable_ram/1000,
-	});
+    $hkd->{host_runtime}->update({ usable_cpu => $bogomips,
+                                   usable_ram => $meminfo{MemTotal}/1000 });
 }
 
 sub _check_l7rs {
