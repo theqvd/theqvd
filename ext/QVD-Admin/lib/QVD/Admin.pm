@@ -417,7 +417,7 @@ sub _start_vm {
 	or die "Unable to start machine, already running";
     if (!defined $vmrt->host_id) {
 	require QVD::L7R::LoadBalancer;
-	my $lb = new QVD::L7R::LoadBalancer();
+	my $lb = QVD::L7R::LoadBalancer->new();
         my $free_host = $lb->get_free_host($vmrt->vm);
         if (!defined $free_host) {
             die "Unable to start machine, no hosts available";
