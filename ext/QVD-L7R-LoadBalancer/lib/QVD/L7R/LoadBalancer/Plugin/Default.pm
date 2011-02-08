@@ -33,8 +33,8 @@ sub get_free_host {
                                         { select   => ['host_id', { count => 'vm_id'}],
                                           as       => ['host_id', 'vm_count'],
                                           group_by => ['host_id'] })) {
-        my $id = $queued->host_id;
-        $host{$id}{vms} = $queued->get_column('vm_count') if defined $id;
+        my $id = $vms->host_id;
+        $host{$id}{vms} = $vms->get_column('vm_count') if defined $id;
 
     }
 
