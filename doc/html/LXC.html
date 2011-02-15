@@ -808,21 +808,58 @@ mount -t aufs -o br<span style="color: #990000">:</span><span style="color: #009
 
 lxc-start -f container<span style="color: #990000">.</span>conf -n <span style="color: #009900">$NAME</span> -l INFO -d -o /tmp/lxc-out -s lxc<span style="color: #990000">.</span><span style="color: #009900">rootfs</span><span style="color: #990000">=</span><span style="color: #009900">$ROOT</span> -s lxc<span style="color: #990000">.</span>network<span style="color: #990000">.</span><span style="color: #009900">hwaddr</span><span style="color: #990000">=</span><span style="color: #009900">$MAC</span> -s lxc<span style="color: #990000">.</span>network<span style="color: #990000">.</span><span style="color: #009900">ipv4</span><span style="color: #990000">=</span><span style="color: #009900">$IP</span><span style="color: #990000">/</span><span style="color: #993399">24</span>
 
-echo <span style="color: #FF0000">"LXC debug output is in /tmp/lxc-out."</span>
-echo <span style="color: #FF0000">"To run nxagent &amp; nxproxy, do the following:"</span>
-echo <span style="color: #FF0000">"ssh -n qvd@$IP 'xinit /etc/X11/Xsession -- /usr/bin/nxagent :100 -ac -name QVD -display nx/nx,options=/home/qvd/nxagent.conf:100' &amp; nxproxy -S $IP:100 &amp;"</span>
 <span style="color: #990000">(</span>
-    sleep <span style="color: #993399">20</span><span style="color: #990000">;</span>
     <span style="font-style: italic"><span style="color: #9A1900">## lxc-wait uses a system-wide socket, so we can't use it here</span></span>
     <span style="font-weight: bold"><span style="color: #0000FF">while</span></span> sleep <span style="color: #993399">1</span><span style="color: #990000">;</span> <span style="font-weight: bold"><span style="color: #0000FF">do</span></span>
-        <span style="color: #990000">[[</span> <span style="color: #009900">$(</span>lxc-info -n <span style="color: #009900">$NAME</span><span style="color: #990000">)</span> <span style="color: #990000">=~</span> <span style="color: #FF0000">" is STOPPED"</span> <span style="color: #990000">]]</span> <span style="color: #990000">&amp;&amp;</span> <span style="font-weight: bold"><span style="color: #0000FF">break</span></span>
+        <span style="color: #990000">[[</span> <span style="color: #009900">$(</span>lxc-info -n <span style="color: #009900">$NAME</span><span style="color: #990000">)</span> <span style="color: #990000">=~</span> <span style="color: #FF0000">" is RUNNING"</span> <span style="color: #990000">]]</span> <span style="color: #990000">&amp;&amp;</span> <span style="font-weight: bold"><span style="color: #0000FF">break</span></span>
     <span style="font-weight: bold"><span style="color: #0000FF">done</span></span>
+
+    <span style="font-style: italic"><span style="color: #9A1900">## ok, once it's running we can wait for it to stop</span></span>
+
+    echo <span style="color: #FF0000">"LXC debug output is in /tmp/lxc-out."</span>
+    echo <span style="color: #FF0000">"To run nxagent &amp; nxproxy, do the following:"</span>
+    echo <span style="color: #FF0000">"ssh -n qvd@$IP 'xinit /etc/X11/Xsession -- /usr/bin/nxagent :100 -ac -name QVD -display nx/nx,options=/home/qvd/nxagent.conf:100' &amp; nxproxy -S $IP:100 &amp;"</span>
+
+    perl lxc-waiter<span style="color: #990000">.</span>pl <span style="color: #009900">$NAME</span>
 
     umount <span style="color: #009900">$ROOT</span><span style="color: #990000">/</span><span style="color: #009900">$LM</span>
     umount <span style="color: #009900">$ROOT</span>
     umount <span style="color: #009900">$OVL</span>
     rmdir <span style="color: #009900">$OVL</span> <span style="color: #009900">$ROOT</span>
 <span style="color: #990000">)</span> <span style="color: #990000">&amp;</span></tt></pre></div></div>
+<div class="paragraph"><p>To wait for a container to stop, it runs <tt>lxc-waiter.pl</tt>, which is defined thusly:</p></div>
+<div class="listingblock">
+<div class="content"><!-- Generator: GNU source-highlight 3.1.3
+by Lorenzo Bettini
+http://www.lorenzobettini.it
+http://www.gnu.org/software/src-highlite -->
+<pre><tt><span style="font-style: italic"><span style="color: #9A1900">#!/usr/bin/perl</span></span>
+
+<span style="font-weight: bold"><span style="color: #0000FF">use</span></span> warnings<span style="color: #990000">;</span>
+<span style="font-weight: bold"><span style="color: #0000FF">use</span></span> strict<span style="color: #990000">;</span>
+
+<span style="font-weight: bold"><span style="color: #0000FF">my</span></span> <span style="color: #009900">$name</span> <span style="color: #990000">=</span> <span style="font-weight: bold"><span style="color: #0000FF">shift</span></span><span style="color: #990000">;</span>
+<span style="color: #009900">$name</span> or <span style="font-weight: bold"><span style="color: #0000FF">die</span></span> <span style="color: #FF0000">"Usage: $0 &lt;container name&gt;\n\nExample: $0 qvdimg00\n\n"</span><span style="color: #990000">;</span>
+
+<span style="font-weight: bold"><span style="color: #0000FF">while</span></span> <span style="color: #990000">(</span><span style="color: #993399">1</span><span style="color: #990000">)</span> <span style="color: #FF0000">{</span>
+    <span style="font-weight: bold"><span style="color: #0000FF">my</span></span> <span style="color: #009900">$tasks_file</span> <span style="color: #990000">=</span> <span style="color: #FF0000">"/cgroup/$name/tasks"</span><span style="color: #990000">;</span>
+    <span style="font-weight: bold"><span style="color: #0000FF">my</span></span> <span style="color: #009900">$fd</span><span style="color: #990000">;</span>
+
+    <span style="font-weight: bold"><span style="color: #0000FF">if</span></span> <span style="color: #990000">(!</span><span style="font-weight: bold"><span style="color: #0000FF">open</span></span> <span style="color: #009900">$fd</span><span style="color: #990000">,</span> <span style="color: #FF0000">'&lt;'</span><span style="color: #990000">,</span> <span style="color: #009900">$tasks_file</span><span style="color: #990000">)</span> <span style="color: #FF0000">{</span>
+        <span style="font-weight: bold"><span style="color: #0000FF">exit</span></span> <span style="color: #993399">0</span> <span style="font-weight: bold"><span style="color: #0000FF">if</span></span> <span style="color: #993399">2</span> <span style="color: #990000">==</span> $<span style="color: #990000">!;</span>  <span style="font-style: italic"><span style="color: #9A1900">## ENOENT is ok, it happens just after we kill init</span></span>
+        <span style="font-weight: bold"><span style="color: #0000FF">die</span></span> <span style="color: #FF0000">"open: [$tasks_file]: $!"</span><span style="color: #990000">;</span>
+    <span style="color: #FF0000">}</span>
+    <span style="font-weight: bold"><span style="color: #0000FF">my</span></span> <span style="color: #009900">@f</span> <span style="color: #990000">=</span> <span style="color: #FF0000">&lt;$fd&gt;</span><span style="color: #990000">;</span>
+    <span style="font-weight: bold"><span style="color: #0000FF">close</span></span> <span style="color: #009900">$fd</span><span style="color: #990000">;</span>
+    <span style="font-weight: bold"><span style="color: #0000FF">kill</span></span> <span style="color: #993399">9</span><span style="color: #990000">,</span> <span style="color: #009900">@f</span> <span style="font-weight: bold"><span style="color: #0000FF">if</span></span> <span style="color: #993399">1</span> <span style="color: #990000">==</span> <span style="color: #009900">@f</span><span style="color: #990000">;</span>   <span style="font-style: italic"><span style="color: #9A1900">## only one PID left?  it's init, KILL'EM!!!</span></span>
+
+    <span style="font-weight: bold"><span style="color: #0000FF">sleep</span></span> <span style="color: #993399">2</span><span style="color: #990000">;</span>
+<span style="color: #FF0000">}</span></tt></pre></div></div>
+<div class="paragraph"><p>When given a container name, it waits for it to host only one process, then it
+assumes it&#8217;s <tt>init</tt> and sends a SIGKILL to it, thereby effectively stopping
+the container (all <tt>lxc-stop</tt> does is, indeed, send a SIGKILL to every process
+in the container, so in this regard <tt>lxc-waiter.pl</tt> is equivalent to
+<tt>lxc-stop</tt>).</p></div>
 <h3 id="_modifications_to_the_container_filesystem">1.4. Modifications to the container filesystem</h3><div style="clear:left"></div>
 <h4 id="_tt_dev_tt">1.4.1. <tt>/dev</tt></h4>
 <div class="paragraph"><p>Only the minimum set of devices should exist under <tt>/dev</tt>. The daemon <tt>udev</tt>
@@ -1035,7 +1072,7 @@ lxc-start -n name -s lxc.rootfs=/some/path  ## sets a configuration directive fr
 <div id="footer">
 <div id="footer-text">
 Version 0.2<br />
-Last updated 2011-02-15 15:12:29 CEST
+Last updated 2011-02-15 17:32:39 CEST
 </div>
 </div>
 </body>
