@@ -60,8 +60,8 @@ EOF
 
     #print "cert_hash ($cert_hash)\n";
     #print "ssl_thinks ($ssl_thinks) mem_addr ($mem_addr) attrs ($attrs) errs ($errs)\n";
-    #printf "cert_pem_str (%s)\n", cert_pem_str;
-    #printf "cert_data (%s)\n", cert_data;
+    #printf "cert_pem_str (%s)\n", $cert_pem_str;
+    #printf "cert_data (%s)\n", $cert_data;
 
     my $accept = $self->{client_delegate}->proxy_unknown_cert([$cert_pem_str, $cert_data]);
 
@@ -90,6 +90,7 @@ EOF
 	$file = File::Spec->catfile ($dir, $basename);
 	last unless -e $file;
     }
+    ## TODO: -e $file and what?
 
     open my $fd, '>', $file or die "open: '$file': $!";
     print $fd $cert_pem_str;
