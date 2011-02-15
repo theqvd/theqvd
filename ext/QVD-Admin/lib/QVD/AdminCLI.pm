@@ -7,12 +7,69 @@ use QVD::Config;
 use QVD::Admin;
 use Text::Table;
 
+my %syntax_check_cbs = (
+    host => {
+        add => sub {
+            my ($errors, $args) = @_;
+
+            $$errors++, warn "Syntax error: parameter 'name' is mandatory\n",    unless exists $args->{'name'};
+            $$errors++, warn "Syntax error: parameter 'address' is mandatory\n", unless exists $args->{'address'};
+            delete @$args{qw/name address/};
+        },
+    },
+    config => {
+        ssl => sub {
+            my ($errors, $args) = @_;
+
+            $$errors++, warn "Syntax error: parameter 'key' is mandatory\n",  unless exists $args->{'key'};
+            $$errors++, warn "Syntax error: parameter 'cert' is mandatory\n", unless exists $args->{'cert'};
+            delete @$args{qw/key cert/};
+        },
+    },
+    osi => {
+        add => sub {
+            my ($errors, $args) = @_;
+
+            $$errors++, warn "Syntax error: parameter 'name' is mandatory\n",       unless exists $args->{'name'};
+            $$errors++, warn "Syntax error: parameter 'disk_image' is mandatory\n", unless exists $args->{'disk_image'};
+            delete @$args{qw/name disk_image/};
+        },
+    },
+    user => {
+        add => sub {
+            my ($errors, $args) = @_;
+
+            $$errors++, warn "Syntax error: parameter 'login' is mandatory\n",    unless exists $args->{'login'};
+            $$errors++, warn "Syntax error: parameter 'password' is mandatory\n", unless exists $args->{'password'};
+            delete @$args{qw/login password/};
+        },
+        passwd => sub {
+            my ($errors, $args) = @_;
+
+            $$errors++, warn "Syntax error: parameter 'user' is mandatory\n", unless exists $args->{'user'};
+            ## se peta: 'Undefined subroutine &QVD::AdminCLI::rs called'
+            #$$errors++, warn "Error: user '$args->{'user'}' not found\n"      unless rs ('User')->find ({ login => $args->{'user'} });
+            delete @$args{qw/user/};
+        },
+    },
+    vm => {
+        add => sub {
+            my ($errors, $args) = @_;
+
+            $$errors++, warn "Syntax error: parameter 'osi' is mandatory\n",  unless exists $args->{'osi'};
+            $$errors++, warn "Syntax error: parameter 'user' is mandatory\n", unless exists $args->{'user'};
+            $$errors++, warn "Syntax error: parameter 'name' is mandatory\n", unless exists $args->{'name'};
+            delete @$args{qw/osi user name ip/};
+        },
+    },
+);
+
 sub new {
     my ($class, $quiet) = @_;
     my $admin = QVD::Admin->new;
     my $self = {
-	admin => $admin,
-	quiet => $quiet,
+        admin => $admin,
+        quiet => $quiet,
     };
     bless $self, $class;
 }
@@ -39,10 +96,48 @@ sub dispatch_command {
     $self->die_and_help ("$object: Valid command expected", $object) unless defined $command;
     my $method = $self->can($help ? "help_${object}_${command}" : "cmd_${object}_${command}");
     if (defined $method) {
-	$self->{admin}{current_object} = $object;
-	$self->$method(@args);
+        $self->_syntax_check ($object, $command, @args);
+        $self->{admin}{current_object} = $object;
+        $self->$method(@args);
     } else {
-	$self->die_and_help ("$object: $command not implemented", $object);
+        $self->die_and_help ("$object: '$command' not implemented", $object);
+    }
+}
+
+sub _syntax_check {
+    my ($self, $obj, $cmd) = (shift, shift, shift);
+    my %args = _split_on_equals(@_);
+    $self->{'errors'} = 0;
+
+    if (exists $syntax_check_cbs{$obj}{$cmd}) {
+        $syntax_check_cbs{$obj}{$cmd}->(\$self->{'errors'}, \%args);
+    }
+
+    my $forbid_extra_args = 1;
+    if ($cmd =~ /^prop(?:del|get|set)$/ or $obj eq 'config') {
+        $forbid_extra_args = 0;
+
+        ## but 'config ssl' is special
+        if ($obj eq 'config' and $cmd eq 'ssl') {
+            $forbid_extra_args = 1;
+        }
+    }
+
+    if ($forbid_extra_args && %args) {
+        $self->{'errors'}++;
+        warn sprintf "Syntax error: extra parameter(s) '%s'\n", join q{', '}, sort keys %args;
+    }
+
+    if ($self->{'errors'}) {
+        my $noun = 1 == $self->{'errors'} ? 'error' : 'errors';
+        warn "$self->{'errors'} $noun encountered\n";
+
+        my $help_cb = sprintf 'help_%s_%s', $obj, $cmd;
+        if ($self->can ($help_cb)) {
+            print "\n";
+            $self->$help_cb;
+        }
+        exit 1;
     }
 }
 
@@ -74,7 +169,7 @@ sub _print_table {
 sub _die {
     my ($self, $msg) = @_;
     chomp $msg;
-    print STDERR "(Error: $msg)\n" unless $self->{quiet};
+    print STDERR "Error: $msg\n" unless $self->{quiet};
     exit 1;
 }
 
@@ -82,16 +177,21 @@ sub die_and_help {
     my ($self, $message, $obj) = @_;
     $message = "Unknown error" unless defined($message);
     my @funcs = do {
-	no strict;
-	grep exists &{"QVD::AdminCLI::$_"}, keys %{"QVD::AdminCLI::"};
+        no strict;
+        grep exists &{"QVD::AdminCLI::$_"}, keys %{"QVD::AdminCLI::"};
     };
     
     @funcs = grep {s/^cmd_([a-z]+)_(\w+)/$1 $2/} @funcs;
     @funcs = grep {m/^${obj}/} @funcs if defined $obj and exists $self->{admin}{objects}{$obj};
+    my $footer = '';
+    for (grep { /^osi (?:add|del)$/ } @funcs) {
+        $footer = "(*) Needs root privileges\n\n";
+        $_ .= ' (*)';
+    }
     
     print $message.", available subcommands:\n   ";
     print join "\n   ", sort @funcs;
-    print "\n\n";
+    print "\n\n$footer";
     
     exit 1;
 }
@@ -103,13 +203,13 @@ sub _print {
 
 sub _obj_del {
     my ($self, $obj) = @_;
-    unless ($self->{quiet}) {
-	if (scalar %{$self->{admin}{filter}} eq 0) {
-	    print "Are you sure you want to delete all ${obj}s? [y/N] ";
-	    my $answer = <STDIN>;
-	    exit 0 unless $answer =~ /^y/i;
-	}
-   }
+
+    if (scalar %{$self->{admin}{filter}} eq 0) {
+        print "Are you sure you want to delete all ${obj}s? [y/N] ";
+        my $answer = <STDIN>;
+        exit 0 unless $answer =~ /^y/i;
+    }
+
     my $count = $self->get_resultset($obj)->count();
     $self->_print("Deleting ".$count." ${obj}(s)");
 }
@@ -117,13 +217,13 @@ sub _obj_del {
 sub _obj_propget {
     my ($self, $display_cb, @args) = @_;
     eval {
-	my $props = $self->{admin}->propget(@args);
-	print map { &$display_cb($_)."\t".$_->key.'='.$_->value."\n" } @$props;
+        my $props = $self->{admin}->propget(@args);
+        print map { &$display_cb($_)."\t".$_->key.'='.$_->value."\n" } @$props;
     };
 
     if ($@) {
-	$self->_print("Wrong syntax, check the command help.\n");
-	$self->_die($@);
+        #$self->_print("Wrong syntax, check the command help.\n");
+        $self->_die($@);
     }
 }
 
@@ -136,9 +236,8 @@ sub _config_pairs {
         $configs = $self->{admin}->cmd_config_get(@_);
     };
     if ($@) {
-        $self->_print("Wrong syntax, check the command help:\n");
-        $self->help_config_get;	
-	$self->_die($@);
+        #$self->_print("Wrong syntax, check the command help:\n");
+        $self->_die($@);
     }
     ## #540: vm.network.netmask and vm.network.gateway have no
     ## default, so they don't appear in the output of 'config get'
@@ -159,20 +258,18 @@ sub cmd_config_del {
     my $self = shift;
     my $ci = 0;
     if (scalar @_ eq 0) {
-	print "Are you sure you want to block all machines? [y/N] ";
-	my $answer = <STDIN>;
-	exit 0 unless $answer =~ /^y/i;
+        print "Are you sure you want to block all machines? [y/N] ";
+        my $answer = <STDIN>;
+        exit 0 unless $answer =~ /^y/i;
     } 
     eval {
-	$ci = $self->{admin}->cmd_config_del(@_);
+        $ci = $self->{admin}->cmd_config_del(@_);
     };
     if ($@) {
-	$self->_print("Wrong syntax, check the command help:\n");
-	$self->help_config_del;
-	$self->_die($@);
+        #$self->_print("Wrong syntax, check the command help:\n");
+        $self->_die($@);
     }
-    $self->_print("$ci config entry deleted.\n");
-
+    $self->_print("$ci config entries deleted.\n");
 }
 
 sub help_config_del {
@@ -205,12 +302,11 @@ sub cmd_config_set {
     my $self = shift;
     my %args = _split_on_equals(@_);
     eval {
-	$self->{admin}->cmd_config_set(%args);
+        $self->{admin}->cmd_config_set(%args);
     };
     if ($@ || (scalar keys %args == 0)) {
-	$self->_print("Wrong syntax, check the command help:\n");
-	$self->help_config_set;
-	$self->_die($@);
+        #$self->_print("Wrong syntax, check the command help:\n");
+        $self->_die($@);
     }
 }
 
@@ -229,19 +325,22 @@ sub cmd_config_ssl {
     my %args = _split_on_equals(@_);
     my $key_file = delete $args{key};
     my $cert_file = delete $args{cert};
-    if (%args or !$key_file or !$cert_file) {
-	$self->help_config_ssl;
-	$self->_die($@);
-    }
+
     # FIXME: Is using File::Slurp the best way?
     use File::Slurp; 
     my $cert = eval { read_file($cert_file) } 
-	or die "$cert_file: Unable to read cert file: $^E";
+        or $self->_die ("$cert_file: Unable to read cert file: $^E\n");
     my $key = eval { read_file($key_file) }  
-	or die "$key_file: Unable to read key file: $^E";
+        or $self->_die ("$key_file: Unable to read key file: $^E\n");
 
-    $self->{admin}->cmd_config_ssl(key => $key, cert => $cert) 
-	and $self->_print("SSL certificate and private key set.\n");
+    eval {
+        $self->{admin}->cmd_config_ssl(key => $key, cert => $cert);
+    };
+    if ($@) {
+        $self->_die($@);
+    } else {
+        $self->_print("SSL certificate and private key set.\n");
+    }
 }
 
 sub help_config_ssl {
@@ -260,13 +359,12 @@ sub cmd_host_add {
     my $self = shift;
     my %args = _split_on_equals(@_);
     eval {
-	my $id = $self->{admin}->cmd_host_add(%args);
-	$self->_print("Host added with id ".$id);
+        my $id = $self->{admin}->cmd_host_add(%args);
+        $self->_print("Host added with id ".$id);
     };
     if ($@) {
-	$self->_print("Wrong syntax, check the command help:\n");
-	$self->help_host_add;	
-	$self->_die($@);
+        #$self->_print("Wrong syntax, check the command help:\n");
+        $self->_die($@);
     }
 }
 
@@ -284,18 +382,17 @@ sub cmd_host_block {
     my $self = shift;
     
     if (scalar %{$self->{admin}{filter}} eq 0) {
-	print "Are you sure you want to block all hosts? [y/N] ";
-	my $answer = <STDIN>;
-	exit 0 unless $answer =~ /^y/i;
+        print "Are you sure you want to block all hosts? [y/N] ";
+        my $answer = <STDIN>;
+        exit 0 unless $answer =~ /^y/i;
     }   
     
     eval {
-    	$self->{admin}->cmd_host_block();
+        $self->{admin}->cmd_host_block();
     };
     if ($@) {
-	$self->_print("Wrong syntax, check the command help:\n");
-	$self->help_host_block;
-	$self->_die($@);
+        #$self->_print("Wrong syntax, check the command help:\n");
+        $self->_die($@);
     }      
 }
 
@@ -313,13 +410,12 @@ EOT
 sub cmd_host_del {
     my $self = shift;
     eval {
-	$self->_obj_del('host', @_);
-	$self->{admin}->cmd_host_del();
+        $self->_obj_del('host', @_);
+        $self->{admin}->cmd_host_del();
     };
     if ($@) {
-	$self->_print("Wrong syntax or host assigned to virtual machines, check the command help:\n");
-	$self->help_host_del;
-	$self->_die($@);
+        #$self->_print("Wrong syntax or host assigned to virtual machines, check the command help:\n");
+        $self->_die($@);
     }
 }
 
@@ -342,19 +438,18 @@ sub cmd_host_list {
     my @body;
 
     eval {
-	while (my $host = $rs->next) {
-	    my $hkd_ts = defined $host->runtime ? $host->runtime->ok_ts : undef;
-	    my $mins = defined $hkd_ts ? _format_timespan(time - $hkd_ts) : '-';
-	    my @row = ($host->id, $host->name, $host->address, $mins,
-				$host->runtime->usable_ram, $host->runtime->usable_cpu,
-				$host->vms->count, $host->runtime->blocked, $host->runtime->state);
-	    push(@body, \@row);
-	}
+        while (my $host = $rs->next) {
+            my $hkd_ts = defined $host->runtime ? $host->runtime->ok_ts : undef;
+            my $mins = defined $hkd_ts ? _format_timespan(time - $hkd_ts) : '-';
+            my @row = ($host->id, $host->name, $host->address, $mins,
+                       $host->runtime->usable_ram, $host->runtime->usable_cpu,
+                       $host->vms->count, $host->runtime->blocked, $host->runtime->state);
+            push(@body, \@row);
+        }
     };
     if ($@) {
-	$self->_print("Wrong syntax, check the command help:\n");
-	$self->help_host_list;
-	$self->_die($@);
+        #$self->_print("Wrong syntax, check the command help:\n");
+        $self->_die($@);
     }
     
     $self->_print_table(\@header, \@body);
@@ -376,17 +471,16 @@ EOT
 sub cmd_host_propdel {
     my $self = shift;
     if (scalar %{$self->{admin}{filter}} eq 0) {
-	print "Are you sure you want to delete the prop in all hosts? [y/N] ";
-	my $answer = <STDIN>;
-	exit 0 unless $answer =~ /^y/i;
+        print "Are you sure you want to delete the prop in all hosts? [y/N] ";
+        my $answer = <STDIN>;
+        exit 0 unless $answer =~ /^y/i;
     }
     eval {
-	$self->{admin}->propdel('host', @_);	
+        $self->{admin}->propdel('host', @_);        
     };
     if ($@) {
-	$self->_print("Wrong syntax, check the command help:\n");
-	$self->help_host_propdel;
-	$self->_die($@);
+        #$self->_print("Wrong syntax, check the command help:\n");
+        $self->_die($@);
     }
 }
 
@@ -398,7 +492,7 @@ usage: host propdel [key...]
     Only the properties with the listed keys are deleted. If no keys are listed
     all properties are deleted.
     Example:
-	host propdel priority -f address=198.168.1.??
+        host propdel priority -f address=198.168.1.??
       
 Valid options:
     -f [--filter] FILTER : Delete properties of hosts matched by FILTER
@@ -426,14 +520,13 @@ sub cmd_host_propset {
     my $self = shift;
     my $ci = 0;
     eval {
-	$ci = $self->{admin}->cmd_host_propset(_split_on_equals @_);
+        $ci = $self->{admin}->cmd_host_propset(_split_on_equals @_);
     };
     if (($ci == -1) || $@) {
-	$self->_print("Wrong syntax, check the command help:\n");
-	$self->help_host_propset;
-	$self->_die($@);
+        #$self->_print("Wrong syntax, check the command help:\n");
+        $self->_die($@);
     } else {
-	$self->_print("propset in $ci hosts.\n");
+        $self->_print("propset in $ci hosts.\n");
     }
 }
 
@@ -453,18 +546,17 @@ EOT
 sub cmd_host_unblock {
     my $self = shift;
     if (scalar %{$self->{admin}{filter}} eq 0) {
-	print "Are you sure you want to unblock all hosts? [y/N] ";
-	my $answer = <STDIN>;
-	exit 0 unless $answer =~ /^y/i;
+        print "Are you sure you want to unblock all hosts? [y/N] ";
+        my $answer = <STDIN>;
+        exit 0 unless $answer =~ /^y/i;
     }   
     
     eval {
-	$self->{admin}->cmd_host_unblock();
+        $self->{admin}->cmd_host_unblock();
     };
     if ($@) {
-	$self->_print("Wrong syntax, check the command help:\n");
-	$self->help_host_unblock;
-	$self->_die($@);
+        #$self->_print("Wrong syntax, check the command help:\n");
+        $self->_die($@);
     }    
 }
 
@@ -482,15 +574,14 @@ EOT
 sub cmd_osi_add {
     my $self = shift;
     eval {
-	my %args = _split_on_equals(@_);
-	my $id = $self->{admin}->cmd_osi_add(%args);
-	$self->_print("OSI added with id ".$id);	
+        my %args = _split_on_equals(@_);
+        my $id = $self->{admin}->cmd_osi_add(%args);
+        $self->_print("OSI added with id ".$id);        
     };
     
     if ($@) {
-	$self->_print("Wrong syntax, check the command help:\n");
-	$self->help_osi_add;
-	$self->_die($@);
+        #$self->_print("Wrong syntax, check the command help:\n");
+        $self->_die($@);
     }
 }
 
@@ -498,13 +589,13 @@ sub help_osi_add {
     print <<EOT
 osi add: Adds operating systems images.
 usage: osi add name=string disk_image=path [memory=size] [use_overlay=boolean]
-		[user_storage_size=size]
+                [user_storage_size=size]
 
     The disk_image is copied to the read-only storage area.
     The default values for the optional parameters are:
-	memory=256 
-	use_overlay=y
-	user_storage_size=undef (no user storage)
+        memory=256 
+        use_overlay=y
+        user_storage_size=undef (no user storage)
 
 Valid options:
     -q [--quiet]         : don't print the command message
@@ -514,16 +605,14 @@ EOT
 sub cmd_osi_del {
     my $self = shift;
     eval {
-	$self->_obj_del('osi', @_);
-	my $count = $self->{admin}->cmd_osi_del();
-	$self->_print("$count osis deleted.");
+        $self->_obj_del('osi', @_);
+        my $count = $self->{admin}->cmd_osi_del();
+        $self->_print("$count osis deleted.");
     };
     if ($@) {
-	$self->_print("Wrong syntax, check the command help:\n");
-	$self->help_osi_del;
-	$self->_die($@);
+        #$self->_print("Wrong syntax, check the command help:\n");
+        $self->_die($@);
     }
-    
 }
 
 sub help_osi_del {
@@ -544,17 +633,16 @@ sub cmd_osi_list {
     my @body;
     
     eval {
-	while (my $osi = $rs->next) {
-	    my @row = map { defined($_) ? $_ : '-' } map { $osi->$_ } qw(id name memory user_storage_size disk_image);
-	    push(@body, \@row);
-	}
+        while (my $osi = $rs->next) {
+            my @row = map { defined($_) ? $_ : '-' } map { $osi->$_ } qw(id name memory user_storage_size disk_image);
+            push(@body, \@row);
+        }
     };
     if ($@) {
-	$self->_print("Wrong syntax, check the command help:\n");
-	$self->help_osi_list;
-	$self->_die($@);
+        #$self->_print("Wrong syntax, check the command help:\n");
+        $self->_die($@);
     } else {
-	$self->_print_table(\@header, \@body);
+        $self->_print_table(\@header, \@body);
     }
 }
 
@@ -576,13 +664,12 @@ sub cmd_user_add {
     my $self = shift;
     my %args = _split_on_equals(@_);
     eval {
-	my $id = $self->{admin}->cmd_user_add(%args);
-	$self->_print( "User added with id ".$id);
+        my $id = $self->{admin}->cmd_user_add(%args);
+        $self->_print( "User added with id ".$id);
     };
     if ($@) {
-	$self->_print("Wrong syntax or user already exists, check the command help:\n");
-	$self->help_user_add;
-	$self->_die($@);
+        #$self->_print("Wrong syntax or user already exists, check the command help:\n");
+        $self->_die($@);
     }
 }
 
@@ -599,13 +686,12 @@ EOT
 sub cmd_user_del {
     my $self = shift;
     eval {
-	$self->_obj_del('user', @_);
-	$self->{admin}->cmd_user_del();
+        $self->_obj_del('user', @_);
+        $self->{admin}->cmd_user_del();
     };
     if ($@) {
-	$self->_print("Wrong syntax, check the command help:\n");
-	$self->help_user_del;
-	$self->_die($@);
+        #$self->_print("Wrong syntax, check the command help:\n");
+        $self->_die($@);
     }
 }
 
@@ -623,16 +709,16 @@ EOT
 sub cmd_user_list {
     my $self = shift;
     eval {
-	my @body;
-	my $rs = $self->get_resultset('user');
-	while (my $user = $rs->next) {
-	    push @body, [$user->id, $user->login];
-	}
-	$self->_print_table([qw(Id Login)], \@body);
+        my @body;
+        my $rs = $self->get_resultset('user');
+        while (my $user = $rs->next) {
+            push @body, [$user->id, $user->login];
+        }
+        $self->_print_table([qw(Id Login)], \@body);
     };
     if ($@) {
-	$self->_print("Wrong syntax, check the command help:\n");
-	$self->help_user_list;
+        #$self->_print("Wrong syntax, check the command help:\n");
+        $self->_die($@);
     }
 }
 
@@ -661,50 +747,43 @@ sub _read_password {
 
 sub cmd_user_passwd {
     my ($self, $user) = @_;
-    if ($user) {
-	my $passwd = $self->_read_password($user);
-	eval {
-	    $self->{admin}->set_password($user, $passwd);
-	};
-	if ($@) {
-	    $self->_print("Wrong syntax or user does not exist, check the command help:\n");
-	    $self->help_user_passwd;    
-	    $self->_die($@);
-	}
-    } else {
-	    $self->_print("Wrong syntax, check the command help:\n");
-	    $self->help_user_passwd;    	
-	    $self->_die($@);
-    }
+    my %args = _split_on_equals(@_);
 
+    eval {
+        my $passwd = $self->_read_password($args{'user'});
+        $self->{admin}->set_password($args{'user'}, $passwd);
+    };
+    if ($@) {
+        #$self->_print("Wrong syntax or user does not exist, check the command help:\n");
+        $self->_die($@);
+    }
 }
 
 sub help_user_passwd {
     print <<EOT
 user passwd: Sets the password of a user
-usage: user passwd username
+usage: user passwd user=username
 
     Prompts the user for the new password for the user with login "username"
     and sets it.
 
-    Example: user passwd qvd
+    Example: user passwd user=qvd
 EOT
 }
 
 sub cmd_user_propdel {
     my $self = shift;
     if (scalar %{$self->{admin}{filter}} eq 0) {
-	print "Are you sure you want to delete the prop in all users? [y/N] ";
-	my $answer = <STDIN>;
-	exit 0 unless $answer =~ /^y/i;
+        print "Are you sure you want to delete the prop in all users? [y/N] ";
+        my $answer = <STDIN>;
+        exit 0 unless $answer =~ /^y/i;
     } 
     eval {
-	$self->{admin}->propdel('user', @_);
+        $self->{admin}->propdel('user', @_);
     };
     if ($@) {
-	$self->_print("Wrong syntax, check the command help:\n");
-	$self->help_user_propdel;
-	$self->_die($@);
+        #$self->_print("Wrong syntax, check the command help:\n");
+        $self->_die($@);
     }
 }
 
@@ -716,7 +795,7 @@ usage: user propdel [key...]
     Only the properties with the listed keys are deleted. If no keys are listed
     all properties are deleted.
     Example:
-	user propdel timezone -f login=M*,department=sales
+        user propdel timezone -f login=M*,department=sales
       
 Valid options:
     -f [--filter] FILTER : Delete properties of users matched by FILTER
@@ -744,14 +823,13 @@ sub cmd_user_propset {
     my $self = shift;
     my $ci = 0;
     eval {
-	$ci = $self->{admin}->cmd_user_propset(_split_on_equals @_);
+        $ci = $self->{admin}->cmd_user_propset(_split_on_equals @_);
     };
     if (($ci == -1) || $@) {
-	$self->_print("Wrong syntax, check the command help:\n");
-	$self->help_user_propset;
-	$self->_die($@);
+        #$self->_print("Wrong syntax, check the command help:\n");
+        $self->_die($@);
     } else {
-	$self->_print("propset in $ci users.\n");
+        $self->_print("propset in $ci users.\n");
     }    
 }
 
@@ -772,13 +850,12 @@ sub cmd_vm_add {
     my $self = shift;
     my %args = _split_on_equals(@_);
     eval {
-	my $id = $self->{admin}->cmd_vm_add(%args);
-	$self->_print( "VM added with id ".$id);
+        my $id = $self->{admin}->cmd_vm_add(%args);
+        $self->_print( "VM added with id ".$id);
     };
     if ($@) {
-	$self->_print("Wrong syntax, check the command help:\n");
-	$self->help_vm_add;
-	$self->_die($@);
+        #$self->_print("Wrong syntax, check the command help:\n");
+        $self->_die($@);
     }  
 }
 
@@ -796,18 +873,17 @@ sub cmd_vm_block {
     my $self = shift;
     
     if (scalar %{$self->{admin}{filter}} eq 0) {
-	print "Are you sure you want to block all machines? [y/N] ";
-	my $answer = <STDIN>;
-	exit 0 unless $answer =~ /^y/i;
+        print "Are you sure you want to block all machines? [y/N] ";
+        my $answer = <STDIN>;
+        exit 0 unless $answer =~ /^y/i;
     }   
     
     eval {
-    	$self->{admin}->cmd_vm_block();
+        $self->{admin}->cmd_vm_block();
     };
     if ($@) {
-	$self->_print("Wrong syntax, check the command help:\n");
-	$self->help_vm_block;
-	$self->_die($@);
+        #$self->_print("Wrong syntax, check the command help:\n");
+        $self->_die($@);
     }      
 }
 
@@ -825,16 +901,15 @@ EOT
 sub cmd_vm_console {
     my ($self, @args) = @_;
     eval {
-	my $vm_runtime = $self->_get_single_vm_runtime;
-	my $serial_port = $vm_runtime->vm_serial_port;
-	die 'Console access is disabled' unless defined $serial_port;
-	exec telnet => $vm_runtime->host->address, $serial_port, @args
+        my $vm_runtime = $self->_get_single_vm_runtime;
+        my $serial_port = $vm_runtime->vm_serial_port;
+        die 'Console access is disabled' unless defined $serial_port;
+        exec telnet => $vm_runtime->host->address, $serial_port, @args
             or die "Unable to exec ssh: $^E";
     };
     if ($@) {
-	$self->_print("Wrong syntax, check the command help:\n");
-	$self->help_vm_console;
-	$self->_die($@);
+        #$self->_print("Wrong syntax, check the command help:\n");
+        $self->_die($@);
     }
 }
 
@@ -854,13 +929,12 @@ EOT
 sub cmd_vm_del {
     my $self = shift;
     eval {
-	$self->_obj_del('vm', @_);
-	$self->{admin}->cmd_vm_del();
+        $self->_obj_del('vm', @_);
+        $self->{admin}->cmd_vm_del();
     };
     if ($@) {
-	$self->_print("Wrong syntax, check the command help:\n");
-	$self->help_vm_del;
-	$self->_die($@);
+        #$self->_print("Wrong syntax, check the command help:\n");
+        $self->_die($@);
     }  
 }
 
@@ -878,19 +952,18 @@ EOT
 sub cmd_vm_disconnect_user {
     my ($self, @args) = @_;
     if (scalar %{$self->{admin}{filter}} eq 0) {
-	print "Are you sure you want to disconnect all users? [y/N] ";
-	my $answer = <STDIN>;
-	exit 0 unless $answer =~ /^y/i;
+        print "Are you sure you want to disconnect all users? [y/N] ";
+        my $answer = <STDIN>;
+        exit 0 unless $answer =~ /^y/i;
     }   
     
     eval {
-	my $count = $self->{admin}->cmd_vm_disconnect_user();
-	$self->_print("Disconnected ".$count." users.");
+        my $count = $self->{admin}->cmd_vm_disconnect_user();
+        $self->_print("Disconnected ".$count." users.");
     };
     if ($@) {
-	$self->_print("Wrong syntax, check the command help:\n");
-	$self->help_vm_disconnect_user;
-	$self->_die($@);
+        #$self->_print("Wrong syntax, check the command help:\n");
+        $self->_die($@);
     }  
 }
 
@@ -920,9 +993,8 @@ sub cmd_vm_edit {
         $self->_print("Edited ".$count." VMs.");
     };
     if ($@) {
-        $self->_print("Wrong syntax, check the command help:\n");
-        $self->help_vm_net;
-	$self->_die($@);
+        #$self->_print("Wrong syntax, check the command help:\n");
+        $self->_die($@);
     }
 }
 
@@ -944,28 +1016,29 @@ sub cmd_vm_list {
     
     my @header = ("Id","Name","User","Ip","Host","State","UserState","Blocked");
     my @body;
-	
+        
     eval { 
-	while (my $vm = $rs->next) {
-	    my $vmr = $vm->vm_runtime;
-	    my @row = map { $_ // '-' } ( $vm->id,
-					   $vm->name,
-					   $vm->user->login,
-					   $vm->ip,
-					   defined $vmr->host ? $vmr->host->name : undef,
-					   $vmr->vm_state,
-					   $vmr->user_state,
-					   $vmr->blocked  );
-	    push(@body, \@row);
-	}
+        while (my $vm = $rs->next) {
+            my $vmr = $vm->vm_runtime;
+            my @row = map { $_ // '-' } (
+                $vm->id,
+                $vm->name,
+                $vm->user->login,
+                $vm->ip,
+                defined $vmr->host ? $vmr->host->name : undef,
+                $vmr->vm_state,
+                $vmr->user_state,
+                $vmr->blocked,
+            );
+            push(@body, \@row);
+        }
     };  
     
     if ($@) {
-	$self->_print("Wrong syntax, check the command help:\n");
-	$self->help_vm_list;
-	$self->_die($@);
+        #$self->_print("Wrong syntax, check the command help:\n");
+        $self->_die($@);
     } else {
-	$self->_print_table(\@header, \@body);
+        $self->_print_table(\@header, \@body);
     }
 }
 
@@ -985,17 +1058,16 @@ EOT
 sub cmd_vm_propdel {
     my $self = shift;
     if (scalar %{$self->{admin}{filter}} eq 0) {
-	print "Are you sure you want to delete the prop in all virtual machines? [y/N] ";
-	my $answer = <STDIN>;
- 	exit 0 unless $answer =~ /^y/i;
+        print "Are you sure you want to delete the prop in all virtual machines? [y/N] ";
+        my $answer = <STDIN>;
+         exit 0 unless $answer =~ /^y/i;
     }
     eval {
-	$self->{admin}->propdel('vm', @_);
+        $self->{admin}->propdel('vm', @_);
     };
     if ($@) {
-	$self->_print("Wrong syntax, check the command help:\n");
-	$self->help_vm_propdel;
-	$self->_die($@);
+        #$self->_print("Wrong syntax, check the command help:\n");
+        $self->_die($@);
     }
 }
 
@@ -1007,7 +1079,7 @@ usage: vm propdel [key...]
     Only the properties with the listed keys are deleted. If no keys are listed
     all properties are deleted.
     Example:
-	vm propdel priority -f user=nobody
+        vm propdel priority -f user=nobody
       
 Valid options:
     -f [--filter] FILTER : sets VM properties of VMs matched by FILTER
@@ -1035,15 +1107,14 @@ sub cmd_vm_propset {
     my $self = shift;
     my $ci = 0;
     eval {
-	$ci = $self->{admin}->cmd_vm_propset(_split_on_equals @_);
+        $ci = $self->{admin}->cmd_vm_propset(_split_on_equals @_);
     };    
 
     if (($ci == -1) || $@) {
-	$self->_print("Wrong syntax, check the command help:\n");
-	$self->help_vm_propset;
-	$self->_die($@);
+        #$self->_print("Wrong syntax, check the command help:\n");
+        $self->_die($@);
     } else {
-	$self->_print("propset in $ci virtual machines.\n");
+        $self->_print("propset in $ci virtual machines.\n");
     }       
     
 }
@@ -1065,7 +1136,7 @@ sub _get_single_vm_runtime {
     my $self = shift;
     my $rs = $self->get_resultset('vm');
     if ($rs->count > 1) {
-	die 'Filter matches more than one VM';
+        die 'Filter matches more than one VM';
     }
     my $vm = $rs->single;
     die 'No matching VMs' unless defined $vm;
@@ -1075,23 +1146,22 @@ sub _get_single_vm_runtime {
 sub cmd_vm_ssh {
     my ($self, @args) = @_;
     eval {
-	my $vm_runtime = $self->_get_single_vm_runtime;
-	my $ssh_port = $vm_runtime->vm_ssh_port;
-	die 'SSH access is disabled' unless defined $ssh_port;
-	my @extra_opts;
-	for (cfg_keys) {
-	    if (my ($key, $opt) = /^(admin\.ssh\.opt\.(.*))$/) {
-		my $value = cfg($key);
-		push @extra_opts, -o => "$opt=$value" if length $value;
-	    }
-	}
-	my @cmd = (ssh => ($vm_runtime->vm_address, -p => $ssh_port, @extra_opts, @args));
-	exec @cmd or die "Unable to exec ssh: $^E";
+        my $vm_runtime = $self->_get_single_vm_runtime;
+        my $ssh_port = $vm_runtime->vm_ssh_port;
+        die 'SSH access is disabled' unless defined $ssh_port;
+        my @extra_opts;
+        for (cfg_keys) {
+            if (my ($key, $opt) = /^(admin\.ssh\.opt\.(.*))$/) {
+                my $value = cfg($key);
+                push @extra_opts, -o => "$opt=$value" if length $value;
+            }
+        }
+        my @cmd = (ssh => ($vm_runtime->vm_address, -p => $ssh_port, @extra_opts, @args));
+        exec @cmd or die "Unable to exec ssh: $^E";
     };
     if ($@) {
-	$self->_print("Wrong syntax, check the command help:\n");
-	$self->help_vm_ssh;
-	$self->_die($@);
+        #$self->_print("Wrong syntax, check the command help:\n");
+        $self->_die($@);
     }
 }
 
@@ -1114,19 +1184,18 @@ sub cmd_vm_start {
     my ($self, @args) = @_;
     
     if (scalar %{$self->{admin}{filter}} eq 0) {
-	print "Are you sure you want to start all machines? [y/N] ";
-	my $answer = <STDIN>;
-	exit 0 unless $answer =~ /^y/i;
+        print "Are you sure you want to start all machines? [y/N] ";
+        my $answer = <STDIN>;
+        exit 0 unless $answer =~ /^y/i;
     }   
      
     eval {
-	my $count = $self->{admin}->cmd_vm_start();
-	$self->_print("Started ".$count." VMs.");
+        my $count = $self->{admin}->cmd_vm_start();
+        $self->_print("Started ".$count." VMs.");
     };   
     if ($@) {
-	$self->_print("Wrong syntax, check the command help:\n");
-	$self->help_vm_start;
-	$self->_die($@);
+        #$self->_print("Wrong syntax, check the command help:\n");
+        $self->_die($@);
     }
 }
 
@@ -1145,19 +1214,18 @@ sub cmd_vm_stop {
     my ($self, @args) = @_;
     
     if (scalar %{$self->{admin}{filter}} eq 0) {
-	print "Are you sure you want to stop all machines? [y/N] ";
-	my $answer = <STDIN>;
-	exit 0 unless $answer =~ /^y/i;
+        print "Are you sure you want to stop all machines? [y/N] ";
+        my $answer = <STDIN>;
+        exit 0 unless $answer =~ /^y/i;
     }   
     
     eval {
-	my $count = $self->{admin}->cmd_vm_stop();
-	$self->_print("Stopped ".$count." VMs.");
+        my $count = $self->{admin}->cmd_vm_stop();
+        $self->_print("Stopped ".$count." VMs.");
     };
     if ($@) {
-	$self->_print("Wrong syntax, check the command help:\n");
-	$self->help_vm_stop;
-	$self->_die($@);
+        #$self->_print("Wrong syntax, check the command help:\n");
+        $self->_die($@);
     }    
 }
 
@@ -1175,18 +1243,17 @@ EOT
 sub cmd_vm_unblock {
     my $self = shift;
     if (scalar %{$self->{admin}{filter}} eq 0) {
-	print "Are you sure you want to unblock all machines? [y/N] ";
-	my $answer = <STDIN>;
-	exit 0 unless $answer =~ /^y/i;
+        print "Are you sure you want to unblock all machines? [y/N] ";
+        my $answer = <STDIN>;
+        exit 0 unless $answer =~ /^y/i;
     }   
     
     eval {
-	$self->{admin}->cmd_vm_unblock();
+        $self->{admin}->cmd_vm_unblock();
     };
     if ($@) {
-	$self->_print("Wrong syntax, check the command help:\n");
-	$self->help_vm_unblock;
-	$self->_die($@);
+        #$self->_print("Wrong syntax, check the command help:\n");
+        $self->_die($@);
     }    
 }
 
@@ -1204,17 +1271,16 @@ EOT
 sub cmd_vm_vnc {
     my ($self, @args) = @_;
     eval {
-	my $vm_runtime = $self->_get_single_vm_runtime;
-	my $vnc_port = $vm_runtime->vm_vnc_port;
-	die 'VNC access is disabled' unless defined $vnc_port;
-	# FIXME Make the vnc client configurable
-	my @cmd = (vncviewer => ($vm_runtime->vm_address.'::'.$vnc_port, @args));
-	exec @cmd or die "Unable to exec vncviewer: $^E";
+        my $vm_runtime = $self->_get_single_vm_runtime;
+        my $vnc_port = $vm_runtime->vm_vnc_port;
+        die 'VNC access is disabled' unless defined $vnc_port;
+        # FIXME Make the vnc client configurable
+        my @cmd = (vncviewer => ($vm_runtime->vm_address.'::'.$vnc_port, @args));
+        exec @cmd or die "Unable to exec vncviewer: $^E";
     };
     if ($@) {
-	$self->_print("Wrong syntax, check the command help:\n");
-	$self->help_vm_vnc;
-	$self->_die($@);
+        #$self->_print("Wrong syntax, check the command help:\n");
+        $self->_die($@);
     }    
 }
 

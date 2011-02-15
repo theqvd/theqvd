@@ -22,30 +22,30 @@ sub new {
     my $class = shift;
     my $quiet = shift;
     my $self = { filter => {},
-		 quiet => $quiet,
-		 objects => { host => 'Host',
-			      vm => 'VM',
-			      user => 'User',
-			      config => 'Config',
-			      osi => 'OSI' } };
+                 quiet => $quiet,
+                 objects => { host => 'Host',
+                              vm => 'VM',
+                              user => 'User',
+                              config => 'Config',
+                              osi => 'OSI' } };
     bless $self, $class;
 }
 
 sub set_filter {
     my ($self, %conditions) = @_;
     while (my ($k, $v) = each %conditions) {
-	$k = 'me.id' if $k eq 'id';
-	if (defined($v)) {
-	    if (ref $v) {
-		$self->{filter}{$k} = $v;
-	    } elsif ($v =~ /[*?]/) {
-		$v =~ s/([_%])/\\$1/g;
-		$v =~ tr/*?/%_/;
-		$self->{filter}{$k} = {like => $v};
-	    } else {
-		$self->{filter}{$k} = $v;
-	    }
-	}
+        $k = 'me.id' if $k eq 'id';
+        if (defined($v)) {
+            if (ref $v) {
+                $self->{filter}{$k} = $v;
+            } elsif ($v =~ /[*?]/) {
+                $v =~ s/([_%])/\\$1/g;
+                $v =~ tr/*?/%_/;
+                $self->{filter}{$k} = {like => $v};
+            } else {
+                $self->{filter}{$k} = $v;
+            }
+        }
     }
 }
 
@@ -57,15 +57,15 @@ sub get_resultset {
     my ($self, $obj) = @_;
     my $db_object = $self->{objects}{$obj};
     if (!defined $db_object) {
-	die("$obj: Unsupported object");
+        die("$obj: Unsupported object");
     }
     my $method = $self->can("get_result_set_for_${obj}");
     if ($method) {
-	$self->$method;
+        $self->$method;
     }
     my $rs = rs($db_object);
     $rs = $rs->search($self->{filter})
-	if defined $self->{filter};
+        if defined $self->{filter};
 
     $rs
 }
@@ -74,7 +74,7 @@ sub _filter_obj {
     my ($self, $term_map) = @_;
     my $filter = $self->{filter};
     while (my ($src,$dst) = each %$term_map) {
-	$filter->{$dst} = delete $filter->{$src} if exists $filter->{$src}
+        $filter->{$dst} = delete $filter->{$src} if exists $filter->{$src}
     }
     $filter
 }
@@ -82,16 +82,16 @@ sub _filter_obj {
 sub get_result_set_for_vm {
     my ($self, @args) = @_;
     my %term_map = (
-	name => 'me.name',
-	osi => 'osi.name',
-	user => 'user.login',
-	host => 'host.name',
-	state => 'vm_runtime.vm_state',
+        name => 'me.name',
+        osi => 'osi.name',
+        user => 'user.login',
+        host => 'host.name',
+        state => 'vm_runtime.vm_state',
     );
     my $filter = $self->_filter_obj(\%term_map);
     rs(VM)->search($filter,
-		   { join => ['osi', 'user',
-			      { vm_runtime => 'host'}] });
+                   { join => ['osi', 'user',
+                              { vm_runtime => 'host'}] });
 }
 
 sub _set_equals {
@@ -100,7 +100,7 @@ sub _set_equals {
     my @a = sort @$a;
     my @b = sort @$b;
     foreach my $i (0 .. @a-1) {
-	return 0 if $a[$i] ne $b[$i];
+        return 0 if $a[$i] ne $b[$i];
     }
     return 1;
 }
@@ -123,9 +123,9 @@ sub _obj_add {
     my ($self, $obj, $required_params, @args) = @_;
     my $params = ref $args[0] ? $args[0] : {@args};
     unless (_set_equals([keys %$params], $required_params)) {
-	die "The required parameters are: ",
-	    join(", ", @$required_params), " (you supplied ",
-	    join(", ", keys %$params), ")";
+        die "The required parameters are: ",
+            join(", ", @$required_params), " (you supplied ",
+            join(", ", keys %$params), ")";
     }
     my $rs = $self->get_resultset($obj);
     $rs->create($params);
@@ -154,17 +154,17 @@ sub _obj_propset {
     my $ci = 0;
     my $success = 0;
     while (my $obj = $rs->next) {
-	foreach my $key (keys %$params) {
-	    $obj->properties->search({key => $key})->update_or_create(
-		{ key => $key, value => $params->{$key} },
-		{ key => 'primary' }
-	    );
-	    $success = 1;
-	}
-	$ci = $ci + 1;
+        foreach my $key (keys %$params) {
+            $obj->properties->search({key => $key})->update_or_create(
+                { key => $key, value => $params->{$key} },
+                { key => 'primary' }
+            );
+            $success = 1;
+        }
+        $ci = $ci + 1;
     }
     if (!$success) {
-	$ci = -1;
+        $ci = -1;
     }
     $ci;
 }
@@ -172,10 +172,10 @@ sub _obj_propset {
 sub _start_vm {
     my ($self, $vmrt) = @_;
     $vmrt->vm_state eq 'stopped'
-	or die "Unable to start machine, already running";
+        or die "Unable to start machine, already running";
     if (!defined $vmrt->host_id) {
-	require QVD::L7R::LoadBalancer;
-	my $lb = QVD::L7R::LoadBalancer->new();
+        require QVD::L7R::LoadBalancer;
+        my $lb = QVD::L7R::LoadBalancer->new();
         my $free_host = $lb->get_free_host($vmrt->vm);
         if (!defined $free_host) {
             die "Unable to start machine, no hosts available";
@@ -234,7 +234,6 @@ sub cmd_config_del {
     $rs->search($condition)->delete;
     
     $ci;
-    
 }
 
 sub cmd_config_get {
@@ -252,7 +251,7 @@ sub cmd_config_set {
         if ($key =~ /^l7r\.ssl\./) {
             warn "to set SSL keys and certificates use the 'config ssl' command\n";
         }
-	else {
+        else {
             $rs->update_or_create({ key => $key,
                                     value => $args{$key}
                                   });
@@ -265,22 +264,22 @@ sub cmd_config_ssl {
     my $cert = delete $args{cert} or die "Certificate is required";
     my $key = delete $args{key} or die "Private key is required";
     rs(SSL_Config)->update_or_create({ key => 'l7r.ssl.cert',
-				       value => $cert });
+                                       value => $cert });
     rs(SSL_Config)->update_or_create({ key => 'l7r.ssl.key',
-				       value => $key });
+                                       value => $key });
     1
 }
 
 sub cmd_host_add {
     my ($self, @args) = @_;
     txn_do {
-	my $row = $self->_obj_add('host',
-				  [qw/name address frontend backend/],
-				  @args, frontend => 1, backend => 1);
-	rs(Host_Runtime)->create({ host_id  => $row->id,
-				   state    => 'stopped',
-				   blocked  => 'false' });
-	$row->id
+        my $row = $self->_obj_add('host',
+                                  [qw/name address frontend backend/],
+                                  @args, frontend => 1, backend => 1);
+        rs(Host_Runtime)->create({ host_id  => $row->id,
+                                   state    => 'stopped',
+                                   blocked  => 'false' });
+        $row->id
     };
 }
 
@@ -289,12 +288,12 @@ sub cmd_host_block {
     my $counter = 0;
     my $rs = $self->get_resultset('host');
     while (defined(my $host = $rs->next)) {
-	txn_eval {
-	    $host->discard_changes;
-	    $host->runtime->block;
-	    $counter++;
-	};
-	# FIXME: report errors
+        txn_eval {
+            $host->discard_changes;
+            $host->runtime->block;
+            $counter++;
+        };
+        # FIXME: report errors
     }
     $counter
 }
@@ -303,9 +302,9 @@ sub cmd_host_block_by_id {
     my ($self, $id) = @_;
     $id // die "Missing parameter id";
     txn_do {
-	my $hostrt = rs(Host_Runtime)->find($id) //
-	    die "Host $id doesn't exist";
-	$hostrt->block;
+        my $hostrt = rs(Host_Runtime)->find($id) //
+            die "Host $id doesn't exist";
+        $hostrt->block;
     };
 }
 
@@ -326,11 +325,11 @@ sub cmd_host_unblock {
     my $counter = 0;
     my $rs = $self->get_resultset('host');
     while (defined(my $host = $rs->next)) {
-	txn_eval {
-	    $host->discard_changes;
-	    $host->runtime->unblock;
-	    $counter++;
-	};
+        txn_eval {
+            $host->discard_changes;
+            $host->runtime->unblock;
+            $counter++;
+        };
     # FIXME: report errors
     }
     $counter
@@ -340,9 +339,9 @@ sub cmd_host_unblock_by_id {
     my ($self, $id) = @_;
     $id // die "Missing parameter id";
     txn_do {
-	my $hostrt = rs(Host_Runtime)->find($id) //
-	    die "Host $id doesn't exist";
-	$hostrt->unblock;
+        my $hostrt = rs(Host_Runtime)->find($id) //
+            die "Host $id doesn't exist";
+        $hostrt->unblock;
     };
 }
 
@@ -355,7 +354,7 @@ sub cmd_osi_add {
     $params{use_overlay} //= $osi_default_overlay;
     
     #die "The required parameters are ".join(", ", @required_params)
-	#unless _set_equals([keys %params], \@required_params);
+    #    unless _set_equals([keys %params], \@required_params);
 
     mkdir $images_path, 0755;
     -d $images_path or die "Directory $images_path does not exist";
@@ -363,17 +362,17 @@ sub cmd_osi_add {
     my $src = delete $params{disk_image};
     my $file = basename($src);
     my $tmp = "$images_path/$file.tmp";
-    copy($src, $tmp) or die "Unable to copy $src to $tmp: $^E";
+    copy($src, $tmp) or die "Unable to copy $src to $tmp: $^E\n";
 
     $params{disk_image} = '-';
     my $id;
     txn_do {
-	my $rs = $self->get_resultset('osi');
-	my $row = $rs->create(\%params);
-	$id = $row->id;
-	my $disk_image = "$id-$file";
-	move($tmp, "$images_path/$disk_image");
-	$row->update({disk_image => $disk_image});
+        my $rs = $self->get_resultset('osi');
+        my $row = $rs->create(\%params);
+        $id = $row->id;
+        my $disk_image = "$id-$file";
+        move($tmp, "$images_path/$disk_image");
+        $row->update({disk_image => $disk_image});
     };
     $id
 }
@@ -383,22 +382,28 @@ sub cmd_osi_del {
     my $counter = 0;
     my $rs = $self->get_resultset('osi');
     while (my $osi = $rs->next) {
-	if ($osi->vms->count == 0) {
-	    warn "deleting osi ".$osi->id;
-	    $osi->delete;
-	    $counter++;
-	    # FIXME Should we delete the actual image file?
-	}
+        if ($osi->vms->count == 0) {
+            warn "deleting osi ".$osi->id;
+            $osi->delete;
+            $counter++;
+            # FIXME Should we delete the actual image file?
+        }
     }
     $counter
 }
 
 sub cmd_user_add {
     my ($self, %params) = @_;
+
+    ## Previously if the user didn't specify any parameter, this line populated the
+    ## hash with undef values. Then, the call to _set_equals in _obj_add returned
+    ## true, and we hit a SQL NOT NULL constraint at a deep layer. Now the syntax
+    ## is checked beforehand so this won't happen anymore.
     my %core_params = ( login    => delete $params{login},
-			password => delete $params{password} );
+                        password => delete $params{password} );
+
     $self->_obj_add('user', [qw/login password/], %core_params)
-	-> id;
+        -> id;
 }
 
 sub cmd_user_del {
@@ -417,33 +422,33 @@ sub cmd_user_propset {
 sub cmd_vm_add {
     my ($self, %params) = @_;
     txn_do {
-	if (exists $params{osi}) {
-	    my $key = $params{osi};
-	    my $rs = rs(OSI)->search({name => $key});
-	    die "$key: No such OSI" if ($rs->count() < 1);
-	    $params{osi_id} = $rs->single->id;
-	    delete $params{osi};
-	}
-	if (exists $params{user}) {
-	    my $key = $params{user};
-	    my $rs = rs(User)->search({login => $key});
-	    die "$key: No such user" if ($rs->count() < 1);
-	    $params{user_id} = $rs->single->id;
-	    delete $params{user};
-	}
-	unless ($params{ip}) {
-	    $params{ip} = $self->_get_free_ip;
-	    INFO "assigned IP: $params{ip}";
-	}
-	$params{storage} = '';
-	my $row = $self->_obj_add('vm', [qw/name user_id osi_id ip storage/],
-				  \%params);
-	rs(VM_Runtime)->create({vm_id         => $row->id,
-				osi_actual_id => $row->osi_id,
-				vm_state      => 'stopped',
-				user_state    => 'disconnected',
-				blocked       => 'false'});
-	$row->id
+        if (exists $params{osi}) {
+            my $key = $params{osi};
+            my $rs = rs(OSI)->search({name => $key});
+            die "$key: No such OSI" if ($rs->count() < 1);
+            $params{osi_id} = $rs->single->id;
+            delete $params{osi};
+        }
+        if (exists $params{user}) {
+            my $key = $params{user};
+            my $rs = rs(User)->search({login => $key});
+            die "$key: No such user" if ($rs->count() < 1);
+            $params{user_id} = $rs->single->id;
+            delete $params{user};
+        }
+        unless ($params{ip}) {
+            $params{ip} = $self->_get_free_ip;
+            INFO "assigned IP: $params{ip}";
+        }
+        $params{storage} = '';
+        my $row = $self->_obj_add('vm', [qw/name user_id osi_id ip storage/],
+                                  \%params);
+        rs(VM_Runtime)->create({vm_id         => $row->id,
+                                osi_actual_id => $row->osi_id,
+                                vm_state      => 'stopped',
+                                user_state    => 'disconnected',
+                                blocked       => 'false'});
+        $row->id
     };
 }
 
@@ -452,12 +457,12 @@ sub cmd_vm_block {
     my $counter = 0;
     my $rs = $self->get_resultset('vm');
     while (defined(my $vm = $rs->next)) {
-	txn_eval {
-	    $vm->discard_changes;
-	    $vm->vm_runtime->block;
-	    $counter++;
-	};
-	# FIXME: report errors
+        txn_eval {
+            $vm->discard_changes;
+            $vm->vm_runtime->block;
+            $counter++;
+        };
+        # FIXME: report errors
     }
     $counter
 }
@@ -466,9 +471,9 @@ sub cmd_vm_block_by_id {
     my ($self, $id) = @_;
     $id // die "Missing parameter id";
     txn_do {
-	my $vmrt = rs(VM_Runtime)->find($id) //
-	    die "VM $id doesn't exist";
-	$vmrt->block;
+        my $vmrt = rs(VM_Runtime)->find($id) //
+            die "VM $id doesn't exist";
+        $vmrt->block;
     };
 }
 
@@ -477,9 +482,9 @@ sub cmd_vm_del {
     my $rs = $self->get_resultset('vm');
     # Checks if vm is running
     while (my $vm = $rs->next) {
-	if ($vm->vm_runtime->vm_state eq 'stopped') {
-	    $vm->delete;
-	}
+        if ($vm->vm_runtime->vm_state eq 'stopped') {
+            $vm->delete;
+        }
     }
     # FIXME Should we delete the overlay image and home disk file?
 }
@@ -489,12 +494,12 @@ sub cmd_vm_disconnect_user {
     my $counter = 0;
     my $rs = $self->get_resultset('vm');
     while (defined(my $vm = $rs->next)) {
-	txn_eval {
-	    $vm->discard_changes;
-	    $self->_disconnect_user($vm->vm_runtime);
-	    $counter++;
-	};
-	# FIXME: report errors
+        txn_eval {
+            $vm->discard_changes;
+            $self->_disconnect_user($vm->vm_runtime);
+            $counter++;
+        };
+        # FIXME: report errors
     }
     $counter
 }
@@ -503,9 +508,9 @@ sub cmd_vm_disconnect_user_by_id {
     my ($self, $id) = @_;
     $id // die "Missing parameter id";
     txn_do {
-	my $vmrt = rs(VM_Runtime)->find($id) //
-	    die "VM $id doesn't exist";
-	$self->_disconnect_user($vmrt);
+        my $vmrt = rs(VM_Runtime)->find($id) //
+            die "VM $id doesn't exist";
+        $self->_disconnect_user($vmrt);
     };
 }
 
@@ -515,7 +520,7 @@ sub cmd_vm_edit {
     my $rs = $self->get_resultset('vm');
     my @vm_columns = $rs->result_source->columns;
     while (defined(my $vm = $rs->next)) {
-	txn_eval {
+        txn_eval {
         $vm->discard_changes;
         my (%vm_args, %vm_runtime_args);
         foreach my $k (keys %args) {
@@ -528,7 +533,7 @@ sub cmd_vm_edit {
         $vm->update (\%vm_args);
         $vm->vm_runtime->update (\%vm_runtime_args);
         $counter++;
-	};
+        };
     # FIXME: report errors
     }
     $counter
@@ -547,12 +552,12 @@ sub cmd_vm_start {
     my $counter = 0;
     my $rs = $self->get_resultset('vm');
     while (defined(my $vm = $rs->next)) {
-	txn_eval {
-	    $vm->discard_changes;
-	    $self->_start_vm($vm->vm_runtime);
-	    $counter++;
-	};
-	# TODO Log error messages ($@) in some way
+        txn_eval {
+            $vm->discard_changes;
+            $self->_start_vm($vm->vm_runtime);
+            $counter++;
+        };
+        # TODO Log error messages ($@) in some way
     }
     $counter
 }
@@ -561,9 +566,9 @@ sub cmd_vm_start_by_id {
     my ($self, $id) = @_;
     $id // die "Missing parameter id";
     txn_do {
-	my $vmrt = rs(VM_Runtime)->find($id) //
-	    die "VM $id doesn't exist";
-	$self->_start_vm($vmrt);
+        my $vmrt = rs(VM_Runtime)->find($id) //
+            die "VM $id doesn't exist";
+        $self->_start_vm($vmrt);
     };
 }
 
@@ -572,12 +577,12 @@ sub cmd_vm_stop {
     my $counter = 0;
     my $rs = $self->get_resultset('vm');
     while (defined(my $vm = $rs->next)) {
-	txn_eval {
-	    $vm->discard_changes;
-	    $self->_stop_vm($vm->vm_runtime);
-	    $counter++;
-	};
-	# TODO Log error messages ($@) in some way
+        txn_eval {
+            $vm->discard_changes;
+            $self->_stop_vm($vm->vm_runtime);
+            $counter++;
+        };
+        # TODO Log error messages ($@) in some way
     }
     $counter
 }
@@ -586,9 +591,9 @@ sub cmd_vm_stop_by_id {
     my ($self, $id) = @_;
     $id or die "Missing parameter id" unless defined $id;
     txn_do {
-	my $vm = rs(VM_Runtime)->find($id) //
-	    die "VM $id doesn't exist";
-	$self->_stop_vm($vm);
+        my $vm = rs(VM_Runtime)->find($id) //
+            die "VM $id doesn't exist";
+        $self->_stop_vm($vm);
     };
 }
 
@@ -597,11 +602,11 @@ sub cmd_vm_unblock {
     my $counter = 0;
     my $rs = $self->get_resultset('vm');
     while (defined(my $vm = $rs->next)) {
-	txn_eval {
-	    $vm->discard_changes;
-	    $vm->vm_runtime->unblock;
-	    $counter++;
-	};
+        txn_eval {
+            $vm->discard_changes;
+            $vm->vm_runtime->unblock;
+            $counter++;
+        };
     # FIXME: report errors
     }
     $counter
@@ -611,9 +616,9 @@ sub cmd_vm_unblock_by_id {
     my ($self, $id) = @_;
     $id // die "Missing parameter id";
     txn_do {
-	my $vmrt = rs(VM_Runtime)->find($id) //
-	    die "VM $id doesn't exist";
-	$vmrt->unblock;
+        my $vmrt = rs(VM_Runtime)->find($id) //
+            die "VM $id doesn't exist";
+        $vmrt->unblock;
     };
 }
 
@@ -634,9 +639,9 @@ Version 0.01
     use QVD::Admin;
     my $admin = QVD::Admin->new;
     my $id = $admin->cmd_osi_add(name => "Ubuntu 9.10 (x86)", 
-				 memory => 512,
-				 use_overlay => 1,
-				 disk_image => "/var/tmp/U910_x86.img");
+                                 memory => 512,
+                                 use_overlay => 1,
+                                 disk_image => "/var/tmp/U910_x86.img");
     print "OSI added with id $id\n";
 
     $admin->set_filter(user=> 'qvd');
