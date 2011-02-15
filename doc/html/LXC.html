@@ -553,8 +553,8 @@ footnotes: function () {
 <div id="header">
 <h1>Linux Containers</h1>
 <span id="author">David Serrano</span><br />
-<span id="revnumber">version 0.1,</span>
-<span id="revdate">Jan 2011</span>
+<span id="revnumber">version 0.2,</span>
+<span id="revdate">Feb 2011</span>
 <div id="toc">
   <div id="toctitle">Table of Contents</div>
   <noscript><p><b>JavaScript must be enabled in your browser to display the table of contents.</b></p></noscript>
@@ -564,7 +564,7 @@ footnotes: function () {
 <h2 id="_setup">1. Setup</h2>
 <div class="sectionbody">
 <h3 id="_installing_lxc">1.1. Installing lxc</h3><div style="clear:left"></div>
-<div class="paragraph"><p>Just run as root:</p></div>
+<div class="paragraph"><p>Just install the package <tt>lxc</tt> as root (this file documents usage with version 0.7):</p></div>
 <div class="listingblock">
 <div class="content">
 <pre><tt># apt-get install lxc</tt></pre>
@@ -599,6 +599,7 @@ Macvlan: enabled
 Vlan: enabled
 File capabilities: enabled</tt></pre>
 </div></div>
+<div class="paragraph"><p>If the output doesn&#8217;t look like this, you&#8217;ll have to recompile your kernel.</p></div>
 <h3 id="_setting_up_a_network_bridge">1.2. Setting up a network bridge</h3><div style="clear:left"></div>
 <div class="paragraph"><p>In this example, we replace eth1, which has IP 10.1.0.101, with a bridge:</p></div>
 <div class="listingblock">
@@ -620,32 +621,42 @@ iface br0 inet static
 <div class="listingblock">
 <div class="content">
 <pre><tt>/somewhere
-  \_ container1.conf
-  \_ container2.conf
-  \_ container1
-  |    \_ bin
-  |    \_ dev
-  |    \_ etc
-  |    \_ ...
-  \_ container2
-       \_ bin
-       \_ dev
-       \_ etc
-       \_ ...</tt></pre>
+  \_ container.conf
+  \_ nfsroot/
+  \_ overlay1.ext4
+  \_ overlay2.ext4
+  \_ ...
+  \_ run-cont.sh</tt></pre>
 </div></div>
+<div class="paragraph"><p><tt>nfsroot</tt> is a directory where, in our setup, the root directory for all the
+containers is to be mounted read-only from a remote NFS server. The script
+<tt>run-cont.sh</tt> takes care of that. The overlays can be created with the
+following:</p></div>
+<div class="listingblock">
+<div class="content">
+<pre><tt>dd if=/dev/null of=overlay99.ext4 bs=1 seek=5G
+mkfs.ext4 -F overlay99.ext4</tt></pre>
+</div></div>
+<div class="paragraph"><p>but <tt>run-cont.sh</tt> already does that when needed, too.</p></div>
 <h4 id="_configuration_file">1.3.2. Configuration file</h4>
 <div class="listingblock">
 <div class="content">
 <pre><tt>lxc.utsname = qvdimg
 lxc.tty = 4
+lxc.pivotdir = .pivot
+
+## network
 lxc.network.type = veth
 lxc.network.flags = up
 lxc.network.link = br0
 lxc.network.name = eth1
 lxc.network.mtu = 1500
-lxc.network.hwaddr = 54:52:00:42:42:42
-lxc.network.ipv4 = 0.0.0.0
-lxc.rootfs = /home/qvd/cont/qvdimg/root
+
+#lxc.rootfs = /home/qvd/cont/qvdimg/root
+#lxc.mount.entry = /home/user554543 /home/qvd/cont/qvdimg/home none bind 0 0
+#lxc.mount = /path/to/some/specific/fstab
+
+## devices
 lxc.cgroup.devices.deny = a
 # /dev/null and zero
 lxc.cgroup.devices.allow = c 1:3 rwm
@@ -662,43 +673,164 @@ lxc.cgroup.devices.allow = c 1:8 rwm
 lxc.cgroup.devices.allow = c 136:* rwm
 lxc.cgroup.devices.allow = c 5:2 rwm
 # rtc
-lxc.cgroup.devices.allow = c 254:0 rwm</tt></pre>
+lxc.cgroup.devices.allow = c 254:0 rwm
+# RAM size
+#lxc.cgroup.memory.limit_in_bytes = 256M
+# swap size
+#lxc.cgroup.memory.memsw.limit_in_bytes = 1G
+# scheduler (1024 == same as everyone)
+#lxc.cgroup.cpu.shares = 512
+# CPUs to use
+#lxc.cgroup.cpuset.cpus = 0-1,3
+
+## capabilities
+# no insmod/rmmod
+lxc.cap.drop = sys_module
+# no time adjusting
+lxc.cap.drop = sys_time</tt></pre>
 </div></div>
 <div class="ulist"><ul>
 <li>
 <p>
-<em>lxc.utsname</em> specifies the hostname of the container.
+<tt>lxc.utsname</tt> specifies the hostname of the container.
 </p>
 </li>
 <li>
 <p>
-<em>lxc.network.type</em> introduces a new network interface inside the container. Everytime it appears in the configuration, a new interface is configured.
+<tt>lxc.pivotdir</tt> specifies the directory for the pivot_root(2) system call.
+    Since the root filesystem is mounted readonly, we can&#8217;t let <tt>lxc-start</tt>
+    choose and create a temporary directory for this operation.
 </p>
 </li>
 <li>
 <p>
-<em>lxc.network.link</em> refers to the bridge we just configured earlier.
+<tt>lxc.network.type</tt> introduces a new network interface inside the container.
+    Everytime it appears in the configuration, a new interface is configured.
 </p>
 </li>
 <li>
 <p>
-<em>lxc.network.name</em> is the name that this network interface will have inside the container. Can be virtually any string.
+<tt>lxc.network.link</tt> refers to the bridge we just configured earlier.
 </p>
 </li>
 <li>
 <p>
-<em>lxc.network.hwaddr</em> is needed for DHCP, not needed otherwise.
+<tt>lxc.network.name</tt> is the name that this network interface will have inside
+    the container. Can be virtually any string.
 </p>
 </li>
 <li>
 <p>
-<em>lxc.network.ipv4</em> can be 0.0.0.0 if DHCP is going to be used.
+<tt>lxc.mount.entry</tt> specifies a fstab-like line to mount a resource before
+    bringing up the container.
+</p>
+</li>
+<li>
+<p>
+<tt>lxc.mount</tt> specifies a file in which those fstab-like lines can be put,
+    instead of having them in this LXC configuration file.
+</p>
+</li>
+<li>
+<p>
+<tt>lxc.cgroup.cpu.shares</tt> limits the amount of CPU time that this container
+    can use. The default value is 1024, so saying eg. 512 will give this container
+    half as much CPU time as the other ones.
 </p>
 </li>
 </ul></div>
+<div class="paragraph"><p>Any directive can be specified at the <tt>lxc-start</tt> command line (using the <tt>-s</tt>
+parameter), making the configuration file effectively optional (but in that
+case the command line would be very long, of course).</p></div>
+<h4 id="_tt_run_cont_sh_tt">1.3.3. <tt>run-cont.sh</tt></h4>
+<div class="paragraph"><p>This is a script I (dserrano) am currently using to start containers. It mounts
+NFS if needed, creates the overlay if needed, picks both MAC and IP addresses,
+union-mounts some directories, starts the container and waits for it to stop so
+as to undo the union-mount operations and do some clean up.</p></div>
+<div class="listingblock">
+<div class="content"><!-- Generator: GNU source-highlight 3.1.3
+by Lorenzo Bettini
+http://www.lorenzobettini.it
+http://www.gnu.org/software/src-highlite -->
+<pre><tt><span style="font-style: italic"><span style="color: #9A1900">#!/bin/bash</span></span>
+
+<span style="font-weight: bold"><span style="color: #0000FF">set</span></span> -e
+
+<span style="color: #009900">ID</span><span style="color: #990000">=</span><span style="color: #009900">$1</span><span style="color: #990000">;</span>
+<span style="font-weight: bold"><span style="color: #0000FF">if</span></span> <span style="color: #990000">[[</span> -z <span style="color: #009900">$ID</span> <span style="color: #990000">]];</span> <span style="font-weight: bold"><span style="color: #0000FF">then</span></span>
+    echo <span style="color: #FF0000">"Usage: $0 [container number]"</span>
+    echo <span style="color: #FF0000">"Example: $0 42"</span>
+    <span style="font-weight: bold"><span style="color: #0000FF">exit</span></span> <span style="color: #993399">1</span><span style="color: #990000">;</span>
+<span style="font-weight: bold"><span style="color: #0000FF">fi</span></span>
+
+<span style="color: #009900">ID</span><span style="color: #990000">=</span><span style="color: #009900">$(</span><span style="font-weight: bold"><span style="color: #0000FF">printf</span></span> <span style="color: #990000">%</span>02d <span style="color: #009900">$ID</span><span style="color: #990000">)</span>
+<span style="color: #009900">OVL</span><span style="color: #990000">=</span>ovl<span style="color: #009900">$ID</span>
+<span style="color: #009900">ROOT</span><span style="color: #990000">=</span>root<span style="color: #009900">$ID</span>
+<span style="color: #009900">NAME</span><span style="color: #990000">=</span>qvdimg<span style="color: #009900">$ID</span><span style="color: #990000">;</span>
+<span style="color: #009900">NFS_REMOTE</span><span style="color: #990000">=</span>aguila<span style="color: #990000">:</span>/var/local/exports/lxc-root
+<span style="color: #009900">NFS_LOCAL</span><span style="color: #990000">=</span>nfsroot
+<span style="color: #009900">LM</span><span style="color: #990000">=</span>lib/modules<span style="color: #990000">/</span><span style="color: #009900">$(</span>uname -r<span style="color: #990000">)</span>
+<span style="color: #009900">IP</span><span style="color: #990000">=</span><span style="color: #993399">10.1</span><span style="color: #990000">.</span><span style="color: #993399">0</span><span style="color: #990000">.</span><span style="color: #009900">$(</span><span style="color: #990000">(</span> <span style="color: #993399">230</span> <span style="color: #990000">+</span> <span style="color: #009900">$ID</span> <span style="color: #990000">))</span>
+
+<span style="color: #009900">NUM</span><span style="color: #990000">=</span><span style="color: #009900">$ID</span><span style="color: #990000">;</span>
+<span style="color: #009900">MAC1</span><span style="color: #990000">=</span><span style="color: #009900">$(</span><span style="color: #990000">(</span> <span style="color: #009900">$NUM</span> <span style="color: #990000">/</span> <span style="color: #993399">256</span> <span style="color: #990000">/</span> <span style="color: #993399">256</span><span style="color: #990000">));</span> <span style="color: #009900">NUM</span><span style="color: #990000">=</span><span style="color: #009900">$(</span><span style="color: #990000">(</span> <span style="color: #009900">$NUM</span> - <span style="color: #009900">$MAC1</span> <span style="color: #990000">*</span> <span style="color: #993399">256</span> <span style="color: #990000">*</span> <span style="color: #993399">256</span> <span style="color: #990000">));</span>
+<span style="color: #009900">MAC2</span><span style="color: #990000">=</span><span style="color: #009900">$(</span><span style="color: #990000">(</span> <span style="color: #009900">$NUM</span> <span style="color: #990000">/</span> <span style="color: #993399">256</span> <span style="color: #990000">));</span>      <span style="color: #009900">NUM</span><span style="color: #990000">=</span><span style="color: #009900">$(</span><span style="color: #990000">(</span> <span style="color: #009900">$NUM</span> - <span style="color: #009900">$MAC2</span> <span style="color: #990000">*</span> <span style="color: #993399">256</span> <span style="color: #990000">));</span>
+<span style="color: #009900">MAC3</span><span style="color: #990000">=</span><span style="color: #009900">$NUM</span>
+<span style="color: #009900">MAC</span><span style="color: #990000">=</span><span style="color: #009900">$(</span><span style="font-weight: bold"><span style="color: #0000FF">printf</span></span> <span style="color: #FF0000">"54:52:00:%02x:%02x:%02x</span><span style="color: #CC33CC">\n</span><span style="color: #FF0000">"</span> <span style="color: #009900">$MAC1</span> <span style="color: #009900">$MAC2</span> <span style="color: #009900">$MAC3</span><span style="color: #990000">);</span>
+<span style="font-weight: bold"><span style="color: #0000FF">unset</span></span> MAC1 MAC2 MAC3 NUM
+
+<span style="font-style: italic"><span style="color: #9A1900">#echo "ID [$ID] OVL [$OVL] ROOT [$ROOT] NAME [$NAME] IP [$IP] MAC [$MAC]"</span></span>
+
+<span style="font-weight: bold"><span style="color: #0000FF">if</span></span> <span style="color: #990000">[[</span> <span style="color: #990000">!</span> <span style="color: #009900">$(</span>lxc-info -n <span style="color: #009900">$NAME</span><span style="color: #990000">)</span> <span style="color: #990000">=~</span> <span style="color: #FF0000">" is STOPPED"</span> <span style="color: #990000">]];</span> <span style="font-weight: bold"><span style="color: #0000FF">then</span></span>
+    echo <span style="color: #FF0000">"Container $ID is not 'STOPPED', aborting."</span>
+    <span style="font-weight: bold"><span style="color: #0000FF">exit</span></span> <span style="color: #993399">1</span>
+<span style="font-weight: bold"><span style="color: #0000FF">fi</span></span>
+
+<span style="font-weight: bold"><span style="color: #0000FF">if</span></span> <span style="color: #990000">[[</span> <span style="color: #990000">!</span> -d <span style="color: #009900">$NFS_LOCAL</span>/bin <span style="color: #990000">]];</span> <span style="font-weight: bold"><span style="color: #0000FF">then</span></span>
+    mkdir -p <span style="color: #009900">$NFS_LOCAL</span>
+    mount -t nfs -o ro <span style="color: #009900">$NFS_REMOTE</span> <span style="color: #009900">$NFS_LOCAL</span>    <span style="font-style: italic"><span style="color: #9A1900">## y esto se queda montado forever</span></span>
+    mount -o <span style="font-weight: bold"><span style="color: #0000FF">bind</span></span> <span style="color: #990000">/</span><span style="color: #009900">$LM</span> <span style="color: #009900">$NFS_LOCAL</span><span style="color: #990000">/</span><span style="color: #009900">$LM</span>            <span style="font-style: italic"><span style="color: #9A1900">## esta sale como rw, y hacerle un remount,ro devuelve "busy"</span></span>
+<span style="font-weight: bold"><span style="color: #0000FF">fi</span></span>
+
+<span style="font-weight: bold"><span style="color: #0000FF">if</span></span> <span style="color: #990000">[[</span> <span style="color: #990000">!</span> -f <span style="color: #009900">$OVL</span><span style="color: #990000">.</span>ext4 <span style="color: #990000">]];</span> <span style="font-weight: bold"><span style="color: #0000FF">then</span></span>
+    echo <span style="color: #FF0000">"Creating overlay $OVL.ext4..."</span>
+    dd <span style="font-weight: bold"><span style="color: #0000FF">if</span></span><span style="color: #990000">=</span>/dev/null <span style="color: #009900">of</span><span style="color: #990000">=</span><span style="color: #009900">$OVL</span><span style="color: #990000">.</span>ext4 <span style="color: #009900">bs</span><span style="color: #990000">=</span><span style="color: #993399">1</span> <span style="color: #009900">seek</span><span style="color: #990000">=</span>5G
+    mkfs<span style="color: #990000">.</span>ext4 -qF <span style="color: #009900">$OVL</span><span style="color: #990000">.</span>ext4
+<span style="font-weight: bold"><span style="color: #0000FF">fi</span></span>
+mkdir -p <span style="color: #009900">$OVL</span>
+mount -o loop <span style="color: #009900">$OVL</span><span style="color: #990000">.</span>ext4 <span style="color: #009900">$OVL</span>
+mkdir -p <span style="color: #009900">$OVL</span><span style="color: #990000">/</span><span style="color: #009900">$LM</span>
+
+mkdir -p <span style="color: #009900">$ROOT</span>
+mount -t aufs -o br<span style="color: #990000">:</span><span style="color: #009900">$OVL</span><span style="color: #990000">:</span><span style="color: #009900">$NFS_LOCAL</span><span style="color: #990000">=</span>ro         aufs <span style="color: #009900">$ROOT</span>
+mount -t aufs -o br<span style="color: #990000">:</span><span style="color: #009900">$OVL</span><span style="color: #990000">/</span><span style="color: #009900">$LM</span><span style="color: #990000">:</span><span style="color: #009900">$NFS_LOCAL</span><span style="color: #990000">/</span><span style="color: #009900">$LM</span><span style="color: #990000">=</span>ro aufs <span style="color: #009900">$ROOT</span><span style="color: #990000">/</span><span style="color: #009900">$LM</span>
+<span style="font-style: italic"><span style="color: #9A1900">#echo "Overlay '$OVL' mounted over '$NFS_LOCAL' on '$ROOT'."</span></span>
+
+lxc-start -f container<span style="color: #990000">.</span>conf -n <span style="color: #009900">$NAME</span> -l INFO -d -o /tmp/lxc-out -s lxc<span style="color: #990000">.</span><span style="color: #009900">rootfs</span><span style="color: #990000">=</span><span style="color: #009900">$ROOT</span> -s lxc<span style="color: #990000">.</span>network<span style="color: #990000">.</span><span style="color: #009900">hwaddr</span><span style="color: #990000">=</span><span style="color: #009900">$MAC</span> -s lxc<span style="color: #990000">.</span>network<span style="color: #990000">.</span><span style="color: #009900">ipv4</span><span style="color: #990000">=</span><span style="color: #009900">$IP</span><span style="color: #990000">/</span><span style="color: #993399">24</span>
+
+echo <span style="color: #FF0000">"LXC debug output is in /tmp/lxc-out."</span>
+echo <span style="color: #FF0000">"To run nxagent &amp; nxproxy, do the following:"</span>
+echo <span style="color: #FF0000">"ssh -n qvd@$IP 'xinit /etc/X11/Xsession -- /usr/bin/nxagent :100 -ac -name QVD -display nx/nx,options=/home/qvd/nxagent.conf:100' &amp; nxproxy -S $IP:100 &amp;"</span>
+<span style="color: #990000">(</span>
+    sleep <span style="color: #993399">20</span><span style="color: #990000">;</span>
+    <span style="font-style: italic"><span style="color: #9A1900">## lxc-wait uses a system-wide socket, so we can't use it here</span></span>
+    <span style="font-weight: bold"><span style="color: #0000FF">while</span></span> sleep <span style="color: #993399">1</span><span style="color: #990000">;</span> <span style="font-weight: bold"><span style="color: #0000FF">do</span></span>
+        <span style="color: #990000">[[</span> <span style="color: #009900">$(</span>lxc-info -n <span style="color: #009900">$NAME</span><span style="color: #990000">)</span> <span style="color: #990000">=~</span> <span style="color: #FF0000">" is STOPPED"</span> <span style="color: #990000">]]</span> <span style="color: #990000">&amp;&amp;</span> <span style="font-weight: bold"><span style="color: #0000FF">break</span></span>
+    <span style="font-weight: bold"><span style="color: #0000FF">done</span></span>
+
+    umount <span style="color: #009900">$ROOT</span><span style="color: #990000">/</span><span style="color: #009900">$LM</span>
+    umount <span style="color: #009900">$ROOT</span>
+    umount <span style="color: #009900">$OVL</span>
+    rmdir <span style="color: #009900">$OVL</span> <span style="color: #009900">$ROOT</span>
+<span style="color: #990000">)</span> <span style="color: #990000">&amp;</span></tt></pre></div></div>
 <h3 id="_modifications_to_the_container_filesystem">1.4. Modifications to the container filesystem</h3><div style="clear:left"></div>
-<h4 id="_dev">1.4.1. /dev</h4>
-<div class="paragraph"><p>Only the minimum set of devices should exist under /dev. The daemon udev doesn&#8217;t work under LXC, so the /dev management has to be done by hand. Following is a set of shell commands needed to create these devices. They assume that the root filesystem path is specified by the shell variable $ROOTFS, <strong>make sure</strong> this is the case, or the system&#8217;s /dev will be wiped clean!</p></div>
+<h4 id="_tt_dev_tt">1.4.1. <tt>/dev</tt></h4>
+<div class="paragraph"><p>Only the minimum set of devices should exist under <tt>/dev</tt>. The daemon <tt>udev</tt>
+doesn&#8217;t work under LXC, so the <tt>/dev</tt> management has to be done by hand.
+Following is a set of shell commands needed to create these devices. They
+assume that the root filesystem path is specified by the shell variable
+<tt>$ROOTFS</tt>, <strong>make sure</strong> this is the case, or the system&#8217;s <tt>/dev</tt> will be wiped
+clean!</p></div>
 <div class="listingblock">
 <div class="content">
 <pre><tt>echo $ROOTFS
@@ -721,22 +853,30 @@ mknod -m 666 $ROOTFS/dev/tty4 c 4 4
 mknod -m 666 $ROOTFS/dev/urandom c 1 9
 mknod -m 666 $ROOTFS/dev/zero c 1 5</tt></pre>
 </div></div>
-<h4 id="_etc_hostname_and_etc_hosts">1.4.2. /etc/hostname and /etc/hosts</h4>
+<h4 id="_tt_etc_hostname_tt_and_tt_etc_hosts_tt">1.4.2. <tt>/etc/hostname</tt> and <tt>/etc/hosts</tt></h4>
 <div class="paragraph"><p>The container&#8217;s hostname must be placed in these files.</p></div>
-<h4 id="_etc_fstab">1.4.3. /etc/fstab</h4>
-<div class="paragraph"><p>(Hmmm, I&#8217;ve read something about fstab but it seems the QVD container works fine without performing any tasks in this regard - dserrano)</p></div>
-<h4 id="_init_scripts_etc_init_in_ubuntu">1.4.4. init scripts (/etc/init in Ubuntu)</h4>
-<div class="paragraph"><p>Most init scripts should be removed since they deal with daemons not needed (or even inconvenient) inside a container. For example, everything hardware-related (ACPI, ALSA, avahi, clock, IRQs, udev) must be moved out of the way. What I did is place them in $ROOTFS/etc/init.moved instead of deleting them. This is what was left:</p></div>
-<div class="paragraph"><p>(TODO: I&#8217;m not sure about dbus - dserrano)</p></div>
-<div class="paragraph"><p>(TODO: I think mountall.conf and friends can be included in some particular cases - dserrano)</p></div>
+<h4 id="_tt_etc_fstab_tt">1.4.3. <tt>/etc/fstab</tt></h4>
+<div class="paragraph"><p>In theory this could be empty, since the default mount points are handled from
+<tt>/lib/init/fstab</tt>. If we want to use DHCP, then a bogus line <tt>none / auto ro 0
+0</tt> is required so that <tt>/sbin/dhclient-script</tt> detects that the root filesystem
+is read-only, preventing it from rewriting <tt>/etc/resolv.conf</tt>.</p></div>
+<h4 id="_init_scripts_tt_etc_init_tt_in_ubuntu">1.4.4. init scripts (<tt>/etc/init</tt> in Ubuntu)</h4>
+<div class="paragraph"><p>Most init scripts should be removed since they deal with daemons not needed (or
+even inconvenient) inside a container. For example, everything hardware-related
+(ACPI, ALSA, avahi, clock, IRQs, udev) must be moved out of the way. What I did
+is place them in <tt>$ROOTFS/etc/init.moved</tt> instead of deleting them. This is
+what was left:</p></div>
+<div class="paragraph"><p>(TODO: I think mountall.conf and friends can be included in some particular
+cases - dserrano)</p></div>
 <div class="listingblock">
 <div class="content">
 <pre><tt>anacron.conf
 atd.conf
 cron.conf
+dbus.conf          (needed for the power-off button in the GNOME panel)
 dmesg.conf
 hostname.conf
-networking.conf
+networking.conf    (not needed if DHCP isn't used, since the network can be configured beforehand via lxc-start)
 rc.conf
 rc-sysinit.conf
 rsyslog.conf
@@ -746,11 +886,17 @@ tty2.conf
 tty3.conf
 ufw.conf</tt></pre>
 </div></div>
-<div class="paragraph"><p>Note the absence of pretty basic stuff like rcS for example. It&#8217;s actually not needed. Another item worth mentioning is ttyS0.conf. Since it deals directly with the hardware, it shouldn&#8217;t run inside a container.</p></div>
-<div class="paragraph"><p>After the cleanup, create a small script, lxc.conf, with these contents:</p></div>
+<div class="paragraph"><p>Regarding the basic rcS scripts, we don&#8217;t have <tt>/etc/init/rcS</tt>, but
+<tt>rc-sysinit.conf</tt> calls <tt>/etc/init.d/rcS</tt>, which runs all scripts under
+<tt>/etc/rcS.d</tt>. This directory only needs two files: <tt>S70screen-cleanup</tt> (useful
+is GNU screen is used, harmless otherwise) and <tt>S70x11-common</tt> (<strong>required</strong>, it
+creates <tt>/tmp/.X11-unix</tt>) - the rest can be removed.</p></div>
+<div class="paragraph"><p>Another thing worth mentioning is <tt>ttyS0.conf</tt>. Since it deals directly with
+the hardware, it shouldn&#8217;t run inside a container.</p></div>
+<div class="paragraph"><p>After the cleanup, create a small script, <tt>lxc.conf</tt>, with these contents:</p></div>
 <div class="listingblock">
 <div class="content">
-<pre><tt># LXC – Fix init sequence to have LXC containers boot with upstart
+<pre><tt># LXC - Fix init sequence to have LXC containers boot with upstart
 
 # description “Fix LXC container - Lucid”
 
@@ -763,6 +909,7 @@ pre-start script
     mount -t sysfs sys /sys || true
     mount -t tmpfs varrun /var/run
     mount -t tmpfs varlock /var/lock
+    mount -t tmpfs -o mode=1777 tmp /tmp
     mkdir -p /var/run/network
     touch /var/run/utmp
     chmod 664 /var/run/utmp
@@ -770,18 +917,23 @@ pre-start script
     if [ "$(find /etc/network/ -name upstart -type f)" ]; then
         chmod -x /etc/network/*/upstart || true
     fi
+    #route add default gw 10.1.0.101    ## uncomment if DHCP isn't used and the network is configured via lxc-start
 end script
 
 script
-    start networking
+    start networking                    ##   comment if DHCP isn't used and the network is configured via lxc-start
+    #initctl emit networking --no-wait  ## uncomment if DHCP isn't used and the network is configured via lxc-start
     initctl emit filesystem --no-wait
     initctl emit local-filesystems --no-wait
     initctl emit virtual-filesystems --no-wait
     init 2
 end script</tt></pre>
 </div></div>
-<div class="paragraph"><p>(TODO: I guess the pre-start script could be dealt with elsewhere - dserrano)</p></div>
-<div class="paragraph"><p>Lastly, the script rc-sysinit.conf must be modified to run after system startup event, instead of waiting to the filesystem event. Modify the line that begins with "start on" so it reads like:</p></div>
+<div class="paragraph"><p>(TODO: I guess the pre-start script could be dealt with elsewhere, for example
+maybe we don&#8217;t have to mount anything - dserrano)</p></div>
+<div class="paragraph"><p>Last, the script <tt>rc-sysinit.conf</tt> must be modified to run after system startup
+event, instead of waiting to the filesystem event. Modify the line that begins
+with "start on" so it reads like:</p></div>
 <div class="listingblock">
 <div class="content">
 <pre><tt>start on startup</tt></pre>
@@ -797,7 +949,8 @@ end script</tt></pre>
 <div class="ulist"><ul>
 <li>
 <p>
-<em>lxc-create</em> creates the container, which isn&#8217;t more than a data structure.
+<tt>lxc-create</tt> creates the container, which isn&#8217;t more than a data structure.
+    This step is optional in LXC 0.7.
 </p>
 <div class="literalblock">
 <div class="content">
@@ -806,7 +959,8 @@ end script</tt></pre>
 </li>
 <li>
 <p>
-<em>lxc-ls</em> lists the existing containers.
+<tt>lxc-ls</tt> lists the existing containers. The containers that were created
+    with <tt>lxc-create</tt> and are running, appear twice.
 </p>
 <div class="literalblock">
 <div class="content">
@@ -815,16 +969,22 @@ end script</tt></pre>
 </li>
 <li>
 <p>
-<em>lxc-start</em> brings the container up.
+<tt>lxc-start</tt> brings the container up.
 </p>
 <div class="literalblock">
 <div class="content">
-<pre><tt>lxc-start -n name</tt></pre>
+<pre><tt>lxc-start -n name
+lxc-start -n name -d                        ## suppress output.
+lxc-start -n name -d -o /tmp/lxc.log        ## send output to a log file.
+lxc-start -n name -l DEBUG ...              ## for debugging.
+lxc-start -f config-file ...                ## LXC 0.7 and later: allows us to skip the lxc-create step.
+lxc-start -n name -s lxc.rootfs=/some/path  ## sets a configuration directive from the command line.</tt></pre>
 </div></div>
 </li>
 <li>
 <p>
-<em>lxc-console</em> connects to one of the container&#8217;s ttys.
+<tt>lxc-console</tt> connects to one of the container&#8217;s ttys. After closing the
+    session, you can get out of <tt>lxc-console</tt> with the key sequence <tt>C-A q</tt>.
 </p>
 <div class="literalblock">
 <div class="content">
@@ -833,7 +993,16 @@ end script</tt></pre>
 </li>
 <li>
 <p>
-<em>lxc-ps</em> shows processes running inside the container.
+<tt>lxc-info</tt> shows information about the specified container.
+</p>
+<div class="literalblock">
+<div class="content">
+<pre><tt>lxc-info -n name</tt></pre>
+</div></div>
+</li>
+<li>
+<p>
+<tt>lxc-ps</tt> shows processes running inside the container.
 </p>
 <div class="literalblock">
 <div class="content">
@@ -842,7 +1011,7 @@ end script</tt></pre>
 </li>
 <li>
 <p>
-<em>lxc-stop</em> kills all processes in the container, effectively stopping it.
+<tt>lxc-stop</tt> kills all processes in the container, effectively stopping it.
 </p>
 <div class="literalblock">
 <div class="content">
@@ -851,7 +1020,8 @@ end script</tt></pre>
 </li>
 <li>
 <p>
-<em>lxc-destroy</em> just removes the data structure.
+<tt>lxc-destroy</tt> just removes the data structure. Only needed if <tt>lxc-create</tt>
+    was used (ie. not needed after <tt>lxc-start -f config-file</tt>).
 </p>
 <div class="literalblock">
 <div class="content">
@@ -864,8 +1034,8 @@ end script</tt></pre>
 <div id="footnotes"><hr /></div>
 <div id="footer">
 <div id="footer-text">
-Version 0.1<br />
-Last updated 2011-01-21 12:36:12 CEST
+Version 0.2<br />
+Last updated 2011-02-15 15:12:29 CEST
 </div>
 </div>
 </body>
