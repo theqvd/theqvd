@@ -1,5 +1,5 @@
-Linux Containers
-================
+Linux Containers Documentation
+==============================
 David Serrano
 v0.2, Feb 2011
 
@@ -100,6 +100,7 @@ Configuration file
 lxc.utsname = qvdimg
 lxc.tty = 4
 lxc.pivotdir = .pivot
+#lxc.arch=x86    ## available from lxc 0.7.3
 
 ## network
 lxc.network.type = veth
@@ -129,7 +130,7 @@ lxc.cgroup.devices.allow = c 1:8 rwm
 lxc.cgroup.devices.allow = c 136:* rwm
 lxc.cgroup.devices.allow = c 5:2 rwm
 # rtc
-lxc.cgroup.devices.allow = c 254:0 rwm
+lxc.cgroup.devices.allow = c 254:0 rm
 # RAM size
 #lxc.cgroup.memory.limit_in_bytes = 256M
 # swap size
@@ -140,14 +141,33 @@ lxc.cgroup.devices.allow = c 254:0 rwm
 #lxc.cgroup.cpuset.cpus = 0-1,3
 
 ## capabilities
-# no insmod/rmmod 
-lxc.cap.drop = sys_module
-# no time adjusting
-lxc.cap.drop = sys_time
+# needed by ssh's init script (oom adjustment)
+#lxc.cap.drop = sys_resource
+# needed by ssh
+#lxc.cap.drop = net_bind_service net_admin
+# needed to shut down the system
+#lxc.cap.drop = kill
+# needed by daemons to drop root privileges
+#lxc.cap.drop = setuid
+# needed by openssh-server
+#lxc.cap.drop = sys_chroot
+# needed by daemons (at least, dbus and rsyslog)
+#lxc.cap.drop = setgid
+## needed by getty or login
+#lxc.cap.drop = chown fowner
+## needed by dbus at least
+#lxc.cap.drop = dac_override
+# needed by dhclient (but we don't use it)
+lxc.cap.drop = net_raw net_broadcast
+# freely droppable
+lxc.cap.drop = audit_control audit_write fsetid ipc_lock ipc_owner lease
+lxc.cap.drop = sys_admin linux_immutable mac_admin mac_override mknod setfcap setpcap
+lxc.cap.drop = sys_boot sys_nice sys_pacct sys_ptrace sys_rawio sys_time sys_tty_config
+lxc.cap.drop = sys_module dac_read_search
 ----
 
   - +lxc.utsname+ specifies the hostname of the container.
-  - +lxc.pivotdir+ specifies the directory for the pivot_root(2) system call.
+  - +lxc.pivotdir+ specifies the directory for the +pivot_root(2)+ system call.
     Since the root filesystem is mounted readonly, we can't let +lxc-start+
     choose and create a temporary directory for this operation.
   - +lxc.network.type+ introduces a new network interface inside the container.
@@ -180,106 +200,100 @@ as to undo the union-mount operations and do some clean up.
 
 set -e
 
+function setup_vars() {
+    ID=$(printf %02d $ID)
+    OVL=ovl$ID
+    ROOT=root$ID
+    NAME=qvdimg$ID;
+    NFS_REMOTE=aguila:/var/local/exports/lxc-root
+    NFS_LOCAL=nfsroot
+    LOG_FILE=/tmp/lxc-$NAME.log
+    CON_FILE=/tmp/lxc-$NAME-console.log
+    LM=lib/modules/$(uname -r)
+    IP=10.1.0.$(( 230 + $ID ))
+
+    NUM=$ID;                             MAC1=$(( $NUM / 256 / 256));
+    NUM=$(( $NUM - $MAC1 * 256 * 256 )); MAC2=$(( $NUM / 256 ));
+    NUM=$(( $NUM - $MAC2 * 256 ));       MAC3=$NUM
+    MAC=$(printf "54:52:00:%02x:%02x:%02x\n" $MAC1 $MAC2 $MAC3);
+    unset MAC1 MAC2 MAC3 NUM
+}
+
+function check_stopped() {
+    [[ $(lxc-info -n $NAME) =~ " is STOPPED" ]] && return
+
+    echo "Container $ID is not 'STOPPED', aborting."
+    exit 1
+}
+
+function mount_nfs() {
+    [[ -d $NFS_LOCAL/bin ]] && return
+
+    mkdir -p $NFS_LOCAL
+    mount -t nfs -o ro $NFS_REMOTE $NFS_LOCAL    ## and this remains mounted forever
+    mount -o bind /$LM $NFS_LOCAL/$LM            ## this is rw; doing a "remount,ro" fails saying that the directory "is busy"
+}
+
+function create_overlay() {
+    [[ -f $OVL.ext4 ]] && return
+
+    echo "Creating overlay $OVL.ext4..."
+    dd if=/dev/null of=$OVL.ext4 bs=1 seek=5G
+    mkfs.ext4 -qF $OVL.ext4
+}   
+    
+function setup_mounts() {
+    mkdir -p $OVL
+    mount -o loop $OVL.ext4 $OVL
+    mkdir -p $OVL/$LM
+    
+    mkdir -p $ROOT
+    mount -t aufs -o br:$OVL:$NFS_LOCAL=ro         aufs $ROOT
+    mount -t aufs -o br:$OVL/$LM:$NFS_LOCAL/$LM=ro aufs $ROOT/$LM
+    #echo "Overlay '$OVL' mounted over '$NFS_LOCAL' on '$ROOT'."
+}   
+    
+function cleanup() {
+    umount $ROOT/$LM
+    umount $ROOT
+    umount $OVL
+    rmdir $OVL $ROOT
+} 
+  
 ID=$1;
 if [[ -z $ID ]]; then
     echo "Usage: $0 [container number]"
     echo "Example: $0 42"
     exit 1;
-fi
+fi  
 
-ID=$(printf %02d $ID)
-OVL=ovl$ID
-ROOT=root$ID
-NAME=qvdimg$ID;
-NFS_REMOTE=aguila:/var/local/exports/lxc-root
-NFS_LOCAL=nfsroot
-LOG_FILE=/tmp/lxc-$NAME.log
-LM=lib/modules/$(uname -r)
-IP=10.1.0.$(( 230 + $ID ))
+setup_vars; #echo "ID [$ID] OVL [$OVL] ROOT [$ROOT] NAME [$NAME] IP [$IP] MAC [$MAC]"
+check_stopped
+mount_nfs
+trap cleanup EXIT
+create_overlay
+setup_mounts
 
-NUM=$ID;
-MAC1=$(( $NUM / 256 / 256)); NUM=$(( $NUM - $MAC1 * 256 * 256 ));
-MAC2=$(( $NUM / 256 ));      NUM=$(( $NUM - $MAC2 * 256 ));
-MAC3=$NUM
-MAC=$(printf "54:52:00:%02x:%02x:%02x\n" $MAC1 $MAC2 $MAC3);
-unset MAC1 MAC2 MAC3 NUM
+echo "LXC debug output is in $LOG_FILE."
+echo "To run nxagent & nxproxy, do the following:"
+echo "ssh -n qvd@$IP 'xinit /etc/X11/Xsession -- /usr/bin/nxagent :100 -ac -name QVD -display nx/nx,options=/home/qvd/nxagent.conf:100' & nxproxy -S $IP:100 &"
 
-#echo "ID [$ID] OVL [$OVL] ROOT [$ROOT] NAME [$NAME] IP [$IP] MAC [$MAC]"
-
-if [[ ! $(lxc-info -n $NAME) =~ " is STOPPED" ]]; then
-    echo "Container $ID is not 'STOPPED', aborting."
-    exit 1
-fi
-
-if [[ ! -d $NFS_LOCAL/bin ]]; then
-    mkdir -p $NFS_LOCAL
-    mount -t nfs -o ro $NFS_REMOTE $NFS_LOCAL    ## y esto se queda montado forever
-    mount -o bind /$LM $NFS_LOCAL/$LM            ## esta sale como rw, y hacerle un remount,ro devuelve "busy"
-fi
-
-if [[ ! -f $OVL.ext4 ]]; then
-    echo "Creating overlay $OVL.ext4..."
-    dd if=/dev/null of=$OVL.ext4 bs=1 seek=5G
-    mkfs.ext4 -qF $OVL.ext4
-fi
-mkdir -p $OVL
-mount -o loop $OVL.ext4 $OVL
-mkdir -p $OVL/$LM
-
-mkdir -p $ROOT
-mount -t aufs -o br:$OVL:$NFS_LOCAL=ro         aufs $ROOT
-mount -t aufs -o br:$OVL/$LM:$NFS_LOCAL/$LM=ro aufs $ROOT/$LM
-#echo "Overlay '$OVL' mounted over '$NFS_LOCAL' on '$ROOT'."
-
-lxc-start -f container.conf -n $NAME -l DEBUG -d -o $LOG_FILE -s lxc.console=/dev/console -s lxc.rootfs=$ROOT -s lxc.network.hwaddr=$MAC -s lxc.network.ipv4=$IP/24
-
-(
-    ## lxc-wait uses a system-wide socket, so we can't use it here
-    while sleep 1; do
-        [[ $(lxc-info -n $NAME) =~ " is RUNNING" ]] && break
-    done
-
-    ## ok, once it's running we can wait for it to stop
-
-    echo "LXC debug output is in $LOG_FILE."
-    echo "To run nxagent & nxproxy, do the following:"
-    echo "ssh -n qvd@$IP 'xinit /etc/X11/Xsession -- /usr/bin/nxagent :100 -ac -name QVD -display nx/nx,options=/home/qvd/nxagent.conf:100' & nxproxy -S $IP:100 &"
-
-    perl lxc-waiter.pl $LOG_FILE
-
-    umount $ROOT/$LM
-    umount $ROOT
-    umount $OVL
-    rmdir $OVL $ROOT
-) &
+## don't use -d; we have to wait for lxc-start to end, so that the trap handler runs after it
+lxc-start -f container.conf -n $NAME -l DEBUG -o $LOG_FILE \
+  -s lxc.console=$CON_FILE \
+  -s lxc.rootfs=$ROOT \
+  -s lxc.mount.entry="proc    $ROOT/proc     proc   defaults  0 0" \
+  -s lxc.mount.entry="sys     $ROOT/sys      sysfs  defaults  0 0" \
+  -s lxc.mount.entry="devpts  $ROOT/dev/pts  devpts defaults  0 0" \
+  -s lxc.mount.entry="varlock $ROOT/var/lock tmpfs  defaults  0 0" \
+  -s lxc.mount.entry="tmp     $ROOT/tmp      tmpfs  mode=1777 0 0" \
+  -s lxc.network.hwaddr=$MAC \
+  -s lxc.network.ipv4=$IP/24 #-- /sbin/init --verbose
 ----
 
-To wait for a container to stop, it runs +lxc-waiter.pl+, which is defined thusly:
-
-[source,perl]
-----
-#!/usr/bin/perl
-
-use warnings;
-use strict;
-
-my $log_file = shift;
-$log_file or die "Usage: $0 <log file>\n\nExample: $0 /tmp/lxc-qvdimg00.log\n\n";
-
-my $pid = open my $fd, "tail -f $log_file |" or die "open: $!";
-my $shutting_down = 0;
-while (<$fd>) {
-    $shutting_down = 1 if /lxc_utmp - container has shutdown/;
-    last if $shutting_down and / ended on signal \(9\)/;
-}
-kill 13, $pid;  ## SIGPIPE
-----
-
-It reads the log file generated by +lxc-start+ and waits until the line
-+/lxc_utmp - container has shutdown/+ appears. At that point, we know that the
-container is shutting down (ie. not rebooting) and wait for the shutdown
-process to complete (message +ended on signal (9)+). Then exits in order to
-let +run-cont.sh+ umount filesystems and clean up.
+Since +CAP_SYS_ADMIN+ is dropped inside the container, all the +mount(2)+
+operations have to be performed from the outside, and that's why they are
+specified in the +lxc-start+ command line.
 
 Modifications to the container filesystem
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
@@ -322,9 +336,9 @@ The container's hostname must be placed in these files.
 +/etc/fstab+
 ^^^^^^^^^^^^
 In theory this could be empty, since the default mount points are handled from
-+/lib/init/fstab+. If we want to use DHCP, then a bogus line +none / auto ro 0
-0+ is required so that +/sbin/dhclient-script+ detects that the root filesystem
-is read-only, preventing it from rewriting +/etc/resolv.conf+.
++run-cont.sh+. If we want to use DHCP, then a bogus line +none / auto ro 0 0+
+is required so that +/sbin/dhclient-script+ detects that the root filesystem is
+read-only, preventing it from rewriting +/etc/resolv.conf+.
 
 init scripts (+/etc/init+ in Ubuntu)
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
@@ -333,9 +347,6 @@ even inconvenient) inside a container. For example, everything hardware-related
 (ACPI, ALSA, avahi, clock, IRQs, udev) must be moved out of the way. What I did
 is place them in +$ROOTFS/etc/init.moved+ instead of deleting them. This is
 what was left:
-
-(TODO: I think mountall.conf and friends can be included in some particular
-cases - dserrano)
 
 ----
 anacron.conf
@@ -375,13 +386,7 @@ start on startup
 
 task
 pre-start script
-    mount -t proc proc /proc || true
-    mount -t devpts devpts /dev/pts || true
-    mount -t sysfs sys /sys || true
-    #mount -t tmpfs varrun /var/run
     find /var/run -xdev ! -path /var/run -delete
-    mount -t tmpfs varlock /var/lock
-    mount -t tmpfs -o mode=1777 tmp /tmp
     mkdir -p /var/run/network
     touch /var/run/utmp
     chmod 664 /var/run/utmp
@@ -402,8 +407,7 @@ script
 end script
 ----
 
-(TODO: I guess the pre-start script could be dealt with elsewhere, for example
-maybe we don't have to mount anything - dserrano)
+(TODO: I guess the pre-start script could be dealt with elsewhere - dserrano)
 
 Last, the script +rc-sysinit.conf+ must be modified to run after system startup
 event, instead of waiting to the filesystem event. Modify the line that begins
@@ -462,3 +466,24 @@ Usage
     was used (ie. not needed after +lxc-start -f config-file+).
 
     lxc-destroy -n name
+
+Random notes
+------------
+
+GNU screen
+~~~~~~~~~~
+
+From <http://sourceforge.net/mailarchive/forum.php?thread_name=380-22010941685612722%40M2W116.mail2web.com&forum_name=lxc-users>:
+----
+# screen -dmS mycontainer lxc-start -n mycontainer && screen -x mycontainer
+----
+
+To exit the container console, do Control-A then D. To re-enter the container console, do:
+
+----
+# screen -x mycontainer
+----
+
+Secure Linux containers cookbook
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+<http://www.ibm.com/developerworks/linux/library/l-lxc-security/>

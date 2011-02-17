@@ -4,7 +4,7 @@
 <head>
 <meta http-equiv="Content-Type" content="text/html; charset=UTF-8" />
 <meta name="generator" content="AsciiDoc 8.5.2" />
-<title>Linux Containers</title>
+<title>Linux Containers Documentation</title>
 <style type="text/css">
 /* Debug borders */
 p, li, dt, dd, div, pre, h1, h2, h3, h4, h5, h6 {
@@ -551,7 +551,7 @@ footnotes: function () {
 </head>
 <body>
 <div id="header">
-<h1>Linux Containers</h1>
+<h1>Linux Containers Documentation</h1>
 <span id="author">David Serrano</span><br />
 <span id="revnumber">version 0.2,</span>
 <span id="revdate">Feb 2011</span>
@@ -644,6 +644,7 @@ mkfs.ext4 -F overlay99.ext4</tt></pre>
 <pre><tt>lxc.utsname = qvdimg
 lxc.tty = 4
 lxc.pivotdir = .pivot
+#lxc.arch=x86    ## available from lxc 0.7.3
 
 ## network
 lxc.network.type = veth
@@ -673,7 +674,7 @@ lxc.cgroup.devices.allow = c 1:8 rwm
 lxc.cgroup.devices.allow = c 136:* rwm
 lxc.cgroup.devices.allow = c 5:2 rwm
 # rtc
-lxc.cgroup.devices.allow = c 254:0 rwm
+lxc.cgroup.devices.allow = c 254:0 rm
 # RAM size
 #lxc.cgroup.memory.limit_in_bytes = 256M
 # swap size
@@ -684,10 +685,29 @@ lxc.cgroup.devices.allow = c 254:0 rwm
 #lxc.cgroup.cpuset.cpus = 0-1,3
 
 ## capabilities
-# no insmod/rmmod
-lxc.cap.drop = sys_module
-# no time adjusting
-lxc.cap.drop = sys_time</tt></pre>
+# needed by ssh's init script (oom adjustment)
+#lxc.cap.drop = sys_resource
+# needed by ssh
+#lxc.cap.drop = net_bind_service net_admin
+# needed to shut down the system
+#lxc.cap.drop = kill
+# needed by daemons to drop root privileges
+#lxc.cap.drop = setuid
+# needed by openssh-server
+#lxc.cap.drop = sys_chroot
+# needed by daemons (at least, dbus and rsyslog)
+#lxc.cap.drop = setgid
+## needed by getty or login
+#lxc.cap.drop = chown fowner
+## needed by dbus at least
+#lxc.cap.drop = dac_override
+# needed by dhclient (but we don't use it)
+lxc.cap.drop = net_raw net_broadcast
+# freely droppable
+lxc.cap.drop = audit_control audit_write fsetid ipc_lock ipc_owner lease
+lxc.cap.drop = sys_admin linux_immutable mac_admin mac_override mknod setfcap setpcap
+lxc.cap.drop = sys_boot sys_nice sys_pacct sys_ptrace sys_rawio sys_time sys_tty_config
+lxc.cap.drop = sys_module dac_read_search</tt></pre>
 </div></div>
 <div class="ulist"><ul>
 <li>
@@ -697,7 +717,7 @@ lxc.cap.drop = sys_time</tt></pre>
 </li>
 <li>
 <p>
-<tt>lxc.pivotdir</tt> specifies the directory for the pivot_root(2) system call.
+<tt>lxc.pivotdir</tt> specifies the directory for the <tt>pivot_root(2)</tt> system call.
     Since the root filesystem is mounted readonly, we can&#8217;t let <tt>lxc-start</tt>
     choose and create a temporary directory for this operation.
 </p>
@@ -756,6 +776,66 @@ http://www.gnu.org/software/src-highlite -->
 
 <span style="font-weight: bold"><span style="color: #0000FF">set</span></span> -e
 
+<span style="font-weight: bold"><span style="color: #000000">function setup_vars()</span></span> {
+    <span style="color: #009900">ID</span><span style="color: #990000">=</span><span style="color: #009900">$(</span><span style="font-weight: bold"><span style="color: #0000FF">printf</span></span> <span style="color: #990000">%</span>02d <span style="color: #009900">$ID</span><span style="color: #990000">)</span>
+    <span style="color: #009900">OVL</span><span style="color: #990000">=</span>ovl<span style="color: #009900">$ID</span>
+    <span style="color: #009900">ROOT</span><span style="color: #990000">=</span>root<span style="color: #009900">$ID</span>
+    <span style="color: #009900">NAME</span><span style="color: #990000">=</span>qvdimg<span style="color: #009900">$ID</span><span style="color: #990000">;</span>
+    <span style="color: #009900">NFS_REMOTE</span><span style="color: #990000">=</span>aguila<span style="color: #990000">:</span>/var/local/exports/lxc-root
+    <span style="color: #009900">NFS_LOCAL</span><span style="color: #990000">=</span>nfsroot
+    <span style="color: #009900">LOG_FILE</span><span style="color: #990000">=</span>/tmp/lxc-<span style="color: #009900">$NAME</span><span style="color: #990000">.</span>log
+    <span style="color: #009900">CON_FILE</span><span style="color: #990000">=</span>/tmp/lxc-<span style="color: #009900">$NAME</span>-console<span style="color: #990000">.</span>log
+    <span style="color: #009900">LM</span><span style="color: #990000">=</span>lib/modules<span style="color: #990000">/</span><span style="color: #009900">$(</span>uname -r<span style="color: #990000">)</span>
+    <span style="color: #009900">IP</span><span style="color: #990000">=</span><span style="color: #993399">10.1</span><span style="color: #990000">.</span><span style="color: #993399">0</span><span style="color: #990000">.</span><span style="color: #009900">$(</span><span style="color: #990000">(</span> <span style="color: #993399">230</span> <span style="color: #990000">+</span> <span style="color: #009900">$ID</span> <span style="color: #990000">))</span>
+
+    <span style="color: #009900">NUM</span><span style="color: #990000">=</span><span style="color: #009900">$ID</span><span style="color: #990000">;</span>                             <span style="color: #009900">MAC1</span><span style="color: #990000">=</span><span style="color: #009900">$(</span><span style="color: #990000">(</span> <span style="color: #009900">$NUM</span> <span style="color: #990000">/</span> <span style="color: #993399">256</span> <span style="color: #990000">/</span> <span style="color: #993399">256</span><span style="color: #990000">));</span>
+    <span style="color: #009900">NUM</span><span style="color: #990000">=</span><span style="color: #009900">$(</span><span style="color: #990000">(</span> <span style="color: #009900">$NUM</span> - <span style="color: #009900">$MAC1</span> <span style="color: #990000">*</span> <span style="color: #993399">256</span> <span style="color: #990000">*</span> <span style="color: #993399">256</span> <span style="color: #990000">));</span> <span style="color: #009900">MAC2</span><span style="color: #990000">=</span><span style="color: #009900">$(</span><span style="color: #990000">(</span> <span style="color: #009900">$NUM</span> <span style="color: #990000">/</span> <span style="color: #993399">256</span> <span style="color: #990000">));</span>
+    <span style="color: #009900">NUM</span><span style="color: #990000">=</span><span style="color: #009900">$(</span><span style="color: #990000">(</span> <span style="color: #009900">$NUM</span> - <span style="color: #009900">$MAC2</span> <span style="color: #990000">*</span> <span style="color: #993399">256</span> <span style="color: #990000">));</span>       <span style="color: #009900">MAC3</span><span style="color: #990000">=</span><span style="color: #009900">$NUM</span>
+    <span style="color: #009900">MAC</span><span style="color: #990000">=</span><span style="color: #009900">$(</span><span style="font-weight: bold"><span style="color: #0000FF">printf</span></span> <span style="color: #FF0000">"54:52:00:%02x:%02x:%02x</span><span style="color: #CC33CC">\n</span><span style="color: #FF0000">"</span> <span style="color: #009900">$MAC1</span> <span style="color: #009900">$MAC2</span> <span style="color: #009900">$MAC3</span><span style="color: #990000">);</span>
+    <span style="font-weight: bold"><span style="color: #0000FF">unset</span></span> MAC1 MAC2 MAC3 NUM
+}
+
+<span style="font-weight: bold"><span style="color: #000000">function check_stopped()</span></span> {
+    <span style="color: #990000">[[</span> <span style="color: #009900">$(</span>lxc-info -n <span style="color: #009900">$NAME</span><span style="color: #990000">)</span> <span style="color: #990000">=~</span> <span style="color: #FF0000">" is STOPPED"</span> <span style="color: #990000">]]</span> <span style="color: #990000">&amp;&amp;</span> <span style="font-weight: bold"><span style="color: #0000FF">return</span></span>
+
+    echo <span style="color: #FF0000">"Container $ID is not 'STOPPED', aborting."</span>
+    <span style="font-weight: bold"><span style="color: #0000FF">exit</span></span> <span style="color: #993399">1</span>
+}
+
+<span style="font-weight: bold"><span style="color: #000000">function mount_nfs()</span></span> {
+    <span style="color: #990000">[[</span> -d <span style="color: #009900">$NFS_LOCAL</span>/bin <span style="color: #990000">]]</span> <span style="color: #990000">&amp;&amp;</span> <span style="font-weight: bold"><span style="color: #0000FF">return</span></span>
+
+    mkdir -p <span style="color: #009900">$NFS_LOCAL</span>
+    mount -t nfs -o ro <span style="color: #009900">$NFS_REMOTE</span> <span style="color: #009900">$NFS_LOCAL</span>    <span style="font-style: italic"><span style="color: #9A1900">## and this remains mounted forever</span></span>
+    mount -o <span style="font-weight: bold"><span style="color: #0000FF">bind</span></span> <span style="color: #990000">/</span><span style="color: #009900">$LM</span> <span style="color: #009900">$NFS_LOCAL</span><span style="color: #990000">/</span><span style="color: #009900">$LM</span>            <span style="font-style: italic"><span style="color: #9A1900">## this is rw; doing a "remount,ro" fails saying that the directory "is busy"</span></span>
+}
+
+<span style="font-weight: bold"><span style="color: #000000">function create_overlay()</span></span> {
+    <span style="color: #990000">[[</span> -f <span style="color: #009900">$OVL</span><span style="color: #990000">.</span>ext4 <span style="color: #990000">]]</span> <span style="color: #990000">&amp;&amp;</span> <span style="font-weight: bold"><span style="color: #0000FF">return</span></span>
+
+    echo <span style="color: #FF0000">"Creating overlay $OVL.ext4..."</span>
+    dd <span style="font-weight: bold"><span style="color: #0000FF">if</span></span><span style="color: #990000">=</span>/dev/null <span style="color: #009900">of</span><span style="color: #990000">=</span><span style="color: #009900">$OVL</span><span style="color: #990000">.</span>ext4 <span style="color: #009900">bs</span><span style="color: #990000">=</span><span style="color: #993399">1</span> <span style="color: #009900">seek</span><span style="color: #990000">=</span>5G
+    mkfs<span style="color: #990000">.</span>ext4 -qF <span style="color: #009900">$OVL</span><span style="color: #990000">.</span>ext4
+}
+
+<span style="font-weight: bold"><span style="color: #000000">function setup_mounts()</span></span> {
+    mkdir -p <span style="color: #009900">$OVL</span>
+    mount -o loop <span style="color: #009900">$OVL</span><span style="color: #990000">.</span>ext4 <span style="color: #009900">$OVL</span>
+    mkdir -p <span style="color: #009900">$OVL</span><span style="color: #990000">/</span><span style="color: #009900">$LM</span>
+
+    mkdir -p <span style="color: #009900">$ROOT</span>
+    mount -t aufs -o br<span style="color: #990000">:</span><span style="color: #009900">$OVL</span><span style="color: #990000">:</span><span style="color: #009900">$NFS_LOCAL</span><span style="color: #990000">=</span>ro         aufs <span style="color: #009900">$ROOT</span>
+    mount -t aufs -o br<span style="color: #990000">:</span><span style="color: #009900">$OVL</span><span style="color: #990000">/</span><span style="color: #009900">$LM</span><span style="color: #990000">:</span><span style="color: #009900">$NFS_LOCAL</span><span style="color: #990000">/</span><span style="color: #009900">$LM</span><span style="color: #990000">=</span>ro aufs <span style="color: #009900">$ROOT</span><span style="color: #990000">/</span><span style="color: #009900">$LM</span>
+    <span style="font-style: italic"><span style="color: #9A1900">#echo "Overlay '$OVL' mounted over '$NFS_LOCAL' on '$ROOT'."</span></span>
+}
+
+<span style="font-weight: bold"><span style="color: #000000">function cleanup()</span></span> {
+    umount <span style="color: #009900">$ROOT</span><span style="color: #990000">/</span><span style="color: #009900">$LM</span>
+    umount <span style="color: #009900">$ROOT</span>
+    umount <span style="color: #009900">$OVL</span>
+    rmdir <span style="color: #009900">$OVL</span> <span style="color: #009900">$ROOT</span>
+}
+
 <span style="color: #009900">ID</span><span style="color: #990000">=</span><span style="color: #009900">$1</span><span style="color: #990000">;</span>
 <span style="font-weight: bold"><span style="color: #0000FF">if</span></span> <span style="color: #990000">[[</span> -z <span style="color: #009900">$ID</span> <span style="color: #990000">]];</span> <span style="font-weight: bold"><span style="color: #0000FF">then</span></span>
     echo <span style="color: #FF0000">"Usage: $0 [container number]"</span>
@@ -763,97 +843,31 @@ http://www.gnu.org/software/src-highlite -->
     <span style="font-weight: bold"><span style="color: #0000FF">exit</span></span> <span style="color: #993399">1</span><span style="color: #990000">;</span>
 <span style="font-weight: bold"><span style="color: #0000FF">fi</span></span>
 
-<span style="color: #009900">ID</span><span style="color: #990000">=</span><span style="color: #009900">$(</span><span style="font-weight: bold"><span style="color: #0000FF">printf</span></span> <span style="color: #990000">%</span>02d <span style="color: #009900">$ID</span><span style="color: #990000">)</span>
-<span style="color: #009900">OVL</span><span style="color: #990000">=</span>ovl<span style="color: #009900">$ID</span>
-<span style="color: #009900">ROOT</span><span style="color: #990000">=</span>root<span style="color: #009900">$ID</span>
-<span style="color: #009900">NAME</span><span style="color: #990000">=</span>qvdimg<span style="color: #009900">$ID</span><span style="color: #990000">;</span>
-<span style="color: #009900">NFS_REMOTE</span><span style="color: #990000">=</span>aguila<span style="color: #990000">:</span>/var/local/exports/lxc-root
-<span style="color: #009900">NFS_LOCAL</span><span style="color: #990000">=</span>nfsroot
-<span style="color: #009900">LOG_FILE</span><span style="color: #990000">=</span>/tmp/lxc-<span style="color: #009900">$NAME</span><span style="color: #990000">.</span>log
-<span style="color: #009900">LM</span><span style="color: #990000">=</span>lib/modules<span style="color: #990000">/</span><span style="color: #009900">$(</span>uname -r<span style="color: #990000">)</span>
-<span style="color: #009900">IP</span><span style="color: #990000">=</span><span style="color: #993399">10.1</span><span style="color: #990000">.</span><span style="color: #993399">0</span><span style="color: #990000">.</span><span style="color: #009900">$(</span><span style="color: #990000">(</span> <span style="color: #993399">230</span> <span style="color: #990000">+</span> <span style="color: #009900">$ID</span> <span style="color: #990000">))</span>
+setup_vars<span style="color: #990000">;</span> <span style="font-style: italic"><span style="color: #9A1900">#echo "ID [$ID] OVL [$OVL] ROOT [$ROOT] NAME [$NAME] IP [$IP] MAC [$MAC]"</span></span>
+check_stopped
+mount_nfs
+<span style="font-weight: bold"><span style="color: #0000FF">trap</span></span> cleanup EXIT
+create_overlay
+setup_mounts
 
-<span style="color: #009900">NUM</span><span style="color: #990000">=</span><span style="color: #009900">$ID</span><span style="color: #990000">;</span>
-<span style="color: #009900">MAC1</span><span style="color: #990000">=</span><span style="color: #009900">$(</span><span style="color: #990000">(</span> <span style="color: #009900">$NUM</span> <span style="color: #990000">/</span> <span style="color: #993399">256</span> <span style="color: #990000">/</span> <span style="color: #993399">256</span><span style="color: #990000">));</span> <span style="color: #009900">NUM</span><span style="color: #990000">=</span><span style="color: #009900">$(</span><span style="color: #990000">(</span> <span style="color: #009900">$NUM</span> - <span style="color: #009900">$MAC1</span> <span style="color: #990000">*</span> <span style="color: #993399">256</span> <span style="color: #990000">*</span> <span style="color: #993399">256</span> <span style="color: #990000">));</span>
-<span style="color: #009900">MAC2</span><span style="color: #990000">=</span><span style="color: #009900">$(</span><span style="color: #990000">(</span> <span style="color: #009900">$NUM</span> <span style="color: #990000">/</span> <span style="color: #993399">256</span> <span style="color: #990000">));</span>      <span style="color: #009900">NUM</span><span style="color: #990000">=</span><span style="color: #009900">$(</span><span style="color: #990000">(</span> <span style="color: #009900">$NUM</span> - <span style="color: #009900">$MAC2</span> <span style="color: #990000">*</span> <span style="color: #993399">256</span> <span style="color: #990000">));</span>
-<span style="color: #009900">MAC3</span><span style="color: #990000">=</span><span style="color: #009900">$NUM</span>
-<span style="color: #009900">MAC</span><span style="color: #990000">=</span><span style="color: #009900">$(</span><span style="font-weight: bold"><span style="color: #0000FF">printf</span></span> <span style="color: #FF0000">"54:52:00:%02x:%02x:%02x</span><span style="color: #CC33CC">\n</span><span style="color: #FF0000">"</span> <span style="color: #009900">$MAC1</span> <span style="color: #009900">$MAC2</span> <span style="color: #009900">$MAC3</span><span style="color: #990000">);</span>
-<span style="font-weight: bold"><span style="color: #0000FF">unset</span></span> MAC1 MAC2 MAC3 NUM
+echo <span style="color: #FF0000">"LXC debug output is in $LOG_FILE."</span>
+echo <span style="color: #FF0000">"To run nxagent &amp; nxproxy, do the following:"</span>
+echo <span style="color: #FF0000">"ssh -n qvd@$IP 'xinit /etc/X11/Xsession -- /usr/bin/nxagent :100 -ac -name QVD -display nx/nx,options=/home/qvd/nxagent.conf:100' &amp; nxproxy -S $IP:100 &amp;"</span>
 
-<span style="font-style: italic"><span style="color: #9A1900">#echo "ID [$ID] OVL [$OVL] ROOT [$ROOT] NAME [$NAME] IP [$IP] MAC [$MAC]"</span></span>
-
-<span style="font-weight: bold"><span style="color: #0000FF">if</span></span> <span style="color: #990000">[[</span> <span style="color: #990000">!</span> <span style="color: #009900">$(</span>lxc-info -n <span style="color: #009900">$NAME</span><span style="color: #990000">)</span> <span style="color: #990000">=~</span> <span style="color: #FF0000">" is STOPPED"</span> <span style="color: #990000">]];</span> <span style="font-weight: bold"><span style="color: #0000FF">then</span></span>
-    echo <span style="color: #FF0000">"Container $ID is not 'STOPPED', aborting."</span>
-    <span style="font-weight: bold"><span style="color: #0000FF">exit</span></span> <span style="color: #993399">1</span>
-<span style="font-weight: bold"><span style="color: #0000FF">fi</span></span>
-
-<span style="font-weight: bold"><span style="color: #0000FF">if</span></span> <span style="color: #990000">[[</span> <span style="color: #990000">!</span> -d <span style="color: #009900">$NFS_LOCAL</span>/bin <span style="color: #990000">]];</span> <span style="font-weight: bold"><span style="color: #0000FF">then</span></span>
-    mkdir -p <span style="color: #009900">$NFS_LOCAL</span>
-    mount -t nfs -o ro <span style="color: #009900">$NFS_REMOTE</span> <span style="color: #009900">$NFS_LOCAL</span>    <span style="font-style: italic"><span style="color: #9A1900">## y esto se queda montado forever</span></span>
-    mount -o <span style="font-weight: bold"><span style="color: #0000FF">bind</span></span> <span style="color: #990000">/</span><span style="color: #009900">$LM</span> <span style="color: #009900">$NFS_LOCAL</span><span style="color: #990000">/</span><span style="color: #009900">$LM</span>            <span style="font-style: italic"><span style="color: #9A1900">## esta sale como rw, y hacerle un remount,ro devuelve "busy"</span></span>
-<span style="font-weight: bold"><span style="color: #0000FF">fi</span></span>
-
-<span style="font-weight: bold"><span style="color: #0000FF">if</span></span> <span style="color: #990000">[[</span> <span style="color: #990000">!</span> -f <span style="color: #009900">$OVL</span><span style="color: #990000">.</span>ext4 <span style="color: #990000">]];</span> <span style="font-weight: bold"><span style="color: #0000FF">then</span></span>
-    echo <span style="color: #FF0000">"Creating overlay $OVL.ext4..."</span>
-    dd <span style="font-weight: bold"><span style="color: #0000FF">if</span></span><span style="color: #990000">=</span>/dev/null <span style="color: #009900">of</span><span style="color: #990000">=</span><span style="color: #009900">$OVL</span><span style="color: #990000">.</span>ext4 <span style="color: #009900">bs</span><span style="color: #990000">=</span><span style="color: #993399">1</span> <span style="color: #009900">seek</span><span style="color: #990000">=</span>5G
-    mkfs<span style="color: #990000">.</span>ext4 -qF <span style="color: #009900">$OVL</span><span style="color: #990000">.</span>ext4
-<span style="font-weight: bold"><span style="color: #0000FF">fi</span></span>
-mkdir -p <span style="color: #009900">$OVL</span>
-mount -o loop <span style="color: #009900">$OVL</span><span style="color: #990000">.</span>ext4 <span style="color: #009900">$OVL</span>
-mkdir -p <span style="color: #009900">$OVL</span><span style="color: #990000">/</span><span style="color: #009900">$LM</span>
-
-mkdir -p <span style="color: #009900">$ROOT</span>
-mount -t aufs -o br<span style="color: #990000">:</span><span style="color: #009900">$OVL</span><span style="color: #990000">:</span><span style="color: #009900">$NFS_LOCAL</span><span style="color: #990000">=</span>ro         aufs <span style="color: #009900">$ROOT</span>
-mount -t aufs -o br<span style="color: #990000">:</span><span style="color: #009900">$OVL</span><span style="color: #990000">/</span><span style="color: #009900">$LM</span><span style="color: #990000">:</span><span style="color: #009900">$NFS_LOCAL</span><span style="color: #990000">/</span><span style="color: #009900">$LM</span><span style="color: #990000">=</span>ro aufs <span style="color: #009900">$ROOT</span><span style="color: #990000">/</span><span style="color: #009900">$LM</span>
-<span style="font-style: italic"><span style="color: #9A1900">#echo "Overlay '$OVL' mounted over '$NFS_LOCAL' on '$ROOT'."</span></span>
-
-lxc-start -f container<span style="color: #990000">.</span>conf -n <span style="color: #009900">$NAME</span> -l DEBUG -d -o <span style="color: #009900">$LOG_FILE</span> -s lxc<span style="color: #990000">.</span><span style="color: #009900">console</span><span style="color: #990000">=</span>/dev/console -s lxc<span style="color: #990000">.</span><span style="color: #009900">rootfs</span><span style="color: #990000">=</span><span style="color: #009900">$ROOT</span> -s lxc<span style="color: #990000">.</span>network<span style="color: #990000">.</span><span style="color: #009900">hwaddr</span><span style="color: #990000">=</span><span style="color: #009900">$MAC</span> -s lxc<span style="color: #990000">.</span>network<span style="color: #990000">.</span><span style="color: #009900">ipv4</span><span style="color: #990000">=</span><span style="color: #009900">$IP</span><span style="color: #990000">/</span><span style="color: #993399">24</span>
-
-<span style="color: #990000">(</span>
-    <span style="font-style: italic"><span style="color: #9A1900">## lxc-wait uses a system-wide socket, so we can't use it here</span></span>
-    <span style="font-weight: bold"><span style="color: #0000FF">while</span></span> sleep <span style="color: #993399">1</span><span style="color: #990000">;</span> <span style="font-weight: bold"><span style="color: #0000FF">do</span></span>
-        <span style="color: #990000">[[</span> <span style="color: #009900">$(</span>lxc-info -n <span style="color: #009900">$NAME</span><span style="color: #990000">)</span> <span style="color: #990000">=~</span> <span style="color: #FF0000">" is RUNNING"</span> <span style="color: #990000">]]</span> <span style="color: #990000">&amp;&amp;</span> <span style="font-weight: bold"><span style="color: #0000FF">break</span></span>
-    <span style="font-weight: bold"><span style="color: #0000FF">done</span></span>
-
-    <span style="font-style: italic"><span style="color: #9A1900">## ok, once it's running we can wait for it to stop</span></span>
-
-    echo <span style="color: #FF0000">"LXC debug output is in $LOG_FILE."</span>
-    echo <span style="color: #FF0000">"To run nxagent &amp; nxproxy, do the following:"</span>
-    echo <span style="color: #FF0000">"ssh -n qvd@$IP 'xinit /etc/X11/Xsession -- /usr/bin/nxagent :100 -ac -name QVD -display nx/nx,options=/home/qvd/nxagent.conf:100' &amp; nxproxy -S $IP:100 &amp;"</span>
-
-    perl lxc-waiter<span style="color: #990000">.</span>pl <span style="color: #009900">$LOG_FILE</span>
-
-    umount <span style="color: #009900">$ROOT</span><span style="color: #990000">/</span><span style="color: #009900">$LM</span>
-    umount <span style="color: #009900">$ROOT</span>
-    umount <span style="color: #009900">$OVL</span>
-    rmdir <span style="color: #009900">$OVL</span> <span style="color: #009900">$ROOT</span>
-<span style="color: #990000">)</span> <span style="color: #990000">&amp;</span></tt></pre></div></div>
-<div class="paragraph"><p>To wait for a container to stop, it runs <tt>lxc-waiter.pl</tt>, which is defined thusly:</p></div>
-<div class="listingblock">
-<div class="content"><!-- Generator: GNU source-highlight 3.1.3
-by Lorenzo Bettini
-http://www.lorenzobettini.it
-http://www.gnu.org/software/src-highlite -->
-<pre><tt><span style="font-style: italic"><span style="color: #9A1900">#!/usr/bin/perl</span></span>
-
-<span style="font-weight: bold"><span style="color: #0000FF">use</span></span> warnings<span style="color: #990000">;</span>
-<span style="font-weight: bold"><span style="color: #0000FF">use</span></span> strict<span style="color: #990000">;</span>
-
-<span style="font-weight: bold"><span style="color: #0000FF">my</span></span> <span style="color: #009900">$log_file</span> <span style="color: #990000">=</span> <span style="font-weight: bold"><span style="color: #0000FF">shift</span></span><span style="color: #990000">;</span>
-<span style="color: #009900">$log_file</span> or <span style="font-weight: bold"><span style="color: #0000FF">die</span></span> <span style="color: #FF0000">"Usage: $0 &lt;log file&gt;\n\nExample: $0 /tmp/lxc-qvdimg00.log\n\n"</span><span style="color: #990000">;</span>
-
-<span style="font-weight: bold"><span style="color: #0000FF">my</span></span> <span style="color: #009900">$pid</span> <span style="color: #990000">=</span> <span style="font-weight: bold"><span style="color: #0000FF">open</span></span> <span style="font-weight: bold"><span style="color: #0000FF">my</span></span> <span style="color: #009900">$fd</span><span style="color: #990000">,</span> <span style="color: #FF0000">"tail -f $log_file |"</span> or <span style="font-weight: bold"><span style="color: #0000FF">die</span></span> <span style="color: #FF0000">"open: $!"</span><span style="color: #990000">;</span>
-<span style="font-weight: bold"><span style="color: #0000FF">my</span></span> <span style="color: #009900">$shutting_down</span> <span style="color: #990000">=</span> <span style="color: #993399">0</span><span style="color: #990000">;</span>
-<span style="font-weight: bold"><span style="color: #0000FF">while</span></span> <span style="color: #990000">(</span><span style="color: #FF0000">&lt;$fd&gt;</span><span style="color: #990000">)</span> <span style="color: #FF0000">{</span>
-    <span style="color: #009900">$shutting_down</span> <span style="color: #990000">=</span> <span style="color: #993399">1</span> <span style="font-weight: bold"><span style="color: #0000FF">if</span></span> <span style="color: #FF0000">/lxc_utmp - container has shutdown/</span><span style="color: #990000">;</span>
-    <span style="font-weight: bold"><span style="color: #0000FF">last</span></span> <span style="font-weight: bold"><span style="color: #0000FF">if</span></span> <span style="color: #009900">$shutting_down</span> <span style="font-weight: bold"><span style="color: #0000FF">and</span></span> <span style="color: #FF0000">/ ended on signal \(9\)/</span><span style="color: #990000">;</span>
-<span style="color: #FF0000">}</span>
-<span style="font-weight: bold"><span style="color: #0000FF">kill</span></span> <span style="color: #993399">13</span><span style="color: #990000">,</span> <span style="color: #009900">$pid</span><span style="color: #990000">;</span>  <span style="font-style: italic"><span style="color: #9A1900">## SIGPIPE</span></span></tt></pre></div></div>
-<div class="paragraph"><p>It reads the log file generated by <tt>lxc-start</tt> and waits until the line
-<tt>/lxc_utmp - container has shutdown/</tt> appears. At that point, we know that the
-container is shutting down (ie. not rebooting) and wait for the shutdown
-process to complete (message <tt>ended on signal (9)</tt>). Then exits in order to
-let <tt>run-cont.sh</tt> umount filesystems and clean up.</p></div>
+<span style="font-style: italic"><span style="color: #9A1900">## don't use -d; we have to wait for lxc-start to end, so that the trap handler runs after it</span></span>
+lxc-start -f container<span style="color: #990000">.</span>conf -n <span style="color: #009900">$NAME</span> -l DEBUG -o <span style="color: #009900">$LOG_FILE</span> <span style="color: #990000">\</span>
+  -s lxc<span style="color: #990000">.</span><span style="color: #009900">console</span><span style="color: #990000">=</span><span style="color: #009900">$CON_FILE</span> <span style="color: #990000">\</span>
+  -s lxc<span style="color: #990000">.</span><span style="color: #009900">rootfs</span><span style="color: #990000">=</span><span style="color: #009900">$ROOT</span> <span style="color: #990000">\</span>
+  -s lxc<span style="color: #990000">.</span>mount<span style="color: #990000">.</span><span style="color: #009900">entry</span><span style="color: #990000">=</span><span style="color: #FF0000">"proc    $ROOT/proc     proc   defaults  0 0"</span> <span style="color: #990000">\</span>
+  -s lxc<span style="color: #990000">.</span>mount<span style="color: #990000">.</span><span style="color: #009900">entry</span><span style="color: #990000">=</span><span style="color: #FF0000">"sys     $ROOT/sys      sysfs  defaults  0 0"</span> <span style="color: #990000">\</span>
+  -s lxc<span style="color: #990000">.</span>mount<span style="color: #990000">.</span><span style="color: #009900">entry</span><span style="color: #990000">=</span><span style="color: #FF0000">"devpts  $ROOT/dev/pts  devpts defaults  0 0"</span> <span style="color: #990000">\</span>
+  -s lxc<span style="color: #990000">.</span>mount<span style="color: #990000">.</span><span style="color: #009900">entry</span><span style="color: #990000">=</span><span style="color: #FF0000">"varlock $ROOT/var/lock tmpfs  defaults  0 0"</span> <span style="color: #990000">\</span>
+  -s lxc<span style="color: #990000">.</span>mount<span style="color: #990000">.</span><span style="color: #009900">entry</span><span style="color: #990000">=</span><span style="color: #FF0000">"tmp     $ROOT/tmp      tmpfs  mode=1777 0 0"</span> <span style="color: #990000">\</span>
+  -s lxc<span style="color: #990000">.</span>network<span style="color: #990000">.</span><span style="color: #009900">hwaddr</span><span style="color: #990000">=</span><span style="color: #009900">$MAC</span> <span style="color: #990000">\</span>
+  -s lxc<span style="color: #990000">.</span>network<span style="color: #990000">.</span><span style="color: #009900">ipv4</span><span style="color: #990000">=</span><span style="color: #009900">$IP</span><span style="color: #990000">/</span><span style="color: #993399">24</span> <span style="font-style: italic"><span style="color: #9A1900">#-- /sbin/init --verbose</span></span></tt></pre></div></div>
+<div class="paragraph"><p>Since <tt>CAP_SYS_ADMIN</tt> is dropped inside the container, all the <tt>mount(2)</tt>
+operations have to be performed from the outside, and that&#8217;s why they are
+specified in the <tt>lxc-start</tt> command line.</p></div>
 <h3 id="_modifications_to_the_container_filesystem">1.4. Modifications to the container filesystem</h3><div style="clear:left"></div>
 <h4 id="_tt_dev_tt">1.4.1. <tt>/dev</tt></h4>
 <div class="paragraph"><p>Only the minimum set of devices should exist under <tt>/dev</tt>. The daemon <tt>udev</tt>
@@ -888,17 +902,15 @@ mknod -m 666 $ROOTFS/dev/zero c 1 5</tt></pre>
 <div class="paragraph"><p>The container&#8217;s hostname must be placed in these files.</p></div>
 <h4 id="_tt_etc_fstab_tt">1.4.3. <tt>/etc/fstab</tt></h4>
 <div class="paragraph"><p>In theory this could be empty, since the default mount points are handled from
-<tt>/lib/init/fstab</tt>. If we want to use DHCP, then a bogus line <tt>none / auto ro 0
-0</tt> is required so that <tt>/sbin/dhclient-script</tt> detects that the root filesystem
-is read-only, preventing it from rewriting <tt>/etc/resolv.conf</tt>.</p></div>
+<tt>run-cont.sh</tt>. If we want to use DHCP, then a bogus line <tt>none / auto ro 0 0</tt>
+is required so that <tt>/sbin/dhclient-script</tt> detects that the root filesystem is
+read-only, preventing it from rewriting <tt>/etc/resolv.conf</tt>.</p></div>
 <h4 id="_init_scripts_tt_etc_init_tt_in_ubuntu">1.4.4. init scripts (<tt>/etc/init</tt> in Ubuntu)</h4>
 <div class="paragraph"><p>Most init scripts should be removed since they deal with daemons not needed (or
 even inconvenient) inside a container. For example, everything hardware-related
 (ACPI, ALSA, avahi, clock, IRQs, udev) must be moved out of the way. What I did
 is place them in <tt>$ROOTFS/etc/init.moved</tt> instead of deleting them. This is
 what was left:</p></div>
-<div class="paragraph"><p>(TODO: I think mountall.conf and friends can be included in some particular
-cases - dserrano)</p></div>
 <div class="listingblock">
 <div class="content">
 <pre><tt>anacron.conf
@@ -935,13 +947,7 @@ start on startup
 
 task
 pre-start script
-    mount -t proc proc /proc || true
-    mount -t devpts devpts /dev/pts || true
-    mount -t sysfs sys /sys || true
-    #mount -t tmpfs varrun /var/run
     find /var/run -xdev ! -path /var/run -delete
-    mount -t tmpfs varlock /var/lock
-    mount -t tmpfs -o mode=1777 tmp /tmp
     mkdir -p /var/run/network
     touch /var/run/utmp
     chmod 664 /var/run/utmp
@@ -961,8 +967,7 @@ script
     init 2
 end script</tt></pre>
 </div></div>
-<div class="paragraph"><p>(TODO: I guess the pre-start script could be dealt with elsewhere, for example
-maybe we don&#8217;t have to mount anything - dserrano)</p></div>
+<div class="paragraph"><p>(TODO: I guess the pre-start script could be dealt with elsewhere - dserrano)</p></div>
 <div class="paragraph"><p>Last, the script <tt>rc-sysinit.conf</tt> must be modified to run after system startup
 event, instead of waiting to the filesystem event. Modify the line that begins
 with "start on" so it reads like:</p></div>
@@ -1062,12 +1067,28 @@ lxc-start -n name -s lxc.rootfs=/some/path  ## sets a configuration directive fr
 </li>
 </ul></div>
 </div>
+<h2 id="_random_notes">3. Random notes</h2>
+<div class="sectionbody">
+<h3 id="_gnu_screen">3.1. GNU screen</h3><div style="clear:left"></div>
+<div class="paragraph"><p>From <a href="http://sourceforge.net/mailarchive/forum.php?thread_name=380-22010941685612722%40M2W116.mail2web.com&amp;forum_name=lxc-users">http://sourceforge.net/mailarchive/forum.php?thread_name=380-22010941685612722%40M2W116.mail2web.com&amp;forum_name=lxc-users</a>:</p></div>
+<div class="listingblock">
+<div class="content">
+<pre><tt># screen -dmS mycontainer lxc-start -n mycontainer &amp;&amp; screen -x mycontainer</tt></pre>
+</div></div>
+<div class="paragraph"><p>To exit the container console, do Control-A then D. To re-enter the container console, do:</p></div>
+<div class="listingblock">
+<div class="content">
+<pre><tt># screen -x mycontainer</tt></pre>
+</div></div>
+<h3 id="_secure_linux_containers_cookbook">3.2. Secure Linux containers cookbook</h3><div style="clear:left"></div>
+<div class="paragraph"><p><a href="http://www.ibm.com/developerworks/linux/library/l-lxc-security/">http://www.ibm.com/developerworks/linux/library/l-lxc-security/</a></p></div>
+</div>
 </div>
 <div id="footnotes"><hr /></div>
 <div id="footer">
 <div id="footer-text">
 Version 0.2<br />
-Last updated 2011-02-16 17:50:18 CEST
+Last updated 2011-02-17 17:24:37 CEST
 </div>
 </div>
 </body>
