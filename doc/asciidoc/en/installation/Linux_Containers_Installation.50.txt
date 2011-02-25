@@ -1,0 +1,489 @@
+Linux Containers Documentation
+==============================
+David Serrano
+v0.2, Feb 2011
+
+Setup
+-----
+
+Installing lxc
+~~~~~~~~~~~~~~
+
+Just install the package +lxc+ as root (this file documents usage with version 0.7):
+
+----
+# apt-get install lxc
+----
+
+Then check that the needed kernel compilation options are in place:
+
+----
+$ lxc-checkconfig 
+Kernel config /proc/config.gz not found, looking in other places...
+Found kernel config file /boot/config-2.6.32-27-generic
+--- Namespaces ---
+Namespaces: enabled
+Utsname namespace: enabled
+Ipc namespace: enabled
+Pid namespace: enabled
+User namespace: enabled
+Network namespace: enabled
+Multiple /dev/pts instances: enabled
+
+--- Control groups ---
+Cgroup: enabled
+Cgroup namespace: enabled
+Cgroup device: enabled
+Cgroup sched: enabled
+Cgroup cpu account: enabled
+Cgroup memory controller: enabled
+Cgroup cpuset: enabled
+
+--- Misc ---
+Veth pair device: enabled
+Macvlan: enabled
+Vlan: enabled
+File capabilities: enabled
+----
+
+If the output doesn't look like this, you'll have to recompile your kernel.
+
+Setting up a network bridge
+~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+In this example, we replace eth1, which has IP 10.1.0.101, with a bridge:
+
+----
+#auto eth1
+#iface eth1 inet static
+# ...
+
+auto br0
+iface br0 inet static
+    address 10.1.0.101
+    netmask 255.255.255.0
+    gateway 10.1.0.1
+    bridge_ports eth1
+    bridge_fd 0
+----
+
+Creating a new container
+~~~~~~~~~~~~~~~~~~~~~~~~
+
+General layout
+^^^^^^^^^^^^^^
+----
+/somewhere
+  \_ container.conf
+  \_ nfsroot/
+  \_ overlay1.ext4
+  \_ overlay2.ext4
+  \_ ...
+  \_ run-cont.sh
+----
+
++nfsroot+ is a directory where, in our setup, the root directory for all the
+containers is to be mounted read-only from a remote NFS server. The script
++run-cont.sh+ takes care of that. The overlays can be created with the
+following:
+
+----
+dd if=/dev/null of=overlay99.ext4 bs=1 seek=5G
+mkfs.ext4 -F overlay99.ext4
+----
+
+but +run-cont.sh+ already does that when needed, too.
+
+Configuration file
+^^^^^^^^^^^^^^^^^^
+----
+lxc.utsname = qvdimg
+lxc.tty = 4
+lxc.pivotdir = .pivot
+#lxc.arch=x86    ## available from lxc 0.7.3
+
+## network
+lxc.network.type = veth
+lxc.network.flags = up
+lxc.network.link = br0
+lxc.network.name = eth1
+lxc.network.mtu = 1500
+
+#lxc.rootfs = /home/qvd/cont/qvdimg/root
+#lxc.mount.entry = /home/user554543 /home/qvd/cont/qvdimg/home none bind 0 0
+#lxc.mount = /path/to/some/specific/fstab
+
+## devices
+lxc.cgroup.devices.deny = a
+# /dev/null and zero
+lxc.cgroup.devices.allow = c 1:3 rwm
+lxc.cgroup.devices.allow = c 1:5 rwm
+# consoles
+lxc.cgroup.devices.allow = c 5:1 rwm
+lxc.cgroup.devices.allow = c 5:0 rwm
+lxc.cgroup.devices.allow = c 4:0 rwm
+lxc.cgroup.devices.allow = c 4:1 rwm
+# /dev/{,u}random
+lxc.cgroup.devices.allow = c 1:9 rwm
+lxc.cgroup.devices.allow = c 1:8 rwm
+# /dev/pts/* - pts namespaces are "coming soon"
+lxc.cgroup.devices.allow = c 136:* rwm
+lxc.cgroup.devices.allow = c 5:2 rwm
+# rtc
+lxc.cgroup.devices.allow = c 254:0 rm
+# RAM size
+#lxc.cgroup.memory.limit_in_bytes = 256M
+# swap size
+#lxc.cgroup.memory.memsw.limit_in_bytes = 1G
+# scheduler (1024 == same as everyone)
+#lxc.cgroup.cpu.shares = 512
+# CPUs to use
+#lxc.cgroup.cpuset.cpus = 0-1,3
+
+## capabilities
+# needed by ssh's init script (oom adjustment)
+#lxc.cap.drop = sys_resource
+# needed by ssh
+#lxc.cap.drop = net_bind_service net_admin
+# needed to shut down the system
+#lxc.cap.drop = kill
+# needed by daemons to drop root privileges
+#lxc.cap.drop = setuid
+# needed by openssh-server
+#lxc.cap.drop = sys_chroot
+# needed by daemons (at least, dbus and rsyslog)
+#lxc.cap.drop = setgid
+## needed by getty or login
+#lxc.cap.drop = chown fowner
+## needed by dbus at least
+#lxc.cap.drop = dac_override
+# needed by dhclient (but we don't use it)
+lxc.cap.drop = net_raw net_broadcast
+# freely droppable
+lxc.cap.drop = audit_control audit_write fsetid ipc_lock ipc_owner lease
+lxc.cap.drop = sys_admin linux_immutable mac_admin mac_override mknod setfcap setpcap
+lxc.cap.drop = sys_boot sys_nice sys_pacct sys_ptrace sys_rawio sys_time sys_tty_config
+lxc.cap.drop = sys_module dac_read_search
+----
+
+  - +lxc.utsname+ specifies the hostname of the container.
+  - +lxc.pivotdir+ specifies the directory for the +pivot_root(2)+ system call.
+    Since the root filesystem is mounted readonly, we can't let +lxc-start+
+    choose and create a temporary directory for this operation.
+  - +lxc.network.type+ introduces a new network interface inside the container.
+    Everytime it appears in the configuration, a new interface is configured.
+  - +lxc.network.link+ refers to the bridge we just configured earlier.
+  - +lxc.network.name+ is the name that this network interface will have inside
+    the container. Can be virtually any string.
+  - +lxc.mount.entry+ specifies a fstab-like line to mount a resource before
+    bringing up the container.
+  - +lxc.mount+ specifies a file in which those fstab-like lines can be put,
+    instead of having them in this LXC configuration file.
+  - +lxc.cgroup.cpu.shares+ limits the amount of CPU time that this container
+    can use. The default value is 1024, so saying eg. 512 will give this container
+    half as much CPU time as the other ones.
+
+Any directive can be specified at the +lxc-start+ command line (using the +-s+
+parameter), making the configuration file effectively optional (but in that
+case the command line would be very long, of course).
+
++run-cont.sh+
+^^^^^^^^^^^^^
+This is a script I (dserrano) am currently using to start containers. It mounts
+NFS if needed, creates the overlay if needed, picks both MAC and IP addresses,
+union-mounts some directories, starts the container and waits for it to stop so
+as to undo the union-mount operations and do some clean up.
+
+[source,bash]
+----
+#!/bin/bash
+
+set -e
+
+function setup_vars() {
+    ID=$(printf %02d $ID)
+    OVL=ovl$ID
+    ROOT=root$ID
+    NAME=qvdimg$ID;
+    NFS_REMOTE=aguila:/var/local/exports/lxc-root
+    NFS_LOCAL=nfsroot
+    LOG_FILE=/tmp/lxc-$NAME.log
+    CON_FILE=/tmp/lxc-$NAME-console.log
+    LM=lib/modules/$(uname -r)
+    IP=10.1.0.$(( 230 + $ID ))
+
+    NUM=$ID;                             MAC1=$(( $NUM / 256 / 256));
+    NUM=$(( $NUM - $MAC1 * 256 * 256 )); MAC2=$(( $NUM / 256 ));
+    NUM=$(( $NUM - $MAC2 * 256 ));       MAC3=$NUM
+    MAC=$(printf "54:52:00:%02x:%02x:%02x\n" $MAC1 $MAC2 $MAC3);
+    unset MAC1 MAC2 MAC3 NUM
+}
+
+function check_stopped() {
+    [[ $(lxc-info -n $NAME) =~ " is STOPPED" ]] && return
+
+    echo "Container $ID is not 'STOPPED', aborting."
+    exit 1
+}
+
+function mount_nfs() {
+    [[ -d $NFS_LOCAL/bin ]] && return
+
+    mkdir -p $NFS_LOCAL
+    mount -t nfs -o ro $NFS_REMOTE $NFS_LOCAL    ## and this remains mounted forever
+    mount -o bind /$LM $NFS_LOCAL/$LM            ## this is rw; doing a "remount,ro" fails saying that the directory "is busy"
+}
+
+function create_overlay() {
+    [[ -f $OVL.ext4 ]] && return
+
+    echo "Creating overlay $OVL.ext4..."
+    dd if=/dev/null of=$OVL.ext4 bs=1 seek=5G
+    mkfs.ext4 -qF $OVL.ext4
+}   
+    
+function setup_mounts() {
+    mkdir -p $OVL
+    mount -o loop $OVL.ext4 $OVL
+    mkdir -p $OVL/$LM
+    
+    mkdir -p $ROOT
+    mount -t aufs -o br:$OVL:$NFS_LOCAL=ro         aufs $ROOT
+    mount -t aufs -o br:$OVL/$LM:$NFS_LOCAL/$LM=ro aufs $ROOT/$LM
+    #echo "Overlay '$OVL' mounted over '$NFS_LOCAL' on '$ROOT'."
+}   
+    
+function cleanup() {
+    umount $ROOT/$LM
+    umount $ROOT
+    umount $OVL
+    rmdir $OVL $ROOT
+} 
+  
+ID=$1;
+if [[ -z $ID ]]; then
+    echo "Usage: $0 [container number]"
+    echo "Example: $0 42"
+    exit 1;
+fi  
+
+setup_vars; #echo "ID [$ID] OVL [$OVL] ROOT [$ROOT] NAME [$NAME] IP [$IP] MAC [$MAC]"
+check_stopped
+mount_nfs
+trap cleanup EXIT
+create_overlay
+setup_mounts
+
+echo "LXC debug output is in $LOG_FILE."
+echo "To run nxagent & nxproxy, do the following:"
+echo "ssh -n qvd@$IP 'xinit /etc/X11/Xsession -- /usr/bin/nxagent :100 -ac -name QVD -display nx/nx,options=/home/qvd/nxagent.conf:100' & nxproxy -S $IP:100 &"
+
+## don't use -d; we have to wait for lxc-start to end, so that the trap handler runs after it
+lxc-start -f container.conf -n $NAME -l DEBUG -o $LOG_FILE \
+  -s lxc.console=$CON_FILE \
+  -s lxc.rootfs=$ROOT \
+  -s lxc.mount.entry="proc    $ROOT/proc     proc   defaults  0 0" \
+  -s lxc.mount.entry="sys     $ROOT/sys      sysfs  defaults  0 0" \
+  -s lxc.mount.entry="devpts  $ROOT/dev/pts  devpts defaults  0 0" \
+  -s lxc.mount.entry="varlock $ROOT/var/lock tmpfs  defaults  0 0" \
+  -s lxc.mount.entry="tmp     $ROOT/tmp      tmpfs  mode=1777 0 0" \
+  -s lxc.network.hwaddr=$MAC \
+  -s lxc.network.ipv4=$IP/24 #-- /sbin/init --verbose
+----
+
+Since +CAP_SYS_ADMIN+ is dropped inside the container, all the +mount(2)+
+operations have to be performed from the outside, and that's why they are
+specified in the +lxc-start+ command line.
+
+Modifications to the container filesystem
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
++/dev+
+^^^^^^
+Only the minimum set of devices should exist under +/dev+. The daemon +udev+
+doesn't work under LXC, so the +/dev+ management has to be done by hand.
+Following is a set of shell commands needed to create these devices. They
+assume that the root filesystem path is specified by the shell variable
++$ROOTFS+, *make sure* this is the case, or the system's +/dev+ will be wiped
+clean!
+
+----
+echo $ROOTFS
+rm -rf $ROOTFS/dev
+mkdir $ROOTFS/dev
+mkdir -m 755 $ROOTFS/dev/pts
+mkdir -m 1777 $ROOTFS/dev/shm 
+mknod -m 600 $ROOTFS/dev/console c 5 1
+mknod -m 666 $ROOTFS/dev/full c 1 7
+mknod -m 600 $ROOTFS/dev/initctl p
+mknod -m 666 $ROOTFS/dev/null c 1 3 
+mknod -m 666 $ROOTFS/dev/ptmx c 5 2
+mknod -m 666 $ROOTFS/dev/random c 1 8
+mknod -m 666 $ROOTFS/dev/tty c 5 0
+mknod -m 666 $ROOTFS/dev/tty0 c 4 0
+mknod -m 666 $ROOTFS/dev/tty1 c 4 1
+mknod -m 666 $ROOTFS/dev/tty2 c 4 2
+mknod -m 666 $ROOTFS/dev/tty3 c 4 3
+mknod -m 666 $ROOTFS/dev/tty4 c 4 4
+mknod -m 666 $ROOTFS/dev/urandom c 1 9
+mknod -m 666 $ROOTFS/dev/zero c 1 5
+----
+
++/etc/hostname+ and +/etc/hosts+
+^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+The container's hostname must be placed in these files.
+
++/etc/fstab+
+^^^^^^^^^^^^
+In theory this could be empty, since the default mount points are handled from
++run-cont.sh+. If we want to use DHCP, then a bogus line +none / auto ro 0 0+
+is required so that +/sbin/dhclient-script+ detects that the root filesystem is
+read-only, preventing it from rewriting +/etc/resolv.conf+.
+
+init scripts (+/etc/init+ in Ubuntu)
+^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+Most init scripts should be removed since they deal with daemons not needed (or
+even inconvenient) inside a container. For example, everything hardware-related
+(ACPI, ALSA, avahi, clock, IRQs, udev) must be moved out of the way. What I did
+is place them in +$ROOTFS/etc/init.moved+ instead of deleting them. This is
+what was left:
+
+----
+anacron.conf
+atd.conf
+cron.conf
+dbus.conf          (needed for the power-off button in the GNOME panel)
+dmesg.conf
+hostname.conf
+networking.conf    (not needed if DHCP isn't used, since the network can be configured beforehand via lxc-start)
+rc.conf
+rc-sysinit.conf
+rsyslog.conf
+ssh.conf
+tty1.conf
+tty2.conf
+tty3.conf
+ufw.conf
+----
+
+Regarding the basic rcS scripts, we don't have +/etc/init/rcS+, but
++rc-sysinit.conf+ calls +/etc/init.d/rcS+, which runs all scripts under
++/etc/rcS.d+. This directory only needs two files: +S70screen-cleanup+ (useful
+is GNU screen is used, harmless otherwise) and +S70x11-common+ (*required*, it
+creates +/tmp/.X11-unix+) - the rest can be removed.
+
+Another thing worth mentioning is +ttyS0.conf+. Since it deals directly with
+the hardware, it shouldn't run inside a container.
+
+After the cleanup, create a small script, +lxc.conf+, with these contents:
+
+----
+# LXC - Fix init sequence to have LXC containers boot with upstart
+
+# description “Fix LXC container - Lucid”
+
+start on startup
+
+task
+pre-start script
+    find /var/run -xdev ! -path /var/run -delete
+    mkdir -p /var/run/network
+    touch /var/run/utmp
+    chmod 664 /var/run/utmp
+    chown root.utmp /var/run/utmp
+    if [ "$(find /etc/network/ -name upstart -type f)" ]; then
+        chmod -x /etc/network/*/upstart || true
+    fi
+    #route add default gw 10.1.0.101    ## uncomment if DHCP isn't used and the network is configured via lxc-start
+end script
+
+script
+    start networking                    ##   comment if DHCP isn't used and the network is configured via lxc-start
+    #initctl emit networking --no-wait  ## uncomment if DHCP isn't used and the network is configured via lxc-start
+    initctl emit filesystem --no-wait
+    initctl emit local-filesystems --no-wait
+    initctl emit virtual-filesystems --no-wait
+    init 2
+end script
+----
+
+(TODO: I guess the pre-start script could be dealt with elsewhere - dserrano)
+
+Last, the script +rc-sysinit.conf+ must be modified to run after system startup
+event, instead of waiting to the filesystem event. Modify the line that begins
+with "start on" so it reads like:
+
+----
+start on startup
+----
+
+A quick sed oneliner can do this (use at your own risk):
+
+----
+sed -i -e '/^start on/s/\(start on\) .*/\1 startup/' /tmp/rc-sysinit.conf
+----
+
+
+Usage
+-----
+  - +lxc-create+ creates the container, which isn't more than a data structure.
+    This step is optional in LXC 0.7.
+
+    lxc-create -n name -f /path/to/config-file
+
+  - +lxc-ls+ lists the existing containers. The containers that were created
+    with +lxc-create+ and are running, appear twice.
+
+    lxc-ls
+
+  - +lxc-start+ brings the container up.
+
+    lxc-start -n name
+    lxc-start -n name -d                        ## suppress output.
+    lxc-start -n name -d -o /tmp/lxc.log        ## send output to a log file.
+    lxc-start -n name -l DEBUG ...              ## for debugging.
+    lxc-start -f config-file ...                ## LXC 0.7 and later: allows us to skip the lxc-create step.
+    lxc-start -n name -s lxc.rootfs=/some/path  ## sets a configuration directive from the command line.
+
+  - +lxc-console+ connects to one of the container's ttys. After closing the
+    session, you can get out of +lxc-console+ with the key sequence +C-A q+.
+
+    lxc-console -n name -t 1   ## connects to tty1
+
+  - +lxc-info+ shows information about the specified container.
+
+    lxc-info -n name
+
+  - +lxc-ps+ shows processes running inside the container.
+
+    lxc-ps -n name
+
+  - +lxc-stop+ kills all processes in the container, effectively stopping it.
+
+    lxc-stop -n name
+
+  - +lxc-destroy+ just removes the data structure. Only needed if +lxc-create+
+    was used (ie. not needed after +lxc-start -f config-file+).
+
+    lxc-destroy -n name
+
+Random notes
+------------
+
+GNU screen
+~~~~~~~~~~
+
+From <http://sourceforge.net/mailarchive/forum.php?thread_name=380-22010941685612722%40M2W116.mail2web.com&forum_name=lxc-users>:
+----
+# screen -dmS mycontainer lxc-start -n mycontainer && screen -x mycontainer
+----
+
+To exit the container console, do Control-A then D. To re-enter the container console, do:
+
+----
+# screen -x mycontainer
+----
+
+Secure Linux containers cookbook
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+<http://www.ibm.com/developerworks/linux/library/l-lxc-security/>

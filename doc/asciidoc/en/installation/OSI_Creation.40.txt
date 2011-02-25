@@ -1,0 +1,138 @@
+﻿OSI Creation
+============
+Nicolas Arenas
+v0.2, 18th January 2011 
+:author initials: NA
+:email: nicolas.arenas@qindel.com
+
+
+Requirements
+------------
+
+* Server x86 with virtualization extensions (Intel or AMD).
+* Linux as OS.
+* 10 GB free disk space
+* qemu-kvm installed
+* Ubuntu Desktop image 
+
+Introduction
+------------
+
+An OSI (Operating System Image) is a set composed of two elements, these are a disk image and some parameters as memory, user space, etc. 
+
+The main idea behind an OSI is to use an OSI for each group of users that have applications in common. For example if you have a section of users that use the same applications every day, all those users would share the same OSI. This way if you have to update an application, you will update the OSI and the OSI will be pushed through all the users that share it.
+
+Package installation
+--------------------
+
+For customized packages the Ubuntu distro that must be used is Ubuntu Desktop alternate installer [ http://releases.ubuntu.com/maverick/ubuntu-10.10-alternate-i386.iso.torrent ]
+
+Once we have downloaded the Ubuntu distro, we will create a qcow2 file that will be our base for the hard disk for each VM. 
+
+....
+
+kvm-img create -f qcow2 example.img 4G
+
+....
+
+Once we have created the file we need to start a VM to install the packages that we want to be in the OSI. For this we can do the following:
+
+.... 
+
+kvm -hda example.img -cdrom ubuntu-10.10-alternate-i386.iso -m 512
+
+....
+
+
+Now we just do an Ubuntu installation as standard basis, once that the server is installed, we just shutdown the server. When the installation is finished, we need to install the VMA.
+
+VMA Installation and configuration
+----------------------------------
+
+To install the VMA package, we need to add the QVD repository to our rencently image, to do this, we just edit the '/etc/apt/sources.list' with our preferred editor and add the following:
+
+....
+deb http://qvd.qindel.com/debian lucid main
+....
+
+After that we just need to make an update of the apt cache:
+
+....
+root@qvd:~# apt-get update
+....
+
+Now we can install the qvd-vma.  
+
+....
+root@qvd:~# apt-get get install qvd-vma.
+....
+
+Once the vma is installed, we can configure it, this is done via the file '/etc/qvd/vma.conf'. This file is read by the vma at start time, being needed a restart to reload the configuration. 
+
+Parameters in vma.conf
+~~~~~~~~~~~~~~~~~~~~~~
+
+Audio
+^^^^^ 
+....
+vma.audio.enable
+....
+
+Possible values:  
+
+0 => Audio is not enabled in the virtual machine (Default)
+1 => Audio is enabled in the virtual machine
+
+Printing
+^^^^^^^^ 
+....
+vma.printing.enable
+....
+
+Possible Values:
+
+0=> Printers are not enabled (Default)
+1=> Printers are enabled
+
+QVD client and the VMA will map all the printers configured on the client. In this moment printer drivers must be installed in the OSI.
+
+PID location
+^^^^^^^^^^^^
+....
+vma.pid_file 
+....
+
+The place where the pid resides, by default is /var/run/qvd/vma.pid
+
+
+Keyboard
+^^^^^^^^
+
+....
+vma.default.client.keyboard
+....
+
+The default keyboard in the virtual machine, this value is used if no other values are detected by the client. The default value is 'pc105/en'. To modify this the value must be in format 'layout/distribution'.
+
+
+Default link
+^^^^^^^^^^^^
+
+The connection link is set by this parameter unless the client overrides this value. 
+
+....
+vma.default.client.link 
+....
+
+Possible values for this key are: 
+
+local
+adsl  (Default)
+modem
+
+
+Further than this parameters the vma can have keys for hooks, these keys are covered in the next section.
+
+
+
+

@@ -1,0 +1,74 @@
+﻿Serial port configuration
+=========================
+Nicolas Arenas
+v0.2, 18th January 2011 
+:author initials: NA
+:email: nicolas.arenas@qindel.com
+
+
+
+To configure the serial port we will do the following as root user in the image that we've previously created:
+
+....
+
+#sudo editor /etc/init/ttyS0.conf
+
+....
+
+Add the configuration:
+
+....
+
+# ttyS0 - getty
+#
+# This service maintains a getty on ttyS0 from the point the system is
+# started until it is shut down again.
+
+start on stopped rc RUNLEVEL=[2345]
+stop on runlevel [!2345]
+
+respawn
+exec /sbin/getty -L 115200 ttyS0 xterm
+
+....
+
+
+To capture the output sent to the consoles by the guest OSs, set:
+
+....
+
+  vm.vnc.redirect=0
+  vm.serial.redirect=0
+  vm.serial.capture=1
+  path.serial.captures=/var/tmp/qvd/
+
+....
+
+In order to allow to access the consoles using the QVD admin tool (the default configuration), set the following options:
+
+....
+
+  vm.vnc.redirect=0
+  vm.serial.redirect=1
+
+....
+The console can be accessed using qvd-admin, for instance:
+
+....
+
+  $ qvd-admin vm console -f id=1
+
+....
+
+
+To enable a graphic console accessible via VNC (not recommended as it wastes a lot of memory), the following settings must be configured:
+
+....
+
+  vm.vnc.redirect=1
+  vm.serial.redirect=0
+  vm.serial.capture=0
+
+....
+
+And obviously, the guest OS image has also to be configured to not use the serial console.

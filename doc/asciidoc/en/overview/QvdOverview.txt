@@ -1,0 +1,69 @@
+QVD Overview
+============
+Santiago Doblas
+v0.1, 13 december 2010
+:author initials: SD
+:email: sdoblas@qindel.com
+
+
+QVD Components
+--------------
+
+QVD is composed of the following packages:
+
+    * +++<b>qvd-client</b>+++: client software
+    * +++<b>qvd-l7r</b>+++: network server
+    * +++<b>qvd-hkd</b>+++: backend daemon
+    * +++<b>qvd-admin</b>+++: command line tools for managing users, virtual machines and operating system images
+    * +++<b>qvd-vma</b>+++: agent that runs in virtual machines
+    * +++<b>qvd-wat</b>+++: web administration tool
+    * +++<b>qvd-db</b>+++: central database for the platform 
+
+QVD uses the following external open source components.
+
+    * The PostgreSQL RDBMS.
+    * KVM: Hypervisor.
+    * NX: protocol that handles remote desktop connections.
+    * Catalyst: an MVC web-application framework
+    * Ubuntu 10.04 GNU/Linux operating system 
+
+Architecture overview
+---------------------
+
+    * Linux and Windows clients available.
+    * Single connection gateway.
+    * Automatic managed network.
+    * Shared OS templates between virtual machines (saves up to 90% disc space). 
+
+image:../inkscape/overview_QVD.png[alt="QVD overview"]
+
+Logic components overview
+-------------------------
+
+    * Client <--> L7R connections via SSL encryption.
+    * Load balancer dispatches the connections among multiple L7Rs.
+    * One HKD per host keeps the DB updated.
+    * One VMA per virtual machine. 
+
+image:../inkscape/logic_components.png[alt="QVD overview"]
+
+Virtual machine starting process
+--------------------------------
+
+    * The client establishes an SSL connection.
+    * Load balancer sends the flow to a L7R.
+    * L7R authenticates the user.
+    * L7R checks the VM status (running, stopped, etc.), if user is valid.
+    * HKD starts the VM and updates DB when VM starts VMA.
+    * L7R watches the DB in order to know when the VM is running. 
+
+image:../inkscape/starting_vm.png[alt="QVD overview"]
+
+Session establishment
+---------------------
+
+    * HKD receives the petition to start VMA while nxagent is not running. Once running, HKD updates VMA state in DB.
+    * L7R watches the DB, when VMA is up connects the VM to the client. 
+
+
+
