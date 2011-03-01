@@ -82,7 +82,7 @@ Firewall
 
 QVD uses two complementing firewalls, iptables and ebtables, the reason is have a firewall at bridge level ebtables and iptables at node level. 
 
-At Node Level these are the rules that QVD applies
+At Node Level these are the rules that QVD applies:
 
 --------------------------------------------------------------------------------
  * ebtables INPUT -i $tap -j QVD_INPUT_$tap
