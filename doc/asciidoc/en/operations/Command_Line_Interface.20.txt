@@ -69,7 +69,7 @@ QVD-Admin/bin/qvd-admin.pl vm stop -f "user=youruser"
 QVD-Admin/bin/qvd-admin.pl vm start -f "user=youruser"
 ----
 
-And also you can do it from the Web Administration Tool, https://intranet.qindel.com/trac/QVD/wiki/WebAdminToolUserGuide#Virtualmachines
+And also you can do it from the Web Administration Tool (have a look at the documentation).
 
 Resolving a "blocked" state
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~

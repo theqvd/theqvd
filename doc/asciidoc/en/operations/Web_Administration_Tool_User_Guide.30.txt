@@ -1,16 +1,12 @@
 Web Administration Tool User Guide
 ==================================
-Santiago Doblas
-v0.1, 20 december 2010
-:author initials: SD
-:email: sdoblas@qindel.com
 
 Web Administration Tool User Guide
 ----------------------------------
 Login
 ~~~~~
 
-That's your very first step, to log in use the default user (login:admin password:admin) or the one you define in https://intranet.qindel.com/trac/QVD/wiki/HowToInstall#RunWAT 
+That's your very first step, to log in use the default user (login:admin password:admin) or the one you define with the Web Administration Tool (have a look at the documentation).
 
 image:../images/WAT_login.png[alt="login"]
 
@@ -45,7 +41,7 @@ image:../images/WAT_newuseradded.png[alt="new user added"]
 Creating a new virtual machine
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
-To assign a VM to a user, you need to click on the user id in the main Users page. Then click on "New virtual machine". 
+To assign a VM to a user, you need to click on the user 'id' in the main Users page. Then click on "New virtual machine". 
 
 image:../images/WAT_newVM1.png[alt="creating a new virtual machine"]
 
@@ -63,7 +59,7 @@ image:../images/WAT_newVMadded.png[alt="new VM created"]
 Virtual machines
 ~~~~~~~~~~~~~~~~
 
-From this pages you can view the current virtual machines defined in QVD and the user and machine states. Also you can start, stop and delete virtual machines as well as disconnect a concrete user. 
+With these pages you can view the current virtual machines defined in QVD and the users and machine states. Also you can start, stop and delete virtual machines as well as disconnect a concrete user. 
 
 Connecting via VNC to a machine
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
@@ -74,7 +70,7 @@ Connecting via VNC to a machine
 Nodes
 ~~~~~
 
-Here you can define new nodes and check the actual ones. To remove a node you must use the Command Line Interface?. 
+Here you can define new nodes and check the actual ones. To remove a node you must use the Command Line Interface. 
 
 To create a node just add a name and the ip address. 
 
@@ -83,7 +79,7 @@ image:../images/WAT_nodes.png[alt="defining new nodes"]
 Images
 ~~~~~~
 
-Use this section for manage your images and create new ones. 
+Use this section to manage your images and create new ones. 
 
 image:../images/WAT_images.png[alt="viewing images"]
 
@@ -99,4 +95,4 @@ image:../images/WAT_newimage.png[alt="creating images"]
 Deleting an image
 ~~~~~~~~~~~~~~~~~
 
-To delete and image just select the one(s) you would like to remove and click "Delete". Only images that are not used in any virtual machine are selectable. 
+To delete an image just select the one(s) you would like to remove and click "Delete". Only images that are not used in any virtual machine are selectable. 

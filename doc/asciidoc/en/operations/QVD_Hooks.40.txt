@@ -5,21 +5,21 @@ v1.0, Jan 2011
 
 Introduction
 ------------
-Hooks are scritps that the VMA run in the virtual machine at certain situations and that allows to modify the platform behavior with the purpose of adapt it to a concrete problematic.
+Hooks are scripts that the VMA run in the virtual machine at certain situations and that allows to modify the platform behaviour with the purpose of adapting it to a concrete problematic.
 
-Each possible hook it's configured by adding an entry to the configuration file "/etc/qvd/vma.conf" with the script path to be executed. 
+Each possible hook is configured by adding an entry to the configuration file "/etc/qvd/vma.conf" with the script path to be executed. 
 
-For example, adding this line
+For example, adding this line:
 
 ....
   vma.on_action.connect = /etc/qvd/hooks/connect.sh
 ....
 
-It makes that the script "/etc/qvd/hooks/connect.sh" will be executed everytime that the user connects to the virtual machine.
+It makes that the script "/etc/qvd/hooks/connect.sh" will be executed every time that the user connects to the virtual machine.
 
-Scripts can receive by the command line paramentes related to the following entities:
+Scripts can receive by the command line parameters related to the following entities:
 
-  - State changes, acction, or the provisioning process that has triggered the call to the hook. 
+  - State changes, action, or the provisioning process that has triggered the call to the hook. 
 
   - Virtual machine properties defined in the administration database
 
@@ -27,18 +27,18 @@ Scripts can receive by the command line paramentes related to the following enti
 
   - User connection parameters.
 
-  - Parameters supply by the client program. 
+  - Parameters supplied by the client program. 
 
 Hooks have their own log file, that by default is /var/logs/qvd/qvd-hooks.log in the virtual machine. 
 
 Action hooks
 ------------
 
-Action hooks are executed everytime that an action begins.
+Action hooks are executed every time that an action begins.
 
 If hook fails with an non zero error code action will be aborted. 
 
-All action hooks receive this paramenters. 
+All action hooks receive these parameters. 
 
   - "qvd.vm.session.state": Current X-Windows server state
 
@@ -50,13 +50,13 @@ connect
 
 key: *vma.on_action.connect*
 
-This hook is executed when user start (or resume) an X-Windows session from the QVD's client. 
+This hook is executed when the user starts (or resumes) an X-Windows session from the QVD's client. 
 
 It also receives the following parameters 
 
   - "qvd.vm.user.name" : user's login. 
 
-  - "qvd.vm.user.groups" : groups that the user belong. 
+  - "qvd.vm.user.groups" : groups that the user belong to. 
 
   - "qvd.vm.user.home" : User's directory home. 
 
@@ -67,12 +67,11 @@ pre-connect
 
 key: *vma.on_action.pre-connect*
 
-This hook is executed when user start (or resume) an X-Windows session from t
-he QVD's client.
+This hook is executed when the use starts (or resumes) an X-Windows session from the QVD's client.
 
-The difference respect to the connect hooks is that pre-connect hooks are executed before the provisioning hooks, while connect hooks are executed after the provisioning hooks. 
+The difference from the connect hooks is that pre-connect hooks are executed before the provisioning hooks, while connect hooks are executed after the provisioning hooks. 
 
-Parameterers for pre-connect are the sames that for connect. 
+Parameters for pre-connect are the same as for connect. 
 
 
 stop
@@ -80,27 +79,27 @@ stop
 
 key: *vma.on_action.stop*
 
-This hook is executed when a X-Windows session is asked to be closed (for example via administration tool).
+This hook is executed when an X-Windows session is asked to be closed (for example via administration tool).
 
-There is no additional paramentes for this hook.
+There are no additional parameters for this hook.
 
 suspend
 ~~~~~~~
 
 key: *vma.on_action.suspend*
 
-This hook is executed when an X-Windows session is suspended (for expample if an user has closed the QVD Client program)
+This hook is executed when an X-Windows session is suspended (for example if an user has closed the QVD Client program)
 
-There is no additional paramentes for this hook.
+There are no additional parameters for this hook.
 
 poweroff
 ~~~~~~~~
 
 key: *vma.on_action.poweroff*
 
-This hook is executed when the virtual machine is shuted down. 
+This hook is executed when the virtual machine is shut down. 
 
-There is no additional paramentes for this hook.
+There are no additional parameters for this hook.
 
 
 State hooks
@@ -115,7 +114,7 @@ connected
 
 key: *vma.on_state.connected*
 
-This hook is executed once a connection has been succefusly established between the QVD client and the X-Windows server that runs in the virtual machine. 
+This hook is executed once a connection has been successfully established between the QVD client and the X-Windows server that runs in the virtual machine. 
 
 suspended
 ~~~~~~~~~
@@ -135,7 +134,7 @@ This hook executes when the X-Windows session ends.
 Provisioning hooks
 ------------------
 
-The provisioning hooks recieve the same parameters that the 'connect' actin hook.
+The provisioning hooks recieves the same parameters that the 'connect' action hook.
 
 
 mount_home
@@ -145,7 +144,7 @@ key: *vma.on_provisioning.mount_home*
 
 By default, QVD mounts the first partition of the device configured with the entry "vma.user.home.drive" on the directory "/home" where the user's directory home is created (by the hook 'add_user'). In case that this partition does not exist is created on the fly.
 
-With this hook it is possible to change this proccess by example mount "/home" from an NFS server
+With this hook it is possible to change this process by example mount "/home" from an NFS server
 
 
 add_user
@@ -153,11 +152,11 @@ add_user
 
 key: *vma.on_provisioning.add_user*
 
-When a user is connected for first time, if the user still does nor exists a new account is created for him in the virtual machine.
+When an user is connected for the first time, if the user still does not exist, a new account is created for him in the virtual machine.
 
-By default the account is created with the useradd "command"
+By default the account is created with the useradd "command".
 
-The hook 'add_user' allows to modify this proccess and create the user account in other ways
+The hook 'add_user' allows to modify this process and create the user account in other ways.
 
 
 after_add_user
@@ -165,13 +164,13 @@ after_add_user
 
 key: *vma.on_provisioning.after_add_user*
 
-Once the user account has been created, this hoon can be used to make some additonals actions as by example to configure the user's email client or any other actions. 
+Once the user account has been created, this hook can be used to make some additional actions as by example to configure the user's email client or any other actions. 
 
 
 Printing hooks
 --------------
 
-Also exist a set of hooks that allow to manage the printers configuration, but at the moment theses are considered privates, and a responsability of QVD's development team and therefore they can't be modified by the platform administrator.
+There is also a set of hooks that allows to manage printers configuration, but at the moment these are considered private, and a responsibility of QVD's development team and therefore they can't be modified by the administrator of the platform.
 
 Printing hooks receive as parameter the configuration from the VMA.
 
@@ -180,7 +179,7 @@ connected
 
 key: *internal.vma.on_printing.connected*
 
-This hook receive the same parameters that tha 'connect' action hook
+This hook receives the same parameters that the 'connect' action hook
 
 suspended
 ~~~~~~~~~

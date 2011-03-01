@@ -1,11 +1,6 @@
 GUI Client User Guide
 =====================
 
-Santiago Doblas
-v0.1, 20 december 2010
-:author initials: SD
-:email: sdoblas@qindel.com
-
 The GUI Client lets you start a session of your virtual machine in a remote server.
 
 Usage
@@ -17,13 +12,13 @@ Installation
 Linux
 ^^^^^
 
-On Linux systems to install on Ubuntu distros you need add qvd's repository, to do that edit as root your '/etc/apt/sources.list' and add
+On Linux systems, to install on Ubuntu distros it is necessary to add QVD's repository. To do so edit as root your '/etc/apt/sources.list' and add the following:
 
 ....
 deb http://qvd.qindel.com/debian lucid main
 ....
 
-Once this step is done you need update the apt cache 
+Once this step is done you need to update the apt cache: 
 
 ....
 
@@ -31,7 +26,7 @@ sudo apt-get update
 
 ....
 
-And install the qvd-client
+And install the qvd-client:
 
 ....
 
@@ -43,9 +38,9 @@ apt-get install qvd-client
 Windows
 ^^^^^^^
 
-For Windows XP just run the setup program and follow the screen structions. 
+For Windows XP just run the setup program and follow the screen instructions. 
 
-Runnin the client
+Running the client
 -----------------
 
 Linux
@@ -65,14 +60,14 @@ You should get a screen like this:
 
 image:../images/GUI_login.png[alt="login"]
 
-Populate the "User", "Password" and "Server" fields, click "Connect" and you are done. After a little load you get a window with your remote desktop inside.
+Populate the "User", "Password" and "Server" fields, click "Connect" and you are done. After a while you get a window with your remote desktop inside.
 
-Also you'll find and access via Menu-->Applications-->Internet-->QVD Client.
+Also you'll find an access via Menu--> Applications--> Internet--> QVD Client.
 
 Windows XP
 ^^^^^^^^^^
 
-On XP systems you'll find and access under Start->Program Files->QVD->Qvd Client. Click it and follow the same instructions that under Linux systems. 
+On XP systems you'll find an access under Start->Program Files->QVD->QVD Client. Click it and follow the same instructions that under Linux systems. 
 
 Troubleshooting
 ---------------
@@ -80,7 +75,7 @@ Troubleshooting
 Unable to connect to host:port at QVD-Client/lib/QVD/Client/Frame.pm…
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
-This message appears when the server is not responding to the client petition.
+This message appears when the server is not responding to the client petition:
 
     * Ensure all components are running in the server side, HKD, L7R and RC.
     * Check server logs, by default in "/var/log/qvd.log".
@@ -89,7 +84,7 @@ This message appears when the server is not responding to the client petition.
 The server has rejected your login. Please verify that your username and password are correct.
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
-This messages occurs when exists communication between client and server but the user can't be authenticated.
+This messages occurs when exists communication between client and server but the user can't be authenticated:
 
     * Verify username and password.
     * Verify user exists in QVD user list:
@@ -104,11 +99,11 @@ Unable to print in WindowsXP Pro
 
 The Guest account must be enabled in order to print with the QVD's Windows Client.
 
-Also, the the Local Directives must allow access from the network to the Guest User. This requirements will dissappear in the nearest versions.
+Also, the the Local Directives must allow access from the network to the Guest User. This requirements will disappear in the nearest versions.
 
-   1. Enable the guest account
-   2. Add the guest account. Go to start, all programs, administrative tools
-   3. Select "User Rights Assignment"
+   1. Enable the guest account.
+   2. Add the guest account. Go to start, all programs, administrative tools.
+   3. Select "User Rights Assignment".
    4. Double click on "Access this computer from the network". Click on "Add User or Group". Type "guest" and then click on "Check Names". Select "guest" and click ok.
    5. Double click on "Deny access to this computer from the network", and remove the guest account from it. 
 
