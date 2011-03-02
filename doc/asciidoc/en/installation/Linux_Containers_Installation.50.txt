@@ -9,11 +9,13 @@ Setup
 Installing lxc
 ~~~~~~~~~~~~~~
 
-Just install the package +lxc+ as root (this file documents usage with version 0.7):
+Just install the package +lxc+ as root (this file documents usage with version 0.7.4):
 
 ----
 # apt-get install lxc
 ----
+
+(*UPDATE*: lxc has been installed in qvd-test1 from ~qvd/lxc-0.7.4.tar.gz)
 
 Then check that the needed kernel compilation options are in place:
 
@@ -97,10 +99,10 @@ but +run-cont.sh+ already does that when needed, too.
 Configuration file
 ^^^^^^^^^^^^^^^^^^
 ----
-lxc.utsname = qvdimg
+## general
 lxc.tty = 4
 lxc.pivotdir = .pivot
-#lxc.arch=x86    ## available from lxc 0.7.3
+lxc.arch=x86
 
 ## network
 lxc.network.type = veth
@@ -166,7 +168,6 @@ lxc.cap.drop = sys_boot sys_nice sys_pacct sys_ptrace sys_rawio sys_time sys_tty
 lxc.cap.drop = sys_module dac_read_search
 ----
 
-  - +lxc.utsname+ specifies the hostname of the container.
   - +lxc.pivotdir+ specifies the directory for the +pivot_root(2)+ system call.
     Since the root filesystem is mounted readonly, we can't let +lxc-start+
     choose and create a temporary directory for this operation.
@@ -201,16 +202,17 @@ as to undo the union-mount operations and do some clean up.
 set -e
 
 function setup_vars() {
-    ID=$(printf %02d $ID)
-    OVL=ovl$ID
-    ROOT=root$ID
-    NAME=qvdimg$ID;
+    ID_PAD=$(printf %02d $ID)
+    OVL=ovl$ID_PAD
+    ROOT=root$ID_PAD
+    NAME=testimg$ID_PAD
+    BASEDIR=/var/lib/lxc/$NAME
     NFS_REMOTE=aguila:/var/local/exports/lxc-root
     NFS_LOCAL=nfsroot
     LOG_FILE=/tmp/lxc-$NAME.log
     CON_FILE=/tmp/lxc-$NAME-console.log
     LM=lib/modules/$(uname -r)
-    IP=10.1.0.$(( 230 + $ID ))
+    IP=10.1.0.$(( 254 - $ID ))
 
     NUM=$ID;                             MAC1=$(( $NUM / 256 / 256));
     NUM=$(( $NUM - $MAC1 * 256 * 256 )); MAC2=$(( $NUM / 256 ));
@@ -222,7 +224,7 @@ function setup_vars() {
 function check_stopped() {
     [[ $(lxc-info -n $NAME) =~ " is STOPPED" ]] && return
 
-    echo "Container $ID is not 'STOPPED', aborting."
+    echo "Container $ID_PAD is not 'STOPPED', aborting."
     exit 1
 }
 
@@ -230,8 +232,9 @@ function mount_nfs() {
     [[ -d $NFS_LOCAL/bin ]] && return
 
     mkdir -p $NFS_LOCAL
-    mount -t nfs -o ro $NFS_REMOTE $NFS_LOCAL    ## and this remains mounted forever
-    mount -o bind /$LM $NFS_LOCAL/$LM            ## this is rw; doing a "remount,ro" fails saying that the directory "is busy"
+    mount -t nfs $NFS_REMOTE $NFS_LOCAL    ## this remains mounted forever
+    mkdir -p $NFS_LOCAL/$LM
+    mount -o bind /$LM $NFS_LOCAL/$LM
 }
 
 function create_overlay() {
@@ -240,32 +243,32 @@ function create_overlay() {
     echo "Creating overlay $OVL.ext4..."
     dd if=/dev/null of=$OVL.ext4 bs=1 seek=5G
     mkfs.ext4 -qF $OVL.ext4
-}   
-    
+}
+
 function setup_mounts() {
-    mkdir -p $OVL
-    mount -o loop $OVL.ext4 $OVL
-    mkdir -p $OVL/$LM
-    
-    mkdir -p $ROOT
-    mount -t aufs -o br:$OVL:$NFS_LOCAL=ro         aufs $ROOT
-    mount -t aufs -o br:$OVL/$LM:$NFS_LOCAL/$LM=ro aufs $ROOT/$LM
+    mkdir -p $BASEDIR/$OVL
+    mount -o loop $OVL.ext4 $BASEDIR/$OVL
+    mkdir -p $BASEDIR/$OVL/$LM
+
+    mkdir -p $BASEDIR/$ROOT
+    mount -t aufs -o br:$BASEDIR/$OVL:$NFS_LOCAL=ro         aufs $BASEDIR/$ROOT
+    mount -t aufs -o br:$BASEDIR/$OVL/$LM:$NFS_LOCAL/$LM=ro aufs $BASEDIR/$ROOT/$LM
     #echo "Overlay '$OVL' mounted over '$NFS_LOCAL' on '$ROOT'."
-}   
-    
+}
+
 function cleanup() {
-    umount $ROOT/$LM
-    umount $ROOT
-    umount $OVL
-    rmdir $OVL $ROOT
-} 
-  
+    umount $BASEDIR/$ROOT/$LM
+    umount $BASEDIR/$ROOT
+    umount $BASEDIR/$OVL
+    rmdir $BASEDIR/$OVL $BASEDIR/$ROOT $BASEDIR
+}
+
 ID=$1;
 if [[ -z $ID ]]; then
     echo "Usage: $0 [container number]"
     echo "Example: $0 42"
     exit 1;
-fi  
+fi
 
 setup_vars; #echo "ID [$ID] OVL [$OVL] ROOT [$ROOT] NAME [$NAME] IP [$IP] MAC [$MAC]"
 check_stopped
@@ -278,15 +281,16 @@ echo "LXC debug output is in $LOG_FILE."
 echo "To run nxagent & nxproxy, do the following:"
 echo "ssh -n qvd@$IP 'xinit /etc/X11/Xsession -- /usr/bin/nxagent :100 -ac -name QVD -display nx/nx,options=/home/qvd/nxagent.conf:100' & nxproxy -S $IP:100 &"
 
-## don't use -d; we have to wait for lxc-start to end, so that the trap handler runs after it
+## don't use -d; we have to wait for lxc-start to end, so that the trap handler runs after that
 lxc-start -f container.conf -n $NAME -l DEBUG -o $LOG_FILE \
+  -s lxc.utsname=$NAME \
   -s lxc.console=$CON_FILE \
-  -s lxc.rootfs=$ROOT \
-  -s lxc.mount.entry="proc    $ROOT/proc     proc   defaults  0 0" \
-  -s lxc.mount.entry="sys     $ROOT/sys      sysfs  defaults  0 0" \
-  -s lxc.mount.entry="devpts  $ROOT/dev/pts  devpts defaults  0 0" \
-  -s lxc.mount.entry="varlock $ROOT/var/lock tmpfs  defaults  0 0" \
-  -s lxc.mount.entry="tmp     $ROOT/tmp      tmpfs  mode=1777 0 0" \
+  -s lxc.rootfs=$BASEDIR/$ROOT \
+  -s lxc.mount.entry="proc    $BASEDIR/$ROOT/proc     proc   defaults  0 0" \
+  -s lxc.mount.entry="sys     $BASEDIR/$ROOT/sys      sysfs  defaults  0 0" \
+  -s lxc.mount.entry="devpts  $BASEDIR/$ROOT/dev/pts  devpts defaults  0 0" \
+  -s lxc.mount.entry="varlock $BASEDIR/$ROOT/var/lock tmpfs  defaults  0 0" \
+  -s lxc.mount.entry="tmp     $BASEDIR/$ROOT/tmp      tmpfs  mode=1777 0 0" \
   -s lxc.network.hwaddr=$MAC \
   -s lxc.network.ipv4=$IP/24 #-- /sbin/init --verbose
 ----
@@ -329,9 +333,11 @@ mknod -m 666 $ROOTFS/dev/urandom c 1 9
 mknod -m 666 $ROOTFS/dev/zero c 1 5
 ----
 
-+/etc/hostname+ and +/etc/hosts+
-^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
-The container's hostname must be placed in these files.
++/etc/hosts+
+^^^^^^^^^^^^
+It needs to be modified to list the special host __HOSTNAME__ where the actual
+hostname is needed. Later, the init scripts will change that into the real
+hostname received from +lxc-start+.
 
 +/etc/fstab+
 ^^^^^^^^^^^^
@@ -354,7 +360,6 @@ atd.conf
 cron.conf
 dbus.conf          (needed for the power-off button in the GNOME panel)
 dmesg.conf
-hostname.conf
 networking.conf    (not needed if DHCP isn't used, since the network can be configured beforehand via lxc-start)
 rc.conf
 rc-sysinit.conf
@@ -386,6 +391,8 @@ start on startup
 
 task
 pre-start script
+    H=$(hostname)
+    sed -i -e "s/__HOSTNAME__/$H/" /etc/hosts
     find /var/run -xdev ! -path /var/run -delete
     mkdir -p /var/run/network
     touch /var/run/utmp
@@ -394,7 +401,7 @@ pre-start script
     if [ "$(find /etc/network/ -name upstart -type f)" ]; then
         chmod -x /etc/network/*/upstart || true
     fi
-    #route add default gw 10.1.0.101    ## uncomment if DHCP isn't used and the network is configured via lxc-start
+    #route add default gw 10.1.0.1      ## uncomment if DHCP isn't used and the network is configured via lxc-start
 end script
 
 script
@@ -427,7 +434,7 @@ sed -i -e '/^start on/s/\(start on\) .*/\1 startup/' /tmp/rc-sysinit.conf
 Usage
 -----
   - +lxc-create+ creates the container, which isn't more than a data structure.
-    This step is optional in LXC 0.7.
+    This step is optional from LXC 0.7 onwards.
 
     lxc-create -n name -f /path/to/config-file
 
@@ -438,11 +445,11 @@ Usage
 
   - +lxc-start+ brings the container up.
 
-    lxc-start -n name
-    lxc-start -n name -d                        ## suppress output.
-    lxc-start -n name -d -o /tmp/lxc.log        ## send output to a log file.
-    lxc-start -n name -l DEBUG ...              ## for debugging.
-    lxc-start -f config-file ...                ## LXC 0.7 and later: allows us to skip the lxc-create step.
+    lxc-start -n name                           ## takes over the terminal.
+    lxc-start -n name -d                        ## doesn't take over the terminal, suppresses output.
+    lxc-start -n name -d -o /tmp/lxc.log        ## sends output to a log file.
+    lxc-start -n name -l DEBUG ...              ## sets the log level.
+    lxc-start -f config-file ...                ## LXC 0.7 and newer: allows us to skip the lxc-create step.
     lxc-start -n name -s lxc.rootfs=/some/path  ## sets a configuration directive from the command line.
 
   - +lxc-console+ connects to one of the container's ttys. After closing the
@@ -450,15 +457,16 @@ Usage
 
     lxc-console -n name -t 1   ## connects to tty1
 
-  - +lxc-info+ shows information about the specified container.
+  - +lxc-info+ shows brief information about the specified container.
 
     lxc-info -n name
 
   - +lxc-ps+ shows processes running inside the container.
 
     lxc-ps -n name
+    lxc-ps --lxc
 
-  - +lxc-stop+ kills all processes in the container, effectively stopping it.
+  - +lxc-stop+ kills (SIGKILL) all processes in the container, effectively stopping it.
 
     lxc-stop -n name
 
@@ -487,3 +495,38 @@ To exit the container console, do Control-A then D. To re-enter the container co
 Secure Linux containers cookbook
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 <http://www.ibm.com/developerworks/linux/library/l-lxc-security/>
+
+Shutdown detection and +/var/run+ in Ubuntu containers
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+Since some version of LXC (0.7 or 0.7.2 or so), +lxc-start+ is able to monitor
+the file +/var/run/utmp+ in the container to figure out when it's being
+rebooted or shut down, and take the appropriate action (restart +init+ or kill
+it, respectively). This is not possible in Ubuntu containers because +/var/run+
+is mounted in a +tmpfs+ by default during the boot process, and their contents
+aren't visible from outside.
+
+This is why in our setup +/var/run+ is *not* a +tmpfs+: to halt a container
+it's enough to log into it and issue the +halt+ command as usual.
+
+Kernel is not Lucid's default
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+The kernel that ships with Ubuntu Lucid has a regression that causes the
++umount+ system call to take a very long time (around 300 milliseconds), which
+causes big delays when starting containers. It has been upgraded from
+2.6.32-24-server to 2.6.35-22-server.
+
++sysctl+ variables in the host
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+When bringing up many containers it's easy to hit the system's default limits.
+The first to appear was +fs.inotify.max_user_instances+, which has been set to
+1024 (from 128 IIRC, which allowed for no more than 30 containers that didn't
+run GNOME).
+
+The kernel 2.6.35 includes additional security measures that don't seem to play
+well with +aufs+: the user +qvd+ suddenly cannot rename and/or delete some
+files. This has been worked around by setting the sysctl variable
++kernel.yama.protected_nonaccess_hardlinks+ to 0, thereby disabling this new
+feature.
