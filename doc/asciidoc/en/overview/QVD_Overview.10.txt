@@ -26,14 +26,17 @@ QVD actors are:
 	* Nodes
 	* Images
 
-Users: People that work at their desks, using office packages, email, whatever. Must be identified by login and password. 
-Virtual Machines: Running Linux Desktops and owned by the users. These VMs run under KVM on Linux Nodes.
-Nodes: Physical servers where the VMs run. 
-Images: Templates with shared properties as applications installed, memory for the VM or space for the user's home.  
+*Users*: People that work at their desks, using office packages, email, whatever. Must be identified by login and password. 
+
+*Virtual Machines*: Running Linux Desktops and owned by the users. These VMs run under KVM on Linux Nodes.
+
+*Nodes*: Physical servers where the VMs run. 
+
+*Images*: Templates with shared properties as applications installed, memory for the VM or space for the user's home.  
 
 QVD components are:
 
-	* QVD-Client. 
+	* QVD-Client
 	* QVD-L7R (Level 7 Router)
 	* QVD-HKD (House Keeping Daemon)
 	* QVD-Node
@@ -49,9 +52,37 @@ QVD components are:
 *QVD-Administrative tools*: Composed by CLI and the WAT (Web administration tool) that provides an easy and simple way to administrate the whole platform, from a couple of nodes to hundreds. +
 *QVD-VMA*: The agent that runs in the Virtual Machine, allowing users to connect, enable printer sharing, audio, hooks, etc. +
 
+Also, QVD uses the following external open source components.
 
-Network Architecture
-~~~~~~~~~~~~~~~~~~~~
+    * The PostgreSQL RDBMS.
+    * KVM: Hypervisor.
+    * NX: protocol that handles remote desktop connections.
+    * Catalyst: an MVC web-application framework
+    * Ubuntu 10.04 GNU/Linux operating system 
+
+Architecture overview
+~~~~~~~~~~~~~~~~~~~~~
+
+    * Linux and Windows clients available.
+    * Single connection gateway.
+    * Automatic managed network.
+    * Shared OS templates between virtual machines (saves up to 90% disc space). 
+
+image:../inkscape/overview_QVD.png[alt="QVD overview"]
+
+Logic components overview
+~~~~~~~~~~~~~~~~~~~~~~~~~
+
+    * Client <--> L7R connections via SSL encryption.
+    * Load balancer dispatches the connections among multiple L7Rs.
+    * One HKD per host keeps the DB updated.
+    * One VMA per virtual machine. 
+
+image:../inkscape/logic_components.png[alt="QVD overview"]
+
+
+Network Architecture and VMs
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
 QVD is a 3-tier solution from a Network perspective, the QVD-Client connects to the QVD-L7R and this connection is forwarded directly to the virtual machine. Each virtual machine has is own IP Address. Each Node has an firewall running that provides security to the Virtual Machines at bridge level. All the virtual machines must be in the same subnet, at this moment a different farm must be created if two or more networks are required. A DHCP server runs in each host to provide the correct IP to each virtual Machine.
 
@@ -62,6 +93,25 @@ The NICs for each VM are tap interfaces. Those will be bridged to a specific phy
 The bridge *MUST* exist before HKD is running and it *MUST* be created manually, by default the bridge's name will be qvdnet0. 
 
 Tap interfaces will be created by HKD and for the KVM perspective they will be passed as file descriptor 3. 
+
+
+Virtual machine starting process
+^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+    * The client establishes an SSL connection.
+    * Load balancer sends the flow to a L7R.
+    * L7R authenticates the user.
+    * L7R checks the VM status (running, stopped, etc.), if user is valid.
+    * HKD starts the VM and updates DB when VM starts VMA.
+    * L7R watches the DB in order to know when the VM is running. 
+
+image:../inkscape/starting_vm.png[alt="QVD overview"]
+
+Session establishment
+^^^^^^^^^^^^^^^^^^^^^
+
+    * HKD receives the petition to start VMA while nxagent is not running. Once running, HKD updates VMA state in DB.
+    * L7R watches the DB, when VMA is up connects the VM to the client. 
 
 
 IP Addresses for VMs
