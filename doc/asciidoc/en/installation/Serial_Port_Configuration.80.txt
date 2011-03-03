@@ -71,4 +71,4 @@ To enable a graphic console accessible via VNC (not recommended as it wastes a l
 
 ....
 
-And obviously, the guest OS image has also to be configured to not use the serial console.
+And obviously, the guest OS image has also to be configured not to use the serial console.

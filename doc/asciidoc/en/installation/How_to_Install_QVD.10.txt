@@ -1,9 +1,5 @@
 How to install QVD 
 ==================
-Santiago Doblas
-v0.1, 9 december 2010
-:author initials: SD
-:email: sdoblas@qindel.com
 
 
 Introduction
@@ -375,7 +371,7 @@ ip addr add 10.3.15.1/24 dev qvdnet0
 
 ----
 
- ** We also need nating network traffic to allow comunication between private virtual machines network and external world. 
+ ** We also need natting network traffic to allow communication between private virtual machines network and external world. 
 
 ---- 
 

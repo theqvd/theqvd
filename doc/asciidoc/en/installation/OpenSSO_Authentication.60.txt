@@ -1,10 +1,5 @@
 OpenSSO Authentication
 ======================
-Santiago Doblas
-v0.1, 20 december 2010
-:author initials: SD
-:email: sdoblas@qindel.com
-
 
 Quick explanation, assuming an OSI ID of 1.
 
@@ -43,7 +38,7 @@ OpenSSO Authentication plugin
 
 The source code is at source:trunk/qvd/QVD-L7R-Authenticator-Plugin-Opensso/
 
-To install the plugin, install the package source:trunk/qvd/auth-plugins/libqvd-l7r-authenticator-plugin-opensso-perl_0.01-1_all.deb on the VM server.
+To install the plugin, install the package source: trunk/qvd/auth-plugins/libqvd-l7r-authenticator-plugin-opensso-perl_0.01-1_all.deb on the VM server.
 
 Example configuration:
 
@@ -77,10 +72,10 @@ The parameters are:
 
     * qvd.auth.opensso.roles. This is the list of nsrole attributes for the authenticated entry. If more than one role is returned then they are separated by ":". If no roles are passed then the this attribute is the empty string.
     * qvd.auth.opensso.uri. This is the target uri used for authorization. If no authorization is used, this is usually the empty string.
-    * qvd.auth.opensso.cookie. This is the cookie that can be embedded in the firefox.
+    * qvd.auth.opensso.cookie. This is the cookie that can be embedded in the Firefox.
     * qvd.auth.opensso.cookiedomain. This is the host or domain where the cookie applies to. 
 
-If cookie or cookiedomain are not defined, no parameters will be passed to firefox. If the roles parameter is empty, they won't be passed to the user. Si los roles están vacios, éstos no se pasarán al usuario. En todo caso se intenta siempre que el usuario haga login y no bloquear la ejecución del hook. Se supone que el acceso es protegido por OpenSSO y no por nosotros.
+If cookie or cookiedomain are not defined, no parameters will be passed to Firefox. If the roles parameter is empty, they won't be passed to the user. Si los roles están vacios, éstos no se pasarán al usuario. Anyhow it is preferred to let the user log in, rather than blocking the execution of the hook. The access is supposed to be protected under OpenSSO.
 
 More documentation
 ------------------

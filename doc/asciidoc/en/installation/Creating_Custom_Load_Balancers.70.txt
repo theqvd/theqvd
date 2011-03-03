@@ -1,13 +1,7 @@
 Creating custom load balancers
 ==============================
-Santiago Doblas
-v0.1, 20 december 2010
-:author initials: SD
-:email: sdoblas@qindel.com
 
-
-
-Load balancers decide on which node virtual machines are started. You may want to create a custom load balancer for example if you want certain virtual machines to start on a dedicated group of nodes.
+Load balancers decide on what node virtual machines are started. You may want to create a custom load balancer for example if you want certain virtual machines to start on a dedicated group of nodes.
 
 QVD has a plugin system for load balancers. A load balancer plugin is a subclass of QVD::L7R::LoadBalancer::Plugin that has to be within the package QVD::L7R::LoadBalancer::Plugin.
 

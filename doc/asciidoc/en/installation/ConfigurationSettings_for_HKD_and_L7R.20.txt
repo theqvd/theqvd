@@ -155,7 +155,7 @@ vma hooks
 
     * vma.on_provisioning.after_add_user 
 
-L7R Authentication Plugings
+L7R Authentication Plugins
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
 LDAP
@@ -187,7 +187,7 @@ Default load balancer configuration
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
 
-The default load balancer chooses the node that has the highest quantity of free resources. The free resources are calculated as the weighed sum of free RAM, unused CPU, and a random number to bring some entropy to the sum. The individual weights are configurable.
+The default load balancer chooses the node that has the highest quantity of free resources. The free resources are calculated as the weighted sum of free RAM, unused CPU, and a random number to bring some entropy to the result. The individual weights are configurable.
 
 
 	l7r.loadbalancer.plugin.default.weight.ram = 1

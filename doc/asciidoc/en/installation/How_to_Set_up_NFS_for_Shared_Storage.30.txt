@@ -1,9 +1,5 @@
 How to set up NFS for shared storage
 ====================================
-Santiago Doblas
-v0.1, 20 december 2010
-:author initials: SD
-:email: sdoblas@qindel.com
 
 
 Introduction
@@ -11,10 +7,10 @@ Introduction
 
 Shared storage must be visible for all hosts in the farm. Four directories are required by QVD:
 
-    * images: OSIS directory
-    * overlays: Modified data for each VM
-    * shared: Directory to put the template images before being associated to any OSI
-    * homes: Users data 
+    * 'images': OSIS directory
+    * 'overlays': Modified data for each VM
+    * 'shared': Directory to put the template images before being associated to any OSI
+    * 'homes': Users data 
 
 Keep in mind that names and PATH could be different according to the configuration.
 
