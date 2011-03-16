@@ -1,7 +1,7 @@
 Linux Containers Documentation
 ==============================
 David Serrano
-v0.2, Feb 2011
+v0.2, Mar 2011
 
 Setup
 -----
@@ -15,14 +15,14 @@ Just install the package +lxc+ as root (this file documents usage with version 0
 # apt-get install lxc
 ----
 
-(*UPDATE*: lxc has been installed in qvd-test1 from ~qvd/lxc-0.7.4.tar.gz)
+(*UPDATE*: lxc has been installed in the test1 box from ~qvd/lxc-0.7.4.tar.gz)
 
 Then check that the needed kernel compilation options are in place:
 
 ----
 $ lxc-checkconfig 
 Kernel config /proc/config.gz not found, looking in other places...
-Found kernel config file /boot/config-2.6.32-27-generic
+Found kernel config file /boot/config-2.6.35-22-server
 --- Namespaces ---
 Namespaces: enabled
 Utsname namespace: enabled
@@ -60,13 +60,15 @@ In this example, we replace eth1, which has IP 10.1.0.101, with a bridge:
 #iface eth1 inet static
 # ...
 
-auto br0
-iface br0 inet static
+auto qvdnet0
+iface qvdnet0 inet static
     address 10.1.0.101
     netmask 255.255.255.0
     gateway 10.1.0.1
     bridge_ports eth1
+    bridge_stp off
     bridge_fd 0
+    bridge_maxwait 0
 ----
 
 Creating a new container
@@ -86,7 +88,7 @@ General layout
 
 +nfsroot+ is a directory where, in our setup, the root directory for all the
 containers is to be mounted read-only from a remote NFS server. The script
-+run-cont.sh+ takes care of that. The overlays can be created with the
++run-cont.sh+ takes care of that. The overlay images can be created with the
 following:
 
 ----
@@ -107,7 +109,7 @@ lxc.arch=x86
 ## network
 lxc.network.type = veth
 lxc.network.flags = up
-lxc.network.link = br0
+lxc.network.link = qvdnet0
 lxc.network.name = eth1
 lxc.network.mtu = 1500
 
@@ -121,16 +123,16 @@ lxc.cgroup.devices.deny = a
 lxc.cgroup.devices.allow = c 1:3 rwm
 lxc.cgroup.devices.allow = c 1:5 rwm
 # consoles
-lxc.cgroup.devices.allow = c 5:1 rwm
-lxc.cgroup.devices.allow = c 5:0 rwm
 lxc.cgroup.devices.allow = c 4:0 rwm
 lxc.cgroup.devices.allow = c 4:1 rwm
+lxc.cgroup.devices.allow = c 5:0 rwm
+lxc.cgroup.devices.allow = c 5:1 rwm
 # /dev/{,u}random
-lxc.cgroup.devices.allow = c 1:9 rwm
 lxc.cgroup.devices.allow = c 1:8 rwm
+lxc.cgroup.devices.allow = c 1:9 rwm
 # /dev/pts/* - pts namespaces are "coming soon"
-lxc.cgroup.devices.allow = c 136:* rwm
 lxc.cgroup.devices.allow = c 5:2 rwm
+lxc.cgroup.devices.allow = c 136:* rwm
 # rtc
 lxc.cgroup.devices.allow = c 254:0 rm
 # RAM size
@@ -179,8 +181,8 @@ lxc.cap.drop = sys_module dac_read_search
   - +lxc.mount.entry+ specifies a fstab-like line to mount a resource before
     bringing up the container.
   - +lxc.mount+ specifies a file in which those fstab-like lines can be put,
-    instead of having them in this LXC configuration file.
-  - +lxc.cgroup.cpu.shares+ limits the amount of CPU time that this container
+    instead of having them inlined in this LXC configuration file.
+  - +lxc.cgroup.cpu.shares+ changes the amount of CPU time that this container
     can use. The default value is 1024, so saying eg. 512 will give this container
     half as much CPU time as the other ones.
 
@@ -214,6 +216,8 @@ function setup_vars() {
     LM=lib/modules/$(uname -r)
     IP=10.1.0.$(( 254 - $ID ))
 
+    ## bitwise operations in bash: declare -i BYTE=$(( 0xC1 & ~ 3 | 2 ))
+    ## useful for fiddling with the MAC address
     NUM=$ID;                             MAC1=$(( $NUM / 256 / 256));
     NUM=$(( $NUM - $MAC1 * 256 * 256 )); MAC2=$(( $NUM / 256 ));
     NUM=$(( $NUM - $MAC2 * 256 ));       MAC3=$NUM
@@ -342,9 +346,10 @@ hostname received from +lxc-start+.
 +/etc/fstab+
 ^^^^^^^^^^^^
 In theory this could be empty, since the default mount points are handled from
-+run-cont.sh+. If we want to use DHCP, then a bogus line +none / auto ro 0 0+
-is required so that +/sbin/dhclient-script+ detects that the root filesystem is
-read-only, preventing it from rewriting +/etc/resolv.conf+.
++run-cont.sh+. Nevertheless, if we want to use DHCP, then a bogus line +none /
+auto ro 0 0+ is required so that +/sbin/dhclient-script+ detects that the root
+filesystem is read-only, preventing it from trying to rewrite
++/etc/resolv.conf+.
 
 init scripts (+/etc/init+ in Ubuntu)
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
@@ -375,7 +380,7 @@ Regarding the basic rcS scripts, we don't have +/etc/init/rcS+, but
 +rc-sysinit.conf+ calls +/etc/init.d/rcS+, which runs all scripts under
 +/etc/rcS.d+. This directory only needs two files: +S70screen-cleanup+ (useful
 is GNU screen is used, harmless otherwise) and +S70x11-common+ (*required*, it
-creates +/tmp/.X11-unix+) - the rest can be removed.
+creates +/tmp/.X11-unix+) — the rest can be removed.
 
 Another thing worth mentioning is +ttyS0.conf+. Since it deals directly with
 the hardware, it shouldn't run inside a container.
@@ -501,10 +506,10 @@ Shutdown detection and +/var/run+ in Ubuntu containers
 
 Since some version of LXC (0.7 or 0.7.2 or so), +lxc-start+ is able to monitor
 the file +/var/run/utmp+ in the container to figure out when it's being
-rebooted or shut down, and take the appropriate action (restart +init+ or kill
-it, respectively). This is not possible in Ubuntu containers because +/var/run+
-is mounted in a +tmpfs+ by default during the boot process, and their contents
-aren't visible from outside.
+rebooted or shut down, and take the appropriate action (restart the container's
++init+ or kill it, respectively). This is not possible in Ubuntu containers
+because +/var/run+ is mounted in a +tmpfs+ by default during the boot process,
+and their contents aren't visible from outside.
 
 This is why in our setup +/var/run+ is *not* a +tmpfs+: to halt a container
 it's enough to log into it and issue the +halt+ command as usual.
@@ -522,7 +527,7 @@ causes big delays when starting containers. It has been upgraded from
 
 When bringing up many containers it's easy to hit the system's default limits.
 The first to appear was +fs.inotify.max_user_instances+, which has been set to
-1024 (from 128 IIRC, which allowed for no more than 30 containers that didn't
+1024 (from 128 IIRC, which allowed for no more than 30 containers which didn't
 run GNOME).
 
 The kernel 2.6.35 includes additional security measures that don't seem to play
