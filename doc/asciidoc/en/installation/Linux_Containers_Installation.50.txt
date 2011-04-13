@@ -71,6 +71,19 @@ iface qvdnet0 inet static
     bridge_maxwait 0
 ----
 
+If QVD has been installed in the machine, it's probable that the bridge
+already exists.
+
+Mounting +cgroup+
+~~~~~~~~~~~~~~~~~
+
+The +cgroup+ filesystem must be mounted for LXC to work. Mount it and add it
+to +/etc/fstab+:
+
+----
+cgroup /cgroup cgroup defaults 0 0
+----
+
 Creating a new container
 ~~~~~~~~~~~~~~~~~~~~~~~~
 
@@ -192,10 +205,11 @@ case the command line would be very long, of course).
 
 +run-cont.sh+
 ^^^^^^^^^^^^^
-This is a script I (dserrano) am currently using to start containers. It mounts
-NFS if needed, creates the overlay if needed, picks both MAC and IP addresses,
-union-mounts some directories, starts the container and waits for it to stop so
-as to undo the union-mount operations and do some clean up.
+This is a script I (dserrano) am currently using to start containers. It
+mounts NFS if needed (which requires the package +nfs-common+ to be
+installed), creates the overlay if needed, picks both MAC and IP addresses,
+union-mounts some directories, starts the container and waits for it to stop
+so as to undo the union-mount operations and do some clean up.
 
 [source,bash]
 ----
@@ -480,6 +494,7 @@ Usage
 
     lxc-destroy -n name
 
+
 Random notes
 ------------
 
@@ -527,8 +542,8 @@ causes big delays when starting containers. It has been upgraded from
 
 When bringing up many containers it's easy to hit the system's default limits.
 The first to appear was +fs.inotify.max_user_instances+, which has been set to
-1024 (from 128 IIRC, which allowed for no more than 30 containers which didn't
-run GNOME).
+1024 (from 128, which allowed for no more than 30 containers which didn't run
+GNOME).
 
 The kernel 2.6.35 includes additional security measures that don't seem to play
 well with +aufs+: the user +qvd+ suddenly cannot rename and/or delete some
