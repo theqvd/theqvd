@@ -12,15 +12,15 @@
 # - Check acroread5, something is missing while loading a PDF
 # - Enough for Flash Player & PluginSDK npsimple.so
 
-function error() {
+error() {
 	echo ${1+"$@"} > /dev/stderr
 }
 
-function status() {
+status() {
 	echo ${1+"$@"} > /dev/stderr
 }
 
-function run() {
+run() {
 	status " " ${1+"$@"}
 	${1+"$@"}
 }

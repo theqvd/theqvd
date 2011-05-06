@@ -25,9 +25,10 @@ This library is free software. You can redistribute it and/or modify
 it under the same terms as Perl itself.
 
 =cut
-has windowid =>(is => 'rw', isa => 'Str', default => "0x5c0001e");
+has windowid =>(is => 'rw', isa => 'Str', default => "0x80001e");
 
-has host => (is => 'rw', isa => 'Str', default => '212.73.49.56');
+#has host => (is => 'rw', isa => 'Str', default => '212.73.49.56');
+has host => (is => 'rw', isa => 'Str', default => '172.16.0.1');
 #has host => (is => 'rw', isa => 'Str', default => '127.0.0.1');
 has port => (is => 'rw', isa => 'Int', default => 4111);
 
@@ -54,7 +55,7 @@ sub getPort {
     
     if (!exists($self->portMappings->{$id}->{port})) {
 	$self->portMappings->{$id}->{port} = $self->port;
-	$self->port($self->port + 1);
+#	$self->port($self->port + 1);
     }
 
     return $self->portMappings->{$id}->{port};
@@ -86,12 +87,12 @@ sub kill_plugin {
     }
 }
 
-sub executeask {
+sub executefake {
     my ($self, $id, $exec_string) = @_;
     my @args = split /\s+/, $exec_string;
     my $cmd = $args[0];
     my ($volume, $dir, $file) = File::Spec->splitpath($cmd);
-    my $pid = -1;
+    my $pid = 4672;
     print STDERR "execute ".Dumper($id, $exec_string);
 
     if (!exists($self->allowed_exec_paths->{$dir}) &&
@@ -101,7 +102,8 @@ sub executeask {
 	return $pid;
     }
 
-    system ("kdialog  --inputbox \"command to execute\". \"$exec_string\"");
+#    system ("xmessage \"command to execute\". \"$exec_string\"");
+#    system ("kdialog  --inputbox \"command to execute\". \"$exec_string\"");
 
     $self->portMappings->{$id}->{exec_string} = $exec_string;
     $self->portMappings->{$id}->{pid} = $pid;
@@ -144,6 +146,42 @@ sub execute {
     $self->portMappings->{$id}->{pid} = $pid;
     return $pid unless ($pid ==0);
 }
+
+sub executewin {
+    my ($self, $id, $exec_string) = @_;
+    my @args = split /\s+/, $exec_string;
+    $args[0] = "/cygdrive/z/w/svn/QVD/trunk/flash/win/nspluginwrapper-1.2.2/npviewer.bin";
+    $args[2] = 'C:\WINDOWS\system32\Macromed\Flash\NPSWF32.dll';
+    $exec_string = join " ", @args;
+    my $cmd = $args[0];
+    my ($volume, $dir, $file) = File::Spec->splitpath($cmd);
+    my $pid = -1;
+#    system ("kdialog  --inputbox \"command to execute\". \"$exec_string\"");
+
+    print STDERR "execute ".Dumper($id, $exec_string);
+
+    $pid = fork();
+    if (!defined($pid)) {
+	print STDERR "Error invoking fork\n";
+	return -1;
+    }
+    if ($pid == 0) 
+    {
+	$ENV{NPW_MESSAGE_TIMEOUT}="300";
+	$ENV{NPW_DEBUG}="7";
+	$ENV{NPW_LOG}="/tmp/b.out";
+	sleep 1;
+#	system("xwininfo -tree -root > /tmp/x.out");
+#	my $exec_string = "strace -f -s 1500 -o /tmp/strace.out $exec_string";
+	exec $exec_string;
+    }
+
+    $self->portMappings->{$id}->{exec_string} = $exec_string;
+    $self->portMappings->{$id}->{pid} = $pid;
+    print STDERR "The pid is $pid\n";
+    return $pid unless ($pid ==0);
+}
+
 
 sub translate_windowid {
     my ($self, $id, $windowid) = @_;

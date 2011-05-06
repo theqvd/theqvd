@@ -11,6 +11,8 @@ requires 'Catalyst::Plugin::ConfigLoader';
 requires 'Catalyst::Plugin::Static::Simple';
 requires 'Catalyst::Action::RenderView';
 requires 'Catalyst::View::Download::Plain';
+requires 'Catalyst::View::TT';
+requires 'Catalyst::View::JSON';
 requires 'Moose';
 requires 'namespace::autoclean';
 requires 'Config::General'; # This should reflect the config file format you've chosen

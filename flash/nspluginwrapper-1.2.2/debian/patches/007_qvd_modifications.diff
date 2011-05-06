@@ -1,7 +1,7 @@
 Index: nspluginwrapper-1.2.2/src/npw-remote-agent-info.c
 ===================================================================
 --- /dev/null	1970-01-01 00:00:00.000000000 +0000
-+++ nspluginwrapper-1.2.2/src/npw-remote-agent-info.c	2010-09-09 22:02:26.000000000 +0200
++++ nspluginwrapper-1.2.2/src/npw-remote-agent-info.c	2010-09-29 12:28:56.000000000 +0200
 @@ -0,0 +1,647 @@
 +/*
 + * npw-remote-agent-info.c
@@ -653,7 +653,7 @@ Index: nspluginwrapper-1.2.2/src/npw-remote-agent-info.c
 Index: nspluginwrapper-1.2.2/src/npw-remote-agent-info.h
 ===================================================================
 --- /dev/null	1970-01-01 00:00:00.000000000 +0000
-+++ nspluginwrapper-1.2.2/src/npw-remote-agent-info.h	2010-09-09 22:02:26.000000000 +0200
++++ nspluginwrapper-1.2.2/src/npw-remote-agent-info.h	2010-09-29 12:28:56.000000000 +0200
 @@ -0,0 +1,58 @@
 +/*
 + * npw-agent-info.h
@@ -716,7 +716,7 @@ Index: nspluginwrapper-1.2.2/src/npw-remote-agent-info.h
 Index: nspluginwrapper-1.2.2/src/npw-use-tcp-sockets.c
 ===================================================================
 --- /dev/null	1970-01-01 00:00:00.000000000 +0000
-+++ nspluginwrapper-1.2.2/src/npw-use-tcp-sockets.c	2010-09-09 22:02:26.000000000 +0200
++++ nspluginwrapper-1.2.2/src/npw-use-tcp-sockets.c	2010-09-29 12:28:56.000000000 +0200
 @@ -0,0 +1,59 @@
 +/*
 + * npw-use-tcp-sockets.c
@@ -780,7 +780,7 @@ Index: nspluginwrapper-1.2.2/src/npw-use-tcp-sockets.c
 Index: nspluginwrapper-1.2.2/src/npw-use-tcp-sockets.h
 ===================================================================
 --- /dev/null	1970-01-01 00:00:00.000000000 +0000
-+++ nspluginwrapper-1.2.2/src/npw-use-tcp-sockets.h	2010-09-09 22:02:26.000000000 +0200
++++ nspluginwrapper-1.2.2/src/npw-use-tcp-sockets.h	2010-09-29 12:28:56.000000000 +0200
 @@ -0,0 +1,38 @@
 +/*
 + * use-tcp-sockets.h
@@ -822,8 +822,8 @@ Index: nspluginwrapper-1.2.2/src/npw-use-tcp-sockets.h
 +#endif
 Index: nspluginwrapper-1.2.2/Makefile
 ===================================================================
---- nspluginwrapper-1.2.2.orig/Makefile	2010-09-09 22:02:26.000000000 +0200
-+++ nspluginwrapper-1.2.2/Makefile	2010-09-10 10:37:40.000000000 +0200
+--- nspluginwrapper-1.2.2.orig/Makefile	2010-09-29 12:28:55.000000000 +0200
++++ nspluginwrapper-1.2.2/Makefile	2010-09-29 12:28:56.000000000 +0200
 @@ -106,14 +106,18 @@
  
  npwrapper_LIBRARY = npwrapper.so
@@ -862,8 +862,8 @@ Index: nspluginwrapper-1.2.2/Makefile
  test_rpc_client_CPPFLAGS = $(CPPFLAGS) -I$(SRC_PATH)/src -DBUILD_CLIENT -DNPW_COMPONENT_NAME="\"Client\""
 Index: nspluginwrapper-1.2.2/src/npw-wrapper.c
 ===================================================================
---- nspluginwrapper-1.2.2.orig/src/npw-wrapper.c	2010-09-09 22:02:23.000000000 +0200
-+++ nspluginwrapper-1.2.2/src/npw-wrapper.c	2010-09-10 10:37:44.000000000 +0200
+--- nspluginwrapper-1.2.2.orig/src/npw-wrapper.c	2010-09-29 12:28:44.000000000 +0200
++++ nspluginwrapper-1.2.2/src/npw-wrapper.c	2010-09-29 12:34:37.000000000 +0200
 @@ -42,6 +42,8 @@
  #include <X11/Shell.h>
  #include <X11/StringDefs.h>
@@ -904,7 +904,23 @@ Index: nspluginwrapper-1.2.2/src/npw-wrapper.c
    D(bugiI("NPP_SetWindow instance=%p\n", instance));
    NPError ret = invoke_NPP_SetWindow(plugin, window);
    D(bugiD("NPP_SetWindow return: %d [%s]\n", ret, string_of_NPError(ret)));
-@@ -3327,7 +3346,7 @@
+@@ -3164,6 +3183,7 @@
+ 	npw_perror("NP_Initialize() invoke", error);
+ 	return NPERR_MODULE_LOAD_FAILED_ERROR;
+   }
++  npw_printf("Sent NP_Initialize invoke\n");
+ 
+   int32_t ret;
+   error = rpc_method_wait_for_reply(g_rpc_connection, RPC_TYPE_INT32, &ret, RPC_TYPE_INVALID);
+@@ -3172,6 +3192,7 @@
+ 	npw_perror("NP_Initialize() wait for reply", error);
+ 	return NPERR_MODULE_LOAD_FAILED_ERROR;
+   }
++  npw_printf("Got response for NP_Initialize\n");
+ 
+   return ret;
+ }
+@@ -3327,7 +3348,7 @@
  	g_plugin.initialized = 1 + is_NP_Initialize;
  	return;
    }
@@ -913,7 +929,7 @@ Index: nspluginwrapper-1.2.2/src/npw-wrapper.c
    if (PLUGIN_DIRECT_EXEC){
  	g_plugin.initialized = 1;
  	return;
-@@ -3350,10 +3369,25 @@
+@@ -3350,10 +3371,25 @@
    ++init_count;
    char viewer_path[PATH_MAX];
    sprintf(viewer_path, "%s/%s/%s/%s", NPW_LIBDIR, NPW_Plugin.target_arch, NPW_Plugin.target_os, NPW_VIEWER);
@@ -940,7 +956,7 @@ Index: nspluginwrapper-1.2.2/src/npw-wrapper.c
    if (g_plugin.name == NULL && g_plugin.description == NULL && g_plugin.formats == NULL) {
  	char command[1024];
  	if (snprintf(command, sizeof(command), "%s --info --plugin %s", viewer_path, plugin_path) >= sizeof(command))
-@@ -3403,7 +3437,22 @@
+@@ -3403,7 +3439,22 @@
  	return;
  
    // Start plug-in viewer
@@ -964,7 +980,7 @@ Index: nspluginwrapper-1.2.2/src/npw-wrapper.c
  	char *argv[8];
  	int argc = 0;
  
-@@ -3419,7 +3468,8 @@
+@@ -3419,7 +3470,8 @@
  	execv(viewer_path, argv);
  	npw_printf("ERROR: failed to execute NSPlugin viewer\n");
  	_Exit(255);
@@ -974,7 +990,7 @@ Index: nspluginwrapper-1.2.2/src/npw-wrapper.c
  
    // Initialize browser-side RPC communication channel
    if ((g_rpc_connection = rpc_init_client(connection_path)) == NULL) {
-@@ -3558,6 +3608,14 @@
+@@ -3558,6 +3610,14 @@
    }
  
    if (g_plugin.viewer_pid != -1) {
@@ -989,7 +1005,7 @@ Index: nspluginwrapper-1.2.2/src/npw-wrapper.c
  	// let it shutdown gracefully, then kill it gently to no mercy
  	const int WAITPID_DELAY_TO_SIGTERM = 3;
  	const int WAITPID_DELAY_TO_SIGKILL = 3;
-@@ -3577,9 +3635,10 @@
+@@ -3577,9 +3637,10 @@
  	  }
  	  sleep(1);
  	}
@@ -1004,9 +1020,9 @@ Index: nspluginwrapper-1.2.2/src/npw-wrapper.c
  
 Index: nspluginwrapper-1.2.2/src/rpc.c
 ===================================================================
---- nspluginwrapper-1.2.2.orig/src/rpc.c	2010-09-09 22:02:24.000000000 +0200
-+++ nspluginwrapper-1.2.2/src/rpc.c	2010-09-10 10:37:45.000000000 +0200
-@@ -42,10 +42,13 @@
+--- nspluginwrapper-1.2.2.orig/src/rpc.c	2010-09-29 12:28:44.000000000 +0200
++++ nspluginwrapper-1.2.2/src/rpc.c	2010-09-29 12:28:56.000000000 +0200
+@@ -42,14 +42,17 @@
  #include <sys/wait.h>
  #include <sys/select.h>
  #include <netinet/in.h>
@@ -1019,6 +1035,11 @@ Index: nspluginwrapper-1.2.2/src/rpc.c
 +#include "npw-use-tcp-sockets.h"
  #include "rpc.h"
  #include "utils.h"
+ 
+-#define DEBUG 0
++#define DEBUG 1
+ #include "debug.h"
+ 
  
 @@ -663,15 +666,59 @@
    return n;
@@ -1293,8 +1314,8 @@ Index: nspluginwrapper-1.2.2/src/rpc.c
  
 Index: nspluginwrapper-1.2.2/src/npw-viewer.c
 ===================================================================
---- nspluginwrapper-1.2.2.orig/src/npw-viewer.c	2010-09-09 22:02:23.000000000 +0200
-+++ nspluginwrapper-1.2.2/src/npw-viewer.c	2010-09-10 10:37:43.000000000 +0200
+--- nspluginwrapper-1.2.2.orig/src/npw-viewer.c	2010-09-29 12:28:44.000000000 +0200
++++ nspluginwrapper-1.2.2/src/npw-viewer.c	2010-09-29 12:28:56.000000000 +0200
 @@ -44,7 +44,7 @@
  #include "xembed.h"
  #include "npw-common.h"
