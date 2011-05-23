@@ -7,12 +7,22 @@ use strict;
 
 our $VERSION = '0.01';
 
+my $logfile = core_cfg('log.filename');
+if (!-w $logfile) {
+    my $err = $!;
+    if (!-w '/tmp/qvd.log') {
+        die "Can't write to '$logfile' ($err) and can't use '/tmp/qvd.log' ($!) as a replacement";
+    }
+    warn "Using '/tmp/qvd.log' instead of '$logfile' as a log file\n";
+    $logfile = '/tmp/qvd.log';
+}
+
 my %config = ( 'log4perl.appender.LOGFILE'          => 'Log::Log4perl::Appender::File',
 	       'log4perl.appender.LOGFILE.mode'     => 'append',
 	       'log4perl.appender.LOGFILE.layout'   => 'PatternLayout',
 	       'log4perl.appender.LOGFILE.layout.ConversionPattern'
                                                     => '%d %P %F %L %c - %m%n',
-	       'log4perl.appender.LOGFILE.filename' => core_cfg('log.filename'),
+	       'log4perl.appender.LOGFILE.filename' => $logfile,
 	       'log4perl.rootLogger'                => core_cfg('log.level') . ", LOGFILE",
 	       grep /^log4perl\./, core_cfg_all );
 
