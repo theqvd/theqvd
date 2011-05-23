@@ -10,9 +10,10 @@ our $VERSION = '0.01';
 my $logfile = core_cfg('log.filename');
 if (!-w $logfile) {
     my $err = $!;
-    if (!-w '/tmp/qvd.log') {
+    if (!open my $fd, '>>', '/tmp/qvd.log') {
         die "Can't write to '$logfile' ($err) and can't use '/tmp/qvd.log' ($!) as a replacement";
     }
+    close $fd;
     warn "Using '/tmp/qvd.log' instead of '$logfile' as a log file\n";
     $logfile = '/tmp/qvd.log';
 }
