@@ -12,6 +12,7 @@ WriteMakefile(
 	'Net::Server::Fork' => 0,
 	'parent' => 0,
 	'QVD::HTTP' => 0,
+	'QVD::Log' => 0,
         'Test::More' => 0,
 	'URI::Split' => 0,
     },

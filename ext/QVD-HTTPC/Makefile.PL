@@ -12,6 +12,7 @@ WriteMakefile(
 	'IO::Socket::INET' => 0,
 	'parent' => 0,
 	'QVD::HTTP' => 0,
+	'QVD::Config' => 0,
         'Test::More' => 0,
 	'URI::Escape' => 0,
     },

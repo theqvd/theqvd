@@ -11,5 +11,6 @@ WriteMakefile(
        AUTHOR         => 'Salvador Fandino <salva@>') : ()),
     PREREQ_PM => {
 	'Time::HiRes' => 0,
+	'QVD::Log' => 0,
     },
 );
