@@ -1,0 +1,6 @@
+Revision history for Perl extension AnyEvent::Pg.
+
+0.01  Wed Jun  1 13:02:52 2011
+	- original version; created by h2xs 1.23 with options
+		-AXn AnyEvent::Pg
+
