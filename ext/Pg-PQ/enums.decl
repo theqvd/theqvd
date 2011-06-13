@@ -1,0 +1,95 @@
+
+enum CopyResultFlag => copyres
+
+    # s/PG_COPYRES/COPYRES/
+    s/COPYRESULTFLAG/PG_COPYRES/
+
+    PG_COPYRES_ATTRS = 1,
+    PG_COPYRES_TUPLES = 2,	/* Implies PG_COPYRES_ATTRS */
+    PG_COPYRES_EVENTS = 4,
+    PG_COPYRES_NOTICEHOOKS = 8,
+
+/* Application-visible enum types */
+
+enum ConnStatusType => connection
+
+    # s/CONNECTION/CONN/
+
+    /*
+     * Although it is okay to add to this list, values which become unused
+     * should never be removed, nor should constants be redefined - that would
+     * break compatibility with existing code.
+     */
+    CONNECTION_OK,
+    CONNECTION_BAD,
+    /* Non-blocking mode only below here */
+    
+    /*
+     * The existence of these should never be relied upon - they should only
+     * be used for user feedback or similar purposes.
+     */
+    CONNECTION_STARTED,			/* Waiting for connection to be made.  */
+    CONNECTION_MADE,			/* Connection OK; waiting to send.	   */
+    CONNECTION_AWAITING_RESPONSE,		/* Waiting for a response from the
+                                                 * postmaster.		  */
+    CONNECTION_AUTH_OK,			/* Received authentication; waiting for
+                                         * backend startup. */
+    CONNECTION_SETENV,			/* Negotiating environment. */
+    CONNECTION_SSL_STARTUP,		/* Negotiating SSL. */
+    CONNECTION_NEEDED,			/* Internal state: connect() needed */
+
+
+enum PostgresPollingStatusType => pgres_polling
+    
+    # s/PGRES_POLLING/RES_POLLING/
+
+    PGRES_POLLING_FAILED = 0,
+    PGRES_POLLING_READING,		/* These two indicate that one may	  */
+    PGRES_POLLING_WRITING,		/* use select before polling again.   */
+    PGRES_POLLING_OK,
+    PGRES_POLLING_ACTIVE,		/* unused; keep for awhile for backwards
+                                         * compatibility */
+
+
+enum  ExecStatusType  => pgres
+
+    # s/PGRES/RES_STATUS/
+
+    PGRES_EMPTY_QUERY = 0,		/* empty query string was executed */
+    PGRES_COMMAND_OK,			/* a query command that doesn't return
+                                         * anything was executed properly by the
+                                         * backend */
+    PGRES_TUPLES_OK,			/* a query command that returns tuples was
+                                         * executed properly by the backend, PGresult
+                                         * contains the result tuples */
+    PGRES_COPY_OUT,				/* Copy Out data transfer in progress */
+    PGRES_COPY_IN,				/* Copy In data transfer in progress */
+    PGRES_BAD_RESPONSE,			/* an unexpected response was recv'd from the
+								 * backend */
+    PGRES_NONFATAL_ERROR,		/* notice or warning message */
+    PGRES_FATAL_ERROR,			/* query failed */
+
+
+enum PGTransactionStatusType => pqtrans
+
+    # s/PQTRANS/TRANS/
+
+    PQTRANS_IDLE,				/* connection idle */
+    PQTRANS_ACTIVE,				/* command in progress */
+    PQTRANS_INTRANS,			/* idle, within transaction block */
+    PQTRANS_INERROR,			/* idle, within failed transaction */
+    PQTRANS_UNKNOWN,				/* cannot determine status */
+
+
+
+enum PGVerbosity  => pqerrors
+
+    # s/PQERRORS/ERRORS/
+
+    PQERRORS_TERSE,				/* single-line error messages */
+    PQERRORS_DEFAULT,			/* recommended style */
+    PQERRORS_VERBOSE,			/* all the facts, ma'am */
+
+enum PGDiag => pqdiag
+
+
