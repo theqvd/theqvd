@@ -38,7 +38,6 @@ sub set_error {
 sub host_add {
     my ( $self, $name, $address ) = @_;
 
-
     $self->reset_status;
     my $id = eval { $self->admin->cmd_host_add( name => $name, address => $address ) };
     defined $id or $self->set_error($@);
@@ -67,8 +66,8 @@ sub host_del {
     my ( $self, $id ) = @_;
     $self->reset_status;
     my $ok = eval {
-	$self->admin->set_filter( id => $id );
-	$self->admin->cmd_host_del;
+        $self->admin->set_filter( id => $id );
+        $self->admin->cmd_host_del;
     };
     $self->set_error($@) unless defined $ok;
     $ok;
@@ -79,8 +78,8 @@ sub host_block {
     $self->reset_status;
     eval { $self->admin->cmd_host_block_by_id($id) };
     if ($@) {
-	$self->set_error($@);
-	return undef;
+        $self->set_error($@);
+        return undef;
     }
     1;
 }
@@ -90,8 +89,8 @@ sub host_unblock {
     $self->reset_status;
     eval { $self->admin->cmd_host_unblock_by_id($id) };
     if ($@) {
-	$self->set_error($@);
-	return undef;
+        $self->set_error($@);
+        return undef;
     }
     1;
 }
@@ -120,8 +119,8 @@ sub user_del {
     my ( $self, $id ) = @_;
     $self->reset_status;
     my $ok = eval {
-	$self->admin->set_filter( id => $id );
-	$self->admin->cmd_user_del;
+        $self->admin->set_filter( id => $id );
+        $self->admin->cmd_user_del;
     };
     $self->set_error($@) unless $ok;
     $ok;
@@ -131,7 +130,7 @@ sub user_passwd {
     my ( $self, $user, $passwd ) = @_;
     $self->reset_status;
     my $ok = eval {
-	$self->{admin}->set_password($user, $passwd);
+        $self->{admin}->set_password($user, $passwd);
     };
     $self->set_error($@) unless $ok;
     $ok;
@@ -161,8 +160,8 @@ sub osi_del {
     my ( $self, $id ) = @_;
     $self->reset_status;
     my $ok = eval {
-	$self->admin->set_filter( id => $id );
-	$self->admin->cmd_osi_del;
+        $self->admin->set_filter( id => $id );
+        $self->admin->cmd_osi_del;
     };
     $self->set_error($@) unless defined $ok;
     $ok;
@@ -185,8 +184,8 @@ sub vm_start {
     $self->reset_status;
     eval { $self->admin->cmd_vm_start_by_id($id) };
     if ($@) {
-	$self->set_error($@);
-	return undef;
+        $self->set_error($@);
+        return undef;
     }
     1;
 }
@@ -196,8 +195,8 @@ sub vm_stop {
     $self->reset_status;
     eval { $self->admin->cmd_vm_stop_by_id($id) };
     if ($@) {
-	$self->set_error($@);
-	return undef;
+        $self->set_error($@);
+        return undef;
     }
     1;
 }
@@ -207,8 +206,8 @@ sub vm_reset {
     $self->reset_status;
     eval { $self->admin->cmd_vm_reset_by_id($id) };
     if ($@) {
-	$self->set_error($@);
-	return undef;
+        $self->set_error($@);
+        return undef;
     }
     1;
 }
@@ -218,8 +217,8 @@ sub vm_disconnect_user {
     $self->reset_status;
     eval { $self->admin->cmd_vm_disconnect_user_by_id($id) };
     if ($@) {
-	$self->set_error($@);
-	return undef;
+        $self->set_error($@);
+        return undef;
     }
     1;
 }
@@ -229,8 +228,8 @@ sub vm_block {
     $self->reset_status;
     eval { $self->admin->cmd_vm_block_by_id($id) };
     if ($@) {
-	$self->set_error($@);
-	return undef;
+        $self->set_error($@);
+        return undef;
     }
     1;
 }
@@ -240,8 +239,8 @@ sub vm_unblock {
     $self->reset_status;
     eval { $self->admin->cmd_vm_unblock_by_id($id) };
     if ($@) {
-	$self->set_error($@);
-	return undef;
+        $self->set_error($@);
+        return undef;
     }
     1;
 }
@@ -258,12 +257,12 @@ sub vm_del {
     my ( $self, $id ) = @_;
     $self->reset_status;
     eval {
-	$self->admin->set_filter( id => $id );
-	$self->admin->cmd_vm_del;
+        $self->admin->set_filter( id => $id );
+        $self->admin->cmd_vm_del;
     };
     if ($@) {
-	$self->set_error($@);
-	return undef;
+        $self->set_error($@);
+        return undef;
     }
     1;
 }
@@ -291,17 +290,17 @@ sub vmrt_find {
 sub vm_stats {
     my ($self, $filter) = @_;
     [ rs(VM_Runtime)->search($filter,{ group_by => ['vm_state'],
-				       select   => ['vm_state',
-						  { count => '*'}],
-				       as => ['vm_state', 'vm_count'] }) ];
+                                       select   => ['vm_state',
+                                                  { count => '*'}],
+                                       as => ['vm_state', 'vm_count'] }) ];
 }
 
 sub host_stats {
     my ($self, $filter) = @_;
     [ rs(Host_Runtime)->search($filter,{ group_by => ['state'],
-				         select   => ['state',
-						  { count => '*'}],
-				         as => ['host_state', 'host_count'] }) ];
+                                         select   => ['state',
+                                                  { count => '*'}],
+                                         as => ['host_state', 'host_count'] }) ];
 }
 
 # FIXME: use better names for these *_total_stats subs or just remove
@@ -346,7 +345,7 @@ sub build_form_error_msg {
     my $result_msg = '';
     if ( $results->has_missing ) {
         for my $f ( $results->missing ) {
-	    # FIXME: no HTML in the model, please!
+            # FIXME: no HTML in the model, please!
             $result_msg .= "$f is missing<br>\n";
         }
     }
@@ -354,7 +353,7 @@ sub build_form_error_msg {
     # Print the name of invalid fields
     if ( $results->has_invalid ) {
         for my $f ( $results->invalid ) {
-	    # FIXME: no HTML in the model, please!
+            # FIXME: no HTML in the model, please!
             $result_msg .=
               "$f is invalid: " . $results->invalid($f) . " <br>\n";
         }
@@ -363,8 +362,8 @@ sub build_form_error_msg {
     # Print unknown fields
     if ( $results->has_unknown ) {
         for my $f ( $results->unknown ) {
-	    # FIXME: no HTML in the model, please!
-	    $result_msg .= "$f is unknown<br>\n";
+            # FIXME: no HTML in the model, please!
+            $result_msg .= "$f is unknown<br>\n";
         }
     }
     return $result_msg;
