@@ -55,7 +55,7 @@ sub list : Local {
 
     my $filter = "";
     if ((defined $s) && !($s eq "")) {
-	$filter = {-or => [{login => { ilike => "%".$s."%" }}, \['cast(id as text) = ?', [id => $s]]]};
+        $filter = {-or => [{login => { ilike => "%".$s."%" }}, \['cast(id as text) = ?', [id => $s]]]};
     }
     
     my $rs    = $model->user_list($filter);
@@ -111,15 +111,15 @@ sub change_passwd : Local : Args(1) {
     my $user = $model->user_find($userid);
     
     if ( my $id = $model->user_passwd($user->login,  $passwd)) {
-	$c->flash->{response_type} = "success";
-	$c->flash->{response_msg} =
-	  "Password successfully modified.";
+        $c->flash->{response_type} = "success";
+        $c->flash->{response_msg} =
+          "Password successfully modified.";
     }
     else {
 
-	# FIXME response_type must be an enumerated
-	$c->flash->{response_type} = "error";
-	$c->flash->{response_msg}  = $model->error_msg;
+        # FIXME response_type must be an enumerated
+        $c->flash->{response_type} = "error";
+        $c->flash->{response_msg}  = $model->error_msg;
     }
 
     $c->response->redirect( $c->uri_for( $self->action_for('list') ) );
@@ -185,22 +185,22 @@ sub del : Local {
           "Error in parameters: " . $model->build_form_error_msg($result);
     }
     else {
-	my $list = $c->req->body_params->{selected};
-	for (ref $list ? @$list : $list) {
+        my $list = $c->req->body_params->{selected};
+        for (ref $list ? @$list : $list) {
        
-	    my $user  = $model->user_find($_);
-	    my $login = $user->login;
-	    if ( my $countdel = $model->user_del($_) ) {
-		$c->flash->{response_type} = "success";
-		$c->flash->{response_msg}  .= "$login ($_) successfully deleted. ";
-	    }
-	    else {
+            my $user  = $model->user_find($_);
+            my $login = $user->login;
+            if ( my $countdel = $model->user_del($_) ) {
+                $c->flash->{response_type} = "success";
+                $c->flash->{response_msg}  .= "$login ($_) successfully deleted. ";
+            }
+            else {
 
-		# FIXME response_type must be an enumerated
-		$c->flash->{response_type} = "error";
-		$c->flash->{response_msg}  .= $model->error_msg;
-	    }
-	}
+                # FIXME response_type must be an enumerated
+                $c->flash->{response_type} = "error";
+                $c->flash->{response_msg}  .= $model->error_msg;
+            }
+        }
     }
 
     #$c->forward('list');

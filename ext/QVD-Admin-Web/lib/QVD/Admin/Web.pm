@@ -19,15 +19,16 @@ use Catalyst qw/ConfigLoader
                 StackTrace
                 Unicode
                 FormValidator
-		Session
-		Session::Store::FastMmap
-		Session::State::Cookie
-		FormBuilder
-		Authentication
+                Session
+                Session::Store::FastMmap
+                Session::State::Cookie
+                Authentication
                /;
-	       
+                #-Debug
+                #FormBuilder
+               
 use QVD::Config;      
-	       
+               
 our $VERSION = sprintf "1.%04d", q$Revision: 6173 $ =~ /(\d+)/xg;
 #our $VERSION = '0.01';
 
@@ -41,33 +42,33 @@ our $VERSION = sprintf "1.%04d", q$Revision: 6173 $ =~ /(\d+)/xg;
 # local deployment.
 
 __PACKAGE__->config( 
-	name => 'QVD::Admin::Web',
-	session => {flash_to_stash => 1}
+        name => 'QVD::Admin::Web',
+        session => {flash_to_stash => 1}
      );
 
 my $username = core_cfg('wat.admin.login');
 my $password = core_cfg('wat.admin.password');
 
 __PACKAGE__->config( 'Plugin::Authentication' =>
-	    {
-		default => {
-		    credential => {
-			class => 'Password',
-			password_field => 'password',
-			password_type => 'clear'
-		    },
-		    store => {
-			class => 'Minimal',
-			users => {
-			    $username => {
-				password => $password,
-				editor => 'yes',
-				roles => [qw/admin/],
-			    }
-			}
-		    }
-		}
-	    }
+            {
+                default => {
+                    credential => {
+                        class => 'Password',
+                        password_field => 'password',
+                        password_type => 'clear'
+                    },
+                    store => {
+                        class => 'Minimal',
+                        users => {
+                            $username => {
+                                password => $password,
+                                editor => 'yes',
+                                roles => [qw/admin/],
+                            }
+                        }
+                    }
+                }
+            }
 );
 
 # Start the application

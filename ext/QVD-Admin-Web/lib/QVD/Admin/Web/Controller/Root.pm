@@ -123,19 +123,19 @@ sub login :Local {
     my ( $self, $c ) = @_;
     
     if (    my $user     = $c->req->param("log")
-	and my $password = $c->req->param("pwd") )
+        and my $password = $c->req->param("pwd") )
     {
-	if ( $c->authenticate( { username => $user,
-				 password => $password } ) ) {
-	    $c->res->redirect('/');
-	} else {
-	    $c->stash->{current_view}='TTMin';
-	    # login incorrect
-	}
+        if ( $c->authenticate( { username => $user,
+                                 password => $password } ) ) {
+            $c->res->redirect('/');
+        } else {
+            $c->stash->{current_view}='TTMin';
+            # login incorrect
+        }
     }
     else {
-	$c->stash->{current_view}='TTMin';
-	# invalid form input
+        $c->stash->{current_view}='TTMin';
+        # invalid form input
     }
 }
 

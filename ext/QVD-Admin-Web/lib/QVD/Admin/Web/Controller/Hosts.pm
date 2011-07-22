@@ -60,7 +60,7 @@ sub list : Local {
    
     my $filter = "";
     if ((defined $s) && !($s eq "")) {
-	$filter = {-or => [{name => { ilike => "%".$s."%" }}, {address => { ilike => "%".$s."%" }}]};
+        $filter = {-or => [{name => { ilike => "%".$s."%" }}, {address => { ilike => "%".$s."%" }}]};
     }
     
     my $rs = $model->host_list($filter);
@@ -78,7 +78,7 @@ sub jlist : Local {
     
     my @list;
     for (@$rs) {
-	push(@list, [$_->id , $_->name , $_->address , $_->runtime->state, $_->runtime->blocked]);
+        push(@list, [$_->id , $_->name , $_->address , $_->runtime->state, $_->runtime->blocked]);
 
     }
     $c->stash->{vm_list} = \@list;
@@ -102,7 +102,6 @@ sub add : Local Form {
                   "$name added succesfully with id $id";
             }
             else {
-
                 # FIXME response_type must be an enumerated
                 $c->flash->{response_type} = "error";
                 $c->flash->{response_msg}  = $model->error_msg;
@@ -134,22 +133,21 @@ sub del : Local {
     }
     else {
         my $list = $c->req->body_params->{selected};
-	for (ref $list ? @$list : $list) {
-	    my $host = $model->host_find($_);
-	    my $host_name = $host->name; 
-	    if ( my $countdel = $model->host_del($_) ) {
-		if ($c->flash->{response_type} ne "error") {
-		    $c->flash->{response_type} = "success";
-		}
-		$c->flash->{response_msg}  .= "$host_name ($_) deleted. ";
-	    }
-	    else {
-
-		# FIXME response_type must be an enumerated
-		$c->flash->{response_type} = "error";
-		$c->flash->{response_msg}  .= $model->error_msg;
-	    }
-	}
+        for (ref $list ? @$list : $list) {
+            my $host = $model->host_find($_);
+            my $host_name = $host->name; 
+            if ( my $countdel = $model->host_del($_) ) {
+                if ($c->flash->{response_type} ne "error") {
+                    $c->flash->{response_type} = "success";
+                }
+                $c->flash->{response_msg}  .= "$host_name ($_) deleted. ";
+            }
+            else {
+                # FIXME response_type must be an enumerated
+                $c->flash->{response_type} = "error";
+                $c->flash->{response_msg}  .= $model->error_msg;
+            }
+        }
     }
 
     $c->response->redirect( $c->uri_for( $self->action_for('list') ) );
@@ -172,22 +170,21 @@ sub block : Local {
     }
     else {
         my $list = $c->req->body_params->{selected};
-	for (ref $list ? @$list : $list) {
-	    my $host = $model->host_find($_);
-	    my $host_name = $host->name; 
-	    if ( my $countdel = $model->host_block($_) ) {
-		if ($c->flash->{response_type} ne "error") {
-		    $c->flash->{response_type} = "success";
-		}
-		$c->flash->{response_msg}  .= "$host_name ($_) blocked. ";
-	    }
-	    else {
-
-		# FIXME response_type must be an enumerated
-		$c->flash->{response_type} = "error";
-		$c->flash->{response_msg}  .= $model->error_msg;
-	    }
-	}
+        for (ref $list ? @$list : $list) {
+            my $host = $model->host_find($_);
+            my $host_name = $host->name; 
+            if ( my $countdel = $model->host_block($_) ) {
+                if ($c->flash->{response_type} ne "error") {
+                    $c->flash->{response_type} = "success";
+                }
+                $c->flash->{response_msg}  .= "$host_name ($_) blocked. ";
+            }
+            else {
+                # FIXME response_type must be an enumerated
+                $c->flash->{response_type} = "error";
+                $c->flash->{response_msg}  .= $model->error_msg;
+            }
+        }
     }
 
     $c->response->redirect( $c->uri_for( $self->action_for('list') ) );
@@ -210,22 +207,21 @@ sub unblock : Local {
     }
     else {
         my $list = $c->req->body_params->{selected};
-	for (ref $list ? @$list : $list) {
-	    my $host = $model->host_find($_);
-	    my $host_name = $host->name; 
-	    if ( my $countdel = $model->host_unblock($_) ) {
-		if ($c->flash->{response_type} ne "error") {
-		    $c->flash->{response_type} = "success";
-		}
-		$c->flash->{response_msg}  .= "$host_name ($_) unblocked. ";
-	    }
-	    else {
-
-		# FIXME response_type must be an enumerated
-		$c->flash->{response_type} = "error";
-		$c->flash->{response_msg}  .= $model->error_msg;
-	    }
-	}
+        for (ref $list ? @$list : $list) {
+            my $host = $model->host_find($_);
+            my $host_name = $host->name; 
+            if ( my $countdel = $model->host_unblock($_) ) {
+                if ($c->flash->{response_type} ne "error") {
+                    $c->flash->{response_type} = "success";
+                }
+                $c->flash->{response_msg}  .= "$host_name ($_) unblocked. ";
+            }
+            else {
+                # FIXME response_type must be an enumerated
+                $c->flash->{response_type} = "error";
+                $c->flash->{response_msg}  .= $model->error_msg;
+            }
+        }
     }
 
     $c->response->redirect( $c->uri_for( $self->action_for('list') ) );
