@@ -103,6 +103,6 @@ function validate_edit (form) {
 	</tr>	
     </table>
     <input type="hidden" name="_submitted" value="1" />
-    <input name="_submit" type="Submit" value="Enviar" />
+    <input name="_submit" type="Submit" value="Submit" />
     </form>
 </div>

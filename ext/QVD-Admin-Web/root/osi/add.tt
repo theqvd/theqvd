@@ -15,7 +15,7 @@ function validate_add (form) {
     
     var disk_image = form.elements['disk_image'].value;
     if (disk_image == null || disk_image == '') {
-        alertstr += 'Seleict a valid value for: "Image"\n';
+        alertstr += 'Select a valid value for: "Image"\n';
         invalid++;
         invalid_fields.push('disk_image');
     }

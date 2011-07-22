@@ -11,7 +11,7 @@
 
 <div class="grid_4 omega">
 <h2>Nodes</h2>
-<a href="/vm/"><img border="0" alt="QVD virtual machines pie chart" src="http://chart.apis.google.com/chart?cht=p&amp;chd=t:[% host_stats_values -%]&amp;chs=320x150&amp;chl=[% host_stats_fields -%]"/></a>
+<a href="/hosts/"><img border="0" alt="QVD virtual machines pie chart" src="http://chart.apis.google.com/chart?cht=p&amp;chd=t:[% host_stats_values -%]&amp;chs=320x150&amp;chl=[% host_stats_fields -%]"/></a>
 </div>
 
 <div class="clear"></div>
