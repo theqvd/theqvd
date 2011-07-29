@@ -40,6 +40,7 @@ my $enable_printing = cfg('vma.printing.enable');
 my $printing_conf   = cfg('internal.vma.printing.config');
 my $nxagent_conf    = cfg('internal.vma.nxagent.config');
 
+my $groupadd        = cfg('command.groupadd');
 my $useradd         = cfg('command.useradd');
 my $userdel         = cfg('command.userdel');
 
@@ -305,17 +306,18 @@ sub _provisionate_user {
 	}
 	else {
 	    eval {
-		my @args = ( '-U', # create user group
+		DEBUG "executing $groupadd => $user";
+        system $groupadd => $user and die "provisioning of group '$user' failed\n";
+
+		my @args = (
 			     '-m', # create home
 			     '-d', $user_home);
-
 		push @args, -G => $groups if length $groups;
 		push @args, -u => $uid if $uid;
-
 		push @args, $user;
+
 		DEBUG "executing $useradd => @args";
-		system $useradd => @args
-		    and die "provisioning of user $user failed\n";
+		system $useradd => @args and die "provisioning of user '$user' failed\n";
 
 		_call_provisioning_hook(after_add_user => @_);
 	    };

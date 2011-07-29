@@ -36,6 +36,7 @@ command.nxagent = /usr/bin/nxagent
 command.nxdiag = /usr/bin/nxdiag.pl
 command.x-session = /etc/X11/Xsession
 
+command.groupadd = /usr/sbin/groupadd
 command.useradd = /usr/sbin/useradd
 command.userdel = /usr/sbin/userdel
 
