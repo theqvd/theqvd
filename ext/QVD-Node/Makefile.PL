@@ -11,7 +11,6 @@ WriteMakefile(
     EXE_FILES     => [ qw(bin/qvd-noded.pl) ],
     PREREQ_PM         => { 'App::Daemon' 		=> 0,
 			   'JSON'     			=> 0,
-			   'Socket::Linux' 		=> 0,
 			   'Linux::Proc::Net::TCP' 	=> 0.02,
 			   'QVD::HKD' 			=> 0.1,
 			   'QVD::Log' 			=> 0.1,
