@@ -216,6 +216,14 @@ button.link:focus span {
 	background-position: 5px 5px;	
 }
 
+.side_download {
+/*	float: left;*/
+	padding: 5px 5px 5px 25px;
+	background-image: url(../images/icons/down.png);
+	background-repeat: no-repeat;
+	background-position: 5px 5px;	
+}
+
 .options {
 	text-align: right;
 }

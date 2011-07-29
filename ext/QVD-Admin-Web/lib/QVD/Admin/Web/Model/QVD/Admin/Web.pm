@@ -15,7 +15,7 @@ sub admin { shift->{admin} ||= QVD::Admin->new }
 # status 1 means Ok, and 0 means error, detail in error_msg
 has 'status' => ( is => 'ro', isa => 'Int', default => 1 );
 
-has 'error_msg' => ( is => 'ro', isa => 'Str', default => undef );
+has 'error_msg' => ( is => 'ro', isa => 'Str', default => '' );
 
 #sub BUILD {
 #    my $self = shift;
