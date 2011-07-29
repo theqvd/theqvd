@@ -1,0 +1,8 @@
+QVD 3.0.1
+=========
+- Fix for a default data type that was exploding under newer versions of Catalyst.
+- WAT now features a link to download OSIs from the QVD web site.
+
+QVD 3.0.0
+=========
+- Initial QVD 3 release.
