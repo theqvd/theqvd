@@ -90,8 +90,8 @@ internal.vm.network.firewall.enable = 1
 internal.vm.debug.enable = 0
 
 
-osi.default.memory = 256
-osi.default.overlay = 1
+osf.default.memory = 256
+osf.default.overlay = 1
 
 vma.audio.enable = 0
 vma.printing.enable = 0
