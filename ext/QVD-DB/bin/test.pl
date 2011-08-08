@@ -6,13 +6,19 @@ use strict;
 my $IP_SUBNET = '172.20.99.';
 my $TEMP_STO = 'En algun lugar';
 
-for (my $i=1;$i<=5;$i++){
+rs(Host)->create({});
+rs(OSF)->create({name => 'test'});
+rs(DI)->create({osf_id => 1,
+                path => '/var/local/img'});
+
+for (my $i=1; $i<=5; $i++){
     rs(User)->create({login => 'test'.$i});
 
     rs(VM)->create({name => 'test'.$i,
 		    farm_id => 1,
 		    user_id => $i,
-		    osi_id => 1,
+		    osf_id => 1,
+                    di_tag => 'default',
 		    ip => $IP_SUBNET . $i, 
 		    storage => $TEMP_STO
 		   });
@@ -26,8 +32,7 @@ for (my $i=1;$i<=5;$i++){
 			   });
 }
 
-rs(Host)->create({});
 
-rs(OSI)->create({name => 'test',
-		 disk_image => '/var/local/img'});
+
+
 

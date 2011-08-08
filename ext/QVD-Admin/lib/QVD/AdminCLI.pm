@@ -26,14 +26,32 @@ my %syntax_check_cbs = (
             delete @$args{qw/key cert/};
         },
     },
-    osi => {
+    osf => {
         add => sub {
             my ($errors, $args) = @_;
-
-            $$errors++, warn "Syntax error: parameter 'name' is mandatory\n",       unless exists $args->{'name'};
-            $$errors++, warn "Syntax error: parameter 'disk_image' is mandatory\n", unless exists $args->{'disk_image'};
-            delete @$args{qw/name disk_image/};
+            $$errors++, warn "Syntax error: parameter 'name' is mandatory\n", unless exists $args->{'name'};
+            delete @$args{qw/name/};
         },
+    },
+    di => {
+       add => sub {
+            my ($errors, $args) = @_;
+            $$errors++, warn "Syntax error: parameter 'osf' is mandatory\n",  unless exists $args->{'osf_id'};
+            $$errors++, warn "Syntax error: parameter 'path' is mandatory\n", unless exists $args->{'path'};
+            delete @$args{qw/osf_id path/};
+        },
+        tag => sub {
+            my ($errors, $args) = @_;
+            $$errors++, warn "Syntax error: parameter 'di_id' is mandatory\n",  unless exists $args->{'di_id'};
+            $$errors++, warn "Syntax error: parameter 'tag' is mandatory\n",  unless exists $args->{'tag'};
+            delete @$args{qw/di_id tag/};
+        },
+        untag => sub {
+            my ($errors, $args) = @_;
+            $$errors++, warn "Syntax error: parameter 'di_id' is mandatory\n",  unless exists $args->{'di_id'};
+            $$errors++, warn "Syntax error: parameter 'tag' is mandatory\n",  unless exists $args->{'tag'};
+            delete @$args{qw/di_id tag/};
+        }
     },
     user => {
         add => sub {
@@ -55,12 +73,15 @@ my %syntax_check_cbs = (
     vm => {
         add => sub {
             my ($errors, $args) = @_;
-
-            $$errors++, warn "Syntax error: parameter 'osi' is mandatory\n",  unless exists $args->{'osi'};
+            $$errors++, warn "Syntax error: parameter 'osf' is mandatory\n",  unless exists $args->{'osf'};
             $$errors++, warn "Syntax error: parameter 'user' is mandatory\n", unless exists $args->{'user'};
             $$errors++, warn "Syntax error: parameter 'name' is mandatory\n", unless exists $args->{'name'};
-            delete @$args{qw/osi user name ip/};
+            delete @$args{qw/osf user name ip/};
         },
+        modify => sub {
+            my ($errors, $args) = @_;
+            
+        }
     },
 );
 
@@ -105,37 +126,31 @@ sub dispatch_command {
 }
 
 sub _syntax_check {
-    my ($self, $obj, $cmd) = (shift, shift, shift);
+    my $self = shift;
+    my $obj  = shift;
+    my $cmd  = shift;
     my %args = _split_on_equals(@_);
-    $self->{'errors'} = 0;
+    $self->{errors} = 0;
 
     if (exists $syntax_check_cbs{$obj}{$cmd}) {
-        $syntax_check_cbs{$obj}{$cmd}->(\$self->{'errors'}, \%args);
+        $syntax_check_cbs{$obj}{$cmd}->(\$self->{errors}, \%args);
     }
 
-    my $forbid_extra_args = 1;
-    if ($cmd =~ /^prop(?:del|get|set)$/ or $obj eq 'config') {
-        $forbid_extra_args = 0;
+    if (%args and
+        $cmd ne 'edit' and                      # some commands actually accept extra arguments
+        $cmd !~ /^prop(?:del|get|set)$/ and
+        ($obj ne 'config' or $cmd eq 'ssl')) {  # 'config ssl' doesn't
 
-        ## but 'config ssl' is special
-        if ($obj eq 'config' and $cmd eq 'ssl') {
-            $forbid_extra_args = 1;
-        }
+        $self->{errors}++;
+        warn sprintf "Syntax error: too many arguments: '%s'\n", join q{', '}, sort keys %args;
     }
 
-    if ($forbid_extra_args && %args) {
-        $self->{'errors'}++;
-        warn sprintf "Syntax error: extra parameter(s) '%s'\n", join q{', '}, sort keys %args;
-    }
+    if ($self->{errors}) {
+        warn "$self->{errors} error".($self->{errors} > 1 ? 's' : '')." encountered\n";
 
-    if ($self->{'errors'}) {
-        my $noun = 1 == $self->{'errors'} ? 'error' : 'errors';
-        warn "$self->{'errors'} $noun encountered\n";
-
-        my $help_cb = sprintf 'help_%s_%s', $obj, $cmd;
-        if ($self->can ($help_cb)) {
+        if (my $help_cb = $self->can("help_${obj}_${cmd}")) {
             print "\n";
-            $self->$help_cb;
+            $help_cb->($self);
         }
         exit 1;
     }
@@ -143,7 +158,7 @@ sub _syntax_check {
 
 sub _format_timespan {
     my $seconds = shift;
-    my $secs = $seconds%60;
+    my $secs = $seconds % 60;
     my $mins = ($seconds /= 60) % 60;
     my $hours = ($seconds /= 60);
     return sprintf "%02d:%02d:%02d", $hours, $mins, $secs;
@@ -168,6 +183,7 @@ sub _print_table {
 
 sub _die {
     my ($self, $msg) = @_;
+    $msg //= $@;
     chomp $msg;
     print STDERR "Error: $msg\n" unless $self->{quiet};
     exit 1;
@@ -184,7 +200,7 @@ sub die_and_help {
     @funcs = grep {s/^cmd_([a-z]+)_(\w+)/$1 $2/} @funcs;
     @funcs = grep {m/^${obj}/} @funcs if defined $obj and exists $self->{admin}{objects}{$obj};
     my $footer = '';
-    for (grep { /^osi (?:add|del)$/ } @funcs) {
+    for (grep { /^osf (?:add|del)$/ } @funcs) {
         $footer = "(*) Needs root privileges\n\n";
         $_ .= ' (*)';
     }
@@ -223,7 +239,7 @@ sub _obj_propget {
 
     if ($@) {
         #$self->_print("Wrong syntax, check the command help.\n");
-        $self->_die($@);
+        $self->_die;
     }
 }
 
@@ -237,7 +253,7 @@ sub _config_pairs {
     };
     if ($@) {
         #$self->_print("Wrong syntax, check the command help:\n");
-        $self->_die($@);
+        $self->_die;
     }
     ## #540: vm.network.netmask and vm.network.gateway have no
     ## default, so they don't appear in the output of 'config get'
@@ -267,7 +283,7 @@ sub cmd_config_del {
     };
     if ($@) {
         #$self->_print("Wrong syntax, check the command help:\n");
-        $self->_die($@);
+        $self->_die;
     }
     $self->_print("$ci config entries deleted.\n");
 }
@@ -306,7 +322,7 @@ sub cmd_config_set {
     };
     if ($@ || (scalar keys %args == 0)) {
         #$self->_print("Wrong syntax, check the command help:\n");
-        $self->_die($@);
+        $self->_die;
     }
 }
 
@@ -337,7 +353,7 @@ sub cmd_config_ssl {
         $self->{admin}->cmd_config_ssl(key => $key, cert => $cert);
     };
     if ($@) {
-        $self->_die($@);
+        $self->_die;
     } else {
         $self->_print("SSL certificate and private key set.\n");
     }
@@ -364,7 +380,7 @@ sub cmd_host_add {
     };
     if ($@) {
         #$self->_print("Wrong syntax, check the command help:\n");
-        $self->_die($@);
+        $self->_die;
     }
 }
 
@@ -392,7 +408,7 @@ sub cmd_host_block {
     };
     if ($@) {
         #$self->_print("Wrong syntax, check the command help:\n");
-        $self->_die($@);
+        $self->_die;
     }      
 }
 
@@ -415,7 +431,7 @@ sub cmd_host_del {
     };
     if ($@) {
         #$self->_print("Wrong syntax or host assigned to virtual machines, check the command help:\n");
-        $self->_die($@);
+        $self->_die;
     }
 }
 
@@ -449,7 +465,7 @@ sub cmd_host_list {
     };
     if ($@) {
         #$self->_print("Wrong syntax, check the command help:\n");
-        $self->_die($@);
+        $self->_die;
     }
     
     $self->_print_table(\@header, \@body);
@@ -480,7 +496,7 @@ sub cmd_host_propdel {
     };
     if ($@) {
         #$self->_print("Wrong syntax, check the command help:\n");
-        $self->_die($@);
+        $self->_die;
     }
 }
 
@@ -524,7 +540,7 @@ sub cmd_host_propset {
     };
     if (($ci == -1) || $@) {
         #$self->_print("Wrong syntax, check the command help:\n");
-        $self->_die($@);
+        $self->_die;
     } else {
         $self->_print("propset in $ci hosts.\n");
     }
@@ -556,7 +572,7 @@ sub cmd_host_unblock {
     };
     if ($@) {
         #$self->_print("Wrong syntax, check the command help:\n");
-        $self->_die($@);
+        $self->_die;
     }    
 }
 
@@ -571,24 +587,24 @@ Valid options:
 EOT
 }
 
-sub cmd_osi_add {
+sub cmd_osf_add {
     my $self = shift;
     eval {
         my %args = _split_on_equals(@_);
-        my $id = $self->{admin}->cmd_osi_add(%args);
-        $self->_print("OSI added with id ".$id);        
+        my $id = $self->{admin}->cmd_osf_add(%args);
+        $self->_print("OSF added with id ".$id);        
     };
     
     if ($@) {
         #$self->_print("Wrong syntax, check the command help:\n");
-        $self->_die($@);
+        $self->_die;
     }
 }
 
-sub help_osi_add {
+sub help_osf_add {
     print <<EOT
-osi add: Adds operating systems images.
-usage: osi add name=string disk_image=path [memory=size] [use_overlay=boolean]
+osf add: Adds operating systems flavours.
+usage: osf add name=string [memory=size] [use_overlay=boolean]
                 [user_storage_size=size]
 
     The disk_image is copied to the read-only storage area.
@@ -602,23 +618,23 @@ Valid options:
 EOT
 }
 
-sub cmd_osi_del {
+sub cmd_osf_del {
     my $self = shift;
     eval {
-        $self->_obj_del('osi', @_);
-        my $count = $self->{admin}->cmd_osi_del();
-        $self->_print("$count osis deleted.");
+        $self->_obj_del('osf', @_);
+        my $count = $self->{admin}->cmd_osf_del();
+        $self->_print("$count osfs deleted.");
     };
     if ($@) {
         #$self->_print("Wrong syntax, check the command help:\n");
-        $self->_die($@);
+        $self->_die;
     }
 }
 
-sub help_osi_del {
+sub help_osf_del {
     print <<EOT
-osi del: Deletes operating systems images.
-usage: osi del
+osf del: Deletes operating systems images.
+usage: osf del
        
 Valid options:
     -f [--filter] FILTER : deletes operating systems images matched by FILTER
@@ -626,37 +642,138 @@ Valid options:
 EOT
 }
 
-sub cmd_osi_list {
+sub cmd_osf_list {
     my ($self, @args) = @_;
-    my $rs = $self->get_resultset('osi');   
-    my @header = qw(Id Name RAM UserHD Image);
+    my $rs = $self->get_resultset('osf');
+    my @header = qw(Id Name RAM UserHD);
     my @body;
-    
     eval {
-        while (my $osi = $rs->next) {
-            my @row = map { defined($_) ? $_ : '-' } map { $osi->$_ } qw(id name memory user_storage_size disk_image);
+        while (my $osf = $rs->next) {
+            my @row = map { defined($_) ? $_ : '-' } map { $osf->$_ } qw(id name memory user_storage_size);
             push(@body, \@row);
         }
     };
     if ($@) {
         #$self->_print("Wrong syntax, check the command help:\n");
-        $self->_die($@);
+        $self->_die;
     } else {
         $self->_print_table(\@header, \@body);
     }
 }
 
-sub help_osi_list {
+sub help_osf_list {
     print <<EOT;
-osi list: lists the installed Operating System Images (OSI)
-usage: osi list
+osf list: lists the installed Operating System Flavours (OSF)
+usage: osf list
 
   Lists consists of Id, Name, RAM size, Home partition size and image
   file name separated by tabs.
 
 Valid options:
-    -f [--filter] FILTER : list only OSIs matched by FILTER
+    -f [--filter] FILTER : list only OSFs matched by FILTER
     -q [--quiet]         : don't print the header
+EOT
+}
+
+sub cmd_di_add {
+    my $self = shift;
+    eval {
+        my %args = _split_on_equals(@_);
+        my $id = $self->{admin}->cmd_di_add(%args);
+        $self->_print("DI added with id ".$id);
+    };
+    $@ and $self->_die
+}
+
+sub help_di_add {
+    print <<EOT
+di add: Adds disk images.
+usage: di add path=string osf_id=id [version=text]
+
+    The disk image file is copied to the read-only storage area.
+
+Valid options:
+    -q [--quiet]         : don't print the command message
+EOT
+
+}
+
+sub cmd_di_del {
+    my $self = shift;
+    eval {
+        $self->_obj_del('di', @_);
+        my $count = $self->{admin}->cmd_di_del();
+        $self->_print("$count DIs deleted.");
+    };
+    $@ and $self->_die;
+}
+
+sub help_di_del {
+    print <<EOT
+di del: Deletes operating systems images.
+usage: di del
+       
+Valid options:
+    -f [--filter] FILTER : deletes di images matched by FILTER
+    -q [--quiet]         : don't print the command message
+EOT
+}
+
+sub cmd_di_list {
+    my ($self, @args) = @_;
+    eval {
+        my @body;
+        my $rs = $self->get_resultset('di');
+        while (my $di = $rs->next) {
+            push @body, [(map { $di->$_ // '-' } qw(id osf_id version path)), join(', ', $di->tag_list)];
+        }
+        $self->_print_table([qw(Id OSF Version Path Tags)],
+                            \@body);
+    };
+    $@ and $self->_die;
+}
+
+sub help_di_list {
+    print <<EOT;
+di list: lists the Disk Images (DI)
+usage: di list
+
+Valid options:
+    -f [--filter] FILTER : list only DIs matched by FILTER
+    -q [--quiet]         : don't print the header
+EOT
+}
+
+sub cmd_di_tag {
+    my ($self, @args) = @_;
+    eval {
+        my %args = _split_on_equals(@_);
+        my $id = $self->{admin}->cmd_di_tag(%args);
+        $self->_print("DI tagged");
+    };
+    $@ and $self->_die;
+}
+
+sub help_di_tag {
+    print <<EOT;
+di tag: tags a Disk Image (DI)
+usage: di tag di_id=id tag=symbol
+EOT
+}
+
+sub cmd_di_untag {
+    my ($self, @args) = @_;
+    eval {
+        my %args = _split_on_equals(@_);
+        $self->{admin}->cmd_di_untag(%args);
+    };
+    $@ and $self->_die;
+}
+
+sub help_di_untag {
+    print <<EOT;
+di untag: untags a Disk Image (DI)
+usage: di untag di_id=id tag=symbol
 EOT
 }
 
@@ -669,7 +786,7 @@ sub cmd_user_add {
     };
     if ($@) {
         #$self->_print("Wrong syntax or user already exists, check the command help:\n");
-        $self->_die($@);
+        $self->_die;
     }
 }
 
@@ -691,7 +808,7 @@ sub cmd_user_del {
     };
     if ($@) {
         #$self->_print("Wrong syntax, check the command help:\n");
-        $self->_die($@);
+        $self->_die;
     }
 }
 
@@ -718,7 +835,7 @@ sub cmd_user_list {
     };
     if ($@) {
         #$self->_print("Wrong syntax, check the command help:\n");
-        $self->_die($@);
+        $self->_die;
     }
 }
 
@@ -755,7 +872,7 @@ sub cmd_user_passwd {
     };
     if ($@) {
         #$self->_print("Wrong syntax or user does not exist, check the command help:\n");
-        $self->_die($@);
+        $self->_die;
     }
 }
 
@@ -783,7 +900,7 @@ sub cmd_user_propdel {
     };
     if ($@) {
         #$self->_print("Wrong syntax, check the command help:\n");
-        $self->_die($@);
+        $self->_die;
     }
 }
 
@@ -827,7 +944,7 @@ sub cmd_user_propset {
     };
     if (($ci == -1) || $@) {
         #$self->_print("Wrong syntax, check the command help:\n");
-        $self->_die($@);
+        $self->_die;
     } else {
         $self->_print("propset in $ci users.\n");
     }    
@@ -855,14 +972,14 @@ sub cmd_vm_add {
     };
     if ($@) {
         #$self->_print("Wrong syntax, check the command help:\n");
-        $self->_die($@);
+        $self->_die;
     }  
 }
 
 sub help_vm_add {
     print <<EOT
 vm add: Adds virtual machines.
-usage: vm add name=value user_id=value osi_id=value ip=value storage=value
+usage: vm add name=value user_id=value osf_id=value ip=value storage=value
        
 Valid options:
     -q [--quiet]         : don't print the command message
@@ -883,7 +1000,7 @@ sub cmd_vm_block {
     };
     if ($@) {
         #$self->_print("Wrong syntax, check the command help:\n");
-        $self->_die($@);
+        $self->_die;
     }      
 }
 
@@ -909,7 +1026,7 @@ sub cmd_vm_console {
     };
     if ($@) {
         #$self->_print("Wrong syntax, check the command help:\n");
-        $self->_die($@);
+        $self->_die;
     }
 }
 
@@ -934,7 +1051,7 @@ sub cmd_vm_del {
     };
     if ($@) {
         #$self->_print("Wrong syntax, check the command help:\n");
-        $self->_die($@);
+        $self->_die;
     }  
 }
 
@@ -963,11 +1080,11 @@ sub cmd_vm_disconnect_user {
     };
     if ($@) {
         #$self->_print("Wrong syntax, check the command help:\n");
-        $self->_die($@);
+        $self->_die;
     }  
 }
 
-sub help_vm_disconnect_user{
+sub help_vm_disconnect_user {
     print <<EOT
 vm disconnect_user: Disconnects user.
 usage: vm disconnect_user
@@ -994,13 +1111,13 @@ sub cmd_vm_edit {
     };
     if ($@) {
         #$self->_print("Wrong syntax, check the command help:\n");
-        $self->_die($@);
+        $self->_die;
     }
 }
 
 sub help_vm_edit {
     print <<EOT
-vm net: network-related commands
+vm edit: network-related commands
 usage: vm edit
       
 Valid options:
@@ -1014,7 +1131,7 @@ sub cmd_vm_list {
     
     my $rs = $self->get_resultset('vm');
     
-    my @header = ("Id","Name","User","Ip","Host","State","UserState","Blocked");
+    my @header = ("Id","Name","User","Ip","OSF", "DI_Tag", "DI", "Host","State","UserState","Blocked");
     my @body;
         
     eval { 
@@ -1025,7 +1142,10 @@ sub cmd_vm_list {
                 $vm->name,
                 $vm->user->login,
                 $vm->ip,
-                defined $vmr->host ? $vmr->host->name : undef,
+                $vm->osf->name,
+                $vm->di_tag,
+                (defined $vm->di ? $vm->di->version : undef),
+                (defined $vmr->host ? $vmr->host->name : undef),
                 $vmr->vm_state,
                 $vmr->user_state,
                 $vmr->blocked,
@@ -1036,7 +1156,7 @@ sub cmd_vm_list {
     
     if ($@) {
         #$self->_print("Wrong syntax, check the command help:\n");
-        $self->_die($@);
+        $self->_die;
     } else {
         $self->_print_table(\@header, \@body);
     }
@@ -1067,7 +1187,7 @@ sub cmd_vm_propdel {
     };
     if ($@) {
         #$self->_print("Wrong syntax, check the command help:\n");
-        $self->_die($@);
+        $self->_die;
     }
 }
 
@@ -1112,7 +1232,7 @@ sub cmd_vm_propset {
 
     if (($ci == -1) || $@) {
         #$self->_print("Wrong syntax, check the command help:\n");
-        $self->_die($@);
+        $self->_die;
     } else {
         $self->_print("propset in $ci virtual machines.\n");
     }       
@@ -1161,7 +1281,7 @@ sub cmd_vm_ssh {
     };
     if ($@) {
         #$self->_print("Wrong syntax, check the command help:\n");
-        $self->_die($@);
+        $self->_die;
     }
 }
 
@@ -1195,7 +1315,7 @@ sub cmd_vm_start {
     };   
     if ($@) {
         #$self->_print("Wrong syntax, check the command help:\n");
-        $self->_die($@);
+        $self->_die;
     }
 }
 
@@ -1225,7 +1345,7 @@ sub cmd_vm_stop {
     };
     if ($@) {
         #$self->_print("Wrong syntax, check the command help:\n");
-        $self->_die($@);
+        $self->_die;
     }    
 }
 
@@ -1253,7 +1373,7 @@ sub cmd_vm_unblock {
     };
     if ($@) {
         #$self->_print("Wrong syntax, check the command help:\n");
-        $self->_die($@);
+        $self->_die;
     }    
 }
 
@@ -1280,7 +1400,7 @@ sub cmd_vm_vnc {
     };
     if ($@) {
         #$self->_print("Wrong syntax, check the command help:\n");
-        $self->_die($@);
+        $self->_die;
     }    
 }
 

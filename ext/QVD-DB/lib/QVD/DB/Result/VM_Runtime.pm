@@ -16,6 +16,10 @@ __PACKAGE__->table('vm_runtimes');
 __PACKAGE__->add_columns( vm_id          => { data_type   => 'integer' },
 			  host_id        => { data_type   => 'integer',
 					      is_nullable => 1 },
+                          current_osf_id => { data_type   => 'integer',
+                                              is_nullable => 1 },
+                          current_di_id  => { data_type   => 'integer',
+                                              is_nullable => 1 },
 			  user_ip        => { data_type   => 'varchar(15)',
 					      is_nullable => 1 },
 			  real_user_id   => { data_type   => 'integer',
@@ -64,9 +68,6 @@ __PACKAGE__->add_columns( vm_id          => { data_type   => 'integer' },
 					      is_nullable => 1 },
 			  vm_serial_port => { data_type   => 'integer',
 					      is_nullable => 1 },
-                          # FIXME: replace by current_osi_id
-			  osi_actual_id  => { data_type   => 'integer',
-					      is_nullable => 1, },
 			  blocked        => { data_type   => 'boolean',
 					      is_nullable => 1 } );
 
@@ -81,7 +82,8 @@ __PACKAGE__->belongs_to('rel_user_state' => 'QVD::DB::Result::User_State', 'user
 __PACKAGE__->belongs_to('rel_vm_cmd' => 'QVD::DB::Result::VM_Cmd', 'vm_cmd');
 __PACKAGE__->belongs_to('rel_user_cmd' => 'QVD::DB::Result::User_Cmd', 'user_cmd');
 
-__PACKAGE__->belongs_to(osi => 'QVD::DB::Result::OSI', 'osi_actual_id');
+__PACKAGE__->belongs_to(current_di => 'QVD::DB::Result::DI', 'current_di_id');
+__PACKAGE__->belongs_to(current_osf => 'QVD::DB::Result::OSF', 'current_osf_id');
 
 sub set_vm_state {
     my $vm = shift;

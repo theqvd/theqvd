@@ -10,7 +10,8 @@ use QVD::Admin;
 
 use parent qw(QVD::L7R::Authenticator::Plugin);
 
-my $osi_id = cfg('auth.auto.osi_id');
+my $osf_id = cfg('auth.auto.osf_id');
+my $di_tag = cfg('auth.auto.di_tag', 'default');
 
 sub before_list_of_vms {
     my ($plugin, $auth) = @_;
@@ -37,7 +38,8 @@ sub before_list_of_vms {
 	    if (rs(VM)->search({name => $name})->count == 0) {
 		$admin->cmd_vm_add(name    => $name,
 				   user_id => $user_id,
-				   osi_id  => $osi_id);
+				   osf_id  => $osf_id,
+                                   di_tag  => $di_tag);
 		$ok = 1;
 	    }
 	    return if $ok;
@@ -62,12 +64,12 @@ plugin is enabled, the user record is created automatically. User records
 created this way are provided with a default virtual machine.
 
 To enable the plugin, add "auto" to C<l7r.auth.plugins>. Set
-C<auth.auto.osi_id> to the id to choose the OSI from which the user's virtual
-machine is created.
+C<auth.auto.osf_id> to the id to choose the OSF from which the user's virtual
+machine is created and optionally C<auth.auto.di_tag> to select the DI tag.
 
 =head1 LICENSE AND COPYRIGHT
 
-Copyright 2010 Qindel FormaciE<oacute>n y Servicios SL.
+Copyright 2010-2011 Qindel FormaciE<oacute>n y Servicios SL.
 
 This program is free software; you can redistribute it and/or modify it under
 the terms of the GNU General Public License version 3 as published by the Free
