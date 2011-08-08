@@ -6,11 +6,9 @@ use HTML::DOM;
 use Test::More tests => 50;
 use Test::WWW::Mechanize::Catalyst 'QVD::Admin::Web';
 
-open my $fd, '>', '/var/lib/qvd/storage/staging/qqimage' or die "open: $!";
-close $fd;
+open my $fd, '>', '/var/lib/qvd/storage/staging/qqimage' or die "open: $!"; close $fd;
 
 my $mech = Test::WWW::Mechanize::Catalyst->new;
-my $dom_tree;
 
 ## login page
 {
@@ -41,7 +39,7 @@ my $osf_id;
 {
     $mech->follow_link_ok ({ text => 'OS flavours' }, 'Go to OSFs');
 
-    $dom_tree = HTML::DOM->new; $dom_tree->write ($mech->content);
+    my $dom_tree = HTML::DOM->new; $dom_tree->write ($mech->content);
     my $table_contents = $dom_tree->getElementById ('props')->tBodies->[0]->innerHTML;
     $dom_tree->close;
     $table_contents =~ s/\s*//;
@@ -78,7 +76,6 @@ my $osf_id;
         },
     }, 'New OSF form');
 
-    $dom_tree = HTML::DOM->new; $dom_tree->write ($mech->content);
     like $mech->content, qr/DBI Exception: DBD::Pg::st execute failed: ERROR:  invalid input syntax for integer: "osf foo"/, 'Error on invalid OSF creation';
 }
 
@@ -87,7 +84,7 @@ my $di_id;
 {
     $mech->follow_link_ok ({ text => 'Disk images' }, 'Go to DIs');
 
-    $dom_tree = HTML::DOM->new; $dom_tree->write ($mech->content);
+    my $dom_tree = HTML::DOM->new; $dom_tree->write ($mech->content);
     my $table_contents = $dom_tree->getElementById ('props')->tBodies->[0]->innerHTML;
     $dom_tree->close;
     like $table_contents, qr/^\s*$/, 'Disk images table is empty';
@@ -153,7 +150,7 @@ my $di_id;
 
     $mech->submit_form_ok ({ form_name => 'propos', fields => { selected => $di_id }}, 'Delete DI');
     is $mech->ct, 'text/html', 'Is text/html';
-    $dom_tree = HTML::DOM->new; $dom_tree->write ($mech->content);
+    my $dom_tree = HTML::DOM->new; $dom_tree->write ($mech->content);
     my $table_contents = $dom_tree->getElementById ('props')->tBodies->[0]->innerHTML;
     $dom_tree->close;
     like $table_contents, qr/^\s*$/, 'Disk images table is empty after removing DI';
@@ -184,8 +181,10 @@ my $di_id;
 
     $mech->submit_form_ok ({ form_name => 'propos', fields => { selected => $osf_id }}, 'Delete OSF');
     is $mech->ct, 'text/html', 'Is text/html';
-    $dom_tree = HTML::DOM->new; $dom_tree->write ($mech->content);
+    my $dom_tree = HTML::DOM->new; $dom_tree->write ($mech->content);
     my $table_contents = $dom_tree->getElementById ('props')->tBodies->[0]->innerHTML;
     $dom_tree->close;
     like $table_contents, qr/^\s*$/, 'OSF table is empty after removing OSF';
 }
+
+unlink '/var/lib/qvd/storage/staging/qqimage', glob '/var/lib/qvd/storage/images/*-qqimage';
