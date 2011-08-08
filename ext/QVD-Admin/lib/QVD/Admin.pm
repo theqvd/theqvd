@@ -13,8 +13,8 @@ use QVD::Config;
 use QVD::Config::Network qw(nettop_n netstart_n net_aton net_ntoa);
 use QVD::Log;
 
-my $osi_default_memory  = cfg('osi.default.memory');
-my $osi_default_overlay = cfg('osi.default.overlay');
+my $osf_default_memory  = cfg('osf.default.memory');
+my $osf_default_overlay = cfg('osf.default.overlay');
 
 my $images_path         = cfg('path.storage.images');
 
@@ -27,7 +27,8 @@ sub new {
                               vm => 'VM',
                               user => 'User',
                               config => 'Config',
-                              osi => 'OSI' } };
+                              osf => 'OSF',
+                              di => 'DI' } };
     bless $self, $class;
 }
 
@@ -81,16 +82,14 @@ sub _filter_obj {
 
 sub get_result_set_for_vm {
     my ($self, @args) = @_;
-    my %term_map = (
-        name => 'me.name',
-        osi => 'osi.name',
-        user => 'user.login',
-        host => 'host.name',
-        state => 'vm_runtime.vm_state',
-    );
+    my %term_map = ( name => 'me.name',
+                     osf => 'osf.name',
+                     user => 'user.login',
+                     host => 'host.name',
+                     state => 'vm_runtime.vm_state' );
     my $filter = $self->_filter_obj(\%term_map);
     rs(VM)->search($filter,
-                   { join => ['osi', 'user',
+                   { join => ['osf', 'user',
                               { vm_runtime => 'host'}] });
 }
 
@@ -345,48 +344,127 @@ sub cmd_host_unblock_by_id {
     };
 }
 
-sub cmd_osi_add {
+sub cmd_di_add {
     my ($self, %params) = @_;
-    my @required_params = qw/name memory use_overlay disk_image/;
-
-    # FIXME: detect type of image and set use_overlay accordingly, iso => no overlay
-    $params{memory}      //= $osi_default_memory;
-    $params{use_overlay} //= $osi_default_overlay;
-    
-    #die "The required parameters are ".join(", ", @required_params)
-    #    unless _set_equals([keys %params], \@required_params);
+    my @required_params = qw/osf_id path/;
 
     mkdir $images_path, 0755;
     -d $images_path or die "Directory $images_path does not exist";
 
-    my $src = delete $params{disk_image};
+    my $version = delete $params{version};
+    my $osf_id = delete $params{osf_id};
+    my $src = delete $params{path};
     my $file = basename($src);
-    my $tmp = "$images_path/$file.tmp";
-    copy($src, $tmp) or die "Unable to copy $src to $tmp: $^E\n";
+    my $tmp = "$images_path/$file.tmp-" . rand;
+    copy($src, $tmp) or die "Unable to copy $src to $tmp: $!\n";
 
-    $params{disk_image} = '-';
+    my ($id, $new_file);
+    txn_eval {
+        my $osf = rs(OSF)->find($osf_id) or die "OSF not found";
+        unless (defined $version) {
+            my ($y, $m, $d) = (localtime)[5, 4, 3];
+            $m ++;
+            $y += 1900;
+            for (0..999) {
+                $version = sprintf("%04d-%02d-%02d-%03d", $y, $m, $d, $_);
+                last unless $osf->di_by_tag($version);
+            }
+        }
+        $osf->delete_tag('head');
+        $osf->delete_tag($version);
+        my $rs = $self->get_resultset('di');
+        my $di = $rs->create({osf_id => $osf_id, path => '', version => $version});
+        $id = $di->id;
+        rs(DI_Tag)->create({di_id => $id, tag => $version, fixed => 1});
+        rs(DI_Tag)->create({di_id => $id, tag => 'head'});
+        rs(DI_Tag)->create({di_id => $id, tag => 'default'})
+            unless $osf->di_by_tag('default');
+        $new_file = "$id-$file";
+        $di->update({path => $new_file});
+        move($tmp, "$images_path/$new_file")
+            or die "Unable to move '$tmp' to its final destination at '$images_path/$new_file': $!";
+    };
+    if ($@) {
+        unlink $tmp;
+        unlink "$images_path/$new_file" if defined $new_file;
+        die;
+    }
+    $id;
+}
+
+sub cmd_di_tag {
+    my ($self, %params) = @_;
+    my @required_params = qw/di_id tag/;
+    my $di_id = delete $params{di_id};
+    my $tag = delete $params{tag};
     my $id;
     txn_do {
-        my $rs = $self->get_resultset('osi');
+        rs(DI_Tag)->search({tag => $tag, fixed => 1})->first 
+            and die "There is a DI with the tag $tag fixed\n";
+        rs(DI_Tag)->search({tag => $tag})->delete_all;
+        $id = rs(DI_Tag)->create({di_id => $di_id, tag => $tag});
+    };
+    $id;
+}
+
+sub cmd_di_untag {
+    my ($self, %params) = @_;
+    my @required_params = qw/di_id tag/;
+    my $di_id = delete $params{di_id};
+    my $tag = delete $params{tag};
+    txn_do {
+        my $old = rs(DI_Tag)->search({tag => $tag, di_id => $di_id})->first;
+        $old or die "DI $di_id is not tagged as $tag\n";
+        $old->fixed and die "DI $di_id tag $tag is fixed\n";
+        $old->delete;
+    };
+    1
+}
+
+sub cmd_di_del {
+    my ($self, @args) = @_;
+    my $counter = 0;
+    my $rs = $self->get_resultset('di');
+    while (my $di = $rs->next) {
+        if ($di->vm_runtimes->count == 0) {
+            warn "deleting di ".$di->id;
+            $di->delete;
+            $counter++;
+            # FIXME Should we delete the actual image file?
+        }
+    }
+    $counter
+}
+
+sub cmd_osf_add {
+    my ($self, %params) = @_;
+    my @required_params = qw/name memory use_overlay/;
+
+    # FIXME: detect type of image and set use_overlay accordingly, iso => no overlay
+    $params{memory}      //= $osf_default_memory;
+    $params{use_overlay} //= $osf_default_overlay;
+
+    #die "The required parameters are ".join(", ", @required_params)
+    #    unless _set_equals([keys %params], \@required_params);
+
+    my $id;
+    txn_do {
+        my $rs = $self->get_resultset('osf');
         my $row = $rs->create(\%params);
         $id = $row->id;
-        my $disk_image = "$id-$file";
-        move($tmp, "$images_path/$disk_image");
-        $row->update({disk_image => $disk_image});
     };
     $id
 }
 
-sub cmd_osi_del {
+sub cmd_osf_del {
     my ($self, @args) = @_;
     my $counter = 0;
-    my $rs = $self->get_resultset('osi');
-    while (my $osi = $rs->next) {
-        if ($osi->vms->count == 0) {
-            warn "deleting osi ".$osi->id;
-            $osi->delete;
+    my $rs = $self->get_resultset('osf');
+    while (my $osf = $rs->next) {
+        if ($osf->vms->count == 0) {
+            warn "deleting osf ".$osf->id;
+            $osf->delete;
             $counter++;
-            # FIXME Should we delete the actual image file?
         }
     }
     $counter
@@ -422,12 +500,12 @@ sub cmd_user_propset {
 sub cmd_vm_add {
     my ($self, %params) = @_;
     txn_do {
-        if (exists $params{osi}) {
-            my $key = $params{osi};
-            my $rs = rs(OSI)->search({name => $key});
-            die "$key: No such OSI" if ($rs->count() < 1);
-            $params{osi_id} = $rs->single->id;
-            delete $params{osi};
+        if (exists $params{osf}) {
+            my $key = $params{osf};
+            my $rs = rs(OSF)->search({name => $key});
+            die "$key: No such OSF" if ($rs->count() < 1);
+            $params{osf_id} = $rs->single->id;
+            delete $params{osf};
         }
         if (exists $params{user}) {
             my $key = $params{user};
@@ -441,10 +519,10 @@ sub cmd_vm_add {
             INFO "assigned IP: $params{ip}";
         }
         $params{storage} = '';
-        my $row = $self->_obj_add('vm', [qw/name user_id osi_id ip storage/],
+        $params{di_tag} = 'default';
+        my $row = $self->_obj_add('vm', [qw/name user_id osf_id ip storage di_tag/],
                                   \%params);
         rs(VM_Runtime)->create({vm_id         => $row->id,
-                                osi_actual_id => $row->osi_id,
                                 vm_state      => 'stopped',
                                 user_state    => 'disconnected',
                                 blocked       => 'false'});
@@ -513,6 +591,9 @@ sub cmd_vm_disconnect_user_by_id {
         $self->_disconnect_user($vmrt);
     };
 }
+
+# FIXME: this is completely unsafe and crazy!
+# It allows to change database fields at will from the admin tool
 
 sub cmd_vm_edit {
     my ($self, %args) = @_;
@@ -638,11 +719,11 @@ Version 0.01
 
     use QVD::Admin;
     my $admin = QVD::Admin->new;
-    my $id = $admin->cmd_osi_add(name => "Ubuntu 9.10 (x86)", 
+    my $id = $admin->cmd_osf_add(name => "Ubuntu 9.10 (x86)", 
                                  memory => 512,
                                  use_overlay => 1,
                                  disk_image => "/var/tmp/U910_x86.img");
-    print "OSI added with id $id\n";
+    print "OSF added with id $id\n";
 
     $admin->set_filter(user=> 'qvd');
     my $count = $admin->cmd_vm_start();
@@ -669,7 +750,7 @@ Removes all conditions from the filter.
 
 Return the DBIx::Class result set for the given object type. The valid object
 types are listed in the "objects" member hash. They are host, vm, uesr, config,
-and osi.
+and osf.
 
 =item cmd_host_add(%parameters)
 
@@ -679,8 +760,8 @@ Returns the id of the new host.
 
 =item cmd_vm_add(%parameters)
 
-Add a virtual machine. The required parameters are name, user, osi, and ip.
-OSI and user can be specified by name (login) or by id (osi_id, user_id). The
+Add a virtual machine. The required parameters are name, user, osf, and ip.
+OSF and user can be specified by name (login) or by id (osf_id, user_id). The
 optional parameter is storage.
 
 Returns the id of the new virtual machine. 
@@ -691,7 +772,7 @@ Adds a user. The required parameters are login and password.
 
 Returns the id of the new user.
 
-=item cmd_osi_add(%parameters)
+=item cmd_osf_add(%parameters)
 
 Adds an operating system image. The required parameters are name and
 disk_image. The value of disk_image should be the path of a disk image file.
@@ -711,10 +792,10 @@ Deletes all users that match the current filter.
 
 Deletes all virtual machines that match the current filter.
 
-=item cmd_osi_del()
+=item cmd_osf_del()
 
-Deletes all OSIs that match the current filter. Only OSIs that have no virtual
-machines assigned are deleted. Returns the number of OSIs that were deleted.
+Deletes all OSFs that match the current filter. Only OSFs that have no virtual
+machines assigned are deleted. Returns the number of OSFs that were deleted.
 
 =item propset($object, %properties)
 

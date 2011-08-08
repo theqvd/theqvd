@@ -43,7 +43,8 @@
 				<li><a href="/users/" class="menu_user">Users</a></li>
 				<li><a href="/vm/" class="menu_vm">Virtual machines</a></li>
 				<li><a href="/hosts/" class="menu_host">Nodes</a></li>
-				<li><a href="/osi/" class="menu_osi">Images</a></li>															
+				<li><a href="/osf/" class="menu_osf">OS flavours</a></li>															
+				<li><a href="/di/" class="menu_di">Disk images</a></li>															
 			</ul>
 		</div>
 		<div class="clear"></div>

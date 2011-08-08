@@ -25,6 +25,11 @@ __PACKAGE__->belongs_to(osi  => 'QVD::DB::Result::OSI',  'osi_id' );
 __PACKAGE__->has_one (vm_runtime => 'QVD::DB::Result::VM_Runtime',  'vm_id');
 __PACKAGE__->has_many(properties => 'QVD::DB::Result::VM_Property', 'vm_id');
 
+## perl -Mlib::glob=*/lib QVD-Admin/bin/qvd-admin.pl vm del -f id=1
+## Error: DBI Exception: DBD::Pg::st execute failed: ERROR:  missing FROM-clause entry for table "di_tags"
+## LINE 1: ...."path", "me"."version" FROM "dis" "me" WHERE ( ( "di_tags"....
+##                                                              ^ [for Statement "SELECT "me"."id", "me"."osf_id", "me"."path", "me"."version" FROM "dis" "me" WHERE ( ( "di_tags"."tag" = ? AND "me"."osf_id" = ? ) )"
+
 sub combined_properties {
     my $vm = shift;
     map { $_->key, $_->value } ( $vm->osi->properties,

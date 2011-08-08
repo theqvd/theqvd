@@ -1,12 +1,12 @@
-name: add_vm_osi_id
+name: add_vm_osf_id
 method: post
 fields:
-  osi_id:
-    label: Osi id
+  osf_id:
+    label: Osf id
     type:  text
     size:  40
     validate: VALUE
     required: 1
-submit: add osi id
+submit: add osf id
 
 

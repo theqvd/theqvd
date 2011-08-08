@@ -31,20 +31,19 @@ function submitvm(a) {
         </tr>
     </thead>
     <tbody>
-        [% FOREACH osi IN osi_list -%]
-        <tr id="[% osi.id %]" class="clickable_row" onClick="submitvm('form[% osi.id %]');">
-            <td>[% osi.id %]<form id="form[% osi.id %]" name="form[% osi.id %]" action="[% c.uri_for('/vm/add') %]" method="post">
-		<input type="hidden" name="osi_id" value ="[% osi.id %]"/>
+        [% FOREACH osf IN osf_list -%]
+        <tr id="[% osf.id %]" class="clickable_row" onClick="submitvm('form[% osf.id %]');">
+            <td>[% osf.id %]<form id="form[% osf.id %]" name="form[% osf.id %]" action="[% c.uri_for('/vm/add') %]" method="post">
+		<input type="hidden" name="osf_id" value ="[% osf.id %]"/>
 		<input type="hidden" name="user_id" value ="[% user.id %]"/>
 		<input type="hidden" name="vm_name" value ="[% user.id %]"/>
 		<input type="hidden" name="vm_storage" value =""/>
 	      </form></td>
-            <td>[% osi.name %]</td>
-            <td>[% osi.disk_image %]</td>
-	    <td>[% IF osi.use_overlay -%]<span class="option_true"></span>
+            <td>[% osf.name %]</td>
+	    <td>[% IF osf.use_overlay -%]<span class="option_true"></span>
 	    [% END %]
 	    </td>
-	    <td>[% osi.memory %]</td>
+	    <td>[% osf.memory %]</td>
 	      
 
         </tr>

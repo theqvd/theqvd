@@ -136,32 +136,63 @@ sub user_passwd {
     $ok;
 }
 
-sub osi_list {
+sub osf_list {
     my ( $self, $filter ) = @_;
     $self->reset_status;
-    [rs(OSI)->search($filter)];
+    [rs(OSF)->search($filter)];
 }
 
-sub osi_find {
+sub osf_find {
     my ( $self, $filter ) = @_;
     $self->reset_status;
-    rs(OSI)->find($filter)  ;
+    rs(OSF)->find($filter);
 }
 
-sub osi_add {
+sub osf_add {
     my ( $self, $params ) = @_;
     $self->reset_status;
-    my $id = eval { $self->admin->cmd_osi_add(%$params) };
+    my $id = eval { $self->admin->cmd_osf_add(%$params) };
     $self->set_error($@) unless defined $id;
     $id;
 }
 
-sub osi_del {
+sub osf_del {
     my ( $self, $id ) = @_;
     $self->reset_status;
     my $ok = eval {
         $self->admin->set_filter( id => $id );
-        $self->admin->cmd_osi_del;
+        $self->admin->cmd_osf_del;
+    };
+    $self->set_error($@) unless defined $ok;
+    $ok;
+}
+
+sub di_list {
+    my ( $self, $filter ) = @_;
+    $self->reset_status;
+    [rs(DI)->search($filter)];
+}
+
+sub di_find {
+    my ( $self, $filter ) = @_;
+    $self->reset_status;
+    rs(DI)->find($filter);
+}
+
+sub di_add {
+    my ( $self, $params ) = @_;
+    $self->reset_status;
+    my $id = eval { $self->admin->cmd_di_add(%$params) };
+    $self->set_error($@) unless defined $id;
+    $id;
+}
+
+sub di_del {
+    my ( $self, $id ) = @_;
+    $self->reset_status;
+    my $ok = eval {
+        $self->admin->set_filter( id => $id );
+        $self->admin->cmd_di_del;
     };
     $self->set_error($@) unless defined $ok;
     $ok;
@@ -320,9 +351,9 @@ sub host_total_stats {
     rs(Host)->search($filter)->count;
 }
 
-sub osi_total_stats {
+sub osf_total_stats {
     my ($self, $filter) = @_;
-    rs(OSI)->search($filter)->count;
+    rs(OSF)->search($filter)->count;
 }
 
 sub session_connected_stats {

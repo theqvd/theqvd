@@ -104,8 +104,8 @@ sub index :Path :Args(0) {
     $rs = $model->host_total_stats("");
     $c->stash('host_total_stats' => $rs);
     
-    $rs = $model->osi_total_stats("");
-    $c->stash('osi_total_stats' => $rs);
+    $rs = $model->osf_total_stats("");
+    $c->stash('osf_total_stats' => $rs);
     
     $rs = $model->session_connected_stats();
     $c->stash('session_connected_stats' => $rs);

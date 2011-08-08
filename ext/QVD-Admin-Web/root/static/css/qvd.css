@@ -388,9 +388,16 @@ button.link:focus span {
 	background-position: 10px 8px;
 }
 
-.menu_osi {
+.menu_di {
 	padding: 5px 5px 5px 25px;
 	background-image: url(../images/icons/cd.png);
+	background-repeat: no-repeat;
+	background-position: 10px 8px;
+}
+
+.menu_osf {
+	padding: 5px 5px 5px 25px;
+	background-image: url(../images/icons/bricks.png);
 	background-repeat: no-repeat;
 	background-position: 10px 8px;
 }

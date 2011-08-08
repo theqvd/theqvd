@@ -1,7 +1,7 @@
 <h1>Welcome to QVD</h1>
 
 <p>This web lets you manage the main issues of the QVD platform, <a href="/users/">Users</a>, <a href="/vm/">Virtual machines</a>, 
-<a href="/hosts/">Nodes</a>  and <a href="/osi/">Images</a>
+<a href="/hosts/">Nodes</a>  and <a href="/osf/">OS Flavours</a>
 </p>
 
 <div class="grid_5 alpha graphs">
@@ -37,6 +37,6 @@
 </div>
 
 <div class="grid_2 center">
-    <p><span class="big_count">[% osi_total_stats -%]</span><br/>images</p>
+    <p><span class="big_count">[% osf_total_stats -%]</span><br/>images</p>
 </div>
 

@@ -390,8 +390,8 @@ POST parameters:
 =item - user_id:
         If user_id is not defined then the url /vm/add_vm_user_id is added as a step to gather the user_id
 
-=item - osi_id
-        If osi_id is not defined then the url /vm/add_vm_osi_id is added as a step to gather the osi_id
+=item - osf_id
+        If osf_id is not defined then the url /vm/add_vm_osf_id is added as a step to gather the osf_id
 
 =back
 
@@ -417,7 +417,7 @@ sub add : Local {
     my $vm_name = $self->_get_add_param($c, 'vm_name');
     my $vm_storage = $self->_get_add_param($c, 'vm_storage');
     my $user_id = $self->_get_add_param($c, 'user_id');
-    my $osi_id = $self->_get_add_param($c, 'osi_id');
+    my $osf_id = $self->_get_add_param($c, 'osf_id');
 
     my ($steps_array, $num_steps, $current_step);
     if (exists($c->session->{vm_add}->{steps}))
@@ -438,7 +438,7 @@ sub add : Local {
         push @{$steps_array}, 'add_vm_name' 
             if (!defined($vm_name) || $vm_name eq '');
         push @{$steps_array}, 'add_vm_user_id' if (!defined($user_id) || $user_id eq '');
-        push  @{$steps_array}, 'add_vm_osi_id' if (!defined($osi_id) || $osi_id eq '');
+        push  @{$steps_array}, 'add_vm_osf_id' if (!defined($osf_id) || $osf_id eq '');
         $num_steps = $#{$steps_array} + 1;
         $current_step = 0;
         $c->session->{vm_add}->{steps} = $steps_array;
@@ -463,7 +463,7 @@ sub add : Local {
         my %parameters = (
             name => $vm_name,
             user_id => $user_id,
-            osi_id => $osi_id,
+            osf_id => $osf_id,
             ip => "",
         );
         $parameters{storage} = $vm_storage if (defined($vm_storage) && $vm_storage ne '');
@@ -524,14 +524,14 @@ sub add_vm_user_id : Local {
         unless exists($c->flash->{current_step});
 }
 
-sub add_vm_osi_id : Local {
+sub add_vm_osf_id : Local {
     my ( $self, $c ) = @_;
 
     #    $self->formbuilder->action('/vm/add');
     my $model = $c->model('QVD::Admin::Web');
-    my $rs    = $model->osi_list("");
-    $c->stash->{osi_list} = $rs;
-    print STDERR "add_vm_osi_id:".Dumper($c->session->{vm_add});
+    my $rs    = $model->osf_list("");
+    $c->stash->{osf_list} = $rs;
+    print STDERR "add_vm_osf_id:".Dumper($c->session->{vm_add});
     # TODO Check if this should be a pre action
     # To avoid browser refresh or reload
     $c->response->redirect( $c->uri_for( $self->action_for('list') ) )

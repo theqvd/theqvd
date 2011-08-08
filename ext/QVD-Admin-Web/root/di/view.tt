@@ -1,0 +1,23 @@
+<h1><a href="[% c.uri_for('/di') %]">Disk images</a> &raquo; [% di.name %]</h1>
+
+<div class="view">
+    <table class="tablesorter resultset">
+	<tr>
+	    <td class="field">Identifier</td>
+	    <td class="value">[% di.id %]</td>
+	</tr>
+	<tr>
+	    <td class="field">OS Flavour id</td>
+	    <td class="value">[% di.osf_id %]</td>
+	</tr>
+	<tr>
+	    <td class="field">Path</td>
+	    <td class="value">[% di.path %]</td>
+	</tr>
+	<tr>
+	    <td class="field">Version</td>
+	    <td class="value">[% di.version %]</td>
+	</tr>	
+    </table>
+</div>
+

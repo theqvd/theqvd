@@ -86,8 +86,8 @@ sub new_vm : Local : Args(1) {
     my $user = $model->user_find($userid);
     $c->stash( user => $user );
     
-    $rs    = $model->osi_list("");
-    $c->stash->{osi_list} = $rs;
+    $rs    = $model->osf_list("");
+    $c->stash->{osf_list} = $rs;
 }
 
 sub passwd : Local : Args(1) {

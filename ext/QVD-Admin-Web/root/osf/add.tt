@@ -1,0 +1,55 @@
+<h1><a href="[% c.uri_for('/osf') %]">OS Flavours</a> &raquo; New</h1>
+
+<script type="text/javascript"><!-- hide from old browsers
+function validate_add (form) {
+    var alertstr = '';
+    var invalid  = 0;
+    var invalid_fields = new Array();
+
+    var name = form.elements['name'].value;
+    if (name == null || name == '') {
+        alertstr += 'Please, introduce a valid value for: "Name"\n';
+        invalid++;
+        invalid_fields.push('name');
+    }
+    
+    if (invalid > 0 || alertstr != '') {
+        if (! invalid) invalid = 'The following';   // catch for programmer error
+        alert(''+invalid+' error(s) were found in your form:'+'\n\n'
+                +alertstr+'\n'+'Please, correct them and try again\n');
+        return false;
+    }
+    
+    $(".loader").show();
+    
+    return true;  // all checked ok
+}
+//-->
+</script>
+
+<p>The fields in <span class="fb_required">bold</span> are mandatory</p>
+
+<form action="/osf/add" class="fb_form" id="add" method="post" name="add" onsubmit="return validate_add(this);">
+    <div class="fb_state" id="add_state"><input id="_submitted_add" name="_submitted_add" type="hidden" value="1" /></div>
+    <table class="fb" id="add_body">
+        <tr id="add_name_row">
+          <td class="fb_label" id="add_name_label"><span class="fb_required">Name</span></td>
+          <td class="fb_field" id="add_name_field"><input class="fb_input" id="name" name="name" size="40" type="text" /></td>
+        </tr>
+        <tr id="add_memory_row">
+          <td class="fb_label" id="add_memory_label">Memory</td>
+          <td class="fb_field" id="add_memory_field"><input class="fb_input" id="memory" name="memory" size="4" type="text" /> MB</td>
+        </tr>
+        <tr id="add_user_storage_size_row">
+          <td class="fb_label" id="add_user_storage_size_label">User space</td>
+          <td class="fb_field" id="add_user_storage_size_field"><input class="fb_input" id="user_storage_size" name="user_storage_size" size="4" type="text" /> MB</td>
+        </tr>
+        <tr id="add_use_overlay_row" style="display:none">
+          <td class="fb_label" id="add_use_overlay_label">Overlay</td>
+          <td class="fb_field" id="add_use_overlay_field"><input checked="checked" class="fb_input" type="checkbox" id="use_overlay" name="use_overlay" onchange="$(this).attr('checked', true);"></td>
+        </tr>
+        <tr id="add_submit_row">
+          <td class="fb_submit" colspan="2" id="add_submit_field"><input class="fb_button" id="add_submit" name="_submit" type="submit" value="Create" /></td>
+        </tr>
+    </table>
+</form>

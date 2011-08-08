@@ -20,7 +20,7 @@ $response = request POST '/vm/add',
     [
      'vm_name' => 'testvm123',
      'user_id' => '1',
-     'osi_id' => '1',
+     'osf_id' => '1',
      'vm_ip' => '10.0.0.1',
     ];
 

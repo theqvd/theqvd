@@ -1,0 +1,78 @@
+<h1><a href="[% c.uri_for('/di') %]">Disk images</a> &raquo; New</h1>
+
+<script type="text/javascript"><!-- hide from old browsers
+function validate_add (form) {
+    var alertstr = '';
+    var invalid  = 0;
+    var invalid_fields = new Array();
+
+    var osf_id = form.elements['osf_id'].value;
+    if (osf_id == null || osf_id == '') {
+        alertstr += 'Select a valid value for: "OSF"\n';
+        invalid++;
+        invalid_fields.push('osf_id');
+    }
+
+    var disk_image = form.elements['disk_image'].value;
+    if (disk_image == null || disk_image == '') {
+        alertstr += 'Select a valid value for: "Image"\n';
+        invalid++;
+        invalid_fields.push('disk_image');
+    }
+
+    if (invalid > 0 || alertstr != '') {
+        if (! invalid) invalid = 'The following';   // catch for programmer error
+        alert(''+invalid+' error(s) were found in your form:'+'\n\n'
+                +alertstr+'\n'+'Please, correct them and try again\n');
+        return false;
+    }
+    
+    $(".loader").show();
+    
+    return true;  // all checked ok
+}
+//-->
+</script>
+
+<p>The fields in <span class="fb_required">bold</span> are mandatory</p>
+
+<form action="/di/add" class="fb_form" id="add" method="post" name="add" onsubmit="return validate_add(this);">
+    <div class="fb_state" id="add_state"><input id="_submitted_add" name="_submitted_add" type="hidden" value="1" /></div>
+    <table class="fb" id="add_body">
+
+        <!-- osf id -->
+        <tr id="add_osf_id_row">
+          <td class="fb_label" id="add_osf_id_label"><span class="fb_required">OS Flavour</span></td>
+          <td class="fb_field" id="add_osf_id_field"><SELECT NAME="osf_id" SIZE=6 style="width: 385px;">
+          [% FOREACH osf IN osfs %]
+          <OPTION VALUE="[% osf.id %]">[% osf.name %]
+          [% END %]
+          </SELECT></td>
+        </tr>
+
+        <tr id="add_disk_image_row">
+          <td class="fb_label" id="add_disk_image_label"><span class="fb_required">Image file</span></td>
+          <td class="fb_field" id="add_disk_image_field"><SELECT NAME="disk_image" SIZE=6 style="width: 385px;">
+          [% FOREACH di_file IN di_file_list %]
+          <OPTION VALUE="[% di_file %]">[% di_file %]
+          [% END %]
+          </SELECT></td>
+        </tr>
+
+        <!-- version? -->
+
+        <tr id="add_delete_row">
+          <td class="fb_label" id="add_delete_label">Delete after action</td>
+          <td class="fb_field" id="add_delete_field"><input class="fb_input" type="checkbox" id="delete" name="delete"></td>
+        </tr>
+
+        <tr id="add_submit_row">
+          <td class="fb_submit" colspan="2" id="add_submit_field"><input class="fb_button" id="add_submit" name="_submit" type="submit" value="Create" /></td>
+        </tr>
+    </table>
+</form>
+
+<div class="loader">
+	<h2>DI creation in progress</h2>
+	<p>This operation could take a couple of minutes to complete, please wait...</p>
+</div>
