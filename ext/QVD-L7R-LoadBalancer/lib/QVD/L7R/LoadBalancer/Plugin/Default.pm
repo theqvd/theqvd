@@ -17,9 +17,10 @@ my $weight_random = cfg('l7r.loadbalancer.plugin.default.weight.random', 100);
 sub get_free_host {
     my %host;
 
-    for my $hrt (rs(Host_Runtime)->search({ backend => 'true',
+    for my $hrt (rs(Host_Runtime)->search({ 'host.backend' => 'true',
                                             blocked => 'false',
-                                            state => 'running' })) {
+                                            state => 'running' },
+                                            { join => 'host' })) {
         my $id = $hrt->host_id;
         $host{$id} =  { ram => $hrt->usable_ram,
                         cpu => $hrt->usable_cpu };
