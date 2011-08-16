@@ -165,6 +165,16 @@ sub set_host_id {
     $vm->update({host_id => $host_id});
 }
 
+sub set_current_osf_id {
+    my ($vm, $current_osf_id) = @_;
+    $vm->update({current_osf_id => $current_osf_id});
+}
+
+sub set_current_di_id {
+    my ($vm, $current_di_id) = @_;
+    $vm->update({current_di_id => $current_di_id});
+}
+
 sub clear_l7r_all {
     shift->update({ user_state => 'disconnected',
                     user_cmd => undef,

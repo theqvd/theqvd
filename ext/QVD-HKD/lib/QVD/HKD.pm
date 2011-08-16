@@ -644,7 +644,8 @@ sub _start_vm {
     my $vnc_port = $vm->vm_vnc_port;
     my $serial_port = $vm->vm_serial_port;
     my $mon_port = $vm->vm_mon_port;
-    my $osi = $vm->vm->osi;
+    my $osf = $vm->vm->osf;
+    my $di = $vm->vm->di;
     my $address = $vm->vm_address;
     my $name = rs(VM)->find($vm->vm_id)->name;
 
@@ -655,7 +656,7 @@ sub _start_vm {
     my $mac = $hkd->_ip_to_mac($address);
 
     my @cmd = ($cmd{kvm},
-               -m => $osi->memory.'M',
+               -m => $osf->memory.'M',
 	       -name => "qvd/$id/$name");
 
     my $nic = "nic,macaddr=$mac";
@@ -697,7 +698,7 @@ sub _start_vm {
     push @cmd, -drive => $hda;
     DEBUG "Using image $image ($hda) for VM $id ";
 
-    if (defined $osi->user_storage_size) {
+    if (defined $osf->user_storage_size) {
         my $user_storage = $hkd->_vm_user_storage_path($vm) //
             die "no user storage for vm $id";
 	my $hdb = "file=$user_storage,index=$hdb_index,media=disk";
@@ -708,6 +709,8 @@ sub _start_vm {
 
     my ($pid, $tap_if) = $hkd->_call_noded(fork_vm => $id, $network_bridge, @cmd);
     $vm->set_vm_pid($pid);
+    $vm->set_current_osf_id ($osf->id);
+    $vm->set_current_di_id ($di->id);
 
     $hkd->_set_vm_fw_rules($vm, $tap_if);
     # TODO: Do "ifconfig" in Perl
@@ -725,18 +728,19 @@ sub _ip_to_mac {
 sub _vm_image_path {
     my ($hkd, $vm) = @_;
     my $id = $vm->id;
-    my $osi = $vm->vm->osi;
-    my $osiid = $osi->id;
-    my $image = "$images_path/".$osi->disk_image;
+    my $osf = $vm->vm->osf;
+    my $osfid = $osf->id;
+    my $di = $vm->vm->di;
+    my $image = "$images_path/".$di->path;
 
     unless (-f $image) {
 	ERROR "Image $image attached to VM $id does not exist on disk";
 	return undef;
     }
-    return $image unless $osi->use_overlay;
+    return $image unless $osf->use_overlay;
 
     # FIXME: use a better policy for overlay allocation
-    my $overlay = "$overlays_path/$osiid-$id-overlay.qcow2";
+    my $overlay = "$overlays_path/$osfid-$id-overlay.qcow2";
     if (-f $overlay) {
         return $overlay if ($persistent_overlay);
         # FIXME: save old overlay for later inspection
@@ -765,8 +769,8 @@ sub _vm_image_path {
 sub _vm_user_storage_path {
     my ($hkd, $vm) = @_;
     my $id = $vm->id;
-    my $osi = $vm->vm->osi;
-    my $size = $osi->user_storage_size // return undef;
+    my $osf = $vm->vm->osf;
+    my $size = $osf->user_storage_size // return undef;
 
     my $image = "$homes_path/$id-data.qcow2";
     return $image if -f $image;

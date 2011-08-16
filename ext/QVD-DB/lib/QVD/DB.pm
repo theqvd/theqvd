@@ -81,10 +81,12 @@ sub erase {
     for my $table (qw( vm_runtimes
 		       vms
 		       vm_properties
-		       osis
+		       osfs
 		       host_runtimes
 		       hosts
 		       host_properties
+		       dis
+		       di_tags
 		       users
 		       user_properties
 		       vm_states
