@@ -399,10 +399,10 @@ sub cmd_di_tag {
     my $tag = delete $params{tag};
     my $id;
     txn_do {
-        rs(DI_Tag)->search({tag => $tag, fixed => 1})->first 
-            and die "There is a DI with the tag $tag fixed\n";
-        my $osf_id = rs(DI)->search({id => $di_id})->first->osf_id;
+        my $osf_id = rs(DI)->find($di_id)->osf_id;
         my @ids = map { $_->id } rs(DI)->search({osf_id => $osf_id});
+        rs(DI_Tag)->search({tag => $tag, fixed => 1, di_id => \@ids})->first 
+            and die "There is a DI with the tag $tag fixed\n";
         rs(DI_Tag)->search({tag => $tag, di_id => \@ids})->delete_all;
         $id = rs(DI_Tag)->create({di_id => $di_id, tag => $tag});
     };
