@@ -52,12 +52,6 @@ my %syntax_check_cbs = (
             $$errors++, warn "Syntax error: parameter 'tag' is mandatory\n",  unless exists $args->{'tag'};
             delete @$args{qw/di_id tag/};
         },
-        has_tag => sub {
-            my ($errors, $args) = @_;
-            $$errors++, warn "Syntax error: parameter 'di_id' is mandatory\n",  unless exists $args->{'di_id'};
-            $$errors++, warn "Syntax error: parameter 'tag' is mandatory\n",  unless exists $args->{'tag'};
-            delete @$args{qw/di_id tag/};
-        },
     },
     user => {
         add => sub {
@@ -780,25 +774,6 @@ sub help_di_untag {
     print <<EOT;
 di untag: untags a Disk Image (DI)
 usage: di untag di_id=id tag=symbol
-EOT
-}
-
-sub cmd_di_has_tag {
-    my ($self, @args) = @_;
-    my %args;
-    my $rc;
-    eval {
-        %args = _split_on_equals(@_);
-        $rc = $self->{admin}->cmd_di_has_tag(%args);
-    };
-    $@ and $self->_die;
-    printf "DI %d is%s tagged with '%s'\n", $args{'di_id'}, ($rc ? '' : ' not'), $args{'tag'};
-}
-
-sub help_di_has_tag {
-    print <<EOT;
-di has_tag: shows whether a given DI id has a given tag or not
-usage: di has_tag di_id=id tag=symbol
 EOT
 }
 
