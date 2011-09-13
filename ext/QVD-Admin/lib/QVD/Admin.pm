@@ -423,6 +423,14 @@ sub cmd_di_untag {
     1
 }
 
+sub cmd_di_has_tag {
+    my ($self, %params) = @_;
+    my @required_params = qw/di_id tag/;
+    my $di_id = delete $params{di_id};
+    my $tag = delete $params{tag};
+    !!rs(DI_Tag)->search({tag => $tag, di_id => $di_id})->first;
+}
+
 sub cmd_di_del {
     my ($self, @args) = @_;
     my $counter = 0;
