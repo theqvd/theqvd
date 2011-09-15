@@ -399,6 +399,7 @@ sub cmd_di_tag {
     my $tag = delete $params{tag};
     my $id;
     txn_do {
+        ## #760: pay attention to OSFs
         my $osf_id = rs(DI)->find($di_id)->osf_id;
         my @ids = map { $_->id } rs(DI)->search({osf_id => $osf_id});
         rs(DI_Tag)->search({tag => $tag, fixed => 1, di_id => \@ids})->first 
@@ -429,6 +430,15 @@ sub cmd_di_del {
     my $rs = $self->get_resultset('di');
     while (my $di = $rs->next) {
         if ($di->vm_runtimes->count == 0) {
+            ## #759: reassign 'default' and 'head' tags to another DI. Using the most recent one here.
+            foreach my $tag (qw/default head/) {
+                next unless $di->has_tag ($tag);
+                my @potentials = grep { $_->id ne $di->id } $di->osf->dis;
+                if (@potentials) {
+                    my $new_di = $potentials[-1];
+                    $self->cmd_di_tag (di_id => $new_di->id, tag => $tag);
+                }
+            }
             warn "deleting di ".$di->id;
             $di->delete;
             $counter++;
