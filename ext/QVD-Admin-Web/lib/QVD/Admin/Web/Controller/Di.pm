@@ -60,8 +60,8 @@ sub list : Local {
     
     my $rs = $model->di_list($filter);
     $c->stash->{di_list} = $rs;
-    
-    $rs = $model->vmrt_list("", {join => ["user"]});  ## dserrano: I don't think I fully understand this join
+
+    $rs = $model->vmrt_list("", {join => ["user"]});
     $c->stash->{vmrt_list} = $rs;
     
     $c->stash->{s} = $s;
@@ -140,6 +140,7 @@ sub del : Local {
                 my $id = $di->id;
                 
                 if ( my $countdel = $model->di_del($_) ) {
+                    # FIXME response_type must be an enumerated
                     $c->flash->{response_type} = "success";
                     $c->flash->{response_msg} .= "DI $id successfully deleted";
                 } else {
@@ -148,6 +149,41 @@ sub del : Local {
                     $c->flash->{response_msg}  .= $model->error_msg;
                 }
             }
+        }
+    }
+
+    $c->response->redirect( $c->uri_for( $self->action_for('list') ) );
+}
+
+sub tag_default : Local {
+    my ( $self, $c ) = @_;
+    $c->go('Root', 'login', @_) unless $c->user_exists;
+    
+    my $model = $c->model('QVD::Admin::Web');
+    my $result = $c->form;
+
+    if ( !$result->success ) {
+        $c->flash->{response_type} = "error";
+        $c->flash->{response_msg} = "Error in parameters: " . $model->build_form_error_msg ($result);
+    } else {
+        my $list = $c->req->params;
+        my $done = 0;
+        my $errors = 0;
+        foreach my $k (keys %$list) {
+            next if $k !~ /^default_di_for_osf_/;
+            my $new_di = $c->req->params->{$k};
+            my $ok = $model->di_tag ($new_di, 'default');
+            $done += $ok;
+            $errors += !$ok;
+        }
+        if ($errors) {
+            # FIXME response_type must be an enumerated
+            $c->flash->{response_type} = "error";
+            $c->flash->{response_msg}  .= "$errors DIs couldn't be tagged";
+        } else {
+            # FIXME response_type must be an enumerated
+            $c->flash->{response_type} = "success";
+            $c->flash->{response_msg} .= "$done DIs successfully tagged";
         }
     }
 

@@ -15,6 +15,10 @@ function on_submit()
       {
 	document.propos.action ="[% c.uri_for('/di/del') %]";
       }
+      if(document.pressed == 'set_defaults')
+      {
+	document.propos.action ="[% c.uri_for('/di/tag_default') %]";
+      }
       return true;
     }
 }
@@ -58,6 +62,7 @@ function check_all(field) {
             <th><input type="checkbox" name="check" onclick="check_all(this);"/></th>
             <th id="id"></th>
             <th id="osf_id">OSF id</th>
+            <th id="is_default">Default</th>
             <th id="disk_image">Disk image</th>
             <th id="version">Version</th>
         </tr>
@@ -78,6 +83,7 @@ function check_all(field) {
             </td>	
             <td><a href="[% c.uri_for('/di/view/') %][% di.id %]" class="option_view">[% di.id %]</a></td>
             <td>[% di.osf_id %]</td>
+            <td><input type="radio" name="default_di_for_osf_[% di.osf_id %]"[% IF di.has_tag('default'); " checked=''"; END %] value="[% di.id %]" /></td>
             <td>[% di.path %]</td>
             <td>[% di.version %]</td>
         </tr>
@@ -85,6 +91,7 @@ function check_all(field) {
     </tbody>
 </table>
 <input type="submit" onClick="document.pressed='delete'" value="Delete"/>
+<input type="submit" onClick="document.pressed='set_defaults'" value="Set defaults"/>
 </form>
 
 <script type="text/javascript" charset="utf-8">

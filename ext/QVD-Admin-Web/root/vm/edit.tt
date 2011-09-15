@@ -69,6 +69,15 @@ function validate_edit (form) {
 	    <td class="value">[% vm.user.login %]</td>
 	</tr>
 	<tr>
+	    <td class="field">DI tag</td>
+	    <td class="value"><select name="di_tag">
+            [% FOREACH tag IN tags %]
+            <option value="[% tag %]"[% IF tag == vm.di_tag; " selected='selected'"; END %]>[% tag %]</option>
+            [% END %]
+        </select></td>
+	</tr>
+<!--
+	<tr>
 	    <td class="field">Current IP address</td>
 	    <td class="value">[% vm.vm_runtime.vm_address %]</td>
 	</tr>
@@ -101,6 +110,7 @@ function validate_edit (form) {
 	    <td class="value">[% IF vm.vm_runtime.blocked -%]<span class="option_blocked"></span>
 	    [% END %]</td>
 	</tr>	
+-->
     </table>
     <input type="hidden" name="_submitted" value="1" />
     <input name="_submit" type="Submit" value="Submit" />

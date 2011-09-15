@@ -28,6 +28,12 @@ sub tag_list {
     sort (map $_->tag, $di->tags);
 }
 
+sub has_tag {
+    my ($di, $tag) = @_;
+    my $ditag = $di->tags->search({tag => $tag})->first;
+    return !!$ditag;
+}
+
 sub delete_tag {
     my $di = shift;
     my $tag = shift;

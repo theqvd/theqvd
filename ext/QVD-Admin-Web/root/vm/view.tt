@@ -16,6 +16,10 @@
 	    <td class="value">[% vm.user.login %]</td>
 	</tr>
 	<tr>
+	    <td class="field">DI tag</td>
+	    <td class="value">[% vm.di_tag %]</td>
+	</tr>
+	<tr>
 	    <td class="field">Current IP address</td>
 	    <td class="value">[% vm.vm_runtime.vm_address %]</td>
 	</tr>

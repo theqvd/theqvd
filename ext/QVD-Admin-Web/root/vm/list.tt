@@ -86,6 +86,7 @@ function check_all(field) {
             <th id="name">Name</th>
             <th id="user">User</th>
             <th id="osf">OS Flavour</th>
+            <th id="di_tag">DI Tag</th>
 	    <th id="status">State</th>
 	    <th id="host">Node</th>
 	    <th id="blocked">Blocked</th>	    
@@ -101,6 +102,7 @@ function check_all(field) {
 		<span id="user_statebullet[% vm.id %]" class="option_user_[% vm.vm_runtime.user_state %]"></span>[% vm.user.login %]
 	    </td>
             <td><a href="[% c.uri_for('/osf/view/') %][% vm.osf_id %]">[% vm.osf.name %]</a></td>
+            <td>[% vm.di_tag %]</td>
 	    <td id="vm_state[% vm.id %]">
 		<span id="vm_statebullet[% vm.id %]" class="option_[% vm.vm_runtime.vm_state %]"></span>
 		<span id="vm_statetext[% vm.id %]">[% vm.vm_runtime.vm_state %]</span>

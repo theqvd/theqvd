@@ -198,6 +198,18 @@ sub di_del {
     $ok;
 }
 
+sub di_tag {
+    my ( $self, $id, $tag ) = @_;
+    warn "going to tag di '$id' as '$tag'\n";
+    $self->reset_status;
+    my $ok = eval {
+        $self->admin->cmd_di_tag(di_id => $id, tag => $tag);
+        1;
+    };
+    $self->set_error($@) unless defined $ok;
+    $ok;
+}
+
 sub vm_list {
     my ( $self, $filter, $attrs) = @_;
     $self->reset_status;

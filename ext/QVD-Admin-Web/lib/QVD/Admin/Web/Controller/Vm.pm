@@ -4,6 +4,7 @@ use strict;
 use warnings;
 use parent 'Catalyst::Controller::FormBuilder';
 use Data::FormValidator::Constraints qw(:closures);
+use List::MoreUtils qw/uniq/;
 use Data::Dumper;
 
 use QVD::DB::Simple;
@@ -67,13 +68,16 @@ sub edit : Local Form :Args(1){
     my $vm = $model->vm_find($id);
     $c->stash(vm => $vm);
 
+    my @tags = sort uniq map { $_->tag_list } $vm->osf->dis;
+    $c->stash(tags => \@tags);
+
     if ( $form->submitted ) {
         if ( $form->validate ) {
             $model->admin->set_filter (id => $id);
             my %params =
                 map { $_ => $c->req->body_params->{$_} }
                 grep { defined $c->req->body_params->{$_} }
-                qw/name ip vm_ssh_port vm_vnc_port vm_serial_port/;
+                qw/name ip di_tag vm_ssh_port vm_vnc_port vm_serial_port/;
             my $count = $model->vm_edit (\%params);
 
             ## I'd like to return to "/vm/view/$id" but this redirect seems to be ignored
