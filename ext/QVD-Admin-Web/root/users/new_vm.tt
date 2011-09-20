@@ -18,16 +18,13 @@ function submitvm(a) {
 </tr>
 
 
-<h2>Image</h2>
+<h2>OS Flavour</h2>
 
 <table id="props" class="tablesorter resultset">
     <thead>
         <tr>
             <th id="id"></th>
             <th id="name">Name</th>
-            <th id="disk_image">Disk image</th>
-            <th id="use_overlay">Overlay</th>
-            <th id="memory">Memory</th>
         </tr>
     </thead>
     <tbody>
@@ -40,12 +37,6 @@ function submitvm(a) {
 		<input type="hidden" name="vm_storage" value =""/>
 	      </form></td>
             <td>[% osf.name %]</td>
-	    <td>[% IF osf.use_overlay -%]<span class="option_true"></span>
-	    [% END %]
-	    </td>
-	    <td>[% osf.memory %]</td>
-	      
-
         </tr>
         [% END -%]
     </tbody>
