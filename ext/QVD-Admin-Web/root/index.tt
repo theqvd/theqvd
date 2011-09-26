@@ -37,6 +37,6 @@
 </div>
 
 <div class="grid_2 center">
-    <p><span class="big_count">[% osf_total_stats -%]</span><br/>images</p>
+    <p><span class="big_count">[% osf_total_stats -%]</span><br/>operating systems</p>
 </div>
 
