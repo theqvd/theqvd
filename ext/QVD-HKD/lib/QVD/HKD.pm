@@ -733,7 +733,8 @@ sub _vm_image_path {
     my $di = $vm->vm->di;
 
     if (!defined $di) {
-        ERROR "No DI seems to be associeted to OSF '$osfid'";
+        my $tag = eval { $vm->vm->di_tag } // 'default';
+        ERROR "No DI with tag '$tag' seems to be associated to OSF '$osfid'";
         return undef;
     }
     my $image = "$images_path/".$di->path;
