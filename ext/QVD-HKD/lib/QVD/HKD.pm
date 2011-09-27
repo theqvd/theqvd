@@ -731,6 +731,11 @@ sub _vm_image_path {
     my $osf = $vm->vm->osf;
     my $osfid = $osf->id;
     my $di = $vm->vm->di;
+
+    if (!defined $di) {
+        ERROR "No DI seems to be associeted to OSF '$osfid'";
+        return undef;
+    }
     my $image = "$images_path/".$di->path;
 
     unless (-f $image) {
