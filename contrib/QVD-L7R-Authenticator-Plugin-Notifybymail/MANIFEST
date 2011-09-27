@@ -4,6 +4,8 @@ ignore.txt
 lib/QVD/L7R/Authenticator/Plugin/Notifybymail.pm
 Makefile.PL
 MANIFEST
+MANIFEST.bak
+MANIFEST.SKIP
 META.yml
 README
 t/00-load.t

@@ -27,7 +27,7 @@ require "lib/defaults.pl";
     $QVD::Config::USE_DB = 0;
 }
 
-plan tests => 6;
+plan tests => 8;
 
 require_ok( 'QVD::Config' ) || 
     BAIL_OUT("Bail out!: Unable to load QVD::Config");
@@ -43,9 +43,17 @@ my $smtp = Net::SMTP->new($QVD::Test::Defaults::test_smtphost);
 ok($smtp, "Be able to get connection to smtp host ".$QVD::Test::Defaults::test_smtphost);
 $smtp->quit;
 
+
 my $auth=QVD::L7R::Authenticator::Plugin::Notifybymail->authenticate_basic($auth_obj, $QVD::Test::Defaults::test_user, $QVD::Test::Defaults::test_pass);
 isnt($auth, 1, "Test for unsuccesful auth but send email");
 $auth_obj->{login} = $QVD::Test::Defaults::test_user;
+
+QVD::L7R::Authenticator::Plugin::Notifybymail->before_list_of_vms($auth_obj);
+ok(1, "Called before_list_of_vms");
+
+$auth=QVD::L7R::Authenticator::Plugin::Notifybymail->authenticate_basic($auth_obj, $QVD::Test::Defaults::test_userskip, $QVD::Test::Defaults::test_pass);
+isnt($auth, 1, "Test for unsuccesful auth but send email");
+$auth_obj->{login} = $QVD::Test::Defaults::test_userskip;
 
 QVD::L7R::Authenticator::Plugin::Notifybymail->before_list_of_vms($auth_obj);
 ok(1, "Called before_list_of_vms");

@@ -15,6 +15,8 @@ use File::Temp;
 
 # Example:
 our $test_user = 'nito';
+our $test_userskip = 'matchregex';
+our $test_regex = '^match.*$';
 our $test_pass = 'nito';
 our $test_smtphost = 'smtp.qindel.com';
 our $test_smtpto = 'nito@qindel.es';
@@ -42,6 +44,7 @@ database.host = $test_dbhost
 database.name = $test_dbname
 database.user = $test_dbuser
 database.password = $test_dbpass
+auth.notifybymail.excludenotifyregex=$test_regex
 EOF
 
     close $fh;

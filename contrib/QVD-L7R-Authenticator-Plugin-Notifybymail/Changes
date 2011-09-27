@@ -1,5 +1,8 @@
 Revision history for QVD-L7R-Authenticator-Plugin-Notifybymail
 
+0.03    27/9/2011
+        Allow to set up an exclude list
+
 0.01    2/7/2010
         First version
 

@@ -14,11 +14,11 @@ QVD::L7R::Authenticator::Plugin::Notifybymail - Sends an email whenever a user c
 
 =head1 VERSION
 
-Version 0.01
+Version 0.03
 
 =cut
 
-our $VERSION = '0.02';
+our $VERSION = '0.03';
 
 =head1 SYNOPSIS
 
@@ -61,7 +61,11 @@ The mail from address. By default this is "qvd@$HOSTNAME"
 
 =item * auth.notifybymail.smtpsubject 
 
-he subject in the email. By default this is "User $USER has tried to connecto to QVD at $HOSTNAME"
+The subject in the email. By default this is "User $USER has tried to connecto to QVD at $HOSTNAME"
+
+=item * auth.notifybymail.excludenotifyregex
+
+If the login matches this regex, the notify will not be sent out
 
 =item * auth.notifybymail.debug
 
@@ -105,6 +109,7 @@ my $smtphost =  cfg('auth.notifybymail.smtphost', 0) // '';
 my $smtpto = cfg('auth.notifybymail.smtpto', 0) // '';
 my $smtpfrom = cfg('auth.notifybymail.smtpfrom', 0) || 'qvd@'.$hostname;
 my $debug = cfg('auth.notifybymail.debug', 0) // 0;
+my $notifyexcluderegex =  cfg('auth.notifybymail.excludenotifyregex', 0) // '';
 
 sub authenticate_basic  {
     my ($plugin, $auth, $login, $passwd) = @_;
@@ -128,6 +133,11 @@ This hook sends the notification email
 sub before_list_of_vms {
     my ($plugin, $auth) = @_;
     my $login=$auth->login;
+
+    if ($notifyexcluderegex ne '' && $login =~ /$notifyexcluderegex/) {
+	DEBUG "Excluding notification because login $login matches regex <$notifyexcluderegex>";
+	return ();
+    }
 
     if ($smtphost eq '' || $smtpto eq '') {
 	ERROR 'You have defined in the auth plugins l73.auth.plugins notifybymail, '.

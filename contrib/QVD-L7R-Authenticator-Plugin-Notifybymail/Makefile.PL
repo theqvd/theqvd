@@ -5,7 +5,9 @@ WriteMakefile
           'NAME' => 'QVD::L7R::Authenticator::Plugin::Notifybymail',
           'VERSION_FROM' => 'lib/QVD/L7R/Authenticator/Plugin/Notifybymail.pm',
           'PREREQ_PM' => {
-                           'Test::More' => 0
+                           'Test::More' => 0,
+                           'QVD::Log' => 0,
+			   'QVD::L7R::Authenticator::Plugin' => 0,
                          },
           'INSTALLDIRS' => 'site',
           'EXE_FILES' => [],
