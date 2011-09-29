@@ -42,6 +42,7 @@ function check_all(field) {
 </form>
 </div>
 <a class="side_add" href="[% c.uri_for('/di/add') %]">New</a>
+<a class="side_download" href="http://theqvd.com/product/download#images" target="_blank">Download</a>
 <div id="pager" class="pager">
 	<form>
 		<img src="/static/icons/first.png" class="first"/>
