@@ -39,7 +39,7 @@ sub this_host {
     my $nodename = core_cfg('nodename');
     my $this_host = rs(Host)->search({name => $nodename})->first;
     unless (defined $this_host) {
-	my $msg = "This node $nodename is not registered in the database";
+	my $msg = "This node '$nodename' is not registered in the database";
 	ERROR $msg;
 	die "$msg\n";
     }
