@@ -430,7 +430,7 @@ sub cmd_di_del {
     my $rs = $self->get_resultset('di');
     while (my $di = $rs->next) {
         if ($di->vm_runtimes->count == 0) {
-            ## #759: reassign 'default' and 'head' tags to another DI. Using the most recent one here.
+            ## #759: reassign 'default' and 'head' tags to another DI. Using the most recent DI here.
             foreach my $tag (qw/default head/) {
                 next unless $di->has_tag ($tag);
                 my @potentials = grep { $_->id ne $di->id } $di->osf->dis;
@@ -439,7 +439,7 @@ sub cmd_di_del {
                     $self->cmd_di_tag (di_id => $new_di->id, tag => $tag);
                 }
             }
-            warn "deleting di ".$di->id;
+            #warn "deleting di ".$di->id;
             $di->delete;
             $counter++;
             # FIXME Should we delete the actual image file?
@@ -474,7 +474,7 @@ sub cmd_osf_del {
     my $rs = $self->get_resultset('osf');
     while (my $osf = $rs->next) {
         if ($osf->vms->count == 0) {
-            warn "deleting osf ".$osf->id;
+            #warn "deleting osf ".$osf->id;
             $osf->delete;
             $counter++;
         }
