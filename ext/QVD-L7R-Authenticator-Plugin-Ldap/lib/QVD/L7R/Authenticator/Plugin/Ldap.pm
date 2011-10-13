@@ -163,8 +163,7 @@ authentication fails.
 
 =head1 SEE ALSO
 
-L<QVD::L7R::Authenticator::Plugin::Auto> and <Met::LDAP>
-
+L<QVD::L7R::Authenticator::Plugin::Auto> and <Net::LDAP>
 
 =head1 SUPPORT
 
