@@ -48,7 +48,7 @@ TODO: {
     "placeholder date/time"       => qr(Date/time)
   );
 
-  module_boilerplate_ok('lib/QVD/L7R/Authenticator/Plugin/LDAP.pm');
+  module_boilerplate_ok('lib/QVD/L7R/Authenticator/Plugin/Ldap.pm');
 
 
 }
