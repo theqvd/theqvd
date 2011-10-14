@@ -187,7 +187,6 @@ sub _authenticate_user {
 	    if (my ($user, $passwd) = decode_base64($basic) =~ /^([^:]+):(.*)$/) {
 		my $auth = QVD::L7R::Authenticator->new;
 		if ($auth->authenticate_basic($user, $passwd, $l7r)) {
-		    use Data::Dumper;
 		    INFO "Accepted connection from user $user from ip:port ".
 			$l7r->{server}->{client}->peerhost().":".$l7r->{server}->{client}->peerport();
 		    return $auth;
