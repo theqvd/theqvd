@@ -66,7 +66,7 @@ Start the VMA in foreground and log messages to screen. Useful for debugging.
 
 =over 
 
-=item F</etc/qvd/vma.ini>
+=item F</etc/qvd/vma.conf>
 
 The main configuration file. 
 
