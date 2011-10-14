@@ -1,3 +1,11 @@
+QVD 3.0.4
+=========
+- Pass the $l7r object to the authentication plugins. Now the authenticate_basic would receive the following
+  arguments:
+	sub authenticate_basic {
+	    my ($auth, $login, $passwd, $l7r) = @_;
+  And you can get the remote ip as in: $l7r->{server}->{client}->peerhost()
+
 QVD 3.0.2
 =========
 - Fix incorrect usage of 'usedadd -U', which isn't portable to SuSE Linux.

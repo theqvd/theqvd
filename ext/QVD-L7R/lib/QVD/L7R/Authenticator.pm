@@ -32,10 +32,10 @@ sub new {
 }
 
 sub authenticate_basic {
-    my ($auth, $login, $passwd) = @_;
+    my ($auth, $login, $passwd, $l7r) = @_;
     DEBUG "authenticating user $login with modules @{$auth->{modules}}";
     for (@{$auth->{modules}}) {
-	if ($_->authenticate_basic($auth, $login, $passwd)) {
+	if ($_->authenticate_basic($auth, $login, $passwd, $l7r)) {
 	    $auth->{login} = $login;
 	    $auth->{params}{'qvd.vm.user.name'} = $login;
 	    return 1;
