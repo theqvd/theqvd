@@ -105,22 +105,27 @@ sub new {
 					      wxTE_PASSWORD);
 	$grid_sizer->Add($self->{password},
 			 1, wxALL|wxEXPAND, 5);
-	$grid_sizer->Add(Wx::StaticText->new($panel, -1, "Server"),
-			 0, wxALL, 5);
-	$self->{host} = Wx::TextCtrl->new($panel, -1, cfg('client.host.name'));
-	$grid_sizer->Add($self->{host},
-			 1, wxALL|wxEXPAND, 5);
 
-	$grid_sizer->Add(Wx::StaticText->new($panel, -1, "Connection type"),
-			 0, wxALL, 5);			 
-			 
-	my @link_options = ("Local", "ADSL", "Modem");
-	$self->{link} = Wx::Choice->new($panel, -1);
-	$grid_sizer->Add($self->{link},
-			 1, wxALL|wxEXPAND, 5);
-	$self->{link}->AppendItems(\@link_options);
-	$self->{link}->Select(0);
-	# FIXME Introduce previous user selection here
+    if (!cfg('client.force.host.name', 0)) {
+        $grid_sizer->Add(Wx::StaticText->new($panel, -1, "Server"),
+                 0, wxALL, 5);
+        $self->{host} = Wx::TextCtrl->new($panel, -1, cfg('client.host.name'));
+        $grid_sizer->Add($self->{host},
+                 1, wxALL|wxEXPAND, 5);
+    }
+
+    if (!cfg('client.force.link', 0)) {
+        $grid_sizer->Add(Wx::StaticText->new($panel, -1, "Connection type"),
+                 0, wxALL, 5);			 
+                 
+        my @link_options = ("Local", "ADSL", "Modem");
+        $self->{link} = Wx::Choice->new($panel, -1);
+        $grid_sizer->Add($self->{link},
+                 1, wxALL|wxEXPAND, 5);
+        $self->{link}->AppendItems(\@link_options);
+        $self->{link}->Select(0);
+        # FIXME Introduce previous user selection here
+    }
 
 	# port goes here!
 	$self->{connect_button} = Wx::Button->new($panel, -1, "Connect");
@@ -243,7 +248,7 @@ sub proxy_connection_error {
 sub OnClickConnect {
     my( $self, $event ) = @_;
     $self->{state} = "";
-    %connect_info = ( link       => cfg('client.link'),
+    %connect_info = ( link       => cfg('client.force.link', 0) // cfg('client.link'),
 		      audio      => cfg('client.audio.enable'),
 		      printing   => cfg('client.printing.enable'),
 		      geometry   => cfg('client.geometry'),
@@ -251,7 +256,8 @@ sub OnClickConnect {
 		      keyboard	 => $self->DetectKeyboard,
 		      port       => $DEFAULT_PORT,
 		      ssl	 => $USE_SSL,
-		      map { $_ => $self->{$_}->GetValue } qw(host username password) );
+              host => cfg('client.force.host.name', 0) // $self->{host}->GetValue,
+		      map { $_ => $self->{$_}->GetValue } qw(username password) );
 
     $connect_info{port} = $1 if $connect_info{host} =~ s/:(\d+)$//;
 
@@ -414,15 +420,21 @@ sub DetectKeyboard {
 
 sub EnableControls {
     my ($self, $enabled) = @_;
-    $self->{$_}->Enable($enabled) for qw(connect_button host username password link);
+    $self->{$_}->Enable($enabled) for qw(connect_button username password);
+    if (!cfg('client.force.link',      0)) { $self->{link}->Enable($enabled); }
+    if (!cfg('client.force.host.name', 0)) { $self->{host}->Enable($enabled); }
 }
 
 sub SaveConfiguration {
     my $self = shift;
     set_core_cfg('client.user.name', $self->{username}->GetValue());
-    set_core_cfg('client.host.name', $self->{host}->GetValue());
+    if (!cfg('client.force.host.name', 0)) {
+        set_core_cfg('client.host.name', $self->{host}->GetValue());
+    }
     #set_core_cfg('client.host.port', $self->{port}->GetValue());
-    set_core_cfg('client.link', lc($self->{link}->GetStringSelection()));
+    if (!cfg('client.force.link', 0)) {
+        set_core_cfg('client.link', lc($self->{link}->GetStringSelection()));
+    }
         
     #set_core_cfg('client.audio.enable', $self->{audio}->GetValue());
     #set_core_cfg('client.printing.enable', $self->{printing}->GetValue());
