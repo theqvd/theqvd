@@ -35,7 +35,7 @@ sub netmask_n {
 
 sub netstart_n {
     $netstart_n //= do {
-        my $a = cfg('vm.network.start');
+        my $a = cfg('vm.network.ip.start');
         net_aton($a);
     }
 }
