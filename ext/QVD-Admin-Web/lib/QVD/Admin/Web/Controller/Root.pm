@@ -30,8 +30,8 @@ sub about :Local {
     my ( $self, $c ) = @_;
     $c->go('login', @_) unless $c->user_exists;
     
-    $c->stash->{data} = $c->model('QVD::Admin::Web');
-
+    #$c->stash->{data} = $c->model('QVD::Admin::Web');
+    $c->stash->{version} = $c->model('QVD::Admin::Web')->version;
 }
 
 sub propget :Local {
