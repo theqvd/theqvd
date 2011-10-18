@@ -516,6 +516,7 @@ sub cmd_vm_add {
             my $key = $params{osf};
             my $rs = rs(OSF)->search({name => $key});
             die "$key: No such OSF" if ($rs->count() < 1);
+            warn "overriding supplied param 'osf_id'\n" if defined $params{osf_id};
             $params{osf_id} = $rs->single->id;
             delete $params{osf};
         }
@@ -523,6 +524,7 @@ sub cmd_vm_add {
             my $key = $params{user};
             my $rs = rs(User)->search({login => $key});
             die "$key: No such user" if ($rs->count() < 1);
+            warn "overriding supplied param 'user_id'\n" if defined $params{user_id};
             $params{user_id} = $rs->single->id;
             delete $params{user};
         }

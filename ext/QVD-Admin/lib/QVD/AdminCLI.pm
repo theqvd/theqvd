@@ -36,7 +36,7 @@ my %syntax_check_cbs = (
     di => {
        add => sub {
             my ($errors, $args) = @_;
-            $$errors++, warn "Syntax error: parameter 'osf' is mandatory\n",  unless exists $args->{'osf_id'};
+            $$errors++, warn "Syntax error: parameter 'osf_id' is mandatory\n",  unless exists $args->{'osf_id'};
             $$errors++, warn "Syntax error: parameter 'path' is mandatory\n", unless exists $args->{'path'};
             delete @$args{qw/osf_id path/};
         },
@@ -73,15 +73,13 @@ my %syntax_check_cbs = (
     vm => {
         add => sub {
             my ($errors, $args) = @_;
-            $$errors++, warn "Syntax error: parameter 'osf' is mandatory\n",  unless exists $args->{'osf'};
-            $$errors++, warn "Syntax error: parameter 'user' is mandatory\n", unless exists $args->{'user'};
+            $$errors++, warn "Syntax error: either parameter 'osf_id' or 'osf' is mandatory\n",  if !exists $args->{'osf_id'} and !exists $args->{'osf'};
+            $$errors++, warn "Syntax error: either parameter 'user_id' or 'user' is mandatory\n", if !exists $args->{'user_id'} and !exists $args->{'user'};
+            $$errors++, warn "Syntax error: parameters 'osf_id' and 'osf' are mutually exclusive\n",  if exists $args->{'osf_id'} and exists $args->{'osf'};
+            $$errors++, warn "Syntax error: parameters 'user_id' and 'user' are mutually exclusive\n", if exists $args->{'user_id'} and exists $args->{'user'};
             $$errors++, warn "Syntax error: parameter 'name' is mandatory\n", unless exists $args->{'name'};
-            delete @$args{qw/osf user name ip/};
+            delete @$args{qw/osf_id osf user_id user name ip/};
         },
-        modify => sub {
-            my ($errors, $args) = @_;
-            
-        }
     },
 );
 
@@ -136,10 +134,14 @@ sub _syntax_check {
         $syntax_check_cbs{$obj}{$cmd}->(\$self->{errors}, \%args);
     }
 
+    ## choke on not-yet-handled arguments, except for the following
+    ## - '* edit'
+    ## - '* propdel', '* propget', '* propset'
+    ## - 'config *'   (but not 'config ssl', which has been already handled)
     if (%args and
-        $cmd ne 'edit' and                      # some commands actually accept extra arguments
+        $cmd ne 'edit' and
         $cmd !~ /^prop(?:del|get|set)$/ and
-        ($obj ne 'config' or $cmd eq 'ssl')) {  # 'config ssl' doesn't
+        ($obj ne 'config' or $cmd eq 'ssl')) {
 
         $self->{errors}++;
         warn sprintf "Syntax error: too many arguments: '%s'\n", join q{', '}, sort keys %args;
@@ -150,7 +152,7 @@ sub _syntax_check {
 
         if (my $help_cb = $self->can("help_${obj}_${cmd}")) {
             print "\n";
-            $help_cb->($self);
+            $help_cb->();
         }
         exit 1;
     }
@@ -274,7 +276,7 @@ sub cmd_config_del {
     my $self = shift;
     my $ci = 0;
     if (scalar @_ eq 0) {
-        print "Are you sure you want to block all machines? [y/N] ";
+        print "Are you sure you want to delete all configuration variables? [y/N] ";
         my $answer = <STDIN>;
         exit 0 unless $answer =~ /^y/i;
     } 
@@ -447,7 +449,7 @@ EOT
 }
 
 sub cmd_host_list {
-    my ($self, @args) = @_;
+    my ($self) = @_;
 
     my $rs = $self->get_resultset('host');
     my @header = ("Id", "Name", "Address ","HKD", "Usable RAM", "Usable CPU", "VMs assigned", "Blocked", "State");
@@ -623,7 +625,7 @@ sub cmd_osf_del {
     eval {
         $self->_obj_del('osf', @_);
         my $count = $self->{admin}->cmd_osf_del();
-        $self->_print("$count osfs deleted.");
+        $self->_print("$count OSFs deleted.");
     };
     if ($@) {
         #$self->_print("Wrong syntax, check the command help:\n");
@@ -643,7 +645,7 @@ EOT
 }
 
 sub cmd_osf_list {
-    my ($self, @args) = @_;
+    my ($self) = @_;
     my $rs = $self->get_resultset('osf');
     my @header = qw(Id Name RAM UserHD);
     my @body;
@@ -720,7 +722,7 @@ EOT
 }
 
 sub cmd_di_list {
-    my ($self, @args) = @_;
+    my ($self) = @_;
     eval {
         my @body;
         my $rs = $self->get_resultset('di');
@@ -979,7 +981,7 @@ sub cmd_vm_add {
 sub help_vm_add {
     print <<EOT
 vm add: Adds virtual machines.
-usage: vm add name=value user_id=value osf_id=value ip=value storage=value
+usage: vm add name=value (user=value | user_id=value) (osf=value | osf_id=value) [ip=value] [storage=value]
        
 Valid options:
     -q [--quiet]         : don't print the command message
@@ -1067,7 +1069,7 @@ EOT
 }
 
 sub cmd_vm_disconnect_user {
-    my ($self, @args) = @_;
+    my ($self) = @_;
     if (scalar %{$self->{admin}{filter}} eq 0) {
         print "Are you sure you want to disconnect all users? [y/N] ";
         my $answer = <STDIN>;
@@ -1127,7 +1129,7 @@ EOT
 }
 
 sub cmd_vm_list {
-    my ($self, @args) = @_;
+    my ($self) = @_;
     
     my $rs = $self->get_resultset('vm');
     
@@ -1301,7 +1303,7 @@ EOT
 }
 
 sub cmd_vm_start {
-    my ($self, @args) = @_;
+    my ($self) = @_;
     
     if (scalar %{$self->{admin}{filter}} eq 0) {
         print "Are you sure you want to start all machines? [y/N] ";
@@ -1331,7 +1333,7 @@ EOT
 }
 
 sub cmd_vm_stop {
-    my ($self, @args) = @_;
+    my ($self) = @_;
     
     if (scalar %{$self->{admin}{filter}} eq 0) {
         print "Are you sure you want to stop all machines? [y/N] ";
