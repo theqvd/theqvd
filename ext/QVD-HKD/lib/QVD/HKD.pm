@@ -105,7 +105,7 @@ sub run {
     INFO "HKD up and running";
 
     while (1) {
-	INFO "HKD round $hkd->{round}";
+	INFO "HKD round $hkd->{round}" unless $hkd->{round} % 10;
 	if ($hkd->_check_storage and
             $hkd->_check_db) {
 	    $hkd->{round}++;
