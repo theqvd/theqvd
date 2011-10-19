@@ -30,6 +30,11 @@ sub reset_status {
 
 sub set_error {
     my ( $self, $msg ) = @_;
+
+    ## $msg can be "Foo bar\n at /blah/blah/.../DBIx/Class/Storage.pm line 126\n"
+    ## we want a clean error message for the WAT
+    $msg =~ s/\n* at \S+ line \d+\n*$//s;
+
     $self->{status}    = 0;
     $self->{error_msg} = $msg;
     DEBUG "$self->set_error($msg)";
