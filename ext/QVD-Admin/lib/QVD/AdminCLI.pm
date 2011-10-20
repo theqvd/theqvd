@@ -855,14 +855,30 @@ Valid options:
 EOT
 }
 
+# FIXME use a real password prompt library
 sub _read_password {
     my ($self, $for_user) = @_;
+    system 'stty -echo';
+
     print "New password for $for_user: ";
-    # FIXME use a real password prompt library
-    my $password = <STDIN>;
-    chomp $password;
-    $password
+    my $password1 = <STDIN>;
+    print "\n";
+    chomp $password1;
+
+    print "Again: ";
+    my $password2 = <STDIN>;
+    print "\n";
+    chomp $password2;
+
+    system 'stty echo';
+
+    if ($password1 ne $password2) {
+        warn "Entered passwords don't match\n";
+        return;
+    }
+    $password1
 }
+END { system 'stty echo'; }
 
 sub cmd_user_passwd {
     my ($self, $user) = @_;
@@ -870,6 +886,7 @@ sub cmd_user_passwd {
 
     eval {
         my $passwd = $self->_read_password($args{'user'});
+        return unless defined $passwd;
         $self->{admin}->set_password($args{'user'}, $passwd);
     };
     if ($@) {
