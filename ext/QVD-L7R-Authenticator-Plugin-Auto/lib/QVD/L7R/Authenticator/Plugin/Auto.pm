@@ -13,8 +13,6 @@ use parent qw(QVD::L7R::Authenticator::Plugin);
 my $osf_id = cfg('auth.auto.osf_id');
 my $di_tag = cfg('auth.auto.di_tag', 0) // 'default';
 
-sub authenticate_basic {1}
-
 sub before_list_of_vms {
     my ($plugin, $auth) = @_;
     my $login = $auth->{login};
