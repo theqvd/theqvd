@@ -1,0 +1,6 @@
+Revision history for Perl extension QVD::HKD.
+
+0.01  Wed Jun 15 13:43:40 2011
+	- original version; created by h2xs 1.23 with options
+		-AXn QVD::HKD
+

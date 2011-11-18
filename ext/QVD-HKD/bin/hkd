@@ -1,0 +1,27 @@
+#!/usr/bin/perl
+
+BEGIN {
+    # close file handles from parent in order to workaround some
+    # interaction between lxc and certain terminal emulators
+    # (i.e. mrxvt)
+    my $this = fileno(DATA);
+    for (2..1000) { open my $fh, ">&=$_" and close $fh unless $_ == $this }
+}
+
+use strict;
+use warnings;
+use QVD::HKD;
+
+use Getopt::Long;
+
+$SIG{'INT'} = sub { die };
+
+
+
+my ($config_file);
+GetOptions("config-file|f=s" => \$config_file);
+
+my $hkd = QVD::HKD->new(config_file => $config_file);
+$hkd->run;
+
+undef $hkd;

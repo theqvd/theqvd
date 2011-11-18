@@ -1,0 +1,6 @@
+Changes
+Makefile.PL
+MANIFEST
+README
+t/QVD-HKD.t
+lib/QVD/HKD.pm
