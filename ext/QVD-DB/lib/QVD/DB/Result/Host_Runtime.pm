@@ -6,7 +6,7 @@ __PACKAGE__->table('host_runtimes');
 __PACKAGE__->add_columns( host_id    => { data_type   => 'integer' },
 			  pid        => { data_type   => 'integer',
 				          is_nullable => 1 },
-			  ok_ts      => { data_type   => 'integer',
+			  ok_ts      => { data_type   => 'timestamp',
 				          is_nullable => 1 },
 			  # Memory available for VMs, in MBs
 			  usable_ram => { data_type   => 'real',
