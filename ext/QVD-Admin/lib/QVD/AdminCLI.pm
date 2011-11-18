@@ -858,6 +858,7 @@ EOT
 # FIXME use a real password prompt library
 sub _read_password {
     my ($self, $for_user) = @_;
+    # FIXME: use Term::ReadKey module for setting tty input mode and for reading lines!
     system 'stty -echo';
 
     print "New password for $for_user: ";
