@@ -496,14 +496,14 @@ sub _run_hook {
     if (defined $meta) {
         my $hook = "$meta/hooks/$name";
         if (-f $hook) {
-            my @args = map { $_ => $self->{$_} }, qw(vm_id
-                                                     use_overlay
-                                                     os_meta
-                                                     mac
-                                                     name
-                                                     ip
-                                                     os_rootfs
-                                                     lxc_name);
+            my @args = map { $_ => $self->{$_} } qw(vm_id
+                                                    use_overlay
+                                                    os_meta
+                                                    mac
+                                                    name
+                                                    ip
+                                                    os_rootfs
+                                                    lxc_name);
 
             $debug and $self->_debug("running hook $hook for $name");
             return $self->_run_cmd([$hook => @args]);
