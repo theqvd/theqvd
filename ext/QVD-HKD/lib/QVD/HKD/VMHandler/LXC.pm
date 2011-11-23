@@ -192,13 +192,13 @@ use Class::StateMachine::Declarative
 
     'failed'                          => { enter       => '_call_on_stopped' };
 
-sub leave_state :OnState('starting/waiting_for_vma') {
-    my ($self, undef, $target) = @_;
-    $debug and $self->_debug("leave_state target: $target");
-    unless ($target =~ /^running/) {
-        $self->_stop_vma_monitor;
-    }
-}
+#sub leave_state :OnState('starting/waiting_for_vma') {
+#    my ($self, undef, $target) = @_;
+#    $debug and $self->_debug("leave_state target: $target");
+#    unless ($target =~ /^running/) {
+#        $self->_stop_vma_monitor;
+#    }
+#}
 
 sub _on_cmd_stop :OnState('__any__') { shift->delay_until_next_state }
 
@@ -496,14 +496,16 @@ sub _run_hook {
     if (defined $meta) {
         my $hook = "$meta/hooks/$name";
         if (-f $hook) {
-            my @args = map { $_ => $self->{$_} } qw(vm_id
-                                                    use_overlay
-                                                    os_meta
-                                                    mac
-                                                    name
-                                                    ip
-                                                    os_rootfs
-                                                    lxc_name);
+            my @args = ( id    => $self->{vm_id},
+                         hook  => $name,
+                         state => $self->_main_state,
+                         map { $_ => $self->{$_} } qw( use_overlay
+                                                       os_meta
+                                                       mac
+                                                       name
+                                                       ip
+                                                       os_rootfs
+                                                       lxc_name ));
 
             $debug and $self->_debug("running hook $hook for $name");
             return $self->_run_cmd([$hook => @args]);
@@ -512,5 +514,6 @@ sub _run_hook {
     $debug and $self->_debug("no hook for $name");
     $self->_on_run_hook_done;
 }
+
 
 1;
