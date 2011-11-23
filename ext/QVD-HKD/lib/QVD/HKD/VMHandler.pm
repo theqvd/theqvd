@@ -123,17 +123,18 @@ sub _save_runtime_row {
     $self->{serial_port} = $self->_allocate_tcp_port if $self->_cfg('vm.serial.redirect');
     $self->{mon_port}    = $self->_allocate_tcp_port if $self->_cfg('internal.vm.monitor.redirect');
 
-    $self->_query_1(<<'SQL', @{$self}{qw(vma_port x_port ssh_port vnc_port serial_port mon_port vm_id)});
+    $self->_query_1(<<'SQL', @{$self}{qw(ip vma_port x_port ssh_port vnc_port serial_port mon_port vm_id)});
 update vm_runtimes
     set
-        vm_vma_port    = $1,
-        vm_x_port      = $2,
-        vm_ssh_port    = $3,
-        vm_vnc_port    = $4,
-        vm_serial_port = $5,
-        vm_mon_port    = $6
+        vm_address     = $1,
+        vm_vma_port    = $2,
+        vm_x_port      = $3,
+        vm_ssh_port    = $4,
+        vm_vnc_port    = $5,
+        vm_serial_port = $6,
+        vm_mon_port    = $7
     where
-        vm_id          = $7
+        vm_id          = $8
 SQL
 }
 
