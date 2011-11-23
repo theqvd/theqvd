@@ -6,6 +6,9 @@ BEGIN {
     # (i.e. mrxvt)
     my $this = fileno(DATA);
     for (2..1000) { open my $fh, ">&=$_" and close $fh unless $_ == $this }
+
+    # VMA monitor will use the proxy if http_proxy is defined.
+    delete $ENV{http_proxy};
 }
 
 use strict;
