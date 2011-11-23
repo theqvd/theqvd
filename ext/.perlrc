@@ -1,0 +1,13 @@
+#!/usr/bin/perl
+
+use strict;
+use warnings;
+use File::Tee qw(tee);
+
+use lib::glob '*/lib:../g/p5*/lib';
+
+my $name = $0;
+$name =~ s/.*\///;
+tee(*STDOUT, '>', "/tmp/$name.out");
+
+open STDERR, '>&STDOUT';
