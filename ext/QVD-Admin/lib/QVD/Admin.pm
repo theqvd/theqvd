@@ -62,7 +62,7 @@ sub get_resultset {
     }
     my $method = $self->can("get_result_set_for_${obj}");
     if ($method) {
-        $self->$method;
+        return $self->$method;
     }
     my $rs = rs($db_object);
     $rs = $rs->search($self->{filter})
