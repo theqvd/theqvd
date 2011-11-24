@@ -7,7 +7,7 @@ use 5.010;
 our $debug = 1;
 
 $Class::StateMachine::debug ||= -1;
-$AnyEvent::Pg::debug ||= -1;
+$AnyEvent::Pg::debug ||= 2;
 
 use strict;
 use warnings;
