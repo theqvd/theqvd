@@ -1,7 +1,0 @@
-Changes
-Makefile.PL
-MANIFEST
-README
-t/AnyEvent-Pg.t
-lib/AnyEvent/Pg.pm
-META.yml                                 Module meta-data (added by MakeMaker)

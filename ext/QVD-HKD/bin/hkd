@@ -11,6 +11,8 @@ BEGIN {
     delete $ENV{http_proxy};
 }
 
+$AnyEvent::Pg::debug = -1;
+
 use strict;
 use warnings;
 use QVD::HKD;
