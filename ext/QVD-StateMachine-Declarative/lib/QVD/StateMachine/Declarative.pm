@@ -1,38 +1,105 @@
 package QVD::StateMachine::Declarative;
 
-use 5.014002;
-use strict;
-use warnings;
-
-require Exporter;
-
-our @ISA = qw(Exporter);
-
-# Items to export into callers namespace by default. Note: do not export
-# names by default without a very good reason. Use EXPORT_OK instead.
-# Do not simply export all your public functions/methods/constants.
-
-# This allows declaration	use QVD::StateMachine::Declarative ':all';
-# If you do not need this, moving things directly into @EXPORT or @EXPORT_OK
-# will save memory.
-our %EXPORT_TAGS = ( 'all' => [ qw(
-	
-) ] );
-
-our @EXPORT_OK = ( @{ $EXPORT_TAGS{'all'} } );
-
-our @EXPORT = qw(
-	
-);
+sub _clean_eval { eval shift }
 
 our $VERSION = '0.01';
 
+use 5.010;
 
-# Preloaded methods go here.
+use strict;
+use warnings;
+
+use Carp;
+BEGIN { our @CARP_NOT = qw(Class::StateMachine Class::StateMachine::Private) }
+use Class::StateMachine;
+use mro;
+
+require parent;
+
+sub import {
+    shift;
+    init_class(scalar(caller), @_);
+}
+
+my $usage = 'usage: use QVD::StateMachine::Declarative state => { enter => action, leave => action, transitions => { event => final_state, ...}, ignore => [ event, ...] }, state => { ... }, ...;';
+
+sub _action {
+    my $action = shift;
+    given (ref $action) {
+        when ('CODE') {
+            return $action;
+        }
+        when ('') {
+            if ($action =~ /^\w+(?:::\w)*$/) {
+                return sub { shift->$action };
+            }
+            else {
+                my ($pkg, $fn, $line) = caller(1);
+                my $sub = _clean_eval <<SUB;
+sub {
+    package $pkg;
+    my \$self = shift;
+    # line $line $fn
+    $action
+}
+SUB
+                die $@ if $@;
+                return $sub;
+            }
+        }
+        default {
+            croak "$action is not a valid action";
+        }
+    }
+}
+
+sub init_class {
+     my ($class, %states) = @_;
+
+     for my $state (keys %states) {
+         my $decl = $states{$state};
+         if (exists $decl->{jump}) {
+             keys %$decl > 1 and croak "jump declaration can not be mixed with other keys";
+             my $target_state = $decl->{jump};
+             Class::StateMachine::install_method($class, 'enter_state', sub { shift->state($target_state) }, $state);
+         }
+         else {
+             while (my ($type, $arg) = each %$decl) {
+                 given ($type) {
+                     when([qw(enter leave)]) {
+                         Class::StateMachine::install_method($class, "${_}_state", _action($arg), $state);
+                     }
+                     when ('transitions') {
+                         ref $arg eq 'HASH' or croak "$arg is not a hash reference, $usage";
+                         while (my ($event, $final) = each %$arg) {
+                             Class::StateMachine::install_method($class, $event,
+                                                                 sub { shift->state($final) },
+                                                                 $state);
+                         }
+                     }
+                     when ('delay') {
+                         ref $arg eq 'ARRAY' or croak "$arg is not an array reference, $usage";
+                         Class::StateMachine::install_method($class, $_,
+                                                             sub { shift->delay_until_next_state },
+                                                             $state)
+                                 for @$arg
+                     }
+                     when ('ignore') {
+                         ref $arg eq 'ARRAY' or croak "$arg is not an array reference, $usage";
+                         Class::StateMachine::install_method($class, $_, sub {}, $state)
+                                 for @$arg;
+                     }
+                     default {
+                         croak "invalid option '$type', $usage";
+                     }
+                 }
+             }
+         }
+     }
+}
 
 1;
 __END__
-# Below is stub documentation for your module. You'd better edit it!
 
 =head1 NAME
 
@@ -40,44 +107,64 @@ QVD::StateMachine::Declarative - Perl extension for blah blah blah
 
 =head1 SYNOPSIS
 
-  use QVD::StateMachine::Declarative;
-  blah blah blah
+
+  package Dog;
+
+  use parent 'Class::StateMachine';
+
+  use QVD::StateMachine::Declarative
+      __any__  => { enter       => sub { say "entering state $_[0]" },
+                    leave       => sub { say "leaving state $_[0" },
+      happy    => { transitions => { on_knocked_down => 'injuried',
+                                     on_kicked       => 'angry' } },
+      injuried => { transitions => { on_sleep        => 'happy' } },
+      angry    => { 'enter+'    => sub { shift->bark },
+                    'leave+'    => sub { shift->bark },
+                    transitions => { on_feed         => 'happy',
+                                     on_knocked_down => 'injuried' },
+                    ignore      => ['on_kicked'] };
+
+  sub new {
+    my $class = shift;
+    my $self = {};
+    # starting state is set here:
+    Class::StateMachine::bless $self, $class, 'happy';
+    $self;
+  }
+
+  # events (mehotds) that do not cause a state change:
+  sub on_touched_head : OnState(happy) { shift->move_tail }
+  sub on_touched_head : OnState(injuried) { shift->bark('') }
+  sub on_touched_head : OnState(angry) { shift->bite }
+
+
+  package main;
+
+  my $dog = Dog->new;
+  $dog->on_touched_head; # the dog moves his tail
+  $dog->on_kicked;
+  $dog->on_touched_head; # the dog bites you
+  $dog->on_injuried;
+  $dog->on_touched_head; # the dog barks
+  $dog->on_sleep;
+  $dog->on_touched_head; # the dog moves his tail
+
 
 =head1 DESCRIPTION
 
-Stub documentation for QVD::StateMachine::Declarative, created by h2xs. It looks like the
-author of the extension was negligent enough to leave the stub
-unedited.
-
-Blah blah blah.
-
-=head2 EXPORT
-
-None by default.
-
-
+QVD::StateMachine::Declarative is a L<Class::StateMachine> extension
+that allows to define most of a state machine class declaratively.
 
 =head1 SEE ALSO
 
-Mention other useful documentation such as the documentation of
-related modules or operating system documentation (such as man pages
-in UNIX), or any relevant external documentation such as RFCs or
-standards.
-
-If you have a mailing list set up for your module, mention it here.
-
-If you have a web site set up for your module, mention it here.
-
-=head1 AUTHOR
-
-root, E<lt>root@nonetE<gt>
+L<Class::StateMachine>.
 
 =head1 COPYRIGHT AND LICENSE
 
-Copyright (C) 2011 by root
+Copyright (C) 2011 by Salvador FandiE<ntilde>o <sfandino@yahoo.com>
 
 This library is free software; you can redistribute it and/or modify
-it under the same terms as Perl itself, either Perl version 5.14.2 or,
+it under the same terms as Perl itself, either Perl version 5.12.4 or,
 at your option, any later version of Perl 5 you may have available.
 
 
