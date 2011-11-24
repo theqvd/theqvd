@@ -29,7 +29,7 @@ use QVD::HKD::VMHandler;
 
 use parent qw(QVD::HKD::Agent);
 
-use Class::StateMachine::Declarative
+use QVD::StateMachine::Declarative
     new                          => { transitions => { _on_run                => 'starting/connecting_to_db'  } },
 
     'starting/connecting_to_db'  => { enter       => '_start_db',

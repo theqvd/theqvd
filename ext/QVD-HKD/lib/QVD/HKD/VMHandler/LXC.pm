@@ -15,7 +15,7 @@ use File::Temp qw(tempfile);
 
 use parent qw(QVD::HKD::VMHandler);
 
-use Class::StateMachine::Declarative
+use QVD:StateMachine::Declarative
     'new'                             => { transitions => { _on_cmd_start                => 'starting' } },
 
     'starting'                        => { jump        => 'starting/saving_state' },

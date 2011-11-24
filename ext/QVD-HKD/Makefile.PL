@@ -4,7 +4,7 @@ use ExtUtils::MakeMaker;
 WriteMakefile( NAME          => 'QVD::HKD',
                VERSION       => '0.1'.$ENV{BUILD_NUMBER},
                PREREQ_PM     => { 'Class::StateMachine' => '0.17',
-                                  'Class::StateMachine::Declarative' => '0',
+                                  'QVD::StateMachine::Declarative' => '0',
                                   'AnyEvent' => '5.34',
                                   'AnyEvent:HTTP' => '2.13',
                                   'Pg::PQ' => '0.05',
