@@ -1,0 +1,63 @@
+#!/usr/bin/perl
+
+BEGIN {
+    # close file handles from parent in order to workaround some
+    # interaction between lxc and certain terminal emulators
+    # (i.e. mrxvt)
+    my $this = fileno(DATA);
+    for (2..1000) { open my $fh, ">&=$_" and close $fh unless $_ == $this }
+
+    # VMA monitor will use the proxy if http_proxy is defined.
+    delete $ENV{http_proxy};
+}
+
+use strict;
+use warnings;
+use Getopt::Long;
+use Config::Properties;
+use QVD::Config::Defaults;
+use App::Daemon qw/daemonize/;
+
+
+# For simplicity replicate here the configuration handling code as
+# QVD::HKD::Config is not usable at this point.
+# FIXME: remove code duplication
+
+my $cfg;
+sub core_cfg {
+    my $value = $cfg->requireProperty(@_);
+    $value =~ s/\${(.*?)}/$1 eq '{' ? '${' : core_cfg($1)/ge;
+    $value;
+}
+
+# FIXME: just for debugging!
+$SIG{'INT'} = sub { die };
+
+my $config_file = '/etc/qvd/node.conf';
+my $foreground = 0;
+GetOptions("config-file|f=s" => \$config_file,
+           "X"               => \$foreground);
+
+$cfg = Config::Properties->new(defaults => $QVD::Config::defaults);
+open my $fh, '<', $config_file or die "unable to open configuration file $config_file\n";
+$cfg->load($fh);
+close $fh;
+
+my $path_run = core_cfg('path.run');
+mkdir $path_run, 0755;
+
+unless (-d $path_run) {
+    die "Unable to create directory $path_run\n";
+    exit (1);
+}
+
+$App::Daemon::pidfile = core_cfg('hkd.pid_file');
+$App::Daemon::as_user = core_cfg('hkd.as_user');
+$App::Daemon::background = 0 if $foreground;
+daemonize;
+
+require QVD::HKD;
+my $hkd = QVD::HKD->new(config_file => $config_file);
+$hkd->run;
+
+undef $hkd;

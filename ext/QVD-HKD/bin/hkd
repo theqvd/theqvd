@@ -21,7 +21,7 @@ $SIG{'INT'} = sub { die };
 
 
 
-my ($config_file);
+my $config_file = '/etc/qvd/node.conf';
 GetOptions("config-file|f=s" => \$config_file);
 
 my $hkd = QVD::HKD->new(config_file => $config_file);

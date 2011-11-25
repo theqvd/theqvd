@@ -107,10 +107,10 @@ l7r.loadbalancer.plugin.default.weight.ram = 1
 l7r.loadbalancer.plugin.default.weight.cpu = 1
 l7r.loadbalancer.plugin.default.weight.random = 1
 
-## user to run noded as
-noded.as_user = root
-## path to the noded PID file
-noded.pid_file = ${path.run}/hkd.pid
+## user to run hkd as
+hkd.as_user = root
+## path to the hkd PID file
+hkd.pid_file = ${path.run}/hkd.pid
 
 ## username of the WAT administrator
 wat.admin.login = admin

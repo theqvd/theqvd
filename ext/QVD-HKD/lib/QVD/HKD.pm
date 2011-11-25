@@ -53,12 +53,10 @@ use QVD::StateMachine::Declarative
     failed                       => { enter       => '_on_failed'                                               };
 
 
-my %defaults = (config_file => '/etc/qvd/node.conf');
-
 sub new {
     my ($class, %opts) = @_;
-    $opts{$_} //= $defaults{$_} for keys %defaults;
-    my $config_file = delete $opts{config_file};
+    # $opts{$_} //= $defaults{$_} for keys %defaults;
+    my $config_file = delete $opts{config_file} // croak "configuration file missing";
 
     my $self = $class->SUPER::new(%opts);
     $self->{config} = QVD::HKD::Config->new(config_file => $config_file,
