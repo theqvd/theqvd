@@ -7,7 +7,6 @@ use strict;
 
 use QVD::Config;
 use QVD::Log;
-use QVD::HTTP::StatusCodes;
 use Net::LDAP;
 use parent qw(QVD::L7R::Authenticator::Plugin);
 

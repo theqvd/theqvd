@@ -13,7 +13,6 @@ WriteMakefile( NAME          => 'QVD::L7R::Authenticator::Plugin::Ldap',
 				  'QVD::Config'      => 0,
 				  'QVD::L7R'         => 0,
 				  'QVD::Log'         => 0,
-				  'QVD::StatusCodes' => 0,
 				  'Net::LDAP'        => 0 },
 	       dist          => { COMPRESS => 'gzip -9f', SUFFIX => 'gz', },
 	       clean         => { FILES => 'QVD-L7R-Authenticator-Plugin-Ldap-*' } );
