@@ -188,6 +188,7 @@ vma.user.default.groups =
 ## external executables the VMA calls when some events happen
 vma.on_action.pre-connect =
 vma.on_action.connect =
+vma.on_action.stop =
 vma.on_action.disconnect =
 vma.on_action.suspend =
 vma.on_action.poweroff =
