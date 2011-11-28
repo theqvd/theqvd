@@ -110,7 +110,7 @@ This module encapsulate configuration access.
 
     use QVD::Config;
     my $foo = cfg('field');
-    my $bar = cfg('bar', $default_bar);
+    my $bar = cfg('bar', $is_mandatory);
 
 =head1 DESCRIPTION
 
@@ -122,7 +122,7 @@ FIXME Write the description
 
 =item cfg($key)
 
-=item cfg($key, $default)
+=item cfg($key, $is_mandatory)
 
 Returns the configuration associated to the given key.
 
@@ -131,7 +131,7 @@ given or otherwise undef.
 
 =item core_cfg($key)
 
-=item core_cfg($key, $default)
+=item core_cfg($key, $is_mandatory)
 
 Returns configuration entries from the local file config.ini
 
