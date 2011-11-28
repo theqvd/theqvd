@@ -2,7 +2,7 @@ Changes
 MANIFEST
 Makefile.PL
 README
-lib/QVD/L7R/Authenticator/Plugin/LDAP.pm
+lib/QVD/L7R/Authenticator/Plugin/Ldap.pm
 t/00-load.t
 t/manifest.t
 t/pod-coverage.t

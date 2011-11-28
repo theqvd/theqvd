@@ -211,6 +211,8 @@ sub _become_user {
     ($<, $>) = ($uid, $uid);
     $ENV{'HOME'} = $home;
     $ENV{'LOGNAME'} = $user;
+    $ENV{'USER'} = $user;
+    $ENV{'MAIL'} = '/var/mail/'.$user;
     chdir $home;
 }
 
