@@ -113,6 +113,12 @@ hkd.as_user = root
 ## path to the hkd PID file
 hkd.pid_file = ${path.run}/hkd.pid
 
+## user to run l7r as
+l7r.as_user = root
+## path to the l7r PID file
+l7r.pid_file = ${path.run}/l7r.pid
+
+
 ## username of the WAT administrator
 wat.admin.login = admin
 # wat.admin.password =
