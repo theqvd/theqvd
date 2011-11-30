@@ -14,6 +14,7 @@ use warnings;
 no warnings 'redefine';
 
 use Carp;
+use File::Slurp qw(slurp);
 use Pg::PQ qw(:pgres);
 use AnyEvent;
 use AnyEvent::Pg;
@@ -30,27 +31,30 @@ use QVD::HKD::VMHandler;
 use parent qw(QVD::HKD::Agent);
 
 use QVD::StateMachine::Declarative
-    new                          => { transitions => { _on_run                => 'starting/connecting_to_db'  } },
+    new                            => { transitions => { _on_run                    => 'starting/connecting_to_db'    } },
 
-    'starting/connecting_to_db'  => { enter       => '_start_db',
-                                      transitions => { _on_db_connected       => 'starting/loading_db_config' } },
+    'starting/connecting_to_db'    => { enter       => '_start_db',
+                                        transitions => { _on_db_connected           => 'starting/loading_db_config'   } },
 
-    'starting/loading_db_config' => { enter       => '_start_config',
-                                      transitions => { _on_config_reloaded    => 'starting/loading_host_row'  } },
+    'starting/loading_db_config'   => { enter       => '_start_config',
+                                        transitions => { _on_config_reloaded        => 'starting/loading_host_row'    } },
 
-    'starting/loading_host_row'  => { enter       => '_load_host_row',
-                                      transitions => { _on_load_host_row_done => 'starting/ticking'           } },
+    'starting/loading_host_row'    => { enter       => '_load_host_row',
+                                        transitions => { _on_load_host_row_done     => 'starting/saving_loadbal_data' } },
 
-    'starting/ticking'           => { enter       => '_start_ticking',
-                                      transitions => { _on_ticked             => 'starting/agents',
-                                                       _on_ticker_error       => 'failed'                     } },
+    'starting/saving_loadbal_data' => { enter       => '_save_loadbal_data',
+                                        transitions => { _on_save_loadbal_data_done => 'starting/ticking'             } },
 
-    'starting/agents'            => { enter       => '_start_agents',
-                                      transitions => { _on_agents_started     => 'running'                    } },
+    'starting/ticking'             => { enter       => '_start_ticking',
+                                        transitions => { _on_ticked                 => 'starting/agents',
+                                                         _on_ticker_error           => 'failed'                       } },
 
-    running                      => { transitions => { _on_cmd_stop           => 'stopping'                   },
-                                      ignore      => ['_on_ticked']                                             },
-    failed                       => { enter       => '_on_failed'                                               };
+    'starting/agents'              => { enter       => '_start_agents',
+                                        transitions => { _on_agents_started         => 'running'                      } },
+
+    running                        => { transitions => { _on_cmd_stop               => 'stopping'                     },
+                                        ignore      => ['_on_ticked']                                                 },
+    failed                         => { enter       => '_on_failed'                                                   };
 
 
 sub new {
@@ -136,6 +140,41 @@ sub _on_load_host_row_result {
     my ($self, $res) = @_;
     $self->{node_id} = $res->row;
 }
+
+sub _calc_load_balancing_data {   ## taken from was_QVD-HKD/lib/QVD/HKD.pm, _update_load_balancing_data
+    my $bogomips;
+
+    open my $fh, '<', '/proc/cpuinfo';
+    (/^bogomips\s*: (\d*\.\d*)/ and $bogomips += $1) foreach <$fh>;
+    close $fh;
+
+    $bogomips *= 0.80; # 20% se reserva para el hipervisor
+
+    # TODO: move this code into an external module!
+    my $meminfo_lines = slurp('/proc/meminfo', array_ref => 1);
+    my %meminfo = map { /^([^:]+):\s*(\d+)/; $1 => $2 } @$meminfo_lines;
+
+    return $bogomips, $meminfo{MemTotal}/1000;
+}
+
+sub _save_loadbal_data {
+    my $self = shift;
+    my ($cpu, $ram) = _calc_load_balancing_data;
+    $self->_query(q(update host_runtimes set usable_cpu=$1, usable_ram=$2 where host_id=$3),
+                  $cpu, $ram, $self->{node_id});
+}
+
+sub _on_save_loadbal_data_bad_result {
+    # FIXME
+    exit(1);
+}
+
+sub _on_save_loadbal_data_error {
+    # FIXME
+    exit(1);
+}
+
+sub _on_save_loadbal_data_result {}
 
 sub _start_ticking {
     my $self = shift;

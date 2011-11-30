@@ -10,9 +10,9 @@ use QVD::Log;
 
 use parent 'QVD::L7R::LoadBalancer::Plugin';
 
-my $weight_ram	  = cfg('l7r.loadbalancer.plugin.default.weight.ram',   1000);
-my $weight_cpu	  = cfg('l7r.loadbalancer.plugin.default.weight.cpu',   1000);
-my $weight_random = cfg('l7r.loadbalancer.plugin.default.weight.random', 100);
+my $weight_ram    = cfg('l7r.loadbalancer.plugin.default.weight.ram',    0) // 1000;
+my $weight_cpu    = cfg('l7r.loadbalancer.plugin.default.weight.cpu',    0) // 1000;
+my $weight_random = cfg('l7r.loadbalancer.plugin.default.weight.random', 0) // 100;
 
 sub get_free_host {
     my %host;
@@ -32,25 +32,28 @@ sub get_free_host {
                                           group_by => ['host_id'] })) {
         my $id = $vms->host_id;
         $host{$id}{vms} = $vms->get_column('vm_count') if defined $id;
-
     }
 
-    my $best;
     for my $id (keys %host) {
-        my $host = $host{$id};
-        my $vms = ++($host->{vms});
-        my $cap = $weight_ram * $host->{ram} / $vms + $weight_cpu * $host->{cpu} / $vms + rand $weight_random;
-        $host->{cap} = $cap;
-        if (!defined $best or $host{$best}{cap} < $cap) {
-            $best = $id;
-        }
+        $host{$id}{cap} =
+            $weight_ram * $host->{ram} / ($host->{vms} + 1) +
+            $weight_cpu * $host->{cpu} / ($host->{vms} + 1) +
+            rand $weight_random;
     }
+
+    my $best = (
+        sort { $host{$a}{cap} <=> $host{$b}{cap} }
+        keys %host
+    )[-1];
 
     # TODO: allow to set limits for the number of virtual machines
     # running on any host and keep (reintroduce) realtime usage of RAM
     # and CPU
 
-    return $best if defined $best;
+    if (defined $best) {
+        $host->{$best}{vms}++;
+        return $best;
+    }
 
 
     my $msg = "Unable to assign vm to host, there is no host available";
