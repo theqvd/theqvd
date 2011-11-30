@@ -115,10 +115,9 @@ use QVD::StateMachine::Declarative
 
     'running/monitoring'              => { enter       => '_start_vma_monitor',
                                            leave       => '_stop_vma_monitor',
-                                           transitions => { _on_cmd_stop                 => 'stopping/powering_off',
+                                           transitions => { _on_cmd_stop                 => 'stopping/deleting_cmd',
                                                             _on_dead                     => 'stopping/stopping_lxc',
                                                             _on_goto_debug               => 'debugging/saving_state',
-                                                            # _on_lxc_done                 => 'stopping/destroying_lxc'
                                                             _on_lxc_done                 => 'stopping/running_poststop_hook' } },
 
     'debugging/saving_state'          => { enter       => '_save_state',
@@ -130,11 +129,13 @@ use QVD::StateMachine::Declarative
     'debugging/waiting_for_vma'       => { enter       => '_start_vma_monitor',
                                            leave       => '_stop_vma_monitor',
                                            transitions => { _on_alive                    => 'running/saving_state',
-                                                            _on_cmd_stop                 => 'stopping/powering_off',
-                                                            # _on_lxc_done                 => 'stopping/destroying_lxc' },
+                                                            _on_cmd_stop                 => 'stopping/deleting_cmd',
                                                             _on_lxc_done                 => 'stopping/running_poststop_hook' },
                                            ignore      => [qw(_on_dead
                                                               _on_goto_debug)] },
+
+    'stopping/deleting_cmd'           => { enter       => '_delete_cmd',
+                                           transitions => { _on_delete_cmd_done          => 'stopping/powering_off' } },
 
     'stopping/powering_off'           => { enter       => '_poweroff',
                                            leave       => '_abort_all',
@@ -145,7 +146,6 @@ use QVD::StateMachine::Declarative
     'stopping/waiting_for_lxc_to_exit'=> { enter       => '_set_state_timer',
                                            leave       => '_abort_all',
                                            transitions => { _on_lxc_done                 => 'stopping/running_poststop_hook',
-                                                            # _on_lxc_done                 => 'stopping/destroying_lxc',
                                                             _on_state_timeout            => 'stopping/stopping_lxc' } },
 
     'stopping/stopping_lxc'           => { enter       => '_stop_lxc',
@@ -200,7 +200,8 @@ use QVD::StateMachine::Declarative
 #    }
 #}
 
-sub _on_cmd_stop :OnState('__any__') { shift->delay_until_next_state }
+sub _on_cmd_stop  :OnState('__any__') { shift->delay_until_next_state }
+sub _on_cmd_start :OnState('__any__') { shift->_maybe_callback('on_cmd_done') }
 
 sub _untar_os_image {
     my $self = shift;

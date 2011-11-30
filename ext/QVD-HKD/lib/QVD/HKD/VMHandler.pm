@@ -42,11 +42,13 @@ sub new {
     my ($class, %opts) = @_;
     my $vm_id = delete $opts{vm_id};
     my $on_stopped = delete $opts{on_stopped};
+    my $on_delete_cmd => delete $opts{on_delete_cmd};
     my $dhcpd_handler = delete $opts{dhcpd_handler};
     my $self = $class->SUPER::new(%opts);
     $self->{vm_id} = $vm_id;
     $self->{dhcpd_handler} = $dhcpd_handler;
     $self->{on_stopped} = $on_stopped;
+    $self->{on_delete_cmd} = $on_delete_cmd;
 
     my $hypervisor = $self->_cfg('vm.hypervisor');
     my $hypervisor_class = $hypervisor_class{$hypervisor} // croak "unsupported hypervisor $hypervisor";
@@ -132,7 +134,8 @@ update vm_runtimes
         vm_ssh_port    = $4,
         vm_vnc_port    = $5,
         vm_serial_port = $6,
-        vm_mon_port    = $7
+        vm_mon_port    = $7,
+        vm_cmd         = NULL
     where
         vm_id          = $8
 SQL

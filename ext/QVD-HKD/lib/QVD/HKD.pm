@@ -233,7 +233,8 @@ sub _on_vm_cmd {
                                                              node_id => $self->{node_id},
                                                              db => $self->{db},
                                                              dhcpd_handler => $self->{dhcpd_handler},
-                                                             on_stopped => sub { $self->_on_vm_stopped($vm_id) });
+                                                             on_stopped => sub { $self->_on_vm_stopped($vm_id) },
+                                                             on_delete_cmd => sub { $self->_on_vm_cmd_done($vm_id) } );
     }
     unless (defined $vm) {
         $debug and $self->_debug("cmd $cmd received for unknown vm $vm_id");
@@ -245,6 +246,11 @@ sub _on_vm_cmd {
 sub _on_vm_stopped {
     my ($self, $vm_id) = @_;
     delete $self->{vm}{$vm_id};
+}
+
+sub _on_vm_cmd_done {
+    my ($self, $vm_id) = @_;
+    $self->{vm_command_handler}->_on_cmd_done($vm_id);
 }
 
 sub _on_failed { croak "something come completely wrong, aborting...\n" }
