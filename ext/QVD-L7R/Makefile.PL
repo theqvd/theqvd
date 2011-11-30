@@ -18,6 +18,4 @@ WriteMakefile( NAME          => 'QVD::L7R',
 				  'Test::More'            => 0,
                                   'App::Daemon'           => 0,
                                 },
-	       dist          => { COMPRESS => 'gzip -9f',
-				  SUFFIX   => 'gz', },
-	       clean         => { FILES => 'QVD-L7R-*' } );
+               EXE_FILES      => [qw(bin/qvd-l7r)] );

@@ -1,8 +1,13 @@
+bin/qvd-l7r
 Changes
-MANIFEST
-Makefile.PL
-README
 lib/QVD/L7R.pm
+lib/QVD/L7R/Authenticator.pm
+lib/QVD/L7R/Authenticator/Plugin.pm
+lib/QVD/L7R/Authenticator/Plugin/Default.pm
+Makefile.PL
+MANIFEST
+README
 t/00-load.t
+t/boilerplate.t
 t/pod-coverage.t
 t/pod.t
