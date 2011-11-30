@@ -12,6 +12,6 @@ WriteMakefile( NAME          => 'QVD::HKD',
                                   'App::Daemon' => '0',
                                   'QVD::Config' => '0' },
                ABSTRACT_FROM => 'lib/QVD/HKD.pm',
-	       EXE_FILES     => [ qw(bin/hkd) ],
+	       EXE_FILES     => [ qw(bin/qvd-hkd) ],
                AUTHOR        => 'QVD Team <qvd@qindel.com>',
 );
