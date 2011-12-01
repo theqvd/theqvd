@@ -278,6 +278,7 @@ sub cmd_host_add {
         rs(Host_Runtime)->create({ host_id  => $row->id,
                                    state    => 'stopped',
                                    blocked  => 'false' });
+        rs(Host_Counter)->create({ host_id  => $row->id });
         $row->id
     };
 }
