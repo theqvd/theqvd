@@ -27,7 +27,9 @@ use QVD::StateMachine::Declarative
 
     deleting_cmds  => { enter       => '_delete_cmds',
                         transitions => { _on_delete_cmds_done  => 'waiting',
-                                         _on_delete_cmds_error => 'waiting'         } },
+                                         _on_delete_cmds_error => 'waiting'         },
+                        ignore      => [qw(_on_delete_cmds_result
+                                           _on_delete_cmds_bad_result)]               },
 
     waiting        => { enter       => '_start_timer',
                         leave       => '_abort_call_after',

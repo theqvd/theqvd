@@ -33,9 +33,12 @@ use QVD::StateMachine::Declarative
                                                             _on_search_di_bad_result     => 'failed' } },
 
     'starting/saving_runtime_row'     => { enter       => '_save_runtime_row',
-                                           transitions => { _on_save_runtime_row_done    => 'starting/untaring_os_image',
+                                           transitions => { _on_save_runtime_row_done    => 'starting/deleting_cmd',
                                                             _on_save_runtime_row_bad_result => 'failed' },
                                            ignore      => ['_on_save_runtime_row_result'] },
+
+    'starting/deleting_cmd'           => { enter       => '_delete_cmd',
+                                           transitions => { _on_delete_cmd_done          => 'starting/untaring_os_image' } },
 
     'starting/untaring_os_image'      => { enter       => '_untar_os_image',
                                            transitions => { _on_untar_os_image_done      => 'starting/placing_os_image',
@@ -99,6 +102,7 @@ use QVD::StateMachine::Declarative
                                            transitions => { _on_alive                    => 'running/saving_state',
                                                             _on_dead                     => 'stopping/stopping_lxc',
                                                             _on_goto_debug               => 'debugging/saving_state',
+                                                            _on_stop_cmd                 => 'stopping/deleting_cmd',
                                                             _on_lxc_done                 => 'stopping/destroying_lxc' } },
 
     'running/saving_state'            => { enter       => '_save_state',
@@ -201,7 +205,7 @@ use QVD::StateMachine::Declarative
 #}
 
 sub _on_cmd_stop  :OnState('__any__') { shift->delay_until_next_state }
-sub _on_cmd_start :OnState('__any__') { shift->_maybe_callback('on_cmd_done') }
+sub _on_cmd_start :OnState('__any__') { shift->_maybe_callback('on_delete_cmd') }
 
 sub _untar_os_image {
     my $self = shift;
@@ -485,6 +489,12 @@ sub _unmount_root_fs {
     }
 
     $self->_on_unmount_root_fs_done;
+}
+
+sub _delete_cmd {
+    my $self = shift;
+    $self->_maybe_callback('on_delete_cmd');
+    $self->_on_delete_cmd_done;
 }
 
 sub _run_prestart_hook { shift->_run_hook('prestart') }
