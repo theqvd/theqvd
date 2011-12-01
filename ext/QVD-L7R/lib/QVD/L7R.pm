@@ -30,6 +30,7 @@ my $vm_start_timeout = cfg('internal.l7r.timeout.vm_start');
 my $x_start_retry    = cfg('internal.l7r.retry.x_start');
 my $x_start_timeout  = cfg('internal.l7r.timeout.x_start');
 my $vma_timeout      = cfg('internal.l7r.timeout.vma');
+my $short_session    = cfg('internal.l7r.short_session');
 
 sub new {
     my $class = shift;
@@ -91,6 +92,7 @@ sub ping_processor {
 
 sub list_of_vm_processor {
     my ($l7r, $method, $url, $headers) = @_;
+    this_host->counters->incr_http_requests;
     my $auth = $l7r->_authenticate_user($headers);
     if (this_host->runtime->blocked) {
 	$l7r->throw_http_error(HTTP_SERVICE_UNAVAILABLE, "Server is blocked");
@@ -116,6 +118,7 @@ sub list_of_vm_processor {
 
 sub connect_to_vm_processor {
     my ($l7r, $method, $url, $headers) = @_;
+    this_host->counters->incr_http_requests;
     my $auth = $l7r->_authenticate_user($headers);
     if (this_host->runtime->blocked) {
 	$l7r->throw_http_error(HTTP_SERVICE_UNAVAILABLE, "Server is blocked");
@@ -182,6 +185,7 @@ sub _authenticate_user {
     my ($l7r, $headers) = @_;
     if (my ($credentials) = header_lookup($headers, 'Authorization')) {
 	# DEBUG "auth credentials: $credentials";
+    $l7r->{_auth_tried}++ or this_host->counters->incr_auth_attempts;
 	if (my ($basic) = $credentials =~ /^Basic (.*)$/) {
 	    # DEBUG "auth basic: $basic";
 	    if (my ($user, $passwd) = decode_base64($basic) =~ /^([^:]+):(.*)$/) {
@@ -189,6 +193,7 @@ sub _authenticate_user {
 		if ($auth->authenticate_basic($user, $passwd, $l7r)) {
 		    INFO "Accepted connection from user $user from ip:port ".
 			$l7r->{server}->{client}->peerhost().":".$l7r->{server}->{client}->peerport();
+            $l7r->{_auth_done}++ or this_host->counters->incr_auth_ok;
 		    return $auth;
 		}
 		INFO "Failed login attempt from user $user";
@@ -361,10 +366,12 @@ sub _run_forwarder {
 
     $l7r->_tell_client("Connecting X session");
 
+    this_host->counters->incr_nx_attempts;
     my $socket = IO::Socket::INET->new(PeerAddr => $vm_address,
 				       PeerPort => $vm_x_port,
 				       Proto => 'tcp')
 	or die "Unable to connect to X server: $!";
+    this_host->counters->incr_nx_ok;
 
     DEBUG "Socket connected to X server";
 
@@ -380,8 +387,10 @@ sub _run_forwarder {
     $l7r->send_http_response(HTTP_SWITCHING_PROTOCOLS);
 
     DEBUG "Starting socket forwarder";
+    my $t0 = time;
     forward_sockets($l7r->{server}{client}, $socket);
     DEBUG "Session terminated";
+    this_host->counters->incr_short_sessions if time - $t0 < $short_session;
 }
 
 sub _vma_client {
