@@ -36,8 +36,8 @@ sub get_free_host {
 
     for my $id (keys %host) {
         $host{$id}{cap} =
-            $weight_ram * $host->{ram} / ($host->{vms} + 1) +
-            $weight_cpu * $host->{cpu} / ($host->{vms} + 1) +
+            $weight_ram * $host{ram} / ($host{vms} + 1) +
+            $weight_cpu * $host{cpu} / ($host{vms} + 1) +
             rand $weight_random;
     }
 
@@ -51,7 +51,7 @@ sub get_free_host {
     # and CPU
 
     if (defined $best) {
-        $host->{$best}{vms}++;
+        $host{$best}{vms}++;
         return $best;
     }
 
