@@ -111,12 +111,12 @@ l7r.loadbalancer.plugin.default.weight.random = 1
 ## user to run hkd as
 hkd.as_user = root
 ## path to the hkd PID file
-hkd.pid_file = ${path.run}/hkd.pid
+hkd.pid_file = ${path.run}/qvd-hkd.pid
 
 ## user to run l7r as
 l7r.as_user = root
 ## path to the l7r PID file
-l7r.pid_file = ${path.run}/l7r.pid
+l7r.pid_file = ${path.run}/qvd-l7r.pid
 
 
 ## username of the WAT administrator
