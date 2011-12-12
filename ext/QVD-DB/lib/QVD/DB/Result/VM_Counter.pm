@@ -16,6 +16,3 @@ __PACKAGE__->set_primary_key('vm_id');
 __PACKAGE__->belongs_to(vm => 'QVD::DB::Result::VM', 'vm_id');
 
 1;
-
-#vms up
-#vms blocked
