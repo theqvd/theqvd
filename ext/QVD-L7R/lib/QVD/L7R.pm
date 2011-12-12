@@ -305,7 +305,7 @@ sub _start_and_wait_for_vm {
         # FIXME: timeout in state starting_1 should be relaxed a bit
 	if (( $vm_state eq 'stopped' and
 	      defined $vm->vm_cmd ) or
-	    $vm_state =~ /^starting_/) {
+	    $vm_state =~ /^starting/) {
 	    die "Unable to start VM, operation timed out!\n"
 		if time > $timeout;
 	}
