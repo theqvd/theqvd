@@ -25,8 +25,12 @@ use QVD::StateMachine::Declarative
                                            ignore      => ['_on_save_state_result'] },
 
     'starting/loading_row'            => { enter       => '_load_row',
-                                           transitions =>  { _on_load_row_done           => 'starting/searching_di',
+                                           transitions =>  { _on_load_row_done           => 'starting/updating_stats',
                                                              _on_load_row_bad_result     => 'failed' } },
+
+    'starting/updating_stats'         => { enter       => '_incr_run_attempts',
+                                           transitions =>  { _on_incr_run_attempts_done  => 'starting/searching_di',
+                                                             _on_incr_run_attempts_bad_result => 'failed' } },
 
     'starting/searching_di'           => { enter       => '_search_di',
                                            transitions => { _on_search_di_done           => 'starting/saving_runtime_row',
@@ -106,11 +110,15 @@ use QVD::StateMachine::Declarative
                                                             _on_lxc_done                 => 'stopping/destroying_lxc' } },
 
     'running/saving_state'            => { enter       => '_save_state',
-                                           transitions => { _on_save_state_done          => 'running/running_poststart_hook',
+                                           transitions => { _on_save_state_done          => 'running/updating_stats',
                                                             # _on_save_state_done          => 'running/monitoring',
                                                             _on_save_state_bad_result    => 'stopping/powering_off' },
                                            delay       => [qw(_on_lxc_done)],
                                            ignore      => [qw(_on_save_state_result)] },
+
+    'running/updating_stats'          => { enter       => '_incr_run_ok',
+                                           transitions =>  { _on_incr_run_ok_done        => 'running/running_poststart_hook',
+                                                             _on_incr_run_ok_bad_result  => 'failed' } },
 
     'running/running_poststart_hook'  => { enter       => '_run_poststart_hook',
                                            transitions => { _on_run_hook_done            => 'running/monitoring',

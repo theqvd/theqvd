@@ -25,11 +25,8 @@ __PACKAGE__->belongs_to(user => 'QVD::DB::Result::User', 'user_id');
 __PACKAGE__->belongs_to(osf  => 'QVD::DB::Result::OSF',  'osf_id' );
 
 __PACKAGE__->has_one (vm_runtime => 'QVD::DB::Result::VM_Runtime',  'vm_id');
+__PACKAGE__->has_one (counters   => 'QVD::DB::Result::VM_Counter',  'vm_id');
 __PACKAGE__->has_many(properties => 'QVD::DB::Result::VM_Property', 'vm_id');
-
-## seems that this isn't used and commenting it fixes #767.
-#__PACKAGE__->has_many(dis => 'QVD::DB::Result::DI', { 'foreign.tags.tag' => 'self.di_tag',
-#                                                      'foreign.osf_id' => 'self.osf_id' });
 
 sub combined_properties {
     my $vm = shift;

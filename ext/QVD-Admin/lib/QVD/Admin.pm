@@ -541,6 +541,7 @@ sub cmd_vm_add {
                                 vm_state      => 'stopped',
                                 user_state    => 'disconnected',
                                 blocked       => 'false'});
+        rs(VM_Counter)->create({ vm_id  => $row->id });
         $row->id
     };
 }
