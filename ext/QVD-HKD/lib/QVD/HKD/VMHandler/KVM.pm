@@ -128,11 +128,11 @@ sub _on_cmd_stop :OnState('__any__') { shift->delay_until_next_state }
 sub _allocate_tap {
     my $self = shift;
     eval {
-        open my $tap_fh, '+<', TUNNEL_DEV or die "Can't open ".TUNNEL_DEV.": $!";
+        open my $tap_fh, '+<', TUNNEL_DEV() or die "Can't open ".TUNNEL_DEV().": $!";
         $self->{tap_fh} = $tap_fh;
-        my $ifreq = pack(STRUCT_IFREQ, 'qvdtap%d', IFF_TAP|IFF_NO_PI);
-        ioctl $tap_fh, TUNSETIFF, $ifreq or die "Can't create tap interface: $!";
-        $self->{tap_if} = unpack STRUCT_IFREQ, $ifreq;
+        my $ifreq = pack(STRUCT_IFREQ(), 'qvdtap%d', IFF_TAP()|IFF_NO_PI());
+        ioctl $tap_fh, TUNSETIFF(), $ifreq or die "Can't create tap interface: $!";
+        $self->{tap_if} = unpack STRUCT_IFREQ(), $ifreq;
     };
     if ($@) {
         ERROR $@;
