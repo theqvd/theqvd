@@ -1,5 +1,6 @@
 bin/qvd-client.pl
 bin/qvd-gui-client.pl
+Build.PL
 Changes
 lib/QVD/Client.pm
 lib/QVD/Client/Frame.pm
@@ -15,3 +16,5 @@ t/00-load.t
 t/boilerplate.t
 t/pod-coverage.t
 t/pod.t
+META.yml
+META.json
