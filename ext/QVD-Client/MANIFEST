@@ -5,8 +5,11 @@ Changes
 lib/QVD/Client.pm
 lib/QVD/Client/Frame.pm
 lib/QVD/Client/Proxy.pm
-Makefile.PL
+Makefile
 MANIFEST
+MANIFEST.SKIP
+META.json
+META.yml
 pixmaps/qvd-logo.png
 pixmaps/qvd.ico
 pixmaps/qvd.svg
@@ -16,5 +19,3 @@ t/00-load.t
 t/boilerplate.t
 t/pod-coverage.t
 t/pod.t
-META.yml
-META.json

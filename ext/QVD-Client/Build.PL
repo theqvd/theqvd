@@ -2,6 +2,7 @@
 use strict;
 use warnings;
 use Module::Build;
+
 my $build = new Module::Build(
                module_name   => 'QVD::Client',
 	       author        => 'QVD Team <qvd@qindel.com>',
@@ -40,15 +41,9 @@ my $build = new Module::Build(
 		png_files    => {
 		                  'pixmaps/qvd-logo.png' => 'pixmaps/qvd-logo.png'
 		                },
-		install_path => { 
-		                  'pixmaps' => '/usr/lib/qvd/share/pixmaps',
-#		                  'ico' => '/usr/lib/qvd/share/pixmaps',
-#		                  'svg' => '/usr/lib/qvd/share/pixmaps',
-#	       	                  'png' => '/usr/lib/qvd/share/pixmaps'
-		              },
-		
-
 );
+
+$build->install_base_relpaths( 'pixmaps' => 'share/pixmaps');
 
 $build->add_build_element('xpm');
 $build->add_build_element('ico');

@@ -1,0 +1,9 @@
+^MYMETA\.yml$
+^MYMETA\.json$
+.bak$
+.svn
+_build
+.old$
+^\.(svn|cvs)ignore$
+^Build$
+^blib
