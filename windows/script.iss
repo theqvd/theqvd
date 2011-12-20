@@ -4,8 +4,8 @@
 ; (To generate a new GUID, click Tools | Generate GUID inside the IDE.)
 AppId={{DD625C30-A6B1-4C48-A3C2-19B39771028F}
 AppName=QVD Client
-AppVerName=QVD Client 3.0.0-1
-AppVersion=3.0.0-1
+AppVerName=QVD Client 3.0.0-2
+AppVersion=3.0.0-2
 AppPublisher=QindelGroup
 AppPublisherURL=http://theqvd.com/
 AppSupportURL=http://theqvd.com/
