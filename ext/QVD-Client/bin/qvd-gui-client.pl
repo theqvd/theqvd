@@ -10,11 +10,14 @@ use File::Spec;
 use Proc::Background;
 
 my $WINDOWS;
+my $DOTQVD;
 
 BEGIN {
+    $DOTQVD = ($ENV{HOME} || $ENV{APPDATA}).'/.qvd';
+    mkdir $DOTQVD if (!-e $DOTQVD);
     $QVD::Config::USE_DB = 0;
     @QVD::Config::FILES = ('/etc/qvd/client.conf',
-			   ($ENV{HOME} || $ENV{APPDATA}).'/.qvd/client.conf',
+			   $DOTQVD.'/client.conf',
 			   'qvd-client.conf');
 
     # FIXME NX_CLIENT is used for showing the user information on things
@@ -36,7 +39,7 @@ sub OnInit {
 	
 	my @cmd;
 	my @opts = qw(-multiwindow -notrayicon -nowinkill -clipboard +bs -wm);
-	push @opts, (-logfile => $ENV{APPDATA}.'/.qvd/xserver.log');
+	push @opts, (-logfile => $DOTQVD.'/xserver.log');
 	push @cmd, ($ENV{QVDPATH}."/Xming/Xming.exe", @opts);
 
 	Proc::Background->new(@cmd);   
