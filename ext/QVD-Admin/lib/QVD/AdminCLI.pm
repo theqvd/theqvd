@@ -202,7 +202,7 @@ sub die_and_help {
     @funcs = grep {s/^cmd_([a-z]+)_(\w+)/$1 $2/} @funcs;
     @funcs = grep {m/^${obj}/} @funcs if defined $obj and exists $self->{admin}{objects}{$obj};
     my $footer = '';
-    for (grep { /^osf (?:add|del)$/ } @funcs) {
+    for (grep { /^di (?:add|del)$/ } @funcs) {
         $footer = "(*) Needs root privileges\n\n";
         $_ .= ' (*)';
     }
