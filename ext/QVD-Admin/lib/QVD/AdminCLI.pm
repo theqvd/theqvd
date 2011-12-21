@@ -30,7 +30,7 @@ my %syntax_check_cbs = (
         add => sub {
             my ($errors, $args) = @_;
             $$errors++, warn "Syntax error: parameter 'name' is mandatory\n", unless exists $args->{'name'};
-            delete @$args{qw/name/};
+            delete @$args{qw/name memory use_overlay user_storage_size/};
         },
     },
     di => {
