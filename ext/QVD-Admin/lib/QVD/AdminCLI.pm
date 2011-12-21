@@ -6,6 +6,7 @@ use strict;
 use QVD::Config;
 use QVD::Admin;
 use Text::Table;
+use DateTime;
 
 my %syntax_check_cbs = (
     host => {
@@ -457,8 +458,25 @@ sub cmd_host_list {
 
     eval {
         while (my $host = $rs->next) {
+            my $mins;
             my $hkd_ts = defined $host->runtime ? $host->runtime->ok_ts : undef;
-            my $mins = defined $hkd_ts ? _format_timespan(time - $hkd_ts) : '-';
+
+            if (!defined $hkd_ts) {
+                $mins = '-';
+            } elsif ($hkd_ts =~ /^(\d{4})-(\d{2})-(\d{2}) (\d{2}):(\d{2}):(\d{2})\.(\d+)/) {
+                $hkd_ts = DateTime->new (
+                    year => $1, month => $2, day => $3,
+                    hour => $4, minute => $5, second => $6,
+                    nanosecond => 1000 * $7
+                )->epoch;
+                $mins = _format_timespan(time - $hkd_ts);
+            } elsif ($hkd_ts =~ /^\d+$/) {
+                $mins = _format_timespan(time - $hkd_ts);
+            } else {
+                warn 'bad hkd ts format';
+                $mins = '-';
+            }
+
             my @row = ($host->id, $host->name, $host->address, $mins,
                        $host->runtime->usable_ram, $host->runtime->usable_cpu,
                        $host->vms->count, $host->runtime->blocked, $host->runtime->state);
