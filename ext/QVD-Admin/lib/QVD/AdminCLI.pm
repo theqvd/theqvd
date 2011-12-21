@@ -499,7 +499,7 @@ usage: host list
   Lists consists of Id, Name, Address, HKD and VMs assigned, separated by tabs.
     
 Valid options:
-    -f [--filter] FILTER : list only host matched by FILTER
+    -f [--filter] FILTER : list only hosts matched by FILTER
     -q [--quiet]         : don't print the header
 EOT
 }
@@ -604,6 +604,47 @@ usage: host unblock
 Valid options:
     -f [--filter] FILTER : unblock only host matched by FILTER
     -q [--quiet]         : don't print the command message
+EOT
+}
+
+sub cmd_host_counters {
+    my ($self) = @_;
+
+    my $rs = $self->get_resultset('host');
+    my @header = ("Id", "Name", "HTTP Requests ","Auth attempts", "Auth OK", "NX attempts", "NX OK", "Short sessions");
+    my @body;
+
+    eval {
+        while (my $host = $rs->next) {
+
+            my @row = (
+                $host->id, $host->name,
+                $host->counters->http_requests,
+                $host->counters->auth_attempts, $host->counters->auth_ok,
+                $host->counters->nx_attempts, $host->counters->nx_ok,
+                $host->counters->short_sessions,
+            );
+            push(@body, \@row);
+        }
+    };
+    if ($@) {
+        #$self->_print("Wrong syntax, check the command help:\n");
+        $self->_die;
+    }
+    
+    $self->_print_table(\@header, \@body);
+}
+
+sub help_host_counters {
+    print <<EOT
+host counters: list hosts' counters
+usage: host counters
+    
+  Lists consists of Id, Name and all the counters for every host, separated by tabs.
+    
+Valid options:
+    -f [--filter] FILTER : list counters only for hosts matched by FILTER
+    -q [--quiet]         : don't print the header
 EOT
 }
 
