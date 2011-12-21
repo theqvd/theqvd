@@ -60,4 +60,14 @@ sub before_list_of_vms {
     $_->before_list_of_vms($auth) for @{$auth->{modules}};
 }
 
+sub filter_list_of_vms {
+    my ($auth, $vm_list) = @_;
+    DEBUG "calling filter_list_of_vms hook";
+    my $new_vm_list = $vm_list;
+    foreach (@{$auth->{modules}}) {
+	$new_vm_list = $_->filter_list_of_vms($auth, $new_vm_list);
+    }
+    return $new_vm_list;
+}
+
 1;

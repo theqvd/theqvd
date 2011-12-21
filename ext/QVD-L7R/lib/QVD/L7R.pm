@@ -110,10 +110,12 @@ sub list_of_vm_processor {
 		    map { $_->vm_runtime }
 		    rs(VM)->search({user_id => $user_id}) );
 
-    @vm_list or INFO "User $user_id does not have any virtual machine";
+    my $vm_list_filtered = $auth->filter_list_of_vms(\@vm_list);
+
+    @$vm_list_filtered or INFO "User $user_id does not have any virtual machine";
 
     $l7r->send_http_response_with_body( HTTP_OK, 'application/json', [],
-					$l7r->json->encode(\@vm_list) );
+					$l7r->json->encode($vm_list_filtered) );
 }
 
 sub connect_to_vm_processor {
