@@ -12,6 +12,7 @@ use parent qw(QVD::L7R::Authenticator::Plugin);
 
 my $osf_id = cfg('auth.auto.osf_id');
 my $di_tag = cfg('auth.auto.di_tag', 0) // 'default';
+my $maxvms = cfg('auth.auto.max_vms', 0) // 5;
 
 sub before_list_of_vms {
     my ($plugin, $auth) = @_;
@@ -32,7 +33,7 @@ sub before_list_of_vms {
     if (rs(VM)->search({user_id => $user_id})->count == 0) {
 	INFO "Auto provisioning VM for user $login ($user_id)";
 	my $admin = QVD::Admin->new;
-	for my $ix (1..5) {
+	for my $ix (1..$maxvms) {
 	    my $name = "$login-$ix";
 	    my $ok;
 	    if (rs(VM)->search({name => $name})->count == 0) {
