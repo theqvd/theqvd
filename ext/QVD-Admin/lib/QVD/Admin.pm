@@ -312,9 +312,9 @@ sub cmd_host_del {
     shift->_obj_del('host', @_);
 }
 
-sub cmd_host_propget {
-    shift->_obj_propget('host', @_);
-}
+#sub cmd_host_propget {
+#    shift->_obj_propget('host', @_);
+#}
 
 sub cmd_host_propset {
     shift->_obj_propset('host', @_);
@@ -510,9 +510,9 @@ sub cmd_user_del {
     # FIXME Should we delete VMs, overlay images and home disk files?
 }
 
-sub cmd_user_propget {
-    shift->_obj_propget('user', @_);
-}
+#sub cmd_user_propget {
+#    shift->_obj_propget('user', @_);
+#}
 
 sub cmd_user_propset {
     shift->_obj_propset('user', @_);
@@ -644,9 +644,9 @@ sub cmd_vm_edit {
     $counter
 }
 
-sub cmd_vm_propget {
-    shift->_obj_propget('vm', @_);
-}
+#sub cmd_vm_propget {
+#    shift->_obj_propget('vm', @_);
+#}
 
 sub cmd_vm_propset {
     shift->_obj_propset('vm', @_);
