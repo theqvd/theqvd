@@ -530,7 +530,7 @@ usage: host propget [key...]
   host propget usage priority
       
 Valid options:
-    -f [--filter] FILTER : sets host property to hosts matched by FILTER
+    -f [--filter] FILTER : gets host property only from hosts matched by FILTER
 EOT
 }
 
@@ -1104,7 +1104,7 @@ usage: user propget [key...]
   user propget genre timezone
       
 Valid options:
-    -f [--filter] FILTER : sets user property to users matched by FILTER
+    -f [--filter] FILTER : gets user property only from users matched by FILTER
 EOT
 }
 
@@ -1391,7 +1391,7 @@ usage: vm propget [key...]
   vm propget usage priority
       
 Valid options:
-    -f [--filter] FILTER : sets VM properties on VMs matched by FILTER
+    -f [--filter] FILTER : gets VM properties only from VMs matched by FILTER
 EOT
 }
 
