@@ -19,6 +19,7 @@ WriteMakefile(
 	'QVD::Log' => 0,
         'Test::More' => 0,
 	'Text::Table' => 0,
+	'DateTime' => 0,
     },
     dist                => { COMPRESS => 'gzip -9f', SUFFIX => 'gz', },
     clean               => { FILES => 'QVD-Admin-*' },
