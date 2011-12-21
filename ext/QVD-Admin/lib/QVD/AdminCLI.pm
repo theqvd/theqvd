@@ -647,11 +647,13 @@ EOT
 sub cmd_osf_list {
     my ($self) = @_;
     my $rs = $self->get_resultset('osf');
-    my @header = qw(Id Name RAM UserHD);
+    my @header = qw(Id Name RAM Overlay UserHD);
     my @body;
     eval {
         while (my $osf = $rs->next) {
-            my @row = map { defined($_) ? $_ : '-' } map { $osf->$_ } qw(id name memory user_storage_size);
+            my @row = map { defined($_) ? $_ : '-' } map { $osf->$_ } qw(id name memory use_overlay user_storage_size);
+            ## translate use_overlay from (0,1) to (no,yes)
+            $row[-2] = { 0 => 'no', 1 => 'yes' }->{$row[-2]};
             push(@body, \@row);
         }
     };
