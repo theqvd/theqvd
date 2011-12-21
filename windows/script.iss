@@ -39,4 +39,6 @@ Name: "{group}\QVD Client"; Filename: "{app}\qvd-client.exe"; WorkingDir: "{app}
 Name: "{commondesktop}\QVD Client"; Filename: "{app}\qvd-client.exe"; WorkingDir: "{app}"; Tasks: desktopicon
 
 [Registry]
-                                                                                                            
+; Make LanmanServer accept 127.0.0.1 as its netbios name 
+; REQUIRED for printing to work on Windows 7
+Root: HKLM; Subkey: "System\CurrentControlSet\Services\LanmanServer\Parameters"; ValueType: string; ValueName: "OptionalNames"; ValueData: "127.0.0.1"; Flags: preservestringtype
