@@ -449,6 +449,10 @@ sub cmd_di_del {
     $counter
 }
 
+sub cmd_di_propset {
+    shift->_obj_propset('di', @_);
+}
+
 sub cmd_osf_add {
     my ($self, %params) = @_;
     my @required_params = qw/name memory use_overlay/;
@@ -481,6 +485,10 @@ sub cmd_osf_del {
         }
     }
     $counter
+}
+
+sub cmd_osf_propset {
+    shift->_obj_propset('osf', @_);
 }
 
 sub cmd_user_add {

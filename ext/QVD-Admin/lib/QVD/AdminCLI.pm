@@ -679,6 +679,81 @@ Valid options:
 EOT
 }
 
+sub cmd_osf_propdel {
+    my $self = shift;
+    if (scalar %{$self->{admin}{filter}} eq 0) {
+        print "Are you sure you want to delete the prop in all OSFs? [y/N] ";
+        my $answer = <STDIN>;
+        exit 0 unless $answer =~ /^y/i;
+    } 
+    eval {
+        $self->{admin}->propdel('osf', @_);
+    };
+    if ($@) {
+        #$self->_print("Wrong syntax, check the command help:\n");
+        $self->_die;
+    }
+}
+
+sub help_osf_propdel {
+    print <<EOT
+vm propdel: Deletes OSF properties
+usage: osf propdel [key...]
+      
+    Only the properties with the listed keys are deleted. If no keys are listed
+    all properties are deleted.
+    Example:
+        osf propdel has_opera -f has_opera=true
+      
+Valid options:
+    -f [--filter] FILTER : Delete properties of OSFs matched by FILTER
+EOT
+}
+
+sub cmd_osf_propget {
+    shift->_obj_propget(sub { $_->osf->name }, 'osf', @_);
+}
+
+sub help_osf_propget {
+    print <<EOT
+osf propget: Gets OSF property.
+usage: osf propget [key...]
+      
+  Example:
+  osf propget has_opera
+      
+Valid options:
+    -f [--filter] FILTER : gets OSF property only from OSFs matched by FILTER
+EOT
+}
+
+sub cmd_osf_propset {
+    my $self = shift;
+    my $ci = 0;
+    eval {
+        $ci = $self->{admin}->cmd_osf_propset(_split_on_equals @_);
+    };
+    if (($ci == -1) || $@) {
+        #$self->_print("Wrong syntax, check the command help:\n");
+        $self->_die;
+    } else {
+        $self->_print("propset in $ci OSFs.\n");
+    }    
+}
+
+sub help_osf_propset {
+    print <<EOT
+osf propset: Sets OSF property.
+usage: osf propset [key=value...]
+      
+  Example:
+  osf propset has_opera=true
+      
+Valid options:
+    -f [--filter] FILTER : sets OSF property to OSFs matched by FILTER
+EOT
+}
+
 sub cmd_di_add {
     my $self = shift;
     eval {
@@ -778,6 +853,81 @@ sub help_di_untag {
     print <<EOT;
 di untag: untags a Disk Image (DI)
 usage: di untag di_id=id tag=symbol
+EOT
+}
+
+sub cmd_di_propdel {
+    my $self = shift;
+    if (scalar %{$self->{admin}{filter}} eq 0) {
+        print "Are you sure you want to delete the prop in all DIs? [y/N] ";
+        my $answer = <STDIN>;
+        exit 0 unless $answer =~ /^y/i;
+    } 
+    eval {
+        $self->{admin}->propdel('di', @_);
+    };
+    if ($@) {
+        #$self->_print("Wrong syntax, check the command help:\n");
+        $self->_die;
+    }
+}
+
+sub help_di_propdel {
+    print <<EOT
+vm propdel: Deletes DI properties
+usage: di propdel [key...]
+      
+    Only the properties with the listed keys are deleted. If no keys are listed
+    all properties are deleted.
+    Example:
+        di propdel linux30_test -f linux30_test=true
+      
+Valid options:
+    -f [--filter] FILTER : Delete properties of DIs matched by FILTER
+EOT
+}
+
+sub cmd_di_propget {
+    shift->_obj_propget(sub { $_->di->path }, 'di', @_);
+}
+
+sub help_di_propget {
+    print <<EOT
+di propget: Gets DI property.
+usage: di propget [key...]
+      
+  Example:
+  di propget linux30_test
+      
+Valid options:
+    -f [--filter] FILTER : gets DI property only from DIs matched by FILTER
+EOT
+}
+
+sub cmd_di_propset {
+    my $self = shift;
+    my $ci = 0;
+    eval {
+        $ci = $self->{admin}->cmd_di_propset(_split_on_equals @_);
+    };
+    if (($ci == -1) || $@) {
+        #$self->_print("Wrong syntax, check the command help:\n");
+        $self->_die;
+    } else {
+        $self->_print("propset in $ci DIs.\n");
+    }    
+}
+
+sub help_di_propset {
+    print <<EOT
+di propset: Sets DI property.
+usage: di propset [key=value...]
+      
+  Example:
+  di propset linux30_test=true
+      
+Valid options:
+    -f [--filter] FILTER : sets DI property to DIs matched by FILTER
 EOT
 }
 
