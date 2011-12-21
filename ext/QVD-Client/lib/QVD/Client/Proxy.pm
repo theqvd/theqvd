@@ -243,7 +243,8 @@ sub _run {
 	my $cmdline = join ' ', map("\"$_\"", @cmd);
 	require Win32::Process;
 	Win32::Process::Create({}, $program, $cmdline, 0, 
-	    CREATE_NO_WINDOW()|NORMAL_PRIORITY_CLASS(), '.');
+	    Win32::Process::CREATE_NO_WINDOW|Win32::Process::NORMAL_PRIORITY_CLASS,
+	    '.');
     } else {
 	Proc::Background->new(@cmd);
     }
