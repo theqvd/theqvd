@@ -1401,7 +1401,7 @@ usage: vm list
   Lists consists of Id, Name, State and Host, separated by tabs.
     
 Valid options:
-    -f [--filter] FILTER : list only vm matched by FILTER
+    -f [--filter] FILTER : list only vms matched by FILTER
     -q [--quiet]         : don't print the header
 EOT
 }
@@ -1647,6 +1647,60 @@ usage: vm vnc
        
 Valid options:
     -f [--filter] FILTER : connect to the virtual machine matched by FILTER
+EOT
+}
+
+sub cmd_vm_counters {
+    my ($self) = @_;
+    
+    my $rs = $self->get_resultset('vm');
+    
+    my @header = ("Id", "Name", "Run attempts", "Run OK");
+    my @body;
+        
+    my ($vm_count, $vms_up, $vms_blocked) = (0, 0, 0);
+    eval { 
+        while (my $vm = $rs->next) {
+            my $vmr = $vm->vm_runtime;
+            my @row = map { $_ // '-' } (
+                $vm->id,
+                $vm->name,
+                $vm->counters->run_attempts,
+                $vm->counters->run_ok,
+            );
+            push(@body, \@row);
+
+            $vm_count++;
+            $vms_up++ if 'running' eq $vm->vm_runtime->vm_state;
+            $vms_blocked++ if $vm->vm_runtime->blocked;
+            #use Data::Dumper;       printf "%s:%s: %s\n", __FILE__, __LINE__, Data::Dumper->Dump (sub{\@_}->(\$vm->vm_runtime), ['vm']);
+        }
+    };
+    
+    if ($@) {
+        #$self->_print("Wrong syntax, check the command help:\n");
+        $self->_die;
+    } else {
+        my @header2 = ('Virtual machines', 'Running', 'Blocked');
+        my @body2 = [ $vm_count, $vms_up, $vms_blocked ];
+        $self->_print_table (\@header2, \@body2);
+
+        print "\n";
+
+        $self->_print_table(\@header, \@body);
+    }
+}
+
+sub help_vm_counters {
+    print <<EOT
+vm counters: Returns counters for each virtual machine.
+usage: vm counters
+    
+  Lists consists of Id, Name and all the counters for every vm, separated by tabs.
+    
+Valid options:
+    -f [--filter] FILTER : list counters only for vms matched by FILTER
+    -q [--quiet]         : don't print the header
 EOT
 }
 
