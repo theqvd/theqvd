@@ -241,9 +241,12 @@ sub _run {
     if ($WINDOWS) {
 	my $program = $cmd[0];
 	my $cmdline = join ' ', map("\"$_\"", @cmd);
+	use constant CREATE_NO_WINDOW => 0;
+	use constant NORMAL_PRIORITY_CLASS => 0;
 	require Win32::Process;
+	Win32::Process->import;
 	Win32::Process::Create({}, $program, $cmdline, 0, 
-	    Win32::Process::CREATE_NO_WINDOW|Win32::Process::NORMAL_PRIORITY_CLASS,
+	    CREATE_NO_WINDOW|NORMAL_PRIORITY_CLASS,
 	    '.');
     } else {
 	Proc::Background->new(@cmd);
