@@ -19,9 +19,13 @@ if (!-w $logfile) {
     $logfile = '/tmp/qvd.log';
 }
 
-my %config = ( 'log4perl.appender.LOGFILE'          => 'Log::Log4perl::Appender::File',
+my %config = ( 'log4perl.appender.LOGFILE'          => 'Log::Dispatch::FileRotate',
 	       'log4perl.appender.LOGFILE.mode'     => 'append',
-	       'log4perl.appender.LOGFILE.layout'   => 'PatternLayout',
+	       'log4perl.appender.LOGFILE.DatePattern'
+	                           => 'yyyy-MM-dd',
+	       'log4perl.appender.LOGFILE.size'     => '50',
+	       'log4perl.appender.LOGFILE.max'      => '20',
+	       'log4perl.appender.LOGFILE.layout'   => 'Log::Log4perl::Layout::PatternLayout',
 	       'log4perl.appender.LOGFILE.layout.ConversionPattern'
                                                     => '%d %P %F %L %c - %m%n',
 	       'log4perl.appender.LOGFILE.filename' => $logfile,
@@ -54,6 +58,15 @@ Initializes Log::Log4perl with QVD configuration. For example:
     use QVD::Log;
 
     INFO "Logging works!";
+
+To modify the default you can add log4perl tags into the /etc/qvd/node.conf. Something like
+
+ log4perl.appender.Mailer=Log::Dispatch::Email::MailSend
+log4perl.appender.Mailer.Threshold=WARN
+log4perl.appender.Mailer.to      = qvd@theqvd.com
+log4perl.appender.Mailer.subject = Alert for QVD system
+log4perl.appender.Mailer.layout  = SimpleLayout
+log4perl.logger.QVD = DEBUG, Mailer
 
 =head1 AUTHOR
 
