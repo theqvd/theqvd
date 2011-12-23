@@ -43,7 +43,7 @@ my $build = new Module::Build(
 		                },
 );
 
-$build->install_base_relpaths( 'pixmaps' => 'share/pixmaps');
+$build->install_path('pixmaps' => $build->config()->{installprefix} . "/share/pixmaps");
 
 $build->add_build_element('xpm');
 $build->add_build_element('ico');
