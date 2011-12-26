@@ -43,6 +43,7 @@ my $nxagent_conf    = cfg('internal.vma.nxagent.config');
 my $groupadd        = cfg('command.groupadd');
 my $useradd         = cfg('command.useradd');
 my $userdel         = cfg('command.userdel');
+my $groupdel        = cfg('command.groupdel');
 
 my $default_user_name   = cfg('vma.user.default.name');
 my $default_user_groups = cfg('vma.user.default.groups');
@@ -312,8 +313,10 @@ sub _provisionate_user {
         system $groupadd => $user and die "provisioning of group '$user' failed\n";
 
 		my @args = (
-			     '-m', # create home
-			     '-d', $user_home);
+            '-m',              ## create home
+            '-d', $user_home,  ## home dir
+            '-g', $user,       ## main group
+        );
 		push @args, -G => $groups if length $groups;
 		push @args, -u => $uid if $uid;
 		push @args, $user;
@@ -327,6 +330,8 @@ sub _provisionate_user {
 		# clean up, do not left the system in an inconsistent state
 		DEBUG "deleting user $user";
 		system $userdel => '-rf', $user;
+		DEBUG "deleting group $user";
+		system $groupdel => $user;
 		die $@;
 	    }
 	}

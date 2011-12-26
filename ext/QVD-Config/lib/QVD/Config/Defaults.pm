@@ -61,6 +61,7 @@ command.dhcpd = /usr/sbin/dnsmasq
 command.useradd = /usr/sbin/useradd
 command.userdel = /usr/sbin/userdel
 command.groupadd = /usr/sbin/groupadd
+command.groupdel = /usr/sbin/groupdel
 command.tar = tar
 command.umount = umount
 command.mount = mount
