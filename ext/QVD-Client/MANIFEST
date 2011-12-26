@@ -5,7 +5,6 @@ Changes
 lib/QVD/Client.pm
 lib/QVD/Client/Frame.pm
 lib/QVD/Client/Proxy.pm
-Makefile
 MANIFEST
 MANIFEST.SKIP
 META.json
