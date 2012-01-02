@@ -16,7 +16,8 @@ use QVD::StateMachine::Declarative
                   transitions => { _on_tick_done => 'delaying' } },
     delaying => { enter => '_set_timer',
                   transitions => { _on_timeout   => 'ticking',
-                                   on_hkd_stop   => 'stopped'  } },
+                                   on_hkd_stop   => 'stopped'  },
+                  leave => '_abort_all'                          },
     stopped  => { enter => '_on_stopped'                         };
 
 sub new {

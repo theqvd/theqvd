@@ -35,7 +35,7 @@ use QVD::StateMachine::Declarative
                         leave       => '_abort_call_after',
                         transitions => { _on_timer             => 'loading_cmd',
                                          _on_delete_cmd        => 'deleting_cmds',
-                                         _on_hkd_stop          => 'stopped'         } },
+                                         on_hkd_stop          => 'stopped'         } },
     stopped        => { enter       => '_on_stopped'                                  };
 
 

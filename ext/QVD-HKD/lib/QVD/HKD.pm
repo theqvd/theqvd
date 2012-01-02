@@ -75,14 +75,15 @@ use QVD::StateMachine::Declarative
     'stopped/saving_state'          => { enter       => '_save_state',
                                          transitions => { _on_save_state_done       => 'stopped/bye'                  } },
 
-    'stopped/bye'                   => { enter       => 'say_goodbye'                                                   },
+    'stopped/bye'                   => { enter       => '_say_goodbye'                                                   },
 
-    failed                          => { enter       => 'say_goodbye'                                                   };
+    failed                          => { enter       => '_say_goodbye'                                                   };
 
 
 sub _on_ticked :OnState(__any__) {}
 sub _on_ticker_error :OnState(__any__) {}
 sub _on_all_vms_stopped :OnState(__any__) {}
+sub _on_cmd_stop :OnState(__any__) { shift->delay_until_next_state }
 
 sub new {
     my ($class, %opts) = @_;
@@ -97,11 +98,18 @@ sub new {
     $self;
 }
 
+sub _say_goodbye {
+    my $self = shift;
+    $self->{exit}->send;
+    print "GOODBYE!\n";
+}
+
 sub run {
     my $self = shift;
     $self->{exit} = AnyEvent->condvar;
     # exit cleanly:
-    $self->{$_. "_watcher"} = AnyEvent->signal(signal => $_, cb => sub { $self->{exit}->send }) for (qw(TERM INT));
+    # $self->{$_. "_watcher"} = AnyEvent->signal(signal => $_, cb => sub { $self->{exit}->send }) for (qw(TERM INT));
+    $self->{$_. "_watcher"} = AnyEvent->signal(signal => $_, cb => sub { $self->_on_cmd_stop }) for (qw(TERM INT));
     if ($self->_cfg('internal.hkd.debugger.run')) {
         my $socket_path = $self->_cfg('internal.hkd.debugger.socket');
         require AnyEvent::Debug;
@@ -219,7 +227,8 @@ sub _start_ticking {
                                              db => $self->{db},
                                              node_id => $self->{node_id},
                                              on_ticked => sub { $self->_on_ticked },
-                                             on_error => sub { $self->_on_ticker_error } );
+                                             on_error => sub { $self->_on_ticker_error },
+                                             on_stopped => sub { $self->_on_agent_stopped(@_) } );
     $self->{ticker}->run;
 }
 
@@ -251,7 +260,8 @@ my @agent_names = qw(vm_command_handler
 
 sub _check_all_agents_have_stopped {
     my $self = shift;
-    grep defined($self->{$_}), @agent_names or $self->_on_all_agents_stopped    
+    $self->_on_all_agents_stopped
+        unless grep defined($self->{$_}), @agent_names
 }
 
 sub _stop_all_agents {

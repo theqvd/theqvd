@@ -28,7 +28,8 @@ sub new {
 
     my $self = { config => $config,
                  db => $db,
-                 node_id => $node_id };
+                 node_id => $node_id,
+                 on_stopped => $on_stopped };
 
     Class::StateMachine::bless($self, $class);
 }
