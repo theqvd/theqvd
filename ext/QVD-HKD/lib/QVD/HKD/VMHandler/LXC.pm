@@ -15,30 +15,35 @@ use File::Temp qw(tempfile);
 
 use parent qw(QVD::HKD::VMHandler);
 
-use QVD::StateMachine::Declarative
-    'new'                             => { transitions => { _on_cmd_start                => 'starting' } },
+# FIXME: move all the patch calculation logic outside the actions so
+# that it can also be called from the zombie state
 
-    'starting'                        => { jump        => 'starting/saving_state' },
+use QVD::StateMachine::Declarative
+    'new'                             => { transitions => { _on_cmd_start                => 'starting',
+                                                            _on_cmd_catch_zombie         => 'zombie'                           } },
+
+    'starting'                        => { jump        => 'starting/saving_state'                                                },
 
     'starting/saving_state'           => { enter       => '_save_state',
-                                           transitions => { _on_save_state_done          => 'starting/loading_row' },
-                                           ignore      => ['_on_save_state_result'] },
+                                           transitions => { _on_save_state_done          => 'starting/loading_row',
+                                                            _on_save_state_error         => 'failed' },
+                                           ignore      => ['_on_save_state_result']                                              },
 
     'starting/loading_row'            => { enter       => '_load_row',
                                            transitions =>  { _on_load_row_done           => 'starting/updating_stats',
-                                                             _on_load_row_bad_result     => 'failed' } },
+                                                             _on_load_row_bad_result     => 'failing/clearing_runtime_row'     } },
 
     'starting/updating_stats'         => { enter       => '_incr_run_attempts',
                                            transitions =>  { _on_incr_run_attempts_done  => 'starting/searching_di',
-                                                             _on_incr_run_attempts_bad_result => 'failed' } },
+                                                             _on_incr_run_attempts_bad_result => 'failing/clearing_runtime_row'} },
 
     'starting/searching_di'           => { enter       => '_search_di',
                                            transitions => { _on_search_di_done           => 'starting/saving_runtime_row',
-                                                            _on_search_di_bad_result     => 'failed' } },
+                                                            _on_search_di_bad_result     => 'failing/clearing_runtime_row'     } },
 
     'starting/saving_runtime_row'     => { enter       => '_save_runtime_row',
                                            transitions => { _on_save_runtime_row_done    => 'starting/deleting_cmd',
-                                                            _on_save_runtime_row_bad_result => 'failed' },
+                                                            _on_save_runtime_row_bad_result => 'failing/clearing_runtime_row'    },
                                            ignore      => ['_on_save_runtime_row_result'] },
 
     'starting/deleting_cmd'           => { enter       => '_delete_cmd',
@@ -107,6 +112,7 @@ use QVD::StateMachine::Declarative
                                                             _on_dead                     => 'stopping/stopping_lxc',
                                                             _on_goto_debug               => 'debugging/saving_state',
                                                             _on_stop_cmd                 => 'stopping/deleting_cmd',
+                                                            on_hkd_stop                 => 'stopping/powering_off',
                                                             _on_lxc_done                 => 'stopping/destroying_lxc' } },
 
     'running/saving_state'            => { enter       => '_save_state',
@@ -128,6 +134,7 @@ use QVD::StateMachine::Declarative
     'running/monitoring'              => { enter       => '_start_vma_monitor',
                                            leave       => '_stop_vma_monitor',
                                            transitions => { _on_cmd_stop                 => 'stopping/deleting_cmd',
+                                                            on_hkd_stop                 => 'stopping/powering_off',
                                                             _on_dead                     => 'stopping/stopping_lxc',
                                                             _on_goto_debug               => 'debugging/saving_state',
                                                             _on_lxc_done                 => 'stopping/running_poststop_hook' } },
@@ -142,6 +149,7 @@ use QVD::StateMachine::Declarative
                                            leave       => '_stop_vma_monitor',
                                            transitions => { _on_alive                    => 'running/saving_state',
                                                             _on_cmd_stop                 => 'stopping/deleting_cmd',
+                                                            _on_hkd_stop                 => 'stopping/powering_off',
                                                             _on_lxc_done                 => 'stopping/running_poststop_hook' },
                                            ignore      => [qw(_on_dead
                                                               _on_goto_debug)] },
@@ -202,7 +210,39 @@ use QVD::StateMachine::Declarative
                                            ignore      => ['_on_clear_runtime_row_result',
                                                            '_on_clear_runtime_row_bad_result'] },
 
-    'failed'                          => { enter       => '_call_on_stopped' };
+    'failed'                          => { enter       => '_call_on_stopped' },
+
+
+    'zombie'                          => { jump        => 'zombie/loading_row' },
+
+    'zombie/loading_row'              => { enter       => '_load_row',
+                                           transitions =>  { _on_load_row_done           => 'zombie/stopping_lxc',
+                                                             _on_load_row_bad_result     => 'zombie/clearing_runtime_row' } },
+
+    'zombie/detecting_os_image_type'  => { enter       => '_detect_os_image_type',
+                                           transitions => { _on_detect_os_image_type_done => 'zombie/stopping_lxc',
+                                                            _on_detect_os_image_type_error => 'zombie/stopping_lxc' } },
+
+    'zombie/stopping_lxc'             => { enter       => '_stop_zombie_lxc',
+                                           transitions => { '_on_stop_zombie_lxc_done'   => 'zombie/running_poststop_hook',
+                                                            '_on_stop_zombie_lxc_error'  => 'zombie/running_poststop_hook' } },
+
+    'zombie/running_poststop_hook'    => { enter       => '_run_poststop_hook',
+                                           transitions => { _on_run_hook_done            => 'zombie/destroying_lxc',
+                                                            _on_run_hook_error           => 'zombie/destroying_lxc' } },
+
+    'zombie/destroying_lxc'           => { enter       => '_destroy_lxc',
+                                           transitions => { _on_destroy_lxc_done         => 'zombie/unmounting_root_fs',
+                                                            _on_destroy_lxc_error        => 'zombie/unmounting_root_fs' } },
+
+    'zombie/unmounting_root_fs'       => { enter       => '_unmount_root_fs',
+                                           transitions => { _on_unmount_root_fs_done     => 'zombie/clearing_runtime_row',
+                                                            _on_unmount_root_fs_error    => 'zombie/clearing_runtime_row' } },
+
+    'zombie/clearing_runtime_row'     => { enter       => '_clear_runtime_row',
+                                           transitions => { _on_clear_runtime_row_done   => 'stopped' },
+                                           ignore      => ['_on_clear_runtime_row_result',
+                                                           '_on_clear_runtime_row_bad_result'] };
 
 #sub leave_state :OnState('starting/waiting_for_vma') {
 #    my ($self, undef, $target) = @_;
@@ -214,6 +254,8 @@ use QVD::StateMachine::Declarative
 
 sub _on_cmd_stop  :OnState('__any__') { shift->delay_until_next_state }
 sub _on_cmd_start :OnState('__any__') { shift->_maybe_callback('on_delete_cmd') }
+
+sub on_hkd_stop  :OnState('__any__') { shift->delay_until_next_state }
 
 sub _untar_os_image {
     my $self = shift;
@@ -469,6 +511,13 @@ sub _stop_lxc {
     $self->_call_after($self->_cfg("internal.hkd.vmhandler.killer.delay"), '_stop_lxc');
 }
 
+
+sub _stop_zombie_lxc {
+    my $self = shift;
+    $self->_run_cmd([$self->_cfg('command.lxc-stop'), -n => $self->{lxc_name}]);
+}
+
+
 sub _destroy_lxc {
     my $self = shift;
     if ($self->_cfg('internal.hkd.lxc.does.not.cleanup')) {
@@ -533,6 +582,5 @@ sub _run_hook {
     $debug and $self->_debug("no hook for $name");
     $self->_on_run_hook_done;
 }
-
 
 1;

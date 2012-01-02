@@ -22,6 +22,7 @@ sub new {
     my $config = delete $opts{config};
     my $db = delete $opts{db};
     my $node_id = delete $opts{node_id};
+    my $on_stopped = delete $opts{on_stopped};
 
     croak_invalid_opts %opts;
 
@@ -30,6 +31,12 @@ sub new {
                  node_id => $node_id };
 
     Class::StateMachine::bless($self, $class);
+}
+
+sub _main_state {
+    my $state = shift->state;
+    $state =~ s|/.*$||;
+    $state;
 }
 
 sub _cfg { shift->{config}->_cfg(@_) }
@@ -303,6 +310,7 @@ sub _abort_all {
     my $self = shift;
     $self->_abort_call_after;
     $self->_abort_rpc;
+    $self->_cancel_current_query;
 }
 
 1;

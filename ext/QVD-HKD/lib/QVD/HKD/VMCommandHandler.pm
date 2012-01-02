@@ -7,8 +7,8 @@ use AnyEvent;
 use Pg::PQ qw(:pgres);
 
 
-# BEGIN { *debug = \$QVD::HKD::debug }
-our $debug = 1;
+BEGIN { *debug = \$QVD::HKD::debug }
+our $debug;
 
 use parent qw(QVD::HKD::Agent);
 
@@ -34,9 +34,14 @@ use QVD::StateMachine::Declarative
     waiting        => { enter       => '_start_timer',
                         leave       => '_abort_call_after',
                         transitions => { _on_timer             => 'loading_cmd',
-                                         _on_delete_cmd        => 'deleting_cmds'   } };
+                                         _on_delete_cmd        => 'deleting_cmds',
+                                         _on_hkd_stop          => 'stopped'         } },
+    stopped        => { enter       => '_on_stopped'                                  };
+
 
 sub _on_delete_cmd :OnState(__any__) {}
+
+sub on_hkd_stop :OnState(__any__) { shift->delay_until_next_state }
 
 sub new {
     my ($class, %opts) = @_;
@@ -116,6 +121,11 @@ sub _delete_cmds {
     @$vm_ids or return $self->_on_delete_cmds_done;
     my $in = join ",", @$vm_ids;
     $self->_query("update vm_runtimes set vm_cmd=NULL where vm_cmd='busy' and vm_id in ($in)");
+}
+
+sub _on_stopped {
+    my $self = shift;
+    $self->_maybe_callback('on_stopped');
 }
 
 1;

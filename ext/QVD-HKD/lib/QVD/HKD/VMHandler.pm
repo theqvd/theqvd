@@ -71,12 +71,6 @@ sub on_cmd {
     }
 }
 
-sub _main_state {
-    my $state = shift->state;
-    $state =~ s|/.*$||;
-    $state;
-}
-
 sub _save_state {
     my $self = shift;
     my $state = $self->_main_state;
@@ -246,7 +240,9 @@ update vm_runtimes
         vm_ssh_port    = NULL,
         vm_vnc_port    = NULL,
         vm_serial_port = NULL,
-        vm_mon_port    = NULL
+        vm_mon_port    = NULL,
+        vm_address     = NULL,
+        vm_cmd         = NULL
     where
         vm_id   = $1  and
         host_id = $2

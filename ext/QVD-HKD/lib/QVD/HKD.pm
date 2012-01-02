@@ -50,12 +50,39 @@ use QVD::StateMachine::Declarative
                                                          _on_ticker_error           => 'failed'                       } },
 
     'starting/agents'              => { enter       => '_start_agents',
-                                        transitions => { _on_agents_started         => 'running'                      } },
+                                        transitions => { _on_agents_started         => 'starting/catching_zombies'    } },
 
-    running                        => { transitions => { _on_cmd_stop               => 'stopping'                     },
-                                        ignore      => ['_on_ticked']                                                 },
-    failed                         => { enter       => '_on_failed'                                                   };
+    'starting/catching_zombies'    => { enter       => '_catch_zombies',
+                                        transitions => { _on_catch_zombies_done     => 'running/saving_state'         } },
 
+    'running/saving_state'         => { enter       => '_save_state',
+                                        transitions => { _on_save_state_done        => 'running'                      } },
+
+    running                        => { transitions => { _on_cmd_stop               => 'stopping'                     } },
+
+    stopping                       => { jump        => 'stopping/saving_state'                                          },
+
+    'stopping/saving_state'        => { enter       => '_save_state',
+                                        transitions => { _on_save_state_done        => 'stopping/stopping_all_vms'    } },
+
+    'stopping/stopping_all_vms'    => { enter       => '_stop_all_vms',
+                                        leave       => '_abort_all',
+                                        transitions => { _on_all_vms_stopped        => 'stopping/stopping_all_agents' } },
+
+    'stopping/stopping_all_agents' => { enter       => '_stop_all_agents',
+                                        transitions => { _on_all_agents_stopped     => 'stopped/saving_state'         } },
+
+    'stopped/saving_state'          => { enter       => '_save_state',
+                                         transitions => { _on_save_state_done       => 'stopped/bye'                  } },
+
+    'stopped/bye'                   => { enter       => 'say_goodbye'                                                   },
+
+    failed                          => { enter       => 'say_goodbye'                                                   };
+
+
+sub _on_ticked :OnState(__any__) {}
+sub _on_ticker_error :OnState(__any__) {}
+sub _on_all_vms_stopped :OnState(__any__) {}
 
 sub new {
     my ($class, %opts) = @_;
@@ -157,6 +184,16 @@ sub _calc_load_balancing_data {   ## taken from was_QVD-HKD/lib/QVD/HKD.pm, _upd
     return $bogomips, $meminfo{MemTotal}/1000;
 }
 
+sub _save_state {
+    my $self = shift;
+    my $state = $self->_main_state;
+    $debug and $self->_debug("changing database state to $state");
+    $self->_query('update host_runtimes set state = $1 where host_id = $2',
+                  $state, $self->{node_id});
+}
+
+sub _on_save_state_result {}
+
 sub _save_loadbal_data {
     my $self = shift;
     my ($cpu, $ram) = _calc_load_balancing_data;
@@ -192,11 +229,13 @@ sub _start_agents {
                  db => $self->{db},
                  node_id => $self->{node_id} );
     $self->{command_handler} = QVD::HKD::CommandHandler->new( %opts,
-                                                              on_cmd => sub { $self->_on_cmd } );
-
+                                                              on_cmd     => sub { $self->_on_cmd($_[1]) },
+                                                              on_stopped => sub { $self->_on_agent_stopped(@_) } );
     $self->{vm_command_handler} = QVD::HKD::VMCommandHandler->new( %opts,
-                                                                   on_cmd => sub { $self->_on_vm_cmd($_[1], $_[2]) });
-    $self->{dhcpd_handler} = QVD::HKD::DHCPDHandler->new( %opts );
+                                                                   on_cmd     => sub { $self->_on_vm_cmd($_[1], $_[2]) },
+                                                                   on_stopped => sub { $self->_on_agent_stopped(@_) } );
+    $self->{dhcpd_handler} = QVD::HKD::DHCPDHandler->new( %opts,
+                                                          on_stopped => sub { $self->_on_agent_stopped(@_) } );
 
     $self->{command_handler}->run;
     $self->{vm_command_handler}->run;
@@ -205,16 +244,57 @@ sub _start_agents {
     $self->_on_agents_started;
 }
 
+my @agent_names = qw(vm_command_handler
+                     command_handler
+                     dhcpd_handler
+                     ticker);
+
+sub _check_all_agents_have_stopped {
+    my $self = shift;
+    grep defined($self->{$_}), @agent_names or $self->_on_all_agents_stopped    
+}
+
+sub _stop_all_agents {
+    my $self = shift;
+    for my $agent_name (@agent_names) {
+        my $agent = $self->{$agent_name};
+        if (defined $agent) {
+            $agent->on_hkd_stop
+        }
+    }
+    $self->_check_all_agents_have_stopped
+}
+
+sub _on_agent_stopped {
+    my ($self, $agent) = @_;
+    for my $mine (@{$self}{@agent_names}) {
+        undef $mine if defined $mine and $mine == $agent;
+    }
+    $self->_check_all_agents_have_stopped
+}
+
 sub _on_cmd {
     my ($self, $cmd) = @_;
-    my $method = $self->can("_on_cmd_$cmd");
+    my $name = "_on_cmd_$cmd";
+    my $method = $self->can($name);
     if ($method) {
-        $debug and $self->_debug("calling method _on_cmd_$cmd");
+        $debug and $self->_debug("calling method $name");
         $method->($self);
     }
     else {
-        $debug and $self->_debug("no method _on_cmd_$cmd defined");
+        $debug and $self->_debug("no method $name defined");
     }
+}
+
+sub _new_vm_handler {
+    my ($self, $vm_id) = @_;
+    $self->{vm}{$vm_id} = QVD::HKD::VMHandler->new(config => $self->{config},
+                                                   vm_id =>  $vm_id,
+                                                   node_id => $self->{node_id},
+                                                   db => $self->{db},
+                                                   dhcpd_handler => $self->{dhcpd_handler},
+                                                   on_stopped => sub { $self->_on_vm_stopped($vm_id) },
+                                                   on_delete_cmd => sub { $self->_on_vm_cmd_done($vm_id) } );
 }
 
 sub _on_vm_cmd {
@@ -228,13 +308,7 @@ sub _on_vm_cmd {
             $debug and $self->_debug("start cmd received for live vm $vm_id");
             return;
         }
-        $self->{vm}{$vm_id} = $vm = QVD::HKD::VMHandler->new(config => $self->{config},
-                                                             vm_id =>  $vm_id,
-                                                             node_id => $self->{node_id},
-                                                             db => $self->{db},
-                                                             dhcpd_handler => $self->{dhcpd_handler},
-                                                             on_stopped => sub { $self->_on_vm_stopped($vm_id) },
-                                                             on_delete_cmd => sub { $self->_on_vm_cmd_done($vm_id) } );
+        $vm = $self->_new_vm_handler($vm_id);
     }
     unless (defined $vm) {
         $debug and $self->_debug("cmd $cmd received for unknown vm $vm_id");
@@ -246,6 +320,7 @@ sub _on_vm_cmd {
 sub _on_vm_stopped {
     my ($self, $vm_id) = @_;
     delete $self->{vm}{$vm_id};
+     keys %{$self->{vm}} or $self->_on_all_vms_stopped;
 }
 
 sub _on_vm_cmd_done {
@@ -254,6 +329,29 @@ sub _on_vm_cmd_done {
 }
 
 sub _on_failed { croak "something come completely wrong, aborting...\n" }
+
+sub _stop_all_vms {
+    my $self = shift;
+    values %{$self->{vm}} or return $self->_on_all_vms_stopped;
+    $_->_on_hkd_stop for values %{$self->{vm}};
+    $self->_call_after($self->_cfg("internal.hkd.killing.vms.timeout"), '_on_state_timeout');
+}
+
+sub _catch_zombies {
+    my $self = shift;
+    $self->_query('select vm_id from vm_runtimes where host_id=$1 and vm_state != \'stopped\'', $self->{node_id});
+}
+
+sub _on_catch_zombies_bad_result { }
+
+sub _on_catch_zombies_result {
+    my ($self, $res) = @_;
+    for my $i (0 .. $res->rows - 1) {
+        my $vm_id = $res->row($i);
+        my $vm = $self->_new_vm_handler($vm_id);
+        $vm->on_cmd('catch_zombie');
+    }
+}
 
 1;
 

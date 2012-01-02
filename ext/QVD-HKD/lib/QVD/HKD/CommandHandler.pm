@@ -10,7 +10,7 @@ use Pg::PQ qw(:pgres);
 
 use QVD::HKD::Helpers;
 
-# BEGIN { *debug = \$QVD::HKD::debug }
+BEGIN { *debug = \$QVD::HKD::debug }
 our $debug;
 
 use parent qw(QVD::HKD::Agent);
@@ -38,6 +38,7 @@ sub _on_load_cmd_result {
     if ($res->status == PGRES_TUPLES_OK) {
         if ($res->rows > 0) {
             $self->{cmd} = $res->row(0);
+            $debug and $self->_debug("host command $self->{cmd} loaded from database");
         }
         else {
             $debug and $self->_debug("no host commands found in database");
@@ -64,7 +65,7 @@ sub _on_load_cmd_error { shift->_loop }
 
 sub _delete_cmd {
     my $self = shift;
-    $self->_query_1('update host_runtime set cmd=NULL where host_id=$1 and cmd=$2', $self->{node_id}, $self->{cmd});
+    $self->_query_1('update host_runtimes set cmd=NULL where host_id=$1 and cmd=$2', $self->{node_id}, $self->{cmd});
 }
 
 sub _on_delete_cmd_result {
@@ -83,6 +84,12 @@ sub _loop {
     my $delay = $self->_cfg('internal.hkd.agent.command_handler.delay');
     $debug and $self->_debug("will be looking for new commands in $delay seconds");
     $self->_call_after($delay, '_load_cmd');
+}
+
+sub on_hkd_stop {
+    my $self = shift;
+    $self->_abort_all;
+    $self->_maybe_callback('on_stopped');
 }
 
 
