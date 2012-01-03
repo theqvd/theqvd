@@ -1,7 +1,0 @@
-libdl
-libc_main
-libpthread
-libgcc_s
-libX11
-libXt
-libXext

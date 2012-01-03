@@ -1,2 +1,0 @@
-#!/bin/bash
-LD_PRELOAD=/usr/lib/libX11-nx.so.6.2:/usr/lib/libXrender-nx.so.1.2.2:/usr/lib/libXext-nx.so.6.4 /usr/local/bin/nxagent.patched "$@"

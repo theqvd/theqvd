@@ -1,8 +1,0 @@
-000_debian_make_symlinks.diff
-001_remove_bashisms.diff
-002_install_to_NSPLUGINDIR.diff
-003_update_help_info.diff
-004_fix_threading.diff
-005_process_env_dirs.diff
-use_syslsb.patch
-007_qvd_modifications.diff
