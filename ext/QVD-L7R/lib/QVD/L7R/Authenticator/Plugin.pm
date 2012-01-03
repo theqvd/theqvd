@@ -11,10 +11,7 @@ sub before_connect_to_vm {}
 
 sub before_list_of_vms {}
 
-sub filter_list_of_vms {
-    my ($plugin, $auth, $vm_list) = @_;
-    return $vm_list;
-}
+sub allow_access_to_vm { 1 }
 
 1;
 

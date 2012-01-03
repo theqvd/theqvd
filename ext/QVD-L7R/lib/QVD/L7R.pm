@@ -103,19 +103,18 @@ sub list_of_vm_processor {
     }
     $auth->before_list_of_vms;
     my $user_id = _auth2user_id($auth);
+
     my @vm_list = ( map { { id      => $_->vm_id,
 			    state   => $_->vm_state,
 			    name    => $_->vm->name,
 			    blocked => $_->blocked } }
-		    map { $_->vm_runtime }
+		    map $_->vm_runtime,
+                    grep $auth->allow_access_to_vm($_),
 		    rs(VM)->search({user_id => $user_id}) );
 
-    my $vm_list_filtered = $auth->filter_list_of_vms(\@vm_list);
-
-    @$vm_list_filtered or INFO "User $user_id does not have any virtual machine";
-
+    @vm_list or INFO "User $user_id does not have any virtual machine";
     $l7r->send_http_response_with_body( HTTP_OK, 'application/json', [],
-					$l7r->json->encode($vm_list_filtered) );
+					$l7r->json->encode(\@vm_list) );
 }
 
 sub connect_to_vm_processor {
@@ -139,9 +138,13 @@ sub connect_to_vm_processor {
 	// $l7r->throw_http_error(HTTP_NOT_FOUND,
 			      "The requested virtual machine does not exists");
 
-    $vm->vm->user_id != _auth2user_id($auth)
-	and $l7r->throw_http_error(HTTP_FORBIDDEN,
-				   "You are not allowed to access requested virtual machine");
+    my $user_id = _auth2user_id($auth);
+    if ($vm->vm->user_id != $user_id or
+        !$auth->allow_access_to_vm($vm)) {
+        INFO "User $user_id has tried to access VM $vm_id";
+        $l7r->throw_http_error(HTTP_FORBIDDEN,
+                               "You are not allowed to access requested virtual machine");
+    }
 
     if (my @forbidden = grep !/^(?:qvd\.client\.|custom\.)/, keys %params) {
 	$l7r->throw_http_error(HTTP_FORBIDDEN,
