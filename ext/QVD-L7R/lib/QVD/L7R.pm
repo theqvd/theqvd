@@ -121,6 +121,8 @@ sub connect_to_vm_processor {
     my ($l7r, $method, $url, $headers) = @_;
     this_host->counters->incr_http_requests;
     my $auth = $l7r->_authenticate_user($headers);
+    my $user_id = _auth2user_id($auth);
+
     if (this_host->runtime->blocked) {
 	$l7r->throw_http_error(HTTP_SERVICE_UNAVAILABLE, "Server is blocked");
     }
@@ -138,7 +140,6 @@ sub connect_to_vm_processor {
 	// $l7r->throw_http_error(HTTP_NOT_FOUND,
 			      "The requested virtual machine does not exists");
 
-    my $user_id = _auth2user_id($auth);
     if ($vm->vm->user_id != $user_id or
         !$auth->allow_access_to_vm($vm)) {
         INFO "User $user_id has tried to access VM $vm_id";
