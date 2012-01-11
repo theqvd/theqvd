@@ -390,7 +390,7 @@ sub _allocate_os_rootfs {
         }
         when ('bind') {
             if (system $self->_cfg('command.mount'),
-                --bind => $self->{os_basefs}, $rootfs) {
+                '--bind' => $self->{os_basefs}, $rootfs) {
                 ERROR "unable to mount bind $self->{os_overlayfs} into $rootfs (code: " . ($? >> 8) . ")";
                 return $self->_on_allocate_os_rootfs_error;
             }
