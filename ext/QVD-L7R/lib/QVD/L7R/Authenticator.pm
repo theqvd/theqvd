@@ -64,7 +64,7 @@ sub allow_access_to_vm {
     my ($auth, $vm) = @_;
     DEBUG "calling allow_access_to_vm hook";
     for (@{$auth->{modules}}) {
-        $_->allow_access_to_vm($vm) or return;
+        $_->allow_access_to_vm($auth, $vm) or return;
     }
     return 1;
 }
