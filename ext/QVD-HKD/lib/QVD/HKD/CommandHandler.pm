@@ -37,8 +37,8 @@ sub _on_load_cmd_result {
     my ($self, $res) = @_;
     if ($res->status == PGRES_TUPLES_OK) {
         if ($res->rows > 0) {
-            $self->{cmd} = $res->row(0);
-            $debug and $self->_debug("host command $self->{cmd} loaded from database");
+            $self->{cmd} = $res->row(0)//'';
+            $debug and $self->_debug("host command '$self->{cmd}' loaded from database");
         }
         else {
             $debug and $self->_debug("no host commands found in database");
