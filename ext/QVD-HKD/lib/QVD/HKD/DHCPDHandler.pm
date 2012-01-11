@@ -75,7 +75,7 @@ sub _run_dhcpd {
     close $fh;
 
     $self->_run_cmd([ $dhcpd_cmd,
-                      '-k', '-log-dhcp',
+                      '-k', '--log-dhcp',
                       '--dhcp-range'     => "interface:$network_bridge,$dhcp_start,static",
                       '--dhcp-option'    => "option:router,$dhcp_default_route",
                       '--interface'      => $network_bridge,
