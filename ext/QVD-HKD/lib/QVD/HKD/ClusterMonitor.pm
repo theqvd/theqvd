@@ -1,0 +1,167 @@
+package QVD::HKD::ClusterMonitor;
+
+use strict;
+use warnings;
+use Carp;
+use DateTime;
+use AnyEvent;
+use Pg::PQ qw(:pgres);
+
+use QVD::HKD::Helpers;
+
+use parent qw(QVD::HKD::Agent);
+
+use QVD::StateMachine::Declarative
+    new           => { transitions => { _on_run             => 'checking'      } },
+    checking      => { enter => '_check',
+                       transitions => { _on_check_done      => 'delaying',
+                                        _on_kill_hosts      => 'killing_hosts' } },
+    killing_hosts => { enter => '_kill_hosts',
+                       transitions => { _on_kill_hosts_done => 'stopping_vms'  } },
+    stopping_vms  => { enter => '_stop_vms',
+                       transitions => { _on_stop_vms_done   => 'delaying'      } },
+    delaying      => { enter => '_set_timer',
+                       transitions => { _on_timeout         => 'checking',
+                                        on_hkd_stop         => 'stopped'       },
+                       leave => '_abort_all'                                     },
+    stopped       => { enter => '_on_stopped'                                    };
+
+sub new {
+    my ($class, %opts) = @_;
+
+    my $on_checked = delete $opts{on_checked};
+    my $on_error = delete $opts{on_error};
+
+    my $self = $class->SUPER::new(%opts);
+
+    $self->{on_checked} = $on_checked;
+    $self->{on_error} = $on_error;
+    $self;
+}
+
+sub run { shift->_on_run }
+
+## ==========================================================================================
+## ==========================================================================================
+
+sub _check {
+    my $self = shift;
+    $self->_query(q(select host_id, ok_ts from host_runtimes where state='running' and host_id!=$1 and not blocked),
+                  $self->{node_id});
+}
+
+sub _on_check_error {
+    my $self = shift;
+    $self->_maybe_callback('on_error');
+    $self->_on_check_done;
+}
+
+sub _on_check_result {
+    my ($self, $res) = @_;
+    if ($res->status == PGRES_TUPLES_OK) {
+        my $cluster_node_timeout = $self->_cfg('internal.hkd.cluster.node.timeout');
+        my $time = time;
+        for ($res->rows) {
+            my ($host_id, $ok_ts) = @$_;
+            $ok_ts =~ /^(\d{4})-(\d{2})-(\d{2}) (\d{2}):(\d{2}):(\d{2})\.(\d+)/ or die 'wrong HKD ts format';
+            $ok_ts = DateTime->new (
+                year => $1, month => $2, day => $3,
+                hour => $4, minute => $5, second => $6,
+                nanosecond => 1000 * $7
+            )->epoch;
+
+            # TODO: esto esta muy justo! habria que darle algun tiempo extra
+            # al noded del nodo caido para matar sus maquinas virtuales.
+            #
+            # 20120112: this aritmetics could be done at the DB level,
+            # thereby saving us from parsing $ok_ts and requiring DateTime
+            if ($ok_ts + $cluster_node_timeout < $time) {
+                push @{ $self->{'_down_hosts'} }, $host_id
+            }
+        }
+    } else {
+        $self->_maybe_callback('on_error')
+    }
+    if ($self->{'_down_hosts'}) {
+        $self->_on_kill_hosts;
+    } else {
+        $self->_maybe_callback('on_checked');
+    }
+}
+
+sub _on_check_bad_result { shift->_maybe_callback('on_error') }
+
+## ==========================================================================================
+## ==========================================================================================
+
+sub _kill_hosts {
+    my ($self) = @_;
+
+    my $plh = join ',', map { "\$$_" } 1 .. @{ $self->{'_down_hosts'} };
+    $self->_query ("update host_runtimes set state = 'lost', blocked = true where host_id in ($plh)", @{ $self->{'_down_hosts'} });
+}
+
+sub _on_kill_hosts_error {
+    my $self = shift;
+    $self->_maybe_callback('on_error');
+    $self->_on_check_done;
+}
+
+sub _on_kill_hosts_result {
+    my ($self, $res) = @_;
+    if ($res->status == PGRES_COMMAND_OK and $res->cmdRows) {
+        ## nothing, progress to next state
+        #$self->_stop_vms;
+    }
+    else {
+        $self->_maybe_callback('on_error')
+    }
+}
+
+sub _on_kill_hosts_bad_result { shift->_maybe_callback('on_error') }
+
+## ==========================================================================================
+## ==========================================================================================
+
+sub _stop_vms {
+    my ($self) = @_;
+
+    my $plh = join ',', map { "\$$_" } 1 .. @{ $self->{'_down_hosts'} };
+    $self->_query ("update vm_runtimes set vm_state = 'stopped', blocked = true where host_id in ($plh)", @{ $self->{'_down_hosts'} });
+}
+
+sub _on_stop_vms_error {
+    my $self = shift;
+    $self->_maybe_callback('on_error');
+    $self->_on_check_done;
+}
+
+sub _on_stop_vms_result {
+    my ($self, $res) = @_;
+    if ($res->status == PGRES_COMMAND_OK and $res->cmdRows) {
+        $self->_maybe_callback('on_checked')
+        # TODO: en este caso, seria interesante regenerar los overlays de la maquina que se recupera de manera que:
+        # - el filesystem puede estar corrupto, el fsck automatico podria fallar.
+        # - realmente nos aseguramos de que en ningun caso pueda haber dos maquinas virtuales corriendo contra la misma imagen.
+    }
+    else {
+        $self->_maybe_callback('on_error')
+    }
+}
+
+sub _on_stop_vms_bad_result { shift->_maybe_callback('on_error') }
+
+## ==========================================================================================
+## ==========================================================================================
+
+sub _set_timer {
+    my $self = shift;
+    $self->_call_after($self->_cfg('internal.hkd.agent.cluster_monitor.delay'), '_on_timeout');
+}
+
+sub _on_stopped {
+    my $self = shift;
+    $self->_maybe_callback('on_stopped');
+}
+
+1;

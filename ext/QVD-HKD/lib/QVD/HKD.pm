@@ -23,6 +23,7 @@ use QVD::HKD::Helpers;
 
 use QVD::HKD::Config;
 use QVD::HKD::Ticker;
+use QVD::HKD::ClusterMonitor;
 use QVD::HKD::DHCPDHandler;
 use QVD::HKD::CommandHandler;
 use QVD::HKD::VMCommandHandler;
@@ -46,8 +47,12 @@ use QVD::StateMachine::Declarative
                                         transitions => { _on_save_loadbal_data_done => 'starting/ticking'             } },
 
     'starting/ticking'             => { enter       => '_start_ticking',
-                                        transitions => { _on_ticked                 => 'starting/agents',
+                                        transitions => { _on_ticked                 => 'starting/checking',
                                                          _on_ticker_error           => 'failed'                       } },
+
+    'starting/checking'            => { enter       => '_start_checking',
+                                        transitions => { _on_checked                => 'starting/agents',
+                                                         _on_checker_error          => 'failed'                       } },
 
     'starting/agents'              => { enter       => '_start_agents',
                                         transitions => { _on_agents_started         => 'starting/catching_zombies'    } },
@@ -82,6 +87,8 @@ use QVD::StateMachine::Declarative
 
 sub _on_ticked :OnState(__any__) {}
 sub _on_ticker_error :OnState(__any__) {}
+sub _on_checked :OnState(__any__) {}
+sub _on_checker_error :OnState(__any__) {}
 sub _on_all_vms_stopped :OnState(__any__) {}
 sub _on_cmd_stop :OnState(__any__) { shift->delay_until_next_state }
 
@@ -230,6 +237,17 @@ sub _start_ticking {
                                              on_error => sub { $self->_on_ticker_error },
                                              on_stopped => sub { $self->_on_agent_stopped(@_) } );
     $self->{ticker}->run;
+}
+
+sub _start_checking {
+    my $self = shift;
+    $self->{checker} = QVD::HKD::ClusterMonitor->new( config => $self->{config},
+                                                      db => $self->{db},
+                                                      node_id => $self->{node_id},
+                                                      on_checked => sub { $self->_on_checked },
+                                                      on_error => sub { $self->_on_checker_error },
+                                                      on_stopped => sub { $self->_on_agent_stopped(@_) } );
+    $self->{checker}->run;
 }
 
 sub _start_agents {
