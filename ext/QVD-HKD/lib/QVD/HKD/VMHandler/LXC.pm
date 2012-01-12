@@ -580,6 +580,7 @@ sub _run_hook {
                                                        name
                                                        ip
                                                        os_rootfs
+                                                       os_overlayfs
                                                        lxc_name ));
 
             $debug and $self->_debug("running hook $hook for $name");
