@@ -9,7 +9,7 @@ use QVD::Log;
 use parent 'QVD::L7R::Authenticator::Plugin';
 
 sub authenticate_basic {
-    my ($plugin, $auth, $login, $passwd) = @_;
+    my ($plugin, $auth, $login, $passwd, $l7r) = @_;
     DEBUG "authenticating $login";
     my $rs = rs(User)->search({login => $login, password => $passwd});
     return () unless $rs->count > 0;
