@@ -361,7 +361,7 @@ sub _on_failed { croak "something come completely wrong, aborting...\n" }
 sub _stop_all_vms {
     my $self = shift;
     values %{$self->{vm}} or return $self->_on_all_vms_stopped;
-    $_->_on_hkd_stop for values %{$self->{vm}};
+    $_->on_hkd_stop for values %{$self->{vm}};
     $self->_call_after($self->_cfg("internal.hkd.killing.vms.timeout"), '_on_state_timeout');
 }
 
