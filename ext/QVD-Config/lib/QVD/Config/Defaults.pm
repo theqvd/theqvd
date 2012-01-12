@@ -193,6 +193,8 @@ vma.user.home.path = /home
 vma.user.default.name = qvd
 vma.user.default.groups =
 
+vma.user.umask = 0022
+
 ## external executables the VMA calls when some events happen
 vma.on_action.pre-connect =
 vma.on_action.connect =
