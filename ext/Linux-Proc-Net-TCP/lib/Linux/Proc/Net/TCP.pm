@@ -1,6 +1,6 @@
 package Linux::Proc::Net::TCP;
 
-our $VERSION = '0.04';
+our $VERSION = '0.05';
 
 use strict;
 use warnings;
@@ -19,9 +19,13 @@ sub read {
 
     $mnt = "/proc" unless defined $mnt;
 
+    unless (-d $mnt and (stat _)[12] == 0) {
+        croak "$mnt is not a proc filesystem";
+    }
+
     my @fn;
     push @fn, "$mnt/net/tcp"  unless (defined $ip4 and not $ip4);
-    push @fn, "$mnt/net/tcp6" unless (defined $ip6 and not $ip6);
+    push @fn, "$mnt/net/tcp6" if (defined $ip6 ? -f "$mnt/net/tcp6" : $ip6);
 
     my @entries;
     for my $fn (@fn) {
@@ -316,7 +320,7 @@ Salvador FandiE<ntilde>o E<lt>sfandino@yahoo.comE<gt>
 
 =head1 COPYRIGHT AND LICENSE
 
-Copyright (C) 2010 by Qindel Formacion y Servicios S.L.
+Copyright (C) 2010, 2012 by Qindel Formacion y Servicios S.L.
 
 This library is free software; you can redistribute it and/or modify
 it under the same terms as Perl itself, either Perl version 5.10.1 or,

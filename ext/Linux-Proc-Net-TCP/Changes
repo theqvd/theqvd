@@ -1,5 +1,9 @@
 Revision history for Perl extension Linux::Proc::Net::TCP.
 
+0.05  Jan 12, 2012
+        - do not die on machines without IPv6 support
+        - check that proc is a proc filesystem
+
 0.04  Oct 20, 2010
         - add support for tcp6 (note that this change could break your
           code)
