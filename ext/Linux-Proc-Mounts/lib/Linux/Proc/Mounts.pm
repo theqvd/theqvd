@@ -1,47 +1,111 @@
 package Linux::Proc::Mounts;
 
-use 5.014002;
-use strict;
-use warnings;
-
-require Exporter;
-
-our @ISA = qw(Exporter);
-
-# Items to export into callers namespace by default. Note: do not export
-# names by default without a very good reason. Use EXPORT_OK instead.
-# Do not simply export all your public functions/methods/constants.
-
-# This allows declaration	use Linux::Proc::Mounts ':all';
-# If you do not need this, moving things directly into @EXPORT or @EXPORT_OK
-# will save memory.
-our %EXPORT_TAGS = ( 'all' => [ qw(
-	
-) ] );
-
-our @EXPORT_OK = ( @{ $EXPORT_TAGS{'all'} } );
-
-our @EXPORT = qw(
-	
-);
-
 our $VERSION = '0.01';
 
+use strict;
+use warnings;
+use Carp;
 
-# Preloaded methods go here.
+sub read {
+    my ($class, %opts) = @_;
+    my $mnt = delete $opts{mnt};
 
-1;
+    %opts and croak "Unknown option(s) ". join(", ", sort keys %opts);
+
+    $mnt = "/proc" unless defined $mnt;
+
+    unless (-d $mnt and (stat _)[12] == 0) {
+        croak "$mnt is not a proc filesystem";
+    }
+
+    my @entries;
+    open my $fh, '<', "$mnt/mounts"
+        or croak "Unable to open $mnt/mounts: $!";
+    while (<$fh>) {
+        chomp;
+        my @entry = split;
+        if (@entry != 6) {
+            warn "invalid number of entries in $mnt/mounts line $.";
+            next;
+        }
+        $#entry = 3; # ignore the two dummy values at the end
+        s/\\([0-7]{1,3})/chr oct $1/g for @entry;
+        push @entry, _key($entry[1]);
+        my $entry = \@entry;
+        bless $entry, 'Linux::Proc::Mounts::Entry';
+        push @entries, $entry;
+    }
+    bless \@entries, $class;
+}
+
+sub _key {
+    my $mnt = shift;
+    $mnt =~ s|/+|/|g;
+    $mnt =~ s|/?$|/|;
+    $mnt =~ s|([\0/])|\0$1|g;
+    $mnt;
+}
+
+sub sorted {
+    my $self = shift;
+    bless [ sort { $a->[4] cmp $b->[4] } @$self ], ref $self;
+}
+
+sub at {
+    my ($self, $at) = @_;
+    my $key = _key $at;
+    bless [ grep { $_->[4] eq $key } @$self ], ref $self;
+}
+
+sub under {
+    my ($self, $at) = @_;
+    my $key = quotemeta _key $at;
+    my $re = qr/^$key/;
+    bless [ grep { $_->[4] =~ $re } @$self ], ref $self;
+}
+
+package Linux::Proc::Mounts::Entry;
+
+sub _key   { shift->[4] }
+sub spec   { shift->[0] }
+sub file   { shift->[1] }
+sub fstype { shift->[2] }
+sub opts   { shift->[3] }
+
+sub opts_hash {
+    my %h;
+    for (split /,/, shift->[3]) {
+        if (/(.*)=(.*)/) {
+            $h{$1} = $2;
+        }
+        else {
+            $h{$_} = 1;
+        }
+    }
+    \%h;
+}
+
+sub is_ro { shift->[3] =~ /(?:^|,)ro(?:,|$)/ }
+
+
 __END__
-# Below is stub documentation for your module. You'd better edit it!
 
 =head1 NAME
 
-Linux::Proc::Mounts - Perl extension for blah blah blah
+Linux::Proc::Mounts - Parser for Linux /proc/mounts
 
 =head1 SYNOPSIS
 
   use Linux::Proc::Mounts;
-  blah blah blah
+
+  my $m = Linux::Proc::Mount->read;
+
+  my $at = $m->at('/');
+  if ($at) {
+    for (@$at) {
+
+    }
+
 
 =head1 DESCRIPTION
 
