@@ -1,0 +1,6 @@
+blib
+pm_to_blib
+.yml$
+Makefile
+.bak$
+.svn
