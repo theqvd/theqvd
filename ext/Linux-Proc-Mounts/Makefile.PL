@@ -1,7 +1,7 @@
 
 use ExtUtils::MakeMaker;
 
-$^O eq 'linux' of die "OS unsupported\n";
+$^O eq 'linux' or die "OS unsupported\n";
 
 WriteMakefile( NAME          => 'Linux::Proc::Mounts',
                VERSION_FROM  => 'lib/Linux/Proc/Mounts.pm',
