@@ -219,7 +219,7 @@ information for TCP over IP6 connections
 
 =item mnt => $procfs_mount_point
 
-allows to override the default mount point for the procfs at C</proc>
+overrides the default mount point for the procfs at C</proc>.
 
 =back
 
