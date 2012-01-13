@@ -136,9 +136,13 @@ the Linux kernel at C</proc/mounts>.
 The internal representation of the class is an array whose entries can
 be accessed directly unreferencing it. For instance:
 
+  my $mnts = Linux::Proc::Mount->read;
+
   for my $e (@$mnts) {
     say $e->spec . " is mounted at " . $e->file . " as " . $e->fstype;
   }
+
+The methods accepted by the class are as follows:
 
 =over 4
 
