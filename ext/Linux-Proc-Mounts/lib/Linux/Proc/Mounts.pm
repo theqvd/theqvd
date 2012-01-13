@@ -229,7 +229,7 @@ Returns the line number of the entry inside the /proc/mounts file.
 
 =item $e->shadower
 
-When the filesystem is hiden behind by a later mount performed at the
+When the filesystem is hiden behind a later mount performed at the
 same path. This method returns the entry of the filesystem shadowing
 it.
 
