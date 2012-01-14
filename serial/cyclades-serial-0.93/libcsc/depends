@@ -1,4 +1,0 @@
-# DO NOT DELETE
-
-libcyclades-ser-cli.o: ../inc/control.h ../inc/misc.h ../inc/telnet.h
-libcyclades-ser-cli.o: ../inc/port_speed.h

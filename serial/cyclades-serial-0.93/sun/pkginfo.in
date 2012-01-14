@@ -1,9 +1,0 @@
-PKG=cyclades-ser-cli
-ARCH=sparc
-VERSION=@version@
-CATEGORY=comms
-NAME=cyclades-ser-cli
-DESC=Serial Port Network Redirector
-VENDOR=Cyclades
-EMAIL=russell@coker.com.au
-MAXINST=1
