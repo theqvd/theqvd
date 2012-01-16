@@ -15,6 +15,7 @@
 PATH=/usr/lib/qvd/bin:/bin:/usr/bin
 
 DAEMON=/usr/lib/qvd/bin/qvd_admin_web_server.pl
+PERL=/usr/lib/qvd/bin/perl
 NAME=qvd-wat
 DESC="QVD Web Administration Tool"
 
@@ -123,17 +124,16 @@ start_server() {
 
 stop_server() {
 # Stop the process using the wrapper
-        if [ -z "$DAEMONUSER" ] ; then
-            killproc -p $PIDFILE $DAEMON
-            errcode=$?
-        else
-# if we are using a daemonuser then look for process that match
-            start-stop-daemon --stop --quiet --pidfile $PIDFILE \
-                        --user $DAEMONUSER \
-                        --exec $DAEMON
-            errcode=$?
-        fi
+	userarg=""
 
+	if [ -n "$DAEMONUSER" ] ; then
+		userarg="--user $DAEMONUSER"
+	fi
+
+	start-stop-daemon --stop --quiet --pidfile $PIDFILE \
+	                  $userarg \
+	                  --exec $PERL
+	errcode=$?
         return $errcode
 }
 
