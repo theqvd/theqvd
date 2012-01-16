@@ -27,7 +27,7 @@ sub read {
         chomp;
         my @entry = split;
         if (@entry != 6) {
-            warn "invalid number of entries in $mnt/mounts line $.";
+            warn "invalid number of entries in $file line $.";
             next;
         }
         $#entry = 3; # ignore the two dummy values at the end
