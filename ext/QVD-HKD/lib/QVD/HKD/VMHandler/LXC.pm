@@ -12,6 +12,7 @@ use AnyEvent;
 use AnyEvent::Util;
 use QVD::Log;
 use File::Temp qw(tempfile);
+use Linux::Proc::Mounts;
 
 use parent qw(QVD::HKD::VMHandler);
 
@@ -149,7 +150,7 @@ use QVD::StateMachine::Declarative
                                            leave       => '_stop_vma_monitor',
                                            transitions => { _on_alive                    => 'running/saving_state',
                                                             _on_cmd_stop                 => 'stopping/deleting_cmd',
-                                                            _on_hkd_stop                 => 'stopping/powering_off',
+                                                            on_hkd_stop                  => 'stopping/powering_off',
                                                             _on_lxc_done                 => 'stopping/running_poststop_hook' },
                                            ignore      => [qw(_on_dead
                                                               _on_goto_debug)] },
