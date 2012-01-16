@@ -1,6 +1,6 @@
 package Linux::Proc::Mounts;
 
-our $VERSION = '0.01';
+our $VERSION = '0.02';
 
 use strict;
 use warnings;
@@ -9,18 +9,20 @@ use Carp;
 sub read {
     my ($class, %opts) = @_;
     my $mnt = delete $opts{mnt};
-
+    my $pid = delete $opts{pid};
+    my $file = delete $opts{file};
     %opts and croak "Unknown option(s) ". join(", ", sort keys %opts);
 
-    $mnt = "/proc" unless defined $mnt;
-
-    unless (-d $mnt and (stat _)[12] == 0) {
-        croak "$mnt is not a proc filesystem";
+    unless (defined $file) {
+        $mnt = "/proc" unless defined $mnt;
+        croak "$mnt is not a proc filesystem" unless -d $mnt and (stat _)[12] == 0;
+        $mnt .= "/$pid" if defined $pid;
+        $file = "$mnt/mounts";
     }
+    open my $fh, '<', $file
+        or croak "Unable to open '$file': $!";
 
     my @entries;
-    open my $fh, '<', "$mnt/mounts"
-        or croak "Unable to open $mnt/mounts: $!";
     while (<$fh>) {
         chomp;
         my @entry = split;
@@ -159,7 +161,15 @@ The currently supported options are as follows:
 
 =item mnt => $proc
 
-overrides the default mount point for the procfs at C</proc>.
+Overrides the default mount point for the procfs at C</proc>.
+
+=item pid => $pid
+
+Reads C</proc/$pid/mounts> instead of C</proc/mounts>.
+
+=item file => $filename
+
+Reads the file with the given name.
 
 =back
 
@@ -252,6 +262,10 @@ entries in /proc/mounts are always 0 and so, useless.
 L<fstab(5)> describes the format of the /proc/mounts file.
 
 L<mount(8)> describes the filesystems and the options accepted.
+
+L<Linux::Proc::Mountinfo>. The information offered by the Linux kernel
+through C</proc/$pid/mountinfo> is more detailed so you should
+probably use that module instead of Linux::Proc::Mounts.
 
 L<Sys::Filesystem> provides similar functionality to this module and
 support most common operating systems.
