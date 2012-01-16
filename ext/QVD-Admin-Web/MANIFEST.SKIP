@@ -1,6 +1,8 @@
 blib
 pm_to_blib
 .yml$
-Makefile
+^Makefile$
 .bak$
 .svn
+inc
+^QVD-Admin-Web-

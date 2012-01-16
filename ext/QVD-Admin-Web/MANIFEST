@@ -1,15 +1,4 @@
 Changes
-inc/Module/AutoInstall.pm
-inc/Module/Install.pm
-inc/Module/Install/AutoInstall.pm
-inc/Module/Install/Base.pm
-inc/Module/Install/Can.pm
-inc/Module/Install/Fetch.pm
-inc/Module/Install/Include.pm
-inc/Module/Install/Metadata.pm
-inc/Module/Install/Scripts.pm
-inc/Module/Install/Win32.pm
-inc/Module/Install/WriteAll.pm
 lib/QVD/Admin/Web.pm
 lib/QVD/Admin/Web/Controller/Di.pm
 lib/QVD/Admin/Web/Controller/Hosts.pm
@@ -342,7 +331,6 @@ lib/QVD/Admin/Web/root/static/images/icons/connect.png
 lib/QVD/Admin/Web/root/static/images/icons/contrast.png
 lib/QVD/Admin/Web/root/static/images/icons/contrast_decrease.png
 lib/QVD/Admin/Web/root/static/images/icons/contrast_high.png
-lib/QVD/Admin/Web/root/static/images/icons/contrast_increase.png
 lib/QVD/Admin/Web/root/static/images/icons/contrast_low.png
 lib/QVD/Admin/Web/root/static/images/icons/control_eject.png
 lib/QVD/Admin/Web/root/static/images/icons/control_eject_blue.png
@@ -1251,11 +1239,13 @@ lib/QVD/Admin/Web/root/wrappermin.tt
 lib/QVD/Admin/Web/View/JSON.pm
 lib/QVD/Admin/Web/View/TT.pm
 lib/QVD/Admin/Web/View/TTMin.pm
+Makefile.PL
 MANIFEST
 MANIFEST.SKIP
 qvd_admin_web.conf
 README
 script/qvd-wat.initrc
+script/qvd-wat.initrc.pl
 script/qvd_admin_web_cgi.pl
 script/qvd_admin_web_create.pl
 script/qvd_admin_web_fastcgi.pl
