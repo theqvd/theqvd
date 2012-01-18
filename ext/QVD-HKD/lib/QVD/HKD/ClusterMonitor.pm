@@ -67,7 +67,8 @@ sub _on_check_result {
             $ok_ts = DateTime->new (
                 year => $1, month => $2, day => $3,
                 hour => $4, minute => $5, second => $6,
-                nanosecond => 1000 * $7
+                nanosecond => 1000 * $7,
+                time_zone => 'local',
             )->epoch;
 
             # TODO: esto esta muy justo! habria que darle algun tiempo extra
