@@ -347,7 +347,7 @@ is supposedly more detailed so there is no reason to use that module
 
 =head1 AUTHOR
 
-Salvador FandiE>ntilde>o, E<lt>sfandino@yahoo.com<gt>
+Salvador FandiE<ntilde>o, E<lt>sfandino@yahoo.com<gt>
 
 =head1 COPYRIGHT AND LICENSE
 
