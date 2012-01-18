@@ -140,10 +140,12 @@ sub _on_stop_vms_error {
 
 sub _on_stop_vms_result {
     my ($self, $res) = @_;
-    if ($res->status == PGRES_COMMAND_OK and $res->cmdRows) {
-        # TODO: en este caso, seria interesante regenerar los overlays de la maquina que se recupera de manera que:
-        # - el filesystem puede estar corrupto, el fsck automatico podria fallar.
-        # - realmente nos aseguramos de que en ningun caso pueda haber dos maquinas virtuales corriendo contra la misma imagen.
+    if ($res->status == PGRES_COMMAND_OK) {
+        if ($res->cmdRows) {
+            # TODO: en este caso, seria interesante regenerar los overlays de la maquina que se recupera de manera que:
+            # - el filesystem puede estar corrupto, el fsck automatico podria fallar.
+            # - realmente nos aseguramos de que en ningun caso pueda haber dos maquinas virtuales corriendo contra la misma imagen.
+        }
     }
     else {
         $self->_maybe_callback('on_error')
