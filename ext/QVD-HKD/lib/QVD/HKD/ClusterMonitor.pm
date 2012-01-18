@@ -84,12 +84,12 @@ sub _on_check_result {
     }
     if ($self->{'_down_hosts'}) {
         $self->_on_kill_hosts;
-    } else {
-        $self->_maybe_callback('on_checked');
     }
 }
 
 sub _on_check_bad_result { shift->_maybe_callback('on_error') }
+
+sub _on_check_done { }
 
 ## ==========================================================================================
 ## ==========================================================================================
@@ -120,6 +120,8 @@ sub _on_kill_hosts_result {
 
 sub _on_kill_hosts_bad_result { shift->_maybe_callback('on_error') }
 
+sub _on_kill_hosts_done { }
+
 ## ==========================================================================================
 ## ==========================================================================================
 
@@ -139,7 +141,6 @@ sub _on_stop_vms_error {
 sub _on_stop_vms_result {
     my ($self, $res) = @_;
     if ($res->status == PGRES_COMMAND_OK and $res->cmdRows) {
-        $self->_maybe_callback('on_checked')
         # TODO: en este caso, seria interesante regenerar los overlays de la maquina que se recupera de manera que:
         # - el filesystem puede estar corrupto, el fsck automatico podria fallar.
         # - realmente nos aseguramos de que en ningun caso pueda haber dos maquinas virtuales corriendo contra la misma imagen.
@@ -151,11 +152,15 @@ sub _on_stop_vms_result {
 
 sub _on_stop_vms_bad_result { shift->_maybe_callback('on_error') }
 
+sub _on_stop_vms_done { }
+
 ## ==========================================================================================
 ## ==========================================================================================
 
 sub _set_timer {
     my $self = shift;
+    undef $self->{'_down_hosts'};
+    $self->_maybe_callback('on_checked');
     $self->_call_after($self->_cfg('internal.hkd.agent.cluster_monitor.delay'), '_on_timeout');
 }
 
