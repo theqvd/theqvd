@@ -71,7 +71,7 @@ sub read {
 sub at {
     my ($self, $at) = @_;
     my $key = _key $at;
-    $_->[12] eq $at and return $_ for @$self;
+    $_->[12] eq $key and return $_ for @$self;
     ()
 }
 
@@ -331,30 +331,30 @@ related to C<mountinfo>.
 
     For more information on mount propagation see:
 
-      Documentation/filesystems/sharedsubtree.txt
+        Documentation/filesystems/sharedsubtree.txt
 
 =head1 SEE ALSO
 
-Mention other useful documentation such as the documentation of
-related modules or operating system documentation (such as man pages
-in UNIX), or any relevant external documentation such as RFCs or
-standards.
+L<mount(8)> describes the filesystems and the options accepted.
 
-If you have a mailing list set up for your module, mention it here.
+L<Sys::Filesystem> provides similar functionality to this module and
+support most common operating systems.
 
-If you have a web site set up for your module, mention it here.
+L<Linux::Proc::Mounts> provides similar information from
+C</proc/mounts>, though the information from C</proc/$PID/mountinfo>
+is supposedly more detailed so there is no reason to use that module
+(at least, this is the theory).
 
 =head1 AUTHOR
 
-root, E<lt>root@nonetE<gt>
+Salvador FandiE>ntilde>o, E<lt>sfandino@yahoo.com<gt>
 
 =head1 COPYRIGHT AND LICENSE
 
-Copyright (C) 2012 by root
+Copyright (C) 2012 Qindel FormaciE<oacute>n y Servicios S.L.
 
 This library is free software; you can redistribute it and/or modify
 it under the same terms as Perl itself, either Perl version 5.14.2 or,
 at your option, any later version of Perl 5 you may have available.
-
 
 =cut
