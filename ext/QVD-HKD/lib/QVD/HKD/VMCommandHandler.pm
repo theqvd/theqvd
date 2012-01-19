@@ -53,8 +53,6 @@ sub new {
     $self;
 }
 
-sub run { shift->_on_run }
-
 sub _load_cmd {
     my $self = shift;
     $self->{vm_id} = undef;

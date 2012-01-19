@@ -34,6 +34,8 @@ sub new {
     Class::StateMachine::bless($self, $class);
 }
 
+sub run { shift->_on_run }
+
 sub _main_state {
     my $state = shift->state;
     $state =~ s|/.*$||;

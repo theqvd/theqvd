@@ -47,7 +47,8 @@ sub _monitor_vma {
         confess "internal error: _monitor_vma called but not running";
     }
     $self->{rpc_retry_count} = 0;
-    $self->_rpc('ping') }
+    $self->_rpc('ping')
+}
 
 sub _on_rpc_ping_result {
     my $self = shift;

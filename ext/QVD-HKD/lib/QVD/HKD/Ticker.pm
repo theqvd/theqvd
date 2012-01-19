@@ -33,8 +33,6 @@ sub new {
     $self;
 }
 
-sub run { shift->_on_run }
-
 sub _tick {
     my $self = shift;
     $self->_query(q(update host_runtimes set ok_ts=now(), pid=$1 where host_id=$2),

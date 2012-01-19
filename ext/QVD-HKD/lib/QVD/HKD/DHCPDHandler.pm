@@ -44,8 +44,6 @@ sub new {
     $self;
 }
 
-sub run { shift->_on_run }
-
 sub register_mac_and_ip {
     # TODO: pass extra info as vm name
     my ($self, $vm_id, $mac, $ip) = @_;
