@@ -72,24 +72,29 @@ use QVD::StateMachine::Declarative
 
     'stopping/stopping_all_vms'    => { enter       => '_stop_all_vms',
                                         leave       => '_abort_all',
-                                        transitions => { _on_all_vms_stopped        => 'stopping/stopping_all_agents' } },
+                                        transitions => { _on_stop_all_vms_done      => 'stopping/stopping_all_agents',
+                                                         _on_state_timeout          => 'stopping/killing_all_vms'     } },
+
+    'stopping/killing_all_vms'     => { enter       => '_kill_all_vms',
+                                        leave       => '_abort_all',
+                                        transitions => { _on_kill_all_vms_done      => 'stopping/stopping_all_agents' } },
 
     'stopping/stopping_all_agents' => { enter       => '_stop_all_agents',
                                         transitions => { _on_all_agents_stopped     => 'stopped/saving_state'         } },
 
-    'stopped/saving_state'          => { enter       => '_save_state',
-                                         transitions => { _on_save_state_done       => 'stopped/bye'                  } },
+    'stopped/saving_state'         => { enter       => '_save_state',
+                                        transitions => { _on_save_state_done       => 'stopped/bye'                  } },
 
-    'stopped/bye'                   => { enter       => '_say_goodbye'                                                   },
+    'stopped/bye'                  => { enter       => '_say_goodbye'                                                   },
 
-    failed                          => { enter       => '_say_goodbye'                                                   };
+    failed                         => { enter       => '_say_goodbye'                                                   };
 
 
 sub _on_ticked :OnState(__any__) {}
 sub _on_ticker_error :OnState(__any__) {}
 sub _on_checked :OnState(__any__) {}
 sub _on_checker_error :OnState(__any__) {}
-sub _on_all_vms_stopped :OnState(__any__) {}
+sub _on_stop_all_vms_done :OnState(__any__) {}
 sub _on_cmd_stop :OnState(__any__) { shift->delay_until_next_state }
 
 sub new {
@@ -348,7 +353,7 @@ sub _on_vm_cmd {
 sub _on_vm_stopped {
     my ($self, $vm_id) = @_;
     delete $self->{vm}{$vm_id};
-     keys %{$self->{vm}} or $self->_on_all_vms_stopped;
+     keys %{$self->{vm}} or $self->_on_stop_all_vms_done
 }
 
 sub _on_vm_cmd_done {
@@ -360,10 +365,13 @@ sub _on_failed { croak "something come completely wrong, aborting...\n" }
 
 sub _stop_all_vms {
     my $self = shift;
-    values %{$self->{vm}} or return $self->_on_all_vms_stopped;
+    values %{$self->{vm}}
+        or return $self->_on_stop_all_vms_done;
     $_->on_hkd_stop for values %{$self->{vm}};
     $self->_call_after($self->_cfg("internal.hkd.killing.vms.timeout"), '_on_state_timeout');
 }
+
+sub _kill_all_vms { shift->_on_kill_all_vms_done }
 
 sub _catch_zombies {
     my $self = shift;
