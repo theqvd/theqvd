@@ -14,6 +14,6 @@ WriteMakefile( NAME          => 'QVD::HKD',
                                   'QVD::Config' => '0',
                                   'File::Slurp' => 0 },
                ABSTRACT_FROM => 'lib/QVD/HKD.pm',
-	       EXE_FILES     => [ qw(bin/qvd-hkd) ],
+	       EXE_FILES     => [ qw(bin/qvd-hkd bin/qvd-hkd.initrc.pl) ],
                AUTHOR        => 'QVD Team <qvd@qindel.com>',
 );
