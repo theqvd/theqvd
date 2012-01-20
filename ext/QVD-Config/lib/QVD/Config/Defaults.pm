@@ -49,6 +49,8 @@ path.ssl.ca.personal = .qvd/certs
 ## KVM serial port captures or LXC console output
 path.serial.captures = ${path.tmp}/qvd
 
+path.cgroup = /cgroup
+
 ## paths to external executables
 command.kvm = kvm
 command.kvm-img = kvm-img
@@ -70,6 +72,7 @@ command.lxc-destroy = lxc-destroy
 command.lxc-create = lxc-create
 command.lxc-start = lxc-start
 command.lxc-stop = lxc-stop
+command.lxc-wait = lxc-wait
 
 ## nxproxy's link parameter, can be: modem, isdn, adsl, wan, lan, local or a bandwidth specification (56k, 1m, 100m...)
 client.link = adsl
@@ -270,6 +273,7 @@ internal.database.client.socket.keepidle = 20
 internal.database.client.socket.keepintvl = 5
 internal.database.client.socket.keepcnt = 4
 
+internal.hkd.killing.vms.timeout = 120
 
 internal.hkd.agent.ticker.delay = 60
 internal.hkd.agent.command_handler.delay = 10
@@ -291,6 +295,9 @@ internal.hkd.vmhandler.vma.failed.max_time.on.starting = 180
 internal.hkd.vmhandler.vma.failed.max_time.on.running = 60
 internal.hkd.vmhandler.vma_monitor.delay = 10
 internal.hkd.lxc.does.not.cleanup = 0
+internal.hkd.lxc.killer.kill_process.retries = 10
+internal.hkd.lxc.killer.destroy_lxc.timeout = 100
+internal.hkd.lxc.killer.umount.timeout = 100
 
 internal.hkd.debugger.run = 0
 internal.hkd.debugger.socket = /root/hkd-debug
