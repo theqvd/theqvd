@@ -59,8 +59,12 @@ use QVD::StateMachine::Declarative
                                                             _on_place_os_image_error     => 'failing/clearing_runtime_row' } },
 
     'starting/detecting_os_image_type'=> { enter       => '_detect_os_image_type',
-                                           transitions => { _on_detect_os_image_type_done => 'starting/allocating_os_overlayfs',
+                                           transitions => { _on_detect_os_image_type_done => 'starting/destroying_old_lxc',
                                                             _on_detect_os_image_type_error => 'failing/clearing_runtime_row' } },
+
+    'starting/destroying_old_lxc'     => { enter       => '_destroy_old_lxc',
+                                           transitions => { _on_destroy_old_lxc_done     => 'starting/allocating_os_overlayfs',
+                                                            _on_destroy_old_lxc_error    => 'starting/allocating_os_overlayfs' } },
 
     'starting/allocating_os_overlayfs'=> { enter       => '_allocate_os_overlayfs',
                                            transitions => { _on_allocate_os_overlayfs_done => 'starting/allocating_os_rootfs',
@@ -71,12 +75,8 @@ use QVD::StateMachine::Declarative
                                                             _on_allocate_os_rootfs_error => 'failing/unmounting_root_fs' } },
 
     'starting/allocating_home_fs'     => { enter       => '_allocate_home_fs',
-                                           transitions => { _on_allocate_home_fs_done    => 'starting/destroying_old_lxc',
+                                           transitions => { _on_allocate_home_fs_done    => 'starting/creating_lxc',
                                                             _on_allocate_home_fs_error   => 'failing/unmounting_root_fs' } },
-
-    'starting/destroying_old_lxc'     => { enter       => '_destroy_old_lxc',
-                                           transitions => { _on_destroy_old_lxc_done     => 'starting/creating_lxc',
-                                                            _on_destroy_old_lxc_error    => 'starting/creating_lxc' } },
 
     'starting/creating_lxc'           => { enter       => '_create_lxc',
                                            transitions => { _on_create_lxc_done          => 'starting/configuring_lxc',
