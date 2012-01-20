@@ -1,4 +1,5 @@
 bin/qvd-l7r
+bin/qvd-l7r.initrc.pl
 Changes
 lib/QVD/L7R.pm
 lib/QVD/L7R/Authenticator.pm

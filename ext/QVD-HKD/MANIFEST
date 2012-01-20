@@ -1,7 +1,10 @@
+bin/hkd
 bin/qvd-hkd
+bin/qvd-hkd.initrc.pl
 Changes
 lib/QVD/HKD.pm
 lib/QVD/HKD/Agent.pm
+lib/QVD/HKD/ClusterMonitor.pm
 lib/QVD/HKD/CommandHandler.pm
 lib/QVD/HKD/Config.pm
 lib/QVD/HKD/DHCPDHandler.pm

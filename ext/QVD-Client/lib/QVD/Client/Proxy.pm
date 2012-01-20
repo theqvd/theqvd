@@ -254,7 +254,7 @@ sub _run {
 
     my $ll = IO::Socket::INET->new(LocalPort => 4040,
 	ReuseAddr => 1,
-	Listen => 1);
+	Listen => 1) or die "Unable to listen on port 4040";
 
     my $local_socket = $ll->accept()
 	or die "connection from nxproxy failed";
