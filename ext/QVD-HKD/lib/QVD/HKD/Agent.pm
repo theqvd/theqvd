@@ -72,21 +72,32 @@ sub _debug {
     warn "[$self state: $state]\@$method> @_\n";
 }
 
-sub _query_callbacks {
-    my $name = shift;
-    $name =~ s/.*::_?//;
-    [ "_on_${name}_result",
-      "_on_${name}_error",
-      "_on_${name}_done",
-      "_on_${name}_bad_result"]
+my @query_callbacks = qw(result error done result);
+my %query_callbacks;
+
+sub _query_callbacks ($;\%) {
+    my ($name, $opts) = @_;
+    my @cb = @{ $query_callbacks{$name} //=
+                    do {
+                        $name =~ /([a-zA-Z]\w*)$/ or die "internal error: bad method name: $name";
+                        [ map "_on_$1_$_", @query_callbacks ];
+                    }
+                };
+    if ($opts and %$opts) {
+        for (0..$#query_callbacks) {
+            my $over = $opts->{"_on_$query_callbacks[$_]"};
+            $cb[$_] = $over if defined $over;
+        }
+    }
+    @cb
 }
 
-my %query_callbacks;
+
 
 sub _query_n {
     my ($self, $n, $sql, @args) = @_;
     my $method = (caller 1)[3];
-    my ($on_result, $on_error, $on_done, $on_bad_result) = @{$query_callbacks{$method} //= _query_callbacks($method)};
+    my ($on_result, $on_error, $on_done, $on_bad_result) = _query_callbacks($method);
 
     if ($debug) {
         $self->can($_) or $self->_debug("warning: callback method $_ not found!")
@@ -163,10 +174,12 @@ sub _db {
 }
 
 sub _run_cmd {
-    my $self = shift;
-    my $cmd = shift;
+    my ($self, $cmd, %opts) = @_;
     my $method = (caller 1)[3];
-    my (undef, $on_error, $on_done) = @{$query_callbacks{$method} //= _query_callbacks($method)};
+    my $kill_after = delete $opts{kill_after};
+    my $ignore_errors = delete $opts{ignore_errors};
+
+    my (undef, $on_error, $on_done) = _query_callbacks($method, %opts);
 
     if ($debug) {
         $self->can($_) or $self->_debug("warning: callback method $_ not found!")
@@ -176,23 +189,40 @@ sub _run_cmd {
 
     my $w = $self->{cmd_watcher} = AnyEvent::Util::run_cmd($cmd,
                                                            '$$' => \$self->{cmd_pid},
-                                                           @_);
+                                                           %opts);
     $w->cb( sub {
                 my $rc = shift->recv;
+                delete $self->{cmd_timer};
+                delete $self->{cmd_watcher};
+                delete $self->{cmd_pid};
                 if ($rc) {
-                    delete $self->{cmd_watcher};
-                    delete $self->{cmd_pid};
                     $cmd = [$cmd] unless ref $cmd;
                     $debug and $self->_debug("command failed: @$cmd => $rc");
                     ERROR "command @$cmd failed: $rc";
-                    $self->$on_error($rc);
+                    unless ($ignore_errors) {
+                        $debug and $self->_debug("calling on_error callback $on_error");
+                        $self->$on_error($rc);
+                        return
+                    }
+                    $debug and $self->_debug("ignore_errors set, so...");
                 }
-                else {
-                    delete $self->{cmd_watcher};
-                    delete $self->{cmd_pid};
-                    $self->$on_done
-                }
+                $debug and $self->_debug("calling on_done callback $on_done");
+                $self->$on_done
             });
+
+    if (defined $kill_after) {
+        $self->{cmd_kill_after} = $kill_after;
+        my $w = $self->{cmd_timer} = AnyEvent->timer(after => $kill_after,
+                                                     cb => sub { $self->_do_kill_after('TERM') });
+    }
+}
+
+sub _do_kill_after {
+    my ($self, $signal) = @_;
+    $debug and $self->_debug("command timed out");
+    $self->_kill_cmd($signal);
+    $self->{cmd_timer} = AnyEvent->timer(after => 2,
+                                         cb => sub { $self->_do_kill_after('KILL') });
 }
 
 sub _kill_cmd {
@@ -200,7 +230,11 @@ sub _kill_cmd {
     my $pid = $self->{cmd_pid} or return undef;
     $signal //= 'TERM';
     $debug and $self->_debug("killing $pid with signal $signal");
-    kill $signal => $pid;
+    my $ok = kill $signal => $pid;
+    unless ($ok) {
+        $debug and $self->_debug("unable to kill process $pid with signal $signal");
+    }
+    $ok;
 }
 
 my $json;
@@ -224,7 +258,7 @@ sub _rpc {
     }
     $url .= '?' . join('&', @query) if @query;
 
-    my ($on_result, $on_error, $on_done) = @{$query_callbacks{"rpc_$method"} //= _query_callbacks("rpc_$method")};
+    my ($on_result, $on_error, $on_done) = _query_callbacks("rpc_$method");
 
     if ($debug) {
         $self->can($_) or $self->_debug("warning: callback method $_ not found!")
@@ -294,7 +328,10 @@ sub _call_after {
                                                 });
 }
 
-use Data::Dumper;
+sub _on_stopped {
+    my $self = shift;
+    $self->_maybe_callback('on_stopped');
+}
 
 sub _abort_call_after {
     my $self = shift;
