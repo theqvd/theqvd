@@ -82,9 +82,4 @@ sub _run_dhcpd {
                     ]);
 }
 
-sub _on_stopped {
-    my $self = shift;
-    $self->_maybe_callback('on_stopped');
-}
-
 1;

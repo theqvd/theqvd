@@ -63,9 +63,4 @@ sub _set_timer {
     $self->_call_after($self->_cfg('internal.hkd.agent.ticker.delay'), '_on_timeout');
 }
 
-sub _on_stopped {
-    my $self = shift;
-    $self->_maybe_callback('on_stopped');
-}
-
 1;
