@@ -121,9 +121,4 @@ sub _delete_cmds {
     $self->_query("update vm_runtimes set vm_cmd=NULL where vm_cmd='busy' and vm_id in ($in)");
 }
 
-sub _on_stopped {
-    my $self = shift;
-    $self->_maybe_callback('on_stopped');
-}
-
 1;
