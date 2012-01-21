@@ -72,7 +72,7 @@ sub _debug {
     warn "[$self state: $state]\@$method> @_\n";
 }
 
-my @query_callbacks = qw(result error done result);
+my @query_callbacks = qw(result error done bad_result);
 my %query_callbacks;
 
 sub _query_callbacks ($;\%) {
