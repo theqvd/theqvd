@@ -117,7 +117,7 @@ Linux::Proc::Mounts - Parser for Linux /proc/mounts
 
   use Linux::Proc::Mounts;
 
-  my $m = Linux::Proc::Mount->read;
+  my $m = Linux::Proc::Mounts->read;
 
   my $at = $m->at('/');
   say $_->spec . ' is mounted at /' for (@$at);

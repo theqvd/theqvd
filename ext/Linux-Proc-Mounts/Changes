@@ -1,5 +1,9 @@
 Revision history for Perl extension Linux::Proc::Mounts.
 
+0.02  Jan 23, 2011
+        - typo in documentation corrected (reported by Mihai Criveti)
+        - some more documentation corrections
+
 0.01  Thu Jan 12 05:52:19 2012
 	- original version; created by h2xs 1.23 with options
 		-AXn Linux::Proc::Mounts
