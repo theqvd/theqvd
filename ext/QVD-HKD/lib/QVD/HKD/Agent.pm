@@ -163,7 +163,7 @@ sub _query_1 {
 sub _cancel_current_query {
     my $self = shift;
     if (my $seq = $self->{current_query_seq}) {
-        $self->db->cancel_query($seq);
+        $self->_db->cancel_query($seq);
     }
 }
 
