@@ -196,55 +196,46 @@ use QVD::StateMachine::Declarative
 
     'failing/running_poststop_hook'   => { enter       => '_run_poststop_hook',
                                            transitions => { _on_run_hook_done            => 'failing/destroying_lxc',
-                                                            _on_run_hook_error           => 'failing/destroying_lxc' } },
+                                                            _on_run_hook_error           => 'failing/destroying_lxc'          } },
 
     'failing/destroying_lxc'          => { enter       => '_destroy_lxc',
                                            transitions => { _on_destroy_lxc_done         => 'failing/unmounting_root_fs',
-                                                            _on_destroy_lxc_error        => 'failing/unmounting_root_fs' } },
+                                                            _on_destroy_lxc_error        => 'failing/unmounting_root_fs'      } },
 
     'failing/unmounting_root_fs'      => { enter       => '_unmount_root_fs',
                                            transitions => { _on_unmount_root_fs_done      => 'failing/clearing_runtime_row',
-                                                            _on_unmount_root_fs_error     => 'failing/clearing_runtime_row'  } },
+                                                            _on_unmount_root_fs_error     => 'failing/clearing_runtime_row'   } },
 
     'failing/clearing_runtime_row'    => { enter       => '_clear_runtime_row',
                                            transitions => { _on_clear_runtime_row_done   => 'failed',
-                                                            _on_clear_runtime_row_error  => 'failed' },
+                                                            _on_clear_runtime_row_error  => 'failed'                          },
                                            ignore      => ['_on_clear_runtime_row_result',
-                                                           '_on_clear_runtime_row_bad_result'] },
+                                                           '_on_clear_runtime_row_bad_result']                                  },
 
-    'failed'                          => { enter       => '_call_on_stopped' },
+    'failed'                          => { enter       => '_call_on_stopped'                                                    },
 
 
-    'zombie'                          => { jump        => 'zombie/loading_row' },
+    'zombie'                          => { jump        => 'zombie/calculating_paths'                                            },
 
-    'zombie/loading_row'              => { enter       => '_load_row',
-                                           transitions =>  { _on_load_row_done           => 'zombie/stopping_lxc',
-                                                             _on_load_row_bad_result     => 'zombie/clearing_runtime_row' } },
-
-    'zombie/detecting_os_image_type'  => { enter       => '_detect_os_image_type',
-                                           transitions => { _on_detect_os_image_type_done => 'zombie/stopping_lxc',
-                                                            _on_detect_os_image_type_error => 'zombie/stopping_lxc' } },
+    'zombie/calculating_paths'        => { enter       => '_calculate_paths',
+                                           transitions => { _on_calculate_paths_done     => 'zombie/stopping_lxc'             } },
 
     'zombie/stopping_lxc'             => { enter       => '_stop_zombie_lxc',
-                                           transitions => { '_on_stop_zombie_lxc_done'   => 'zombie/running_poststop_hook',
-                                                            '_on_stop_zombie_lxc_error'  => 'zombie/running_poststop_hook' } },
-
-    'zombie/running_poststop_hook'    => { enter       => '_run_poststop_hook',
-                                           transitions => { _on_run_hook_done            => 'zombie/destroying_lxc',
-                                                            _on_run_hook_error           => 'zombie/destroying_lxc' } },
+                                           transitions => { '_on_stop_zombie_lxc_done'   => 'zombie/destroying_lxc',
+                                                            '_on_stop_zombie_lxc_error'  => 'zombie/destroying_lxc'           } },
 
     'zombie/destroying_lxc'           => { enter       => '_destroy_lxc',
                                            transitions => { _on_destroy_lxc_done         => 'zombie/unmounting_root_fs',
-                                                            _on_destroy_lxc_error        => 'zombie/unmounting_root_fs' } },
+                                                            _on_destroy_lxc_error        => 'zombie/unmounting_root_fs'       } },
 
     'zombie/unmounting_root_fs'       => { enter       => '_unmount_root_fs',
                                            transitions => { _on_unmount_root_fs_done     => 'zombie/clearing_runtime_row',
-                                                            _on_unmount_root_fs_error    => 'zombie/clearing_runtime_row' } },
+                                                            _on_unmount_root_fs_error    => 'zombie/clearing_runtime_row'     } },
 
     'zombie/clearing_runtime_row'     => { enter       => '_clear_runtime_row',
-                                           transitions => { _on_clear_runtime_row_done   => 'stopped' },
+                                           transitions => { _on_clear_runtime_row_done   => 'stopped'                         },
                                            ignore      => ['_on_clear_runtime_row_result',
-                                                           '_on_clear_runtime_row_bad_result'] };
+                                                           '_on_clear_runtime_row_bad_result']                                  };
 
 #sub leave_state :OnState('starting/waiting_for_vma') {
 #    my ($self, undef, $target) = @_;
@@ -279,26 +270,30 @@ sub _mkpath {
 sub _calculate_paths {
     my $self = shift;
 
-    my $basefs_parent = $self->_cfg('path.storage.basefs');
-    $basefs_parent =~ s|/*$|/|;
-    # note that os_basefs may be changed later from
-    # _detect_os_image_type!
-    $self->{os_basefs} = "$basefs_parent/$self->{di_path}";
-
-    # FIXME: use a better policy for overlay allocation
-    my $overlays_parent = $self->_cfg('path.storage.overlayfs');
-    $overlays_parent =~ s|/*$|/|;
-    $self->{os_overlayfs} = $overlays_parent . join('-', $self->{di_id}, $self->{vm_id}, 'overlayfs');
-    unless ($self->_cfg('vm.overlay.persistent')) {
-        $self->{os_overlayfs_old} = $overlays_parent . join('-',
-                                                         'deleteme', $self->{di_id}, $self->{vm_id},
-                                                         $$, rand(100000));
-    }
-
     my $rootfs_parent = $self->_cfg('path.storage.rootfs');
     $rootfs_parent =~ s|/*$|/|;
     $self->{os_rootfs_parent} = $rootfs_parent;
     $self->{os_rootfs} = "$rootfs_parent$self->{vm_id}-fs";
+
+    if (defined $self->{di_path}) {
+        # this sub is called with just the vm_id loaded into the
+        # object when reaping zombie containers
+        my $basefs_parent = $self->_cfg('path.storage.basefs');
+        $basefs_parent =~ s|/*$|/|;
+        # note that os_basefs may be changed later from
+        # _detect_os_image_type!
+        $self->{os_basefs} = "$basefs_parent/$self->{di_path}";
+
+        # FIXME: use a better policy for overlay allocation
+        my $overlays_parent = $self->_cfg('path.storage.overlayfs');
+        $overlays_parent =~ s|/*$|/|;
+        $self->{os_overlayfs} = $overlays_parent . join('-', $self->{di_id}, $self->{vm_id}, 'overlayfs');
+        unless ($self->_cfg('vm.overlay.persistent')) {
+            $self->{os_overlayfs_old} = $overlays_parent . join('-',
+                                                                'deleteme', $self->{di_id}, $self->{vm_id},
+                                                                $$, rand(100000));
+        }
+    }
 
     if ($self->{user_storage_size}) {
         my $homefs_parent = $self->_cfg('path.storage.homefs');
@@ -306,6 +301,13 @@ sub _calculate_paths {
         $self->{home_fs} = "$homefs_parent$self->{vm_id}-fs";
 
         $self->{home_fs_mnt} = "$self->{os_rootfs}/home";
+    }
+
+    if ($debug) {
+        for (qw(di_path os_basefs os_overlayfs os_overlayfs_old os_rootfs_parent os_rootfs home_fs home_fs_mnt)) {
+            my $path = $self->{$_} // '<undef>';
+            $self->_debug("path $_: $path");
+        }
     }
 
     $self->_on_calculate_paths_done;
