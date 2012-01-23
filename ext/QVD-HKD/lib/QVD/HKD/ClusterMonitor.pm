@@ -44,7 +44,7 @@ sub new {
 
 sub _check {
     my $self = shift;
-    $self->_query(q(select host_id, ok_ts from host_runtimes where state='running' and host_id!=$1 and not blocked),
+    $self->_query(q(select host_id, extract('epoch' from (now() - ok_ts)) as ok_ts from host_runtimes where state='running' and host_id!=$1 and not blocked),
                   $self->{node_id});
 }
 
@@ -61,20 +61,10 @@ sub _on_check_result {
         my $time = time;
         for ($res->rows) {
             my ($host_id, $ok_ts) = @$_;
-            $ok_ts =~ /^(\d{4})-(\d{2})-(\d{2}) (\d{2}):(\d{2}):(\d{2})\.(\d+)/ or die 'wrong HKD ts format';
-            $ok_ts = DateTime->new (
-                year => $1, month => $2, day => $3,
-                hour => $4, minute => $5, second => $6,
-                nanosecond => 1000 * $7,
-                time_zone => 'local',
-            )->epoch;
 
             # TODO: esto esta muy justo! habria que darle algun tiempo extra
             # al noded del nodo caido para matar sus maquinas virtuales.
-            #
-            # 20120112: this aritmetics could be done at the DB level,
-            # thereby saving us from parsing $ok_ts and requiring DateTime
-            if ($ok_ts + $cluster_node_timeout < $time) {
+            if ($ok_ts >= $cluster_node_timeout) {
                 push @{ $self->{'_down_hosts'} }, $host_id
             }
         }
