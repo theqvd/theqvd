@@ -13,11 +13,9 @@ use AnyEvent::Util;
 use QVD::Log;
 use File::Temp qw(tempfile);
 use Linux::Proc::Mounts;
+use File::Spec;
 
 use parent qw(QVD::HKD::VMHandler);
-
-# FIXME: move all the patch calculation logic outside the actions so
-# that it can also be called from the zombie state
 
 use QVD::StateMachine::Declarative
     'new'                             => { transitions => { _on_cmd_start                => 'starting',
@@ -27,7 +25,7 @@ use QVD::StateMachine::Declarative
 
     'starting/saving_state'           => { enter       => '_save_state',
                                            transitions => { _on_save_state_done          => 'starting/loading_row',
-                                                            _on_save_state_error         => 'failed' },
+                                                            _on_save_state_error         => 'failed'                           },
                                            ignore      => ['_on_save_state_result']                                              },
 
     'starting/loading_row'            => { enter       => '_load_row',
@@ -44,23 +42,26 @@ use QVD::StateMachine::Declarative
 
     'starting/saving_runtime_row'     => { enter       => '_save_runtime_row',
                                            transitions => { _on_save_runtime_row_done    => 'starting/deleting_cmd',
-                                                            _on_save_runtime_row_bad_result => 'failing/clearing_runtime_row'    },
-                                           ignore      => ['_on_save_runtime_row_result'] },
+                                                            _on_save_runtime_row_bad_result => 'failing/clearing_runtime_row'  },
+                                           ignore      => ['_on_save_runtime_row_result']                                        },
 
     'starting/deleting_cmd'           => { enter       => '_delete_cmd',
-                                           transitions => { _on_delete_cmd_done          => 'starting/untaring_os_image' } },
+                                           transitions => { _on_delete_cmd_done          => 'starting/calculating_paths'       } },
+
+    'starting/calculating_paths'      => { enter       => '_calculate_paths',
+                                           transitions => { _on_calculate_paths_done     => 'starting/untaring_os_image'       } },
 
     'starting/untaring_os_image'      => { enter       => '_untar_os_image',
                                            transitions => { _on_untar_os_image_done      => 'starting/placing_os_image',
-                                                            _on_untar_os_image_error     => 'failing/clearing_runtime_row' } },
+                                                            _on_untar_os_image_error     => 'failing/clearing_runtime_row'     } },
 
     'starting/placing_os_image'       => { enter       => '_place_os_image',
                                            transitions => { _on_place_os_image_done      => 'starting/detecting_os_image_type',
-                                                            _on_place_os_image_error     => 'failing/clearing_runtime_row' } },
+                                                            _on_place_os_image_error     => 'failing/clearing_runtime_row'     } },
 
     'starting/detecting_os_image_type'=> { enter       => '_detect_os_image_type',
                                            transitions => { _on_detect_os_image_type_done => 'starting/destroying_old_lxc',
-                                                            _on_detect_os_image_type_error => 'failing/clearing_runtime_row' } },
+                                                            _on_detect_os_image_type_error => 'failing/clearing_runtime_row'   } },
 
     'starting/destroying_old_lxc'     => { enter       => '_destroy_old_lxc',
                                            transitions => { _on_destroy_old_lxc_done     => 'starting/allocating_os_overlayfs',
@@ -258,6 +259,58 @@ sub _on_cmd_start :OnState('__any__') { shift->_maybe_callback('on_delete_cmd') 
 
 sub on_hkd_stop  :OnState('__any__') { shift->delay_until_next_state }
 
+sub _mkpath {
+    my ($path, $mask) = @_;
+    $mask ||= 0755;
+    my @dirs;
+    my @parts = File::Spec->splitdir(File::Spec->rel2abs($path));
+    while (@parts) {
+        my $dir = File::Spec->join(@parts);
+        if (-d $dir) {
+            -d $_ or mkdir $_, $mask or return for @dirs;
+            return -d $path;
+        }
+        unshift @dirs, $dir;
+        pop @parts;
+    }
+    return;
+}
+
+sub _calculate_paths {
+    my $self = shift;
+
+    my $basefs_parent = $self->_cfg('path.storage.basefs');
+    $basefs_parent =~ s|/*$|/|;
+    # note that os_basefs may be changed later from
+    # _detect_os_image_type!
+    $self->{os_basefs} = "$basefs_parent/$self->{di_path}";
+
+    # FIXME: use a better policy for overlay allocation
+    my $overlays_parent = $self->_cfg('path.storage.overlayfs');
+    $overlays_parent =~ s|/*$|/|;
+    $self->{os_overlayfs} = $overlays_parent . join('-', $self->{di_id}, $self->{vm_id}, 'overlayfs');
+    unless ($self->_cfg('vm.overlay.persistent')) {
+        $self->{os_overlayfs_old} = $overlays_parent . join('-',
+                                                         'deleteme', $self->{di_id}, $self->{vm_id},
+                                                         $$, rand(100000));
+    }
+
+    my $rootfs_parent = $self->_cfg('path.storage.rootfs');
+    $rootfs_parent =~ s|/*$|/|;
+    $self->{os_rootfs_parent} = $rootfs_parent;
+    $self->{os_rootfs} = "$rootfs_parent$self->{vm_id}-fs";
+
+    if ($self->{user_storage_size}) {
+        my $homefs_parent = $self->_cfg('path.storage.homefs');
+        $homefs_parent =~ s|/*$|/|;
+        $self->{home_fs} = "$homefs_parent$self->{vm_id}-fs";
+
+        $self->{home_fs_mnt} = "$self->{os_rootfs}/home";
+    }
+
+    $self->_on_calculate_paths_done;
+}
+
 sub _untar_os_image {
     my $self = shift;
     my $image_path = $self->_cfg('path.storage.images') . '/' . $self->{di_path};
@@ -265,16 +318,11 @@ sub _untar_os_image {
         ERROR "Image $image_path attached to VM $self->{vm_id} does not exist on disk";
         return $self->_on_untar_os_image_error;
     }
-
-    my $basefs_dir = $self->_cfg('path.storage.basefs');
-    $basefs_dir =~ s|/*$|/|;
-    my $basefs = $self->{os_basefs} = "$basefs_dir/$self->{di_path}";
+    my $basefs = $self->{os_basefs};
     -d $basefs and return $self->_on_untar_os_image_done;
     my $tmp = $self->_cfg('path.storage.basefs') . "/untar-$$-" . rand(100000);
     $tmp++ while -e $tmp;
-    mkdir $basefs_dir, 0755;
-    mkdir $tmp, 0755;
-    unless (-d $tmp) {
+    unless (_mkpath $tmp) {
         ERROR "Unable to create directory $tmp";
         return $self->_on_untar_os_image_error;
     }
@@ -325,25 +373,23 @@ sub _detect_os_image_type {
 
 sub _allocate_os_overlayfs {
     my $self = shift;
-    my $basefs = $self->{os_basefs};
-
-    # FIXME: use a better policy for overlay allocation
-    my $overlays_dir = $self->_cfg('path.storage.overlayfs');
-    $overlays_dir =~ s|/*$|/|;
-    my $overlayfs = $self->{os_overlayfs} = $overlays_dir . join('-', $self->{di_id}, $self->{vm_id}, 'overlayfs');
-    if (-d $overlayfs) {
-        if ($self->_cfg('vm.overlay.persistent')) {
-            return $self->_on_allocate_os_overlayfs_done;
+    my $overlayfs = $self->{os_overlayfs};
+    my $overlayfs_old =  $self->{os_overlayfs_old};
+        if (-d $overlayfs) {
+        if (defined $overlayfs_old) {
+            $debug and $self->_debug("deleting old overlay directory");
+            unless (rename $overlayfs, $overlayfs_old) {
+                ERROR "Unable to move old $overlayfs out of the way to $overlayfs_old";
+                return $self->_on_allocate_os_overlayfs_error;
+            }
         }
-        my $deleteme =  $overlays_dir . join('-', 'deleteme', $self->{di_id}, $self->{vm_id}, $$, rand(100000));
-        unless (rename $overlayfs, $deleteme) {
-            ERROR "Unable to move old $overlayfs out of the way to $deleteme";
-            return $self->_on_allocate_os_overlayfs_error;
+        else {
+            $debug and $self->_debug("reusing old overlay directory");
+            return $self->_on_allocate_os_overlayfs_done
         }
     }
-    mkdir $overlays_dir, 0755;
-    unless (mkdir $overlayfs, 0755) {
-        ERROR "Unable to create overlay file system $overlayfs";
+    unless (_mkpath $overlayfs) {
+        ERROR "Unable to create overlay file system $overlayfs: $!";
         return $self->_on_allocate_os_overlayfs_error;
     }
     $self->_on_allocate_os_overlayfs_done;
@@ -351,17 +397,14 @@ sub _allocate_os_overlayfs {
 
 sub _allocate_os_rootfs {
     my $self = shift;
-    my $rootfs_dir = $self->_cfg('path.storage.rootfs');
-    $rootfs_dir =~ s|/*$|/|;
-    my $rootfs = $self->{os_rootfs} = "$rootfs_dir$self->{vm_id}-fs";
-    mkdir $rootfs_dir, 0755;
-    mkdir $rootfs, 0755;
-    unless (-d $rootfs) {
+    my $rootfs = $self->{os_rootfs};
+    unless (_mkpath $rootfs) {
         ERROR "unable to create directory $rootfs";
         return $self->_on_allocate_os_rootfs_error;
     }
     system $self->_cfg('command.umount'), $rootfs; # just in case!
-    if ((stat $rootfs)[0] != (stat $rootfs_dir)[0]) {
+    $debug and $self->_debug("rootfs: $rootfs, rootfs_parent: $self->{os_rootfs_parent}");
+    if ((stat $rootfs)[0] != (stat $self->{os_rootfs_parent})[0]) {
         ERROR "a file system is already mounted on top of $rootfs";
         return $self->_on_allocate_os_rootfs_error;
     }
@@ -392,7 +435,7 @@ sub _allocate_os_rootfs {
         when ('bind') {
             if (system $self->_cfg('command.mount'),
                 '--bind' => $self->{os_basefs}, $rootfs) {
-                ERROR "unable to mount bind $self->{os_overlayfs} into $rootfs (code: " . ($? >> 8) . ")";
+                ERROR "unable to mount bind $self->{os_basefs} into $rootfs (code: " . ($? >> 8) . ")";
                 return $self->_on_allocate_os_rootfs_error;
             }
         }
@@ -401,37 +444,27 @@ sub _allocate_os_rootfs {
             return $self->_on_allocate_os_rootfs_error;
         }
     }
-
     $self->_on_allocate_os_rootfs_done;
 }
 
 sub _allocate_home_fs {
     my $self = shift;
 
-    my $size = $self->{user_storage_size};
-    unless (defined $size) {
-        return $self->_on_allocate_home_fs_done;
-    }
+    my $homefs = $self->{home_fs};
+    defined $homefs or return $self->_on_allocate_home_fs_done;
 
-    my $homefs_dir = $self->_cfg('path.storage.homefs');
-    $homefs_dir =~ s|/*$|/|;
-    my $homefs = $self->{home_fs} = "$homefs_dir$self->{vm_id}-fs";
-    mkdir $homefs_dir, 0755;
-    mkdir $homefs, 0755;
-    unless (-d $homefs) {
+    unless (_mkpath $homefs) {
         ERROR "unable to create directory $homefs";
         return $self->_on_allocate_home_fs_error;
     }
-    my $mount_point = "$self->{os_rootfs}/home";
-
-    mkdir $mount_point, 0755;
-    unless (-d $mount_point) {
+    my $mount_point = $self->{os_homefs_mnt};
+    unless (_mkpath $mount_point) {
         ERROR "unable to create directory $mount_point";
         return $self->_on_allocate_home_fs_error;
     }
 
     # let lxc mount the home file system for us
-    $self->{home_fstab} = "$homefs $self->{os_rootfs}/home none defaults,bind";
+    $self->{home_fstab} = "$homefs $mount_point none defaults,bind";
     #    if (system $self->_cfg('command.mount'), '--bind', $homefs, $mount_point) {
     #        ERROR "unable to bind $homefs into $mount_point, mount failed (code: ".($?>>8).")";
     #        return $self->_on_allocate_os_rootfs_error;
