@@ -3,7 +3,7 @@ use warnings;
 use ExtUtils::MakeMaker;
 
 WriteMakefile( NAME => 'QVD::VMA',
-	       VERSION => "0.1".$ENV{BUILD_NUMBER},
+	       VERSION => "3.1".$ENV{BUILD_NUMBER},
 	       ABSTRACT_FROM => 'lib/QVD/VMA.pm',
 	       EXE_FILES => [ 'bin/nxdiag.pl',
 			      'bin/qvd-printing',
