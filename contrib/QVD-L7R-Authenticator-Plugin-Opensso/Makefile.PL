@@ -3,7 +3,7 @@ use ExtUtils::MakeMaker;
 WriteMakefile
 (
   'NAME' => 'QVD::L7R::Authenticator::Plugin::Opensso',
-  'VERSION_FROM' => 'lib/QVD/L7R/Authenticator/Plugin/Opensso.pm',
+  'VERSION' => '3.1'.$ENV{BUILD_NUMBER},
   'PREREQ_PM' => {
                    'File::Spec' => 0,
                    'File::Temp' => 0,
