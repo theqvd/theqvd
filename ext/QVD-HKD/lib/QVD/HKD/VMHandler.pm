@@ -103,8 +103,6 @@ sub _incr_run_ok {
     $self->_query('update vm_counters set run_ok = run_ok + 1 where vm_id = $1', $self->{vm_id});
 }
 
-sub _on_incr_run_ok_result {}
-
 sub _search_di {
     my $self = shift;
     $self->_query_1(<<'SQL', @$self{qw(osf_id di_tag)});
