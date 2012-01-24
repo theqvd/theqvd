@@ -85,7 +85,7 @@ sub _query_callbacks ($;\%) {
                 };
     if ($opts and %$opts) {
         for (0..$#query_callbacks) {
-            my $over = $opts->{"_on_$query_callbacks[$_]"};
+            my $over = delete $opts->{"on_$query_callbacks[$_]"};
             $cb[$_] = $over if defined $over;
         }
     }
@@ -186,15 +186,13 @@ sub _run_cmd {
             for ($on_error, $on_done);
         $self->_debug("running command @$cmd");
     }
-
-    my $w = $self->{cmd_watcher} = AnyEvent::Util::run_cmd($cmd,
-                                                           '$$' => \$self->{cmd_pid},
-                                                           %opts);
+    my $pid;
+    my $w = AnyEvent::Util::run_cmd($cmd, '$$' => \$pid, %opts);
+    $self->{cmd_watcher}{$pid} = $w;
     $w->cb( sub {
                 my $rc = shift->recv;
-                delete $self->{cmd_timer};
-                delete $self->{cmd_watcher};
-                delete $self->{cmd_pid};
+                delete $self->{cmd_timer}{$pid};
+                delete $self->{cmd_watcher}{$pid};
                 if ($rc) {
                     $cmd = [$cmd] unless ref $cmd;
                     $debug and $self->_debug("command failed: @$cmd => $rc");
@@ -211,23 +209,26 @@ sub _run_cmd {
             });
 
     if (defined $kill_after) {
-        $self->{cmd_kill_after} = $kill_after;
-        my $w = $self->{cmd_timer} = AnyEvent->timer(after => $kill_after,
-                                                     cb => sub { $self->_do_kill_after('TERM') });
+        $self->{cmd_timer}{$pid} = AnyEvent->timer(after => $kill_after,
+                                                   cb => sub { $self->_do_kill_after(TERM => $pid) });
     }
+    $pid;
 }
 
 sub _do_kill_after {
-    my ($self, $signal) = @_;
+    my ($self, $signal, $pid) = @_;
     $debug and $self->_debug("command timed out");
     $self->_kill_cmd($signal);
-    $self->{cmd_timer} = AnyEvent->timer(after => 2,
-                                         cb => sub { $self->_do_kill_after('KILL') });
+    $self->{cmd_timer}{$pid} = AnyEvent->timer(after => 2,
+                                               cb => sub { $self->_do_kill_after(KILL => $pid) });
 }
 
 sub _kill_cmd {
-    my ($self, $signal) = @_;
-    my $pid = $self->{cmd_pid} or return undef;
+    my ($self, $signal, $pid) = @_;
+    unless (defined $pid) {
+        ($pid) = my(@pids) = keys %{$self->{cmd_watcher}};
+        @pids != 1 and die("internal error: none or more than one slave command is running, pids: @pids");
+    }
     $signal //= 'TERM';
     $debug and $self->_debug("killing $pid with signal $signal");
     my $ok = kill $signal => $pid;
@@ -339,11 +340,17 @@ sub _abort_call_after {
     undef $self->{call_after_timer}
 }
 
+sub _abort_cmd {
+    my ($self, $pid) = @_;
+    delete $self->{cmd_watcher}{$pid};
+    delete $self->{cmd_timer}{$pid};
+}
+
 sub DESTROY {
     local $!;
     my $self = shift;
     $debug and $self->_debug("$self->DESTROY called");
-    $self->_kill_cmd('KILL');
+    # $self->_kill_cmd('KILL');
 }
 
 sub _abort_all {
