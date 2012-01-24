@@ -5,7 +5,7 @@ use ExtUtils::MakeMaker;
 WriteMakefile(
     NAME                => 'QVD::HTTPD',
     AUTHOR              => 'Salvador Fandiño <sfandino@yahoo.com>',
-    VERSION	        => '0.1'.$ENV{BUILD_NUMBER},
+    VERSION	        => '3.1'.$ENV{BUILD_NUMBER},
     ABSTRACT_FROM       => 'lib/QVD/HTTPD.pm',
     PL_FILES            => {},
     PREREQ_PM => {
