@@ -5,7 +5,7 @@ use ExtUtils::MakeMaker;
 WriteMakefile(
     NAME                => 'QVD::URI',
     AUTHOR              => 'Salvador Fandiño <sfandino@yahoo.com>',
-    VERSION             => '0.1'.$ENV{BUILD_NUMBER},
+    VERSION             => '3.1'.$ENV{BUILD_NUMBER},
     ABSTRACT_FROM       => 'lib/QVD/URI.pm',
     PL_FILES            => {},
     PREREQ_PM => {
