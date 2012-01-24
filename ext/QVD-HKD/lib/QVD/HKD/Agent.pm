@@ -342,8 +342,10 @@ sub _abort_call_after {
 
 sub _abort_cmd {
     my ($self, $pid) = @_;
-    delete $self->{cmd_watcher}{$pid};
-    delete $self->{cmd_timer}{$pid};
+    if (defined $cmd) {
+        delete $self->{cmd_watcher}{$pid};
+        delete $self->{cmd_timer}{$pid};
+    }
 }
 
 sub DESTROY {

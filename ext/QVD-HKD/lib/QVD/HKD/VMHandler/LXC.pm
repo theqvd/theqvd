@@ -25,8 +25,7 @@ use QVD::StateMachine::Declarative
 
     'starting/saving_state'           => { enter       => '_save_state',
                                            transitions => { _on_save_state_done          => 'starting/loading_row',
-                                                            _on_save_state_error         => 'failed'                           },
-                                           ignore      => ['_on_save_state_result']                                              },
+                                                            _on_save_state_error         => 'failed'                           } },
 
     'starting/loading_row'            => { enter       => '_load_row',
                                            transitions =>  { _on_load_row_done           => 'starting/updating_stats',
@@ -111,8 +110,7 @@ use QVD::StateMachine::Declarative
                                            transitions => { _on_save_state_done          => 'running/updating_stats',
                                                             # _on_save_state_done          => 'running/monitoring',
                                                             _on_save_state_bad_result    => 'stopping/powering_off' },
-                                           delay       => [qw(_on_lxc_done)],
-                                           ignore      => [qw(_on_save_state_result)] },
+                                           delay       => [qw(_on_lxc_done)]                                                    },
 
     'running/updating_stats'          => { enter       => '_incr_run_ok',
                                            transitions =>  { _on_incr_run_ok_done        => 'running/running_poststart_hook',
@@ -131,20 +129,19 @@ use QVD::StateMachine::Declarative
                                                             on_hkd_stop                  => 'stopping/powering_off',
                                                             _on_dead                     => 'stopping/stopping_lxc',
                                                             _on_goto_debug               => 'debugging/saving_state',
-                                                            _on_lxc_done                 => 'stopping/running_poststop_hook' } },
+                                                            _on_lxc_done                 => 'stopping/killing_lxc' } },
 
     'debugging/saving_state'          => { enter       => '_save_state',
                                            transitions => { _on_save_state_done          => 'debugging/waiting_for_vma',
-                                                            _on_save_state_bad_result    => 'stopping/powering_off' },
-                                           delay       => [qw(_on_lxc_done)],
-                                           ignore      => [qw(_on_save_state_result)] },
+                                                            _on_save_state_bad_result    => 'stopping/powering_off'          },
+                                           delay       => [qw(_on_lxc_done)]                                                   },
 
     'debugging/waiting_for_vma'       => { enter       => '_start_vma_monitor',
                                            leave       => '_stop_vma_monitor',
                                            transitions => { _on_alive                    => 'running/saving_state',
                                                             _on_cmd_stop                 => 'stopping/deleting_cmd',
                                                             on_hkd_stop                  => 'stopping/powering_off',
-                                                            _on_lxc_done                 => 'stopping/running_poststop_hook' },
+                                                            _on_lxc_done                 => 'stopping/killing_lxc' },
                                            ignore      => [qw(_on_dead
                                                               _on_goto_debug)] },
 
@@ -216,33 +213,36 @@ use QVD::StateMachine::Declarative
 
     'failed'                          => { enter       => '_call_on_stopped'                                                    },
 
+    'zombie'                          => { jump        => 'zombie/save_state'                                                   },
 
-    'zombie'                          => { jump        => 'zombie/calculating_attrs'                                            },
+    'zombie/saving_state'             => { enter       => '_save_state',
+                                           transitions => { _on_save_state_done          => 'zombie/calculating_attrs',
+                                                            _on_save_state_error         => 'zombie/calculating_attrs',       } },
 
     'zombie/calculating_attrs'        => { enter       => '_calculate_attrs',
-                                           transitions => { _on_calculate_attrs_done     => 'zombie/stopping_lxc'             } },
+                                           transitions => { _on_calculate_attrs_done     => 'zombie/stopping_lxc'            } },
 
     'zombie/stopping_lxc'             => { enter       => '_stop_lxc',
-                                           transitions => { _on_stop_lxc_done            => 'zombie/waiting_for_lxc_to_stop'  } },
+                                           transitions => { _on_stop_lxc_done            => 'zombie/waiting_for_lxc_to_stop' } },
 
     'zombie/waiting_for_lxc_to_stop'  => { enter       => '_wait_for_zombie_lxc',
-                                           transitions => { _on_wait_for_zombie_lxc_done => 'zombie/killing_lxc'              } },
+                                           transitions => { _on_wait_for_zombie_lxc_done => 'zombie/killing_lxc'             } },
 
     'zombie/killing_lxc'              => { enter       => '_kill_lxc',
                                            transitions => { _on_kill_lxc_done            => 'zombie/destroying_lxc',
-                                                            _on_kill_lxc_error           => 'failed/destroying_lxc' } },
+                                                            _on_kill_lxc_error           => 'failed/destroying_lxc'          } },
 
     'zombie/destroying_lxc'           => { enter       => '_destroy_lxc',
-                                           transitions => { _on_destroy_lxc_done         => 'zombie/unmounting_filesystems'   } },
+                                           transitions => { _on_destroy_lxc_done         => 'zombie/unmounting_filesystems'  } },
 
     'zombie/unmounting_filesystems'   => { enter       => '_unmount_filesystems',
                                            transitions => { _on_unmount_filesystems_done => 'zombie/clearing_runtime_row',
-                                                            _on_unmount_filesystems_error=> 'zombie/clearing_runtime_row'     } },
+                                                            _on_unmount_filesystems_error=> 'zombie/clearing_runtime_row'    } },
 
     'zombie/clearing_runtime_row'     => { enter       => '_clear_runtime_row',
-                                           transitions => { _on_clear_runtime_row_done   => 'stopped'                         },
+                                           transitions => { _on_clear_runtime_row_done   => 'stopped'                        },
                                            ignore      => ['_on_clear_runtime_row_result',
-                                                           '_on_clear_runtime_row_bad_result']                                  };
+                                                           '_on_clear_runtime_row_bad_result']                                 };
 
 #sub leave_state :OnState('starting/waiting_for_vma') {
 #    my ($self, undef, $target) = @_;
@@ -585,7 +585,6 @@ sub _kill_lxc {
     }
     else {
         $debug and $self->_debug("all processes killed");
-        $self->_abort_cmd($lxc_pid);
         return $self->_on_kill_lxc_done;
     }
 }

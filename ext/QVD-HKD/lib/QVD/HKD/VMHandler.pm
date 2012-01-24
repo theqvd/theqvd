@@ -79,6 +79,8 @@ sub _save_state {
                   $state, $self->{vm_id}, $self->{node_id});
 }
 
+sub _on_save_state_result {}
+
 sub _load_row {
     my $self = shift;
     $self->_query_1('select name, user_id, osf_id, di_tag, ip, storage from vms where id = $1', $self->{vm_id});
