@@ -4,9 +4,9 @@ use ExtUtils::MakeMaker;
 # the contents of the Makefile that is written.
 WriteMakefile(
     NAME              => 'QVD::Node',
-    VERSION	      => '0.1'.$ENV{BUILD_NUMBER},
+    VERSION	      => '3.1'.$ENV{BUILD_NUMBER},
     ($] >= 5.005 ?     ## Add these new keywords supported since 5.005
       ( AUTHOR         => 'QVD Team <qvd@qindel.com>') : ()),
-    PREREQ_PM         => { 'QVD::HKD' 			=> 0.1,
-			   'QVD::L7R' 			=> 0.1 },
+    PREREQ_PM         => { 'QVD::HKD' 			=> 3.1,
+			   'QVD::L7R' 			=> 3.1 },
 );
