@@ -19,29 +19,29 @@ use parent qw(QVD::HKD::VMHandler);
 
 use QVD::StateMachine::Declarative
     'new'                             => { transitions => { _on_cmd_start                => 'starting',
-                                                            _on_cmd_catch_zombie         => 'zombie'                           } },
+                                                            _on_cmd_catch_zombie         => 'zombie/beating_to_death'          } },
 
     'starting'                        => { jump        => 'starting/saving_state'                                                },
 
     'starting/saving_state'           => { enter       => '_save_state',
                                            transitions => { _on_save_state_done          => 'starting/loading_row',
-                                                            _on_save_state_error         => 'failed'                           } },
+                                                            _on_save_state_error         => 'stopped'                          } },
 
     'starting/loading_row'            => { enter       => '_load_row',
                                            transitions =>  { _on_load_row_done           => 'starting/updating_stats',
-                                                             _on_load_row_bad_result     => 'failing/clearing_runtime_row'     } },
+                                                             _on_load_row_bad_result     => 'stopping/clearing_runtime_row'    } },
 
     'starting/updating_stats'         => { enter       => '_incr_run_attempts',
                                            transitions =>  { _on_incr_run_attempts_done  => 'starting/searching_di',
-                                                             _on_incr_run_attempts_bad_result => 'failing/clearing_runtime_row'} },
+                                                             _on_incr_run_attempts_bad_result => 'stopping/clearing_runtime_row'} },
 
     'starting/searching_di'           => { enter       => '_search_di',
                                            transitions => { _on_search_di_done           => 'starting/saving_runtime_row',
-                                                            _on_search_di_bad_result     => 'failing/clearing_runtime_row'     } },
+                                                            _on_search_di_bad_result     => 'stopping/clearing_runtime_row'     } },
 
     'starting/saving_runtime_row'     => { enter       => '_save_runtime_row',
                                            transitions => { _on_save_runtime_row_done    => 'starting/deleting_cmd',
-                                                            _on_save_runtime_row_bad_result => 'failing/clearing_runtime_row'  },
+                                                            _on_save_runtime_row_bad_result => 'stopping/clearing_runtime_row'  },
                                            ignore      => ['_on_save_runtime_row_result']                                        },
 
     'starting/deleting_cmd'           => { enter       => '_delete_cmd',
@@ -52,42 +52,46 @@ use QVD::StateMachine::Declarative
 
     'starting/untaring_os_image'      => { enter       => '_untar_os_image',
                                            transitions => { _on_untar_os_image_done      => 'starting/placing_os_image',
-                                                            _on_untar_os_image_error     => 'failing/clearing_runtime_row'     } },
+                                                            _on_untar_os_image_error     => 'stopping/clearing_runtime_row'     } },
 
     'starting/placing_os_image'       => { enter       => '_place_os_image',
                                            transitions => { _on_place_os_image_done      => 'starting/detecting_os_image_type',
-                                                            _on_place_os_image_error     => 'failing/clearing_runtime_row'     } },
+                                                            _on_place_os_image_error     => 'stopping/clearing_runtime_row'     } },
 
     'starting/detecting_os_image_type'=> { enter       => '_detect_os_image_type',
-                                           transitions => { _on_detect_os_image_type_done  => 'starting/destroying_old_lxc',
-                                                            _on_detect_os_image_type_error => 'failing/clearing_runtime_row'   } },
+                                           transitions => { _on_detect_os_image_type_done  => 'starting/killing_old_lxc',
+                                                            _on_detect_os_image_type_error => 'stopping/clearing_runtime_row'   } },
+
+    'starting/killing_old_lxc'        => { enter       => '_kill_lxc',
+                                           transitions => { _on_kill_lxc_done            => 'starting/destroying_old_lxc',
+                                                            _on_kill_lxc_error           => 'zombie/beating_to_death'          } },
 
     'starting/destroying_old_lxc'     => { enter       => '_destroy_lxc',
                                            transitions => { _on_destroy_lxc_done         => 'starting/allocating_os_overlayfs' } },
 
     'starting/allocating_os_overlayfs'=> { enter       => '_allocate_os_overlayfs',
                                            transitions => { _on_allocate_os_overlayfs_done  => 'starting/allocating_os_rootfs',
-                                                            _on_allocate_os_overlayfs_error => 'failing/clearing_runtime_row' } },
+                                                            _on_allocate_os_overlayfs_error => 'stopping/clearing_runtime_row' } },
 
     'starting/allocating_os_rootfs'   => { enter       => '_allocate_os_rootfs',
                                            transitions => { _on_allocate_os_rootfs_done  => 'starting/allocating_home_fs',
-                                                            _on_allocate_os_rootfs_error => 'failing/unmounting_filesystems' } },
+                                                            _on_allocate_os_rootfs_error => 'stopping/unmounting_filesystems' } },
 
     'starting/allocating_home_fs'     => { enter       => '_allocate_home_fs',
                                            transitions => { _on_allocate_home_fs_done    => 'starting/creating_lxc',
-                                                            _on_allocate_home_fs_error   => 'failing/unmounting_filesystems' } },
+                                                            _on_allocate_home_fs_error   => 'stopping/unmounting_filesystems' } },
 
     'starting/creating_lxc'           => { enter       => '_create_lxc',
                                            transitions => { _on_create_lxc_done          => 'starting/configuring_lxc',
-                                                            _on_create_lxc_error         => 'failing/destroying_lxc' } },
+                                                            _on_create_lxc_error         => 'stopping/destroying_lxc' } },
 
     'starting/configuring_lxc'        => { enter       => '_configure_lxc',
                                            transitions => { _on_configure_lxc_done       => 'starting/running_prestart_hook',
-                                                            _on_configure_lxc_error      => 'failing/destroying_lxc' } },
+                                                            _on_configure_lxc_error      => 'stopping/destroying_lxc' } },
 
     'starting/running_prestart_hook'  => { enter       => '_run_prestart_hook',
                                            transitions => { _on_run_hook_done            => 'starting/launching',
-                                                            _on_run_hook_error           => 'failing/running_poststop_hook' } },
+                                                            _on_run_hook_error           => 'stopping/running_poststop_hook' } },
 
     #'starting/setting_fw_rules'       => { enter       => '_set_fw_rules',
     #                                       transitions => { _on_set_fw_rules_done        => 'starting/enabling_iface',
@@ -95,7 +99,7 @@ use QVD::StateMachine::Declarative
 
     'starting/launching'              => { enter       => '_start_lxc',
                                            transitions => { _on_start_lxc_done           => 'starting/waiting_for_vma',
-                                                            _on_start_lxc_error          => 'failing/running_poststop_hook' } },
+                                                            _on_start_lxc_error          => 'stopping/running_poststop_hook' } },
 
     'starting/waiting_for_vma'        => { enter       => '_start_vma_monitor',
                                            leave       => '_stop_vma_monitor',
@@ -169,51 +173,27 @@ use QVD::StateMachine::Declarative
 
     'stopping/killing_lxc'            => { enter       => '_kill_lxc',
                                            transitions => { _on_kill_lxc_done            => 'stopping/running_poststop_hook',
-                                                            _on_kill_lxc_error           => 'failing/destroying_lxc'          },
+                                                            _on_kill_lxc_error           => 'zombie/beating_to_death'         },
                                            ignore      => ['_on_lxc_done']                                                      },
 
     'stopping/running_poststop_hook'  => { enter       => '_run_poststop_hook',
                                            transitions => { _on_run_hook_done            => 'stopping/destroying_lxc',
-                                                            _on_run_hook_error           => 'failed/destroying_lxc'           } },
+                                                            _on_run_hook_error           => 'stopping/destroying_lxc'         } },
 
     'stopping/destroying_lxc'         => { enter       => '_destroy_lxc',
                                            transitions => { _on_destroy_lxc_done         => 'stopping/unmounting_filesystems' } },
 
     'stopping/unmounting_filesystems' => { enter       => '_unmount_filesystems',
                                            transitions => { _on_unmount_filesystems_done  => 'stopping/clearing_runtime_row',
-                                                            _on_unmount_filesystems_error => 'failing/clearing_runtime_row'   } },
+                                                            _on_unmount_filesystems_error => 'zombie/beating_to_death'        } },
 
     'stopping/clearing_runtime_row'   => { enter       => '_clear_runtime_row',
-                                           transitions => { _on_clear_runtime_row_done   => 'stopped'                         },
-                                           ignore      => ['_on_clear_runtime_row_result',
-                                                           '_on_clear_runtime_row_bad_result']                                  },
+                                           transitions => { _on_clear_runtime_row_done   => 'stopped',
+                                                            _on_clear_runtime_row_error  => 'zombie/beating_to_death'         } },
 
     'stopped'                         => { enter       => '_call_on_stopped'                                                    },
 
-    'failing/killing_lxc'             => { enter       => '_kill_lxc',
-                                           transitions => { _on_kill_lxc_done            => 'failing/running_poststop_hook',
-                                                            _on_kill_lxc_error           => 'failing/destroying_lxc'          } },
-
-    'failing/running_poststop_hook'   => { enter       => '_run_poststop_hook',
-                                           transitions => { _on_run_hook_done            => 'failing/destroying_lxc',
-                                                            _on_run_hook_error           => 'failing/destroying_lxc'          } },
-
-    'failing/destroying_lxc'          => { enter       => '_destroy_lxc',
-                                           transitions => { _on_destroy_lxc_done         => 'failing/unmounting_filesystems'  } },
-
-    'failing/unmounting_filesystems'  => { enter       => '_unmount_filesystems',
-                                           transitions => { _on_unmount_filesystems_done => 'failing/clearing_runtime_row',
-                                                            _on_unmount_filesystems_error=> 'failing/clearing_runtime_row'   } },
-
-    'failing/clearing_runtime_row'    => { enter       => '_clear_runtime_row',
-                                           transitions => { _on_clear_runtime_row_done   => 'failed',
-                                                            _on_clear_runtime_row_error  => 'failed'                          },
-                                           ignore      => ['_on_clear_runtime_row_result',
-                                                           '_on_clear_runtime_row_bad_result']                                  },
-
-    'failed'                          => { enter       => '_call_on_stopped'                                                    },
-
-    'zombie'                          => { jump        => 'zombie/save_state'                                                   },
+    'zombie/beating_to_death'         => { jump        => 'zombie/saving_state'                                                   },
 
     'zombie/saving_state'             => { enter       => '_save_state',
                                            transitions => { _on_save_state_done          => 'zombie/calculating_attrs',
@@ -230,19 +210,23 @@ use QVD::StateMachine::Declarative
 
     'zombie/killing_lxc'              => { enter       => '_kill_lxc',
                                            transitions => { _on_kill_lxc_done            => 'zombie/destroying_lxc',
-                                                            _on_kill_lxc_error           => 'failed/destroying_lxc'          } },
+                                                            _on_kill_lxc_error           => 'zombie'                         } },
 
     'zombie/destroying_lxc'           => { enter       => '_destroy_lxc',
                                            transitions => { _on_destroy_lxc_done         => 'zombie/unmounting_filesystems'  } },
 
     'zombie/unmounting_filesystems'   => { enter       => '_unmount_filesystems',
                                            transitions => { _on_unmount_filesystems_done => 'zombie/clearing_runtime_row',
-                                                            _on_unmount_filesystems_error=> 'zombie/clearing_runtime_row'    } },
+                                                            _on_unmount_filesystems_error=> 'zombie'                         } },
 
     'zombie/clearing_runtime_row'     => { enter       => '_clear_runtime_row',
-                                           transitions => { _on_clear_runtime_row_done   => 'stopped'                        },
-                                           ignore      => ['_on_clear_runtime_row_result',
-                                                           '_on_clear_runtime_row_bad_result']                                 };
+                                           transitions => { _on_clear_runtime_row_done   => 'stopped',
+                                                            _on_clear_runtime_row_error  => 'zombie'                         } },
+
+    'zombie'                          => { enter       => '_set_state_timer',
+                                           leave       => '_abort_all',
+                                           transitions => { _on_state_timeout => 'zombie/killing_lxc',
+                                                            on_hkd_stop => 'stopped'                                         } };
 
 #sub leave_state :OnState('starting/waiting_for_vma') {
 #    my ($self, undef, $target) = @_;
@@ -611,6 +595,7 @@ sub _unmount_filesystems {
         else {
             ERROR "Some filesystems could not be unmounted: @mnts";
             $debug and $self->_debug("Some filesystems could not be unmounted: @mnts");
+            delete $self->{unmounted};
             return $self->_on_unmount_filesystems_error;
         }
     }

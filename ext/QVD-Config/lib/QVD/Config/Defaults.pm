@@ -287,6 +287,7 @@ internal.hkd.agent.rpc.timeout = 3
 
 internal.hkd.vmhandler.killer.delay = 10
 internal.hkd.vmhandler.timeout.on_state.stopping = 200
+internal.hkd.vmhandler.timeout.on_state.zombie = 200
 
 internal.hkd.vmhandler.vma.failed.max_count.on.starting = 20
 internal.hkd.vmhandler.vma.failed.max_count.on.running = 10

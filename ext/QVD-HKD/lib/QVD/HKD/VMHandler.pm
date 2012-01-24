@@ -249,6 +249,9 @@ update vm_runtimes
 SQL
 }
 
+sub _on_clear_runtime_row_result {}
+sub _on_clear_runtime_row_bad_result {}
+
 sub _call_on_stopped { shift->_maybe_callback('on_stopped') }
 
 1;
