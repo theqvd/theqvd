@@ -16,3 +16,4 @@ t/lib/perlcriticrc
 t/lib/defaults.pl
 Makefile.PL
 META.yml
+META.json
