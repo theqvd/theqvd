@@ -5,7 +5,7 @@ use ExtUtils::MakeMaker;
 WriteMakefile(
     NAME                => 'QVD::Log',
     AUTHOR              => q{QVD Team <qvd@qindel.com>},
-    VERSION		=> '0.1'.$ENV{BUILD_NUMBER},
+    VERSION		=> '3.1'.$ENV{BUILD_NUMBER},
     ABSTRACT_FROM       => 'lib/QVD/Log.pm',
     LICENSE		=> 'gpl',
     PL_FILES            => {},
