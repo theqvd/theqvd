@@ -2,8 +2,8 @@ use 5.010;
 use ExtUtils::MakeMaker;
 
 WriteMakefile( NAME          => 'QVD::HKD',
-               VERSION       => '0.1'.$ENV{BUILD_NUMBER},
-               PREREQ_PM     => { 'Class::StateMachine' => '0.17',
+               VERSION       => '3.1'.$ENV{BUILD_NUMBER},
+               PREREQ_PM     => { 'Class::StateMachine' => '3.17',
                                   'QVD::StateMachine::Declarative' => '0',
                                   'AnyEvent' => '5.34',
                                   'AnyEvent:HTTP' => '2.13',
