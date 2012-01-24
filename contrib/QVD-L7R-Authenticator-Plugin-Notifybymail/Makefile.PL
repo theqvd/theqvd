@@ -3,7 +3,7 @@ use ExtUtils::MakeMaker;
 WriteMakefile
 (
   'NAME' => 'QVD::L7R::Authenticator::Plugin::Notifybymail',
-  'VERSION_FROM' => 'lib/QVD/L7R/Authenticator/Plugin/Notifybymail.pm',
+  VERSION             => '3.1'.$ENV{BUILD_NUMBER},
   'PREREQ_PM' => {
                    'Test::More' => 0
                  },
