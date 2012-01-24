@@ -1,6 +1,6 @@
 package QVD::VMKiller;
 
-our $VERSION = '0.01';
+our $VERSION = '3.1';
 
 use strict;
 use warnings;
