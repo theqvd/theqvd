@@ -228,13 +228,6 @@ use QVD::StateMachine::Declarative
                                            transitions => { _on_state_timeout => 'zombie/killing_lxc',
                                                             on_hkd_stop => 'stopped'                                         } };
 
-#sub leave_state :OnState('starting/waiting_for_vma') {
-#    my ($self, undef, $target) = @_;
-#    $debug and $self->_debug("leave_state target: $target");
-#    unless ($target =~ /^running/) {
-#        $self->_stop_vma_monitor;
-#    }
-#}
 
 sub _on_cmd_stop  :OnState('__any__') { shift->delay_until_next_state }
 sub _on_cmd_start :OnState('__any__') { shift->_maybe_callback('on_delete_cmd') }
