@@ -1,7 +1,7 @@
 #!/bin/sh
 #
 ### BEGIN INIT INFO
-# Provides:          qvd-l7r
+# Provides:          qvd-hkd
 # Required-Start:    $network $local_fs $remote_fs
 # Required-Stop:     $null
 # Should-Start:      $named
