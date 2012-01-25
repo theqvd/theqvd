@@ -82,24 +82,28 @@ use QVD::StateMachine::Declarative
                                                             _on_allocate_home_fs_error   => 'stopping/unmounting_filesystems' } },
 
     'starting/creating_lxc'           => { enter       => '_create_lxc',
-                                           transitions => { _on_create_lxc_done          => 'starting/configuring_lxc',
-                                                            _on_create_lxc_error         => 'stopping/destroying_lxc' } },
+                                           transitions => { _on_create_lxc_done          => 'starting/removing_old_fw_rules',
+                                                            _on_create_lxc_error         => 'stopping/destroying_lxc'         } },
+
+    'starting/removing_old_fw_rules'  => { enter       => '_remove_fw_rules',
+                                           transitions => { _on_remove_fw_rules_done     => 'starting/configuring_lxc',
+                                                            _on_remove_fw_rules_error    => 'zombie/beating_to_death',        } },
 
     'starting/configuring_lxc'        => { enter       => '_configure_lxc',
                                            transitions => { _on_configure_lxc_done       => 'starting/running_prestart_hook',
-                                                            _on_configure_lxc_error      => 'stopping/destroying_lxc' } },
+                                                            _on_configure_lxc_error      => 'stopping/destroying_lxc'         } },
 
     'starting/running_prestart_hook'  => { enter       => '_run_prestart_hook',
-                                           transitions => { _on_run_hook_done            => 'starting/launching',
-                                                            _on_run_hook_error           => 'stopping/running_poststop_hook' } },
+                                           transitions => { _on_run_hook_done            => 'starting/setting_fw_rules',
+                                                            _on_run_hook_error           => 'stopping/running_poststop_hook'  } },
 
-    #'starting/setting_fw_rules'       => { enter       => '_set_fw_rules',
-    #                                       transitions => { _on_set_fw_rules_done        => 'starting/enabling_iface',
-    #                                                        _on_set_fw_rules_error       => 'failing/unmounting_filesystems' } },
+    'starting/setting_fw_rules'       => { enter       => '_set_fw_rules',
+                                           transitions => { _on_set_fw_rules_done        => 'starting/launching',
+                                                            _on_set_fw_rules_error       => 'stopping/removing_fw_rules'      } },
 
     'starting/launching'              => { enter       => '_start_lxc',
                                            transitions => { _on_start_lxc_done           => 'starting/waiting_for_vma',
-                                                            _on_start_lxc_error          => 'stopping/running_poststop_hook' } },
+                                                            _on_start_lxc_error          => 'stopping/removing_fw_rules'      } },
 
     'starting/waiting_for_vma'        => { enter       => '_start_vma_monitor',
                                            leave       => '_stop_vma_monitor',
@@ -172,9 +176,13 @@ use QVD::StateMachine::Declarative
                                                             _on_state_timeout            => 'stopping/killing_lxc'            } },
 
     'stopping/killing_lxc'            => { enter       => '_kill_lxc',
-                                           transitions => { _on_kill_lxc_done            => 'stopping/running_poststop_hook',
+                                           transitions => { _on_kill_lxc_done            => 'stopping/removing_fw_rules',
                                                             _on_kill_lxc_error           => 'zombie/beating_to_death'         },
                                            ignore      => ['_on_lxc_done']                                                      },
+
+    'stopping/removing_fw_rules'      => { enter       => '_remove_fw_rules',
+                                           transitions => { _on_remove_fw_rules_done     => 'stopping/running_poststop_hook',
+                                                            _on_remove_fw_rules_error    => 'zombie/beating_to_death'         } },
 
     'stopping/running_poststop_hook'  => { enter       => '_run_poststop_hook',
                                            transitions => { _on_run_hook_done            => 'stopping/destroying_lxc',
@@ -211,6 +219,10 @@ use QVD::StateMachine::Declarative
     'zombie/killing_lxc'              => { enter       => '_kill_lxc',
                                            transitions => { _on_kill_lxc_done            => 'zombie/destroying_lxc',
                                                             _on_kill_lxc_error           => 'zombie'                         } },
+
+    'zombie/removing_fw_rules'        => { enter       => '_remove_fw_rules',
+                                           transitions => { _on_remove_fw_rules_done     => 'zombie/destroying_lxc',
+                                                            _on_remove_fw_rules_error    => 'zombie'                         } },
 
     'zombie/destroying_lxc'           => { enter       => '_destroy_lxc',
                                            transitions => { _on_destroy_lxc_done         => 'zombie/unmounting_filesystems'  } },
@@ -644,5 +656,8 @@ sub _run_hook {
     $debug and $self->_debug("no hook for $name");
     $self->_on_run_hook_done;
 }
+
+sub _remove_fw_rules { shift->_on_remove_fw_rules_done }
+sub _set_fw_rules { shift->_on_set_fw_rules_done }
 
 1;
