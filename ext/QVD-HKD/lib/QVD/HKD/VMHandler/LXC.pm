@@ -579,7 +579,8 @@ sub _unmount_filesystems {
     my $mi = Linux::Proc::Mountinfo->read;
     if (my $at = $mi->at($rootfs)) {
         my @mnts = map $_->mount_point, @{$at->flatten};
-        my @remaining = grep !$self->{unmounted}, @mnts;
+        $debug and $self->_debug("mnts behind $rootfs: @mnts");
+        my @remaining = grep !$self->{unmounted}{$_}, @mnts;
         if (@remaining) {
             my $next = $remaining[-1];
             $self->{unmounted}{$next} = 1;
@@ -595,6 +596,7 @@ sub _unmount_filesystems {
     else {
         $debug and $self->_debug("No filesystem mounted at $rootfs found");
     }
+    delete $self->{unmounted};
     $self->_on_unmount_filesystems_done
 }
 
