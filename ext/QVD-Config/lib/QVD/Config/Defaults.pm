@@ -74,6 +74,7 @@ command.lxc-start = lxc-start
 command.lxc-stop = lxc-stop
 command.lxc-wait = lxc-wait
 command.ebtables = ebtables
+command.iptables = iptables
 
 ## nxproxy's link parameter, can be: modem, isdn, adsl, wan, lan, local or a bandwidth specification (56k, 1m, 100m...)
 client.link = adsl

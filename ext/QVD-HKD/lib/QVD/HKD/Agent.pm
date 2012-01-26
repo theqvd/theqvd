@@ -12,7 +12,6 @@ use QVD::HKD::Helpers;
 use Pg::PQ qw(:pgres);
 use QVD::Log;
 use JSON;
-
 use parent qw(Class::StateMachine);
 
 our $debug = 1;

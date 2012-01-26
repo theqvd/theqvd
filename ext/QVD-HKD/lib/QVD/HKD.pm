@@ -29,65 +29,78 @@ use QVD::HKD::CommandHandler;
 use QVD::HKD::VMCommandHandler;
 use QVD::HKD::VMHandler;
 
+use QVD::HKD::Config::Network qw(netvms netnodes);
+
+
 use parent qw(QVD::HKD::Agent);
 
 use QVD::StateMachine::Declarative
-    new                            => { transitions => { _on_run                    => 'starting/connecting_to_db'    } },
+    'new'                            => { transitions => { _on_run                    => 'starting/connecting_to_db'    } },
 
-    'starting/connecting_to_db'    => { enter       => '_start_db',
-                                        transitions => { _on_db_connected           => 'starting/loading_db_config'   } },
+    'starting/connecting_to_db'      => { enter       => '_start_db',
+                                          transitions => { _on_db_connected           => 'starting/loading_db_config'   } },
 
-    'starting/loading_db_config'   => { enter       => '_start_config',
-                                        transitions => { _on_config_reloaded        => 'starting/loading_host_row'    } },
+    'starting/loading_db_config'     => { enter       => '_start_config',
+                                          transitions => { _on_config_reloaded        => 'starting/loading_host_row'    } },
 
-    'starting/loading_host_row'    => { enter       => '_load_host_row',
-                                        transitions => { _on_load_host_row_done     => 'starting/saving_loadbal_data' } },
+    'starting/loading_host_row'      => { enter       => '_load_host_row',
+                                          transitions => { _on_load_host_row_done     => 'starting/removing_old_fw_rules' } },
 
-    'starting/saving_loadbal_data' => { enter       => '_save_loadbal_data',
-                                        transitions => { _on_save_loadbal_data_done => 'starting/ticking'             } },
+    'starting/removing_old_fw_rules' => { enter       => '_remove_fw_rules',
+                                          transitions => { _on_remove_fw_rules_done   => 'starting/setting_fw_rules'    } },
 
-    'starting/ticking'             => { enter       => '_start_ticking',
-                                        transitions => { _on_ticked                 => 'starting/checking',
-                                                         _on_ticker_error           => 'failed'                       } },
+    'starting/setting_fw_rules'      => { enter       => '_set_fw_rules',
+                                          transitions => { _on_set_fw_rules_done      => 'starting/saving_loadbal_data',
+                                                           _on_set_fw_rules_error     => 'failed'                       } },
 
-    'starting/checking'            => { enter       => '_start_checking',
-                                        transitions => { _on_checked                => 'starting/agents',
-                                                         _on_checker_error          => 'failed'                       } },
+    'starting/saving_loadbal_data'   => { enter       => '_save_loadbal_data',
+                                          transitions => { _on_save_loadbal_data_done => 'starting/ticking'             } },
 
-    'starting/agents'              => { enter       => '_start_agents',
-                                        transitions => { _on_agents_started         => 'starting/catching_zombies'    } },
+    'starting/ticking'               => { enter       => '_start_ticking',
+                                          transitions => { _on_ticked                 => 'starting/checking',
+                                                           _on_ticker_error           => 'failed'                       } },
 
-    'starting/catching_zombies'    => { enter       => '_catch_zombies',
-                                        transitions => { _on_catch_zombies_done     => 'running/saving_state'         } },
+    'starting/checking'              => { enter       => '_start_checking',
+                                          transitions => { _on_checked                => 'starting/agents',
+                                                           _on_checker_error          => 'failed'                       } },
 
-    'running/saving_state'         => { enter       => '_save_state',
-                                        transitions => { _on_save_state_done        => 'running'                      } },
+    'starting/agents'                => { enter       => '_start_agents',
+                                          transitions => { _on_agents_started         => 'starting/catching_zombies'    } },
 
-    running                        => { transitions => { _on_cmd_stop               => 'stopping'                     } },
+    'starting/catching_zombies'      => { enter       => '_catch_zombies',
+                                          transitions => { _on_catch_zombies_done     => 'running/saving_state'         } },
 
-    stopping                       => { jump        => 'stopping/saving_state'                                          },
+    'running/saving_state'           => { enter       => '_save_state',
+                                          transitions => { _on_save_state_done        => 'running'                      } },
 
-    'stopping/saving_state'        => { enter       => '_save_state',
-                                        transitions => { _on_save_state_done        => 'stopping/stopping_all_vms'    } },
+    'running'                        => { transitions => { _on_cmd_stop               => 'stopping'                     } },
 
-    'stopping/stopping_all_vms'    => { enter       => '_stop_all_vms',
-                                        leave       => '_abort_all',
-                                        transitions => { _on_stop_all_vms_done      => 'stopping/stopping_all_agents',
-                                                         _on_state_timeout          => 'stopping/killing_all_vms'     } },
+    'stopping'                       => { jump        => 'stopping/saving_state'                                          },
 
-    'stopping/killing_all_vms'     => { enter       => '_kill_all_vms',
-                                        leave       => '_abort_all',
-                                        transitions => { _on_kill_all_vms_done      => 'stopping/stopping_all_agents' } },
+    'stopping/saving_state'          => { enter       => '_save_state',
+                                          transitions => { _on_save_state_done        => 'stopping/stopping_all_vms'    } },
 
-    'stopping/stopping_all_agents' => { enter       => '_stop_all_agents',
-                                        transitions => { _on_all_agents_stopped     => 'stopped/saving_state'         } },
+    'stopping/stopping_all_vms'      => { enter       => '_stop_all_vms',
+                                          leave       => '_abort_all',
+                                          transitions => { _on_stop_all_vms_done      => 'stopping/stopping_all_agents',
+                                                           _on_state_timeout          => 'stopping/killing_all_vms'     } },
 
-    'stopped/saving_state'         => { enter       => '_save_state',
-                                        transitions => { _on_save_state_done       => 'stopped/bye'                  } },
+    'stopping/killing_all_vms'       => { enter       => '_kill_all_vms',
+                                          leave       => '_abort_all',
+                                          transitions => { _on_kill_all_vms_done      => 'stopping/stopping_all_agents' } },
 
-    'stopped/bye'                  => { enter       => '_say_goodbye'                                                   },
+    'stopping/stopping_all_agents'   => { enter       => '_stop_all_agents',
+                                          transitions => { _on_all_agents_stopped     => 'stopping/removing_fw_rules'   } },
 
-    failed                         => { enter       => '_say_goodbye'                                                   };
+    'stopping/removing_fw_rules'     => { enter       => '_remove_fw_rules',
+                                          transitions => { _on_remove_fw_rules_done   => 'stopped/saving_state'         } },
+
+    'stopped/saving_state'           => { enter       => '_save_state',
+                                          transitions => { _on_save_state_done        => 'stopped/bye'                  } },
+
+    'stopped/bye'                    => { enter       => '_say_goodbye'                                                   },
+
+    failed                           => { enter       => '_say_goodbye'                                                   };
 
 
 sub _on_ticked :OnState(__any__) {}
@@ -279,7 +292,8 @@ sub _start_agents {
 my @agent_names = qw(vm_command_handler
                      command_handler
                      dhcpd_handler
-                     ticker);
+                     ticker
+                     checker);
 
 sub _check_all_agents_have_stopped {
     my $self = shift;
@@ -387,6 +401,55 @@ sub _on_catch_zombies_result {
         my $vm = $self->_new_vm_handler($vm_id);
         $vm->on_cmd('catch_zombie');
     }
+}
+
+sub _fw_rules {
+    my $self = shift;
+    my $netnodes = $self->netnodes;
+    my $netvms   = $self->netvms;
+
+    ( # forbind opening TCP connections from the VMs to the hosts:
+     [FORWARD => -m => 'iprange', '--src-range' => $netvms, '--dst-range' => $netnodes, '-p' => 'tcp', '--syn', '-j' => 'DROP'],
+     [INPUT   => -m => 'iprange', '--src-range' => $netvms, '-p' => 'tcp', '--syn', '-j', 'DROP'],
+
+     # otherwise, allow traffic between the hosts and the VMs:
+     [FORWARD => -m => 'iprange', '--src-range' => $netvms, '--dst-range' => $netnodes, '-p' => 'tcp', '-j', 'ACCEPT'],
+     [INPUT   => -m => 'iprange', '--src-range' => $netvms, '-p' => 'tcp', '-j', 'ACCEPT'],
+
+     # allow DHCP and DNS traffic between the VMs and this host:
+     [INPUT   => -m => 'iprange', '--src-range' => $netvms, '-p' => 'udp', '-m' => 'multiport', '--dports' => '67,53', '-j', 'ACCEPT'],
+
+     # disallow non-tcp protocols between the VMs and the hosts:
+     [FORWARD => -m => 'iprange', '--src-range' => $netvms, '--dst-range' => $netnodes, '-j', 'DROP'],
+     [INPUT   => -m => 'iprange', '--src-range' => $netvms, '-j', 'DROP'],
+
+     # forbid traffic between virtual machines:
+     [FORWARD => -m => 'iprange', '--src-range' => $netvms, '--dst-range' => $netvms, '-j', 'DROP'] );
+}
+
+sub _set_fw_rules {
+    my $self = shift;
+    my $iptables = $self->_cfg('command.iptables');
+    for my $rule ($self->_fw_rules) {
+        $debug and $self->_debug("setting iptables entry @$rule");
+        if (system $iptables => -A => @$rule) {
+            $debug and $self->_debug("iptables command failed, rc: " . ($? >> 8));
+            return $self->_on_set_fw_rules_error;
+        }
+    }
+    $self->_on_set_fw_rules_done;
+}
+
+sub _remove_fw_rules {
+    my $self = shift;
+    my $iptables = $self->_cfg('command.iptables');
+    for my $rule (reverse $self->_fw_rules) {
+        $debug and $self->_debug("removing iptables entry @$rule");
+        if (system $iptables => -D => @$rule) {
+            $debug and $self->_debug("iptables command failed, rc: " . ($? >> 8));
+        }
+    }
+    $self->_on_remove_fw_rules_done;
 }
 
 1;
