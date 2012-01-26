@@ -442,7 +442,7 @@ sub _allocate_os_rootfs {
                 return $self->_on_allocate_os_rootfs_error;
             }
             if ($self->_cfg('vm.lxc.unionfs.bind.ro')) {
-                if (system $self->_cfg('commnad.mount'),
+                if (system $self->_cfg('command.mount'),
                     -o => 'remount,ro', $rootfs) {
                     ERROR "unable to remount bind mount $rootfs as read-only, mount rc: ". ($? >> 8);
                     return $self->_on_allocate_os_rootfs_error;
