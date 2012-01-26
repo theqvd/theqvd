@@ -4,7 +4,7 @@ use inc::Module::Install;
 
 name 'QVD-Admin-Web';
 all_from 'lib/QVD/Admin/Web.pm';
-version '1.'.$ENV{SVN_REVISION};
+version '3.1'.$ENV{SVN_REVISION};
 
 requires 'Catalyst::Runtime' => '5.80007';
 requires 'Catalyst::Plugin::ConfigLoader';
