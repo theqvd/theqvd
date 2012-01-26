@@ -3,7 +3,10 @@
 use inc::Module::Install;
 
 name 'QVD-Admin-Web';
-all_from 'lib/QVD/Admin/Web.pm';
+abstract_from 'lib/QVD/Admin/Web.pm';
+author_from 'lib/QVD/Admin/Web.pm';
+license_from 'lib/QVD/Admin/Web.pm';
+perl_version_from 'lib/QVD/Admin/Web.pm';
 version '3.1'.$ENV{SVN_REVISION};
 
 requires 'Catalyst::Runtime' => '5.80007';
