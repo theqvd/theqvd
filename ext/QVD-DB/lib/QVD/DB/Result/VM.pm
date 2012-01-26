@@ -42,7 +42,7 @@ sub combined_properties {
 sub di {
     my $self = shift;
     my $tag = eval { $self->di_tag } // 'default';
-    warn "tag: $tag";
+    #warn "tag: $tag";
     $self->osf->di_by_tag($tag);
 }
 
