@@ -8,6 +8,10 @@ use strict;
 our $VERSION = '0.01';
 
 my $logfile = core_cfg('log.filename');
+
+## create the file if it doesn't exist, ignore errors
+{ open my $fd, '>>', $logfile; }
+
 if (!-w $logfile) {
     my $err = $!;
     if (!open my $fd, '>>', '/tmp/qvd.log') {
