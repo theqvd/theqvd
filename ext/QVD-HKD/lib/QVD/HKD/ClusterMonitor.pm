@@ -65,7 +65,7 @@ sub _on_check_result {
             # TODO: esto esta muy justo! habria que darle algun tiempo extra
             # al noded del nodo caido para matar sus maquinas virtuales.
             if ($ok_ts >= $cluster_node_timeout) {
-                push @{ $self->{'_down_hosts'} }, $host_id
+                push @{ $self->{'_down_hosts'} }, $host_id;
             }
         }
     } else {
