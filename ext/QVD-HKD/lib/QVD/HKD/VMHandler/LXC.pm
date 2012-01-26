@@ -501,14 +501,13 @@ sub _create_lxc {
         $console = '/dev/null';
     }
 
-    my $pair = $self->_cfg('vm.network.device.prefix') . $self->{vm_id};
-    
-    my ($r1, $r2) = map int rand 10000, 0..1;
-    
+    my $iface = $self->{iface} =
+        $self->_cfg('internal.vm.network.device.prefix') . $self->{vm_id} . 'r' . int(rand 10000);
+
     # FIXME: make this template-able or configurable in some way
     print $fh <<EOC;
 lxc.network.type=veth
-lxc.network.veth.pair=${pair}r$r1
+lxc.network.veth.pair=$iface
 lxc.network.name=eth0
 lxc.network.flags=up
 lxc.network.hwaddr=$self->{mac}
@@ -660,8 +659,5 @@ sub _run_hook {
     $debug and $self->_debug("no hook for $name");
     $self->_on_run_hook_done;
 }
-
-sub _remove_fw_rules { shift->_on_remove_fw_rules_done }
-sub _set_fw_rules { shift->_on_set_fw_rules_done }
 
 1;

@@ -73,6 +73,7 @@ command.lxc-create = lxc-create
 command.lxc-start = lxc-start
 command.lxc-stop = lxc-stop
 command.lxc-wait = lxc-wait
+command.ebtables = ebtables
 
 ## nxproxy's link parameter, can be: modem, isdn, adsl, wan, lan, local or a bandwidth specification (56k, 1m, 100m...)
 client.link = adsl
@@ -160,13 +161,16 @@ vm.serial.capture = 0
 ## all VMs will be attached to this interface, which must be a bridge
 ## the DHCP server uses this setting too
 vm.network.bridge = qvdnet
+
 ## for LXC's lxc.network.veth.pair parameter
-vm.network.device.prefix = qvd
+internal.vm.network.device.prefix = qvd
 ## start of DHCP range. There's no sensible default value
 # vm.network.ip.start=10.0.0.100
+
 ## file to pass to dnsmasq at its --dhcp-hostsfile parameter
 internal.vm.network.dhcp-hostsfile=${path.run}/dhcp-hostsfile
-## unused
+
+# enable firewall rules
 internal.vm.network.firewall.enable = 1
 
 ## not sure about this one

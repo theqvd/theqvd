@@ -156,8 +156,78 @@ use constant IFF_NO_PI => 0x1000;
 use constant IFF_TAP => 2;
 use constant TUNSETIFF => 0x400454ca;
 
+sub _fw_rules {
+    my $self = shift;
+    my $vm_id = $self->{vm_id};
+    my $ip = $self->{ip};
+    my $mac = $self->{mac};
+    my $iface = $self->{iface};
+
+    # this ebrules rules are just to forbid MAC or IP spoofing
+    # everything else is done using global rules.
+
+    my $INPUT   = "QVD_${vm_id}_INPUT";
+    my $FORWARD = "QVD_${vm_id}_FORWARD";
+
+    return ( [-N => $INPUT,   -P => 'ACCEPT'],
+             [-N => $FORWARD, -P => 'ACCEPT'],
+
+             [-A => $FORWARD => -s => '!', $mac, -j => 'DROP'],
+             [-A => $INPUT   => -s => '!', $mac, -j => 'DROP'],
+             [-A => $FORWARD => -p => '0x800', '--ip-source' => '!', $ip, -j => 'DROP'],
+             [-A => $INPUT   => -p => '0x800', '--ip-protocol' => '17',   # allow DHCP requests to host
+                                        '--ip-source' => '0.0.0.0',
+                                        '--ip-destination-port' => '67', -j => 'ACCEPT'],
+             [-A => $FORWARD => -p => '0x800', '--ip-protocol' => '17',   # do not let DHCP traffic leave the host
+                                        '--ip-destination-port' => '67', -j => 'DROP'],
+             [-A => $INPUT   => -p => '0x800', '--ip-source' => '!', $ip, -j => 'DROP'],
+
+             [-A => INPUT    => -i => $iface, -j => $INPUT  ],
+             [-A => FORWARD  => -i => $iface, -j => $FORWARD] );
+}
+
 sub _set_fw_rules {
-    shift->_on_set_fw_rules_done;
+    my $self = shift;
+    if ($self->_cfg('internal.vm.network.firewall.enable')) {
+        my $ebtables = $self->_cfg('command.ebtables');
+        for my $rule ($self->_fw_rules) {
+            $debug and $self->_debug("adding ebtables entry @$rule");
+            if (system $ebtables => @$rule) {
+                $debug and $self->_debug("unable to add ebtables entry, rc: " . ($? >> 8));
+                return $self->_on_set_fw_rules_error;
+            }
+        }
+    }
+    $self->_on_set_fw_rules_done;
+}
+
+sub _remove_fw_rules {
+    my $self = shift;
+    my $vm_id = $self->{vm_id};
+    my $ebtables = $self->_cfg('command.ebtables');
+    for my $chain (qw(INPUT FORWARD)) {
+        my $target = "QVD_${vm_id}_${chain}";
+        my $j = quotemeta $target;
+        $j = qr/\b$j$/;
+        $debug and $self->_debug("retrieving list of ebtables entries for $chain");
+        for (`$ebtables -L $chain --Ln`) {
+            chomp;
+            if ($_ =~ $j) {
+                my ($n) = split /\./;
+                $debug and $self->_debug("deleting rule $_");
+                system $ebtables => -D => $chain, $n and
+                    $debug and $self->_debug("unable to delete rule, rc: " . ($? << 8));
+            }
+        }
+        system $ebtables => -X => $target and
+            $debug and $self->_debug("unable to delete chain $target, rc: " . ($? << 8));
+
+        unless ("$ebtables -L $target >/dev/null 2>&1") {
+            $debug and $self->_debug("deletion of chain $target failed");
+            $self->_on_remove_fw_rules_error;
+        }
+    }
+    $self->_on_remove_fw_rules_done
 }
 
 sub _vma_url {
