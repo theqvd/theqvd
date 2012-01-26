@@ -437,9 +437,16 @@ sub _allocate_os_rootfs {
         }
         when ('bind') {
             if (system $self->_cfg('command.mount'),
-                '--bind' => $self->{os_basefs}, $rootfs) {
-                ERROR "unable to mount bind $self->{os_basefs} into $rootfs (code: " . ($? >> 8) . ")";
+                '--bind', $self->{os_basefs}, $rootfs) {
+                ERROR "unable to mount bind $self->{os_basefs} into $rootfs, mount rc: " . ($? >> 8);
                 return $self->_on_allocate_os_rootfs_error;
+            }
+            if ($self->_cfg('vm.lxc.unionfs.bind.ro')) {
+                if (system $self->_cfg('commnad.mount'),
+                    -o => 'remount,ro', $rootfs) {
+                    ERROR "unable to remount bind mount $rootfs as read-only, mount rc: ". ($? >> 8);
+                    return $self->_on_allocate_os_rootfs_error;
+                }
             }
         }
         default {
