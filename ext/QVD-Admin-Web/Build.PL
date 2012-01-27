@@ -8,7 +8,7 @@ my $build = new Module::Build(
 	dist_author       => 'QVD Team <qvd@qindel.com',
 	dist_version     => '3.1'.$ENV{SVN_REVISION},
 	dist_abstract    => 'QVD::Admin::Web - Catalyst based application',
-	license          => 'gpl3',
+	license          => 'gpl',
 
 	PL_files         => {},
 	pl_files         => glob('script/*.pl'),
