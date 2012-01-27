@@ -1244,7 +1244,6 @@ MANIFEST
 MANIFEST.SKIP
 qvd_admin_web.conf
 README
-script/qvd-wat.initrc
 script/qvd-wat.initrc.pl
 script/qvd_admin_web_cgi.pl
 script/qvd_admin_web_create.pl
@@ -1261,3 +1260,4 @@ t/12vm.t
 t/model_QVD-Admin-Web.t
 t/view_JSON.t
 t/view_TT.t
+META.yml
