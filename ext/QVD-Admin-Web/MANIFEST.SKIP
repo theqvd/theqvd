@@ -10,3 +10,4 @@ inc
 ^_build
 ^Build$
 ^MYMETA
+^Makefile.PL$
