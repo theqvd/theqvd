@@ -13,6 +13,10 @@ my $build = new Module::Build(
 	PL_files         => {},
 	pl_files         => glob('script/*.pl'),
 
+	configure_requires => { 
+		'Module::Build'                      => 0.38
+	},
+
 	requires => {
 		'Catalyst::Runtime'                  => '5.80007',
 		'Catalyst::Plugin::ConfigLoader'     => 0,
