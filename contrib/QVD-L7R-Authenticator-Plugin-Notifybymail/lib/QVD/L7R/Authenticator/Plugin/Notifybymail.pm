@@ -61,7 +61,7 @@ The mail from address. By default this is "qvd@$HOSTNAME"
 
 =item * auth.notifybymail.smtpsubject 
 
-The subject in the email. By default this is "User $USER has tried to connecto to QVD at $HOSTNAME"
+The subject in the email. By default this is "User $USER has tried to connect to QVD at $HOSTNAME"
 
 =item * auth.notifybymail.excludenotifyregex
 
@@ -153,7 +153,7 @@ sub before_list_of_vms {
 	return ();
     }
 
-    my $smtpsubject = cfg('auth.notifybymail.smtpsubject', 0) || 'User '.$login.' has tried to connecto to QVD at '.$hostname;
+    my $smtpsubject = cfg('auth.notifybymail.smtpsubject', 0) || 'User '.$login.' has tried to connect to QVD at '.$hostname;
 
     $smtp->mail($smtpfrom);
     foreach my $to (@smtpto) {
