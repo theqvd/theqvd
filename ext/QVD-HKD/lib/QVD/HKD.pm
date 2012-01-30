@@ -14,6 +14,7 @@ use warnings;
 no warnings 'redefine';
 
 use Carp;
+use Fcntl qw(LOCK_EX LOCK_NB);
 use File::Slurp qw(slurp);
 use Pg::PQ qw(:pgres);
 use AnyEvent;
@@ -35,7 +36,11 @@ use QVD::HKD::Config::Network qw(netvms netnodes);
 use parent qw(QVD::HKD::Agent);
 
 use QVD::StateMachine::Declarative
-    'new'                            => { transitions => { _on_run                    => 'starting/connecting_to_db'    } },
+    'new'                            => { transitions => { _on_run                    => 'starting/acquiring_lock'      } },
+
+    'starting/acquiring_lock'        => { enter       => '_acquire_lock',
+                                          transitions => { _on_acquire_lock_done      => 'starting/connecting_to_db',
+                                                           _on_acquire_lock_error     => 'failed'                       } },
 
     'starting/connecting_to_db'      => { enter       => '_start_db',
                                           transitions => { _on_db_connected           => 'starting/loading_db_config'   } },
@@ -121,6 +126,26 @@ sub new {
                                             on_reload_error => sub { $self->_on_config_reload_error } );
     $self->{vm} = {};
     $self;
+}
+
+sub _acquire_lock {
+    my $self = shift;
+    my $lock_file = $self->_cfg('internal.hkd.lock.path');
+    if (open my $lf, '>', $lock_file) {
+        if (flock $lf, LOCK_EX|LOCK_NB) {
+            $self->{lock_file} = $lf;
+            return $self->_on_acquire_lock_done;
+        }
+        if ($self->{lock_retries}++ < $self->_cfg('internal.hkd.lock.retries')) {
+            $debug and $self->_debug("lock busy, dealying... ($!)");
+            return $self->_call_after($self->_cfg('internal.hkd.lock.delay'), sub { $self->_acquire_lock });
+        }
+        $debug and $self->_debug("unable to lock file, tried $self->{lock_retries} times: $!");
+    }
+    else {
+        $debug and $self->_debug("unable to open lock file $lock_file: $!");
+    }
+    $self->_on_acquire_lock_error;
 }
 
 sub _say_goodbye {
