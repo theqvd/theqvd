@@ -15,15 +15,17 @@ my $lock_file = cfg('internal.hkd.lock.path');
 
 open my $lock, '>', $lock_file;
 if (flock $lock, LOCK_EX|LOCK_NB) {
-    sub kill_dangling_containers {
-        for my $dir (<$path_cgroup/qvd-*>) {
-            if (open my $fh, '<', "$dir/cgroup.procs") {
-                chomp (my @pids = <$fh>);
-                if (@pids) {
-                    my $dir =~ m|/(qvd-[^/]*$)|;
-                    INFO sprintf("killing %d processes from container %s", scalar(@pids), ($1 // '<unknown>'));
-                    kill KILL => @pids;
-                }
+    for my $dir (<$path_cgroup/qvd-*>) {
+        my ($container) = $dir =~ m|/(qvd-[^/]*$)|;
+        DEBUG "reading LXC $container process IDs";
+        if (open my $fh, '<', "$dir/cgroup.procs") {
+            chomp (my @pids = <$fh>);
+            if (@pids) {
+                INFO sprintf("killing %d processes from container %s", scalar(@pids), ($1 // '<unknown>'));
+                kill KILL => @pids;
+            }
+            else {
+                DEBUG "LXC $container has no processes";
             }
         }
     }
