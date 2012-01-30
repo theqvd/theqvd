@@ -64,6 +64,7 @@ sub _run_dhcpd {
     my $network_bridge     = $self->_cfg('vm.network.bridge');
     my $dhcp_start         = $self->_cfg('vm.network.ip.start');
     my $dhcp_default_route = $self->_cfg('vm.network.gateway');
+    my $dhcp_domain        = $self->_cfg('vm.network.domain');
     my $dhcp_hostsfile     = $self->_cfg('internal.vm.network.dhcp-hostsfile');
 
     open my $fh, ">", $dhcp_hostsfile or die "unable to open $dhcp_hostsfile: $!";
@@ -72,14 +73,16 @@ sub _run_dhcpd {
     }
     close $fh;
 
-    $self->_run_cmd([ $dhcpd_cmd,
-                      '-k', '--log-dhcp',
-                      '--dhcp-range'     => "interface:$network_bridge,$dhcp_start,static",
-                      '--dhcp-option'    => "option:router,$dhcp_default_route",
-                      '--interface'      => $network_bridge,
-                      '--dhcp-hostsfile' => $dhcp_hostsfile,
-                      ($debug ? ('-d') : ())
-                    ]);
+    my @dhcp_cmd = ( $dhcpd_cmd,
+                     '-k', '--log-dhcp',
+                     '--dhcp-range'     => "interface:$network_bridge,$dhcp_start,static",
+                     '--dhcp-option'    => "option:router,$dhcp_default_route",
+                     '--interface'      => $network_bridge,
+                     '--dhcp-hostsfile' => $dhcp_hostsfile );
+    push @dhcp_cmd, "--domain=$dhcp_domain" if length $dhcp_domain;
+    push @dhcp_cmd, "-d" if $debug;
+
+    $self->_run_cmd(\@dhcp_cmd);
 }
 
 1;

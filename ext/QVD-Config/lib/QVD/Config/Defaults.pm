@@ -164,6 +164,9 @@ vm.serial.capture = 0
 ## the DHCP server uses this setting too
 vm.network.bridge = qvdnet
 
+# Default search domain for virtual machines
+vm.network.domain=
+
 ## for LXC's lxc.network.veth.pair parameter
 internal.vm.network.device.prefix = qvd
 ## start of DHCP range. There's no sensible default value
