@@ -194,7 +194,7 @@ sub _run_cmd {
                 delete $self->{cmd_watcher}{$pid};
                 if ($rc) {
                     $cmd = [$cmd] unless ref $cmd;
-                    $debug and $self->_debug("command failed: @$cmd => $rc");
+                    $debug and $self->_debug("command failed: @$cmd => " . ($rc >> 8) " ($rc)");
                     ERROR "command @$cmd failed: $rc";
                     unless ($ignore_errors) {
                         $debug and $self->_debug("calling on_error callback $on_error");
