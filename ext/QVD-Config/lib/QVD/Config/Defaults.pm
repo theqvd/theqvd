@@ -312,3 +312,6 @@ internal.hkd.lxc.killer.umount.timeout = 100
 internal.hkd.debugger.run = 0
 internal.hkd.debugger.socket = /root/hkd-debug
 
+internal.hkd.lock.path = ${path.run}/hkd.lock
+internal.hkd.lock.retries = 5
+internal.hkd.lock.delay = 2
