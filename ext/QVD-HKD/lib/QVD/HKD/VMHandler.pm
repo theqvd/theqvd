@@ -198,34 +198,42 @@ sub _set_fw_rules {
             }
         }
     }
+    else {
+        $debug and $self->_debug("setup of VM firewall rules skiped, do you really need to do that?");
+    }
     $self->_on_set_fw_rules_done;
 }
 
 sub _remove_fw_rules {
     my $self = shift;
-    my $vm_id = $self->{vm_id};
-    my $ebtables = $self->_cfg('command.ebtables');
-    for my $chain (qw(INPUT FORWARD)) {
-        my $target = "QVD_${vm_id}_${chain}";
-        my $j = quotemeta $target;
-        $j = qr/\b$j$/;
-        $debug and $self->_debug("retrieving list of ebtables entries for $chain");
-        for (`$ebtables -L $chain --Ln`) {
-            chomp;
-            if ($_ =~ $j) {
-                my ($n) = split /\./;
-                $debug and $self->_debug("deleting rule $_");
-                system $ebtables => -D => $chain, $n and
-                    $debug and $self->_debug("unable to delete rule, rc: " . ($? << 8));
+    if ($self->_cfg('internal.vm.network.firewall.enable')) {
+        my $vm_id = $self->{vm_id};
+        my $ebtables = $self->_cfg('command.ebtables');
+        for my $chain (qw(INPUT FORWARD)) {
+            my $target = "QVD_${vm_id}_${chain}";
+            my $j = quotemeta $target;
+            $j = qr/\b$j$/;
+            $debug and $self->_debug("retrieving list of ebtables entries for $chain");
+            for (`$ebtables -L $chain --Ln`) {
+                chomp;
+                if ($_ =~ $j) {
+                    my ($n) = split /\./;
+                    $debug and $self->_debug("deleting rule $_");
+                    system $ebtables => -D => $chain, $n and
+                        $debug and $self->_debug("unable to delete rule, rc: " . ($? << 8));
+                }
+            }
+            system $ebtables => -X => $target and
+                $debug and $self->_debug("unable to delete chain $target, rc: " . ($? << 8));
+
+            unless ("$ebtables -L $target >/dev/null 2>&1") {
+                $debug and $self->_debug("deletion of chain $target failed");
+                $self->_on_remove_fw_rules_error;
             }
         }
-        system $ebtables => -X => $target and
-            $debug and $self->_debug("unable to delete chain $target, rc: " . ($? << 8));
-
-        unless ("$ebtables -L $target >/dev/null 2>&1") {
-            $debug and $self->_debug("deletion of chain $target failed");
-            $self->_on_remove_fw_rules_error;
-        }
+    }
+    else {
+        $debug and $self->_debug("cleanup of VM firewall rules skiped");
     }
     $self->_on_remove_fw_rules_done
 }

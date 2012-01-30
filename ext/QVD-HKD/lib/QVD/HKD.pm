@@ -429,25 +429,35 @@ sub _fw_rules {
 
 sub _set_fw_rules {
     my $self = shift;
-    my $iptables = $self->_cfg('command.iptables');
-    for my $rule ($self->_fw_rules) {
-        $debug and $self->_debug("setting iptables entry @$rule");
-        if (system $iptables => -A => @$rule) {
-            $debug and $self->_debug("iptables command failed, rc: " . ($? >> 8));
-            return $self->_on_set_fw_rules_error;
+    if ($self->_cfg('internal.vm.network.firewall.enable')) {
+        my $iptables = $self->_cfg('command.iptables');
+        for my $rule ($self->_fw_rules) {
+            $debug and $self->_debug("setting iptables entry @$rule");
+            if (system $iptables => -A => @$rule) {
+                $debug and $self->_debug("iptables command failed, rc: " . ($? >> 8));
+                return $self->_on_set_fw_rules_error;
+            }
         }
+    }
+    else {
+        $debug and $self->_debug("setup of global firewall rules skiped, do you really need to do that?");
     }
     $self->_on_set_fw_rules_done;
 }
 
 sub _remove_fw_rules {
     my $self = shift;
-    my $iptables = $self->_cfg('command.iptables');
-    for my $rule (reverse $self->_fw_rules) {
-        $debug and $self->_debug("removing iptables entry @$rule");
-        if (system $iptables => -D => @$rule) {
-            $debug and $self->_debug("iptables command failed, rc: " . ($? >> 8));
+    if ($self->_cfg('internal.vm.network.firewall.enable')) {
+        my $iptables = $self->_cfg('command.iptables');
+        for my $rule (reverse $self->_fw_rules) {
+            $debug and $self->_debug("removing iptables entry @$rule");
+            if (system $iptables => -D => @$rule) {
+                $debug and $self->_debug("iptables command failed, rc: " . ($? >> 8));
+            }
         }
+    }
+    else {
+         $debug and $self->_debug("cleanup of global firewall rules skiped");
     }
     $self->_on_remove_fw_rules_done;
 }
