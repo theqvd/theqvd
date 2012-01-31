@@ -137,7 +137,7 @@ sub _acquire_lock {
             return $self->_on_acquire_lock_done;
         }
         if ($self->{lock_retries}++ < $self->_cfg('internal.hkd.lock.retries')) {
-            $debug and $self->_debug("lock busy, dealying... ($!)");
+            $debug and $self->_debug("lock busy, delaying... ($!)");
             return $self->_call_after($self->_cfg('internal.hkd.lock.delay'), sub { $self->_acquire_lock });
         }
         $debug and $self->_debug("unable to lock file, tried $self->{lock_retries} times: $!");
@@ -465,7 +465,7 @@ sub _set_fw_rules {
         }
     }
     else {
-        $debug and $self->_debug("setup of global firewall rules skiped, do you really need to do that?");
+        $debug and $self->_debug("setup of global firewall rules skipped, do you really need to do that?");
     }
     $self->_on_set_fw_rules_done;
 }
@@ -482,7 +482,7 @@ sub _remove_fw_rules {
         }
     }
     else {
-         $debug and $self->_debug("cleanup of global firewall rules skiped");
+         $debug and $self->_debug("cleanup of global firewall rules skipped");
     }
     $self->_on_remove_fw_rules_done;
 }

@@ -199,7 +199,7 @@ sub _set_fw_rules {
         }
     }
     else {
-        $debug and $self->_debug("setup of VM firewall rules skiped, do you really need to do that?");
+        $debug and $self->_debug("setup of VM firewall rules skipped, do you really need to do that?");
     }
     $self->_on_set_fw_rules_done;
 }
@@ -233,7 +233,7 @@ sub _remove_fw_rules {
         }
     }
     else {
-        $debug and $self->_debug("cleanup of VM firewall rules skiped");
+        $debug and $self->_debug("cleanup of VM firewall rules skipped");
     }
     $self->_on_remove_fw_rules_done
 }
