@@ -56,10 +56,11 @@ sub _maybe_callback {
                 } // 'unknown';
             $self->_debug("calling $cb as $sub ($name) with args @_");
         }
-        $sub->($self, @_);
+        return $sub->($self, @_);
     }
     else {
         $debug and $self->_debug("no callback for $cb");
+        return ();
     }
 }
 

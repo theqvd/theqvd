@@ -42,13 +42,19 @@ use QVD::StateMachine::Declarative
     'starting/saving_runtime_row'     => { enter       => '_save_runtime_row',
                                            transitions => { _on_save_runtime_row_done    => 'starting/deleting_cmd',
                                                             _on_save_runtime_row_bad_result => 'stopping/clearing_runtime_row'  },
-                                           ignore      => ['_on_save_runtime_row_result']                                        },
+                                           ignore      => ['_on_save_runtime_row_result']                                         },
 
     'starting/deleting_cmd'           => { enter       => '_delete_cmd',
-                                           transitions => { _on_delete_cmd_done          => 'starting/calculating_attrs'       } },
+                                           transitions => { _on_delete_cmd_done          => 'starting/calculating_attrs'        } },
 
     'starting/calculating_attrs'      => { enter       => '_calculate_attrs',
-                                           transitions => { _on_calculate_attrs_done     => 'starting/untaring_os_image'       } },
+                                           transitions => { _on_calculate_attrs_done     => 'starting/setting_heavy_mark'       } },
+
+    'starting/setting_heavy_mark'     => { enter       => '_set_heavy_mark',
+                                           transitions => { _on_set_heavy_mark_done      => 'starting/untaring_os_image',
+                                                            _on_set_heavy_mark_error     => 'starting/delaying'                 } },
+
+    'starting/delaying'               => { transitions => { _on_cmd_go_heavy             => 'starting/setting_heavy_mark'       } },
 
     'starting/untaring_os_image'      => { enter       => '_untar_os_image',
                                            transitions => { _on_untar_os_image_done      => 'starting/placing_os_image',
@@ -127,9 +133,12 @@ use QVD::StateMachine::Declarative
                                            ignore      => [qw(_on_incr_run_ok_result)]                                          },
 
     'running/running_poststart_hook'  => { enter       => '_run_poststart_hook',
-                                           transitions => { _on_run_hook_done            => 'running/monitoring',
+                                           transitions => { _on_run_hook_done            => 'running/unsetting_heavy_mark',
                                                             _on_run_hook_error           => 'stopping/saving_state'           },
                                            delay       => [qw(_on_lxc_done)]                                                    },
+
+    'running/unsetting_heavy_mark'    => { enter       => '_unset_heavy_mark',
+                                           transitions => { _on_unset_heavy_mark_done      => 'running/monitoring'             } },
 
     'running/monitoring'              => { enter       => '_start_vma_monitor',
                                            leave       => '_stop_vma_monitor',
@@ -140,9 +149,12 @@ use QVD::StateMachine::Declarative
                                                             _on_lxc_done                 => 'stopping/killing_lxc'            } },
 
     'debugging/saving_state'          => { enter       => '_save_state',
-                                           transitions => { _on_save_state_done          => 'debugging/waiting_for_vma',
+                                           transitions => { _on_save_state_done          => 'debugging/unsetting_heavy_mark',
                                                             _on_save_state_bad_result    => 'stopping/saving_state'          },
                                            delay       => [qw(_on_lxc_done)]                                                   },
+
+    'debugging/unsetting_heavy_mark'  => { enter       => '_unset_heavy_mark',
+                                           transitions => { _on_unset_heavy_mark_done    => 'debugging/waiting_for_vma'      } },
 
     'debugging/waiting_for_vma'       => { enter       => '_start_vma_monitor',
                                            leave       => '_stop_vma_monitor',
@@ -157,8 +169,14 @@ use QVD::StateMachine::Declarative
                                            transitions => { _on_delete_cmd_done          => 'stopping/saving_state'           } },
 
     'stopping/saving_state'           => { enter       => '_save_state',
-                                           transitions => { _on_save_state_done          => 'stopping/powering_off',
-                                                            _on_save_state_error         => 'stopping/powering_off'           } },
+                                           transitions => { _on_save_state_done          => 'stopping/setting_heavy_mark',
+                                                            _on_save_state_error         => 'stopping/setting_heavy_mark'     } },
+
+    'stopping/setting_heavy_mark'     => { enter       => '_set_heavy_mark',
+                                           transitions => { _on_set_heavy_mark_done      => 'stopping/powering_off',
+                                                            _on_set_heavy_mark_error     => 'stopping/delaying'               } },
+
+    'stopping/delaying'               => { transitions => { _on_cmd_go_heavy             => 'stopping/setting_heavy_mark'     } },
 
     'stopping/powering_off'           => { enter       => '_poweroff',
                                            leave       => '_abort_all',
@@ -222,22 +240,25 @@ use QVD::StateMachine::Declarative
 
     'zombie/killing_lxc'              => { enter       => '_kill_lxc',
                                            transitions => { _on_kill_lxc_done            => 'zombie/destroying_lxc',
-                                                            _on_kill_lxc_error           => 'zombie'                         } },
+                                                            _on_kill_lxc_error           => 'zombie/unsetting_heavy_mark'    } },
 
     'zombie/removing_fw_rules'        => { enter       => '_remove_fw_rules',
                                            transitions => { _on_remove_fw_rules_done     => 'zombie/destroying_lxc',
-                                                            _on_remove_fw_rules_error    => 'zombie'                         } },
+                                                            _on_remove_fw_rules_error    => 'zombie/unsetting_heavy_mark'    } },
 
     'zombie/destroying_lxc'           => { enter       => '_destroy_lxc',
                                            transitions => { _on_destroy_lxc_done         => 'zombie/unmounting_filesystems'  } },
 
     'zombie/unmounting_filesystems'   => { enter       => '_unmount_filesystems',
                                            transitions => { _on_unmount_filesystems_done => 'zombie/clearing_runtime_row',
-                                                            _on_unmount_filesystems_error=> 'zombie'                         } },
+                                                            _on_unmount_filesystems_error=> 'zombie/unsetting_heavy_mark'    } },
 
     'zombie/clearing_runtime_row'     => { enter       => '_clear_runtime_row',
                                            transitions => { _on_clear_runtime_row_done   => 'stopped',
-                                                            _on_clear_runtime_row_error  => 'zombie'                         } },
+                                                            _on_clear_runtime_row_error  => 'zombie/unsetting_heavy_mark'    } },
+
+    'zombie/unsetting_heavy_mark'     => { enter       => '_unset_heavy_mark',
+                                           transitions => { _on_unset_heavy_mark_done    => 'zombie'                         } },
 
     'zombie'                          => { enter       => '_set_state_timer',
                                            leave       => '_abort_all',
@@ -317,6 +338,7 @@ sub _calculate_attrs {
 sub _untar_os_image {
     my $self = shift;
     my $image_path = $self->_cfg('path.storage.images') . '/' . $self->{di_path};
+    $debug and $self->_debug("image_path=$image_path");
     unless (-f $image_path) {
         ERROR "Image $image_path attached to VM $self->{vm_id} does not exist on disk";
         return $self->_on_untar_os_image_error;

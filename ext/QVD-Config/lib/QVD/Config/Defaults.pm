@@ -315,3 +315,5 @@ internal.hkd.debugger.socket = /root/hkd-debug
 internal.hkd.lock.path = ${path.run}/hkd.lock
 internal.hkd.lock.retries = 5
 internal.hkd.lock.delay = 2
+
+internal.hkd.max_heavy = 10

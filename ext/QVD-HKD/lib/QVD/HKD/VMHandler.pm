@@ -43,11 +43,14 @@ sub new {
     my $vm_id = delete $opts{vm_id};
     my $on_stopped = delete $opts{on_stopped};
     my $on_delete_cmd = delete $opts{on_delete_cmd};
+    my $on_heavy = delete $opts{on_heavy};
+
     my $dhcpd_handler = delete $opts{dhcpd_handler};
     my $self = $class->SUPER::new(%opts);
     $self->{vm_id} = $vm_id;
     $self->{dhcpd_handler} = $dhcpd_handler;
     $self->{on_stopped} = $on_stopped;
+    $self->{on_heavy} = $on_heavy;
     $self->{on_delete_cmd} = $on_delete_cmd;
 
     my $hypervisor = $self->_cfg('vm.hypervisor');
@@ -325,6 +328,22 @@ update vm_runtimes
         vm_id   = $1  and
         host_id = $2
 SQL
+}
+
+sub _set_heavy_mark {
+    my $self = shift;
+    if ($self->_maybe_callback(on_heavy => 1)) {
+        $self->_on_set_heavy_mark_done;
+    }
+    else {
+        $self->_on_set_heavy_mark_error;
+    }
+}
+
+sub _unset_heavy_mark {
+    my $self = shift;
+    $self->_maybe_callback(on_heavy => 0);
+    $self->_on_unset_heavy_mark_done;
 }
 
 sub _on_clear_runtime_row_result {}

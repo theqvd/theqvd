@@ -125,6 +125,8 @@ sub new {
                                             on_reload_done => sub { $self->_on_config_reloaded },
                                             on_reload_error => sub { $self->_on_config_reload_error } );
     $self->{vm} = {};
+    $self->{heavy} = {};
+    $self->{delayed} = {};
     $self;
 }
 
@@ -366,7 +368,8 @@ sub _new_vm_handler {
                                                    db => $self->{db},
                                                    dhcpd_handler => $self->{dhcpd_handler},
                                                    on_stopped => sub { $self->_on_vm_stopped($vm_id) },
-                                                   on_delete_cmd => sub { $self->_on_vm_cmd_done($vm_id) } );
+                                                   on_delete_cmd => sub { $self->_on_vm_cmd_done($vm_id) },
+                                                   on_heavy => sub { $self->_on_vm_heavy($vm_id, @_) } );
 }
 
 sub _on_vm_cmd {
@@ -392,7 +395,48 @@ sub _on_vm_cmd {
 sub _on_vm_stopped {
     my ($self, $vm_id) = @_;
     delete $self->{vm}{$vm_id};
-     keys %{$self->{vm}} or $self->_on_stop_all_vms_done
+    my $all_done = not keys %{$self->{vm}};
+    delete $self->{delayed}{$vm_id};
+    if (delete $self->{heavy}{$vm_id}) {
+        $self->_run_delayed;
+    }
+    $self->_on_stop_all_vms_done if $all_done;
+}
+
+sub _on_vm_heavy {
+    my ($self, $vm_id, undef, $set) = @_;
+    $debug and $self->_debug("_on_vm_heavy($vm_id, $set) called");
+    if ($set) {
+        if ($self->{heavy}{$vm_id}) {
+            $debug and $self->_debug("VM $vm_id is already marked as heavy");
+            return 1;
+        }
+        if (keys %{$self->{heavy}} <= $self->_cfg('internal.hkd.max_heavy')) {
+            $debug and $self->_debug("VM $vm_id marked as heavy");
+            $self->{heavy}{$vm_id} = 1;
+            return 1;
+        }
+        else {
+            $debug and $self->_debug("Can mark VM $vm_id as heavy, there are already too many");
+            $self->{delayed}{$vm_id} = 1;
+            return;
+        }
+    }
+    else {
+        $debug and $self->_debug("Removing heavy mark for VM $vm_id");
+        delete $self->{heavy}{$vm_id};
+        $self->_run_delayed;
+    }
+}
+
+sub _run_delayed {
+    my $self = shift;
+    while (keys %{$self->{delayed}} and
+           keys %{$self->{heavy}} <= $self->_cfg('internal.hkd.max_heavy')) {
+        my $vm_id = each %{$self->{delayed}};
+        delete $self->{delayed}{$vm_id};
+        $self->_on_vm_cmd($vm_id, 'go_heavy');
+    }
 }
 
 sub _on_vm_cmd_done {
