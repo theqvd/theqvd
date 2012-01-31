@@ -73,16 +73,21 @@ sub _run_dhcpd {
     }
     close $fh;
 
-    my @dhcp_cmd = ( $dhcpd_cmd,
-                     '-k', '--log-dhcp',
-                     '--dhcp-range'     => "interface:$network_bridge,$dhcp_start,static",
-                     '--dhcp-option'    => "option:router,$dhcp_default_route",
-                     '--interface'      => $network_bridge,
-                     '--dhcp-hostsfile' => $dhcp_hostsfile );
-    push @dhcp_cmd, "--domain=$dhcp_domain" if length $dhcp_domain;
-    push @dhcp_cmd, "-d" if $debug;
+    my @dhcpd_cmd = ( $dhcpd_cmd,
+                      '-k', '--log-dhcp',
+                      '--dhcp-range'     => "interface:$network_bridge,$dhcp_start,static",
+                      '--dhcp-option'    => "option:router,$dhcp_default_route",
+                      '--interface'      => $network_bridge,
+                      '--dhcp-hostsfile' => $dhcp_hostsfile,
+                      '-X'               => 50000,  # set the limit to the number of
+                                                    # leases served big enough to
+                                                    # ensure it will not be reached
+                                                    # ever
+                    );
+    push @dhcpd_cmd, "--domain=$dhcp_domain" if length $dhcp_domain;
+    push @dhcpd_cmd, "-d" if $debug;
 
-    $self->_run_cmd(\@dhcp_cmd);
+    $self->_run_cmd(\@dhcpd_cmd);
 }
 
 1;
