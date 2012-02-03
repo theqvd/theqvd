@@ -615,6 +615,8 @@ sub _destroy_lxc {
     my $self = shift;
     $self->_run_cmd([$self->_cfg('command.lxc-destroy'), -n => $self->{lxc_name}],
                     ignore_errors => 1);
+    $self->_run_cmd(['ip', 'link', 'del', $self->{iface}],
+                    ignore_errors => 1);
 }
 
 sub _unmount_filesystems {
