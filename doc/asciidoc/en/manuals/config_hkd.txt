@@ -1,0 +1,12 @@
+You are able to specify the following additional options to control
+the HKD:
+
+----
+hkd.vm.starting.max = 6
+----
+
+The value set above is the default value.
+
+* *hkd.vm.starting.max*: the maximum number of virtual machines that
+  the HKD will start on a Server Node
+

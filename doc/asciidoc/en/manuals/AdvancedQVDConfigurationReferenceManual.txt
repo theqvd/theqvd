@@ -1,0 +1,177 @@
+// a2x: -L 
+// a2x: --dblatex-opts "-d"
+// a2x: --dblatex-opts "-p ./qvd.xsl"
+// a2x: --dblatex-opts "-s ./GettingStartedGuide.sty"
+
+Getting Started with QVD 
+========================
+Rowan Puttergill <rowan.puttergill@qindel.com>
+$Id: AdvancedQVDConfigurationReferenceManual.txt 11680 2011-07-22 08:22:43Z rputtergill $
+:author initials: RP
+:email: rowan.puttergill@qindel.com
+:doctype: book
+:toc:
+:icons:
+:numbered:
+:qvdversion: 3.0.1
+:website: http://theqvd.com/
+ifdef::blogpost[]
+// Use the same article for both a blog post and on the AsciiDoc
+// website.
+:blogpost-status: published
+:blogpost-doctype: book
+:blogpost-posttype: page
+:blogpost-categories: doc
+endif::blogpost[]
+[preamble]
+Revision Information
+--------------------
+This document was last updated: {revdate}
+
+Its current version number is set at: {revnumber} 
+
+[preface]
+Preface
+========
+This document is designed as a supplement to the
+link:http://theqvd.com/downloads/docs/AdministrationManual.pdf[QVD Administration Manual], 
+where basic concepts about administering a QVD deployment have
+already been covered. The contents described within this reference
+manual provide a more detailed look at the different configuration
+parameters that are available for the different components within a
+QVD solution. We also explore some more advanced configuration tasks,
+such as the use of VMA Hooks in order to control behaviours within the
+Virtual Machine depending on particular operational triggers.
+
+
+Configuration Parameters
+========================
+[partintro]
+--
+In this part of the document, we discuss all of the different configuration parameters 
+that can be used to control the behaviour of various components withing a QVD deployment.
+
+Configuration Parameters are stored in different locations depending on their purpose:
+
+* *Bootstrapping Parameters*: Used on server-side components. These parameters are used to bootstrap the service so that it is able to access other global configuration parameters and runtime data. These parameters are usually stored in `/etc/qvd/node.conf`.
+* *Server Side Configuration Parameters*: The large proportion of configuration parameters for the QVD are stored in the QVD-DB component. These parameters are used to define global behaviour within a solution and have precedence over any configuration parameters specified in the `/etc/qvd/node.conf` file. These parameters should usually be set using the 'qvd-admin.pl' command-line interface utility.
+* *VMA Configuration Parameters*: Used within Operating System Disk Images to control the behaviour of the Virtual Machine Agent. These settings are stored in `/etc/qvd/vma.conf`.
+* *Client Configuration Parameters*: Configuration parameters for the QVD Client software control the behaviour of the client software. Under Linux this file is usually in the user's home directory at `/home/someuser/.qvd/client.conf`. On Windows, this file is usually found within `%USERPROFILE%\Application Data\.qvd\client.conf`.
+
+Default values for all configuration parameters are listed in `QVD/Config/Defaults.pm` within 
+the default location for your Perl modules (usually `/usr/share/perl5`).
+--
+
+Bootstrapping Parameters
+------------------------
+All serverside components require access to the QVD-DB. In order to connect, the serverside 
+components need access to particular configuration parameters which define the different 
+connectivity requirements. These parameters are stored in a file, usually located at 
+`/etc/qvd/node.conf`.
+
+include::config_database.txt
+
+NOTE: While it is possible to store other server-side configuration parameters within the node.conf file, parameters that are also stored in the QVD-DB will always have precedence and will override anything that you have stored in the node.conf file. Therefore, it is not good practice to store configuration parameters other than the Bootstrapping parameters mentioned within this section inside of this file. Nonetheless, it is worth mentioning as it is possible to configure different server components to behave differently for a particular configuration parameter by unsetting its value within the database, and then specifying the parameter and its local value within the node.conf file. This is *not* recommended practice, but it can be used to resolve particular use-case or policy requirements.
+
+Server Side Parameters
+----------------------
+All of the server-side components that make up a QVD solution have a variety of different 
+configuration parameters that control how they interact, where things are stored, and how 
+they should behave. In order to ensure the proper running of the environment, these parameters 
+are shared among servers within a cluster so that they usually behave in a homogenous fashion. 
+As a result, all server-side parameters are stored within the QVD-DB.
+
+While it is possible to enter parameters directly into the `/etc/qvd/node.conf` file, it is 
+important to understand that the values for matching parameters stored in the QVD-DB will 
+always have precedence. This means that in order for a parameter specified in this configuration 
+file to have effect, the parameter in the QVD-DB will need to be removed. This is not generally 
+advised as it can cause confusion particularly if the `qvd-admin.pl` command line utility is 
+used to set other configuration parameters. 
+
+General Parameters
+~~~~~~~~~~~~~~~~~~
+The parameters specified here will apply to all of the different server-side components and are 
+usually used to describe things like the filepath information. Since things like your disk images 
+will usually be located on a shared storage facility such as NFS, it is important that paths to 
+mountpoints are standardized across your deployment.
+
+QVD System Paths
+^^^^^^^^^^^^^^^^
+include::config_systempaths.txt
+
+Logging
+^^^^^^^
+include::config_logging.txt
+
+Node Server Parameters
+~~~~~~~~~~~~~~~~~~~~~~
+Each QVD Node Server runs 3 separate processes:
+
+* *noded*:
+* *l7r*:
+* *hkd*:
+
+Node Daemon Options
+^^^^^^^^^^^^^^^^^^^
+include::config_noded.txt
+
+L7R Options
+^^^^^^^^^^^
+include::config_l7r.txt
+
+HKD Options
+^^^^^^^^^^^
+include::config_hkd.txt
+
+VMA Configuration Parameters
+----------------------------
+include::config_vma.txt
+
+Client Configuration Parameters
+-------------------------------
+include::config_client.txt
+
+Working With Hooks
+==================
+[partintro]
+--
+In this part of the document, we discuss VMA Hooks. These are useful 
+configuration elements that can be used to trigger particular functionality 
+within a running Virtual Machine based on particular operational activities. 
+Here, we will discuss all of the Hooks that are currently available, along 
+with examples of some of their common use-cases.
+--
+
+Building Disk Images
+====================
+[partintro]
+--
+In this part of the document we will run through the requirements to
+build your own disk images and will provide some tips to help you
+ensure that your disk image sizes are kept to a minimum.
+--
+
+
+Troubleshooting
+===============
+[partintro]
+--
+In this part of the document, we will explore some of the more common
+problem areas that QVD implementors run into when setting up a
+deployment. These can range from client workstation configuration
+requirements through to changes required within a disk image. The
+examples discussed here have largely been taken from actual support
+queries where the QVD team has had to help a customer resolve a
+problem. You can help to contribute to this document by providing
+feedback on your own support issues, so that they can be added here
+for future reference.
+--
+
+Audio
+-----
+
+Printing
+--------
+
+General Networking
+------------------

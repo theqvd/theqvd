@@ -1,0 +1,58 @@
+Community
+=========
+Rowan Puttergill <rowan.puttergill@qindel.com>
+$Id: community.txt 11772 2011-08-08 08:03:06Z rputtergill $
+:author initials: RP
+:email: rowan.puttergill@qindel.com
+:doctype: book
+:toc:
+:icons:
+:qvdversion: 3.0.0
+:website: http://theqvd.com/
+ifdef::blogpost[]
+// Use the same article for both a blog post and on the AsciiDoc
+// website.
+:blogpost-status: published
+:blogpost-doctype: article
+:blogpost-posttype: page
+endif::blogpost[]
+
+QVD is an open-source project. We welcome all of our users to join the
+QVD Community, and invite you to share contributions of bug-fixes,
+enhancements, or other modifications with other users and with the
+core QVD team so that they can make their way into future releases of
+the software.
+
+If you’re a developer and want to get your hands dirty, why not
+link:http://theqvd.com/community/source-code[download the source code] 
+and take a look at what we’ve built so far.
+We keep all of our code in a subversion repository to manage our
+change control. If you think that you have something worth
+contributing, let us know and we will work out a way to incorporate
+your code.
+
+Our end-users are important to us as well. Contributions of feature
+requests and bug reports are just as useful as the code itself. By
+submitting a link:http://theqvd.com/community/report-a-bug[bug report or a feature request], you are helping to
+improve the product for yourself and for other users.
+
+Help with documentation is also widely appreciated. We mostly write
+our documentation using link:http://www.methods.co.nz/asciidoc/[AsciiDoc], because its simple and portable and
+it can be stored within our subversion repository for change control.
+Documentation isn’t just about writing. Often we struggle to keep
+screenshots up to date, so even if you don’t think you can write, you
+can certainly help to keep the images within our manuals in good
+shape. If you think you can help with documentation let us know and we
+will help you get started.
+
+Finally, too many good open-source software simply disappears because
+people don’t know about it. We’re looking for people who can help to
+make some noise and get a good project noticed. If you blog about us,
+or write about us, or just tell your friends, you’re helping. We’ll
+try to give you some recognition for your efforts towards making this
+project grow, so let us know what you’ve been doing.
+
+If you don’t know where to start, join the Trac and start posting in
+link:http://theqvd.com/trac/discussion[our forum] to get to know other people who are passionate about QVD!
+
+image::../../../images/qvd_community.png[]

@@ -1,0 +1,80 @@
+Partner
+=======
+Rowan Puttergill <rowan.puttergill@qindel.com>
+$Id: partners.txt 11772 2011-08-08 08:03:06Z rputtergill $
+:author initials: RP
+:email: rowan.puttergill@qindel.com
+:doctype: book
+:toc:
+:icons:
+:qvdversion: 3.0.0
+:website: http://theqvd.com/
+ifdef::blogpost[]
+// Use the same article for both a blog post and on the AsciiDoc
+// website.
+:blogpost-status: published
+:blogpost-doctype: article
+:blogpost-posttype: page
+endif::blogpost[]
+
+If you're into systems integration, desktop deployment or software
+reselling, you might be interested in developing a mutually beneficial partnership
+with us. We can offer partners a number of great incentives to join up
+and work directly with us.
+
+Discounted Licensing and Support
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+The QVD provides partners with discounted licensing, so that a partner
+is able to obtain some of the revenue that would be available through
+the software licensing model. 
+
+Partners are also able to take advantage of discounted support, so
+that each partner is able to obtain a percentage of the revenue
+generated through the annual support agreement.
+
+QVD recognizes that different partners are able to service different
+sorts of customers. In this way, discounting is calculated based on
+the annual sales forecast in terms of the number of licenses sold.
+Discounts for partners that are working with large-scale deployments
+are generally higher than smaller deployments. 
+
+Dedicated Support
+~~~~~~~~~~~~~~~~~
+Our partnership agreements include the designation of dedicated
+support personell on both sides of the agreement. In this way, we can
+guarantee that the communications chain is properly managed and can
+offer end-customers reassurance that their problems will be resolved
+in a timely manner.
+
+For CIRs, the QVD will provide technical training in the product to
+ensure that the partner is properly versed in the technology and
+fully understands how to support it. CIRs are also required to commit
+to a Service Level Agreement that is specified in the Partnership
+Contract.
+
+Training
+~~~~~~~~
+We want our partners to be completely knowledgeable about the product
+they will be selling, so we insist on providing the appropriate
+training to bring our partners up to a level where we can be confident
+that they will offer customers the best possible service and where
+they can feel fully equipped to handle customer queries.
+
+In order to achieve qualified partnership status with the QVD, any
+partner will have undergone a rigorous training course in the core
+technology. Both CRs and CIRs are given sales training that helps them
+to understand use cases along with the strengths of the QVD product.
+CIRs are also given detailed technical training in order to establish
+the technical expertise required to provide first-tier support for the
+product, and so that deployment and professional service engagements
+can run as smoothly as possible.
+
+Sign Up
+~~~~~~~
+If you can see the potential of a partnership agreement, then please
+click here to visit our sign-up form. We'll send you all of the
+contractual documentation and details of the agreement immediately. If
+you're keen to move forward from there, we can work through the steps
+and build up our relationship as quickly as you like.
+
+image::../../../images/sign-up.png["Sign Up",align="center",link="/partner/sign-up"]

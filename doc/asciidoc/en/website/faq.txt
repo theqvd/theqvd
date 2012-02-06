@@ -1,0 +1,141 @@
+Frequently Asked Questions
+==========================
+Rowan Puttergill <rowan.puttergill@qindel.com>
+$Id: download.txt 11772 2011-08-08 08:03:06Z rputtergill $
+:author initials: RP
+:email: rowan.puttergill@qindel.com
+:doctype: book
+:toc:
+:icons:
+:qvdversion: 3.0.0
+:website: http://theqvd.com/
+ifdef::blogpost[]
+// Use the same article for both a blog post and on the AsciiDoc
+// website.
+:blogpost-status: published
+:blogpost-doctype: article
+:blogpost-posttype: page
+:blogpost-title: F.A.Q.
+endif::blogpost[]
+
+
+Software
+~~~~~~~~
+
+1. *Can I install QVD on a single computer?*
+Yes, although this is not the recommended approach. Our demo package
+is designed to install all of the components on a single system so
+that you can see how QVD actually behaves, however running a VDI to
+service a number of users is usually pretty resource intensive so the
+general approach is to run each logical component on a different
+hardware device. This gives you the ability to scale your solution to service any
+number of users and provides failover and load-balancing capability to
+provide superior performance and high-availability.
+
+2. *Do I have to use Ubuntu Linux to run QVD?*
+No. All of the components make use of open-source software capable of
+running on any Linux platform. Currently, we have packages available
+for Ubuntu Linux and for SuSE. If you want to run QVD on another
+distribution, you can either try to port it yourself, or get our
+Professional Services team to help you. Whichever route you choose, we
+will make sure that the packages get maintained and are always
+available for other users.
+
+3. *How can QVD lower costs for me?*
+QVD can help you to reduce costs in a number of ways. Firstly, if you
+are already considering using an alternate VDI on the market, you will
+find that QVD will cost you less than anything that you will pay any
+other vendor. If you're willing to run it without support, its
+essentially free. However, any VDI will help to lower costs in many
+other ways. By running a VDI, you can generally use much lower cost
+hardware for user desktop systems as all of the processing, storage
+and memory is handled directly by the VDI. Furthermore, if you choose
+to make use of a Linux environment to service your users, you can
+avoid paying many unnecessary license fees.
+
+4. *Can QVD serve my Microsoft Windows users?*
+No. QVD makes use of the NX protocol within the disk images that it
+uses in order to serve Virtual Desktops. Currently there is no openly
+available support for the NX protocol under Windows, so QVD is unable
+to service Windows users. However, you should consider whether it is
+entirely necessary that your users run on a Windows platform at all.
+Many Windows applications have open-source alternatives that can run
+under Linux and integrate with existing systems. It is also true that
+as more businesses make use of cloud technology, the underlying
+operating system is becoming less significant in terms of its actual
+use within a business environment. If you choose Linux as your base
+operating system, you will have access to the majority of mainstream
+web-browsers, as well as applications such as LibreOffice/OpenOffice
+and a variety of mail clients and database suites to service most
+user's needs.
+
+5. *Can QVD really scale to cater to the requirements of a truly large
+organization?*
+QVD has been deployed on an enterprise scale servicing over 35,000
+users and handling up to 9,000 concurrent sessions at any one time in
+a single deployment. QVD is currently used by BBVA Bancomer and is
+considered a safe and secure environment to provision all of the bank
+workstations across the organization.
+
+Licenses
+~~~~~~~~
+
+1. *Do I need to have a license in order to run QVD?*
+Certainly not. QVD is an open-source product and we believe that by
+providing our software for free to an interested community, that we
+will stand to benefit through community contributions. As a result, we
+specially package each release to install on Ubuntu Linux and make it
+available as the QVD Community Edition. If you don't need any support
+and you think that you can contribute toward the ongoing development
+of the software, then this is the version for you.
+
+2. *What is the difference between QVD Community Edition and QVD
+Commercial Edition?*
+While we release the core QVD software for free to the open-source
+community, we understand that businesses are often wary of open-source
+projects because they often tend to lack commercial-grade support. The
+QVD Commercial Edition includes all of the software released in the
+Community Edition but with the added security of a 24/7 support
+agreement, additional dedicated resources and access to integration
+scripts and thin-client images. We also do our best to promote QVD
+Commercial Edition customers, because they are ultimately the people
+who are helping to fund the ongoing development of the software.
+
+3. *Do you give license discounts to non-profit, educational and
+governmental organizations?*
+Sure. If you talk to us, we will try to cater as best as possible to
+fit your needs. We are still working through some internal processes
+to formalize how we handle license discounting, but we would be more
+than happy to work with you to come to some kind of arrangement in the
+meantime.
+
+Company
+~~~~~~~
+
+1. *Who are the core developers of QVD?*
+The core developers of QVD are employees working for the Qindel Group.
+We are spread across many countries. with a large team working
+directly from Spain, and a smaller team based in Mexico. We also have
+members of the team based in Colombia and in the United Kingdom.
+
+2. *What is Qindel Group?*
+The Qindel Group is a consultancy company working out of Madrid in
+Spain. Qindel has worked for a large number of big enterprise clients
+in the banking, telecommunications and governmental sectors. Qindel
+tends to focus on projects that promote the use of open-source
+technologies and often works to provide better integration with
+existing infrastructure. QVD emerged out of a project that Qindel was
+originally working on and has released the source-code for. Qindel
+continues to actively fund development and dedicates some of its
+development resources to the project.
+
+3. *How can I get a full-time job working on QVD?*
+QVD is still fairly small, but we're growing fast. We're on the
+lookout for more talent that can really help shape our product and
+help build its commercial value. If you would like to work with us
+full-time, start out by joining the community and contributing there.
+If we notice that you're a very active contributor, we will probably
+contact you to offer you a full-time position working on the project.
+We believe that the best people for hire will be experts on the
+technology already. We're giving you all the tools to become an
+expert. If you show us what you've got, we'll take you on!

@@ -1,0 +1,86 @@
+High-Level Architecture Diagrams
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+In this section we will provide some simplistic diagrams explaining
+the architecture of a typical QVD deployment to show how the different
+components interact. Please note that these are very high-level diagrams·
+and do not cover many of the internal processes involved. 
+
+.Client and Server Interaction in the QVD Architecture
+image::../images/architecture1.png[alt="Client and Server Interaction in the QVD Architecture" width=98%]
+
+In the above diagram, we show the interactions between the GUI client
+application, the Server Nodes, Shared Storage and the PostgreSQL
+database. Note that for this relationship, the QVD Web Administration
+Tool is not used.
+
+1. The client application can connect over a LAN or via the Internet.
+   The connection initially makes use of the HTTPS protocol to handle
+   the initial authentication and to establish a session.
+
+2. The L7R component within the Server Node connects to the PostgreSQL·
+   database to check configuration settings and to authenticate the user. If
+   authentication has been delegated to some other integrated service
+   such as LDAP, the L7R component will obtain the
+   appropriate information from the database and perform the
+   steps required to authenticate the user. The L7R also uses the
+   database to obtain information about which virtual machine it should·
+   serve to the user along with other related information. Finally,
+   the Server Node will regularly update status information about
+   sessions, virtual machines and users within the database for
+   management purposes.
+
+3. Once authenticated, the server and client renegotiate an NX
+   protocol connection secured using SSL. The client is then able to
+   connect to a desktop loaded within the allocated virtual machine
+   running on the Server Node.
+
+4. Prior to any connection from the client, the Server Node will load
+   an image from the Shared Storage into a Virtual Machine. The Shared
+   Storage is usually accessed on a mounted network filesystem such as·
+   NFS. When the Virtual Machine is started for a particular user, a
+   qcow image is created for the user's home directory. This is also
+   stored on a network fileshare. By keeping the user's home image,
+   the OSF and Overlays within Shared Storage, QVD is able to
+   automatically ensure that the user is still able to access the same
+   desktop via a different Server Node if a Server Node fails for some
+   reason. This provides built-in failover and redundancy.
+
+.QVD-WAT and Server Node Interactions in the QVD Architecture
+image::../images/architecture2.png[alt="QVD-WAT and Server Node Interactions in the QVD Architecture" width=98%]
+
+In the diagram above, we explore the different interactions that are
+involved in the functioning of the QVD Web Administration Tool
+(QVD-WAT). The QVD-WAT interacts with all of the components within the
+solution except the QVD GUI Client. The interactions mentioned here
+are simplified, since there are a large number of operations that can
+be performed using QVD-WAT.
+
+1. An Administrator can connect to the QVD-WAT using a normal Web
+   Browser. The connection takes place over HTTP, but can be secured
+   to use HTTPS. The Administrator will need to authenticate in order
+   to make use of the tools offered by QVD-WAT. Authentication uses
+   HTTP-BASIC but credentials are stored within the PostgreSQL
+   database.
+
+2. The QVD-WAT makes use of the PostgreSQL database to store
+   configuration information entered by the Administrator via the web
+   interface. The QVD-WAT also extracts information such as the status
+   of Virtual Machines, Users and Sessions from the database, to
+   present to the Administrator via the web interface.
+
+3. When an DI (Disk Image) is available within the Shared
+   Storage, the QVD-WAT can enable it by converting it to an OSF
+   (Operating System Flavour) so that it is accessible to any
+   QVD Server Node and can be loaded into a Virtual Machine. In order
+   to do this, the QVD-WAT needs access to the Shared Storage via an
+   NFS (or similar network file system) connection.
+
+4. The House Keeping Daemon (HKD) on each QVD Server Node regularly
+   polls the PostgreSQL database to pick up configuration and status
+   changes made by the QVD-WAT. For instance, when QVD-WAT starts or
+   stops a Virtual Machine, this change is effected within the
+   database, and when the HKD next polls the database and determines
+   that the status of a Virtual Machine has been changed, the change
+   will be enacted on the QVD Server Node. As a result, the QVD-WAT
+   never interacts directly with any particular Server Node, but
+   always uses the PostgreSQL database as an intermediary.

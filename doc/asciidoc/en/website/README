@@ -1,0 +1,7 @@
+CREATE TABLE `wordpress`.`capture` (
+`id` INT NOT NULL AUTO_INCREMENT ,
+`first_name` VARCHAR( 255 ) NOT NULL ,
+`last_name` VARCHAR( 255 ) NOT NULL ,
+`mail` VARCHAR( 255 ) NOT NULL ,
+PRIMARY KEY ( `id` ) ,
+) ENGINE = InnoDB;

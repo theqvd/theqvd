@@ -1,0 +1,84 @@
+About QVD
+=========
+Rowan Puttergill <rowan.puttergill@qindel.com>
+$Id: download.txt 11772 2011-08-08 08:03:06Z rputtergill $
+:author initials: RP
+:email: rowan.puttergill@qindel.com
+:doctype: book
+:toc:
+:icons:
+:qvdversion: 3.0.0
+:website: http://theqvd.com/
+ifdef::blogpost[]
+// Use the same article for both a blog post and on the AsciiDoc
+// website.
+:blogpost-status: published
+:blogpost-doctype: article
+:blogpost-posttype: page
+endif::blogpost[]
+
+
+What is QVD?
+~~~~~~~~~~~~
+Quality Virtual Desktop is a powerful, open-source virtual desktop
+infrastructure (VDI) that makes it easy to deploy highly scalable and
+low-cost solutions to provision any number of users with local and
+remote access to their Linux desktop environments.
+
+QVD aims to provide a secure, reliable and easy-to-manage service that
+can be installed within any enterprise environment quickly and with
+minimal difficulty. It is focussed primarily on delivering Linux-based
+virtual desktop environments to end-users with the aim of lowering
+licensing costs and encouraging the adoption of open-source technology
+within the enterprise.
+
+We believe that as many applications including email, office tools,
+banking, and other facilities move into the 'cloud', Linux is becoming
+increasingly viable as the standard desktop environment within the
+workplace, massively reducing licencing and support costs.
+
+QVD provides the perfect way to manage Linux users within large
+organizations, allowing systems administrators to effectively
+implement security policies, manage application installation and
+provision remote desktop access with ease.
+
+Why the Ladybird?
+~~~~~~~~~~~~~~~~~
+The ladybird (Coccinellidae) was selected as QVD's mascot due to its bright colors,
+which serve as a defense against predators who typically associate
+bright colors with poison. It is also an effective natural predator of
+many crop pests, and as a result is often regarded as a lucky icon by
+many cultures around the world.
+
+QVD defines its core values as:
+
+ * Security
+ * Protection
+ * Performance
+ * Effectiveness
+
+We believe that the ladybird represents each of these core values in
+some way or another.
+
+We also think that the ladybird icon is simply colorful and friendly
+looking. As a project we aspire toward these principals, engaging our
+customers, staff and contibutors in a friendly and colorful way.
+
+Who is Qindel Group?
+~~~~~~~~~~~~~~~~~~~~
+Without Qindel Group, QVD would simply cease to exist. Qindel owns and
+actively develops the QVD project and contributes heavily toward its
+success, both in development resources and financially.
+
+The Qindel Group is an international consultancy company with over 12
+years of active engagement within the field of Information Technology.
+It has serviced customers such as Vodafone, BBVA Bancomer and Sun
+(Oracle) in sectors such as telecommunications, banking or government.
+
+The Qindel Group is also a training partner for the
+link:http://lpi.org/[Linux Professionals Institute (LPI)] and is an
+active contributor to many open-source initiatives.
+
+You can find out more on the link:http://qindel.com/[Qindel Group website].
+
+

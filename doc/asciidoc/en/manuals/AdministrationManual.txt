@@ -1,0 +1,2856 @@
+// a2x: -L 
+// a2x: --dblatex-opts "-d"
+// a2x: --dblatex-opts "-p ./qvd.xsl"
+// a2x: --dblatex-opts "-s ./AdministrationManual.sty"
+
+The QVD Administration Manual
+=============================
+Rowan Puttergill <rowan.puttergill@qindel.com>
+$Id: AdministrationManual.txt 11680 2011-07-22 08:22:43Z rputtergill $
+:author initials: RP
+:email: rowan.puttergill@qindel.com
+:doctype: book
+:toc:
+:icons:
+:numbered:
+:qvdversion: 3.0.1
+:website: http://theqvd.com/
+ifdef::blogpost[]
+// Use the same article for both a blog post and on the AsciiDoc
+// website.
+:blogpost-status: published
+:blogpost-doctype: book
+:blogpost-posttype: page
+:blogpost-categories: doc
+endif::blogpost[]
+
+[preamble]
+Revision Information
+--------------------
+This document was last updated: {revdate}
+
+Its current revision number is set at: {revnumber} 
+
+[preface]
+Preface
+========
+This document will provide you with all of the information that you
+need to install, manage and administer any of the QVD components
+within a QVD solution. As an open-source product, QVD is constantly
+growing and being improved. We endeavour to keep our documentation as
+complete as possible and encourage readers to notify us of ways that
+the documentation can be improved. If you have any queries or
+suggestions, please email us at info@theqvd.com.
+
+The document is broken into three main parts. The first part discusses
+the core components that make up a solution, how they interact and how
+they are installed and configured. The second part deals with
+integration issues and how to tweak behaviours within QVD to achieve
+better performance or to be more scalable. The third part is dedicated
+to providing you with all of the information that you may need to
+create and manage the Operating System Disk Images and Virtual Machines
+that get loaded into each virtual desktop.
+
+Additionally, we provide a Bibliography to reference external material
+that may help you to gain a better understanding of the different
+technologies involved in a QVD solution. We also provide a Glossary of
+commonly used terms, that may help you to understand some of our own
+terminologies and some less frequently encountered terms when you come
+across them.
+
+include::whatisQVD.txt[]
+
+Core Components
+===============
+[partintro]
+--
+In this part of the manual, we discuss the core components that make
+up a QVD Solution. We will explain the architecture of a solution, and
+we will cover the installation and configuration settings specific to
+each component in detail.
+--
+
+Components and Architecture
+----------------------------
+
+Introduction to QVD Components
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+QVD {qvdversion} is comprised of a number of core components that work
+together to create a complete QVD solution. While not every single
+component is necessarily required in order to create a functioning
+environment, it is advisable that all components are actually installed to
+ensure ease of management and to protect the stability of the platform.
+
+There are three major server side components:
+
+* QVD server,
+* Administration Server, and
+* PostgreSQL DBMS.
+
+Ideally, each of these should be stored on a dedicated host for
+stability reasons, although it will become clear later that these
+components will have access to some shared resources in order to
+function properly.
+
+While it is likely that you will only have one Administration Server
+and one PostgreSQL Database system in your environment, it is possible
+to have any number of QVD Server Nodes.
+
+Finally there is a client side component:
+
+* QVD GUI Client
+
+The client is packaged for a variety of Linux base operating systems,
+and for Microsoft Windows. Development for an Android client is also
+underway and this should be available in the next major release of the
+software.
+
+The client software can be installed on as many host systems as
+required.
+
+include::HighLevelArchitectureDiagrams.txt[]
+
+QVD Server Architecture
+~~~~~~~~~~~~~~~~~~~~~~~
+[[qvd_node_architecture]]
+In most production environments, the architecture of a QVD environment
+is such that several QVD Server Nodes will be running in parallel to
+each other. The QVD environment is designed to handle a fully
+load-balanced environment, so that you can have a High Availability
+solution.
+
+Internal Elements
+^^^^^^^^^^^^^^^^^
+A QVD Server Node is composed of three core elements:
+
+* *QVD Node* - Responsible for managing the L7R and HKD elements
+* *L7R* - A Layer-7 Router that acts as the broker within the server
+  environment, responsible for authenticating users, establishing
+  sessions and routing connections to the appropriate virtual IP
+  addresses. In general, the L7R is responsible for managing user
+  status.
+* *HKD* - A 'House Keeping Daemon' that tracks the status of virtual 
+  machines. The HKD is responsible for starting and stopping virtual
+  machines. The HKD monitors the health of each virtual machine and 
+  then updates status information within the QVD Database, so that 
+  other Nodes and the administration tools are able to function 
+  accordingly. In general, the HKD is responsible for managing virtual
+  machine status.
+
+QVD Node Behaviour
+^^^^^^^^^^^^^^^^^^
+The QVD Node is a daemon that runs on the QVD Node Server with the
+purpose of managing the L7R and HKD daemon processes. Its primary
+function is to start and stop these processes when it receives the
+appropriate command or when it detects that there is some anomaly that
+may cause the QVD Server Node to fail.
+
+The QVD Node, ensures that networking elements required for virtual
+machine connectivity are all in place and available. This means that
+QVD Node will ensure that DHCP is configured and running.
+
+The QVD Node also looks for broken database connections, to determine
+if there is a problem with the HKD, and will automatically kill and
+restart the HKD if there seems to be some problem with the HKD's
+communication with the QVD Database.
+
+Logically, the QVD Node performs functions that are closely related to
+the HKD and in the future these two processes are likely to be merged.
+
+HKD Behaviour
+^^^^^^^^^^^^^
+The 'House Keeping Daemon' is responsible for managing virtual
+machine states based on information that it detects within the QVD
+Database. The HKD regularly polls the QVD database to determine the
+status of each Virtual Machine. If the status has been changed by an
+external element (such as the L7R or the QVD-WAT) the HKD is
+responsible for enacting the appropriate commands to effect the status
+change.
+
+The HKD runs a KVM instance for each virtual machine that needs to be
+started, and provides startup options based on information obtained
+from the database. As the KVM instance starts, the HKD will check that
+the image boots correctly, that it has network connectivity and that
+the QVD-VMA is running within the virtual machine. If any of these
+checks fails, the HKD will change the state of the virtual machine to
+'blocked' within the QVD Database. After a short period, the HKD will
+kill the running KVM instance.
+
+During each loop run that the HKD performs it will check the health
+of all running virtual machines, it checks the database to determine
+if there are any VM state changes, implements any changes to VM state,
+and updates information in the database pertaining to VM state.
+
+QVD Client and L7R Server Node Interactions
+^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+The QVD Client connects directly to the L7R element of a QVD Server
+Node. The Client initiates a connection over HTTPS, where it is
+prompted to provide HTTP BASIC authentication credentials.·
+
+The L7R will then connect to the backend database to determine how
+authentication should take place (i.e. locally or using an external
+LDAP directory) and take the appropriate steps to perform the
+authentication process. The L7R will return an HTTP OK response if the
+authentication was successful, or will return a 401 Unauthorized if
+authentication fails.
+
+Once authenticated, the client requests a list of virtual machines that·
+are available to the user. The server responds with a JSON formatted list·
+of virtual machine IDs and their corresponding status. The client selects
+an appropriate virtual machine to connect to and submits a GET request
+with the ID of the virtual machine at a standard GET variable. It also
+requests a protocol upgrade to QVD/1.0 within the HTTP request
+headers.
+
+The L7R performs the necessary steps to ensure that the virtual machine·
+is up and waiting for connections using the NX protocol. If the
+virtual machine is not running on any server node, it will determine
+which node it should be started on and automatically start a virtual
+machine for that user. In all events, the L7R will determine which
+node is running the virtual machine and will forward all requests to
+this machine for all further handling, including checking to see that
+an NX session can be set up. During this process, the L7R will return a series 
+of HTTP 102 responses indicating the progress of the processing required to 
+establish a connection with the Virtual Machine. If the virtual machine is 
+available, the L7R establishes a connection to the *nxagent* running on the 
+virtual machine and becomes a pass-thru proxy for the NX session. Once the 
+session is set up, the L7R will issue a final HTTP 101 (Switching Protocols) 
+response to the client, and the protocol for all future interactions with the 
+client will be upgraded to the NX protocol, secured using SSL. The L7R
+updates the QVD Database to set the status for the virtual machine to
+indicate that a client is connected.
+
+From this point onward, all communications between the client and the
+Virtual Machine are performed over the NX protocol via the L7R. When
+the client disconnects, the L7R updates the QVD Database to represent·
+the change in virtual machine status.
+
+The process flow is indicated in the following diagram:
+
+.Protocols and process flow for Client/Server Node interaction
+image::../images/client_server_protocol.png[alt="Protocols and process flow for Client/Server Node interaction" width=98%]
+
+L7R in a HA load-balanced environment
+^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+As already mentioned, Server Nodes are designed for a fully
+load-balanced environment. In order to cater for this, the L7R element
+of each Server Node is capable of redirecting traffic for a particular
+virtual machine to any other Server Node in the environment.
+
+The usual configuration is such that a Virtual Machine is started for
+each user on any one of the server nodes. When a user is authenticated
+by any L7R within the solution, the L7R determines which server node
+is currently running a virtual machine for the authenticated user.
+This is achieved by querying the QVD Database. If a running virtual
+machine is detected within the environment, the L7R will reroute all
+traffic for that connection to the appropriate server node.
+
+If no virtual machine is currently running for the user, the L7R makes
+use of an internal algorithm to determine the most appropriate node to
+start a new virtual machine for the user. This algorithm is based on
+assessing which node has the highest quantity of free resources,
+calculated as the weighted sum of free RAM, unused CPU, and a
+random number to bring some entropy to the result. 
+
+When an appropriate node has been selected, the database is updated so
+that a virtual machine will be started by the HKD on the correct host. The 
+L7R will then reroute all traffic for that connection to the server node 
+that has been selected to run the new virtual machine.
+
+Virtual Machines and VMA
+^^^^^^^^^^^^^^^^^^^^^^^^
+Virtual Machines are started by the HKD on a per-user basis. In a
+production environment, it is usual for there to be a number of
+different QVD Node Servers running in parallel. Virtual Machines are
+started for different users across the different QVD Server Nodes, so
+that there is one virtual machine instance running for each user that
+needs to be provisioned. If a virtual machine has not been started for
+a user, and the user connects and authenticates against an L7R, the
+L7R will use its load-balancing algorithm to determine which node
+should run the user's virtual machine and the database will be updated
+so that the virtual machine will be started on the appropriate node.
+
+Virtual Machines are started using KVM and an "Operating System Flavour" or OSF is loaded
+into the Virtual Machine. The parameters for the Virtual Machine are
+determined by data stored within the QVD-DB for each OSF. In general,
+the OSF's Disk Image is loaded from a network share. There is a separate chapter
+within this document dedicated to creating, editing and managing OSFs.
+
+Virtual Machines make use of _overlays_ in order to best utilize
+different elements of the Guest operating system, and in order to make
+particular elements persistent. For instance, while write activity is
+not persistent within the actual OSF that is loaded, it is important
+that data written to the user's home folder or desktop is stored for
+future connections to the virtual desktop. In order to facilitate
+this, the user's home directory is stored within a 'qcow2' image, and
+this is loaded over the home directory within the OSF that is running
+in the Virtual Machine. The 'qcow2' image is usually stored on a
+network share, so that it is accessible to any server node within the
+environment. If the user's virtual machine is later started on a
+different Server Node, the user's home directory can be loaded at run
+time and the user's modified data will always be available to the
+user. 'Overlays' can also be used to make other data such as log and tmp 
+files persistent from a user perspective.
+
+Each Virtual Machine must run the QVD-VMA (Virtual Machine Agent) in
+order to function properly. The VMA will ensure that the *nxagent* is
+available so that a client is able to connect to the virtual desktop
+that is created for the user. It also returns different states that
+helps the L7R to determine user state, which can be fed back to the
+QVD-DB. When an OSF is created, it if fundamentally important that the
+QVD-VMA is installed and configured in order for QVD to work at all.
+
+QVD Administration
+~~~~~~~~~~~~~~~~~~
+QVD Administration can be performed using one of two tools:
+
+* *qvdadmin.pl*: a command line utility that can be installed on any
+  machine that has the connectivity to the QVD-DB and that is
+  configured appropriately for this purpose.
+
+* *QVD-WAT*: a Web-based Administration Tool that allows an
+  Administrator to remotely access the solution and to perform a
+  variety of administrative tasks using a standard web browser.
+
+Both tools require access to the QVD-DB and will need to be configured
+for this purpose. Nearly all of the commands that can be performed
+through either of these tools will simply change values for entities
+within the QVD-DB. Actions are then carried out by the various QVD
+Server Node elements based on the changes made within the QVD-DB.
+
+The QVD Administration tools are also be used to load new images into
+QVD and to configure their runtime parameters. In order to facilitate
+this functionality, these tools need access to the folders where these
+images are stored and accessed by the Virtual Server Nodes. Usually,
+this access is provisioned over a network file share such as NFS.
+
+Base QVD Configuration
+----------------------
+[[qvd_db_config]]
+All QVD Components, except the QVD Client, make use of the QVD-DB. As a result
+any system that makes use of a QVD Component should have a QVD Configuration
+file that provides the information required to connect to the database.
+
+This information should be configured within a file that is stored at `/etc/qvd/node.conf`.
+This path is not created automatically. You can either create it
+manually, or you can use the provided configuration template by doing
+the following:
+
+----
+root@myserver:~# cp -R /usr/share/qvd/config /etc/qvd
+----
+
+include::config_database.txt
+
+Other QVD Configuration Parameters
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+[[config_params]]
+Outside of the configuration file, QVD stores the majority of its configuration
+options within the QVD-DB. There are a wide range of parameters that apply to
+different components within the QVD infrastructure. These parameters can be
+set using the QVD CLI Administration Utility. We discuss the
+appropriate steps for this in the chapter titled <<qvd-admin-config,QVD CLI Administration Utility>>.
+
+While it is possible to set any of the following configuration parameters within
+the node.conf file, the settings within the QVD-DB will always have precedence. This means
+that if a change is made to the settings contained within the database, the settings stored
+within the configuration file would become obsolete and confusing for future administration
+work. Therefore, we strongly recommend that these options are only updated within the database
+using the QVD CLI Administration Utility.
+
+This section describes some of these additional configuration parameters. While there are many
+other settings which you will be able to view using the QVD CLI Administration Utility, some of these
+(such as the parameters prepended with the word 'internal') should never be modified unless under the
+expert guidance of a QVD developer. In general, we do not recommend that you change any of these
+configuration parameters unless you have been guided to do so, either by instruction within this
+manual, or by QVD Support.
+
+Note that in order to set these parameters, you should have already installed and configured QVD-DB.
+
+WARNING: Modifying any QVD 'internal' parameter will void any support agreement that you have set out
+for QVD. These parameters are subject to change in any release of the software and are designed to help
+developers debug behaviour inside of the product.
+
+QVD System Paths
+^^^^^^^^^^^^^^^^
+include::config_systempaths.txt
+
+Logging
+^^^^^^^
+include::config_logging.txt
+
+QVD-Node Configuration Options
+^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+include::config_noded.txt
+
+L7R Configuration Options
+^^^^^^^^^^^^^^^^^^^^^^^^^
+include::config_l7r.txt
+
+HKD Configuration Options
+^^^^^^^^^^^^^^^^^^^^^^^^^
+include::config_hkd.txt
+
+Virtual Machine Options
+^^^^^^^^^^^^^^^^^^^^^^^
+[[vm_options]]
+There are some options that can be set to control virtual machine behaviour within QVD:
+
+----
+vm.overlay.persistent = 0
+vm.kvm.virtio = 1
+vm.vnc.redirect = 0
+vm.vnc.opts =
+vm.serial.redirect = 1
+vm.serial.capture = 0
+vm.network.ip.start =
+vm.network.netmask = 
+vm.network.gateway=
+vm.network.bridge=
+vm.network.dns_server=
+----
+
+The values set above are the default values.
+
+* *vm.overlay.persistent*: whether to make use of persistent overlays for temporary and log files
+* *vm.kvm.virtio*: whether to make use of the virtio driver for networking (the OSF running in the image must support the virtio driver)
+* *vm.vnc.redirect*: redirect traffic to a running VNC server to allow access from outside the QVD bus network (VNC must be installed and running in the OSF)
+* *vm.vnc.opts*: additional VNC options that should be applied to the VNC connection
+* *vm.serial.redirect*: redirect traffic to the serial console to allow access from outside the QVD bus network
+* *vm.serial.capture*: capture serial console output to file
+* *vm.network.ip.start*: the start IP address for the range allocated for the virtual machines on the QVD bus network
+* *vm.network.netmask*: CIDR netmask for the size of the QVD bus network
+* *vm.network.gateway*: IP of the firewall on the QVD bus network that will be passed by DHCP to the virtual machines
+* *vm.network.bridge*: Name of the bridge interface
+* *vm.network.dns_server*: IP of the DNS service to be configured by DHCP on the QVD bus network
+
+Note that the 'vm.network' settings are generally required in order
+for the QVD-Node servers to function correctly.
+
+QVD-DB
+------
+[[QVD-DB]]
+The QVD-DB is the glue that ties all of the QVD components together.
+It makes use of an underlying PostgreSQL DBMS, and should be installed
+on an Ubuntu 10.04 (Lucid Lynx) GNU/Linux operating system.
+
+All of the configuration and runtime information for the entire QVD
+VDI is stored in the database and if it fails the full platform will 
+stop working. For that reason, it is highly recommended that the database 
+is installed in a high availability configuration. You can find out
+how to configure PostgreSQL in an HA configuration at
+link:http://www.slideshare.net/jessejajti/hadrbdpostgres-postgreswest-08-presentation[Linux-HA
++ DRBD + PostgreSQL ] and link:http://fanqiang.chi
+naunix.net/db/psql/2005-09-07/3628.shtml[High Avaibility PostgreSQL
+HOWTO].
+
+The actual hardware requirements for QVD-DB are very modest and any
+modern server with just two CPU cores and 2GB of RAM will be able to
+support the database load.
+
+IMPORTANT: At the moment QVD works only on PostgreSQL 8 which is the
+default version provided with Ubuntu 10.04 (Lucid Lynx). If you are
+installing on a later distribution or on an alternative platform such
+as SuSE Linux, you may need to downgrade to the appropriate version of
+PostgreSQL.
+
+Installing and configuring QVD-DB
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+On the system that you intend to install QVD-DB, you will need to add
+the QVD repository to your apt sources. You can do this with the
+following command:
+
+----
+apt-add-repository 'deb http://theqvd.com/debian lucid main'
+----
+
+Execute `apt-get update` after modifying sources.list.
+
+The preferred way to install the central database is with the package
+qvd-db. It installs the PostgreSQL database system if needed, and
+provides the tools to provision the database. You should do this as
+root, as you will need to perform a number of steps that will require
+full root privileges:
+
+----
+root@myserver:~# apt-get install qvd-db
+----
+
+Creating the QVD User and Database
+^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+You will need to create a user within PostgreSQL to access the QVD
+Database, and you will need to create the actual database where QVD
+can set up its tables and store its data. To do this, you will need to
+use the sudo command to change to the postgres account:
+
+----
+$ sudo su - postgres
+----
+
+As the 'postgres' user, you can create PostgreSQL user accounts
+with the `createuser` command. It will prompt for a password for the 
+new user and ask some details on the user account. In general, you can 
+answer 'n' to all of the options that are presented.
+
+For example, to create a user called QVDUser you would use the
+following command.
+
+----
+postgres@myserver:~$ createuser -P QVDUser
+Enter password for new role: passw0rd
+Enter it again: passw0rd
+Shall the new role be a superuser? (y/n) n
+Shall the new role be allowed to create databases? (y/n) n
+Shall the new role be allowed to create more new roles? (y/n) n
+----
+
+TIP: For more information on this command, please refer to the
+PostgreSQL documentation at: http://www.postgresql.org/docs/8.4/static/app-createuser.html
+
+The new user can now be assigned as the owner of a database. To create
+a database for QVD and to assign ownership, use the `createdb` command. 
+Use the -O switch to set the database's owner to the account you wish to use. 
+In this case we will set the owner to the new user that we created in the 
+previous step.
+
+----
+postgres@myserver:~$ createdb -O QVDUser QVDDatabase
+----
+
+TIP: For more information on this command, please refer to the
+PostgreSQL documentation at: http://www.postgresql.org/docs/8.4/static/app-createdb.html
+
+PostgreSQL Configuration Requirements
+^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+In order to support concurrent access from all the nodes in the QVD
+farm and handle transactions coherently, the transaction isolation
+level must be changed from 'read commited' to 'serializable'. This is
+a very important step that should not be ommited or your database
+would eventually become inconsistent and QVD fail to work.
+
+Furthermore, it is necessary to allow network access to the database.
+By default, it is usually set to only listen for queries on localhost.
+This should be changed to listen on all interfaces.
+
+To do this you must edit the PostgreSQL configuration files postgresql.conf and pg_hba.conf. On Ubuntu they
+are located in /etc/postgresql/8.4/main.
+
+The transaction isolation level is controlled with the default_transaction_isolation setting. 
+To enable network access to PostgreSQL in general, change the listen_addresses 
+setting from 'localhost' to '*'.
+
+----
+root@myserver:~# cd /etc/postgresql/8.4/main
+root@myserver:/etc/postgresql/8.4/main# vi postgresql.conf
+listen_addresses = '*'
+default_transaction_isolation = 'serializable'
+----
+
+To enable network access for the user qvd, add the following line to
+pg_hba.conf (its format follows: host database user CIDR-address auth-method
+[auth-options]).
+
+----
+root@myserver:/etc/postgresql/8.4/main# vi pg_hba.conf
+host  QVDDatabase QVDUser 192.168.0.0/24  md5
+----
+
+NOTE: Make sure to replace the default network 192.168.0.0/24 with the
+network that your QVD platform uses.
+
+Restart PostgreSQL for the changes to take effect.
+----
+root@myserver:~# /etc/init.d/postgresql restart
+----
+
+Provisioning QVD-DB
+~~~~~~~~~~~~~~~~~~~
+The QVD-DB package includes a script that will help you to provision
+the QVD Database with all of the tables that are required for QVD to
+function correctly. In order for this script to work, it requires that
+the QVD Database settings have been correctly entered in the
+`/etc/qvd/node.conf` file.
+
+To provision the database, execute qvd-deploy-db.pl.
+
+----
+# qvd-deploy-db.pl
+----
+
+Once you have run this command, QVD-DB will be ready to use by any
+component within the QVD environment.
+
+.Resetting QVD
+****
+If at some point you just want to remove all the nodes, images,
+virtual machines, etc. configured in QVD in order to start over (for
+instance, if you are testing it), you can use the same command with
+the `--force` parameter:
+
+----
+# qvd-deploy-db --force
+----
+
+Note that there is no way to undo this operation once it has been run.
+All data within the database will be dropped and the database will be
+reinitialized. Use this command with care!
+****
+
+Testing access to QVD-DB
+~~~~~~~~~~~~~~~~~~~~~~~~
+
+Any system that requires access to the database (e.g. any of the QVD
+Server Node components, the QVD-WAT or the CLI Administration utility)
+should be tested to ensure that database connectivity is available.
+This can be easily achieved by connecting to the database and listing
+the tables used by QVD. To do this, you will need to ensure that you
+have the PostgreSQL client installed on the host that you are
+connecting from. You can install this by issuing the following
+command:
+
+----
+# sudo apt-get install postgresql-client
+----
+
+To list the tables in the QVD database using the PostgreSQL client,
+you can do the following:
+
+----
+anyuser@otherserver:~$ psql -U QVDUser -W -h myserver QVDDatabase
+Password for user qvd:·
+psql (8.4.1, server 8.3.10)
+
+QVDDatabase=> \d
+
+               List of relations
+ Schema |      Name       |   Type   |  Owner  
+--------+-----------------+----------+---------
+ public | configs            | table    | hue
+ public | di_properties      | table    | hue
+ public | di_tags            | table    | hue
+ public | di_tags_id_seq     | sequence | hue
+ public | dis                | table    | hue
+ public | dis_id_seq         | sequence | hue
+ public | host_cmds          | table    | hue
+ public | host_properties    | table    | hue
+ public | host_runtimes      | table    | hue
+ public | host_states        | table    | hue
+ public | hosts              | table    | hue
+ public | hosts_id_seq       | sequence | hue
+ public | osf_properties     | table    | hue
+ public | osfs               | table    | hue
+ public | osfs_id_seq        | sequence | hue
+ public | ssl_configs        | table    | hue
+ public | user_cmds          | table    | hue
+ public | user_extras        | table    | hue
+ public | user_extras_id_seq | sequence | hue
+ public | user_properties    | table    | hue
+ public | user_states        | table    | hue
+ public | users              | table    | hue
+ public | users_id_seq       | sequence | hue
+ public | vm_cmds            | table    | hue
+ public | vm_properties      | table    | hue
+ public | vm_runtimes        | table    | hue
+ public | vm_states          | table    | hue
+ public | vms                | table    | hue
+ public | vms_id_seq         | sequence | hue
+(29 rows)
+
+QVDDatabase=> \q
+----
+
+Backing up and Restoring QVD-DB
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+A very simple backup technique would involve dumping the entire
+PostgreSQL database to file:
+
+----
+pg_dump -U postgres postgres > yourfile.backup
+----
+
+To rollback your database to match a backup file, you can run the
+following command:
+
+----
+psql -U postgres postgres < yourfile.backup
+----
+
+TIP: For advanced operations, check http://www.postgresql.org/docs/8.4/static/backup.html
+
+QVD-DB Data Relationship Model
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+The following diagram shows the general data model for data stored
+within the QVD-DB. 
+
+IMPORTANT: It is recommended that Administrators do not attempt to 
+modify entries in the database directly as it is highly likely that 
+this will break the QVD installation. Any changes made to the data
+stored in the database, outside of those achieved using the QVD tools,
+will void any support agreement.
+
+NOTE: This diagram is under review and will be updated in later·
+versions of this manual, in an effort to fit more closely with the
+actual tables within the database.
+
+.QVD-DB General Data Model
+image::../images/data-model.png[alt="QVD-DB General Data Model" width=98%]
+
+QVD Web Administration Tool
+---------------------------
+The QVD Web Administration Tool (QVD-WAT) is a web-based GUI that
+provides QVD system administrators with all of the tools required to
+administer a fully installed QVD solution. As a web-based utitlity,
+QVD-WAT can be used remotely to provision new users, configure virtual
+machines and to monitor the health of the various components within
+the solution.
+
+Installing and configuring QVD-WAT
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+On the system that you intend to install QVD-WAT, you will need to add
+the QVD repository to your apt sources. You can do this with the
+following command:
+
+----
+apt-add-repository 'deb http://theqvd.com/debian lucid main'
+----
+
+Execute `apt-get update` after modifying sources.list.
+
+----
+# sudo apt-get install qvd-wat
+----
+
+The QVD-WAT requires access to the QVD Database.
+You will need to ensure that the QVD Node configuration file is set
+up correctly in order for this QVD-WAT to function properly. You can
+find out how to do this in chapter titled
+<<qvd_db_config,QVD Base Configuration>>.
+
+Once you have setup the QVD Configuration, you can restart QVD-WAT:
+
+----
+# sudo /etc/init.d/qvd-wat restart
+----
+
+CAUTION: At the moment QVD works only with libcatalyst-perl version 5.80024-1.·
+This is the default versions currently provided with Ubuntu 10.04
+(Lucid Lynx). If you are using a newer distribution, you may need to
+downgrade this package.
+
+QVD-WAT Web Server Port
+~~~~~~~~~~~~~~~~~~~~~~~
+By default, QVD-WAT listens on the TCP port 3000 for incoming HTTP requests.
+If you are running another service on a conflicting port, or you would prefer
+to use some other port number for some reason, it is possible to change the
+port used by QVD-WAT by editing or creating `/etc/default/qvd-wat`.
+The easiest way to do this is to do:
+
+----
+# echo 'PORT=4000' > /etc/default/qvd-wat
+----
+
+Once you have changed the port, you will need to restart QVD-WAT, to access it
+on the different port number.
+
+The QVD-WAT Interface
+~~~~~~~~~~~~~~~~~~~~~
+To access QVD-WAT you can open a web browser and point it at the host where
+you are running the QVD-WAT service. If locally, you can point your browser to
+http://localhost:3000/. Note that you will need to specify the port number that
+QVD-WAT is running on. By default, this is set to 3000, but you are able to
+change this.
+
+Authentication
+^^^^^^^^^^^^^^
+QVD-WAT currently only supports authentication for a single user. The default
+username is set to 'admin' and the default password is also set to 'admin'.
+
+It is possible to change these values using the <<qvd-admin-cli,QVD CLI Administration Utility>>.
+On a system that has the QVD CLI Administration Utility installed, run the following
+commands:
+
+----
+# qvd-admin.pl config set wat.admin.login=administrator
+# qvd-admin.pl config set wat.admin.password=myS3cR3t
+----
+
+The above commands will change the username to 'administrator' and the password to 'myS3cR3t'.
+
+If you are not authenticated and you connect to the QVD-WAT interface, you will be 
+presented with a login screen.
+
+.The QVD-WAT Login Screen
+image::../images/WAT_login.png[alt="The QVD-WAT Login Screen" width=98%]
+
+QVD Dashboard
+^^^^^^^^^^^^^
+After authentication the administrator is presented with the QVD Dashboard. This 
+screen provides a quick overview of the status of the various components and elements
+within a QVD solution.
+
+.The QVD-WAT Dashboard
+image::../images/WAT_dashboard.png[alt="The QVD-WAT Dashboard" width=98%]
+
+Pie graphs are used to display the proportion of Virtual Machines that are running, 
+stopped or failed; and QVD Server Nodes that are running or stopped.
+
+There is also a summary displaying counters for the numbers of users, virtual machines, 
+actively running sessions, nodes, operating systems and disk images that are active within the QVD
+infrastructure.
+
+The administrator can return to this screen by clicking on the QVD logo image on the top
+left of the web page, or alternately setting the browser URL back to the root of the site:
+http://localhost:3000/.
+
+Navigation
+^^^^^^^^^^
+Primary navigation within QVD-WAT is largely handled by a 'Navigation Bar' that runs along
+the top of all web-pages.
+
+.The QVD-WAT Navigation Bar
+image::../images/WAT_newuser1.png[alt="The QVD-WAT Navigation Bar"]
+
+The primary navigation links are as follows:
+
+* *Users*: http://localhost:3000/users/ - Provides the screen to manage and add users. Since
+virtual machines are assigned to users, the option to create a new virtual machine is provided
+through this channel when you choose to view details for a user.
+
+* *Virtual machines*: http://localhost:3000/vm/ - Provides a screen to administer existing 
+virtual machines. A java applet to telnet into any virtual machine's serial console is also
+available via this channel, when you choose to view the details for a particular virtual 
+machine. Note that you can only add a virtual machine through the _Users_ link, since they
+need to be assigned to a user when they are created.
+
+* *Nodes*: http://localhost:3000/hosts/ - Provides a screen to add new QVD Server Nodes to
+the QVD infrastructure, and to view the running state of any existing server node.
+
+* *OS Flavours*: http://localhost:3000/osf/ - Provides a screen to add operating system "flavours"
+to the QVD infrastructure. There is also the option to view and edit the running parameters
+for any existing image.
+
+* *Disk Images*: http://localhost:3000/di/ - Provides a screen to manage disk images for the
+OSFs. These contain the actual operating system files and directories.
+
+Users
+^^^^^
+Users are managed within QVD-WAT by clicking on the _Users_ link in the Navigation bar, or
+by going to the URL http://localhost:3000/users/.
+
+This page displays a list of users that have already been provisioned within the QVD 
+environment. Users are listed by ID along with their login name, and their state within
+the environment.
+
+.The Users Page within the QVD-WAT
+image::../images/WAT_users.png[alt="The Users Page within the QVD-WAT" width=98%]
+
+Note that in the above image, users are listed as having different 'states'. A user with
+state set to `0/0` has no active session and has no virtual machine assigned. A user with
+state set to `0/1` has a virtual machine assigned but is not currently running a session.
+A user with state set to `1/1` is currently running a session and has a single virtual 
+machine assigned.
+
+Adding a User
++++++++++++++
+It is simple to add a user to the environment using QVD-WAT. On the Users page, you will
+notice that there is a button image:../images/WAT_new_button.png[alt="The New button used to add a user within the QVD-WAT"] above the user list:
+
+Clicking on the New button will take you to the 'New User' page within the QVD-WAT. Here you
+are prompted to provide a *Login* username and *Password* and to *Confirm Password*.
+
+.The New User Page within the QVD-WAT
+image::../images/WAT_newuser.png[alt="The New User Page within the QVD-WAT" width=98%]
+
+By clicking on the Submit button, the new user will be created within the QVD database.
+
+NOTE: If you choose to make use of an external authentication mechanism such as LDAP you
+will still need to add the users to the QVD Database in order to be able to assign virtual
+machines to them. The usernames should match the entries in LDAP. The password that is
+stored for the user within the QVD Database will be ignored and the user will actually 
+authenticate against the credentials stored in LDAP.
+
+Deleting Users
+++++++++++++++
+Deleting users from QVD using the QVD-WAT is simple. On the Users page, you will notice
+that there is a checkbox next to each user entry in the Users List. By simply checking the
+checkbox next to each entry that you wish to remove, you are able to select the users that
+should be deleted. When you have finished your selection, you can click on the Delete button
+at the bottom of the User List.
+
+You will be prompted to confirm your intention to delete the users from the system. You
+will need to affirm your decision before the users are actually removed.
+
+Changing a User Password
+++++++++++++++++++++++++
+To change the password for a user, you will need to find the user in the User List 
+displayed on the Users Page and click on the magnifying glass icon next to the user's 
+User ID image:../images/WAT_view_button.png[alt="The Magnifying Glass icon"]. This will 
+take you to the User Profile page.
+
+.The User Profile Page within the QVD-WAT
+image::../images/WAT_user_profile.png[alt="The User Profile Page within the QVD-WAT" width=98%]
+
+Here, you will be able to locate and click on the image:../images/WAT_change_password_button.png[alt="The Change Password Button"] link.
+
+This will take you to the Change Password page, where you will be able to enter a new
+password for the user.
+
+NOTE: If you have opted to make use of an external authentication mechanism such as LDAP, password
+changes performed through the QVD-WAT will not update the user's password within the LDAP directory.
+
+Assigning a Virtual Machine To A User
++++++++++++++++++++++++++++++++++++++
+In order for a user to be able to login to a virtual desktop environment, the user must have a
+virtual machine assigned. This is easily achieved by finding the user in the User List
+displayed on the Users Page. Click on the magnifying glass icon 
+image:../images/WAT_view_button.png[alt="The Magnifying Glass icon"] next to the user's User ID. This will·
+take you to the User Profile page.
+
+On the User Profile page, locate and click on the image:../images/WAT_newvm_button.png[alt="The New Virtual Machine Button"] link.
+This will take you to the New Virtual Machine Page. Here you can enter a name for the Virtual Machine that
+will make it easy to identify. You will then need to select which loaded OSF you would like to run within
+the Virtual Machine from the list of OSFs. As soon as you click on an OSF within the list, the virtual
+machine will be created and assigned to the current user.
+
+.The New Virtual Machine Page within the QVD-WAT
+image::../images/WAT_newvm_gsg.png[alt="The New Virtual Machine Page within the QVD-WAT" width=98%]
+
+After creating a new virtual machine, you will automatically be taken to the Virtual Machines Page.
+
+NOTE: You can assign multiple virtual machines to a single user. These may contain different OSFs, allowing the user
+to perform a variety of different tasks. If a user attempts to connect using the QVD Client, and multiple virtual machines
+are available to the user, the user will be presented with a menu of the available virtual machines to select from before
+the connection is established.
+
+Virtual Machines
+^^^^^^^^^^^^^^^^
+The Virtual Machines Page is usually accessed by clicking on the _Virtual Machines_ link in the Navigation bar,
+or by going to the URL http://localhost:3000/vm/, within the QVD-WAT.
+
+This page displays a list of Virtual Machines that have already been created and assigned to users
+within the QVD environment. Virtual Machines are listed by ID along with their name, the user that they
+have been assigned to, the OSF that they will load, their state within the environment, and the node where
+the virtual machine is running.
+
+.The Virtual Machines Page within the QVD-WAT
+image::../images/WAT_vm_page.png[alt="The Virtual Machines Page within the QVD-WAT" width=98%]
+
+Starting and Stopping Virtual Machines
+++++++++++++++++++++++++++++++++++++++
+While the L7R component of any Server Node that receives an authentication request will automatically
+start an instance of a virtual machine for the user that has been authenticated, if one is not already
+running, this takes time and delays the client from presenting the desktop to the user. It is usually
+a good idea to start up virtual machine instances beforehand, so that users do not have to wait for
+an image to boot.
+
+Starting a Virtual Machine within the QVD-WAT is trivial. Check the checkboxes next to each of the
+Virtual Machines that you wish to start and then click on the _Start_ button at the bottom of the list.
+
+TIP: If you want to start all of the listed Virtual Machines, you can click on the checkbox in the
+header of the table.
+
+While a machine is starting up, you will see that the state first changes to 'starting_2' and then 
+eventually changes to 'running'. If something goes wrong during the startup, the state will change to
+'failed' and usually the 'Blocked' flag will be set.
+
+To stop any Virtual Machine within the environment, follow the same procedure. Check the checkboxes for
+the Virtual Machines that you want to stop, and then click on the _Stop_ button at the bottom of the list.
+
+Virtual Machine Blocking and Unblocking
++++++++++++++++++++++++++++++++++++++++
+[[wat_vm_block]]
+Virtual Machines can enter a 'Blocked' state. This means that even if they are started, a user will
+not be able to login to the desktop using the client. Usually machines automatically enter a 'Blocked'
+state if they fail to start correctly or if there is some problem either with their network configuration
+or with the QVD-VMA that should be running on each virtual machine. However, it is also possible to
+force the 'Blocked' state using the QVD-WAT. This is usually done if an administrative task needs to be
+performed on the Virtual Machine, and the administrator does not want anybody to be accessing the
+virtual machine at the same time.
+
+In order to 'Block' a Virtual Machine, check the checkbox next to the Virtual Machine that you want to
+disable, and then click on the _Block_ button at the bottom of the Virtual Machine list. You will be prompted
+to confirm that you intend this action.
+
+Once the Virtual Machine has been blocked, you will be able to access it via the Terminal Console in order
+to perform maintanence.
+
+It is equally trivial to 'Unblock' a Virtual Machine. Check the checkbox next to the Virtual Machine that you want to
+enable, and then click on the _Unblock_ button at the bottom of the Virtual Machine list. You will be prompted
+to confirm that you intend this action.
+
+Unblocking a Virtual Machine that has failed to start properly will not fix the problem. It only really makes
+sense to 'Unblock' a Virtual Machine if you have purposefully 'Blocked' it or if you have just finished resolving
+a startup problem. If a machine is 'Blocked' as a result of a startup failure, you will more than likely need to
+edit the underlying OSF.
+
+Deleting a Virtual Machine
+++++++++++++++++++++++++++
+Since it is possible to assign more than one Virtual Machine to a user, there may be times that you wish
+to delete a particular virtual machine. This is a trivial action. On the Virtual Machines page, check the 
+checkbox next to the Virtual Machine that you want to delete, and then click on the _Delete_ link at the 
+bottom of the Virtual Machine list. You will be prompted to confirm that you intend this action.
+
+Disconnecting a User
+++++++++++++++++++++
+During periods of maintenance, you may find that you need to disconnect users from their Virtual Machines.
+This can be acheived easily. On the Virtual Machines page, check the·checkbox next to the Virtual Machine 
+that you want to disconnect a user from, and then click on the _Disconnect User_ button at the·
+bottom of the Virtual Machine list. You will be prompted to confirm that you intend this action.
+
+This action is performed without any warning to the user. The client will simply disconnect the moment that
+the command is issued. While no data will be lost, unless the Virtual Machine is restarted, the user will be
+unaware of the reason for the dropped connection. As a result, this action should be used with care.
+
+Editing Runtime Parameters
+++++++++++++++++++++++++++
+It is possible to edit the runtime parameters for any virtual machine. To do this, you will need to go to
+the Virtual Machines page and find the virtual machine within the Virtual Machine List. Each Virtual Machine
+entry includes the Virtual Machine identifier and a magnifying glass icon 
+image:../images/WAT_view_button.png[alt="The Magnifying Glass icon"] which acts as a link through to a page
+where you are able to view the current runtime parameters for that Virtual Machine.
+
+.The VM Runtime Parameters Page
+image::../images/WAT_VM_runtime.png[alt="The VM Runtime Page within the QVD-WAT" width=98%]
+
+In order to edit any of these parameters, you can click on the image:../images/WAT_edit_button.png[alt="The Edit Button"]
+button to render this page as a form that allows you to change some of the runtime options within the
+virtual machine.
+
+.Editing the VM Runtime Parameters
+image::../images/WAT_VM_runtime_edit.png[alt="Editing The VM Runtime Parameters within the QVD-WAT" width=98%]
+
+Here you are able to change the following parameters:
+
+Name:: The virtual machine name that will be listed in the QVD-WAT and that will be presented to the user 
+in a menu if the user has more than one Virtual Machine assigned.
+
+DI Tag:: The Disk Image tag this VM will use. Most of the time this will be either *default* or *head*.
+
+Terminal Console
+++++++++++++++++
+At the bottom of the VM Runtime Parameters Page there is a image:../images/WAT_telnet_button.png[alt="The Telnet Button"] button.
+Clicking on the Telnet Viewer button will open a separate window containing a Java applet that will automatically telnet into
+the Serial Port on the Virtual Machine, allowing an Administrator to connect and to login in order to perform administrative 
+duties for a particular Virtual Machine.
+
+In general, major administration is directly performed on a DI, so that changes are implemented across all virtual machines
+sharing the same image, however there are particular instances where an Administrator may need to access a running virtual machine
+to help a user or to troubleshoot a problem. Most frequently, this utility will be used by an Administrator when a virtual machine
+fails to start correctly and enters a 'Blocked' state.
+
+.The Terminal Console
+image::../images/WAT_telnet_interface.png[alt="The Terminal Console" width=98%]
+
+The java Telnet applet is only provided as a convenience to remote administrators. It is equally possible to use any other standard 
+telnet application to access the serial port used for a Virtual Machine on any QVD Server Node by specifying the IP address of the
+Server Node and the port number for the Serial Port.
+
+Nodes
+^^^^^
+The Nodes Page is usually accessed by clicking on the _Nodes_ link in the Navigation bar, or
+by going to the URL http://localhost:3000/hosts/, within the QVD-WAT.
+
+This page displays a list of QVD Server Nodes that have already been provisioned within the QVD·
+environment. Nodes are listed by ID along with their name, IP Address, and their state within
+the environment.
+
+.The Nodes Page within the QVD-WAT
+image::../images/WAT_nodes.png[alt="The Nodes Page within the QVD-WAT" width=98%]
+
+While it is possible to click on the magnifying glass icon image:../images/WAT_view_button.png[alt="The Magnifying Glass icon"] 
+next to the identifier for any node, to view the details for a particular node, you should be able
+to view all of this data immediately from the Nodes Page directly in the Nodes List.
+
+Adding Nodes
+++++++++++++
+In order for a QVD Server Node to function properly within the QVD environment, it needs to be registered
+within the QVD-DB. To do this, you can add the Server Node details within the QVD-WAT. Go to the Nodes Page
+and click on the image:../images/WAT_new_button.png[alt="The New button"] button. This will take you to the
+New Node Page.
+
+.The New Node Page
+image::../images/WAT_newnode.png[alt="The New Node Page within the QVD-WAT" width=98%]
+
+On this page, you should enter a name to identify the node that you are adding (usually the hostname would 
+be a good option) and provide the IP address for the node. Click on the 'addhost' button to register the
+node within QVD-DB.
+
+Blocking and Unblocking Nodes
++++++++++++++++++++++++++++++
+Just as with Virtual Machines, it is possible to 'Block' access to a Server Node. This will disable the
+Server Node from any behaviour within the QVD infrastructure. This is effectively the same as shutting
+down the Server Node, in the sense that to the rest of the environment the Server Node will be unavailable.
+If the Server Node is currently hosting any number of virtual machines, and a client attempts to connect
+the client will not be able to access that Virtual Machine and will receive an error notifying it that the
+server is currently under maintenance. Clients that are already connected to virtual machines running on
+a Node that has been blocked will remain connected until they are either forced to disconnect by an 
+Administrator or they disconnect of their own accord.
+
+To change the state of a Server Node to 'Blocked' you can check the checkbox next to the Server Node in the
+Node List on the Nodes Page. Then click on the _Block_ button at the bottom of the list.
+
+'Unblocking' a Server Node is as simple as checking the checkbox next to the Server Node in the
+Node List on the Nodes Page and then clicking on the _Unblock_ button at the bottom of the list. 
+
+OS Flavours
+^^^^^^^^^^^
+The OS Flavours Page is usually accessed by clicking on the _OS Flavours_ link in the Navigation bar or
+by going to the URL http://localhost:3000/osf/, within the QVD-WAT. QVD uses an Operating System Flavour (OSF)
+to load into each virtual machine that it creates for every user. The OSF provides the user's
+desktop environment and all of the user's applications. This manual goes into depth about creating,
+editing and managing OSFs and Virtual Machines. Please refer to the part labelled 
+<<osf_and_vm,Operating System Flavours and Virtual Machines>> for more information on this.
+
+The OS Flavours Page lists any OSFs that are already registered into the QVD-DB. OSFs are listed by ID along 
+with their name, whether they have overlays enabled and the memory allocated for them to run.
+OSFs need at least one DI (Disk Image) linked to them. This DI is which actually contains the
+files and directories that comprise the Operating System that is run inside the Virtual Machine.
+
+.The OS Flavours Page
+image::../images/WAT_osfs.png[alt="The Images Page within the QVD-WAT" width=98%]
+
+Adding an OSF
++++++++++++++
+In order to use an OSF, it needs to be registered into the QVD-DB along with its runtime parameters.
+To do this, you can add the OSF within the QVD-WAT. Go to the OS Flavours Page and click on the image:../images/WAT_new_button.png[alt="The New button"] 
+button. This will take you to the New OSF Page.
+
+.The New OSF Page
+image::../images/WAT_newosf.png[alt="The New OSF Page within the QVD-WAT" width=98%]
+
+This page presents a number of runtime parameters for the OSF that you are adding.
+
+* *Name*: This field is mandatory. You should use it to provide a name 
+for the OSF that will allow you to identify it when adding it to
+a Virtual Machine or when linking a Disk Image to it.
+
+* *Memory*: This field is optional. It is used to allocate system 
+memory to the Operating System. It has a default value of 256 MB.
+While the default value should be sufficient for a basic desktop,
+on most production systems, you would probably increase this to at 
+least 512 MB for the Gnome or KDE desktop environment to run comfortably.
+
+* *User space*: This field is optional. It is used to allocate disk 
+space to a user for the purpose of storing a home directory. By default, 
+this option is usually not set and the user's home will not be
+persistent. That means that if the virtual machine is restarted, any
+user data will be lost. Setting a value here will create a virtual disk of the
+size specified. This ensures that user data is persistent, and helps to 
+enforce quotas and to prevent user home directories from unlimited growth 
+which could impact on other users of the QVD environment. 
+
+Finally, click on the *Create* button to load the OSF.
+
+Deleting an OSF
++++++++++++++++
+Deleting OSFs from QVD using the QVD-WAT is simple. On the OS Flavours page, you will notice
+that there is a checkbox next to each OSF entry in the list. By simply checking the
+checkbox next to each entry that you wish to remove, you are able to select the OSFs that
+should be deleted. When you have finished your selection, you can click on the Delete button
+at the bottom of the Image List.
+
+You will be prompted to confirm your intention to delete the OSF from the system. You
+will need to affirm your decision before the image is actually removed.
+
+Disk Images
+^^^^^^^^^^^
+[[disk_images]]
+OSFs only contain information about the Operating System that will run inside
+the Virtual Machine, but they don't hold the actual Operating System. For this, a
+Disk Image is needed. Disk Images relate Operating System image files with OSFs,
+so several images files can be used with a given OSF. This mechanism allows the
+administrator to roll back to a previous, known-good image file if a newer one
+is found to have some kind of problem.
+
+The way this works is by *tagging*. DIs can be tagged with several strings,
+and on the other hand VMs have a *DI Tag* field that refer to these tags. This
+way, when a VM starts, the Disk Image which has the specified tag is chosen.
+
+When adding Disk Images, they are automatically tagged with a string like
+*2011-03-04-000*. This is a unique string that identifies that DI. It contains
+the current date and a sequential number.
+
+Other meaningful tags a DI can have are *head* and *default*. *head* is always
+assigned to the most recent DI. This is useful for VMs that must always run
+the latest image—just set their *DI Tag* field to *head* and they will always
+use new DIs as they are added to the system.
+
+If this behaviour isn't desired, you can use the tag *default*. This tag isn't
+reassigned when DIs are added, so you can expect VMs to be using always a
+specific DI. Whenever the user tags a different DI as default, though, VMs will
+start using it from their next boot.
+
+In the Disk Images listing in the WAT, you can see and change which image is
+the default for each OSF. The column *Default* in the listing serves both of
+these purposes.
+
+
+Adding an Image
++++++++++++++++
+Disk Images must be registered into the QVD-DB before you can make use of them. The
+QVD-WAT can be used to register images in the database. Go to the Disk Images page
+and click on the image:../images/WAT_new_button.png[alt="The New button"] button.
+
+.The New Disk Image Page
+image::../images/WAT_newimage.png[alt="The New Disk Image Page within the QVD-WAT" width=98%]
+
+* *OS Flavour*: This field is mandatory. The list will show the existing OS
+Flavours in the system, and you can choose the OSF this Image will be associated to.
+
+* *Image file*: Selecting an image from the list of images is compulsory. The
+list will only be populated with the image files that are available within
+`/var/lib/qvd/storage/staging`. If no files are available within this 
+directory, the field will appear empty and you will not be able to proceed
+from this point.
+
+* *Delete after action*: A checkbox that allows you to either delete the
+original image from the staging directory once it has been added, or to
+keep it available as a staging image. This option is available because 
+the original image file is copied to `/var/lib/qvd/storage/images` once 
+you have loaded it into QVD. You may want to delete the image file from 
+the staging directory to save disk space, but you may equally want to 
+reuse it with alternative memory and user space settings for another 
+group of users. It is optional to delete the temporary image file.
+
+Finally, click on the *Create* button to load the Disk Image. It may take some
+time to copy the image file and to update the database. Please be patient
+while this action completes.
+
+Deleting an Image
++++++++++++++++++
+When a Disk Image is no longer deemed necessary, it can be removed from the system.
+This can be easily done from the Disk Images page. Just as with OSFs, you can click
+the checkbox next to each entry that you wish to remove, then click on the Delete
+button at the bottom of the list.
+
+You will be prompted to confirm your intention to delete the OSF from the system. You
+will need to affirm your decision before the image is actually removed.
+
+WARNING: If a copy of your image file is not available in the staging directory
+or in a backup, you will lose the image file completely. Since these are usually
+very large and take some time to create, you may want to create a backup before
+you proceed with this action.
+
+Setting default Images
+++++++++++++++++++++++
+As explained in <<disk_images,Disk Images>>, more than one DI can be assigned
+to an OSF and there's a field in each VM parameters (DI Tag) that selects
+which of these DIs is to be used on a per VM basis. VMs that choose the tag
+*head* will always use the latest DI in the relevant OSF. VMs that choose a
+given numeric tag will use it. VMs that choose the *default* tag will use
+whatever DI is set as default in each OSF.
+
+In the listing of DIs there are some radio buttons that allows the user to
+select which of the DIs among each OSF has the *default* tag. It is best to
+sort the list by OSF to see this clearly. To set a given DI as default, just
+check its radio button (which will uncheck the currently checked DI in the
+same OSF) and then click on the *Set defaults* button. From now on, the next
+time a VM using that OSF and having *default* in its DI Tag field is started,
+it will use the newly selected DI.
+
+You can change more than one DI at the same time by checking the desired radio
+buttons, then clicking on *Set defaults* once instead of changing one default
+DI each time.
+
+QVD Server Nodes
+----------------
+QVD Server Nodes are the work-horses within the QVD infrastructure. They consist of
+three major components:
+
+* *QVD Node* - Responsible for managing the L7R and HKD elements
+* *L7R* - A Layer-7 Router that acts as the broker within the server
+  environment, responsible for authenticating users, establishing
+  sessions and routing connections to the appropriate virtual IP
+  addresses. In general, the L7R is responsible for managing user
+  status.
+* *HKD* - A 'House Keeping Daemon' that tracks the status of virtual·
+  machines. The HKD is responsible for starting and stopping virtual
+  machines. The HKD monitors the health of each virtual machine and·
+  then updates status information within the QVD Database, so that·
+  other Nodes and the administration tools are able to function·
+  accordingly. In general, the HKD is responsible for managing virtual
+  machine status.
+
+Usually Server Nodes are installed across a number of systems running as a cluster.
+This means that within a typical deployment you are likely to have any number
+of Server Nodes that will need to be installed and configured.
+
+You should familiarize yourself with the general architecture of a server node
+by referring to the chapter in this manual labelled _Components and Architecture_ and in
+particular the subsection labelled <<qvd_node_architecture,QVD Server Architecture>>.
+
+Installation of a QVD Server Node
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+On any of the systems that you intend to install the QVD Server Node components, you will need to add
+the QVD repository to your apt sources. You can do this with the
+following command:
+
+----
+apt-add-repository 'deb http://theqvd.com/debian lucid main'
+----
+
+Execute `apt-get update` after modifying sources.list.
+
+To install all of the QVD Server Node components and their dependencies, run the following command:
+
+----
+# sudo apt-get install qvd-node
+----
+
+This will install all of the qvd-node components along with any existing dependencies. In general
+we recommend that the QVD CLI Administration Utility is installed on any of the QVD Server Node systems
+as well, since it is common to work directly from these systems to configure QVD quickly. You can
+find out more about this utility in the following chapter labelled <<qvd-admin-cli, QVD CLI Administration Utility>>.
+
+Base Configuration
+~~~~~~~~~~~~~~~~~~
+As with most other QVD infrastructure components, every QVD Server Node requires access to the QVD Database.
+You will need to ensure that the QVD Node configuration file is set up correctly in order for the QVD Server Node 
+to function properly. You can find out how to do this in chapter titled
+<<qvd_db_config,QVD Base Configuration>>.
+
+Unlike most other components, QVD Server Nodes require an additional entry within the QVD Base Configuration
+file in order to be able to quickly search within the QVD-DB. This is a single line entry that should be
+appended to your configuration, containing the *nodename* which should match the name that you assign to
+your node when you register it within the QVD-DB, either using QVD-WAT or using the·QVD CLI Administration Utility.
+
+In general, we recommend that you name your nodes using the hostname of the system that they are running on.
+
+This can be quickly achieved by doing something like the following:
+
+----
+echo "nodename=`hostname`" >> /etc/qvd/node.conf
+----
+
+Networking Requirements
+~~~~~~~~~~~~~~~~~~~~~~~
+QVD Server Nodes make use of a network bridge and virtual network interfaces to facilitate
+networking across each of the virtual machines that run on the node. In order to automatically
+provision IP addresses to virtual machines, QVD also runs a DHCP server that will allocate
+IP addresses within the virtual network range to virtual hosts as they boot up.
+
+There are a number of configuration steps that may need to be configured manually in order
+to properly set up the networking for a QVD Server Node. There are often other ways to achieve
+an appropriate network configuration, so we provide these only as guidelines.
+
+Set dnsmasq to be controlled by QVD
+^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+QVD uses dnsmasq as a DHCP and DNS server for the virtual machines
+that run in a node. In order to function correctly, dnsmasq needs to
+be run by the qvd-node process. By default, the Ubuntu package starts
+the process running as a daemon in the background, so you need to stop 
+it from starting automatically. This is done with the following commands.
+
+----
+# /etc/init.d/dnsmasq stop
+# sed -i s/ENABLED=1/ENABLED=0/ /etc/default/dnsmasq
+----
+
+Configure IP forwarding
+^^^^^^^^^^^^^^^^^^^^^^^
+
+IP Forwarding is required in order to route clients to the correct location.
+You can do this quickly by running the following command.
+
+----
+# echo 1 > /proc/sys/net/ipv4/ip_forward
+----
+
+Unfortunately, when you reboot you host system, this change will be
+lost. To make it permanent, you can edit `/etc/sysctl.conf` and
+uncomment the line:
+
+----
+net.ipv4.ip_forward=1
+----
+
+You can force sysctl to reload its settings after you have edited this
+file by running:
+
+----
+# sysctl -p
+----
+
+Configure a Network Bridge
+^^^^^^^^^^^^^^^^^^^^^^^^^^
+There are a number of ways to go about configuring your network bridge
+and the appropriate routing to make sure that a QVD client is routed
+to the correct virtual machine.
+
+The easiest method is to set up a static network interface and to
+configure a set of *iptables* routing rules to perform the NAT
+required to translate IP addresses between your real and virtual
+network interfaces. To do this, edit the file
+`/etc/network/interfaces` and add the following lines.
+
+----
+auto qvdnet0
+iface qvdnet0 inet static
+  pre-up brctl addbr qvdnet0
+  pre-up iptables -t nat -A POSTROUTING -o qvdnet0 -j SNAT to-source 192.168.0.2
+  pre-up iptables -t nat -A PREROUTING -d 192.168.0.2 -p tcp --dport 8443 -j DNAT --to-destination 10.3.15.1
+  address 10.3.15.1
+  netmask 255.255.255.0
+----
+
+It is important to note that in the above example you will need to
+change the IP address *192.168.0.2* to the IP address of the network
+interface that you intend your clients to connect to.
+
+While there are other cleaner approaches to setting up your network,
+these sometimes run into problems with particular network interfaces
+such as WIFI. The approach listed above should work for most systems.
+
+Once you have written the network configuration to file, you should
+bring up the network bridge interface.
+
+----
+# ifup qvdnet0
+----
+
+Configure QVD for your Networking
+^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+In order for QVD to properly manage virtual machine setup and the subsequent routing,
+you will need to change some configuration settings within QVD-DB. It is recommended
+that you make use of the <<qvd-admin-cli,QVD CLI Administration Utility>> to do this.
+
+----
+# qvd-admin.pl config set vm.network.ip.start=10.1.0.50
+# qvd-admin.pl config set vm.network.netmask=16
+# qvd-admin.pl config set vm.network.gateway=10.1.0.1
+# qvd-admin.pl config set vm.network.dns_server=10.1.1.254
+# qvd-admin.pl config set vm.network.bridge=qvdnet0
+----
+
+These settings are described in more details in the section of this document entitled <<vm_options,Virtual Machine Options>> in the 
+Base QVD Configuration chapter.
+
+Configuring SSL
+~~~~~~~~~~~~~~~
+The QVD server needs an x509 certificate and private key for securing
+network connections. For a production installation you should use a
+certificate issued by a recognized certificate authority, such as
+Verisign or Thawte. For testing purposes you can use a self-signed
+certificate. We provide instructions on creating a self-signed certificate
+in the _Guide to Getting Started With QVD_.
+
+If you have a certificate signed by a third party, you can register it with
+QVD using the QVD CLI Administration Utility:
+
+----
+# qvd-admin.pl config ssl key=/path/to/private/key.pem cert=/path/to/server/certificate.pem
+----
+
+QVD CLI Administration Utility
+------------------------------
+[[qvd-admin-cli]]
+The QVD Command Line Administration utility is a perl script that can
+interact with the QVD-DB to perform a wide range of administrative
+operations within the QVD infrastructure. It can be used as an
+alternative to the QVD Web Administration Tool (QVD-WAT) and can be
+installed on any system with access to the QVD-DB.
+
+Installing and configuring the QVD CLI Administration Utility
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+On any of the systems that you intend to install the QVD CLI Administration
+Utility, you will need to add the QVD repository to your apt sources. You 
+can do this with the following command:
+
+----
+apt-add-repository 'deb http://theqvd.com/debian lucid main'
+----
+
+Execute `apt-get update` after modifying sources.list.
+
+To install the QVD CLI Administration Utility, run the following command:
+
+----
+# sudo apt-get install qvd-admin
+----
+
+The QVD Administration utility requires access to the QVD Database.
+You will need to ensure that the QVD Node configuration file is set
+up correctly in order for this tool to function properly. You can
+find out how to do this in the QVD-DB Chapter in the section titled
+<<qvd_db_config,QVD Database Configuration>>.
+
+QVD CLI Command List
+~~~~~~~~~~~~~~~~~~~~
+The QVD CLI Administration Utility provides a very large set of 
+administrative functions that can be used to control all of the 
+components and elements that are involved within the QVD environment.
+
+A complete list of functions or commands available through the 
+QVD CLI Administration Utility can be obtained using the `--help` 
+switch.
+
+----
+root@altar:~# qvd-admin.pl --help
+Valid command expected, available subcommands:
+   config del
+   config get
+   config set
+   config ssl
+   di add
+   di del
+   di list
+   di tag
+   di untag
+   host add
+   host block
+   host del
+   host list
+   host propdel
+   host propget
+   host propset
+   host unblock
+   osf add (*)
+   osf del (*)
+   osf list
+   user add
+   user del
+   user list
+   user passwd
+   user propdel
+   user propget
+   user propset
+   vm add
+   vm block
+   vm del
+   vm disconnect_user
+   vm list
+   vm propdel
+   vm propget
+   vm propset
+   vm ssh
+   vm start
+   vm stop
+   vm unblock
+   vm vnc
+----
+
+TIP: Any of the commands presented above can be prepended or appended with the `--help` switch in order to obtain
+a more detailed description of the syntax.
+
+Using Filters To Add Control To Operations
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+Many of the operations available through the QVD CLI Administration Utility also admit a
+filter (using the -f switch) to limit an action to a particular element or entity. Filters 
+are essentially matches on elements within table columns, as provided in a standard SQL 
+'WHERE' statement. Filters accept the asterisk (*) as a wildcard character.
+
+Most commonly used filters are on ID of an element or on a name. For instance, using the 
+`host list` operation as an example, you can limit the entries returned by filtering on
+`id` or `name`:
+
+----
+# qvd-admin.pl host list -f name=sha*
+
+Id Name    Address      HKD       Usable RAM Usable CPU VMs assigned Blocked State   
+_____________________________________________________________________________________
+1  shamash 192.168.0.12 103:14:31 296.676    16172.48   0            0       starting
+----
+
+Basic Administrative Operations 
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+In this section we will look at some of the more common administrative tasks that the
+QVD CLI Administration Utility gets used for.
+
+Changing QVD Configuration Settings
+^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+[[qvd-admin-config]]
+QVD has a wide range of very specific configuration settings that control various components
+within the infrastructure. We discuss some of these <<config_params,here>>.
+
+To change a QVD configuration setting using the QVD CLI Administration Utility you can do the following:
+
+----
+# qvd-admin.pl config set myproperty="this is a value"
+----
+
+It is also possible to get all of the current configuration settings from the database and list them:
+
+----
+# qvd-admin.pl config get·
+----
+
+Finally, it is possible to delete a QVD configuration setting from the database:
+
+----
+# qvd-admin.pl config del myproperty
+----
+
+Adding a QVD Server Node
+^^^^^^^^^^^^^^^^^^^^^^^^
+It is common to use the QVD CLI Administration Utility to add new QVD Server Nodes to the QVD Database.
+This can be done very quickly from the command line with the following command:
+
+----
+# qvd-admin.pl host add name=NewNode address=192.168.0.12
+----
+
+Deleting a QVD Server Node is just as simple:
+
+----
+# qvd-admin.pl host del -f "name=NewNode"
+----
+
+Configuring SSL for QVD
+^^^^^^^^^^^^^^^^^^^^^^^
+QVD Server Nodes need to be configured to make use of SSL. Currently the only way to do this is to make
+use of the QVD CLI Administration Utility:
+
+----
+# qvd-admin.pl config ssl --help
+
+config ssl: Sets the SSL certificate and private key
+usage: config ssl key=mykey.pem cert=mycert.pem
+
+    Sets the SSL certificate to the one read from the file mycert.pem, and the
+    private key to the one read from mykey.pem.
+
+    Example: config ssl key=certs/server-key.pem cert=certs/server-cert.pem
+----
+
+It is recommended that wherever possible you make use of a trusted CA-signed certificate.
+
+Adding an OSF
+^^^^^^^^^^^^^
+You can easily add an OSF to QVD using the QVD CLI Administration Utility if you are on a host that has
+access to the shared storage where the 'images' are stored:
+
+----
+# qvd-admin.pl osf add name=myOSF use_overlay=no memory=1024 user_storage_size=2048
+----
+
+There is only one compulsory value to add an OSF, which is *name*. If the other parameters
+are left unspecified, the default parameters are used instead. These are:
+
+* *memory*=256 
+* *use_overlay*=y
+* *user_storage_size*=undef (no limit to user storage)
+
+You can get a list of currently available OSFs by doing the following:
+
+----
+# qvd-admin.pl osf list
+----
+
+Adding a DI
+^^^^^^^^^^^
+Using the QVD CLI Administration Utility, you can attach a Disk Image
+(DI) to any existing OSF within the system. This process can take some
+time, since the database is updated and the actual disk image file is
+copied into the `storage/images` directory within the shared storage.
+
+By attaching a DI to a particular OSF, it decouples the actual disk
+image from the image that will be served to an end user. This means
+that you can make changes to the disk image and then simply update the
+OSF, so that when a user reconnects the image is automatically
+updated without the user experiencing any discontinuity in the
+service.
+
+----
+# qvd-admin.pl di add path=/var/lib/qvd/storage/staging/qvd-guest.img osf_id=1
+----
+
+Both *path* and *osf_id* are compulsory in order to add a DI. When the DI is added, the image specified in path 
+is copied to the read-only storage area set up for storing active DIs (usually `/var/lib/qvd/storage/images`).
+
+You can get a list of currently available images by doing the following:
+
+----
+# qvd-admin.pl di list
+----
+
+Tagging a DI
+^^^^^^^^^^^^
+DIs can be tagged with arbitrary strings at will. The WAT only allows users to
+set DIs as default in each OSF but the CLI gives greater flexibility.
+
+To tag a DI as default just use the *di tag* command:
+
+----
+# qvd-admin.pl di tag di_id=42 tag=default
+----
+
+You can tag DIs with any string, not just *default* or *head*. This allows you
+to use meaningful names for the tags, for example "acrobat_bug_fixed", for use
+within Virtual Machines' *DI Tag* field.
+
+
+Adding and Deleting Users
+^^^^^^^^^^^^^^^^^^^^^^^^^
+It is common to use the QVD CLI Administration Utility to quickly add and remove users.
+
+----
+# qvd-admin.pl user add login=peter password=s3cr3t·
+# qvd-admin.pl user del -f login=guest3
+----
+
+You can also list all QVD users using the list option:
+
+----
+# qvd-admin.pl user list
+----
+
+Resetting a User Password
+^^^^^^^^^^^^^^^^^^^^^^^^^
+You can quickly change a user's password using the QVD CLI Administration Utility:
+
+----
+# qvd-admin.pl user passwd guest
+----
+
+In the above example, we are changing the password for the user login 'guest'. You will be
+prompted to provide a new password.
+
+Adding and Deleting Virtual Machines
+^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+Adding and deleting virtual machines using the QVD CLI Administration Utility is also
+relatively easy but requires that you know the User ID that you wish to assign the Virtual Machine to,
+along with the ID of the OSF that you want to load into the Virtual Machine.
+
+----
+# qvd-admin.pl vm add name=GuestVM user_id=1 osf_id=1
+----
+
+You can easily delete a Virtual Machine using the following command:
+
+----
+qvd-admin.pl vm del -f "name=GuestVM"
+----
+
+Starting and stopping virtual machines
+^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+The QVD CLI Administration Utility can be used to start and stop Virtual Machines.
+If not specified with a particular filter, the action will be to start or stop all
+virtual machines. Usually you would run this command specifying a filter to identify
+the actual virtual machine that you wish to start or stop. Examples follow:
+
+----
+qvd-admin.pl vm stop -f "user=guest*"
+qvd-admin.pl vm start -f "id=1"
+----
+
+Blocking and Unblocking Virtual Machines
+^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+Virtual Machines can be flagged as 'Blocked'. When in this state, the QVD Client application
+will not be able to connect to the Virtual Machine. This can either be forcefully implemented
+by an Administrator to perform an Administrative task, or can take place when the HKD fails to
+properly start a virtual machine.
+
+The following commands can be used to either forcefully flag a Virtual Machine as 'blocked', or
+can be used to unblock a Virtual Machine that has been set in this state.
+
+----
+QVD-Admin/bin/qvd-admin.pl vm block -f "id=2"
+QVD-Admin/bin/qvd-admin.pl vm unblock -f "name=GuestVM"
+----
+
+Please refer to <<wat_vm_block,Virtual Machine Blocking and Unblocking>> in the chapter
+on the QVD Web Administration Tool for more information on setting this state.
+
+Connecting to a Virtual Machine
+^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+The QVD CLI Administration Utility also provides options to easily connect to a Virtual Machine without
+using the client application. Currently, the supported options include
+Console, SSH and VNC access.
+
+To access the console for a Virtual Machine, simply run the following
+command:
+
+----
+# qvd-admin.pl vm console -f id=1
+----
+
+This will open a telnet session to the console port on the Virtual
+Machine with the 'id' of '1'. Your Virtual Machine will need to have
+had console access configured.
+
+To ssh into a Virtual Machine, simply run the following command:
+
+----
+# qvd-admin.pl vm ssh -f name=myVM -- -l qvd
+----
+
+This will open an SSH connection to the Virtual Machine named 'myVM'
+using the username 'qvd'. Your Virtual machine would need to have
+OpenSSH installed and configured.
+
+If you have VNC running on the Virtual Machine and you have a VNC client installed, you can
+run the following command to open a VNC connection:
+
+----
+# qvd-admin.pl vm vnc -f name=myVM
+----
+
+QVD GUI Client
+--------------
+The QVD client is available for both Linux and Microsoft Windows
+platforms. Certainly, we recommend that for more seamless integration
+you should consider running the client on a Linux platform. However,
+it is quite possible that you have users that make use of both
+environments and would like to run a virtualized Linux desktop from
+within Windows.
+
+Downloading and Installing the Windows Client
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+If you are using Microsoft Windows as your base platform to run the
+QVD Client application, you will need to download the QVD Client
+installer manually. You can download the installer from:
+
+http://qvd.qindel.com/qvd3/windows/qvd-client-3.0.0-1-setup.exe
+
+Once you have finished downloading the installer, run it as a normal
+executable file and follow the wizard through the installation
+process.
+
+.The Windows QVD Client Installer Wizard
+image::../images/Windows_ClientInstaller1.png[alt="The Windows QVD Client Installer Wizard"]
+
+Once you have finished the installation, you can either run the client
+from the shortcut on your Windows desktop (if you selected to add the
+shortcut) or from the QVD menu in your Applications menu. This will
+open the client so that you are ready to connect.
+
+.The Windows QVD Client
+image::../images/Windows_Client.png[alt="The Windows QVD Client"]
+
+Downloading and Installing the Ubuntu Client
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+Installing the QVD Client on an Ubuntu Linux platform is simple. You
+should add the QVD repository to your apt repository sources. Run the
+following commands as root:
+
+----
+# apt-add-repository 'deb http://theqvd.com/debian lucid main'
+# apt-get update
+----
+
+You will now be able to install the client with the following command.
+
+----
+sudo apt-get install qvd-client
+----
+
+Depending on your Desktop Environment, you should be able to access
+the client within your 'Applications' menu, usually under the
+'Internet' submenu. Alternatively, you can run the client GUI from the
+console using the command `qvd-gui-client.pl`.
+
+Connecting to your Virtual Desktop
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+Once you have the GUI client running, you can enter the *Username* for
+the user that you created in QVD, the *Password* that you configured
+for the user, the *Server* hostname or IP address for the QVD Server
+Node that you created, and you can choose the level of compression for
+the connection by selecting a *Connection type*.
+
+.Enter the details for your QVD connection
+image::../images/GUI_login.png[alt="Enter the details for your QVD connection"]
+
+By default, the *Connection type* is set to 'Local'. This setting is
+appropriate for connections over a local area network. There are also
+options for 'ADSL', which would be appropriate for any broadband
+connection, and for 'Modem' which can be used in cases where bandwidth
+is severely limited or impaired.
+
+Changing the *Connection type* will increase the compression used to
+deliver the virtual desktop across your network connection. It also
+increases the amount of caching that the client performs to limit the
+amount of screen refreshing that needs to take place.
+
+In general, using heavy compression and caching will still afford your
+users the ability to work comfortably within their virtual desktops.
+However the quality of graphical rendering will be a little inferior.
+
+Once you have completed entering your connection details, simply click
+on the button labelled *Connect* and your virtual desktop should load.
+
+.A Gnome desktop loaded under QVD
+image::../images/qvd-desktop-gnome.png[alt="A Gnome desktop loaded under QVD" width=98%]
+
+Additional Settings For QVD Client
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+The QVD Client can be configured with some default settings that can tune its behaviour
+to provide better integration or a cleaner user experience. These settings are found
+in the `client.conf` file. Under Linux this file is usually in the user's home directory
+at `/home/someuser/.qvd/client.conf`. On Windows, this file is usually
+found within `%USERPROFILE%\Application Data\.qvd\client.conf`.
+
+The client config file can have the following settings:
+
+----
+client.link = local
+client.geometry = 1024x768
+client.fullscreen = 1
+client.audio.enable = 1
+client.printing.enable = 1
+client.host.port = 8443
+client.host.name = loadbalancer.mydomain.com
+client.user.name = guest
+client.use_ssl = 1
+----
+
+The meanings for the above settings are explained in the list below:
+
+* *client.link*: this is the equivalent of the 'Connection Type'
+  setting. Options include 'local', 'adsl' and 'modem'.
+* *client.geometry*: screen size for the client, if not set to use
+  fullscreen
+* *client.fullscreen*: whether or not to display the client in
+  fullscreen mode
+* *client.audio.enable*: whether or not to enable audio within the
+  client. You will need to configure this on the OSF as well.
+* *client.printing.enable*: whether or not to enable printer sharing
+  within the client. You will need to configure this on the OSF as
+  well.
+* *client.host.port*: the default port to connect to your server nodes
+  on. Do not change this unless you have reconfigured all of your
+  server nodes to use a different port number for some reason.
+* *client.host.name*: the default hostname or IP address that the
+  client should connect to. Usually you would specify a load balancer
+  or one of your server node IP addresses here.
+* *client.user.name*: the default username to connect as.
+* *client.use_ssl*: whether or not to use SSL to encrypt the client
+  connection.
+
+
+Design Considerations and Integration
+=====================================
+[partintro]
+--
+In this part of the manual, we explore things that will affect the
+design of your solution, such as your storage requirements and
+authentication mechanisms.
+--
+
+Shared Storage
+--------------
+Since there are multiple server-side components within the QVD
+infrastructure, and each of these will usually be installed on a
+number of different physical systems, it is important to set up some
+shared storage facility that is accessible to all of the hosts within
+your server farm.
+
+The currently supported network file sharing services are GFS or OCFS2 
+on top of some SAN server (i.e. iSCSI, AoE, etc.) and NFS.
+
+QVD usually keeps all commonly used files in the directory location:
+
+    /var/lib/qvd/storage
+
+NOTE: All of the paths used by QVD are configurable items, so you
+should keep in mind that although this is the default location, the
+pathnames within your infrastructure may be different depending on
+your configuration. You can check these configuration settings using 
+the QVD CLI Administration Utility.
+
+Within this location there are four subdirectories:
+
+* *homes* - location of the qcow2 home images for each user serviced by
+  QVD. These should be accessible to all QVD Server Nodes usually on
+  some type of network file share such as NFS, OCFS2 or GFS2.
+* *images* - location of the DIs (Disk Images) that are
+  loaded by the nodes for each Virtual Machine that is created. These
+  need to be accessible to QVD Server Nodes and to the QVD-WAT. This
+  directory might be stored on an network share, but in a very simple
+  configuration where the QVD-WAT is either not used or is hosted on
+  the same system as the QVD Server Node, it can be hosted locally
+  which will help to improve performance.
+* *overlays* - location used to store overlays for temporary files
+  etc. Usually this folder can be hosted locally, but for more
+  persistent behaviour in your virtual machines, you can choose to
+  store these on a network share and configure QVD to make your virtual
+  machines persistent.
+* *staging* - temporary location for DIs that you want available in
+  the QVD-WAT for the purpose of loading as an image. Files located
+  here are available within QVD-WAT when you select to add an image.
+  When you enable an image, the image file is moved to the 'images'
+  directory and is updated to include additional information such as
+  the available memory to allocate the system image, and the memory
+  that should be allocated to user space. This folder can either be
+  hosted locally or on a network share.
+
+While some of the components do not need access to all of the QVD
+Storage folders, and in some cases you can opt to have some of these
+folders running locally on one system, we recommend that all of these
+folders are accessible within some form of network based shared storage.
+
+NFS
+~~~
+In this section of the document we will provide instructions for setting up NFS for QVD, as
+this is one of the more commonly used network file sharing protocols used to facilitate shared
+storage. We will assume that you are installing and configuring NFS on Ubuntu 10.04 (Lucid Lynx) 
+in order to maintain consistency in our instruction set, however you should be able to extrapolate these
+instructions to provide NFS access for any distribution.
+
+TIP: We recommend that you run through the following process before
+installing any QVD Server components to ensure that when the QVD
+components are installed, they are automatically making use of the NFS
+share from the beginning. This way, you are less likely to run into
+trouble migrating files and creating directories in the longer term.
+
+Installing the NFS Server
+^^^^^^^^^^^^^^^^^^^^^^^^^
+
+First install the NFS Server:
+
+----
+# apt-get install nfs-kernel-server
+----
+
+Configuring the NFS Server
+^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+Add an entry to /etc/exports as follows:
+
+----
+/var/lib/exports        *(rw,sync,no_subtree_check,no_root_squash)
+----
+
+Note that this would mean that on your NFS Server, you would set up
+each of the QVD storage directories within the path
+`/var/lib/exports`. You can choose an appropriate location if you
+would prefer to host these files at an alternative path.
+
+Once you have added your path entry within the NFS Server's exports,
+you should reload the NFS Server.
+
+----
+# /etc/init.d/nfs-kernel-server reload
+----
+
+The NFS Server should now be making the configured path available over
+the network.
+
+Mounting the NFS directory on QVD Hosts
+^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+Each host system that is running any QVD server component will now
+need to be configured to access the NFS share that we have configured
+on the NFS server.
+
+First, create the mountpoint on your host systems:
+
+----
+# mkdir -p /var/lib/qvd/storage
+----
+
+Ensure that you have the tools required to access an NFS share
+installed on your host systems:
+
+----
+# apt-get install nfs-common
+----
+
+To ensure that the NFS file system is always mounted at boot time,
+edit your `/etc/fstab` to add the following line:
+
+----
+aguila:/var/lib/exports /var/lib/qvd/storage      nfs rw,soft,intr,rsize=8192,wsize=8192  0       0
+----
+
+Note that in the line above 'aguila' is the name of the server hosting
+the NFS Share. You should substitute this with the IP address or
+resolvable hostname of your NFS Server.
+
+
+Once you have finished editing your fstab, you should be able to mount
+the NFS export on your host systems:
+
+----
+# mount /var/lib/qvd/storage
+----
+
+Finally, you should check that the NFS export has been properly
+mounted. You can do this by running the `mount` command and then
+checking the output to see that your NFS export is listed:
+
+----
+# mount
+...
+aguila:/var/lib/exports on /var/lib/qvd/storage type nfs (rw,soft,intr,rsize=8192,wsize=8192,addr=172.20.64.22)
+----
+
+Authentication
+--------------
+Although QVD does provide its own authentication framework, which
+stores its users within the QVD database, it is quite common to
+require integration with another authentication framework so that
+changes to user passwords etc, do not need to be replicated within
+the QVD-DB.
+
+QVD does provide a certain level of integration with external
+resources. In this chapter, we will explore two of the more common
+integration requirements, and the level of support offered by QVD for
+these authentication frameworks.
+
+LDAP Integration
+~~~~~~~~~~~~~~~~
+The most commonly used authentication framework is LDAP, and QVD
+provides support to authenticate against LDAP right out of the box.
+
+Configuring QVD for LDAP Authentication
+^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+LDAP Authentication can be configured within QVD by setting a few
+configuration keys in the QVD database. This can be achieved using the
+<<qvd-admin-cli,QVD CLI Administration Utility>>.
+
+----
+# qvd-admin.pl config set l7r.auth.mode=ldap
+# qvd-admin.pl config set l7r.auth.ldap.host=aguila:3389 
+# qvd-admin.pl config set l7r.auth.ldap.base=dc=example,dc=com
+----
+
+In the above example, we have changed the QVD authentication mode to
+LDAP, we have set the LDAP Host and port number to `aquila` on port
+`3389`. And we have set the LDAP base DN that should be searched for
+matching users to `dc=example,dc=com`.
+
+With these basic configuration elements, QVD will automatically search
+the LDAP directory for a matching username, and then perform a BIND
+against that user using the credentials supplied by the client.
+By default, the search is performed with a scope set to 'base' and the
+filter set to '(uid=%u)'. Using our example host above, a client
+connecting with the Username set to 'guest' would need a corresponding
+entry 'uid=guest,dc=example,dc=com' within the LDAP server running on
+host 'aquila' available on port '3389'.
+
+It is possible to change the scope and filter settings for the search,
+to allow QVD to scan other branches and attributes to find a matching
+user:
+
+----
+# qvd-admin.pl config set l7r.auth.ldap.scope=sub
+# qvd-admin.pl config set l7r.auth.ldap.filter=(|(uid=%u)(cn=%u))
+----
+
+The above examples change the default search scope for LDAP
+authentication to 'sub' and the filter will cause the search to match
+users with either the 'uid' or the 'cn' equal to the provided
+Username.
+
+QVD LDAP Limitations
+^^^^^^^^^^^^^^^^^^^^
+While it is relatively trivial to get QVD to authenticate users
+against LDAP, you will still need to create matching users within your
+QVD-DB in order to assign virtual machines to them. Currently, the QVD
+does not come with any tools for you to do this automatically.
+However, customers who choose to pay for support can be provided with
+scripts that can cater for batch-mode provisioning of users within
+QVD.
+
+QVD tools allowing you to change user passwords within QVD will not
+update passwords within an LDAP backend, as this may affect the
+functioning of other facilities within your infrastructure. While
+these tools will report success for a password change, it is important
+to understand that the password that has been changed is the one
+stored within QVD-DB for the user, and not the password within the
+LDAP directory. If you are making use of LDAP Authentication, all
+password changes should be made using the tools that you usually make
+use of to manage your users.
+
+OpenSSO and OpenAM
+~~~~~~~~~~~~~~~~~~
+QVD is capable of providing support for other authentication platforms
+such as the federation and access management framework developed by
+Sun Microsystems and known as OpenSSO.
+
+NOTE: Since Oracle's acquisition of Sun in 2010, OpenSSO has been
+discontinued, but a fork known as OpenAM is available from ForgeRock.
+
+In order for OpenSSO or OpenAM to function within QVD, the appropriate
+plugin should be installed onto all of your QVD Server Nodes and you
+will need to configure the VMA within each of your OSFs where you want 
+to provide federation support.
+
+Currently, this is an advanced configuration option that will require
+some professional help to implement. Customers who choose to pay for
+support can be provided with instructions and help deploying this
+facility.
+
+Load Balancing
+--------------
+
+Introduction
+~~~~~~~~~~~~
+QVD is designed to be used in a load-balanced environment. Since a
+typical deployment makes use of several QVD Server Nodes to run all of
+the virtual machines, it is common to have Clients connect to these
+through a hardware load balancer.Since a virtual machine could run on 
+any single Server Node, and a client could connect to any other Server Node, 
+QVD's L7R component will handle the forwarding of a connection to the correct 
+Server Node. However, since each Server Node has limited resources,
+running virtual machines need to be equitably distributed to maximize
+system resources across the Server Node cluster.
+
+If a Virtual Machine is not already running for a connecting user, the
+L7R component will determine which Server Node would be most
+appropriate to use in order to start a new virtual machine for that
+user. QVD uses its own load balancing algorithm to determine which
+node should be used for the new virtual machine. This algorithm
+assesses which node has the highest quantity of free resources,
+calculated as the weighted sum of free RAM, the weighted sum of unused
+CPU, and a weighted random value to bring some entropy to the result.
+Once the best candidate Server Node has been selected, the QVD-DB is
+updated to indicate that the virtual machine should be started on this
+Server Node, and the virtual machine is automatically started by the
+Server Node's HKD.
+
+This whole process is known as QVD Load Balancing, and it is used to
+ensure that running virtual machines are equitably distributed across all of
+the Server Nodes. This maximizes the resources available to any
+virtual machine to preserve healthy functionality.
+
+Changing the weighting in the QVD Load Balancer
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+The default QVD Load Balancing algorithm calculates the current system
+load for each of the available server nodes by multiplying the
+available RAM, available CPU and a random number in order to score each
+system in the cluster. As we have already mentioned, these figures are
+weighted, so that you can alter how the load balancer functions.
+
+Increasing the weight on the RAM variable in the algorithm will cause
+the load balancer to add precedence to systems with more available
+RAM.
+
+Increasing the weight on the CPU variable in the algorithm will cause
+the load balancer to add precedence to systems with more available 
+CPU.
+
+Increasing the weight on the random variable in the algorithm will cause
+the load balancer to increase the likelihood that a more random server
+node will be selected.
+
+These weights are controlled as configuration settings within QVD-DB,
+and can be altered using the QVD CLI Administration Utility:
+
+----
+# qvd-admin.pl config set l7r.loadbalancer.plugin.default.weight.cpu=3
+# qvd-admin.pl config set l7r.loadbalancer.plugin.default.weight.ram=2
+# qvd-admin.pl config set l7r.loadbalancer.plugin.default.weight.random=1
+----
+
+In the above example, we have assigned more weight to CPU resources,
+slightly less to RAM, and even less to the randomizer. This will
+result in new virtual machines being started on the Server Nodes that
+tend to have more CPU resources available.
+
+Building a Custom QVD Load Balancer
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+Since QVD is an open-source product built largely in Perl, it is
+relatively simple to build your own customized QVD Load Balancer that
+uses an alternate algorithm. A typical use case would be where you
+have a dedicated set of Server Nodes that you would prefer to use over
+another set.
+
+QVD has a plugin system for load balancers. A load balancer plugin is
+a subclass of QVD::L7R::LoadBalancer::Plugin that has to be within the
+package QVD::L7R::LoadBalancer::Plugin.
+
+Plugin API
+^^^^^^^^^^
+
+get_free_host($vm) = $host_id
++++++++++++++++++++++++++++++
+
+Return the id of the node on which the virtual machine $vm should be
+started. A load balancer has to implement at least this method.
+
+The parameter $vm is QVD::DB::Result::VM object. It gives you access
+to the virtual machine's attributes and properties. The attributes and
+properties of the VM's user and OSF can be accessed through $vm->user
+and $vm->osf respectively. Other data can be accessed through QVD::DB.
+
+init()
+++++++
+
+Initialize the load balancer. Use this if your load balancer has to be
+step up, for example by loading a persistent cache.
+
+Minimal example: random assignment
+^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+This load balancer assigns virtual machines to random backend nodes.
+
+[source,perl]
+----
+package QVD::L7R::LoadBalancer::Plugin::Random;
+
+use QVD::DB::Simple;
+use parent 'QVD::L7R::LoadBalancer::Plugin';
+
+sub get_free_host {
+    my ($self, $vm) = @_;
+    my $conditions = { backend => 'true',
+                       blocked => 'false',
+                       state   => 'running' };
+
+    my $attr = { columns  => 'host_id' };
+
+    my @hosts = rs(Host)->search_related('runtime', $conditions, $attr)->all;
+    return $hosts[rand @hosts]->host_id;
+}
+
+1;
+----
+
+Operating System Flavours and Virtual Machines
+==============================================
+[[osf_and_vm]]
+[partintro]
+--
+In this part of the manual, you will find all of the information that
+you need to create, edit and manage an Operating System Flavour (OSF)
+that will get loaded into your Virtual Machines. We also explore the
+Virtual Machine Agent in a little more detail to see how you can use
+it to trigger your own functionalities based on actions performed by
+users accessing the Virtual Machine.
+--
+
+DI Creation
+-----------
+
+Introduction
+~~~~~~~~~~~~
+An OSF (Operating System Flavour) is actually composed of two elements:
+a DI (Disk Image), and some runtime parameters stored within the QVD-DB
+when the Disk Image is loaded into QVD using QVD-WAT or the QVD CLI
+Administration Utility. In this chapter, we will concern ourselves
+largely with the actual Disk Image part of the OSF, since the runtime
+parameters are covered in the other relevant chapters.
+
+QVD uses DIs in order to serve groups of users that make use of a
+common set of applications. By using a single image to cater to a
+number of users, it becomes easier to administer desktop environments
+for all of your users. It also improves overall security, since a
+policy can be applied to each group of users.
+
+In this way, if a group of users require a particular application, you
+can install it once and the change will apply to all of the users that
+share the same DI. Equally, you can remove an application from an
+entire group's desktop environment.
+
+DIs can easily be duplicated, so that you can quickly create
+additional environments for different subsets of users. By copying a
+base image, you can edit the copy and provide additional applications
+or other customizations to a second set of users without having to repeat 
+a full operating system installation.
+
+In this way QVD can massively reduce administration and maintenance,
+improve desktop conformity, and ease security policy implementation.
+
+In this chapter, we will look at the process involved in creating your
+own base Disk Image for an OSF, so that you can implement an
+environment that is perfectly suited to your users.
+
+System Requirements
+~~~~~~~~~~~~~~~~~~~
+You can create a DI that can be loaded into QVD on any Linux system
+that you have available for the task. In order to create an image, you
+will need to meet the following base requirements:
+
+* Server x86 with virtualization extensions (Intel or AMD).
+* Linux Operating System (preferably Ubuntu, in order to conform with
+  these instructions)
+* At least 10 GB free disk space
+* qemu-kvm installed
+* An Ubuntu Desktop installation ISO to be used for your Guest
+  operating system
+
+Creating the Image
+~~~~~~~~~~~~~~~~~~
+In order to create your DI, you will need to download the installer
+of the guest operating system that you intend to serve to your users.
+Since the DI will need to support the QVD VMA we recommend that you
+use an Ubuntu variant as your choice of operating system, since it
+will prove easier for you to set up and configure this environment.
+It is possible to make use of any other Linux-based operating system
+but you may need professional help creating a functional image.
+
+For customized packages, we recommend that you install Ubuntu using
+the 'Desktop alternate installer'. You will need to visit
+http://www.ubuntu.com/download/ubuntu/alternative-download in order to
+find the installation ISO that you should download.
+
+Create a QCOW2 File
+^^^^^^^^^^^^^^^^^^^
+QVD will make use of the qcow2 disk image format to create a
+virtual disk that will be used to store the DI. This virtual disk
+file is essentially the base hard disk used within each virtual machine.
+In order to create the qcow2 disk image file, you can run the
+following command:
+
+----
+# kvm-img create -f qcow2 example.img 4G
+----
+
+In the command, the file that will be created will be called
+`example.img` and will have a virtual hard disk size of a maximum of 4GB. In
+actuality, the qcow2 will only create a relatively small image file.
+One of the features of the qcow2 format is that it can expand the
+image as required. the 4GB limit is applied to prevent the image from
+growing too large without any control.
+
+TIP: Remember that user's home directories will not be stored within this
+image, so the limit to the image file size will not affect user home
+space.
+
+Installing the Operating System
+^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+Once you have created the virtual disk file that you will install the
+base Operating System into, you need to load it into a virtual machine
+and boot the Ubuntu CD installer image within the virtual machine. You
+can do this by running `kvm` in the following way:
+
+----
+kvm -hda example.img -cdrom ubuntu-10.10-alternate-i386.iso -m 512
+----
+
+In the example command above, the `ubuntu-10.10-alternate-i386.iso` is
+the installer ISO that you would have downloaded from the Ubuntu
+website.
+
+KVM should load a basic virtual machine that will boot the installer
+ISO. You should be able to follow the instructions in the installer to
+complete a standard Ubuntu installation within the virtual machine.
+You will notice that you are installing into the virtual hard disk
+which is only 4GB in size. During the installation, you will be
+prompted for a username and password. You should select a username and
+password that you will use to manage package installation and other
+administrative tasks within the DI at a future date.
+
+When you have completed the installation, the installer will prompt
+you to reboot. You should allow the installer to reboot and KVM will
+restart the virtual machine, this time booting off the virtual hard
+disk and loading your newly installed Operating System.
+
+Adding and Configuring the VMA
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+In order for QVD to be able to serve the Operating System Image to
+connecting clients, the image will need to have the QVD VMA (Virtual
+Machine Agent) installed. This is provided as a package from the QVD
+repositories.
+
+To install the vma package, you should open a terminal or console
+window within your new Ubuntu installation running in the virtual
+machine, and run the following commands:
+
+----
+# sudo apt-add-repository 'deb http://theqvd.com/debian lucid main'
+# sudo apt-get update
+# sudo apt-get install qvd-vma
+----
+
+This will add the QVD package repository to your apt resources, update
+the package cache and then install the QVD VMA and all of its
+dependencies.
+
+VMA Configuration
+^^^^^^^^^^^^^^^^^
+Once the vma is installed, it will need to be properly configured.
+Configuration settings for the VMA are stored in the file at
+`/etc/qvd/vma.conf`. The configuration file is read by the VMA when it
+is started, so any changes to the configuration file will require that
+the VMA is restarted in order for the changes to come into effect.
+
+The VMA can be restarted by running the command:
+
+----
+# sudo /etc/init.d/qvd-vma restart
+----
+There are some basic configuration parameters that can be configured
+within the VMA to facilitate how a client will interact with the
+virtual machine.
+
+Audio
++++++
+....
+vma.audio.enable
+....
+
+Possible values:  
+
+0 => Audio is not enabled in the virtual machine (Default)
+1 => Audio is enabled in the virtual machine
+
+NOTE: In order to get Audio working within QVD, you will need to
+ensure that your DI is configured correctly. Usually it is easiest if
+you make use of PulseAudio (default in Ubuntu) and that it is
+configured to enable network access to local sound devices. You can
+configure this using the program `paprefs`.
+
+Printing
+++++++++o
+....
+vma.printing.enable
+....
+
+Possible Values:
+
+0=> Printers are not enabled (Default)
+1=> Printers are enabled
+
+The QVD client and the VMA will map all the printers configured on the
+client. Currently, you will need to ensure that the required printer
+drivers are installed on the DI.
+
+PID location
+++++++++++++
+....
+vma.pid_file 
+....
+
+The place where the pid resides, by default /var/run/qvd/vma.pid
+
+
+Keyboard
+++++++++
+
+....
+vma.default.client.keyboard
+....
+
+The default keyboard in the virtual machine, this value is used if no
+other values are detected by the client. The default value is
+'pc105/en'. To modify this the value must be in format
+layout/distribution
+
+
+Default link
+++++++++++++
+The default NX connection link is set by this paramenter unless the client
+overrides this value. Usually, the QVD client will set its own value.
+
+....
+vma.default.client.link 
+....
+
+Possible values for this key are: 
+
+local
+adsl  (Default)
+modem
+
+VMA Hooks
++++++++++
+The VMA can also have a variety of additional configuration entries
+that control actions within the running operating system for the
+virtual machine, based on particular activities relating to QVD. These
+are known as VMA Hooks. We discuss these settings in significantly
+more detail in the chapter titled <<qvd-vma-hooks,VMA Hooks>>.
+
+Setting up Serial Port access
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+In order for an Administrator to connect to the running Virtual
+Machine via a serial connection you will need to 
+configure access within the DI that you have created.
+
+To configure the serial port you will need to perform the following
+steps as the root user in your running virtual machine:
+
+----
+# sudo editor /etc/init/ttyS0.conf
+----
+
+Add the configuration
+
+----
+# ttyS0 - getty
+#
+# This service maintains a getty on ttyS0 from the point the system is
+# started until it is shut down again.
+
+start on stopped rc RUNLEVEL=[2345]
+stop on runlevel [!2345]
+
+respawn
+exec /sbin/getty -L 115200 ttyS0 xterm
+----
+
+Once the Serial Port has been configured, the default settings for any
+Server Node will allow you to access a running Virtual Machine using
+telnet or the QVD CLI Administration Utility with a command like:
+
+----
+# qvd-admin vm console -f id=1
+----
+
+Editing a DI
+------------
+At any point, you are able to quickly edit a DI. This means that you
+can add new applications or remove existing applicaitons, or you can
+implement new policies.
+
+In order to edit an existing image, ensure that no users are
+connected and using the image that you want to edit. Stop any Virtual
+Machines that are currently making use of the DI, and block access to
+them so that no users can connect and start up a virtual machine while
+you are working on its underlying image.
+
+Once the virtual machines have all been stopped, locate the DI file
+that you wish to edit and run it within KVM in the following way:
+
+----
+# kvm -hda example.img -m 512
+----
+
+KVM will load a virtual machine and allow you to login as the user that 
+you created when you installed the Operating System. You can now perform any
+administration tasks as this user.
+
+When you have completed any work on the DI, shut it down. You can
+mark the virtual machines that require access to the image as
+'unblocked' and allow them to start up again.
+
+VMA Hooks
+---------
+[[qvd-vma-hooks]]
+
+Introduction
+~~~~~~~~~~~~
+VMA Hooks can be configured within an DI to trigger functionality within a Virtual Machine
+when particular QVD related events take place. This allows you to automatically modify platform
+behaviour to adapt the operating system to address particular client-related requirements and
+to solve concrete problems.
+
+Hooks are added as configuration entries within the VMA configuration file on the underlying DI.
+Therefore, by editing the `/etc/qvd/vma.conf` file and adding an entry similar to the following:
+
+....
+  vma.on_action.connect = /etc/qvd/hooks/connect.sh
+....
+
+it is possible to ensure that the script `/etc/qvd/hooks/connect.sh` running on the virtual machine
+will be executed everytime that a user connects to the virtual machine.
+
+It is also possible for QVD to provision scripts with command line parameters that are specific to QVD,
+such as:
+
+  - State changes, actions, or the provisioning process that has triggered the call to the hook. 
+
+  - Virtual machine properties defined in the administration database
+
+  - Parameters generated by the authentication plugins. 
+
+  - User connection parameters.
+
+  - Parameters supplied by the client program. 
+
+Hooks have their own log file, stored within `/var/log/qvd/qvd-hooks.log` on the virtual machine. This makes
+it possible to view which hooks have triggered scripts to run and to debug any unusual behaviours.
+
+Action Hooks
+~~~~~~~~~~~~
+Action Hooks are executed every time that a particular action begins.
+
+If the hook fails with a non-zero error code, the action will be aborted. 
+
+All action hooks receive these parameters. 
+
+  - _qvd.vm.session.state_: Current X-Windows server state
+
+  - _qvd.hook.on_action_: Action that triggers the hook.
+
+
+connect
+^^^^^^^
+key: *vma.on_action.connect*
+
+This hook is executed when a user starts (or resumes) an X-Windows session using the QVD Client. The script will execute
+after all Provisioning Hooks have been triggered.
+
+It also receives the following parameters by default:
+
+  - _qvd.vm.user.name_ : the user's login. 
+
+  - _qvd.vm.user.groups_ : groups that the user belongs to. 
+
+  - _qvd.vm.user.home_ : the user's directory home. 
+
+This hook is capable of receiving other connection parameters and any additional parameters assigned to the VM within the QVD-DB.
+
+pre-connect
+^^^^^^^^^^^
+key: *vma.on_action.pre-connect*
+
+This hook is executed when a user starts (or resumes) an X-Windows session from the QVD Client, with the difference 
+that it will trigger a script to execute _before_ any of the Provisioning Hooks are implemented.
+
+Parameters for pre-connect are the same as that for connect.
+
+stop
+^^^^
+key: *vma.on_action.stop*
+
+This hook is executed when an X-Windows session receives a request to be closed. This behaviour usually occurs when the VMA
+recieves such a request from the QVD-WAT or the QVD CLI Administration Utility.
+
+There are no additional parameters for this hook.
+
+suspend
+^^^^^^^
+key: *vma.on_action.suspend*
+
+This hook is executed when an X-Windows session is suspended. This usually happens if a user closes the QVD Client application.
+
+There are no additional parameters for this hook.
+
+poweroff
+^^^^^^^^
+key: *vma.on_action.poweroff*
+
+This hook is executed when the virtual machine is shut down. 
+
+There are no additional parameters for this hook.
+
+State Hooks
+~~~~~~~~~~~
+State Hooks are executed when changes within the X-Windows session take place. These hooks
+will always receive the parameter _qvd.hook.on_state_ with the current X-Windows state. 
+
+connected
+^^^^^^^^^
+key: *vma.on_state.connected*
+
+This hook is executed once a connection has been succefully established between the QVD Client 
+and the X-Windows server that runs in the virtual machine. 
+
+suspended
+^^^^^^^^^
+key: *vma.on_state.suspended*
+
+This hook executes once the user closes the QVD Client and the X-Windows session is in the 
+suspended state.
+
+stopped
+^^^^^^^
+key: *vma.on_state.disconnected*
+
+This hook executes when the X-Windows session ends.
+
+Provisioning Hooks
+~~~~~~~~~~~~~~~~~~
+Provisioning Hooks recieve the same parameters that are available to the 'connect' Action Hook.
+
+add_user
+^^^^^^^^
+key: *vma.on_provisioning.add_user*
+
+When a user is connected for first time, if the user still does not exist, a new account is created 
+for him in the virtual machine.
+
+By default the account is created with the `useradd` command.
+
+The hook 'add_user' allows an Administrator to modify this proccess and create the user account 
+using an alternate method or script.
+
+after_add_user
+^^^^^^^^^^^^^^
+key: *vma.on_provisioning.after_add_user*
+
+Once the user account has been created, this hook can be used to perform additonal actions related to
+setting up the user account within the virtual machine, such as the automatic configuration of an email
+client or other similar tasks.
+
+mount_home
+^^^^^^^^^^
+key: *vma.on_provisioning.mount_home*
+
+By default, QVD mounts the first partition of the device configured with the entry "vma.user.home.drive" 
+on the directory "/home" where the user's home directory is created (by the hook 'add_user'). Should this 
+partition not exist, it is created on the fly.
+
+With this hook it is possible to change this process so that some other behaviour takes place instead, such
+as mounting a "/home" directory from an NFS server.
+
+
+//[bibliography]
+//Bibliography
+//============
+//The bibliography list is a style of AsciiDoc bulleted list.
+
+//[bibliography]
+//- [[[taoup]]] Eric Steven Raymond. 'The Art of Unix
+//  Programming'. Addison-Wesley. ISBN 0-13-142901-9.
+//- [[[walsh-muellner]]] Norman Walsh & Leonard Muellner.
+//  'DocBook - The Definitive Guide'. O'Reilly & Associates. 1999.
+//  ISBN 1-56592-580-7.
+
+
+[glossary]
+Glossary
+========
+//Glossaries are optional. Glossaries entries are an example of a style
+//of AsciiDoc labeled lists.
+
+[glossary]
+
+QVD::
+  The Quality Virtual Desktop, a set of server components and a client application that provides remote virtual desktop access to users.
+
+QVD Client::
+  A modified NX Client capable of connecting to a Virtual Machine running on a QVD Server Node. The client is available for Linux and Windows operating systems.
+
+QVD-DB::
+  The QVD database. This is installed on top of a PostgreSQL RDBM Server. All of the server-side components within the QVD infrastructure rely on the database
+  to communicate with each other and to implement functionality.
+
+QVD Server Node::
+  A host that is running the QVD Server Node components, including the QVD Node daemon, the L7R daemon and the HKD. 
+  Usually there are multiple QVD Server Nodes within a typical deployment. The Virtual Machines that the QVD Client accesses
+  run on different QVD Server Nodes.
+
+QVD-WAT::
+  The QVD Web Administration Tool. This is a web-based GUI that allows an Administrator to configure and monitor the running of the QVD environment.
+
+QVD CLI Administration Utility::
+  A Perl script that provides a command line interface with which the QVD environment can be monitored and managed.
+
+L7R::
+  The Layer-7 Router which acts as the broker for all QVD Client connections. This is a QVD Server Node daemon. It is responsible for authenticating users
+  and routing client requests to the appropriate Server Node running the Virtual Machine for an authenticated user. It also monitors session status.
+
+HKD::
+  The House Keeping Daemon is a QVD Server Node daemon. It is responsible for starting and stopping Virtual Machines and for performing virtual machine health
+  checking.
+
+QVD Node::
+  The QVD Node is a simple QVD Server Node daemon that is used to manage the run states of the L7R and HKD.
+
+VMA::
+  The Virtual Machine Agent is a QVD component that runs inside of a virtual machine to facilitate client connectivity to the virtual desktop and that is responsible
+  for listening to management requests sent by the HKD. It also provides a number of 'hooks' that allow an Administrator to customize behaviours within the virtual machine.
+
+VMA Hook::
+  A facility within the VMA to trigger other functionality (usually through the use of scripts) within the virtual machine, based on particular state changes within the virtual machine.
+
+Virtual Machine::
+  A Virtual Machine is a virtualized system running on top of a base Operating System. Usually the virtualized system loads an OSF for the purpose of running a virtual operating system.
+
+OSF::
+  An Operating System Flavour is loaded into any number
+  of virtual machines on a QVD Server Node in order to serve a virtual desktop to a client. The OSF is usually installed into QVD along with particular runtime parameters
+  such as the amount of system memory that should be available to it.
+
+DI::
+  A Disk Image is a qcow2 image that has been created as a virtual disk containing an installed operating system. This image is then associated to an OSF.
+
+User::
+  Person using the QVD service, usually connected using the QVD Client.
+
+Administrator::
+  A user who has permission to access the management platform, usually via the QVD-WAT or through the QVD CLI Administration Utility
+
+Session::
+  The period that a user is actually connected to a virtual machine.
+
+
+
+//[index]
+//Index
+//=====

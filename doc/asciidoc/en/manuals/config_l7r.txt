@@ -1,0 +1,28 @@
+You are able to specify the following additional options to control the L7R:
+
+----
+l7r.as_user = root
+l7r.use_ssl = 1
+l7r.port = 8443
+l7r.address = *
+l7r.pid_file = ${path.run}/l7r.pid
+l7r.auth.plugins = default
+l7r.loadbalancer.plugin = default
+l7r.loadbalancer.plugin.default.weight.ram = 1
+l7r.loadbalancer.plugin.default.weight.cpu = 1
+l7r.loadbalancer.plugin.default.weight.random = 1
+----
+
+The values set above are the default values.
+
+* *l7r.as_user*: the user that should be used to run the QVD L7R daemon
+* *l7r.use_ssl*: whether or not to make use of SSL to encrypt client connections
+* *l7r.port*: the port that should be listened on for client connections to the L7R (the client would need to be configured for this value as well)
+* *l7r.address*: the IP address that the L7R should bind to
+* *l7r.pid_file*: the path to the PID file that is created when the L7R daemon is running
+* *l7r.auth.plugins*: can be used to provision additional authentication plugins such as OpenSSO
+* *l7r.loadbalancer.plugin*: can be used to include an alternative load balancing algorithm plugin
+* *l7r.loadbalancer.plugin.default.weight.ram*: weight to be assigned to RAM resources for the default load balancing algorithm
+* *l7r.loadbalancer.plugin.default.weight.cpu*: weight to be assigned to CPU resources for the default load balancing algorithm
+* *l7r.loadbalancer.plugin.default.weight.random*: weight to be assigned to the randomizer for the default load balancing algorithm
+

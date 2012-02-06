@@ -1,0 +1,78 @@
+Source Code
+===========
+Rowan Puttergill <rowan.puttergill@qindel.com>
+$Id: source-code.txt 11772 2011-08-08 08:03:06Z rputtergill $
+:author initials: RP
+:email: rowan.puttergill@qindel.com
+:doctype: book
+:toc:
+:icons:
+:qvdversion: 3.0.0
+:website: http://theqvd.com/
+ifdef::blogpost[]
+// Use the same article for both a blog post and on the AsciiDoc
+// website.
+:blogpost-status: published
+:blogpost-doctype: article
+:blogpost-posttype: page
+endif::blogpost[]
+
+All of QVD OSE's source code is available to the general public, and
+is stored in a Subversion repository. We make our code available for
+non-contributors via the web using Trac. You can review the code here: 
+
+link:http://theqvd.com/trac/browser[Browse the QVD Source Code].
+
+If you're serious about contributing to our project, you will need to
+sign our link:/community/how-to-contribute/qvd-contributor-agreement[Contributors
+Agreement] and we will provide you with the details required to access our Subversion
+repository directly.
+
+QVD Technology
+~~~~~~~~~~~~~~
+QVD makes use of a wide range of technologies available under Linux in
+order to provide a single coherent product. In order to do this, QVD
+makes heavy use of the link:http://www.perl.org/[Perl] programming
+language to tie different technologies together and to provide an
+integration framework. Perl is also used heavily in our Layer-7
+routing technology that acts as the connection broker and
+load-balancer within any solution. Our use of Perl not only makes much 
+of the source code accessible to a wide audience of potential developers, 
+but also provides the flexibility to port the product to other platforms.
+
+At the core of any QVD deployment, we rely on a
+link:http://www.postgresql.org/[PostgreSQL database] to
+store all configuration and event information. Different components
+communicate with the database in order to trigger new events or to
+check the status of other components. PostgreSQL is an open-source
+relational database management system with a wide user base. Any
+requirement to change the source-code here can be fed back to the
+PostgreSQL community.
+
+QVD relies on link:http://www.linux-kvm.org/[KVM] and
+link:http://lxc.sourceforge.net/[LXC] in order to provide different
+virtualization environments within which the virtual desktop facility
+actually runs. Both of these technologies are fully open source and
+are under active development. QVD makes use of these technologies to
+run virtualized environments on each server node. The server nodes are
+actively managed using QVD composed Perl code to integrate the
+virtualization software with the rest of the solution.
+
+Inside each disk image that gets loaded into a virtualization
+environment, the QVD Virtual Machine Agent ensures that client
+applications can connect to an X-Session using the NX protocol. The
+core libraries for the NX protocol are provided as open-source
+software under the GNU Public License by
+link:http://www.nomachine.com/[NoMachine].
+
+The QVD Web Administration Tool is built using the
+link:http://www.catalystframework.org/[Perl Catalyst]
+framework, making it simple to port other Perl administrative
+functions within the QVD Solution into the Web Administration Tool.
+Catalyst is an open-source framework available via the
+link:http://search.cpan.org/dist/Catalyst-Runtime/[Perl CPAN].
+
+With a general awareness of the technologies involved, you can
+contribute to QVD by either working directly on our own source code or
+by helping to contribute to any one of the technologies that we make
+use of.

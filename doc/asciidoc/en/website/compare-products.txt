@@ -1,0 +1,126 @@
+Compare Products
+================
+Rowan Puttergill <rowan.puttergill@qindel.com>
+$Id: compare-products.txt 11806 2011-08-09 14:44:58Z rputtergill $
+:author initials: RP
+:email: rowan.puttergill@qindel.com
+:doctype: book
+:toc:
+:icons:
+:qvdversion: 3.0.0
+:website: http://theqvd.com/
+ifdef::blogpost[]
+// Use the same article for both a blog post and on the AsciiDoc
+// website.
+:blogpost-status: published
+:blogpost-doctype: article
+:blogpost-posttype: page
+endif::blogpost[]
+
+Which edition is right for me?
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+QVD comes in three different flavors, so you may be struggling to work
+out which option will suit you best. In the table below, we have tried
+to provide some basic comparisons that might help you to decide.
+
+[cols="<s,^1m,^1m,^1m",frame="topbot",options="header"]
+|=====================================================================================================================
+|                                           |QVD Community Edition      |QVD Commercial Edition |QVD Cloud Edition
+|QVD Server Components                      |image:../../../images/icons/tick.png[alt="Yes"]|image:../../../images/icons/tick.png[alt="Yes"]|image:../../../images/icons/NA.png[alt="Not Applicable"]
+|Multi-platform QVD GUI Client              |image:../../../images/icons/tick.png[alt="Yes"]|image:../../../images/icons/tick.png[alt="Yes"]|image:../../../images/icons/tick.png[alt="Yes"]
+|QVD Web Administration Tool                |image:../../../images/icons/tick.png[alt="Yes"]|image:../../../images/icons/tick.png[alt="Yes"]|image:../../../images/icons/tick.png[alt="Yes"]
+|QVD Bug and Feature Submission             |image:../../../images/icons/tick.png[alt="Yes"]|image:../../../images/icons/tick.png[alt="Yes"]|image:../../../images/icons/tick.png[alt="Yes"]
+|QVD Priority Support                       |image:../../../images/icons/cross.png[alt="No"]|image:../../../images/icons/tick.png[alt="Yes"]|image:../../../images/icons/tick.png[alt="Yes"]
+|QVD Thin-client Software                   |image:../../../images/icons/cross.png[alt="No"]|image:../../../images/icons/tick.png[alt="Yes"]|image:../../../images/icons/tick.png[alt="Yes"]
+|QVD Professional Services Discount         |image:../../../images/icons/cross.png[alt="No"]|image:../../../images/icons/tick.png[alt="Yes"]|image:../../../images/icons/NA.png[alt="Not Applicable"]
+|Custom System Disk Images                  |image:../../../images/icons/cross.png[alt="No"]|image:../../../images/icons/tick.png[alt="Yes"]|image:../../../images/icons/tick.png[alt="Yes"]
+|Remote Support Management Service          |image:../../../images/icons/cross.png[alt="No"]|image:../../../images/icons/tick.png[alt="Yes"]|image:../../../images/icons/tick.png[alt="Yes"]
+|Fully Hosted and Managed QVD Service       |image:../../../images/icons/cross.png[alt="No"]|image:../../../images/icons/cross.png[alt="No"]|image:../../../images/icons/tick.png[alt="Yes"]
+|Price Plan                                 |FREE!                                       |Per-User                                    |Per-User + Quotas
+|=====================================================================================================================
+
+QVD Server Components
+^^^^^^^^^^^^^^^^^^^^^
+Both the Community and Commercial Editions include the QVD Server Components required to deploy a functioning VDI.
+This includes the QVD Database, QVD Server Node Daemon, QVD House Keeping Daemon and QVD Layer-7 Routing Daemon. With
+these base components, it is simple to create the base infrastructure required to get QVD up and running.
+
+The QVD Cloud Edition is fully hosted, so you don't need to get your hands dirty installing or working with server-side
+software. We take care of all of that for you.
+
+Multi-platform QVD GUI Client
+^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+Whichever edition you choose, you will need the QVD GUI Client in order for your users to access their desktops. Currently
+QVD provides clients for both Windows and Linux operating systems, and we've got a client for Android in development right now.
+Users of all editions can download the client software for free and install it on as many platforms as required.
+
+If you're serious about creating a seamless experience for your users, you should consider using the QVD Commercial or Cloud 
+Editions, and we will provide you with thin-client software that can be installed onto your workstations in order for your
+users to directly login to their desktops without needing to switch from the host operating system.
+
+QVD Web Administration Tool
+^^^^^^^^^^^^^^^^^^^^^^^^^^^
+The QVD Web Administration Tool makes managing and monitoring your QVD infrastructure simple. This Web-based GUI provides
+a point-and-click facility for your systems administrators to keep control over users, virtual machines and operating system
+images. The Web Administration Tool even comes with a java applet that directly connects to the serial port console of any
+running virtual machine, so that an Administrator can quickly connect to a user's environment and offer support.
+
+QVD Bug Submission and Feature Requests
+^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+In order for QVD to progress we need to know about bugs in the software, that's why we make it possible for anybody to submit
+a bug report. We also want to know about new features that our customers and users are interested in seeing within the product.
+Whether you're using the Open-Source Edition, or you're a fully paying customer, we will listen to your requests. If you find
+something in our product that needs improvement, head over to our Community pages and Report a Bug.
+
+For paying customers, we have a complete SLA that will help to
+guarantee that bug submissions and feature requests are dealt with
+expediently and that you are kept constantly updated as to the status
+of your ticket.
+
+QVD Priority Support
+^^^^^^^^^^^^^^^^^^^^
+While we take all bug reports and feature requests seriously, we have to look after our paying customers first. After all, these
+are the guys that make this software possible in the first place. Users of the Commercial Edition and Cloud Edition are able to
+submit priority bug reports and feature requests. We also offer them a Next Business Day support guarantee, ensuring that they are
+looked after 24/7.
+
+QVD Priority Support includes access to our internal knowledge-base, and will give you access to all of the resources required to
+make sure that your deployment runs smoothly and that you are able to integrate it with whatever infrastructure you are currently using.
+
+QVD Thin-client Software
+^^^^^^^^^^^^^^^^^^^^^^^^
+QVD Commercial and Cloud Editions have access to QVD's own Thin-client software. This base Linux operating system has been cut down and
+purposefully designed so that when the system boots, the end-user is finally presented with a QVD login screen. This means that your end
+users should never be accessing the underlying host software, and can have a seamless experience of their desktop environment as if 
+working locally directly on the workstation. This helps to reduce workstation support requirements and ensures that your users actually
+make direct use of their virtual desktop and don't take advantage of the underlying host operating system to perform other activities.
+
+QVD Professional Services Discount
+^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+We know that designing and deploying a VDI can be intimidating, especially when you are trying to get things working for hundreds of users
+while integrating with existing infrastructure. Commercial Edition customers have discounted access to all of the QVD expertise directly from our team.
+We can help you design and deploy your VDI so that it runs properly and so that it fits well with the rest of your existing infrastructure.
+You can rest assured that your QVD deployment functions in a fully-supportable manner and that you have the best possible team helping you go-live.
+
+Check out our link:/support/professional-services[Professional Services] page to fully explore the advantages of being a Commercial Edition customer.
+
+Pre-configured Base System Disk Images
+^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+While we provide demonstration operating system disk images to users of our Community Edition, these are very slimmed down and provide minimal 
+functionality. For paying customers, we can help you tailor your Disk Images to your required environment. This includes adapting
+any Linux distribution to suit your own needs. By taking advantage of our commercial support package, you can be sure that the Disk
+Image that is being loaded into your virtual machines, is wholly compatible with the environment and that your users have access to
+the software that they require.
+
+Remote Support Management Service
+^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+The QVD support team can work directly on your QVD deployment via VPN or over provisioned SSH access, so that in the case of a support call,
+an engineer can access your infrastructure and make any required changes to fix any issues. That means that you can run your solution in
+the full knowledge that if something goes wrong, there will always be somebody available to fix it instantly.
+
+Fully Hosted and Managed QVD Service
+^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+If you're making use of the QVD Cloud Edition, you don't have to worry about hardware or systems administration. You can leave all of that in
+our hands. The QVD team will install the operating system images that you want to make use of and can help you provision your initial users.
+Once you're up and running we will ensure that the VDI is kept up to date with all security patches and software updates that we release. You can
+sit back and let your users connect to their desktops across the Internet. And that's all there is to it.

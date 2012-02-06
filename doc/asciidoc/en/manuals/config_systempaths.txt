@@ -1,0 +1,49 @@
+The following options are available to change the paths that QVD uses to search for applications, certificates and other QVD
+specific data.
+
+----
+path.run = /var/run/qvd
+path.log = /var/log
+path.tmp = /var/tmp
+path.storage.root = /var/lib/qvd/storage
+path.storage.staging = ${path.storage.root}/staging
+path.storage.images = ${path.storage.root}/images
+path.storage.overlays = ${path.storage.root}/overlays
+path.storage.homes = ${path.storage.root}/homes
+path.ssl.certs = ${path.run}/ssl
+path.ssl.ca.system = /etc/ssl/certs
+path.ssl.ca.personal = .qvd/certs
+path.serial.captures = ${path.tmp}/qvd
+
+command.kvm = kvm
+command.kvm-img = kvm-img
+command.nxagent = /usr/bin/nxagent
+command.nxdiag = /usr/bin/nxdiag.pl
+command.x-session = /etc/X11/Xsession
+
+command.useradd = /usr/sbin/useradd
+command.userdel = /usr/sbin/userdel
+----
+
+The above values are the default values.
+
+* *path.run*: the run path (usually referenced by other path options)
+* *path.log*: the base path to store log output
+* *path.tmp*: the path to store temporary files
+* *path.storage.root*: the base path for the main storage area used by QVD
+* *path.storage.staging*: the staging directory used to hold temporary DIs
+* *path.storage.images*: the images directory used to hold registered DIs
+* *path.storage.overlays*: the overlays directory used to hold overlay qcow images
+* *path.storage.homes*: the homes directory used to hold user home data qcow images
+* *path.ssl.certs*: the path to store SSL certificates used by QVD
+* *path.ssl.ca.system*: the path to where system CA certificates are stored
+* *path.ssl.ca.personal*: the path to where local or personal CA certificates are stored
+* *path.serial.captures*: the location used to store serial captures (if enabled)
+* *command.kvm*: the command to run the Kernel Virtual Machine 
+* *command.kvm-img*: the command used to work with QEMU virtual disks within the KVM
+* *command.nxagent*: the path to the nxagent binary (usually only used by the VMA on an OSF)
+* *command.nxdiag*: the path to the nxdiag.pl script used by the VMA to ensure that nxagent is running properly
+* *command.x-session*: the path to the XSession shell script run by the system when an X Windows session is started
+* *command.useradd*: the path to the useradd script used by the system to add users
+* *command.userdel*: the path to the userdel script used by the system to remove users
+

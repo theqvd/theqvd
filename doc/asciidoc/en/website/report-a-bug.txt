@@ -1,0 +1,34 @@
+Report a bug
+============
+Rowan Puttergill <rowan.puttergill@qindel.com>
+$Id: community.txt 11723 2011-07-29 10:09:23Z rputtergill $
+:author initials: RP
+:email: rowan.puttergill@qindel.com
+:doctype: book
+:toc:
+:icons:
+:qvdversion: 3.0.0
+:website: http://theqvd.com/
+ifdef::blogpost[]
+// Use the same article for both a blog post and on the AsciiDoc
+// website.
+:blogpost-status: published
+:blogpost-doctype: article
+:blogpost-posttype: page
+endif::blogpost[]
+
+If you’ve found something wrong with the product, or you want to
+request a new feature, let us know! We ask community members to
+link:http://theqvd.com/trac/register[register with our Trac], and post 
+tickets here. Once you are logged in, you can post a new ticket here:
+
+link:http://theqvd.com/trac/newticket[Post a bug report or request a
+feature enhancement]
+
+The public Trac facility is kept separate from the internal Trac, so
+that community members can help each other out and so that we can
+properly manage the priority of our tickets. Once a public ticket has
+been recognized by our core development team, it is copied into the
+internal Trac and we start working on it. We notify you of the change
+of status via the public Trac and keep you up to date with the
+progress of the ticket.

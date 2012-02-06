@@ -1,0 +1,24 @@
+Enviar un error
+===============
+Rowan Puttergill <rowan.puttergill@qindel.com>
+$Id: community.txt 11723 2011-07-29 10:09:23Z rputtergill $
+:author initials: RP
+:email: rowan.puttergill@qindel.com
+:doctype: book
+:toc:
+:icons:
+:qvdversion: 3.0.0
+:website: http://theqvd.com/
+ifdef::blogpost[]
+// Use the same article for both a blog post and on the AsciiDoc
+// website.
+:blogpost-status: published
+:blogpost-doctype: article
+:blogpost-posttype: page
+endif::blogpost[]
+
+Si has encontrado algo mal en el producto, o quieres pedirnos alguna mejora, ¡háznoslo saber! Pedimos a los usuarios de la Community Edition que link:http://theqvd.com/trac/register[se registren en nuestro Trac], y envíen sus tickets aquí. Una vez que te has logeado, puedes enviar un ticket nuevo aquí:
+
+link:http://theqvd.com/trac/newticket[Enviar un reporte de error o pedir una mejora]
+
+La infraestructura pública de Trac se mantiene separada del Trac interno, para que los usuarios de la Community Edition pueden echarse una mano entre ellos y para que podamos manejar adecuadamente la prioridad de nuestros tickets. Una vez que un ticket público a sido reconocido por nuestro equipo central de desarrollo, se copia a nuestro Trac interno y empezamos a trabajar con él. Te notificamos del cambio de estado vía el Trac público y te mantenemos al día con el progreso del ticket.

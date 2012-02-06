@@ -1,0 +1,50 @@
+QVD Audio 
+---------
+
+This section explains how audio played on the virtual desktop is rerouted and
+replayed on the client machine.
+
+Technical Overview
+~~~~~~~~~~~~~~~~~~
+
+QVD uses the *PulseAudio* sound server, the default audio system on most
+mainstream Linux distributions, to route audio between the client machine
+and the virtual machine. PulseAudio is network-transparent in the same was as
+X11: sound played on a remote audio client is easy to redirect to a local
+server.
+
+The QVD client includes a PulseAudio server for platforms that don't use it
+natively.
+
+Enabling audio on the client
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+To enable audio redirection on the QVD client, add the following lines to
+`client.conf`.
+
+----
+# Enable audio redirection
+client.audio.enable = 1
+----
+
+For more details see the client configuration guide.
+
+Addtional setup needed for Linux clients
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+Linux users need to enable unauthenticated network access to the system
+pulseaudio server. The easiest way to do this is with the `paprefs`
+application.
+
+image::../images/paprefs.png[alt="Screen capture of paprefs]
+
+Enabling audio on the server
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+To enable audio redirection on the QVD server, add the following lines to
+`/etc/qvd/vma.conf` on the virtual machine image.
+
+----
+# Enable audio redirection
+vma.audio.enable = 1
+----

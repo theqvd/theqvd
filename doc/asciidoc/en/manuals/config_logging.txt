@@ -1,0 +1,13 @@
+The following options can be used to change the path to the log file
+and to control log level output.
+
+----
+log.filename = ${path.log}/qvd.log
+log.level = INFO
+----
+
+The above values are the default values.
+
+* *log.filename*: the path to the log file
+* *log.level*: the log level output, values can be: ALL, DEBUG, INFO,
+  WARN, ERROR, FATAL, OFF

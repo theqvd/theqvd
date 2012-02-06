@@ -1,0 +1,57 @@
+%
+\NeedsTeXFormat{LaTeX2e}
+\ProvidesPackage{asciidoc}[2008/06/05 AsciiDoc DocBook Style]
+%% Just use the original package and pass the options
+\RequirePackageWithOptions{docbook}
+
+%% Redefine the paragraph layout
+\setlength\parskip{\medskipamount}
+
+\newcommand{\HRule}{\rule{\linewidth}{0.5mm}}
+
+\newcommand\edhead{}
+\renewcommand{\maketitle}{\begin{titlepage}%
+\begin{center}%
+% Upper part of the page
+\includegraphics[width=0.15\textwidth]{../images/qvd-logo.png}\\[1cm]
+\textsc{\Large The}\\[0.5cm]
+% Title
+\HRule \\[0.4cm]
+{ \huge \bfseries QVD Administration Manual}\\[0.4cm]
+\HRule \\[1.5cm]
+% Author and supervisor
+\begin{minipage}{0.5\textwidth}%
+\begin{center} \large
+Rowan \textsc{Puttergill}\\[0.3cm]
+<rowan.puttergill@qindel.com>
+\end{center}
+\end{minipage}\\[0.8cm]
+\begin{minipage}{0.7\textwidth}%
+\begin{center}\normalsize
+\textbf{Other contributors:} \textit{Nicolas Arenas, David Serrano,}\\[0.1cm]
+\textit{Salvador Fandi\~{n}o, Nito Martinez, Santiago Doblas}
+\end{center}
+\end{minipage}
+\vfill
+% Bottom of the page
+{\large \today}
+\end{center}%
+\end{titlepage}%
+}%
+
+\usepackage{fancyhdr}
+\fancyhead{}
+\fancyfoot{}
+\fancyhfoffset[RO]{0in}
+\fancyhead[RO]{\raisebox{-5mm}{\includegraphics[height=8mm,keepaspectratio]{../images/qvd-logo.png}}}
+\fancyfoot[RO]{~\\\qquad\thepage}
+\fancyfoot[L]{~\\info@theqvd.com}
+\fancyfoot[CO,C]{}
+
+\setlength{\footskip}{2\baselineskip}
+%\tolerance=500
+\sloppy
+
+% For DocBook literallayout elements, see
+% `./dblatex/dblatex-readme.txt`.
+\usepackage{alltt}

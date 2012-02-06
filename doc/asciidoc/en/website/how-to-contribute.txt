@@ -1,0 +1,104 @@
+How To Contribute
+=================
+Rowan Puttergill <rowan.puttergill@qindel.com>
+$Id: compare-products.txt 11723 2011-07-29 10:09:23Z rputtergill $
+:author initials: RP
+:email: rowan.puttergill@qindel.com
+:doctype: book
+:toc:
+:icons:
+:qvdversion: 3.0.0
+:website: http://theqvd.com/
+ifdef::blogpost[]
+// Use the same article for both a blog post and on the AsciiDoc
+// website.
+:blogpost-status: published
+:blogpost-doctype: article
+:blogpost-posttype: page
+endif::blogpost[]
+
+Developers Developers Developers!
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+The QVD project can always benefit from developer input. If you know a
+bit about Linux, Perl, Catalyst or PostgreSQL, you are already in a
+position to contribute. We take developers
+very seriously and keep an eye on contributions and patches. We want
+to grow the QVD team, so finding developers who write good
+code and are fired up about working in an open-source community is the
+best place for us to look for new talent.
+
+If you want to get started, take a look at the source code and see
+whether you have anything to offer. If you think that you could
+improve on things, you can sign our
+link:/community/how-to-contribute/qvd-contributor-agreement[Contributors
+Agreement] and send us
+a scanned copy and we will provide you with access to our SVN
+repository, along with other information that you may find helpful to
+get you started.
+
+Testers
+~~~~~~~
+Good code is as much in the writing as in the testing. The quicker we
+can find and iron out bugs, the better for everyone. You can help us by
+testing the product, reporting bugs, sending patches and requesting
+enhancements. We're busy formalizing our testing procedure, so that we
+can send dedicated testers a script that they can follow to work
+through each of the major parts of the product. If you have experience
+in formal test procedures, or have a background in dedicated testing,
+you could really help us out. By getting fully engaged in the testing
+process, you get access to new features before they are released and
+will get mention in the credits for the product.
+
+If you're happy to work on the released product and just report back
+to us, we'd very much appreciate your help. If you want to get
+involved in the more formal testing and have access to beta packages
+before they are released, then you will need to sign our
+link:/community/how-to-contribute/qvd-contributor-agreement[Contributors
+Agreement] and send us a scanned copy. Once we have you on file, we
+will give you access to all of the information that you need to get
+started.
+
+Packaging
+~~~~~~~~~
+If you're into packaging, you might be able to help us port QVD to your 
+preferred distribution. Making sure that all dependencies are met,
+that the software is installed into the correct places and functions
+properly for a particular distribution is a challenge. We've nailed it
+for Ubuntu and SuSE, but if QVD is really going to grow, we want to
+see it running on all flavours of Linux.
+
+If you can port our software to another distribution, let us know
+about it and we will help to support your efforts in maintaining the
+port.
+
+Documentation
+~~~~~~~~~~~~~
+Documentation is essential. Too many open-source projects remain
+undocumented or allow documentation to go out of date. While we have a
+dedicated technical author working flat out to keep documents up to
+date, often things get missed or screenshots fall out of date.
+
+We document everything using Asciidoc so all you need is a simple text
+editor and some screenshot capturing software. By joining us to work
+on documentation, you will have access to our SVN repository so that
+you can access existing document sources to update them. Sign our
+Contributors Agreement and you can get started right away!
+
+Documentation is not just limited to manuals and guides. We want to
+get proactive with screencasts and other video content. If you have
+experience with this, perhaps you can help here too. Send us links to
+uploaded video content and we will link to them directly from our
+site, or host the content for you if necessary.
+
+Benefits
+~~~~~~~~
+Contributors to QVD should not remain behind the curtain. We want to
+give you the recognition that you deserve. Once you have joined up
+with us and actively started contributing, you will appear in the 
+credits for the software and we will be happy to provide references
+for you.
+
+As QVD grows, more opportunities will open up in the core QVD team,
+and the best way to get a place working full time on the project is to
+already be contributing to it. We'll look out for top contributors and
+contact them if there is a position available within the team.

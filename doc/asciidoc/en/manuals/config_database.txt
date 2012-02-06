@@ -1,0 +1,24 @@
+The node.conf file should at least contain the following:
+
+----
+#·
+# QVD Node Configuration
+#
+
+# Database connection information.
+# database.host: where the QVD database is found
+# database.name: the name of the QVD database
+# database.user: the user account needed to connect
+# database.password: the password needed to connect
+database.host = mycomputer
+database.name = QVDDatabase
+database.user = QVDUser
+database.password = passw0rd
+----
+
+You should ensure that the *database.host*, *database.name*,
+*database.user* and *database.password* contain values that match the
+environment that you have set up.
+
+Once these settings are in place any utility that requires access to
+the database will have the appropriate configuration details to do so.

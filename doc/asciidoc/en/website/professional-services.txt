@@ -1,0 +1,37 @@
+Professional Services
+=====================
+
+Setting up a VDI and migrating your users onto a new platform can be a
+daunting task. Sure, setting up a demo environment to check out QVD's
+capabilities is easy enough, and for many SME users providing a basic
+solution to service a dozen end-users can be achieved with little
+assistance. However, for many larger businesses the challenges imposed
+in terms of assessing requirements and selecting hardware, migrating
+users, integrating with existing software and infrastructure, and
+finally providing training can turn a simple VDI deployment into a
+complex and resource-hungry project.
+
+That's why we don't expect you to do everything on your own. The QVD
+can provide dedicated Professional Services through the Qindel Group.
+Since the majority of the core development team, systems and software
+architects and QVD engineers are employed directly by the Qindel
+Group, you can be certain that any assistance you require to go-live
+with a QVD deployment will involve the best minds in the business.
+
+The Qindel Group can provide your organization with dedicated
+resources to assist in:
+
+* Requirements analysis
+* Architecture and design
+* Installation and configuration
+* Operating system image customization
+* Solution behavior customization
+* Software integration
+* Development
+* Training
+
+Pricing for professional services are generally structured around
+customer requirements and project size. If you're interested in
+contracting us to help with a deployment, feel free to email us at
+link:mailto://info@theqvd.com[info@theqvd.com] or to contact the
+link:http://qindel.com/[Qindel Group] directly.

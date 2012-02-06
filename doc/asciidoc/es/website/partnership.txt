@@ -1,0 +1,69 @@
+Partner
+=======
+Rowan Puttergill <rowan.puttergill@qindel.com>
+$Id: partners.txt 11772 2011-08-08 08:03:06Z rputtergill $
+:author initials: RP
+:email: rowan.puttergill@qindel.com
+:doctype: book
+:toc:
+:icons:
+:qvdversion: 3.0.0
+:website: http://theqvd.com/
+ifdef::blogpost[]
+// Use the same article for both a blog post and on the AsciiDoc
+// website.
+:blogpost-status: published
+:blogpost-doctype: article
+:blogpost-posttype: page
+endif::blogpost[]
+
+Si estás interesado en la integración de sistemas, implementación de escritorios, o la reventa de software, podría interesarte una colaboración con nosotros que sea mutuamente beneficiosa. Podemos ofrecer a los partners una serie de incentivos muy buenos para unirse y trabajar directamente con nosotros.
+
+Tipos de acuerdos
+~~~~~~~~~~~~~~~~~
+QVD ofrece dos tipos de acuerdos para futuros revendedores o integradores de sistemas.
+
+1. *Revendedor Comercial (CRs)*: tienen una responsabilidad minima con el
+   cliente final, pero pueden aprovecharse de licencias con descuento
+   y formación QVD oficial de ventas. A través de este acuerdo, tú única
+   responsabilidad será vender licencias, y además podrás
+   aventajarte del Soporte Oficial y los servicios profesionales
+   que serán provistos por el equipo de QVD.
+2. *Integradores Comerciales y Revendedores (CRIs)*: tienen más 
+   responsabilidad con el cliente final, incluyendo proveer el soporte 
+   de la instalación y compromiso de servicio profesional, así como soporte
+   de primer nivel una vez que la instalación entre en producción. Bajo este acuerdo,
+   recibirás licencias con mejores descuentos y tendrás también descuentos
+   tanto de soporte como de formación por parte del equipo de QVD. Naturalmente, este acuerdo
+   te proporciona mejores ganancias por la inversión, pero también añade la responsabilidad con 
+   respecto a tus clientes.
+
+Durante el proceso de convertirte un Partner certificado de QVD, podrás decidir bajo que acuerdo te gustaría certificarte. También tendrás que completar la formación necesaria para convertirte en un partner reconocido, de manera que podamos garantizar que el servicio que ofreces a tus clientes es de la mayor calidad posible.
+
+Licencias con descuento y Soporte
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+QVD facilita descuentos de licencias a sus partners, para que los partners puedan obtener algo de beneficio que estará disponible a través del modelo de licencias del programa. 
+
+Los partners también pueden aventajarse del los descuentos de soporte, para que cada partner sea capaz de obtener un porcentaje de las ganancias generadas a traves del acuerdo de soporte anual.
+
+QVD se da cuenta que diferentes partners son capaces de dar servicio a diferentes tipos de clientes. Así, el descuento se calcula en base a la previsión de ventas anuales en términos del número de licencias vendidas.
+Los descuentos para partners que están trabajando con despliegues a gran escala son, en general, más grandes que los despliegues más pequeños. 
+
+Soporte Dedicado
+~~~~~~~~~~~~~~~~
+Nuestros acuerdos para partners incluyen la asignación de personal de soporte dedicado en ambos lados del acuerdo. De este modo, podemos garantizar que la cadena de comunicaciones está adecuadamente dirigida y que podemos ofrecer la seguridad a los clientes finales de que sus problemas serán resueltos de manera oportuna.
+
+Para CIRs, QVD proveerá formación técnica del producto para asegurar que los partners conocen de manera adecuada la tecnología y saben completamente como darle soporte. A los CIRs también están obligados a comprometerse a un acuerdo de nivel de servicio que se especifica en el contrato de alianza.
+
+Formación
+~~~~~~~~~
+Queremos que nuestros partners sepan todo lo que hay que saber sobre el producto que venderán, por eso insistimos en proveer la formación apropiada para darle al partner el nivel necesario donde se sientan seguros para dar a sus clientes el mejor servicio posible y donde sientan que tienen todas las herramientas para solucionar las peticiones de los clientes.
+
+Para obtener el estado de qualified partnership con QVD, cualquier partner tiene que tomar parte de un riguroso curso de formación de la tecnología central del producto. A ambos CRs y CIRs se les da formación en ventas que les ayuda a entender los casos de uso, así como las fortalezas de QVD.
+A los CIRs se les da también formación técnica detallada para que puedan tener los conocimientos especializados requeridos para dar suporte de primer nivel al producto, y asi asegurar que las instalaciones y los compromisos de servicio profesional funcionen de la mejor manera posible.
+
+Darse de alta
+~~~~~~~~~~~~~
+Si le ves potencial a un acuerdo de partnership, por favor, haz click aquí para visitar nuestro formulario para darse de alta. Te enviaremos toda la documentación de los contratos y los detalles de los acuerdos inmediatamente. Si estas interesado en más a partir de ahí, podemos trabajar lo que sea necesario e ir construyendo nuestra relación tan rápido como quieras.
+
+image::../../../images/sign-up.png["Sign Up",align="center",link="/partner/sign-up"]

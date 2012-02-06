@@ -1,0 +1,205 @@
+Terms of Service
+================
+Rowan Puttergill <rowan.puttergill@qindel.com>
+$Id: download.txt 11772 2011-08-08 08:03:06Z rputtergill $
+:author initials: RP
+:email: rowan.puttergill@qindel.com
+:doctype: book
+:toc:
+:icons:
+:qvdversion: 3.0.0
+:website: http://theqvd.com/
+ifdef::blogpost[]
+// Use the same article for both a blog post and on the AsciiDoc
+// website.
+:blogpost-status: published
+:blogpost-doctype: article
+:blogpost-posttype: page
+endif::blogpost[]
+
+Thank you for trying out the QVD Demo. By using this service you 
+agree to the following terms, conditions, policies, guidelines or 
+amendments thereto known as the Terms of Service.
+
+QVD reserves the right to modify the Terms of Service without notice.
+
+Use of the QVD Demo Service
+~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+You may use our service, provided that you are of legal age to
+form a binding contract and are not a person barred from receiving
+services under the laws of the Spain or other jurisdictions.
+In order to make use of the demo service, you are required to provide
+current and accurate identification, contact, and other information as
+part of the registration process. QVD will provide you with a
+demonstration username and password. You are responsible for maintaining
+the confidentiality of your account information, and are responsible
+for all activities that occur under your account. You are solely
+responsible for all content on your account. You agree to immediately
+notify QVD of any unauthorized use of your account or any other
+breach of security. QVD will not be liable for any loss or
+damage arising from your failure to provide us with accurate
+information or to keep your account secure.
+
+Acceptable Conduct
+~~~~~~~~~~~~~~~~~~
+
+You agree that you are responsible for maintaining your own account.
+You understand that all information, data, text, software, music,
+sound, photographs, graphics, video, messages, files, attachments or
+other materials (‘Content’) are the sole responsibility of the account
+from which such Content originated. QVD reserves the right, but
+does not assume the responsibility, to monitor or review any Content
+on QVD services. You agree that you are responsible for the
+conduct of all users of your account and any Content that is created,
+transmitted, stored, or displayed by, from, or within your account
+while using the QVD demo and for any consequences thereof. You
+agree to use QVD services only for purposes that are legal,
+proper and in accordance with the Terms of Service and any applicable
+policies or guidelines. You agree that you will not engage in any
+activity that interferes with or disrupts QVD services or
+servers or networks connected to QVD services. You agree that the QVD
+demo is a service that is designed only for demonstration purposes and
+that data stored on this service may be destroyed at any time that QVD
+requires.
+
+Prohibited Usage
+~~~~~~~~~~~~~~~~
+You agree that any of the below activities are considered prohibited
+usage and will result in immediate account suspension or cancellation
+and the possibility that QVD will impose fees; and/or pursue civil remedies 
+without providing advance notice.
+
+Misuse of System Resources: Misuse of system resources, including but
+not limited to running processes that consume excessive CPU time, network 
+capacity, disk IO or storage space, particularly if those processes
+were not installed on the demonstration image by QVD.
+
+Unsolicited Communications: Sending unsolicited bulk messages
+utilizing our network. Generating a significantly higher volume of
+outgoing e-mail than a normal user. Using a non-existent email return
+address. Sending out unsolicited email from any other network that points 
+to a QVD server.
+
+Access to Other Computers or Networks without Authorization:
+Attempting unauthorized and/or illegal access of computers, networks
+and/or accounts not belonging to party seeking access. Any act which
+interferes with the services of another user or network. Any act
+relating to the circumvention of security measures.
+
+Other Activities viewed as Illegal or Harmful: Engaging in illegal
+activities or engaging in activities harmful to the operations of
+QVD or the customer.
+
+Providing False Data on any Contract or Application: including
+fraudulent use of credit card numbers.
+
+Account Cancellation or Suspension
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+QVD may cancel or suspend your access to QVD services at
+any time and for any reason without notice. Upon cancellation or
+suspension, your right to use the service will stop immediately. You
+may not have access to data that you stored on the service after we
+suspend or terminate the service. You are responsible for backing-up
+your data that you use with the service.
+
+You may terminate the service at any time by sending us notification
+to disable your demo account, either by email or by written letter. 
+As soon as you terminate the service your right to use it stops 
+immediately. The account will be deleted and you may not
+have access to data that you stored on the service after you terminate
+the service.
+
+Limitation of Liability
+~~~~~~~~~~~~~~~~~~~~~~~
+
+YOU EXPRESSLY UNDERSTAND AND AGREE THAT QVD SHALL NOT BE LIABLE
+TO YOU FOR ANY INDIRECT, INCIDENTAL, SPECIAL, CONSEQUENTIAL OR
+EXEMPLARY DAMAGES, INCLUDING BUT NOT LIMITED TO, DAMAGES FOR LOSS OF
+PROFITS, GOODWILL, USE, DATA OR OTHER INTANGIBLE LOSSES RESULTING
+FROM: (I) THE USE OR THE INABILITY TO USE QVD SERVICES; (II)
+UNAUTHORIZED ACCESS TO OR ALTERATION OF YOUR TRANSMISSIONS OR DATA; OR
+(III) ANY OTHER MATTER RELATING TO QVD SERVICES. YOU EXPRESSLY
+UNDERSTAND AND AGREE THAT NOTWITHSTANDING ANYTHING IN THE AGREEMENT TO
+THE CONTRARY, THE MAXIMUM AGGREGATE MONETARY LIABILTY OF QVD AND
+ANY OF ITS AGENTS, SUPPLIERS, EMPLOYEES, OR AFFILIATES IN CONNECTION
+WITH THE QVD SERVICES , UNDER ANY THEORY OF LAW (INCLUDING
+BREACH OF CONTRACT, TORT, STRICT LIABILITY, AND INFRINGEMENT) SHALL
+NOT EXCEED THREE TIMES ONE MONTHS RECURRING FEE FOR THE SERVICES THAT
+ARE THE SUBJECT OF THE CLAIM AS OF THE TIME OF THE OCCURRENCE OF THE
+EVENTS GIVING RISE TO THE CLAIM.
+
+Exclusions and Limitations
+~~~~~~~~~~~~~~~~~~~~~~~~~~
+Nothing in this agreement is intended to exclude or limit any
+condition, warranty, right or liability which may not be lawfully
+excluded or limited.
+
+No Third Party Beneficiaries
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+You agree that, except as otherwise expressly provided in this Terms
+of Service, there shall be no third party beneficiaries to the Terms
+of Service.
+
+Warranty Disclaimer
+~~~~~~~~~~~~~~~~~~~
+YOU AGREE THAT YOUR USE OF QVD SERVICES SHALL BE AT YOUR SOLE
+RISK. ALL SERVICES PROVIDED BY QVD ARE AVAILABLE AS IS WITHOUT
+WARRANTIES OR GUARANTESS APPLIED.
+
+Indemnity
+~~~~~~~~~
+You agree to defend, indemnify and hold harmless QVD, its
+officers, directors, employees and agents, from and against any and
+all claims, damages, obligations, losses, liabilities, costs or debt,
+and expenses (including but not limited to attorney’s fees) arising
+from: (i) your use of and access to the QVD services; (ii) your
+violation of any term of this Agreement; (iii) your violation of any
+third party right, including without limitation any copyright,
+property, or privacy right; or (iv) any claim that use of our services
+caused damage to a third party. This defense and indemnification
+obligation will survive this Agreement and your use of the QVD
+services.
+
+NOTICE
+~~~~~~
+You agree that QVD may provide you with notices, including those
+regarding changes to the Terms of Service, by email, regular mail, or
+postings on QVD services.
+
+GENERAL INFORMATION
+~~~~~~~~~~~~~~~~~~~
+Entire Agreement. The Terms of Service (including any policies,
+guidelines or amendments that may be presented to your from time to
+time) constitute the entire agreement between you and QVD and
+govern your use of QVD services, superceding any prior
+agreements between you and QVD for the use of QVD
+services. You also may be subject to additional terms and conditions
+that may apply when you use or purchase certain other QVD
+services, affiliate services, third-party content or third-party
+software.
+
+Choice of Law and Forum. The Terms of Service and the relationship
+between you and QVD shall be governed by the laws of Madrid, Spain and
+any disputes concerning this agreement including the issue of its
+valid conclusion and its pre and past contractual effects are
+exclusively decided by the competent court in Madrid, Spain or, at
+QVD's discretion, also by the competent court is whose district you may have
+your residence, your registered seat, an establishment or assets.
+
+Waiver and Severability of Terms. The failure of QVD to exercise
+or enforce any right or provision of the Terms of Service shall not
+constitute a waiver of such right or provision. If any provision of
+the Terms of Service is found by a court of competent jurisdiction to
+be invalid, the parties nevertheless agree that the court should
+endeavor to give effect to the parties’ intentions as reflected in the
+provision, and the other provisions of the Terms of Service remain in
+full force and effect.
+
+Statute of Limitations. You agree that regardless of any statute or
+law to the contrary, any claim or cause of action arising out of or
+related to use of QVD services or the Terms of Service must be
+filed within one (1) year after such claim or cause of action arose or
+be forever barred.
+

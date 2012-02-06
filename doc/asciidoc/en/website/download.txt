@@ -1,0 +1,150 @@
+Download
+========
+Rowan Puttergill <rowan.puttergill@qindel.com>
+$Id: download.txt 11806 2011-08-09 14:44:58Z rputtergill $
+:author initials: RP
+:email: rowan.puttergill@qindel.com
+:doctype: book
+:toc:
+:icons:
+:qvdversion: 3.0.0
+:website: http://theqvd.com/
+ifdef::blogpost[]
+// Use the same article for both a blog post and on the AsciiDoc
+// website.
+:blogpost-status: published
+:blogpost-doctype: article
+:blogpost-posttype: page
+endif::blogpost[]
+
+
+QVD Server Environment
+~~~~~~~~~~~~~~~~~~~~~~
+
+Ubuntu Linux
+^^^^^^^^^^^^
+The QVD Server Environment is designed to be installed on the Ubuntu 10.04 (Lucid Lynx) GNU/Linux operating system. While we are capable of providing the source in tarball format we prefer if you simply make use of the provided packages to install and configure your environment, as this will help to ensure that all of the required dependencies are available as well.
+
+Run the following command to update `/etc/apt/sources.list` on any systems where you intend to install QVD components
+
+----
+sudo apt-add-repository 'deb http://theqvd.com/debian lucid main'
+----
+
+[NOTE]
+===================================================================
+If you are running on Lucid Lynx, and have not already done
+so, you may need to install *python-software-properties* before you
+attempt to use *apt-add-repository*.
+===================================================================
+
+Execute `sudo apt-get update` after adding the QVD repository.
+
+The QVD repository provides the following packages:
+
+* *qvd-demo-single-instance-nosupport*: meta-package to install a demonstration configuration on a single host
+* *qvd-client*: QVD GUI Client software
+* *qvd-l7r*: Layer-7 Router brokering component for the QVD Server
+* *qvd-hkd*: House Keeping Daemon for the QVD Server
+* *qvd-admin*: command line tools for managing users, virtual machines and operating system images
+* *qvd-vma*: agent that runs within virtual machines
+* *qvd-wat*: Web Administration Tool
+* *qvd-db*: central database for the platform
+
+Please refer to the documentation for instruction on how to install and build a QVD solution.
+
+SuSE Linux
+^^^^^^^^^^
+The QVD Server Environment can also be installed on the SuSE Linux
+Enterprise Server 11 (SP1 x86_64).
+
+The packages for the QVD Server Environment are available at
+link:https://build.opensuse.org/project/show?project=home%3Aqvd%3Aqvd-3.0[https://build.opensuse.org/project/show?project=home%3Aqvd%3Aqvd-3.0].
+
+Run the following command to add the repository to your system.
+
+----
+sudo zypper ar-3.0.0 http://download.opensuse.org/repositories/home:/qvd:/qvd-3.0/SLE_11_SP1 QVD
+----
+
+Execute `sudo zypper refresh` after adding the QVD repository. You
+will need to accept the certificate that you are presented with. We
+recommend that you accept the certificate permanently by pressing 'a'
+on your keyboard.
+
+You may be required to provide your installation disk to complete the
+operation.
+
+Please refer to the documentation for instruction on how to install and build a QVD solution.
+
+
+QVD GUI Client
+~~~~~~~~~~~~~~
+
+The QVD GUI Client can be installed on any workstation that will require access to a QVD desktop.  Installation packages are available for Linux and for Windows.
+
+Linux (Ubuntu)
+^^^^^^^^^^^^^^
+On Ubuntu-based Linux operating systems, simply add the QVD repository to your apt sources, and perform an `apt-get install qvd-client`. 
+
+----
+apt-add-repository 'deb http://theqvd.com/debian lucid main'
+apt-get update
+apt-get install qvd-client
+----
+
+The client should appear within your desktop applications menu.
+
+Linux (SuSE)
+^^^^^^^^^^^^
+For SuSE and OpenSuSE users, it is possible to download our client
+package directly from the OpenSuse Build Service, at:
+link:https://build.opensuse.org/package/show?package=qvd-client&project=home%3Aqvd%3Aqvd-3.0[https://build.opensuse.org/package/show?package=qvd-client&project=home%3Aqvd%3Aqvd-3.0]
+
+Windows
+^^^^^^^
+The Windows QVD GUI Client installer is available at the following link:
+
+* link:http://theqvd.com/downloads/windows/qvd-client-3.0.0-2-setup.exe[QVD Windows GUI Client]
+
+The Windows installer should install the client on most modern Microsoft Windows operating systems.
+
+[[images]]
+QVD Demonstration Disk Images
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+If you are trying QVD out for the first time, and don’t want to bother yourself with the hassle·
+of creating your own Disk Image to run within a QVD Virtual Machine, we have provided·
+some simple demonstration images for you to make use of.
+
+You can download one of the following demonstration DI’s from the following links:
+
+*   *link:http://theqvd.com/downloads/demo/demo-ubuntu-gnome.img.gz[QVD Demonstration DI (Ubuntu 10.10 – Gnome Desktop) [740Mb]]*
+
+[NOTE]
+========================================================================================
+This demonstration image is a very basic install of Ubuntu 10.10 (Maverick Meerkat) and·
+includes the Firefox web browser (with Adobe Flash Player installed), the Evolution mail·
+client, and OpenOffice.org.
+========================================================================================
+
+*   *link:http://theqvd.com/downloads/demo/demo-ubuntu-kde.img.gz[QVD Demonstration DI (Ubuntu 10.10 – KDE Desktop) [717Mb]]*
+
+[NOTE]
+============================================================================================
+This demonstration image is a very basic install of Ubuntu 10.10 (Maverick Meerkat) with KDE
+and includes the Konqueror web browser (with Adobe Flash Player installed), Kontact, and·
+LibreOffice.
+============================================================================================
+
+These images are simply intended to demonstrate how QVD is able to serve a virtual desktop to a user.·
+You may modify an image to suit your own requirements, once you have downloaded it, but we do recommend·
+that you create your own DI from scratch if you are building a production level environment, or consider·
+using our Commercial Edition or Cloud Edition and get professional support creating the Disk Images that 
+you require.
+
+Note that the DI files that we have provided are gzipped. If your browser doesn’t automatically handle this·
+for you, you may need to uncompress the file manually yourself once you have finished downloading it:
+
+----
+gunzip qvd-demo-gnome.img.gz
+----

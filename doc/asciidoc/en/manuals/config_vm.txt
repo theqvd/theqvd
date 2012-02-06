@@ -1,0 +1,11 @@
+# vm.hypervisor: used to describe which virtual machine hypervisor should be used (LXC/KVM)
+# vm.lxc.unionfs.type: if using LXC, this setting will describe which COW filesystem to use
+# vm.overlay.persistent: whether to keep overlay images from one session to the next
+# vm.kvm.virtio: if using KVM, whether to make use of virtio capabilities
+# vm.vnc.redirect: whether to provide KVM VNC availability
+# vm.vnc.opts: options for KVM VNC support
+# vm.serial.redirect: whether to provide KVM serial port facility
+# vm.serial.capture: whether to capture serial port traffic to file (KVM and LXC)
+# vm.network.bridge: the network bridge interface that all VMs will be attached to
+# vm.network.device.prefix: used to set LXC's lxc.network.veth.pair parameter
+# vm.network.ip.start: the starting IP of the range of network addresses used by VMs

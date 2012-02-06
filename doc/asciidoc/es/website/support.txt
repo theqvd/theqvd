@@ -1,0 +1,123 @@
+Soporte
+=======
+Rowan Puttergill <rowan.puttergill@qindel.com>
+$Id: support.txt 11806 2011-08-09 14:44:58Z rputtergill $
+:author initials: RP
+:email: rowan.puttergill@qindel.com
+:doctype: book
+:toc:
+:icons:
+:qvdversion: 3.0.0
+:website: http://theqvd.com/
+ifdef::blogpost[]
+// Use the same article for both a blog post and on the AsciiDoc
+// website.
+:blogpost-status: published
+:blogpost-doctype: article
+:blogpost-posttype: page
+endif::blogpost[]
+
+El Soporte de QVD está dirigido en gran parte a los clientes con licencias. Aunque atendemos sin problemas los envíos de error y las peticiones de mejoras de cualquier miembro de la Comunidad, los clientes de QVD Commercial Edition y de QVD Cloud Edition pueden esperar un soporte de alta calidad de nivel comercial provisto directamente por el equipo de QVD y respaldado por Qindel.
+
+Soporte Telefónico
+~~~~~~~~~~~~~~~~~~
+En la actualidad tenemos una linea de soporte telefónico de 24x7 facilitada por Qindel Group, que tiene base Madrid, España. Los titulares de licencias puede llamar a este número en cualquier momento para abrir un ticket de soporte:
+
+IMPORTANTE: [,,2]#+34 63 7825 553#
+
+Si llamas a este número, por favor ten tú numero de licencia a mano antes de llamar. Por favor, ten en cuenta que el asesor que te conteste dará de alta tu ticket en la base de datos de Soporte de QVD, pero podría no poder resolver tu problema directamente. Nos pondremos en contacto contigo poco después por un asesor técnico de soporte cualificado.
+
+Soporte por Email
+~~~~~~~~~~~~~~~~~
+También puedes enviar un correo a nuestro servicio de soporte:
+
+IMPORTANTE: [,,2]#link:mailto://support@theqvd.com[support@theqvd.com]#
+
+Para poder procesar tu correo adecuadamente, tu número de licencia debería aparecer al principio de la linea de Asunto en tu email.
+Por favor adjunta un breve resumen del problema, y detalles de contacto para que nuestros ingenieros de soporte técnico sean capaces de ponerse en contacto contigo.
+
+Soporte Web
+~~~~~~~~~~~
+Todos nuestros tickets de soporte son introducidos en nuestro programa Request Tracker y los tickets son monitorizados y gestionados por los Ingenieros de Soporte de QVD. Si quieres enviar un ticket directamente a nuestro sistema por ti mismo, puedes visitar nuestro portal online al cliente en:
+
+IMPORTANTE:[,,2]#link:https://support.theqvd.com/[https://support.theqvd.com/]#
+
+Tendrás que loguearte con el usuario y el password que te dimos cuando compraste tus licencias. 
+
+Proceso de Soporte
+~~~~~~~~~~~~~~~~~~
+QVD está comprometido a resolver los problemas del cliente eficientemente. Independientemente del mecanismo que utilices para informar de un ticket, el procedimiento básico que se sigue es el siguiente:
+
+* Tu ticket se crea dentro de nuestro sistema de soporte y es accesible a todos nuestros representantes del Soporte Técnico.
+* El equipo de Soporte Técnico evalúa tu ticket y comprueba el nivel de severidad para poder asignarle una prioridad.
+* Un representante del Soporte técnico se pondrá en contacto contigo para proporcionarte un soporte inicial de búsqueda de errores y para completar detalles técnicos que podrían ser útiles más tarde a los ingenieros para resolver tu problema.
+* El ticket se escala al departamento de ingenieros, y se asigna el ticket a un ingeniero dedicado. El ingeniero se pondrá en contacto contigo directamente para proporcionarte un tiempo estimado de resolución y empezar a trabajar en el ticket.
+
+Categorización de los Tickets de Soporte
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+Los tickets de Soporte de QVD son categorizados de acuerdo a su severidad. Esto te ayudará a determinar tiempos de respuesta y permitirá al equipo de QVD priorizar el flujo de trabajo eficientemente. Cuando envíes un ticket, tienes que indicar el nivel de severidad que crees que se aplica a tu caso. Ten en cuenta que si indicas un nivel de severidad inapropiado, la prioridad será reasignada por nuestros ingenieros y esto podría retrasar un poco el proceso.
+
+Se han definido los siguientes niveles de severidad:
+
+[cols="1,4",frame="topbot",options="header",width="60%"]
+|========================================================
+|Nivel de Severidad |Descripción
+|P1             |*Error Critico*
+
+                 Errores en el código de QVD que están causando un fallo
+                 total de rendimiento dentro de la solucion en su conjunto,
+                 o un fallo que probablemente conlleve una pérdida de datos. 
+                 Los Tickets enviados con este nivel de severidad asumen que
+                 la situación no permite llevar acabo las operaciones del negocio
+                 de una manera normal y no existe ningún procedimiento 
+                 para solucionar el problema
+                 
+                 Para que el equipo de soporte sea capaz de
+                 buscar el problema y resolver asuntos con este nivel de 
+                 severidad, necesitarás recursos dedicados para
+                 trabajar junto con el equipo de soporte para resolver el problema
+                 durante horas de oficina.
+|P2             |*Error Serio*
+                 
+                 Los programas son funciones, pero está comportándose de una manera
+                 que tiene un impacto serio en las operaciones normales del negocio.
+                 Normalmente en estos casos, se puede implementar una solución
+                 provisional para poder seguir dando servicio a los escritorios,
+                 pero se necesita que se arregle de manera definitiva.
+|P3             |*Pequeños Errores de Funcionalidad*
+                 
+                 Un problema dentro del programa que no afecta de manera
+                 seria a las operaciones del negocio, pero que tiene relación con
+                 un funcionamiento incorrecto de algún componente particular.
+                 behavior. Normalmente a los tickets en esta categoría se pueden
+                 arreglar con una solución provisional y no afectan al usuario final
+                 de usar el servicio. Los Tickets para sistemas
+                 que se usan dentro de un entorno en producción
+                 se les asigna una prioridad más alta.
+|P4             |*Error General de Usabilidad*
+                 
+                 Los tickets en esta categoría tienen relación con asuntos con la
+                 usabilidad en general del programa, o reportes de
+                 errores en la documentación. Normalmente hay un impacto muy
+                 bajo o no hay impacto en las operaciones del negocio
+                 como consecuencia del problema.
+|P5             |*personalizaciones y peticiones a medida*
+                
+                 Peticiones a medida con respecto al rendimiento o
+                 la personalización del producto para un cliente particular.
+|========================================================
+
+
+Tiempos de respuesta
+~~~~~~~~~~~~~~~~~~~~
+Los tiempos de respuesta se determinan en base al nivel de severidad.
+
+[frame="topbot",options="header",width="50%"]
+|===================================================================
+|Nivel de Severidad|Tiempo Inicial de Respuesta|Asignación al caso 
+|P1                |1 hora                     |4 horas
+|P2                |4 horas                    |8 horas
+|P3                |Siguiente día laborable    |2-3 días
+|P4                |2 días laborables          |Dentro de una semana
+|P5                |Siguiente día laborable    |N/A
+|===================================================================
