@@ -25,9 +25,10 @@ use QVD::StateMachine::Declarative
     stopped  => { enter => '_on_stopped'                            };
 
 
-# FIXME: on error wait some time before respawning the new dhcpd
-# process
-sub _on_run_dhcpd_error { shift->_on_run_dhcpd_done }
+sub _on_run_dhcpd_error {
+    my $self = shift;
+    $self->_call_after ($self->_cfg('internal.hkd.dhcpdhandler.wait_on_run_error'), '_on_run_dhcpd_done');
+}
 
 sub _on_run_dhcpd_done :OnState('running') {
     my $self = shift;

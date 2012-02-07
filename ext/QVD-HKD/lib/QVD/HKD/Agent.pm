@@ -227,7 +227,11 @@ sub _kill_cmd {
     my ($self, $signal, $pid) = @_;
     unless (defined $pid) {
         ($pid) = my(@pids) = keys %{$self->{cmd_watcher}};
-        @pids != 1 and die("internal error: none or more than one slave command is running, pids: @pids");
+        @pids > 1 and die("internal error: more than one slave command is running, pids: @pids");
+        if (!@pids) {
+            warn("no slave command is running");
+            return 1;
+        }
     }
     $signal //= 'TERM';
     $debug and $self->_debug("killing $pid with signal $signal");
