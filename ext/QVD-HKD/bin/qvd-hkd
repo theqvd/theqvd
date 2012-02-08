@@ -18,9 +18,9 @@ use strict;
 use warnings;
 use Getopt::Long;
 use Config::Properties;
+use QVD::Log;   ## this needs to go before App::Daemon, so we get to initialize l4p
 use QVD::Config::Defaults;
 use App::Daemon qw/daemonize/;
-use Log::Log4perl qw(:levels);
 
 
 # For simplicity replicate here the configuration handling code as
@@ -34,20 +34,18 @@ sub core_cfg {
     $value;
 }
 
+# FIXME: just for debugging!
+$SIG{'INT'} = sub { die };
+
 my $config_file = '/etc/qvd/node.conf';
+my $foreground = 0;
+GetOptions("config-file|f=s" => \$config_file,
+           "X"               => \$foreground);
+
 $cfg = Config::Properties->new(defaults => $QVD::Config::defaults);
 open my $fh, '<', $config_file or die "unable to open configuration file $config_file\n";
 $cfg->load($fh);
 close $fh;
-
-# FIXME: just for debugging!
-$SIG{'INT'} = sub { die };
-
-my $foreground = 0;
-my $log_file = core_cfg('log.filename');
-GetOptions("config-file|f=s" => \$config_file,
-           "X"               => \$foreground,
-           "l"               => \$log_file);
 
 my $path_run = core_cfg('path.run');
 mkdir $path_run, 0755;
@@ -57,14 +55,14 @@ unless (-d $path_run) {
     exit (1);
 }
 
-$App::Daemon::pidfile    = core_cfg('hkd.pid_file');
-$App::Daemon::as_user    = core_cfg('hkd.as_user');
+$App::Daemon::pidfile = core_cfg('hkd.pid_file');
+$App::Daemon::as_user = core_cfg('hkd.as_user');
 $App::Daemon::background = 0 if $foreground;
-$App::Daemon::logfile    = $log_file;
-$App::Daemon::loglevel   = $DEBUG;
+
+## require the module before daemonizing—otherwise syntax errors end up nowhere since STDERR is closed
+require QVD::HKD;
 daemonize;
 
-require QVD::HKD;
 my $hkd = QVD::HKD->new(config_file => $config_file);
 $hkd->run;
 
