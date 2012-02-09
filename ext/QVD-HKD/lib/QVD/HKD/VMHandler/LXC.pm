@@ -336,8 +336,13 @@ sub _calculate_attrs {
         $self->{home_fs_mnt} = "$self->{os_rootfs}/home";
     }
 
+    my $iface = $self->{iface} =
+        $self->_cfg('internal.vm.network.device.prefix') . $self->{vm_id};
+    # $self->_cfg('internal.vm.network.device.prefix') . $self->{vm_id} . 'r' . int(rand 10000);
+    DEBUG "network interface: $iface";
+
     if ($debug) {
-        for (qw(di_path os_basefs os_overlayfs os_overlayfs_old os_rootfs_parent os_rootfs home_fs home_fs_mnt)) {
+        for (qw(di_path os_basefs os_overlayfs os_overlayfs_old os_rootfs_parent os_rootfs home_fs home_fs_mnt iface)) {
             my $path = $self->{$_} // '<undef>';
             $self->_debug("path $_: $path");
         }
@@ -543,9 +548,7 @@ sub _create_lxc {
         $console = '/dev/null';
     }
 
-    my $iface = $self->{iface} =
-        $self->_cfg('internal.vm.network.device.prefix') . $self->{vm_id} . 'r' . int(rand 10000);
-    DEBUG "network interface: $iface";
+    my $iface = $self->{iface};
 
     # FIXME: make this template-able or configurable in some way
     print $fh <<EOC;
@@ -633,6 +636,8 @@ sub _destroy_lxc {
 }
 
 sub _unlink_iface {
+    my $self = shift;
+    # FIXME: check that the interface has been really removed or return error
     $self->_run_cmd(['ip', 'link', 'del', $self->{iface}],
                     ignore_errors => 1);
 }
