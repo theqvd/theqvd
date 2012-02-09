@@ -69,8 +69,12 @@ use QVD::StateMachine::Declarative
                                                             _on_detect_os_image_type_error => 'stopping/clearing_runtime_row'   } },
 
     'starting/killing_old_lxc'        => { enter       => '_kill_lxc',
-                                           transitions => { _on_kill_lxc_done            => 'starting/destroying_old_lxc',
+                                           transitions => { _on_kill_lxc_done            => 'starting/unlinking_iface',
                                                             _on_kill_lxc_error           => 'zombie/beating_to_death'          } },
+
+    'starting/unlinking_iface'        => { enter       => '_unlink_iface',
+                                           transitions => { _on_unlink_iface_done        => 'starting/destroying_old_lxc',
+                                                            _on_unlink_iface_error       => 'zombie/beating_to_death'          } },
 
     'starting/destroying_old_lxc'     => { enter       => '_destroy_lxc',
                                            transitions => { _on_destroy_lxc_done         => 'starting/allocating_os_overlayfs' } },
@@ -109,7 +113,7 @@ use QVD::StateMachine::Declarative
 
     'starting/launching'              => { enter       => '_start_lxc',
                                            transitions => { _on_start_lxc_done           => 'starting/waiting_for_vma',
-                                                            _on_start_lxc_error          => 'stopping/removing_fw_rules'      } },
+                                                            _on_start_lxc_error          => 'stopping/killing_lxc'            } },
 
     'starting/waiting_for_vma'        => { enter       => '_start_vma_monitor',
                                            leave       => '_stop_vma_monitor',
@@ -117,13 +121,12 @@ use QVD::StateMachine::Declarative
                                                             _on_dead                     => 'stopping/stopping_lxc',
                                                             _on_goto_debug               => 'debugging/saving_state',
                                                             _on_stop_cmd                 => 'stopping/deleting_cmd',
-                                                            on_hkd_stop                 => 'stopping/saving_state',
-                                                            _on_lxc_done                 => 'stopping/destroying_lxc' } },
+                                                            on_hkd_stop                  => 'stopping/saving_state',
+                                                            _on_lxc_done                 => 'stopping/killing_lxc'            } },
 
     'running/saving_state'            => { enter       => '_save_state',
                                            transitions => { _on_save_state_done          => 'running/updating_stats',
-                                                            # _on_save_state_done          => 'running/monitoring',
-                                                            _on_save_state_bad_result    => 'stopping/saving_state' },
+                                                            _on_save_state_bad_result    => 'stopping/saving_state'           },
                                            delay       => [qw(_on_lxc_done)]                                                    },
 
     'running/updating_stats'          => { enter       => '_incr_run_ok',
@@ -138,7 +141,7 @@ use QVD::StateMachine::Declarative
                                            delay       => [qw(_on_lxc_done)]                                                    },
 
     'running/unsetting_heavy_mark'    => { enter       => '_unset_heavy_mark',
-                                           transitions => { _on_unset_heavy_mark_done      => 'running/monitoring'             } },
+                                           transitions => { _on_unset_heavy_mark_done    => 'running/monitoring'              } },
 
     'running/monitoring'              => { enter       => '_start_vma_monitor',
                                            leave       => '_stop_vma_monitor',
@@ -150,8 +153,8 @@ use QVD::StateMachine::Declarative
 
     'debugging/saving_state'          => { enter       => '_save_state',
                                            transitions => { _on_save_state_done          => 'debugging/unsetting_heavy_mark',
-                                                            _on_save_state_bad_result    => 'stopping/saving_state'          },
-                                           delay       => [qw(_on_lxc_done)]                                                   },
+                                                            _on_save_state_bad_result    => 'stopping/saving_state'           },
+                                           delay       => [qw(_on_lxc_done)]                                                    },
 
     'debugging/unsetting_heavy_mark'  => { enter       => '_unset_heavy_mark',
                                            transitions => { _on_unset_heavy_mark_done    => 'debugging/waiting_for_vma'      } },
@@ -181,7 +184,7 @@ use QVD::StateMachine::Declarative
     'stopping/powering_off'           => { enter       => '_poweroff',
                                            leave       => '_abort_all',
                                            transitions => { _on_rpc_poweroff_error       => 'stopping/stopping_lxc',
-                                                            _on_lxc_done                 => 'stopping/destroying_lxc',
+                                                            _on_lxc_done                 => 'stopping/killing_lxc',
                                                             _on_rpc_poweroff_result      => 'stopping/waiting_for_lxc_to_exit'} },
 
     'stopping/waiting_for_lxc_to_exit'=> { enter       => '_set_state_timer',
@@ -198,9 +201,13 @@ use QVD::StateMachine::Declarative
                                                             _on_state_timeout            => 'stopping/killing_lxc'            } },
 
     'stopping/killing_lxc'            => { enter       => '_kill_lxc',
-                                           transitions => { _on_kill_lxc_done            => 'stopping/removing_fw_rules',
+                                           transitions => { _on_kill_lxc_done            => 'stopping/unlinking_iface',
                                                             _on_kill_lxc_error           => 'zombie/beating_to_death'         },
                                            ignore      => ['_on_lxc_done']                                                      },
+
+    'stopping/unlinking_iface'        => { enter       => '_unlink_iface',
+                                           transitions => { _on_unlink_iface_done        => 'stopping/removing_fw_rules',
+                                                            _on_unlink_iface_error       => 'zombie/beating_to_death'         } },
 
     'stopping/removing_fw_rules'      => { enter       => '_remove_fw_rules',
                                            transitions => { _on_remove_fw_rules_done     => 'stopping/running_poststop_hook',
@@ -239,8 +246,12 @@ use QVD::StateMachine::Declarative
                                            transitions => { _on_wait_for_zombie_lxc_done => 'zombie/killing_lxc'             } },
 
     'zombie/killing_lxc'              => { enter       => '_kill_lxc',
-                                           transitions => { _on_kill_lxc_done            => 'zombie/destroying_lxc',
+                                           transitions => { _on_kill_lxc_done            => 'zombie/unlinking_iface',
                                                             _on_kill_lxc_error           => 'zombie/unsetting_heavy_mark'    } },
+
+    'zombie/unlinking_iface'          => { enter       => '_unlink_iface',
+                                           transitions => { _on_unlink_iface_done        => 'zombie/removing_fw_rules',
+                                                            _on_unlink_iface_error       => 'zombie/beating_to_death'         } },
 
     'zombie/removing_fw_rules'        => { enter       => '_remove_fw_rules',
                                            transitions => { _on_remove_fw_rules_done     => 'zombie/destroying_lxc',
@@ -619,6 +630,9 @@ sub _destroy_lxc {
     my $self = shift;
     $self->_run_cmd([$self->_cfg('command.lxc-destroy'), -n => $self->{lxc_name}],
                     ignore_errors => 1);
+}
+
+sub _unlink_iface {
     $self->_run_cmd(['ip', 'link', 'del', $self->{iface}],
                     ignore_errors => 1);
 }
