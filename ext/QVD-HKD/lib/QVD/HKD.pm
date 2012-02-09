@@ -7,7 +7,7 @@ use 5.010;
 our $debug = 1;
 
 $Class::StateMachine::debug ||= -1;
-$AnyEvent::Pg::debug ||= 2;
+$AnyEvent::Pg::debug ||= 6;
 
 use strict;
 use warnings;
@@ -21,6 +21,8 @@ use QVD::Log;
 use AnyEvent;
 use AnyEvent::Pg;
 
+use Time::HiRes ();
+
 use QVD::HKD::Helpers;
 
 use QVD::HKD::Config;
@@ -32,7 +34,6 @@ use QVD::HKD::VMCommandHandler;
 use QVD::HKD::VMHandler;
 
 use QVD::HKD::Config::Network qw(netvms netnodes);
-
 
 use parent qw(QVD::HKD::Agent);
 
@@ -393,6 +394,7 @@ sub _on_vm_cmd {
         return;
     }
     $vm->on_cmd($cmd);
+    $debug and $self->_debug_heavy_stats;
 }
 
 sub _on_vm_stopped {
@@ -406,6 +408,15 @@ sub _on_vm_stopped {
     $self->_on_stop_all_vms_done if $all_done;
 }
 
+sub _debug_heavy_stats {
+    my $self = shift;
+    my $ts = Time::HiRes::time();
+    my $running = keys %{$self->{vm}};
+    my $heavy = keys %{$self->{heavy}};
+    my $delayed = keys %{$self->{delayed}};
+    $self->_debug("VMs in this host: $running, heavy: $heavy, delayed: $delayed, time: $ts");
+}
+
 sub _on_vm_heavy {
     my ($self, $vm_id, undef, $set) = @_;
     $debug and $self->_debug("_on_vm_heavy($vm_id, $set) called");
@@ -417,17 +428,20 @@ sub _on_vm_heavy {
         if (keys %{$self->{heavy}} <= $self->_cfg('internal.hkd.max_heavy')) {
             $debug and $self->_debug("VM $vm_id marked as heavy");
             $self->{heavy}{$vm_id} = 1;
+            $debug and $self->_debug_heavy_stats;
             return 1;
         }
         else {
             $debug and $self->_debug("Can't mark VM $vm_id as heavy, there are already too many");
             $self->{delayed}{$vm_id} = 1;
+            $debug and $self->_debug_heavy_stats;
             return;
         }
     }
     else {
         $debug and $self->_debug("Removing heavy mark for VM $vm_id");
         delete $self->{heavy}{$vm_id};
+        $debug and $self->_debug_heavy_stats;
         $self->_run_delayed;
     }
 }
