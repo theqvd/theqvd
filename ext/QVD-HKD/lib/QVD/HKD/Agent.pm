@@ -12,6 +12,8 @@ use QVD::HKD::Helpers;
 use Pg::PQ qw(:pgres);
 use QVD::Log;
 use JSON;
+use Time::HiRes ();
+
 use parent qw(Class::StateMachine);
 
 our $debug = 1;
@@ -69,7 +71,8 @@ sub _debug {
     my $state = $self->state;
     my $method = (caller 1)[3];
     $method =~ s/.*:://;
-    warn "[$self state: $state]\@$method> @_\n";
+    my $ts = sprintf "%08.3f", (Time::HiRes::time() - $^T);
+    warn "$ts> [$self state: $state]\@$method> @_\n";
 }
 
 my @query_callbacks = qw(result error done bad_result);
