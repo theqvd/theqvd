@@ -9,6 +9,7 @@ use 5.010;
 
 use Linux::Proc::Mountinfo;
 
+use QVD::Log;
 use parent qw(QVD::HKD::VMHandler);
 
 use QVD::StateMachine::Declarative
@@ -43,6 +44,7 @@ sub new {
 sub _stop_lxc {
     my $self = shift;
     $debug and $self->_debug("stopping container $self->{lxc_name}");
+    DEBUG "stopping container $self->{lxc_name}";
     system $self->_cfg('command.lxc-stop'), -n => $self->{lxc_name};
     $debug and $self->_debug("waiting for $self->{lxc_name} to reach state STOPPED");
     $self->_run_cmd([$self->_cfg('command.lxc-wait'), -n => $self->{lxc_name}, 'STOPPED'],
@@ -62,6 +64,7 @@ sub _kill_lxc_processes {
         if ($self->{killing_count}++ > $self->_cfg('internal.hkd.lxc.killer.kill_process.retries'))
         chomp @pids;
         $debug and $self->_debug("killing zombie processes and then trying again, pids: @pids");
+        DEBUG "killing zombie processes: PIDs @pids";
         kill KILL => @pids;
         $self->_call_after(2 => '_kill_lxc_processes');
     }
@@ -100,6 +103,7 @@ sub _umount_filesystems {
         }
         else {
             $debug and $self->_debug("Some filesystems could not be umounted: @mnts");
+            WARN "Some filesystems could not be umounted: @mnts";
         }
     }
     else {

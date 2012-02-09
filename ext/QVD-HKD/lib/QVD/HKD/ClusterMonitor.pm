@@ -3,6 +3,7 @@ package QVD::HKD::ClusterMonitor;
 use strict;
 use warnings;
 use Carp;
+use QVD::Log;
 use DateTime;
 use AnyEvent;
 use Pg::PQ qw(:pgres);
@@ -44,12 +45,14 @@ sub new {
 
 sub _check {
     my $self = shift;
+    DEBUG 'checking other nodes';
     $self->_query(q(select host_id, extract('epoch' from (now() - ok_ts)) as ok_ts from host_runtimes where state='running' and host_id!=$1 and not blocked),
                   $self->{node_id});
 }
 
 sub _on_check_error {
     my $self = shift;
+    WARN 'error on checking other nodes';
     $self->_maybe_callback('on_error');
     $self->_on_check_done;
 }
@@ -72,6 +75,7 @@ sub _on_check_result {
         $self->_maybe_callback('on_error')
     }
     if ($self->{'_down_hosts'}) {
+        INFO sprintf 'found %s down hosts: %s', scalar @{ $self->{'_down_hosts'} }, join ', ', @{ $self->{'_down_hosts'} };
         $self->_on_kill_hosts;
     }
 }
@@ -87,11 +91,13 @@ sub _kill_hosts {
     my ($self) = @_;
 
     my $plh = join ',', map { "\$$_" } 1 .. @{ $self->{'_down_hosts'} };
+    INFO sprintf 'killing hosts %s', join ', ', @{ $self->{'_down_hosts'} };
     $self->_query ("update host_runtimes set state = 'lost', blocked = true where host_id in ($plh)", @{ $self->{'_down_hosts'} });
 }
 
 sub _on_kill_hosts_error {
     my $self = shift;
+    warn 'error on killing hosts';
     $self->_maybe_callback('on_error');
     $self->_on_check_done;
 }
@@ -100,7 +106,6 @@ sub _on_kill_hosts_result {
     my ($self, $res) = @_;
     if ($res->status == PGRES_COMMAND_OK and $res->cmdRows) {
         ## nothing, progress to next state
-        #$self->_stop_vms;
     }
     else {
         $self->_maybe_callback('on_error')
@@ -118,11 +123,13 @@ sub _stop_vms {
     my ($self) = @_;
 
     my $plh = join ',', map { "\$$_" } 1 .. @{ $self->{'_down_hosts'} };
+    INFO sprintf 'stopping VMs on hosts %s', join ', ', @{ $self->{'_down_hosts'} };
     $self->_query ("update vm_runtimes set vm_state = 'stopped', blocked = true where host_id in ($plh)", @{ $self->{'_down_hosts'} });
 }
 
 sub _on_stop_vms_error {
     my $self = shift;
+    ERROR 'error on stopping VMs';
     $self->_maybe_callback('on_error');
     $self->_on_check_done;
 }

@@ -186,6 +186,7 @@ sub _run_cmd {
             for ($on_error, $on_done);
         $self->_debug("running command @$cmd");
     }
+    INFO "running command @$cmd";
     my $pid;
     my $w = AnyEvent::Util::run_cmd($cmd, '$$' => \$pid, %opts);
     $self->{cmd_watcher}{$pid} = $w;
@@ -229,7 +230,7 @@ sub _kill_cmd {
         ($pid) = my(@pids) = keys %{$self->{cmd_watcher}};
         @pids > 1 and die("internal error: more than one slave command is running, pids: @pids");
         if (!@pids) {
-            warn("no slave command is running");
+            WARN 'no slave command is running';
             return 1;
         }
     }
@@ -238,6 +239,7 @@ sub _kill_cmd {
     my $ok = kill $signal => $pid;
     unless ($ok) {
         $debug and $self->_debug("unable to kill process $pid with signal $signal");
+        WARN "unable to kill process $pid with signal $signal";
     }
     $ok;
 }

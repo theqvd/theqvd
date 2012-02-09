@@ -17,6 +17,7 @@ use Carp;
 use Fcntl qw(LOCK_EX LOCK_NB);
 use File::Slurp qw(slurp);
 use Pg::PQ qw(:pgres);
+use QVD::Log;
 use AnyEvent;
 use AnyEvent::Pg;
 
@@ -153,7 +154,7 @@ sub _acquire_lock {
 sub _say_goodbye {
     my $self = shift;
     $self->{exit}->send;
-    print "GOODBYE!\n";
+    DEBUG "GOODBYE!\n";
 }
 
 sub run {
@@ -194,6 +195,7 @@ sub run {
 
 sub _start_db {
     my $self = shift;
+    INFO 'connecting to database';
     my $db = AnyEvent::Pg->new( {host     => $self->_cfg('database.host'),
                                  dbname   => $self->_cfg('database.name'),
                                  user     => $self->_cfg('database.user'),
@@ -377,6 +379,7 @@ sub _on_vm_cmd {
     my $vm = $self->{vm}{$vm_id};
 
     $debug and $self->_debug("command $cmd received for vm $vm_id");
+    DEBUG "command $cmd received for vm $vm_id";
 
     if ($cmd eq 'start') {
         if (defined $vm) {
@@ -417,7 +420,7 @@ sub _on_vm_heavy {
             return 1;
         }
         else {
-            $debug and $self->_debug("Can mark VM $vm_id as heavy, there are already too many");
+            $debug and $self->_debug("Can't mark VM $vm_id as heavy, there are already too many");
             $self->{delayed}{$vm_id} = 1;
             return;
         }

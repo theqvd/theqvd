@@ -5,6 +5,7 @@ use 5.010;
 use strict;
 use warnings;
 use Carp;
+use QVD::Log;
 use AnyEvent;
 use Pg::PQ qw(:pgres);
 
@@ -39,9 +40,11 @@ sub _on_load_cmd_result {
         if ($res->rows > 0) {
             $self->{cmd} = $res->row(0)//'';
             $debug and $self->_debug("host command '$self->{cmd}' loaded from database");
+            DEBUG "host command '$self->{cmd}' loaded from database" if length $self->{cmd};
         }
         else {
             $debug and $self->_debug("no host commands found in database");
+            DEBUG "no host commands found in database";
         }
     }
     else {

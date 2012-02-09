@@ -4,6 +4,7 @@ use strict;
 use warnings;
 use Carp;
 use AnyEvent;
+use QVD::Log;
 use Pg::PQ qw(:pgres);
 
 use QVD::HKD::Helpers;
@@ -35,12 +36,14 @@ sub new {
 
 sub _tick {
     my $self = shift;
+    DEBUG 'ticking';
     $self->_query(q(update host_runtimes set ok_ts=now(), pid=$1 where host_id=$2),
                   $$, $self->{node_id});
 }
 
 sub _on_tick_error {
     my $self = shift;
+    WARN 'error on ticking';
     $self->_maybe_callback('on_error');
     $self->_on_tick_done;
 }

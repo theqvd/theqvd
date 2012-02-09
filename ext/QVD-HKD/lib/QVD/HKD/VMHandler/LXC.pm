@@ -435,6 +435,7 @@ sub _allocate_os_rootfs {
     }
 
     my $unionfs_type = $self->_cfg('vm.lxc.unionfs.type');
+    DEBUG "unionfs type: $unionfs_type";
 
     given ($unionfs_type) {
         when('aufs') {
@@ -511,6 +512,7 @@ sub _create_lxc {
 
     my ($fh, $fn) = tempfile(UNLINK => 0);
     $debug and $self->_debug("saving lxc configuration to $fn");
+    DEBUG "saving lxc configuration to $fn";
     my $bridge = $self->_cfg('vm.network.bridge');
     my $console;
     if ($self->_cfg('vm.serial.capture')) {
@@ -532,6 +534,7 @@ sub _create_lxc {
 
     my $iface = $self->{iface} =
         $self->_cfg('internal.vm.network.device.prefix') . $self->{vm_id} . 'r' . int(rand 10000);
+    DEBUG "network interface: $iface";
 
     # FIXME: make this template-able or configurable in some way
     print $fh <<EOC;
@@ -599,6 +602,7 @@ sub _kill_lxc {
         $debug and $self->_debug("killing zombie processes and then trying again, pids: @pids");
         if ($self->{killer_count}++ > $self->_cfg('internal.hkd.lxc.killer.retries')) {
             $debug and $self->_debug("too many retries, no more killing, peace!");
+            WARN "too many retries when killing cointainer processes: @pids";
             $self->_abort_cmd($lxc_pid);
             return $self->_on_kill_lxc_error;
         }
@@ -684,11 +688,13 @@ sub _run_hook {
                                                        lxc_name ));
 
             $debug and $self->_debug("running hook $hook for $name");
+            DEBUG "running hook $hook for $name";
             return $self->_run_cmd([$hook => @args],
                                    save_old_watcher => 1);
         }
     }
-    $debug and $self->_debug("no hook for $name");
+    $debug and $self->_debug("no hooks for $name");
+    DEBUG "no hooks for $name";
     $self->_on_run_hook_done;
 }
 

@@ -3,6 +3,7 @@ package QVD::HKD::VMCommandHandler;
 use strict;
 use warnings;
 use Carp;
+use QVD::Log;
 use AnyEvent;
 use Pg::PQ qw(:pgres);
 
@@ -66,7 +67,8 @@ sub _on_load_cmd_result {
     my ($self, $res) = @_;
     if ($res->rows) {
         @{$self}{qw(vm_id vm_cmd)} = $res->row;
-        $debug and $self->_debug("command loaded, vm_id: $self->{vm_id}, vm_cmd: $self->{vm_cmd}");
+        $debug and $self->_debug("VM command loaded, vm_id: $self->{vm_id}, vm_cmd: $self->{vm_cmd}");
+        DEBUG "VM command loaded, vm_id: $self->{vm_id}, vm_cmd: $self->{vm_cmd}";
     }
 }
 
