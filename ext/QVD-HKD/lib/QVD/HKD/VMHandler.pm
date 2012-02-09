@@ -229,7 +229,7 @@ sub _remove_fw_rules {
             system $ebtables => -X => $target and
                 $debug and $self->_debug("unable to delete chain $target, rc: " . ($? << 8));
 
-            unless ("$ebtables -L $target >/dev/null 2>&1") {
+            unless (system "$ebtables -L $target >/dev/null 2>&1") {
                 $debug and $self->_debug("deletion of chain $target failed");
                 $self->_on_remove_fw_rules_error;
             }
