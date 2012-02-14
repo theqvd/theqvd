@@ -71,14 +71,17 @@ use QVD::StateMachine::Declarative
                                           transitions => { _on_checked                => 'starting/agents',
                                                            _on_checker_error          => 'failed'                       } },
 
-    'starting/agents'                => { enter       => '_start_agents',
-                                          transitions => { _on_agents_started         => 'starting/catching_zombies'    } },
-
     'starting/catching_zombies'      => { enter       => '_catch_zombies',
-                                          transitions => { _on_catch_zombies_done     => 'running/saving_state'         } },
+                                          transitions => { _on_catch_zombies_done     => 'starting/agents'              } },
+
+    'starting/agents'                => { enter       => '_start_agents',
+                                          transitions => { _on_agents_started         => 'running/saving_state'         } },
 
     'running/saving_state'           => { enter       => '_save_state',
-                                          transitions => { _on_save_state_done        => 'running'                      } },
+                                          transitions => { _on_save_state_done        => 'running/agents'               } },
+
+    'running/agents'                 => { enter       => '_start_vm_command_handler',
+                                          transitions => { _on_start_vm_command_handler_done => 'running'               } },
 
     'running'                        => { transitions => { _on_cmd_stop               => 'stopping'                     } },
 
@@ -158,12 +161,20 @@ sub _say_goodbye {
     DEBUG "GOODBYE!\n";
 }
 
+sub _on_signal {
+    my $self = shift;
+    $debug and $self->_debug("signal $_[0] received, stopping...");
+    $self->_on_cmd_stop;
+}
+
 sub run {
     my $self = shift;
     $self->{exit} = AnyEvent->condvar;
-    # exit cleanly:
-    # $self->{$_. "_watcher"} = AnyEvent->signal(signal => $_, cb => sub { $self->{exit}->send }) for (qw(TERM INT));
-    $self->{$_. "_watcher"} = AnyEvent->signal(signal => $_, cb => sub { $self->_on_cmd_stop }) for (qw(TERM INT));
+    for (qw(TERM INT)) {
+        my $name = $_;
+        $self->{$_. "_watcher"} = AnyEvent->signal(signal => $_,
+                                                   cb => sub { $self->_on_signal($name) });
+    }
     if ($self->_cfg('internal.hkd.debugger.run')) {
         my $socket_path = $self->_cfg('internal.hkd.debugger.socket');
         require AnyEvent::Debug;
@@ -313,10 +324,16 @@ sub _start_agents {
                                                           on_stopped => sub { $self->_on_agent_stopped(@_) } );
 
     $self->{command_handler}->run;
-    $self->{vm_command_handler}->run;
+    # $self->{vm_command_handler}->run;
     $self->{dhcpd_handler}->run;
 
     $self->_on_agents_started;
+}
+
+sub _start_vm_command_handler {
+    my $self = shift;
+    $self->{vm_command_handler}->run;
+    $self->_on_start_vm_command_handler_done;
 }
 
 my @agent_names = qw(vm_command_handler
@@ -387,7 +404,15 @@ sub _on_vm_cmd {
             $debug and $self->_debug("start cmd received for live vm $vm_id");
             return;
         }
-        $vm = $self->_new_vm_handler($vm_id);
+        if ($self->state eq 'running') {
+            $debug and $self->_debug("creating VM handler agent");
+            $vm = $self->_new_vm_handler($vm_id);
+        }
+        else {
+            $debug and $self->_debug("dropping command $cmd for vm $vm_id while on state " . $self->state);
+            ERROR "dropping command $cmd received for $vm_id";
+            return $self->_on_vm_cmd_done($vm_id);
+        }
     }
     unless (defined $vm) {
         $debug and $self->_debug("cmd $cmd received for unknown vm $vm_id");
@@ -405,6 +430,7 @@ sub _on_vm_stopped {
     if (delete $self->{heavy}{$vm_id}) {
         $self->_run_delayed;
     }
+    $debug and $self->_debug_heavy_stats;
     $self->_on_stop_all_vms_done if $all_done;
 }
 
@@ -450,6 +476,7 @@ sub _run_delayed {
     my $self = shift;
     while (keys %{$self->{delayed}} and
            keys %{$self->{heavy}} <= $self->_cfg('internal.hkd.max_heavy')) {
+        $debug and $self->_debug_heavy_stats;
         my $vm_id = each %{$self->{delayed}};
         delete $self->{delayed}{$vm_id};
         $self->_on_vm_cmd($vm_id, 'go_heavy');
