@@ -445,10 +445,8 @@ sub _debug_vm_stats {
     $self->_debug("VMs in this host: $running, heavy: $heavy, delayed: $delayed, time: $ts");
 
     my %state;
-    for my $vm_id (keys %{$self->{vm}}) {
-        my $state = $self->{vm}{$vm_id}->state;
-        $state .= " (delayed)" if $self->{delayed}{$vm_id};
-        $state{$state}++;
+    for my $vm (values %{$self->{vm}}) {
+        $state{$vm->state}++;
     }
     $self->_debug("VM states: " . join ', ', map "$_: $state{$_}", sort keys %state);
 }
