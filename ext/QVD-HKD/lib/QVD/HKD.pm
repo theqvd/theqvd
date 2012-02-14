@@ -68,7 +68,7 @@ use QVD::StateMachine::Declarative
                                                            _on_ticker_error           => 'failed'                       } },
 
     'starting/checking'              => { enter       => '_start_checking',
-                                          transitions => { _on_checked                => 'starting/agents',
+                                          transitions => { _on_checked                => 'starting/catching_zombies',
                                                            _on_checker_error          => 'failed'                       } },
 
     'starting/catching_zombies'      => { enter       => '_catch_zombies',
@@ -390,7 +390,7 @@ sub _new_vm_handler {
                                                             on_stopped => sub { $self->_on_vm_stopped($vm_id) },
                                                             on_delete_cmd => sub { $self->_on_vm_cmd_done($vm_id) },
                                                             on_heavy => sub { $self->_on_vm_heavy($vm_id, @_) } );
-    $debug and $self->_debug_heavy_stats;
+    $debug and $self->_debug_vm_stats;
     $vm;
 }
 
@@ -421,7 +421,7 @@ sub _on_vm_cmd {
         return;
     }
     $vm->on_cmd($cmd);
-    $debug and $self->_debug_heavy_stats;
+    $debug and $self->_debug_vm_stats;
 }
 
 sub _on_vm_stopped {
@@ -432,17 +432,25 @@ sub _on_vm_stopped {
     if (delete $self->{heavy}{$vm_id}) {
         $self->_run_delayed;
     }
-    $debug and $self->_debug_heavy_stats;
+    $debug and $self->_debug_vm_stats;
     $self->_on_stop_all_vms_done if $all_done;
 }
 
-sub _debug_heavy_stats {
+sub _debug_vm_stats {
     my $self = shift;
     my $ts = Time::HiRes::time();
     my $running = keys %{$self->{vm}};
     my $heavy = keys %{$self->{heavy}};
     my $delayed = keys %{$self->{delayed}};
     $self->_debug("VMs in this host: $running, heavy: $heavy, delayed: $delayed, time: $ts");
+
+    my %state;
+    for my $vm_id (keys %{$self->{vm}}) {
+        my $state = $self->{vm}{$vm_id}->state;
+        $state .= " (delayed)" if $self->{delayed}{$vm_id};
+        $state{$state}++;
+    }
+    $self->_debug("VM states: " . join ', ', map "$_: $state{$_}", sort keys %state);
 }
 
 sub _on_vm_heavy {
@@ -456,20 +464,20 @@ sub _on_vm_heavy {
         if (keys %{$self->{heavy}} <= $self->_cfg('internal.hkd.max_heavy')) {
             $debug and $self->_debug("VM $vm_id marked as heavy");
             $self->{heavy}{$vm_id} = 1;
-            $debug and $self->_debug_heavy_stats;
+            $debug and $self->_debug_vm_stats;
             return 1;
         }
         else {
             $debug and $self->_debug("Can't mark VM $vm_id as heavy, there are already too many");
             $self->{delayed}{$vm_id} = 1;
-            $debug and $self->_debug_heavy_stats;
+            $debug and $self->_debug_vm_stats;
             return;
         }
     }
     else {
         $debug and $self->_debug("Removing heavy mark for VM $vm_id");
         delete $self->{heavy}{$vm_id};
-        $debug and $self->_debug_heavy_stats;
+        $debug and $self->_debug_vm_stats;
         $self->_run_delayed;
     }
 }
@@ -478,7 +486,7 @@ sub _run_delayed {
     my $self = shift;
     while (keys %{$self->{delayed}} and
            keys %{$self->{heavy}} <= $self->_cfg('internal.hkd.max_heavy')) {
-        $debug and $self->_debug_heavy_stats;
+        $debug and $self->_debug_vm_stats;
         my $vm_id = each %{$self->{delayed}};
         delete $self->{delayed}{$vm_id};
         $self->_on_vm_cmd($vm_id, 'go_heavy');
