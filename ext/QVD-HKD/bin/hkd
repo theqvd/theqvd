@@ -17,7 +17,7 @@ use QVD::HKD;
 
 use Getopt::Long;
 
-$SIG{'INT'} = sub { die };
+# $SIG{'INT'} = sub { die };
 
 
 
