@@ -382,14 +382,16 @@ sub _on_cmd {
 
 sub _new_vm_handler {
     my ($self, $vm_id) = @_;
-    $self->{vm}{$vm_id} = QVD::HKD::VMHandler->new(config => $self->{config},
-                                                   vm_id =>  $vm_id,
-                                                   node_id => $self->{node_id},
-                                                   db => $self->{db},
-                                                   dhcpd_handler => $self->{dhcpd_handler},
-                                                   on_stopped => sub { $self->_on_vm_stopped($vm_id) },
-                                                   on_delete_cmd => sub { $self->_on_vm_cmd_done($vm_id) },
-                                                   on_heavy => sub { $self->_on_vm_heavy($vm_id, @_) } );
+    my $vm = $self->{vm}{$vm_id} = QVD::HKD::VMHandler->new(config => $self->{config},
+                                                            vm_id =>  $vm_id,
+                                                            node_id => $self->{node_id},
+                                                            db => $self->{db},
+                                                            dhcpd_handler => $self->{dhcpd_handler},
+                                                            on_stopped => sub { $self->_on_vm_stopped($vm_id) },
+                                                            on_delete_cmd => sub { $self->_on_vm_cmd_done($vm_id) },
+                                                            on_heavy => sub { $self->_on_vm_heavy($vm_id, @_) } );
+    $debug and $self->_debug_heavy_stats;
+    $vm;
 }
 
 sub _on_vm_cmd {

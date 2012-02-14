@@ -194,7 +194,9 @@ sub _run_cmd {
     my $w = AnyEvent::Util::run_cmd($cmd, '$$' => \$pid, %opts);
     $self->{cmd_watcher}{$pid} = $w;
     $w->cb( sub {
+                $debug and $self->_debug("slave process $pid terminated");
                 my $rc = shift->recv;
+                $debug and $self->_debug("rc: $rc");
                 delete $self->{cmd_timer}{$pid};
                 delete $self->{cmd_watcher}{$pid};
                 if ($rc) {
