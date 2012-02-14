@@ -344,6 +344,7 @@ my @agent_names = qw(vm_command_handler
 
 sub _check_all_agents_have_stopped {
     my $self = shift;
+    $debug and _$self->_debug("Agents running: ", join ", ", grep defined($self->{$_}), @agent_names);
     $self->_on_all_agents_stopped
         unless grep defined($self->{$_}), @agent_names
 }
