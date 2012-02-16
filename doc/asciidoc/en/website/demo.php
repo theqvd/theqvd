@@ -1,10 +1,33 @@
 <?php
+
+function validate_form($vars, &$error= null){
+ if(empty($vars['last_name'])){
+   $error['last_name']="Last name is required!";
+ }
+ if(empty($vars['mail'])){
+   $error['mail']="Email address is required!";
+ }
+
+ # formatting of fields (e.g. date, mail)
+ 
+ if(!empty($vars['mail']) && ! preg_match("/^[^@]*@[^@]*\.[^@]*$/", $vars['mail']) ){
+   $error['mail']="Email address is badly formatted!";
+ }
+ $phone=preg_replace('/\s+/','',$vars['phone_work']);
+ if(!empty($vars['phone_work']) && ! preg_match("/^\+\d{1,3}[\s.()-]*(\d[\s.()-]*){6,20}(x\d*)?$/",$phone)){
+   $error['phone_work']="Telephone number (".$phone.") is badly formatted! Try something like +34 91 766 23 57";
+ }
+
+ return null;
+}
+
 if(!empty($_POST)){
-if(!empty($_REQUEST['mail'])&&!empty($_REQUEST['last_name'])){
+  validate_form($_POST,$error);
+  if(empty($error)){ 
   //add to the db
   global $wpdb;
   if($wpdb->get_row("SELECT email1 FROM qvd_trial_contacts WHERE email1 = '" . $_REQUEST['mail'] . "'", 'ARRAY_A')) {
-  $error = 'The email address '. $_REQUEST['mail'].' has already been registered!';
+     $error['mail_registered'] = 'The email address '. $_REQUEST['mail'].' has already been registered!';
   }
   else
   {
@@ -14,14 +37,12 @@ if(!empty($_REQUEST['mail'])&&!empty($_REQUEST['last_name'])){
 <p>While you\'re waiting, why not head over to our <a href="/product/download">download page</a> and start downloading the Client application most suited for your platform. Or if you want to know more, you might want to <a href="/support/documentation">read some documentation</a>.</p>
 <p>Remember that if you\'re impressed with what you get in our demo, we can host an environment for you in a similar way. Consider signing up for our Cloud Edition.</p>';
   }
-}
-else {
-$error="Email Address and Last Name are required!."; 
-}
+ }
 }
 if(empty($_POST)||!empty($error)) {
 if(!empty($error)){
-echo "<div style='color: red; border: 1px solid red; padding: 4px;'><strong>Error:</strong>". $error ."</div>";
+$msg=implode('<br/>',$error);
+echo "<div style='color: red; border: 1px solid red; padding: 4px;'><strong>The following errors have been detected:</strong><br/>". $msg ."</div>";
 }
 else {
 ?>
@@ -32,58 +53,78 @@ else {
 <?php } ?>
 <form name="registerform" id="registerform" action="/product/demo" method="post">
         <p>
-                <label>Salutation<br />
+                <label class='niceform'>Salutation</label>
 <SELECT name="salutation" id="salutation" tabindex='2'> 
 <option value="Mr">Mr</option>
 <option value="Mrs">Mrs</option>
 <option value="Ms">Ms</option>
 <option value="Dr">Dr</option>
 <option value="Prof">Prof</option>
-</SELECT></label>
-        </p>
+</SELECT>
+       </p>
         <p>
-                <label>First Name<br />
+                <label class='niceform'>First Name</label>
                 <input type="text" name="first_name" id="first_name" class="input" value="<?php
- echo $_REQUEST['first_name']; ?>" size="20" tabindex="10" /></label>
+ echo $_REQUEST['first_name']; ?>" size="25" tabindex="10" />
+        <br/>
         </p>
-<p>
-                <label>Surname (Required)<br />
+        <p>
+                <label class='niceform'>Surname (Required)</label>
                 <input type="text" name="last_name" id="last_name" class="input" value="<?php
- echo $_REQUEST['last_name']; ?>" size="20" tabindex="15" /></label>
+ echo $_REQUEST['last_name']; ?>" size="25" tabindex="15" />
+        <br/> 
         </p>
         <p>
-                <label>E-mail (Required)<br />
+                <label class='niceform'>E-mail (Required)</label>
                 <input type="text" name="mail" id="mail" class="input" value="<?php
- echo $_REQUEST['mail']; ?>" size="25" tabindex="20" /></label>
+ echo $_REQUEST['mail']; ?>" size="25" tabindex="20" />
+<br/>
         </p>
         <p>
-                <label>Company<br />
+                <label class='niceform'>Company</label>
                 <input type="text" name="account_name" id="account_name" class="input" value="<?php
- echo $_REQUEST['account_name']; ?>" size="25" tabindex="20" /></label>
-        </p>
+ echo $_REQUEST['account_name']; ?>" size="25" tabindex="20" />
+<br/>        
+</p>
         <p>
-                <label>Department<br />
+                <label class='niceform'>Department</label>
                 <input type="text" name="department" id="department" class="input" value="<?php
- echo $_REQUEST['department']; ?>" size="25" tabindex="30" /></label>
-        </p>
+ echo $_REQUEST['department']; ?>" size="25" tabindex="30" />
+<br/>        
+</p>
         <p>
-                <label>Job Title<br />
+                <label class='niceform'>Job Title</label>
                 <input type="text" name="title" id="title" class="input" value="<?php
- echo $_REQUEST['title']; ?>" size="25" tabindex="40" /></label>
-        </p>
+ echo $_REQUEST['title']; ?>" size="25" tabindex="40" />
+<br/>        
+</p>
         <p>
-                <label>Phone Number<br />
+                <label class='niceform'>Phone Number</label>
                 <input type="text" name="phone_work" id="phone_work" class="input" value="<?php
- echo $_REQUEST['phone_work']; ?>" size="25" tabindex="50" /></label>
-        </p>
+ echo $_REQUEST['phone_work']; ?>" size="25" tabindex="50" />
+<br/>        
+</p>
         <p>
-                <label>Website<br />
+                <label class='niceform'>Website</label>
                 <input type="text" name="website" id="website" class="input" value="<?php
- echo $_REQUEST['website']; ?>" size="25" tabindex="60" /></label>
-        </p>
-        <p>By clicking on the Register button below, you agree to the
-        contract set out in our <a
-        href="/product/demo/terms-of-service">Terms of Service</a></p>
+ echo $_REQUEST['website']; ?>" size="25" tabindex="60" />
+<br/>        
+</p>
+<p>
+    <script type="text/javascript"
+       src="http://www.google.com/recaptcha/api/challenge?k=6LcFI8oSAAAAAOCxXMRBUHChw9gHp12yhOkOJZII ">
+    </script>
+    <noscript>
+       <iframe src="http://www.google.com/recaptcha/api/noscript?k=6LcFI8oSAAAAAOCxXMRBUHChw9gHp12yhOkOJZII "
+           height="300" width="500" frameborder="0"></iframe><br>
+       <textarea name="recaptcha_challenge_field" rows="3" cols="40">
+       </textarea>
+       <input type="hidden" name="recaptcha_response_field"
+           value="manual_challenge">
+    </noscript>
+
+</p>
+        <p>By clicking on the Register button below, you agree to the contract set out in our <a href="/product/demo/terms-of-service">Terms of Service</a></p>
         <p id="reg_passmail">When you submit this form, the Demo instructions will be e-mailed to you. It is likely that it will take about 10 minutes for us to provision your desktop. Please be patient.</p>
         <br class="clear" />
         <p class="submit"><input type="submit" name="register" id="register" class="button-primary" value="Register" tabindex="100" /></p>
@@ -91,3 +132,4 @@ else {
 <?php
 }
 ?>
+
