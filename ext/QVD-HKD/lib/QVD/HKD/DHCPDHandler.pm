@@ -50,7 +50,28 @@ sub register_mac_and_ip {
     my ($self, $vm_id, $mac, $ip) = @_;
     $self->{mac}{$vm_id} = $mac;
     $self->{ip}{$vm_id} = $ip;
-    $self->_restart_server;
+    $self->_reload_config;
+    # $self->_restart_server;
+}
+
+sub _make_config {
+    my $self = shift;
+    my $dhcp_hostsfile     = $self->_cfg('internal.vm.network.dhcp-hostsfile');
+    open my $fh, ">", $dhcp_hostsfile or die "unable to open $dhcp_hostsfile: $!";
+    for my $vm (sort { $self->{mac}{$a} cmp $self->{mac}{$b} } keys %{$self->{mac}}) {
+        print $fh "$self->{mac}{$vm},$self->{ip}{$vm}\n";
+    }
+    close $fh;
+}
+
+sub _reload_config {
+    my $self = shift;
+    $self->_make_config;
+    my $ok = $self->_kill_cmd('HUP');
+    unless ($ok) {
+        $debug and $self->_debug("unable to signal dnsmasq");
+        ERROR "Unable to signal dnsmasq process";
+    }
 }
 
 sub _restart_server {
@@ -67,13 +88,7 @@ sub _run_dhcpd {
     my $dhcp_default_route = $self->_cfg('vm.network.gateway');
     my $dhcp_domain        = $self->_cfg('vm.network.domain');
     my $dhcp_hostsfile     = $self->_cfg('internal.vm.network.dhcp-hostsfile');
-
-    open my $fh, ">", $dhcp_hostsfile or die "unable to open $dhcp_hostsfile: $!";
-    for my $vm (sort { $self->{mac}{$a} cmp $self->{mac}{$b} } keys %{$self->{mac}}) {
-        print $fh "$self->{mac}{$vm},$self->{ip}{$vm}\n";
-    }
-    close $fh;
-
+    $self->_make_config;
     my @dhcpd_cmd = ( $dhcpd_cmd,
                       '-k', '--log-dhcp',
                       '--dhcp-range'     => "interface:$network_bridge,$dhcp_start,static",
