@@ -19,7 +19,7 @@ if (!-w $logfile) {
     } else {
         close $fd;
     }
-    warn "Using '/tmp/qvd.log' instead of '$logfile' as a log file\n";
+    warn "Using '/tmp/qvd.log' as log file ('$logfile' gave '$err')\n";
     $logfile = '/tmp/qvd.log';
 }
 
@@ -34,7 +34,7 @@ my %config = ( 'log4perl.appender.LOGFILE'          => 'Log::Dispatch::FileRotat
                                                     => '%d %P %F %L %c - %m%n',
 	       'log4perl.appender.LOGFILE.filename' => $logfile,
 	       'log4perl.rootLogger'                => core_cfg('log.level') . ", LOGFILE",
-	       grep /^log4perl\./, core_cfg_all );
+	       map { $_ => core_cfg $_ } grep /^log4perl\./, core_cfg_all );
 
 use Log::Log4perl qw(:levels :easy);
 Log::Log4perl::init_once(\%config);

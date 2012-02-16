@@ -187,7 +187,7 @@ sub _call_printing_hook {
     local $@;
     eval {
 	my $props = Config::Properties->new;
-	open my $fh, '<', $printing_conf or die "Unable to open printing configuration";
+	open my $fh, '<', $printing_conf or die "Unable to open printing configuration file '$printing_conf': $!";
 	$props->load($fh);
 	close $fh;
 	_call_hook("printing $state", $on_printing{$state}, 1, $props->properties,
