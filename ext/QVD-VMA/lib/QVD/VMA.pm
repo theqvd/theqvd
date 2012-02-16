@@ -349,8 +349,16 @@ my %props2nx = ( 'qvd.client.keyboard'   => 'keyboard',
 		 'qvd.client.geometry'   => 'geometry',
 		 'qvd.client.fullscreen' => 'fullscreen' );
 
+sub _fill_props {
+    my (%props) = @_;
+		    my $user = $props{'qvd.vm.user.name'}   //= $default_user_name;
+		    $props{'qvd.vm.user.groups'} //= $default_user_groups;
+		    $props{'qvd.vm.user.home'} = "$home_path/$user";
+    return %props;
+}
+
 sub _fork_monitor {
-    my %props = @_;
+    my %props = _fill_props @_;
     my $log = _open_log('nxagent');
     my $logfd = fileno $log;
     select $log;
@@ -384,9 +392,6 @@ sub _fork_monitor {
 		defined $pid or die ERROR "unable to start X server, fork failed: $!\n";
 		eval {
 		    POSIX::dup2(1, 2); # equivalent to shell 2>&1
-		    my $user = $props{'qvd.vm.user.name'}   //= $default_user_name;
-		    $props{'qvd.vm.user.groups'} //= $default_user_groups;
-		    $props{'qvd.vm.user.home'} = "$home_path/$user";
 		    _provisionate_user(%props);
 		    _call_action_hook(connect => %props);
 		    _make_nxagent_config(%props);
@@ -400,7 +405,7 @@ sub _fork_monitor {
 			       '-ac', '-name', 'QVD',
 			       '-display', "nx/nx,options=$nxagent_conf:$display");
 		    say "running @cmd";
-		    _become_user($user);
+		    _become_user($props{'qvd.vm.user.name'});
 		    exec @cmd;
 		};
 		say "Unable to start X server: " .($@ || $!);
@@ -522,20 +527,17 @@ sub _make_nxagent_config {
 
 sub _start_session {
     my ($state, $pid) = _state;
+    my (%props) = _fill_props @_;
     DEBUG "starting session in state $state, pid $pid";
     given ($state) {
 	when ('suspended') {
-	    _call_action_hook(pre_connect =>  @_);
+	    _call_action_hook(pre_connect => %props);
 	    DEBUG "awaking nxagent";
-	    _save_printing_config(@_);
+	    _save_printing_config(%props);
 	    _save_nxagent_state_and_call_hook 'initiating';
-        my %props = @_;
-        my $user = $props{'qvd.vm.user.name'} //= $default_user_name;
-        $props{'qvd.vm.user.groups'} //= $default_user_groups;
-        $props{'qvd.vm.user.home'} = "$home_path/$user";
         _make_nxagent_config(%props);
 	    kill HUP => $pid;
-	    _call_action_hook(connect => @_);
+	    _call_action_hook(connect => %props);
 	}
 	when ('connected') {
 	    DEBUG "suspend and fail";
@@ -543,9 +545,9 @@ sub _start_session {
 	    die "Can't connect to X session in state connected, suspending it, retry later\n";
 	}
 	when ('stopped') {
-	    _call_action_hook(pre_connect => @_);
-	    _save_printing_config(@_);
-	    _fork_monitor(@_);
+	    _call_action_hook(pre_connect => %props);
+	    _save_printing_config(%props);
+	    _fork_monitor(%props);
 	}
 	default {
 	    die "Unable to start/resume X session in state $_, try again in a few minutes\n";
