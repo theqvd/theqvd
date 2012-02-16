@@ -529,7 +529,11 @@ sub _start_session {
 	    DEBUG "awaking nxagent";
 	    _save_printing_config(@_);
 	    _save_nxagent_state_and_call_hook 'initiating';
-	    _make_nxagent_config(@_);
+        my %props = @_;
+        my $user = $props{'qvd.vm.user.name'} //= $default_user_name;
+        $props{'qvd.vm.user.groups'} //= $default_user_groups;
+        $props{'qvd.vm.user.home'} = "$home_path/$user";
+        _make_nxagent_config(%props);
 	    kill HUP => $pid;
 	    _call_action_hook(connect => @_);
 	}
