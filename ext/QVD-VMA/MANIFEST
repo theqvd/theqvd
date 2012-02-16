@@ -1,8 +1,13 @@
+bin/nxdiag.pl
+bin/qvd-printing
+bin/qvd-vma.initrc.pl
+bin/qvd-vma.pl
 Changes
-MANIFEST
-Makefile.PL
-README
 lib/QVD/VMA.pm
+Makefile.PL
+MANIFEST
+README
 t/00-load.t
+t/boilerplate.t
 t/pod-coverage.t
 t/pod.t
