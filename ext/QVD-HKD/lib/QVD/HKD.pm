@@ -344,7 +344,7 @@ my @agent_names = qw(vm_command_handler
 
 sub _check_all_agents_have_stopped {
     my $self = shift;
-    $debug and _$self->_debug("Agents running: ", join ", ", grep defined($self->{$_}), @agent_names);
+    $debug and $self->_debug("Agents running: ", join ", ", grep defined($self->{$_}), @agent_names);
     $self->_on_all_agents_stopped
         unless grep defined($self->{$_}), @agent_names
 }
@@ -427,10 +427,14 @@ sub _on_vm_cmd {
 
 sub _on_vm_stopped {
     my ($self, $vm_id) = @_;
+
+    $debug and $self->_debug("releasing handler for VM $vm_id");
     delete $self->{vm}{$vm_id};
     my $all_done = not keys %{$self->{vm}};
+    $debug and $self->_debug("all VM done: $all_done");
     delete $self->{delayed}{$vm_id};
     if (delete $self->{heavy}{$vm_id}) {
+        $debug and $self->_debug("VM was in a heavy state");
         $self->_run_delayed;
     }
     $debug and $self->_debug_vm_stats;

@@ -103,7 +103,7 @@ sub _query_n {
     my ($on_result, $on_error, $on_done, $on_bad_result) = _query_callbacks($method);
 
     if ($debug) {
-        $self->can($_) or $self->_debug("warning: callback method $_ not found!")
+        ref $_ or $self->can($_) or $self->_debug("warning: callback method $_ not found!")
             for ($on_result, $on_error, $on_done, $on_bad_result);
 
         my $line = $sql;
@@ -185,13 +185,14 @@ sub _run_cmd {
     my (undef, $on_error, $on_done) = _query_callbacks($method, %opts);
 
     if ($debug) {
-        $self->can($_) or $self->_debug("warning: callback method $_ not found!")
+        ref $_ or $self->can($_) or $self->_debug("warning: callback method $_ not found!")
             for ($on_error, $on_done);
         $self->_debug("running command @$cmd");
     }
     INFO "running command @$cmd";
     my $pid;
     my $w = AnyEvent::Util::run_cmd($cmd, '$$' => \$pid, %opts);
+    $debug and $self->_debug("process $pid forked");
     $self->{cmd_watcher}{$pid} = $w;
     $w->cb( sub {
                 $debug and $self->_debug("slave process $pid terminated");
@@ -217,6 +218,7 @@ sub _run_cmd {
     if (defined $kill_after) {
         $self->{cmd_timer}{$pid} = AnyEvent->timer(after => $kill_after,
                                                    cb => sub { $self->_do_kill_after(TERM => $pid) });
+        $debug and $self->_debug("process $pid will be killed after $kill_after seconds");
     }
     $pid;
 }
@@ -235,6 +237,7 @@ sub _kill_cmd {
         ($pid) = my(@pids) = keys %{$self->{cmd_watcher}};
         @pids > 1 and die("internal error: more than one slave command is running, pids: @pids");
         if (!@pids) {
+            $debug and $self->_debug("no slave command is running");
             WARN 'no slave command is running';
             return 1;
         }
@@ -273,7 +276,7 @@ sub _rpc {
     my ($on_result, $on_error, $on_done) = _query_callbacks("rpc_$method");
 
     if ($debug) {
-        $self->can($_) or $self->_debug("warning: callback method $_ not found!")
+        ref $_ or $self->can($_) or $self->_debug("warning: callback method $_ not found!")
             for ($on_result, $on_error, $on_done);
     }
 
