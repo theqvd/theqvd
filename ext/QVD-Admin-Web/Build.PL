@@ -11,7 +11,7 @@ my $build = new Module::Build(
 	license          => 'gpl',
 
 	PL_files         => {},
-	pl_files         => glob('script/*.pl'),
+	pl_files         => glob('bin/*.pl'),
 
 	configure_requires => { 
 		'Module::Build'                      => 0.38
