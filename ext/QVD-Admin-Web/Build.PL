@@ -34,4 +34,8 @@ my $build = new Module::Build(
 	}
 );
 
+foreach my $ext (qw(fb tt png jar css gif js zip ico)) {
+	$build->add_build_element($ext);
+}
+
 $build->create_build_script();
