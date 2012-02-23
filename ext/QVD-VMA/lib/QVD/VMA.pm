@@ -37,7 +37,6 @@ my $nxdiag          = cfg('command.nxdiag');
 my $x_session       = cfg('command.x-session');
 my $enable_audio    = cfg('vma.audio.enable');
 my $enable_printing = cfg('vma.printing.enable');
-my $umask           = cfg('vma.user.umask');
 my $printing_conf   = cfg('internal.vma.printing.config');
 my $nxagent_conf    = cfg('internal.vma.nxagent.config');
 
@@ -100,9 +99,6 @@ my %nx2x = ( initiating   => 'starting',
 
 my %running   = map { $_ => 1 } qw(listening connected suspending suspended);
 my %connected = map { $_ => 1 } qw(listening connected);
-
-$umask =~ /^[0-7]+$/ or die "invalid umask $umask\n";
-$umask = oct $umask;
 
 sub _open_log {
     my $name = shift;
@@ -218,7 +214,6 @@ sub _become_user {
     $ENV{'LOGNAME'} = $user;
     $ENV{'USER'} = $user;
     $ENV{'MAIL'} = '/var/mail/'.$user;
-    umask $umask;
     chdir $home;
 }
 

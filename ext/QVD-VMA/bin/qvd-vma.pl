@@ -19,11 +19,11 @@ $App::Daemon::as_user = 'root';
 $ENV{PATH} = join(':', $ENV{PATH}, '/sbin/');
 
 my $port = cfg('internal.vm.port.vma');
+my $umask = cfg('vma.user.umask');
 
+$umask =~ /^[0-7]+$/ or die "invalid umask $umask\n";
 
-
-
-daemonize();
+daemonize; umask oct $umask;
 my $vma = QVD::VMA->new(port => $port);
 $vma->run();
 

@@ -8,6 +8,9 @@ use QVD::L7R;
 use QVD::Config;
 use QVD::Log;
 
+my $umask = cfg('l7r.user.umask');
+$umask =~ /^[0-7]+$/ or die "invalid umask $umask\n";
+
 my $path_run = core_cfg('path.run');
 mkdir $path_run, 0755;
 
@@ -19,7 +22,7 @@ unless (-d $path_run) {
 $App::Daemon::pidfile = core_cfg('l7r.pid_file');
 $App::Daemon::as_user = core_cfg('l7r.as_user');
 
-daemonize;
+daemonize; umask oct $umask;
 my $ok = QVD::L7R->new->run;
 exit ($ok ? 0 : 1);
 

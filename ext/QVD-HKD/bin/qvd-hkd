@@ -26,7 +26,6 @@ use App::Daemon qw/daemonize/;
 # For simplicity replicate here the configuration handling code as
 # QVD::HKD::Config is not usable at this point.
 # FIXME: remove code duplication
-
 my $cfg;
 sub core_cfg {
     my $value = $cfg->requireProperty(@_);
@@ -47,6 +46,9 @@ open my $fh, '<', $config_file or die "unable to open configuration file $config
 $cfg->load($fh);
 close $fh;
 
+my $umask = core_cfg('hkd.user.umask');  ## BUG: should use 'cfg' instead of 'core_cfg'
+$umask =~ /^[0-7]+$/ or die "invalid umask $umask\n";
+
 my $path_run = core_cfg('path.run');
 mkdir $path_run, 0755;
 
@@ -61,7 +63,7 @@ $App::Daemon::background = 0 if $foreground;
 
 ## require the module before daemonizing—otherwise syntax errors end up nowhere since STDERR is closed
 require QVD::HKD;
-daemonize;
+daemonize; umask oct $umask;
 
 my $hkd = QVD::HKD->new(config_file => $config_file);
 $hkd->run;
