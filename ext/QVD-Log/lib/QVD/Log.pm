@@ -31,7 +31,7 @@ my %config = ( 'log4perl.appender.LOGFILE'          => 'Log::Dispatch::FileRotat
 	       'log4perl.appender.LOGFILE.max'      => '20',
 	       'log4perl.appender.LOGFILE.layout'   => 'Log::Log4perl::Layout::PatternLayout',
 	       'log4perl.appender.LOGFILE.layout.ConversionPattern'
-                                                    => '%d %P %F %L %c - %m%n',
+                                                    => '%d %P %F %L - %m%n',
 	       'log4perl.appender.LOGFILE.filename' => $logfile,
 	       'log4perl.rootLogger'                => core_cfg('log.level') . ", LOGFILE",
 	       map { $_ => core_cfg $_ } grep /^log4perl\./, core_cfg_all );
