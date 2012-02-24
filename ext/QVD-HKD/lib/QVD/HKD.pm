@@ -138,19 +138,24 @@ sub new {
 sub _acquire_lock {
     my $self = shift;
     my $lock_file = $self->_cfg('internal.hkd.lock.path');
+    DEBUG "Trying to get lock at '$lock_file'";
     if (open my $lf, '>', $lock_file) {
         if (flock $lf, LOCK_EX|LOCK_NB) {
             $self->{lock_file} = $lf;
+            DEBUG 'Lock acquired';
             return $self->_on_acquire_lock_done;
         }
         if ($self->{lock_retries}++ < $self->_cfg('internal.hkd.lock.retries')) {
             $debug and $self->_debug("lock busy, delaying... ($!)");
+            DEBUG "Lock busy ($!), delaying...";
             return $self->_call_after($self->_cfg('internal.hkd.lock.delay'), sub { $self->_acquire_lock });
         }
         $debug and $self->_debug("unable to lock file, tried $self->{lock_retries} times: $!");
+        ERROR "Unable to lock file, tried '$self->{lock_retries}' times: $!";
     }
     else {
         $debug and $self->_debug("unable to open lock file $lock_file: $!");
+        ERROR "Unable to open lock file '$lock_file': $!";
     }
     $self->_on_acquire_lock_error;
 }
@@ -164,6 +169,7 @@ sub _say_goodbye {
 sub _on_signal {
     my $self = shift;
     $debug and $self->_debug("signal $_[0] received, stopping...");
+    DEBUG "Signal '$_[0]' received, stopping...";
     $self->_on_cmd_stop;
 }
 
@@ -207,7 +213,7 @@ sub run {
 
 sub _start_db {
     my $self = shift;
-    INFO 'connecting to database';
+    INFO 'Connecting to database';
     my $db = AnyEvent::Pg->new( {host     => $self->_cfg('database.host'),
                                  dbname   => $self->_cfg('database.name'),
                                  user     => $self->_cfg('database.user'),
@@ -219,12 +225,15 @@ sub _start_db {
 
 sub _start_config {
     my $self = shift;
+    DEBUG 'Loading configuration';
     $self->{config}->set_db_and_reload($self->{db});
 }
 
 sub _load_host_row {
     my $self = shift;
-    $self->_query_1('select id, name from hosts where name=$1', $self->_cfg('nodename'));
+    my $host = $self->_cfg('nodename');
+    DEBUG "Loading entry for host '$host' from DB";
+    $self->_query_1('select id, name from hosts where name=$1', $host);
 }
 
 sub _on_load_host_row_bad_result {
@@ -254,6 +263,7 @@ sub _calc_load_balancing_data {   ## taken from was_QVD-HKD/lib/QVD/HKD.pm, _upd
     # TODO: move this code into an external module!
     my $meminfo_lines = slurp('/proc/meminfo', array_ref => 1);
     my %meminfo = map { /^([^:]+):\s*(\d+)/; $1 => $2 } @$meminfo_lines;
+    DEBUG sprintf "Load balancing data: '%s' bogomips, '%s' memtotal", $bogomips, $meminfo{MemTotal}/1000;
 
     return $bogomips, $meminfo{MemTotal}/1000;
 }
@@ -295,6 +305,7 @@ sub _start_ticking {
                                              on_ticked => sub { $self->_on_ticked },
                                              on_error => sub { $self->_on_ticker_error },
                                              on_stopped => sub { $self->_on_agent_stopped(@_) } );
+    DEBUG 'Starting ticker';
     $self->{ticker}->run;
 }
 
@@ -306,6 +317,7 @@ sub _start_checking {
                                                       on_checked => sub { $self->_on_checked },
                                                       on_error => sub { $self->_on_checker_error },
                                                       on_stopped => sub { $self->_on_agent_stopped(@_) } );
+    DEBUG 'Starting node checker';
     $self->{checker}->run;
 }
 
@@ -323,8 +335,11 @@ sub _start_agents {
     $self->{dhcpd_handler} = QVD::HKD::DHCPDHandler->new( %opts,
                                                           on_stopped => sub { $self->_on_agent_stopped(@_) } );
 
+    DEBUG 'Starting command handler';
     $self->{command_handler}->run;
+    # DEBUG 'Starting VM command handler';
     # $self->{vm_command_handler}->run;
+    DEBUG 'Starting DHCPD handler';
     $self->{dhcpd_handler}->run;
 
     $self->_on_agents_started;
@@ -332,6 +347,7 @@ sub _start_agents {
 
 sub _start_vm_command_handler {
     my $self = shift;
+    DEBUG 'Starting VM command handler';
     $self->{vm_command_handler}->run;
     $self->_on_start_vm_command_handler_done;
 }
@@ -345,6 +361,7 @@ my @agent_names = qw(vm_command_handler
 sub _check_all_agents_have_stopped {
     my $self = shift;
     $debug and $self->_debug("Agents running: ", join ", ", grep defined($self->{$_}), @agent_names);
+    DEBUG "Still running agents: ", join ', ', grep defined($self->{$_}), @agent_names;
     $self->_on_all_agents_stopped
         unless grep defined($self->{$_}), @agent_names
 }
@@ -400,25 +417,28 @@ sub _on_vm_cmd {
     my $vm = $self->{vm}{$vm_id};
 
     $debug and $self->_debug("command $cmd received for vm $vm_id");
-    DEBUG "command $cmd received for vm $vm_id";
+    INFO "Command '$cmd' received for vm '$vm_id'";
 
     if ($cmd eq 'start') {
         if (defined $vm) {
             $debug and $self->_debug("start cmd received for live vm $vm_id");
+            DEBUG "'start' cmd received for live vm '$vm_id'";
             return;
         }
         if ($self->state eq 'running') {
             $debug and $self->_debug("creating VM handler agent");
+            DEBUG 'Creating VM handler agent';
             $vm = $self->_new_vm_handler($vm_id);
         }
         else {
             $debug and $self->_debug("dropping command $cmd for vm $vm_id while on state " . $self->state);
-            ERROR "dropping command $cmd received for $vm_id";
+            WARN "Dropping command '$cmd' received for '$vm_id'";
             return $self->_on_vm_cmd_done($vm_id);
         }
     }
     unless (defined $vm) {
         $debug and $self->_debug("cmd $cmd received for unknown vm $vm_id");
+        WARN "Cmd '$cmd' received for unknown vm '$vm_id'";
         return;
     }
     $vm->on_cmd($cmd);
@@ -429,6 +449,7 @@ sub _on_vm_stopped {
     my ($self, $vm_id) = @_;
 
     $debug and $self->_debug("releasing handler for VM $vm_id");
+    DEBUG "Releasing handler for VM '$vm_id'";
     delete $self->{vm}{$vm_id};
     my $all_done = not keys %{$self->{vm}};
     $debug and $self->_debug("all VM done: $all_done");
@@ -557,6 +578,7 @@ sub _set_fw_rules {
     my $self = shift;
     if ($self->_cfg('internal.vm.network.firewall.enable')) {
         my $iptables = $self->_cfg('command.iptables');
+        DEBUG 'Setting up firewall rules';
         for my $rule ($self->_fw_rules) {
             $debug and $self->_debug("setting iptables entry @$rule");
             if (system $iptables => -A => @$rule) {
@@ -567,6 +589,7 @@ sub _set_fw_rules {
     }
     else {
         $debug and $self->_debug("setup of global firewall rules skipped, do you really need to do that?");
+        INFO 'Setup of global firewall rules skipped, do you really need to do that?';
     }
     $self->_on_set_fw_rules_done;
 }
@@ -575,6 +598,7 @@ sub _remove_fw_rules {
     my $self = shift;
     if ($self->_cfg('internal.vm.network.firewall.enable')) {
         my $iptables = $self->_cfg('command.iptables');
+        DEBUG 'Removing firewall rules';
         for my $rule (reverse $self->_fw_rules) {
             $debug and $self->_debug("removing iptables entry @$rule");
             if (system $iptables => -D => @$rule) {

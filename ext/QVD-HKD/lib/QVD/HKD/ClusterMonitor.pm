@@ -45,14 +45,14 @@ sub new {
 
 sub _check {
     my $self = shift;
-    DEBUG 'checking other nodes';
+    DEBUG 'Checking other nodes';
     $self->_query(q(select host_id, extract('epoch' from (now() - ok_ts)) as ok_ts from host_runtimes where state='running' and host_id!=$1 and not blocked),
                   $self->{node_id});
 }
 
 sub _on_check_error {
     my $self = shift;
-    WARN 'error on checking other nodes';
+    WARN 'Error on checking other nodes';
     $self->_maybe_callback('on_error');
     $self->_on_check_done;
 }
@@ -75,7 +75,7 @@ sub _on_check_result {
         $self->_maybe_callback('on_error')
     }
     if ($self->{'_down_hosts'}) {
-        INFO sprintf 'found %s down hosts: %s', scalar @{ $self->{'_down_hosts'} }, join ', ', @{ $self->{'_down_hosts'} };
+        INFO sprintf 'Found %s down hosts: %s', scalar @{ $self->{'_down_hosts'} }, join ', ', @{ $self->{'_down_hosts'} };
         $self->_on_kill_hosts;
     }
 }
@@ -91,13 +91,13 @@ sub _kill_hosts {
     my ($self) = @_;
 
     my $plh = join ',', map { "\$$_" } 1 .. @{ $self->{'_down_hosts'} };
-    INFO sprintf 'killing hosts %s', join ', ', @{ $self->{'_down_hosts'} };
+    INFO sprintf 'Killing hosts %s', join ', ', @{ $self->{'_down_hosts'} };
     $self->_query ("update host_runtimes set state = 'lost', blocked = true where host_id in ($plh)", @{ $self->{'_down_hosts'} });
 }
 
 sub _on_kill_hosts_error {
     my $self = shift;
-    warn 'error on killing hosts';
+    WARN 'Error on killing hosts';
     $self->_maybe_callback('on_error');
     $self->_on_check_done;
 }
@@ -105,7 +105,7 @@ sub _on_kill_hosts_error {
 sub _on_kill_hosts_result {
     my ($self, $res) = @_;
     if ($res->status == PGRES_COMMAND_OK and $res->cmdRows) {
-        ## nothing, progress to next state
+        INFO 'Successfully killed hosts';
     }
     else {
         $self->_maybe_callback('on_error')
@@ -123,13 +123,13 @@ sub _stop_vms {
     my ($self) = @_;
 
     my $plh = join ',', map { "\$$_" } 1 .. @{ $self->{'_down_hosts'} };
-    INFO sprintf 'stopping VMs on hosts %s', join ', ', @{ $self->{'_down_hosts'} };
+    INFO sprintf 'Stopping VMs on hosts %s', join ', ', @{ $self->{'_down_hosts'} };
     $self->_query ("update vm_runtimes set vm_state = 'stopped', blocked = true where host_id in ($plh)", @{ $self->{'_down_hosts'} });
 }
 
 sub _on_stop_vms_error {
     my $self = shift;
-    ERROR 'error on stopping VMs';
+    ERROR 'Error on stopping VMs';
     $self->_maybe_callback('on_error');
     $self->_on_check_done;
 }
@@ -138,6 +138,7 @@ sub _on_stop_vms_result {
     my ($self, $res) = @_;
     if ($res->status == PGRES_COMMAND_OK) {
         if ($res->cmdRows) {
+            INFO 'Successfully stopped VMs';
             # TODO: en este caso, seria interesante regenerar los overlays de la maquina que se recupera de manera que:
             # - el filesystem puede estar corrupto, el fsck automatico podria fallar.
             # - realmente nos aseguramos de que en ningun caso pueda haber dos maquinas virtuales corriendo contra la misma imagen.

@@ -8,6 +8,7 @@ use warnings;
 use Carp;
 use Config::Properties;
 use Pg::PQ qw(:pgres);
+use QVD::Log;
 use QVD::Config::Defaults;
 use QVD::HKD::Helpers;
 
@@ -34,6 +35,7 @@ sub _reload_base_config {
     my $self = shift;
     my $props = $self->{props};
     my $file = $self->{config_file};
+    DEBUG "(re-)Loading configuration from file '$file'";
     -f $file or croak "configuration file $file does not exist";
     open my $fh, '<', $file
         or croak "unable to open configuration file $file: $!";
@@ -62,6 +64,7 @@ sub _on_reload_result {
         my @rows = $res->rows;
         $self->_reload_base_config;
         my $props = $self->{props};
+        DEBUG 'Reloading configuration from database';
         for (@rows) {
             my ($k, $v) = @$_;
             $props->changeProperty($k, $v);

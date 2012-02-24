@@ -135,7 +135,7 @@ sub _allocate_tap {
         $self->{tap_if} = unpack STRUCT_IFREQ(), $ifreq;
     };
     if ($@) {
-        ERROR $@;
+        ERROR "Allocating TAP device: $@";
         return $self->_on_allocate_tap_error
     }
 
@@ -156,7 +156,7 @@ sub _allocate_os_disk {
     my $self = shift;
     my $image_path = $self->_cfg('path.storage.images') . '/' . $self->{di_path};
     unless (-f $image_path) {
-        ERROR "Image $image_path attached to VM $self->{vm_id} does not exist on disk";
+        ERROR "Image '$image_path' attached to VM '$self->{vm_id}' does not exist on disk";
         return $self->_on_allocate_os_disk_error;
     }
     unless ($self->{use_overlay}) {
@@ -170,13 +170,15 @@ sub _allocate_os_disk {
     my $overlay_path = $self->{os_image_path} = $overlays_dir . join('-', $self->{di_id}, $self->{vm_id}, 'overlay.qcow2');
     if (-f $overlay_path) {
         if ($self->_cfg('vm.overlay.persistent')) {
+            DEBUG "Reusing persistent overlay '$overlay_path'";
             return $self->_on_allocate_os_disk_done;
         }
+        DEBUG "Discarding overlay '$overlay_path'";
         unlink $overlay_path;
     }
-    mkdir $overlays_dir, 0755;
+    mkdir $overlays_dir, 0755 or WARN "mkdir: 'overlays_dir': $!";
     unless (-d $overlays_dir) {
-        ERROR "Overlays directory $overlays_dir does not exist";
+        ERROR "Overlays directory '$overlays_dir' does not exist";
         return $self->_on_allocate_os_disk_error
     }
 
@@ -193,6 +195,7 @@ sub _allocate_user_disk {
     my $self = shift;
     my $size = $self->{user_storage_size};
     unless (defined $size) {
+        DEBUG 'Not allocating user storage';
         return $self->_on_allocate_user_disk_done;
     }
 
@@ -200,11 +203,12 @@ sub _allocate_user_disk {
     $homes_dir =~ s|/*$|/|;
     my $image_path = $self->{user_image_path} = "$homes_dir$self->{vm_id}-data.qcow2";
     if (-f $image_path) {
+        DEBUG "Reusing user storage at '$image_path'";
         return $self->_on_allocate_user_disk_done;
     }
-    mkdir $homes_dir, 0755;
+    mkdir $homes_dir, 0755 or WARN "mkdir: '$homes_dir': $!";
     unless (-d $homes_dir) {
-        ERROR "Homes directory $homes_dir does not exist";
+        ERROR "Homes directory '$homes_dir' does not exist";
         return $self->_on_allocate_user_disk_error;
     }
 
@@ -227,20 +231,24 @@ sub _launch_process {
 
     my $redirect_io = $self->_cfg('vm.serial.capture');
     if (defined $self->{serial_port}) {
+        DEBUG "Using serial port '$self->{serial_port}'";
         push @cmd, -serial => "telnet::$self->{serial_port},server,nowait,nodelay";
         undef $redirect_io;
+    } else {
+        DEBUG 'No serial port';
     }
 
     if ($redirect_io) {
         my $captures_dir = $self->_cfg('path.serial.captures');
-        mkdir $captures_dir, 0700;
+        mkdir $captures_dir, 0700 or WARN "mkdir: '$captures_dir': $!";
         if (-d $captures_dir) {
             my @t = gmtime; $t[5] += 1900; $t[4] += 1;
             my $ts = sprintf("%04d-%02d-%02d-%02d:%02d:%2d-GMT0", @t[5,4,3,2,1,0]);
+            DEBUG "Redirecting I/O to '$captures_dir/capture-$self->{name}-$ts.txt'";
             push @cmd, -serial => "file:$captures_dir/capture-$self->{name}-$ts.txt";
         }
         else {
-            ERROR "Unable to create captures directory $captures_dir";
+            ERROR "Captures directory '$captures_dir' does not exist";
         }
     }
 
@@ -248,14 +256,19 @@ sub _launch_process {
         my $vnc_display = $self->{vnc_port} - 5900;
         my $vnc_opts = $self->_cfg('vm.vnc.opts');
         $vnc_display .= ",$vnc_opts" if $vnc_opts =~ /\S/;
+        DEBUG "VNC is at display ':$vnc_display'";
         push @cmd, -vnc => ":$vnc_display";
     }
     else {
+        DEBUG 'No VNC';
         push @cmd, '-nographic';
     }
 
     if ($self->{mon_port}) {
-	push @cmd, -monitor, "telnet::$self->{mon_port},server,nowait,nodelay";
+        push @cmd, -monitor, "telnet::$self->{mon_port},server,nowait,nodelay";
+        DEBUG "Using monitor port '$self->{mon_port}'";
+    } else {
+        DEBUG 'No monitor port';
     }
 
     my $hda = "file=$self->{os_image_path},index=0,media=disk";
@@ -265,8 +278,8 @@ sub _launch_process {
     if (defined $self->{user_image_path}) {
         my $hdb_index = $self->_cfg('vm.kvm.home.drive.index');
         my $hdb = "file=$self->{user_image_path},index=$hdb_index,media=disk";
-	$hdb .= ',if=virtio' if $use_virtio;
-        DEBUG "Using user storage $self->{user_image_path} ($hdb) for VM $self->{vm_id}";
+        $hdb .= ',if=virtio' if $use_virtio;
+        DEBUG "Using user storage '$self->{user_image_path}' ($hdb) for VM '$self->{vm_id}'";
         push @cmd, -drive => $hdb;
     }
 
@@ -277,9 +290,8 @@ sub _launch_process {
             return $self->_on_launch_process_error;
         }
         eval {
-            DEBUG "exec cmd: " . join(" ", @cmd) . "\n";
-            #setpgrp; # do not kill kvm when HKD runs on terminal and
-            #         # user CTRL-C's it
+            DEBUG "exec cmd: '" . join(" ", @cmd) . "'\n";
+            #setpgrp;   # do not kill kvm when HKD runs on terminal and user CTRL-C's it
 	    open STDIN, '<', '/dev/null' or die "can't open /dev/null\n";
 	    open STDOUT, '>', '/dev/null' or die "can't redirect STDOUT to /dev/null\n";
 
@@ -322,6 +334,7 @@ sub _launch_process {
 
 sub _kill_vm {
     my $self = shift;
+    DEBUG "Sending SIGINT to PID '$self->{pid}'";
     kill INT => $self->{pid};
     $self->_call_after($self->_cfg("internal.hkd.vmhandler.killer.delay"), '_kill_vm');
 }

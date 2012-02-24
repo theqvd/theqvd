@@ -27,7 +27,7 @@ sub _allocate_tcp_port {
     while (1) {
 	$off++;
 	my $port = $base + $off;
-	return $port unless $used{$port};
+	unless ($used{$port}) { DEBUG "Allocating port '$port'"; return $port; }
     }
 }
 
@@ -54,6 +54,7 @@ sub new {
     $self->{on_delete_cmd} = $on_delete_cmd;
 
     my $hypervisor = $self->_cfg('vm.hypervisor');
+    DEBUG "Using hypervisor type '$hypervisor'";
     my $hypervisor_class = $hypervisor_class{$hypervisor} // croak "unsupported hypervisor $hypervisor";
     eval "require $hypervisor_class; 1" or croak "unable to load module $hypervisor_class:\n$@";
     $self->bless($hypervisor_class);
@@ -68,9 +69,11 @@ sub on_cmd {
     my $method = $self->can("_on_cmd_$cmd");
     if ($method) {
         $method->($self);
+        INFO "Command $cmd received by vm $self->{vm_id}";
     }
     else {
         $debug and $self->_debug("unsupported command $cmd received by vm $self->{vm_id}");
+        WARN "Unsupported command '$cmd' received by vm '$self->{vm_id}'";
     }
 }
 
@@ -78,6 +81,7 @@ sub _save_state {
     my $self = shift;
     my $state = $self->_main_state;
     $debug and $self->_debug("changing database state to $state");
+    DEBUG "Changing database state to '$state'";
     $self->_query('update vm_runtimes set vm_state = $1 where vm_id = $2 and host_id = $3',
                   $state, $self->{vm_id}, $self->{node_id});
 }
@@ -92,12 +96,14 @@ sub _load_row {
 sub _on_load_row_result {
     my ($self, $res) = @_;
     @{$self}{qw(name user_id osf_id di_tag ip storage)} = $res->row;
+    INFO "Successfully loaded row for VM '$self->{vm_id}'";
     $self->{mac} = $self->_ip_to_mac($self->{ip});
     $self->{dhcpd_handler}->register_mac_and_ip(@$self{qw(vm_id mac ip)});
 }
 
 sub _incr_run_attempts {
     my $self = shift;
+    DEBUG "Increasing run attempts counter for VM '$self->{vm_id}'";
     $self->_query('update vm_counters set run_attempts = run_attempts + 1 where vm_id = $1', $self->{vm_id});
 }
 
@@ -105,11 +111,13 @@ sub _on_incr_run_attempts_result {}
 
 sub _incr_run_ok {
     my $self = shift;
+    DEBUG "Increasing run ok counter for VM '$self->{vm_id}'";
     $self->_query('update vm_counters set run_ok = run_ok + 1 where vm_id = $1', $self->{vm_id});
 }
 
 sub _search_di {
     my $self = shift;
+    DEBUG "Searching DIs with tag '$self->{di_tag}' for OSF '$self->{osf_id}'";
     $self->_query_1(<<'SQL', @$self{qw(osf_id di_tag)});
 select dis.id, dis.path, osfs.use_overlay, osfs.user_storage_size, memory
     from di_tags, dis, osfs
@@ -124,6 +132,7 @@ SQL
 sub _on_search_di_result {
     my ($self, $res) = @_;
     @{$self}{qw(di_id di_path use_overlay user_storage_size memory)} = $res->row;
+    DEBUG "Found DI '$self->{di_id}'";
 }
 
 sub _save_runtime_row {
@@ -135,6 +144,9 @@ sub _save_runtime_row {
     $self->{vnc_port}    = $self->_allocate_tcp_port if $self->_cfg('vm.vnc.redirect');
     $self->{serial_port} = $self->_allocate_tcp_port if $self->_cfg('vm.serial.redirect');
     $self->{mon_port}    = $self->_allocate_tcp_port if $self->_cfg('internal.vm.monitor.redirect');
+    no warnings 'uninitialized';
+    DEBUG sprintf "Saving runtime row for VM '%d': VMA port '%d', X11 port '%d', SSH port '%d', VNC port '%d', serial port '%d', monitor port '%d'",
+        @{$self}{qw(vm_id vma_port x_port ssh_port vnc_port serial_port mon_port)};
 
     $self->_query_1(<<'SQL', @{$self}{qw(ip vma_port x_port ssh_port vnc_port serial_port mon_port vm_id)});
 update vm_runtimes
@@ -195,14 +207,17 @@ sub _set_fw_rules {
         my $ebtables = $self->_cfg('command.ebtables');
         for my $rule ($self->_fw_rules) {
             $debug and $self->_debug("adding ebtables entry @$rule");
+            DEBUG "Adding ebtables entry '@$rule'";
             if (system $ebtables => @$rule) {
                 $debug and $self->_debug("unable to add ebtables entry, rc: " . ($? >> 8));
+                DEBUG "Unable to add ebtables entry, rc: " . ($? >> 8);
                 return $self->_on_set_fw_rules_error;
             }
         }
     }
     else {
         $debug and $self->_debug("setup of VM firewall rules skipped, do you really need to do that?");
+        INFO "Setup of VM firewall rules skipped, do you really need to do that?";
     }
     $self->_on_set_fw_rules_done;
 }
@@ -217,26 +232,32 @@ sub _remove_fw_rules {
             my $j = quotemeta $target;
             $j = qr/\b$j$/;
             $debug and $self->_debug("retrieving list of ebtables entries for $chain");
+            DEBUG "Retrieving list of ebtables entries for chain '$chain'";
             for (`$ebtables -L $chain --Ln`) {
                 chomp;
                 if ($_ =~ $j) {
                     my ($n) = split /\./;
                     $debug and $self->_debug("deleting rule $_");
+                    DEBUG "Deleting rule '$_'";
                     system $ebtables => -D => $chain, $n and
                         $debug and $self->_debug("unable to delete rule, rc: " . ($? << 8));
                 }
             }
-            system $ebtables => -X => $target and
+            if (system $ebtables => -X => $target) {
                 $debug and $self->_debug("unable to delete chain $target, rc: " . ($? << 8));
+                DEBUG "Unable to delete chain '$target', rc: " . ($? << 8);
+            }
 
             unless (system "$ebtables -L $target >/dev/null 2>&1") {
                 $debug and $self->_debug("deletion of chain $target failed");
+                DEBUG "Deletion of chain '$target' failed";
                 $self->_on_remove_fw_rules_error;
             }
         }
     }
     else {
         $debug and $self->_debug("cleanup of VM firewall rules skipped");
+        DEBUG 'Cleanup of VM firewall rules skipped';
     }
     $self->_on_remove_fw_rules_done
 }
@@ -259,6 +280,7 @@ sub _start_vma_monitor {
 sub _stop_vma_monitor {
     my $self = shift;
     $debug and $self->_debug('stopping vma monitor');
+    DEBUG 'Stopping VMA monitor';
     my $vma_monitor = delete $self->{vma_monitor};
     $vma_monitor->stop;
 }
@@ -283,6 +305,7 @@ sub _on_failed_vma_monitor {
         $debug and $self->_debug("failed_vma_monitor, time: " .(time - $self->{last_seen_alive}). "/$max_time");
         WARN "failed_vma_monitor, time: " .(time - $self->{last_seen_alive}). "/$max_time";
         if (time - $self->{last_seen_alive} > $max_time) {
+            WARN "VMA didn't start, stopping VM '$self->{vm_id}'";
             if ($self->_cfg('internal.vm.debug.enable')) {
                 $debug and $self->_debug("calling _on_goto_debug");
                 $self->_on_goto_debug;
@@ -299,6 +322,7 @@ sub _on_failed_vma_monitor {
 sub _poweroff {
     my $self = shift;
     $self->{rpc_service} = $self->_vma_url;
+    DEBUG "Invoking RPC 'poweroff' method";
     $self->_rpc('poweroff');
 }
 
@@ -311,6 +335,7 @@ sub _set_state_timer {
 sub _clear_runtime_row {
     my $self = shift;
     my $state = $self->_main_state;
+    DEBUG "Clearing runtime row for VM '$self->{vm_id}'";
     # FIXME: final state could also be 'failed', currently 'stopped'
     # is hard-coded here.
     $self->_query(<<'SQL', $self->{vm_id}, $self->{node_id});

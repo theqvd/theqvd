@@ -339,12 +339,12 @@ sub _calculate_attrs {
     my $iface = $self->{iface} =
         $self->_cfg('internal.vm.network.device.prefix') . $self->{vm_id};
     # $self->_cfg('internal.vm.network.device.prefix') . $self->{vm_id} . 'r' . int(rand 10000);
-    DEBUG "network interface: $iface";
 
     if ($debug) {
         for (qw(di_path os_basefs os_overlayfs os_overlayfs_old os_rootfs_parent os_rootfs home_fs home_fs_mnt iface)) {
             my $path = $self->{$_} // '<undef>';
             $self->_debug("path $_: $path");
+            DEBUG "Path $_: $path";
         }
     }
 
@@ -356,19 +356,23 @@ sub _untar_os_image {
     my $image_path = $self->_cfg('path.storage.images') . '/' . $self->{di_path};
     $debug and $self->_debug("image_path=$image_path");
     unless (-f $image_path) {
-        ERROR "Image $image_path attached to VM $self->{vm_id} does not exist on disk";
+        ERROR "Image '$image_path' attached to VM '$self->{vm_id}' does not exist on disk";
         return $self->_on_untar_os_image_error;
     }
     my $basefs = $self->{os_basefs};
-    -d $basefs and return $self->_on_untar_os_image_done;
+    if (-d $basefs) {
+        DEBUG 'Image already untarred';
+        return $self->_on_untar_os_image_done;
+    }
     my $tmp = $self->_cfg('path.storage.basefs') . "/untar-$$-" . rand(100000);
     $tmp++ while -e $tmp;
     unless (_mkpath $tmp) {
-        ERROR "Unable to create directory $tmp";
+        ERROR "Unable to create directory '$tmp'";
         return $self->_on_untar_os_image_error;
     }
     $self->{os_basefs_tmp} = $tmp;
 
+    INFO "Untarring image to '$tmp'";
     my @cmd = ( $self->_cfg('command.tar'),
                 'x',
                 -f => $image_path,
@@ -384,10 +388,11 @@ sub _place_os_image {
     my $basefs = $self->{os_basefs};
     -d $basefs and return $self->_on_place_os_image_done;
     my $tmp = $self->{os_basefs_tmp};
+    INFO "Renaming '$tmp' to '$basefs'";
     rename $tmp, $basefs
-        or ERROR "rename of $tmp to $basefs failed: $!";
+        or ERROR "Rename of '$tmp' to '$basefs' failed: $!";
     unless (-d $basefs) {
-        ERROR "$basefs does not exist or is not a directory";
+        ERROR "'$basefs' does not exist or is not a directory";
         return $self->_on_place_os_image_error;
     }
     $self->_on_place_os_image_done;
@@ -399,11 +404,13 @@ sub _detect_os_image_type {
     if (-d "$basefs/sbin/") {
         # FIXME: improve autodetection logic
         $debug and $self->_debug("os image is of type basic");
+        DEBUG 'OS image is of type basic';
     }
     elsif (-d "$basefs/rootfs/sbin/") {
         $self->{os_meta} = $basefs;
         $self->{os_basefs} = "$basefs/rootfs";
         $debug and $self->_debug("os image is of type extended");
+        DEBUG 'OS image is of type extended';
     }
     else {
         ERROR "sbin not found at $basefs/sbin or at $basefs/rootfs/sbin";
@@ -416,21 +423,23 @@ sub _allocate_os_overlayfs {
     my $self = shift;
     my $overlayfs = $self->{os_overlayfs};
     my $overlayfs_old =  $self->{os_overlayfs_old};
-        if (-d $overlayfs) {
+    if (-d $overlayfs) {
         if (defined $overlayfs_old) {
             $debug and $self->_debug("deleting old overlay directory");
             unless (rename $overlayfs, $overlayfs_old) {
-                ERROR "Unable to move old $overlayfs out of the way to $overlayfs_old";
+                ERROR "Unable to move old '$overlayfs' out of the way to '$overlayfs_old'";
                 return $self->_on_allocate_os_overlayfs_error;
             }
+            DEBUG "Renamed old overlayfd '$overlayfs' to '$overlayfs_old'";
         }
         else {
-            $debug and $self->_debug("reusing old overlay directory");
+            $debug and $self->_debug("reusing existing overlay directory");
+            DEBUG 'Reusing existing overlay directory';
             return $self->_on_allocate_os_overlayfs_done
         }
     }
     unless (_mkpath $overlayfs) {
-        ERROR "Unable to create overlay file system $overlayfs: $!";
+        ERROR "Unable to create overlay file system '$overlayfs': $!";
         return $self->_on_allocate_os_overlayfs_error;
     }
     $self->_on_allocate_os_overlayfs_done;
@@ -440,25 +449,26 @@ sub _allocate_os_rootfs {
     my $self = shift;
     my $rootfs = $self->{os_rootfs};
     unless (_mkpath $rootfs) {
-        ERROR "unable to create directory $rootfs";
+        ERROR "Unable to create directory '$rootfs'";
         return $self->_on_allocate_os_rootfs_error;
     }
     system $self->_cfg('command.umount'), $rootfs; # just in case!
     $debug and $self->_debug("rootfs: $rootfs, rootfs_parent: $self->{os_rootfs_parent}");
+    DEBUG "rootfs: '$rootfs', rootfs_parent: '$self->{os_rootfs_parent}'";
     if ((stat $rootfs)[0] != (stat $self->{os_rootfs_parent})[0]) {
-        ERROR "a file system is already mounted on top of $rootfs";
+        ERROR "A file system is already mounted on top of $rootfs";
         return $self->_on_allocate_os_rootfs_error;
     }
 
     my $unionfs_type = $self->_cfg('vm.lxc.unionfs.type');
-    DEBUG "unionfs type: $unionfs_type";
+    DEBUG "Unionfs type: '$unionfs_type'";
 
     given ($unionfs_type) {
         when('aufs') {
             if (system $self->_cfg('command.mount'),
                 -t => 'aufs',
                 -o => "br:$self->{os_overlayfs}:$self->{os_basefs}=ro", "aufs", $rootfs) {
-                ERROR "unable to mount aufs (code: " . ($?>>8) . ")";
+                ERROR "Unable to mount aufs (code: " . ($?>>8) . ")";
                 return $self->_on_allocate_os_rootfs_error;
             }
         }
@@ -470,26 +480,26 @@ sub _allocate_os_rootfs {
                 -o => 'dev',
                 -o => 'allow_other',
                 "$self->{os_overlayfs}=RW:$self->{os_basefs}=RO", $rootfs) {
-                ERROR "unable to mount unionfs-fuse (code: " . ($? >> 8) . ")";
+                ERROR "Unable to mount unionfs-fuse (code: " . ($? >> 8) . ")";
                 return $self->_on_allocate_os_rootfs_error;
             }
         }
         when ('bind') {
             if (system $self->_cfg('command.mount'),
                 '--bind', $self->{os_basefs}, $rootfs) {
-                ERROR "unable to mount bind $self->{os_basefs} into $rootfs, mount rc: " . ($? >> 8);
+                ERROR "Unable to mount bind '$self->{os_basefs}' into '$rootfs', mount rc: " . ($? >> 8);
                 return $self->_on_allocate_os_rootfs_error;
             }
             if ($self->_cfg('vm.lxc.unionfs.bind.ro')) {
                 if (system $self->_cfg('command.mount'),
                     -o => 'remount,ro', $rootfs) {
-                    ERROR "unable to remount bind mount $rootfs as read-only, mount rc: ". ($? >> 8);
+                    ERROR "Unable to remount bind mount '$rootfs' as read-only, mount rc: ". ($? >> 8);
                     return $self->_on_allocate_os_rootfs_error;
                 }
             }
         }
         default {
-            ERROR "unsupported unionfs type $unionfs_type";
+            ERROR "Unsupported unionfs type '$unionfs_type'";
             return $self->_on_allocate_os_rootfs_error;
         }
     }
@@ -503,17 +513,18 @@ sub _allocate_home_fs {
     defined $homefs or return $self->_on_allocate_home_fs_done;
 
     unless (_mkpath $homefs) {
-        ERROR "unable to create directory $homefs";
+        ERROR "Unable to create directory '$homefs'";
         return $self->_on_allocate_home_fs_error;
     }
     my $mount_point = $self->{os_homefs_mnt};
     unless (_mkpath $mount_point) {
-        ERROR "unable to create directory $mount_point";
+        ERROR "Unable to create directory '$mount_point'";
         return $self->_on_allocate_home_fs_error;
     }
 
     # let lxc mount the home file system for us
     $self->{home_fstab} = "$homefs $mount_point none defaults,bind";
+    DEBUG "Setting up homefs fstab entry as '$homefs $mount_point none defaults,bind'";
     #    if (system $self->_cfg('command.mount'), '--bind', $homefs, $mount_point) {
     #        ERROR "unable to bind $homefs into $mount_point, mount failed (code: ".($?>>8).")";
     #        return $self->_on_allocate_os_rootfs_error;
@@ -528,27 +539,30 @@ sub _create_lxc {
 
     my ($fh, $fn) = tempfile(UNLINK => 0);
     $debug and $self->_debug("saving lxc configuration to $fn");
-    DEBUG "saving lxc configuration to $fn";
+    DEBUG "Saving lxc configuration to '$fn'";
     my $bridge = $self->_cfg('vm.network.bridge');
     my $console;
     if ($self->_cfg('vm.serial.capture')) {
         my $captures_dir = $self->_cfg('path.serial.captures');
-        mkdir $captures_dir, 0700;
+        mkdir $captures_dir, 0700 or WARN "mkdir: '$captures_dir': $!";
         if (-d $captures_dir) {
             my @t = gmtime; $t[5] += 1900; $t[4] += 1;
             my $ts = sprintf("%04d-%02d-%02d-%02d:%02d:%2d-GMT0", @t[5,4,3,2,1,0]);
             $console = "$captures_dir/capture-$self->{name}-$ts.txt";
+            DEBUG "Console output will be saved in '$console'";
         }
         else {
-            ERROR "Unable to create captures directory $captures_dir";
+            ERROR "Captures directory '$captures_dir' does not exist";
             return $self->_on_create_lxc_error;
         }
     }
     else {
         $console = '/dev/null';
+        DEBUG 'Console output will not be saved';
     }
 
     my $iface = $self->{iface};
+    DEBUG "Local endpoint of the network device, connected to the bridge '$bridge': '$iface'";
 
     # FIXME: make this template-able or configurable in some way
     print $fh <<EOC;
@@ -609,14 +623,16 @@ sub _kill_lxc {
     }
     else {
         $debug and $self->_debug("unable to open $fn: $!");
+        ERROR "Unable to open '$fn': $!";
     }
     my $lxc_pid = $self->{lxc_pid};
     push @pids, $lxc_pid if defined $lxc_pid;
     if (@pids) {
         $debug and $self->_debug("killing zombie processes and then trying again, pids: @pids");
+        DEBUG "Killing zombie processes and then trying again, PIDs: @pids";
         if ($self->{killer_count}++ > $self->_cfg('internal.hkd.lxc.killer.retries')) {
             $debug and $self->_debug("too many retries, no more killing, peace!");
-            WARN "too many retries when killing cointainer processes: @pids";
+            WARN "Too many retries when killing cointainer processes: @pids";
             $self->_abort_cmd($lxc_pid);
             return $self->_on_kill_lxc_error;
         }
@@ -625,6 +641,7 @@ sub _kill_lxc {
     }
     else {
         $debug and $self->_debug("all processes killed");
+        DEBUG "All processes killed";
         return $self->_on_kill_lxc_done;
     }
 }
@@ -647,6 +664,7 @@ sub _unmount_filesystems {
     $self->{unmounted} //= {};
     my $rootfs = $self->{os_rootfs};
     my $mi = Linux::Proc::Mountinfo->read;
+    DEBUG "Unmounting filesystems under '$rootfs'";
     if (my $at = $mi->at($rootfs)) {
         my @mnts = map $_->mount_point, @{$at->flatten};
         $debug and $self->_debug("mnts behind $rootfs: @mnts");
@@ -657,14 +675,15 @@ sub _unmount_filesystems {
             return $self->_unmount_filesystem($next);
         }
         else {
-            ERROR "Some filesystems could not be unmounted: @mnts";
             $debug and $self->_debug("Some filesystems could not be unmounted: @mnts");
+            ERROR sprintf 'Some filesystems could not be unmounted: %s', join ', ', @mnts;
             delete $self->{unmounted};
             return $self->_on_unmount_filesystems_error;
         }
     }
     else {
         $debug and $self->_debug("No filesystem mounted at $rootfs found");
+        DEBUG "No filesystem mounted at '$rootfs' found";
     }
     delete $self->{unmounted};
     $self->_on_unmount_filesystems_done
@@ -707,13 +726,15 @@ sub _run_hook {
                                                        lxc_name ));
 
             $debug and $self->_debug("running hook $hook for $name");
-            DEBUG "running hook $hook for $name";
+            DEBUG "Running hook '$hook' for '$name'";
             return $self->_run_cmd([$hook => @args],
                                    save_old_watcher => 1);
+        } else {
+            WARN "Hook '$hook' for '$name' not found";
         }
     }
     $debug and $self->_debug("no hooks for $name");
-    DEBUG "no hooks for $name";
+    DEBUG "No hooks for '$name'";
     $self->_on_run_hook_done;
 }
 

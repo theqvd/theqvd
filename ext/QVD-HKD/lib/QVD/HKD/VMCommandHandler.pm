@@ -59,6 +59,7 @@ sub _load_cmd {
     $self->{vm_id} = undef;
     $self->{vm_cmd} = undef;
     $debug and $self->_debug("loading command for virtual machines running in host $self->{node_id}");
+    DEBUG "Loading commands for virtual machines running in host '$self->{node_id}'";
     $self->_query('select vm_id, vm_cmd from vm_runtimes where host_id = $1 and vm_cmd is not null and vm_cmd != \'busy\' limit 1',
                   $self->{node_id});
 }
@@ -68,7 +69,7 @@ sub _on_load_cmd_result {
     if ($res->rows) {
         @{$self}{qw(vm_id vm_cmd)} = $res->row;
         $debug and $self->_debug("VM command loaded, vm_id: $self->{vm_id}, vm_cmd: $self->{vm_cmd}");
-        DEBUG "VM command loaded, vm_id: $self->{vm_id}, vm_cmd: $self->{vm_cmd}";
+        DEBUG "VM command loaded, vm_id: '$self->{vm_id}', vm_cmd: '$self->{vm_cmd}'";
     }
 }
 
@@ -78,10 +79,12 @@ sub _on_load_cmd_done {
     my $self = shift;
     if (defined $self->{vm_id}) {
         $debug and $self->_debug("vm command found");
+        DEBUG 'VM command found';
         $self->_on_cmd_found;
     }
     else {
         $debug and $self->_debug("vm command *not* found");
+        DEBUG 'VM command *not* found';
         $self->_on_cmd_not_found;
     }
 }
@@ -89,6 +92,7 @@ sub _on_load_cmd_done {
 sub _lock_cmd {
     my $self = shift;
     $debug and $self->_debug("locking command, vm_id: $self->{vm_id}, vm_cmd: $self->{vm_cmd}");
+    DEBUG "Locking command, vm_id: '$self->{vm_id}', vm_cmd: '$self->{vm_cmd}'";
     $self->_query_1('update vm_runtimes set vm_cmd=\'busy\' where vm_id=$1 and vm_cmd=$2',
                     $self->{vm_id}, $self->{vm_cmd});
 }

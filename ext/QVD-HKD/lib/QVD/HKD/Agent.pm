@@ -189,7 +189,7 @@ sub _run_cmd {
             for ($on_error, $on_done);
         $self->_debug("running command @$cmd");
     }
-    INFO "running command @$cmd";
+    INFO "Running command '@$cmd'";
     my $pid;
     my $w = AnyEvent::Util::run_cmd($cmd, '$$' => \$pid, %opts);
     $debug and $self->_debug("process $pid forked");
@@ -203,7 +203,7 @@ sub _run_cmd {
                 if ($rc) {
                     $cmd = [$cmd] unless ref $cmd;
                     $debug and $self->_debug("command failed: @$cmd => " . ($rc >> 8) . " ($rc)");
-                    ERROR "command @$cmd failed: $rc";
+                    ERROR "Command '@$cmd' failed: $rc";
                     unless ($ignore_errors) {
                         $debug and $self->_debug("calling on_error callback $on_error");
                         $self->$on_error($rc);
@@ -219,6 +219,7 @@ sub _run_cmd {
         $self->{cmd_timer}{$pid} = AnyEvent->timer(after => $kill_after,
                                                    cb => sub { $self->_do_kill_after(TERM => $pid) });
         $debug and $self->_debug("process $pid will be killed after $kill_after seconds");
+        DEBUG "Process '$pid' will be killed after '$kill_after' seconds";
     }
     $pid;
 }
@@ -226,6 +227,7 @@ sub _run_cmd {
 sub _do_kill_after {
     my ($self, $signal, $pid) = @_;
     $debug and $self->_debug("command timed out");
+    DEBUG 'Command timed out';
     $self->_kill_cmd($signal);
     $self->{cmd_timer}{$pid} = AnyEvent->timer(after => 2,
                                                cb => sub { $self->_do_kill_after(KILL => $pid) });
@@ -238,7 +240,7 @@ sub _kill_cmd {
         @pids > 1 and die("internal error: more than one slave command is running, pids: @pids");
         if (!@pids) {
             $debug and $self->_debug("no slave command is running");
-            WARN 'no slave command is running';
+            WARN 'No slave command is running';
             return 1;
         }
     }
@@ -247,7 +249,7 @@ sub _kill_cmd {
     my $ok = kill $signal => $pid;
     unless ($ok) {
         $debug and $self->_debug("unable to kill process $pid with signal $signal");
-        WARN "unable to kill process $pid with signal $signal";
+        WARN "Unable to kill process '$pid' with signal '$signal'";
     }
     $ok;
 }
