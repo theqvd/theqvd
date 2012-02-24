@@ -95,6 +95,8 @@ client.user.name =
 ## whether to use SSL in the client↔server communication or not
 client.use_ssl = 1
 
+## umask for the L7R process
+l7r.user.umask = 0022
 ## whether L7R accepts SSL incoming connections or not
 l7r.use_ssl = 1
 ## port the L7R should listen to
@@ -114,6 +116,8 @@ l7r.loadbalancer.plugin.default.weight.ram = 1
 l7r.loadbalancer.plugin.default.weight.cpu = 1
 l7r.loadbalancer.plugin.default.weight.random = 1
 
+## umask for the HKD process
+hkd.user.umask = 0022
 ## user to run hkd as
 hkd.as_user = root
 ## path to the hkd PID file
@@ -205,6 +209,7 @@ vma.user.home.path = /home
 vma.user.default.name = qvd
 vma.user.default.groups =
 
+## umask for the VMA
 vma.user.umask = 0022
 
 ## external executables the VMA calls when some events happen
