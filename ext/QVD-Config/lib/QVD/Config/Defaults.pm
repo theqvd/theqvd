@@ -55,7 +55,7 @@ path.cgroup = /cgroup
 command.kvm = kvm
 command.kvm-img = kvm-img
 command.nxagent = /usr/bin/nxagent
-command.nxdiag = /usr/bin/nxdiag.pl
+command.nxdiag = /usr/lib/qvd/bin/nxdiag.pl
 command.x-session = /etc/X11/Xsession
 command.brctl = /sbin/brctl
 command.ifconfig = /sbin/ifconfig
@@ -275,9 +275,9 @@ internal.nxagent.timeout.listening = 10
 internal.nxagent.timeout.suspending = 20
 internal.nxagent.timeout.stopping = 20
 
-internal.vma.on_printing.connected = /usr/bin/qvd-printing
-internal.vma.on_printing.suspended = /usr/bin/qvd-printing
-internal.vma.on_printing.stopped = /usr/bin/qvd-printing
+internal.vma.on_printing.connected = /usr/lib/qvd/bin/qvd-printing
+internal.vma.on_printing.suspended = /usr/lib/qvd/bin/qvd-printing
+internal.vma.on_printing.stopped = /usr/lib/qvd/bin/qvd-printing
 
 internal.vma.printing.config = ${path.run}/printing.conf
 internal.vma.nxagent.config = ${path.run}/nxagent.conf
