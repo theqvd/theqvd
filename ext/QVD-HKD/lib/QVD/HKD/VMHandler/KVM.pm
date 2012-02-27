@@ -128,10 +128,10 @@ sub _on_cmd_stop :OnState('__any__') { shift->delay_until_next_state }
 sub _allocate_tap {
     my $self = shift;
     eval {
-        open my $tap_fh, '+<', TUNNEL_DEV() or die "Can't open ".TUNNEL_DEV().": $!";
+        open my $tap_fh, '+<', TUNNEL_DEV() or LOGDIE "Can't open ".TUNNEL_DEV().": $!";
         $self->{tap_fh} = $tap_fh;
         my $ifreq = pack(STRUCT_IFREQ(), 'qvdtap%d', IFF_TAP()|IFF_NO_PI());
-        ioctl $tap_fh, TUNSETIFF(), $ifreq or die "Can't create tap interface: $!";
+        ioctl $tap_fh, TUNSETIFF(), $ifreq or LOGDIE "Can't create tap interface: $!";
         $self->{tap_if} = unpack STRUCT_IFREQ(), $ifreq;
     };
     if ($@) {
@@ -292,8 +292,8 @@ sub _launch_process {
         eval {
             DEBUG "exec cmd: '" . join(" ", @cmd) . "'\n";
             #setpgrp;   # do not kill kvm when HKD runs on terminal and user CTRL-C's it
-	    open STDIN, '<', '/dev/null' or die "can't open /dev/null\n";
-	    open STDOUT, '>', '/dev/null' or die "can't redirect STDOUT to /dev/null\n";
+	    open STDIN, '<', '/dev/null' or LOGDIE "can't open /dev/null\n";
+	    open STDOUT, '>', '/dev/null' or LOGDIE "can't redirect STDOUT to /dev/null\n";
 
             setpriority(1, 0, 10); # run VMs with low priority so in
                                    # case the machine gets overloaded,
@@ -303,18 +303,18 @@ sub _launch_process {
             $^F = 3;
             if (fileno $self->{tap_fh} == 3) {
                 POSIX::fcntl($self->{tap_fh}, F_SETFD, fcntl($self->{tap_fh}, F_GETFD, 0) & ~FD_CLOEXEC)
-                        or die "fcntl failed: $!";
+                        or LOGDIE "fcntl failed: $!";
             }
             else {
-                POSIX::dup2(fileno $self->{tap_fh}, 3) or die "dup2 failed: $!";
+                POSIX::dup2(fileno $self->{tap_fh}, 3) or LOGDIE "dup2 failed: $!";
             }
 
             # system "cat /proc/$$/fdinfo/3 >>/tmp/hkd-fdinfo";
 
-	    POSIX::dup2(1, 2) or die "dup2 failed (2): $!";
+	    POSIX::dup2(1, 2) or LOGDIE "dup2 failed (2): $!";
             # DEBUG "cmd: >" . join("< >", @cmd) . "<\n";
 
-	    exec @cmd or die "exec failed\n";
+	    exec @cmd or LOGDIE "exec failed\n";
 	};
  	ERROR "Unable to start VM: $@";
  	POSIX::_exit(1);

@@ -40,7 +40,7 @@ use Log::Log4perl qw(:levels :easy);
 Log::Log4perl::init_once(\%config);
 
 use Exporter qw(import);
-our @EXPORT = qw(DEBUG WARN INFO ERROR);
+our @EXPORT = qw(DEBUG WARN INFO ERROR LOGDIE);
 
 1;
 
