@@ -28,7 +28,8 @@ use App::Daemon qw/daemonize/;
 # FIXME: remove code duplication
 my $cfg;
 sub core_cfg {
-    my $value = $cfg->requireProperty(@_);
+    my $value = eval { $cfg->requireProperty(@_) };
+    defined $value or die $@;
     $value =~ s/\${(.*?)}/$1 eq '{' ? '${' : core_cfg($1)/ge;
     $value;
 }

@@ -44,7 +44,8 @@ sub _reload_base_config {
 
 sub _cfg {
     my $self = shift;
-    my $value = $self->{props}->requireProperty(@_);
+    my $value = eval { $self->{props}->requireProperty(@_) };
+    defined $value or LOGDIE $@;
     $value =~ s/\${(.*?)}/$1 eq '{' ? '${' : $self->_cfg($1)/ge;
     $debug and $self->_debug("config: $_[0] = $value");
     $value;
