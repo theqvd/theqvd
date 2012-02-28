@@ -46,10 +46,10 @@ sub new {
  	# copy the SSL certificate and key from the database to local
  	# files
  	mkdir $l7r_certs_path, 0700;
- 	-d $l7r_certs_path or die "Unable to create directory $l7r_certs_path\n";
+ 	-d $l7r_certs_path or LOGDIE "Unable to create directory $l7r_certs_path\n";
  	my ($mode, $uid) = (stat $l7r_certs_path)[2, 4];
- 	$uid == $> or $uid == 0 or die "bad owner for directory $l7r_certs_path\n";
- 	$mode & 0077 and die "bad permissions for directory $l7r_certs_path\n";
+ 	$uid == $> or $uid == 0 or LOGDIE "bad owner for directory $l7r_certs_path\n";
+ 	$mode & 0077 and LOGDIE "bad permissions for directory $l7r_certs_path\n";
  	_write_to_file($l7r_ssl_cert_fn, $l7r_ssl_cert);
  	_write_to_file($l7r_ssl_key_fn,  $l7r_ssl_key);
  	push @args, ( SSL           => 1,
@@ -67,7 +67,7 @@ sub _write_to_file {
  	     binmode $fh         and
  	     print $fh $data     and
  	     close $fh ) {
- 	die "Unable to write to $fn";
+ 	LOGDIE "Unable to write to $fn";
     }
 }
 
@@ -183,7 +183,7 @@ sub _auth2user_id {
     my $auth = shift;
     my $login = $auth->login;
     my $user = rs(User)->search({ login => $login })->first
-	// die "Authenticated user $login does not exist in database";
+	// LOGDIE "Authenticated user $login does not exist in database";
     $user->id
 }
 
@@ -223,7 +223,7 @@ sub _takeover_vm {
 	txn_eval {
 	    DEBUG "txn_eval in _takeover_vm";
 	    $vm->discard_changes;
-	    $vm->user_state eq 'disconnected' or die "user is connected from another L7R instance yet";
+	    $vm->user_state eq 'disconnected' or LOGDIE "user is connected from another L7R instance yet";
 	    $vm->set_user_state('connecting',
 				l7r_pid => $$,
 				l7r_host => this_host_id,
@@ -245,7 +245,7 @@ sub _takeover_vm {
         # could send the x_suspend message to the VMA without going
         # through the HKD
 
-	die "Unable to acquire VM, close other clients\n" if time > $timeout;
+	LOGDIE "Unable to acquire VM, close other clients\n" if time > $timeout;
 	sleep($vm_poll_time);
 
 	# FIXME: check the VM has not left the state running
@@ -271,17 +271,17 @@ sub _assign_vm {
 	$l7r->_tell_client("Assigning VM to host");
 	my $lb = QVD::L7R::LoadBalancer->new;
 	my $host_id = $lb->get_free_host($vm->vm) //
-	    die "Unable to start VM, can't assign to any host\n";
+	    LOGDIE "Unable to start VM, can't assign to any host\n";
 
         # FIXME: assigning the host and pushing the start command
         # should go in the same transaction!
 
 	txn_eval {
 	    $vm->discard_changes;
-	    die if (defined $vm->host_id or $vm->vm_state ne 'stopped');
+	    LOGDIE if (defined $vm->host_id or $vm->vm_state ne 'stopped');
 	    $vm->set_host_id($host_id);
 	};
-	$@ and die "Unable to start VM, state changed unexpectedly\n";
+	$@ and LOGDIE "Unable to start VM, state changed unexpectedly\n";
 
 	$l7r->_check_abort($vm);
     }
@@ -312,11 +312,11 @@ sub _start_and_wait_for_vm {
 	if (( $vm_state eq 'stopped' and
 	      defined $vm->vm_cmd ) or
 	    $vm_state =~ /^starting/) {
-	    die "Unable to start VM, operation timed out!\n"
+	    LOGDIE "Unable to start VM, operation timed out!\n"
 		if time > $timeout;
 	}
 	else {
-	    die "Unable to start VM in state $vm_state";
+	    LOGDIE "Unable to start VM in state $vm_state";
 	}
     }
 }
@@ -332,7 +332,7 @@ sub _start_x {
 	sleep($x_poll_time);
 	$l7r->_check_abort($vm, 1);
     }
-    $resp or die "Unable to start X server on VM: $@";
+    $resp or LOGDIE "Unable to start X server on VM: $@";
 }
 
 sub _wait_for_x {
@@ -348,7 +348,7 @@ sub _wait_for_x {
 		return
 	    }
 	    when ([undef, 'starting']) {
-		die "Unable to start VM X server, operation timed out!\n"
+		LOGDIE "Unable to start VM X server, operation timed out!\n"
 		    if time > $timeout;
 	    }
 	    when ('provisioning') {
@@ -356,7 +356,7 @@ sub _wait_for_x {
 		# long process
 	    }
 	    default {
-		die "Unable to start XV X server, state went to $_\n"
+		LOGDIE "Unable to start XV X server, state went to $_\n"
 	    }
 	}
 	sleep($x_poll_time);
@@ -376,7 +376,7 @@ sub _run_forwarder {
     my $socket = IO::Socket::INET->new(PeerAddr => $vm_address,
 				       PeerPort => $vm_x_port,
 				       Proto => 'tcp')
-	or die "Unable to connect to X server: $!";
+	or LOGDIE "Unable to connect to X server: $!";
     this_host->counters->incr_nx_ok;
 
     DEBUG "Socket connected to X server";
@@ -416,7 +416,7 @@ sub _check_abort {
     my ($l7r, $vm, $update) = @_;
     $vm->discard_changes if $update;
     my $cmd = $vm->user_cmd;
-    die "Aborted by contending session"
+    LOGDIE "Aborted by contending session"
 	if (defined $cmd and $cmd eq 'abort');
 }
 
