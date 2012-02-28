@@ -20,6 +20,7 @@ use Pg::PQ qw(:pgres);
 use QVD::Log;
 use AnyEvent;
 use AnyEvent::Pg;
+use Linux::Proc::Net::TCP;
 
 use Time::HiRes ();
 
@@ -41,8 +42,11 @@ use QVD::StateMachine::Declarative
     'new'                            => { transitions => { _on_run                    => 'starting/acquiring_lock'      } },
 
     'starting/acquiring_lock'        => { enter       => '_acquire_lock',
-                                          transitions => { _on_acquire_lock_done      => 'starting/connecting_to_db',
+                                          transitions => { _on_acquire_lock_done      => 'starting/checking_tcp_ports',
                                                            _on_acquire_lock_error     => 'failed'                       } },
+    'starting/checking_tcp_ports'    => { enter       => '_check_tcp_ports',
+                                          transitions => { _on_check_tcp_ports_done   => 'starting/connecting_to_db',
+                                                           _on_check_tcp_ports_error  => 'failed'                       } },
 
     'starting/connecting_to_db'      => { enter       => '_start_db',
                                           transitions => { _on_db_connected           => 'starting/loading_db_config'   } },
@@ -209,6 +213,19 @@ sub run {
 
     $self->_on_run;
     $self->{exit}->recv;
+}
+
+sub _check_tcp_ports {
+    my $self = shift;
+    INFO 'checking TCP ports are free';
+    my $tcp = Linux::Proc::Net::TCP->read;
+    if (grep $_ == 53, $tcp->listener_ports) {
+        ERROR "TCP port 53 is already in use";
+        $self->_on_check_tcp_ports_error;
+    }
+    else {
+        $self->_on_check_tcp_ports_done;
+    }
 }
 
 sub _start_db {

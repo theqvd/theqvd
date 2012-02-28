@@ -61,7 +61,7 @@ sub _make_config {
     my $self = shift;
     my $dhcp_hostsfile     = $self->_cfg('internal.vm.network.dhcp-hostsfile');
     DEBUG "Writing DHCP hosts file '$dhcp_hostsfile'";
-    open my $fh, ">", $dhcp_hostsfile or LOGDIE "unable to open $dhcp_hostsfile: $!";
+    open my $fh, ">", $dhcp_hostsfile or die "unable to open $dhcp_hostsfile: $!";
     for my $vm (sort { $self->{mac}{$a} cmp $self->{mac}{$b} } keys %{$self->{mac}}) {
         print $fh "$self->{mac}{$vm},$self->{ip}{$vm}\n";
     }

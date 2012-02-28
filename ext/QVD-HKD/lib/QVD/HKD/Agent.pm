@@ -82,7 +82,7 @@ sub _query_callbacks ($;\%) {
     my ($name, $opts) = @_;
     my @cb = @{ $query_callbacks{$name} //=
                     do {
-                        $name =~ /([a-zA-Z]\w*)$/ or LOGDIE "internal error: bad method name: $name";
+                        $name =~ /([a-zA-Z]\w*)$/ or die "internal error: bad method name: $name";
                         [ map "_on_$1_$_", @query_callbacks ];
                     }
                 };
@@ -112,7 +112,7 @@ sub _query_n {
     }
 
 
-    my $db = $self->_db // LOGDIE "internal error: database handler not available";
+    my $db = $self->_db // die "internal error: database handler not available";
     my $seq = $db->push_query(query     => $sql,
                               args      => \@args,
                               on_result => sub {
@@ -237,7 +237,7 @@ sub _kill_cmd {
     my ($self, $signal, $pid) = @_;
     unless (defined $pid) {
         ($pid) = my(@pids) = keys %{$self->{cmd_watcher}};
-        @pids > 1 and LOGDIE "internal error: more than one slave command is running, pids: @pids";
+        @pids > 1 and die "internal error: more than one slave command is running, pids: @pids";
         if (!@pids) {
             $debug and $self->_debug("no slave command is running");
             WARN 'No slave command is running';
