@@ -1,6 +1,8 @@
 # IMPORTANT: if you delete this file your app will not work as
 # expected.  you have been warned
 #use inc::Module::Install;
+use strict;
+use warnings;
 use Module::Build;
 
 my $build = new Module::Build(
@@ -11,7 +13,7 @@ my $build = new Module::Build(
 	license          => 'gpl',
 
 	PL_files         => {},
-	pl_files         => glob('bin/*.pl'),
+	pl_files         => [ glob('script/*.pl') ],
 
 	configure_requires => { 
 		'Module::Build'                      => 0.38
