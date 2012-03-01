@@ -18,4 +18,4 @@ WriteMakefile( NAME          => 'QVD::L7R',
 				  'Test::More'            => 0,
                                   'App::Daemon'           => 0,
                                 },
-               EXE_FILES      => [qw(bin/qvd-l7r bin/qvd-l7r.initrc.pl)] );
+               EXE_FILES      => [qw(bin/qvd-l7r bin/qvd-l7r.initrc.pl bin/qvd-l7r.debrc.pl)] );
