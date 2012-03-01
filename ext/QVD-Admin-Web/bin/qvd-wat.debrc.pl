@@ -18,10 +18,11 @@
 
 # PATH should only include /usr/* if it runs after the mountnfs.sh script
 PATH=/usr/lib/qvd/bin:/bin:/usr/bin:/sbin
+
 DESC="QVD Web Administration Tool"
 NAME=qvd-wat
 DAEMON=/usr/lib/qvd/bin/qvd_admin_web_server.pl
-PIDFILE=/var/run/$NAME.pid
+PIDFILE=/var/run/qvd/$NAME.pid
 SCRIPTNAME=/etc/init.d/$NAME
 PORT=3000
 
