@@ -1,3 +1,4 @@
+bin/qvd-wat.debrc.pl
 bin/qvd-wat.initrc.pl
 bin/qvd_admin_web_cgi.pl
 bin/qvd_admin_web_create.pl
