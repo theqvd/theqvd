@@ -582,6 +582,7 @@ sub _fw_rules {
 
      # allow DHCP and DNS traffic between the VMs and this host:
      [INPUT   => -m => 'iprange', '--src-range' => $netvms, '-p' => 'udp', '-m' => 'multiport', '--dports' => '67,53', '-j', 'ACCEPT'],
+     [INPUT   => -m => 'iprange', '--src-range' => $netvms, '-p' => 'tcp',                      '--dports' => '53',    '-j', 'ACCEPT'],
 
      # disallow non-tcp protocols between the VMs and the hosts:
      [FORWARD => -m => 'iprange', '--src-range' => $netvms, '--dst-range' => $netnodes, '-j', 'DROP'],
