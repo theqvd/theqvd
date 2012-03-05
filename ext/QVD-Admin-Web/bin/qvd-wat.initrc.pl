@@ -6,7 +6,7 @@
 # Required-Stop:     $null
 # Should-Start:      $named
 # Should-Stop:       $null
-# Default-Start:     2 3 4 5
+# Default-Start:     2 3 5
 # Default-Stop:      0 1 6
 # Short-Description: QVD Web Administration Tool
 # Description:       QVD Web Administration Tool allows administrators manage the users, virtualmachines and operating system images of a QVD platform from the web browser.
