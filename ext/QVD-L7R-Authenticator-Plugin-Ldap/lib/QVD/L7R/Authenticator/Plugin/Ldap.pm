@@ -17,8 +17,10 @@ my $ldap_scope  = cfg('auth.ldap.scope' , 0) // 'base';
 my $ldap_binddn = cfg('auth.ldap.binddn', 0) // '';
 my $ldap_bindpass = cfg('auth.ldap.bindpass', 0) // '';
 my $ldap_userbindpattern = cfg('auth.ldap.userbindpattern', 0) // '';
+my $ldap_deref = cfg('auth.ldap.deref', 0) // 'never';
 
 $ldap_scope =~ /^(?:base|one|sub)$/ or die "bad value $ldap_scope for auth.ldap.scope";
+$ldap_deref =~ /^(?:never|search|find|always)$/ or die "bad value $ldap_deref for auth.ldap.deref";
 
 sub _escape {
     # This sub formerly copied from Net::LDAP::Filter
@@ -61,7 +63,9 @@ sub authenticate_basic {
     my $filter = $ldap_filter;
     $filter =~ s/\%u/$escaped_login/g;
     $msg = $ldap->search(base   => $ldap_base,
-			 filter => $filter);
+			 filter => $filter,
+			 deref => $ldap_deref,
+	);
     DEBUG("searching in $ldap_base with filter $filter for user $login");
     if (!$msg->code) {
 	if (defined (my $entry = ($msg->entries)[0])) {
@@ -70,8 +74,14 @@ sub authenticate_basic {
 	    $msg = $ldap->bind($dn, password => $passwd);
 	    if (!$msg->code) {
 		return 1;
+	    } else {
+		DEBUG "Error in authentication. Ldap code was: ".$msg->code."(".$msg->error_desc.")";
 	    }
+	} else {
+		DEBUG "Error no entry found for $ldap_base with filter $filter for user $login";
 	}
+    } else {
+	ERROR "Error in DN search $ldap_base with filter $filter for user $login. Ldap code was: ".$msg->code."(".$msg->error_desc.")";
     }
     return ()
 }
@@ -137,6 +147,9 @@ the authentication is used
 
 =item * auth.ldap.userbindpattern (Optional by default empty). If specified an initial
 bind with this string is attempted. The login attribute is susbsituted with %u.
+
+=item * auth.ldap.deref (Optional by default never). How aliases are dereferenced, the
+accepted values are never, search, find and always. See L<Net::LDAP> for more info.
 
 =back
 
