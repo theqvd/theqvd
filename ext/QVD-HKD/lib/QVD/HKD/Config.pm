@@ -44,8 +44,11 @@ sub _reload_base_config {
 
 sub _cfg {
     my $self = shift;
-    my $value = eval { $self->{props}->requireProperty(@_) };
-    defined $value or LOGDIE $@;
+    my $value = $self->{props}->getProperty(@_);
+    unless (defined $value) {
+        $debug and $self->_debug("configuration entry for key $_[0] missing");
+        LOGDIE "configuration entry $_[0] missing";
+    }
     $value =~ s/\${(.*?)}/$1 eq '{' ? '${' : $self->_cfg($1)/ge;
     $debug and $self->_debug("config: $_[0] = $value");
     $value;
