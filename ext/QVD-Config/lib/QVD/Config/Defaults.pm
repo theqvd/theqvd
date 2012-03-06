@@ -147,6 +147,7 @@ vm.hypervisor = kvm
 
 ## COW fs to use with LXC
 vm.lxc.unionfs.type = aufs
+# vm.lxc.unionfs.type = unionfs-fuse
 vm.lxc.unionfs.bind.ro = 1
 
 ## whether to keep overlay images from one session to the next
