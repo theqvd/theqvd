@@ -2,8 +2,10 @@
 
 export PERL5OPT='-Mlib::glob=*/lib -Mlib::glob=/home/salva/g/perl/p5-*/{lib,blib/arch}'
 
-for i in */bin; do PATH=$i:$PATH; done
+for i in QVD*/bin; do PATH=$i:$PATH; done
 export PATH
+
+echo PATH=$PATH
 
 set -x
 
