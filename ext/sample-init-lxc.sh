@@ -26,6 +26,9 @@ perl -S qvd-deploy-db.pl --force >/tmp/sample-init.log 2>&1|| exit 1;
 
 perl -S qvd-admin.pl config ssl key=sample-config/certs/server-key.pem cert=sample-config/certs/server-cert.pem
 perl -S qvd-admin.pl config set vm.network.ip.start=10.1.0.30
+perl -S qvd-admin.pl config set vm.network.netmask=255.255.0.0
+perl -S qvd-admin.pl config set vm.network.gateway=10.1.0.1
+
 perl -S qvd-admin.pl config set vm.hypervisor=lxc
 
 perl -S qvd-admin.pl host add name=node1 address=127.0.0.1
