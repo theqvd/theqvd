@@ -13,6 +13,7 @@ use QVD::Log;
 use Carp;
 
 use QVD::HKD::VMAMonitor;
+use QVD::HKD::Config::Network qw(netmask_len);
 
 use parent qw(QVD::HKD::Agent);
 
@@ -98,7 +99,8 @@ sub _on_load_row_result {
     @{$self}{qw(name user_id osf_id di_tag ip storage)} = $res->row;
     INFO "Successfully loaded row for VM '$self->{vm_id}'";
     $self->{mac} = $self->_ip_to_mac($self->{ip});
-    $self->{dhcpd_handler}->register_mac_and_ip(@$self{qw(vm_id mac ip)});
+    my $dhcpd_handler = $self->{dhcpd_handler};
+    $dhcpd_handler->register_mac_and_ip(@$self{qw(vm_id mac ip)}) if $dhcpd_handler;
 }
 
 sub _incr_run_attempts {
@@ -184,6 +186,8 @@ sub _fw_rules {
     my $INPUT   = "QVD_${vm_id}_INPUT";
     my $FORWARD = "QVD_${vm_id}_FORWARD";
 
+    my $dhcp_accept = ($self->_cfg('vm.network.use_dhcp') ? 'ACCEPT' : 'DROP');
+
     return ( [-N => $INPUT,   -P => 'ACCEPT'],
              [-N => $FORWARD, -P => 'ACCEPT'],
 
@@ -192,9 +196,9 @@ sub _fw_rules {
              [-A => $FORWARD => -p => '0x800', '--ip-source' => '!', $ip, -j => 'DROP'],
              [-A => $INPUT   => -p => '0x800', '--ip-protocol' => '17',   # allow DHCP requests to host
                                         '--ip-source' => '0.0.0.0',
-                                        '--ip-destination-port' => '67', -j => 'ACCEPT'],
+                                        '--ip-destination-port' => '67', -j => $dhcp_accept],
              [-A => $FORWARD => -p => '0x800', '--ip-protocol' => '17',   # do not let DHCP traffic leave the host
-                                        '--ip-destination-port' => '67', -j => 'DROP'],
+                                               '--ip-destination-port' => '67', -j => 'DROP'],
              [-A => $INPUT   => -p => '0x800', '--ip-source' => '!', $ip, -j => 'DROP'],
 
              [-A => INPUT    => -i => $iface, -j => $INPUT  ],

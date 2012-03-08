@@ -349,15 +349,25 @@ sub _start_agents {
     $self->{vm_command_handler} = QVD::HKD::VMCommandHandler->new( %opts,
                                                                    on_cmd     => sub { $self->_on_vm_cmd($_[1], $_[2]) },
                                                                    on_stopped => sub { $self->_on_agent_stopped(@_) } );
-    $self->{dhcpd_handler} = QVD::HKD::DHCPDHandler->new( %opts,
-                                                          on_stopped => sub { $self->_on_agent_stopped(@_) } );
+
+    if ($self->_cfg("vm.network.use_dhcp")) {
+        $self->{dhcpd_handler} = QVD::HKD::DHCPDHandler->new( %opts,
+                                                              on_stopped => sub { $self->_on_agent_stopped(@_) } );
+    }
 
     DEBUG 'Starting command handler';
     $self->{command_handler}->run;
     # DEBUG 'Starting VM command handler';
     # $self->{vm_command_handler}->run;
-    DEBUG 'Starting DHCPD handler';
-    $self->{dhcpd_handler}->run;
+
+    if ($self->{dhcpd_handler}) {
+        DEBUG 'Starting DHCPD handler';
+        $self->{dhcpd_handler}->run;
+    }
+    else {
+        $debug and $self->_debug("use_dhcp is off");
+        INFO "DHCP server is administratively disabled, not running";
+    }
 
     $self->_on_agents_started;
 }
@@ -379,19 +389,21 @@ sub _check_all_agents_have_stopped {
     my $self = shift;
     $debug and $self->_debug("Agents running: ", join ", ", grep defined($self->{$_}), @agent_names);
     DEBUG "Still running agents: ", join ', ', grep defined($self->{$_}), @agent_names;
-    $self->_on_all_agents_stopped
-        unless grep defined($self->{$_}), @agent_names
+    return 0 if grep defined ($self->{$_}), @agent_names;
+    $self->_on_all_agents_stopped;
+    return 1;
 }
 
 sub _stop_all_agents {
     my $self = shift;
-    for my $agent_name (@agent_names) {
-        my $agent = $self->{$agent_name};
-        if (defined $agent) {
-            $agent->on_hkd_stop
+    unless ($self->_check_all_agents_have_stopped) {
+        for my $agent_name (@agent_names) {
+            my $agent = $self->{$agent_name};
+            if (defined $agent) {
+                $agent->on_hkd_stop
+            }
         }
     }
-    $self->_check_all_agents_have_stopped
 }
 
 sub _on_agent_stopped {

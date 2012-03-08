@@ -177,6 +177,8 @@ internal.vm.network.device.prefix = qvd
 ## start of DHCP range. There's no sensible default value
 # vm.network.ip.start=10.0.0.100
 
+vm.network.use_dhcp = 1
+
 ## file to pass to dnsmasq at its --dhcp-hostsfile parameter
 internal.vm.network.dhcp-hostsfile=${path.run}/dhcp-hostsfile
 

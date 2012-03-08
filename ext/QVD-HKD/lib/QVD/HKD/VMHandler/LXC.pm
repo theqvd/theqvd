@@ -202,7 +202,8 @@ use QVD::StateMachine::Declarative
 
     'stopping/killing_lxc'            => { enter       => '_kill_lxc',
                                            transitions => { _on_kill_lxc_done            => 'stopping/unlinking_iface',
-                                                            _on_kill_lxc_error           => 'zombie/beating_to_death'         },
+                                                            _on_kill_lxc_error           => 'zombie/beating_to_death',
+                                                            _on_dirty                    => 'dirty'                           },
                                            ignore      => ['_on_lxc_done']                                                      },
 
     'stopping/unlinking_iface'        => { enter       => '_unlink_iface',
@@ -247,11 +248,12 @@ use QVD::StateMachine::Declarative
 
     'zombie/killing_lxc'              => { enter       => '_kill_lxc',
                                            transitions => { _on_kill_lxc_done            => 'zombie/unlinking_iface',
-                                                            _on_kill_lxc_error           => 'zombie/unsetting_heavy_mark'    } },
+                                                            _on_kill_lxc_error           => 'zombie/unsetting_heavy_mark',
+                                                            _on_dirty                    => 'dirty'                          } },
 
     'zombie/unlinking_iface'          => { enter       => '_unlink_iface',
                                            transitions => { _on_unlink_iface_done        => 'zombie/removing_fw_rules',
-                                                            _on_unlink_iface_error       => 'zombie/beating_to_death'         } },
+                                                            _on_unlink_iface_error       => 'zombie/beating_to_death'        } },
 
     'zombie/removing_fw_rules'        => { enter       => '_remove_fw_rules',
                                            transitions => { _on_remove_fw_rules_done     => 'zombie/destroying_lxc',
@@ -274,7 +276,9 @@ use QVD::StateMachine::Declarative
     'zombie'                          => { enter       => '_set_state_timer',
                                            leave       => '_abort_all',
                                            transitions => { _on_state_timeout => 'zombie/killing_lxc',
-                                                            on_hkd_stop => 'stopped'                                         } };
+                                                            on_hkd_stop => 'stopped'                                         } },
+
+    'dirty'                           => {};
 
 
 sub _on_cmd_stop  :OnState('__any__') { shift->delay_until_next_state }
@@ -302,6 +306,9 @@ sub _mkpath {
 sub _calculate_attrs {
     my $self = shift;
     $self->{lxc_name} = "qvd-$self->{vm_id}";
+
+    $self->{netmask_len} = $self->netmask_len;
+    $self->{gateway} = $self->_cfg('vm.network.gateway');
 
     my $rootfs_parent = $self->_cfg('path.storage.rootfs');
     $rootfs_parent =~ s|/*$|/|;
@@ -341,10 +348,11 @@ sub _calculate_attrs {
     # $self->_cfg('internal.vm.network.device.prefix') . $self->{vm_id} . 'r' . int(rand 10000);
 
     if ($debug) {
-        for (qw(di_path os_basefs os_overlayfs os_overlayfs_old os_rootfs_parent os_rootfs home_fs home_fs_mnt iface)) {
+        for (qw(di_path os_basefs os_overlayfs os_overlayfs_old os_rootfs_parent os_rootfs
+                home_fs home_fs_mnt iface netmask_len gateway)) {
             my $path = $self->{$_} // '<undef>';
-            $self->_debug("path $_: $path");
-            DEBUG "Path $_: $path";
+            $self->_debug("attribute $_: $path");
+            DEBUG "Attribute $_: $path";
         }
     }
 
@@ -578,8 +586,15 @@ lxc.pts=1
 lxc.rootfs=$self->{os_rootfs}
 lxc.mount.entry=$self->{home_fstab}
 #lxc.cap.drop=sys_module audit_control audit_write linux_immutable mknod net_admin net_raw sys_admin sys_boot sys_resource sys_time
-
 EOC
+
+    if (!$self->_cfg('vm.network.use_dhcp')) {
+        print $fh <<EOC;
+lxc.network.ipv4 = $self->{ip}/$self->{netmask_len}
+lxc.network.ipv4.gateway = $self->{gateway}
+EOC
+    }
+
     close $fh;
     $self->_run_cmd([$self->_cfg('command.lxc-create'),
                      -n => $lxc_name,
@@ -615,6 +630,12 @@ sub _wait_for_zombie_lxc {
 
 sub _kill_lxc {
     my $self = shift;
+
+    if ($self->_cfg("internal.hkd.lxc.does.not.cleanup") and $self->state =~ /^(?:stopping|zombie)\b/) {
+        $debug and $self->_debug("making machine dirty at _kill_lxc because internal.hkd.lxc.does.not.cleanup is set");
+        return $self->_on_dirty;
+    }
+
     my @pids;
     my $cgroup = $self->_cfg('path.cgroup');
     my $fn = "$cgroup/$self->{lxc_name}/cgroup.procs";
