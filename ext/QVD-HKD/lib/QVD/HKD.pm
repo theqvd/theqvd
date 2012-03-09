@@ -461,7 +461,7 @@ sub _on_vm_cmd {
         }
         else {
             $debug and $self->_debug("dropping command $cmd for vm $vm_id while on state " . $self->state);
-            WARN "Dropping command '$cmd' received for '$vm_id'";
+            WARN "Dropping command '$cmd' received for '$vm_id' while on state " . $self->state;
             return $self->_on_vm_cmd_done($vm_id);
         }
     }
