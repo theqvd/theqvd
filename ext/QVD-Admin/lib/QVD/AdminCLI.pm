@@ -79,7 +79,7 @@ my %syntax_check_cbs = (
             $$errors++, warn "Syntax error: parameters 'osf_id' and 'osf' are mutually exclusive\n",  if exists $args->{'osf_id'} and exists $args->{'osf'};
             $$errors++, warn "Syntax error: parameters 'user_id' and 'user' are mutually exclusive\n", if exists $args->{'user_id'} and exists $args->{'user'};
             $$errors++, warn "Syntax error: parameter 'name' is mandatory\n", unless exists $args->{'name'};
-            delete @$args{qw/osf_id osf user_id user name ip/};
+            delete @$args{qw/osf_id osf user_id user name ip di_tag/};
         },
     },
 );
@@ -1210,7 +1210,7 @@ sub cmd_vm_add {
 sub help_vm_add {
     print <<EOT
 vm add: Adds virtual machines.
-usage: vm add name=value (user=value | user_id=value) (osf=value | osf_id=value) [ip=value] [storage=value]
+usage: vm add name=value (user=value | user_id=value) (osf=value | osf_id=value) [ip=value] [storage=value] [di_tag=value]
        
 Valid options:
     -q [--quiet]         : don't print the command message

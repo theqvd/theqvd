@@ -542,7 +542,7 @@ sub cmd_vm_add {
             INFO "assigned IP: $params{ip}";
         }
         $params{storage} = '';
-        $params{di_tag} = 'default';
+        $params{di_tag} //= 'default';
         my $row = $self->_obj_add('vm', [qw/name user_id osf_id ip storage di_tag/],
                                   \%params);
         rs(VM_Runtime)->create({vm_id         => $row->id,
