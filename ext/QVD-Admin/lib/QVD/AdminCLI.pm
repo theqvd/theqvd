@@ -1210,7 +1210,7 @@ sub cmd_vm_add {
 sub help_vm_add {
     print <<EOT
 vm add: Adds virtual machines.
-usage: vm add name=value (user=value | user_id=value) (osf=value | osf_id=value) [ip=value] [storage=value] [di_tag=value]
+usage: vm add name=value (user=value | user_id=value) (osf=value | osf_id=value) [ip=value] [di_tag=value]
        
 Valid options:
     -q [--quiet]         : don't print the command message
