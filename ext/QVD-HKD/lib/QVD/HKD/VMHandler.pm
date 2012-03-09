@@ -147,7 +147,7 @@ sub _save_runtime_row {
     $self->{serial_port} = $self->_allocate_tcp_port if $self->_cfg('vm.serial.redirect');
     $self->{mon_port}    = $self->_allocate_tcp_port if $self->_cfg('internal.vm.monitor.redirect');
     no warnings 'uninitialized';
-    DEBUG sprintf "Saving runtime row for VM '%d': VMA port '%d', X11 port '%d', SSH port '%d', VNC port '%d', serial port '%d', monitor port '%d'",
+    DEBUG sprintf "Saving runtime row for VM '%d': VMA port '%d', X11 port '%d', SSH port '%d', VNC port '%s', serial port '%s', monitor port '%s'",
         @{$self}{qw(vm_id vma_port x_port ssh_port vnc_port serial_port mon_port)};
 
     $self->_query_1(<<'SQL', @{$self}{qw(ip vma_port x_port ssh_port vnc_port serial_port mon_port vm_id)});
@@ -164,7 +164,6 @@ update vm_runtimes
         vm_id          = $8
 SQL
 }
-
 
 # FIXME: move this out of here, maybe into a module:
 use constant TUNNEL_DEV => '/dev/net/tun';
