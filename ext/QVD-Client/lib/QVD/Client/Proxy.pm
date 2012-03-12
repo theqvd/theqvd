@@ -153,6 +153,10 @@ sub connect_to_vm {
 
     my $vm_id = $cli->proxy_list_of_vm_loaded($vm_list);
 
+    if (!defined $vm_id) {
+        $cli->proxy_connection_status('CLOSED');
+        return;
+    }
     $connect_info{id} = $vm_id;
 
     my %o = ( id 			    => $connect_info{id},
