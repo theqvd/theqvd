@@ -18,6 +18,8 @@ database.user = qvd
 database.name = qvd
 # database.password =
 
+model.user.login.case-sensitive = 0
+
 ## directory where several configuration, state, pid and certificate files are stored
 path.run = /var/run/qvd
 ## where QVD logs are stored
@@ -116,6 +118,8 @@ l7r.loadbalancer.plugin.default.weight.ram = 1
 l7r.loadbalancer.plugin.default.weight.cpu = 1
 l7r.loadbalancer.plugin.default.weight.random = 1
 
+
+
 ## umask for the HKD process
 hkd.user.umask = 0022
 ## user to run hkd as
@@ -149,6 +153,8 @@ vm.hypervisor = kvm
 vm.lxc.unionfs.type = aufs
 # vm.lxc.unionfs.type = unionfs-fuse
 vm.lxc.unionfs.bind.ro = 1
+
+internal.vm.lxc.conf.extra=
 
 ## whether to keep overlay images from one session to the next
 vm.overlay.persistent = 0

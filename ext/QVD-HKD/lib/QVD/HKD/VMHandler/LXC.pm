@@ -585,6 +585,7 @@ lxc.tty=3
 lxc.pts=1
 lxc.rootfs=$self->{os_rootfs}
 lxc.mount.entry=$self->{home_fstab}
+lxc.pivotdir=qvd-pivot
 #lxc.cap.drop=sys_module audit_control audit_write linux_immutable mknod net_admin net_raw sys_admin sys_boot sys_resource sys_time
 EOC
 
@@ -594,6 +595,8 @@ lxc.network.ipv4 = $self->{ip}/$self->{netmask_len}
 lxc.network.ipv4.gateway = $self->{gateway}
 EOC
     }
+
+    print $fh, $self->_cfg('internal.vm.lxc.conf.extra'), "\n";
 
     close $fh;
     $self->_run_cmd([$self->_cfg('command.lxc-create'),
