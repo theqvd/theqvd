@@ -13,10 +13,11 @@ use QVD::Config;
 use QVD::Config::Network qw(nettop_n netstart_n net_aton net_ntoa);
 use QVD::Log;
 
-my $osf_default_memory  = cfg('osf.default.memory');
-my $osf_default_overlay = cfg('osf.default.overlay');
+my $osf_default_memory   = cfg('osf.default.memory');
+my $osf_default_overlay  = cfg('osf.default.overlay');
 
-my $images_path         = cfg('path.storage.images');
+my $images_path          = cfg('path.storage.images');
+my $case_sensitive_login = cfg('model.user.login.case-sensitive');
 
 sub new {
     my $class = shift;
@@ -500,6 +501,14 @@ sub cmd_user_add {
     ## is checked beforehand so this won't happen anymore.
     my %core_params = ( login    => delete $params{login},
                         password => delete $params{password} );
+
+    my $rs = $self->get_resultset('user');
+    while (my $user = $rs->next) {
+        if (!$case_sensitive_login and lc $core_params{login} eq lc $user->login) {
+            die "User already exists\n";
+        }
+    }
+
 
     $self->_obj_add('user', [qw/login password/], %core_params)
         -> id;
