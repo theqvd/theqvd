@@ -78,6 +78,8 @@ command.lxc-wait = /usr/lib/qvd/bin/lxc-wait
 command.ebtables = ebtables
 command.iptables = iptables
 
+## whether to remember password after successful connection
+client.remember_password = 1
 ## nxproxy's link parameter, can be: modem, isdn, adsl, wan, lan, local or a bandwidth specification (56k, 1m, 100m...)
 client.link = adsl
 ## nxproxy's geometry parameter

@@ -66,9 +66,7 @@ sub new {
 
 	my $self = $class->SUPER::new( $parent, $id, $title, $pos, $size, $style, $name );
 
-	my $panel = $self->{panel} = Wx::Panel->new($self, -1,
-						    wxDefaultPosition, wxDefaultSize,
-						    wxTAB_TRAVERSAL );
+	my $panel = $self->{panel} = Wx::Panel->new($self, -1, wxDefaultPosition, wxDefaultSize, wxTAB_TRAVERSAL );
 
 	my $ver_sizer  = Wx::BoxSizer->new(wxVERTICAL);
 
@@ -83,62 +81,59 @@ sub new {
 		$logo_image = "/usr/share/pixmaps/qvd-logo.png";
 	    }
 	}
-	$ver_sizer->Add(Wx::StaticBitmap->new($panel, -1,
-					      Wx::Bitmap->new($logo_image,
-							      wxBITMAP_TYPE_ANY)),
-			0, wxLEFT|wxRIGHT|wxTOP|wxALIGN_CENTER_HORIZONTAL, 20);
+	$ver_sizer->Add(
+        Wx::StaticBitmap->new(
+            $panel,
+            -1,
+            Wx::Bitmap->new($logo_image, wxBITMAP_TYPE_ANY)
+        ),
+        0,
+        wxLEFT|wxRIGHT|wxTOP|wxALIGN_CENTER_HORIZONTAL,
+        20
+    );
 
-	my $grid_sizer = Wx::GridSizer->new(1, 2, 0, 0);
+	my $grid_sizer = Wx::GridSizer->new(1, 3, 0, 0);
 	$ver_sizer->Add($grid_sizer, 1, wxALL|wxEXPAND, 20);
 
-	$grid_sizer->Add(Wx::StaticText->new($panel, -1, "User"),
-			 0, wxALL, 5);
-
+	$grid_sizer->Add(Wx::StaticText->new($panel, -1, "User"), 0, wxALL, 5);
 	$self->{username} = Wx::TextCtrl->new($panel, -1, cfg('client.user.name'));
-	$grid_sizer->Add($self->{username},
-			 1, wxALL|wxEXPAND, 5);
+	$grid_sizer->Add($self->{username}, 1, wxALL|wxEXPAND, 5);
 	$self->{username}->SetFocus();
-	$grid_sizer->Add(Wx::StaticText->new($panel, -1, "Password"),
-			 0, wxALL, 5);
-	$self->{password} = Wx::TextCtrl->new($panel, -1, "",
-					      wxDefaultPosition, wxDefaultSize,
-					      wxTE_PASSWORD);
-	$grid_sizer->Add($self->{password},
-			 1, wxALL|wxEXPAND, 5);
+	$grid_sizer->Add(Wx::StaticText->new($panel, -1, ""), 0, wxALL, 5);
+
+	$grid_sizer->Add(Wx::StaticText->new($panel, -1, "Password"), 0, wxALL, 5);
+	$self->{password} = Wx::TextCtrl->new($panel, -1, "", wxDefaultPosition, wxDefaultSize, wxTE_PASSWORD);
+	$grid_sizer->Add($self->{password}, 0, wxALL|wxEXPAND, 5);
+    $self->{remember_pass} = Wx::CheckBox->new ($panel, -1, 'Remember password', wxDefaultPosition);
+    $self->{remember_pass}->SetValue(!!cfg('client.remember_password'));
+	$grid_sizer->Add($self->{remember_pass}, 1, wxALL, 5);
 
     if (!cfg('client.force.host.name', 0)) {
-        $grid_sizer->Add(Wx::StaticText->new($panel, -1, "Server"),
-                 0, wxALL, 5);
+        $grid_sizer->Add(Wx::StaticText->new($panel, -1, "Server"), 0, wxALL, 5);
         $self->{host} = Wx::TextCtrl->new($panel, -1, cfg('client.host.name'));
-        $grid_sizer->Add($self->{host},
-                 1, wxALL|wxEXPAND, 5);
+        $grid_sizer->Add($self->{host}, 1, wxALL|wxEXPAND, 5);
+        $grid_sizer->Add(Wx::StaticText->new($panel, -1, ""), 0, wxALL, 5);
     }
 
     if (!cfg('client.force.link', 0)) {
-        $grid_sizer->Add(Wx::StaticText->new($panel, -1, "Connection type"),
-                 0, wxALL, 5);			 
-                 
+        $grid_sizer->Add(Wx::StaticText->new($panel, -1, "Connection type"), 0, wxALL, 5);			 
         my @link_options = ("Local", "ADSL", "Modem");
         $self->{link} = Wx::Choice->new($panel, -1);
-        $grid_sizer->Add($self->{link},
-                 1, wxALL|wxEXPAND, 5);
+        $grid_sizer->Add($self->{link}, 1, wxALL|wxEXPAND, 5);
         $self->{link}->AppendItems(\@link_options);
         $self->{link}->Select(0);
         # FIXME Introduce previous user selection here
+        $grid_sizer->Add(Wx::StaticText->new($panel, -1, ""), 0, wxALL, 5);
     }
 
 	# port goes here!
 	$self->{connect_button} = Wx::Button->new($panel, -1, "Connect");
-	$ver_sizer->Add($self->{connect_button},
-			0, wxLEFT|wxRIGHT|wxBOTTOM|wxEXPAND, 20);
+	$ver_sizer->Add($self->{connect_button}, 0, wxLEFT|wxRIGHT|wxBOTTOM|wxEXPAND, 20);
 	$self->{connect_button}->SetDefault;
 
-	$self->{progress_bar} = Wx::Gauge->new($panel, -1, 100,
-					       wxDefaultPosition, wxDefaultSize,
-					       wxGA_HORIZONTAL|wxGA_SMOOTH);
+	$self->{progress_bar} = Wx::Gauge->new($panel, -1, 100, wxDefaultPosition, wxDefaultSize, wxGA_HORIZONTAL|wxGA_SMOOTH);
 	$self->{progress_bar}->SetValue(0);
-	$ver_sizer->Add($self->{progress_bar},
-			 0, wxEXPAND, 0);
+	$ver_sizer->Add($self->{progress_bar}, 0, wxEXPAND, 0);
 
 	$self->SetTitle("QVD");
 	my $icon = Wx::Icon->new();
@@ -324,6 +319,7 @@ sub OnConnectionStatusChanged {
 	$self->EnableControls(0);
 	$self->{timer}->Start(50, 0);
     } elsif ($status eq 'CONNECTED') {
+    $self->{password}->SetValue ('') if !$self->{remember_pass}->IsChecked;
 	$self->Hide();
 	$self->{timer}->Stop();
     } elsif ($status eq 'CLOSED') {
