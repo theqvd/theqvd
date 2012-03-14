@@ -254,6 +254,10 @@ sub OnClickConnect {
               host => cfg('client.force.host.name', 0) // $self->{host}->GetValue,
 		      map { $_ => $self->{$_}->GetValue } qw(username password) );
 
+    my $u = $self->{username}->GetValue;
+    $u =~ s/^\s*//; $u =~ s/\s*$//;
+    $self->{username}->SetValue ($u);
+
     $connect_info{port} = $1 if $connect_info{host} =~ s/:(\d+)$//;
 
     $self->SaveConfiguration();
