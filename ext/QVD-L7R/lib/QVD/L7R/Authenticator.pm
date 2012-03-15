@@ -5,8 +5,9 @@ use warnings;
 
 use QVD::Config;
 use QVD::Log;
-
 use Carp;
+
+my $case_sensitive_login = cfg('model.user.login.case-sensitive');
 
 my @plugin_modules;
 for (split /\s*,\s*/, cfg('l7r.auth.plugins')) {
@@ -16,16 +17,16 @@ for (split /\s*,\s*/, cfg('l7r.auth.plugins')) {
     s/^(.)/uc $1/e;
     my $module = "QVD::L7R::Authenticator::Plugin::$_";
     eval "require $module; 1"
-	or croak "unable to load $module: $@";
+        or croak "unable to load $module: $@";
     push @plugin_modules, $module;
 }
 
 sub new {
     my $class = shift;
     my $auth = { modules => [@plugin_modules],
-		 params  => {},
-		 login   => undef,
-		 user_id => undef };
+                 params  => {},
+                 login   => undef,
+                 user_id => undef };
     bless $auth, $class;
     $_->init($auth) for @plugin_modules;
     $auth;
@@ -33,13 +34,16 @@ sub new {
 
 sub authenticate_basic {
     my ($auth, $login, $passwd, $l7r) = @_;
-    DEBUG "authenticating user $login with modules @{$auth->{modules}}";
+
+    my $login2 = $case_sensitive_login ? $login : lc $login;
+
+    DEBUG "authenticating user $login ($login2) with modules @{$auth->{modules}}";
     for (@{$auth->{modules}}) {
-	if ($_->authenticate_basic($auth, $login, $passwd, $l7r)) {
-	    $auth->{login} = $login;
-	    $auth->{params}{'qvd.vm.user.name'} = $login;
-	    return 1;
-	}
+        if ($_->authenticate_basic($auth, $login2, $passwd, $l7r)) {
+            $auth->{login} = $login2;
+            $auth->{params}{'qvd.vm.user.name'} = $login2;
+            return 1;
+        }
     }
     return ();
 }
