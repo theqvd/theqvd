@@ -191,7 +191,7 @@ sub _authenticate_user {
     my ($l7r, $headers) = @_;
     if (my ($credentials) = header_lookup($headers, 'Authorization')) {
         # DEBUG "auth credentials: $credentials";
-    $l7r->{_auth_tried}++ or this_host->counters->incr_auth_attempts;
+        $l7r->{_auth_tried}++ or this_host->counters->incr_auth_attempts;
         if (my ($basic) = $credentials =~ /^Basic (.*)$/) {
             # DEBUG "auth basic: $basic";
             if (my ($user, $passwd) = decode_base64($basic) =~ /^([^:]+):(.*)$/) {
@@ -199,7 +199,7 @@ sub _authenticate_user {
                 if ($auth->authenticate_basic($user, $passwd, $l7r)) {
                     INFO "Accepted connection from user $user from ip:port ".
                         $l7r->{server}->{client}->peerhost().":".$l7r->{server}->{client}->peerport();
-            $l7r->{_auth_done}++ or this_host->counters->incr_auth_ok;
+                        $l7r->{_auth_done}++ or this_host->counters->incr_auth_ok;
                     return $auth;
                 }
                 INFO "Failed login attempt from user $user";

@@ -32,16 +32,29 @@ sub new {
     $auth;
 }
 
+sub _set_login {
+    my ($auth, $login) = @_;
+    $auth->{login} = $login;
+    $auth->{params}{'qvd.vm.user.name'} = $login;
+}
+
 sub authenticate_basic {
     my ($auth, $login, $passwd, $l7r) = @_;
 
     my $login2 = $case_sensitive_login ? $login : lc $login;
 
+    if ($l7r->{_auth_cred_cache} eq "$login2:$passwd") {
+        INFO "Cached credentials found, user '$login2' successfully authenticated";
+        $auth->_set_login ($login2);
+        return $auth;
+    }
+    DEBUG 'Cached credentials not found';
+
     DEBUG "authenticating user $login ($login2) with modules @{$auth->{modules}}";
     for (@{$auth->{modules}}) {
         if ($_->authenticate_basic($auth, $login2, $passwd, $l7r)) {
-            $auth->{login} = $login2;
-            $auth->{params}{'qvd.vm.user.name'} = $login2;
+            $auth->_set_login ($login2);
+            $l7r->{_auth_cred_cache} = "$login2:$passwd";
             return 1;
         }
     }
