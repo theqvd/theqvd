@@ -501,14 +501,8 @@ sub cmd_user_add {
     ## is checked beforehand so this won't happen anymore.
     my ($u, $p) = delete @params{qw/login password/};
     $u =~ s/^\s*//; $u =~ s/\s*$//;
+    $u = lc $u unless $case_sensitive_login;
     my %core_params = ( login => $u, password => $p );
-
-    my $rs = $self->get_resultset('user');
-    while (my $user = $rs->next) {
-        if (!$case_sensitive_login and lc $u eq lc $user->login) {
-            die "User already exists\n";
-        }
-    }
 
     $self->_obj_add('user', [qw/login password/], %core_params)->id;
 }
