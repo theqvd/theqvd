@@ -1250,10 +1250,20 @@ sub cmd_vm_console {
     my ($self, @args) = @_;
     eval {
         my $vm_runtime = $self->_get_single_vm_runtime;
-        my $serial_port = $vm_runtime->vm_serial_port;
-        die 'Console access is disabled' unless defined $serial_port;
-        exec telnet => $vm_runtime->host->address, $serial_port, @args
-            or die "Unable to exec ssh: $^E";
+        my $hv = cfg('vm.hypervisor');
+        if ('lxc' eq $hv) {
+            my $container_name = sprintf 'qvd-%d', $vm_runtime->vm_id;
+            @args = qw/-t 1/ unless @args;
+            exec 'lxc-console', '-n', $container_name, @args
+                or die "Unable to exec lxc-console: $^E";
+        } elsif ('kvm' eq $hv) {
+            my $serial_port = $vm_runtime->vm_serial_port;
+            die 'Console access is disabled' unless defined $serial_port;
+            exec telnet => $vm_runtime->host->address, $serial_port, @args
+                or die "Unable to exec telnet: $^E";
+        } else {
+            die "Unknown hypervisor '$hv'";
+        }
     };
     if ($@) {
         #$self->_print("Wrong syntax, check the command help:\n");
