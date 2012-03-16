@@ -17,11 +17,12 @@
 # Do NOT "set -e"
 
 # PATH should only include /usr/* if it runs after the mountnfs.sh script
-PATH=/usr/lib/qvd/bin:/bin:/usr/bin:/sbin
+PATH=/usr/lib/qvd/bin:/bin:/usr/bin:/sbin:/usr/sbin
 
 DESC="QVD Web Administration Tool"
 NAME=qvd-wat
 DAEMON=/usr/lib/qvd/bin/qvd_admin_web_server.pl
+PERL=/usr/lib/qvd/bin/perl
 PIDFILE=/var/run/qvd/$NAME.pid
 SCRIPTNAME=/etc/init.d/$NAME
 PORT=3000
@@ -39,7 +40,7 @@ if [ ! -d "$CONFDIR" ]; then
     exit 0
 fi
 
-DAEMON_ARGS="--port $PORT --pidfile $PIDFILE --background"
+DAEMON_ARGS="--port $PORT"
 
 
 # Load the VERBOSE setting and other rcS variables
@@ -58,9 +59,9 @@ do_start()
 	#   0 if daemon has been started
 	#   1 if daemon was already running
 	#   2 if daemon could not be started
-	start-stop-daemon --start --quiet --pidfile $PIDFILE --exec $DAEMON --test > /dev/null \
+	start-stop-daemon --start --quiet --make-pidfile --pidfile $PIDFILE --exec $DAEMON -b --test > /dev/null \
 		|| return 1
-	start-stop-daemon --start --quiet --pidfile $PIDFILE --exec $DAEMON -- \
+	start-stop-daemon --start --quiet --make-pidfile --pidfile $PIDFILE --exec $DAEMON -b -- \
 		$DAEMON_ARGS \
 		|| return 2
 	# Add code here, if necessary, that waits for the process to be ready
@@ -78,7 +79,7 @@ do_stop()
 	#   1 if daemon was already stopped
 	#   2 if daemon could not be stopped
 	#   other if a failure occurred
-	start-stop-daemon --stop --quiet --retry=TERM/30/KILL/5 --pidfile $PIDFILE --name $NAME
+	start-stop-daemon --stop --quiet --retry=TERM/30/KILL/5 --pidfile $PIDFILE --exec $PERL
 	RETVAL="$?"
 	[ "$RETVAL" = 2 ] && return 2
 	# Wait for children to finish too if this is a daemon that forks
@@ -87,7 +88,7 @@ do_stop()
 	# that waits for the process to drop all resources that could be
 	# needed by services started subsequently.  A last resort is to
 	# sleep for some time.
-	start-stop-daemon --stop --quiet --oknodo --retry=0/30/KILL/5 --exec $DAEMON
+	start-stop-daemon --stop --quiet --oknodo --retry=0/30/KILL/5 --exec $PERL
 	[ "$?" = 2 ] && return 2
 	# Many daemons don't delete their pidfiles when they exit.
 	rm -f $PIDFILE
