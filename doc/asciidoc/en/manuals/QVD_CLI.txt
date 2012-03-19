@@ -1,0 +1,341 @@
+[[qvd-admin-cli]]
+The QVD Command Line Administration utility is a perl script that can
+interact with the QVD-DB to perform a wide range of administrative
+operations within the QVD infrastructure. It can be used as an
+alternative to the QVD Web Administration Tool (QVD-WAT) and can be
+installed on any system with access to the QVD-DB.
+
+Installing and configuring the QVD CLI Administration Utility
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+On any of the systems that you intend to install the QVD CLI Administration
+Utility, you will need to add the QVD repository to your apt sources. You 
+can do this with the following command:
+
+----
+apt-add-repository 'deb http://theqvd.com/debian lucid main'
+----
+
+Execute `apt-get update` after modifying sources.list.
+
+To install the QVD CLI Administration Utility, run the following command:
+
+----
+# sudo apt-get install qvd-admin
+----
+
+The QVD Administration utility requires access to the QVD Database.
+You will need to ensure that the QVD Node configuration file is set
+up correctly in order for this tool to function properly. You can
+find out how to do this in the QVD-DB Chapter in the section titled
+<<qvd_db_config,QVD Database Configuration>>.
+
+QVD CLI Command List
+~~~~~~~~~~~~~~~~~~~~
+The QVD CLI Administration Utility provides a very large set of 
+administrative functions that can be used to control all of the 
+components and elements that are involved within the QVD environment.
+
+A complete list of functions or commands available through the 
+QVD CLI Administration Utility can be obtained using the `--help` 
+switch.
+
+----
+root@altar:~# qvd-admin.pl --help
+Valid command expected, available subcommands:
+   config del
+   config get
+   config set
+   config ssl
+   di add
+   di del
+   di list
+   di tag
+   di untag
+   host add
+   host block
+   host del
+   host list
+   host propdel
+   host propget
+   host propset
+   host unblock
+   osf add (*)
+   osf del (*)
+   osf list
+   user add
+   user del
+   user list
+   user passwd
+   user propdel
+   user propget
+   user propset
+   vm add
+   vm block
+   vm del
+   vm disconnect_user
+   vm list
+   vm propdel
+   vm propget
+   vm propset
+   vm ssh
+   vm start
+   vm stop
+   vm unblock
+   vm vnc
+----
+
+TIP: Any of the commands presented above can be prepended or appended with the `--help` switch in order to obtain
+a more detailed description of the syntax.
+
+Using Filters To Add Control To Operations
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+Many of the operations available through the QVD CLI Administration Utility also admit a
+filter (using the -f switch) to limit an action to a particular element or entity. Filters 
+are essentially matches on elements within table columns, as provided in a standard SQL 
+'WHERE' statement. Filters accept the asterisk (*) as a wildcard character.
+
+Most commonly used filters are on ID of an element or on a name. For instance, using the 
+`host list` operation as an example, you can limit the entries returned by filtering on
+`id` or `name`:
+
+----
+# qvd-admin.pl host list -f name=sha*
+
+Id Name    Address      HKD       Usable RAM Usable CPU VMs assigned Blocked State   
+_____________________________________________________________________________________
+1  shamash 192.168.0.12 103:14:31 296.676    16172.48   0            0       starting
+----
+
+Basic Administrative Operations 
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+In this section we will look at some of the more common administrative tasks that the
+QVD CLI Administration Utility gets used for.
+
+Changing QVD Configuration Settings
+^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+[[qvd-admin-config]]
+QVD has a wide range of very specific configuration settings that control various components
+within the infrastructure. We discuss some of these <<config_params,here>>.
+
+To change a QVD configuration setting using the QVD CLI Administration Utility you can do the following:
+
+----
+# qvd-admin.pl config set myproperty="this is a value"
+----
+
+It is also possible to get all of the current configuration settings from the database and list them:
+
+----
+# qvd-admin.pl config get·
+----
+
+Finally, it is possible to delete a QVD configuration setting from the database:
+
+----
+# qvd-admin.pl config del myproperty
+----
+
+Adding a QVD Server Node
+^^^^^^^^^^^^^^^^^^^^^^^^
+It is common to use the QVD CLI Administration Utility to add new QVD Server Nodes to the QVD Database.
+This can be done very quickly from the command line with the following command:
+
+----
+# qvd-admin.pl host add name=NewNode address=192.168.0.12
+----
+
+Deleting a QVD Server Node is just as simple:
+
+----
+# qvd-admin.pl host del -f "name=NewNode"
+----
+
+Configuring SSL for QVD
+^^^^^^^^^^^^^^^^^^^^^^^
+QVD Server Nodes need to be configured to make use of SSL. Currently the only way to do this is to make
+use of the QVD CLI Administration Utility:
+
+----
+# qvd-admin.pl config ssl --help
+
+config ssl: Sets the SSL certificate and private key
+usage: config ssl key=mykey.pem cert=mycert.pem
+
+    Sets the SSL certificate to the one read from the file mycert.pem, and the
+    private key to the one read from mykey.pem.
+
+    Example: config ssl key=certs/server-key.pem cert=certs/server-cert.pem
+----
+
+It is recommended that wherever possible you make use of a trusted CA-signed certificate.
+
+Adding an OSF
+^^^^^^^^^^^^^
+You can easily add an OSF to QVD using the QVD CLI Administration Utility if you are on a host that has
+access to the shared storage where the 'images' are stored:
+
+----
+# qvd-admin.pl osf add name=myOSF use_overlay=no memory=1024 user_storage_size=2048
+----
+
+There is only one compulsory value to add an OSF, which is *name*. If the other parameters
+are left unspecified, the default parameters are used instead. These are:
+
+* *memory*=256 
+* *use_overlay*=y
+* *user_storage_size*=undef (no limit to user storage)
+
+You can get a list of currently available OSFs by doing the following:
+
+----
+# qvd-admin.pl osf list
+----
+
+Adding a DI
+^^^^^^^^^^^
+Using the QVD CLI Administration Utility, you can attach a Disk Image
+(DI) to any existing OSF within the system. This process can take some
+time, since the database is updated and the actual disk image file is
+copied into the `storage/images` directory within the shared storage.
+
+By attaching a DI to a particular OSF, it decouples the actual disk
+image from the image that will be served to an end user. This means
+that you can make changes to the disk image and then simply update the
+OSF, so that when a user reconnects the image is automatically
+updated without the user experiencing any discontinuity in the
+service.
+
+----
+# qvd-admin.pl di add path=/var/lib/qvd/storage/staging/qvd-guest.img osf_id=1
+----
+
+Both *path* and *osf_id* are compulsory in order to add a DI. When the DI is added, the image specified in path 
+is copied to the read-only storage area set up for storing active DIs (usually `/var/lib/qvd/storage/images`).
+
+You can get a list of currently available images by doing the following:
+
+----
+# qvd-admin.pl di list
+----
+
+Tagging a DI
+^^^^^^^^^^^^
+DIs can be tagged with arbitrary strings at will. The WAT only allows users to
+set DIs as default in each OSF but the CLI gives greater flexibility.
+
+To tag a DI as default just use the *di tag* command:
+
+----
+# qvd-admin.pl di tag di_id=42 tag=default
+----
+
+You can tag DIs with any string, not just *default* or *head*. This allows you
+to use meaningful names for the tags, for example "acrobat_bug_fixed", for use
+within Virtual Machines' *DI Tag* field.
+
+
+Adding and Deleting Users
+^^^^^^^^^^^^^^^^^^^^^^^^^
+It is common to use the QVD CLI Administration Utility to quickly add and remove users.
+
+----
+# qvd-admin.pl user add login=peter password=s3cr3t·
+# qvd-admin.pl user del -f login=guest3
+----
+
+You can also list all QVD users using the list option:
+
+----
+# qvd-admin.pl user list
+----
+
+Resetting a User Password
+^^^^^^^^^^^^^^^^^^^^^^^^^
+You can quickly change a user's password using the QVD CLI Administration Utility:
+
+----
+# qvd-admin.pl user passwd guest
+----
+
+In the above example, we are changing the password for the user login 'guest'. You will be
+prompted to provide a new password.
+
+Adding and Deleting Virtual Machines
+^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+Adding and deleting virtual machines using the QVD CLI Administration Utility is also
+relatively easy but requires that you know the User ID that you wish to assign the Virtual Machine to,
+along with the ID of the OSF that you want to load into the Virtual Machine.
+
+----
+# qvd-admin.pl vm add name=GuestVM user_id=1 osf_id=1
+----
+
+You can easily delete a Virtual Machine using the following command:
+
+----
+qvd-admin.pl vm del -f "name=GuestVM"
+----
+
+Starting and stopping virtual machines
+^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+The QVD CLI Administration Utility can be used to start and stop Virtual Machines.
+If not specified with a particular filter, the action will be to start or stop all
+virtual machines. Usually you would run this command specifying a filter to identify
+the actual virtual machine that you wish to start or stop. Examples follow:
+
+----
+qvd-admin.pl vm stop -f "user=guest*"
+qvd-admin.pl vm start -f "id=1"
+----
+
+Blocking and Unblocking Virtual Machines
+^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+Virtual Machines can be flagged as 'Blocked'. When in this state, the QVD Client application
+will not be able to connect to the Virtual Machine. This can either be forcefully implemented
+by an Administrator to perform an Administrative task, or can take place when the HKD fails to
+properly start a virtual machine.
+
+The following commands can be used to either forcefully flag a Virtual Machine as 'blocked', or
+can be used to unblock a Virtual Machine that has been set in this state.
+
+----
+QVD-Admin/bin/qvd-admin.pl vm block -f "id=2"
+QVD-Admin/bin/qvd-admin.pl vm unblock -f "name=GuestVM"
+----
+
+Please refer to <<wat_vm_block,Virtual Machine Blocking and Unblocking>> in the chapter
+on the QVD Web Administration Tool for more information on setting this state.
+
+Connecting to a Virtual Machine
+^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+The QVD CLI Administration Utility also provides options to easily connect to a Virtual Machine without
+using the client application. Currently, the supported options include
+Console, SSH and VNC access.
+
+To access the console for a Virtual Machine, simply run the following
+command:
+
+----
+# qvd-admin.pl vm console -f id=1
+----
+
+This will open a telnet session to the console port on the Virtual
+Machine with the 'id' of '1'. Your Virtual Machine will need to have
+had console access configured.
+
+To ssh into a Virtual Machine, simply run the following command:
+
+----
+# qvd-admin.pl vm ssh -f name=myVM -- -l qvd
+----
+
+This will open an SSH connection to the Virtual Machine named 'myVM'
+using the username 'qvd'. Your Virtual machine would need to have
+OpenSSH installed and configured.
+
+If you have VNC running on the Virtual Machine and you have a VNC client installed, you can
+run the following command to open a VNC connection:
+
+----
+# qvd-admin.pl vm vnc -f name=myVM
+----

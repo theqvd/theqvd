@@ -1,0 +1,398 @@
+[[LXC_Virtualization]]
+LXC Technology Basics
+~~~~~~~~~~~~~~~~~~~~~
+LXC virtualization runs directly within the kernel of the host operating system, so
+that processes running within guest containers are actually visible within the host.
+As a result, containers share kernel space which is more efficient, since only a single
+kernel is loaded on the host running your virtual desktops. On the other hand, this means
+that all of your virtual machines necessarily run the same kernel, so kernel customizations
+per machine are not possible. Since many distributions tweak kernel configuration options
+to suit the environment, it is usually advisable that the same distribution is used for
+each container as is running on the host platform.
+
+Each container has its own filespace running on the host's filesystem, called the *rootfs*. 
+A container's filesystem heirarchy looks identical to the linux installation that it is 
+running, and is directly accessible from within the host environment. This makes it possible 
+to actually access the underlying filesystem of a running container from its parent host. This can be
+very useful from a troubleshooting and debugging perspective. It also makes LXC containers
+much easier to access and update for system administrators. On the other hand, the nature
+of LXC virtualization and its specific requirements make it more difficult to configure
+and easier to break. In particular, it is essential that processes and scripts that require
+direct access to hardware (such as udev) do not run within container space. Frequently,
+package requirements and dependencies may make this difficult to maintain for inexperienced
+administrators.
+
+Unlike a traditional chroot, LXC provides a high level of isolation of processes and resources.
+This means that each container can be allocated its own network address and can run processes
+without directly affecting other containers or the parent host system.
+
+LXC can be used outside of QVD quite easily, and any LXC image that can run within QVD can be
+loaded on any linux system with LXC support. In order to run a container using LXC outside of
+QVD, you will need to create a config file for your container, providing details of mountpoints,
+control groups, networking requirements and console access. See 'man lxc.conf' for options. When
+running an LXC container within QVD, QVD will automatically generate a configuration file for the
+container before it is started, in order to ensure that it is configured correctly to run within
+the QVD environment.
+
+Containers can be created directly from the filesystem of any functional linux installation, but
+will almost certainly require some modification in order to work. This modification usually involves
+removing any processes or scripts that directly access hardware, and manually recreating device nodes.
+Most distributions with LXC support also include 'templates', which are essentially bash scripts that
+will set up a base installation of the operating system within a container for you automatically.
+
+Templates can go a long way toward getting you started and should be used as a baseline toward creating
+your LXC images, however they vary across distributions and usually fall short of generating a useful
+configuration, and certainly require that you install many more packages manually in order to bring
+a container up to a level where it is usable within QVD. 
+
+When to Use LXC
+~~~~~~~~~~~~~~~
+It is important that you are able to determine the best use-cases for
+LXC, as opposed to using KVM. Both technologies have their advantages
+and should be used in different situations. In general, LXC should
+offer superior overall performance to KVM and will scale better, since
+the virtualization that it is offering is not complete. On the other
+hand, KVM will offer much greater flexibility and will allow you to
+run a wider variety of guest operating systems.
+
+Here are some basic guidelines that you should follow when determining
+whether or not to use LXC:
+
+* The disk image that you are going to create will be shared among
+  many users
+* The guest operating system that you want to install uses exactly the
+  same kernel as the host (i.e. the kernel will be identical). Ideally,
+  in order to avoid any confusion, the guest distribution should be 
+  identical to the host distribution
+* You wish to further abstract the virtualization in order to be able
+  to run other guest operating systems within QVD, by running KVM within
+  an LXC environment. This is a highly complex configuration and will not
+  be presented in this documentation. Nonetheless, the QVD team has 
+  succeeded in creating Microsoft Windows virtual desktops using this 
+  methodology.
+
+In general, it is easier to set up and configure QVD to use KVM virtualization,
+and it has proven to be easier for administrators to work with KVM images. If
+you are in doubt or are new to QVD, we recommend using KVM.
+
+If you have a good understanding of QVD already, and are already familiar with
+LXC, you will find that the support for LXC within QVD will help you to deploy
+complex LXC configurations very easily. You will also find that the nature of
+this type of virtualization provides you with much better administration 
+capability and that you are able to achieve more efficient use of your hardware.
+
+
+QVD LXC Implementation Details
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+In this section, we will take a closer look at how LXC is implemented within QVD.
+
+Disk Image Storage and Structure
+^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+QVD makes use of ~unionfs-fuse~ in order to handle union style mount points.
+This allows QVD to mount directories containing user home data and
+temporary data typically handled as overlays within KVM onto the
+running LXC. Since the LXC disk image is a read-only system, ~unionfs-fuse~
+facilitates the mount of writable storage areas. It is therefore essential 
+that the ~fuse~ kernel module is loaded at system startup.
+
+Since LXC Virtualization implementation differs dramatically from KVM, QVD
+stores all of the data associated with each virtual machine deployment in 
+logically distinct directories within the QVD storage location.
+
+While the 'staging' and 'images' directories are used in common with KVM, the
+majority of functional activity takes place outside of these directories. 
+When a Virtual Machine is started for a user, the Disk Image that will be used
+within the Virtual Machine is literally extracted from the tarball stored in
+the 'images' directory into a subfolder within the 'basefs' folder.
+
+When the Virtual Machine is started the filesystem that is extracted under the 
+'basefs' folder is mounted together with the user's home data, stored in the 
+'homefs' folder, and the relevant overlay data (in 'overlayfs'), onto a runtime 
+directory within 'rootfs'. This runtime directory is then used to load the LXC
+and serve the Virtual Desktop to the end user.
+
+The folder content, structure and purpose are described in more detail below. 
+
+basefs
+++++++
+
+For each virtual machine that has been started within the QVD environment, a 
+subfolder is created within the 'basefs' folder. This subfolder is named using
+the convention that it is prefixed with the ID assigned to the virtual machine
+within QVD-DB and is suffixed with the name of the Disk Image file that was loaded
+for that machine. Therefore, within the basefs folder, it is likely that you will
+see folders named similarly to the following:
+
+----
+# ls -l /var/lib/qvd/storage/basefs/
+total 4
+drw-r--r-- 18 root root 4096 2012-02-20 11:59 2-image.0.22.tgz
+---- 
+
+In this example, the folder is named '2-image.0.22.tgz'. This is because the 
+filesystem contained under this folder belongs to the virtual machine with an
+ID==2, and the disk image that is loaded here is from the disk image file named
+'image.0.22.tgz'. Within this folder is a typical linux filesystem:
+
+----
+# ls /var/lib/qvd/storage/basefs/2-image.0.22.tgz/
+bin  dev  etc  lib  lib64  media  mnt  opt  root  sbin  selinux  srv  sys  tmp  usr  var
+----
+
+Using 'unionfs-fuse', the filesystem represented in this folder will be mounted in 
+conjunction with the filesystems represented in the 'homefs' and 'overlayfs' folders
+inside the 'rootfs' folder at runtime.
+
+homefs
+++++++
+User home data is stored within the 'homefs' folder. According to convention, user home directories
+are stored within a folder named in the following way:
+
+----
+<id of VM>-<id of User>-homefs
+----
+
+This makes it possible for a single user to have multiple home environments for different virtual
+desktops, based on the virtual machine that the home directory is mounted in.
+
+overlayfs
++++++++++
+This directory contains overlay data used within the virtual machine. Since the contents of the
+basefs image are treated as a read-only filesystem, an overlay is created to handle data that
+the running virtual machine may need to write to the operating system. Typically, this data is in
+the form of log data, runtime PIDs, lock files and temporary files.
+
+Each virtual machine has its own overlayfs directory, and this is named following the convention:
+
+----
+<id of DI>-<id of VM>-overlayfs
+---- 
+
+Note that if a virtual machine fails to start properly for some reason, a temporary overlay folder 
+is created. This folder is named with the prefix "deleteme-". The folder is retained to allow you
+to view log files specific to a virtual machine that may have failed to start, in order to assist
+you with the debugging process.
+
+rootfs
+++++++
+This directory contains the mountpoints for running LXC Virtual Machine instances. Each mountpoint
+is named following a convention where it is prefixed with the ID of the User within the QVD-DB.
+The mountpoint directory is created when the container is first started. Since it is only used to 
+mount the filesystem of a running container, it will only contain anything when a container is 
+actually running. If the container is stopped, the directory is unmounted and will remain empty
+until the container is restarted.
+
+Networking
+^^^^^^^^^^
+Similarly to QVD's KVM implementation, a bridge interface is created on the
+QVD Server Node host, and a virtual network interface is brought up and bound
+to the bridge interface. In order for this to function correctly, you will need
+your bridge interface to be set up with the IP address which will be used by clients
+in order to access your virtual desktops. You will also need to configure QVD with
+the IP range that should be used to configure the networking for each virtual machine.
+
+QVD Base Configuration
+~~~~~~~~~~~~~~~~~~~~~~
+By default, QVD is configured to make use of KVM virtualization. Before you 
+attempt to load any LXC Disk Images into the QVD infrastructure, you should
+ensure that QVD has been reconfigured to use LXC. In order to do this, you 
+should update the following configuration parameters using the QVD Admin Command 
+Line Utility:
+
+----
+# qvd-admin.pl config set vm.hypervisor=lxc
+# qvd-admin.pl config set vm.lxc.unionfs.bind.ro=0
+# qvd-admin.pl config set vm.lxc.unionfs.type=unionfs-fuse
+# qvd-admin.pl config set command.unionfs-fuse=/usr/bin/unionfs
+----
+
+In SLES, the unionfs binary is provided by QVD and is located in '/usr/lib/qvd/bin/unionfs', therefore
+the last command in the list above should be modified to reflect this path.
+
+Note that once you have reset these QVD system parameters, you will need to restart
+the HKD on each of your QVD Server nodes:
+
+----
+# /etc/init.d/qvd-hkd restart
+----
+
+Assuming that you have already configured your networking correctly, the QVD should be able to
+load and run LXC images.
+
+Loading LXC Images into QVD
+^^^^^^^^^^^^^^^^^^^^^^^^^^^
+Standard QVD administration tools, such as the QVD-WAT and the QVD Command Line Administration Utility,
+can be used to load an LXC image into QVD. The important difference here is that the file will take the
+form of a standard linux tarball, as opposed to a qcow2 image. It is absolutely imperative that the environment
+has been preconfigured for LXC virtualization, or images will be copied into the wrong folder and will fail
+to load when a virtual machine is started.
+
+To load an LXC image into QVD from the command line you will need to take the following steps:
+
+1. Add an Operating System Flavor to host your image file:
+
+----
+# qvd-admin.pl osf add name=MyOSF
+----
+
+2. Now add your Disk Image to the OSF
+
+----
+# qvd-admin.pl di add path=/var/lib/qvd/storage/staging/my_image.tar.gz osf=MyOSF
+----
+
+This will take some time, as the image will be copied from the staging directory into the images directory.
+
+3. Now add a User that you can test this image against
+
+----
+# qvd-admin.pl user add login=test password=test
+----
+
+4. Finally create a Virtual Machine for the User, and attach the OSF that this Virtual Machine will use at runtime
+
+----
+# qvd-admin.pl vm add name=TestVM user=test osf=MyOSF
+----
+
+If your QVD installation is properly set up, you will now be able to start the Virtual Machine and test it.
+
+Starting an LXC Virtual Machine
+^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+
+Accessing an LXC Virtual Machine for Debugging
+^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+Since you are actually able to access the filesystem of a running LXC image directly from the
+host operating system, it is possible to tail log files and to do a fair amount of debugging
+directly from the host where the virtual machine is running. It is important to note, though,
+that it is highly inadvisable to attempt any write operations to a running container's 
+filesystem.
+
+When an LXC Virtual Machine is started, its various components are merged together using
+unionfs and are mounted into the 'rootfs' folder in QVD's storage area 
+(usually /var/lib/qvd/storage/rootfs). Inside this space, it is possible to view the state
+of a running instance in realtime. This means that you can quickly access log files and
+configuration information from the host operating system. Often, this is the best way to
+quickly debug problems within a running instance.
+
+In general, it is better to access a running container via its console. There are two ways that
+you can do this. 
+
+The first method is to use the console facility provided with the qvd-admin command line utility:
+
+----
+# qvd-admin.pl vm console -f name=test
+---- 
+
+The second method is to access the console of the container directly using the
+'lxc-console' command. This avoids using the QVD code which provides a wrapper for this.
+If you have direct access to the host on which the virtual machine is running, you
+will need to find out the virtual machine's ID:
+
+----
+# qvd-admin.pl vm list -f name=test
+Id Name    User    Ip             OSF  DI_Tag  DI             Host      State   UserState    Blocked
+----------------------------------------------------------------------------------------------------
+1  test    nicolas 172.20.127.254 test default 2012-03-05-000 qvd-test3 running disconnected 0      
+----
+
+Once you have the ID, you will be able to run the 'lxc-console' command to access the console of the 
+virtual machine. Usually the lxc containers run with a name constructed out of the string 'qvd-' followed
+by the ID of the virtual machine:
+
+----
+# lxc-console -n qvd-1
+
+Type <Ctrl+a q> to exit the console
+
+Welcome to SUSE Linux Enterprise Server 11 SP2  (x86_64) - Kernel 3.0.13-0.27-default (tty1).
+
+sles11-sp2 login:
+----
+
+Note that you can exit the console by using the <Ctrl+a q> key-sequence.
+
+
+Creating and Configuring LXC Disk Images
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+The process involved in creating an LXC Disk Image very much depends on the 
+operating system or distribution that you wish to run. However, there are a
+number of common essential guidelines that should be followed in order to 
+create a functional image. In this document, we will present a rough outline
+of the steps that need to be taken, and will then provide some base examples
+of how this is done for Ubuntu and for SuSE systems.
+
+The following list provides a basic outline of the steps that need to be 
+taken to prepare an image in order to have it run within the QVD:
+
+* Install a copy of the base operating system into a file-space. On Debian-based 
+systems, this can be achieved using 'debootstrap', while on SuSE systems, 'zypper'
+can be used. It is also possible to simply use the filesystem created during an 
+original installation.
+* Manually recreate the device nodes in /dev
+* Remove any hardware references in your init scripts. This process is very 
+specific to the operating system that you are using.
+* Add the QVD sources to your repositories, and add the 'qvd-vma' package along with its
+dependencies. This can be done in a number of ways including a simple 'chroot', running
+the container within lxc, or using `zypper --root` within SLES environments.
+* Update the system inittab
+* Create an fstab
+
+Typically, most Linux distributions provide 'templates' that can be used to automate the
+steps required to build a base installation within a container. These templates are 
+essentially shell scripts that automate many of the steps required to install the base
+operating system, to remove hardware references in the init scripts and to create device
+nodes. These scripts are usually stored in '/usr/lib/lxc/templates/', but you should not
+need to modify them. Instead, you can usually invoke the template that you wish to use by
+running the `lxc-create` command with the '-t' switch:
+
+----
+# lxc-create -n MyUbuntuContainer -t ubuntu
+# lxc-create -n MySLESContainer -t sles
+----
+
+NOTE: The template for SLES linux is only provided with SLES 11 SP2 and up. In fact, due to
+many of the complications in creating functional containers on earlier versions of SLES, we
+recommend that LXC under QVD is only used on these versions of SLES.
+
+We suggest that you take the time to look over the template scripts to understand what they
+are doing. During some installations, some modification to the template script may be required
+and it is important that you know what the script is trying to achieve. The list of steps presented
+above should provide some outline for the majority of work handled by a template script.
+
+If you take advantage of the lxc-create command, as specified above, you will be notified that
+you have not provided a configuration file. This is not extremely important, since QVD will
+actually generate configuration files for your containers as required. However, if you intend
+to use a container outside of QVD, you may need to create a configuration for your container
+after it has been created. Some instruction on how to do this is presented for each distribution
+in the subsections below.
+
+Remember that if you use the lxc-create command, the container that is created will only include
+the packages required for a minimal installation of the distribution that you are creating. Once
+this container has been created, you will still be required to install a wide variety of 
+applications in order to set up a functional desktop environment.
+
+Ubuntu Image
+^^^^^^^^^^^^
+The following outline should guide you through preparing and setting up an LXC image
+on an Ubuntu system.
+
+Setting up and configuring a base LXC image on Ubuntu is relatively easy if you take 
+advantage of the template that is packaged with LXC. To get started, use the lxc-create command
+to build a simple container:
+
+----
+# lxc-create -n MyUbuntuContainer -t ubuntu
+----
+
+This will invoke the debootstrap command to download a base Ubuntu installation, and will 
+perform some basic tasks such as the recreation of your device nodes. If you do not provide a
+configuration file, a very basic configuration will be created for you by the template script, 
+however the container will not have network access to begin with.
+
+SLES Image
+^^^^^^^^^^
+The following outline should guide you through preparing and setting up an LXC image
+on a SLES 11 SP2 system. Note that due to limited support for LXC in previous versions of SLES,
+QVD is only supported on versions above SLES 11 SP2.

@@ -1,0 +1,197 @@
+[[QVD_NODE]]
+QVD Server Nodes are the work-horses within the QVD infrastructure. They consist of
+three major components:
+
+* *QVD Node* - Responsible for managing the L7R and HKD elements
+* *L7R* - A Layer-7 Router that acts as the broker within the server
+  environment, responsible for authenticating users, establishing
+  sessions and routing connections to the appropriate virtual IP
+  addresses. In general, the L7R is responsible for managing user
+  status.
+* *HKD* - A 'House Keeping Daemon' that tracks the status of virtual·
+  machines. The HKD is responsible for starting and stopping virtual
+  machines. The HKD monitors the health of each virtual machine and·
+  then updates status information within the QVD Database, so that·
+  other Nodes and the administration tools are able to function·
+  accordingly. In general, the HKD is responsible for managing virtual
+  machine status.
+
+Usually Server Nodes are installed across a number of systems running as a cluster.
+This means that within a typical deployment you are likely to have any number
+of Server Nodes that will need to be installed and configured.
+
+You should familiarize yourself with the general architecture of a server node
+by referring to the chapter in this manual labelled _Components and Architecture_ and in
+particular the subsection labelled <<qvd_node_architecture,QVD Server Architecture>>.
+
+Installation of a QVD Server Node
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+On any of the systems that you intend to install the QVD Server Node components, you will need to add
+the QVD repository to your apt sources. You can do this with the
+following command:
+
+----
+apt-add-repository 'deb http://theqvd.com/debian lucid main'
+----
+
+Execute `apt-get update` after modifying sources.list.
+
+To install all of the QVD Server Node components and their dependencies, run the following command:
+
+----
+# sudo apt-get install qvd-node
+----
+
+This will install all of the qvd-node components along with any existing dependencies. In general
+we recommend that the QVD CLI Administration Utility is installed on any of the QVD Server Node systems
+as well, since it is common to work directly from these systems to configure QVD quickly. You can
+find out more about this utility in the following chapter labelled <<qvd-admin-cli, QVD CLI Administration Utility>>.
+
+Base Configuration
+~~~~~~~~~~~~~~~~~~
+As with most other QVD infrastructure components, every QVD Server Node requires access to the QVD Database.
+You will need to ensure that the QVD Node configuration file is set up correctly in order for the QVD Server Node 
+to function properly. You can find out how to do this in chapter titled
+<<qvd_db_config,QVD Base Configuration>>.
+
+Unlike most other components, QVD Server Nodes require an additional entry within the QVD Base Configuration
+file in order to be able to quickly search within the QVD-DB. This is a single line entry that should be
+appended to your configuration, containing the *nodename* which should match the name that you assign to
+your node when you register it within the QVD-DB, either using QVD-WAT or using the·QVD CLI Administration Utility.
+
+In general, we recommend that you name your nodes using the hostname of the system that they are running on.
+
+This can be quickly achieved by doing something like the following:
+
+----
+echo "nodename=`hostname`" >> /etc/qvd/node.conf
+----
+
+Networking Requirements
+~~~~~~~~~~~~~~~~~~~~~~~
+QVD Server Nodes make use of a network bridge and virtual network interfaces to facilitate
+networking across each of the virtual machines that run on the node. In order to automatically
+provision IP addresses to virtual machines, QVD also runs a DHCP server that will allocate
+IP addresses within the virtual network range to virtual hosts as they boot up.
+
+There are a number of configuration steps that may need to be configured manually in order
+to properly set up the networking for a QVD Server Node. There are often other ways to achieve
+an appropriate network configuration, so we provide these only as guidelines.
+
+Set dnsmasq to be controlled by QVD
+^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+QVD uses dnsmasq as a DHCP and DNS server for the virtual machines
+that run in a node. In order to function correctly, dnsmasq needs to
+be run by the qvd-node process. By default, the Ubuntu package starts
+the process running as a daemon in the background, so you need to stop 
+it from starting automatically. This is done with the following commands.
+
+----
+# /etc/init.d/dnsmasq stop
+# sed -i s/ENABLED=1/ENABLED=0/ /etc/default/dnsmasq
+----
+
+Note: This step is essential in order for QVD to work using KVM virtualization. For LXC
+virtualization, it is possible to specify whether or not to make use of DHCP to configure
+the networking within your virtual machines.
+
+Configure IP forwarding
+^^^^^^^^^^^^^^^^^^^^^^^
+
+IP Forwarding is required in order to route clients to the correct location.
+You can do this quickly by running the following command.
+
+----
+# echo 1 > /proc/sys/net/ipv4/ip_forward
+----
+
+Unfortunately, when you reboot you host system, this change will be
+lost. To make it permanent, you can edit `/etc/sysctl.conf` and
+uncomment the line:
+
+----
+net.ipv4.ip_forward=1
+----
+
+You can force sysctl to reload its settings after you have edited this
+file by running:
+
+----
+# sysctl -p
+----
+
+Configure a Network Bridge
+^^^^^^^^^^^^^^^^^^^^^^^^^^
+There are a number of ways to go about configuring your network bridge
+and the appropriate routing to make sure that a QVD client is routed
+to the correct virtual machine.
+
+The easiest method is to set up a static network interface and to
+configure a set of *iptables* routing rules to perform the NAT
+required to translate IP addresses between your real and virtual
+network interfaces. Using NAT is necessary within a mononode installation,
+but on a deployment using multiple nodes and where different components run
+on different systems, the iptables routing rules would not be necessary.
+To configure you networking, edit the file `/etc/network/interfaces` and add 
+the following lines.
+
+----
+auto qvdnet0
+iface qvdnet0 inet static
+  pre-up brctl addbr qvdnet0
+  pre-up iptables -t nat -A POSTROUTING -o qvdnet0 -j SNAT to-source 192.168.0.2
+  pre-up iptables -t nat -A PREROUTING -d 192.168.0.2 -p tcp --dport 8443 -j DNAT --to-destination 10.3.15.1
+  address 10.3.15.1
+  netmask 255.255.255.0
+----
+
+It is important to note that in the above example you will need to
+change the IP address *192.168.0.2* to the IP address of the network
+interface that you intend your clients to connect to.
+
+While there are other cleaner approaches to setting up your network,
+these sometimes run into problems with particular network interfaces
+such as WIFI. The approach listed above should work for most systems.
+
+Once you have written the network configuration to file, you should
+bring up the network bridge interface.
+
+----
+# ifup qvdnet0
+----
+
+NOTE: If using SLES, we recommend that you use Yast2 to configure your network bridge.
+
+Configure QVD for your Networking
+^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+In order for QVD to properly manage virtual machine setup and the subsequent routing,
+you will need to change some configuration settings within QVD-DB. It is recommended
+that you make use of the <<qvd-admin-cli,QVD CLI Administration Utility>> to do this.
+
+----
+# qvd-admin.pl config set vm.network.ip.start=10.1.0.50
+# qvd-admin.pl config set vm.network.netmask=16
+# qvd-admin.pl config set vm.network.gateway=10.1.0.1
+# qvd-admin.pl config set vm.network.dns_server=10.1.1.254
+# qvd-admin.pl config set vm.network.bridge=qvdnet0
+----
+
+These settings are described in more details in the section of this document entitled <<vm_options,Virtual Machine Options>> in the 
+Base QVD Configuration chapter.
+
+Configuring SSL
+~~~~~~~~~~~~~~~
+The QVD server needs an x509 certificate and private key for securing
+network connections. For a production installation you should use a
+certificate issued by a recognized certificate authority, such as
+Verisign or Thawte. For testing purposes you can use a self-signed
+certificate. We provide instructions on creating a self-signed certificate
+in the _Guide to Getting Started With QVD_.
+
+If you have a certificate signed by a third party, you can register it with
+QVD using the QVD CLI Administration Utility:
+
+----
+# qvd-admin.pl config ssl key=/path/to/private/key.pem cert=/path/to/server/certificate.pem
+----

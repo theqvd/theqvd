@@ -1,0 +1,130 @@
+[[QVD_Client]]
+The QVD client is available for both Linux and Microsoft Windows
+platforms. Certainly, we recommend that for more seamless integration
+you should consider running the client on a Linux platform. However,
+it is quite possible that you have users that make use of both
+environments and would like to run a virtualized Linux desktop from
+within Windows.
+
+Downloading and Installing the Windows Client
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+If you are using Microsoft Windows as your base platform to run the
+QVD Client application, you will need to download the QVD Client
+installer manually. You can download the installer from:
+
+http://qvd.qindel.com/qvd3/windows/qvd-client-3.0.0-1-setup.exe
+
+Once you have finished downloading the installer, run it as a normal
+executable file and follow the wizard through the installation
+process.
+
+.The Windows QVD Client Installer Wizard
+image::../images/Windows_ClientInstaller1.png[alt="The Windows QVD Client Installer Wizard"]
+
+Once you have finished the installation, you can either run the client
+from the shortcut on your Windows desktop (if you selected to add the
+shortcut) or from the QVD menu in your Applications menu. This will
+open the client so that you are ready to connect.
+
+.The Windows QVD Client
+image::../images/Windows_Client.png[alt="The Windows QVD Client"]
+
+Downloading and Installing the Ubuntu Client
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+Installing the QVD Client on an Ubuntu Linux platform is simple. You
+should add the QVD repository to your apt repository sources. Run the
+following commands as root:
+
+----
+# apt-add-repository 'deb http://theqvd.com/debian lucid main'
+# apt-get update
+----
+
+You will now be able to install the client with the following command.
+
+----
+sudo apt-get install qvd-client
+----
+
+Depending on your Desktop Environment, you should be able to access
+the client within your 'Applications' menu, usually under the
+'Internet' submenu. Alternatively, you can run the client GUI from the
+console using the command `qvd-gui-client.pl`.
+
+Connecting to your Virtual Desktop
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+Once you have the GUI client running, you can enter the *Username* for
+the user that you created in QVD, the *Password* that you configured
+for the user, the *Server* hostname or IP address for the QVD Server
+Node that you created, and you can choose the level of compression for
+the connection by selecting a *Connection type*.
+
+.Enter the details for your QVD connection
+image::../images/GUI_login.png[alt="Enter the details for your QVD connection"]
+
+By default, the *Connection type* is set to 'Local'. This setting is
+appropriate for connections over a local area network. There are also
+options for 'ADSL', which would be appropriate for any broadband
+connection, and for 'Modem' which can be used in cases where bandwidth
+is severely limited or impaired.
+
+Changing the *Connection type* will increase the compression used to
+deliver the virtual desktop across your network connection. It also
+increases the amount of caching that the client performs to limit the
+amount of screen refreshing that needs to take place.
+
+In general, using heavy compression and caching will still afford your
+users the ability to work comfortably within their virtual desktops.
+However the quality of graphical rendering will be a little inferior.
+
+Once you have completed entering your connection details, simply click
+on the button labelled *Connect* and your virtual desktop should load.
+
+.A Gnome desktop loaded under QVD
+image::../images/qvd-desktop-gnome.png[alt="A Gnome desktop loaded under QVD" width=98%]
+
+Additional Settings For QVD Client
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+The QVD Client can be configured with some default settings that can tune its behaviour
+to provide better integration or a cleaner user experience. These settings are found
+in the `client.conf` file. Under Linux this file is usually in the user's home directory
+at `/home/someuser/.qvd/client.conf`. On Windows, this file is usually
+found within `%USERPROFILE%\Application Data\.qvd\client.conf`.
+
+The client config file can have the following settings:
+
+----
+client.link = local
+client.geometry = 1024x768
+client.fullscreen = 1
+client.audio.enable = 1
+client.printing.enable = 1
+client.host.port = 8443
+client.host.name = loadbalancer.mydomain.com
+client.user.name = guest
+client.use_ssl = 1
+----
+
+The meanings for the above settings are explained in the list below:
+
+* *client.link*: this is the equivalent of the 'Connection Type'
+  setting. Options include 'local', 'adsl' and 'modem'.
+* *client.geometry*: screen size for the client, if not set to use
+  fullscreen
+* *client.fullscreen*: whether or not to display the client in
+  fullscreen mode
+* *client.audio.enable*: whether or not to enable audio within the
+  client. You will need to configure this on the OSF as well.
+* *client.printing.enable*: whether or not to enable printer sharing
+  within the client. You will need to configure this on the OSF as
+  well.
+* *client.host.port*: the default port to connect to your server nodes
+  on. Do not change this unless you have reconfigured all of your
+  server nodes to use a different port number for some reason.
+* *client.host.name*: the default hostname or IP address that the
+  client should connect to. Usually you would specify a load balancer
+  or one of your server node IP addresses here.
+* *client.user.name*: the default username to connect as.
+* *client.use_ssl*: whether or not to use SSL to encrypt the client
+  connection.

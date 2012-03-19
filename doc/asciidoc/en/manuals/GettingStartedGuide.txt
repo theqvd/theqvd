@@ -13,7 +13,7 @@ $Id: GettingStartedGuide.txt 11680 2011-07-22 08:22:43Z rputtergill $
 :toc:
 :icons:
 :numbered:
-:qvdversion: 3.0.1
+:qvdversion: 3.1
 :website: http://theqvd.com/
 ifdef::blogpost[]
 // Use the same article for both a blog post and on the AsciiDoc
@@ -40,8 +40,15 @@ understand how to set QVD up from scratch in a demonstration
 environment. It will provide the most simple installation and
 configuration instructions that can be used to get started. It will
 not go into any detail about additional configuration steps or
-build functionality, as these details will be covered in the QVD
-Administration Manual.
+build functionality, as these details will be covered in the _QVD
+Administration Manual_.
+
+Please note that while versions of QVD since version 3.1 are capable of
+supporting LXC virtualization, this guide will explain how to configure
+the environment for the default KVM virtualization, in order to keep 
+things as simple as possible. If you are interested in configuring your
+QVD installation to take advantage of LXC, please refer to the chapter
+titled 'Using LXC Virtualization in QVD' in the _QVD Administration Manual_.
 
 QVD is under continuous development. While we try to keep all of our
 documentation up to date with the current version, it is possible that
@@ -122,9 +129,9 @@ QVD Server is responsible for accepting requests from the QVD Client
 and for loading a Virtual Machine to serve the client request. In
 order to facilitate authentication requests, and to determine which
 image to load within the Virtual Machine, QVD Server makes use of a
-PostgreSQL database.
+PostgreSQL database which is generally referred to as QVD-DB.
 
-In actual fact, the QVD Server is comprised of three separate core
+In actual fact, the QVD Server is comprised of two separate core
 components:
 
 * *L7R* - A level-7 router, is the broker responsible for handling client 
@@ -136,7 +143,6 @@ components:
 * *HKD* - The 'House Keeping Daemon', is responsible for starting and
   stopping virtual machines, and updating status within the PostgreSQL
   database.
-* *Node* - Is responsible for managing the L7R and HKD
 
 In order for QVD Server to work correctly, it must have access to the
 PostgreSQL database, and it must have a properly configured network
@@ -201,9 +207,13 @@ Administration tools. It is used to determine the status of the
 overall solution and to manage users, sessions and all of the
 individual components in the solution.
 
-The PostgreSQL database is installed using the 'qvd-db' package, which
+The PostgreSQL database can be installed using the 'qvd-db' package, which
 includes all of the required dependencies as well as the tools needed
-to create and configure the database for use within the QVD solution.
+to create and configure the database for use within the QVD solution. 
+It is possible to make use of an existing PostgreSQL installation, and the QVD
+team can also provide you with advice on how to set up a PostgreSQL cluster for 
+better redundancy and performance, but these topics will not be covered in this 
+guide.
 
 Shared Storage
 ^^^^^^^^^^^^^^
@@ -219,40 +229,90 @@ QVD keeps all commonly used files in the directory location:
 
     /var/lib/qvd/storage
 
-Within this location there are four subdirectories:
-
-* *homes* - location of the qcow2 home images for each user serviced by
-  QVD. These should be accessible to all QVD Server Nodes usually on
-  some type of network file share such as NFS, OCFS2 or GFS2.
-* *images* - location of the DIs (Disk Images) that are
-  loaded by the nodes for each Virtual Machine that is created. These
-  need to be accessible to QVD Server Nodes and to the QVD-WAT. This
-  directory might be stored on an network share, but in a very simple
-  configuration where the QVD-WAT is either not used or is hosted on
-  the same system as the QVD Server Node, it can be hosted locally
-  which will help to improve performance.
-* *overlays* - location used to store overlays for temporary files
-  etc. Usually this folder can be hosted locally, but for more
-  persistent behaviour in your virtual machines, you can choose to
-  store these on a network share and configure QVD to make your virtual
-  machines persistent.
-* *staging* - temporary location for DIs that you want available in
-  the QVD-WAT for the purpose of loading as an image. Files located
-  here are available within QVD-WAT when you select to add an image.
-  When you enable an image, the image file is moved to the 'images'
-  directory and is updated to include additional information such as
-  the available memory to allocate the system image, and the memory
-  that should be allocated to user space. This folder can either be
-  hosted locally or on a network share.
+Within this location there are a number of subdirectories which are 
+usually stored on some form of network accessible shared storage facility,
+and are mounted according to your requirements. The majority of these
+directories are related to the type of virtualization that you choose
+to make use of within your QVD deployment (KVM or LXC).
 
 While we will *not* be making use of shared storage in this guide, since 
 all of the components will be installed on the same system and will
 have access to the same storage directories, you should be aware that
 in a normal environment you will have to configure NFS mountpoints for
-some of the directories listed above. If you are interested in setting
+some of the directories listed below. If you are interested in setting
 your environment up in this way, please refer to the _QVD Administration
 Manual_, where the chapter titled 'Design Considerations and
 Integration' contains information on configuring NFS for QVD.
+
+General Storage
++++++++++++++++
+
+* *staging*: temporary location for all DIs that you want available in
+  the QVD-WAT for the purpose of loading as an image. Files located
+  here are available within QVD-WAT when you select to add an image.
+  The image file will be copied out of this directory and into the
+  *images* folder when it is enabled using one of the administration tools. 
+  The staging folder can either be hosted locally or on a network share, 
+  but must be accessible to the QVD-WAT.
+* *images*: location of the DIs (Disk Images) that are
+  loaded by the nodes for each Virtual Machine that is created. These
+  need to be accessible to QVD Server Nodes and to the QVD-WAT. This
+  directory might be stored on a network share, but in a very simple
+  configuration where the QVD-WAT is either not used or is hosted on
+  the same system as the QVD Server Node, it can be hosted locally
+  which will help to improve performance. Note that where KVM 
+  virtualization is used, the image is loaded into the virtual machine
+  from this directory. When LXC virtualization is used, the image is
+  extracted from this directory into the *basefs* directory, before it
+  is loaded.
+
+
+KVM Storage Directories
++++++++++++++++++++++++
+
+* *homes*: location of user home data. Under KVM, home data
+  is stored in individual files as qcow2 images. The *homes* directory 
+  should be accessible to all QVD Server Nodes usually on some type of 
+  network file share such as NFS, OCFS2 or GFS2.
+* *overlays*: location used to store overlays for data that is constantly
+  written to the Operating System in order for it to function correctly, such
+  as temporary files and variable data etc. Usually this folder can be hosted 
+  locally, but for more persistent behaviour in your virtual machines, you can 
+  choose to store these on a network share and configure QVD to make your 
+  virtual machines persistent.
+
+LXC Storage Directories
++++++++++++++++++++++++
+
+Note that while we will not be taking advantage of LXC Virtualization for this 
+guide, it is useful to understand what the other directories within the storage
+area are used for and how LXC differs from KVM.
+
+* *basefs*:  location of the DIs (Disk Images) that are
+  loaded by the nodes for each Virtual Machine that is created. These
+  need to be accessible to QVD Server Nodes and to the QVD-WAT. This
+  directory might be stored on an network share, but in a very simple
+  configuration where the QVD-WAT is either not used or is hosted on
+  the same system as the QVD Server Node, it can be hosted locally
+  which will help to improve performance. The basefs folder will contain
+  a subdirectory for each DI, which will in turn contain the complete 
+  filesystem tree for a functioning operating system
+* *homesfs*: location of user home data. Under LXC, home data
+  is stored within subdirectories inside the *homesfs* directory, named 
+  according to the user-id and the osf-id stored within the QVD-DB. 
+  The *homesfs* directory should be accessible to all QVD Server Nodes 
+  usually on some type of network file share such as NFS, OCFS2 or GFS2.
+* *overlayfs*: location used to store overlays for data that is constantly
+  written to the Operating System in order for it to function correctly, such
+  as temporary files and variable data etc. Usually this folder can be hosted 
+  locally, but for more persistent behaviour in your virtual machines, you can 
+  choose to store these on a network share and configure QVD to make your 
+  virtual machines persistent.
+* *rootfs*: location of the running LXC once all required mountpoints have
+  been mounted and configured. Usually this folder is local to each QVD
+  Node Server, for performance, but it could equally be stored within the
+  shared storage space.
+
 
 include::HighLevelArchitectureDiagrams.txt[]
 
@@ -301,7 +361,7 @@ operating system. Run the following command to update `/etc/apt/sources.list`
 on any systems where you intend to install QVD components
 
 ----
-sudo apt-add-repository ppa:qvd-qindel/qvd-3.0
+sudo apt-add-repository ppa:qvd-qindel/qvd-3.1
 ----
 
 [NOTE]
@@ -332,6 +392,8 @@ QVD follows:
 
     * The PostgreSQL RDBMS.
     * KVM: Hypervisor.
+    * LXC: Linux containers userspace tools
+    * libvirt0: a library for interfacing with different virtualization systems
     * NX: protocol that handles remote desktop connections.
     * Catalyst: an MVC web-application framework for Perl
     * Ebtables: a IP-based firewalling utility for ethernet bridges
@@ -1106,18 +1168,18 @@ you have just entered.
 Installing Your First Image
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
-In order for QVD to serve a desktop to a user, it first needs to load an OSF
-(Operating System Flavour) image. The OSF allows you to provide different
-users with different operating systems, or simply to provide different
-applications or environments to users with different requirements. As
-already mentioned, the image is loaded into its own virtual machine
+In order for QVD to serve a desktop to a user, you will need to create an OSF
+(Operating System Flavour) and assign a DI (Disk Image) to it. The OSF allows 
+you to provide different users with different operating systems, or simply to 
+provide different applications or environments to users with different requirements. 
+As already mentioned, the image is loaded into its own virtual machine
 for each user that connects to the server. This means that you can
 have one image that is used to serve multiple users. On the other
 hand, you can install as many images as you require, so that in a
 'worst case' scenario you have a different image for each user.
 
 
-Download a demonstration OSF image
+Download a demonstration Disk Image
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 Since we just want a quick method to get started, we are not going to
 go to the trouble of creating our own image. Instead, we will simply
@@ -1529,6 +1591,23 @@ access a terminal within the virtual machine.
 
 These topics are fairly advanced and are covered in much more detail
 within our _QVD Administration Manual_.
+
+Using LXC Virtualization instead of KVM
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+This Getting Started Guide is mainly focussed on demonstrating how easily
+you can provide Virtual Desktops to end users by using the KVM hypervisor
+within the QVD infrastructure. For environments where the base operating
+system used for the desktop platform will essentially be the same as the 
+host operating system, you may be able to benefit from improved performance
+and resource management by taking advantage of LXC technology in conjunction
+with QVD.
+
+As of QVD 3.1, the KVM hypervisor can be disabled and virtualization can
+be achieved using LXC. Since there are various complexities to setting up
+an LXC environment at this stage within QVD's development, instructions for
+achieving a basic LXC configuration have been omitted from this document.
+If you are interested in setting up LXC, please refer to the chapter on
+'Using LXC Virtualization in QVD' in our _QVD Administration Manual_.
 
 Conclusion
 ----------

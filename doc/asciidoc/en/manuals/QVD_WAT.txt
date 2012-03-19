@@ -1,0 +1,555 @@
+[[QVD_WAT]]
+The QVD Web Administration Tool (QVD-WAT) is a web-based GUI that
+provides QVD system administrators with all of the tools required to
+administer a fully installed QVD solution. As a web-based utitlity,
+QVD-WAT can be used remotely to provision new users, configure virtual
+machines and to monitor the health of the various components within
+the solution.
+
+Installing and configuring QVD-WAT
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+On the system that you intend to install QVD-WAT, you will need to add
+the QVD repository to your apt sources. You can do this with the
+following command:
+
+----
+apt-add-repository 'deb http://theqvd.com/debian lucid main'
+----
+
+Execute `apt-get update` after modifying sources.list.
+
+----
+# sudo apt-get install qvd-wat
+----
+
+The QVD-WAT requires access to the QVD Database.
+You will need to ensure that the QVD Node configuration file is set
+up correctly in order for this QVD-WAT to function properly. You can
+find out how to do this in chapter titled
+<<qvd_db_config,QVD Base Configuration>>.
+
+Once you have setup the QVD Configuration, you can restart QVD-WAT:
+
+----
+# sudo /etc/init.d/qvd-wat restart
+----
+
+CAUTION: At the moment QVD works only with libcatalyst-perl version 5.80024-1.·
+This is the default versions currently provided with Ubuntu 10.04
+(Lucid Lynx). If you are using a newer distribution, you may need to
+downgrade this package.
+
+QVD-WAT Web Server Port
+~~~~~~~~~~~~~~~~~~~~~~~
+By default, QVD-WAT listens on the TCP port 3000 for incoming HTTP requests.
+If you are running another service on a conflicting port, or you would prefer
+to use some other port number for some reason, it is possible to change the
+port used by QVD-WAT by editing or creating `/etc/default/qvd-wat`.
+The easiest way to do this is to do:
+
+----
+# echo 'PORT=4000' > /etc/default/qvd-wat
+----
+
+Once you have changed the port, you will need to restart QVD-WAT, to access it
+on the different port number.
+
+The QVD-WAT Interface
+~~~~~~~~~~~~~~~~~~~~~
+To access QVD-WAT you can open a web browser and point it at the host where
+you are running the QVD-WAT service. If locally, you can point your browser to
+http://localhost:3000/. Note that you will need to specify the port number that
+QVD-WAT is running on. By default, this is set to 3000, but you are able to
+change this.
+
+Authentication
+^^^^^^^^^^^^^^
+QVD-WAT currently only supports authentication for a single user. The default
+username is set to 'admin' and the default password is also set to 'admin'.
+
+It is possible to change these values using the <<qvd-admin-cli,QVD CLI Administration Utility>>.
+On a system that has the QVD CLI Administration Utility installed, run the following
+commands:
+
+----
+# qvd-admin.pl config set wat.admin.login=administrator
+# qvd-admin.pl config set wat.admin.password=myS3cR3t
+----
+
+The above commands will change the username to 'administrator' and the password to 'myS3cR3t'.
+
+If you are not authenticated and you connect to the QVD-WAT interface, you will be 
+presented with a login screen.
+
+.The QVD-WAT Login Screen
+image::../images/WAT_login.png[alt="The QVD-WAT Login Screen" width=98%]
+
+QVD Dashboard
+^^^^^^^^^^^^^
+After authentication the administrator is presented with the QVD Dashboard. This 
+screen provides a quick overview of the status of the various components and elements
+within a QVD solution.
+
+.The QVD-WAT Dashboard
+image::../images/WAT_dashboard.png[alt="The QVD-WAT Dashboard" width=98%]
+
+Pie graphs are used to display the proportion of Virtual Machines that are running, 
+stopped or failed; and QVD Server Nodes that are running or stopped.
+
+There is also a summary displaying counters for the numbers of users, virtual machines, 
+actively running sessions, nodes, operating systems and disk images that are active within the QVD
+infrastructure.
+
+The administrator can return to this screen by clicking on the QVD logo image on the top
+left of the web page, or alternately setting the browser URL back to the root of the site:
+http://localhost:3000/.
+
+Navigation
+^^^^^^^^^^
+Primary navigation within QVD-WAT is largely handled by a 'Navigation Bar' that runs along
+the top of all web-pages.
+
+.The QVD-WAT Navigation Bar
+image::../images/WAT_newuser1.png[alt="The QVD-WAT Navigation Bar"]
+
+The primary navigation links are as follows:
+
+* *Users*: http://localhost:3000/users/ - Provides the screen to manage and add users. Since
+virtual machines are assigned to users, the option to create a new virtual machine is provided
+through this channel when you choose to view details for a user.
+
+* *Virtual machines*: http://localhost:3000/vm/ - Provides a screen to administer existing 
+virtual machines. A java applet to telnet into any virtual machine's serial console is also
+available via this channel, when you choose to view the details for a particular virtual 
+machine. Note that you can only add a virtual machine through the _Users_ link, since they
+need to be assigned to a user when they are created.
+
+* *Nodes*: http://localhost:3000/hosts/ - Provides a screen to add new QVD Server Nodes to
+the QVD infrastructure, and to view the running state of any existing server node.
+
+* *OS Flavours*: http://localhost:3000/osf/ - Provides a screen to add operating system "flavours"
+to the QVD infrastructure. There is also the option to view and edit the running parameters
+for any existing image.
+
+* *Disk Images*: http://localhost:3000/di/ - Provides a screen to manage disk images for the
+OSFs. These contain the actual operating system files and directories.
+
+Users
+^^^^^
+Users are managed within QVD-WAT by clicking on the _Users_ link in the Navigation bar, or
+by going to the URL http://localhost:3000/users/.
+
+This page displays a list of users that have already been provisioned within the QVD 
+environment. Users are listed by ID along with their login name, and their state within
+the environment.
+
+.The Users Page within the QVD-WAT
+image::../images/WAT_users.png[alt="The Users Page within the QVD-WAT" width=98%]
+
+Note that in the above image, users are listed as having different 'states'. A user with
+state set to `0/0` has no active session and has no virtual machine assigned. A user with
+state set to `0/1` has a virtual machine assigned but is not currently running a session.
+A user with state set to `1/1` is currently running a session and has a single virtual 
+machine assigned.
+
+Adding a User
++++++++++++++
+It is simple to add a user to the environment using QVD-WAT. On the Users page, you will
+notice that there is a button image:../images/WAT_new_button.png[alt="The New button used to add a user within the QVD-WAT"] above the user list:
+
+Clicking on the New button will take you to the 'New User' page within the QVD-WAT. Here you
+are prompted to provide a *Login* username and *Password* and to *Confirm Password*.
+
+.The New User Page within the QVD-WAT
+image::../images/WAT_newuser.png[alt="The New User Page within the QVD-WAT" width=98%]
+
+By clicking on the Submit button, the new user will be created within the QVD database.
+
+NOTE: If you choose to make use of an external authentication mechanism such as LDAP you
+will still need to add the users to the QVD Database in order to be able to assign virtual
+machines to them. The usernames should match the entries in LDAP. The password that is
+stored for the user within the QVD Database will be ignored and the user will actually 
+authenticate against the credentials stored in LDAP.
+
+Deleting Users
+++++++++++++++
+Deleting users from QVD using the QVD-WAT is simple. On the Users page, you will notice
+that there is a checkbox next to each user entry in the Users List. By simply checking the
+checkbox next to each entry that you wish to remove, you are able to select the users that
+should be deleted. When you have finished your selection, you can click on the Delete button
+at the bottom of the User List.
+
+You will be prompted to confirm your intention to delete the users from the system. You
+will need to affirm your decision before the users are actually removed.
+
+Changing a User Password
+++++++++++++++++++++++++
+To change the password for a user, you will need to find the user in the User List 
+displayed on the Users Page and click on the magnifying glass icon next to the user's 
+User ID image:../images/WAT_view_button.png[alt="The Magnifying Glass icon"]. This will 
+take you to the User Profile page.
+
+.The User Profile Page within the QVD-WAT
+image::../images/WAT_user_profile.png[alt="The User Profile Page within the QVD-WAT" width=98%]
+
+Here, you will be able to locate and click on the image:../images/WAT_change_password_button.png[alt="The Change Password Button"] link.
+
+This will take you to the Change Password page, where you will be able to enter a new
+password for the user.
+
+NOTE: If you have opted to make use of an external authentication mechanism such as LDAP, password
+changes performed through the QVD-WAT will not update the user's password within the LDAP directory.
+
+Assigning a Virtual Machine To A User
++++++++++++++++++++++++++++++++++++++
+In order for a user to be able to login to a virtual desktop environment, the user must have a
+virtual machine assigned. This is easily achieved by finding the user in the User List
+displayed on the Users Page. Click on the magnifying glass icon 
+image:../images/WAT_view_button.png[alt="The Magnifying Glass icon"] next to the user's User ID. This will·
+take you to the User Profile page.
+
+On the User Profile page, locate and click on the image:../images/WAT_newvm_button.png[alt="The New Virtual Machine Button"] link.
+This will take you to the New Virtual Machine Page. Here you can enter a name for the Virtual Machine that
+will make it easy to identify. You will then need to select which loaded OSF you would like to run within
+the Virtual Machine from the list of OSFs. As soon as you click on an OSF within the list, the virtual
+machine will be created and assigned to the current user.
+
+.The New Virtual Machine Page within the QVD-WAT
+image::../images/WAT_newvm_gsg.png[alt="The New Virtual Machine Page within the QVD-WAT" width=98%]
+
+After creating a new virtual machine, you will automatically be taken to the Virtual Machines Page.
+
+NOTE: You can assign multiple virtual machines to a single user. These may contain different OSFs, allowing the user
+to perform a variety of different tasks. If a user attempts to connect using the QVD Client, and multiple virtual machines
+are available to the user, the user will be presented with a menu of the available virtual machines to select from before
+the connection is established.
+
+Virtual Machines
+^^^^^^^^^^^^^^^^
+The Virtual Machines Page is usually accessed by clicking on the _Virtual Machines_ link in the Navigation bar,
+or by going to the URL http://localhost:3000/vm/, within the QVD-WAT.
+
+This page displays a list of Virtual Machines that have already been created and assigned to users
+within the QVD environment. Virtual Machines are listed by ID along with their name, the user that they
+have been assigned to, the OSF that they will load, their state within the environment, and the node where
+the virtual machine is running.
+
+.The Virtual Machines Page within the QVD-WAT
+image::../images/WAT_vm_page.png[alt="The Virtual Machines Page within the QVD-WAT" width=98%]
+
+Starting and Stopping Virtual Machines
+++++++++++++++++++++++++++++++++++++++
+While the L7R component of any Server Node that receives an authentication request will automatically
+start an instance of a virtual machine for the user that has been authenticated, if one is not already
+running, this takes time and delays the client from presenting the desktop to the user. It is usually
+a good idea to start up virtual machine instances beforehand, so that users do not have to wait for
+an image to boot.
+
+Starting a Virtual Machine within the QVD-WAT is trivial. Check the checkboxes next to each of the
+Virtual Machines that you wish to start and then click on the _Start_ button at the bottom of the list.
+
+TIP: If you want to start all of the listed Virtual Machines, you can click on the checkbox in the
+header of the table.
+
+While a machine is starting up, you will see that the state first changes to 'starting_2' and then 
+eventually changes to 'running'. If something goes wrong during the startup, the state will change to
+'failed' and usually the 'Blocked' flag will be set.
+
+To stop any Virtual Machine within the environment, follow the same procedure. Check the checkboxes for
+the Virtual Machines that you want to stop, and then click on the _Stop_ button at the bottom of the list.
+
+Virtual Machine Blocking and Unblocking
++++++++++++++++++++++++++++++++++++++++
+[[wat_vm_block]]
+Virtual Machines can enter a 'Blocked' state. This means that even if they are started, a user will
+not be able to login to the desktop using the client. Usually machines automatically enter a 'Blocked'
+state if they fail to start correctly or if there is some problem either with their network configuration
+or with the QVD-VMA that should be running on each virtual machine. However, it is also possible to
+force the 'Blocked' state using the QVD-WAT. This is usually done if an administrative task needs to be
+performed on the Virtual Machine, and the administrator does not want anybody to be accessing the
+virtual machine at the same time.
+
+In order to 'Block' a Virtual Machine, check the checkbox next to the Virtual Machine that you want to
+disable, and then click on the _Block_ button at the bottom of the Virtual Machine list. You will be prompted
+to confirm that you intend this action.
+
+Once the Virtual Machine has been blocked, you will be able to access it via the Terminal Console in order
+to perform maintanence.
+
+It is equally trivial to 'Unblock' a Virtual Machine. Check the checkbox next to the Virtual Machine that you want to
+enable, and then click on the _Unblock_ button at the bottom of the Virtual Machine list. You will be prompted
+to confirm that you intend this action.
+
+Unblocking a Virtual Machine that has failed to start properly will not fix the problem. It only really makes
+sense to 'Unblock' a Virtual Machine if you have purposefully 'Blocked' it or if you have just finished resolving
+a startup problem. If a machine is 'Blocked' as a result of a startup failure, you will more than likely need to
+edit the underlying OSF.
+
+Deleting a Virtual Machine
+++++++++++++++++++++++++++
+Since it is possible to assign more than one Virtual Machine to a user, there may be times that you wish
+to delete a particular virtual machine. This is a trivial action. On the Virtual Machines page, check the 
+checkbox next to the Virtual Machine that you want to delete, and then click on the _Delete_ link at the 
+bottom of the Virtual Machine list. You will be prompted to confirm that you intend this action.
+
+Disconnecting a User
+++++++++++++++++++++
+During periods of maintenance, you may find that you need to disconnect users from their Virtual Machines.
+This can be acheived easily. On the Virtual Machines page, check the·checkbox next to the Virtual Machine 
+that you want to disconnect a user from, and then click on the _Disconnect User_ button at the·
+bottom of the Virtual Machine list. You will be prompted to confirm that you intend this action.
+
+This action is performed without any warning to the user. The client will simply disconnect the moment that
+the command is issued. While no data will be lost, unless the Virtual Machine is restarted, the user will be
+unaware of the reason for the dropped connection. As a result, this action should be used with care.
+
+Editing Runtime Parameters
+++++++++++++++++++++++++++
+It is possible to edit the runtime parameters for any virtual machine. To do this, you will need to go to
+the Virtual Machines page and find the virtual machine within the Virtual Machine List. Each Virtual Machine
+entry includes the Virtual Machine identifier and a magnifying glass icon 
+image:../images/WAT_view_button.png[alt="The Magnifying Glass icon"] which acts as a link through to a page
+where you are able to view the current runtime parameters for that Virtual Machine.
+
+.The VM Runtime Parameters Page
+image::../images/WAT_VM_runtime.png[alt="The VM Runtime Page within the QVD-WAT" width=98%]
+
+In order to edit any of these parameters, you can click on the image:../images/WAT_edit_button.png[alt="The Edit Button"]
+button to render this page as a form that allows you to change some of the runtime options within the
+virtual machine.
+
+.Editing the VM Runtime Parameters
+image::../images/WAT_VM_runtime_edit.png[alt="Editing The VM Runtime Parameters within the QVD-WAT" width=98%]
+
+Here you are able to change the following parameters:
+
+Name:: The virtual machine name that will be listed in the QVD-WAT and that will be presented to the user 
+in a menu if the user has more than one Virtual Machine assigned.
+
+DI Tag:: The Disk Image tag this VM will use. Most of the time this will be either *default* or *head*.
+
+Terminal Console
+++++++++++++++++
+At the bottom of the VM Runtime Parameters Page there is a image:../images/WAT_telnet_button.png[alt="The Telnet Button"] button.
+Clicking on the Telnet Viewer button will open a separate window containing a Java applet that will automatically telnet into
+the Serial Port on the Virtual Machine, allowing an Administrator to connect and to login in order to perform administrative 
+duties for a particular Virtual Machine.
+
+In general, major administration is directly performed on a DI, so that changes are implemented across all virtual machines
+sharing the same image, however there are particular instances where an Administrator may need to access a running virtual machine
+to help a user or to troubleshoot a problem. Most frequently, this utility will be used by an Administrator when a virtual machine
+fails to start correctly and enters a 'Blocked' state.
+
+.The Terminal Console
+image::../images/WAT_telnet_interface.png[alt="The Terminal Console" width=98%]
+
+The java Telnet applet is only provided as a convenience to remote administrators. It is equally possible to use any other standard 
+telnet application to access the serial port used for a Virtual Machine on any QVD Server Node by specifying the IP address of the
+Server Node and the port number for the Serial Port.
+
+Nodes
+^^^^^
+The Nodes Page is usually accessed by clicking on the _Nodes_ link in the Navigation bar, or
+by going to the URL http://localhost:3000/hosts/, within the QVD-WAT.
+
+This page displays a list of QVD Server Nodes that have already been provisioned within the QVD·
+environment. Nodes are listed by ID along with their name, IP Address, and their state within
+the environment.
+
+.The Nodes Page within the QVD-WAT
+image::../images/WAT_nodes.png[alt="The Nodes Page within the QVD-WAT" width=98%]
+
+While it is possible to click on the magnifying glass icon image:../images/WAT_view_button.png[alt="The Magnifying Glass icon"] 
+next to the identifier for any node, to view the details for a particular node, you should be able
+to view all of this data immediately from the Nodes Page directly in the Nodes List.
+
+Adding Nodes
+++++++++++++
+In order for a QVD Server Node to function properly within the QVD environment, it needs to be registered
+within the QVD-DB. To do this, you can add the Server Node details within the QVD-WAT. Go to the Nodes Page
+and click on the image:../images/WAT_new_button.png[alt="The New button"] button. This will take you to the
+New Node Page.
+
+.The New Node Page
+image::../images/WAT_newnode.png[alt="The New Node Page within the QVD-WAT" width=98%]
+
+On this page, you should enter a name to identify the node that you are adding (usually the hostname would 
+be a good option) and provide the IP address for the node. Click on the 'addhost' button to register the
+node within QVD-DB.
+
+Blocking and Unblocking Nodes
++++++++++++++++++++++++++++++
+Just as with Virtual Machines, it is possible to 'Block' access to a Server Node. This will disable the
+Server Node from any behaviour within the QVD infrastructure. This is effectively the same as shutting
+down the Server Node, in the sense that to the rest of the environment the Server Node will be unavailable.
+If the Server Node is currently hosting any number of virtual machines, and a client attempts to connect
+the client will not be able to access that Virtual Machine and will receive an error notifying it that the
+server is currently under maintenance. Clients that are already connected to virtual machines running on
+a Node that has been blocked will remain connected until they are either forced to disconnect by an 
+Administrator or they disconnect of their own accord.
+
+To change the state of a Server Node to 'Blocked' you can check the checkbox next to the Server Node in the
+Node List on the Nodes Page. Then click on the _Block_ button at the bottom of the list.
+
+'Unblocking' a Server Node is as simple as checking the checkbox next to the Server Node in the
+Node List on the Nodes Page and then clicking on the _Unblock_ button at the bottom of the list. 
+
+OS Flavours
+^^^^^^^^^^^
+The OS Flavours Page is usually accessed by clicking on the _OS Flavours_ link in the Navigation bar or
+by going to the URL http://localhost:3000/osf/, within the QVD-WAT. QVD uses an Operating System Flavour (OSF)
+to load into each virtual machine that it creates for every user. The OSF provides the user's
+desktop environment and all of the user's applications. This manual goes into depth about creating,
+editing and managing OSFs and Virtual Machines. Please refer to the part labelled 
+<<osf_and_vm,Operating System Flavours and Virtual Machines>> for more information on this.
+
+The OS Flavours Page lists any OSFs that are already registered into the QVD-DB. OSFs are listed by ID along 
+with their name, whether they have overlays enabled and the memory allocated for them to run.
+OSFs need at least one DI (Disk Image) linked to them. This DI is which actually contains the
+files and directories that comprise the Operating System that is run inside the Virtual Machine.
+
+.The OS Flavours Page
+image::../images/WAT_osfs.png[alt="The Images Page within the QVD-WAT" width=98%]
+
+Adding an OSF
++++++++++++++
+In order to use an OSF, it needs to be registered into the QVD-DB along with its runtime parameters.
+To do this, you can add the OSF within the QVD-WAT. Go to the OS Flavours Page and click on the image:../images/WAT_new_button.png[alt="The New button"] 
+button. This will take you to the New OSF Page.
+
+.The New OSF Page
+image::../images/WAT_newosf.png[alt="The New OSF Page within the QVD-WAT" width=98%]
+
+This page presents a number of runtime parameters for the OSF that you are adding.
+
+* *Name*: This field is mandatory. You should use it to provide a name 
+for the OSF that will allow you to identify it when adding it to
+a Virtual Machine or when linking a Disk Image to it.
+
+* *Memory*: This field is optional. It is used to allocate system 
+memory to the Operating System. It has a default value of 256 MB.
+While the default value should be sufficient for a basic desktop,
+on most production systems, you would probably increase this to at 
+least 512 MB for the Gnome or KDE desktop environment to run comfortably.
+
+* *User space*: This field is optional. It is used to allocate disk 
+space to a user for the purpose of storing a home directory. By default, 
+this option is usually not set and the user's home will not be
+persistent. That means that if the virtual machine is restarted, any
+user data will be lost. Setting a value here will create a virtual disk of the
+size specified. This ensures that user data is persistent, and helps to 
+enforce quotas and to prevent user home directories from unlimited growth 
+which could impact on other users of the QVD environment. 
+
+Finally, click on the *Create* button to load the OSF.
+
+Deleting an OSF
++++++++++++++++
+Deleting OSFs from QVD using the QVD-WAT is simple. On the OS Flavours page, you will notice
+that there is a checkbox next to each OSF entry in the list. By simply checking the
+checkbox next to each entry that you wish to remove, you are able to select the OSFs that
+should be deleted. When you have finished your selection, you can click on the Delete button
+at the bottom of the Image List.
+
+You will be prompted to confirm your intention to delete the OSF from the system. You
+will need to affirm your decision before the image is actually removed.
+
+Disk Images
+^^^^^^^^^^^
+[[disk_images]]
+OSFs only contain information about the Operating System that will run inside
+the Virtual Machine, but they don't hold the actual Operating System. For this, a
+Disk Image is needed. Disk Images relate Operating System image files with OSFs,
+so several images files can be used with a given OSF. This mechanism allows the
+administrator to roll back to a previous, known-good image file if a newer one
+is found to have some kind of problem.
+
+The way this works is by *tagging*. DIs can be tagged with several strings,
+and on the other hand VMs have a *DI Tag* field that refer to these tags. This
+way, when a VM starts, the Disk Image which has the specified tag is chosen.
+
+When adding Disk Images, they are automatically tagged with a string like
+*2011-03-04-000*. This is a unique string that identifies that DI. It contains
+the current date and a sequential number.
+
+Other meaningful tags a DI can have are *head* and *default*. *head* is always
+assigned to the most recent DI. This is useful for VMs that must always run
+the latest image—just set their *DI Tag* field to *head* and they will always
+use new DIs as they are added to the system.
+
+If this behaviour isn't desired, you can use the tag *default*. This tag isn't
+reassigned when DIs are added, so you can expect VMs to be using always a
+specific DI. Whenever the user tags a different DI as default, though, VMs will
+start using it from their next boot.
+
+In the Disk Images listing in the WAT, you can see and change which image is
+the default for each OSF. The column *Default* in the listing serves both of
+these purposes.
+
+
+Adding an Image
++++++++++++++++
+Disk Images must be registered into the QVD-DB before you can make use of them. The
+QVD-WAT can be used to register images in the database. Go to the Disk Images page
+and click on the image:../images/WAT_new_button.png[alt="The New button"] button.
+
+.The New Disk Image Page
+image::../images/WAT_newimage.png[alt="The New Disk Image Page within the QVD-WAT" width=98%]
+
+* *OS Flavour*: This field is mandatory. The list will show the existing OS
+Flavours in the system, and you can choose the OSF this Image will be associated to.
+
+* *Image file*: Selecting an image from the list of images is compulsory. The
+list will only be populated with the image files that are available within
+`/var/lib/qvd/storage/staging`. If no files are available within this 
+directory, the field will appear empty and you will not be able to proceed
+from this point.
+
+* *Delete after action*: A checkbox that allows you to either delete the
+original image from the staging directory once it has been added, or to
+keep it available as a staging image. This option is available because 
+the original image file is copied to `/var/lib/qvd/storage/images` once 
+you have loaded it into QVD. You may want to delete the image file from 
+the staging directory to save disk space, but you may equally want to 
+reuse it with alternative memory and user space settings for another 
+group of users. It is optional to delete the temporary image file.
+
+Finally, click on the *Create* button to load the Disk Image. It may take some
+time to copy the image file and to update the database. Please be patient
+while this action completes.
+
+Deleting an Image
++++++++++++++++++
+When a Disk Image is no longer deemed necessary, it can be removed from the system.
+This can be easily done from the Disk Images page. Just as with OSFs, you can click
+the checkbox next to each entry that you wish to remove, then click on the Delete
+button at the bottom of the list.
+
+You will be prompted to confirm your intention to delete the OSF from the system. You
+will need to affirm your decision before the image is actually removed.
+
+WARNING: If a copy of your image file is not available in the staging directory
+or in a backup, you will lose the image file completely. Since these are usually
+very large and take some time to create, you may want to create a backup before
+you proceed with this action.
+
+Setting default Images
+++++++++++++++++++++++
+As explained in <<disk_images,Disk Images>>, more than one DI can be assigned
+to an OSF and there's a field in each VM parameters (DI Tag) that selects
+which of these DIs is to be used on a per VM basis. VMs that choose the tag
+*head* will always use the latest DI in the relevant OSF. VMs that choose a
+given numeric tag will use it. VMs that choose the *default* tag will use
+whatever DI is set as default in each OSF.
+
+In the listing of DIs there are some radio buttons that allows the user to
+select which of the DIs among each OSF has the *default* tag. It is best to
+sort the list by OSF to see this clearly. To set a given DI as default, just
+check its radio button (which will uncheck the currently checked DI in the
+same OSF) and then click on the *Set defaults* button. From now on, the next
+time a VM using that OSF and having *default* in its DI Tag field is started,
+it will use the newly selected DI.
+
+You can change more than one DI at the same time by checking the desired radio
+buttons, then clicking on *Set defaults* once instead of changing one default
+DI each time.
