@@ -143,9 +143,9 @@ sub _save_runtime_row {
     $self->{vma_port}    = $self->_cfg('internal.vm.port.vma');
     $self->{x_port}      = $self->_cfg('internal.nxagent.display') + 4000;
     $self->{ssh_port}    = $self->_cfg('internal.vm.port.ssh');
-    $self->{vnc_port}    = $self->_allocate_tcp_port if $self->_cfg('vm.vnc.redirect');
-    $self->{serial_port} = $self->_allocate_tcp_port if $self->_cfg('vm.serial.redirect');
-    $self->{mon_port}    = $self->_allocate_tcp_port if $self->_cfg('internal.vm.monitor.redirect');
+    $self->{vnc_port}    = $self->_cfg('vm.vnc.redirect') ?              $self->_allocate_tcp_port : 0;
+    $self->{serial_port} = $self->_cfg('vm.serial.redirect') ?           $self->_allocate_tcp_port : 0;
+    $self->{mon_port}    = $self->_cfg('internal.vm.monitor.redirect') ? $self->_allocate_tcp_port : 0;
     no warnings 'uninitialized';
     DEBUG sprintf "Saving runtime row for VM '%d': VMA port '%d', X11 port '%d', SSH port '%d', VNC port '%s', serial port '%s', monitor port '%s'",
         @{$self}{qw(vm_id vma_port x_port ssh_port vnc_port serial_port mon_port)};
