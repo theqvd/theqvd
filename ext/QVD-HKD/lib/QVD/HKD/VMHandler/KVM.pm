@@ -125,6 +125,13 @@ sub leave_state :OnState('starting/waiting_for_vma') {
 
 sub _on_cmd_stop :OnState('__any__') { shift->delay_until_next_state }
 
+# FIXME: move this out of here, maybe into a module:
+use constant TUNNEL_DEV => '/dev/net/tun';
+use constant STRUCT_IFREQ => "Z16 s";
+use constant IFF_NO_PI => 0x1000;
+use constant IFF_TAP => 2;
+use constant TUNSETIFF => 0x400454ca;
+
 sub _allocate_tap {
     my $self = shift;
     eval {
@@ -132,7 +139,7 @@ sub _allocate_tap {
         $self->{tap_fh} = $tap_fh;
         my $ifreq = pack(STRUCT_IFREQ(), 'qvdtap%d', IFF_TAP()|IFF_NO_PI());
         ioctl $tap_fh, TUNSETIFF(), $ifreq or LOGDIE "Can't create tap interface: $!";
-        $self->{tap_if} = unpack STRUCT_IFREQ(), $ifreq;
+        $self->{iface} = unpack STRUCT_IFREQ(), $ifreq;
     };
     if ($@) {
         ERROR "Allocating TAP device: $@";
@@ -144,12 +151,12 @@ sub _allocate_tap {
 
     $self->_run_cmd([$self->_cfg('command.brctl'),
                      addif => $self->_cfg('vm.network.bridge'),
-                     $self->{tap_if}]);
+                     $self->{iface}]);
 }
 
 sub _enable_iface {
     my $self = shift;
-    $self->_run_cmd([$self->_cfg('command.ifconfig'), $self->{tap_if}, 'up']);
+    $self->_run_cmd([$self->_cfg('command.ifconfig'), $self->{iface}, 'up']);
 }
 
 sub _allocate_os_disk {

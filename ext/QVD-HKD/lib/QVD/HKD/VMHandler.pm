@@ -165,13 +165,6 @@ update vm_runtimes
 SQL
 }
 
-# FIXME: move this out of here, maybe into a module:
-use constant TUNNEL_DEV => '/dev/net/tun';
-use constant STRUCT_IFREQ => "Z16 s";
-use constant IFF_NO_PI => 0x1000;
-use constant IFF_TAP => 2;
-use constant TUNSETIFF => 0x400454ca;
-
 sub _fw_rules {
     my $self = shift;
     my $vm_id = $self->{vm_id};
