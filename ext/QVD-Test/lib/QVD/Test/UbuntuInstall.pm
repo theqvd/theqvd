@@ -1,4 +1,4 @@
-package QVD::Test::ServerInstall;
+package QVD::Test::UbuntuInstall;
 use parent qw(QVD::Test);
 
 use strict;
@@ -9,18 +9,20 @@ use Test::More	qw(no_plan);
 sub check_environment : Test(startup => 3) {
     is($^O, 'linux', 'Node installation can be tested only on linux');
 
-    open my $issue_fh, '<', '/etc/issue';
-    my $issue = <$issue_fh>;
-    close $issue_fh;
+    if ( ! -x '/usr/bin/lsb_release' ) {
+        my $distributor = `/usr/bin/lsb_release -i`;
+        if ( $distributor !~ /Ubuntu/ ) {
+            fail("Not Ubuntu linux (I read distributor from lsb_release)");
+        }
 
-    chomp $issue;
-    if ($issue =~ /Ubuntu ([.0-9]+)/) {
-	my $version = $1;
-	ok(version->parse("v$version") ge 'v10.04',
-	    "Detected Ubuntu $version, need at least 10.04");
+        my $ver = `/usr/bin/lsb_release -r`;
+        $ver =~ /:\s+([.0-9]+)/;
+
+	ok(version->parse("v$version") ge 'v10.04', "Detected Ubuntu $version, need at least 10.04");
     } else {
-	fail("Not Ubuntu linux (I read $issue from /etc/issue)");
+        fail("Not Ubuntu linux (/usr/bin/lsb_release not found)");
     }
+ 
 
     open my $sources_fh, '<', '/etc/apt/sources.list';
     my @sources = <$sources_fh>;
