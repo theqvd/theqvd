@@ -92,27 +92,29 @@ sub new {
         20
     );
 
-	my $grid_sizer = Wx::GridSizer->new(1, 3, 0, 0);
+	my $grid_sizer = Wx::GridSizer->new(1, 2, 0, 0);
 	$ver_sizer->Add($grid_sizer, 1, wxALL|wxEXPAND, 20);
 
 	$grid_sizer->Add(Wx::StaticText->new($panel, -1, "User"), 0, wxALL, 5);
 	$self->{username} = Wx::TextCtrl->new($panel, -1, cfg('client.user.name'));
 	$grid_sizer->Add($self->{username}, 1, wxALL|wxEXPAND, 5);
 	$self->{username}->SetFocus();
-	$grid_sizer->Add(Wx::StaticText->new($panel, -1, ""), 0, wxALL, 5);
 
 	$grid_sizer->Add(Wx::StaticText->new($panel, -1, "Password"), 0, wxALL, 5);
 	$self->{password} = Wx::TextCtrl->new($panel, -1, "", wxDefaultPosition, wxDefaultSize, wxTE_PASSWORD);
 	$grid_sizer->Add($self->{password}, 0, wxALL|wxEXPAND, 5);
-    $self->{remember_pass} = Wx::CheckBox->new ($panel, -1, 'Remember password', wxDefaultPosition);
-    $self->{remember_pass}->SetValue(!!cfg('client.remember_password'));
-	$grid_sizer->Add($self->{remember_pass}, 1, wxALL, 5);
+
+    if (cfg('client.show.remember_password')) {
+        $grid_sizer->Add(Wx::StaticText->new($panel, -1, "Remember password"), 0, wxALL, 5);
+        $self->{remember_pass} = Wx::CheckBox->new ($panel, -1, '', wxDefaultPosition);
+        $self->{remember_pass}->SetValue(!!cfg('client.remember_password'));
+        $grid_sizer->Add($self->{remember_pass}, 1, wxALL, 5);
+    }
 
     if (!cfg('client.force.host.name', 0)) {
         $grid_sizer->Add(Wx::StaticText->new($panel, -1, "Server"), 0, wxALL, 5);
         $self->{host} = Wx::TextCtrl->new($panel, -1, cfg('client.host.name'));
         $grid_sizer->Add($self->{host}, 1, wxALL|wxEXPAND, 5);
-        $grid_sizer->Add(Wx::StaticText->new($panel, -1, ""), 0, wxALL, 5);
     }
 
     if (!cfg('client.force.link', 0)) {
@@ -123,7 +125,6 @@ sub new {
         $self->{link}->AppendItems(\@link_options);
         $self->{link}->Select(0);
         # FIXME Introduce previous user selection here
-        $grid_sizer->Add(Wx::StaticText->new($panel, -1, ""), 0, wxALL, 5);
     }
 
 	# port goes here!
