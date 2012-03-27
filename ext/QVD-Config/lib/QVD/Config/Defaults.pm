@@ -260,6 +260,8 @@ internal.l7r.poll_time.vm = 3
 internal.l7r.poll_time.x = 1
 internal.l7r.short_session = 120
 
+# internal.hkd.perl.anyevent.backend = EV
+
 internal.hkd.timeout.vm.state.starting_2 = 240
 internal.hkd.timeout.vm.state.stopping_1 = 30
 internal.hkd.timeout.vm.state.stopping_2 = 240

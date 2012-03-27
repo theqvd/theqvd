@@ -18,6 +18,7 @@ use Fcntl qw(LOCK_EX LOCK_NB);
 use File::Slurp qw(slurp);
 use Pg::PQ qw(:pgres);
 use QVD::Log;
+use AnyEvent::Impl::Perl;
 use AnyEvent;
 use AnyEvent::Pg;
 use Linux::Proc::Net::TCP;
@@ -180,6 +181,9 @@ sub _on_signal {
 sub run {
     my $self = shift;
     $self->{exit} = AnyEvent->condvar;
+
+    $debug and $self->_debug("Using AnyEvent backend $AnyEvent::MODEL");
+
     for (qw(TERM INT)) {
         my $name = $_;
         $self->{$_. "_watcher"} = AnyEvent->signal(signal => $_,
