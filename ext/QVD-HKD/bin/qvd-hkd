@@ -35,7 +35,7 @@ sub core_cfg {
 }
 
 # FIXME: just for debugging!
-$SIG{'INT'} = sub { die };
+# $SIG{'INT'} = sub { die };
 
 my $config_file = '/etc/qvd/node.conf';
 my $foreground = 0;
@@ -64,7 +64,8 @@ $App::Daemon::background = 0 if $foreground;
 
 ## require the module before daemonizing—otherwise syntax errors end up nowhere since STDERR is closed
 require QVD::HKD;
-daemonize; umask oct $umask;
+daemonize;
+umask oct $umask;
 
 my $hkd = QVD::HKD->new(config_file => $config_file);
 $hkd->run;
