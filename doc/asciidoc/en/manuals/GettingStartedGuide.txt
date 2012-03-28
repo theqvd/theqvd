@@ -57,7 +57,7 @@ updated. If there are sections in this document which are have become
 obsolete, or if you find that some of the instructions provided do not
 work as expected, please do not hesitate to contact us.
 
-include::whatisQVD.txt[]
+include::WhatIsQVD.txt[]
 
 Components and Architecture
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~

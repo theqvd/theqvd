@@ -229,13 +229,13 @@ to load when a virtual machine is started.
 
 To load an LXC image into QVD from the command line you will need to take the following steps:
 
-1. Add an Operating System Flavor to host your image file:
+Add an Operating System Flavor to host your image file:
 
 ----
 # qvd-admin.pl osf add name=MyOSF
 ----
 
-2. Now add your Disk Image to the OSF
+Now add your Disk Image to the OSF
 
 ----
 # qvd-admin.pl di add path=/var/lib/qvd/storage/staging/my_image.tar.gz osf=MyOSF
@@ -243,13 +243,13 @@ To load an LXC image into QVD from the command line you will need to take the fo
 
 This will take some time, as the image will be copied from the staging directory into the images directory.
 
-3. Now add a User that you can test this image against
+Now add a User that you can test this image against
 
 ----
 # qvd-admin.pl user add login=test password=test
 ----
 
-4. Finally create a Virtual Machine for the User, and attach the OSF that this Virtual Machine will use at runtime
+Finally create a Virtual Machine for the User, and attach the OSF that this Virtual Machine will use at runtime
 
 ----
 # qvd-admin.pl vm add name=TestVM user=test osf=MyOSF
@@ -259,7 +259,29 @@ If your QVD installation is properly set up, you will now be able to start the V
 
 Starting an LXC Virtual Machine
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+Starting an LXC Virtual Machine within QVD is no different to starting a KVM virtual machine. It can either
+be started manually using the QVD Admin Command Line Utility, or it can be started automatically by the HKD when
+a client attempts to connect to the virtual desktop handled by the Virtual Machine. For testing purposes, it
+is usually advisable to start the virtual machine from the command line:
 
+----
+# qvd-admin.pl vm start -f name=TestVM
+----
+
+You can monitor the startup process either from the QVD-WAT, or by listing the status of the virtual machine.
+
+----
+qvd-admin.pl vm list -f name=TestVM
+
+Id Name    User    Ip             OSF  DI_Tag  DI             Host      State    UserState    Blocked
+
+1  TestVM  nicolas 172.20.127.254 test default 2012-03-05-000 qvd-test3 starting disconnected 0 
+----
+
+As the virtual machine boots, it will change state. If the Virtual Machine starts without a problem, you should
+check that you are able to connect to it using the QVD Client and that the virtual desktop is rendered. If the
+virtual machine does not start correctly, or you are unable to access the virtual desktop, you may need to
+perform some debugging.
 
 Accessing an LXC Virtual Machine for Debugging
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
@@ -293,7 +315,7 @@ will need to find out the virtual machine's ID:
 ----
 # qvd-admin.pl vm list -f name=test
 Id Name    User    Ip             OSF  DI_Tag  DI             Host      State   UserState    Blocked
-----------------------------------------------------------------------------------------------------
+
 1  test    nicolas 172.20.127.254 test default 2012-03-05-000 qvd-test3 running disconnected 0      
 ----
 
@@ -311,8 +333,14 @@ Welcome to SUSE Linux Enterprise Server 11 SP2  (x86_64) - Kernel 3.0.13-0.27-de
 sles11-sp2 login:
 ----
 
-Note that you can exit the console by using the <Ctrl+a q> key-sequence.
-
+Note that you can exit the console by using the <Ctrl+a q> key-sequence. Once you have gained console access,
+you will be able to review log files and start or stop various services. It is important to remember that
+many aspects of a running container are not actually writable. This means that while you may be able to install
+applications and make changes to files on a running container, these changes will only be temporary. When the
+container is stopped, these changes will be lost. If you need to make lasting changes to an LXC container, you
+will need to edit the actual disk image. This can either be done by directly modifying files for the image in
+/var/lib/qvd/storage/basefs, or by modifying the LXC Disk Image by running it inside of an independantly running
+container started up using the LXC tools provided with your distribution.
 
 Creating and Configuring LXC Disk Images
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
@@ -379,20 +407,160 @@ The following outline should guide you through preparing and setting up an LXC i
 on an Ubuntu system.
 
 Setting up and configuring a base LXC image on Ubuntu is relatively easy if you take 
-advantage of the template that is packaged with LXC. To get started, use the lxc-create command
-to build a simple container:
+advantage of the template that is packaged with LXC. To get started, use the lxc-create 
+command to build a simple container:
 
 ----
 # lxc-create -n MyUbuntuContainer -t ubuntu
 ----
 
 This will invoke the debootstrap command to download a base Ubuntu installation, and will 
-perform some basic tasks such as the recreation of your device nodes. If you do not provide a
-configuration file, a very basic configuration will be created for you by the template script, 
-however the container will not have network access to begin with.
+perform some basic tasks such as the recreation of your device nodes. Although you will be
+notified that no configuration file has been provided, a very basic configuration will be created for 
+you by the template script, but will not include any networking options. This isn't a problem as QVD will
+handle your configuration parameters when the image is loaded into the QVD framework, and the container
+will automatically share the network resources of the host system if a network configuration has not been
+provided. Once the command has finished running, the image and its configuration file will be stored in 
+/var/lib/lxc under a directory that matches the name that you provided following the -n switch.
+ 
+A container created using the default template is not in any state that can be used within the QVD framework.
+To begin with, it will not have X Windows installed and it will not have any desktop environment available.
+It is possible to build a simple container and then to chroot into it to install the packages required for
+a desktop environment by doing the following:
+
+----
+# chroot /var/lib/lxc/MyUbuntuContainer/rootfs/
+# apt-get install kde-standard
+----
+
+This may help you to get to a point where you can continue to work toward building your disk image, but
+the preferred approach is for you to edit the template script before you create your container. Ideally,
+your template script should at least include the commands that should be used to handle the installation
+of packages for your desktop environment as well as the QVD VMA packages. The QVD team maintains its own 
+set of modified template scripts that will ensure that a desktop environment and the necessary QVD VMA 
+packages are also installed. These templates are not supported, but may help you to get started. Template 
+scripts are usually installed in /usr/lib/lxc/templates.
+
+If you are using the 'lxc-ubuntu' template, the easiest way to ensure that the majority of required packages
+are installed is to add the packages for the items that you want to include to the list of packages that are 
+downloaded for the base installation, for instance if you would like to include KDE, try editing the template
+file to locate and modify the following line:
+
+----
+packages=dialog,apt,apt-utils,iproute,inetutils-ping,vim,isc-dhcp-client,isc-dhcp-common,ssh,lsb-release,gnupg,netbase,ubuntu-keyring,kde-standard
+----
+
+Note that although this should help you to get started, it is quite possible that some packages may not get installed.
+If you find that you are having trouble, but your container has been built. It is better to add packages from
+within a chroot environment than from a running container.
+
+On some Ubuntu systems, you may need to edit your /etc/fstab in order to accommodate the use of cgroups, which
+are a special system mount much like /proc or /sys:
+
+----
+cgroup          /cgroup         cgroup  defaults        0       0
+----
+
+If you included the above line in your /etc/fstab, you will probably also need to create the directory and mount
+it:
+
+----
+sudo mkdir /cgroup
+sudo mount /cgroup
+----
+
+Once these steps have been taken, you should be able to start up your linux container from the command line:
+
+----
+lxc-start -n MyUbuntuContainer
+----
+
+This will start the boot process, which you will be able to watch within the console. Once it has finished loading, you
+should be able to login as root using the password set up by your template. Usually the password is set to 'root' if you
+are using one of the default templates.
+
+You should now follow the instructions to <<qvd-vma-config,install and configure the QVD VMA>> and to <<qvd-serial-port-access,set up Serial Port Access>>.
+
+When you have finished setting up your image, you can stop it from a different console or tty on the host system:
+
+----
+# lxc-stop -n MyUbuntuContainer
+----
+
+Note that when creating a container from one of the templates, network access will rely on the configuration used 
+by the host system (if possible) and these resources will be shared between containers. This is not very secure, but is usually
+fine to prepare an image for use within QVD, as the QVD infrastructure will provide its own configuration for the image
+when it actually runs inside of QVD. However, if you are having trouble with your networking within the container, or you are
+having trouble starting a container you may find that it is helpful to change how the container accesses the network. 
+The usual approach is to create a bridge interface that can be used to route traffic to the virtual interface that is created 
+when you start the container. Under Ubuntu, you can easily create a bridge interface by editing your network configuration file in /etc/network/interfaces:
+
+----
+# The primary network interface
+#iface eth0 inet dhcp
+
+auto br0
+iface br0 inet dhcp
+       bridge_ports eth0
+       bridge_fd 0
+       bridge_maxwait 0
+----
+
+In this example, we have attached the usual ethernet port that connects the machine to the network
+to the bridge, which will obtain an IP address using DHCP. You will need to bring up your bridge interface in
+order to start using it:
+
+----
+# ifup br0
+----
+
+Now you will need to change the network parameters inside your LXC configuration for the container that you are
+working on. Usually, this means that you will need to edit the file /var/lib/lxc/MyUbuntuContainer/config where
+'MyUbuntuContainer' is the name of your container. Add the following lines to the configuration file:
+
+----
+lxc.network.type = veth
+lxc.network.flags = up
+lxc.network.link = br0
+----
+
+When the container is started, a virtual interface attached to the bridge will be created on the host system
+and made available to the container once it has started.
 
 SLES Image
 ^^^^^^^^^^
 The following outline should guide you through preparing and setting up an LXC image
 on a SLES 11 SP2 system. Note that due to limited support for LXC in previous versions of SLES,
 QVD is only supported on versions above SLES 11 SP2.
+
+SLES 11 SP2 includes its own template for building a base SLES container for LXC. This means that it is
+possible to use the lxc-create command to quickly build a container. However, while the template will create
+a functional container with a base installation of SLES, adding new packages or modifying the container can
+quickly break its functionality under LXC. This makes it fairly important that you modify the template to
+automatically install the packages that you need at build time. To proceed, open the template in an editor and
+locate the following line:
+
+----
+zypper --quiet --root $cache/partial-$arch --non-interactive --gpg-auto-import-keys in --auto-agree-with-licenses --no-recommends -t pattern base
+----
+
+This line is responsible for downloading and installing the base packages for SLES. You need to add the following lines
+in order to create a template that includes the Gnome desktop and the necessary packages to install and configure QVD:
+
+----
+zypper --quiet --root $cache/partial-$arch --non-interactive --gpg-auto-import-keys in --auto-agree-with-licenses --no-recommends -t pattern gnome
+zypper --quiet --root $cache/partial-$arch --non-interactive --gpg-auto-import-keys in --auto-agree-with-licenses --no-recommends postgresql-libs
+zypper --quiet --root $cache/partial-$arch --non-interactive --gpg-auto-import-keys in --auto-agree-with-licenses --no-recommends intlfonts-ttf
+----
+
+You should also add the following lines to install the QVD VMA packages:
+
+----
+# Commands to be added to configure zypper for the QVD repository and to add the QVD VMA packages and dependencies
+----
+
+Now use the lxc-create command to generate a container:
+
+----
+# lxc-create -n MySLESContainer -t sles
+----

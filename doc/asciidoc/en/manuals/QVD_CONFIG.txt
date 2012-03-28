@@ -12,7 +12,7 @@ the following:
 root@myserver:~# cp -R /usr/share/qvd/config /etc/qvd
 ----
 
-include::config_database.txt
+include::config_database.txt[]
 
 Other QVD Configuration Parameters
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
@@ -45,23 +45,23 @@ developers debug behaviour inside of the product.
 
 QVD System Paths
 ^^^^^^^^^^^^^^^^
-include::config_systempaths.txt
+include::config_systempaths.txt[]
 
 Logging
 ^^^^^^^
-include::config_logging.txt
+include::config_logging.txt[]
 
 QVD-Node Configuration Options
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
-include::config_noded.txt
+include::config_noded.txt[]
 
 L7R Configuration Options
 ^^^^^^^^^^^^^^^^^^^^^^^^^
-include::config_l7r.txt
+include::config_l7r.txt[]
 
 HKD Configuration Options
 ^^^^^^^^^^^^^^^^^^^^^^^^^
-include::config_hkd.txt
+include::config_hkd.txt[]
 
 Virtual Machine Options
 ^^^^^^^^^^^^^^^^^^^^^^^
