@@ -187,8 +187,8 @@ sub _fw_rules {
              [-A => $INPUT   => -s => '!', $mac, -j => 'DROP'],
              [-A => $FORWARD => -p => '0x800', '--ip-source' => '!', $ip, -j => 'DROP'],
              [-A => $INPUT   => -p => '0x800', '--ip-protocol' => '17',   # allow DHCP requests to host
-                                        '--ip-source' => '0.0.0.0',
-                                        '--ip-destination-port' => '67', -j => $dhcp_accept],
+                                               '--ip-source' => '0.0.0.0',
+                                               '--ip-destination-port' => '67', -j => $dhcp_accept],
              [-A => $FORWARD => -p => '0x800', '--ip-protocol' => '17',   # do not let DHCP traffic leave the host
                                                '--ip-destination-port' => '67', -j => 'DROP'],
              [-A => $INPUT   => -p => '0x800', '--ip-source' => '!', $ip, -j => 'DROP'],
@@ -247,7 +247,7 @@ sub _remove_fw_rules {
             unless (system "$ebtables -L $target >/dev/null 2>&1") {
                 $debug and $self->_debug("deletion of chain $target failed");
                 DEBUG "Deletion of chain '$target' failed";
-                $self->_on_remove_fw_rules_error;
+                return $self->_on_remove_fw_rules_error;
             }
         }
     }
