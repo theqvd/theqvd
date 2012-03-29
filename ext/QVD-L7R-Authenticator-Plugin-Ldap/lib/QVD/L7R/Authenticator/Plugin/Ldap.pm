@@ -7,7 +7,7 @@ use strict;
 
 use QVD::Config;
 use QVD::Log;
-use Net::LDAP;
+use Net::LDAP qw(LDAP_SUCCESS LDAP_INVALID_CREDENTIALS);
 use parent qw(QVD::L7R::Authenticator::Plugin);
 
 my $ldap_host   = cfg('auth.ldap.host');
@@ -18,6 +18,7 @@ my $ldap_binddn = cfg('auth.ldap.binddn', 0) // '';
 my $ldap_bindpass = cfg('auth.ldap.bindpass', 0) // '';
 my $ldap_userbindpattern = cfg('auth.ldap.userbindpattern', 0) // '';
 my $ldap_deref = cfg('auth.ldap.deref', 0) // 'never';
+my $ldap_racf_regex = cfg('auth.ldap.racf_allowregex', 0);
 
 $ldap_scope =~ /^(?:base|one|sub)$/ or die "bad value $ldap_scope for auth.ldap.scope";
 $ldap_deref =~ /^(?:never|search|find|always)$/ or die "bad value $ldap_deref for auth.ldap.deref";
@@ -31,7 +32,7 @@ sub _escape {
 }
 
 sub authenticate_basic {
-    my ($class, $auth, $login, $passwd) = @_;
+    my ($class, $auth, $login, $passwd, $l7r) = @_;
     my $ldap = Net::LDAP->new($ldap_host)
 	// die "Unable to connect to LDAP server $ldap_host for user $login: $@\n";
 
@@ -75,7 +76,14 @@ sub authenticate_basic {
 	    if (!$msg->code) {
 		return 1;
 	    } else {
-		DEBUG "Error in authentication. Ldap code was: ".$msg->code."(".$msg->error_desc.")";
+		# TODO check for $msg->code failed credentials (49) LDAP_INVALID_CREDENTIALS (49) from LDAP::Constant
+		if (defined($ldap_racf_regex) && $msg->code == LDAP_INVALID_CREDENTIALS && 
+		    defined($msg->server_error) && $msg->server_error =~ /$ldap_racf_regex/) {
+		    INFO "Authenticating user $escaped_login with error code invalid credentials but matching RACF Extension <$ldap_racf_regex>";
+		    return 1;
+		}
+		DEBUG "Error in authentication. Ldap code was: ".$msg->code."(".$msg->error_desc.").".
+		    ((defined $msg->server_error) ? " Server error:".$msg->server_error : "");
 	    }
 	} else {
 		DEBUG "Error no entry found for $ldap_base with filter $filter for user $login";
@@ -151,6 +159,34 @@ bind with this string is attempted. The login attribute is susbsituted with %u.
 =item * auth.ldap.deref (Optional by default never). How aliases are dereferenced, the
 accepted values are never, search, find and always. See L<Net::LDAP> for more info.
 
+=item * auth.ldap.racf_allowregex (Optional by default not set). This is a regex to allow
+to authenticate some RACF error codes. An example setting would be "^R004109 ".
+One of the common cases is R004109 which returns an ldap code 49 (invalid credentials)
+and a text message such as "R004109 The password has expired 
+(srv_authenticate_native_password))". If you don't have RACF this is probably not for you.
+Example RACF errors:
+
+=over 4
+
+=item * R004107 The password function failed; not loaded from a program controlled library.
+
+=item * R004108 TDBM backend password API resulted in an internal error.
+
+=item * R004109 The password has expired.
+
+=item * R004110 The userid has been revoked.
+
+=item * R004128 Native authentication password change failed. The new password is not
+valid or does not meet requirements.
+
+=item * R004111 The password is not correct.
+
+=item * R004112 A bind argument is not valid.
+
+=item * R004118 Entry native user ID (ibm-nativeId,uid) is not defined to the Security Server.
+
+=back
+
 =back
 
 =head2 AUTHENTICATCION ALGORITHM
@@ -172,6 +208,31 @@ authentication fails.
 =item * If a userdn is found a bind with that user is tried.
 
 =back
+
+=head1 METHODS
+
+=head2 authenticate_basic
+
+Main authentication function. The parameters received are:
+
+=over 4
+
+=item $self. The QVD::L7R::Authenticator::Plugin::Ldap object
+
+=item $auth. The QVD::L7R::Authenticator object this object usually stores the login and
+other common information
+
+=item $login. The username
+
+=item $passwd. The password
+
+=item $l7r. The L7R object. This is the L7R object. You can obtain the source ip address for
+example with $l7r->{server}->{client}->peerhost()
+
+=back
+
+=cut
+
 
 =head1 SEE ALSO
 
