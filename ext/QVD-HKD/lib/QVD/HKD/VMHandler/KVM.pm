@@ -44,8 +44,12 @@ use QVD::StateMachine::Declarative
                                                             _on_allocate_os_disk_error   => 'failed/clearing_runtime_row' } },
 
     'starting/allocating_user_disk'   => { enter       => '_allocate_user_disk',
-                                           transitions => { _on_allocate_user_disk_done  => 'starting/allocating_tap',
+                                           transitions => { _on_allocate_user_disk_done  => 'starting/removing_old_fw_rules',
                                                             _on_allocate_user_disk_error => 'failed/clearing_runtime_row' } },
+
+    'starting/removing_old_fw_rules'  => { enter       => '_remove_fw_rules',
+                                           transitions => { _on_remove_fw_rules_done     => 'starting/allocating_tap',
+                                                            _on_remove_fw_rules_error    => 'failed/clearing_runtime_row',} },
 
     'starting/allocating_tap'         => { enter       => '_allocate_tap',
                                            transitions => { _on_allocate_tap_done        => 'starting/setting_fw_rules',
@@ -78,9 +82,10 @@ use QVD::StateMachine::Declarative
 
     'running/updating_stats'          => { enter       => '_incr_run_ok',
                                            transitions =>  { _on_incr_run_ok_done        => 'running/monitoring',
-                                                             _on_incr_run_ok_bad_result  => 'failed' } },
+                                                             _on_incr_run_ok_bad_result  => 'failed' },
+                                           ignore      => [qw(_on_incr_run_ok_result)]                                          },
 
-    'running/monitoring'              => { enter       => '_check_delayed_actions',
+    'running/monitoring'              => { enter       => '_start_vma_monitor',
                                            leave       => '_stop_vma_monitor',
                                            transitions => { _on_cmd_stop                 => 'stopping/powering_off',
                                                             _on_dead                     => 'stopping/killing_vm',
@@ -99,7 +104,11 @@ use QVD::StateMachine::Declarative
 
     'stopping/killing_vm'             => { enter       => '_kill_vm',
                                            leave       => '_abort_all',
-                                           transitions => { _on_vm_process_done          => 'stopping/clearing_runtime_row' } },
+                                           transitions => { _on_vm_process_done          => 'stopping/removing_fw_rules' } },
+
+    'stopping/removing_fw_rules'      => { enter       => '_remove_fw_rules',
+                                           transitions => { _on_remove_fw_rules_done     => 'stopping/clearing_runtime_row',
+                                                            _on_remove_fw_rules_error    => 'stopping/clearing_runtime_row' } },
 
     'stopping/clearing_runtime_row'   => { enter       => '_clear_runtime_row',
                                            transitions => { _on_clear_runtime_row_done   => 'stopped' },
