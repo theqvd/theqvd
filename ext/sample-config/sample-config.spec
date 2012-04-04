@@ -45,10 +45,69 @@ rm -rf $RPM_BUILD_ROOT
 %post
 
 hostname=`hostname`
-sed -i "s/^nodename =.*/nodename = $hostname/g" "$RPM_BUILD_ROOT/etc/qvd/node.conf"
-/usr/lib/qvd/bin/qvd-sample-init.sh
+
+set -e -x
 
 
+if [ ! -f /etc/qvd/.config_edited ] ; then
+	sed -i "s/^nodename =.*/nodename = $hostname/g" "$RPM_BUILD_ROOT/etc/qvd/node.conf"
+	touch /etc/qvd/.config_edited
+fi
+
+
+if ( ! /etc/init.d/postgresql status ) ; then
+	/etc/init.d/postgresql start
+fi
+
+
+if [ ! -f /etc/qvd/.postgres_configured ] ; then
+	cat >/var/lib/pgsql/data/pg_hba.conf <<CONF
+# database or username with that name.
+#
+# This file is read on server startup and when the postmaster receives
+# a SIGHUP signal.  If you edit the file on a running system, you have
+# to SIGHUP the postmaster for the changes to take effect.  You can use
+# "pg_ctl reload" to do that.
+
+# Put your actual configuration here
+# ----------------------------------
+#
+# If you want to allow non-local connections, you need to add more
+# "host" records. In that case you will also need to make PostgreSQL listen
+# on a non-local interface via the listen_addresses configuration parameter,
+# or via the -i or -h command line switches.
+#
+
+
+
+# TYPE  DATABASE    USER        CIDR-ADDRESS          METHOD
+
+host    qvd         qvd         ::1/128               md5
+host    qvd         qvd         127.0.0.1/32          md5
+
+# "local" is for Unix domain socket connections only
+local   all         all                               ident sameuser
+# IPv4 local connections:
+host    all         all         127.0.0.1/32          ident sameuser
+# IPv6 local connections:
+host    all         all         ::1/128               ident sameuser
+
+CONF
+
+	/etc/init.d/postgresql restart
+	touch /etc/qvd/.postgres_configured
+fi
+
+if [ ! -f /etc/qvd/.db_created ] ; then
+	echo -e "qvd\nqvd" | su -  postgres -c "createuser -e -S -D -R -E -P qvd"
+	su -  postgres -c "createdb -E UTF8 -O qvd qvd"
+
+	touch /etc/qvd/.db_created
+fi
+
+if [ ! -f /etc/qvd/.db_initialized ] ; then
+	/usr/lib/qvd/bin/qvd-sample-init.sh && touch /etc/qvd/.db_initialized
+fi
 
 %files
 /*
