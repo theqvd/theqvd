@@ -592,8 +592,9 @@ EOC
     if (!$self->_cfg('vm.network.use_dhcp')) {
         print $fh <<EOC;
 lxc.network.ipv4 = $self->{ip}/$self->{netmask_len}
-lxc.network.ipv4.gateway = $self->{gateway}
 EOC
+# Linea comentada ver ticket #948 esperar a que se empaquete lxc 0.8 
+#lxc.network.ipv4.gateway = $self->{gateway}
     }
 
     print $fh, $self->_cfg('internal.vm.lxc.conf.extra'), "\n";
