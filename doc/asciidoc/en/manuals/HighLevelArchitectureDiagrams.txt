@@ -6,7 +6,7 @@ components interact. Please note that these are very high-level diagrams·
 and do not cover many of the internal processes involved. 
 
 .Client and Server Interaction in the QVD Architecture
-image::../images/architecture1.png[alt="Client and Server Interaction in the QVD Architecture" width=98%]
+image::../images/architecture1.png[alt="Client and Server Interaction in the QVD Architecture",width="400"]
 
 In the above diagram, we show the interactions between the GUI client
 application, the Server Nodes, Shared Storage and the PostgreSQL
@@ -46,7 +46,7 @@ Tool is not used.
    reason. This provides built-in failover and redundancy.
 
 .QVD-WAT and Server Node Interactions in the QVD Architecture
-image::../images/architecture2.png[alt="QVD-WAT and Server Node Interactions in the QVD Architecture" width=98%]
+image::../images/architecture2.png[alt="QVD-WAT and Server Node Interactions in the QVD Architecture",width="400"]
 
 In the diagram above, we explore the different interactions that are
 involved in the functioning of the QVD Web Administration Tool
@@ -68,7 +68,7 @@ be performed using QVD-WAT.
    of Virtual Machines, Users and Sessions from the database, to
    present to the Administrator via the web interface.
 
-3. When an DI (Disk Image) is available within the Shared
+3. When a DI (Disk Image) is available within the Shared
    Storage, the QVD-WAT can enable it by converting it to an OSF
    (Operating System Flavour) so that it is accessible to any
    QVD Server Node and can be loaded into a Virtual Machine. In order
@@ -84,3 +84,14 @@ be performed using QVD-WAT.
    will be enacted on the QVD Server Node. As a result, the QVD-WAT
    never interacts directly with any particular Server Node, but
    always uses the PostgreSQL database as an intermediary.
+
+.An Overview of QVD Infrastructure Components
+image::../images/Architecture.png[alt="An Overview of QVD Infrastructure Components",width="400"]
+
+The image above shows the typical network connectivity and interactions between
+the different components within a production environment. Here, it is clear that
+the L7R components are accessed via a standard hardware load-balancer, but are still
+capable of routing connections to the correct Virtual Machine, even if it is running
+on a different node server. The image also shows how the Virtual Machines are loaded
+from images stored within a shared storage environment, while the HKD is able to start
+up Virtual Machines for users as they are required.

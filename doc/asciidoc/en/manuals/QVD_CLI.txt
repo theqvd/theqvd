@@ -92,7 +92,8 @@ Using Filters To Add Control To Operations
 Many of the operations available through the QVD CLI Administration Utility also admit a
 filter (using the -f switch) to limit an action to a particular element or entity. Filters 
 are essentially matches on elements within table columns, as provided in a standard SQL 
-'WHERE' statement. Filters accept the asterisk (*) as a wildcard character.
+'WHERE' statement. Filters accept the asterisk (*) as a wildcard character and accept (,)
+to build chains of AND statements.
 
 Most commonly used filters are on ID of an element or on a name. For instance, using the 
 `host list` operation as an example, you can limit the entries returned by filtering on
@@ -104,6 +105,20 @@ Most commonly used filters are on ID of an element or on a name. For instance, u
 Id Name    Address      HKD       Usable RAM Usable CPU VMs assigned Blocked State   
 _____________________________________________________________________________________
 1  shamash 192.168.0.12 103:14:31 296.676    16172.48   0            0       starting
+----
+
+When using the CLI Administration Utility to view VM status, it is common to use filters to
+view virtual machines in a particular state or belonging to a particular user or where a VM has
+a particular user_state. For instance, the following example will show you how to chain together
+a number of filters to view all virtual machines that belong to users with usernames starting 'al',
+where the virtual machine is running and the user is connected:
+
+----
+# qvd-admin.pl vm list -f user=al*,state=running,user_state=connected
+Id Name    User    Ip             OSF  DI_Tag  DI             Host      State   UserState    Blocked
+____________________________________________________________________________________________________
+1  alison  alison  172.20.127.254 test default 2012-03-05-000 qvd_test  running connected    0      
+7  antony  antony  172.20.127.232 live default 2012-02-15-000 qvd_test2 running connected    0   
 ----
 
 Basic Administrative Operations 
@@ -220,8 +235,9 @@ You can get a list of currently available images by doing the following:
 
 Tagging a DI
 ^^^^^^^^^^^^
+[[di_tags]]
 DIs can be tagged with arbitrary strings at will. The WAT only allows users to
-set DIs as default in each OSF but the CLI gives greater flexibility.
+set DIs as 'default' in each OSF but the CLI gives greater flexibility.
 
 To tag a DI as default just use the *di tag* command:
 
@@ -233,6 +249,12 @@ You can tag DIs with any string, not just *default* or *head*. This allows you
 to use meaningful names for the tags, for example "acrobat_bug_fixed", for use
 within Virtual Machines' *DI Tag* field.
 
+Tags are useful, because they allow you to attach a new version of a Disk Image
+to an OSF without affecting anybody using the current or default image for an
+OSF. This allows you to roll out a change, and migrate particular Virtual Machines
+using an OSF to the new image while you test it out. If the image fails for some reason
+or does not meet your requirements, it is simple to rollback to the default image and
+allow your users to continue to work while you make corrections.
 
 Adding and Deleting Users
 ^^^^^^^^^^^^^^^^^^^^^^^^^
@@ -338,4 +360,32 @@ run the following command to open a VNC connection:
 
 ----
 # qvd-admin.pl vm vnc -f name=myVM
+----
+
+Setting Custom Properties for a Virtual Machine
+^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+QVD includes the option to set custom properties for a virtual machine that can be set and retrieved
+using the QVD CLI Administration Utility. These are useful if you need to write your own scripted behaviours
+or wish to take advantage of VMA Hooks. Custom properties are often used when writing your own plugins
+for the L7R component, such as Authentication or Load Balancing modules.
+
+Custom properties are supported for the *host*, *user* and *vm* configuration parameters.
+
+To add a custom property, you can use the ~propset~ command:
+----
+# qvd-admin.pl user propset beverage=beer -F login=rowan
+propset in 1 users.
+----
+
+Outputting the contents of all of the custom properties that have been set for a configuration parameter can
+be achieved by using the ~propget~ command:
+----
+# qvd-admin.pl user propget
+rowan   beverage=beer
+----
+
+Finally, you can delete a custom property by using the ~propdel~ command: 
+----
+# qvd-admin.pl user propdel beverage
+Are you sure you want to delete the prop in all users? [y/N] y
 ----

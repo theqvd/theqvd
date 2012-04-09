@@ -20,7 +20,7 @@ executable file and follow the wizard through the installation
 process.
 
 .The Windows QVD Client Installer Wizard
-image::../images/Windows_ClientInstaller1.png[alt="The Windows QVD Client Installer Wizard"]
+image::../images/Windows_ClientInstaller1.png[alt="The Windows QVD Client Installer Wizard",width="250"]
 
 Once you have finished the installation, you can either run the client
 from the shortcut on your Windows desktop (if you selected to add the
@@ -28,7 +28,7 @@ shortcut) or from the QVD menu in your Applications menu. This will
 open the client so that you are ready to connect.
 
 .The Windows QVD Client
-image::../images/Windows_Client.png[alt="The Windows QVD Client"]
+image::../images/Windows_Client.png[alt="The Windows QVD Client,width="250""]
 
 Downloading and Installing the Ubuntu Client
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
@@ -104,6 +104,10 @@ client.host.port = 8443
 client.host.name = loadbalancer.mydomain.com
 client.user.name = guest
 client.use_ssl = 1
+client.force.host.name = loadbalancer.mydomain.com
+client.force.link = local
+client.remember_password = 0
+client.show.remember_password = 0
 ----
 
 The meanings for the above settings are explained in the list below:
@@ -128,3 +132,11 @@ The meanings for the above settings are explained in the list below:
 * *client.user.name*: the default username to connect as.
 * *client.use_ssl*: whether or not to use SSL to encrypt the client
   connection.
+* *client.force.host.name*: forces the hostname available to the client,
+  so that it is only able to connect to this host
+* *client.force.link*: forces the client link parameter, so that it is not
+  possible to select an alternative option within the GUI.
+* *client.remember_password*: controls whether or not the client remembers
+  the password used for the previous connection
+* *client.show.remember_password*: controls whether or not the option to 'Remember Password'
+  is displayed within the GUI.

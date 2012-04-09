@@ -1,5 +1,5 @@
 [[qvd_db_config]]
-All QVD Components, except the QVD Client, make use of the QVD-DB. As a result
+All QVD Components, except the QVD Client and the QVD VMA, make use of the QVD-DB. As a result
 any system that makes use of a QVD Component should have a QVD Configuration
 file that provides the information required to connect to the database.
 
@@ -33,7 +33,7 @@ using the QVD CLI Administration Utility.
 This section describes some of these additional configuration parameters. While there are many
 other settings which you will be able to view using the QVD CLI Administration Utility, some of these
 (such as the parameters prepended with the word 'internal') should never be modified unless under the
-expert guidance of a QVD developer. In general, we do not recommend that you change any of these
+expert guidance of a QVD Support Engineer. In general, we do not recommend that you change any of these
 configuration parameters unless you have been guided to do so, either by instruction within this
 manual, or by QVD Support.
 
@@ -51,10 +51,6 @@ Logging
 ^^^^^^^
 include::config_logging.txt[]
 
-QVD-Node Configuration Options
-^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
-include::config_noded.txt[]
-
 L7R Configuration Options
 ^^^^^^^^^^^^^^^^^^^^^^^^^
 include::config_l7r.txt[]
@@ -63,8 +59,8 @@ HKD Configuration Options
 ^^^^^^^^^^^^^^^^^^^^^^^^^
 include::config_hkd.txt[]
 
-Virtual Machine Options
-^^^^^^^^^^^^^^^^^^^^^^^
+VM Options
+^^^^^^^^^^
 [[vm_options]]
 There are some options that can be set to control virtual machine behaviour within QVD:
 

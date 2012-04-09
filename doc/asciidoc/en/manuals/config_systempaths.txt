@@ -1,3 +1,4 @@
+[[config_systempaths]]
 The following options are available to change the paths that QVD uses to search for applications, certificates and other QVD
 specific data.
 
@@ -38,7 +39,7 @@ The above values are the default values.
 * *path.ssl.certs*: the path to store SSL certificates used by QVD
 * *path.ssl.ca.system*: the path to where system CA certificates are stored
 * *path.ssl.ca.personal*: the path to where local or personal CA certificates are stored
-* *path.serial.captures*: the location used to store serial captures (if enabled)
+* *path.serial.captures*: the location used to store serial captures (if <<config_vm,enabled>>)
 * *command.kvm*: the command to run the Kernel Virtual Machine 
 * *command.kvm-img*: the command used to work with QEMU virtual disks within the KVM
 * *command.nxagent*: the path to the nxagent binary (usually only used by the VMA on an OSF)

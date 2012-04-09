@@ -492,8 +492,8 @@ of a bridged network interface (qvdnet0),·installation, configuration
 and creation of the PostgreSQL database with the following information:
 
 ----
-Database Name = QVDDatabase
-Database User = qvduser
+Database Name = qvddb
+Database User = qvd
 Database Password = passw0rd
 ----
 
@@ -630,10 +630,10 @@ Once you have access to the database, you can create user accounts
 with the createuser command. It will prompt for a password for the 
 new user and ask some details on the user account. You can answer 'n' to all.
 
-For example, to create a user called QVDUser you would use the following command.
+For example, to create a user called qvd you would use the following command.
 
 ----
-postgres@myserver:~$ createuser -P QVDUser
+postgres@myserver:~$ createuser -P qvd
 Enter password for new role: passw0rd
 Enter it again: passw0rd
 Shall the new role be a superuser? (y/n) n
@@ -652,7 +652,7 @@ to set the database's owner to the account you wish to use. In this case
 we will set the owner to the new user that we created in the previous step.
 
 ----
-postgres@myserver:~$ createdb -O QVDUser QVDDatabase
+postgres@myserver:~$ createdb -O qvd qvddb
 ----
 
 Changing PostgreSQL configuration·
@@ -690,7 +690,7 @@ format follows: host database user CIDR-address auth-method [auth-options]).
 
 ----
 root@myserver:/etc/postgresql/8.4/main# vi pg_hba.conf
-host  QVDDatabase QVDUser 192.168.0.0/24  md5
+host  qvddb qvd 192.168.0.0/24  md5
 ----
 
 NOTE: Make sure to replace the default network 192.168.0.0/24 with the network that your 
@@ -718,7 +718,7 @@ Testing access
 
 The following command lists the tables used by QVD.
 ----
-anyuser@otherserver:~$ psql -U QVDUser -W -h myserver
+anyuser@otherserver:~$ psql -U qvd -W -h myserver
 Password for user qvd:·
 psql (8.4.1, server 8.3.10)
 
@@ -795,8 +795,8 @@ nodename = mycomputer
 # database.user: the user account needed to connect
 # database.password: the password needed to connect
 database.host = mycomputer
-database.name = QVDDatabase
-database.user = QVDUser
+database.name = qvddb
+database.user = qvd
 database.password = passw0rd
 
 ----
@@ -806,7 +806,7 @@ machine's hostname, so the example above does need some editing.
 
 The database host should also match the hostname or IP address for the
 system where your database is located. By default the database name is
-usually set to 'QVDDatabase' but for customized installs, this may be
+usually set to 'qvddb' but for customized installs, this may be
 different. You will also need to set the database username and
 password, which you configured when you set up the database.
 

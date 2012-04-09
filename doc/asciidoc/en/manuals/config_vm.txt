@@ -1,3 +1,4 @@
+[[config_vm]]
 # vm.hypervisor: used to describe which virtual machine hypervisor should be used (LXC/KVM)
 # vm.lxc.unionfs.type: if using LXC, this setting will describe which COW filesystem to use
 # vm.overlay.persistent: whether to keep overlay images from one session to the next
@@ -9,3 +10,7 @@
 # vm.network.bridge: the network bridge interface that all VMs will be attached to
 # vm.network.device.prefix: used to set LXC's lxc.network.veth.pair parameter
 # vm.network.ip.start: the starting IP of the range of network addresses used by VMs
+
+Note that if the ~vm.serial.capture~ option is set, it will send the output to the path
+specified by the ~path.serial.captures~ configuration parameter. By default, this should
+be to /var/tmp/qvd. See <<config_systempaths, QVD System Paths>> for more information.

@@ -60,6 +60,25 @@ across them.
 
 include::WhatIsQVD.txt[]
 
+Some Notes About This Manual
+----------------------------
+In general, it is assumed that most users of the QVD will take advantage
+of the KVM virtualization offered within the product. As a result, the majority
+of this guide assumes that you will configure the product in this way. Where
+users select to use LXC to achieve virtualization, there may be some differences
+in configuration. Where these are significantly important, we have included 
+information for both virtualization platforms. However, we have also included
+a separate chapter on LXC virtualization which attempts to provide some additional
+guidance to users who choose to explore this option.
+
+In the same line, although we provide packages for other Linux distributions such
+as SuSE Linux Enterprise Server (SLES), we assume that the majority of our users will
+use Ubuntu Linux. As a result, many of the commands in this guide, along with the
+locations of configuration files etc, are generally provided with the assumption
+that you are using Ubuntu Linux. Where it is important the users of SLES are aware
+of differences, we have attempted to also provide this information. A small chapter
+is appended to the end of this guide to provide some further details for SLES users.
+
 Core Components
 ===============
 [partintro]
@@ -94,24 +113,47 @@ function properly.
 
 While it is likely that you will only have one Administration Server
 and one PostgreSQL Database system in your environment, it is possible
-to have any number of QVD Server Nodes.
+to have any number of QVD Server Nodes. Therefore, most deployments of 
+the QVD will also include the following components:
 
-Finally there is a client side component:
+* Load Balancer
+* Shared Storage Facility (e.g. NFS etc)
+
+By using a Load Balancer in front of your QVD Server Nodes, clients 
+connections can be balanced across healthy Server Nodes in order to access
+a virtual desktop. This reduces the amount of configuration within the client
+software and also ensures a much healthier environment to serve virtual desktops.
+
+Since each server node will require access to particular shared resources, such
+as the disk images that will be loaded into a virtual machine, and user home
+data, a shared storage facility is generally set up in order to allow all of the
+server nodes to have access to this shared data.
+
+Within each Disk Image, that is loaded into a Virtual Machine out of which the
+Virtual Desktop is served to an end user, there is an additional component which
+becomes active for each Virtual Machine that is started:
+
+* QVD Virtual Machine Agent
+
+The QVD Virtual Machine Agent (VMA) is responsible for accepting connections from
+the client via a QVD Server Node. It facilitates access to the desktop environment
+running within the virtual machine, including the ability to configure printer access
+and to configure the virtual machine to stream audio to the client.
+
+Finally there is the client side component:
 
 * QVD GUI Client
 
 The client is packaged for a variety of Linux base operating systems,
-and for Microsoft Windows. Development for an Android client is also
-underway and this should be available in the next major release of the
-software.
+and for Microsoft Windows. A client for Android platforms has also been released.
 
 The client software can be installed on as many host systems as
 required.
 
 include::HighLevelArchitectureDiagrams.txt[]
 
-QVD Server Architecture
-~~~~~~~~~~~~~~~~~~~~~~~
+QVD Architecture
+~~~~~~~~~~~~~~~~
 [[qvd_node_architecture]]
 In most production environments, the architecture of a QVD environment
 is such that several QVD Server Nodes will be running in parallel to
@@ -136,26 +178,6 @@ A QVD Server Node is composed of two core elements:
   accordingly. In general, the HKD is responsible for managing virtual
   machine status.
 
-QVD Node Behaviour
-^^^^^^^^^^^^^^^^^^
-The QVD Node is a daemon that runs on the QVD Node Server with the
-purpose of managing the L7R and HKD daemon processes. Its primary
-function is to start and stop these processes when it receives the
-appropriate command or when it detects that there is some anomaly that
-may cause the QVD Server Node to fail.
-
-The QVD Node, ensures that networking elements required for virtual
-machine connectivity are all in place and available. This means that
-QVD Node will ensure that DHCP is configured and running.
-
-The QVD Node also looks for broken database connections, to determine
-if there is a problem with the HKD, and will automatically kill and
-restart the HKD if there seems to be some problem with the HKD's
-communication with the QVD Database.
-
-Logically, the QVD Node performs functions that are closely related to
-the HKD and in the future these two processes are likely to be merged.
-
 HKD Behaviour
 ^^^^^^^^^^^^^
 The 'House Keeping Daemon' is responsible for managing virtual
@@ -173,7 +195,10 @@ options based on information obtained from the database.
 When QVD is configured for LXC virtualization, the HKD will first check to
 determine whether the image file has been uncompressed into the basefs folder
 in the shared storage area, and uncompresses the image file if this has not
-already been done. The HKD then uses the 'fuse-unionfs' module to perform a
+already been done. The HKD then uses the 'fuse-unionfs' module footnote:[<It is 
+possible to use alternative methods to create a union style mount, including using
+the *aufs* module which can offer significant performance improvements. Users have
+also succeeded in using *bind mounts* to achieve the same purpose.>] to perform a
 union mount of the image in the basefs folder with an automatically generated
 overlay file system and home file system. This mount is performed inside the
 rootfs folder in the shared storage. Finally, the HKD will load the newly mounted
@@ -240,8 +265,8 @@ The process flow is indicated in the following diagram:
 .Protocols and process flow for Client/Server Node interaction
 image::../images/client_server_protocol.png[alt="Protocols and process flow for Client/Server Node interaction" width=98%]
 
-L7R in a HA load-balanced environment
-^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+L7R in an HA load-balanced environment
+^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 As already mentioned, Server Nodes are designed for a fully
 load-balanced environment. In order to cater for this, the L7R element
 of each Server Node is capable of redirecting traffic for a particular
@@ -346,8 +371,10 @@ by storing the user's home directory within a 'qcow2' image. This is loaded
 over the home directory within the OSF that is running in the Virtual Machine. 
 
 In instances of QVD that make use of LXC virtualization, this is achieved by
-taking advantage of _unionfs_ mounts. The user's home data and any overlay
-data is stored within a separate directory outside of the image used for a
+taking advantage of _unionfs_ mounts footnote:[<Once again, note that it is possible to use 
+alternative methods to create a union style mount, including using
+the *aufs* module or by simply using *bind mounts* to achieve the same purpose.>]. 
+The user's home data and any overlay data is stored within a separate directory outside of the image used for a
 virtual machine. These folders can then be mounted over the base image at
 runtime, in order to create a container specific to each user and virtual
 machine.
@@ -369,7 +396,7 @@ order to function properly. The VMA will ensure that the *nxagent* is
 available so that a client is able to connect to the virtual desktop
 that is created for the user. It also returns different states that
 helps the L7R to determine user state, which can be fed back to the
-QVD-DB. When an OSF is created, it if fundamentally important that the
+QVD-DB. When an OSF is created, it is fundamentally important that the
 QVD-VMA is installed and configured in order for QVD to work at all.
 
 QVD Administration
@@ -438,6 +465,9 @@ number of different physical systems, it is important to set up some
 shared storage facility that is accessible to all of the hosts within
 your server farm.
 
+.Shared Storage is accessed by Node Servers and the QVD WAT
+image::../images/shared_storage_access.png[alt="Shared Storage is accessed by Node Servers and the QVD WAT", width="250"]
+
 The currently supported network file sharing services are GFS or OCFS2 
 on top of some SAN server (i.e. iSCSI, AoE, etc.) and NFS.
 
@@ -456,8 +486,15 @@ Storage folders, and in some cases you can opt to have some of these
 folders running locally on one system, we recommend that all of these
 folders are accessible within some form of network based shared storage.
 
+TIP: Backing up your the QVD folders that are kept in your Shared Storage facility
+is highly recommended. At a minimum, you should ensure that the folders where
+your user home data is stored and the folders where your Disk Images are stored
+are backed up in line with your disaster recovery strategy.
+
+
 Storage Folders
 ~~~~~~~~~~~~~~~
+[[storage_folders]]
 There are a variety of folders that belong in the storage path. Many of
 these are specific to the type of virtualization that you choose to make
 use of within your environment.
@@ -689,11 +726,9 @@ QVD LDAP Limitations
 ^^^^^^^^^^^^^^^^^^^^
 While it is relatively trivial to get QVD to authenticate users
 against LDAP, you will still need to create matching users within your
-QVD-DB in order to assign virtual machines to them. Currently, the QVD
-does not come with any tools for you to do this automatically.
-However, customers who choose to pay for support can be provided with
-scripts that can cater for batch-mode provisioning of users within
-QVD.
+QVD-DB in order to assign virtual machines to them. Alternatively, you
+can make use of the ~Auto Plugin~ discussed in the next section of this
+chapter, to automatically handle user provisioning.
 
 QVD tools allowing you to change user passwords within QVD will not
 update passwords within an LDAP backend, as this may affect the
@@ -704,6 +739,61 @@ stored within QVD-DB for the user, and not the password within the
 LDAP directory. If you are making use of LDAP Authentication, all
 password changes should be made using the tools that you usually make
 use of to manage your users.
+
+Automatic User Provisioning Plugin
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+When using an alternative authentication mechanism, such as the LDAP
+authentication plugin, there is a common requirement to automatically
+provision users who have authenticated against the provided plugin. The
+~Auto Plugin~ is designed to cater to this requirement.
+
+When QVD is configured to authenticate against an external source, such as LDAP,
+QVD usually does not have have any record for the users that log in. When the 
+~Auto Plugin~ is enabled, the user record is created automatically. User records
+created this way are provided with a default virtual machine, as specified in the
+plugin configuration.
+
+To enable the plugin, add "auto" to the list of enabled plugins in the L7R configuration:
+
+----
+qvd-admin.pl config set l7r.auth.plugins=auto,ldap
+----
+
+Note that in the example above, we are using the auto plugin in conjunction with the ldap
+authentication plugin.
+
+You will now need to tell the auto plugin which OSF to use as the default for provisioning
+a virtual machine for the user:
+
+----
+qvd-admin.pl config set auth.auto.osf_id=1
+----
+
+In this case, new users who are authenticated using LDAP will automatically be provisioned with
+a user account and a VM will be created using the OSF ID that we have specified.
+
+It is also possible to force the use of a particular Disk Image using the <<di_tag,DI Tag>> functionality.
+This can be done by setting the following configuration option:
+
+----
+qvd-admin.pl config set auth.auto.di_tag="testing"
+----
+
+A typical example to use the LDAP Plugin and the Auto Plugin in conjunction would require you
+to run the following commands:
+
+----
+qvd-admin.pl config set l7r.auth.plugins=auto,ldap
+qvd-admin.pl config set auth.ldap.host=ldaps://myldap.mydomain.com:1636
+qvd-admin.pl config set auth.ldap.base=ou=People,dc=example,dc=com
+qvd-admin.pl config set auth.ldap.scope=sub
+qvd-admin.pl config set auth.ldap.filter=(&(objectClass=inetOrgPerson)(cn=%u))
+qvd-admin.pl config set auth.auto.osf_id=1
+----
+
+This would mean that as users authenticated for the first time, using QVD, they would be
+authenticated using your LDAP repository and they would be automatically provisioned with
+a default desktop to start work immediately.
 
 OpenSSO and OpenAM
 ~~~~~~~~~~~~~~~~~~
@@ -756,6 +846,41 @@ This whole process is known as QVD Load Balancing, and it is used to
 ensure that running virtual machines are equitably distributed across all of
 the Server Nodes. This maximizes the resources available to any
 virtual machine to preserve healthy functionality.
+
+QVD Health Checking
+~~~~~~~~~~~~~~~~~~~
+When using an external load balancer to route traffic to the different QVD Server
+Nodes, you will generally need some method to perform health-checking against
+each of the L7R instances. The QVD L7R daemon includes a simple health checking
+facility that responds over HTTP.
+
+Typically, you will need to configure your load balancer to perform an HTTP GET on
+the URL: https://hostname/qvd/ping where 'hostname' is the hostname or IP address
+for the Server Node instance. The query will return a text string with the content
+"I am alive!" if the server is healthy and available.
+  
+Some of our users take advantage of the software load balancing provided by Linux Virtual 
+Server (LVS). An example of the configuration required within the ~ldirectord.cf~ file follows:
+
+----
+autoreload = no
+checkinterval = 1
+checktimeout = 3
+negotiatetimeout = 3
+logfile="/var/log/ldirectord.log"
+quiescent = yes
+virtual = 150.210.0.72:8443
+    checkport = 8443
+    checktype = negotiate
+    httpmethod = GET
+    protocol = tcp
+    real = 150.210.4.1:8443 gate 10
+    real = 150.210.4.2:8443 gate 10
+    receive = "I am alive!"
+    request = "/qvd/ping"
+    scheduler = wlc
+    service = https
+----
 
 Changing the weighting in the QVD Load Balancer
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
@@ -898,8 +1023,8 @@ In this chapter, we will look at the process involved in creating your
 own base Disk Image for an OSF, so that you can implement an
 environment that is perfectly suited to your users.
 
-System Requirements
-~~~~~~~~~~~~~~~~~~~
+System Requirements for KVM Images
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 You can create a DI that can be loaded into QVD on any Linux system
 that you have available for the task. In order to create an image, you
 will need to meet the following base requirements:
@@ -912,8 +1037,8 @@ will need to meet the following base requirements:
 * An Ubuntu Desktop installation ISO to be used for your Guest
   operating system
 
-Creating the Image
-~~~~~~~~~~~~~~~~~~
+Creating a KVM Image
+~~~~~~~~~~~~~~~~~~~~
 In order to create your DI, you will need to download the installer
 of the guest operating system that you intend to serve to your users.
 Since the DI will need to support the QVD VMA we recommend that you
@@ -981,6 +1106,254 @@ disk and loading your newly installed Operating System.
 
 include::QVD_VMA_CONFIG.txt[]
 
+Creating and Configuring LXC Disk Images
+----------------------------------------
+[[LXC_DI_Creation]]
+The process involved in creating an LXC Disk Image very much depends on the 
+operating system or distribution that you wish to run. However, there are a
+number of common essential guidelines that should be followed in order to 
+create a functional image. In this document, we will present a rough outline
+of the steps that need to be taken, and will then provide some base examples
+of how this is done for Ubuntu and for SuSE systems.
+
+The following list provides a basic outline of the steps that need to be 
+taken to prepare an image in order to have it run within the QVD:
+
+* Install a copy of the base operating system into a file-space. On Debian-based 
+systems, this can be achieved using 'debootstrap', while on SuSE systems, 'zypper'
+can be used. It is also possible to simply use the filesystem created during an 
+original installation.
+* Manually recreate the device nodes in /dev
+* Remove any hardware references in your init scripts. This process is very 
+specific to the operating system that you are using.
+* Add the QVD sources to your repositories, and add the 'qvd-vma' package along with its
+dependencies. This can be done in a number of ways including a simple 'chroot', running
+the container within lxc, or using `zypper --root` within SLES environments.
+* Update the system inittab
+* Create an fstab
+
+Typically, most Linux distributions provide 'templates' that can be used to automate the
+steps required to build a base installation within a container. These templates are 
+essentially shell scripts that automate many of the steps required to install the base
+operating system, to remove hardware references in the init scripts and to create device
+nodes. These scripts are usually stored in '/usr/lib/lxc/templates/', but you should not
+need to modify them. Instead, you can usually invoke the template that you wish to use by
+running the `lxc-create` command with the '-t' switch:
+
+----
+# lxc-create -n MyUbuntuContainer -t ubuntu
+# lxc-create -n MySLESContainer -t sles
+----
+
+NOTE: The template for SLES linux is only provided with SLES 11 SP2 and up. In fact, due to
+many of the complications in creating functional containers on earlier versions of SLES, we
+recommend that LXC under QVD is only used on these versions of SLES. Even when using this
+version of SLES, you will be required to perform a number of modifications to the default template.
+
+We suggest that you take the time to look over the template scripts to understand what they
+are doing. During some installations, some modification to the template script may be required
+and it is important that you know what the script is trying to achieve. The list of steps presented
+above should provide some outline for the majority of work handled by a template script.
+
+If you take advantage of the lxc-create command, as specified above, you will be notified that
+you have not provided a configuration file. This is not extremely important, since QVD will
+actually generate configuration files for your containers as required. However, if you intend
+to use a container outside of QVD, you may need to create a configuration for your container
+after it has been created. Some instruction on how to do this is presented for each distribution
+in the subsections below.
+
+Remember that if you use the lxc-create command, the container that is created will only include
+the packages required for a minimal installation of the distribution that you are creating. Once
+this container has been created, you will still be required to install a wide variety of 
+applications in order to set up a functional desktop environment.
+
+Ubuntu Image
+~~~~~~~~~~~~
+The following outline should guide you through preparing and setting up an LXC image
+on an Ubuntu system.
+
+Setting up and configuring a base LXC image on Ubuntu is relatively easy if you take 
+advantage of the template that is packaged with LXC. To get started, use the lxc-create 
+command to build a simple container:
+
+----
+# lxc-create -n MyUbuntuContainer -t ubuntu
+----
+
+This will invoke the debootstrap command to download a base Ubuntu installation, and will 
+perform some basic tasks such as the recreation of your device nodes. Although you will be
+notified that no configuration file has been provided, a very basic configuration will be created for 
+you by the template script, but will not include any networking options. This isn't a problem as QVD will
+handle your configuration parameters when the image is loaded into the QVD framework, and the container
+will automatically share the network resources of the host system if a network configuration has not been
+provided. Once the command has finished running, the image and its configuration file will be stored in 
+/var/lib/lxc under a directory that matches the name that you provided following the -n switch.
+ 
+A container created using the default template is not in any state that can be used within the QVD framework.
+To begin with, it will not have X Windows installed and it will not have any desktop environment available.
+It is possible to build a simple container and then to chroot into it to install the packages required for
+a desktop environment by doing the following:
+
+----
+# chroot /var/lib/lxc/MyUbuntuContainer/rootfs/
+# apt-get install kde-standard
+----
+
+This may help you to get to a point where you can continue to work toward building your disk image, but
+the preferred approach is for you to edit the template script before you create your container. Ideally,
+your template script should at least include the commands that should be used to handle the installation
+of packages for your desktop environment as well as the QVD VMA packages. The QVD team maintains its own 
+set of modified template scripts that will ensure that a desktop environment and the necessary QVD VMA 
+packages are also installed. These templates are not supported, but may help you to get started. Template 
+scripts are usually installed in /usr/lib/lxc/templates.
+
+If you are using the 'lxc-ubuntu' template, the easiest way to ensure that the majority of required packages
+are installed is to add the packages for the items that you want to include to the list of packages that are 
+downloaded for the base installation, for instance if you would like to include KDE, try editing the template
+file to locate and modify the following line:
+
+----
+packages=dialog,apt,apt-utils,iproute,inetutils-ping,vim,isc-dhcp-client,isc-dhcp-common,ssh,lsb-release,gnupg,netbase,ubuntu-keyring,kde-standard
+----
+
+Note that although this should help you to get started, it is quite possible that some packages may not get installed.
+If you find that you are having trouble, but your container has been built. It is better to add packages from
+within a chroot environment than from a running container.
+
+On some Ubuntu systems, you may need to edit your /etc/fstab in order to accommodate the use of cgroups, which
+are a special system mount much like /proc or /sys:
+
+----
+cgroup          /cgroup         cgroup  defaults        0       0
+----
+
+If you included the above line in your /etc/fstab, you will probably also need to create the directory and mount
+it:
+
+----
+sudo mkdir /cgroup
+sudo mount /cgroup
+----
+
+Once these steps have been taken, you should be able to start up your linux container from the command line:
+
+----
+lxc-start -n MyUbuntuContainer
+----
+
+This will start the boot process, which you will be able to watch within the console. Once it has finished loading, you
+should be able to login as root using the password set up by your template. Usually the password is set to 'root' if you
+are using one of the default templates.
+
+IMPORTANT: You should now follow the instructions to <<qvd-vma-config,install and configure the QVD VMA>> and to <<qvd-serial-port-access,set up Serial Port Access>>.
+
+When you have finished setting up your image, you can stop it from a different console or tty on the host system:
+
+----
+# lxc-stop -n MyUbuntuContainer
+----
+
+Note that when creating a container from one of the templates, network access will rely on the configuration used 
+by the host system (if possible) and these resources will be shared between containers. This is not very secure, but is usually
+fine to prepare an image for use within QVD, as the QVD infrastructure will provide its own configuration for the image
+when it actually runs inside of QVD. However, if you are having trouble with your networking within the container, or you are
+having trouble starting a container you may find that it is helpful to change how the container accesses the network. 
+The usual approach is to create a bridge interface that can be used to route traffic to the virtual interface that is created 
+when you start the container. Under Ubuntu, you can easily create a bridge interface by editing your network configuration file in /etc/network/interfaces:
+
+----
+# The primary network interface
+#iface eth0 inet dhcp
+
+auto br0
+iface br0 inet dhcp
+       bridge_ports eth0
+       bridge_fd 0
+       bridge_maxwait 0
+----
+
+In this example, we have attached the usual ethernet port that connects the machine to the network
+to the bridge, which will obtain an IP address using DHCP. You will need to bring up your bridge interface in
+order to start using it:
+
+----
+# ifup br0
+----
+
+Now you will need to change the network parameters inside your LXC configuration for the container that you are
+working on. Usually, this means that you will need to edit the file /var/lib/lxc/MyUbuntuContainer/config where
+'MyUbuntuContainer' is the name of your container. Add the following lines to the configuration file:
+
+----
+lxc.network.type = veth
+lxc.network.flags = up
+lxc.network.link = br0
+----
+
+When the container is started, a virtual interface attached to the bridge will be created on the host system
+and made available to the container once it has started.
+
+SLES Image
+~~~~~~~~~~
+The following outline should guide you through preparing and setting up an LXC image
+on a SLES 11 SP2 system. Note that due to limited support for LXC in previous versions of SLES,
+QVD is only supported on versions above SLES 11 SP2.
+
+SLES 11 SP2 includes its own template for building a base SLES container for LXC. This means that it is
+possible to use the lxc-create command to quickly build a container. However, while the template will create
+a functional container with a base installation of SLES, adding new packages or modifying the container can
+quickly break its functionality under LXC. This makes it fairly important that you modify the template to
+automatically install the packages that you need at build time. To proceed, open the template in an editor and
+locate the following line:
+
+----
+# zypper --quiet --root $cache/partial-$arch --non-interactive --gpg-auto-import-keys in --auto-agree-with-licenses --no-recommends -t pattern base
+----
+
+This line is responsible for downloading and installing the base packages for SLES. You need to add the following lines
+in order to create a template that includes the Gnome desktop and the necessary packages to install and configure QVD:
+
+----
+# zypper --quiet --root $cache/partial-$arch --non-interactive --gpg-auto-import-keys in --auto-agree-with-licenses --no-recommends -t pattern gnome
+# zypper --quiet --root $cache/partial-$arch --non-interactive --gpg-auto-import-keys in --auto-agree-with-licenses --no-recommends postgresql-libs
+# zypper --quiet --root $cache/partial-$arch --non-interactive --gpg-auto-import-keys in --auto-agree-with-licenses --no-recommends intlfonts-ttf
+----
+
+You should also add the following lines to install the QVD VMA packages:
+
+----
+# Commands to be added to configure zypper for the QVD repository and to add the QVD VMA packages and dependencies
+----
+
+Now use the lxc-create command to generate a container:
+
+----
+# lxc-create -n MySLESContainer -t sles
+----
+
+Once these steps have been taken, you should be able to start up your linux container from the command line:
+
+----
+# lxc-start -n MyUbuntuContainer
+----
+
+This will start the boot process, which you will be able to watch within the console. Once it has finished loading, you
+should be able to login as root using the password set up by your template. Usually the password is set to 'root' if you
+are using one of the default templates.
+
+When you have finished setting up your image, you can stop it from a different console or tty on the host system:
+
+----
+# lxc-stop -n MyUbuntuContainer
+---- 
+
+Note that sometimes configuring network parameters correctly in SLES can be relatively tricky and will require use of
+the YAST configuration utility. If you are struggling to configure your network parameters, you may find it easier to
+use a chrooted environment to complete the setup and configuration of your disk image. You can find out more about this
+in the <<lxc-editing-di,next section>>.
+
+IMPORTANT: You should now follow the instructions to <<qvd-vma-config,install and configure the QVD VMA>> and to <<qvd-serial-port-access,set up Serial Port Access>>.
+
 Editing a DI
 ------------
 At any point, you are able to quickly edit a DI. This means that you
@@ -993,6 +1366,8 @@ Machines that are currently making use of the DI, and block access to
 them so that no users can connect and start up a virtual machine while
 you are working on its underlying image.
 
+KVM
+~~~
 Once the virtual machines have all been stopped, locate the DI file
 that you wish to edit and run it within KVM in the following way:
 
@@ -1007,6 +1382,49 @@ administration tasks as this user.
 When you have completed any work on the DI, shut it down. You can
 mark the virtual machines that require access to the image as
 'unblocked' and allow them to start up again.
+
+LXC
+~~~
+[[lxc-editing-di]]
+Once the virtual machines have all been stopped, locate the LXC container
+that you wish to edit in the Shared Storage within the 'basefs' directory.
+Depending on your requirements, you can either chroot the directory and
+work directly within it as needed or you can load it as an LXC instance.
+Since loading an image into a separate LXC instance generally requires that
+you configure networking properly and provide a configuration file it is generally
+recommended that you rather attempt to perform modifications to an image
+using a chroot.
+
+The example below shows how you can use bind mounts and chroot to access an LXC
+disk image to perform updates:
+
+----
+# mount -o bind /proc /var/lib/qvd/storage/basefs/1-image1.tgz/proc/
+# mount -o bind /dev /var/lib/qvd/storage/basefs/1-image1.tgz/dev/
+# mount -o bind /sys /var/lib/qvd/storage/basefs/1-image1.tgz/sys/
+# chroot /var/lib/qvd/storage/basefs/1-image1.tgz
+#
+----
+
+When you have finished making changes, remember to exit and unmount your bind mounts:
+
+----
+# exit
+# umount /var/lib/qvd/storage/basefs/1-image1.tgz/proc
+# umount /var/lib/qvd/storage/basefs/1-image1.tgz/dev
+# umount /var/lib/qvd/storage/basefs/1-image1.tgz/sys
+#
+----
+
+If everything has gone well, you should try to start a virtual machine that makes use of
+this image to ensure that it starts up correctly. If it starts properly, mark the virtual
+machines that require access to the image as 'unblocked' and allow them to start up again.
+
+It is important that you test an LXC image after making changes to ensure that nothing has
+changed a configuration to have direct access to hardware. Packages that have 'udev' as
+a dependency can often result in trouble if you have not taken steps to prevent udev from
+running.
+
 
 VMA Hooks
 ---------
@@ -1168,6 +1586,184 @@ partition not exist, it is created on the fly.
 
 With this hook it is possible to change this process so that some other behaviour takes place instead, such
 as mounting a "/home" directory from an NFS server.
+
+
+Operational Procedures
+======================
+[[ops]]
+[partintro]
+--
+In this part of the manual, we will cover topics related to day-to-day operational procedures, such as
+backups and logging, along with some of the more frequently used commands used within the QVD in order
+to control access to a server node or virtual machine while performing basic administrative tasks.
+--
+
+Backups
+-------
+
+Backing up QVD-DB
+~~~~~~~~~~~~~~~~~
+Since QVD makes use of the open-source PostgreSQL database in order to handle its database requirements,
+backing up your QVD data can be achieved using standard PostgreSQL backup and restore commands.
+
+To backup your database, you can simply run the following command to output the database content to file:
+
+----
+# sudo su - postgres
+# pgdump qvd > QVDDatabase.sql
+----
+
+Restoring the database is as simple as piping the SQL content back into the pgsql client:
+
+----
+# sudo su - postgres
+# pgsql qvd < QVDDatabase.sql
+----
+
+PostgreSQL also gives you the ability to pipe content from one database into another, making it
+relatively simple to replicate the database:
+
+----
+# pgdump -h host1 qvd | pgsql -h host2 qvd
+----
+
+For more complex backup requirements, refer directly to the PostgreSQL documentation at
+http://www.postgresql.org/docs/8.3/static/backup-dump.html for more information.
+
+Remember that once you have dumped your database to file, the file should be backed up following your
+usual backup strategy.
+
+Note that you may also find that it is useful to backup your database configuration files, so that
+if you need to reinstall and configure your database you are able to do so quickly and with your 
+configuration data at hand. On Ubuntu systems, these files are usually located at /etc/postgresql/8.4/main.
+On SuSE Linux systems, you will be able to find these files at /var/lib/pgsql/data.
+
+Backing up Shared Storage
+~~~~~~~~~~~~~~~~~~~~~~~~~
+All of QVD's disk images, user home data and overlay data is usually stored in some form of Shared 
+Storage facility accessible using a network filesharing protocol like NFS, GFS or OCFS2. Although 
+particular data, such as the overlay data and images stored within the 'staging' directory, are 
+not critical during disaster recovery, we recommend that this data is backed up alongside active
+disk images and user home data if possible.
+
+Understanding how files are stored within the Shared Storage accessed by QVD will help you to plan
+a reasonable backup strategy. Please refer to the section titled <<storage_folders,Shared Storage>> for
+more information.
+
+Backing up Configuration Files
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+Since the majority of QVD's configuration data is stored within the database and QVD's configuration
+files are relatively simple to create, they are not usually considered to have high-priority within
+a backup strategy. Nonetheless, for nearly all components within the QVD infrastructure, configuration
+files are stored within /etc/qvd. Note that all QVD Server Nodes should have identical configuration
+files, so only one copy needs to be stored.
+
+Logging
+-------
+
+Database Logs
+~~~~~~~~~~~~~
+Since QVD makes use of the open-source PostGreSQL database, logging options are controlled by editing
+the PostGreSQL configuration files. To change logging parameters, please refer to the PostGreSQL 
+documentation at: http://www.postgresql.org/docs/8.3/static/runtime-config-logging.html
+
+On Ubuntu, PostGreSQL keeps database logs in: /var/log/postgresql/. On SuSE, PostGreSQL keeps database 
+logs in: /var/lib/pgsql/data/pg_log.
+
+TIP: If you are new to PostGreSQL you might find the PGAdmin tool handy, particularly for monitoring server
+status, logs and transactions. You can find out more about the tool at http://www.pgadmin.org/
+
+QVD Server Node Logs
+~~~~~~~~~~~~~~~~~~~~
+QVD Server Nodes also keep their own log files. These are usually located at /var/log/qvd.log.
+Log output format and logging facilities are controlled using the Perl logging module
+http://search.cpan.org/~mschilli/Log-Log4perl-1.36/lib/Log/Log4perl.pm[log4perl]. Configuration
+of the logging within the QVD can be controlled by setting various configuration parameters. These
+are covered in more depth in <<config_logging, the section on Log Configuration>>.
+
+QVD Virtual Machine Logs 
+~~~~~~~~~~~~~~~~~~~~~~~~
+The QVD VMA is installed within the disk image that is used by each virtual machine as it starts up.
+The QVD VMA will send log output to its own log file at /var/log/qvd.log within the virtual machine.
+Remember that content, outside of user data, written to disk within a virtual machine will make use
+of the overlay facility provided by QVD.
+
+To review log data written to file within a virtual machine, if possible you should access the running 
+virtual machine via the console:
+
+----
+# qvd-admin.pl vm console -f id=1
+----
+
+If you are using LXC virtualization, it is often easier to access log files directly from the parent
+QVD Server Node. Remember that for a running environment, its filesystem is constructed as it is started
+and mounted into /var/lib/qvd/storage/rootfs. This means that for any virtual machine, it is possible
+to directly view the log files from the parent host:
+
+----
+# tail /var/lib/qvd/storage/rootfs/1-fs/var/log/qvd.log
+----
+
+QVD also stores a backup of the overlay for any LXC virtual machine that fails to start properly. These
+backups can be accessed in /var/lib/qvd/storage/overlayfs and are usually prefixed with 'deleteme-' and are
+named following a similar convention to that followed for the naming of successful overlays. See <<overlayfs,overlayfs>>
+for more information.
+
+Commonly Used Commands
+----------------------
+When performing regular administration tasks, it may be cumbersome working with the QVD-WAT, particularly if
+you need to script behaviours. For systems administrators, we include this section to provide examples for some
+of the more commonly used commands that can be issued using the QVD CLI Admin Utility. If you need more guidance
+on the commands available to you, please refer back to the <<qvd-admin-cli, chapter where we discuss the QVD CLI Admin Utility>>
+in more detail.
+
+QVD Server Node Administration
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+When performing maintenance on a Server Node, it is common to require that users are blocked from accessing
+the Server Node while you are working. This can be easily achieved by using the QVD CLI Admin Utility:
+
+----
+# qvd-admin.pl host block -f name='qvd*'          #block access on any server node host with name beginning with 'qvd'
+# qvd-admin.pl host list -f address='192.168.0.2' #list the details for any host with IP Address '192.168.0.2'
+----
+
+Once you have finished performing maintenance, remember to unblock the host:
+
+----
+# qvd-admin.pl host block -f name='qvd*'          #allow access on any server node host with name beginning with 'qvd'
+----
+
+It can also be useful to check QVD Server Node Host Counters to monitor access to a Server Node:
+
+----
+# qvd-admin.pl host counters
+Id Name      HTTP Requests  Auth attempts Auth OK NX attempts NX OK Short sessions
+__________________________________________________________________________________
+1  qvd-test3 168            84            84      77          77    65            
+2  qvd-test4 275            122           118     109         109   52
+----
+
+VM Administration
+~~~~~~~~~~~~~~~~~
+When performing maintenance on Virtual Machines or when updating images, it is often the case that
+you will need to prevent access to a group of users, or to force them to disconnect. Filters can be
+used to control how actions are effected. The following examples provide some common usage of the
+QVD CLI Admin Utility to control virtual machines while you are performing maintenance:
+
+----
+# qvd-admin.pl vm block -f user_id=5         #block access on any VM where the user has an id=5
+# qvd-admin.pl vm unblock -f name=test       #unblock access on any VM where the name=test
+# qvd-admin.pl vm disconnect_user -f id=23   #force disconnect the user on VM with id=23
+# qvd-admin.pl vm start -f id=1              #manually start the VM with id=1
+# qvd-admin.pl vm stop -f osf_id=2           #manually stop all VMs using the OS Flavour with id=2
+# qvd-admin.pl vm del -f user_id=5           #delete all Vms for the user with id=5
+----
+
+//Information for SLES Users
+//==========================
+
+//Installation notes
+//------------------
 
 
 //[bibliography]

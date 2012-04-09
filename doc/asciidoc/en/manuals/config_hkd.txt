@@ -7,6 +7,5 @@ hkd.vm.starting.max = 6
 
 The value set above is the default value.
 
-* *hkd.vm.starting.max*: the maximum number of virtual machines that
-  the HKD will start on a Server Node
+* *hkd.vm.starting.max*: the maximum number of virtual machines that are concurrently in the 'starting' state that the HKD will allow before starting a new instance on a Server Node
 

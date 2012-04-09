@@ -3,14 +3,16 @@ The QVD-DB is the glue that ties all of the QVD components together.
 It makes use of an underlying PostgreSQL DBMS, and should be installed
 on an Ubuntu 10.04 (Lucid Lynx) GNU/Linux operating system.
 
+.The QVD-DB is used to link together different components
+image::../images/qvd_db_access.png[alt="The QVD-DB is used to link together different components", width="250"]
+
 All of the configuration and runtime information for the entire QVD
 VDI is stored in the database and if it fails the full platform will 
 stop working. For that reason, it is highly recommended that the database 
 is installed in a high availability configuration. You can find out
 how to configure PostgreSQL in an HA configuration at
 link:http://www.slideshare.net/jessejajti/hadrbdpostgres-postgreswest-08-presentation[Linux-HA
-+ DRBD + PostgreSQL ] and link:http://fanqiang.chi
-naunix.net/db/psql/2005-09-07/3628.shtml[High Avaibility PostgreSQL
++ DRBD + PostgreSQL ] and link:http://fanqiang.chinaunix.net/db/psql/2005-09-07/3628.shtml[High Avaibility PostgreSQL
 HOWTO].
 
 The actual hardware requirements for QVD-DB are very modest and any
@@ -61,11 +63,11 @@ with the `createuser` command. It will prompt for a password for the
 new user and ask some details on the user account. In general, you can 
 answer 'n' to all of the options that are presented.
 
-For example, to create a user called QVDUser you would use the
+For example, to create a user called qvd you would use the
 following command.
 
 ----
-postgres@myserver:~$ createuser -P QVDUser
+postgres@myserver:~$ createuser -P qvd
 Enter password for new role: passw0rd
 Enter it again: passw0rd
 Shall the new role be a superuser? (y/n) n
@@ -83,7 +85,7 @@ In this case we will set the owner to the new user that we created in the
 previous step.
 
 ----
-postgres@myserver:~$ createdb -O QVDUser QVDDatabase
+postgres@myserver:~$ createdb -O qvd qvddb
 ----
 
 TIP: For more information on this command, please refer to the
@@ -121,7 +123,7 @@ pg_hba.conf (its format follows: host database user CIDR-address auth-method
 
 ----
 root@myserver:/etc/postgresql/8.4/main# vi pg_hba.conf
-host  QVDDatabase QVDUser 192.168.0.0/24  md5
+host  qvddb qvd 192.168.0.0/24  md5
 ----
 
 NOTE: Make sure to replace the default network 192.168.0.0/24 with the
@@ -185,11 +187,11 @@ To list the tables in the QVD database using the PostgreSQL client,
 you can do the following:
 
 ----
-anyuser@otherserver:~$ psql -U QVDUser -W -h myserver QVDDatabase
+anyuser@otherserver:~$ psql -U qvd -W -h myserver qvddb
 Password for user qvd:·
 psql (8.4.1, server 8.3.10)
 
-QVDDatabase=> \d
+qvddb=> \d
 
                List of relations
  Schema |      Name       |   Type   |  Owner  
@@ -225,7 +227,7 @@ QVDDatabase=> \d
  public | vms_id_seq         | sequence | hue
 (29 rows)
 
-QVDDatabase=> \q
+qvddb=> \q
 ----
 
 Backing up and Restoring QVD-DB
