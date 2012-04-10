@@ -501,6 +501,11 @@ usage: host list
 Valid options:
     -f [--filter] FILTER : list only hosts matched by FILTER
     -q [--quiet]         : don't print the header
+
+Fields that can be used with -f:
+    id
+    name
+    address
 EOT
 }
 
@@ -645,6 +650,12 @@ usage: host counters
 Valid options:
     -f [--filter] FILTER : list counters only for hosts matched by FILTER
     -q [--quiet]         : don't print the header
+
+Fields that can be used with -f:
+    id
+    name
+    address
+    (all of them refer to the host)
 EOT
 }
 
@@ -735,6 +746,13 @@ usage: osf list
 Valid options:
     -f [--filter] FILTER : list only OSFs matched by FILTER
     -q [--quiet]         : don't print the header
+
+Fields that can be used with -f:
+    id
+    name
+    memory
+    use_overlay
+    user_storage_size
 EOT
 }
 
@@ -879,6 +897,12 @@ usage: di list
 Valid options:
     -f [--filter] FILTER : list only DIs matched by FILTER
     -q [--quiet]         : don't print the header
+
+Fields that can be used with -f:
+    id
+    osf_id
+    path
+    version
 EOT
 }
 
@@ -1063,6 +1087,10 @@ usage: user list
 Valid options:
     -f [--filter] FILTER : list only user matched by FILTER
     -q [--quiet]         : don't print the header
+
+Fields that can be used with -f:
+    id
+    login
 EOT
 }
 
@@ -1413,6 +1441,25 @@ usage: vm list
 Valid options:
     -f [--filter] FILTER : list only vms matched by FILTER
     -q [--quiet]         : don't print the header
+
+Fields that can be used with -f:
+    id
+    name
+    user_id
+    user
+    ip
+    osf_id
+    osf
+    memory
+    use_overlay
+    user_storage_size
+    di_tag
+    host
+    host_id
+    state
+    user_state
+    vm_pid
+    blocked
 EOT
 }
 
@@ -1711,6 +1758,25 @@ usage: vm counters
 Valid options:
     -f [--filter] FILTER : list counters only for vms matched by FILTER
     -q [--quiet]         : don't print the header
+
+Fields that can be used with -f:
+    id
+    name
+    user_id
+    user
+    ip
+    osf_id
+    osf
+    memory
+    use_overlay
+    user_storage_size
+    di_tag
+    host
+    host_id
+    state
+    user_state
+    vm_pid
+    blocked
 EOT
 }
 
