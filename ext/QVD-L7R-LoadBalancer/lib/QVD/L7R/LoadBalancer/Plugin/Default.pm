@@ -23,7 +23,9 @@ sub get_free_host {
                                             { join => 'host' })) {
         my $id = $hrt->host_id;
         $host{$id} =  { ram => $hrt->usable_ram,
-                        cpu => $hrt->usable_cpu };
+                        cpu => $hrt->usable_cpu,
+                        vms => 0,
+                      };
     }
 
     for my $vms (rs(VM_Runtime)->search(undef,
