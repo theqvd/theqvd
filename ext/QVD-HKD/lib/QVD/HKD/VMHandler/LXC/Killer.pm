@@ -63,7 +63,7 @@ sub _kill_lxc_processes {
         return $self->_on_kill_lxc_processes_done;
     };
     if (my @pids = <$fh>) {
-        if ($self->{killing_count}++ > $self->_cfg('internal.hkd.lxc.killer.kill_process.retries')) {
+        if ($self->{killing_count}++ > $self->_cfg('internal.hkd.lxc.killer.retries')) {
             $debug and $self->_debug("too many retries, no more killing, peace!");
             WARN "Too many retries when killing cointainer processes: @pids";
             return $self->_on_kill_lxc_processes_error;
