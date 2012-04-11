@@ -26,6 +26,7 @@ PERL=/usr/lib/qvd/bin/perl
 NAME=qvd-vma
 DESC="QVD VMA"
 PIDFILE=/var/run/qvd/$NAME.pid
+RUNDIR=/var/run/qvd
 SCRIPTNAME=/etc/init.d/$NAME
 
 
@@ -54,6 +55,10 @@ fi
 #
 do_start()
 {
+	# Create RUNDIR if does not exist
+	if [ ! -d $RUNDIR ] ; then 
+		mkdir $RUNDIR
+	fi
 	# Return
 	#   0 if daemon has been started
 	#   1 if daemon was already running

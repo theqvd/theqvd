@@ -19,6 +19,7 @@ PERL=/usr/lib/qvd/bin/perl
 NAME=qvd-vma
 DESC="QVD VMA"
 
+RUNDIR=/var/run/qvd
 PIDFILE=/var/run/qvd/vma.pid
 
 test -x $DAEMON || exit 5
@@ -108,6 +109,12 @@ running() {
 }
 
 start_server() {
+
+# Create rundir dir if does not exists
+	if [ ! -d $RUNDIR ] ; then 
+	    mkdir $RUNDIR
+	fi
+
 # Start the process using the wrapper
         if [ -z "$DAEMONUSER" ] ; then
             start_daemon -p $PIDFILE $DAEMON $DAEMON_OPTS
