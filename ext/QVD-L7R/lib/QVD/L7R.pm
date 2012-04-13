@@ -93,12 +93,15 @@ sub ping_processor {
 sub list_of_vm_processor {
     my ($l7r, $method, $url, $headers) = @_;
     this_host->counters->incr_http_requests;
+    DEBUG 'method list_of_vm requested';
     my $auth = $l7r->_authenticate_user($headers);
     if (this_host->runtime->blocked) {
+        INFO 'Server is blocked';
         $l7r->throw_http_error(HTTP_SERVICE_UNAVAILABLE, "Server is blocked");
     }
     my $server_state = this_host->runtime->state;
     if ($server_state ne 'running') {
+        INFO "Server is not in state 'running' but '$server_state'";
         $l7r->throw_http_error(HTTP_SERVICE_UNAVAILABLE, "Server is $server_state");
     }
     $auth->before_list_of_vms;
@@ -112,7 +115,11 @@ sub list_of_vm_processor {
                     grep $auth->allow_access_to_vm($_),
                     rs(VM)->search({user_id => $user_id}) );
 
-    @vm_list or INFO "User $user_id does not have any virtual machine";
+    if (@vm_list) {
+        DEBUG sprintf "User $user_id has %d virtual machines", scalar @vm_list;
+    } else {
+        INFO "User $user_id does not have any virtual machine";
+    }
     $l7r->send_http_response_with_body( HTTP_OK, 'application/json', [],
                                         $l7r->json->encode(\@vm_list) );
 }
@@ -120,41 +127,50 @@ sub list_of_vm_processor {
 sub connect_to_vm_processor {
     my ($l7r, $method, $url, $headers) = @_;
     this_host->counters->incr_http_requests;
+    DEBUG 'method connect_to_vm requested';
     my $auth = $l7r->_authenticate_user($headers);
     my $user_id = _auth2user_id($auth);
 
     if (this_host->runtime->blocked) {
+        INFO 'Server is blocked';
         $l7r->throw_http_error(HTTP_SERVICE_UNAVAILABLE, "Server is blocked");
     }
 
     header_eq_check($headers, Connection => 'Upgrade') &&
-    header_eq_check($headers, Upgrade => 'QVD/1.0')
-        or $l7r->throw_http_error(HTTP_UPGRADE_REQUIRED);
+    header_eq_check($headers, Upgrade => 'QVD/1.0') or do {
+        INFO 'Upgrade HTTP header required';
+        $l7r->throw_http_error(HTTP_UPGRADE_REQUIRED);
+    };
 
     my $query = (uri_split $url)[3];
     my %params = uri_query_split  $query;
-    my $vm_id = delete $params{id}
-        // $l7r->throw_http_error(HTTP_UNPROCESSABLE_ENTITY, "parameter id is missing");
+    my $vm_id = delete $params{id} // do {
+        INFO 'Parameter id required';
+        $l7r->throw_http_error(HTTP_UNPROCESSABLE_ENTITY, "parameter id is missing");
+    };
 
-    my $vm = rs(VM_Runtime)->search({vm_id => $vm_id})->first
-        // $l7r->throw_http_error(HTTP_NOT_FOUND,
-                              "The requested virtual machine does not exists");
+    my $vm = rs(VM_Runtime)->search({vm_id => $vm_id})->first // do {
+        INFO 'The requested virtual machine does not exist';
+        $l7r->throw_http_error(HTTP_NOT_FOUND, "The requested virtual machine does not exist");
+    };
 
-    if ($vm->vm->user_id != $user_id or
-        !$auth->allow_access_to_vm($vm)) {
-        INFO "User $user_id has tried to access VM $vm_id";
+    if ($vm->vm->user_id != $user_id or !$auth->allow_access_to_vm($vm)) {
+        INFO "User $user_id has tried to access VM $vm_id but (s)he isn't allowed to";
         $l7r->throw_http_error(HTTP_FORBIDDEN,
                                "You are not allowed to access requested virtual machine");
     }
 
     if (my @forbidden = grep !/^(?:qvd\.client\.|custom\.)/, keys %params) {
+        INFO "Invalid parameters @forbidden";
         $l7r->throw_http_error(HTTP_FORBIDDEN,
                                "Invalid parameters @forbidden");
     }
 
-    $vm->blocked
-        and $l7r->throw_http_error(HTTP_FORBIDDEN,
+    $vm->blocked and do {
+        INFO 'The requested virtual machine is offline for maintenance';
+        $l7r->throw_http_error(HTTP_FORBIDDEN,
                                    "The requested virtual machine is offline for maintenance");
+    };
 
     eval {
         $l7r->_takeover_vm($vm);
@@ -169,9 +185,11 @@ sub connect_to_vm_processor {
         $l7r->_run_forwarder($vm);
     };
     my $saved_err = $@;
+    DEBUG 'Releasing VM';
     $l7r->_release_vm($vm);
     if ($saved_err) {
         chomp $saved_err;
+        INFO "The requested virtual machine is not available: '$saved_err'. Retry later";
         $l7r->throw_http_error(HTTP_SERVICE_UNAVAILABLE,
                           "The requested virtual machine is not available: ",
                           "$saved_err, retry later");
@@ -190,10 +208,8 @@ sub _auth2user_id {
 sub _authenticate_user {
     my ($l7r, $headers) = @_;
     if (my ($credentials) = header_lookup($headers, 'Authorization')) {
-        # DEBUG "auth credentials: $credentials";
         $l7r->{_auth_tried}++ or this_host->counters->incr_auth_attempts;
         if (my ($basic) = $credentials =~ /^Basic (.*)$/) {
-            # DEBUG "auth basic: $basic";
             if (my ($user, $passwd) = decode_base64($basic) =~ /^([^:]+):(.*)$/) {
                 my $auth = QVD::L7R::Authenticator->new;
                 if ($auth->authenticate_basic($user, $passwd, $l7r)) {
@@ -212,7 +228,7 @@ sub _authenticate_user {
     $l7r->throw_http_error(HTTP_UNAUTHORIZED, ['WWW-Authenticate: Basic realm="QVD"']);
 }
 
-# Take the machine for this L7R process meybe disconnecting others
+# Take the machine for this L7R process maybe disconnecting others
 sub _takeover_vm {
     my ($l7r, $vm) = @_;
     DEBUG "Taking over session for VM " . $vm->id;
@@ -235,7 +251,7 @@ sub _takeover_vm {
         }
 
         $vm->discard_changes;
-        DEBUG sprintf("Session acquisition failed: L7R state %s for VM %d, pid: %d, host: %d, cmd: %s, my pid: %d, \$\@: %s",
+        INFO sprintf("Session acquisition failed: L7R state %s for VM %d, pid: %d, host: %d, cmd: %s, my pid: %d, \$\@: %s",
                       $vm->user_state, $vm->id, $vm->l7r_pid, $vm->l7r_host, $vm->user_cmd, $$, $@);
 
         $l7r->_tell_client("Aborting contending session");
@@ -254,6 +270,7 @@ sub _takeover_vm {
 
 sub _release_vm {
     my ($l7r, $vm) = @_;
+    DEBUG 'Releasing VM';
     txn_eval {
         $vm->discard_changes;
         my $pid = $vm->l7r_pid;
@@ -262,7 +279,7 @@ sub _release_vm {
             if (defined $pid  and $pid  == $$  and
                 defined $host and $host == this_host_id);
     };
-    $@ and DEBUG "L7R release failed but don't bother, HKD will cleanup the mesh: $@";
+    $@ and INFO "L7R release failed but don't bother, HKD will cleanup the mess: $@";
 }
 
 sub _assign_vm {
@@ -307,7 +324,10 @@ sub _start_and_wait_for_vm {
         $vm->discard_changes;
         $l7r->_check_abort($vm);
         my $vm_state = $vm->vm_state;
-        return if $vm_state eq 'running';
+        if ($vm_state eq 'running') {
+            DEBUG 'VM is running';
+            return;
+        }
         # FIXME: timeout in state starting_1 should be relaxed a bit
         if (( $vm_state eq 'stopped' and
               defined $vm->vm_cmd ) or
@@ -345,6 +365,7 @@ sub _wait_for_x {
         $x_state = eval { $vma->x_state };
         given ($x_state) {
             when ('listening') {
+                DEBUG 'X session is up';
                 return
             }
             when ([undef, 'starting']) {
