@@ -116,7 +116,7 @@ sub dispatch_command {
     $self->die_and_help ("$object: Valid command expected", $object) unless defined $command;
     my $method = $self->can($help ? "help_${object}_${command}" : "cmd_${object}_${command}");
     if (defined $method) {
-        $self->_syntax_check ($object, $command, @args);
+        $help or $self->_syntax_check ($object, $command, @args);
         $self->{admin}{current_object} = $object;
         $self->$method(@args);
     } else {
