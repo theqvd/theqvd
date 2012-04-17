@@ -44,8 +44,9 @@ rm -rf $RPM_BUILD_ROOT
 
 %post
 
-
 hostname=`hostname`
+gateway=`ip -o route | grep '^default' | awk '{print $3}'`
+
 export PATH=/usr/lib/qvd/bin:/bin:/usr/bin:/sbin:/usr/sbin
 set -e -x
 
@@ -83,6 +84,7 @@ fi
 
 ### Edit config
 sed -i "s/^nodename =.*/nodename = $hostname/g" "/etc/qvd/node.conf"
+sed -i "s/^vm.network.gateway =.*/vm.network.gateway = $gateway/g" "/etc/qvd/node.conf"
 
 ### Start postgres
 if ( ! /etc/init.d/postgresql status ) ; then
@@ -142,7 +144,7 @@ if [ -n "$db_created" -o ! -f /etc/qvd/.db_initialized ] ; then
 fi
 
 # Set cert, if one was generated before
-if [ -n "$set_cert" ] ; then
+if [ -n "$set_cert" -o -z "`qvd-admin.pl config get l7r.ssl.key`" ] ; then
 	qvd-admin.pl config ssl key=/etc/qvd/server-private-key.pem cert=/etc/qvd/server-certificate.pem
 fi
 
