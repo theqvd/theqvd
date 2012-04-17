@@ -44,23 +44,54 @@ rm -rf $RPM_BUILD_ROOT
 
 %post
 
-hostname=`hostname`
 
+hostname=`hostname`
+export PATH=/usr/lib/qvd/bin:/bin:/usr/bin:/sbin:/usr/sbin
 set -e -x
 
 
-if [ ! -f /etc/qvd/.config_edited ] ; then
-	sed -i "s/^nodename =.*/nodename = $hostname/g" "$RPM_BUILD_ROOT/etc/qvd/node.conf"
-	touch /etc/qvd/.config_edited
+if [ ! -f /etc/qvd/server-private-key.pem -o ! -f /etc/qvd/server-certificate.pem ] ; then
+	openssl genrsa 1024 > /etc/qvd/server-private-key.pem
+
+	cat >/etc/qvd/server-certificate.cnf <<SSL_CONF
+RANDFILE               = $ENV{HOME}/.rnd
+[ req ]
+default_bits           = 1024
+default_keyfile        = /etc/qvd/server-private-key.pem
+distinguished_name     = req_distinguished_name
+attributes             = req_attributes
+prompt                 = no
+output_password        =
+
+[ req_distinguished_name ]
+C                      = ES
+ST                     = Madrid
+L                      = Madrid
+O                      = QVD Test
+OU                     = QVD
+CN                     = QVD Test
+emailAddress           = test@example.com
+[ req_attributes ]
+challengePassword      =
+
+SSL_CONF
+
+	openssl req -new -x509 -nodes -sha1 -days 60 -key /etc/qvd/server-private-key.pem -config /etc/qvd/server-certificate.cnf -out /etc/qvd/server-certificate.pem
+
+	set_cert=1
 fi
 
+### Edit config
+sed -i "s/^nodename =.*/nodename = $hostname/g" "/etc/qvd/node.conf"
 
+### Start postgres
 if ( ! /etc/init.d/postgresql status ) ; then
 	/etc/init.d/postgresql start
 fi
 
+### Edit config if needed
+if ( ! grep -q '^# QVD Settings' /var/lib/pgsql/data/pg_hba.conf )  ; then
 
-if [ ! -f /etc/qvd/.postgres_configured ] ; then
 	cat >/var/lib/pgsql/data/pg_hba.conf <<CONF
 # database or username with that name.
 #
@@ -82,6 +113,7 @@ if [ ! -f /etc/qvd/.postgres_configured ] ; then
 
 # TYPE  DATABASE    USER        CIDR-ADDRESS          METHOD
 
+# QVD Settings - do not remove or change this line
 host    qvd         qvd         ::1/128               md5
 host    qvd         qvd         127.0.0.1/32          md5
 
@@ -95,18 +127,23 @@ host    all         all         ::1/128               ident sameuser
 CONF
 
 	/etc/init.d/postgresql restart
-	touch /etc/qvd/.postgres_configured
 fi
 
-if [ ! -f /etc/qvd/.db_created ] ; then
+# Create DB
+if ( ! su - postgres -c "psql -l" | grep -E -q '^\s+qvd ' ) ; then
 	echo -e "qvd\nqvd" | su -  postgres -c "createuser -e -S -D -R -E -P qvd"
 	su -  postgres -c "createdb -E UTF8 -O qvd qvd"
-
-	touch /etc/qvd/.db_created
+	db_created=1
 fi
 
-if [ ! -f /etc/qvd/.db_initialized ] ; then
+# Init DB
+if [ -n "$db_created" -o ! -f /etc/qvd/.db_initialized ] ; then
 	/usr/lib/qvd/bin/qvd-sample-init.sh && touch /etc/qvd/.db_initialized
+fi
+
+# Set cert, if one was generated before
+if [ -n "$set_cert" ] ; then
+	qvd-admin.pl config ssl key=/etc/qvd/server-private-key.pem cert=/etc/qvd/server-certificate.pem
 fi
 
 %files
