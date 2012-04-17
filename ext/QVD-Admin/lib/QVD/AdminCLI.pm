@@ -258,9 +258,7 @@ sub _config_pairs {
         #$self->_print("Wrong syntax, check the command help:\n");
         $self->_die;
     }
-    ## #540: vm.network.netmask and vm.network.gateway have no
-    ## default, so they don't appear in the output of 'config get'
-    my @to_ret = @_ ? @_ : keys %{{ $QVD::Config::defaults->properties }};
+    my @to_ret = @_ ? @_ : grep { $_ !~ /^internal\./ } cfg_keys;
     foreach my $k (@to_ret) {
         if (my $c = (grep { $_->key eq $k } @$configs)[0]) {
             $pairs{ $c->key } = $c->value;
