@@ -22,11 +22,11 @@ sub new {
     my $cli = shift;
     my %opts = @_;
     my $self = {
-	client_delegate => $cli,
-	audio => delete $opts{audio},
-	extra => delete $opts{extra},
-	printing => delete $opts{printing},
-	opts => \%opts,
+        client_delegate => $cli,
+        audio           => delete $opts{audio},
+        extra           => delete $opts{extra},
+        printing        => delete $opts{printing},
+        opts            => \%opts,
     };
     bless $self, $class;
 }
@@ -71,24 +71,24 @@ EOF
     my $dir = File::Spec->catfile (($ENV{HOME} || $ENV{APPDATA}), cfg('path.ssl.ca.personal'));
     make_path $dir, { error => \my $mkpath_err };
     if ($mkpath_err and @$mkpath_err) {
-	my $errs_text;
-	for my $err (@$mkpath_err) {
-	    my ($file, $errmsg) = %$err;
-	    if ('' eq $file) {
-		$errs_text .= "generic error: ($errmsg)\n";
-	    } else {
-		$errs_text .= "mkpath '$file': ($errmsg)\n";
-	    }
-	}
+        my $errs_text;
+        for my $err (@$mkpath_err) {
+            my ($file, $errmsg) = %$err;
+            if ('' eq $file) {
+                $errs_text .= "generic error: ($errmsg)\n";
+            } else {
+                $errs_text .= "mkpath '$file': ($errmsg)\n";
+            }
+        }
 
-	die $errs_text;
+        die $errs_text;
     }
 
     my $file;
     foreach my $idx (0..9) {
-	my $basename = sprintf '%s.%d', $cert_hash, $idx;
-	$file = File::Spec->catfile ($dir, $basename);
-	last unless -e $file;
+        my $basename = sprintf '%s.%d', $cert_hash, $idx;
+        $file = File::Spec->catfile ($dir, $basename);
+        last unless -e $file;
     }
     ## TODO: -e $file and what?
 
@@ -111,42 +111,47 @@ sub connect_to_vm {
     # SSL library has to be initialized in the thread where it's used,
     # so we do a "require QVD::HTTPC" here instead of "use"ing it above
     require QVD::HTTPC;
-    my $httpc = eval { new QVD::HTTPC("$host:$port", SSL => $connect_info{ssl}, 
-			       SSL_verify_callback => sub {$self->_ssl_verify_callback(@_)}) };
+    my $httpc = eval { new QVD::HTTPC(
+        "$host:$port",
+        SSL => $connect_info{ssl},
+        SSL_verify_callback => sub { $self->_ssl_verify_callback(@_) }
+    )};
     if ($@) {
-	$cli->proxy_connection_error(message => $@);
-	return;
+        $cli->proxy_connection_error(message => $@);
+        return;
     } else {
-	if (!$httpc) {
-	    # User rejected the server SSL certificate. Return to main window.
-	    $cli->proxy_connection_status('CLOSED');
-	    return;
-	}
+        if (!$httpc) {
+            # User rejected the server SSL certificate. Return to main window.
+            $cli->proxy_connection_status('CLOSED');
+            return;
+        }
     }
 
     use MIME::Base64 qw(encode_base64);
     my $auth = encode_base64("$user:$passwd", '');
 
-    $httpc->send_http_request(GET => '/qvd/list_of_vm', 
-	headers => [
-	"Authorization: Basic $auth",
-	"Accept: application/json"
-	]);
+    $httpc->send_http_request(
+        GET => '/qvd/list_of_vm', 
+        headers => [
+            "Authorization: Basic $auth",
+            "Accept: application/json"
+        ],
+    );
 
     my ($code, $msg, $response_headers, $body) = $httpc->read_http_response();
     if ($code != HTTP_OK) {
-	my $message;
-	given ($code) {
-	    when (HTTP_UNAUTHORIZED) {
-		$message = "The server has rejected your login. Please verify that your username and password are correct.";
-	    }
-	    when (HTTP_SERVICE_UNAVAILABLE) {
-		$message = "The server is under maintenance. Retry later.";
-	    }
-	}
+        my $message;
+        given ($code) {
+            when (HTTP_UNAUTHORIZED) {
+                $message = "The server has rejected your login. Please verify that your username and password are correct.";
+            }
+            when (HTTP_SERVICE_UNAVAILABLE) {
+                $message = "The server is under maintenance. Retry later.";
+            }
+        }
         $message ||= "$host replied with $msg";
-	$cli->proxy_connection_error(message => $message);
-	return;
+        $cli->proxy_connection_error(message => $message);
+        return;
     }
 
     my $vm_list = JSON->new->decode($body);
@@ -159,48 +164,54 @@ sub connect_to_vm {
     }
     $connect_info{id} = $vm_id;
 
-    my %o = ( id 			    => $connect_info{id},
-	      'qvd.client.keyboard'         => $connect_info{keyboard},
-	      'qvd.client.os'               => $NX_OS,
-	      'qvd.client.link'             => $connect_info{link},
-	      'qvd.client.geometry'         => $connect_info{geometry},
-	      'qvd.client.fullscreen'       => $connect_info{fullscreen},
-	      'qvd.client.printing.enabled' => $self->{printing} );
+    my %o = (
+        id                            => $connect_info{id},
+        'qvd.client.keyboard'         => $connect_info{keyboard},
+        'qvd.client.os'               => $NX_OS,
+        'qvd.client.link'             => $connect_info{link},
+        'qvd.client.geometry'         => $connect_info{geometry},
+        'qvd.client.fullscreen'       => $connect_info{fullscreen},
+        'qvd.client.printing.enabled' => $self->{printing},
+    );
 
     my $q = join '&', map { uri_escape($_) .'='. uri_escape($o{$_}) } keys %o;
-    $httpc->send_http_request(GET => "/qvd/connect_to_vm?$q",
-			      headers => [ "Authorization: Basic $auth",
-					   'Connection: Upgrade',
-					   'Upgrade: QVD/1.0' ]);
+    $httpc->send_http_request(
+        GET => "/qvd/connect_to_vm?$q",
+        headers => [
+            "Authorization: Basic $auth",
+            'Connection: Upgrade',
+            'Upgrade: QVD/1.0',
+        ],
+    );
 
     while (1) {
-	my ($code, $msg, $headers, $body) = $httpc->read_http_response;
-	if ($code == HTTP_SWITCHING_PROTOCOLS) {
-	    $cli->proxy_connection_status('CONNECTED');
-	    $self->_run($httpc);
-	    last;
-	}
-	elsif ($code == HTTP_PROCESSING) {
-	    # Server is starting the virtual machine and connecting to the VMA
-	}
-	else {
-	    # Fatal error
-	    my $message;
-	    if ($code == HTTP_NOT_FOUND) {
-		$message = "Your virtual machine does not exist any more.";
-	    } elsif ($code == HTTP_UPGRADE_REQUIRED) {
-		$message = "The server requires a more up-to-date client version.";
-	    } elsif ($code == HTTP_UNAUTHORIZED) {
-		$message = "Login error. Please verify your user and password.";
-	    } elsif ($code == HTTP_BAD_GATEWAY) {
-		$message = "Server error: ".$body;
-	    } elsif ($code == HTTP_FORBIDDEN) {
-		$message = "Your virtual machine is under maintenance.";
-	    }
-	    $message ||= "Unable to connect to remote vm: $code $msg";
-	    $cli->proxy_connection_error(message => $message, code => $code);
-	    last;
-	}
+        my ($code, $msg, $headers, $body) = $httpc->read_http_response;
+        if ($code == HTTP_SWITCHING_PROTOCOLS) {
+            $cli->proxy_connection_status('CONNECTED');
+            $self->_run($httpc);
+            last;
+        }
+        elsif ($code == HTTP_PROCESSING) {
+            # Server is starting the virtual machine and connecting to the VMA
+        }
+        else {
+            # Fatal error
+            my $message;
+            if ($code == HTTP_NOT_FOUND) {
+                $message = "Your virtual machine does not exist any more.";
+            } elsif ($code == HTTP_UPGRADE_REQUIRED) {
+                $message = "The server requires a more up-to-date client version.";
+            } elsif ($code == HTTP_UNAUTHORIZED) {
+                $message = "Login error. Please verify your user and password.";
+            } elsif ($code == HTTP_BAD_GATEWAY) {
+                $message = "Server error: ".$body;
+            } elsif ($code == HTTP_FORBIDDEN) {
+                $message = "Your virtual machine is under maintenance.";
+            }
+            $message ||= "Unable to connect to remote vm: $code $msg";
+            $cli->proxy_connection_error(message => $message, code => $code);
+            last;
+        }
     }
     $cli->proxy_connection_status('CLOSED');
 }
@@ -211,67 +222,69 @@ sub _run {
 
     my @cmd;
     if ($WINDOWS) {
-	push @cmd, $ENV{QVDPATH}."/NX/nxproxy.exe";
+        push @cmd, $ENV{QVDPATH}."/NX/nxproxy.exe";
     } else {
-	push @cmd, "nxproxy";
+        push @cmd, "nxproxy";
     }
 
     my %o = ();
 
     if ($WINDOWS) {
-	$ENV{'NX_ROOT'} = $ENV{APPDATA}.'/.qvd';
-	(my $cygwin_nx_root = $ENV{NX_ROOT}) =~ tr!:\\!//!;
-	$o{errors} = '/cygdrive/'.$cygwin_nx_root.'/proxy.log';
-	# Call pulseaudio in Windows
-	Proc::Background->new($ENV{QVDPATH}."/pulseaudio/pulseaudio.exe", "-D", "--high-priority") if $self->{audio};     
+        $ENV{'NX_ROOT'} = $ENV{APPDATA}.'/.qvd';
+        (my $cygwin_nx_root = $ENV{NX_ROOT}) =~ tr!:\\!//!;
+        $o{errors} = '/cygdrive/'.$cygwin_nx_root.'/proxy.log';
+        # Call pulseaudio in Windows
+        Proc::Background->new($ENV{QVDPATH}."/pulseaudio/pulseaudio.exe", "-D", "--high-priority") if $self->{audio};     
     }  
     
     $o{media} = 4713 if $self->{audio};
 
     if ($self->{printing}) {
-	if ($WINDOWS) {
-	    $o{smb} = 139;
-	} else {
-	    $o{cups} = 631;
-	}
+        if ($WINDOWS) {
+            $o{smb} = 139;
+        } else {
+            $o{cups} = 631;
+        }
     }
 
-    @o{keys %{$self->{extra}}} = values %{$self->{extra}};
+    @o{ keys %{$self->{extra}} } = values %{$self->{extra}};
     push @cmd, ("-S");
     push @cmd, (map "$_=$o{$_}", keys %o);
 
     push @cmd, qw(localhost:40);
 
     if ($WINDOWS) {
-	my $program = $cmd[0];
-	my $cmdline = join ' ', map("\"$_\"", @cmd);
-	use constant CREATE_NO_WINDOW => 0;
-	use constant NORMAL_PRIORITY_CLASS => 0;
-	require Win32::Process;
-	Win32::Process->import;
-	Win32::Process::Create({}, $program, $cmdline, 0, 
-	    CREATE_NO_WINDOW|NORMAL_PRIORITY_CLASS,
-	    '.');
+        my $program = $cmd[0];
+        my $cmdline = join ' ', map("\"$_\"", @cmd);
+        use constant CREATE_NO_WINDOW => 0;
+        use constant NORMAL_PRIORITY_CLASS => 0;
+        require Win32::Process;
+        Win32::Process->import;
+        Win32::Process::Create({}, $program, $cmdline, 0, CREATE_NO_WINDOW|NORMAL_PRIORITY_CLASS, '.');
     } else {
-	Proc::Background->new(@cmd);
+        Proc::Background->new(@cmd);
     }
 
-    my $ll = IO::Socket::INET->new(LocalPort => 4040,
-	ReuseAddr => 1,
-	Listen => 1) or die "Unable to listen on port 4040";
+    my $ll = IO::Socket::INET->new(
+        LocalPort => 4040,
+        ReuseAddr => 1,
+        Listen    => 1,
+    ) or die "Unable to listen on port 4040";
 
-    my $local_socket = $ll->accept()
-	or die "connection from nxproxy failed";
+    my $local_socket = $ll->accept() or die "connection from nxproxy failed";
     undef $ll; # close the listening socket
     if ($WINDOWS) {
-	my $nonblocking = 1;
-	use constant FIONBIO => 0x8004667e;
-	ioctl($local_socket, FIONBIO, \$nonblocking);
+        my $nonblocking = 1;
+        use constant FIONBIO => 0x8004667e;
+        ioctl($local_socket, FIONBIO, \$nonblocking);
     }
 
-    forward_sockets($local_socket, $httpc->get_socket,
-		    buffer_2to1 => $httpc->read_buffered);
-		    # debug => 1);
+    forward_sockets(
+        $local_socket,
+        $httpc->get_socket,
+        buffer_2to1 => $httpc->read_buffered);
+        # debug => 1,
+    );
 }
 
 1;
