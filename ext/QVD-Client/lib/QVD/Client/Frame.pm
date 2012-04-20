@@ -8,10 +8,10 @@ use QVD::Client::Proxy;
 use base qw(Wx::Frame);
 use strict;
 
-use constant EVT_LIST_OF_VM_LOADED	=> Wx::NewEventType;
-use constant EVT_CONNECTION_ERROR	=> Wx::NewEventType;
-use constant EVT_CONN_STATUS		=> Wx::NewEventType;
-use constant EVT_UNKNOWN_CERT		=> Wx::NewEventType;
+use constant EVT_LIST_OF_VM_LOADED => Wx::NewEventType;
+use constant EVT_CONNECTION_ERROR  => Wx::NewEventType;
+use constant EVT_CONN_STATUS       => Wx::NewEventType;
+use constant EVT_UNKNOWN_CERT      => Wx::NewEventType;
 
 my $vm_id :shared;
 my %connect_info :shared;
@@ -53,35 +53,35 @@ my %lang_codes = qw/
 /;
 
 sub new {
-	my( $class, $parent, $id, $title, $pos, $size, $style, $name ) = @_;
-	$parent = undef              unless defined $parent;
-	$id     = -1                 unless defined $id;
-	$title  = ""                 unless defined $title;
-	$pos    = wxDefaultPosition  unless defined $pos;
-	$size   = wxDefaultSize      unless defined $size;
-	$name   = ""                 unless defined $name;
+    my( $class, $parent, $id, $title, $pos, $size, $style, $name ) = @_;
+    $parent = undef              unless defined $parent;
+    $id     = -1                 unless defined $id;
+    $title  = ""                 unless defined $title;
+    $pos    = wxDefaultPosition  unless defined $pos;
+    $size   = wxDefaultSize      unless defined $size;
+    $name   = ""                 unless defined $name;
 
-	$style = wxCAPTION|wxCLOSE_BOX|wxSYSTEM_MENU
-		unless defined $style;
+    $style = wxCAPTION|wxCLOSE_BOX|wxSYSTEM_MENU
+        unless defined $style;
 
-	my $self = $class->SUPER::new( $parent, $id, $title, $pos, $size, $style, $name );
+    my $self = $class->SUPER::new( $parent, $id, $title, $pos, $size, $style, $name );
 
-	my $panel = $self->{panel} = Wx::Panel->new($self, -1, wxDefaultPosition, wxDefaultSize, wxTAB_TRAVERSAL );
+    my $panel = $self->{panel} = Wx::Panel->new($self, -1, wxDefaultPosition, wxDefaultSize, wxTAB_TRAVERSAL );
 
-	my $ver_sizer  = Wx::BoxSizer->new(wxVERTICAL);
+    my $ver_sizer  = Wx::BoxSizer->new(wxVERTICAL);
 
-	my $logo_image;
+    my $logo_image;
 
-	my ($volume, $directories, $file) = File::Spec->splitpath(File::Spec->rel2abs($0));
-	if ($WINDOWS) {
-	    $logo_image = $ENV{QVDPATH}."/pixmaps/qvd-logo.png";
-	} else {
-	    $logo_image = "$volume$directories/../pixmaps/qvd-logo.png";
-	    unless (-e $logo_image) {
-		$logo_image = "/usr/share/pixmaps/qvd-logo.png";
-	    }
-	}
-	$ver_sizer->Add(
+    my ($volume, $directories, $file) = File::Spec->splitpath(File::Spec->rel2abs($0));
+    if ($WINDOWS) {
+        $logo_image = $ENV{QVDPATH}."/pixmaps/qvd-logo.png";
+    } else {
+        $logo_image = "$volume$directories/../pixmaps/qvd-logo.png";
+        unless (-e $logo_image) {
+            $logo_image = "/usr/share/pixmaps/qvd-logo.png";
+        }
+    }
+    $ver_sizer->Add(
         Wx::StaticBitmap->new(
             $panel,
             -1,
@@ -92,17 +92,17 @@ sub new {
         20
     );
 
-	my $grid_sizer = Wx::GridSizer->new(1, 2, 0, 0);
-	$ver_sizer->Add($grid_sizer, 1, wxALL|wxEXPAND, 20);
+    my $grid_sizer = Wx::GridSizer->new(1, 2, 0, 0);
+    $ver_sizer->Add($grid_sizer, 1, wxALL|wxEXPAND, 20);
 
-	$grid_sizer->Add(Wx::StaticText->new($panel, -1, "User"), 0, wxALL, 5);
-	$self->{username} = Wx::TextCtrl->new($panel, -1, cfg('client.user.name'));
-	$grid_sizer->Add($self->{username}, 1, wxALL|wxEXPAND, 5);
-	$self->{username}->SetFocus();
+    $grid_sizer->Add(Wx::StaticText->new($panel, -1, "User"), 0, wxALL, 5);
+    $self->{username} = Wx::TextCtrl->new($panel, -1, cfg('client.user.name'));
+    $grid_sizer->Add($self->{username}, 1, wxALL|wxEXPAND, 5);
+    $self->{username}->SetFocus();
 
-	$grid_sizer->Add(Wx::StaticText->new($panel, -1, "Password"), 0, wxALL, 5);
-	$self->{password} = Wx::TextCtrl->new($panel, -1, "", wxDefaultPosition, wxDefaultSize, wxTE_PASSWORD);
-	$grid_sizer->Add($self->{password}, 0, wxALL|wxEXPAND, 5);
+    $grid_sizer->Add(Wx::StaticText->new($panel, -1, "Password"), 0, wxALL, 5);
+    $self->{password} = Wx::TextCtrl->new($panel, -1, "", wxDefaultPosition, wxDefaultSize, wxTE_PASSWORD);
+    $grid_sizer->Add($self->{password}, 0, wxALL|wxEXPAND, 5);
 
     if (cfg('client.show.remember_password')) {
         $grid_sizer->Add(Wx::StaticText->new($panel, -1, "Remember password"), 0, wxALL, 5);
@@ -118,7 +118,7 @@ sub new {
     }
 
     if (!cfg('client.force.link', 0)) {
-        $grid_sizer->Add(Wx::StaticText->new($panel, -1, "Connection type"), 0, wxALL, 5);			 
+        $grid_sizer->Add(Wx::StaticText->new($panel, -1, "Connection type"), 0, wxALL, 5);             
         my @link_options = ("Local", "ADSL", "Modem");
         $self->{link} = Wx::Choice->new($panel, -1);
         $grid_sizer->Add($self->{link}, 1, wxALL|wxEXPAND, 5);
@@ -127,66 +127,66 @@ sub new {
         # FIXME Introduce previous user selection here
     }
 
-	# port goes here!
-	$self->{connect_button} = Wx::Button->new($panel, -1, "Connect");
-	$ver_sizer->Add($self->{connect_button}, 0, wxLEFT|wxRIGHT|wxBOTTOM|wxEXPAND, 20);
-	$self->{connect_button}->SetDefault;
+    # port goes here!
+    $self->{connect_button} = Wx::Button->new($panel, -1, "Connect");
+    $ver_sizer->Add($self->{connect_button}, 0, wxLEFT|wxRIGHT|wxBOTTOM|wxEXPAND, 20);
+    $self->{connect_button}->SetDefault;
 
-	$self->{progress_bar} = Wx::Gauge->new($panel, -1, 100, wxDefaultPosition, wxDefaultSize, wxGA_HORIZONTAL|wxGA_SMOOTH);
-	$self->{progress_bar}->SetValue(0);
-	$ver_sizer->Add($self->{progress_bar}, 0, wxEXPAND, 0);
+    $self->{progress_bar} = Wx::Gauge->new($panel, -1, 100, wxDefaultPosition, wxDefaultSize, wxGA_HORIZONTAL|wxGA_SMOOTH);
+    $self->{progress_bar}->SetValue(0);
+    $ver_sizer->Add($self->{progress_bar}, 0, wxEXPAND, 0);
 
-	$self->SetTitle("QVD");
-	my $icon = Wx::Icon->new();
-	
-	if ($WINDOWS) {
-	    $logo_image = $ENV{QVDPATH}."/pixmaps/qvd.xpm";
-	} else {
-	    $logo_image = "$volume$directories/../pixmaps/qvd.xpm";
-	    unless (-e $logo_image) {
-		$logo_image = "/usr/share/pixmaps/qvd.xpm";
-	    }
-	}
-	$icon->CopyFromBitmap(Wx::Bitmap->new($logo_image, wxBITMAP_TYPE_ANY));
-	$self->SetIcon($icon);
+    $self->SetTitle("QVD");
+    my $icon = Wx::Icon->new();
+    
+    if ($WINDOWS) {
+        $logo_image = $ENV{QVDPATH}."/pixmaps/qvd.xpm";
+    } else {
+        $logo_image = "$volume$directories/../pixmaps/qvd.xpm";
+        unless (-e $logo_image) {
+            $logo_image = "/usr/share/pixmaps/qvd.xpm";
+        }
+    }
+    $icon->CopyFromBitmap(Wx::Bitmap->new($logo_image, wxBITMAP_TYPE_ANY));
+    $self->SetIcon($icon);
 
-	$panel->SetSizer($ver_sizer);
+    $panel->SetSizer($ver_sizer);
 
-	$ver_sizer->Fit($self);
-	$self->Center;
-	$self->Show(1);
+    $ver_sizer->Fit($self);
+    $self->Center;
+    $self->Show(1);
 
-	Wx::Event::EVT_BUTTON($self, $self->{connect_button}->GetId, \&OnClickConnect);
-	Wx::Event::EVT_TIMER($self, -1, \&OnTimer);
+    Wx::Event::EVT_BUTTON($self, $self->{connect_button}->GetId, \&OnClickConnect);
+    Wx::Event::EVT_TIMER($self, -1, \&OnTimer);
 
-	Wx::Event::EVT_COMMAND($self, -1, EVT_CONNECTION_ERROR, \&OnConnectionError);
-	Wx::Event::EVT_COMMAND($self, -1, EVT_LIST_OF_VM_LOADED, \&OnListOfVMLoaded);
-	Wx::Event::EVT_COMMAND($self, -1, EVT_CONN_STATUS, \&OnConnectionStatusChanged);
-	Wx::Event::EVT_COMMAND($self, -1, EVT_UNKNOWN_CERT, \&OnUnknownCert);
+    Wx::Event::EVT_COMMAND($self, -1, EVT_CONNECTION_ERROR, \&OnConnectionError);
+    Wx::Event::EVT_COMMAND($self, -1, EVT_LIST_OF_VM_LOADED, \&OnListOfVMLoaded);
+    Wx::Event::EVT_COMMAND($self, -1, EVT_CONN_STATUS, \&OnConnectionStatusChanged);
+    Wx::Event::EVT_COMMAND($self, -1, EVT_UNKNOWN_CERT, \&OnUnknownCert);
 
-	Wx::Event::EVT_CLOSE($self, \&OnExit);
+    Wx::Event::EVT_CLOSE($self, \&OnExit);
 
-	$self->{timer} = Wx::Timer->new($self);
-	$self->{proc} = undef;
-	$self->{proc_pid} = undef;
-	$self->{log} = "";
+    $self->{timer} = Wx::Timer->new($self);
+    $self->{proc} = undef;
+    $self->{proc_pid} = undef;
+    $self->{log} = "";
 
-	return $self;
+    return $self;
 }
 
 sub RunWorkerThread {
     my $self = shift;
     my @args = @_;
     while (1) {
-	lock(%connect_info);
-	local $@;
-	eval { 
-	    QVD::Client::Proxy->new($self, %connect_info)->connect_to_vm();
-	};
-	if ($@) {
-	    $self->proxy_connection_error(message => $@);
-	}
-	cond_wait(%connect_info);
+        lock(%connect_info);
+        local $@;
+        eval { 
+            QVD::Client::Proxy->new($self, %connect_info)->connect_to_vm();
+        };
+        if ($@) {
+            $self->proxy_connection_error(message => $@);
+        }
+        cond_wait(%connect_info);
     }
 }
 
@@ -210,14 +210,14 @@ sub proxy_list_of_vm_loaded {
     my $self = shift;
     my $vm_data :shared = $self->_shared_clone(shift);
     if (@$vm_data > 1) {
-	lock($vm_id);
-	my $evt = new Wx::PlThreadEvent(-1, EVT_LIST_OF_VM_LOADED, $vm_data);
-	Wx::PostEvent($self, $evt);
-	cond_wait($vm_id);
+        lock($vm_id);
+        my $evt = new Wx::PlThreadEvent(-1, EVT_LIST_OF_VM_LOADED, $vm_data);
+        Wx::PostEvent($self, $evt);
+        cond_wait($vm_id);
     } elsif (@$vm_data == 1) {
-	$vm_id = $vm_data->[0]{id};
+        $vm_id = $vm_data->[0]{id};
     } else {
-	die "You don't have any virtual machine available";
+        die "You don't have any virtual machine available";
     }
     return $vm_id;
 }
@@ -244,16 +244,18 @@ sub proxy_connection_error {
 sub OnClickConnect {
     my( $self, $event ) = @_;
     $self->{state} = "";
-    %connect_info = ( link       => cfg('client.force.link', 0) // cfg('client.link'),
-		      audio      => cfg('client.audio.enable'),
-		      printing   => cfg('client.printing.enable'),
-		      geometry   => cfg('client.geometry'),
-		      fullscreen => cfg('client.fullscreen'),
-		      keyboard	 => $self->DetectKeyboard,
-		      port       => $DEFAULT_PORT,
-		      ssl	 => $USE_SSL,
-              host => cfg('client.force.host.name', 0) // $self->{host}->GetValue,
-		      map { $_ => $self->{$_}->GetValue } qw(username password) );
+    %connect_info = (
+        link       => cfg('client.force.link', 0) // cfg('client.link'),
+        audio      => cfg('client.audio.enable'),
+        printing   => cfg('client.printing.enable'),
+        geometry   => cfg('client.geometry'),
+        fullscreen => cfg('client.fullscreen'),
+        keyboard   => $self->DetectKeyboard,
+        port       => $DEFAULT_PORT,
+        ssl        => $USE_SSL,
+        host       => cfg('client.force.host.name', 0) // $self->{host}->GetValue,
+        (map { $_ => $self->{$_}->GetValue } qw(username password)),
+    );
 
     my $u = $self->{username}->GetValue;
     $u =~ s/^\s*//; $u =~ s/\s*$//;
@@ -266,13 +268,13 @@ sub OnClickConnect {
     # Start or notify worker thread
     # Will result in the execution of a loop in RunWorkerThread.
     if (!$self->{worker_thread} || !$self->{worker_thread}->is_running()) {
-	@_ = (); # necessary to avoid "Scalars leaked," see perldoc Wx::Thread
-	my $thr = threads->create(\&RunWorkerThread, $self);
-	$thr->detach();
-	$self->{worker_thread} = $thr;
+        @_ = (); # necessary to avoid "Scalars leaked," see perldoc Wx::Thread
+        my $thr = threads->create(\&RunWorkerThread, $self);
+        $thr->detach();
+        $self->{worker_thread} = $thr;
     } else {
-	lock(%connect_info);
-	cond_signal(%connect_info);
+        lock(%connect_info);
+        cond_signal(%connect_info);
     }
 }
 
@@ -282,8 +284,7 @@ sub OnConnectionError {
     $self->{progress_bar}->SetValue(0);
     $self->{progress_bar}->SetRange(100);
     my $message = $event->GetData;
-    my $dialog = Wx::MessageDialog->new($self, $message, "Connection error.",
-			    wxOK | wxICON_ERROR);
+    my $dialog = Wx::MessageDialog->new($self, $message, "Connection error.", wxOK | wxICON_ERROR);
     $dialog->ShowModal();
     $dialog->Destroy();
     $self->EnableControls(1);
@@ -293,27 +294,28 @@ sub OnListOfVMLoaded {
     my ($self, $event) = @_;
     my $vm_data = $event->GetData;
     {
-	lock($vm_id);
-	my $dialog = new Wx::SingleChoiceDialog(
-	    $self, 
-	    "Select virtual machine:", 
-	    "Select virtual machine", 
-	    [map { 
-		if ($_->{blocked}) {
-		    $_->{name}." (blocked)";
-		} else {
-		    $_->{name};
-		}
-		
-	    } @$vm_data],
-	    [map { $_->{id} } @$vm_data]
-	);
-	$self->{timer}->Stop();
-	$dialog->ShowModal();
-	$vm_id = $dialog->GetSelectionClientData();
-	$self->{timer}->Start();
+        lock($vm_id);
+        my $dialog = new Wx::SingleChoiceDialog(
+            $self, 
+            "Select virtual machine:", 
+            "Select virtual machine", 
+            [
+                map { 
+                    if ($_->{blocked}) {
+                        $_->{name}." (blocked)";
+                    } else {
+                        $_->{name};
+                    }
+                } @$vm_data
+            ],
+            [ map { $_->{id} } @$vm_data ],
+        );
+        $self->{timer}->Stop();
+        $dialog->ShowModal();
+        $vm_id = $dialog->GetSelectionClientData();
+        $self->{timer}->Start();
 
-	cond_signal($vm_id);
+        cond_signal($vm_id);
     }
 }
 
@@ -321,19 +323,19 @@ sub OnConnectionStatusChanged {
     my ($self, $event) = @_;
     my $status = $event->GetData();
     if ($status eq 'CONNECTING') {
-	$self->EnableControls(0);
-	$self->{timer}->Start(50, 0);
+        $self->EnableControls(0);
+        $self->{timer}->Start(50, 0);
     } elsif ($status eq 'CONNECTED') {
-    $self->{password}->SetValue ('') if !$self->{remember_pass}->IsChecked;
-	$self->Hide();
-	$self->{timer}->Stop();
+        $self->{password}->SetValue ('') if !$self->{remember_pass}->IsChecked;
+        $self->Hide();
+        $self->{timer}->Stop();
     } elsif ($status eq 'CLOSED') {
-	$self->{timer}->Stop();
-	$self->{progress_bar}->SetValue(0);
-	$self->{progress_bar}->SetRange(100);
-	$self->EnableControls(1);
-	$self->{username}->SetFocus();
-	$self->Show;
+        $self->{timer}->Stop();
+        $self->{progress_bar}->SetValue(0);
+        $self->{progress_bar}->SetRange(100);
+        $self->EnableControls(1);
+        $self->{username}->SetFocus();
+        $self->Show;
     }
 }
 
@@ -351,9 +353,9 @@ sub OnUnknownCert {
     $vsizer->Add($tc, 1, wxALL|wxEXPAND, 5);
 
     my $but_clicked = sub {
-	lock $accept_cert;
-	$accept_cert = (shift and ($cert_data ne ""));
-	$dialog->Destroy();
+        lock $accept_cert;
+        $accept_cert = (shift and ($cert_data ne ""));
+        $dialog->Destroy();
     };
     my $bsizer = Wx::BoxSizer->new(wxHORIZONTAL);
     my $but_ok     = Wx::Button->new($dialog, -1, 'Ok');
@@ -393,29 +395,29 @@ sub OnExit {
 
 sub DetectKeyboard {
     if ($^O eq 'MSWin32') {
-	require Win32::API;
+        require Win32::API;
 
-	my $gkln = Win32::API->new ('user32', 'GetKeyboardLayoutName', 'P', 'I');
-	my $str = ' ' x 8;
-	$gkln->Call ($str);
+        my $gkln = Win32::API->new ('user32', 'GetKeyboardLayoutName', 'P', 'I');
+        my $str = ' ' x 8;
+        $gkln->Call ($str);
 
-	my $k = substr $str, -4;
-	my $layout = $lang_codes{$k} // 'es';
+        my $k = substr $str, -4;
+        my $layout = $lang_codes{$k} // 'es';
 
-	## use a hardcoded 'pc105' since windows doesn't seem to have the notion of keyboard model
-	return "pc105/$layout";
+        ## use a hardcoded 'pc105' since windows doesn't seem to have the notion of keyboard model
+        return "pc105/$layout";
 
     } else {
-	require X11::Protocol;
+        require X11::Protocol;
 
-	my $x11 = X11::Protocol->new;
-	my ($raw) = $x11->GetProperty ($x11->root, $x11->atom ('_XKB_RULES_NAMES'), 'AnyPropertyType', 0, 4096, 0);
-	my ($rules, $model, $layout, $variant, $options) = split /\x00/, $raw;
+        my $x11 = X11::Protocol->new;
+        my ($raw) = $x11->GetProperty ($x11->root, $x11->atom ('_XKB_RULES_NAMES'), 'AnyPropertyType', 0, 4096, 0);
+        my ($rules, $model, $layout, $variant, $options) = split /\x00/, $raw;
 
-	## these may be comma-separated values, pick the first element
-	($layout, $variant) = map { (split /,/)[0] // '' } $layout, $variant;
+        ## these may be comma-separated values, pick the first element
+        ($layout, $variant) = map { (split /,/)[0] // '' } $layout, $variant;
 
-	return "$model/$layout";
+        return "$model/$layout";
     }
 }
 
@@ -444,16 +446,16 @@ sub SaveConfiguration {
 
     local $@;
     eval {
-	my $qvd_dir = ($ENV{HOME} || $ENV{APPDATA}).'/.qvd';
-	mkdir $qvd_dir unless -e $qvd_dir;
-	save_core_cfg($qvd_dir.'/client.conf');
+        my $qvd_dir = ($ENV{HOME} || $ENV{APPDATA}).'/.qvd';
+        mkdir $qvd_dir unless -e $qvd_dir;
+        save_core_cfg($qvd_dir.'/client.conf');
     };
     if ($@) {
-	my $message = $@;
-	my $dialog = Wx::MessageDialog->new($self, $message, 
-	    "Error saving configuration", wxOK | wxICON_ERROR);
-	$dialog->ShowModal();
-	$dialog->Destroy();
+        my $message = $@;
+        my $dialog = Wx::MessageDialog->new($self, $message, 
+            "Error saving configuration", wxOK | wxICON_ERROR);
+        $dialog->ShowModal();
+        $dialog->Destroy();
     }
 }
 
@@ -462,16 +464,16 @@ sub _shared_clone {
     my ($self, $ref) = @_;
     my $type = ref $ref;
     if ($type eq 'ARRAY') {
-	my @arr :shared = map { $self->_shared_clone($_); } @$ref;
-	return \@arr;
+        my @arr :shared = map { $self->_shared_clone($_); } @$ref;
+        return \@arr;
     } elsif ($type eq 'HASH') {
-	my %hash :shared;
-	while (my ($k, $v) = each %$ref) {
-	    $hash{$k} = $self->_shared_clone($v);
-	}
-	return \%hash;
+        my %hash :shared;
+        while (my ($k, $v) = each %$ref) {
+            $hash{$k} = $self->_shared_clone($v);
+        }
+        return \%hash;
     } else {
-	return ${share $ref};
+        return ${share $ref};
     }
 }
 
