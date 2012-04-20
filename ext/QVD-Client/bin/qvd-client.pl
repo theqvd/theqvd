@@ -8,9 +8,11 @@ use JSON;
 
 BEGIN {
     $QVD::Config::USE_DB = 0;
-    @QVD::Config::FILES = ('/etc/qvd/client.conf',
-			   ($ENV{HOME} || $ENV{APPDATA}).'/.qvd/client.conf',
-			   'qvd-client.conf');
+    @QVD::Config::FILES = (
+        '/etc/qvd/client.conf',
+        ($ENV{HOME} || $ENV{APPDATA}).'/.qvd/client.conf',
+        'qvd-client.conf',
+    );
 
     # FIXME NX_CLIENT is used for showing the user information on things
     # like broken connection, perhaps we should show them to the user
@@ -32,17 +34,18 @@ my $nonblocking=1;
 my $ssl = ($port =~ /43$/ ? 1 : undef);
 
 my %connect_info = (
-    link		=> cfg('client.link'),
-    audio		=> cfg('client.audio.enable'),
-    printing		=> cfg('client.printing.enable'),
-    geometry		=> cfg('client.geometry'),
-    fullscreen		=> cfg('client.fullscreen'),
-    keyboard		=> 'pc105/en',
-    port		=> $port,
-    ssl			=> $ssl,
-    host		=> $host,
-    username		=> $username,
-    password		=> $password);
+    link          => cfg('client.link'),
+    audio         => cfg('client.audio.enable'),
+    printing      => cfg('client.printing.enable'),
+    geometry      => cfg('client.geometry'),
+    fullscreen    => cfg('client.fullscreen'),
+    keyboard      => 'pc105/en',
+    port          => $port,
+    ssl           => $ssl,
+    host          => $host,
+    username      => $username,
+    password      => $password,
+);
 
 my $delegate = QVD::Client::CLI->new();
 QVD::Client::Proxy->new($delegate, %connect_info)->connect_to_vm();
@@ -66,9 +69,9 @@ sub proxy_list_of_vm_loaded {
     my ($self, $vm_data) = @_;
     my $vm;
     if (@$vm_data > 0) {
-	print "You have ".@$vm_data." virtual machines.\n";
-	$vm = $vm_data->[rand @$vm_data];
-	print "Connecting to the one called ".$vm->{name}."\n";
+        print "You have ".@$vm_data." virtual machines.\n";
+        $vm = $vm_data->[rand @$vm_data];
+        print "Connecting to the one called ".$vm->{name}."\n";
     }
     return $vm->{id};
 }
