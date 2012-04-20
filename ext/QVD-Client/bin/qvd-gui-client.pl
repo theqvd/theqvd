@@ -16,9 +16,11 @@ BEGIN {
     $DOTQVD = ($ENV{HOME} || $ENV{APPDATA}).'/.qvd';
     mkdir $DOTQVD if (!-e $DOTQVD);
     $QVD::Config::USE_DB = 0;
-    @QVD::Config::FILES = ('/etc/qvd/client.conf',
-			   $DOTQVD.'/client.conf',
-			   'qvd-client.conf');
+    @QVD::Config::FILES = (
+        '/etc/qvd/client.conf',
+        $DOTQVD.'/client.conf',
+        'qvd-client.conf',
+    );
 
     # FIXME NX_CLIENT is used for showing the user information on things
     # like broken connection, perhaps we should show them to the user
@@ -33,16 +35,16 @@ sub OnInit {
     my $self = shift;
     
     if ($WINDOWS) {
-	my ($volume,$directories,$file) = File::Spec->splitpath(Cwd::realpath($0));
-	$ENV{QVDPATH} //= File::Spec->catpath( $volume, $directories);
-	$ENV{DISPLAY} //= '127.0.0.1:0';
-	
-	my @cmd;
-	my @opts = qw(-multiwindow -notrayicon -nowinkill -clipboard +bs -wm);
-	push @opts, (-logfile => $DOTQVD.'/xserver.log');
-	push @cmd, ($ENV{QVDPATH}."/Xming/Xming.exe", @opts);
+        my ($volume,$directories,$file) = File::Spec->splitpath(Cwd::realpath($0));
+        $ENV{QVDPATH} //= File::Spec->catpath( $volume, $directories);
+        $ENV{DISPLAY} //= '127.0.0.1:0';
+        
+        my @cmd;
+        my @opts = qw(-multiwindow -notrayicon -nowinkill -clipboard +bs -wm);
+        push @opts, (-logfile => $DOTQVD.'/xserver.log');
+        push @cmd, ($ENV{QVDPATH}."/Xming/Xming.exe", @opts);
 
-	Proc::Background->new(@cmd);   
+        Proc::Background->new(@cmd);   
     }
     
     my $frame = QVD::Client::Frame->new();
