@@ -33,34 +33,50 @@ sub _escape {
 
 sub authenticate_basic {
     my ($class, $auth, $login, $passwd, $l7r) = @_;
-    my $ldap = Net::LDAP->new($ldap_host)
-	// die "Unable to connect to LDAP server $ldap_host for user $login: $@\n";
+
+    # ldap connection
+    my $ldap = Net::LDAP->new($ldap_host);
+    if (!$ldap)
+    {
+	ERROR "authenticate_basic: Unable to connect to LDAP server $ldap_host for user $login: $@\n";
+	return ();
+    }
 
     my $escaped_login = _escape($login);
 
-    if ($ldap_userbindpattern ne '') {
-	$ldap_userbindpattern =~ s/\%u/$escaped_login/g;
-	DEBUG("auth.ldap.userbindpattern provided trying login with <$ldap_userbindpattern> for user $login");
-	my $msg = $ldap->bind($ldap_userbindpattern, password => $passwd);
-	if (!$msg->code) {
-	    DEBUG("auth.ldap.userbindpattern login with <$ldap_userbindpattern> was success for user $login");
+    # Bind directly with a dn pattern (no previous search) if defined
+    if ($ldap_userbindpattern ne '')
+    {
+	my $userbindpattern = $ldap_userbindpattern; 
+	$userbindpattern =~ s/\%u/$escaped_login/g;
+	DEBUG("authenticate_basic: auth.ldap.userbindpattern provided trying login with <$userbindpattern> for user $login");
+	my $msg = $ldap->bind($userbindpattern, password => $passwd);
+	if (!$msg->code)
+	{
+	    DEBUG("authenticate_basic: auth.ldap.userbindpattern login with <$userbindpattern> was success for user $login");
 	    return 1;
 	}
-	DEBUG("auth.ldap.userbindpattern login with <$ldap_userbindpattern> failed, continuing next bit for user $login");
+	DEBUG("authenticate_basic: auth.ldap.userbindpattern login with <$userbindpattern> failed, continuing next bit for user $login");
     }
 
+    # Create connection/bind to search the user
     $ldap_binddn =~ s/\%u/$escaped_login/g;
-    if ($ldap_bindpass eq '' && $ldap_binddn ne '') {
-	DEBUG("auth.ldap.bindpass was empty using session password for user <$ldap_binddn> for user $login");
+    if ($ldap_bindpass eq '' && $ldap_binddn ne '')
+    {
+	DEBUG("authenticate_basic: auth.ldap.bindpass was empty using session password for user <$ldap_binddn> for user $login");
 	$ldap_bindpass = $passwd 
     }
     my $msg = ($ldap_binddn eq '')
 	? $ldap->bind
 	: $ldap->bind($ldap_binddn, password=>$ldap_bindpass);
-
     DEBUG("Binding as <$ldap_binddn> for user $login");
-    $msg->code and die "LDAP bind failed: " . $msg->error . "\n";
+    if ($msg->code)
+    {
+	 ERROR "authenticate_basic: LDAP initial bind failed: " . $msg->error . "\n";
+	return ();	 
+    }
 
+    # Search for user
     my $filter = $ldap_filter;
     $filter =~ s/\%u/$escaped_login/g;
     $msg = $ldap->search(base   => $ldap_base,
@@ -68,30 +84,56 @@ sub authenticate_basic {
 			 deref => $ldap_deref,
 	);
     DEBUG("searching in $ldap_base with filter $filter for user $login");
-    if (!$msg->code) {
-	if (defined (my $entry = ($msg->entries)[0])) {
-	    my $dn = $entry->dn;
-	    DEBUG("Found DN $dn for for user $login");
-	    $msg = $ldap->bind($dn, password => $passwd);
-	    if (!$msg->code) {
-		return 1;
-	    } else {
-		# TODO check for $msg->code failed credentials (49) LDAP_INVALID_CREDENTIALS (49) from LDAP::Constant
-		if (defined($ldap_racf_regex) && $msg->code == LDAP_INVALID_CREDENTIALS && 
-		    defined($msg->server_error) && $msg->server_error =~ /$ldap_racf_regex/) {
-		    INFO "Authenticating user $escaped_login with error code invalid credentials but matching RACF Extension <$ldap_racf_regex>";
-		    return 1;
-		}
-		DEBUG "Error in authentication. Ldap code was: ".$msg->code."(".$msg->error_desc.").".
-		    ((defined $msg->server_error) ? " Server error:".$msg->server_error : "");
-	    }
-	} else {
-		DEBUG "Error no entry found for $ldap_base with filter $filter for user $login";
-	}
-    } else {
-	ERROR "Error in DN search $ldap_base with filter $filter for user $login. Ldap code was: ".$msg->code."(".$msg->error_desc.")";
+    if ($msg->code)
+    {
+	ERROR "authenticate_basic: Error in DN search $ldap_base with filter $filter for user $login. Ldap code was: ".$msg->code."(".$msg->error_desc.")";
+	return ();
+    }    
+
+    # User not found
+    if ($msg->count == 0)
+    {
+	ERROR "authenticate_basic: Error in DN search $ldap_base with filter $filter for user $login. No entries found";
+	return ();
     }
-    return ()
+
+    # More than one user found
+    if ($msg->count > 1)
+    {
+	my @entries = map { $_->dn() } $msg->entries;
+	ERROR "authenticate_basic: Error in DN search $ldap_base with filter $filter for user $login. More than one entry found: ".join(",", @entries);
+	return ();
+    }
+
+    # This should always succeed
+    my $entry = ($msg->entries)[0];
+    if (!defined ($entry)) {
+	# This should never happen
+	DEBUG "authenticate_basic: Error no entry found for $ldap_base with filter $filter for user $login";
+	return ();
+    }
+
+    # Authenticate the user running a bind
+    my $dn = $entry->dn;
+    DEBUG("authenticate_basic: Found DN $dn for for user $login");
+    $msg = $ldap->bind($dn, password => $passwd);
+    if (!$msg->code) {
+	DEBUG("authenticate_basic: DN $dn for user $login was authenticated");
+	return 1;
+    }
+
+    # In case of failed credentials if ldap_racf_regex is defined allow to login if
+    # the error message matches
+    if (defined($ldap_racf_regex) && $msg->code == LDAP_INVALID_CREDENTIALS && 
+	defined($msg->server_error) && $msg->server_error =~ /$ldap_racf_regex/) {
+	DEBUG("authenticate_basic: DN $dn for user $login returned invalid credentials but matches <$ldap_racf_regex> for message ".$msg->server_error);
+	return 1;
+    }
+
+    DEBUG "Error in authentication. Ldap code was: ".$msg->code."(".$msg->error_desc.").".
+	((defined $msg->server_error) ? " Server error:".$msg->server_error : "");
+
+    return ();
 }
 
 
