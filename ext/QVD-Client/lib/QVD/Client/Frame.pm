@@ -98,11 +98,12 @@ sub new {
     $grid_sizer->Add(Wx::StaticText->new($panel, -1, "User"), 0, wxALL, 5);
     $self->{username} = Wx::TextCtrl->new($panel, -1, cfg('client.user.name'));
     $grid_sizer->Add($self->{username}, 1, wxALL|wxEXPAND, 5);
-    $self->{username}->SetFocus();
 
     $grid_sizer->Add(Wx::StaticText->new($panel, -1, "Password"), 0, wxALL, 5);
     $self->{password} = Wx::TextCtrl->new($panel, -1, "", wxDefaultPosition, wxDefaultSize, wxTE_PASSWORD);
     $grid_sizer->Add($self->{password}, 0, wxALL|wxEXPAND, 5);
+
+    length cfg('client.user.name') ? $self->{password}->SetFocus() : $self->{username}->SetFocus();
 
     if (cfg('client.show.remember_password')) {
         $grid_sizer->Add(Wx::StaticText->new($panel, -1, "Remember password"), 0, wxALL, 5);
