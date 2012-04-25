@@ -11,7 +11,7 @@ window within your new Ubuntu installation running in the virtual
 machine, and run the following commands:
 
 ----
-# sudo apt-add-repository 'deb http://theqvd.com/debian lucid main'
+# sudo apt-add-repository ppa:qvd-qindel/qvd-3.1
 # sudo apt-get update
 # sudo apt-get install qvd-vma
 ----

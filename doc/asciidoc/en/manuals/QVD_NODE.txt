@@ -31,7 +31,7 @@ the QVD repository to your apt sources. You can do this with the
 following command:
 
 ----
-apt-add-repository 'deb http://theqvd.com/debian lucid main'
+sudo apt-add-repository ppa:qvd-qindel/qvd-3.1
 ----
 
 Execute `apt-get update` after modifying sources.list.
@@ -72,7 +72,10 @@ Networking Requirements
 QVD Server Nodes make use of a network bridge and virtual network interfaces to facilitate
 networking across each of the virtual machines that run on the node. In order to automatically
 provision IP addresses to virtual machines, QVD also runs a DHCP server that will allocate
-IP addresses within the virtual network range to virtual hosts as they boot up.
+IP addresses within the virtual network range to virtual hosts as they boot up. It is therefore
+extremely important that you choose a network range that is unlikely to conflict with any of your
+other existing infrastructure for this purpose. Services running on systems in the same IP network
+may be affected by QVD or any of the virtual machines that run within QVD.
 
 There are a number of configuration steps that may need to be configured manually in order
 to properly set up the networking for a QVD Server Node. There are often other ways to achieve
@@ -148,11 +151,17 @@ iface qvdnet0 inet static
 
 It is important to note that in the above example you will need to
 change the IP address *192.168.0.2* to the IP address of the network
-interface that you intend your clients to connect to.
+interface that you intend your clients to connect to. In the example
+above we are using the *10.3.15.0/24* range for the virtual network used
+by QVD. This range should be unique within your infrastructure and should
+be dedicated to QVD usage, so that services starting within QVD do not impact
+on other systems within your network.
 
 While there are other cleaner approaches to setting up your network,
 these sometimes run into problems with particular network interfaces
-such as WIFI. The approach listed above should work for most systems.
+such as WIFI. The approach listed above should work for most systems. Remember that
+the NAT provided using iptables, as presented in the example above, is only required
+for mononode installations.
 
 Once you have written the network configuration to file, you should
 bring up the network bridge interface.
@@ -169,11 +178,19 @@ In order for QVD to properly manage virtual machine setup and the subsequent rou
 you will need to change some configuration settings within QVD-DB. It is recommended
 that you make use of the <<qvd-admin-cli,QVD CLI Administration Utility>> to do this.
 
+These settings are used to provide a dedicated networking environment for your 
+virtual machines to run. You should use IP addresses and network ranges that do not
+conflict with your existing network infrastructure. In the example
+below we are using the *10.3.15.0/24* range for the virtual network used
+by QVD. This range should be unique within your infrastructure and should
+be dedicated to QVD usage, so that services starting within QVD do not impact
+on other systems within your network.
+
 ----
-# qvd-admin.pl config set vm.network.ip.start=10.1.0.50
-# qvd-admin.pl config set vm.network.netmask=16
-# qvd-admin.pl config set vm.network.gateway=10.1.0.1
-# qvd-admin.pl config set vm.network.dns_server=10.1.1.254
+# qvd-admin.pl config set vm.network.ip.start=10.3.15.50
+# qvd-admin.pl config set vm.network.netmask=24
+# qvd-admin.pl config set vm.network.gateway=10.3.15.1
+# qvd-admin.pl config set vm.network.dns_server=10.3.15.254
 # qvd-admin.pl config set vm.network.bridge=qvdnet0
 ----
 

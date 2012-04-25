@@ -13,7 +13,7 @@ the QVD repository to your apt sources. You can do this with the
 following command:
 
 ----
-apt-add-repository 'deb http://theqvd.com/debian lucid main'
+sudo apt-add-repository ppa:qvd-qindel/qvd-3.1
 ----
 
 Execute `apt-get update` after modifying sources.list.

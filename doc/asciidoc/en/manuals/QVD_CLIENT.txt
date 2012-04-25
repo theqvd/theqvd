@@ -37,7 +37,7 @@ should add the QVD repository to your apt repository sources. Run the
 following commands as root:
 
 ----
-# apt-add-repository 'deb http://theqvd.com/debian lucid main'
+# apt-add-repository ppa:qvd-qindel/qvd-3.1
 # apt-get update
 ----
 

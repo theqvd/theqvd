@@ -1167,6 +1167,14 @@ the packages required for a minimal installation of the distribution that you ar
 this container has been created, you will still be required to install a wide variety of 
 applications in order to set up a functional desktop environment.
 
+NOTE: Some of the more feature rich desktop environments, such as Gnome and KDE are often packaged
+in such a way that their dependencies include packages that directly access hardware. This can cause
+trouble when trying to set up an LXC image. Therefore, we recommend that when using LXC virtualization
+you take advantage of one of the more lightweight desktop environments, such as LXDE or Razor-QT. While
+it is possible to use Gnome or KDE, you will need to be particularly experienced at package management
+and in your configuration capabilities. In our examples and demonstration images, we generally use LXDE or
+Razor-QT to minimize configuration issues.
+
 Ubuntu Image
 ~~~~~~~~~~~~
 The following outline should guide you through preparing and setting up an LXC image
@@ -1196,7 +1204,7 @@ a desktop environment by doing the following:
 
 ----
 # chroot /var/lib/lxc/MyUbuntuContainer/rootfs/
-# apt-get install kde-standard
+# apt-get install lubuntu-desktop
 ----
 
 This may help you to get to a point where you can continue to work toward building your disk image, but
@@ -1209,11 +1217,11 @@ scripts are usually installed in /usr/lib/lxc/templates.
 
 If you are using the 'lxc-ubuntu' template, the easiest way to ensure that the majority of required packages
 are installed is to add the packages for the items that you want to include to the list of packages that are 
-downloaded for the base installation, for instance if you would like to include KDE, try editing the template
+downloaded for the base installation, for instance if you would like to include Ubuntu LXDE, try editing the template
 file to locate and modify the following line:
 
 ----
-packages=dialog,apt,apt-utils,iproute,inetutils-ping,vim,isc-dhcp-client,isc-dhcp-common,ssh,lsb-release,gnupg,netbase,ubuntu-keyring,kde-standard
+packages=dialog,apt,apt-utils,iproute,inetutils-ping,vim,isc-dhcp-client,isc-dhcp-common,ssh,lsb-release,gnupg,netbase,ubuntu-keyring,lubuntu-desktop
 ----
 
 Note that although this should help you to get started, it is quite possible that some packages may not get installed.
@@ -1311,10 +1319,10 @@ locate the following line:
 ----
 
 This line is responsible for downloading and installing the base packages for SLES. You need to add the following lines
-in order to create a template that includes the Gnome desktop and the necessary packages to install and configure QVD:
+in order to create a template that includes the LXDE desktop and the necessary packages to install and configure QVD:
 
 ----
-# zypper --quiet --root $cache/partial-$arch --non-interactive --gpg-auto-import-keys in --auto-agree-with-licenses --no-recommends -t pattern gnome
+# zypper --quiet --root $cache/partial-$arch --non-interactive --gpg-auto-import-keys in --auto-agree-with-licenses --no-recommends -t pattern lxde
 # zypper --quiet --root $cache/partial-$arch --non-interactive --gpg-auto-import-keys in --auto-agree-with-licenses --no-recommends postgresql-libs
 # zypper --quiet --root $cache/partial-$arch --non-interactive --gpg-auto-import-keys in --auto-agree-with-licenses --no-recommends intlfonts-ttf
 ----
@@ -1322,7 +1330,8 @@ in order to create a template that includes the Gnome desktop and the necessary 
 You should also add the following lines to install the QVD VMA packages:
 
 ----
-# Commands to be added to configure zypper for the QVD repository and to add the QVD VMA packages and dependencies
+# zypper ar http://download.opensuse.org/repositories/home:/qvd/SLE_11_SP2/ QVD
+# zypper --quiet --root $cache/partial-$arch --non-interactive --gpg-auto-import-keys in --auto-agree-with-licenses --no-recommends qvd-vma
 ----
 
 Now use the lxc-create command to generate a container:
@@ -1845,7 +1854,12 @@ Administrator::
 
 Session::
   The period that a user is actually connected to a virtual machine.
+  
+KVM::
+  Kernel Virtual Machine. This is a hypervisor that is installed into the Linux Kernel to achieve type-1 virtualization. QVD makes use of KVM in order to run the virtual machines required to serve virtual desktops to end users.
 
+LXC::
+  Linux Containers. This is a virtualization technology that is included in the Linux Kernel. It uses a similar approach to the standard Linux 'chroot' command, but provides a greater degree of separation of resources. QVD can make use of LXC instead of KVM in order to run the virtual machines required to serve virtual desktops to end users. LXC virtualization is a lot less resource intensive, allowing you to take better advantage of existing hardware to service more users.
 
 
 //[index]

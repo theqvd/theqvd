@@ -408,12 +408,12 @@ The QVD Server Environment can also be installed on the SuSE Linux
 Enterprise Server 11 (SP1 x86_64).
 
 The packages for the QVD Server Environment are available at 
-https://build.opensuse.org/project/show?project=home%3Aqvd%3Aqvd-3.0
+https://build.opensuse.org/project/show?project=home%3Aqvd
 
 Run the following command to add the repository to your system.
 
 ----
-sudo zypper ar-3.0.0 http://download.opensuse.org/repositories/home:/qvd:/qvd-3.0/SLE_11_SP1 QVD
+sudo zypper ar http://download.opensuse.org/repositories/home:/qvd/SLE_11_SP2/ QVD
 ----
 Execute `sudo zypper refresh` after adding the QVD repository. You
 will need to accept the certificate that you are presented with. We
