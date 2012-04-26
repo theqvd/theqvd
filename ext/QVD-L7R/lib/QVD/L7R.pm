@@ -150,7 +150,7 @@ sub connect_to_vm_processor {
     };
 
     my $vm = rs(VM_Runtime)->search({vm_id => $vm_id})->first // do {
-        INFO 'The requested virtual machine does not exist';
+        INFO 'The requested virtual machine does not exist,)'. " VM_ID: $vm_id";
         $l7r->throw_http_error(HTTP_NOT_FOUND, "The requested virtual machine does not exist");
     };
 
@@ -167,7 +167,7 @@ sub connect_to_vm_processor {
     }
 
     $vm->blocked and do {
-        INFO 'The requested virtual machine is offline for maintenance';
+        INFO 'The requested virtual machine is offline for maintenance'. " VM_ID: $vm_id";
         $l7r->throw_http_error(HTTP_FORBIDDEN,
                                    "The requested virtual machine is offline for maintenance");
     };
@@ -185,16 +185,16 @@ sub connect_to_vm_processor {
         $l7r->_run_forwarder($vm);
     };
     my $saved_err = $@;
-    DEBUG 'Releasing VM';
+    DEBUG 'Releasing VM'. " VM_ID: $vm_id";
     $l7r->_release_vm($vm);
     if ($saved_err) {
         chomp $saved_err;
-        INFO "The requested virtual machine is not available: '$saved_err'. Retry later";
+        INFO "The requested virtual machine is not available: '$saved_err'. Retry later". " VM_ID: $vm_id";
         $l7r->throw_http_error(HTTP_SERVICE_UNAVAILABLE,
                           "The requested virtual machine is not available: ",
                           "$saved_err, retry later");
     }
-    DEBUG "Session ended";
+    DEBUG "Session ended". " VM_ID: $vm_id";
 }
 
 sub _auth2user_id {
@@ -237,7 +237,7 @@ sub _takeover_vm {
 
     while(1) {
         txn_eval {
-            DEBUG "txn_eval in _takeover_vm";
+            DEBUG "txn_eval in _takeover_vm for VM_ID: ". $vm->id;
             $vm->discard_changes;
             $vm->user_state eq 'disconnected' or LOGDIE "user is connected from another L7R instance yet";
             $vm->set_user_state('connecting',
@@ -246,7 +246,7 @@ sub _takeover_vm {
                                 user_cmd => undef);
         };
         unless ($@) {
-            $l7r->_tell_client("Session acquired");
+            $l7r->_tell_client("Session acquired for VM_ID: ". $vm->id);
             return;
         }
 
@@ -254,7 +254,7 @@ sub _takeover_vm {
         INFO sprintf("Session acquisition failed: L7R state %s for VM %d, pid: %d, host: %d, cmd: %s, my pid: %d, \$\@: %s",
                       $vm->user_state, $vm->id, $vm->l7r_pid, $vm->l7r_host, $vm->user_cmd, $$, $@);
 
-        $l7r->_tell_client("Aborting contending session");
+        $l7r->_tell_client("Aborting contending session for VM_ID: ". $vm->id);
         $vm->send_user_abort;
 
         # TODO: when contending L7R is in state "connected" this L7R
@@ -270,7 +270,7 @@ sub _takeover_vm {
 
 sub _release_vm {
     my ($l7r, $vm) = @_;
-    DEBUG 'Releasing VM';
+    DEBUG 'Releasing VM for VM_ID: '.$vm->id;
     txn_eval {
         $vm->discard_changes;
         my $pid = $vm->l7r_pid;
@@ -285,7 +285,7 @@ sub _release_vm {
 sub _assign_vm {
     my ($l7r, $vm) = @_;
     unless (defined $vm->host_id) {
-        $l7r->_tell_client("Assigning VM to host");
+        $l7r->_tell_client("Assigning VM to host, VM_ID: ". $vm->id) ;
         my $lb = QVD::L7R::LoadBalancer->new;
         my $host_id = $lb->get_free_host($vm->vm) //
             LOGDIE "Unable to start VM, can't assign to any host\n";
@@ -298,7 +298,7 @@ sub _assign_vm {
             LOGDIE if (defined $vm->host_id or $vm->vm_state ne 'stopped');
             $vm->set_host_id($host_id);
         };
-        $@ and LOGDIE "Unable to start VM, state changed unexpectedly\n";
+        $@ and LOGDIE "Unable to start VM VM_ID: ". $vm->id ." , state changed unexpectedly\n";
 
         $l7r->_check_abort($vm);
     }
@@ -319,31 +319,31 @@ sub _start_and_wait_for_vm {
 
     $l7r->_tell_client("Waiting for VM to start");
     while (1) {
-        DEBUG "waiting for VM to come up";
+        DEBUG "waiting for VM to come up VM_ID:" . $vm->id;
         sleep($vm_poll_time);
         $vm->discard_changes;
         $l7r->_check_abort($vm);
         my $vm_state = $vm->vm_state;
         if ($vm_state eq 'running') {
-            DEBUG 'VM is running';
+            DEBUG 'VM is running VM_ID: '. $vm->id;
             return;
         }
         # FIXME: timeout in state starting_1 should be relaxed a bit
         if (( $vm_state eq 'stopped' and
               defined $vm->vm_cmd ) or
             $vm_state =~ /^starting/) {
-            LOGDIE "Unable to start VM, operation timed out!\n"
+            LOGDIE "Unable to start VM VM_ID: ". $vm->id . ", operation timed out!\n"
                 if time > $timeout;
         }
         else {
-            LOGDIE "Unable to start VM in state $vm_state";
+            LOGDIE "Unable to start VM VM_ID: ". $vm->id . " in state $vm_state";
         }
     }
 }
 
 sub _start_x {
     my ($l7r, $vm, @params) = @_;
-    $l7r->_tell_client("Starting X session");
+    $l7r->_tell_client("Starting X session at VM VM_ID: ". $vm->id);
     my $resp;
     for (0..$x_start_retry) {
         my $vma = $l7r->_vma_client($vm);
@@ -352,24 +352,24 @@ sub _start_x {
         sleep($x_poll_time);
         $l7r->_check_abort($vm, 1);
     }
-    $resp or LOGDIE "Unable to start X server on VM: $@";
+    $resp or LOGDIE "Unable to start X server on VM VM_ID: ". $vm->id . " : $@";
 }
 
 sub _wait_for_x {
     my ($l7r, $vm) = @_;
     my $timeout = time + $x_start_timeout;
-    $l7r->_tell_client("Waiting for X session to come up");
+    $l7r->_tell_client("Waiting for X session to come up VM VM_ID: ". $vm->id );
     my $x_state;
     while (1) {
         my $vma = $l7r->_vma_client($vm);
         $x_state = eval { $vma->x_state };
         given ($x_state) {
             when ('listening') {
-                DEBUG 'X session is up';
+                DEBUG 'X session is up on VM VM_ID: '. $vm->id;
                 return
             }
             when ([undef, 'starting']) {
-                LOGDIE "Unable to start VM X server, operation timed out!\n"
+                LOGDIE "Unable to start VM X server on VM VM_ID: " . $vm->id . ", operation timed out!\n"
                     if time > $timeout;
             }
             when ('provisioning') {
@@ -377,7 +377,7 @@ sub _wait_for_x {
                 # long process
             }
             default {
-                LOGDIE "Unable to start XV X server, state went to $_\n"
+                LOGDIE "Unable to start XV X server on VM VM_ID: " . $vm->id . ", state went to $_\n"
             }
         }
         sleep($x_poll_time);
@@ -391,32 +391,32 @@ sub _run_forwarder {
     my $vm_address = $vm->vm_address;
     my $vm_x_port = $vm->vm_x_port;
 
-    $l7r->_tell_client("Connecting X session");
+    $l7r->_tell_client("Connecting X session for VM_ID: " . $vm->id);
 
     this_host->counters->incr_nx_attempts;
     my $socket = IO::Socket::INET->new(PeerAddr => $vm_address,
                                        PeerPort => $vm_x_port,
                                        Proto => 'tcp')
-        or LOGDIE "Unable to connect to X server: $!";
+        or LOGDIE "Unable to connect to X server  on VM VM_ID: " . $vm->id .  ": $!";
     this_host->counters->incr_nx_ok;
 
-    DEBUG "Socket connected to X server";
+    DEBUG "Socket connected to X server on VM VM_ID: " . $vm->id;
 
     txn_do {
         $vm->discard_changes;
         $l7r->_check_abort($vm);
         $vm->set_user_state('connected');
     };
-    DEBUG "Connected";
+    DEBUG "Connected on VM VM_ID: " . $vm->id ;
 
     $l7r->_tell_client("Connection established");
 
     $l7r->send_http_response(HTTP_SWITCHING_PROTOCOLS);
 
-    DEBUG "Starting socket forwarder";
+    DEBUG "Starting socket forwarder on VM VM_ID: " . $vm->id;
     my $t0 = time;
     forward_sockets($l7r->{server}{client}, $socket);
-    DEBUG "Session terminated";
+    DEBUG "Session terminated on VM VM_ID: " . $vm->id ;
     this_host->counters->incr_short_sessions if time - $t0 < $short_session;
 }
 
@@ -437,7 +437,7 @@ sub _check_abort {
     my ($l7r, $vm, $update) = @_;
     $vm->discard_changes if $update;
     my $cmd = $vm->user_cmd;
-    LOGDIE "Aborted by contending session"
+    LOGDIE "Aborted by contending session VM VM_ID: ". $vm->id
         if (defined $cmd and $cmd eq 'abort');
 }
 
