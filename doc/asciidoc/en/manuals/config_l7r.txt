@@ -1,3 +1,4 @@
+[[config_l7r]]
 You are able to specify the following additional options to control the L7R:
 
 ----
@@ -17,7 +18,7 @@ The values set above are the default values.
 
 * *l7r.as_user*: the user that should be used to run the QVD L7R daemon
 * *l7r.use_ssl*: whether or not to make use of SSL to encrypt client connections
-* *l7r.port*: the port that should be listened on for client connections to the L7R (the client would need to be configured for this value as well)
+* *l7r.port*: the port that should be listened on for client connections to the L7R (the <<config_client,client.host.port>> setting for each client would need to be configured for this value as well)
 * *l7r.address*: the IP address that the L7R should bind to
 * *l7r.pid_file*: the path to the PID file that is created when the L7R daemon is running
 * *l7r.auth.plugins*: can be used to provision additional authentication plugins such as OpenSSO

@@ -473,6 +473,25 @@ have succeeded in serving desktops over Wireless connections as well.
 You may use any client system to run the QVD Client software, as long
 as it supports Linux or a modern Microsoft Windows operating system.
 
+Networking Requirements
+~~~~~~~~~~~~~~~~~~~~~~~
+QVD Server Nodes make use of a network bridge and virtual network interfaces to facilitate
+networking across each of the virtual machines that run on the node. In order to automatically
+provision IP addresses to virtual machines, QVD also runs a DHCP server that will allocate
+IP addresses within the virtual network range to virtual hosts as they boot up. It is therefore
+extremely important that you choose a network range that is unlikely to conflict with any of your
+other existing infrastructure for this purpose. Services running on systems in the same IP network
+may be affected by QVD or any of the virtual machines that run within QVD.
+
+Networking steps are covered in more detail later in this document, however the most important thing
+to be aware of at this point is that you should ensure that you have a dedicated network IP range that
+can be used for the virtual machines that will run within the QVD environment.
+
+Furthermore, in a mononode installation, such as the one that we are describing here, you will need
+to configure some form of NAT in order for the virtual machines to have network access. This is usually 
+achieved by configuring some ~iptables~ rules on the host. In this document, we provide an example, but
+you may find that an alternative approach is more suited to your environment.
+
 Installing the QVD Demo Metapackage
 -----------------------------------
 [[qvd_metapackage]]
@@ -851,92 +870,7 @@ You can also use this tool to set the QVD-WAT username and password:
 # qvd-admin.pl config set wat.admin.password = admin
 ----
 
-Configuring network
-~~~~~~~~~~~~~~~~~~~
-
-Getting your network configuration right is one of the most important
-steps to getting QVD running properly. In order to be successful you
-need to prepare you system to run the QVD Server. If you follow the
-steps in this section carefully, you should not run into any trouble.
-
-Set dnsmasq to be controlled by QVD
-^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
-
-QVD uses dnsmasq as a DHCP and DNS server for the virtual machines
-that run in a node. In order to function correctly, dnsmasq needs to
-be run by the qvd-node process. By default, the Ubuntu package starts
-the process running as a daemon in the background, so you need to stop 
-it from starting automatically. This is done with the following commands.
-
-----
-# /etc/init.d/dnsmasq stop
-# sed -i s/ENABLED=1/ENABLED=0/ /etc/default/dnsmasq
-----
-
-Configure IP forwarding
-^^^^^^^^^^^^^^^^^^^^^^^
-
-Next up, we need to make sure that your system is capable of handling
-the IP forwarding in order to route clients to the correct location.
-You can do this quickly by running the following command.
-
-----
-# echo 1 > /proc/sys/net/ipv4/ip_forward
-----
-
-Unfortunately, when you reboot you host system, this change will be
-lost. To make it permanent, you can edit `/etc/sysctl.conf` and
-uncomment the line:
-
-----
-net.ipv4.ip_forward=1
-----
-
-You can force sysctl to reload its settings after you have edited this
-file by running:
-
-----
-# sysctl -p
-----
-
-Configure a Network Bridge
-^^^^^^^^^^^^^^^^^^^^^^^^^^
-There are a number of ways to go about configuring your network bridge
-and the appropriate routing to make sure that a QVD client is routed
-to the correct virtual machine.
-
-The easiest method is to set up a static network interface and to
-configure a set of *iptables* routing rules to perform the NAT
-required to translate IP addresses between your real and virtual
-network interfaces. To do this, edit the file
-`/etc/network/interfaces` and add the following lines.
-
-----
-auto qvdnet0
-iface qvdnet0 inet static
-  pre-up brctl addbr qvdnet0
-  pre-up iptables -t nat -A POSTROUTING -o qvdnet0 -j SNAT to-source 192.168.0.2
-  pre-up iptables -t nat -A PREROUTING -d 192.168.0.2 -p tcp --dport 8443 -j DNAT --to-destination 10.1.0.1
-  post-down brctl delbr qvdnet0
-  address 10.1.0.1
-  netmask 255.255.0.0
-  network 10.1.0.0
-----
-
-It is important to note that in the above example you will need to
-change the IP address *192.168.0.2* to the IP address of the network
-interface that you intend your clients to connect to.
-
-While there are other cleaner approaches to setting up your network,
-these sometimes run into problems with particular network interfaces
-such as WIFI. The approach listed above should work for most systems.
-
-Once you have written the network configuration to file, you should
-bring up the network bridge interface.
-
-----
-# ifup qvdnet0
-----
+include::NetworkingRequirements.txt[]
 
 Configuring SSL
 ~~~~~~~~~~~~~~~

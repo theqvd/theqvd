@@ -10,6 +10,7 @@ $Id: AdministrationManual.txt 11680 2011-07-22 08:22:43Z rputtergill $
 :author initials: RP
 :email: rowan.puttergill@qindel.com
 :doctype: book
+:adminmanual:
 :toc:
 :icons:
 :numbered:

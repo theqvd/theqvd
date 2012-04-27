@@ -39,6 +39,10 @@ manual, or by QVD Support.
 
 Note that in order to set these parameters, you should have already installed and configured QVD-DB.
 
+TIP: Some configuration parameters may relate to the parameters set for another component in the system.
+In these cases, you may need to update the parameter in more than one place. A typical example would be
+the ~l7r.port~ setting which would affect the ~client.host.port~ setting.
+
 WARNING: Modifying any QVD 'internal' parameter will void any support agreement that you have set out
 for QVD. These parameters are subject to change in any release of the software and are designed to help
 developers debug behaviour inside of the product.
