@@ -64,7 +64,7 @@ link:https://build.opensuse.org/project/show?project=home%3Aqvd%3Aqvd-3.0[https:
 Run the following command to add the repository to your system.
 
 ----
-sudo zypper ar-3.0.0 http://download.opensuse.org/repositories/home:/qvd:/qvd-3.0/SLE_11_SP1 QVD
+sudo zypper ar http://download.opensuse.org/repositories/home:/qvd:/qvd-3.0/SLE_11_SP1 QVD
 ----
 
 Execute `sudo zypper refresh` after adding the QVD repository. You
@@ -118,7 +118,7 @@ some simple demonstration images for you to make use of.
 
 You can download one of the following demonstration DI’s from the following links:
 
-*   *link:http://theqvd.com/downloads/demo/demo-ubuntu-gnome.img.gz[QVD Demonstration DI (Ubuntu 10.10 – Gnome Desktop) [740Mb]]*
+*   *link:http://theqvd.com/product/download/demo-image-ubuntu-gnome[QVD Demonstration DI (Ubuntu 10.10 – Gnome Desktop) [740Mb]]*
 
 [NOTE]
 ========================================================================================
@@ -127,7 +127,7 @@ includes the Firefox web browser (with Adobe Flash Player installed), the Evolut
 client, and OpenOffice.org.
 ========================================================================================
 
-*   *link:http://theqvd.com/downloads/demo/demo-ubuntu-kde.img.gz[QVD Demonstration DI (Ubuntu 10.10 – KDE Desktop) [717Mb]]*
+*   *link:http://theqvd.com/product/download/demo-image-ubuntu-kde[QVD Demonstration DI (Ubuntu 10.10 – KDE Desktop) [717Mb]]*
 
 [NOTE]
 ============================================================================================
