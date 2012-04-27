@@ -24,4 +24,26 @@ sub _die {
     die @_;
 }
 
+sub table_column {
+    my ($self, $key_col, $value_col) = @_;
+
+    my %cols;
+    my $colno = 0;
+    foreach my $col ( @{$self->table_header} ) {
+        $cols{$col} = $colno++;
+    }
+
+    die "$key_col column missing" unless(exists $cols{$key_col});
+    die "$value_col column missing" unless(exists $cols{$value_col});
+
+    my $name_col = $cols{$key_col};
+    my $want_col = $cols{$value_col};
+
+    return map { $_->[$name_col] => $_->[$want_col] } @{$self->table_body};
+}
+
+
+
+
+
 1;

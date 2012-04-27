@@ -6,9 +6,10 @@ use strict;
 
 our $VERSION = '0.01';
 
-INIT {
-    Test::Class->runtests
-}
+# Removed follow code, makes tests run twice. Tests already run from t/500-runtests
+#INIT {
+#    Test::Class->runtests
+#}
 
 1;
 

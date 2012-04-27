@@ -13,6 +13,9 @@ WriteMakefile(
         'Test::Class' 	=> 0,
 	'File::Slurp'	=> 0,
         'Test::More' 	=> 0,
+        'X11::GUITest'  => 0,
+        'parent'        => 0,
+        'lib::glob'     => 0 
     },
     dist                => { COMPRESS => 'gzip -9f', SUFFIX => 'gz', },
     clean               => { FILES => 'QVD-Test-*' },

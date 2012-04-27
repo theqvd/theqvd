@@ -1,12 +1,15 @@
 package QVD::Test::AdminCLI;
 use parent qw(QVD::Test);
 
-use lib::glob '*/lib';
+use lib 'lib';
 
 use strict;
 use warnings;
+use Data::Dumper qw(Dumper);
 
 use Test::More qw(no_plan);
+
+$| = 1;
 
 BEGIN {
     $QVD::Config::USE_DB = 0;
@@ -19,27 +22,44 @@ use QVD::HTTPC;
 use QVD::Test::Mock::AdminCLI;
 use MIME::Base64 qw(encode_base64);
 use JSON;
+use Carp;
+
+my $test_done;
 
 sub check_environment : Test(startup => 2) {
-    my $noded_executable = 'QVD-Test/bin/qvd-noded.sh';
+    my $hkd_executable = '/etc/init.d/qvd-hkd';
+
+    if ( $test_done ) {
+        confess("Being called a second time!");
+#    } else {
+ #       confess("Being called the first time");
+    }
+
+    $test_done = 1;
 
     ok(-f '/etc/qvd/node.conf',		'Existence of QVD configuration, node.conf');
-    ok(-x $noded_executable,		'QVD node installation');
+    ok(-x $hkd_executable,		'QVD HKD installation');
 
     my $httpc = QVD::HTTPC->new('localhost:8443',SSL=>1,SSL_verify_callback=>sub {1});
     $httpc->send_http_request(GET => '/qvd/ping');
     my $response_code = ($httpc->read_http_response())[0];
-    fail('QVD node not running') if $response_code ne 200;
+    fail("QVD HKD not running (response $response_code)") if $response_code ne 200;
 }
 
 sub main_test : Test {
     my $self = shift;
-    my @tests = qw(user_add user_list_with_filter user_login_with_httpc
-    user_passwd user_del osi_add vm_add vm_edit vm_del vm_delete_on_user_delete
-    vm_start osi_del config_get);
+    my @tests = qw(user_del_all di_del osf_del user_add user_list_with_filter user_login_with_httpc
+    user_passwd user_del osf_add di_add vm_add vm_edit vm_del vm_delete_on_user_delete
+    vm_start di_del osf_del config_get user_del_all);
     foreach my $test (@tests) {
-	$self->{adm} = new QVD::Test::Mock::AdminCLI(1);
-	$self->$test;
+        print "########## Test $test ############\n";
+        eval {
+        	$self->{adm} = new QVD::Test::Mock::AdminCLI(1);
+	        $self->$test;
+        };
+        if ( $@ ) {
+            warn $@;
+        }
     }
 }
 
@@ -57,14 +77,50 @@ sub user_add {
     my $self = shift;
     my $adm = $self->{adm};
     for my $i (0..9) {
-	$adm->cmd_user_add("login=qvd$i", "password=qvd");
-	$adm->cmd_user_add("login=xvd$i", "password=qvd");
+        eval {
+	        $adm->cmd_user_add("login=qvd$i", "password=qvd");
+        };
+        if ( $@ ) {
+            fail("Failed to create user qvd$i");
+        } else {
+            ok(1, "Create user qvd$i");
+        }
+
+        eval {
+        	$adm->cmd_user_add("login=xvd$i", "password=qvd");
+        }; 
+        if ( $@ ) {
+            fail("Failed to create user xvd$i");
+        } else {
+            ok(1, "Create user xvd$i");
+        }
     }
+
     $adm->cmd_user_list();
     my %user_list = map { $_->[1] => 1 } @{$adm->table_body};
-    ok($user_list{qvd0},	'User qvd0 was created');
-    ok($user_list{xvd0},	'User xvd0 was created');
+
+    for my $i (0..9) {
+        ok($user_list{"qvd$i"},	"Verify: User qvd$i was created");
+        ok($user_list{"xvd$i"},	"Verify: User xvd$i was created");
+    }
 }
+
+sub user_del_all {
+    my $self = shift;
+    my $adm = $self->{adm};
+
+    $adm->set_filter('login=qvd*');
+    $adm->cmd_user_del();
+
+    $adm->cmd_user_list();
+    my %user_list = map { $_->[1] => 1 } @{$adm->table_body};
+
+    for my $i (0..9) {
+        ok(!exists $user_list{qvd0},	'User qvd0 was deleted');
+        ok(!exists $user_list{xvd0},	'User xvd0 was deleted');
+    }
+}
+
 
 sub user_list_with_filter {
     my $self = shift;
@@ -85,7 +141,7 @@ sub user_passwd {
     my $self = shift;
     my $adm = $self->{adm};
     $adm->set_mock_password('xvd0');
-    $adm->cmd_user_passwd('xvd0');
+    $adm->cmd_user_passwd('user=xvd0');
     is($self->_check_login(xvd0=>'xvd0'), 200,	'Check login after password change');
     is($self->_check_login(qvd0=>'qvd'), 200,	'Check user qvd0 login');
 }
@@ -127,17 +183,17 @@ sub _check_login {
 #
 ################################################################################
 
-sub osi_add {
+sub osf_add {
     my ($self) = @_;
     my $adm = $self->{adm};
-    $adm->cmd_osi_add('name=qvd',
-	'disk_image=/var/lib/qvd/storage/staging/ubuntu-10.04-i386.qcow2');
-    $adm->cmd_osi_list();
-    my %osi_list = map { $_->[1] => 1 } @{$adm->table_body};
-    ok($osi_list{qvd},				'Check creation of OSI "qvd"');
+    $adm->cmd_osf_add('name=qvd');
+#	'disk_image=/var/lib/qvd/storage/staging/ubuntu-10.04-i386.qcow2');
+    $adm->cmd_osf_list();
+    my %osf_list = map { $_->[1] => 1 } @{$adm->table_body};
+    ok($osf_list{qvd},				'Check creation of OSF "qvd"');
 }
 
-sub osi_del {
+sub osf_del {
     my ($self) = @_;
     my $adm = $self->{adm};
     $adm->set_filter('name=vm*');
@@ -145,19 +201,50 @@ sub osi_del {
 
     $adm = new QVD::Test::Mock::AdminCLI(1);
     $adm->set_filter('name=qvd');
-    $adm->cmd_osi_del();
+    $adm->cmd_osf_del();
 
     $adm = new QVD::Test::Mock::AdminCLI(1);
-    $adm->cmd_osi_list();
-    my %osi_list = map { $_->[1] => 1 } @{$adm->table_body};
-    ok(!exists$osi_list{qvd},			'Check deletion of OSI "qvd"');
+    $adm->cmd_osf_list();
+    my %osf_list = map { $_->[1] => 1 } @{$adm->table_body};
+    ok(!exists$osf_list{qvd},			'Check deletion of OSF "qvd"');
 }
+
+sub di_add {
+    my ($self) = @_;
+    my $adm = $self->{adm};
+    my $id = $self->get_osf_id('qvd');
+
+    $adm->cmd_di_add("osf_id=$id", 'path=/var/lib/qvd/storage/staging/2-test.tgz');
+
+    $adm = new QVD::Test::Mock::AdminCLI(1);
+    $adm->cmd_di_list();
+    my %osf_list = map { $_->[1] => 1 } @{$adm->table_body};
+    ok($osf_list{$id},				'Check creation of OSF "qvd"');
+}
+
+sub di_del {
+    my ($self) = @_;
+    my $adm = $self->{adm};
+    my $id = $self->get_osf_id('qvd');
+
+    if ( $id ) {
+        $adm->set_filter("osf_id=$id");
+        $adm->cmd_di_del();
+    }
+
+    $adm = new QVD::Test::Mock::AdminCLI(1);
+    $adm->cmd_di_list();
+    my %di_list = map { $_->[1] => 1 } @{$adm->table_body};
+    print "DI list:\n" .  Dumper(\%di_list);
+    ok(!exists$di_list{$id},			'Check deletion of DI of OSF "qvd"');
+}
+
 
 sub vm_add {
     my $self = shift;
     my $adm = $self->{adm};
     foreach (0..9) {
-	$adm->cmd_vm_add("name=vm$_", "user=qvd$_", "osi=qvd");
+	    $adm->cmd_vm_add("name=vm$_", "user=qvd$_", "osf=qvd");
     }
 
     my $httpc = QVD::HTTPC->new('localhost:8443',SSL=>1,SSL_verify_callback=>sub {1});
@@ -205,11 +292,9 @@ sub vm_start {
     $adm->set_filter('name=vm1');
     $adm->cmd_vm_start();
 
-    sleep 60;
-    $adm = new QVD::Test::Mock::AdminCLI(1);
-    $adm->cmd_vm_list();
-    my %vm_list = map { $_->[1] => $_->[5] } @{$adm->table_body};
-    is($vm_list{vm1}, 'running',		'Check start of vm "vm1"');
+    my %vm_list;
+
+    wait_for_col_value( vm => 'vm1', col => 'State', value => 'running', message => 'Check start of vm "vm1"', timeout => 300);
 
     $adm = new QVD::Test::Mock::AdminCLI(1);
     $adm->set_filter('name=vm1');
@@ -222,37 +307,71 @@ sub vm_start {
 
     $adm = new QVD::Test::Mock::AdminCLI(1);
     $adm->set_filter('name=qvd');
-    $adm->cmd_osi_del();
+    $adm->cmd_osf_del();
 
     $adm = new QVD::Test::Mock::AdminCLI(1);
-    $adm->cmd_osi_list();
-    my %osi_list = map { $_->[1] => 1 } @{$adm->table_body};
-    ok(exists $osi_list{qvd},			'Check osi del fail with VMs defined');
+    $adm->cmd_osf_list();
+    my %osf_list = map { $_->[1] => 1 } @{$adm->table_body};
+    ok(exists $osf_list{qvd},			'Check osf del fail with VMs defined');
 
     $adm = new QVD::Test::Mock::AdminCLI(1);
     $adm->set_filter('name=vm1');
     $adm->cmd_vm_block();
 
-    $adm = new QVD::Test::Mock::AdminCLI(1);
-    $adm->cmd_vm_list();
-    %vm_list = map { $_->[1] => $_->[7] } @{$adm->table_body};
-    is($vm_list{vm1}, '1',			'Check vm "vm1" becomes blocked');
+    wait_for_col_value( vm => 'vm1', col => 'Blocked', value => '1', message => 'Wait for vm1 to become blocked', timeout => 30);
 
     $adm = new QVD::Test::Mock::AdminCLI(1);
     $adm->set_filter('name=vm1');
     $adm->cmd_vm_stop();
 
-    sleep 60;
-    $adm = new QVD::Test::Mock::AdminCLI(1);
-    $adm->cmd_vm_list();
-    %vm_list = map { $_->[1] => $_->[5] } @{$adm->table_body};
-    is($vm_list{vm1}, 'stopped',		'Check stop of vm "vm1"');
+    wait_for_col_value( vm => 'vm1', col => 'State', value => 'stopped', message => 'Check stop of vm "vm1"', timeout => 300);
+    
 }
 
 sub config_get {
     my $self = shift;
     my $adm = $self->{adm};
     $adm->cmd_config_get;
+}
+
+sub get_osf_id {
+    my ($self, $osf) = @_;
+    
+    my $adm = new QVD::Test::Mock::AdminCLI(1);
+    $adm->cmd_osf_list();
+    my %osf_list = map { $_->[1] => $_ } @{$adm->table_body};
+    return $osf_list{qvd}->[0];
+}
+
+
+
+
+sub wait_for_col_value {
+    my %args = @_;
+
+    die "Missing arguments" unless ( $args{vm} && $args{col} && $args{value} && $args{message} && $args{timeout} );
+
+    my $adm = new QVD::Test::Mock::AdminCLI(1);
+    my $time = 0;
+
+    while(1) {
+        $adm->cmd_vm_list();
+        my %vm_list = $adm->table_column("Name", $args{col});
+
+        if ( !exists $vm_list{ $args{vm} } ) {
+            die "VM " . $args{vm} . " doesn't exist. VMs: " . join(', ', keys %vm_list);
+        }
+
+        if ( $time++ > $args{timeout} || ( $vm_list{$args{vm}} eq  $args{value} ) ) {
+            print "\n";
+            is($vm_list{$args{vm}}, $args{value}, $args{message});
+            last;
+        }
+       
+        print ".";
+        sleep(1); 
+    }
+
 }
 
 1;
