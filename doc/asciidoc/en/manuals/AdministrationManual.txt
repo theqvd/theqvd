@@ -216,6 +216,38 @@ of all running virtual machines, it checks the database to determine
 if there are any VM state changes, implements any changes to VM state,
 and updates information in the database pertaining to VM state.
 
+.Typical Virtual Machine Runtime States (KVM) and HKD behavior
+image::../images/HKD-VM-states.png[alt="Typical Virtual Machine Runtime States (KVM) and HKD behavior", width="250"]
+
+As per the diagram above, these are typical examples of the different Machine States that the HKD will return for
+a Virtual Machine starting up using KVM.
+
+* *Stopped*: the VM is not running on any host
+* *Starting 1*: the HKD has received the start command but is waiting until it has the resources available to move to the next machine state
+* *Starting 2*: the VM has been started but the boot process has not yet completed
+* *Running*: the VM is running on a host
+* *Stopping 1*: the HKD received the stop command but is waiting for the VMA within the VM to respond to the request
+* *Stopping 2*: the VMA has responded to the stop request and the VM is in the process of shutting down
+* *Zombie 1*: The VM is running but is not responding, a TERM signal has been sent to the process
+* *Zombie 2*: The VM is running but is not responding, a KILL signal has been sent to the process
+
+DI Tags
++++++++
+
+QVD supports the ability to "tag" Disk Images. This feature is important, because it allows you
+to easily change Disk Image versions for Virtual Machines. If you are making a change to the Disk Image
+that a large number of users are already making use of, you can assign it a new DI Tag. You are then
+able to roll the change out to as many virtual desktops as you require by changing the DI Tag that the
+Virtual Machine is set to load. If something goes wrong, rollback is as simple as updating the DI Tag
+being used by a Virtual Machine.
+
+When the HKD loads a Virtual Machine, it checks the DI Tag for that Virtual Machine within the QVD-DB, and
+ensures that the correct Disk Image is used during the startup phase. Therefore, if a DI Tag is changed while
+a Virtual Machine is running, the change will not be implemented until the Virtual Machine has been restarted.
+
+You can find more information on how to change DI Tags using the QVD Command Line Utility <<di_tags,here>>.
+There is also some information on how to manage DI Tags within the QVD Web Administration Tool <<disk_images, here>>.
+
 QVD Client and L7R Server Node Interactions
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
@@ -264,7 +296,7 @@ the change in virtual machine status.
 The process flow is indicated in the following diagram:
 
 .Protocols and process flow for Client/Server Node interaction
-image::../images/client_server_protocol.png[alt="Protocols and process flow for Client/Server Node interaction" width=98%]
+image::../images/client_server_protocol.png[alt="Protocols and process flow for Client/Server Node interaction" width=90%]
 
 L7R in an HA load-balanced environment
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
