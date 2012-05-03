@@ -260,9 +260,5 @@ this will break the QVD installation. Any changes made to the data
 stored in the database, outside of those achieved using the QVD tools,
 will void any support agreement.
 
-NOTE: This diagram is under review and will be updated in later
-versions of this manual, in an effort to fit more closely with the
-actual tables within the database.
-
 .QVD-DB General Data Model
 image::../images/data-model.png[alt="QVD-DB General Data Model" width=98%]
