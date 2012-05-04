@@ -18,6 +18,7 @@ if ( -x "/usr/bin/lsb_release" ) {
 
 	my $ver = `/usr/bin/lsb_release -r`;
 	$ver =~ /:\s+([.0-9]+)/;
+	$ver = $1;
 
 	plan tests => 11;
 	ok(version->parse("v$ver") ge 'v10.04', "Detected Ubuntu $ver, need at least 10.04");
