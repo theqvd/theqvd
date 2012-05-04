@@ -20,7 +20,7 @@ if ( -x "/usr/bin/lsb_release" ) {
 	$ver =~ /:\s+([.0-9]+)/;
 	$ver = $1;
 
-	plan tests => 11;
+	plan tests => 12;
 	ok(version->parse("v$ver") ge 'v10.04', "Detected Ubuntu $ver, need at least 10.04");
 } else {
 	plan skip_all => "Not Ubuntu linux (/usr/bin/lsb_release not found)";
@@ -56,5 +56,8 @@ ok(!system('apt-get -y purge qvd-wat'), 'Purging qvd-wat');
 
 # remove automatically installed dependencies
 system('apt-get -y autoremove');
+
+# Reinstall
+ok(!system('apt-get -y --force-yes install qvd-node'), 'Installing qvd-node');
 
 1;
