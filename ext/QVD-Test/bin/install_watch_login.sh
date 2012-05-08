@@ -1,10 +1,13 @@
 #!/bin/bash 
+set -x
 
-echo "LpwdeQND"  | ssh -o "StrictHostKeyChecking no" -o  "PasswordAuthentication yes" -o "UserKnownHostsFile /dev/null" root@qvd-test2 'ls -l' &> /dev/null
+HOST=$1
+
+ssh -o "StrictHostKeyChecking no" -o  "PasswordAuthentication yes" -o "UserKnownHostsFile /dev/null" root@$HOST 'ls -l' &> /dev/null
 while [ $? -ne 0  ]
 do
         sleep 10
-        echo "LpwdeQND" | ssh -o "StrictHostKeyChecking no" -o  "PasswordAuthentication yes" -o "UserKnownHostsFile /dev/null" root@qvd-test2 'ls -l' &> /dev/null
+	ssh -o "StrictHostKeyChecking no" -o  "PasswordAuthentication yes" -o "UserKnownHostsFile /dev/null" root@$HOST 'ls -l' &> /dev/null
 done
 
 echo login
