@@ -42,7 +42,6 @@ case $ACTION in
   	   ipmitool -I lanplus -H $host -U $ipmi_user -P $ipmi_pass chassis bootdev pxe
       	   ipmitool -I lanplus -H $host -U $ipmi_user -P $ipmi_pass chassis power reset
 	   sleep 20 
-	   ipmitool -I lanplus -H $host -U $ipmi_user -P $ipmi_pass sol activate
  ;;
  console) 
    ipmitool -I lanplus -H $host -U $ipmi_user -P $ipmi_pass sol activate
