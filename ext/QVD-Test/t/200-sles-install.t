@@ -27,7 +27,7 @@ if ( open(SR, '<', '/etc/SuSE-release' ))  {
 
 	plan tests => 45;
 
-	ok(version->parse("v$ver.$rev") ge 'v11.2', "Detected SLES $ver.$rev, need at least 11.2");
+	#ok(version->parse("v$ver.$rev") ge 'v11.2', "Detected SLES $ver.$rev, need at least 11.2");
 } else {
 	plan skip_all => "Not SuSE linux (/etc/SuSE-release not found)";
 }
@@ -43,7 +43,7 @@ SKIP: {
 
 SKIP: {
 	skip( "Repository addition not needed", 1 ) if ( $ret == 1 );
-	ok( run("zypper", "addrepo", "--gpg-auto-import-keys" ,"-c", $REPO, "QVD"), "Add repository");
+	ok( run("zypper", "addrepo", "-G" ,"-c", $REPO, "QVD"), "Add repository");
 }
 
 
