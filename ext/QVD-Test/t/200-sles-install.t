@@ -43,7 +43,7 @@ SKIP: {
 
 SKIP: {
 	skip( "Repository addition not needed", 1 ) if ( $ret == 1 );
-	ok( run("zypper", "addrepo", "-c", $REPO, "QVD"), "Add repository");
+	ok( run("zypper", "addrepo", "--gpg-auto-import-keys" ,"-c", $REPO, "QVD"), "Add repository");
 }
 
 
