@@ -1,0 +1,32 @@
+Slide and Video Presentations - Marketing Collateral
+====================================================
+
+Better TCO
+----------
+QVD can help you greatly reduce TCO across your entire IT infrastructure. If you're not already using Linux for your desktop workstations, you could reduce your TCO by up to 40% by simply cutting licensing costs and using Linux to handle the majority of your desktop workstation requirements. http://www.ibm.com/linux/whitepapers/robertFrancesGroupLinuxTCOAnalysis05.pdf
+
+But simply converting all of your desktops to Linux can also make administration difficult. That's where QVD comes in. By taking advantage of the desktop virtualization provided by QVD, you can standardize your Linux desktops and greatly reduce your administration tasks.
+
+Traditional Desktop vs QVD
+~~~~~~~~~~~~~~~~~~~~~~~~~~
+But desktop virtualization can also help you to reduce the costs associate with the traditional desktop workstation by reducing the amount of money that you need to invest in the powerful desktop computers that are required to run modern software. Since all of the processing required to serve a desktop and run applications can be handled by the QVD servers, future desktop computer purchasing is limited to low-cost and energy efficient systems. For instance, a single desktop computer today will need a couple of gigabytes of RAM, a fairly hefty processor, and plenty of disk space to go. Since QVD reuses disk images across multiple users, your disk space requirements are exceedingly limited. Since your QVD clients will not need to do very much processing, you can opt for very low-end systems for your end-users.
+
+Horizontal and Vertical Scalability with QVD
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+You may be wondering about the cost of running your QVD infrastructure. QVD is both horizontally and vertically scalable. That means that you can grow as you need to. QVD provides its own clustering and routing mechanisms which can be achieved using white-box PCs. That means that you can choose whether you want to scale up by adding more hardware to your existing systems, or whether you just want to add more systems to the cluster. Since QVD manages resources more efficiently than your average desktop workstation, many virtual desktops can be served from a single server node... allowing you to greatly reduce hardware costs.
+
+Other Virtualization Benefits
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+By virtualizing your desktop infrastructure with QVD, you will reduce hardware costs and licensing fees. But there are other savings that are more difficult to measure. For instance, your backup and disaster strategy can be greatly simplified, since all user data is centralized and application and operating resources are shared across users. This means that you will not need as much space for backups, configuring backups will be less complicated, and your disaster recovery plan will be more robust than ever before. The amount of time and money spent on desktop support can also be reduced, since computers can be easily substituted with little effect on a user's access to applications and resources. Similarly you will also save on the cost of provisioning remote access to resources, applications and data as the ability to access a virtual desktop securely from a remote location is one of QVD's many features.
+
+An Open Source Model
+~~~~~~~~~~~~~~~~~~~~
+Unlike most other VDI suites, QVD is entirely open-source. This means that you do not experience vendor lock-in. If you need to migrate your data in the future, you will not find that you have unexpected costs in trying to get it into a format that allows you to integrate with a new provider. Furthermore, you get all of the benefits that come out of the open-source community, including the ability to source alternative help along with new features or bug-fixes that are submitted by the open-source community.
+
+This usually means that you don't have to pay for a new set of licenses when a newer version of the software is released. Every patch, bug-fix or new range of features is available to you with each new release.
+
+Comparative Pricing
+~~~~~~~~~~~~~~~~~~~
+If you're already convinced that virtualization is the way to go, consider the incredible savings that you can make by selecting QVD as your platform of choice. Comparatively, QVD is significantly less expensive than every other vendor in the market. Since QVD is freely-available under our 'Community Edition' license, you aren't paying for software when you buy a QVD license. You're paying for service. Our commercial licensing fees are geared toward providing you with competitive service and support that will make QVD an asset to your organization.
+
+Try QVD now to see how you can lower the TCO of your entire infrastructure.
