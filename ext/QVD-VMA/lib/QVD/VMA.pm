@@ -532,7 +532,7 @@ sub _start_session {
 	    DEBUG "awaking nxagent";
 	    _save_printing_config(%props);
 	    _save_nxagent_state_and_call_hook 'initiating';
-        _make_nxagent_config(%props);
+            _make_nxagent_config(%props);
 	    kill HUP => $pid;
 	    _call_action_hook(connect => %props);
 	}

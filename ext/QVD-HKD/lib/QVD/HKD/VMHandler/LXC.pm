@@ -29,23 +29,24 @@ use QVD::StateMachine::Declarative
 
     'starting/loading_row'            => { enter       => '_load_row',
                                            transitions =>  { _on_load_row_done           => 'starting/updating_stats',
-                                                             _on_load_row_bad_result     => 'stopping/clearing_runtime_row'    } },
+                                                             _on_load_row_error          => 'stopping/clearing_runtime_row'    } },
 
     'starting/updating_stats'         => { enter       => '_incr_run_attempts',
                                            transitions =>  { _on_incr_run_attempts_done  => 'starting/searching_di',
-                                                             _on_incr_run_attempts_bad_result => 'stopping/clearing_runtime_row'} },
+                                                             _on_incr_run_attempts_error => 'stopping/clearing_runtime_row'} },
 
     'starting/searching_di'           => { enter       => '_search_di',
                                            transitions => { _on_search_di_done           => 'starting/saving_runtime_row',
-                                                            _on_search_di_bad_result     => 'stopping/clearing_runtime_row'     } },
+                                                            _on_search_di_error          => 'stopping/clearing_runtime_row'     } },
 
     'starting/saving_runtime_row'     => { enter       => '_save_runtime_row',
                                            transitions => { _on_save_runtime_row_done    => 'starting/deleting_cmd',
-                                                            _on_save_runtime_row_bad_result => 'stopping/clearing_runtime_row'  },
+                                                            _on_save_runtime_row_error   => 'stopping/clearing_runtime_row'  },
                                            ignore      => ['_on_save_runtime_row_result']                                         },
 
     'starting/deleting_cmd'           => { enter       => '_delete_cmd',
-                                           transitions => { _on_delete_cmd_done          => 'starting/calculating_attrs'        } },
+                                           transitions => { _on_delete_cmd_done          => 'starting/calculating_attrs',
+                                                            _on_delete_cmd_error         => 'starting/calculating_attrs'        } },
 
     'starting/calculating_attrs'      => { enter       => '_calculate_attrs',
                                            transitions => { _on_calculate_attrs_done     => 'starting/setting_heavy_mark'       } },
@@ -126,12 +127,12 @@ use QVD::StateMachine::Declarative
 
     'running/saving_state'            => { enter       => '_save_state',
                                            transitions => { _on_save_state_done          => 'running/updating_stats',
-                                                            _on_save_state_bad_result    => 'stopping/saving_state'           },
+                                                            _on_save_state_error         => 'stopping/saving_state'           },
                                            delay       => [qw(_on_lxc_done)]                                                    },
 
     'running/updating_stats'          => { enter       => '_incr_run_ok',
                                            transitions =>  { _on_incr_run_ok_done        => 'running/running_poststart_hook',
-                                                             _on_incr_run_ok_bad_result  => 'running/running_poststart_hook'  },
+                                                             _on_incr_run_ok_error       => 'running/running_poststart_hook'  },
                                            delay       => [qw(_on_lxc_done)],
                                            ignore      => [qw(_on_incr_run_ok_result)]                                          },
 
@@ -153,7 +154,7 @@ use QVD::StateMachine::Declarative
 
     'debugging/saving_state'          => { enter       => '_save_state',
                                            transitions => { _on_save_state_done          => 'debugging/unsetting_heavy_mark',
-                                                            _on_save_state_bad_result    => 'stopping/saving_state'           },
+                                                            _on_save_state_error         => 'stopping/saving_state'           },
                                            delay       => [qw(_on_lxc_done)]                                                    },
 
     'debugging/unsetting_heavy_mark'  => { enter       => '_unset_heavy_mark',
@@ -253,14 +254,15 @@ use QVD::StateMachine::Declarative
 
     'zombie/unlinking_iface'          => { enter       => '_unlink_iface',
                                            transitions => { _on_unlink_iface_done        => 'zombie/removing_fw_rules',
-                                                            _on_unlink_iface_error       => 'zombie/beating_to_death'        } },
+                                                            _on_unlink_iface_error       => 'zombie/unsetting_heavy_mark'    } },
 
     'zombie/removing_fw_rules'        => { enter       => '_remove_fw_rules',
                                            transitions => { _on_remove_fw_rules_done     => 'zombie/destroying_lxc',
                                                             _on_remove_fw_rules_error    => 'zombie/unsetting_heavy_mark'    } },
 
     'zombie/destroying_lxc'           => { enter       => '_destroy_lxc',
-                                           transitions => { _on_destroy_lxc_done         => 'zombie/unmounting_filesystems'  } },
+                                           transitions => { _on_destroy_lxc_done         => 'zombie/unmounting_filesystems',
+                                                            _on_destroy_lxc_error        => 'zombie/unmounting_filesystems'  } },
 
     'zombie/unmounting_filesystems'   => { enter       => '_unmount_filesystems',
                                            transitions => { _on_unmount_filesystems_done => 'zombie/clearing_runtime_row',

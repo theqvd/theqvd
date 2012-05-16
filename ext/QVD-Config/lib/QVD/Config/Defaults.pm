@@ -18,6 +18,10 @@ database.user = qvd
 database.name = qvd
 # database.password =
 
+internal.database.poll.connection.timeout = 8
+internal.database.poll.size = 2
+internal.database.poll.connection.delay = 2
+internal.database.poll.connection.retries = 60
 model.user.login.case-sensitive = 0
 
 ## directory where several configuration, state, pid and certificate files are stored

@@ -13,7 +13,7 @@ our $debug;
 
 use parent qw(QVD::HKD::Agent);
 
-use QVD::StateMachine::Declarative 
+use QVD::StateMachine::Declarative
     new      => { transitions => { _on_run      => 'running'  } },
 
     running  => { enter => '_run_dhcpd',

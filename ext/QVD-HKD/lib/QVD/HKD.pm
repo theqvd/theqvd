@@ -7,7 +7,7 @@ use 5.010;
 our $debug = 1;
 
 $Class::StateMachine::debug ||= -1;
-$AnyEvent::Pg::debug ||= 6;
+$AnyEvent::Pg::debug ||= ~0;
 
 use strict;
 use warnings;
@@ -20,7 +20,7 @@ use Pg::PQ qw(:pgres);
 use QVD::Log;
 use AnyEvent::Impl::Perl;
 use AnyEvent;
-use AnyEvent::Pg;
+use AnyEvent::Pg::Pool;
 use Linux::Proc::Net::TCP;
 
 use Time::HiRes ();
@@ -40,78 +40,87 @@ use QVD::HKD::Config::Network qw(netvms netnodes);
 use parent qw(QVD::HKD::Agent);
 
 use QVD::StateMachine::Declarative
-    'new'                            => { transitions => { _on_run                    => 'starting/acquiring_lock'      } },
+    'new'                            => { transitions => { _on_run                    => 'starting/acquiring_lock'        } },
 
     'starting/acquiring_lock'        => { enter       => '_acquire_lock',
                                           transitions => { _on_acquire_lock_done      => 'starting/checking_tcp_ports',
-                                                           _on_acquire_lock_error     => 'failed'                       } },
+                                                           _on_acquire_lock_error     => 'failed'                         } },
     'starting/checking_tcp_ports'    => { enter       => '_check_tcp_ports',
                                           transitions => { _on_check_tcp_ports_done   => 'starting/connecting_to_db',
-                                                           _on_check_tcp_ports_error  => 'failed'                       } },
+                                                           _on_check_tcp_ports_error  => 'failed'                         } },
 
     'starting/connecting_to_db'      => { enter       => '_start_db',
-                                          transitions => { _on_db_connected           => 'starting/loading_db_config'   } },
+                                          transitions => { _on_db_connected           => 'starting/loading_db_config'     } },
 
     'starting/loading_db_config'     => { enter       => '_start_config',
-                                          transitions => { _on_config_reloaded        => 'starting/loading_host_row'    } },
+                                          transitions => { _on_config_reload_done     => 'starting/loading_host_row',
+                                                           _on_config_reload_error    => 'failed'                         } },
 
     'starting/loading_host_row'      => { enter       => '_load_host_row',
-                                          transitions => { _on_load_host_row_done     => 'starting/removing_old_fw_rules' } },
+                                          transitions => { _on_load_host_row_done     => 'starting/removing_old_fw_rules',
+                                                           _on_load_host_row_error    => 'failed'                         } },
 
     'starting/removing_old_fw_rules' => { enter       => '_remove_fw_rules',
-                                          transitions => { _on_remove_fw_rules_done   => 'starting/setting_fw_rules'    } },
+                                          transitions => { _on_remove_fw_rules_done   => 'starting/setting_fw_rules'      } },
 
     'starting/setting_fw_rules'      => { enter       => '_set_fw_rules',
                                           transitions => { _on_set_fw_rules_done      => 'starting/saving_loadbal_data',
-                                                           _on_set_fw_rules_error     => 'failed'                       } },
+                                                           _on_set_fw_rules_error     => 'failed'                         } },
 
     'starting/saving_loadbal_data'   => { enter       => '_save_loadbal_data',
-                                          transitions => { _on_save_loadbal_data_done => 'starting/ticking'             } },
+                                          transitions => { _on_save_loadbal_data_done => 'starting/ticking',
+                                                           _on_save_loadbal_data_error => 'stopping/removing_fw_rules'    } },
 
     'starting/ticking'               => { enter       => '_start_ticking',
                                           transitions => { _on_ticked                 => 'starting/checking',
-                                                           _on_ticker_error           => 'failed'                       } },
+                                                           _on_ticker_error           => 'stopping/removing_fw_rules'     } },
 
     'starting/checking'              => { enter       => '_start_checking',
                                           transitions => { _on_checked                => 'starting/catching_zombies',
-                                                           _on_checker_error          => 'failed'                       } },
+                                                           _on_checker_error          => 'stopping/removing_fw_rules'     } },
 
     'starting/catching_zombies'      => { enter       => '_catch_zombies',
-                                          transitions => { _on_catch_zombies_done     => 'starting/agents'              } },
+                                          transitions => { _on_catch_zombies_done     => 'starting/agents',
+                                                           _on_catch_zombies_error    => 'stopping/removing_fw_rules'     } },
 
     'starting/agents'                => { enter       => '_start_agents',
-                                          transitions => { _on_agents_started         => 'running/saving_state'         } },
+                                          transitions => { _on_agents_started         => 'running/saving_state'           } },
 
     'running/saving_state'           => { enter       => '_save_state',
-                                          transitions => { _on_save_state_done        => 'running/agents'               } },
+                                          transitions => { _on_save_state_done        => 'running/agents',
+                                                           _on_save_state_error       => 'stopping/killing_all_vms'       } },
 
     'running/agents'                 => { enter       => '_start_vm_command_handler',
-                                          transitions => { _on_start_vm_command_handler_done => 'running'               } },
+                                          transitions => { _on_start_vm_command_handler_done => 'running'                 } },
 
-    'running'                        => { transitions => { _on_cmd_stop               => 'stopping'                     } },
+    'running'                        => { transitions => { _on_cmd_stop               => 'stopping',
+                                                           _on_dead_db                => 'stopping/killing_all_vms',
+                                                           _on_ticker_error           => 'stopping/killing_all_vms'       } },
 
-    'stopping'                       => { jump        => 'stopping/saving_state'                                          },
+    'stopping'                       => { jump        => 'stopping/saving_state'                                            },
 
     'stopping/saving_state'          => { enter       => '_save_state',
-                                          transitions => { _on_save_state_done        => 'stopping/stopping_all_vms'    } },
+                                          transitions => { _on_save_state_done        => 'stopping/stopping_all_vms',
+                                                           _on_save_state_error       => 'stopping/killing_all_vms'       } },
 
     'stopping/stopping_all_vms'      => { enter       => '_stop_all_vms',
                                           leave       => '_abort_all',
                                           transitions => { _on_stop_all_vms_done      => 'stopping/stopping_all_agents',
-                                                           _on_state_timeout          => 'stopping/killing_all_vms'     } },
+                                                           _on_state_timeout          => 'stopping/killing_all_vms'       } },
 
     'stopping/killing_all_vms'       => { enter       => '_kill_all_vms',
                                           leave       => '_abort_all',
-                                          transitions => { _on_kill_all_vms_done      => 'stopping/stopping_all_agents' } },
+                                          transitions => { _on_kill_all_vms_done      => 'stopping/stopping_all_agents'   } },
 
     'stopping/stopping_all_agents'   => { enter       => '_stop_all_agents',
-                                          transitions => { _on_all_agents_stopped     => 'stopping/removing_fw_rules'   } },
+                                          transitions => { _on_all_agents_stopped     => 'stopping/removing_fw_rules'     } },
 
     'stopping/removing_fw_rules'     => { enter       => '_remove_fw_rules',
-                                          transitions => { _on_remove_fw_rules_done   => 'stopped/saving_state'         } },
+                                          transitions => { _on_remove_fw_rules_done   => 'stopped/saving_state'           } },
 
     'stopped/saving_state'           => { enter       => '_save_state',
-                                          transitions => { _on_save_state_done        => 'stopped/bye'                  } },
+                                          transitions => { _on_save_state_done        => 'stopped/bye',
+                                                           _on_save_state_error       => 'stopped/bye'                    } },
 
     'stopped/bye'                    => { enter       => '_say_goodbye'                                                   },
 
@@ -125,6 +134,8 @@ sub _on_checker_error :OnState(__any__) {}
 sub _on_stop_all_vms_done :OnState(__any__) {}
 sub _on_cmd_stop :OnState(__any__) { shift->delay_until_next_state }
 
+sub _on_dead_db :OnState(__any__) { shift->delay_until_next_state }
+
 sub new {
     my ($class, %opts) = @_;
     # $opts{$_} //= $defaults{$_} for keys %defaults;
@@ -132,8 +143,8 @@ sub new {
 
     my $self = $class->SUPER::new(%opts);
     $self->{config} = QVD::HKD::Config->new(config_file => $config_file,
-                                            on_reload_done => sub { $self->_on_config_reloaded },
-                                            on_reload_error => sub { $self->_on_config_reload_error } );
+                                            on_reload_done => sub { $self->_on_config_reload_done },
+                                            on_reload_error => sub { $self->_on_config_reload_error });
     $self->{vm} = {};
     $self->{heavy} = {};
     $self->{delayed} = {};
@@ -168,7 +179,10 @@ sub _acquire_lock {
 sub _say_goodbye {
     my $self = shift;
     $self->{exit}->send;
+    $debug and $self->_debug("GOODBYE!");
     DEBUG "GOODBYE!\n";
+
+    exit(0);
 }
 
 sub _on_signal {
@@ -235,13 +249,18 @@ sub _check_tcp_ports {
 sub _start_db {
     my $self = shift;
     INFO 'Connecting to database';
-    my $db = AnyEvent::Pg->new( {host     => $self->_cfg('database.host'),
-                                 dbname   => $self->_cfg('database.name'),
-                                 user     => $self->_cfg('database.user'),
-                                 password => $self->_cfg('database.password') },
-                                on_connect => sub { $self->_on_db_connected },
-                                on_connect_error => sub { $self->_on_db_connect_failed } );
+    my $db = AnyEvent::Pg::Pool->new( {host     => $self->_cfg('database.host'),
+                                       dbname   => $self->_cfg('database.name'),
+                                       user     => $self->_cfg('database.user'),
+                                       password => $self->_cfg('database.password') },
+                                      timeout            => $self->_cfg('internal.database.poll.connection.timeout'),
+                                      connection_delay   => $self->_cfg('internal.database.poll.connection.delay'),
+                                      connection_retries => $self->_cfg('internal.database.poll.connection.retries'),
+                                      size               => $self->_cfg('internal.database.poll.size'),
+                                      on_connect_error   => sub { $self->_on_dead_db }
+                                    );
     $self->_db($db);
+    $self->_on_db_connected;
 }
 
 sub _start_config {

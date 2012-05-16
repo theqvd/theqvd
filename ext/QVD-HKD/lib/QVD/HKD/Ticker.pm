@@ -37,7 +37,7 @@ sub new {
 sub _tick {
     my $self = shift;
     DEBUG 'Ticking';
-    $self->_query(q(update host_runtimes set ok_ts=now(), pid=$1 where host_id=$2),
+    $self->_query_1(q(update host_runtimes set ok_ts=now(), pid=$1 where host_id=$2),
                   $$, $self->{node_id});
 }
 
@@ -49,17 +49,9 @@ sub _on_tick_error {
 }
 
 sub _on_tick_result {
-    my ($self, $res) = @_;
-    if ($res->status == PGRES_COMMAND_OK and $res->cmdRows) {
-        # FIXME: check for blocked when cmdRows == 0
-        shift->_maybe_callback('on_ticked')
-    }
-    else {
-        shift->_maybe_callback('on_error')
-    }
+    INFO "Database ticked";
+    shift->_maybe_callback('on_ticked');
 }
-
-sub _on_tick_bad_result { shift->_maybe_callback('on_error') }
 
 sub _set_timer {
     my $self = shift;

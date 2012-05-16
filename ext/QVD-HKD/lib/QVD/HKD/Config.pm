@@ -83,8 +83,6 @@ sub _on_reload_result {
     }
 }
 
-sub _on_reload_bad_result {}
-
 sub _on_reload_error { shift->_maybe_callback('on_reload_error') }
 
 sub _on_reload_done { shift->_maybe_callback('on_reload_done') }

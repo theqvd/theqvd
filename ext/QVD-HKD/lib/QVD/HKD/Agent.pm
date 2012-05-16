@@ -95,7 +95,8 @@ sub _query_callbacks ($;\%) {
     @cb
 }
 
-
+my %retry_on_sqlstate = map { $_ => 1 } ( '40001', # serialization_failure
+                                        );
 
 sub _query_n {
     my ($self, $n, $sql, @args) = @_;
@@ -103,6 +104,9 @@ sub _query_n {
     my ($on_result, $on_error, $on_done, $on_bad_result) = _query_callbacks($method);
 
     if ($debug) {
+        for ($on_result, $on_error, $on_done, $on_bad_result) {
+            $self->_debug("callback $_ is " . (ref $_ ? $_ : $self->can($_)));
+        }
         ref $_ or $self->can($_) or $self->_debug("warning: callback method $_ not found!")
             for ($on_result, $on_error, $on_done, $on_bad_result);
 
@@ -111,44 +115,67 @@ sub _query_n {
         $self->_debug("sql: >$line<, args: >@args<");
     }
 
-
     my $db = $self->_db // die "internal error: database handler not available";
-    my $seq = $db->push_query(query     => $sql,
-                              args      => \@args,
-                              on_result => sub {
-                                  $debug and $self->_debug("calling method $on_result");
-                                  my $res = $_[1];
-                                  given ($res->status) {
-                                      when (PGRES_TUPLES_OK) {
-                                          return $self->$on_result($res)
-                                              if (!defined $n or $res->rows == $n);
+    my $watcher = $db->push_query(query       => $sql,
+                                  args        => \@args,
+                                  max_retries => 1000, # FIXME!!!
+                                  retry_on_sqlstate => \%retry_on_sqlstate,
+                                  on_result   => sub {
+                                      my $res = $_[2];
+                                      my $or = $self->can($on_result);
+                                      $debug and $self->_debug("calling method $on_result: " . ($or // '<undef>'));
+                                      given ($res->status) {
+                                          when (PGRES_TUPLES_OK) {
+                                              if (!defined $n or $res->rows == $n) {
+                                                  $or->($self, $res) if $or;
+                                                  return;
+                                              }
+                                          }
+                                          when (PGRES_COMMAND_OK) {
+                                              if (!defined $n or $res->cmdRows == $n) {
+                                                  $or->($self, $res) if $or;
+                                                  return;
+                                              }
+                                          }
                                       }
-                                      when (PGRES_COMMAND_OK) {
-                                          return $self->$on_result($res)
-                                              if (!defined $n or $res->cmdRows == $n);
+                                      $debug and $self->_debug("actually calling method $on_bad_result");
+                                      my $m = $self->can($on_bad_result);
+                                      if ($m) {
+                                          $m->($self, $res);
                                       }
-                                  }
-                                  $debug and $self->_debug("actually calling method $on_bad_result");
-                                  $self->$on_bad_result($res);
-                              },
-                              on_error  => sub {
-                                  delete $self->{current_query_seq};
-                                  $debug and $self->_debug("calling method $on_error");
-                                  $self->$on_error
-                              },
-                              on_done   => sub {
-                                  delete $self->{current_query_seq};
-                                  my $m = $self->can($on_done);
-                                  if ($m) {
-                                      $debug and $self->_debug("calling method $on_done");
-                                      $m->($self);
-                                  }
-                                  else {
-                                      $debug and $self->_debug("there is not method $on_done");
-                                  }
-                              },
-                             );
-    $self->{current_query_seq} = $seq;
+                                      else {
+                                          $debug and $self->_debug("there is no such method, marking the query"
+                                                                   . " as erroneus for later");
+                                          $self->{current_query_bad_result} = 1;
+                                      }
+                                  },
+                                  on_error    => sub {
+                                      delete $self->{current_query_watcher};
+                                      delete $self->{current_query_bad_result};
+                                      $debug and $self->_debug("calling method $on_error");
+                                      $self->$on_error
+                                  },
+                                  on_done     => sub {
+                                      delete $self->{current_query_watcher};
+                                      if ($self->{current_query_bad_result}) {
+                                          delete $self->{current_query_bad_result};
+                                          $debug and $self->_debug("bad result seen, calling on_error callback $on_error");
+                                          $self->$on_error
+                                      }
+                                      else {
+                                          my $m = $self->can($on_done);
+                                          if ($m) {
+                                              $debug and $self->_debug("calling method $on_done");
+                                              $m->($self);
+                                          }
+                                          else {
+                                              $debug and $self->_debug("there is not method $on_done");
+                                          }
+                                      }
+                                  },
+                                 );
+    $self->{current_query_bad_result} = 0;
+    $self->{current_query_watcher} = $watcher;
 }
 
 sub _query {
@@ -163,12 +190,7 @@ sub _query_1 {
     goto &_query_n;
 }
 
-sub _cancel_current_query {
-    my $self = shift;
-    if (my $seq = $self->{current_query_seq}) {
-        $self->_db->cancel_query($seq);
-    }
-}
+sub _cancel_current_query { undef shift->{current_query_watcher} }
 
 sub _db {
     my $self = shift;
@@ -191,37 +213,51 @@ sub _run_cmd {
     }
     INFO "Running command '@$cmd'";
     my $pid;
-    my $w = AnyEvent::Util::run_cmd($cmd, '$$' => \$pid, %opts);
-    $debug and $self->_debug("process $pid forked");
-    $self->{cmd_watcher}{$pid} = $w;
-    $w->cb( sub {
-                $debug and $self->_debug("slave process $pid terminated");
-                my $rc = shift->recv;
-                $debug and $self->_debug("rc: $rc");
-                delete $self->{cmd_timer}{$pid};
-                delete $self->{cmd_watcher}{$pid};
-                if ($rc) {
-                    $cmd = [$cmd] unless ref $cmd;
-                    $debug and $self->_debug("command failed: @$cmd => " . ($rc >> 8) . " ($rc)");
-                    ERROR "Command '@$cmd' failed: $rc";
-                    unless ($ignore_errors) {
-                        $debug and $self->_debug("calling on_error callback $on_error");
-                        $self->$on_error($rc);
-                        return
+    if (my $w = eval { AnyEvent::Util::run_cmd($cmd, '$$' => \$pid, %opts) }) {
+        $debug and $self->_debug("process $pid forked");
+        $self->{cmd_watcher}{$pid} = $w;
+        $w->cb( sub {
+                    $debug and $self->_debug("slave process $pid terminated");
+                    my $rc = shift->recv;
+                    $debug and $self->_debug("rc: $rc");
+                    delete $self->{cmd_timer}{$pid};
+                    delete $self->{cmd_watcher}{$pid};
+                    if ($rc) {
+                        $cmd = [$cmd] unless ref $cmd;
+                        $debug and $self->_debug("command failed: @$cmd => " . ($rc >> 8) . " ($rc)");
+                        ERROR "Command '@$cmd' failed: $rc";
+                        unless ($ignore_errors) {
+                            $debug and $self->_debug("calling on_error callback $on_error");
+                            $self->$on_error($rc);
+                            return
+                        }
+                        $debug and $self->_debug("ignore_errors set, so...");
                     }
-                    $debug and $self->_debug("ignore_errors set, so...");
-                }
-                $debug and $self->_debug("calling on_done callback $on_done");
-                $self->$on_done
-            });
-
-    if (defined $kill_after) {
-        $self->{cmd_timer}{$pid} = AnyEvent->timer(after => $kill_after,
-                                                   cb => sub { $self->_do_kill_after(TERM => $pid) });
-        $debug and $self->_debug("process $pid will be killed after $kill_after seconds");
-        DEBUG "Process '$pid' will be killed after '$kill_after' seconds";
+                    $debug and $self->_debug("calling on_done callback $on_done");
+                    $self->$on_done
+                });
+        if (defined $kill_after) {
+            $self->{cmd_timer}{$pid} = AnyEvent->timer(after => $kill_after,
+                                                       cb => sub { $self->_do_kill_after(TERM => $pid) });
+            $debug and $self->_debug("process $pid will be killed after $kill_after seconds");
+            DEBUG "Process '$pid' will be killed after '$kill_after' seconds";
+        }
+        return $pid;
     }
-    $pid;
+    else {
+        AE::postpone {
+            $debug and $self->_debug("faked slave process termination");
+            if ($ignore_errors) {
+                $debug and $self->_debug("ignore_errors set, calling  $on_done");
+                $self->$on_done;
+            }
+            else {
+                $debug and $self->_debug("calling on_error callback $on_error");
+                $self->$on_error(-1);
+            }
+        };
+        return -1
+    }
 }
 
 sub _do_kill_after {

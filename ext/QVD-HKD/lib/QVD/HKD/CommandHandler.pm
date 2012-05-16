@@ -31,32 +31,20 @@ sub run { shift->_load_cmd }
 sub _load_cmd {
     my $self = shift;
     $self->{cmd} = undef;
-    $self->_query('select cmd from host_runtimes where host_id = $1', $self->{node_id});
+    $self->_query_1('select cmd from host_runtimes where host_id = $1', $self->{node_id});
 }
 
 sub _on_load_cmd_result {
     my ($self, $res) = @_;
-    if ($res->status == PGRES_TUPLES_OK) {
-        if ($res->rows > 0) {
-            $self->{cmd} = $res->row(0)//'';
-            $debug and $self->_debug("host command '$self->{cmd}' loaded from database");
-            DEBUG "host command '$self->{cmd}' loaded from database" if length $self->{cmd};
-        }
-        else {
-            $debug and $self->_debug("no host commands found in database");
-            DEBUG "no host commands found in database";
-        }
-    }
-    else {
-        $debug and $self->_debug("unexpected result from database!");
-    }
+    $self->{cmd} = $res->row(0);
+    $debug and $self->_debug("host command ".($self->{cmd}//'<undef>')." loaded from database");
+    DEBUG "host command '$self->{cmd}' loaded from database" if length $self->{cmd};
 }
-
-sub _on_load_cmd_bad_result {}
 
 sub _on_load_cmd_done {
     my $self = shift;
     if (defined $self->{cmd}) {
+        $debug and $self->_debug("going to delete HKD command $self->{cmd}");
         $self->_delete_cmd;
     }
     else {
@@ -75,8 +63,6 @@ sub _on_delete_cmd_result {
     my ($self, $res) = @_;
     $self->_maybe_callback('on_cmd', $self->{cmd});
 }
-
-sub _on_delete_cmd_bad_result {}
 
 sub _on_delete_cmd_done { shift->_loop }
 
