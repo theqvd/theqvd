@@ -1,50 +1,50 @@
-Slide and Video Presentations - Marketing Collateral
-====================================================
-
 Simplified Desktop Management with QVD
---------------------------------------
+======================================
+
 Managing desktop workstations can be a real headache. Installing operating systems and software, configuring software, keeping track of updates and patches, adding users, enforcing security policies and providing remote access when users are on the road... the list seems to be endless... and the time and money that it takes to keep your IT infrastructure running properly sometimes doesn't seem worth it.
 
 But you could make your life much easier by virtualizing all of your desktops using QVD.
 
 Automated Desktop Provisioning
-~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+------------------------------
 Whenever a new user joins your organization, you have the problem of setting up and configuring a workstation to meet that user's requirements. QVD makes this very easy. Simply add the user to the QVD environment and set a password. As soon as the user logs into a workstation using the provided username and password, a new virtual desktop environment will be created. All of the software that the user needs access to... all security policy which applies to that user... and all of the network resources that should be available... are instantly taken care of.
 
 This is called Automated Desktop Provisioning, and is handled by QVD based on the desktop images that you have added to the system for each different set of users. QVD automatically creates a virtual machine for the user and loads the appropriate desktop image into the virtual machine, so that your administrative tasks are reduced to simply adding the new user to the system.
 
 Integrated authentication services
-^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 You don't have to store your users in QVD. Thanks to QVD's programmable nature, plugins are available to use external authentication systems such as Active Directory or any other LDAP repository to handle user provisioning and authentication. By using one of the provided plugins, you can continue to make use of your existing authentication resources to start provisioning virtual desktops to your users from day-1.
 
 Virtual Desktop Image Management
-~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+--------------------------------
 Looking after Virtual Desktops comes down to Desktop Image Management. A Desktop Image defines the software and desktop environment that will be presented to a group of users. This helps to reduce the amount of disk space required to support many users, and minimizes the amount of work required to keep all users up to date and in sync.
 
 Open-source Tools
-^^^^^^^^^^^^^^^^^
+~~~~~~~~~~~~~~~~~
 QVD uses open source tools to create and update desktop images. This means that you are able to create or update an image from any system that has the correct software installed. By creating or updating a single desktop image, you can service hundreds of users in an instant.
 
 Web-based Administration
-^^^^^^^^^^^^^^^^^^^^^^^^
+~~~~~~~~~~~~~~~~~~~~~~~~
 For administrators who are not confident working on the command-line, QVD includes a Web-based Administration Panel, that makes it simple to load and update disk images so that they are ready to use. Assigning disk images to users is a simple point and click operation.
 
 For the more daring, a command line utility is available that allows much more flexibility... and is fully scriptable... so that you can automate many of your Image Management tasks to suit your own procedures.
 
 Image Versioning, Rollout and Rollback
-^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 Disk Images can be tagged with version numbers, so that updates can be rolled out in stages to limit corporate-wide impact and reduce support overhead. As a result, rollback to a previous desktop image is as simple as selecting the image version to rollback to and clicking on a button to effect the change. User data remains unaffected during the operation.
 
 Desktop Operations Management
-~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+-----------------------------
 QVD makes Desktop Operations Management easier. Each Virtual Machine supports direct console access either via a terminal or through the applet provided in the Web Administration Panel. Adding VNC or SSH support to Virtual Machines is a basic operation. These facilities allow support staff direct access to the virtual machine that a user is accessing at any point in time. Logs are also stored separately from the disk image used by the virtual machine, allowing staff to review log data retrospectively to gain further insight into any issues that a user may be experiencing.
 
 Built-in Security
-~~~~~~~~~~~~~~~~~
+-----------------
 QVD provides a secure framework for your users to access their desktops. All connections to virtual desktops are protected using certificate-based encryption, so that user authentication and desktop interaction takes place securely. Since desktop images remain read-only, your virtual desktops are automatically protected from malicious rootkit style attacks, keeping your network virus free... and you can be secure in the knowledge that your data stays in the data center where it belongs.
 
 Remote Access
-~~~~~~~~~~~~~
+--------------
 Keep your laptops and mobile devices clean with QVD. You don't need to install business critical applications on systems that are outside of your network with QVD. You also don't need to worry about tricky VPN configurations. With the QVD client installed on any laptop or mobile device, your road-warriors and executives can access their desktops from anywhere on the Internet. QVD provides strong security to ensure that communications are encrypted and is capable of working in extremely low-bandwidth environments. Not only does this mean that your users are able to work as safely and seamlessly as if they are in the office, but it also means that you have greater control over data and applications without needing access to the devices that are using your infrastructure.
 
+Conclusion
+----------
 Try QVD today to see how you can simplify the majority of desktop management and access requirements that you face today.

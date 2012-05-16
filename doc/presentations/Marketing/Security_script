@@ -1,30 +1,28 @@
-Slide and Video Presentations - Marketing Collateral
-====================================================
-
 Security and Compliance using QVD
----------------------------------
+=================================
+
 Security and compliance often present some of the biggest challenges within the IT industry... Particularly when coupled with growing requirements to make use of online resources. QVD is designed to help you to overcome many of these challenges.
 
 Security by Design
-~~~~~~~~~~~~~~~~~~
+------------------
 In a world where computer viruses and trojans are commonplace, a single intrusion can wreak havoc in any business. QVD is designed to help you avoid attack and minimize damage. By using Linux to power your virtual desktops, the number of viruses and trojans that can actually be installed onto running systems is reduced dramatically. But QVD adds a further layer of protection that is built into its design. By making the disk images that are used to load the operating system and applications into a virtual machine, rootkits are unable to survive a restart of any virtual machine. That means that if whenever a user connects to a new virtual machine, they are starting with a clean slate. Any malicious code that makes its way into the environment simply cannot survive.
 
 Furthermore, QVD's virtualization techniques provide complete separation of resources between virtual machines. This means that during a compromise, only a single virtual desktop will be affected, and as soon as that virtual machine is restarted the problem can be averted. 
 
 Secure and centralized authentication
-~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+-------------------------------------
 QVD offers secure and centralized authentication. By using a single authentication resource, such as QVD's own user database, or an LDAP server in order to handle user logons, your users only need to remember a single username and password to access their desktops and all of the resources that they require. This means that you can enforce a password strength policy to ensure that user passwords offer adequate security. Your users will also only need to remember a single password to authenticate, reducing the likelihood that they will write their passwords down or store them in a way that may compromise your security.
 
 Encrypted communications
-~~~~~~~~~~~~~~~~~~~~~~~~
+------------------------
 QVD also uses certificate-based encryption via SSL to encrypt all communications between the QVD client and the QVD infrastructure. This helps reduce the possibility of a man-in-the-middle attack by providing the same level of security that your bank uses to protect your online banking.
 
 Standardized desktop policy for Linux
-~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+-------------------------------------
 While simply running Linux for your desktop workstations may help to reduce many security issues, it is difficult to enforce a coherent security policy across multiple Linux desktops and to keep them synchronized for compliance purposes. By using a single disk image to service multiple users, QVD instantly ensures that all users sharing a particular disk image have exactly the same environment. Patching and updating software no longer needs to take place on multiple systems. Instead, you only need to update a single image and you can be sure that all of your users are up to date and compliant with your security requirements.
 
 Simplified Disaster Recovery
-~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+----------------------------
 Since all disk images and all user data is stored within a centralized location, backups are simplified and the amount of disk space required is dramatically reduced. By backing up your disk images and user home directories, you can rest easy knowing that disaster recovery can be achieved in a matter of hours as opposed to days or weeks.
 
 Workstation hardware failures are simple to recover from. Since all of your desktops are virtualized, any system can be used to replace a workstation and a user will be able to login to their desktop and access all of their applications and data as if nothing had ever happened.
@@ -32,7 +30,9 @@ Workstation hardware failures are simple to recover from. Since all of your desk
 QVD also supports disk image tagging, so that you can rollout changes and updates to images according to a schedule without affecting all users at once. By selecting the version of a disk image that you wish to assign to a group of users, it is simple to contain the risk of changes to your operating environment, and to implement a rollback strategy within minutes.
 
 Security through Open Source Technology
-~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+---------------------------------------
 Unlike many other VDI platforms, QVD is entirely open-source. All of the technologies that are used and all of the code is available for public scrutiny. That means that if you don't like how something has been done, you are free to change it yourself. It also means that faults in the code can be highlighted by the open source community and can be fixed more quickly than in other commercial software models. And you're not tied to QVD for life. If you need to migrate to another platform in the future, all of the technology that has been used can be easily ported.
 
+Conclusion
+----------
 QVD can help you to quickly secure your business operations and reduce administration while saving you money. Try it today.

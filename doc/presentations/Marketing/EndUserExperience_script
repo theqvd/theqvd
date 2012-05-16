@@ -1,13 +1,10 @@
-Slide and Video Presentations - Marketing Collateral
-====================================================
-
 End-User Experience and Accessibility for QVD
----------------------------------------------
+=============================================
 
 Implementing a Virtual Desktop Infrastructure should always take into account end-user experience. Your users need to feel as comfortable accessing their Desktop Environment as if it was hosted locally. QVD provides all of the tools to make this experience as seamless as possible... regardless of where your users are located. 
 
 QVD Virtual Desktop Demonstration
-~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+---------------------------------
 QVD can be used to provide your users with a Linux desktop environment that includes the entire range of open source applications that are available. That means your users can take advantage of the most up-to-date web browsers that are available to access the Internet. General office requirements such as word-processing, spreadsheet calculations and presentation work can all be achieved in a variety of software suites such as OpenOffice.org or LibreOffice. A large number of email clients are also available, along with personal information management software to handle calendaring and contact management. You also have application runtime environments such as Java and Adobe Flash Player at your fingertips, while full-scale development work in any mainstream language is also supported.
 
 In the following short video, we will show how QVD facilitates access to a variety of Linux desktop environments to provide all of the tools that your users need in order to get the job done.
@@ -17,23 +14,28 @@ In the following short video, we will show how QVD facilitates access to a varie
 While your virtual desktop is hosted remotely, you may be wondering how you can use a local printer or whether it is possible to hear audio from your virtual desktop. Thanks to QVD, printing locally or listening to audio on a client system can be achieved easily with minimal configuration required, so that your users can work within their virtual desktops as if they were working on a normal desktop workstation.
 
 Clients for a variety of platforms
-~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+----------------------------------
 QVD is developed to work on a range of platforms. That means that you can install the QVD client on any Linux system... or on a standard Microsoft Windows computer. In fact, we've even developed a client for Android, so that a QVD virtual desktop can be accessed from your mobile devices. A base Linux image is also available so that thin-clients can boot right into the QVD client, so that your users never see the operating system of the device that they are using to access their virtual desktops.
 
 By providing a client that is capable of running on many host operating systems and devices, QVD can be used with existing infrastructure and can accommodate user requirements well into the future.
 
 Remote Access
-~~~~~~~~~~~~~
+-------------
 QVD is ideal for users who require access to applications and resources while away from the office. Frequently these sorts of requirements are handled by installing the appropriate software on a secondary device and providing access to resources via a VPN. QVD makes this approach redundant. By simply installing the QVD client on any mobile computing device, users are able to access the same desktop, applications and resources regardless of the computer that they are using. This comes with a whole range of advantages... including... the security of knowing that your data and applications are always under control within the datacenter... the ability to provide access to resources to any user anywhere in the world... without needing direct access to the computer that they are using... and without having to configure a VPN.
 
 Security
-^^^^^^^^
+~~~~~~~~
 QVD handles all of its connections securely, using certificate-based encryption to prevent eavesdropping while your users are accessing their desktops. That means that users can continue to login to QVD remotely in the same way that they do when in the office... and you can be sure that the same standard of security is being applied outside of the office as within it.
 
 Low-bandwidth Support
-^^^^^^^^^^^^^^^^^^^^^
+~~~~~~~~~~~~~~~~~~~~~
 Since QVD can still function in extremely low-bandwidth environments without losing performance, your remote users can continue to access their desktops even when on a dial-up connection. In fact, QVD applies such great compression in the presentation of its desktop that you can be comfortable provisioning access in environments that are bandwidth-capped.
 
 Complete access to resources
-^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 Most importantly, users experience the same thing out of the offic as they do within it. Applications need not be configured differently... network resources are always in the same place... even the user's desktop looks identical. This means that there is no distinction between users working remotely and users working inside of your network. Not only does this help to make support that much easier, but it also makes the entire user experience more pleasant.
+
+Conclusion
+----------
+
+Try QVD now to see how great the end user experience is when working with a remote desktop.
