@@ -11,6 +11,7 @@ WriteMakefile(
     PL_FILES            => {},
     PREREQ_PM => {
         'Test::Class' 	=> 0,
+        'Test::Class::Load' 	=> 0,
 	'File::Slurp'	=> 0,
         'Test::More' 	=> 0,
         'X11::GUITest'  => 0,
