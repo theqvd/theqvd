@@ -1,5 +1,8 @@
 Revision history for Perl extension Linux::Proc::Mountinfo.
 
+0.02  21 May, 2012
+        - add bind_source method
+
 0.01  Mon Jan 16 05:39:23 2012
 	- original version; created by h2xs 1.23 with options
 		-AXn Linux::Proc::Mountinfo

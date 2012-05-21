@@ -1,6 +1,6 @@
 package Linux::Proc::Mountinfo;
 
-our $VERSION = '0.01';
+our $VERSION = '0.02';
 
 use strict;
 use warnings;
@@ -31,6 +31,7 @@ sub read {
 
     my @entries;
     my %entry_by_id;
+    my %entry_by_mm;
  OUT: while (<$fh>) {
         chomp;
         my @fields = split;
@@ -54,13 +55,23 @@ sub read {
                       [] ];
         push @entries, bless $entry, 'Linux::Proc::Mountinfo::Entry';
         $entry_by_id{$entry->[0]} = $entry;
+
+        my $old = $entry_by_mm{$entry->[2]};
+        if (not $old or length($entry->[3]) < length($old->[3])) {
+            $entry_by_mm{$entry->[2]} = $entry
+        }
     }
 
     for my $entry (@entries) {
-        my $parent_id = $entry->[1];
-        next if $entry->[0] == $parent_id;
-        my $parent = $entry_by_id{$parent_id} or next;
-        push @{$parent->[13]}, $entry;
+        my $bind = $entry_by_mm{$entry->[2]};
+        $entry->[14] = ( $bind == $entry ? undef : $bind );
+
+        if ($entry->[0] != $entry->[1]) {
+            if (my $parent = $entry_by_id{$entry->[1]}) {
+                push @{$parent->[13]}, $entry;
+            }
+        }
+
     }
 
     bless \@entries, $class;
@@ -104,6 +115,8 @@ sub major           { (split /:/, shift->[2])[0] }
 sub minor           { (split /:/, shift->[2])[1] }
 
 sub children        { bless [@{shift->[13]}], 'Linux::Proc::Mountinfo' }
+
+sub bind_source     { shift->[14] }
 
 sub flatten {
     my $self = shift;
@@ -263,6 +276,12 @@ Returns the major part or the major:minor field.
 =item $mie->minor
 
 Returns the minor part of the major:minor field.
+
+=item $mie->bind_source
+
+If the mount is a binding (i.e. created with C<mount --bind ...>),
+this method returns the object representing the source file
+system. Othersise, it returns undef.
 
 =item $mie->children
 
