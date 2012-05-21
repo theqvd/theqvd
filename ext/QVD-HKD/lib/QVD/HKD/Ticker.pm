@@ -14,12 +14,14 @@ use parent qw(QVD::HKD::Agent);
 use QVD::StateMachine::Declarative
     new      => { transitions => { _on_run       => 'ticking'  } },
     ticking  => { enter => '_tick',
-                  transitions => { _on_tick_done => 'delaying' } },
+                  transitions => { _on_delay     => 'delaying' } },
     delaying => { enter => '_set_timer',
                   transitions => { _on_timeout   => 'ticking',
                                    on_hkd_stop   => 'stopped'  },
                   leave => '_abort_all'                          },
     stopped  => { enter => '_on_stopped'                         };
+
+sub on_hkd_stop { shift->delay_until_next_state }
 
 sub new {
     my ($class, %opts) = @_;
@@ -41,11 +43,20 @@ sub _tick {
                   $$, $self->{node_id});
 }
 
+sub _on_tick_done {
+    my $self = shift;
+    WARN 'Ticking ok';
+    $self->{failed_ticks} = 0;
+    $self->_on_delay;
+}
+
 sub _on_tick_error {
     my $self = shift;
     WARN 'Error on ticking';
-    $self->_maybe_callback('on_error');
-    $self->_on_tick_done;
+    if (++$self->{failed_ticks} > 2) {
+        $self->_maybe_callback('on_error')
+    };
+    $self->_on_delay;
 }
 
 sub _on_tick_result {
