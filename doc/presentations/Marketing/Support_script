@@ -9,9 +9,9 @@ QVD comes with a powerful Web-based Administration Tool, that allows your suppor
 
 For more advanced administrators, a feature rich command-line utility is also available. This can be used to script and automate tasks that need to be performed regularly. This tool also allows administrators to perform more complex tasks than are available within the Web Administration Tool. Since statistical information can be extracted from this tool, your administrators can easily build notification or graphical tools that can be triggered for particular scenarios.
 
-Console Access, SSH and VNC
----------------------------
-Every virtual machine, run for every user, provides its own console access... and is also capable of supporting SSH and VNC... so that your support staff are able to access the virtual machine while it is being used. By enabling VNC on any remote desktop, it is possible to share the user's desktop to help to view and resolve issues that a user may be experiencing directly with an application or with the desktop environment itself. SSH access makes it possible for administrators or support staff to access a virtual machine securely and directly from any system that has the industry standard tool installed. This means that it is technically possible for a support engineer to help users even when out of the office. 
+Console Access and SSH
+-----------------------
+Every virtual machine, run for every user, provides its own console access... and is also capable of supporting SSH... so that your support staff are able to access the virtual machine while it is being used. By enabling SSH access it is possible for administrators or support staff to access a virtual machine securely and directly from any system that has the industry standard tool installed. This means that it is technically possible for a support engineer to help users even when out of the office.
 
 Logging
 -------
@@ -19,9 +19,9 @@ QVD stores the logs for each virtual machine separately to the disk image that h
 
 QVD also includes its own logging capabilities so that it is possible to turn up log verbosity in order to troubleshoot any problems within the QVD infrastructure itself. QVD is capable of publishing using a variety of log formats, and can output to most typical log management facilities, including most databases, syslog or to file.
 
-Programmability
----------------
-QVD is also highly programmable. It includes a full API and provides 'hooks' that can be used to trigger script events from within any virtual machine. This programmability makes QVD incredibly versatile. If you need to trigger provisioning scripts based on successful logins, or if you need to control access to resources depending on location or time, QVD provides all of the facilities that you need in order to control how your VDI behaves.
+Flexibility and Extensibility
+-----------------------------
+QVD is also highly programmable. It includes a full API and provides 'hooks' that can be used to trigger script events from within any virtual machine. This programmability makes QVD incredibly versatile. If you need to trigger provisioning scripts based on successful logins, or if you need to control access to resources depending on location or time, QVD provides all of the facilities that you need in order to control how your VDI behaves. This ability to change behaviours within the VDI and to extend it to implement new features sets QVD apart from many other VDI suites on the market today.
 
 QVD's support and administration tools are incredibly powerful, and the ability to script and program around the environment can allow you to achieve things that are simply not possible within a traditional desktop workstation environment.
 
