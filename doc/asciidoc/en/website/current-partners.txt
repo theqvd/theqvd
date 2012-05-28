@@ -1,0 +1,54 @@
+Current Partners
+================
+Rowan Puttergill <rowan.puttergill@qindel.com>
+$Id: partners.txt 11772 2011-08-08 08:03:06Z rputtergill $
+:author initials: RP
+:email: rowan.puttergill@qindel.com
+:doctype: book
+:toc:
+:icons:
+:qvdversion: 3.0.0
+:website: http://theqvd.com/
+ifdef::blogpost[]
+// Use the same article for both a blog post and on the AsciiDoc
+// website.
+:blogpost-status: published
+:blogpost-doctype: article
+:blogpost-posttype: page
+endif::blogpost[]
+
+Partners that have already signed up with Qindel to sell and support
+the QVD are able to help you purchase licensing and can assist you
+with the deployment and support of your QVD VDI.
+
+Commercial Integrators and Resellers (CRIs)
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+We're proud to announce that the following organizations are
+registered and qualified to sell and support the QVD. These
+organizations have undergone the appropriate training to help you
+deploy and integrate your QVD VDI within your existing infrastructure.
+
+CIIA y Asociados. S.A de C.V.
+^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+image::../../../images/logociia.png["CIIA",height=50,align="left",link="http://www.ciia.com.mx/"]
+
+CIIA was founded in 2005 in Mexico City with the objective of
+providing technology oriented services. As a company, CIIA, has a
+strong focus on networking and communications, development and systems
+programming, as well as the management and integration of UNIX and
+Linux systems. CIIA has over 100 employees providing services to
+CIIA's many existing clients.
+
+CIIA can help companies in Mexico and surrounding areas to obtain QVD
+licensing and to deploy and support QVD.
+
+For more information, http://www.ciia.com.mx/V2/contacto.html["contact CIIA"].
+
+//Commercial Resellers (CRs)
+//~~~~~~~~~~~~~~~~~~~~~~~~~~
+//We're proud to announce that the following organizations have
+//partnered with Qindel to sell QVD licensing. Dealing with these
+//partners will help you to achieve a rapid turnaround and will allow
+//you to speak to localized representatives about your requirements.
+
