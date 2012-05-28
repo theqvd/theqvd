@@ -7,6 +7,7 @@ use feature qw(switch);
 use Crypt::OpenSSL::X509;
 use File::Path 'make_path';
 use File::Spec;
+use IO::Socket::INET;
 use IO::Socket::Forwarder qw(forward_sockets);
 use JSON;
 use Proc::Background;
@@ -26,6 +27,7 @@ sub new {
         audio           => delete $opts{audio},
         extra           => delete $opts{extra},
         printing        => delete $opts{printing},
+        local_serial    => delete $opts{local_serial},
         opts            => \%opts,
     };
     bless $self, $class;
@@ -107,7 +109,7 @@ sub connect_to_vm {
     my ($host, $port, $user, $passwd) = @connect_info{qw/host port username password/};
 
     $cli->proxy_connection_status('CONNECTING');
-
+    print "*** Connecting to $host:$port\n";
     # SSL library has to be initialized in the thread where it's used,
     # so we do a "require QVD::HTTPC" here instead of "use"ing it above
     require QVD::HTTPC;
@@ -172,6 +174,7 @@ sub connect_to_vm {
         'qvd.client.geometry'         => $connect_info{geometry},
         'qvd.client.fullscreen'       => $connect_info{fullscreen},
         'qvd.client.printing.enabled' => $self->{printing},
+        'qvd.client.serial.port'      => $connect_info{remote_serial}
     );
 
     my $q = join '&', map { uri_escape($_) .'='. uri_escape($o{$_}) } keys %o;
@@ -220,6 +223,8 @@ sub _run {
     my $self = shift;
     my $httpc = shift;
 
+
+
     my @cmd;
     if ($WINDOWS) {
         push @cmd, $ENV{QVDPATH}."/NX/nxproxy.exe";
@@ -228,6 +233,12 @@ sub _run {
     }
 
     my %o = ();
+
+    if ( $self->{local_serial} ) {
+        $self->_start_socat();
+        $o{http} = cfg("client.socat.port");
+    }
+
 
     if ($WINDOWS) {
         $ENV{'NX_ROOT'} = $ENV{APPDATA}.'/.qvd';
@@ -262,9 +273,10 @@ sub _run {
         Win32::Process->import;
         Win32::Process::Create({}, $program, $cmdline, 0, CREATE_NO_WINDOW|NORMAL_PRIORITY_CLASS, '.');
     } else {
+        print "Starting " . join(' ' , @cmd) . "\n";
         Proc::Background->new(@cmd);
     }
-
+    print "Listening on 4040\n";
     my $ll = IO::Socket::INET->new(
         LocalPort => 4040,
         ReuseAddr => 1,
@@ -272,6 +284,8 @@ sub _run {
     ) or die "Unable to listen on port 4040";
 
     my $local_socket = $ll->accept() or die "connection from nxproxy failed";
+    print "Connection accepted\n";
+
     undef $ll; # close the listening socket
     if ($WINDOWS) {
         my $nonblocking = 1;
@@ -279,12 +293,61 @@ sub _run {
         ioctl($local_socket, FIONBIO, \$nonblocking);
     }
 
+    print "Forwarding sockets\n";
     forward_sockets(
         $local_socket,
         $httpc->get_socket,
         buffer_2to1 => $httpc->read_buffered,
         # debug => 1,
     );
+
+    print "Done.\n";
 }
 
+sub _start_socat {
+    my ($self) = @_;
+
+    my $socket  = $self->{local_serial};
+    my $debug   = 1;
+    my $port    = cfg("client.socat.port");
+    my $timeout = cfg("client.socat.timeout");
+
+    my @args = ("PTY,link=$socket,raw,echo=0", "tcp-l:$port,reuseaddr,fork");
+    
+    unshift @args, "-x", "-v" if ($debug);
+   
+    if ($WINDOWS) {
+        my $program = $ENV{QVDPATH} . "/socat/socat.exe";
+        my $cmdline = join ' ', map("\"$_\"", @args);
+        use constant CREATE_NO_WINDOW => 0;
+        use constant NORMAL_PRIORITY_CLASS => 0;
+        require Win32::Process;
+        Win32::Process->import;
+        Win32::Process::Create({}, $program, $cmdline, 0, CREATE_NO_WINDOW|NORMAL_PRIORITY_CLASS, '.');
+    } else {
+        Proc::Background->new("/usr/bin/socat", @args);
+    }
+
+    print "Waiting for socat to start listening...\n";
+    my $retries = 0;
+    my $sock;
+    while ($retries++ < $timeout) {
+        $sock = new IO::Socket::INET(PeerAddr => 'localhost', 
+                                     PeerPort => $port, 
+                                     Proto    => 'tcp');
+
+        last if ($sock);
+
+        print "Retry $retries/$timeout: $!\n";
+        sleep(1);
+    }
+
+    if (!$sock) {
+        print "socat not listening on port $port\n";
+        $self->{client_delegate}->internal_error(message => "Failed to forward serial port, socat is not listening");
+    } else {
+        close($sock);
+    }
+
+}
 1;

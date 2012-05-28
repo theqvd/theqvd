@@ -12,6 +12,7 @@ use constant EVT_LIST_OF_VM_LOADED => Wx::NewEventType;
 use constant EVT_CONNECTION_ERROR  => Wx::NewEventType;
 use constant EVT_CONN_STATUS       => Wx::NewEventType;
 use constant EVT_UNKNOWN_CERT      => Wx::NewEventType;
+use constant EVT_INTERNAL_ERROR    => Wx::NewEventType;
 
 my $vm_id :shared;
 my %connect_info :shared;
@@ -164,6 +165,7 @@ sub new {
     Wx::Event::EVT_COMMAND($self, -1, EVT_LIST_OF_VM_LOADED, \&OnListOfVMLoaded);
     Wx::Event::EVT_COMMAND($self, -1, EVT_CONN_STATUS, \&OnConnectionStatusChanged);
     Wx::Event::EVT_COMMAND($self, -1, EVT_UNKNOWN_CERT, \&OnUnknownCert);
+    Wx::Event::EVT_COMMAND($self, -1, EVT_INTERNAL_ERROR, \&OnInternalError);
 
     Wx::Event::EVT_CLOSE($self, \&OnExit);
 
@@ -236,6 +238,14 @@ sub proxy_connection_error {
     Wx::PostEvent($self, $evt);
 }
 
+sub internal_error {
+    my $self = shift;
+    my %args = @_;
+    my $message :shared = $args{message};
+    my $evt = new Wx::PlThreadEvent(-1, EVT_INTERNAL_ERROR, $message);
+    Wx::PostEvent($self, $evt);
+}
+
 ################################################################################
 #
 # Wx event handlers
@@ -246,15 +256,17 @@ sub OnClickConnect {
     my( $self, $event ) = @_;
     $self->{state} = "";
     %connect_info = (
-        link       => cfg('client.force.link', 0) // cfg('client.link'),
-        audio      => cfg('client.audio.enable'),
-        printing   => cfg('client.printing.enable'),
-        geometry   => cfg('client.geometry'),
-        fullscreen => cfg('client.fullscreen'),
-        keyboard   => $self->DetectKeyboard,
-        port       => $DEFAULT_PORT,
-        ssl        => $USE_SSL,
-        host       => cfg('client.force.host.name', 0) // $self->{host}->GetValue,
+        link          => cfg('client.force.link', 0) // cfg('client.link'),
+        audio         => cfg('client.audio.enable'),
+        printing      => cfg('client.printing.enable'),
+        geometry      => cfg('client.geometry'),
+        fullscreen    => cfg('client.fullscreen'),
+        local_serial  => cfg('client.serial.enabled') ? cfg('client.serial.local') : '',
+        remote_serial => cfg('client.serial.enabled') ? cfg('client.serial.remote') : '',
+        keyboard      => $self->DetectKeyboard,
+        port          => $DEFAULT_PORT,
+        ssl           => $USE_SSL,
+        host          => cfg('client.force.host.name', 0) // $self->{host}->GetValue,
         (map { $_ => $self->{$_}->GetValue } qw(username password)),
     );
 
@@ -289,6 +301,15 @@ sub OnConnectionError {
     $dialog->ShowModal();
     $dialog->Destroy();
     $self->EnableControls(1);
+}
+
+sub OnInternalError {
+    my ($self, $event) = @_;
+    my $message = $event->GetData;
+    my $dialog = Wx::MessageDialog->new($self, $message, "Internal error.", wxOK | wxICON_ERROR);
+    $dialog->ShowModal();
+    $dialog->Destroy();
+#    $self->EnableControls(1);
 }
 
 sub OnListOfVMLoaded {

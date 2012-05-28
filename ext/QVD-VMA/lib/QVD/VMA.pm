@@ -27,6 +27,7 @@ use feature qw(switch say);
 use QVD::Config;
 use QVD::Log;
 use Config::Properties;
+use IO::Socket::INET;
 
 use parent 'QVD::SimpleRPC::Server';
 
@@ -35,6 +36,7 @@ my $run_path        = cfg('path.run');
 my $nxagent         = cfg('command.nxagent');
 my $nxdiag          = cfg('command.nxdiag');
 my $x_session       = cfg('command.x-session');
+my $socat           = cfg('command.socat');
 my $enable_audio    = cfg('vma.audio.enable');
 my $enable_printing = cfg('vma.printing.enable');
 my $printing_conf   = cfg('internal.vma.printing.config');
@@ -100,10 +102,14 @@ my %nx2x = ( initiating   => 'starting',
 my %running   = map { $_ => 1 } qw(listening connected suspending suspended);
 my %connected = map { $_ => 1 } qw(listening connected);
 
+my $socat_pid;
+
 sub _open_log {
     my $name = shift;
     my $log_fn = "$log_path/qvd-$name.log";
     open my $log, '>>', $log_fn or die "unable to open $name log file $log_fn\n";
+    print $log "=== Opened log file at " . scalar localtime . " ====\n";
+    DEBUG "Opened $name log at $log_path/qvd-$name.log";
     return $log;
 }
 
@@ -248,6 +254,8 @@ sub _save_nxagent_state {
 }
 
 sub _save_nxagent_state_and_call_hook {
+    DEBUG "_save_nxagent_state_and_call_hook: " . join(', ', @_);
+
     _save_nxagent_state(@_);
     _call_printing_hook;
     _call_state_hook;
@@ -260,6 +268,7 @@ sub _delete_nxagent_state_and_pid_and_call_hook {
     unlink $nxagent_state_fn;
     _call_printing_hook;
     _call_state_hook;
+    _kill_socat();
 }
 
 sub _timestamp {
@@ -412,14 +421,22 @@ sub _fork_monitor {
 	    while(defined (my $line = <$out>)) {
 		given ($line) {
 		    when (/Info: Agent running with pid '(\d+)'/) {
+			DEBUG "Agent running";
 			_save_nxagent_pid $1;
 		    }
 		    when (/Session: (\w+) session at/) {
+			DEBUG "Session $1, calling hooks";
 			_save_nxagent_state_and_call_hook lc $1;
 		    }
 		    when (/Session: Session (\w+) at/) {
+			DEBUG "Session $1, calling hooks";
 			_save_nxagent_state_and_call_hook lc $1;
 		    }
+		    when (/Listening to HTTP connections on port '(\d+)'/) {
+			DEBUG "Starting socat on port $1";
+			_fork_socat($1, %props);
+		    }
+
 		}
 		print $line;
 	    }
@@ -430,6 +447,88 @@ sub _fork_monitor {
     }
 }
 
+sub _fork_socat {
+	my ($port, %props) = @_;
+
+	my $socket = $props{'qvd.client.serial.port'};
+
+
+	if ( !$socket ) {
+		DEBUG "Serial redirection requested, but the serial port is not set";
+		return;
+	}
+
+
+	if ( $socat_pid ) {
+		WARN "Socat was already running, killing";
+		_kill_socat();
+	}
+
+	#retry=5, fork
+	my @args = ("PTY,link=$socket,raw,echo=0", "tcp:localhost:$port,nonblock,reuseaddr,retry=5");
+
+	if ( cfg('internal.vma.socat.debug') ) {
+		DEBUG "Enabling debug options for socat";
+		unshift @args, "-x", "-v";
+	}
+
+
+	
+	DEBUG "Calling $socat " . join(' ', @args);
+	$SIG{CHLD} = 'IGNORE';
+	my $pid = fork;
+
+	if (!$pid) {
+		defined $pid or die "fork failed: $!\n";
+		eval {
+			my $log = _open_log('socat');
+			my $logfd = fileno $log;
+			POSIX::dup2($logfd, 1);
+			POSIX::dup2($logfd, 2);
+			open STDIN, '<', '/dev/null';
+
+			print "exec: $socat " . join(' ', @args) . "\n";
+			do { exec $socat, @args };
+			die "exec failed: $!\n";
+		};
+	} else {
+		if ( $@ ) {
+			ERROR "execution of socat failed: $@";
+		} else {
+			DEBUG "socat started with pid $pid";
+			$socat_pid = $pid;
+		}
+	}
+	
+	return undef;
+}
+
+sub _kill_socat {
+	my $timeout = 3;
+	my $signalled;
+
+	if ( !$socat_pid ) {
+		DEBUG "Socat not running, killing not needed";
+		return;
+	}
+
+
+	DEBUG "Stopping socat, sending SIGTERM";
+	while( ($timeout-- > 0) && ($signalled = kill('TERM', $socat_pid)) ) {
+		sleep 1;
+	}
+
+	if ($signalled) {
+		DEBUG "Failed to stop socat normally, sending SIGKILL";
+		kill 'KILL', $socat_pid;
+	} else {
+		DEBUG "Socat stopped";
+	}
+
+	undef $socat_pid;
+}
+
+
 sub _state {
     -f $nxagent_state_fn or return 'stopped'; # shortcut!
 
@@ -439,6 +538,7 @@ sub _state {
     my $state = $nx2x{$nxstate};
     my $timeout = $timeout{$state};
     my $pid = _read_line $nxagent_pid_fn;
+
     { no warnings; DEBUG ("_state: $state, nxstate: $nxstate, ts: $timestamp, timeout: $timeout") };
 
     if ($timeout and $timestamp) {
@@ -508,6 +608,7 @@ sub _make_nxagent_config {
     }
 
     push @nx_args, 'media=1' if $enable_audio;
+    push @nx_args, 'http=1' if $props{'qvd.client.serial.port'};
 
     if ($enable_printing) {
 	# FIXME: check that printing is also enabled on the client
@@ -535,6 +636,7 @@ sub _start_session {
             _make_nxagent_config(%props);
 	    kill HUP => $pid;
 	    _call_action_hook(connect => %props);
+	    _kill_socat();
 	}
 	when ('connected') {
 	    DEBUG "suspend and fail";
@@ -544,6 +646,7 @@ sub _start_session {
 	when ('stopped') {
 	    _call_action_hook(pre_connect => %props);
 	    _save_printing_config(%props);
+	    DEBUG "Forking monitor";
 	    _fork_monitor(%props);
 	}
 	default {
@@ -562,7 +665,6 @@ sub _poweroff {
 
 sub SimpleRPC_ping {
     DEBUG "pinged";
-    1
 }
 
 sub SimpleRPC_x_state {
@@ -587,9 +689,10 @@ sub SimpleRPC_x_stop {
 
 sub SimpleRPC_x_start {
     my $self = shift;
-    INFO "starting/resuming X session";
+    INFO "starting/resuming X session. Args: " . join(' ', @_);
     _start_session(@_);
 }
+
 
 1;
 

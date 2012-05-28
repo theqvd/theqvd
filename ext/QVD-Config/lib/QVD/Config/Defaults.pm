@@ -81,6 +81,7 @@ command.lxc-stop = /usr/lib/qvd/bin/lxc-stop
 command.lxc-wait = /usr/lib/qvd/bin/lxc-wait
 command.ebtables = ebtables
 command.iptables = iptables
+command.socat = /usr/bin/socat
 
 ## whether to remember password after successful connection
 client.remember_password = 1
@@ -104,6 +105,10 @@ client.host.name =
 client.user.name =
 ## whether to use SSL in the client↔server communication or not
 client.use_ssl = 1
+# Port where to run socat
+client.socat.port = 2002
+client.socat.timeout = 10
+
 
 ## umask for the L7R process
 l7r.user.umask = 0022
@@ -300,6 +305,9 @@ internal.vma.on_printing.stopped = /usr/lib/qvd/bin/qvd-printing
 
 internal.vma.printing.config = ${path.run}/printing.conf
 internal.vma.nxagent.config = ${path.run}/nxagent.conf
+
+internal.vma.socat.debug = 0
+
 
 internal.database.client.connect.timeout = 20
 internal.database.client.socket.keepidle = 20
