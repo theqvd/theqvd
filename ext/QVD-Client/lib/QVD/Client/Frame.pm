@@ -348,7 +348,10 @@ sub OnConnectionStatusChanged {
         $self->EnableControls(0);
         $self->{timer}->Start(50, 0);
     } elsif ($status eq 'CONNECTED') {
-        $self->{password}->SetValue ('') if !$self->{remember_pass}->IsChecked;
+        if (cfg('client.show.remember_password')) {
+            # $self->{remember_pass} only exists when client.show.remember_password is set
+            $self->{password}->SetValue ('') if !$self->{remember_pass}->IsChecked;
+        }
         $self->Hide();
         $self->{timer}->Stop();
     } elsif ($status eq 'CLOSED') {
