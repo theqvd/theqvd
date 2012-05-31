@@ -108,6 +108,10 @@ client.use_ssl = 1
 # Port where to run socat
 client.socat.port = 2002
 client.socat.timeout = 10
+client.serial.enabled = 0
+client.serial.local =
+client.serial.remote =
+
 
 
 ## umask for the L7R process
