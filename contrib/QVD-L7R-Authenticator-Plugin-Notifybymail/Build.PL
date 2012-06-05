@@ -7,6 +7,7 @@ my $builder = Module::Build->new(
     license             => 'perl',
     dist_author         => q{Nito Martinez <Nito@Qindel.ES>},
     dist_version        => '3.1'.$ENV{BUILD_NUMBER},
+    configure_requires  => { 'Module::Build' => 0.4 },
     build_requires => {
         'Test::More' => 0,
     },
