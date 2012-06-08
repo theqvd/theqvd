@@ -117,8 +117,9 @@ sub _call_hook {
     my $name = shift;
     my $file = shift;
     my $detach = shift;
-    DEBUG "calling hook '$file' for $name with args @_";
+    
     if (length $file) {
+	DEBUG "calling hook '$file' for $name with args @_";
 	my $pid = fork;
 	if (!$pid) {
 	    defined $pid or die "fork failed: $!\n";
