@@ -302,6 +302,16 @@ sub _run {
     );
 
     print "Done.\n";
+
+    if ( $self->{socat_proc} ) {
+        print "Killing socat...";
+        if ( $self->{socat_proc}->die ) {
+            print " ok\n";
+        } else {
+            print " failed\n";
+        }
+    }
+
 }
 
 sub _start_socat {
@@ -311,6 +321,7 @@ sub _start_socat {
     my $debug   = 1;
     my $port    = cfg("client.socat.port");
     my $timeout = cfg("client.socat.timeout");
+    my $socat_running;
 
     my @args = ("PTY,link=$socket,raw,echo=0", "tcp-l:$port,reuseaddr,fork");
     
@@ -323,30 +334,49 @@ sub _start_socat {
         use constant NORMAL_PRIORITY_CLASS => 0;
         require Win32::Process;
         Win32::Process->import;
-        Win32::Process::Create({}, $program, $cmdline, 0, CREATE_NO_WINDOW|NORMAL_PRIORITY_CLASS, '.');
+
+        print "Running socat: $program $cmdline\n";
+        if ( Win32::Process::Create({}, $program, $cmdline, 0, CREATE_NO_WINDOW|NORMAL_PRIORITY_CLASS, '.') ) {
+            $socat_running = 1;
+        } else {
+            $self->{client_delegate}->internal_error(message => "Failed to forward serial port: couldn't start socat: " .
+                                                                Win32::FormatMessage( Win32::GetLastError() ));
+        }
     } else {
-        Proc::Background->new("/usr/bin/socat", @args);
+        my $program = cfg("command.socat");
+        print "Running socat: $program " . join(' ', @args) . "\n";
+
+        $self->{socat_proc} = Proc::Background->new({'die_upon_destroy' => 1}, $program, @args);
+        if ( !$self->{socat_proc} || !$self->{socat_proc}->alive ) {
+            $self->{client_delegate}->internal_error(message => "Failed to forward serial port: couldn't start socat");
+        } else {
+            $socat_running = 1;
+        }
+
     }
+ 
+    if ( $socat_running ) {
+        print "Waiting for socat to start listening...\n";
+        my $retries = 0;
+        my $sock;
+        while ($retries++ < $timeout) {
+                $sock = new IO::Socket::INET(PeerAddr => 'localhost', 
+                                        PeerPort => $port, 
+                                        Proto    => 'tcp');
 
-    print "Waiting for socat to start listening...\n";
-    my $retries = 0;
-    my $sock;
-    while ($retries++ < $timeout) {
-        $sock = new IO::Socket::INET(PeerAddr => 'localhost', 
-                                     PeerPort => $port, 
-                                     Proto    => 'tcp');
+                last if ($sock);
 
-        last if ($sock);
+                print "Retry $retries/$timeout: $!\n";
+                sleep(1);
+        }
 
-        print "Retry $retries/$timeout: $!\n";
-        sleep(1);
-    }
-
-    if (!$sock) {
-        print "socat not listening on port $port\n";
-        $self->{client_delegate}->internal_error(message => "Failed to forward serial port, socat is not listening");
-    } else {
-        close($sock);
+        if (!$sock) {
+                print "socat not listening on port $port\n";
+                $self->{client_delegate}->internal_error(message => "Failed to forward serial port: socat is not listening");
+        } else {
+                print "ok\n";
+                close($sock);
+        }
     }
 
 }
