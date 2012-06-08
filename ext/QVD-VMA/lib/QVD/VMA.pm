@@ -482,6 +482,7 @@ sub _fork_socat {
 	if (!$pid) {
 		defined $pid or die "fork failed: $!\n";
 		eval {
+			$| = 1;
 			my $log = _open_log('socat');
 			my $logfd = fileno $log;
 			POSIX::dup2($logfd, 1);
