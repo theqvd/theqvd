@@ -234,6 +234,7 @@ vma.user.home.path = /home
 ## default user name and groups it will belong to
 vma.user.default.name = qvd
 vma.user.default.groups =
+vma.user.socat.group = dialout
 
 ## umask for the VMA
 vma.user.umask = 0022

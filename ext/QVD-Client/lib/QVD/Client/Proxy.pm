@@ -164,6 +164,14 @@ sub connect_to_vm {
         $cli->proxy_connection_status('CLOSED');
         return;
     }
+
+    if ( $self->{local_serial} ) {
+        if ( !$self->_start_socat() ) {
+            $cli->proxy_connection_status('CLOSED');
+            return;
+        }
+    }
+
     $connect_info{id} = $vm_id;
 
     my %o = (
@@ -235,7 +243,6 @@ sub _run {
     my %o = ();
 
     if ( $self->{local_serial} ) {
-        $self->_start_socat();
         $o{http} = cfg("client.socat.port");
     }
 
@@ -323,7 +330,7 @@ sub _start_socat {
     my $timeout = cfg("client.socat.timeout");
     my $socat_running;
 
-    my @args = ("PTY,link=$socket,raw,echo=0", "tcp-l:$port,reuseaddr,fork");
+    my @args = ("tcp-l:$port,reuseaddr,fork", "$socket,nonblock,raw,echo=0");
     
     unshift @args, "-x", "-v" if ($debug);
    
@@ -339,20 +346,23 @@ sub _start_socat {
         if ( Win32::Process::Create({}, $program, $cmdline, 0, CREATE_NO_WINDOW|NORMAL_PRIORITY_CLASS, '.') ) {
             $socat_running = 1;
         } else {
-            $self->{client_delegate}->internal_error(message => "Failed to forward serial port: couldn't start socat: " .
+            $self->{client_delegate}->socat_error(message => "Failed to forward serial port: couldn't start socat: " .
                                                                 Win32::FormatMessage( Win32::GetLastError() ));
         }
     } else {
-        my $program = cfg("command.socat");
-        print "Running socat: $program " . join(' ', @args) . "\n";
-
-        $self->{socat_proc} = Proc::Background->new({'die_upon_destroy' => 1}, $program, @args);
-        if ( !$self->{socat_proc} || !$self->{socat_proc}->alive ) {
-            $self->{client_delegate}->internal_error(message => "Failed to forward serial port: couldn't start socat");
+        if ( ! -c $socket ) {
+            $self->{client_delegate}->socat_error(message => "Failed to forward serial port: port $socket doesn't exist");
         } else {
-            $socat_running = 1;
-        }
+            my $program = cfg("command.socat");
+            print "Running socat: $program " . join(' ', @args) . "\n";
 
+            $self->{socat_proc} = Proc::Background->new({'die_upon_destroy' => 1}, $program, @args);
+            if ( !$self->{socat_proc} || !$self->{socat_proc}->alive ) {
+                $self->{client_delegate}->socat_error(message => "Failed to forward serial port: couldn't start socat");
+            } else {
+                $socat_running = 1;
+            }
+        }
     }
  
     if ( $socat_running ) {
@@ -372,12 +382,15 @@ sub _start_socat {
 
         if (!$sock) {
                 print "socat not listening on port $port\n";
-                $self->{client_delegate}->internal_error(message => "Failed to forward serial port: socat is not listening");
+                $self->{client_delegate}->socat_error(message => "Failed to forward serial port: socat is not listening");
         } else {
                 print "ok\n";
                 close($sock);
+                return 1;
         }
     }
 
+    # Something went wrong
+    return undef;
 }
 1;

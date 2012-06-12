@@ -12,7 +12,7 @@ use constant EVT_LIST_OF_VM_LOADED => Wx::NewEventType;
 use constant EVT_CONNECTION_ERROR  => Wx::NewEventType;
 use constant EVT_CONN_STATUS       => Wx::NewEventType;
 use constant EVT_UNKNOWN_CERT      => Wx::NewEventType;
-use constant EVT_INTERNAL_ERROR    => Wx::NewEventType;
+use constant EVT_SOCAT_ERROR       => Wx::NewEventType;
 
 my $vm_id :shared;
 my %connect_info :shared;
@@ -165,7 +165,7 @@ sub new {
     Wx::Event::EVT_COMMAND($self, -1, EVT_LIST_OF_VM_LOADED, \&OnListOfVMLoaded);
     Wx::Event::EVT_COMMAND($self, -1, EVT_CONN_STATUS, \&OnConnectionStatusChanged);
     Wx::Event::EVT_COMMAND($self, -1, EVT_UNKNOWN_CERT, \&OnUnknownCert);
-    Wx::Event::EVT_COMMAND($self, -1, EVT_INTERNAL_ERROR, \&OnInternalError);
+    Wx::Event::EVT_COMMAND($self, -1, EVT_SOCAT_ERROR, \&OnSocatError);
 
     Wx::Event::EVT_CLOSE($self, \&OnExit);
 
@@ -238,11 +238,11 @@ sub proxy_connection_error {
     Wx::PostEvent($self, $evt);
 }
 
-sub internal_error {
+sub socat_error {
     my $self = shift;
     my %args = @_;
     my $message :shared = $args{message};
-    my $evt = new Wx::PlThreadEvent(-1, EVT_INTERNAL_ERROR, $message);
+    my $evt = new Wx::PlThreadEvent(-1, EVT_SOCAT_ERROR, $message);
     Wx::PostEvent($self, $evt);
 }
 
@@ -303,10 +303,10 @@ sub OnConnectionError {
     $self->EnableControls(1);
 }
 
-sub OnInternalError {
+sub OnSocatError {
     my ($self, $event) = @_;
     my $message = $event->GetData;
-    my $dialog = Wx::MessageDialog->new($self, $message, "Internal error.", wxOK | wxICON_ERROR);
+    my $dialog = Wx::MessageDialog->new($self, $message, "Serial forwarding error.", wxOK | wxICON_ERROR);
     $dialog->ShowModal();
     $dialog->Destroy();
 #    $self->EnableControls(1);

@@ -283,6 +283,12 @@ sub _provisionate_user {
     my $uid = $props{'qvd.vm.user.uid'};
     my $user_home = $props{'qvd.vm.user.home'};
     my $groups = $props{'qvd.vm.user.groups'};
+
+    if ($props{'qvd.client.serial.port'}) {
+        $groups .= ", " if ($groups);
+        $groups .= cfg('vma.user.socat.group');
+    }
+
     $groups =~ s/\s//g;
 
     unless (-d $user_home) {
@@ -465,8 +471,8 @@ sub _fork_socat {
 		_kill_socat();
 	}
 
-	#retry=5, fork
-	my @args = ("PTY,link=$socket,raw,echo=0", "tcp:localhost:$port,nonblock,reuseaddr,retry=5");
+	my $group = cfg('vma.user.socat.group');
+	my @args = ("PTY,link=$socket,raw,echo=0,mode=0660,group=$group", "tcp:localhost:$port,nonblock,reuseaddr,retry=5");
 
 	if ( cfg('internal.vma.socat.debug') ) {
 		DEBUG "Enabling debug options for socat";
