@@ -16,6 +16,9 @@ use QVD::HTTP::StatusCodes qw(:status_codes);
 use URI::Escape qw(uri_escape);
 use Log::Log4perl;
 
+use constant CREATE_NO_WINDOW => 0;
+use constant NORMAL_PRIORITY_CLASS => 0;
+
 my $WINDOWS = ($^O eq 'MSWin32');
 my $NX_OS = $WINDOWS ? 'windows' : 'linux';
 
@@ -300,8 +303,7 @@ sub _run {
         push @cmd, $dotqvd;
         my $program = $cmd[0];
         my $cmdline = join ' ', map("\"$_\"", @cmd);
-        use constant CREATE_NO_WINDOW => 0;
-        use constant NORMAL_PRIORITY_CLASS => 0;
+
         require Win32::Process;
         Win32::Process->import;
         Win32::Process::Create({}, $program, $cmdline, 0, CREATE_NO_WINDOW|NORMAL_PRIORITY_CLASS, '.');
@@ -363,8 +365,7 @@ sub _start_socat {
     if ($WINDOWS) {
         my $program = $ENV{QVDPATH} . "/socat/socat.exe";
         my $cmdline = join ' ', map("\"$_\"", @args);
-        use constant CREATE_NO_WINDOW => 0;
-        use constant NORMAL_PRIORITY_CLASS => 0;
+
         require Win32::Process;
         Win32::Process->import;
 
