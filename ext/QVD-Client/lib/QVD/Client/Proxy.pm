@@ -14,6 +14,7 @@ use Proc::Background;
 use QVD::Config;
 use QVD::HTTP::StatusCodes qw(:status_codes);
 use URI::Escape qw(uri_escape);
+use Log::Log4perl;
 
 my $WINDOWS = ($^O eq 'MSWin32');
 my $NX_OS = $WINDOWS ? 'windows' : 'linux';
@@ -29,6 +30,7 @@ sub new {
         printing        => delete $opts{printing},
         local_serial    => delete $opts{local_serial},
         opts            => \%opts,
+        log             => Log::Log4perl->get_logger("QVD::Client::Proxy"),
     };
     bless $self, $class;
 }
@@ -43,6 +45,8 @@ sub new {
 sub _ssl_verify_callback {
     my ($self, $ssl_thinks, $mem_addr, $attrs, $errs) = @_;
     return 1 if $ssl_thinks;
+
+    $self->{log}->debug("_ssl_verify_callback called: " . join(' ', @_));
 
     my $cert_pem_str = Net::SSLeay::PEM_get_string_X509 (Net::SSLeay::X509_STORE_CTX_get_current_cert ($mem_addr));
     my $x509 = Crypt::OpenSSL::X509->new_from_string ($cert_pem_str);
@@ -66,6 +70,7 @@ EOF
     #printf "cert_data (%s)\n", $cert_data;
 
     my $accept = $self->{client_delegate}->proxy_unknown_cert([$cert_pem_str, $cert_data]);
+    $self->{log}->debug("Certificate " . $accept ? "accepted" : "rejected");
 
     return unless $accept;
 
@@ -109,7 +114,8 @@ sub connect_to_vm {
     my ($host, $port, $user, $passwd) = @connect_info{qw/host port username password/};
 
     $cli->proxy_connection_status('CONNECTING');
-    print "*** Connecting to $host:$port\n";
+    $self->{log}->info("Connecting to $host:$port\n");
+
     # SSL library has to be initialized in the thread where it's used,
     # so we do a "require QVD::HTTPC" here instead of "use"ing it above
     require QVD::HTTPC;
@@ -119,11 +125,13 @@ sub connect_to_vm {
         SSL_verify_callback => sub { $self->_ssl_verify_callback(@_) }
     )};
     if ($@) {
+        $self->{log}->error("Connection error: $@");
         $cli->proxy_connection_error(message => $@);
         return;
     } else {
         if (!$httpc) {
             # User rejected the server SSL certificate. Return to main window.
+            $self->{log}->info("User rejected certificate. Closing connection.");
             $cli->proxy_connection_status('CLOSED');
             return;
         }
@@ -132,6 +140,7 @@ sub connect_to_vm {
     use MIME::Base64 qw(encode_base64);
     my $auth = encode_base64("$user:$passwd", '');
 
+    $self->{log}->info("Sending auth");
     $httpc->send_http_request(
         GET => '/qvd/list_of_vm', 
         headers => [
@@ -141,6 +150,8 @@ sub connect_to_vm {
     );
 
     my ($code, $msg, $response_headers, $body) = $httpc->read_http_response();
+    $self->{log}->debug("Auth reply: $code/$msg");
+
     if ($code != HTTP_OK) {
         my $message;
         given ($code) {
@@ -152,6 +163,7 @@ sub connect_to_vm {
             }
         }
         $message ||= "$host replied with $msg";
+        $self->{log}->info("Connection error: $message");
         $cli->proxy_connection_error(message => $message);
         return;
     }
@@ -161,12 +173,14 @@ sub connect_to_vm {
     my $vm_id = $cli->proxy_list_of_vm_loaded($vm_list);
 
     if (!defined $vm_id) {
+        $self->{log}->info("VM not selected, closing coonection");
         $cli->proxy_connection_status('CLOSED');
         return;
     }
 
     if ( $self->{local_serial} ) {
         if ( !$self->_start_socat() ) {
+            $self->{log}->error("Socat failed to start, closing connection");
             $cli->proxy_connection_status('CLOSED');
             return;
         }
@@ -186,6 +200,8 @@ sub connect_to_vm {
     );
 
     my $q = join '&', map { uri_escape($_) .'='. uri_escape($o{$_}) } keys %o;
+
+    $self->{log}->debug("Sending parameters");
     $httpc->send_http_request(
         GET => "/qvd/connect_to_vm?$q",
         headers => [
@@ -197,6 +213,12 @@ sub connect_to_vm {
 
     while (1) {
         my ($code, $msg, $headers, $body) = $httpc->read_http_response;
+        $self->{log}->debug("Response: $code/$msg");
+	foreach my $hdr (@$headers) {
+		$self->{log}->debug("Header: $hdr");
+	}
+        $self->{log}->debug("Body: $body") if (defined $body);
+
         if ($code == HTTP_SWITCHING_PROTOCOLS) {
             $cli->proxy_connection_status('CONNECTED');
             $self->_run($httpc);
@@ -235,6 +257,7 @@ sub _run {
 
     my @cmd;
     if ($WINDOWS) {
+	push @cmd, $ENV{COMSPEC};
         push @cmd, $ENV{QVDPATH}."/NX/nxproxy.exe";
     } else {
         push @cmd, "nxproxy";
@@ -272,6 +295,9 @@ sub _run {
     push @cmd, qw(localhost:40);
 
     if ($WINDOWS) {
+        my $dotqvd = ($ENV{HOME} || $ENV{APPDATA}).'/.qvd';
+        push @cmd, ">";
+        push @cmd, $dotqvd;
         my $program = $cmd[0];
         my $cmdline = join ' ', map("\"$_\"", @cmd);
         use constant CREATE_NO_WINDOW => 0;
@@ -280,10 +306,10 @@ sub _run {
         Win32::Process->import;
         Win32::Process::Create({}, $program, $cmdline, 0, CREATE_NO_WINDOW|NORMAL_PRIORITY_CLASS, '.');
     } else {
-        print "Starting " . join(' ' , @cmd) . "\n";
+        $self->{log}->debug("Starting " . join(' ' , @cmd));
         Proc::Background->new(@cmd);
     }
-    print "Listening on 4040\n";
+    $self->{log}->debug("Listening on 4040\n");
     my $ll = IO::Socket::INET->new(
         LocalPort => 4040,
         ReuseAddr => 1,
@@ -291,7 +317,7 @@ sub _run {
     ) or die "Unable to listen on port 4040";
 
     my $local_socket = $ll->accept() or die "connection from nxproxy failed";
-    print "Connection accepted\n";
+    $self->{log}->debug("Connection accepted\n");
 
     undef $ll; # close the listening socket
     if ($WINDOWS) {
@@ -300,7 +326,7 @@ sub _run {
         ioctl($local_socket, FIONBIO, \$nonblocking);
     }
 
-    print "Forwarding sockets\n";
+    $self->{log}->debug("Forwarding sockets\n");
     forward_sockets(
         $local_socket,
         $httpc->get_socket,
@@ -308,14 +334,14 @@ sub _run {
         # debug => 1,
     );
 
-    print "Done.\n";
+    $self->{log}->debug("Done.");
 
     if ( $self->{socat_proc} ) {
-        print "Killing socat...";
+        $self->{log}->debug("Killing socat...");
         if ( $self->{socat_proc}->die ) {
-            print " ok\n";
+            $self->{log}->debug("ok");
         } else {
-            print " failed\n";
+            $self->{log}->debug("failed\n");
         }
     }
 
@@ -342,7 +368,7 @@ sub _start_socat {
         require Win32::Process;
         Win32::Process->import;
 
-        print "Running socat: $program $cmdline\n";
+        $self->{log}->debug("Running socat: $program $cmdline\n");
         if ( Win32::Process::Create({}, $program, $cmdline, 0, CREATE_NO_WINDOW|NORMAL_PRIORITY_CLASS, '.') ) {
             $socat_running = 1;
         } else {
@@ -354,7 +380,7 @@ sub _start_socat {
             $self->{client_delegate}->socat_error(message => "Failed to forward serial port: port $socket doesn't exist");
         } else {
             my $program = cfg("command.socat");
-            print "Running socat: $program " . join(' ', @args) . "\n";
+            $self->{log}->debug("Running socat: $program " . join(' ', @args) . "\n");
 
             $self->{socat_proc} = Proc::Background->new({'die_upon_destroy' => 1}, $program, @args);
             if ( !$self->{socat_proc} || !$self->{socat_proc}->alive ) {
@@ -366,7 +392,7 @@ sub _start_socat {
     }
  
     if ( $socat_running ) {
-        print "Waiting for socat to start listening...\n";
+        $self->{log}->debug("Waiting for socat to start listening...\n");
         my $retries = 0;
         my $sock;
         while ($retries++ < $timeout) {
@@ -376,15 +402,15 @@ sub _start_socat {
 
                 last if ($sock);
 
-                print "Retry $retries/$timeout: $!\n";
+                $self->{log}->debug("Retry $retries/$timeout: $!\n");
                 sleep(1);
         }
 
         if (!$sock) {
-                print "socat not listening on port $port\n";
+                $self->{log}->error("socat not listening on port $port\n");
                 $self->{client_delegate}->socat_error(message => "Failed to forward serial port: socat is not listening");
         } else {
-                print "ok\n";
+                $self->{log}->debug("ok\n");
                 close($sock);
                 return 1;
         }

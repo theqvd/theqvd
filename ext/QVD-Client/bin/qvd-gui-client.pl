@@ -8,12 +8,30 @@ use warnings;
 use Cwd;
 use File::Spec;
 use Proc::Background;
+use Log::Log4perl qw(:levels :easy);
 
 my $WINDOWS;
 my $DOTQVD;
+my $log;
 
 BEGIN {
     $DOTQVD = ($ENV{HOME} || $ENV{APPDATA}).'/.qvd';
+
+    if ( -f "$DOTQVD/log.conf" ) {
+        Log::Log4perl->init("$DOTQVD/log.conf");
+    } else {
+
+        Log::Log4perl->easy_init( { level => $DEBUG, file => ">>$DOTQVD/client.log" } );
+    }
+
+    $log = Log::Log4perl->get_logger("QVD::Client::App");
+
+    $log->info("Starting up...");
+    $log->info("Home dir is $DOTQVD, OS is $^O");
+
+    $SIG{__WARN__} = sub { my $l = Log::Log4perl->get_logger("QVD::Client::App"); $l->warn(@_); };
+    $SIG{__DIE__}  = sub { my $l = Log::Log4perl->get_logger("QVD::Client::App"); $l->error(@_); die(@_); };
+
     mkdir $DOTQVD if (!-e $DOTQVD);
     $QVD::Config::USE_DB = 0;
     @QVD::Config::FILES = (
@@ -33,7 +51,8 @@ use parent 'Wx::App';
 
 sub OnInit {
     my $self = shift;
-    
+    $log->debug("OnInit called");
+
     if ($WINDOWS) {
         my ($volume,$directories,$file) = File::Spec->splitpath(Cwd::realpath($0));
         $ENV{QVDPATH} //= File::Spec->catpath( $volume, $directories);
@@ -47,6 +66,7 @@ sub OnInit {
         Proc::Background->new(@cmd);   
     }
     
+    $log->debug("Showing frame");
     my $frame = QVD::Client::Frame->new();
     $self->SetTopWindow($frame);
     $frame->Show();
@@ -57,7 +77,10 @@ package main;
 
 Wx::InitAllImageHandlers();
 my $app = QVD::Client::App->new();
+
+$log->debug("Starting main loop");
 $app->MainLoop();
+$log->info("Exiting");
 
 __END__
 
