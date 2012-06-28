@@ -16,12 +16,15 @@ my $log;
 
 BEGIN {
     $DOTQVD = ($ENV{HOME} || $ENV{APPDATA}).'/.qvd';
-
+    mkdir($DOTQVD);
+    
     if ( -f "$DOTQVD/log.conf" ) {
         Log::Log4perl->init("$DOTQVD/log.conf");
+        print "Log configuration loaded from $DOTQVD/log.conf";
     } else {
 
-        Log::Log4perl->easy_init( { level => $DEBUG, file => ">>$DOTQVD/client.log" } );
+        Log::Log4perl->easy_init( { level => $DEBUG, file => ">>$DOTQVD/qvd_client.log" } );
+        print "Default log configuration. Logging to $DOTQVD/qvd_client.log";
     }
 
     $log = Log::Log4perl->get_logger("QVD::Client::App");

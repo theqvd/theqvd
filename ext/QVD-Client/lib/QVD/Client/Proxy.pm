@@ -170,6 +170,7 @@ sub connect_to_vm {
         $cli->proxy_connection_error(message => $message);
         return;
     }
+    $self->{log}->info("Authentication successful");
 
     my $vm_list = JSON->new->decode($body);
 
@@ -223,11 +224,14 @@ sub connect_to_vm {
         $self->{log}->debug("Body: $body") if (defined $body);
 
         if ($code == HTTP_SWITCHING_PROTOCOLS) {
+            $self->{log}->debug("Switching protocols. Connected.");
+            
             $cli->proxy_connection_status('CONNECTED');
             $self->_run($httpc);
             last;
         }
         elsif ($code == HTTP_PROCESSING) {
+            $self->{log}->debug("Starting VM...");
             # Server is starting the virtual machine and connecting to the VMA
         }
         else {
@@ -245,11 +249,14 @@ sub connect_to_vm {
                 $message = "Your virtual machine is under maintenance.";
             }
             $message ||= "Unable to connect to remote vm: $code $msg";
+            
+            $self->{log}->error("Fatal error: $message");
             $cli->proxy_connection_error(message => $message, code => $code);
             last;
         }
     }
     $cli->proxy_connection_status('CLOSED');
+    $self->{log}->debug("Connection closed");
 }
 
 sub _run {
@@ -260,7 +267,6 @@ sub _run {
 
     my @cmd;
     if ($WINDOWS) {
-	push @cmd, $ENV{COMSPEC};
         push @cmd, $ENV{QVDPATH}."/NX/nxproxy.exe";
     } else {
         push @cmd, "nxproxy";
@@ -278,7 +284,12 @@ sub _run {
         (my $cygwin_nx_root = $ENV{NX_ROOT}) =~ tr!:\\!//!;
         $o{errors} = '/cygdrive/'.$cygwin_nx_root.'/proxy.log';
         # Call pulseaudio in Windows
-        Proc::Background->new($ENV{QVDPATH}."/pulseaudio/pulseaudio.exe", "-D", "--high-priority") if $self->{audio};     
+        
+        if ( $self->{audio} ) {
+            my @pa_args = ($ENV{QVDPATH}."/pulseaudio/pulseaudio.exe", "-D", "--high-priority");
+            $self->{log}->debug("Starting pulseaudio: " . join(' ', @pa_args));
+            Proc::Background->new(@pa_args);
+        }
     }  
     
     $o{media} = 4713 if $self->{audio};
@@ -299,16 +310,20 @@ sub _run {
 
     if ($WINDOWS) {
         my $dotqvd = ($ENV{HOME} || $ENV{APPDATA}).'/.qvd';
-        push @cmd, ">";
-        push @cmd, $dotqvd;
         my $program = $cmd[0];
         my $cmdline = join ' ', map("\"$_\"", @cmd);
 
+        $self->{log}->debug("Running nxproxy: $program $cmdline");
         require Win32::Process;
         Win32::Process->import;
-        Win32::Process::Create({}, $program, $cmdline, 0, CREATE_NO_WINDOW|NORMAL_PRIORITY_CLASS, '.');
+        my $ret = Win32::Process::Create({}, $program, $cmdline, 0, CREATE_NO_WINDOW|NORMAL_PRIORITY_CLASS, '.');
+        if (!$ret) {
+            $self->{log}->error("Failed to start nxproxy");
+        } else {
+            $self->{log}->info("nxproxy started");
+        }
     } else {
-        $self->{log}->debug("Starting " . join(' ' , @cmd));
+        $self->{log}->debug("Running nxproxy: " . join(' ' , @cmd));
         Proc::Background->new(@cmd);
     }
     $self->{log}->debug("Listening on 4040\n");
@@ -393,7 +408,7 @@ sub _start_socat {
     }
  
     if ( $socat_running ) {
-        $self->{log}->debug("Waiting for socat to start listening...\n");
+        $self->{log}->debug("Waiting for socat to start listening...");
         my $retries = 0;
         my $sock;
         while ($retries++ < $timeout) {
