@@ -7,9 +7,7 @@ WriteMakefile(
     AUTHOR              => 'QVD Team <qvd@qindel.es>',
     VERSION	        => '3.1'.$ENV{BUILD_NUMBER},
     ABSTRACT_FROM       => 'lib/QVD/Admin.pm',
-    EXE_FILES		=> [
-	'bin/qvd-admin.pl',
-    ],
+    EXE_FILES		=> [ 'bin/qvd-admin.pl'],
     PL_FILES            => {},
     PREREQ_PM => {
 	'File::Slurp' => 0,
@@ -21,6 +19,4 @@ WriteMakefile(
 	'Text::Table' => 0,
 	'DateTime' => 0,
     },
-    dist                => { COMPRESS => 'gzip -9f', SUFFIX => 'gz', },
-    clean               => { FILES => 'QVD-Admin-*' },
 );
