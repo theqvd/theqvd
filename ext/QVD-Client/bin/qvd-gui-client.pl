@@ -65,8 +65,14 @@ sub OnInit {
         my @opts = qw(-multiwindow -notrayicon -nowinkill -clipboard +bs -wm);
         push @opts, (-logfile => $DOTQVD.'/xserver.log');
         push @cmd, ($ENV{QVDPATH}."/Xming/Xming.exe", @opts);
-
-        Proc::Background->new(@cmd);   
+        $log->debug("Starting Xming: " . join(' ', @cmd));
+        
+        if ( Proc::Background->new(@cmd) ) {
+            $log->debug("Xming started");
+        } else {
+            $log->error("Xming failed to start");
+        }
+        
     }
     
     $log->debug("Showing frame");

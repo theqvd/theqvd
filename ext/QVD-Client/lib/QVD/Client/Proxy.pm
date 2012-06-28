@@ -288,7 +288,11 @@ sub _run {
         if ( $self->{audio} ) {
             my @pa_args = ($ENV{QVDPATH}."/pulseaudio/pulseaudio.exe", "-D", "--high-priority");
             $self->{log}->debug("Starting pulseaudio: " . join(' ', @pa_args));
-            Proc::Background->new(@pa_args);
+            if ( Proc::Background->new(@pa_args) ) {
+                $self->{log}->debug("Pulseaudio started");
+            } else {
+                $self->{log}->error("Pulseaudio failed to start");
+            }
         }
     }  
     
@@ -324,7 +328,11 @@ sub _run {
         }
     } else {
         $self->{log}->debug("Running nxproxy: " . join(' ' , @cmd));
-        Proc::Background->new(@cmd);
+        if ( Proc::Background->new(@cmd) ) {
+            $self->{log}->debug("nxproxy started");
+        } else {
+            $self->{log}->error("nxproxy failed to start");
+        }
     }
     $self->{log}->debug("Listening on 4040\n");
     my $ll = IO::Socket::INET->new(
@@ -400,8 +408,10 @@ sub _start_socat {
 
             $self->{socat_proc} = Proc::Background->new({'die_upon_destroy' => 1}, $program, @args);
             if ( !$self->{socat_proc} || !$self->{socat_proc}->alive ) {
+                $self->{log}->error("Failed to start socat");
                 $self->{client_delegate}->socat_error(message => "Failed to forward serial port: couldn't start socat");
             } else {
+                $self->{log}->debug("socat running");
                 $socat_running = 1;
             }
         }
