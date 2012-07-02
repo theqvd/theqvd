@@ -15,9 +15,7 @@ qvd-admin.pl config set vm.network.ip.start=10.1.0.30
 qvd-admin.pl host add name=node1 address=127.0.0.1
 
 qvd-admin.pl osf  add name=foo1
-qvd-admin.pl di   add osf_id=1 path=/var/lib/qvd/storage/staging/good.qcow2
-qvd-admin.pl di   add osf_id=1 path=/var/lib/qvd/storage/staging/good.qcow2
-qvd-admin.pl di   add osf_id=1 path=/var/lib/qvd/storage/staging/ptem.qcow2
+qvd-admin.pl di   add osf_id=1 path=/var/lib/qvd/storage/staging/demo-ubuntu-gnome.img
 qvd-admin.pl user add login=salva password=foo
 qvd-admin.pl vm   add name=salva-1 user=salva osf=foo1
 

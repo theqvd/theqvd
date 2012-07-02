@@ -78,6 +78,12 @@ sub on_cmd {
     }
 }
 
+sub _delete_cmd {
+    my $self = shift;
+    $self->_maybe_callback('on_delete_cmd');
+    $self->_on_delete_cmd_done;
+}
+
 sub _save_state {
     my $self = shift;
     my $state = $self->_main_state;
@@ -150,7 +156,7 @@ sub _save_runtime_row {
     DEBUG sprintf "Saving runtime row for VM '%d': VMA port '%d', X11 port '%d', SSH port '%d', VNC port '%s', serial port '%s', monitor port '%s'",
         @{$self}{qw(vm_id vma_port x_port ssh_port vnc_port serial_port mon_port)};
 
-    $self->_query_1(<<'SQL', @{$self}{qw(ip vma_port x_port ssh_port vnc_port serial_port mon_port vm_id)});
+    $self->_query_1(<<'SQL', @{$self}{qw(ip vma_port x_port ssh_port vnc_port serial_port mon_port vm_pid vm_id)});
 update vm_runtimes
     set
         vm_address     = $1,
@@ -159,9 +165,10 @@ update vm_runtimes
         vm_ssh_port    = $4,
         vm_vnc_port    = $5,
         vm_serial_port = $6,
-        vm_mon_port    = $7
+        vm_mon_port    = $7,
+        vm_pid         = $8
     where
-        vm_id          = $8
+        vm_id          = $9
 SQL
 }
 
@@ -373,5 +380,9 @@ sub _on_clear_runtime_row_result {}
 sub _on_clear_runtime_row_bad_result {}
 
 sub _call_on_stopped { shift->_maybe_callback('on_stopped') }
+
+sub _run_prestart_hook { shift->_run_hook('prestart') }
+sub _run_poststart_hook { shift->_run_hook('poststart') }
+sub _run_poststop_hook { shift->_run_hook('poststop') }
 
 1;

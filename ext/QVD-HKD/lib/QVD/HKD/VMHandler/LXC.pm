@@ -620,6 +620,7 @@ sub _start_lxc {
                                            delete $self->{lxc_pid};
                                            $self->_on_lxc_done;
                                        });
+    $self->{vm_pid} = $self->{lxc_pid}; # this is the field that goes into the database
     $self->_on_start_lxc_done;
 }
 
@@ -724,15 +725,17 @@ sub _unmount_filesystem {
                     on_done => '_unmount_filesystems');
 }
 
-sub _delete_cmd {
+sub _hook_args {
     my $self = shift;
-    $self->_maybe_callback('on_delete_cmd');
-    $self->_on_delete_cmd_done;
+    map { $_ => $self->{$_} } qw( use_overlay
+                                  os_meta
+                                  mac
+                                  name
+                                  ip
+                                  os_rootfs
+                                  os_overlayfs
+                                  lxc_name );
 }
-
-sub _run_prestart_hook { shift->_run_hook('prestart') }
-sub _run_poststart_hook { shift->_run_hook('poststart') }
-sub _run_poststop_hook { shift->_run_hook('poststop') }
 
 sub _run_hook {
     my ($self, $name) = @_;
@@ -743,14 +746,7 @@ sub _run_hook {
             my @args = ( id    => $self->{vm_id},
                          hook  => $name,
                          state => $self->_main_state,
-                         map { $_ => $self->{$_} } qw( use_overlay
-                                                       os_meta
-                                                       mac
-                                                       name
-                                                       ip
-                                                       os_rootfs
-                                                       os_overlayfs
-                                                       lxc_name ));
+                         $self->_hook_args );
 
             $debug and $self->_debug("running hook $hook for $name");
             DEBUG "Running hook '$hook' for '$name'";
