@@ -471,8 +471,11 @@ sub _fork_socat {
 		_kill_socat();
 	}
 
+	my $user  = cfg('vma.user.socat.user') || $props{'qvd.vm.user.name'};
 	my $group = cfg('vma.user.socat.group');
-	my @args = ("PTY,link=$socket,raw,echo=0,mode=0660,group=$group", "tcp:localhost:$port,nonblock,reuseaddr,retry=5");
+	my $mode  = cfg('vma.user.socat.mode');
+
+	my @args = ("PTY,link=$socket,raw,echo=0,mode=$mode,group=$group" . ( $user ? ",user=$user" : "" ), "tcp:localhost:$port,nonblock,reuseaddr,retry=5");
 
 	if ( cfg('internal.vma.socat.debug') ) {
 		DEBUG "Enabling debug options for socat";

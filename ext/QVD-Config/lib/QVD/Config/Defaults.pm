@@ -234,7 +234,10 @@ vma.user.home.path = /home
 ## default user name and groups it will belong to
 vma.user.default.name = qvd
 vma.user.default.groups =
+## If user is not set, the port is owned by the user that is logging in
+vma.user.socat.user =
 vma.user.socat.group = dialout
+vma.user.socat.mode = 0660
 
 ## umask for the VMA
 vma.user.umask = 0022
