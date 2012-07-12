@@ -28,6 +28,7 @@ my $build = new Module::Build(
 		'Catalyst::Plugin::FormBuilder'      => 0,
 		'Catalyst::View::Component::jQuery'  => 0,
 		'MooseX::Log::Log4perl'              => 0,
+		'MooseX::Getopt'   	             => 0,
 		'parent'                             => 0,
 		'QVD::Admin'                         => 0,
 		'QVD::Config'                        => 0,
