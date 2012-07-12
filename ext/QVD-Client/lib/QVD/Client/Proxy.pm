@@ -251,11 +251,13 @@ sub connect_to_vm {
             $message ||= "Unable to connect to remote vm: $code $msg";
             
             $self->{log}->error("Fatal error: $message");
+            $self->_stop_socat();
             $cli->proxy_connection_error(message => $message, code => $code);
             last;
         }
     }
     $cli->proxy_connection_status('CLOSED');
+    $self->_stop_socat();
     $self->{log}->debug("Connection closed");
 }
 
@@ -361,15 +363,7 @@ sub _run {
 
     $self->{log}->debug("Done.");
 
-    if ( $self->{socat_proc} ) {
-        $self->{log}->debug("Killing socat...");
-        if ( $self->{socat_proc}->die ) {
-            $self->{log}->debug("ok");
-        } else {
-            $self->{log}->debug("failed\n");
-        }
-    }
-
+    $self->_stop_socat();
 }
 
 sub _start_socat {
@@ -445,4 +439,19 @@ sub _start_socat {
     # Something went wrong
     return undef;
 }
+
+
+sub _stop_socat {
+    my ($self) = @_;
+
+    if ( $self->{socat_proc} ) {
+        $self->{log}->debug("Killing socat...");
+        if ( $self->{socat_proc}->die ) {
+            $self->{log}->debug("ok");
+        } else {
+            $self->{log}->debug("failed\n");
+        }
+    }
+}
+
 1;
