@@ -109,16 +109,18 @@ running() {
 
 start_server() {
 # Start the process using the wrapper
-        if [ -z "$DAEMONUSER" ] ; then
-            start_daemon -p $PIDFILE $DAEMON $DAEMON_OPTS
-            errcode=$?
-        else
+#        if [ -z "$DAEMONUSER" ] ; then
+#            start_daemon -p $PIDFILE $DAEMON $DAEMON_OPTS
+#            errcode=$?
+#        else
 # if we are using a daemonuser then change the user id
-            start-stop-daemon --start --quiet --pidfile $PIDFILE \
-                        --chuid $DAEMONUSER \
-                        --exec $DAEMON -- $DAEMON_OPTS
-            errcode=$?
-        fi
+#            start-stop-daemon --start --quiet --pidfile $PIDFILE \
+#                        --chuid $DAEMONUSER \
+#                        --exec $DAEMON -- $DAEMON_OPTS
+#            errcode=$?
+#        fi
+	nohup $DAEMON $DAEMON_OPTS > /dev/null &
+	errcode=$?
         return $errcode
 }
 
