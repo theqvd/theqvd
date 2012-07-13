@@ -15,13 +15,12 @@ use parent qw(QVD::HKD::VMHandler);
 
 use QVD::StateMachine::Declarative
     'new'                             => { transitions => { _on_cmd_start                => 'starting',
-                                                            _on_cmd_catch_zombie         => 'zombie/beating_to_death' } },
+                                                            _on_cmd_catch_zombie         => 'zombie/beating_to_death'       } },
 
     'starting'                        => { jump        => 'starting/saving_state' },
 
     'starting/saving_state'           => { enter       => '_save_state',
-                                           transitions => { _on_save_state_done          => 'starting/loading_row' },
-                                           ignore      => ['_on_save_state_result'] },
+                                           transitions => { _on_save_state_done          => 'starting/loading_row'          } },
 
     'starting/loading_row'            => { enter       => '_load_row',
                                            transitions => { _on_load_row_done            => 'starting/updating_stats',
@@ -55,35 +54,35 @@ use QVD::StateMachine::Declarative
 
     'starting/allocating_os_disk'     => { enter       => '_allocate_os_disk',
                                            transitions => { _on_allocate_os_disk_done    => 'starting/allocating_user_disk',
-                                                            _on_allocate_os_disk_error   => 'failed/clearing_runtime_row' } },
+                                                            _on_allocate_os_disk_error   => 'stopping/clearing_runtime_row' } },
 
     'starting/allocating_user_disk'   => { enter       => '_allocate_user_disk',
                                            transitions => { _on_allocate_user_disk_done  => 'starting/removing_old_fw_rules',
-                                                            _on_allocate_user_disk_error => 'failed/clearing_runtime_row' } },
+                                                            _on_allocate_user_disk_error => 'stopping/clearing_runtime_row' } },
 
     'starting/removing_old_fw_rules'  => { enter       => '_remove_fw_rules',
                                            transitions => { _on_remove_fw_rules_done     => 'starting/allocating_tap',
-                                                            _on_remove_fw_rules_error    => 'failed/clearing_runtime_row',} },
+                                                            _on_remove_fw_rules_error    => 'stopping/clearing_runtime_row',} },
 
     'starting/allocating_tap'         => { enter       => '_allocate_tap',
                                            transitions => { _on_allocate_tap_done        => 'starting/running_prestart_hook',
-                                                            _on_allocate_tap_error       => 'failed/clearing_runtime_row' } },
+                                                            _on_allocate_tap_error       => 'stopping/clearing_runtime_row' } },
 
     'starting/running_prestart_hook'  => { enter    => '_run_prestart_hook',
                                            transitions => { _on_run_hook_done            => 'starting/setting_fw_rules',
-                                                            _on_run_hook_error           => 'stopping/running_poststop_hook'  } },
+                                                            _on_run_hook_error           => 'stopping/saving_state_2'  } },
 
     'starting/setting_fw_rules'       => { enter       => '_set_fw_rules',
                                            transitions => { _on_set_fw_rules_done        => 'starting/enabling_iface',
-                                                            _on_set_fw_rules_error       => 'failed/clearing_runtime_row' } },
+                                                            _on_set_fw_rules_error       => 'stopping/saving_state_2' } },
 
     'starting/enabling_iface'         => { enter       => '_enable_iface',
                                            transitions => { _on_enable_iface_done        => 'starting/launching',
-                                                            _on_enable_iface_error       => 'failed/clearing_runtime_row' } },
+                                                            _on_enable_iface_error       => 'stopping/saving_state_2' } },
 
     'starting/launching'              => { enter       => '_launch_process',
                                            transitions => { _on_launch_process_done      => 'starting/waiting_for_vma',
-                                                            _on_launch_process_error     => 'failed/clearing_runtime_row' } },
+                                                            _on_launch_process_error     => 'stopping/saving_state_2' } },
 
     'starting/waiting_for_vma'        => { enter       => '_start_vma_monitor',
                                            leave       => '_stop_vma_monitor',
@@ -96,9 +95,7 @@ use QVD::StateMachine::Declarative
 
     'running/saving_state'            => { enter       => '_save_state',
                                            transitions => { _on_save_state_done          => 'running/updating_stats',
-                                                            _on_save_state_error         => 'stopping/saving_state' },
-                                           delay       => [qw(_on_vm_process_done)]                                    },
-
+                                                            _on_save_state_error         => 'stopping/saving_state' } },
 
     'running/updating_stats'          => { enter       => '_incr_run_ok',
                                            transitions =>  { _on_incr_run_ok_done        => 'running/running_poststart_hook',
@@ -108,8 +105,7 @@ use QVD::StateMachine::Declarative
 
     'running/running_poststart_hook'  => {  enter       => '_run_poststart_hook',
                                             transitions => { _on_run_hook_done            => 'running/unsetting_heavy_mark',
-                                                             _on_run_hook_error           => 'stopping/saving_state'           },
-                                            delay       => [qw(_on_vm_process_done)] },
+                                                             _on_run_hook_error           => 'stopping/saving_state'          } },
 
     'running/unsetting_heavy_mark'    => { enter       => '_unset_heavy_mark',
                                            transitions => { _on_unset_heavy_mark_done    => 'running/monitoring'              } },
@@ -117,11 +113,11 @@ use QVD::StateMachine::Declarative
     'running/monitoring'              => { enter       => '_start_vma_monitor',
                                            leave       => '_stop_vma_monitor',
                                            # TODO: check these transitions:
-                                           transitions => { _on_cmd_stop                 => 'stopping/powering_off',
+                                           transitions => { _on_cmd_stop                 => 'stopping/deleting_cmd',
                                                             on_hkd_stop                  => 'stopping/saving_state',
-                                                            _on_dead                     => 'stopping/killing_vm',
+                                                            _on_dead                     => 'stopping/saving_state',
                                                             _on_goto_debug               => 'debugging/saving_state',
-                                                            _on_vm_process_done          => 'stopping/clearing_runtime_row' } },
+                                                            _on_vm_process_done          => 'stopping/saving_state_2' } },
 
     'debugging/saving_state'          => { enter       => '_save_state',
                                            transitions => { _on_save_state_done          => 'debugging/unsetting_heavy_mark',
@@ -136,28 +132,51 @@ use QVD::StateMachine::Declarative
                                            transitions => { _on_alive                    => 'running/saving_state',
                                                             _on_cmd_stop                 => 'stopping/deleting_cmd',
                                                             on_hkd_stop                  => 'stopping/saving_state',
-                                                            _on_lxc_done                 => 'stopping/killing_lxc' },
+                                                            _on_vm_process_done          => 'stopping/saving_state_2' },
                                            ignore      => [qw(_on_dead
                                                               _on_goto_debug)] },
+
+    'stopping/deleting_cmd'           => { enter       => '_delete_cmd',
+                                           transitions => { _on_delete_cmd_done          => 'stopping/saving_state'           } },
+
+    'stopping/saving_state'           => { enter       => '_save_state',
+                                           transitions => { _on_save_state_done          => 'stopping/setting_heavy_mark',
+                                                            _on_save_state_error         => 'stopping/setting_heavy_mark'     } },
+
+    'stopping/setting_heavy_mark'     => { enter       => '_set_heavy_mark',
+                                           transitions => { _on_set_heavy_mark_done      => 'stopping/powering_off',
+                                                            _on_set_heavy_mark_error     => 'stopping/delaying'               } },
+
+    'stopping/delaying'               => { transitions => { _on_cmd_go_heavy             => 'stopping/setting_heavy_mark'     } },
 
     'stopping/powering_off'           => { enter       => '_poweroff',
                                            leave       => '_abort_all',
                                            transitions => { _on_rpc_poweroff_error       => 'stopping/killing_vm',
-                                                            _on_vm_process_done          => 'stopping/clearing_runtime_row',
+                                                            _on_vm_process_done          => 'stopping/removing_fw_rules',
                                                             _on_rpc_poweroff_result      => 'stopping/waiting_for_vm_to_exit' } },
 
     'stopping/waiting_for_vm_to_exit' => { enter       => '_set_state_timer',
                                            leave       => '_abort_all',
-                                           transitions => { _on_vm_process_done          => 'stopping/clearing_runtime_row',
+                                           transitions => { _on_vm_process_done          => 'stopping/removing_fw_rules',
                                                             _on_state_timeout            => 'stopping/killing_vm' } },
 
     'stopping/killing_vm'             => { enter       => '_kill_vm',
                                            leave       => '_abort_all',
                                            transitions => { _on_vm_process_done          => 'stopping/removing_fw_rules' } },
 
+    'stopping/saving_state_2'         => { enter       => '_save_state',
+                                           transitions => { _on_save_state_done          => 'stopping/removing_fw_rules',
+                                                            _on_save_state_error         => 'stopping/removing_fw_rules'     } },
+
     'stopping/removing_fw_rules'      => { enter       => '_remove_fw_rules',
-                                           transitions => { _on_remove_fw_rules_done     => 'stopping/clearing_runtime_row',
-                                                            _on_remove_fw_rules_error    => 'stopping/clearing_runtime_row' } },
+                                           transitions => { _on_remove_fw_rules_done     => 'stopping/running_poststop_hook',
+                                                            _on_remove_fw_rules_error    => 'stopping/running_poststop_hook' } },
+
+    'stopping/running_poststop_hook'  => { enter    => '_run_prestart_hook',
+                                           transitions => { _on_run_hook_done            => 'stopping/clearing_runtime_row',
+                                                            _on_run_hook_error           => 'stopping/clearing_runtime_row'  } },
+
+
 
     'stopping/clearing_runtime_row'   => { enter       => '_clear_runtime_row',
                                            transitions => { _on_clear_runtime_row_done   => 'stopped' },
@@ -191,15 +210,12 @@ use QVD::StateMachine::Declarative
                                            transitions => { _on_state_timeout => 'zombie/beating_to_death',
                                                             on_hkd_stop => 'stopped'                                         } },
 
-    'failed/clearing_runtime_row'     => { enter       => '_clear_runtime_row',
-                                           transitions => { _on_clear_runtime_row_done   => 'failed',
-                                                            _on_clear_runtime_row_error  => 'failed' },
-                                           ignore      => ['_on_clear_runtime_row_result',
-                                                           '_on_clear_runtime_row_bad_result'] },
+    __any__                           => { delay       => ['_on_cmd_stop',
+                                                           '_on_vm_process_done',
+                                                           'on_hkd_stop']                                                      };
 
-    'failed'                          => { enter       => '_call_on_stopped' };
+sub _on_cmd_start :OnState('__any__') { shift->_maybe_callback('on_delete_cmd') }
 
-sub _on_cmd_stop :OnState('__any__') { shift->delay_until_next_state }
 
 # FIXME: move this out of here, maybe into a module:
 use constant TUNNEL_DEV => '/dev/net/tun';
