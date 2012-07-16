@@ -279,19 +279,19 @@ internal.l7r.short_session = 120
 
 # internal.hkd.perl.anyevent.backend = EV
 
-internal.hkd.timeout.vm.state.starting_2 = 240
-internal.hkd.timeout.vm.state.stopping_1 = 30
-internal.hkd.timeout.vm.state.stopping_2 = 240
-internal.hkd.timeout.vm.state.zombie_1 = 30
-internal.hkd.timeout.vm.state.running = 120
-internal.hkd.timeout.vm.vma = 4
-internal.hkd.poll_time = 2
-internal.hkd.poll_all_mod = 10
+#internal.hkd.timeout.vm.state.starting_2 = 240
+#internal.hkd.timeout.vm.state.stopping_1 = 30
+#internal.hkd.timeout.vm.state.stopping_2 = 240
+#internal.hkd.timeout.vm.state.zombie_1 = 30
+#internal.hkd.timeout.vm.state.running = 120
+#internal.hkd.timeout.vm.vma = 4
+#internal.hkd.poll_time = 2
+#internal.hkd.poll_all_mod = 10
 
-internal.hkd.database.retry_delay = 5
-internal.hkd.database.timeout = 20
-internal.hkd.cluster.check.interval = 30
-internal.hkd.cluster.node.timeout = 80
+#internal.hkd.database.retry_delay = 5
+#internal.hkd.database.timeout = 20
+#internal.hkd.cluster.check.interval = 30
+#internal.hkd.cluster.node.timeout = 80
 
 internal.vm.port.x = 5000
 internal.vm.port.vma = 3030
@@ -316,7 +316,6 @@ internal.vma.nxagent.config = ${path.run}/nxagent.conf
 
 internal.vma.socat.debug = 0
 
-
 internal.database.client.connect.timeout = 20
 internal.database.client.socket.keepidle = 20
 internal.database.client.socket.keepintvl = 5
@@ -338,7 +337,7 @@ internal.hkd.vmhandler.killer.delay = 10
 internal.hkd.vmhandler.timeout.on_state.stopping = 200
 internal.hkd.vmhandler.timeout.on_state.zombie = 200
 
-internal.hkd.vmhandler.vma.failed.max_count.on.starting = 20
+internal.hkd.vmhandler.vma.failed.max_count.on.starting = 40
 internal.hkd.vmhandler.vma.failed.max_count.on.running = 10
 
 internal.hkd.vmhandler.vma.failed.max_time.on.starting = 180
