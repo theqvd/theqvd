@@ -7,12 +7,18 @@ set -x
 
 if [ ! -f /var/lib/qvd/storage/staging/demo-ubuntu-kde.img ] ; then
 	mkdir -p /var/lib/qvd/storage/staging/
-	wget http://theqvd.com/downloads/demo/demo-ubuntu-kde.img.gz -c -O /var/lib/qvd/storage/staging/demo-ubuntu-kde.img.gz
-	gunzip /var/lib/qvd/storage/staging/demo-ubuntu-kde.img.gz
+	file=/var/lib/qvd/storage/staging/demo-ubuntu-kde.img.gz
+	wget http://theqvd.com/downloads/demo/demo-ubuntu-kde.img.gz -c -O "$file" || rm -f "$file"
+	gunzip "$file" || rm -f /var/lib/qvd/storage/staging/*
+
+	if [ ! -f /var/lib/qvd/storage/staging/demo-ubuntu-kde.img ] ; then
+		echo "Failed to download demo image, aborting"
+		exit 1
+	fi
 fi
 
 
-qvd-deploy-db.pl --force >/tmp/sample-init.log 2>&1|| exit 1;
+qvd-deploy-db.pl --force 2>&1 | tee /tmp/sample-init.log || exit 1;
 
 qvd-admin.pl config ssl key=/etc/qvd/server-private-key.pem cert=/etc/qvd/server-certificate.pem
 qvd-admin.pl config set vm.network.ip.start=10.1.0.30
