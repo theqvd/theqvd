@@ -34,6 +34,7 @@ use QVD::HKD::DHCPDHandler;
 use QVD::HKD::CommandHandler;
 use QVD::HKD::VMCommandHandler;
 use QVD::HKD::VMHandler;
+use QVD::HKD::L7RMonitor;
 
 use QVD::HKD::Config::Network qw(netvms netnodes);
 
@@ -273,7 +274,7 @@ sub _load_host_row {
     my $self = shift;
     my $host = $self->_cfg('nodename');
     DEBUG "Loading entry for host '$host' from DB";
-    $self->_query_1('select id, name from hosts where name=$1', $host);
+    $self->_query_1('select id from hosts where name=$1', $host);
 }
 
 sub _on_load_host_row_bad_result {
@@ -288,7 +289,7 @@ sub _on_load_host_row_error {
 
 sub _on_load_host_row_result {
     my ($self, $res) = @_;
-    $self->{node_id} = $res->row;
+    ($self->{node_id}) = $res->row;
 }
 
 sub _calc_load_balancing_data {   ## taken from was_QVD-HKD/lib/QVD/HKD.pm, _update_load_balancing_data
@@ -373,6 +374,9 @@ sub _start_agents {
                                                                    on_cmd     => sub { $self->_on_vm_cmd($_[1], $_[2]) },
                                                                    on_stopped => sub { $self->_on_agent_stopped(@_) } );
 
+    $self->{l7r_monitor} = QVD::HKD::L7RMonitor->new( %opts,
+                                                      on_stopped => sub { $self->_on_agent_stopped(@_) } );
+
     if ($self->_cfg("vm.network.use_dhcp")) {
         $self->{dhcpd_handler} = QVD::HKD::DHCPDHandler->new( %opts,
                                                               on_stopped => sub { $self->_on_agent_stopped(@_) } );
@@ -380,6 +384,10 @@ sub _start_agents {
 
     DEBUG 'Starting command handler';
     $self->{command_handler}->run;
+
+    DEBUG 'Starting L7R Monitor';
+    $self->{l7r_monitor}->run;
+
     # DEBUG 'Starting VM command handler';
     # $self->{vm_command_handler}->run;
 
@@ -406,6 +414,7 @@ my @agent_names = qw(vm_command_handler
                      command_handler
                      dhcpd_handler
                      ticker
+                     l7r_monitor
                      checker);
 
 sub _check_all_agents_have_stopped {

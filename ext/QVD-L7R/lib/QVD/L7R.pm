@@ -275,9 +275,15 @@ sub _release_vm {
         $vm->discard_changes;
         my $pid = $vm->l7r_pid;
         my $host = $vm->l7r_host;
-        $vm->clear_l7r_all
-            if (defined $pid  and $pid  == $$  and
-                defined $host and $host == this_host_id);
+        if (defined $pid  and $pid  == $$  and
+            defined $host and $host == this_host_id) {
+            DEBUG 'calling clear l7r all for vm ' . $vm->id;
+            $vm->clear_l7r_all;
+        }
+        else {
+            DEBUG 'not calling clear_l7r_all for vm ' . $vm->id
+                . " where pid=$pid, \$\$=$$, host=$host, this_host=". this_host_id;
+        }
     };
     $@ and INFO "L7R release failed but don't bother, HKD will cleanup the mess: $@";
 }
