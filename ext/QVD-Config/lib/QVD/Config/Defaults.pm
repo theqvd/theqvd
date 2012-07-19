@@ -290,8 +290,9 @@ internal.l7r.short_session = 120
 
 #internal.hkd.database.retry_delay = 5
 #internal.hkd.database.timeout = 20
-#internal.hkd.cluster.check.interval = 30
-#internal.hkd.cluster.node.timeout = 80
+
+internal.hkd.cluster.check.interval = 30
+internal.hkd.cluster.node.timeout = 80
 
 internal.vm.port.x = 5000
 internal.vm.port.vma = 3030
