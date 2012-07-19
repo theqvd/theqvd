@@ -402,7 +402,8 @@ sub _run_forwarder {
     this_host->counters->incr_nx_attempts;
     my $socket = IO::Socket::INET->new(PeerAddr => $vm_address,
                                        PeerPort => $vm_x_port,
-                                       Proto => 'tcp')
+                                       Proto => 'tcp',
+                                       KeepAlive => 1)
         or LOGDIE "Unable to connect to X server  on VM VM_ID: " . $vm->id .  ": $!";
     this_host->counters->incr_nx_ok;
 
