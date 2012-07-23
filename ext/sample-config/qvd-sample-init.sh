@@ -17,6 +17,53 @@ if [ ! -f /var/lib/qvd/storage/staging/demo-ubuntu-kde.img ] ; then
 	fi
 fi
 
+if [ ! -f /etc/sysconfig/network/ifcfg-qvdnet ] ; then
+	if [ ! -f /etc/sysconfig/network/ifcfg-eth0 ] ; then
+		echo "Can't open network configuration for eth0, aborting"
+		exit 1
+	fi
+
+	. /etc/sysconfig/network/ifcfg-eth0
+
+	# Backup original config file only once -- this backs up the system default file
+	if [ ! -f /etc/sysconfig/network/ifcfg-eth0.orig ] ; then
+		cp -f /etc/sysconfig/network/ifcfg-eth0 /etc/sysconfig/network/ifcfg-eth0.orig
+	fi
+
+	# Backup previous config file.
+	cp -f /etc/sysconfig/network/ifcfg-eth0 /etc/sysconfig/network/ifcfg-eth0.bak
+
+	if [ -f /etc/sysconfig/network/ifcfg-qvdnet ] ; then
+		cp -f /etc/sysconfig/network/ifcfg-qvdnet /etc/sysconfig/network/ifcfg-qvdnet.bak
+	fi
+
+	# Generate new network config
+	
+	cat >/etc/sysconfig/network/ifcfg-qvdnet <<CONF
+BOOTPROTO='$BOOTPROTO'
+GATEWAY='$GATEWAY'
+IPADDR='$IPADDR'
+PREFIXLEN='$PREFIXLEN'
+STARTMODE='$STARTMODE'
+USERCONTROL='no'
+BRIDGE='yes'
+BRIDGE_PORTS='eth0'
+BRIDGE_STP='on'
+NAME='QVD Network'
+CONF
+
+	cat >/etc/sysconfig/network/ifcfg-eth0 <<CONF2
+BOOTPROTO='static'
+BROADCAST=''
+IPADDR='0.0.0.0'
+NAME='$NAME'
+NETMASK=''
+NETWORK=''
+USERCONTROL='no'
+CONF2
+
+fi
+
 
 qvd-deploy-db.pl --force 2>&1 | tee /tmp/sample-init.log || exit 1;
 
