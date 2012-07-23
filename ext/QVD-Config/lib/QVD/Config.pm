@@ -6,46 +6,12 @@ use warnings;
 use strict;
 
 use Config::Properties;
-use QVD::Config::Defaults;
+use QVD::Config::Core qw(core_cfg core_cfg_keys);
 
 use Exporter qw(import);
-our @EXPORT = qw(core_cfg core_cfg_all core_cfg_keys cfg ssl_cfg cfg_keys
-		 save_core_cfg set_core_cfg);
+our @EXPORT = qw(cfg ssl_cfg cfg_keys);
 
 our $USE_DB //= 1;
-our @FILES;
-push @FILES, '/etc/qvd/node.conf' unless @FILES;
-
-my $defaults = $QVD::Config::defaults;
-my $core_cfg;
-
-for my $FILE (@FILES) {
-    open my $cfg_fh, '<', $FILE or next;
-    $core_cfg = Config::Properties->new($core_cfg // $defaults);
-    $core_cfg->load($cfg_fh);
-    close $cfg_fh;
-}
-
-$core_cfg //= Config::Properties->new($defaults);
-
-sub core_cfg {
-    my $key = shift;
-    my $mandatory = shift // 1;
-    my $value = $core_cfg->getProperty($key);
-    if (defined $value) {
-	$value =~ s/\$\{(.*?)\}/core_cfg($1)/ge;
-    }
-    elsif ($mandatory) {
-	die "Configuration entry for $key missing\n";
-    }
-    $value;
-}
-
-sub core_cfg_all {
-    map { $_ => core_cfg($_) } $core_cfg->propertyNames
-}
-
-sub core_cfg_keys { $core_cfg->propertyNames }
 
 my $cfg;
 
@@ -82,18 +48,6 @@ sub cfg_keys {
     $cfg // reload;
     my %keys = map { $_ => 1 } core_cfg_keys, keys %$cfg;
     return keys %keys;
-}
-
-sub set_core_cfg {
-    $core_cfg->changeProperty(@_);
-}
-
-sub save_core_cfg {
-    my $path = shift;
-    open my $cfg_fh, '>', $path
-	or die "Unable to save configuration to '$path': $^E";
-    $core_cfg->save($cfg_fh);
-    close $cfg_fh;
 }
 
 1;

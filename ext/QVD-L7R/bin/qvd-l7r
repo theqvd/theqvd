@@ -5,10 +5,10 @@ use warnings;
 
 use App::Daemon qw/daemonize/;
 use QVD::L7R;
-use QVD::Config;
+use QVD::Config::Core;
 use QVD::Log;
 
-my $umask = cfg('l7r.user.umask');
+my $umask = core_cfg('l7r.user.umask');
 $umask =~ /^[0-7]+$/ or die "invalid umask $umask\n";
 
 my $path_run = core_cfg('path.run');

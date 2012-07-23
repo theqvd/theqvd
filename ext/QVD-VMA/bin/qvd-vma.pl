@@ -9,17 +9,17 @@ BEGIN {
     $QVD::Config::USE_DB = 0;
     @QVD::Config::FILES = ('/etc/qvd/vma.conf');
 }
-use QVD::Config;
+use QVD::Config::Core;
 
 use QVD::VMA;
 use App::Daemon qw(daemonize);
-$App::Daemon::pidfile = cfg('vma.pid_file');
+$App::Daemon::pidfile = core_cfg('vma.pid_file');
 $App::Daemon::as_user = 'root';
 
 $ENV{PATH} = join(':', $ENV{PATH}, '/sbin/');
 
-my $port = cfg('internal.vm.port.vma');
-my $umask = cfg('vma.user.umask');
+my $port = core_cfg('internal.vm.port.vma');
+my $umask = core_cfg('vma.user.umask');
 
 $umask =~ /^[0-7]+$/ or die "invalid umask $umask\n";
 

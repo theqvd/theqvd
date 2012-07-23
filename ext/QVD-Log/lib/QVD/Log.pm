@@ -1,6 +1,6 @@
 package QVD::Log;
 
-use QVD::Config;
+use QVD::Config::Core;
 
 use warnings;
 use strict;

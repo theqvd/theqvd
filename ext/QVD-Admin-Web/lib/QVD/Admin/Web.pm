@@ -27,7 +27,7 @@ use Catalyst qw/ConfigLoader
                 #-Debug
                 #FormBuilder
                
-use QVD::Config;      
+use QVD::Config::Core;      
                
 our $VERSION = sprintf "1.%04d", q$Revision: 6173 $ =~ /(\d+)/xg;
 #our $VERSION = '0.01';

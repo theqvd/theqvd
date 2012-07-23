@@ -20,13 +20,13 @@ BEGIN {
     $ENV{NX_CLIENT} = '/bin/false';
 }
 
-use QVD::Config;
+use QVD::Config::Core;
 use QVD::Client::Proxy;
 
 my $username = shift @ARGV;
 my $password = shift @ARGV;
 my $host = shift @ARGV;
-my $port = shift @ARGV // cfg('client.host.port');
+my $port = shift @ARGV // core_cfg('client.host.port');
 my $child_proc;
 my $nonblocking=1;
 
@@ -34,11 +34,11 @@ my $nonblocking=1;
 my $ssl = ($port =~ /43$/ ? 1 : undef);
 
 my %connect_info = (
-    link          => cfg('client.link'),
-    audio         => cfg('client.audio.enable'),
-    printing      => cfg('client.printing.enable'),
-    geometry      => cfg('client.geometry'),
-    fullscreen    => cfg('client.fullscreen'),
+    link          => core_cfg('client.link'),
+    audio         => core_cfg('client.audio.enable'),
+    printing      => core_cfg('client.printing.enable'),
+    geometry      => core_cfg('client.geometry'),
+    fullscreen    => core_cfg('client.fullscreen'),
     keyboard      => 'pc105/en',
     port          => $port,
     ssl           => $ssl,

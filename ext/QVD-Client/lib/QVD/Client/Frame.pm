@@ -3,7 +3,7 @@ package QVD::Client::Frame;
 use threads;
 use threads::shared;
 use Wx qw[:everything];
-use QVD::Config;
+use QVD::Config::Core;
 use QVD::Client::Proxy;
 use base qw(Wx::Frame);
 use strict;
@@ -18,8 +18,8 @@ my $vm_id :shared;
 my %connect_info :shared;
 my $accept_cert :shared;
 
-my $DEFAULT_PORT = cfg('client.host.port');
-my $USE_SSL      = cfg('client.use_ssl');
+my $DEFAULT_PORT = core_cfg('client.host.port');
+my $USE_SSL      = core_cfg('client.use_ssl');
 
 my $WINDOWS = ($^O eq 'MSWin32');
 
@@ -97,29 +97,29 @@ sub new {
     $ver_sizer->Add($grid_sizer, 1, wxALL|wxEXPAND, 20);
 
     $grid_sizer->Add(Wx::StaticText->new($panel, -1, "User"), 0, wxALL, 5);
-    $self->{username} = Wx::TextCtrl->new($panel, -1, cfg('client.user.name'));
+    $self->{username} = Wx::TextCtrl->new($panel, -1, core_cfg('client.user.name'));
     $grid_sizer->Add($self->{username}, 1, wxALL|wxEXPAND, 5);
 
     $grid_sizer->Add(Wx::StaticText->new($panel, -1, "Password"), 0, wxALL, 5);
     $self->{password} = Wx::TextCtrl->new($panel, -1, "", wxDefaultPosition, wxDefaultSize, wxTE_PASSWORD);
     $grid_sizer->Add($self->{password}, 0, wxALL|wxEXPAND, 5);
 
-    length cfg('client.user.name') ? $self->{password}->SetFocus() : $self->{username}->SetFocus();
+    length core_cfg('client.user.name') ? $self->{password}->SetFocus() : $self->{username}->SetFocus();
 
-    if (cfg('client.show.remember_password')) {
+    if (core_cfg('client.show.remember_password')) {
         $grid_sizer->Add(Wx::StaticText->new($panel, -1, "Remember password"), 0, wxALL, 5);
         $self->{remember_pass} = Wx::CheckBox->new ($panel, -1, '', wxDefaultPosition);
-        $self->{remember_pass}->SetValue(!!cfg('client.remember_password'));
+        $self->{remember_pass}->SetValue(!!core_cfg('client.remember_password'));
         $grid_sizer->Add($self->{remember_pass}, 1, wxALL, 5);
     }
 
-    if (!cfg('client.force.host.name', 0)) {
+    if (!core_cfg('client.force.host.name', 0)) {
         $grid_sizer->Add(Wx::StaticText->new($panel, -1, "Server"), 0, wxALL, 5);
-        $self->{host} = Wx::TextCtrl->new($panel, -1, cfg('client.host.name'));
+        $self->{host} = Wx::TextCtrl->new($panel, -1, core_cfg('client.host.name'));
         $grid_sizer->Add($self->{host}, 1, wxALL|wxEXPAND, 5);
     }
 
-    if (!cfg('client.force.link', 0)) {
+    if (!core_cfg('client.force.link', 0)) {
         $grid_sizer->Add(Wx::StaticText->new($panel, -1, "Connection type"), 0, wxALL, 5);             
         my @link_options = ("Local", "ADSL", "Modem");
         $self->{link} = Wx::Choice->new($panel, -1);
@@ -256,17 +256,17 @@ sub OnClickConnect {
     my( $self, $event ) = @_;
     $self->{state} = "";
     %connect_info = (
-        link          => cfg('client.force.link', 0) // cfg('client.link'),
-        audio         => cfg('client.audio.enable'),
-        printing      => cfg('client.printing.enable'),
-        geometry      => cfg('client.geometry'),
-        fullscreen    => cfg('client.fullscreen'),
-        local_serial  => cfg('client.serial.enabled') ? cfg('client.serial.local') : '',
-        remote_serial => cfg('client.serial.enabled') ? cfg('client.serial.remote') : '',
+        link          => core_cfg('client.force.link', 0) // core_cfg('client.link'),
+        audio         => core_cfg('client.audio.enable'),
+        printing      => core_cfg('client.printing.enable'),
+        geometry      => core_cfg('client.geometry'),
+        fullscreen    => core_cfg('client.fullscreen'),
+        local_serial  => core_cfg('client.serial.enabled') ? core_cfg('client.serial.local') : '',
+        remote_serial => core_cfg('client.serial.enabled') ? core_cfg('client.serial.remote') : '',
         keyboard      => $self->DetectKeyboard,
         port          => $DEFAULT_PORT,
         ssl           => $USE_SSL,
-        host          => cfg('client.force.host.name', 0) // $self->{host}->GetValue,
+        host          => core_cfg('client.force.host.name', 0) // $self->{host}->GetValue,
         (map { $_ => $self->{$_}->GetValue } qw(username password)),
     );
 
@@ -348,7 +348,7 @@ sub OnConnectionStatusChanged {
         $self->EnableControls(0);
         $self->{timer}->Start(50, 0);
     } elsif ($status eq 'CONNECTED') {
-        if (cfg('client.show.remember_password')) {
+        if (core_cfg('client.show.remember_password')) {
             # $self->{remember_pass} only exists when client.show.remember_password is set
             $self->{password}->SetValue ('') if !$self->{remember_pass}->IsChecked;
         }
@@ -449,18 +449,18 @@ sub DetectKeyboard {
 sub EnableControls {
     my ($self, $enabled) = @_;
     $self->{$_}->Enable($enabled) for qw(connect_button username password);
-    if (!cfg('client.force.link',      0)) { $self->{link}->Enable($enabled); }
-    if (!cfg('client.force.host.name', 0)) { $self->{host}->Enable($enabled); }
+    if (!core_cfg('client.force.link',      0)) { $self->{link}->Enable($enabled); }
+    if (!core_cfg('client.force.host.name', 0)) { $self->{host}->Enable($enabled); }
 }
 
 sub SaveConfiguration {
     my $self = shift;
     set_core_cfg('client.user.name', $self->{username}->GetValue());
-    if (!cfg('client.force.host.name', 0)) {
+    if (!core_cfg('client.force.host.name', 0)) {
         set_core_cfg('client.host.name', $self->{host}->GetValue());
     }
     #set_core_cfg('client.host.port', $self->{port}->GetValue());
-    if (!cfg('client.force.link', 0)) {
+    if (!core_cfg('client.force.link', 0)) {
         set_core_cfg('client.link', lc($self->{link}->GetStringSelection()));
     }
         

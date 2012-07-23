@@ -4,7 +4,7 @@ use strict;
 use warnings;
 
 use QVD::DB;
-use QVD::Config;
+use QVD::Config::Core;
 use QVD::Log;
 
 use Exporter qw(import);

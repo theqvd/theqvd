@@ -11,7 +11,7 @@ use DBIx::Class::Exception;
 use Socket qw(IPPROTO_TCP SOL_SOCKET SO_KEEPALIVE);
 use Socket::Linux qw(TCP_KEEPIDLE TCP_KEEPINTVL TCP_KEEPCNT);
 
-use QVD::Config;
+use QVD::Config::Core;
 
 use parent qw(DBIx::Class::Schema);
 
