@@ -7,6 +7,7 @@ use strict;
 
 use Config::Properties;
 use QVD::Config::Core qw(core_cfg core_cfg_keys);
+use QVD::Log;
 
 use Exporter qw(import);
 our @EXPORT = qw(cfg ssl_cfg cfg_keys);
@@ -41,7 +42,11 @@ sub cfg {
 	    return $value;
 	}
     }
-    core_cfg($key, $mandatory);
+    my $v = core_cfg($key, 0);
+    if ($mandatory and not defined $v) {
+        LOGDIE "mandatory configuration entry $key missing";
+    }
+    $v
 }
 
 sub cfg_keys {
