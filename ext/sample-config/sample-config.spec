@@ -13,6 +13,7 @@ Requires:       perl-QVD-HKD
 Requires:       perl-QVD-Config
 Requires:       perl-QVD-DB
 Requires:       postgresql-server
+Vendor:         QVD Team
 
 %description
 QVD default config
