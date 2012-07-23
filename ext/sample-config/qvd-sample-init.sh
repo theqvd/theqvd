@@ -1,5 +1,14 @@
 #!/bin/sh
 
+if [ "$TERM" != "screen" ] ; then
+	# Run in screen. This is for the "service network restart" lower down.
+
+	exec /usr/bin/screen "$0" "$@"
+
+	echo Failed to exec /usr/bin/screen "$0" "$@", result code was $?
+	exit 1
+fi
+
 export PATH=/usr/lib/qvd/bin:$PATH
 host=`hostname`
 
@@ -62,6 +71,7 @@ NETWORK=''
 USERCONTROL='no'
 CONF2
 
+	service network restart
 fi
 
 
