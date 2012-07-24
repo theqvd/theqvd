@@ -100,7 +100,6 @@ use QVD::StateMachine::Declarative
     'running/updating_stats'          => { enter       => '_incr_run_ok',
                                            transitions =>  { _on_incr_run_ok_done        => 'running/running_poststart_hook',
                                                              _on_incr_run_ok_error       => 'running/running_poststart_hook' },
-                                           delay       => [qw(_on_lxc_done)],
                                            ignore      => [qw(_on_incr_run_ok_result)]                                          },
 
     'running/running_poststart_hook'  => {  enter       => '_run_poststart_hook',
