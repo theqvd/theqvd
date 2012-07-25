@@ -57,7 +57,7 @@ PORT=3000
 if [ -f /etc/sysconfig/$NAME ] ; then
     . /etc/sysconfig/$NAME
 fi
-DAEMON_OPTS="--port $PORT --pidfile $PIDFILE --background"
+DAEMON_OPTS="--port $PORT --pidfile $PIDFILE"
 
 # Use this if you want the user to explicitly set 'RUN' in
 # /etc/default/
