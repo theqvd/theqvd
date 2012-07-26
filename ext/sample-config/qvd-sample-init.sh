@@ -26,6 +26,16 @@ if [ ! -f "$staging/$image" ] ; then
 fi
 
 if [ -f "/etc/SuSE-release" ] ; then
+
+	mkdir -p /cgroup
+
+	if ( ! grep -q '/cgroup' /etc/fstab ) ; then
+		cp -f /etc/fstab /etc/fstab.bak
+		echo "cgroup               /cgroup              cgroup     defaults              0 0" >> /etc/fstab
+	fi
+
+	mount /cgroup
+
 	if [ ! -f /etc/sysconfig/network/ifcfg-qvdnet ] ; then
 		if [ ! -f /etc/sysconfig/network/ifcfg-eth0 ] ; then
 			echo "Can't open network configuration for eth0, aborting"
