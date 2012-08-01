@@ -173,7 +173,7 @@ case "$1" in
         echo "Starting $DESC " "$NAME"
         # Check if it's running first
         if running ;  then
-            echo -n "apparently already running"
+            echo "apparently already running"
             exit 0
         fi
         if start_server ; then
