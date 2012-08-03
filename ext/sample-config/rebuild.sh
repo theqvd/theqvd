@@ -1,7 +1,7 @@
 #!/bin/bash
 svnrev=`svnversion .`
 
-if ( echo "$svnrev" | grep -q -E '[A-Z]+' ) ; then
+if ( echo "$svnrev" | grep -q -E '[A-Z:]+' ) ; then
 	echo SVN tree not fully committed or in conflict, please commit/update
 	exit 1
 fi
