@@ -92,7 +92,9 @@ fi
 qvd-deploy-db.pl --force 2>&1 | tee /tmp/sample-init.log || exit 1;
 
 qvd-admin.pl config ssl key=/etc/qvd/server-private-key.pem cert=/etc/qvd/server-certificate.pem
-qvd-admin.pl config set vm.network.ip.start=10.1.0.30
+qvd-admin.pl config set vm.network.ip.start=172.20.111.30
+qvd-admin.pl config set vm.network.netmask=255.255.255.0
+
 qvd-admin.pl config set vm.hypervisor=lxc
 qvd-admin.pl config set vm.lxc.unionfs.type=unionfs-fuse
 
