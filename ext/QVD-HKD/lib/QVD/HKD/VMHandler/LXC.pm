@@ -462,7 +462,7 @@ sub _allocate_os_rootfs {
         ERROR "Unable to create directory '$rootfs'";
         return $self->_on_allocate_os_rootfs_error;
     }
-    system $self->_cfg('command.umount'), $rootfs; # just in case!
+    _run($self->_cfg('command.umount'), $rootfs); # just in case!
     $debug and $self->_debug("rootfs: $rootfs, rootfs_parent: $self->{os_rootfs_parent}");
     DEBUG "rootfs: '$rootfs', rootfs_parent: '$self->{os_rootfs_parent}'";
     if ((stat $rootfs)[0] != (stat $self->{os_rootfs_parent})[0]) {
@@ -475,34 +475,42 @@ sub _allocate_os_rootfs {
 
     given ($unionfs_type) {
         when('aufs') {
-            if (system $self->_cfg('command.mount'),
+            if(_run($self->_cfg('command.modprobe'), "aufs")) {
+                ERROR "Failed to load aufs kernel module. Mounting will probably fail.";
+            }
+
+            if (_run($self->_cfg('command.mount'),
                 -t => 'aufs',
-                -o => "br:$self->{os_overlayfs}:$self->{os_basefs}=ro", "aufs", $rootfs) {
+                -o => "br:$self->{os_overlayfs}:$self->{os_basefs}=ro", "aufs", $rootfs)) {
                 ERROR "Unable to mount aufs (code: " . ($?>>8) . ")";
                 return $self->_on_allocate_os_rootfs_error;
             }
         }
         when ('unionfs-fuse') {
-            if (system $self->_cfg('command.unionfs-fuse'),
+            if(_run($self->_cfg('command.modprobe'), "fuse")) {
+                ERROR "Failed to load fuse kernel module. Mounting will probably fail.";
+            }
+
+            if (_run($self->_cfg('command.unionfs-fuse'),
                 -o => 'cow',
                 -o => 'max_files=32000',
                 -o => 'suid',
                 -o => 'dev',
                 -o => 'allow_other',
-                "$self->{os_overlayfs}=RW:$self->{os_basefs}=RO", $rootfs) {
+                "$self->{os_overlayfs}=RW:$self->{os_basefs}=RO", $rootfs)) {
                 ERROR "Unable to mount unionfs-fuse (code: " . ($? >> 8) . ")";
                 return $self->_on_allocate_os_rootfs_error;
             }
         }
         when ('bind') {
-            if (system $self->_cfg('command.mount'),
-                '--bind', $self->{os_basefs}, $rootfs) {
+            if (_run($self->_cfg('command.mount'),
+                '--bind', $self->{os_basefs}, $rootfs)) {
                 ERROR "Unable to mount bind '$self->{os_basefs}' into '$rootfs', mount rc: " . ($? >> 8);
                 return $self->_on_allocate_os_rootfs_error;
             }
             if ($self->_cfg('vm.lxc.unionfs.bind.ro')) {
-                if (system $self->_cfg('command.mount'),
-                    -o => 'remount,ro', $rootfs) {
+                if (_run($self->_cfg('command.mount'),
+                    -o => 'remount,ro', $rootfs)) {
                     ERROR "Unable to remount bind mount '$rootfs' as read-only, mount rc: ". ($? >> 8);
                     return $self->_on_allocate_os_rootfs_error;
                 }
@@ -626,7 +634,7 @@ sub _start_lxc {
 
 sub _stop_lxc {
     my $self = shift;
-    system ($self->_cfg('command.lxc-stop'), -n => $self->{lxc_name});
+    _run($self->_cfg('command.lxc-stop'), -n => $self->{lxc_name});
     $self->_on_stop_lxc_done;
 }
 
@@ -759,6 +767,30 @@ sub _run_hook {
     $debug and $self->_debug("no hooks for $name");
     DEBUG "No hooks for '$name'";
     $self->_on_run_hook_done;
+}
+
+sub _run {
+	my @cmd = @_;
+	my $cmd_str = join(" ", @cmd);
+
+	DEBUG "Running command:  $cmd_str\n";
+
+	my $ret = system(@cmd);
+
+	if ( $? == -1 ) {
+		ERROR "Failed to execute '$cmd_str': $!";
+		return undef;
+	} elsif ( $? & 127 ) {
+		ERROR sprintf("Command '$cmd_str' died with signal %d, %s coredump\n", ($? & 127),  ($? & 128) ? 'with' : 'without');
+		return undef;
+	} elsif ( ($? >> 8) > 0 )  {
+		ERROR sprintf("Command '$cmd_str' exited with signal %d", $? >> 8);
+		return undef;
+	} else {
+		DEBUG "Command executed successfully";
+	}
+
+	return $ret;
 }
 
 1;

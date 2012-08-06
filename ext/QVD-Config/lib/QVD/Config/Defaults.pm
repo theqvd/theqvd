@@ -82,6 +82,7 @@ command.lxc-wait = /usr/lib/qvd/bin/lxc-wait
 command.ebtables = ebtables
 command.iptables = iptables
 command.socat = /usr/bin/socat
+command.modprobe = /sbin/modprobe
 
 ## whether to remember password after successful connection
 client.remember_password = 1
