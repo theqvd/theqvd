@@ -20,6 +20,7 @@ use constant CREATE_NO_WINDOW => 0;
 use constant NORMAL_PRIORITY_CLASS => 0;
 
 my $WINDOWS = ($^O eq 'MSWin32');
+my $DARWIN = ($^O eq 'darwin');
 my $NX_OS = $WINDOWS ? 'windows' : 'linux';
 
 sub new {
@@ -265,7 +266,16 @@ sub _run {
     my $self = shift;
     my $httpc = shift;
 
-
+    # See http://www.nomachine.com/tr/view.php?id=TR02H02326
+    if ($DARWIN) {
+	my $localuser = '+si:localuser:'.$ENV{USER};
+	my @xhost = ('xhost', $localuser);
+        if ( Proc::Background->new(@xhost) ) {
+            $self->{log}->debug("Executed xhost $localuser for Mac OS X");
+        } else {
+            $self->{log}->error("Error executing xhost $localuser for Mac OS X");
+        }
+    }
 
     my @cmd;
     if ($WINDOWS) {

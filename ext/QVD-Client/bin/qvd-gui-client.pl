@@ -11,6 +11,7 @@ use Proc::Background;
 use Log::Log4perl qw(:levels :easy);
 
 my $WINDOWS;
+my $DARWIN;
 my $DOTQVD;
 my $log;
 
@@ -47,7 +48,8 @@ BEGIN {
     # like broken connection, perhaps we should show them to the user
     # instead of ignoring them? 
     $WINDOWS = ($^O eq 'MSWin32');
-    $ENV{NX_CLIENT} = $WINDOWS ? 'cmd.exe /c :' : '/bin/false';
+    $DARWIN = ($^O eq 'darwin');
+    $ENV{NX_CLIENT} = $WINDOWS ? 'cmd.exe /c :' : 'false';
 }
 use QVD::Client::Frame;
 use parent 'Wx::App';
@@ -73,6 +75,15 @@ sub OnInit {
             $log->error("Xming failed to start");
         }
         
+    }
+    if ($DARWIN) {
+	my @cmd = qw(open -a X11 --args true);
+        $ENV{DISPLAY} //= ':0';
+        if ( Proc::Background->new(@cmd) ) {
+            $log->debug("X server started");
+        } else {
+            $log->error("X server failed to start");
+        }
     }
     
     $log->debug("Showing frame");
