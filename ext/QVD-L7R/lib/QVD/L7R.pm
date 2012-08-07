@@ -420,7 +420,10 @@ sub _run_forwarder {
 
     $l7r->send_http_response(HTTP_SWITCHING_PROTOCOLS);
 
-    DEBUG "Starting socket forwarder on VM VM_ID: " . $vm->id;
+    DEBUG "Starting socket forwarder for VM " . $vm->id;
+    db->storage->disconnect; # don't keep the DB connection open while
+                             # the session is running.
+    DEBUG "L7R disconnected from the database for VM " . $vm->id . " while user session runs";
     my $t0 = time;
     forward_sockets($l7r->{server}{client}, $socket);
     DEBUG "Session terminated on VM VM_ID: " . $vm->id ;
