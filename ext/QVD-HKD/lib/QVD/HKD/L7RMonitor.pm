@@ -78,7 +78,7 @@ sub _search_dead_l7r {
 select vm_id, l7r_pid
   from vm_runtimes
   where l7r_host = $1
-    and l7r_pid != NUL
+    and l7r_pid != NULL
   limit 1
 EOQ
 }
