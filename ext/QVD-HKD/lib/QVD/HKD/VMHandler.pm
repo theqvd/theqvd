@@ -33,10 +33,10 @@ sub _allocate_tcp_port {
 }
 
 sub _ip_to_mac {
-    shift;
-    my $ip = shift;
+    my ($self, $ip) = @_;
     my (undef, @hex) = map sprintf('%02x', $_), split /\./, $ip;
-    join(':', '54:52:00', @hex);
+    my $mac_prefix = $self->_cfg('vm.network.mac.prefix');
+    join(':', $mac_prefix, @hex);
 }
 
 sub new {
