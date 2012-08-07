@@ -58,8 +58,12 @@ use QVD::StateMachine::Declarative
                                                            _on_config_reload_error    => 'failed'                         } },
 
     'starting/loading_host_row'      => { enter       => '_load_host_row',
-                                          transitions => { _on_load_host_row_done     => 'starting/removing_old_fw_rules',
+                                          transitions => { _on_load_host_row_done     => 'starting/checking_address',
                                                            _on_load_host_row_error    => 'failed'                         } },
+
+    'starting/checking_address'      => { enter       => '_check_address',
+                                          transitions => { _on_check_address_done     => 'starting/removing_old_fw_rules',
+                                                           _on_check_address_error    => 'failed'                         } },
 
     'starting/removing_old_fw_rules' => { enter       => '_remove_fw_rules',
                                           transitions => { _on_remove_fw_rules_done   => 'starting/setting_fw_rules'      } },
@@ -274,7 +278,7 @@ sub _load_host_row {
     my $self = shift;
     my $host = $self->_cfg('nodename');
     DEBUG "Loading entry for host '$host' from DB";
-    $self->_query_1('select id from hosts where name=$1', $host);
+    $self->_query_1('select id, address from hosts where name=$1', $host);
 }
 
 sub _on_load_host_row_bad_result {
@@ -289,7 +293,19 @@ sub _on_load_host_row_error {
 
 sub _on_load_host_row_result {
     my ($self, $res) = @_;
-    ($self->{node_id}) = $res->row;
+    @{$self}{qw(node_id address)} = $res->row;
+}
+
+sub _check_address {
+    my $self = shift;
+    my $address = quotemeta $self->{address};
+    my $ifaces = `ip -f inet addr show`;
+    unless ($ifaces =~ /inet $address\b/) {
+        ERROR "IP address $self->{address} not configured on node";
+        return $self->_on_check_address_error
+    }
+    $self->_debug("some interface has IP $self->{address}:\n$ifaces");
+    $self->_on_check_address_done;
 }
 
 sub _calc_load_balancing_data {   ## taken from was_QVD-HKD/lib/QVD/HKD.pm, _update_load_balancing_data
