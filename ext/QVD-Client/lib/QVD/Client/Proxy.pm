@@ -201,17 +201,17 @@ sub connect_to_vm {
         }
     }
 
-    $connect_info{id} = $vm_id;
+    $opts->{id} = $vm_id;
 
     my %o = (
-        id                            => $connect_info{id},
-        'qvd.client.keyboard'         => $connect_info{keyboard},
+        id                            => $opts->{id},
+        'qvd.client.keyboard'         => $opts->{keyboard},
         'qvd.client.os'               => $NX_OS,
-        'qvd.client.link'             => $connect_info{link},
-        'qvd.client.geometry'         => $connect_info{geometry},
-        'qvd.client.fullscreen'       => $connect_info{fullscreen},
+        'qvd.client.link'             => $opts->{link},
+        'qvd.client.geometry'         => $opts->{geometry},
+        'qvd.client.fullscreen'       => $opts->{fullscreen},
         'qvd.client.printing.enabled' => $self->{printing},
-        'qvd.client.serial.port'      => $connect_info{remote_serial}
+        'qvd.client.serial.port'      => $opts->{remote_serial}
     );
 
     my $q = join '&', map { uri_escape($_) .'='. uri_escape($o{$_}) } keys %o;
