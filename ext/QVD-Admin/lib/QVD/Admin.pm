@@ -263,10 +263,19 @@ sub cmd_config_ssl {
     my ($self, %args) = @_;
     my $cert = delete $args{cert} or die "Certificate is required";
     my $key = delete $args{key} or die "Private key is required";
+    my $crl = delete $args{crl};
     rs(SSL_Config)->update_or_create({ key => 'l7r.ssl.cert',
                                        value => $cert });
     rs(SSL_Config)->update_or_create({ key => 'l7r.ssl.key',
                                        value => $key });
+    if (defined $crl) {
+        rs(SSL_Config)->update_or_create({ key => 'l7r.ssl.crl',
+                                           value => $crl })
+    }
+    else {
+        rs(SSL_Config)->search('l7r.ssl.crl')->delete;
+    }
+
     1
 }
 
@@ -917,7 +926,7 @@ filter.
 
 Returns the number of users that were disconnected.
 
-=item cmd_config_ssl(cert => 'certificate', key => 'privatekey')
+=item cmd_config_ssl(cert => 'certificate', key => 'privatekey', crl => 'crl')
 
 Sets the SSL certificate to 'certificate' and the private key to 'privatekey'.
 Returns 1 on success.

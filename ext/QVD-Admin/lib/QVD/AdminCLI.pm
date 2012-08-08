@@ -342,33 +342,45 @@ sub cmd_config_ssl {
     my %args = _split_on_equals(@_);
     my $key_file = delete $args{key};
     my $cert_file = delete $args{cert};
+    my $crl_file = delete $args{crl};
 
     # FIXME: Is using File::Slurp the best way?
     use File::Slurp; 
-    my $cert = eval { read_file($cert_file) } 
+    my $cert = eval { read_file($cert_file) }
         or $self->_die ("$cert_file: Unable to read cert file: $^E\n");
-    my $key = eval { read_file($key_file) }  
+    my $key = eval { read_file($key_file)   }
         or $self->_die ("$key_file: Unable to read key file: $^E\n");
+    my $crl;
+    if (defined $crl_file) {
+        $crl = eval { read_file($crl_file) }
+            or $self->_die ("$crl_file: Unable to read crl file: $^E\n");
+    }
 
     eval {
-        $self->{admin}->cmd_config_ssl(key => $key, cert => $cert);
+        $self->{admin}->cmd_config_ssl(key => $key, cert => $cert, crl => $crl);
     };
     if ($@) {
         $self->_die;
     } else {
-        $self->_print("SSL certificate and private key set.\n");
+        $self->_print("SSL certificate, private key and crl set.\n");
     }
 }
 
 sub help_config_ssl {
     print <<EOT
 config ssl: Sets the SSL certificate and private key
-usage: config ssl key=mykey.pem cert=mycert.pem
+usage: config ssl key=mykey.pem cert=mycert.pem [crl=crl.pem]
 
     Sets the SSL certificate to the one read from the file mycert.pem, and the
     private key to the one read from mykey.pem.
 
     Example: config ssl key=certs/server-key.pem cert=certs/server-cert.pem
+
+    If you want to use client certificates, you can also set a CRL
+    file to blacklist invalid ones. Note that If you are using a
+    custom CA for signing your client certificates you must also add
+    it to /etc/ssl/certs in all the QVD nodes.
+
 EOT
 }
 

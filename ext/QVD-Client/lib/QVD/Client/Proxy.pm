@@ -113,9 +113,8 @@ EOF
 sub connect_to_vm {
     my $self = shift;
     my $cli = $self->{client_delegate};
-    my $ci = $self->{opts};
-    my %connect_info = %$ci;
-    my ($host, $port, $user, $passwd) = @connect_info{qw/host port username password/};
+    my $opts = $self->{opts};
+    my ($host, $port, $user, $passwd) = @{$oprs}{qw/host port username password/};
 
     $cli->proxy_connection_status('CONNECTING');
     $self->{log}->info("Connecting to $host:$port\n");
@@ -123,22 +122,33 @@ sub connect_to_vm {
     # SSL library has to be initialized in the thread where it's used,
     # so we do a "require QVD::HTTPC" here instead of "use"ing it above
     require QVD::HTTPC;
-    my $httpc = eval { new QVD::HTTPC(
-        "$host:$port",
-        SSL => $connect_info{ssl},
-        SSL_verify_callback => sub { $self->_ssl_verify_callback(@_) }
-    )};
-    if ($@) {
-        $self->{log}->error("Connection error: $@");
-        $cli->proxy_connection_error(message => $@);
-        return;
-    } else {
-        if (!$httpc) {
+    my %args;
+    $ssl = $opts->{ssl};
+    if ($ssl) {
+        $args{SSL}                 = 1;
+        $args{SSL_ca_path}         = cfg('path.ssl.ca.system');
+        $args{SSL_ca_path_alt}     = cfg('path.ssl.ca.personal');
+        $args{SSL_ca_path_alt}     =~ s|^~(?=/)|$ENV{HOME} // $ENV{APPDATA}|e;
+        my $use_cert = cfg('path.ssl.use_cert', 0);
+        if ($use_cert) {
+            $args{SSL_use_cert} = 1;
+            $args{SSL_cert_file} = cfg('client.ssl.cert_file');
+            $args{SSL_key_file} = cfg('client.ssl.key_file');
+        }
+        $args{SSL_verify_callback} = sub { $self->_ssl_verify_callback(@_) };
+    }
+    my $httpc = eval { QVD::HTTPC->new("$host:$port", %args) };
+    unless (defined $httpc) {
+        if ($@) {
+            $self->{log}->error("Connection error: $@");
+            $cli->proxy_connection_error(message => $@);
+        }
+        else {
             # User rejected the server SSL certificate. Return to main window.
             $self->{log}->info("User rejected certificate. Closing connection.");
             $cli->proxy_connection_status('CLOSED');
-            return;
         }
+        return;
     }
 
     use MIME::Base64 qw(encode_base64);

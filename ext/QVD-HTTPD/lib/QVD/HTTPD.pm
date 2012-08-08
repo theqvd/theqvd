@@ -24,6 +24,10 @@ sub options {
     $template->{SSL_key_file} = \$prop->{SSL_key_file};
     $prop->{SSL_cert_file} //= undef;
     $template->{SSL_cert_file} = \$prop->{SSL_cert_file};
+    $prop->{SSL_crl_file} //= undef;
+    $template->{SSL_crl_file} = \$prop->{SSL_crl_file};
+    $prop->{SSL_verify_mode} //= undef;
+    $template->{SSL_verify_mode} = \$prop->{SSL_verify_mode};
 }
 
 # token          = 1*<any CHAR except CTLs or separators>
@@ -41,12 +45,19 @@ sub process_request {
 
     if ($self->{server}{SSL}) {
 	require IO::Socket::SSL;
+        my @extra;
+        if ($self->{server}{SSL_verify_mode}) {
+            push @extra, SSL_verify_mode => $self->{server}{SSL_verify_mode};
+            push @extra, SSL_check_crl => 1,
+                         SSL_crl_file  => $self->{server}{SSL_crl_file}
+                if defined $self->{server}{SSL_crl_file};
+        }
 	IO::Socket::SSL->start_SSL($socket, SSL_server => 1, NonBlocking => 1,
 				   SSL_cert_file => $self->{server}{SSL_cert_file},
-				   SSL_key_file  => $self->{server}{SSL_key_file});
+				   SSL_key_file  => $self->{server}{SSL_key_file},
+                                   @extra);
 	$socket->isa('IO::Socket::SSL')
 	    or die "SSL negotiation failed: " . IO::Socket::SSL::errstr()
-
     }
 
     while (<$socket>) {

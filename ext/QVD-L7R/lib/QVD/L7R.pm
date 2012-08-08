@@ -39,22 +39,35 @@ sub new {
     my $ssl = cfg('l7r.use_ssl');
     if ($ssl) {
         my $l7r_certs_path  = cfg('path.ssl.certs');
-         my $l7r_ssl_key     = cfg('l7r.ssl.key');
-         my $l7r_ssl_cert    = cfg('l7r.ssl.cert');
-         my $l7r_ssl_cert_fn = "$l7r_certs_path/l7r-cert.pem";
-         my $l7r_ssl_key_fn  = "$l7r_certs_path/l7r-key.pem";
-         # copy the SSL certificate and key from the database to local
-         # files
-         mkdir $l7r_certs_path, 0700;
-         -d $l7r_certs_path or LOGDIE "Unable to create directory $l7r_certs_path\n";
-         my ($mode, $uid) = (stat $l7r_certs_path)[2, 4];
-         $uid == $> or $uid == 0 or LOGDIE "bad owner for directory $l7r_certs_path\n";
-         $mode & 0077 and LOGDIE "bad permissions for directory $l7r_certs_path\n";
-         _write_to_file($l7r_ssl_cert_fn, $l7r_ssl_cert);
-         _write_to_file($l7r_ssl_key_fn,  $l7r_ssl_key);
-         push @args, ( SSL           => 1,
-                       SSL_key_file  => $l7r_ssl_key_fn,
-                       SSL_cert_file => $l7r_ssl_cert_fn );
+        my $l7r_ssl_key     = cfg('l7r.ssl.key');
+        my $l7r_ssl_cert    = cfg('l7r.ssl.cert');
+        my $l7r_ssl_cert_fn = "$l7r_certs_path/l7r-cert.pem";
+        my $l7r_ssl_key_fn  = "$l7r_certs_path/l7r-key.pem";
+        # copy the SSL certificate and key from the database to local
+        # files
+        mkdir $l7r_certs_path, 0700;
+        -d $l7r_certs_path or LOGDIE "Unable to create directory $l7r_certs_path\n";
+        my ($mode, $uid) = (stat $l7r_certs_path)[2, 4];
+        $uid == $> or $uid == 0 or LOGDIE "bad owner for directory $l7r_certs_path\n";
+        $mode & 0077 and LOGDIE "bad permissions for directory $l7r_certs_path\n";
+        _write_to_file($l7r_ssl_cert_fn, $l7r_ssl_cert);
+        _write_to_file($l7r_ssl_key_fn,  $l7r_ssl_key);
+        push @args, ( SSL           => 1,
+                      SSL_key_file  => $l7r_ssl_key_fn,
+                      SSL_cert_file => $l7r_ssl_cert_fn );
+
+        # handle the case where we require the client to have a valid certificate:
+        my $l7r_client_cert_require = cfg('l7r.client.cert.require');
+        if ($l7r_client_cert_require) {
+            push @args, SSL_verify_mode => 3;
+
+            my $l7r_ssl_crl = cfg('l7r.ssl.crl', 0);
+            if (defined $l7r_ssl_crl) {
+                my $l7r_ssl_crl_fn  = "$l7r_certs_path/l7r-crl.pem";
+                _write_to_file($l7r_ssl_crl_fn, $l7r_ssl_crl);
+                push @args, SSL_crl_file => $l7r_ssl_crl_fn;
+            }
+        }
     }
     $class->SUPER::new(@args);
 }

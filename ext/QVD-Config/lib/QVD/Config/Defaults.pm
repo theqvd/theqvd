@@ -51,7 +51,7 @@ path.storage.homefs = ${path.storage.root}/homefs
 ## paths for SSL certificates and CAs
 path.ssl.certs = ${path.run}/ssl
 path.ssl.ca.system = /etc/ssl/certs
-path.ssl.ca.personal = .qvd/certs
+path.ssl.ca.personal = ~/.qvd/certs
 ## KVM serial port captures or LXC console output
 path.serial.captures = ${path.tmp}/qvd
 
@@ -136,7 +136,7 @@ l7r.loadbalancer.plugin.default.weight.ram = 1
 l7r.loadbalancer.plugin.default.weight.cpu = 1
 l7r.loadbalancer.plugin.default.weight.random = 1
 
-
+l7r.client.cert.require = 0
 
 ## umask for the HKD process
 hkd.user.umask = 0022

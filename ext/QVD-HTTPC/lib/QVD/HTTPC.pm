@@ -24,53 +24,40 @@ sub _create_socket {
     my $self = shift;
     my $target = $self->{target};
     my $SSL = $self->{SSL};
-
+    my $s;
     if ($SSL) {
         require IO::Socket::SSL;
         require Net::SSLeay;
         Net::SSLeay::load_error_strings();
-        my $s;
 
-        my %ssl_args = (
-            SSL_verify_mode     => 1,
-            SSL_ca_path         => cfg('path.ssl.ca.system'),
-        );
-        unless ($s = IO::Socket::SSL->new(PeerAddr => $target, Blocking => 0, %ssl_args)) {
-            $ssl_args{'SSL_ca_path'} = File::Spec->catfile($ENV{HOME} || $ENV{APPDATA}, cfg('path.ssl.ca.personal')),
-            $ssl_args{SSL_verify_callback} = $self->{SSL_verify_callback};
-            $s = IO::Socket::SSL->new(PeerAddr => $target, Blocking => 0, %ssl_args);
+        my %args = ( SSL_verify_mode => 3 );
+        $args{$_} = $self->{$_} for qw(SSL_ca_path SSL_use_cert SSL_cert_file SSL_key_file);
+        $s = IO::Socket::SSL->new(PeerAddr => $target, Blocking => 0, %args);
+        unless ($s) {
+            # try again with the user customized CA certificates
+            $args{SSL_ca_path}         = $self->{SSL_ca_path_alt};
+            $args{SSL_verify_callback} = $self->{SSL_verify_callback};
+            $s = IO::Socket::SSL->new(PeerAddr => $target, Blocking => 0, %args);
         }
-
-        $self->{socket} = $s;
     }
     else {
-        $self->{socket} = IO::Socket::INET->new(PeerAddr => $target, Blocking => 0);
+        $s = IO::Socket::INET->new(PeerAddr => $target, Blocking => 0);
     }
-
-    unless ($self->{socket}) {
-	my $errmsg = "Unable to connect to $target";
-	use Data::Dumper;
-	print Dumper IO::Socket::SSL::errstr();
-	$SSL and $errmsg .= ': ' . $IO::Socket::SSL::SSL_ERROR;
-	croak $errmsg;
-    } 
+    $s or croak "Unable to connect to $target: " . ($SSL ? $IO::Socket::SSL::SSL_ERROR : $!);
+    $self->{socket} = $s;
 }
 
 sub new {
     my ($class, $target, %opts) = @_;
-    my $timeout = delete $opts{timeout};
-    my $ssl = delete $opts{SSL};
-    my $ssl_cb = delete $opts{SSL_verify_callback};
-
-    keys %opts and
-	croak "unknown constructor option(s) " . join(', ', keys %opts);
-
     my $self = { target => $target,
-		 timeout => $timeout,
-		 SSL => $ssl,
-		 SSL_verify_callback => $ssl_cb,
-		 bin => '',
-		 bout => '' };
+                 bin => '',
+		 bout => ''
+               };
+
+    $self->{$_} = delete $opts{$_} for qw(timeout SSL SSL_verify_callback
+                                          SSL_ca_path SSL_ca_path_alt);
+    keys %opts and croak "unknown constructor option(s) " . join(', ', keys %opts);
+
     bless $self, $class;
     $self->_create_socket();
     setsockopt $self->{socket}, IPPROTO_TCP, TCP_NODELAY, 1;
