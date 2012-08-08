@@ -8,7 +8,7 @@ require Exporter;
 our @ISA = qw(Exporter);
 
 our @EXPORT_OK = qw(netmask_n netstart_n nettop_n network_n netnodes
-                    netvms net_aton net_ntoa netmask_len);
+                    netvms net_aton net_ntoa netmask_len net_aton net_ntoa);
 
 sub net_aton { unpack('N', pack('C4', split /\./, shift)) }
 sub net_ntoa { join '.', unpack('C4', pack('N', shift)) }
@@ -35,6 +35,11 @@ sub network_n {
     my $nm = netmask_n($agent);
     my $ns = netstart_n($agent);
     $ns & $nm;
+}
+
+sub network {
+    my $agent = shift;
+    net_ntoa(network_n($agent));
 }
 
 sub netmask_len {

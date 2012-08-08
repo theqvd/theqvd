@@ -36,7 +36,7 @@ use QVD::HKD::VMCommandHandler;
 use QVD::HKD::VMHandler;
 use QVD::HKD::L7RMonitor;
 
-use QVD::HKD::Config::Network qw(netvms netnodes);
+use QVD::HKD::Config::Network qw(netvms netnodes net_aton net_ntoa netstart_n network_n);
 
 use parent qw(QVD::HKD::Agent);
 
@@ -298,13 +298,22 @@ sub _on_load_host_row_result {
 
 sub _check_address {
     my $self = shift;
-    my $address = quotemeta $self->{address};
+    my $address_q = quotemeta $self->{address};
     my $ifaces = `ip -f inet addr show`;
-    unless ($ifaces =~ /inet $address\b/) {
+    unless ($ifaces =~ /inet $address_q\b/) {
         ERROR "IP address $self->{address} not configured on node";
         return $self->_on_check_address_error
     }
     $self->_debug("some interface has IP $self->{address}:\n$ifaces");
+
+    my $address_n = net_aton($self->{address});
+    my $start_n = netstart_n($self);
+    my $net_n = network_n($self);
+    if ($address_n <= $net_n or $address_n >= $start_n) {
+        ERROR sprintf("Host IP address is outside of the network range reserved for hosts (IP: %s, range: %s-%s)",
+                      $self->{address}, net_ntoa($net_n), net_ntoa($start_n));
+        return $self->_on_check_address_error;
+    }
     $self->_on_check_address_done;
 }
 
