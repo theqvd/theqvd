@@ -114,7 +114,7 @@ sub connect_to_vm {
     my $self = shift;
     my $cli = $self->{client_delegate};
     my $opts = $self->{opts};
-    my ($host, $port, $user, $passwd) = @{$oprs}{qw/host port username password/};
+    my ($host, $port, $user, $passwd) = @{$opts}{qw/host port username password/};
 
     $cli->proxy_connection_status('CONNECTING');
     $self->{log}->info("Connecting to $host:$port\n");
@@ -123,7 +123,7 @@ sub connect_to_vm {
     # so we do a "require QVD::HTTPC" here instead of "use"ing it above
     require QVD::HTTPC;
     my %args;
-    $ssl = $opts->{ssl};
+    my $ssl = $opts->{ssl};
     if ($ssl) {
         $args{SSL}                 = 1;
         $args{SSL_ca_path}         = cfg('path.ssl.ca.system');
