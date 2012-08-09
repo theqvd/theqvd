@@ -30,13 +30,19 @@ sub _create_socket {
         require Net::SSLeay;
         Net::SSLeay::load_error_strings();
 
+	IO::Socket::SSL->import('debug3');
+
         my %args = ( SSL_verify_mode => 3 );
         $args{$_} = $self->{$_} for qw(SSL_ca_path SSL_use_cert SSL_cert_file SSL_key_file);
+	#open my $err, ">>/tmp/qvd-httpc.err";
+	#$args{SSL_passwd_cb} = sub { print $err "user certificate requires password\n"; "foo" };
+	#print STDERR "ssl args:\n", Dumper \%args;
         $s = IO::Socket::SSL->new(PeerAddr => $target, Blocking => 0, %args);
         unless ($s) {
             # try again with the user customized CA certificates
             $args{SSL_ca_path}         = $self->{SSL_ca_path_alt};
             $args{SSL_verify_callback} = $self->{SSL_verify_callback};
+	    #print STDERR "ssl args (second try):\n", Dumper \%args;
             $s = IO::Socket::SSL->new(PeerAddr => $target, Blocking => 0, %args);
         }
     }
@@ -55,7 +61,8 @@ sub new {
                };
 
     $self->{$_} = delete $opts{$_} for qw(timeout SSL SSL_verify_callback
-                                          SSL_ca_path SSL_ca_path_alt);
+                                          SSL_ca_path SSL_ca_path_alt
+					  SSL_use_cert SSL_cert_file SSL_key_file);
     keys %opts and croak "unknown constructor option(s) " . join(', ', keys %opts);
 
     bless $self, $class;
