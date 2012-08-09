@@ -106,6 +106,8 @@ client.host.name =
 client.user.name =
 ## whether to use SSL in the client↔server communication or not
 client.use_ssl = 1
+client.ssl.use_cert = 0
+
 # Port where to run socat
 client.socat.port = 2002
 client.socat.timeout = 10
