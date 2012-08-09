@@ -2,6 +2,8 @@
 
 package QVD::Client::App;
 
+use IO::Socket::SSL qw(debug3);
+
 use strict;
 use warnings;
 
@@ -51,6 +53,15 @@ BEGIN {
     $DARWIN = ($^O eq 'darwin');
     $ENV{NX_CLIENT} = $WINDOWS ? 'cmd.exe /c :' : 'false';
 }
+
+use QVD::Config::Core qw(set_core_cfg);
+
+for (@ARGV) {
+    if (my ($k, $v) = /^\s*([\w\.]+)\s*[:=\s]\s*(.*?)\s*$/) {
+	set_core_cfg($k, $v);
+    }
+}
+
 use QVD::Client::Frame;
 use parent 'Wx::App';
 
