@@ -6,8 +6,8 @@ use warnings;
 use strict;
 
 use Config::Properties;
-use QVD::Config::Defaults;
-my $core_cfg = Config::Properties->new($QVD::Config::defaults);
+use QVD::Config::Core::Defaults;
+my $core_cfg = Config::Properties->new($QVD::Config::Core::defaults);
 
 use Exporter qw(import);
 our @EXPORT = qw(core_cfg core_cfg_all core_cfg_keys save_core_cfg set_core_cfg);

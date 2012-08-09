@@ -1,0 +1,6 @@
+Revision history for Perl extension QVD::Config::Core.
+
+0.01  Thu Aug  9 08:53:18 2012
+	- original version; created by h2xs 1.23 with options
+		-AXn QVD::Config::Core
+

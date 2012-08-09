@@ -1,0 +1,6 @@
+Changes
+Makefile.PL
+MANIFEST
+README
+t/QVD-Config-Core.t
+lib/QVD/Config/Core.pm

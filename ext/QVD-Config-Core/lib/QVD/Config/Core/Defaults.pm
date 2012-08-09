@@ -1,4 +1,4 @@
-package QVD::Config;
+package QVD::Config::Core;
 
 use Config::Properties;
 

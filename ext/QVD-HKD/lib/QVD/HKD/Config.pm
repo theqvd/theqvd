@@ -9,7 +9,7 @@ use Carp;
 use Config::Properties;
 use Pg::PQ qw(:pgres);
 use QVD::Log;
-use QVD::Config::Defaults;
+use QVD::Config::Core::Defaults;
 use QVD::HKD::Helpers;
 
 use parent 'QVD::HKD::Agent';
@@ -23,7 +23,7 @@ sub new {
     my $self = $class->SUPER::new(%opts);
 
     $self->{config_file} = $config_file;
-    $self->{props} = Config::Properties->new(defaults => $QVD::Config::defaults);
+    $self->{props} = Config::Properties->new(defaults => $QVD::Config::Core::defaults);
     $self->{on_reload_error} = $on_reload_error;
     $self->{on_reload_done} = $on_reload_done;
 
