@@ -127,6 +127,7 @@ sub send_http_request {
     my ($self, $method, $url, %opts)= @_;
     my $params = delete $opts{params};
     my @headers = @{delete $opts{headers} // []};
+    push @headers, "User-Agent: QVD::HTTPC/$VERSION ($^O)";
     my $body = delete $opts{body};
 
     if ($params and %$params) {
