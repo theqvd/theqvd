@@ -138,8 +138,8 @@ sub send_http_request {
 
     if (defined $body) {
 	my $content_type = delete $opts{content_type} // 'text/ascii';
-	push @headers, ('Content-Length: ' . length $body,
-			'Content-Type: $content_type');
+	push @headers, ("Content-Length: " . length $body,
+			"Content-Type: $content_type");
     }
 
     my $socket = $self->{socket};
