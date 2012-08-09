@@ -38,7 +38,7 @@ BEGIN {
 
     mkdir $DOTQVD if (!-e $DOTQVD);
     $QVD::Config::USE_DB = 0;
-    @QVD::Config::FILES = (
+    @QVD::Config::Core::FILES = (
         '/etc/qvd/client.conf',
         $DOTQVD.'/client.conf',
         'qvd-client.conf',

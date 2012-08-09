@@ -7,7 +7,7 @@ use warnings;
 
 BEGIN {
     $QVD::Config::USE_DB = 0;
-    @QVD::Config::FILES = ('/etc/qvd/vma.conf');
+    @QVD::Config::Core::FILES = ('/etc/qvd/vma.conf');
 }
 use QVD::Config::Core;
 

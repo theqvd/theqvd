@@ -8,7 +8,7 @@ use JSON;
 
 BEGIN {
     $QVD::Config::USE_DB = 0;
-    @QVD::Config::FILES = (
+    @QVD::Config::Core::FILES = (
         '/etc/qvd/client.conf',
         ($ENV{HOME} || $ENV{APPDATA}).'/.qvd/client.conf',
         'qvd-client.conf',
