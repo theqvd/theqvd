@@ -8,6 +8,7 @@ use lib::glob '*/lib:../g/p5*/lib';
 
 my $name = $0;
 $name =~ s/.*\///;
-tee(*STDOUT, '>', "/tmp/$name.out");
-
-open STDERR, '>&STDOUT';
+unless ($ENV{NO_AUTO_TEE}) {
+	tee(*STDOUT, '>', "/tmp/$name.out");
+	open STDERR, '>&STDOUT';
+}
