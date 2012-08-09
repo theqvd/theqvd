@@ -129,7 +129,7 @@ sub connect_to_vm {
         $args{SSL_ca_path}         = cfg('path.ssl.ca.system');
         $args{SSL_ca_path_alt}     = cfg('path.ssl.ca.personal');
         $args{SSL_ca_path_alt}     =~ s|^~(?=/)|$ENV{HOME} // $ENV{APPDATA}|e;
-        my $use_cert = cfg('path.ssl.use_cert', 0);
+        my $use_cert = cfg('client.ssl.use_cert');
         if ($use_cert) {
             $args{SSL_use_cert} = 1;
             $args{SSL_cert_file} = cfg('client.ssl.cert_file');
