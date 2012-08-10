@@ -380,6 +380,7 @@ sub OnUnknownCert {
     my $but_clicked = sub {
         lock $accept_cert;
         $accept_cert = (shift and ($cert_data ne ""));
+	cond_signal $accept_cert;
         $dialog->Destroy();
     };
     my $bsizer = Wx::BoxSizer->new(wxHORIZONTAL);
