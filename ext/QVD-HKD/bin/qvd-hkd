@@ -1,8 +1,5 @@
 #!/usr/lib/qvd/bin/perl
 
-use strict;
-use warnings;
-
 BEGIN {
     # close file handles from parent in order to workaround some
     # interaction between lxc and certain terminal emulators
@@ -13,6 +10,9 @@ BEGIN {
     # VMA monitor will use the proxy if http_proxy is defined.
     delete $ENV{http_proxy};
 }
+
+use strict;
+use warnings;
 
 use Getopt::Long;
 my ($config_file, $foreground);
