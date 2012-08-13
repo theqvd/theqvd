@@ -273,7 +273,7 @@ sub cmd_config_ssl {
                                            value => $crl })
     }
     else {
-        rs(SSL_Config)->search('l7r.ssl.crl')->delete;
+        rs(SSL_Config)->search({ key => 'l7r.ssl.crl' })->delete;
     }
 
     1
