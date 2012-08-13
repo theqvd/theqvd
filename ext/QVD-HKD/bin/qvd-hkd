@@ -1,7 +1,7 @@
 #!/usr/lib/qvd/bin/perl
 
-eval 'exec /usr/lib/qvd/bin/perl  -S $0 ${1+"$@"}'
-    if 0; # not running under some shell
+use strict;
+use warnings;
 
 BEGIN {
     # close file handles from parent in order to workaround some
@@ -14,38 +14,25 @@ BEGIN {
     delete $ENV{http_proxy};
 }
 
-use strict;
-use warnings;
 use Getopt::Long;
-use Config::Properties;
-use QVD::Log;   ## this needs to go before App::Daemon, so we get to initialize l4p
-use QVD::Config::Defaults;
-use App::Daemon qw/daemonize/;
-
-
-# For simplicity replicate here the configuration handling code as
-# QVD::HKD::Config is not usable at this point.
-# FIXME: remove code duplication
-my $cfg;
-sub core_cfg {
-    my $value = eval { $cfg->requireProperty(@_) };
-    defined $value or die $@;
-    $value =~ s/\${(.*?)}/$1 eq '{' ? '${' : core_cfg($1)/ge;
-    $value;
+my ($config_file, $foreground);
+BEGIN {
+    # we parse command line arguments before loading QVD::Config::Core
+    # in order to allow for changing the configuration file name
+    $config_file = '/etc/qvd/node.conf';
+    $foreground = 0;
+    GetOptions("config-file|f=s" => \$config_file,
+               "X"               => \$foreground);
+    @QVD::Config::Core::FILES = $config_file;
 }
+
+
+use QVD::Log;   ## this needs to go before App::Daemon, so we get to initialize l4p
+use QVD::Config::Core;
+use App::Daemon qw/daemonize/;
 
 # FIXME: just for debugging!
 # $SIG{'INT'} = sub { die };
-
-my $config_file = '/etc/qvd/node.conf';
-my $foreground = 0;
-GetOptions("config-file|f=s" => \$config_file,
-           "X"               => \$foreground);
-
-$cfg = Config::Properties->new(defaults => $QVD::Config::defaults);
-open my $fh, '<', $config_file or die "unable to open configuration file $config_file\n";
-$cfg->load($fh);
-close $fh;
 
 my $umask = core_cfg('hkd.user.umask');  ## BUG: should use 'cfg' instead of 'core_cfg'
 $umask =~ /^[0-7]+$/ or die "invalid umask $umask\n";
