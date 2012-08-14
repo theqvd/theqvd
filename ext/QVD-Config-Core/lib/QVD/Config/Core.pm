@@ -54,3 +54,30 @@ sub save_core_cfg {
 }
 
 1;
+
+__END__
+
+=head1 NAME 
+
+QVD::Config::Core - Core QVD Configuration
+
+=head1 SYNOPSYS
+
+TODO
+
+=head1 DESCRIPTION
+
+TODO
+
+=head1 AUTHORS
+
+The QVD Team (qvd@qindel.com) 
+
+=head1 COPYRIGHT
+
+Copyright 2009-2010 by Qindel Formacion y Servicios S.L.
+
+This program is free software; you can redistribute it and/or modify it
+under the terms of the GNU GPL version 3 as published by the Free
+Software Foundation.
+
