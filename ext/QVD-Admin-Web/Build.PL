@@ -5,6 +5,15 @@ use strict;
 use warnings;
 use Module::Build;
 
+my $apache_dst; 
+
+if ( -f '/etc/debian_version' ) {
+	$apache_dst = '/etc/apache2/sites-avaiable' ;
+}
+else {
+	$apache_dst = '/etc/apache2/conf.d'; 
+}
+
 my $build = new Module::Build(
 	module_name      => 'QVD::Admin::Web',
 	dist_author       => 'QVD Team <qvd@qindel.com',
@@ -34,10 +43,12 @@ my $build = new Module::Build(
 		'QVD::Config'                        => 0,
 		'QVD::Log'                           => 0,
 		'Config::General'                    => 0
-	}
+	}, 
+	etc_files=> { 'etc/qvd-wat.conf' => "$apache_dst/qvd-wat.conf" },
 );
 
-foreach my $ext (qw(fb tt png jar css gif js zip ico)) {
+
+foreach my $ext (qw(fb tt png jar css gif js zip ico etc)) {
 	$build->add_build_element($ext);
 }
 
