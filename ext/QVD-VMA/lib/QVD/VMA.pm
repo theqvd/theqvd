@@ -413,7 +413,7 @@ sub _fork_monitor {
 		    # FIXME: Include VM name in -name argument.
 		    # FIXME: Reimplement xinit in Perl in order to allow capturing nxagent ouput alone.
                     # FIXME: Why do we need "-norender -defer 0" arguments? do they break anything?
-		    my @cmd = (xinit => $x_session, '--', $nxagent, ":$display",
+		    my @cmd = (xinit => split(/\s+/, $x_session), '--', $nxagent, ":$display",
 			       '-ac', '-name', 'QVD',
                                '-norender', '-defer', '0',
 			       '-display', "nx/nx,options=$nxagent_conf:$display");
