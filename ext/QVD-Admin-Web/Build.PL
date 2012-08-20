@@ -8,7 +8,7 @@ use Module::Build;
 my $apache_dst; 
 
 if ( -f '/etc/debian_version' ) {
-	$apache_dst = '/etc/apache2/sites-avaiable' ;
+	$apache_dst = '/etc/apache2/sites-available' ;
 }
 else {
 	$apache_dst = '/etc/apache2/conf.d'; 
@@ -44,7 +44,8 @@ my $build = new Module::Build(
 		'QVD::Log'                           => 0,
 		'Config::General'                    => 0
 	}, 
-	etc_files=> { 'etc/qvd-wat.conf' => "$apache_dst/qvd-wat.conf" },
+	etc_files=> { 'etc/apache2/sites-available' => "$apache_dst/qvd-wat.conf" },
+	install_path => { 'etc' => '/etc' },
 );
 
 
