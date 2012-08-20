@@ -7,6 +7,7 @@ bin/qvd_admin_web_server.pl
 bin/qvd_admin_web_test.pl
 Build.PL
 Changes
+etc/qvd-wat.conf
 lib/QVD/Admin/Web.pm
 lib/QVD/Admin/Web/Controller/Di.pm
 lib/QVD/Admin/Web/Controller/Hosts.pm
@@ -1262,4 +1263,3 @@ t/12vm.t
 t/model_QVD-Admin-Web.t
 t/view_JSON.t
 t/view_TT.t
-META.yml
