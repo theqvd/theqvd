@@ -44,7 +44,7 @@ my $build = new Module::Build(
 		'QVD::Log'                           => 0,
 		'Config::General'                    => 0
 	}, 
-	etc_files=> { 'etc/apache2/sites-available' => "$apache_dst/qvd-wat.conf" },
+	etc_files=> { 'etc/apache2/sites-available/qvd-wat.conf' => "$apache_dst/qvd-wat.conf" },
 	install_path => { 'etc' => '/etc' },
 );
 
