@@ -7,11 +7,6 @@ bin/qvd_admin_web_server.pl
 bin/qvd_admin_web_test.pl
 Build.PL
 Changes
-debian/changelog
-debian/compat
-debian/control
-debian/files
-debian/rules
 etc/apache2/sites-available/qvd-wat.conf
 lib/QVD/Admin/Web.pm
 lib/QVD/Admin/Web/Controller/Di.pm
@@ -345,7 +340,6 @@ lib/QVD/Admin/Web/root/static/images/icons/connect.png
 lib/QVD/Admin/Web/root/static/images/icons/contrast.png
 lib/QVD/Admin/Web/root/static/images/icons/contrast_decrease.png
 lib/QVD/Admin/Web/root/static/images/icons/contrast_high.png
-lib/QVD/Admin/Web/root/static/images/icons/contrast_increase.png
 lib/QVD/Admin/Web/root/static/images/icons/contrast_low.png
 lib/QVD/Admin/Web/root/static/images/icons/control_eject.png
 lib/QVD/Admin/Web/root/static/images/icons/control_eject_blue.png
@@ -1255,6 +1249,7 @@ lib/QVD/Admin/Web/View/JSON.pm
 lib/QVD/Admin/Web/View/TT.pm
 lib/QVD/Admin/Web/View/TTMin.pm
 MANIFEST			This list of files
+MANIFEST.SKIP
 qvd_admin_web.conf
 README
 t/01app.t
