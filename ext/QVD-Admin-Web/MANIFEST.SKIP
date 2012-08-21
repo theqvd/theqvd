@@ -12,3 +12,4 @@ inc
 ^MYMETA
 ^Makefile.PL$
 .tmp$
+debian\/
