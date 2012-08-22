@@ -25,7 +25,7 @@ DAEMON_ARGS=""
 PERL=/usr/lib/qvd/bin/perl
 NAME=qvd-vma
 DESC="QVD VMA"
-PIDFILE=/var/run/qvd/$NAME.pid
+PIDFILE=/var/run/qvd/vma.pid
 RUNDIR=/var/run/qvd
 SCRIPTNAME=/etc/init.d/$NAME
 
@@ -83,7 +83,7 @@ do_stop()
 	#   1 if daemon was already stopped
 	#   2 if daemon could not be stopped
 	#   other if a failure occurred
-	start-stop-daemon --stop --quiet --retry=TERM/30/KILL/5 --pidfile $PIDFILE --name $NAME
+	start-stop-daemon --stop --quiet --retry=TERM/30/KILL/5 --pidfile $PIDFILE --name qvd-vma.pl
 	RETVAL="$?"
 	[ "$RETVAL" = 2 ] && return 2
 	# Wait for children to finish too if this is a daemon that forks
@@ -108,7 +108,7 @@ do_reload() {
 	# restarting (for example, when it is sent a SIGHUP),
 	# then implement that here.
 	#
-	start-stop-daemon --stop --signal 1 --quiet --pidfile $PIDFILE --name $NAME
+	start-stop-daemon --stop --signal 1 --quiet --pidfile $PIDFILE --name qvd-vma.pl
 	return 0
 }
 
