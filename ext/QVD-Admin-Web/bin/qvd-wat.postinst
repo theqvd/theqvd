@@ -1,0 +1,24 @@
+#!/bin/bash
+
+set -e 
+
+case "$1" in
+    configure)
+	if [ -x /usr/sbin/a2ensite ] 
+	then 
+		a2ensite qvd-wat.conf 
+	fi
+	if [ -x /usr/sbin/apache2 ] 
+	then 
+		apache2ctl graceful
+	fi
+    ;;
+
+    abort-upgrade|abort-remove|abort-deconfigure)
+    ;;
+
+    *)
+        echo "postinst called with unknown argument \`$1'" >&2
+        exit 1
+    ;;
+esac
