@@ -1,0 +1,13 @@
+#!/bin/bash
+
+set -e 
+if [ -x /usr/sbin/a2dissite ] 
+then 
+	a2dissite qvd-wat.conf 
+fi
+
+if [ -x /etc/init.d/apache2 ] ; then 
+	/etc/init.d/apache2 status && apache2ctl graceful
+fi 
+
+exit 0 
