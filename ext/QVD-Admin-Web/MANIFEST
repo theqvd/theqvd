@@ -1262,3 +1262,5 @@ t/12vm.t
 t/model_QVD-Admin-Web.t
 t/view_JSON.t
 t/view_TT.t
+META.yml
+META.json
