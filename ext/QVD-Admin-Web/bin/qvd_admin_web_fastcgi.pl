@@ -1,4 +1,4 @@
-#!/usr/bin/env perl
+#!/usr/lib/qvd/bin/perl
 
 use Catalyst::ScriptRunner;
 Catalyst::ScriptRunner->run('QVD::Admin::Web', 'FastCGI');
