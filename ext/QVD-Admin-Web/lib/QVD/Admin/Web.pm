@@ -4,8 +4,8 @@ use strict;
 use warnings;
 
 BEGIN { $QVD::Log::DAEMON_NAME = "wat" }
-use QVD::Config;
 use QVD::Log;
+use QVD::Config;
 
 use Catalyst::Runtime 5.70;
 
