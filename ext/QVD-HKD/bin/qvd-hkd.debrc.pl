@@ -41,10 +41,9 @@ SCRIPTNAME=/etc/init.d/$NAME
 . /lib/lsb/init-functions
 
 CONFIG=/etc/qvd/node.conf
-if [ ! -d "$CONFIG" ]; then
-        echo "Configuration directory $CONFIG doesn't exist."
-        echo "Create it with 'cp -R /usr/share/qvd/config $CONFIG' and edit node.conf."
-        exit 0
+if [ ! -f "$CONFIG" ]; then
+        echo "Configuration file $CONFIG doesn't exist."
+        exit 1
 fi
 
 
