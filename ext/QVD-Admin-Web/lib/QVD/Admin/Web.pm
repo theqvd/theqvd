@@ -26,9 +26,9 @@ use Catalyst qw/ConfigLoader
                /;
                 #-Debug
                 #FormBuilder
-               
-use QVD::Config::Core;      
-               
+
+use QVD::Config;
+
 our $VERSION = sprintf "1.%04d", q$Revision: 6173 $ =~ /(\d+)/xg;
 #our $VERSION = '0.01';
 
@@ -46,8 +46,8 @@ __PACKAGE__->config(
         session => {flash_to_stash => 1}
      );
 
-my $username = core_cfg('wat.admin.login');
-my $password = core_cfg('wat.admin.password');
+my $username = cfg('wat.admin.login');
+my $password = cfg('wat.admin.password');
 
 __PACKAGE__->config( 'Plugin::Authentication' =>
             {
