@@ -16,6 +16,7 @@ PATH=/usr/lib/qvd/bin:/bin:/usr/bin
 
 DAEMON=/usr/lib/qvd/bin/qvd-vma.pl
 PERL=/usr/lib/qvd/bin/perl
+CONFIG=/etc/qvd/vma.conf
 NAME=qvd-vma
 DESC="QVD VMA"
 
@@ -44,12 +45,12 @@ DIETIME=10              # Time to wait for the server to die, in seconds
 #DAEMONUSER=test   # Users to run the daemons as. If this value
                         # is set start-stop-daemon will chuid the server
 
-CONFDIR=/etc/qvd
-if [ ! -d "$CONFDIR" ]; then
-    echo "Configuration directory $CONFDIR doesn't exist."
-    echo "Create it with 'cp -R /usr/share/qvd/config $CONFDIR' and edit vma.conf."
-    exit 0
-fi
+
+if [ ! -f "$CONFIG" ]; then 
+    echo "Configuration file $CONFIG doesn't exist."
+    echo "Create it with 'cp -R /usr/share/qvd/config/vma.conf $CONFIG and edit vma.conf." 
+    exit 0 
+fi 
 
 # Default options, these can be overriden by the information
 # at /etc/default/$NAME

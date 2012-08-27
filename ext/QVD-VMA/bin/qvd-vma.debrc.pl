@@ -28,6 +28,7 @@ DESC="QVD VMA"
 PIDFILE=/var/run/qvd/vma.pid
 RUNDIR=/var/run/qvd
 SCRIPTNAME=/etc/init.d/$NAME
+CONFIG=/etc/qvd/vma.conf
 
 
 # Exit if the package is not installed
@@ -43,12 +44,12 @@ SCRIPTNAME=/etc/init.d/$NAME
 # Depend on lsb-base (>= 3.0-6) to ensure that this file is present.
 . /lib/lsb/init-functions
 
-CONFDIR=/etc/qvd
-if [ ! -d "$CONFDIR" ]; then
-	echo "Configuration directory $CONFDIR doesn't exist."
-	echo "Create it with 'cp -R /usr/share/qvd/config $CONFDIR' and edit vma.conf."
-	exit 0
+if [ ! -f "$CONFIG" ]; then
+    echo "Configuration file $CONFIG doesn't exist."
+    echo "Create it with 'cp -R /usr/share/qvd/config/vma.conf $CONFIG and edit vma.conf."
+    exit 0 
 fi
+
 
 #
 # Function that starts the daemon/service
