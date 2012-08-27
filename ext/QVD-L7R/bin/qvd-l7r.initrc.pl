@@ -43,11 +43,11 @@ DIETIME=10              # Time to wait for the server to die, in seconds
 #DAEMONUSER=test   # Users to run the daemons as. If this value
                         # is set start-stop-daemon will chuid the server
 
-CONFDIR=/etc/qvd
-if [ ! -d "$CONFDIR" ]; then
-    echo "Configuration directory $CONFDIR doesn't exist."
-    echo "Create it with 'cp -R /usr/share/qvd/config $CONFDIR' and edit node.conf."
-    exit 0
+CONFIG=/etc/qvd/node.conf
+if [ ! -d "$CONFIG" ]; then
+        echo "Configuration directory $CONFIG doesn't exist."
+        echo "Create it with 'cp -R /usr/share/qvd/config $CONFIG' and edit node.conf."
+        exit 0
 fi
 
 # Default options, these can be overriden by the information
