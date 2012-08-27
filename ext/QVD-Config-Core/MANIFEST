@@ -4,3 +4,5 @@ MANIFEST
 README
 t/QVD-Config-Core.t
 lib/QVD/Config/Core.pm
+META.yml
+META.json
