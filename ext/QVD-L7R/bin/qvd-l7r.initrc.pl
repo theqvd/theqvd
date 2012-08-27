@@ -44,7 +44,7 @@ DIETIME=10              # Time to wait for the server to die, in seconds
                         # is set start-stop-daemon will chuid the server
 
 CONFIG=/etc/qvd/node.conf
-if [ ! -d "$CONFIG" ]; then
+if [ ! -f "$CONFIG" ]; then
         echo "Configuration directory $CONFIG doesn't exist."
         echo "Create it with 'cp -R /usr/share/qvd/config/sample-node.conf $CONFIG' and edit node.conf."
         exit 0
