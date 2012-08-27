@@ -159,6 +159,10 @@ wat.admin.login = admin
 
 ## path to the log file
 log.filename = ${path.log}/qvd.log
+
+## WAT logs go into its own file to avoid permission issues as the process is not run as root
+wat.log.filename = ${path.log}/qvd-wat.log
+
 ## log verbosity (FATAL, ERROR, WARN, INFO, DEBUG or TRACE)
 log.level = INFO
 
