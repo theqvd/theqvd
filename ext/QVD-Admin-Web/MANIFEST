@@ -1,5 +1,5 @@
-bin/qvd-wat.debrc.pl
-bin/qvd-wat.initrc.pl
+bin/qvd-wat.postinst
+bin/qvd-wat.prerm
 bin/qvd_admin_web_cgi.pl
 bin/qvd_admin_web_create.pl
 bin/qvd_admin_web_fastcgi.pl
@@ -1250,6 +1250,7 @@ lib/QVD/Admin/Web/View/TT.pm
 lib/QVD/Admin/Web/View/TTMin.pm
 MANIFEST			This list of files
 MANIFEST.SKIP
+META.json
 qvd_admin_web.conf
 README
 t/01app.t
@@ -1262,5 +1263,3 @@ t/12vm.t
 t/model_QVD-Admin-Web.t
 t/view_JSON.t
 t/view_TT.t
-META.yml
-META.json
