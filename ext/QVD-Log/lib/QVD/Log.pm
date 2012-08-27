@@ -20,6 +20,10 @@ unless (open my $fd, '>>', $logfile) {
     }
 }
 
+print STDERR "logging to $logfile\n";
+
+
+
 my %config = ( 'log4perl.appender.LOGFILE'          => 'Log::Dispatch::FileRotate',
 	       'log4perl.appender.LOGFILE.mode'     => 'append',
 	       'log4perl.appender.LOGFILE.DatePattern'
