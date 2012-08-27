@@ -13,6 +13,10 @@ use Catalyst::Runtime 5.70;
 # Static::Simple: will serve static files from the application's root
 #                 directory
 
+use QVD::Config;
+BEGIN { QVD::Log::DAEMON_NAME = "wat" };
+use QVD::Log;
+
 use parent qw/Catalyst/;
 use Catalyst qw/ConfigLoader
                 Static::Simple
@@ -26,8 +30,6 @@ use Catalyst qw/ConfigLoader
                /;
                 #-Debug
                 #FormBuilder
-
-use QVD::Config;
 
 our $VERSION = sprintf "1.%04d", q$Revision: 6173 $ =~ /(\d+)/xg;
 #our $VERSION = '0.01';

@@ -7,20 +7,17 @@ use strict;
 
 our $VERSION = '0.01';
 
-my $logfile = core_cfg('log.filename');
+our $DAEMON_NAME;
+my $logfile = core_cfg(defined $DAEMON_NAME ? "$DAEMON_NAME.log.filename" : "log.filename");
 
 ## create the file if it doesn't exist, ignore errors
-{ open my $fd, '>>', $logfile; }
 
-if (!-w $logfile) {
-    my $err = $!;
-    if (!open my $fd, '>>', '/tmp/qvd.log') {
-        die "Can't write to '$logfile' ($err) and can't use '/tmp/qvd.log' ($!) as a replacement";
-    } else {
-        close $fd;
+unless (open my $fd, '>>', $logfile) {
+    warn "Can't open $logfile: $!\n";
+    $logfile = (defined $DAEMON_NAME ? "/tmp/qvd-$DAEMON_NAME.log" : '/tmp/qvd.log');
+    if (not open my $fd, '>>', $logfile) {
+        die "Can't open '/tmp/qvd.log': $!";
     }
-    warn "Using '/tmp/qvd.log' as log file ('$logfile' gave '$err')\n";
-    $logfile = '/tmp/qvd.log';
 }
 
 my %config = ( 'log4perl.appender.LOGFILE'          => 'Log::Dispatch::FileRotate',
