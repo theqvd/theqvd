@@ -16,7 +16,7 @@ unless (open my $fd, '>>', $logfile) {
     warn "Can't open $logfile: $!\n";
     $logfile = (defined $DAEMON_NAME ? "/tmp/qvd-$DAEMON_NAME.log" : '/tmp/qvd.log');
     if (not open my $fd, '>>', $logfile) {
-        die "Can't open '/tmp/qvd.log': $!";
+        die "Can't open '$logfile': $!";
     }
 }
 
