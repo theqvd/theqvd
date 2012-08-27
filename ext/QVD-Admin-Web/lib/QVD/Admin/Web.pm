@@ -3,6 +3,10 @@ package QVD::Admin::Web;
 use strict;
 use warnings;
 
+use QVD::Config;
+BEGIN { $QVD::Log::DAEMON_NAME = "wat" };
+use QVD::Log;
+
 use Catalyst::Runtime 5.70;
 
 # Set flags and add plugins for the application
@@ -12,10 +16,6 @@ use Catalyst::Runtime 5.70;
 #                 application's home directory
 # Static::Simple: will serve static files from the application's root
 #                 directory
-
-use QVD::Config;
-BEGIN { QVD::Log::DAEMON_NAME = "wat" };
-use QVD::Log;
 
 use parent qw/Catalyst/;
 use Catalyst qw/ConfigLoader
