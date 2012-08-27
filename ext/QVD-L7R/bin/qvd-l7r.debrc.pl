@@ -44,7 +44,7 @@ SCRIPTNAME=/etc/init.d/$NAME
 CONFIG=/etc/qvd/node.conf
 if [ ! -f "$CONFIG" ]; then
 	echo "Configuration file $CONFIG doesn't exist."
-	exit 1
+	exit 0
 fi
 
 

@@ -46,7 +46,7 @@ DIETIME=10              # Time to wait for the server to die, in seconds
 CONFIG=/etc/qvd/node.conf
 if [ ! -d "$CONFIG" ]; then
         echo "Configuration directory $CONFIG doesn't exist."
-        echo "Create it with 'cp -R /usr/share/qvd/config $CONFIG' and edit node.conf."
+        echo "Create it with 'cp -R /usr/share/qvd/config/sample-node.conf $CONFIG' and edit node.conf."
         exit 0
 fi
 
