@@ -16,6 +16,6 @@ WriteMakefile( NAME          => 'QVD::HKD',
                                   'Linux::Proc::Mountinfo' => '0.01',
                                 },
                ABSTRACT_FROM => 'lib/QVD/HKD.pm',
-	       EXE_FILES     => [ qw(bin/qvd-hkd bin/qvd-hkd.initrc.pl bin/qvd-hkd.debrc.pl) ],
+	       EXE_FILES     => [ qw(bin/qvd-hkd bin/qvd-hkd.initrc.pl bin/qvd-hkd.debrc.pl bin/qvd-hkd.postinst) ],
                AUTHOR        => 'QVD Team <qvd@qindel.com>',
 );
