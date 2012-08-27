@@ -3,8 +3,8 @@ package QVD::Admin::Web;
 use strict;
 use warnings;
 
-use QVD::Config;
 BEGIN { $QVD::Log::DAEMON_NAME = "wat" }
+use QVD::Config;
 use QVD::Log;
 
 use Catalyst::Runtime 5.70;

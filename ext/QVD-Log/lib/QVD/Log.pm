@@ -4,10 +4,13 @@ use QVD::Config::Core;
 
 use warnings;
 use strict;
+use 5.010;
 
 our $VERSION = '0.01';
 
 our $DAEMON_NAME;
+warn "DAEMON_NAME is " . ($DAEMON_NAME // '<undef>');
+
 my $logfile = core_cfg(defined $DAEMON_NAME ? "$DAEMON_NAME.log.filename" : "log.filename");
 
 ## create the file if it doesn't exist, ignore errors
