@@ -24,6 +24,7 @@ my $build = new Module::Build(
 				  'QVD::Config' => 0,
 				  'QVD::HTTP' => 0,
 				  'QVD::HTTPC' => 0,
+				  'QVD::Log' => 0,
 				  'Test::More' => 0,
 				  'URI::Escape' => 0,
 				  'Wx' => 0,
