@@ -16,8 +16,7 @@ my $build = new Module::Build(
 	requires => {
 		'Config::Properties' => 0
 	}, 
-	usr_files=> { 'usr/lib/qvd/config/sample-node.conf' => "/usr/lib/qvd/config/sample-node.conf" },
-	usr_files=> { 'usr/lib/qvd/config/sample-vma.conf' => "/usr/lib/qvd/config/sample-vma.conf" },
+	usr_files => { 'usr/lib/qvd/config/sample-node.conf' => "/usr/lib/qvd/config/sample-node.conf", 'usr/lib/qvd/config/sample-vma.conf' => "/usr/lib/qvd/config/sample-vma.conf" },
 	install_path => { 'usr' => '/usr' },
 );
 
