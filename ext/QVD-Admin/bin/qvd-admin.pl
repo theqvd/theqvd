@@ -12,7 +12,9 @@ use QVD::Log;
 my $filter = '';
 my $quiet = '';
 my $help = '';
-GetOptions('filter|f=s' => \$filter, 'quiet|q' => \$quiet, 'help|h' => \$help);
+
+my $ret = GetOptions('filter|f=s' => \$filter, 'quiet|q' => \$quiet, 'help|h' => \$help);
+$help = 1 unless $ret;
 
 my $object = shift @ARGV;
 my $command = shift @ARGV;

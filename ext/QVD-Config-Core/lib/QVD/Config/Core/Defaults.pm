@@ -252,6 +252,15 @@ vma.user.socat.user =
 vma.user.socat.group = dialout
 vma.user.socat.mode = 0660
 
+# When using LXC if this flag is set, QVD will assume that the home
+# directories are not per virtual machine but per user and that they
+# follow the typical NFS home structure.
+# Note that in order for this schema to work, the user ids used on the
+# containers and in the directories shouls match. This is usually
+# atained using an authentication plugin (i.e. LDAP) that assigns a UID
+# that is the same used on the NFS.
+vm.lxc.home.per.user = 0
+
 ## umask for the VMA
 vma.user.umask = 0022
 

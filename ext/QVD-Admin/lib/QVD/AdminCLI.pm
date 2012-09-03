@@ -137,10 +137,12 @@ sub _syntax_check {
 
     ## choke on not-yet-handled arguments, except for the following
     ## - '* edit'
+    ## - 'vm ssh ' 
     ## - '* propdel', '* propget', '* propset'
     ## - 'config *'   (but not 'config ssl', which has been already handled)
     if (%args and
         $cmd ne 'edit' and
+        not ($obj eq 'vm' and $cmd eq 'ssh') and
         $cmd !~ /^prop(?:del|get|set)$/ and
         ($obj ne 'config' or $cmd eq 'ssl')) {
 
@@ -1588,10 +1590,10 @@ sub help_vm_ssh {
 vm ssh: Connects to the virtual machine SSH server.
 usage: vm ssh
 
-  To pass aditional parameters to SSH add them to the command line after --
+  Parameters after -- are passed to SSH.
   
   Example:
-  vm ssh -- -l qvd
+  vm ssh -f name=qvd-vm42 -- -l qvd -X -f xterm
        
 Valid options:
     -f [--filter] FILTER : connect to the virtual machine matched by FILTER

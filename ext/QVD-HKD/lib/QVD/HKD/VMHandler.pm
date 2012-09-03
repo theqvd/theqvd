@@ -97,12 +97,19 @@ sub _on_save_state_result {}
 
 sub _load_row {
     my $self = shift;
-    $self->_query_1('select name, user_id, osf_id, di_tag, ip, storage from vms where id = $1', $self->{vm_id});
+    $self->_query_1(<<'EOQ', $self->{vm_id});
+select name, user_id, osf_id,
+       di_tag, ip, storage,
+       login
+  from vms, users
+  where vms.id = $1
+    and users.id = vms.user_id
+EOQ
 }
 
 sub _on_load_row_result {
     my ($self, $res) = @_;
-    @{$self}{qw(name user_id osf_id di_tag ip storage)} = $res->row;
+    @{$self}{qw(name user_id osf_id di_tag ip storage login)} = $res->row;
     INFO "Successfully loaded row for VM '$self->{vm_id}'";
     $self->{mac} = $self->_ip_to_mac($self->{ip});
     my $dhcpd_handler = $self->{dhcpd_handler};
