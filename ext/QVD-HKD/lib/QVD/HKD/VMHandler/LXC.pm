@@ -340,9 +340,14 @@ sub _calculate_attrs {
     if ($self->{user_storage_size}) {
         my $homefs_parent = $self->_cfg('path.storage.homefs');
         $homefs_parent =~ s|/*$|/|;
-        $self->{home_fs} = "$homefs_parent$self->{vm_id}-fs";
-
-        $self->{home_fs_mnt} = "$self->{os_rootfs}/home";
+        if ($self->_cfg('vm.lxc.home.per.user')) {
+            $self->{home_fs} = "$homefs_parent$self->{login}";
+            $self->{home_fs_mnt} = "$self->{os_rootfs}/home/$self->{login}";
+        }
+        else {
+            $self->{home_fs} = "$homefs_parent$self->{vm_id}-fs";
+            $self->{home_fs_mnt} = "$self->{os_rootfs}/home";
+        }
     }
 
     my $iface = $self->{iface} =
@@ -534,7 +539,7 @@ sub _allocate_home_fs {
         ERROR "Unable to create directory '$homefs'";
         return $self->_on_allocate_home_fs_error;
     }
-    my $mount_point = $self->{os_homefs_mnt};
+    my $mount_point = $self->{home_fs_mnt};
     unless (_mkpath $mount_point) {
         ERROR "Unable to create directory '$mount_point'";
         return $self->_on_allocate_home_fs_error;
