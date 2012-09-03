@@ -25,7 +25,9 @@ use QVD::StateMachine::Declarative
                        transitions => { _on_timeout         => 'checking',
                                         on_hkd_stop         => 'stopped'       },
                        leave => '_abort_all'                                     },
-    stopped       => { enter => '_on_stopped'                                    };
+    stopped       => { enter => '_on_stopped'                                    },
+
+    __any__       => { delay => [qw(on_hkd_Stop)] };
 
 sub new {
     my ($class, %opts) = @_;
