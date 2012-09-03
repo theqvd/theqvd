@@ -7,7 +7,7 @@ __PACKAGE__->add_columns( id         => { data_type         => 'integer',
 					  is_auto_increment => 1 },
 			  login      => { data_type         => 'varchar(64)' },
 			  # FIXME: get passwords out of this table!
-              # FIXME: omg encrypt passwords!!
+                          # FIXME: omg encrypt passwords!!
 			  password   => { data_type         => 'varchar(64)',
 					  is_nullable       => 1 } );
 
