@@ -37,10 +37,16 @@ my $nxagent         = cfg('command.nxagent');
 my $nxdiag          = cfg('command.nxdiag');
 my $x_session       = cfg('command.x-session');
 my $socat           = cfg('command.socat');
+my $xinit           = cfg('command.xinit');
 my $enable_audio    = cfg('vma.audio.enable');
 my $enable_printing = cfg('vma.printing.enable');
 my $printing_conf   = cfg('internal.vma.printing.config');
 my $nxagent_conf    = cfg('internal.vma.nxagent.config');
+
+my $nxagent_args_extra   = cfg('command.nxagent.args.extra');
+my $x_session_args_extra = cfg('command.x-session.args.extra');
+my @nxagent_args_extra   = < $nxagent_args_extra >; # unquote arguments using the shell via glob!!!
+my @x_session_args_extra = < $x_session_args_extra >;
 
 my $groupadd        = cfg('command.groupadd');
 my $useradd         = cfg('command.useradd');
@@ -412,11 +418,13 @@ sub _fork_monitor {
 
 		    # FIXME: Include VM name in -name argument.
 		    # FIXME: Reimplement xinit in Perl in order to allow capturing nxagent ouput alone.
-                    # FIXME: Why do we need "-norender -defer 0" arguments? do they break anything?
-		    my @cmd = (xinit => split(/\s+/, $x_session), '--', $nxagent, ":$display",
+		    my @cmd = ($xinit => $x_session, @x_session_args_extra,
+                               '--',
+                               $nxagent, ":$display",
 			       '-ac', '-name', 'QVD',
-                               '-norender', '-defer', '0',
-			       '-display', "nx/nx,options=$nxagent_conf:$display");
+                               # '-norender', '-defer', '0', # GTK/Cairo require Xrender to work properly
+			       '-display', "nx/nx,options=$nxagent_conf:$display",
+                               @nxagent_args_extra);
 		    say "running @cmd";
 		    _become_user($props{'qvd.vm.user.name'});
 		    exec @cmd;
