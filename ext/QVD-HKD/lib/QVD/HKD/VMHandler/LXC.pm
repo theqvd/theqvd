@@ -479,9 +479,21 @@ sub _allocate_os_rootfs {
     DEBUG "Unionfs type: '$unionfs_type'";
 
     given ($unionfs_type) {
+        when('overlayfs') {
+            if(_run($self->_cfg('command.modprobe'), "overlayfs")) {
+                WARN "Failed to load aufs kernel module. Mounting will probably fail.";
+            }
+            # mount -t overlayfs -o rw,uppderdir=x,lowerdir=y overlayfs /mount/point
+            if (_run($self->_cfg('command.mount'),
+                     -t => 'overlayfs',
+                     -o => "rw,upperdir=$self->{os_overlayfs},lowerdir=$self->{os_basefs}", "overlayfs", $rootfs)) {
+                ERROR "Unable to mount overlayfs (code: " . ($?>>8) . ")";
+                return $self->_on_allocate_os_rootfs_error;
+            }
+        }
         when('aufs') {
             if(_run($self->_cfg('command.modprobe'), "aufs")) {
-                ERROR "Failed to load aufs kernel module. Mounting will probably fail.";
+                WARN "Failed to load aufs kernel module. Mounting will probably fail.";
             }
 
             if (_run($self->_cfg('command.mount'),

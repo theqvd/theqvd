@@ -121,21 +121,25 @@ sub authenticate_basic {
 	DEBUG("authenticate_basic: DN $dn for user $login was authenticated");
 	return 1;
     }
-
-    # In case of failed credentials if ldap_racf_regex is defined allow to login if
-    # the error message matches
-    if (defined($ldap_racf_regex) && $msg->code == LDAP_INVALID_CREDENTIALS && 
-	defined($msg->server_error) && $msg->server_error =~ /$ldap_racf_regex/) {
-	DEBUG("authenticate_basic: DN $dn for user $login returned invalid credentials but matches <$ldap_racf_regex> for message ".$msg->server_error);
-	return 1;
+    else {
+        # In case of failed credentials if ldap_racf_regex is defined allow to login if
+        # the error message matches
+        if (defined($ldap_racf_regex) && $msg->code == LDAP_INVALID_CREDENTIALS && 
+            defined($msg->server_error) && $msg->server_error =~ /$ldap_racf_regex/) {
+            DEBUG("authenticate_basic: DN $dn for user $login returned invalid credentials but matches ".
+                  "<$ldap_racf_regex> for message ".$msg->server_error);
+        }
+        else {
+            DEBUG "Error in authentication. Ldap code was: ".$msg->code."(".$msg->error_desc.").".
+                ((defined $msg->server_error) ? " Server error:".$msg->server_error : "");
+            return ();
+        }
     }
+    my $uidNumber = $entry->get_value('uidNumber');
+    $auth->{params}{'qvd.vm.user.uid'} = $uidNumber if defined $uidNumber;
 
-    DEBUG "Error in authentication. Ldap code was: ".$msg->code."(".$msg->error_desc.").".
-	((defined $msg->server_error) ? " Server error:".$msg->server_error : "");
-
-    return ();
+    return 1;
 }
-
 
 1;
 

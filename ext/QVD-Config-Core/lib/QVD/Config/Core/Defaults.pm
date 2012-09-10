@@ -83,6 +83,10 @@ command.ebtables = ebtables
 command.iptables = iptables
 command.socat = /usr/bin/socat
 command.modprobe = /sbin/modprobe
+command.xinit = /usr/bin/xinit
+
+command.nxagent.args.extra =
+command.x-session.args.extra =
 
 ## whether to remember password after successful connection
 client.remember_password = 1
