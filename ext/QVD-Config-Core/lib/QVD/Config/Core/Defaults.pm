@@ -85,8 +85,8 @@ command.socat = /usr/bin/socat
 command.modprobe = /sbin/modprobe
 command.xinit = /usr/bin/xinit
 
-command.nxagent.extra_args =
-command.x-session.extra_args =
+command.nxagent.args.extra =
+command.x-session.args.extra =
 
 ## whether to remember password after successful connection
 client.remember_password = 1
