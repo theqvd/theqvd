@@ -9,7 +9,7 @@ use 5.010;
 our $VERSION = '0.01';
 
 our $DAEMON_NAME;
-warn "DAEMON_NAME is " . ($DAEMON_NAME // '<undef>');
+# warn "DAEMON_NAME is " . ($DAEMON_NAME // '<undef>');
 
 my $logfile = core_cfg(defined $DAEMON_NAME ? "$DAEMON_NAME.log.filename" : "log.filename");
 
@@ -23,7 +23,7 @@ unless (open my $fd, '>>', $logfile) {
     }
 }
 
-print STDERR "logging to $logfile\n";
+# print STDERR "logging to $logfile\n";
 
 
 
