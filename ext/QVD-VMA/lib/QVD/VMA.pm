@@ -45,8 +45,9 @@ my $nxagent_conf    = cfg('internal.vma.nxagent.config');
 
 my $nxagent_args_extra   = cfg('command.nxagent.args.extra');
 my $x_session_args_extra = cfg('command.x-session.args.extra');
-my @nxagent_args_extra   = < $nxagent_args_extra >; # unquote arguments using the shell via glob!!!
-my @x_session_args_extra = < $x_session_args_extra >;
+# unquote arguments using the shell via glob!!!
+my @nxagent_args_extra   = ($nxagent_args_extra   =~ /\S/ ? < $nxagent_args_extra   > : ());
+my @x_session_args_extra = ($x_session_args_extra =~ /\S/ ? < $x_session_args_extra > : ());
 
 my $groupadd        = cfg('command.groupadd');
 my $useradd         = cfg('command.useradd');
