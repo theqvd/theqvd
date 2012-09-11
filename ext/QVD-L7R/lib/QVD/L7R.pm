@@ -54,12 +54,17 @@ sub new {
         _write_to_file($l7r_ssl_key_fn,  $l7r_ssl_key);
         push @args, ( SSL           => 1,
                       SSL_key_file  => $l7r_ssl_key_fn,
-                      SSL_cert_file => $l7r_ssl_cert_fn );
+                      SSL_cert_file => $l7r_ssl_cert_fn);
 
         # handle the case where we require the client to have a valid certificate:
         my $l7r_client_cert_require = cfg('l7r.client.cert.require');
         if ($l7r_client_cert_require) {
-            push @args, SSL_verify_mode => 3;
+            my $l7r_ssl_ca = cfg('l7r.ssl.ca');
+            my $l7r_ssl_ca_fn   = "$l7r_certs_path/l7r-ca.pem";
+            _write_to_file($l7r_ssl_ca_fn, $l7r_ssl_ca);
+            push @args, ( SSL_verify_mode => 0x03, # 0x01 => verify peer,
+                                                   # 0x02 => fail verification if no peer certificate exists
+                          SSL_ca_file     => $l7r_ssl_ca_fn );
 
             my $l7r_ssl_crl = cfg('l7r.ssl.crl', 0);
             if (defined $l7r_ssl_crl) {

@@ -24,7 +24,7 @@ my %syntax_check_cbs = (
 
             $$errors++, warn "Syntax error: parameter 'key' is mandatory\n",  unless exists $args->{'key'};
             $$errors++, warn "Syntax error: parameter 'cert' is mandatory\n", unless exists $args->{'cert'};
-            delete @$args{qw/key cert/};
+            delete @$args{qw/key cert ca crl/};
         },
     },
     osf => {
@@ -345,6 +345,7 @@ sub cmd_config_ssl {
     my $key_file = delete $args{key};
     my $cert_file = delete $args{cert};
     my $crl_file = delete $args{crl};
+    my $ca_file = delete $args{ca};
 
     # FIXME: Is using File::Slurp the best way?
     use File::Slurp; 
@@ -357,21 +358,26 @@ sub cmd_config_ssl {
         $crl = eval { read_file($crl_file) }
             or $self->_die ("$crl_file: Unable to read crl file: $^E\n");
     }
+    my $ca;
+    if (defined $ca_file) {
+        $ca = eval { read_file($ca_file) }
+            or $self->_die ("$ca_file: Unable to read ca file: $^E\n");
+    }
 
     eval {
-        $self->{admin}->cmd_config_ssl(key => $key, cert => $cert, crl => $crl);
+        $self->{admin}->cmd_config_ssl(key => $key, cert => $cert, crl => $crl, ca => $ca);
     };
     if ($@) {
         $self->_die;
     } else {
-        $self->_print("SSL certificate, private key and crl set.\n");
+        $self->_print("SSL certificate, private key, ca and crl set.\n");
     }
 }
 
 sub help_config_ssl {
     print <<EOT
 config ssl: Sets the SSL certificate and private key
-usage: config ssl key=mykey.pem cert=mycert.pem [crl=crl.pem]
+usage: config ssl key=mykey.pem cert=mycert.pem [ca=ca.pem] [crl=crl.pem]
 
     Sets the SSL certificate to the one read from the file mycert.pem, and the
     private key to the one read from mykey.pem.

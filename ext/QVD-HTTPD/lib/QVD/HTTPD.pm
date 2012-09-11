@@ -39,22 +39,23 @@ my $token_re = qr/[!#\$%&'*+\-\.0-9a-zA-Z]+/;
 
 sub process_request {
     my $self = shift;
-    my $socket = $self->{server}{client};
+    my $server = $self->{server};
+    my $socket = $server->{client};
 
     setsockopt $socket, IPPROTO_TCP, TCP_NODELAY, 1;
 
-    if ($self->{server}{SSL}) {
+    if ($server->{SSL}) {
 	require IO::Socket::SSL;
         my @extra;
-        if ($self->{server}{SSL_verify_mode}) {
-            push @extra, SSL_verify_mode => $self->{server}{SSL_verify_mode};
-            push @extra, SSL_check_crl => 1,
-                         SSL_crl_file  => $self->{server}{SSL_crl_file}
-                if defined $self->{server}{SSL_crl_file};
+        if ($server->{SSL_verify_mode}) {
+            push @extra, SSL_verify_mode => $server->{SSL_verify_mode};
+            push @extra, SSL_ca_file => $server->{SSL_ca_file};
+            push @extra, SSL_check_crl => 1, SSL_crl_file  => $server->{SSL_crl_file}
+                if defined $server->{SSL_crl_file};
         }
 	IO::Socket::SSL->start_SSL($socket, SSL_server => 1, NonBlocking => 1,
-				   SSL_cert_file => $self->{server}{SSL_cert_file},
-				   SSL_key_file  => $self->{server}{SSL_key_file},
+				   SSL_cert_file => $server->{SSL_cert_file},
+				   SSL_key_file  => $server->{SSL_key_file},
                                    @extra);
 	$socket->isa('IO::Socket::SSL')
 	    or die "SSL negotiation failed: " . IO::Socket::SSL::errstr()

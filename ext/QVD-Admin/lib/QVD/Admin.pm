@@ -264,10 +264,12 @@ sub cmd_config_ssl {
     my $cert = delete $args{cert} or die "Certificate is required";
     my $key = delete $args{key} or die "Private key is required";
     my $crl = delete $args{crl};
+    my $ca = delete $args{ca};
     rs(SSL_Config)->update_or_create({ key => 'l7r.ssl.cert',
                                        value => $cert });
     rs(SSL_Config)->update_or_create({ key => 'l7r.ssl.key',
                                        value => $key });
+
     if (defined $crl) {
         rs(SSL_Config)->update_or_create({ key => 'l7r.ssl.crl',
                                            value => $crl })
@@ -275,6 +277,15 @@ sub cmd_config_ssl {
     else {
         rs(SSL_Config)->search({ key => 'l7r.ssl.crl' })->delete;
     }
+
+    if (defined $ca) {
+        rs(SSL_Config)->update_or_create({key => 'l7r.ssl.ca',
+                                          value => $ca });
+    }
+    else {
+        rs(SSL_Config)->search({ key => 'l7r.ssl.ca' })->delete;
+    }
+
 
     1
 }
