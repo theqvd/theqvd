@@ -51,7 +51,7 @@ path.storage.homefs = ${path.storage.root}/homefs
 ## paths for SSL certificates and CAs
 path.ssl.certs = ${path.run}/ssl
 path.ssl.ca.system = /etc/ssl/certs
-path.ssl.ca.personal = ~/.qvd/certs
+path.ssl.ca.personal = .qvd/certs
 ## KVM serial port captures or LXC console output
 path.serial.captures = ${path.tmp}/qvd
 
