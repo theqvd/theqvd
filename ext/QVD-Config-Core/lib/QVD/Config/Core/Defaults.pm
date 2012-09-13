@@ -51,7 +51,7 @@ path.storage.homefs = ${path.storage.root}/homefs
 ## paths for SSL certificates and CAs
 path.ssl.certs = ${path.run}/ssl
 path.ssl.ca.system = /etc/ssl/certs
-path.ssl.ca.personal = ~/.qvd/certs
+path.ssl.ca.personal = .qvd/certs
 ## KVM serial port captures or LXC console output
 path.serial.captures = ${path.tmp}/qvd
 
@@ -89,9 +89,9 @@ command.nxagent.args.extra =
 command.x-session.args.extra =
 
 ## whether to remember password after successful connection
-client.remember_password = 1
+client.remember_password = 0
 ## whether to show the previous checkbox or not
-client.show.remember_password = 1
+client.show.remember_password = 0
 ## nxproxy's link parameter, can be: modem, isdn, adsl, wan, lan, local or a bandwidth specification (56k, 1m, 100m...)
 client.link = adsl
 ## nxproxy's geometry parameter

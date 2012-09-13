@@ -109,7 +109,7 @@ sub new {
     if (core_cfg('client.show.remember_password')) {
         $grid_sizer->Add(Wx::StaticText->new($panel, -1, "Remember password"), 0, wxALL, 5);
         $self->{remember_pass} = Wx::CheckBox->new ($panel, -1, '', wxDefaultPosition);
-        $self->{remember_pass}->SetValue(!!core_cfg('client.remember_password'));
+        $self->{remember_pass}->SetValue(core_cfg('client.remember_password') ? 1 : 0);
         $grid_sizer->Add($self->{remember_pass}, 1, wxALL, 5);
     }
 
@@ -275,6 +275,14 @@ sub OnClickConnect {
     $self->{username}->SetValue ($u);
 
     $connect_info{port} = $1 if $connect_info{host} =~ s/:(\d+)$//;
+
+    my $remember_password = ( $self->{remember_pass}
+                              ? $self->{remember_pass}->GetValue
+                              : core_cfg("client.remember_password") );
+
+    unless ($remember_password) {
+        $self->{password}->SetValue('');
+    }
 
     $self->SaveConfiguration();
 
@@ -464,7 +472,11 @@ sub SaveConfiguration {
     if (!core_cfg('client.force.link', 0)) {
         set_core_cfg('client.link', lc($self->{link}->GetStringSelection()));
     }
-        
+
+    if ($self->{remember_pass}) {
+        set_core_cfg('client.remember_password', ($self->{remember_pass}->IsChecked() ? 1 : 0));
+    }
+
     #set_core_cfg('client.audio.enable', $self->{audio}->GetValue());
     #set_core_cfg('client.printing.enable', $self->{printing}->GetValue());
     #set_core_cfg('client.fullscreen', $self->{fullscreen}->GetValue());
