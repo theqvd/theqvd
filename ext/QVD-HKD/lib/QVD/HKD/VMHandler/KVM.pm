@@ -91,7 +91,7 @@ use QVD::StateMachine::Declarative
                                                             _on_dead                     => 'stopping/killing_vm',
                                                             _on_goto_debug               => 'debugging/saving_state',
                                                             on_hkd_stop                  => 'stopping/saving_state',
-                                                            _on_vm_process_done          => 'stopping/clearing_runtime_row' } },
+                                                            _on_vm_process_done          => 'stopping/saving_state_2' } },
 
     'running/saving_state'            => { enter       => '_save_state',
                                            transitions => { _on_save_state_done          => 'running/updating_stats',
@@ -174,8 +174,6 @@ use QVD::StateMachine::Declarative
     'stopping/running_poststop_hook'  => { enter    => '_run_prestart_hook',
                                            transitions => { _on_run_hook_done            => 'stopping/clearing_runtime_row',
                                                             _on_run_hook_error           => 'stopping/clearing_runtime_row'  } },
-
-
 
     'stopping/clearing_runtime_row'   => { enter       => '_clear_runtime_row',
                                            transitions => { _on_clear_runtime_row_done   => 'stopped' },
