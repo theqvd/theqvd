@@ -42,14 +42,19 @@ my $build = new Module::Build(
 		png_files    => {
 		                  'pixmaps/qvd-logo.png' => 'pixmaps/qvd-logo.png'
 		                },
+		desktop_files => {
+				  'desktop/qvd.desktop' => 'desktop/qvd.desktop'
+		}
 );
 
 $build->install_path('pixmaps' => $build->config()->{installprefix} . "/pixmaps");
+$build->install_path('desktop' => $build->config()->{installprefix} . "/share/applications");
 
 $build->add_build_element('xpm');
 $build->add_build_element('ico');
 $build->add_build_element('svg');
 $build->add_build_element('png');
+$build->add_build_element('desktop');
 
 $build->create_build_script;
 

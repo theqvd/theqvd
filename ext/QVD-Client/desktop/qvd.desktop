@@ -1,0 +1,7 @@
+[Desktop Entry]
+Name=QVD Client
+Exec=qvd-client
+Icon=qvd
+Type=Application
+Categories=Network
+Terminal=False
