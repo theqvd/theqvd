@@ -11,7 +11,7 @@ use IO::Socket::INET;
 use IO::Socket::Forwarder qw(forward_sockets);
 use JSON;
 use Proc::Background;
-use QVD::Config;
+use QVD::Config::Core;
 use QVD::HTTP::StatusCodes qw(:status_codes);
 use URI::Escape qw(uri_escape);
 use Log::Log4perl;
@@ -79,7 +79,7 @@ EOF
     return unless $accept;
 
     ## guardar certificado en archivo
-    my $dir = File::Spec->catfile (($ENV{HOME} || $ENV{APPDATA}), cfg('path.ssl.ca.personal'));
+    my $dir = File::Spec->catfile (($ENV{HOME} || $ENV{APPDATA}), core_cfg('path.ssl.ca.personal'));
     make_path $dir, { error => \my $mkpath_err };
     if ($mkpath_err and @$mkpath_err) {
         my $errs_text;
@@ -126,14 +126,14 @@ sub connect_to_vm {
     my $ssl = $opts->{ssl};
     if ($ssl) {
         $args{SSL}                 = 1;
-        $args{SSL_ca_path}         = cfg('path.ssl.ca.system');
-        $args{SSL_ca_path_alt}     = cfg('path.ssl.ca.personal');
+        $args{SSL_ca_path}         = core_cfg('path.ssl.ca.system');
+        $args{SSL_ca_path_alt}     = core_cfg('path.ssl.ca.personal');
         $args{SSL_ca_path_alt}     =~ s|^~(?=/)|$ENV{HOME} // $ENV{APPDATA}|e;
-        my $use_cert = cfg('client.ssl.use_cert');
+        my $use_cert = core_cfg('client.ssl.use_cert');
         if ($use_cert) {
             $args{SSL_use_cert} = 1;
-            $args{SSL_cert_file} = cfg('client.ssl.cert_file');
-            $args{SSL_key_file} = cfg('client.ssl.key_file');
+            $args{SSL_cert_file} = core_cfg('client.ssl.cert_file');
+            $args{SSL_key_file} = core_cfg('client.ssl.key_file');
         }
         $args{SSL_verify_callback} = sub { $self->_ssl_verify_callback(@_) };
     }
@@ -280,7 +280,7 @@ sub _run {
     unless ($WINDOWS) {
         my $user = getpwuid($>);
         if (defined $user and length $user) {
-            my $xhost = cfg_core('command.xhost');
+            my $xhost = core_cfg('command.xhost');
             system $xhost, "+si:localuser:$user" and
                 $self->{log}->warn("command $xhost +si:localuser:$user failed, rc: " . ($? >> 8));
         }
@@ -299,7 +299,7 @@ sub _run {
     my %o = ();
 
     if ( $self->{local_serial} ) {
-        $o{http} = cfg("client.socat.port");
+        $o{http} = core_cfg("client.socat.port");
     }
 
 
@@ -393,8 +393,8 @@ sub _start_socat {
 
     my $socket  = $self->{local_serial};
     my $debug   = 1;
-    my $port    = cfg("client.socat.port");
-    my $timeout = cfg("client.socat.timeout");
+    my $port    = core_cfg("client.socat.port");
+    my $timeout = core_cfg("client.socat.timeout");
     my $socat_running;
 
     my @args = ("tcp-l:$port,reuseaddr,fork", "$socket,nonblock,raw,echo=0");
@@ -419,7 +419,7 @@ sub _start_socat {
         if ( ! -c $socket ) {
             $self->{client_delegate}->socat_error(message => "Failed to forward serial port: port $socket doesn't exist");
         } else {
-            my $program = cfg("command.socat");
+            my $program = core_cfg("command.socat");
             $self->{log}->debug("Running socat: $program " . join(' ', @args) . "\n");
 
             $self->{socat_proc} = Proc::Background->new({'die_upon_destroy' => 1}, $program, @args);
