@@ -84,6 +84,7 @@ command.iptables = iptables
 command.socat = /usr/bin/socat
 command.modprobe = /sbin/modprobe
 command.xinit = /usr/bin/xinit
+command.xhost = /usr/bin/xhost
 
 command.nxagent.args.extra =
 command.x-session.args.extra =

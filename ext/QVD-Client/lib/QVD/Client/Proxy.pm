@@ -277,13 +277,15 @@ sub _run {
     my $httpc = shift;
 
     # See http://www.nomachine.com/tr/view.php?id=TR02H02326
-    if ($DARWIN) {
-	my $localuser = '+si:localuser:'.$ENV{USER};
-	my @xhost = ('xhost', $localuser);
-        if ( Proc::Background->new(@xhost) ) {
-            $self->{log}->debug("Executed xhost $localuser for Mac OS X");
-        } else {
-            $self->{log}->error("Error executing xhost $localuser for Mac OS X");
+    unless ($WINDOWS) {
+        my $user = getpwuid($>);
+        if (defined $user and length $user) {
+            my $xhost = cfg_core('command.xhost');
+            system $xhost, "+si:localuser:$user" and
+                $self->{log}->warn("command $xhost +si:localuser:$user failed, rc: " . ($? >> 8));
+        }
+        else {
+            $self->{log}->warn("unable to retrieve login name for UID $>");
         }
     }
 
@@ -306,7 +308,7 @@ sub _run {
         (my $cygwin_nx_root = $ENV{NX_ROOT}) =~ tr!:\\!//!;
         $o{errors} = '/cygdrive/'.$cygwin_nx_root.'/proxy.log';
         # Call pulseaudio in Windows
-        
+
         if ( $self->{audio} ) {
             my @pa_args = ($ENV{QVDPATH}."/pulseaudio/pulseaudio.exe", "-D", "--high-priority");
             $self->{log}->debug("Starting pulseaudio: " . join(' ', @pa_args));
