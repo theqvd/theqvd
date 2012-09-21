@@ -119,7 +119,6 @@ sub authenticate_basic {
     $msg = $ldap->bind($dn, password => $passwd);
     if (!$msg->code) {
 	DEBUG("authenticate_basic: DN $dn for user $login was authenticated");
-	return 1;
     }
     else {
         # In case of failed credentials if ldap_racf_regex is defined allow to login if
