@@ -6,7 +6,8 @@ no warnings 'redefine';
 
 use 5.010;
 
-our $debug = 1;
+BEGIN { *debug = \$QVD::HKD::VMHandler::debug }
+our $debug;
 
 use parent qw(QVD::HKD::Agent);
 
@@ -59,6 +60,7 @@ sub _disconnect_user {
     if (my $vm = $self->{_vm_to_be_disconnected}) {
         $self->{_rpc_service} = sprintf "http://%s:%d/vma", $vm->{ip}, $vm->{vma_port};
         $self->_rpc('x_suspend');
+        $debug and $self->_debug("x_suspend RPC sent to VM $vm->{vm_id} VMA");
         delete $self->{_vm_to_be_disconnected}
     }
     else {
