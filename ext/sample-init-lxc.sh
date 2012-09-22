@@ -31,10 +31,9 @@ perl -S qvd-admin.pl config set vm.network.gateway=10.1.0.1
 
 perl -S qvd-admin.pl config set vm.hypervisor=lxc
 
-perl -S qvd-admin.pl host add name=node1 address=127.0.0.1
+perl -S qvd-admin.pl host add name=node1 address=10.1.0.2
 
 perl -S qvd-admin.pl osf  add name=foo1
 perl -S qvd-admin.pl di   add osf_id=1 path=/var/lib/qvd/storage/staging/container-good.tgz
 perl -S qvd-admin.pl user add login=salva password=foo
 perl -S qvd-admin.pl vm   add name=salva-1 user=salva osf=foo1
-
