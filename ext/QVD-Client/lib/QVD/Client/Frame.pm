@@ -126,7 +126,20 @@ sub new {
         $grid_sizer->Add($self->{link}, 1, wxALL|wxEXPAND, 5);
         $self->{link}->AppendItems(\@link_options);
         $self->{link}->Select(0);
-        # FIXME Introduce previous user selection here
+
+	my $link_select; 
+	if ( core_cfg('client.link') eq "lan" || core_cfg('client.link') eq "local") {
+		$link_select = 0 ; 
+	}
+	elsif ( core_cfg('client.link') eq "adsl" core_cfg('client.link') eq "wan" ) {
+		$link_select = 1 ; 
+	}
+	elseif (core_cfg('client.link) eq "modem" || core_cfg('client.link) eq "isdn") {
+		$link_select = 2; 
+	}
+	else 
+		$link_select = 1; 
+	}	
     }
 
     # port goes here!
