@@ -126,8 +126,6 @@ sub new {
         $grid_sizer->Add($self->{link}, 1, wxALL|wxEXPAND, 5);
         $self->{link}->AppendItems(\@link_options);
 
-	my $kk=core_cfg('client.link');
-	print ("El link es: $kk\n");
 	my $link_select; 
 	if ( core_cfg('client.link') eq "lan" || core_cfg('client.link') eq "local") {
 		$link_select = 0 ; 
