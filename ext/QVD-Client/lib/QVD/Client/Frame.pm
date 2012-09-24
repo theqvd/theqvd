@@ -131,13 +131,13 @@ sub new {
 	if ( core_cfg('client.link') eq "lan" || core_cfg('client.link') eq "local") {
 		$link_select = 0 ; 
 	}
-	elsif ( core_cfg('client.link') eq "adsl" core_cfg('client.link') eq "wan" ) {
+	elsif ( core_cfg('client.link') eq "adsl" || core_cfg('client.link') eq "wan" ) {
 		$link_select = 1 ; 
 	}
-	elseif (core_cfg('client.link) eq "modem" || core_cfg('client.link) eq "isdn") {
+	elsif ( core_cfg('client.link') eq "modem" || core_cfg('client.link') eq "isdn") {
 		$link_select = 2; 
 	}
-	else 
+	else {
 		$link_select = 1; 
 	}	
     }
