@@ -5,6 +5,7 @@ use threads::shared;
 use Wx qw[:everything];
 use QVD::Config::Core;
 use QVD::Client::Proxy;
+use Log::Log4perl; 
 use base qw(Wx::Frame);
 use strict;
 
@@ -125,6 +126,9 @@ sub new {
         $self->{link} = Wx::Choice->new($panel, -1);
         $grid_sizer->Add($self->{link}, 1, wxALL|wxEXPAND, 5);
         $self->{link}->AppendItems(\@link_options);
+
+	my $kk = core_cfg('client.link') ; 
+	print ("El link es: $kk\n");
 
 	my $link_select; 
 	if ( core_cfg('client.link') eq "lan" || core_cfg('client.link') eq "local") {
@@ -441,6 +445,9 @@ sub OnExit {
 ################################################################################
 
 sub DetectKeyboard {
+
+    my $log = Log::Log4perl->get_logger("QVD::Client::Frame"); 
+
     if ($^O eq 'MSWin32') {
         require Win32::API;
 
@@ -456,6 +463,18 @@ sub DetectKeyboard {
 
     } else {
         require X11::Protocol;
+
+	# See http://www.nomachine.com/tr/view.php?id=TR02H02326
+	my $user = getpwuid($>);
+	if (defined $user and length $user){
+		my $xhost = core_cfg('command.xhost') ; 
+		system $xhost, "+si:localuser:$user"; 
+		$log->warn("xhost executed for $user");
+			
+	}
+	else {
+		$log->warn("Cannot execute xhost for $user"); 	
+	}
 
         my $x11 = X11::Protocol->new;
         my ($raw) = $x11->GetProperty ($x11->root, $x11->atom ('_XKB_RULES_NAMES'), 'AnyPropertyType', 0, 4096, 0);

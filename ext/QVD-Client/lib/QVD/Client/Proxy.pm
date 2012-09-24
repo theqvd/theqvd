@@ -276,19 +276,6 @@ sub _run {
     my $self = shift;
     my $httpc = shift;
 
-    # See http://www.nomachine.com/tr/view.php?id=TR02H02326
-    unless ($WINDOWS) {
-        my $user = getpwuid($>);
-        if (defined $user and length $user) {
-            my $xhost = core_cfg('command.xhost');
-            system $xhost, "+si:localuser:$user" and
-                $self->{log}->warn("command $xhost +si:localuser:$user failed, rc: " . ($? >> 8));
-        }
-        else {
-            $self->{log}->warn("unable to retrieve login name for UID $>");
-        }
-    }
-
     my @cmd;
     if ($WINDOWS) {
         push @cmd, $ENV{QVDPATH}."/NX/nxproxy.exe";
