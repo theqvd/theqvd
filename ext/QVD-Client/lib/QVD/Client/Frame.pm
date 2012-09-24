@@ -125,8 +125,9 @@ sub new {
         $self->{link} = Wx::Choice->new($panel, -1);
         $grid_sizer->Add($self->{link}, 1, wxALL|wxEXPAND, 5);
         $self->{link}->AppendItems(\@link_options);
-        $self->{link}->Select(0);
 
+	my $kk=core_cfg('client.link');
+	print ("El link es: $kk\n");
 	my $link_select; 
 	if ( core_cfg('client.link') eq "lan" || core_cfg('client.link') eq "local") {
 		$link_select = 0 ; 
@@ -140,6 +141,7 @@ sub new {
 	else {
 		$link_select = 1; 
 	}	
+        $self->{link}->Select($link_select);
     }
 
     # port goes here!
