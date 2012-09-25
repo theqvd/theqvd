@@ -10,94 +10,78 @@ use warnings;
 use Cwd;
 use File::Spec;
 use Proc::Background;
-use Log::Log4perl qw(:levels :easy);
+use File::Spec;
+use 5.010;
 
-my $WINDOWS;
-my $DARWIN;
-my $DOTQVD;
-my $log;
+our ($WINDOWS, $DARWIN, $user_dir, $app_dir);
+
 
 BEGIN {
-    $DOTQVD = ($ENV{HOME} || $ENV{APPDATA}).'/.qvd';
-    mkdir($DOTQVD);
-    
-    if ( -f "$DOTQVD/log.conf" ) {
-        Log::Log4perl->init("$DOTQVD/log.conf");
-        # print "Log configuration loaded from $DOTQVD/log.conf";
-    } else {
+    $WINDOWS = ($^O eq 'MSWin32');
+    $DARWIN = ($^O eq 'darwin');
 
-        Log::Log4perl->easy_init( { level => $DEBUG, file => ">>$DOTQVD/qvd_client.log" } );
-        # print "Default log configuration. Logging to $DOTQVD/qvd_client.log";
-    }
+    my $user_dir = ($WINDOWS
+                  ? File::Spec->join($ENV{APPDATA}, 'QVD')
+                  : File::Spec->join((getpwuid $>)[7] // $ENV{HOME}, '.qvd'));
+    mkdir($user_dir);
+    warn "user_dir: $user_dir";
 
-    $log = Log::Log4perl->get_logger("QVD::Client::App");
+    $app_dir = File::Spec->join((File::Spec->splitpath($0))[0, 1]);
 
-    $log->info("Starting up...");
-    $log->info("Home dir is $DOTQVD, OS is $^O");
-
-    $SIG{__WARN__} = sub { my $l = Log::Log4perl->get_logger("QVD::Client::App"); $l->warn(@_); };
-    $SIG{__DIE__}  = sub { my $l = Log::Log4perl->get_logger("QVD::Client::App"); $l->error(@_); die(@_); };
-
-    mkdir $DOTQVD if (!-e $DOTQVD);
     $QVD::Config::USE_DB = 0;
-    @QVD::Config::Core::FILES = (
-        '/etc/qvd/client.conf',
-        $DOTQVD.'/client.conf',
-        'qvd-client.conf',
-    );
+    @QVD::Config::Core::FILES = ( File::Spec->join($user_dir, 'client.conf'),
+                                  'qvd-client.conf' );
+    push @QVD::Config::Core::FILES, '/etc/qvd/client.conf' unless $WINDOWS;
 
     # FIXME NX_CLIENT is used for showing the user information on things
     # like broken connection, perhaps we should show them to the user
     # instead of ignoring them? 
-    $WINDOWS = ($^O eq 'MSWin32');
-    $DARWIN = ($^O eq 'darwin');
     $ENV{NX_CLIENT} = $WINDOWS ? 'cmd.exe /c :' : 'false';
 }
 
-use QVD::Config::Core qw(set_core_cfg);
+use QVD::Config::Core qw(set_core_cfg core_cfg);
 
-for (@ARGV) {
-    if (my ($k, $v) = /^\s*([\w\.]+)\s*[:=\s]\s*(.*?)\s*$/) {
-	set_core_cfg($k, $v);
+# change defaults for log configuration before loading it
+BEGIN {
+    for (@ARGV) {
+        if (my ($k, $v) = /^\s*([\w\.]+)\s*[:=\s]\s*(.*?)\s*$/) {
+            set_core_cfg($k, $v);
+        }
     }
+
+    set_core_cfg('client.log.filename', File::Spec->join($user_dir, 'qvd-client.log'))
+        unless defined core_cfg('client.log.filename', 0);
+    $QVD::Log::DAEMON_NAME = 'client';
 }
 
+use QVD::Log;
 use QVD::Client::Frame;
 use parent 'Wx::App';
 
 sub OnInit {
     my $self = shift;
-    $log->debug("OnInit called");
+    DEBUG("OnInit called");
 
-    if ($WINDOWS) {
-        my ($volume,$directories,$file) = File::Spec->splitpath(Cwd::realpath($0));
-        $ENV{QVDPATH} //= File::Spec->catpath( $volume, $directories);
-        $ENV{DISPLAY} //= '127.0.0.1:0';
-        
+    if ($WINDOWS or $DARWIN) {
         my @cmd;
-        my @opts = qw(-multiwindow -notrayicon -nowinkill -clipboard +bs -wm);
-        push @opts, (-logfile => $DOTQVD.'/xserver.log');
-        push @cmd, ($ENV{QVDPATH}."/Xming/Xming.exe", @opts);
-        $log->debug("Starting Xming: " . join(' ', @cmd));
-        
-        if ( Proc::Background->new(@cmd) ) {
-            $log->debug("Xming started");
-        } else {
-            $log->error("Xming failed to start");
+        if ($WINDOWS) {
+            $ENV{DISPLAY} //= '127.0.0.1:0';
+            @cmd = ( File::Spec->join($app_dir, "Xming", "Xming.exe"),
+                     '-multiwindow', '-notrayicon', '-nowinkill', '-clipboard', '+bs', '-wm',
+                     '-logfile' => File::Spec->join($user_dir, "xserver.log") );
         }
-        
-    }
-    if ($DARWIN) {
-	my @cmd = qw(open -a X11 --args true);
-        $ENV{DISPLAY} //= ':0';
+        else { # DARWIN!
+            $ENV{DISPLAY} //= ':0';
+            @cmd = qw(open -a X11 --args true);
+        }
         if ( Proc::Background->new(@cmd) ) {
-            $log->debug("X server started");
+            DEBUG("X server started");
         } else {
-            $log->error("X server failed to start");
+            ERROR("X server failed to start");
         }
     }
-    
-    $log->debug("Showing frame");
+
+    DEBUG("Showing frame");
     my $frame = QVD::Client::Frame->new();
     $self->SetTopWindow($frame);
     $frame->Show();
@@ -105,13 +89,14 @@ sub OnInit {
 };
 
 package main;
+use QVD::Log;
 
 Wx::InitAllImageHandlers();
 my $app = QVD::Client::App->new();
 
-$log->debug("Starting main loop");
+DEBUG("Starting main loop");
 $app->MainLoop();
-$log->info("Exiting");
+INFO("Exiting");
 
 __END__
 

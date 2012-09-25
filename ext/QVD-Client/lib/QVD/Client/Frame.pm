@@ -5,7 +5,6 @@ use threads::shared;
 use Wx qw[:everything];
 use QVD::Config::Core;
 use QVD::Client::Proxy;
-use Log::Log4perl; 
 use base qw(Wx::Frame);
 use strict;
 

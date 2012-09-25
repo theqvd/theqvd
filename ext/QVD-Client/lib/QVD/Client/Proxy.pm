@@ -2,7 +2,7 @@ package QVD::Client::Proxy;
 
 use strict;
 use warnings;
-use feature qw(switch);
+use 5.010;
 
 use Crypt::OpenSSL::X509;
 use File::Path 'make_path';
@@ -14,7 +14,7 @@ use Proc::Background;
 use QVD::Config::Core;
 use QVD::HTTP::StatusCodes qw(:status_codes);
 use URI::Escape qw(uri_escape);
-use Log::Log4perl;
+use QVD::Log;
 
 use constant CREATE_NO_WINDOW => 0;
 use constant NORMAL_PRIORITY_CLASS => 0;
@@ -34,7 +34,6 @@ sub new {
         printing        => delete $opts{printing},
         local_serial    => delete $opts{local_serial},
         opts            => \%opts,
-        log             => Log::Log4perl->get_logger("QVD::Client::Proxy"),
     };
     bless $self, $class;
 }
@@ -50,13 +49,13 @@ sub _ssl_verify_callback {
     my ($self, $ssl_thinks, $mem_addr, $attrs, $errs) = @_;
     return 1 if $ssl_thinks;
 
-    $self->{log}->debug("_ssl_verify_callback called: " . join(' ', @_));
+    DEBUG("_ssl_verify_callback called: " . join(' ', @_));
 
     my $cert_pem_str = Net::SSLeay::PEM_get_string_X509 (Net::SSLeay::X509_STORE_CTX_get_current_cert ($mem_addr));
     my $x509 = Crypt::OpenSSL::X509->new_from_string ($cert_pem_str);
 
     my $cert_hash = $x509->hash;
-    my $cert_data = sprintf <<'EOF', (join ':', $x509->serial=~/../g), $x509->issuer, $x509->notBefore, $x509->notAfter, $x509->subject;
+    my $cert_temp = <<'EOF';
 Serial: %s
 
 Issuer: %s
@@ -68,13 +67,15 @@ Validity:
 Subject: %s
 EOF
 
-    #print "cert_hash ($cert_hash)\n";
-    #print "ssl_thinks ($ssl_thinks) mem_addr ($mem_addr) attrs ($attrs) errs ($errs)\n";
-    #printf "cert_pem_str (%s)\n", $cert_pem_str;
-    #printf "cert_data (%s)\n", $cert_data;
+    my $cert_data = sprintf($cert_temp,
+                            (join ':', $x509->serial =~ /../g),
+                            $x509->issuer,
+                            $x509->notBefore,
+                            $x509->notAfter,
+                            $x509->subject);
 
     my $accept = $self->{client_delegate}->proxy_unknown_cert([$cert_pem_str, $cert_data]);
-    $self->{log}->debug("Certificate " . $accept ? "accepted" : "rejected");
+    DEBUG("Certificate " . $accept ? "accepted" : "rejected");
 
     return unless $accept;
 
@@ -118,7 +119,7 @@ sub connect_to_vm {
     my ($host, $port, $user, $passwd) = @{$opts}{qw/host port username password/};
 
     $cli->proxy_connection_status('CONNECTING');
-    $self->{log}->info("Connecting to $host:$port\n");
+    INFO("Connecting to $host:$port\n");
 
     # SSL library has to be initialized in the thread where it's used,
     # so we do a "require QVD::HTTPC" here instead of "use"ing it above
@@ -141,12 +142,12 @@ sub connect_to_vm {
     my $httpc = eval { QVD::HTTPC->new("$host:$port", %args) };
     unless (defined $httpc) {
         if ($@) {
-            $self->{log}->error("Connection error: $@");
+            ERROR("Connection error: $@");
             $cli->proxy_connection_error(message => $@);
         }
         else {
             # User rejected the server SSL certificate. Return to main window.
-            $self->{log}->info("User rejected certificate. Closing connection.");
+            INFO("User rejected certificate. Closing connection.");
             $cli->proxy_connection_status('CLOSED');
         }
         return;
@@ -155,7 +156,7 @@ sub connect_to_vm {
     use MIME::Base64 qw(encode_base64);
     my $auth = encode_base64("$user:$passwd", '');
 
-    $self->{log}->info("Sending auth");
+    INFO("Sending auth");
     $httpc->send_http_request(
         GET => '/qvd/list_of_vm', 
         headers => [
@@ -165,7 +166,7 @@ sub connect_to_vm {
     );
 
     my ($code, $msg, $response_headers, $body) = $httpc->read_http_response();
-    $self->{log}->debug("Auth reply: $code/$msg");
+    DEBUG("Auth reply: $code/$msg");
 
     if ($code != HTTP_OK) {
         my $message;
@@ -178,25 +179,25 @@ sub connect_to_vm {
             }
         }
         $message ||= "$host replied with $msg";
-        $self->{log}->info("Connection error: $message");
+        INFO("Connection error: $message");
         $cli->proxy_connection_error(message => $message);
         return;
     }
-    $self->{log}->info("Authentication successful");
+    INFO("Authentication successful");
 
     my $vm_list = JSON->new->decode($body);
 
     my $vm_id = $cli->proxy_list_of_vm_loaded($vm_list);
 
     if (!defined $vm_id) {
-        $self->{log}->info("VM not selected, closing coonection");
+        INFO("VM not selected, closing coonection");
         $cli->proxy_connection_status('CLOSED');
         return;
     }
 
     if ( $self->{local_serial} ) {
         if ( !$self->_start_socat() ) {
-            $self->{log}->error("Socat failed to start, closing connection");
+            ERROR("Socat failed to start, closing connection");
             $cli->proxy_connection_status('CLOSED');
             return;
         }
@@ -217,7 +218,7 @@ sub connect_to_vm {
 
     my $q = join '&', map { uri_escape($_) .'='. uri_escape($o{$_}) } keys %o;
 
-    $self->{log}->debug("Sending parameters");
+    DEBUG("Sending parameters");
     $httpc->send_http_request(
         GET => "/qvd/connect_to_vm?$q",
         headers => [
@@ -229,21 +230,21 @@ sub connect_to_vm {
 
     while (1) {
         my ($code, $msg, $headers, $body) = $httpc->read_http_response;
-        $self->{log}->debug("Response: $code/$msg");
+        DEBUG("Response: $code/$msg");
 	foreach my $hdr (@$headers) {
-		$self->{log}->debug("Header: $hdr");
+		DEBUG("Header: $hdr");
 	}
-        $self->{log}->debug("Body: $body") if (defined $body);
+        DEBUG("Body: $body") if (defined $body);
 
         if ($code == HTTP_SWITCHING_PROTOCOLS) {
-            $self->{log}->debug("Switching protocols. Connected.");
+            DEBUG("Switching protocols. Connected.");
             
             $cli->proxy_connection_status('CONNECTED');
             $self->_run($httpc);
             last;
         }
         elsif ($code == HTTP_PROCESSING) {
-            $self->{log}->debug("Starting VM...");
+            DEBUG("Starting VM...");
             # Server is starting the virtual machine and connecting to the VMA
         }
         else {
@@ -262,7 +263,7 @@ sub connect_to_vm {
             }
             $message ||= "Unable to connect to remote vm: $code $msg";
             
-            $self->{log}->error("Fatal error: $message");
+            ERROR("Fatal error: $message");
             $self->_stop_socat();
             $cli->proxy_connection_error(message => $message, code => $code);
             last;
@@ -270,7 +271,7 @@ sub connect_to_vm {
     }
     $cli->proxy_connection_status('CLOSED');
     $self->_stop_socat();
-    $self->{log}->debug("Connection closed");
+    DEBUG("Connection closed");
 }
 
 sub _run {
@@ -299,11 +300,11 @@ sub _run {
 
         if ( $self->{audio} ) {
             my @pa_args = ($ENV{QVDPATH}."/pulseaudio/pulseaudio.exe", "-D", "--high-priority");
-            $self->{log}->debug("Starting pulseaudio: " . join(' ', @pa_args));
+            DEBUG("Starting pulseaudio: " . join(' ', @pa_args));
             if ( Proc::Background->new(@pa_args) ) {
-                $self->{log}->debug("Pulseaudio started");
+                DEBUG("Pulseaudio started");
             } else {
-                $self->{log}->error("Pulseaudio failed to start");
+                ERROR("Pulseaudio failed to start");
             }
         }
     }  
@@ -329,24 +330,25 @@ sub _run {
         my $program = $cmd[0];
         my $cmdline = join ' ', map("\"$_\"", @cmd);
 
-        $self->{log}->debug("Running nxproxy: $program $cmdline");
+        DEBUG("Running nxproxy: $program $cmdline");
         require Win32::Process;
         Win32::Process->import;
         my $ret = Win32::Process::Create({}, $program, $cmdline, 0, CREATE_NO_WINDOW|NORMAL_PRIORITY_CLASS, '.');
-        if (!$ret) {
-            $self->{log}->error("Failed to start nxproxy");
-        } else {
-            $self->{log}->info("nxproxy started");
+        if ($ret) {
+            INFO("nxproxy started");
+        }
+        else {
+            ERROR("Failed to start nxproxy");
         }
     } else {
-        $self->{log}->debug("Running nxproxy: " . join(' ' , @cmd));
+        DEBUG("Running nxproxy: " . join(' ' , @cmd));
         if ( Proc::Background->new(@cmd) ) {
-            $self->{log}->debug("nxproxy started");
+            DEBUG("nxproxy started");
         } else {
-            $self->{log}->error("nxproxy failed to start");
+            ERROR("nxproxy failed to start");
         }
     }
-    $self->{log}->debug("Listening on 4040\n");
+    DEBUG("Listening on 4040\n");
     my $ll = IO::Socket::INET->new(
         LocalPort => 4040,
         ReuseAddr => 1,
@@ -354,7 +356,7 @@ sub _run {
     ) or die "Unable to listen on port 4040";
 
     my $local_socket = $ll->accept() or die "connection from nxproxy failed";
-    $self->{log}->debug("Connection accepted\n");
+    DEBUG("Connection accepted\n");
 
     undef $ll; # close the listening socket
     if ($WINDOWS) {
@@ -363,7 +365,7 @@ sub _run {
         ioctl($local_socket, FIONBIO, \$nonblocking);
     }
 
-    $self->{log}->debug("Forwarding sockets\n");
+    DEBUG("Forwarding sockets\n");
     forward_sockets(
         $local_socket,
         $httpc->get_socket,
@@ -371,7 +373,7 @@ sub _run {
         # debug => 1,
     );
 
-    $self->{log}->debug("Done.");
+    DEBUG("Done.");
 
     $self->_stop_socat();
 }
@@ -396,7 +398,7 @@ sub _start_socat {
         require Win32::Process;
         Win32::Process->import;
 
-        $self->{log}->debug("Running socat: $program $cmdline\n");
+        DEBUG("Running socat: $program $cmdline\n");
         if ( Win32::Process::Create({}, $program, $cmdline, 0, CREATE_NO_WINDOW|NORMAL_PRIORITY_CLASS, '.') ) {
             $socat_running = 1;
         } else {
@@ -408,41 +410,41 @@ sub _start_socat {
             $self->{client_delegate}->socat_error(message => "Failed to forward serial port: port $socket doesn't exist");
         } else {
             my $program = core_cfg("command.socat");
-            $self->{log}->debug("Running socat: $program " . join(' ', @args) . "\n");
+            DEBUG("Running socat: $program " . join(' ', @args) . "\n");
 
             $self->{socat_proc} = Proc::Background->new({'die_upon_destroy' => 1}, $program, @args);
             if ( !$self->{socat_proc} || !$self->{socat_proc}->alive ) {
-                $self->{log}->error("Failed to start socat");
+                ERROR("Failed to start socat");
                 $self->{client_delegate}->socat_error(message => "Failed to forward serial port: couldn't start socat");
             } else {
-                $self->{log}->debug("socat running");
+                DEBUG("socat running");
                 $socat_running = 1;
             }
         }
     }
- 
     if ( $socat_running ) {
-        $self->{log}->debug("Waiting for socat to start listening...");
+        DEBUG("Waiting for socat to start listening...");
         my $retries = 0;
         my $sock;
         while ($retries++ < $timeout) {
-                $sock = new IO::Socket::INET(PeerAddr => 'localhost', 
-                                        PeerPort => $port, 
-                                        Proto    => 'tcp');
+            $sock = IO::Socket::INET->new(PeerAddr => 'localhost',
+                                          PeerPort => $port,
+                                          Proto    => 'tcp');
 
-                last if ($sock);
+            last if $sock;
 
-                $self->{log}->debug("Retry $retries/$timeout: $!\n");
-                sleep(1);
+            DEBUG("Retry $retries/$timeout: $!");
+            sleep(1);
         }
 
         if (!$sock) {
-                $self->{log}->error("socat not listening on port $port\n");
-                $self->{client_delegate}->socat_error(message => "Failed to forward serial port: socat is not listening");
-        } else {
-                $self->{log}->debug("ok\n");
-                close($sock);
-                return 1;
+            ERROR("socat not listening on port $port");
+            $self->{client_delegate}->socat_error(message => "Failed to forward serial port: socat is not listening");
+        }
+        else {
+            DEBUG("ok");
+            close($sock);
+            return 1;
         }
     }
 
@@ -455,11 +457,12 @@ sub _stop_socat {
     my ($self) = @_;
 
     if ( $self->{socat_proc} ) {
-        $self->{log}->debug("Killing socat...");
+        DEBUG("Killing socat...");
         if ( $self->{socat_proc}->die ) {
-            $self->{log}->debug("ok");
-        } else {
-            $self->{log}->debug("failed\n");
+            DEBUG("ok");
+        }
+        else {
+            DEBUG("failed\n");
         }
     }
 }
