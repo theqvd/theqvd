@@ -458,8 +458,6 @@ sub DetectKeyboard {
         return "pc105/$layout";
     }
     else {
-        require X11::Protocol;
-
 	# See http://www.nomachine.com/tr/view.php?id=TR02H02326
 	my $user = getpwuid($>);
 	if (defined $user and length $user){
@@ -471,6 +469,7 @@ sub DetectKeyboard {
             WARN("Cannot execute xhost for $user");
 	}
 
+        require X11::Protocol;
         my $x11 = X11::Protocol->new;
         my ($raw) = $x11->GetProperty ($x11->root, $x11->atom ('_XKB_RULES_NAMES'), 'AnyPropertyType', 0, 4096, 0);
         my ($rules, $model, $layout, $variant, $options) = split /\x00/, $raw;
