@@ -79,7 +79,8 @@ EOF
     return unless $accept;
 
     ## guardar certificado en archivo
-    my $dir = File::Spec->catfile (($ENV{HOME} || $ENV{APPDATA}), core_cfg('path.ssl.ca.personal'));
+    my $dir = core_cfg('path.ssl.ca.personal');
+    $dir =~ s|^~(?=/)$ENV{HOME} // $ENV{APPDATA}|e ;
     make_path $dir, { error => \my $mkpath_err };
     if ($mkpath_err and @$mkpath_err) {
         my $errs_text;
