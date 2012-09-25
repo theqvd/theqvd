@@ -20,23 +20,24 @@ BEGIN {
     $WINDOWS = ($^O eq 'MSWin32');
     $DARWIN = ($^O eq 'darwin');
 
-    my $user_dir = ($WINDOWS
-                  ? File::Spec->join($ENV{APPDATA}, 'QVD')
-                  : File::Spec->join((getpwuid $>)[7] // $ENV{HOME}, '.qvd'));
+    $user_dir = ($WINDOWS
+                 ? File::Spec->join($ENV{APPDATA}, 'QVD')
+                 : File::Spec->join((getpwuid $>)[7] // $ENV{HOME}, '.qvd'));
     mkdir($user_dir);
-    warn "user_dir: $user_dir";
+    # warn "user_dir: $user_dir";
 
     $app_dir = File::Spec->join((File::Spec->splitpath($0))[0, 1]);
-
-    $QVD::Config::USE_DB = 0;
-    @QVD::Config::Core::FILES = ( File::Spec->join($user_dir, 'client.conf'),
-                                  'qvd-client.conf' );
-    push @QVD::Config::Core::FILES, '/etc/qvd/client.conf' unless $WINDOWS;
 
     # FIXME NX_CLIENT is used for showing the user information on things
     # like broken connection, perhaps we should show them to the user
     # instead of ignoring them? 
     $ENV{NX_CLIENT} = $WINDOWS ? 'cmd.exe /c :' : 'false';
+
+    no warnings;
+    $QVD::Config::USE_DB = 0;
+    @QVD::Config::Core::FILES = ( File::Spec->join($user_dir, 'client.conf'),
+                                  'qvd-client.conf' );
+    push @QVD::Config::Core::FILES, '/etc/qvd/client.conf' unless $WINDOWS;
 }
 
 use QVD::Config::Core qw(set_core_cfg core_cfg);
@@ -55,6 +56,9 @@ BEGIN {
 }
 
 use QVD::Log;
+
+#$SIG{__DIE__} = sub { ERROR "@_"; die (@_) };
+
 use QVD::Client::Frame;
 use parent 'Wx::App';
 

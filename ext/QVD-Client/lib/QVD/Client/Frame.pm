@@ -7,6 +7,7 @@ use QVD::Config::Core;
 use QVD::Client::Proxy;
 use base qw(Wx::Frame);
 use strict;
+use QVD::Log;
 
 use constant EVT_LIST_OF_VM_LOADED => Wx::NewEventType;
 use constant EVT_CONNECTION_ERROR  => Wx::NewEventType;

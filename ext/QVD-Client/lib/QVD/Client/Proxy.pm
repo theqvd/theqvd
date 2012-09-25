@@ -377,20 +377,10 @@ sub _start_socat {
     unshift @args, "-x", "-v" if ($debug);
    
     if ($WINDOWS) {
-        my $program = $ENV{QVDPATH} . "/socat/socat.exe";
-        my $cmdline = join ' ', map("\"$_\"", @args);
-
-        require Win32::Process;
-        Win32::Process->import;
-
-        DEBUG("Running socat: $program $cmdline\n");
-        if ( Win32::Process::Create({}, $program, $cmdline, 0, CREATE_NO_WINDOW|NORMAL_PRIORITY_CLASS, '.') ) {
-            $socat_running = 1;
-        } else {
-            $self->{client_delegate}->socat_error(message => "Failed to forward serial port: couldn't start socat: " .
-                                                                Win32::FormatMessage( Win32::GetLastError() ));
-        }
-    } else {
+        ERROR "socat is not supported on Windows";
+        # return undef;
+    }
+    else {
         if ( ! -c $socket ) {
             $self->{client_delegate}->socat_error(message => "Failed to forward serial port: port $socket doesn't exist");
         } else {
