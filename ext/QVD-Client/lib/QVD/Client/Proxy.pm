@@ -16,9 +16,6 @@ use QVD::HTTP::StatusCodes qw(:status_codes);
 use URI::Escape qw(uri_escape);
 use QVD::Log;
 
-use constant CREATE_NO_WINDOW => 0;
-use constant NORMAL_PRIORITY_CLASS => 0;
-
 my $WINDOWS = ($^O eq 'MSWin32');
 my $DARWIN = ($^O eq 'darwin');
 my $NX_OS = $WINDOWS ? 'windows' : 'linux';
@@ -313,29 +310,29 @@ sub _run {
 
     push @cmd, qw(localhost:40);
 
-    if ($WINDOWS) {
-        my $dotqvd = ($ENV{HOME} || $ENV{APPDATA}).'/.qvd';
-        my $program = $cmd[0];
-        my $cmdline = join ' ', map("\"$_\"", @cmd);
+    # if ($WINDOWS) {
+    # my $program = $cmd[0];
+    # my $cmdline = join ' ', map("\"$_\"", @cmd);
+    # DEBUG("Running nxproxy: $program $cmdline");
+    # require Win32::Process;
+    # Win32::Process->import;
+    # my $ret = Win32::Process::Create({}, $program, $cmdline, 0, CREATE_NO_WINDOW|NORMAL_PRIORITY_CLASS, '.');
+    # if ($ret) {
+    # INFO("nxproxy started");
+    # }
+    # else {
+    # ERROR("Failed to start nxproxy");
+    # }
+    # } else {
 
-        DEBUG("Running nxproxy: $program $cmdline");
-        require Win32::Process;
-        Win32::Process->import;
-        my $ret = Win32::Process::Create({}, $program, $cmdline, 0, CREATE_NO_WINDOW|NORMAL_PRIORITY_CLASS, '.');
-        if ($ret) {
-            INFO("nxproxy started");
-        }
-        else {
-            ERROR("Failed to start nxproxy");
-        }
+    DEBUG("Running nxproxy: @cmd");
+    if ( Proc::Background->new(@cmd) ) {
+        DEBUG("nxproxy started");
     } else {
-        DEBUG("Running nxproxy: " . join(' ' , @cmd));
-        if ( Proc::Background->new(@cmd) ) {
-            DEBUG("nxproxy started");
-        } else {
-            ERROR("nxproxy failed to start");
-        }
+        ERROR("nxproxy failed to start");
+        die "nxproxy failed to start";
     }
+
     DEBUG("Listening on 4040\n");
     my $ll = IO::Socket::INET->new(
         LocalPort => 4040,
