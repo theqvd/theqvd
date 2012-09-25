@@ -2,8 +2,9 @@
 
 set QVDPATH=.
 
-perl ^
+wperl ^
 -I ..\..\ext\IO-Socket-Forwarder\lib ^
+-I ..\..\ext\QVD-Config-Core\lib ^
 -I ..\..\ext\QVD-Config\lib ^
 -I ..\..\ext\QVD-Client\lib ^
 -I ..\..\ext\QVD-HTTP\lib\ ^

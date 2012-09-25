@@ -4,8 +4,8 @@
 ; (To generate a new GUID, click Tools | Generate GUID inside the IDE.)
 AppId={{DD625C30-A6B1-4C48-A3C2-19B39771028F}
 AppName=QVD Client
-AppVerName=QVD Client 3.0.0-2
-AppVersion=3.0.0-2
+AppVerName=QVD Client 3.1.0-0
+AppVersion=3.1.0-0
 AppPublisher=QindelGroup
 AppPublisherURL=http://theqvd.com/
 AppSupportURL=http://theqvd.com/
@@ -28,7 +28,7 @@ Name: "desktopicon"; Description: "{cm:CreateDesktopIcon}"; GroupDescription: "{
 [Files]
 Source: "installer\NX\*"; DestDir: "{app}\NX"; Flags: ignoreversion recursesubdirs createallsubdirs
 Source: "installer\pulseaudio\*"; DestDir: "{app}\pulseaudio"; Flags: ignoreversion recursesubdirs createallsubdirs
-Source: "installer\system32\*"; DestDir: "{app}"; Flags: ignoreversion recursesubdirs createallsubdirs
+;Source: "installer\system32\*"; DestDir: "{app}"; Flags: ignoreversion recursesubdirs createallsubdirs
 Source: "installer\Xming\*"; DestDir: "{app}\Xming"; Flags: ignoreversion recursesubdirs createallsubdirs
 Source: "installer\pixmaps\*"; DestDir: "{app}\pixmaps"; Flags: ignoreversion recursesubdirs createallsubdirs
 Source: "installer\qvd-client.exe"; DestDir: "{app}"; Flags: ignoreversion
