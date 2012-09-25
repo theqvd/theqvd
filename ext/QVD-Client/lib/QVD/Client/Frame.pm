@@ -456,20 +456,19 @@ sub DetectKeyboard {
 
         ## use a hardcoded 'pc105' since windows doesn't seem to have the notion of keyboard model
         return "pc105/$layout";
-
-    } else {
+    }
+    else {
         require X11::Protocol;
 
 	# See http://www.nomachine.com/tr/view.php?id=TR02H02326
 	my $user = getpwuid($>);
 	if (defined $user and length $user){
-		my $xhost = core_cfg('command.xhost') ; 
-		system $xhost, "+si:localuser:$user"; 
-		$log->warn("xhost executed for $user");
-			
+            my $xhost = core_cfg('command.xhost') ;
+            system $xhost, "+si:localuser:$user";
+            DEBUG("xhost executed for $user");
 	}
 	else {
-		$log->warn("Cannot execute xhost for $user"); 	
+            WARN("Cannot execute xhost for $user");
 	}
 
         my $x11 = X11::Protocol->new;
