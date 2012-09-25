@@ -81,31 +81,19 @@ EOF
 
     ## guardar certificado en archivo
     my $dir = core_cfg('path.ssl.ca.personal');
-    $dir =~ s|^~(?=/)$ENV{HOME} // $ENV{APPDATA}|e ;
-    make_path $dir, { error => \my $mkpath_err };
-    if ($mkpath_err and @$mkpath_err) {
-        my $errs_text;
-        for my $err (@$mkpath_err) {
-            my ($file, $errmsg) = %$err;
-            if ('' eq $file) {
-                $errs_text .= "generic error: ($errmsg)\n";
-            } else {
-                $errs_text .= "mkpath '$file': ($errmsg)\n";
-            }
-        }
-
-        die $errs_text;
-    }
+    $dir = File::Spec->join($QVD::Client::App::user_dir, $dir);
+    make_path $dir;
+    -d $dir or die "Unable to create directory $dir";
 
     my $file;
-    foreach my $idx (0..9) {
+    foreach my $idx (0..99) {
         my $basename = sprintf '%s.%d', $cert_hash, $idx;
         $file = File::Spec->catfile ($dir, $basename);
         last unless -e $file;
     }
     ## TODO: -e $file and what?
 
-    open my $fd, '>', $file or die "open: '$file': $!";
+    open my $fd, '>', $file or die "Unable to open '$file': $!";
     print $fd $cert_pem_str;
     close $fd;
 
