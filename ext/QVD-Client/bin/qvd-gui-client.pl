@@ -34,7 +34,6 @@ BEGIN {
     $ENV{NX_CLIENT} = $WINDOWS ? 'cmd.exe /c :' : 'false';
 
     $user_config_filename = File::Spec->join($user_dir, 'client.conf');
-    $user_certs_dir       = File::Spec->rel2abs(core_cfg('path.ssl.ca.personal'), $user_dir);
 
     no warnings;
     $QVD::Config::USE_DB = 0;
@@ -62,6 +61,10 @@ use QVD::Log;
 
 DEBUG "user_dir: $user_dir";
 DEBUG "app_dir: $app_dir";
+
+$user_certs_dir       = File::Spec->rel2abs(core_cfg('path.ssl.ca.personal'), $user_dir);
+DEBUG "user_certs_dir: $user_certs_dir";
+
 
 #$SIG{__DIE__} = sub { ERROR "@_"; die (@_) };
 
