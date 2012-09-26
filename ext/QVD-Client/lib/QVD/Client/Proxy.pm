@@ -79,6 +79,7 @@ EOF
     ## guardar certificado en archivo
     my $dir = core_cfg('path.ssl.ca.personal');
     $dir = File::Spec->rel2abs($dir, $QVD::Client::App::user_dir);
+    DEBUG "certificates are stored in $dir";
     make_path $dir;
     -d $dir or die "Unable to create directory $dir";
 
