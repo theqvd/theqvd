@@ -85,8 +85,11 @@ command.socat = /usr/bin/socat
 command.modprobe = /sbin/modprobe
 command.xinit = /usr/bin/xinit
 command.xhost = /usr/bin/xhost
+command.nxproxy = /usr/lib/qvd/bin/nxproxy
 
-command.xming = Xming/Xming.exe
+command.windows.xming = Xming\\Xming.exe
+command.windows.pulseaudio = pulseaudio\\pulseaudio.exe
+command.windows.nxproxy = nx\\nxproxy,exe
 
 command.nxagent.args.extra =
 command.x-session.args.extra =
