@@ -13,6 +13,7 @@ use Pg::PQ qw(:pgres);
 use QVD::Log;
 use JSON;
 use Time::HiRes ();
+use URI::Escape qw(uri_escape);
 
 use parent qw(Class::StateMachine);
 
@@ -294,9 +295,8 @@ my $json;
 sub _json { $json //= JSON->new->ascii->pretty->allow_nonref }
 
 sub _rpc {
-    my $self = shift;
-    my ($method) = @_;
-    $self->{rpc_last_query} = [@_];
+    my ($self, $method, @args) = @_;
+    $self->{rpc_last_query} = [$method, @args];
 
     my $url = "$self->{rpc_service}/$method";
 
