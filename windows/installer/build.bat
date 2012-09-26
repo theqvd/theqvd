@@ -1,9 +1,9 @@
 
 set PATH=%PATH%;"c:\Archivos de programa\Resource Hacker\";%;"c:\Program files\Resource Hacker\"
 
-exetype NX\nxproxy.exe WINDOWS
+call exetype NX\nxproxy.exe WINDOWS
 
-pp -x -gui ^
+call pp -x -gui ^
 -I ..\..\ext\IO-Socket-Forwarder\lib ^
 -I ..\..\ext\QVD-Config\lib ^
 -I ..\..\ext\QVD-Config-Core\lib ^
