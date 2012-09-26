@@ -2,8 +2,6 @@
 
 package QVD::Client::App;
 
-use IO::Socket::SSL qw(debug3);
-
 use strict;
 use warnings;
 
