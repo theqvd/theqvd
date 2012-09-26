@@ -263,37 +263,29 @@ sub _run {
     my $self = shift;
     my $httpc = shift;
 
-    my @cmd;
-    if ($WINDOWS) {
-        push @cmd, $ENV{QVDPATH}."/NX/nxproxy.exe";
-    } else {
-        push @cmd, "nxproxy";
-    }
-
-    my %o = ();
-
+    my %o;
     if ( $self->{local_serial} ) {
         $o{http} = core_cfg("client.socat.port");
     }
 
-
     if ($WINDOWS) {
-        $ENV{'NX_ROOT'} = $ENV{APPDATA}.'/.qvd';
+        $ENV{'NX_ROOT'} = $QVD::Client::App::app_dir;
         (my $cygwin_nx_root = $ENV{NX_ROOT}) =~ tr!:\\!//!;
         $o{errors} = '/cygdrive/'.$cygwin_nx_root.'/proxy.log';
         # Call pulseaudio in Windows
 
         if ( $self->{audio} ) {
-            my @pa_args = ($ENV{QVDPATH}."/pulseaudio/pulseaudio.exe", "-D", "--high-priority");
-            DEBUG("Starting pulseaudio: " . join(' ', @pa_args));
-            if ( Proc::Background->new(@pa_args) ) {
+            my @pa = (File::Spec->rel2abs(core_cfg('command.windows.pulseaudio'), $QVD::Client::App::app_dir),
+                      "-D", "--high-priority" );
+            DEBUG("Starting pulseaudio: @pa");
+            if ( Proc::Background->new(@pa) ) {
                 DEBUG("Pulseaudio started");
             } else {
                 ERROR("Pulseaudio failed to start");
             }
         }
-    }  
-    
+    }
+
     $o{media} = 4713 if $self->{audio};
 
     if ($self->{printing}) {
@@ -305,10 +297,13 @@ sub _run {
     }
 
     @o{ keys %{$self->{extra}} } = values %{$self->{extra}};
-    push @cmd, ("-S");
-    push @cmd, (map "$_=$o{$_}", keys %o);
 
-    push @cmd, qw(localhost:40);
+    my @cmd = ( ( $WINDOWS
+                  ? File::Spec->rel2abs(core_cfg('command.windows.nxproxy'), $QVD::Client::App::app_dir)
+                  : core_cfg('command.nxproxy') ),
+                '-S',
+                map("$_=$o{$_}", keys %o),
+                'localhost:40' );
 
     # if ($WINDOWS) {
     # my $program = $cmd[0];
