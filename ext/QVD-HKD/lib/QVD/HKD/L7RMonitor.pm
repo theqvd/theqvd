@@ -6,7 +6,7 @@ no warnings 'redefine';
 
 use 5.010;
 
-BEGIN { *debug = \$QVD::HKD::VMHandler::debug }
+BEGIN { *debug = \$QVD::HKD::debug }
 our $debug;
 
 use parent qw(QVD::HKD::Agent);
