@@ -239,8 +239,7 @@ sub connect_to_vm {
                         $code == HTTP_UNAUTHORIZED     ? "Login error. Please verify your user and password"    :
                         $code == HTTP_BAD_GATEWAY      ? "Server error: $body"                                  :
                         $code == HTTP_FORBIDDEN        ? "Your virtual machine is under maintenance."           :
-                                                         "Unable to connect to remote VM: $code $msg" )
-            }
+                                                         "Unable to connect to remote VM: $code $msg" );
             ERROR("Fatal error: $message");
             $self->_stop_socat();
             $cli->proxy_connection_error(message => $message, code => $code);
