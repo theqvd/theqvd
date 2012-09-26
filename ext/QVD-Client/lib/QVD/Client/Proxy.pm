@@ -223,7 +223,6 @@ sub connect_to_vm {
 
         if ($code == HTTP_SWITCHING_PROTOCOLS) {
             DEBUG("Switching protocols. Connected.");
-            
             $cli->proxy_connection_status('CONNECTED');
             $self->_run($httpc);
             last;
@@ -235,19 +234,13 @@ sub connect_to_vm {
         else {
             # Fatal error
             my $message;
-            if ($code == HTTP_NOT_FOUND) {
-                $message = "Your virtual machine does not exist any more.";
-            } elsif ($code == HTTP_UPGRADE_REQUIRED) {
-                $message = "The server requires a more up-to-date client version.";
-            } elsif ($code == HTTP_UNAUTHORIZED) {
-                $message = "Login error. Please verify your user and password.";
-            } elsif ($code == HTTP_BAD_GATEWAY) {
-                $message = "Server error: ".$body;
-            } elsif ($code == HTTP_FORBIDDEN) {
-                $message = "Your virtual machine is under maintenance.";
+            $message = ($code == HTTP_NOT_FOUND        ? "Your virtual machine does not exist any more"         :
+                        $code == HTTP_UPGRADE_REQUIRED ? "The server requires a more up-to-date client version" :
+                        $code == HTTP_UNAUTHORIZED     ? "Login error. Please verify your user and password"    :
+                        $code == HTTP_BAD_GATEWAY      ? "Server error: $body"                                  :
+                        $code == HTTP_FORBIDDEN        ? "Your virtual machine is under maintenance."           :
+                                                         "Unable to connect to remote VM: $code $msg" )
             }
-            $message ||= "Unable to connect to remote vm: $code $msg";
-            
             ERROR("Fatal error: $message");
             $self->_stop_socat();
             $cli->proxy_connection_error(message => $message, code => $code);
