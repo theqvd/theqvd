@@ -304,9 +304,9 @@ sub _rpc {
     $self->{rpc_retry_delay} //= $self->_cfg('internal.hkd.agent.rpc.retry.delay');
 
     my @query;
-    while (@_) {
-        my $key = shift;
-        my $value = shift;
+    while (@args) {
+        my $key = shift @args;
+        my $value = shift @args;
         push @query, uri_escape($key) . '=' . uri_escape($value);
     }
     $url .= '?' . join('&', @query) if @query;
