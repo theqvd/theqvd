@@ -295,9 +295,9 @@ sub _json { $json //= JSON->new->ascii->pretty->allow_nonref }
 
 sub _rpc {
     my $self = shift;
+    my ($method) = @_;
     $self->{rpc_last_query} = [@_];
 
-    my $method = shift;
     my $url = "$self->{rpc_service}/$method";
 
     $self->{rpc_retry_count} //= $self->_cfg('internal.hkd.agent.rpc.retry.count');
