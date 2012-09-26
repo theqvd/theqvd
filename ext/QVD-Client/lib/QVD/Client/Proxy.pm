@@ -114,7 +114,7 @@ sub connect_to_vm {
     if ($ssl) {
         $args{SSL}                 = 1;
         $args{SSL_ca_path}         = core_cfg('path.ssl.ca.system');
-        $args{SSL_ca_path_alt}     = $user_certs_dirs;
+        $args{SSL_ca_path_alt}     = $QVD::Client::App::user_certs_dir;
         $args{SSL_ca_path_alt}     =~ s|^~(?=/)|$ENV{HOME} // $ENV{APPDATA}|e;
         my $use_cert = core_cfg('client.ssl.use_cert');
         if ($use_cert) {
