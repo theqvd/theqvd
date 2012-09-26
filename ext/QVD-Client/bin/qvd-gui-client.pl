@@ -13,7 +13,7 @@ use Proc::Background;
 use File::Spec;
 use 5.010;
 
-our ($WINDOWS, $DARWIN, $user_dir, $app_dir, $user_config_filename);
+our ($WINDOWS, $DARWIN, $user_dir, $app_dir, $user_config_filename, $user_certs_dir);
 
 
 BEGIN {
@@ -34,6 +34,7 @@ BEGIN {
     $ENV{NX_CLIENT} = $WINDOWS ? 'cmd.exe /c :' : 'false';
 
     $user_config_filename = File::Spec->join($user_dir, 'client.conf');
+    $user_certs_dirs      = File::Spec->rel2abs(core_cfg('path.ssl.ca.personal'), $user_dir);
 
     no warnings;
     $QVD::Config::USE_DB = 0;

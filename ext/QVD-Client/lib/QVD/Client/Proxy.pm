@@ -77,8 +77,7 @@ EOF
     return unless $accept;
 
     ## guardar certificado en archivo
-    my $dir = core_cfg('path.ssl.ca.personal');
-    $dir = File::Spec->rel2abs($dir, $QVD::Client::App::user_dir);
+    my $dir = $QVD::Client::App::user_certs_dir;
     DEBUG "certificates are stored in $dir";
     make_path $dir;
     -d $dir or die "Unable to create directory $dir";
@@ -115,7 +114,7 @@ sub connect_to_vm {
     if ($ssl) {
         $args{SSL}                 = 1;
         $args{SSL_ca_path}         = core_cfg('path.ssl.ca.system');
-        $args{SSL_ca_path_alt}     = core_cfg('path.ssl.ca.personal');
+        $args{SSL_ca_path_alt}     = $user_certs_dirs;
         $args{SSL_ca_path_alt}     =~ s|^~(?=/)|$ENV{HOME} // $ENV{APPDATA}|e;
         my $use_cert = core_cfg('client.ssl.use_cert');
         if ($use_cert) {
