@@ -362,7 +362,7 @@ sub _rpc_retry {
     $self->{rpc_watcher} = AnyEvent->timer(after => $self->{rpc_retry_count},
                                            cb => sub {
                                                $debug and $self->_debug("retrying rpc query");
-                                               $self->rpc(@{$self->{rpc_last_query}})
+                                               $self->_rpc(@{$self->{rpc_last_query}})
                                            });
 }
 
