@@ -27,7 +27,7 @@ call pp -x -gui ^
 ..\..\ext\QVD-Client\bin\qvd-gui-client.pl
 
 reshacker -addoverwrite qvd-client-1.exe, qvd-client.exe, pixmaps\qvd.ico,icongroup,WINEXE,
-delete qvd-client-1.exe
+del qvd-client-1.exe
 
 rem -l C:\strawberry\perl\site\lib\auto\Crypt\OpenSSL\X509\libeay32.dll ^
 
