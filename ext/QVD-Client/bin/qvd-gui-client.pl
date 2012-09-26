@@ -70,7 +70,7 @@ sub OnInit {
         my @cmd;
         if ($WINDOWS) {
             $ENV{DISPLAY} //= '127.0.0.1:0';
-            @cmd = ( File::Spec->join($app_dir, core_cfg('command.xming')),
+            @cmd = ( File::Spec->rel2abs(core_cfg('command.xming'), $app_dir),
                      '-multiwindow', '-notrayicon', '-nowinkill', '-clipboard', '+bs', '-wm',
                      '-logfile' => File::Spec->join($user_dir, "xserver.log") );
         }

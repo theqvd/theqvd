@@ -78,14 +78,14 @@ EOF
 
     ## guardar certificado en archivo
     my $dir = core_cfg('path.ssl.ca.personal');
-    $dir = File::Spec->join($QVD::Client::App::user_dir, $dir);
+    $dir = File::Spec->rel2abs($dir, $QVD::Client::App::user_dir);
     make_path $dir;
     -d $dir or die "Unable to create directory $dir";
 
     my $file;
     foreach my $idx (0..99) {
         my $basename = sprintf '%s.%d', $cert_hash, $idx;
-        $file = File::Spec->catfile ($dir, $basename);
+        $file = File::Spec->join($dir, $basename);
         last unless -e $file;
     }
     ## TODO: -e $file and what?
