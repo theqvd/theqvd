@@ -20,9 +20,9 @@ BEGIN {
     $WINDOWS = ($^O eq 'MSWin32');
     $DARWIN = ($^O eq 'darwin');
 
-    $user_dir = ($WINDOWS
-                 ? File::Spec->join($ENV{APPDATA}, 'QVD')
-                 : File::Spec->join((getpwuid $>)[7] // $ENV{HOME}, '.qvd'));
+    $user_dir = File::Spec->rel2abs($WINDOWS
+                                    ? File::Spec->join($ENV{APPDATA}, 'QVD')
+                                    : File::Spec->join((getpwuid $>)[7] // $ENV{HOME}, '.qvd'));
     mkdir($user_dir);
 
     $app_dir = File::Spec->join((File::Spec->splitpath(File::Spec->rel2abs($0)))[0, 1]);
