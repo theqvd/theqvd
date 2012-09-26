@@ -300,6 +300,8 @@ sub _rpc {
 
     my $url = "$self->{rpc_service}/$method";
 
+    $debug and $self->_debug("calling RPC service $url");
+
     $self->{rpc_retry_count} //= $self->_cfg('internal.hkd.agent.rpc.retry.count');
     $self->{rpc_retry_delay} //= $self->_cfg('internal.hkd.agent.rpc.retry.delay');
 
