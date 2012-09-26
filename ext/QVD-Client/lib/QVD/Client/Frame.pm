@@ -510,11 +510,7 @@ sub SaveConfiguration {
     #set_core_cfg('client.geometry', $self->{geometry}->GetValue());
 
     local $@;
-    eval {
-        my $qvd_dir = ($ENV{HOME} || $ENV{APPDATA}).'/.qvd';
-        mkdir $qvd_dir unless -e $qvd_dir;
-        save_core_cfg($qvd_dir.'/client.conf');
-    };
+    eval { save_core_cfg($QVD::Client::App::user_config_filename) };
     if ($@) {
         my $message = $@;
         my $dialog = Wx::MessageDialog->new($self, $message, 

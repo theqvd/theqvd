@@ -13,7 +13,7 @@ use Proc::Background;
 use File::Spec;
 use 5.010;
 
-our ($WINDOWS, $DARWIN, $user_dir, $app_dir);
+our ($WINDOWS, $DARWIN, $user_dir, $app_dir, $user_config_filename);
 
 
 BEGIN {
@@ -24,7 +24,6 @@ BEGIN {
                  ? File::Spec->join($ENV{APPDATA}, 'QVD')
                  : File::Spec->join((getpwuid $>)[7] // $ENV{HOME}, '.qvd'));
     mkdir($user_dir);
-    # warn "user_dir: $user_dir";
 
     $app_dir = File::Spec->join((File::Spec->splitpath($0))[0, 1]);
 
@@ -33,9 +32,11 @@ BEGIN {
     # instead of ignoring them? 
     $ENV{NX_CLIENT} = $WINDOWS ? 'cmd.exe /c :' : 'false';
 
+    $user_config_filename = File::Spec->join($user_dir, 'client.conf');
+
     no warnings;
     $QVD::Config::USE_DB = 0;
-    @QVD::Config::Core::FILES = ( File::Spec->join($user_dir, 'client.conf'),
+    @QVD::Config::Core::FILES = ( $user_config_filename,
                                   'qvd-client.conf' );
     push @QVD::Config::Core::FILES, '/etc/qvd/client.conf' unless $WINDOWS;
 }
