@@ -51,7 +51,7 @@ path.storage.homefs = ${path.storage.root}/homefs
 ## paths for SSL certificates and CAs
 path.ssl.certs = ${path.run}/ssl
 path.ssl.ca.system = /etc/ssl/certs
-path.ssl.ca.personal = .qvd/certs
+path.ssl.ca.personal = certs
 ## KVM serial port captures or LXC console output
 path.serial.captures = ${path.tmp}/qvd
 
@@ -85,6 +85,8 @@ command.socat = /usr/bin/socat
 command.modprobe = /sbin/modprobe
 command.xinit = /usr/bin/xinit
 command.xhost = /usr/bin/xhost
+
+command.xming = Xming/Xming.exe
 
 command.nxagent.args.extra =
 command.x-session.args.extra =
