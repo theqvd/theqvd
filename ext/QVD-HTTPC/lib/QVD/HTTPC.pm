@@ -30,7 +30,7 @@ sub _create_socket {
         require Net::SSLeay;
         Net::SSLeay::load_error_strings();
 
-	IO::Socket::SSL->import('debug3');
+	# IO::Socket::SSL->import('debug3');
 
         my %args = ( SSL_verify_mode => 3 );
         $args{$_} = $self->{$_} for qw(SSL_ca_path SSL_use_cert SSL_cert_file SSL_key_file);
