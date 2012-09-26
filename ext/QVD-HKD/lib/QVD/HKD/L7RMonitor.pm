@@ -51,14 +51,14 @@ sub _on_get_user_cmd_result {
     my ($self, $res) = @_;
     if ($res->rows) {
         my ($vm_id, $ip, $port) = $res->row;
-        ($self->{_vm_to_be_disconnected}) = { vm_id => $vm_id, ip => $ip, vma_port => $port };
+        $self->{_vm_to_be_disconnected} = { vm_id => $vm_id, ip => $ip, vma_port => $port };
     }
 }
 
 sub _disconnect_user {
     my $self = shift;
     if (my $vm = $self->{_vm_to_be_disconnected}) {
-        $self->{_rpc_service} = sprintf "http://%s:%d/vma", $vm->{ip}, $vm->{vma_port};
+        $self->{rpc_service} = sprintf "http://%s:%d/vma", $vm->{ip}, $vm->{vma_port};
         $debug and $self->_debug("sending 'x_suspend' RPC to VM $vm->{vm_id} VMA");
         $self->_rpc('x_suspend');
         delete $self->{_vm_to_be_disconnected}
