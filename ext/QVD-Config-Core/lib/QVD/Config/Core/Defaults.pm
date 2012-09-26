@@ -89,7 +89,7 @@ command.nxproxy = /usr/bin/nxproxy
 
 command.windows.xming = Xming\\Xming.exe
 command.windows.pulseaudio = pulseaudio\\pulseaudio.exe
-command.windows.nxproxy = nx\\nxproxy,exe
+command.windows.nxproxy = nx\\nxproxy.exe
 
 command.nxagent.args.extra =
 command.x-session.args.extra =
