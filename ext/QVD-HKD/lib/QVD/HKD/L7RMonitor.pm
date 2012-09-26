@@ -59,8 +59,8 @@ sub _disconnect_user {
     my $self = shift;
     if (my $vm = $self->{_vm_to_be_disconnected}) {
         $self->{_rpc_service} = sprintf "http://%s:%d/vma", $vm->{ip}, $vm->{vma_port};
+        $debug and $self->_debug("sending 'x_suspend' RPC to VM $vm->{vm_id} VMA");
         $self->_rpc('x_suspend');
-        $debug and $self->_debug("x_suspend RPC sent to VM $vm->{vm_id} VMA");
         delete $self->{_vm_to_be_disconnected}
     }
     else {
