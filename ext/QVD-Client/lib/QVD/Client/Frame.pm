@@ -201,6 +201,7 @@ sub RunWorkerThread {
             QVD::Client::Proxy->new($self, %connect_info)->connect_to_vm();
         };
         if ($@) {
+            ERROR "Unable to connect to VM: $@";
             $self->proxy_connection_error(message => $@);
         }
         cond_wait(%connect_info);
