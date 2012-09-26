@@ -26,7 +26,7 @@ BEGIN {
     mkdir($user_dir);
 
     $app_dir = File::Spec->join((File::Spec->splitpath(File::Spec->rel2abs($0)))[0, 1]);
-    warn "app_dir: $app_dir";
+    # warn "app_dir: $app_dir";
 
     # FIXME NX_CLIENT is used for showing the user information on things
     # like broken connection, perhaps we should show them to the user
@@ -58,6 +58,9 @@ BEGIN {
 }
 
 use QVD::Log;
+
+DEBUG "user_dir: $user_dir";
+DEBUG "app_dir: $app_dir";
 
 #$SIG{__DIE__} = sub { ERROR "@_"; die (@_) };
 
