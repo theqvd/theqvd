@@ -107,7 +107,15 @@ running() {
     return 0
 }
 
+kill_dnsmasq() {
+	#Function added to kill dnsmasq 	
+	pkill dnsmasq 
+}
+
+
 start_server() {
+	# Check for dnsmasq and kill it
+	kill_dnsmasq
 # Start the process using the wrapper
         if [ -z "$DAEMONUSER" ] ; then
             start_daemon -p $PIDFILE $DAEMON $DAEMON_OPTS
@@ -135,7 +143,8 @@ stop_server() {
 				  --exec $PERL
 		errcode=$?
 	fi
-
+	
+	kill_dnsmasq
         return $errcode
 }
 
@@ -164,6 +173,7 @@ force_stop() {
         fi
     fi
 
+    kill_dnsmasq
     rm -f $PIDFILE
 }
 

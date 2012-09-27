@@ -61,6 +61,14 @@ if [ -n "$DAEMONUSER" ] ; then
 	fi
 fi
 
+
+#
+# Function that stops dnsmasq
+#
+kill_dnsmaq () {
+	pkill dnsmasq
+}
+
 #
 # Function that starts the daemon/service
 #
