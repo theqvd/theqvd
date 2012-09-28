@@ -50,11 +50,19 @@ sub new {
 sub register_mac_and_ip {
     # TODO: pass extra info as vm name
     my ($self, $vm_id, $mac, $ip) = @_;
-    INFO "Registering mac '$mac', ip '$ip' in DHCP";
+    INFO "Registering mac '$mac', ip '$ip' for VM $vm_id in DHCP";
     $self->{mac}{$vm_id} = $mac;
     $self->{ip}{$vm_id} = $ip;
     $self->_reload_config;
     # $self->_restart_server;
+}
+
+sub unregister_mac_and_ip {
+    my ($self, $vm_id) = @_;
+    INFO "Unregistering mac '" . $self->{mac}{$vm_id}. "', ip '" . $self->{ip}{$vm_id} . "' for VM $vm_id in DHCP";
+    delete $self->{mac}{$vm_id};
+    delete $self->{ip}{$vm_id};
+    $self->_reload_config;
 }
 
 sub _make_config {

@@ -350,6 +350,10 @@ sub _clear_runtime_row {
     my $self = shift;
     my $state = $self->_main_state;
     DEBUG "Clearing runtime row for VM '$self->{vm_id}'";
+
+    my $dhcpd_handler = $self->{dhcpd_handler};
+    $dhcpd_handler->unregister_mac_and_ip($self->{vm_id}) if $dhcpd_handler;
+
     # FIXME: final state could also be 'failed', currently 'stopped'
     # is hard-coded here.
     $self->_query(<<'SQL', $self->{vm_id}, $self->{node_id});

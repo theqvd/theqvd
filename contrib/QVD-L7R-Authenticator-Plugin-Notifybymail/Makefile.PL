@@ -9,6 +9,7 @@ WriteMakefile
                  },
   'INSTALLDIRS' => 'site',
   'EXE_FILES' => [],
-  'PL_FILES' => {}
+  'PL_FILES' => {},
+  configure_requires => { 'Module::Build' => 0.4 }
 )
 ;
