@@ -63,7 +63,7 @@ $user_certs_dir = File::Spec->rel2abs(core_cfg('path.ssl.ca.personal'), $user_di
 DEBUG "user_certs_dir: $user_certs_dir";
 
 $pixmaps_dir = File::Spec->rel2abs(core_cfg('path.client.pixmaps'), $app_dir);
-$pixmaps_dir = File::Spec->rel2abs(core_cfg('path.client.pixmaps.alt', $app_dir) unless -d $pixmaps_dir;
+$pixmaps_dir = File::Spec->rel2abs(core_cfg('path.client.pixmaps.alt'), $app_dir) unless -d $pixmaps_dir;
 DEBUG "pixmaps_dir: $pixmaps_dir";
 
 #$SIG{__DIE__} = sub { ERROR "@_"; die (@_) };
