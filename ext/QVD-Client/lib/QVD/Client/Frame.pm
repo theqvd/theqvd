@@ -73,7 +73,7 @@ sub new {
     my $ver_sizer  = Wx::BoxSizer->new(wxVERTICAL);
 
     my $bm_logo_big = Wx::Bitmap->new(File::Spec->join($QVD::Client::App::pixmaps_dir, 'qvd-big.png'),
-                                      wxBITMAP_TYPE_ANY)
+                                      wxBITMAP_TYPE_ANY);
     $ver_sizer->Add( Wx::StaticBitmap->new($panel, -1, $bm_logo_big),
                      0, wxLEFT|wxRIGHT|wxTOP|wxALIGN_CENTER_HORIZONTAL, 20 );
 
@@ -138,7 +138,7 @@ sub new {
     $self->SetTitle("QVD");
     my $icon = Wx::Icon->new();
     my $bm_logo_small = Wx::Bitmap->new(File::Spec->join($QVD::Client::App::pixmaps_dir, 'qvd-small.png'),
-                                        wxBITMAP_TYPE_ANY));
+                                        wxBITMAP_TYPE_ANY);
     $icon->CopyFromBitmap($bm_logo_small);
     $self->SetIcon($icon);
 
