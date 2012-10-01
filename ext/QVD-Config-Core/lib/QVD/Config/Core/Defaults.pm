@@ -57,6 +57,9 @@ path.serial.captures = ${path.tmp}/qvd
 
 path.cgroup = /cgroup
 
+path.client.pixmaps = pixmaps
+path.client.pixmaps.alt = /usr/share/pixmaps
+
 ## paths to external executables
 command.kvm = kvm
 command.kvm-img = kvm-img

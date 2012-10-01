@@ -72,27 +72,10 @@ sub new {
 
     my $ver_sizer  = Wx::BoxSizer->new(wxVERTICAL);
 
-    my $logo_image;
-
-    my ($volume, $directories, $file) = File::Spec->splitpath(File::Spec->rel2abs($0));
-    if ($WINDOWS) {
-        $logo_image = $ENV{QVDPATH}."/pixmaps/qvd-logo.png";
-    } else {
-        $logo_image = "$volume$directories/../pixmaps/qvd-logo.png";
-        unless (-e $logo_image) {
-            $logo_image = "/usr/share/pixmaps/qvd-logo.png";
-        }
-    }
-    $ver_sizer->Add(
-        Wx::StaticBitmap->new(
-            $panel,
-            -1,
-            Wx::Bitmap->new($logo_image, wxBITMAP_TYPE_ANY)
-        ),
-        0,
-        wxLEFT|wxRIGHT|wxTOP|wxALIGN_CENTER_HORIZONTAL,
-        20
-    );
+    my $bm_logo_big = Wx::Bitmap->new(File::Spec->join($QVD::Client::App::pixmaps_dir, 'qvd-big.png'),
+                                      wxBITMAP_TYPE_ANY)
+    $ver_sizer->Add( Wx::StaticBitmap->new($panel, -1, $bm_logo_big),
+                     0, wxLEFT|wxRIGHT|wxTOP|wxALIGN_CENTER_HORIZONTAL, 20 );
 
     my $grid_sizer = Wx::GridSizer->new(1, 2, 0, 0);
     $ver_sizer->Add($grid_sizer, 1, wxALL|wxEXPAND, 20);
@@ -154,16 +137,9 @@ sub new {
 
     $self->SetTitle("QVD");
     my $icon = Wx::Icon->new();
-    
-    if ($WINDOWS) {
-        $logo_image = $ENV{QVDPATH}."/pixmaps/qvd.xpm";
-    } else {
-        $logo_image = "$volume$directories/../pixmaps/qvd.xpm";
-        unless (-e $logo_image) {
-            $logo_image = "/usr/share/pixmaps/qvd.xpm";
-        }
-    }
-    $icon->CopyFromBitmap(Wx::Bitmap->new($logo_image, wxBITMAP_TYPE_ANY));
+    my $bm_logo_small = Wx::Bitmap->new(File::Spec->join($QVD::Client::App::pixmaps_dir, 'qvd-small.png'),
+                                        wxBITMAP_TYPE_ANY));
+    $icon->CopyFromBitmap($bm_logo_small);
     $self->SetIcon($icon);
 
     $panel->SetSizer($ver_sizer);

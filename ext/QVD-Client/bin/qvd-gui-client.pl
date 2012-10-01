@@ -11,8 +11,7 @@ use Proc::Background;
 use File::Spec;
 use 5.010;
 
-our ($WINDOWS, $DARWIN, $user_dir, $app_dir, $user_config_filename, $user_certs_dir);
-
+our ($WINDOWS, $DARWIN, $user_dir, $app_dir, $user_config_filename, $user_certs_dir, $pixmaps_dir);
 
 BEGIN {
     $WINDOWS = ($^O eq 'MSWin32');
@@ -60,9 +59,12 @@ use QVD::Log;
 DEBUG "user_dir: $user_dir";
 DEBUG "app_dir: $app_dir";
 
-$user_certs_dir       = File::Spec->rel2abs(core_cfg('path.ssl.ca.personal'), $user_dir);
+$user_certs_dir = File::Spec->rel2abs(core_cfg('path.ssl.ca.personal'), $user_dir);
 DEBUG "user_certs_dir: $user_certs_dir";
 
+$pixmaps_dir = File::Spec->rel2abs(core_cfg('path.client.pixmaps'), $app_dir);
+$pixmaps_dir = File::Spec->rel2abs(core_cfg('path.client.pixmaps.alt', $app_dir) unless -d $pixmaps_dir;
+DEBUG "pixmaps_dir: $pixmaps_dir";
 
 #$SIG{__DIE__} = sub { ERROR "@_"; die (@_) };
 
