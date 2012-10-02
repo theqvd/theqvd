@@ -129,6 +129,7 @@ do_reload() {
 
 case "$1" in
   start)
+	kill_dnsmasq
 	[ "$VERBOSE" != no ] && log_daemon_msg "Starting $DESC" "$NAME"
 	do_start
 	case "$?" in
@@ -143,6 +144,7 @@ case "$1" in
 		0|1) [ "$VERBOSE" != no ] && log_end_msg 0 ;;
 		2) [ "$VERBOSE" != no ] && log_end_msg 1 ;;
 	esac
+	kill_dnsmasq
 	;;
   status)
        status_of_proc "$DAEMON" "$NAME" && exit 0 || exit $?
@@ -163,6 +165,7 @@ case "$1" in
 	#
 	log_daemon_msg "Restarting $DESC" "$NAME"
 	do_stop
+	kill_dnsmasq
 	case "$?" in
 	  0|1)
 		do_start
