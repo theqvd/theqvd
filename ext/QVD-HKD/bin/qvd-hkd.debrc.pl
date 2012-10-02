@@ -65,7 +65,7 @@ fi
 #
 # Function that stops dnsmasq
 #
-kill_dnsmaq () {
+kill_dnsmasq() {
 	pkill dnsmasq
 }
 
