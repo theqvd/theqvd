@@ -1,0 +1,7 @@
+Crypt::OpenSSL::X509 T_PTROBJ
+
+Crypt::OpenSSL::X509::Extension T_PTROBJ
+Crypt::OpenSSL::X509::ObjectID T_PTROBJ
+Crypt::OpenSSL::X509::Name T_PTROBJ
+Crypt::OpenSSL::X509::Name_Entry T_PTROBJ
+Crypt::OpenSSL::X509::CRL T_PTROBJ
