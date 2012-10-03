@@ -77,7 +77,6 @@ SSL_CONF
 
 	openssl req -new -x509 -nodes -sha1 -days 60 -key /etc/qvd/server-private-key.pem -config /etc/qvd/server-certificate.cnf -out /etc/qvd/server-certificate.pem
 
-	set_cert=1
 fi
 
 ### Edit config
