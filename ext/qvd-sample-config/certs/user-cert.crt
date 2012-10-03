@@ -1,0 +1,73 @@
+Certificate:
+    Data:
+        Version: 3 (0x2)
+        Serial Number: 378 (0x17a)
+        Signature Algorithm: sha1WithRSAEncryption
+        Issuer: C=ES, ST=Spain, O=Internet, OU=People, CN=ca.int.qindel.com
+        Validity
+            Not Before: Aug  9 08:38:09 2012 GMT
+            Not After : Aug  9 08:38:09 2013 GMT
+        Subject: C=ES, ST=Spain, O=Internet, OU=People, CN=Test User
+        Subject Public Key Info:
+            Public Key Algorithm: rsaEncryption
+            RSA Public Key: (1024 bit)
+                Modulus (1024 bit):
+                    00:ce:95:3c:dd:7a:20:e0:c0:60:80:29:1c:ae:ae:
+                    59:00:67:57:2a:6b:44:18:c1:ea:f9:72:51:09:9a:
+                    8b:dc:90:1f:ff:b9:6d:a5:ae:c4:8e:b6:b4:5b:ee:
+                    15:70:c9:ca:07:e1:5d:d0:17:9f:0b:99:c1:e7:14:
+                    2f:ed:30:55:b1:42:85:57:d8:e4:78:03:18:82:72:
+                    42:21:d7:3d:48:71:e0:82:b7:12:3d:9b:1f:f6:d0:
+                    0a:1e:35:40:cf:4c:99:4f:09:24:ce:a2:13:c5:7a:
+                    36:a9:8e:27:c2:8f:5e:56:ab:01:3e:61:f1:a0:b3:
+                    09:c2:79:20:0b:6d:03:a7:53
+                Exponent: 65537 (0x10001)
+        X509v3 extensions:
+            X509v3 Basic Constraints: critical
+                CA:FALSE
+            Netscape Comment: 
+                Qindel Generated Certificate
+            X509v3 Subject Key Identifier: 
+                73:F2:84:0C:5B:B4:22:40:FA:EA:E6:F8:75:6F:71:45:06:40:E7:39
+            X509v3 Authority Key Identifier: 
+                keyid:27:1C:44:70:D7:CF:7C:9C:BC:B9:30:6F:7B:A2:8E:A9:1A:5B:F6:34
+
+            X509v3 Subject Alternative Name: 
+                <EMPTY>
+
+    Signature Algorithm: sha1WithRSAEncryption
+        8b:ca:90:af:b4:48:3a:79:ab:1e:9c:f6:39:49:53:44:7e:c4:
+        9a:29:05:41:f3:78:cc:b3:e4:ce:a0:a7:be:29:43:d1:cc:da:
+        45:b2:a0:8d:75:76:94:2b:21:0e:47:0e:34:81:64:d9:5d:cd:
+        5f:74:b7:59:f4:98:33:4b:96:77:1b:0b:be:6b:d9:8a:9a:19:
+        08:c0:72:5e:34:1a:d9:f2:45:1f:ca:b0:9a:41:bb:e5:cb:3c:
+        e9:c1:29:fa:7f:dd:7a:a9:dc:a4:d7:b0:09:1a:02:bd:ee:2b:
+        be:16:33:bc:02:21:e4:67:76:88:14:e3:60:7a:d3:e2:66:20:
+        78:22:b6:08:11:3f:c7:0a:0b:80:1e:b6:82:b9:64:1d:2b:85:
+        45:28:67:80:4c:82:49:c5:a7:ce:01:88:2b:df:f0:56:e6:a6:
+        05:40:aa:e3:15:aa:33:db:aa:ae:66:e9:98:eb:3e:5a:d7:aa:
+        96:ec:7d:60:65:ef:c3:e8:0e:78:1d:97:5d:53:08:c8:4c:ba:
+        bb:61:5d:27:08:9c:89:fc:25:2f:8a:95:98:e9:70:d6:aa:60:
+        7f:91:ff:a8:35:ff:4e:59:42:17:fa:d9:72:9c:d1:73:b2:53:
+        26:63:83:22:4d:18:be:ba:82:11:16:d4:d9:bc:0c:f6:99:f4:
+        ba:c3:83:69
+-----BEGIN CERTIFICATE-----
+MIIDNDCCAhygAwIBAgICAXowDQYJKoZIhvcNAQEFBQAwXTELMAkGA1UEBhMCRVMx
+DjAMBgNVBAgTBVNwYWluMREwDwYDVQQKEwhJbnRlcm5ldDEPMA0GA1UECxMGUGVv
+cGxlMRowGAYDVQQDExFjYS5pbnQucWluZGVsLmNvbTAeFw0xMjA4MDkwODM4MDla
+Fw0xMzA4MDkwODM4MDlaMFUxCzAJBgNVBAYTAkVTMQ4wDAYDVQQIEwVTcGFpbjER
+MA8GA1UEChMISW50ZXJuZXQxDzANBgNVBAsTBlBlb3BsZTESMBAGA1UEAxMJVGVz
+dCBVc2VyMIGfMA0GCSqGSIb3DQEBAQUAA4GNADCBiQKBgQDOlTzdeiDgwGCAKRyu
+rlkAZ1cqa0QYwer5clEJmovckB//uW2lrsSOtrRb7hVwycoH4V3QF58LmcHnFC/t
+MFWxQoVX2OR4AxiCckIh1z1IceCCtxI9mx/20AoeNUDPTJlPCSTOohPFejapjifC
+j15WqwE+YfGgswnCeSALbQOnUwIDAQABo4GJMIGGMAwGA1UdEwEB/wQCMAAwKwYJ
+YIZIAYb4QgENBB4WHFFpbmRlbCBHZW5lcmF0ZWQgQ2VydGlmaWNhdGUwHQYDVR0O
+BBYEFHPyhAxbtCJA+urm+HVvcUUGQOc5MB8GA1UdIwQYMBaAFCccRHDXz3ycvLkw
+b3uijqkaW/Y0MAkGA1UdEQQCMAAwDQYJKoZIhvcNAQEFBQADggEBAIvKkK+0SDp5
+qx6c9jlJU0R+xJopBUHzeMyz5M6gp74pQ9HM2kWyoI11dpQrIQ5HDjSBZNldzV90
+t1n0mDNLlncbC75r2YqaGQjAcl40GtnyRR/KsJpBu+XLPOnBKfp/3Xqp3KTXsAka
+Ar3uK74WM7wCIeRndogU42B60+JmIHgitggRP8cKC4AetoK5ZB0rhUUoZ4BMgknF
+p84BiCvf8FbmpgVAquMVqjPbqq5m6ZjrPlrXqpbsfWBl78PoDngdl11TCMhMurth
+XScInIn8JS+KlZjpcNaqYH+R/6g1/05ZQhf62XKc0XOyUyZjgyJNGL66ghEW1Nm8
+DPaZ9LrDg2k=
+-----END CERTIFICATE-----
