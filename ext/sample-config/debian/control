@@ -1,0 +1,21 @@
+Source: sample-config
+Section: misc
+Priority: extra
+Maintainer: QVD Team <qvd@qindel.com>
+Build-Depends: debhelper (>= 7.0.50~)
+Standards-Version: 3.9.1
+Homepage: http://theqvd.com
+#Vcs-Git: git://git.debian.org/collab-maint/sample-config.git
+#Vcs-Browser: http://git.debian.org/?p=collab-maint/sample-config.git;a=summary
+
+Package: sample-config
+Architecture: any
+Depends: ${shlibs:Depends}, ${misc:Depends}, postgresql-9.1, perl-qvd-hkd,
+ perl-qvd-l7r, perl-qvd-admin, qvd-lxc, qvd-fuse-unionfs
+Description: Configures a sample QVD installation
+ This package sets up a functional sample install of QVD.
+ . 
+ Warning: this modifies PostgreSQL and network interface settings.
+ There exists a slight chance of a bug breaking network access to
+ the machine. Installation with access to the hardware is
+ recommended.
