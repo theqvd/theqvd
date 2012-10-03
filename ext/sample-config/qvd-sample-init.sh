@@ -30,11 +30,14 @@ gateway=`ip -o route | grep '^default' | awk '{print $3}'`
 
 
 if [ "$hypervisor" == "lxc" ] ; then
-	image=ubuntu-12.04-desktop.i386.tar.gz
-	url=http://s3.amazonaws.com/QVD_Images/3.1/lxc/$image
+	disk_image=ubuntu-12.04-desktop.i386.tar.gz
+	download_image=$disk_image
+	url=http://s3.amazonaws.com/QVD_Images/3.1/lxc/$download_image
 elif [ "$hypervisor" == "kvm" ] ; then
-	image=ubuntu-12.04-desktop.i386.tar.gz
-	url=http://s3.amazonaws.com/QVD_Images/3.1/kvm/$image
+	disk_image=ubuntu-12.04-desktop-i386.img
+	download_image=ubuntu-12.04-desktop-i386.img.gz
+	url=http://s3.amazonaws.com/QVD_Images/3.1/kvm/$download_image
+	uncompress=1
 else
 	echo Bad hypervisor: $hypervisor
 	exit 1
@@ -145,16 +148,21 @@ if ( ! su - postgres -c "psql -l" | grep -E -q '^\s+qvd ' ) ; then
 	db_created=1
 fi
 
-if [ ! -f "$staging/$image" ] ; then
+if [ ! -f "$staging/$disk_image" ] ; then
 	mkdir -p "$staging"
-	compressed="$staging/$image"
+	compressed="$staging/$download_image"
 
 	wget "$url" -c -O "$compressed" || rm -f "$compressed"
 
-	if [ ! -f "$staging/$image" ] ; then
+	if [ ! -f "$staging/$download_image" ] ; then
 		echo "Failed to download demo image, aborting"
 		exit 1
 	fi
+
+	if [ -n "$uncompress" ] ; then
+		gunzip "$compressed"
+	fi
+
 fi
 
 
@@ -272,7 +280,7 @@ qvd-admin.pl config set vm.lxc.unionfs.type=unionfs-fuse
 qvd-admin.pl host add name=$host address=$ip_address
 
 qvd-admin.pl osf  add name=sample
-qvd-admin.pl di   add osf_id=1 path=$staging/$image
+qvd-admin.pl di   add osf_id=1 path=$staging/$disk_image
 qvd-admin.pl user add login=qvd password=qvd
 qvd-admin.pl vm   add name=sample_vm user=qvd osf=sample
 
