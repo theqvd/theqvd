@@ -1,7 +1,5 @@
 @echo off
 
-set QVDPATH=.
-
 perl ^
 -I ..\..\ext\IO-Socket-Forwarder\lib ^
 -I ..\..\ext\QVD-Config-Core\lib ^
