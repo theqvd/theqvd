@@ -9,7 +9,8 @@ MANIFEST
 MANIFEST.SKIP
 META.json
 META.yml
-pixmaps/qvd-logo.png
+pixmaps/qvd-small.png
+pixmaps/qvd-big.png
 pixmaps/qvd.ico
 pixmaps/qvd.svg
 pixmaps/qvd.xpm
