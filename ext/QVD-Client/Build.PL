@@ -40,8 +40,8 @@ my $build = new Module::Build(
 		                  'pixmaps/qvd.svg' => 'pixmaps/qvd.svg',
 		                },
 		png_files    => {
-		                  'pixmaps/qvd-small.png' => 'pixmaps/qvd-small.png'
-		                  'pixmaps/qvd-big.png' => 'pixmaps/qvd-big.png'
+		                  'pixmaps/qvd-small.png' => 'pixmaps/qvd-small.png', 
+		                  'pixmaps/qvd-big.png' => 'pixmaps/qvd-big.png' ,
 		                },
 		desktop_files => {
 				  'desktop/qvd.desktop' => 'desktop/qvd.desktop'
