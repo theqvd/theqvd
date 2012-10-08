@@ -1,0 +1,13 @@
+bin/qvdcmd.pl
+Build.PL
+Changes
+ignore.txt
+lib/QVD/CommandInterpreter.pm
+MANIFEST
+README
+t/00-load.t
+t/100-qvdcmd.t
+t/boilerplate.t
+t/manifest.t
+t/pod-coverage.t
+t/pod.t
