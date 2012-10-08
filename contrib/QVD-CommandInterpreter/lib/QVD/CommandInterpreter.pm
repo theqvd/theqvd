@@ -277,7 +277,7 @@ L<http://search.cpan.org/dist/QVD-CommandInterpreter/>
 
 Copyright 2012 QVD Team.
 
-This program is released under the following license: GLP3
+This program is released under the following license: GPL3
 
 
 =cut
