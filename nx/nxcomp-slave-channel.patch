@@ -1,0 +1,184 @@
+diff -aur nx-old/nxcomp/Loop.cpp nx-new/nxcomp/Loop.cpp
+--- nx-old/nxcomp/Loop.cpp	2010-03-30 15:38:11.000000000 +0200
++++ nx-new/nxcomp/Loop.cpp	2012-10-05 15:24:48.000000000 +0200
+@@ -350,7 +350,7 @@
+ 
+ static int HandleChildren();
+ 
+-static int HandleChild(int child);
++int HandleChild(int child);
+ static int CheckChild(int pid, int status);
+ static int WaitChild(int child, const char *label, int force);
+ 
+@@ -6219,6 +6219,8 @@
+     return 1;
+   }
+ 
++  proxy->checkSlaves();
++
+   //
+   // This can actually happen either because we
+   // reset the pid of the child process as soon
+diff -aur nx-old/nxcomp/Proxy.cpp nx-new/nxcomp/Proxy.cpp
+--- nx-old/nxcomp/Proxy.cpp	2011-06-01 18:04:37.000000000 +0200
++++ nx-new/nxcomp/Proxy.cpp	2012-10-09 13:47:28.000000000 +0200
+@@ -75,6 +75,8 @@
+ 
+ extern void CleanupListeners();
+ 
++extern int HandleChild(int);
++
+ //
+ // Default size of string buffers.
+ //
+@@ -148,6 +150,7 @@
+ 
+     fdMap_[channelId]      = nothing;
+     channelMap_[channelId] = nothing;
++    slavePidMap_[channelId] = nothing;
+   }
+ 
+   inputChannel_  = nothing;
+@@ -6336,42 +6339,89 @@
+ 
+ int Proxy::handleNewSlaveConnectionFromProxy(int channelId)
+ {
+-  //
+-  // Implementation is incomplete. Opening a
+-  // slave channel should let the proxy fork
+-  // a new client and pass to it the channel
+-  // descriptors. For now we make the channel
+-  // fail immediately.
+-  //
+-  // #include <fcntl.h>
+-  // #include <sys/types.h>
+-  // #include <sys/stat.h>
+-  //
+-  // char *slaveServer = "/dev/null";
+-  //
+-  // #ifdef TEST
+-  // *logofs << "Proxy: Opening file '" << slaveServer
+-  //         << "'.\n" << logofs_flush;
+-  // #endif
+-  //
+-  // int serverFd = open(slaveServer, O_RDWR);
+-  //
+-  // if (handlePostConnectionFromProxy(channelId, serverFd, channel_slave, "slave") < 0)
+-  // {
+-  //   return -1;
+-  // }
+-  //
+ 
+-  #ifdef WARNING
+-  *logofs << "Proxy: Refusing new slave connection for "
+-          << "channel ID#" << channelId << "\n"
+-          << logofs_flush;
+-  #endif
++  cerr << "Warning" << ": New slave connection for "
++       << "channel ID#" << channelId << "\n";
+ 
+-  cerr << "Warning" << ": Refusing new slave connection for "
+-          << "channel ID#" << channelId << "\n";
++  char *qvd_slave_cmd = getenv("QVD_SLAVE_CMD");
++  if (qvd_slave_cmd == NULL) {
++    return -1;
++  }
+ 
+-  return -1;
++  int spair[2];
++  if (socketpair(AF_UNIX, SOCK_STREAM, 0, spair) == -1) {
++    perror("socketpair");
++    return -1;
++  }
++
++  int serverFd = spair[0];
++  int clientFd = spair[1];
++
++  if (handlePostConnectionFromProxy(channelId, serverFd, channel_slave, "slave") < 0)
++  {
++    close(serverFd);
++    close(clientFd);
++    return -1;
++  }
++
++
++  int pid = fork();
++  if (pid == 0)
++  {
++
++    if (dup2(clientFd, 0) == -1) 
++    {
++      perror("dup2");
++      exit(1);
++    }
++
++    if (dup2(clientFd, 1) == -1) 
++    {
++      perror("dup2");
++      exit(1);
++    }
++
++    close(serverFd);
++    close(clientFd);
++
++    char *const argv[2] = {qvd_slave_cmd, NULL};
++
++    if (execv(qvd_slave_cmd, argv) == -1) 
++    {
++      perror("execv");
++    }
++    exit(1);
++
++  }
++  else if (pid == -1)
++  {
++    // TODO Test this!
++    perror("fork");
++    close(serverFd);
++    close(clientFd);
++    return -1;
++  }
++
++  slavePidMap_[channelId] = pid;
++  cerr << "Info" << ": channel ID#" << channelId << " handler has PID " << pid << endl;
++
++  return 1;
++}
++
++void Proxy::checkSlaves()
++{
++  for (int channelId = 0; channelId<CONNECTIONS_LIMIT; channelId++) 
++  {
++    int pid = slavePidMap_[channelId];
++
++    if (pid > 1 && HandleChild(pid))
++    {
++      int fd = fdMap_[channelId];
++      shutdown(fd, SHUT_RDWR);
++      slavePidMap_[channelId] = nothing;
++      cerr << "Info:" << " Handled death of slave with pid " << pid << endl;
++    }
++  }
+ }
+ 
+ int Proxy::handlePostConnectionFromProxy(int channelId, int serverFd,
+diff -aur nx-old/nxcomp/Proxy.h nx-new/nxcomp/Proxy.h
+--- nx-old/nxcomp/Proxy.h	2010-01-12 16:32:39.000000000 +0100
++++ nx-new/nxcomp/Proxy.h	2012-10-05 11:10:24.000000000 +0200
+@@ -287,6 +287,8 @@
+ 
+   int handleNewSlaveConnectionFromProxy(int channelId);
+ 
++  void checkSlaves();
++
+   //
+   // Force closure of channels.
+   //
+@@ -1258,6 +1260,7 @@
+ 
+   int channelMap_[CONNECTIONS_LIMIT];
+   int fdMap_[CONNECTIONS_LIMIT];
++  int slavePidMap_[CONNECTIONS_LIMIT];
+ };
+ 
+ #endif /* Proxy_H */
