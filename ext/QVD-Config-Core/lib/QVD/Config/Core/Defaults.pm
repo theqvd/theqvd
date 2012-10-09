@@ -244,6 +244,8 @@ osf.default.overlay = 1
 
 ## so that the VMA exports PULSE_SERVER before xinit invocation and passes the 'media=1' parameter to nxagent
 vma.audio.enable = 0
+## enables "slave channel" in nxagent
+vma.slave.enable = 0
 ## enables the printing channel in nxagent
 vma.printing.enable = 0
 ## path to the VMA PID file

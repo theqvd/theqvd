@@ -37,6 +37,7 @@ my $nxdiag          = cfg('command.nxdiag');
 my $x_session       = cfg('command.x-session');
 my $xinit           = cfg('command.xinit');
 my $enable_audio    = cfg('vma.audio.enable');
+my $enable_slave    = cfg('vma.slave.enable');
 my $enable_printing = cfg('vma.printing.enable');
 my $printing_conf   = cfg('internal.vma.printing.config');
 my $nxagent_conf    = cfg('internal.vma.nxagent.config');
@@ -529,6 +530,7 @@ sub _make_nxagent_config {
     }
 
     push @nx_args, 'media=1' if $enable_audio;
+    push @nx_args, 'slave=1' if $enable_slave;
 
     if ($enable_printing) {
 	# FIXME: check that printing is also enabled on the client
