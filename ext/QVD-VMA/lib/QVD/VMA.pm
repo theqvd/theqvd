@@ -27,7 +27,6 @@ use feature qw(switch say);
 use QVD::Config;
 use QVD::Log;
 use Config::Properties;
-use IO::Socket::INET;
 
 use parent 'QVD::SimpleRPC::Server';
 
@@ -36,7 +35,6 @@ my $run_path        = cfg('path.run');
 my $nxagent         = cfg('command.nxagent');
 my $nxdiag          = cfg('command.nxdiag');
 my $x_session       = cfg('command.x-session');
-my $socat           = cfg('command.socat');
 my $xinit           = cfg('command.xinit');
 my $enable_audio    = cfg('vma.audio.enable');
 my $enable_printing = cfg('vma.printing.enable');
@@ -109,7 +107,6 @@ my %nx2x = ( initiating   => 'starting',
 my %running   = map { $_ => 1 } qw(listening connected suspending suspended);
 my %connected = map { $_ => 1 } qw(listening connected);
 
-my $socat_pid;
 
 sub _open_log {
     my $name = shift;
@@ -276,7 +273,6 @@ sub _delete_nxagent_state_and_pid_and_call_hook {
     unlink $nxagent_state_fn;
     _call_printing_hook;
     _call_state_hook;
-    _kill_socat();
 }
 
 sub _timestamp {
@@ -290,11 +286,6 @@ sub _provisionate_user {
     my $uid = $props{'qvd.vm.user.uid'};
     my $user_home = $props{'qvd.vm.user.home'};
     my $groups = $props{'qvd.vm.user.groups'};
-
-    if ($props{'qvd.client.serial.port'}) {
-        $groups .= ", " if ($groups);
-        $groups .= cfg('vma.user.socat.group');
-    }
 
     $groups =~ s/\s//g;
 
@@ -448,10 +439,6 @@ sub _fork_monitor {
 			DEBUG "Session $1, calling hooks";
 			_save_nxagent_state_and_call_hook lc $1;
 		    }
-		    when (/Listening to HTTP connections on port '(\d+)'/) {
-			DEBUG "Starting socat on port $1";
-			_fork_socat($1, %props);
-		    }
 
 		}
 		print $line;
@@ -462,92 +449,6 @@ sub _fork_monitor {
 	_delete_nxagent_state_and_pid_and_call_hook;
     }
 }
-
-sub _fork_socat {
-	my ($port, %props) = @_;
-
-	my $socket = $props{'qvd.client.serial.port'};
-
-
-	if ( !$socket ) {
-		DEBUG "Serial redirection requested, but the serial port is not set";
-		return;
-	}
-
-
-	if ( $socat_pid ) {
-		WARN "Socat was already running, killing";
-		_kill_socat();
-	}
-
-	my $user  = cfg('vma.user.socat.user') || $props{'qvd.vm.user.name'};
-	my $group = cfg('vma.user.socat.group');
-	my $mode  = cfg('vma.user.socat.mode');
-
-	my @args = ("PTY,link=$socket,raw,echo=0,mode=$mode,group=$group" . ( $user ? ",user=$user" : "" ), "tcp:localhost:$port,nonblock,reuseaddr,retry=5");
-
-	if ( cfg('internal.vma.socat.debug') ) {
-		DEBUG "Enabling debug options for socat";
-		unshift @args, "-x", "-v";
-	}
-
-
-	
-	DEBUG "Calling $socat " . join(' ', @args);
-	$SIG{CHLD} = 'IGNORE';
-	my $pid = fork;
-
-	if (!$pid) {
-		defined $pid or die "fork failed: $!\n";
-		eval {
-			$| = 1;
-			my $log = _open_log('socat');
-			my $logfd = fileno $log;
-			POSIX::dup2($logfd, 1);
-			POSIX::dup2($logfd, 2);
-			open STDIN, '<', '/dev/null';
-
-			print "exec: $socat " . join(' ', @args) . "\n";
-			do { exec $socat, @args };
-			die "exec failed: $!\n";
-		};
-	} else {
-		if ( $@ ) {
-			ERROR "execution of socat failed: $@";
-		} else {
-			DEBUG "socat started with pid $pid";
-			$socat_pid = $pid;
-		}
-	}
-	
-	return undef;
-}
-
-sub _kill_socat {
-	my $timeout = 3;
-	my $signalled;
-
-	if ( !$socat_pid ) {
-		DEBUG "Socat not running, killing not needed";
-		return;
-	}
-
-
-	DEBUG "Stopping socat, sending SIGTERM";
-	while( ($timeout-- > 0) && ($signalled = kill('TERM', $socat_pid)) ) {
-		sleep 1;
-	}
-
-	if ($signalled) {
-		DEBUG "Failed to stop socat normally, sending SIGKILL";
-		kill 'KILL', $socat_pid;
-	} else {
-		DEBUG "Socat stopped";
-	}
-
-	undef $socat_pid;
-}
-
 
 sub _state {
     -f $nxagent_state_fn or return 'stopped'; # shortcut!
@@ -628,7 +529,6 @@ sub _make_nxagent_config {
     }
 
     push @nx_args, 'media=1' if $enable_audio;
-    push @nx_args, 'http=1' if $props{'qvd.client.serial.port'};
 
     if ($enable_printing) {
 	# FIXME: check that printing is also enabled on the client
@@ -656,7 +556,6 @@ sub _start_session {
             _make_nxagent_config(%props);
 	    kill HUP => $pid;
 	    _call_action_hook(connect => %props);
-	    _kill_socat();
 	}
 	when ('connected') {
 	    DEBUG "suspend and fail";
