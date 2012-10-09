@@ -1,9 +1,13 @@
 bin/qvdcmd
+bin/qvdconnect
 Build.PL
 Changes
 ignore.txt
 lib/QVD/CommandInterpreter.pm
+lib/QVD/CommandInterpreter/Client.pm
+Makefile.PL
 MANIFEST
+META.yml
 pod2htmd.tmp
 pod2htmi.tmp
 README
@@ -13,4 +17,3 @@ t/boilerplate.t
 t/manifest.t
 t/pod-coverage.t
 t/pod.t
-Makefile.PL

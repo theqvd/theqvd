@@ -1,0 +1,46 @@
+#!/usr/bin/perl -w
+use strict;
+use Getopt::Long;
+use IO::Socket::INET;
+use QVD::CommandInterpreter::Client;
+
+my ($help);
+my $interpreter_addr = "localhost:2000";
+my $remote_addr;
+
+my $cmd_connect_serial;
+my $cmd_getversion;
+my $cmd_gethelp;
+
+GetOptions("help"                => \$help,
+           "interpreter|i=s"     => \$interpreter_addr,
+           "serial|s=s"          => \$cmd_connect_serial,
+           "getversion"          => \$cmd_getversion,
+           "gethelp"             => \$cmd_gethelp,
+           "remote|r=s"          => \$remote_addr
+ ) or die "Getopt failed: $!";
+
+if ( $help ) {
+	print <<HELP;
+Syntax: $0 [arguments]
+
+HELP
+}
+
+my $client = new QVD::CommandInterpreter::Client();
+
+if ( $cmd_getversion ) {
+	print $client->version() . "\n";
+} elsif ( $cmd_gethelp ) {
+	print $client->help() . "\n";
+} elsif ( $cmd_connect_serial ) {
+	if ( !$remote_addr ) {
+		print STDERR "Error: --remote argument required\n";
+		exit(1);
+	} else {
+		my $socat = $client->socat($cmd_connect_serial);
+		exec("/usr/bin/socat", "-v", "-", "tcp:$remote_addr,nonblock,reuseaddr,retry=5");
+	}
+}
+
+

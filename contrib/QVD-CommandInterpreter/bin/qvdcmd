@@ -3,7 +3,7 @@ use strict;
 use lib 'lib';
 use Getopt::Long;
 use QVD::CommandInterpreter;
-
+use IO::Socket::INET;
 
 # Protocol:
 #
@@ -37,14 +37,15 @@ my $config_file = "/etc/qvd/qvdcmd.conf";
 my $debug;
 my $help;
 my %args;
-
+my $listen;
 
 delete $ENV{PATH};
 
 GetOptions(
 	"config|c=s"    => \$config_file,
 	"debug|D"       => \$debug,
-	"help|h"        => \$help
+	"help|h"        => \$help,
+        "listen|l=i"    => \$listen
 ) or die "Bad arguments";
 
 if ( $help ) {
@@ -85,10 +86,40 @@ if ( $config_file && -f $config_file ) {
 
 }
 
+if ( $listen ) {
+	my $listener = new IO::Socket::INET(Listen    => 5,
+	                                    LocalAddr => 'localhost',
+	                                    LocalPort => $listen);
 
-my $cmd = new QVD::CommandInterpreter( %args );
-$cmd->run();
+	if ( !$listener ) {
+		die "Failed to listen on port $listen";
+	}
 
+	while(my $socket = $listener->accept()) {
+		my $fileno = fileno($socket);
+
+		if ( defined $fileno ) {
+			my $pid = fork();
+
+			if ( !$pid ) {
+				open(STDIN, "<&$fileno") or die "Can't reopen stdin: $!";
+				open(STDOUT, ">&$fileno") or die "Can't reopen stdout: $!";
+				STDIN->autoflush(1);
+				STDOUT->autoflush(1);
+				print "Connected\n";
+				my $cmd = new QVD::CommandInterpreter( %args );
+				$cmd->run();
+				$socket->shutdown(2);
+				exit(0);
+			}
+		} else {
+			die "no file handle!";
+		}
+	}
+} else {
+	my $cmd = new QVD::CommandInterpreter( %args );
+	$cmd->run();
+}
 
 sub untaint {
 	my $arg = shift;
