@@ -227,6 +227,10 @@ sub _err {
 	print $msg;
 }
 
+=head1 SEE ALSO
+
+L<QVD::CommandInterpreter::Client>
+
 =head1 AUTHOR
 
 QVD Team, C<< <qvd at qindel.com> >>
