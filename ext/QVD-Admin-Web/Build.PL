@@ -6,11 +6,13 @@ use warnings;
 use Module::Build;
 
 my $apache_dst; 
-
+my $apache_conf;
 if ( -f '/etc/debian_version' ) {
+	$apache_conf = 'qvd-wat.conf';
 	$apache_dst = '/etc/apache2/sites-available' ;
 }
 else {
+	$apache_conf = 'qvd-wat-suse.conf';
 	$apache_dst = '/etc/apache2/conf.d'; 
 }
 
@@ -44,7 +46,7 @@ my $build = new Module::Build(
 		'QVD::Log'                           => 0,
 		'Config::General'                    => 0
 	}, 
-	etc_files=> { 'etc/apache2/sites-available/qvd-wat.conf' => "$apache_dst/qvd-wat.conf" },
+	etc_files=> { "etc/apache2/sites-available/$apache_conf"  => "$apache_dst/qvd-wat.conf" },
 	install_path => { 'etc' => '/etc' },
 );
 
