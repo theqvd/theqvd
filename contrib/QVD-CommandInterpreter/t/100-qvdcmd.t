@@ -32,7 +32,7 @@ chmod 0755, "$dir/testscript.sh";
 
 
 expect_run(
-	command => "bin/qvdcmd.pl -c $dir/qvdcmd.conf",
+	command => "bin/qvdcmd -c $dir/qvdcmd.conf",
 	prompt  => "\n> ",
 	quit    => 'quit'
 );
