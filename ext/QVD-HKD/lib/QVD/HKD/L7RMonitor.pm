@@ -10,6 +10,7 @@ BEGIN { *debug = \$QVD::HKD::debug }
 our $debug;
 
 use parent qw(QVD::HKD::Agent);
+use QVD::Log;
 
 use QVD::StateMachine::Declarative
     new                => { transitions => { _on_run => 'getting_user_cmd' }},
@@ -76,11 +77,12 @@ sub _on_rpc_x_suspend_error { shift->_on_disconnect_user_done }
 
 sub _search_dead_l7r {
     my $self = shift;
+    DEBUG "searching for L7R processes running on this host $self->{node_id}";
     $self->_query(<<'EOQ', $self->{node_id});
 select vm_id, l7r_pid
   from vm_runtimes
   where l7r_host = $1
-    and l7r_pid != NULL
+    and l7r_pid is not NULL
   limit 1
 EOQ
 }
@@ -89,7 +91,9 @@ sub _on_search_dead_l7r_result {
     my ($self, $res) = @_;
     for my $row ($res->rows) {
         my ($vm_id, $l7r_pid) = $res->row;
+        DEBUG "checking L7R process $l7r_pid corresponding to VM $vm_id";
         unless (kill 0, $l7r_pid) {
+            ERROR "L7R process $l7r_pid for VM $vm_id does not exist anymore";
             $self->{_dead_l7r_vm_id} = $vm_id;
             last;
         }
@@ -99,27 +103,34 @@ sub _on_search_dead_l7r_result {
 
 sub _clean_dead_l7r {
     my $self = shift;
-    if (defined(my $vm_id = $self->{_dead_l7r_vm_id})) {
+    my $vm_id = delete $self->{_dead_l7r_vm_id};
+    if (defined $vm_id) {
+        INFO "clearing L7R data for VM $vm_id running here, in host $self->{node_id}";
         $self->_query_1(<<'EOQ', $vm_id, $self->{node_id}),
 update vm_runtimes
-  set    ('user_state'  , 'user_cmd', 'l7r_host', 'l7r_pid')
-  values ('disconnected', NULL      , NULL      , NULL     )
+  set (user_state, user_cmd, l7r_host, l7r_pid) = ('disconnected', NULL, NULL, NULL)
   where vm_id    = $1
     and l7r_host = $2
 EOQ
     }
     else {
+        DEBUG "all the L7R processes on this host are alive and kicking!";
         $self->_on_clean_dead_l7r_done
     }
 }
 
-sub _on_clean_dead_l7r_result { shift->{actions_done}++ }
+sub _on_clean_dead_l7r_result {
+    my ($self, $res) = @_;
+    $self->{_actions_done} += $res->cmdRows;
+}
 
 sub _set_timer {
     my $self = shift;
-    my $delay = (delete($self->{_actions_done})
-                 ? $self->_cfg('internal.hkd.agent.l7rmonitor.delay.short')
-                 : $self->_cfg('internal.hkd.agent.l7rmonitor.delay.long'));
+    my $actions_done = delete($self->{_actions_done}) // 0;
+    DEBUG "actions done in this run: $actions_done";
+    my $delay = ( $actions_done
+                  ? $self->_cfg('internal.hkd.agent.l7rmonitor.delay.short')
+                  : $self->_cfg('internal.hkd.agent.l7rmonitor.delay.long' ) );
     $self->_call_after($delay, '_on_timeout');
 }
 
