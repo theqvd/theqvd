@@ -2,6 +2,8 @@ package QVD::CommandInterpreter;
 
 use warnings;
 use strict;
+use Log::Log4perl;
+
 
 =head1 NAME
 
@@ -66,6 +68,8 @@ sub new {
 
 	bless $self, $class;
 
+	$self->{log} = Log::Log4perl->get_logger('QVD::CommandInterpreter');
+
 	$self->{commands} = {
 		version => \&cmd_version,
 		help    => \&cmd_help,
@@ -100,6 +104,8 @@ sub run {
 	while(!$self->{done}) {
 		$self->_out( "\n> " );
 		my $line = <STDIN>;
+		last unless ($line);
+
 		chomp $line;
 		my ($command, @args) = split(/\s+/, $line);
 		next unless ($command);
@@ -118,6 +124,7 @@ Executes a single command with the specified arguments
 sub run_command {
 	my ($self, $command, @args) = @_;
 	if ( exists $self->{commands}->{$command} ) {
+		$self->{log}->debug("Command: $command " . join(' ', @args));
 		$self->{commands}->{$command}->($self, @args);
 	} else {
 		$self->_err("ERROR: Unknown command '$command'. Try 'help'.\n");
@@ -155,7 +162,7 @@ Quits the interpreter if called from whithin L</run>
 
 sub cmd_quit {
 	my ($self, @args) = @_;
-
+	$self->{log}->info("Quit command received");
 	$self->_out("Bye.\n");
 	$self->{done} = 1;
 }
@@ -190,6 +197,8 @@ sub cmd_socat {
 				push @extra_args, "-v", "-lf/tmp/qvdcmd-socat.log";
 			}
 
+			$self->{log}->info("Starting socat on port $cport");
+			$self->_out("OK\n");
 			exec($self->{config}->{socat}, @extra_args, "-", "$cport,nonblock,raw,echo=0");
 		}
 	}
@@ -224,6 +233,7 @@ sub _out {
 
 sub _err {
 	my ($self, $msg) = @_;
+	$self->{log}->error($msg);
 	print $msg;
 }
 

@@ -2,6 +2,7 @@
 package QVD::CommandInterpreter::Client;
 use strict;
 use IO::Socket::INET;
+use Log::Log4perl;
 
 =head1 NAME
 
@@ -37,8 +38,8 @@ sub new {
 	my ($class, %opts) = @_;
 	my $self = {};
 
-	$self->{host} = $opts{host} // 'localhost';
-	$self->{port} = $opts{port} // 2000;
+	$self->{log}  = Log::Log4perl->get_logger('QVD::CommandInterpreter::Client');
+	$self->{host} = $opts{host} // 'localhost:2000';
 	bless $self, $class;
 
 	$self->_connect();
@@ -48,13 +49,15 @@ sub new {
 sub _connect {
 	my ($self) = @_;
 
-	my $addr = $self->{host} . ( $self->{port} ? ":" . $self->{port} : "");
+	my $addr = $self->{host};
+
+	$self->{log}->debug("Connecting to QVD::CommandInterpreter on $addr");
 
 	$self->{sock} = new IO::Socket::INET(PeerAddr => $addr );
 	if ( !$self->{sock} ) {
 		die "Failed to connect to $addr";
 	}
-
+	$self->{log}->debug("Connected");
 	$self->{sock}->autoflush(1);
 	$self->_wait_prompt();
 }
@@ -98,8 +101,20 @@ sub socat {
 	my ($self, $port) = @_;
 	my $sock = $self->{sock};
 
+	$self->{log}->debug("Sending command: socat $port");
 	print $sock "socat $port\n";
-	return $self->{sock};
+
+	$self->{log}->debug("Waiting for answer");
+	my $answer = <$sock>;
+
+	$self->{log}->debug("Answer is: $answer");
+	if ( $answer =~ /^OK/ ) {
+		$self->{log}->debug("Remote socat successful");
+		return $self->{sock};
+	} else {
+		$self->{log}->error("Remote socat error: $answer");
+		die "Server refused to connect port: $answer";
+	}
 }
 
 
@@ -119,7 +134,11 @@ sub quit {
 sub _send_cmd {
 	my ($self, @cmd) = @_;
 	my $sock = $self->{sock};
-	print $sock join(' ', @cmd) . "\n";
+	my $cmdstr = join(' ', @cmd); 
+
+	$self->{log}->debug("Sending command: $cmdstr");
+
+	print $sock "$cmdstr\n";
 	return $self->_wait_prompt();
 }
 
@@ -134,6 +153,7 @@ sub _wait_prompt {
 	my $whole_lines = ""; # entirely received lines
 	my $data;             # received block of data
 
+	$self->{log}->debug("Waiting for prompt");
 	while(defined ($status = $sock->recv($data, 512))) {
 		#print STDERR "READ: '$data'\n";
 
@@ -152,6 +172,7 @@ sub _wait_prompt {
 
 			chomp $whole_lines;
 			chomp $whole_lines;
+			$self->{log}->debug("Prompt found");
 			return $whole_lines;
 		}
 
@@ -159,6 +180,7 @@ sub _wait_prompt {
 
 	chomp $whole_lines;
 	chomp $whole_lines;
+	$self->{log}->debug("Socket was closed");
 	return $whole_lines;
 }
 

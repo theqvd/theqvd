@@ -4,6 +4,8 @@ use lib 'lib';
 use Getopt::Long;
 use QVD::CommandInterpreter;
 use IO::Socket::INET;
+use Log::Log4perl qw(:easy);
+use POSIX ":sys_wait_h";
 
 # Protocol:
 #
@@ -39,6 +41,17 @@ my $help;
 my %args;
 my $listen;
 
+my $log_config = '/etc/qvd/qvdcmd-log.conf';
+if ( -f $log_config ) {
+	Log::Log4perl::init($log_config);
+} else {
+	Log::Log4perl::easy_init($ERROR);
+}
+
+my $log = Log::Log4perl->get_logger('qvdcmd');
+$SIG{__WARN__} = sub { $log->warn(shift); };
+$SIG{__DIE__}  = sub { $log->error(shift); };
+
 delete $ENV{PATH};
 
 GetOptions(
@@ -64,6 +77,9 @@ HELP
 $args{options} = {
 	debug => $debug
 };
+use File::Temp qw(tempdir);
+use Proc::Background;
+
 
 # Untaint the config file. The taint check is for the data coming
 # from the socket.
@@ -71,6 +87,8 @@ $args{options} = {
 $config_file = untaint($config_file);
 
 if ( $config_file && -f $config_file ) {
+	$log->info("Loading config file $config_file");
+
 	eval {
 		$args{config} = do($config_file);
 	};
@@ -87,6 +105,11 @@ if ( $config_file && -f $config_file ) {
 }
 
 if ( $listen ) {
+	my $terminate = 0;
+	my $term_sig  = "";
+
+	$log->info("Listening on localhost, port $listen");
+
 	my $listener = new IO::Socket::INET(Listen    => 5,
 	                                    LocalAddr => 'localhost',
 	                                    LocalPort => $listen);
@@ -95,13 +118,24 @@ if ( $listen ) {
 		die "Failed to listen on port $listen";
 	}
 
-	while(my $socket = $listener->accept()) {
+	#$SIG{CHLD} = sub { while( waitpid( -1, &WNOHANG ) > 0 ) {} };
+	$SIG{HUP}  = 'IGNORE';
+	$SIG{TERM} = sub { $terminate = 1; $term_sig = "SIGTERM" };
+	$SIG{INT}  = sub { $terminate = 1; $term_sig = "SIGINT" };
+
+	while((!$terminate) && (my $socket = $listener->accept())) {
 		my $fileno = fileno($socket);
+
+		$log->info("Accepted connection");
 
 		if ( defined $fileno ) {
 			my $pid = fork();
 
 			if ( !$pid ) {
+				#$SIG{CHLD} = 'DEFAULT';
+				$SIG{TERM} = 'DEFAULT';
+				$SIG{INT}  = 'DEFAULT';
+
 				open(STDIN, "<&$fileno") or die "Can't reopen stdin: $!";
 				open(STDOUT, ">&$fileno") or die "Can't reopen stdout: $!";
 				STDIN->autoflush(1);
@@ -110,12 +144,26 @@ if ( $listen ) {
 				my $cmd = new QVD::CommandInterpreter( %args );
 				$cmd->run();
 				$socket->shutdown(2);
+
+				$log->debug("Child process $$ exiting");
 				exit(0);
+			} else {
+				$log->debug("Started child $pid");
 			}
 		} else {
 			die "no file handle!";
 		}
 	}
+	
+	if ( $terminate ) {
+		$log->info("Terminating due to signal $term_sig");
+	} else {
+		$log->info("Listener terminated, odd");
+	}
+	$listener->shutdown(2);
+	$listener->close();
+
+	
 } else {
 	my $cmd = new QVD::CommandInterpreter( %args );
 	$cmd->run();

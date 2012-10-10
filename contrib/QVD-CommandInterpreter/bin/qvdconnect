@@ -1,8 +1,10 @@
 #!/usr/bin/perl -w
 use strict;
+use lib 'lib';
 use Getopt::Long;
 use IO::Socket::INET;
 use QVD::CommandInterpreter::Client;
+use Log::Log4perl qw(:easy);
 
 my ($help);
 my $interpreter_addr = "localhost:2000";
@@ -27,7 +29,20 @@ Syntax: $0 [arguments]
 HELP
 }
 
-my $client = new QVD::CommandInterpreter::Client();
+
+my $log_config = '/etc/qvd/qvdconnect-log.conf';
+if ( -f $log_config ) {
+	Log::Log4perl::init($log_config);
+} else {
+	Log::Log4perl::easy_init($ERROR);
+}
+my $log = Log::Log4perl->get_logger('qvdcmd');
+$SIG{__WARN__} = sub { $log->warn(shift); };
+$SIG{__DIE__}  = sub { $log->error(shift); };
+
+
+
+my $client = new QVD::CommandInterpreter::Client(host => $interpreter_addr);
 
 if ( $cmd_getversion ) {
 	print $client->version() . "\n";
@@ -39,7 +54,17 @@ if ( $cmd_getversion ) {
 		exit(1);
 	} else {
 		my $socat = $client->socat($cmd_connect_serial);
-		exec("/usr/bin/socat", "-v", "-", "tcp:$remote_addr,nonblock,reuseaddr,retry=5");
+		if ( $socat ) {
+			$log->info("Remote socat started, connecting to $remote_addr");
+			print "Remote socat started\n";
+		}
+
+		my $fileno = fileno($socat);
+		open(STDIN, "<&$fileno") or die "Can't reopen stdin: $!";
+		open(STDOUT, ">&$fileno") or die "Can't reopen stdout: $!";
+		STDIN->autoflush(1);
+		STDOUT->autoflush(1);
+		exec("/usr/bin/socat", "-", "tcp:$remote_addr,nonblock,reuseaddr,retry=5");
 	}
 }
 

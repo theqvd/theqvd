@@ -9,26 +9,8 @@ use Proc::Background;
 delete $ENV{PATH};
 
 my $dir = tempdir( CLEANUP => 1 );
+create_temp_conf($dir);
 
-open(CONF, ">", "$dir/qvdcmd.conf") or die "Can't create config $dir/qvdcmd.conf: $!";
-print CONF <<CONFIG;
-{
-        socat => '/usr/bin/socat',
-        allowed_ports => [ qr#^$dir/testport\\d+# ]
-};
-CONFIG
-close(CONF);
-
-open(SCRIPT, ">", "$dir/testscript.sh") or die "Can't create script $dir/testscript.sh: $!";
-print SCRIPT <<SCRIPTDATA;
-#!/bin/bash
-echo socat test
-echo
-echo "> "
-sleep 1
-SCRIPTDATA
-close(SCRIPT);
-chmod 0755, "$dir/testscript.sh";
 
 
 expect_run(
@@ -64,5 +46,29 @@ expect_send("socat $dir/testport0", "Test socat with simulated port");
 expect_like(qr/socat test/, "Test data received");
 
 
+sub create_temp_conf {
+	my $dir = shift;
 
+	open(CONF, ">", "$dir/qvdcmd.conf") or die "Can't create config $dir/qvdcmd.conf: $!";
+	print CONF <<CONFIG;
+{
+	socat => '/usr/bin/socat',
+	allowed_ports => [ qr#^$dir/testport\\d+# ]
+};
+CONFIG
+	close(CONF);
+
+	open(SCRIPT, ">", "$dir/testscript.sh") or die "Can't create script $dir/testscript.sh: $!";
+	print SCRIPT <<SCRIPTDATA;
+#!/bin/bash
+echo socat test
+echo
+echo "> "
+sleep 1
+SCRIPTDATA
+	close(SCRIPT);
+	chmod 0755, "$dir/testscript.sh";
+
+	return $dir;
+}
 
