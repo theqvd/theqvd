@@ -7,6 +7,7 @@ bin/qvd_admin_web_server.pl
 bin/qvd_admin_web_test.pl
 Build.PL
 Changes
+etc/apache2/sites-available/qvd-wat-suse.conf
 etc/apache2/sites-available/qvd-wat.conf
 lib/QVD/Admin/Web.pm
 lib/QVD/Admin/Web/Controller/Di.pm
@@ -16,6 +17,7 @@ lib/QVD/Admin/Web/Controller/Root.pm
 lib/QVD/Admin/Web/Controller/Users.pm
 lib/QVD/Admin/Web/Controller/Vm.pm
 lib/QVD/Admin/Web/Model/QVD/Admin/Web.pm
+lib/QVD/Admin/Web/qvd_admin_web.conf
 lib/QVD/Admin/Web/root/about.tt
 lib/QVD/Admin/Web/root/di/add.tt
 lib/QVD/Admin/Web/root/di/list.tt
@@ -1251,7 +1253,6 @@ lib/QVD/Admin/Web/View/TTMin.pm
 MANIFEST			This list of files
 MANIFEST.SKIP
 META.json
-qvd_admin_web.conf
 README
 t/01app.t
 t/02pod.t
