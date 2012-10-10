@@ -1,5 +1,5 @@
-diff -aur nx-old/nxcomp/Loop.cpp nx-new/nxcomp/Loop.cpp
---- nx-old/nxcomp/Loop.cpp	2010-03-30 15:38:11.000000000 +0200
+diff -aur nx-orig/nxcomp/Loop.cpp nx-new/nxcomp/Loop.cpp
+--- nx-orig/nxcomp/Loop.cpp	2010-03-30 15:38:11.000000000 +0200
 +++ nx-new/nxcomp/Loop.cpp	2012-10-05 15:24:48.000000000 +0200
 @@ -350,7 +350,7 @@
  
@@ -19,9 +19,9 @@ diff -aur nx-old/nxcomp/Loop.cpp nx-new/nxcomp/Loop.cpp
    //
    // This can actually happen either because we
    // reset the pid of the child process as soon
-diff -aur nx-old/nxcomp/Proxy.cpp nx-new/nxcomp/Proxy.cpp
---- nx-old/nxcomp/Proxy.cpp	2011-06-01 18:04:37.000000000 +0200
-+++ nx-new/nxcomp/Proxy.cpp	2012-10-09 13:47:28.000000000 +0200
+diff -aur nx-orig/nxcomp/Proxy.cpp nx-new/nxcomp/Proxy.cpp
+--- nx-orig/nxcomp/Proxy.cpp	2011-06-01 18:04:37.000000000 +0200
++++ nx-new/nxcomp/Proxy.cpp	2012-10-10 13:14:56.000000000 +0200
 @@ -75,6 +75,8 @@
  
  extern void CleanupListeners();
@@ -74,7 +74,7 @@ diff -aur nx-old/nxcomp/Proxy.cpp nx-new/nxcomp/Proxy.cpp
 -          << "channel ID#" << channelId << "\n"
 -          << logofs_flush;
 -  #endif
-+  cerr << "Warning" << ": New slave connection for "
++  cerr << "Info" << ": New slave connection on "
 +       << "channel ID#" << channelId << "\n";
  
 -  cerr << "Warning" << ": Refusing new slave connection for "
@@ -139,8 +139,10 @@ diff -aur nx-old/nxcomp/Proxy.cpp nx-new/nxcomp/Proxy.cpp
 +    return -1;
 +  }
 +
++  close(clientFd);
 +  slavePidMap_[channelId] = pid;
-+  cerr << "Info" << ": channel ID#" << channelId << " handler has PID " << pid << endl;
++
++  cerr << "Info" << ": slave channel ID#" << channelId << " handler has PID " << pid << endl;
 +
 +  return 1;
 +}
@@ -153,8 +155,6 @@ diff -aur nx-old/nxcomp/Proxy.cpp nx-new/nxcomp/Proxy.cpp
 +
 +    if (pid > 1 && HandleChild(pid))
 +    {
-+      int fd = fdMap_[channelId];
-+      shutdown(fd, SHUT_RDWR);
 +      slavePidMap_[channelId] = nothing;
 +      cerr << "Info:" << " Handled death of slave with pid " << pid << endl;
 +    }
@@ -162,8 +162,8 @@ diff -aur nx-old/nxcomp/Proxy.cpp nx-new/nxcomp/Proxy.cpp
  }
  
  int Proxy::handlePostConnectionFromProxy(int channelId, int serverFd,
-diff -aur nx-old/nxcomp/Proxy.h nx-new/nxcomp/Proxy.h
---- nx-old/nxcomp/Proxy.h	2010-01-12 16:32:39.000000000 +0100
+diff -aur nx-orig/nxcomp/Proxy.h nx-new/nxcomp/Proxy.h
+--- nx-orig/nxcomp/Proxy.h	2010-01-12 16:32:39.000000000 +0100
 +++ nx-new/nxcomp/Proxy.h	2012-10-05 11:10:24.000000000 +0200
 @@ -287,6 +287,8 @@
  
