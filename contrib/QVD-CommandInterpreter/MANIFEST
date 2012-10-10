@@ -13,6 +13,7 @@ pod2htmi.tmp
 README
 t/00-load.t
 t/100-qvdcmd.t
+t/200-qvdconnect.t
 t/boilerplate.t
 t/manifest.t
 t/pod-coverage.t
