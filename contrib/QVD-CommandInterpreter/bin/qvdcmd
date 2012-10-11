@@ -6,6 +6,7 @@ use QVD::CommandInterpreter;
 use IO::Socket::INET;
 use Log::Log4perl qw(:easy);
 use POSIX ":sys_wait_h";
+$| = 1;
 
 # Protocol:
 #
