@@ -9,6 +9,7 @@ use Log::Log4perl qw(:easy);
 my ($help);
 my $interpreter_addr = "localhost:2000";
 my $remote_addr;
+my $localport;
 
 my $cmd_connect_serial;
 my $cmd_getversion;
@@ -19,7 +20,8 @@ GetOptions("help"                => \$help,
            "serial|s=s"          => \$cmd_connect_serial,
            "getversion"          => \$cmd_getversion,
            "gethelp"             => \$cmd_gethelp,
-           "remote|r=s"          => \$remote_addr
+           "remote|r=s"          => \$remote_addr,
+           "localport=s"         => \$localport
  ) or die "Getopt failed: $!";
 
 if ( $help ) {
@@ -49,13 +51,13 @@ if ( $cmd_getversion ) {
 } elsif ( $cmd_gethelp ) {
 	print $client->help() . "\n";
 } elsif ( $cmd_connect_serial ) {
-	if ( !$remote_addr ) {
+	if ( ! ($remote_addr || $localport) ) {
 		print STDERR "Error: --remote argument required\n";
 		exit(1);
 	} else {
 		my $socat = $client->socat($cmd_connect_serial);
 		if ( $socat ) {
-			$log->info("Remote socat started, connecting to $remote_addr");
+			$log->info("Remote socat started, connecting to " . ($remote_addr ? $remote_addr : $localport) );
 			print "Remote socat started\n";
 		}
 
@@ -64,7 +66,11 @@ if ( $cmd_getversion ) {
 		open(STDOUT, ">&$fileno") or die "Can't reopen stdout: $!";
 		STDIN->autoflush(1);
 		STDOUT->autoflush(1);
-		exec("/usr/bin/socat", "-", "tcp:$remote_addr,nonblock,reuseaddr,retry=5");
+		if ( $remote_addr ) {
+			exec("/usr/bin/socat", "-", "tcp:$remote_addr,nonblock,reuseaddr,retry=5");
+		} elsif ( $localport ) {
+			exec("/usr/bin/socat", "-", "PTY,link=$localport,raw,echo=0");
+		}
 	}
 }
 
