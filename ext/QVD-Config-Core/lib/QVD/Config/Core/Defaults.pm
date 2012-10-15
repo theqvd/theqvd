@@ -84,11 +84,11 @@ command.lxc-stop = /usr/lib/qvd/bin/lxc-stop
 command.lxc-wait = /usr/lib/qvd/bin/lxc-wait
 command.ebtables = ebtables
 command.iptables = iptables
-command.socat = /usr/bin/socat
 command.modprobe = /sbin/modprobe
 command.xinit = /usr/bin/xinit
 command.xhost = /usr/bin/xhost
 command.nxproxy = /usr/bin/nxproxy
+command.qvdcmd = /usr/lib/qvd/bin/qvdcmd
 
 command.windows.xming = Xming\\Xming.exe
 command.windows.pulseaudio = pulseaudio\\pulseaudio.exe
@@ -120,15 +120,6 @@ client.user.name =
 ## whether to use SSL in the client↔server communication or not
 client.use_ssl = 1
 client.ssl.use_cert = 0
-
-# Port where to run socat
-client.socat.port = 2002
-client.socat.timeout = 10
-client.serial.enabled = 0
-client.serial.local =
-client.serial.remote =
-
-
 
 ## umask for the L7R process
 l7r.user.umask = 0022
@@ -262,10 +253,6 @@ vma.user.home.path = /home
 ## default user name and groups it will belong to
 vma.user.default.name = qvd
 vma.user.default.groups =
-## If user is not set, the port is owned by the user that is logging in
-vma.user.socat.user =
-vma.user.socat.group = dialout
-vma.user.socat.mode = 0660
 
 # When using LXC if this flag is set, QVD will assume that the home
 # directories are not per virtual machine but per user and that they
@@ -351,8 +338,6 @@ internal.vma.on_printing.stopped = /usr/lib/qvd/bin/qvd-printing
 
 internal.vma.printing.config = ${path.run}/printing.conf
 internal.vma.nxagent.config = ${path.run}/nxagent.conf
-
-internal.vma.socat.debug = 0
 
 internal.database.client.connect.timeout = 20
 internal.database.client.socket.keepidle = 20

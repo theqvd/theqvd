@@ -13,7 +13,6 @@ use constant EVT_LIST_OF_VM_LOADED => Wx::NewEventType;
 use constant EVT_CONNECTION_ERROR  => Wx::NewEventType;
 use constant EVT_CONN_STATUS       => Wx::NewEventType;
 use constant EVT_UNKNOWN_CERT      => Wx::NewEventType;
-use constant EVT_SOCAT_ERROR       => Wx::NewEventType;
 
 my $vm_id :shared;
 my %connect_info :shared;
@@ -155,7 +154,6 @@ sub new {
     Wx::Event::EVT_COMMAND($self, -1, EVT_LIST_OF_VM_LOADED, \&OnListOfVMLoaded);
     Wx::Event::EVT_COMMAND($self, -1, EVT_CONN_STATUS, \&OnConnectionStatusChanged);
     Wx::Event::EVT_COMMAND($self, -1, EVT_UNKNOWN_CERT, \&OnUnknownCert);
-    Wx::Event::EVT_COMMAND($self, -1, EVT_SOCAT_ERROR, \&OnSocatError);
 
     Wx::Event::EVT_CLOSE($self, \&OnExit);
 
@@ -229,14 +227,6 @@ sub proxy_connection_error {
     Wx::PostEvent($self, $evt);
 }
 
-sub socat_error {
-    my $self = shift;
-    my %args = @_;
-    my $message :shared = $args{message};
-    my $evt = new Wx::PlThreadEvent(-1, EVT_SOCAT_ERROR, $message);
-    Wx::PostEvent($self, $evt);
-}
-
 ################################################################################
 #
 # Wx event handlers
@@ -252,8 +242,6 @@ sub OnClickConnect {
         printing      => core_cfg('client.printing.enable'),
         geometry      => core_cfg('client.geometry'),
         fullscreen    => core_cfg('client.fullscreen'),
-        local_serial  => core_cfg('client.serial.enabled') ? core_cfg('client.serial.local') : '',
-        remote_serial => core_cfg('client.serial.enabled') ? core_cfg('client.serial.remote') : '',
         keyboard      => $self->DetectKeyboard,
         port          => $DEFAULT_PORT,
         ssl           => $USE_SSL,
@@ -300,15 +288,6 @@ sub OnConnectionError {
     $dialog->ShowModal();
     $dialog->Destroy();
     $self->EnableControls(1);
-}
-
-sub OnSocatError {
-    my ($self, $event) = @_;
-    my $message = $event->GetData;
-    my $dialog = Wx::MessageDialog->new($self, $message, "Serial forwarding error.", wxOK | wxICON_ERROR);
-    $dialog->ShowModal();
-    $dialog->Destroy();
-#    $self->EnableControls(1);
 }
 
 sub OnListOfVMLoaded {

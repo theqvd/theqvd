@@ -29,7 +29,6 @@ sub new {
         audio           => delete $opts{audio},
         extra           => delete $opts{extra},
         printing        => delete $opts{printing},
-        local_serial    => delete $opts{local_serial},
         opts            => \%opts,
     };
     bless $self, $class;
@@ -180,14 +179,6 @@ sub connect_to_vm {
         return;
     }
 
-    if ( $self->{local_serial} ) {
-        if ( !$self->_start_socat() ) {
-            ERROR("Socat failed to start, closing connection");
-            $cli->proxy_connection_status('CLOSED');
-            return;
-        }
-    }
-
     $opts->{id} = $vm_id;
 
     my %o = (
@@ -198,7 +189,6 @@ sub connect_to_vm {
         'qvd.client.geometry'         => $opts->{geometry},
         'qvd.client.fullscreen'       => $opts->{fullscreen},
         'qvd.client.printing.enabled' => $self->{printing},
-        'qvd.client.serial.port'      => $opts->{remote_serial}
     );
 
     my $q = join '&', map { uri_escape($_) .'='. uri_escape($o{$_}) } keys %o;
@@ -241,13 +231,11 @@ sub connect_to_vm {
                         $code == HTTP_FORBIDDEN        ? "Your virtual machine is under maintenance."           :
                                                          "Unable to connect to remote VM: $code $msg" );
             ERROR("Fatal error: $message");
-            $self->_stop_socat();
             $cli->proxy_connection_error(message => $message, code => $code);
             last;
         }
     }
     $cli->proxy_connection_status('CLOSED');
-    $self->_stop_socat();
     DEBUG("Connection closed");
 }
 
@@ -256,9 +244,6 @@ sub _run {
     my $httpc = shift;
 
     my %o;
-    if ( $self->{local_serial} ) {
-        $o{http} = core_cfg("client.socat.port");
-    }
 
     if ($WINDOWS) {
         $ENV{'NX_ROOT'} = $QVD::Client::App::app_dir;
@@ -312,6 +297,14 @@ sub _run {
     # }
     # } else {
 
+    my $slave_cmd = core_cfg('command.qvdcmd');
+    if ( -x $slave_cmd ) {
+        DEBUG("Slave command is '$slave_cmd'");
+        $ENV{QVD_SLAVE_CMD} = $slave_cmd;
+    } else {
+        WARN("Slave command '$slave_cmd' not found or not executable. Serial port forwarding won't work.");
+    }
+
     DEBUG("Running nxproxy: @cmd");
     if ( Proc::Background->new(@cmd) ) {
         DEBUG("nxproxy started");
@@ -347,86 +340,6 @@ sub _run {
 
     DEBUG("Done.");
 
-    $self->_stop_socat();
-}
-
-sub _start_socat {
-    my ($self) = @_;
-
-    my $socket  = $self->{local_serial};
-    my $debug   = 1;
-    my $port    = core_cfg("client.socat.port");
-    my $timeout = core_cfg("client.socat.timeout");
-    my $socat_running;
-
-    my @args = ("tcp-l:$port,reuseaddr,fork", "$socket,nonblock,raw,echo=0");
-    
-    unshift @args, "-x", "-v" if ($debug);
-   
-    if ($WINDOWS) {
-        ERROR "socat is not supported on Windows";
-        # return undef;
-    }
-    else {
-        if ( ! -c $socket ) {
-            $self->{client_delegate}->socat_error(message => "Failed to forward serial port: port $socket doesn't exist");
-        } else {
-            my $program = core_cfg("command.socat");
-            DEBUG("Running socat: $program " . join(' ', @args) . "\n");
-
-            $self->{socat_proc} = Proc::Background->new({'die_upon_destroy' => 1}, $program, @args);
-            if ( !$self->{socat_proc} || !$self->{socat_proc}->alive ) {
-                ERROR("Failed to start socat");
-                $self->{client_delegate}->socat_error(message => "Failed to forward serial port: couldn't start socat");
-            } else {
-                DEBUG("socat running");
-                $socat_running = 1;
-            }
-        }
-    }
-    if ( $socat_running ) {
-        DEBUG("Waiting for socat to start listening...");
-        my $retries = 0;
-        my $sock;
-        while ($retries++ < $timeout) {
-            $sock = IO::Socket::INET->new(PeerAddr => 'localhost',
-                                          PeerPort => $port,
-                                          Proto    => 'tcp');
-
-            last if $sock;
-
-            DEBUG("Retry $retries/$timeout: $!");
-            sleep(1);
-        }
-
-        if (!$sock) {
-            ERROR("socat not listening on port $port");
-            $self->{client_delegate}->socat_error(message => "Failed to forward serial port: socat is not listening");
-        }
-        else {
-            DEBUG("ok");
-            close($sock);
-            return 1;
-        }
-    }
-
-    # Something went wrong
-    return undef;
-}
-
-
-sub _stop_socat {
-    my ($self) = @_;
-
-    if ( $self->{socat_proc} ) {
-        DEBUG("Killing socat...");
-        if ( $self->{socat_proc}->die ) {
-            DEBUG("ok");
-        }
-        else {
-            DEBUG("failed\n");
-        }
-    }
 }
 
 1;
