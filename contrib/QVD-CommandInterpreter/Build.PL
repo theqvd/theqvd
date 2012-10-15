@@ -7,6 +7,7 @@ my $builder = Module::Build->new(
     license             => 'gpl3',
     dist_author         => q{QVD Team <qvd@qindel.com>},
     dist_version_from   => 'lib/QVD/CommandInterpreter.pm',
+    configure_requires => { 'Module::Build' => 0.38  },
     build_requires => {
         'Test::More' => 0,
         'Proc::Background' => 0
