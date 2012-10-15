@@ -257,13 +257,16 @@ sub _takeover_vm {
         txn_eval {
             DEBUG "txn_eval in _takeover_vm for VM_ID: ". $vm->id;
             $vm->discard_changes;
-            $vm->user_state eq 'disconnected' or LOGDIE "user is connected from another L7R instance yet";
+            if ($vm->user_state ne 'disconnected') {
+                die "user is connected from another L7R instance yet";
+            }
             $vm->set_user_state('connecting',
                                 l7r_pid => $$,
                                 l7r_host => this_host_id,
                                 user_cmd => undef);
         };
         unless ($@) {
+            DEBUG "txn_eval with no issues";
             $l7r->_tell_client("Session acquired for VM_ID: ". $vm->id);
             return;
         }
