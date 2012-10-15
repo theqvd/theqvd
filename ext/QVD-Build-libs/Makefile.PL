@@ -20,5 +20,6 @@ WriteMakefile(
 			   'Variable::Magic' 		=> 0,
 			   'Params::Validate' 		=> 0,
 			   'YAML::XS' 			=> 0,
+			   'Proc::Background'		=> 0,
 			 },
 );
