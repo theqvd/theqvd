@@ -5,11 +5,13 @@ use Getopt::Long;
 use IO::Socket::INET;
 use QVD::CommandInterpreter::Client;
 use Log::Log4perl qw(:easy);
+use Fcntl;
 
 my ($help);
 my $interpreter_addr = "localhost:2000";
 my $remote_addr;
 my $localport;
+my $std;
 
 my $cmd_connect_serial;
 my $cmd_getversion;
@@ -21,12 +23,33 @@ GetOptions("help"                => \$help,
            "getversion"          => \$cmd_getversion,
            "gethelp"             => \$cmd_gethelp,
            "remote|r=s"          => \$remote_addr,
-           "localport=s"         => \$localport
+           "localport=s"         => \$localport,
+           "std"                 => \$std
  ) or die "Getopt failed: $!";
 
 if ( $help ) {
 	print <<HELP;
 Syntax: $0 [arguments]
+
+--help              Shows this help
+--interpreter ADDR  Host and port where qvdcmd is listening
+--getversion        qvdcmd's version
+--gethelp           qvdcmd's 'help' output
+--serial PORT       Serial port on the client(qvdcmd's) side to forward
+--remote ADDR       Remote socat to forward the serial port to
+--localport PORT    Local port to forward the serial port to
+
+The --serial argument requires either --remote, --local or --std
+
+To connect the client's /dev/ttyS0 with a socat listening on port 1234
+on remotehost:
+
+ qvdconnect --serial /dev/ttyS0 --remote remotehost:1234
+
+To connect the client's /dev/ttyS0 to a local virtual port:
+
+ qvdconnect --serial /dev/ttyS0 --localport /dev/ttyS0
+
 
 HELP
 }
@@ -51,25 +74,37 @@ if ( $cmd_getversion ) {
 } elsif ( $cmd_gethelp ) {
 	print $client->help() . "\n";
 } elsif ( $cmd_connect_serial ) {
-	if ( ! ($remote_addr || $localport) ) {
-		print STDERR "Error: --remote argument required\n";
+	if ( ! ($remote_addr || $localport || $std ) ) {
+		print STDERR "Error: --remote or --localport argument required\n";
 		exit(1);
 	} else {
 		my $socat = $client->socat($cmd_connect_serial);
 		if ( $socat ) {
 			$log->info("Remote socat started, connecting to " . ($remote_addr ? $remote_addr : $localport) );
-			print "Remote socat started\n";
+			print STDERR "Remote socat started\n";
 		}
 
 		my $fileno = fileno($socat);
-		open(STDIN, "<&$fileno") or die "Can't reopen stdin: $!";
-		open(STDOUT, ">&$fileno") or die "Can't reopen stdout: $!";
-		STDIN->autoflush(1);
-		STDOUT->autoflush(1);
+		if (!$std) {
+			open(STDIN, "<&$fileno") or die "Can't reopen stdin: $!";
+			open(STDOUT, ">&$fileno") or die "Can't reopen stdout: $!";
+			STDIN->autoflush(1);
+			STDOUT->autoflush(1);
+		} else {
+
+			my $flags = fcntl($socat, F_GETFL, 0);
+			fcntl($fileno, F_SETFL, $flags & (~FD_CLOEXEC));
+
+		}
+
 		if ( $remote_addr ) {
 			exec("/usr/bin/socat", "-", "tcp:$remote_addr,nonblock,reuseaddr,retry=5");
 		} elsif ( $localport ) {
 			exec("/usr/bin/socat", "-", "PTY,link=$localport,raw,echo=0");
+		} elsif ( $std ) {
+			exec("/usr/bin/socat", "FD:$fileno", "-");
+		} else {
+			die "Internal error: Don't know how to call socat";
 		}
 	}
 }
