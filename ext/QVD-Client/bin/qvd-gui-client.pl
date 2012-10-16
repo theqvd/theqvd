@@ -22,9 +22,6 @@ BEGIN {
                                     : File::Spec->join((getpwuid $>)[7] // $ENV{HOME}, '.qvd'));
     mkdir($user_dir);
 
-    $app_dir = File::Spec->join((File::Spec->splitpath(File::Spec->rel2abs($0)))[0, 1]);
-    # warn "app_dir: $app_dir";
-
     # FIXME NX_CLIENT is used for showing the user information on things
     # like broken connection, perhaps we should show them to the user
     # instead of ignoring them? 
@@ -52,6 +49,9 @@ BEGIN {
     set_core_cfg('client.log.filename', File::Spec->join($user_dir, 'qvd-client.log'))
         unless defined core_cfg('client.log.filename', 0);
     $QVD::Log::DAEMON_NAME = 'client';
+
+    $app_dir = ( core_cfg('path.client.installation', 0) //
+                 File::Spec->join((File::Spec->splitpath(File::Spec->rel2abs($0)))[0, 1]));
 }
 
 use QVD::Log;
