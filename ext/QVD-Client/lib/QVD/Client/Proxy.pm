@@ -246,11 +246,15 @@ sub _run {
     my %o;
 
     if ($WINDOWS) {
-        $ENV{'NX_ROOT'} = $QVD::Client::App::app_dir;
-        (my $cygwin_nx_root = $ENV{NX_ROOT}) =~ tr!:\\!//!;
-        $o{errors} = '/cygdrive/'.$cygwin_nx_root.'/proxy.log';
-        # Call pulseaudio in Windows
+        my $cygwin_nx_root = "/cygdrive/$QVD::Client::App::user_dir";
+        $cygwin_nx_root =~ tr|:\\|//|;
+        $ENV{NX_ROOT} = $cygwin_nx_root;
+        $o{errors} = "$cygwin_nx_root/nxproxy.log";
 
+        DEBUG "NX_ROOT: $ENV{NX_ROOT}";
+        DEBUG "save nxproxy log at: $o{errors}";
+
+        # Call pulseaudio in Windows
         if ( $self->{audio} ) {
             my @pa = (File::Spec->rel2abs(core_cfg('command.windows.pulseaudio'), $QVD::Client::App::app_dir),
                       "-D", "--high-priority" );
