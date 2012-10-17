@@ -1,5 +1,5 @@
 
-set PATH=%PATH%;"c:\Archivos de programa\Resource Hacker\";%;"c:\Program files\Resource Hacker\"
+set PATH=%PATH%;"c:\Archivos de programa\Resource Hacker\";"c:\Program files\Resource Hacker\";"c:\Archivos de programa\Inno Setup 5";"c:\Program files\Inno Setup 5"
 
 call exetype NX\nxproxy.exe WINDOWS
 
@@ -29,26 +29,4 @@ call pp -x -gui ^
 reshacker -addoverwrite qvd-client-1.exe, qvd-client.exe, pixmaps\qvd.ico,icongroup,WINEXE,
 del qvd-client-1.exe
 
-rem -l C:\strawberry\perl\site\lib\auto\Crypt\OpenSSL\X509\libeay32.dll ^
-
-rem -a system32\libeay32_.dll ^
-rem -a system32\libssl32_.dll ^
-rem -a system32\advapi32.dll ^
-rem -a system32\cyggcc_s-1.dll ^
-rem -a system32\cygjpeg-7.dll ^
-rem -a system32\cygpng12.dll ^
-rem -a system32\cygstdc++-6.dll ^
-rem -a system32\cygwin1.dll ^
-rem -a system32\cygXcomp.dll ^
-rem -a system32\cygz.dll ^
-rem -a system32\mingwm10.dll ^
-rem -a system32\nxproxy.exe ^
-rem -l C:\strawberry\perl\site\lib\Alien\wxWidgets\msw_2_8_10_uni_gcc_3_4\lib\wxbase28u_net_gcc_custom.dll ^
-rem -l C:\strawberry\perl\site\lib\Alien\wxWidgets\msw_2_8_10_uni_gcc_3_4\lib\wxbase28u_xml_gcc_custom.dll ^
-rem -l C:\strawberry\perl\site\lib\Alien\wxWidgets\msw_2_8_10_uni_gcc_3_4\lib\wxmsw28u_aui_gcc_custom.dll ^
-rem -l C:\strawberry\perl\site\lib\Alien\wxWidgets\msw_2_8_10_uni_gcc_3_4\lib\wxmsw28u_gl_gcc_custom.dll ^
-rem -l C:\strawberry\perl\site\lib\Alien\wxWidgets\msw_2_8_10_uni_gcc_3_4\lib\wxmsw28u_html_gcc_custom.dll ^
-rem -l C:\strawberry\perl\site\lib\Alien\wxWidgets\msw_2_8_10_uni_gcc_3_4\lib\wxmsw28u_media_gcc_custom.dll ^
-rem -l C:\strawberry\perl\site\lib\Alien\wxWidgets\msw_2_8_10_uni_gcc_3_4\lib\wxmsw28u_richtext_gcc_custom.dll ^
-rem -l C:\strawberry\perl\site\lib\Alien\wxWidgets\msw_2_8_10_uni_gcc_3_4\lib\wxmsw28u_stc_gcc_custom.dll ^
-rem -l C:\strawberry\perl\site\lib\Alien\wxWidgets\msw_2_8_10_uni_gcc_3_4\lib\wxmsw28u_xrc_gcc_custom.dll ^
+ISCC.exe ..\script.iss
