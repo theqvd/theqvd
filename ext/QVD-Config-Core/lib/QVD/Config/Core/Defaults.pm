@@ -88,7 +88,6 @@ command.modprobe = /sbin/modprobe
 command.xinit = /usr/bin/xinit
 command.xhost = /usr/bin/xhost
 command.nxproxy = /usr/bin/nxproxy
-command.qvdcmd = /usr/lib/qvd/bin/qvdcmd
 
 command.windows.xming = Xming\\Xming.exe
 command.windows.pulseaudio = pulseaudio\\pulseaudio.exe
@@ -120,6 +119,8 @@ client.user.name =
 ## whether to use SSL in the client↔server communication or not
 client.use_ssl = 1
 client.ssl.use_cert = 0
+## slave shell
+client.slave.command =
 
 ## umask for the L7R process
 l7r.user.umask = 0022

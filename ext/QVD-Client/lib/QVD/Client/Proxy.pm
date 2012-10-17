@@ -301,12 +301,15 @@ sub _run {
     # }
     # } else {
 
-    my $slave_cmd = core_cfg('command.qvdcmd');
-    if ( -x $slave_cmd ) {
-        DEBUG("Slave command is '$slave_cmd'");
-        $ENV{QVD_SLAVE_CMD} = $slave_cmd;
-    } else {
-        WARN("Slave command '$slave_cmd' not found or not executable. Serial port forwarding won't work.");
+    my $slave_cmd = core_cfg('client.slave.command', 0);
+    if (defined $slave_cmd and length $slave_cmd) {
+        $slave_cmd = File::Spec->rel2abs(client.slave.command, $QVD::Client::App::app_dir);
+        if (-x $slave_cmd ) {
+            DEBUG("Slave command is '$slave_cmd'");
+            $ENV{QVD_SLAVE_CMD} = $slave_cmd;
+        } else {
+            WARN("Slave command '$slave_cmd' not found or not executable.");
+        }
     }
 
     DEBUG("Running nxproxy: @cmd");
