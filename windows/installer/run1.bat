@@ -9,4 +9,4 @@ perl ^
 -I ..\..\ext\QVD-HTTPC\lib ^
 -I ..\..\ext\QVD-Log\lib ^
 -I ..\..\ext\QVD-URI\lib ^
-..\..\ext\QVD-Client\bin\qvd-gui-client.pl path.client.installation="c:\Program Files\QVD" log.level=DEBUG
+..\..\ext\QVD-Client\bin\qvd-gui-client.pl path.client.installation="c:\Archivos de programa\QVD" log.level=DEBUG

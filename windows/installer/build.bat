@@ -30,5 +30,5 @@ reshacker -addoverwrite qvd-client-1.exe, qvd-client.exe, pixmaps\qvd.ico,icongr
 del qvd-client-1.exe
 
 del ..\Output\*.* /q
-
+perl ..\script.pl >..\script.iss
 ISCC.exe ..\script.iss
