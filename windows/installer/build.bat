@@ -29,4 +29,6 @@ call pp -x -gui ^
 reshacker -addoverwrite qvd-client-1.exe, qvd-client.exe, pixmaps\qvd.ico,icongroup,WINEXE,
 del qvd-client-1.exe
 
+del ..\Output\*.*
+
 ISCC.exe ..\script.iss
