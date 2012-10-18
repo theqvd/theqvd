@@ -4,12 +4,11 @@ package QVD::Client::App;
 
 use strict;
 use warnings;
+use 5.010;
 
 use Cwd;
 use File::Spec;
 use Proc::Background;
-use File::Spec;
-use 5.010;
 
 our ($WINDOWS, $DARWIN, $user_dir, $app_dir, $user_config_filename, $user_certs_dir, $pixmaps_dir);
 
