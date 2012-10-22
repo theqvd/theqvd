@@ -13,21 +13,31 @@ use QVD::HKD::Helpers;
 use parent qw(QVD::HKD::Agent);
 
 use QVD::StateMachine::Declarative
-    new           => { transitions => { _on_run             => 'checking'      } },
-    checking      => { enter => '_check',
-                       transitions => { _on_check_done      => 'delaying',
-                                        _on_kill_hosts      => 'killing_hosts' } },
-    killing_hosts => { enter => '_kill_hosts',
-                       transitions => { _on_kill_hosts_done => 'stopping_vms'  } },
-    stopping_vms  => { enter => '_stop_vms',
-                       transitions => { _on_stop_vms_done   => 'delaying'      } },
-    delaying      => { enter => '_set_timer',
-                       transitions => { _on_timeout         => 'checking',
-                                        on_hkd_stop         => 'stopped'       },
-                       leave => '_abort_all'                                     },
-    stopped       => { enter => '_on_stopped'                                    },
+    new           => { transitions => { _on_run                => 'long_delaying' } },
 
-    __any__       => { delay => [qw(on_hkd_stop)] };
+    checking      => { enter       => '_check',
+                       transitions => { _on_check_done         => 'delaying',
+                                        _on_kill_hosts         => 'killing_hosts' } },
+
+    killing_hosts => { enter       => '_kill_hosts',
+                       transitions => { _on_kill_hosts_done    => 'stopping_vms', } },
+
+    stopping_vms  => { enter       => '_stop_vms',
+                       transitions => { _on_stop_vms_done      => 'delaying',     } },
+
+    delaying      => { enter       => '_set_timer',
+                       transitions => { _on_timeout            => 'checking',
+                                        on_hkd_stop            => 'stopped',      } },
+
+    long_delaying => { enter       => '_set_timer',
+                       transitions => { _on_timeout            => 'checking',
+                                        on_hkd_stop            => 'stopped',      } },
+
+    stopped       => { enter       => '_on_stopped'                                 },
+
+    __any__       => { delay       => [qw(on_hkd_stop )],
+                       transitions => { on_transient_db_error => 'long_delaying' },
+                       leave       => '_abort_all'                                  };
 
 sub new {
     my ($class, %opts) = @_;
@@ -48,8 +58,13 @@ sub new {
 sub _check {
     my $self = shift;
     DEBUG 'Checking other nodes';
-    $self->_query(q(select host_id, extract('epoch' from (now() - ok_ts)) as ok_ts from host_runtimes where state='running' and host_id!=$1 and not blocked),
-                  $self->{node_id});
+    $self->_query(<<EOQ, $self->{node_id});
+select host_id, extract('epoch' from (now() - ok_ts)) as ok_ts
+  from host_runtimes
+  where state='running'
+    and host_id!=$1
+    and not blocked
+EOQ
 }
 
 sub _on_check_error {
@@ -67,8 +82,6 @@ sub _on_check_result {
         for ($res->rows) {
             my ($host_id, $ok_ts) = @$_;
 
-            # TODO: esto esta muy justo! habria que darle algun tiempo extra
-            # al noded del nodo caido para matar sus maquinas virtuales.
             if ($ok_ts >= $cluster_node_timeout) {
                 push @{ $self->{'_down_hosts'} }, $host_id;
             }
@@ -126,7 +139,8 @@ sub _stop_vms {
 
     my $plh = join ',', map { "\$$_" } 1 .. @{ $self->{'_down_hosts'} };
     INFO sprintf 'Stopping VMs on hosts %s', join ', ', @{ $self->{'_down_hosts'} };
-    $self->_query ("update vm_runtimes set vm_state = 'stopped', blocked = true where host_id in ($plh)", @{ $self->{'_down_hosts'} });
+    $self->_query("update vm_runtimes set vm_state = 'stopped', blocked = true where host_id in ($plh)",
+                  @{ $self->{'_down_hosts'} });
 }
 
 sub _on_stop_vms_error {
@@ -141,9 +155,6 @@ sub _on_stop_vms_result {
     if ($res->status == PGRES_COMMAND_OK) {
         if ($res->cmdRows) {
             INFO 'Successfully stopped VMs';
-            # TODO: en este caso, seria interesante regenerar los overlays de la maquina que se recupera de manera que:
-            # - el filesystem puede estar corrupto, el fsck automatico podria fallar.
-            # - realmente nos aseguramos de que en ningun caso pueda haber dos maquinas virtuales corriendo contra la misma imagen.
         }
     }
     else {
@@ -162,7 +173,16 @@ sub _set_timer {
     my $self = shift;
     undef $self->{'_down_hosts'};
     $self->_maybe_callback('on_checked');
-    $self->_call_after($self->_cfg('internal.hkd.agent.cluster_monitor.delay'), '_on_timeout');
+    $self->_call_after($self->_cfg($self->state =~ /^long_/
+                                   ? 'internal.hkd.agent.cluster_monitor.long_delay'
+                                   : 'internal.hkd.agent.cluster_monitor.delay'),
+                       '_on_timeout');
+}
+
+sub on_transient_db_error :OnState('long_delaying') {
+    my $self = shift;
+    $self->_abort_all;
+    $self->_set_timer;
 }
 
 1;

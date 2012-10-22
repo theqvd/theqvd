@@ -140,6 +140,11 @@ sub _on_stop_all_vms_done :OnState(__any__) {}
 sub _on_cmd_stop :OnState(__any__) { shift->delay_until_next_state }
 
 sub _on_dead_db :OnState(__any__) { shift->delay_until_next_state }
+sub _on_transient_db_error :OnState(__any__) {}
+
+sub _on_transient_db_error :OnState('running') {
+    shift->{checker}->on_transient_db_error
+}
 
 sub new {
     my ($class, %opts) = @_;
@@ -262,7 +267,8 @@ sub _start_db {
                                       connection_delay   => $self->_cfg('internal.database.poll.connection.delay'),
                                       connection_retries => $self->_cfg('internal.database.poll.connection.retries'),
                                       size               => $self->_cfg('internal.database.poll.size'),
-                                      on_connect_error   => sub { $self->_on_dead_db }
+                                      on_connect_error   => sub { $self->_on_dead_db },
+                                      on_transient_error => sub { $self->_on_transient_db_error },
                                     );
     $self->_db($db);
     $self->_on_db_connected;
