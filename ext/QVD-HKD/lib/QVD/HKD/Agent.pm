@@ -119,7 +119,7 @@ sub _query_n {
     my $db = $self->_db // die "internal error: database handler not available";
     my $watcher = $db->push_query(query       => $sql,
                                   args        => \@args,
-                                  max_retries => 1000, # FIXME!!!
+                                  max_retries => $self->{query_retry_count} // 1000, # FIXME!!!
                                   retry_on_sqlstate => \%retry_on_sqlstate,
                                   on_result   => sub {
                                       my $res = $_[2];

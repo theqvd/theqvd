@@ -33,19 +33,20 @@ sub new {
 
     $self->{on_ticked} = $on_ticked;
     $self->{on_error} = $on_error;
+    $self->{query_retry_count} = 1;
     $self;
 }
 
 sub _tick {
     my $self = shift;
-    DEBUG 'Ticking';
-    $self->_query_1(q(update host_runtimes set ok_ts=now(), pid=$1 where host_id=$2),
-                  $$, $self->{node_id});
+    INFO 'Ticking';
+    $self->_query_1(q(update host_runtimes set ok_ts=now(), pid=$1 where host_id=$2 and state != 'lost')
+                    $$, $self->{node_id});
 }
 
 sub _on_tick_done {
     my $self = shift;
-    WARN 'Ticking ok';
+    DEBUG 'Ticking ok';
     $self->{failed_ticks} = 0;
     $self->_on_delay;
 }
@@ -53,7 +54,7 @@ sub _on_tick_done {
 sub _on_tick_error {
     my $self = shift;
     WARN 'Error on ticking';
-    if (++$self->{failed_ticks} > 2) {
+    if (++$self->{failed_ticks} >= $self->_cfg('internal.hkd.agent.ticker.retries')) {
         $self->_maybe_callback('on_error')
     };
     $self->_on_delay;

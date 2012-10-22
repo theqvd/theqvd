@@ -348,6 +348,7 @@ internal.database.client.socket.keepcnt = 4
 internal.hkd.killing.vms.timeout = 120
 
 internal.hkd.agent.ticker.delay = 60
+internal.hkd.agent.ticker.retries = 3
 internal.hkd.agent.command_handler.delay = 10
 internal.hkd.agent.vm_command_handler.delay = 11
 
