@@ -51,7 +51,7 @@ my $build = new Module::Build(
 );
 
 
-foreach my $ext (qw(fb tt png jar css gif js zip ico etc)) {
+foreach my $ext (qw(fb tt png jar css gif js zip ico etc conf)) {
 	$build->add_build_element($ext);
 }
 
