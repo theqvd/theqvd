@@ -21,7 +21,7 @@ database.name = qvd
 internal.database.poll.connection.timeout = 8
 internal.database.poll.size = 2
 internal.database.poll.connection.delay = 2
-internal.database.poll.connection.retries = 60
+internal.database.poll.connection.retries = 30
 model.user.login.case-sensitive = 0
 
 ## directory where several configuration, state, pid and certificate files are stored
@@ -317,7 +317,7 @@ internal.l7r.short_session = 120
 #internal.hkd.database.timeout = 20
 
 internal.hkd.cluster.check.interval = 30
-internal.hkd.cluster.node.timeout = 80
+internal.hkd.cluster.node.timeout = 180
 
 internal.vm.port.x = 5000
 internal.vm.port.vma = 3030
@@ -348,7 +348,7 @@ internal.database.client.socket.keepcnt = 4
 internal.hkd.killing.vms.timeout = 120
 
 internal.hkd.agent.ticker.delay = 60
-internal.hkd.agent.ticker.retries = 3
+internal.hkd.agent.ticker.retries = 2
 internal.hkd.agent.command_handler.delay = 10
 internal.hkd.agent.vm_command_handler.delay = 11
 

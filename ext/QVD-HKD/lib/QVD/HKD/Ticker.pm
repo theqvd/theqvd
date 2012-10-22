@@ -53,8 +53,9 @@ sub _on_tick_done {
 
 sub _on_tick_error {
     my $self = shift;
-    WARN 'Error on ticking';
-    if (++$self->{failed_ticks} >= $self->_cfg('internal.hkd.agent.ticker.retries')) {
+    my $failed = ++$self->{failed_ticks};
+    WARN "Error on ticking $failed)";
+    if ($failed >= $self->_cfg('internal.hkd.agent.ticker.retries')) {
         $self->_maybe_callback('on_error')
     };
     $self->_on_delay;

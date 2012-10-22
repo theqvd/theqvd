@@ -27,7 +27,7 @@ use QVD::StateMachine::Declarative
                        leave => '_abort_all'                                     },
     stopped       => { enter => '_on_stopped'                                    },
 
-    __any__       => { delay => [qw(on_hkd_Stop)] };
+    __any__       => { delay => [qw(on_hkd_stop)] };
 
 sub new {
     my ($class, %opts) = @_;

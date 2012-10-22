@@ -85,6 +85,8 @@ select vm_id, l7r_pid
     and l7r_pid is not NULL
   limit 1
 EOQ
+    DEBUG "waiting for response to database query...";
+    $debug and $self->_debug("leaving _search_dead_l7r");
 }
 
 sub _on_search_dead_l7r_result {
