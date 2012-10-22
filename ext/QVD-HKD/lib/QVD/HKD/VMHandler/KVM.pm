@@ -121,7 +121,7 @@ use QVD::StateMachine::Declarative
     'debugging/saving_state'          => { enter       => '_save_state',
                                            transitions => { _on_save_state_done          => 'debugging/unsetting_heavy_mark',
                                                             _on_save_state_error         => 'stopping/saving_state'           },
-                                           delay       => [qw(_on_lxc_done)]                                                    },
+                                           delay       => [qw(_on_vm_process_done)]                                            },
 
     'debugging/unsetting_heavy_mark'  => { enter       =>  '_unset_heavy_mark',
                                            transitions => { _on_unset_heavy_mark_done    => 'debugging/waiting_for_vma'      } },
