@@ -303,7 +303,7 @@ sub _run {
 
     my $slave_cmd = core_cfg('client.slave.command', 0);
     if (defined $slave_cmd and length $slave_cmd) {
-        $slave_cmd = File::Spec->rel2abs("client.slave.command", $QVD::Client::App::app_dir);
+        $slave_cmd = File::Spec->rel2abs($slave_cmd, $QVD::Client::App::app_dir);
         if (-x $slave_cmd ) {
             DEBUG("Slave command is '$slave_cmd'");
             $ENV{QVD_SLAVE_CMD} = $slave_cmd;
