@@ -40,7 +40,7 @@ sub new {
 sub _tick {
     my $self = shift;
     INFO 'Ticking';
-    $self->_query_1(q(update host_runtimes set ok_ts=now(), pid=$1 where host_id=$2 and state != 'lost')
+    $self->_query_1(q(update host_runtimes set ok_ts=now(), pid=$1 where host_id=$2 and state != 'lost'),
                     $$, $self->{node_id});
 }
 
