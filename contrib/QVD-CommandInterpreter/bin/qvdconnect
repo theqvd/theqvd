@@ -5,6 +5,8 @@ use Getopt::Long;
 use IO::Socket::INET;
 use QVD::CommandInterpreter::Client;
 use Log::Log4perl qw(:easy);
+use App::Daemon qw( daemonize );
+
 use Fcntl;
 
 my ($help);
@@ -16,6 +18,7 @@ my $std;
 my $cmd_connect_serial;
 my $cmd_getversion;
 my $cmd_gethelp;
+my $daemonize;
 
 GetOptions("help"                => \$help,
            "interpreter|i=s"     => \$interpreter_addr,
@@ -24,6 +27,7 @@ GetOptions("help"                => \$help,
            "gethelp"             => \$cmd_gethelp,
            "remote|r=s"          => \$remote_addr,
            "localport=s"         => \$localport,
+           "daemonize"           => \$daemonize,
            "std"                 => \$std
  ) or die "Getopt failed: $!";
 
@@ -38,6 +42,7 @@ Syntax: $0 [arguments]
 --serial PORT       Serial port on the client(qvdcmd's) side to forward
 --remote ADDR       Remote socat to forward the serial port to
 --localport PORT    Local port to forward the serial port to
+--daemonize         Daemonize. Only applies to --serial
 
 The --serial argument requires either --remote, --local or --std
 
@@ -97,15 +102,24 @@ if ( $cmd_getversion ) {
 
 		}
 
+		if ( $daemonize ) {
+			$log->debug("Daemonizing");
+			daemonize();
+		}
+
+		my @exec_cmd;
 		if ( $remote_addr ) {
-			exec("/usr/bin/socat", "-", "tcp:$remote_addr,nonblock,reuseaddr,retry=5");
+			@exec_cmd = ("/usr/bin/socat", "-", "tcp:$remote_addr,nonblock,reuseaddr,retry=5");
 		} elsif ( $localport ) {
-			exec("/usr/bin/socat", "-", "PTY,link=$localport,raw,echo=0");
+			@exec_cmd = ("/usr/bin/socat", "-", "PTY,link=$localport,raw,echo=0");
 		} elsif ( $std ) {
-			exec("/usr/bin/socat", "FD:$fileno", "-");
+			@exec_cmd = ("/usr/bin/socat", "FD:$fileno", "-");
 		} else {
 			die "Internal error: Don't know how to call socat";
 		}
+
+		$log->debug("Running socat: " . join(' ', @exec_cmd));
+		exec(@exec_cmd) or die "exec failed: $!";
 	}
 }
 

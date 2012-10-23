@@ -9,8 +9,10 @@ my $builder = Module::Build->new(
     dist_version_from   => 'lib/QVD/CommandInterpreter.pm',
     configure_requires => { 'Module::Build' => 0.38  },
     build_requires => {
-        'Test::More' => 0,
-        'Proc::Background' => 0
+        'Test::More'       => 0,
+        'Proc::Background' => 0,
+        'Log::Log4perl'    => 0,
+        'App::Daemon'      => 0
     },
     add_to_cleanup      => [ 'QVD-CommandInterpreter-*' ],
     create_makefile_pl => 'traditional',
