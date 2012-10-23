@@ -13,10 +13,12 @@ use constant EVT_LIST_OF_VM_LOADED => Wx::NewEventType;
 use constant EVT_CONNECTION_ERROR  => Wx::NewEventType;
 use constant EVT_CONN_STATUS       => Wx::NewEventType;
 use constant EVT_UNKNOWN_CERT      => Wx::NewEventType;
+use constant EVT_SET_ENVIRONMENT   => Wx::NewEventType;
 
 my $vm_id :shared;
 my %connect_info :shared;
 my $accept_cert :shared;
+my $set_env :shared;
 
 my $DEFAULT_PORT = core_cfg('client.host.port');
 my $USE_SSL      = core_cfg('client.use_ssl');
@@ -154,6 +156,7 @@ sub new {
     Wx::Event::EVT_COMMAND($self, -1, EVT_LIST_OF_VM_LOADED, \&OnListOfVMLoaded);
     Wx::Event::EVT_COMMAND($self, -1, EVT_CONN_STATUS, \&OnConnectionStatusChanged);
     Wx::Event::EVT_COMMAND($self, -1, EVT_UNKNOWN_CERT, \&OnUnknownCert);
+    Wx::Event::EVT_COMMAND($self, -1, EVT_SET_ENVIRONMENT, \&OnSetEnvironment);
 
     Wx::Event::EVT_CLOSE($self, \&OnExit);
 
@@ -225,6 +228,16 @@ sub proxy_connection_error {
     my $message :shared = $args{message};
     my $evt = new Wx::PlThreadEvent(-1, EVT_CONNECTION_ERROR, $message);
     Wx::PostEvent($self, $evt);
+}
+
+sub proxy_set_environment {
+    my $self = shift;
+    my %args = @_;
+    my $shared_args :shared = $self->_shared_clone(\%args);
+
+    lock($set_env);
+    Wx::PostEvent($self, new Wx::PlThreadEvent(-1, EVT_SET_ENVIRONMENT, $shared_args));
+    cond_wait($set_env);
 }
 
 ################################################################################
@@ -389,6 +402,22 @@ sub OnTimer {
 sub OnExit {
     my $self = shift;
     $self->Destroy();
+}
+
+sub OnSetEnvironment {
+    my ($self, $event) = @_;
+    my $args = $event->GetData();
+    DEBUG "Setting environment: start";
+
+    foreach my $k (keys %$args) {
+        DEBUG("Setting environment var '$k' to '" . $args->{$k} . "' in main thread");
+        $ENV{$k} = $args->{$k};
+    }
+
+    DEBUG "Setting environment: done";
+    lock $set_env;
+    $set_env = 1;
+    cond_signal $set_env;
 }
 
 ################################################################################

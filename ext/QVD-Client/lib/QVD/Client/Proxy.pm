@@ -248,10 +248,10 @@ sub _run {
     if ($WINDOWS) {
         my $cygwin_nx_root = "/cygdrive/$QVD::Client::App::user_dir";
         $cygwin_nx_root =~ tr|:\\|//|;
-        $ENV{NX_ROOT} = $cygwin_nx_root;
+        $self->{client_delegate}->proxy_set_environment( NX_ROOT => $cygwin_nx_root );
         $o{errors} = "$cygwin_nx_root/nxproxy.log";
 
-        DEBUG "NX_ROOT: $ENV{NX_ROOT}";
+        DEBUG "NX_ROOT: $cygwin_nx_root";
         DEBUG "save nxproxy log at: $o{errors}";
 
         # Call pulseaudio in Windows
@@ -306,7 +306,7 @@ sub _run {
         $slave_cmd = File::Spec->rel2abs($slave_cmd, $QVD::Client::App::app_dir);
         if (-x $slave_cmd ) {
             DEBUG("Slave command is '$slave_cmd'");
-            $ENV{QVD_SLAVE_CMD} = $slave_cmd;
+            $self->{client_delegate}->proxy_set_environment( QVD_SLAVE_CMD => $slave_cmd );
         } else {
             WARN("Slave command '$slave_cmd' not found or not executable.");
         }
