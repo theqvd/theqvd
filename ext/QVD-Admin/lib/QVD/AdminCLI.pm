@@ -1404,12 +1404,14 @@ sub cmd_vm_edit {
 
 sub help_vm_edit {
     print <<EOT
-vm edit: network-related commands
-usage: vm edit
-      
+vm edit: change virtual machine settings
+usage: vm edit di_tag=<t>
+
+di_tag: Use the disk image with tag "t". Change takes effect on VM start.
+
 Valid options:
-    -f [--filter] FILTER : starts virtual machine matched by FILTER
-    -q [--quiet]         : don't print the command message
+    -f [--filter] FILTER : edits virtual machines matched by FILTER
+    -q [--quiet]         : don't print messages
 EOT
 }
 
