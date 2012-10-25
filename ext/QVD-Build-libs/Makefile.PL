@@ -10,6 +10,7 @@ WriteMakefile(
     PREREQ_PM         => { 'CPAN::Easy'		 	=> 0,
 			   'Module::Install' 		=> 0,
 			   'Module::Runtime' 		=> 0,
+			   'Module::Implementation'	=> 0,
 			   'YAML' 			=> 0,
 			   'Moose' 			=> 0,
 			   'Clone' 			=> 0,
