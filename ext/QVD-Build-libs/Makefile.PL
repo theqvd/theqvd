@@ -9,6 +9,7 @@ WriteMakefile(
       ( AUTHOR         => 'QVD Team <qvd@qindel.com>') : ()),
     PREREQ_PM         => { 'CPAN::Easy'		 	=> 0,
 			   'Module::Install' 		=> 0,
+			   'ExtUtils::MakeMaker'	=> 0,
 			   'Module::Runtime' 		=> 0,
 			   'Module::Implementation'	=> 0,
 			   'YAML' 			=> 0,
