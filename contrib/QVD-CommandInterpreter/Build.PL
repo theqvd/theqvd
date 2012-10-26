@@ -12,7 +12,6 @@ my $builder = Module::Build->new(
         'Test::More'       => 0,
         'Proc::Background' => 0,
         'Log::Log4perl'    => 0,
-        'App::Daemon'      => 0
     },
     add_to_cleanup      => [ 'QVD-CommandInterpreter-*' ],
     create_makefile_pl => 'traditional',

@@ -14,7 +14,7 @@ $SIG{__DIE__} = sub {
 };
 
 $SIG{INT} = \&cleanup;
-
+ 
 undef $ENV{PATH};
 my $dir = tempdir( CLEANUP => 1 );
 create_temp_conf($dir);
@@ -46,7 +46,7 @@ ok($test_proc && $test_proc->alive, "Start socat for reception port on port $soc
 
 
 
-test_cmd("--interpreter localhost:$cmdport --serial $dir/testport0 --remote localhost:$socatport", qr/Remote socat started/, "Serial interconnect");
+test_cmd("--daemonize --interpreter localhost:$cmdport --log-socat --serial $dir/testport0 --remote localhost:$socatport", qr/Remote socat started/, "Serial interconnect");
 
 my $timeout = 10;
 my $received_text;
