@@ -81,7 +81,9 @@ sub new {
 		socat => '/usr/bin/socat',
 		allowed_ports => [ qr#^/dev/ttyS\d+#,
 		                   qr#^/dev/ttyUSB/\d+#,
-		                   qr#^/tmp/testport\d+# ]
+		                   qr#^/dev/ttyUSB\d+#,
+		                   qr#^/dev/ttyACM\d+#,
+		                   qr#^/dev/usblp\d+#]
 	};
 
 	foreach my $key (keys %args) {
