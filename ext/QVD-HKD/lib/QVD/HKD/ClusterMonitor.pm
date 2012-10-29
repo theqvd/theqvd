@@ -58,7 +58,7 @@ sub new {
 sub _check {
     my $self = shift;
     DEBUG 'Checking other nodes';
-    $self->_query(<<EOQ, $self->{node_id});
+    $self->_query(<<'EOQ', $self->{node_id});
 select host_id, extract('epoch' from (now() - ok_ts)) as ok_ts
   from host_runtimes
   where state='running'
