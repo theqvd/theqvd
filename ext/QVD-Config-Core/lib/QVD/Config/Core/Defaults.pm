@@ -316,7 +316,6 @@ internal.l7r.short_session = 120
 #internal.hkd.database.retry_delay = 5
 #internal.hkd.database.timeout = 20
 
-internal.hkd.cluster.check.interval = 30
 internal.hkd.cluster.node.timeout = 180
 
 internal.vm.port.x = 5000
@@ -354,6 +353,7 @@ internal.hkd.agent.vm_command_handler.delay = 11
 
 internal.hkd.agent.cluster_monitor.delay = 60
 internal.hkd.agent.cluster_monitor.long_delay = 240
+internal.hkd.agent.cluster_monitor.fuzzy_delay = 60
 
 internal.hkd.agent.rpc.retry.count = 3
 internal.hkd.agent.rpc.retry.delay = 5

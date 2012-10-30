@@ -77,12 +77,8 @@ use QVD::StateMachine::Declarative
                                                            _on_save_loadbal_data_error => 'stopping/removing_fw_rules'    } },
 
     'starting/ticking'               => { enter       => '_start_ticking',
-                                          transitions => { _on_ticked                 => 'starting/checking',
+                                          transitions => { _on_ticked                 => 'starting/catching_zombies',
                                                            _on_ticker_error           => 'stopping/removing_fw_rules'     } },
-
-    'starting/checking'              => { enter       => '_start_checking',
-                                          transitions => { _on_checked                => 'starting/catching_zombies',
-                                                           _on_checker_error          => 'stopping/removing_fw_rules'     } },
 
     'starting/catching_zombies'      => { enter       => '_catch_zombies',
                                           transitions => { _on_catch_zombies_done     => 'starting/agents',
@@ -135,7 +131,6 @@ use QVD::StateMachine::Declarative
 sub _on_ticked :OnState(__any__) {}
 sub _on_ticker_error :OnState(__any__) {}
 sub _on_checked :OnState(__any__) {}
-sub _on_checker_error :OnState(__any__) {}
 sub _on_stop_all_vms_done :OnState(__any__) {}
 sub _on_cmd_stop :OnState(__any__) { shift->delay_until_next_state }
 
@@ -143,7 +138,7 @@ sub _on_dead_db :OnState(__any__) { shift->delay_until_next_state }
 sub _on_transient_db_error :OnState(__any__) {}
 
 sub _on_transient_db_error :OnState('running') {
-    shift->{checker}->on_transient_db_error
+    shift->{cluster_monitor}->on_transient_db_error
 }
 
 sub new {
@@ -395,29 +390,26 @@ sub _start_checking {
 
 sub _start_agents {
     my $self = shift;
-    my %opts = ( config => $self->{config},
-                 db => $self->{db},
-                 node_id => $self->{node_id} );
-    $self->{command_handler} = QVD::HKD::CommandHandler->new( %opts,
-                                                              on_cmd     => sub { $self->_on_cmd($_[1]) },
-                                                              on_stopped => sub { $self->_on_agent_stopped(@_) } );
-    $self->{vm_command_handler} = QVD::HKD::VMCommandHandler->new( %opts,
-                                                                   on_cmd     => sub { $self->_on_vm_cmd($_[1], $_[2]) },
-                                                                   on_stopped => sub { $self->_on_agent_stopped(@_) } );
+    my %opts = ( config     => $self->{config},
+                 db         => $self->{db},
+                 node_id    => $self->{node_id},
+                 on_stopped => sub { $self->_on_agent_stopped(@_) } );
 
-    $self->{l7r_monitor} = QVD::HKD::L7RMonitor->new( %opts,
-                                                      on_stopped => sub { $self->_on_agent_stopped(@_) } );
-
-    if ($self->_cfg("vm.network.use_dhcp")) {
-        $self->{dhcpd_handler} = QVD::HKD::DHCPDHandler->new( %opts,
-                                                              on_stopped => sub { $self->_on_agent_stopped(@_) } );
-    }
+    $self->{command_handler}    = QVD::HKD::CommandHandler->new(%opts, on_cmd => sub { $self->_on_cmd($_[1]) });
+    $self->{vm_command_handler} = QVD::HKD::VMCommandHandler->new(%opts, on_cmd => sub { $self->_on_vm_cmd($_[1], $_[2]) });
+    $self->{l7r_monitor}        = QVD::HKD::L7RMonitor->new(%opts);
+    $self->{cluster_monitor}    = QVD::HKD::ClusterMonitor->new(%opts);
+    $self->{dhcpd_handler} = QVD::HKD::DHCPDHandler->new(%opts)
+        if $self->_cfg("vm.network.use_dhcp");
 
     DEBUG 'Starting command handler';
     $self->{command_handler}->run;
 
     DEBUG 'Starting L7R Monitor';
     $self->{l7r_monitor}->run;
+
+    DEBUG 'Starting Cluster Monitor';
+    $self->{cluster_monitor}->run;
 
     # DEBUG 'Starting VM command handler';
     # $self->{vm_command_handler}->run;
@@ -446,7 +438,7 @@ my @agent_names = qw(vm_command_handler
                      dhcpd_handler
                      ticker
                      l7r_monitor
-                     checker);
+                     cluster_monitor);
 
 sub _check_all_agents_have_stopped {
     my $self = shift;
