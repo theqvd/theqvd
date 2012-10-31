@@ -1,3 +1,18 @@
+QVD 3.1.1
+=========
+
+- Fixed the fastcgi configuration of qvd-admin-web on SLES 11 (#1016).
+- Fixed issue with missing configuration for qvd-admin-web, cause of #1015.
+- Multipurpose slave program feature that permits obtaining access to local
+devices from a QVD virtual machine (#1022)
+- Fixed issue where VMs are incorrectly marked as having user connected when
+HKD is restarted (#1014)
+
+QVD 3.1.0
+=========
+
+- New major release with support for LXC virtualization
+
 QVD 3.0.4
 =========
 - Pass the $l7r object to the authentication plugins. Now the authenticate_basic would receive the following
