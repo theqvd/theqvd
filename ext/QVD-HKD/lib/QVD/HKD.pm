@@ -59,7 +59,7 @@ use QVD::StateMachine::Declarative
 
     'starting/loading_host_row'      => { enter       => '_load_host_row',
                                           transitions => { _on_load_host_row_done     => 'starting/saving_state',
-                                                           _on_load_host_row_error    => 'failed'                         } },
+                                                           _on_load_host_row_error2   => 'failed'                         } },
 
     'starting/saving_state'          => { enter       => '_save_state',
                                           transitions => { _on_save_state_done        => 'starting/checking_address',
@@ -285,14 +285,11 @@ sub _load_host_row {
     $self->_query_1('select id, address from hosts where name=$1', $host);
 }
 
-sub _on_load_host_row_bad_result {
-    # FIXME
-    exit(1);
-}
-
 sub _on_load_host_row_error {
-    # FIXME
-    exit(1);
+    my ($self, $res) = @_;
+    $self->_debug("node row not found in database");
+    ERROR "Unable to retrieve node data from database";
+    $self->_on_load_host_row_error2
 }
 
 sub _on_load_host_row_result {
