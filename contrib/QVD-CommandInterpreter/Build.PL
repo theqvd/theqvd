@@ -4,7 +4,7 @@ use Module::Build;
 
 my $builder = Module::Build->new(
     module_name         => 'QVD::CommandInterpreter',
-    license             => 'gpl3',
+#    license             => 'gpl2',
     dist_author         => q{QVD Team <qvd@qindel.com>},
     dist_version_from   => 'lib/QVD/CommandInterpreter.pm',
     configure_requires => { 'Module::Build' => 0.38  },
