@@ -54,10 +54,10 @@ sub _kill_hosts {
     my ($self) = @_;
     INFO "looking for lost hosts";
     $self->_query(<<'EOQ', $self->{node_id}, $self->_cfg('internal.hkd.cluster.node.timeout'));
-update host_runtimes set state = 'lost', blocked = true
+update host_runtimes set state = 'lost'
     where state = 'running'
-      and host_id != $1
       and not blocked
+      and host_id != $1
       and $2 < extract('epoch' from (now() - ok_ts))
     returning host_id
 EOQ
@@ -76,7 +76,6 @@ sub _stop_vms {
     $self->_query(<<EOQ);
 update vm_runtimes
     set vm_state = 'stopped',
-        blocked  = true,
         host_id  = NULL
     from host_runtimes
     where vm_state != 'stopped'
