@@ -317,7 +317,8 @@ sub _allocate_user_disk {
     $self->_run_cmd([ $self->_cfg('command.kvm-img'),
                       'create',
                       -f => 'qcow2',
-                      $image_path ]);
+                      $image_path,
+                      $size ]);
 }
 
 sub _launch_process {
