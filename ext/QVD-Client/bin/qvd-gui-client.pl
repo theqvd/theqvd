@@ -30,9 +30,8 @@ BEGIN {
 
     no warnings;
     $QVD::Config::USE_DB = 0;
-    @QVD::Config::Core::FILES = ( $user_config_filename,
-                                  'qvd-client.conf' );
-    push @QVD::Config::Core::FILES, '/etc/qvd/client.conf' unless $WINDOWS;
+    @QVD::Config::Core::FILES = ( ($WINDOWS ? () : ('/etc/qvd/client.conf')),
+                                  $user_config_filename );
 }
 
 use QVD::Config::Core qw(set_core_cfg core_cfg);

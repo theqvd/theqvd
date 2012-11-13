@@ -17,7 +17,7 @@ our @FILES;
 
 for my $FILE (@FILES) {
     open my $cfg_fh, '<', $FILE or next;
-    $core_cfg = Config::Properties->new($core_cfg);
+    $core_cfg = Config::Properties->new(defaults => $core_cfg);
     $core_cfg->load($cfg_fh);
     close $cfg_fh;
 }
