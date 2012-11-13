@@ -171,7 +171,7 @@ qvd-admin.pl config set auth.ldap.host=ldaps://ds.theqvd.com:1636
 qvd-admin.pl config set auth.ldap.base=ou=People,dc=theqvd,dc=com
 qvd-admin.pl config set auth.ldap.scope=sub
 qvd-admin.pl config set auth.ldap.filter=(&(objectClass=inetOrgPerson)(cn=%u))
-qvd-admin.pl config set auth.auto.osi_id=1
+qvd-admin.pl config set auth.auto.osf_id=1
 
 =head2 OPTIONS
 
