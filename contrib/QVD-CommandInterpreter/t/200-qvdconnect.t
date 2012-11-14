@@ -72,7 +72,7 @@ cleanup();
 sub test_cmd {
 	my ($args, $regex, $message) = @_;
 
-	my $ret = `bin/qvdconnect $args`;
+	my $ret = `bin/qvdconnect $args 2>&1`;
 	chomp $ret;
 	ok($ret =~ /$regex/, $message);
 }
