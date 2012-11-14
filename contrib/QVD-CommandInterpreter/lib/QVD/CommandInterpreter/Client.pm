@@ -105,7 +105,7 @@ sub socat {
 	print $sock "socat $port\n";
 
 	$self->{log}->debug("Waiting for answer");
-	my $answer = <$sock>;
+	my $answer = $self->_read();
 
 	$self->{log}->debug("Answer is: $answer");
 	if ( $answer =~ /^OK/ ) {
@@ -142,6 +142,16 @@ sub _send_cmd {
 	return $self->_wait_prompt();
 }
 
+sub _read {
+	my ($self) = @_;
+	my $sock = $self->{sock};
+	my $ret = <$sock>;
+
+	$self->{log}->logdie("Failed to read from socket: $!") if (!defined $ret);
+	#$self->{log}->logdie("Socket closed") if ( !$ret );
+
+	return $ret;
+}
 sub _wait_prompt {
 	my ($self) = @_;
 
@@ -154,8 +164,10 @@ sub _wait_prompt {
 	my $data;             # received block of data
 
 	$self->{log}->debug("Waiting for prompt");
-	while(defined ($status = $sock->recv($data, 512))) {
-		#print STDERR "READ: '$data'\n";
+	while( 1 ) {
+		$status = $sock->recv($data, 512);
+		$self->{log}->debug("READ: '$data', status " . (defined $status ? "'$status'" : 'undef') . ", err $!, connected " . $sock->connected . "\n");
+		last if (!$data);
 
 		$buf .= $data;
 
@@ -177,6 +189,8 @@ sub _wait_prompt {
 		}
 
 	}
+
+	$self->{log}->debug("Last status " . (defined $status ? "'$status'" : 'undef') . ", err $!, data '$data'\n");
 
 	chomp $whole_lines;
 	chomp $whole_lines;
