@@ -6,4 +6,3 @@ sleep 2
 #perl -Mlib::glob=*/lib QVD-L7R/bin/qvd-l7rd
 perl -Mlib::glob=*/lib QVD-HKD/bin/qvd-hkd
 #perl -Mlib::glob=*/lib QVD-Admin-Web/script/qvd_admin_web_server.pl &
-
