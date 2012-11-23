@@ -44,9 +44,13 @@ path.storage.check = ${path.storage.homes}/.rw_check
 
 # storage directories for LXC
 path.storage.basefs = ${path.storage.root}/basefs
-path.storage.overlayfs = ${path.storage.root}/overlayfs
-path.storage.rootfs = ${path.storage.root}/rootfs
 path.storage.homefs = ${path.storage.root}/homefs
+
+path.storage.btrfs.root = ${path.storage.root}
+
+path.storage.overlayfs = ${path.storage.btrfs.root}/overlayfs
+path.storage.rootfs = ${path.storage.btrfs.root}/rootfs
+
 
 ## paths for SSL certificates and CAs
 path.ssl.certs = ${path.run}/ssl
@@ -88,6 +92,7 @@ command.modprobe = /sbin/modprobe
 command.xinit = /usr/bin/xinit
 command.xhost = /usr/bin/xhost
 command.nxproxy = /usr/bin/nxproxy
+command.btrfs = /sbin/btrfs
 
 command.windows.xming = Xming\\Xming.exe
 command.windows.pulseaudio = pulseaudio\\pulseaudio.exe

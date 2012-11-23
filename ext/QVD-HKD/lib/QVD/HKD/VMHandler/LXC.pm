@@ -438,26 +438,52 @@ sub _allocate_os_overlayfs {
     my $self = shift;
     my $overlayfs = $self->{os_overlayfs};
     my $overlayfs_old =  $self->{os_overlayfs_old};
+    my $unionfs_type = $self->_cfg('vm.lxc.unionfs.type');
+
     if (-d $overlayfs) {
         if (defined $overlayfs_old) {
-            $debug and $self->_debug("deleting old overlay directory");
-            unless (rename $overlayfs, $overlayfs_old) {
-                ERROR "Unable to move old '$overlayfs' out of the way to '$overlayfs_old'";
-                return $self->_on_allocate_os_overlayfs_error;
+            if ($unionfs_type eq 'btrfs') {
+                if (_run($self->_cfg('command.btrfs'),
+                             'subvolume', 'delete', $overlayfs)) {
+                    ERROR "Unable to delete old btrfs snapshot at $overlayfs";
+                    return $self->_on_allocate_os_overlayfs_error;
+                }
+                DEBUG "Old btrfs snapshot at $overlayfs removed";
             }
-            DEBUG "Renamed old overlayfd '$overlayfs' to '$overlayfs_old'";
+            else {
+                $debug and $self->_debug("deleting old overlay directory");
+                unless (rename $overlayfs, $overlayfs_old) {
+                    ERROR "Unable to move old '$overlayfs' out of the way to '$overlayfs_old'";
+                    return $self->_on_allocate_os_overlayfs_error;
+                }
+                DEBUG "Renamed old overlayfd '$overlayfs' to '$overlayfs_old'";
+            }
         }
         else {
             $debug and $self->_debug("reusing existing overlay directory");
             DEBUG 'Reusing existing overlay directory';
+            # TODO: add some sanity checks here for btrfs!
             return $self->_on_allocate_os_overlayfs_done
         }
     }
-    unless (_mkpath $overlayfs) {
-        ERROR "Unable to create overlay file system '$overlayfs': $!";
-        return $self->_on_allocate_os_overlayfs_error;
+    if ($unionfs_type eq 'btrfs') {
+        if (_run($self->_cfg('command.btrfs'),
+                 'subvolume', 'snapshot',
+                 $self->_cfg("path.storage.btrfs.root"), $overlayfs)) {
+            ERROR "Unable to create btrfs snapshort at $overlayfs";
+            $self->_on_allocate_os_overlayfs_error;
+        }
+        DEBUG "Btrfs snapshort created at $overlayfs";
+    }
+    else {
+        unless (_mkpath $overlayfs) {
+            ERROR "Unable to create overlay file system '$overlayfs': $!";
+            return $self->_on_allocate_os_overlayfs_error;
+        }
+        DEBUG "overlay directory $overlayfs created";
     }
     $self->_on_allocate_os_overlayfs_done;
+
 }
 
 sub _allocate_os_rootfs {
@@ -531,6 +557,21 @@ sub _allocate_os_rootfs {
                     ERROR "Unable to remount bind mount '$rootfs' as read-only, mount rc: ". ($? >> 8);
                     return $self->_on_allocate_os_rootfs_error;
                 }
+            }
+        }
+        when ('btrfs') {
+            my $btrfs = $self->_cfg("path.storage.btrfs.root");
+            my $base = $self->{os_basefs};
+            my $rel = File::Spec->abs2rel($base, $btrfs);
+            if ($rel =~ m|^/|) {
+                ERROR "Bad btrfs configuration, $base is not under $btrfs";
+                return $self->_on_allocate_os_rootfs_error;
+            }
+            my $base_snapshot = File::Spec->join($self->{os_overlayfs}, $rel);
+            if (_run($self->_cfg('command.mount'),
+                     '--bind', $base_snapshot, $rootfs)) {
+                ERROR "Unable to mount bind '$base_snapshot' into '$rootfs', mount rc: " . ($? >> 8);
+                return $self->_on_allocate_os_rootfs_error;
             }
         }
         default {
