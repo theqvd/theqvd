@@ -10,7 +10,11 @@ my $builder = Module::Build->new(
     configure_requires => { 'Module::Build' => 0.38  },
     build_requires => {
         'Test::More'       => 0,
+	'Test::Expect'    => 0,
         'Proc::Background' => 0,
+        'Net::Ping' => 0,
+    },
+    requires => {
         'Log::Log4perl'    => 0,
     },
     add_to_cleanup      => [ 'QVD-CommandInterpreter-*' ],

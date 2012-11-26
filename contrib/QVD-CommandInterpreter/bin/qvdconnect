@@ -1,5 +1,6 @@
-#!/usr/lib/qvd/bin/perl -w
+#!/usr/lib/qvd/bin/perl
 use strict;
+use warnings;
 use lib 'lib';
 use Getopt::Long;
 use IO::Socket::INET;
@@ -39,6 +40,7 @@ my $localport;
 my $std;
 
 my $cmd_connect_serial;
+my $cmd_connect_pppd;
 my $cmd_getversion;
 my $cmd_gethelp;
 my $daemonize;
@@ -50,6 +52,7 @@ DEBUG("Called with arguments: " . join(' ', @ARGV));
 GetOptions("help"                => \$help,
            "interpreter|i=s"     => \$interpreter_addr,
            "serial|s=s"          => \$cmd_connect_serial,
+           "pppd=s"              => \$cmd_connect_pppd,
            "getversion"          => \$cmd_getversion,
            "gethelp"             => \$cmd_gethelp,
            "remote|r=s"          => \$remote_addr,
@@ -67,28 +70,42 @@ if ( $help ) {
 }
 
 my $log = Log::Log4perl->get_logger('qvdcmd');
-$SIG{__WARN__} = sub { $log->warn(shift); };
-$SIG{__DIE__}  = sub { $log->error(shift); };
+local $SIG{__WARN__} = sub { $log->warn(shift); };
+local $SIG{__DIE__}  = sub { $log->error(shift); };
 
 
 
 
 
-
+#FIXME refactor cmd_connect_serial and cmd_connect_pppd
 
 if ( $cmd_getversion ) {
-	my $client = new QVD::CommandInterpreter::Client(host => $interpreter_addr);
+	my $client = QVD::CommandInterpreter::Client->new(host => $interpreter_addr);
 	print $client->version() . "\n";
 } elsif ( $cmd_gethelp ) {
-	my $client = new QVD::CommandInterpreter::Client(host => $interpreter_addr);
+	my $client = QVD::CommandInterpreter::Client->new(host => $interpreter_addr);
 	print $client->help() . "\n";
-} elsif ( $cmd_connect_serial ) {
+} elsif ( $cmd_connect_serial || $cmd_connect_pppd ) {
+	die "--serial and --pppd are mutually exclusive" if ( $cmd_connect_serial && $cmd_connect_pppd );
+
+	
+	my ($port, $func, $remote_prog);
+
+	if ( $cmd_connect_serial ) {
+		$port        = $cmd_connect_serial;
+		$remote_prog = "socat"; # Name for text output
+		$func        = "socat"; # function to call in $client
+	} else {
+		$port        = $cmd_connect_pppd;
+		$remote_prog = "pppd";
+		$func        = "pppd";
+	}
 
 	if ( $daemonize || $stop ) {
 		
 		if ( !$pidfile ) {
 			$pidfile = "qvdconnect";
-			$pidfile .= get_port_filename($cmd_connect_serial) . ".pid";
+			$pidfile .= get_port_filename($port) . ".pid";
 			$pidfile = File::Spec->join($user_dir, $pidfile);
 		}
 
@@ -97,7 +114,7 @@ if ( $cmd_getversion ) {
 			stop_daemon($pidfile);
 		} else {
 			if ( $stop ) {
-				LOGDIE "Process for port $cmd_connect_serial not running";
+				LOGDIE "Process for port $port not running";
 			}
 		}
 
@@ -106,7 +123,7 @@ if ( $cmd_getversion ) {
 		}
 	}
 
-	my $client = new QVD::CommandInterpreter::Client(host => $interpreter_addr);
+	my $client = QVD::CommandInterpreter::Client->new(host => $interpreter_addr);
 	my $pid;
 
 	if (!-x $socat_binary) {
@@ -116,34 +133,34 @@ if ( $cmd_getversion ) {
 	if ( ! ($remote_addr || $localport || $std ) ) {
 		die "Error: --remote or --localport argument required";
 	} else {
-		my $socat = $client->socat($cmd_connect_serial);
+		my $remote_socket = $client->$func($port);
 
-		if ( $socat ) {
-			$log->info("Remote socat started, connecting to " . ($remote_addr ? $remote_addr : $localport) );
-			print STDERR "Remote socat started\n";
+		if ( $remote_socket ) {
+			$log->info("Remote $remote_prog started, connecting to " . ($remote_addr ? $remote_addr : $localport) );
+			print STDERR "Remote $remote_prog started\n";
 		}
 
-		my $fileno = fileno($socat);
+		my $fileno = fileno($remote_socket);
 		if (!$std) {
-			open(STDIN, "<&$fileno") or die "Can't reopen stdin: $!";
-			open(STDOUT, ">&$fileno") or die "Can't reopen stdout: $!";
+			open(STDIN, "<&", "$fileno") or die "Can't reopen stdin: $!";
+			open(STDOUT, ">&", "$fileno") or die "Can't reopen stdout: $!";
 			STDIN->autoflush(1);
 			STDOUT->autoflush(1);
 		} else {
-			my $flags = fcntl($socat, F_GETFL, 0);
+			my $flags = fcntl($remote_socket, F_GETFL, 0);
 			fcntl($fileno, F_SETFL, $flags & (~FD_CLOEXEC));
 		}
 
 		my @exec_cmd = ($socat_binary);
 
 		if ( $log_socat ) {
-			my $log_file = File::Spec->join($user_dir, "socat" . get_port_filename($cmd_connect_serial) . ".log");
+			my $log_file = File::Spec->join($user_dir, "socat" . get_port_filename($port) . ".log");
 			push @exec_cmd, "-lf$log_file";
 			DEBUG "socat log set to $log_file";
 		}
 
 		if ( $remote_addr ) {
-			push @exec_cmd, ("-", "tcp:$remote_addr,nonblock,reuseaddr,retry=5");
+			push @exec_cmd, ("-", "tcp:$remote_addr,nonblock,reuseaddr,nodelay,retry=5");
 		} elsif ( $localport ) {
 			push @exec_cmd, ("-", "PTY,link=$localport,raw,echo=0");
 		} elsif ( $std ) {
@@ -169,7 +186,7 @@ if ( $cmd_getversion ) {
 			DEBUG "Waiting for child $pid to terminate";
 			my $killed = 0;
 
-			$SIG{TERM} = sub {
+			local $SIG{TERM} = sub {
 				$killed = 1;
 			};
 	
@@ -206,6 +223,7 @@ sub stop_daemon {
 	my $pid = read_file($pidfile);
 	kill_process($pid);
 	unlink($pidfile) or ERROR("Can't unlink $pidfile: $!");
+	return;
 }
 
 sub kill_process {
@@ -234,15 +252,16 @@ sub kill_process {
 
 		sleep 1;
 	}
+	return;
 }
 
 sub read_file {
 	my $file = shift;
-	open(F, '<', $file) or die "Can't open $file: $!";
+	open(my $f, '<', $file) or die "Can't open $file: $!";
 	local $/;
 	undef $/;
-	my $data = <F>;
-	close F;
+	my $data = <$f>;
+	close $f;
 
 	return $data;
 }
@@ -261,8 +280,8 @@ sub daemonize {
 	my $pidfile = shift;
 
 	DEBUG "Daemonizing";
-	$SIG{HUP} = 'IGNORE';
-	$SIG{TERM} = 'IGNORE';
+	local $SIG{HUP} = 'IGNORE';
+	local $SIG{TERM} = 'IGNORE';
 
 	my $pid = fork();
 	LOGDIE "fork failed" if ( $pid < 0 );
@@ -271,14 +290,15 @@ sub daemonize {
 	POSIX::setsid();
 
 	DEBUG "Now running as pid $$";
-	open(PID, '>', $pidfile) or LOGDIE "Can't create pidfile $pidfile: $!";
-	print PID "$$\n";
-	close(PID);
+	open(my $pidfh, '>', $pidfile) or LOGDIE "Can't create pidfile $pidfile: $!";
+	print $pidfh "$$\n";
+	close($pidfh);
 	DEBUG "Wrote pid file $pidfile";
+	return;
 }
 
 sub help {
-	print <<HELP;
+	print <<'HELP';
 Syntax: $0 [arguments]
 
 --help              Shows this help
@@ -286,6 +306,7 @@ Syntax: $0 [arguments]
 --getversion        qvdcmd's version
 --gethelp           qvdcmd's 'help' output
 --serial PORT       Serial port on the client(qvdcmd's) side to forward
+--pppd "args"       pppd's command and args on the client to invoke
 --remote ADDR       Remote socat to forward the serial port to
 --localport PORT    Local port to forward the serial port to
 --daemonize         Daemonize. Only applies to --serial
@@ -310,5 +331,11 @@ To stop the daemon:
 
  qvdconnect --stop --serial /dev/ttyS0
 
+For the pppd option please see the perldoc QVD::CommandInterpreter::Client
+
 HELP
+
+     return;
 }
+
+# FIXME Document pppd perhaps using perldoc

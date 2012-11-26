@@ -1,6 +1,7 @@
-#!/usr/bin/perl -w
+#!/usr/bin/perl
 package QVD::CommandInterpreter::Client;
 use strict;
+use warnings;
 use IO::Socket::INET;
 use Log::Log4perl;
 
@@ -53,13 +54,14 @@ sub _connect {
 
 	$self->{log}->debug("Connecting to QVD::CommandInterpreter on $addr");
 
-	$self->{sock} = new IO::Socket::INET(PeerAddr => $addr );
+	$self->{sock} = IO::Socket::INET->new(PeerAddr => $addr );
 	if ( !$self->{sock} ) {
 		die "Failed to connect to $addr";
 	}
 	$self->{log}->debug("Connected");
 	$self->{sock}->autoflush(1);
 	$self->_wait_prompt();
+	return;
 }
 
 =head2 version
@@ -113,6 +115,57 @@ sub socat {
 		return $self->{sock};
 	} else {
 		$self->{log}->error("Remote socat error: $answer");
+		die "Server refused to connect port: $answer";
+	}
+}
+
+=head2 pppd args
+
+Asks the remote QVD::CommandInterpreter to connect pppd with the indicated
+arguments
+
+Returns an IO::Socket connected to socat on the other side, this socat
+is tipically connected to an execution of pppd. Something like
+
+ /usr/bin/socat -lf/tmp/socatppp_recv.log tcp-listen:9999,nonblock,reuseaddr,retry=5 exec:"/usr/sbin/pppd notty noauth lcp-echo-interval 0 asyncmap 0 nodefaultroute nodetach 192.168.0.1\:192.168.0.2"
+
+And the equivalent qvdconnect command line is:
+
+ qvdconnect --remote localhost:$pppdport --log-socat --pppd \"notty noauth lcp-echo-interval 0 asyncmap 0 nodefaultroute nodetach\"
+
+Basics about pppd:
+
+=over 4
+
+=item * You need root, setuid, or similar to be able to start pppd either on the client or in the users VM. That means that you probably need to run qvd-gui-client as root, or in some distributions, the user must be in the "dip" or dialout group. See the permissions for /usr/sbin/pppd or your distributbion doc.
+
+=item * If you are using LXC virtualization, then it is probable that you need to verify also if you have the required capabilities to start pppd in the container.
+
+=item * Currently the path defined is /usr/sbin/pppd, see the L<QVD::CommandInterpreter> how to change this in the config file
+
+=item * In the example above the IP negotiation is done in the VM
+
+=back
+=cut
+
+# FIXME refactor with _send_cmd and with socat
+
+sub pppd {
+	my ($self, @args) = @_;
+	my $sock = $self->{sock};
+
+	$self->{log}->debug("Sending command: pppd ", join(" ", @args));
+	print $sock "pppd ".join(" ", @args)."\n";
+
+	$self->{log}->debug("Waiting for answer");
+	my $answer = $self->_read();
+
+	$self->{log}->debug("Answer is: $answer");
+	if ( $answer =~ /^OK/ ) {
+		$self->{log}->debug("Remote pppd successful");
+		return $self->{sock};
+	} else {
+		$self->{log}->error("Remote pppd error: $answer");
 		die "Server refused to connect port: $answer";
 	}
 }

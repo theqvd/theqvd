@@ -1,12 +1,14 @@
-#!/usr/bin/perl -wT
+#!/usr/bin/perl -T
 use strict;
+use warnings;
 use lib 'lib';
+use Carp;
 use Getopt::Long;
 use QVD::CommandInterpreter;
 use IO::Socket::INET;
 use Log::Log4perl qw(:easy);
 use POSIX ":sys_wait_h";
-$| = 1;
+local $| = 1;
 
 # Protocol:
 #
@@ -50,8 +52,8 @@ if ( -f $log_config ) {
 }
 
 my $log = Log::Log4perl->get_logger('qvdcmd');
-$SIG{__WARN__} = sub { $log->warn(shift); };
-$SIG{__DIE__}  = sub { $log->error(shift); };
+local $SIG{__WARN__} = sub { $log->warn(shift); };
+local $SIG{__DIE__}  = sub { $log->error(shift); };
 
 delete $ENV{PATH};
 
@@ -60,16 +62,16 @@ GetOptions(
 	"debug|D"       => \$debug,
 	"help|h"        => \$help,
         "listen|l=i"    => \$listen
-) or die "Bad arguments";
+) or croak "Bad arguments";
 
 if ( $help ) {
-	print <<HELP;
+	print <<'HELP';
 Syntax: $0 [options]
-
+ 
 Options:
 	--help, -h	Show this help
 	--config, -c	Specify the config file to use
-
+ 
 HELP
 	exit(0);
 }
@@ -92,6 +94,7 @@ if ( $config_file && -f $config_file ) {
 
 	eval {
 		$args{config} = do($config_file);
+		1;
 	};
 	if ($@) {
 		print "FATAL: Syntax error in config file: $@\n";
@@ -111,18 +114,18 @@ if ( $listen ) {
 
 	$log->info("Listening on localhost, port $listen");
 
-	my $listener = new IO::Socket::INET(Listen    => 5,
+	my $listener = IO::Socket::INET->new(Listen    => 5,
 	                                    LocalAddr => 'localhost',
 	                                    LocalPort => $listen);
 
 	if ( !$listener ) {
-		die "Failed to listen on port $listen";
+		croak "Failed to listen on port $listen";
 	}
 
 	#$SIG{CHLD} = sub { while( waitpid( -1, &WNOHANG ) > 0 ) {} };
-	$SIG{HUP}  = 'IGNORE';
-	$SIG{TERM} = sub { $terminate = 1; $term_sig = "SIGTERM" };
-	$SIG{INT}  = sub { $terminate = 1; $term_sig = "SIGINT" };
+	local $SIG{HUP}  = 'IGNORE';
+	local $SIG{TERM} = sub { $terminate = 1; $term_sig = "SIGTERM" };
+	local $SIG{INT}  = sub { $terminate = 1; $term_sig = "SIGINT" };
 
 	while((!$terminate) && (my $socket = $listener->accept())) {
 		my $fileno = fileno($socket);
@@ -134,15 +137,15 @@ if ( $listen ) {
 
 			if ( !$pid ) {
 				#$SIG{CHLD} = 'DEFAULT';
-				$SIG{TERM} = 'DEFAULT';
-				$SIG{INT}  = 'DEFAULT';
+				local $SIG{TERM} = 'DEFAULT';
+				local $SIG{INT}  = 'DEFAULT';
 
-				open(STDIN, "<&$fileno") or die "Can't reopen stdin: $!";
-				open(STDOUT, ">&$fileno") or die "Can't reopen stdout: $!";
+				open(STDIN, "<&", "$fileno") or croak "Can't reopen stdin: $!";
+				open(STDOUT, ">&", "$fileno") or croak "Can't reopen stdout: $!";
 				STDIN->autoflush(1);
 				STDOUT->autoflush(1);
 				print "Connected\n";
-				my $cmd = new QVD::CommandInterpreter( %args );
+				my $cmd = QVD::CommandInterpreter->new( %args );
 				$cmd->run();
 				$socket->shutdown(2);
 
@@ -152,7 +155,7 @@ if ( $listen ) {
 				$log->debug("Started child $pid");
 			}
 		} else {
-			die "no file handle!";
+			croak "no file handle!";
 		}
 	}
 	
@@ -166,13 +169,13 @@ if ( $listen ) {
 
 	
 } else {
-	my $cmd = new QVD::CommandInterpreter( %args );
+	my $cmd = QVD::CommandInterpreter->new( %args );
 	$cmd->run();
 }
 
 sub untaint {
 	my $arg = shift;
-	$arg =~ /(.*)/;
+	$arg =~ /(.*)/x;
 	return $1;
 }
 

@@ -1,7 +1,7 @@
 package QVD::CommandInterpreter;
 
-use warnings;
 use strict;
+use warnings;
 use Log::Log4perl;
 
 
@@ -11,11 +11,11 @@ QVD::CommandInterpreter - Command interpreter for serial port forwarding
 
 =head1 VERSION
 
-Version 0.01
+Version 0.02
 
 =cut
 
-our $VERSION = '0.01';
+our $VERSION = '0.02';
 
 
 =head1 SYNOPSIS
@@ -49,6 +49,7 @@ $config is the configuration file, with the following stucture:
 
  my $config = {
  	socat => '/usr/bin/socat',
+        pppd  => '/usr/sbin/pppd',
  	allowed_ports => [ qr#^/dev/ttyS\d+#,
  	                   qr#^/dev/ttyUSB/\d+# ]
  };
@@ -74,11 +75,13 @@ sub new {
 		version => \&cmd_version,
 		help    => \&cmd_help,
 		quit    => \&cmd_quit,
-		socat   => \&cmd_socat
+		socat   => \&cmd_socat,
+		pppd    => \&cmd_pppd
 	};
 
 	$self->{config} = {
 		socat => '/usr/bin/socat',
+		pppd  => '/usr/sbin/pppd',
 		allowed_ports => [ qr#^/dev/ttyS\d+#,
 		                   qr#^/dev/ttyUSB/\d+#,
 		                   qr#^/dev/ttyUSB\d+#,
@@ -106,7 +109,7 @@ sub run {
 
 	while(!$self->{done}) {
 		$self->_out( "\n> " );
-		my $line = <STDIN>;
+		my $line = <>;
 		last unless ($line);
 
 		chomp $line;
@@ -115,7 +118,7 @@ sub run {
 	
 		$self->run_command($command, @args);
 	}
-
+	return;
 }
 
 =head2 run_command($command, @args)
@@ -132,6 +135,7 @@ sub run_command {
 	} else {
 		$self->_err("ERROR: Unknown command '$command'. Try 'help'.\n");
 	}
+	return;
 }
 
 
@@ -153,8 +157,10 @@ sub cmd_help {
 	$self->_out("Commands:\n");
 	$self->_out("\thelp          Shows this help\n");
 	$self->_out("\tsocat <port>  Connects socat on the indicated port\n");
+	$self->_out("\tpppd arg1 ..  pppd with the given args\n");
 	$self->_out("\tquit          Quits the interpreter\n");
 	$self->_out("\tversion       Shows the version number\n");
+	return;
 }
 
 =head2 cmd_quit
@@ -168,6 +174,7 @@ sub cmd_quit {
 	$self->{log}->info("Quit command received");
 	$self->_out("Bye.\n");
 	$self->{done} = 1;
+	return;
 }
 
 
@@ -205,7 +212,33 @@ sub cmd_socat {
 			exec($self->{config}->{socat}, @extra_args, "-", "$cport,nonblock,raw,echo=0");
 		}
 	}
+	return ;
 }
+
+
+=head2 cmd_pppd( @args )
+
+Runs pppd with specified args
+
+=cut
+
+sub cmd_pppd {
+	my ($self, @args) = @_;
+
+	my @full_args = $self->_check_pppd_args(@args);
+	if (!@full_args) {
+	    $self->_err("ERROR: pppd args do not comply with character constraints");
+	    return;
+	}
+	# FIXME do not start pppd if full_args is empty
+	if ( $self->{debug} ) {
+	    push @full_args, "debug";
+	}
+	$self->{log}->info("Starting pppd with args: ", join(" ", @full_args));
+	$self->_out("OK\n");
+	exec($self->{config}->{pppd}, @full_args);
+}
+
 
 =head2 cmd_version
 
@@ -217,27 +250,49 @@ sub cmd_version {
 	my ($self, @args) = @_;
 
 	$self->_out("$VERSION\n");
+	return;
+}
+
+# FIXME get this also in config
+sub _check_pppd_args {
+	my ($self, @args) = @_;
+	my @result;
+	foreach my $arg ( @args ) {
+	    if ($arg =~ qr#([-a-zA-Z0-9:,/]+)#x) {
+		push @result, $1;
+	    } else {
+		print STDERR "check_pppd_args: Argument <$arg> does not match constraints returning non arg";
+		$self->{log}->error("check_pppd_args: Argument <$arg> does not match constraints returning non arg");
+		return ();
+	    }
+	}
+
+	return @result;
 }
 
 
 sub _check_port {
 	my ($self, $port) = @_;
 	foreach my $reg ( @{$self->{config}->{allowed_ports}} ) {
-		return $& if ( $port =~ m/$reg/ );
+	    if ( $port =~ m/($reg)/x ) {
+		return $1;
+	    }
 	}
 
-	return undef;
+	return ();
 }
 
 sub _out {
 	my ($self, $msg) = @_;
 	print $msg;
+	return;
 }
 
 sub _err {
 	my ($self, $msg) = @_;
 	$self->{log}->error($msg);
 	print $msg;
+	return;
 }
 
 =head1 SEE ALSO
