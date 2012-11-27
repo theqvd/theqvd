@@ -14,6 +14,7 @@ use QVD::Log;
 use File::Temp qw(tempfile);
 use Linux::Proc::Mountinfo;
 use File::Spec;
+use Fcntl ();
 
 use parent qw(QVD::HKD::VMHandler);
 
@@ -59,15 +60,21 @@ use QVD::StateMachine::Declarative
 
     'starting/untaring_os_image'      => { enter       => '_untar_os_image',
                                            transitions => { _on_untar_os_image_done      => 'starting/placing_os_image',
-                                                            _on_untar_os_image_error     => 'stopping/clearing_runtime_row'     } },
+                                                            _on_untar_os_image_eagain    => 'starting/delaying_untar_os_image',
+                                                            _on_untar_os_image_error     => 'stopping/releasing_untar_lock'     } },
+
+    'starting/delaying_untar_os_image'=> { enter       => '_delay_untar_os_image',
+                                           transitions => { on_hkd_stop                  => 'stopping/releasing_untar_lock',
+                                                            _on_delay_untar_os_image_done=> 'starting/setting_heavy_mark'       },
+                                           leave       => '_abort_call_after'                                                     },
 
     'starting/placing_os_image'       => { enter       => '_place_os_image',
                                            transitions => { _on_place_os_image_done      => 'starting/detecting_os_image_type',
-                                                            _on_place_os_image_error     => 'stopping/clearing_runtime_row'     } },
+                                                            _on_place_os_image_error     => 'stopping/releasing_untar_lock'     } },
 
     'starting/detecting_os_image_type'=> { enter       => '_detect_os_image_type',
                                            transitions => { _on_detect_os_image_type_done  => 'starting/killing_old_lxc',
-                                                            _on_detect_os_image_type_error => 'stopping/clearing_runtime_row'   } },
+                                                            _on_detect_os_image_type_error => 'stopping/releasing_untar_lock'   } },
 
     'starting/killing_old_lxc'        => { enter       => '_kill_lxc',
                                            transitions => { _on_kill_lxc_done            => 'starting/unlinking_iface',
@@ -82,7 +89,7 @@ use QVD::StateMachine::Declarative
 
     'starting/allocating_os_overlayfs'=> { enter       => '_allocate_os_overlayfs',
                                            transitions => { _on_allocate_os_overlayfs_done  => 'starting/allocating_os_rootfs',
-                                                            _on_allocate_os_overlayfs_error => 'stopping/clearing_runtime_row' } },
+                                                            _on_allocate_os_overlayfs_error => 'stopping/releasing_untar_lock' } },
 
     'starting/allocating_os_rootfs'   => { enter       => '_allocate_os_rootfs',
                                            transitions => { _on_allocate_os_rootfs_done  => 'starting/allocating_home_fs',
@@ -223,8 +230,11 @@ use QVD::StateMachine::Declarative
                                            transitions => { _on_destroy_lxc_done         => 'stopping/unmounting_filesystems' } },
 
     'stopping/unmounting_filesystems' => { enter       => '_unmount_filesystems',
-                                           transitions => { _on_unmount_filesystems_done  => 'stopping/clearing_runtime_row',
+                                           transitions => { _on_unmount_filesystems_done  => 'stopping/releasing_untar_lock',
                                                             _on_unmount_filesystems_error => 'zombie/beating_to_death'        } },
+
+    'stopping/releasing_untar_lock'   => { enter       => '_release_untar_lock',
+                                           transitions => { _on_release_untar_lock_done  => 'stopping/clearing_runtime_row'   } },
 
     'stopping/clearing_runtime_row'   => { enter       => '_clear_runtime_row',
                                            transitions => { _on_clear_runtime_row_done   => 'stopped',
@@ -265,8 +275,11 @@ use QVD::StateMachine::Declarative
                                                             _on_destroy_lxc_error        => 'zombie/unmounting_filesystems'  } },
 
     'zombie/unmounting_filesystems'   => { enter       => '_unmount_filesystems',
-                                           transitions => { _on_unmount_filesystems_done => 'zombie/clearing_runtime_row',
+                                           transitions => { _on_unmount_filesystems_done => 'zombie/releasing_untar_lock',
                                                             _on_unmount_filesystems_error=> 'zombie/unsetting_heavy_mark'    } },
+
+    'zombie/releasing_untar_lock'     => { enter       => '_release_untar_lock',
+                                           transitions => { _on_release_untar_lock_done  => 'zombie/clearing_runtime_row'    } },
 
     'zombie/clearing_runtime_row'     => { enter       => '_clear_runtime_row',
                                            transitions => { _on_clear_runtime_row_done   => 'stopped',
@@ -280,7 +293,7 @@ use QVD::StateMachine::Declarative
                                            transitions => { _on_state_timeout => 'zombie/killing_lxc',
                                                             on_hkd_stop => 'stopped'                                         } },
 
-    'dirty'                           => {};
+    'dirty'                           => { transitions => { on_hkd_stop => 'stopped'                                         } };
 
 
 sub _on_cmd_stop  :OnState('__any__') { shift->delay_until_next_state }
@@ -325,6 +338,7 @@ sub _calculate_attrs {
         # note that os_basefs may be changed later from
         # _detect_os_image_type!
         $self->{os_basefs} = "$basefs_parent/$self->{di_path}";
+        $self->{os_basefs_lockfn} = "$basefs_parent/lock.$self->{di_path}";
 
         # FIXME: use a better policy for overlay allocation
         my $overlays_parent = $self->_cfg('path.storage.overlayfs');
@@ -374,11 +388,31 @@ sub _untar_os_image {
         ERROR "Image '$image_path' attached to VM '$self->{vm_id}' does not exist on disk";
         return $self->_on_untar_os_image_error;
     }
+
     my $basefs = $self->{os_basefs};
+    my $lockfn = $self->{os_basefs_lockfn};
+    my $lock;
+    unless (open $lock, '>>', $lockfn) {
+        ERROR "Unable to create or open lock file '$lockfn'";
+        return $self->_on_untar_os_image_error;
+    }
+    $debug and $self->_debug("lock is $lock");
+    unless (flock($lock, Fcntl::LOCK_EX()|Fcntl::LOCK_NB())) {
+        if ($! == POSIX::EAGAIN()) {
+            DEBUG "Waiting for lock $lockfn...";
+            return $self->_on_untar_os_image_eagain
+        }
+        ERROR "Unable to acquire lock for $lockfn";
+        return $self->_on_untar_os_image_error;
+    }
+
     if (-d $basefs) {
         DEBUG 'Image already untarred';
         return $self->_on_untar_os_image_done;
     }
+
+    $self->{untar_lock} = $lock;
+
     my $tmp = $self->_cfg('path.storage.basefs') . "/untar-$$-" . rand(100000);
     $tmp++ while -e $tmp;
     unless (_mkpath $tmp) {
@@ -398,6 +432,21 @@ sub _untar_os_image {
     $self->_run_cmd(\@cmd);
 }
 
+sub _delay_untar_os_image {
+    my $self = shift;
+    $self->_maybe_callback(on_heavy => 0);
+    $self->_call_after($self->_cfg('internal.hkd.lxc.acquire.untar.lock.delay'), '_on_delay_untar_os_image_done')
+}
+
+sub _release_untar_lock {
+    my $self = shift;
+    if ($self->{untar_lock}) {
+        DEBUG "Releasing untar lock";
+        delete $self->{untar_lock};
+    }
+    return $self->_on_release_untar_lock_done
+}
+
 sub _place_os_image {
     my $self = shift;
     my $basefs = $self->{os_basefs};
@@ -410,6 +459,8 @@ sub _place_os_image {
         ERROR "'$basefs' does not exist or is not a directory";
         return $self->_on_place_os_image_error;
     }
+    DEBUG "OS placement done, releasing untar lock";
+    delete $self->{untar_lock};
     $self->_on_place_os_image_done;
 }
 

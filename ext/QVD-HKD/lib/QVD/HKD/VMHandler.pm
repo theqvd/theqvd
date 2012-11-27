@@ -1,6 +1,6 @@
 package QVD::HKD::VMHandler;
 
-BEGIN { *debug = \$QVD::HKD::VMHandler::debug }
+BEGIN { *debug = \$QVD::HKD::debug }
 our $debug;
 
 use strict;
