@@ -393,7 +393,7 @@ sub _untar_os_image {
     my $lockfn = $self->{os_basefs_lockfn};
     my $lock;
     unless (open $lock, '>>', $lockfn) {
-        ERROR "Unable to create or open lock file '$lockfn'";
+        ERROR "Unable to create or open lock file '$lockfn': $!";
         return $self->_on_untar_os_image_error;
     }
     $debug and $self->_debug("lock is $lock");
@@ -402,7 +402,7 @@ sub _untar_os_image {
             DEBUG "Waiting for lock $lockfn...";
             return $self->_on_untar_os_image_eagain
         }
-        ERROR "Unable to acquire lock for $lockfn";
+        ERROR "Unable to acquire lock for $lockfn: $!";
         return $self->_on_untar_os_image_error;
     }
 
@@ -415,10 +415,21 @@ sub _untar_os_image {
 
     my $tmp = $self->_cfg('path.storage.basefs') . "/untar-$$-" . rand(100000);
     $tmp++ while -e $tmp;
-    unless (_mkpath $tmp) {
-        ERROR "Unable to create directory '$tmp'";
-        return $self->_on_untar_os_image_error;
+
+    if ($self->_cfg('vm.lxc.unionfs.type') eq 'btrfs') {
+        if (_run($self->_cfg('command.btrfs'),
+                 'subvolume', 'create', $tmp)) {
+            ERROR "Unable to create btrfs subvolume at '$tmp'";
+            return $self->_on_untar_os_image_error;
+        }
     }
+    else {
+        unless (_mkpath $tmp) {
+            ERROR "Unable to create directory '$tmp': $!";
+            return $self->_on_untar_os_image_error;
+        }
+    }
+
     $self->{os_basefs_tmp} = $tmp;
 
     INFO "Untarring image to '$tmp'";
@@ -450,7 +461,10 @@ sub _release_untar_lock {
 sub _place_os_image {
     my $self = shift;
     my $basefs = $self->{os_basefs};
-    -d $basefs and return $self->_on_place_os_image_done;
+    if (-d $basefs) {
+        DEBUG "image already on place";
+        return $self->_on_place_os_image_done;
+    }
     my $tmp = $self->{os_basefs_tmp};
     INFO "Renaming '$tmp' to '$basefs'";
     rename $tmp, $basefs
@@ -474,7 +488,7 @@ sub _detect_os_image_type {
     }
     elsif (-d "$basefs/rootfs/sbin/") {
         $self->{os_meta} = $basefs;
-        $self->{os_basefs} = "$basefs/rootfs";
+        $self->{os_basefs_subdir} = '/rootfs';
         $debug and $self->_debug("os image is of type extended");
         DEBUG 'OS image is of type extended';
     }
@@ -520,7 +534,7 @@ sub _allocate_os_overlayfs {
     if ($unionfs_type eq 'btrfs') {
         if (_run($self->_cfg('command.btrfs'),
                  'subvolume', 'snapshot',
-                 $self->_cfg("path.storage.btrfs.root"), $overlayfs)) {
+                 $self->{os_basefs}, $overlayfs)) {
             ERROR "Unable to create btrfs snapshort at $overlayfs";
             $self->_on_allocate_os_overlayfs_error;
         }
@@ -539,6 +553,10 @@ sub _allocate_os_overlayfs {
 
 sub _allocate_os_rootfs {
     my $self = shift;
+
+    my $basefs    = $self->{os_basefs}    . ($self->{os_base_subdir} // '');
+    my $overlayfs = $self->{os_overlayfs} . ($self->{os_base_subdir} // '');
+
     my $rootfs = $self->{os_rootfs};
     unless (_mkpath $rootfs) {
         ERROR "Unable to create directory '$rootfs'";
@@ -555,6 +573,7 @@ sub _allocate_os_rootfs {
     my $unionfs_type = $self->_cfg('vm.lxc.unionfs.type');
     DEBUG "Unionfs type: '$unionfs_type'";
 
+
     given ($unionfs_type) {
         when('overlayfs') {
             if(_run($self->_cfg('command.modprobe'), "overlayfs")) {
@@ -563,7 +582,7 @@ sub _allocate_os_rootfs {
             # mount -t overlayfs -o rw,uppderdir=x,lowerdir=y overlayfs /mount/point
             if (_run($self->_cfg('command.mount'),
                      -t => 'overlayfs',
-                     -o => "rw,upperdir=$self->{os_overlayfs},lowerdir=$self->{os_basefs}", "overlayfs", $rootfs)) {
+                     -o => "rw,upperdir=$overlayfs,lowerdir=$basefs", "overlayfs", $rootfs)) {
                 ERROR "Unable to mount overlayfs (code: " . ($?>>8) . ")";
                 return $self->_on_allocate_os_rootfs_error;
             }
@@ -575,7 +594,7 @@ sub _allocate_os_rootfs {
 
             if (_run($self->_cfg('command.mount'),
                 -t => 'aufs',
-                -o => "br:$self->{os_overlayfs}:$self->{os_basefs}=ro", "aufs", $rootfs)) {
+                -o => "br:$overlayfs:$basefs=ro", "aufs", $rootfs)) {
                 ERROR "Unable to mount aufs (code: " . ($?>>8) . ")";
                 return $self->_on_allocate_os_rootfs_error;
             }
@@ -591,15 +610,15 @@ sub _allocate_os_rootfs {
                 -o => 'suid',
                 -o => 'dev',
                 -o => 'allow_other',
-                "$self->{os_overlayfs}=RW:$self->{os_basefs}=RO", $rootfs)) {
+                "$overlayfs=RW:$basefs=RO", $rootfs)) {
                 ERROR "Unable to mount unionfs-fuse (code: " . ($? >> 8) . ")";
                 return $self->_on_allocate_os_rootfs_error;
             }
         }
         when ('bind') {
             if (_run($self->_cfg('command.mount'),
-                '--bind', $self->{os_basefs}, $rootfs)) {
-                ERROR "Unable to mount bind '$self->{os_basefs}' into '$rootfs', mount rc: " . ($? >> 8);
+                '--bind', $basefs, $rootfs)) {
+                ERROR "Unable to mount bind '$basefs' into '$rootfs', mount rc: " . ($? >> 8);
                 return $self->_on_allocate_os_rootfs_error;
             }
             if ($self->_cfg('vm.lxc.unionfs.bind.ro')) {
@@ -611,17 +630,9 @@ sub _allocate_os_rootfs {
             }
         }
         when ('btrfs') {
-            my $btrfs = $self->_cfg("path.storage.btrfs.root");
-            my $base = $self->{os_basefs};
-            my $rel = File::Spec->abs2rel($base, $btrfs);
-            if ($rel =~ m|^/|) {
-                ERROR "Bad btrfs configuration, $base is not under $btrfs";
-                return $self->_on_allocate_os_rootfs_error;
-            }
-            my $base_snapshot = File::Spec->join($self->{os_overlayfs}, $rel);
             if (_run($self->_cfg('command.mount'),
-                     '--bind', $base_snapshot, $rootfs)) {
-                ERROR "Unable to mount bind '$base_snapshot' into '$rootfs', mount rc: " . ($? >> 8);
+                     '--bind', $overlayfs, $rootfs)) {
+                ERROR "Unable to mount bind '$overlayfs' into '$rootfs', mount rc: " . ($? >> 8);
                 return $self->_on_allocate_os_rootfs_error;
             }
         }
