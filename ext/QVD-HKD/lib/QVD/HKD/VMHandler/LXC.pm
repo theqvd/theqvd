@@ -717,7 +717,7 @@ lxc.pts=1
 lxc.rootfs=$self->{os_rootfs}
 lxc.mount.entry=$self->{home_fstab}
 lxc.pivotdir=qvd-pivot
-lxc.cgroup.cpu.shares=100
+lxc.cgroup.cpu.shares=1024
 
 #lxc.cap.drop=sys_module audit_control audit_write linux_immutable mknod net_admin net_raw sys_admin sys_boot sys_resource sys_time
 
