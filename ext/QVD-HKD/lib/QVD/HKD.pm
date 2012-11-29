@@ -66,8 +66,12 @@ use QVD::StateMachine::Declarative
                                                            _on_save_state_error       => 'failed'                         } },
 
     'starting/checking_address'      => { enter       => '_check_address',
-                                          transitions => { _on_check_address_done     => 'starting/removing_old_fw_rules',
+                                          transitions => { _on_check_address_done     => 'starting/preparing_storage',
                                                            _on_check_address_error    => 'failed'                         } },
+
+    'starting/preparing_storage'     => { enter       => '_prepare_storage',
+                                          transitions => { _on_prepare_storage_done   => 'starting/removing_old_fw_rules',
+                                                           _on_prepare_storage_error  => 'failed'                         } },
 
     'starting/removing_old_fw_rules' => { enter       => '_remove_fw_rules',
                                           transitions => { _on_remove_fw_rules_done   => 'starting/setting_fw_rules'      } },
@@ -620,6 +624,23 @@ sub _on_catch_zombies_result {
         my $vm = $self->_new_vm_handler($vm_id);
         $vm->on_cmd('catch_zombie');
     }
+}
+
+sub _prepare_storage {
+    my $self = shift;
+
+    if ($self->_cfg('vm.hypervisor')       eq 'lxc'  and
+        $self->_cfg('vm.lxc.unionfs.type') eq 'btrfs') {
+        my $fn = $self->_cfg('path.storage.btrfs.root') . '/qvd_btrfs_lock';
+        my $fh;
+        unless (open $fh, '>>', $fn) {
+            ERROR "Unable to create or open file $fn to work around LXC make-btrfs-ro-on-exit bug: $!";
+            $self->_on_prepare_storage_error;
+        }
+        DEBUG "$fn opened";
+        $self->{btrfs_lock} = $fh;
+    }
+    $self->_on_prepare_storage_done
 }
 
 sub _fw_rules {
