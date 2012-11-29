@@ -704,6 +704,7 @@ sub _create_lxc {
 
     # FIXME: make this template-able or configurable in some way
     print $fh <<EOC;
+lxc.utsname=$self->{name}
 lxc.network.type=veth
 lxc.network.veth.pair=$iface
 lxc.network.name=eth0
