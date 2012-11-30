@@ -18,10 +18,6 @@ database.user = qvd
 database.name = qvd
 # database.password =
 
-internal.database.poll.connection.timeout = 8
-internal.database.poll.size = 2
-internal.database.poll.connection.delay = 2
-internal.database.poll.connection.retries = 30
 model.user.login.case-sensitive = 0
 
 ## directory where several configuration, state, pid and certificate files are stored
@@ -309,7 +305,7 @@ internal.l7r.short_session = 120
 
 # internal.hkd.perl.anyevent.backend = EV
 
-internal.hkd.cluster.node.timeout = 180
+internal.hkd.cluster.node.timeout = 500
 
 internal.vm.port.x = 5000
 internal.vm.port.vma = 3030
@@ -332,20 +328,26 @@ internal.vma.on_printing.stopped = /usr/lib/qvd/bin/qvd-printing
 internal.vma.printing.config = ${path.run}/printing.conf
 internal.vma.nxagent.config = ${path.run}/nxagent.conf
 
+# TODO: some of these DB settings may not be used anymore, cleanup them!
 internal.database.client.connect.timeout = 20
 internal.database.client.socket.keepidle = 20
 internal.database.client.socket.keepintvl = 5
 internal.database.client.socket.keepcnt = 4
 
+internal.database.poll.connection.timeout = 20
+internal.database.poll.size = 2
+internal.database.poll.connection.delay = 20
+internal.database.poll.connection.retries = 18
+
 internal.hkd.killing.vms.timeout = 120
 
-internal.hkd.agent.ticker.delay = 60
+internal.hkd.agent.ticker.delay = 120
 internal.hkd.agent.ticker.retries = 2
 internal.hkd.agent.command_handler.delay = 10
 internal.hkd.agent.vm_command_handler.delay = 11
 
-internal.hkd.agent.cluster_monitor.delay = 60
-internal.hkd.agent.cluster_monitor.long_delay = 240
+internal.hkd.agent.cluster_monitor.delay = 180
+internal.hkd.agent.cluster_monitor.long_delay = 600
 internal.hkd.agent.cluster_monitor.fuzzy_delay = 60
 
 internal.hkd.agent.rpc.retry.count = 3
