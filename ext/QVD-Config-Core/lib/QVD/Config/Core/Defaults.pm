@@ -334,9 +334,9 @@ internal.database.client.socket.keepidle = 20
 internal.database.client.socket.keepintvl = 5
 internal.database.client.socket.keepcnt = 4
 
-internal.database.poll.connection.timeout = 20
+internal.database.poll.connection.timeout = 10
 internal.database.poll.size = 2
-internal.database.poll.connection.delay = 20
+internal.database.poll.connection.delay = 10
 internal.database.poll.connection.retries = 18
 
 internal.hkd.killing.vms.timeout = 120
