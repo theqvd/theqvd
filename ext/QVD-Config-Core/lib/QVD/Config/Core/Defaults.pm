@@ -309,18 +309,6 @@ internal.l7r.short_session = 120
 
 # internal.hkd.perl.anyevent.backend = EV
 
-#internal.hkd.timeout.vm.state.starting_2 = 240
-#internal.hkd.timeout.vm.state.stopping_1 = 30
-#internal.hkd.timeout.vm.state.stopping_2 = 240
-#internal.hkd.timeout.vm.state.zombie_1 = 30
-#internal.hkd.timeout.vm.state.running = 120
-#internal.hkd.timeout.vm.vma = 4
-#internal.hkd.poll_time = 2
-#internal.hkd.poll_all_mod = 10
-
-#internal.hkd.database.retry_delay = 5
-#internal.hkd.database.timeout = 20
-
 internal.hkd.cluster.node.timeout = 180
 
 internal.vm.port.x = 5000
