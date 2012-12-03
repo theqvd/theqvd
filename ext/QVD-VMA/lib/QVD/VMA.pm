@@ -325,13 +325,13 @@ sub _provisionate_user {
 	else {
 	    eval {
 		DEBUG "executing $groupadd => $user";
-        system $groupadd => $user and die "provisioning of group '$user' failed\n";
+                system $groupadd => $user and die "provisioning of group '$user' failed\n";
 
 		my @args = (
-            '-m',              ## create home
-            '-d', $user_home,  ## home dir
-            '-g', $user,       ## main group
-        );
+                            '-m',              ## create home
+                            '-d', $user_home,  ## home dir
+                            '-g', $user,       ## main group
+                           );
 		push @args, -G => $groups if length $groups;
 		push @args, -u => $uid if $uid;
 		push @args, $user;
