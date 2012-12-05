@@ -1,0 +1,14 @@
+Changes
+ignore.txt
+lib/QVD/L7R/Authenticator/Plugin/Passthrough.pm
+Makefile.PL
+MANIFEST			This list of files
+README
+t/00-load.t
+t/10-passtest.t
+t/20-returncode.t
+t/lib/perlcriticrc
+t/manifest.t
+t/perlcritic.t
+t/pod-coverage.t
+t/pod.t
