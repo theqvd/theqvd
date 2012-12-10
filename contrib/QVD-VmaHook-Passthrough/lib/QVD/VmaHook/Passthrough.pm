@@ -7,6 +7,7 @@ use QVD::Config::Core;
 use QVD::Log;
 use File::Spec;
 use File::Slurp;
+use POSIX qw(geteuid);
 our @EXPORT_OK = qw(save_credentials);
 
 
@@ -53,7 +54,7 @@ This file can be read in perl (among others) with Config::Properties, or from a 
 
 Please install the module in the target image and do not forget to set up the following entry in the /etc/qvd/vma.conf file in the image
  
-vma.on_action.connect=/usr/bin/qvd_passthrough_hook
+ vma.on_action.connect: /usr/lib/qvd/bin/qvd_passthrough_hook
 
 =head1 OPTIONS
 
@@ -101,10 +102,26 @@ sub save_credentials {
 	return 0;
     }
 
-    my $content= "qvduser=".$args{'qvd.vm.user.name'}."\n".
+    my $user = $args{'qvd.vm.user.name'};
+    my $content= "qvduser=$user\n".
 	"qvdpassword=".$args{'qvd.auth.passthrough.passwd'}."\n";
     my $result = write_file($envfile, $content);
-    return $result;
+    if (!$result) {
+	ERROR "save_credentials: Error writing file $envfile";
+	return 0;
+    }
+    my ($login,$pass,$uid,$gid) = getpwnam($user);
+
+    if (!$uid || !$gid) {
+	ERROR "save_credentials: Failed getwnam($user)";
+	return 0;
+    }
+    $result = chown $uid, $gid, $envfile;
+    if (!$result && geteuid() == 0) {
+	ERROR "save_credentials: Failed chown $uid:$gid $envfile";
+	return 0;
+    }
+    return 1;
 }
 
 =head1 SEE ALSO

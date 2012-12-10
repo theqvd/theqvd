@@ -20,6 +20,7 @@ WriteMakefile(
     PREREQ_PM => {
         'QVD::Log' => 0,
         'QVD::Config' => 0,
+	'POSIX' => 0,
     },
     dist                => { COMPRESS => 'gzip -9f', SUFFIX => 'gz', },
     clean               => { FILES => 'QVD-VmaHook-Passthrough-*' },

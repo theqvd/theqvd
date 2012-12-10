@@ -1,7 +1,7 @@
 severity=3
 
 [TestingAndDebugging::ProhibitNoWarnings]
-allow = exec
+allow = exec,once
 
 [Subroutines::RequireArgUnpacking]
 short_subroutine_statements = 6

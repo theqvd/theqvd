@@ -1,4 +1,4 @@
-#!/usr/bin/perl
+#!/usr/lib/qvd/bin/perl
 #
 
 use strict;
@@ -6,16 +6,16 @@ use warnings;
 use Data::Dumper;
 
 BEGIN {
-    $QVD::Config::USE_DB = 0;
-    @QVD::Config::FILES = ('/etc/qvd/vma.conf');
+    no warnings 'once';
+    @QVD::Config::Core::FILES = ('/etc/qvd/vma.conf');
 }
 
-use QVD::Config;
+use QVD::Config::Core;
 use QVD::Log;
 use QVD::VmaHook::Passthrough qw(save_credentials);
 
 DEBUG "The arguments are:".Dumper(\@ARGV);
-my $result = save_credentials(\@ARGV);
+my $result = QVD::VmaHook::Passthrough::save_credentials(\@ARGV);
 my $exit_value = ($result ? 0 : 1);
 exit $exit_value;
 
