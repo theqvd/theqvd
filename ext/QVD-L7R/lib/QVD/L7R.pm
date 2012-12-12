@@ -226,14 +226,20 @@ sub _auth2user_id {
 sub _authenticate_user {
     my ($l7r, $headers) = @_;
     if (my ($credentials) = header_lookup($headers, 'Authorization')) {
-        $l7r->{_auth_tried}++ or this_host->counters->incr_auth_attempts;
         if (my ($basic) = $credentials =~ /^Basic (.*)$/) {
             if (my ($user, $passwd) = decode_base64($basic) =~ /^([^:]+):(.*)$/) {
-                my $auth = QVD::L7R::Authenticator->new;
+		my $auth = $l7r->{_auth};
+		if (defined $auth and
+		    $auth->recheck_authentication_basic($user, $passwd, $l7r)) {
+		    return $auth;
+		}
+                $auth = QVD::L7R::Authenticator->new;
+		this_host->counters->incr_auth_attempts;
                 if ($auth->authenticate_basic($user, $passwd, $l7r)) {
-                    INFO "Accepted connection from user $user from ip:port ".
-                        $l7r->{server}->{client}->peerhost().":".$l7r->{server}->{client}->peerport();
-                        $l7r->{_auth_done}++ or this_host->counters->incr_auth_ok;
+		    INFO "Accepted connection from user $user from ip:port ".
+			$l7r->{server}->{client}->peerhost().":".$l7r->{server}->{client}->peerport();
+		    $l7r->{_auth} = $auth;
+		    this_host->counters->incr_auth_ok;
                     return $auth;
                 }
                 INFO "Failed login attempt from user $user";

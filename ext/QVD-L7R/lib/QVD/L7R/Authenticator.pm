@@ -33,28 +33,33 @@ sub new {
 }
 
 sub _set_login {
-    my ($auth, $login) = @_;
+    my ($auth, $login, $passwd) = @_;
     $auth->{login} = $login;
+    $auth->{passwd} = $passwd;
     $auth->{params}{'qvd.vm.user.name'} = $login;
+}
+
+sub _normalize_login {
+    my ($auth, $login) = @_;
+    $case_sensitive_login ? $login : lc $login
+}
+
+sub recheck_authentication_basic {
+    my ($auth, $login, $passwd, $l7r) = @_;
+    my $login_normalized = $auth->_normalize_login;
+
+    $auth->{login} eq $login and $auth->{passwd} eq $passwd;
 }
 
 sub authenticate_basic {
     my ($auth, $login, $passwd, $l7r) = @_;
 
-    my $login2 = $case_sensitive_login ? $login : lc $login;
+    my $login_normalized = $auth->_normalize_login($login);
 
-    if ($l7r->{_auth_cred_cache} eq "$login2:$passwd") {
-        INFO "Cached credentials found, user '$login2' successfully authenticated";
-        $auth->_set_login ($login2);
-        return $auth;
-    }
-    DEBUG 'Cached credentials not found';
-
-    DEBUG "authenticating user $login ($login2) with modules @{$auth->{modules}}";
+    DEBUG "authenticating user $login ($login_normalized) with modules @{$auth->{modules}}";
     for (@{$auth->{modules}}) {
-        if ($_->authenticate_basic($auth, $login2, $passwd, $l7r)) {
-            $auth->_set_login ($login2);
-            $l7r->{_auth_cred_cache} = "$login2:$passwd";
+        if ($_->authenticate_basic($auth, $login_normalized, $passwd, $l7r)) {
+            $auth->_set_login($login_normalized, $passwd);
             return 1;
         }
     }
