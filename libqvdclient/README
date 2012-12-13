@@ -1,0 +1,30 @@
+Structure
+=========
+
+./c -> libqvdclient.so and qvdclient binary
+
+Prerrequisites
+==============
+
+To compile the c client you need at least (for Ubuntu Precise)
+
+  libssl-dev
+  libcurl4-openssl-dev
+  libjansson-dev
+  qvd-libxcomp-dev
+  libpng12-dev
+  libjpeg-dev
+
+Build
+=====
+
+Run make
+
+Run
+===
+
+C client
+--------
+cd c
+LD_LIBRARY_PATH=. ./qvdclient -h qvddemo.theqvd.com -u yourlogin -w yourpass
+
