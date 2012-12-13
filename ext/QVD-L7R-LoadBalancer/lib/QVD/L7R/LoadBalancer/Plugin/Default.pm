@@ -28,7 +28,7 @@ sub get_free_host {
                       };
     }
 
-    for my $vms (rs(VM_Runtime)->search(undef,
+    for my $vms (rs(VM_Runtime)->search({ vm_state => 'running' },
                                         { select   => ['host_id', { count => 'vm_id'}],
                                           as       => ['host_id', 'vm_count'],
                                           group_by => ['host_id'] })) {
