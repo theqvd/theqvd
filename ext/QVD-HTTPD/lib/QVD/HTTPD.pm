@@ -110,7 +110,7 @@ sub set_http_request_processor {
     $matcher .= "(?:/.*)?" if $children_also;
     $matcher = qr/^$matcher$/;
     my $p = $self->{_http_request_processor} ||= [];
-    @$p = sort { length $_->[1] } @$p, [$callback, $url, $matcher];
+    @$p = sort { length $a->[1] <=> length $b->[1] } @$p, [$callback, $url, $matcher];
     my $c = $self->{_http_request_processor_cache} ||= {};
     delete $$c{$_} for (grep /$matcher/, keys %$c);
     1
