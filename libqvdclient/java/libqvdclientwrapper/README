@@ -1,0 +1,39 @@
+nito@cardalda:~/w/svn/QVD/src/branches/qvdclientlib-jni/jni $ javah -classpath ~/w/src/qvdclientjni/bin com.theqvd.client.jni.QvdclientWrapper
+
+java -cp bin:/usr/share/java/junit4.jar:/usr/share/java/hamcrest-core.jar -Djava.library.path=/home/nito/w/svn/QVD/src/branches/qvdclientlib-jni/c  org.junit.runner.JUnitCore com.theqvd.client.jni.TestLibraryLoad
+
+javah -classpath bin com.theqvd.client.jni.QvdclientWrapper
+nito@cardalda:~/w/src/qvdclientjni $ ls
+bin  com_theqvd_client_jni_QvdclientWrapper.h  README  src  test
+nito@cardalda:~/w/src/qvdclientjni $ 
+
+
+javap -s -p com.theqvd.client.jni.QvdclientWrapper
+
+
+nito@cardalda:~/w/src/qvdclientjni $ javap -s -p  -classpath bin com.theqvd.client.jni.QvdclientWrapper
+Compiled from "QvdclientWrapper.java"
+public class com.theqvd.client.jni.QvdclientWrapper extends java.lang.Object{
+private com.theqvd.client.jni.Qvdclient qvdclient;
+  Signature: Lcom/theqvd/client/jni/Qvdclient;
+private long qvd_c_pointer;
+  Signature: J
+static {};
+  Signature: ()V
+public com.theqvd.client.jni.QvdclientWrapper();
+  Signature: ()V
+public void qvd_init(java.lang.String, int, java.lang.String, java.lang.String)   throws com.theqvd.client.jni.QvdException;
+  Signature: (Ljava/lang/String;ILjava/lang/String;Ljava/lang/String;)V
+private native long c_qvd_init(com.theqvd.client.jni.Qvdclient);
+  Signature: (Lcom/theqvd/client/jni/Qvdclient;)J
+public void qvd_free()   throws com.theqvd.client.jni.QvdException;
+  Signature: ()V
+private native void c_qvd_free(long);
+  Signature: (J)V
+public com.theqvd.client.jni.Qvdclient getQvdclient();
+  Signature: ()Lcom/theqvd/client/jni/Qvdclient;
+public void setQvdclient(com.theqvd.client.jni.Qvdclient);
+  Signature: (Lcom/theqvd/client/jni/Qvdclient;)V
+private static native void initIds();
+  Signature: ()V
+}

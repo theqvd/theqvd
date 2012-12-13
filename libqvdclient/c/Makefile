@@ -31,6 +31,16 @@ $(QVDCLIENTLIB): $(OBJ)
 $(QVDCLIENTLIBA): $(OBJ)
 	$(AR) cru $(QVDCLIENTLIBA) $(OBJ)
 
+test: checkenv-QVDTESTHOST checkenv-QVDTESTUSER checkenv-QVDTESTPASS
+	LD_LIBRARY_PATH=. ./qvdclient -o -n -h $(QVDTESTHOST) -u $(QVDTESTUSER) -w $(QVDTESTPASS)
+
+
+checkenv-%:
+	@if [ -z "${${*}}" ]; then \
+	  echo ${*} not defined; \
+          exit 1;\
+	fi 
+
 clean:
 	rm -f *~ *.o
 

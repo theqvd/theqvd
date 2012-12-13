@@ -1,18 +1,14 @@
 # Get these in order
 #SUBDIRS=src jni/c jni/java jni/jqvdclient
-SUBDIRS=c
+SUBDIRS=c java
 TARGETARCH=
-TESTHOST=qvddemo.theqvd.com
-TESTUSER=test@qindel.com
-TESTPASS=test
-ARGS4J=$$HOME/.m2/repository/args4j/args4j/2.0.16/args4j-2.0.16.jar
 
 default: all
 
-all clean distclean: $(SUBDIRS)
+all clean distclean test: $(SUBDIRS)
 	$(eval TARGET:=$@)
 	for i in $(SUBDIRS); do\
-	    $(MAKE) -C $$i $(TARGET);\
+	    $(MAKE) -C $$i $(TARGET) || exit 1;\
 	done
 
 .PHONY: all clean distclean
