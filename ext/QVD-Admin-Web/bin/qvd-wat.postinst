@@ -4,6 +4,13 @@ set -e
 
 case "$1" in
     configure)
+	if [ -d /var/log/qvd ]
+        then 
+                chown www-data /var/log/qvd
+        else 
+                mkdir -p /var/log/qvd
+                chown www-data /var/log/qvd
+        fi 
 	if [ -x /usr/sbin/a2ensite ] 
 	then 
 		a2ensite qvd-wat.conf 
