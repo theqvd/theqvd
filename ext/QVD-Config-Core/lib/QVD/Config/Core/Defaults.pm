@@ -78,6 +78,7 @@ command.umount = umount
 command.mount = mount
 command.unionfs-fuse = /usr/lib/qvd/bin/unionfs
 command.lxc-destroy = /usr/lib/qvd/bin/lxc-destroy
+command.lxc-console = /usr/lib/qvd/bin/lxc-console
 command.lxc-create = /usr/lib/qvd/bin/lxc-create
 command.lxc-start = /usr/lib/qvd/bin/lxc-start
 command.lxc-stop = /usr/lib/qvd/bin/lxc-stop

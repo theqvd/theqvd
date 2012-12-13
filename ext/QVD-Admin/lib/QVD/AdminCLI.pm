@@ -84,8 +84,6 @@ my %syntax_check_cbs = (
     },
 );
 
-my $lxc_console_command = '/usr/lib/qvd/bin/lxc-console';
-
 sub new {
     my ($class, $quiet) = @_;
     my $admin = QVD::Admin->new;
@@ -1296,6 +1294,7 @@ EOT
 
 sub cmd_vm_console {
     my ($self, @args) = @_;
+    my $lxc_console_command = core_cfg('command.lxc-console');
     eval {
         my $vm_runtime = $self->_get_single_vm_runtime;
         my $hv = cfg('vm.hypervisor');
