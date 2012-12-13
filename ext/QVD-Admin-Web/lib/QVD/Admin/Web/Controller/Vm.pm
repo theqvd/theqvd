@@ -73,12 +73,11 @@ sub edit : Local Form :Args(1){
 
     if ( $form->submitted ) {
         if ( $form->validate ) {
-            $model->admin->set_filter (id => $id);
             my %params =
                 map { $_ => $c->req->body_params->{$_} }
                 grep { defined $c->req->body_params->{$_} }
                 qw/name ip di_tag vm_ssh_port vm_vnc_port vm_serial_port/;
-            my $count = $model->vm_edit (\%params);
+            my $count = $model->vm_edit($id, \%params);
 
             ## I'd like to return to "/vm/view/$id" but this redirect seems to be ignored
             ## I leave it as "/users" to show that it doesn't work
