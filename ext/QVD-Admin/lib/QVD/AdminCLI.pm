@@ -84,6 +84,8 @@ my %syntax_check_cbs = (
     },
 );
 
+my $lxc_console_command = '/usr/lib/qvd/bin/lxc-console';
+
 sub new {
     my ($class, $quiet) = @_;
     my $admin = QVD::Admin->new;
@@ -1300,7 +1302,7 @@ sub cmd_vm_console {
         if ('lxc' eq $hv) {
             my $container_name = sprintf 'qvd-%d', $vm_runtime->vm_id;
             @args = qw/-t 1/ unless @args;
-            exec 'lxc-console', '-n', $container_name, @args
+            exec $lxc_console_command, '-n', $container_name, @args
                 or die "Unable to exec lxc-console: $^E";
         } elsif ('kvm' eq $hv) {
             my $serial_port = $vm_runtime->vm_serial_port;
