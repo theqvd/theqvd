@@ -1,0 +1,333 @@
+/**
+ *  Singleton Class to hold all the configuration strings
+ */
+package com.theqvd.android.xpro;
+
+import com.theqvd.android.client.R;
+import android.app.Activity;
+import android.content.Context;
+import android.content.Intent;
+import android.content.SharedPreferences;
+import android.content.SharedPreferences.Editor;
+import android.content.pm.ApplicationInfo;
+import android.content.pm.PackageManager;
+import android.net.Uri;
+import android.os.Handler;
+import android.os.Message;
+import android.util.DisplayMetrics;
+import android.util.Log;
+import android.view.WindowManager;
+/**
+ * 
+ * Class to hold all the configuration strings + the persistent configuration
+ * of the application stored in the property files
+ * 
+ * @author nito
+ *
+ */
+
+public class Config {
+	public final static String specialAndroid22Extension = ".ogg";
+	public final static String assetscopydir = "xserver";
+	public final static String vnccmd = "vnc://localhost:5900/C24bit/ben1to";
+	public final static String x11cmd = "x11://localhost:6000";
+	private static String targetdir;
+	public static String xvnc;
+	public static String xvnccmd;
+	public static String pocketvncconfigfullpath;
+	public final static String xvncbinary = "Xvncqvd";
+//	public final static String xvnc = targetdir + "/usr/X11R6/bin/" + xvncbinary;
+//	public final static String xvnccmd = xvnc + " :0 -br -localhost -nolisten local -PasswordFile="+targetdir+"/etc/vncpasswd";
+	public final static String psxvnccmd = "/system/bin/ps "+xvncbinary;
+	public final static String serverstartedstring = "^.*?created VNC server for screen 0";
+	public final static String vncdisconnectedstring = ".*?Connections: closed: 127.0.0.1.*";
+	// Connections: closed: 127.0.0.1::51506
+	// Property strings in the property file
+	public final static String props_hasbeencopied = "hasbeencopied";
+	public final static String props_pocketconfigcopied = "pocketconfigcopied";
+	public final static String props_forcexresolution = "forcexresolution";
+	public final static String props_widthpixels = "widthpixels";
+	public final static String props_heightpixels = "heightpixels";
+	public final static String props_keep_x_running = "keepxrunning";
+	public final static String props_use_android_vnc = "useandroidvnc";
+	public final static String helpurl = "http://theqvd.com/trac/wiki/AndroidX11Server";
+	public final static int minPixels = 32;
+	public final static int maxPixels = 10000;
+	public final static boolean debug = false;
+	public final static int notifycopy = 1;
+	public final static int notifystartx = 2;
+	public final static int notifynovncinstalled = 3;
+	public final static int xvncsizerequired = 37; /* 37 MB required */
+	public final static long xvncsizerequiredinkbytes = xvncsizerequired * 1024L;
+	public final static String pocketvncconfig = "xvnc.vnc";
+//	public static String pocketvncconfigfullpath = targetdir + Config.pocketvncconfig;
+	public final static int INSTALLPACKAGE=1;
+	public final static int SENDALERT=0;
+	public final static int SETCOPYPROGRESS=1;
+	public final static int SETPROGRESSVISIBILITY=2;
+	public final static int UPDATEBUTTONS=3;
+	public final static int PRERREQUISITEINSTALLED=4;
+	public final static int[] messageType = {
+		SENDALERT, // uses messageTitle and messageText in the setData
+		SETCOPYPROGRESS, // uses progress in the setData
+		SETPROGRESSVISIBILITY, // uses progressvisibility in the setData
+		UPDATEBUTTONS, // no parameters
+		PRERREQUISITEINSTALLED, // no parameters
+	};
+	public final static String messageTitle = "title";
+	public final static String messageText = "text";
+	public final static String copyProgress = "progress";
+	public final static String progressVisibility = "progressVisibility";
+	// StartActivityForResult codes
+	public final static int vncActivityRequestCode = 11;
+	
+	
+	public static String getAbout(String version) {
+		return "XVnc\nLicense: Licensed under the GPLv3.\nAuthor: Nito@Qindel.ES\nSponsored: http://theqvd.com\nVersion: "+version+"\nRevision: $Revision: 13666 $\nDate: $Date: 2012-01-17 15:16:24 +0100 (Tue, 17 Jan 2012) $";
+	}
+	// Class info
+	static final String tag = Config.xvncbinary + "-Config-" +java.util.Map.Entry.class.getSimpleName();
+	private static Context context;
+	private static Activity activity;
+	private static boolean appConfig_force_x_geometry = false,
+			appConfig_keep_x_running = false,
+			appConfig_run_androidvnc_client = true,
+			appConfig_xvncbinary_copied = false,
+			appConfig_pocketconfig_copied = false;
+	private static int appConfig_height_pixels = 0, appConfig_width_pixels = 0,
+			appConfig_defaultHeightPixels = 0, appconfig_defaultWidthPixels = 0;
+	private static VncViewerAndroid androidvncviewer;
+	private static VncViewerPocketCloud pocketcloudvncviewer;
+	private static PrerrequisiteXvncCopy xvnccopy;
+	private static Handler uiHandler;
+	private Prerrequisite[] prerrequisites;
+	// Set installPrerrequisitesOnStart to true if you want to finish the activity
+	// after installation
+	private static boolean installPrerrequisitesOnStart = false;
+	
+	private void init() {
+		setTargetdir(context.getFilesDir().getAbsolutePath());
+		pocketvncconfigfullpath = getTargetdir() + "/" + Config.pocketvncconfig;
+		xvnc = getTargetdir() + "/usr/X11R6/bin/" + xvncbinary;
+		xvnccmd = xvnc + " :0 -br -localhost -nolisten local -PasswordFile="+getTargetdir()+"/etc/vncpasswd";
+		
+		// Set height and width
+		DisplayMetrics metrics = new DisplayMetrics();
+		((WindowManager) context.getSystemService(Context.WINDOW_SERVICE)).getDefaultDisplay().getMetrics(metrics);
+		// force landscape hack
+		appConfig_defaultHeightPixels = (metrics.heightPixels > metrics.widthPixels) ? metrics.widthPixels : metrics.heightPixels;
+		appconfig_defaultWidthPixels = (metrics.heightPixels > metrics.widthPixels) ? metrics.heightPixels : metrics.widthPixels;
+		load_properties();
+	}
+	public Config(Context c) {
+		context = c;
+		init();
+	}
+	public Config(Activity a) {
+		context = a;
+		activity = a;
+		init();
+	}
+	private void load_properties() {
+		SharedPreferences prefsPrivate;
+		prefsPrivate = context.getSharedPreferences("PREFS_PRIVATE", Context.MODE_PRIVATE);
+		appConfig_force_x_geometry = prefsPrivate.getBoolean(Config.props_forcexresolution, appConfig_force_x_geometry);
+		appConfig_keep_x_running = prefsPrivate.getBoolean(Config.props_keep_x_running, appConfig_keep_x_running);
+		appConfig_run_androidvnc_client = prefsPrivate.getBoolean(Config.props_use_android_vnc, appConfig_run_androidvnc_client);
+		appConfig_xvncbinary_copied = prefsPrivate.getBoolean(Config.props_hasbeencopied, appConfig_xvncbinary_copied);
+		appConfig_height_pixels = prefsPrivate.getInt(Config.props_heightpixels, appConfig_defaultHeightPixels);
+		appConfig_width_pixels = prefsPrivate.getInt(Config.props_widthpixels, appconfig_defaultWidthPixels);
+		appConfig_pocketconfig_copied = prefsPrivate.getBoolean(Config.props_pocketconfigcopied, appConfig_pocketconfig_copied);
+	}
+	private void save_properties() {
+		SharedPreferences prefsPrivate;
+		prefsPrivate = context.getSharedPreferences("PREFS_PRIVATE", Context.MODE_PRIVATE);
+		Editor prefsPrivateEditor = prefsPrivate.edit();
+		prefsPrivateEditor.putBoolean(Config.props_forcexresolution, appConfig_force_x_geometry);
+		prefsPrivateEditor.putBoolean(Config.props_keep_x_running, appConfig_keep_x_running);
+		prefsPrivateEditor.putBoolean(Config.props_use_android_vnc, appConfig_run_androidvnc_client);
+		prefsPrivateEditor.putBoolean(Config.props_hasbeencopied, appConfig_xvncbinary_copied);
+		prefsPrivateEditor.putBoolean(Config.props_pocketconfigcopied, appConfig_pocketconfig_copied);
+		prefsPrivateEditor.putInt(Config.props_heightpixels, appConfig_height_pixels);
+		prefsPrivateEditor.putInt(Config.props_widthpixels, appConfig_width_pixels);
+		prefsPrivateEditor.commit();
+	}
+	public VncViewer getVncViewer() throws XvncproException {
+		return is_run_androidvnc_client() ? this.getAndroidvncviewer() : this.getPocketcloudvncviewer();
+	}
+	public boolean is_force_x_geometry() {
+		return appConfig_force_x_geometry;
+	}
+	public void set_force_x_geometry(
+			boolean appConfig_force_x_geometry) {
+		Config.appConfig_force_x_geometry = appConfig_force_x_geometry;
+		save_properties();
+	}
+	public boolean is_keep_x_running() {
+		return appConfig_keep_x_running;
+	}
+	public void set_keep_x_running(boolean appConfig_keep_x_running) {
+		Config.appConfig_keep_x_running = appConfig_keep_x_running;
+		save_properties();
+	}
+	public boolean is_run_androidvnc_client() {
+		return appConfig_run_androidvnc_client;
+	}
+	public void set_run_androidvnc_client(boolean appConfig_run_androidvnc_client) {
+		Config.appConfig_run_androidvnc_client = appConfig_run_androidvnc_client;
+		// Recalculate prerrequisites in the next invocation
+		prerrequisites = null;
+		save_properties();
+	}
+	public boolean is_xvncbinary_copied() {
+		return appConfig_xvncbinary_copied;
+	}
+	public void set_xvncbinary_copied(
+			boolean appConfig_xvncbinary_copied) {
+		Config.appConfig_xvncbinary_copied = appConfig_xvncbinary_copied;
+		save_properties();
+	}
+	public boolean isAppConfig_pocketconfig_copied() {
+		return appConfig_pocketconfig_copied;
+	}
+	public void setAppConfig_pocketconfig_copied(
+			boolean appConfig_pocketconfig_copied) {
+		Config.appConfig_pocketconfig_copied = appConfig_pocketconfig_copied;
+		save_properties();
+	}
+	public int get_height_pixels() {
+		return appConfig_height_pixels;
+	}
+	public void set_height_pixels(int appConfig_height_pixels) {
+		Config.appConfig_height_pixels = appConfig_height_pixels;
+		save_properties();
+	}
+	public int get_width_pixels() {
+		return appConfig_width_pixels;
+	}
+	public void set_width_pixels(int appConfig_width_pixels) {
+		Config.appConfig_width_pixels = appConfig_width_pixels;
+		save_properties();
+	}
+    public int getAppConfig_defaultHeightPixels() {
+		return appConfig_defaultHeightPixels;
+	}
+	public int getAppconfig_defaultWidthPixels() {
+		return appconfig_defaultWidthPixels;
+	}
+	public VncViewerAndroid getAndroidvncviewer() throws XvncproException {
+		if (activity == null) {
+			throw new XvncproException(context.getString(R.string.xvncpro_activity_notdefined));
+		}
+    	androidvncviewer = (androidvncviewer == null) ? new VncViewerAndroid(activity) : androidvncviewer;
+		
+		return androidvncviewer;
+	}
+	public VncViewerPocketCloud getPocketcloudvncviewer() throws XvncproException {
+		if (activity == null) {
+			throw new XvncproException(context.getString(R.string.xvncpro_activity_notdefined));
+		}
+		pocketcloudvncviewer = (pocketcloudvncviewer == null) ? new VncViewerPocketCloud(activity) : pocketcloudvncviewer;
+		
+		return pocketcloudvncviewer;
+	}
+	public PrerrequisiteXvncCopy getXvnccopy() {
+		xvnccopy = (xvnccopy == null) ? new PrerrequisiteXvncCopy(context) : xvnccopy;
+		return xvnccopy;
+	}
+	public Handler getUiHandler() {
+		return uiHandler;
+	}
+	public void setUiHandler(Handler mHandler) {
+		Config.uiHandler = mHandler;
+		getXvnccopy().setuiHandler(mHandler);
+	}
+	public boolean packageInstalled(String packagename) {
+		ApplicationInfo info;
+		try{
+			info = context.getPackageManager().getApplicationInfo(packagename, 0);
+		} catch( PackageManager.NameNotFoundException e ){
+			Log.i(tag, packagename + " is not installed");
+			return false;
+		}
+		Log.i(tag, packagename+" is already installed" + info);
+		return true;
+	}
+    public void installPackage(String packagename) {
+    	Log.i(tag, "Requesting installation of "+packagename);
+    	Intent goToMarket = new Intent(Intent.ACTION_VIEW).setData(Uri.parse("market://details?id="+packagename));
+//    	goToMarket.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
+    	if (activity == null) {
+    		Log.i(tag, "Calling installPackage withouth startActivityForResult because activity is null");
+    		context.startActivity(goToMarket);
+    	} else {
+    		Log.d(tag, "Calling installPackage with startActivityForResult because activity is non null");
+    		activity.startActivityForResult(goToMarket, INSTALLPACKAGE);
+    	}
+		Log.d(tag, "package is installed sending prerrequisite installed for " + packagename);
+		Message m = getUiHandler().obtainMessage(Config.PRERREQUISITEINSTALLED);
+		getUiHandler().sendMessage(m);
+    }
+	public Prerrequisite[] getPrerrequisites() throws XvncproException {
+		if (prerrequisites != null) {
+			return prerrequisites;
+		}
+		Log.i(tag, "getPrerrequisites(): prerrequisites not defined");
+    	prerrequisites = new Prerrequisite[2];
+
+    	prerrequisites[0] = getXvnccopy();
+    	prerrequisites[1] = getVncViewer();
+    	
+    	return prerrequisites;
+    }
+    public boolean prerrequisitesInstalled() throws XvncproException {
+    	boolean prerrequisitesInstalled = true;
+    	int i;
+    	Log.d(tag, "prerrequisitesInstalled:"+getPrerrequisites().length);
+    	for (i=0; i < getPrerrequisites().length; i ++) {
+    		prerrequisitesInstalled &= getPrerrequisites()[i].isInstalled();
+    		Log.i(tag, "prerrequisite["+i+"] installation="+getPrerrequisites()[i].isInstalled());
+    	}
+    	return prerrequisitesInstalled;
+    }
+    
+    public void installPrerrequisites() throws XvncproException {
+    	int i;
+    	for (i=0; i < getPrerrequisites().length; i ++) {
+    		if (!getPrerrequisites()[i].isInstalled()) {
+    			Log.i(tag, "prerrequisite["+i+"] start installing");
+    			getPrerrequisites()[i].install();
+    		}
+    	}
+    }
+    public String getPrerrequisitesText() throws XvncproException {
+    	String result = "";
+    	int i;
+    	for (i=0; i < getPrerrequisites().length; i ++) {
+    		if (!getPrerrequisites()[i].isInstalled()) {
+    			Log.d(tag, "prerrequisite["+i+"] description:" + getPrerrequisites()[i].getDescriptionText());
+    			result += getPrerrequisites()[i].getDescriptionText()+"\n";
+    		}
+    	}
+    	return result;
+    }
+	public String getTargetdir() {
+		return targetdir;
+	}
+	public void setTargetdir(String targetdir) {
+		Config.targetdir = targetdir;
+	}
+	public static Activity getActivity() {
+		return activity;
+	}
+	public static void setActivity(Activity activity) {
+		Config.activity = activity;
+	}
+	public static boolean isInstallPrerrequisitesOnStart() {
+		return installPrerrequisitesOnStart;
+	}
+	public static void setInstallPrerrequisitesOnStart(
+			boolean finishAfterInstallingPrerrequisites) {
+		Config.installPrerrequisitesOnStart = finishAfterInstallingPrerrequisites;
+	}
+}
