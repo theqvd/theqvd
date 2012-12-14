@@ -71,7 +71,7 @@ sub _on_reload_result {
         DEBUG 'Reloading configuration from database';
         for (@rows) {
             my ($k, $v) = @$_;
-            $props->changeProperty($k, $v);
+            $props->changeProperty($k, $v) if $k;
         }
     }
     else {
