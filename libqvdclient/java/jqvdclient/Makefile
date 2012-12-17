@@ -1,7 +1,10 @@
 default: all
 
-all android: 
+all: 
 	mvn install
+
+test: all
+
 clean:
 	mvn clean
 
