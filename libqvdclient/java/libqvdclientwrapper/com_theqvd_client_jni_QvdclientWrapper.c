@@ -844,3 +844,27 @@ JNIEXPORT void JNICALL Java_com_theqvd_client_jni_QvdclientWrapper_qvd_1c_1set_1
   qvd_set_nx_options(qvd, str);
   (*env)->ReleaseStringUTFChars(env, nx_options, str);
 }
+
+JNIEXPORT void JNICALL Java_com_theqvd_client_jni_QvdclientWrapper_qvd_1c_1set_1cert_1files
+  (JNIEnv *env, jobject obj, jlong qvd_c_pointer, jstring client_cert, jstring client_key)
+{
+  qvdclient *qvd; 
+  const jbyte *client_cert_c, *client_key_c;
+
+  qvd=_set_qvdclient(qvd_c_pointer);
+
+  client_cert_c = (*env)->GetStringUTFChars(env, client_cert, NULL);
+  if (client_cert == NULL) {
+    return ; /* OutOfMemoryError already thrown */
+  }
+  client_key_c = (*env)->GetStringUTFChars(env, client_key, NULL);
+  if (client_key == NULL) {
+    (*env)->ReleaseStringUTFChars(env, client_cert, client_cert_c);
+    return ; /* OutOfMemoryError already thrown */
+  }
+
+  qvd_set_cert_files(qvd, client_cert_c, client_key_c);
+
+  (*env)->ReleaseStringUTFChars(env, client_cert, client_cert_c);
+  (*env)->ReleaseStringUTFChars(env, client_key, client_key_c);
+}

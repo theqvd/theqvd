@@ -159,6 +159,14 @@ JNIEXPORT jstring JNICALL Java_com_theqvd_client_jni_QvdclientWrapper_qvd_1c_1ge
 JNIEXPORT void JNICALL Java_com_theqvd_client_jni_QvdclientWrapper_qvd_1c_1set_1nx_1options
   (JNIEnv *, jobject, jlong, jstring);
 
+/*
+ * Class:     com_theqvd_client_jni_QvdclientWrapper
+ * Method:    qvd_c_set_cert_files
+ * Signature: (JLjava/lang/String;Ljava/lang/String;)V
+ */
+JNIEXPORT void JNICALL Java_com_theqvd_client_jni_QvdclientWrapper_qvd_1c_1set_1cert_1files
+  (JNIEnv *, jobject, jlong, jstring, jstring);
+
 #ifdef __cplusplus
 }
 #endif

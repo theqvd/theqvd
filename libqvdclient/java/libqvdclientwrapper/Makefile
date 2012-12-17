@@ -13,6 +13,8 @@ CFLAGS=-fPIC -g -I/usr/lib/jvm/default-java/include -I/usr/lib/jvm/default-java/
 #.phony: ALL
 all: $(QVDCLIENTLIB)
 
+test: $(QVDCLIENTLIB)
+
 $(QVDCLIENTLIB): $(OBJ)
 	$(LD) -shared -o $(QVDCLIENTLIB) $(OBJ) $(QVDCLIENTLIBS)
 
