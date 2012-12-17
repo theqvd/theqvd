@@ -2,6 +2,7 @@ package com.theqvd.client.jni;
 
 import static org.junit.Assert.*;
 
+import java.io.IOException;
 import java.io.InputStream;
 import java.util.Properties;
 
@@ -17,8 +18,13 @@ public class TestConnectToVM {
 	public void setUp() throws Exception {
 		// create and load default properties
 		Properties testprops = new Properties();
-		InputStream in = getClass().getResourceAsStream("/test2.properties");
-		testprops.load(in);
+		InputStream in = getClass().getResourceAsStream("/testlocal.properties");
+		try {
+			testprops.load(in);
+		} catch (IOException e) {
+			in = getClass().getResourceAsStream("/test.properties");
+			testprops.load(in);
+		}
 		in.close();
 		host = testprops.getProperty("test.host");
 		port = Integer.parseInt(testprops.getProperty("test.port"));
