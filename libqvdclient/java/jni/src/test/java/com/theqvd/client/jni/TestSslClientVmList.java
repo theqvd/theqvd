@@ -16,7 +16,7 @@ public class TestSslClientVmList {
 	@Before
 	public void setUp() throws Exception {
 		Properties testprops = new Properties();
-		InputStream in = getClass().getResourceAsStream("/test.properties");
+		InputStream in = getClass().getResourceAsStream("/test2.properties");
 		testprops.load(in);
 		in.close();
 		host = testprops.getProperty("test.sslhost");
