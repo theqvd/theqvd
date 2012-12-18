@@ -3,6 +3,7 @@ package QVD::AdminCLI;
 use warnings;
 use strict;
 
+use QVD::Config::Core qw(core_cfg);
 use QVD::Config;
 use QVD::Admin;
 use Text::Table;
