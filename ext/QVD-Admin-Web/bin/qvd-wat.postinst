@@ -3,8 +3,8 @@
 set -e 
 
 case "$1" in
-    configure)
 
+    configure)
 	if [ -d /var/log/qvd ]
 	then 
 		chown www-data /var/log/qvd
@@ -19,6 +19,10 @@ case "$1" in
 	if [ -x /usr/sbin/apache2 ] 
 	then 
 		apache2ctl graceful
+	fi
+	if [ -d /var/lib/qvd/storage/staging ]
+	then 
+		chown www-data /var/lib/qvd/storage/staging
 	fi
 		
     ;;
