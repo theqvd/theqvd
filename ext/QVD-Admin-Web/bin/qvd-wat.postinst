@@ -20,9 +20,9 @@ case "$1" in
 	then 
 		apache2ctl graceful
 	fi
-	if [ -d /var/lib/qvd/storage/staging ]
+	if [ -d /var/lib/qvd/storage/images ]
 	then 
-		chown www-data /var/lib/qvd/storage/staging
+		chown www-data /var/lib/qvd/storage/images
 	fi
 		
     ;;
