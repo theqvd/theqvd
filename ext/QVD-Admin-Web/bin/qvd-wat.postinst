@@ -11,10 +11,6 @@ case "$1" in
                 mkdir -p /var/log/qvd
                 chown www-data /var/log/qvd
         fi 
-	if [ -d /var/lib/qvd/storage/images ]
-	then
-		chown www-data /var/lib/qvd/storage/images
-	fi
 	if [ -x /usr/sbin/a2ensite ] 
 	then 
 		a2ensite qvd-wat.conf 
@@ -22,6 +18,9 @@ case "$1" in
 	if [ -x /usr/sbin/apache2 ] 
 	then 
 		apache2ctl graceful
+	fi
+	if [ -d /var/lib/qvd/storage/images ] ; then
+		chown www-data /var/lib/qvd/storage/images
 	fi
 	
     ;;
