@@ -3,6 +3,7 @@ package QVD::AdminCLI;
 use warnings;
 use strict;
 
+use QVD::Config::Core qw(core_cfg);
 use QVD::Config;
 use QVD::Admin;
 use Text::Table;
@@ -1294,13 +1295,14 @@ EOT
 
 sub cmd_vm_console {
     my ($self, @args) = @_;
+    my $lxc_console_command = core_cfg('command.lxc-console');
     eval {
         my $vm_runtime = $self->_get_single_vm_runtime;
         my $hv = cfg('vm.hypervisor');
         if ('lxc' eq $hv) {
             my $container_name = sprintf 'qvd-%d', $vm_runtime->vm_id;
             @args = qw/-t 1/ unless @args;
-            exec 'lxc-console', '-n', $container_name, @args
+            exec $lxc_console_command, '-n', $container_name, @args
                 or die "Unable to exec lxc-console: $^E";
         } elsif ('kvm' eq $hv) {
             my $serial_port = $vm_runtime->vm_serial_port;
