@@ -1,11 +1,13 @@
-#!/usr/bin/perl -T
+#!/usr/lib/qvd/bin/perl -T
 use strict;
 
 use Test::Expect;
-use Test::More tests => 12;
+use Test::More tests => 17;
 use File::Temp qw(tempdir);
 use Proc::Background;
 use POSIX;
+use Data::Dumper;
+
 my ($port_proc, $test_proc, $cmd_proc, $cmd_proc2, $pppd_proc);
 my ($pppd_pid);
 
@@ -18,8 +20,14 @@ $SIG{__DIE__} = sub {
 $SIG{INT} = \&cleanup;
  
 undef $ENV{PATH};
-my $dir = tempdir( CLEANUP => 1 );
-create_temp_conf($dir);
+my $dir = tempdir( CLEANUP => 0 );
+
+my $base_config = `bin/qvdcmd --mkconfig`;
+
+ok($? == 0, "Get base config");
+
+create_temp_conf($dir, $base_config);
+
 
 my $random = int(rand(48000) + 16000);
 my $cmdport = $random;
@@ -80,6 +88,9 @@ SKIP: {
 
     test_cmd("--interpreter localhost:$cmdport2 --getversion", qr/\d+/, "Test getversion");
 
+    test_cmd("--interpreter localhost:$cmdport2  --ppprestartservice inexistentdaemon", qr/Service doesn't match constraints/, "Try restarting inexistent daemon");
+    
+    
     # Client socat to run pppd if remote connection is alive
     $pppd_proc = Proc::Background->new("/usr/bin/socat", "-lf/tmp/socatppp_recv.log", "tcp-listen:$pppdport,nonblock,reuseaddr,retry=5", "exec:$pppd notty noauth lcp-echo-interval 0 asyncmap 0 nodefaultroute nodetach $localip\\:$remoteip");
     sleep(0.2);
@@ -88,7 +99,7 @@ SKIP: {
     $pppd_pid = fork();
     if ($pppd_pid eq 0) {
 	# child
-	test_cmd("--daemonize --interpreter localhost:$cmdport2 --remote localhost:$pppdport --log-socat --pppd \"notty noauth lcp-echo-interval 0 asyncmap 0 nodefaultroute nodetach\"", qr/Remote pppd started/, "pppd interconnect");
+	test_cmd("--daemonize --interpreter localhost:$cmdport2 --remote localhost:$pppdport --log-socat --ppprestartservice testdaemon --ppproute \"to 1.2.3.4 via 0.0.0.0\" --pppd \"notty noauth lcp-echo-interval 0 asyncmap 0 nodefaultroute nodetach\"", qr/Remote pppd started/, "pppd interconnect");
 	# should not return
 	exit(0);
     } 
@@ -103,6 +114,17 @@ SKIP: {
     }
     ok($p->ping($remoteip), "Ping to $remoteip");
     ok($p->ping($localip), "Ping to $localip");
+    
+    ok(-f "/etc/ppp/ip-up.d/qvd", "qvd ppp ip-up script exists");
+    my $contents = slurp("/etc/ppp/ip-up.d/qvd");
+    
+    ok( $contents =~ /$dir/, "qvd pp ip-script was written during this test");
+    
+    
+    ok(-f "$dir/daemon_restarted", "ppp restarted daemon");
+    
+    sleep 10;
+    
 }
 
 
@@ -129,18 +151,33 @@ sub cleanup {
 }
 
 sub create_temp_conf {
-	my $dir = shift;
-
+	my ($dir, $orig_conf_str) = @_;
+	my $conf = eval(untaint($orig_conf_str));
+	if ($@) {
+		die "Failed to parse config: $@";
+	}
+	
+	unless ( $conf && exists $conf->{paths} ) {
+		die "Failed to parse config. Config is " . ($conf // "[undef]") . ". Source is:\n\n$orig_conf_str";
+	}
+	
+	$conf->{paths}->{sysv_dir} = $dir;
+	$conf->{socat}->{allowed_ports} = [ qr#^$dir/testport\d+# ];
+	
 	open(CONF, ">", "$dir/qvdcmd.conf") or die "Can't create config $dir/qvdcmd.conf: $!";
-	print CONF <<CONFIG;
-{
-	socat => '/usr/bin/socat',
-	pppd  => '/usr/sbin/pppd',
-	allowed_ports => [ qr#^$dir/testport\\d+# ]
-};
-CONFIG
-	close(CONF);
-
+	
+	print CONF "my \$config;\n";
+	print CONF Data::Dumper->Dump([$conf], ["config"]);
+	close CONF;
+	
+	open(RCSCRIPT, '>', "$dir/testdaemon") or die "Can't create script $dir/daemon.sh: $!";
+	print RCSCRIPT <<RCDATA;
+#!/bin/bash
+touch $dir/daemon_restarted
+RCDATA
+	close(RCSCRIPT);
+	chmod 0755, "$dir/testdaemon";
+	
 	open(SCRIPT, ">", "$dir/testscript.sh") or die "Can't create script $dir/testscript.sh: $!";
 	print SCRIPT <<SCRIPTDATA;
 #!/bin/bash
@@ -155,6 +192,17 @@ SCRIPTDATA
 
 sub untaint {
 	my $arg = shift;
-	$arg =~ /(.*)/x;
+	$arg =~ /(.*)/xs;
 	return $1;
+}
+
+sub slurp {
+	my ($file) = @_;
+	open my $fh, '<', $file or die "Can't open $file: $!";
+	local $/;
+	undef $/;
+	my $ret = <$fh>;
+	close $fh;
+	
+	return $ret;
 }
