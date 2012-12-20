@@ -316,8 +316,9 @@ sub vm_del {
 }
 
 sub vm_edit {
-    my ($self, $params) = @_;
+    my ($self, $vm_id, $params) = @_;
     $self->reset_status;
+    $self->admin->set_filter( id => $vm_id );
     my $count = eval { $self->admin->cmd_vm_edit(%$params) };
     $self->set_error($@) unless defined $count;
     $count;
