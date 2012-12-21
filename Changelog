@@ -1,3 +1,10 @@
+QVD 3.2.0
+=========
+
+- Main feature: btrfs images
+- Rewritten cluster monitor
+- Fixes to several minor bugs
+
 QVD 3.1.1
 =========
 
