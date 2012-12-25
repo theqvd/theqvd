@@ -21,7 +21,6 @@
             android:id="@+id/connectionStartButton"
             android:layout_width="150dip"
             android:layout_height="fill_parent"
-            android:textAppearance="?android:attr/textAppearanceSmall"
             android:layout_marginLeft="75dip"/>
         <ImageView
             android:layout_width="wrap_content"
@@ -85,6 +84,32 @@
            android:layout_height="wrap_content"
            android:textOff="@string/stop_x_on_disconnect"
            android:textOn="@string/keep_x_running"
+           android:layout_gravity="center_vertical"/> 
+    </LinearLayout>
+    <LinearLayout 
+        android:layout_height="wrap_content"
+        android:layout_width="fill_parent">
+       <ToggleButton
+           android:text="@string/remoteVncConnectionChoice"
+           android:id="@+id/allowRemoteVNCButton"
+           android:layout_width="150dip"
+           android:layout_marginLeft="75dip"
+           android:layout_height="wrap_content"
+           android:textOff="@string/noRemoteVncConnection"
+           android:textOn="@string/allowRemoteVncConnection"
+           android:layout_gravity="center_vertical"/> 
+    </LinearLayout>
+    <LinearLayout 
+        android:layout_height="wrap_content"
+        android:layout_width="fill_parent">
+       <ToggleButton
+           android:text="@string/renderChoice"
+           android:id="@+id/renderButton"
+           android:layout_width="150dip"
+           android:layout_marginLeft="75dip"
+           android:layout_height="wrap_content"
+           android:textOff="@string/noRender"
+           android:textOn="@string/render"
            android:layout_gravity="center_vertical"/> 
     </LinearLayout>
     <TextView

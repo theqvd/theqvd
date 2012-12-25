@@ -33,12 +33,12 @@ public class XvncproActivity extends Activity {
 	PrerrequisiteXvncCopy xvnccopy;
 	Config config;
 	private Button connectionStartButton, buttonStopX;
-	private ToggleButton forceXresolutionToggleButton, androidVncToggleButton, keepXRunningToggleButton;
+	private ToggleButton forceXresolutionToggleButton, androidVncToggleButton, keepXRunningToggleButton, allowRemoteVncToogleButton, renderButton;
 	private ProgressBar progressbar;
 	TextView consoleTextview;
 	private EditText xResolution, yResolution;
 	
-	private Handler mainHandler;
+	private static Handler mainHandler;
 	
     /** Called when the activity is first created. */
     @Override
@@ -56,13 +56,17 @@ public class XvncproActivity extends Activity {
 		forceXresolutionToggleButton = (ToggleButton) findViewById(R.id.toggleForceResolutionButton);
 		keepXRunningToggleButton = (ToggleButton) findViewById(R.id.stopOnVncDisconnectButton);
 		androidVncToggleButton = (ToggleButton) findViewById(R.id.vncChoiceButton);
+		allowRemoteVncToogleButton = (ToggleButton) findViewById(R.id.allowRemoteVNCButton);
+		renderButton = (ToggleButton) findViewById(R.id.renderButton);
 		progressbar = (ProgressBar) findViewById(R.id.progressbar1);
 		
 		setConnectionStartButton();
         setStopButton();
         setResolution();
         setVncToggleButton();
+        setRenderButton();
         setStopOnExit();
+        setAllowRemoteVncButton();
         
         Log.d(tag, "InstallPrerrequisites is "+Config.isInstallPrerrequisitesOnStart());
         if (Config.isInstallPrerrequisitesOnStart()) {
@@ -155,20 +159,6 @@ public class XvncproActivity extends Activity {
     		}
     	};
     }
-// No startActivityForResult
-//    protected void onActivityResult(int requestCode, int resultCode,
-//    		Intent data) {
-//    	Log.i(tag, "onActivityResult: Return for activity result, probably after an install");
-//		try {
-//			Log.d(tag, "onActivityResult: prerrequisitesinstalled="+config.prerrequisitesInstalled());
-//			if (config.prerrequisitesInstalled()) {
-//				Log.d(tag, "OnActivityResult: Calling XvncproActivity finish");
-//				XvncproActivity.this.finish();
-//			}
-//		} catch (XvncproException e) {
-//			sendAlert(getString(R.string.x11_error), e.toString());
-//		}
-//    }
     void setConnectionStartButton() {
     	connectionStartButton.setOnClickListener(new ConnectionStartButtonActivity());
     }
@@ -209,8 +199,8 @@ public class XvncproActivity extends Activity {
     }
     
     void setResolution() {
-    	String width = new Integer(config.get_width_pixels()).toString(); 
-        String height = new Integer(config.get_height_pixels()).toString();
+    	String width = Integer.valueOf(config.get_width_pixels()).toString(); 
+        String height = Integer.valueOf(config.get_height_pixels()).toString();
         xResolution.setText(width);
         xResolution.addTextChangedListener(new TextWatcher() {
 			@Override
@@ -293,8 +283,8 @@ public class XvncproActivity extends Activity {
                     config.set_height_pixels(config.getAppConfig_defaultHeightPixels());
                     config.set_width_pixels(config.getAppconfig_defaultWidthPixels());
                     config.set_force_x_geometry(false);
-                    String width = new Integer(config.get_width_pixels()).toString(); 
-                    String height = new Integer(config.get_height_pixels()).toString();
+                    String width = Integer.valueOf(config.get_width_pixels()).toString(); 
+                    String height = Integer.valueOf(config.get_height_pixels()).toString();
                     xResolution.setText(width);
                     yResolution.setText(height);
                 }
@@ -306,8 +296,18 @@ public class XvncproActivity extends Activity {
     	androidVncToggleButton.setOnClickListener(new OnClickListener() {
 			@Override
 			public void onClick(View v) {
-				Log.d(tag, "Clicked on Android VNC togle. The togle button is "+androidVncToggleButton.isChecked());
+				Log.d(tag, "Clicked on Android VNC toggle. The toggle button is "+androidVncToggleButton.isChecked());
 				config.set_run_androidvnc_client(androidVncToggleButton.isChecked());
+				updateButtons();
+			}
+    	});
+    }
+    void setRenderButton() {
+    	renderButton.setOnClickListener(new OnClickListener() {
+			@Override
+			public void onClick(View v) {
+				Log.d(tag, "Clicked on render toggle. The toggle button is "+renderButton.isChecked());
+				config.set_run_androidvnc_client(renderButton.isChecked());
 				updateButtons();
 			}
     	});
@@ -322,12 +322,23 @@ public class XvncproActivity extends Activity {
 			}
     	});
     }
+    void setAllowRemoteVncButton() {
+    	allowRemoteVncToogleButton.setOnClickListener(new OnClickListener() {
+			@Override
+			public void onClick(View v) {
+				Log.d(tag, "Clicked on allow Remote VNC toogle. The togle button is "+allowRemoteVncToogleButton.isChecked());
+				config.setAppConfig_remote_vnc_allowed(allowRemoteVncToogleButton.isChecked());
+				updateButtons();
+			}
+    	});
+    }
     void updateButtons() {
     	// Installed usual case
     	//forceXresolutionToggleButton, androidVncToggleButton, keepXRunningToggleButton
     	forceXresolutionToggleButton.setChecked(config.is_force_x_geometry());
     	androidVncToggleButton.setChecked(config.is_run_androidvnc_client());
-    	keepXRunningToggleButton.setChecked(config.is_keep_x_running());
+     	renderButton.setChecked(config.isAppConfig_render());
+       	keepXRunningToggleButton.setChecked(config.is_keep_x_running());
     	try {
     		if (config.prerrequisitesInstalled())
     		{
@@ -404,11 +415,11 @@ public class XvncproActivity extends Activity {
             case R.id.aboutitem:
             	String version = getResources().getString(R.string.xvncpro_versionName); 
         		Log.i(tag, "Clicked on about. version is "+version);
-        		Toast.makeText(getApplication().getApplicationContext(), Config.getAbout(version), 30).show();
+        		Toast.makeText(getApplication().getApplicationContext(), Config.getAbout(version), Toast.LENGTH_LONG).show();
                 return true;
             case R.id.changelogitem:
         		Log.i(tag, "Clicked on changelog");
-        		sendAlert(getString(R.string.changelogtitle), getString(R.string.xvncpro_changelog));
+        		sendAlert(getString(R.string.xvncpro_changelogtitle), getString(R.string.xvncpro_changelog));
                 return true;
             case R.id.exititem:
         		Log.i(tag, "Clicked on exit");
@@ -424,7 +435,7 @@ public class XvncproActivity extends Activity {
     private void sendAlert(String title, String text) {
     	if (this.isFinishing()) {
     		Log.i(tag, "sending toast instead of alert because application is finishing");
-    		Toast.makeText(getApplication().getApplicationContext(), title + "\n" + text, 30).show();
+    		Toast.makeText(getApplication().getApplicationContext(), title + "\n" + text, Toast.LENGTH_LONG).show();
     		return;
     	}
     	AlertDialog.Builder builder = new AlertDialog.Builder(XvncproActivity.this);

@@ -1,5 +1,7 @@
 <?xml version="1.0" encoding="utf-8" ?>
 <resources>
+    <string name="xvncpro_versionName">3.4</string>
+    <string name="xvncpro_changelog">18/12/2012 3.4 New Xvnc binary with 7 depth layers support and default depth 24\n14/11/2012 3.3 Allow for remote Vnc connections\n3.2 01/10/20012 Added rgb.txt color mapping\n3.1 17/04/2012 Update buttons\n30/05/2012 3.0 Redesign of the xvnc program</string>
     <string name="xvncpro_subject">\nXvnc Control Panel\n</string>
     <string name="xvncpro_app_name">xvncpro</string>
     <string name="app_name_xserver">xserver</string>
@@ -7,7 +9,6 @@
     <string name="local_service_started">X11vnc was started</string>
     <string name="local_service_label">X11vnc</string>
     <string name="xvncpro_description">X/X11 Server with VNC backend</string>
-    <string name="xvncpro_versionName">3.2</string>
     <string name="xvncpro_about">About</string>
     <string name="xvncpro_help">Help and developer info</string>
     <string name="install">Install VNC</string>
@@ -16,7 +17,6 @@
     <string name="xresolution">width</string>
     <string name="yresolution">height</string>
     <string name="copy">Copy X</string>
-    <string name="xvncpro_changelog">3.0 30/05/2012 Redesign of the xvnc program\n</string>
     <string name="copyprogress">Copy Progress</string>
     <string name="dummy">Dummy String</string>
     <string name="keepxserver_on_disconnect">Stop X on VNC disconnect</string>
@@ -55,4 +55,10 @@
     <string name="local">local</string>
     <string name="generic">generic</string>
     <string name="xvncpro_activity_notdefined">Error please report: Activity was not defined</string>
+    <string name="remoteVncConnectionChoice">Allow Remote VNC conn</string>
+    <string name="noRemoteVncConnection">remote VNC disallowed</string>
+    <string name="allowRemoteVncConnection">Remote VNC allowed</string>
+    <string name="render">use XRENDER</string>
+    <string name="noRender">disable XRENDER</string>
+    <string name="renderChoice">Use XRENDER</string>
 </resources>

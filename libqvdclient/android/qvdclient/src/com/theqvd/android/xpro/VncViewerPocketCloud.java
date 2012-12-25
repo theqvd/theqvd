@@ -37,14 +37,21 @@ public class VncViewerPocketCloud implements VncViewer {
 		contentVncIntent = PendingIntent.getActivity(activity, 0, vncIntent, 0);
 	}
 	@Override
-	public void launchVncViewer() {
+	public void launchVncViewer() throws XvncproException {
 		Log.i(tag, "launching vncviewer PocketCloud");
+		if (!isInstalled()) {
+			throw new XvncproException("Error internal: trying to launch PocketCloud which is not installed");
+		}
 		activity.startActivityForResult(vncIntent, Config.vncActivityRequestCode);
 	}
 
 	@Override
 	public void stopVncViewer() {
 		Log.i(tag, "Stopping activity with activity code " + Config.vncActivityRequestCode);
+		if (!isInstalled()) {
+			Log.e(tag, "Error internal: Trying to stop a non installed PocketCloud");
+			return;
+		}
 		activity.finishActivity(Config.vncActivityRequestCode);
 	}
 	@Override

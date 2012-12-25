@@ -38,6 +38,7 @@ public class Config {
 	public final static String xvncbinary = "Xvncqvd";
 //	public final static String xvnc = targetdir + "/usr/X11R6/bin/" + xvncbinary;
 //	public final static String xvnccmd = xvnc + " :0 -br -localhost -nolisten local -PasswordFile="+targetdir+"/etc/vncpasswd";
+	public final static String notAllowRemoteVncConns = "-localhost";
 	public final static String psxvnccmd = "/system/bin/ps "+xvncbinary;
 	public final static String serverstartedstring = "^.*?created VNC server for screen 0";
 	public final static String vncdisconnectedstring = ".*?Connections: closed: 127.0.0.1.*";
@@ -50,7 +51,9 @@ public class Config {
 	public final static String props_heightpixels = "heightpixels";
 	public final static String props_keep_x_running = "keepxrunning";
 	public final static String props_use_android_vnc = "useandroidvnc";
-	public final static String helpurl = "http://theqvd.com/trac/wiki/AndroidX11Server";
+	public final static String props_remote_vnc = "useremotevnc";
+	public final static String props_render = "userender";
+	public final static String helpurl = "http://theqvd.com/support/documentation";
 	public final static int minPixels = 32;
 	public final static int maxPixels = 10000;
 	public final static boolean debug = false;
@@ -93,7 +96,9 @@ public class Config {
 			appConfig_keep_x_running = false,
 			appConfig_run_androidvnc_client = true,
 			appConfig_xvncbinary_copied = false,
-			appConfig_pocketconfig_copied = false;
+			appConfig_pocketconfig_copied = false,
+			appConfig_remote_vnc_allowed = false,
+			appConfig_render = true;
 	private static int appConfig_height_pixels = 0, appConfig_width_pixels = 0,
 			appConfig_defaultHeightPixels = 0, appconfig_defaultWidthPixels = 0;
 	private static VncViewerAndroid androidvncviewer;
@@ -109,7 +114,7 @@ public class Config {
 		setTargetdir(context.getFilesDir().getAbsolutePath());
 		pocketvncconfigfullpath = getTargetdir() + "/" + Config.pocketvncconfig;
 		xvnc = getTargetdir() + "/usr/X11R6/bin/" + xvncbinary;
-		xvnccmd = xvnc + " :0 -br -localhost -nolisten local -PasswordFile="+getTargetdir()+"/etc/vncpasswd";
+		xvnccmd = xvnc + " :0 -br -nolisten local +render -PasswordFile="+getTargetdir()+"/etc/vncpasswd";
 		
 		// Set height and width
 		DisplayMetrics metrics = new DisplayMetrics();
@@ -138,6 +143,8 @@ public class Config {
 		appConfig_height_pixels = prefsPrivate.getInt(Config.props_heightpixels, appConfig_defaultHeightPixels);
 		appConfig_width_pixels = prefsPrivate.getInt(Config.props_widthpixels, appconfig_defaultWidthPixels);
 		appConfig_pocketconfig_copied = prefsPrivate.getBoolean(Config.props_pocketconfigcopied, appConfig_pocketconfig_copied);
+		appConfig_remote_vnc_allowed =  prefsPrivate.getBoolean(Config.props_use_android_vnc, appConfig_remote_vnc_allowed);
+		appConfig_render =  prefsPrivate.getBoolean(Config.props_render, appConfig_render);
 	}
 	private void save_properties() {
 		SharedPreferences prefsPrivate;
@@ -148,6 +155,8 @@ public class Config {
 		prefsPrivateEditor.putBoolean(Config.props_use_android_vnc, appConfig_run_androidvnc_client);
 		prefsPrivateEditor.putBoolean(Config.props_hasbeencopied, appConfig_xvncbinary_copied);
 		prefsPrivateEditor.putBoolean(Config.props_pocketconfigcopied, appConfig_pocketconfig_copied);
+		prefsPrivateEditor.putBoolean(Config.props_use_android_vnc, appConfig_remote_vnc_allowed);
+		prefsPrivateEditor.putBoolean(Config.props_render, appConfig_render);
 		prefsPrivateEditor.putInt(Config.props_heightpixels, appConfig_height_pixels);
 		prefsPrivateEditor.putInt(Config.props_widthpixels, appConfig_width_pixels);
 		prefsPrivateEditor.commit();
@@ -195,6 +204,14 @@ public class Config {
 		Config.appConfig_pocketconfig_copied = appConfig_pocketconfig_copied;
 		save_properties();
 	}
+	public boolean isAppConfig_remote_vnc_allowed() {
+		return appConfig_remote_vnc_allowed;
+	}
+	public void setAppConfig_remote_vnc_allowed(
+			boolean appConfig_remote_vnc_allowed) {
+		Config.appConfig_remote_vnc_allowed = appConfig_remote_vnc_allowed;
+		save_properties();
+	}
 	public int get_height_pixels() {
 		return appConfig_height_pixels;
 	}
@@ -214,6 +231,13 @@ public class Config {
 	}
 	public int getAppconfig_defaultWidthPixels() {
 		return appconfig_defaultWidthPixels;
+	}
+	public boolean isAppConfig_render() {
+		return appConfig_render;
+	}
+	public void setAppConfig_render(boolean appConfig_render) {
+		Config.appConfig_render = appConfig_render;
+		save_properties();
 	}
 	public VncViewerAndroid getAndroidvncviewer() throws XvncproException {
 		if (activity == null) {

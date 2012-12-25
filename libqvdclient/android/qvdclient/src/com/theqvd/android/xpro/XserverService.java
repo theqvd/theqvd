@@ -88,10 +88,10 @@ implements Runnable
 	@Override
 	public void onDestroy() {
 		Log.i(tag, "onDestroy");
+		stopVNC();
 		if (isRunning()) {
 			Log.i(tag, "onDestroy xserverrunning destroy " + getPid());
 			stopXvnc();
-			stopVNC();
 		}
 		
 		cancelNotify();
@@ -112,7 +112,7 @@ implements Runnable
 			v.launchVncViewer();
 		} catch (XvncproException e) {
 			sendNotify(getString(R.string.x11_error), "Pid:"+e.toString());
-		}	
+		}
 	}
 	private void stopVNC() {
 		VncViewer v;
@@ -125,7 +125,9 @@ implements Runnable
 	}
 	@Override
 	public void run() {
-		String cmd = Config.xvnccmd+" -geometry "+ config.get_width_pixels() + "x"  + config.get_height_pixels();	
+		String cmd = Config.xvnccmd+" -geometry "+ config.get_width_pixels() + "x"  + config.get_height_pixels();
+		cmd +=  config.isAppConfig_remote_vnc_allowed() ? "" : " " + Config.notAllowRemoteVncConns;
+		cmd += config.isAppConfig_render() ? " +render" : "";
 		Log.i(tag, "launching:"+cmd);
 		String cmdList[] = cmd.split("[ ]+");
 		try {
@@ -150,9 +152,11 @@ implements Runnable
 				// See http://code.google.com/p/android-vnc-viewer/issues/detail?id=299
 				if (line.matches(Config.vncdisconnectedstring)) {
 					Log.i(tag, "Found string <"+line+">");
+					stopVNC();
 					if (!config.is_keep_x_running()) {
 						Log.i(tag, "Stopping Xvnc service");
 						stopXvnc();
+						this.stopSelf();
 					}
 				}
 			}
@@ -307,6 +311,10 @@ private void sendNotify(CharSequence title, CharSequence text) {
 			Log.e(tag, "Vnc intent error "+e.toString());
 		}
 		
+		if (config == null) {
+			Log.i(tag, "Not sending notify because config, vncViewer, or context is null");
+			return;
+		}
 		if (i == null) {
 			Log.e(tag, "PendingIntent is null creating empty PendingIntent");
 			i = PendingIntent.getActivity(c, 0, new Intent(), 0);

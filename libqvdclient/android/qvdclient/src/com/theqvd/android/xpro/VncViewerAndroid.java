@@ -26,14 +26,21 @@ public class VncViewerAndroid implements VncViewer {
 	}
 
 	@Override
-	public void launchVncViewer() {
+	public void launchVncViewer() throws XvncproException {
 		Log.i(tag, "launching vncviewer androidvnc with activity="+activity+"; vncIntent="+vncIntent);
+		if (!isInstalled()) {
+			throw new XvncproException("Error internal: trying to launch AndroidVnc which is not installed");
+		}
 		activity.startActivityForResult(vncIntent, Config.vncActivityRequestCode);
 	}
 	
 	@Override
 	public void stopVncViewer() {
 		Log.i(tag, "Stopping activity with activity code " + Config.vncActivityRequestCode);
+		if (!isInstalled()) {
+			Log.e(tag, "Error internal: Trying to stop a non installed AndroidVNC");
+			return;
+		}
 		activity.finishActivity(Config.vncActivityRequestCode);
 	}
 	@Override
