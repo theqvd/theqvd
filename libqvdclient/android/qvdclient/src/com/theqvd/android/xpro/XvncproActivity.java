@@ -307,7 +307,7 @@ public class XvncproActivity extends Activity {
 			@Override
 			public void onClick(View v) {
 				Log.d(tag, "Clicked on render toggle. The toggle button is "+renderButton.isChecked());
-				config.set_run_androidvnc_client(renderButton.isChecked());
+				config.setAppConfig_render(renderButton.isChecked());
 				updateButtons();
 			}
     	});
