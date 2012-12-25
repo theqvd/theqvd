@@ -114,7 +114,7 @@ public class Config {
 		setTargetdir(context.getFilesDir().getAbsolutePath());
 		pocketvncconfigfullpath = getTargetdir() + "/" + Config.pocketvncconfig;
 		xvnc = getTargetdir() + "/usr/X11R6/bin/" + xvncbinary;
-		xvnccmd = xvnc + " :0 -br -nolisten local +render -PasswordFile="+getTargetdir()+"/etc/vncpasswd";
+		xvnccmd = xvnc + " :0 -br -nolisten local -depth 32 -PasswordFile="+getTargetdir()+"/etc/vncpasswd";
 		
 		// Set height and width
 		DisplayMetrics metrics = new DisplayMetrics();
