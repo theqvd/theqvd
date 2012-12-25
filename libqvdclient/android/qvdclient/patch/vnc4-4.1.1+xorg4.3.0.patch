@@ -1,0 +1,430 @@
+diff -Naur -x .svn -x '*~' vnc4-4.1.1+xorg4.3.0/unix/xc/config/cf/X11.tmpl vnc4-4.1.1+xorg4.3.0.orig/unix/xc/config/cf/X11.tmpl
+--- vnc4-4.1.1+xorg4.3.0/unix/xc/config/cf/X11.tmpl	2012-12-13 20:35:27.597445597 +0100
++++ vnc4-4.1.1+xorg4.3.0.orig/unix/xc/config/cf/X11.tmpl	2012-12-25 07:46:15.000000000 +0100
+@@ -738,7 +738,7 @@
+ #endif
+ #endif
+ #ifndef DefaultRGBDatabase
+-#define DefaultRGBDatabase /data/data/com.theqvd.android.client/files/usr/share/X11/rgb
++#define DefaultRGBDatabase /usr/share/X11/rgb
+ #endif
+ #ifndef UseRgbTxt
+ #define UseRgbTxt		NO	/* default is to compile with dbm */
+@@ -1548,7 +1548,7 @@
+            DOCDIR = DocDir
+        DOCHTMLDIR = DocHtmlDir
+          DOCPSDIR = DocPsDir
+-          FONTDIR = /data/data/com.theqvd.android.client/files/usr/share/fonts/X11		/* font directories */
++          FONTDIR = /usr/share/fonts/X11		/* font directories */
+      ENCODINGSDIR = $(FONTDIR)/encodings /* font encodings directory */
+          XINITDIR = XinitDir		/* xinit config files */
+            XDMDIR = XdmDir		/* xdm config files */
+diff -Naur -x .svn -x '*~' vnc4-4.1.1+xorg4.3.0/unix/xc/config/cf/cross.def vnc4-4.1.1+xorg4.3.0.orig/unix/xc/config/cf/cross.def
+--- vnc4-4.1.1+xorg4.3.0/unix/xc/config/cf/cross.def	2012-12-25 08:35:46.857342644 +0100
++++ vnc4-4.1.1+xorg4.3.0.orig/unix/xc/config/cf/cross.def	2002-04-04 16:05:33.000000000 +0200
+@@ -5,9 +5,8 @@
+  * compiler images.  It will have to be edited to reflect these
+  * given your local configuration.
+  */
+-#if 1
++#if 0
+ #undef i386Architecture
+-#undef x86_64Architecture
+ #define Arm32Architecture
+ 
+ #undef OptimizedCDebugFlags
+@@ -17,37 +16,30 @@
+ #define StandardDefines 	-Dlinux -D__arm__ -D_POSIX_SOURCE \
+ 				-D_BSD_SOURCE -D_GNU_SOURCE -DX_LOCALE
+ #undef CcCmd
+-#define StdIncDir 
++#define StdIncDir /skiff/local/arm-linux/include
+ #define PreIncDir 
+ #undef PostIncDir
+-#define PostIncDir
+-#define CcCmd /usr/local/CodeSourcery/Sourcery_G++_Lite/bin/arm-none-linux-gnueabi-gcc
+-/*#define CcCmd arm-linux-androideabi-gcc*/
++#define PostIncDir /skiff/local/lib/gcc-lib/arm-linux/2.95.2/include
++#define CcCmd /skiff/local/bin/arm-linux-gcc
+ #undef CplusplusCmd
+ #define HasCplusplus YES
+-#define CplusplusCmd /usr/local/CodeSourcery/Sourcery_G++_Lite/bin/arm-none-linux-gnueabi-c++
+-/*#define CplusplusCmd arm-linux-androideabi-g++ */
++#define CplusplusCmd /skiff/local/bin/arm-linux-g++
+ #define DoRanlibCmd YES
+-#define RanlibCmd /usr/local/CodeSourcery/Sourcery_G++_Lite/bin/arm-none-linux-gnueabi-ar s
+-/*#define RanlibCmd arm-linux-androideabi-ranlib*/
+-#undef ExtraLoadFlags 
+-#define ExtraLoadFlags -static -static-libgcc
++#define RanlibCmd /skiff/local/bin/arm-linux-ranlib
++#undef ExtraLoadFlags
++#define ExtraLoadFlags
+ #define FbNoPixelAddrCode
+ #undef TermcapLibrary
+ #define TermcapLibrary -ltermcap
+ 
+-#undef	CppCmd	
+-#define	CppCmd	/usr/local/CodeSourcery/Sourcery_G++_Lite/bin/arm-none-linux-gnueabi-cpp
+-/*#define	CppCmd	arm-linux-androideabi-cpp*/
+-
+ #undef LdPostLib
+-#define LdPostLib
++#define LdPostLib	-L/skiff/local/arm-linux/lib
+ 
+ #undef ExtensionOSDefines
+ #define ExtensionOSDefines
+ 
+ #define ServerXdmcpDefines	/**/
+ 
+-#define HostCcCmd gcc
++#define HostCcCmd  cc
+ #endif
+ #include <cross.rules>
+diff -Naur -x .svn -x '*~' vnc4-4.1.1+xorg4.3.0/unix/xc/config/cf/site.def vnc4-4.1.1+xorg4.3.0.orig/unix/xc/config/cf/site.def
+--- vnc4-4.1.1+xorg4.3.0/unix/xc/config/cf/site.def	2012-12-25 08:35:46.887287191 +0100
++++ vnc4-4.1.1+xorg4.3.0.orig/unix/xc/config/cf/site.def	2002-02-27 01:51:12.000000000 +0100
+@@ -30,58 +30,8 @@
+ #define LocalConfigFiles host.def
+ #endif
+ */
+-#define CrossCompiling YES
+-#define HasZlib NO
+-#define DESTDIR /mnt/destdir
+-#define XF86CardDrivers dummy
+-#define XFShadowFB NO
+-#define XF86VgaHw NO
+-#define XF86FBDevHw NO
+-#define XF86XAA NO
+-#define XF86Ramdac NO
+-#define XF86I2C NO
+-#define XF86DDC NO
+-#define XF86RAC NO
+-#define XF86Int10 NO
+-#define XF86VBE NO
+-#define BuildFreeType YES
+-#define BuildRender YES
+-#define BuildRenderLibrary YES
+-#define SharedLibXrender NO
+-#define UseFreetype2 YES
+-#define SharedLibFreetype2 NO
+-#define UseExpat YES
+-#define SharedLibExpat NO
+-#define BuildX11Lib YES
+-#define SharedLibX11 NO
+-#define BuildXextLib YES
+-#define SharedLibXext NO
+-#define BuildLoadableXlibI18n NO
+-#define SharedLibXft NO
+-#define SharedLibXft1 NO
+-#define UseFontconfig YES
+-#define BuildFontconfigLibrary YES
+-#define NormalLibFontconfig YES
+-#define SharedLibFontconfig NO
+-#define GlxStaticServerLib YES
+-  /*
+-#define ForceNormalLib YES
+-#define NormalLibXext YES
+-#define NormalLibXrender YES
+-#define BuildLibraries YES
+-  */
+-/* This is hack for including X11/Xlibint.h:for the compilation of XRender
+-  Due to BuildServersOnly YES in vnc.def (if we set to no it compiles a lot of x86 staff)
+-/usr/local/CodeSourcery/Sourcery_G++_Lite/bin/arm-none-linux-gnueabi-gcc -c -ansi -pedantic -Wall -Wpointer-arith -Wundef  -I../../lib/X11 -I../../include/extensions  -I../.. -I../../exports/include -I/data/data/com.theqvd.android.client/files/usr/X11R6/include -I../lib -Dlinux -D__arm__ -D_POSIX_SOURCE 				-D_BSD_SOURCE -D_GNU_SOURCE -DX_LOCALE  -DFUNCPROTO=15 -DNARROWPROTO -DXTHREADS  -D_REENTRANT -DXUSE_MTSAFE_API    -DMALLOC_0_RETURNS_NULL  	-O2   Xrender.c -o unshared/Xrender.o
+-In file included from Xrender.c:26:0:
+-Xrenderint.h:31:25: fatal error: X11/Xlibint.h: No such file or directory
+-*/
+-#define StandardIncludes -I..
+-#define XFree86ServerOSDefines -DDDXOSINIT -DDDXOSFATALERROR -DDDXOSVERRORF
+-#define EtcX11Directory /data/data/com.theqvd.android.client/files/etc/X11
+-#define ServerConfigDir /data/data/com.theqvd.android.client/files/etc/X11/xserver
+-#define ProjectRoot /data/data/com.theqvd.android.client/files/usr/X11R6
+-#define FontconfigFontsConfDir /data/data/com.theqvd.android.client/files/etc/fonts
++
++
+ #ifdef BeforeVendorCF
+ 
+ /*
+@@ -91,53 +41,10 @@
+ #define SiteIConfigFiles $(IRULESRC)/xf86site.def $(IRULESRC)/host.def
+ #endif
+ 
+-  /* 
+ #include <host.def>
+-  */
+-  /* contents of the vnc.def file */
+-#define BuildServersOnly YES
+-#define BuildLibrariesForXServers YES
+-#define BuildFonts NO
+-#define BuildFontServer NO
+-#define BuildClients NO
+-#define BuildDocs NO
+-#define BuildPexExt NO
+-#define BuildNls NO
+-#define BuildXIE NO
+-#define GlxBuiltInXMesa YES
+-#define BuildGlxExt YES
+-#define XnestServer NO
+-#define XprtServer NO
+-
+-#ifdef SunArchitecture
+-#define ProjectRoot /usr/openwin
+-#define HasGcc2 YES
+-#define BuildXKB NO
+-#endif
+-
+-#define HasFreetype2 NO
+-#define BuildVNCExt YES
+-#define VNCExtDefines -DVNCEXT
+-#define SiteExtensionDefines VNCExtDefines
+-#define SiteExtensionDirs vnc
+-#define VncUseFb YES
+-#define VncUnixDir $(TOP)/..
+-#define VncCommonDir VncUnixDir/../common
+-#define VncExtLibs VncCommonDir/rfb/librfb.a \
+-                   VncCommonDir/Xregion/libXregion.a \
+-                   VncCommonDir/network/libnetwork.a \
+-                   VncCommonDir/rdr/librdr.a 
+-
+-#define SiteExtensionLibs vnc/LibraryTargetName(vnc) VncExtLibs
+-
+-#define	ServerTarget(server,subdirs,objects,libs,syslibs)		@@\
+-CCLINK = $(CXXENVSETUP) $(CXX) @@\
+-ServerTargetWithFlags(server,subdirs,objects,libs,syslibs,$(_NOOP_))
+ 
+ #include <xf86site.def>
+ 
+-#define XF86CardDrivers dummy
+-
+ /* On systems where cpp doesn't correctly expand macros in include directives
+  * the two following macros need to be defined directly (where "X11" is
+  * really whatever the TopLevelProject macro is defined to be).
+diff -Naur -x .svn -x '*~' vnc4-4.1.1+xorg4.3.0/unix/xc/config/cf/vnc.def vnc4-4.1.1+xorg4.3.0.orig/unix/xc/config/cf/vnc.def
+--- vnc4-4.1.1+xorg4.3.0/unix/xc/config/cf/vnc.def	2012-12-25 08:35:46.827350048 +0100
++++ vnc4-4.1.1+xorg4.3.0.orig/unix/xc/config/cf/vnc.def	2012-12-25 07:46:15.000000000 +0100
+@@ -1,4 +1,3 @@
+-/* #define BuildServersOnly YES*/
+ #define BuildServersOnly YES
+ #define BuildFonts NO
+ #define BuildClients NO
+diff -Naur -x .svn -x '*~' vnc4-4.1.1+xorg4.3.0/unix/xc/extras/FreeType/lib/freetype.h vnc4-4.1.1+xorg4.3.0.orig/unix/xc/extras/FreeType/lib/freetype.h
+--- vnc4-4.1.1+xorg4.3.0/unix/xc/extras/FreeType/lib/freetype.h	2012-12-13 20:37:19.897447613 +0100
++++ vnc4-4.1.1+xorg4.3.0.orig/unix/xc/extras/FreeType/lib/freetype.h	2000-02-13 05:55:36.000000000 +0100
+@@ -40,7 +40,6 @@
+ #define EXPORT_DEF  extern
+ #endif
+ 
+-typedef unsigned long CARD64;
+ /* The same for TT_Text.  If you define the HAVE_TT_TEXT macro, you */
+ /* have to provide a typedef declaration for TT_Text before         */
+ /* including this file.                                             */
+diff -Naur -x .svn -x '*~' vnc4-4.1.1+xorg4.3.0/unix/xc/lib/fontconfig/fc-cache/Imakefile vnc4-4.1.1+xorg4.3.0.orig/unix/xc/lib/fontconfig/fc-cache/Imakefile
+--- vnc4-4.1.1+xorg4.3.0/unix/xc/lib/fontconfig/fc-cache/Imakefile	2012-12-25 08:35:47.157300157 +0100
++++ vnc4-4.1.1+xorg4.3.0.orig/unix/xc/lib/fontconfig/fc-cache/Imakefile	2002-08-19 21:32:00.000000000 +0200
+@@ -17,8 +17,6 @@
+ LinkBuildBinary(ProgramTargetName(fc-cache))
+ 
+ install::
+-
+-/*	if [ x$${DESTDIR} = x ]; then \
++	if [ x$${DESTDIR} = x ]; then \
+ 		$(FCCACHE) -v -f;\
+ 	fi
+-*/
+\ No newline at end of file
+diff -Naur -x .svn -x '*~' vnc4-4.1.1+xorg4.3.0/unix/xc/programs/Xserver/Imakefile vnc4-4.1.1+xorg4.3.0.orig/unix/xc/programs/Xserver/Imakefile
+--- vnc4-4.1.1+xorg4.3.0/unix/xc/programs/Xserver/Imakefile	2012-12-25 08:35:46.527313576 +0100
++++ vnc4-4.1.1+xorg4.3.0.orig/unix/xc/programs/Xserver/Imakefile	2006-01-27 18:58:51.000000000 +0100
+@@ -421,7 +421,7 @@
+ 	    $(CFB8DIR) $(CFB16DIR) $(CFB24DIR) $(CFB32DIR) \
+ 	    $(XVNCDDXDIR) $(DEPDIRS)
+ XVNCOBJS = $(XVNCDDXDIR)/stubs.o $(XVNCDDXDIR)/miinitext.o
+-XVNCLIBS = PreFbLibs vnc/Xvnc/LibraryTargetName(xvnc) $(FB) CFBLibs PostFbLibs
++XVNCLIBS = PreFbLibs vnc/Xvnc/LibraryTargetName(xvnc) CFBLibs PostFbLibs
+ XVNCSYSLIBS = $(FONTLIBS) $(SYSLIBS)
+ ServerTarget(Xvnc,$(XVNCDIRS),$(XVNCOBJS), \
+ 	$(LIBCWRAPPER) $(XVNCLIBS) $(LOADABLEEXTS),$(XVNCSYSLIBS))
+diff -Naur -x .svn -x '*~' vnc4-4.1.1+xorg4.3.0/unix/xc/programs/Xserver/Xext/Imakefile vnc4-4.1.1+xorg4.3.0.orig/unix/xc/programs/Xserver/Xext/Imakefile
+--- vnc4-4.1.1+xorg4.3.0/unix/xc/programs/Xserver/Xext/Imakefile	2012-12-25 08:35:46.417283693 +0100
++++ vnc4-4.1.1+xorg4.3.0.orig/unix/xc/programs/Xserver/Xext/Imakefile	2012-12-25 07:46:15.000000000 +0100
+@@ -76,8 +76,7 @@
+ #if BuildXCSecurity
+     SECURITYSRCS = security.c
+     SECURITYOBJS = security.o
+-# SERVERCONFIGDIR = /etc/X11/xserver
+- SERVERCONFIGDIR = /data/data/com.theqvd.android.client/files/etc/X11/xserver
++ SERVERCONFIGDIR = /etc/X11/xserver
+    POLICYFILEDEF = -DDEFAULTPOLICYFILE=\"$(SERVERCONFIGDIR)/SecurityPolicy\"
+ #endif
+ #if BuildCup
+@@ -127,7 +126,7 @@
+ #endif
+     INCLUDES = -I. -I../include -I$(XINCLUDESRC) -I$(EXTINCSRC) \
+ 		$(PNRXINCLUDES) $(XF86INCLUDES) -I$(FONTINCSRC) \
+-		$(FONTCACHEINCLUDES)
++ 		$(FONTCACHEINCLUDES)
+     LINTLIBS = ../dix/llib-ldix.ln ../os/llib-los.ln
+ 
+      DEFINES = $(EXT_DEFINES)
+diff -Naur -x .svn -x '*~' vnc4-4.1.1+xorg4.3.0/unix/xc/programs/Xserver/hw/xfree86/fbdevhw/fbdevhw.c vnc4-4.1.1+xorg4.3.0.orig/unix/xc/programs/Xserver/hw/xfree86/fbdevhw/fbdevhw.c
+--- vnc4-4.1.1+xorg4.3.0/unix/xc/programs/Xserver/hw/xfree86/fbdevhw/fbdevhw.c	2012-12-13 20:32:07.157437528 +0100
++++ vnc4-4.1.1+xorg4.3.0.orig/unix/xc/programs/Xserver/hw/xfree86/fbdevhw/fbdevhw.c	2012-12-25 07:46:15.000000000 +0100
+@@ -16,7 +16,7 @@
+ 
+ /* Added check so that asm/page.h is not included for hppa arch */
+ /* Ola Lundqvist, to work around Debian Bug#485958 & Bug#486104*/
+-#if !defined(__hppa__) && !defined(__mips__) && !defined(__alpha__) && !defined(__arm__)
++#if !defined(__hppa__) && !defined(__mips__) && !defined(__alpha__)
+ # include "asm/page.h"	/* #define for PAGE_* */
+ #endif
+ 
+diff -Naur -x .svn -x '*~' vnc4-4.1.1+xorg4.3.0/unix/xc/programs/Xserver/hw/xfree86/loader/xf86sym.c vnc4-4.1.1+xorg4.3.0.orig/unix/xc/programs/Xserver/hw/xfree86/loader/xf86sym.c
+--- vnc4-4.1.1+xorg4.3.0/unix/xc/programs/Xserver/hw/xfree86/loader/xf86sym.c	2012-12-13 20:32:01.217434262 +0100
++++ vnc4-4.1.1+xorg4.3.0.orig/unix/xc/programs/Xserver/hw/xfree86/loader/xf86sym.c	2003-02-26 21:08:02.000000000 +0100
+@@ -141,9 +141,9 @@
+ #pragma weak __umodsi3
+ #endif
+ 
+-/*#if defined(__arm__) && defined(__linux__)
++#if defined(__arm__) && defined(__linux__)
+ #include <sys/io.h>
+-#endif*/
++#endif
+ 
+ #if defined(__powerpc__) && (defined(Lynx) || defined(linux))
+ void _restf14();
+diff -Naur -x .svn -x '*~' vnc4-4.1.1+xorg4.3.0/unix/xc/programs/Xserver/render/picture.c vnc4-4.1.1+xorg4.3.0.orig/unix/xc/programs/Xserver/render/picture.c
+--- vnc4-4.1.1+xorg4.3.0/unix/xc/programs/Xserver/render/picture.c	2012-12-25 08:35:46.217284864 +0100
++++ vnc4-4.1.1+xorg4.3.0.orig/unix/xc/programs/Xserver/render/picture.c	2003-01-26 17:40:43.000000000 +0100
+@@ -544,7 +544,7 @@
+     PictureScreenPtr	ps;
+     int			n;
+     CARD32		type, a, r, g, b;
+-
++    
+     if (PictureGeneration != serverGeneration)
+     {
+ 	PictureType = CreateNewResourceType (FreePicture);
+diff -Naur -x .svn -x '*~' vnc4-4.1.1+xorg4.3.0/unix/xc/programs/Xserver/render/render.c vnc4-4.1.1+xorg4.3.0.orig/unix/xc/programs/Xserver/render/render.c
+--- vnc4-4.1.1+xorg4.3.0/unix/xc/programs/Xserver/render/render.c	2012-12-25 08:35:46.257297633 +0100
++++ vnc4-4.1.1+xorg4.3.0.orig/unix/xc/programs/Xserver/render/render.c	2003-02-14 19:15:21.000000000 +0100
+@@ -214,7 +214,7 @@
+ RenderExtensionInit (void)
+ {
+     ExtensionEntry *extEntry;
+-    
++
+     if (!PictureType)
+ 	return;
+     if (!PictureFinishInit ())
+diff -Naur -x .svn -x '*~' vnc4-4.1.1+xorg4.3.0/unix/xc/programs/Xserver/vnc/Xvnc/xvnc.cc vnc4-4.1.1+xorg4.3.0.orig/unix/xc/programs/Xserver/vnc/Xvnc/xvnc.cc
+--- vnc4-4.1.1+xorg4.3.0/unix/xc/programs/Xserver/vnc/Xvnc/xvnc.cc	2012-12-25 08:35:45.967287789 +0100
++++ vnc4-4.1.1+xorg4.3.0.orig/unix/xc/programs/Xserver/vnc/Xvnc/xvnc.cc	2012-12-25 07:46:15.000000000 +0100
+@@ -101,7 +101,7 @@
+ 
+ #define VFB_DEFAULT_WIDTH  1024
+ #define VFB_DEFAULT_HEIGHT 768
+-#define VFB_DEFAULT_DEPTH  32
++#define VFB_DEFAULT_DEPTH  16
+ #define VFB_DEFAULT_WHITEPIXEL 0xffff
+ #define VFB_DEFAULT_BLACKPIXEL 0
+ #define VFB_DEFAULT_LINEBIAS 0
+@@ -228,7 +228,9 @@
+     // already have been cleaned up but it doesn't hurt to try again.
+     if (wellKnownSocketsCreated) {
+       char sockName[64];
+-      sprintf(sockName,"/data/data/com.theqvd.android.client/files/tmp/.X11-unix/X%s",display);
++      sprintf(sockName,"/tmp/.X11-unix/X%s",display);
++      unlink(sockName);
++      sprintf(sockName,"/usr/spool/sockets/X11/%s",display);
+       unlink(sockName);
+     }
+   }
+@@ -277,9 +279,11 @@
+     return false;
+   }
+   char file[256];
+-  sprintf(file, "/data/data/com.theqvd.android.client/files/tmp/.X%d-lock", num);
++  sprintf(file, "/tmp/.X%d-lock", num);
++  if (access(file, F_OK) == 0) return false;
++  sprintf(file, "/tmp/.X11-unix/X%d", num);
+   if (access(file, F_OK) == 0) return false;
+-  sprintf(file, "/data/data/com.theqvd.android.client/files/tmp/.X11-unix/X%d", num);
++  sprintf(file, "/usr/spool/sockets/X11/%d", num);
+   if (access(file, F_OK) == 0) return false;
+   return true;
+ }
+@@ -564,9 +568,6 @@
+   {
+   case 1:  return mfbCreateGC (pGC);
+   case 8:  return cfbCreateGC (pGC);
+-  case 15: 
+-    fprintf(stderr, "vfbMultiDepthCreateGC: with depth 15\n");
+-    return FALSE;
+   case 16: return cfb16CreateGC (pGC);
+   case 32: return cfb32CreateGC (pGC);
+   default: return FALSE;
+@@ -588,9 +589,6 @@
+   case 8:
+     cfbGetSpans(pDrawable, wMax, ppt, pwidth, nspans, pdstStart);
+     break;
+-  case 15:
+-    fprintf(stderr, "vfbMultiDepthGetSpans: asking for 15\n");
+-    break;
+   case 16:
+     cfb16GetSpans(pDrawable, wMax, ppt, pwidth, nspans, pdstStart);
+     break;
+@@ -614,9 +612,6 @@
+   case 8:
+     cfbGetImage(pDrawable, sx, sy, w, h, format, planeMask, pdstLine);
+     break;
+-  case 15:
+-    fprintf(stderr, "vfbMultiDepthGetImage: asking for 15\n");
+-    break;
+   case 16:
+     cfb16GetImage(pDrawable, sx, sy, w, h, format, planeMask, pdstLine);
+     break;
+@@ -1085,16 +1080,14 @@
+   defaultColorVisualClass
+     = (pvfb->bitsPerPixel > 8) ? TrueColor : PseudoColor;
+ 
+-  
+ #ifdef VNC_USE_FB
+   if (!fbScreenInit(pScreen, pbits, pvfb->width, pvfb->height,
+                     dpi, dpi, pvfb->paddedWidth, pvfb->bitsPerPixel))
+       return FALSE;
+ 
+ #ifdef RENDER
+-  if (Render) {
++  if (ret && Render)
+       fbPictureInit(pScreen, 0, 0);
+-  }
+ #endif /* RENDER */
+ #else /* VNC_USE_FB */
+   switch (pvfb->bitsPerPixel)
+@@ -1107,9 +1100,6 @@
+     ret = cfbScreenInit(pScreen, pbits, pvfb->width, pvfb->height,
+                         dpi, dpi, pvfb->paddedWidth);
+     break;
+-  case 15:
+-    fprintf(stderr, "vfbScreenInit: For 15 not used\n");
+-    break;
+   case 16:
+     ret = cfb16ScreenInit(pScreen, pbits, pvfb->width, pvfb->height,
+                           dpi, dpi, pvfb->paddedWidth);
+@@ -1127,7 +1117,6 @@
+   pScreen->CreateGC = vfbMultiDepthCreateGC;
+   pScreen->GetImage = vfbMultiDepthGetImage;
+   pScreen->GetSpans = vfbMultiDepthGetSpans;
+-
+ #endif
+ 
+   pScreen->InstallColormap = vfbInstallColormap;
+@@ -1241,7 +1230,7 @@
+       vfbPixmapDepths[1] = TRUE;
+       vfbPixmapDepths[4] = TRUE;
+       vfbPixmapDepths[8] = TRUE;
+-      vfbPixmapDepths[15] = TRUE;
++/*    vfbPixmapDepths[15] = TRUE; */
+       vfbPixmapDepths[16] = TRUE;
+       vfbPixmapDepths[24] = TRUE;
+       vfbPixmapDepths[32] = TRUE;
