@@ -105,6 +105,9 @@ int ioctl(int fd, unsigned long int request, ...) {
 		ret = g_ioctl_original(fd, request, ptr);
 		
 		fprintf(stderr, "qvdserial: original_ioctl(%i, %ld, %p) returned %i\n", fd, request, ptr, ret);
+	} else {
+		void *ptr = va_arg(args, void*);
+		g_ioctl_original(-fd, request, ptr);
 	}
 
 	va_end(args);

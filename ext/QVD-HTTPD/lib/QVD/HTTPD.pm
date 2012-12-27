@@ -37,6 +37,12 @@ sub options {
 #                | "{" | "}" | SP | HT
 my $token_re = qr/[!#\$%&'*+\-\.0-9a-zA-Z]+/;
 
+sub post_accept_hook {
+	my $self = shift;
+	$SIG{__WARN__} = sub { WARN shift; };
+	$SIG{__DIE__}  = sub { ERROR shift; };
+}
+
 sub process_request {
     my $self = shift;
     my $server = $self->{server};

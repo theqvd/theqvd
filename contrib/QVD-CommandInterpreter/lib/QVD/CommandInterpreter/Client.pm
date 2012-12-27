@@ -119,6 +119,33 @@ sub socat {
 	}
 }
 
+=head2 ppproute
+
+Returns the results of the "ppproute" command.
+
+
+
+=cut
+
+sub ppproute {
+	my ($self, $route) = @_;
+	return $self->_send_cmd('ppproute', $route);
+}
+
+
+=head2 ppprestartservice
+
+Returns the results of the "ppprestartservice" command.
+
+
+=cut
+
+sub ppprestartservice {
+	my ($self, $service) = @_;
+	return $self->_send_cmd('ppprestartservice', $service);
+}
+
+
 =head2 pppd args
 
 Asks the remote QVD::CommandInterpreter to connect pppd with the indicated

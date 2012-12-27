@@ -1,15 +1,20 @@
-#!/usr/bin/perl -wT
+#!/usr/lib/qvd/bin/perl -w
 use strict;
 
 use Test::Expect;
-use Test::More tests => 16;
+use Test::More tests => 17;
 use File::Temp qw(tempdir);
 use Proc::Background;
+use Data::Dumper;
 
 delete $ENV{PATH};
 
 my $dir = tempdir( CLEANUP => 1 );
-create_temp_conf($dir);
+my $base_config = `bin/qvdcmd --mkconfig`;
+
+ok($? == 0, "Get base config");
+
+create_temp_conf($dir, $base_config);
 
 
 
@@ -47,17 +52,24 @@ expect_like(qr/socat test/, "Test data received");
 
 
 sub create_temp_conf {
-	my $dir = shift;
-
+	my ($dir, $orig_conf_str) = @_;
+	my $conf = eval(untaint($orig_conf_str));
+	if ($@) {
+		die "Failed to parse config: $@";
+	}
+	
+	unless ( $conf && exists $conf->{paths} ) {
+		die "Failed to parse config. Config is " . ($conf // "[undef]") . ". Source is:\n\n$orig_conf_str";
+	}
+	
+	$conf->{socat}->{allowed_ports} = [ qr#^$dir/testport\d+# ];
+	
 	open(CONF, ">", "$dir/qvdcmd.conf") or die "Can't create config $dir/qvdcmd.conf: $!";
-	print CONF <<CONFIG;
-{
-	socat => '/usr/bin/socat',
-	allowed_ports => [ qr#^$dir/testport\\d+# ]
-};
-CONFIG
-	close(CONF);
-
+	print CONF "my \$config;\n";
+	print CONF Data::Dumper->Dump([$conf], ["config"]);
+	close CONF;
+	
+	
 	open(SCRIPT, ">", "$dir/testscript.sh") or die "Can't create script $dir/testscript.sh: $!";
 	print SCRIPT <<SCRIPTDATA;
 #!/bin/bash
@@ -70,5 +82,11 @@ SCRIPTDATA
 	chmod 0755, "$dir/testscript.sh";
 
 	return $dir;
+}
+
+sub untaint {
+	my $arg = shift;
+	$arg =~ /(.*)/xs;
+	return $1;
 }
 

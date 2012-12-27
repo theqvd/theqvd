@@ -11,6 +11,7 @@ use QVD::Config::Core qw(set_core_cfg core_cfg);
 use POSIX;
 
 my $user_dir;
+my $client_instance;
 
 BEGIN {
 	my $WINDOWS = ($^O eq 'MSWin32');
@@ -47,6 +48,9 @@ my $daemonize;
 my $stop;
 my $log_socat;
 
+my @restartservice;
+my @ppproute;
+
 DEBUG("Called with arguments: " . join(' ', @ARGV));
 
 GetOptions("help"                => \$help,
@@ -62,7 +66,9 @@ GetOptions("help"                => \$help,
            "socat=s"             => \$socat_binary,
            "log-socat"           => \$log_socat,
            "std"                 => \$std,
-           "pidfile=s"           => \$pidfile
+           "pidfile=s"           => \$pidfile,
+           "ppprestartservice=s" => \@restartservice,
+           "ppproute=s"          => \@ppproute,
  ) or die "Getopt failed: $!";
 
 if ( $help ) {
@@ -73,19 +79,38 @@ my $log = Log::Log4perl->get_logger('qvdcmd');
 local $SIG{__WARN__} = sub { $log->warn(shift); };
 local $SIG{__DIE__}  = sub { $log->error(shift); };
 
+my $command_executed;
 
-
-
-
-#FIXME refactor cmd_connect_serial and cmd_connect_pppd
 
 if ( $cmd_getversion ) {
-	my $client = QVD::CommandInterpreter::Client->new(host => $interpreter_addr);
+	my $client = get_client();
 	print $client->version() . "\n";
-} elsif ( $cmd_gethelp ) {
-	my $client = QVD::CommandInterpreter::Client->new(host => $interpreter_addr);
+	$command_executed = 1;
+}
+
+if ( $cmd_gethelp ) {
+	my $client = get_client();
 	print $client->help() . "\n";
-} elsif ( $cmd_connect_serial || $cmd_connect_pppd ) {
+	$command_executed = 1;
+}
+
+if ( @ppproute ) {
+	my $client = get_client();
+	foreach my $route (@ppproute) {
+		print $client->ppproute($route) . "\n";
+	}
+	$command_executed = 1;
+}
+
+if ( @restartservice ) {
+	my $client = get_client();
+	foreach my $service (@restartservice) {
+		print $client->ppprestartservice($service);
+	}
+	$command_executed = 1;
+}
+
+if ( $cmd_connect_serial || $cmd_connect_pppd ) {
 	die "--serial and --pppd are mutually exclusive" if ( $cmd_connect_serial && $cmd_connect_pppd );
 
 	
@@ -123,7 +148,7 @@ if ( $cmd_getversion ) {
 		}
 	}
 
-	my $client = QVD::CommandInterpreter::Client->new(host => $interpreter_addr);
+	my $client = get_client();
 	my $pid;
 
 	if (!-x $socat_binary) {
@@ -213,7 +238,11 @@ if ( $cmd_getversion ) {
 			exec(@exec_cmd) or die "exec failed: $!";
 		}
 	}
-} else {
+
+	$command_executed = 1;
+}
+
+if ( !$command_executed ) {
 	help() if ( !$stop);
 }
 
@@ -295,6 +324,14 @@ sub daemonize {
 	close($pidfh);
 	DEBUG "Wrote pid file $pidfile";
 	return;
+}
+
+sub get_client {
+	if ( !$client_instance ) {
+		$client_instance = QVD::CommandInterpreter::Client->new(host => $interpreter_addr);
+	}
+	
+	return $client_instance
 }
 
 sub help {
