@@ -488,7 +488,7 @@ sub _detect_os_image_type {
     }
     elsif (-d "$basefs/rootfs/sbin/") {
         $self->{os_meta} = $basefs;
-        $self->{os_basefs_subdir} = '/rootfs';
+        $self->{os_base_subdir} = '/rootfs';
         $debug and $self->_debug("os image is of type extended");
         DEBUG 'OS image is of type extended';
     }
