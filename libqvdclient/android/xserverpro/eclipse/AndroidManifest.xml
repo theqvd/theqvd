@@ -1,0 +1,38 @@
+<?xml version="1.0" encoding="utf-8"?>
+<manifest xmlns:android="http://schemas.android.com/apk/res/android"
+    package="com.theqvd.android.xpro"
+    android:versionCode="17218"
+    android:versionName="@string/xvncpro_versionName"
+    android:installLocation="internalOnly" >
+    <uses-sdk android:minSdkVersion="8" android:targetSdkVersion="8"/>
+    <uses-permission android:name="android.permission.INTERNET"/>
+    <uses-permission android:name="android.permission.KILL_BACKGROUND_PROCESSES"/>
+    <application
+        android:icon="@drawable/ic_xvnc"
+        android:label="@string/xvncpro_app_name" android:theme="@android:style/Theme.Light">
+        <activity
+            android:name=".XvncproActivity"
+            android:label="@string/xvncpro_app_name" >
+            <intent-filter>
+                <action android:name="android.intent.action.MAIN" />
+                <category android:name="android.intent.category.LAUNCHER" />
+            </intent-filter>
+        </activity>
+        <activity android:name="DummyActivity" android:screenOrientation="landscape">
+            <intent-filter>
+                <action android:name="android.intent.action.MAIN"></action>
+                <action android:name="android.intent.action.VIEW"></action>
+                <category android:name="android.intent.category.DEFAULT"></category>
+                <data android:scheme="x11"></data>
+            </intent-filter>            
+        </activity>
+        <service android:enabled="true" android:name=".XserverService" android:exported="false">
+            <intent-filter>
+                <action android:name="android.intent.action.MAIN"></action>
+                <action android:name="android.intent.action.VIEW"></action>
+                <category android:name="android.intent.category.DEFAULT"></category>
+                <data android:scheme="x11"></data>
+            </intent-filter>
+        </service>
+    </application>
+</manifest>
