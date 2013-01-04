@@ -80,6 +80,63 @@ diff -Naur -x .svn -x '*~' vnc4-4.1.1+xorg4.3.0/unix/xc/config/cf/cross.def vnc4
 +#define HostCcCmd  cc
  #endif
  #include <cross.rules>
+diff -Naur -x .svn -x '*~' vnc4-4.1.1+xorg4.3.0/unix/xc/config/cf/crossi386.def vnc4-4.1.1+xorg4.3.0.orig/unix/xc/config/cf/crossi386.def
+--- vnc4-4.1.1+xorg4.3.0/unix/xc/config/cf/crossi386.def	2013-01-04 14:04:01.587298163 +0100
++++ vnc4-4.1.1+xorg4.3.0.orig/unix/xc/config/cf/crossi386.def	1970-01-01 01:00:00.000000000 +0100
+@@ -1,53 +0,0 @@
+-/* $XFree86: xc/config/cf/cross.def,v 1.3 2002/04/04 14:05:33 eich Exp $ */
+-/*
+- * This file contains redefinitions of some symbols to enable
+- * cross compilation: e.g. paths for include files and paths to
+- * compiler images.  It will have to be edited to reflect these
+- * given your local configuration.
+- */
+-#if 1
+-#define i386Architecture
+-#undef x86_64Architecture
+-#undef Arm32Architecture
+-
+-#undef OptimizedCDebugFlags
+-#define OptimizedCDebugFlags 	-g
+-#define ServerCDebugFlags	-g
+-#undef StandardDefines
+-#define StandardDefines 	-Dlinux -D_POSIX_SOURCE \
+-				-D_BSD_SOURCE -D_GNU_SOURCE -DX_LOCALE
+-#undef CcCmd
+-#define StdIncDir 
+-#define PreIncDir 
+-#undef PostIncDir
+-#define PostIncDir
+-#define CcCmd gcc -m32
+-/*#define CcCmd arm-linux-androideabi-gcc*/
+-#undef CplusplusCmd
+-#define HasCplusplus YES
+-#define CplusplusCmd g++ -m32
+-/*#define CplusplusCmd arm-linux-androideabi-g++ */
+-#define DoRanlibCmd YES
+-#define RanlibCmd ranlib
+-/*#define RanlibCmd arm-linux-androideabi-ranlib*/
+-#undef ExtraLoadFlags 
+-#define ExtraLoadFlags -static -static-libgcc
+-#define FbNoPixelAddrCode
+-#undef TermcapLibrary
+-#define TermcapLibrary -ltermcap
+-
+-#undef	CppCmd	
+-#define	CppCmd	cpp
+-/*#define	CppCmd	arm-linux-androideabi-cpp*/
+-
+-#undef LdPostLib
+-#define LdPostLib
+-
+-#undef ExtensionOSDefines
+-#define ExtensionOSDefines
+-
+-#define ServerXdmcpDefines	/**/
+-
+-#define HostCcCmd gcc
+-#endif
+-#include <cross.rules>
 diff -Naur -x .svn -x '*~' vnc4-4.1.1+xorg4.3.0/unix/xc/config/cf/site.def vnc4-4.1.1+xorg4.3.0.orig/unix/xc/config/cf/site.def
 --- vnc4-4.1.1+xorg4.3.0/unix/xc/config/cf/site.def	2012-12-25 08:35:46.887287191 +0100
 +++ vnc4-4.1.1+xorg4.3.0.orig/unix/xc/config/cf/site.def	2002-02-27 01:51:12.000000000 +0100
@@ -198,6 +255,252 @@ diff -Naur -x .svn -x '*~' vnc4-4.1.1+xorg4.3.0/unix/xc/config/cf/site.def vnc4-
  /* On systems where cpp doesn't correctly expand macros in include directives
   * the two following macros need to be defined directly (where "X11" is
   * really whatever the TopLevelProject macro is defined to be).
+diff -Naur -x .svn -x '*~' vnc4-4.1.1+xorg4.3.0/unix/xc/config/cf/sitei386.def vnc4-4.1.1+xorg4.3.0.orig/unix/xc/config/cf/sitei386.def
+--- vnc4-4.1.1+xorg4.3.0/unix/xc/config/cf/sitei386.def	2013-01-04 14:04:01.617349768 +0100
++++ vnc4-4.1.1+xorg4.3.0.orig/unix/xc/config/cf/sitei386.def	1970-01-01 01:00:00.000000000 +0100
+@@ -1,242 +0,0 @@
+-XCOMM site:  $TOG: site.sample /main/r64_final/1 1998/02/05 16:28:49 kaleb $
+-
+-/***************************************************************************
+- *                                                                         *
+- *			   SITE-SPECIFIC DEFINITIONS                       *
+- *                                                                         *
+- * This file contains two halves, one included before the vendor-specific  *
+- * configuration file (.cf file), and one included after the .cf file.     *
+- * The before-half should be protected by #ifdef BeforeVendorCF, and the   *
+- * after-half should be protected by #ifdef AfterVendorCF.                 *
+- *                                                                         *
+- * The before-half should only set things that the .cf file depends on.    *
+- * For the .cf files shipped in this release, the main variables in this   *
+- * category are HasGcc, HasGcc2, HasCplusplus, OSMajorVersion,             *
+- * OSMinorVersion, and OSTeenyVersion.                                     *
+- *                                                                         *
+- * The after-half should contain all other definitions.  For example,      *
+- * place your ProjectRoot definition here.                                 *
+- *                                                                         *
+- * OS Major and Minor version numbers should be changed directly in the    *
+- * .cf file, not overridden in site.def.                                   *
+- *                                                                         *
+- ***************************************************************************/
+-XCOMM site:  $XFree86: xc/config/cf/site.def,v 3.25 2002/02/27 00:51:12 dawes Exp $
+-
+-/* if you want host-specific customization, this is one way to do it */
+-/*
+-#ifndef SiteIConfigFiles
+-#define SiteIConfigFiles $(IRULESRC)/host.def
+-#define LocalConfigFiles host.def
+-#endif
+-*/
+-#undef CrossCompiling
+-#define CrossCompilingi386 YES
+-#define HasZlib NO
+-#define DESTDIR /mnt/destdir
+-#define XF86CardDrivers dummy
+-#define XFShadowFB NO
+-#define XF86VgaHw NO
+-#define XF86FBDevHw NO
+-#define XF86XAA NO
+-#define XF86Ramdac NO
+-#define XF86I2C NO
+-#define XF86DDC NO
+-#define XF86RAC NO
+-#define XF86Int10 NO
+-#define XF86VBE NO
+-#define BuildFreeType YES
+-#define BuildRender YES
+-#define BuildRenderLibrary YES
+-#define SharedLibXrender NO
+-#define UseFreetype2 YES
+-#define SharedLibFreetype2 NO
+-#define UseExpat YES
+-#define SharedLibExpat NO
+-#define BuildX11Lib YES
+-#define SharedLibX11 NO
+-#define BuildXextLib YES
+-#define SharedLibXext NO
+-#define BuildLoadableXlibI18n NO
+-#define SharedLibXft NO
+-#define SharedLibXft1 NO
+-#define UseFontconfig YES
+-#define BuildFontconfigLibrary YES
+-#define NormalLibFontconfig YES
+-#define SharedLibFontconfig NO
+-#define GlxStaticServerLib YES
+-  /*
+-#define ForceNormalLib YES
+-#define NormalLibXext YES
+-#define NormalLibXrender YES
+-#define BuildLibraries YES
+-  */
+-/* This is hack for including X11/Xlibint.h:for the compilation of XRender
+-  Due to BuildServersOnly YES in vnc.def (if we set to no it compiles a lot of x86 staff)
+-/usr/local/CodeSourcery/Sourcery_G++_Lite/bin/arm-none-linux-gnueabi-gcc -c -ansi -pedantic -Wall -Wpointer-arith -Wundef  -I../../lib/X11 -I../../include/extensions  -I../.. -I../../exports/include -I/data/data/com.theqvd.android.client/files/usr/X11R6/include -I../lib -Dlinux -D__arm__ -D_POSIX_SOURCE 				-D_BSD_SOURCE -D_GNU_SOURCE -DX_LOCALE  -DFUNCPROTO=15 -DNARROWPROTO -DXTHREADS  -D_REENTRANT -DXUSE_MTSAFE_API    -DMALLOC_0_RETURNS_NULL  	-O2   Xrender.c -o unshared/Xrender.o
+-In file included from Xrender.c:26:0:
+-Xrenderint.h:31:25: fatal error: X11/Xlibint.h: No such file or directory
+-*/
+-#define StandardIncludes -I..
+-#define XFree86ServerOSDefines -DDDXOSINIT -DDDXOSFATALERROR -DDDXOSVERRORF
+-#define EtcX11Directory /data/data/com.theqvd.android.client/files/etc/X11
+-#define ServerConfigDir /data/data/com.theqvd.android.client/files/etc/X11/xserver
+-#define ProjectRoot /data/data/com.theqvd.android.client/files/usr/X11R6
+-#define FontconfigFontsConfDir /data/data/com.theqvd.android.client/files/etc/fonts
+-#ifdef BeforeVendorCF
+-
+-/*
+- * Include this for easy XFree86 customisations
+- */
+-#ifndef SiteIConfigFiles
+-#define SiteIConfigFiles $(IRULESRC)/xf86site.def $(IRULESRC)/host.def
+-#endif
+-
+-  /* 
+-#include <host.def>
+-  */
+-  /* contents of the vnc.def file */
+-#define BuildServersOnly YES
+-#define BuildLibrariesForXServers YES
+-#define BuildFonts NO
+-#define BuildFontServer NO
+-#define BuildClients NO
+-#define BuildDocs NO
+-#define BuildPexExt NO
+-#define BuildNls NO
+-#define BuildXIE NO
+-#define GlxBuiltInXMesa YES
+-#define BuildGlxExt YES
+-#define XnestServer NO
+-#define XprtServer NO
+-
+-#ifdef SunArchitecture
+-#define ProjectRoot /usr/openwin
+-#define HasGcc2 YES
+-#define BuildXKB NO
+-#endif
+-
+-#define HasFreetype2 NO
+-#define BuildVNCExt YES
+-#define VNCExtDefines -DVNCEXT
+-#define SiteExtensionDefines VNCExtDefines
+-#define SiteExtensionDirs vnc
+-#define VncUseFb YES
+-#define VncUnixDir $(TOP)/..
+-#define VncCommonDir VncUnixDir/../common
+-#define VncExtLibs VncCommonDir/rfb/librfb.a \
+-                   VncCommonDir/Xregion/libXregion.a \
+-                   VncCommonDir/network/libnetwork.a \
+-                   VncCommonDir/rdr/librdr.a 
+-
+-#define SiteExtensionLibs vnc/LibraryTargetName(vnc) VncExtLibs
+-
+-#define	ServerTarget(server,subdirs,objects,libs,syslibs)		@@\
+-CCLINK = $(CXXENVSETUP) $(CXX) @@\
+-ServerTargetWithFlags(server,subdirs,objects,libs,syslibs,$(_NOOP_))
+-
+-#include <xf86site.def>
+-
+-#define XF86CardDrivers dummy
+-
+-/* On systems where cpp doesn't correctly expand macros in include directives
+- * the two following macros need to be defined directly (where "X11" is
+- * really whatever the TopLevelProject macro is defined to be).
+- */
+-# if defined(AIXArchitecture) || defined(SVR4Architecture) || \
+-     defined(SCOArchitecture) || defined(Win32Architecture) || \
+-     defined(UXPArchitecture) || defined(SunArchitecture) || \
+-     defined(DynixPtxArchitecture) || defined(i386IscArchitecture)
+-#  ifndef ProjectRulesFile
+-#   define ProjectRulesFile	<X11.rules>
+-#  endif
+-#  ifndef ProjectTmplFile
+-#   define ProjectTmplFile	<X11.tmpl>
+-#  endif
+-# endif
+-
+-/*
+-#ifndef HasGcc2
+-#define HasGcc2 YES
+-#endif
+-*/
+-
+-#endif /* BeforeVendorCF */
+-
+-#ifdef AfterVendorCF
+-
+-#ifndef ProjectRoot
+-#define ProjectRoot /usr/X11R6
+-#endif
+-
+-/*
+- * On some platforms, some things may be installed outside of ProjectRoot
+- * by default.  To disable this, uncomment the following line.
+- *
+-#define NothingOutsideProjectRoot YES
+- */
+-
+-/*
+- * Set EtcX11Directory if you want config file links installed under
+- * ProjectRoot rather than in /etc/X11.  See also HasVarDirectory,
+- * UseEtcX11 and UseSeparateConfDir.
+- *
+-#define EtcX11Directory ProjectRoot/etc
+- */
+-
+-
+-/* Only set HasXdmAuth to YES if you have a Wraphelp.c file. */
+-/* #define HasXdmAuth YES */
+-
+-/*
+-#if defined(SunArchitecture) && defined(SparcArchitecture)
+-#define HasCodeCenter	YES
+-#ifndef SVR4Architecture
+-#define HasTestCenter	YES
+-#endif
+-#endif
+-*/
+-
+-/*
+-#ifdef __hp9000s800
+-#define HasCodeCenter	YES
+-#endif
+-*/
+-
+-/*
+-#if defined(SunArchitecture) && defined(SparcArchitecture) && !defined(SVR4Architecture)
+-#define HasPurify	YES
+-#endif
+-*/
+-
+-/*
+-#define HasSentinel	YES
+-*/
+-
+-/*
+-#undef DefaultUserPath
+-#define DefaultUserPath /bin:/usr/bin:$(BINDIR):/usr/ucb:/usr/local/bin
+-*/
+-
+-
+-/* You do NOT need SetUID if you only run the server under xdm */
+-/* You MAY need SetUID if users run the server by hand or under xinit */
+-/* Consult your system administrator before making the X server setuid */
+-/*
+-#if defined(SunArchitecture) && OSMajorVersion > 4
+-#define InstallXserverSetUID YES
+-#endif
+-*/
+-
+-/* You do NOT need SetUID if you only run the server under xdm */
+-/* You MAY need SetUID if users run the server by hand or under xinit */
+-/* Consult your system administrator before making the X server setuid */
+-/*
+-#ifdef XFree86Version
+-#define InstallXserverSetUID YES
+-#endif
+-*/
+-
+-#include <host.def>
+-
+-#endif /* AfterVendorCF */
 diff -Naur -x .svn -x '*~' vnc4-4.1.1+xorg4.3.0/unix/xc/config/cf/vnc.def vnc4-4.1.1+xorg4.3.0.orig/unix/xc/config/cf/vnc.def
 --- vnc4-4.1.1+xorg4.3.0/unix/xc/config/cf/vnc.def	2012-12-25 08:35:46.827350048 +0100
 +++ vnc4-4.1.1+xorg4.3.0.orig/unix/xc/config/cf/vnc.def	2012-12-25 07:46:15.000000000 +0100
@@ -206,6 +509,18 @@ diff -Naur -x .svn -x '*~' vnc4-4.1.1+xorg4.3.0/unix/xc/config/cf/vnc.def vnc4-4
  #define BuildServersOnly YES
  #define BuildFonts NO
  #define BuildClients NO
+diff -Naur -x .svn -x '*~' vnc4-4.1.1+xorg4.3.0/unix/xc/config/cf/xfree86.cf vnc4-4.1.1+xorg4.3.0.orig/unix/xc/config/cf/xfree86.cf
+--- vnc4-4.1.1+xorg4.3.0/unix/xc/config/cf/xfree86.cf	2013-01-04 14:04:01.557290083 +0100
++++ vnc4-4.1.1+xorg4.3.0.orig/unix/xc/config/cf/xfree86.cf	2003-02-26 21:07:59.000000000 +0100
+@@ -2073,8 +2073,5 @@
+ #if CrossCompiling
+ #include <cross.def>
+ #endif
+-#if CrossCompilingi386
+-#include <crossi386.def>
+-#endif
+ #include <xf86.rules>
+ 
 diff -Naur -x .svn -x '*~' vnc4-4.1.1+xorg4.3.0/unix/xc/extras/FreeType/lib/freetype.h vnc4-4.1.1+xorg4.3.0.orig/unix/xc/extras/FreeType/lib/freetype.h
 --- vnc4-4.1.1+xorg4.3.0/unix/xc/extras/FreeType/lib/freetype.h	2012-12-13 20:37:19.897447613 +0100
 +++ vnc4-4.1.1+xorg4.3.0.orig/unix/xc/extras/FreeType/lib/freetype.h	2000-02-13 05:55:36.000000000 +0100
@@ -317,7 +632,7 @@ diff -Naur -x .svn -x '*~' vnc4-4.1.1+xorg4.3.0/unix/xc/programs/Xserver/render/
  	return;
      if (!PictureFinishInit ())
 diff -Naur -x .svn -x '*~' vnc4-4.1.1+xorg4.3.0/unix/xc/programs/Xserver/vnc/Xvnc/xvnc.cc vnc4-4.1.1+xorg4.3.0.orig/unix/xc/programs/Xserver/vnc/Xvnc/xvnc.cc
---- vnc4-4.1.1+xorg4.3.0/unix/xc/programs/Xserver/vnc/Xvnc/xvnc.cc	2012-12-25 08:35:45.967287789 +0100
+--- vnc4-4.1.1+xorg4.3.0/unix/xc/programs/Xserver/vnc/Xvnc/xvnc.cc	2013-01-04 14:04:01.067680806 +0100
 +++ vnc4-4.1.1+xorg4.3.0.orig/unix/xc/programs/Xserver/vnc/Xvnc/xvnc.cc	2012-12-25 07:46:15.000000000 +0100
 @@ -101,7 +101,7 @@
  
@@ -359,31 +674,33 @@ diff -Naur -x .svn -x '*~' vnc4-4.1.1+xorg4.3.0/unix/xc/programs/Xserver/vnc/Xvn
    case 8:  return cfbCreateGC (pGC);
 -  case 15: 
 -    fprintf(stderr, "vfbMultiDepthCreateGC: with depth 15\n");
--    return FALSE;
+-    return cfb16CreateGC (pGC);
    case 16: return cfb16CreateGC (pGC);
    case 32: return cfb32CreateGC (pGC);
    default: return FALSE;
-@@ -588,9 +589,6 @@
+@@ -588,10 +589,6 @@
    case 8:
      cfbGetSpans(pDrawable, wMax, ppt, pwidth, nspans, pdstStart);
      break;
 -  case 15:
 -    fprintf(stderr, "vfbMultiDepthGetSpans: asking for 15\n");
+-    cfb16GetSpans(pDrawable, wMax, ppt, pwidth, nspans, pdstStart);
 -    break;
    case 16:
      cfb16GetSpans(pDrawable, wMax, ppt, pwidth, nspans, pdstStart);
      break;
-@@ -614,9 +612,6 @@
+@@ -615,10 +612,6 @@
    case 8:
      cfbGetImage(pDrawable, sx, sy, w, h, format, planeMask, pdstLine);
      break;
 -  case 15:
 -    fprintf(stderr, "vfbMultiDepthGetImage: asking for 15\n");
+-    cfb16GetImage(pDrawable, sx, sy, w, h, format, planeMask, pdstLine);
 -    break;
    case 16:
      cfb16GetImage(pDrawable, sx, sy, w, h, format, planeMask, pdstLine);
      break;
-@@ -1085,16 +1080,14 @@
+@@ -1087,16 +1080,14 @@
    defaultColorVisualClass
      = (pvfb->bitsPerPixel > 8) ? TrueColor : PseudoColor;
  
@@ -401,17 +718,19 @@ diff -Naur -x .svn -x '*~' vnc4-4.1.1+xorg4.3.0/unix/xc/programs/Xserver/vnc/Xvn
  #endif /* RENDER */
  #else /* VNC_USE_FB */
    switch (pvfb->bitsPerPixel)
-@@ -1107,9 +1100,6 @@
+@@ -1109,11 +1100,6 @@
      ret = cfbScreenInit(pScreen, pbits, pvfb->width, pvfb->height,
                          dpi, dpi, pvfb->paddedWidth);
      break;
 -  case 15:
 -    fprintf(stderr, "vfbScreenInit: For 15 not used\n");
+-    ret = cfb16ScreenInit(pScreen, pbits, pvfb->width, pvfb->height,
+-                          dpi, dpi, pvfb->paddedWidth);
 -    break;
    case 16:
      ret = cfb16ScreenInit(pScreen, pbits, pvfb->width, pvfb->height,
                            dpi, dpi, pvfb->paddedWidth);
-@@ -1127,7 +1117,6 @@
+@@ -1131,7 +1117,6 @@
    pScreen->CreateGC = vfbMultiDepthCreateGC;
    pScreen->GetImage = vfbMultiDepthGetImage;
    pScreen->GetSpans = vfbMultiDepthGetSpans;
@@ -419,11 +738,24 @@ diff -Naur -x .svn -x '*~' vnc4-4.1.1+xorg4.3.0/unix/xc/programs/Xserver/vnc/Xvn
  #endif
  
    pScreen->InstallColormap = vfbInstallColormap;
-@@ -1241,7 +1230,7 @@
+@@ -1156,12 +1141,6 @@
+     pvfb->greenBits = 6;
+   }
+ 
+-  if (!pvfb->pixelFormatDefined && pvfb->depth == 15) {
+-    pvfb->pixelFormatDefined = TRUE;
+-    pvfb->rgbNotBgr = TRUE;
+-    pvfb->blueBits = pvfb->redBits = pvfb->greenBits = 5;
+-  }
+-
+   if (pvfb->pixelFormatDefined) {
+     VisualPtr vis;
+     for (vis = pScreen->visuals; vis->vid != pScreen->rootVisual; vis++)
+@@ -1251,7 +1230,7 @@
        vfbPixmapDepths[1] = TRUE;
        vfbPixmapDepths[4] = TRUE;
        vfbPixmapDepths[8] = TRUE;
--      vfbPixmapDepths[15] = TRUE;
+-      vfbPixmapDepths[15] = TRUE; 
 +/*    vfbPixmapDepths[15] = TRUE; */
        vfbPixmapDepths[16] = TRUE;
        vfbPixmapDepths[24] = TRUE;
