@@ -4,6 +4,7 @@ etc/X11/xserver/SecurityPolicy.ogg
 etc/vncpasswd.ogg
 index
 usr/X11R6/bin/Xvncqvd.ogg
+usr/X11R6/bin/Xvncqvdi386.ogg
 usr/share/fonts/X11/encodings/tis620-2.enc.ogg
 usr/share/fonts/X11/encodings/microsoft-cp1256.enc.ogg
 usr/share/fonts/X11/encodings/encodings.dir.ogg
