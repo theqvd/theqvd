@@ -5,9 +5,6 @@ import java.io.File;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
-
-import com.theqvd.android.client.R;
-
 import android.app.Activity;
 import android.app.AlertDialog;
 import android.app.PendingIntent;
@@ -18,7 +15,7 @@ import android.net.Uri;
 import android.util.Log;
 
 public class VncViewerPocketCloud implements VncViewer {
-	static final String tag = Config.xvncbinary + "-VncViewerPocketCloud-" +java.util.Map.Entry.class.getSimpleName();
+	static final String tag = L.xvncbinary + "-VncViewerPocketCloud-" +java.util.Map.Entry.class.getSimpleName();
 	static final String vncpackage = "com.wyse.pocketcloudfull";
 	private static Activity activity;
 	private Config config;
@@ -96,8 +93,8 @@ public class VncViewerPocketCloud implements VncViewer {
 			Log.e(tag, "Error in copy " + e);
 			AlertDialog.Builder builder = new AlertDialog.Builder(activity);
     		builder
-    		.setMessage(activity.getResources().getString(R.string.errorincopytitle))
-    		.setTitle(activity.getResources().getString(R.string.errorincopy)+e.toString())
+    		.setMessage(activity.getResources().getString(L.r_errorincopytitle))
+    		.setTitle(activity.getResources().getString(L.r_errorincopy)+e.toString())
     		.setCancelable(true)
     		.setNeutralButton(activity.getResources().getString(android.R.string.ok), new DialogInterface.OnClickListener() {
     			public void onClick(DialogInterface dialog, int id) {
@@ -110,12 +107,12 @@ public class VncViewerPocketCloud implements VncViewer {
 	}
 	@Override
 	public String getButtonText() {
-		String text = activity.getString(R.string.pocketvnc_button_string);
+		String text = activity.getString(L.r_pocketvnc_button_string);
 		return text;
 	}
 	@Override
 	public String getDescriptionText() {
-		String text = activity.getString(R.string.pocketvnc_install_string);
+		String text = activity.getString(L.r_pocketvnc_install_string);
 		return text;
 	}
 	@Override

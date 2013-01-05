@@ -1,7 +1,5 @@
 package com.theqvd.android.xpro;
 
-import com.theqvd.android.client.R;
-
 import android.app.Activity;
 import android.app.PendingIntent;
 import android.content.Intent;
@@ -9,7 +7,7 @@ import android.net.Uri;
 import android.util.Log;
 
 public class VncViewerAndroid implements VncViewer {
-	static final String tag = Config.xvncbinary + "-VncViewerAndroid-" +java.util.Map.Entry.class.getSimpleName();
+	static final String tag = L.xvncbinary + "-VncViewerAndroid-" +java.util.Map.Entry.class.getSimpleName();
 	final static String vncpackage = "android.androidVNC";
 	private static Activity activity;
 	private Config config;
@@ -54,12 +52,12 @@ public class VncViewerAndroid implements VncViewer {
 	}
 	@Override
 	public String getButtonText() {
-		String text = activity.getString(R.string.androidvnc_button_string);
+		String text = activity.getString(L.r_androidvnc_button_string);
 		return text;
 	}
 	@Override
 	public String getDescriptionText() {
-		String text = activity.getString(R.string.androidvnc_install_string);
+		String text = activity.getString(L.r_androidvnc_install_string);
 		return text;
 	}
 	@Override

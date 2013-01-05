@@ -1,9 +1,6 @@
 package com.theqvd.android.xpro;
 
 import java.io.IOException;
-
-import com.theqvd.android.client.R;
-
 import android.content.Context;
 import android.content.res.AssetManager;
 import android.os.Bundle;
@@ -14,7 +11,7 @@ import android.util.Log;
 import android.view.View;
 
 public class PrerrequisiteXvncCopy implements Prerrequisite {
-	static final String tag = Config.xvncbinary + "-PrerrequisiteXvncCopy-" +java.util.Map.Entry.class.getSimpleName();
+	static final String tag = L.xvncbinary + "-PrerrequisiteXvncCopy-" +java.util.Map.Entry.class.getSimpleName();
 	private static Context context;
 	private Config config;
 	private boolean useNotifyUpdates;
@@ -31,7 +28,7 @@ public class PrerrequisiteXvncCopy implements Prerrequisite {
 	private Long getKbytesAvailable() {
 		if (kbytesavailable == -1) {
 			StatFs fs = new StatFs(config.getTargetdir());
-			kbytesavailable = new Long(fs.getAvailableBlocks()) * new Long(fs.getBlockSize());
+			kbytesavailable = Long.valueOf(fs.getAvailableBlocks()) * Long.valueOf(fs.getBlockSize());
 			Log.d(tag,"Blocks available:"+fs.getAvailableBlocks()+"; block size:"+fs.getBlockSize()+
 					";kbytes available="+kbytesavailable);
 			kbytesavailable = kbytesavailable / 1024;
@@ -46,7 +43,7 @@ public class PrerrequisiteXvncCopy implements Prerrequisite {
 
 	private boolean enoughSpaceAvailable() {
 		long mbytesavailable = getMegaBytesAvailable();
-		Log.d(tag, "The MB available are:" + mbytesavailable+" and the MBytes needed are:"+(new Integer(Config.xvncsizerequired).toString()));
+		Log.d(tag, "The MB available are:" + mbytesavailable+" and the MBytes needed are:"+(Integer.valueOf(Config.xvncsizerequired).toString()));
 		return mbytesavailable > Config.xvncsizerequired;
 	}
 	
@@ -58,8 +55,8 @@ public class PrerrequisiteXvncCopy implements Prerrequisite {
 	private void sendErrorAlert(String error) {
 		Message m = config.getUiHandler().obtainMessage(Config.SENDALERT);
 		Bundle b = new Bundle();
-		b.putString(Config.messageTitle, context.getResources().getString(R.string.errorincopytitle));
-		b.putString(Config.messageText, context.getResources().getString(R.string.errorincopy)+error);
+		b.putString(Config.messageTitle, context.getResources().getString(L.r_errorincopytitle));
+		b.putString(Config.messageText, context.getResources().getString(L.r_errorincopy)+error);
 		m.setData(b);
 		config.getUiHandler().sendMessage(m);
 	}
@@ -87,7 +84,7 @@ public class PrerrequisiteXvncCopy implements Prerrequisite {
 	@Override
 	public void install() {
 		if (!enoughSpaceAvailable()) {
-			sendErrorAlert(context.getString(R.string.xvnccopy_not_enough_space));
+			sendErrorAlert(context.getString(L.r_xvnccopy_not_enough_space));
 			return;
 		}
 		
@@ -150,12 +147,12 @@ public class PrerrequisiteXvncCopy implements Prerrequisite {
 	}
 	@Override
 	public String getButtonText() {
-		String text = context.getString(R.string.xvnccopy_button_string);
+		String text = context.getString(L.r_xvnccopy_button_string);
 		return text;
 	}
 	@Override
 	public String getDescriptionText() {
-		String text = context.getString(R.string.xvnccopy_install_string);
+		String text = context.getString(L.r_xvnccopy_install_string);
 		return text;
 	}
 

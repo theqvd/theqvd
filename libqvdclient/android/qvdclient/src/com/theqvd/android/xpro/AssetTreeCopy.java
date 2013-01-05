@@ -35,7 +35,7 @@ import android.util.Log;
  *
  */
 public class AssetTreeCopy {
-	static final private String tag = Config.xvncbinary + "-AssetTreeCopy-" +java.util.Map.Entry.class.getSimpleName();
+	static final private String tag = L.xvncbinary + "-AssetTreeCopy-" +java.util.Map.Entry.class.getSimpleName();
 	static final private String srcDirInAsset = Config.assetscopydir;
 	static private String specialExtension = Config.specialAndroid22Extension;
 	static private Integer filesCopied = 0;

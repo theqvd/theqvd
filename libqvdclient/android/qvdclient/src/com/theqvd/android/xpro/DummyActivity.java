@@ -1,21 +1,19 @@
 package com.theqvd.android.xpro;
 
-import com.theqvd.android.client.R;
-
 import android.app.Activity;
 import android.content.Intent;
 import android.os.Bundle;
 import android.util.Log;
 
 public class DummyActivity extends Activity {
-	static final String tag = Config.xvncbinary + "-DummyActivity-" +java.util.Map.Entry.class.getSimpleName();
+	static final String tag = L.xvncbinary + "-DummyActivity-" +java.util.Map.Entry.class.getSimpleName();
 	Config config;
 	Intent x11Intent;
 	
 	@Override
     public void onCreate(Bundle savedInstanceState) {
 		super.onCreate(savedInstanceState);
-		setContentView(R.layout.dummylayout);
+		setContentView(L.r_dummylayout);
 		Log.i(tag, "receiving intent:"+this.getIntent());
 		config = new Config(this); // side effect sets the activity for config
 		x11Intent = new Intent(this, XserverService.class);

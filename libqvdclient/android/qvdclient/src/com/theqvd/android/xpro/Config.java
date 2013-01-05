@@ -3,7 +3,7 @@
  */
 package com.theqvd.android.xpro;
 
-import com.theqvd.android.client.R;
+
 import android.app.Activity;
 import android.content.Context;
 import android.content.Intent;
@@ -35,11 +35,12 @@ public class Config {
 	public static String xvnc;
 	public static String xvnccmd;
 	public static String pocketvncconfigfullpath;
-	public final static String xvncbinary = "Xvncqvd";
+
 //	public final static String xvnc = targetdir + "/usr/X11R6/bin/" + xvncbinary;
 //	public final static String xvnccmd = xvnc + " :0 -br -localhost -nolisten local -PasswordFile="+targetdir+"/etc/vncpasswd";
+	public static String xvncbinary = L.xvncbinary;
 	public final static String notAllowRemoteVncConns = "-localhost";
-	public final static String psxvnccmd = "/system/bin/ps "+xvncbinary;
+	public final static String psxvnccmd = "/system/bin/ps "+L.xvncbinary;
 	public final static String serverstartedstring = "^.*?created VNC server for screen 0";
 	public final static String vncdisconnectedstring = ".*?Connections: closed: 127.0.0.1.*";
 	// Connections: closed: 127.0.0.1::51506
@@ -89,7 +90,7 @@ public class Config {
 		return "XVnc\nLicense: Licensed under the GPLv3.\nAuthor: Nito@Qindel.ES\nSponsored: http://theqvd.com\nVersion: "+version+"\nRevision: $Revision: 13666 $\nDate: $Date: 2012-01-17 15:16:24 +0100 (Tue, 17 Jan 2012) $";
 	}
 	// Class info
-	static final String tag = Config.xvncbinary + "-Config-" +java.util.Map.Entry.class.getSimpleName();
+	static final String tag = L.xvncbinary + "-Config-" +java.util.Map.Entry.class.getSimpleName();
 	private static Context context;
 	private static Activity activity;
 	private static boolean appConfig_force_x_geometry = false,
@@ -113,7 +114,7 @@ public class Config {
 	private void init() {
 		setTargetdir(context.getFilesDir().getAbsolutePath());
 		pocketvncconfigfullpath = getTargetdir() + "/" + Config.pocketvncconfig;
-		xvnc = getTargetdir() + "/usr/X11R6/bin/" + xvncbinary;
+		xvnc = getTargetdir() + "/usr/X11R6/bin/" + L.xvncbinary;
 		xvnccmd = xvnc + " :0 -br -nolisten local  -pixelformat rgb888 -PasswordFile="+getTargetdir()+"/etc/vncpasswd";
 		
 		// Set height and width
@@ -241,7 +242,7 @@ public class Config {
 	}
 	public VncViewerAndroid getAndroidvncviewer() throws XvncproException {
 		if (activity == null) {
-			throw new XvncproException(context.getString(R.string.xvncpro_activity_notdefined));
+			throw new XvncproException(context.getString(L.r_xvncpro_activity_notdefined));
 		}
     	androidvncviewer = (androidvncviewer == null) ? new VncViewerAndroid(activity) : androidvncviewer;
 		
@@ -249,7 +250,7 @@ public class Config {
 	}
 	public VncViewerPocketCloud getPocketcloudvncviewer() throws XvncproException {
 		if (activity == null) {
-			throw new XvncproException(context.getString(R.string.xvncpro_activity_notdefined));
+			throw new XvncproException(context.getString(L.r_xvncpro_activity_notdefined));
 		}
 		pocketcloudvncviewer = (pocketcloudvncviewer == null) ? new VncViewerPocketCloud(activity) : pocketcloudvncviewer;
 		
