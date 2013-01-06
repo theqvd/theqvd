@@ -11,7 +11,7 @@ import android.util.Log;
 import android.view.View;
 
 public class PrerrequisiteXvncCopy implements Prerrequisite {
-	static final String tag = Config.xvncbinary + "-PrerrequisiteXvncCopy-" +java.util.Map.Entry.class.getSimpleName();
+	static final String tag = L.xvncbinary + "-PrerrequisiteXvncCopy-" +java.util.Map.Entry.class.getSimpleName();
 	private static Context context;
 	private Config config;
 	private boolean useNotifyUpdates;
@@ -28,7 +28,7 @@ public class PrerrequisiteXvncCopy implements Prerrequisite {
 	private Long getKbytesAvailable() {
 		if (kbytesavailable == -1) {
 			StatFs fs = new StatFs(config.getTargetdir());
-			kbytesavailable = new Long(fs.getAvailableBlocks()) * new Long(fs.getBlockSize());
+			kbytesavailable = Long.valueOf(fs.getAvailableBlocks()) * Long.valueOf(fs.getBlockSize());
 			Log.d(tag,"Blocks available:"+fs.getAvailableBlocks()+"; block size:"+fs.getBlockSize()+
 					";kbytes available="+kbytesavailable);
 			kbytesavailable = kbytesavailable / 1024;
@@ -43,7 +43,7 @@ public class PrerrequisiteXvncCopy implements Prerrequisite {
 
 	private boolean enoughSpaceAvailable() {
 		long mbytesavailable = getMegaBytesAvailable();
-		Log.d(tag, "The MB available are:" + mbytesavailable+" and the MBytes needed are:"+(new Integer(Config.xvncsizerequired).toString()));
+		Log.d(tag, "The MB available are:" + mbytesavailable+" and the MBytes needed are:"+(Integer.valueOf(Config.xvncsizerequired).toString()));
 		return mbytesavailable > Config.xvncsizerequired;
 	}
 	
@@ -55,8 +55,8 @@ public class PrerrequisiteXvncCopy implements Prerrequisite {
 	private void sendErrorAlert(String error) {
 		Message m = config.getUiHandler().obtainMessage(Config.SENDALERT);
 		Bundle b = new Bundle();
-		b.putString(Config.messageTitle, context.getResources().getString(R.string.errorincopytitle));
-		b.putString(Config.messageText, context.getResources().getString(R.string.errorincopy)+error);
+		b.putString(Config.messageTitle, context.getResources().getString(L.r_errorincopytitle));
+		b.putString(Config.messageText, context.getResources().getString(L.r_errorincopy)+error);
 		m.setData(b);
 		config.getUiHandler().sendMessage(m);
 	}
@@ -84,7 +84,7 @@ public class PrerrequisiteXvncCopy implements Prerrequisite {
 	@Override
 	public void install() {
 		if (!enoughSpaceAvailable()) {
-			sendErrorAlert(context.getString(R.string.xvnccopy_not_enough_space));
+			sendErrorAlert(context.getString(L.r_xvnccopy_not_enough_space));
 			return;
 		}
 		
@@ -93,7 +93,7 @@ public class PrerrequisiteXvncCopy implements Prerrequisite {
 				Log.d(tag, "message setProgressBarVisibility:"+visibility);
 				Message m = config.getUiHandler().obtainMessage(Config.SETPROGRESSVISIBILITY);
 				Bundle b = new Bundle();
-				b.putInt(Config.progressVisibility, View.VISIBLE);
+				b.putInt(Config.progressVisibility, visibility);
 				m.setData(b);
 				config.getUiHandler().sendMessage(m);
 			}
@@ -110,6 +110,11 @@ public class PrerrequisiteXvncCopy implements Prerrequisite {
 				Message m = config.getUiHandler().obtainMessage(Config.UPDATEBUTTONS);
 				config.getUiHandler().sendMessage(m);
 			}
+			private void sendCopyFinished() {
+				Log.d(tag, "message updateButtons");
+				Message m = config.getUiHandler().obtainMessage(Config.PRERREQUISITEINSTALLED);
+				config.getUiHandler().sendMessage(m);
+			}
 			public void run() {
 				setProgressBarVisibility(View.VISIBLE);
 				mProgressStatus = 0;
@@ -117,11 +122,12 @@ public class PrerrequisiteXvncCopy implements Prerrequisite {
 				while (mProgressStatus < 100) {
 					mProgressStatus = AssetTreeCopy.getPercentageOfFilesCopied();
 					try { Thread.sleep(200); } catch (InterruptedException e) {	Log.w(tag, "Thread sleep interrupted " + e); }
-					// Update the progress bar
+					// Update the progress bar 
 					setProgressBarProgress(mProgressStatus);
 				}
 				setProgressBarVisibility(View.GONE);
 				updateButtons();
+				sendCopyFinished();
 			}
 		});
 
@@ -141,12 +147,12 @@ public class PrerrequisiteXvncCopy implements Prerrequisite {
 	}
 	@Override
 	public String getButtonText() {
-		String text = context.getString(R.string.xvnccopy_button_string);
+		String text = context.getString(L.r_xvnccopy_button_string);
 		return text;
 	}
 	@Override
 	public String getDescriptionText() {
-		String text = context.getString(R.string.xvnccopy_install_string);
+		String text = context.getString(L.r_xvnccopy_install_string);
 		return text;
 	}
 

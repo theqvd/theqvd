@@ -7,32 +7,39 @@ import android.net.Uri;
 import android.util.Log;
 
 public class VncViewerAndroid implements VncViewer {
-	static final String tag = Config.xvncbinary + "-VncViewerAndroid-" +java.util.Map.Entry.class.getSimpleName();
+	static final String tag = L.xvncbinary + "-VncViewerAndroid-" +java.util.Map.Entry.class.getSimpleName();
 	final static String vncpackage = "android.androidVNC";
-//	private final int vncActivityRequestCode = 11;
 	private static Activity activity;
 	private Config config;
 	PendingIntent contentVncIntent;
+	Intent vncIntent;
 	
 	VncViewerAndroid(Activity a) {
 		activity = a;
 		config = new Config(activity);
+		String cmd = Config.vnccmd;
+		vncIntent = new Intent(android.content.Intent.ACTION_VIEW, Uri.parse(cmd));
+		vncIntent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
+		contentVncIntent = PendingIntent.getActivity(activity, 0, vncIntent, 0);
 	}
 
 	@Override
-	public void launchVncViewer() {
-		Log.i(tag, "launching vncviewer androidvnc");
-		String cmd = Config.vnccmd;
-		Intent vncIntent = new Intent(android.content.Intent.ACTION_VIEW, Uri.parse(cmd));
-		vncIntent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
-		contentVncIntent = PendingIntent.getActivity(activity, 0, vncIntent, 0);
-		activity.startActivityForResult(vncIntent, vncActivityRequestCode);
+	public void launchVncViewer() throws XvncproException {
+		Log.i(tag, "launching vncviewer androidvnc with activity="+activity+"; vncIntent="+vncIntent);
+		if (!isInstalled()) {
+			throw new XvncproException("Error internal: trying to launch AndroidVnc which is not installed");
+		}
+		activity.startActivityForResult(vncIntent, Config.vncActivityRequestCode);
 	}
 	
 	@Override
 	public void stopVncViewer() {
-		Log.i(tag, "Stopping activity with activity code " + vncActivityRequestCode);
-		activity.finishActivity(vncActivityRequestCode);
+		Log.i(tag, "Stopping activity with activity code " + Config.vncActivityRequestCode);
+		if (!isInstalled()) {
+			Log.e(tag, "Error internal: Trying to stop a non installed AndroidVNC");
+			return;
+		}
+		activity.finishActivity(Config.vncActivityRequestCode);
 	}
 	@Override
 	public boolean isInstalled() {
@@ -45,12 +52,12 @@ public class VncViewerAndroid implements VncViewer {
 	}
 	@Override
 	public String getButtonText() {
-		String text = activity.getString(R.string.androidvnc_button_string);
+		String text = activity.getString(L.r_androidvnc_button_string);
 		return text;
 	}
 	@Override
 	public String getDescriptionText() {
-		String text = activity.getString(R.string.androidvnc_install_string);
+		String text = activity.getString(L.r_androidvnc_install_string);
 		return text;
 	}
 	@Override

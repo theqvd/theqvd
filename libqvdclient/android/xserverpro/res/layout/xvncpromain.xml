@@ -99,6 +99,19 @@
            android:textOn="@string/allowRemoteVncConnection"
            android:layout_gravity="center_vertical"/> 
     </LinearLayout>
+    <LinearLayout 
+        android:layout_height="wrap_content"
+        android:layout_width="fill_parent">
+       <ToggleButton
+           android:text="@string/renderChoice"
+           android:id="@+id/renderButton"
+           android:layout_width="150dip"
+           android:layout_marginLeft="75dip"
+           android:layout_height="wrap_content"
+           android:textOff="@string/noRender"
+           android:textOn="@string/render"
+           android:layout_gravity="center_vertical"/> 
+    </LinearLayout>
     <TextView
         android:id="@+id/consoletext"
         android:layout_width="fill_parent"

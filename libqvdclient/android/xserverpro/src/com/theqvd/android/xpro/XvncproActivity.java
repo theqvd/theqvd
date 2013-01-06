@@ -24,14 +24,14 @@ import android.widget.Toast;
 import android.widget.ToggleButton;
 
 public class XvncproActivity extends Activity {
-	static final String tag = Config.xvncbinary + "-XvncproActivity-" +java.util.Map.Entry.class.getSimpleName();
+	static final String tag = L.xvncbinary + "-XvncproActivity-" +java.util.Map.Entry.class.getSimpleName();
 
 	VncViewerAndroid androidvncviewer;
 	VncViewerPocketCloud pocketcloudvncviewer;
 	PrerrequisiteXvncCopy xvnccopy;
 	Config config;
 	private Button connectionStartButton, buttonStopX;
-	private ToggleButton forceXresolutionToggleButton, androidVncToggleButton, keepXRunningToggleButton, allowRemoteVncToogleButton;
+	private ToggleButton forceXresolutionToggleButton, androidVncToggleButton, keepXRunningToggleButton, allowRemoteVncToogleButton, renderButton;
 	private ProgressBar progressbar;
 	TextView consoleTextview;
 	private EditText xResolution, yResolution;
@@ -42,25 +42,27 @@ public class XvncproActivity extends Activity {
     @Override
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        setContentView(R.layout.xvncpromain);
+        setContentView(L.r_xvncpromain);
         config = new Config(this);
         setupHandler();
         config.setUiHandler(mainHandler);
-        connectionStartButton = (Button) findViewById(R.id.connectionStartButton);
-        buttonStopX = (Button) findViewById(R.id.stopButton);
-		xResolution = (EditText) findViewById(R.id.editText1);
-		yResolution = (EditText) findViewById(R.id.editText2);
-		consoleTextview = (TextView) findViewById(R.id.consoletext);
-		forceXresolutionToggleButton = (ToggleButton) findViewById(R.id.toggleForceResolutionButton);
-		keepXRunningToggleButton = (ToggleButton) findViewById(R.id.stopOnVncDisconnectButton);
-		androidVncToggleButton = (ToggleButton) findViewById(R.id.vncChoiceButton);
-		allowRemoteVncToogleButton = (ToggleButton) findViewById(R.id.allowRemoteVNCButton);
-		progressbar = (ProgressBar) findViewById(R.id.progressbar1);
+        connectionStartButton = (Button) findViewById(L.r_connectionStartButton);
+        buttonStopX = (Button) findViewById(L.r_stopButton);
+		xResolution = (EditText) findViewById(L.r_editText1);
+		yResolution = (EditText) findViewById(L.r_editText2);
+		consoleTextview = (TextView) findViewById(L.r_consoletext);
+		forceXresolutionToggleButton = (ToggleButton) findViewById(L.r_toggleForceResolutionButton);
+		keepXRunningToggleButton = (ToggleButton) findViewById(L.r_stopOnVncDisconnectButton);
+		androidVncToggleButton = (ToggleButton) findViewById(L.r_vncChoiceButton);
+		allowRemoteVncToogleButton = (ToggleButton) findViewById(L.r_allowRemoteVNCButton);
+		renderButton = (ToggleButton) findViewById(L.r_renderButton);
+		progressbar = (ProgressBar) findViewById(L.r_progressbar1);
 		
 		setConnectionStartButton();
         setStopButton();
         setResolution();
         setVncToggleButton();
+        setRenderButton();
         setStopOnExit();
         setAllowRemoteVncButton();
         
@@ -77,10 +79,10 @@ public class XvncproActivity extends Activity {
 					finish();
 				}
 			} catch (XvncproException e) {
-				sendAlert(getString(R.string.x11_error), e.toString());
+				sendAlert(getString(L.r_x11_error), e.toString());
 			}
         }
-        updateButtons();
+        updateButtons();	
     }
     
 	@Override
@@ -103,7 +105,7 @@ public class XvncproActivity extends Activity {
     		public void handleMessage(Message msg) {
     			if (msg.what >= Config.messageType.length) {
     				Log.e(tag, "Error this should not happen, you have sent a message with key greater than Config.MessageTypes");
-    				sendAlert(getString(R.string.error_handler_message), getString(R.string.error_handler_message) + ": " + msg.what);
+    				sendAlert(getString(L.r_error_handler_message), getString(L.r_error_handler_message) + ": " + msg.what);
     				return;
     			}
     			Bundle b;
@@ -120,9 +122,9 @@ public class XvncproActivity extends Activity {
     				int progress = b.getInt(Config.copyProgress);
     				Log.i(tag, "Received message progress update with value <"+progress+">");
     				progressbar.setProgress(progress);
-    				connectionStartButton.setText(getResources().getString(R.string.copying) + " " +
+    				connectionStartButton.setText(getResources().getString(L.r_copying) + " " +
     						progress+ "%" + (progress == 0 ? 
-    								getResources().getString(R.string.checkingfiles) : 
+    								getResources().getString(L.r_checkingfiles) : 
     								""));
     				return;
     			case Config.SETPROGRESSVISIBILITY:
@@ -139,17 +141,17 @@ public class XvncproActivity extends Activity {
     				Log.i(tag, "Received message that copy has finished");
     				try {
     					Log.d(tag, "message copy finished prerrequisitesinstalled="+config.prerrequisitesInstalled());
-						if (config.prerrequisitesInstalled()) {
-							Log.d(tag, "Calling XvncproActivity finish");
+						if (config.prerrequisitesInstalled() && Config.isInstallPrerrequisitesOnStart()) {
+							Log.d(tag, "Calling XvncproActivity finish because the the prerrequisites where installed on start");
 							XvncproActivity.this.finish();
 						}
 					} catch (XvncproException e) {
-						sendAlert(getString(R.string.x11_error), e.toString());
+						sendAlert(getString(L.r_x11_error), e.toString());
 					}
     				return;
     			default:
     				Log.i(tag, "Received message not defined??? :" + msg.what);
-    				sendAlert(getString(R.string.error_handler_message), getString(R.string.error_handler_message) + ": " + msg.what + "[default]");
+    				sendAlert(getString(L.r_error_handler_message), getString(L.r_error_handler_message) + ": " + msg.what + "[default]");
     				return;
     			}
     		}
@@ -176,7 +178,7 @@ public class XvncproActivity extends Activity {
 					XvncproActivity.this.finish();
 				}
 			} catch (XvncproException e) {
-				sendAlert(getString(R.string.x11_error), e.toString());
+				sendAlert(getString(L.r_x11_error), e.toString());
 			}
 			updateButtons();
 		}
@@ -292,8 +294,18 @@ public class XvncproActivity extends Activity {
     	androidVncToggleButton.setOnClickListener(new OnClickListener() {
 			@Override
 			public void onClick(View v) {
-				Log.d(tag, "Clicked on Android VNC togle. The togle button is "+androidVncToggleButton.isChecked());
+				Log.d(tag, "Clicked on Android VNC toggle. The toggle button is "+androidVncToggleButton.isChecked());
 				config.set_run_androidvnc_client(androidVncToggleButton.isChecked());
+				updateButtons();
+			}
+    	});
+    }
+    void setRenderButton() {
+    	renderButton.setOnClickListener(new OnClickListener() {
+			@Override
+			public void onClick(View v) {
+				Log.d(tag, "Clicked on render toggle. The toggle button is "+renderButton.isChecked());
+				config.setAppConfig_render(renderButton.isChecked());
 				updateButtons();
 			}
     	});
@@ -323,7 +335,8 @@ public class XvncproActivity extends Activity {
     	//forceXresolutionToggleButton, androidVncToggleButton, keepXRunningToggleButton
     	forceXresolutionToggleButton.setChecked(config.is_force_x_geometry());
     	androidVncToggleButton.setChecked(config.is_run_androidvnc_client());
-    	keepXRunningToggleButton.setChecked(config.is_keep_x_running());
+     	renderButton.setChecked(config.isAppConfig_render());
+       	keepXRunningToggleButton.setChecked(config.is_keep_x_running());
     	try {
     		if (config.prerrequisitesInstalled())
     		{
@@ -334,26 +347,26 @@ public class XvncproActivity extends Activity {
     			// Installed and running. Show pid in button, and say connect to X
     			if (XserverService.getInstance() != null && XserverService.getInstance().isRunning()) {
     				Log.d(tag, "updateButtons: getInstance is non null and isRunning");
-    				connectionStartButton.setText(getString(R.string.connect_to_x)+" pid="+XserverService.getInstance().getPid());
-    				buttonStopX.setText(getString(R.string.stopx));
+    				connectionStartButton.setText(getString(L.r_connect_to_x)+" pid="+XserverService.getInstance().getPid());
+    				buttonStopX.setText(getString(L.r_stopx));
     				buttonStopX.setEnabled(true);
     				return;
     			}
     			// Installed and not running
     			// Show start X message
-    			connectionStartButton.setText(getString(R.string.launchx));
+    			connectionStartButton.setText(getString(L.r_launchx));
     			buttonStopX.setEnabled(false);
-    			buttonStopX.setText(getString(R.string.stopdisabled_not_running));
+    			buttonStopX.setText(getString(L.r_stopdisabled_not_running));
     			return;
     		}
     		// Not installed
-    		connectionStartButton.setText(getString(R.string.installprereqs));
+    		connectionStartButton.setText(getString(L.r_installprereqs));
     		consoleTextview.setVisibility(View.VISIBLE);
     		consoleTextview.setText(config.getPrerrequisitesText());
     		buttonStopX.setEnabled(false);
     		// The updates are handled via the handler
     	} catch (XvncproException e) {
-    		sendAlert(getString(R.string.x11_error), e.toString());
+    		sendAlert(getString(L.r_x11_error), e.toString());
 		}
     }
     /*
@@ -363,7 +376,7 @@ public class XvncproActivity extends Activity {
     @Override
     public boolean onCreateOptionsMenu(Menu menu) {
         MenuInflater inflater = getMenuInflater();
-        inflater.inflate(R.menu.xvncmenu, menu);
+        inflater.inflate(L.r_xvncmenu, menu);
         return true;
     }
     
@@ -392,21 +405,21 @@ public class XvncproActivity extends Activity {
         // Handle item selection
         switch (item.getItemId()) {
             
-            case R.id.helpitem:
+            case L.r_helpitem:
             	Log.i(tag, "Clicked on help");
-        		Intent helpIntent = new Intent(android.content.Intent.ACTION_VIEW, Uri.parse(getResources().getString(R.string.xncpro_helpurl)));
+        		Intent helpIntent = new Intent(android.content.Intent.ACTION_VIEW, Uri.parse(getResources().getString(L.r_xncpro_helpurl)));
     			startActivity(helpIntent);
                 return true;
-            case R.id.aboutitem:
-            	String version = getResources().getString(R.string.xvncpro_versionName); 
+            case L.r_aboutitem:
+            	String version = getResources().getString(L.r_xvncpro_versionName); 
         		Log.i(tag, "Clicked on about. version is "+version);
-        		Toast.makeText(getApplication().getApplicationContext(), Config.getAbout(version), 30).show();
+        		Toast.makeText(getApplication().getApplicationContext(), Config.getAbout(version), Toast.LENGTH_LONG).show();
                 return true;
-            case R.id.changelogitem:
+            case L.r_changelogitem:
         		Log.i(tag, "Clicked on changelog");
-        		sendAlert(getString(R.string.xvncpro_changelogtitle), getString(R.string.xvncpro_changelog));
+        		sendAlert(getString(L.r_xvncpro_changelogtitle), getString(L.r_xvncpro_changelog));
                 return true;
-            case R.id.exititem:
+            case L.r_exititem:
         		Log.i(tag, "Clicked on exit");
         		Intent x11Intent = new Intent(this, XserverService.class);
         		stopService(x11Intent);
@@ -420,7 +433,7 @@ public class XvncproActivity extends Activity {
     private void sendAlert(String title, String text) {
     	if (this.isFinishing()) {
     		Log.i(tag, "sending toast instead of alert because application is finishing");
-    		Toast.makeText(getApplication().getApplicationContext(), title + "\n" + text, 30).show();
+    		Toast.makeText(getApplication().getApplicationContext(), title + "\n" + text, Toast.LENGTH_LONG).show();
     		return;
     	}
     	AlertDialog.Builder builder = new AlertDialog.Builder(XvncproActivity.this);

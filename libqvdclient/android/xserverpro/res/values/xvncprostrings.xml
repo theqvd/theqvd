@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="utf-8" ?>
 <resources>
-    <string name="xvncpro_versionName">3.3</string>
-    <string name="xvncpro_changelog">14/11/2012 3.3 Allow for remote Vnc connections\n3.2 01/10/20012 Added rgb.txt color mapping\n3.1 17/04/2012 Update buttons\n30/05/2012 3.0 Redesign of the xvnc program</string>
+    <string name="xvncpro_versionName">3.4</string>
+    <string name="xvncpro_changelog">18/12/2012 3.4 New Xvnc binary with 7 depth layers support and default depth 24\n14/11/2012 3.3 Allow for remote Vnc connections\n3.2 01/10/20012 Added rgb.txt color mapping\n3.1 17/04/2012 Update buttons\n30/05/2012 3.0 Redesign of the xvnc program</string>
     <string name="xvncpro_subject">\nXvnc Control Panel\n</string>
     <string name="xvncpro_app_name">xvncpro</string>
     <string name="app_name_xserver">xserver</string>
@@ -58,4 +58,7 @@
     <string name="remoteVncConnectionChoice">Allow Remote VNC conn</string>
     <string name="noRemoteVncConnection">remote VNC disallowed</string>
     <string name="allowRemoteVncConnection">Remote VNC allowed</string>
+    <string name="render">use XRENDER</string>
+    <string name="noRender">disable XRENDER</string>
+    <string name="renderChoice">Use XRENDER</string>
 </resources>

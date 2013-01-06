@@ -3,6 +3,7 @@
  */
 package com.theqvd.android.xpro;
 
+
 import android.app.Activity;
 import android.content.Context;
 import android.content.Intent;
@@ -34,11 +35,12 @@ public class Config {
 	public static String xvnc;
 	public static String xvnccmd;
 	public static String pocketvncconfigfullpath;
-	public final static String xvncbinary = "Xvncpro";
+
 //	public final static String xvnc = targetdir + "/usr/X11R6/bin/" + xvncbinary;
 //	public final static String xvnccmd = xvnc + " :0 -br -localhost -nolisten local -PasswordFile="+targetdir+"/etc/vncpasswd";
+	public static String xvncbinary = L.xvncbinary;
 	public final static String notAllowRemoteVncConns = "-localhost";
-	public final static String psxvnccmd = "/system/bin/ps "+xvncbinary;
+	public final static String psxvnccmd = "/system/bin/ps "+L.xvncbinary;
 	public final static String serverstartedstring = "^.*?created VNC server for screen 0";
 	public final static String vncdisconnectedstring = ".*?Connections: closed: 127.0.0.1.*";
 	// Connections: closed: 127.0.0.1::51506
@@ -51,7 +53,8 @@ public class Config {
 	public final static String props_keep_x_running = "keepxrunning";
 	public final static String props_use_android_vnc = "useandroidvnc";
 	public final static String props_remote_vnc = "useremotevnc";
-	public final static String helpurl = "http://theqvd.com/trac/wiki/AndroidX11Server";
+	public final static String props_render = "userender";
+	public final static String helpurl = "http://theqvd.com/support/documentation";
 	public final static int minPixels = 32;
 	public final static int maxPixels = 10000;
 	public final static boolean debug = false;
@@ -81,13 +84,13 @@ public class Config {
 	public final static String progressVisibility = "progressVisibility";
 	// StartActivityForResult codes
 	public final static int vncActivityRequestCode = 11;
-
+	
 	
 	public static String getAbout(String version) {
 		return "XVnc\nLicense: Licensed under the GPLv3.\nAuthor: Nito@Qindel.ES\nSponsored: http://theqvd.com\nVersion: "+version+"\nRevision: $Revision: 13666 $\nDate: $Date: 2012-01-17 15:16:24 +0100 (Tue, 17 Jan 2012) $";
 	}
 	// Class info
-	static final String tag = Config.xvncbinary + "-Config-" +java.util.Map.Entry.class.getSimpleName();
+	static final String tag = L.xvncbinary + "-Config-" +java.util.Map.Entry.class.getSimpleName();
 	private static Context context;
 	private static Activity activity;
 	private static boolean appConfig_force_x_geometry = false,
@@ -95,7 +98,8 @@ public class Config {
 			appConfig_run_androidvnc_client = true,
 			appConfig_xvncbinary_copied = false,
 			appConfig_pocketconfig_copied = false,
-			appConfig_remote_vnc_allowed = false;
+			appConfig_remote_vnc_allowed = false,
+			appConfig_render = true;
 	private static int appConfig_height_pixels = 0, appConfig_width_pixels = 0,
 			appConfig_defaultHeightPixels = 0, appconfig_defaultWidthPixels = 0;
 	private static VncViewerAndroid androidvncviewer;
@@ -106,12 +110,12 @@ public class Config {
 	// Set installPrerrequisitesOnStart to true if you want to finish the activity
 	// after installation
 	private static boolean installPrerrequisitesOnStart = false;
-
+	
 	private void init() {
 		setTargetdir(context.getFilesDir().getAbsolutePath());
 		pocketvncconfigfullpath = getTargetdir() + "/" + Config.pocketvncconfig;
-		xvnc = getTargetdir() + "/usr/X11R6/bin/" + xvncbinary;
-		xvnccmd = xvnc + " :0 -br -nolisten local -PasswordFile="+getTargetdir()+"/etc/vncpasswd";
+		xvnc = getTargetdir() + "/usr/X11R6/bin/" + L.xvncbinary;
+		xvnccmd = xvnc + " :0 -br -nolisten local  -pixelformat rgb888 -PasswordFile="+getTargetdir()+"/etc/vncpasswd";
 		
 		// Set height and width
 		DisplayMetrics metrics = new DisplayMetrics();
@@ -141,6 +145,7 @@ public class Config {
 		appConfig_width_pixels = prefsPrivate.getInt(Config.props_widthpixels, appconfig_defaultWidthPixels);
 		appConfig_pocketconfig_copied = prefsPrivate.getBoolean(Config.props_pocketconfigcopied, appConfig_pocketconfig_copied);
 		appConfig_remote_vnc_allowed =  prefsPrivate.getBoolean(Config.props_use_android_vnc, appConfig_remote_vnc_allowed);
+		appConfig_render =  prefsPrivate.getBoolean(Config.props_render, appConfig_render);
 	}
 	private void save_properties() {
 		SharedPreferences prefsPrivate;
@@ -152,6 +157,7 @@ public class Config {
 		prefsPrivateEditor.putBoolean(Config.props_hasbeencopied, appConfig_xvncbinary_copied);
 		prefsPrivateEditor.putBoolean(Config.props_pocketconfigcopied, appConfig_pocketconfig_copied);
 		prefsPrivateEditor.putBoolean(Config.props_use_android_vnc, appConfig_remote_vnc_allowed);
+		prefsPrivateEditor.putBoolean(Config.props_render, appConfig_render);
 		prefsPrivateEditor.putInt(Config.props_heightpixels, appConfig_height_pixels);
 		prefsPrivateEditor.putInt(Config.props_widthpixels, appConfig_width_pixels);
 		prefsPrivateEditor.commit();
@@ -227,9 +233,16 @@ public class Config {
 	public int getAppconfig_defaultWidthPixels() {
 		return appconfig_defaultWidthPixels;
 	}
+	public boolean isAppConfig_render() {
+		return appConfig_render;
+	}
+	public void setAppConfig_render(boolean appConfig_render) {
+		Config.appConfig_render = appConfig_render;
+		save_properties();
+	}
 	public VncViewerAndroid getAndroidvncviewer() throws XvncproException {
 		if (activity == null) {
-			throw new XvncproException(context.getString(R.string.xvncpro_activity_notdefined));
+			throw new XvncproException(context.getString(L.r_xvncpro_activity_notdefined));
 		}
     	androidvncviewer = (androidvncviewer == null) ? new VncViewerAndroid(activity) : androidvncviewer;
 		
@@ -237,7 +250,7 @@ public class Config {
 	}
 	public VncViewerPocketCloud getPocketcloudvncviewer() throws XvncproException {
 		if (activity == null) {
-			throw new XvncproException(context.getString(R.string.xvncpro_activity_notdefined));
+			throw new XvncproException(context.getString(L.r_xvncpro_activity_notdefined));
 		}
 		pocketcloudvncviewer = (pocketcloudvncviewer == null) ? new VncViewerPocketCloud(activity) : pocketcloudvncviewer;
 		

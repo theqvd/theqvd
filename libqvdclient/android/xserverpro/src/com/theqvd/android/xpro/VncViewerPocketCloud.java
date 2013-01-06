@@ -15,36 +15,41 @@ import android.net.Uri;
 import android.util.Log;
 
 public class VncViewerPocketCloud implements VncViewer {
-	static final String tag = Config.xvncbinary + "-VncViewerPocketCloud-" +java.util.Map.Entry.class.getSimpleName();
+	static final String tag = L.xvncbinary + "-VncViewerPocketCloud-" +java.util.Map.Entry.class.getSimpleName();
 	static final String vncpackage = "com.wyse.pocketcloudfull";
 	private static Activity activity;
-//	private final int vncActivityRequestCode = 11;
 	private Config config;
 	PendingIntent contentVncIntent;
 	boolean configcopied;
+	Intent vncIntent;
 
 	VncViewerPocketCloud(Activity c) {
 		activity = c;
 		config = new Config(activity);
 		setConfigcopied(false);
-	}
-	@Override
-	public void launchVncViewer() {
-		Log.i(tag, "launching vncviewer androidvnc");
 		Uri uri = Uri.parse("pocketcloud://file://"+Config.pocketvncconfigfullpath);
-		Log.i(tag, "Clicked on connect" + uri );
-		Intent vncIntent = new Intent();
-		vncIntent.setAction(Intent.ACTION_VIEW);
-		vncIntent.setData(uri);
+		Log.i(tag, "pocketcloud uri when connect is" + uri );
+	    vncIntent = new Intent(Intent.ACTION_VIEW, uri);
 		vncIntent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
 		contentVncIntent = PendingIntent.getActivity(activity, 0, vncIntent, 0);
-		activity.startActivityForResult(vncIntent, vncActivityRequestCode);
+	}
+	@Override
+	public void launchVncViewer() throws XvncproException {
+		Log.i(tag, "launching vncviewer PocketCloud");
+		if (!isInstalled()) {
+			throw new XvncproException("Error internal: trying to launch PocketCloud which is not installed");
+		}
+		activity.startActivityForResult(vncIntent, Config.vncActivityRequestCode);
 	}
 
 	@Override
 	public void stopVncViewer() {
-		Log.i(tag, "Stopping activity with activity code " + vncActivityRequestCode);
-		activity.finishActivity(vncActivityRequestCode);
+		Log.i(tag, "Stopping activity with activity code " + Config.vncActivityRequestCode);
+		if (!isInstalled()) {
+			Log.e(tag, "Error internal: Trying to stop a non installed PocketCloud");
+			return;
+		}
+		activity.finishActivity(Config.vncActivityRequestCode);
 	}
 	@Override
 	public boolean isInstalled() {
@@ -88,8 +93,8 @@ public class VncViewerPocketCloud implements VncViewer {
 			Log.e(tag, "Error in copy " + e);
 			AlertDialog.Builder builder = new AlertDialog.Builder(activity);
     		builder
-    		.setMessage(activity.getResources().getString(R.string.errorincopytitle))
-    		.setTitle(activity.getResources().getString(R.string.errorincopy)+e.toString())
+    		.setMessage(activity.getResources().getString(L.r_errorincopytitle))
+    		.setTitle(activity.getResources().getString(L.r_errorincopy)+e.toString())
     		.setCancelable(true)
     		.setNeutralButton(activity.getResources().getString(android.R.string.ok), new DialogInterface.OnClickListener() {
     			public void onClick(DialogInterface dialog, int id) {
@@ -102,12 +107,12 @@ public class VncViewerPocketCloud implements VncViewer {
 	}
 	@Override
 	public String getButtonText() {
-		String text = activity.getString(R.string.pocketvnc_button_string);
+		String text = activity.getString(L.r_pocketvnc_button_string);
 		return text;
 	}
 	@Override
 	public String getDescriptionText() {
-		String text = activity.getString(R.string.pocketvnc_install_string);
+		String text = activity.getString(L.r_pocketvnc_install_string);
 		return text;
 	}
 	@Override
@@ -118,7 +123,7 @@ public class VncViewerPocketCloud implements VncViewer {
 		if (configcopied)
 			return configcopied;
 		File pocketvncconfig = new File(Config.pocketvncconfigfullpath);
-		setConfigcopied(pocketvncconfig.exists());
+		setConfigcopied(pocketvncconfig.exists()); 
 		Log.d(tag, "Config for vnc "+Config.pocketvncconfigfullpath+" was copied:"+configcopied);
 		return configcopied;
 	}

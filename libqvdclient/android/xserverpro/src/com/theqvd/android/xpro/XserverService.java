@@ -28,7 +28,7 @@ import android.util.Log;
 public class XserverService extends Service 
 implements Runnable 
 {
-	final static String tag = Config.xvncbinary + "-XserverService-" +java.util.Map.Entry.class.getSimpleName();
+	final static String tag = L.xvncbinary + "-XserverService-" +java.util.Map.Entry.class.getSimpleName();
     private Thread aThread;
 	private static Process process;
 	static private boolean xserverrunning = false;
@@ -52,13 +52,13 @@ implements Runnable
 			if (!config.prerrequisitesInstalled()) {
 				Intent mainActivity = new Intent(this, XvncproActivity.class);
 				Log.i(tag, "Prerrequisites not installed. Launching intent:"+mainActivity);
-				sendAlert(getString(R.string.installprereqs), getString(R.string.installprereqs));
+				sendAlert(getString(L.r_installprereqs), getString(L.r_installprereqs));
 				mainActivity.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
 				startActivity(mainActivity);
 				return START_REDELIVER_INTENT;
 			}
 		} catch (XvncproException e) {
-			sendNotify(getString(R.string.x11_error), "Pid:"+e.toString());
+			sendNotify(getString(L.r_x11_error), "Pid:"+e.toString());
 			return START_REDELIVER_INTENT;
 		}
 
@@ -108,8 +108,8 @@ implements Runnable
 			v = config.getVncViewer();
 			v.launchVncViewer();
 		} catch (XvncproException e) {
-			sendNotify(getString(R.string.x11_error), "Pid:"+e.toString());
-		}	
+			sendNotify(getString(L.r_x11_error), "Pid:"+e.toString());
+		}
 	}
 	private void stopVNC() {
 		VncViewer v;
@@ -117,13 +117,14 @@ implements Runnable
 			v = config.getVncViewer();
 			v.stopVncViewer();
 		} catch (XvncproException e) {
-			sendNotify(getString(R.string.x11_error), "Pid:"+e.toString());
+			sendNotify(getString(L.r_x11_error), "Pid:"+e.toString());
 		}
 	}
 	@Override
 	public void run() {
 		String cmd = Config.xvnccmd+" -geometry "+ config.get_width_pixels() + "x"  + config.get_height_pixels();
 		cmd +=  config.isAppConfig_remote_vnc_allowed() ? "" : " " + Config.notAllowRemoteVncConns;
+		cmd += config.isAppConfig_render() ? " +render" : "";
 		Log.i(tag, "launching:"+cmd);
 		String cmdList[] = cmd.split("[ ]+");
 		try {
@@ -160,10 +161,10 @@ implements Runnable
 			Log.i(tag, "Xvnc Process has died");
 		} catch (IOException e) {
 			Log.e(tag, "IOException:"+e.toString());
-			sendNotify(getString(R.string.x11_error), "Pid:"+e.toString());
+			sendNotify(getString(L.r_x11_error), "Pid:"+e.toString());
 		} catch (InterruptedException e) {
 			Log.e(tag, "InterruptedException:"+e.toString());
-			sendNotify(getString(R.string.x11_error), "Pid:"+e.toString());	
+			sendNotify(getString(L.r_x11_error), "Pid:"+e.toString());	
 		} finally {
 			if (!config.is_keep_x_running()) {
 				Log.i(tag, "Stopping Xvnc service (step 2)");
@@ -220,7 +221,7 @@ implements Runnable
 			return pidfound;
 		}
 
-		Pattern pattern = Pattern.compile("(?m)^\\S+\\s+(\\d+)\\s+.*?"+Config.xvncbinary+"$");
+		Pattern pattern = Pattern.compile("(?m)^\\S+\\s+(\\d+)\\s+.*?"+L.xvncbinary+"$");
 		
 		Matcher m = pattern.matcher(psoutput);
 		if (m.find()) {
@@ -239,7 +240,7 @@ implements Runnable
 			File file=new File("/proc/" + pid);
 			boolean exists = file.exists();
 			if (exists) {
-				sendNotify(getString(R.string.x11_is_running), "Pid:"+XserverService.pid);
+				sendNotify(getString(L.r_x11_is_running), "Pid:"+XserverService.pid);
 				return XserverService.xserverrunning;
 			}
 			// Pid no longer there
@@ -248,7 +249,7 @@ implements Runnable
 		XserverService.pid=searchForXvncPid();
 		XserverService.xserverrunning = (XserverService.pid != -1);
 		if (XserverService.xserverrunning) {
-			sendNotify(getString(R.string.x11_is_running), "Pid:"+XserverService.pid);
+			sendNotify(getString(L.r_x11_is_running), "Pid:"+XserverService.pid);
 		} else {
 			cancelNotify();
 		}
@@ -287,6 +288,7 @@ implements Runnable
 		return instance;
 	}
 
+//@SuppressWarnings("deprecation")
 private void sendNotify(CharSequence title, CharSequence text) {
 		Context c = this.getApplicationContext();
 		// TODO try to set the DummyActivity as the intent
@@ -314,7 +316,7 @@ private void sendNotify(CharSequence title, CharSequence text) {
 			Log.e(tag, "PendingIntent is null creating empty PendingIntent");
 			i = PendingIntent.getActivity(c, 0, new Intent(), 0);
 		}
-		Notification notification = new Notification(R.drawable.ic_xvnc, title, System.currentTimeMillis());
+		Notification notification = new Notification(L.r_ic_xvnc, title, System.currentTimeMillis());
 		notification.setLatestEventInfo(c, title, text, i);
 		NotificationManager nm = (NotificationManager) this.getSystemService(Context.NOTIFICATION_SERVICE);
 		nm.notify(Config.notifystartx, notification);
