@@ -56,7 +56,13 @@
            android:layout_height="fill_parent"
            android:digits="0123456789"
            android:inputType="number" /> 
-       <ToggleButton
+       <CheckBox
+            android:id="@+id/toggleForceResolutionButton"
+            android:layout_width="120dip"
+            android:layout_height="wrap_content"
+            android:text="@string/resolution_forced" 
+            android:layout_gravity="center_vertical"/>
+<!--       <ToggleButton
            android:text="@string/resolution_forced"
            android:id="@+id/toggleForceResolutionButton"
            android:layout_width="120dip"
@@ -64,6 +70,7 @@
            android:textOff="@string/resolution_auto"
            android:textOn="@string/resolution_forced"
            android:layout_gravity="center_vertical"/> 
+           -->
     </LinearLayout>
     <LinearLayout 
         android:layout_height="wrap_content"
@@ -77,7 +84,8 @@
             android:text="@string/vncclientChoice"
             android:textOff="@string/pocketview_vnc_viewer"
             android:textOn="@string/android_vnc_viewer" />
-       <ToggleButton
+<!-- 
+        <ToggleButton
            android:text="@string/keepxserver_on_disconnect"
            android:id="@+id/stopOnVncDisconnectButton"
            android:layout_width="120dip"
@@ -85,10 +93,18 @@
            android:textOff="@string/stop_x_on_disconnect"
            android:textOn="@string/keep_x_running"
            android:layout_gravity="center_vertical"/> 
+            -->
+       <CheckBox
+            android:id="@+id/stopOnVncDisconnectButton"
+            android:layout_width="120dip"
+            android:layout_height="wrap_content"
+            android:text="@string/keep_x_running" 
+            android:layout_gravity="center_vertical"/>
     </LinearLayout>
     <LinearLayout 
         android:layout_height="wrap_content"
         android:layout_width="fill_parent">
+       <!-- 
        <ToggleButton
            android:text="@string/remoteVncConnectionChoice"
            android:id="@+id/allowRemoteVNCButton"
@@ -98,10 +114,26 @@
            android:textOff="@string/noRemoteVncConnection"
            android:textOn="@string/allowRemoteVncConnection"
            android:layout_gravity="center_vertical"/> 
+           -->
+       <CheckBox
+            android:id="@+id/allowRemoteVNCButton"
+            android:layout_width="200dip"
+            android:layout_marginLeft="75dip"
+            android:layout_height="wrap_content"
+            android:text="@string/remoteVncConnectionChoice" 
+            android:layout_gravity="center_vertical"/>
     </LinearLayout>
     <LinearLayout 
         android:layout_height="wrap_content"
         android:layout_width="fill_parent">
+              <CheckBox
+            android:id="@+id/renderButton"
+            android:layout_width="200dip"
+            android:layout_marginLeft="75dip"
+            android:layout_height="wrap_content"
+            android:text="@string/renderChoice" 
+            android:layout_gravity="center_vertical"/>
+       <!-- 
        <ToggleButton
            android:text="@string/renderChoice"
            android:id="@+id/renderButton"
@@ -110,7 +142,8 @@
            android:layout_height="wrap_content"
            android:textOff="@string/noRender"
            android:textOn="@string/render"
-           android:layout_gravity="center_vertical"/> 
+           android:layout_gravity="center_vertical"/>
+            --> 
     </LinearLayout>
     <TextView
         android:id="@+id/consoletext"

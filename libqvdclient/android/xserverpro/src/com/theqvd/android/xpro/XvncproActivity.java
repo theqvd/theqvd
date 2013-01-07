@@ -17,6 +17,7 @@ import android.view.MenuItem;
 import android.view.View;
 import android.view.View.OnClickListener;
 import android.widget.Button;
+import android.widget.CheckBox;
 import android.widget.EditText;
 import android.widget.ProgressBar;
 import android.widget.TextView;
@@ -31,7 +32,8 @@ public class XvncproActivity extends Activity {
 	PrerrequisiteXvncCopy xvnccopy;
 	Config config;
 	private Button connectionStartButton, buttonStopX;
-	private ToggleButton forceXresolutionToggleButton, androidVncToggleButton, keepXRunningToggleButton, allowRemoteVncToogleButton, renderButton;
+	private ToggleButton androidVncToggleButton;
+	private CheckBox forceXresolutionToggleButton, keepXRunningToggleButton, allowRemoteVncToogleButton, renderButton;
 	private ProgressBar progressbar;
 	TextView consoleTextview;
 	private EditText xResolution, yResolution;
@@ -51,11 +53,11 @@ public class XvncproActivity extends Activity {
 		xResolution = (EditText) findViewById(L.r_editText1);
 		yResolution = (EditText) findViewById(L.r_editText2);
 		consoleTextview = (TextView) findViewById(L.r_consoletext);
-		forceXresolutionToggleButton = (ToggleButton) findViewById(L.r_toggleForceResolutionButton);
-		keepXRunningToggleButton = (ToggleButton) findViewById(L.r_stopOnVncDisconnectButton);
+		forceXresolutionToggleButton = (CheckBox) findViewById(L.r_toggleForceResolutionButton);
+		keepXRunningToggleButton = (CheckBox) findViewById(L.r_stopOnVncDisconnectButton);
 		androidVncToggleButton = (ToggleButton) findViewById(L.r_vncChoiceButton);
-		allowRemoteVncToogleButton = (ToggleButton) findViewById(L.r_allowRemoteVNCButton);
-		renderButton = (ToggleButton) findViewById(L.r_renderButton);
+		allowRemoteVncToogleButton = (CheckBox) findViewById(L.r_allowRemoteVNCButton);
+		renderButton = (CheckBox) findViewById(L.r_renderButton);
 		progressbar = (ProgressBar) findViewById(L.r_progressbar1);
 		
 		setConnectionStartButton();

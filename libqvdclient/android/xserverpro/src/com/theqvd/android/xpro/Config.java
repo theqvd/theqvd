@@ -61,7 +61,7 @@ public class Config {
 	public final static int notifycopy = 1;
 	public final static int notifystartx = 2;
 	public final static int notifynovncinstalled = 3;
-	public final static int xvncsizerequired = 37; /* 37 MB required */
+	public final static int xvncsizerequired = 40; /* 37 MB required */
 	public final static long xvncsizerequiredinkbytes = xvncsizerequired * 1024L;
 	public final static String pocketvncconfig = "xvnc.vnc";
 //	public static String pocketvncconfigfullpath = targetdir + Config.pocketvncconfig;
@@ -110,8 +110,9 @@ public class Config {
 	// Set installPrerrequisitesOnStart to true if you want to finish the activity
 	// after installation
 	private static boolean installPrerrequisitesOnStart = false;
-	
+
 	private void init() {
+		Log.i(tag, "The CPU type from CPU_ABI is "+android.os.Build.CPU_ABI);
 		setTargetdir(context.getFilesDir().getAbsolutePath());
 		pocketvncconfigfullpath = getTargetdir() + "/" + Config.pocketvncconfig;
 		xvnc = getTargetdir() + "/usr/X11R6/bin/" + L.xvncbinary;
