@@ -1,4 +1,4 @@
-#!/usr/bin/perl
+package QVD::VMKiller::LXC;
 
 use strict;
 use warnings;
@@ -10,29 +10,36 @@ BEGIN { $QVD::Config::USE_DB = 0 }
 use QVD::Config;
 use QVD::Log;
 
-my $path_cgroup = cfg('path.cgroup');
-my $lock_file = cfg('internal.hkd.lock.path');
+sub kill_dangling_vms {
 
-open my $lock, '>', $lock_file;
-if (flock $lock, LOCK_EX|LOCK_NB) {
-    for my $dir (<$path_cgroup/qvd-*>) {
-        my ($container) = $dir =~ m|/(qvd-[^/]*$)|;
-        DEBUG "reading LXC $container process IDs";
-        if (open my $fh, '<', "$dir/cgroup.procs") {
-            chomp (my @pids = <$fh>);
-            if (@pids) {
-                INFO sprintf("killing %d processes from container %s", scalar(@pids), ($1 // '<unknown>'));
-                kill KILL => @pids;
-            }
-            else {
-                DEBUG "LXC $container has no processes";
+    my $path_cgroup = cfg('path.cgroup');
+    my $lock_file = cfg('internal.hkd.lock.path');
+
+    open my $lock, '>', $lock_file or
+       ERROR("Unable to open lock file $lock_file: $^E"),
+       return;
+    if (flock $lock, LOCK_EX|LOCK_NB) {
+        for my $dir (<$path_cgroup/qvd-*>) {
+            my ($container) = $dir =~ m|/(qvd-[^/]*$)|;
+            DEBUG "reading LXC $container process IDs";
+            if (open my $fh, '<', "$dir/cgroup.procs") {
+                chomp (my @pids = <$fh>);
+                if (@pids) {
+                    INFO sprintf("killing %d processes from container %s", scalar(@pids), ($1 // '<unknown>'));
+                    kill KILL => @pids;
+                }
+                else {
+                    DEBUG "LXC $container has no processes";
+                }
             }
         }
     }
+    else {
+        DEBUG "HKD is running";
+    }
 }
-else {
-    DEBUG "HKD is running";
-}
+
+1;
 
 # FIXME, reword this description
 
@@ -63,3 +70,4 @@ started in another node.
 
 
 =cut
+
