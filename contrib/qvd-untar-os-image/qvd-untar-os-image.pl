@@ -56,7 +56,6 @@ sub _run {
 
 sub calc_paths {
     my ($di_path) = @_;
-    #printf "p.s.images (%s)\n", cfg 'path.storage.images';
 
     my $basefs_parent = cfg 'path.storage.basefs';
     $basefs_parent =~ s|/*$||;
@@ -74,7 +73,8 @@ sub get_lock {
     my $lock;
 
     unless (open $lock, '>>', $lockfn) {
-        die "Unable to create or open lock file '$lockfn': $!";
+        warn "Unable to create or open lock file '$lockfn': $!";
+        return;
     }
     $debug and warn "lock file is $lockfn\n";
     my $retries = 1;
@@ -83,22 +83,26 @@ sub get_lock {
             return $lock;
         } else {
             if ($! == POSIX::EAGAIN()) {
-                $debug and warn "Waiting for lock $lockfn...\n";
+                $debug and warn "Waiting for lock '$lockfn'...\n";
                 sleep 5;
                 $retries++;
                 next;
             }
-            die "Unable to acquire lock for $lockfn: $!";
+            warn "Unable to acquire lock for '$lockfn': $!";
+            return;
         }
     }
+    ## unreached
 }
 
 sub is_untarred {
     my ($basefs) = @_;
 
     if (-d $basefs) {
-        die "Image already untarred\n";
+        $debug and warn "Image '$basefs' already untarred\n";
+        return;
     }
+    return 1;
 }
 
 sub create_btrfs_subvol {
@@ -106,13 +110,16 @@ sub create_btrfs_subvol {
 
     if ('btrfs' eq cfg 'vm.lxc.unionfs.type') {
         if (_run cfg ('command.btrfs'), 'subvolume', 'create', $tmp) {
-            die "Unable to create btrfs subvolume at '$tmp'";
+            warn "Unable to create btrfs subvolume at '$tmp'";
+            return;
         }
     } else {
         unless (_mkpath $tmp) {
-            die "Unable to create directory '$tmp': $!";
+            warn "Unable to create directory '$tmp': $!";
+            return;
         }
     }
+    return 1;
 }
 
 sub untar_image {
@@ -126,7 +133,7 @@ sub untar_image {
     push @cmd, '-z' if $image_path =~ /\.(?:tgz|gz)$/;
     push @cmd, '-j' if $image_path =~ /\.(?:tbz|bz2)$/;
 
-    _run @cmd;
+    return !_run @cmd;   ## negate return val from system
 }
 
 sub place_image {
@@ -135,13 +142,19 @@ sub place_image {
     $debug and warn "Renaming '$tmp' to '$basefs'\n";
     rename $tmp, $basefs or warn "Rename of '$tmp' to '$basefs' failed: $!\n";
     unless (-d $basefs) {
-        die "'$basefs' does not exist or is not a directory";
+        warn "'$basefs' does not exist or is not a directory";
+        return;
     }
+    return 1;
 }
 
 sub release_lock {
     my ($lock) = @_;
-    flock($lock, LOCK_UN) or die "unlock failed: $!";
+    if (!flock $lock, LOCK_UN) {
+        warn "unlock failed: $!";
+        return;
+    }
+    return 1;
 }
 
 die "No images given\nUsage: $0 <image_path> ...\n" unless @ARGV;
@@ -158,9 +171,10 @@ foreach my $image_path (@ARGV) {
 
     my ($basefs, $lockfn, $tmp) = calc_paths $di_path;
     my $lock = get_lock $lockfn;
-    is_untarred $basefs;
-    create_btrfs_subvol $tmp;
-    untar_image $image_path, $tmp;
-    place_image $tmp, $basefs;
-    release_lock $lock;
+    next unless $lock;
+    next unless is_untarred $basefs;
+    next unless create_btrfs_subvol $tmp;
+    next unless untar_image $image_path, $tmp;
+    next unless place_image $tmp, $basefs;
+    next unless release_lock $lock;
 }
