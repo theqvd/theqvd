@@ -144,18 +144,23 @@ sub release_lock {
     flock($lock, LOCK_UN) or die "unlock failed: $!";
 }
 
-my ($image_path) = @ARGV;
-die "image_path not given\n" unless $image_path;
-die "Image '$image_path' does not exist on disk" unless -f $image_path;
+die "No images given\nUsage: $0 <image_path> ...\n" unless @ARGV;
 
-## we can use 'basename' which doesn't require access to the db. If
-## access is needed for other reason, then change this to use dis.path
-my $di_path = basename $image_path;
+foreach my $image_path (@ARGV) {
+    if (!-f $image_path) {
+        warn "Image '$image_path' does not exist on disk";
+        next;
+    }
 
-my ($basefs, $lockfn, $tmp) = calc_paths $di_path;
-my $lock = get_lock $lockfn;
-is_untarred $basefs;
-create_btrfs_subvol $tmp;
-untar_image $image_path, $tmp;
-place_image $tmp, $basefs;
-release_lock $lock;
+    ## we can use 'basename' which doesn't require access to the db. If
+    ## access is needed for other reason, then change this to use dis.path
+    my $di_path = basename $image_path;
+
+    my ($basefs, $lockfn, $tmp) = calc_paths $di_path;
+    my $lock = get_lock $lockfn;
+    is_untarred $basefs;
+    create_btrfs_subvol $tmp;
+    untar_image $image_path, $tmp;
+    place_image $tmp, $basefs;
+    release_lock $lock;
+}
