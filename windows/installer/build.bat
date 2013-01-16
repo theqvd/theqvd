@@ -20,7 +20,7 @@ call pp -x -gui ^
 -l C:\strawberry\c\bin\libeay32_.dll ^
 -l C:\strawberry\perl\site\lib\auto\Net\SSLeay\ssleay32.dll ^
 -l C:\strawberry\c\bin\ssleay32_.dll ^
--l C:\strawberry\c\bin\libz_.dll ^
+-l C:\strawberry\c\bin\zlib1_.dll ^
 -l C:\strawberry\perl\site\lib\auto\Crypt\OpenSSL\X509\X509.dll ^
 --icon .\pixmaps\qvd.ico ^
 -o qvd-client-1.exe ^
