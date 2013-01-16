@@ -8,6 +8,8 @@ use Fcntl qw/:flock/;
 use File::Basename;
 use QVD::Config;
 
+our $VERSION = '0.01';
+
 sub new {
     my ($class, %args) = @_;
     my %attrs;
