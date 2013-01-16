@@ -98,6 +98,8 @@ command.windows.nxproxy = nx\\nxproxy.exe
 command.nxagent.args.extra =
 command.x-session.args.extra =
 
+command.darwin.x11 = XQuartz.app
+
 ## whether to remember password after successful connection
 client.remember_password = 0
 ## whether to show the previous checkbox or not

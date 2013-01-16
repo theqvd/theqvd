@@ -88,7 +88,8 @@ sub OnInit {
         }
         else { # DARWIN!
             $ENV{DISPLAY} //= ':0';
-            @cmd = qw(open -a X11 --args true);
+            my $x11_cmd = core_cfg('command.darwin.x11');
+            @cmd = qq(open -a $x11_cmd --args true);
         }
         if ( Proc::Background->new(@cmd) ) {
             DEBUG("X server started");
