@@ -99,6 +99,7 @@ command.nxagent.args.extra =
 command.x-session.args.extra =
 
 command.darwin.x11 = XQuartz.app
+command.darwin.nxproxy = bin/nxproxy
 
 ## whether to remember password after successful connection
 client.remember_password = 0

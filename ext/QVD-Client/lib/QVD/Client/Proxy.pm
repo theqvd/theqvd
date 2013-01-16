@@ -279,12 +279,16 @@ sub _run {
 
     @o{ keys %{$self->{extra}} } = values %{$self->{extra}};
 
-    my @cmd = ( ( $WINDOWS
-                  ? File::Spec->rel2abs(core_cfg('command.windows.nxproxy'), $QVD::Client::App::app_dir)
-                  : core_cfg('command.nxproxy') ),
-                '-S',
-                map("$_=$o{$_}", keys %o),
-                'localhost:40' );
+    my @cmd;
+    if ( $WINDOWS ) {
+        @cmd = File::Spec->rel2abs(core_cfg('command.windows.nxproxy'), $QVD::Client::App::app_dir);
+    } elsif ( $DARWIN ) {
+        @cmd = File::Spec->rel2abs(core_cfg('command.darwin.nxproxy'), $QVD::Client::App::app_dir);
+    } else {
+        @cmd = core_cfg('command.nxproxy');
+    }
+
+    push @cmd, '-S', map("$_=$o{$_}", keys %o), 'localhost:40';
 
     # if ($WINDOWS) {
     # my $program = $cmd[0];
