@@ -36,11 +36,11 @@ my %syntax_check_cbs = (
         },
     },
     di => {
-       add => sub {
+        add => sub {
             my ($errors, $args) = @_;
             $$errors++, warn "Syntax error: parameter 'osf_id' is mandatory\n",  unless exists $args->{'osf_id'};
             $$errors++, warn "Syntax error: parameter 'path' is mandatory\n", unless exists $args->{'path'};
-            delete @$args{qw/osf_id path/};
+            delete @$args{qw/osf_id path version/};
         },
         tag => sub {
             my ($errors, $args) = @_;
@@ -145,8 +145,8 @@ sub _syntax_check {
         $cmd ne 'edit' and
         not ($obj eq 'vm' and $cmd eq 'ssh') and
         $cmd !~ /^prop(?:del|get|set)$/ and
-        ($obj ne 'config' or $cmd eq 'ssl')) {
-
+        ($obj ne 'config' or $cmd eq 'ssl')
+    ) {
         $self->{errors}++;
         warn sprintf "Syntax error: too many arguments: '%s'\n", join q{', '}, sort keys %args;
     }
