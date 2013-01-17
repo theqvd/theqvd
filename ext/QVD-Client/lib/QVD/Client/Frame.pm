@@ -431,7 +431,7 @@ sub DetectKeyboard {
 
     my $log = Log::Log4perl->get_logger("QVD::Client::Frame"); 
 
-    if ($^O eq 'MSWin32' || $^O eq "darwin" ) {
+    if ($^O eq 'MSWin32' ) {
         require Win32::API;
 
         my $gkln = Win32::API->new ('user32', 'GetKeyboardLayoutName', 'P', 'I');
@@ -443,8 +443,10 @@ sub DetectKeyboard {
 
         ## use a hardcoded 'pc105' since windows doesn't seem to have the notion of keyboard model
         return "pc105/$layout";
-    }
-    else {
+    } elsif ( $^O eq "darwin" ) { 
+        WARN "Darwin keyboard layout not properly implemented yet";
+        return "pc105/es";
+    } else {
 	# See http://www.nomachine.com/tr/view.php?id=TR02H02326
 	my $user = getpwuid($>);
 	if (defined $user and length $user){
