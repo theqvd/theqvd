@@ -69,6 +69,11 @@ $pixmaps_dir = File::Spec->rel2abs(core_cfg('path.client.pixmaps'), $app_dir);
 $pixmaps_dir = File::Spec->rel2abs(core_cfg('path.client.pixmaps.alt'), $app_dir) unless -d $pixmaps_dir;
 DEBUG "pixmaps_dir: $pixmaps_dir";
 
+if ( $DARWIN ) {
+    $ENV{LD_LIBRARY_PATH} = "$app_dir/lib";
+    DEBUG "Running on Darwin, LD_LIBRARY_PATH set to $ENV{LD_LIBRARY_PATH}";
+}
+
 #$SIG{__DIE__} = sub { ERROR "@_"; die (@_) };
 
 use QVD::Client::Frame;

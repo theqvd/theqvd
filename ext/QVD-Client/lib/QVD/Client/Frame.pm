@@ -431,7 +431,7 @@ sub DetectKeyboard {
 
     my $log = Log::Log4perl->get_logger("QVD::Client::Frame"); 
 
-    if ($^O eq 'MSWin32') {
+    if ($^O eq 'MSWin32' || $^O eq "darwin" ) {
         require Win32::API;
 
         my $gkln = Win32::API->new ('user32', 'GetKeyboardLayoutName', 'P', 'I');
