@@ -133,16 +133,16 @@ use QVD::StateMachine::Declarative
 
     'stopped/bye'                    => { enter       => '_say_goodbye'                                                   },
 
-    failed                           => { enter       => '_say_goodbye'                                                   };
+    failed                           => { enter       => '_say_goodbye'                                                   },
 
-
-sub _on_ticked :OnState(__any__) {}
-sub _on_ticker_error :OnState(__any__) {}
-sub _on_stop_all_vms_done :OnState(__any__) {}
-sub _on_cmd_stop :OnState(__any__) { shift->delay_until_next_state }
-
-sub _on_dead_db :OnState(__any__) { shift->delay_until_next_state }
-sub _on_transient_db_error :OnState(__any__) {}
+    __any__                          => { ignore      => [qw(_on_ticked
+                                                             _on_ticked_error
+                                                             _on_stop_all_vms_done
+                                                             _on_transient_db_error
+                                                             _on_config_reload_done
+                                                             _on_config_reload_error )],
+                                          delay       => [qw(_on_cmd_stop
+                                                             _on_dead_db)]                                                  };
 
 sub _on_transient_db_error :OnState('running') {
     shift->{cluster_monitor}->on_transient_db_error
