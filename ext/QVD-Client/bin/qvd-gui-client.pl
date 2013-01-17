@@ -1,4 +1,7 @@
-#!/usr/bin/perl
+#!/Applications/Qvd.app/Contents/Resources/usr/lib/qvd/bin/perl 
+
+eval 'exec /Applications/Qvd.app/Contents/Resources/usr/lib/qvd/bin/perl  -S $0 ${1+"$@"}'
+    if 0; # not running under some shell
 
 package QVD::Client::App;
 
@@ -84,22 +87,29 @@ sub OnInit {
     DEBUG("OnInit called");
 
     if ($WINDOWS or $DARWIN) {
-        my @cmd;
-        if ($WINDOWS) {
-            $ENV{DISPLAY} //= '127.0.0.1:0';
-            @cmd = ( File::Spec->rel2abs(core_cfg('command.windows.xming'), $app_dir),
-                     '-multiwindow', '-notrayicon', '-nowinkill', '-clipboard', '+bs', '-wm',
-                     '-logfile' => File::Spec->join($user_dir, "xserver.log") );
-        }
-        else { # DARWIN!
-            $ENV{DISPLAY} //= ':0';
-            my $x11_cmd = core_cfg('command.darwin.x11');
-            @cmd = qq(open -a $x11_cmd --args true);
-        }
-        if ( Proc::Background->new(@cmd) ) {
-            DEBUG("X server started");
+        unless( $ENV{DISPLAY} ) {
+            my @cmd;
+            if ($WINDOWS) {
+                $ENV{DISPLAY} = '127.0.0.1:0';
+                @cmd = ( File::Spec->rel2abs(core_cfg('command.windows.xming'), $app_dir),
+                         '-multiwindow', '-notrayicon', '-nowinkill', '-clipboard', '+bs', '-wm',
+                         '-logfile' => File::Spec->join($user_dir, "xserver.log") );
+            }
+            else { # DARWIN!
+                $ENV{DISPLAY} = ':0';
+                my $x11_cmd = core_cfg('command.darwin.x11');
+                @cmd = qq(open -a $x11_cmd --args true);
+            }
+
+            DEBUG("DISPLAY set to $ENV{DISPLAY}");
+            DEBUG("Starting X11 server: " . join(' ', @cmd));
+            if ( Proc::Background->new(@cmd) ) {
+                DEBUG("X server started");
+            } else {
+                ERROR("X server failed to start");
+            }
         } else {
-            ERROR("X server failed to start");
+                DEBUG("X11 server already running on display $ENV{DISPLAY}, using that.");
         }
     }
 
