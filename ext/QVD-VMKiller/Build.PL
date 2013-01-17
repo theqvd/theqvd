@@ -14,7 +14,7 @@ my $build = new Module::Build(
 	dist_abstract    => 'QVD::VMKiller - Kill QVD Zombies VM',
 	license          => 'gpl',
 
-	cron_files=> { "cron.d/qvd-vmkiller"  => "$cron_dst/qvd-wat.conf" },
+	cron_files=> { "cron.d/qvd-vm-killer"  => "$cron_dst/qvd-vm-killer" },
 
 	configure_requires => { 
 		'Module::Build'                      => 0.38
