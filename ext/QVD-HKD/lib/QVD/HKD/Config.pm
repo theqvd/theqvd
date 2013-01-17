@@ -14,6 +14,13 @@ use QVD::HKD::Helpers;
 
 use parent 'QVD::HKD::Agent';
 
+use QVD::StateMachine::Declarative
+    idle      => { transitions => { _on_qvd_config_changed_notify => 'reloading' } },
+
+    reloading => { enter       => '_reload',
+                   transitions => { _goto_idle                    => 'idle'      },
+                   delayed     => [qw(_on_qvd_config_changed_notify)]              };
+
 sub new {
     my ($class, %opts) = @_;
     my $config_file = delete $opts{config_file};
@@ -23,23 +30,24 @@ sub new {
     my $self = $class->SUPER::new(%opts);
 
     $self->{config_file} = $config_file;
-    $self->{props} = Config::Properties->new(defaults => $QVD::Config::Core::defaults);
     $self->{on_reload_error} = $on_reload_error;
     $self->{on_reload_done} = $on_reload_done;
 
-    $self->_reload_base_config;
+    $self->{props} = $self->_load_base_config;
+    $self->state('idle');
     $self;
 }
 
-sub _reload_base_config {
+sub _load_base_config {
     my $self = shift;
-    my $props = $self->{props};
+    my $props = Config::Properties->new(defaults => $QVD::Config::Core::defaults);
     my $file = $self->{config_file};
-    DEBUG "(re-)Loading configuration from file '$file'";
+    DEBUG "Loading configuration from file '$file'";
     -f $file or croak "configuration file $file does not exist";
     open my $fh, '<', $file
         or croak "unable to open configuration file $file: $!";
     $props->load($fh);
+    $props;
 }
 
 sub _cfg {
@@ -54,37 +62,49 @@ sub _cfg {
     $value;
 }
 
-sub set_db_and_reload {
+sub set_db {
     my ($self, $db) = @_;
     $self->_db($db);
-    $self->reload;
+    # we depend on the listener calling back the
+    # _on_qvd_config_changed_notify method here in order to get the
+    # ball rolling:
+    $self->_listen('qvd_config_changed');
 }
 
-sub reload { shift->_query('select key, value from configs') }
+sub _reload {
+    my $self = shift;
+    delete $self->{reload_failed};
+    $self->_query('select key, value from configs');
+}
 
 sub _on_reload_result {
     my ($self, $res) = @_;
     if ($res->status == PGRES_TUPLES_OK) {
         my @rows = $res->rows;
-        $self->_reload_base_config;
-        my $props = $self->{props};
+        my $props = $self->_load_base_config;
         DEBUG 'Reloading configuration from database';
         for (@rows) {
             my ($k, $v) = @$_;
             $props->changeProperty($k, $v) if $k;
         }
+        $self->{props} = $props;
     }
     else {
-        $self->_cancel_current_query;
-        $self->_maybe_callback('on_reload_error');
-
-        # FIXME:
-        croak "bad result from database: " . $res->status . ", " . $res->errorMessage;
+        $self->{reload_failed} = 1;
     }
 }
 
-sub _on_reload_error { shift->_maybe_callback('on_reload_error') }
+sub _on_reload_error {
+    my $self = shift;
+    $self->{reload_failed} = 1;
+    $self->_on_reload_done;
+}
 
-sub _on_reload_done { shift->_maybe_callback('on_reload_done') }
-
+sub _on_reload_done {
+    my $self = shift;
+    $self->_maybe_callback($self->{reload_failed}
+                           ? 'on_reload_error'
+                           : 'on_reload_done');
+    $self->_goto_idle;
+}
 1;

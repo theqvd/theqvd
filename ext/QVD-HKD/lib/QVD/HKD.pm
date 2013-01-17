@@ -279,7 +279,7 @@ sub _start_db {
 sub _start_config {
     my $self = shift;
     DEBUG 'Loading configuration';
-    $self->{config}->set_db_and_reload($self->{db});
+    $self->{config}->set_db($self->{db});
 }
 
 sub _load_host_row {
