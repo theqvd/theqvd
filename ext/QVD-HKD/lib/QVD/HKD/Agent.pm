@@ -186,7 +186,7 @@ sub _listen {
     my $w = $self->_db->listen($channel,
                                on_notify           => $cb,
                                on_listener_started => $cb);
-    my $self->{listener_watcher}{$channel} = $w;
+    $self->{listener_watcher}{$channel} = $w;
 }
 
 sub _query {
