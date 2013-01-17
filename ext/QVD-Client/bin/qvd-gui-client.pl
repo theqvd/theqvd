@@ -3,6 +3,9 @@
 eval 'exec /Applications/Qvd.app/Contents/Resources/usr/lib/qvd/bin/perl  -S $0 ${1+"$@"}'
     if 0; # not running under some shell
 
+eval 'exec /Applications/Qvd.app/Contents/Resources/usr/lib/qvd/bin/perl  -S $0 ${1+"$@"}'
+    if 0; # not running under some shell
+
 package QVD::Client::App;
 
 use strict;
@@ -89,6 +92,8 @@ sub OnInit {
     if ($WINDOWS or $DARWIN) {
         unless( $ENV{DISPLAY} ) {
             my @cmd;
+            my $proc;
+
             if ($WINDOWS) {
                 $ENV{DISPLAY} = '127.0.0.1:0';
                 @cmd = ( File::Spec->rel2abs(core_cfg('command.windows.xming'), $app_dir),
@@ -103,10 +108,35 @@ sub OnInit {
 
             DEBUG("DISPLAY set to $ENV{DISPLAY}");
             DEBUG("Starting X11 server: " . join(' ', @cmd));
-            if ( Proc::Background->new(@cmd) ) {
+
+            if ( ($proc = Proc::Background->new(@cmd))  ) {
                 DEBUG("X server started");
+                if ( $DARWIN ) {
+                    DEBUG("Waiting to see if X starts");
+                    my $timeout=5;
+                    my $all_ok;
+                    while($timeout-- > 0) {
+                        if (!$proc->alive) {
+                            if (!defined $proc->wait || ($proc->wait << 8) > 0 ) {
+                                _osx_error("Failed to start X server. Please install XQuartz.");
+                                exit(1);
+                            } else {
+                                $all_ok = 1;
+                                last;
+                            }
+                        }
+                        sleep(1);
+                    }
+
+                    if (!$all_ok) {
+                        WARN("X server command still seems to be running. Can't exactly determine whether the server started");
+                    }
+                }
             } else {
                 ERROR("X server failed to start");
+                if ($DARWIN) {
+                     _osx_error("Failed to start X server. Please install XQuartz.");
+                }
             }
         } else {
                 DEBUG("X11 server already running on display $ENV{DISPLAY}, using that.");
@@ -120,8 +150,24 @@ sub OnInit {
     return 1;
 };
 
+sub _osx_error {
+    my ($message) = @_;
+    ERROR("$message");
+
+    open(OSA, "|/usr/bin/osascript") or die "Can't call osascript: $!";
+    print OSA <<SCRIPT;
+        tell application "System Events"
+            activate
+            display dialog "$message" buttons {"Ok"} with title "QVD Client" with icon 0
+        end tell
+SCRIPT
+
+    close(OSA);
+}
 package main;
 use QVD::Log;
+
+
 
 Wx::InitAllImageHandlers();
 my $app = QVD::Client::App->new();
