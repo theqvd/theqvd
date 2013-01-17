@@ -5,7 +5,7 @@ use Module::Build;
 
 my $builder = Module::Build->new(
     module_name         => 'QVD::UntarDIs',
-    license             => 'Artistic_2_0',
+    license             => 'gpl',
     dist_author         => q{QVD Team <qvd-devel@theqvd.com>},
     dist_version_from   => 'lib/QVD/UntarDIs.pm',
     release_status      => 'stable',
