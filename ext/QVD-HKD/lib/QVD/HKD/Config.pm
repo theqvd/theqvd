@@ -19,7 +19,7 @@ use QVD::StateMachine::Declarative
 
     reloading => { enter       => '_reload',
                    transitions => { _goto_idle                    => 'idle'      },
-                   delayed     => [qw(_on_qvd_config_changed_notify)]              };
+                   delay       => [qw(_on_qvd_config_changed_notify)]              };
 
 sub new {
     my ($class, %opts) = @_;
