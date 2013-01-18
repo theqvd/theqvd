@@ -6,6 +6,9 @@ eval 'exec /Applications/Qvd.app/Contents/Resources/usr/lib/qvd/bin/perl  -S $0 
 eval 'exec /Applications/Qvd.app/Contents/Resources/usr/lib/qvd/bin/perl  -S $0 ${1+"$@"}'
     if 0; # not running under some shell
 
+eval 'exec /Applications/Qvd.app/Contents/Resources/usr/lib/qvd/bin/perl  -S $0 ${1+"$@"}'
+    if 0; # not running under some shell
+
 package QVD::Client::App;
 
 use strict;
@@ -76,8 +79,8 @@ $pixmaps_dir = File::Spec->rel2abs(core_cfg('path.client.pixmaps.alt'), $app_dir
 DEBUG "pixmaps_dir: $pixmaps_dir";
 
 if ( $DARWIN ) {
-    $ENV{LD_LIBRARY_PATH} = "$app_dir/lib";
-    DEBUG "Running on Darwin, LD_LIBRARY_PATH set to $ENV{LD_LIBRARY_PATH}";
+    $ENV{DYLD_LIBRARY_PATH} = "$app_dir/lib";
+    DEBUG "Running on Darwin, DYLD_LIBRARY_PATH set to $ENV{DYLD_LIBRARY_PATH}";
 }
 
 #$SIG{__DIE__} = sub { ERROR "@_"; die (@_) };
