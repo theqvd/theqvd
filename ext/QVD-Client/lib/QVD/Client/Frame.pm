@@ -442,10 +442,8 @@ sub DetectKeyboard {
         my $layout = $lang_codes{$k} // 'es';
 
         ## use a hardcoded 'pc105' since windows doesn't seem to have the notion of keyboard model
+        DEBUG "Detected layout $layout, assuming pc105 keyboard";
         return "pc105/$layout";
-    } elsif ( $^O eq "darwin" ) { 
-        WARN "Darwin keyboard layout not properly implemented yet";
-        return "pc105/es";
     } else {
 	# See http://www.nomachine.com/tr/view.php?id=TR02H02326
 	my $user = getpwuid($>);
@@ -465,7 +463,7 @@ sub DetectKeyboard {
 
         ## these may be comma-separated values, pick the first element
         ($layout, $variant) = map { (split /,/)[0] // '' } $layout, $variant;
-
+        DEBUG "Detected layout: $model/$layout";
         return "$model/$layout";
     }
 }
