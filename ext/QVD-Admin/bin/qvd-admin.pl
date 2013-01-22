@@ -10,17 +10,18 @@ use QVD::AdminCLI;
 use QVD::Log;
 
 my $filter = '';
+my $force = 0;
 my $quiet = '';
 my $help = '';
 
-my $ret = GetOptions('filter|f=s' => \$filter, 'quiet|q' => \$quiet, 'help|h' => \$help);
+my $ret = GetOptions('filter|f=s' => \$filter, 'force' => \$force, 'quiet|q' => \$quiet, 'help|h' => \$help);
 $help = 1 unless $ret;
 
 my $object = shift @ARGV;
 my $command = shift @ARGV;
 my @args = @ARGV;
 
-my $admin = QVD::AdminCLI->new($quiet);
+my $admin = QVD::AdminCLI->new($quiet, $force);
 $admin->set_filter($filter) if $filter;
 $admin->dispatch_command($object, $command, $help, @args);
 
