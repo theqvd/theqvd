@@ -15,28 +15,33 @@ use parent qw(QVD::HKD::Agent);
 
 use QVD::StateMachine::Declarative
     new            => { transitions => { _on_run               => 'loading_cmd'     } },
+
     loading_cmd    => { enter       => '_load_cmd',
                         transitions => { _on_cmd_found         => 'locking_cmd',
                                          _on_cmd_not_found     => 'deleting_cmds',
-                                         _on_load_cmd_error    => 'waiting'         } },
+                                         _on_load_cmd_error    => 'idle'            } },
+
     locking_cmd    => { enter       => '_lock_cmd',
                         transitions => { '_on_lock_cmd_done'   => 'delivering_cmd',
-                                         '_on_lock_cmd_error'  => 'waiting'         } },
+                                         '_on_lock_cmd_error'  => 'idle'            } },
+
 
     delivering_cmd => { enter       => '_deliver_cmd',
                         transitions => { _on_deliver_cmd_done  => 'loading_cmd'     } },
 
+
     deleting_cmds  => { enter       => '_delete_cmds',
-                        transitions => { _on_delete_cmds_done  => 'waiting',
-                                         _on_delete_cmds_error => 'waiting'         },
+                        transitions => { _on_delete_cmds_done  => 'idle',
+                                         _on_delete_cmds_error => 'idle'            },
                         ignore      => [qw(_on_delete_cmds_result
                                            _on_delete_cmds_bad_result)]               },
 
-    waiting        => { enter       => '_start_timer',
+    idle           => { enter       => '_set_timer',
                         leave       => '_abort_call_after',
                         transitions => { _on_timer             => 'loading_cmd',
                                          _on_delete_cmd        => 'deleting_cmds',
                                          on_hkd_stop          => 'stopped'         } },
+
     stopped        => { enter       => '_on_stopped'                                  };
 
 
@@ -107,7 +112,7 @@ sub _deliver_cmd {
     $self->_on_deliver_cmd_done;
 }
 
-sub _start_timer {
+sub _set_timer {
     my $self = shift;
     my $delay = $self->_cfg('internal.hkd.agent.vm_command_handler.delay');
     $self->_call_after($delay, '_on_timer');

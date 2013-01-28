@@ -17,27 +17,27 @@ our $debug;
 use parent qw(QVD::HKD::Agent);
 
 use QVD::StateMachine::Declarative
-    new          => { transitions => { _on_run                     => 'idle'        } },
+    new            => { transitions => { _on_run                     => 'idle'        } },
 
-    idle         => { enter       => '_set_timer',
-                      transitions => { _on_qvd_cmd_for_host_notify => 'loading_cmd',
-                                       _on_timeout                 => 'loading_cmd',
-                                       on_hkd_stop                 => 'stopped'     },
-                      leave       => '_abort_all'                                     },
+    idle           => { enter       => '_set_timer',
+                        transitions => { _on_qvd_cmd_for_host_notify => 'loading_cmd',
+                                         _on_timeout                 => 'loading_cmd',
+                                         on_hkd_stop                 => 'stopped'     },
+                        leave       => '_abort_all'                                     },
 
-    loading_cmd  => { enter       => '_load_cmd',
-                      transitions => { _on_load_cmd_error          => 'idle',
-                                       _on_cmd_loaded              => 'doing_cmd',
-                                       _on_no_more_cmds            => 'idle'        } },
+    loading_cmd    => { enter       => '_load_cmd',
+                        transitions => { _on_load_cmd_error          => 'idle',
+                                         _on_cmd_loaded              => 'delivering_cmd',
+                                         _on_no_more_cmds            => 'idle'        } },
 
-    doing_cmd    => { enter       => '_do_cmd',
-                      transitions => { _on_do_cmd_error            => 'idle',
-                                       _on_do_cmd_done             => 'loading_cmd' } },
+    delivering_cmd => { enter       => '_deliver_cmd',
+                        transitions => { _on_deliver_cmd_error       => 'idle',
+                                         _on_deliver_cmd_done        => 'loading_cmd' } },
 
-    stopped      => { enter       => '_stop'                                          },
+    stopped      => { enter       => '_on_stopped'                                    },
 
     __any__ =>   => { delay_once  => [qw(_on_qvd_cmd_for_host_notify
-                                         on_hkd_stop)]                                };
+                                         on_hkd_stop)]                                  };
 
 
 sub new {
@@ -74,7 +74,6 @@ sub _on_load_cmd_result {
 sub _on_load_cmd_done {
     my $self = shift;
     if (defined $self->{cmd}) {
-        $debug and $self->_debug("going to delete HKD command $self->{cmd}");
         $self->_on_cmd_loaded;
     }
     else {
@@ -82,21 +81,14 @@ sub _on_load_cmd_done {
     }
 }
 
-sub _do_cmd {
+sub _deliver_cmd {
     my $self = shift;
     $self->_query_1('update host_runtimes set cmd=NULL where host_id=$1 and cmd=$2', $self->{node_id}, $self->{cmd});
 }
 
-sub _on_do_cmd_result {
+sub _on_deliver_cmd_result {
     my ($self, $res) = @_;
     $self->_maybe_callback('on_cmd', $self->{cmd});
 }
-
-sub _stop {
-    my $self = shift;
-    $self->_abort_all;
-    $self->_maybe_callback('on_stopped');
-}
-
 
 1;
