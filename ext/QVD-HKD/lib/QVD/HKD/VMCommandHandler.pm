@@ -43,8 +43,6 @@ use QVD::StateMachine::Declarative
     __any__        => { delay_once  => [qw(_on_delete_cmd on_hkd_stop)]               };
 
 
-
-
 sub _on_delete_cmd :OnState(__any__) {}
 
 sub on_hkd_stop :OnState(__any__) { shift->delay_until_next_state }
