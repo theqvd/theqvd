@@ -182,12 +182,20 @@ sub _start_vm {
         }
         $vmrt->set_host_id($free_host);
     }
-    $vmrt->send_vm_start;
+    txn_do {
+        $vmrt->send_vm_start;
+        my $host_id = $vmrt->host_id;
+        notify("qvd_cmd_for_vm_on_host$host_id");
+    };
 }
 
 sub _stop_vm {
     my ($self, $vmrt) = @_;
-    $vmrt->send_vm_stop;
+    txn_do {
+        $vmrt->send_vm_stop;
+        my $host_id = $vmrt->host_id;
+        notify("qvd_cmd_for_vm_on_host$host_id");
+    };
 }
 
 sub _disconnect_user {
