@@ -31,7 +31,6 @@ use QVD::StateMachine::Declarative
                         transitions => { '_on_lock_cmd_done'   => 'delivering_cmd',
                                          '_on_lock_cmd_error'  => 'idle'            } },
 
-
     delivering_cmd => { enter       => '_deliver_cmd',
                         transitions => { _on_deliver_cmd_done  => 'loading_cmd'     } },
 
