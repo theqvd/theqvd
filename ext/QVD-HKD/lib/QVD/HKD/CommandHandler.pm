@@ -16,6 +16,30 @@ our $debug;
 
 use parent qw(QVD::HKD::Agent);
 
+use QVD::StateMachine::Declarative
+    new          => { transitions => { _on_run                     => 'idle'        } },
+
+    idle         => { enter       => '_set_timer',
+                      transitions => { _on_qvd_cmd_for_host_notify => 'loading_cmd',
+                                       _on_timeout                 => 'loading_cmd',
+                                       on_hkd_stop                 => 'stopped'     },
+                      leave       => '_abort_all'                                     },
+
+    loading_cmd  => { enter       => '_load_cmd',
+                      transitions => { _on_load_cmd_error          => 'idle',
+                                       _on_cmd_loaded              => 'doing_cmd',
+                                       _on_no_more_cmds            => 'idle'        } },
+
+    doing_cmd    => { enter       => '_do_cmd',
+                      transitions => { _on_do_cmd_error            => 'idle',
+                                       _on_do_cmd_done             => 'loading_cmd' } },
+
+    stopped      => { enter       => '_stop'                                          },
+
+    __any__ =>   => { delay_once  => [qw(_on_qvd_cmd_for_host_notify
+                                         on_hkd_stop)]                                };
+
+
 sub new {
     my ($class, %opts) = @_;
     my $on_cmd = delete $opts{on_cmd};
@@ -23,10 +47,16 @@ sub new {
     my $self = $class->SUPER::new(%opts);
     $self->{on_cmd} = $on_cmd;
     $self->{cmd} = undef;
+    $self->_listen("qvd_cmd_for_host$self->{node_id}" => '_on_qvd_cmd_for_host_notify');
     $self;
 }
 
-sub run { shift->_load_cmd }
+sub _set_timer {
+    my $self = shift;
+    my $delay = $self->_cfg('internal.hkd.agent.command_handler.delay');
+    $debug and $self->_debug("will be looking for new commands in $delay seconds");
+    $self->_call_after($delay, '_on_timeout');
+}
 
 sub _load_cmd {
     my $self = shift;
@@ -45,37 +75,24 @@ sub _on_load_cmd_done {
     my $self = shift;
     if (defined $self->{cmd}) {
         $debug and $self->_debug("going to delete HKD command $self->{cmd}");
-        $self->_delete_cmd;
+        $self->_on_cmd_loaded;
     }
     else {
-        $self->_loop;
+        $self->_on_no_more_cmds;
     }
 }
 
-sub _on_load_cmd_error { shift->_loop }
-
-sub _delete_cmd {
+sub _do_cmd {
     my $self = shift;
     $self->_query_1('update host_runtimes set cmd=NULL where host_id=$1 and cmd=$2', $self->{node_id}, $self->{cmd});
 }
 
-sub _on_delete_cmd_result {
+sub _on_do_cmd_result {
     my ($self, $res) = @_;
     $self->_maybe_callback('on_cmd', $self->{cmd});
 }
 
-sub _on_delete_cmd_done { shift->_loop }
-
-sub _on_delete_cmd_error { shift->_loop }
-
-sub _loop {
-    my $self = shift;
-    my $delay = $self->_cfg('internal.hkd.agent.command_handler.delay');
-    $debug and $self->_debug("will be looking for new commands in $delay seconds");
-    $self->_call_after($delay, '_load_cmd');
-}
-
-sub on_hkd_stop {
+sub _stop {
     my $self = shift;
     $self->_abort_all;
     $self->_maybe_callback('on_stopped');

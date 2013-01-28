@@ -79,17 +79,28 @@ sub init_class {
                      }
                      when ('delay_once') {
                          ref $arg eq 'ARRAY' or croak "$arg is not and array reference, $usage";
-                         Class::StateMachine::install_method($class, $_,
-                                                             sub { shift->delay_once_until_next_state },
-                                                             $state)
-                                 for @$arg;
+                         for (@$arg) {
+                             my $method = $_;
+                             Class::StateMachine::install_method($class, $method,
+                                                                 sub {
+                                                                     my $self = shift;
+                                                                     $self->_debug("method $method delayed once");
+                                                                     $self->delay_once_until_next_state($method);
+                                                                 },
+                                                                 $state);
+                         };
                      }
                      when ('delay') {
                          ref $arg eq 'ARRAY' or croak "$arg is not an array reference, $usage";
-                         Class::StateMachine::install_method($class, $_,
-                                                             sub { shift->delay_until_next_state },
-                                                             $state)
-                                 for @$arg;
+                         for (@$arg) {
+                             my $method = $_;
+                             Class::StateMachine::install_method($class, $method,
+                                                                 sub {
+                                                                     my $self = shift;
+                                                                     $self->_debug("method $method delayed");
+                                                                     $self->delay_until_next_state },
+                                                                 $state);
+                         }
                      }
                      when ('ignore') {
                          ref $arg eq 'ARRAY' or croak "$arg is not an array reference, $usage";
