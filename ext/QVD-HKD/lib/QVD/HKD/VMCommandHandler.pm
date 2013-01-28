@@ -18,7 +18,7 @@ use QVD::StateMachine::Declarative
 
     idle           => { enter       => '_set_timer',
                         leave       => '_abort_call_after',
-                        transitions => { _on_timer             => 'loading_cmd',
+                        transitions => { _on_timeout           => 'loading_cmd',
                                          _on_delete_cmd        => 'deleting_cmds',
                                          on_hkd_stop           => 'stopped'         } },
 
@@ -111,7 +111,7 @@ sub _deliver_cmd {
 sub _set_timer {
     my $self = shift;
     my $delay = $self->_cfg('internal.hkd.agent.vm_command_handler.delay');
-    $self->_call_after($delay, '_on_timer');
+    $self->_call_after($delay, '_on_timeout');
 }
 
 sub _on_cmd_done {
