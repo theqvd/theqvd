@@ -23,12 +23,12 @@ use QVD::StateMachine::Declarative
                         transitions => { _on_qvd_cmd_for_host_notify => 'loading_cmd',
                                          _on_timeout                 => 'loading_cmd',
                                          on_hkd_stop                 => 'stopped'     },
-                        leave       => '_abort_all'                                     },
+                        leave       => '_abort_call_after'                              },
 
     loading_cmd    => { enter       => '_load_cmd',
                         transitions => { _on_load_cmd_error          => 'idle',
                                          _on_cmd_loaded              => 'delivering_cmd',
-                                         _on_no_more_cmds            => 'idle'        } },
+                                         _on_cmd_not_found           => 'idle'        } },
 
     delivering_cmd => { enter       => '_deliver_cmd',
                         transitions => { _on_deliver_cmd_error       => 'idle',
@@ -77,7 +77,7 @@ sub _on_load_cmd_done {
         $self->_on_cmd_loaded;
     }
     else {
-        $self->_on_no_more_cmds;
+        $self->_on_cmd_not_found;
     }
 }
 
