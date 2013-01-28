@@ -77,12 +77,19 @@ sub init_class {
                                                                  $state);
                          }
                      }
+                     when ('delay_once') {
+                         ref $arg eq 'ARRAY' or croak "$arg is not and array reference, $usage";
+                         Class::StateMachine::install_method($class, $_,
+                                                             sub { shift->delay_once_until_next_state },
+                                                             $state)
+                                 for @$arg;
+                     }
                      when ('delay') {
                          ref $arg eq 'ARRAY' or croak "$arg is not an array reference, $usage";
                          Class::StateMachine::install_method($class, $_,
                                                              sub { shift->delay_until_next_state },
                                                              $state)
-                                 for @$arg
+                                 for @$arg;
                      }
                      when ('ignore') {
                          ref $arg eq 'ARRAY' or croak "$arg is not an array reference, $usage";
