@@ -16,8 +16,14 @@ use parent qw(QVD::HKD::Agent);
 use QVD::StateMachine::Declarative
     new            => { transitions => { _on_run               => 'loading_cmd'     } },
 
+    idle           => { enter       => '_set_timer',
+                        leave       => '_abort_call_after',
+                        transitions => { _on_timer             => 'loading_cmd',
+                                         _on_delete_cmd        => 'deleting_cmds',
+                                         on_hkd_stop           => 'stopped'         } },
+
     loading_cmd    => { enter       => '_load_cmd',
-                        transitions => { _on_cmd_found         => 'locking_cmd',
+                        transitions => { _on_cmd_loaded        => 'locking_cmd',
                                          _on_cmd_not_found     => 'deleting_cmds',
                                          _on_load_cmd_error    => 'idle'            } },
 
@@ -29,20 +35,15 @@ use QVD::StateMachine::Declarative
     delivering_cmd => { enter       => '_deliver_cmd',
                         transitions => { _on_deliver_cmd_done  => 'loading_cmd'     } },
 
-
     deleting_cmds  => { enter       => '_delete_cmds',
                         transitions => { _on_delete_cmds_done  => 'idle',
                                          _on_delete_cmds_error => 'idle'            },
-                        ignore      => [qw(_on_delete_cmds_result
-                                           _on_delete_cmds_bad_result)]               },
 
-    idle           => { enter       => '_set_timer',
-                        leave       => '_abort_call_after',
-                        transitions => { _on_timer             => 'loading_cmd',
-                                         _on_delete_cmd        => 'deleting_cmds',
-                                         on_hkd_stop          => 'stopped'         } },
+    stopped        => { enter       => '_on_stopped'                                  },
 
-    stopped        => { enter       => '_on_stopped'                                  };
+    __any__        => { delay_once  => [qw(_on_delete_cmd on_hkd_stop)]               };
+
+
 
 
 sub _on_delete_cmd :OnState(__any__) {}
@@ -78,14 +79,12 @@ sub _on_load_cmd_result {
     }
 }
 
-sub _on_load_cmd_bad_result {}
-
 sub _on_load_cmd_done {
     my $self = shift;
     if (defined $self->{vm_id}) {
         $debug and $self->_debug("vm command found");
         DEBUG 'VM command found';
-        $self->_on_cmd_found;
+        $self->_on_cmd_loaded;
     }
     else {
         $debug and $self->_debug("vm command *not* found");
