@@ -14,33 +14,36 @@ our $debug;
 use parent qw(QVD::HKD::Agent);
 
 use QVD::StateMachine::Declarative
-    new            => { transitions => { _on_run               => 'loading_cmd'     } },
+    new            => { transitions => { _on_run                   => 'idle'            } },
 
     idle           => { enter       => '_set_timer',
                         leave       => '_abort_call_after',
-                        transitions => { _on_timeout           => 'loading_cmd',
-                                         _on_delete_cmd        => 'deleting_cmds',
-                                         on_hkd_stop           => 'stopped'         } },
+                        transitions => { _on_timeout               => 'loading_cmd',
+                                         _on_delete_cmd            => 'deleting_cmds',
+                                         _on_qvd_cmd_for_vm_notify => 'loading_cmd',
+                                         on_hkd_stop               => 'stopped'         } },
 
     loading_cmd    => { enter       => '_load_cmd',
-                        transitions => { _on_cmd_loaded        => 'locking_cmd',
-                                         _on_cmd_not_found     => 'deleting_cmds',
-                                         _on_load_cmd_error    => 'idle'            } },
+                        transitions => { _on_cmd_loaded            => 'locking_cmd',
+                                         _on_cmd_not_found         => 'deleting_cmds',
+                                         _on_load_cmd_error        => 'idle'            } },
 
     locking_cmd    => { enter       => '_lock_cmd',
-                        transitions => { '_on_lock_cmd_done'   => 'delivering_cmd',
-                                         '_on_lock_cmd_error'  => 'idle'            } },
+                        transitions => { '_on_lock_cmd_done'       => 'delivering_cmd',
+                                         '_on_lock_cmd_error'      => 'idle'            } },
 
     delivering_cmd => { enter       => '_deliver_cmd',
-                        transitions => { _on_deliver_cmd_done  => 'loading_cmd'     } },
+                        transitions => { _on_deliver_cmd_done      => 'loading_cmd'     } },
 
     deleting_cmds  => { enter       => '_delete_cmds',
-                        transitions => { _on_delete_cmds_done  => 'idle',
-                                         _on_delete_cmds_error => 'idle'            },
+                        transitions => { _on_delete_cmds_done      => 'idle',
+                                         _on_delete_cmds_error     => 'idle'            } },
 
-    stopped        => { enter       => '_on_stopped'                                  },
+    stopped        => { enter       => '_on_stopped'                                      },
 
-    __any__        => { delay_once  => [qw(_on_delete_cmd on_hkd_stop)]               };
+    __any__        => { delay_once  => [qw(_on_delete_cmd
+                                           _on_qvd_cmd_for_vm_notify
+                                           on_hkd_stop)]                                  };
 
 
 sub _on_delete_cmd :OnState(__any__) {}
@@ -54,6 +57,7 @@ sub new {
     my $self = $class->SUPER::new(%opts);
     $self->{vm_ids_with_cmd_done} = [];
     $self->{on_cmd} = $on_cmd;
+    $self->_listen("qvd_cmd_for_vm_on_host$self->{node_id}" => '_on_qvd_cmd_for_vm_notify');
     $self;
 }
 

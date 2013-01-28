@@ -345,7 +345,7 @@ internal.hkd.killing.vms.timeout = 120
 internal.hkd.agent.ticker.delay = 120
 internal.hkd.agent.ticker.retries = 2
 internal.hkd.agent.command_handler.delay = 60
-internal.hkd.agent.vm_command_handler.delay = 11
+internal.hkd.agent.vm_command_handler.delay = 61
 
 internal.hkd.agent.cluster_monitor.delay = 180
 internal.hkd.agent.cluster_monitor.long_delay = 600
