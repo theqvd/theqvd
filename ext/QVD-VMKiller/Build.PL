@@ -25,8 +25,8 @@ my $build = new Module::Build(
                 'QVD::Log' => '0',
 	}, 
 	
+	etc_files=> { 'etc/cron.d/qvd-vm-killer' => '/etc/cron.d/qvd-vm-killer'},
 	install_path => { 'etc' => '/etc' },
-	etc_files => etc_files { 'etc/cron.d/qvd-vm-killer' => '/etc/cron.d/qvd-vm-killer'},
 	
 );
 
