@@ -14,7 +14,7 @@ my $build = new Module::Build(
 	dist_abstract    => 'QVD::VMKiller - Kill QVD Zombies VM',
 	license          => 'gpl',
 
-	install_path => { 'cron.d' => $cron_dst  },
+	install_path => { 'cron' => $cron_dst  },
 
 	configure_requires => { 
 		'Module::Build'                      => 0.38
@@ -28,7 +28,7 @@ my $build = new Module::Build(
 );
 
 
-foreach my $ext (qw(cron.d)) {
+foreach my $ext (qw(cron)) {
 	$build->add_build_element($ext);
 }
 
