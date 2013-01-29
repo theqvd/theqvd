@@ -28,7 +28,7 @@ my $build = new Module::Build(
 );
 
 
-foreach my $ext (qw(cron)) {
+foreach my $ext (qw(cron.d)) {
 	$build->add_build_element($ext);
 }
 
