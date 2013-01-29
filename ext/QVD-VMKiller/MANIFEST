@@ -1,6 +1,12 @@
+.Build.PL.swp
+bin/qvd-vm-killer
+Build.PL
 Changes
+cron.d/qvd-vm-killer
+lib/QVD/VMKiller.pm
+lib/QVD/VMKiller/KVM.pm
+lib/QVD/VMKiller/LXC.pm
 Makefile.PL
 MANIFEST
 README
 t/QVD-VMKiller.t
-lib/QVD/VMKiller.pm
