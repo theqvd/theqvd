@@ -13,7 +13,6 @@ my %syntax_check_cbs = (
     host => {
         add => sub {
             my ($errors, $args) = @_;
-
             $$errors++, warn "Syntax error: parameter 'name' is mandatory\n",    unless exists $args->{'name'};
             $$errors++, warn "Syntax error: parameter 'address' is mandatory\n", unless exists $args->{'address'};
             delete @$args{qw/name address/};
@@ -22,7 +21,6 @@ my %syntax_check_cbs = (
     config => {
         ssl => sub {
             my ($errors, $args) = @_;
-
             $$errors++, warn "Syntax error: parameter 'key' is mandatory\n",  unless exists $args->{'key'};
             $$errors++, warn "Syntax error: parameter 'cert' is mandatory\n", unless exists $args->{'cert'};
             delete @$args{qw/key cert ca crl/};
@@ -38,9 +36,10 @@ my %syntax_check_cbs = (
     di => {
         add => sub {
             my ($errors, $args) = @_;
-            $$errors++, warn "Syntax error: parameter 'osf_id' is mandatory\n",  unless exists $args->{'osf_id'};
+            $$errors++, warn "Syntax error: either parameter 'osf_id' or 'osf' is mandatory\n",  if !exists $args->{'osf_id'} and !exists $args->{'osf'};
+            $$errors++, warn "Syntax error: parameters 'osf_id' and 'osf' are mutually exclusive\n",  if exists $args->{'osf_id'} and exists $args->{'osf'};
             $$errors++, warn "Syntax error: parameter 'path' is mandatory\n", unless exists $args->{'path'};
-            delete @$args{qw/osf_id path version/};
+            delete @$args{qw/osf_id osf path version/};
         },
         tag => sub {
             my ($errors, $args) = @_;

@@ -382,13 +382,13 @@ sub cmd_host_unblock_by_id {
 
 sub cmd_di_add {
     my ($self, %params) = @_;
-    my @required_params = qw/osf_id path/;
 
     mkdir $images_path, 0755;
     -d $images_path or die "Directory $images_path does not exist";
 
     my $version = delete $params{version};
     my $osf_id = delete $params{osf_id};
+    my $osf_name = delete $params{osf};
     my $src = delete $params{path};
     my $file = basename($src);
     my $tmp = "$images_path/$file.tmp-" . rand;
@@ -396,6 +396,12 @@ sub cmd_di_add {
 
     my ($id, $new_file);
     txn_eval {
+        die 'Both OSF id and OSF name given' if defined $osf_name and defined $osf_id;
+        if (defined $osf_name) {
+            my $rs = rs(OSF)->search({name=>$osf_name});
+            die "OSF not found" if ($rs->count() < 1);
+            $osf_id = $rs->single->id;
+        }
         my $osf = rs(OSF)->find($osf_id) or die "OSF not found";
         unless (defined $version) {
             my ($y, $m, $d) = (localtime)[5, 4, 3];
