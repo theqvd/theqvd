@@ -18,8 +18,7 @@ case "$1" in
   remove)
     # This package is being removed, but its configuration has not yet
     # been purged.
-    :
-    /etc/init.d/qvd-hkd stop 
+    service qvd-hkd stop 
     update-rc.d -f qvd-hkd remove > /dev/null
 	
     # Remove diversion
