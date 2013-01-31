@@ -248,6 +248,7 @@ sub cmd_socat {
 
 			$self->{log}->info("Starting socat on port $cport");
 			$self->_out("OK\n");
+			$self->_close_fds();
 			exec($self->{config}->{paths}->{socat}, @extra_args, "-", "$cport,nonblock,raw,echo=0");
 		}
 	}
@@ -285,6 +286,7 @@ sub cmd_pppd {
 
 	$self->{log}->info("Starting pppd with args: ", join(" ", @full_args));
 	$self->_out("OK\n");
+	$self->_close_fds();
 	exec($self->{config}->{paths}->{pppd}, @full_args);
 }
 
@@ -569,6 +571,15 @@ sub _concat_list {
 	return $ret;
 }
 
+# Close all fds to make sure nothing inherited gets passed on
+# before we exec another process. 
+sub _close_fds {
+	my ($self) = @_;
+	
+	for(my $i=3;$i<1024;$i++) {
+		POSIX::close($i);
+	}
+}
 =head1 SEE ALSO
 
 L<QVD::CommandInterpreter::Client>
