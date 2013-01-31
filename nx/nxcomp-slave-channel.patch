@@ -1,6 +1,6 @@
-diff -aur nx-orig/nxcomp/Loop.cpp nx-new/nxcomp/Loop.cpp
---- nx-orig/nxcomp/Loop.cpp	2010-03-30 15:38:11.000000000 +0200
-+++ nx-new/nxcomp/Loop.cpp	2012-10-05 15:24:48.000000000 +0200
+diff -aur nxcomp-old/Loop.cpp nxcomp/Loop.cpp
+--- nxcomp-old/Loop.cpp	2010-03-30 15:38:11.000000000 +0200
++++ nxcomp/Loop.cpp	2012-10-05 15:24:48.000000000 +0200
 @@ -350,7 +350,7 @@
  
  static int HandleChildren();
@@ -19,9 +19,9 @@ diff -aur nx-orig/nxcomp/Loop.cpp nx-new/nxcomp/Loop.cpp
    //
    // This can actually happen either because we
    // reset the pid of the child process as soon
-diff -aur nx-orig/nxcomp/Proxy.cpp nx-new/nxcomp/Proxy.cpp
---- nx-orig/nxcomp/Proxy.cpp	2011-06-01 18:04:37.000000000 +0200
-+++ nx-new/nxcomp/Proxy.cpp	2012-10-10 13:14:56.000000000 +0200
+diff -aur nxcomp-old/Proxy.cpp nxcomp/Proxy.cpp
+--- nxcomp-old/Proxy.cpp	2011-06-01 18:04:37.000000000 +0200
++++ nxcomp/Proxy.cpp	2013-01-31 15:05:03.000000000 +0100
 @@ -75,6 +75,8 @@
  
  extern void CleanupListeners();
@@ -39,7 +39,7 @@ diff -aur nx-orig/nxcomp/Proxy.cpp nx-new/nxcomp/Proxy.cpp
    }
  
    inputChannel_  = nothing;
-@@ -6336,42 +6339,89 @@
+@@ -6336,42 +6339,94 @@
  
  int Proxy::handleNewSlaveConnectionFromProxy(int channelId)
  {
@@ -121,6 +121,11 @@ diff -aur nx-orig/nxcomp/Proxy.cpp nx-new/nxcomp/Proxy.cpp
 +    close(serverFd);
 +    close(clientFd);
 +
++    /* Close FDs used by NX, QVD #1208 */
++    for (int fd = 3; fd < 256; fd++) {
++        close(fd);
++    }
++
 +    char *const argv[2] = {qvd_slave_cmd, NULL};
 +
 +    if (execv(qvd_slave_cmd, argv) == -1) 
@@ -162,9 +167,9 @@ diff -aur nx-orig/nxcomp/Proxy.cpp nx-new/nxcomp/Proxy.cpp
  }
  
  int Proxy::handlePostConnectionFromProxy(int channelId, int serverFd,
-diff -aur nx-orig/nxcomp/Proxy.h nx-new/nxcomp/Proxy.h
---- nx-orig/nxcomp/Proxy.h	2010-01-12 16:32:39.000000000 +0100
-+++ nx-new/nxcomp/Proxy.h	2012-10-05 11:10:24.000000000 +0200
+diff -aur nxcomp-old/Proxy.h nxcomp/Proxy.h
+--- nxcomp-old/Proxy.h	2010-01-12 16:32:39.000000000 +0100
++++ nxcomp/Proxy.h	2012-10-05 11:10:24.000000000 +0200
 @@ -287,6 +287,8 @@
  
    int handleNewSlaveConnectionFromProxy(int channelId);
