@@ -317,7 +317,9 @@ sub _run {
     }
 
     DEBUG("Running nxproxy: @cmd");
-    if ( Proc::Background->new(@cmd) ) {
+    my $nxproxy_proc;
+    
+    if ( ($nxproxy_proc =  Proc::Background->new(@cmd)) ) {
         DEBUG("nxproxy started");
     } else {
         ERROR("nxproxy failed to start");
@@ -348,7 +350,7 @@ sub _run {
         buffer_2to1 => $httpc->read_buffered,
         # debug => 1,
     );
-
+    DEBUG("nxproxy exited with status " . $nxproxy_proc->wait);
     DEBUG("Done.");
 
 }
