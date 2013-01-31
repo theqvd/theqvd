@@ -3,6 +3,7 @@ package QVD::CommandInterpreter;
 use strict;
 use warnings;
 use Log::Log4perl;
+use POSIX;
 
 
 =head1 NAME
