@@ -145,7 +145,7 @@ public class Config {
 		appConfig_height_pixels = prefsPrivate.getInt(Config.props_heightpixels, appConfig_defaultHeightPixels);
 		appConfig_width_pixels = prefsPrivate.getInt(Config.props_widthpixels, appconfig_defaultWidthPixels);
 		appConfig_pocketconfig_copied = prefsPrivate.getBoolean(Config.props_pocketconfigcopied, appConfig_pocketconfig_copied);
-		appConfig_remote_vnc_allowed =  prefsPrivate.getBoolean(Config.props_use_android_vnc, appConfig_remote_vnc_allowed);
+		appConfig_remote_vnc_allowed =  prefsPrivate.getBoolean(Config.props_remote_vnc, appConfig_remote_vnc_allowed);
 		appConfig_render =  prefsPrivate.getBoolean(Config.props_render, appConfig_render);
 	}
 	private void save_properties() {
