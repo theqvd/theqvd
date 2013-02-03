@@ -157,7 +157,7 @@ public class Config {
 		prefsPrivateEditor.putBoolean(Config.props_use_android_vnc, appConfig_run_androidvnc_client);
 		prefsPrivateEditor.putBoolean(Config.props_hasbeencopied, appConfig_xvncbinary_copied);
 		prefsPrivateEditor.putBoolean(Config.props_pocketconfigcopied, appConfig_pocketconfig_copied);
-		prefsPrivateEditor.putBoolean(Config.props_use_android_vnc, appConfig_remote_vnc_allowed);
+		prefsPrivateEditor.putBoolean(Config.props_remote_vnc, appConfig_remote_vnc_allowed);
 		prefsPrivateEditor.putBoolean(Config.props_render, appConfig_render);
 		prefsPrivateEditor.putInt(Config.props_heightpixels, appConfig_height_pixels);
 		prefsPrivateEditor.putInt(Config.props_widthpixels, appConfig_width_pixels);
