@@ -298,7 +298,7 @@ host del: Deletes config properties.
 usage: config del [key...]
        
 Valid options:
-    -f [--force]         : perform the operation without asking
+    --force              : perform the operation without asking
     -q [--quiet]         : don't print the command message
 EOT
 }
@@ -442,7 +442,7 @@ usage: host block
        
 Valid options:
     -f [--filter] FILTER : block only host matched by FILTER
-    -f [--force]         : perform the operation without asking
+    --force              : perform the operation without asking
     -q [--quiet]         : don't print the command message
 EOT
 }
@@ -466,7 +466,7 @@ usage: host del
        
 Valid options:
     -f [--filter] FILTER : deletes hosts matched by FILTER
-    -f [--force]         : perform the operation without asking
+    --force              : perform the operation without asking
     -q [--quiet]         : don't print the command message
 EOT
 }
@@ -559,7 +559,7 @@ usage: host propdel [key...]
       
 Valid options:
     -f [--filter] FILTER : Delete properties of hosts matched by FILTER
-    -f [--force]         : perform the operation without asking
+    --force              : perform the operation without asking
 EOT
 }
 
@@ -631,7 +631,7 @@ usage: host unblock
        
 Valid options:
     -f [--filter] FILTER : unblock only host matched by FILTER
-    -f [--force]         : perform the operation without asking
+    --force              : perform the operation without asking
     -q [--quiet]         : don't print the command message
 EOT
 }
@@ -734,7 +734,7 @@ usage: osf del
        
 Valid options:
     -f [--filter] FILTER : deletes operating systems images matched by FILTER
-    -f [--force]         : perform the operation without asking
+    --force              : perform the operation without asking
     -q [--quiet]         : don't print the command message
 EOT
 }
@@ -809,7 +809,7 @@ usage: osf propdel [key...]
       
 Valid options:
     -f [--filter] FILTER : Delete properties of OSFs matched by FILTER
-    -f [--force]         : perform the operation without asking
+    --force              : perform the operation without asking
 EOT
 }
 
@@ -897,7 +897,7 @@ usage: di del
        
 Valid options:
     -f [--filter] FILTER : deletes di images matched by FILTER
-    -f [--force]         : perform the operation without asking
+    --force              : perform the operation without asking
     -q [--quiet]         : don't print the command message
 EOT
 }
@@ -994,7 +994,7 @@ usage: di propdel [key...]
       
 Valid options:
     -f [--filter] FILTER : Delete properties of DIs matched by FILTER
-    -f [--force]         : perform the operation without asking
+    --force              : perform the operation without asking
 EOT
 }
 
@@ -1084,7 +1084,7 @@ usage: user del
        
 Valid options:
     -f [--filter] FILTER : deletes users matched by FILTER
-    -f [--force]         : perform the operation without asking
+    --force              : perform the operation without asking
     -q [--quiet]         : don't print the command message
 EOT
 }
@@ -1204,7 +1204,7 @@ usage: user propdel [key...]
       
 Valid options:
     -f [--filter] FILTER : Delete properties of users matched by FILTER
-    -f [--force]         : perform the operation without asking
+    --force              : perform the operation without asking
 EOT
 }
 
@@ -1300,7 +1300,7 @@ usage: vm block
        
 Valid options:
     -f [--filter] FILTER : block only vm matched by FILTER
-    -f [--force]         : perform the operation without asking
+    --force              : perform the operation without asking
     -q [--quiet]         : don't print the command message
 EOT
 }
@@ -1363,7 +1363,7 @@ usage: vm del
        
 Valid options:
     -f [--filter] FILTER : deletes virtual machines matched by FILTER
-    -f [--force]         : perform the operation without asking
+    --force              : perform the operation without asking
     -q [--quiet]         : don't print the command message
 EOT
 }
@@ -1393,7 +1393,7 @@ usage: vm disconnect_user
       
 Valid options:
     -f [--filter] FILTER : disconnects users on VMs matched by FILTER
-    -f [--force]         : perform the operation without asking
+    --force              : perform the operation without asking
     -q [--quiet]         : don't print the command message
 EOT
 }
@@ -1427,7 +1427,7 @@ di_tag: Use the disk image with tag "t". Change takes effect on VM start.
 
 Valid options:
     -f [--filter] FILTER : edits virtual machines matched by FILTER
-    -f [--force]         : perform the operation without asking
+    --force              : perform the operation without asking
     -q [--quiet]         : don't print messages
 EOT
 }
@@ -1528,7 +1528,7 @@ usage: vm propdel [key...]
       
 Valid options:
     -f [--filter] FILTER : sets VM properties of VMs matched by FILTER
-    -f [--force]         : perform the operation without asking
+    --force              : perform the operation without asking
 EOT
 }
 
@@ -1652,7 +1652,7 @@ usage: vm start
       
 Valid options:
     -f [--filter] FILTER : starts virtual machine matched by FILTER
-    -f [--force]         : perform the operation without asking
+    --force              : perform the operation without asking
     -q [--quiet]         : don't print the command message
 EOT
 }
@@ -1683,7 +1683,7 @@ usage: vm stop
       
 Valid options:
     -f [--filter] FILTER : stops virtual machine matched by FILTER
-    -f [--force]         : perform the operation without asking
+    --force              : perform the operation without asking
     -q [--quiet]         : don't print the command message
 EOT
 }
@@ -1712,7 +1712,7 @@ usage: vm unblock
        
 Valid options:
     -f [--filter] FILTER : unblock only vm matched by FILTER
-    -f [--force]         : perform the operation without asking
+    --force              : perform the operation without asking
     -q [--quiet]         : don't print the command message
 EOT
 }
