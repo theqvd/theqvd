@@ -91,7 +91,7 @@ sub new {
 
 	$self->{config} = {
 		paths => {
-			ip          => '/usr/sbin/ip',
+			ip          => '/bin/ip',
 			socat       => '/usr/bin/socat',
 			pppd        => '/usr/sbin/pppd',
 			systemctl   => '/usr/bin/systemctl',
@@ -653,8 +653,8 @@ __DATA__
 interfacename=$1
 ttydevice=$2
 speed=$3
-localIPaddress=$4
-remoteIPaddress=$5
+localipaddress=$4
+remoteipaddress=$5
 ipparam=$6
 
 
