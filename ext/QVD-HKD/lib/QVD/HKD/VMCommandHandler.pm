@@ -46,10 +46,6 @@ use QVD::StateMachine::Declarative
                                            on_hkd_stop)]                                  };
 
 
-sub _on_delete_cmd :OnState(__any__) {}
-
-sub on_hkd_stop :OnState(__any__) { shift->delay_until_next_state }
-
 sub new {
     my ($class, %opts) = @_;
     my $on_cmd = delete $opts{on_cmd};
