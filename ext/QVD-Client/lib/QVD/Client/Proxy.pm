@@ -111,18 +111,28 @@ sub connect_to_vm {
     my %args;
     my $ssl = $opts->{ssl};
     if ($ssl) {
+        DEBUG "Using a SSL connection";
         $args{SSL}                 = 1;
         $args{SSL_ca_path}         = core_cfg('path.ssl.ca.system');
         $args{SSL_ca_path_alt}     = $QVD::Client::App::user_certs_dir;
         $args{SSL_ca_path_alt}     =~ s|^~(?=/)|$ENV{HOME} // $ENV{APPDATA}|e;
+
+        DEBUG "SSL CA path: " . $args{SSL_ca_path_alt};
+        DEBUG "SSL CA alt path: " . $args{SSL_ca_path_alt};
+
         my $use_cert = core_cfg('client.ssl.use_cert');
         if ($use_cert) {
             $args{SSL_use_cert} = 1;
             $args{SSL_cert_file} = core_cfg('client.ssl.cert_file');
             $args{SSL_key_file} = core_cfg('client.ssl.key_file');
+            
+            DEBUG "SSL cert: $args{SSL_cert_file}; key: $args{SSL_key_file}";
         }
         $args{SSL_verify_callback} = sub { $self->_ssl_verify_callback(@_) };
+    } else {
+        DEBUG "Not using SSL";
     }
+    
     my $httpc = eval { QVD::HTTPC->new("$host:$port", %args) };
     unless (defined $httpc) {
         if ($@) {
