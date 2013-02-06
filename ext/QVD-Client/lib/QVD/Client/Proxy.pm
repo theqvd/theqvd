@@ -339,6 +339,7 @@ sub _run {
     DEBUG("Listening on 4040\n");
     my $ll = IO::Socket::INET->new(
         LocalPort => 4040,
+        LocalAddr => 'localhost',
         ReuseAddr => 1,
         Listen    => 1,
     ) or die "Unable to listen on port 4040";
