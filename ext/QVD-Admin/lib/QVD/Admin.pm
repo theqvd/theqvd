@@ -395,6 +395,14 @@ sub cmd_di_add {
     copy($src, $tmp) or die "Unable to copy $src to $tmp: $!\n";
 
     my ($id, $new_file);
+
+    # The image may take a couple of minutes to copy, so we retry the
+    # transaction a couple of times before bailing out. Otherwise adding
+    # two images at the same time may fail. See trac #1166
+    my $MAX_RETRIES = 5;
+    my $retry_count = 0;
+    my $saved_error;
+    while ($retry_count < $MAX_RETRIES) {
     txn_eval {
         die 'Both OSF id and OSF name given' if defined $osf_name and defined $osf_id;
         if (defined $osf_name) {
@@ -427,9 +435,17 @@ sub cmd_di_add {
             or die "Unable to move '$tmp' to its final destination at '$images_path/$new_file': $!";
     };
     if ($@) {
+        $saved_error = $@;
+        $retry_count++;
+        undef $version;
+    } else {
+        last;
+    }
+    }
+    if ($retry_count == $MAX_RETRIES) {
         unlink $tmp;
         unlink "$images_path/$new_file" if defined $new_file;
-        die;
+        die $saved_error;
     }
     $id;
 }
