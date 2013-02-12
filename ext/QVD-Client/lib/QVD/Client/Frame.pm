@@ -373,6 +373,7 @@ sub OnUnknownCert {
         lock $accept_cert;
         $accept_cert = (shift and ($cert_data ne ""));
 	cond_signal $accept_cert;
+        $dialog->EndModal(0);
         $dialog->Destroy();
     };
     my $bsizer = Wx::BoxSizer->new(wxHORIZONTAL);
@@ -431,7 +432,7 @@ sub DetectKeyboard {
 
     my $log = Log::Log4perl->get_logger("QVD::Client::Frame"); 
 
-    if ($^O eq 'MSWin32') {
+    if ($^O eq 'MSWin32' ) {
         require Win32::API;
 
         my $gkln = Win32::API->new ('user32', 'GetKeyboardLayoutName', 'P', 'I');
@@ -442,9 +443,9 @@ sub DetectKeyboard {
         my $layout = $lang_codes{$k} // 'es';
 
         ## use a hardcoded 'pc105' since windows doesn't seem to have the notion of keyboard model
+        DEBUG "Detected layout $layout, assuming pc105 keyboard";
         return "pc105/$layout";
-    }
-    else {
+    } else {
 	# See http://www.nomachine.com/tr/view.php?id=TR02H02326
 	my $user = getpwuid($>);
 	if (defined $user and length $user){
@@ -463,7 +464,7 @@ sub DetectKeyboard {
 
         ## these may be comma-separated values, pick the first element
         ($layout, $variant) = map { (split /,/)[0] // '' } $layout, $variant;
-
+        DEBUG "Detected layout: $model/$layout";
         return "$model/$layout";
     }
 }

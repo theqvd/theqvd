@@ -99,6 +99,11 @@ sub forward_sockets {
 
 	$debug and _debug "wtr1: $wtr1, wtr2: $wtr2, wtw1: $wtw1, wtw2: $wtw2";
 
+	if ( $s1_out_closed && $s2_out_closed ) {
+		$debug and _debug "can't write anywhere, exiting...";
+		last;
+	}
+
 	unless ($wtr1 or $wtr2 or $wtw1 or $wtw2) {
 	    $debug and _debug "nothing else to do, exiting...";
 	    last;

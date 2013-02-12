@@ -1,4 +1,13 @@
-#!/usr/bin/perl
+#!/Applications/Qvd.app/Contents/Resources/usr/lib/qvd/bin/perl 
+
+eval 'exec /Applications/Qvd.app/Contents/Resources/usr/lib/qvd/bin/perl  -S $0 ${1+"$@"}'
+    if 0; # not running under some shell
+
+eval 'exec /Applications/Qvd.app/Contents/Resources/usr/lib/qvd/bin/perl  -S $0 ${1+"$@"}'
+    if 0; # not running under some shell
+
+eval 'exec /Applications/Qvd.app/Contents/Resources/usr/lib/qvd/bin/perl  -S $0 ${1+"$@"}'
+    if 0; # not running under some shell
 
 package QVD::Client::App;
 
@@ -48,8 +57,13 @@ BEGIN {
         unless defined core_cfg('client.log.filename', 0);
     $QVD::Log::DAEMON_NAME = 'client';
 
-    $app_dir = ( core_cfg('path.client.installation', 0) //
-                 File::Spec->join((File::Spec->splitpath(File::Spec->rel2abs($0)))[0, 1]));
+    $app_dir = core_cfg('path.client.installation', 0);
+    if (!$app_dir) {
+        my $bin_dir = File::Spec->join((File::Spec->splitpath(File::Spec->rel2abs($0)))[0, 1]);
+        my @dirs = File::Spec->splitdir($bin_dir);
+        $app_dir = File::Spec->catdir( @dirs[0..$#dirs-1] ); 
+    }
+
 }
 
 use QVD::Log;
@@ -64,6 +78,11 @@ $pixmaps_dir = File::Spec->rel2abs(core_cfg('path.client.pixmaps'), $app_dir);
 $pixmaps_dir = File::Spec->rel2abs(core_cfg('path.client.pixmaps.alt'), $app_dir) unless -d $pixmaps_dir;
 DEBUG "pixmaps_dir: $pixmaps_dir";
 
+if ( $DARWIN ) {
+    $ENV{DYLD_LIBRARY_PATH} = "$app_dir/lib";
+    DEBUG "Running on Darwin, DYLD_LIBRARY_PATH set to $ENV{DYLD_LIBRARY_PATH}";
+}
+
 #$SIG{__DIE__} = sub { ERROR "@_"; die (@_) };
 
 use QVD::Client::Frame;
@@ -74,21 +93,56 @@ sub OnInit {
     DEBUG("OnInit called");
 
     if ($WINDOWS or $DARWIN) {
-        my @cmd;
-        if ($WINDOWS) {
-            $ENV{DISPLAY} //= '127.0.0.1:0';
-            @cmd = ( File::Spec->rel2abs(core_cfg('command.windows.xming'), $app_dir),
-                     '-multiwindow', '-notrayicon', '-nowinkill', '-clipboard', '+bs', '-wm',
-                     '-logfile' => File::Spec->join($user_dir, "xserver.log") );
-        }
-        else { # DARWIN!
-            $ENV{DISPLAY} //= ':0';
-            @cmd = qw(open -a X11 --args true);
-        }
-        if ( Proc::Background->new(@cmd) ) {
-            DEBUG("X server started");
+        unless( $ENV{DISPLAY} ) {
+            my @cmd;
+            my $proc;
+
+            if ($WINDOWS) {
+                $ENV{DISPLAY} = '127.0.0.1:0';
+                @cmd = ( File::Spec->rel2abs(core_cfg('command.windows.xming'), $app_dir),
+                         '-multiwindow', '-notrayicon', '-nowinkill', '-clipboard', '+bs', '-wm',
+                         '-logfile' => File::Spec->join($user_dir, "xserver.log") );
+            }
+            else { # DARWIN!
+                $ENV{DISPLAY} = ':0';
+                my $x11_cmd = core_cfg('command.darwin.x11');
+                @cmd = qq(open -a $x11_cmd --args true);
+            }
+
+            DEBUG("DISPLAY set to $ENV{DISPLAY}");
+            DEBUG("Starting X11 server: " . join(' ', @cmd));
+
+            if ( ($proc = Proc::Background->new(@cmd))  ) {
+                DEBUG("X server started");
+                if ( $DARWIN ) {
+                    DEBUG("Waiting to see if X starts");
+                    my $timeout=5;
+                    my $all_ok;
+                    while($timeout-- > 0) {
+                        if (!$proc->alive) {
+                            if (!defined $proc->wait || ($proc->wait << 8) > 0 ) {
+                                _osx_error("Failed to start X server. Please install XQuartz.");
+                                exit(1);
+                            } else {
+                                $all_ok = 1;
+                                last;
+                            }
+                        }
+                        sleep(1);
+                    }
+
+                    if (!$all_ok) {
+                        WARN("X server command still seems to be running. Can't exactly determine whether the server started");
+                    }
+                }
+            } else {
+                ERROR("X server failed to start");
+                if ($DARWIN) {
+                     _osx_error("Failed to start X server. Please install XQuartz.");
+                }
+            }
         } else {
-            ERROR("X server failed to start");
+                DEBUG("X11 server already running on display $ENV{DISPLAY}, using that.");
         }
     }
 
@@ -99,8 +153,24 @@ sub OnInit {
     return 1;
 };
 
+sub _osx_error {
+    my ($message) = @_;
+    ERROR("$message");
+
+    open(OSA, "|/usr/bin/osascript") or die "Can't call osascript: $!";
+    print OSA <<SCRIPT;
+        tell application "System Events"
+            activate
+            display dialog "$message" buttons {"Ok"} with title "QVD Client" with icon 0
+        end tell
+SCRIPT
+
+    close(OSA);
+}
 package main;
 use QVD::Log;
+
+
 
 Wx::InitAllImageHandlers();
 my $app = QVD::Client::App->new();

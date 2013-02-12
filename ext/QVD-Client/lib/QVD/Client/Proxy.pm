@@ -111,18 +111,28 @@ sub connect_to_vm {
     my %args;
     my $ssl = $opts->{ssl};
     if ($ssl) {
+        DEBUG "Using a SSL connection";
         $args{SSL}                 = 1;
         $args{SSL_ca_path}         = core_cfg('path.ssl.ca.system');
         $args{SSL_ca_path_alt}     = $QVD::Client::App::user_certs_dir;
         $args{SSL_ca_path_alt}     =~ s|^~(?=/)|$ENV{HOME} // $ENV{APPDATA}|e;
+
+        DEBUG "SSL CA path: " . $args{SSL_ca_path_alt};
+        DEBUG "SSL CA alt path: " . $args{SSL_ca_path_alt};
+
         my $use_cert = core_cfg('client.ssl.use_cert');
         if ($use_cert) {
             $args{SSL_use_cert} = 1;
             $args{SSL_cert_file} = core_cfg('client.ssl.cert_file');
             $args{SSL_key_file} = core_cfg('client.ssl.key_file');
+            
+            DEBUG "SSL cert: $args{SSL_cert_file}; key: $args{SSL_key_file}";
         }
         $args{SSL_verify_callback} = sub { $self->_ssl_verify_callback(@_) };
+    } else {
+        DEBUG "Not using SSL";
     }
+    
     my $httpc = eval { QVD::HTTPC->new("$host:$port", %args) };
     unless (defined $httpc) {
         if ($@) {
@@ -279,12 +289,16 @@ sub _run {
 
     @o{ keys %{$self->{extra}} } = values %{$self->{extra}};
 
-    my @cmd = ( ( $WINDOWS
-                  ? File::Spec->rel2abs(core_cfg('command.windows.nxproxy'), $QVD::Client::App::app_dir)
-                  : core_cfg('command.nxproxy') ),
-                '-S',
-                map("$_=$o{$_}", keys %o),
-                'localhost:40' );
+    my @cmd;
+    if ( $WINDOWS ) {
+        @cmd = File::Spec->rel2abs(core_cfg('command.windows.nxproxy'), $QVD::Client::App::app_dir);
+    } elsif ( $DARWIN ) {
+        @cmd = File::Spec->rel2abs(core_cfg('command.darwin.nxproxy'), $QVD::Client::App::app_dir);
+    } else {
+        @cmd = core_cfg('command.nxproxy');
+    }
+
+    push @cmd, '-S', map("$_=$o{$_}", keys %o), 'localhost:40';
 
     # if ($WINDOWS) {
     # my $program = $cmd[0];
@@ -313,7 +327,9 @@ sub _run {
     }
 
     DEBUG("Running nxproxy: @cmd");
-    if ( Proc::Background->new(@cmd) ) {
+    my $nxproxy_proc;
+    
+    if ( ($nxproxy_proc =  Proc::Background->new(@cmd)) ) {
         DEBUG("nxproxy started");
     } else {
         ERROR("nxproxy failed to start");
@@ -323,6 +339,7 @@ sub _run {
     DEBUG("Listening on 4040\n");
     my $ll = IO::Socket::INET->new(
         LocalPort => 4040,
+        LocalAddr => 'localhost',
         ReuseAddr => 1,
         Listen    => 1,
     ) or die "Unable to listen on port 4040";
@@ -344,7 +361,7 @@ sub _run {
         buffer_2to1 => $httpc->read_buffered,
         # debug => 1,
     );
-
+    DEBUG("nxproxy exited with status " . $nxproxy_proc->wait);
     DEBUG("Done.");
 
 }
