@@ -402,9 +402,9 @@ sub cmd_di_add {
     my $MAX_RETRIES = 5;
     my $retry_count = 0;
     my $saved_error;
+    die 'Both OSF id and OSF name given' if defined $osf_name and defined $osf_id;
     while ($retry_count < $MAX_RETRIES) {
     txn_eval {
-        die 'Both OSF id and OSF name given' if defined $osf_name and defined $osf_id;
         if (defined $osf_name) {
             my $rs = rs(OSF)->search({name=>$osf_name});
             die "OSF not found" if ($rs->count() < 1);
@@ -436,13 +436,15 @@ sub cmd_di_add {
     };
     if ($@) {
         $saved_error = $@;
+        last if $saved_error !~ /concurrent update/;
         $retry_count++;
         undef $version;
     } else {
+        undef $saved_error;
         last;
     }
     }
-    if ($retry_count == $MAX_RETRIES) {
+    if ($saved_error) {
         unlink $tmp;
         unlink "$images_path/$new_file" if defined $new_file;
         die $saved_error;
