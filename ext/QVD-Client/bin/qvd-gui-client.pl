@@ -1,13 +1,4 @@
-#!/Applications/Qvd.app/Contents/Resources/usr/lib/qvd/bin/perl 
-
-eval 'exec /Applications/Qvd.app/Contents/Resources/usr/lib/qvd/bin/perl  -S $0 ${1+"$@"}'
-    if 0; # not running under some shell
-
-eval 'exec /Applications/Qvd.app/Contents/Resources/usr/lib/qvd/bin/perl  -S $0 ${1+"$@"}'
-    if 0; # not running under some shell
-
-eval 'exec /Applications/Qvd.app/Contents/Resources/usr/lib/qvd/bin/perl  -S $0 ${1+"$@"}'
-    if 0; # not running under some shell
+#!/usr/bin/env perl
 
 package QVD::Client::App;
 
