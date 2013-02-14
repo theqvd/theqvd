@@ -1,4 +1,4 @@
-! /bin/sh
+#! /bin/sh
 # postrm.skeleton
 # Skeleton maintainer script showing all the possible cases.
 # Written by Charles Briscoe-Smith, March-June 1998.  Public Domain.
