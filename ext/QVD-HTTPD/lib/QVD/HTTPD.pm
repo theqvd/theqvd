@@ -1,23 +1,28 @@
 package QVD::HTTPD;
 
+our $VERSION = '0.01';
+
+sub new {
+    # By default delegate to forking server
+    my $impl = QVD::HTTPD::Fork->new(@_);
+    return $impl;
+}
+
+package QVD::HTTPD::Impl;
+
 use warnings;
 use strict;
-
-our $VERSION = '0.01';
 
 use URI::Split qw(uri_split);
 use QVD::Log;
 use QVD::HTTP::StatusCodes qw(:all);
 use Socket qw(IPPROTO_TCP TCP_NODELAY);
 
-use parent qw(Net::Server::Fork);
-
 sub default_values { return { no_client_stdout => 1 } }
 
-sub options {
+sub _set_options {
     my ($self, $template) = @_;
     my $prop = $self->{server};
-    $self->SUPER::options($template);
     $prop->{SSL} ||= undef;
     $template->{SSL} = \$prop->{SSL};
     $prop->{SSL_key_file} //= undef;
@@ -217,6 +222,31 @@ sub new {
     my ($class, @args) = @_;
     my $self = \@args;
     bless $self, $class;
+}
+
+package QVD::HTTPD::Fork;
+
+use Net::Server::Fork;
+
+our @ISA = qw(QVD::HTTPD::Impl Net::Server::Fork);
+
+sub options {
+    my ($self, $template) = @_;
+    $self->QVD::HTTPD::Impl->_set_options($template);
+    $self->Net::Server::Fork->options($template);
+}
+
+package QVD::HTTPD::INET;
+
+use Net::Server::INET;
+
+our @ISA = qw(QVD::HTTPD::Impl Net::Server::INET);
+
+sub process_request {
+    my ($self) = @_;
+    $self->{server}{client} = IO::Handle->new_from_fd(fileno(STDIN), '+<');
+    $self->{server}{client}->autoflush();
+    $self->QVD::HTTPD::Impl::process_request();
 }
 
 1;

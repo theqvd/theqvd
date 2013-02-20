@@ -65,7 +65,8 @@ QVD::SimpleRPC::Server - QVD internal RPC mechanism, server side
 
   package My::Server;
 
-  use parent 'QVD::HTTPD';
+  use QVD::HTTPD;
+  use base 'QVD::HTTPD::Fork';
 
   sub post_configure_hook {
     my $self = shift;

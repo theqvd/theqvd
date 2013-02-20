@@ -1,0 +1,8 @@
+GET /qvd/resources HTTP/1.1
+
+GET /sftp/ HTTP/1.1
+
+GET /sftp/ HTTP/1.1
+Connection: Upgrade
+Upgrade: qvd:slave/1.0
+

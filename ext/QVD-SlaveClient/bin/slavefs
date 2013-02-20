@@ -1,0 +1,35 @@
+#!/usr/lib/qvd/bin/perl
+
+use strict;
+use warnings;
+
+use QVD::HTTP::StatusCodes ':all';
+use QVD::HTTPC;
+use Fcntl qw(F_GETFL F_SETFL O_NONBLOCK);
+use File::Spec;
+
+my $remote_path = $ARGV[0];
+my $mount_point = $ARGV[1];
+
+print STDERR "Mounting $remote_path to $mount_point\n";
+
+my $httpc = QVD::HTTPC->new("localhost:20203");
+my ($code, $msg, $headers, $data) = $httpc->make_http_request(
+    GET => $remote_path,
+    headers => ['Connection: Upgrade', 'Upgrade: qvd:slave/1.0']);
+
+if ($code != HTTP_SWITCHING_PROTOCOLS) {
+    die "Server replied $code $msg";
+} 
+
+my $flgs = fcntl($httpc->{socket}, F_GETFL, 0);
+fcntl($httpc->{socket}, F_SETFL, $flgs & ~O_NONBLOCK) 
+    or die "Unable set connection to blocking: $^E";
+
+open STDIN, '<&', $httpc->{socket} or die "Unable to dup stdin: $^E";
+open STDOUT, '>&', $httpc->{socket} or die "Unable to dup stdout: $^E";
+
+close $httpc->{socket};
+
+exec(sshfs => 'qvd-client:', $mount_point, -o => 'slave');
+die "Unable to exec sshfs: $^E";

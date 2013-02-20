@@ -21,7 +21,8 @@ use QVD::SimpleRPC::Client;
 use QVD::L7R::Authenticator;
 use QVD::L7R::LoadBalancer;
 
-use parent qw(QVD::HTTPD);
+use QVD::HTTPD;
+use base qw(QVD::HTTPD::Fork);
 
 my $vm_poll_time     = cfg('internal.l7r.poll_time.vm');
 my $x_poll_time      = cfg('internal.l7r.poll_time.x');

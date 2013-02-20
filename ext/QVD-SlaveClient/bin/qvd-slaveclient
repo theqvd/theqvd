@@ -1,0 +1,9 @@
+#!/usr/lib/qvd/bin/perl
+
+use strict;
+use warnings;
+
+use QVD::SlaveClient;
+
+my $c = QVD::SlaveClient->new('localhost:12100');
+$c->run;

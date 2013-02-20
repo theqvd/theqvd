@@ -5,7 +5,8 @@ our $VERSION = '0.02';
 use warnings;
 use strict;
 
-use parent 'QVD::HTTPD';
+use QVD::HTTPD;
+use base qw(QVD::HTTPD);
 
 sub post_configure_hook {
     my $self = shift;
