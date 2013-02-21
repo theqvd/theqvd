@@ -5,69 +5,62 @@ use warnings;
 
 our $VERSION = '0.01';
 
-use URI::Split qw(uri_split);
-use IO::Handle;
-use QVD::HTTP::Headers qw(header_eq_check);
+use QVD::Config::Core qw(core_cfg);
+use QVD::HTTP::Headers qw(header_eq_check header_lookup);
 use QVD::HTTP::StatusCodes qw(:all);
 use QVD::HTTPD;
 
 use base 'QVD::HTTPD::INET';
 
-my $mount_root = '/tmp';
+my $mount_root = core_cfg('vma.share.mount.path');
+my $command_sshfs = core_cfg('command.sshfs');
 
 sub new {
     my ($class) = @_;
     my $self = $class->SUPER::new();
-    $self->set_http_request_processor(\&handle_shares, PUT => '/shares/*');
+    $self->set_http_request_processor(\&handle_put_share, PUT => '/shared/*');
+    $self->set_http_request_processor(\&handle_get_share, GET => '/shared/*');
     bless $self, $class;
-    $self;
 }
 
-#sub process_request {
-#    my ($self) = @_;
-#    $self->{server}{client} = IO::Handle->new_from_fd(fileno(STDIN), '+<');
-#    $self->{server}{client}->autoflush();
-#    $self->process_request();
-#}
+sub handle_put_share {
+    my ($self, $method, $url, $headers) = @_;
 
-sub handle_shares {
-    my ($httpd, $method, $url, $headers) = @_;
-
-    $httpd->send_http_error(HTTP_BAD_REQUEST)
+    $self->send_http_error(HTTP_BAD_REQUEST)
         unless header_eq_check($headers, Connection => 'Upgrade')
-            and header_eq_check($headers, Upgrade => 'qvd:sftp/1.0');
+            and header_lookup($headers, 'Upgrade');
 
-    $httpd->send_http_error(HTTP_UNSUPPORTED_MEDIA_TYPE)
-        unless header_eq_check($headers, 'Accept'=>'application/vnd.qvd-sftp');
+    $self->send_http_error(HTTP_NOT_IMPLEMENTED)
+        unless header_eq_check($headers, 'Upgrade'=>'qvd:sftp/1.0');
 
-    (my $remote_path = $url) =~ s/^\/shares//;
-    (my $mount_dir = $remote_path) =~ s/^.*\///; # pick last part of path
+    chop $url if $url =~ /\/$/;  # remove / if last character
+
+    (my $mount_dir = $url) =~ s/.*\///; # pick last part of path
     $mount_dir = 'ROOT' if ($mount_dir eq '');
+
+    $mount_root = '/tmp'; # FIXME temporarily mount to /tmp
     my $mount_point = $mount_root.'/'.$mount_dir;
 
-    $httpd->send_http_error(HTTP_CONFLICT) if -e $mount_point;
+    $self->send_http_error(HTTP_CONFLICT) if -e $mount_point;
 
-    mkdir $mount_point;
-    $httpd->send_http_response(HTTP_SWITCHING_PROTOCOLS);
+    mkdir $mount_point or die "Unable to create mount point: $^E";
 
-    #my $flgs = fcntl($httpc->{socket}, F_GETFL, 0);
-    #fcntl($httpc->{socket}, F_SETFL, $flgs & ~O_NONBLOCK) 
-    #    or die "Unable set connection to blocking: $^E";
-
-    #open STDIN, '<&', $httpc->{socket} or die "Unable to dup stdin: $^E";
-    #open STDOUT, '>&', $httpc->{socket} or die "Unable to dup stdout: $^E";
-
-    #close $httpc->{socket};
-    #mkdir $mount_point;
+    $self->send_http_response(HTTP_SWITCHING_PROTOCOLS);
 
     my $pid = fork();
     if ($pid) {
         wait;
         rmdir $mount_point;
     } else {
-        exec(sshfs => "qvd-client:$remote_path", $mount_point, -o => 'slave');
-        die "Unable to exec sshfs: $^E";
+        exec($command_sshfs => "qvd-client:", $mount_point, -o => 'slave');
+        die "Unable to exec $command_sshfs: $^E";
     }
+}
+
+sub handle_get_share {
+    my ($self, $method, $url, $headers) = @_;
+    # We don't allow clients to mount directories from the VM
+    $self->send_http_error(HTTP_FORBIDDEN);
 }
 
 

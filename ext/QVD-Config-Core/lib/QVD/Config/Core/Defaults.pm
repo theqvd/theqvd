@@ -63,6 +63,7 @@ path.client.pixmaps.alt = /usr/share/pixmaps
 ## paths to external executables
 command.kvm = kvm
 command.kvm-img = kvm-img
+command.sshfs = sshfs
 command.sftp-server = /usr/lib/openssh/sftp-server
 command.nxagent = /usr/bin/nxagent
 command.nxdiag = /usr/lib/qvd/bin/nxdiag.pl
@@ -272,6 +273,9 @@ vm.lxc.home.per.user = 0
 
 ## umask for the VMA
 vma.user.umask = 0022
+
+## Path where shared folders are mounted
+vma.share.mount.path = ~/Desktop
 
 ## external executables the VMA calls when some events happen
 vma.on_action.pre-connect =

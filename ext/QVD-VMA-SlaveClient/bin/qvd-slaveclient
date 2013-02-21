@@ -5,5 +5,5 @@ use warnings;
 
 use QVD::SlaveClient;
 
-my $c = QVD::SlaveClient->new('localhost:12100');
+my $c = QVD::SlaveClient->new('localhost:11100');
 $c->run;
