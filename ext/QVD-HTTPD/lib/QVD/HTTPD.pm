@@ -243,11 +243,13 @@ use Net::Server::INET;
 our @ISA = qw(QVD::HTTPD::Impl Net::Server::INET);
 
 sub process_request {
-    my ($self) = @_;
+    my $self = shift;
+    # We use stdin to read and write because the IO::Handle that
+    # Net::Server::INET sets up doesn't work well. (But this also means this
+    # module is not really compatible with INET.)
     $self->{server}{client} = IO::Handle->new_from_fd(fileno(STDIN), '+<');
     $self->{server}{client}->autoflush();
-    $self->QVD::HTTPD::Impl::process_request();
-}
+    $self->QVD::HTTPD::Impl::process_request(@_); }
 
 1;
 
