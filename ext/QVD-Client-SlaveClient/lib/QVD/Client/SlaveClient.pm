@@ -39,7 +39,7 @@ sub handle_share {
     my ($self, $path) = @_;
 
     my ($code, $msg, $headers, $data) =
-    $self->{httpc}->make_http_request(PUT => '/shared/'.$path,
+    $self->{httpc}->make_http_request(PUT => '/shares/'.$path,
         headers => ['Connection: Upgrade', 'Upgrade: qvd:sftp/1.0']);
     
     if ($code != HTTP_SWITCHING_PROTOCOLS) {

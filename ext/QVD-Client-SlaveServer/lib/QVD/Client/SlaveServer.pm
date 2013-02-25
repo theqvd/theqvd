@@ -22,8 +22,8 @@ sub new {
     my $self = {};
     my $httpd = QVD::HTTPD->new();
     $httpd->set_http_request_processor(\&handle_qvd,  GET => '/qvd/resources');
-    $httpd->set_http_request_processor(\&handle_get_shared, GET => '/shared/*');
-    $httpd->set_http_request_processor(\&handle_put_shared, PUT => '/shared/*');
+    $httpd->set_http_request_processor(\&handle_get_shares, GET => '/shares/*');
+    $httpd->set_http_request_processor(\&handle_put_shares, PUT => '/shares/*');
     $self->{httpd} = $httpd;
     bless $self, $class;
     $self;
@@ -33,14 +33,14 @@ sub handle_qvd {
     my ($httpd) = @_;
     my @resources;
     for my $dir ('/', $ENV{HOME}) {
-        unshift @resources, {uri => '/shared'.$dir};
+        unshift @resources, {uri => '/shares'.$dir};
     }
 
     $httpd->send_http_response_with_body(HTTP_OK, 'application/json', [], 
         $httpd->json->encode([\@resources]));
 }
 
-sub handle_get_shared {
+sub handle_get_shares {
     my ($httpd, $method, $url, $headers) = @_;
 
     $httpd->send_http_error(HTTP_BAD_REQUEST)
@@ -51,7 +51,7 @@ sub handle_get_shared {
 
     # Extract root from URI
     my ($scheme, $host, $path, $query, $frag) = uri_split($url);
-    (my $realpath = $path) =~ s/^\/shared//;
+    (my $realpath = $path) =~ s/^\/shares//;
 
     # Run sftp-server from root
     chdir $realpath or die "Unable to chdir to $realpath: $^E";
@@ -60,7 +60,7 @@ sub handle_get_shared {
     exec $command_sftp_server;
 }
 
-sub handle_put_shared {
+sub handle_put_shares {
     my ($httpd, $method, $url, $headers) = @_;
 
     # The client does not allow mounting shares from the VM for the moment.

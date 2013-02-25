@@ -1,2 +1,5 @@
 cd $(dirname $0)
-perl -Mlib::glob=*/lib QVD-Client/bin/qvd-gui-client.pl
+
+DEBUG="${DEBUG:+gdb --args}"
+
+$DEBUG perl -Mlib::glob=*/lib QVD-Client/bin/qvd-gui-client.pl
