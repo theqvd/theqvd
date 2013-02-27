@@ -6,7 +6,7 @@ use warnings;
 use strict;
 
 use QVD::HTTPD;
-use base qw(QVD::HTTPD);
+use base qw(QVD::HTTPD::Fork);
 
 sub post_configure_hook {
     my $self = shift;
