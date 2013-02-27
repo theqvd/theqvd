@@ -9,11 +9,11 @@ use QVD::Client::SlaveClient;
 
 my $help = '';
 my $host = 'localhost';
-my $port = 12100;
+my $port = 12040;
 
 my $ret = GetOptions(
-    'host' => \$host,
-    'port' => \$port,
+    'host|h=s' => \$host,
+    'port|p=i' => \$port,
     'help|h' => \$help
 );
 $help = 1 unless $ret;
