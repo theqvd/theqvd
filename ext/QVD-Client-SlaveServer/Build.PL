@@ -7,6 +7,7 @@ my $builder = Module::Build->new(
     license             => 'gpl',
     dist_author         => q{QVD Team <qvd@qindel.com>},
     dist_version_from   => 'lib/QVD/Client/SlaveServer.pm',
+    dist_abstract    	=> 'QVD::Client::SlaveServer',
     configure_requires => { 'Module::Build' => 0.38  },
     build_requires => {
         'Test::More'       => 0,
