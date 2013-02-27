@@ -232,8 +232,8 @@ our @ISA = qw(QVD::HTTPD::Impl Net::Server::Fork);
 
 sub options {
     my ($self, $template) = @_;
-    $self->QVD::HTTPD::Impl->_set_options($template);
-    $self->Net::Server::Fork->options($template);
+    $self->QVD::HTTPD::Impl::_set_options($template);
+    $self->Net::Server::Fork::options($template);
 }
 
 package QVD::HTTPD::INET;
