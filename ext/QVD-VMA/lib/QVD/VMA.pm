@@ -39,6 +39,7 @@ my $x_session       = cfg('command.x-session');
 my $xinit           = cfg('command.xinit');
 my $enable_audio    = cfg('vma.audio.enable');
 my $enable_slave    = cfg('vma.slave.enable');
+my $command_slave   = cfg('vma.slave.command');
 my $enable_printing = cfg('vma.printing.enable');
 my $printing_conf   = cfg('internal.vma.printing.config');
 my $nxagent_conf    = cfg('internal.vma.nxagent.config');
@@ -409,6 +410,7 @@ sub _fork_monitor {
 
 		    $ENV{PULSE_SERVER} = "tcp:localhost:".($display+7000) if $enable_audio;
 		    $ENV{NX_CLIENT} = $nxdiag;
+		    $ENV{QVD_SLAVE_COMMAND} = $command_slave if $enable_slave;
 
 		    # FIXME: Include VM name in -name argument.
 		    # FIXME: Reimplement xinit in Perl in order to allow capturing nxagent ouput alone.

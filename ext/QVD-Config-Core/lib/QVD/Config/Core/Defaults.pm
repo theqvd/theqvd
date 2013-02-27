@@ -245,6 +245,7 @@ osf.default.overlay = 1
 vma.audio.enable = 0
 ## enables "slave channel" in nxagent
 vma.slave.enable = 0
+vma.slave.command = 
 ## enables the printing channel in nxagent
 vma.printing.enable = 0
 ## path to the VMA PID file
