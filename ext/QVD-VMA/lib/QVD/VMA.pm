@@ -410,7 +410,7 @@ sub _fork_monitor {
 
 		    $ENV{PULSE_SERVER} = "tcp:localhost:".($display+7000) if $enable_audio;
 		    $ENV{NX_CLIENT} = $nxdiag;
-		    $ENV{QVD_SLAVE_COMMAND} = $command_slave if $enable_slave;
+		    $ENV{QVD_SLAVE_CMD} = $command_slave if $enable_slave;
 
 		    # FIXME: Include VM name in -name argument.
 		    # FIXME: Reimplement xinit in Perl in order to allow capturing nxagent ouput alone.
