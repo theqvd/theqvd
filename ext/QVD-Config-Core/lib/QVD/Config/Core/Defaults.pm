@@ -279,7 +279,7 @@ vm.lxc.home.per.user = 0
 vma.user.umask = 0022
 
 ## Path where shared folders are mounted
-vma.share.mount.path = ~/Desktop
+vma.share.mount.path = /media
 
 ## external executables the VMA calls when some events happen
 vma.on_action.pre-connect =
