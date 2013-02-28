@@ -7,7 +7,7 @@ use QVD::HTTP::StatusCodes qw(:status_codes);
 use JSON qw(decode_json);
 use feature 'switch';
 
-my $mount_root = core_cfg('vma.share.mount.path', $ENV{HOME}.'/Desktop');
+my $mount_root = $ENV{HOME}.'/.qvdfs';
 my $command_sshfs = core_cfg('command.sshfs');
 
 sub new {
@@ -86,7 +86,7 @@ sub _handle_sftp {
     $mount_dir = 'ROOT' if ($mount_dir eq '');
     my $mount_point = $mount_root.'/'.$mount_dir;
 
-
+    mkdir $mount_root;
     mkdir $mount_point;
 
     my $kid = fork;

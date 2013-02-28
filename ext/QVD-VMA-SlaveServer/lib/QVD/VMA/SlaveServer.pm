@@ -12,7 +12,7 @@ use QVD::HTTPD;
 
 use base 'QVD::HTTPD::INET';
 
-my $mount_root = core_cfg('vma.share.mount.path', $ENV{HOME}.'/Desktop');
+my $mount_root = $ENV{HOME}.'/.qvdfs';
 my $command_sshfs = core_cfg('command.sshfs');
 
 sub new {
@@ -38,6 +38,7 @@ sub handle_put_share {
     (my $mount_dir = $url) =~ s/.*\///; # pick last part of path
     $mount_dir = 'ROOT' if ($mount_dir eq '');
 
+    mkdir $mount_root unless -d $mount_root;
     my $mount_point = $mount_root.'/'.$mount_dir;
 
     $self->send_http_error(HTTP_CONFLICT) if -e $mount_point;
@@ -58,7 +59,7 @@ sub handle_put_share {
 
 sub handle_get_share {
     my ($self, $method, $url, $headers) = @_;
-    # We don't allow clients to mount directories from the VM
+    # We don't allow clients to mount directories *from* the VM
     $self->send_http_error(HTTP_FORBIDDEN);
 }
 
