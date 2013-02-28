@@ -111,7 +111,7 @@ sub _handle_sftp {
         open STDOUT, '>&', $httpc->{socket} or die "Unable to dup stdout: $^E";
 
         close $httpc->{socket};
-        mkdir $mount_point;
+        mkdir $mount_point or die "Unable to create mount point $mount_point: $^E";
 
         exec($command_sshfs => "qvd-client:$remote_path", $mount_point, -o => 'slave');
         die "Unable to exec sshfs: $^E";

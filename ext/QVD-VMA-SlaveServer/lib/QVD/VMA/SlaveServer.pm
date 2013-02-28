@@ -42,7 +42,7 @@ sub handle_put_share {
 
     $self->send_http_error(HTTP_CONFLICT) if -e $mount_point;
 
-    mkdir $mount_point or die "Unable to create mount point: $^E";
+    mkdir $mount_point or die "Unable to create mount point $mount_point: $^E";
 
     $self->send_http_response(HTTP_SWITCHING_PROTOCOLS);
 
