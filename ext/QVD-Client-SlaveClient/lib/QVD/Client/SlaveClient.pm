@@ -25,7 +25,7 @@ sub dispatch {
     if (defined $method) {
         $self->$method(@args);
     } else {
-        $self->usage();
+        $self->handle_usage();
     }
 }
 

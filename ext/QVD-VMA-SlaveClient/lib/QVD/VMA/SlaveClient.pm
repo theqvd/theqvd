@@ -1,12 +1,14 @@
 package QVD::VMA::SlaveClient;
 
 use Fcntl qw(F_GETFL F_SETFL O_NONBLOCK);
+use QVD::Config::Core qw(core_cfg);
 use QVD::HTTPC;
 use QVD::HTTP::StatusCodes qw(:status_codes);
 use JSON qw(decode_json);
 use feature 'switch';
 
-my $mount_root = '/tmp';
+my $mount_root = core_cfg('vma.share.mount.path', $ENV{HOME}.'/Desktop');
+my $command_sshfs = core_cfg('command.sshfs');
 
 sub new {
     my ($class, $target, %opts) = @_;
@@ -111,7 +113,7 @@ sub _handle_sftp {
         close $httpc->{socket};
         mkdir $mount_point;
 
-        exec(sshfs => "qvd-client:$remote_path", $mount_point, -o => 'slave');
+        exec($command_sshfs => "qvd-client:$remote_path", $mount_point, -o => 'slave');
         die "Unable to exec sshfs: $^E";
     }
 }

@@ -288,6 +288,7 @@ sub _run {
     }
 
     @o{ keys %{$self->{extra}} } = values %{$self->{extra}};
+    $o{slave} = 1 if core_cfg('client.slave.enable', 1);
 
     my @cmd;
     if ( $WINDOWS ) {

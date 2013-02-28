@@ -128,6 +128,8 @@ client.use_ssl = 1
 client.ssl.use_cert = 0
 ## slave shell
 client.slave.command =
+## enable making slave connections to VM
+client.slave.enable = 1
 
 ## umask for the L7R process
 l7r.user.umask = 0022
@@ -245,6 +247,7 @@ osf.default.overlay = 1
 vma.audio.enable = 0
 ## enables "slave channel" in nxagent
 vma.slave.enable = 0
+## slave shell to execute to client requests
 vma.slave.command = /usr/lib/qvd/bin/qvd-vma-slaveserver
 ## enables the printing channel in nxagent
 vma.printing.enable = 0
