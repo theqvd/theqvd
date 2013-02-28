@@ -255,6 +255,9 @@ sub _run {
 
     my %o;
 
+    # Erase any previously set value. This is only for nxproxy, may break other things
+    $self->{client_delegate}->proxy_set_environment( DYLD_LIBRARY_PATH => "" );
+    
     if ($WINDOWS) {
         my $cygwin_nx_root = "/cygdrive/$QVD::Client::App::user_dir";
         $cygwin_nx_root =~ tr|:\\|//|;
@@ -263,20 +266,24 @@ sub _run {
 
         DEBUG "NX_ROOT: $cygwin_nx_root";
         DEBUG "save nxproxy log at: $o{errors}";
-
-        # Call pulseaudio in Windows
-        if ( $self->{audio} ) {
-            my @pa = (File::Spec->rel2abs(core_cfg('command.windows.pulseaudio'), $QVD::Client::App::app_dir),
-                      "-D", "--high-priority" );
-            DEBUG("Starting pulseaudio: @pa");
-            if ( Proc::Background->new(@pa) ) {
-                DEBUG("Pulseaudio started");
-            } else {
-                ERROR("Pulseaudio failed to start");
-            }
-        }
     }
 
+   
+    # Call pulseaudio in Windows or Darwin
+    if ( $self->{audio} && ( $WINDOWS || $DARWIN ) ) {
+        my $pa_bin = $WINDOWS ? core_cfg('command.windows.pulseaudio') : core_cfg('command.darwin.pulseaudio');
+        
+        my @pa = (File::Spec->rel2abs($pa_bin, $QVD::Client::App::app_dir),
+            "-D", "--high-priority", "-vvvv", "--log-target=file:/$QVD::Client::App::user_dir/pulseaudio.log" );
+        DEBUG("Starting pulseaudio: @pa");
+        if ( Proc::Background->new(@pa) ) {
+            DEBUG("Pulseaudio started");
+        } else {
+            ERROR("Pulseaudio failed to start");
+        }
+    }
+    
+    
     $o{media} = 4713 if $self->{audio};
 
     if ($self->{printing}) {
@@ -326,12 +333,24 @@ sub _run {
             WARN("Slave command '$slave_cmd' not found or not executable.");
         }
     }
+    
+    if ( $DARWIN ) {
+        my $app_dir = core_cfg('path.client.installation', 0);
+        if (!$app_dir) {
+            my $bin_dir = File::Spec->join((File::Spec->splitpath(File::Spec->rel2abs($0)))[0, 1]);
+            my @dirs = File::Spec->splitdir($bin_dir);
+            $app_dir = File::Spec->catdir( @dirs[0..$#dirs-1] ); 
+        }
+
+        $self->{client_delegate}->proxy_set_environment( DYLD_LIBRARY_PATH => "$app_dir/lib" );
+        DEBUG "Running on Darwin, DYLD_LIBRARY_PATH set to $ENV{DYLD_LIBRARY_PATH}";
+    }
 
     DEBUG("Running nxproxy: @cmd");
     my $nxproxy_proc;
-    
+
     if ( ($nxproxy_proc =  Proc::Background->new(@cmd)) ) {
-        DEBUG("nxproxy started");
+        DEBUG("nxproxy started, DYLD_LIBRARY_PATH=" . $ENV{DYLD_LIBRARY_PATH});
     } else {
         ERROR("nxproxy failed to start");
         die "nxproxy failed to start";

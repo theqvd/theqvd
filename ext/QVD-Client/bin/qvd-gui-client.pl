@@ -69,10 +69,6 @@ $pixmaps_dir = File::Spec->rel2abs(core_cfg('path.client.pixmaps'), $app_dir);
 $pixmaps_dir = File::Spec->rel2abs(core_cfg('path.client.pixmaps.alt'), $app_dir) unless -d $pixmaps_dir;
 DEBUG "pixmaps_dir: $pixmaps_dir";
 
-if ( $DARWIN ) {
-    $ENV{DYLD_LIBRARY_PATH} = "$app_dir/lib";
-    DEBUG "Running on Darwin, DYLD_LIBRARY_PATH set to $ENV{DYLD_LIBRARY_PATH}";
-}
 
 #$SIG{__DIE__} = sub { ERROR "@_"; die (@_) };
 
