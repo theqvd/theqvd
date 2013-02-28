@@ -52,7 +52,7 @@ sub handle_put_share {
         wait;
         rmdir $mount_point;
     } else {
-        exec($command_sshfs => "qvd-client:", $mount_point, -o => 'slave');
+        exec($command_sshfs => "qvd-client:", $mount_point, -o => 'slave', -o => 'idmap=user');
         die "Unable to exec $command_sshfs: $^E";
     }
 }

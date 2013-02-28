@@ -113,7 +113,7 @@ sub _handle_sftp {
         close $httpc->{socket};
         mkdir $mount_point or die "Unable to create mount point $mount_point: $^E";
 
-        exec($command_sshfs => "qvd-client:$remote_path", $mount_point, -o => 'slave');
+        exec($command_sshfs => "qvd-client:$remote_path", $mount_point, -o => 'slave', -o => 'idmap=user');
         die "Unable to exec sshfs: $^E";
     }
 }
