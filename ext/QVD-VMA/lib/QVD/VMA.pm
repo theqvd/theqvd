@@ -62,6 +62,8 @@ my $home_fs    = cfg('vma.user.home.fs');
 my $home_path  = cfg('vma.user.home.path');
 my $home_drive = cfg('vma.user.home.drive');
 
+my $user_shell = cfg('vma.user.shell');
+
 my $home_partition = $home_drive . '1';
 
 my %on_action =       ( pre_connect    => cfg('vma.on_action.pre-connect'),
@@ -333,6 +335,7 @@ sub _provisionate_user {
                             '-m',              ## create home
                             '-d', $user_home,  ## home dir
                             '-g', $user,       ## main group
+                            '-s', $user_shell, ## shell
                            );
 		push @args, -G => $groups if length $groups;
 		push @args, -u => $uid if $uid;

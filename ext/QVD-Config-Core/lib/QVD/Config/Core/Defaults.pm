@@ -279,6 +279,9 @@ vm.lxc.home.per.user = 0
 ## umask for the VMA
 vma.user.umask = 0022
 
+## shell for user
+vma.user.shell = /bin/bash
+
 ## external executables the VMA calls when some events happen
 vma.on_action.pre-connect =
 vma.on_action.connect =
