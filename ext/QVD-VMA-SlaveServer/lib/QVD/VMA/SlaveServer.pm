@@ -12,7 +12,7 @@ use QVD::HTTPD;
 
 use base 'QVD::HTTPD::INET';
 
-my $mount_root = $ENV{HOME}.'/.qvdfs';
+my $mount_root = $ENV{HOME}.'/Redirected';
 my $command_sshfs = core_cfg('command.sshfs');
 
 sub new {
