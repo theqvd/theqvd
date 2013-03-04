@@ -201,7 +201,8 @@ use QVD::StateMachine::Declarative
                                                             _on_state_timeout            => 'stopping/stopping_lxc'           } },
 
     'stopping/stopping_lxc'           => { enter       => '_stop_lxc',
-                                           transitions => { _on_stop_lxc_done            => 'stopping/waiting_for_lxc_to_stop'} },
+                                           transitions => { _on_stop_lxc_done            => 'stopping/waiting_for_lxc_to_stop'},
+                                           delay       => ['_on_lxc_done']                                                      },
 
     'stopping/waiting_for_lxc_to_stop'=> { enter       => '_set_state_timer',
                                            leave       => '_abort_all',
