@@ -272,9 +272,17 @@ sub _run {
     # Call pulseaudio in Windows or Darwin
     if ( $self->{audio} && ( $WINDOWS || $DARWIN ) ) {
         my $pa_bin = $WINDOWS ? core_cfg('command.windows.pulseaudio') : core_cfg('command.darwin.pulseaudio');
+        my $pa_log = File::Spec->rel2abs("pulseaudio.log", $QVD::Client::App::user_dir);
+        my $pa_cfg = File::Spec->rel2abs("default.pa", $QVD::Client::App::user_dir);
         
         my @pa = (File::Spec->rel2abs($pa_bin, $QVD::Client::App::app_dir),
-            "-D", "--high-priority", "-vvvv", "--log-target=file:/$QVD::Client::App::user_dir/pulseaudio.log" );
+            "-D", "--high-priority", "-vvvv", "--log-target=file:/$pa_log" );
+            
+        if ( -f $pa_cfg ) {
+		DEBUG "Using config file $pa_cfg";
+		push @pa, "-F", $pa_cfg;
+	}
+	
         DEBUG("Starting pulseaudio: @pa");
         if ( Proc::Background->new(@pa) ) {
             DEBUG("Pulseaudio started");
@@ -335,14 +343,7 @@ sub _run {
     }
     
     if ( $DARWIN ) {
-        my $app_dir = core_cfg('path.client.installation', 0);
-        if (!$app_dir) {
-            my $bin_dir = File::Spec->join((File::Spec->splitpath(File::Spec->rel2abs($0)))[0, 1]);
-            my @dirs = File::Spec->splitdir($bin_dir);
-            $app_dir = File::Spec->catdir( @dirs[0..$#dirs-1] ); 
-        }
-
-        $self->{client_delegate}->proxy_set_environment( DYLD_LIBRARY_PATH => "$app_dir/lib" );
+        $self->{client_delegate}->proxy_set_environment( DYLD_LIBRARY_PATH => "$QVD::Client::App::app_dir/lib" );
         DEBUG "Running on Darwin, DYLD_LIBRARY_PATH set to $ENV{DYLD_LIBRARY_PATH}";
     }
 
@@ -385,5 +386,6 @@ sub _run {
     DEBUG("Done.");
 
 }
+
 
 1;
