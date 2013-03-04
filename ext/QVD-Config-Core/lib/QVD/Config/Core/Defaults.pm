@@ -384,6 +384,8 @@ internal.hkd.lxc.killer.destroy_lxc.timeout = 100
 internal.hkd.lxc.killer.umount.timeout = 100
 internal.hkd.lxc.acquire.untar.lock.delay = 2
 
+internal.hkd.lxc.lxc-stop.timeout = 30
+
 internal.hkd.dhcpdhandler.wait_on_run_error = 5
 
 internal.hkd.debugger.run = 0

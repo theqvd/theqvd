@@ -787,8 +787,12 @@ sub _start_lxc {
 
 sub _stop_lxc {
     my $self = shift;
-    _run($self->_cfg('command.lxc-stop'), -n => $self->{lxc_name});
-    $self->_on_stop_lxc_done;
+    $self->_run_cmd([$self->_cfg('command.lxc-stop'), -n => $self->{lxc_name}],
+                    kill_after => $self->_cfg('internal.hkd.command.timeout.lxc-stop'),
+                    ignore_errors => 1);
+
+    #_run($self->_cfg('command.lxc-stop'), -n => $self->{lxc_name});
+    #$self->_on_stop_lxc_done;
 }
 
 sub _wait_for_zombie_lxc {
