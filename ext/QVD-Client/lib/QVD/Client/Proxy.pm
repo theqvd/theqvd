@@ -270,13 +270,14 @@ sub _run {
 
    
     # Call pulseaudio in Windows or Darwin
+    my $pa_proc;
     if ( $self->{audio} && ( $WINDOWS || $DARWIN ) ) {
         my $pa_bin = $WINDOWS ? core_cfg('command.windows.pulseaudio') : core_cfg('command.darwin.pulseaudio');
         my $pa_log = File::Spec->rel2abs("pulseaudio.log", $QVD::Client::App::user_dir);
         my $pa_cfg = File::Spec->rel2abs("default.pa", $QVD::Client::App::user_dir);
         
-        my @pa = (File::Spec->rel2abs($pa_bin, $QVD::Client::App::app_dir),
-            "-D", "--high-priority", "-vvvv", "--log-target=file:/$pa_log" );
+        my @pa = (File::Spec->rel2abs($pa_bin, $QVD::Client::App::app_dir), # -D
+            "--high-priority", "-vvvv", "--log-target=file:/$pa_log" );
             
         if ( -f $pa_cfg ) {
 		DEBUG "Using config file $pa_cfg";
@@ -284,7 +285,7 @@ sub _run {
 	}
 	
         DEBUG("Starting pulseaudio: @pa");
-        if ( Proc::Background->new(@pa) ) {
+        if ( ( $pa_proc = Proc::Background->new(@pa)) ) {
             DEBUG("Pulseaudio started");
         } else {
             ERROR("Pulseaudio failed to start");
@@ -383,6 +384,16 @@ sub _run {
         # debug => 1,
     );
     DEBUG("nxproxy exited with status " . $nxproxy_proc->wait);
+    
+    if ( $pa_proc ) {
+        DEBUG("Stopping pulseaudio...");
+        if ( $pa_proc->die ) {
+	    DEBUG("Pulseaudio exited with status " . $pa_proc->wait);
+        } else {
+            ERROR("Failed to kill pulseaudio");
+        }
+    }
+
     DEBUG("Done.");
 
 }
