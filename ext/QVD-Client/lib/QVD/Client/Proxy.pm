@@ -16,6 +16,7 @@ use QVD::HTTP::StatusCodes qw(:status_codes);
 use URI::Escape qw(uri_escape);
 use QVD::Log;
 
+my $LINUX = ($^O eq 'linux');
 my $WINDOWS = ($^O eq 'MSWin32');
 my $DARWIN = ($^O eq 'darwin');
 my $NX_OS = $WINDOWS ? 'windows' : 'linux';
@@ -378,7 +379,7 @@ sub _run {
 
     my $slave_client_proc;
     # TODO Add Windows/Mac support, make configurable
-    if (core_cfg('client.slave.enable', 1)) {
+    if ($LINUX && core_cfg('client.slave.enable', 1)) {
         my $slave_client_cmd = '/usr/lib/qvd/bin/qvd-slaveclient';
         my @sc = ($slave_client_cmd, share => $ENV{HOME});
         DEBUG("Starting folder sharing: @sc");
