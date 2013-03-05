@@ -524,6 +524,10 @@ sub _allocate_os_overlayfs {
                 }
                 DEBUG "Renamed old overlayfd '$overlayfs' to '$overlayfs_old'";
             }
+            if (-d $overlayfs) {
+                ERROR "Overlay directory still exists at '$overlayfs'";
+                return $self->_on_allocate_os_overlayfs_error;
+            }
         }
         else {
             $debug and $self->_debug("reusing existing overlay directory");
