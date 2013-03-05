@@ -379,7 +379,7 @@ sub _run {
     my $slave_client_proc;
     # TODO Add Windows/Mac support, make configurable
     if (core_cfg('client.slave.enable', 1)) {
-        my $slave_client_cmd = 'qvd-slaveclient';
+        my $slave_client_cmd = '/usr/lib/qvd/bin/qvd-slaveclient';
         my @sc = ($slave_client_cmd, share => $ENV{HOME});
         DEBUG("Starting folder sharing: @sc");
         if ($slave_client_proc = Proc::Background->new(@sc)) {
