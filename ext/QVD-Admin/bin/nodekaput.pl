@@ -25,8 +25,18 @@ txn_eval {
     my $res = <STDIN>;
     $res =~ /^y(es)?$/i or die "Aborted!\n";
 
-    $_->unassign for @vms;
-
+    for my $vm (@vms) {
+        my $l7r_host = $vm->l7r_host;
+        if ($vm->l7r_state != 'disconnected') {
+            if ($vm->l7r_host == $host_id) {
+                $vm->clear_l7r_all;
+            }
+            else {
+                $vm->send_user_abort;
+            }
+        }
+        $vm->unassign;
+    }
 };
 
 if ($@) {
