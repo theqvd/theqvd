@@ -79,7 +79,8 @@ my %syntax_check_cbs = (
             $$errors++, warn "Syntax error: parameters 'osf_id' and 'osf' are mutually exclusive\n",  if exists $args->{'osf_id'} and exists $args->{'osf'};
             $$errors++, warn "Syntax error: parameters 'user_id' and 'user' are mutually exclusive\n", if exists $args->{'user_id'} and exists $args->{'user'};
             $$errors++, warn "Syntax error: parameter 'name' is mandatory\n", unless exists $args->{'name'};
-            delete @$args{qw/osf_id osf user_id user name ip di_tag/};
+            $$errors++, warn "Syntax error: parameters 'bulk' and 'ip' can not be used together\n", if exists $args->{'ip'} and exists $args->{'bulk'};
+            delete @$args{qw/osf_id osf user_id user name ip di_tag bulk/};
         },
     },
 );

@@ -597,19 +597,38 @@ sub cmd_vm_add {
             $params{user_id} = $rs->single->id;
             delete $params{user};
         }
-        unless ($params{ip}) {
-            $params{ip} = $self->_get_free_ip;
-            INFO "assigned IP: $params{ip}";
-        }
         $params{storage} = '';
         $params{di_tag} //= 'default';
-        my $row = $self->_obj_add('vm', [qw/name user_id osf_id ip storage di_tag/],
+        my $row;
+        my $bulk = delete $params{bulk};
+        if (defined $bulk) {
+            for my $i (0..$bulk-1) {
+                my %p = %params;
+                $p{name} .= "-$i";
+                $p{ip} = $self->_get_free_ip;
+                $row = $self->_obj_add('vm', [qw/name user_id osf_id ip storage di_tag/],
+                                       \%p);
+                rs(VM_Runtime)->create({vm_id         => $row->id,
+                                        vm_state      => 'stopped',
+                                        user_state    => 'disconnected',
+                                        blocked       => 'false'});
+                rs(VM_Counter)->create({ vm_id  => $row->id });
+            }
+        }
+        else {
+            unless ($params{ip}) {
+                $params{ip} = $self->_get_free_ip;
+                INFO "assigned IP: $params{ip}";
+            }
+
+            $row = $self->_obj_add('vm', [qw/name user_id osf_id ip storage di_tag/],
                                   \%params);
-        rs(VM_Runtime)->create({vm_id         => $row->id,
-                                vm_state      => 'stopped',
-                                user_state    => 'disconnected',
-                                blocked       => 'false'});
-        rs(VM_Counter)->create({ vm_id  => $row->id });
+            rs(VM_Runtime)->create({vm_id         => $row->id,
+                                    vm_state      => 'stopped',
+                                    user_state    => 'disconnected',
+                                    blocked       => 'false'});
+            rs(VM_Counter)->create({ vm_id  => $row->id });
+        }
         $row->id
     };
 }
