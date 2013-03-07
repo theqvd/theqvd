@@ -278,7 +278,7 @@ sub _do_kill_after {
     my ($self, $signal, $pid) = @_;
     $debug and $self->_debug("command timed out");
     DEBUG 'Command timed out';
-    $self->_kill_cmd($signal);
+    $self->_kill_cmd($signal, $pid);
     $self->{cmd_timer}{$pid} = AnyEvent->timer(after => 2,
                                                cb => sub { $self->_do_kill_after(KILL => $pid) });
 }
