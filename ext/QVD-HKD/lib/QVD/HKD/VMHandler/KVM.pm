@@ -157,11 +157,13 @@ use QVD::StateMachine::Declarative
     'stopping/waiting_for_vm_to_exit' => { enter       => '_set_state_timer',
                                            leave       => '_abort_all',
                                            transitions => { _on_vm_process_done          => 'stopping/removing_fw_rules',
-                                                            _on_state_timeout            => 'stopping/killing_vm' } },
+                                                            _on_state_timeout            => 'stopping/killing_vm',
+                                                            on_hkd_kill                  => 'stopping/killing_vm'            } },
 
     'stopping/killing_vm'             => { enter       => '_kill_vm',
                                            leave       => '_abort_all',
-                                           transitions => { _on_vm_process_done          => 'stopping/removing_fw_rules' } },
+                                           transitions => { _on_vm_process_done          => 'stopping/removing_fw_rules'     },
+                                           ignore      => [qw(on_hhd_kill)]                                                    },
 
     'stopping/saving_state_2'         => { enter       => '_save_state',
                                            transitions => { _on_save_state_done          => 'stopping/removing_fw_rules',
@@ -204,12 +206,13 @@ use QVD::StateMachine::Declarative
 
     'zombie'                          => { enter       => '_set_state_timer',
                                            leave       => '_abort_all',
-                                           transitions => { _on_state_timeout => 'zombie/beating_to_death',
-                                                            on_hkd_stop => 'stopped'                                         } },
+                                           transitions => { _on_state_timeout            => 'zombie/removing_fw_rules',
+                                                            on_hkd_stop                  => 'stopped'                       } },
 
-    __any__                           => { delay       => ['_on_cmd_stop',
+    __any__                           => { delay_once  => ['_on_cmd_stop',
                                                            '_on_vm_process_done',
-                                                           'on_hkd_stop']                                                      };
+                                                           'on_hkd_stop',
+                                                           'on_hkd_kill']                                                      };
 
 sub _on_cmd_start :OnState('__any__') { shift->_maybe_callback('on_delete_cmd') }
 

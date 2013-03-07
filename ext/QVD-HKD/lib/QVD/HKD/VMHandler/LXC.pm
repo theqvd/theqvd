@@ -198,7 +198,8 @@ use QVD::StateMachine::Declarative
     'stopping/waiting_for_lxc_to_exit'=> { enter       => '_set_state_timer',
                                            leave       => '_abort_all',
                                            transitions => { _on_lxc_done                 => 'stopping/killing_lxc',
-                                                            _on_state_timeout            => 'stopping/stopping_lxc'           } },
+                                                            _on_state_timeout            => 'stopping/stopping_lxc',
+                                                            on_hkd_kill                  => 'stopping/killing_lxc'            } },
 
     'stopping/stopping_lxc'           => { enter       => '_stop_lxc',
                                            transitions => { _on_stop_lxc_done            => 'stopping/waiting_for_lxc_to_stop'},
@@ -207,13 +208,15 @@ use QVD::StateMachine::Declarative
     'stopping/waiting_for_lxc_to_stop'=> { enter       => '_set_state_timer',
                                            leave       => '_abort_all',
                                            transitions => { _on_lxc_done                 => 'stopping/killing_lxc',
-                                                            _on_state_timeout            => 'stopping/killing_lxc'            } },
+                                                            _on_state_timeout            => 'stopping/killing_lxc',
+                                                            on_hkd_kill                  => 'stopping/killing_lxc'            } },
 
     'stopping/killing_lxc'            => { enter       => '_kill_lxc',
                                            transitions => { _on_kill_lxc_done            => 'stopping/unlinking_iface',
                                                             _on_kill_lxc_error           => 'zombie/beating_to_death',
                                                             _on_dirty                    => 'dirty'                           },
-                                           ignore      => ['_on_lxc_done']                                                      },
+                                           ignore      => ['_on_lxc_done',
+                                                           'on_hkd_kill']                                                       },
 
     'stopping/unlinking_iface'        => { enter       => '_unlink_iface',
                                            transitions => { _on_unlink_iface_done        => 'stopping/removing_fw_rules',
@@ -291,16 +294,21 @@ use QVD::StateMachine::Declarative
 
     'zombie'                          => { enter       => '_set_state_timer',
                                            leave       => '_abort_all',
-                                           transitions => { _on_state_timeout => 'zombie/killing_lxc',
-                                                            on_hkd_stop => 'stopped'                                         } },
+                                           transitions => { _on_state_timeout            => 'zombie/killing_lxc',
+                                                            on_hkd_kill                  => 'stopped'                        },
+                                           ignore      => [qw(on_hkd_stop)]                                                    },
 
-    'dirty'                           => { transitions => { on_hkd_stop => 'stopped'                                         } };
+    'dirty'                           => { transitions => { on_hkd_stop                  => 'stopped'                        } },
 
 
-sub _on_cmd_stop  :OnState('__any__') { shift->delay_until_next_state }
+    '__any__'                         => { delay_once  => [qw( _on_cmd_stop
+                                                               on_hkd_stop
+                                                               on_hkd_kill )],                                                 };
+
+
+
 sub _on_cmd_start :OnState('__any__') { shift->_maybe_callback('on_delete_cmd') }
 
-sub on_hkd_stop  :OnState('__any__') { shift->delay_until_next_state }
 
 sub _mkpath {
     my ($path, $mask) = @_;

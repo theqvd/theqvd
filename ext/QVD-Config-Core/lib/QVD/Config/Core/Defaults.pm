@@ -353,7 +353,8 @@ internal.database.pool.size = 2
 internal.database.pool.connection.delay = 10
 internal.database.pool.connection.retries = 18
 
-internal.hkd.killing.vms.timeout = 120
+internal.hkd.stopping.vms.timeout = 300
+internal.hkd.killing.vms.retry.timeout = 100
 
 internal.hkd.agent.ticker.delay = 120
 internal.hkd.agent.ticker.retries = 2
