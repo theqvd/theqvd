@@ -302,6 +302,7 @@ use QVD::StateMachine::Declarative
 
 
     '__any__'                         => { delay_once  => [qw( _on_cmd_stop
+                                                               _on_lxc_done
                                                                on_hkd_stop
                                                                on_hkd_kill )],                                                 };
 
