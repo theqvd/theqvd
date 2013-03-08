@@ -14,22 +14,36 @@ use QVD::Log;
 
 use QVD::StateMachine::Declarative
     new                => { transitions => { _on_run => 'getting_user_cmd' }},
+
     getting_user_cmd   => { enter       => '_get_user_cmd',
                             transitions => { _on_get_user_cmd_done     => 'disconnecting_user',
                                              _on_get_user_cmd_error    => 'searching_dead_l7r' } },
+
     disconnecting_user => { enter       => '_disconnect_user',
-                            transitions => { _on_disconnect_user_done  => 'searching_dead_l7r',
-                                             _on_disconnect_user_error => 'searching_dead_l7r' } },
+                            transitions => { _on_disconnect_user_done  => 'deleting_user_cmd',
+                                             _on_disconnect_user_error => 'killing_l7r' } },
+
+    killing_l7r        => { enter       => '_kill_l7r',
+                            transitions => { _on_kill_l7r_done         => 'deleting_user_cmd',
+                                             _on_kill_l7r_error        => 'searching_dead_l7r' } },
+
+    deleting_user_cmd  => { enter       => '_delete_user_cmd',
+                            transitions => { _on_delete_user_cmd_done   => 'searching_dead_l7r',
+                                             _on_delete_user_cmd_error  => 'searching_dead_l7r' } },
+
     searching_dead_l7r => { enter       => '_search_dead_l7r',
                             transitions => { _on_search_dead_l7r_done  => 'cleaning_dead_l7r',
                                              _on_search_dead_l7r_error => 'delaying' } },
+
     cleaning_dead_l7r  => { enter       => '_clean_dead_l7r',
                             transitions => { _on_clean_dead_l7r_done   => 'delaying',
                                              _on_clean_dead_l7r_error  => 'delaying' } },
+
     delaying           => { enter       => '_set_timer',
                             leave       => '_abort_all',
                             transitions => { _on_timeout               => 'getting_user_cmd',
                                              on_hkd_stop               => 'stopped'           } },
+
     stopped            => { enter       => '_on_stopped'  },
 
     __any__            => { delay       => ['on_hkd_stop'] };
@@ -37,13 +51,13 @@ use QVD::StateMachine::Declarative
 
 sub _get_user_cmd {
     my $self = shift;
+    delete $self->{_vm_to_be_disconnected};
     $self->_query_1(<<'EOQ', $self->{node_id});
-select vm_id, vm_address, vm_vma_port
+select vm_id, vm_state, vm_address, vm_vma_port, l7r_pid
   from vm_runtimes
   where l7r_host=$1
     and user_state='connected'
     and user_cmd='abort'
-    and vm_state='running'
   limit 1
 EOQ
 }
@@ -51,29 +65,69 @@ EOQ
 sub _on_get_user_cmd_result {
     my ($self, $res) = @_;
     if ($res->rows) {
-        my ($vm_id, $ip, $port) = $res->row;
-        $self->{_vm_to_be_disconnected} = { vm_id => $vm_id, ip => $ip, vma_port => $port };
+        my %row;
+        @row{qw(vm_id state ip vma_port l7r_pid)} = $res->row;
+        INFO "User cmd 'abort' received for VM $row{vm_id}";
+        $self->{_vm_to_be_disconnected} = \%row;
     }
 }
 
 sub _disconnect_user {
     my $self = shift;
     if (my $vm = $self->{_vm_to_be_disconnected}) {
-        $self->{rpc_service} = sprintf "http://%s:%d/vma", $vm->{ip}, $vm->{vma_port};
-        $debug and $self->_debug("sending 'x_suspend' RPC to VM $vm->{vm_id} VMA");
-        $self->_rpc('x_suspend');
-        delete $self->{_vm_to_be_disconnected}
+        if ($vm->{vm_state} eq 'running') {
+            INFO "Sending x_suspend request to VM $vm->{vm_id}";
+            $self->{rpc_service} = sprintf "http://%s:%d/vma", $vm->{ip}, $vm->{vma_port};
+            $debug and $self->_debug("sending 'x_suspend' RPC to VM $vm->{vm_id} VMA");
+            return $self->_rpc('x_suspend');
+        }
     }
     else {
-        $self->_on_disconnect_user_done
+        ERROR "Internal error: $self->_disconnect_user called without _vm_to_be_disconnected set";
     }
+    $self->_on_disconnect_user_error
 }
 
-sub _on_rpc_x_suspend_result { shift->{actions_done}++ }
+sub _on_rpc_x_suspend_result { }
+sub _on_rpc_x_suspend_done  { shift->_on_disconnect_user_done  }
+sub _on_rpc_x_suspend_error { shift->_on_disconnect_user_error }
 
-sub _on_rpc_x_suspend_done  { shift->_on_disconnect_user_done }
-sub _on_rpc_x_suspend_error { shift->_on_disconnect_user_done }
+sub _kill_l7r {
+    my $self = shift;
+    if (my $vm = $self->{_vm_to_be_disconnected}) {
+        if ($vm->{l7r_pid}) {
+            if (kill TERM => $vm->{l7r_pid}) {
+                INFO "L7R process $vm->{l7r_pid} for VM $vm->{vm_id} killed";
+                return $self->_on_kill_l7r_done;
+            }
+            else {
+                ERROR "Unable to kill L7R process $vm->{l7r_pid} for VM $vm->{vm_id}: $!";
+            }
+        }
+        else {
+            ERROR "Internal error: $self->_kill_l7r called but l7r_pid is unknown";
+        }
+    }
+    else {
+        ERROR "Internal error: $self->_kill_l7r called without _vm_to_be_disconnected set";
+    }
+    $self->_on_kill_l7r_error;
+}
 
+sub _delete_user_cmd {
+    my $self = shift;
+    $self->{_actions_done}++;
+    if (my $vm = $self->{_vm_to_be_disconnected}) {
+        $self->_query_1(<<'EOQ', @{$vm}{qw(vm_id)});
+update user_cmd=NULL
+  from vm_runtimes
+  where vm_id=$1
+EOQ
+        return;
+    }
+    ERROR "Internal error: $self->_delete_user_cmd called without _vm_to_be_disconnected set";
+    $self->_on_delete_user_cmd_error;
+}
 
 sub _search_dead_l7r {
     my $self = shift;
@@ -107,7 +161,7 @@ sub _clean_dead_l7r {
     my $self = shift;
     my $vm_id = delete $self->{_dead_l7r_vm_id};
     if (defined $vm_id) {
-        INFO "clearing L7R data for VM $vm_id running here, in host $self->{node_id}";
+        INFO "cleaning L7R data for VM $vm_id running here, in host $self->{node_id}";
         $self->_query_1(<<'EOQ', $vm_id, $self->{node_id}),
 update vm_runtimes
   set (user_state, user_cmd, l7r_host, l7r_pid) = ('disconnected', NULL, NULL, NULL)
