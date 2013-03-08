@@ -3,9 +3,24 @@
 use strict;
 use warnings;
 
-use Getopt::Long;
+use File::Spec;
+
+BEGIN {
+    my $WINDOWS = ($^O eq 'MSWin32');
+
+    my $user_dir = File::Spec->rel2abs($WINDOWS
+                                    ? File::Spec->join($ENV{APPDATA}, 'QVD')
+                                    : File::Spec->join((getpwuid $>)[7] // $ENV{HOME}, '.qvd'));
+    mkdir($user_dir);
+
+    my $user_config_filename = File::Spec->join($user_dir, 'client.conf');
+    $QVD::Config::USE_DB = 0;
+    @QVD::Config::Core::FILES = ( ($WINDOWS ? () : ('/etc/qvd/client.conf')),
+                                  $user_config_filename );
+}
 
 use QVD::Client::SlaveClient;
+use Getopt::Long;
 
 my $help = '';
 my $host = 'localhost';
