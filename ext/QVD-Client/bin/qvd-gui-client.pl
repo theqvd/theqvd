@@ -59,15 +59,15 @@ BEGIN {
 
 use QVD::Log;
 
-DEBUG "user_dir: $user_dir";
-DEBUG "app_dir: $app_dir";
+INFO "user_dir: $user_dir";
+INFO "app_dir: $app_dir";
 
 $user_certs_dir = File::Spec->rel2abs(core_cfg('path.ssl.ca.personal'), $user_dir);
-DEBUG "user_certs_dir: $user_certs_dir";
+INFO "user_certs_dir: $user_certs_dir";
 
 $pixmaps_dir = File::Spec->rel2abs(core_cfg('path.client.pixmaps'), $app_dir);
 $pixmaps_dir = File::Spec->rel2abs(core_cfg('path.client.pixmaps.alt'), $app_dir) unless -d $pixmaps_dir;
-DEBUG "pixmaps_dir: $pixmaps_dir";
+INFO "pixmaps_dir: $pixmaps_dir";
 
 
 #$SIG{__DIE__} = sub { ERROR "@_"; die (@_) };

@@ -96,13 +96,16 @@ command.btrfs = /sbin/btrfs
 command.windows.xming = Xming\\Xming.exe
 command.windows.pulseaudio = pulseaudio\\pulseaudio.exe
 command.windows.nxproxy = nx\\nxproxy.exe
+command.windows.sftp-server = bin/sftp-server.exe
 
 command.nxagent.args.extra =
 command.x-session.args.extra =
+command.sftp-server = /usr/lib/openssh/sftp-server
 
 command.darwin.x11 = XQuartz.app
 command.darwin.nxproxy = bin/nxproxy
 command.darwin.pulseaudio = bin/pulseaudio
+command.darwin.sftp-server = /usr/libexec/sftp-server
 
 ## whether to remember password after successful connection
 client.remember_password = 0
@@ -129,6 +132,7 @@ client.use_ssl = 1
 client.ssl.use_cert = 0
 ## slave shell
 client.slave.command =
+client.slave.client = bin/qvd-slaveclient
 ## enable making slave connections to VM
 client.slave.enable = 1
 

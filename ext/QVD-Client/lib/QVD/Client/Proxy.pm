@@ -305,7 +305,7 @@ sub _run {
     }
 
     @o{ keys %{$self->{extra}} } = values %{$self->{extra}};
-    $o{slave} = 1 if core_cfg('client.slave.enable', 1);
+    $o{slave} = 1 if (core_cfg('client.slave.enable', 1));
 
     my @cmd;
     if ( $WINDOWS ) {
@@ -379,8 +379,8 @@ sub _run {
 
     my $slave_client_proc;
     # TODO Add Windows/Mac support, make configurable
-    if ($LINUX && core_cfg('client.slave.enable', 1)) {
-        my $slave_client_cmd = '/usr/lib/qvd/bin/qvd-slaveclient';
+    if (core_cfg('client.slave.enable', 1)) {
+        my $slave_client_cmd = core_cfg('client.slave.client');
         my @sc = ($slave_client_cmd, share => $ENV{HOME});
         DEBUG("Starting folder sharing: @sc");
         if ($slave_client_proc = Proc::Background->new(@sc)) {
