@@ -306,8 +306,6 @@ use QVD::StateMachine::Declarative
                                                                on_hkd_stop
                                                                on_hkd_kill )],                                                 };
 
-
-
 sub _on_cmd_start :OnState('__any__') { shift->_maybe_callback('on_delete_cmd') }
 
 
