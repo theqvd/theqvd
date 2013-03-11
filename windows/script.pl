@@ -7,7 +7,7 @@ use 5.010;
 my ($revision) = `svn info .` =~ /^Revision:\s*(\d+)/m;
 
 my %pl = ( me       => $0,
-		   version  => '3.1.1',
+		   version  => '3.1.2',
 		   revision => $revision );
 
 while (<DATA>) {
@@ -48,18 +48,19 @@ Name: "english"; MessagesFile: "compiler:Default.isl"
 Name: "desktopicon"; Description: "{cm:CreateDesktopIcon}"; GroupDescription: "{cm:AdditionalIcons}"; Flags: unchecked
 
 [Files]
+Source: "installer\bin\*"; DestDir: "{app}\bin"; Flags: ignoreversion recursesubdirs createallsubdirs
 Source: "installer\NX\*"; DestDir: "{app}\NX"; Flags: ignoreversion recursesubdirs createallsubdirs
 Source: "installer\pulseaudio\*"; DestDir: "{app}\pulseaudio"; Flags: ignoreversion recursesubdirs createallsubdirs
 ;Source: "installer\system32\*"; DestDir: "{app}"; Flags: ignoreversion recursesubdirs createallsubdirs
 Source: "installer\Xming\*"; DestDir: "{app}\Xming"; Flags: ignoreversion recursesubdirs createallsubdirs
 Source: "installer\pixmaps\*"; DestDir: "{app}\pixmaps"; Flags: ignoreversion recursesubdirs createallsubdirs
-Source: "installer\qvd-client.exe"; DestDir: "{app}"; Flags: ignoreversion
+Source: "installer\qvd-client.exe"; DestDir: "{app}\bin"; Flags: ignoreversion
 ; Source: "c:\Strawberry\perl\bin\libstdc++-6.dll"; DestDir: "{app}"; Flags: ignoreversion
 ; NOTE: Don't use "Flags: ignoreversion" on any shared system files
 
 [Icons]
-Name: "{group}\QVD Client"; Filename: "{app}\qvd-client.exe"; WorkingDir: "{app}"
-Name: "{commondesktop}\QVD Client"; Filename: "{app}\qvd-client.exe"; WorkingDir: "{app}"; Tasks: desktopicon
+Name: "{group}\QVD Client"; Filename: "{app}\bin\qvd-client.exe"; WorkingDir: "{app}"
+Name: "{commondesktop}\QVD Client"; Filename: "{app}\bin\qvd-client.exe"; WorkingDir: "{app}"; Tasks: desktopicon
 
 [Registry]
 ; Make LanmanServer accept 127.0.0.1 as its netbios name 

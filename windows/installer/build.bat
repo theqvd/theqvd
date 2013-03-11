@@ -29,6 +29,16 @@ call pp -x -gui ^
 reshacker -addoverwrite qvd-client-1.exe, qvd-client.exe, pixmaps\qvd.ico,icongroup,WINEXE,
 del qvd-client-1.exe
 
+call pp -x ^
+-I ..\..\ext\QVD-Config\lib ^
+-I ..\..\ext\QVD-Config-Core\lib ^
+-I ..\..\ext\QVD-Client-SlaveClient\lib ^
+-I ..\..\ext\QVD-HTTP\lib\ ^
+-I ..\..\ext\QVD-HTTPC\lib ^
+-I ..\..\ext\QVD-Log\lib ^
+-o bin\qvd-slaveclient.exe ^
+..\..\ext\QVD-Client-SlaveClient\bin\qvd-slaveclient
+
 del ..\Output\*.* /q
 perl ..\script.pl >..\script.iss
 ISCC.exe ..\script.iss

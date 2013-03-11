@@ -28,6 +28,8 @@ use QVD::HTTPC;
 use QVD::HTTP::StatusCodes qw(:status_codes);
 use JSON qw(decode_json);
 use feature 'switch';
+use POSIX qw(dup2);
+use IPC::Open3 qw(open3);
 
 my $command_sftp_server = core_cfg('command.sftp-server');
 if ($WINDOWS) {
@@ -77,14 +79,26 @@ sub handle_share {
         die "Server replied $code $msg $data";
     }
 
-    open STDIN, '<&', $self->{httpc}->{socket} or die "Unable to dup stdin: $^E";
-    open STDOUT, '>&', $self->{httpc}->{socket} or die "Unable to dup stdout: $^E";
+    #open STDIN, '<&', $self->{httpc}->{socket} or die "Unable to dup stdin: $^E";
+    #open STDOUT, '>&', $self->{httpc}->{socket} or die "Unable to dup stdout: $^E";
+    #dup2(fileno($self->{httpc}->{socket}), fileno(STDIN)) or die "Unable to dup stdin: $^E";
+    #dup2(fileno($self->{httpc}->{socket}), fileno(STDOUT)) or die "Unable to dup stdin: $^E";
 
-    close $self->{httpc}->{socket};
+    #close $self->{httpc}->{socket};
 
-    chdir $path or die "Unable to chdir to $path: $^E";
-    exec($command_sftp_server, $command_sftp_server)
-        or die "Unable to exec $command_sftp_server: $^E";
+    if ($WINDOWS) {
+        chdir $path or die "Unable to chdir to $path: $^E";
+        my $pid = open3(
+		'>&'.$self->{httpc}->{socket}->fileno, 
+		'<&'.$self->{httpc}->{socket}->fileno, 
+		'<&'.fileno(STDERR), 
+		$command_sftp_server, "-e");
+        waitpid $pid, 0;
+    } else {
+        chdir $path or die "Unable to chdir to $path: $^E";
+        exec($command_sftp_server, '-e')
+            or die "Unable to exec $command_sftp_server: $^E";
+    }
 }
 
 sub handle_usage {
