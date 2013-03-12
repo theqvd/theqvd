@@ -15,7 +15,6 @@ use parent qw(QVD::HKD::Agent);
 use QVD::StateMachine::Declarative
     new              => { transitions => { _on_run                 => 'long_delaying'     } },
 
-
     # mark nodes that have not touched the database for too long as lost:
     killing_hosts    => { enter       => '_kill_hosts',
                           transitions => { _on_kill_hosts_done     => 'unassigning_vms',
