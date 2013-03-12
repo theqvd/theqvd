@@ -323,6 +323,7 @@ internal.l7r.short_session = 120
 
 # internal.hkd.perl.anyevent.backend = EV
 
+# this value should ba adjusted in accordance to internal.database.pool.connection.global_timeout
 internal.hkd.cluster.node.timeout = 500
 
 internal.vm.port.x = 5000
@@ -353,9 +354,10 @@ internal.database.client.socket.keepintvl = 5
 internal.database.client.socket.keepcnt = 4
 
 internal.database.pool.connection.timeout = 10
+internal.database.pool.connection.global_timeout = 400
 internal.database.pool.size = 2
 internal.database.pool.connection.delay = 10
-internal.database.pool.connection.retries = 18
+internal.database.pool.connection.retries = 100
 
 internal.hkd.stopping.vms.timeout = 300
 internal.hkd.killing.vms.retry.timeout = 100
