@@ -13,29 +13,33 @@ use QVD::HKD::Helpers;
 use parent qw(QVD::HKD::Agent);
 
 use QVD::StateMachine::Declarative
-    new           => { transitions => { _on_run               => 'long_delaying'    } },
+    new              => { transitions => { _on_run                 => 'long_delaying'     } },
 
-    killing_hosts => { enter       => '_kill_hosts',
-                       transitions => { _on_kill_hosts_done   => 'stopping_vms',
-                                        _on_kill_hosts_error  => 'stopping_vms'     } },
+    killing_hosts    => { enter       => '_kill_hosts',
+                          transitions => { _on_kill_hosts_done     => 'unassigning_vms',
+                                           _on_kill_hosts_error    => 'unassigning_vms'   } },
 
-    stopping_vms  => { enter       => '_stop_vms',
-                       transitions => { _on_stop_vms_done     => 'delaying',
-                                        _on_stop_vms_error    => 'delaying',        } },
+    unassigning_vms  => { enter       => '_unassign_vms',
+                          transitions => { _on_unassign_vms_done   => 'unassigning_l7rs',
+                                           _on_unassign_vms_error  => 'unassigning_l7rs'  } },
 
-    delaying      => { enter       => '_set_timer',
-                       transitions => { _on_timeout           => 'killing_hosts',
-                                        on_hkd_stop           => 'stopped',         } },
+    unassigning_l7rs => { enter       => '_unassign_l7rs',
+                          transitions => { _on_unassign_l7rs_done  => 'delaying',
+                                           _on_unassign_l7rs_error => 'delaying'          } },
 
-    long_delaying => { enter       => '_set_timer',
-                       transitions => { _on_timeout           => 'killing_hosts',
-                                        on_hkd_stop           => 'stopped',         } },
+    delaying         => { enter       => '_set_timer',
+                          transitions => { _on_timeout             => 'killing_hosts',
+                                           on_hkd_stop             => 'stopped',          } },
 
-    stopped       => { enter       => '_on_stopped'                                 },
+    long_delaying    => { enter       => '_set_timer',
+                          transitions => { _on_timeout             => 'killing_hosts',
+                                           on_hkd_stop             => 'stopped'           } },
 
-    __any__       => { delay       => [qw(on_hkd_stop )],
-                       transitions => { on_transient_db_error => 'long_delaying' },
-                       leave       => '_abort_all'                                  };
+    stopped          => { enter       => '_on_stopped'                                      },
+
+    __any__          => { delay_once  => [qw(on_hkd_stop )],
+                          transitions => { on_transient_db_error   => 'long_delaying'     },
+                          leave       => '_abort_all'                                       };
 
 sub new {
     my ($class, %opts) = @_;
@@ -71,12 +75,20 @@ sub _on_kill_hosts_result {
     }
 }
 
-sub _stop_vms {
+sub _unassign_vms {
     my ($self) = @_;
     $self->_query(<<EOQ);
 update vm_runtimes
-    set vm_state = 'stopped',
-        host_id  = NULL
+    set vm_state       = 'stopped',
+        host_id        = NULL,
+        vm_vma_port    = NULL,
+        vm_x_port      = NULL,
+        vm_vnc_port    = NULL,
+        vm_ssh_port    = NULL,
+        vm_serial_port = NULL,
+        vm_mon_port    = NULL,
+        vm_address     = NULL,
+        vma_ok_ts      = NULL
     from host_runtimes
     where vm_state != 'stopped'
       and host_runtimes.host_id = vm_runtimes.host_id
@@ -85,11 +97,35 @@ update vm_runtimes
 EOQ
 }
 
-sub _on_stop_vms_result {
+sub _on_unassign_vms_result {
     my ($self, $res) = @_;
     if ($res->status == PGRES_COMMAND_OK and $res->cmdRows) {
         my @vms = $res->column(0);
-        INFO "Succesfully recovered ".$res->cmdRows." in hosts marked as lost: @vms";
+        INFO "Succesfully recovered ".$res->cmdRows." VMs in hosts marked as lost: @vms";
+    }
+}
+
+sub _unassign_l7rs {
+    my ($self) = @_;
+    $self->_query(<<EOQ);
+update vm_runtimes
+    set user_state = 'disconnected',
+        user_cmd = NULL,
+        l7r_host = NULL,
+        l7r_pid  = NULL
+   from host_runtimes
+   where user_state != 'disconnected'
+     and host_runtimes.host_id = vm_runtimes.l7r_host
+     and host_runtimes.state = 'lost'
+   returning vm_id
+EOQ
+}
+
+sub _on_unassign_l7rs_result {
+    my ($self, $res) = @_;
+    if ($res->status == PGRES_COMMAND_OK and $res->cmdRows) {
+        my @vms = $res->column(0);
+        INFO "Succesfully recovered ".$res->cmdRows." L7Rs in hosts marked as lost: @vms";
     }
 }
 
