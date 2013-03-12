@@ -15,17 +15,26 @@ use parent qw(QVD::HKD::Agent);
 use QVD::StateMachine::Declarative
     new              => { transitions => { _on_run                 => 'long_delaying'     } },
 
+
+    # mark nodes that have not touched the database for too long as lost:
     killing_hosts    => { enter       => '_kill_hosts',
                           transitions => { _on_kill_hosts_done     => 'unassigning_vms',
                                            _on_kill_hosts_error    => 'unassigning_vms'   } },
 
+    # unassign VMs on nodes marked as lost
     unassigning_vms  => { enter       => '_unassign_vms',
                           transitions => { _on_unassign_vms_done   => 'unassigning_l7rs',
                                            _on_unassign_vms_error  => 'unassigning_l7rs'  } },
 
+    # unassign L7R processes running in nodes marked as lost
     unassigning_l7rs => { enter       => '_unassign_l7rs',
-                          transitions => { _on_unassign_l7rs_done  => 'delaying',
-                                           _on_unassign_l7rs_error => 'delaying'          } },
+                          transitions => { _on_unassign_l7rs_done  => 'aborting_l7rs',
+                                           _on_unassign_l7rs_error => 'aborting_l7rs'     } },
+
+    # abort L7R processes corresponding to machines that are not running
+    aborting_l7rs    => { enter       => '_abort_l7rs',
+                          transitions => { _on_abort_l7rs_done     => 'delaying',
+                                           _on_abort_l7rs_error    => 'delaying'          } },
 
     delaying         => { enter       => '_set_timer',
                           transitions => { _on_timeout             => 'killing_hosts',
@@ -126,6 +135,25 @@ sub _on_unassign_l7rs_result {
     if ($res->status == PGRES_COMMAND_OK and $res->cmdRows) {
         my @vms = $res->column(0);
         INFO "Succesfully recovered ".$res->cmdRows." L7Rs in hosts marked as lost: @vms";
+    }
+}
+
+sub _abort_l7rs {
+    my ($self) = @_;
+    $self->_query(<<EOQ);
+update vm_runtimes
+    set user_cmd = 'abort',
+    where user_state = 'connected'
+      and vm_state   = 'stopped'
+    returning vm_id
+EOQ
+}
+
+sub _on_abort_l7rs_result {
+    my ($self, $res) = @_;
+    if ($res->status == PGRES_COMMAND_OK and $res->cmdRows) {
+        my @vms = $res->column(0);
+        INFO "Aborting ".$res->cmdRows." L7Rs processes for VMs not running: @vms";
     }
 }
 
