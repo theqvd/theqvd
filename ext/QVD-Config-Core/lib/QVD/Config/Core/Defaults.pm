@@ -367,9 +367,9 @@ internal.hkd.agent.ticker.retries = 2
 internal.hkd.agent.command_handler.delay = 60
 internal.hkd.agent.vm_command_handler.delay = 61
 
-internal.hkd.agent.cluster_monitor.delay = 180
+internal.hkd.agent.cluster_monitor.delay = 120
 internal.hkd.agent.cluster_monitor.long_delay = 600
-internal.hkd.agent.cluster_monitor.fuzzy_delay = 60
+internal.hkd.agent.cluster_monitor.fuzzy_delay = 30
 
 internal.hkd.agent.rpc.retry.count = 3
 internal.hkd.agent.rpc.retry.delay = 5

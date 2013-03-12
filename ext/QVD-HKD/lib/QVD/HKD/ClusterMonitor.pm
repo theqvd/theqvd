@@ -40,6 +40,7 @@ use QVD::StateMachine::Declarative
                           transitions => { _on_timeout             => 'killing_hosts',
                                            on_hkd_stop             => 'stopped',          } },
 
+    # don't do anything for a while if we have had problems connecting to the database
     long_delaying    => { enter       => '_set_timer',
                           transitions => { _on_timeout             => 'killing_hosts',
                                            on_hkd_stop             => 'stopped'           } },
