@@ -16,12 +16,8 @@ use QVD::StateMachine::Declarative
     new                => { transitions => { _on_run => 'getting_user_cmd' }},
 
     getting_user_cmd   => { enter       => '_get_user_cmd',
-                            transitions => { _on_get_user_cmd_done     => 'disconnecting_user',
+                            transitions => { _on_get_user_cmd_done     => 'killing_l7r',
                                              _on_get_user_cmd_error    => 'searching_dead_l7r' } },
-
-    disconnecting_user => { enter       => '_disconnect_user',
-                            transitions => { _on_disconnect_user_done  => 'deleting_user_cmd',
-                                             _on_disconnect_user_error => 'killing_l7r' } },
 
     killing_l7r        => { enter       => '_kill_l7r',
                             transitions => { _on_kill_l7r_done         => 'deleting_user_cmd',
@@ -71,26 +67,6 @@ sub _on_get_user_cmd_result {
         $self->{_vm_to_be_disconnected} = \%row;
     }
 }
-
-sub _disconnect_user {
-    my $self = shift;
-    if (my $vm = $self->{_vm_to_be_disconnected}) {
-        if ($vm->{vm_state} eq 'running') {
-            INFO "Sending x_suspend request to VM $vm->{vm_id}";
-            $self->{rpc_service} = sprintf "http://%s:%d/vma", $vm->{ip}, $vm->{vma_port};
-            $debug and $self->_debug("sending 'x_suspend' RPC to VM $vm->{vm_id} VMA");
-            return $self->_rpc('x_suspend');
-        }
-    }
-    else {
-        ERROR "Internal error: $self->_disconnect_user called without _vm_to_be_disconnected set";
-    }
-    $self->_on_disconnect_user_error
-}
-
-sub _on_rpc_x_suspend_result { }
-sub _on_rpc_x_suspend_done  { shift->_on_disconnect_user_done  }
-sub _on_rpc_x_suspend_error { shift->_on_disconnect_user_error }
 
 sub _kill_l7r {
     my $self = shift;
