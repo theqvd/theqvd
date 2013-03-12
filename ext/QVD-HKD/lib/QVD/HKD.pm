@@ -57,7 +57,8 @@ use QVD::StateMachine::Declarative
 
     'starting/loading_db_config'     => { enter       => '_start_config',
                                           transitions => { _on_config_reload_done     => 'starting/loading_host_row',
-                                                           _on_config_reload_error    => 'failed'                         } },
+                                                           _on_config_reload_error    => 'failed',
+                                                           _on_dead_db                => 'failed'                         } },
 
     'starting/loading_host_row'      => { enter       => '_load_host_row',
                                           transitions => { _on_load_host_row_done     => 'starting/saving_state',
