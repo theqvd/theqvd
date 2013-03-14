@@ -447,6 +447,7 @@ sub _untar_os_image {
                 -C => $tmp );
     push @cmd, '-z' if $image_path =~ /\.(?:tgz|gz)$/;
     push @cmd, '-j' if $image_path =~ /\.(?:tbz|bz2)$/;
+    push @cmd, '-J' if $image_path =~ /\.(?:txz|xz)$/;
 
     $self->_run_cmd(\@cmd);
 }
