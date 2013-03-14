@@ -714,6 +714,8 @@ sub _create_lxc {
     my $iface = $self->{iface};
     DEBUG "Local endpoint of the network device, connected to the bridge '$bridge': '$iface'";
 
+    my $lxc_version = $self->_cfg('command.version.lxc');
+
     # FIXME: make this template-able or configurable in some way
     print $fh <<EOC;
 lxc.utsname=$self->{name}
@@ -768,16 +770,21 @@ EOC
         print $fh <<EOC;
 lxc.network.ipv4 = $self->{ip}/$self->{netmask_len}
 EOC
-# Linea comentada ver ticket #948 esperar a que se empaquete lxc 0.8 
-#lxc.network.ipv4.gateway = $self->{gateway}
+        if ($lxc_version >= 0.8) {
+            print $fh <<EOC;
+lxc.network.ipv4.gateway = $self->{gateway}
+EOC
+        }
     }
 
     print $fh, $self->_cfg('internal.vm.lxc.conf.extra'), "\n";
-
     close $fh;
+
     $self->_run_cmd([$self->_cfg('command.lxc-create'),
                      -n => $lxc_name,
-                     -f => $fn]);
+                     -f => $fn,
+                     ($lxc_version >= 0.9 ? (-B => 'dir') : ())
+                     ]);
 }
 
 sub _configure_lxc {
