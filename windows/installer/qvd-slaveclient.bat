@@ -8,4 +8,4 @@ perl ^
 -I ..\..\ext\QVD-HTTPC\lib ^
 -I ..\..\ext\QVD-Log\lib ^
 -I ..\..\ext\QVD-URI\lib ^
-..\..\ext\QVD-Client-SlaveClient\bin\qvd-slaveclient share "%USERPROFILE%"
+..\..\ext\QVD-Client-SlaveClient\bin\qvd-slaveclient %*
