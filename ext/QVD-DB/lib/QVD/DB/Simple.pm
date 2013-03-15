@@ -46,7 +46,7 @@ sub this_host {
     unless (defined $this_host) {
 	my $msg = "This node '$nodename' is not registered in the database";
 	ERROR $msg;
-	die "$msg\n";
+	return;
     }
     $this_host;
 }
