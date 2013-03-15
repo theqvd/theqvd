@@ -142,7 +142,7 @@ sub _abort_l7rs {
     my ($self) = @_;
     $self->_query(<<EOQ);
 update vm_runtimes
-    set user_cmd = 'abort',
+    set user_cmd = 'abort'
     where user_state = 'connected'
       and vm_state   = 'stopped'
     returning vm_id
