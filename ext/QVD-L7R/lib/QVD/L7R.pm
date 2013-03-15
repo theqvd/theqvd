@@ -231,7 +231,6 @@ sub _authenticate_user {
     my ($l7r, $headers) = @_;
     my $this_host = this_host; $this_host // $l7r->throw_http_error(HTTP_SERVICE_UNAVAILABLE, 'Host is not registered in the database');
     if (my ($credentials) = header_lookup($headers, 'Authorization')) {
-        $l7r->{_auth_tried}++ or this_host->counters->incr_auth_attempts;
         if (my ($basic) = $credentials =~ /^Basic (.*)$/) {
             if (my ($user, $passwd) = decode_base64($basic) =~ /^([^:]+):(.*)$/) {
 		my $auth = $l7r->{_auth};
@@ -242,10 +241,10 @@ sub _authenticate_user {
                 $auth = QVD::L7R::Authenticator->new;
 		$this_host->counters->incr_auth_attempts;
                 if ($auth->authenticate_basic($user, $passwd, $l7r)) {
-                    INFO "Accepted connection from user $user from ip:port ".
-                        $l7r->{server}->{client}->peerhost().":".$l7r->{server}->{client}->peerport();
+		    INFO "Accepted connection from user $user from ip:port ".
+			$l7r->{server}->{client}->peerhost().":".$l7r->{server}->{client}->peerport();
 		    $l7r->{_auth} = $auth;
-                    this_host->counters->incr_auth_ok;
+		    $this_host->counters->incr_auth_ok;
                     return $auth;
                 }
                 INFO "Failed login attempt from user $user";
