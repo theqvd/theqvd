@@ -28,10 +28,6 @@ use QVD::HTTPC;
 use QVD::HTTP::StatusCodes qw(:status_codes);
 use JSON qw(decode_json);
 use feature 'switch';
-use POSIX qw(dup2);
-use IPC::Open3 qw(open3);
-use Win32::API;
-#use Net::SFTP::Server::FS;
 
 my $command_sftp_server = core_cfg('command.sftp-server');
 if ($WINDOWS) {
@@ -81,20 +77,11 @@ sub handle_share {
         die "Server replied $code $msg $data";
     }
 
-    #open STDIN, '<&', $self->{httpc}->{socket} or die "Unable to dup stdin: $^E";
-    #open STDOUT, '>&', $self->{httpc}->{socket} or die "Unable to dup stdout: $^E";
-    #dup2(fileno($self->{httpc}->{socket}), fileno(STDIN)) or die "Unable to dup stdin: $^E";
-    #dup2(fileno($self->{httpc}->{socket}), fileno(STDOUT)) or die "Unable to dup stdin: $^E";
-
-    #close $self->{httpc}->{socket};
 
     if ($WINDOWS) {
- 	  print "** Windows OS detected\n";
-	  $self->_do_windows($path);
+        $self->_handle_share_windows($path);
     } else {
-        chdir $path or die "Unable to chdir to $path: $^E";
-        exec($command_sftp_server, '-e')
-            or die "Unable to exec $command_sftp_server: $^E";
+        $self->_handle_share_unix($path);
     }
 }
 
@@ -103,74 +90,83 @@ sub handle_usage {
     print "** Write usage doc!\n";
 }
 
-sub _do_windows {
-my ($self, $path) = @_;
-require Win32::API;
-require Win32::Process;
-use Win32API::File qw(FdGetOsFHandle WriteFile);
+sub _handle_share_unix {
+    my ($self, $path) = @_;
 
-        Win32::API->Import(kernel32 => 'HANDLE WINAPI CreateNamedPipe(
-	        LPCTSTR lpName,
-	        DWORD dwOpenMode,
-	        DWORD dwPipeMode,
-	        DWORD nMaxInstances,
-	        DWORD nOutBufferSize,
-	        DWORD nInBufferSize,
-	        DWORD nDefaultTimeOut,
-	        LPSTR lpSecurityAttributes
-	  )') or die "Unable to import CreatedNamedPipe";
+    open STDIN, '<&', $self->{httpc}->{socket} or die "Unable to dup stdin: $^E";
+    open STDOUT, '>&', $self->{httpc}->{socket} or die "Unable to dup stdout: $^E";
+    close $self->{httpc}->{socket};
 
-Win32::API->Import(kernel32 => 'BOOL WINAPI ConnectNamedPipe(HANDLE hNamedPipe, LPSTR lpOverlapped)')
-	or die "Unable to import ConnectNamedPipe";
-
-Win32::API->Import(ws2_32 => 'int WSAGetLastError()')
-	or die "Unable to import WSAGetLastError";
-
-Win32::API->Import(ws2_32 => 'int WSADuplicateSocket(HANDLE s, DWORD dwProcessId, LPSTR lpProtocolInfo)')
-	or die "Unable to import WSADuplicateSocket";
-	  
-# Create pipe
-print "** Creating named pipe...\n";
-my $pipe = CreateNamedPipe("//./PIPE/qvd:sftp-server", 0x3, 0x4, 2, 512, 512, 0, undef);
-
-# Start child
-print "** Creating child process...\n";
-my $child;
-Win32::Process::Create($child, 
-	$command_sftp_server, 
-	"sftp-server.exe -e -l DEBUG",
-	1, # inherit handles
-	CREATE_NO_WINDOW, # creation flags
-	$path);
-
-# Duplicate socket
-print "** Duplicating socket...\n";
-my $lpProtocolInfo = "\0"x400; # Apparently WSAPROTOCOL_INFO is 372 bytes long
-print unpack('H*', $lpProtocolInfo), "\n";
-my $handle = FdGetOsFHandle(fileno($self->{httpc}->{socket}));
-print $handle,"\n";
-if (WSADuplicateSocket($handle, $child->GetProcessID(), $lpProtocolInfo)) {
-	die "Unable to duplicate socket, $ret, : ".WSAGetLastError();
+    chdir $path or die "Unable to chdir to $path: $^E";
+    exec($command_sftp_server, '-e')
+        or die "Unable to exec $command_sftp_server: $^E";
 }
-print unpack('H*', $lpProtocolInfo), "\n";
 
-# Connect to pipe
-print "** Connecting to pipe...\n";
-ConnectNamedPipe($pipe, undef)
-	or die "Unable to connect to pipe: $^E";
+sub _handle_share_windows {
+    my ($self, $path) = @_;
 
-# Send "protocol info" to child
-print "** Sending protocol info to child...\n";
-my $written;
-WriteFile($pipe, $lpProtocolInfo, 372, $written, [])
-	or die "Unable to write to pipe: $^E";
-print "** Wrote $written bytes to the pipe...\n";
+    use Win32::API;
+    use Win32::Process;
+    use Win32API::File qw(FdGetOsFHandle WriteFile);
 
-# Wait for child
-print "** Waiting for child...\n";
-$child->Wait(INFINITE);
-print "** Finished.\n";
+    Win32::API->Import(kernel32 => 'HANDLE WINAPI CreateNamedPipe(
+        LPCTSTR lpName,
+        DWORD dwOpenMode,
+        DWORD dwPipeMode,
+        DWORD nMaxInstances,
+        DWORD nOutBufferSize,
+        DWORD nInBufferSize,
+        DWORD nDefaultTimeOut,
+        LPSTR lpSecurityAttributes
+        )') or die "Unable to import CreatedNamedPipe";
 
+    Win32::API->Import(kernel32 => 'BOOL WINAPI ConnectNamedPipe(HANDLE hNamedPipe, LPSTR lpOverlapped)')
+        or die "Unable to import ConnectNamedPipe";
+
+    Win32::API->Import(ws2_32 => 'int WSAGetLastError()')
+        or die "Unable to import WSAGetLastError";
+
+    Win32::API->Import(ws2_32 => 'int WSADuplicateSocket(HANDLE s, DWORD dwProcessId, LPSTR lpProtocolInfo)')
+            or die "Unable to import WSADuplicateSocket";
+
+    # Create pipe
+    print "** Creating named pipe...\n";
+    my $pipe = CreateNamedPipe("//./PIPE/qvd:sftp-server", 0x3, 0x4, 2, 512, 512, 0, undef);
+
+    # Start child
+    print "** Creating child process...\n";
+    my $child;
+    Win32::Process::Create($child, 
+        $command_sftp_server, 
+        "sftp-server.exe -e -l DEBUG",
+        1,                      # inherit handles
+        CREATE_NO_WINDOW,       # creation flags
+        $path);
+
+    # Duplicate socket
+    print "** Duplicating socket...\n";
+    my $lpProtocolInfo = "\0"x400; # Apparently WSAPROTOCOL_INFO is 372 bytes long
+    my $handle = FdGetOsFHandle(fileno($self->{httpc}->{socket}));
+    if (WSADuplicateSocket($handle, $child->GetProcessID(), $lpProtocolInfo)) {
+        die "Unable to duplicate socket, $ret, : ".WSAGetLastError();
+    }
+
+    # Connect to pipe
+    print "** Connecting to pipe...\n";
+    ConnectNamedPipe($pipe, undef)
+        or die "Unable to connect to pipe: $^E";
+
+    # Send "protocol info" to child
+    print "** Sending protocol info to child...\n";
+    my $written;
+    WriteFile($pipe, $lpProtocolInfo, 372, $written, [])
+        or die "Unable to write to pipe: $^E";
+    print "** Wrote $written bytes to the pipe...\n";
+
+    # Wait for child
+    print "** Waiting for child...\n";
+    $child->Wait(INFINITE);
+    print "** Finished.\n";
 }
 
 1;
