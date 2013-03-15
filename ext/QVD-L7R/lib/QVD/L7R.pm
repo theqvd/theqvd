@@ -352,6 +352,8 @@ sub _start_and_wait_for_vm {
     if ($vm_state eq 'stopped') {
         $l7r->_tell_client("Starting virtual machine");
         $vm->send_vm_start;
+        my $host_id = $vm->host_id;
+        notify("qvd_cmd_for_vm_on_host$host_id");
     }
 
     return if $vm_state eq 'running';
