@@ -8,7 +8,7 @@ use QVD::Config::Core;
 use QVD::Log;
 
 use Exporter qw(import);
-our @EXPORT = qw(db db_release txn_do txn_eval rs this_host_id this_host);
+our @EXPORT = qw(db db_release txn_do txn_eval rs this_host_id this_host notify);
 
 my $db;
 
@@ -33,6 +33,11 @@ sub txn_eval (&) {
 
 sub rs (*) {
     ($db //= QVD::DB->new())->resultset($_[0]);
+}
+
+sub notify (*) {
+    my $channel = shift;
+    db->storage->dbh_do(sub { $_[1]->do("notify $channel") });
 }
 
 sub this_host {

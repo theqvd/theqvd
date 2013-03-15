@@ -230,9 +230,12 @@ sub cmd_config_del {
     my $rs = $self->get_resultset("config");
     my $condition = scalar @keys > 0 ? {key => \@keys} : {};
 
-    my $ci = $rs->search($condition)->count;
-    $rs->search($condition)->delete;
-    
+    my $ci;
+    txn_do {
+        $ci = $rs->search($condition)->count;
+        $rs->search($condition)->delete;
+        notify(qvd_config_changed);
+    };
     $ci;
 }
 
@@ -246,17 +249,20 @@ sub cmd_config_get {
 
 sub cmd_config_set {
     my ($self, %args) = @_;
-    my $rs = $self->get_resultset('config');
-    foreach my $key (keys %args) {
-        if ($key =~ /^l7r\.ssl\./) {
-            warn "to set SSL keys and certificates use the 'config ssl' command\n";
+    txn_do {
+        my $rs = $self->get_resultset('config');
+        foreach my $key (keys %args) {
+            if ($key =~ /^l7r\.ssl\./) {
+                warn "to set SSL keys and certificates use the 'config ssl' command\n";
+            }
+            else {
+                $rs->update_or_create({ key => $key,
+                                        value => $args{$key}
+                                      });
+                notify(qvd_config_changed);
+            }
         }
-        else {
-            $rs->update_or_create({ key => $key,
-                                    value => $args{$key}
-                                  });
-        }
-    }
+    };
 }
 
 sub cmd_config_ssl {
