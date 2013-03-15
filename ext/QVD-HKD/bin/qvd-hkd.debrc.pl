@@ -130,6 +130,7 @@ do_reload() {
 case "$1" in
   start)
 	kill_dnsmasq
+	/sbin/sysctl -w fs.inotify.max_user_instances="65000"
 	[ "$VERBOSE" != no ] && log_daemon_msg "Starting $DESC" "$NAME"
 	do_start
 	case "$?" in
