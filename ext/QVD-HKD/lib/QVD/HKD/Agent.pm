@@ -180,9 +180,12 @@ sub _query_n {
 }
 
 sub _listen {
-    my ($self, $channel) = @_;
-    my $method = "_on_${channel}_notify";
-    my $cb = sub { $self->$method };
+    my ($self, $channel, $method) = @_;
+    $method = "_on_${channel}_notify" unless defined $method;
+    my $cb = sub {
+        $debug and $self->_debug("calling method $self->$method");
+        $self->$method
+    };
     my $w = $self->_db->listen($channel,
                                on_notify           => $cb,
                                on_listener_started => $cb);

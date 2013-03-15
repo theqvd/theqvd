@@ -14,30 +14,36 @@ our $debug;
 use parent qw(QVD::HKD::Agent);
 
 use QVD::StateMachine::Declarative
-    new            => { transitions => { _on_run               => 'loading_cmd'     } },
+    new            => { transitions => { _on_run                   => 'idle'            } },
+
+    idle           => { enter       => '_set_timer',
+                        leave       => '_abort_call_after',
+                        transitions => { _on_timeout               => 'loading_cmd',
+                                         _on_delete_cmd            => 'deleting_cmds',
+                                         _on_qvd_cmd_for_vm_notify => 'loading_cmd',
+                                         on_hkd_stop               => 'stopped'         } },
+
     loading_cmd    => { enter       => '_load_cmd',
-                        transitions => { _on_cmd_found         => 'locking_cmd',
-                                         _on_cmd_not_found     => 'deleting_cmds',
-                                         _on_load_cmd_error    => 'waiting'         } },
+                        transitions => { _on_cmd_loaded            => 'locking_cmd',
+                                         _on_cmd_not_found         => 'deleting_cmds',
+                                         _on_load_cmd_error        => 'idle'            } },
+
     locking_cmd    => { enter       => '_lock_cmd',
-                        transitions => { '_on_lock_cmd_done'   => 'delivering_cmd',
-                                         '_on_lock_cmd_error'  => 'waiting'         } },
+                        transitions => { '_on_lock_cmd_done'       => 'delivering_cmd',
+                                         '_on_lock_cmd_error'      => 'idle'            } },
 
     delivering_cmd => { enter       => '_deliver_cmd',
-                        transitions => { _on_deliver_cmd_done  => 'loading_cmd'     } },
+                        transitions => { _on_deliver_cmd_done      => 'loading_cmd'     } },
 
     deleting_cmds  => { enter       => '_delete_cmds',
-                        transitions => { _on_delete_cmds_done  => 'waiting',
-                                         _on_delete_cmds_error => 'waiting'         },
-                        ignore      => [qw(_on_delete_cmds_result
-                                           _on_delete_cmds_bad_result)]               },
+                        transitions => { _on_delete_cmds_done      => 'idle',
+                                         _on_delete_cmds_error     => 'idle'            } },
 
-    waiting        => { enter       => '_start_timer',
-                        leave       => '_abort_call_after',
-                        transitions => { _on_timer             => 'loading_cmd',
-                                         _on_delete_cmd        => 'deleting_cmds',
-                                         on_hkd_stop          => 'stopped'         } },
-    stopped        => { enter       => '_on_stopped'                                  };
+    stopped        => { enter       => '_on_stopped'                                      },
+
+    __any__        => { delay_once  => [qw(_on_delete_cmd
+                                           _on_qvd_cmd_for_vm_notify
+                                           on_hkd_stop)]                                  };
 
 
 sub _on_delete_cmd :OnState(__any__) {}
@@ -51,6 +57,7 @@ sub new {
     my $self = $class->SUPER::new(%opts);
     $self->{vm_ids_with_cmd_done} = [];
     $self->{on_cmd} = $on_cmd;
+    $self->_listen("qvd_cmd_for_vm_on_host$self->{node_id}" => '_on_qvd_cmd_for_vm_notify');
     $self;
 }
 
@@ -73,14 +80,12 @@ sub _on_load_cmd_result {
     }
 }
 
-sub _on_load_cmd_bad_result {}
-
 sub _on_load_cmd_done {
     my $self = shift;
     if (defined $self->{vm_id}) {
         $debug and $self->_debug("vm command found");
         DEBUG 'VM command found';
-        $self->_on_cmd_found;
+        $self->_on_cmd_loaded;
     }
     else {
         $debug and $self->_debug("vm command *not* found");
@@ -107,10 +112,10 @@ sub _deliver_cmd {
     $self->_on_deliver_cmd_done;
 }
 
-sub _start_timer {
+sub _set_timer {
     my $self = shift;
     my $delay = $self->_cfg('internal.hkd.agent.vm_command_handler.delay');
-    $self->_call_after($delay, '_on_timer');
+    $self->_call_after($delay, '_on_timeout');
 }
 
 sub _on_cmd_done {
