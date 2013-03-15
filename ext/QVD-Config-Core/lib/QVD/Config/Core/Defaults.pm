@@ -83,6 +83,7 @@ command.lxc-create = /usr/lib/qvd/bin/lxc-create
 command.lxc-start = /usr/lib/qvd/bin/lxc-start
 command.lxc-stop = /usr/lib/qvd/bin/lxc-stop
 command.lxc-wait = /usr/lib/qvd/bin/lxc-wait
+command.version.lxc = 0.7
 command.ebtables = ebtables
 command.iptables = iptables
 command.modprobe = /sbin/modprobe
