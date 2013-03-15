@@ -42,7 +42,7 @@ SCRIPTNAME=/etc/init.d/$NAME
 
 CONFIG=/etc/qvd/node.conf
 if [ ! -f "$CONFIG" ]; then
-	echo "cp -R /usr/share/qvd/config/sample-node.conf $CONFIG' and edit node.conf"
+	echo "cp -R /usr/lib/qvd/config/sample-node.conf $CONFIG' and edit node.conf"
         echo "Configuration file $CONFIG doesn't exist."
         exit 0
 fi
