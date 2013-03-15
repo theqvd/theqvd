@@ -52,11 +52,13 @@ use QVD::StateMachine::Declarative
                                                            _on_check_tcp_ports_error  => 'failed'                         } },
 
     'starting/connecting_to_db'      => { enter       => '_start_db',
-                                          transitions => { _on_db_connected           => 'starting/loading_db_config'     } },
+                                          transitions => { _on_db_connected           => 'starting/loading_db_config',
+                                                           _on_dead_db                => 'failed'                         } },
 
     'starting/loading_db_config'     => { enter       => '_start_config',
                                           transitions => { _on_config_reload_done     => 'starting/loading_host_row',
-                                                           _on_config_reload_error    => 'failed'                         } },
+                                                           _on_config_reload_error    => 'failed',
+                                                           _on_dead_db                => 'failed'                         } },
 
     'starting/loading_host_row'      => { enter       => '_load_host_row',
                                           transitions => { _on_load_host_row_done     => 'starting/saving_state',
@@ -274,10 +276,11 @@ sub _start_db {
                                        dbname   => $self->_cfg('database.name'),
                                        user     => $self->_cfg('database.user'),
                                        password => $self->_cfg('database.password') },
-                                      timeout            => $self->_cfg('internal.database.poll.connection.timeout'),
-                                      connection_delay   => $self->_cfg('internal.database.poll.connection.delay'),
-                                      connection_retries => $self->_cfg('internal.database.poll.connection.retries'),
-                                      size               => $self->_cfg('internal.database.poll.size'),
+                                      timeout            => $self->_cfg('internal.database.pool.connection.timeout'),
+                                      global_timeout     => $self->_cfg('internal.database.pool.connection.global_timeout'),
+                                      connection_delay   => $self->_cfg('internal.database.pool.connection.delay'),
+                                      connection_retries => $self->_cfg('internal.database.pool.connection.retries'),
+                                      size               => $self->_cfg('internal.database.pool.size'),
                                       on_connect_error   => sub { $self->_on_dead_db },
                                       on_transient_error => sub { $self->_on_transient_db_error },
                                     );
