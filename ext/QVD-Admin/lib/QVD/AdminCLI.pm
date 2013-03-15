@@ -86,11 +86,12 @@ my %syntax_check_cbs = (
 );
 
 sub new {
-    my ($class, $quiet) = @_;
+    my ($class, $quiet, $force) = @_;
     my $admin = QVD::Admin->new;
     my $self = {
         admin => $admin,
         quiet => $quiet,
+        force => $force,
     };
     bless $self, $class;
 }
@@ -226,7 +227,7 @@ sub _print {
 sub _obj_del {
     my ($self, $obj) = @_;
 
-    if (scalar %{$self->{admin}{filter}} eq 0) {
+    if (!$self->{force} and scalar %{$self->{admin}{filter}} eq 0) {
         print "Are you sure you want to delete all ${obj}s? [y/N] ";
         my $answer = <STDIN>;
         exit 0 unless $answer =~ /^y/i;
@@ -277,7 +278,7 @@ sub _config_pairs {
 sub cmd_config_del {
     my $self = shift;
     my $ci = 0;
-    if (scalar @_ eq 0) {
+    if (!$self->{force} and !@_) {
         print "Are you sure you want to delete all configuration variables? [y/N] ";
         my $answer = <STDIN>;
         exit 0 unless $answer =~ /^y/i;
@@ -295,9 +296,10 @@ sub cmd_config_del {
 sub help_config_del {
     print <<EOT
 host del: Deletes config properties.
-usage: condif del [key...]
+usage: config del [key...]
        
 Valid options:
+    --force              : perform the operation without asking
     -q [--quiet]         : don't print the command message
 EOT
 }
@@ -419,7 +421,7 @@ EOT
 sub cmd_host_block {
     my $self = shift;
     
-    if (scalar %{$self->{admin}{filter}} eq 0) {
+    if (!$self->{force} and scalar %{$self->{admin}{filter}} eq 0) {
         print "Are you sure you want to block all hosts? [y/N] ";
         my $answer = <STDIN>;
         exit 0 unless $answer =~ /^y/i;
@@ -441,6 +443,7 @@ usage: host block
        
 Valid options:
     -f [--filter] FILTER : block only host matched by FILTER
+    --force              : perform the operation without asking
     -q [--quiet]         : don't print the command message
 EOT
 }
@@ -464,6 +467,7 @@ usage: host del
        
 Valid options:
     -f [--filter] FILTER : deletes hosts matched by FILTER
+    --force              : perform the operation without asking
     -q [--quiet]         : don't print the command message
 EOT
 }
@@ -530,7 +534,7 @@ EOT
 
 sub cmd_host_propdel {
     my $self = shift;
-    if (scalar %{$self->{admin}{filter}} eq 0) {
+    if (!$self->{force} and scalar %{$self->{admin}{filter}} eq 0) {
         print "Are you sure you want to delete the prop in all hosts? [y/N] ";
         my $answer = <STDIN>;
         exit 0 unless $answer =~ /^y/i;
@@ -556,6 +560,7 @@ usage: host propdel [key...]
       
 Valid options:
     -f [--filter] FILTER : Delete properties of hosts matched by FILTER
+    --force              : perform the operation without asking
 EOT
 }
 
@@ -605,7 +610,7 @@ EOT
 
 sub cmd_host_unblock {
     my $self = shift;
-    if (scalar %{$self->{admin}{filter}} eq 0) {
+    if (!$self->{force} and scalar %{$self->{admin}{filter}} eq 0) {
         print "Are you sure you want to unblock all hosts? [y/N] ";
         my $answer = <STDIN>;
         exit 0 unless $answer =~ /^y/i;
@@ -627,6 +632,7 @@ usage: host unblock
        
 Valid options:
     -f [--filter] FILTER : unblock only host matched by FILTER
+    --force              : perform the operation without asking
     -q [--quiet]         : don't print the command message
 EOT
 }
@@ -729,6 +735,7 @@ usage: osf del
        
 Valid options:
     -f [--filter] FILTER : deletes operating systems images matched by FILTER
+    --force              : perform the operation without asking
     -q [--quiet]         : don't print the command message
 EOT
 }
@@ -777,7 +784,7 @@ EOT
 
 sub cmd_osf_propdel {
     my $self = shift;
-    if (scalar %{$self->{admin}{filter}} eq 0) {
+    if (!$self->{force} and scalar %{$self->{admin}{filter}} eq 0) {
         print "Are you sure you want to delete the prop in all OSFs? [y/N] ";
         my $answer = <STDIN>;
         exit 0 unless $answer =~ /^y/i;
@@ -803,6 +810,7 @@ usage: osf propdel [key...]
       
 Valid options:
     -f [--filter] FILTER : Delete properties of OSFs matched by FILTER
+    --force              : perform the operation without asking
 EOT
 }
 
@@ -890,6 +898,7 @@ usage: di del
        
 Valid options:
     -f [--filter] FILTER : deletes di images matched by FILTER
+    --force              : perform the operation without asking
     -q [--quiet]         : don't print the command message
 EOT
 }
@@ -960,7 +969,7 @@ EOT
 
 sub cmd_di_propdel {
     my $self = shift;
-    if (scalar %{$self->{admin}{filter}} eq 0) {
+    if (!$self->{force} and scalar %{$self->{admin}{filter}} eq 0) {
         print "Are you sure you want to delete the prop in all DIs? [y/N] ";
         my $answer = <STDIN>;
         exit 0 unless $answer =~ /^y/i;
@@ -986,6 +995,7 @@ usage: di propdel [key...]
       
 Valid options:
     -f [--filter] FILTER : Delete properties of DIs matched by FILTER
+    --force              : perform the operation without asking
 EOT
 }
 
@@ -1075,6 +1085,7 @@ usage: user del
        
 Valid options:
     -f [--filter] FILTER : deletes users matched by FILTER
+    --force              : perform the operation without asking
     -q [--quiet]         : don't print the command message
 EOT
 }
@@ -1168,7 +1179,7 @@ EOT
 
 sub cmd_user_propdel {
     my $self = shift;
-    if (scalar %{$self->{admin}{filter}} eq 0) {
+    if (!$self->{force} and scalar %{$self->{admin}{filter}} eq 0) {
         print "Are you sure you want to delete the prop in all users? [y/N] ";
         my $answer = <STDIN>;
         exit 0 unless $answer =~ /^y/i;
@@ -1194,6 +1205,7 @@ usage: user propdel [key...]
       
 Valid options:
     -f [--filter] FILTER : Delete properties of users matched by FILTER
+    --force              : perform the operation without asking
 EOT
 }
 
@@ -1267,7 +1279,7 @@ EOT
 sub cmd_vm_block {
     my $self = shift;
     
-    if (scalar %{$self->{admin}{filter}} eq 0) {
+    if (!$self->{force} and scalar %{$self->{admin}{filter}} eq 0) {
         print "Are you sure you want to block all machines? [y/N] ";
         my $answer = <STDIN>;
         exit 0 unless $answer =~ /^y/i;
@@ -1289,6 +1301,7 @@ usage: vm block
        
 Valid options:
     -f [--filter] FILTER : block only vm matched by FILTER
+    --force              : perform the operation without asking
     -q [--quiet]         : don't print the command message
 EOT
 }
@@ -1351,13 +1364,14 @@ usage: vm del
        
 Valid options:
     -f [--filter] FILTER : deletes virtual machines matched by FILTER
+    --force              : perform the operation without asking
     -q [--quiet]         : don't print the command message
 EOT
 }
 
 sub cmd_vm_disconnect_user {
     my ($self) = @_;
-    if (scalar %{$self->{admin}{filter}} eq 0) {
+    if (!$self->{force} and scalar %{$self->{admin}{filter}} eq 0) {
         print "Are you sure you want to disconnect all users? [y/N] ";
         my $answer = <STDIN>;
         exit 0 unless $answer =~ /^y/i;
@@ -1380,6 +1394,7 @@ usage: vm disconnect_user
       
 Valid options:
     -f [--filter] FILTER : disconnects users on VMs matched by FILTER
+    --force              : perform the operation without asking
     -q [--quiet]         : don't print the command message
 EOT
 }
@@ -1387,7 +1402,7 @@ EOT
 sub cmd_vm_edit {
     my ($self, @args) = @_;
 
-    if (scalar %{$self->{admin}{filter}} eq 0) {
+    if (!$self->{force} and scalar %{$self->{admin}{filter}} eq 0) {
         print "Are you sure you want to edit all machines? [y/N] ";
         my $answer = <STDIN>;
         exit 0 if $answer !~ /^y/i;
@@ -1413,6 +1428,7 @@ di_tag: Use the disk image with tag "t". Change takes effect on VM start.
 
 Valid options:
     -f [--filter] FILTER : edits virtual machines matched by FILTER
+    --force              : perform the operation without asking
     -q [--quiet]         : don't print messages
 EOT
 }
@@ -1487,7 +1503,7 @@ EOT
 
 sub cmd_vm_propdel {
     my $self = shift;
-    if (scalar %{$self->{admin}{filter}} eq 0) {
+    if (!$self->{force} and scalar %{$self->{admin}{filter}} eq 0) {
         print "Are you sure you want to delete the prop in all virtual machines? [y/N] ";
         my $answer = <STDIN>;
          exit 0 unless $answer =~ /^y/i;
@@ -1513,6 +1529,7 @@ usage: vm propdel [key...]
       
 Valid options:
     -f [--filter] FILTER : sets VM properties of VMs matched by FILTER
+    --force              : perform the operation without asking
 EOT
 }
 
@@ -1613,7 +1630,7 @@ EOT
 sub cmd_vm_start {
     my ($self) = @_;
     
-    if (scalar %{$self->{admin}{filter}} eq 0) {
+    if (!$self->{force} and scalar %{$self->{admin}{filter}} eq 0) {
         print "Are you sure you want to start all machines? [y/N] ";
         my $answer = <STDIN>;
         exit 0 unless $answer =~ /^y/i;
@@ -1636,6 +1653,7 @@ usage: vm start
       
 Valid options:
     -f [--filter] FILTER : starts virtual machine matched by FILTER
+    --force              : perform the operation without asking
     -q [--quiet]         : don't print the command message
 EOT
 }
@@ -1643,7 +1661,7 @@ EOT
 sub cmd_vm_stop {
     my ($self) = @_;
     
-    if (scalar %{$self->{admin}{filter}} eq 0) {
+    if (!$self->{force} and scalar %{$self->{admin}{filter}} eq 0) {
         print "Are you sure you want to stop all machines? [y/N] ";
         my $answer = <STDIN>;
         exit 0 unless $answer =~ /^y/i;
@@ -1666,13 +1684,14 @@ usage: vm stop
       
 Valid options:
     -f [--filter] FILTER : stops virtual machine matched by FILTER
+    --force              : perform the operation without asking
     -q [--quiet]         : don't print the command message
 EOT
 }
 
 sub cmd_vm_unblock {
     my $self = shift;
-    if (scalar %{$self->{admin}{filter}} eq 0) {
+    if (!$self->{force} and scalar %{$self->{admin}{filter}} eq 0) {
         print "Are you sure you want to unblock all machines? [y/N] ";
         my $answer = <STDIN>;
         exit 0 unless $answer =~ /^y/i;
@@ -1694,6 +1713,7 @@ usage: vm unblock
        
 Valid options:
     -f [--filter] FILTER : unblock only vm matched by FILTER
+    --force              : perform the operation without asking
     -q [--quiet]         : don't print the command message
 EOT
 }
