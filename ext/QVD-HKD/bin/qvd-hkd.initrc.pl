@@ -116,7 +116,8 @@ kill_dnsmasq() {
 start_server() {
 	# Check for dnsmasq and kill it
 	kill_dnsmasq
-	/sbin/sysctl -w fs.inotify.max_user_instances="65000"
+	/sbin/sysctl -w fs.inotify.max_user_instances="65000" &> /dev/null
+	/sbin/sysctl -w fs.inotify.max_user_watches="81920" &> /dev/null
 # Start the process using the wrapper
         if [ -z "$DAEMONUSER" ] ; then
             start_daemon -p $PIDFILE $DAEMON $DAEMON_OPTS
