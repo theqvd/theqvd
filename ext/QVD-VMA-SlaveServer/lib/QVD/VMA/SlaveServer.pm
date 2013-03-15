@@ -30,8 +30,11 @@ sub handle_put_share {
         unless header_eq_check($headers, Connection => 'Upgrade')
             and header_lookup($headers, 'Upgrade');
 
-    $self->send_http_error(HTTP_NOT_IMPLEMENTED)
-        unless header_eq_check($headers, 'Upgrade'=>'qvd:sftp/1.0');
+    my $protocol = header_lookup($headers, 'Upgrade');
+    unless ($protocol =~ m!qvd:sftp/1.0(?:;charset=(.*))?!) {
+	$self->send_http_error(HTTP_BAD_REQUEST)
+    }
+    my $charset = $1;
 
     chop $url if $url =~ /\/$/;  # remove / if last character
 
@@ -52,7 +55,9 @@ sub handle_put_share {
         wait;
         rmdir $mount_point;
     } else {
-        exec($command_sshfs => "qvd-client:", $mount_point, -o => 'slave', -o => 'idmap=user');
+	my @cmd = ($command_sshfs => "qvd-client:", $mount_point, -o => 'slave', -o => 'idmap=user');
+	push @cmd, -o => "modules=iconv,from_code=$charset" if ($charset);
+	exec @cmd;
         die "Unable to exec $command_sshfs: $^E";
     }
 }
