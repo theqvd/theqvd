@@ -59,7 +59,7 @@ sub dispatch {
 }
 
 sub help_share {
-    print "** Syntax: share /path/to/folder
+    print "Syntax: share /path/to/folder
 
     Forwards the specified folder to the virtual machine.\n"
 }
@@ -68,10 +68,13 @@ sub handle_share {
     my ($self, $path) = @_;
 
     print "** Starting $command_sftp_server...\n";
-
+	
+	# FIXME detect file system code page, don't just assume 1252
+	my $charset = $WINDOWS? 'CP1252' : 'UTF-8';
+	
     my ($code, $msg, $headers, $data) =
     $self->{httpc}->make_http_request(PUT => '/shares/'.$path,
-        headers => ['Connection: Upgrade', 'Upgrade: qvd:sftp/1.0']);
+        headers => ['Connection: Upgrade', "Upgrade: qvd:sftp/1.0;charset=$charset"]);
     
     if ($code != HTTP_SWITCHING_PROTOCOLS) {
         die "Server replied $code $msg $data";
@@ -129,16 +132,18 @@ sub _handle_share_windows {
     Win32::API->Import(ws2_32 => 'int WSADuplicateSocket(HANDLE s, DWORD dwProcessId, LPSTR lpProtocolInfo)')
             or die "Unable to import WSADuplicateSocket";
 
+	my $pipe_name = "//./PIPE/qvd:sftp-server";
+			
     # Create pipe
     print "** Creating named pipe...\n";
-    my $pipe = CreateNamedPipe("//./PIPE/qvd:sftp-server", 0x3, 0x4, 2, 512, 512, 0, undef);
+    my $pipe = CreateNamedPipe($pipe_name, 0x3, 0x4, 2, 512, 512, 0, undef);
 
     # Start child
     print "** Creating child process...\n";
     my $child;
     Win32::Process::Create($child, 
         $command_sftp_server, 
-        "sftp-server.exe -e -l DEBUG",
+        "sftp-server.exe -e -l DEBUG -P $pipe_name",
         1,                      # inherit handles
         CREATE_NO_WINDOW,       # creation flags
         $path);
