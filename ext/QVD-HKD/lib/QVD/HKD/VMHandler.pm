@@ -151,6 +151,13 @@ sub _on_search_di_result {
     DEBUG "Found DI '$self->{di_id}'";
 }
 
+sub _on_search_dir_bad_result {
+    my ($self, $res) = @_;
+    my $rows = $res->rows || 0;
+    ERROR "no DI found for OSF $self->{osf_id} with tag $self->{di_tag} as assigned to VM $self->{vm_id}";
+    $self->{current_query_bad_result} = 1;
+}
+
 sub _save_runtime_row {
     my $self = shift;
 
