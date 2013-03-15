@@ -120,7 +120,7 @@ use QVD::StateMachine::Declarative
 
     'stopping/killing_all_vms'       => { enter       => '_kill_all_vms',
                                           leave       => '_abort_all',
-                                          transitions => { _on_kill_all_vms_done      => 'stopping/stopping_all_agents'   } },
+                                          transitions => { _on_stop_all_vms_done      => 'stopping/stopping_all_agents'   } },
 
     'stopping/stopping_all_agents'   => { enter       => '_stop_all_agents',
                                           transitions => { _on_all_agents_stopped     => 'stopping/removing_fw_rules'     } },
@@ -614,10 +614,17 @@ sub _stop_all_vms {
     values %{$self->{vm}}
         or return $self->_on_stop_all_vms_done;
     $_->on_hkd_stop for values %{$self->{vm}};
-    $self->_call_after($self->_cfg("internal.hkd.killing.vms.timeout"), '_on_state_timeout');
+    $self->_call_after($self->_cfg("internal.hkd.stopping.vms.timeout"), '_on_state_timeout');
 }
 
-sub _kill_all_vms { shift->_on_kill_all_vms_done }
+sub _kill_all_vms {
+    my $self = shift;
+    values %{$self->{vm}}
+        or return $self->_on_stop_all_vms_done;
+    $_->on_hkd_kill for values %{$self->{vm}};
+    # FIXME: what to do when not all machines can be killed? nothing? repeat?
+    $self->_call_after($self->_cfg("internal.hkd.killing.vms.retry.timeout"), '_kill_all_vms');
+}
 
 sub _catch_zombies {
     my $self = shift;

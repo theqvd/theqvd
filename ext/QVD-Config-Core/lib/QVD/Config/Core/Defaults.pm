@@ -343,7 +343,8 @@ internal.database.poll.size = 2
 internal.database.poll.connection.delay = 10
 internal.database.poll.connection.retries = 18
 
-internal.hkd.killing.vms.timeout = 120
+internal.hkd.stopping.vms.timeout = 300
+internal.hkd.killing.vms.retry.timeout = 100
 
 internal.hkd.agent.ticker.delay = 120
 internal.hkd.agent.ticker.retries = 2
