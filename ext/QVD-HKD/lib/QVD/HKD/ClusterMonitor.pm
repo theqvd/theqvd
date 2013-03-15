@@ -69,6 +69,7 @@ sub _kill_hosts {
     $self->_query(<<'EOQ', $self->{node_id}, $self->_cfg('internal.hkd.cluster.node.timeout'));
 update host_runtimes set state = 'lost'
     where state != 'stopped'
+      and state != 'starting'
       and not blocked
       and host_id != $1
       and $2 < extract('epoch' from (now() - ok_ts))
