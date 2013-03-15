@@ -30,6 +30,8 @@ use JSON qw(decode_json);
 use feature 'switch';
 use POSIX qw(dup2);
 use IPC::Open3 qw(open3);
+use Win32::API;
+#use Net::SFTP::Server::FS;
 
 my $command_sftp_server = core_cfg('command.sftp-server');
 if ($WINDOWS) {
@@ -61,7 +63,7 @@ sub dispatch {
 }
 
 sub help_share {
-    print "Syntax: share /path/to/folder
+    print "** Syntax: share /path/to/folder
 
     Forwards the specified folder to the virtual machine.\n"
 }
@@ -69,7 +71,7 @@ sub help_share {
 sub handle_share {
     my ($self, $path) = @_;
 
-    print "Starting $command_sftp_server...\n";
+    print "** Starting $command_sftp_server...\n";
 
     my ($code, $msg, $headers, $data) =
     $self->{httpc}->make_http_request(PUT => '/shares/'.$path,
@@ -87,13 +89,8 @@ sub handle_share {
     #close $self->{httpc}->{socket};
 
     if ($WINDOWS) {
-        chdir $path or die "Unable to chdir to $path: $^E";
-        my $pid = open3(
-		'>&'.$self->{httpc}->{socket}->fileno, 
-		'<&'.$self->{httpc}->{socket}->fileno, 
-		'<&'.fileno(STDERR), 
-		$command_sftp_server, "-e");
-        waitpid $pid, 0;
+ 	  print "** Windows OS detected\n";
+	  $self->_do_windows($path);
     } else {
         chdir $path or die "Unable to chdir to $path: $^E";
         exec($command_sftp_server, '-e')
@@ -103,7 +100,77 @@ sub handle_share {
 
 sub handle_usage {
     # FIXME
-    print "Write usage doc!\n";
+    print "** Write usage doc!\n";
+}
+
+sub _do_windows {
+my ($self, $path) = @_;
+require Win32::API;
+require Win32::Process;
+use Win32API::File qw(FdGetOsFHandle WriteFile);
+
+        Win32::API->Import(kernel32 => 'HANDLE WINAPI CreateNamedPipe(
+	        LPCTSTR lpName,
+	        DWORD dwOpenMode,
+	        DWORD dwPipeMode,
+	        DWORD nMaxInstances,
+	        DWORD nOutBufferSize,
+	        DWORD nInBufferSize,
+	        DWORD nDefaultTimeOut,
+	        LPSTR lpSecurityAttributes
+	  )') or die "Unable to import CreatedNamedPipe";
+
+Win32::API->Import(kernel32 => 'BOOL WINAPI ConnectNamedPipe(HANDLE hNamedPipe, LPSTR lpOverlapped)')
+	or die "Unable to import ConnectNamedPipe";
+
+Win32::API->Import(ws2_32 => 'int WSAGetLastError()')
+	or die "Unable to import WSAGetLastError";
+
+Win32::API->Import(ws2_32 => 'int WSADuplicateSocket(HANDLE s, DWORD dwProcessId, LPSTR lpProtocolInfo)')
+	or die "Unable to import WSADuplicateSocket";
+	  
+# Create pipe
+print "** Creating named pipe...\n";
+my $pipe = CreateNamedPipe("//./PIPE/qvd:sftp-server", 0x3, 0x4, 2, 512, 512, 0, undef);
+
+# Start child
+print "** Creating child process...\n";
+my $child;
+Win32::Process::Create($child, 
+	$command_sftp_server, 
+	"sftp-server.exe -e -l DEBUG",
+	1, # inherit handles
+	CREATE_NO_WINDOW, # creation flags
+	$path);
+
+# Duplicate socket
+print "** Duplicating socket...\n";
+my $lpProtocolInfo = "\0"x400; # Apparently WSAPROTOCOL_INFO is 372 bytes long
+print unpack('H*', $lpProtocolInfo), "\n";
+my $handle = FdGetOsFHandle(fileno($self->{httpc}->{socket}));
+print $handle,"\n";
+if (WSADuplicateSocket($handle, $child->GetProcessID(), $lpProtocolInfo)) {
+	die "Unable to duplicate socket, $ret, : ".WSAGetLastError();
+}
+print unpack('H*', $lpProtocolInfo), "\n";
+
+# Connect to pipe
+print "** Connecting to pipe...\n";
+ConnectNamedPipe($pipe, undef)
+	or die "Unable to connect to pipe: $^E";
+
+# Send "protocol info" to child
+print "** Sending protocol info to child...\n";
+my $written;
+WriteFile($pipe, $lpProtocolInfo, 372, $written, [])
+	or die "Unable to write to pipe: $^E";
+print "** Wrote $written bytes to the pipe...\n";
+
+# Wait for child
+print "** Waiting for child...\n";
+$child->Wait(INFINITE);
+print "** Finished.\n";
+
 }
 
 1;
