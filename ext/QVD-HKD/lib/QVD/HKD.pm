@@ -19,6 +19,7 @@ use File::Slurp qw(slurp);
 use Pg::PQ qw(:pgres);
 use QVD::Log;
 use AnyEvent::Impl::Perl;
+# use AnyEvent::Impl::EV;
 use AnyEvent;
 use AnyEvent::Pg::Pool;
 use Linux::Proc::Net::TCP;
@@ -198,10 +199,17 @@ sub _say_goodbye {
 }
 
 sub _on_signal {
-    my $self = shift;
-    $debug and $self->_debug("signal $_[0] received, stopping...");
-    DEBUG "Signal '$_[0]' received, stopping...";
-    $self->_on_cmd_stop;
+    my ($self, $name) = @_;
+    print STDERR "foo!\n";
+    $debug and $self->_debug("signal $name received");
+    DEBUG "Signal $name received";
+    if ($name eq 'USR1') {
+        $self->_write_vm_report;
+    }
+    else {
+        $debug and $self->_debug("stopping!");
+        $self->_on_cmd_stop;
+    }
 }
 
 sub run {
@@ -210,11 +218,12 @@ sub run {
 
     $debug and $self->_debug("Using AnyEvent backend $AnyEvent::MODEL");
 
-    for (qw(TERM INT)) {
+    for (qw(TERM INT USR1)) {
         my $name = $_;
         $self->{$_. "_watcher"} = AnyEvent->signal(signal => $_,
                                                    cb => sub { $self->_on_signal($name) });
     }
+
     if ($self->_cfg('internal.hkd.debugger.run')) {
         my $socket_path = $self->_cfg('internal.hkd.debugger.socket');
         require AnyEvent::Debug;
@@ -704,6 +713,24 @@ sub _remove_fw_rules {
          $debug and $self->_debug("cleanup of global firewall rules skipped");
     }
     $self->_on_remove_fw_rules_done;
+}
+
+sub _write_vm_report {
+    my $self = shift;
+    my %state;
+    for my $vm (values %{$self->{vm}}) {
+        $state{$vm->state}++;
+    }
+    if (open my $fh, '>', '/tmp/hkd-vm-states') {
+        print $fh "HKD Internal VM states report\n", ('-' x 80), "\n";
+        for my $state (sort { $state{$b} <=> $state{$a} } keys %state) {
+            printf $fh "%5d %s\n", $state{$state}, $state;
+        }
+        $debug and $self->_debug("VM states report written to '/tmp/hkd-vm-states");
+    }
+    else {
+        ERROR "unable to open '/tmp/hkd-vm-states': $!";
+    }
 }
 
 1;
