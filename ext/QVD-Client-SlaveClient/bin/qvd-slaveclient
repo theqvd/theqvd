@@ -7,7 +7,8 @@ use File::Spec;
 
 my $WINDOWS;
 BEGIN {
-	$WINDOWS = ($^O eq 'MSWin32');
+    $WINDOWS = ($^O eq 'MSWin32');
+
     my $user_dir = File::Spec->rel2abs($WINDOWS
                                     ? File::Spec->join($ENV{APPDATA}, 'QVD')
                                     : File::Spec->join((getpwuid $>)[7] // $ENV{HOME}, '.qvd'));

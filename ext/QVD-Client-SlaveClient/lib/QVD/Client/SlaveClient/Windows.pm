@@ -47,9 +47,9 @@ sub _handle_share_native {
     # Create pipe
     print "** Creating named pipe...\n";
     my $pipe = CreateNamedPipe($pipe_name, 0x3, 0x4, 2, 512, 512, 0, undef);
-	if ($pipe == -1) {
-		die "Unable to create named pipe: $^E";
-	}
+    if ($pipe == -1) {
+        die "Unable to create named pipe: $^E";
+    }
 
     # Start child
     print "** Starting $command_sftp_server to serve $path...\n";
@@ -60,7 +60,7 @@ sub _handle_share_native {
         1,                      # inherit handles
         CREATE_NO_WINDOW,       # creation flags
         $path)
-		or die "Unable to start sftp-server: $^E";
+        or die "Unable to start sftp-server: $^E";
 	
     # Duplicate socket
     print "** Duplicating socket...\n";
