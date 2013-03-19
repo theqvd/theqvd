@@ -318,21 +318,6 @@ sub _run {
 
     push @cmd, '-S', map("$_=$o{$_}", keys %o), 'localhost:40';
 
-    # if ($WINDOWS) {
-    # my $program = $cmd[0];
-    # my $cmdline = join ' ', map("\"$_\"", @cmd);
-    # DEBUG("Running nxproxy: $program $cmdline");
-    # require Win32::Process;
-    # Win32::Process->import;
-    # my $ret = Win32::Process::Create({}, $program, $cmdline, 0, CREATE_NO_WINDOW|NORMAL_PRIORITY_CLASS, '.');
-    # if ($ret) {
-    # INFO("nxproxy started");
-    # }
-    # else {
-    # ERROR("Failed to start nxproxy");
-    # }
-    # } else {
-
     my $slave_cmd = core_cfg('client.slave.command', 0);
     if (defined $slave_cmd and length $slave_cmd) {
         $slave_cmd = File::Spec->rel2abs($slave_cmd, $QVD::Client::App::app_dir);
@@ -378,15 +363,25 @@ sub _run {
     }
 
     my $slave_client_proc;
-    # TODO Add Windows/Mac support, make configurable
     if (core_cfg('client.slave.enable', 1)) {
-        my $slave_client_cmd = core_cfg('client.slave.client');
-        my @sc = ($slave_client_cmd, share => $ENV{HOME});
-        DEBUG("Starting folder sharing: @sc");
-        if ($slave_client_proc = Proc::Background->new(@sc)) {
-            DEBUG("Folder sharing started");
+        my $slave_client_cmd = $QVD::Client::App::app_dir . '/bin/qvd-slaveclient';
+        my @shares;
+        if ($WINDOWS) {
+            push @shares, $ENV{USERPROFILE};
+            require Win32API::File;
+            push @shares, getLogicalDrives();
         } else {
-            ERROR("Folder sharing failed to start");
+            push @shares, $ENV{HOME};
+            push @shares, '/media' if -e '/media';
+        }
+
+        for my $share (@shares) {
+            INFO("Starting folder sharing for $share");
+            if ($slave_client_proc = Proc::Background->new($slave_client_cmd, share => $share)) {
+                DEBUG("Folder sharing started for $share");
+            } else {
+                ERROR("Folder sharing failed to start for $share");
+            }
         }
     }
 
