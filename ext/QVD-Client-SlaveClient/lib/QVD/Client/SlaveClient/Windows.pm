@@ -1,7 +1,11 @@
 package QVD::Client::SlaveClient::Windows;
 
+use strict;
+use warnings;
+
 use parent 'QVD::Client::SlaveClient';
 
+use QVD::Config::Core qw(core_cfg);
 use Win32::API;
 use Win32::Process;
 use Win32API::File qw(FdGetOsFHandle WriteFile);
@@ -43,23 +47,27 @@ sub _handle_share_native {
     # Create pipe
     print "** Creating named pipe...\n";
     my $pipe = CreateNamedPipe($pipe_name, 0x3, 0x4, 2, 512, 512, 0, undef);
+	if ($pipe == -1) {
+		die "Unable to create named pipe: $^E";
+	}
 
     # Start child
-    print "** Creating child process...\n";
+    print "** Starting $command_sftp_server to serve $path...\n";
     my $child;
     Win32::Process::Create($child, 
         $command_sftp_server, 
         "sftp-server.exe -e -l DEBUG -P $pipe_name",
         1,                      # inherit handles
         CREATE_NO_WINDOW,       # creation flags
-        $path);
-
+        $path)
+		or die "Unable to start sftp-server: $^E";
+	
     # Duplicate socket
     print "** Duplicating socket...\n";
     my $lpProtocolInfo = "\0"x400; # Apparently WSAPROTOCOL_INFO is 372 bytes long
     my $handle = FdGetOsFHandle(fileno($self->{httpc}->{socket}));
     if (WSADuplicateSocket($handle, $child->GetProcessID(), $lpProtocolInfo)) {
-        die "Unable to duplicate socket, $ret, : ".WSAGetLastError();
+        die "Unable to duplicate socket: ".WSAGetLastError();
     }
 
     # Connect to pipe

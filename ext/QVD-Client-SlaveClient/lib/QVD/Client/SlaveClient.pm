@@ -1,5 +1,7 @@
 package QVD::Client::SlaveClient;
 
+use strict;
+use warnings;
 use File::Spec;
 use QVD::Config::Core qw(core_cfg set_core_cfg);
 
@@ -49,8 +51,6 @@ sub help_share {
 sub handle_share {
     my ($self, $path) = @_;
 
-    print "** Starting $command_sftp_server...\n";
-	
     # FIXME detect file system code page, don't just assume 1252
     my $charset = $WINDOWS? 'CP1252' : 'UTF-8';
 	
