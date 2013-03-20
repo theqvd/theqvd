@@ -204,6 +204,26 @@ sub _listen {
     $self->{listener_watcher}{$channel} = $w;
 }
 
+sub _notify {
+    my ($self, $name) = @_;
+    my $queue = $self->{notify_queue} ||= [];
+    push @$queue, $name;
+    $self->_next_notify unless $self->{notify_watcher};
+}
+
+sub _next_notify {
+    my $self = shift;
+    delete $self->{notify_watcher};
+    my $nq = $self->{notify_queue};
+    if ($nq and @$nq) {
+        my $channel = shift @nq;
+        $self->{notify_watcher} = $self->_db->push_query(query       => "notify $channel",
+                                                         max_retries => 0,
+                                                         on_done     => sub { $self->_next_notify },
+                                                         on_error    => sub { $self->_next_notify });
+    };
+}
+
 sub _cancel_current_query { undef shift->{current_query_watcher} }
 
 sub _db {

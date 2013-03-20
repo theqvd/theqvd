@@ -405,5 +405,5 @@ internal.hkd.lock.delay = 2
 
 internal.hkd.max_heavy = 10
 
-internal.hkd.agent.l7rmonitor.delay.short = 1
-internal.hkd.agent.l7rmonitor.delay.long  = 4
+internal.hkd.agent.l7rmonitor.delay = 60
+internal.hkd.agent.l7rkiller.delay = 61

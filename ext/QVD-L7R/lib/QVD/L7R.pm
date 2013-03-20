@@ -289,6 +289,7 @@ sub _takeover_vm {
 
         $l7r->_tell_client("Aborting contending session for VM_ID: ". $vm->id);
         $vm->send_user_abort;
+        notify("qvd_cmd_for_user_on_host" . $vm->l7r_host);
 
         # TODO: when contending L7R is in state "connected" this L7R
         # could send the x_suspend message to the VMA without going

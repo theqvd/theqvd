@@ -32,10 +32,15 @@ use QVD::StateMachine::Declarative
 
     # abort L7R processes corresponding to machines that are not running
     aborting_l7rs    => { enter       => '_abort_l7rs',
-                          transitions => { _on_abort_l7rs_done     => 'delaying',
-                                           _on_abort_l7rs_error    => 'delaying'          } },
+                          transitions => { _on_abort_l7rs_done     => 'notifying_hkds',
+                                           _on_abort_l7rs_error    => 'idle'              } },
 
-    delaying         => { enter       => '_set_timer',
+    # notify HKDs in other nodes they should handle the abort requests
+    notifying_hkds   => { enter       => '_notify_hkds',
+                          transitions => { _on_notify_hkds_done    => 'idle',
+                                           _on_notify_hkds_error   => 'idle'              } },
+
+    idle             => { enter       => '_set_timer',
                           transitions => { _on_timeout             => 'killing_hosts',
                                            on_hkd_stop             => 'stopped',          } },
 
@@ -141,12 +146,13 @@ sub _on_unassign_l7rs_result {
 
 sub _abort_l7rs {
     my ($self) = @_;
+    delete $self->{hosts_to_be_notified};
     $self->_query(<<EOQ);
 update vm_runtimes
     set user_cmd = 'abort'
     where user_state = 'connected'
       and vm_state   = 'stopped'
-    returning vm_id
+    returning vm_id, host_id
 EOQ
 }
 
@@ -155,7 +161,18 @@ sub _on_abort_l7rs_result {
     if ($res->status == PGRES_COMMAND_OK and $res->cmdRows) {
         my @vms = $res->column(0);
         INFO "Aborting ".$res->cmdRows." L7Rs processes for VMs not running: @vms";
+        $self->{hosts_to_be_notified} = [$res->column(1)];
     }
+}
+
+sub _notify_hkds {
+    my $self = shift;
+    if (my $hosts = delete $self->{hosts_to_be_notified}) {
+        for my $host (@$hosts) {
+            $self->_notify("qvd_user_cmd_for_host$host");
+        }
+    }
+    $self->_on_notify_hkds_done;
 }
 
 sub _set_timer {

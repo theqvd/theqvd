@@ -36,6 +36,7 @@ use QVD::HKD::CommandHandler;
 use QVD::HKD::VMCommandHandler;
 use QVD::HKD::VMHandler;
 use QVD::HKD::L7RMonitor;
+use QVD::HKD::L7RKiller;
 
 use QVD::HKD::Config::Network qw(netvms netnodes net_aton net_ntoa netstart_n network_n);
 
@@ -402,6 +403,7 @@ sub _start_agents {
     $self->{command_handler}    = QVD::HKD::CommandHandler->new(%opts, on_cmd => sub { $self->_on_cmd($_[1]) });
     $self->{vm_command_handler} = QVD::HKD::VMCommandHandler->new(%opts, on_cmd => sub { $self->_on_vm_cmd($_[1], $_[2]) });
     $self->{l7r_monitor}        = QVD::HKD::L7RMonitor->new(%opts);
+    $self->{l7r_killer}         = QVD::HKD::L7RKiller->new(%opts);
     $self->{cluster_monitor}    = QVD::HKD::ClusterMonitor->new(%opts);
     $self->{dhcpd_handler} = QVD::HKD::DHCPDHandler->new(%opts)
         if $self->_cfg("vm.network.use_dhcp");
@@ -411,6 +413,9 @@ sub _start_agents {
 
     DEBUG 'Starting L7R Monitor';
     $self->{l7r_monitor}->run;
+
+    DEBUG 'Starting L7RKiller';
+    $self->{l7r_killer}->run;
 
     DEBUG 'Starting Cluster Monitor';
     $self->{cluster_monitor}->run;
@@ -442,6 +447,7 @@ my @agent_names = qw(vm_command_handler
                      dhcpd_handler
                      ticker
                      l7r_monitor
+                     l7r_killer
                      cluster_monitor);
 
 sub _check_all_agents_have_stopped {
