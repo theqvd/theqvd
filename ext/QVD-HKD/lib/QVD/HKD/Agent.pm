@@ -216,7 +216,7 @@ sub _next_notify {
     delete $self->{notify_watcher};
     my $nq = $self->{notify_queue};
     if ($nq and @$nq) {
-        my $channel = shift @nq;
+        my $channel = shift @$nq;
         $self->{notify_watcher} = $self->_db->push_query(query       => "notify $channel",
                                                          max_retries => 0,
                                                          on_done     => sub { $self->_next_notify },

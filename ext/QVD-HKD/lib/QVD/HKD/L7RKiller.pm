@@ -29,7 +29,7 @@ use QVD::StateMachine::Declarative
                                             _on_qvd_cmd_for_user_notify => 'getting_user_cmd',
                                             on_hkd_stop                 => 'stopped'          } },
 
-    stop              => { enter       => '_on_stopped'                                         },
+    stopped           => { enter       => '_on_stopped'                                         },
 
     __any__           => { delay_once => [qw(_on_qvd_cmd_for_user_notify
                                              _on_hkd_stop)]                                     };
@@ -91,3 +91,5 @@ sub _kill_l7r {
     }
     $self->_on_kill_l7r_error;
 }
+
+1;
