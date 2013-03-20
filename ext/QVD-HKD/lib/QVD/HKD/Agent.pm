@@ -179,6 +179,18 @@ sub _query_n {
     $self->{current_query_watcher} = $watcher;
 }
 
+sub _query {
+    my $self = shift;
+    unshift @_, ($self, undef);
+    goto &_query_n;
+}
+
+sub _query_1 {
+    my $self = shift;
+    unshift @_, ($self, 1);
+    goto &_query_n;
+}
+
 sub _listen {
     my ($self, $channel, $method) = @_;
     $method = "_on_${channel}_notify" unless defined $method;
@@ -190,18 +202,6 @@ sub _listen {
                                on_notify           => $cb,
                                on_listener_started => $cb);
     $self->{listener_watcher}{$channel} = $w;
-}
-
-sub _query {
-    my $self = shift;
-    unshift @_, ($self, undef);
-    goto &_query_n;
-}
-
-sub _query_1 {
-    my $self = shift;
-    unshift @_, ($self, 1);
-    goto &_query_n;
 }
 
 sub _cancel_current_query { undef shift->{current_query_watcher} }
