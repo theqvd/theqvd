@@ -140,13 +140,13 @@ use QVD::StateMachine::Declarative
     failed                           => { enter       => '_say_goodbye'                                                   },
 
     __any__                          => { ignore      => [qw(_on_ticked
-                                                             _on_ticked_error
                                                              _on_stop_all_vms_done
                                                              _on_transient_db_error
                                                              _on_config_reload_done
                                                              _on_config_reload_error )],
-                                          delay       => [qw(_on_cmd_stop
-                                                             _on_dead_db)]                                                  };
+                                          delay_once  => [qw(_on_cmd_stop
+                                                             _on_dead_db
+                                                             _on_ticker_error)]                                                  };
 
 sub _on_transient_db_error :OnState('running') {
     shift->{cluster_monitor}->on_transient_db_error
