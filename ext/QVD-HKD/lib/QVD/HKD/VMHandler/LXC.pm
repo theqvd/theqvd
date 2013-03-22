@@ -130,6 +130,7 @@ use QVD::StateMachine::Declarative
                                                             _on_goto_debug               => 'debugging/saving_state',
                                                             _on_stop_cmd                 => 'stopping/deleting_cmd',
                                                             on_hkd_stop                  => 'stopping/saving_state',
+                                                            on_hkd_kill                  => 'stopping/killing_lxc',
                                                             _on_lxc_done                 => 'stopping/killing_lxc'            } },
 
     'running/saving_state'            => { enter       => '_save_state',
@@ -155,6 +156,7 @@ use QVD::StateMachine::Declarative
                                            leave       => '_stop_vma_monitor',
                                            transitions => { _on_cmd_stop                 => 'stopping/deleting_cmd',
                                                             on_hkd_stop                  => 'stopping/saving_state',
+                                                            on_hkd_kill                  => 'stopping/killing_lxc',
                                                             _on_dead                     => 'stopping/stopping_lxc',
                                                             _on_goto_debug               => 'debugging/saving_state',
                                                             _on_lxc_done                 => 'stopping/killing_lxc'            } },
@@ -172,6 +174,7 @@ use QVD::StateMachine::Declarative
                                            transitions => { _on_alive                    => 'running/saving_state',
                                                             _on_cmd_stop                 => 'stopping/deleting_cmd',
                                                             on_hkd_stop                  => 'stopping/saving_state',
+                                                            on_hkd_kill                  => 'stopping/killing_lxc',
                                                             _on_lxc_done                 => 'stopping/killing_lxc' },
                                            ignore      => [qw(_on_dead
                                                               _on_goto_debug)] },
@@ -193,7 +196,8 @@ use QVD::StateMachine::Declarative
                                            leave       => '_abort_all',
                                            transitions => { _on_rpc_poweroff_error       => 'stopping/stopping_lxc',
                                                             _on_lxc_done                 => 'stopping/killing_lxc',
-                                                            _on_rpc_poweroff_result      => 'stopping/waiting_for_lxc_to_exit'} },
+                                                            _on_rpc_poweroff_result      => 'stopping/waiting_for_lxc_to_exit',
+                                                            on_hkd_kill                  => 'stopping/killing_lxc' } },
 
     'stopping/waiting_for_lxc_to_exit'=> { enter       => '_set_state_timer',
                                            leave       => '_abort_all',
@@ -298,7 +302,8 @@ use QVD::StateMachine::Declarative
                                                             on_hkd_kill                  => 'stopped'                        },
                                            ignore      => [qw(on_hkd_stop)]                                                    },
 
-    'dirty'                           => { transitions => { on_hkd_stop                  => 'stopped'                        } },
+    'dirty'                           => { transitions => { on_hkd_stop                  => 'stopped',
+                                                            on_hkd_kill                  => 'stopped'                        } },
 
 
     '__any__'                         => { delay_once  => [qw( _on_cmd_stop
