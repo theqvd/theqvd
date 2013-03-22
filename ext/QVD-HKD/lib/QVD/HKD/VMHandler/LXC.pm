@@ -135,19 +135,16 @@ use QVD::StateMachine::Declarative
 
     'running/saving_state'            => { enter       => '_save_state',
                                            transitions => { _on_save_state_done          => 'running/updating_stats',
-                                                            _on_save_state_error         => 'stopping/saving_state'           },
-                                           delay       => [qw(_on_lxc_done)]                                                    },
+                                                            _on_save_state_error         => 'stopping/saving_state'           } },
 
     'running/updating_stats'          => { enter       => '_incr_run_ok',
                                            transitions =>  { _on_incr_run_ok_done        => 'running/running_poststart_hook',
                                                              _on_incr_run_ok_error       => 'running/running_poststart_hook'  },
-                                           delay       => [qw(_on_lxc_done)],
                                            ignore      => [qw(_on_incr_run_ok_result)]                                          },
 
     'running/running_poststart_hook'  => { enter       => '_run_poststart_hook',
                                            transitions => { _on_run_hook_done            => 'running/unsetting_heavy_mark',
-                                                            _on_run_hook_error           => 'stopping/saving_state'           },
-                                           delay       => [qw(_on_lxc_done)]                                                    },
+                                                            _on_run_hook_error           => 'stopping/saving_state'           } },
 
     'running/unsetting_heavy_mark'    => { enter       => '_unset_heavy_mark',
                                            transitions => { _on_unset_heavy_mark_done    => 'running/monitoring'              } },
@@ -163,11 +160,10 @@ use QVD::StateMachine::Declarative
 
     'debugging/saving_state'          => { enter       => '_save_state',
                                            transitions => { _on_save_state_done          => 'debugging/unsetting_heavy_mark',
-                                                            _on_save_state_error         => 'stopping/saving_state'           },
-                                           delay       => [qw(_on_lxc_done)]                                                    },
+                                                            _on_save_state_error         => 'stopping/saving_state'           } },
 
     'debugging/unsetting_heavy_mark'  => { enter       => '_unset_heavy_mark',
-                                           transitions => { _on_unset_heavy_mark_done    => 'debugging/waiting_for_vma'      } },
+                                           transitions => { _on_unset_heavy_mark_done    => 'debugging/waiting_for_vma'       } },
 
     'debugging/waiting_for_vma'       => { enter       => '_start_vma_monitor',
                                            leave       => '_stop_vma_monitor',
@@ -206,8 +202,7 @@ use QVD::StateMachine::Declarative
                                                             on_hkd_kill                  => 'stopping/killing_lxc'            } },
 
     'stopping/stopping_lxc'           => { enter       => '_stop_lxc',
-                                           transitions => { _on_stop_lxc_done            => 'stopping/waiting_for_lxc_to_stop'},
-                                           delay       => ['_on_lxc_done']                                                      },
+                                           transitions => { _on_stop_lxc_done            => 'stopping/waiting_for_lxc_to_stop'} },
 
     'stopping/waiting_for_lxc_to_stop'=> { enter       => '_set_state_timer',
                                            leave       => '_abort_all',
