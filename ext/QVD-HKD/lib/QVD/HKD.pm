@@ -159,7 +159,7 @@ sub new {
 
     my $self = $class->SUPER::new(%opts);
     $self->{config} = QVD::HKD::Config->new(config_file => $config_file,
-                                            on_reload_done => sub { $self->_on_config_reload_done },
+                                            on_reload_done => sub { $self->_config_reloaded },
                                             on_reload_error => sub { $self->_on_config_reload_error });
     $self->{vm} = {};
     $self->{heavy} = {};
@@ -287,6 +287,18 @@ sub _start_db {
                                     );
     $self->_db($db);
     $self->_on_db_connected;
+}
+
+sub _config_reloaded {
+    my $self = shift;
+    if (my $db = $hkd->{db}) {
+        $db->set(timeout            => $self->_cfg('internal.database.pool.connection.timeout'),
+                 global_timeout     => $self->_cfg('internal.database.pool.connection.global_timeout'),
+                 connection_delay   => $self->_cfg('internal.database.pool.connection.delay'),
+                 connection_retries => $self->_cfg('internal.database.pool.connection.retries'),
+                 size               => $self->_cfg('internal.database.pool.size') );
+    }
+    $pool->_on_config_reload_done;
 }
 
 sub _start_config {
