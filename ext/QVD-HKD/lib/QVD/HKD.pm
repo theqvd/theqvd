@@ -291,7 +291,7 @@ sub _start_db {
 
 sub _config_reloaded {
     my $self = shift;
-    if (my $db = $hkd->{db}) {
+    if (my $db = $hkd->_db) {
         $db->set(timeout            => $self->_cfg('internal.database.pool.connection.timeout'),
                  global_timeout     => $self->_cfg('internal.database.pool.connection.global_timeout'),
                  connection_delay   => $self->_cfg('internal.database.pool.connection.delay'),
