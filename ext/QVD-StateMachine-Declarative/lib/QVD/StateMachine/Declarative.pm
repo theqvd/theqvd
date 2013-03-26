@@ -15,7 +15,6 @@ use Class::StateMachine;
 use mro;
 
 my $dump = exists $ENV{CLASS_STATEMACHINE_DECLARATIVE_DUMPFILE};
-warn "dump: $dump\n";
 my %dump;
 
 END {
