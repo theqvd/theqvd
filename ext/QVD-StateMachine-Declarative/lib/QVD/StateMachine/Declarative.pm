@@ -14,11 +14,26 @@ BEGIN { our @CARP_NOT = qw(Class::StateMachine Class::StateMachine::Private) }
 use Class::StateMachine;
 use mro;
 
+my $dump = exists $ENV{CLASS_STATEMACHINE_DECLARATIVE_DUMPFILE};
+warn "dump: $dump\n";
+my %dump;
+
+END {
+    if ($dump) {
+        open my $fh, ">", $ENV{CLASS_STATEMACHINE_DECLARATIVE_DUMPFILE} or return;
+        require Data::Dumper;
+        print $fh, Data::Dumper->Dump(\%dump, [qw(*state_machines)]);
+        close $fh;
+    }
+}
+
 require parent;
 
 sub import {
     shift;
-    init_class(scalar(caller), @_);
+    my $caller = caller;
+    $dump{$caller} = [@_] if $dump;
+    init_class($caller, @_);
 }
 
 my $usage = 'usage: use QVD::StateMachine::Declarative state => { enter => action, leave => action, transitions => { event => final_state, ...}, ignore => [ event, ...] }, state => { ... }, ...;';
