@@ -22,7 +22,7 @@ END {
     if ($dump) {
         open my $fh, ">", $ENV{CLASS_STATEMACHINE_DECLARATIVE_DUMPFILE} or return;
         require Data::Dumper;
-        print $fh, Data::Dumper->Dump([\%dump], [qw(*state_machines)]);
+        print $fh Data::Dumper->Dump([\%dump], [qw(*state_machines)]);
         close $fh;
     }
 }
