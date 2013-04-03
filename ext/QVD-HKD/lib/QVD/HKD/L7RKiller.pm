@@ -16,8 +16,12 @@ use QVD::StateMachine::Declarative
     new               => { transitions => { _on_run                     => 'idle' } },
 
     getting_user_cmd  => { enter       => '_get_user_cmd',
-                           transitions => { _on_get_user_cmd_done       => 'killing_l7r',
+                           transitions => { _on_get_user_cmd_done       => 'deleting_user_cmd',
                                             _on_get_user_cmd_error      => 'idle'             } },
+
+    deleting_user_cmd => { enter       => '_delete_user_cmd',
+                           transitions => { _on_delete_user_cmd_done    => 'killing_l7r',
+                                            _on_delete_user_cmd_error   => 'idle'             } },
 
     killing_l7r       => { enter       => '_kill_l7r',
                            transitions => { _on_kill_l7r_done           => 'getting_user_cmd',
@@ -51,12 +55,11 @@ sub _get_user_cmd {
     my $self = shift;
     delete $self->{_vm_to_be_disconnected};
     $self->_query_1(<<'EOQ', $self->{node_id});
-update vm_runtimes set user_cmd=NULL
+select vm_id, l7r_pid
   where l7r_host=$1
-    and user_state='connected'
-    and user_cmd='abort'
-    limit 1
-  returning vm_id, l7r_pid
+    and user_state = 'connected'
+    and user_cmd   = 'abort'
+  limit 1
 EOQ
 }
 
@@ -68,6 +71,19 @@ sub _on_get_user_cmd_result {
         INFO "User cmd 'abort' received for VM $row{vm_id}";
         $self->{_vm_to_be_disconnected} = \%row;
     }
+}
+
+sub _delete_user_cmd {
+    my $self = shift;
+    my $vm = $self->{_vm_to_be_disconnected};
+    $self->_query_1(<<'EOQ', $self->{node_id}, $vm->{vm_id}, $vm->{l7r_pid});
+update vm_runtimes set user_cmd=NULL
+  where l7r_host=$1
+    and vm_id = $2
+    and l7r_pid = $3
+    and user_state='connected'
+    and user_cmd='abort'
+EOQ
 }
 
 sub _kill_l7r {
