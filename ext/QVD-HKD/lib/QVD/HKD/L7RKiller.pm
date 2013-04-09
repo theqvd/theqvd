@@ -56,6 +56,7 @@ sub _get_user_cmd {
     delete $self->{_vm_to_be_disconnected};
     $self->_query_1(<<'EOQ', $self->{node_id});
 select vm_id, l7r_pid
+  from vm_runtimes
   where l7r_host=$1
     and user_state = 'connected'
     and user_cmd   = 'abort'
