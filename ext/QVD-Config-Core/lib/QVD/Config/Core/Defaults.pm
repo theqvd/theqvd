@@ -93,6 +93,7 @@ command.xinit = /usr/bin/xinit
 command.xhost = /usr/bin/xhost
 command.nxproxy = /usr/bin/nxproxy
 command.btrfs = /sbin/btrfs
+command.ip = /sbin/ip
 
 command.windows.xming = Xming\\Xming.exe
 command.windows.pulseaudio = pulseaudio\\pulseaudio.exe
