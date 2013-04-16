@@ -14,7 +14,6 @@ use warnings;
 no warnings 'redefine';
 
 use Carp;
-use Fcntl qw(LOCK_EX LOCK_NB);
 use File::Slurp qw(slurp);
 use Pg::PQ qw(:pgres);
 use QVD::Log;
@@ -42,111 +41,67 @@ use QVD::HKD::Config::Network qw(netvms netnodes net_aton net_ntoa netstart_n ne
 
 use parent qw(QVD::HKD::Agent);
 
-use QVD::StateMachine::Declarative
-    'new'                            => { transitions => { _on_run                    => 'starting/acquiring_lock'        } },
+use Class::StateMachine::Declarative
+    __any__        => { advance => '_on_done',
+                        on => { _on_dead_db => '_on_error',
+                                _on_ticker_error => '_on_error' },
+                        ignore => [qw(_on_db_ticked
+                                      _on_transient_db_error
+                                      _on_config_reload_done)],
+                        delay => [qw(_on_cmd_stop)],
+                        before => {_on_config_reload_done => '_sync_db_config' } },
 
-    'starting/acquiring_lock'        => { enter       => '_acquire_lock',
-                                          transitions => { _on_acquire_lock_done      => 'starting/checking_tcp_ports',
-                                                           _on_acquire_lock_error     => 'failed'                         } },
-    'starting/checking_tcp_ports'    => { enter       => '_check_tcp_ports',
-                                          transitions => { _on_check_tcp_ports_done   => 'starting/connecting_to_db',
-                                                           _on_check_tcp_ports_error  => 'failed'                         } },
+    new            => { transitions => { _on_run => 'starting'} },
 
-    'starting/connecting_to_db'      => { enter       => '_start_db',
-                                          transitions => { _on_db_connected           => 'starting/loading_db_config',
-                                                           _on_dead_db                => 'failed'                         } },
+    starting       => { substates => [ zero => { transitions => { _on_error => 'exit',
+                                                                  _on_cmd_stop => 'exit' },
+                                                 substates => [ acquiring_lock => { enter => '_acquire_lock' },
+                                                                connecting_to_db      => { enter => '_start_db' },
+                                                                loading_db_config     => { enter => '_start_config',
+                                                                                           on => { _on_config_reload_done => '_on_done' } },
+                                                                loading_host_row      => { enter => '_load_host_row' },
+                                                                checking_tcp_ports    => { enter => '_check_tcp_ports' },
+                                                                checking_address      => { enter => '_check_address' } ] },
 
-    'starting/loading_db_config'     => { enter       => '_start_config',
-                                          transitions => { _on_config_reload_done     => 'starting/loading_host_row',
-                                                           _on_config_reload_error    => 'failed',
-                                                           _on_dead_db                => 'failed'                         } },
+                                       setup => { transitions => { _on_error => 'stopping',
+                                                                   _on_cmd_stop => 'stopping' },
+                                                  substates => [ saving_state          => { enter => '_save_state' },
+                                                                 preparing_storage     => { enter => '_prepare_storage' },
+                                                                 removing_old_fw_rules => { enter => '_remove_fw_rules' },
+                                                                 setting_fw_rules      => { enter => '_set_fw_rules' },
+                                                                 saving_loadbal_data   => { enter => '_save_loadbal_data' },
+                                                                 ticking               => { enter => '_start_ticker',
+                                                                                            on => { _on_db_ticked => '_on_done' } },
+                                                                 searching_zombies     => { enter => '_search_zombies' },
+                                                                 catching_zombies      => { enter => '_catch_zombies',
+                                                                                            on => { _on_no_vms_are_running => '_on_done' } },
+                                                                 agents                => { enter => '_start_agents' } ] } ] },
 
-    'starting/loading_host_row'      => { enter       => '_load_host_row',
-                                          transitions => { _on_load_host_row_done     => 'starting/saving_state',
-                                                           _on_load_host_row_error2   => 'failed'                         } },
+    running        => { transitions => { _on_error   => 'stopping' },
+                        ignore => [qw(_on_no_vms_are_running) ],
+                        substates => [ saving_state => { enter => '_save_state' },
+                                       agents       => { enter => '_start_vm_command_handler' },
+                                       main         => { on => { _on_cmd_stop => '_on_done' } } ] },
 
-    'starting/saving_state'          => { enter       => '_save_state',
-                                          transitions => { _on_save_state_done        => 'starting/checking_address',
-                                                           _on_save_state_error       => 'failed'                         } },
+    stopping       => { on => { _on_error => '_on_done' },
+                        ignore => [qw(_on_ticker_error _on_dead_db)],
+                        substates => [ stopping_vm_command_handler => { enter => '_stop_vm_command_handler',
+                                                                        on => { _on_vm_command_handler_stopped => '_on_done' } },
+                                       saving_state                => { enter => '_save_state' },
+                                       stopping_all_vms            => { enter => '_stop_all_vms',
+                                                                        on => { _on_no_vms_are_running => '_on_done',
+                                                                                _on_state_timeout     => '_on_error' },
+                                                                        transitions => { _on_error => 'killing_all_vms' } },
+                                       '(killing_all_vms)'         => { enter => '_kill_all_vms' },
 
-    'starting/checking_address'      => { enter       => '_check_address',
-                                          transitions => { _on_check_address_done     => 'starting/preparing_storage',
-                                                           _on_check_address_error    => 'failed'                         } },
+                                       stopping_all_agents         => { enter => '_stop_all_agents',
+                                                                        on => {_on_all_agents_stopped => '_on_done' } },
+                                       removing_fw_rules           => { enter => '_remove_fw_rules' } ] },
 
-    'starting/preparing_storage'     => { enter       => '_prepare_storage',
-                                          transitions => { _on_prepare_storage_done   => 'starting/removing_old_fw_rules',
-                                                           _on_prepare_storage_error  => 'failed'                         } },
+    stopped        => { enter => '_save_state',
+                        on => { _on_error => '_on_done' } },
 
-    'starting/removing_old_fw_rules' => { enter       => '_remove_fw_rules',
-                                          transitions => { _on_remove_fw_rules_done   => 'starting/setting_fw_rules'      } },
-
-    'starting/setting_fw_rules'      => { enter       => '_set_fw_rules',
-                                          transitions => { _on_set_fw_rules_done      => 'starting/saving_loadbal_data',
-                                                           _on_set_fw_rules_error     => 'failed'                         } },
-
-    'starting/saving_loadbal_data'   => { enter       => '_save_loadbal_data',
-                                          transitions => { _on_save_loadbal_data_done => 'starting/ticking',
-                                                           _on_save_loadbal_data_error => 'stopping/removing_fw_rules'    } },
-
-    'starting/ticking'               => { enter       => '_start_ticking',
-                                          transitions => { _on_ticked                 => 'starting/catching_zombies',
-                                                           _on_ticker_error           => 'stopping/removing_fw_rules'     } },
-
-    'starting/catching_zombies'      => { enter       => '_catch_zombies',
-                                          transitions => { _on_catch_zombies_done     => 'starting/agents',
-                                                           _on_catch_zombies_error    => 'stopping/removing_fw_rules'     } },
-
-    'starting/agents'                => { enter       => '_start_agents',
-                                          transitions => { _on_agents_started         => 'running/saving_state'           } },
-
-    'running/saving_state'           => { enter       => '_save_state',
-                                          transitions => { _on_save_state_done        => 'running/agents',
-                                                           _on_save_state_error       => 'stopping/killing_all_vms'       } },
-
-    'running/agents'                 => { enter       => '_start_vm_command_handler',
-                                          transitions => { _on_start_vm_command_handler_done => 'running'                 } },
-
-    'running'                        => { transitions => { _on_cmd_stop               => 'stopping',
-                                                           _on_dead_db                => 'stopping/killing_all_vms',
-                                                           _on_ticker_error           => 'stopping/killing_all_vms'       } },
-
-    'stopping'                       => { jump        => 'stopping/saving_state'                                            },
-
-    'stopping/saving_state'          => { enter       => '_save_state',
-                                          transitions => { _on_save_state_done        => 'stopping/stopping_all_vms',
-                                                           _on_save_state_error       => 'stopping/killing_all_vms'       } },
-
-    'stopping/stopping_all_vms'      => { enter       => '_stop_all_vms',
-                                          leave       => '_abort_all',
-                                          transitions => { _on_stop_all_vms_done      => 'stopping/stopping_all_agents',
-                                                           _on_state_timeout          => 'stopping/killing_all_vms'       } },
-
-    'stopping/killing_all_vms'       => { enter       => '_kill_all_vms',
-                                          leave       => '_abort_all',
-                                          transitions => { _on_stop_all_vms_done      => 'stopping/stopping_all_agents'   } },
-
-    'stopping/stopping_all_agents'   => { enter       => '_stop_all_agents',
-                                          transitions => { _on_all_agents_stopped     => 'stopping/removing_fw_rules'     } },
-
-    'stopping/removing_fw_rules'     => { enter       => '_remove_fw_rules',
-                                          transitions => { _on_remove_fw_rules_done   => 'stopped/saving_state'           } },
-
-    'stopped/saving_state'           => { enter       => '_save_state',
-                                          transitions => { _on_save_state_done        => 'stopped/bye',
-                                                           _on_save_state_error       => 'stopped/bye'                    } },
-
-    'stopped/bye'                    => { enter       => '_say_goodbye'                                                   },
-
-    failed                           => { enter       => '_say_goodbye'                                                   },
-
-    __any__                          => { ignore      => [qw(_on_ticked
-                                                             _on_stop_all_vms_done
-                                                             _on_transient_db_error
-                                                             _on_config_reload_done
-                                                             _on_config_reload_error )],
-                                          delay_once  => [qw(_on_cmd_stop
-                                                             _on_dead_db
-                                                             _on_ticker_error)]                                                  };
+    exit           => { enter => '_say_goodbye' };
 
 sub _on_transient_db_error :OnState('running') {
     shift->{cluster_monitor}->on_transient_db_error
@@ -159,8 +114,7 @@ sub new {
 
     my $self = $class->SUPER::new(%opts);
     $self->{config} = QVD::HKD::Config->new(config_file => $config_file,
-                                            on_reload_done => sub { $self->_config_reloaded },
-                                            on_reload_error => sub { $self->_on_config_reload_error });
+                                            on_reload_done => sub { $self->_on_config_reload_done });
     $self->{vm} = {};
     $self->{heavy} = {};
     $self->{delayed} = {};
@@ -169,27 +123,10 @@ sub new {
 
 sub _acquire_lock {
     my $self = shift;
-    my $lock_file = $self->_cfg('internal.hkd.lock.path');
-    DEBUG "Trying to get lock at '$lock_file'";
-    if (open my $lf, '>', $lock_file) {
-        if (flock $lf, LOCK_EX|LOCK_NB) {
-            $self->{lock_file} = $lf;
-            DEBUG 'Lock acquired';
-            return $self->_on_acquire_lock_done;
-        }
-        if ($self->{lock_retries}++ < $self->_cfg('internal.hkd.lock.retries')) {
-            $debug and $self->_debug("lock busy, delaying... ($!)");
-            DEBUG "Lock busy ($!), delaying...";
-            return $self->_call_after($self->_cfg('internal.hkd.lock.delay'), sub { $self->_acquire_lock });
-        }
-        $debug and $self->_debug("unable to lock file, tried $self->{lock_retries} times: $!");
-        ERROR "Unable to lock file, tried '$self->{lock_retries}' times: $!";
-    }
-    else {
-        $debug and $self->_debug("unable to open lock file $lock_file: $!");
-        ERROR "Unable to open lock file '$lock_file': $!";
-    }
-    $self->_on_acquire_lock_error;
+    my $file = $self->_cfg('internal.hkd.lock.path');
+    $self->_flock({ save_to => 'lock_file',
+                    log_error => "Unable to lock file '$file'" },
+                  $file);
 }
 
 sub _say_goodbye {
@@ -263,10 +200,10 @@ sub _check_tcp_ports {
     my $tcp = Linux::Proc::Net::TCP->read;
     if (grep $_ == 53, $tcp->listener_ports) {
         ERROR "TCP port 53 is already in use";
-        $self->_on_check_tcp_ports_error;
+        $self->_on_error;
     }
     else {
-        $self->_on_check_tcp_ports_done;
+        $self->_on_done;
     }
 }
 
@@ -286,10 +223,10 @@ sub _start_db {
                                       on_transient_error => sub { $self->_on_transient_db_error },
                                     );
     $self->_db($db);
-    $self->_on_db_connected;
+    $self->_on_done;
 }
 
-sub _config_reloaded {
+sub _sync_db_config {
     my $self = shift;
     if (my $db = $self->_db) {
         $db->set(timeout            => $self->_cfg('internal.database.pool.connection.timeout'),
@@ -298,32 +235,23 @@ sub _config_reloaded {
                  connection_retries => $self->_cfg('internal.database.pool.connection.retries'),
                  size               => $self->_cfg('internal.database.pool.size') );
     }
-    $self->_on_config_reload_done;
 }
 
 sub _start_config {
     my $self = shift;
     DEBUG 'Loading configuration';
     $self->{config}->set_db($self->{db});
+    # not _on_done or _on_error generation because the db config reload events trigger them.
 }
 
 sub _load_host_row {
     my $self = shift;
     my $host = $self->_cfg('nodename');
     DEBUG "Loading entry for host '$host' from DB";
-    $self->_query_1('select id, address from hosts where name=$1', $host);
-}
-
-sub _on_load_host_row_error {
-    my ($self, $res) = @_;
-    $self->_debug("node row not found in database");
-    ERROR "Unable to retrieve node data from database";
-    $self->_on_load_host_row_error2
-}
-
-sub _on_load_host_row_result {
-    my ($self, $res) = @_;
-    @{$self}{qw(node_id address)} = $res->row;
+    $self->_query({n => 1,
+                   save_to_self => [qw(node_id address)],
+                   log_error => 'Unable to retrieve node data from database' },
+                  'select id, address from hosts where name=$1', $host);
 }
 
 sub _check_address {
@@ -332,7 +260,7 @@ sub _check_address {
     my $ifaces = `ip -f inet addr show`;
     unless ($ifaces =~ /inet $address_q\b/) {
         ERROR "IP address $self->{address} not configured on node";
-        return $self->_on_check_address_error
+        return $self->_on_error;
     }
     $self->_debug("some interface has IP $self->{address}:\n$ifaces");
 
@@ -342,9 +270,18 @@ sub _check_address {
     if ($address_n <= $net_n or $address_n >= $start_n) {
         ERROR sprintf("Host IP address is outside of the network range reserved for hosts (IP: %s, range: %s-%s)",
                       $self->{address}, net_ntoa($net_n), net_ntoa($start_n));
-        return $self->_on_check_address_error;
+        return $self->_on_error;
     }
-    $self->_on_check_address_done;
+    $self->_on_done;
+}
+
+sub _save_state {
+    my $self = shift;
+    my $state = $self->_main_state;
+    $debug and $self->_debug("changing database state to $state");
+    $self->_query({n => 1,
+                   log_error => "Unable to update host_runtimes table in database" },
+                  'update host_runtimes set state = $1 where host_id = $2', $state, $self->{node_id});
 }
 
 sub _calc_load_balancing_data {   ## taken from was_QVD-HKD/lib/QVD/HKD.pm, _update_load_balancing_data
@@ -364,41 +301,21 @@ sub _calc_load_balancing_data {   ## taken from was_QVD-HKD/lib/QVD/HKD.pm, _upd
     return $bogomips, $meminfo{MemTotal}/1000;
 }
 
-sub _save_state {
-    my $self = shift;
-    my $state = $self->_main_state;
-    $debug and $self->_debug("changing database state to $state");
-    $self->_query('update host_runtimes set state = $1 where host_id = $2',
-                  $state, $self->{node_id});
-}
-
-sub _on_save_state_result {}
-
 sub _save_loadbal_data {
     my $self = shift;
     my ($cpu, $ram) = _calc_load_balancing_data;
-    $self->_query(q(update host_runtimes set usable_cpu=$1, usable_ram=$2 where host_id=$3),
+    $self->_query({n => 1,
+                   log_error => 'Unable to update load balancing data on host_runtimes table' },
+                  'update host_runtimes set usable_cpu=$1, usable_ram=$2 where host_id=$3',
                   $cpu, $ram, $self->{node_id});
 }
 
-sub _on_save_loadbal_data_bad_result {
-    # FIXME
-    exit(1);
-}
-
-sub _on_save_loadbal_data_error {
-    # FIXME
-    exit(1);
-}
-
-sub _on_save_loadbal_data_result {}
-
-sub _start_ticking {
+sub _start_ticker {
     my $self = shift;
     $self->{ticker} = QVD::HKD::Ticker->new( config => $self->{config},
                                              db => $self->{db},
                                              node_id => $self->{node_id},
-                                             on_ticked => sub { $self->_on_ticked },
+                                             on_ticked => sub { $self->_on_db_ticked },
                                              on_error => sub { $self->_on_ticker_error },
                                              on_stopped => sub { $self->_on_agent_stopped(@_) } );
     DEBUG 'Starting ticker';
@@ -412,8 +329,8 @@ sub _start_agents {
                  node_id    => $self->{node_id},
                  on_stopped => sub { $self->_on_agent_stopped(@_) } );
 
-    $self->{command_handler}    = QVD::HKD::CommandHandler->new(%opts, on_cmd => sub { $self->_on_cmd($_[1]) });
-    $self->{vm_command_handler} = QVD::HKD::VMCommandHandler->new(%opts, on_cmd => sub { $self->_on_vm_cmd($_[1], $_[2]) });
+    $self->{command_handler}    = QVD::HKD::CommandHandler->new(%opts,
+                                                                on_cmd => sub { $self->_on_cmd($_[1]) });
     $self->{l7r_monitor}        = QVD::HKD::L7RMonitor->new(%opts);
     $self->{l7r_killer}         = QVD::HKD::L7RKiller->new(%opts);
     $self->{cluster_monitor}    = QVD::HKD::ClusterMonitor->new(%opts);
@@ -444,18 +361,24 @@ sub _start_agents {
         INFO "DHCP server is administratively disabled, not running";
     }
 
-    $self->_on_agents_started;
+    $self->_on_done;
 }
 
 sub _start_vm_command_handler {
     my $self = shift;
     DEBUG 'Starting VM command handler';
+    $self->{vm_command_handler} = QVD::HKD::VMCommandHandler->new(config => $self->{config},
+                                                                  db         => $self->{db},
+                                                                  node_id    => $self->{node_id},
+                                                                  on_stopped => sub { $self->_on_vm_command_handler_stopped },
+                                                                  on_cmd => sub { $self->_on_vm_cmd($_[1], $_[2]) });
     $self->{vm_command_handler}->run;
-    $self->_on_start_vm_command_handler_done;
+    $self->_on_done;
 }
 
-my @agent_names = qw(vm_command_handler
-                     command_handler
+# vm_command_handler does not appear in the following list because it
+# is handled by specific code
+my @agent_names = qw(command_handler
                      dhcpd_handler
                      ticker
                      l7r_monitor
@@ -471,13 +394,22 @@ sub _check_all_agents_have_stopped {
     return 1;
 }
 
+sub _stop_vm_command_handler {
+    my $self = shift;
+    if (defined(my $agent = $self->{vm_command_handler})) {
+        $agent->on_hkd_stop;
+    }
+    else {
+        $self->_on_done;
+    }
+}
+
 sub _stop_all_agents {
     my $self = shift;
     unless ($self->_check_all_agents_have_stopped) {
         for my $agent_name (@agent_names) {
-            my $agent = $self->{$agent_name};
-            if (defined $agent) {
-                $agent->on_hkd_stop
+            if (defined (my $agent = $self->{$agent_name})) {
+                $agent->on_hkd_stop;
             }
         }
     }
@@ -512,7 +444,6 @@ sub _new_vm_handler {
                                                             db => $self->{db},
                                                             dhcpd_handler => $self->{dhcpd_handler},
                                                             on_stopped => sub { $self->_on_vm_stopped($vm_id) },
-                                                            on_delete_cmd => sub { $self->_on_vm_cmd_done($vm_id) },
                                                             on_heavy => sub { $self->_on_vm_heavy($vm_id, @_) } );
     $debug and $self->_debug_vm_stats;
     $vm;
@@ -531,15 +462,10 @@ sub _on_vm_cmd {
             DEBUG "'start' cmd received for live vm '$vm_id'";
             return;
         }
-        if ($self->state eq 'running') {
+        else {
             $debug and $self->_debug("creating VM handler agent");
             DEBUG 'Creating VM handler agent';
             $vm = $self->_new_vm_handler($vm_id);
-        }
-        else {
-            $debug and $self->_debug("dropping command $cmd for vm $vm_id while on state " . $self->state);
-            WARN "Dropping command '$cmd' received for '$vm_id' while on state " . $self->state;
-            return $self->_on_vm_cmd_done($vm_id);
         }
     }
     unless (defined $vm) {
@@ -565,7 +491,7 @@ sub _on_vm_stopped {
         $self->_run_delayed;
     }
     $debug and $self->_debug_vm_stats;
-    $self->_on_stop_all_vms_done if $all_done;
+    $self->_on_no_vms_are_running if $all_done;
 }
 
 sub _debug_vm_stats {
@@ -584,32 +510,29 @@ sub _debug_vm_stats {
 }
 
 sub _on_vm_heavy {
-    my ($self, $vm_id, undef, $set) = @_;
+    my ($self, $vm_id, undef, $set, $cb) = @_;
     $debug and $self->_debug("_on_vm_heavy($vm_id, $set) called");
     if ($set) {
         if ($self->{heavy}{$vm_id}) {
             $debug and $self->_debug("VM $vm_id is already marked as heavy");
-            return 1;
-        }
-        if (keys %{$self->{heavy}} <= $self->_cfg('internal.hkd.max_heavy')) {
-            $debug and $self->_debug("VM $vm_id marked as heavy");
-            $self->{heavy}{$vm_id} = 1;
-            $debug and $self->_debug_vm_stats;
-            return 1;
+            $cb->();
         }
         else {
-            $debug and $self->_debug("Can't mark VM $vm_id as heavy, there are already too many");
-            $self->{delayed}{$vm_id} = 1;
-            $debug and $self->_debug_vm_stats;
-            return;
+            $debug and $self->_debug("Pushing VM $vm_id into heavy queue");
+            $self->{delayed}{$vm_id} = $cb;
         }
     }
     else {
-        $debug and $self->_debug("Removing heavy mark for VM $vm_id");
-        delete $self->{heavy}{$vm_id};
-        $debug and $self->_debug_vm_stats;
-        $self->_run_delayed;
+        if (delete $self->{heavy}{$vm_id}) {
+            $debug and $self->_debug("Heavy mark for VM $vm_id removed");
+        }
+        else {
+            $debug and $self->_debug("Heavy mark for VM $vm_id was not set");
+        }
+        delete $self->{delayed}{$vm_id};
     }
+    $self->_run_delayed;
+    1;
 }
 
 sub _run_delayed {
@@ -618,22 +541,16 @@ sub _run_delayed {
            keys %{$self->{heavy}} <= $self->_cfg('internal.hkd.max_heavy')) {
         $debug and $self->_debug_vm_stats;
         my $vm_id = each %{$self->{delayed}};
-        delete $self->{delayed}{$vm_id};
-        $self->_on_vm_cmd($vm_id, 'go_heavy');
+        my $cb = delete $self->{delayed}{$vm_id};
+        $self->{heavy}{$vm_id} = 1;
+        $cb->();
     }
 }
-
-sub _on_vm_cmd_done {
-    my ($self, $vm_id) = @_;
-    $self->{vm_command_handler}->_on_cmd_done($vm_id);
-}
-
-sub _on_failed { croak "something come completely wrong, aborting...\n" }
 
 sub _stop_all_vms {
     my $self = shift;
     values %{$self->{vm}}
-        or return $self->_on_stop_all_vms_done;
+        or return $self->_on_no_vms_are_running;
     $_->on_hkd_stop for values %{$self->{vm}};
     $self->_call_after($self->_cfg("internal.hkd.stopping.vms.timeout"), '_on_state_timeout');
 }
@@ -641,25 +558,30 @@ sub _stop_all_vms {
 sub _kill_all_vms {
     my $self = shift;
     values %{$self->{vm}}
-        or return $self->_on_stop_all_vms_done;
+        or return $self->_on_no_vms_are_running;
     $_->on_hkd_kill for values %{$self->{vm}};
     # FIXME: what to do when not all machines can be killed? nothing? repeat?
     $self->_call_after($self->_cfg("internal.hkd.killing.vms.retry.timeout"), '_kill_all_vms');
 }
 
-sub _catch_zombies {
+sub _search_zombies {
     my $self = shift;
-    $self->_query('select vm_id from vm_runtimes where host_id=$1 and vm_state != \'stopped\'', $self->{node_id});
+    $self->_query( { save_to => 'zombies',
+                     log_error => 'unable to retrieve list of zombie vms from table vm_runtimes' },
+                   q(select vm_id from vm_runtimes where host_id=$1 and vm_state != 'stopped'), $self->{node_id});
 }
 
-sub _on_catch_zombies_bad_result { }
-
-sub _on_catch_zombies_result {
-    my ($self, $res) = @_;
-    for my $i (0 .. $res->rows - 1) {
-        my $vm_id = $res->row($i);
-        my $vm = $self->_new_vm_handler($vm_id);
-        $vm->on_cmd('catch_zombie');
+sub _catch_zombies {
+    my $self = shift;
+    my $zombies = delete $self->{zombies};
+    if (@$zombies) {
+        for my $row (@$zombies) {
+            my $vm = $self->_new_vm_handler($row->{vm_id});
+            $vm->on_cmd('catch_zombie');
+        }
+    }
+    else {
+        $self->_on_done;
     }
 }
 
@@ -672,12 +594,12 @@ sub _prepare_storage {
         my $fh;
         unless (open $fh, '>>', $fn) {
             ERROR "Unable to create or open file $fn to work around LXC make-btrfs-ro-on-exit bug: $!";
-            $self->_on_prepare_storage_error;
+            $self->_on_error;
         }
         DEBUG "$fn opened";
         $self->{btrfs_lock} = $fh;
     }
-    $self->_on_prepare_storage_done
+    $self->_on_done
 }
 
 sub _fw_rules {
@@ -711,18 +633,18 @@ sub _set_fw_rules {
         my $iptables = $self->_cfg('command.iptables');
         DEBUG 'Setting up firewall rules';
         for my $rule ($self->_fw_rules) {
-            $debug and $self->_debug("setting iptables entry @$rule");
+            DEBUG "setting iptables entry @$rule";
             if (system $iptables => -A => @$rule) {
-                $debug and $self->_debug("iptables command failed, rc: " . ($? >> 8));
-                return $self->_on_set_fw_rules_error;
+                my $rc = $? >> 8;
+                ERROR "Unable to set firewall rule, command failed, rc: $rc, cmd: $iptables -A @$rule";
+                return $self->_on_error;
             }
         }
     }
     else {
-        $debug and $self->_debug("setup of global firewall rules skipped, do you really need to do that?");
-        INFO 'Setup of global firewall rules skipped, do you really need to do that?';
+        WARN 'Setup of global firewall rules skipped, do you really need to do that?';
     }
-    $self->_on_set_fw_rules_done;
+    $self->_on_done;
 }
 
 sub _remove_fw_rules {
@@ -733,14 +655,15 @@ sub _remove_fw_rules {
         for my $rule (reverse $self->_fw_rules) {
             $debug and $self->_debug("removing iptables entry @$rule");
             if (system $iptables => -D => @$rule) {
-                $debug and $self->_debug("iptables command failed, rc: " . ($? >> 8));
+                my $rc = $? >> 8;
+                INFO "Unable to remove firewall rule, command failed, rc: $rc, cmd: $iptables -D @$rule";
             }
         }
     }
     else {
-         $debug and $self->_debug("cleanup of global firewall rules skipped");
+        INFO "cleanup of global firewall rules skipped";
     }
-    $self->_on_remove_fw_rules_done;
+    $self->_on_done;
 }
 
 sub _write_vm_report {
@@ -754,7 +677,6 @@ sub _write_vm_report {
         for my $state (sort { $state{$b} <=> $state{$a} } keys %state) {
             printf $fh "%5d %s\n", $state{$state}, $state;
         }
-        $debug and $self->_debug("VM states report written to '/tmp/hkd-vm-states");
     }
     else {
         ERROR "unable to open '/tmp/hkd-vm-states': $!";
@@ -763,37 +685,6 @@ sub _write_vm_report {
 
 1;
 
-__END__
-
-# HKD tasks:
-#
-# * keep connection to the database open
-# * (re)load config
-# * periodically check for commands and launch/stop virtual machines
-# * update Host_Runtimes table
-# * monitor other HKDs
-# * clean shutdown
-# * run and monitor DHCP
-# * run and monitor L7R
-# * kill dangling L7R processes for disconnected VMs
-
-# VM tasks:
-#
-# * start/stop
-# * monitor processes
-# * keep internal state
-# * keep public info in VM_Runtimes table
-
-# Concerns
-#
-# * DB may be a bottleneck, should we use some kind of priority system
-# or whatever? add timeouts for push_query into AnyEvent::Pg?
-#
-
-
-
-
-1;
 __END__
 
 =head1 NAME

@@ -11,17 +11,23 @@ use QVD::HKD::Helpers;
 
 use parent qw(QVD::HKD::Agent);
 
-use QVD::StateMachine::Declarative
-    new      => { transitions => { _on_run       => 'ticking'  } },
-    ticking  => { enter => '_tick',
-                  transitions => { _on_delay     => 'delaying' } },
-    delaying => { enter => '_set_timer',
-                  transitions => { _on_timeout   => 'ticking',
-                                   on_hkd_stop   => 'stopped'  },
-                  leave => '_abort_all'                          },
-    stopped  => { enter => '_on_stopped'                         };
+use Class::StateMachine::Declarative
+    __any__  => { transitions => { on_hkd_stop => 'stopped' } },
 
-sub on_hkd_stop { shift->delay_until_next_state }
+    new      => { transitions => { _on_run => 'ticking'  } },
+
+    ticking  => { enter => '_tick',
+                  before => { _on_error => '_tick_error',
+                              _on_done => '_tick_done' },
+                  transitions => { _on_done => 'delaying',
+                                   _on_error => 'delaying' } },
+
+    delaying => { enter => '_set_timer',
+                  transitions => { _on_timeout   => 'ticking' } },
+
+    stopped  => { enter => '_on_stopped' };
+
+sub stop { shift->_on_stop }
 
 sub new {
     my ($class, %opts) = @_;
@@ -40,30 +46,30 @@ sub new {
 sub _tick {
     my $self = shift;
     INFO 'Ticking';
-    $self->_query_1(q(update host_runtimes set ok_ts=now(), pid=$1 where host_id=$2 and state != 'lost'),
-                    $$, $self->{node_id});
-}
-
-sub _on_tick_done {
-    my $self = shift;
-    DEBUG 'Ticking ok';
-    $self->{failed_ticks} = 0;
-    $self->_on_delay;
-}
-
-sub _on_tick_error {
-    my $self = shift;
-    my $failed = ++$self->{failed_ticks};
-    WARN "Error on ticking $failed)";
-    if ($failed >= $self->_cfg('internal.hkd.agent.ticker.retries')) {
-        $self->_maybe_callback('on_error')
-    };
-    $self->_on_delay;
+    $self->_query(q(update host_runtimes set ok_ts=now(), pid=$1 where host_id=$2 and state != 'lost' returning extract('epoch' from ok_ts)),
+                  $$, $self->{node_id});
 }
 
 sub _on_tick_result {
-    INFO "Database ticked";
-    shift->_maybe_callback('on_ticked');
+    my ($self, $res) = @_;
+    $self->{last_ts_ok} = $res->row;
+    DEBUG "Ticking ok at $self->{last_ts_ok} (localtime: ".time.")";
+
+}
+
+sub _tick_error {
+    my $self = shift;
+    WARN "Ticker failed";
+    if (defined (my $last = $self->{last_ts_ok})) {
+        if (time - $last > $self->_cfg('internal.hkd.agent.ticker.timeout')) {
+            $self->_maybe_callback('on_error');
+        }
+    }
+}
+
+sub _tick_done {
+    my $self = shift;
+    $self->_maybe_callback('on_ticked');
 }
 
 sub _set_timer {

@@ -13,30 +13,24 @@ our $debug;
 
 use parent qw(QVD::HKD::Agent);
 
-use QVD::StateMachine::Declarative
+use Class::StateMachine::Declarative
+    __any__  => {},
+
     new      => { transitions => { _on_run      => 'running'  } },
 
-    running  => { enter => '_run_dhcpd',
-                  transitions => { on_hkd_stop => 'stopping' } },
+    running  => { substates => [ run   => { enter => '_start_dhcpd',
+                                            transitions => { _on_done    => 'delay',
+                                                             on_hkd_stop => 'stopping' } },
+
+                                 delay => { enter => '_set_timer',
+                                            transitions => { _on_timeout => 'run',
+                                                             on_hkd_stop => 'stopped' } } ] },
 
     stopping => { enter => '_kill_cmd',
-                  transitions => { _on_run_dhcpd_done => 'stopped' },
-                  ignore => [qw(on_hkd_stop)]                       },
-    stopped  => { enter => '_on_stopped'                            };
+                  transitions => { _on_done => 'stopped' },
+                  ignore => [qw(on_hkd_stop)] },
 
-
-sub _on_run_dhcpd_error {
-    my $self = shift;
-    ERROR 'Error running dhcpd';
-    $self->_call_after ($self->_cfg('internal.hkd.dhcpdhandler.wait_on_run_error'), '_on_run_dhcpd_done');
-}
-
-sub _on_run_dhcpd_done :OnState('running') {
-    my $self = shift;
-    WARN 'dhcpd exited';
-    $self->{dhcpd_pid} = undef;
-    $self->_run_dhcpd;
-}
+    stopped  => { enter => '_on_stopped' };
 
 sub new {
     my ($class, %opts) = @_;
@@ -54,7 +48,6 @@ sub register_mac_and_ip {
     $self->{mac}{$vm_id} = $mac;
     $self->{ip}{$vm_id} = $ip;
     $self->_reload_config;
-    # $self->_restart_server;
 }
 
 sub unregister_mac_and_ip {
@@ -67,7 +60,7 @@ sub unregister_mac_and_ip {
 
 sub _make_config {
     my $self = shift;
-    my $dhcp_hostsfile     = $self->_cfg('internal.vm.network.dhcp-hostsfile');
+    my $dhcp_hostsfile = $self->_cfg('internal.vm.network.dhcp-hostsfile');
     DEBUG "Writing DHCP hosts file '$dhcp_hostsfile'";
     open my $fh, ">", $dhcp_hostsfile or die "unable to open $dhcp_hostsfile: $!";
     for my $vm (sort { $self->{mac}{$a} cmp $self->{mac}{$b} } keys %{$self->{mac}}) {
@@ -80,19 +73,11 @@ sub _reload_config {
     my $self = shift;
     $self->_make_config;
     DEBUG 'Sending HUP signal to dhcpd';
-    my $ok = $self->_kill_cmd('HUP');
-    unless ($ok) {
-        $debug and $self->_debug("unable to signal dnsmasq");
+    $self->_kill_cmd('HUP') or
         ERROR "Unable to signal dnsmasq process";
-    }
 }
 
-sub _restart_server {
-    my $self = shift;
-    $self->_kill_cmd or $self->_on_run_dhcpd_done;
-}
-
-sub _run_dhcpd {
+sub _start_dhcpd {
     my $self = shift;
 
     my $dhcpd_cmd          = $self->_cfg('command.dhcpd');
@@ -103,7 +88,7 @@ sub _run_dhcpd {
     my $dhcp_hostsfile     = $self->_cfg('internal.vm.network.dhcp-hostsfile');
     DEBUG "About to run dhcpd: network bridge '$network_bridge', IP start '$dhcp_start', gateway '$dhcp_default_route', domain '$dhcp_domain'";
     $self->_make_config;
-    my @dhcpd_cmd = ( $dhcpd_cmd,
+    my @dhcpd_cmd = ( 'dhcpd',
                       '-k', '--log-dhcp',
                       '--dhcp-range'     => "interface:$network_bridge,$dhcp_start,static",
                       '--dhcp-option'    => "option:router,$dhcp_default_route",
@@ -117,7 +102,14 @@ sub _run_dhcpd {
     push @dhcpd_cmd, "--domain=$dhcp_domain" if length $dhcp_domain;
     push @dhcpd_cmd, "-d" if $debug;
 
-    $self->_run_cmd(\@dhcpd_cmd);
+    $self->_run_cmd( { ignore_errors => 1,
+                       outlives_state => 1 },
+                     @dhcpd_cmd);
+}
+
+sub _set_timer {
+    my $self = shift;
+    $self->_call_after($self->_cfg('internal.hkd.agent.dhcpdhandler.delay' ), '_on_timeout');
 }
 
 1;

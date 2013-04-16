@@ -12,61 +12,38 @@ use QVD::HKD::Helpers;
 
 use parent qw(QVD::HKD::Agent);
 
-use QVD::StateMachine::Declarative
-    new              => { transitions => { _on_run                 => 'long_delaying'     } },
+use Class::StateMachine::Declarative
+    __any__       => { advance => '_on_done',
+                       transitions => { on_transient_db_error => 'long_delaying',
+                                        on_hkd_stop => 'stopped' } },
 
-    # mark nodes that have not touched the database for too long as lost:
-    killing_hosts    => { enter       => '_kill_hosts',
-                          transitions => { _on_kill_hosts_done     => 'unassigning_vms',
-                                           _on_kill_hosts_error    => 'unassigning_vms'   } },
+    new           => { transitions => { _on_run => 'long_delaying'     } },
 
-    # unassign VMs on nodes marked as lost
-    unassigning_vms  => { enter       => '_unassign_vms',
-                          transitions => { _on_unassign_vms_done   => 'unassigning_l7rs',
-                                           _on_unassign_vms_error  => 'unassigning_l7rs'  } },
+    running       => { transitions => { _on_error => 'idle' },
+                       substates => [ killing_hosts    => { enter => '_kill_hosts' },
+                                      # mark nodes that have not touched the database for too long as lost
 
-    # unassign L7R processes running in nodes marked as lost
-    unassigning_l7rs => { enter       => '_unassign_l7rs',
-                          transitions => { _on_unassign_l7rs_done  => 'aborting_l7rs',
-                                           _on_unassign_l7rs_error => 'aborting_l7rs'     } },
+                                      unassigning_vms  => { enter => '_unassign_vms' },
+                                      # unassign VMs on nodes marked as lost
 
-    # abort L7R processes corresponding to machines that are not running
-    aborting_l7rs    => { enter       => '_abort_l7rs',
-                          transitions => { _on_abort_l7rs_done     => 'notifying_hkds',
-                                           _on_abort_l7rs_error    => 'idle'              } },
+                                      unassigning_l7rs => { enter => '_unassign_l7rs' },
+                                      # unassign L7R processes running in nodes marked as lost
 
-    # notify HKDs in other nodes they should handle the abort requests
-    notifying_hkds   => { enter       => '_notify_hkds',
-                          transitions => { _on_notify_hkds_done    => 'idle',
-                                           _on_notify_hkds_error   => 'idle'              } },
+                                      aborting_l7rs    => { enter => '_abort_l7rs' },
+                                      # abort L7R processes corresponding to machines that are not running
 
-    idle             => { enter       => '_set_timer',
-                          transitions => { _on_timeout             => 'killing_hosts',
-                                           on_hkd_stop             => 'stopped',          } },
+                                      notifying_hkds   => { enter => '_notify_hkds' }
+                                      # notify HKDs in other nodes they should handle the abort requests
+                                    ] },
+
+    idle          => { enter => '_set_timer',
+                       transitions => { _on_timeout => 'running' } },
 
     # don't do anything for a while if we have had problems connecting to the database
-    long_delaying    => { enter       => '_set_timer',
-                          transitions => { _on_timeout             => 'killing_hosts',
-                                           on_hkd_stop             => 'stopped'           } },
+    long_delaying => { enter       => '_set_timer',
+                       transitions => { _on_timeout => 'running' } },
 
-    stopped          => { enter       => '_on_stopped'                                      },
-
-    __any__          => { delay_once  => [qw(on_hkd_stop )],
-                          transitions => { on_transient_db_error   => 'long_delaying'     },
-                          leave       => '_abort_all'                                       };
-
-sub new {
-    my ($class, %opts) = @_;
-
-    my $on_checked = delete $opts{on_checked};
-    my $on_error = delete $opts{on_error};
-
-    my $self = $class->SUPER::new(%opts);
-
-    $self->{on_checked} = $on_checked;
-    $self->{on_error} = $on_error;
-    $self;
-}
+    stopped       => { enter       => '_on_stopped' };
 
 sub _kill_hosts {
     my ($self) = @_;
@@ -84,10 +61,7 @@ EOQ
 
 sub _on_kill_hosts_result {
     my ($self, $res) = @_;
-    if ($res->status == PGRES_COMMAND_OK and $res->cmdRows) {
-        my @lost = $res->column(0);
-        INFO 'Successfully marked as lost '.$res->cmdRows.' hosts: @lost';
-    }
+    WARN "host $_ marked as lost!" for $res->column;
 }
 
 sub _unassign_vms {
@@ -114,10 +88,7 @@ EOQ
 
 sub _on_unassign_vms_result {
     my ($self, $res) = @_;
-    if ($res->status == PGRES_COMMAND_OK and $res->cmdRows) {
-        my @vms = $res->column(0);
-        INFO "Succesfully recovered ".$res->cmdRows." VMs in hosts marked as lost: @vms";
-    }
+    WARN "VM $_ unassigned from host in state lost" for $res->column;
 }
 
 sub _unassign_l7rs {
@@ -138,41 +109,30 @@ EOQ
 
 sub _on_unassign_l7rs_result {
     my ($self, $res) = @_;
-    if ($res->status == PGRES_COMMAND_OK and $res->cmdRows) {
-        my @vms = $res->column(0);
-        INFO "Succesfully recovered ".$res->cmdRows." L7Rs in hosts marked as lost: @vms";
-    }
+    WARN "User connection to VM $_ going through lost host removed" for $res->column;
 }
 
 sub _abort_l7rs {
     my ($self) = @_;
-    delete $self->{hosts_to_be_notified};
-    $self->_query(<<EOQ);
+    $self->_query({ save_to => 'hosts_to_be_notified' },
+                  <<EOQ);
 update vm_runtimes
     set user_cmd = 'abort'
     where user_state = 'connected'
-      and vm_state   = 'stopped'
-    returning vm_id, host_id
+      and vm_state = 'stopped'
+      and user_cmd = NULL
+    returning l7r_host
 EOQ
-}
-
-sub _on_abort_l7rs_result {
-    my ($self, $res) = @_;
-    if ($res->status == PGRES_COMMAND_OK and $res->cmdRows) {
-        my @vms = $res->column(0);
-        INFO "Aborting ".$res->cmdRows." L7Rs processes for VMs not running: @vms";
-        $self->{hosts_to_be_notified} = [$res->column(1)];
-    }
 }
 
 sub _notify_hkds {
     my $self = shift;
     if (my $hosts = delete $self->{hosts_to_be_notified}) {
-        for my $host (@$hosts) {
-            $self->_notify("qvd_user_cmd_for_host$host");
-        }
+        my %hosts;
+        $hosts{$_->[0]} = 1 for @$hosts;
+        $self->_notify("qvd_user_cmd_for_host$_") for keys %hosts;
     }
-    $self->_on_notify_hkds_done;
+    $self->_on_done;
 }
 
 sub _set_timer {
@@ -181,12 +141,6 @@ sub _set_timer {
     my $delay = $self->_cfg("internal.hkd.agent.cluster_monitor.${long}delay") +
         int rand $self->_cfg("internal.hkd.agent.cluster_monitor.fuzzy_delay");
     $self->_call_after($delay, '_on_timeout');
-}
-
-sub on_transient_db_error :OnState('long_delaying') {
-    my $self = shift;
-    $self->_abort_all;
-    $self->_set_timer;
 }
 
 1;

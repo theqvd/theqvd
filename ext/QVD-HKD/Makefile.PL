@@ -3,12 +3,14 @@ use ExtUtils::MakeMaker;
 
 WriteMakefile( NAME          => 'QVD::HKD',
                VERSION       => '3.1'.$ENV{BUILD_NUMBER},
-               PREREQ_PM     => { 'Class::StateMachine' => '0.19',
-                                  'QVD::StateMachine::Declarative' => '0',
+               PREREQ_PM     => { 'Class::StateMachine' => '0.23',
+                                  'Class::StateMachine::Declarative' => '0.01',
                                   'AnyEvent' => '5.34',
                                   'AnyEvent:HTTP' => '2.13',
+                                  'AnyEvent::FileLock' => '0.02',
+                                  'Fcntl::Packer' => '0.02',
                                   'EV' => '4.10',
-                                  'Pg::PQ' => '0.06',
+                                  'Pg::PQ' => '0.12',
                                   'AnyEvent::Pg' => '0.10',
                                   'App::Daemon' => '0',
                                   'QVD::Config' => '0',
@@ -17,6 +19,10 @@ WriteMakefile( NAME          => 'QVD::HKD',
                                   'Linux::Proc::Mountinfo' => '0.01',
                                 },
                ABSTRACT_FROM => 'lib/QVD/HKD.pm',
-	       EXE_FILES     => [ qw(bin/qvd-hkd bin/qvd-hkd.initrc.pl bin/qvd-hkd.debrc.pl bin/qvd-hkd.postinst bin/qvd-hkd.prerm) ],
+	       EXE_FILES     => [ qw(bin/qvd-hkd
+                                     bin/qvd-hkd.initrc.pl
+                                     bin/qvd-hkd.debrc.pl
+                                     bin/qvd-hkd.postinst
+                                     bin/qvd-hkd.prerm) ],
                AUTHOR        => 'QVD Team <qvd@qindel.com>',
 );

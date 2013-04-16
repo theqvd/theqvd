@@ -1,9 +1,0 @@
-Revision history for Perl extension Class::StateMachine::Declarative.
-
-0.02
-        - renamed to QVD::StateMachine::Declarative
-
-0.01  Fri Jul 15 10:45:26 2011
-	- original version; created by h2xs 1.23 with options
-		-AXn Class::StateMachine::Declarative
-

@@ -325,8 +325,13 @@ internal.l7r.short_session = 120
 
 # internal.hkd.perl.anyevent.backend = EV
 
-# this value should ba adjusted in accordance to internal.database.pool.connection.global_timeout
+# this value should ba adjusted in accordance to
+# internal.database.pool.connection.global_timeout
 internal.hkd.cluster.node.timeout = 500
+
+# if the ticker agent is not able to tick the database for the
+# following time, it aborts the HKD
+internal.hkd.agent.ticker.timeout = 450
 
 internal.vm.port.x = 5000
 internal.vm.port.vma = 3030
@@ -365,7 +370,6 @@ internal.hkd.stopping.vms.timeout = 300
 internal.hkd.killing.vms.retry.timeout = 100
 
 internal.hkd.agent.ticker.delay = 120
-internal.hkd.agent.ticker.retries = 2
 internal.hkd.agent.command_handler.delay = 60
 internal.hkd.agent.vm_command_handler.delay = 61
 
@@ -394,17 +398,16 @@ internal.hkd.lxc.killer.umount.timeout = 100
 internal.hkd.lxc.acquire.untar.lock.delay = 2
 
 internal.hkd.command.timeout.lxc-stop = 30
-
-internal.hkd.dhcpdhandler.wait_on_run_error = 5
+internal.hkd.agent.dhcpdhandler.delay = 2
 
 internal.hkd.debugger.run = 0
 internal.hkd.debugger.socket = /root/hkd-debug
 
 internal.hkd.lock.path = ${path.run}/hkd.lock
-internal.hkd.lock.retries = 5
-internal.hkd.lock.delay = 2
 
 internal.hkd.max_heavy = 10
 
 internal.hkd.agent.l7rmonitor.delay = 60
 internal.hkd.agent.l7rkiller.delay = 61
+
+internal.hkd.agent.config.delay = 10

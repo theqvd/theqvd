@@ -44,7 +44,6 @@ sub new {
     my ($class, %opts) = @_;
     my $vm_id = delete $opts{vm_id};
     my $on_stopped = delete $opts{on_stopped};
-    my $on_delete_cmd = delete $opts{on_delete_cmd};
     my $on_heavy = delete $opts{on_heavy};
 
     my $dhcpd_handler = delete $opts{dhcpd_handler};
@@ -53,7 +52,6 @@ sub new {
     $self->{dhcpd_handler} = $dhcpd_handler;
     $self->{on_stopped} = $on_stopped;
     $self->{on_heavy} = $on_heavy;
-    $self->{on_delete_cmd} = $on_delete_cmd;
 
     my $hypervisor = $self->_cfg('vm.hypervisor');
     DEBUG "Using hypervisor type '$hypervisor'";
@@ -75,30 +73,35 @@ sub on_cmd {
     }
     else {
         $debug and $self->_debug("unsupported command $cmd received by vm $self->{vm_id}");
-        WARN "Unsupported command '$cmd' received by vm '$self->{vm_id}'";
+        WARN "Unsupported command '$cmd' received by vm '$self->{vm_id}' on state ". $self->state;
     }
 }
 
-sub _delete_cmd {
+sub _delete_cmd_busy {
     my $self = shift;
-    $self->_maybe_callback('on_delete_cmd');
-    $self->_on_delete_cmd_done;
+    my $vm_id = $self->{vm_id};
+    DEBUG "Deleting pseudo command 'busy'";
+    $self->_query({n => 1,
+                   log_error => "Unable to delete pseudo command 'busy' for vm $vm_id in table vm_runtimes" },
+                  q(update vm_runtimes set vm_cmd = NULL where vm_id = $1 and host_id = $2 and vm_cmd='busy'),
+                  $vm_id, $self->{node_id});
 }
 
 sub _save_state {
     my $self = shift;
     my $state = $self->_main_state;
+    my $vm_id = $self->{vm_id};
     $debug and $self->_debug("changing database state to $state");
-    DEBUG "Changing database state to '$state'";
-    $self->_query('update vm_runtimes set vm_state = $1 where vm_id = $2 and host_id = $3',
-                  $state, $self->{vm_id}, $self->{node_id});
+    DEBUG "Changing database state to '$state' for VM $vm_id";
+    $self->_query({n => 1,
+                   log_error => "Unable to change state to $state for VM $vm_id in table vm_runtimes" },
+                  'update vm_runtimes set vm_state = $1 where vm_id = $2 and host_id = $3',
+                  $state, $vm_id, $self->{node_id});
 }
-
-sub _on_save_state_result {}
 
 sub _load_row {
     my $self = shift;
-    $self->_query_1(<<'EOQ', $self->{vm_id});
+    $self->_query({save_to_self => 1}, <<'EOQ', $self->{vm_id});
 select name, user_id, osf_id,
        di_tag, ip, storage,
        login
@@ -108,13 +111,35 @@ select name, user_id, osf_id,
 EOQ
 }
 
-sub _on_load_row_result {
-    my ($self, $res) = @_;
-    @{$self}{qw(name user_id osf_id di_tag ip storage login)} = $res->row;
-    INFO "Successfully loaded row for VM '$self->{vm_id}'";
-    $self->{mac} = $self->_ip_to_mac($self->{ip});
-    my $dhcpd_handler = $self->{dhcpd_handler};
-    $dhcpd_handler->register_mac_and_ip(@$self{qw(vm_id mac ip)}) if $dhcpd_handler;
+sub _calculate_attrs {
+    my $self = shift;
+    $self->{vma_port}    = $self->_cfg('internal.vm.port.vma');
+    $self->{x_port}      = $self->_cfg('internal.nxagent.display') + 4000;
+    $self->{ssh_port}    = $self->_cfg('internal.vm.port.ssh');
+    $self->{vnc_port}    = $self->_cfg('vm.vnc.redirect')              ? $self->_allocate_tcp_port : 0;
+    $self->{serial_port} = $self->_cfg('vm.serial.redirect')           ? $self->_allocate_tcp_port : 0;
+    $self->{mon_port}    = $self->_cfg('internal.vm.monitor.redirect') ? $self->_allocate_tcp_port : 0;
+    $self->{gateway}     = $self->_cfg('vm.network.gateway');
+    $self->{netmask_len} = $self->netmask_len;
+    $self->{mac}         = $self->_ip_to_mac($self->{ip});
+
+    $self->{rpc_service} = sprintf("http://%s:%d/vma", $self->{ip}, $self->{vma_port});
+}
+
+sub _add_to_dhcpd {
+    my $self = shift;
+    if (my $dhcpd_handler = $self->{dhcpd_handler}) {
+        $dhcpd_handler->register_mac_and_ip(@$self{qw(vm_id mac ip)});
+    }
+    $self->_on_done;
+}
+
+sub _rm_from_dhcpd {
+    my $self = shift;
+    if (my $dhcpd_handler = $self->{dhcpd_handler}) {
+        $dhcpd_handler->unregister_mac_and_ip($self->{vm_id});
+    }
+    $self->_on_done;
 }
 
 sub _incr_run_attempts {
@@ -122,8 +147,6 @@ sub _incr_run_attempts {
     DEBUG "Increasing run attempts counter for VM '$self->{vm_id}'";
     $self->_query('update vm_counters set run_attempts = run_attempts + 1 where vm_id = $1', $self->{vm_id});
 }
-
-sub _on_incr_run_attempts_result {}
 
 sub _incr_run_ok {
     my $self = shift;
@@ -134,7 +157,8 @@ sub _incr_run_ok {
 sub _search_di {
     my $self = shift;
     DEBUG "Searching DIs with tag '$self->{di_tag}' for OSF '$self->{osf_id}'";
-    $self->_query_1(<<'SQL', @$self{qw(osf_id di_tag)});
+    $self->_query( { save_to_self => [qw(di_id di_path use_overlay user_storage_size memory)] },
+                   <<'SQL', @$self{qw(osf_id di_tag)});
 select dis.id, dis.path, osfs.use_overlay, osfs.user_storage_size, memory
     from di_tags, dis, osfs
     where
@@ -145,33 +169,14 @@ select dis.id, dis.path, osfs.use_overlay, osfs.user_storage_size, memory
 SQL
 }
 
-sub _on_search_di_result {
-    my ($self, $res) = @_;
-    @{$self}{qw(di_id di_path use_overlay user_storage_size memory)} = $res->row;
-    DEBUG "Found DI '$self->{di_id}'";
-}
-
-sub _on_search_dir_bad_result {
-    my ($self, $res) = @_;
-    my $rows = $res->rows || 0;
-    ERROR "no DI found for OSF $self->{osf_id} with tag $self->{di_tag} as assigned to VM $self->{vm_id}";
-    $self->{current_query_bad_result} = 1;
-}
-
 sub _save_runtime_row {
     my $self = shift;
+    DEBUG sprintf("Saving runtime row for VM '%d': VMA port '%d', X11 port '%d', ".
+                  "SSH port '%d', VNC port '%s', serial port '%s', monitor port '%s'",
+                  map { defined $_ ? $_ : '<undef>' }
+                  @{$self}{qw(vm_id vma_port x_port ssh_port vnc_port serial_port mon_port)});
 
-    $self->{vma_port}    = $self->_cfg('internal.vm.port.vma');
-    $self->{x_port}      = $self->_cfg('internal.nxagent.display') + 4000;
-    $self->{ssh_port}    = $self->_cfg('internal.vm.port.ssh');
-    $self->{vnc_port}    = $self->_cfg('vm.vnc.redirect') ?              $self->_allocate_tcp_port : 0;
-    $self->{serial_port} = $self->_cfg('vm.serial.redirect') ?           $self->_allocate_tcp_port : 0;
-    $self->{mon_port}    = $self->_cfg('internal.vm.monitor.redirect') ? $self->_allocate_tcp_port : 0;
-    no warnings 'uninitialized';
-    DEBUG sprintf "Saving runtime row for VM '%d': VMA port '%d', X11 port '%d', SSH port '%d', VNC port '%s', serial port '%s', monitor port '%s'",
-        @{$self}{qw(vm_id vma_port x_port ssh_port vnc_port serial_port mon_port)};
-
-    $self->_query_1(<<'SQL', @{$self}{qw(ip vma_port x_port ssh_port vnc_port serial_port mon_port vm_pid vm_id)});
+    $self->_query({ n => 1}, <<'SQL', @{$self}{qw(ip vma_port x_port ssh_port vnc_port serial_port mon_port vm_pid vm_id)});
 update vm_runtimes
     set
         vm_address     = $1,
@@ -229,7 +234,7 @@ sub _set_fw_rules {
             if (system $ebtables => @$rule) {
                 $debug and $self->_debug("unable to add ebtables entry, rc: " . ($? >> 8));
                 DEBUG "Unable to add ebtables entry, rc: " . ($? >> 8);
-                return $self->_on_set_fw_rules_error;
+                return $self->_on_error;
             }
         }
     }
@@ -237,7 +242,7 @@ sub _set_fw_rules {
         $debug and $self->_debug("setup of VM firewall rules skipped, do you really need to do that?");
         INFO "Setup of VM firewall rules skipped, do you really need to do that?";
     }
-    $self->_on_set_fw_rules_done;
+    $self->_on_done;
 }
 
 sub _remove_fw_rules {
@@ -272,7 +277,7 @@ sub _remove_fw_rules {
             unless (system "$ebtables -L $target >/dev/null 2>&1") {
                 $debug and $self->_debug("deletion of chain $target failed");
                 ERROR "Deletion of chain '$target' failed";
-                return $self->_on_remove_fw_rules_error;
+                return $self->_on_error;
             }
         }
     }
@@ -280,30 +285,26 @@ sub _remove_fw_rules {
         $debug and $self->_debug("cleanup of VM firewall rules skipped");
         DEBUG 'Cleanup of VM firewall rules skipped';
     }
-    $self->_on_remove_fw_rules_done
-}
-
-sub _vma_url {
-    my $self = shift;
-    sprintf "http://%s:%d/vma", $self->{ip}, $self->{vma_port};
+    $self->_on_done
 }
 
 sub _start_vma_monitor {
     my $self = shift;
-    my $vma_monitor = $self->{vma_monitor} = QVD::HKD::VMAMonitor->new(config => $self->{config},
-                                                                       on_failed => sub { $self->_on_failed_vma_monitor },
-                                                                       on_alive => sub { $self->_on_alive },
-                                                                       rpc_service => $self->_vma_url);
+    my $vma_monitor = $self->{vma_monitor} //= QVD::HKD::VMAMonitor->new(config => $self->{config},
+                                                                         on_failed => sub { $self->_on_failed_vma_monitor },
+                                                                         on_alive => sub { $self->_on_alive },
+                                                                         rpc_service => $self->{rpc_service});
     $self->{last_seen_alive} = time;
     $vma_monitor->run;
+    $self->on_leave_state('__stop_vma_monitor');
 }
 
-sub _stop_vma_monitor {
+sub __stop_vma_monitor {
     my $self = shift;
-    $debug and $self->_debug('stopping vma monitor');
-    DEBUG 'Stopping VMA monitor';
-    my $vma_monitor = delete $self->{vma_monitor};
-    $vma_monitor->stop;
+    if (my $vma_monitor = $self->{vma_monitor}) {
+        DEBUG "stopping VMA monitor";
+        $vma_monitor->stop;
+    }
 }
 
 sub _on_alive {
@@ -340,10 +341,8 @@ sub _on_failed_vma_monitor {
     }
 }
 
-sub _poweroff {
+sub _shutdown {
     my $self = shift;
-    $self->{rpc_service} = $self->_vma_url;
-    DEBUG "Invoking RPC 'poweroff' method";
     $self->_rpc('poweroff');
 }
 
@@ -357,12 +356,6 @@ sub _clear_runtime_row {
     my $self = shift;
     my $state = $self->_main_state;
     DEBUG "Clearing runtime row for VM '$self->{vm_id}'";
-
-    my $dhcpd_handler = $self->{dhcpd_handler};
-    $dhcpd_handler->unregister_mac_and_ip($self->{vm_id}) if $dhcpd_handler;
-
-    # FIXME: final state could also be 'failed', currently 'stopped'
-    # is hard-coded here.
     $self->_query(<<'SQL', $self->{vm_id}, $self->{node_id});
 update vm_runtimes
     set
@@ -384,22 +377,15 @@ SQL
 
 sub _set_heavy_mark {
     my $self = shift;
-    if ($self->_maybe_callback(on_heavy => 1)) {
-        $self->_on_set_heavy_mark_done;
-    }
-    else {
-        $self->_on_set_heavy_mark_error;
-    }
+    $self->_maybe_callback(on_heavy => 1, sub { $self->_on_done })
+        or $self->_on_done;
 }
 
 sub _unset_heavy_mark {
     my $self = shift;
     $self->_maybe_callback(on_heavy => 0);
-    $self->_on_unset_heavy_mark_done;
+    $self->_on_done;
 }
-
-sub _on_clear_runtime_row_result {}
-sub _on_clear_runtime_row_bad_result {}
 
 sub _call_on_stopped { shift->_maybe_callback('on_stopped') }
 

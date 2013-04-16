@@ -16,28 +16,24 @@ our $debug;
 
 use parent qw(QVD::HKD::Agent);
 
-use QVD::StateMachine::Declarative
-    new            => { transitions => { _on_run                     => 'idle'        } },
+use Class::StateMachine::Declarative
+    __any__     => { advance => '_on_done',
+                     delay => [qw(_on_qvd_cmd_for_host_notify)],
+                     transitions => { on_hkd_stop => 'stopped',
+                                      _on_error => 'idle' } },
 
-    idle           => { enter       => '_set_timer',
-                        transitions => { _on_qvd_cmd_for_host_notify => 'loading_cmd',
-                                         _on_timeout                 => 'loading_cmd',
-                                         on_hkd_stop                 => 'stopped'     },
-                        leave       => '_abort_call_after'                              },
+    new         => { transitions => { _on_run => 'idle' } },
 
-    loading_cmd    => { enter       => '_load_cmd',
-                        transitions => { _on_load_cmd_error          => 'idle',
-                                         _on_cmd_loaded              => 'delivering_cmd',
-                                         _on_cmd_not_found           => 'idle'        } },
+    loading_cmd => { enter => '_load_cmd',
+                     before => { _on_done => '_deliver_cmd' } },
 
-    delivering_cmd => { enter       => '_deliver_cmd',
-                        transitions => { _on_deliver_cmd_error       => 'idle',
-                                         _on_deliver_cmd_done        => 'loading_cmd' } },
+    delete_cmd  => { enter => '_delete_cmd' },
 
-    stopped      => { enter       => '_on_stopped'                                    },
+    idle        => { enter => '_set_timer',
+                     transitions => { _on_qvd_cmd_for_host_notify => 'loading_cmd',
+                                      _on_timeout                 => 'loading_cmd' } },
 
-    __any__ =>   => { delay_once  => [qw(_on_qvd_cmd_for_host_notify
-                                         on_hkd_stop)]                                  };
+    stopped     => { enter => '_on_stopped' };
 
 
 sub new {
@@ -46,8 +42,8 @@ sub new {
 
     my $self = $class->SUPER::new(%opts);
     $self->{on_cmd} = $on_cmd;
-    $self->{cmd} = undef;
-    $self->_listen("qvd_cmd_for_host$self->{node_id}" => '_on_qvd_cmd_for_host_notify');
+    $self->_listen({on_notify => '_on_qvd_cmd_for_host_notify' },
+                   "qvd_cmd_for_host$self->{node_id}");
     $self;
 }
 
@@ -60,34 +56,20 @@ sub _set_timer {
 
 sub _load_cmd {
     my $self = shift;
-    $self->{cmd} = undef;
-    $self->_query_1('select cmd from host_runtimes where host_id = $1', $self->{node_id});
+    $self->_query({save_to_self => 1},
+                  'select cmd from host_runtimes where host_id = $1',
+                  $self->{node_id});
 }
 
-sub _on_load_cmd_result {
-    my ($self, $res) = @_;
-    $self->{cmd} = $res->row(0);
-    $debug and $self->_debug("host command ".($self->{cmd}//'<undef>')." loaded from database");
-    DEBUG "host command '$self->{cmd}' loaded from database" if length $self->{cmd};
-}
-
-sub _on_load_cmd_done {
+sub _delete_cmd {
     my $self = shift;
-    if (defined $self->{cmd}) {
-        $self->_on_cmd_loaded;
-    }
-    else {
-        $self->_on_cmd_not_found;
-    }
+    $self->_query({ n => 1 },
+                  'update host_runtimes set cmd=NULL where host_id=$1 and cmd=$2',
+                  $self->{node_id}, $self->{cmd});
 }
 
 sub _deliver_cmd {
     my $self = shift;
-    $self->_query_1('update host_runtimes set cmd=NULL where host_id=$1 and cmd=$2', $self->{node_id}, $self->{cmd});
-}
-
-sub _on_deliver_cmd_result {
-    my ($self, $res) = @_;
     $self->_maybe_callback('on_cmd', $self->{cmd});
 }
 

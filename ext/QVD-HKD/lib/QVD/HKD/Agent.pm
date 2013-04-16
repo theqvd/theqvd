@@ -8,16 +8,37 @@ use warnings;
 
 use AnyEvent::Util ();
 use AnyEvent::HTTP;
+use AnyEvent::FileLock;
 use QVD::HKD::Helpers;
 use Pg::PQ qw(:pgres);
 use QVD::Log;
 use JSON;
 use Time::HiRes ();
-use URI::Escape qw(uri_escape);
-
+use URI::Escape ();
+use Method::WeakCallback qw(weak_method_callback);
 use parent qw(Class::StateMachine);
 
 our $debug = 1;
+
+sub __caller_method {
+    my $method = (caller 2)[3];
+    $method =~ s/.*::_?//;
+    return $method;
+}
+
+sub __opts {
+    my $self = shift;
+    my %opts = (ref $_[0] eq 'HASH' ? %{shift(@_)} : ());
+    return ($self, \%opts, @_);
+}
+
+sub _debug {
+    my $self = shift;
+    my $state = $self->state;
+    my $method = $self->__caller_method;
+    my $ts = sprintf "%08.3f", (Time::HiRes::time() - $^T);
+    warn "$ts> [$self state: $state]\@$method> @_\n";
+}
 
 sub new {
     my ($class, %opts) = @_;
@@ -61,170 +82,150 @@ sub _maybe_callback {
         }
         return $sub->($self, @_);
     }
+    $debug and $self->_debug("no callback for $cb");
+    ();
+}
+
+my %retry_on_sqlstate = map { $_ => 1 } ( '40001' ); # serialization_failure
+
+sub __call_on_done_or_error_callback {
+    my ($self, $opts, $failed, @args) = @_;
+    if ($opts->{run_and_forget}) {
+        DEBUG "action is configured as run_and_forget";
+    }
     else {
-        $debug and $self->_debug("no callback for $cb");
-        return ();
-    }
-}
-
-sub _debug {
-    my $self = shift;
-    my $state = $self->state;
-    my $method = (caller 1)[3];
-    $method =~ s/.*:://;
-    my $ts = sprintf "%08.3f", (Time::HiRes::time() - $^T);
-    warn "$ts> [$self state: $state]\@$method> @_\n";
-}
-
-my @query_callbacks = qw(result error done bad_result);
-my %query_callbacks;
-
-sub _query_callbacks ($;\%) {
-    my ($name, $opts) = @_;
-    my @cb = @{ $query_callbacks{$name} //=
-                    do {
-                        $name =~ /([a-zA-Z]\w*)$/ or die "internal error: bad method name: $name";
-                        [ map "_on_$1_$_", @query_callbacks ];
-                    }
-                };
-    if ($opts and %$opts) {
-        for (0..$#query_callbacks) {
-            my $over = delete $opts->{"on_$query_callbacks[$_]"};
-            $cb[$_] = $over if defined $over;
+        my $cb;
+        if ($failed and not $opts->{ignore_errors}) {
+            $cb = $opts->{on_error} // '_on_error';
+            if (defined(my $msg = $opts->{log_error})) {
+                ERROR $msg;
+            }
         }
-    }
-    @cb
-}
-
-my %retry_on_sqlstate = map { $_ => 1 } ( '40001', # serialization_failure
-                                        );
-
-sub _query_n {
-    my ($self, $n, $sql, @args) = @_;
-    my $method = (caller 1)[3];
-    my ($on_result, $on_error, $on_done, $on_bad_result) = _query_callbacks($method);
-
-    if ($debug) {
-        for ($on_result, $on_error, $on_done, $on_bad_result) {
-            $self->_debug("callback $_ is " . (ref $_ ? $_ : $self->can($_)));
+        else {
+            $cb = $opts->{on_done} // '_on_done';
         }
-        ref $_ or $self->can($_) or $self->_debug("warning: callback method $_ not found!")
-            for ($on_result, $on_error, $on_done, $on_bad_result);
-
-        my $line = $sql;
-        $line =~ s/\s+/ /gms;
-        $self->_debug("sql: >$line<, args: >@args<");
+        DEBUG sprintf("invoking callback (failed: %s, ignore_errors: %s, cb: %s)",
+                      map { defined $_ ? $_ : '<undef>' } $failed, $opts->{ignore_errors}, $cb);
+        $self->$cb(@args);
     }
-
-    my $db = $self->_db // die "internal error: database handler not available";
-    my $watcher = $db->push_query(query       => $sql,
-                                  args        => \@args,
-                                  max_retries => $self->{query_retry_count} // 1000, # FIXME!!!
-                                  retry_on_sqlstate => \%retry_on_sqlstate,
-                                  on_result   => sub {
-                                      my $res = $_[2];
-                                      my $or = $self->can($on_result);
-                                      $debug and $self->_debug("calling method $on_result: " . ($or // '<undef>'));
-                                      given ($res->status) {
-                                          when (PGRES_TUPLES_OK) {
-                                              if (!defined $n or $res->rows == $n) {
-                                                  $or->($self, $res) if $or;
-                                                  return;
-                                              }
-                                          }
-                                          when (PGRES_COMMAND_OK) {
-                                              if (!defined $n or $res->cmdRows == $n) {
-                                                  $or->($self, $res) if $or;
-                                                  return;
-                                              }
-                                          }
-                                      }
-                                      $debug and $self->_debug("actually calling method $on_bad_result");
-                                      my $m = $self->can($on_bad_result);
-                                      if ($m) {
-                                          $m->($self, $res);
-                                      }
-                                      else {
-                                          $debug and $self->_debug("there is no such method, marking the query"
-                                                                   . " as erroneus for later");
-                                          $self->{current_query_bad_result} = 1;
-                                      }
-                                  },
-                                  on_error    => sub {
-                                      delete $self->{current_query_watcher};
-                                      delete $self->{current_query_bad_result};
-                                      $debug and $self->_debug("calling method $on_error");
-                                      $self->$on_error
-                                  },
-                                  on_done     => sub {
-                                      delete $self->{current_query_watcher};
-                                      if ($self->{current_query_bad_result}) {
-                                          delete $self->{current_query_bad_result};
-                                          $debug and $self->_debug("bad result seen, calling on_error callback $on_error");
-                                          $self->$on_error
-                                      }
-                                      else {
-                                          my $m = $self->can($on_done);
-                                          if ($m) {
-                                              $debug and $self->_debug("calling method $on_done");
-                                              $m->($self);
-                                          }
-                                          else {
-                                              $debug and $self->_debug("there is not method $on_done");
-                                          }
-                                      }
-                                  },
-                                 );
-    $self->{current_query_bad_result} = 0;
-    $self->{current_query_watcher} = $watcher;
 }
 
 sub _query {
-    my $self = shift;
-    unshift @_, ($self, undef);
-    goto &_query_n;
+    my ($self, $opts, $sql, @args) = &__opts;
+    my $db = $self->_db // die "internal error: database handler not available";
+    $opts->{caller_method} = $self->__caller_method;
+
+    $self->{query_watcher} =
+        $db->push_query(query       => $sql,
+                        args        => \@args,
+                        max_retries => $self->{query_retry_count} // 1000, # FIXME!!!
+                        retry_on_sqlstate => \%retry_on_sqlstate,
+                        on_result => weak_method_callback($self, __query_result_callback => $opts),
+                        on_done   => weak_method_callback($self, __query_callback => $opts, 0),
+                        on_error  => weak_method_callback($self, __query_callback => $opts, 1) );
 }
 
-sub _query_1 {
-    my $self = shift;
-    unshift @_, ($self, 1);
-    goto &_query_n;
+sub __query_result_callback {
+    my ($self, $opts, undef, undef, $res) = @_;
+    my ($rows, $tuples_ok);
+    my $status = $res->status;
+    given ($status) {
+        when (PGRES_TUPLES_OK) {
+            $rows = $res->rows;
+            $tuples_ok = 1;
+        }
+        when (PGRES_COMMAND_OK) {
+            if ($opts->{save_to_self} or $opts->{save_to}) {
+                ERROR "Internal error: query with save_to_self or save_to set returned PGRES_COMMAND_OK"
+            }
+            else {
+                $rows = $res->cmdRows;
+            }
+        }
+    }
+    if (defined $rows) {
+        my $n = $opts->{n};
+        my $save_to_self = $opts->{save_to_self};
+        $n ||= 1 if $save_to_self;
+        if (not defined $n or $n == $rows) {
+            if ($save_to_self) {
+                $debug and $self->_debug("reply saved to self");
+                my @names = (ref $save_to_self ? @$save_to_self : ());
+                my $hash = $res->rowAsHash(0, @names);
+                use Data::Dumper;
+                $debug and $self->_debug("save_to_self --> \n" . Dumper($hash));
+                @{$self}{keys %$hash} = values %$hash;
+            }
+            elsif (defined (my $save_to = $opts->{save_to})) {
+                my ($to, @names) = (ref $save_to ? @$save_to : $save_to);
+                $debug and $self->_debug("reply saved to $save_to");
+                $self->{$to} = [$res->rowsAsHashes(@names)];
+            }
+            else {
+                my $on_result = $opts->{on_result} // "_on_$opts->{caller_method}_result";
+                my $method = (ref $on_result ? $on_result : $self->can($on_result));
+                if ($method) {
+                    $method->($self, $res);
+                }
+                else {
+                    DEBUG "No action performed for on_result callback";
+                }
+            }
+            return;
+        }
+        else {
+            DEBUG "unexpected number of rows on query result, $n expected, $rows received";
+        }
+    }
+    DEBUG "query set to failed";
+    $opts->{query_got_bad_result} = 1;
+};
+
+sub __query_callback {
+    my ($self, $opts, $failed) = @_;
+    delete $self->{query_watcher};
+    $failed ||= $opts->{query_got_bad_result};
+    DEBUG "query from $opts->{caller_method} " . ($failed ? "failed" : "succeeded");
+    $self->__call_on_done_or_error_callback($opts, $failed);
 }
 
 sub _listen {
-    my ($self, $channel, $method) = @_;
-    $method = "_on_${channel}_notify" unless defined $method;
-    my $cb = sub {
-        $debug and $self->_debug("calling method $self->$method");
-        $self->$method
-    };
-    my $w = $self->_db->listen($channel,
-                               on_notify           => $cb,
-                               on_listener_started => $cb);
-    $self->{listener_watcher}{$channel} = $w;
+    my ($self, $opts, $channel) = &__opts;
+    my $cb = weak_method_callback($self, __listen_callback => $opts, $channel);
+    $self->{listener_watcher}{$channel} =
+        $self->_db->listen($channel,
+                           on_notify           => $cb,
+                           on_listener_started => $cb);
+}
+
+sub __listen_callback {
+    my ($self, $opts, $channel) = @_;
+    my $cb = $opts->{on_notify} // "_on_${channel}_notify";
+    $self->$cb($channel);
 }
 
 sub _notify {
     my ($self, $name) = @_;
     my $queue = $self->{notify_queue} ||= [];
     push @$queue, $name;
-    $self->_next_notify unless $self->{notify_watcher};
+    $self->__queue_next_notify unless $self->{notify_watcher};
 }
 
-sub _next_notify {
+sub __queue_next_notify {
     my $self = shift;
-    delete $self->{notify_watcher};
     my $nq = $self->{notify_queue};
     if ($nq and @$nq) {
         my $channel = shift @$nq;
+        my $cb = weak_method_callback($self, '__queue_next_notify');
         $self->{notify_watcher} = $self->_db->push_query(query       => "notify $channel",
                                                          max_retries => 0,
-                                                         on_done     => sub { $self->_next_notify },
-                                                         on_error    => sub { $self->_next_notify });
-    };
+                                                         on_done     => $cb,
+                                                         on_error    => $cb);
+    }
+    else {
+        delete $self->{notify_watcher};
+    }
 }
-
-sub _cancel_current_query { undef shift->{current_query_watcher} }
 
 sub _db {
     my $self = shift;
@@ -233,206 +234,214 @@ sub _db {
 }
 
 sub _run_cmd {
-    my ($self, $cmd, %opts) = @_;
-    my $method = (caller 1)[3];
-    my $kill_after = delete $opts{kill_after};
-    my $ignore_errors = delete $opts{ignore_errors};
+    my ($self, $opts, $cmd, @args) = &__opts;
+    $cmd = $self->_cfg("command.$cmd") unless $opts->{skip_cmd_lookup};
+    INFO "Running command '$cmd @args'";
+    $opts->{outlives_state} //= $opts->{run_and_forget};
 
-    my (undef, $on_error, $on_done) = _query_callbacks($method, %opts);
-
-    if ($debug) {
-        ref $_ or $self->can($_) or $self->_debug("warning: callback method $_ not found!")
-            for ($on_error, $on_done);
-        $self->_debug("running command @$cmd");
-    }
-    INFO "Running command '@$cmd'";
     my $pid;
-    if (my $w = eval { AnyEvent::Util::run_cmd($cmd, '$$' => \$pid, %opts) }) {
-        $debug and $self->_debug("process $pid forked");
+    my $w = eval { AnyEvent::Util::run_cmd([$cmd, @args], '$$' => \$pid) };
+    if (defined(my $save_pid_to = $opts->{save_pid_to})) {
+        $self->{$save_pid_to} = $pid;
+    }
+    if ($pid) {
+        DEBUG "Process $pid forked";
         $self->{cmd_watcher}{$pid} = $w;
-        $w->cb( sub {
-                    $debug and $self->_debug("slave process $pid terminated");
-                    my $rc = shift->recv;
-                    $debug and $self->_debug("rc: $rc");
-                    delete $self->{cmd_timer}{$pid};
-                    delete $self->{cmd_watcher}{$pid};
-                    if ($rc) {
-                        $cmd = [$cmd] unless ref $cmd;
-                        $debug and $self->_debug("command failed: @$cmd => " . ($rc >> 8) . " ($rc)");
-                        ERROR "Command '@$cmd' failed: $rc";
-                        unless ($ignore_errors) {
-                            $debug and $self->_debug("calling on_error callback $on_error");
-                            $self->$on_error($rc);
-                            return
-                        }
-                        $debug and $self->_debug("ignore_errors set, so...");
-                    }
-                    $debug and $self->_debug("calling on_done callback $on_done");
-                    $self->$on_done
-                });
-        if (defined $kill_after) {
-            $self->{cmd_timer}{$pid} = AnyEvent->timer(after => $kill_after,
-                                                       cb => sub { $self->_do_kill_after(TERM => $pid) });
-            $debug and $self->_debug("process $pid will be killed after $kill_after seconds");
-            DEBUG "Process '$pid' will be killed after '$kill_after' seconds";
+        $self->{last_cmd_pid} = $pid;
+        $w->cb(weak_method_callback($self, __run_cmd_callback => $opts, $pid));
+        if (defined(my $after = $opts->{kill_after})) {
+            DEBUG "Process '$pid' will be killed after '$after' seconds";
+            $opts->{kill_counter} = 0;
+            $self->{cmd_timer_watcher}{$pid} =
+                AE::timer($after, 2,
+                          weak_method_callback($self, __run_cmd_kill_after_callback => $opts, $pid));
         }
-        return $pid;
+        $self->on_leave_state(__run_cmd_on_leave_state => $opts, $pid);
     }
     else {
-        AE::postpone {
-            $debug and $self->_debug("faked slave process termination");
-            if ($ignore_errors) {
-                $debug and $self->_debug("ignore_errors set, calling  $on_done");
-                $self->$on_done;
-            }
-            else {
-                $debug and $self->_debug("calling on_error callback $on_error");
-                $self->$on_error(-1);
-            }
-        };
-        return -1
+        &AE::postpone(weak_method_callback($self, __call_on_done_or_error_callback => $opts, 1));
     }
 }
 
-sub _do_kill_after {
-    my ($self, $signal, $pid) = @_;
-    $debug and $self->_debug("command timed out");
-    DEBUG 'Command timed out';
+sub __run_cmd_callback {
+    my ($self, $opts, $pid, $var) = @_;
+    my $rc = $var->recv;
+    DEBUG "Process $pid returned rc: $rc";
+    my $last = $self->{last_cmd_pid};
+    delete $self->{last_cmd_pid} if $last and $last == $pid;
+    delete $self->{cmd_timer_watcher}{$pid};
+    delete $self->{cmd_watcher}{$pid};
+    if (defined(my $as = $opts->{save_pid_to})) {
+        delete $self->{$as};
+    }
+    $self->__call_on_done_or_error_callback($opts, $rc != 0, $rc);
+}
+
+sub __run_cmd_kill_after_callback {
+    my ($self, $opts, $pid) = @_;
+    my $signal = (++$opts->{kill_counter} > 3 ? 'KILL' : 'TERM');
     $self->_kill_cmd($signal, $pid);
-    $self->{cmd_timer}{$pid} = AnyEvent->timer(after => 2,
-                                               cb => sub { $self->_do_kill_after(KILL => $pid) });
+}
+
+sub __run_cmd_on_leave_state {
+    my ($self, $opts, $pid) = @_;
+    if ($self->{cmd_watcher}{$pid}) {
+        DEBUG "process $pid keeps running on the background";
+        unless ($opts->{outlives_state}) {
+            $opts->{run_and_forget} = 1;
+            $self->{cmd_timer_watcher}{$pid} =
+                AE::timer(0, 2, weak_method_callback($self, __run_cmd_kill_after_callback => $opts, $pid));
+        }
+    }
 }
 
 sub _kill_cmd {
     my ($self, $signal, $pid) = @_;
-    unless (defined $pid) {
-        ($pid) = my(@pids) = keys %{$self->{cmd_watcher}};
-        @pids > 1 and die "internal error: more than one slave command is running, pids: @pids";
-        if (!@pids) {
-            $debug and $self->_debug("no slave command is running");
-            WARN 'No slave command is running';
-            return 1;
-        }
+    $pid = $self->{last_cmd_pid} if @_ < 3;
+    if ($pid) {
+        $signal //= 'TERM';
+        DEBUG("killing $pid with signal $signal");
+        kill $signal => $pid and return 1;
+        WARN "Unable to send signal $signal to process $pid: $!";
     }
-    $signal //= 'TERM';
-    $debug and $self->_debug("killing $pid with signal $signal");
-    my $ok = kill $signal => $pid;
-    unless ($ok) {
-        $debug and $self->_debug("unable to kill process $pid with signal $signal");
-        WARN "Unable to kill process '$pid' with signal '$signal'";
+    else {
+        WARN '_kill_cmd method invoked but last command has already finished or pid was undefined';
     }
-    $ok;
+    return;
 }
 
 my $json;
 sub _json { $json //= JSON->new->ascii->pretty->allow_nonref }
 
-sub _rpc {
-    my ($self, $method, @args) = @_;
-    $self->{rpc_last_query} = [$method, @args];
-
-    my $url = "$self->{rpc_service}/$method";
-
-    $debug and $self->_debug("calling RPC service $url");
-
-    $self->{rpc_retry_count} //= $self->_cfg('internal.hkd.agent.rpc.retry.count');
-    $self->{rpc_retry_delay} //= $self->_cfg('internal.hkd.agent.rpc.retry.delay');
-
+sub __make_simplerpc_url {
+    my ($self, $service, $method, @args) = @_;
     my @query;
     while (@args) {
         my $key = shift @args;
         my $value = shift @args;
-        push @query, uri_escape($key) . '=' . uri_escape($value);
+        push @query, URI::Escape::uri_escape($key) . '=' . URI::Escape::uri_escape($value);
     }
+
+    my $url = "$service/$method";
     $url .= '?' . join('&', @query) if @query;
+    $url
+}
 
-    my ($on_result, $on_error, $on_done) = _query_callbacks("rpc_$method");
+sub _rpc {
+    my ($self, $opts, $method, @args) = &__opts;
+    $opts->{caller_method} = $self->__caller_method;
+    $opts->{retry_count} //= $self->_cfg('internal.hkd.agent.rpc.retry.count');
+    $opts->{retry_delay} //= $self->_cfg('internal.hkd.agent.rpc.retry.delay');
+    my $service = $opts->{rpc_service} //= $self->{rpc_service};
+    my $url = $opts->{url} //= $self->__make_simplerpc_url($service, $method, @args);
+    my $timeout = $opts->{timeout} //= $self->_cfg('internal.hkd.agent.rpc.timeout');
+    DEBUG "calling RPC service $url";
+    $self->{rpc_watcher} = http_get($url,
+                                    persistent => 0,
+                                    timeout => $timeout,
+                                    cb => weak_method_callback($self, _rpc_callback => $opts));
+}
 
-    if ($debug) {
-        ref $_ or $self->can($_) or $self->_debug("warning: callback method $_ not found!")
-            for ($on_result, $on_error, $on_done);
+sub _rpc_callback {
+    my ($self, $opts, undef, $headers) = @_;
+    $debug and $self->_debug("on _rpc_result");
+    my $status = $headers->{Status};
+    my $error = 1;
+    my $result;
+    if ($status =~ /^2\d\d$/) {
+        my $data = _json->decode("[$_[2]]");
+        if (defined $data) {
+            ($result, $error) = @$data;
+            unless ($error) {
+                if (defined (my $save_to = $opts->{save_to})) {
+                    $self->{$save_to} = $result;
+                }
+                else {
+                    my $on_result = $opts->{_on_result} // "_on_$opts->{caller_method}_result";
+                    my $method = (ref $on_result ? $on_result : $self->can($on_result));
+                    $self->$method($result) if $method;
+                }
+            }
+        }
+        else {
+            DEBUG "bad JSON response: $_[2]";
+        }
     }
-
-    my $w = http_get($url, persistent => 0,
-                     timeout => $self->_cfg('internal.hkd.agent.rpc.timeout'),
-                     cb => sub {
-                         $debug and $self->_debug("on http_get callback");
-                         my $headers = $_[1];
-                         my $status = $headers->{Status};
-                         my ($result, $error);
-                         if ($status =~ /^2\d\d$/) {
-                             my $data = _json->decode("[$_[0]]");
-                             if (defined $data) {
-                                 ($result, $error) = @$data;
-                                 if (defined $error) {
-                                     $self->$on_error($error);
-                                 }
-                                 else {
-                                     $self->$on_result($result);
-                                 }
-                             }
-                             else {
-                                 $debug and $self->_debug("bad JSON response: $_[0]");
-                                 $self->$on_error("bad JSON response");
-                             }
-                         }
-                         else {
-                             $debug and $self->_debug("bad response status: $status");
-                             return $self->_rpc_retry if $self->{rpc_retry_count};
-
-                             $self->$on_error("HTTP response status: $status");
-                         }
-                         $self->$on_done if $self->{rpc_watcher}; # may be unset on a previous callback
-                     });
-
-    delete $self->{rpc_retry_count};
-    delete $self->{rpc_retry_delay};
-
-    $self->{rpc_watcher} = $w;
-}
-
-sub _rpc_retry {
-    my $self = shift;
-    $self->{rpc_retry_count}--;
-    $self->{rpc_watcher} = AnyEvent->timer(after => $self->{rpc_retry_count},
-                                           cb => sub {
-                                               $debug and $self->_debug("retrying rpc query");
-                                               $self->_rpc(@{$self->{rpc_last_query}})
-                                           });
-}
-
-sub _abort_rpc {
-    my $self = shift;
-    $debug and $self->_debug("_abort_rpc called");
-    undef $self->{rpc_watcher}
+    elsif ($opts->{retry_count} > 0) {
+        DEBUG "bad response status: $status, retrying in $opts->{retry_delay} seconds";
+        $opts->{retry_count}--;
+        $self->{rpc_watcher} = AE::timer($opts->{retry_delay}, 0,
+                                         weak_method_callback($self, _rpc => $opts));
+        return;
+    }
+    else {
+        DEBUG "bad response status: $status";
+    }
+    $self->__call_on_done_or_error_callback($opts, $error);
 }
 
 sub _call_after {
-    my ($self, $delay, $method) = @_;
-    $self->{call_after_timer} = AnyEvent->timer(after => $delay,
-                                                cb => sub {
-                                                    $debug and $self->_debug("call after timeout, method: $method");
-                                                    $self->$method
-                                                });
+    my ($self, $delay, $method, @args) = @_;
+    $self->{call_after_watcher} = AE::timer($delay, 0,
+                                            weak_method_callback($self, $method, @args));
+}
+
+sub _flock {
+    my ($self, $opts, $file) = &__opts;
+    my $cb = weak_method_callback($self, '__on_flock', $opts);
+    my $mode = $opts->{mode} //= '>';
+    $opts->{file_or_fh} = $opts->{file} // $opts->{fh};
+    DEBUG "Trying to lock file $opts->{file_or_fh}";
+    if ($self->{flock_watcher} = AnyEvent::FileLock->flock(file => $file,
+                                                           type => 'fcntl',
+                                                           mode => $mode,
+                                                           cb => $cb)) {
+    }
+    else {
+        my $err = $!;
+        AE::postpone {
+            local $! = $err;
+            $cb->()
+        }
+    }
+}
+
+sub __on_flock {
+    my ($self, $opts, $fh) = @_;
+    if (defined $fh) {
+        DEBUG "lock for file $opts->{file_or_fh} acquired";
+        if (defined (my $save_to = $opts->{save_to})) {
+            $self->{$save_to} = $fh;
+        }
+        else {
+            my $on_result = $opts->{_on_result} // "_on_$opts->{caller_method}_result";
+            my $method = (ref $on_result ? $on_result : $self->can($on_result));
+            if ($method) {
+                $self->$method($fh)
+            }
+            else {
+                DEBUG "__on_flock did nothing!"
+            }
+        }
+    }
+    else {
+        $opts->{log_error} .= ": $!" if defined $opts->{log_error};
+        DEBUG "flock failed: $!";
+    }
+    $self->__call_on_done_or_error_callback($opts, !defined($fh));
+}
+
+sub leave_state {
+    my $self = shift;
+    delete $self->{call_after_watcher} and DEBUG "aborting delayed method call";
+    delete $self->{rpc_watcher}        and DEBUG "aborting RPC call";
+    delete $self->{query_watcher}      and DEBUG "aborting database query";
+    delete $self->{flock_watcher}      and DEBUG "aborting file locking";
 }
 
 sub _on_stopped {
     my $self = shift;
     $self->_maybe_callback('on_stopped');
-}
-
-sub _abort_call_after {
-    my $self = shift;
-    $debug and $self->_debug("_abort_call_after called");
-    undef $self->{call_after_timer}
-}
-
-sub _abort_cmd {
-    my ($self, $pid) = @_;
-    if (defined $pid) {
-        delete $self->{cmd_watcher}{$pid};
-        delete $self->{cmd_timer}{$pid};
-    }
 }
 
 sub DESTROY {
@@ -442,11 +451,5 @@ sub DESTROY {
     # $self->_kill_cmd('KILL');
 }
 
-sub _abort_all {
-    my $self = shift;
-    $self->_abort_call_after;
-    $self->_abort_rpc;
-    $self->_cancel_current_query;
-}
 
 1;

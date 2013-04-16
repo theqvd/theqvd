@@ -12,25 +12,34 @@ use QVD::Log;
 use QVD::Config::Core::Defaults;
 use QVD::HKD::Helpers;
 
-use parent 'QVD::HKD::Agent';
+use parent qw(QVD::HKD::Agent);
 
-use QVD::StateMachine::Declarative
-    idle      => { transitions => { _on_qvd_config_changed_notify => 'reloading' } },
+use Class::StateMachine::Declarative
 
-    reloading => { enter       => '_reload',
-                   transitions => { _goto_idle                    => 'idle'      },
-                   delay       => [qw(_on_qvd_config_changed_notify)]              };
+    __any__ => { advance => '_on_done',
+                 transitions => {  _on_qvd_config_changed_notify => 'reloading',
+                                   on_hkd_stop => 'stopped' } },
+
+    reloading => { enter => '_reload',
+                   before => { _on_done => '_send_config_reloaded' },
+                   transitions => { _on_error => 'delay' } },
+
+    '(delay)' => { enter => '_set_timer',
+                   transitions => { _on_timeout => 'reloading' } },
+
+    idle      => {},
+
+    stopped   => { enter => '_on_stopped' };
+
 
 sub new {
     my ($class, %opts) = @_;
     my $config_file = delete $opts{config_file};
-    my $on_reload_error = delete $opts{on_reload_error};
     my $on_reload_done = delete $opts{on_reload_done};
 
     my $self = $class->SUPER::new(%opts);
 
     $self->{config_file} = $config_file;
-    $self->{on_reload_error} = $on_reload_error;
     $self->{on_reload_done} = $on_reload_done;
 
     $self->{props} = $self->_load_base_config;
@@ -73,7 +82,6 @@ sub set_db {
 
 sub _reload {
     my $self = shift;
-    delete $self->{reload_failed};
     $self->_query('select key, value from configs');
 }
 
@@ -92,22 +100,16 @@ sub _on_reload_result {
         }
         $self->{props} = $props;
     }
-    else {
-        $self->{reload_failed} = 1;
-    }
 }
 
-sub _on_reload_error {
+sub _send_config_reloaded {
     my $self = shift;
-    $self->{reload_failed} = 1;
-    $self->_on_reload_done;
+    $self->_maybe_callback('on_reload_done');
 }
 
-sub _on_reload_done {
+sub _set_timer {
     my $self = shift;
-    $self->_maybe_callback($self->{reload_failed}
-                           ? 'on_reload_error'
-                           : 'on_reload_done');
-    $self->_goto_idle;
+    $self->_call_after($self->_cfg('internal.hkd.agent.config.delay' ), '_on_timeout');
 }
+
 1;

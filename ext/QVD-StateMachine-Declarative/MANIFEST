@@ -1,6 +1,0 @@
-Changes
-Makefile.PL
-MANIFEST
-README
-t/QVD-StateMachine-Declarative.t
-lib/QVD/StateMachine/Declarative.pm

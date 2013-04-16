@@ -12,32 +12,30 @@ our $debug;
 use parent qw(QVD::HKD::Agent);
 use QVD::Log;
 
-use QVD::StateMachine::Declarative
-    new                => { transitions => { _on_run                   => 'searching_dead_l7r' } },
+use Class::StateMachine::Declarative
 
-    searching_dead_l7r => { enter       => '_search_dead_l7r',
-                            transitions => { _on_search_dead_l7r_done  => 'cleaning_dead_l7r',
-                                             _on_search_dead_l7r_error => 'idle'               } },
+    __any__ => { transitions => { 'on_hkd_stop' => 'stopped' } },
 
-    cleaning_dead_l7r  => { enter       => '_clean_dead_l7r',
-                            transitions => { _on_clean_dead_l7r_done   => 'searching_dead_l7r',
-                                             _on_clean_dead_l7r_error  => 'idle'               } },
+    new     => { transitions => { _on_run => 'idle' } },
 
-    idle               => { enter       => '_set_timer',
-                            leave       => '_abort_all',
-                            transitions => { _on_timeout               => 'getting_user_cmd',
-                                             on_hkd_stop               => 'stopped'            } },
+    running => { advance => '_on_done',
+                 transitions => { _on_error => 'idle' },
+                 substates => [ searching_l7rs    => { enter => '_search_l7rs' },
+                                checking_l7rs     => { enter => '_check_l7rs' },
+                                cleaning_dead_l7r => { enter => '_clean_dead_l7rs' },
+                                redo              => { jump => 'cleaning_dead_l7r' } ] },
 
-    stopped            => { enter       => '_on_stopped'  },
+    idle    => { enter => '_set_timer',
+                 transitions => { _on_timeout => 'running' } },
 
-    __any__            => { delay_once  => ['on_hkd_stop'] };
+    stopped => { enter => '_on_stopped'  };
 
 
-sub _search_dead_l7r {
+sub _search_l7rs {
     my $self = shift;
     DEBUG "searching for L7R processes running on this host $self->{node_id}";
-    delete $self->{dead_l7r};
-    $self->_query(<<'EOQ', $self->{node_id});
+    $self->_query({save_to => 'l7rs'},
+                  <<'EOQ', $self->{node_id});
 select vm_id, l7r_pid
   from vm_runtimes
   where l7r_host = $1
@@ -45,24 +43,37 @@ select vm_id, l7r_pid
 EOQ
 }
 
-sub _on_search_dead_l7r_result {
-    my ($self, $res) = @_;
-    for my $row ($res->rows) {
-        my ($vm_id, $l7r_pid) = $res->row;
-        DEBUG "checking L7R process $l7r_pid corresponding to VM $vm_id";
-        unless (kill 0, $l7r_pid) {
-            ERROR "L7R process $l7r_pid for VM $vm_id does not exist anymore";
-            $self->{dead_l7r} = { vm_id => $vm_id, l7r_pid => $l7r_pid };
-        }
+sub _check_process {
+    my $pid = shift;
+    if (kill 0, $pid) {
+        DEBUG "L7R process $pid is running";
     }
-    return;
+    elsif ($! == Errno::ESRCH()) {
+        WARN "L7R process $pid died unexpectedly";
+        return;
+    }
+    else {
+        WARN "Unable to check L7R process $pid: $!"
+    }
+    return 1;
+}
+
+sub _check_l7rs {
+    my $self = shift;
+    my $l7rs = $self->{l7rs};
+    @$l7rs = grep(_check_process($_->{l7r_pid}), @$l7rs);
+    unless (@$l7rs) {
+        DEBUG "all the L7R processes on this host are alive and kicking!";
+        return $self->_on_error; # shortcut to idle state
+    }
+    $self->_on_done;
 }
 
 sub _clean_dead_l7r {
     my $self = shift;
-    if (my $dead = delete $self->{dead_l7r}) {
-        INFO "cleaning L7R data for VM $dead->{vm_id} running here, in host $self->{node_id}, L7R pid: $dead->{l7r_pid}";
-        $self->_query_1(<<'EOQ', $dead->{vm_id}, $dead->{l7r_pid}, $self->{node_id}),
+    if (defined(my $l7r = shift @{$self->{l7rs}})) {
+        $self->_query({n => 1},
+                      <<'EOQ', $l7r->{vm_id}, $l7r->{l7r_pid}, $l7r->{node_id}),
 update vm_runtimes
   set (user_state, user_cmd, l7r_host, l7r_pid) = ('disconnected', NULL, NULL, NULL)
   where vm_id    = $1
@@ -71,8 +82,7 @@ update vm_runtimes
 EOQ
     }
     else {
-        DEBUG "all the L7R processes on this host are alive and kicking!";
-        $self->_on_clean_dead_l7r_error;
+        $self->_on_error;
     }
 }
 

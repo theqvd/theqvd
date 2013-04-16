@@ -1,17 +1,30 @@
 package QVD::HKD::VMAMonitor;
 
 BEGIN { *debug = \$QVD::HKD::debug }
+our $debug;
 
 use 5.010;
 use strict;
 use warnings;
 use Carp qw(confess);
-
-use AnyEvent;
+use QVD::Log;
 
 use parent qw(QVD::HKD::Agent);
+use Class::StateMachine::Declarative
+    __any__       => { transitions => { _on_stop => 'stopped' } },
 
-our $debug;
+    new           => { transitions => { _on_run => 'pinging' } },
+
+    pinging       => { enter => '_ping',
+                       before => { _on_done => '_send_ok',
+                                   _on_error => '_send_error' },
+                       transitions => { _on_done  => 'idle',
+                                        _on_error => 'idle' } },
+
+    idle          => { enter => '_set_timer',
+                       transitions => { _on_timeout => 'pinging' } },
+
+    stopped       => { transitions => { _on_run => 'pinging' } };
 
 sub new {
     my ($class, %opts) = @_;
@@ -25,50 +38,27 @@ sub new {
     $self;
 }
 
-sub run {
-    my $self = shift;
-    $self->state('unknown');
-    $self->{run} = 1;
-    $self->_monitor_vma
-}
-
 sub stop {
-    my $self = shift;
-    $self->{run} = 0;
-    $self->_abort_rpc;
-    $self->_abort_call_after;
+    DEBUG 'Stopping VMA monitor';
+    shift->_on_stop;
 }
 
-sub _monitor_vma {
-    my $self = shift;
-    unless ($self->{run}) {
-        require Data::Dumper;
-        $debug and $self->_debug("self:\n", Data::Dumper::Dumper($self));
-        confess "internal error: _monitor_vma called but not running";
-    }
-    $self->{rpc_retry_count} = 0;
-    $self->_rpc('ping')
-}
+sub _ping { shift->_rpc({retry_count => 0}, 'ping') }
 
-sub _on_rpc_ping_result {
+sub _send_ok {
     my $self = shift;
     $self->_maybe_callback('on_alive');
-    $self->_on_rpc_ping_done
 }
 
-sub _on_rpc_ping_error {
+sub _send_error {
     my $self = shift;
     $self->_maybe_callback('on_failed');
-    $self->_on_rpc_ping_done
 }
 
-sub _on_rpc_ping_done {
+sub _set_timer {
     my $self = shift;
-    if ($self->{run}) {
-        my $delay = $self->_cfg('internal.hkd.vmhandler.vma_monitor.delay');
-        $debug and $self->_debug("will be checking the VMA in $delay seconds");
-        $self->_call_after($delay, '_monitor_vma');
-    }
+    $self->_call_after($self->_cfg('internal.hkd.vmhandler.vma_monitor.delay'),
+                       '_on_timeout');
 }
 
 1;
