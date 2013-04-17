@@ -36,7 +36,7 @@ use Class::StateMachine::Declarative
 
                                   db              => { transitions => { _on_error => 'stopping/db' },
                                                        substates => [ deleting_cmd       => { enter => '_delete_cmd_busy',
-                                                                                              on => { _on_error => "_on_done" } },
+                                                                                              on => { _on_error => '_on_done' } },
                                                                       loading_row        => { enter => '_load_row' },
                                                                       searching_di       => { enter => '_search_di' },
                                                                       calculating_attrs  => { enter => '_calculate_attrs' },
@@ -200,7 +200,7 @@ sub _mkpath {
 sub _calculate_attrs {
     my $self = shift;
 
-    $self->SUPER::_calculate_attrs($self);
+    $self->SUPER::_calculate_attrs;
 
     $self->{lxc_name} = "qvd-$self->{vm_id}";
     my $rootfs_parent = $self->_cfg('path.storage.rootfs');
