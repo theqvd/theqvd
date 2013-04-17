@@ -295,6 +295,7 @@ sub _start_vma_monitor {
                                                                          on_alive => sub { $self->_on_alive },
                                                                          rpc_service => $self->{rpc_service});
     $self->{last_seen_alive} = time;
+    $self->{failed_vma_count} = 0;
     $vma_monitor->run;
     $self->on_leave_state('__stop_vma_monitor');
 }
