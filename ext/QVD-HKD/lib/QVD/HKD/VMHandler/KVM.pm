@@ -5,6 +5,7 @@ our $debug;
 
 use strict;
 use warnings;
+use 5.010;
 
 use POSIX;
 use AnyEvent;
@@ -13,208 +14,133 @@ use QVD::Log;
 
 use parent qw(QVD::HKD::VMHandler);
 
-use QVD::StateMachine::Declarative
-    'new'                             => { transitions => { _on_cmd_start                => 'starting',
-                                                            _on_cmd_catch_zombie         => 'zombie/beating_to_death'       } },
+use Class::StateMachine::Declarative
+    __any__  => { delay => [qw(on_hkd_stop
+                               on_hkd_kill)],
+                  ignore => [qw(_on_cmd_start)] },
 
-    'starting'                        => { jump        => 'starting/saving_state' },
+    new      => { transitions => { _on_cmd_start        => 'starting',
+                                   _on_cmd_catch_zombie => 'zombie' } },
 
-    'starting/saving_state'           => { enter       => '_save_state',
-                                           transitions => { _on_save_state_done          => 'starting/loading_row'          } },
+    starting => { advance => '_on_done',
+                  delay => [qw(on_hkd_stop
+                               on_hkd_kill)],
+                  substates => [ saving_state   => { enter => '_save_state',
+                                                     transitions => { _on_error => 'stopped' } },
 
-    'starting/loading_row'            => { enter       => '_load_row',
-                                           transitions => { _on_load_row_done            => 'starting/updating_stats',
-                                                            _on_load_row_error           => 'stopping/clearing_runtime_row' } },
+                                 db             => { transitions => { _on_error => 'stopping/db' },
+                                                     substates => [ deleting_cmd       => { enter => '_delete_cmd_busy',
+                                                                                            on => { _on_error => '_on_done' } },
+                                                                    loading_row        => { enter => '_load_row' },
+                                                                    searching_di       => { enter => '_search_di' },
+                                                                    calculating_attrs  => { enter => '_calculate_attrs' },
+                                                                    saving_runtime_row => { enter => '_save_runtime_row' },
+                                                                    updating_stats     => { enter => '_incr_run_attempts' } ] },
 
-    'starting/updating_stats'         => { enter       => '_incr_run_attempts',
-                                           transitions =>  { _on_incr_run_attempts_done  => 'starting/searching_di',
-                                                             _on_incr_run_attempts_bad_result => 'stopping/clearing_runtime_row' } },
+                                 clean_old       => { transitions => { _on_error => 'zombie' },
+                                                      substates => [ removing_fw_rules => { enter => '_remove_fw_rules' } ] },
 
-    'starting/searching_di'           => { enter       => '_search_di',
-                                           transitions => { _on_search_di_done           => 'starting/saving_runtime_row',
-                                                            _on_search_di_error          => 'stopping/clearing_runtime_row' } },
+                                 heavy           => { enter => '_set_heavy_mark' },
 
-    'starting/saving_runtime_row'     => { enter       => '_save_runtime_row',
-                                           transitions => { _on_save_runtime_row_done    => 'starting/deleting_cmd',
-                                                            _on_save_runtime_row_error   => 'stopping/clearing_runtime_row' },
-                                           ignore      => ['_on_save_runtime_row_result'] },
+                                 setup           => { transitions => { _on_error   => 'stopping/cleanup',
+                                                                       on_hkd_stop => 'stopping/cleanup',
+                                                                       on_hkd_kill => 'stopping/cleanup' },
+                                                      substates => [ allocating_os_disk    => { enter => '_allocate_os_disk' },
+                                                                     allocating_user_disk  => { enter => '_allocate_user_disk' },
+                                                                     allocating_tap        => { enter => '_allocate_tap' },
+                                                                     running_prestart_hook => { enter => '_run_prestart_hook' },
+                                                                     setting_fw_rules      => { enter => '_set_fw_rules' },
+                                                                     enabling_iface        => { enter => '_enable_iface' },
+                                                                     launching             => { enter => '_start_kvm' } ] },
 
-    'starting/deleting_cmd'           => { enter       => '_delete_cmd',
-                                           transitions => { _on_delete_cmd_done          => 'starting/calculating_attrs',
-                                                            _on_delete_cmd_error         => 'starting/calculating_attrs'        } },
+                                 waiting_for_vma => { enter => '_start_vma_monitor',
+                                                      transitions => { _on_alive      => 'running',
+                                                                       _on_dead       => 'stopping/stop',
+                                                                       _on_cmd_stop   => 'stopping/cmd',
+                                                                       _on_kvm_done   => 'stopping/cleanup',
+                                                                       on_hkd_stop    => 'stopping/stop',
+                                                                       on_hkd_kill    => 'stopping/cleanup',
+                                                                       _on_goto_debug => 'debugging' } } ] },
+    running => { advance => '_on_done',
+                 delay => [qw(_on_kvm_done)],
+                 transitions => { _on_error => 'stopping/stop' },
+                 substates => [ saving_state           => { enter => '_save_state' },
+                                updating_stats         => { enter => '_incr_run_ok' },
+                                running_poststart_hook => { enter => '_run_poststart_hook' },
+                                unsetting_heavy_mark   => { enter => '_unset_heavy_mark' },
+                                monitoring             => { enter => '_start_vma_monitor',
+                                                            transitions => { _on_dead       => 'stopping/stop',
+                                                                             _on_cmd_stop   => 'stopping/cmd',
+                                                                             _on_kvm_done   => 'stopping/cleanup',
+                                                                             on_hkd_stop    => 'stopping/stop',
+                                                                             on_hkd_kill    => 'stopping/stop',
+                                                                             _on_goto_debug => 'debugging' } } ] },
 
-    'starting/calculating_attrs'      => { enter       => '_calculate_attrs',
-                                           transitions => { _on_calculate_attrs_done     => 'starting/setting_heavy_mark'       } },
+    debugging => { advance => '_on_done',
+                   delay => [qw(_on_kvm_done)],
+                   transitions => { _on_error => 'stopping/stop' },
+                   substates => [ saving_state          => { enter => '_save_state' },
+                                  unsetting_heavy_mark  => { enter => '_unset_heavy_mark' },
+                                  waiting_for_vma       => { enter => '_start_vma_monitor',
+                                                             ignore => [qw(_on_dead
+                                                                           _on_goto_debug)],
+                                                             transitions => { _on_alive    => 'running',
+                                                                              _on_cmd_stop => 'stopping/cmd',
+                                                                              _on_kvm_done => 'stopping/cleanup',
+                                                                              on_hkd_stop  => 'stopping/stop',
+                                                                              on_hkd_kill  => 'stopping/stop' } } ] },
 
-    'starting/setting_heavy_mark'     => { enter       => '_set_heavy_mark',
-                                           transitions => { _on_set_heavy_mark_done      => 'starting/allocating_os_disk',
-                                                            _on_set_heavy_mark_error     => 'starting/delaying'                 } },
+    stopping => { advance => '_on_done',
+                  delay => [qw(_on_kvm_done)],
+                  substates => [ cmd      => { advance => '_on_error',
+                                               substates => [ saving_state => { enter => '_save_state' },
+                                                              deleting_cmd    => { enter => '_delete_cmd_busy' } ] },
 
-    'starting/delaying'               => { transitions => { _on_cmd_go_heavy             => 'starting/setting_heavy_mark'       } },
+                                 shutdown => { substates => [ saving_state    => { enter => '_save_state' },
+                                                              heavy           => { enter => '_set_heavy_mark' },
+                                                              shuttingdown    => { enter => '_shutdown',
+                                                                                   transitions => { _on_error    => 'stop',
+                                                                                                    _on_kvm_done => 'cleanup' } },
+                                                              waiting_for_kvm => { enter => '_set_state_timer',
+                                                                                   transitions => { _on_kvm_done      => 'cleanup',
+                                                                                                    _on_state_timeout => 'stop' } } ] },
+                                 stop     => { substates => [ saving_state => { enter => '_save_state' },
+                                                              killing      => { enter => '_kill_kvm',
+                                                                                transitions => { _on_error => 'cleanup' } },
+                                                              waiting      => { enter => '_set_state_timer',
+                                                                                transitions => { _on_kvm_done => 'cleanup',
+                                                                                                 _on_state_timeout => 'zombie' } } ] },
 
-    'starting/allocating_os_disk'     => { enter       => '_allocate_os_disk',
-                                           transitions => { _on_allocate_os_disk_done    => 'starting/allocating_user_disk',
-                                                            _on_allocate_os_disk_error   => 'stopping/clearing_runtime_row' } },
+                                 cleanup  => { substates => [ saving_state => { enter => '_save_state' },
+                                                              removing_fw_rules     => { enter => '_remove_fw_rules' },
+                                                              running_poststop_hook => { enter => '_run_prestart_hook' } ] },
+                                 db => { enter => '_clear_runtime_row',
+                                         transitions => { _on_error => 'zombie',
+                                                          _on_done  => 'stopped' } } ] },
 
-    'starting/allocating_user_disk'   => { enter       => '_allocate_user_disk',
-                                           transitions => { _on_allocate_user_disk_done  => 'starting/removing_old_fw_rules',
-                                                            _on_allocate_user_disk_error => 'stopping/clearing_runtime_row' } },
+    stopped => { enter => '_call_on_stopped' },
 
-    'starting/removing_old_fw_rules'  => { enter       => '_remove_fw_rules',
-                                           transitions => { _on_remove_fw_rules_done     => 'starting/allocating_tap',
-                                                            _on_remove_fw_rules_error    => 'stopping/clearing_runtime_row',} },
+    # TODO: improve the zombie handling
+    zombie  => { advance => '_on_done',
+                 delay => [qw(_on_kvm_done)],
+                 ignore => [qw(on_hkd_stop)],
+                 transitions => { _on_error => 'unsetting_heavy_mark' },
+                 substates => [ saving_state          => { enter => 'save_state' },
+                                calculating_attrs     => { enter => '_calculate_attrs' },
+                                killing_kvm           => { enter => '_kill_kvm',
+                                                           transitions => { on_error => 'removing_fw_rules' } },
+                                waiting_for_kvm       => { enter => '_set_state_timer',
+                                                           on => { _on_kvm_done      => '_on_done',
+                                                                   _on_state_timeout => '_on_error' } },
+                                removing_fw_rules    => { enter => '_remove_fw_rules' },
+                                configuring_dhcpd    => { enter => '_rm_from_dhcpd' },
+                                clearing_runtime_row => { enter => '_clear_runtime_row',
+                                                          transitions => { _on_done => 'stopped' } },
+                                unsetting_heavy_mark => { enter => '_unset_heavy_mark' },
+                                idle                 => { enter => '_set_state_timer',
+                                                          transitions => { _on_state_timeout => 'killing_kvm',
+                                                                           on_hkd_kill       => 'stopped' } } ] };
 
-    'starting/allocating_tap'         => { enter       => '_allocate_tap',
-                                           transitions => { _on_allocate_tap_done        => 'starting/running_prestart_hook',
-                                                            _on_allocate_tap_error       => 'stopping/clearing_runtime_row' } },
-
-    'starting/running_prestart_hook'  => { enter    => '_run_prestart_hook',
-                                           transitions => { _on_run_hook_done            => 'starting/setting_fw_rules',
-                                                            _on_run_hook_error           => 'stopping/saving_state_2'  } },
-
-    'starting/setting_fw_rules'       => { enter       => '_set_fw_rules',
-                                           transitions => { _on_set_fw_rules_done        => 'starting/enabling_iface',
-                                                            _on_set_fw_rules_error       => 'stopping/saving_state_2' } },
-
-    'starting/enabling_iface'         => { enter       => '_enable_iface',
-                                           transitions => { _on_enable_iface_done        => 'starting/launching',
-                                                            _on_enable_iface_error       => 'stopping/saving_state_2' } },
-
-    'starting/launching'              => { enter       => '_launch_process',
-                                           transitions => { _on_launch_process_done      => 'starting/waiting_for_vma',
-                                                            _on_launch_process_error     => 'stopping/saving_state_2' } },
-
-    'starting/waiting_for_vma'        => { enter       => '_start_vma_monitor',
-                                           leave       => '_stop_vma_monitor',
-                                           # leave defined as a sub below
-                                           transitions => { _on_alive                    => 'running/saving_state',
-                                                            _on_dead                     => 'stopping/killing_vm',
-                                                            _on_goto_debug               => 'debugging/saving_state',
-                                                            on_hkd_stop                  => 'stopping/saving_state',
-                                                            _on_vm_process_done          => 'stopping/saving_state_2' } },
-
-    'running/saving_state'            => { enter       => '_save_state',
-                                           transitions => { _on_save_state_done          => 'running/updating_stats',
-                                                            _on_save_state_error         => 'stopping/saving_state' } },
-
-    'running/updating_stats'          => { enter       => '_incr_run_ok',
-                                           transitions =>  { _on_incr_run_ok_done        => 'running/running_poststart_hook',
-                                                             _on_incr_run_ok_error       => 'running/running_poststart_hook' },
-                                           ignore      => [qw(_on_incr_run_ok_result)]                                          },
-
-    'running/running_poststart_hook'  => {  enter       => '_run_poststart_hook',
-                                            transitions => { _on_run_hook_done            => 'running/unsetting_heavy_mark',
-                                                             _on_run_hook_error           => 'stopping/saving_state'          } },
-
-    'running/unsetting_heavy_mark'    => { enter       => '_unset_heavy_mark',
-                                           transitions => { _on_unset_heavy_mark_done    => 'running/monitoring'              } },
-
-    'running/monitoring'              => { enter       => '_start_vma_monitor',
-                                           leave       => '_stop_vma_monitor',
-                                           # TODO: check these transitions:
-                                           transitions => { _on_cmd_stop                 => 'stopping/deleting_cmd',
-                                                            on_hkd_stop                  => 'stopping/saving_state',
-                                                            _on_dead                     => 'stopping/saving_state',
-                                                            _on_goto_debug               => 'debugging/saving_state',
-                                                            _on_vm_process_done          => 'stopping/saving_state_2' } },
-
-    'debugging/saving_state'          => { enter       => '_save_state',
-                                           transitions => { _on_save_state_done          => 'debugging/unsetting_heavy_mark',
-                                                            _on_save_state_error         => 'stopping/saving_state'           },
-                                           delay       => [qw(_on_vm_process_done)]                                            },
-
-    'debugging/unsetting_heavy_mark'  => { enter       =>  '_unset_heavy_mark',
-                                           transitions => { _on_unset_heavy_mark_done    => 'debugging/waiting_for_vma'      } },
-
-    'debugging/waiting_for_vma'       => { enter       => '_start_vma_monitor',
-                                           leave       => '_stop_vma_monitor',
-                                           transitions => { _on_alive                    => 'running/saving_state',
-                                                            _on_cmd_stop                 => 'stopping/deleting_cmd',
-                                                            on_hkd_stop                  => 'stopping/saving_state',
-                                                            _on_vm_process_done          => 'stopping/saving_state_2' },
-                                           ignore      => [qw(_on_dead
-                                                              _on_goto_debug)] },
-
-    'stopping/deleting_cmd'           => { enter       => '_delete_cmd',
-                                           transitions => { _on_delete_cmd_done          => 'stopping/saving_state'           } },
-
-    'stopping/saving_state'           => { enter       => '_save_state',
-                                           transitions => { _on_save_state_done          => 'stopping/setting_heavy_mark',
-                                                            _on_save_state_error         => 'stopping/setting_heavy_mark'     } },
-
-    'stopping/setting_heavy_mark'     => { enter       => '_set_heavy_mark',
-                                           transitions => { _on_set_heavy_mark_done      => 'stopping/powering_off',
-                                                            _on_set_heavy_mark_error     => 'stopping/delaying'               } },
-
-    'stopping/delaying'               => { transitions => { _on_cmd_go_heavy             => 'stopping/setting_heavy_mark'     } },
-
-    'stopping/powering_off'           => { enter       => '_poweroff',
-                                           leave       => '_abort_all',
-                                           transitions => { _on_rpc_poweroff_error       => 'stopping/killing_vm',
-                                                            _on_vm_process_done          => 'stopping/removing_fw_rules',
-                                                            _on_rpc_poweroff_result      => 'stopping/waiting_for_vm_to_exit' } },
-
-    'stopping/waiting_for_vm_to_exit' => { enter       => '_set_state_timer',
-                                           leave       => '_abort_all',
-                                           transitions => { _on_vm_process_done          => 'stopping/removing_fw_rules',
-                                                            _on_state_timeout            => 'stopping/killing_vm',
-                                                            on_hkd_kill                  => 'stopping/killing_vm'            } },
-
-    'stopping/killing_vm'             => { enter       => '_kill_vm',
-                                           leave       => '_abort_all',
-                                           transitions => { _on_vm_process_done          => 'stopping/removing_fw_rules'     },
-                                           ignore      => [qw(on_hhd_kill)]                                                    },
-
-    'stopping/saving_state_2'         => { enter       => '_save_state',
-                                           transitions => { _on_save_state_done          => 'stopping/removing_fw_rules',
-                                                            _on_save_state_error         => 'stopping/removing_fw_rules'     } },
-
-    'stopping/removing_fw_rules'      => { enter       => '_remove_fw_rules',
-                                           transitions => { _on_remove_fw_rules_done     => 'stopping/running_poststop_hook',
-                                                            _on_remove_fw_rules_error    => 'stopping/running_poststop_hook' } },
-
-    'stopping/running_poststop_hook'  => { enter    => '_run_prestart_hook',
-                                           transitions => { _on_run_hook_done            => 'stopping/clearing_runtime_row',
-                                                            _on_run_hook_error           => 'stopping/clearing_runtime_row'  } },
-
-    'stopping/clearing_runtime_row'   => { enter       => '_clear_runtime_row',
-                                           transitions => { _on_clear_runtime_row_done   => 'stopped' },
-                                           ignore      => ['_on_clear_runtime_row_result',
-                                                           '_on_clear_runtime_row_bad_result'] },
-
-    'stopped'                         => { enter       => '_call_on_stopped' },
-
-    'zombie/beating_to_death'         => { jump        => 'zombie/saving_state' },
-
-    'zombie/saving_state'             => { enter       => '_save_state',
-                                           transitions => { _on_save_state_done          => 'zombie/calculating_attrs',
-                                                            _on_save_state_error         => 'zombie/calculating_attrs',       } },
-
-    'zombie/calculating_attrs'        => { enter       => '_calculate_attrs',
-                                           transitions => { _on_calculate_attrs_done     => 'zombie/removing_fw_rules'            } },
-
-    'zombie/removing_fw_rules'        => { enter       => '_remove_fw_rules',
-                                           transitions => { _on_remove_fw_rules_done     => 'zombie/clearing_runtime_row',
-                                                            _on_remove_fw_rules_error    => 'zombie/unsetting_heavy_mark'    } },
-
-    'zombie/clearing_runtime_row'     => { enter       => '_clear_runtime_row',
-                                           transitions => { _on_clear_runtime_row_done   => 'stopped',
-                                                            _on_clear_runtime_row_error  => 'zombie/unsetting_heavy_mark'    } },
-
-    'zombie/unsetting_heavy_mark'     => { enter       => '_unset_heavy_mark',
-                                           transitions => { _on_unset_heavy_mark_done    => 'zombie'                         } },
-
-    'zombie'                          => { enter       => '_set_state_timer',
-                                           leave       => '_abort_all',
-                                           transitions => { _on_state_timeout            => 'zombie/removing_fw_rules',
-                                                            on_hkd_stop                  => 'stopped'                       } },
-
-    __any__                           => { delay_once  => ['_on_cmd_stop',
-                                                           '_on_vm_process_done',
-                                                           'on_hkd_stop',
-                                                           'on_hkd_kill']                                                      };
-
-sub _on_cmd_start :OnState('__any__') { shift->_maybe_callback('on_delete_cmd') }
 
 
 # FIXME: move this out of here, maybe into a module:
@@ -223,6 +149,17 @@ use constant STRUCT_IFREQ => "Z16 s";
 use constant IFF_NO_PI => 0x1000;
 use constant IFF_TAP => 2;
 use constant TUNSETIFF => 0x400454ca;
+
+sub _calculate_attrs {
+    my $self = shift;
+    $self->SUPER::_calculate_attrs;
+
+    # TODO: move attribute calculation here!
+
+    $self->_on_done
+}
+
+
 
 sub _allocate_tap {
     my $self = shift;
@@ -235,38 +172,35 @@ sub _allocate_tap {
     };
     if ($@) {
         ERROR "Allocating TAP device: $@";
-        return $self->_on_allocate_tap_error
+        return $self->_on_error;
     }
 
     # FIXME: add the ebtables thing back again
     # $noded->_make_ebtables_tap_chain($tap_if);
 
-    $self->_run_cmd([$self->_cfg('command.brctl'),
-                     addif => $self->_cfg('vm.network.bridge'),
-                     $self->{iface}]);
+    $self->_run_cmd('brctl',
+                    addif => $self->_cfg('vm.network.bridge'),
+                    $self->{iface});
 }
 
 sub _enable_iface {
     my $self = shift;
-    $self->_run_cmd([$self->_cfg('command.ifconfig'), $self->{iface}, 'up']);
-}
-
-sub _calculate_attrs {
-    # TODO: move attribute calculation here!
-    shift->_on_calculate_attrs_done
-
+    $self->_run_cmd(ifconfig => $self->{iface}, 'up');
 }
 
 sub _allocate_os_disk {
+    # FIXME: move attribute calculation to its proper place
+
     my $self = shift;
     my $image_path = $self->_cfg('path.storage.images') . '/' . $self->{di_path};
     unless (-f $image_path) {
         ERROR "Image '$image_path' attached to VM '$self->{vm_id}' does not exist on disk";
-        return $self->_on_allocate_os_disk_error;
+        return $self->_on_error;
     }
     unless ($self->{use_overlay}) {
+        DEBUG "Image path for VM $self->{vm_id} set to $image_path";
         $self->{os_image_path} = $image_path;
-        return $self->_on_allocate_os_disk_done;
+        return $self->_on_done;
     }
 
     # FIXME: use a better policy for overlay allocation
@@ -276,24 +210,24 @@ sub _allocate_os_disk {
     if (-f $overlay_path) {
         if ($self->_cfg('vm.overlay.persistent')) {
             DEBUG "Reusing persistent overlay '$overlay_path'";
-            return $self->_on_allocate_os_disk_done;
+            return $self->_on_done;
         }
-        DEBUG "Discarding overlay '$overlay_path'";
+        DEBUG "Discarding old overlay '$overlay_path'";
         unlink $overlay_path;
     }
-    mkdir $overlays_dir, 0755 or WARN "mkdir: 'overlays_dir': $!";
+    mkdir $overlays_dir, 0755 or DEBUG "mkdir 'overlays_dir' failed: $!";
     unless (-d $overlays_dir) {
         ERROR "Overlays directory '$overlays_dir' does not exist";
-        return $self->_on_allocate_os_disk_error
+        return $self->_on_error;
     }
 
     # FIXME: use a relative path to the base image?
     #my $image_relative = File::Spec->abs2rel($image, $overlays_path);
-    $self->_run_cmd([ $self->_cfg('command.kvm-img'),
-                      'create',
-                      -f => 'qcow2',
-                      -b => $image_path,
-                      $overlay_path ]);
+    $self->_run_cmd('kvm-img',
+                    'create',
+                    -f => 'qcow2',
+                    -b => $image_path,
+                    $overlay_path);
 }
 
 sub _allocate_user_disk {
@@ -301,7 +235,7 @@ sub _allocate_user_disk {
     my $size = $self->{user_storage_size};
     unless (defined $size) {
         DEBUG 'Not allocating user storage';
-        return $self->_on_allocate_user_disk_done;
+        return $self->_on_done;
     }
 
     my $homes_dir = $self->_cfg('path.storage.homes');
@@ -309,24 +243,24 @@ sub _allocate_user_disk {
     my $image_path = $self->{user_image_path} = "$homes_dir$self->{vm_id}-data.qcow2";
     if (-f $image_path) {
         DEBUG "Reusing user storage at '$image_path'";
-        return $self->_on_allocate_user_disk_done;
+        return $self->_on_done;
     }
-    mkdir $homes_dir, 0755 or WARN "mkdir: '$homes_dir': $!";
+    mkdir $homes_dir, 0755 or DEBUG "mkdir '$homes_dir' failed: $!";
     unless (-d $homes_dir) {
         ERROR "Homes directory '$homes_dir' does not exist";
-        return $self->_on_allocate_user_disk_error;
+        return $self->_on_error;
     }
 
-    $self->_run_cmd([ $self->_cfg('command.kvm-img'),
-                      'create',
-                      -f => 'qcow2',
-                      $image_path,
-                      $size ]);
+    $self->_run_cmd('kvm-img',
+                    'create',
+                    -f => 'qcow2',
+                    $image_path,
+                    $size);
 }
 
-sub _launch_process {
+sub _start_kvm {
     my $self = shift;
-    my @cmd = ( $self->_cfg('command.kvm'),
+    my @cmd = ( $self->_cfg('kvm'),
                 -m => $self->{memory},
                 -name => "qvd/$self->{vm_id}/$self->{name}");
 
@@ -389,66 +323,48 @@ sub _launch_process {
         push @cmd, -drive => $hdb;
     }
 
-    my $pid = fork;
-    unless ($pid) {
-        unless (defined $pid) {
-            ERROR "Unable to fork virtual machine process: $!";
-            return $self->_on_launch_process_error;
-        }
-        eval {
-            DEBUG "exec cmd: '" . join(" ", @cmd) . "'\n";
-            #setpgrp;   # do not kill kvm when HKD runs on terminal and user CTRL-C's it
-	    open STDIN, '<', '/dev/null' or LOGDIE "can't open /dev/null\n";
-	    open STDOUT, '>', '/dev/null' or LOGDIE "can't redirect STDOUT to /dev/null\n";
+    $self->_run_cmd({ save_pid_to => 'vm_pid',
+                      ignore_erros => 1,
+                      outlives_state => 1,
+                      on_done => weak_method_callback($self, '_on_kvm_done'),
+                      '>'  => '/dev/null',
+                      '<'  => '/dev/null',
+                      '2>' => '/dev/null',
+                      on_prepare => sub {
+                          # run VMs with low priority so in case the machine gets overloaded,
+                          # the noded and hkd daemons do not become unresponsive.
+                          # (PRIO_PGRP => 1, current PGRP => 0)
+                          setpriority(1, 0, 10);
 
-            setpriority(1, 0, 10); # run VMs with low priority so in
-                                   # case the machine gets overloaded,
-                                   # the noded and hkd daemons do not
-                                   # become unresponsive.
-                                   # (PRIO_PGRP => 1, current PGRP => 0)
-            $^F = 3;
-            if (fileno $self->{tap_fh} == 3) {
-                POSIX::fcntl($self->{tap_fh}, F_SETFD, fcntl($self->{tap_fh}, F_GETFD, 0) & ~FD_CLOEXEC)
-                        or LOGDIE "fcntl failed: $!";
-            }
-            else {
-                POSIX::dup2(fileno $self->{tap_fh}, 3) or LOGDIE "dup2 failed: $!";
-            }
-
-            # system "cat /proc/$$/fdinfo/3 >>/tmp/hkd-fdinfo";
-
-	    POSIX::dup2(1, 2) or LOGDIE "dup2 failed (2): $!";
-            # DEBUG "cmd: >" . join("< >", @cmd) . "<\n";
-
-	    exec @cmd or LOGDIE "exec failed\n";
-	};
- 	ERROR "Unable to start VM: $@";
- 	POSIX::_exit(1);
-    }
-    DEBUG "kvm pid: $pid\n";
-    $self->{pid} = $pid;
-    $self->{vm_watcher} = AnyEvent->child(pid => $pid,
-                                          cb => sub {
-                                              $debug and $self->_debug("kvm process exited with code $?");
-                                              $self->_on_vm_process_done($_[1])
-                                          });
-    $self->{last_seen_alive} = time;
-    $self->{failed_vma_count} = 0;
-
-    $self->_on_launch_process_done;
+                          $^F = 3;
+                          if (fileno $self->{tap_fh} == 3) {
+                              POSIX::fcntl($self->{tap_fh}, F_SETFD, fcntl($self->{tap_fh}, F_GETFD, 0) & ~FD_CLOEXEC)
+                                      or LOGDIE "fcntl failed: $!";
+                          }
+                          else {
+                              POSIX::dup2(fileno $self->{tap_fh}, 3) or LOGDIE "dup2 failed: $!";
+                          }
+                      } },
+                    @cmd);
+    $self->_on_done;
 }
 
-sub _kill_vm {
+sub _kill_kvm {
     my $self = shift;
-    DEBUG "Sending SIGINT to PID '$self->{pid}'";
-    kill INT => $self->{pid};
-    $self->_call_after($self->_cfg("internal.hkd.vmhandler.killer.delay"), '_kill_vm');
+    DEBUG "killing VM process";
+    if ($self->_kill_cmd(TERM => $self->{vm_pid})) {
+        $self->_on_done;
+    }
+    else {
+        WARN "VM process has dissapeared";
+        $self->_on_error;
+    }
 }
 
 sub _run_hook {
     my ($self, $name) = @_;
-    DEBUG "TODO: where are hooks stored when using images?";
-    $self->_on_run_hook_done;
+    # FIXME: where are hooks stored when using images?
+    $self->_on_done;
 }
 
 1;
