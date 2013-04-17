@@ -21,8 +21,8 @@ __PACKAGE__->set_primary_key('id');
 __PACKAGE__->add_unique_constraint(['name']);
 __PACKAGE__->add_unique_constraint(['ip']);
 
-__PACKAGE__->belongs_to(user => 'QVD::DB::Result::User', 'user_id');
-__PACKAGE__->belongs_to(osf  => 'QVD::DB::Result::OSF',  'osf_id' );
+__PACKAGE__->belongs_to(user => 'QVD::DB::Result::User', 'user_id', { cascade_delete => 0 });
+__PACKAGE__->belongs_to(osf  => 'QVD::DB::Result::OSF',  'osf_id',  { cascade_delete => 0 });
 
 __PACKAGE__->has_one (vm_runtime => 'QVD::DB::Result::VM_Runtime',  'vm_id');
 __PACKAGE__->has_one (counters   => 'QVD::DB::Result::VM_Counter',  'vm_id');
