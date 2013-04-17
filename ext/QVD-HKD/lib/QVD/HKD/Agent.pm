@@ -238,9 +238,11 @@ sub _run_cmd {
     $cmd = $self->_cfg("command.$cmd") unless $opts->{skip_cmd_lookup};
     INFO "Running command '$cmd @args'";
     $opts->{outlives_state} //= $opts->{run_and_forget};
-
+    my @extra = ( map { $_ => $opts->{$_} }
+                  grep { defined $opts->{$_} }
+                  ('>', '<', '2>', 'on_prepare') );
     my $pid;
-    my $w = eval { AnyEvent::Util::run_cmd([$cmd, @args], '$$' => \$pid) };
+    my $w = eval { AnyEvent::Util::run_cmd([$cmd, @args], '$$' => \$pid, @extra) };
     if (defined(my $save_pid_to = $opts->{save_pid_to})) {
         $self->{$save_pid_to} = $pid;
     }
