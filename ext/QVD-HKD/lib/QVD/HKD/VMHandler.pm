@@ -12,7 +12,7 @@ use AnyEvent::Util;
 use Linux::Proc::Net::TCP;
 use QVD::Log;
 use Carp;
-
+use Method::WeakCallback qw(weak_method_callback);
 use QVD::HKD::VMAMonitor;
 use QVD::HKD::Config::Network qw(netmask_len);
 
@@ -44,14 +44,12 @@ sub new {
     my ($class, %opts) = @_;
     my $vm_id = delete $opts{vm_id};
     my $on_stopped = delete $opts{on_stopped};
-    my $on_heavy = delete $opts{on_heavy};
 
     my $dhcpd_handler = delete $opts{dhcpd_handler};
     my $self = $class->SUPER::new(%opts);
     $self->{vm_id} = $vm_id;
     $self->{dhcpd_handler} = $dhcpd_handler;
     $self->{on_stopped} = $on_stopped;
-    $self->{on_heavy} = $on_heavy;
 
     my $hypervisor = $self->_cfg('vm.hypervisor');
     DEBUG "Using hypervisor type '$hypervisor'";
@@ -82,6 +80,7 @@ sub _delete_cmd_busy {
     my $vm_id = $self->{vm_id};
     DEBUG "Deleting pseudo command 'busy'";
     $self->_query({n => 1,
+                   ignore_errors => 1,
                    log_error => "Unable to delete pseudo command 'busy' for vm $vm_id in table vm_runtimes" },
                   q(update vm_runtimes set vm_cmd = NULL where vm_id = $1 and host_id = $2 and vm_cmd='busy'),
                   $vm_id, $self->{node_id});
@@ -291,8 +290,8 @@ sub _remove_fw_rules {
 sub _start_vma_monitor {
     my $self = shift;
     my $vma_monitor = $self->{vma_monitor} //= QVD::HKD::VMAMonitor->new(config => $self->{config},
-                                                                         on_failed => sub { $self->_on_failed_vma_monitor },
-                                                                         on_alive => sub { $self->_on_alive },
+                                                                         on_failed => weak_method_callback($self, '_on_failed_vma_monitor'),
+                                                                         on_alive  => weak_method_callback($self, '_on_alive'),
                                                                          rpc_service => $self->{rpc_service});
     $self->{last_seen_alive} = time;
     $self->{failed_vma_count} = 0;
@@ -374,18 +373,6 @@ update vm_runtimes
         vm_id   = $1  and
         host_id = $2
 SQL
-}
-
-sub _set_heavy_mark {
-    my $self = shift;
-    $self->_maybe_callback(on_heavy => 1, sub { $self->_on_done })
-        or $self->_on_done;
-}
-
-sub _unset_heavy_mark {
-    my $self = shift;
-    $self->_maybe_callback(on_heavy => 0);
-    $self->_on_done;
 }
 
 sub _call_on_stopped { shift->_maybe_callback('on_stopped') }

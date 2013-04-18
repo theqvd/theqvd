@@ -20,46 +20,44 @@ use Method::WeakCallback qw(weak_method_callback);
 use parent qw(QVD::HKD::VMHandler);
 
 use Class::StateMachine::Declarative
-    __any__   => { delay => [qw(on_hkd_stop
-                                on_hkd_kill)],
-                   ignore => [qw(_on_cmd_start)],
+    __any__   => { ignore => [qw(_on_cmd_start)],
+                   delay => [qw(on_hkd_kill)],
+                   on => { on_hkd_stop => 'on_hkd_kill' },
                    transitions => { _on_dirty => 'dirty' } },
 
     new       => { transitions => { _on_cmd_start        => 'starting',
                                     _on_cmd_catch_zombie => 'zombie' } },
 
     starting  => { advance => '_on_done',
-                   delay => [qw(on_hkd_stop
-                                on_hkd_kill)],
+                   on => { on_hkd_kill => '_on_error' },
                    substates => [ saving_state    => { enter => '_save_state',
                                                        transitions => { _on_error => 'stopped' } },
 
-                                  db              => { transitions => { _on_error => 'stopping/db' },
-                                                       substates => [ deleting_cmd       => { enter => '_delete_cmd_busy',
-                                                                                              on => { _on_error => '_on_done' } },
+                                  db              => { transitions => { _on_error   => 'stopping/db' },
+                                                       substates => [ deleting_cmd       => { enter => '_delete_cmd_busy' },
                                                                       loading_row        => { enter => '_load_row' },
                                                                       searching_di       => { enter => '_search_di' },
                                                                       calculating_attrs  => { enter => '_calculate_attrs' },
                                                                       saving_runtime_row => { enter => '_save_runtime_row' },
                                                                       updating_stats     => { enter => '_incr_run_attempts' } ] },
 
-                                  clean_old       => { transitions => { _on_error => 'zombie/reap' },
+                                  clean_old       => { transitions => { _on_error => 'zombie/reap',
+                                                                        on_hkd_kill => 'stopping/db' },
                                                        substates => [ killing_lxc            => { enter => '_kill_lxc' },
                                                                       unlinking_iface        => { enter => '_unlink_iface' },
                                                                       removing_fw_rules      => { enter => '_remove_fw_rules' },
                                                                       destroying_lxc         => { enter => '_destroy_lxc' },
                                                                       unmounting_filesystems => { enter => '_unmount_filesystems' } ] },
 
-                                  heavy           => { enter => '_set_heavy_mark' },
+                                  heavy           => { enter => '_heavy_down',
+                                                       transitions => { on_hkd_kill => 'stopping/db' } },
 
-                                  setup           => { transitions => { _on_error   => 'stopping/cleanup',
-                                                                        on_hkd_stop => 'stopping/cleanup',
-                                                                        on_hkd_kill => 'stopping/cleanup' },
+                                  setup           => { transitions => { _on_error   => 'stopping/cleanup' },
                                                        substates => [ untaring_os_image       => { enter => '_untar_os_image',
                                                                                                    transitions => { _on_eagain => 'delaying_untar' } },
-                                                                      '(delaying_untar)'      => { substates => [ unset_heavy_mark => { enter => '_unset_heavy_mark' },
-                                                                                                                  delaying         => { enter => '_set_state_timer',
-                                                                                                                                        transitions => { _on_state_timeout => 'heavy' } } ] },
+                                                                      '(delaying_untar)'      => { substates => [ unheavy  => { enter => '_heavy_up' },
+                                                                                                                  delaying => { enter => '_set_state_timer',
+                                                                                                                                transitions => { _on_state_timeout => 'heavy' } } ] },
                                                                       placing_os_image        => { enter => '_place_os_image' },
                                                                       detecting_os_image_type => { enter => '_detect_os_image_type' },
                                                                       allocating_os_overlayfs => { enter => '_allocate_os_overlayfs' },
@@ -77,8 +75,7 @@ use Class::StateMachine::Declarative
                                                                         _on_dead       => 'stopping/stop',
                                                                         _on_cmd_stop   => 'stopping/cmd',
                                                                         _on_lxc_done   => 'stopping/cleanup',
-                                                                        on_hkd_stop    => 'stopping/stop',
-                                                                        on_hkd_kill    => 'stopping/cleanup',
+                                                                        on_hkd_kill    => 'stopping/stop',
                                                                         _on_goto_debug => 'debugging' } } ] },
 
     running   => { advance => '_on_done',
@@ -87,37 +84,36 @@ use Class::StateMachine::Declarative
                    substates => [ saving_state           => { enter => '_save_state' },
                                   updating_stats         => { enter => '_incr_run_ok' },
                                   running_poststart_hook => { enter => '_run_poststart_hook' },
-                                  unsetting_heavy_mark   => { enter => '_unset_heavy_mark' },
+                                  unheavy                => { enter => '_heavy_up' },
                                   monitoring             => { enter => '_start_vma_monitor',
                                                               ignore => [qw(_on_alive)],
                                                               transitions => { _on_dead       => 'stopping/stop',
                                                                                _on_cmd_stop   => 'stopping/cmd',
                                                                                _on_lxc_done   => 'stopping/cleanup',
-                                                                               on_hkd_stop    => 'stopping/stop',
-                                                                               on_hkd_kill    => 'stopping/cleanup',
+                                                                               on_hkd_kill    => 'stopping/stop',
                                                                                _on_goto_debug => 'debugging' } } ] },
 
     debugging => { advance => '_on_done',
                    delay => [qw(_on_lxc_done)],
                    transitions => { _on_error => 'stopping/stop' },
-                   substates => [ saving_state          => { enter => '_save_state' },
-                                  unsetting_heavy_mark  => { enter => '_unset_heavy_mark' },
-                                  waiting_for_vma       => { enter => '_start_vma_monitor',
-                                                             ignore => [qw(_on_dead
-                                                                           _on_goto_debug)],
-                                                             transitions => { _on_alive    => 'running',
-                                                                              _on_cmd_stop => 'stopping/cmd',
-                                                                              _on_lxc_done => 'stopping/cleanup',
-                                                                              on_hkd_stop  => 'stopping/stop',
-                                                                              on_hkd_kill  => 'stopping/cleanup' } } ] },
+                   substates => [ saving_state => { enter => '_save_state' },
+                                  unheavy      => { enter => '_heavy_up' },
+                                  monitoring   => { enter => '_start_vma_monitor',
+                                                    ignore => [qw(_on_dead
+                                                                  _on_goto_debug)],
+                                                    transitions => { _on_alive    => 'running',
+                                                                     _on_cmd_stop => 'stopping/cmd',
+                                                                     _on_lxc_done => 'stopping/cleanup',
+                                                                     on_hkd_kill  => 'stopping/stop' } } ] },
 
     stopping  => { advance => '_on_done',
                    delay => [qw(_on_lxc_done)],
                    substates => [ cmd      => { advance => '_on_error',
                                                 substates => [ saving_state    => { enter => '_save_state' },
                                                                deleting_cmd    => { enter => '_delete_cmd_busy' } ] },
-                                  shutdown => { substates => [ saving_state    => { enter => '_save_state' },
-                                                               heavy           => { enter => '_set_heavy_mark' },
+                                  shutdown => { transitions => { on_hkd_kill => 'stop' },
+                                                substates => [ saving_state    => { enter => '_save_state' },
+                                                               heavy           => { enter => '_heavy_down' },
                                                                shuttingdown    => { enter => '_shutdown',
                                                                                     transitions => { _on_error    => 'stop',
                                                                                                      _on_lxc_done => 'cleanup' } },
@@ -132,6 +128,7 @@ use Class::StateMachine::Declarative
                                   cleanup  => { transitions => { _on_error => 'zombie/reap' },
                                                 substates => [ saving_state           => { enter => '_save_state' },
                                                                checking_dirty         => { enter => '_check_dirty_flag' },
+                                                               heavy                  => { enter => '_heavy_down' },
                                                                killing_lxc            => { enter => '_kill_lxc' },
                                                                unlinking_iface        => { enter => '_unlink_iface' },
                                                                removing_fw_rules      => { enter => '_remove_fw_rules' },
@@ -162,7 +159,7 @@ use Class::StateMachine::Declarative
                                 reap   => { transitions => { _on_error => 'delay' },
                                             substates => [ saving_state           => { enter => '_save_state',
                                                                                       on => { _on_error => '_on_done' } },
-                                                           dirty                  => { enter => '_check_dirty',
+                                                           dirty                  => { enter => '_check_dirty_flag',
                                                                                       transitions => { _on_error => 'dirty' } },
                                                            checking_lxc           => { enter => '_check_lxc',
                                                                                       transitions => { _on_error => 'killing_lxc' } },
@@ -176,7 +173,7 @@ use Class::StateMachine::Declarative
                                                            destroying_lxc         => { enter => '_destroy_lxc',
                                                                                        transitions => { _on_error => 'unmounting_filesystems'  } },
                                                            unmounting_filesystems => { enter => '_unmount_filesystems' },
-                                                           unsetting_heavy_mark   => { enter => '_unset_heavy_mark' },
+                                                           unheavy                => { enter => '_heavy_up' },
                                                            releasing_untar_lock   => { enter => '_release_untar_lock' },
                                                            configuring_dhcpd      => { enter => '_rm_from_dhcpd' },
                                                            '(delay)'              => { enter => '_set_state_timer',
@@ -188,7 +185,8 @@ use Class::StateMachine::Declarative
                                                            '(delay)'            => { enter => '_set_state_timer',
                                                                                      transitions => { _on_timeout => 'db'} } ] } ] },
 
-    dirty  => { transitions => { on_hkd_kill => 'stopped' } };
+    dirty  => { ignore => [qw(on_hkd_stop)],
+                transitions => { on_hkd_kill => 'stopped' } };
 
 
 sub _mkpath {
@@ -328,12 +326,6 @@ sub _untar_os_image {
     push @args, '-J' if $image_path =~ /\.(?:txz|xz)$/;
 
     $self->_run_cmd(tar => @args);
-}
-
-sub _delay_untar_os_image {
-    my $self = shift;
-    $self->_maybe_callback(on_heavy => 0);
-    $self->_call_after($self->_cfg('internal.hkd.lxc.acquire.untar.lock.delay'), '_on_delay_untar_os_image_done')
 }
 
 sub _release_untar_lock {
