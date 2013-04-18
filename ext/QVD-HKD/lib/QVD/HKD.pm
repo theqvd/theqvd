@@ -20,6 +20,7 @@ use QVD::Log;
 use AnyEvent::Impl::Perl;
 # use AnyEvent::Impl::EV;
 use AnyEvent;
+use AnyEvent::Semaphore;
 use AnyEvent::Pg::Pool;
 use Linux::Proc::Net::TCP;
 
@@ -116,8 +117,7 @@ sub new {
     $self->{config} = QVD::HKD::Config->new(config_file => $config_file,
                                             on_reload_done => sub { $self->_on_config_reload_done });
     $self->{vm} = {};
-    $self->{heavy} = {};
-    $self->{delayed} = {};
+    $self->{heavy} = AnyEvent::Semaphore->new($self->_cfg('internal.hkd.max_heavy'));
     $self;
 }
 
@@ -235,6 +235,7 @@ sub _sync_db_config {
                  connection_retries => $self->_cfg('internal.database.pool.connection.retries'),
                  size               => $self->_cfg('internal.database.pool.size') );
     }
+    $self->{heavy}->size($self->_cfg('internal.hkd.max_heavy'));
 }
 
 sub _start_config {
@@ -442,10 +443,9 @@ sub _new_vm_handler {
                                                             vm_id =>  $vm_id,
                                                             node_id => $self->{node_id},
                                                             db => $self->{db},
+                                                            heavy => $self->{heavy},
                                                             dhcpd_handler => $self->{dhcpd_handler},
-                                                            on_stopped => sub { $self->_on_vm_stopped($vm_id) },
-                                                            on_heavy => sub { $self->_on_vm_heavy($vm_id, @_) } );
-    $debug and $self->_debug_vm_stats;
+                                                            on_stopped => sub { $self->_on_vm_stopped($vm_id) });
     $vm;
 }
 
@@ -474,7 +474,6 @@ sub _on_vm_cmd {
         return;
     }
     $vm->on_cmd($cmd);
-    $debug and $self->_debug_vm_stats;
 }
 
 sub _on_vm_stopped {
@@ -483,68 +482,7 @@ sub _on_vm_stopped {
     $debug and $self->_debug("releasing handler for VM $vm_id");
     DEBUG "Releasing handler for VM '$vm_id'";
     delete $self->{vm}{$vm_id};
-    my $all_done = not keys %{$self->{vm}};
-    $debug and $self->_debug("all VM done: $all_done");
-    delete $self->{delayed}{$vm_id};
-    if (delete $self->{heavy}{$vm_id}) {
-        $debug and $self->_debug("VM was in a heavy state");
-        $self->_run_delayed;
-    }
-    $debug and $self->_debug_vm_stats;
-    $self->_on_no_vms_are_running if $all_done;
-}
-
-sub _debug_vm_stats {
-    my $self = shift;
-    my $ts = Time::HiRes::time();
-    my $running = keys %{$self->{vm}};
-    my $heavy = keys %{$self->{heavy}};
-    my $delayed = keys %{$self->{delayed}};
-    $self->_debug("VMs in this host: $running, heavy: $heavy, delayed: $delayed, time: $ts");
-
-    my %state;
-    for my $vm (values %{$self->{vm}}) {
-        $state{$vm->state}++;
-    }
-    $self->_debug("VM states: " . join ', ', map "$_: $state{$_}", sort keys %state);
-}
-
-sub _on_vm_heavy {
-    my ($self, $vm_id, undef, $set, $cb) = @_;
-    $debug and $self->_debug("_on_vm_heavy($vm_id, $set) called");
-    if ($set) {
-        if ($self->{heavy}{$vm_id}) {
-            $debug and $self->_debug("VM $vm_id is already marked as heavy");
-            $cb->();
-        }
-        else {
-            $debug and $self->_debug("Pushing VM $vm_id into heavy queue");
-            $self->{delayed}{$vm_id} = $cb;
-        }
-    }
-    else {
-        if (delete $self->{heavy}{$vm_id}) {
-            $debug and $self->_debug("Heavy mark for VM $vm_id removed");
-        }
-        else {
-            $debug and $self->_debug("Heavy mark for VM $vm_id was not set");
-        }
-        delete $self->{delayed}{$vm_id};
-    }
-    $self->_run_delayed;
-    1;
-}
-
-sub _run_delayed {
-    my $self = shift;
-    while (keys %{$self->{delayed}} and
-           keys %{$self->{heavy}} <= $self->_cfg('internal.hkd.max_heavy')) {
-        $debug and $self->_debug_vm_stats;
-        my $vm_id = each %{$self->{delayed}};
-        my $cb = delete $self->{delayed}{$vm_id};
-        $self->{heavy}{$vm_id} = 1;
-        $cb->();
-    }
+    keys %{$self->{vm}} or $self->_on_no_vms_are_running;
 }
 
 sub _stop_all_vms {
