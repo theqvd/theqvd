@@ -46,13 +46,14 @@ sub new {
     my $db = delete $opts{db};
     my $node_id = delete $opts{node_id};
     my $on_stopped = delete $opts{on_stopped};
-
+    my $heavy = delete $opts{heavy};
     croak_invalid_opts %opts;
 
     my $self = { config => $config,
                  db => $db,
                  node_id => $node_id,
-                 on_stopped => $on_stopped };
+                 on_stopped => $on_stopped,
+                 heavy => $heavy };
 
     Class::StateMachine::bless($self, $class);
 }
@@ -108,6 +109,29 @@ sub __call_on_done_or_error_callback {
                       map { defined $_ ? $_ : '<undef>' } $failed, $opts->{ignore_errors}, $cb);
         $self->$cb(@args);
     }
+}
+
+sub _heavy_down {
+    my ($self, $opts) = &__opts;
+    if ($self->{heavy_watcher_down}) {
+        $self->__call_on_done_or_error_callback($opts, 0)
+    }
+    else {
+        $self->{heavy_watcher} = $self->{heavy}->down(weak_method_callback($self, '__heavy_down_callback', $opts))
+    }
+}
+
+sub __heavy_down_callback {
+    my ($self, $opts) = @_;
+    $self->{heavy_watcher_down} = delete $self->{heavy_watcher};
+    $self->__call_on_done_or_error_callback($opts, 0);
+}
+
+sub _heavy_up {
+    my ($self, $opts) = @_;
+    delete $self->{heavy_watcher_down};
+    delete $self->{heavy_watcher};
+    $self->__call_on_done_or_error_callback($opts, 0);
 }
 
 sub _query {
@@ -439,6 +463,7 @@ sub leave_state {
     delete $self->{rpc_watcher}        and DEBUG "aborting RPC call";
     delete $self->{query_watcher}      and DEBUG "aborting database query";
     delete $self->{flock_watcher}      and DEBUG "aborting file locking";
+    delete $self->{heavy_watcher}      and DEBUG "aborting heavy down";
 }
 
 sub _on_stopped {
