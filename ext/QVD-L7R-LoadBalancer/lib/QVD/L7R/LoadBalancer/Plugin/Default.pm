@@ -15,52 +15,40 @@ my $weight_cpu    = cfg('l7r.loadbalancer.plugin.default.weight.cpu',    0) // 1
 my $weight_random = cfg('l7r.loadbalancer.plugin.default.weight.random', 0) // 100;
 
 sub get_free_host {
-    my %host;
+    my $self = shift;
+    my ($best_host, $best_cap);
 
-    for my $hrt (rs(Host_Runtime)->search({ 'host.backend' => 'true',
-                                            blocked => 'false',
-                                            state => 'running' },
-                                            { join => 'host' })) {
-        my $id = $hrt->host_id;
-        $host{$id} =  { ram => $hrt->usable_ram,
-                        cpu => $hrt->usable_cpu,
-                        vms => 0,
-                      };
+    my $rs = rs(Host)->search({ backend           => 'true',
+                                'runtime.blocked' => 'false',
+                                'runtime.state'   => 'running' },
+                              { distinct => 1,
+                                join => [qw(runtime vms)],
+                                '+select' => [ { count => 'vms.vm_id', -as => 'amount_of_vms' } ] });
+
+    while (my $host = $rs->next) {
+        my $id = $host->id;
+        my $hrt = $host->runtime;
+        my $vms = $host->get_column('amount_of_vms');
+        my $ram = $hrt->usable_ram;
+        my $cpu = $hrt->usable_cpu;
+
+        my $cap = ($weight_ram * $ram + $weight_cpu * $cpu) / ($vms + 1) + rand($weight_random);
+        DEBUG "Host $id, RAM: $ram, CPU: $cpu, VMs: $vms, per VM cap: $cap";
+
+        if (not defined $best_cap or $best_cap < $cap) {
+            $best_host = $id;
+            $best_cap = $cap;
+        }
     }
 
-    for my $vms (rs(VM_Runtime)->search({ vm_state => 'running' },
-                                        { select   => ['host_id', { count => 'vm_id'}],
-                                          as       => ['host_id', 'vm_count'],
-                                          group_by => ['host_id'] })) {
-        my $id = $vms->host_id;
-        $host{$id}{vms} = $vms->get_column('vm_count') if defined $id;
+    unless (defined $best_host) {
+        my $msg = "Unable to assign vm to host, there is no host available";
+        ERROR $msg;
+        croak $msg;
     }
 
-    for my $id (keys %host) {
-        $host{$id}{cap} =
-            $weight_ram * $host{$id}{ram} / ($host{$id}{vms} + 1) +
-            $weight_cpu * $host{$id}{cpu} / ($host{$id}{vms} + 1) +
-            rand $weight_random;
-    }
-
-    my $best = (
-        sort { $host{$a}{cap} <=> $host{$b}{cap} }
-        keys %host
-    )[-1];
-
-    # TODO: allow to set limits for the number of virtual machines
-    # running on any host and keep (reintroduce) realtime usage of RAM
-    # and CPU
-
-    if (defined $best) {
-        $host{$best}{vms}++;
-        return $best;
-    }
-
-
-    my $msg = "Unable to assign vm to host, there is no host available";
-    ERROR $msg;
-    croak $msg;
+    INFO "Best available host is $best_host (per VM capability: $best_cap)";
+    $best_host;
 }
 
 1;
