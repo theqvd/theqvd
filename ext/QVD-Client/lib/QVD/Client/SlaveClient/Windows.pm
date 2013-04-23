@@ -42,10 +42,10 @@ sub _handle_share_native {
     Win32::API->Import(ws2_32 => 'int WSADuplicateSocket(HANDLE s, DWORD dwProcessId, LPSTR lpProtocolInfo)')
             or die "Unable to import WSADuplicateSocket";
 
-    my $pipe_name = sprintf("//./PIPE/qvd:sftp-server.%04d", rand(10000));
+    my $pipe_name = "//./PIPE/qvd:sftp-server";
 			
     # Create pipe
-    print "** Creating named pipe $pipe_name...\n";
+    print "** Creating named pipe...\n";
     my $pipe = CreateNamedPipe($pipe_name, 0x3, 0x4, 2, 512, 512, 0, undef);
     if ($pipe == -1) {
         die "Unable to create named pipe: $^E";
@@ -71,7 +71,7 @@ sub _handle_share_native {
     }
 
     # Connect to pipe
-    print "** Connecting to pipe $pipe_name...\n";
+    print "** Connecting to pipe...\n";
     ConnectNamedPipe($pipe, undef)
         or die "Unable to connect to pipe: $^E";
 
