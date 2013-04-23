@@ -18,5 +18,6 @@ WriteMakefile(
         'Test::More' => 0,
 	'Text::Table' => 0,
 	'DateTime' => 0,
+        'Digest::SHA' => 0,
     },
 );

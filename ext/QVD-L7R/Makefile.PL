@@ -18,5 +18,6 @@ WriteMakefile( NAME          => 'QVD::L7R',
 				  'QVD::URI'              => 0,
 				  'Test::More'            => 0,
                                   'App::Daemon'           => 0,
+                                  'Disgest::SHA'          => 0,
                                 },
                EXE_FILES      => [qw(bin/qvd-l7r bin/qvd-l7r.initrc.pl bin/qvd-l7r.debrc.pl bin/qvd-l7r.postinst)] );
