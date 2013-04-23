@@ -518,32 +518,31 @@ sub start_file_sharing {
 		my $slave_client_cmd = 'qvd-slaveclient';
         my @shares;
         if ($WINDOWS) {
-			eval "use QVD::Client::SlaveClient::Windows";
-			
-			push @shares, 'c:\\';
-			push @shares, 'c:\\Archivos de programa';
-			push @shares, $ENV{USERPROFILE};
-			
-			#eval "use Win32API::File";
-			#for my $drive (Win32API::File::getLogicalDrives()) {
-			#	push @shares, $drive if -d $drive;
-			#}
+            push @shares, 'c:\\';
+            push @shares, 'c:\\Archivos de programa';
+            push @shares, $ENV{USERPROFILE};
+
+            #eval "use Win32API::File";
+            #for my $drive (Win32API::File::getLogicalDrives()) {
+            #	push @shares, $drive if -d $drive;
+            #}
         } else {
-			eval "use QVD::Client::SlaveClient::Unix";
             push @shares, $ENV{HOME};
             push @shares, '/media' if -e '/media';
         }
 
+        use QVD::Client::SlaveClient;
         for my $share (@shares) {
             INFO("Starting folder sharing for $share");
-			eval {
-				my $client = QVD::Client::SlaveClient::Windows->new('172.20.68.136:12040');
-				$client->handle_share($share);
-				DEBUG("Folder sharing started for $share");
-			};
-			if ($@) {
-				ERROR $@;
-			}
+            eval {
+                ERROR $@ if $@;
+                my $client = QVD::Client::SlaveClient->new('localhost:12040');
+                $client->handle_share($share);
+                DEBUG("Folder sharing started for $share");
+            };
+            if ($@) {
+                ERROR $@;
+            }
         }
     }
 }

@@ -1,6 +1,6 @@
 package QVD::Client::SlaveClient::Unix;
 
-use parent 'QVD::Client::SlaveClient';
+use parent 'QVD::Client::SlaveClient::Base';
 
 use QVD::Config::Core qw(core_cfg);
 use QVD::HTTP::StatusCodes qw(:status_codes);
@@ -25,13 +25,18 @@ sub handle_share {
         die "Server replied $code $msg $data";
     }
 
-    open STDIN, '<&', $self->{httpc}->{socket} or die "Unable to dup stdin: $^E";
-    open STDOUT, '>&', $self->{httpc}->{socket} or die "Unable to dup stdout: $^E";
-    close $self->{httpc}->{socket};
+    my $pid = fork();
+    if ($pid) {
 
-    chdir $path or die "Unable to chdir to $path: $^E";
-    exec($command_sftp_server, '-e')
-        or die "Unable to exec $command_sftp_server: $^E";
+    } else {
+        open STDIN, '<&', $self->{httpc}->{socket} or die "Unable to dup stdin: $^E";
+        open STDOUT, '>&', $self->{httpc}->{socket} or die "Unable to dup stdout: $^E";
+        close $self->{httpc}->{socket};
+
+        chdir $path or die "Unable to chdir to $path: $^E";
+        exec($command_sftp_server, '-e')
+            or die "Unable to exec $command_sftp_server: $^E";
+    }
 }
 
 1;

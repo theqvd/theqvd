@@ -3,7 +3,7 @@ package QVD::Client::SlaveClient::Windows;
 use strict;
 use warnings;
 
-use parent 'QVD::Client::SlaveClient';
+use parent 'QVD::Client::SlaveClient::Base';
 
 use QVD::Config::Core qw(core_cfg);
 use QVD::HTTP::StatusCodes qw(:status_codes);

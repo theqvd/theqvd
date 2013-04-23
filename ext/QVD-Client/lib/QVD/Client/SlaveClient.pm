@@ -4,6 +4,7 @@ use strict;
 use warnings;
 use File::Spec;
 use QVD::Config::Core qw(core_cfg set_core_cfg);
+use QVD::Log;
 
 our ($WINDOWS, $DARWIN, $user_dir, $user_config_filename, $user_certs_dir, $pixmaps_dir);
 
@@ -14,6 +15,14 @@ BEGIN {
     set_core_cfg('client.log.filename', File::Spec->join($user_dir, 'qvd-client.log'))
         unless defined core_cfg('client.log.filename', 0);
     $QVD::Log::DAEMON_NAME='client';
+
+    if ($WINDOWS) {
+        eval 'use QVD::Client::SlaveClient::Windows';
+        ERROR $@ if ($@);
+    } else {
+        eval 'use QVD::Client::SlaveClient::Unix';
+        ERROR $@ if ($@);
+    }
 }
 
 use Fcntl qw(F_GETFL F_SETFL O_NONBLOCK);
@@ -24,11 +33,12 @@ use feature 'switch';
 
 sub new {
     my ($class, $target, %opts) = @_;
-    my $self = { 
-        httpc => QVD::HTTPC->new($target, %opts)
-    };
-    bless $self, $class;
-    $self
+
+    if ($WINDOWS) {
+        return QVD::Client::SlaveClient::Windows->new($target, %opts);
+    } else {
+        return QVD::Client::SlaveClient::Unix->new($target, %opts);
+    }
 }
 
 sub dispatch {
