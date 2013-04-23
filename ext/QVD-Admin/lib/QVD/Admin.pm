@@ -226,10 +226,16 @@ sub propdel {
     $rs->search_related('properties', $condition)->delete;
 }
 
+sub _password_to_token {
+    my ($self, $password) = @_;
+    require Digest::SHA;
+    Digest::SHA::sha256_base64(cfg('l7r.auth.plugin.default.salt') . $password);
+}
+
 sub set_password {
     my ($self, $user, $password) = @_;
     my $row = rs('User')->find({login => $user}) or die "No such user: $user";
-    $row->update({password => $password});
+    $row->update({password => $self->_password_to_token($password)});
 }
 
 sub cmd_config_del {
@@ -560,7 +566,7 @@ sub cmd_user_add {
     my ($u, $p) = delete @params{qw/login password/};
     $u =~ s/^\s*//; $u =~ s/\s*$//;
     $u = lc $u unless $case_sensitive_login;
-    my %core_params = ( login => $u, password => $p );
+    my %core_params = ( login => $u, password => $self->_password_to_token($p) );
 
     $self->_obj_add('user', [qw/login password/], %core_params)->id;
 }
