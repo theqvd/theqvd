@@ -49,20 +49,6 @@ sub help_share {
 }
 
 sub handle_share {
-    my ($self, $path) = @_;
-
-    # FIXME detect file system code page, don't just assume 1252
-    my $charset = $WINDOWS? 'CP1252' : 'UTF-8';
-	
-    my ($code, $msg, $headers, $data) =
-    $self->{httpc}->make_http_request(PUT => '/shares/'.$path,
-        headers => ['Connection: Upgrade', "Upgrade: qvd:sftp/1.0;charset=$charset"]);
-    
-    if ($code != HTTP_SWITCHING_PROTOCOLS) {
-        die "Server replied $code $msg $data";
-    }
-
-    $self->_handle_share_native($path);
 }
 
 sub handle_usage {
