@@ -241,6 +241,8 @@ sub proxy_set_environment {
     cond_wait($set_env);
 }
 
+
+
 ################################################################################
 #
 # Wx event handlers
@@ -346,6 +348,8 @@ sub OnConnectionStatusChanged {
         }
         $self->Hide();
         $self->{timer}->Stop();
+	} elsif ($status eq 'FORWARDING') {
+		$self->start_file_sharing();
     } elsif ($status eq 'CLOSED') {
         $self->{timer}->Stop();
         $self->{progress_bar}->SetValue(0);
@@ -504,6 +508,43 @@ sub SaveConfiguration {
             "Error saving configuration", wxOK | wxICON_ERROR);
         $dialog->ShowModal();
         $dialog->Destroy();
+    }
+}
+
+sub start_file_sharing {
+    my $slave_client_proc;
+    if (core_cfg('client.slave.enable', 1)) {
+        #my $slave_client_cmd = $QVD::Client::App::app_dir . '/bin/qvd-slaveclient.exe';
+		my $slave_client_cmd = 'qvd-slaveclient';
+        my @shares;
+        if ($WINDOWS) {
+			eval "use QVD::Client::SlaveClient::Windows";
+			
+			push @shares, 'c:\\';
+			push @shares, 'c:\\Archivos de programa';
+			push @shares, $ENV{USERPROFILE};
+			
+			#eval "use Win32API::File";
+			#for my $drive (Win32API::File::getLogicalDrives()) {
+			#	push @shares, $drive if -d $drive;
+			#}
+        } else {
+			eval "use QVD::Client::SlaveClient::Unix";
+            push @shares, $ENV{HOME};
+            push @shares, '/media' if -e '/media';
+        }
+
+        for my $share (@shares) {
+            INFO("Starting folder sharing for $share");
+			eval {
+				my $client = QVD::Client::SlaveClient::Windows->new('172.20.68.136:12040');
+				$client->handle_share($share);
+				DEBUG("Folder sharing started for $share");
+			};
+			if ($@) {
+				ERROR $@;
+			}
+        }
     }
 }
 
