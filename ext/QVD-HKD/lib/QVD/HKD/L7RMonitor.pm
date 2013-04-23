@@ -22,7 +22,7 @@ use Class::StateMachine::Declarative
                  transitions => { _on_error => 'idle' },
                  substates => [ searching_l7rs    => { enter => '_search_l7rs' },
                                 checking_l7rs     => { enter => '_check_l7rs' },
-                                cleaning_dead_l7r => { enter => '_clean_dead_l7rs' },
+                                cleaning_dead_l7r => { enter => '_clean_dead_l7r' },
                                 redo              => { jump => 'cleaning_dead_l7r' } ] },
 
     idle    => { enter => '_set_timer',
