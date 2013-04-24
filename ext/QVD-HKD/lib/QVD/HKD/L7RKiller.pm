@@ -22,7 +22,8 @@ use Class::StateMachine::Declarative
                  transitions => { _on_error => 'idle' },
                  substates => [ getting_user_cmd  => { enter => '_get_user_cmd' },
                                 deleting_user_cmd => { enter => '_delete_user_cmd' },
-                                killing_l7r       => { enter => '_kill_l7r' } ] },
+                                killing_l7r       => { enter => '_kill_l7r',
+                                                       transitions => { _on_done => 'running' } } ] },
 
     idle    => { enter       => '_set_timer',
                  transitions => { _on_timeout                 => 'running',
@@ -59,21 +60,9 @@ EOQ
 
 sub _delete_user_cmd {
     my $self = shift;
-    $self->_query(<<'EOQ', $self->{node_id}, $self->{vm_id}, $self->{l7r_pid});
-select vm_id, l7r_pid
-  from vm_runtimes
-  where l7r_host=$1
-    and vm_id = $2
-    and l7r_pid = $3
-    and user_state='connected'
-    and user_cmd='abort'
-EOQ
-}
-
-sub _delete_user_cmd {
-    my $self = shift;
     my $vm = $self->{_vm_to_be_disconnected};
-    $self->_query_1(<<'EOQ', $self->{node_id}, $vm->{vm_id}, $vm->{l7r_pid});
+    $self->_query({n => 1},
+                  <<'EOQ', $self->{node_id}, $vm->{vm_id}, $vm->{l7r_pid});
 update vm_runtimes set user_cmd=NULL
   where l7r_host=$1
     and vm_id = $2
@@ -88,7 +77,6 @@ sub _kill_l7r {
     if (defined (my $pid = $self->{l7r_pid})) {
         if (kill TERM => $pid) {
             INFO "L7R process $pid for VM $self->{vm_id} killed";
-            return $self->_on_done;
         }
         else {
             WARN "Unable to kill L7R process $pid for VM $self->{vm_id}: $!";
@@ -97,7 +85,7 @@ sub _kill_l7r {
     else {
         WARN "Internal error: $self->_kill_l7r called without a valid PID";
     }
-    $self->_on_error;
+    $self->_on_done;
 }
 
 1;
