@@ -21,8 +21,8 @@ use Class::StateMachine::Declarative
     running => { advance => '_on_done',
                  transitions => { _on_error => 'idle' },
                  substates => [ getting_user_cmd  => { enter => '_get_user_cmd' },
-                                deleting_user_cmd => { enter => '_delete_user_cmd' },
-                                killing_l7r       => { enter => '_kill_l7r',
+                                killing_l7r       => { enter => '_kill_l7r' },
+                                deleting_user_cmd => { enter => '_delete_user_cmd',
                                                        transitions => { _on_done => 'running' } } ] },
 
     idle    => { enter       => '_set_timer',
@@ -46,7 +46,6 @@ sub _set_timer {
 
 sub _get_user_cmd {
     my $self = shift;
-    delete $self->{_vm_to_be_disconnected};
     $self->_query({save_to_self => 1},
                   <<'EOQ', $self->{node_id});
 select vm_id, l7r_pid
@@ -55,20 +54,6 @@ select vm_id, l7r_pid
     and user_state = 'connected'
     and user_cmd   = 'abort'
   limit 1
-EOQ
-}
-
-sub _delete_user_cmd {
-    my $self = shift;
-    my $vm = $self->{_vm_to_be_disconnected};
-    $self->_query({n => 1},
-                  <<'EOQ', $self->{node_id}, $vm->{vm_id}, $vm->{l7r_pid});
-update vm_runtimes set user_cmd=NULL
-  where l7r_host=$1
-    and vm_id = $2
-    and l7r_pid = $3
-    and user_state='connected'
-    and user_cmd='abort'
 EOQ
 }
 
@@ -86,6 +71,23 @@ sub _kill_l7r {
         WARN "Internal error: $self->_kill_l7r called without a valid PID";
     }
     $self->_on_done;
+}
+
+sub _delete_user_cmd {
+    my $self = shift;
+    $self->_query({n => 1},
+                  <<'EOQ', $self->{node_id}, $self->{vm_id}, $self->{l7r_pid});
+update vm_runtimes
+  set user_cmd = NULL,
+      l7r_host = NULL,
+      l7r_pid  = NULL,
+      user_state = 'disconnected'
+  where l7r_host=$1
+    and vm_id = $2
+    and l7r_pid = $3
+    and user_state='connected'
+    and user_cmd='abort'
+EOQ
 }
 
 1;
