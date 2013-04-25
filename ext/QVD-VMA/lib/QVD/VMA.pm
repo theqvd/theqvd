@@ -622,8 +622,9 @@ sub _vnc_connect {
 
     $httpd->send_http_response(QVD::HTTP::StatusCodes::HTTP_SWITCHING_PROTOCOLS);
 
+    POSIX::dup2(fileno($httpd->{server}{client}), 0);
+    POSIX::dup2(fileno($httpd->{server}{client}), 1);
     POSIX::dup2(fileno($log), 2);
-    POSIX::dup2(0, 1);
 
     eval { exec($x11vnc, -display => ":$display", '-inetd') };
     ERROR "unable to start x11vnc: $!";
