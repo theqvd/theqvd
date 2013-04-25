@@ -33,25 +33,37 @@ sub _process_request {
     $function = "SimpleRPC_$function";
 
     local $SIG{__DIE__};
-    DEBUG "SimpleRPC serving $function(". join(', ', @params).')';
-    my $data = eval { $self->$function(@params) };
-    if ($@) {
-	my $saved_err = $@;
-	DEBUG "SimpleRPC call $function failed: $saved_err";
-	$httpd->send_http_response_with_body(HTTP_OK,
-					     'application/json-simplerpc',
-					     [],
-					     '"",'.$httpd->json->encode($saved_err)."\r\n");
+    my $name = "SimpleRPC_$function";
+    if (my $rpc_processor = $self->can($name)) {
+        DEBUG "SimpleRPC serving $name(". join(', ', @params).')';
+        my $data = eval { $self->$rpc_processor(@params) };
+        if ($@) {
+            my $saved_err = $@;
+            DEBUG "SimpleRPC call $name failed: $saved_err";
+            $httpd->send_http_response_with_body(HTTP_OK,
+                                                 'application/json-simplerpc',
+                                                 [],
+                                                 '"",'.$httpd->json->encode($saved_err)."\r\n");
+        }
+        else {
+            DEBUG "SimpleRPC call ok";
+            $httpd->send_http_response_with_body(HTTP_OK,
+                                                 'application/json-simplerpc',
+                                                 [],
+                                                 $httpd->json->encode($data)."\r\n");
+        }
     }
     else {
-	DEBUG "SimpleRPC call ok";
-	$httpd->send_http_response_with_body(HTTP_OK,
-					     'application/json-simplerpc',
-					     [],
-					     $httpd->json->encode($data)."\r\n");
+        my $name = "HTTP_$function";
+        if (my $http_processor = $self->can($name)) {
+            DEBUG "Serving raw HTTP GET request $name(". join(", ", @params).')';
+            $self->$http_processor($httpd, $headers, @params);
+        }
+        else {
+            $httpd->send_http_error(HTTP_NOT_FOUND);
+        }
     }
 }
-
 
 1;
 
