@@ -219,20 +219,15 @@ sub _sysread {
         next if $bytes;
 
         my ($wv, $rv) = ('', '');
-        if ($self->{SSL}) {
-            if (defined $bytes) {
-                die "socket closed unexpectedly";
+        if ($self->{SSL} and not defined $bytes) {
+            if    ($IO::Socket::SSL::SSL_ERROR == IO::Socket::SSL::SSL_WANT_READ()) {
+                $rv = $select_mask;
+            }
+            elsif ($IO::Socket::SSL::SSL_ERROR == IO::Socket::SSL::SSL_WANT_WRITE()) {
+                $wv = $select_mask;
             }
             else {
-                if    ($IO::Socket::SSL::SSL_ERROR == IO::Socket::SSL::SSL_WANT_READ()) {
-                    $rv = $select_mask;
-                }
-                elsif ($IO::Socket::SSL::SSL_ERROR == IO::Socket::SSL::SSL_WANT_WRITE()) {
-                    $wv = $select_mask;
-                }
-                else {
-                    die "internal error: unexpected SSL error: " . IO::Socket::SSL::errstr();
-                }
+                die "internal error: unexpected SSL error: " . IO::Socket::SSL::errstr();
             }
         }
         else {
