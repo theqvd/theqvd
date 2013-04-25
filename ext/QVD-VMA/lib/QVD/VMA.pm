@@ -25,9 +25,11 @@ package QVD::VMA::Impl;
 use POSIX;
 use Fcntl qw(:flock);
 use feature qw(switch say);
+use Config::Properties;
+
 use QVD::Config;
 use QVD::Log;
-use Config::Properties;
+use QVD::HTTP::Headers qw(header_eq_check);
 
 use parent 'QVD::SimpleRPC::Server';
 
@@ -37,6 +39,7 @@ my $nxagent         = cfg('command.nxagent');
 my $nxdiag          = cfg('command.nxdiag');
 my $x_session       = cfg('command.x-session');
 my $xinit           = cfg('command.xinit');
+my $x11vnc          = cfg('command.x11vnc');
 my $enable_audio    = cfg('vma.audio.enable');
 my $enable_slave    = cfg('vma.slave.enable');
 my $command_slave   = cfg('vma.slave.command');
@@ -588,6 +591,41 @@ sub _poweroff {
     system(init => 0);
 }
 
+sub _vnc_connect {
+    my ($httpd, $headers) = @_;
+
+    unless (header_eq_check($headers, Connection => 'Upgrade') and
+            header_eq_check($headers, Upgrade => 'QVD/1.0')) {
+        INFO 'Upgrade HTTP header required';
+        $httpd->throw_http_error(HTTP_UPGRADE_REQUIRED);
+    };
+
+    $httpd->_tell_client("Starting VNC service");
+
+    my ($state, $pid) = _state;
+
+    $httpd->throw_http_error(HTTP_SERVICE_UNAVAILABLE, "Unable to start VNC service while session is in state $state\n")
+        unless $state =~ /^(?:connected|suspended)$/;
+
+    $httpd->throw_http_error(HTTP_SERVICE_UNAVAILABLE, "nxagent is not running\n")
+        unless defined $pid;
+
+    my $uid = stat ("/proc/$pid")[4];
+    $httpd->throw_http_error(HTTP_SERVICE_UNAVAILABLE, "Unable to retrieve UID for nxagent process")
+        unless defined $uid;
+
+    setgrp(0, 0);
+    _become_user($uid);
+
+    $httpd->send_http_response(HTTP_SWITCHING_PROTOCOLS);
+
+    my $log = _open_log("x11vnc");
+    POSIX::dup2(fileno($log), 2);
+
+    eval { exec($x11vnc, -display => ":$display", '-inet', -enc => 'none') };
+    ERROR "unable to start x11vnc: $!";
+}
+
 ################################ RPC methods ######################################
 
 sub SimpleRPC_ping {
@@ -596,7 +634,7 @@ sub SimpleRPC_ping {
 
 sub SimpleRPC_x_state {
     DEBUG "x_state called";
-    _state
+    _state;
 }
 
 sub SimpleRPC_poweroff {
@@ -606,12 +644,12 @@ sub SimpleRPC_poweroff {
 
 sub SimpleRPC_x_suspend {
     INFO "suspending X session";
-    _suspend_session
+    _suspend_session;
 }
 
 sub SimpleRPC_x_stop {
     INFO "stopping X session";
-    _stop_session
+    _stop_session;
 }
 
 sub SimpleRPC_x_start {
@@ -620,6 +658,11 @@ sub SimpleRPC_x_start {
     _start_session(@_);
 }
 
+sub HTTP_vnc_connect {
+    my ($self, $httpd, $headers) = @_;
+    DEBUG "starting a VNC monitoring session";
+    _vnc_connect($httpd, $headers);
+}
 
 1;
 
