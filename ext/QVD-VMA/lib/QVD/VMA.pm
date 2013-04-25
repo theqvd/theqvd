@@ -601,7 +601,8 @@ sub _vnc_connect {
         $httpd->throw_http_error(QVD::HTTP::StatusCodes::HTTP_UPGRADE_REQUIRED);
     };
 
-    $httpd->_tell_client("Starting VNC service");
+    $httpd->send_http_response(QVD::HTTP::StatusCodes::HTTP_PROCESSING,
+                               "X-QVD-VMA-Info: Starting VNC service");
 
     my ($state, $pid) = _state;
 
