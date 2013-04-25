@@ -208,13 +208,15 @@ sub _sysread {
     my $SSL = $self->{SSL};
     my $fn = fileno $socket;
     $fn >= 0 or croak "bad file handle $socket";
-    while (length $$bin < $length) {
+    while (1) {
+        my $missing = $length - length $$bin;
+        last unless $missing > 0;
 	my $rv = '';
 	vec($rv, $fn, 1) = 1;
 	my $n = select($rv, undef, undef, $timeout);
 	if ($n > 0) {
 	    if (vec($rv, $fn, 1)) {
-		my $bytes = sysread ($socket, $$bin, 16 * 1024, length $$bin);
+		my $bytes = sysread ($socket, $$bin, $missing, length $$bin);
 		unless ($bytes) {
 		    if ($SSL and defined $bytes) {
 			$IO::Socket::SSL::SSL_ERROR == IO::Socket::SSL::SSL_WANT_WRITE()
