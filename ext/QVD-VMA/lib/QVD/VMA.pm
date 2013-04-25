@@ -30,6 +30,7 @@ use Config::Properties;
 use QVD::Config;
 use QVD::Log;
 use QVD::HTTP::Headers qw(header_eq_check);
+use QVD::HTTP::StatusCodes ();
 
 use parent 'QVD::SimpleRPC::Server';
 
@@ -597,27 +598,27 @@ sub _vnc_connect {
     unless (header_eq_check($headers, Connection => 'Upgrade') and
             header_eq_check($headers, Upgrade => 'QVD/1.0')) {
         INFO 'Upgrade HTTP header required';
-        $httpd->throw_http_error(HTTP_UPGRADE_REQUIRED);
+        $httpd->throw_http_error(QVD::HTTP::StatusCodes::HTTP_UPGRADE_REQUIRED);
     };
 
     $httpd->_tell_client("Starting VNC service");
 
     my ($state, $pid) = _state;
 
-    $httpd->throw_http_error(HTTP_SERVICE_UNAVAILABLE, "Unable to start VNC service while session is in state $state\n")
+    $httpd->throw_http_error(QVD::HTTP::StatusCodes::HTTP_SERVICE_UNAVAILABLE, "Unable to start VNC service while session is in state $state\n")
         unless $state =~ /^(?:connected|suspended)$/;
 
-    $httpd->throw_http_error(HTTP_SERVICE_UNAVAILABLE, "nxagent is not running\n")
+    $httpd->throw_http_error(QVD::HTTP::StatusCodes::HTTP_SERVICE_UNAVAILABLE, "nxagent is not running\n")
         unless defined $pid;
 
     my $uid = (stat "/proc/$pid")[4];
-    $httpd->throw_http_error(HTTP_SERVICE_UNAVAILABLE, "Unable to retrieve UID for nxagent process")
+    $httpd->throw_http_error(QVD::HTTP::StatusCodes::HTTP_SERVICE_UNAVAILABLE, "Unable to retrieve UID for nxagent process")
         unless defined $uid;
 
     setgrp(0, 0);
     _become_user($uid);
 
-    $httpd->send_http_response(HTTP_SWITCHING_PROTOCOLS);
+    $httpd->send_http_response(QVD::HTTP::StatusCodes::HTTP_SWITCHING_PROTOCOLS);
 
     my $log = _open_log("x11vnc");
     POSIX::dup2(fileno($log), 2);
