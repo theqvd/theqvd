@@ -94,6 +94,7 @@ command.xhost = /usr/bin/xhost
 command.nxproxy = /usr/bin/nxproxy
 command.btrfs = /sbin/btrfs
 command.ip = /sbin/ip
+command.x11vnc = /usr/bin/x11vnc
 
 command.windows.xming = Xming\\Xming.exe
 command.windows.pulseaudio = pulseaudio\\pulseaudio.exe
