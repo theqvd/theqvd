@@ -610,7 +610,7 @@ sub _vnc_connect {
     $httpd->throw_http_error(HTTP_SERVICE_UNAVAILABLE, "nxagent is not running\n")
         unless defined $pid;
 
-    my $uid = stat ("/proc/$pid")[4];
+    my $uid = (stat "/proc/$pid")[4];
     $httpd->throw_http_error(HTTP_SERVICE_UNAVAILABLE, "Unable to retrieve UID for nxagent process")
         unless defined $uid;
 
