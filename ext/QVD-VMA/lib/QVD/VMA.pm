@@ -616,7 +616,7 @@ sub _vnc_connect {
     $httpd->throw_http_error(QVD::HTTP::StatusCodes::HTTP_SERVICE_UNAVAILABLE, "Unable to retrieve UID for nxagent process")
         unless defined $uid;
 
-    setgrp(0, 0);
+    setpgrp(0, 0);
     _become_user($uid);
 
     $httpd->send_http_response(QVD::HTTP::StatusCodes::HTTP_SWITCHING_PROTOCOLS);
