@@ -628,6 +628,7 @@ sub _vnc_connect {
 
     eval { exec($x11vnc, -display => ":$display", '-inetd') };
     ERROR "unable to start x11vnc: $!";
+    POSIX::_exit(-1);
 }
 
 ################################ RPC methods ######################################
