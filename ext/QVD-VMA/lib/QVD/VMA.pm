@@ -596,7 +596,7 @@ sub _vnc_connect {
     my ($httpd, $headers) = @_;
 
     unless (header_eq_check($headers, Connection => 'Upgrade') and
-            header_eq_check($headers, Upgrade => 'QVD/1.0')) {
+            header_eq_check($headers, Upgrade => 'VNC')) {
         INFO 'Upgrade HTTP header required';
         $httpd->throw_http_error(QVD::HTTP::StatusCodes::HTTP_UPGRADE_REQUIRED);
     };
