@@ -205,32 +205,41 @@ sub _sysread {
     my $bin = \$self->{bin};
     return if length($$bin) >= $length;
     my $socket = $self->{socket};
-    my $SSL = $self->{SSL};
+
+    my $select_mask = '';
     my $fn = fileno $socket;
     $fn >= 0 or croak "bad file handle $socket";
+    vec($select_mask, $fn, 1) = 1;
+
+    my $n;
     while (1) {
         my $missing = $length - length $$bin;
-        last unless $missing > 0;
-	my $rv = '';
-	vec($rv, $fn, 1) = 1;
-	my $n = select($rv, undef, undef, $timeout);
-	if ($n > 0) {
-	    if (vec($rv, $fn, 1)) {
-		my $bytes = sysread ($socket, $$bin, $missing, length $$bin);
-		unless ($bytes) {
-		    if ($SSL and defined $bytes) {
-			$IO::Socket::SSL::SSL_ERROR == IO::Socket::SSL::SSL_WANT_WRITE()
-			    or die "internal error: unexpected SSL error: " . IO::Socket::SSL::errstr();
-			my $wv = '';
-			vec($wv, $fn, 1) = 1;
-			$n = select(undef, $wv, undef, $timeout);
-		    }
-		    else {
-			die "socket closed unexpectedly";
-		    }
-		}
-	    }
-	}
+        return unless $missing > 0;
+        my $bytes = sysread ($socket, $$bin, $missing, length $$bin) and next;
+
+        my ($wv, $rv) = ('', '');
+        if ($self->{SSL}) {
+            if (defined $bytes) {
+                if ($IO::Socket::SSL::SSL_ERROR == IO::Socket::SSL::SSL_WANT_READ()) {
+                    $rv = $select_mask;
+                }
+                elsif ($IO::Socket::SSL::SSL_ERROR == IO::Socket::SSL::SSL_WANT_WRITE()) {
+                    $wv = $select_mask;
+                }
+                else {
+                    die "internal error: unexpected SSL error: " . IO::Socket::SSL::errstr();
+                }
+            }
+            else {
+                die "socket closed unexpectedly";
+            }
+        }
+        else {
+            $n > 0 and die "socket closed unexpectedly";
+            $rv = $select_mask;
+        }
+
+        $n = select($rv, $wv, undef, $timeout);
 	$n > 0 or $! == Errno::EINTR or die "connection timed out";
     }
 }
