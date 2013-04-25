@@ -30,7 +30,6 @@ sub _process_request {
 	or die "bad url";
     # DEBUG "SimpleRPC function: url $url, $function, query: $query";
     my @params = uri_query_split $query;
-    $function = "SimpleRPC_$function";
 
     local $SIG{__DIE__};
     my $name = "SimpleRPC_$function";
