@@ -432,7 +432,8 @@ sub _run_forwarder {
     my $vm_id = $vm->vm_id;
     my $vm_address = $vm->vm_address;
     my $vm_x_port = $vm->vm_x_port;
-    my $this_host = this_host; $this_host // $l7r->throw_http_error(HTTP_SERVICE_UNAVAILABLE, 'Host is not registered in the database');
+    my $this_host = this_host;
+    $this_host // $l7r->throw_http_error(HTTP_SERVICE_UNAVAILABLE, 'Host is not registered in the database');
 
     $l7r->_tell_client("Connecting X session for VM_ID: " . $vm->id);
 
