@@ -545,24 +545,30 @@ sub _fw_rules {
     my $netnodes = $self->netnodes;
     my $netvms   = $self->netvms;
 
-    ( # forbind opening TCP connections from the VMs to the hosts:
-     [FORWARD => -m => 'iprange', '--src-range' => $netvms, '--dst-range' => $netnodes, '-p' => 'tcp', '--syn', '-j' => 'DROP'],
-     [INPUT   => -m => 'iprange', '--src-range' => $netvms, '-p' => 'tcp', '--syn', '-j', 'DROP'],
+    my @rules = ( # forbind opening TCP connections from the VMs to the hosts:
+                 [FORWARD => -m => 'iprange', '--src-range' => $netvms, '--dst-range' => $netnodes, '-p' => 'tcp', '--syn', '-j' => 'DROP'],
+                 [INPUT   => -m => 'iprange', '--src-range' => $netvms, '-p' => 'tcp', '--syn', '-j', 'DROP'],
 
-     # otherwise, allow traffic between the hosts and the VMs:
-     [FORWARD => -m => 'iprange', '--src-range' => $netvms, '--dst-range' => $netnodes, '-p' => 'tcp', '-j', 'ACCEPT'],
-     [INPUT   => -m => 'iprange', '--src-range' => $netvms, '-p' => 'tcp', '-j', 'ACCEPT'],
+                 # otherwise, allow traffic between the hosts and the VMs:
+                 [FORWARD => -m => 'iprange', '--src-range' => $netvms, '--dst-range' => $netnodes, '-p' => 'tcp', '-j', 'ACCEPT'],
+                 [INPUT   => -m => 'iprange', '--src-range' => $netvms, '-p' => 'tcp', '-j', 'ACCEPT'],
 
-     # allow DHCP and DNS traffic between the VMs and this host:
-     [INPUT   => -m => 'iprange', '--src-range' => $netvms, '-p' => 'udp', '-m' => 'multiport', '--dports' => '67,53', '-j', 'ACCEPT'],
-     [INPUT   => -m => 'iprange', '--src-range' => $netvms, '-p' => 'tcp', '--dport' => '53',    '-j', 'ACCEPT'],
+                 # allow DHCP and DNS traffic between the VMs and this host:
+                 [INPUT   => -m => 'iprange', '--src-range' => $netvms, '-p' => 'udp', '-m' => 'multiport', '--dports' => '67,53', '-j', 'ACCEPT'],
+                 [INPUT   => -m => 'iprange', '--src-range' => $netvms, '-p' => 'tcp', '--dport' => '53',    '-j', 'ACCEPT'],
 
-     # disallow non-tcp protocols between the VMs and the hosts:
-     [FORWARD => -m => 'iprange', '--src-range' => $netvms, '--dst-range' => $netnodes, '-j', 'DROP'],
-     [INPUT   => -m => 'iprange', '--src-range' => $netvms, '-j', 'DROP'],
+                 # disallow non-tcp protocols between the VMs and the hosts:
+                 [FORWARD => -m => 'iprange', '--src-range' => $netvms, '--dst-range' => $netnodes, '-j', 'DROP'],
+                 [INPUT   => -m => 'iprange', '--src-range' => $netvms, '-j', 'DROP'],
 
-     # forbid traffic between virtual machines:
-     [FORWARD => -m => 'iprange', '--src-range' => $netvms, '--dst-range' => $netvms, '-j', 'DROP'] );
+                 # forbid traffic between virtual machines:
+                 [FORWARD => -m => 'iprange', '--src-range' => $netvms, '--dst-range' => $netvms, '-j', 'DROP'] );
+
+    my $nat_iface = $self->_cfg('vm.network.firewall.nat.iface');
+    push @rules, [-t => 'nat', POSTROUTING => -m => 'iprange', '--src-range' => $netvms, -o => $nat_iface, -j => 'MASQUERADE']
+        if length $nat_iface;
+
+    @rules;
 }
 
 sub _set_fw_rules {
@@ -572,9 +578,10 @@ sub _set_fw_rules {
         DEBUG 'Setting up firewall rules';
         for my $rule ($self->_fw_rules) {
             DEBUG "setting iptables entry @$rule";
-            if (system $iptables => -A => @$rule) {
+            my @table = ($rule->[0] eq '-t' ? splice(@$rule, 0, 2) : ());
+            if (system $iptables => @table, -A => @$rule) {
                 my $rc = $? >> 8;
-                ERROR "Unable to set firewall rule, command failed, rc: $rc, cmd: $iptables -A @$rule";
+                ERROR "Unable to set firewall rule, command failed, rc: $rc, cmd: $iptables @table -A @$rule";
                 return $self->_on_error;
             }
         }
@@ -591,10 +598,11 @@ sub _remove_fw_rules {
         my $iptables = $self->_cfg('command.iptables');
         DEBUG 'Removing firewall rules';
         for my $rule (reverse $self->_fw_rules) {
-            $debug and $self->_debug("removing iptables entry @$rule");
-            if (system $iptables => -D => @$rule) {
+            DEBUG and $self->_debug("removing iptables entry @$rule");
+            my @table = ($rule->[0] eq '-t' ? splice(@$rule, 0, 2) : ());
+            if (system $iptables => @table, -D => @$rule) {
                 my $rc = $? >> 8;
-                INFO "Unable to remove firewall rule, command failed, rc: $rc, cmd: $iptables -D @$rule";
+                INFO "Unable to remove firewall rule, command failed, rc: $rc, cmd: $iptables @table -D @$rule";
             }
         }
     }

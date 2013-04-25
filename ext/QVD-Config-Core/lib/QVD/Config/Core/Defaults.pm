@@ -243,6 +243,7 @@ internal.vm.network.dhcp-hostsfile=${path.run}/dhcp-hostsfile
 
 # enable firewall rules
 internal.vm.network.firewall.enable = 1
+vm.network.firewall.nat.iface =
 
 ## not sure about this one
 internal.vm.debug.enable = 0
