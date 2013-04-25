@@ -624,7 +624,7 @@ sub _vnc_connect {
 
     POSIX::dup2(fileno($log), 2);
 
-    eval { exec($x11vnc, -display => ":$display", '-inet', -enc => 'none') };
+    eval { exec($x11vnc, -display => ":$display", '-inetd', -enc => 'none') };
     ERROR "unable to start x11vnc: $!";
 }
 
