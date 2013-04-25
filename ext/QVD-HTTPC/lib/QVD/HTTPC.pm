@@ -211,7 +211,7 @@ sub _sysread {
     $fn >= 0 or croak "bad file handle $socket";
     vec($select_mask, $fn, 1) = 1;
 
-    my $n;
+    my $n = 0;
     while (1) {
         my $missing = $length - length $$bin;
         return unless $missing > 0;
