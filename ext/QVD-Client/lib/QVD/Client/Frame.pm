@@ -518,15 +518,14 @@ sub start_file_sharing {
 		my $slave_client_cmd = 'qvd-slaveclient';
         my @shares;
         if ($WINDOWS) {
-            push @shares, 'c:\\';
-            push @shares, 'c:\\Archivos de programa';
+			# User's home + all drives
             push @shares, $ENV{USERPROFILE};
-
-            #eval "use Win32API::File";
-            #for my $drive (Win32API::File::getLogicalDrives()) {
-            #	push @shares, $drive if -d $drive;
-            #}
+			eval "use Win32API::File";
+            for my $drive (Win32API::File::getLogicalDrives()) {
+            	push @shares, $drive if -d $drive;
+            }
         } else {
+			# User's home + /media
             push @shares, $ENV{HOME};
             push @shares, '/media' if -e '/media';
         }
