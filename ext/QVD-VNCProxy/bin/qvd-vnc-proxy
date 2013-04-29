@@ -1,0 +1,25 @@
+use strict;
+use warnings;
+use 5.010;
+
+use App::pnc qw(netcat_socket);
+use QVD::VNCProxy;
+
+my $vm_id = shift // die <<EOU;
+Usage:
+  $0 <vm_id>
+
+EOU
+
+sub err {
+    my ($level, $msg) = @_;
+    warn "$msg\n";
+}
+
+if (my $socket = vnc_connect($vm_id, \&err)) {
+    netcat_socket($socket);
+    err(0, "connection closed");
+}
+else {
+    err(1, "VNC connection failed";
+}

@@ -1,0 +1,6 @@
+Revision history for Perl extension QVD::VNCProxy.
+
+0.01  Mon Apr 29 11:42:29 2013
+	- original version; created by h2xs 1.23 with options
+		-AXn QVD::VNCProxy
+

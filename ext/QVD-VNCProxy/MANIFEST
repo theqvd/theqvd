@@ -1,0 +1,6 @@
+Changes
+Makefile.PL
+MANIFEST
+README
+t/QVD-VNCProxy.t
+lib/QVD/VNCProxy.pm
