@@ -348,8 +348,8 @@ sub OnConnectionStatusChanged {
         }
         $self->Hide();
         $self->{timer}->Stop();
-	} elsif ($status eq 'FORWARDING') {
-		$self->start_file_sharing();
+    } elsif ($status eq 'FORWARDING') {
+        $self->start_file_sharing();
     } elsif ($status eq 'CLOSED') {
         $self->{timer}->Stop();
         $self->{progress_bar}->SetValue(0);
@@ -514,18 +514,17 @@ sub SaveConfiguration {
 sub start_file_sharing {
     my $slave_client_proc;
     if (core_cfg('client.slave.enable', 1)) {
-        #my $slave_client_cmd = $QVD::Client::App::app_dir . '/bin/qvd-slaveclient.exe';
-		my $slave_client_cmd = 'qvd-slaveclient';
+        #my $slave_client_cmd = $QVD::Client::App::app_dir . '/bin/qvd-slaveclient';
         my @shares;
         if ($WINDOWS) {
-			# User's home + all drives
+            # User's home + all drives
             push @shares, $ENV{USERPROFILE};
-			eval "use Win32API::File";
+            eval "use Win32API::File";
             for my $drive (Win32API::File::getLogicalDrives()) {
             	push @shares, $drive if -d $drive;
             }
         } else {
-			# User's home + /media
+            # User's home + /media
             push @shares, $ENV{HOME};
             push @shares, '/media' if -e '/media';
         }
