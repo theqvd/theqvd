@@ -43,13 +43,11 @@ sub _ip_to_mac {
 sub new {
     my ($class, %opts) = @_;
     my $vm_id = delete $opts{vm_id};
-    my $on_stopped = delete $opts{on_stopped};
 
     my $dhcpd_handler = delete $opts{dhcpd_handler};
     my $self = $class->SUPER::new(%opts);
     $self->{vm_id} = $vm_id;
     $self->{dhcpd_handler} = $dhcpd_handler;
-    $self->{on_stopped} = $on_stopped;
 
     my $hypervisor = $self->_cfg('vm.hypervisor');
     DEBUG "Using hypervisor type '$hypervisor'";
@@ -374,8 +372,6 @@ update vm_runtimes
         host_id = $2
 SQL
 }
-
-sub _call_on_stopped { shift->_maybe_callback('on_stopped') }
 
 sub _run_prestart_hook { shift->_run_hook('prestart') }
 sub _run_poststart_hook { shift->_run_hook('poststart') }

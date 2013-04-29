@@ -118,7 +118,7 @@ use Class::StateMachine::Declarative
                                          transitions => { _on_error => 'zombie',
                                                           _on_done  => 'stopped' } } ] },
 
-    stopped => { enter => '_call_on_stopped' },
+    stopped => { enter => '_on_stopped' },
 
     # TODO: improve the zombie handling
     zombie  => { advance => '_on_done',

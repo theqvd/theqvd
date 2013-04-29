@@ -142,7 +142,7 @@ use Class::StateMachine::Declarative
                                                 transitions => { _on_error => 'zombie/db',
                                                                  _on_done  => 'stopped' } } ] },
 
-    stopped => { enter => '_call_on_stopped' },
+    stopped => { enter => '_on_stopped' },
 
     zombie  => { advance => '_on_done',
                  delay => [qw(_on_lxc_done)],
