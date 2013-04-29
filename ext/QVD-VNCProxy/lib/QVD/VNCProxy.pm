@@ -17,10 +17,14 @@ our @EXPORT_OK = qw(vnc_connect);
 
 
 sub vnc_connect {
-    my ($vm_id, $err_cb);
+    my ($vm_id, $err_cb) = @_;
     $err_cb //= sub {};
 
-    my $vm = rs(VM)->find($vm_id);
+    my $vm = rs(VM)->find($vm_id) or do {
+        $err_cb->(1, "VM $vm_id not found");
+        return;
+    };
+
     my $ip = $vm->ip;
     my $rt = $vm->vm_runtime;
     given ($rt->vm_state) {
@@ -40,7 +44,7 @@ sub vnc_connect {
     my $httpc = QVD::HTTPC->new("${ip}:$port") or do {
         $err_cb->(1, "unable to connect to VMA at ${ip}:$port");
         return;
-    }
+    };
 
     $httpc->send_http_request(GET => "/vma/vnc_connect",
                               headers => [ 'Connection: Upgrade',
