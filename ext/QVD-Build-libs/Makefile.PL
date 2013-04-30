@@ -23,6 +23,7 @@ WriteMakefile(
 			   'Params::Validate' 		=> 0,
 			   'YAML::XS' 			=> 0,
 			   'Proc::Background'		=> 0,
-			   'local::lib' => 0
+			   'local::lib' 		=> 0,
+			   'MooseX::::Role::Parameterized'	=> 0
 			 },
 );
