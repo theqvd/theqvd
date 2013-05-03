@@ -1,0 +1,151 @@
+#!/usr/bin/perl
+
+use strict;
+use warnings;
+
+use Fcntl;
+use Net::OpenSSH;
+use Getopt::Std;
+use POSIX;
+use Socket;
+
+our ($opt_s, $opt_p, $opt_i);
+
+BEGIN {
+    getopts('s:p:e');
+
+    if ($opt_i) {
+        local $@;
+        eval {
+            require Gtk3;
+            Gtk3->import('-init');
+        };
+        if ($@) {
+            warn "unable to load Gtk3 module, trying with external program 'ssvncviewer'\n";
+            $opt_i = 0;
+        }
+    }
+}
+
+my $target = shift // die <<EOU;
+Usage:
+  $0 [-s node] vm_id
+
+EOU
+
+my $proxy_cmd = $opt_p // '/usr/lib/qvd/bin/qvd-vnc-proxy';
+
+my ($ssh, $pid, $socket, $socket2);
+if (defined $opt_s) {
+    $ssh = Net::OpenSSH->new($opt_s);
+    ($socket, $pid) = $ssh->open2socket(\\$proxy_cmd,
+                                        $target);
+
+    $ssh->error and die "unable to stablish SSH connection to host $opt_s: " . $ssh->error;
+}
+else {
+    socketpair($socket, $socket2, AF_UNIX, SOCK_STREAM, PF_UNSPEC);
+    $pid = fork;
+    unless ($pid) {
+        defined $pid or die "unable to fork new process: $!";
+        open(STDIN, '<&', $socket2);
+        open(STDOUT, '>&', $socket2);
+        eval { exec "$proxy_cmd $target" };
+        $@ and warn $@;
+        POSIX::_exit(255);
+    }
+}
+
+if ($opt_i) {
+    require Gtk3;
+    # Gtk3->import('-init');
+    Glib::Object::Introspection->setup(basename => 'GtkVnc', version => '2.0', package => 'GtkVnc');
+    Glib::Object::Introspection->setup(basename => 'GVnc', version => '1.0', package => 'GVnc');
+    # GVnc::util_set_debug(1);
+    my $win = Gtk3::Window->new ('toplevel');
+    my $dpy = GtkVnc::Display->new();
+
+    $win->set_title("QVD VM $target");
+    $win->add($dpy);
+    $dpy->open_fd_with_hostname(fileno($socket), $target);
+    $win->show_all;
+    Gtk3::main();
+}
+else {
+    my $vnc_pid = fork;
+    unless ($vnc_pid) {
+        defined $vnc_pid or die "unable to fork new process: $!";
+
+        fcntl($socket, F_SETFD, fcntl($socket, F_GETFD, 0) & ~FD_CLOEXEC);
+        my $fileno = fileno $socket;
+
+        eval { exec 'ssvncviewer', "fd=$fileno" };
+        $@ and warn $@;
+        POSIX::_exit(255);
+    }
+    waitpid($vnc_pid, 0);
+
+}
+
+kill TERM => $pid;
+waitpid($pid, 0);
+
+__END__
+
+=head1 NAME
+
+qvd-spy
+
+=head1 SYNOPSIS
+
+qvd-spy [-i] [-s user@ssh-gateway] [-p vnc_proxy_cmd] vm_id
+
+=head1 DESCRIPTION
+
+This command establishes a tunnel to a virtual machine running on a
+QVD farm and runs a VNC viewer on top of it.
+
+This command requires a X session to be already running on the virtual machine.
+
+The following arguments are accepted:
+
+=over 4
+
+=item -i
+
+Uses its own VNC implementation based on the Gtk-VNC widget.
+
+This option is experimental.
+
+=item -s user@ssh-gateway
+
+As access to the VM is forbidden from outside the QVD network one of
+the QVD nodes or the administrative host must be used as a gateway.
+
+This option allows to select the host to be used for that task.
+
+=item -p qvd_proxy_cmd
+
+The proxy command to be run on the gateway.
+
+The default is C</usr/lib/qvd/bin/qvd-vnc-proxy>.
+
+=itme vm_id
+
+The Id of the target VM.
+
+=back
+
+=head1 AUTHOR
+
+Salvador FandiE<ntilde>o, E<lt>sfandino@yahoo.comE<gt>
+
+=head1 COPYRIGHT AND LICENSE
+
+Copyright (C) 2013 Qindel Formacion y Servicios S.L.
+
+This program is free software; you can redistribute it and/or modify it
+under the terms of the GNU GPL version 3 as published by the Free
+Software Foundation.
+
+=cut

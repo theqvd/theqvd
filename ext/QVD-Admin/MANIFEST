@@ -3,6 +3,8 @@ MANIFEST
 Makefile.PL
 README
 lib/QVD/Admin.pm
+bin/qvd-spy
+bin/qvd-admin.pl
 t/00-load.t
 t/pod-coverage.t
 t/pod.t
