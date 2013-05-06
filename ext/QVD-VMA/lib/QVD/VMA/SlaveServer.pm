@@ -36,15 +36,18 @@ sub handle_put_share {
     }
     my $charset = $1;
 
-    chop $url if $url =~ /\/$/;  # remove / if last character
+    chop $url if $url =~ /[\/\\]$/;  # remove dir separator if last character
 
-    (my $mount_dir = $url) =~ s/.*\///; # pick last part of path
+    (my $mount_dir = $url) =~ s/.*[\/\\]//; # pick last part of path
     $mount_dir = 'ROOT' if ($mount_dir eq '');
 
     mkdir $mount_root unless -d $mount_root;
     my $mount_point = $mount_root.'/'.$mount_dir;
 
-    $self->send_http_error(HTTP_CONFLICT) if -e $mount_point;
+    if (-e $mount_point) {
+	# Make sure mount point is empty
+	rmdir $mount_point or $self->send_http_error(HTTP_CONFLICT);
+    }
 
     mkdir $mount_point or die "Unable to create mount point $mount_point: $^E";
 
