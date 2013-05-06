@@ -58,13 +58,13 @@ sub handle_share {
 	# FIXME: Might be wrong for some encodings, we should look into this in more detail!
     my $charset = 'cp'.GetACP();
 	
-	INFO 'Making a PUT request to /shares/'.$path;
+	DEBUG "Making a PUT request to /shares/$path";
 	
     my ($code, $msg, $headers, $data) =
     $self->{httpc}->make_http_request(PUT => '/shares/'.$path,
         headers => ['Connection: Upgrade', "Upgrade: qvd:sftp/1.0;charset=$charset"]);
 		
-	INFO 'PUT returned';
+	DEBUG "PUT returned with code $code";
         
     if ($code != HTTP_SWITCHING_PROTOCOLS) {
         die "Server replied $code $msg $data";
@@ -89,7 +89,7 @@ sub handle_share {
 
 	# To debug under GDB:
 	# my $command_gdb='c:/mingw/bin/gdb.exe';
-	# my $cmdline = "gdb -ex run -w --directory \"c:\\documents and settings\\administrador\\Mis documentos\\openssh-6.0p1\" --args \"$command_sftp_server\" -l DEBUG3 -F $tempfile";
+	# my $cmdline = "gdb -w --directory \"c:\\documents and settings\\administrador\\Mis documentos\\openssh-6.0p1\" --args \"$command_sftp_server\" -l DEBUG3 -F \"$tempfile\" -L \"$logfile\"";
     my $cmdline = "sftp-server.exe -l ERROR -F \"$tempfile\" -L \"$logfile\"";
 	#my $cmdline = "sftp-server.exe -l ERROR -F \"$tempfile\" -P \"$pipe_name\"";
     my $child;
