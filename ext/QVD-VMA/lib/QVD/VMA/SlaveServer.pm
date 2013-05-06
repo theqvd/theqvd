@@ -58,7 +58,7 @@ sub handle_put_share {
         wait;
         rmdir $mount_point;
     } else {
-	my @cmd = ($command_sshfs => "qvd-client:", $mount_point, -o => 'slave', -o => 'idmap=user');
+	my @cmd = ($command_sshfs => "qvd-client:", $mount_point, -o => 'slave', -o => 'idmap=user', -o => 'atomic_o_trunc');
 	push @cmd, -o => "modules=iconv,from_code=$charset" if ($charset);
 	exec @cmd;
         die "Unable to exec $command_sshfs: $^E";
