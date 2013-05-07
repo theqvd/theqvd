@@ -1252,7 +1252,6 @@ lib/QVD/Admin/Web/View/TT.pm
 lib/QVD/Admin/Web/View/TTMin.pm
 MANIFEST			This list of files
 MANIFEST.SKIP
-META.json
 README
 t/01app.t
 t/02pod.t
