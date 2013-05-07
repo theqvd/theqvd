@@ -12,8 +12,8 @@
 /* #define BUFFER_SIZE CURL_MAX_WRITE_SIZE * 2 */
 #define BUFFER_SIZE 65536
 #include "qvdbuffer.h"
-
-#define ABOUT "About: $Id$"
+#define QVDVERSION 100
+#define QVDABOUT "Version: 1.0. $Id$"
 /* #define DEBUG 1 */
 #define DEBUG_FLAG_ENV_VAR_NAME "QVD_DEBUG"
 #define DEBUG_FILE_ENV_VAR_NAME "QVD_DEBUG_FILE"
@@ -38,6 +38,7 @@
 #define CONF_DIR ".qvd"
 #define CERT_DIR ".qvd/certs"
 #define MAX_NX_OPTS_BUFFER 256
+#define MAX_STRING_VERSION 256
 
 #ifndef MAX
 #define MAX(x,y) ((x) > (y) ? (x) : (y))
@@ -97,6 +98,8 @@ struct qvdclientstruct {
 } ;
 typedef struct qvdclientstruct qvdclient;
 
+int qvd_get_version(void);
+const char *qvd_get_version_text(void);
 qvdclient *qvd_init(const char *hostname, const int port, const char *username, const char *password);
 vmlist *qvd_list_of_vm(qvdclient *qvd);
 int qvd_connect_to_vm(qvdclient *qvd, int id);
@@ -127,5 +130,4 @@ void qvd_error(qvdclient *qvd, const char *format, ...);
 void qvd_progress(qvdclient *qvd, const char *message);
 void set_debug_level(int level);
 int get_debug_level(void);
-
 #endif

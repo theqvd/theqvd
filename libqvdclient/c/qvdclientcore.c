@@ -40,11 +40,21 @@ int _qvd_set_base64_auth(qvdclient *qvd);
 int _qvd_switch_protocols(qvdclient *qvd, int id);
 void _qvd_print_environ();
 int _qvd_use_client_cert(qvdclient *qvd);
+static char qvdversion[MAX_STRING_VERSION];
+
+int qvd_get_version(void) {
+  return QVDVERSION;
+}
+
+const char *qvd_get_version_text(void) {
+  snprintf(qvdversion, MAX_STRING_VERSION, "QVD Version: %s\nCurl Version: %s\nOpenssl version: %s\n", QVDABOUT, curl_version(), OPENSSL_VERSION_TEXT);
+  return qvdversion;
+}
 
 /* Init and free functions */
 qvdclient *qvd_init(const char *hostname, const int port, const char *username, const char *password) {
   qvdclient *qvd;
-  qvd_printf("Starting qvd_init. QVD Version: <%s>. Curl Version: <%s>, Openssl version: <%s>\n", ABOUT, curl_version(), OPENSSL_VERSION_TEXT);
+  qvd_printf("Starting qvd_init. %s", qvd_get_version_text);
   if (strlen(username) + strlen(password) + 2 > MAX_USERPWD) {
     qvd_error(qvd, "Length of username and password + 2 is longer than %d\n", MAX_USERPWD);
     return NULL;

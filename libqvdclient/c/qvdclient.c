@@ -3,12 +3,14 @@
 #include <stdlib.h>
 #include <limits.h>
 #include <string.h>
+#include <openssl/ssl.h>
 #include "qvdclient.h"
 
 void help(const char *program)
 {
   printf("%s [-?] [-d] -h host [-p port] -u username -w pass [-g wxh] [-f] \n", program);
   printf("  -? : shows this help\n");
+  printf("  -v : shows version and exits\n");
   printf("  -d : Enables debugging\n");
   printf("  -h : indicates the host to connect to\n");
   printf("  -p : indicates the port to connect to, if not specified 8443 is used\n");
@@ -26,16 +28,19 @@ void help(const char *program)
 
 int parse_params(int argc, char **argv, const char **host, int *port, const char **user, const char **pass, const char **geometry, int *fullscreen, int *only_list_of_vm, int *one_vm, int *no_cert_check, const char **nx_options, const char **client_cert, const char **client_key)
 {
-  int opt, error = 0;
+  int opt, error = 0, version = 0;
   const char *program = argv[0];
   char *endptr;
 
-  while ((opt = getopt(argc, argv, "?dh:p:u:w:g:flonx:c:k:")) != -1 )
+  while ((opt = getopt(argc, argv, "?dvh:p:u:w:g:flonx:c:k:")) != -1 )
     {
       switch (opt)
 	{
 	case '?':
 	  error = 1;
+	  break;
+	case 'v':
+	  version = 1;
 	  break;
 	case 'd':
 	  qvd_set_debug(2);
@@ -85,6 +90,10 @@ int parse_params(int argc, char **argv, const char **host, int *port, const char
 	  error = 1;
 	}
     }
+  if (version) {
+    printf("%s", qvd_get_version_text());
+    exit(0);
+  }
   if (*host == NULL)
     {
       fprintf(stderr, "The host paramter -h is required\n");
