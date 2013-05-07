@@ -532,14 +532,20 @@ sub start_file_sharing {
         use QVD::Client::SlaveClient;
         for my $share (@shares) {
             INFO("Starting folder sharing for $share");
-            eval {
-                ERROR $@ if $@;
+            for (my $conn_attempt = 0; $conn_attempt < 10; $conn_attempt++) {
+                local $@;
                 my $client = QVD::Client::SlaveClient->new('localhost:12040');
-                $client->handle_share($share);
-                DEBUG("Folder sharing started for $share");
-            };
-            if ($@) {
-                ERROR $@;
+                eval { $client->handle_share($share) };
+                if ($@) {
+                    if ($@ =~ 'Connection refused') {
+                        sleep 1;
+                        next;
+                    }
+                    ERROR $@;
+                } else {
+                    DEBUG("Folder sharing started for $share");
+                }
+                last;
             }
         }
     }
