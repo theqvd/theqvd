@@ -1,3 +1,20 @@
+Steps:
+
+1) Edit QvdclientWrapper.java and build
+
+2) Create headers in C
+
+qindel@qvdandroid:~/svn/libqvdclient/java/libqvdclientwrapper$ javah -classpath ../../java/jni/target/classes com.theqvd.client.jni.QvdclientWrapper
+
+3) Create C methods
+
+
+
+4) Compile java
+
+Other notes
+===========
+
 nito@cardalda:~/w/svn/QVD/src/branches/qvdclientlib-jni/jni $ javah -classpath ~/w/src/qvdclientjni/bin com.theqvd.client.jni.QvdclientWrapper
 
 java -cp bin:/usr/share/java/junit4.jar:/usr/share/java/hamcrest-core.jar -Djava.library.path=/home/nito/w/svn/QVD/src/branches/qvdclientlib-jni/c  org.junit.runner.JUnitCore com.theqvd.client.jni.TestLibraryLoad

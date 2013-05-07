@@ -150,6 +150,16 @@ int initIds(JNIEnv *env) {
 
 JNINativeMethod methods[] = {
   {
+    "qvd_c_get_version_text",
+    "()Ljava/lang/String;",
+    Java_com_theqvd_client_jni_QvdclientWrapper_qvd_1c_1get_1version_1text
+  },
+  {
+    "qvd_c_get_version",
+    "()I",
+    Java_com_theqvd_client_jni_QvdclientWrapper_qvd_1c_1get_1version
+  },
+  {
     "qvd_c_init",
     "(Lcom/theqvd/client/jni/Qvdclient;)J",
     (void *) Java_com_theqvd_client_jni_QvdclientWrapper_qvd_1c_1init
@@ -439,6 +449,33 @@ int progress_callback(qvdclient *qvd, const char *message)
 
   return 1;
 }
+
+
+
+/*
+ * Class:     com_theqvd_client_jni_QvdclientWrapper
+ * Method:    qvd_c_get_version_text
+ * Signature: ()Ljava/lang/String;
+ */
+JNIEXPORT jstring JNICALL Java_com_theqvd_client_jni_QvdclientWrapper_qvd_1c_1get_1version_1text
+(JNIEnv *env, jobject obj) {
+  const char *version = qvd_get_version_text();
+  return (*env)->NewStringUTF(env, version);
+}
+
+/*
+ * Class:     com_theqvd_client_jni_QvdclientWrapper
+ * Method:    qvd_c_get_version
+ * Signature: ()I
+ */
+JNIEXPORT jint JNICALL Java_com_theqvd_client_jni_QvdclientWrapper_qvd_1c_1get_1version
+(JNIEnv *env, jobject obj) {
+  jint version;
+  version = qvd_get_version();
+  return version;
+}
+
+
 
 
 /**

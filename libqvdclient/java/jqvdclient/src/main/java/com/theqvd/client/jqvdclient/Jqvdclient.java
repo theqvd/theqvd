@@ -19,6 +19,8 @@ import com.theqvd.client.jni.Vm;
 public class Jqvdclient {
 	@Option(name="-d",usage="debug")
     private boolean debug=false;
+	@Option(name="-v",usage="version")
+    private boolean version=false;
 	@Option(name="-h",usage="Remote host")
     private String host;
 	@Option(name="-p",usage="Remote port")
@@ -66,10 +68,14 @@ public class Jqvdclient {
 
             // you can parse additional arguments if you want.
             // parser.parseArgument("more","args");
-
+            if (version) {
+        		QvdclientWrapper q = new QvdclientWrapper();
+        		System.out.print(q.get_version_text());
+            	return;
+            }
             // after parsing arguments, you should check
             // if enough arguments are given.
-            if( host == null || user == null || password == null || host.isEmpty() || user.isEmpty() || password.isEmpty() )
+            if(host == null || user == null || password == null || host.isEmpty() || user.isEmpty() || password.isEmpty() )
                 throw new CmdLineException(parser, "No argument is given");
 
         } catch( CmdLineException e ) {
@@ -98,6 +104,7 @@ public class Jqvdclient {
 		AcceptUnknownCertHandler unknown_cert_handler = new AcceptUnknownCertHandler();
 		QvdProgressHandler progress_handler = new PrintProgress();
 		QvdclientWrapper q = new QvdclientWrapper();
+		
 		if (debug) {
 			q.qvd_set_debug();
 		}

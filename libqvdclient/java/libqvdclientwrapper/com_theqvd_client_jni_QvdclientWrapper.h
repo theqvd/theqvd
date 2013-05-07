@@ -9,6 +9,22 @@ extern "C" {
 #endif
 /*
  * Class:     com_theqvd_client_jni_QvdclientWrapper
+ * Method:    qvd_c_get_version_text
+ * Signature: ()Ljava/lang/String;
+ */
+JNIEXPORT jstring JNICALL Java_com_theqvd_client_jni_QvdclientWrapper_qvd_1c_1get_1version_1text
+  (JNIEnv *, jobject);
+
+/*
+ * Class:     com_theqvd_client_jni_QvdclientWrapper
+ * Method:    qvd_c_get_version
+ * Signature: ()I
+ */
+JNIEXPORT jint JNICALL Java_com_theqvd_client_jni_QvdclientWrapper_qvd_1c_1get_1version
+  (JNIEnv *, jobject);
+
+/*
+ * Class:     com_theqvd_client_jni_QvdclientWrapper
  * Method:    qvd_c_init
  * Signature: (Lcom/theqvd/client/jni/Qvdclient;)J
  */

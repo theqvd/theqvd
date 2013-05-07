@@ -28,6 +28,8 @@ public class QvdclientWrapper {
 	private long qvd_c_pointer = 0;
 	private final static String library = "qvdclientwrapper";
 	private final int MAX_SCREEN_SIZE = 32565;
+	private native String qvd_c_get_version_text();
+	private native int qvd_c_get_version();
 	private native long qvd_c_init(Qvdclient q);
 	private native void qvd_c_free(long qvdclient);
 	private native int qvd_c_connect_to_vm(long qvdclient, int i);
@@ -50,6 +52,14 @@ public class QvdclientWrapper {
 	private native void qvd_c_set_cert_files(long qvdclient, String client_cert, String client_key);
 	private QvdUnknownCertificateHandler certificateHandler = null;
 	private QvdProgressHandler progressHandler = null;
+	
+	public int get_version() {
+		return qvd_c_get_version();
+	}
+	
+	public String get_version_text() {
+		return qvd_c_get_version_text();
+	}
 	
 	public void qvd_init(String host, int port, String username, String password) throws QvdException {
 		
