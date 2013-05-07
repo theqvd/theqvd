@@ -1,7 +1,6 @@
 bin/qvd-vm-killer
 Build.PL
 Changes
-cron/qvd-vm-killer
 lib/QVD/VMKiller.pm
 lib/QVD/VMKiller/KVM.pm
 lib/QVD/VMKiller/LXC.pm
