@@ -587,9 +587,10 @@ sub cmd_host_propset {
     eval {
         $ci = $self->{admin}->cmd_host_propset(_split_on_equals @_);
     };
-    if (($ci == -1) || $@) {
-        #$self->_print("Wrong syntax, check the command help:\n");
-        $self->_die;
+    if ($@) {
+        $self->_die($@);
+    } elsif ($ci == -1) {
+        $self->_die("No properties were set (filter matched 0 hosts)");
     } else {
         $self->_print("propset in $ci hosts.\n");
     }
@@ -837,9 +838,10 @@ sub cmd_osf_propset {
     eval {
         $ci = $self->{admin}->cmd_osf_propset(_split_on_equals @_);
     };
-    if (($ci == -1) || $@) {
-        #$self->_print("Wrong syntax, check the command help:\n");
-        $self->_die;
+    if ($@) {
+        $self->_die($@);
+    } elsif ($ci == -1) {
+        $self->_die("No properties were set (filter matched 0 OSFs)");
     } else {
         $self->_print("propset in $ci OSFs.\n");
     }    
@@ -1022,9 +1024,10 @@ sub cmd_di_propset {
     eval {
         $ci = $self->{admin}->cmd_di_propset(_split_on_equals @_);
     };
-    if (($ci == -1) || $@) {
-        #$self->_print("Wrong syntax, check the command help:\n");
-        $self->_die;
+    if ($@) {
+        $self->_die($@);
+    } elsif ($ci == -1) {
+        $self->_die("No properties were set (filter matched 0 DIs)");
     } else {
         $self->_print("propset in $ci DIs.\n");
     }    
@@ -1232,9 +1235,10 @@ sub cmd_user_propset {
     eval {
         $ci = $self->{admin}->cmd_user_propset(_split_on_equals @_);
     };
-    if (($ci == -1) || $@) {
-        #$self->_print("Wrong syntax, check the command help:\n");
-        $self->_die;
+    if ($@) {
+        $self->_die($@);
+    } elsif ($ci == -1) {
+        $self->_die("No properties were set (filter matched 0 users)");
     } else {
         $self->_print("propset in $ci users.\n");
     }    
@@ -1556,10 +1560,10 @@ sub cmd_vm_propset {
     eval {
         $ci = $self->{admin}->cmd_vm_propset(_split_on_equals @_);
     };    
-
-    if (($ci == -1) || $@) {
-        #$self->_print("Wrong syntax, check the command help:\n");
-        $self->_die;
+    if ($@) {
+        $self->_die($@);
+    } elsif ($ci == -1) {
+        $self->_die("No properties were set (filter matched 0 VMs)");
     } else {
         $self->_print("propset in $ci virtual machines.\n");
     }       
