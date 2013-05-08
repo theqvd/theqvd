@@ -69,6 +69,9 @@ my %initial_values = ( VM_State   => [qw(stopped
 
 sub deploy {
     my $db = shift;
+    # Ensure the default transaction isolation is "serializable" (see #1210)
+    my $dbh = $db->storage->dbh;
+    $dbh->do("ALTER DATABASE $db_name SET default_transaction_isolation TO serializable");
     $db->SUPER::deploy(@_);
     while (my ($rs, $names) = each %initial_values) {
 	$db->resultset($rs)->create({name => $_}) for @$names;
