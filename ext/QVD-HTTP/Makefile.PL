@@ -6,7 +6,7 @@ WriteMakefile(
     NAME                => 'QVD::HTTP',
     AUTHOR              => 'Salvador Fandiño <sfandino@yahoo.com>',
     VERSION	        => '3.1'.$ENV{BUILD_NUMBER},
-    ABSTRACT_FROM       => 'lib/QVD/HTTP.pm',
+    ABSTRACT            => 'lib/QVD/HTTP.pm',
     PL_FILES            => {},
     PREREQ_PM => {
         'Test::More' => 0,

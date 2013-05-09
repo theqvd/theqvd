@@ -7,7 +7,7 @@ use ExtUtils::MakeMaker;
 WriteMakefile( NAME          => 'QVD::L7R::Authenticator::Plugin::Auto',
 	       AUTHOR        => 'QVD Team <qvd@qindel.com>',
 	       VERSION	     => '3.1'.$ENV{BUILD_NUMBER},
-	       ABSTRACT_FROM => 'lib/QVD/L7R/Authenticator/Plugin/Auto.pm',
+	       ABSTRACT => 'lib/QVD/L7R/Authenticator/Plugin/Auto.pm',
 	       LICENSE       => 'GPL3',
 	       PREREQ_PM     => { 'Test::More'       => 0,
 				  'QVD::Admin'	     => 0,

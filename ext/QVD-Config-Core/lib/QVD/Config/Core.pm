@@ -1,6 +1,6 @@
 package QVD::Config::Core;
 
-our $VERSION = '0.01';
+our $VERSION = '3.3';
 
 use warnings;
 use strict;

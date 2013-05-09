@@ -6,7 +6,7 @@ WriteMakefile(
     NAME                => 'QVD::SimpleRPC',
     AUTHOR              => 'Salvador Fandiño <sfandino@yahoo.com>',
     VERSION             => '3.1'.$ENV{BUILD_NUMBER},
-    ABSTRACT_FROM       => 'lib/QVD/SimpleRPC.pm',
+    ABSTRACT       => 'lib/QVD/SimpleRPC.pm',
     PL_FILES            => {},
     PREREQ_PM => {
 	'JSON' => 0,

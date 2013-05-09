@@ -7,7 +7,7 @@ WriteMakefile(
     VERSION           => '3.1'.$ENV{BUILD_NUMBER},
     PREREQ_PM         => {}, # e.g., Module::Name => 1.1
     ($] >= 5.005 ?     ## Add these new keywords supported since 5.005
-      (ABSTRACT_FROM  => 'lib/QVD/ParallelNet.pm', # retrieve abstract from module
+      (ABSTRACT  => 'lib/QVD/ParallelNet.pm', # retrieve abstract from module
        AUTHOR         => 'Salvador Fandino <salva@>') : ()),
     PREREQ_PM => {
 	'Time::HiRes' => 0,

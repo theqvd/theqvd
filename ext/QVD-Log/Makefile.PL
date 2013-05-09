@@ -6,7 +6,7 @@ WriteMakefile(
     NAME                => 'QVD::Log',
     AUTHOR              => q{QVD Team <qvd@qindel.com>},
     VERSION		=> '3.1'.$ENV{BUILD_NUMBER},
-    ABSTRACT_FROM       => 'lib/QVD/Log.pm',
+    ABSTRACT       => 'lib/QVD/Log.pm',
     LICENSE		=> 'gpl',
     PL_FILES            => {},
     PREREQ_PM => { 'QVD::Config' => 0,

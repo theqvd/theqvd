@@ -7,7 +7,7 @@ use ExtUtils::MakeMaker;
 WriteMakefile( NAME          => 'QVD::DB',
 	       AUTHOR        => 'QVD Team <qvd@qindel.es>',
 	       VERSION	     => '3.1'.$ENV{BUILD_NUMBER},
-	       ABSTRACT_FROM => 'lib/QVD/DB.pm',
+	       ABSTRACT      => 'lib/QVD/DB.pm',
 	       EXE_FILES     => [ 'bin/qvd-deploy-db.pl' ],
 	       PL_FILES      => {},
 	       PREREQ_PM     => { 'DBD::Pg'           => 0,

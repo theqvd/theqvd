@@ -19,7 +19,7 @@ else {
 my $build = new Module::Build(
 	module_name      => 'QVD::Admin::Web',
 	dist_author       => 'QVD Team <qvd@qindel.com',
-	dist_version     => '3.1'.$ENV{SVN_REVISION},
+	dist_version     => '3.3'.$ENV{SVN_REVISION},
 	dist_abstract    => 'QVD::Admin::Web - Catalyst based application',
 	license          => 'gpl',
 

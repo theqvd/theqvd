@@ -6,7 +6,7 @@ WriteMakefile(
     NAME                => 'QVD::HTTPC',
     AUTHOR              => 'Salvador Fandiño <sfandino@yahoo.com>',
     VERSION	        => '3.1'.$ENV{BUILD_NUMBER},
-    ABSTRACT_FROM       => 'lib/QVD/HTTPC.pm',
+    ABSTRACT       => 'lib/QVD/HTTPC.pm',
     PL_FILES            => {},
     PREREQ_PM => {
 	'IO::Socket::INET' => 0,

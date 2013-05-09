@@ -4,7 +4,7 @@ use ExtUtils::MakeMaker;
 
 WriteMakefile( NAME => 'QVD::VMA',
 	       VERSION => "3.1".$ENV{BUILD_NUMBER},
-	       ABSTRACT_FROM => 'lib/QVD/VMA.pm',
+	       ABSTRACT => 'lib/QVD/VMA.pm',
 	       EXE_FILES => [ 'bin/nxdiag.pl',
 			      'bin/qvd-printing',
 			      'bin/qvd-vma.pl',

@@ -6,7 +6,7 @@ use Module::Build;
 my $build = new Module::Build(
                module_name   => 'QVD::Client',
 	       author        => 'QVD Team <qvd@qindel.com>',
-	       dist_version  => '3.1'.$ENV{BUILD_NUMBER},
+	       dist_version  => '3.3'.$ENV{BUILD_NUMBER},
 	       abstract_from => 'lib/QVD/Client.pm',
 	       PL_files      => {},
 	       pl_files      => [ qw(bin/qvd-client.pl bin/qvd-gui-client.pl bin/qvd-slaveclient) ],

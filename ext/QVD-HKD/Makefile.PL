@@ -19,7 +19,7 @@ WriteMakefile( NAME          => 'QVD::HKD',
                                   'File::Slurp' => '0',
                                   'Linux::Proc::Mountinfo' => '0.01',
                                 },
-               ABSTRACT_FROM => 'lib/QVD/HKD.pm',
+               ABSTRACT      => 'lib/QVD/HKD.pm',
 	       EXE_FILES     => [ qw(bin/qvd-hkd
                                      bin/qvd-hkd.initrc.pl
                                      bin/qvd-hkd.debrc.pl

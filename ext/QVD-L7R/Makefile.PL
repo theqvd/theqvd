@@ -5,7 +5,7 @@ use ExtUtils::MakeMaker;
 WriteMakefile( NAME          => 'QVD::L7R',
 	       AUTHOR        => 'QVD Team <qvd@qindel.com>',
 	       VERSION       => '3.1'.$ENV{BUILD_NUMBER},
-	       ABSTRACT_FROM => 'lib/QVD/L7R.pm',
+	       ABSTRACT      => 'lib/QVD/L7R.pm',
 	       PREREQ_PM     => { 'IO::Socket::Forwarder' => 0,
 				  'QVD::Config'           => 0,
 				  'QVD::DB'               => 0,

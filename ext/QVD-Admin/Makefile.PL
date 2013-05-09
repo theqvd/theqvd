@@ -4,8 +4,8 @@ use ExtUtils::MakeMaker;
 
 WriteMakefile( NAME          => 'QVD::Admin',
                AUTHOR        => 'QVD Team <qvd@qindel.es>',
-               VERSION	     => '3.1'.$ENV{BUILD_NUMBER},
-               ABSTRACT_FROM => 'lib/QVD/Admin.pm',
+               VERSION	     => '3.3'.$ENV{BUILD_NUMBER},
+               ABSTRACT      => 'QVD::Admin',
                EXE_FILES     => [ 'bin/qvd-admin.pl'],
                PL_FILES      => {},
                PREREQ_PM     => { 'File::Slurp' => 0,

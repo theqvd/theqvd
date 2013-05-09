@@ -6,7 +6,7 @@ WriteMakefile(
     NAME                => 'QVD::HTTPD',
     AUTHOR              => 'Salvador Fandiño <sfandino@yahoo.com>',
     VERSION	        => '3.1'.$ENV{BUILD_NUMBER},
-    ABSTRACT_FROM       => 'lib/QVD/HTTPD.pm',
+    ABSTRACT   	       => 'lib/QVD/HTTPD.pm',
     PL_FILES            => {},
     PREREQ_PM => {
 	'Net::Server::Fork' => 0,
