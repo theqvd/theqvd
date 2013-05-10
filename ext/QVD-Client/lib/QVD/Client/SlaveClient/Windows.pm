@@ -87,7 +87,7 @@ sub handle_share {
 	# To debug under GDB:
 	# my $command_gdb='c:/mingw/bin/gdb.exe';
 	# my $cmdline = "gdb -w --directory \"c:\\documents and settings\\administrador\\Mis documentos\\openssh-6.0p1\" --args \"$command_sftp_server\" -l DEBUG3 -F \"$tempfile\" -L \"$logfile\"";
-    my $cmdline = "sftp-server.exe -l DEBUG3 -F \"$tempfile\" -L \"$logfile\"";
+    my $cmdline = "sftp-server.exe -l ERROR -F \"$tempfile\" -L \"$logfile\"";
 	#my $cmdline = "sftp-server.exe -l ERROR -F \"$tempfile\" -P \"$pipe_name\"";
     my $child;
     Win32::Process::Create($child, 
