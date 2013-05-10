@@ -1,9 +1,15 @@
+bin/helper.pl
+bin/qvd-slaveclient
+bin/slavefs
+Build.PL
 Changes
-lib/QVD/SlaveClient.pm
-Makefile.PL
+ignore.txt
+lib/QVD/VMA/SlaveClient.pm
 MANIFEST			This list of files
+out
 README
 t/00-load.t
+t/boilerplate.t
 t/manifest.t
 t/pod-coverage.t
 t/pod.t
