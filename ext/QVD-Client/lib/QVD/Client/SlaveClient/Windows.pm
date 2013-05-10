@@ -54,15 +54,12 @@ my $command_sftp_server = File::Spec->rel2abs(core_cfg('command.windows.sftp-ser
 
 sub handle_share {
     my ($self, $path) = @_;
-
-	# FIXME: Might be wrong for some encodings, we should look into this in more detail!
-    my $charset = 'cp'.GetACP();
 	
 	DEBUG "Making a PUT request to /shares/$path";
 	
     my ($code, $msg, $headers, $data) =
     $self->{httpc}->make_http_request(PUT => '/shares/'.$path,
-        headers => ['Connection: Upgrade', "Upgrade: qvd:sftp/1.0;charset=$charset"]);
+        headers => ['Connection: Upgrade', "Upgrade: qvd:sftp/1.0;charset=utf-8"]);
 		
 	DEBUG "PUT returned with code $code";
         
@@ -90,7 +87,7 @@ sub handle_share {
 	# To debug under GDB:
 	# my $command_gdb='c:/mingw/bin/gdb.exe';
 	# my $cmdline = "gdb -w --directory \"c:\\documents and settings\\administrador\\Mis documentos\\openssh-6.0p1\" --args \"$command_sftp_server\" -l DEBUG3 -F \"$tempfile\" -L \"$logfile\"";
-    my $cmdline = "sftp-server.exe -l ERROR -F \"$tempfile\" -L \"$logfile\"";
+    my $cmdline = "sftp-server.exe -l DEBUG3 -F \"$tempfile\" -L \"$logfile\"";
 	#my $cmdline = "sftp-server.exe -l ERROR -F \"$tempfile\" -P \"$pipe_name\"";
     my $child;
     Win32::Process::Create($child, 
