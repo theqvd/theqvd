@@ -7,6 +7,7 @@ use QVD::Config::Core qw(core_cfg);
 use QVD::Config;
 use QVD::Admin;
 use Text::Table;
+use Term::ReadKey;
 use DateTime;
 
 my %syntax_check_cbs = (
@@ -1127,11 +1128,9 @@ Fields that can be used with -f:
 EOT
 }
 
-# FIXME use a real password prompt library
 sub _read_password {
     my ($self, $for_user) = @_;
-    # FIXME: use Term::ReadKey module for setting tty input mode and for reading lines!
-    system 'stty -echo';
+    ReadMode 'noecho';
 
     print "New password for $for_user: ";
     my $password1 = <STDIN>;
@@ -1143,7 +1142,7 @@ sub _read_password {
     print "\n";
     chomp $password2;
 
-    system 'stty echo';
+    ReadMode 'restore';
 
     if ($password1 ne $password2) {
         warn "Entered passwords don't match\n";
@@ -1151,7 +1150,7 @@ sub _read_password {
     }
     $password1
 }
-END { system 'stty echo'; }
+END { ReadMode 'restore'; }
 
 sub cmd_user_passwd {
     my ($self, $user) = @_;
