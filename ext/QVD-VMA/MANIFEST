@@ -1,4 +1,5 @@
 bin/nxdiag.pl
+bin/qvd-vma-slaveserver
 bin/qvd-printing
 bin/qvd-vma.debrc.pl
 bin/qvd-vma.initrc.pl
