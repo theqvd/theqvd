@@ -527,6 +527,7 @@ sub start_file_sharing {
             # User's home + /media
             push @shares, $ENV{HOME};
             push @shares, '/media' if -e '/media';
+            push @shares, '/Volumes' if -e '/Volumes'; # For OS X
         }
 
         use QVD::Client::SlaveClient;
