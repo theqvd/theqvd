@@ -55,7 +55,8 @@ path.ssl.ca.personal = certs
 ## KVM serial port captures or LXC console output
 path.serial.captures = ${path.tmp}/qvd
 
-path.cgroup = /cgroup
+path.cgroup = /sys/fs/cgroup
+path.cgroup.cpu.lxc = ${path.cgroup}/cpu/lxc
 
 path.client.pixmaps = pixmaps
 path.client.pixmaps.alt = /usr/share/pixmaps

@@ -703,14 +703,14 @@ sub _check_dirty_flag {
 sub _kill_lxc {
     my $self = shift;
     my @pids;
-    my $cgroup = $self->_cfg('path.cgroup');
-    my $fn = "$cgroup/$self->{lxc_name}/cgroup.procs";
+    my $cgroup_cpu_lxc = $self->_cfg('path.cgroup.cpu.lxc');
+    my $fn = "$cgroup_cpu_lxc/$self->{lxc_name}/cgroup.procs";
     if (open my $fh, '<', $fn) {
         chomp(@pids = <$fh>);
     }
     else {
         $debug and $self->_debug("unable to open $fn: $!");
-        ERROR "Unable to open '$fn': $!";
+        INFO "Unable to open '$fn': $!";
     }
     my $vm_pid = $self->{vm_pid};
     push @pids, $vm_pid if defined $vm_pid;
