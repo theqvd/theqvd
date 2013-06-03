@@ -387,14 +387,20 @@ internal.hkd.agent.rpc.retry.delay = 5
 internal.hkd.agent.rpc.timeout = 3
 
 internal.hkd.vmhandler.killer.delay = 10
-internal.hkd.vmhandler.timeout.on_state.stopping = 200
-internal.hkd.vmhandler.timeout.on_state.zombie = 200
+
+internal.hkd.vmhandler.timeout.on_state.starting.setup.delaying_untar.delaying = 60
+internal.hkd.vmhandler.timeout.on_state.stopping.shutdown.waiting_for_lxc = 180
+internal.hkd.vmhandler.timeout.on_state.stopping.stop.waiting_for_lxc = 120
+internal.hkd.vmhandler.timeout.on_state.zombie.reap.waiting_for_lxc = 120
+internal.hkd.vmhandler.timeout.on_state.zombie.config.delaying = 60
+internal.hkd.vmhandler.timeout.on_state.zombie.reap.delaying = 60
+internal.hkd.vmhandler.timeout.on_state.zombie.db.delaying = 60
 
 internal.hkd.vmhandler.vma.failed.max_count.on.starting = 40
 internal.hkd.vmhandler.vma.failed.max_count.on.running = 10
 
 internal.hkd.vmhandler.vma.failed.max_time.on.starting = 180
-internal.hkd.vmhandler.vma.failed.max_time.on.running = 60
+internal.hkd.vmhandler.vma.failed.max_time.on.running = 320
 internal.hkd.vmhandler.vma_monitor.delay = 10
 internal.hkd.lxc.does.not.cleanup = 0
 internal.hkd.lxc.killer.retries = 10

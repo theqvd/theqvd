@@ -346,7 +346,8 @@ sub _shutdown {
 
 sub _set_state_timer {
     my $self = shift;
-    my $state = $self->_main_state;
+    my $state = $self->state;
+    $state =~ s|/|.|g;
     $self->_call_after($self->_cfg("internal.hkd.vmhandler.timeout.on_state.$state"), '_on_state_timeout');
 }
 
