@@ -69,6 +69,7 @@ $pixmaps_dir = File::Spec->rel2abs(core_cfg('path.client.pixmaps'), $app_dir);
 $pixmaps_dir = File::Spec->rel2abs(core_cfg('path.client.pixmaps.alt'), $app_dir) unless -d $pixmaps_dir;
 INFO "pixmaps_dir: $pixmaps_dir";
 
+$SIG{PIPE} = 'IGNORE';
 $SIG{__WARN__} = sub { WARN "@_"; };
 $SIG{__DIE__} = sub { ERROR "@_"; die (@_) };
 
