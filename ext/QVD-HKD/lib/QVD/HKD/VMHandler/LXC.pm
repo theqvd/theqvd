@@ -107,6 +107,7 @@ use Class::StateMachine::Declarative
                                                                      on_hkd_kill  => 'stopping/stop' } } ] },
 
     stopping  => { advance => '_on_done',
+                   transitions => { _on_error => 'zombie/reap' },
                    delay => [qw(_on_lxc_done)],
                    substates => [ cmd      => { advance => '_on_error',
                                                 substates => [ saving_state    => { enter => '_save_state' },
@@ -125,8 +126,7 @@ use Class::StateMachine::Declarative
                                                                waiting_for_lxc => { enter => '_set_state_timer',
                                                                                     transitions => { _on_lxc_done      => 'cleanup',
                                                                                                      _on_state_timeout => 'cleanup' } } ] },
-                                  cleanup  => { transitions => { _on_error => 'zombie/reap' },
-                                                substates => [ saving_state           => { enter => '_save_state' },
+                                  cleanup  => { substates => [ saving_state           => { enter => '_save_state' },
                                                                checking_dirty         => { enter => '_check_dirty_flag' },
                                                                heavy                  => { enter => '_heavy_down' },
                                                                killing_lxc            => { enter => '_kill_lxc' },
