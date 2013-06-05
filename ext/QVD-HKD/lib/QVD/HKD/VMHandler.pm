@@ -173,7 +173,7 @@ sub _save_runtime_row {
                   map { defined $_ ? $_ : '<undef>' }
                   @{$self}{qw(vm_id vma_port x_port ssh_port vnc_port serial_port mon_port)});
 
-    $self->_query({ n => 1}, <<'SQL', @{$self}{qw(ip vma_port x_port ssh_port vnc_port serial_port mon_port vm_pid vm_id)});
+    $self->_query({ n => 1}, <<'SQL', @{$self}{qw(ip vma_port x_port ssh_port vnc_port serial_port mon_port vm_pid di_id vm_id)});
 update vm_runtimes
     set
         vm_address     = $1,
@@ -183,9 +183,10 @@ update vm_runtimes
         vm_vnc_port    = $5,
         vm_serial_port = $6,
         vm_mon_port    = $7,
-        vm_pid         = $8
+        vm_pid         = $8,
+        current_di_id  = $9
     where
-        vm_id          = $9
+        vm_id          = $10
 SQL
 }
 
@@ -367,7 +368,8 @@ update vm_runtimes
         vm_serial_port = NULL,
         vm_mon_port    = NULL,
         vm_address     = NULL,
-        vm_cmd         = NULL
+        vm_cmd         = NULL,
+        current_di_id  = NULL
     where
         vm_id   = $1  and
         host_id = $2
