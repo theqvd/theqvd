@@ -1,4 +1,4 @@
-#! /bin/sh
+#!/bin/sh
 ### BEGIN INIT INFO
 # Provides:          skeleton
 # Required-Start:    $remote_fs $syslog
@@ -130,8 +130,8 @@ do_reload() {
 case "$1" in
   start)
 	kill_dnsmasq
-	/sbin/sysctl -w fs.inotify.max_user_instances="65000" &> /dev/null
-	/sbin/sysctl -w fs.inotify.max_user_watches="81920" &> /dev/null
+	/sbin/sysctl -w fs.inotify.max_user_instances="65000" 2>&1 >  /dev/null
+	/sbin/sysctl -w fs.inotify.max_user_watches="81920" 2>&1 >  /dev/null
 	[ "$VERBOSE" != no ] && log_daemon_msg "Starting $DESC" "$NAME"
 	do_start
 	case "$?" in
