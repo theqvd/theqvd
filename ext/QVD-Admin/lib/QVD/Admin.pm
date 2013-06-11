@@ -89,9 +89,18 @@ sub get_result_set_for_vm {
                      host => 'host.name',
                      state => 'vm_runtime.vm_state' );
     my $filter = $self->_filter_obj(\%term_map);
-    rs(VM)->search($filter,
-                   { join => ['osf', 'user',
-                              { vm_runtime => 'host'}] });
+
+    # Be able to filter VMs by properties - #1354
+    my @joins = ('osf', 'user', { vm_runtime => 'host'});
+    my @prop_keys = map {/^properties\.(.*)/ ? $1 : ()} keys %$filter;
+    if (@prop_keys) {
+        push @joins, "properties";
+        foreach my $key (@prop_keys) {
+            $filter->{'properties.key'} = $key;
+            $filter->{'properties.value'} = delete $filter->{'properties.'.$key};
+        }
+    }
+    rs(VM)->search($filter, { join => \@joins });
 }
 
 sub _set_equals {
