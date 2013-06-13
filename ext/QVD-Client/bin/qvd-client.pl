@@ -1,4 +1,31 @@
-#!/usr/bin/perl
+#!/usr/lib/qvd/bin/perl 
+
+eval 'exec /usr/lib/qvd/bin/perl  -S $0 ${1+"$@"}'
+    if 0; # not running under some shell
+
+{
+    package QVD::Client::App;
+
+    use warnings;
+    use strict;
+    use QVD::Config::Core qw(core_cfg);
+
+    our $WINDOWS = ($^O eq 'MSWin32');
+
+    our $user_dir = File::Spec->rel2abs($WINDOWS
+        ? File::Spec->join($ENV{APPDATA}, 'QVD')
+        : File::Spec->join((getpwuid $>)[7] // $ENV{HOME}, '.qvd'));
+    mkdir $user_dir;
+
+    our $app_dir = core_cfg('path.client.installation', 0);
+    if (!$app_dir) {
+        my $bin_dir = File::Spec->join((File::Spec->splitpath(File::Spec->rel2abs($0)))[0, 1]);
+        my @dirs = File::Spec->splitdir($bin_dir);
+        $app_dir = File::Spec->catdir( @dirs[0..$#dirs-1] ); 
+    }
+
+    our $user_certs_dir = File::Spec->rel2abs(core_cfg('path.ssl.ca.personal'), $user_dir);
+}
 
 use strict;
 use warnings;
@@ -54,6 +81,11 @@ package QVD::Client::CLI;
 
 sub new {
     bless {}, shift;
+}
+
+sub proxy_set_environment {
+    my ($self, %args) = @_;
+    @ENV{keys %args} = values %args;
 }
 
 sub proxy_unknown_cert {
