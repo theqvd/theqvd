@@ -18,11 +18,17 @@ case "$1" in
 	fi
 	if [ -x /usr/sbin/apache2 ] 
 	then 
-		apache2ctl graceful
+		service apache2 reload
 	fi
 	if [ -d /var/lib/qvd/storage/images ]
 	then 
-		chown www-data /var/lib/qvd/storage/images
+		if cat /proc/mounts | grep /var/lib/qvd/storage/images | grep nfs 
+		then  
+			echo "Images directory mounted via NFS"
+		else
+			echo "Images directory locally mounted, changing permissions"
+			chown www-data /var/lib/qvd/storage/images
+		fi
 	fi
 		
     ;;
