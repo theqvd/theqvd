@@ -177,13 +177,13 @@ use Class::StateMachine::Declarative
                                                            releasing_untar_lock   => { enter => '_release_untar_lock' },
                                                            configuring_dhcpd      => { enter => '_rm_from_dhcpd' },
                                                            '(delaying)'           => { enter => '_set_state_timer',
-                                                                                       transitions => { _on_timeout => 'reap'} } ] },
+                                                                                       transitions => { _on_state_timeout => 'reap'} } ] },
 
                                 db     => { transitions => { _on_error => 'delaying' },
                                             substates => [ clearing_runtime_row => { enter => '_clear_runtime_row',
                                                                                      transitions => { _on_done => 'stopped' } },
                                                            '(delaying)'         => { enter => '_set_state_timer',
-                                                                                     transitions => { _on_timeout => 'db'} } ] } ] },
+                                                                                     transitions => { _on_state_timeout => 'db'} } ] } ] },
 
     dirty  => { ignore => [qw(on_hkd_stop)],
                 transitions => { on_hkd_kill => 'stopped' } };
