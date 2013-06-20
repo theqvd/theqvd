@@ -93,7 +93,8 @@ use Class::StateMachine::Declarative
                                                                         on => { _on_no_vms_are_running => '_on_done',
                                                                                 _on_state_timeout     => '_on_error' },
                                                                         transitions => { _on_error => 'killing_all_vms' } },
-                                       '(killing_all_vms)'         => { enter => '_kill_all_vms' },
+                                       '(killing_all_vms)'         => { enter => '_kill_all_vms',
+                                                                        on => { _on_no_vms_are_running => '_on_done' } },
 
                                        stopping_all_agents         => { enter => '_stop_all_agents',
                                                                         on => {_on_all_agents_stopped => '_on_done' } },
