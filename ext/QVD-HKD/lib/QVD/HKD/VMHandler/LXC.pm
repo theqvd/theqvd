@@ -20,7 +20,7 @@ use Method::WeakCallback qw(weak_method_callback);
 use parent qw(QVD::HKD::VMHandler);
 
 use Class::StateMachine::Declarative
-    __any__   => { ignore => [qw(_on_cmd_start)],
+    __any__   => { ignore => [qw(_on_cmd_start on_expired)],
                    delay => [qw(on_hkd_kill)],
                    on => { on_hkd_stop => 'on_hkd_kill' },
                    transitions => { _on_dirty => 'dirty' } },
@@ -91,7 +91,10 @@ use Class::StateMachine::Declarative
                                                                                _on_cmd_stop   => 'stopping/cmd',
                                                                                _on_lxc_done   => 'stopping/cleanup',
                                                                                on_hkd_kill    => 'stopping/stop',
-                                                                               _on_goto_debug => 'debugging' } } ] },
+                                                                               _on_goto_debug => 'debugging',
+                                                                               on_expired     => 'expiring' } },
+                                  '(expiring)'           => { enter => '_expire',
+                                                              transitions => { _on_done => 'monitoring' } } ] },
 
     debugging => { advance => '_on_done',
                    delay => [qw(_on_lxc_done)],

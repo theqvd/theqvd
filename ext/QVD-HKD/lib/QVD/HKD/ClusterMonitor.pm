@@ -4,9 +4,6 @@ use strict;
 use warnings;
 use Carp;
 use QVD::Log;
-use DateTime;
-use AnyEvent;
-use Pg::PQ qw(:pgres);
 
 use QVD::HKD::Helpers;
 
@@ -77,7 +74,10 @@ update vm_runtimes
         vm_serial_port = NULL,
         vm_mon_port    = NULL,
         vm_address     = NULL,
-        vma_ok_ts      = NULL
+        vm_expiration_soft = NULL,
+        vm_expiration_hard = NULL,
+        vma_ok_ts      = NULL,
+        current_di_id  = NULL
     from host_runtimes
     where vm_state != 'stopped'
       and host_runtimes.host_id = vm_runtimes.host_id
@@ -129,7 +129,7 @@ sub _notify_hkds {
     my $self = shift;
     if (my $hosts = delete $self->{hosts_to_be_notified}) {
         my %hosts;
-        $hosts{$_->[0]} = 1 for @$hosts;
+        $hosts{$_->{l7r_host}} = 1 for @$hosts;
         $self->_notify("qvd_user_cmd_for_host$_") for keys %hosts;
     }
     $self->_on_done;

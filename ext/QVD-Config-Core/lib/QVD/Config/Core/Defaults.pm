@@ -300,6 +300,7 @@ vma.on_action.stop =
 vma.on_action.disconnect =
 vma.on_action.suspend =
 vma.on_action.poweroff =
+vma.on_action.expire =
 
 ## external executables the VMA calls just before some states are entered
 vma.on_state.connected =
@@ -377,6 +378,7 @@ internal.hkd.killing.vms.retry.timeout = 100
 internal.hkd.agent.ticker.delay = 120
 internal.hkd.agent.command_handler.delay = 60
 internal.hkd.agent.vm_command_handler.delay = 61
+internal.hkd.agent.expiration_monitor.delay = 3600
 
 internal.hkd.agent.cluster_monitor.delay = 120
 internal.hkd.agent.cluster_monitor.long_delay = 600

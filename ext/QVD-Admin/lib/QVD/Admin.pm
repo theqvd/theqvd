@@ -4,6 +4,7 @@ our $VERSION = '0.01';
 
 use warnings;
 use strict;
+use 5.010;
 
 use File::Copy qw(copy move);
 use File::Basename qw(basename);
@@ -395,6 +396,42 @@ sub cmd_host_unblock_by_id {
     };
 }
 
+my ($parser, $now);
+sub _parse_datetime {
+    my $spec = shift // return;
+
+    unless ($parser) {
+        require DateTime::Format::GnuAt;
+        $parser = DateTime::Format::GnuAt->new;
+        $now = DateTime->now(time_zone => 'UTC');
+    }
+
+    eval { $parser->parse_datetime($spec, now => $now) } //
+        die "invalid datetime specification '$spec'";
+
+}
+
+sub _expire_vms {
+    my ($self, $rs, $params) = @_;
+    my $expire_soft = _parse_datetime delete $params->{'expire-soft'};
+    my $expire_hard = _parse_datetime delete $params->{'expire-hard'};
+    my $count = $rs->count;
+    if ($count and (defined $expire_soft or defined $expire_hard)) {
+        while (defined (my $vmrt = $rs->next)) {
+            $vmrt->update({ vm_expiration_soft => $expire_soft }) if defined $expire_soft;
+            $vmrt->update({ vm_expiration_hard => $expire_hard }) if defined $expire_hard;
+        }
+        # FIXME: notify nodes here!
+        warn("$count VM have had their expiration dates set (".
+             ($expire_soft // 'undef').
+             ", ".
+             ($expire_hard // 'undef') .
+             ")!\n") if $count;
+        return $count;
+    }
+    0;
+}
+
 sub cmd_di_add {
     my ($self, %params) = @_;
 
@@ -414,57 +451,54 @@ sub cmd_di_add {
     # The image may take a couple of minutes to copy, so we retry the
     # transaction a couple of times before bailing out. Otherwise adding
     # two images at the same time may fail. See trac #1166
-    my $MAX_RETRIES = 5;
-    my $retry_count = 0;
-    my $saved_error;
+
     die 'Both OSF id and OSF name given' if defined $osf_name and defined $osf_id;
-    while ($retry_count < $MAX_RETRIES) {
-    txn_eval {
-        if (defined $osf_name) {
-            my $rs = rs(OSF)->search({name=>$osf_name});
-            die "OSF not found" if ($rs->count() < 1);
-            $osf_id = $rs->single->id;
-        }
-        my $osf = rs(OSF)->find($osf_id) or die "OSF not found";
-        unless (defined $version) {
-            my ($y, $m, $d) = (localtime)[5, 4, 3];
-            $m ++;
-            $y += 1900;
-            for (0..999) {
-                $version = sprintf("%04d-%02d-%02d-%03d", $y, $m, $d, $_);
-                last unless $osf->di_by_tag($version);
+    for (1 .. 5) {
+        txn_eval {
+            if (defined $osf_name) {
+                my $rs = rs(OSF)->search({name=>$osf_name});
+                die "OSF not found" if ($rs->count() < 1);
+                $osf_id = $rs->single->id;
             }
-        }
-        $osf->delete_tag('head');
-        $osf->delete_tag($version);
-        my $rs = $self->get_resultset('di');
-        my $di = $rs->create({osf_id => $osf_id, path => '', version => $version});
-        $id = $di->id;
-        rs(DI_Tag)->create({di_id => $id, tag => $version, fixed => 1});
-        rs(DI_Tag)->create({di_id => $id, tag => 'head'});
-        rs(DI_Tag)->create({di_id => $id, tag => 'default'})
-            unless $osf->di_by_tag('default');
-        $new_file = "$id-$file";
-        $di->update({path => $new_file});
-        move($tmp, "$images_path/$new_file")
-            or die "Unable to move '$tmp' to its final destination at '$images_path/$new_file': $!";
-    };
-    if ($@) {
-        $saved_error = $@;
-        last if $saved_error !~ /concurrent update/;
-        $retry_count++;
-        undef $version;
-    } else {
-        undef $saved_error;
-        last;
+            my $osf = rs(OSF)->find($osf_id) or die "OSF not found";
+            my $v = $version;
+            unless (defined $v) {
+                my ($y, $m, $d) = (localtime)[5, 4, 3];
+                $m ++;
+                $y += 1900;
+                for (0..999) {
+                    $v = sprintf("%04d-%02d-%02d-%03d", $y, $m, $d, $_);
+                    last unless $osf->di_by_tag($v);
+                }
+            }
+            $osf->delete_tag('head');
+            $osf->delete_tag($v);
+            my $rs = $self->get_resultset('di');
+            my $di = $rs->create({osf_id => $osf_id, path => '', version => $v});
+            $id = $di->id;
+            rs(DI_Tag)->create({di_id => $id, tag => $v, fixed => 1});
+            rs(DI_Tag)->create({di_id => $id, tag => 'head'});
+            rs(DI_Tag)->create({di_id => $id, tag => 'default'})
+                unless $osf->di_by_tag('default');
+            $new_file = "$id-$file";
+            $di->update({path => $new_file});
+            move($tmp, "$images_path/$new_file")
+                or die "Unable to move '$tmp' to its final destination at '$images_path/$new_file': $!";
+
+            my $vms = rs(VM_Runtime)->search({ 'vm.osf_id' => $osf_id,
+                                               'vm.di_tag' => 'head',
+                                               'vm_state'  => { '!=' => 'stopped' } },
+                                             { join => 'vm' });
+            $self->_expire_vms($vms, \%params);
+        };
+
+        return $id unless $@;
+
+        $@ =~ /concurrent update/ or last;
     }
-    }
-    if ($saved_error) {
-        unlink $tmp;
-        unlink "$images_path/$new_file" if defined $new_file;
-        die $saved_error;
-    }
-    $id;
+    unlink $tmp;
+    unlink "$images_path/$new_file" if defined $new_file;
+    die;
 }
 
 sub cmd_di_tag {
@@ -481,6 +515,13 @@ sub cmd_di_tag {
             and die "There is a DI with the tag $tag fixed\n";
         rs(DI_Tag)->search({tag => $tag, di_id => \@ids})->delete_all;
         $id = rs(DI_Tag)->create({di_id => $di_id, tag => $tag});
+
+        my $rs = rs(VM_Runtime)->search( { 'vm.osf_id' => $osf_id,
+                                           'vm.di_tag' => $tag,
+                                           'vm_state' => { '!=' => 'stopped' },
+                                           'current_di_id' => { '!=' => $di_id } },
+                                         { join => 'vm' } );
+        $self->_expire_vms($rs, \%params);
     };
     $id;
 }
@@ -493,8 +534,16 @@ sub cmd_di_untag {
     txn_do {
         my $old = rs(DI_Tag)->search({tag => $tag, di_id => $di_id})->first;
         $old or die "DI $di_id is not tagged as $tag\n";
+        my $osf_id = $old->osf_id;
         $old->fixed and die "DI $di_id tag $tag is fixed\n";
         $old->delete;
+
+        my $rs = rs(VM_Runtime)->search( { 'vm.osf_id' => $osf_id,
+                                           'vm.di_tag' => $tag,
+                                           'vm_state' => { ne => 'stopped' },
+                                           'current_di_id' => $di_id },
+                                         { join => 'vm' } );
+        $self->_expire_vms($rs, \%params);
     };
     1
 }
@@ -716,31 +765,67 @@ sub cmd_vm_disconnect_user_by_id {
 sub cmd_vm_edit {
     my ($self, %args) = @_;
     my $counter = 0;
+
+    my (%expire, @clean_expire);
+    for (qw(soft hard)) {
+        if (defined(my $arg = delete $args{"expire-$_"})) {
+            if (length $arg) {
+                $expire{$_} = _parse_datetime($arg);
+            }
+            else {
+                push @clean_expire, $_;
+            }
+        }
+    }
+
     my $rs = $self->get_resultset('vm');
     my @vm_columns = $rs->result_source->columns;
     while (defined(my $vm = $rs->next)) {
         txn_eval {
-        $vm->discard_changes;
-        my (%vm_args, %vm_runtime_args);
-        foreach my $k (keys %args) {
-            if (grep { $_ eq $k } @vm_columns) {
-                $vm_args{$k} = $args{$k};
-            } else {
-                $vm_runtime_args{$k} = $args{$k};
+            $vm->discard_changes;
+            my (%vm_args, %vm_runtime_args);
+            foreach my $k (keys %args) {
+                if (grep { $_ eq $k } @vm_columns) {
+                    $vm_args{$k} = $args{$k};
+                } else {
+                    $vm_runtime_args{$k} = $args{$k};
+                }
             }
-        }
-        $vm->update (\%vm_args);
-        $vm->vm_runtime->update (\%vm_runtime_args);
-        $counter++;
+
+            $vm->update (\%vm_args);
+
+            my $vmrt = $vm->vm_runtime;
+            $vmrt->update (\%vm_runtime_args);
+
+            if (%expire) {
+                if ($vmrt->vm_state ne 'stopped') {
+                    my $di = $vm->di;
+                    if (not defined $di or $di->id != $vmrt->current_di_id) {
+                        $vmrt->update({ "vm_expiration_$_" => $expire{$_} })
+                            for keys %expire;
+                    }
+                    else {
+                        $vmrt->update({ "vm_expiration_$_" => undef })
+                            for keys %expire;
+                    }
+                }
+            }
+
+            $vmrt->update({"vm_expiration_$_" => undef})
+                for @clean_expire;
+
+            $counter++;
         };
-    # FIXME: report errors
+        warn $@ if $@;
+        # FIXME: report errors
     }
+
     $counter
 }
 
-#sub cmd_vm_propget {
+# sub cmd_vm_propget {
 #    shift->_obj_propget('vm', @_);
-#}
+# }
 
 sub cmd_vm_propset {
     shift->_obj_propset('vm', @_);

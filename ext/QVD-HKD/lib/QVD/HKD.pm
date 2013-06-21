@@ -37,6 +37,7 @@ use QVD::HKD::VMCommandHandler;
 use QVD::HKD::VMHandler;
 use QVD::HKD::L7RMonitor;
 use QVD::HKD::L7RKiller;
+use QVD::HKD::ExpirationMonitor;
 
 use QVD::HKD::Config::Network qw(netvms netnodes net_aton net_ntoa netstart_n network_n);
 
@@ -333,6 +334,8 @@ sub _start_agents {
 
     $self->{command_handler}    = QVD::HKD::CommandHandler->new(%opts,
                                                                 on_cmd => sub { $self->_on_cmd($_[1]) });
+    $self->{expiration_monitor} = QVD::HKD::ExpirationMonitor->new(%opts,
+                                                                  on_expired_vm => sub { $self->_on_expired_vm(@_[1..3])});
     $self->{l7r_monitor}        = QVD::HKD::L7RMonitor->new(%opts);
     $self->{l7r_killer}         = QVD::HKD::L7RKiller->new(%opts);
     $self->{cluster_monitor}    = QVD::HKD::ClusterMonitor->new(%opts);
@@ -341,6 +344,9 @@ sub _start_agents {
 
     DEBUG 'Starting command handler';
     $self->{command_handler}->run;
+
+    DEBUG 'Starting ExpirationMonitor';
+    $self->{expiration_monitor}->run;
 
     DEBUG 'Starting L7R Monitor';
     $self->{l7r_monitor}->run;
@@ -385,6 +391,7 @@ my @agent_names = qw(command_handler
                      ticker
                      l7r_monitor
                      l7r_killer
+                     expiration_monitor
                      cluster_monitor);
 
 sub _check_all_agents_have_stopped {
@@ -475,6 +482,20 @@ sub _on_vm_cmd {
         return;
     }
     $vm->on_cmd($cmd);
+}
+
+sub _on_expired_vm {
+    my ($self, $vm_id, $is_hard, $soft_expiration, $hard_expiration) = @_;
+    my $vm = $self->{vm}{$vm_id} or return;
+
+    if ($is_hard) {
+        INFO "VM $vm_id has expired (hard), stopping it";
+        $vm->on_cmd('stop');
+    }
+    else {
+        INFO "VM $vm_id has expired (soft), telling the user";
+        $vm->on_expired($soft_expiration, $hard_expiration);
+    }
 }
 
 sub _on_vm_stopped {

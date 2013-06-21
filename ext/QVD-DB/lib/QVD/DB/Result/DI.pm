@@ -6,6 +6,7 @@ __PACKAGE__->table('dis');
 __PACKAGE__->add_columns( id     => { data_type => 'integer',
                                       is_auto_increment => 1 },
                           osf_id => { data_type => 'integer' },
+
                           # Valor tomado de la variable PATH_MAX de
                           # /usr/src/linux-headers-2.6.28-15/include/linux/limits.h:
 

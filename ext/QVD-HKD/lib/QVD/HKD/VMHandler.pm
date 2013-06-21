@@ -173,7 +173,9 @@ sub _save_runtime_row {
                   map { defined $_ ? $_ : '<undef>' }
                   @{$self}{qw(vm_id vma_port x_port ssh_port vnc_port serial_port mon_port)});
 
-    $self->_query({ n => 1}, <<'SQL', @{$self}{qw(ip vma_port x_port ssh_port vnc_port serial_port mon_port vm_pid di_id vm_id)});
+    my @args = @{$self}{qw(ip vma_port x_port ssh_port vnc_port serial_port mon_port vm_pid
+                           di_id vm_id)};
+    $self->_query({ n => 1}, <<'SQL', @args);
 update vm_runtimes
     set
         vm_address     = $1,
@@ -369,11 +371,21 @@ update vm_runtimes
         vm_mon_port    = NULL,
         vm_address     = NULL,
         vm_cmd         = NULL,
+        vm_expiration_soft = NULL,
+        vm_expiration_hard = NULL,
         current_di_id  = NULL
     where
         vm_id   = $1  and
         host_id = $2
 SQL
+}
+
+sub _expire {
+    my ($self, $expiration_soft, $expiration_hard) = @_;
+    my @args;
+    push @args, 'vm.expiration.soft' => $expiration_soft if defined $expiration_soft;
+    push @args, 'vm.expiration.hard' => $expiration_hard if defined $expiration_hard;
+    $self->_rpc( { retry_count => 0, ignore_errors => 1 }, expire => @args );
 }
 
 sub _run_prestart_hook { shift->_run_hook('prestart') }

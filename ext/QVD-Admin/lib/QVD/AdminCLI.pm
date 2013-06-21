@@ -40,19 +40,19 @@ my %syntax_check_cbs = (
             $$errors++, warn "Syntax error: either parameter 'osf_id' or 'osf' is mandatory\n",  if !exists $args->{'osf_id'} and !exists $args->{'osf'};
             $$errors++, warn "Syntax error: parameters 'osf_id' and 'osf' are mutually exclusive\n",  if exists $args->{'osf_id'} and exists $args->{'osf'};
             $$errors++, warn "Syntax error: parameter 'path' is mandatory\n", unless exists $args->{'path'};
-            delete @$args{qw/osf_id osf path version/};
+            delete @$args{qw/osf_id osf path version expire-soft expire-hard/};
         },
         tag => sub {
             my ($errors, $args) = @_;
             $$errors++, warn "Syntax error: parameter 'di_id' is mandatory\n",  unless exists $args->{'di_id'};
             $$errors++, warn "Syntax error: parameter 'tag' is mandatory\n",  unless exists $args->{'tag'};
-            delete @$args{qw/di_id tag/};
+            delete @$args{qw/di_id tag expire-soft expire-hard/};
         },
         untag => sub {
             my ($errors, $args) = @_;
             $$errors++, warn "Syntax error: parameter 'di_id' is mandatory\n",  unless exists $args->{'di_id'};
             $$errors++, warn "Syntax error: parameter 'tag' is mandatory\n",  unless exists $args->{'tag'};
-            delete @$args{qw/di_id tag/};
+            delete @$args{qw/di_id tag expire-soft expire-hard/};
         },
     },
     user => {
@@ -874,12 +874,18 @@ sub cmd_di_add {
 sub help_di_add {
     print <<EOT
 di add: Adds disk images.
-usage: di add path=string osf_id=id [version=text]
+usage: di add path=string osf_id=id [version=text] [expire-soft=DATE] [expire-hard=DATE]
 
     The disk image file is copied to the read-only storage area.
 
 Valid options:
-    -q [--quiet]         : don't print the command message
+    -q [--quiet]            : don't print the command message
+
+    expire-soft=DATE : sets the soft expiration date for machines
+                       that should change to use the new DI
+    expire-hard=DATE : sets the hard expiration date for machines
+                       that should change to use the new DI
+
 EOT
 
 }
@@ -950,7 +956,14 @@ sub cmd_di_tag {
 sub help_di_tag {
     print <<EOT;
 di tag: tags a Disk Image (DI)
-usage: di tag di_id=id tag=symbol
+usage: di tag di_id=id tag=symbol [expire-soft=DATE] [expire-hard=DATE]
+
+Valid options:
+    expire-soft=DATE : sets the soft expiration date for machines
+                       that should change to use the new DI
+    expire-hard=DATE : sets the hard expiration date for machines
+                       that should change to use the new DI
+
 EOT
 }
 
@@ -966,7 +979,14 @@ sub cmd_di_untag {
 sub help_di_untag {
     print <<EOT;
 di untag: untags a Disk Image (DI)
-usage: di untag di_id=id tag=symbol
+usage: di untag di_id=id tag=symbol [expire-soft=DATE] [expire-hard=DATE]
+
+Valid options:
+    expire-soft=DATE : sets the soft expiration date for machines
+                       that were using this DI
+    expire-hard=DATE : sets the hard expiration date for machines
+                       that were using this DI
+
 EOT
 }
 
@@ -1441,7 +1461,8 @@ sub cmd_vm_list {
     
     my $rs = $self->get_resultset('vm');
     
-    my @header = ("Id","Name","User","Ip","OSF", "DI_Tag", "DI", "Host","State","UserState","Blocked");
+    my @header = ("Id","Name","User","Ip","OSF", "DI_Tag", "DI", "Host","State","UserState","Blocked",
+                  "Expire soft", "Expire hard");
     my @body;
         
     eval { 
@@ -1459,6 +1480,8 @@ sub cmd_vm_list {
                 $vmr->vm_state,
                 $vmr->user_state,
                 $vmr->blocked,
+                $vmr->vm_expiration_soft,
+                $vmr->vm_expiration_hard
             );
             push(@body, \@row);
         }

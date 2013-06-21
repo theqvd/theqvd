@@ -74,7 +74,8 @@ my %on_action =       ( pre_connect    => cfg('vma.on_action.pre-connect'),
 			connect        => cfg('vma.on_action.connect'),
 			stop           => cfg('vma.on_action.stop'),
 			suspend        => cfg('vma.on_action.suspend'),
-			poweroff       => cfg('vma.on_action.poweroff') );
+			poweroff       => cfg('vma.on_action.poweroff'),
+                        expire         => cfg('vma.on_action.expire') );
 
 my %on_state =        ( connected      => cfg('vma.on_state.connected'),
 			suspended      => cfg('vma.on_state.suspended'),
@@ -592,6 +593,12 @@ sub _poweroff {
     system(init => 0);
 }
 
+sub _expire {
+    _call_action_hook('expire', @_);
+}
+
+
+
 sub _vnc_connect {
     my ($httpd, $headers) = @_;
 
@@ -663,11 +670,17 @@ sub SimpleRPC_x_start {
     _start_session(@_);
 }
 
+sub SimpleRPC_expire {
+    INFO "VM DI has expired";
+    _expire(@_);
+}
+
 sub HTTP_vnc_connect {
     my ($self, $httpd, $headers) = @_;
     DEBUG "starting a VNC monitoring session";
     _vnc_connect($httpd, $headers);
 }
+
 
 1;
 

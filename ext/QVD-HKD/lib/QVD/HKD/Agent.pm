@@ -79,7 +79,8 @@ sub _maybe_callback {
                 require Devel::Peek;
                 Devel::Peek::CvGV($sub)
                 } // 'unknown';
-            $self->_debug("calling $cb as $sub ($name) with args @_");
+            $self->_debug("calling $cb as $sub ($name) with args (" .
+                          join(", ", map { $_ // '<undef>' }, @_) . ")");
         }
         return $sub->($self, @_);
     }

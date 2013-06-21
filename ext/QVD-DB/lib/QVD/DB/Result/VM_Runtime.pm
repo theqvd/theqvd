@@ -65,7 +65,12 @@ __PACKAGE__->add_columns( vm_id          => { data_type   => 'integer' },
 			  vm_serial_port => { data_type   => 'integer',
 					      is_nullable => 1 },
 			  blocked        => { data_type   => 'boolean',
-					      is_nullable => 1 } );
+					      is_nullable => 1 },
+                          vm_expiration_soft => { data_type   => 'timestamp',
+                                                  is_nullable => 1 },
+                          vm_expiration_hard => { data_type   => 'timestamp',
+                                                  is_nullable => 1 },
+                        );
 
 __PACKAGE__->set_primary_key('vm_id');
 
