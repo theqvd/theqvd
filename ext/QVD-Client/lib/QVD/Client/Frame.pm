@@ -24,6 +24,7 @@ my $DEFAULT_PORT = core_cfg('client.host.port');
 my $USE_SSL      = core_cfg('client.use_ssl');
 
 my $WINDOWS = ($^O eq 'MSWin32');
+my $DARWIN = ($^O eq 'darwin');
 
 ## adapted from the VB code at: 
 ## http://o-st.chat.ru/vb/keyboard/def_rask/def_rask.htm 
@@ -125,6 +126,34 @@ sub new {
 		$link_select = 1; 
 	}	
         $self->{link}->Select($link_select);
+    }
+
+    if ($DARWIN && !core_cfg('client.darwin.screen_resolution.verified')) {
+	my @min_res = split(/x/, core_cfg('client.darwin.screen_resolution.min'));
+	my $res_ok;
+
+	DEBUG "Verifying screen resolution on Darwin. Min resolution is " . join('x', @min_res);
+
+        foreach my $res ( get_osx_resolutions() ) {
+	    DEBUG "Found screen with " . join('x', @$res) . " resolution";
+
+	    if ( $res->[0] >= $min_res[0] && $res->[1] >= $min_res[1] ) {
+	        DEBUG "This resolution is good";
+	        $res_ok=1;
+		last;
+	    } else {
+                DEBUG "This resolution is too low";
+            }
+	}
+
+	if ( !$res_ok ) {
+		DEBUG "Only low resolution displays were found, defaulting to low res geometry";
+		set_core_cfg('client.geometry', core_cfg('client.darwin.screen_resolution.low_res_geometry'));
+	} else {
+		DEBUG "High resolution display found";
+	}
+
+	set_core_cfg('client.darwin.screen_resolution.verified', 1);
     }
 
     # port goes here!
@@ -568,6 +597,18 @@ sub _shared_clone {
     } else {
         return ${share $ref};
     }
+}
+
+sub get_osx_resolutions {
+    my @ret;
+
+    foreach my $line (`system_profiler SPDisplaysDataType`) {
+        if ( $line =~ /Resolution: (\d+) x (\d+)/ ) {
+            push @ret, [$1, $2];
+        }
+    }
+
+    return @ret;
 }
 
 1;

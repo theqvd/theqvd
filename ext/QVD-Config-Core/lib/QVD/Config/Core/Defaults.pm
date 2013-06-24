@@ -140,6 +140,19 @@ client.slave.client = bin/qvd-slaveclient
 ## enable making slave connections to VM
 client.slave.enable = 1
 
+## On OSX the window is hard to resize if it's too large, so
+## we check whether we should default to a lower window size
+
+## Only do the check on the first start, and don't mess
+## with it afterwards. Also saves startup time.
+client.darwin.screen_resolution.verified = 0
+## When the screen resolution is this or less, use the low geometry setting
+client.darwin.screen_resolution.min=1440x900
+## Geometry to use when the screen is low resolution
+client.darwin.screen_resolution.low_res_geometry=800x600
+
+
+
 ## umask for the L7R process
 l7r.user.umask = 0022
 ## whether L7R accepts SSL incoming connections or not
