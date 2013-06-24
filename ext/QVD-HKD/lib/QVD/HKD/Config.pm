@@ -95,6 +95,7 @@ sub _on_reload_result {
             my ($k, $v) = @$_;
             if (defined $k and length $k) {
                 $props->changeProperty($k, $v);
+                $v = '*****' if $k =~ /passw(?:or)?d/;
                 DEBUG "configuration set: $k=$v";
             }
         }

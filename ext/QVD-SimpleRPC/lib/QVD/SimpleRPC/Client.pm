@@ -50,26 +50,23 @@ sub _make_request {
     return undef unless $self->{httpc};
     my $method = shift;
     my @query;
+    my @unsafe_query; # use a simple heuristic to remove passwords from the logs
     while (@_) {
 	my $key = shift;
 	my $value = shift;
 	push @query, uri_escape($key).'='.uri_escape($value);
+        push @unsafe_query, ($key =~ /passw(?:or)d/ ? uri_escape($key) .'=*****' : $query[-1])
     }
     my $query = (@query ? '?'.join('&', @query) : '');
-
+    my $unsafe_query = (@unsafe_query ? '?'.join('&', @unsafe_query) : '');
     my $url = "$self->{base}$method$query";
-    DEBUG "SimpleRPC request: $url";
+    DEBUG "SimpleRPC request: $self->{base}$method$unsafe_query";
     my ($code, $msg, $headers, $body) =
 	$self->{httpc}->make_http_request(GET => $url);
     die "HTTP request failed: $code - $msg"
 	unless $code == HTTP_OK;
 
     my $data = $json->decode("[$body]");
-
-    # FIXME: remove this:
-    use Data::Dumper;
-    DEBUG "remote JSON response\n" . Dumper $data;
-
     die $data->[1] if @$data >= 2;
     $data->[0];
 }
