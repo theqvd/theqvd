@@ -1,0 +1,34 @@
+#!/usr/bin/perl
+
+use strict;
+use warnings;
+
+use Getopt::Long;
+use QVD::DB::Upgrade;
+
+my $version;
+my $downgrade;
+my $i_am_brave;
+
+GetOptions("to-version|t=s" => \$version,
+           "downgrade|d"    => \$downgrade,
+           "i-am-brave"     => \$i_am_brave);
+
+$i_am_brave or die <<EOM;
+Are you sure you want to upgrade the QVD database?
+
+This is a potentially dangerous operation that may cause your running
+systems to malfunction.
+
+To circunvent this safety measure, you have to use the --i-am-brave flag.
+
+EOM
+
+die "Target version argument is mandatory when downgrading\n"
+    if $downgrade and not defined $version;
+
+qvd_db_upgrade($version, $downgrade);
+
+__END__
+
+=head1
