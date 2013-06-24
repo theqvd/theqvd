@@ -31,4 +31,42 @@ qvd_db_upgrade($version, $downgrade);
 
 __END__
 
-=head1
+=head1 SYNOPSIS
+
+qvd-upgrade-db [--to-version=$version] [--downgrade] --i-am-brave
+
+=head1 DESCRIPTION
+
+When the QVD software is upgraded to a newer version it may be
+necesarry to perform some changes on the database schema in order to
+support new features.
+
+This program performs such changes automatically.
+
+=head1 COMMON OPTIONS
+
+=over
+
+=item --to-version
+
+Target version, defaults to the latest one.
+
+=item --downgrade
+
+In case you want to downgrade to a previous version.
+
+=item --i-am-brave
+
+This magic flag is always required. Just to ensure you really want to
+upgrade/downgrade the database schema.
+
+=back
+
+=head1 COPYRIGHT
+
+Copyright 2009-2013 by Qindel Formacion y Servicios S.L.
+
+This program is free software; you can redistribute it and/or modify it
+under the terms of the GNU GPL version 3 as published by the Free
+Software Foundation.
+
