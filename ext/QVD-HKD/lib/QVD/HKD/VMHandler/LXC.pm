@@ -21,7 +21,8 @@ use parent qw(QVD::HKD::VMHandler);
 
 use Class::StateMachine::Declarative
     __any__   => { ignore => [qw(_on_cmd_start on_expired)],
-                   delay => [qw(on_hkd_kill)],
+                   delay => [qw(on_hkd_kill
+                                _on_cmd_stop)],
                    on => { on_hkd_stop => 'on_hkd_kill' },
                    transitions => { _on_dirty => 'dirty' } },
 
@@ -50,7 +51,8 @@ use Class::StateMachine::Declarative
                                                                       unmounting_filesystems => { enter => '_unmount_filesystems' } ] },
 
                                   heavy           => { enter => '_heavy_down',
-                                                       transitions => { on_hkd_kill => 'stopping/db' } },
+                                                       transitions => { _on_error    => 'stopping/db',
+                                                                        _on_cmd_stop => 'stopping/db' } },
 
                                   setup           => { transitions => { _on_error   => 'stopping/cleanup' },
                                                        substates => [ untaring_os_image       => { enter => '_untar_os_image',
