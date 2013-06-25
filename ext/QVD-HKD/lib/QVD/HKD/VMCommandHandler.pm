@@ -26,7 +26,8 @@ use Class::StateMachine::Declarative
                                       _on_cmd_not_found => 'idle' } },
 
     locking_cmd => { enter => '_lock_cmd',
-                     before => { _on_done => '_send_cmd' } },
+                     before => { _on_done => '_send_cmd' },
+                     transitions => { _on_done => 'loading_cmd' } },
 
     idle        => { enter       => '_set_timer',
                      transitions => { _on_timeout               => 'loading_cmd',
@@ -59,7 +60,9 @@ sub _lock_cmd {
     my $self = shift;
     $debug and $self->_debug("locking command, vm_id: $self->{vm_id}, vm_cmd: $self->{vm_cmd}");
     DEBUG "Locking command, vm_id: '$self->{vm_id}', vm_cmd: '$self->{vm_cmd}'";
-    $self->_query({n => 1},
+    $self->_query ( {n => 1,
+                     log_error => 'unable to lock VM command',
+                     ignore_errors => 1 },
                   q(update vm_runtimes set vm_cmd='busy' where vm_id=$1 and vm_cmd=$2),
                   $self->{vm_id}, $self->{vm_cmd});
 }
