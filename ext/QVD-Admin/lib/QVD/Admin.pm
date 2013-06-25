@@ -340,7 +340,6 @@ sub cmd_host_block {
         $counter = 0;
         my $rs = $self->get_resultset('host');
         while (defined(my $host = $rs->next)) {
-            $host->discard_changes;
             $host->runtime->block;
             $counter++;
         }
@@ -378,7 +377,6 @@ sub cmd_host_unblock {
         $counter = 0;
         my $rs = $self->get_resultset('host');
         while (defined(my $host = $rs->next)) {
-            $host->discard_changes;
             $host->runtime->unblock;
             $counter++;
         }
@@ -705,7 +703,6 @@ sub cmd_vm_block {
         $counter = 0;
         my $rs = $self->get_resultset('vm');
         while (defined(my $vm = $rs->next)) {
-            $vm->discard_changes;
             $vm->vm_runtime->block;
             $counter++;
         }
@@ -743,7 +740,6 @@ sub cmd_vm_disconnect_user {
         $counter = 0;
         my $rs = $self->get_resultset('vm');
         while (defined(my $vm = $rs->next)) {
-            $vm->discard_changes;
             $self->_disconnect_user($vm->vm_runtime);
             $counter++;
         }
@@ -786,7 +782,6 @@ sub cmd_vm_edit {
         my $rs = $self->get_resultset('vm');
         my @vm_columns = $rs->result_source->columns;
         while (defined(my $vm = $rs->next)) {
-            $vm->discard_changes;
             my (%vm_args, %vm_runtime_args);
             foreach my $k (keys %args) {
                 if (grep { $_ eq $k } @vm_columns) {
@@ -840,7 +835,6 @@ sub cmd_vm_start {
         $counter = 0;
         my $rs = $self->get_resultset('vm');
         while (defined(my $vm = $rs->next)) {
-            $vm->discard_changes;
             $self->_start_vm($vm->vm_runtime);
             $counter++;
         }
@@ -870,7 +864,6 @@ sub cmd_vm_stop {
         $counter = 0;
         my $rs = $self->get_resultset('vm');
         while (defined(my $vm = $rs->next)) {
-            $vm->discard_changes;
             $self->_stop_vm($vm->vm_runtime);
             $counter++;
         }
@@ -896,7 +889,6 @@ sub cmd_vm_unblock {
         $counter = 0;
         my $rs = $self->get_resultset('vm');
         while (defined(my $vm = $rs->next)) {
-            $vm->discard_changes;
             $vm->vm_runtime->unblock;
             $counter++;
         }
