@@ -16,10 +16,10 @@ __PACKAGE__->add_columns( id          => { data_type => 'integer',
 
 __PACKAGE__->set_primary_key('id');
 __PACKAGE__->add_unique_constraint(['name']);
-__PACKAGE__->has_many(vms => 'QVD::DB::Result::VM', 'osf_id');
+__PACKAGE__->has_many(vms => 'QVD::DB::Result::VM', 'osf_id', { cascade_delete => 0 } );
 __PACKAGE__->has_many(properties => 'QVD::DB::Result::OSF_Property',
                       'osf_id', { join_type => 'INNER' });
-__PACKAGE__->has_many(dis => 'QVD::DB::Result::DI', 'osf_id');
+__PACKAGE__->has_many(dis => 'QVD::DB::Result::DI', 'osf_id', { cascade_delete => 0 } );
 
 sub _dis_by_tag {
     my ($osf, $tag, $fixed) = @_;

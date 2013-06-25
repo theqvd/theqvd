@@ -24,7 +24,7 @@ __PACKAGE__->add_columns( host_id    => { data_type   => 'integer' },
 				          extra       => { list => [qw(stop)] } } );
 
 __PACKAGE__->set_primary_key('host_id');
-__PACKAGE__->belongs_to('host'      => 'QVD::DB::Result::Host',       'host_id');
+__PACKAGE__->belongs_to('host'      => 'QVD::DB::Result::Host',       'host_id', { cascade_delete => 0 } );
 __PACKAGE__->belongs_to('rel_state' => 'QVD::DB::Result::Host_State', 'state'  );
 __PACKAGE__->belongs_to('rel_cmd'   => 'QVD::DB::Result::Host_Cmd',   'cmd'    );
 

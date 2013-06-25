@@ -15,11 +15,11 @@ __PACKAGE__->add_columns( id     => { data_type => 'integer',
                           version => { data_type => 'varchar(64)' } );
 
 __PACKAGE__->set_primary_key('id');
-__PACKAGE__->belongs_to(osf => 'QVD::DB::Result::OSF', 'osf_id');
+__PACKAGE__->belongs_to(osf => 'QVD::DB::Result::OSF', 'osf_id', { cascade_delete => 0 } );
 __PACKAGE__->has_many(properties => 'QVD::DB::Result::DI_Property',
                       'di_id', { join_type => 'INNER' });
 
-__PACKAGE__->has_many(vm_runtimes => 'QVD::DB::Result::VM_Runtime', 'current_di_id');
+__PACKAGE__->has_many(vm_runtimes => 'QVD::DB::Result::VM_Runtime', 'current_di_id', { cascade_delete => 0 });
 __PACKAGE__->has_many(tags => 'QVD::DB::Result::DI_Tag', 'di_id');
 
 __PACKAGE__->add_unique_constraint(['osf_id', 'version']);
