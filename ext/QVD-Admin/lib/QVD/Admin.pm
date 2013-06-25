@@ -179,20 +179,26 @@ sub _obj_propset {
     $ci;
 }
 
-sub _start_vm {
+my $lb;
+sub _assign_host {
     my ($self, $vmrt) = @_;
-    $vmrt->vm_state eq 'stopped'
-        or die "Unable to start machine, already running";
     if (!defined $vmrt->host_id) {
-        require QVD::L7R::LoadBalancer;
-        my $lb = QVD::L7R::LoadBalancer->new();
-        my $free_host = $lb->get_free_host($vmrt->vm);
-        if (!defined $free_host) {
+        $lb //= do {
+            require QVD::L7R::LoadBalancer;
+            QVD::L7R::LoadBalancer->new();
+        };
+        my $free_host = $lb->get_free_host($vmrt->vm) //
             die "Unable to start machine, no hosts available";
-        }
+
         $vmrt->set_host_id($free_host);
     }
+}
+
+sub _start_vm {
+    my ($self, $vmrt) = @_;
     txn_do {
+        $vmrt->discard_changes;
+        $self->_assign_host($vmrt);
         $vmrt->send_vm_start;
         my $host_id = $vmrt->host_id;
         notify("qvd_cmd_for_vm_on_host$host_id");
@@ -830,22 +836,26 @@ sub cmd_vm_propset {
 
 sub cmd_vm_start {
     my ($self, @args) = @_;
-    my $counter;
-    txn_eval {
-        $counter = 0;
-        my $rs = $self->get_resultset('vm');
-        while (defined(my $vm = $rs->next)) {
-            my $vmrt = $vm->vm_runtime;
-            next unless $vmrt->can_send_vm_cmd('start');
-            $self->_start_vm($vmrt);
-            $counter++;
+    my $counter = 0;
+    my %host;
+    my $rs = $self->get_resultset('vm');
+    while (defined(my $vm = $rs->next)) {
+        for (1..5) {
+            $counter++ if txn_eval {
+                my $vmrt = $vm->vm_runtime;
+                $vmrt->can_send_vm_cmd('start') or return;
+                $self->_assign_host($vmrt);
+                $vmrt->send_vm_start;
+                $self->_start_vm($vmrt);
+                $host{$vmrt->host_id}++;
+                1;
+            };
+            $@ or last;
         }
-        # TODO Log error messages ($@) in some way
-    };
-    if ($@) {
-        ERROR $@;
-        return 0;
+        $@ and ERROR $@;
     }
+
+    notify("qvd_cmd_for_vm_on_host$_") for keys %host;
     $counter;
 }
 
@@ -861,19 +871,35 @@ sub cmd_vm_start_by_id {
 
 sub cmd_vm_stop {
     my ($self, @args) = @_;
-    my $counter;
-    txn_eval {
-        $counter = 0;
-        my $rs = $self->get_resultset('vm');
-        while (defined(my $vm = $rs->next)) {
-            my $vmrt = $vm->vm_runtime;
-            next unless $vmrt->can_send_vm_cmd('stop');
-            $self->_stop_vm($vmrt);
-            $counter++;
+    my $counter = 0;
+    my %host;
+    my $rs = $self->get_resultset('vm');
+    while (defined(my $vm = $rs->next)) {
+        for (1..5) {
+            $counter++ if txn_eval {
+                my $vmrt = $vm->vm_runtime;
+                if ($vmrt->can_send_vm_cmd('stop')) {
+                    $vmrt->send_vm_stop;
+                    $host{$vmrt->host_id}++;
+                    return 1;
+                }
+                else {
+                    no warnings 'uninitialized';
+                    if ($vmrt->vm_state eq 'stopped' and
+                        $vmrt->vm_cmd eq 'start') {
+                        $vmrt->update({ vm_cmd => undef });
+                        return 1;
+                    }
+                }
+                0
+            };
+            $@ or last;
         }
-        # TODO Log error messages ($@) in some way
-    };
-    ($@ ? 0 : $counter);
+        $@ and ERROR $@;
+    }
+
+    notify("qvd_cmd_for_vm_on_host$_") for keys %host;
+    $counter;
 }
 
 sub cmd_vm_stop_by_id {
