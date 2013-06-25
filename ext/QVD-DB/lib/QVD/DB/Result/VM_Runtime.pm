@@ -112,6 +112,11 @@ my %valid_vm_cmd = ( start => { stopped    => 1 },
 				running    => 1,
                                 debugging  => 1 } );
 
+sub can_send_vm_cmd {
+    my ($vm, $cmd) = @_;
+    $valid_vm_cmd{$cmd}{$vm->vm_state};
+}
+
 sub send_vm_cmd {
     my ($vm, $cmd) = @_;
     my $id = $vm->vm_id;

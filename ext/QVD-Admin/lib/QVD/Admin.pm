@@ -835,7 +835,9 @@ sub cmd_vm_start {
         $counter = 0;
         my $rs = $self->get_resultset('vm');
         while (defined(my $vm = $rs->next)) {
-            $self->_start_vm($vm->vm_runtime);
+            my $vmrt = $vm->vm_runtime;
+            next unless $vmrt->can_send_vm_cmd('start');
+            $self->_start_vm($vmrt);
             $counter++;
         }
         # TODO Log error messages ($@) in some way
@@ -864,7 +866,9 @@ sub cmd_vm_stop {
         $counter = 0;
         my $rs = $self->get_resultset('vm');
         while (defined(my $vm = $rs->next)) {
-            $self->_stop_vm($vm->vm_runtime);
+            my $vmrt = $vm->vm_runtime;
+            next unless $vmrt->can_send_vm_cmd('stop');
+            $self->_stop_vm($vmrt);
             $counter++;
         }
         # TODO Log error messages ($@) in some way
