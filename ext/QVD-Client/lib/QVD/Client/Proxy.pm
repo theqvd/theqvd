@@ -47,12 +47,22 @@ sub _ssl_verify_callback {
     return 1 if $ssl_thinks;
 
     DEBUG("_ssl_verify_callback called: " . join(' ', @_));
+  
 
     my $cert_pem_str = Net::SSLeay::PEM_get_string_X509 (Net::SSLeay::X509_STORE_CTX_get_current_cert ($mem_addr));
     my $x509 = Crypt::OpenSSL::X509->new_from_string ($cert_pem_str);
+    my $err_no    = Net::SSLeay::X509_STORE_CTX_get_error($mem_addr);
+    my $err_depth = Net::SSLeay::X509_STORE_CTX_get_error_depth($mem_addr);
+    my $err_str   = Net::SSLeay::X509_verify_cert_error_string($err_no);
 
     my $cert_hash = $x509->hash;
+
+    DEBUG("Verification error at depth $err_depth: $err_str when checking " . $x509->subject); 
+
     my $cert_temp = <<'EOF';
+Verification error at depth %i:
+%s
+
 Serial: %s
 
 Issuer: %s
@@ -65,6 +75,8 @@ Subject: %s
 EOF
 
     my $cert_data = sprintf($cert_temp,
+                            $err_depth,
+                            $err_str,
                             (join ':', $x509->serial =~ /../g),
                             $x509->issuer,
                             $x509->notBefore,
