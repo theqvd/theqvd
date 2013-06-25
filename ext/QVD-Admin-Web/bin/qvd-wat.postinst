@@ -18,7 +18,7 @@ case "$1" in
 	fi
 	if [ -x /usr/sbin/apache2 ] 
 	then 
-		service apache2 reload
+		service apache2 restart
 	fi
 	if [ -d /var/lib/qvd/storage/images ]
 	then 
