@@ -201,11 +201,9 @@ sub _start_vm {
 
 sub _stop_vm {
     my ($self, $vmrt) = @_;
-    txn_do {
-        $vmrt->send_vm_stop;
-        my $host_id = $vmrt->host_id;
-        notify("qvd_cmd_for_vm_on_host$host_id");
-    };
+    $vmrt->send_vm_stop;
+    my $host_id = $vmrt->host_id;
+    notify("qvd_cmd_for_vm_on_host$host_id");
 }
 
 sub _disconnect_user {
@@ -336,17 +334,19 @@ sub cmd_host_add {
 
 sub cmd_host_block {
     my ($self, @args) = @_;
-    my $counter = 0;
-    my $rs = $self->get_resultset('host');
-    while (defined(my $host = $rs->next)) {
-        txn_eval {
+
+    my $counter;
+    txn_eval {
+        $counter = 0;
+        my $rs = $self->get_resultset('host');
+        while (defined(my $host = $rs->next)) {
             $host->discard_changes;
             $host->runtime->block;
             $counter++;
-        };
+        }
         # FIXME: report errors
-    }
-    $counter
+    };
+    ($@ ? 0 : $counter);
 }
 
 sub cmd_host_block_by_id {
@@ -373,17 +373,18 @@ sub cmd_host_propset {
 
 sub cmd_host_unblock {
     my ($self, @args) = @_;
-    my $counter = 0;
-    my $rs = $self->get_resultset('host');
-    while (defined(my $host = $rs->next)) {
-        txn_eval {
+    my $counter;
+    txn_eval {
+        $counter = 0;
+        my $rs = $self->get_resultset('host');
+        while (defined(my $host = $rs->next)) {
             $host->discard_changes;
             $host->runtime->unblock;
             $counter++;
-        };
-    # FIXME: report errors
-    }
-    $counter
+        }
+        # FIXME: report errors
+    };
+    ($@ ? 0 : $counter)
 }
 
 sub cmd_host_unblock_by_id {
@@ -699,17 +700,18 @@ sub cmd_vm_add {
 
 sub cmd_vm_block {
     my ($self, @args) = @_;
-    my $counter = 0;
-    my $rs = $self->get_resultset('vm');
-    while (defined(my $vm = $rs->next)) {
-        txn_eval {
+    my $counter;
+    txn_eval {
+        $counter = 0;
+        my $rs = $self->get_resultset('vm');
+        while (defined(my $vm = $rs->next)) {
             $vm->discard_changes;
             $vm->vm_runtime->block;
             $counter++;
-        };
+        }
         # FIXME: report errors
-    }
-    $counter
+    };
+    ($@ ? 0 : $counter)
 }
 
 sub cmd_vm_block_by_id {
@@ -736,17 +738,18 @@ sub cmd_vm_del {
 
 sub cmd_vm_disconnect_user {
     my ($self, @args) = @_;
-    my $counter = 0;
-    my $rs = $self->get_resultset('vm');
-    while (defined(my $vm = $rs->next)) {
-        txn_eval {
+    my $counter;
+    txn_eval {
+        $counter = 0;
+        my $rs = $self->get_resultset('vm');
+        while (defined(my $vm = $rs->next)) {
             $vm->discard_changes;
             $self->_disconnect_user($vm->vm_runtime);
             $counter++;
-        };
+        }
         # FIXME: report errors
-    }
-    $counter
+    };
+    ($@ ? 0 : $counter)
 }
 
 sub cmd_vm_disconnect_user_by_id {
@@ -764,7 +767,7 @@ sub cmd_vm_disconnect_user_by_id {
 
 sub cmd_vm_edit {
     my ($self, %args) = @_;
-    my $counter = 0;
+    my $counter;
 
     my (%expire, @clean_expire);
     for (qw(soft hard)) {
@@ -778,10 +781,11 @@ sub cmd_vm_edit {
         }
     }
 
-    my $rs = $self->get_resultset('vm');
-    my @vm_columns = $rs->result_source->columns;
-    while (defined(my $vm = $rs->next)) {
-        txn_eval {
+    txn_eval {
+        $counter = 0;
+        my $rs = $self->get_resultset('vm');
+        my @vm_columns = $rs->result_source->columns;
+        while (defined(my $vm = $rs->next)) {
             $vm->discard_changes;
             my (%vm_args, %vm_runtime_args);
             foreach my $k (keys %args) {
@@ -791,7 +795,6 @@ sub cmd_vm_edit {
                     $vm_runtime_args{$k} = $args{$k};
                 }
             }
-
             $vm->update (\%vm_args);
 
             my $vmrt = $vm->vm_runtime;
@@ -815,12 +818,11 @@ sub cmd_vm_edit {
                 for @clean_expire;
 
             $counter++;
-        };
-        warn $@ if $@;
+        }
         # FIXME: report errors
-    }
+    };
 
-    $counter
+    ($@ ? 0 : $counter);
 }
 
 # sub cmd_vm_propget {
@@ -833,17 +835,22 @@ sub cmd_vm_propset {
 
 sub cmd_vm_start {
     my ($self, @args) = @_;
-    my $counter = 0;
-    my $rs = $self->get_resultset('vm');
-    while (defined(my $vm = $rs->next)) {
-        txn_eval {
+    my $counter;
+    txn_eval {
+        $counter = 0;
+        my $rs = $self->get_resultset('vm');
+        while (defined(my $vm = $rs->next)) {
             $vm->discard_changes;
             $self->_start_vm($vm->vm_runtime);
             $counter++;
-        };
+        }
         # TODO Log error messages ($@) in some way
+    };
+    if ($@) {
+        ERROR $@;
+        return 0;
     }
-    $counter
+    $counter;
 }
 
 sub cmd_vm_start_by_id {
@@ -858,17 +865,18 @@ sub cmd_vm_start_by_id {
 
 sub cmd_vm_stop {
     my ($self, @args) = @_;
-    my $counter = 0;
-    my $rs = $self->get_resultset('vm');
-    while (defined(my $vm = $rs->next)) {
-        txn_eval {
+    my $counter;
+    txn_eval {
+        $counter = 0;
+        my $rs = $self->get_resultset('vm');
+        while (defined(my $vm = $rs->next)) {
             $vm->discard_changes;
             $self->_stop_vm($vm->vm_runtime);
             $counter++;
-        };
+        }
         # TODO Log error messages ($@) in some way
-    }
-    $counter
+    };
+    ($@ ? 0 : $counter);
 }
 
 sub cmd_vm_stop_by_id {
@@ -883,17 +891,18 @@ sub cmd_vm_stop_by_id {
 
 sub cmd_vm_unblock {
     my ($self, @args) = @_;
-    my $counter = 0;
-    my $rs = $self->get_resultset('vm');
-    while (defined(my $vm = $rs->next)) {
-        txn_eval {
+    my $counter;
+    txn_eval {
+        $counter = 0;
+        my $rs = $self->get_resultset('vm');
+        while (defined(my $vm = $rs->next)) {
             $vm->discard_changes;
             $vm->vm_runtime->unblock;
             $counter++;
-        };
-    # FIXME: report errors
-    }
-    $counter
+        }
+        # FIXME: report errors
+    };
+    ($@ ? 0 : $counter);
 }
 
 sub cmd_vm_unblock_by_id {
