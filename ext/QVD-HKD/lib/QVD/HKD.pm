@@ -59,6 +59,7 @@ use Class::StateMachine::Declarative
                                                                   _on_cmd_stop => 'exit' },
                                                  substates => [ acquiring_lock => { enter => '_acquire_lock' },
                                                                 connecting_to_db      => { enter => '_start_db' },
+                                                                checking_db_version   => { enter => '_check_db_version' },
                                                                 loading_db_config     => { enter => '_start_config',
                                                                                            on => { _on_config_reload_done => '_on_done' } },
                                                                 loading_host_row      => { enter => '_load_host_row' },
@@ -226,6 +227,19 @@ sub _start_db {
                                     );
     $self->_db($db);
     $self->_on_done;
+}
+
+sub _check_db_version {
+    my $self = shift;
+    my $schema_version = '3.3.0';
+    $self->_query( { n => 1,
+                     log_error => "Bad database schema. Upgrade it to version $schema_version" },
+                   <<'EOQ', $schema_version);
+select version
+    from versions
+    where component='schema'
+      and version=$1
+EOQ
 }
 
 sub _sync_db_config {

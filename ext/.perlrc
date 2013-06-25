@@ -2,13 +2,17 @@
 
 use strict;
 use warnings;
-use File::Tee qw(tee);
+#use File::Tee qw(tee);
 
 use lib::glob '*/lib:../g/p5*/lib';
 
 my $name = $0;
 $name =~ s/.*\///;
-unless ($ENV{NO_AUTO_TEE}) {
-	tee(*STDOUT, '>', "/tmp/$name.out");
+#unless ($ENV{NO_AUTO_TEE}) {
+#	tee(*STDOUT, '>', "/tmp/$name.out");
+#	open STDERR, '>&STDOUT';
+#}
+if ($name eq 'hkd') {
+	open STDOUT, '>', "/var/lib/qvd/tmp/hkd.out";
 	open STDERR, '>&STDOUT';
 }
