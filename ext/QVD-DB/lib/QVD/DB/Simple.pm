@@ -27,8 +27,16 @@ sub txn_do (&) {
 
 sub txn_eval (&) {
     $db //= QVD::DB->new();
-    eval { $db->txn_do(@_) };
-    DEBUG "txn_eval failed: $@" if $@;
+    if (wantarray) {
+        my @r = eval { $db->txn_do(@_) };
+        DEBUG "txn_eval failed: $@" if $@;
+        return @r;
+    }
+    else {
+        my $r = eval { $db->txn_do(@_) };
+        DEBUG "txn_eval failed: $@" if $@;
+        return $r;
+    }
 }
 
 sub rs (*) {
