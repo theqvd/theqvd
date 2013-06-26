@@ -27,7 +27,7 @@ use Class::StateMachine::Declarative
                    transitions => { _on_dirty => 'dirty' } },
 
     new       => { transitions => { _on_cmd_start        => 'starting',
-                                    _on_cmd_stop         => 'stopping/db'
+                                    _on_cmd_stop         => 'stopping/db',
                                     _on_cmd_catch_zombie => 'zombie' } },
 
     starting  => { advance => '_on_done',
