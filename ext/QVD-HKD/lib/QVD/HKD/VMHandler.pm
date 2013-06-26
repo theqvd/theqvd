@@ -73,17 +73,6 @@ sub on_cmd {
     }
 }
 
-sub _delete_cmd_busy {
-    my $self = shift;
-    my $vm_id = $self->{vm_id};
-    DEBUG "Deleting pseudo command 'busy'";
-    $self->_query({n => 1,
-                   ignore_errors => 1,
-                   log_error => "Unable to delete pseudo command 'busy' for vm $vm_id in table vm_runtimes" },
-                  q(update vm_runtimes set vm_cmd = NULL where vm_id = $1 and host_id = $2 and vm_cmd='busy'),
-                  $vm_id, $self->{node_id});
-}
-
 sub _save_state {
     my $self = shift;
     my $state = $self->_main_state;

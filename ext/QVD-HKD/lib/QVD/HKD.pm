@@ -488,6 +488,16 @@ sub _on_vm_cmd {
             $debug and $self->_debug("creating VM handler agent");
             DEBUG 'Creating VM handler agent';
             $vm = $self->_new_vm_handler($vm_id);
+
+            if ($self->state !~ /^running\b/) {
+                # there is a race condition between this HKD setting
+                # its state to stopping and other programs sending it a
+                # start command for some virtual machine. At this
+                # point the VMCommandHandler has already marked the VM
+                # as starting so we can not just ignore the
+                # command. Instead we make it into a "stop" command.
+                $cmd = 'stop';
+            }
         }
     }
     unless (defined $vm) {

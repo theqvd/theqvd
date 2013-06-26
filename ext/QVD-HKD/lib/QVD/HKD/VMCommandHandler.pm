@@ -21,17 +21,15 @@ use Class::StateMachine::Declarative
 
     new         => { transitions => { _on_run => 'idle' } },
 
-    loading_cmd => { enter => '_load_cmd',
-                     transitions => { _on_cmd_loaded    => 'locking_cmd',
-                                      _on_cmd_not_found => 'idle' } },
-
-    locking_cmd => { enter => '_lock_cmd',
-                     before => { _on_done => '_send_cmd' },
-                     transitions => { _on_done => 'loading_cmd' } },
+    loading => { delay => [qw(on_hkd_stop)],
+                 substates => [ stops  => { enter => '_load_stop_cmds',
+                                            before => { _on_done => '_send_stop_cmds' } },
+                                starts => { enter => '_load_start_cmds',
+                                            before => { _on_done => '_send_start_cmds' } } ] },
 
     idle        => { enter       => '_set_timer',
-                     transitions => { _on_timeout               => 'loading_cmd',
-                                      _on_qvd_cmd_for_vm_notify => 'loading_cmd' } },
+                     transitions => { _on_timeout               => 'loading',
+                                      _on_qvd_cmd_for_vm_notify => 'loading' } },
 
     stopped     => { enter       => '_on_stopped' };
 
@@ -45,31 +43,47 @@ sub new {
     $self;
 }
 
-sub _load_cmd {
+sub _load_stop_cmds {
     my $self = shift;
-    $self->{vm_id} = undef;
-    $self->{vm_cmd} = undef;
-    $debug and $self->_debug("loading command for virtual machines running in host $self->{node_id}");
-    DEBUG "Loading commands for virtual machines running in host '$self->{node_id}'";
-    $self->_query( { save_to_self => 1 },
-                  q(select vm_id, vm_cmd from vm_runtimes where host_id = $1 and vm_cmd is not null and vm_cmd != 'busy' limit 1),
-                  $self->{node_id});
+    $self->_query( { save_to => 'vms_to_be_stopped' },
+                   <<'EOQ', $self->{node_id});
+update vm_runtimes
+    set vm_cmd=NULL
+    where host_id=$1 and
+          vm_cmd='stop'
+    returning vm_id
+EOQ
 }
 
-sub _lock_cmd {
+sub _load_start_cmds {
     my $self = shift;
-    $debug and $self->_debug("locking command, vm_id: $self->{vm_id}, vm_cmd: $self->{vm_cmd}");
-    DEBUG "Locking command, vm_id: '$self->{vm_id}', vm_cmd: '$self->{vm_cmd}'";
-    $self->_query ( {n => 1,
-                     log_error => 'unable to lock VM command',
-                     ignore_errors => 1 },
-                  q(update vm_runtimes set vm_cmd='busy' where vm_id=$1 and vm_cmd=$2),
-                  $self->{vm_id}, $self->{vm_cmd});
+    $self->_query( { save_to => 'vms_to_be_started' },
+                   <<'EOQ', $self->{node_id});
+update vm_runtimes
+    set vm_cmd=NULL,
+        vm_state='starting'
+    where host_id=$1 and
+          vm_cmd='start' and
+          vm_state='stopped'
+    returning vm_id
+EOQ
 }
 
-sub _send_cmd {
-    my ($self, $res) = @_;
-    $self->_maybe_callback(on_cmd => $self->{vm_id}, $self->{vm_cmd});
+sub _send_cmds {
+    my ($self, $rows, $cmd) = @_;
+    if (defined $rows) {
+        $self->_maybe_callback(on_cmd => $_->{vm_id}, $cmd) for @$rows;
+    }
+}
+
+sub _send_stop_cmds {
+    my $self = shift;
+    $self->_send_cmds(delete($self->{vms_to_be_stopped}), 'stop');
+}
+
+sub _send_start_cmds {
+    my $self = shift;
+    $self->_send_cmds(delete($self->{vms_to_be_started}), 'start');
 }
 
 sub _set_timer {
