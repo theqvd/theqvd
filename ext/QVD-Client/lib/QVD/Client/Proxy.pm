@@ -83,7 +83,7 @@ EOF
                             $x509->notAfter,
                             $x509->subject);
 
-    my $accept = $self->{client_delegate}->proxy_unknown_cert([$cert_pem_str, $cert_data]);
+    my $accept = $self->{client_delegate}->proxy_unknown_cert([$cert_pem_str, $cert_data, $err_no]);
     DEBUG("Certificate " . $accept ? "accepted" : "rejected");
 
     return unless $accept;

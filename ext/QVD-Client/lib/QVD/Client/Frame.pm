@@ -392,14 +392,34 @@ sub OnConnectionStatusChanged {
 sub OnUnknownCert {
     my ($self, $event) = @_;
     my $evt_data = $event->GetData();
-    my ($cert_pem_str, $cert_data) = @$evt_data;
+    my ($cert_pem_str, $cert_data, $cert_errno) = @$evt_data;
+    my $err_desc;
 
     my $dialog = Wx::Dialog->new($self, undef, 'Invalid certificate');
     my $vsizer = Wx::BoxSizer->new(wxVERTICAL);
+    my $no_ok_button;
+
+    # Net::SSLeay doesn't seem to have error constants. Values taken from:
+    # http://www.openssl.org/docs/apps/verify.html#
+    
+    if ( $cert_errno == 2 || $cert_errno == 20 || $cert_errno == 21 || $cert_errno == 27 ) {
+        $err_desc = "Unrecognized Certificate Authority. See the documentation for instructions on how to use your own CA.\n"; 
+    } elsif ( $cert_errno == 9 ) {
+        $err_desc = "The ertificate is not yet valid. Make sure your clock is set correctly.\n"; 
+    } elsif ( $cert_errno == 10 ) {
+        $err_desc = "The certificate has expired.\n"; 
+    } elsif ( $cert_errno == 23 ) {
+        $err_desc = "The certificate has been revoked.\n";
+        $no_ok_button = 1;
+    } else {
+        $err_desc = "Unrecognized SSL error #$cert_errno. See the certificate information below for details.\n";
+    }
+
+    $vsizer->Add(Wx::StaticText->new($dialog, -1, $err_desc), 0, wxALL, 5);
 
     $vsizer->Add(Wx::StaticText->new($dialog, -1, 'Certificate information:'), 0, wxALL, 5); 
-    my $tc = Wx::TextCtrl->new($dialog, -1, $cert_data ? $cert_data : 'Certificate not found, maybe HKD component is not runnning at server side.', wxDefaultPosition, [400,200], wxTE_MULTILINE|wxTE_READONLY);
-    $tc->SetFont (Wx::Font->new(9, wxDEFAULT, wxNORMAL, wxNORMAL, 0, 'Courier New'));
+    my $tc = Wx::TextCtrl->new($dialog, -1, $cert_data ? $cert_data : 'Certificate not found, maybe HKD component is not runnning at server side.', wxDefaultPosition, [600,300], wxTE_MULTILINE|wxTE_READONLY);
+    $tc->SetFont (Wx::Font->new(12, wxDEFAULT, wxNORMAL, wxNORMAL, 0, 'Courier New'));
     $vsizer->Add($tc, 1, wxALL|wxEXPAND, 5);
 
     my $but_clicked = sub {
@@ -410,15 +430,25 @@ sub OnUnknownCert {
         $dialog->Destroy();
     };
     my $bsizer = Wx::BoxSizer->new(wxHORIZONTAL);
-    my $but_ok     = Wx::Button->new($dialog, -1, 'Ok');
+
+    my $but_ok;
+    unless ($no_ok_button) {
+        $but_ok     = Wx::Button->new($dialog, -1, 'Ok') ;
+        Wx::Event::EVT_BUTTON($dialog, $but_ok    ->GetId, sub { $but_clicked->(1) });
+        $bsizer->Add($but_ok, 0, wxALL, 5);
+    }
+
     my $but_cancel = Wx::Button->new($dialog, -1, 'Cancel');
-    Wx::Event::EVT_BUTTON($dialog, $but_ok    ->GetId, sub { $but_clicked->(1) });
     Wx::Event::EVT_BUTTON($dialog, $but_cancel->GetId, sub { $but_clicked->(0) });
-    $bsizer->Add($but_ok);
-    $bsizer->Add($but_cancel);
+    $bsizer->Add($but_cancel, 0, wxALL, 5);
     $vsizer->Add($bsizer);
 
-    $but_ok->SetFocus;
+    if ($but_ok) {
+        $but_ok->SetFocus;
+    } else {
+        $but_cancel->SetFocus;
+    }
+
     $dialog->SetSizer($vsizer);
     $vsizer->Fit($dialog);
 
