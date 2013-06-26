@@ -20,7 +20,7 @@ use Method::WeakCallback qw(weak_method_callback);
 use parent qw(QVD::HKD::VMHandler);
 
 use Class::StateMachine::Declarative
-    __any__   => { ignore => [qw(_on_cmd_start on_expired)],
+    __any__   => { ignore => [qw(_on_cmd_start on_expired _on_lxc_done)],
                    delay => [qw(on_hkd_kill
                                 _on_cmd_stop)],
                    on => { on_hkd_stop => 'on_hkd_kill' },
@@ -131,7 +131,8 @@ use Class::StateMachine::Declarative
                                                                waiting_for_lxc => { enter => '_set_state_timer',
                                                                                     transitions => { _on_lxc_done      => 'cleanup',
                                                                                                      _on_state_timeout => 'cleanup' } } ] },
-                                  cleanup  => { substates => [ saving_state           => { enter => '_save_state' },
+                                  cleanup  => { ignore => [qw(_on_lxc_done)],
+                                                substates => [ saving_state           => { enter => '_save_state' },
                                                                checking_dirty         => { enter => '_check_dirty_flag' },
                                                                heavy                  => { enter => '_heavy_down' },
                                                                killing_lxc            => { enter => '_kill_lxc' },
