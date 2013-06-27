@@ -76,12 +76,16 @@ sub deploy {
     while (my ($rs, $names) = each %initial_values) {
 	$db->resultset($rs)->create({name => $_}) for @$names;
     }
+
+    $db->resultset('Version')->create({ component => 'schema',
+                                        version => '3.3.0' });
 }
 
 sub erase {
     my $db = shift;
     my $dbh = $db->storage->dbh;
-    for my $table (qw( vm_runtimes
+    for my $table (qw( versions
+                       vm_runtimes
 		       vms
 		       vm_properties
 		       osfs

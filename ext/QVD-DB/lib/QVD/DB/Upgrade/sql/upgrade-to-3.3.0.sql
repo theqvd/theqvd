@@ -1,7 +1,8 @@
 
 CREATE TABLE versions (
        component VARCHAR(100) NOT NULL,
-       version   VARCHAR(100) NOT NULL
+       version   VARCHAR(100) NOT NULL,
+       PRIMARY KEY (component)
 );
 
 INSERT INTO versions VALUES ('schema', '3.3.0');
