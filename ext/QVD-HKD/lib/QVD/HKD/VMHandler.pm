@@ -280,8 +280,8 @@ sub _remove_fw_rules {
 sub _start_vma_monitor {
     my $self = shift;
     my $vma_monitor = $self->{vma_monitor} //= QVD::HKD::VMAMonitor->new(config => $self->{config},
-                                                                         on_failed => weak_method_callback($self, '_on_failed_vma_monitor'),
-                                                                         on_alive  => weak_method_callback($self, '_on_alive'),
+                                                                         on_failed => weak_method_callback($self, '_on_vma_monitor_failed'),
+                                                                         on_alive  => weak_method_callback($self, '_on_vma_monitor_ok'),
                                                                          rpc_service => $self->{rpc_service});
     $self->{last_seen_alive} = time;
     $self->{failed_vma_count} = 0;
@@ -297,25 +297,26 @@ sub __stop_vma_monitor {
     }
 }
 
-sub _on_alive {
+sub _on_vma_monitor_ok {
     my $self = shift;
     $self->{last_seen_alive} = time;
     $self->{failed_vma_count} = 0;
+    $self->_on_alive;
 }
 
-sub _on_failed_vma_monitor {
+sub _on_vma_monitor_failed {
     my $self = shift;
     my $failed_vma_count = ++$self->{failed_vma_count};
     my $state_key = ($self->state =~ /^starting/ ? 'starting' : 'running');
     my $max = $self->_cfg("internal.hkd.vmhandler.vma.failed.max_count.on.$state_key");
 
-    $debug and $self->_debug("failed_vma_monitor for vm '$self->{vm_id}', tries: $failed_vma_count/$max");
-    WARN "failed_vma_monitor for vm '$self->{vm_id}', tries: $failed_vma_count/$max";
+    $debug and $self->_debug("vma_monitor_failed for vm '$self->{vm_id}', tries: $failed_vma_count/$max");
+    WARN "vma_monitor_failed for vm '$self->{vm_id}', tries: $failed_vma_count/$max";
 
     if ($failed_vma_count >= $max) {
         my $max_time = $self->_cfg("internal.hkd.vmhandler.vma.failed.max_time.on.$state_key");
-        $debug and $self->_debug("failed_vma_monitor for vm '$self->{vm_id}', time: " .(time - $self->{last_seen_alive}). "/$max_time");
-        WARN "failed_vma_monitor for vm '$self->{vm_id}', time: " .(time - $self->{last_seen_alive}). "/$max_time";
+        $debug and $self->_debug("vma_monitor_failed for vm '$self->{vm_id}', time: " .(time - $self->{last_seen_alive}). "/$max_time");
+        WARN "vma_monitor_failed for vm '$self->{vm_id}', time: " .(time - $self->{last_seen_alive}). "/$max_time";
         if (time - $self->{last_seen_alive} > $max_time) {
             WARN "VMA didn't start, stopping VM '$self->{vm_id}'";
             if ($self->_cfg('internal.vm.debug.enable')) {
