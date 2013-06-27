@@ -1,5 +1,7 @@
 #!/usr/bin/perl
 
+# FIXME: this script is obsolete, ensure it is not being used anymore and remove it!!!
+
 use strict;
 use warnings;
 use QVD::Log;
