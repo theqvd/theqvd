@@ -90,8 +90,6 @@ sub new {
     $self->{password} = Wx::TextCtrl->new($panel, -1, "", wxDefaultPosition, wxDefaultSize, wxTE_PASSWORD);
     $grid_sizer->Add($self->{password}, 0, wxALL|wxEXPAND, 5);
 
-    length core_cfg('client.user.name') ? $self->{password}->SetFocus() : $self->{username}->SetFocus();
-
     if (core_cfg('client.show.remember_password')) {
         $grid_sizer->Add(Wx::StaticText->new($panel, -1, "Remember password"), 0, wxALL, 5);
         $self->{remember_pass} = Wx::CheckBox->new ($panel, -1, '', wxDefaultPosition);
@@ -177,6 +175,7 @@ sub new {
     $ver_sizer->Fit($self);
     $self->Center;
     $self->Show(1);
+    length core_cfg('client.user.name') ? $self->{password}->SetFocus() : $self->{username}->SetFocus();
 
     Wx::Event::EVT_BUTTON($self, $self->{connect_button}->GetId, \&OnClickConnect);
     Wx::Event::EVT_TIMER($self, -1, \&OnTimer);
@@ -443,17 +442,20 @@ sub OnUnknownCert {
     $bsizer->Add($but_cancel, 0, wxALL, 5);
     $vsizer->Add($bsizer);
 
-    if ($but_ok) {
-        $but_ok->SetFocus;
-    } else {
-        $but_cancel->SetFocus;
-    }
-
     $dialog->SetSizer($vsizer);
     $vsizer->Fit($dialog);
 
     $self->{timer}->Stop();
+
+
+    if ( $but_ok ) {
+        $but_ok->SetDefault;
+    } else {
+         $but_cancel->SetDefault;
+    }
+
     $dialog->ShowModal();
+
     $self->{timer}->Start();
 
     { lock $accept_cert; cond_signal $accept_cert; }
