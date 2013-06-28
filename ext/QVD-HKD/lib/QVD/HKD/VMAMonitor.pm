@@ -16,8 +16,8 @@ use Class::StateMachine::Declarative
     new           => { transitions => { _on_run => 'pinging' } },
 
     pinging       => { enter => '_ping',
-                       before => { _on_done => '_send_ok',
-                                   _on_error => '_send_error' },
+                       before => { _on_done => '_on_ping_ok',
+                                   _on_error => '_on_ping_error' },
                        transitions => { _on_done  => 'idle',
                                         _on_error => 'idle' } },
 
@@ -35,6 +35,7 @@ sub new {
     $self->{rpc_service} = $rpc_service;
     $self->{on_alive} = $on_alive;
     $self->{on_failed} = $on_failed;
+    $self->{last} = 'error';
     $self;
 }
 
@@ -45,19 +46,21 @@ sub stop {
 
 sub _ping { shift->_rpc({retry_count => 0}, 'ping') }
 
-sub _send_ok {
+sub _on_ping_ok {
     my $self = shift;
     $self->_maybe_callback('on_alive');
+    $self->{last} = 'ok';
 }
 
-sub _send_error {
+sub _on_ping_error {
     my $self = shift;
     $self->_maybe_callback('on_failed');
+    $self->{last} = 'error';
 }
 
 sub _set_timer {
     my $self = shift;
-    $self->_call_after($self->_cfg('internal.hkd.vmhandler.vma_monitor.delay'),
+    $self->_call_after($self->_cfg("internal.hkd.vmhandler.vma_monitor.delay.after.$self->{last}"),
                        '_on_timeout');
 }
 

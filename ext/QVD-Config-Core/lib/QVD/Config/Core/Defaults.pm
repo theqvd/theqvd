@@ -416,7 +416,8 @@ internal.hkd.vmhandler.vma.failed.max_count.on.running = 10
 
 internal.hkd.vmhandler.vma.failed.max_time.on.starting = 180
 internal.hkd.vmhandler.vma.failed.max_time.on.running = 320
-internal.hkd.vmhandler.vma_monitor.delay = 10
+internal.hkd.vmhandler.vma_monitor.delay.after.error = 10
+internal.hkd.vmhandler.vma_monitor.delay.after.ok = 120
 internal.hkd.lxc.does.not.cleanup = 0
 internal.hkd.lxc.killer.retries = 10
 internal.hkd.lxc.killer.destroy_lxc.timeout = 100
