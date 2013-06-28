@@ -383,8 +383,9 @@ sub OnConnectionStatusChanged {
         $self->{progress_bar}->SetValue(0);
         $self->{progress_bar}->SetRange(100);
         $self->EnableControls(1);
-        $self->{username}->SetFocus();
         $self->Show;
+        length core_cfg('client.user.name') ? $self->{password}->SetFocus() : $self->{username}->SetFocus();
+
     }
 }
 
@@ -453,6 +454,8 @@ sub OnUnknownCert {
     } else {
          $but_cancel->SetDefault;
     }
+
+    $dialog->SetEscapeId( $but_cancel->GetId );
 
     $dialog->ShowModal();
 
