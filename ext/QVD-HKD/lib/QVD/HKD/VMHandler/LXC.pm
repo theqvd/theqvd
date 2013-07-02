@@ -32,11 +32,7 @@ use Class::StateMachine::Declarative
 
     starting  => { advance => '_on_done',
                    on => { on_hkd_kill => '_on_error' },
-                   substates => [ heavy           => { enter => '_heavy_down',
-                                                       transitions => { _on_error    => 'stopping/db',
-                                                                        _on_cmd_stop => 'stopping/db' } },
-
-                                  db              => { transitions => { _on_error   => 'stopping/db' },
+                   substates => [ db              => { transitions => { _on_error   => 'stopping/db' },
                                                        substates => [ loading_row        => { enter => '_load_row' },
                                                                       searching_di       => { enter => '_search_di' },
                                                                       calculating_attrs  => { enter => '_calculate_attrs' },
@@ -51,16 +47,19 @@ use Class::StateMachine::Declarative
                                                                       destroying_lxc         => { enter => '_destroy_lxc' },
                                                                       unmounting_filesystems => { enter => '_unmount_filesystems' } ] },
 
+                                  heavy           => { enter => '_heavy_down',
+                                                       transitions => { _on_error    => 'stopping/db',
+                                                                        _on_cmd_stop => 'stopping/db' } },
+
                                   setup           => { transitions => { _on_error   => 'stopping/cleanup' },
                                                        substates => [ untaring_os_image       => { enter => '_untar_os_image',
                                                                                                    transitions => { _on_eagain => 'delaying_untar' } },
                                                                       '(delaying_untar)'      => { substates => [ unheavy  => { enter => '_heavy_up' },
                                                                                                                   delaying => { enter => '_set_state_timer',
-                                                                                                                                on => { _on_state_timeout => '_on_done' } },
-                                                                                                                  heavy    => { enter => '_heavy_down',
-                                                                                                                                transitions => { _on_error    => 'stopping/db',
-                                                                                                                                                 _on_cmd_stop => 'stopping/db',
-                                                                                                                                                 _on_done     =>  'untaring_os_image' } } ] },
+                                                                                                                                transitions => { _on_state_timeout => 'heavy',
+                                                                                                                                                 _on_error         => 'stopping/db',
+                                                                                                                                                 _on_cmd_stop      => 'stopping/db' } } ] },
+
                                                                       placing_os_image        => { enter => '_place_os_image' },
                                                                       detecting_os_image_type => { enter => '_detect_os_image_type' },
                                                                       allocating_os_overlayfs => { enter => '_allocate_os_overlayfs' },

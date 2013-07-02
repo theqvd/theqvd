@@ -42,6 +42,14 @@ use Class::StateMachine::Declarative
 
     stopped       => { enter       => '_on_stopped' };
 
+
+sub new {
+    my $class = shift;
+    my $self = $class->SUPER::new(@_);
+    $self->{queue_priority} = 30;
+    $self;
+}
+
 sub _kill_hosts {
     my ($self) = @_;
     INFO "looking for lost hosts";

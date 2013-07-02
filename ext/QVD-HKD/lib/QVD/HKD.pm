@@ -121,6 +121,7 @@ sub new {
                                             on_reload_done => sub { $self->_on_config_reload_done });
     $self->{vm} = {};
     $self->{heavy} = AnyEvent::Semaphore->new($self->_cfg('internal.hkd.max_heavy'));
+    $self->{query_priority} = 30;
     $self;
 }
 

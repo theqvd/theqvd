@@ -38,6 +38,7 @@ sub new {
     my $on_cmd = delete $opts{on_cmd};
     my $self = $class->SUPER::new(%opts);
     $self->{on_cmd} = $on_cmd;
+    $self->{query_priority} = 10;
     $self->_listen( { on_notify => '_on_qvd_cmd_for_vm_notify' },
                     "qvd_cmd_for_vm_on_host$self->{node_id}" );
     $self;

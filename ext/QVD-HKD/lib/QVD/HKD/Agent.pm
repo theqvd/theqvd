@@ -144,10 +144,11 @@ sub _query {
         $db->push_query(query       => $sql,
                         args        => \@args,
                         max_retries => $self->{query_retry_count} // 1000, # FIXME!!!
+                        priority    => $self->{query_priority},
                         retry_on_sqlstate => \%retry_on_sqlstate,
-                        on_result => weak_method_callback($self, __query_result_callback => $opts),
-                        on_done   => weak_method_callback($self, __query_callback => $opts, 0),
-                        on_error  => weak_method_callback($self, __query_callback => $opts, 1) );
+                        on_result   => weak_method_callback($self, __query_result_callback => $opts),
+                        on_done     => weak_method_callback($self, __query_callback => $opts, 0),
+                        on_error    => weak_method_callback($self, __query_callback => $opts, 1) );
 }
 
 sub __query_result_callback {

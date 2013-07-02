@@ -40,6 +40,7 @@ sub new {
     $self->{on_ticked} = $on_ticked;
     $self->{on_error} = $on_error;
     $self->{query_retry_count} = 1;
+    $self->{query_priority} = 100;
     $self;
 }
 

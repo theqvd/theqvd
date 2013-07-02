@@ -43,6 +43,7 @@ sub new {
     $self->{on_reload_done} = $on_reload_done;
 
     $self->{props} = $self->_load_base_config;
+    $self->{query_priority} = 20;
     $self->state('idle');
     $self;
 }
