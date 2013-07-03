@@ -8,14 +8,19 @@ use QVD::Config::Core;
 use QVD::Log;
 
 use Exporter qw(import);
-our @EXPORT = qw(db db_release txn_do txn_eval rs this_host_id this_host notify);
+our @EXPORT = qw(db db_release txn_do txn_eval rs this_host_id this_host notify sql);
 
 my $db;
 
+sub sql {
+    my $sql = shift;
+    db->storage->dbh_do(sub { $_[1]->do($sql) })
+}
+
 sub db {
     unless (defined $db) {
-        $db //= QVD::DB->new;
-        $db->storage->dbh_do("set session time zone 'UTC'");
+        $db = QVD::DB->new;
+        $db->storage->dbh_do(sub { $_[1]->do("set session time zone 'UTC'") })
     }
     $db;
 }
@@ -48,7 +53,7 @@ sub rs (*) {
 
 sub notify (*) {
     my $channel = shift;
-    db->storage->dbh_do(sub { $_[1]->do("notify $channel") });
+    sql("notify $channel");
 }
 
 sub this_host {
