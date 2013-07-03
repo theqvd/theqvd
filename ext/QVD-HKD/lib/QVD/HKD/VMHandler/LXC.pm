@@ -221,15 +221,16 @@ sub _calculate_attrs {
     $self->{os_rootfs_parent} = $rootfs_parent;
     $self->{os_rootfs} = "$rootfs_parent$self->{vm_id}-fs";
 
-    if (defined $self->{di_path}) {
+    if (defined(my $di_path = $self->{di_path})) {
         # this sub is called with just the vm_id loaded into the
         # object when reaping zombie containers
+        $self->{os_image_path} = $self->_cfg('path.storage.images') .'/'. $di_path;
         my $basefs_parent = $self->_cfg('path.storage.basefs');
         $basefs_parent =~ s|/*$|/|;
         # note that os_basefs may be changed later from
         # _detect_os_image_type!
-        $self->{os_basefs} = "$basefs_parent/$self->{di_path}";
-        $self->{os_basefs_lockfn} = "$basefs_parent/lock.$self->{di_path}";
+        $self->{os_basefs} = "$basefs_parent/$di_path";
+        $self->{os_basefs_lockfn} = "$basefs_parent/lock.$di_path";
 
         # FIXME: use a better policy for overlay allocation
         my $overlays_parent = $self->_cfg('path.storage.overlayfs');
@@ -259,21 +260,18 @@ sub _calculate_attrs {
         $self->_cfg('internal.vm.network.device.prefix') . $self->{vm_id};
     # $self->_cfg('internal.vm.network.device.prefix') . $self->{vm_id} . 'r' . int(rand 10000);
 
-    if ($debug) {
-        for (qw(di_path os_basefs os_overlayfs os_overlayfs_old os_rootfs_parent os_rootfs
-                home_fs home_fs_mnt iface netmask_len gateway)) {
-            my $path = $self->{$_} // '<undef>';
-            $self->_debug("attribute $_: $path");
-            DEBUG "Attribute $_: $path";
-        }
-    }
+    DEBUG("attributes for VM $self->{vm_id}: "
+          . join(', ', map($_ . '=' . ($self->{$_} // '<undef>'),
+                           qw(di_path os_image_path os_basefs os_overlayfs
+                              os_overlayfs_old os_rootfs_parent os_rootfs
+                              home_fs home_fs_mnt iface netmask_len gateway) ) ) );
 
     $self->_on_done;
 }
 
 sub _untar_os_image {
     my $self = shift;
-    my $image_path = $self->_cfg('path.storage.images') . '/' . $self->{di_path};
+    my $image_path = $self->{os_image_path};
     $debug and $self->_debug("image_path=$image_path");
     unless (-f $image_path) {
         ERROR "Image '$image_path' attached to VM '$self->{vm_id}' does not exist on disk";
