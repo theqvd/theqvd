@@ -227,6 +227,8 @@ sub _start_db {
                                       on_transient_error => sub { $self->_on_transient_db_error },
                                     );
     $self->_db($db);
+    $db->push_query(initialization => 1,
+                    query => "set session time zone 'UTC'");
     $self->_on_done;
 }
 

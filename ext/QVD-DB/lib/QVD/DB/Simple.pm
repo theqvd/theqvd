@@ -13,7 +13,11 @@ our @EXPORT = qw(db db_release txn_do txn_eval rs this_host_id this_host notify)
 my $db;
 
 sub db {
-    $db //= QVD::DB->new
+    unless (defined $db) {
+        $db //= QVD::DB->new;
+        $db->storage->dbh_do("set session time zone 'UTC'");
+    }
+    $db;
 }
 
 sub db_release {
@@ -21,12 +25,11 @@ sub db_release {
 }
 
 sub txn_do (&) {
-    $db //= QVD::DB->new();
-    $db->txn_do(@_);
+    db->txn_do(@_);
 }
 
 sub txn_eval (&) {
-    $db //= QVD::DB->new();
+    my $db = db;
     if (wantarray) {
         my @r = eval { $db->txn_do(@_) };
         DEBUG "txn_eval failed: $@" if $@;
@@ -40,7 +43,7 @@ sub txn_eval (&) {
 }
 
 sub rs (*) {
-    ($db //= QVD::DB->new())->resultset($_[0]);
+    db->resultset($_[0]);
 }
 
 sub notify (*) {
