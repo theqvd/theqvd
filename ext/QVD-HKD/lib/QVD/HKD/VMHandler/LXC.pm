@@ -15,6 +15,7 @@ use File::Temp qw(tempfile);
 use Linux::Proc::Mountinfo;
 use File::Spec;
 use Fcntl ();
+use Fcntl::Packer ();
 use Method::WeakCallback qw(weak_method_callback);
 
 use parent qw(QVD::HKD::VMHandler);
@@ -51,18 +52,21 @@ use Class::StateMachine::Declarative
                                                        transitions => { _on_error    => 'stopping/db',
                                                                         _on_cmd_stop => 'stopping/db' } },
 
-                                  setup           => { transitions => { _on_error   => 'stopping/cleanup' },
-                                                       substates => [ untaring_os_image       => { enter => '_untar_os_image',
-                                                                                                   transitions => { _on_eagain => 'delaying_untar' } },
-                                                                      '(delaying_untar)'      => { substates => [ unheavy  => { enter => '_heavy_up' },
-                                                                                                                  delaying => { enter => '_set_state_timer',
-                                                                                                                                transitions => { _on_state_timeout => 'heavy',
-                                                                                                                                                 _on_error         => 'stopping/db',
-                                                                                                                                                 _on_cmd_stop      => 'stopping/db' } } ] },
+                                  os_image        => { transitions => { _on_error => 'stopping/db' },
+                                                       substates => [ locking        => { enter => '_lock_os_image' },
+                                                                      is_there       => { enter => '_check_if_os_image_is_there',
+                                                                                          transitions => { _on_it_is_not => 'unpacking' } },
+                                                                      '(unpacking)'  => { transitions => { _on_error => 'clean' },
+                                                                                          substates => [ tmp_dir   => { enter => '_make_tmp_dir_for_os_image' },
+                                                                                                         untar     => { enter => '_untar_os_image' },
+                                                                                                         place     => { enter => '_place_os_image' },
+                                                                                                         '(clean)' => { enter => '_clean_failed_os_image_unpack',
+                                                                                                                        transitions => { _on_done => 'stopping/db' } } ] },
+                                                                      detecting_type => { enter => '_detect_os_image_type' },
+                                                                      unlocking      => { enter => '_release_untar_lock' } ] },
 
-                                                                      placing_os_image        => { enter => '_place_os_image' },
-                                                                      detecting_os_image_type => { enter => '_detect_os_image_type' },
-                                                                      allocating_os_overlayfs => { enter => '_allocate_os_overlayfs' },
+                                  setup           => { transitions => { _on_error   => 'stopping/cleanup' },
+                                                       substates => [ allocating_os_overlayfs => { enter => '_allocate_os_overlayfs' },
                                                                       allocating_os_rootfs    => { enter => '_allocate_os_rootfs' },
                                                                       allocating_home_fs      => { enter => '_allocate_home_fs' },
                                                                       configuring_dhcpd       => { enter => '_add_to_dhcpd' },
@@ -269,57 +273,60 @@ sub _calculate_attrs {
     $self->_on_done;
 }
 
-sub _untar_os_image {
+sub _lock_os_image {
+    my $self = shift;
+
+    $self->_flock({reheavy => 1, save_as => 'untar_lock'},
+                  $self->{os_basefs_lockfn});
+}
+
+sub _check_if_os_image_is_there {
     my $self = shift;
     my $image_path = $self->{os_image_path};
-    $debug and $self->_debug("image_path=$image_path");
-    unless (-f $image_path) {
-        ERROR "Image '$image_path' attached to VM '$self->{vm_id}' does not exist on disk";
-        return $self->_on_error;
-    }
-
     my $basefs = $self->{os_basefs};
-    my $lockfn = $self->{os_basefs_lockfn};
-    my $lock;
-    unless (open $lock, '>>', $lockfn) {
-        ERROR "Unable to create or open lock file '$lockfn': $!";
-        return $self->_on_error;
-    }
-    $debug and $self->_debug("lock is $lock");
-    unless (flock($lock, Fcntl::LOCK_EX()|Fcntl::LOCK_NB())) {
-        if ($! == POSIX::EAGAIN()) {
-            DEBUG "Waiting for lock $lockfn...";
-            return $self->_on_eagain
-        }
-        ERROR "Unable to acquire lock for $lockfn: $!";
+
+    unless (-f $image_path) {
+        ERROR "OS image for DI $self->{di_id} used by VM $self->{vm_id} not found at '$image_path'";
         return $self->_on_error;
     }
 
-    if (-d $basefs) {
-        DEBUG 'Image already untarred';
-        return $self->_on_done;
+    unless (-d $basefs) {
+        DEBUG "OS image for DI $self->{di_id} used by VM $self->{vm_id} has not been unpacked yet into $basefs";
+        return $self->_on_it_is_not;
     }
+    $self->_on_done;
+}
 
-    $self->{untar_lock} = $lock;
+sub _make_tmp_dir_for_os_image {
+    my $self = shift;
+    my $tmp;
+    do {
+        $tmp = $self->_cfg('path.storage.basefs') . join('-', "/untar", $$, time, rand(10000))
+    } while -e $tmp;
 
-    my $tmp = $self->_cfg('path.storage.basefs') . "/untar-$$-" . rand(100000);
-    $tmp++ while -e $tmp;
+    $self->{os_basefs_tmp} = $tmp;
 
     if ($self->_cfg('vm.lxc.unionfs.type') eq 'btrfs') {
         if (_run($self->_cfg('command.btrfs'),
                  'subvolume', 'create', $tmp)) {
             ERROR "Unable to create btrfs subvolume at '$tmp'";
+            delete $self->{untar_lock};
             return $self->_on_error;
         }
     }
     else {
         unless (_mkpath $tmp) {
             ERROR "Unable to create directory '$tmp': $!";
+            delete $self->{untar_lock};
             return $self->_on_error;
         }
     }
+}
 
-    $self->{os_basefs_tmp} = $tmp;
+sub _untar_os_image {
+    my $self = shift;
+    my $image_path = $self->{os_image_path};
+    my $tmp = $self->{os_basefs_tmp};
 
     INFO "Untarring image to '$tmp'";
     my @args = ( 'x', -f => $image_path, -C => $tmp );
@@ -343,7 +350,7 @@ sub _place_os_image {
     my $self = shift;
     my $basefs = $self->{os_basefs};
     if (-d $basefs) {
-        DEBUG "image already on place";
+        INFO "Internal error: image already on place, locking failed";
         return $self->_on_done;
     }
     my $tmp = $self->{os_basefs_tmp};
