@@ -307,17 +307,16 @@ sub _make_tmp_dir_for_os_image {
     $self->{os_basefs_tmp} = $tmp;
 
     if ($self->_cfg('vm.lxc.unionfs.type') eq 'btrfs') {
-        if (_run($self->_cfg('command.btrfs'),
-                 'subvolume', 'create', $tmp)) {
-            ERROR "Unable to create btrfs subvolume at '$tmp'";
-            delete $self->{untar_lock};
-            return $self->_on_error;
-        }
+        $self->_run_cmd({ log_error => "Unable to create btrfs subvolume at '$tmp'" },
+                        btrfs => 'subvolume', 'create', $tmp)) {
+        return;
     }
     else {
-        unless (_mkpath $tmp) {
+        if (_mkpath $tmp) {
+            $self->_on_done;
+        }
+        else {
             ERROR "Unable to create directory '$tmp': $!";
-            delete $self->{untar_lock};
             return $self->_on_error;
         }
     }
@@ -334,7 +333,7 @@ sub _untar_os_image {
     push @args, '-j' if $image_path =~ /\.(?:tbz|bz2)$/;
     push @args, '-J' if $image_path =~ /\.(?:txz|xz)$/;
 
-    $self->_run_cmd(tar => @args);
+    $self->_run_cmd({log_error => "command (tar @args) failed", tar => @args);
 }
 
 sub _release_untar_lock {
