@@ -15,6 +15,7 @@ no warnings 'redefine';
 
 use Carp;
 use File::Slurp qw(slurp);
+use File::Spec;
 use Pg::PQ qw(:pgres);
 use QVD::Log;
 use AnyEvent::Impl::Perl;
@@ -23,6 +24,7 @@ use AnyEvent;
 use AnyEvent::Semaphore;
 use AnyEvent::Pg::Pool;
 use Linux::Proc::Net::TCP;
+use Linux::Proc::Mountinfo;
 
 use Time::HiRes ();
 
@@ -64,7 +66,8 @@ use Class::StateMachine::Declarative
                                                                                            on => { _on_config_reload_done => '_on_done' } },
                                                                 loading_host_row      => { enter => '_load_host_row' },
                                                                 checking_tcp_ports    => { enter => '_check_tcp_ports' },
-                                                                checking_address      => { enter => '_check_address' } ] },
+                                                                checking_address      => { enter => '_check_address' },
+                                                                checking_cgroups      => { enter => '_check_cgroups' } ] },
 
                                        setup => { transitions => { _on_error => 'stopping',
                                                                    _on_cmd_stop => 'stopping' },
@@ -293,6 +296,30 @@ sub _check_address {
         return $self->_on_error;
     }
     $self->_on_done;
+}
+
+sub _check_cgroups {
+    my $self = shift;
+
+    return $self->_on_done
+        unless $self->_cfg('vm.hypervisor') eq 'lxc';
+
+    my $mi = Linux::Proc::Mountinfo->read;
+    my $dir = $self->_cfg('path.cgroup.cpu.lxc');
+    my @parts = File::Spec->splitdir(File::Spec->rel2abs($dir));
+    while (@parts) {
+        my $dir = File::Spec->join(@parts);
+        if (defined(my $mie = $mi->at($dir))) {
+            if ($mie->fs_type eq 'cgroup') {
+                INFO "cgroup found at $dir";
+                $self->_on_done;
+            }
+            last;
+        }
+        pop @parts;
+    }
+    ERROR "$dir does not lay inside a cgroups file system";
+    $self->_on_error;
 }
 
 sub _save_state {

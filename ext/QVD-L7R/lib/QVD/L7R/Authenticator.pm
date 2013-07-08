@@ -32,41 +32,39 @@ sub new {
     $auth;
 }
 
+sub _set_login {
+    my ($auth, $login, $passwd) = @_;
+    $auth->{login} = $login;
+    $auth->{passwd} = $passwd;
+    $auth->{params}{'qvd.vm.user.name'} = $login;
+}
+
 sub _normalize_login {
     my ($auth, $login) = @_;
-    my $normalized_login = ($case_sensitive_login ? $login : lc $login);
-    $normalized_login =~ s/^\s+//;
-    $normalized_login =~ s/\s+$//;
-    $normalized_login = $_->normalize_login($normalized_login) for @{$auth->{modules}};
-    $normalized_login;
+    defined $login ? ($case_sensitive_login ? $login : lc $login) : undef;
 }
 
 sub recheck_authentication_basic {
     my ($auth, $login, $passwd, $l7r) = @_;
+    my $login_normalized = $auth->_normalize_login;
+
     $auth->{login} eq $login and $auth->{passwd} eq $passwd;
 }
 
 sub authenticate_basic {
     my ($auth, $login, $passwd, $l7r) = @_;
-    if (defined (my $normalized_login = $auth->_normalize_login($login))) {
-        DEBUG "authenticating user $login ($normalized_login) with modules @{$auth->{modules}}";
-        for (@{$auth->{modules}}) {
-            if ($_->authenticate_basic($auth, $normalized_login, $passwd, $l7r)) {
-                $auth->{login} = $login;
-                $auth->{normalized_login} = $normalized_login;
-                $auth->{passwd} = $passwd;
-                $auth->{params}{'qvd.vm.user.name'} = $normalized_login;
-                return 1;
-            }
+
+    my $login_normalized = $auth->_normalize_login($login);
+
+    DEBUG "authenticating user $login ($login_normalized) with modules @{$auth->{modules}}";
+    for (@{$auth->{modules}}) {
+        if ($_->authenticate_basic($auth, $login_normalized, $passwd, $l7r)) {
+            $auth->_set_login($login_normalized, $passwd);
+            return 1;
         }
-    }
-    else {
-        ERROR "login normalization for '$login' failed";
     }
     return ();
 }
-
-sub normalized_login { shift->{normalized_login} // croak "internal error: user not authenticated yet!" }
 
 sub login { shift->{login} // croak "internal error: user not authenticated yet!" }
 
