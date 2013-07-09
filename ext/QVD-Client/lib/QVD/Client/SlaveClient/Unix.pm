@@ -24,25 +24,27 @@ sub handle_share {
     if ($code != HTTP_SWITCHING_PROTOCOLS) {
         die "Server replied $code $msg $data";
     }
+    
+    my $ticket = _header_lookup($headers, 'X-QVD-Share-Ticket');
 
     my $pid = fork();
-    if ($pid) {
-
+    if ($pid > 0) {
+        return $ticket;
     } else {
         open STDIN, '<&', $self->{httpc}->{socket} or die "Unable to dup stdin: $^E";
         open STDOUT, '>&', $self->{httpc}->{socket} or die "Unable to dup stdout: $^E";
         close $self->{httpc}->{socket};
 
         chdir $path or die "Unable to chdir to $path: $^E";
-        exec($command_sftp_server, '-e', -l => 'INFO')
+        exec($command_sftp_server, '-e')
             or die "Unable to exec $command_sftp_server: $^E";
     }
 }
 
 sub handle_open {
-    my ($self, $path) = @_;
+    my ($self, $path, $ticket) = @_;
 
-    my $ticket = 'ROOT';
+    $ticket = 'ROOT' unless defined $ticket;
 
     # FIXME detect from locale, don't just assume utf-8
     my $charset = 'UTF-8';

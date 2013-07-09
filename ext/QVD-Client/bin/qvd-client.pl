@@ -110,14 +110,13 @@ sub proxy_unknown_cert {
 
 sub proxy_list_of_vm_loaded {
     my ($self, $vm_data) = @_;
-    #my $vm;
-    #if (@$vm_data > 0) {
-    #    print "You have ".@$vm_data." virtual machines.\n";
-    #    $vm = $vm_data->[rand @$vm_data];
-    #    print "Connecting to the one called ".$vm->{name}."\n";
-    #}
-    #return $vm->{id};
-    return 1;
+    my $vm;
+    if (@$vm_data > 0) {
+        print "You have ".@$vm_data." virtual machines.\n";
+        $vm = $vm_data->[rand @$vm_data];
+       print "Connecting to the one called ".$vm->{name}."\n";
+    }
+    return $vm->{id};
 }
 
 sub proxy_connection_status {
@@ -143,7 +142,7 @@ sub open_file {
             INFO("Starting folder sharing for $share, attempt $conn_attempt");
             local $@;
             my $client = QVD::Client::SlaveClient->new('localhost:12040');
-            eval { $client->handle_share($share) };
+            my $ticket = eval { $client->handle_share($share) };
             if ($@) {
                 if ($@ =~ 'Connection refused') {
                     sleep 1;
@@ -154,7 +153,7 @@ sub open_file {
                 INFO("Folder sharing started for $share");
                 INFO("Opening $file");
                 $client = QVD::Client::SlaveClient->new('localhost:12040');
-                $client->handle_open($file);
+                $client->handle_open($file, $ticket);
             }
             last;
         }
