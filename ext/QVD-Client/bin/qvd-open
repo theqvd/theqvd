@@ -1,0 +1,27 @@
+#!/usr/bin/perl
+
+use strict;
+use warnings;
+
+use QVD::Log;
+use QVD::Client::SlaveClient;
+
+my $file = shift;
+
+eval {
+    my $client = QVD::Client::SlaveClient->new('localhost:12040');
+    $client->handle_open($file);
+};
+if ($@ =~ 'Connection refused') {
+    my $pid = fork;
+    if ($pid == 0) {
+        @ARGV = qw(joni joni koivu 8443);
+        push @ARGV, $file;
+        do 'QVD-Client/bin/qvd-client.pl';
+    } elsif ($pid < 0) {
+        ERROR("Fork failed: $@");
+    }
+} else {
+    ERROR($@);
+}
+

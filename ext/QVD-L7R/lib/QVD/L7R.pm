@@ -167,20 +167,39 @@ sub connect_to_vm_processor {
 
     my $query = (uri_split $url)[3];
     my %params = uri_query_split  $query;
-    my $vm_id = delete $params{id} // do {
+    my $vm_id = delete $params{id};
+    my $file_name = delete $params{file_name};
+    unless (defined $vm_id or defined $file_name)  {
         INFO 'Parameter id required';
         $l7r->throw_http_error(HTTP_UNPROCESSABLE_ENTITY, "parameter id is missing");
-    };
+    }
 
-    my $vm = rs(VM_Runtime)->search({vm_id => $vm_id})->first // do {
-        INFO 'The requested virtual machine does not exist,)'. " VM_ID: $vm_id";
-        $l7r->throw_http_error(HTTP_NOT_FOUND, "The requested virtual machine does not exist");
-    };
+    my $vm;
+        
+    if (defined $vm_id) {
+        $vm = rs(VM_Runtime)->search({vm_id => $vm_id})->first // do {
+            INFO 'The requested virtual machine does not exist,)'. " VM_ID: $vm_id";
+            $l7r->throw_http_error(HTTP_NOT_FOUND, "The requested virtual machine does not exist");
+        };
 
-    if ($vm->vm->user_id != $user_id or !$auth->allow_access_to_vm($vm)) {
-        INFO "User $user_id has tried to access VM $vm_id but (s)he isn't allowed to";
-        $l7r->throw_http_error(HTTP_FORBIDDEN,
-                               "You are not allowed to access requested virtual machine");
+        if ($vm->vm->user_id != $user_id or !$auth->allow_access_to_vm($vm)) {
+            INFO "User $user_id has tried to access VM $vm_id but (s)he isn't allowed to";
+            $l7r->throw_http_error(HTTP_FORBIDDEN,
+                                   "You are not allowed to access requested virtual machine");
+        }
+    } else {
+        my ($file_ext) = ($file_name =~ /([^.]*)$/);
+        my $rs = rs(VM)->search({
+                user_id             => $user_id,
+                'properties.key'    => 'qvd.app.file_exts',
+                'properties.value'  => {like => "%$file_ext%"}},
+            {join => ['properties']})->first // do {
+            INFO 'VM not found for file name extension '.$file_ext;
+            $l7r->throw_http_error(HTTP_NOT_FOUND, "The requested virtual machine does not exist");
+        };
+        $vm_id = $rs->id;
+        $vm = $rs->vm_runtime;
+        $params{'qvd.client.open_file'} = $file_name;
     }
 
     if (my @forbidden = grep !/^(?:qvd\.client\.|custom\.)/, keys %params) {

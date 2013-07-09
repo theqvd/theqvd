@@ -9,6 +9,7 @@ use QVD::Config::Core qw(core_cfg);
 use QVD::HTTP::Headers qw(header_eq_check header_lookup);
 use QVD::HTTP::StatusCodes qw(:all);
 use QVD::HTTPD;
+use File::Spec;
 
 use base 'QVD::HTTPD::INET';
 
@@ -20,7 +21,17 @@ sub new {
     my $self = $class->SUPER::new();
     $self->set_http_request_processor(\&handle_put_share, PUT => '/shares/*');
     $self->set_http_request_processor(\&handle_get_share, GET => '/shares/*');
+    $self->set_http_request_processor(\&handle_open, POST => '/open/*');
     bless $self, $class;
+}
+
+sub _url_to_mount_point {
+    my ($url) = @_;
+    chop $url if $url =~ /[\/\\]$/;  # remove dir separator if last character
+
+    (my $mount_dir = $url) =~ s/.*[\/\\]//; # pick last part of path
+    $mount_dir = 'ROOT' if ($mount_dir eq '');
+    return $mount_dir;
 }
 
 sub handle_put_share {
@@ -36,10 +47,7 @@ sub handle_put_share {
     }
     my $charset = $1;
 
-    chop $url if $url =~ /[\/\\]$/;  # remove dir separator if last character
-
-    (my $mount_dir = $url) =~ s/.*[\/\\]//; # pick last part of path
-    $mount_dir = 'ROOT' if ($mount_dir eq '');
+    my $mount_dir = _url_to_mount_point($url);
 
     mkdir $mount_root unless -d $mount_root;
     my $mount_point = $mount_root.'/'.$mount_dir;
@@ -51,7 +59,9 @@ sub handle_put_share {
 
     mkdir $mount_point or die "Unable to create mount point $mount_point: $^E";
 
-    $self->send_http_response(HTTP_SWITCHING_PROTOCOLS);
+    $self->send_http_response(HTTP_SWITCHING_PROTOCOLS,
+        "X-QVD-Share-Ticket: $mount_dir"
+    );
 
     my $pid = fork();
     if ($pid) {
@@ -69,6 +79,26 @@ sub handle_get_share {
     my ($self, $method, $url, $headers) = @_;
     # We don't allow clients to mount directories *from* the VM
     $self->send_http_error(HTTP_FORBIDDEN);
+}
+
+sub handle_open {
+    my ($self, $method, $url, $headers) = @_;
+    my $mount_dir = header_lookup($headers, 'X-QVD-Share-Ticket');
+    my $rel_path = ($url =~ m!/open/(.*)!, $1);
+    my $abs_path = "$mount_root/$mount_dir/$rel_path";
+
+    $self->send_http_error(HTTP_NOT_FOUND) unless -e $abs_path;
+
+    my $pid = fork();
+    if ($pid) {
+        $self->send_http_response(HTTP_OK);
+        wait;
+    } else {
+        $ENV{DISPLAY} = ':100';
+	my @cmd = ('/usr/bin/libreoffice', $abs_path);
+	exec @cmd;
+        die "Unable to exec: $^E";
+    }
 }
 
 

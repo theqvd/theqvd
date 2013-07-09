@@ -109,14 +109,105 @@ EOF
     return $accept;
 }
 
-sub connect_to_vm {
-    my $self = shift;
-    my $cli = $self->{client_delegate};
+sub open_file {
+    my ($self, $path) = @_;
     my $opts = $self->{opts};
+    my $cli = $self->{client_delegate};
     my ($host, $port, $user, $passwd) = @{$opts}{qw/host port username password/};
-
     $cli->proxy_connection_status('CONNECTING');
     INFO("Connecting to $host:$port\n");
+    my $httpc = $self->_get_httpc($host, $port) or return;
+    use MIME::Base64 qw(encode_base64);
+    my $auth = encode_base64("$user:$passwd", '');
+
+    INFO("Sending auth");
+    $httpc->send_http_request(
+        GET => '/qvd/list_of_vm', 
+        headers => [
+            "Authorization: Basic $auth",
+            "Accept: application/json"
+        ],
+    );
+
+    $opts->{file_name} = $path;
+
+    my %o = (
+        file_name                     => $path,
+        'qvd.client.keyboard'         => $opts->{keyboard},
+        'qvd.client.os'               => $NX_OS,
+        'qvd.client.link'             => $opts->{link},
+        'qvd.client.geometry'         => $opts->{geometry},
+        'qvd.client.fullscreen'       => $opts->{fullscreen},
+        'qvd.client.printing.enabled' => $self->{printing},
+    );
+
+    my $q = join '&', map { uri_escape($_) .'='. uri_escape($o{$_}) } keys %o;
+    $httpc->send_http_request(
+        GET => "/qvd/connect_to_vm?$q",
+        headers => [
+            "Authorization: Basic $auth",
+            'Connection: Upgrade',
+            'Upgrade: QVD/1.0',
+        ],
+    );
+    my ($code, $msg, $response_headers, $body) = $httpc->read_http_response();
+
+    while (1) {
+        my ($code, $msg, $headers, $body) = $httpc->read_http_response;
+        DEBUG("Response: $code/$msg");
+	foreach my $hdr (@$headers) {
+		DEBUG("Header: $hdr");
+	}
+        DEBUG("Body: $body") if (defined $body);
+
+        given ($code) {
+            when (HTTP_UNAUTHORIZED) {
+                my $message = "The server has rejected your login. Please verify that your username and password are correct.";
+                $message ||= "$host replied with $msg";
+                INFO("Connection error: $message");
+                $cli->proxy_connection_error(message => $message);
+                return;
+            }
+            when (HTTP_SERVICE_UNAVAILABLE) {
+                my $message = "The server is under maintenance. Retry later.";
+                $message ||= "$host replied with $msg";
+                INFO("Connection error: $message");
+                $cli->proxy_connection_error(message => $message);
+                return;
+            }
+        }
+        if ($code == HTTP_SWITCHING_PROTOCOLS) {
+            DEBUG("Switching protocols. Connected.");
+            $cli->proxy_connection_status('CONNECTED');
+            $self->_run($httpc);
+            last;
+        }
+        elsif ($code == HTTP_PROCESSING) {
+            DEBUG("Starting VM...");
+            # Server is starting the virtual machine and connecting to the VMA
+        }
+        else {
+            # Fatal error
+            my $message;
+            $message = ($code == HTTP_NOT_FOUND        ? "Your virtual machine does not exist any more"         :
+                        $code == HTTP_UPGRADE_REQUIRED ? "The server requires a more up-to-date client version" :
+                        $code == HTTP_UNAUTHORIZED     ? "Login error. Please verify your user and password"    :
+                        $code == HTTP_BAD_GATEWAY      ? "Server error: $body"                                  :
+                        $code == HTTP_FORBIDDEN        ? "Your virtual machine is under maintenance."           :
+                                                         "Unable to connect to remote VM: $code $msg" );
+            ERROR("Fatal error: $message");
+            $cli->proxy_connection_error(message => $message, code => $code);
+            last;
+        }
+    }
+    $cli->proxy_connection_status('CLOSED');
+    DEBUG("Connection closed");
+}
+
+sub _get_httpc {
+    my ($self, $host, $port) = @_;
+    my $opts = $self->{opts};
+    my $cli = $self->{client_delegate};
 
     # SSL library has to be initialized in the thread where it's used,
     # so we do a "require QVD::HTTPC" here instead of "use"ing it above
@@ -159,6 +250,19 @@ sub connect_to_vm {
         }
         return;
     }
+    $httpc;
+}
+
+sub connect_to_vm {
+    my $self = shift;
+    my $cli = $self->{client_delegate};
+    my $opts = $self->{opts};
+    my ($host, $port, $user, $passwd) = @{$opts}{qw/host port username password/};
+
+    $cli->proxy_connection_status('CONNECTING');
+    INFO("Connecting to $host:$port\n");
+
+    my $httpc = $self->_get_httpc($host, $port) or return;
 
     use MIME::Base64 qw(encode_base64);
     my $auth = encode_base64("$user:$passwd", '');
@@ -375,7 +479,7 @@ sub _run {
     }
 
     DEBUG("Forwarding sockets\n");
-	$self->{client_delegate}->proxy_connection_status('FORWARDING');
+    $self->{client_delegate}->proxy_connection_status('FORWARDING');
     forward_sockets(
         $local_socket,
         $httpc->get_socket,

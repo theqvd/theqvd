@@ -54,7 +54,7 @@ my $username = shift @ARGV;
 my $password = shift @ARGV;
 my $host = shift @ARGV;
 my $port = shift @ARGV // core_cfg('client.host.port');
-my $child_proc;
+my $file = shift;
 my $nonblocking=1;
 
 # FIXME: do not use a heuristic but some command line flag for that
@@ -62,25 +62,37 @@ my $ssl = ($port =~ /43$/ ? 1 : undef);
 
 my %connect_info = (
     link          => core_cfg('client.link'),
+    slave         => core_cfg('client.slave.enable'),
     audio         => core_cfg('client.audio.enable'),
     printing      => core_cfg('client.printing.enable'),
     geometry      => core_cfg('client.geometry'),
     fullscreen    => core_cfg('client.fullscreen'),
-    keyboard      => 'pc105/en',
+    keyboard      => 'pc105/es',
     port          => $port,
     ssl           => $ssl,
     host          => $host,
     username      => $username,
     password      => $password,
+    file          => $file,
 );
 
-my $delegate = QVD::Client::CLI->new();
-QVD::Client::Proxy->new($delegate, %connect_info)->connect_to_vm();
+my $delegate = QVD::Client::CLI->new(file => $file);
+if ($file) {
+    QVD::Client::Proxy->new($delegate, %connect_info)->open_file($file);
+} else {
+    QVD::Client::Proxy->new($delegate, %connect_info)->connect_to_vm();
+}
 
 package QVD::Client::CLI;
 
+use Data::Dumper;
+use QVD::Client::SlaveClient;
+use QVD::Log;
+
 sub new {
-    bless {}, shift;
+    my $class = shift;
+    my %attrs = @_;
+    bless \%attrs, $class;
 }
 
 sub proxy_set_environment {
@@ -91,7 +103,6 @@ sub proxy_set_environment {
 sub proxy_unknown_cert {
     my ($self, $cert_arr) = @_;
     my ($cert_pem_str, $cert_data) = @$cert_arr;
-    use Data::Dumper;
     print "$cert_data\n";
     print "Accept certificate? [y/N] ";
     return <STDIN> =~ /^y/i;
@@ -99,24 +110,60 @@ sub proxy_unknown_cert {
 
 sub proxy_list_of_vm_loaded {
     my ($self, $vm_data) = @_;
-    my $vm;
-    if (@$vm_data > 0) {
-        print "You have ".@$vm_data." virtual machines.\n";
-        $vm = $vm_data->[rand @$vm_data];
-        print "Connecting to the one called ".$vm->{name}."\n";
-    }
-    return $vm->{id};
+    #my $vm;
+    #if (@$vm_data > 0) {
+    #    print "You have ".@$vm_data." virtual machines.\n";
+    #    $vm = $vm_data->[rand @$vm_data];
+    #    print "Connecting to the one called ".$vm->{name}."\n";
+    #}
+    #return $vm->{id};
+    return 1;
 }
 
 sub proxy_connection_status {
     my ($self, $status) = @_;
     print "Connection status $status\n";
+    if ($status eq 'FORWARDING') {
+        $self->open_file($self->{file});
+    }
 }
 
 sub proxy_connection_error {
     my $self = shift;
     my %args = @_;
     print 'Connection error: ',$args{message},"\n";
+}
+
+sub open_file {
+    my ($self, $file) = @_;
+    my $pid = fork;
+    if ($pid == 0) {
+        my $share = '/';
+        for (my $conn_attempt = 0; $conn_attempt < 10; $conn_attempt++) {
+            INFO("Starting folder sharing for $share, attempt $conn_attempt");
+            local $@;
+            my $client = QVD::Client::SlaveClient->new('localhost:12040');
+            eval { $client->handle_share($share) };
+            if ($@) {
+                if ($@ =~ 'Connection refused') {
+                    sleep 1;
+                    next;
+                }
+                ERROR($@);
+            } else {
+                INFO("Folder sharing started for $share");
+                INFO("Opening $file");
+                $client = QVD::Client::SlaveClient->new('localhost:12040');
+                $client->handle_open($file);
+            }
+            last;
+        }
+        exit;
+    } elsif ($pid > 0) {
+        INFO("Folder sharing running with PID $pid");
+    } else {
+        ERROR("Unable to run folder sharing: $^E");
+    }
 }
 
 __END__

@@ -34,8 +34,25 @@ sub handle_share {
         close $self->{httpc}->{socket};
 
         chdir $path or die "Unable to chdir to $path: $^E";
-        exec($command_sftp_server, '-e')
+        exec($command_sftp_server, '-e', -l => 'INFO')
             or die "Unable to exec $command_sftp_server: $^E";
+    }
+}
+
+sub handle_open {
+    my ($self, $path) = @_;
+
+    my $ticket = 'ROOT';
+
+    # FIXME detect from locale, don't just assume utf-8
+    my $charset = 'UTF-8';
+	
+    my ($code, $msg, $headers, $data) =
+    $self->{httpc}->make_http_request(POST => '/open/'.$path,
+        headers => ["X-QVD-Share-Ticket: $ticket"]);
+    
+    if ($code != HTTP_OK) {
+        die "Server replied $code $msg $data";
     }
 }
 
