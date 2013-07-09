@@ -17,6 +17,7 @@ use File::Spec;
 use Fcntl ();
 use Fcntl::Packer ();
 use Method::WeakCallback qw(weak_method_callback);
+use QVD::HKD::Helpers qw(mkpath);
 
 use parent qw(QVD::HKD::VMHandler);
 
@@ -52,23 +53,12 @@ use Class::StateMachine::Declarative
                                                        transitions => { _on_error    => 'stopping/db',
                                                                         _on_cmd_stop => 'stopping/db' } },
 
-                                  os_image        => { transitions => { _on_error => 'stopping/db' },
-                                                       substates => [ locking        => { enter => '_lock_os_image' },
-                                                                      is_there       => { enter => '_check_if_os_image_is_there',
-                                                                                          transitions => { _on_it_is_not => 'unpacking' } },
-                                                                      '(unpacking)'  => { transitions => { _on_error => 'clean' },
-                                                                                          substates => [ tmp_dir   => { enter => '_make_tmp_dir_for_os_image' },
-                                                                                                         untar     => { enter => '_untar_os_image' },
-                                                                                                         place     => { enter => '_place_os_image' },
-                                                                                                         '(clean)' => { enter => '_clean_failed_os_image_unpack',
-                                                                                                                        transitions => { _on_done => 'stopping/db' } } ] },
-                                                                      detecting_type => { enter => '_detect_os_image_type' },
-                                                                      unlocking      => { enter => '_release_untar_lock' } ] },
+                                  os_fs           => { on => { _on_hkd_kill =>'_on_error' },
+                                                       transitions => { _on_error   => 'stopping/fs' },
+                                                       enter => '_start_os_fs' } },
 
                                   setup           => { transitions => { _on_error   => 'stopping/cleanup' },
-                                                       substates => [ allocating_os_overlayfs => { enter => '_allocate_os_overlayfs' },
-                                                                      allocating_os_rootfs    => { enter => '_allocate_os_rootfs' },
-                                                                      allocating_home_fs      => { enter => '_allocate_home_fs' },
+                                                       substates => [ allocating_home_fs      => { enter => '_allocate_home_fs' },
                                                                       configuring_dhcpd       => { enter => '_add_to_dhcpd' },
                                                                       creating_lxc            => { enter => '_create_lxc' },
                                                                       configuring_lxc         => { enter => '_configure_lxc' },
@@ -143,9 +133,8 @@ use Class::StateMachine::Declarative
                                                                running_poststop_hook  => { enter => '_run_poststop_hook',
                                                                                            transitions => { _on_error => 'destroying_lxc' } },
                                                                destroying_lxc         => { enter => '_destroy_lxc' },
-                                                               unmounting_filesystems => { enter => '_unmount_filesystems' },
-                                                               releasing_untar_lock   => { enter => '_release_untar_lock' },
                                                                configuring_dhcpd      => { enter => '_rm_from_dhcpd' } ] },
+                                  fs       => { enter => '_unmount_filesystems' },
                                   db       => { enter => '_clear_runtime_row',
                                                 transitions => { _on_error => 'zombie/db',
                                                                  _on_done  => 'stopped' } } ] },
@@ -196,23 +185,6 @@ use Class::StateMachine::Declarative
 
     dirty  => { ignore => [qw(on_hkd_stop)],
                 transitions => { on_hkd_kill => 'stopped' } };
-
-sub _mkpath {
-    my ($path, $mask) = @_;
-    $mask ||= 0755;
-    my @dirs;
-    my @parts = File::Spec->splitdir(File::Spec->rel2abs($path));
-    while (@parts) {
-        my $dir = File::Spec->join(@parts);
-        if (-d $dir) {
-            -d $_ or mkdir $_, $mask or return for @dirs;
-            return -d $path;
-        }
-        unshift @dirs, $dir;
-        pop @parts;
-    }
-    return;
-}
 
 sub _calculate_attrs {
     my $self = shift;
@@ -312,7 +284,7 @@ sub _make_tmp_dir_for_os_image {
         return;
     }
     else {
-        if (_mkpath $tmp) {
+        if (mkpath $tmp) {
             $self->_on_done;
         }
         else {
@@ -345,103 +317,6 @@ sub _release_untar_lock {
     return $self->_on_done
 }
 
-sub _place_os_image {
-    my $self = shift;
-    my $basefs = $self->{os_basefs};
-    if (-d $basefs) {
-        INFO "Internal error: image already on place, locking failed";
-        return $self->_on_done;
-    }
-    my $tmp = $self->{os_basefs_tmp};
-    INFO "Renaming '$tmp' to '$basefs'";
-    rename $tmp, $basefs
-        or ERROR "Rename of '$tmp' to '$basefs' failed: $!";
-    unless (-d $basefs) {
-        ERROR "'$basefs' does not exist or is not a directory";
-        return $self->_on_error;
-    }
-    DEBUG "OS placement done, releasing untar lock";
-    delete $self->{untar_lock};
-    $self->_on_done;
-}
-
-sub _detect_os_image_type {
-    my $self = shift;
-    my $basefs = $self->{os_basefs};
-    if (-d "$basefs/sbin/") {
-        # FIXME: improve autodetection logic
-        $debug and $self->_debug("os image is of type basic");
-        DEBUG 'OS image is of type basic';
-    }
-    elsif (-d "$basefs/rootfs/sbin/") {
-        $self->{os_meta} = $basefs;
-        $self->{os_base_subdir} = '/rootfs';
-        $debug and $self->_debug("os image is of type extended");
-        DEBUG 'OS image is of type extended';
-    }
-    else {
-        ERROR "sbin not found at $basefs/sbin or at $basefs/rootfs/sbin";
-        return $self->_on_error;
-    }
-    return $self->_on_done;
-}
-
-sub _allocate_os_overlayfs {
-    my $self = shift;
-    my $overlayfs = $self->{os_overlayfs};
-    my $overlayfs_old =  $self->{os_overlayfs_old};
-    my $unionfs_type = $self->_cfg('vm.lxc.unionfs.type');
-
-    if (-d $overlayfs) {
-        if (defined $overlayfs_old) {
-            if ($unionfs_type eq 'btrfs') {
-                if (_run($self->_cfg('command.btrfs'),
-                             'subvolume', 'delete', $overlayfs)) {
-                    ERROR "Unable to delete old btrfs snapshot at $overlayfs";
-                    return $self->_on_error;
-                }
-                DEBUG "Old btrfs snapshot at $overlayfs removed";
-            }
-            else {
-                $debug and $self->_debug("deleting old overlay directory");
-                unless (rename $overlayfs, $overlayfs_old) {
-                    ERROR "Unable to move old '$overlayfs' out of the way to '$overlayfs_old'";
-                    return $self->_on_error;
-                }
-                DEBUG "Renamed old overlayfd '$overlayfs' to '$overlayfs_old'";
-            }
-            if (-d $overlayfs) {
-                ERROR "Overlay directory still exists at '$overlayfs'";
-                return $self->_on_error;
-            }
-        }
-        else {
-            $debug and $self->_debug("reusing existing overlay directory");
-            DEBUG 'Reusing existing overlay directory';
-            # TODO: add some sanity checks here for btrfs!
-            return $self->_on_done
-        }
-    }
-    if ($unionfs_type eq 'btrfs') {
-        if (_run($self->_cfg('command.btrfs'),
-                 'subvolume', 'snapshot',
-                 $self->{os_basefs}, $overlayfs)) {
-            ERROR "Unable to create btrfs snapshort at $overlayfs";
-            $self->_on_error;
-        }
-        DEBUG "Btrfs snapshort created at $overlayfs";
-    }
-    else {
-        unless (_mkpath $overlayfs) {
-            ERROR "Unable to create overlay file system '$overlayfs': $!";
-            return $self->_on_error;
-        }
-        DEBUG "overlay directory $overlayfs created";
-    }
-    $self->_on_done;
-
-}
-
 sub _allocate_os_rootfs {
     my $self = shift;
 
@@ -449,7 +324,7 @@ sub _allocate_os_rootfs {
     my $overlayfs = $self->{os_overlayfs} . ($self->{os_base_subdir} // '');
 
     my $rootfs = $self->{os_rootfs};
-    unless (_mkpath $rootfs) {
+    unless (mkpath $rootfs) {
         ERROR "Unable to create directory '$rootfs'";
         return $self->_on_error;
     }
@@ -541,12 +416,12 @@ sub _allocate_home_fs {
     my $homefs = $self->{home_fs};
     defined $homefs or return $self->_on_done;
 
-    unless (_mkpath $homefs) {
+    unless (mkpath $homefs) {
         ERROR "Unable to create directory '$homefs'";
         return $self->_on_error;
     }
     my $mount_point = $self->{home_fs_mnt};
-    unless (_mkpath $mount_point) {
+    unless (mkpath $mount_point) {
         ERROR "Unable to create directory '$mount_point'";
         return $self->_on_error;
     }

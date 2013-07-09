@@ -6,7 +6,7 @@ use Carp;
 
 use Exporter;
 
-our @EXPORT = qw(croak_invalid_opts);
+our @EXPORT_OK = qw(croak_invalid_opts mkpath);
 our @CARP_NOT;
 my %CARP_NOT;
 
@@ -21,5 +21,24 @@ sub croak_invalid_opts (\%) {
     croak "invalid option(s) '".join("', '", sort keys %$opts)."'"
         if %$opts;
 }
+
+sub mkpath {
+    my ($path, $mask) = @_;
+    $mask ||= 0755;
+    my @dirs;
+    my @parts = File::Spec->splitdir(File::Spec->rel2abs($path));
+    while (@parts) {
+        my $dir = File::Spec->join(@parts);
+        if (-d $dir) {
+            -d $_ or mkdir $_, $mask or return for @dirs;
+            return -d $path;
+        }
+        unshift @dirs, $dir;
+        pop @parts;
+    }
+    return;
+}
+
+
 
 1;
