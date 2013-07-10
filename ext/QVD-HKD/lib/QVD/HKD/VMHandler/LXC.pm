@@ -294,19 +294,6 @@ sub _make_tmp_dir_for_os_image {
     }
 }
 
-sub _untar_os_image {
-    my $self = shift;
-    my $image_path = $self->{os_image_path};
-    my $tmp = $self->{os_basefs_tmp};
-
-    INFO "Untarring image to '$tmp'";
-    my @args = ( 'x', -f => $image_path, -C => $tmp );
-    push @args, '-z' if $image_path =~ /\.(?:tgz|gz)$/;
-    push @args, '-j' if $image_path =~ /\.(?:tbz|bz2)$/;
-    push @args, '-J' if $image_path =~ /\.(?:txz|xz)$/;
-
-    $self->_run_cmd({log_error => "command (tar @args) failed", tar => @args);
-}
 
 sub _release_untar_lock {
     my $self = shift;
