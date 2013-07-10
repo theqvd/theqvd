@@ -5,9 +5,10 @@ use warnings;
 
 use parent qw(QVD::HKD::VMHandler::LXC::FS);
 
-sub _init_backend {
-    my $self = shift;
-    $self->_run_cmd({log_error => 'Unable to load kernel module overlayfs'},
+sub init_backend {
+    my ($hkd, $on_done, $on_error) = @_;
+    $hkd->_run_cmd({log_error => 'Unable to load kernel module overlayfs',
+                    on_done => sub { $hkd->$on_done }, on_error => sub { $hkd->$on_error } },
                     modprobe => 'overlayfs')
 }
 

@@ -23,7 +23,7 @@ use AnyEvent;
 use AnyEvent::Semaphore;
 use AnyEvent::Pg::Pool;
 use Linux::Proc::Net::TCP;
-
+use Method::WeakCallback qw(weak_method_callback);
 use Time::HiRes ();
 
 use QVD::HKD::Helpers;
@@ -332,12 +332,12 @@ sub _save_loadbal_data {
 
 sub _start_ticker {
     my $self = shift;
-    $self->{ticker} = QVD::HKD::Ticker->new( config => $self->{config},
-                                             db => $self->{db},
-                                             node_id => $self->{node_id},
-                                             on_ticked => sub { $self->_on_db_ticked },
-                                             on_error => sub { $self->_on_ticker_error },
-                                             on_stopped => sub { $self->_on_agent_stopped(@_) } );
+    $self->{ticker} = QVD::HKD::Ticker->new( config     => $self->{config},
+                                             db         => $self->{db},
+                                             node_id    => $self->{node_id},
+                                             on_ticked  => weak_method_callback($self, '_on_db_ticked'),
+                                             on_error   => weak_method_callback($self, '_on_ticker_error'),
+                                             on_stopped => weak_method_callback($self, '_on_agent_stopped') );
     DEBUG 'Starting ticker';
     $self->{ticker}->run;
 }
@@ -347,7 +347,7 @@ sub _start_agents {
     my %opts = ( config     => $self->{config},
                  db         => $self->{db},
                  node_id    => $self->{node_id},
-                 on_stopped => sub { $self->_on_agent_stopped(@_) } );
+                 on_stopped => weak_method_callback($self, '_on_agent_stopped') );
 
     $self->{command_handler}    = QVD::HKD::CommandHandler->new(%opts,
                                                                 on_cmd => sub { $self->_on_cmd($_[1]) });
@@ -574,17 +574,22 @@ sub _catch_zombies {
 
 sub _prepare_storage {
     my $self = shift;
-
-    if ($self->_cfg('vm.hypervisor')       eq 'lxc'  and
-        $self->_cfg('vm.lxc.unionfs.type') eq 'btrfs') {
-        my $fn = $self->_cfg('path.storage.btrfs.root') . '/qvd_btrfs_lock';
-        my $fh;
-        unless (open $fh, '>>', $fn) {
-            ERROR "Unable to create or open file $fn to work around LXC make-btrfs-ro-on-exit bug: $!";
-            $self->_on_error;
+    if ($self->_cfg('vm.hypervisor') eq 'lxc') {
+        # Initializing the unionfs backend here is quite ugly but it
+        # allows us to catch some fatal errors during startup.
+        my $driver = $self->_cfg('vm.lxc.unionfs.type');
+        $driver =~ s/-/_/g;
+        my $class = "QVD::HKD::VMHandler::LXC::FS::$driver";
+        local $@;
+        unless ($driver =~ /^\w+$/ and eval "require $class; 1") {
+            ERROR "bad storage type $driver or unable to load backend module: $@";
+            return $self->_on_error;
         }
-        DEBUG "$fn opened";
-        $self->{btrfs_lock} = $fh;
+
+        if (defined (my $init = $class->can('init_backend'))) {
+            DEBUG "initializing unionfs $driver backend";
+            return $init->($self, '_on_done', '_on_error');
+        }
     }
     $self->_on_done
 }
@@ -665,7 +670,10 @@ sub _write_vm_report {
     my $self = shift;
     my %state;
     for my $vm (values %{$self->{vm}}) {
-        $state{$vm->state}++;
+        # FIXME: investigate why sometimes undefs appear here!
+        if (defined $vm) {
+            $state{$vm->state}++;
+        }
     }
     if (open my $fh, '>', '/tmp/hkd-vm-states') {
         print $fh "HKD Internal VM states report\n", ('-' x 80), "\n";

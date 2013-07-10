@@ -1,20 +1,21 @@
-package QVD::HKD::VMHandler::LXC::FS::btrfs;
+package QVD::HKD::VMHandler::LXC::FS;
 
 use strict;
 use warnings;
 
 use QVD::HKD::Helpers qw(mkpath);
+use QVD::Log;
+
+use parent qw(QVD::HKD::Agent);
 
 use Class::StateMachine::Declarative
+    __any__  => { advance => '_on_done',
+                  transitions => { _on_error => 'aborting' } },
 
-    __any__  => { transitions => { _on_error => 'aborting' } },
-
-    new      => { transitions => { _on_run => 'init' } },
-
-    init     => { enter => '_init_backend' },
+    new      => { transitions => { _on_run => 'base' } },
 
     base     => { substates => [ locking       => { enter => '_lock_os_image' },
-                                 checking_dir  => { enter => '_check_dir',
+                                 checking_dir  => { enter => '_check_base_dir',
                                                     transitions => { _on_error => 'unpacking' } },
                                  '(unpacking)' => { substates => [ finding_tmp_dir => { enter => '_find_tmp_dir' },
                                                                    making_tmp_dir  => { enter => '_make_tmp_dir' },
@@ -23,24 +24,35 @@ use Class::StateMachine::Declarative
                                  analyze       => { enter => '_analyze_os_image' },
                                  unlocking     => { enter => '_unlock_os_image' } ] },
 
-    overlay  => { },
+    overlay  => { substates => [ removing_old => { enter => '_remove_old_overlay' },
+                                 making       => { enter => '_make_overlay' } ] },
 
-    root     => { },
+    root     => { enter => '_make_root' },
 
-    running  => { enter => '_tell_parent_done' },
+    running  => { enter => '_tell_running' },
 
-    stopping => { },
+    aborting => { substates => [ unlocking        => { enter => '_unlock_os_image' },
+                                 deleting_tmp_dir => { enter => '_delete_tmp_dir'  } ] },
 
-    stopped  => { enter => '_tell_parent_stop' },
-
-
-use parent qw(QVD::HKD::Agent);
+    aborted  => { enter => '_tell_error' };
 
 sub new {
     my ($class, %opts) = @_;
-    my $vmhandler = delete $opts{vmhandler};
+
+    my %mine = map { $_ => delete $opts{$_} }
+        qw(vm_id basefs basefs_lockfn
+           overlayfs overlayfs_old rootfs
+           on_running on_stopped on_error);
+
     my $self = $class->SUPER::new(%opts);
-    $self->{vmhandler} = $vmhandler;
+
+    $self->{$_} = $mine{$_} for keys %mine;
+
+    my $driver = $self->_cfg('vm.lxc.unionfs.type');
+    $driver =~ s/-/_/g;
+    $class .= "::$driver";
+    $self->bless($class);
+
     $self
 }
 
@@ -49,18 +61,39 @@ sub run {
     $self->_on_run;
 }
 
-sub _init_backend {
-    shift->_on_done;
+sub init_backend {
+    my ($hkd, $on_done) = @_;
+    $hkd->$on_done;
 }
 
-sub _tell_parent_done {
+sub _tell_running { shift->_maybe_callback('on_running') }
+sub _tell_stopped { shift->_maybe_callback('on_stopped') }
+sub _tell_error   { shift->_maybe_callback('on_error')   }
+
+sub _lock_os_image {
     my $self = shift;
-    $self->{vmhandler}->_on_done;
+
+    $self->_flock({save_as => 'untar_lock'},
+                  $self->{basefs_lockfn});
 }
 
-sub _tell_parent_stop {
+sub _unlock_os_image {
     my $self = shift;
-    $self->{vmhandler}->_on_done;
+    if ($self->{untar_lock}) {
+        DEBUG "Releasing untar lock";
+        delete $self->{untar_lock};
+    }
+    return $self->_on_done
+}
+
+sub _check_base_dir {
+    my $self = shift;
+    my $basefs = $self->{basefs};
+    unless (-d $basefs) {
+        DEBUG "OS image for DI $self->{di_id} used by VM $self->{vm_id} has not been unpacked yet into $basefs";
+        return $self->_on_error
+    }
+    $self->_on_done;
 }
 
 sub _find_tmp_dir_for_os_image {
@@ -69,14 +102,18 @@ sub _find_tmp_dir_for_os_image {
     do {
         $tmp = $self->_cfg('path.storage.basefs') . join('-', "/untar", $$, time, rand(10000))
     } while -e $tmp;
-    $self->{os_basefs_tmp} = $tmp;
+    $self->{basefs_tmp} = $tmp;
     $self->_on_done;
 }
 
 sub _untar_os_image {
     my $self = shift;
-    my $image_path = $self->{os_image_path};
-    my $tmp = $self->{os_basefs_tmp};
+    my $image_path = $self->{image_path};
+    my $tmp = $self->{basefs_tmp};
+
+    unless (-f $image_path) {
+        ERROR "OS image $image_path for VM $self->{vm_id} not found on filesystem"
+    }
 
     INFO "Untarring image to '$tmp'";
     my @args = ( 'x', -f => $image_path, -C => $tmp );
@@ -84,14 +121,14 @@ sub _untar_os_image {
     push @args, '-j' if $image_path =~ /\.(?:tbz|bz2)$/;
     push @args, '-J' if $image_path =~ /\.(?:txz|xz)$/;
 
-    $self->_run_cmd({log_error => "command (tar @args) failed", tar => @args);
+    $self->_run_cmd({log_error => "command (tar @args) failed"},
+                    tar => @args);
 }
 
 sub _place_os_image {
     my $self = shift;
-    my $vmhandler = $self->{vmhandler};
-    my $basefs = $vmhandler->{os_basefs};
-    my $tmp = $self->{os_basefs_tmp};
+    my $basefs = $self->{basefs};
+    my $tmp = $self->{basefs_tmp};
 
     if (-d $basefs) {
          INFO "Internal error: image already on place, locking failed";
@@ -100,50 +137,50 @@ sub _place_os_image {
 
     INFO "Renaming '$tmp' to '$basefs'";
     rename $tmp, $basefs
-        or ERROR "Rename of '$tmp' to '$basefs' failed: $!";
+        or ERROR "Rename of '$tmp' to '$basefs' for VM $self->{vm_id} failed: $!";
+
     unless (-d $basefs) {
-        ERROR "'$basefs' does not exist or is not a directory";
+        ERROR "basefs '$basefs' for VM $self->{vm_id} does not exist or is not a directory";
         return $self->_on_error;
     }
-    DEBUG "OS placement done, releasing untar lock";
-    delete $self->{untar_lock};
+    delete $self->{basefs_tmp};
     $self->_on_done;
 }
 
 sub _analyze_os_image {
     my $self = shift;
-    my $vmhandler = $self->{vmhandler};
-    my $basefs = $vmhandler->{os_basefs};
+    my $basefs = $self->{basefs};
     if (-d "$basefs/sbin/") {
         DEBUG 'OS image is of type basic';
     }
     elsif (-d "$basefs/rootfs/sbin/") {
-        $vmhandler->{os_meta} = $basefs;
-        $vmhandler->{os_base_subdir} = 'rootfs';
+        $self->{meta} = $basefs;
+        $self->{basefs_subdir} = 'rootfs';
         DEBUG 'OS image is of type extended';
     }
     else {
-        ERROR "sbin not found at $basefs/sbin or at $basefs/rootfs/sbin";
+        ERROR "sbin not found at $basefs/sbin or at $basefs/rootfs/sbin for VM $self->{vm_id}";
         return $self->_on_error;
     }
     $self->_on_done;
 }
 
+sub image_metadata_dir { shift->{meta} }
+
 sub _make_tmp_dir_for_os_image {
     my $self = shift;
-    my $tmp = $self->{os_basefs_tmp};
+    my $tmp = $self->{basefs_tmp};
     mkpath $tmp and return $self->_on_done;
 
-    ERROR "Unable to create directory '$tmp': $!";
+    ERROR "Unable to create directory '$tmp' for VM $self->{vm_id}: $!";
     $self->_on_error;
 }
 
 sub _remove_old_overlay {
     my $self = shift;
-    my $vmhandler = $self->{vmhandler};
-    my $overlayfs = $vmhandler->{os_overlayfs};
-    if (-d $overlayfs) {
-        if (defined (my $overlayfs_old =  $vmhandler->{os_overlayfs_old})) {
+    my $overlayfs = $self->{overlayfs};
+    if (-e $overlayfs) {
+        if (defined (my $overlayfs_old =  $self->{overlayfs_old})) {
             return $self->_remove_overlay_dir($overlayfs, $overlayfs_old);
         }
         else {
@@ -155,8 +192,8 @@ sub _remove_old_overlay {
 
 sub _remove_overlay_dir {
     my ($self, $dir, $move_to) = @_;
-    unless (rename $overlayfs, $overlayfs_old) {
-        ERROR "Unable to move old '$dir' out of the way to '$move_to'";
+    unless (rename $dir, $move_to) {
+        ERROR "Unable to move old '$dir' out of the way to '$move_to' for VM $self->{vm_id}";
         return $self->_on_error;
     }
     DEBUG "old overlay directory '$dir' moved to '$move_to'";
@@ -165,24 +202,22 @@ sub _remove_overlay_dir {
 
 sub _make_overlay {
     my $self = shift;
-    my $vmhandler = $self->{vmhandler};
-    my $overlayfs = $vmhandler->{os_overlayfs};
+    my $overlayfs = $self->{overlayfs};
     if (-d $overlayfs) {
-        if (defined (my $overlayfs_old =  $vmhandler->{os_overlayfs_old})) {
-            ERROR "Overlay directory still exists at '$overlayfs'";
+        if (defined (my $overlayfs_old =  $self->{overlayfs_old})) {
+            ERROR "Overlay directory still exists at '$overlayfs' for VM $self->{vm_id}";
             return $self->_on_error;
         }
-        $self->_on_done;
+        return $self->_on_done;
     }
 
-    my $basefs = $vmhandler->{os_basefs};
-    $self->_make_overlay_dir($overlayfs, $basefs);
+    $self->_make_overlay_dir($overlayfs, $self->{basefs});
 }
 
 sub _make_overlay_dir {
     my ($self, $dir) = @_;
     unless (_mkpath($dir)) {
-        ERROR "Unable to create overlay file system '$dir': $!";
+        ERROR "Unable to create overlay file system '$dir' for VM $self->{vm_id}: $!";
         return $self->_on_error;
     }
     DEBUG "overlay directory $dir created";
@@ -191,23 +226,32 @@ sub _make_overlay_dir {
 
 sub _make_root {
     my $self = shift;
-    my $vmhandler = $self->{vmhandler};
-    my $rootfs = $vmhandler->{os_rootfs};
+    my $rootfs = $self->{rootfs};
 
     unless (mkpath($rootfs)) {
-        ERROR "Unable to create directory '$rootfs'";
+        ERROR "Unable to create root directory '$rootfs' for VM $self->{vm_id}";
         return $self->_on_error;
     }
 
-    my $basefs = $vmhandler->{os_basefs};
-    my $overlayfs = $vmhandler->{os_overlayfs};
-    my $subdir = $vmhandler->{os_base_subdir};
+    $self->_mount_root($rootfs, @{$self}{qw(basefs overlayfs basefs_subdir)});
+}
+# _mount_root is a virtual function that must be implemented by all the subclasses
 
-    $self->_mount_root($rootfs, $basefs, $overlayfs, $subdir);
+sub _delete_tmp {
+    my $self = shift;
+    my $tmp = $self->{basefs_tmp};
+
+    if (defined $tmp and -e $tmp) {
+        DEBUG "deleting temporary directory '$tmp' for VM $self->{vm_id}";
+        return $self->_delete_tmp_dir($tmp);
+    }
+    $self->_on_done;
 }
 
-sub _mount_root {
-    croak "internal error: unimplemented virtual function called";
+sub _delete_tmp_dir {
+    my ($self, $dir) = @_;
+    $self->_run_cmd({log_error => "deleting temporal directory $dir for VM $self->{vm_id} failed"},
+                    'rm', '-Rf', $dir);
 }
 
 1;

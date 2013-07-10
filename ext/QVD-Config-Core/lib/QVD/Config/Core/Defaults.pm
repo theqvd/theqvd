@@ -79,6 +79,7 @@ command.groupdel = /usr/sbin/groupdel
 command.tar = tar
 command.umount = umount
 command.mount = mount
+command.rm = rm
 command.unionfs-fuse = /usr/lib/qvd/bin/unionfs
 command.lxc-destroy = /usr/lib/qvd/bin/lxc-destroy
 command.lxc-console = /usr/lib/qvd/bin/lxc-console

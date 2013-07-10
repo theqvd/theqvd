@@ -18,6 +18,7 @@ use Fcntl ();
 use Fcntl::Packer ();
 use Method::WeakCallback qw(weak_method_callback);
 use QVD::HKD::Helpers qw(mkpath);
+use QVD::HKD::VMHandler::LXC::FS;
 
 use parent qw(QVD::HKD::VMHandler);
 
@@ -49,13 +50,12 @@ use Class::StateMachine::Declarative
                                                                       destroying_lxc         => { enter => '_destroy_lxc' },
                                                                       unmounting_filesystems => { enter => '_unmount_filesystems' } ] },
 
-                                  heavy           => { enter => '_heavy_down',
-                                                       transitions => { _on_error    => 'stopping/db',
-                                                                        _on_cmd_stop => 'stopping/db' } },
+                                  os_fs           => { enter => '_start_os_fs',
+                                                       transitions => { _on_error   => 'stopping/os_fs' } },
 
-                                  os_fs           => { on => { _on_hkd_kill =>'_on_error' },
-                                                       transitions => { _on_error   => 'stopping/fs' },
-                                                       enter => '_start_os_fs' } },
+                                  heavy           => { enter => '_heavy_down',
+                                                       transitions => { _on_error    => 'stopping/os_fs',
+                                                                        _on_cmd_stop => 'stopping/os_fs' } },
 
                                   setup           => { transitions => { _on_error   => 'stopping/cleanup' },
                                                        substates => [ allocating_home_fs      => { enter => '_allocate_home_fs' },
@@ -134,7 +134,9 @@ use Class::StateMachine::Declarative
                                                                                            transitions => { _on_error => 'destroying_lxc' } },
                                                                destroying_lxc         => { enter => '_destroy_lxc' },
                                                                configuring_dhcpd      => { enter => '_rm_from_dhcpd' } ] },
-                                  fs       => { enter => '_unmount_filesystems' },
+
+                                  os_fs    => { enter => '_unmount_filesystems' },
+
                                   db       => { enter => '_clear_runtime_row',
                                                 transitions => { _on_error => 'zombie/db',
                                                                  _on_done  => 'stopped' } } ] },
@@ -172,7 +174,6 @@ use Class::StateMachine::Declarative
                                                                                        transitions => { _on_error => 'unmounting_filesystems'  } },
                                                            unmounting_filesystems => { enter => '_unmount_filesystems' },
                                                            unheavy                => { enter => '_heavy_up' },
-                                                           releasing_untar_lock   => { enter => '_release_untar_lock' },
                                                            configuring_dhcpd      => { enter => '_rm_from_dhcpd' },
                                                            '(delaying)'           => { enter => '_set_state_timer',
                                                                                        transitions => { _on_state_timeout => 'reap'} } ] },
@@ -245,156 +246,20 @@ sub _calculate_attrs {
     $self->_on_done;
 }
 
-sub _lock_os_image {
+sub _start_os_fs {
     my $self = shift;
-
-    $self->_flock({reheavy => 1, save_as => 'untar_lock'},
-                  $self->{os_basefs_lockfn});
-}
-
-sub _check_if_os_image_is_there {
-    my $self = shift;
-    my $image_path = $self->{os_image_path};
-    my $basefs = $self->{os_basefs};
-
-    unless (-f $image_path) {
-        ERROR "OS image for DI $self->{di_id} used by VM $self->{vm_id} not found at '$image_path'";
-        return $self->_on_error;
-    }
-
-    unless (-d $basefs) {
-        DEBUG "OS image for DI $self->{di_id} used by VM $self->{vm_id} has not been unpacked yet into $basefs";
-        return $self->_on_it_is_not;
-    }
-    $self->_on_done;
-}
-
-sub _make_tmp_dir_for_os_image {
-    my $self = shift;
-    my $tmp;
-    do {
-        $tmp = $self->_cfg('path.storage.basefs') . join('-', "/untar", $$, time, rand(10000))
-    } while -e $tmp;
-
-    $self->{os_basefs_tmp} = $tmp;
-
-    if ($self->_cfg('vm.lxc.unionfs.type') eq 'btrfs') {
-        $self->_run_cmd({ log_error => "Unable to create btrfs subvolume at '$tmp'" },
-                        btrfs => 'subvolume', 'create', $tmp)) {
-        return;
-    }
-    else {
-        if (mkpath $tmp) {
-            $self->_on_done;
-        }
-        else {
-            ERROR "Unable to create directory '$tmp': $!";
-            return $self->_on_error;
-        }
-    }
-}
-
-
-sub _release_untar_lock {
-    my $self = shift;
-    if ($self->{untar_lock}) {
-        DEBUG "Releasing untar lock";
-        delete $self->{untar_lock};
-    }
-    return $self->_on_done
-}
-
-sub _allocate_os_rootfs {
-    my $self = shift;
-
-    my $basefs    = $self->{os_basefs}    . ($self->{os_base_subdir} // '');
-    my $overlayfs = $self->{os_overlayfs} . ($self->{os_base_subdir} // '');
-
-    my $rootfs = $self->{os_rootfs};
-    unless (mkpath $rootfs) {
-        ERROR "Unable to create directory '$rootfs'";
-        return $self->_on_error;
-    }
-    _run($self->_cfg('command.umount'), $rootfs); # just in case!
-    $debug and $self->_debug("rootfs: $rootfs, rootfs_parent: $self->{os_rootfs_parent}");
-    DEBUG "rootfs: '$rootfs', rootfs_parent: '$self->{os_rootfs_parent}'";
-    if ((stat $rootfs)[0] != (stat $self->{os_rootfs_parent})[0]) {
-        ERROR "A file system is already mounted on top of $rootfs";
-        return $self->_on_error;
-    }
-
-    my $unionfs_type = $self->_cfg('vm.lxc.unionfs.type');
-    DEBUG "Unionfs type: '$unionfs_type'";
-
-
-    given ($unionfs_type) {
-        when('overlayfs') {
-            if(_run($self->_cfg('command.modprobe'), "overlayfs")) {
-                WARN "Failed to load aufs kernel module. Mounting will probably fail.";
-            }
-            # mount -t overlayfs -o rw,uppderdir=x,lowerdir=y overlayfs /mount/point
-            if (_run($self->_cfg('command.mount'),
-                     -t => 'overlayfs',
-                     -o => "rw,upperdir=$overlayfs,lowerdir=$basefs", "overlayfs", $rootfs)) {
-                ERROR "Unable to mount overlayfs (code: " . ($?>>8) . ")";
-                return $self->_on_error;
-            }
-        }
-        when('aufs') {
-            if(_run($self->_cfg('command.modprobe'), "aufs")) {
-                WARN "Failed to load aufs kernel module. Mounting will probably fail.";
-            }
-
-            if (_run($self->_cfg('command.mount'),
-                -t => 'aufs',
-                -o => "br:$overlayfs:$basefs=ro", "aufs", $rootfs)) {
-                ERROR "Unable to mount aufs (code: " . ($?>>8) . ")";
-                return $self->_on_error;
-            }
-        }
-        when ('unionfs-fuse') {
-            if(_run($self->_cfg('command.modprobe'), "fuse")) {
-                ERROR "Failed to load fuse kernel module. Mounting will probably fail.";
-            }
-
-            if (_run($self->_cfg('command.unionfs-fuse'),
-                -o => 'cow',
-                -o => 'max_files=32000',
-                -o => 'suid',
-                -o => 'dev',
-                -o => 'allow_other',
-                "$overlayfs=RW:$basefs=RO", $rootfs)) {
-                ERROR "Unable to mount unionfs-fuse (code: " . ($? >> 8) . ")";
-                return $self->_on_error;
-            }
-        }
-        when ('bind') {
-            if (_run($self->_cfg('command.mount'),
-                '--bind', $basefs, $rootfs)) {
-                ERROR "Unable to mount bind '$basefs' into '$rootfs', mount rc: " . ($? >> 8);
-                return $self->_on_error;
-            }
-            if ($self->_cfg('vm.lxc.unionfs.bind.ro')) {
-                if (_run($self->_cfg('command.mount'),
-                    -o => 'remount,ro', $rootfs)) {
-                    ERROR "Unable to remount bind mount '$rootfs' as read-only, mount rc: ". ($? >> 8);
-                    return $self->_on_error;
-                }
-            }
-        }
-        when ('btrfs') {
-            if (_run($self->_cfg('command.mount'),
-                     '--bind', $overlayfs, $rootfs)) {
-                ERROR "Unable to mount bind '$overlayfs' into '$rootfs', mount rc: " . ($? >> 8);
-                return $self->_on_error;
-            }
-        }
-        default {
-            ERROR "Unsupported unionfs type '$unionfs_type'";
-            return $self->_on_error;
-        }
-    }
-    $self->_on_done;
+    my $fs = QVD::HKD::VMHandler::LXC::FS->new(vm_id         => $self->{vm_id},
+                                               config        => $self->{config},
+                                               heavy         => $self->{heavy},
+                                               on_error      => weak_method_callback($self, '_on_error'),
+                                               on_running    => weak_method_callback($self, '_on_done'),
+                                               basefs        => $self->{os_basefs},
+                                               basefs_lockfn => $self->{os_basefs_lockfn},
+                                               overlayfs     => $self->{os_overlayfs},
+                                               overlayfs_old => $self->{os_overlayfs_old},
+                                               rootfs        => $self->{os_rootfs});
+    $self->{os_fs} = $fs;
+    $fs->run;
 }
 
 sub _allocate_home_fs {
@@ -414,12 +279,8 @@ sub _allocate_home_fs {
     }
 
     # let lxc mount the home file system for us
-    $self->{home_fstab} = "$homefs $mount_point none defaults,bind";
     DEBUG "Setting up homefs fstab entry as '$homefs $mount_point none defaults,bind'";
-    #    if (system $self->_cfg('command.mount'), '--bind', $homefs, $mount_point) {
-    #        ERROR "unable to bind $homefs into $mount_point, mount failed (code: ".($?>>8).")";
-    #        return $self->_on_error;
-    #    }
+    $self->{home_fstab} = "$homefs $mount_point none defaults,bind";
 
     $self->_on_done
 }
@@ -657,7 +518,6 @@ sub __unmount_filesystem {
 sub _hook_args {
     my $self = shift;
     map { $_ => $self->{$_} } qw( use_overlay
-                                  os_meta
                                   mac
                                   name
                                   ip
@@ -668,13 +528,14 @@ sub _hook_args {
 
 sub _run_hook {
     my ($self, $name) = @_;
-    my $meta = $self->{os_meta};
+    my $meta = $self->{os_fs}->image_metadata_dir;
     if (defined $meta) {
         my $hook = "$meta/hooks/$name";
         if (-f $hook) {
-            my @args = ( id    => $self->{vm_id},
-                         hook  => $name,
-                         state => $self->_main_state,
+            my @args = ( id      => $self->{vm_id},
+                         hook    => $name,
+                         state   => $self->_main_state,
+                         os_meta => $meta,
                          $self->_hook_args );
 
             $debug and $self->_debug("running hook $hook for $name");
