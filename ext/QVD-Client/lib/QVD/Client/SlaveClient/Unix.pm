@@ -3,6 +3,7 @@ package QVD::Client::SlaveClient::Unix;
 use parent 'QVD::Client::SlaveClient::Base';
 
 use QVD::Config::Core qw(core_cfg);
+use QVD::HTTP::Headers qw(header_lookup);
 use QVD::HTTP::StatusCodes qw(:status_codes);
 
 my $command_sftp_server = core_cfg('command.sftp-server');
@@ -25,7 +26,7 @@ sub handle_share {
         die "Server replied $code $msg $data";
     }
     
-    my $ticket = _header_lookup($headers, 'X-QVD-Share-Ticket');
+    my $ticket = header_lookup($headers, 'X-QVD-Share-Ticket');
 
     my $pid = fork();
     if ($pid > 0) {
