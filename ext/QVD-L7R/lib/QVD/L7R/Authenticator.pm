@@ -34,6 +34,7 @@ sub new {
 
 sub _normalize_login {
     my ($auth, $login) = @_;
+    $login //= '';
     my $normalized_login = ($case_sensitive_login ? $login : lc $login);
     $normalized_login =~ s/^\s+//;
     $normalized_login =~ s/\s+$//;
