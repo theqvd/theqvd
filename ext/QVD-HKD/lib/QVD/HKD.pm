@@ -312,7 +312,7 @@ sub _check_cgroups {
         if (defined(my $mie = $mi->at($dir))) {
             if ($mie->fs_type eq 'cgroup') {
                 INFO "cgroup found at $dir";
-                $self->_on_done;
+                return $self->_on_done;
             }
             last;
         }
