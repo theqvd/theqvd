@@ -419,7 +419,7 @@ sub _flock {
     my ($self, $opts, $file) = &__opts;
     my $cb = weak_method_callback($self, '__on_flock', $opts);
 
-    if (open my $fh, '+<', $file) {
+    if (sysopen my $fh, $file, Fcntl::O_CREAT()|Fcntl::O_RDWR()) {
         my $save_to = ($opts->{save_to} //= 'flock_fh');
         $self->{$save_to} = $fh;
         DEBUG "flock file descriptor is " . fileno($self->{$save_to});
