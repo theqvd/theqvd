@@ -419,6 +419,8 @@ sub _flock {
     my ($self, $opts, $file) = &__opts;
     my $cb = weak_method_callback($self, '__on_flock', $opts);
 
+    DEBUG "locking $file";
+
     if (sysopen my $fh, $file, Fcntl::O_CREAT()|Fcntl::O_RDWR()) {
         my $save_to = ($opts->{save_to} //= 'flock_fh');
         $self->{$save_to} = $fh;
@@ -431,14 +433,16 @@ sub _flock {
     }
 }
 
-my $fcntl_lock_packet = Fcntl::Packer::pack_fcntl_flock({ type => Fcntl::F_WRLCK() });
+my $fcntl_lock_packet = Fcntl::Packer::pack_fcntl_flock({ type => Fcntl::F_WRLCK(), len => 1 });
 
 sub __acquire_flock {
     my ($self, $opts) = @_;
     my $save_to = $opts->{save_to};
-    my $ok = fcntl($self->{$save_to}, Fcntl::F_SETLK(), $fcntl_lock_packet);
+    my $ok = flock($self->{$save_to}, Fcntl::LOCK_EX() | Fcntl::LOCK_NB());
+    # my $ok = fcntl($self->{$save_to}, Fcntl::F_SETLK(), $fcntl_lock_packet);
     unless ($ok) {
         if ($! == Errno::EAGAIN()) {
+            DEBUG "delaying flock";
             my $delay = ($opts->{delay} // 10) * (0.8 + rand 0.4);
             if ($opts->{reheavy}) {
                 delete $opts->{heavy_watcher_down}
@@ -451,10 +455,9 @@ sub __acquire_flock {
             }
             return;
         }
-        DEBUG "fcntl failed: $!";
+        DEBUG "flock failed: $!";
         delete $self->{$save_to};
     }
-
     $self->__call_on_done_or_error_callback($opts, !$ok);
 }
 
