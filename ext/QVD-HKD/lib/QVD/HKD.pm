@@ -534,19 +534,34 @@ sub _on_vm_stopped {
     keys %{$self->{vm}} or $self->_on_no_vms_are_running;
 }
 
+sub _call_for_all_vms {
+    my ($self, $method) = @_;
+    my $count = 0;
+    for my $key (keys %{$self->{vm}}) {
+        if (defined (my $vm = $self->{vm}{$key})) {
+            $vm->$method;
+            $count++;
+        }
+        else {
+            delete $self->{vm}{$key}
+        }
+    }
+    $count;
+}
+
 sub _stop_all_vms {
     my $self = shift;
-    values %{$self->{vm}}
+    $self->_call_for_all_vms('on_hkd_stop')
         or return $self->_on_no_vms_are_running;
-    $_->on_hkd_stop for values %{$self->{vm}};
+
     $self->_call_after($self->_cfg("internal.hkd.stopping.vms.timeout"), '_on_state_timeout');
 }
 
 sub _kill_all_vms {
     my $self = shift;
-    values %{$self->{vm}}
+    $self->_call_for_all_vms('on_hkd_kill')
         or return $self->_on_no_vms_are_running;
-    $_->on_hkd_kill for values %{$self->{vm}};
+
     # FIXME: what to do when not all machines can be killed? nothing? repeat?
     $self->_call_after($self->_cfg("internal.hkd.killing.vms.retry.timeout"), '_kill_all_vms');
 }
@@ -673,6 +688,9 @@ sub _write_vm_report {
         # FIXME: investigate why sometimes undefs appear here!
         if (defined $vm) {
             $state{$vm->state}++;
+        }
+        else {
+            DEBUG 'internal error: undef found inside %{hkd->{vm}}';
         }
     }
     if (open my $fh, '>', '/tmp/hkd-vm-states') {
