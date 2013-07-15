@@ -17,8 +17,8 @@ use Class::StateMachine::Declarative
     base     => { substates => [ locking       => { enter => '_lock_os_image' },
                                  checking_dir  => { enter => '_check_base_dir',
                                                     transitions => { _on_error => 'unpacking' } },
-                                 '(unpacking)' => { substates => [ finding_tmp_dir => { enter => '_find_tmp_dir' },
-                                                                   making_tmp_dir  => { enter => '_make_tmp_dir' },
+                                 '(unpacking)' => { substates => [ finding_tmp_dir => { enter => '_find_tmp_dir_for_os_image' },
+                                                                   making_tmp_dir  => { enter => '_make_tmp_dir_for_os_image' },
                                                                    untaring        => { enter => '_untar_os_image' },
                                                                    placing         => { enter => '_place_os_image' } ] },
                                  analyze       => { enter => '_analyze_os_image' },
@@ -31,8 +31,9 @@ use Class::StateMachine::Declarative
 
     running  => { enter => '_tell_running' },
 
-    aborting => { substates => [ unlocking        => { enter => '_unlock_os_image' },
-                                 deleting_tmp_dir => { enter => '_delete_tmp_dir'  } ] },
+    aborting => { on => { _on_error => '_on_done' },
+                  substates => [ unlocking        => { enter => '_unlock_os_image' },
+                                 deleting_tmp_dir => { enter => '_delete_tmp' } ] },
 
     aborted  => { enter => '_tell_error' };
 
