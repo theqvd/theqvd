@@ -253,19 +253,19 @@ sub _remove_fw_rules {
                     DEBUG "Deleting rule '$_'";
                     if (system $ebtables => -D => $chain, $n) {
                         $debug and $self->_debug("unable to delete rule, rc: " . ($? << 8));
-                        ERROR "Unable to delete ebtable";
+                        WARN "Unable to delete ebtable";
                     }
                 }
             }
             DEBUG "deleting ebtables chain $target";
             if (system $ebtables => -X => $target) {
                 $debug and $self->_debug("unable to delete chain $target, rc: " . ($? << 8));
-                ERROR "Unable to delete chain '$target', rc: " . ($? << 8);
+                WARN "Unable to delete chain '$target', rc: " . ($? << 8);
             }
 
             unless (system "$ebtables -L $target >/dev/null 2>&1") {
                 $debug and $self->_debug("deletion of chain $target failed");
-                ERROR "Deletion of chain '$target' failed";
+                WARN "Deletion of chain '$target' failed";
                 return $self->_on_error;
             }
         }
