@@ -22,10 +22,15 @@ sub init_backend {
 
 sub _make_tmp_dir_for_os_image {
     my $self = shift;
-    my $tmp = $self->{os_basefs_tmp};
-    DEBUG "creating btrfs subvolume '$tmp'";
-    $self->_run_cmd({ log_error => "Unable to create btrfs subvolume at '$tmp'" },
-                    btrfs => 'subvolume', 'create', $tmp);
+    if (defined (my $tmp = $self->{basefs_tmp})) {
+        DEBUG "creating btrfs subvolume '$tmp'";
+        $self->_run_cmd({ log_error => "Unable to create btrfs subvolume at '$tmp'" },
+                        btrfs => 'subvolume', 'create', $tmp);
+    }
+    else {
+        ERROR "internal error: basefs_tmp is undefined for VM $self->{vm_id}";
+        $self->_on_error;
+    }
 }
 
 sub _remove_overlay_dir {
@@ -38,7 +43,7 @@ sub _remove_overlay_dir {
 sub _make_overlay_dir {
     my ($self, $dir, $basefs) = @_;
     DEBUG "creating btrfs subvolume '$dir' as a snapshot of '$basefs'";
-    $self->_run_cmd({log_error => "Unable to create Btrfs volumen '$dir' as a snapshot of '$basefs'"},
+    $self->_run_cmd({log_error => "Unable to create btrfs volumen '$dir' as a snapshot of '$basefs'"},
                     btrfs => 'subvolume', 'snapshot', $basefs, $dir);
 }
 

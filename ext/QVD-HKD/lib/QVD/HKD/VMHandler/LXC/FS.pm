@@ -41,7 +41,8 @@ sub new {
     my ($class, %opts) = @_;
 
     my %mine = map { $_ => delete $opts{$_} }
-        qw(vm_id basefs basefs_lockfn
+        qw(vm_id image_path
+           basefs basefs_lockfn
            overlayfs overlayfs_old rootfs
            on_running on_stopped on_error);
 

@@ -201,10 +201,9 @@ sub _calculate_attrs {
     if (defined(my $di_path = $self->{di_path})) {
         # this sub is called with just the vm_id loaded into the
         # object when reaping zombie containers
+        $self->{os_image_path} = $self->_cfg('path.storage.images') .'/'. $di_path;
         my $base_dir = $di_path;
         $base_dir =~ s/\.(?:tar(?:\.(?:gz|bz2|xz))?|tgz|tbz|txz)$//;
-
-        $self->{os_image_path} = $self->_cfg('path.storage.images') .'/'. $base_dir;
         my $basefs_parent = $self->_cfg('path.storage.basefs');
         $basefs_parent =~ s|/*$|/|;
         # note that os_basefs may be changed later from
@@ -256,6 +255,7 @@ sub _start_os_fs {
                                                heavy         => $self->{heavy},
                                                on_error      => weak_method_callback($self, '_on_error'),
                                                on_running    => weak_method_callback($self, '_on_done'),
+                                               image_path    => $self->{os_image_path},
                                                basefs        => $self->{os_basefs},
                                                basefs_lockfn => $self->{os_basefs_lockfn},
                                                overlayfs     => $self->{os_overlayfs},
