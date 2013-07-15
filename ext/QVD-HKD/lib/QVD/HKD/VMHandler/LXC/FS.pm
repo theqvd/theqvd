@@ -75,7 +75,7 @@ sub _tell_error   { shift->_maybe_callback('on_error')   }
 sub _lock_os_image {
     my $self = shift;
 
-    $self->_flock({save_as => 'untar_lock'},
+    $self->_flock({save_to => 'untar_lock'},
                   $self->{basefs_lockfn});
 }
 
