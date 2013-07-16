@@ -846,7 +846,6 @@ sub cmd_vm_start {
                 $vmrt->can_send_vm_cmd('start') or return;
                 $self->_assign_host($vmrt);
                 $vmrt->send_vm_start;
-                $self->_start_vm($vmrt);
                 $host{$vmrt->host_id}++;
                 1;
             };
