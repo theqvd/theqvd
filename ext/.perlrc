@@ -9,10 +9,17 @@ use lib::glob '*/lib:../g/p5*/lib';
 my $name = $0;
 $name =~ s/.*\///;
 unless ($ENV{NO_AUTO_TEE}) {
-	tee(*STDOUT, '>', "/tmp/$name.out");
-	open STDERR, '>&STDOUT';
+    mkdir "/var/lib/qvd";
+    mkdir "/var/lib/qvd/tmp";
+    tee(*STDOUT, '>', "/var/lib/qvd/tmp/$name.out");
+    open STDERR, '>&STDOUT';
+
+    open my $pid, '>', "/var/lib/qvd/tmp/$name.pid";
+    print $pid "$$\n";
+    close $pid;
 }
-if ($name eq 'hkd') {
-	open STDOUT, '>', "/var/lib/qvd/tmp/hkd.out";
-	open STDERR, '>&STDOUT';
+
+END {
+    unlink "/var/lib/qvd/tmp/$name.pid";
 }
+
