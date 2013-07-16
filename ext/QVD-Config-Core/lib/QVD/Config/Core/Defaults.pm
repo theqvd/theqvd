@@ -347,7 +347,8 @@ internal.l7r.short_session = 120
 
 # this value should ba adjusted in accordance to
 # internal.database.pool.connection.global_timeout
-internal.hkd.cluster.node.timeout = 500
+# and internal.hkd.agent.ticker.timeout
+internal.hkd.cluster.node.timeout = 600
 
 # if the ticker agent is not able to tick the database for the
 # following time, it aborts the HKD
