@@ -114,7 +114,8 @@ sub _untar_os_image {
     my $tmp = $self->{basefs_tmp};
 
     unless (-f $image_path) {
-        ERROR "OS image $image_path for VM $self->{vm_id} not found on filesystem"
+        ERROR "OS image $image_path for VM $self->{vm_id} not found on filesystem";
+        return $self->_on_error;
     }
 
     INFO "Untarring image to '$tmp'";
