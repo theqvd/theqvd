@@ -1,0 +1,20 @@
+#!/usr/bin/perl
+
+use strict;
+use warnings;
+
+use File::Slurp qw(slurp);
+
+while (1) {
+    while (-f '/var/lib/qvd/tmp/hkd.pid') {
+        eval {
+            unlink "/tmp/hkd-vm-states";
+            chomp(my $pid = slurp "/var/lib/qvd/tmp/hkd.pid");
+            kill USR1 => $pid;
+            sleep 3;
+            print slurp "/tmp/hkd-vm-states";
+        };
+        print $@ if $@;
+    }
+    sleep 1;
+}

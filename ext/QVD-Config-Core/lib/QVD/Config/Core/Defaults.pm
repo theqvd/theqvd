@@ -79,6 +79,7 @@ command.groupdel = /usr/sbin/groupdel
 command.tar = tar
 command.umount = umount
 command.mount = mount
+command.rm = rm
 command.unionfs-fuse = /usr/lib/qvd/bin/unionfs
 command.lxc-destroy = /usr/lib/qvd/bin/lxc-destroy
 command.lxc-console = /usr/lib/qvd/bin/lxc-console
@@ -346,7 +347,8 @@ internal.l7r.short_session = 120
 
 # this value should ba adjusted in accordance to
 # internal.database.pool.connection.global_timeout
-internal.hkd.cluster.node.timeout = 500
+# and internal.hkd.agent.ticker.timeout
+internal.hkd.cluster.node.timeout = 600
 
 # if the ticker agent is not able to tick the database for the
 # following time, it aborts the HKD

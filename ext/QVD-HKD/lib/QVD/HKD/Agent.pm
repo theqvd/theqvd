@@ -8,8 +8,9 @@ use warnings;
 
 use AnyEvent::Util ();
 use AnyEvent::HTTP;
-use AnyEvent::FileLock;
-use QVD::HKD::Helpers;
+use Fcntl ();
+use Fcntl::Packer ();
+use QVD::HKD::Helpers qw(croak_invalid_opts);
 use Pg::PQ qw(:pgres);
 use QVD::Log;
 use JSON;
@@ -417,46 +418,47 @@ sub _call_after {
 sub _flock {
     my ($self, $opts, $file) = &__opts;
     my $cb = weak_method_callback($self, '__on_flock', $opts);
-    my $mode = $opts->{mode} //= '>';
-    $opts->{file_or_fh} = $opts->{file} // $opts->{fh};
-    DEBUG "Trying to lock file $opts->{file_or_fh}";
-    if ($self->{flock_watcher} = AnyEvent::FileLock->flock(file => $file,
-                                                           type => 'fcntl',
-                                                           mode => $mode,
-                                                           cb => $cb)) {
+
+    DEBUG "locking $file";
+
+    if (sysopen my $fh, $file, Fcntl::O_CREAT()|Fcntl::O_RDWR()) {
+        my $save_to = ($opts->{save_to} //= 'flock_fh');
+        $self->{$save_to} = $fh;
+        DEBUG "flock file descriptor is " . fileno($self->{$save_to});
+        $self->__acquire_flock($opts);
     }
     else {
-        my $err = $!;
-        AE::postpone {
-            local $! = $err;
-            $cb->()
-        }
+        ERROR "Unable to open lock file $file: $!";
+        $self->__call_on_done_or_error_callback($opts, 1);
     }
 }
 
-sub __on_flock {
-    my ($self, $opts, $fh) = @_;
-    if (defined $fh) {
-        DEBUG "lock for file $opts->{file_or_fh} acquired";
-        if (defined (my $save_to = $opts->{save_to})) {
-            $self->{$save_to} = $fh;
-        }
-        else {
-            my $on_result = $opts->{_on_result} // "_on_$opts->{caller_method}_result";
-            my $method = (ref $on_result ? $on_result : $self->can($on_result));
-            if ($method) {
-                $self->$method($fh)
+my $fcntl_lock_packet = Fcntl::Packer::pack_fcntl_flock({ type => Fcntl::F_WRLCK(), len => 1 });
+
+sub __acquire_flock {
+    my ($self, $opts) = @_;
+    my $save_to = $opts->{save_to};
+    my $ok = flock($self->{$save_to}, Fcntl::LOCK_EX() | Fcntl::LOCK_NB());
+    # my $ok = fcntl($self->{$save_to}, Fcntl::F_SETLK(), $fcntl_lock_packet);
+    unless ($ok) {
+        if ($! == Errno::EAGAIN()) {
+            DEBUG "delaying flock";
+            my $delay = ($opts->{delay} // 10) * (0.8 + rand 0.4);
+            if ($opts->{reheavy}) {
+                delete $opts->{heavy_watcher_down}
+                    or die "internal error: __acquire_flock called with reheavy set but Agent is not heavy";
+                my $on_heavy = weak_method_callback($self, '__acquire_flock', $opts);
+                $self->_call_after($delay, _heavy_down => { on_done => $on_heavy });
             }
             else {
-                DEBUG "__on_flock did nothing!"
+                $self->_call_after($delay, '__acquire_flock', $opts);
             }
+            return;
         }
-    }
-    else {
-        $opts->{log_error} .= ": $!" if defined $opts->{log_error};
         DEBUG "flock failed: $!";
+        delete $self->{$save_to};
     }
-    $self->__call_on_done_or_error_callback($opts, !defined($fh));
+    $self->__call_on_done_or_error_callback($opts, !$ok);
 }
 
 sub leave_state {
