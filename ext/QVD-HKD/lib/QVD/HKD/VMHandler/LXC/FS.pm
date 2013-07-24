@@ -219,7 +219,7 @@ sub _make_overlay {
 
 sub _make_overlay_dir {
     my ($self, $dir) = @_;
-    unless (_mkpath($dir)) {
+    unless (mkpath($dir)) {
         ERROR "Unable to create overlay file system '$dir' for VM $self->{vm_id}: $!";
         return $self->_on_error;
     }
