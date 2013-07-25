@@ -1,0 +1,13 @@
+diff -Naru qvd-nxcomp.old/Loop.cpp qvd-nxcomp/Loop.cpp
+--- qvd-nxcomp.old/Loop.cpp	2012-10-09 15:38:03.000000000 +0200
++++ qvd-nxcomp/Loop.cpp	2013-07-25 13:06:07.957795999 +0200
+@@ -4512,7 +4512,8 @@
+ 
+   tcpAddr.sin_family = AF_INET;
+   tcpAddr.sin_port = htons(portTCP);
+-  tcpAddr.sin_addr.s_addr = htonl(INADDR_ANY);
++  /* qvd: listen for utility connections only on loopback interface -Joni */
++  tcpAddr.sin_addr.s_addr = htonl(INADDR_LOOPBACK);
+ 
+   if (bind(newFD, (sockaddr *) &tcpAddr, sizeof(tcpAddr)) == -1)
+   {
