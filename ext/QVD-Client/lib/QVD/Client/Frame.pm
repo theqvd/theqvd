@@ -83,7 +83,7 @@ sub new {
     $ver_sizer->Add($grid_sizer, 1, wxALL|wxEXPAND, 20);
 
     $grid_sizer->Add(Wx::StaticText->new($panel, -1, "User"), 0, wxALL, 5);
-    $self->{username} = Wx::TextCtrl->new($panel, -1, core_cfg('client.user.name'));
+    $self->{username} = Wx::TextCtrl->new($panel, -1, core_cfg('client.remember_username') ?  core_cfg('client.user.name') : "");
     $grid_sizer->Add($self->{username}, 1, wxALL|wxEXPAND, 5);
 
     $grid_sizer->Add(Wx::StaticText->new($panel, -1, "Password"), 0, wxALL, 5);
@@ -175,7 +175,7 @@ sub new {
     $ver_sizer->Fit($self);
     $self->Center;
     $self->Show(1);
-    length core_cfg('client.user.name') ? $self->{password}->SetFocus() : $self->{username}->SetFocus();
+    (core_cfg('client.remember_username') && length core_cfg('client.user.name')) ? $self->{password}->SetFocus() : $self->{username}->SetFocus();
 
     Wx::Event::EVT_BUTTON($self, $self->{connect_button}->GetId, \&OnClickConnect);
     Wx::Event::EVT_TIMER($self, -1, \&OnTimer);
@@ -303,6 +303,10 @@ sub OnClickConnect {
                               ? $self->{remember_pass}->GetValue
                               : core_cfg("client.remember_password") );
 
+    unless (core_cfg('client.remember_username')) {
+        $self->{username}->SetValue('');
+    }
+
     unless ($remember_password) {
         $self->{password}->SetValue('');
     }
@@ -384,7 +388,7 @@ sub OnConnectionStatusChanged {
         $self->{progress_bar}->SetRange(100);
         $self->EnableControls(1);
         $self->Show;
-        length core_cfg('client.user.name') ? $self->{password}->SetFocus() : $self->{username}->SetFocus();
+        (core_cfg('client.remember_username') && length core_cfg('client.user.name')) ? $self->{password}->SetFocus() : $self->{username}->SetFocus();
 
     }
 }
@@ -546,7 +550,12 @@ sub EnableControls {
 
 sub SaveConfiguration {
     my $self = shift;
-    set_core_cfg('client.user.name', $self->{username}->GetValue());
+    if (core_cfg('client.remember_username')) {
+        set_core_cfg('client.user.name', $self->{username}->GetValue());
+    } else {
+        # If remembering the username is disabled, erase any previously stored value
+        set_core_cfg('client.user.name', "");
+    }
     if (!core_cfg('client.force.host.name', 0)) {
         set_core_cfg('client.host.name', $self->{host}->GetValue());
     }

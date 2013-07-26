@@ -114,6 +114,10 @@ command.darwin.sftp-server = /usr/libexec/sftp-server
 
 ## whether to remember password after successful connection
 client.remember_password = 0
+
+## whether to remember the username after a successful connection
+client.remember_username = 1
+
 ## whether to show the previous checkbox or not
 client.show.remember_password = 0
 ## nxproxy's link parameter, can be: modem, isdn, adsl, wan, lan, local or a bandwidth specification (56k, 1m, 100m...)
