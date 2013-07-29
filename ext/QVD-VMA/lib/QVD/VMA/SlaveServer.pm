@@ -15,6 +15,7 @@ use base 'QVD::HTTPD::INET';
 
 my $mount_root = $ENV{HOME}.'/Redirected';
 my $command_sshfs = core_cfg('command.sshfs');
+my $open_command = core_cfg('command.open_file');
 
 sub new {
     my ($class) = @_;
@@ -95,7 +96,7 @@ sub handle_open {
         wait;
     } else {
         $ENV{DISPLAY} = ':100';
-	my @cmd = ('/usr/bin/libreoffice', $abs_path);
+	my @cmd = ($open_command, $abs_path);
 	exec @cmd;
         die "Unable to exec: $^E";
     }
