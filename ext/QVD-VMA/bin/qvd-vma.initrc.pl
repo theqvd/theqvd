@@ -8,8 +8,8 @@
 # Should-Stop:       $null
 # Default-Start:     2 3 5
 # Default-Stop:      0 1 6
-# Short-Description: QVD Layer7 Router
-# Description:       QVD L7R service
+# Short-Description: QVD Virtual Machine Agent
+# Description:       QVD Virtual Machine Agent
 ### END INIT INFO
 
 PATH=/usr/lib/qvd/bin:/bin:/usr/bin
