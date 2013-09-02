@@ -1,6 +1,13 @@
 @echo off
 
+set docsdir=
+
 FOR /F "skip=2 tokens=3 delims=	" %%G IN ('REG QUERY "HKCU\Software\Microsoft\Windows\CurrentVersion\Explorer\Shell Folders" /v "Personal"') DO (SET docsdir=%%G)
+
+IF "%docsdir%"=="" (
+  echo It doesn't look like we were running in Windows XP, good!
+  FOR /F "skip=2 tokens=3" %%G IN ('REG QUERY "HKCU\Software\Microsoft\Windows\CurrentVersion\Explorer\Shell Folders" /v "Personal"') DO (SET docsdir=%%G)
+)
 
 set out=%docsdir%\qvdbug.txt
 
