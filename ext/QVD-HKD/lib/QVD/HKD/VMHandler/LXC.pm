@@ -47,7 +47,6 @@ use Class::StateMachine::Declarative
                                                        substates => [ killing_lxc            => { enter => '_kill_lxc' },
                                                                       unlinking_iface        => { enter => '_unlink_iface' },
                                                                       removing_fw_rules      => { enter => '_remove_fw_rules' },
-                                                                      destroying_lxc         => { enter => '_destroy_lxc' },
                                                                       unmounting_filesystems => { enter => '_unmount_filesystems' } ] },
 
                                   os_fs           => { enter => '_start_os_fs',
@@ -61,7 +60,6 @@ use Class::StateMachine::Declarative
                                                        substates => [ allocating_home_fs      => { enter => '_allocate_home_fs' },
                                                                       configuring_dhcpd       => { enter => '_add_to_dhcpd' },
                                                                       creating_lxc            => { enter => '_create_lxc' },
-                                                                      configuring_lxc         => { enter => '_configure_lxc' },
                                                                       running_prestart_hook   => { enter => '_run_prestart_hook' },
                                                                       setting_fw_rules        => { enter => '_set_fw_rules' },
                                                                       launching               => { enter => '_start_lxc' } ] },
@@ -292,9 +290,26 @@ sub _create_lxc {
     my $self = shift;
     my $lxc_name = $self->{lxc_name};
 
-    my ($fh, $fn) = tempfile(UNLINK => 0);
-    $debug and $self->_debug("saving lxc configuration to $fn");
+    my $lxc_root = $self->_cfg('path.storage.lxc');
+    unless (-d $lxc_root) {
+        ERROR "Directory $lxc_root does not exist";
+        return $self->_on_error;
+    }
+
+    my $lxc_dir = "$lxc_root/$lxc_name";
+    unless (-d $lxc_dir or mkdir $lxc_dir) {
+        ERROR "Unable to create directory '$lxc_dir': $!";
+        return $self->_on_error;
+    }
+
+    my $fn = "$lxc_dir/config";
     DEBUG "Saving lxc configuration to '$fn'";
+    open my $cfg_fh, '>', $fn;
+    unless ($cfg_fh) {
+        ERROR "Unable to create file '$fn': $!";
+        return $self->_on_error;
+    }
+
     my $bridge = $self->_cfg('vm.network.bridge');
     my $console;
     if ($self->_cfg('vm.serial.capture')) {
@@ -322,7 +337,7 @@ sub _create_lxc {
     my $lxc_version = $self->_cfg('command.version.lxc');
 
     # FIXME: make this template-able or configurable in some way
-    print $fh <<EOC;
+    print $cfg_fh <<EOC;
 lxc.utsname=$self->{name}
 lxc.network.type=veth
 lxc.network.veth.pair=$iface
@@ -372,27 +387,20 @@ lxc.cgroup.devices.allow = c 10:232 rwm
 EOC
 
     if (!$self->_cfg('vm.network.use_dhcp')) {
-        print $fh <<EOC;
+        print $cfg_fh <<EOC;
 lxc.network.ipv4 = $self->{ip}/$self->{netmask_len}
 EOC
         if ($lxc_version >= 0.8) {
-            print $fh <<EOC;
+            print $cfg_fh <<EOC;
 lxc.network.ipv4.gateway = $self->{gateway}
 EOC
         }
     }
 
-    print $fh, $self->_cfg('internal.vm.lxc.conf.extra'), "\n";
-    close $fh;
+    print $cfg_fh, $self->_cfg('internal.vm.lxc.conf.extra'), "\n";
+    close $cfg_fh;
 
-    my @args = (-n => $lxc_name, -f => $fn);
-    push @args, (-B => 'dir') if $lxc_version >= 0.9;
-    $self->_run_cmd('lxc-create', @args);
-}
-
-sub _configure_lxc {
-    # FIXME: anything to do here?
-    shift->_on_done
+    $self->_on_done;
 }
 
 sub _start_lxc {
@@ -401,7 +409,7 @@ sub _start_lxc {
                        ignore_errors => 1,
                        outlives_state => 1,
                        on_done => weak_method_callback($self, '_on_lxc_done') },
-                     'lxc-start', -n => $self->{lxc_name});
+                     'lxc-start', -n => $self->{lxc_name}, -P => $self->_cfg('path.storage.lxc'));
     $self->_on_done;
 }
 
@@ -420,7 +428,7 @@ sub _stop_lxc {
     if (defined $self->{vm_pid}) {
         $self->_run_cmd( { kill_after => $self->_cfg('internal.hkd.command.timeout.lxc-stop'),
                            run_and_forget => 1 },
-                         'lxc-stop', -n => $self->{lxc_name});
+                         'lxc-stop', -n => $self->{lxc_name}, -P => $self->_cfg('path.storage.lxc'));
     }
     $self->_on_done;
 }
@@ -469,8 +477,11 @@ sub _kill_lxc {
 
 sub _destroy_lxc {
     my $self = shift;
-    $self->_run_cmd( { ignore_errors => 1 },
-                     'lxc-destroy', -n => $self->{lxc_name});
+    my $lxc_name = $self->{lxc_name};
+    my $lxc_dir = $self->_cfg('path.storage.lxc'). "/$lxc_name";
+    unlink "$lxc_dir/config" or DEBUG "unable to unlink '$lxc_dir/config': $!";
+    rmdir $lxc_dir or DEBUG "unable to delete '$lxc_dir': $!";
+    $self->_on_done;
 }
 
 sub _unlink_iface {
