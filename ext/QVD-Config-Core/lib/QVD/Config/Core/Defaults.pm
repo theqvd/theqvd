@@ -65,6 +65,7 @@ path.client.pixmaps.alt = /usr/share/pixmaps
 command.kvm = kvm
 command.kvm-img = kvm-img
 command.sshfs = /usr/lib/qvd/bin/sshfs
+command.open_file = /usr/bin/xdg-open
 command.sftp-server = /usr/lib/openssh/sftp-server
 command.nxagent = /usr/bin/nxagent
 command.nxdiag = /usr/lib/qvd/bin/nxdiag.pl

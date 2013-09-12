@@ -36,6 +36,12 @@ sub help_share {
 sub handle_share {
 }
 
+sub help_open {
+}
+
+sub handle_open {
+}
+
 sub handle_usage {
     # FIXME
     print "** Write usage doc!\n";
