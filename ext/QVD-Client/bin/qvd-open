@@ -2,9 +2,28 @@
 
 use strict;
 use warnings;
+use File::Spec;
+
+our ($user_dir, $user_config_filename);
+
+BEGIN {
+    $user_dir = File::Spec->rel2abs(File::Spec->join((getpwuid $>)[7] // $ENV{HOME}, '.qvd'));
+    mkdir($user_dir);
+
+    $ENV{NX_CLIENT} = 'false';
+
+    $user_config_filename = File::Spec->join($user_dir, 'client.conf');
+    print("using $user_config_filename\n");
+
+    #no warnings;
+    $QVD::Config::USE_DB = 0;
+    @QVD::Config::Core::FILES = ( '/etc/qvd/client.conf',
+                                  $user_config_filename );
+}
 
 use QVD::Log;
 use QVD::Client::SlaveClient;
+use QVD::Config::Core;
 
 my $file = shift;
 
@@ -13,10 +32,15 @@ eval {
     $client->handle_open($file);
 };
 if ($@ =~ 'Connection refused') {
+    my $user = core_cfg('client.user.name');
+    my $pass = core_cfg('client.user.pass');
+    my $host = core_cfg('client.host.name');
+    my $port = 8443;
+    @ARGV = ($user, $pass, $host, $port);
+    print join(' ', @ARGV), "\n";
+    push @ARGV, $file;
     my $pid = fork;
     if ($pid == 0) {
-        @ARGV = qw(joni joni koivu 8443);
-        push @ARGV, $file;
         do 'QVD-Client/bin/qvd-client.pl';
     } elsif ($pid < 0) {
         ERROR("Fork failed: $@");
