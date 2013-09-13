@@ -1461,7 +1461,7 @@ sub cmd_vm_list {
     
     my $rs = $self->get_resultset('vm');
     
-    my @header = ("Id","Name","User","Ip","OSF", "DI_Tag", "DI", "Host","State","UserState","Blocked",
+    my @header = ("Id","Name","User","RealUser","Ip","OSF", "DI_Tag", "DI", "Host","State","UserState","Blocked",
                   "Expire soft", "Expire hard");
     my @body;
         
@@ -1472,6 +1472,7 @@ sub cmd_vm_list {
                 $vm->id,
                 $vm->name,
                 $vm->user->login,
+                (defined $vmr->real_user? $vmr->real_user->login: undef),
                 $vm->ip,
                 $vm->osf->name,
                 $vm->di_tag,
