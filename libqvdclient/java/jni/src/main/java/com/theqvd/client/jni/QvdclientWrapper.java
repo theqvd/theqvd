@@ -50,6 +50,7 @@ public class QvdclientWrapper {
 	private native String qvd_c_get_last_error_message(long qvdclient);
 	private native void qvd_c_set_nx_options(long qvdclient, String nx_options);
 	private native void qvd_c_set_cert_files(long qvdclient, String client_cert, String client_key);
+	private native void qvd_c_end_connection(long qvdclient);
 	private QvdUnknownCertificateHandler certificateHandler = null;
 	private QvdProgressHandler progressHandler = null;
 	
@@ -244,6 +245,12 @@ public class QvdclientWrapper {
 			throw new QvdException("Error in qvd_set_cert_files. qvd_c_pointer is 0 and it should not be, have you called qvd_init?");
 		}
 		qvd_c_set_cert_files(qvd_c_pointer, client_cert, client_key);
+	}
+	public void qvd_end_connection() throws QvdException {
+		if (qvd_c_pointer == 0) {
+			throw new QvdException("Error in qvd_end_connection. qvd_c_pointer is 0 and it should not be, have you called qvd_init?");
+		}
+		qvd_c_end_connection(qvd_c_pointer);
 	}
 	static {
 		System.loadLibrary(library);

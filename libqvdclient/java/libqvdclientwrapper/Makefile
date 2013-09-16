@@ -25,7 +25,7 @@ distclean: clean
 	rm -f $(QVDCLIENTLIB) core
 
 javah:
-	$(MAKE) -C ../java -e
-	javah -classpath ../java/target/classes com.theqvd.client.jni.QvdclientWrapper
+	$(MAKE) -C ../jni -e
+	javah -classpath ../jni/target/classes com.theqvd.client.jni.QvdclientWrapper
 
 .EXPORT_ALL_VARIABLES:

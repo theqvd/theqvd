@@ -905,3 +905,13 @@ JNIEXPORT void JNICALL Java_com_theqvd_client_jni_QvdclientWrapper_qvd_1c_1set_1
   (*env)->ReleaseStringUTFChars(env, client_cert, client_cert_c);
   (*env)->ReleaseStringUTFChars(env, client_key, client_key_c);
 }
+
+JNIEXPORT void JNICALL Java_com_theqvd_client_jni_QvdclientWrapper_qvd_1c_1end_1connection
+  (JNIEnv *env, jobject obj, jlong qvd_c_pointer)
+{
+  qvdclient *qvd; 
+
+  qvd=_set_qvdclient(qvd_c_pointer);
+
+  qvd_end_connection(qvd);
+}
