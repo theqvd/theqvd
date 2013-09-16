@@ -290,9 +290,9 @@ sub _create_lxc {
     my $self = shift;
     my $lxc_name = $self->{lxc_name};
 
-    my $lxc_root = $self->_cfg('path.storage.lxc');
-    unless (-d $lxc_root) {
-        ERROR "Directory $lxc_root does not exist";
+    my $lxc_root = $self->_cfg('path.run.lxc');
+    unless (-d $lxc_root or mkdir $lxc_root) {
+        ERROR "Unable to create directory $lxc_root: $!";
         return $self->_on_error;
     }
 
@@ -409,7 +409,7 @@ sub _start_lxc {
                        ignore_errors => 1,
                        outlives_state => 1,
                        on_done => weak_method_callback($self, '_on_lxc_done') },
-                     'lxc-start', -n => $self->{lxc_name}, -P => $self->_cfg('path.storage.lxc'));
+                     'lxc-start', -n => $self->{lxc_name}, -P => $self->_cfg('path.run.lxc'));
     $self->_on_done;
 }
 
@@ -428,7 +428,7 @@ sub _stop_lxc {
     if (defined $self->{vm_pid}) {
         $self->_run_cmd( { kill_after => $self->_cfg('internal.hkd.command.timeout.lxc-stop'),
                            run_and_forget => 1 },
-                         'lxc-stop', -n => $self->{lxc_name}, -P => $self->_cfg('path.storage.lxc'));
+                         'lxc-stop', -n => $self->{lxc_name}, -P => $self->_cfg('path.run.lxc'));
     }
     $self->_on_done;
 }
@@ -478,7 +478,7 @@ sub _kill_lxc {
 sub _destroy_lxc {
     my $self = shift;
     my $lxc_name = $self->{lxc_name};
-    my $lxc_dir = $self->_cfg('path.storage.lxc'). "/$lxc_name";
+    my $lxc_dir = $self->_cfg('path.run.lxc'). "/$lxc_name";
     unlink "$lxc_dir/config" or DEBUG "unable to unlink '$lxc_dir/config': $!";
     rmdir $lxc_dir or DEBUG "unable to delete '$lxc_dir': $!";
     $self->_on_done;
