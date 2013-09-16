@@ -39,6 +39,9 @@
 #define CERT_DIR ".qvd/certs"
 #define MAX_NX_OPTS_BUFFER 256
 #define MAX_STRING_VERSION 256
+/* 200 milliseconds sleep */
+#define QVDLOOP_TIMEOUT_SEC 0
+#define QVDLOOP_TIMEOUT_USEC 200000000
 
 #ifndef MAX
 #define MAX(x,y) ((x) > (y) ? (x) : (y))
@@ -47,6 +50,9 @@
 #define MIN(x,y) ((x) < (y) ? (x) : (y))
 #endif
 /* #define TRACE */
+#ifdef __cplusplus
+extern "C" {
+#endif
 
 typedef struct {
   int id;
@@ -95,8 +101,10 @@ struct qvdclientstruct {
   int use_client_cert;
   char client_cert[MAX_PATH_STRING]; /* PEM format */
   char client_key[MAX_PATH_STRING];
+  int end_connection;
 } ;
 typedef struct qvdclientstruct qvdclient;
+
 
 int qvd_get_version(void);
 const char *qvd_get_version_text(void);
@@ -130,4 +138,10 @@ void qvd_error(qvdclient *qvd, const char *format, ...);
 void qvd_progress(qvdclient *qvd, const char *message);
 void set_debug_level(int level);
 int get_debug_level(void);
+void qvd_end_connection(qvdclient *qvd);
+
+#ifdef __cplusplus
+}
+#endif
+
 #endif

@@ -271,6 +271,8 @@ int qvd_connect_to_vm(qvdclient *qvd, int id)
     return 5;
   }
 
+  qvd->end_connection = 0;
+
   result = _qvd_switch_protocols(qvd, id);
   _qvd_print_environ();
   /* if non zero return with error */
@@ -286,6 +288,7 @@ int qvd_connect_to_vm(qvdclient *qvd, int id)
   qvd_printf("Remote fd: %d Local fd: %d\n", fd, proxyFd);
   qvd_printf("Before _qvd_client_loop\n");
   result = _qvd_client_loop(qvd, fd, proxyFd);
+  qvd_progress(qvd, "End of QVD connection");
   shutdown(proxyFd, 2);
   qvd_printf("before NXTransDestroy\n");
   NXTransDestroy(NX_FD_ANY);
@@ -497,8 +500,8 @@ int _qvd_client_loop(qvdclient *qvd, int connFd, int proxyFd)
   do
     {
       ret = 0;
-      timeout.tv_sec = 5;
-      timeout.tv_usec = 0;
+      timeout.tv_sec = QVDLOOP_TIMEOUT_SEC;
+      timeout.tv_usec = QVDLOOP_TIMEOUT_USEC;
       maxfds = 1+MAX(connFd, proxyFd);
       FD_ZERO(&rfds);
       FD_ZERO(&wfds);
@@ -523,6 +526,12 @@ int _qvd_client_loop(qvdclient *qvd, int connFd, int proxyFd)
 	{
 	  qvd_error(qvd, "Error in _qvd_client_loop: select() %s\n", strerror(errno));
 	  return 1;
+	}
+      if (qvd->end_connection)
+	{
+	  qvd_printf("Connection ended with qvd_end_connection().");
+	  qvd_progress(qvd, "Connection ended with qvd_end_connection().");
+	  return 0;
 	}
 #ifdef TRACE
       qvd_printf("isset proxyfd read: %d; connfd read: %d\n",
@@ -1017,4 +1026,9 @@ void qvd_set_cert_files(qvdclient *qvd, const char *client_cert, const char *cli
   qvd_printf("Setting client_cert to <%s> and client_key to <%s> and enabling client certificate send", qvd->client_cert, qvd->client_key);
 
   return;
+}
+
+void qvd_end_connection(qvdclient *qvd)
+{
+  qvd->end_connection=1;
 }
