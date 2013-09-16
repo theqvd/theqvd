@@ -1,6 +1,6 @@
 # Get these in order
 #SUBDIRS=src jni/c jni/java jni/jqvdclient
-SUBDIRS=c java
+SUBDIRS=c java webplugin
 TARGETARCH=
 
 Default: all

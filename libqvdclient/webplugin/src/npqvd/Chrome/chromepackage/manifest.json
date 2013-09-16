@@ -1,0 +1,9 @@
+{
+  "name": "QVD Web Client Plugin",
+  "version": "${FBSTRING_PLUGIN_VERSION}",
+  "description": "Web client plugin for QVD. For further info see http://theqvd.com",
+
+	"plugins": [
+    { "path": "npnpqvd.dll", "public": true }
+  ]
+}
