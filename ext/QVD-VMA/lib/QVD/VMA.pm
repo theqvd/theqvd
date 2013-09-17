@@ -4,6 +4,7 @@ our $VERSION = '0.02';
 
 use warnings;
 use strict;
+use 5.010;
 
 use QVD::HTTPD;
 use base qw(QVD::HTTPD::Fork);
@@ -294,6 +295,8 @@ sub _provisionate_user {
     my %props = @_;
     my $user = $props{'qvd.vm.user.name'};
     my $uid = $props{'qvd.vm.user.uid'};
+    my $gid = $props{'qvd.vm.user.gid'};
+    my $group = $props{'qvd.vm.user.group'} // $user;
     my $user_home = $props{'qvd.vm.user.home'};
     my $groups = $props{'qvd.vm.user.groups'};
 
@@ -333,21 +336,24 @@ sub _provisionate_user {
 	}
 	else {
 	    eval {
-		DEBUG "executing $groupadd => $user";
-                system $groupadd => $user and die "provisioning of group '$user' failed\n";
+                my @group_args;
+                push @group_args, (-g => $gid) if defined $gid;
+                push @group_args, $group;
+		DEBUG "executing $groupadd => @group_args";
+                unless (system $groupadd => @group_args) {
+                    WARN "provisioning of group '$group' failed\n";
+                }
 
-		my @args = (
-                            '-m',              ## create home
-                            '-d', $user_home,  ## home dir
-                            '-g', $user,       ## main group
-                            '-s', $user_shell, ## shell
-                           );
-		push @args, -G => $groups if length $groups;
-		push @args, -u => $uid if $uid;
-		push @args, $user;
+		my @user_args = ( '-m',              ## create home
+                                  '-d', $user_home,  ## home dir
+                                  '-g', $group,      ## main group
+                                  '-s', $user_shell, ## shell );
+		push @user_args, -G => $groups if length $groups;
+		push @user_args, -u => $uid if $uid;
+		push @user_args, $user;
 
-		DEBUG "executing $useradd => @args";
-		system $useradd => @args and die "provisioning of user '$user' failed\n";
+		DEBUG "executing $useradd => @user_args";
+		system $useradd => @user_args and die "provisioning of user '$user' failed\n";
 
 		_call_provisioning_hook(after_add_user => @_);
 	    };
