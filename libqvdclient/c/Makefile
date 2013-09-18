@@ -41,6 +41,8 @@ checkenv-%:
           exit 1;\
 	fi 
 
+install:
+
 clean:
 	rm -f *~ *.o
 
