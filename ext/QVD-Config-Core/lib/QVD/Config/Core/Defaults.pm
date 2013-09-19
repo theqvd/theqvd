@@ -41,8 +41,10 @@ path.storage.check = ${path.storage.homes}/.rw_check
 # storage directories for LXC
 path.storage.basefs = ${path.storage.root}/basefs
 path.storage.homefs = ${path.storage.root}/homefs
-path.storage.lxc = ${path.storage.root}/lxc
 path.storage.btrfs.root = ${path.storage.root}
+
+path.storage.lxc = ${path.run}/lxc
+
 
 path.storage.overlayfs = ${path.storage.btrfs.root}/overlayfs
 path.storage.rootfs = ${path.storage.btrfs.root}/rootfs
