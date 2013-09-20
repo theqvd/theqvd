@@ -19,6 +19,8 @@ test: $(QVDCLIENTLIB)
 $(QVDCLIENTLIB): $(OBJ)
 	$(LD) -shared -o $(QVDCLIENTLIB) $(OBJ) $(QVDCLIENTLIBS)
 
+install:
+
 clean:
 	rm -f *~ *.o
 
