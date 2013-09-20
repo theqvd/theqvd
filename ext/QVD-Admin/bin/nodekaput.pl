@@ -30,11 +30,17 @@ txn_eval {
     my @vms = rs(VM_Runtime)->search({host_id => $host_id});
     $vm_count = @vms;
 
-    for my $vm (@vms) {
-        $vm->send_user_abort unless $vm->user_state eq 'disconnected';
-        $vm->set_vm_state('stopped');
-        $vm->unassign;
-    }
+    print STDERR "This command may corrupt the QVD database.\n".
+                 "Are you sure you want to unassign ".
+                 "$c virtual machines from host $host_id [y/N]? ";
+
+    my $res = <STDIN>;
+    $res =~ /^y(es)?$/i or die "Aborted!\n";
+
+    $_->unassign for @vms;
+    my $host = rs(Host_Runtime)->find({host_id => $host_id});
+    $host->set_state('lost);
+
 };
 
 if ($@) {
