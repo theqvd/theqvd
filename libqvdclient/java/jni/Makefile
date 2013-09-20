@@ -1,3 +1,6 @@
+QVDCLIENTDIR=../../c
+QVDCLIENTWRAPPER=../libqvdclientwrapper
+
 default: all
 
 all android: 
@@ -12,3 +15,4 @@ clean:
 
 distclean: clean
 
+.EXPORT_ALL_VARIABLES:

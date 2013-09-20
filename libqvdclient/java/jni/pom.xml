@@ -31,14 +31,14 @@
         <configuration>
           <forkMode>once</forkMode>
           <environmentVariables>
-            <LD_LIBRARY_PATH>../libqvdclientwrapper:../../c</LD_LIBRARY_PATH>
+            <LD_LIBRARY_PATH>${env.QVDCLIENTWRAPPER}:${env.QVDCLIENTDIR}</LD_LIBRARY_PATH>
           </environmentVariables>
-          <systemProperties>
+          <systemPropertyVariables>
             <property>
               <name>java.library.path</name>
-              <value>../c</value>
+              <value>${env.QVDCLIENTDIR}</value>
             </property>
-          </systemProperties>
+          </systemPropertyVariables>
         </configuration>
       </plugin>                              
     </plugins> 
