@@ -121,7 +121,7 @@ use Class::StateMachine::Declarative
                                                                waiting_for_lxc => { enter => '_set_state_timer',
                                                                                     transitions => { _on_lxc_done      => 'cleanup',
                                                                                                      _on_state_timeout => 'cleanup' } } ] },
-                                  cleanup  => { ignore => [qw(_on_lxc_done)],
+                                  cleanup  => { ignore => [qw(_on_lxc_done)], # FIXME: is there really a reason for that?
                                                 substates => [ saving_state           => { enter => '_save_state' },
                                                                checking_dirty         => { enter => '_check_dirty_flag' },
                                                                heavy                  => { enter => '_heavy_down' },
