@@ -27,11 +27,13 @@ set (SOURCES
 add_x11_plugin(${PROJECT_NAME} SOURCES)
 
 # Add the qvdclient library
-find_library(QVDCLIENT NAMES libqvdclient.so  HINTS "${CMAKE_CURRENT_SOURCE_DIR}/../../../c")
-include_directories("${CMAKE_CURRENT_SOURCE_DIR}/../../../c")
+#find_library(QVDCLIENT NAMES libqvdclient.so  HINTS "${CMAKE_CURRENT_SOURCE_DIR}/../../../c")
+include_directories("$ENV{QVDCLIENT_INCLUDE}" "$ENV{CURL_INCLUDE}")
+
 
 # add library dependencies here; leave ${PLUGIN_INTERNAL_DEPS} there unless you know what you're doing!
 target_link_libraries(${PROJECT_NAME}
     ${PLUGIN_INTERNAL_DEPS}
-    "-L${CMAKE_CURRENT_SOURCE_DIR}/../../../c" "-lqvdclient"
+    "$ENV{QVDCLIENT_LIB}"
+    "$ENV{QVDCLIENT_EXTRA_LIBS}"
     )
