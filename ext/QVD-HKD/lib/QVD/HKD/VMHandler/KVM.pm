@@ -11,43 +11,42 @@ use POSIX;
 use AnyEvent;
 use AnyEvent::Util;
 use QVD::Log;
+use Method::WeakCallback qw(weak_method_callback);
 
 use parent qw(QVD::HKD::VMHandler);
 
 use Class::StateMachine::Declarative
-    __any__  => { delay => [qw(on_hkd_stop
-                               on_hkd_kill)],
-                  ignore => [qw(_on_cmd_start)] },
+    __any__  => { ignore => [qw(_on_cmd_start on_expired _on_kvm_done)],
+                  delay => [qw(on_hkd_kill
+                               _on_cmd_stop)],
+                  on => { on_hkd_stop => 'on_hkd_kill' } },
 
     new      => { transitions => { _on_cmd_start        => 'starting',
+                                   _on_cmd_stop         => 'stopping/db',
                                    _on_cmd_catch_zombie => 'zombie' } },
 
     starting => { advance => '_on_done',
-                  delay => [qw(on_hkd_stop
-                               on_hkd_kill)],
-                  substates => [ saving_state   => { enter => '_save_state',
-                                                     transitions => { _on_error => 'stopped' } },
-
-                                 db             => { transitions => { _on_error => 'stopping/db' },
-                                                     substates => [ deleting_cmd       => { enter => '_delete_cmd_busy',
-                                                                                            on => { _on_error => '_on_done' } },
-                                                                    loading_row        => { enter => '_load_row' },
+                  on => { on_hkd_kill => '_on_error' },
+                  substates => [ db             => { transitions => { _on_error => 'stopping/db' },
+                                                     substates => [ loading_row        => { enter => '_load_row' },
                                                                     searching_di       => { enter => '_search_di' },
                                                                     calculating_attrs  => { enter => '_calculate_attrs' },
                                                                     saving_runtime_row => { enter => '_save_runtime_row' },
                                                                     updating_stats     => { enter => '_incr_run_attempts' } ] },
 
-                                 clean_old       => { transitions => { _on_error => 'zombie' },
+                                 clean_old       => { transitions => { _on_error   => 'zombie/reap',
+                                                                       on_hkd_kill => 'stopping/db' },
                                                       substates => [ removing_fw_rules => { enter => '_remove_fw_rules' } ] },
 
-                                 heavy           => { enter => '_set_heavy_mark' },
+                                 heavy           => { enter => '_heavy_down',
+                                                      transitions => { _on_error    => 'stopping/db',
+                                                                       _on_cmd_stop => 'stopping/db' } },
 
-                                 setup           => { transitions => { _on_error   => 'stopping/cleanup',
-                                                                       on_hkd_stop => 'stopping/cleanup',
-                                                                       on_hkd_kill => 'stopping/cleanup' },
+                                 setup           => { transitions => { _on_error   => 'stopping/cleanup' },
                                                       substates => [ allocating_os_disk    => { enter => '_allocate_os_disk' },
                                                                      allocating_user_disk  => { enter => '_allocate_user_disk' },
                                                                      allocating_tap        => { enter => '_allocate_tap' },
+                                                                     configuring_dhcp      => { enter => '_add_to_dhcpd' },
                                                                      running_prestart_hook => { enter => '_run_prestart_hook' },
                                                                      setting_fw_rules      => { enter => '_set_fw_rules' },
                                                                      enabling_iface        => { enter => '_enable_iface' },
@@ -56,10 +55,10 @@ use Class::StateMachine::Declarative
                                  waiting_for_vma => { enter => '_start_vma_monitor',
                                                       transitions => { _on_alive      => 'running',
                                                                        _on_dead       => 'stopping/stop',
-                                                                       _on_cmd_stop   => 'stopping/cmd',
+                                                                       _on_cmd_stop   => 'stopping/shutdown',
                                                                        _on_kvm_done   => 'stopping/cleanup',
-                                                                       on_hkd_stop    => 'stopping/stop',
-                                                                       on_hkd_kill    => 'stopping/cleanup',
+                                                                       on_hkd_stop    => 'stopping/shutdown',
+                                                                       on_hkd_kill    => 'stopping/stop',
                                                                        _on_goto_debug => 'debugging' } } ] },
     running => { advance => '_on_done',
                  delay => [qw(_on_kvm_done)],
@@ -67,55 +66,60 @@ use Class::StateMachine::Declarative
                  substates => [ saving_state           => { enter => '_save_state' },
                                 updating_stats         => { enter => '_incr_run_ok' },
                                 running_poststart_hook => { enter => '_run_poststart_hook' },
-                                unsetting_heavy_mark   => { enter => '_unset_heavy_mark' },
+                                unheavy                => { enter => '_heavy_up' },
                                 monitoring             => { enter => '_start_vma_monitor',
+                                                            ignore => [qw(_on_alive)],
                                                             transitions => { _on_dead       => 'stopping/stop',
-                                                                             _on_cmd_stop   => 'stopping/cmd',
+                                                                             _on_cmd_stop   => 'stopping/shutdown',
                                                                              _on_kvm_done   => 'stopping/cleanup',
-                                                                             on_hkd_stop    => 'stopping/stop',
+                                                                             on_hkd_stop    => 'stopping/shutdown',
                                                                              on_hkd_kill    => 'stopping/stop',
-                                                                             _on_goto_debug => 'debugging' } } ] },
+                                                                             _on_goto_debug => 'debugging',
+                                                                             on_expired     => 'expiring'} },
+                              '(expiring)'             => { enter => '_expire',
+                                                            transitions => { _on_done => 'monitoring' } } ] },
 
     debugging => { advance => '_on_done',
                    delay => [qw(_on_kvm_done)],
                    transitions => { _on_error => 'stopping/stop' },
-                   substates => [ saving_state          => { enter => '_save_state' },
-                                  unsetting_heavy_mark  => { enter => '_unset_heavy_mark' },
-                                  waiting_for_vma       => { enter => '_start_vma_monitor',
-                                                             ignore => [qw(_on_dead
-                                                                           _on_goto_debug)],
-                                                             transitions => { _on_alive    => 'running',
-                                                                              _on_cmd_stop => 'stopping/cmd',
-                                                                              _on_kvm_done => 'stopping/cleanup',
-                                                                              on_hkd_stop  => 'stopping/stop',
-                                                                              on_hkd_kill  => 'stopping/stop' } } ] },
+                   substates => [ saving_state    => { enter => '_save_state' },
+                                  unheavy         => { enter => '_heavy_up' },
+                                  waiting_for_vma => { enter => '_start_vma_monitor',
+                                                       ignore => [qw(_on_dead
+                                                                     _on_goto_debug)],
+                                                       transitions => { _on_alive    => 'running',
+                                                                        _on_cmd_stop => 'stopping/stop',
+                                                                        _on_kvm_done => 'stopping/cleanup',
+                                                                        on_hkd_kill  => 'stopping/stop' } } ] },
 
     stopping => { advance => '_on_done',
+                  transitions => { _on_error => 'zombie/reap' },
                   delay => [qw(_on_kvm_done)],
-                  substates => [ cmd      => { advance => '_on_error',
-                                               substates => [ saving_state => { enter => '_save_state' },
-                                                              deleting_cmd    => { enter => '_delete_cmd_busy' } ] },
-
-                                 shutdown => { substates => [ saving_state    => { enter => '_save_state' },
-                                                              heavy           => { enter => '_set_heavy_mark' },
+                  substates => [ shutdown => { transitions => { on_hkd_kill => 'stop' },
+                                               substates => [ saving_state    => { enter => '_save_state' },
+                                                              heavy           => { enter => '_heavy_down' },
                                                               shuttingdown    => { enter => '_shutdown',
                                                                                    transitions => { _on_error    => 'stop',
                                                                                                     _on_kvm_done => 'cleanup' } },
                                                               waiting_for_kvm => { enter => '_set_state_timer',
                                                                                    transitions => { _on_kvm_done      => 'cleanup',
                                                                                                     _on_state_timeout => 'stop' } } ] },
-                                 stop     => { substates => [ saving_state => { enter => '_save_state' },
-                                                              killing      => { enter => '_kill_kvm',
-                                                                                transitions => { _on_error => 'cleanup' } },
-                                                              waiting      => { enter => '_set_state_timer',
-                                                                                transitions => { _on_kvm_done => 'cleanup',
-                                                                                                 _on_state_timeout => 'zombie' } } ] },
+                                 stop     => { substates => [ saving_state    => { enter => '_save_state' },
+                                                              heavy           => { enter => '_heavy_down' },
+                                                              killing         => { enter => '_kill_kvm',
+                                                                                   on => { _on_error => '_on_done' } },
+                                                              waiting_for_kvm => { enter => '_set_state_timer',
+                                                                                   transitions => { _on_kvm_done => 'cleanup',
+                                                                                                    _on_state_timeout => 'zombie/reap' } } ] },
 
-                                 cleanup  => { substates => [ saving_state => { enter => '_save_state' },
+                                 cleanup  => { substates => [ saving_state          => { enter => '_save_state' },
+                                                              heavy                 => { enter => '_heavy_down' },
                                                               removing_fw_rules     => { enter => '_remove_fw_rules' },
-                                                              running_poststop_hook => { enter => '_run_prestart_hook' } ] },
+                                                              running_poststop_hook => { enter => '_run_prestart_hook' },
+                                                              configuring_dhcpd     => { enter => '_rm_from_dhcpd' } ] },
+
                                  db => { enter => '_clear_runtime_row',
-                                         transitions => { _on_error => 'zombie',
+                                         transitions => { _on_error => 'zombie/db',
                                                           _on_done  => 'stopped' } } ] },
 
     stopped => { enter => '_on_stopped' },
@@ -124,22 +128,33 @@ use Class::StateMachine::Declarative
     zombie  => { advance => '_on_done',
                  delay => [qw(_on_kvm_done)],
                  ignore => [qw(on_hkd_stop)],
-                 transitions => { _on_error => 'unsetting_heavy_mark' },
-                 substates => [ saving_state          => { enter => 'save_state' },
-                                calculating_attrs     => { enter => '_calculate_attrs' },
-                                killing_kvm           => { enter => '_kill_kvm',
-                                                           transitions => { on_error => 'removing_fw_rules' } },
-                                waiting_for_kvm       => { enter => '_set_state_timer',
-                                                           on => { _on_kvm_done      => '_on_done',
-                                                                   _on_state_timeout => '_on_error' } },
-                                removing_fw_rules    => { enter => '_remove_fw_rules' },
-                                configuring_dhcpd    => { enter => '_rm_from_dhcpd' },
-                                clearing_runtime_row => { enter => '_clear_runtime_row',
-                                                          transitions => { _on_done => 'stopped' } },
-                                unsetting_heavy_mark => { enter => '_unset_heavy_mark' },
-                                idle                 => { enter => '_set_state_timer',
-                                                          transitions => { _on_state_timeout => 'killing_kvm',
-                                                                           on_hkd_kill       => 'stopped' } } ] };
+                 transitions => { on_hkd_kill => 'stopped' },
+                 substates => [ config => { transitions => { _on_error => 'delaying' },
+                                            substates => [ saving_state      => { enter => '_save_state',
+                                                                                  on => { _on_error => '_on_done' } },
+                                                           calculating_attrs => { enter => '_calculate_attrs',
+                                                                                  transitions => { _on_error => 'delaying' } },
+                                                           '(delaying)'      => { enter => '_set_state_timer',
+                                                                                  transitions => { _on_timeout => 'config' } } ] },
+                                reap   => { transitions => { _on_error       => 'delaying' },
+                                            substates => [ saving_state      => { enter => '_save_state',
+                                                                                  on => { _on_error => '_on_done' } },
+                                                           heavy             => { enter => '_heavy_down' },
+                                                           killing_kvm       => { enter => '_kill_kvm',
+                                                                                  transitions => { _on_error => 'removing_fw_rules' } },
+                                                           waiting_for_kvm   => { enter => '_set_state_timer',
+                                                                                  on => { _on_kvm_done      => '_on_done',
+                                                                                          _on_state_timeout => '_on_error' } },
+                                                           removing_fw_rules => { enter => '_remove_fw_rules' },
+                                                           unheavy           => { enter => '_heavy_up' },
+                                                           configuring_dhcpd => { enter => '_rm_from_dhcpd' },
+                                                           '(delaying)'      => { enter => '_set_state_timer',
+                                                                                  transitions => { _on_state_timeout => 'reap'} } ] },
+                                db     => { transitions => { _on_error => 'delaying' },
+                                            substates => [ clearing_runtime_row => { enter => '_clear_runtime_row',
+                                                                                     transitions => { _on_done => 'stopped' } },
+                                                           '(delaying)'         => { enter => '_set_state_timer',
+                                                                                     transitions => { _on_state_timeout => 'db'} } ] } ] };
 
 
 
@@ -260,19 +275,18 @@ sub _allocate_user_disk {
 
 sub _start_kvm {
     my $self = shift;
-    my @cmd = ( $self->_cfg('kvm'),
-                -m => $self->{memory},
-                -name => "qvd/$self->{vm_id}/$self->{name}");
+    my @kvm_args = ( -m => $self->{memory},
+                     -name => "qvd/$self->{vm_id}/$self->{name}");
 
     my $use_virtio = $self->_cfg('vm.kvm.virtio');
     my $nic = "nic,macaddr=$self->{mac},vlan=0";
     $nic .= ',model=virtio' if $use_virtio;
-    push @cmd, (-net => $nic, -net => 'tap,vlan=0,fd=3');
+    push @kvm_args, (-net => $nic, -net => 'tap,vlan=0,fd=3');
 
     my $redirect_io = $self->_cfg('vm.serial.capture');
     if (defined $self->{serial_port}) {
         DEBUG "Using serial port '$self->{serial_port}'";
-        push @cmd, -serial => "telnet::$self->{serial_port},server,nowait,nodelay";
+        push @kvm_args, -serial => "telnet::$self->{serial_port},server,nowait,nodelay";
         undef $redirect_io;
     } else {
         DEBUG 'No serial port';
@@ -285,7 +299,7 @@ sub _start_kvm {
             my @t = gmtime; $t[5] += 1900; $t[4] += 1;
             my $ts = sprintf("%04d-%02d-%02d-%02d:%02d:%2d-GMT0", @t[5,4,3,2,1,0]);
             DEBUG "Redirecting I/O to '$captures_dir/capture-$self->{name}-$ts.txt'";
-            push @cmd, -serial => "file:$captures_dir/capture-$self->{name}-$ts.txt";
+            push @kvm_args, -serial => "file:$captures_dir/capture-$self->{name}-$ts.txt";
         }
         else {
             ERROR "Captures directory '$captures_dir' does not exist";
@@ -297,15 +311,15 @@ sub _start_kvm {
         my $vnc_opts = $self->_cfg('vm.vnc.opts');
         $vnc_display .= ",$vnc_opts" if $vnc_opts =~ /\S/;
         DEBUG "VNC is at display ':$vnc_display'";
-        push @cmd, -vnc => ":$vnc_display";
+        push @kvm_args, -vnc => ":$vnc_display";
     }
     else {
         DEBUG 'No VNC';
-        push @cmd, '-nographic';
+        push @kvm_args, '-nographic';
     }
 
     if ($self->{mon_port}) {
-        push @cmd, -monitor, "telnet::$self->{mon_port},server,nowait,nodelay";
+        push @kvm_args, -monitor, "telnet::$self->{mon_port},server,nowait,nodelay";
         DEBUG "Using monitor port '$self->{mon_port}'";
     } else {
         DEBUG 'No monitor port';
@@ -313,14 +327,14 @@ sub _start_kvm {
 
     my $hda = "file=$self->{os_image_path},index=0,media=disk";
     $hda .= ',if=virtio,boot=on' if $use_virtio;
-    push @cmd, -drive => $hda;
+    push @kvm_args, -drive => $hda;
 
     if (defined $self->{user_image_path}) {
         my $hdb_index = $self->_cfg('vm.kvm.home.drive.index');
         my $hdb = "file=$self->{user_image_path},index=$hdb_index,media=disk";
         $hdb .= ',if=virtio' if $use_virtio;
         DEBUG "Using user storage '$self->{user_image_path}' ($hdb) for VM '$self->{vm_id}'";
-        push @cmd, -drive => $hdb;
+        push @kvm_args, -drive => $hdb;
     }
 
     $self->_run_cmd({ save_pid_to => 'vm_pid',
@@ -331,8 +345,9 @@ sub _start_kvm {
                       '<'  => '/dev/null',
                       '2>' => '/dev/null',
                       on_prepare => sub {
-                          # run VMs with low priority so in case the machine gets overloaded,
-                          # the noded and hkd daemons do not become unresponsive.
+                          # run VMs with low priority so in case the
+                          # machine gets overloaded, the hkd does not
+                          # become unresponsive.
                           # (PRIO_PGRP => 1, current PGRP => 0)
                           setpriority(1, 0, 10);
 
@@ -345,7 +360,7 @@ sub _start_kvm {
                               POSIX::dup2(fileno $self->{tap_fh}, 3) or LOGDIE "dup2 failed: $!";
                           }
                       } },
-                    @cmd);
+                    kvm => @kvm_args);
     $self->_on_done;
 }
 
