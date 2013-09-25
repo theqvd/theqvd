@@ -4,6 +4,7 @@
     <meta http-equiv="Content-Type" content="text/html; charset=utf-8"/>
     <script type="text/javascript" src="jquery.min.js"></script>
     <script type="text/javascript" src="qvd.js"></script>
+	<link rel="stylesheet" type="text/css" href="qvd.css">
   </head>
   <body>
     <div id="placeholder"> </div>
@@ -16,29 +17,45 @@
     </div>
     <div id="connectionparams">
       <form name="connectionparamsform" id="connectionparamsform" action="">
-	<p>
-          <label class='niceform' size="10">login</label>
-	  <input type="text" name="login" id="login" class="input" value="" size="10" tabindex="10" />
-	</p>
-	<p>
-          <label class='niceform'>pass</label>
-	  <input type="password" name="password" id="password" class="input" value="" size="10" tabindex="15" />
-	</p>
-	<p>
-          <label class='niceform'>host</label>
-	  <input type="text" name="host" id="host" class="input" value="" size="10" tabindex="20" />
-	</p>
-	<p>
-	  <input id="connectionbutton" type="button" value="Connect" onclick="loginaction()" tabindex="25"/>
-	</p>
-      </form>
+	  <table class='login-table'>
+		<tr>
+			<td>			
+				<label class='niceform' size="10">login</label>
+			</td>
+			<td>
+				<input type="text" name="login" id="login" class="input" value="" size="10" tabindex="10" />
+			</td>
+		</tr>
+		<tr>
+			<td>
+				<label class='niceform'>pass</label>
+			</td>
+			<td>
+				<input type="password" name="password" id="password" class="input" value="" size="10" tabindex="15" />
+			</td>
+		</tr>
+		<tr>
+			<td>
+				<label class='niceform'>host</label>
+			</td>
+			<td>
+				<input type="text" name="host" id="host" class="input" value="" size="10" tabindex="20" />
+			</td>
+		</tr>
+		<tr>
+			<td colspan='2' align='center'>
+				<input id="connectionbutton" type="button" value="Connect" onclick="loginaction()" tabindex="25"/>
+			</td>
+		</tr>
+	</table>
+    </form>
     </div>
     <br/>
     <div id="vmlist"></div>
     <br/>
     <div id="select-vm"></div>
     <br/>
-    <div id="stopconnection"></div>
+    <div id="stopconnection" class="stopconnection"></div>
 
     
     <script type="text/javascript">

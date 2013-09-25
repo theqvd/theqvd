@@ -10,7 +10,7 @@ function select_vm_and_connect(vmid)
     console.log("Vmid pressed was " +vmid);
     var row = "vmlist-" + vmid;
     $("#select-vm").html("Connecting to VM "+vmid);
-    $("#stopconnection").html("Click here to stop connection");
+    $("#stopconnection").html('<div class="stoprow">Click here to stop connection</div>');
     $("#stopconnection").click(function() { $(this).off('click'); 
 					    qvdembed.qvd_end_connection(); 
 					    $(this).html('Ending connection'); 
