@@ -343,11 +343,12 @@ sub _release_vm {
 
 sub _assign_vm {
     my ($l7r, $vm) = @_;
+    my $vm_id = $vm->id;
     unless (defined $vm->host_id) {
-        $l7r->_tell_client("Assigning VM to host, VM_ID: ". $vm->id) ;
+        $l7r->_tell_client("Assigning VM $vm_id to host");
         my $lb = QVD::L7R::LoadBalancer->new;
         my $host_id = $lb->get_free_host($vm->vm) //
-            LOGDIE "Unable to start VM, can't assign to any host\n";
+            LOGDIE "Unable to start VM $vm_id, can't assign to any host\n";
 
         # FIXME: assigning the host and pushing the start command
         # should go in the same transaction!
@@ -357,7 +358,7 @@ sub _assign_vm {
             LOGDIE if (defined $vm->host_id or $vm->vm_state ne 'stopped');
             $vm->set_host_id($host_id);
         };
-        $@ and LOGDIE "Unable to start VM VM_ID: ". $vm->id ." , state changed unexpectedly\n";
+        $@ and LOGDIE "Unable to start VM $vm_id, state changed unexpectedly\n";
 
         $l7r->_check_abort($vm);
     }
@@ -366,6 +367,7 @@ sub _assign_vm {
 sub _start_and_wait_for_vm {
     my ($l7r, $vm) = @_;
 
+    my $vm_id = $vm->id;
     my $timeout = time + $vm_start_timeout;
     my $vm_state = $vm->vm_state;
 
@@ -378,9 +380,9 @@ sub _start_and_wait_for_vm {
 
     return if $vm_state eq 'running';
 
-    $l7r->_tell_client("Waiting for VM to start");
+    $l7r->_tell_client("Waiting for VM $vm_id to start");
     while (1) {
-        DEBUG "waiting for VM to come up VM_ID:" . $vm->id;
+        DEBUG "waiting for VM $vm_id to come up";
         sleep($vm_poll_time);
         $vm->discard_changes;
         $l7r->_check_abort($vm);
@@ -393,18 +395,19 @@ sub _start_and_wait_for_vm {
         if (( $vm_state eq 'stopped' and
               defined $vm->vm_cmd ) or
             $vm_state =~ /^starting/) {
-            LOGDIE "Unable to start VM VM_ID: ". $vm->id . ", operation timed out!\n"
+            LOGDIE "Unable to start VM $vm_id, operation timed out!\n"
                 if time > $timeout;
         }
         else {
-            LOGDIE "Unable to start VM VM_ID: ". $vm->id . " in state $vm_state";
+            LOGDIE "Unable to start VM $vm_id in state $vm_state";
         }
     }
 }
 
 sub _start_x {
     my ($l7r, $vm, @params) = @_;
-    $l7r->_tell_client("Starting X session at VM VM_ID: ". $vm->id);
+    my $vm_id = $vm->id;
+    $l7r->_tell_client("Starting X session at VM $vm_id");
     my $resp;
     for (0..$x_start_retry) {
         my $vma = $l7r->_vma_client($vm);
@@ -413,24 +416,26 @@ sub _start_x {
         sleep($x_poll_time);
         $l7r->_check_abort($vm, 1);
     }
-    $resp or LOGDIE "Unable to start X server on VM VM_ID: ". $vm->id . " : $@";
+    $resp or LOGDIE "Unable to start X session on VM $vm_id: $@";
 }
 
 sub _wait_for_x {
     my ($l7r, $vm) = @_;
+    my $vm_id = $vm->id;
     my $timeout = time + $x_start_timeout;
-    $l7r->_tell_client("Waiting for X session to come up VM VM_ID: ". $vm->id );
+    $l7r->_tell_client("Waiting for X session to come up on VM $vm_id");
     my $x_state;
     while (1) {
         my $vma = $l7r->_vma_client($vm);
         $x_state = eval { $vma->x_state };
+        DEBUG "X session state on VM $vm_id is $x_state";
         given ($x_state) {
             when ('listening') {
-                DEBUG 'X session is up on VM VM_ID: '. $vm->id;
+                DEBUG "X session is ready on VM $vm_id";
                 return
             }
             when ([undef, 'starting']) {
-                LOGDIE "Unable to start VM X server on VM VM_ID: " . $vm->id . ", operation timed out!\n"
+                LOGDIE "Unable to start X session on VM $vm_id, operation timed out!\n"
                     if time > $timeout;
             }
             when ('provisioning') {
@@ -438,7 +443,7 @@ sub _wait_for_x {
                 # long process
             }
             default {
-                LOGDIE "Unable to start XV X server on VM VM_ID: " . $vm->id . ", state went to $_\n"
+                LOGDIE "Unable to start X session on VM $vm_id, state went to $_\n"
             }
         }
         sleep($x_poll_time);
