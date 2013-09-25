@@ -347,7 +347,8 @@ sub _provisionate_user {
 		my @user_args = ( '-m',              ## create home
                                   '-d', $user_home,  ## home dir
                                   '-g', $group,      ## main group
-                                  '-s', $user_shell, ## shell );
+                                  '-s', $user_shell, ## shell
+                                );
 		push @user_args, -G => $groups if length $groups;
 		push @user_args, -u => $uid if $uid;
 		push @user_args, $user;
