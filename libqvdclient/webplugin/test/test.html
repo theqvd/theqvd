@@ -4,10 +4,9 @@
     <meta http-equiv="Content-Type" content="text/html; charset=utf-8"/>
     <script type="text/javascript" src="jquery.min.js"></script>
     <script type="text/javascript" src="qvd.js"></script>
-	<link rel="stylesheet" type="text/css" href="qvd.css">
+    <link rel="stylesheet" type="text/css" href="qvd.css">
   </head>
   <body>
-    <div id="placeholder"> </div>
 
     <div id="version">
       version:
@@ -15,6 +14,7 @@
     <div id="versiontext">
       versiontext:
     </div>
+    <hr/>
     <div id="connectionparams">
       <form name="connectionparamsform" id="connectionparamsform" action="">
 	  <table class='login-table'>
@@ -56,9 +56,14 @@
     <div id="select-vm"></div>
     <br/>
     <div id="stopconnection" class="stopconnection"></div>
+    <div id="placeholder">
+     <object id="qvdobject" type="application/theqvd" height="0" width="0" ></object>
+    </div>
 
     
     <script type="text/javascript">
+      myinit();
+      displayversion();
       $("#connectionbutton").click(function() { $(this).off('click'); loginaction();} );
  
     </script>
