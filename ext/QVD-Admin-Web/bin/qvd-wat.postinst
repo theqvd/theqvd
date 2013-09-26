@@ -3,14 +3,15 @@
 set -e 
 
 case "$1" in
+
     configure)
 	if [ -d /var/log/qvd ]
-        then 
-                chown www-data /var/log/qvd
-        else 
-                mkdir -p /var/log/qvd
-                chown www-data /var/log/qvd
-        fi 
+	then 
+		chown www-data /var/log/qvd
+	else 
+		mkdir -p /var/log/qvd
+		chown www-data /var/log/qvd
+	fi 
 	if [ -x /usr/sbin/a2ensite ] 
 	then 
 		a2ensite qvd-wat.conf 
@@ -19,7 +20,8 @@ case "$1" in
 	then 
 		service apache2 restart
 	fi
-	if [ -d /var/lib/qvd/storage/images ] ; then
+	if [ -d /var/lib/qvd/storage/images ]
+	then 
 		if cat /proc/mounts | grep /var/lib/qvd/storage/images | grep nfs 
 		then  
 			echo "Images directory mounted via NFS"
@@ -28,7 +30,7 @@ case "$1" in
 			chown www-data /var/lib/qvd/storage/images
 		fi
 	fi
-	
+		
     ;;
 
     abort-upgrade|abort-remove|abort-deconfigure)
