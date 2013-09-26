@@ -405,10 +405,17 @@ EOC
 
 sub _start_lxc {
     my $self = shift;
+
+    my $hv_out = $self->_hypervisor_output_redirection;
+
     $self->_run_cmd( { save_pid_to => 'vm_pid',
                        ignore_errors => 1,
                        outlives_state => 1,
-                       on_done => weak_method_callback($self, '_on_lxc_done') },
+                       on_done => weak_method_callback($self, '_on_lxc_done'),
+                       '<' => '/dev/null',
+                       '>' => $hv_out,
+                       '2>' => $hv_out
+                     },
                      'lxc-start', -n => $self->{lxc_name}, -P => $self->_cfg('path.run.lxc'));
     $self->_on_done;
 }

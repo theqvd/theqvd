@@ -283,26 +283,14 @@ sub _start_kvm {
     $nic .= ',model=virtio' if $use_virtio;
     push @kvm_args, (-net => $nic, -net => 'tap,vlan=0,fd=3');
 
-    my $redirect_io = $self->_cfg('vm.serial.capture');
-    if (defined $self->{serial_port}) {
-        DEBUG "Using serial port '$self->{serial_port}'";
-        push @kvm_args, -serial => "telnet::$self->{serial_port},server,nowait,nodelay";
-        undef $redirect_io;
-    } else {
-        DEBUG 'No serial port';
-    }
-
-    if ($redirect_io) {
-        my $captures_dir = $self->_cfg('path.serial.captures');
-        mkdir $captures_dir, 0700 or WARN "mkdir: '$captures_dir': $!";
-        if (-d $captures_dir) {
-            my @t = gmtime; $t[5] += 1900; $t[4] += 1;
-            my $ts = sprintf("%04d-%02d-%02d-%02d:%02d:%2d-GMT0", @t[5,4,3,2,1,0]);
-            DEBUG "Redirecting I/O to '$captures_dir/capture-$self->{name}-$ts.txt'";
-            push @kvm_args, -serial => "file:$captures_dir/capture-$self->{name}-$ts.txt";
-        }
-        else {
-            ERROR "Captures directory '$captures_dir' does not exist";
+    if ($self->_cfg('vm.serial.capture')) {
+        if (defined $self->{serial_port}) {
+            DEBUG "Using serial port '$self->{serial_port}'";
+            push @kvm_args, -serial => "telnet::$self->{serial_port},server,nowait,nodelay";
+        } else {
+            DEBUG 'No serial port allocated, redirecting to file';
+            my $fn = $self->_capture_fn('serial');
+            push @kvm_args, -serial => "file:$fn" if defined $fn;
         }
     }
 
@@ -337,19 +325,22 @@ sub _start_kvm {
         push @kvm_args, -drive => $hdb;
     }
 
+    my $hv_out = $self->_hypervisor_output_redirection;
+
     $self->_run_cmd({ save_pid_to => 'vm_pid',
                       ignore_erros => 1,
                       outlives_state => 1,
                       on_done => weak_method_callback($self, '_on_kvm_done'),
-                      '>'  => '/dev/null',
                       '<'  => '/dev/null',
-                      '2>' => '/dev/null',
+                      '>'  => $hv_out,
+                      '2>' => $hv_out,
                       on_prepare => sub {
                           # run VMs with low priority so in case the
                           # machine gets overloaded, the hkd does not
                           # become unresponsive.
                           # (PRIO_PGRP => 1, current PGRP => 0)
                           setpriority(1, 0, 10);
+                          setpgrp(0, 0);
 
                           $^F = 3;
                           if (fileno $self->{tap_fh} == 3) {

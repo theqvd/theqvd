@@ -49,8 +49,9 @@ sub new {
     $self->{vm_id} = $vm_id;
     $self->{dhcpd_handler} = $dhcpd_handler;
 
-    my $hypervisor = $self->_cfg('vm.hypervisor');
+    my $hypervisor = lc $self->_cfg('vm.hypervisor');
     DEBUG "Using hypervisor type '$hypervisor'";
+    $self->{hypervisor} = $hypervisor;
     my $hypervisor_class = $hypervisor_class{$hypervisor} // croak "unsupported hypervisor $hypervisor";
     eval "require $hypervisor_class; 1" or croak "unable to load module $hypervisor_class:\n$@";
     $self->bless($hypervisor_class);
@@ -337,11 +338,42 @@ sub _shutdown {
     $self->_rpc('poweroff');
 }
 
+my $hv_re = __PACKAGE__ .'::(\w+)\b';
 sub _set_state_timer {
     my $self = shift;
     my $state = $self->state;
     $state =~ s|/|.|g;
-    $self->_call_after($self->_cfg("internal.hkd.vmhandler.timeout.on_state.$state"), '_on_state_timeout');
+    $self->_call_after($self->_cfg("internal.hkd.$self->{hypervisor}.timeout.on_state.$state"), '_on_state_timeout');
+}
+
+sub _capture_fn {
+    my ($self, $key) = @_;
+    my $fn = '/dev/null';
+    if ($self->_cfg("vm.$key.capture")) {
+        my $path = $self->_cfg("path.$key.captures");
+        if (-d $path or mkdir $path, 0700) {
+            my $ts = sprintf("%04d-%02d-%02d-%02d:%02d:%2d-GMT0", (gmtime)[5,4,3,2,1,0]);
+            $fn = "$path/$key-$self->{vm_id}-$ts.txt";
+            DEBUG "Redirecting VM $self->{vm_id} $key I/O to '$fn'";
+            return $fn;
+        }
+        else {
+            WARN "Unable to create $key captures directory '$path': $!";
+        }
+    }
+    DEBUG "Output for $key on VM $self->{vm_id} is not being redirected";
+    ()
+}
+
+sub _hypervisor_output_redirection {
+    my $self = shift;
+    if (defined (my $fn = $self->_capture_fn('hypervisor'))) {
+        open my $hv_out, '>>', $fn;
+        return $hv_out if defined $hv_out;
+        WARN "Unable to redirect hypervisor output for VM $self->{vm_id} to $fn";
+    }
+    '/dev/null';
+
 }
 
 sub _clear_runtime_row {

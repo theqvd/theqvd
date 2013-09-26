@@ -54,8 +54,10 @@ path.storage.rootfs = ${path.storage.btrfs.root}/rootfs
 path.ssl.certs = ${path.run}/ssl
 path.ssl.ca.system = /etc/ssl/certs
 path.ssl.ca.personal = certs
+
 ## KVM serial port captures or LXC console output
 path.serial.captures = ${path.tmp}/qvd
+path.hypervisor.captures = ${path.tmp}/qvd
 
 path.cgroup = /sys/fs/cgroup
 path.cgroup.cpu.lxc = ${path.cgroup}/cpu/lxc
@@ -241,6 +243,8 @@ vm.serial.redirect = 1
 ## - in LXC it saves the capture under the directory specified in path.serial.captures
 vm.serial.capture = 0
 
+vm.hypervisor.capture = 0
+
 ## all VMs will be attached to this interface, which must be a bridge
 ## the DHCP server uses this setting too
 vm.network.bridge = qvdnet
@@ -412,13 +416,20 @@ internal.hkd.agent.rpc.timeout = 3
 
 internal.hkd.vmhandler.killer.delay = 10
 
-internal.hkd.vmhandler.timeout.on_state.starting.setup.delaying_untar.delaying = 60
-internal.hkd.vmhandler.timeout.on_state.stopping.shutdown.waiting_for_lxc = 180
-internal.hkd.vmhandler.timeout.on_state.stopping.stop.waiting_for_lxc = 120
-internal.hkd.vmhandler.timeout.on_state.zombie.reap.waiting_for_lxc = 120
-internal.hkd.vmhandler.timeout.on_state.zombie.config.delaying = 60
-internal.hkd.vmhandler.timeout.on_state.zombie.reap.delaying = 60
-internal.hkd.vmhandler.timeout.on_state.zombie.db.delaying = 60
+internal.hkd.lxc.timeout.on_state.starting.setup.delaying_untar.delaying = 60
+internal.hkd.lxc.timeout.on_state.stopping.shutdown.waiting_for_lxc = 180
+internal.hkd.lxc.timeout.on_state.stopping.stop.waiting_for_lxc = 120
+internal.hkd.lxc.timeout.on_state.zombie.config.delaying = 60
+internal.hkd.lxc.timeout.on_state.zombie.reap.waiting_for_lxc = 120
+internal.hkd.lxc.timeout.on_state.zombie.reap.delaying = 60
+internal.hkd.lxc.timeout.on_state.zombie.db.delaying = 60
+
+internal.hkd.kvm.timeout.on_state.stopping.shutdown.waiting_for_kvm = 180
+internal.hkd.kvm.timeout.on_state.stopping.stop.waiting_for_kvm = 180
+internal.hkd.kvm.timeout.on_state.zombie.config.delaying = 60
+internal.hkd.kvm.timeout.on_state.zombie.config.reap.waiting_for_kvm = 120
+internal.hkd.kvm.timeout.on_state.zombie.config.reap.delaying = 60
+internal.hkd.kvm.timeout.on_state.zombie.db.delaying = 60
 
 internal.hkd.vmhandler.vma.failed.max_count.on.starting = 40
 internal.hkd.vmhandler.vma.failed.max_count.on.running = 10
