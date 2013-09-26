@@ -92,7 +92,6 @@ std::vector<std::map<std::string,std::string> > npqvdAPI::npqvd_list_of_vm()
       qvd_printf("Error qvd is null qvd_init has not been called");
       return myreturn;
     }
-  /* TODO in a different thread this call */
   vmlist = qvd_list_of_vm(qvd);
   if (vmlist == NULL)
     {
@@ -132,9 +131,19 @@ void npqvdAPI::npqvd_connect_to_vm(int vmid_param)
   /*  qvd_set_display(qvd, ":0"); */
   qvd_printf("Connecting to vmid: %d\n", vmid);
   vmid=vmid_param;
+#if defined(__unix__) || defined(__APPLE__)
+  if ((qvdpid = fork()) == 0)
+    {
+      // Child
+      // After a fork no connection can be done to popup the cert validation
+      // But it should be validated beforehand with the qvd_get_vm_list
+      qvd_set_no_cert_check(qvd);
+      qvd_connect_to_vm(qvd, vmid);
+    }
+#else
   boost::thread t(boost::bind(&npqvdAPI::npqvd_connect_to_vm_thread,
 			      this));
-  //  connect_thread = &t;
+#endif
 }
 
 void npqvdAPI::npqvd_connect_to_vm_thread()
@@ -354,11 +363,21 @@ std::string npqvdAPI::npqvd_get_last_error()
 
 void npqvdAPI::npqvd_end_connection()
 {
+#if defined(__unix__) || defined(__APPLE__)
+  // Run kill
+  if (qvdpid != 0)
+    {
+      qvd_printf("~npqvd_end_connection: killing pid: %d\n", qvdpid);
+      kill(qvdpid, 9);
+      qvdpid = 0;
+    }
+#else
   if (qvd == NULL)
     {
       qvd_printf("Error in npqvd_end_connection qvd is null, qvd_init has not been called");
       return;
     }
   qvd_end_connection(qvd);
+#endif
 }
 

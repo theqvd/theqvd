@@ -69,9 +69,11 @@ public:
                          make_property(this,
                                        &npqvdAPI::get_version));
 	qvd = NULL;
-	//	qvdpid = 0;
 	vmid = 0;
 	connect_thread = NULL;
+#ifdef __unix__
+	qvdpid = 0;
+#endif
     }
 
     ///////////////////////////////////////////////////////////////////////////////
@@ -82,19 +84,21 @@ public:
     ///         the plugin is released.
     ///////////////////////////////////////////////////////////////////////////////
     ~npqvdAPI() {
-      /* if (qvdpid != 0) */
-      /* 	{ */
-      /* 	  qvd_printf("~npqvdAPI: NPP_Destroy killing pid: %d\n", qvdpid);   */
-      /* 	  kill(qvdpid, 9); */
-      /* 	  qvdpid = 0; */
-      /* 	} */
-	
+#if defined(__unix__) || defined(__APPLE__)
+      if (qvdpid != 0)
+      	{
+      	  qvd_printf("~npqvdAPI: NPP_Destroy killing pid: %d\n", qvdpid);
+      	  kill(qvdpid, 9);
+      	  qvdpid = 0;
+      	}
+#else
       if (connect_thread)
 	{
 	  qvd_printf("Interrupting connect thread %p", connect_thread);
 	  qvd_end_connection(qvd);
 	  connect_thread->join();
 	}
+#endif
       if (qvd != NULL)
 	{
 	  qvd_free(qvd);
@@ -154,7 +158,9 @@ private:
 
     std::string m_testString;
     qvdclient *qvd;
-    //    pid_t qvdpid;
+#ifdef __unix__
+    pid_t qvdpid;
+#endif
     int vmid;
     void npqvd_list_of_vm_async_thread(const FB::JSObjectPtr &callback);
     std::vector<std::map<std::string,std::string> > npqvd_list_of_vm();

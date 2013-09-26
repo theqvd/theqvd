@@ -43,7 +43,7 @@ endif ( FB_PLATFORM_ARCH_32 )
 # strings
 set(FBSTRING_CompanyName "QVD Dev Team")
 set(FBSTRING_PluginDescription "Web client plugin for QVD. For further info see http://theqvd.com")
-set(FBSTRING_PLUGIN_VERSION "1.0.0.0")
+set(FBSTRING_PLUGIN_VERSION "1.1.0.0")
 set(FBSTRING_LegalCopyright "Copyright 2013 QVD Dev Team")
 set(FBSTRING_PluginFileName "np${PLUGIN_NAME}")
 set(FBSTRING_ProductName "QVD Web Client Plugin")
