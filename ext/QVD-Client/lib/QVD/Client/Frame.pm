@@ -65,12 +65,76 @@ sub new {
     $size   = wxDefaultSize      unless defined $size;
     $name   = ""                 unless defined $name;
 
+    my ($tab_ctl, $tab_sizer, $settings_panel);
+     
     $style = wxCAPTION|wxCLOSE_BOX|wxSYSTEM_MENU|wxMINIMIZE_BOX
         unless defined $style;
 
     my $self = $class->SUPER::new( $parent, $id, $title, $pos, $size, $style, $name );
 
-    my $panel = $self->{panel} = Wx::Panel->new($self, -1, wxDefaultPosition, wxDefaultSize, wxTAB_TRAVERSAL );
+    
+    
+    
+    if ( core_cfg('client.show.settings') ) {
+        $tab_ctl = Wx::Notebook->new($self, -1, wxDefaultPosition, wxDefaultSize, 0, "tab");
+    }
+    
+    my $panel = $self->{panel} = Wx::Panel->new($tab_ctl // $self, -1, wxDefaultPosition, wxDefaultSize, wxTAB_TRAVERSAL ); # / broken highlighter
+    
+    if ( $tab_ctl ) {
+        $tab_ctl->AddPage( $panel, "Connect" );
+        
+        $tab_sizer = Wx::BoxSizer->new(wxVERTICAL);
+        $tab_sizer->Add($tab_ctl);
+        
+        
+        $settings_panel = Wx::Panel->new($tab_ctl, -1, wxDefaultPosition, wxDefaultSize, wxTAB_TRAVERSAL );
+        $tab_ctl->AddPage( $settings_panel, "Settings");
+        my $settings_sizer = Wx::BoxSizer->new(wxVERTICAL);
+        $settings_panel->SetSizer($settings_sizer);
+        
+
+        ###############################
+        $settings_sizer->Add( Wx::StaticText->new($settings_panel, -1, "VM options"), 0, wxALL, 5);
+        $settings_sizer->Add( Wx::StaticLine->new($settings_panel, -1, wxDefaultPosition, wxDefaultSize, wxLI_HORIZONTAL, "line"), 0, wxEXPAND | wxLEFT | wxRIGHT, 5 );
+       
+        
+        $self->{kill_vm} = Wx::CheckBox->new($settings_panel, -1, "Kill current VM", wxDefaultPosition, wxDefaultSize, 0, wxDefaultValidator, "checkBox");
+        $settings_sizer->Add($self->{kill_vm});
+       
+        $settings_sizer->AddSpacer(5);
+
+        ###############################
+        $settings_sizer->Add( Wx::StaticText->new($settings_panel, -1, "Connection"), 0, wxALL, 5);
+        $settings_sizer->Add( Wx::StaticLine->new($settings_panel, -1, wxDefaultPosition, wxDefaultSize, wxLI_HORIZONTAL, "line"), 0, wxEXPAND | wxLEFT | wxRIGHT, 5 );
+
+
+        $self->{audio} = Wx::CheckBox->new($settings_panel, -1, "Enable audio", wxDefaultPosition, wxDefaultSize, 0, wxDefaultValidator, "checkBox");
+        $self->{audio}->SetValue( core_cfg("client.audio.enable" ) );
+        $settings_sizer->Add($self->{audio});
+
+        $self->{printing} = Wx::CheckBox->new($settings_panel, -1, "Enable printing", wxDefaultPosition, wxDefaultSize, 0, wxDefaultValidator, "checkBox");
+        $self->{printing}->SetValue( core_cfg("client.printing.enable" ) );
+        $settings_sizer->Add($self->{printing});
+
+        $self->{forwarding} = Wx::CheckBox->new($settings_panel, -1, "Enable port forwarding", wxDefaultPosition, wxDefaultSize, 0, wxDefaultValidator, "checkBox");
+        $self->{forwarding}->SetValue( core_cfg("client.slave.enable" ) );
+        $settings_sizer->Add($self->{forwarding});        
+        $settings_sizer->AddSpacer(5);
+
+        ###############################
+        $settings_sizer->Add( Wx::StaticText->new($settings_panel, -1, "Screen"), 0, wxALL, 5);
+        $settings_sizer->Add( Wx::StaticLine->new($settings_panel, -1, wxDefaultPosition, wxDefaultSize, wxLI_HORIZONTAL, "line"), 0, wxEXPAND | wxLEFT | wxRIGHT, 5 );
+#        my $screen_sizer = Wx::GridSizer->new(1, 2, 0, 0);
+#        $settings_sizer->Add( $screen_sizer, wxLEFT | wxRIGHT , 20 );
+#        $screen_sizer->Add(Wx::StaticText->new($settings_panel, -1, "Resolution"), 0, wxALL, 5);
+#        $screen_sizer->Add(Wx::TextCtrl->new($settings_panel, -1, ""), 0, wxALL | wxEXPAND, 5);
+
+        $self->{fullscreen} = Wx::CheckBox->new($settings_panel, -1, "Full screen");
+        $self->{fullscreen}->SetValue( core_cfg("client.fullscreen" ) );
+        $settings_sizer->Add($self->{fullscreen}, 0, wxALL, 5);
+        
+    }
 
     my $ver_sizer  = Wx::BoxSizer->new(wxVERTICAL);
 
@@ -172,7 +236,14 @@ sub new {
 
     $panel->SetSizer($ver_sizer);
 
-    $ver_sizer->Fit($self);
+    if ( $tab_ctl ) {
+         $tab_ctl->SetSizer($tab_sizer);
+         $ver_sizer->Fit($tab_ctl);
+         $tab_sizer->Fit($self);         
+    } else {
+         $ver_sizer->Fit($self);
+    }
+    
     $self->Center;
     $self->Show(1);
     (core_cfg('client.remember_username') && length core_cfg('client.user.name')) ? $self->{password}->SetFocus() : $self->{username}->SetFocus();
@@ -279,6 +350,9 @@ sub proxy_set_environment {
 
 sub OnClickConnect {
     my( $self, $event ) = @_;
+    
+    $self->SaveConfiguration();
+    
     $self->{state} = "";
     %connect_info = (
         link          => core_cfg('client.force.link', 0) // core_cfg('client.link'),
@@ -290,7 +364,7 @@ sub OnClickConnect {
         port          => $DEFAULT_PORT,
         ssl           => $USE_SSL,
         host          => core_cfg('client.force.host.name', 0) // $self->{host}->GetValue,
-        (map { $_ => $self->{$_}->GetValue } qw(username password)),
+        (map { $_ => $self->{$_}->GetValue } grep { defined $self->{$_} } qw(username password kill_vm)),
     );
 
     my $u = $self->{username}->GetValue;
@@ -310,8 +384,6 @@ sub OnClickConnect {
     unless ($remember_password) {
         $self->{password}->SetValue('');
     }
-
-    $self->SaveConfiguration();
 
     # Start or notify worker thread
     # Will result in the execution of a loop in RunWorkerThread.
@@ -353,6 +425,7 @@ sub OnListOfVMLoaded {
                         $_->{name}." (blocked)";
                     } else {
                         $_->{name};
+                        
                     }
                 } @$vm_data
             ],
@@ -568,9 +641,13 @@ sub SaveConfiguration {
         set_core_cfg('client.remember_password', ($self->{remember_pass}->IsChecked() ? 1 : 0));
     }
 
-    #set_core_cfg('client.audio.enable', $self->{audio}->GetValue());
-    #set_core_cfg('client.printing.enable', $self->{printing}->GetValue());
-    #set_core_cfg('client.fullscreen', $self->{fullscreen}->GetValue());
+    
+    # The widgets only exist if the settings tab is enabled.
+    set_core_cfg('client.audio.enable', $self->{audio}->GetValue())       if ( $self->{audio} );
+    set_core_cfg('client.printing.enable', $self->{printing}->GetValue()) if ( $self->{printing} );
+    set_core_cfg('client.fullscreen', $self->{fullscreen}->GetValue())    if ( $self->{fullscreen} );
+    set_core_cfg('client.slave.enable', $self->{forwarding}->GetValue())  if ( $self->{forwarding} );
+    
     #set_core_cfg('client.geometry', $self->{geometry}->GetValue());
 
     local $@;
