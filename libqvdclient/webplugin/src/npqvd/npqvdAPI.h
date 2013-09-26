@@ -71,7 +71,7 @@ public:
 	qvd = NULL;
 	vmid = 0;
 	connect_thread = NULL;
-#ifdef __unix__
+#if defined(__unix__) || defined(__APPLE__)
 	qvdpid = 0;
 #endif
     }
@@ -158,7 +158,7 @@ private:
 
     std::string m_testString;
     qvdclient *qvd;
-#ifdef __unix__
+#if defined(__unix__) || defined(__APPLE__)
     pid_t qvdpid;
 #endif
     int vmid;
