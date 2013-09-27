@@ -121,7 +121,7 @@ std::vector<std::map<std::string,std::string> > npqvdAPI::npqvd_list_of_vm()
   return myreturn;
 }
 
-void npqvdAPI::npqvd_connect_to_vm(int vmid_param)
+int npqvdAPI::npqvd_connect_to_vm(int vmid_param)
 {
   if (qvd == NULL)
     {
@@ -131,18 +131,35 @@ void npqvdAPI::npqvd_connect_to_vm(int vmid_param)
   /*  qvd_set_display(qvd, ":0"); */
   qvd_printf("Connecting to vmid: %d\n", vmid);
   vmid=vmid_param;
-#if defined(__unix__) || defined(__APPLE__)
+#if defined(__unix__)
   if ((qvdpid = fork()) == 0)
     {
       // Child
       // After a fork no connection can be done to popup the cert validation
       // But it should be validated beforehand with the qvd_get_vm_list
+      qvd_printf("Inside fork with pid %d", getpid());
       qvd_set_no_cert_check(qvd);
       qvd_connect_to_vm(qvd, vmid);
+      return 1;
+    }
+  else
+    {
+      qvd_printf("Fork initiated (parent). The pid is %d", qvdpid);
+      return 1;
     }
 #else
-  boost::thread t(boost::bind(&npqvdAPI::npqvd_connect_to_vm_thread,
-			      this));
+  if (connection_established)
+    {
+      qvd_error(qvd, "Currently only one connection is allowed. Close the current connection and open another");
+      return 0;
+    }
+  else
+    {
+      connection_established = 1;
+      boost::thread t(boost::bind(&npqvdAPI::npqvd_connect_to_vm_thread,
+				  this));
+      return 0;
+    }
 #endif
 }
 
@@ -363,7 +380,7 @@ std::string npqvdAPI::npqvd_get_last_error()
 
 void npqvdAPI::npqvd_end_connection()
 {
-#if defined(__unix__) || defined(__APPLE__)
+#if defined(__unix__)
   // Run kill
   if (qvdpid != 0)
     {
@@ -378,6 +395,7 @@ void npqvdAPI::npqvd_end_connection()
       return;
     }
   qvd_end_connection(qvd);
+  connection_established = 0;
 #endif
 }
 

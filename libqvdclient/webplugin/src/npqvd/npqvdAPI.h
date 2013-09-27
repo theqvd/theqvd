@@ -71,8 +71,10 @@ public:
 	qvd = NULL;
 	vmid = 0;
 	connect_thread = NULL;
-#if defined(__unix__) || defined(__APPLE__)
+#if defined(__unix__)
 	qvdpid = 0;
+#else
+	connection_established = 0;
 #endif
     }
 
@@ -84,7 +86,7 @@ public:
     ///         the plugin is released.
     ///////////////////////////////////////////////////////////////////////////////
     ~npqvdAPI() {
-#if defined(__unix__) || defined(__APPLE__)
+#if defined(__unix__)
       if (qvdpid != 0)
       	{
       	  qvd_printf("~npqvdAPI: NPP_Destroy killing pid: %d\n", qvdpid);
@@ -98,6 +100,7 @@ public:
 	  qvd_end_connection(qvd);
 	  connect_thread->join();
 	}
+      connection_established = 0;
 #endif
       if (qvd != NULL)
 	{
@@ -120,7 +123,7 @@ public:
     const char *npqvd_get_version_text();
     int npqvd_get_version();
     void npqvd_init(std::string host, int port, std::string username, std::string password);
-    void npqvd_connect_to_vm(int vmid);
+    int npqvd_connect_to_vm(int vmid);
     void npqvd_list_of_vm_async(const FB::JSObjectPtr &callback);
     void npqvd_set_progress_callback(const FB::JSObjectPtr &callback);
     void npqvd_set_unknown_cert_callback(const FB::JSObjectPtr &callback);
@@ -158,8 +161,10 @@ private:
 
     std::string m_testString;
     qvdclient *qvd;
-#if defined(__unix__) || defined(__APPLE__)
+#if defined(__unix__)
     pid_t qvdpid;
+#else
+    int connection_established;
 #endif
     int vmid;
     void npqvd_list_of_vm_async_thread(const FB::JSObjectPtr &callback);
