@@ -15,7 +15,13 @@ function select_vm_and_connect(vmid)
 					    qvd.qvd_end_connection(); 
 					    $(this).html('Ending connection'); 
 					  });
-    qvd.qvd_connect_to_vm(vmid);
+    // Set the display if you need it
+    // qvd.qvd_set_display(":0");
+    var result = qvdembed.qvd_connect_to_vm(vmid);
+    if (!result)
+    {
+	window.alert("Error connecting to VM: " + qvd.qvd_get_last_error())
+    }
 }
 
 function after_qvd_list_of_vm(qvd, vmlist)
