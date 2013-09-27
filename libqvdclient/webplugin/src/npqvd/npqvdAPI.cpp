@@ -126,7 +126,7 @@ int npqvdAPI::npqvd_connect_to_vm(int vmid_param)
   if (qvd == NULL)
     {
       qvd_printf("Error qvd is null qvd_init has not been called");
-      return;
+      return 0;
     }
   /*  qvd_set_display(qvd, ":0"); */
   qvd_printf("Connecting to vmid: %d\n", vmid);
