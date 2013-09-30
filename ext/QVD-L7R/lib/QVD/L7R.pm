@@ -127,15 +127,14 @@ sub list_of_vm_processor {
         $l7r->throw_http_error(HTTP_SERVICE_UNAVAILABLE, "Server is $server_state");
     }
     $auth->before_list_of_vms;
-    my $user_id = _auth2user_id($auth);
+    my $user_id = $auth->user_id;
 
     my @vm_list = ( map { { id      => $_->vm_id,
                             state   => $_->vm_state,
                             name    => $_->vm->name,
                             blocked => $_->blocked } }
                     map $_->vm_runtime,
-                    grep $auth->allow_access_to_vm($_),
-                    rs(VM)->search({user_id => $user_id}) );
+                    $auth->list_of_vm($url, $headers) );
 
     if (@vm_list) {
         DEBUG sprintf "User $user_id has %d virtual machines", scalar @vm_list;
@@ -152,7 +151,7 @@ sub connect_to_vm_processor {
     $this_host->counters->incr_http_requests;
     DEBUG 'method connect_to_vm requested';
     my $auth = $l7r->_authenticate_user($headers);
-    my $user_id = _auth2user_id($auth);
+    my $user_id = $auth->user_id;
 
     if ($this_host->runtime->blocked) {
         INFO 'Server is blocked';
@@ -174,47 +173,37 @@ sub connect_to_vm_processor {
         $l7r->throw_http_error(HTTP_UNPROCESSABLE_ENTITY, "parameter id is missing");
     }
 
-    my $vm;
-        
-    if (defined $vm_id) {
-        $vm = rs(VM_Runtime)->search({vm_id => $vm_id})->first // do {
-            INFO 'The requested virtual machine does not exist,)'. " VM_ID: $vm_id";
-            $l7r->throw_http_error(HTTP_NOT_FOUND, "The requested virtual machine does not exist");
-        };
-
-        if ($vm->vm->user_id != $user_id or !$auth->allow_access_to_vm($vm)) {
-            INFO "User $user_id has tried to access VM $vm_id but (s)he isn't allowed to";
-            $l7r->throw_http_error(HTTP_FORBIDDEN,
-                                   "You are not allowed to access requested virtual machine");
-        }
-    } else {
-        my ($file_ext) = ($file_name =~ /([^.]*)$/);
-        my $rs = rs(VM)->search({
-                user_id             => $user_id,
-                'properties.key'    => 'qvd.app.file_exts',
-                'properties.value'  => {like => "%$file_ext%"}},
-            {join => ['properties']})->first // do {
-            INFO 'VM not found for file name extension '.$file_ext;
-            $l7r->throw_http_error(HTTP_NOT_FOUND, "The requested virtual machine does not exist");
-        };
-        $vm_id = $rs->id;
-        $vm = $rs->vm_runtime;
-        $params{'qvd.client.open_file'} = $file_name;
-    }
-
     if (my @forbidden = grep !/^(?:qvd\.client\.|custom\.)/, keys %params) {
         INFO "Invalid parameters @forbidden";
         $l7r->throw_http_error(HTTP_FORBIDDEN,
                                "Invalid parameters @forbidden");
     }
-
-    $vm->blocked and do {
-        INFO 'The requested virtual machine is offline for maintenance'. " VM_ID: $vm_id";
-        $l7r->throw_http_error(HTTP_FORBIDDEN,
-                                   "The requested virtual machine is offline for maintenance");
+    
+    my $vm = txn_eval {
+        my $vm;
+        $vm = rs(VM_Runtime)->search({vm_id => $vm_id})->first // do {
+            INFO 'The requested virtual machine does not exist,)'. " VM_ID: $vm_id";
+            $l7r->throw_http_error(HTTP_NOT_FOUND, "The requested virtual machine does not exist");
+        };
+        $vm->blocked and do {
+            INFO 'The requested virtual machine is offline for maintenance'. " VM_ID: $vm_id";
+            $l7r->throw_http_error(HTTP_FORBIDDEN,
+                                       "The requested virtual machine is offline for maintenance");
+        };
+        $vm->update({real_user_id => $user_id});
+        return $vm,
     };
 
+    if (!$vm) {
+        $l7r->throw_http_error(HTTP_NOT_FOUND, $@);
+    }
+
     eval {
+        if (!$auth->allow_access_to_vm($vm->vm)) {
+            INFO "User $user_id has tried to access VM $vm_id but (s)he isn't allowed to";
+            $l7r->throw_http_error(HTTP_FORBIDDEN,
+                                   "You are not allowed to access requested virtual machine");
+        }
         $l7r->_takeover_vm($vm);
         $l7r->_assign_vm($vm);
         $auth->before_connect_to_vm;
@@ -237,14 +226,6 @@ sub connect_to_vm_processor {
                           "$saved_err, retry later");
     }
     DEBUG "Session ended". " VM_ID: $vm_id";
-}
-
-sub _auth2user_id {
-    my $auth = shift;
-    my $login = $auth->normalized_login;
-    my $user = rs(User)->search({ login => $login })->first
-        // LOGDIE "Authenticated user $login does not exist in database";
-    $user->id
 }
 
 sub _authenticate_user {
@@ -328,6 +309,10 @@ sub _release_vm {
         $vm->discard_changes;
         my $pid = $vm->l7r_pid;
         my $host = $vm->l7r_host;
+        if ($vm->is_ephemeral && $vm->vm_state eq 'running') {
+            $vm->send_vm_stop; # Clean up ephemeral VMs
+        }
+        $vm->update({ real_user_id => undef });
         if (defined $pid  and $pid  == $$  and
             defined $host and $host == this_host_id) {
             DEBUG 'calling clear l7r all for vm ' . $vm->id;

@@ -49,6 +49,7 @@ BEGIN {
 
 use QVD::Config::Core;
 use QVD::Client::Proxy;
+use QVD::Log;
 
 my $username = shift @ARGV;
 my $password = shift @ARGV;
@@ -68,19 +69,29 @@ my %connect_info = (
     geometry      => core_cfg('client.geometry'),
     fullscreen    => core_cfg('client.fullscreen'),
     keyboard      => 'pc105/es',
+    kill_vm       => 0,
     port          => $port,
     ssl           => $ssl,
     host          => $host,
     username      => $username,
     password      => $password,
-    file          => $file,
 );
 
+$connect_info{file} = $file if defined $file;
+
 my $delegate = QVD::Client::CLI->new(file => $file);
-if ($file) {
-    QVD::Client::Proxy->new($delegate, %connect_info)->open_file($file);
-} else {
-    QVD::Client::Proxy->new($delegate, %connect_info)->connect_to_vm();
+
+my $proxy = QVD::Client::Proxy->new($delegate, %connect_info);
+my $err_count = 0;
+
+while ($err_count < 5) {
+    $proxy->connect_to_vm();
+    last unless $delegate->{error};
+    $err_count++;
+}
+if (defined $delegate->{error}) {
+    ERROR("Unable to connect to VM: ".$delegate->{error});
+    exit 1;
 }
 
 package QVD::Client::CLI;
@@ -92,6 +103,7 @@ use QVD::Log;
 sub new {
     my $class = shift;
     my %attrs = @_;
+    $attrs{error} = undef;
     bless \%attrs, $class;
 }
 
@@ -101,27 +113,32 @@ sub proxy_set_environment {
 }
 
 sub proxy_unknown_cert {
-    my ($self, $cert_arr) = @_;
-    my ($cert_pem_str, $cert_data) = @$cert_arr;
-    print "$cert_data\n";
-    print "Accept certificate? [y/N] ";
-    return <STDIN> =~ /^y/i;
+    ## Accept all certificates for now.
+    # my ($self, $cert_arr) = @_;
+    # my ($cert_pem_str, $cert_data) = @$cert_arr;
+    # print "$cert_data\n";
+    # print "Accept certificate? [y/N] ";
+    # return <STDIN> =~ /^y/i;
+    1;
 }
 
 sub proxy_list_of_vm_loaded {
     my ($self, $vm_data) = @_;
     my $vm;
     if (@$vm_data > 0) {
-        print "You have ".@$vm_data." virtual machines.\n";
+        #print "You have ".@$vm_data." virtual machines.\n";
         $vm = $vm_data->[rand @$vm_data];
-       print "Connecting to the one called ".$vm->{name}."\n";
+        INFO "Connecting to VM called ".$vm->{name}."\n";
     }
     return $vm->{id};
 }
 
 sub proxy_connection_status {
     my ($self, $status) = @_;
-    print "Connection status $status\n";
+    INFO "Connection status $status\n";
+    if ($status eq 'CONNECTING') {
+        $self->{error} = undef;
+    }
     if ($status eq 'FORWARDING') {
         $self->open_file($self->{file});
     }
@@ -130,7 +147,8 @@ sub proxy_connection_status {
 sub proxy_connection_error {
     my $self = shift;
     my %args = @_;
-    print 'Connection error: ',$args{message},"\n";
+    ERROR 'Connection error: ',$args{message},"\n";
+    $self->{error} = $args{message};
 }
 
 sub open_file {

@@ -14,7 +14,7 @@ my $osf_id = cfg('auth.auto.osf_id');
 my $di_tag = cfg('auth.auto.di_tag', 0) // 'default';
 my $maxvms = cfg('auth.auto.max_vms', 0) // 5;
 
-sub before_list_of_vms {
+sub after_authenticate_basic {
     my ($plugin, $auth) = @_;
     my $login = $auth->{login};
     my $user = rs(User)->search({login => $login})->first;
@@ -29,6 +29,7 @@ sub before_list_of_vms {
 	    // die "Unable to provision user $login";
         $user_id = $user_id_obj->id;
     }
+    $auth->{user_id} = $user_id;
 
     if (rs(VM)->search({user_id => $user_id, osf_id => $osf_id})->count == 0) {
 	INFO "Auto provisioning VM for user $login ($user_id) with OSF $osf_id";

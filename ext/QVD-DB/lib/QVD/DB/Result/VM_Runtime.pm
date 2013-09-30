@@ -198,4 +198,10 @@ sub vma_url {
 
 sub combined_properties { shift->vm->combined_properties }
 
+sub is_ephemeral {
+    # FIXME add a database field to mark ephemeral VMs
+    my ($vm) = @_;
+    return $vm->real_user_id != $vm->vm->user_id;
+}
+
 1;

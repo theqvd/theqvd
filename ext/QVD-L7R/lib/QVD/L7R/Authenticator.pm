@@ -5,6 +5,7 @@ use warnings;
 
 use QVD::Config;
 use QVD::Log;
+use QVD::DB::Simple;
 use Carp;
 
 my $case_sensitive_login = cfg('model.user.login.case-sensitive');
@@ -57,6 +58,7 @@ sub authenticate_basic {
                 $auth->{normalized_login} = $normalized_login;
                 $auth->{passwd} = $passwd;
                 $auth->{params}{'qvd.vm.user.name'} = $normalized_login;
+                $auth->after_authenticate_basic($login, $l7r);
                 return 1;
             }
         }
@@ -71,7 +73,15 @@ sub normalized_login { shift->{normalized_login} // croak "internal error: user 
 
 sub login { shift->{login} // croak "internal error: user not authenticated yet!" }
 
+sub user_id { shift->{user_id} // croak "internal error: user not authenticated yet!" }
+
 sub params { %{shift->{params}} }
+
+sub after_authenticate_basic {
+    my ($auth, $login, $l7r) = @_;
+    DEBUG "calling after_authenticate_basic hook";
+    $_->after_authenticate_basic($auth, $login) for @{$auth->{modules}};
+}
 
 sub before_connect_to_vm {
     my $auth = shift;
@@ -85,13 +95,30 @@ sub before_list_of_vms {
     $_->before_list_of_vms($auth) for @{$auth->{modules}};
 }
 
+sub list_of_vm {
+    my ($auth) = @_;
+    my @vm_list;
+    for (@{$auth->{modules}}) {
+        if ($_->can('list_of_vm')) {
+            INFO "listing VMs using plugin $_";
+            @vm_list = $_->list_of_vm(@_);
+            last if @vm_list;
+        }
+    }
+    unless (@vm_list) {
+        INFO "listing VMs by user id";
+        @vm_list = (rs(VM)->search({user_id => $auth->{user_id}}));
+    }
+    return @vm_list;
+}
+
 sub allow_access_to_vm {
     my ($auth, $vm) = @_;
     DEBUG "calling allow_access_to_vm hook";
     for (@{$auth->{modules}}) {
-        $_->allow_access_to_vm($auth, $vm) or return;
+        return 1 if $_->allow_access_to_vm($auth, $vm);
     }
-    return 1;
+    return ();
 }
 
 1;
