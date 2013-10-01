@@ -47,6 +47,7 @@ add_windows_plugin(${PROJECT_NAME} SOURCES)
 # Add the qvdclient library from env vars
 include_directories("$ENV{QVDCLIENT_INCLUDE}" "$ENV{CURL_INCLUDE}" "$ENV{CYGWIN_INCLUDE}")
 
+set_target_properties(${PROJECT_NAME} PROPERTIES COMPILE_FLAGS "/clr:oldSyntax")
 
 # add library dependencies here; leave ${PLUGIN_INTERNAL_DEPS} there unless you know what you're doing!
 target_link_libraries(${PROJECT_NAME}
