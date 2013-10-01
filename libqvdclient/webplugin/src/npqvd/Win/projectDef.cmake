@@ -45,7 +45,7 @@ add_windows_plugin(${PROJECT_NAME} SOURCES)
 #    "http://timestamp.verisign.com/scripts/timestamp.dll")
 
 # Add the qvdclient library from env vars
-include_directories("$ENV{QVDCLIENT_INCLUDE}" "$ENV{CURL_INCLUDE}")
+include_directories("$ENV{QVDCLIENT_INCLUDE}" "$ENV{CURL_INCLUDE}" "$ENV{CYGWIN_INCLUDE}")
 
 
 # add library dependencies here; leave ${PLUGIN_INTERNAL_DEPS} there unless you know what you're doing!
