@@ -44,9 +44,15 @@ add_windows_plugin(${PROJECT_NAME} SOURCES)
 #    "${CMAKE_CURRENT_SOURCE_DIR}/sign/passphrase.txt"
 #    "http://timestamp.verisign.com/scripts/timestamp.dll")
 
+# Add the qvdclient library from env vars
+include_directories("$ENV{QVDCLIENT_INCLUDE}" "$ENV{CURL_INCLUDE}")
+
+
 # add library dependencies here; leave ${PLUGIN_INTERNAL_DEPS} there unless you know what you're doing!
 target_link_libraries(${PROJECT_NAME}
     ${PLUGIN_INTERNAL_DEPS}
+    "$ENV{QVDCLIENT_LIB}"
+    "$ENV{QVDCLIENT_EXTRA_LIBS}"
     )
 
 set(WIX_HEAT_FLAGS
