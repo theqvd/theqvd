@@ -9,23 +9,6 @@
 #include "DOM/Document.h"
 #include "global/config.h"
 
-
-// Pure hack to compile in MS Visual Studio with cygnwin headers, completely not
-// portable
-#ifdef QVD_FIREBREATH_WINDOWS
-typedef struct
-{
-  int __count;
-  union
-  {
-    wint_t __wch;
-    unsigned char __wchb[4];
-  };            /* Value so far.  */
-//  } __value;            /* Value so far.  */
-} _mbstate_t;
-#define __mbstate_t_defined
-#endif
-
 #include "npqvdAPI.h"
 
 ///////////////////////////////////////////////////////////////////////////////
