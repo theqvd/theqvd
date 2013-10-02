@@ -47,7 +47,7 @@ add_windows_plugin(${PROJECT_NAME} SOURCES)
 #:\cygwin\usr\include\sys/_types.h(36): error C2144: syntax error : '__int64' should be preceded by ';' [C:\jenkins\workspace\w20-webplugin-master\build\i686-pc-cygwin\projects\npqvd\npqvd.vcxproj]
 #
 add_definitions(-D__extension__=)
-#add_definitions(-D__off64_t_defined)
+add_definitions(-DQVD_FIREBREATH_WINDOWS)
 
 # Add the qvdclient library from env vars
 include_directories("$ENV{QVDCLIENT_INCLUDE}" "$ENV{CURL_INCLUDE}" "$ENV{CYGWIN_INCLUDE}")
