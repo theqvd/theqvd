@@ -54,7 +54,6 @@ sub _ssl_verify_callback {
     my $err_no    = Net::SSLeay::X509_STORE_CTX_get_error($mem_addr);
     my $err_depth = Net::SSLeay::X509_STORE_CTX_get_error_depth($mem_addr);
     my $err_str   = Net::SSLeay::X509_verify_cert_error_string($err_no);
-    Net::SSLeay::X509::ERR_remove_thread_state(undef);
     
     my $cert_hash = $x509->hash;
 
