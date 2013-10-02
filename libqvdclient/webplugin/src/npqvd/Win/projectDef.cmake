@@ -44,6 +44,11 @@ add_windows_plugin(${PROJECT_NAME} SOURCES)
 #    "${CMAKE_CURRENT_SOURCE_DIR}/sign/passphrase.txt"
 #    "http://timestamp.verisign.com/scripts/timestamp.dll")
 
+#:\cygwin\usr\include\sys/_types.h(36): error C2144: syntax error : '__int64' should be preceded by ';' [C:\jenkins\workspace\w20-webplugin-master\build\i686-pc-cygwin\projects\npqvd\npqvd.vcxproj]
+#
+add_definitions(-D__extension__)
+#add_definitions(-D__off64_t_defined)
+
 # Add the qvdclient library from env vars
 include_directories("$ENV{QVDCLIENT_INCLUDE}" "$ENV{CURL_INCLUDE}" "$ENV{CYGWIN_INCLUDE}")
 
