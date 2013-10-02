@@ -44,9 +44,6 @@ add_windows_plugin(${PROJECT_NAME} SOURCES)
 #    "${CMAKE_CURRENT_SOURCE_DIR}/sign/passphrase.txt"
 #    "http://timestamp.verisign.com/scripts/timestamp.dll")
 
-cmake_policy(SET CMP0011 NEW)
-cmake_policy(SET CMP0008 NEW)
-
 # Add the qvdclient library from env vars
 include_directories("$ENV{QVDCLIENT_INCLUDE}" "$ENV{CURL_INCLUDE}" "$ENV{CYGWIN_INCLUDE}")
 

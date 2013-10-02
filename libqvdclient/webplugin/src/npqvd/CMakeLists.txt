@@ -36,6 +36,10 @@ SET( SOURCES
 
 # This will include Win/projectDef.cmake, X11/projectDef.cmake, Mac/projectDef 
 # depending on the platform
+cmake_policy(SET CMP0011 NEW)
+cmake_policy(SET CMP0008 NEW)
+
+
 include_platform()
 
 #this will build a Chrome package
