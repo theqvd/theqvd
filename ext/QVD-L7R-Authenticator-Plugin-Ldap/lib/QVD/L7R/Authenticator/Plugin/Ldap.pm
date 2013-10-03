@@ -41,7 +41,7 @@ sub authenticate_basic {
         $binddn =~ s/\%u/$escaped_login/g;
         push @bind_args, $binddn;
         DEBUG "binding with query '$binddn'";
-        if (defined(my $bindpass = cfg('auth.ldap.bindpass'))) {
+        if (defined(my $bindpass = cfg('auth.ldap.bindpass', 0))) {
             push @bind_args, password => $bindpass;
         }
         else {
