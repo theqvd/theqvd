@@ -62,6 +62,7 @@ sub authenticate_basic {
     # Search for user
     my $base   = cfg('auth.ldap.base');
     my $filter = cfg('auth.ldap.filter', 0) // '(uid=%u)';
+    $filter =~ s/\%u/$escaped_login/g;
     my $scope  = cfg('auth.ldap.scope' , 0) // 'base';
     $scope =~ /^(?:base|one|sub)$/ or WARN "bad value $scope for auth.ldap.scope";
     my $deref = cfg('auth.ldap.deref', 0) // 'never';
