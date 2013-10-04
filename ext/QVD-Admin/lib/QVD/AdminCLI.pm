@@ -1,4 +1,4 @@
-package QVD::AditerCLI;
+package QVD::AdminCLI;
 
 use warnings;
 use strict;
