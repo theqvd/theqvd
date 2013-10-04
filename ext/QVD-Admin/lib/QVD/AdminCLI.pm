@@ -1,4 +1,4 @@
-package QVD::AdminCLI;
+package QVD::AditerCLI;
 
 use warnings;
 use strict;
@@ -1336,7 +1336,9 @@ sub cmd_vm_console {
         my $vm_runtime = $self->_get_single_vm_runtime;
         my $hv = cfg('vm.hypervisor');
         if ('lxc' eq $hv) {
+            my $lxc_run_path = cfg('path.run.lxc');
             my $container_name = sprintf 'qvd-%d', $vm_runtime->vm_id;
+            unshift @args, (-P => $lxc_run_path);
             @args = qw/-t 1/ unless @args;
             exec $lxc_console_command, '-n', $container_name, @args
                 or die "Unable to exec lxc-console: $^E";
