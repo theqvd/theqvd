@@ -13,7 +13,6 @@ BEGIN {
     $ENV{NX_CLIENT} = 'false';
 
     $user_config_filename = File::Spec->join($user_dir, 'client.conf');
-    print("using $user_config_filename\n");
 
     #no warnings;
     $QVD::Config::USE_DB = 0;
@@ -37,7 +36,6 @@ if ($@ =~ 'Connection refused') {
     my $host = core_cfg('client.host.name');
     my $port = 8443;
     @ARGV = ($user, $pass, $host, $port);
-    print join(' ', @ARGV), "\n";
     push @ARGV, $file;
     my $pid = fork;
     if ($pid == 0) {

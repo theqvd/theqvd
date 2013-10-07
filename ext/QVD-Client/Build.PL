@@ -9,7 +9,7 @@ my $build = new Module::Build(
 	       dist_version  => '3.3'.$ENV{BUILD_NUMBER},
 	       abstract_from => 'lib/QVD/Client.pm',
 	       PL_files      => {},
-	       pl_files      => [ qw(bin/qvd-client.pl bin/qvd-gui-client.pl bin/qvd-slaveclient) ],
+	       pl_files      => [ qw(bin/qvd-client.pl bin/qvd-gui-client.pl bin/qvd-slaveclient bin/qvd-open) ],
 	       configure_requires => { 'Module::Build' => 0.38  },
 	       requires      => {
 				  'Crypt::OpenSSL::X509' => 0,
