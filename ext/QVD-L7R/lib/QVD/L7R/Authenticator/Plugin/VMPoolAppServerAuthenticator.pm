@@ -25,7 +25,7 @@ sub list_of_vm {
     my $query = (uri_split $url)[3];
     my %params = uri_query_split $query;
     my $file_name = delete $params{file_name};
-    INFO "url: $url auth: $auth auth->params: ".$auth->params;
+    INFO "User ".$auth->{user_id}." wants to open '$file_name'";
     return () unless ($file_name);
 
     $auth->{params}{'qvd.client.open_file'} = $file_name;
@@ -38,10 +38,9 @@ sub list_of_vm {
         },
         {join => ['properties', 'vm_runtime']}));
 
-    INFO "Number of available VMS: ".scalar @rs;
+    INFO "Number of available VMs for files with extension $file_ext: ".scalar @rs;
 
-    return ($rs[rand(scalar @rs)]);
+    return @rs? ($rs[rand(scalar @rs)]): ();
 }
 
-'dummy';
-
+1;

@@ -131,13 +131,15 @@ sub proxy_unknown_cert {
 
 sub proxy_list_of_vm_loaded {
     my ($self, $vm_data) = @_;
-    my $vm;
     if (@$vm_data > 0) {
         #print "You have ".@$vm_data." virtual machines.\n";
-        $vm = $vm_data->[rand @$vm_data];
+        my $vm = $vm_data->[rand @$vm_data];
         INFO "Connecting to VM called ".$vm->{name}."\n";
+        return $vm->{id};
+    } else {
+        ERROR "No VM available, server returned an empty list!";
+        return ();
     }
-    return $vm->{id};
 }
 
 sub proxy_connection_status {

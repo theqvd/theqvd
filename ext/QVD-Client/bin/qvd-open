@@ -46,8 +46,13 @@ if ($@ =~ 'Connection refused') {
     my $port = 8443;
     @ARGV = ($user, $pass, $host, $port);
     push @ARGV, $file;
-    unless (do "$Bin/qvd-client.pl") {
-        ERROR("Unable to run QVD client: $@");
+    local $@;
+    unless (defined do "$Bin/qvd-client.pl") {
+        if ($@) {
+            ERROR("Error running qvd-client: $@");
+        } elsif ($!) {
+            ERROR("Error running qvd-client: $^E");
+        }
     }
 } else {
     ERROR($@);

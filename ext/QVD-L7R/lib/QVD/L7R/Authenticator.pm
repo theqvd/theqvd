@@ -97,18 +97,15 @@ sub before_list_of_vms {
 
 sub list_of_vm {
     my ($auth) = @_;
-    my @vm_list;
     for (@{$auth->{modules}}) {
         if ($_->can('list_of_vm')) {
-            INFO "listing VMs using plugin $_";
-            @vm_list = $_->list_of_vm(@_);
-            last if @vm_list;
+            INFO "Listing VMs using auth module $_";
+            return $_->list_of_vm(@_);
         }
     }
-    unless (@vm_list) {
-        INFO "listing VMs by user id";
-        @vm_list = (rs(VM)->search({user_id => $auth->{user_id}}));
-    }
+    INFO "No VMs found by auth modules; listing VMs for user ".$auth->{user_id};
+    my @vm_list = (rs(VM)->search({user_id => $auth->{user_id}}));
+    INFO "Number of available VMs: ".scalar @vm_list;
     return @vm_list;
 }
 
