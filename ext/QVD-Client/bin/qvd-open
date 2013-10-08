@@ -1,4 +1,4 @@
-#!/usr/bin/perl
+#!/usr/lib/qvd/bin/perl
 
 use strict;
 use warnings;
@@ -18,11 +18,20 @@ BEGIN {
     $QVD::Config::USE_DB = 0;
     @QVD::Config::Core::FILES = ( '/etc/qvd/client.conf',
                                   $user_config_filename );
+
+}
+
+use QVD::Config::Core qw(set_core_cfg core_cfg);
+
+BEGIN {
+    set_core_cfg('client.log.filename', File::Spec->join($user_dir, 'qvd-client.log'))
+        unless defined core_cfg('client.log.filename', 0);
+    $QVD::Log::DAEMON_NAME = 'client';
 }
 
 use QVD::Log;
 use QVD::Client::SlaveClient;
-use QVD::Config::Core;
+use FindBin qw($Bin);
 
 my $file = shift;
 
@@ -37,11 +46,8 @@ if ($@ =~ 'Connection refused') {
     my $port = 8443;
     @ARGV = ($user, $pass, $host, $port);
     push @ARGV, $file;
-    my $pid = fork;
-    if ($pid == 0) {
-        do 'QVD-Client/bin/qvd-client.pl';
-    } elsif ($pid < 0) {
-        ERROR("Fork failed: $@");
+    unless (do "$Bin/qvd-client.pl") {
+        ERROR("Unable to run QVD client: $@");
     }
 } else {
     ERROR($@);

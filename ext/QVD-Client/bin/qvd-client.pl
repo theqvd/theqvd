@@ -47,7 +47,14 @@ BEGIN {
     $ENV{NX_CLIENT} = '/bin/false';
 }
 
-use QVD::Config::Core;
+use QVD::Config::Core qw(set_core_cfg core_cfg);
+
+BEGIN {
+    set_core_cfg('client.log.filename', File::Spec->join($QVD::Client::App::user_dir, 'qvd-client.log'))
+        unless defined core_cfg('client.log.filename', 0);
+    $QVD::Log::DAEMON_NAME = 'client';
+}
+
 use QVD::Client::Proxy;
 use QVD::Log;
 
