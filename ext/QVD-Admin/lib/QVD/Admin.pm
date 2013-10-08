@@ -93,7 +93,7 @@ sub get_result_set_for_vm {
 
     # Be able to filter VMs by properties - #1354
     my @joins = ('osf', 'user', { vm_runtime => 'host'});
-    my @prop_keys = map {/^properties\.(.*)/ ? $1 : ()} keys %$filter;
+    my @prop_keys = map {/^property\.(.*)/ ? $1 : ()} keys %$filter;
     if (@prop_keys) {
         push @joins, "properties";
         foreach my $key (@prop_keys) {
@@ -102,6 +102,26 @@ sub get_result_set_for_vm {
         }
     }
     rs(VM)->search($filter, { join => \@joins });
+}
+
+sub get_result_set_for_di {
+    my ($self, @args) = @_;
+    my %term_map = ( name => 'me.name',
+                     osf => 'osf.name',
+		     tag => 'tags.tag' );
+    my $filter = $self->_filter_obj(\%term_map);
+
+    # Be able to filter VMs by properties - #1354
+    my @joins = ('osf', 'tags');
+    my @prop_keys = map {/^property\.(.*)/ ? $1 : ()} keys %$filter;
+    if (@prop_keys) {
+        push @joins, "properties";
+        foreach my $key (@prop_keys) {
+            $filter->{'properties.key'} = $key;
+            $filter->{'properties.value'} = delete $filter->{'properties.'.$key};
+        }
+    }
+    rs(DI)->search($filter, { join => \@joins });
 }
 
 sub _set_equals {
