@@ -103,7 +103,7 @@ if (defined $delegate->{error}) {
 
 package QVD::Client::CLI;
 
-use Data::Dumper;
+use Cwd qw(abs_path);
 use QVD::Client::SlaveClient;
 use QVD::Log;
 
@@ -180,7 +180,7 @@ sub open_file {
                 INFO("Folder sharing started for $share");
                 INFO("Opening $file");
                 $client = QVD::Client::SlaveClient->new('localhost:12040');
-                $client->handle_open($file, $ticket);
+                $client->handle_open(abs_path($file), $ticket);
             }
             last;
         }
