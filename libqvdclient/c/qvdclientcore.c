@@ -177,15 +177,16 @@ vmlist *qvd_list_of_vm(qvdclient *qvd) {
   json_error_t error;
   char *command = "/qvd/list_of_vm";
 
+  if (!_qvd_set_certdir(qvd)) {
+    qvd_printf("Please set the cert dir");
+    return NULL;
+  }
+
   if (qvd->home && (*(qvd->home)) != '\0') {
     qvd_printf("Setting NX_HOME to %s\n", qvd->home);
     if (setenv("NX_HOME", qvd->home, 1)) {
       qvd_error(qvd, "Error setting NX_HOME to %s. errno: %d (%s)", qvd->home, errno, strerror(errno));
     }
-  }
-  if (!_qvd_set_certdir(qvd)) {
-    qvd_printf("Please set the cert dir");
-    return NULL;
   }
 
   if (snprintf(url, MAX_BASEURL, "%s%s", qvd->baseurl, command) >= MAX_BASEURL) {
