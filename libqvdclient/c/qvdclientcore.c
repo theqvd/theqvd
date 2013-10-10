@@ -383,20 +383,26 @@ int _qvd_set_certdir(qvdclient *qvd)
   char *appdata = getenv(APPDATA_ENV);
 
   int result;
-  if (home == NULL && appdata == NULL && !qvd->home && (*(qvd->home)) == '\0')
+  if (home == NULL && appdata == NULL && !qvd->home && (*(qvd->home)) == '\0' && !_qvd_dir_exists(qvd, qvd->home)
+      && _qvd_dir_exists(qvd, home) && !_qvd_dir_exists(qvd, appdata))
     {
       qvd_error(qvd, "Error %s and %s environment var were not defined, cannot save to $HOME/.qvd/certs, you can try to set also qvd_set_home", HOME_ENV, APPDATA_ENV);
       return 0;
     }
 
-  if (qvd->home && (*(qvd->home))) {
+  if (qvd->home && (*(qvd->home)) && _qvd_dir_exists(qvd, qvd->home))
+    {
       home = qvd->home;
-    } else if (home == NULL && appdata != NULL)
-	{
-	  home = appdata;
-	  qvd_printf("%s was not defined using %s environment var", HOME_ENV, APPDATA_ENV);
-	}
-    
+    } else if (home != NULL && _qvd_dir_exists(qvd, home))
+    {
+      qvd_set_home(qvd, home);
+      qvd_printf("using %s environment var", HOME_ENV);
+    } else if (appdata != NULL && _qvd_dir_exists(qvd, appdata))
+    {
+      qvd_set_home(qvd, appdata);
+      home = appdata;
+      qvd_printf("%s was not defined using %s environment var", HOME_ENV, APPDATA_ENV);
+    }
 
   /* Define .qvd/certs in qvdclient.h */
   if (!_qvd_create_dir(qvd, home, CONF_DIR))
@@ -822,6 +828,18 @@ void _qvd_print_environ()
 X509 *certificate[MAX_CERTS];
 long certificate_error[MAX_CERTS]; 
 
+int _qvd_dir_exists(qvdclient *qvd, const char *path)
+{
+  struct stat fs_stat;
+  int result;
+  result = stat(path, &fs_stat);
+  if (!S_ISDIR(fs_stat.st_mode))
+    {
+      qvd_error(qvd, "Error accessing dir %s the file is not a directory\n", path);
+      return 0;
+    }
+  return 1;
+}
 int _qvd_create_dir(qvdclient *qvd, const char *home, const char *subdir)
 {
   char path[MAX_PATH_STRING];
