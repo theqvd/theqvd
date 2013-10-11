@@ -205,6 +205,16 @@ int progress_callback(qvdclient *qvd, const char *message) {
   qvd_printf("Progress Callback: %s\n", message);
 }
 
+int _set_display_if_not_set(qvdclient *qvd) {
+  char *display = getenv(DISPLAY_ENV);
+  if (display == NULL || *display == '\0') {
+    qvd_error(qvd, "The display variable was not set, setting %s to %s", DISPLAY_ENV, DEFAULT_DISPLAY);
+    setenv(DISPLAY_ENV, DEFAULT_DISPLAY, 1);
+    return 1;
+  }
+  return 0;
+}
+
 
 int qvd_connection(const char *host, int port, const char *user, const char *pass, const char *geometry, int fullscreen, int only_list_of_vm, int one_vm, int no_cert_check, const char *nx_options, const char *client_cert, const char *client_key) {
   int vm_id;
@@ -262,6 +272,9 @@ int qvd_connection(const char *host, int port, const char *user, const char *pas
       printf("Error choosing vm_id: %d\n", vm_id);
       return 6;
     }
+
+  /* Set display if not set */
+  _set_display_if_not_set(qvd);
 
   qvd_connect_to_vm(qvd, vm_id);
   printf("after qvd_connect_to_vm\n");

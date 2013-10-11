@@ -34,6 +34,8 @@
 #define MAX_LINK 128
 #define DEFAULT_LINK "adsl"
 #define HOME_ENV "HOME"
+#define DISPLAY_ENV "DISPLAY"
+#define DEFAULT_DISPLAY "127.0.0.1:0"
 #define APPDATA_ENV "APPDATA"
 #define CONF_DIR ".qvd"
 #define CERT_DIR ".qvd/certs"

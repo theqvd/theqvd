@@ -257,7 +257,7 @@ int qvd_connect_to_vm(qvdclient *qvd, int id)
   qvd_printf("qvd_connect_to_vm(%p,%d)", qvd, id);
   if (qvd->display && (*(qvd->display)) != '\0') {
     qvd_printf("Setting DISPLAY to %s\n", qvd->display);
-    if (setenv("DISPLAY", qvd->display, 1)) {
+    if (setenv(DISPLAY_ENV, qvd->display, 1)) {
       qvd_error(qvd, "Error setting DISPLAY to %s. errno: %d (%s)", qvd->display, errno, strerror(errno));
     }
   }
