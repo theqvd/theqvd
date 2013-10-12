@@ -8,22 +8,37 @@
 
 void help(const char *program)
 {
-  printf("%s [-?] [-d] -h host [-p port] -u username -w pass [-g wxh] [-f] \n", program);
-  printf("  -? : shows this help\n");
-  printf("  -v : shows version and exits\n");
-  printf("  -d : Enables debugging\n");
-  printf("  -h : indicates the host to connect to\n");
-  printf("  -p : indicates the port to connect to, if not specified 8443 is used\n");
-  printf("  -u : indicates the username for the connection\n");
-  printf("  -w : indicates the password for the user\n");
-  printf("  -g : indicates the geometry wxh. Example -g 1024x768\n");
-  printf("  -f : Use fullscreen\n");
-  printf("  -l : Use only list_of_vm (don't try to connect, useful for debugging)\n");
-  printf("  -o : Assume One VM, that is connect always to the first VM (useful for debugging)\n");
-  printf("  -n : No strict certificate checking, always accept certificate\n");
-  printf("  -x : NX client options. Example: nx/nx,data=0,delta=0,cache=16384,pack=0:0\n");
-  printf("  -c : Specify client certificate (PEM), it requires also -k. Example -c $HOME/.qvd/client.crt -k $HOME/.qvd/client.key\n");
-  printf("  -k : Specify client certificate key (PEM), requires -c. Example $HOME/.qvd/client.crt -k $HOME/.qvd/client.key\n");
+  printf("%s [-?] [-d] -h host [-p port] -u username -w pass [-g wxh] [-f] \n\n"
+         "  -? : shows this help\n"
+         "  -v : shows version and exits\n"
+	 "  -d : Enables debugging\n"
+	 "  -h : indicates the host to connect to. You can also set it up in the env var %s.\n"
+	 "       The command line argument takes precedence, if specified\n"
+	 "  -p : indicates the port to connect to, if not specified 8443 is used\n"
+	 "  -u : indicates the username for the connection. You can also set it up in the env var %s\n"
+	 "       The command line argument takes precedence, if specified\n"
+	 "  -w : indicates the password for the user. You can also set it up in the env var %s\n"
+	 "       The command line argument takes precedence, if specified\n"
+	 "  -g : indicates the geometry wxh. Example -g 1024x768\n"
+	 "  -f : Use fullscreen\n"
+	 "  -l : Use only list_of_vm (don't try to connect, useful for debugging)\n"
+	 "  -o : Assume One VM, that is connect always to the first VM (useful for debugging)\n"
+	 "  -n : No strict certificate checking, always accept certificate\n"
+	 "  -x : NX client options. Example: nx/nx,data=0,delta=0,cache=16384,pack=0:0\n"
+	 "  -c : Specify client certificate (PEM), it requires also -k. Example -c $HOME/.qvd/client.crt -k $HOME/.qvd/client.key\n"
+	 "  -k : Specify client certificate key (PEM), requires -c. Example $HOME/.qvd/client.crt -k $HOME/.qvd/client.key\n"
+	 "\n"
+	 "Environment variables:\n"
+	 "  %s : Specifies the host to connect to, if not specified with -h\n"
+	 "  %s : Specifies the username, if not specified with -u\n"
+	 "  %s : Specifies the password, if not specified with -w\n"
+	 "  %s : Enables debugging, can also be enabled with -d\n"
+	 "  %s : Enables the file were debugging should go to\n"
+	 "\nChangelog:\n%s\n", 
+	 program, QVDHOST_ENV, QVDLOGIN_ENV, QVDPASSWORD_ENV,
+	 QVDHOST_ENV, QVDLOGIN_ENV, QVDPASSWORD_ENV, DEBUG_FLAG_ENV_VAR_NAME, DEBUG_FILE_ENV_VAR_NAME,
+	 QVDCHANGELOG
+	 );
 }
 
 int parse_params(int argc, char **argv, const char **host, int *port, const char **user, const char **pass, const char **geometry, int *fullscreen, int *only_list_of_vm, int *one_vm, int *no_cert_check, const char **nx_options, const char **client_cert, const char **client_key)
@@ -31,6 +46,10 @@ int parse_params(int argc, char **argv, const char **host, int *port, const char
   int opt, error = 0, version = 0;
   const char *program = argv[0];
   char *endptr;
+
+  *host = getenv(QVDHOST_ENV);
+  *user = getenv(QVDLOGIN_ENV);
+  *pass = getenv(QVDPASSWORD_ENV);
 
   while ((opt = getopt(argc, argv, "?dvh:p:u:w:g:flonx:c:k:")) != -1 )
     {
@@ -90,8 +109,14 @@ int parse_params(int argc, char **argv, const char **host, int *port, const char
 	  error = 1;
 	}
     }
+
+  if (error) {
+    help(program);
+    exit(0);
+  }
+
   if (version) {
-    printf("%s", qvd_get_version_text());
+    printf("%s\nChangelog:\n%s", qvd_get_version_text(), qvd_get_changelog());
     exit(0);
   }
   if (*host == NULL)

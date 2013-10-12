@@ -12,8 +12,11 @@
 /* #define BUFFER_SIZE CURL_MAX_WRITE_SIZE * 2 */
 #define BUFFER_SIZE 65536
 #include "qvdbuffer.h"
-#define QVDVERSION 100
-#define QVDABOUT "Version: 1.0. $Id$"
+#define QVDVERSION 101
+#define QVDABOUT "Version: 1.0.1. $Id$"
+#define QVDCHANGELOG "1.0.1 12/10/2013 in the client added support for environment vars QVDLOGIN QVDPASSWORD and QVDHOST\n"\
+                     "                 and in the library support for qvd_get_changelog\n"\
+                     "1.0   ////////// Initial version\n"
 /* #define DEBUG 1 */
 #define DEBUG_FLAG_ENV_VAR_NAME "QVD_DEBUG"
 #define DEBUG_FILE_ENV_VAR_NAME "QVD_DEBUG_FILE"
@@ -37,6 +40,9 @@
 #define DISPLAY_ENV "DISPLAY"
 #define DEFAULT_DISPLAY "127.0.0.1:0"
 #define APPDATA_ENV "APPDATA"
+#define QVDLOGIN_ENV "QVDLOGIN"
+#define QVDPASSWORD_ENV "QVDPASSWORD"
+#define QVDHOST_ENV "QVDHOST"
 #define CONF_DIR ".qvd"
 #define CERT_DIR ".qvd/certs"
 #define MAX_NX_OPTS_BUFFER 256
@@ -110,6 +116,7 @@ typedef struct qvdclientstruct qvdclient;
 
 int qvd_get_version(void);
 const char *qvd_get_version_text(void);
+const char *qvd_get_changelog(void);
 qvdclient *qvd_init(const char *hostname, const int port, const char *username, const char *password);
 vmlist *qvd_list_of_vm(qvdclient *qvd);
 int qvd_connect_to_vm(qvdclient *qvd, int id);

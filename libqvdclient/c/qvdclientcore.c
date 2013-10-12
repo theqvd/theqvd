@@ -51,6 +51,10 @@ const char *qvd_get_version_text(void) {
   return qvdversion;
 }
 
+const char *qvd_get_changelog(void) {
+  return QVDCHANGELOG;
+}
+
 /* Init and free functions */
 qvdclient *qvd_init(const char *hostname, const int port, const char *username, const char *password) {
   qvdclient *qvd;
