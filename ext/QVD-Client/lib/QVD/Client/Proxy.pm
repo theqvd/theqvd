@@ -217,6 +217,56 @@ sub connect_to_vm {
         return;
     }
 
+
+    if ( $opts->{kill_vm} ) {        
+        DEBUG("Stopping currently running VM $vm_id");
+        
+        my %o = ( id => $vm_id );
+        $q = join '&', map { uri_escape($_) .'='. uri_escape($o{$_}) } keys %o;
+        
+        $httpc->send_http_request(
+            GET => "/qvd/stop_vm?$q",
+            headers => [
+                "Authorization: Basic $auth",
+                'Connection: Upgrade',
+                'Upgrade: QVD/1.0',
+            ],
+        );
+        
+        
+        while (1) {
+            my ($code, $msg, $headers, $body) = $httpc->read_http_response;
+            DEBUG("Response: $code/$msg");
+            foreach my $hdr (@$headers) {
+                    DEBUG("Header: $hdr");
+            }
+            
+            DEBUG("Body: $body") if (defined $body);
+            
+            
+            if ( $code != HTTP_PROCESSING ) {
+                if ( $code == HTTP_OK ) {
+                    DEBUG "VM shut down";
+                } elsif ( $code == HTTP_SERVICE_UNAVAILABLE ) {
+                    # VM blocked, this should fail again when start is attempted
+                    DEBUG "VM on blocked server, ignoring";
+                } elsif ( $code == HTTP_NOT_FOUND ) {
+                    # No VM, no problem
+                    DEBUG "VM does not exist, ignoring";
+                } elsif ( $code == HTTP_FORBIDDEN ) {
+                    DEBUG "VM offline for maintenance";
+                } else {
+                    DEBUG "Unrecognized status code $code";
+                }
+            
+                # Leave error reporting to the next step
+                last;
+            }
+        }
+        
+    }
+    
+    
     $opts->{id} = $vm_id;
 
     my %o = (
@@ -227,12 +277,11 @@ sub connect_to_vm {
         'qvd.client.geometry'         => $opts->{geometry},
         'qvd.client.fullscreen'       => $opts->{fullscreen},
         'qvd.client.printing.enabled' => $self->{printing},
-        'qvd.client.kill_vm'          => $opts->{kill_vm}
     );
 
     $q = join '&', map { uri_escape($_) .'='. uri_escape($o{$_}) } keys %o;
 
-    DEBUG("Sending parameters");
+    DEBUG("Sending parameters: $q");
     $httpc->send_http_request(
         GET => "/qvd/connect_to_vm?$q",
         headers => [
