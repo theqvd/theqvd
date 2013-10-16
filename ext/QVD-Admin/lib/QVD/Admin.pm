@@ -101,7 +101,11 @@ sub get_result_set_for_vm {
             $filter->{'properties.value'} = delete $filter->{'properties.'.$key};
         }
     }
-    rs(VM)->search($filter, { join => \@joins });
+    rs(VM)->search($filter,
+                   { join => \@joins,
+                     columns => [qw(id name user_id ip osf_id di_tag)],
+                     distinct => 1,
+                     order_by => 'id' });
 }
 
 sub get_result_set_for_di {
@@ -121,7 +125,11 @@ sub get_result_set_for_di {
             $filter->{'properties.value'} = delete $filter->{'properties.'.$key};
         }
     }
-    rs(DI)->search($filter, { join => \@joins });
+    rs(DI)->search($filter,
+                   { join => \@joins,
+                     columns => [qw(id osf_id version path)],
+                     distinct => 1,
+                     order_by => 'id' } );
 }
 
 sub _set_equals {
