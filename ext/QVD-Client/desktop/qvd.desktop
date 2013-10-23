@@ -1,7 +1,8 @@
 [Desktop Entry]
 Name=QVD Client
-Exec=qvd-client
+Exec=qvd-client %U
 Icon=qvd
 Type=Application
 Categories=Network
 Terminal=False
+MimeType=application/qvd;x-scheme-handler/qvd;
