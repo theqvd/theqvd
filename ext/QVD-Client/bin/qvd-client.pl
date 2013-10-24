@@ -9,6 +9,7 @@ eval 'exec /usr/lib/qvd/bin/perl  -S $0 ${1+"$@"}'
     use warnings;
     use strict;
     use QVD::Config::Core qw(core_cfg);
+    use File::Spec;
 
     our $WINDOWS = ($^O eq 'MSWin32');
 
@@ -50,6 +51,7 @@ BEGIN {
 use QVD::Config::Core qw(set_core_cfg core_cfg);
 
 BEGIN {
+    use File::Spec;
     set_core_cfg('client.log.filename', File::Spec->join($QVD::Client::App::user_dir, 'qvd-client.log'))
         unless defined core_cfg('client.log.filename', 0);
     $QVD::Log::DAEMON_NAME = 'client';
