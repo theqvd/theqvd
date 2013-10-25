@@ -170,7 +170,7 @@ sub open_file {
         for (my $conn_attempt = 0; $conn_attempt < 10; $conn_attempt++) {
             INFO("Starting folder sharing for $share, attempt $conn_attempt");
             local $@;
-            my $client = QVD::Client::SlaveClient->new('localhost:12040');
+            my $client = QVD::Client::SlaveClient->new();
             my $ticket = eval { $client->handle_share($share) };
             if ($@) {
                 if ($@ =~ 'Connection refused') {

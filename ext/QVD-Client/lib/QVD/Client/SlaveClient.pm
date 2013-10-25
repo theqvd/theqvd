@@ -12,6 +12,9 @@ BEGIN {
     $WINDOWS = ($^O eq 'MSWin32');
     $DARWIN = ($^O eq 'darwin');
 
+    $user_dir = File::Spec->rel2abs(File::Spec->join((getpwuid $>)[7] // $ENV{HOME}, '.qvd'));
+    mkdir($user_dir);
+
     set_core_cfg('client.log.filename', File::Spec->join($user_dir, 'qvd-client.log'))
         unless defined core_cfg('client.log.filename', 0);
     $QVD::Log::DAEMON_NAME='client';
@@ -32,7 +35,14 @@ use JSON qw(decode_json);
 use feature 'switch';
 
 sub new {
-    my ($class, $target, %opts) = @_;
+    my ($class, $remove_this, %opts) = @_;
+
+    my $slave_port_file = $user_dir.'/slave-port'; 
+    open my $fh, '<', $slave_port_file or return 0;
+    my $slave_port = <$fh>;
+    close $fh;
+
+    my $target = 'localhost:'.$slave_port;
 
     if ($WINDOWS) {
         return QVD::Client::SlaveClient::Windows->new($target, %opts);

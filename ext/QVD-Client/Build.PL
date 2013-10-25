@@ -13,8 +13,8 @@ my $build = new Module::Build(
 	       configure_requires => { 'Module::Build' => 0.38  },
 	       requires      => {
 				  'Crypt::OpenSSL::X509' => 0,
-				  'File::Spec' => 0, 
 				  'Cwd' => 0,
+				  'File::Spec' => 0, 
 				  'IO::Socket::Forwarder' => 0,
 				  'IO::Socket::SSL' => 0,
 				  'JSON' => 0,

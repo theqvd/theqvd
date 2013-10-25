@@ -382,7 +382,18 @@ sub _run {
     }
 
     @o{ keys %{$self->{extra}} } = values %{$self->{extra}};
-    $o{slave} = 1 if (core_cfg('client.slave.enable', 1));
+    # Use a port from the ephemeral range for slave server
+    my $slave_port_file = $QVD::Client::App::user_dir.'/slave-port'; 
+    if (core_cfg('client.slave.enable', 1)) {
+        $o{slave} = 62000 + int(rand(2000));
+        if (open(my $fh, '>', $slave_port_file)) {
+            INFO "Saving slave port in $slave_port_file";
+            print $fh $o{slave};
+            close $fh;
+        } else {
+            WARN "Unable to save port used for slave connections: $^E";
+        }
+    }
 
     my @cmd;
     if ( $WINDOWS ) {
@@ -439,6 +450,7 @@ sub _run {
         ioctl($local_socket, FIONBIO, \$nonblocking);
     }
 
+
     DEBUG("Forwarding sockets\n");
     $self->{client_delegate}->proxy_connection_status('FORWARDING');
     forward_sockets(
@@ -456,6 +468,11 @@ sub _run {
         } else {
             ERROR("Failed to kill pulseaudio");
         }
+    }
+
+    if ($o{slave}) {
+        INFO "Deleting slave port file $slave_port_file";
+        unlink $slave_port_file ;
     }
 
     DEBUG("Done.");

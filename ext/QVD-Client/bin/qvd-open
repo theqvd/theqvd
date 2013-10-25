@@ -35,11 +35,12 @@ use FindBin qw($Bin);
 
 my $file = shift;
 
-eval {
-    my $client = QVD::Client::SlaveClient->new('localhost:12040');
+my $success = eval {
+    my $client = QVD::Client::SlaveClient->new();
     $client->handle_open($file);
+    1;
 };
-if ($@ =~ 'Connection refused') {
+if (!$success) {
     my $user = core_cfg('client.user.name');
     my $pass = core_cfg('client.user.pass');
     my $host = core_cfg('client.host.name');
@@ -55,6 +56,6 @@ if ($@ =~ 'Connection refused') {
         }
     }
 } else {
-    ERROR($@);
+    ERROR($@) if $@;
 }
 
