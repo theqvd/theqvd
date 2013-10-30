@@ -181,7 +181,7 @@ sub open_file {
             } else {
                 INFO("Folder sharing started for $share");
                 INFO("Opening $file");
-                $client = QVD::Client::SlaveClient->new('localhost:12040');
+                $client = QVD::Client::SlaveClient->new();
                 $client->handle_open(abs_path($file), $ticket);
             }
             last;

@@ -35,19 +35,31 @@ use JSON qw(decode_json);
 use feature 'switch';
 
 sub new {
-    my ($class, $remove_this, %opts) = @_;
+    my ($class, %opts) = @_;
 
+    my $fh;
     my $slave_port_file = $user_dir.'/slave-port'; 
-    open my $fh, '<', $slave_port_file or return 0;
-    my $slave_port = <$fh>;
+    open $fh, '<', $slave_port_file or return 0;
+    my $slave_port = <$fh> // 12040;
     close $fh;
 
-    my $target = 'localhost:'.$slave_port;
+    INFO "Connecting to slave server on port $slave_port";
+
+    my $slave_key_file = $user_dir.'/slave-key'; 
+    open $fh, '<', $slave_key_file or return 0;
+    my $slave_key = <$fh> // '';
+    close $fh;
+
+    chomp $slave_key;
+
+    $opts{'slave.host'} = 'localhost';
+    $opts{'slave.port'} = $slave_port;
+    $opts{'slave.key'} = $slave_key;
 
     if ($WINDOWS) {
-        return QVD::Client::SlaveClient::Windows->new($target, %opts);
+        return QVD::Client::SlaveClient::Windows->new(%opts);
     } else {
-        return QVD::Client::SlaveClient::Unix->new($target, %opts);
+        return QVD::Client::SlaveClient::Unix->new(%opts);
     }
 }
 

@@ -12,6 +12,7 @@ use IO::Socket::Forwarder qw(forward_sockets);
 use JSON;
 use Proc::Background;
 use QVD::Config::Core;
+use QVD::HTTP::Headers qw(header_lookup);
 use QVD::HTTP::StatusCodes qw(:status_codes);
 use URI::Escape qw(uri_escape);
 use QVD::Log;
@@ -302,6 +303,16 @@ sub connect_to_vm {
         if ($code == HTTP_SWITCHING_PROTOCOLS) {
             DEBUG("Switching protocols. Connected.");
             $cli->proxy_connection_status('CONNECTED');
+            if (my ($key) = header_lookup($headers, 'X-QVD-Slave-Key')) {
+                $cli->proxy_slave_key($key) if $cli->can('proxy_slave_key');
+                my $slave_key_file = $QVD::Client::App::user_dir.'/slave-key'; 
+                if (open(my $fh, '>', $slave_key_file)) {
+                    print $fh $key;
+                    close $fh;
+                } else {
+                    WARN "Unable to save key used for slave connections: $^E";
+                }
+            }
             $self->_run($httpc);
             last;
         }
@@ -385,13 +396,14 @@ sub _run {
     # Use a port from the ephemeral range for slave server
     my $slave_port_file = $QVD::Client::App::user_dir.'/slave-port'; 
     if (core_cfg('client.slave.enable', 1)) {
-        $o{slave} = 62000 + int(rand(2000));
+        my $port = 62000 + int(rand(2000));
         if (open(my $fh, '>', $slave_port_file)) {
-            INFO "Saving slave port in $slave_port_file";
-            print $fh $o{slave};
+            $o{slave} = $port;
+            INFO "Using slave port $port";
+            print $fh $port;
             close $fh;
         } else {
-            WARN "Unable to save port used for slave connections: $^E";
+            WARN "Unable to save port used for slave connections; slave client disabled: $^E";
         }
     }
 

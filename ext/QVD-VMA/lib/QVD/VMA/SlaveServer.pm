@@ -14,8 +14,21 @@ use File::Spec;
 use base 'QVD::HTTPD::INET';
 
 my $mount_root = $ENV{HOME}.'/Redirected';
-my $command_sshfs = core_cfg('command.sshfs');
 my $open_command = core_cfg('command.open_file');
+my $command_sshfs = core_cfg('command.sshfs');
+my $authentication_key;
+
+BEGIN {
+    my $slave_conf = core_cfg('internal.vma.slave.config');
+    if (open my $fh, '<', $slave_conf) { 
+        $authentication_key = <$fh> // '';
+        chomp $authentication_key;
+        close $fh;
+        print STDERR "Read auth key $authentication_key\n";
+    } else {
+        print STDERR "Unable to read slave auth key: $!";
+    }
+}
 
 sub new {
     my ($class) = @_;
@@ -24,6 +37,21 @@ sub new {
     $self->set_http_request_processor(\&handle_get_share, GET => '/shares/*');
     $self->set_http_request_processor(\&handle_open, POST => '/open/*');
     bless $self, $class;
+}
+
+sub auth {
+    my ($self, $headers) = @_;
+    if (my ($credentials) = header_lookup($headers, 'Authorization')) {
+        if (my ($request_key) = $credentials =~ /^Basic (.*)/) {
+            print STDERR "Client offers key $request_key\n";
+            return 1 if $request_key eq $authentication_key;
+        }
+        print STDERR "Matching key not offered!\n";
+        $self->throw_http_error(HTTP_FORBIDDEN);
+    } else {
+        print STDERR "Authorization not provided!\n";
+        $self->throw_http_error(HTTP_UNAUTHORIZED, ['WWW-Authenticate: Basic realm="QVD"']);
+    }
 }
 
 sub _url_to_mount_point {
@@ -37,6 +65,8 @@ sub _url_to_mount_point {
 
 sub handle_put_share {
     my ($self, $method, $url, $headers) = @_;
+
+    $self->auth($headers);
 
     $self->send_http_error(HTTP_BAD_REQUEST)
         unless header_eq_check($headers, Connection => 'Upgrade')
@@ -78,12 +108,15 @@ sub handle_put_share {
 
 sub handle_get_share {
     my ($self, $method, $url, $headers) = @_;
+    $self->auth($headers);
     # We don't allow clients to mount directories *from* the VM
     $self->send_http_error(HTTP_FORBIDDEN);
 }
 
 sub handle_open {
     my ($self, $method, $url, $headers) = @_;
+    $self->auth($headers);
+
     my $mount_dir = header_lookup($headers, 'X-QVD-Share-Ticket');
     my $rel_path = ($url =~ m!/open/(.*)!, $1);
     my $abs_path = "$mount_root/$mount_dir/$rel_path";
@@ -102,6 +135,9 @@ sub handle_open {
     }
 }
 
+'QVD-VMA'
+
+__END__
 
 =head1 NAME
 

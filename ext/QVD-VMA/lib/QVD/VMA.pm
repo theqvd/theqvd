@@ -47,6 +47,7 @@ my $enable_slave    = cfg('vma.slave.enable');
 my $command_slave   = cfg('vma.slave.command');
 my $enable_printing = cfg('vma.printing.enable');
 my $printing_conf   = cfg('internal.vma.printing.config');
+my $slave_conf      = cfg('internal.vma.slave.config');
 my $nxagent_conf    = cfg('internal.vma.nxagent.config');
 
 my $nxagent_args_extra   = cfg('command.nxagent.args.extra');
@@ -521,6 +522,15 @@ sub _stop_session {
     $state;
 }
 
+sub _save_slave_config {
+    my %args = @_;
+    my $tmp = "$slave_conf.tmp";
+    open my $fh, '>', $tmp or die "Unable to save printing configuration to $tmp";
+    print $fh $args{'qvd.slave.key'};
+    close $fh or die "Unable to write printing configuration to $tmp";
+    rename $tmp, $slave_conf or die "Unable to write slave key to $slave_conf";
+}
+
 sub _save_printing_config {
     my %args = @_;
     my $props = Config::Properties->new;
@@ -571,6 +581,7 @@ sub _start_session {
 	when ('suspended') {
 	    _call_action_hook(pre_connect => %props);
 	    DEBUG "awaking nxagent";
+	    _save_slave_config(%props);
 	    _save_printing_config(%props);
 	    _save_nxagent_state_and_call_hook 'initiating';
             _make_nxagent_config(%props);
@@ -584,6 +595,7 @@ sub _start_session {
 	}
 	when ('stopped') {
 	    _call_action_hook(pre_connect => %props);
+	    _save_slave_config(%props);
 	    _save_printing_config(%props);
 	    DEBUG "Forking monitor";
 	    _fork_monitor(%props);

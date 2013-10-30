@@ -3,14 +3,20 @@ package QVD::Client::SlaveClient::Base;
 use strict;
 use warnings;
 
+use QVD::HTTP::StatusCodes qw(:status_codes);
 use QVD::HTTPC;
 use QVD::Log;
 
 sub new {
-    my ($class, $target, %opts) = @_;
+    my ($class, %opts) = @_;
+
+    my $host = delete $opts{'slave.host'};
+    my $port = delete $opts{'slave.port'};
+    my $key = delete $opts{'slave.key'};
 
     my $self = { 
-        httpc => QVD::HTTPC->new($target, %opts)
+        auth_key => $key,
+        httpc => QVD::HTTPC->new("$host:$port", %opts)
     };
     bless $self, $class;
     $self
@@ -40,6 +46,20 @@ sub help_open {
 }
 
 sub handle_open {
+    my ($self, $path, $ticket) = @_;
+
+    $ticket = 'ROOT' unless defined $ticket;
+
+    my ($code, $msg, $headers, $data) =
+    $self->{httpc}->make_http_request(POST => '/open/'.$path,
+        headers => [
+            "Authorization: Basic $self->{auth_key}",
+            "X-QVD-Share-Ticket: $ticket"
+        ]);
+    
+    if ($code != HTTP_OK) {
+        die "Server replied $code $msg $data";
+    }
 }
 
 sub handle_usage {

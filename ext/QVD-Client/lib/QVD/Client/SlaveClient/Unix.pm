@@ -20,7 +20,11 @@ sub handle_share {
 	
     my ($code, $msg, $headers, $data) =
     $self->{httpc}->make_http_request(PUT => '/shares/'.$path,
-        headers => ['Connection: Upgrade', "Upgrade: qvd:sftp/1.0;charset=$charset"]);
+        headers => [
+            "Authorization: Basic $self->{auth_key}",
+            'Connection: Upgrade', 
+            "Upgrade: qvd:sftp/1.0;charset=$charset"
+        ]);
     
     if ($code != HTTP_SWITCHING_PROTOCOLS) {
         die "Server replied $code $msg $data";
@@ -42,21 +46,5 @@ sub handle_share {
     }
 }
 
-sub handle_open {
-    my ($self, $path, $ticket) = @_;
-
-    $ticket = 'ROOT' unless defined $ticket;
-
-    # FIXME detect from locale, don't just assume utf-8
-    my $charset = 'UTF-8';
-	
-    my ($code, $msg, $headers, $data) =
-    $self->{httpc}->make_http_request(POST => '/open/'.$path,
-        headers => ["X-QVD-Share-Ticket: $ticket"]);
-    
-    if ($code != HTTP_OK) {
-        die "Server replied $code $msg $data";
-    }
-}
 
 1;

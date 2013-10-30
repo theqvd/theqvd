@@ -387,6 +387,7 @@ internal.vma.on_printing.suspended = /usr/lib/qvd/bin/qvd-printing
 internal.vma.on_printing.stopped = /usr/lib/qvd/bin/qvd-printing
 
 internal.vma.printing.config = ${path.run}/printing.conf
+internal.vma.slave.config = ${path.run}/slave.conf
 internal.vma.nxagent.config = ${path.run}/nxagent.conf
 
 # TODO: some of these DB settings may not be used anymore, cleanup them!

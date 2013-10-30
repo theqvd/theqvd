@@ -142,10 +142,17 @@ sub list_of_vm_processor {
     if (@vm_list) {
         DEBUG sprintf "User $user_id has %d virtual machines", scalar @vm_list;
     } else {
-        INFO "User $user_id does not have any virtual machine";
+        INFO "User $user_id does not have virtual machines";
     }
     $l7r->send_http_response_with_body( HTTP_OK, 'application/json', [],
                                         $l7r->json->encode(\@vm_list) );
+}
+
+sub generate_slave_key {
+    # generate a random 64-character string to serve as authentication key
+    # between slave server and client
+    my @alpha = ("A".."Z", "a".."z", "0".."9");
+    join "", map @alpha[rand @alpha], 0..63;
 }
 
 sub connect_to_vm_processor {
@@ -171,6 +178,7 @@ sub connect_to_vm_processor {
     my %params = uri_query_split  $query;
     my $vm_id = delete $params{id};
     my $file_name = delete $params{file_name};
+    
     unless (defined $vm_id or defined $file_name)  {
         INFO 'Parameter id required';
         $l7r->throw_http_error(HTTP_UNPROCESSABLE_ENTITY, "parameter id is missing");
@@ -201,6 +209,8 @@ sub connect_to_vm_processor {
         $l7r->throw_http_error(HTTP_NOT_FOUND, $@);
     }
 
+    my $slave_key = generate_slave_key();
+
     eval {
         if (!$auth->allow_access_to_vm($vm->vm)) {
             INFO "User $user_id has tried to access VM $vm_id but (s)he isn't allowed to";
@@ -213,10 +223,11 @@ sub connect_to_vm_processor {
         $l7r->_start_and_wait_for_vm($vm);
         %params = (%params,
                    $vm->combined_properties,
-                   $auth->params);
+                   $auth->params,
+                   'qvd.slave.key' => $slave_key);
         $l7r->_start_x($vm, %params);
         $l7r->_wait_for_x($vm);
-        $l7r->_run_forwarder($vm);
+        $l7r->_run_forwarder($vm, %params);
     };
     my $saved_err = $@;
     DEBUG 'Releasing VM'. " VM_ID: $vm_id";
@@ -561,7 +572,7 @@ sub _wait_for_x {
 }
 
 sub _run_forwarder {
-    my ($l7r, $vm) = @_;
+    my ($l7r, $vm, %params) = @_;
     my $vm_id = $vm->vm_id;
     my $vm_address = $vm->vm_address;
     my $vm_x_port = $vm->vm_x_port;
@@ -589,7 +600,8 @@ sub _run_forwarder {
 
     $l7r->_tell_client("Connection established");
 
-    $l7r->send_http_response(HTTP_SWITCHING_PROTOCOLS);
+    $l7r->send_http_response(HTTP_SWITCHING_PROTOCOLS,
+        "X-QVD-Slave-Key: $params{'qvd.slave.key'}");
 
     DEBUG "Starting socket forwarder for VM " . $vm->id;
     db->storage->disconnect; # don't keep the DB connection open while

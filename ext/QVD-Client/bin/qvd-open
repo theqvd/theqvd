@@ -41,6 +41,7 @@ my $success = eval {
     1;
 };
 if (!$success) {
+    ERROR($@) if $@;
     my $user = core_cfg('client.user.name');
     my $pass = core_cfg('client.user.pass');
     my $host = core_cfg('client.host.name');
@@ -55,7 +56,4 @@ if (!$success) {
             ERROR("Error running qvd-client: $^E");
         }
     }
-} else {
-    ERROR($@) if $@;
 }
-
