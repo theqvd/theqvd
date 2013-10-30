@@ -1,0 +1,8 @@
+#!/usr/lib/qvd/bin/perl
+
+use strict;
+use warnings;
+
+use QVD::L7R;
+
+QVD::L7R->new->run;

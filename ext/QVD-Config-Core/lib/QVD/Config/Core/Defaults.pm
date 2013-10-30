@@ -101,7 +101,7 @@ command.nxproxy = /usr/bin/nxproxy
 command.btrfs = /sbin/btrfs
 command.ip = /sbin/ip
 command.x11vnc = /usr/bin/x11vnc
-
+command.qvd-l7r-slave = /usr/lib/qvd/bin/qvd-l7r-slave
 command.windows.xming = Xming\\Xming.exe
 command.windows.pulseaudio = pulseaudio\\pulseaudio.exe
 command.windows.nxproxy = nx\\nxproxy.exe
@@ -419,6 +419,8 @@ internal.hkd.agent.rpc.retry.delay = 5
 internal.hkd.agent.rpc.timeout = 3
 
 internal.hkd.vmhandler.killer.delay = 10
+
+internal.hkd.l7r.timeout.on_state.killing = 10
 
 internal.hkd.lxc.timeout.on_state.starting.setup.delaying_untar.delaying = 60
 internal.hkd.lxc.timeout.on_state.stopping.shutdown.waiting_for_lxc = 180

@@ -37,6 +37,8 @@ use QVD::HKD::DHCPDHandler;
 use QVD::HKD::CommandHandler;
 use QVD::HKD::VMCommandHandler;
 use QVD::HKD::VMHandler;
+use QVD::HKD::L7RListener;
+use QVD::HKD::L7R;
 use QVD::HKD::L7RMonitor;
 use QVD::HKD::L7RKiller;
 use QVD::HKD::ExpirationMonitor;
@@ -51,7 +53,9 @@ use Class::StateMachine::Declarative
                                 _on_ticker_error => '_on_error' },
                         ignore => [qw(_on_db_ticked
                                       _on_transient_db_error
-                                      _on_config_reload_done)],
+                                      _on_config_reload_done
+                                      _on_no_vms_are_running
+                                      _on_no_l7rs_are_running)],
                         delay => [qw(_on_cmd_stop)],
                         before => {_on_config_reload_done => '_sync_db_config' } },
 
@@ -84,19 +88,23 @@ use Class::StateMachine::Declarative
                                                                  agents                => { enter => '_start_agents' } ] } ] },
 
     running        => { transitions => { _on_error   => 'stopping' },
-                        ignore => [qw(_on_no_vms_are_running) ],
                         substates => [ saving_state => { enter => '_save_state' },
-                                       agents       => { enter => '_start_vm_command_handler' },
+                                       agents       => { enter => '_start_later_agents' },
                                        main         => { on => { _on_cmd_stop => '_on_done' } } ] },
 
     stopping       => { on => { _on_error => '_on_done' },
                         ignore => [qw(_on_ticker_error _on_dead_db)],
-                        substates => [ stopping_vm_command_handler => { enter => '_stop_vm_command_handler',
+                        substates => [ stopping_l7r_listener       => { enter => '_stop_l7r_listener',
+                                                                        on => { _on_l7r_listener_stopped => '_on_done' } },
+                                       stopping_vm_command_handler => { enter => '_stop_vm_command_handler',
                                                                         on => { _on_vm_command_handler_stopped => '_on_done' } },
                                        saving_state                => { enter => '_save_state' },
+                                       stopping_all_l7rs           => { enter => '_stop_all_l7rs',
+                                                                      on => { _on_no_l7rs_are_running => '_on_done',
+                                                                              _on_state_timeout       => '_on_error'} },
                                        stopping_all_vms            => { enter => '_stop_all_vms',
                                                                         on => { _on_no_vms_are_running => '_on_done',
-                                                                                _on_state_timeout     => '_on_error' },
+                                                                                _on_state_timeout      => '_on_error' },
                                                                         transitions => { _on_error => 'killing_all_vms' } },
                                        '(killing_all_vms)'         => { enter => '_kill_all_vms',
                                                                         on => { _on_no_vms_are_running => '_on_done' } },
@@ -122,6 +130,7 @@ sub new {
     my $self = $class->SUPER::new(%opts);
     $self->{config} = QVD::HKD::Config->new(config_file => $config_file,
                                             on_reload_done => sub { $self->_on_config_reload_done });
+    $self->{l7r} = {};
     $self->{vm} = {};
     $self->{heavy} = AnyEvent::Semaphore->new($self->_cfg('internal.hkd.max_heavy'));
     $self->{query_priority} = 30;
@@ -416,15 +425,25 @@ sub _start_agents {
     $self->_on_done;
 }
 
-sub _start_vm_command_handler {
+sub _start_later_agents {
     my $self = shift;
+    my %opts = ( config     => $self->{config},
+                 db         => $self->{db},
+                 node_id    => $self->{node_id});
+
     DEBUG 'Starting VM command handler';
-    $self->{vm_command_handler} = QVD::HKD::VMCommandHandler->new(config => $self->{config},
-                                                                  db         => $self->{db},
-                                                                  node_id    => $self->{node_id},
-                                                                  on_stopped => sub { $self->_on_vm_command_handler_stopped },
-                                                                  on_cmd => sub { $self->_on_vm_cmd($_[1], $_[2]) });
+    $self->{vm_command_handler} =
+                 QVD::HKD::VMCommandHandler->new(%opts,
+                                                 on_cmd => sub { $self->_on_vm_cmd($_[1], $_[2]) },
+                                                 on_stopped => weak_method_callback($self, '_on_vm_command_handler_stopped'));
     $self->{vm_command_handler}->run;
+
+    DEBUG 'Starting L7R listener';
+    $self->{l7r_listener} =
+        QVD::HKD::L7RListener->new(%opts,
+                                   on_connection => sub { $self->_on_l7r_connection($_[1]) },
+                                   on_stopped => weak_method_callback($self, '_on_l7r_listener_stopped'));
+    $self->{l7r_listener}->run;
     $self->_on_done;
 }
 
@@ -447,14 +466,18 @@ sub _check_all_agents_have_stopped {
     return 1;
 }
 
+sub _stop_l7r_listener {
+    my $self = shift;
+    my $agent = $self->{l7r_listener}
+        or return $self->_on_done;
+    $agent->on_hkd_stop;
+}
+
 sub _stop_vm_command_handler {
     my $self = shift;
-    if (defined(my $agent = $self->{vm_command_handler})) {
-        $agent->on_hkd_stop;
-    }
-    else {
-        $self->_on_done;
-    }
+    my $agent = $self->{vm_command_handler}
+        or return $self->_on_done;
+    $agent->on_hkd_stop;
 }
 
 sub _stop_all_agents {
@@ -474,6 +497,28 @@ sub _on_agent_stopped {
         undef $mine if defined $mine and $mine == $agent;
     }
     $self->_check_all_agents_have_stopped
+}
+
+sub _on_l7r_connection {
+    my ($self, $fh) = @_;
+    my $l7r = QVD::HKD::L7R->new(config => $self->{config},
+                                 db => $self->{db},
+                                 node_id => $self->{node_id},
+                                 on_stopped => weak_method_callback($self, '_on_l7r_stopped'));
+    if (my $pid = $l7r->run($fh)) {
+        INFO "New L7R process started, PID: $pid";
+        $self->{l7r}{$pid} = $l7r;
+    }
+}
+
+sub _on_l7r_stopped {
+    my ($self, $l7r) = @_;
+    DEBUG "L7R agent $l7r is stopped";
+    my $pid = $l7r->pid;
+    INFO "L7R process finished, PID: $pid";
+    my $l7r1 = delete $self->{l7r}{$pid};
+    $l7r == $l7r1 or ERROR "Internal error, L7R caller is different from the cached one: $l7r != $l7r1";
+    keys %{$self->{l7r}} or $self->_on_no_l7rs_are_running;
 }
 
 sub _on_cmd {
@@ -554,11 +599,25 @@ sub _on_expired_vm {
 
 sub _on_vm_stopped {
     my ($self, $vm_id) = @_;
-
     $debug and $self->_debug("releasing handler for VM $vm_id");
     DEBUG "Releasing handler for VM '$vm_id'";
     delete $self->{vm}{$vm_id};
     keys %{$self->{vm}} or $self->_on_no_vms_are_running;
+}
+
+sub _hash_apply_method {
+    my ($self, $hash, $method) = @_;
+    my $count = 0;
+    for my $key (keys %{$self->{$hash}}) {
+        if (defined (my $entry = $self->{$hash}{$key})) {
+            $entry->$method;
+            $count++;
+        }
+        else {
+            delete $self->{$hash}{$key}
+        }
+    }
+    $count;
 }
 
 sub _call_for_all_vms {
@@ -576,9 +635,17 @@ sub _call_for_all_vms {
     $count;
 }
 
+sub _stop_all_l7rs {
+    my $self = shift;
+    _hash_apply_method($self, 'l7r', 'on_hkd_stop')
+        or return $self->_on_no_l7rs_are_running;
+
+    $self->_call_after($self->_cfg("internal.hkd.stopping.l7rs.timeout"), '_on_state_timeout');
+}
+
 sub _stop_all_vms {
     my $self = shift;
-    $self->_call_for_all_vms('on_hkd_stop')
+    _hash_apply_method($self, 'vm', 'on_hkd_stop')
         or return $self->_on_no_vms_are_running;
 
     $self->_call_after($self->_cfg("internal.hkd.stopping.vms.timeout"), '_on_state_timeout');
@@ -586,7 +653,7 @@ sub _stop_all_vms {
 
 sub _kill_all_vms {
     my $self = shift;
-    $self->_call_for_all_vms('on_hkd_kill')
+    _hash_apply_method($self, 'vm', 'on_hkd_kill')
         or return $self->_on_no_vms_are_running;
 
     # FIXME: what to do when not all machines can be killed? nothing? repeat?

@@ -22,7 +22,7 @@ use QVD::L7R::Authenticator;
 use QVD::L7R::LoadBalancer;
 
 use QVD::HTTPD;
-use base qw(QVD::HTTPD::Fork);
+use base qw(QVD::HTTPD::INET);
 
 my $vm_poll_time     = cfg('internal.l7r.poll_time.vm');
 my $x_poll_time      = cfg('internal.l7r.poll_time.x');

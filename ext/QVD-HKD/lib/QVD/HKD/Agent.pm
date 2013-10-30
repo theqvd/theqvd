@@ -263,7 +263,7 @@ sub _db {
 sub _run_cmd {
     my ($self, $opts, $cmd, @args) = &__opts;
     $cmd = $self->_cfg("command.$cmd") unless $opts->{skip_cmd_lookup};
-    INFO "Running command '$cmd @args'";
+    INFO "Running command '$cmd' with args '@args'";
     $opts->{outlives_state} //= $opts->{run_and_forget};
     my @extra = ( map { $_ => $opts->{$_} }
                   grep { defined $opts->{$_} }
