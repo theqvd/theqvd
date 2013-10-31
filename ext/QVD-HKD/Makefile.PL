@@ -18,6 +18,7 @@ WriteMakefile( NAME          => 'QVD::HKD',
                                   'File::Slurp' => '0',
                                   'Linux::Proc::Mountinfo' => '0.01',
                                   'QVD::L7R' => '3.5',
+                                  'QVD::VKMiller' => '0',
                                 },
                ABSTRACT      => 'lib/QVD/HKD.pm',
 	       EXE_FILES     => [ qw(bin/qvd-hkd
