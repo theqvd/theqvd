@@ -4,12 +4,11 @@ use ExtUtils::MakeMaker;
 
 WriteMakefile( NAME          => 'QVD::L7R',
 	       AUTHOR        => 'QVD Team <qvd@qindel.com>',
-	       VERSION       => '3.1'.$ENV{BUILD_NUMBER},
+	       VERSION       => '3.5'.$ENV{BUILD_NUMBER},
 	       ABSTRACT      => 'lib/QVD/L7R.pm',
 	       PREREQ_PM     => { 'IO::Socket::Forwarder' => 0,
 				  'QVD::Config'           => 0,
 				  'QVD::DB'               => 0,
-				  'QVD::HKD'              => 0,
 				  'QVD::HTTP'             => 0,
 				  'QVD::HTTPD'            => 0,
 				  'QVD::L7R::LoadBalancer'=> 0,
@@ -17,7 +16,7 @@ WriteMakefile( NAME          => 'QVD::L7R',
 				  'QVD::SimpleRPC'        => 0,
 				  'QVD::URI'              => 0,
 				  'Test::More'            => 0,
-                                  'App::Daemon'           => 0,
                                   'Disgest::SHA'          => 0,
                                 },
-               EXE_FILES      => [qw(bin/qvd-l7r bin/qvd-l7r.initrc.pl bin/qvd-l7r.debrc.pl bin/qvd-l7r.postinst)] );
+               EXE_FILES [qw(bin/qvd-l7r-slave)] );
+

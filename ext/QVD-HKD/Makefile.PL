@@ -2,7 +2,7 @@ use 5.010;
 use ExtUtils::MakeMaker;
 
 WriteMakefile( NAME          => 'QVD::HKD',
-               VERSION       => '3.1'.$ENV{BUILD_NUMBER},
+               VERSION       => '3.5'.$ENV{BUILD_NUMBER},
                PREREQ_PM     => { 'Class::StateMachine' => '0.23',
                                   'Class::StateMachine::Declarative' => '0.01',
                                   'AnyEvent' => '5.34',
@@ -17,6 +17,7 @@ WriteMakefile( NAME          => 'QVD::HKD',
 				  'QVD::Log' => '0',
                                   'File::Slurp' => '0',
                                   'Linux::Proc::Mountinfo' => '0.01',
+                                  'QVD::L7R' => '3.5',
                                 },
                ABSTRACT      => 'lib/QVD/HKD.pm',
 	       EXE_FILES     => [ qw(bin/qvd-hkd
