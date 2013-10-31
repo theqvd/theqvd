@@ -249,6 +249,7 @@ sub process_request {
     # module is not really compatible with INET.)
     $self->{server}{client} = IO::Handle->new_from_fd(fileno(STDIN), '+<');
     $self->{server}{client}->autoflush();
+    $self->{server}{client}->blocking(1);
     $self->QVD::HTTPD::Impl::process_request(@_); }
 
 1;

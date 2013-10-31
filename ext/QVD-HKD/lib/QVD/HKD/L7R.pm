@@ -43,9 +43,7 @@ sub run {
 }
 
 sub _set_env_perl5lib {
-    $ENV{PERL5LIB} = ( join ':',
-                       map  { File::Spec->rel2abs($_) }
-                       grep { defined and not ref $_ } @INC);
+
 }
 
 sub _start {
@@ -55,10 +53,14 @@ sub _start {
     $self->_run_cmd( { save_pid_to => 'pid',
                        ignore_errors => 1,
                        outlives_state => 1,
-                       on_prepare => \&_set_env_perl5lib,
-                       on_done => weak_method_callback($self, '_on_l7r_done'),
-                       '<' => $fh,
-                       '>', => $fh },
+                       on_prepare => sub {
+                           POSIX::dup2(fileno($fh), 0);
+                           POSIX::dup2(0, 1);
+                           $ENV{PERL5LIB} = ( join ':',
+                                              map  { File::Spec->rel2abs($_) }
+                                              grep { defined and not ref $_ } @INC);
+                       },
+                       on_done => weak_method_callback($self, '_on_l7r_done') },
                      'qvd-l7r-slave');
     # Agent::_run_cmd deletes the 'save_pid_to' entry automatically so
     # we have to duplicate it:
