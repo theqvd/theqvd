@@ -37,57 +37,22 @@ sub new {
     my $class = shift;
     my @args = ( host => cfg('l7r.address'),
                  port => cfg('l7r.port') );
-    my $ssl = cfg('l7r.use_ssl');
-    if ($ssl) {
-        my $l7r_certs_path  = cfg('path.ssl.certs');
-        my $l7r_ssl_key     = cfg('l7r.ssl.key');
-        my $l7r_ssl_cert    = cfg('l7r.ssl.cert');
-        my $l7r_ssl_cert_fn = "$l7r_certs_path/l7r-cert.pem";
-        my $l7r_ssl_key_fn  = "$l7r_certs_path/l7r-key.pem";
-        # copy the SSL certificate and key from the database to local
-        # files
-        mkdir $l7r_certs_path, 0700;
-        -d $l7r_certs_path or LOGDIE "Unable to create directory $l7r_certs_path\n";
-        my ($mode, $uid) = (stat $l7r_certs_path)[2, 4];
-        $uid == $> or $uid == 0 or LOGDIE "bad owner for directory $l7r_certs_path\n";
-        $mode & 0077 and LOGDIE "bad permissions for directory $l7r_certs_path\n";
-        _write_to_file($l7r_ssl_cert_fn, $l7r_ssl_cert);
-        _write_to_file($l7r_ssl_key_fn,  $l7r_ssl_key);
+    if(cfg('l7r.use_ssl')) {
         push @args, ( SSL           => 1,
-                      SSL_key_file  => $l7r_ssl_key_fn,
-                      SSL_cert_file => $l7r_ssl_cert_fn);
+                      SSL_key_file  => cfg('path.l7r.ssl.key'),
+                      SSL_cert_file => cfg('path.l7r.ssl.cert'));
 
         # handle the case where we require the client to have a valid certificate:
-        my $l7r_client_cert_require = cfg('l7r.client.cert.require');
-        if ($l7r_client_cert_require) {
-            my $l7r_ssl_ca = cfg('l7r.ssl.ca');
-            my $l7r_ssl_ca_fn   = "$l7r_certs_path/l7r-ca.pem";
-            _write_to_file($l7r_ssl_ca_fn, $l7r_ssl_ca);
+        if (cfg('l7r.client.cert.require')) {
             push @args, ( SSL_verify_mode => 0x03, # 0x01 => verify peer,
                                                    # 0x02 => fail verification if no peer certificate exists
-                          SSL_ca_file     => $l7r_ssl_ca_fn );
+                          SSL_ca_file     => cfg('path.l7r.ssl.ca'));
 
-            my $l7r_ssl_crl = cfg('l7r.ssl.crl', 0);
-            if (defined $l7r_ssl_crl) {
-                my $l7r_ssl_crl_fn  = "$l7r_certs_path/l7r-crl.pem";
-                _write_to_file($l7r_ssl_crl_fn, $l7r_ssl_crl);
-                push @args, SSL_crl_file => $l7r_ssl_crl_fn;
-            }
+            my $crl = cfg('path.l7r.ssl.crl');
+            push @args, SSL_crl_file => $crl if -f $crl;
         }
     }
     $class->SUPER::new(@args);
-}
-
-sub _write_to_file {
-    my ($fn, $data) = @_;
-    my $fh;
-    DEBUG "Writing data to $fn";
-    unless ( open $fh, '>', $fn  and
-              binmode $fh         and
-              print $fh $data     and
-              close $fh ) {
-         LOGDIE "Unable to write to $fn";
-    }
 }
 
 sub post_configure_hook {

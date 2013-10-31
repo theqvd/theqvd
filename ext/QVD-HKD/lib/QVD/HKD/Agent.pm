@@ -162,7 +162,7 @@ sub __query_result_callback {
             $tuples_ok = 1;
         }
         when (PGRES_COMMAND_OK) {
-            if ($opts->{save_to_self} or $opts->{save_to}) {
+            if ($opts->{save_to_self} or $opts->{save_to} or $opts->{save_pairs_to}) {
                 ERROR "Internal error: query with save_to_self or save_to set returned PGRES_COMMAND_OK"
             }
             else {
@@ -188,6 +188,13 @@ sub __query_result_callback {
                 $debug and $self->_debug("reply saved to $save_to");
                 $self->{$to} = [$res->rowsAsHashes(@names)];
             }
+            elsif (defined (my $save_pairs_to = $opts->{save_pairs_to})) {
+                $debug and $self->_debug("reply saved as pairs to $save_pairs_to");
+                my $columns = $res->columns;
+                $columns == 2 or DEBUG "Internal error, too many columns ($columns)";
+                my %res = map { @{$_}[0, 1] } $res->rows;
+                $self->{$save_pairs_to} = \%res;
+            }
             else {
                 my $on_result = $opts->{on_result} // "_on_$opts->{caller_method}_result";
                 my $method = (ref $on_result ? $on_result : $self->can($on_result));
@@ -202,6 +209,12 @@ sub __query_result_callback {
         }
         else {
             DEBUG "unexpected number of rows on query result, $n expected, $rows received";
+        }
+    }
+    else {
+        if (defined(my $to = $opts->{save_to} // $opts->{save_pairs_to})) {
+            $to = $to->[0] if ref $to;
+            delete $self->{$to};
         }
     }
     DEBUG "query set to failed";

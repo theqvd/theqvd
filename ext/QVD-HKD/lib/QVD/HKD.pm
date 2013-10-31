@@ -267,6 +267,10 @@ sub _sync_db_config {
                  size               => $self->_cfg('internal.database.pool.size') );
     }
     $self->{heavy}->size($self->_cfg('internal.hkd.max_heavy'));
+
+    if (my $agent = $self->{l7r_listener}) {
+        $agent->on_config_changed;
+    }
 }
 
 sub _start_config {

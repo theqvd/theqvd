@@ -348,6 +348,7 @@ sub cmd_config_ssl {
         rs(SSL_Config)->search({ key => 'l7r.ssl.ca' })->delete;
     }
 
+    notify(qvd_config_changed);
 
     1
 }

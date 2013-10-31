@@ -48,9 +48,13 @@ path.run.lxc = ${path.run}/lxc
 path.storage.overlayfs = ${path.storage.btrfs.root}/overlayfs
 path.storage.rootfs = ${path.storage.btrfs.root}/rootfs
 
-
 ## paths for SSL certificates and CAs
-path.ssl.certs = ${path.run}/ssl
+path.l7r.ssl = ${path.run}/l7r/ssl
+path.l7r.ssl.key = ${path.l7r.ssl}/key.pem
+path.l7r.ssl.cert = ${path.l7r.ssl}/cert.pem
+path.l7r.ssl.ca = ${path.l7r.ssl}/ca.pem
+path.l7r.ssl.crl = ${path.l7r.ssl}/crl.pem
+
 path.ssl.ca.system = /etc/ssl/certs
 path.ssl.ca.personal = certs
 
