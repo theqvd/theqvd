@@ -13,8 +13,10 @@ use Class::StateMachine::Declarative
 
     __any__ => { ignore => [qw(_on_kill)],
                  on => { on_hkd_stop => '_on_kill',
-                         on_hkd_kill => '_on_kill' },
-                 transitions => { _on_l7r_done => 'stopped' } },
+                         on_hkd_kill => '_on_kill',
+                         _on_abort   => '_on_kill' },
+
+                 transitions => { _on_l7r_done => 'cleanup' } },
 
     new     => { transitions => { '_on_run' => 'running' } },
 
@@ -25,7 +27,12 @@ use Class::StateMachine::Declarative
                  substates => [ waiting => { enter => '_set_state_timer',
                                              transitions => { _on_timeout => 'killing' } } ] },
 
+    cleanup => { enter => '_clean_row',
+                 transitions => { _on_done => 'stopped' } },
+
     stopped => { enter => '_on_stopped' };
+
+sub abort { shift->_on_abort }
 
 sub new {
     my ($class, %opts) = @_;
@@ -40,10 +47,6 @@ sub run {
     $self->_on_run;
     DEBUG "New L7R process $self->{pid}";
     return $self->{saved_pid};
-}
-
-sub _set_env_perl5lib {
-
 }
 
 sub _start {
@@ -70,6 +73,7 @@ sub _start {
 sub _kill {
     my $self = shift;
     my $signal = ($self->{hard}++ ? 'KILL' : 'TERM');
+    DEBUG "Killing L7R process $self->{pid} with signal $signal";
     kill $signal, $self->{pid};
 }
 
@@ -82,5 +86,18 @@ sub _set_state_timer {
 
 sub pid { shift->{saved_pid} }
 
+sub _clean_row {
+    my $self = shift;
+    $self->_query({ ignore_errors => 1 },
+                  <<'EOQ', $self->{node_id}, $self->{saved_pid});
+update vm_runtimes
+   set user_cmd = NULL,
+       l7r_host = NULL,
+       l7r_pid  = NULL,
+       user_state = 'disconnected'
+   where l7r_host = $1
+     and l7r_pid = $2
+EOQ
+}
 
 1;

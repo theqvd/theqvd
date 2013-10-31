@@ -357,7 +357,7 @@ internal.l7r.timeout.x_start = 10
 internal.l7r.timeout.vma = 4
 internal.l7r.timeout.takeover = 30
 internal.l7r.retry.x_start = 5
-internal.l7r.poll_time.vm = 3
+internal.l7r.poll_time.vm = 2
 internal.l7r.poll_time.x = 1
 internal.l7r.short_session = 120
 
@@ -406,6 +406,7 @@ internal.database.pool.size = 2
 internal.database.pool.connection.delay = 10
 internal.database.pool.connection.retries = 100
 
+internal.hkd.stopping.l7rs.timeout = 300
 internal.hkd.stopping.vms.timeout = 300
 internal.hkd.killing.vms.retry.timeout = 100
 

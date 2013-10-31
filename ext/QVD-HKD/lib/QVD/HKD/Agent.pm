@@ -231,6 +231,7 @@ sub __query_callback {
 
 sub _listen {
     my ($self, $opts, $channel) = &__opts;
+    DEBUG "Listening to channel '$channel'";
     my $cb = weak_method_callback($self, __listen_callback => $opts, $channel);
     $self->{listener_watcher}{$channel} =
         $self->_db->listen($channel,
@@ -240,6 +241,7 @@ sub _listen {
 
 sub __listen_callback {
     my ($self, $opts, $channel) = @_;
+    DEBUG "Notification for channel '$channel' received";
     my $cb = $opts->{on_notify} // "_on_${channel}_notify";
     $self->$cb($channel);
 }

@@ -394,7 +394,8 @@ sub _start_agents {
     $self->{expiration_monitor} = QVD::HKD::ExpirationMonitor->new(%opts,
                                                                   on_expired_vm => sub { $self->_on_expired_vm(@_[1..3])});
     $self->{l7r_monitor}        = QVD::HKD::L7RMonitor->new(%opts);
-    $self->{l7r_killer}         = QVD::HKD::L7RKiller->new(%opts);
+    $self->{l7r_killer}         = QVD::HKD::L7RKiller->new(%opts,
+                                                           on_cmd_abort => sub { $self->_on_l7r_cmd_abort($_[1])});
     $self->{cluster_monitor}    = QVD::HKD::ClusterMonitor->new(%opts);
     $self->{dhcpd_handler} = QVD::HKD::DHCPDHandler->new(%opts)
         if $self->_cfg("vm.network.use_dhcp");
@@ -523,6 +524,17 @@ sub _on_l7r_stopped {
     my $l7r1 = delete $self->{l7r}{$pid};
     $l7r == $l7r1 or ERROR "Internal error, L7R caller is different from the cached one: $l7r != $l7r1";
     keys %{$self->{l7r}} or $self->_on_no_l7rs_are_running;
+}
+
+sub _on_l7r_cmd_abort {
+    my ($self, $l7r_pid) = @_;
+    DEBUG "aborting L7R with PID $l7r_pid";
+    if (my $l7r = $self->{l7r}{$l7r_pid}) {
+        $l7r->abort;
+    }
+    else {
+        WARN "I know nothing about an L7R with PID $l7r_pid";
+    }
 }
 
 sub _on_cmd {
