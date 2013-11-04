@@ -39,7 +39,6 @@ use QVD::HKD::VMCommandHandler;
 use QVD::HKD::VMHandler;
 use QVD::HKD::L7RListener;
 use QVD::HKD::L7R;
-use QVD::HKD::L7RMonitor;
 use QVD::HKD::L7RKiller;
 use QVD::HKD::ExpirationMonitor;
 
@@ -393,7 +392,6 @@ sub _start_agents {
                                                                 on_cmd => sub { $self->_on_cmd($_[1]) });
     $self->{expiration_monitor} = QVD::HKD::ExpirationMonitor->new(%opts,
                                                                   on_expired_vm => sub { $self->_on_expired_vm(@_[1..3])});
-    $self->{l7r_monitor}        = QVD::HKD::L7RMonitor->new(%opts);
     $self->{l7r_killer}         = QVD::HKD::L7RKiller->new(%opts,
                                                            on_cmd_abort => sub { $self->_on_l7r_cmd_abort($_[1])});
     $self->{cluster_monitor}    = QVD::HKD::ClusterMonitor->new(%opts);
@@ -405,9 +403,6 @@ sub _start_agents {
 
     DEBUG 'Starting ExpirationMonitor';
     $self->{expiration_monitor}->run;
-
-    DEBUG 'Starting L7R Monitor';
-    $self->{l7r_monitor}->run;
 
     DEBUG 'Starting L7RKiller';
     $self->{l7r_killer}->run;
@@ -457,7 +452,6 @@ sub _start_later_agents {
 my @agent_names = qw(command_handler
                      dhcpd_handler
                      ticker
-                     l7r_monitor
                      l7r_killer
                      expiration_monitor
                      cluster_monitor);
