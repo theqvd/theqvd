@@ -18,5 +18,5 @@ WriteMakefile( NAME          => 'QVD::L7R',
 				  'Test::More'            => 0,
                                   'Disgest::SHA'          => 0,
                                 },
-               EXE_FILES [qw(bin/qvd-l7r-slave)] );
+               EXE_FILES => [qw(bin/qvd-l7r-slave)] );
 
