@@ -25,6 +25,7 @@ sub list_of_vm {
     my $query = (uri_split $url)[3];
     my %params = uri_query_split $query;
     my $file_name = delete $params{file_name};
+    INFO "User ".$auth->{user_id}." wants to open '$file_name'";
     return () unless ($file_name);
     INFO "User ".$auth->{user_id}." wants to open '$file_name'";
 

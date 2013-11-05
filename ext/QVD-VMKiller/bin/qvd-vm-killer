@@ -6,3 +6,28 @@ use warnings;
 use QVD::VMKiller;
 
 QVD::VMKiller->kill_dangling_vms;
+
+__END__
+
+=head1 TITLE
+
+qvd-vm-killer - The QVD orphaned VM killer.
+
+=head1 DESCRIPTION
+
+Kill any QVD VM that keeps still running after the controlling HKD
+daemon has terminated.
+
+This program is intended to be run for cron every minute. If the HKD
+is running it will exit immediately. Otherwise it will look for VMs
+that may still be running (both KVM and LXC bassed) and kill all its
+processes.
+
+Under normal operation, the HKD will stop any container and its
+processes before exiting. If for whatever reason that doesn't happen
+(for instance, due to some software bug or the HKD process being
+killed) any orphaned VM must be killed in order to avoid any
+possibility of having it running simultaneously in two QVD nodes.
+
+=cut
+

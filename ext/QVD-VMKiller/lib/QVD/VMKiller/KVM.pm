@@ -3,16 +3,23 @@ package QVD::VMKiller::KVM;
 use strict;
 use warnings;
 
-use Proc::ProcessTable;
+use QVD::Config::Core;
+use QVD::Log;
+use Linux::Fuser;
 
 sub kill_dangling_vms {
-    my $t = Proc::ProcessTable->new;
-    foreach my $p (@{$t->table}) {
-        if ($p->ppid == 1 and $p->cmndline =~ m|^kvm.*\s-name\s+qvd/(\d+)/|) {
-            my $pid = $p->pid;
-            warn "killing dangling VM $1, pid: $pid\n";
-            kill KILL => $pid;
-        }
+    my $vm_lock_fn = core_cfg('internal.hkd.vm.lock.path');
+    unless (-e $vm_lock_fn) {
+        INFO "VM lock '$vm_lock_fn' does not exists on disk";
+        return;
+    }
+    my $fuser = Linux::Fuser->new;
+    for my $proc ($fuser->fuser($vm_lock_fn)) {
+        my $pid = $proc->pid;
+        next if $pid == $$;
+        # next if $proc->ppid != 1;
+        DEBUG "Killing process $pid";
+        kill KILL => $pid;
     }
 }
 

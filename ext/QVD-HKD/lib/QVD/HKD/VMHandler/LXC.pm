@@ -414,7 +414,7 @@ sub _start_lxc {
                        on_done => weak_method_callback($self, '_on_lxc_done'),
                        '<' => '/dev/null',
                        '>' => $hv_out,
-                       '2>' => $hv_out
+                       '2>' => $hv_out,
                      },
                      'lxc-start', -n => $self->{lxc_name}, -P => $self->_cfg('path.run.lxc'));
     $self->_on_done;

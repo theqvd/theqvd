@@ -51,7 +51,6 @@ BEGIN {
 use QVD::Config::Core qw(set_core_cfg core_cfg);
 
 BEGIN {
-    use File::Spec;
     set_core_cfg('client.log.filename', File::Spec->join($QVD::Client::App::user_dir, 'qvd-client.log'))
         unless defined core_cfg('client.log.filename', 0);
     $QVD::Log::DAEMON_NAME = 'client';
@@ -181,7 +180,7 @@ sub open_file {
             } else {
                 INFO("Folder sharing started for $share");
                 INFO("Opening $file");
-                $client = QVD::Client::SlaveClient->new();
+                $client = QVD::Client::SlaveClient->new('localhost:12040');
                 $client->handle_open(abs_path($file), $ticket);
             }
             last;

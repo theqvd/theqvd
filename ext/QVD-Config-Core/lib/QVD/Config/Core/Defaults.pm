@@ -438,8 +438,8 @@ internal.hkd.lxc.timeout.on_state.zombie.db.delaying = 60
 internal.hkd.kvm.timeout.on_state.stopping.shutdown.waiting_for_kvm = 180
 internal.hkd.kvm.timeout.on_state.stopping.stop.waiting_for_kvm = 180
 internal.hkd.kvm.timeout.on_state.zombie.config.delaying = 60
-internal.hkd.kvm.timeout.on_state.zombie.config.reap.waiting_for_kvm = 120
-internal.hkd.kvm.timeout.on_state.zombie.config.reap.delaying = 60
+internal.hkd.kvm.timeout.on_state.zombie.reap.waiting_for_kvm = 120
+internal.hkd.kvm.timeout.on_state.zombie.reap.delaying = 60
 internal.hkd.kvm.timeout.on_state.zombie.db.delaying = 60
 
 internal.hkd.vmhandler.vma.failed.max_count.on.starting = 40
@@ -462,6 +462,7 @@ internal.hkd.debugger.run = 0
 internal.hkd.debugger.socket = /root/hkd-debug
 
 internal.hkd.lock.path = ${path.run}/hkd.lock
+internal.hkd.vm.lock.path = ${path.run}/hkd-vm.lock
 
 internal.hkd.max_heavy = 10
 

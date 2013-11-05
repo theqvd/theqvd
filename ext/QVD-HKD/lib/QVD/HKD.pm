@@ -58,11 +58,13 @@ use Class::StateMachine::Declarative
                         delay => [qw(_on_cmd_stop)],
                         before => {_on_config_reload_done => '_sync_db_config' } },
 
-    new            => { transitions => { _on_run => 'starting'} },
+    new            => { before => { _on_run => '_say_hello' },
+                        transitions => { _on_run => 'starting'} },
 
     starting       => { substates => [ zero => { transitions => { _on_error => 'exit',
                                                                   _on_cmd_stop => 'exit' },
-                                                 substates => [ acquiring_lock => { enter => '_acquire_lock' },
+                                                 substates => [ acquiring_hkd_lock    => { enter => '_acquire_hkd_lock' },
+                                                                acquiring_vm_lock     => { enter => '_acquire_vm_lock' },
                                                                 connecting_to_db      => { enter => '_start_db' },
                                                                 checking_db_version   => { enter => '_check_db_version' },
                                                                 loading_db_config     => { enter => '_start_config',
@@ -136,11 +138,24 @@ sub new {
     $self;
 }
 
-sub _acquire_lock {
+sub _say_hello { INFO "HKD starting, PID: $$" }
+
+sub _acquire_hkd_lock {
     my $self = shift;
     my $file = $self->_cfg('internal.hkd.lock.path');
-    $self->_flock({ save_to => 'lock_file',
-                    log_error => "Unable to lock file '$file'" },
+    $self->_flock({ save_to => 'hkd_lock_fh',
+                    log_error => "Unable to lock file '$file'",
+                    retries => 3 },
+                  $file);
+}
+
+sub _acquire_vm_lock {
+    my $self = shift;
+    my $file = $self->_cfg('internal.hkd.vm.lock.path');
+    $self->_flock({ save_to => 'vm_lock_fh',
+                    log_error => "Unable to lock file '$file', some VM processes may still be running ".
+                                 "from a previous invocation of the HKD",
+                    retries => 1 },
                   $file);
 }
 
@@ -550,6 +565,7 @@ sub _new_vm_handler {
                                                             vm_id =>  $vm_id,
                                                             node_id => $self->{node_id},
                                                             db => $self->{db},
+                                                            vm_lock_fh => $self->{vm_lock_fh},
                                                             heavy => $self->{heavy},
                                                             dhcpd_handler => $self->{dhcpd_handler},
                                                             on_stopped => sub { $self->_on_vm_stopped($vm_id) });

@@ -45,10 +45,11 @@ sub new {
     my $vm_id = delete $opts{vm_id};
 
     my $dhcpd_handler = delete $opts{dhcpd_handler};
+    my $vm_lock_fh = delete $opts{vm_lock_fh};
     my $self = $class->SUPER::new(%opts);
     $self->{vm_id} = $vm_id;
     $self->{dhcpd_handler} = $dhcpd_handler;
-
+    $self->{vm_lock_fh} = $vm_lock_fh;
     my $hypervisor = lc $self->_cfg('vm.hypervisor');
     DEBUG "Using hypervisor type '$hypervisor'";
     $self->{hypervisor} = $hypervisor;

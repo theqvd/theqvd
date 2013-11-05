@@ -326,30 +326,26 @@ sub _start_kvm {
     }
 
     my $hv_out = $self->_hypervisor_output_redirection;
+    DEBUG "VM lock fd is ".fileno($self->{vm_lock_fh});
+    $^F = 5;
 
     $self->_run_cmd({ save_pid_to => 'vm_pid',
-                      ignore_erros => 1,
+                      ignore_errors => 1,
                       outlives_state => 1,
                       on_done => weak_method_callback($self, '_on_kvm_done'),
                       '<'  => '/dev/null',
                       '>'  => $hv_out,
                       '2>' => $hv_out,
+                      '3>' => $self->{tap_fh},
+                      '4>' => $self->{vm_lock_fh},
                       on_prepare => sub {
                           # run VMs with low priority so in case the
                           # machine gets overloaded, the hkd does not
                           # become unresponsive.
                           # (PRIO_PGRP => 1, current PGRP => 0)
+
                           setpriority(1, 0, 10);
                           setpgrp(0, 0);
-
-                          $^F = 3;
-                          if (fileno $self->{tap_fh} == 3) {
-                              POSIX::fcntl($self->{tap_fh}, F_SETFD, fcntl($self->{tap_fh}, F_GETFD, 0) & ~FD_CLOEXEC)
-                                      or LOGDIE "fcntl failed: $!";
-                          }
-                          else {
-                              POSIX::dup2(fileno $self->{tap_fh}, 3) or LOGDIE "dup2 failed: $!";
-                          }
                       } },
                     kvm => @kvm_args);
     $self->_on_done;
@@ -357,7 +353,12 @@ sub _start_kvm {
 
 sub _kill_kvm {
     my $self = shift;
-    DEBUG "killing VM process";
+    unless ($self->{vm_pid}) {
+        DEBUG "There is no process for VM $self->{vm_id}, can't kill!";
+        return $self->_on_error;
+    }
+
+    INFO "Killing kvm process $self->{vm_pid} for VM $self->{vm_id}";
     if ($self->_kill_cmd(TERM => $self->{vm_pid})) {
         $self->_on_done;
     }

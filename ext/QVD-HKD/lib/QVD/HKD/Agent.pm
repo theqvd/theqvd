@@ -277,14 +277,25 @@ sub _db {
 
 sub _run_cmd {
     my ($self, $opts, $cmd, @args) = &__opts;
-    $cmd = $self->_cfg("command.$cmd") unless $opts->{skip_cmd_lookup};
-    INFO "Running command '$cmd' with args '@args'";
+    my @cmd;
+    if ($opts->{skip_cmd_lookup}) {
+        @cmd = $cmd;
+    }
+    else {
+        @cmd = $self->_cfg("command.$cmd");
+        if (length(my $args = $self->_cfg("command.$cmd.args.extra", ''))) {
+            push @cmd, < $args >;
+        }
+    }
+    INFO "Running command '@cmd @args'";
     $opts->{outlives_state} //= $opts->{run_and_forget};
-    my @extra = ( map { $_ => $opts->{$_} }
-                  grep { defined $opts->{$_} }
-                  ('>', '<', '2>', 'on_prepare') );
+    my @extra = map { ( defined $opts->{$_}
+                        ? ($_ => $opts->{$_})
+                        : () ) }
+                      ( qw(on_prepare), grep /^\d*[<>]$/, keys %$opts);
+
     my $pid;
-    my $w = eval { AnyEvent::Util::run_cmd([$cmd, @args], '$$' => \$pid, @extra) };
+    my $w = eval { AnyEvent::Util::run_cmd([@cmd, @args], '$$' => \$pid, @extra) };
     if (defined(my $save_pid_to = $opts->{save_pid_to})) {
         $self->{$save_pid_to} = $pid;
     }
@@ -435,6 +446,7 @@ sub _flock {
     my $cb = weak_method_callback($self, '__on_flock', $opts);
 
     DEBUG "locking $file";
+    $opts->{filename} = $file; # save for error messages
 
     if (sysopen my $fh, $file, Fcntl::O_CREAT()|Fcntl::O_RDWR()) {
         my $save_to = ($opts->{save_to} //= 'flock_fh');
@@ -448,29 +460,33 @@ sub _flock {
     }
 }
 
-my $fcntl_lock_packet = Fcntl::Packer::pack_fcntl_flock({ type => Fcntl::F_WRLCK(), len => 1 });
-
 sub __acquire_flock {
     my ($self, $opts) = @_;
     my $save_to = $opts->{save_to};
     my $ok = flock($self->{$save_to}, Fcntl::LOCK_EX() | Fcntl::LOCK_NB());
-    # my $ok = fcntl($self->{$save_to}, Fcntl::F_SETLK(), $fcntl_lock_packet);
     unless ($ok) {
         if ($! == Errno::EAGAIN()) {
-            DEBUG "delaying flock";
-            my $delay = ($opts->{delay} // 10) * (0.8 + rand 0.4);
-            if ($opts->{reheavy}) {
-                delete $opts->{heavy_watcher_down}
-                    or die "internal error: __acquire_flock called with reheavy set but Agent is not heavy";
-                my $on_heavy = weak_method_callback($self, '__acquire_flock', $opts);
-                $self->_call_after($delay, _heavy_down => { on_done => $on_heavy });
+            if (!defined($opts->{retries}) or --$opts->{retries} > 0) {
+                DEBUG "delaying flock";
+                my $delay = ($opts->{delay} // 10) * (0.8 + rand 0.4);
+                if ($opts->{reheavy}) {
+                    delete $opts->{heavy_watcher_down}
+                        or die "internal error: __acquire_flock called with reheavy set but Agent is not heavy";
+                    my $on_heavy = weak_method_callback($self, '__acquire_flock', $opts);
+                    $self->_call_after($delay, _heavy_down => { on_done => $on_heavy });
+                }
+                else {
+                    $self->_call_after($delay, '__acquire_flock', $opts);
+                }
+                return;
             }
             else {
-                $self->_call_after($delay, '__acquire_flock', $opts);
+                ERROR "flocking '$opts->{filename}' failed: too many retries";
             }
-            return;
         }
-        DEBUG "flock failed: $!";
+        else {
+            ERROR "flocking '$opts->{filename}' failed: $!";
+        }
         delete $self->{$save_to};
     }
     $self->__call_on_done_or_error_callback($opts, !$ok);
