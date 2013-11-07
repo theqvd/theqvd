@@ -1,0 +1,7 @@
+#!/bin/bash
+
+# LXC Autodev hook
+
+cd ${LXC_ROOTFS_MOUNT}/dev
+
+mknod -m 666 fuse c 10 229

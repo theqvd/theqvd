@@ -338,6 +338,8 @@ sub _create_lxc {
 
     # FIXME: make this template-able or configurable in some way
     print $cfg_fh <<EOC;
+lxc.autodev=1
+lxc.hook.autodev=/usr/lib/qvd/bin/qvd-lxc-autodev
 lxc.utsname=$self->{name}
 lxc.network.type=veth
 lxc.network.veth.pair=$iface

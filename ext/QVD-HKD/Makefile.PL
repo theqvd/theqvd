@@ -22,6 +22,7 @@ WriteMakefile( NAME          => 'QVD::HKD',
                                 },
                ABSTRACT      => 'lib/QVD/HKD.pm',
 	       EXE_FILES     => [ qw(bin/qvd-hkd
+                                     bin/qvd-lxc-autodev
                                      bin/qvd-hkd.initrc.pl
                                      bin/qvd-hkd.debrc.pl
                                      bin/qvd-hkd.postinst
