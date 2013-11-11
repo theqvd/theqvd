@@ -6,6 +6,7 @@ use warnings;
 use QVD::Log;
 
 use parent qw(QVD::HKD::VMHandler::LXC::FS);
+use Method::WeakCallback qw(weak_method_callback);
 
 sub init_backend {
     my ($hkd, $on_done, $on_error) = @_;
@@ -34,10 +35,32 @@ sub _make_tmp_dir_for_os_image {
 }
 
 sub _remove_overlay_dir {
-    my ($self, $dir) = @_;
+    my ($self, $dir, $move_to) = @_;
     DEBUG "deleting btrfs subvolume '$dir'";
-    $self->_run_cmd({log_error => "Unable to remove Btrfs volumen '$dir'"},
+    $self->_run_cmd({log_error => "Unable to remove Btrfs volumen '$dir'",
+		     on_error => weak_method_callback($self, '_remove_overlay_dir__btrfs_check', $dir, $move_to)},
                     btrfs => 'subvolume', 'delete', $dir);
+}
+
+sub _remove_overlay_dir__btrfs_check {
+    my ($self, $dir, $move_to) = @_;
+    # If the administrator changed the driver from something else to
+    # btrfs, $dir may be not a btrfs subvolume but a regular dir.
+
+    INFO "checking if $dir is not a btrfs subvolume but something else";
+    $self->_run_cmd({log_error => "But $dir is a btrfs subvolume",
+		     non_zero_rc_expected => 1,
+		     on_done => weak_method_callback($self, '_remove_overlay_dir__rmdir', $dir, $move_to),
+		     '2>' => '/dev/null',
+		     '1>' => '/dev/null' },
+		    btrfs => 'subvolume', 'show', $dir);
+}
+
+sub _remove_overlay_dir__rmdir {
+    my ($self, $dir, $move_to) = @_;
+    INFO "Deleting regular directory '$dir'";
+    # fallback to default
+    $self->SUPER::_remove_overlay_dir($dir, $move_to);
 }
 
 sub _make_overlay_dir {

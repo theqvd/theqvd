@@ -101,7 +101,13 @@ sub __call_on_done_or_error_callback {
         if ($failed and not $opts->{ignore_errors}) {
             $cb = $opts->{on_error} // '_on_error';
             if (defined(my $msg = $opts->{log_error})) {
-                ERROR $msg;
+		if (defined (my $level = $opts->{log_error_level})) {
+		    no strict 'refs';
+		    &{uc $level}($msg);
+		}
+		else {
+		    ERROR $msg;
+		}
             }
         }
         else {
@@ -109,7 +115,12 @@ sub __call_on_done_or_error_callback {
         }
         DEBUG sprintf("invoking callback (failed: %s, ignore_errors: %s, cb: %s)",
                       map { defined $_ ? $_ : '<undef>' } $failed, $opts->{ignore_errors}, $cb);
-        $self->$cb(@args);
+	if (ref $cb) {
+	    $cb->(@args);
+	}
+	else {
+	    $self->$cb(@args);
+	}
     }
 }
 
@@ -329,7 +340,8 @@ sub __run_cmd_callback {
     if (defined(my $as = $opts->{save_pid_to})) {
         delete $self->{$as};
     }
-    $self->__call_on_done_or_error_callback($opts, $rc != 0, $rc);
+    my $failed = ($opts->{non_zero_rc_expected} ? $rc == 0 : $rc != 0);
+    $self->__call_on_done_or_error_callback($opts, $failed, $rc);
 }
 
 sub __run_cmd_kill_after_callback {
