@@ -13,4 +13,18 @@ for dir in `find ext -maxdepth 1 -mindepth 1 -type d | grep -v '.svn'` ; do
 done
 
 #cd ext/QVD-Client && /usr/lib/qvd/bin/perl $includes bin/qvd-gui-client.pl
-cd ext/QVD-Client && /usr/lib/qvd/bin/perl $includes bin/qvd-client.pl
+echo
+echo "cd ext/QVD-Client && perl $includes bin/qvd-gui-client.pl"
+echo
+
+cd ext/QVD-Client
+
+if [ "$1" == "gdb" ] ; then
+	gdb --args perl $includes bin/qvd-gui-client.pl
+else
+	perl $includes bin/qvd-gui-client.pl
+fi
+
+
+
+#cd ext/QVD-Client && /usr/lib/qvd/bin/perl $includes bin/qvd-client.pl

@@ -63,6 +63,8 @@ INFO "user_dir: $user_dir";
 INFO "app_dir: $app_dir";
 
 $user_certs_dir = File::Spec->rel2abs(core_cfg('path.ssl.ca.personal'), $user_dir);
+mkdir $user_certs_dir;
+
 INFO "user_certs_dir: $user_certs_dir";
 
 $pixmaps_dir = File::Spec->rel2abs(core_cfg('path.client.pixmaps'), $app_dir);
