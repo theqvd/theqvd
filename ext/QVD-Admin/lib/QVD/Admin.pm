@@ -222,24 +222,6 @@ sub _assign_host {
     }
 }
 
-sub _start_vm {
-    my ($self, $vmrt) = @_;
-    txn_do {
-        $vmrt->discard_changes;
-        $self->_assign_host($vmrt);
-        $vmrt->send_vm_start;
-        my $host_id = $vmrt->host_id;
-        notify("qvd_cmd_for_vm_on_host$host_id");
-    };
-}
-
-sub _stop_vm {
-    my ($self, $vmrt) = @_;
-    $vmrt->send_vm_stop;
-    my $host_id = $vmrt->host_id;
-    notify("qvd_cmd_for_vm_on_host$host_id");
-}
-
 sub _disconnect_user {
     my ($self, $vmrt) = @_;
     $vmrt->send_user_abort;
@@ -888,13 +870,30 @@ sub cmd_vm_start {
 }
 
 sub cmd_vm_start_by_id {
-    my ($self, $id) = @_;
-    $id // die "Missing parameter id";
-    txn_do {
-        my $vmrt = rs(VM_Runtime)->find($id) //
-            die "VM $id doesn't exist";
-        $self->_start_vm($vmrt);
-    };
+    my ($self, @ids) = @_;
+    scalar @ids or die "Missing parameter id";
+    my %hosts = ();
+    my %vms_with_error = ();
+    foreach my $id (@ids) {
+        for (1..5) {
+            txn_eval {
+                my $vmrt = rs(VM_Runtime)->find($id) //
+                die "VM $id doesn't exist";
+                $self->_assign_host($vmrt);
+                $vmrt->send_vm_start;
+                $hosts{$vmrt->host_id} = 1;
+            };
+            $@ or last;
+        }
+        if ($@) {
+            $vms_with_error{$id} = $@;
+            ERROR $@;
+        }
+    }
+    for (keys %hosts) { 
+        notify("qvd_cmd_for_vm_on_host$_");
+    }
+    return %vms_with_error;
 }
 
 sub cmd_vm_stop {
@@ -931,13 +930,30 @@ sub cmd_vm_stop {
 }
 
 sub cmd_vm_stop_by_id {
-    my ($self, $id) = @_;
-    $id or die "Missing parameter id" unless defined $id;
-    txn_do {
-        my $vm = rs(VM_Runtime)->find($id) //
-            die "VM $id doesn't exist";
-        $self->_stop_vm($vm);
-    };
+    my ($self, @ids) = @_;
+    scalar @ids or die "Missing parameter id";
+    my %hosts = ();
+    my %vms_with_error = ();
+    for my $id (@ids) {
+        for (1..5) {
+            txn_eval {
+                my $vm = rs(VM_Runtime)->find($id) //
+                die "VM $id doesn't exist";
+                $vm->send_vm_stop;
+                my $host_id = $vm->host_id;
+                $hosts{$host_id} = 1;
+            };
+            $@ or last;
+        }
+        if ($@) {
+            $vms_with_error{$id} = $@;
+            ERROR $@;
+        }
+    }
+    foreach (keys %hosts) {
+        notify("qvd_cmd_for_vm_on_host$_");
+    }
+    return %vms_with_error;
 }
 
 sub cmd_vm_unblock {

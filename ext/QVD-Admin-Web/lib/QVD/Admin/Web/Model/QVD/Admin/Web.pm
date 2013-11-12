@@ -228,22 +228,22 @@ sub vm_find {
 }
 
 sub vm_start {
-    my ( $self, $id ) = @_;
+    my ( $self, @ids ) = @_;
     $self->reset_status;
-    eval { $self->admin->cmd_vm_start_by_id($id) };
-    if ($@) {
-        $self->set_error($@);
+    my %vms_with_error = $self->admin->cmd_vm_start_by_id(@ids);
+    if (scalar %vms_with_error) {
+        $self->set_error([values %vms_with_error]);
         return undef;
     }
     1;
 }
 
 sub vm_stop {
-    my ( $self, $id ) = @_;
+    my ( $self, @ids ) = @_;
     $self->reset_status;
-    eval { $self->admin->cmd_vm_stop_by_id($id) };
-    if ($@) {
-        $self->set_error($@);
+    my %vms_with_error = $self->admin->cmd_vm_stop_by_id(@ids);
+    if (scalar %vms_with_error) {
+        $self->set_error([values %vms_with_error]);
         return undef;
     }
     1;

@@ -146,21 +146,12 @@ sub start_vm : Local {
     } else 
     {
         my $list = $c->req->body_params->{selected};
-        for (ref $list ? @$list : $list) {
-            my $vm = $model->vm_find($_);
-            my $name = $vm->name; 
-            if ( my $countstart = $model->vm_start($_) ) 
-            {
-                if ($c->flash->{response_type} ne "error") {
-                    $c->flash->{response_type} = "success";
-                }
-                $c->flash->{response_msg}  .= "$name ($_) starting. ";
-            }
-            else {
-                # FIXME response_type must be an enumerated
-                $c->flash->{response_type} = "error";
-                $c->flash->{response_msg}  .= $model->error_msg;
-            }
+        if ($model->vm_start(ref $list? @$list : $list)) {
+            $c->flash->{response_type} = "success";
+            $c->flash->{response_msg} = "Starting VMs";
+        } else {
+            $c->flash->{response_type} = "error";
+            $c->flash->{response_msg} = join "<br/>", grep {s/\bat\b.*//g} @{$model->error_msg};
         }
     }
     $c->response->redirect( $c->uri_for( $self->action_for('list') ) );
@@ -187,22 +178,12 @@ sub stop_vm : Local {
     } else 
     {
         my $list = $c->req->body_params->{selected};
-        for (ref $list ? @$list : $list) {
-            my $vm = $model->vm_find($_);
-            my $name = $vm->name; 
-            if ( my $countstop = $model->vm_stop($_) ) 
-            {
-                if ($c->flash->{response_type} ne "error") {
-                        $c->flash->{response_type} = "success";
-                    }
-                $c->flash->{response_msg}  .= "$name ($_) stopping. ";
-            }
-            else {
-
-                # FIXME response_type must be an enumerated
-                $c->flash->{response_type} = "error";
-                $c->flash->{response_msg} .= $model->error_msg;
-            }
+        if ($model->vm_stop(ref $list? @$list : $list)) {
+            $c->flash->{response_type} = "success";
+            $c->flash->{response_msg} = "Stopping VMs";
+        } else {
+            $c->flash->{response_type} = "error";
+            $c->flash->{response_msg} = join "<br/>", grep {s/\bat\b.*//g} @{$model->error_msg};
         }
     }
     #$c->forward('list');
