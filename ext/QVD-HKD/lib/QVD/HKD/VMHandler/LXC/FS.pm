@@ -119,7 +119,7 @@ sub _untar_os_image {
     }
 
     INFO "Untarring image to '$tmp'";
-    my @args = ( 'x', -f => $image_path, -C => $tmp );
+    my @args = ( 'x', -f => $image_path, -C => $tmp, '--numeric-owner' );
     push @args, '-z' if $image_path =~ /\.(?:tgz|gz)$/;
     push @args, '-j' if $image_path =~ /\.(?:tbz|bz2)$/;
     push @args, '-J' if $image_path =~ /\.(?:txz|xz)$/;
