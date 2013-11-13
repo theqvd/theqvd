@@ -105,7 +105,7 @@ sub get_result_set_for_vm {
                    { join => \@joins,
                      columns => [qw(id name user_id ip osf_id di_tag)],
                      distinct => 1,
-                     order_by => 'id' });
+                     order_by => 'me.id' });
 }
 
 sub get_result_set_for_di {
@@ -129,7 +129,7 @@ sub get_result_set_for_di {
                    { join => \@joins,
                      columns => [qw(id osf_id version path)],
                      distinct => 1,
-                     order_by => 'id' } );
+                     order_by => 'me.id' } );
 }
 
 sub _set_equals {
