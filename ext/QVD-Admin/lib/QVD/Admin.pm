@@ -104,8 +104,7 @@ sub get_result_set_for_vm {
     rs(VM)->search($filter,
                    { join => \@joins,
                      columns => [qw(id name user_id ip osf_id di_tag)],
-                     distinct => 1,
-                     order_by => 'me.id' });
+                     distinct => 1 })
 }
 
 sub get_result_set_for_di {
@@ -128,8 +127,7 @@ sub get_result_set_for_di {
     rs(DI)->search($filter,
                    { join => \@joins,
                      columns => [qw(id osf_id version path)],
-                     distinct => 1,
-                     order_by => 'me.id' } );
+                     distinct => 1 });
 }
 
 sub _set_equals {
@@ -175,13 +173,14 @@ sub _obj_del {
     $rs->delete_all;
 }
 
-sub _obj_propget {
+sub _obj_propget_rs {
     my ($self, $obj, @keys) = @_;
     my $rs = $self->get_resultset($obj);
     my $condition = scalar @keys > 0 ? {key => \@keys} : {};
-    my @props = $rs->search_related('properties', $condition);
-    return \@props;
+    scalar $rs->search_related('properties', $condition);
 }
+
+sub _obj_propget { [ shift->_obj_propget_rs(@_)->all ] }
 
 sub _obj_propset {
     my ($self, $obj, @args) = @_;
@@ -238,15 +237,14 @@ sub propset {
     $self->_obj_propset($object, @args);
 }
 
-sub propget {
-    my $self = shift;
-    $self->_obj_propget(@_);
-}
+sub propget { shift->_obj_propget(@_) }
+
+sub propget_rs { shift->_obj_propget_rs(@_) }
 
 sub propdel {
     my ($self, $obj, @keys) = @_;
     my $rs = $self->get_resultset($obj);
-    my $condition = scalar @keys > 0 ? {key => \@keys} : {};
+    my $condition = (@keys > 0 ? {key => \@keys} : {});
     $rs->search_related('properties', $condition)->delete;
 }
 

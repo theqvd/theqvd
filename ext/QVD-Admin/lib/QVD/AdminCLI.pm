@@ -227,7 +227,7 @@ sub _print {
 
 sub _obj_del {
     my ($self, $obj) = @_;
-
+    
     if (!$self->{force} and scalar %{$self->{admin}{filter}} eq 0) {
         print "Are you sure you want to delete all ${obj}s? [y/N] ";
         my $answer = <STDIN>;
@@ -239,10 +239,10 @@ sub _obj_del {
 }
 
 sub _obj_propget {
-    my ($self, $display_cb, @args) = @_;
+    my ($self, $display_cb, $obj, @keys) = @_;
     eval {
-        my $props = $self->{admin}->propget(@args);
-        print map { &$display_cb($_)."\t".$_->key.'='.$_->value."\n" } @$props;
+        my @props = $self->{admin}->propget_rs($obj, @keys)->search({}, {order_by => "${obj}_id"});
+        print map { &$display_cb($_)."\t".$_->key.'='.$_->value."\n" } @props;
     };
 
     if ($@) {
@@ -476,9 +476,11 @@ EOT
 sub cmd_host_list {
     my ($self) = @_;
 
-    my $rs = $self->get_resultset('host');
+    my $rs = $self->get_resultset('host')->search({}, { order_by => 'id' });
     my @header = ("Id", "Name", "Address ","HKD", "Usable RAM", "Usable CPU", "VMs assigned", "Blocked", "State");
     my @body;
+
+
 
     eval {
         while (my $host = $rs->next) {
@@ -744,7 +746,7 @@ EOT
 
 sub cmd_osf_list {
     my ($self) = @_;
-    my $rs = $self->get_resultset('osf');
+    my $rs = $self->get_resultset('osf')->search({}, {order_by => 'id'});
     my @header = qw(Id Name RAM Overlay UserHD);
     my @body;
     eval {
@@ -916,7 +918,7 @@ sub cmd_di_list {
     my ($self) = @_;
     eval {
         my @body;
-        my $rs = $self->get_resultset('di');
+        my $rs = $self->get_resultset('di')->search({}, {order_by => 'id'});
         while (my $di = $rs->next) {
             push @body, [(map { $di->$_ // '-' } qw(id osf_id version path)), join(', ', $di->tag_list)];
         }
@@ -1118,7 +1120,7 @@ sub cmd_user_list {
     my $self = shift;
     eval {
         my @body;
-        my $rs = $self->get_resultset('user');
+        my $rs = $self->get_resultset('user')->search({}, {order_by => 'id'});
         while (my $user = $rs->next) {
             push @body, [$user->id, $user->login];
         }
@@ -1461,7 +1463,7 @@ EOT
 sub cmd_vm_list {
     my ($self) = @_;
     
-    my $rs = $self->get_resultset('vm');
+    my $rs = $self->get_resultset('vm')->search({}, {order_by => 'id'});
     
     my @header = ("Id","Name","User","RealUser","Ip","OSF", "DI_Tag", "DI", "Host","State","UserState","Blocked",
                   "Expire soft", "Expire hard");

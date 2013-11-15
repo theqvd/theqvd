@@ -130,7 +130,7 @@ The proxy command to be run on the gateway.
 
 The default is C</usr/lib/qvd/bin/qvd-vnc-proxy>.
 
-=itme vm_id
+=item vm_id
 
 The Id of the target VM.
 
