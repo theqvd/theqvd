@@ -113,6 +113,7 @@ my %nx2x = ( initiating   => 'starting',
 	     terminating  => 'stopping',
 	     aborting     => 'stopping',
 	     aborted      => 'stopped',
+             terminated   => 'stopped',
 	     stopped      => 'stopped',
 	     ''           => 'stopped');
 
@@ -471,30 +472,34 @@ sub _fork_monitor {
 }
 
 sub _state {
-    -f $nxagent_state_fn or return 'stopped'; # shortcut!
-
     my $state_line = _read_line $nxagent_state_fn;
     my ($nxstate, $timestamp) = $state_line =~ /^(.*?)(?::(.*))?$/;
 
+    return 'stopped' if $nxstate eq ''; # shortcut!
+
     my $state = $nx2x{$nxstate};
+    unless (defined $state) {
+        ERROR "unhandled nxstate '$state_line'";
+        $state = 'stopped';
+    }
     my $timeout = $timeout{$state};
     my $pid = _read_line $nxagent_pid_fn;
 
     { no warnings; DEBUG ("_state: $state, nxstate: $nxstate, ts: $timestamp, timeout: $timeout") };
 
     if ($timeout and $timestamp) {
-	if (time > $timestamp + $timeout) {
-	    DEBUG "timeout!";
-	    $pid and kill TERM => $pid;
-	    return 'stopping';
-	}
+        if (time > $timestamp + $timeout) {
+            DEBUG "timeout!";
+            $pid and kill TERM => $pid;
+            return 'stopping';
+        }
     }
 
     if ($running{$state}) {
-	unless ($pid and kill 0, $pid) {
-	    DEBUG "nxagent disappeared, pid $pid";
-	    $state = 'stopped';
-	}
+        unless ($pid and kill 0, $pid) {
+            DEBUG "nxagent disappeared, pid $pid";
+            $state = 'stopped';
+        }
     }
 
     _delete_nxagent_state_and_pid_and_call_hook if $state eq 'stopped';
