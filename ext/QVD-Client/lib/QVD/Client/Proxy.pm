@@ -198,7 +198,7 @@ sub connect_to_vm {
                 $message = "The server has rejected your login. Please verify that your username and password are correct.";
             }
             when (HTTP_SERVICE_UNAVAILABLE) {
-                $message = "The server is under maintenance. Retry later.";
+                $message = "The server is under maintenance. Retry later.\nThe server said: $body";
             }
         }
         $message ||= "$host replied with $msg";
@@ -328,7 +328,7 @@ sub connect_to_vm {
                         $code == HTTP_UNAUTHORIZED     ? "Login error. Please verify your user and password"    :
                         $code == HTTP_BAD_GATEWAY      ? "Server error: $body"                                  :
                         $code == HTTP_FORBIDDEN        ? "Your virtual machine is under maintenance."           :
-                                                         "Unable to connect to remote VM: $code $msg" );
+                                                         "Unable to connect to remote VM: $code $msg\n\n$body" );
             ERROR("Fatal error: $message");
             $cli->proxy_connection_error(message => $message, code => $code);
             last;
