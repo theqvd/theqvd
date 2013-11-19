@@ -1465,7 +1465,7 @@ sub cmd_vm_list {
     
     my $rs = $self->get_resultset('vm')->search({}, {order_by => 'id'});
     
-    my @header = ("Id","Name","User","RealUser","Ip","OSF", "DI_Tag", "DI", "Host","State","UserState","Blocked",
+    my @header = ("Id","Name","User","RealUser","Ip","OSF", "DI_Tag", "DI", "Host","State","L7R","UserState","Blocked",
                   "Expire soft", "Expire hard");
     my @body;
         
@@ -1483,6 +1483,7 @@ sub cmd_vm_list {
                 (defined $vm->di ? $vm->di->version : undef),
                 (defined $vmr->host ? $vmr->host->name : undef),
                 $vmr->vm_state,
+                (defined $vmr->l7r_host ? $vmr->l7r_host->name : undef),
                 $vmr->user_state,
                 $vmr->blocked,
                 $vmr->vm_expiration_soft,
