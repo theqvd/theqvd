@@ -241,7 +241,9 @@ sub _obj_del {
 sub _obj_propget {
     my ($self, $display_cb, $obj, @keys) = @_;
     eval {
-        my @props = $self->{admin}->propget_rs($obj, @keys)->search({}, {order_by => "${obj}_id"});
+        my @props = $self->{admin}->propget_rs($obj, @keys)->search({},
+                                                                    { order_by => "${obj}_id",
+                                                                      distinct => 1 } );
         print map { &$display_cb($_)."\t".$_->key.'='.$_->value."\n" } @props;
     };
 
