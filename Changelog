@@ -1,3 +1,24 @@
+QVD 3.4.0
+=========
+
+- Main feature: Application Server
+- Allowing client to restart session
+- Rewriting LDAP Backend
+- Allow client to not remember user login
+- Use system cgroups mountpoint instead of /cgroup
+- File systems Backend refactoring
+- Improvement in the certificates management
+- Binary Clients.
+
+
+QVD 3.3.0
+=========
+
+- Main Feature: Sharing folders from client
+- OSX Client
+- QVD spy
+
+
 QVD 3.2.0
 =========
 
