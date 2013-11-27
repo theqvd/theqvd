@@ -6,7 +6,7 @@ my $builder = Module::Build->new(
     module_name         => 'QVD::VMA::SlaveClient',
     license             => 'gpl',
     dist_author         => q{QVD Team <qvd@qindel.com>},
-    dist_version_from   => 'lib/QVD/VMA/SlaveClient.pm',
+    dist_version        => '3.3',
     dist_abstract    	=> 'QVD::VMA::SlaveClient',
     configure_requires => { 'Module::Build' => 0.38  },
     build_requires => {
