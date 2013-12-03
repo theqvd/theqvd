@@ -58,6 +58,8 @@ path.l7r.ssl.crl = ${path.l7r.ssl}/crl.pem
 path.ssl.ca.system = /etc/ssl/certs
 path.ssl.ca.personal = certs
 
+path.darwin.ssl.ca.system = /System/Library/OpenSSL/certs/
+
 ## KVM serial port captures or LXC console output
 path.serial.captures = ${path.tmp}/qvd
 path.hypervisor.captures = ${path.tmp}/qvd

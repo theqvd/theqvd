@@ -123,11 +123,11 @@ sub _get_httpc {
     if ($ssl) {
         DEBUG "Using a SSL connection";
         $args{SSL}                 = 1;
-        $args{SSL_ca_path}         = core_cfg('path.ssl.ca.system');
+        $args{SSL_ca_path}         = $DARWIN ? core_cfg('path.darwin.ssl.ca.system') : core_cfg('path.ssl.ca.system');
         $args{SSL_ca_path_alt}     = $QVD::Client::App::user_certs_dir;
         $args{SSL_ca_path_alt}     =~ s|^~(?=/)|$ENV{HOME} // $ENV{APPDATA}|e;
 
-        DEBUG "SSL CA path: " . $args{SSL_ca_path_alt};
+        DEBUG "SSL CA path: " . $args{SSL_ca_path};
         DEBUG "SSL CA alt path: " . $args{SSL_ca_path_alt};
 
         my $use_cert = core_cfg('client.ssl.use_cert');
