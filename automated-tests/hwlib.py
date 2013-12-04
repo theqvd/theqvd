@@ -780,7 +780,11 @@ def run_gui_tests(os_vm_ip, user, passwd, host):
 def run_disconnect_test(os_vm_ip, vm_name, user, password):
     _run_xorg (os_vm_ip)
     run_cmd_in_vm (os_vm_ip, 'bash -c \\""echo y | DISPLAY=:0 /usr/lib/qvd/bin/perl /usr/lib/qvd/bin/qvd-client.pl %s %s localhost &>/tmp/qc &"\\"' % (user, password))
-    run_cmd_in_vm (os_vm_ip, 'pgrep -lf qvd-client')
+    output = run_cmd_in_vm (os_vm_ip, 'pgrep -lf qvd-client')
+    match = re.search ('qvd-client', output)
+    if not match:
+        run_cmd_in_vm (os_vm_ip, 'cat /tmp/qc')
+        raise Exception, 'client has died'
     _wait_vm_started (os_vm_ip, vm_name)
 
     output = run_qvd_admin (os_vm_ip, 'vm list -f name=%s' % vm_name)
@@ -818,7 +822,11 @@ def run_session_kept_test(os_vm_ip, vm_name, user, password):
     _run_xorg (os_vm_ip)
 
     run_cmd_in_vm (os_vm_ip, 'bash -c \\""echo y | DISPLAY=:0 /usr/lib/qvd/bin/perl /usr/lib/qvd/bin/qvd-client.pl %s %s localhost &>/tmp/qc &"\\"' % (user, password))
-    run_cmd_in_vm (os_vm_ip, 'pgrep -lf qvd-client')
+    output = run_cmd_in_vm (os_vm_ip, 'pgrep -lf qvd-client')
+    match = re.search ('qvd-client', output)
+    if not match:
+        run_cmd_in_vm (os_vm_ip, 'cat /tmp/qc')
+        raise Exception, 'client has died'
     _wait_vm_started (os_vm_ip, vm_name)
 
     qvd_vm_ip = _get_qvd_vm_ip (os_vm_ip, vm_name)
