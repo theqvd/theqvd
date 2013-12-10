@@ -1,4 +1,4 @@
-#!/usr/lib/qvd/bin/perl 
+#!/usr/lib/qvd/bin/perl -w
 
 eval 'exec /usr/lib/qvd/bin/perl  -S $0 ${1+"$@"}'
     if 0; # not running under some shell
@@ -49,6 +49,7 @@ BEGIN {
 }
 
 use QVD::Config::Core qw(set_core_cfg core_cfg);
+use File::Spec;
 
 BEGIN {
     set_core_cfg('client.log.filename', File::Spec->join($QVD::Client::App::user_dir, 'qvd-client.log'))
