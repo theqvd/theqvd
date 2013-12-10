@@ -111,6 +111,7 @@ sub authenticate_basic {
             defined $server_error and
             defined $racf_regex) {
             if ($server_error =~ /$racf_regex/) {
+                $auth->{params}->{'qvd.auth.ldap.racf_detailed_error'} = $server_error;
                 DEBUG "binding to DN $dn for user $login failed but server error ".
                     "'$server_error' matches '$racf_regex'";
             }
@@ -208,6 +209,11 @@ to authenticate some RACF error codes. An example setting would be "^R004109 ".
 One of the common cases is R004109 which returns an ldap code 49 (invalid credentials)
 and a text message such as "R004109 The password has expired 
 (srv_authenticate_native_password))". If you don't have RACF this is probably not for you.
+
+This will also set the variable qvd.auth.ldap.racf_detailed_error which can be used to
+determine the error which let the user authenticate in the VMA. See the Plugin Developer
+Guide for more info.
+
 Example RACF errors:
 
 =over 4
