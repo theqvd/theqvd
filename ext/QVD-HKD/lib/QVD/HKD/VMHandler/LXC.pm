@@ -563,7 +563,7 @@ sub _run_hook {
 
             $debug and $self->_debug("running hook $hook for $name");
             DEBUG "Running hook '$hook' for '$name'";
-            $self->_run_cmd( { skip_cmd_lookup => 0 },
+            $self->_run_cmd( { skip_cmd_lookup => 1 },
                              $hook => @args);
             return;
         } else {
