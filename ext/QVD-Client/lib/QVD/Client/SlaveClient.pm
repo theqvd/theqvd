@@ -37,24 +37,30 @@ use feature 'switch';
 sub new {
     my ($class, %opts) = @_;
 
-    my $fh;
-    my $slave_port_file = $user_dir.'/slave-port'; 
-    open $fh, '<', $slave_port_file or return 0;
-    my $slave_port = <$fh> // 12040;
-    close $fh;
+    my $slave_port;
 
-    INFO "Connecting to slave server on port $slave_port";
+    my $slave_port_file = $user_dir.'/slave-port'; 
+    if (open my $fh, '<', $slave_port_file) { 
+        $slave_port = <$fh> // 12040;
+        close $fh;
+        INFO "Connecting to slave server on port $slave_port";
+    } else {
+        $slave_port = 12040;
+        WARN "Cannot connect to slave server: port not known"
+    }
 
     my $slave_key_file = $user_dir.'/slave-key'; 
-    open $fh, '<', $slave_key_file or return 0;
-    my $slave_key = <$fh> // '';
-    close $fh;
-
-    chomp $slave_key;
-
+    if (open my $fh, '<', $slave_key_file) {
+        my $slave_key = <$fh> // '';
+        close $fh;
+        chomp $slave_key;
+        $opts{'slave.key'} = $slave_key;
+    } else {
+        WARN "Slave key cannot be read, slave connection will not be authenticated!";
+    }
+    
     $opts{'slave.host'} = 'localhost';
     $opts{'slave.port'} = $slave_port;
-    $opts{'slave.key'} = $slave_key;
 
     if ($WINDOWS) {
         return QVD::Client::SlaveClient::Windows->new(%opts);
