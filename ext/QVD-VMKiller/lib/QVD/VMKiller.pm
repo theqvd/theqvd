@@ -11,6 +11,7 @@ use QVD::Config::Core;
 use QVD::VMKiller::KVM;
 use QVD::VMKiller::LXC;
 
+use Errno qw(EAGAIN);
 use Fcntl ();
 
 sub kill_dangling_vms {

@@ -8,6 +8,7 @@ use warnings;
 
 use AnyEvent::Util ();
 use AnyEvent::HTTP;
+use Errno qw(EAGAIN);
 use Fcntl ();
 use Fcntl::Packer ();
 use QVD::HKD::Helpers qw(croak_invalid_opts);
