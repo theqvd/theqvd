@@ -50,12 +50,14 @@ sub handle_open {
 
     $ticket = 'ROOT' unless defined $ticket;
 
+    my @headers = ("X-QVD-Share-Ticket: $ticket");
+
+    if (defined $self->{auth_key}) {
+        push @headers, "Authorization: Basic $self->{auth_key}";
+    }
+
     my ($code, $msg, $headers, $data) =
-    $self->{httpc}->make_http_request(POST => '/open/'.$path,
-        headers => [
-            "Authorization: Basic $self->{auth_key}",
-            "X-QVD-Share-Ticket: $ticket"
-        ]);
+    $self->{httpc}->make_http_request(POST => '/open/'.$path, headers => \@headers);
     
     if ($code != HTTP_OK) {
         die "Server replied $code $msg $data";
