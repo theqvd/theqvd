@@ -125,10 +125,6 @@ sub new {
         ###############################
         $settings_sizer->Add( Wx::StaticText->new($settings_panel, -1, "Screen"), 0, wxALL, 5);
         $settings_sizer->Add( Wx::StaticLine->new($settings_panel, -1, wxDefaultPosition, wxDefaultSize, wxLI_HORIZONTAL, "line"), 0, wxEXPAND | wxLEFT | wxRIGHT, 5 );
-#        my $screen_sizer = Wx::GridSizer->new(1, 2, 0, 0);
-#        $settings_sizer->Add( $screen_sizer, wxLEFT | wxRIGHT , 20 );
-#        $screen_sizer->Add(Wx::StaticText->new($settings_panel, -1, "Resolution"), 0, wxALL, 5);
-#        $screen_sizer->Add(Wx::TextCtrl->new($settings_panel, -1, ""), 0, wxALL | wxEXPAND, 5);
 
         $self->{fullscreen} = Wx::CheckBox->new($settings_panel, -1, "Full screen");
         $self->{fullscreen}->SetValue( core_cfg("client.fullscreen" ) );
@@ -237,13 +233,13 @@ sub new {
     $panel->SetSizer($ver_sizer);
 
     if ( $tab_ctl ) {
-         $tab_ctl->SetSizer($tab_sizer);
          $ver_sizer->Fit($tab_ctl);
-         $tab_sizer->Fit($self);         
+         $self->SetSizer($tab_sizer);
+         $tab_sizer->Fit($self);
     } else {
          $ver_sizer->Fit($self);
     }
-    
+
     $self->Center;
     $self->Show(1);
     (core_cfg('client.remember_username') && length core_cfg('client.user.name')) ? $self->{password}->SetFocus() : $self->{username}->SetFocus();
@@ -685,7 +681,7 @@ sub start_file_sharing {
             INFO("Starting folder sharing for $share");
             for (my $conn_attempt = 0; $conn_attempt < 10; $conn_attempt++) {
                 local $@;
-                my $client = QVD::Client::SlaveClient->new();
+                my $client = QVD::Client::SlaveClient->new('localhost:12040');
                 eval { $client->handle_share($share) };
                 if ($@) {
                     if ($@ =~ 'Connection refused') {
