@@ -95,16 +95,6 @@ sub new {
         
 
         ###############################
-        $settings_sizer->Add( Wx::StaticText->new($settings_panel, -1, "VM options"), 0, wxALL, 5);
-        $settings_sizer->Add( Wx::StaticLine->new($settings_panel, -1, wxDefaultPosition, wxDefaultSize, wxLI_HORIZONTAL, "line"), 0, wxEXPAND | wxLEFT | wxRIGHT, 5 );
-       
-        
-        $self->{kill_vm} = Wx::CheckBox->new($settings_panel, -1, "Kill current VM", wxDefaultPosition, wxDefaultSize, 0, wxDefaultValidator, "checkBox");
-        $settings_sizer->Add($self->{kill_vm});
-       
-        $settings_sizer->AddSpacer(5);
-
-        ###############################
         $settings_sizer->Add( Wx::StaticText->new($settings_panel, -1, "Connection"), 0, wxALL, 5);
         $settings_sizer->Add( Wx::StaticLine->new($settings_panel, -1, wxDefaultPosition, wxDefaultSize, wxLI_HORIZONTAL, "line"), 0, wxEXPAND | wxLEFT | wxRIGHT, 5 );
 
@@ -185,6 +175,10 @@ sub new {
 	}	
         $self->{link}->Select($link_select);
     }
+
+    $grid_sizer->Add(Wx::StaticText->new($panel, -1, "Kill current VM"), 0, wxALL, 5);
+    $self->{kill_vm} = Wx::CheckBox->new ($panel, -1, '', wxDefaultPosition);
+    $grid_sizer->Add($self->{kill_vm});
 
     if ($DARWIN && !core_cfg('client.darwin.screen_resolution.verified')) {
 	my @min_res = split(/x/, core_cfg('client.darwin.screen_resolution.min'));
@@ -379,6 +373,11 @@ sub OnClickConnect {
 
     unless ($remember_password) {
         $self->{password}->SetValue('');
+    }
+
+    if ( defined $self->{kill_vm} ) {
+        # This option normally only needs to be used once
+        $self->{kill_vm}->SetValue('');
     }
 
     # Start or notify worker thread
