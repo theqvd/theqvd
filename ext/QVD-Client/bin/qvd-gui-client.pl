@@ -26,7 +26,7 @@ BEGIN {
     # instead of ignoring them? 
     $ENV{NX_CLIENT} = $WINDOWS ? 'cmd.exe /c :' : 'false';
 
-    $user_config_filename = File::Spec->join($user_dir, 'client.conf');
+    $user_config_filename = $ARGV[0] // File::Spec->join($user_dir, 'client.conf');
 
     no warnings;
     $QVD::Config::USE_DB = 0;
