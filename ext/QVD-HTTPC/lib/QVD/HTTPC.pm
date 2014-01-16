@@ -37,7 +37,7 @@ sub _create_socket {
 	#open my $err, ">>/tmp/qvd-httpc.err";
 	#$args{SSL_passwd_cb} = sub { print $err "user certificate requires password\n"; "foo" };
 	#print STDERR "ssl args:\n", Dumper \%args;
-        $s = IO::Socket::SSL->new(PeerAddr => $target, Blocking => 0, %args);
+        $s = eval { return IO::Socket::SSL->new(PeerAddr => $target, Blocking => 0, %args); };
         unless ($s) {
             # try again with the user customized CA certificates
             $args{SSL_ca_path}         = $self->{SSL_ca_path_alt};

@@ -12,7 +12,9 @@ BEGIN {
     $WINDOWS = ($^O eq 'MSWin32');
     $DARWIN = ($^O eq 'darwin');
 
-    $user_dir = File::Spec->rel2abs(File::Spec->join((getpwuid $>)[7] // $ENV{HOME}, '.qvd'));
+	$user_dir = File::Spec->rel2abs($WINDOWS
+								? File::Spec->join($ENV{APPDATA}, 'QVD')
+								: File::Spec->join((getpwuid $>)[7] // $ENV{HOME}, '.qvd'));
     mkdir($user_dir);
 
     set_core_cfg('client.log.filename', File::Spec->join($user_dir, 'qvd-client.log'))
