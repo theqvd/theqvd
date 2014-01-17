@@ -3,7 +3,7 @@ set PATH=%PATH%;"c:\Archivos de programa\Resource Hacker\";"c:\Program files\Res
 
 call exetype NX\nxproxy.exe WINDOWS
 
-call pp -x -gui ^
+call pp -vvv -x -gui ^
 -I ..\..\ext\IO-Socket-Forwarder\lib ^
 -I ..\..\ext\QVD-Config\lib ^
 -I ..\..\ext\QVD-Config-Core\lib ^
@@ -22,22 +22,11 @@ call pp -x -gui ^
 -l C:\strawberry\c\bin\ssleay32_.dll ^
 -l C:\strawberry\c\bin\zlib1_.dll ^
 -l C:\strawberry\perl\site\lib\auto\Crypt\OpenSSL\X509\X509.dll ^
---icon .\pixmaps\qvd.ico ^
 -o qvd-client-1.exe ^
 ..\..\ext\QVD-Client\bin\qvd-gui-client.pl
 
 reshacker -addoverwrite qvd-client-1.exe, qvd-client.exe, pixmaps\qvd.ico,icongroup,WINEXE,
 del qvd-client-1.exe
-
-call pp -x ^
--I ..\..\ext\QVD-Config\lib ^
--I ..\..\ext\QVD-Config-Core\lib ^
--I ..\..\ext\QVD-Client-SlaveClient\lib ^
--I ..\..\ext\QVD-HTTP\lib\ ^
--I ..\..\ext\QVD-HTTPC\lib ^
--I ..\..\ext\QVD-Log\lib ^
--o bin\qvd-slaveclient.exe ^
-..\..\ext\QVD-Client-SlaveClient\bin\qvd-slaveclient
 
 del ..\Output\*.* /q
 perl ..\script.pl >..\script.iss
