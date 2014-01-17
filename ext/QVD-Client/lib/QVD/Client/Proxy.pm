@@ -365,8 +365,11 @@ sub _run {
         my $pa_log = File::Spec->rel2abs("pulseaudio.log", $QVD::Client::App::user_dir);
         my $pa_cfg = File::Spec->rel2abs("default.pa", $QVD::Client::App::user_dir);
         
-        my @pa = (File::Spec->rel2abs($pa_bin, $QVD::Client::App::app_dir), # -D
-            "--high-priority", "-vvvv", "--log-target=file:/$pa_log" );
+        my @pa = (File::Spec->rel2abs($pa_bin, $QVD::Client::App::app_dir),
+            "--high-priority", "-vvvv");
+
+        # Current version of PulseAudio on Windows doesn't permit "file" target
+        push @pa, "--log-target=file:/$pa_log"  if ($DARWIN);
             
         if ( -f $pa_cfg ) {
 		DEBUG "Using config file $pa_cfg";
