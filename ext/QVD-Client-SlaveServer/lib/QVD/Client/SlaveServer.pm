@@ -15,16 +15,14 @@ use QVD::HTTP::StatusCodes qw(:all);
 use QVD::Config::Core qw(core_cfg);
 
 ## SFTP server
-my $command_sftp_server = core_cfg('command.sftp_server');
+my $command_sftp_server = 0; #core_cfg('command.sftp_server');
 
 sub new {
     my ($class) = @_;
-    my $self = {};
-    my $httpd = QVD::HTTPD->new();
-    $httpd->set_http_request_processor(\&handle_qvd,  GET => '/qvd/resources');
-    $httpd->set_http_request_processor(\&handle_get_shares, GET => '/shares/*');
-    $httpd->set_http_request_processor(\&handle_put_shares, PUT => '/shares/*');
-    $self->{httpd} = $httpd;
+    my $self = $class->SUPER::new();
+    $self->set_http_request_processor(\&handle_qvd,  GET => '/qvd/resources');
+    $self->set_http_request_processor(\&handle_get_shares, GET => '/shares/*');
+    $self->set_http_request_processor(\&handle_put_shares, PUT => '/shares/*');
     bless $self, $class;
     $self;
 }
