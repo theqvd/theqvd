@@ -19,7 +19,7 @@ BEGIN {
 }
 
 
-our $VERSION = '0.01';
+our $VERSION = '0.02';
 use QVD::Log;
 use QVD::HTTP::Headers qw(header_eq_check header_lookup);
 use QVD::HTTP::StatusCodes qw(:all);
@@ -35,9 +35,11 @@ my $socat = "/usr/bin/socat";
 sub new {
     my ($class) = @_;
     my $self = $class->SUPER::new();
-    $self->set_http_request_processor(\&handle_ping   , GET  => '/ping');
-    $self->set_http_request_processor(\&handle_version, GET  => '/version');
-    $self->set_http_request_processor(\&handle_connect, POST => '/tcp/connect/*');
+    $self->set_http_request_processor(\&handle_ping      , GET  => '/ping');
+    $self->set_http_request_processor(\&handle_version   , GET  => '/version');
+    $self->set_http_request_processor(\&handle_connect   , POST => '/tcp/connect/*');
+    $self->set_http_request_processor(\&handle_port_check, GET  => '/tcp/portcheck/*');
+
 
     bless $self, $class;
 }
@@ -89,6 +91,28 @@ sub handle_connect {
         die "Unable to exec: $^E";
     }
 }
+
+sub handle_port_check {
+    my ($self, $method, $url, $headers) = @_;
+
+    my $port = $self->_url_to_port($url);
+
+    unless ($port) {
+        $self->send_http_error(HTTP_BAD_REQUEST, "Bad port number");
+        return;
+    }
+
+    my $sock = new IO::Socket::INET( PeerAddr => 'localhost',
+                                     PeerPort => $port,
+                                     Proto    => 'tcp' );
+
+    if ( $sock ) {
+        $self->send_http_response(HTTP_OK);
+    } else {
+        $self->send_http_error(HTTP_FORBIDDEN, $!);
+    }
+}
+
 
 
 'QVD-Client'

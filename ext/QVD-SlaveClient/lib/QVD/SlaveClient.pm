@@ -113,6 +113,19 @@ sub forward_port {
 #    $SIG{CHLD} = sub { waitpid; }
 
 
+    my $httpc = $self->_make_httpc();
+
+    my ($code, $msg, $headers, $data) =
+        $httpc->make_http_request(GET => "/tcp/portcheck/$remote_side_port");
+
+    if ( $code != HTTP_OK ) {
+        my $err = "Can't connect to port $remote_side_port on the remote side: $data";
+        ERROR $err;
+        die $err;
+    }
+
+
+
     my $serv = new IO::Socket::INET( Listen    => 5,
                                      LocalAddr => 'localhost',
                                      LocalPort => $port,
@@ -127,7 +140,7 @@ sub forward_port {
         if ( $pid == 0 ) {
             INFO "Child started, connecting to port $remote_side_port on the remote side";
 
-            my $httpc = $self->_make_httpc();
+            $httpc = $self->_make_httpc();
 
             my ($code, $msg, $headers, $data) =
                  $httpc->make_http_request(POST => "/tcp/connect/$remote_side_port");
