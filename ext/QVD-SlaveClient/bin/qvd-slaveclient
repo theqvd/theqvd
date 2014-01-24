@@ -1,0 +1,31 @@
+#!/usr/lib/qvd/bin/perl
+
+use strict;
+use warnings;
+use FindBin;
+use lib "$FindBin::Bin/../lib";                                                                                                                                                  
+use QVD::SlaveClient;
+use Getopt::Long;
+
+
+my $c = QVD::SlaveClient->new('localhost:11100');
+my ($cmd_ping, $cmd_version, $cmd_listen);
+my ($clientside_port);
+
+GetOptions( "ping"              => \$cmd_ping,
+            "version"           => \$cmd_version,
+            "forward-port=s"    => \$cmd_listen,
+            "clientside-port=s" => \$clientside_port) or die "Getopt failed: $!";
+
+if ( $cmd_ping ) {
+	exit $c->ping;
+} elsif ( $cmd_version ) {
+	print $c->version;
+	exit 0;
+} elsif ( $cmd_listen ) {
+	$c->forward_port($cmd_listen, $clientside_port);
+	exit 0;
+}
+
+
+
