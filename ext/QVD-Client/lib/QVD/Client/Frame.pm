@@ -348,6 +348,7 @@ sub OnClickConnect {
         link          => core_cfg('client.force.link', 0) // core_cfg('client.link'),
         audio         => core_cfg('client.audio.enable'),
         printing      => core_cfg('client.printing.enable'),
+        usb           => core_cfg('client.usb.enable'),
         geometry      => core_cfg('client.geometry'),
         fullscreen    => core_cfg('client.fullscreen'),
         keyboard      => $self->DetectKeyboard,

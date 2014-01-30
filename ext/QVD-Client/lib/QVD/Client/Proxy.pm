@@ -31,6 +31,7 @@ sub new {
         audio           => delete $opts{audio},
         extra           => delete $opts{extra},
         printing        => delete $opts{printing},
+        usb             => delete $opts{usb},
         opts            => \%opts,
     };
     bless $self, $class;
@@ -278,6 +279,7 @@ sub connect_to_vm {
         'qvd.client.geometry'         => $opts->{geometry},
         'qvd.client.fullscreen'       => $opts->{fullscreen},
         'qvd.client.printing.enabled' => $self->{printing},
+        'qvd.client.usb.enabled'      => $self->{usb},
     );
 
     $q = join '&', map { uri_escape($_) .'='. uri_escape($o{$_}) } keys %o;
@@ -383,7 +385,59 @@ sub _run {
             ERROR("Pulseaudio failed to start");
         }
     }
-    
+
+     if ( core_cfg('client.slave.enable') && core_cfg('client.usb.enable') ) {
+        DEBUG "USB sharing enabled";
+        my $usbsrv = core_cfg('command.usbsrv');
+
+        if ( core_cfg('client.usb.share_all') ) {
+            DEBUG "USB autoshare enabled";
+            system($usbsrv, '-autoshare', 'on');
+        } else {
+            DEBUG "USB autoshare disabled";
+            system($usbsrv, '-autoshare', 'off');
+
+            my @usblist = `$usbsrv -list`;
+            chomp @usblist;
+            my (@unshare, $pid, $vid);
+
+            DEBUG "Getting shared USB devices";
+            foreach my $line ( @usblist ) {
+                if ( $line =~ /^\s*\d+:/ ) {
+                    undef $pid;
+                    undef $vid;
+                }
+
+                if ( $line =~ /Vid: ([a-f0-9]{4})\s+Pid: ([a-f0-9]{4})/i  ) {
+                    ($vid, $pid) = ($1, $2);
+                }
+
+                if ( $line =~ /^\s+Status:.*?shared/ && $pid && $vid ) {
+                    push @unshare, [$vid, $pid];
+                }
+            }
+            
+            DEBUG "Unsharing devices";
+            foreach my $dev (@unshare) {
+                my ($vid, $pid) = @$dev;
+                DEBUG "Unsharing VID $vid, PID $pid";
+                system($usbsrv, "-unshare", "-vid", $vid, "-pid", $pid) == 0
+                    or ERROR "Failed to unshare device with VID $vid, PID $pid";
+            }
+
+            my $tmp = core_cfg('client.usb.share_list', 0) // "";
+            $tmp =~ s/\s+//g;
+
+            DEBUG "Sharing devices: $tmp";
+            foreach my $dev ( split(/,/, $tmp) ) {
+                my ($vid, $pid) = split(/:/, $dev);
+
+                DEBUG "Sharing VID $vid PID $pid";
+                system($usbsrv, "-share", "-vid", $vid, "-pid", $pid) == 0 or ERROR "Failed to share device with VID $vid, PID $pid";
+            }
+        }
+    }
+   
     
     $o{media} = 4713 if $self->{audio};
 
@@ -464,7 +518,6 @@ sub _run {
         use constant FIONBIO => 0x8004667e;
         ioctl($local_socket, FIONBIO, \$nonblocking);
     }
-
 
     DEBUG("Forwarding sockets\n");
     $self->{client_delegate}->proxy_connection_status('FORWARDING');
