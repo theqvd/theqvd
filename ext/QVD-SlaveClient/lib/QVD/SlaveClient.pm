@@ -5,7 +5,6 @@ use strict;
 use warnings FATAL => 'all';
 
 
-
 use QVD::Config::Core qw(core_cfg);
 use QVD::HTTPC;
 use QVD::HTTP::StatusCodes qw(:status_codes);
@@ -13,7 +12,7 @@ use IO::Socket::INET;
 use IO::Socket::Forwarder qw(forward_sockets);
 use QVD::Log;
 use feature 'switch';
-
+use POSIX qw(setsid);
 
 =head1 NAME
 
@@ -44,6 +43,16 @@ Perhaps a little code snippet.
 A list of functions that can be exported.  You can delete this section
 if you don't export anything, such as for a purely object-oriented module.
 
+=head1 GETTERS/SETTERS
+
+=head2 usb_port
+
+Port used for USB over IP. This is port to listen on the VM side.
+
+=head2 remote_usb_port
+
+Port used for USB over IP. This is the port the daemon listens on the client side.
+
 =head1 SUBROUTINES/METHODS
 
 =cut
@@ -51,8 +60,10 @@ if you don't export anything, such as for a purely object-oriented module.
 sub new {
     my ($class, $target, %opts) = @_;
     my $self = {
-        target => $target,
-        opts   => \%opts
+        target          => $target,
+        opts            => \%opts,
+        usb_port        => 32033,
+        remote_usb_port => 32032,
 
     };
     bless $self, $class;
@@ -106,13 +117,14 @@ on the client side.
 =cut
 
 sub forward_port {
-    my ($self, $port, $remote_side_port) = @_;
+    my ($self, $port, $remote_side_port, %opts) = @_;
 
 
     my %children;
 #    $SIG{CHLD} = sub { waitpid; }
 
 
+    DEBUG "Verifying connectivity";
     my $httpc = $self->_make_httpc();
 
     my ($code, $msg, $headers, $data) =
@@ -125,6 +137,7 @@ sub forward_port {
     }
 
 
+    INFO "Forwarding local port $port to remote port $remote_side_port";
 
     my $serv = new IO::Socket::INET( Listen    => 5,
                                      LocalAddr => 'localhost',
@@ -132,6 +145,10 @@ sub forward_port {
                                      Proto     => 'tcp' );
 
     die "Failed to listen on port $port: $!" unless ($serv);
+
+
+    $SIG{CHLD} = 'IGNORE';
+    _daemonize( _mk_pidname( ($opts{_name} // "forward_port") . "_$port" ));
 
     while( my $socket = $serv->accept() ) {
 
@@ -165,12 +182,94 @@ sub forward_port {
     return 0;
 }
 
+=head2 forward_usb
+
+Set up USB forwarding.
+
+Forwards the USB port to the client side. Only works if USB forwarding is configured on
+the client.
+
+The client side decides what devices are shared.
+
+=cut
+
+sub forward_usb {
+	my ($self) = @_;
+        INFO "Forwarding USB";
+        DEBUG "Setting up port forwarding";
+	$self->forward_port($self->{usb_port}, $self->{remote_usb_port}, _name => 'forward_usb');
+
+	DEBUG "Setting up USB";
+	_run($self->usbclnt, "-addserver", "localhost:" . $self->{usb_port});
+	_run($self->usbclnt, "-autoconnect", "on", "localhost:" . $self->{usb_port});
+	
+	DEBUG "USB setup done";
+}
 
 sub _make_httpc {
     my $self = shift;
 
     return QVD::HTTPC->new($self->{target}, %{$self->{opts}})
 }
+
+
+sub _mk_pidname {
+	my ($name) = @_;
+
+	my $dir = "$ENV{HOME}/.qvd";
+	mkdir($dir);
+
+	return "$dir/qvd-slaveclient_$name.pid";
+	
+}
+
+sub _daemonize {
+	my $pidfile = shift;
+
+	DEBUG "Daemonizing";
+	local $SIG{HUP} = 'IGNORE';
+	local $SIG{TERM} = 'IGNORE';
+
+	my $pid = fork();
+	LOGDIE "fork failed" if ( $pid < 0 );
+	exit(0) if ( $pid );
+
+	POSIX::setsid();
+
+	DEBUG "Now running as pid $$";
+	open(my $pidfh, '>', $pidfile) or LOGDIE "Can't create pidfile $pidfile: $!";
+	print $pidfh "$$\n";
+	close($pidfh);
+	DEBUG "Wrote pid file $pidfile";
+	return;
+}
+
+sub _run {
+	my (@args) = @_;
+
+	my $cmd = join(' ', @args);
+
+	DEBUG "Running: $cmd";
+
+	system(@args);
+
+	if ($? == -1) {
+		ERROR "failed to execute '$cmd': $!\n";
+	} elsif ($? & 127) {
+		ERROR sprintf("'$cmd' died with signal %d, %s coredump\n",
+		             ($? & 127),  ($? & 128) ? 'with' : 'without');
+	} else {
+		if ( $? >> 8 ) {
+			ERROR sprintf("'$cmd' exited with value %d\n", $? >> 8);
+		} else {
+			DEBUG "'$cmd' exited successfully";
+			return 1;
+		}
+	}
+
+	return;
+}
+
 
 =head1 AUTHOR
 
