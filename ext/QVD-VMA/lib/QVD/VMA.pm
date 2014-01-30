@@ -60,6 +60,7 @@ my $groupadd        = cfg('command.groupadd');
 my $useradd         = cfg('command.useradd');
 my $userdel         = cfg('command.userdel');
 my $groupdel        = cfg('command.groupdel');
+my $slaveclient     = cfg('command.slaveclient');
 
 my $default_user_name   = cfg('vma.user.default.name');
 my $default_user_groups = cfg('vma.user.default.groups');
@@ -460,7 +461,10 @@ sub _fork_monitor {
 			DEBUG "Session $1, calling hooks";
 			_save_nxagent_state_and_call_hook lc $1;
 		    }
-
+                    when (/Listening to slave connections on port '(\d+)'/) {
+                        DEBUG "Slave channel opened";
+                        _start_usb($1) if ( $props{'qvd.client.usb.enabled' } );
+                    }
 		}
 		print $line;
 	    }
@@ -660,6 +664,14 @@ sub _vnc_connect {
     eval { exec($x11vnc, -display => ":$display", '-inetd') };
     ERROR "unable to start x11vnc: $!";
     POSIX::_exit(-1);
+}
+
+sub _start_usb {
+    my ($port) = @_;
+    DEBUG "Starting USB";
+    my @cmd = ($slaveclient, "--forward-usb");
+
+    system(@cmd) == 0 or ERROR "Failed to execute " . join(' ', @cmd) . ": $?";
 }
 
 ################################ RPC methods ######################################
