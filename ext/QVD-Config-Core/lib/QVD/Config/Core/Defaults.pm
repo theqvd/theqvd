@@ -122,6 +122,10 @@ command.darwin.nxproxy = bin/nxproxy
 command.darwin.pulseaudio = bin/pulseaudio
 command.darwin.sftp-server = /usr/libexec/sftp-server
 
+command.usbsrv = /usr/local/bin/usbsrv
+command.usbclnt = /usr/local/bin/usbclnt
+command.slaveclient = /usr/lib/qvd/bin/qvd-slaveclient
+
 ## whether to remember password after successful connection
 client.remember_password = 0
 
@@ -170,6 +174,16 @@ client.darwin.screen_resolution.min=1440x900
 ## Geometry to use when the screen is low resolution
 client.darwin.screen_resolution.low_res_geometry=800x600
 
+# Enable USB sharing
+client.usb.enable = 0
+
+# Share all USB devices automatically (most of the time not a good idea)
+client.usb.share_all = 0
+
+# List of USB devices to share with the VM. 
+# Syntax: VID:PID, comma separated. Spaces are allowed. For example:
+# 0441:0012, 1234:5678
+client.usb.share_list =
 
 
 ## umask for the L7R process
