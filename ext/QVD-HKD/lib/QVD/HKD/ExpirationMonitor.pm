@@ -36,7 +36,8 @@ sub _load_vm_expirations {
                   <<'EOQ', $self->{node_id});
 select vm_id,
        (vm_expiration_hard < now()) as hard,
-       vm_expiration_soft, vm_expiration_hard
+       vm_expiration_soft, vm_expiration_hard,
+       now() as really_now,
     from vm_runtimes
     where vm_state = 'running'
       and ( vm_expiration_soft < now()
@@ -50,9 +51,10 @@ sub _expire_vms {
     my $self = shift;
     for (@{$self->{vms_to_be_expired}}) {
         DEBUG join('', map { $_ // '<undef>' }
-                   "VM is expired ", $_->{hard},
+                   "VM is expired, hard: ", $_->{hard},
                    ", expiration_soft: ", $_->{vm_expiration_soft},
-                   ", expiration_hard: ", $_->{vm_expiration_hard});
+                   ", expiration_hard: ", $_->{vm_expiration_hard},
+                   ", now: ", $_->{really_now});
         $self->_maybe_callback(on_expired_vm => @{$_}{qw(vm_id hard vm_expiration_soft vm_expiration_hard)});
     }
 }
