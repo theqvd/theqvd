@@ -37,7 +37,7 @@ sub _load_vm_expirations {
 select vm_id,
        (vm_expiration_hard < now()) as hard,
        vm_expiration_soft, vm_expiration_hard,
-       now() as really_now,
+       now() as really_now
     from vm_runtimes
     where vm_state = 'running'
       and ( vm_expiration_soft < now()
