@@ -34,6 +34,9 @@ void help(const char *program)
 	 "  %s : Specifies the password, if not specified with -w\n"
 	 "  %s : Enables debugging, can also be enabled with -d\n"
 	 "  %s : Enables the file were debugging should go to\n"
+	 "  DISPLAY : Needed to be correctly setup. In some environments you might need to run one of the following:\n"
+	 "            export DISPLAY=localhost:0; xhost + localhost\n"
+	 "            xhost +si:localuser:$LOGNAME\n"
 	 "\nChangelog:\n%s\n", 
 	 program, QVDHOST_ENV, QVDLOGIN_ENV, QVDPASSWORD_ENV,
 	 QVDHOST_ENV, QVDLOGIN_ENV, QVDPASSWORD_ENV, DEBUG_FLAG_ENV_VAR_NAME, DEBUG_FILE_ENV_VAR_NAME,
