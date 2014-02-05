@@ -1,0 +1,46 @@
+Source: vnc4
+Section: x11
+Priority: optional
+Maintainer: Ubuntu Developers <ubuntu-devel-discuss@lists.ubuntu.com>
+XSBC-Original-Maintainer: Ola Lundqvist <opal@debian.org>
+Build-Depends: debhelper (>= 4.0.0), perl, zlib1g-dev, xutils, libx11-dev, libxtst-dev, x11proto-core-dev, libxext-dev
+Standards-Version: 3.7.2
+
+Package: vnc4server
+Architecture: any
+Depends: ${shlibs:Depends}, ${misc:Depends}, xbase-clients, x11-common | xserver-common
+Provides: vnc-server, xserver
+Recommends: xfonts-base
+Conflicts: vnc4-common
+Suggests: vnc-java
+Description: Virtual network computing server software
+ VNC stands for Virtual Network Computing. It is, in essence, a remote
+ display system which allows you to view a computing `desktop' environment
+ not only on the machine where it is running, but from anywhere on the
+ Internet and from a wide variety of machine architectures.
+ .
+ This package provides a vncserver to which X clients can connect and the
+ server generates a display that can be viewed with a vncviewer.
+ .
+ It contains an X server connector so clients can connect to your local X
+ desktop directly.
+ .
+ Note: This server does not need a display. You need a vncviewer to see
+ something. This viewer may also be on a computer running other operating
+ systems.
+
+Package: xvnc4viewer
+Section: net
+Architecture: any
+Provides: vnc-viewer
+Depends: ${shlibs:Depends}, ${misc:Depends}
+Description: Virtual network computing client software for X
+ VNC stands for Virtual Network Computing. It is, in essence, a remote
+ display system which allows you to view a computing `desktop' environment
+ not only on the machine where it is running, but from anywhere on the
+ Internet and from a wide variety of machine architectures.
+ .
+ It is implemented in a client/server model. This package provides a vncclient
+ for X, with this you can connect to a vncserver somewhere in the network
+ and display its content in a window. There are vncservers available for other
+ operating systems.

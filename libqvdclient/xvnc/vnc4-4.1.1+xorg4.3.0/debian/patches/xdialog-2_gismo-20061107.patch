@@ -1,0 +1,41 @@
+--- vnc4-4.1.1+X4.3.0_gismo-1/unix/vncviewer/CConn.cxx	2006-11-07 18:15:41.000000000 +0100
++++ vnc4-4.1.1+X4.3.0_gismo-2/unix/vncviewer/CConn.cxx	2006-11-07 18:17:26.000000000 +0100
+@@ -211,7 +211,7 @@
+     return;
+   }
+ 
+-  int popup = popupUserPassDialog;
++  int popup = popupXDialog;
+   if (!popup) {
+     if (user) {
+       /* Get username */
+
+--- vnc4-4.1.1+X4.3.0_gismo-1/unix/vncviewer/parameters.h	2006-11-07 18:14:28.000000000 +0100
++++ vnc4-4.1.1+X4.3.0_gismo-2/unix/vncviewer/parameters.h	2006-11-07 18:18:23.000000000 +0100
+@@ -37,7 +37,7 @@
+ extern rfb::BoolParameter sendPrimary;
+ extern rfb::BoolParameter fullScreen;
+ extern rfb::StringParameter geometry;
+-extern rfb::BoolParameter popupUserPassDialog;
++extern rfb::BoolParameter popupXDialog;
+ 
+ extern char aboutText[];
+ extern char* programName;
+
+--- vnc4-4.1.1+X4.3.0_gismo-1/unix/vncviewer/vncviewer.cxx	2006-11-07 18:14:28.000000000 +0100
++++ vnc4-4.1.1+X4.3.0_gismo-2/unix/vncviewer/vncviewer.cxx	2006-11-07 18:20:42.000000000 +0100
+@@ -93,10 +93,10 @@
+ 
+ BoolParameter listenMode("listen", "Listen for connections from VNC servers",
+                          false);
+-BoolParameter popupUserPassDialog("PasswordDialog",
+-				  "Popup a user and password dialog. Default "
+-				  "no when running from command line",
+-				  !isatty(0));
++BoolParameter popupXDialog("XDialog",
++                           "Popup a user and password dialog. Default "
++                           "no when running from command line",
++                           !isatty(0));
+ StringParameter geometry("geometry", "X geometry specification", "");
+ StringParameter displayname("display", "The X display", "");
+ 

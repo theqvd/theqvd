@@ -1,0 +1,208 @@
+#!/usr/bin/make -f
+# -*- makefile -*-
+# Sample debian/rules that uses debhelper.
+#
+# This file was originally written by Joey Hess and Craig Small.
+# As a special exception, when this file is copied by dh-make into a
+# dh-make output file, you may use that output file without restriction.
+# This special exception was added by Craig Small in version 0.37 of dh-make.
+#
+# Modified to make a template file for a multi-binary package with separated
+# build-arch and build-indep targets  by Bill Allombert 2001
+
+# Uncomment this to turn on verbose mode.
+#export DH_VERBOSE=1
+
+# This has to be exported to make some magic below work.
+export DH_OPTIONS
+
+
+
+CFLAGS = -Wall -g
+CXXFLAGS = -Wall -g
+
+ifneq (,$(findstring noopt,$(DEB_BUILD_OPTIONS)))
+	CFLAGS += -O0
+	CXXFLAGS += -O0
+else
+	CFLAGS += -O2
+endif
+
+configure: configure-unix-stamp configure-common-stamp
+
+configure-common-stamp:
+	dh_testdir
+	# Add here commands to configure the package.
+	(cd common; CFLAGS="$(CFLAGS)" CXXFLAGS="$(CXXFLAGS)" ./configure \
+		--host=$(DEB_HOST_GNU_TYPE) --build=$(DEB_BUILD_GNU_TYPE) \
+		--prefix=/usr --mandir=\$${prefix}/share/man \
+		--infodir=\$${prefix}/share/info \
+		--with-installed-zlib)
+	touch configure-common-stamp
+
+configure-unix-stamp:
+	dh_testdir
+	# Add here commands to configure the package.
+	(cd unix; CFLAGS="$(CFLAGS)" CXXFLAGS="$(CXXFLAGS)" ./configure \
+		--host=$(DEB_HOST_GNU_TYPE) --build=$(DEB_BUILD_GNU_TYPE) \
+		--prefix=/usr --mandir=\$${prefix}/share/man \
+		--infodir=\$${prefix}/share/info \
+		--with-installed-zlib)
+	touch configure-unix-stamp
+
+#Architecture 
+build: build-arch build-indep
+
+build-arch: build-arch-unix-stamp build-arch-common-stamp build-arch-x-stamp
+
+build-arch-x-stamp: build-arch-common-stamp build-arch-unix-stamp
+	(cd unix/xc; make World)
+	touch build-arch-x-stamp
+
+build-arch-common-stamp: configure-common-stamp 
+	(cd common; $(MAKE))
+	touch build-arch-common-stamp
+
+build-arch-unix-stamp: configure-unix-stamp build-arch-common-stamp
+	(cd unix; $(MAKE))
+	touch build-arch-unix-stamp
+
+build-indep: build-indep-stamp
+build-indep-stamp:
+	# Add here commands to compile the indep part of the package.
+	#$(MAKE) doc
+	touch build-indep-stamp
+
+clean:
+	dh_testdir
+	dh_testroot
+	rm -f build-arch-common-stamp build-arch-unix-stamp build-arch-x-stamp build-indep-stamp configure-unix-stamp configure-common-stamp #CONFIGURE-STAMP#
+	# Add here commands to clean up after the build process.
+	-rm -f config.log config.status config.cache config.guess config.sub
+	-(cd unix/xc; $(MAKE) clean)
+	-(cd unix/xc; $(MAKE) distclean)
+	-(cd common; $(MAKE) clean)
+	-(cd common; $(MAKE) distclean)
+	-(cd unix; $(MAKE) clean)
+	-(cd unix; $(MAKE) distclean)
+	-rm -f \
+		unix/tx/Makefile \
+		unix/vncconfig/Makefile \
+		unix/vncpasswd/Makefile \
+		unix/vncviewer/Makefile \
+		unix/x0vncserver/Makefile \
+		unix/Makefile \
+		common/Xregion/Makefile \
+		common/network/Makefile \
+		common/rdr/Makefile \
+		common/rfb/Makefile \
+		common/Makefile
+	-rm -f unix/config.log unix/config.cache unix/config.status
+	-rm -f common/config.log common/config.cache common/config.status
+	dh_clean 
+
+install: install-indep install-arch
+install-indep:
+#	dh_testdir
+#	dh_testroot
+#	dh_clean -k -i 
+#	dh_installdirs -i
+#
+#	# Add here commands to install the indep part of the package into
+#	# debian/<package>-doc.
+#	#INSTALLDOC#
+#	dh_install -i
+
+install-arch:
+	dh_testdir
+	dh_testroot
+	dh_clean -k -s 
+	dh_installdirs -s
+
+	# Add here commands to install the arch part of the package into 
+	# debian/tmp.
+	#$(MAKE) install DESTDIR=$(CURDIR)/debian/vnc4
+	mkdir -p $(CURDIR)/debian/tmp/usr/bin
+	mkdir -p $(CURDIR)/debian/tmp/usr/share/man/man1
+	mkdir -p $(CURDIR)/debian/tmp/usr/lib/xorg/modules/extensions
+	(cd unix; ./vncinstall \
+		$(CURDIR)/debian/tmp/usr/bin \
+		$(CURDIR)/debian/tmp/usr/share/man \
+		$(CURDIR)/debian/tmp/usr/lib/xorg/modules/extensions)
+	rename "s/vncviewer/xvncviewer/;" \
+		debian/tmp/usr/bin/* \
+		debian/tmp/usr/share/man/man1/*
+	rename "s/vnc/vnc4/;" \
+		debian/tmp/usr/bin/* \
+		debian/tmp/usr/share/man/man1/*
+	-rm -f	debian/tmp/usr/lib/xorg/modules/extensions/*vnc.so
+	dh_install -s
+
+# Must not depend on anything. This is to be called by
+# binary-arch/binary-indep
+# in another 'make' thread.
+binary-common:
+
+# Build architecture independant packages using the common target.
+binary-indep: build-indep install-indep
+
+binary-indep-for-later:
+	dh_testdir -i
+	dh_testroot -i
+	dh_installchangelogs -i
+	dh_installdocs -i
+	dh_installexamples -i
+	dh_installmenu -i
+#	dh_installdebconf	
+#	dh_installlogrotate	
+#	dh_installemacsen
+#	dh_installpam
+#	dh_installmime
+#	dh_installinit
+#	dh_installcron
+#	dh_installinfo
+	dh_installman -i
+	dh_link -i
+	dh_compress -i 
+	dh_fixperms -i
+#	dh_perl
+#	dh_python
+#	dh_makeshlibs -i
+	dh_installdeb -i
+#	dh_shlibdeps
+	dh_gencontrol -i
+	dh_md5sums -i
+	dh_builddeb -i
+
+# Build architecture dependant packages using the common target.
+binary-arch: build-arch install-arch
+	dh_testdir -a
+	dh_testroot -a
+	dh_installchangelogs -a
+	dh_installdocs -a
+	dh_installexamples -a
+	dh_installmenu -a
+#	dh_installdebconf	
+#	dh_installlogrotate	
+#	dh_installemacsen
+#	dh_installpam
+#	dh_installmime
+#	dh_installinit
+#	dh_installcron
+#	dh_installinfo
+	dh_installman -a
+	dh_link -a
+	dh_compress -a
+	dh_fixperms -a
+#	dh_perl
+#	dh_python
+	dh_strip -a
+	dh_makeshlibs -a
+	dh_installdeb -a
+	dh_shlibdeps -a
+	dh_gencontrol -a
+	dh_md5sums -a
+	dh_builddeb -a
+
+binary: binary-arch binary-indep
+.PHONY: build clean binary-indep binary-arch binary install install-indep install-arch configure

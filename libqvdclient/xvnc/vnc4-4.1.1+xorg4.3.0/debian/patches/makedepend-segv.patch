@@ -1,0 +1,25 @@
+--- unix/xc/config/makedepend/ifparser.c.orig	2006-09-06 08:25:51.847400000 +0200
++++ unix/xc/config/makedepend/ifparser.c	2006-09-06 08:26:23.961407000 +0200
+@@ -296,12 +296,20 @@
+ 
+       case '/':
+ 	DO (cp = parse_product (g, cp + 1, &rightval));
+-	*valp = (*valp / rightval);
++	if (rightval == 0) {
++		*valp = 0;
++	} else {
++		*valp = (*valp / rightval);
++	}
+ 	break;
+ 
+       case '%':
+ 	DO (cp = parse_product (g, cp + 1, &rightval));
+-	*valp = (*valp % rightval);
++	if (rightval == 0) {
++	      	*valp = 0;
++        } else {
++		*valp = (*valp % rightval);
++	}
+ 	break;
+     }
+     return cp;

@@ -1,0 +1,22 @@
+--- common/rfb/Password.cxx~	2005-03-11 12:08:41.000000000 -0300
++++ common/rfb/Password.cxx	2006-03-09 16:09:13.000000000 -0300
+@@ -35,6 +35,9 @@
+ 
+ PlainPasswd::PlainPasswd() {}
+ 
++PlainPasswd::PlainPasswd(int len) : CharArray(len) {
++}
++
+ PlainPasswd::PlainPasswd(char* pwd) : CharArray(pwd) {
+ }
+ 
+--- common/rfb/Password.h~	2005-03-11 12:08:41.000000000 -0300
++++ common/rfb/Password.h	2006-03-09 16:08:55.000000000 -0300
+@@ -27,6 +27,7 @@
+   class PlainPasswd : public CharArray {
+   public:
+     PlainPasswd();
++    PlainPasswd(int l);
+     PlainPasswd(char* pwd);
+     PlainPasswd(const ObfuscatedPasswd& obfPwd);
+     ~PlainPasswd();

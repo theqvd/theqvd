@@ -1,0 +1,417 @@
+diff -urN vnc4-4.1.1+X4.3.0/unix/xc/programs/Xserver/randr/randr.c vnc4-4.1.1+X4.3.0+RANDR/unix/xc/programs/Xserver/randr/randr.c
+--- vnc4-4.1.1+X4.3.0/unix/xc/programs/Xserver/randr/randr.c	2003-02-08 06:52:30.000000000 +0300
++++ vnc4-4.1.1+X4.3.0+RANDR/unix/xc/programs/Xserver/randr/randr.c	2006-06-03 16:34:48.000000000 +0400
+@@ -726,10 +726,31 @@
+      * timestamp, then the config information isn't up-to-date and
+      * can't even be validated
+      */
++    /* A DIRTY WORKAROUND.
++     * Looks like under some reasons, this test fails, although 32bit timestamp
++     * passed in stuff->configTimestamp is exactly the same as was returned
++     * in RRGetScreenInfo just before. So 'months' parts differ. Maybe
++     * some bug elsewhere, causing 'months' jump? Or maybe it could happen
++     * if enough time passed since previous configuration? I'm afraid that
++     * both have happened here ...
++     * Since I have no time to investigate details, I'm just replacing this
++     * with 32bit compare. Probability of config times that differ only
++     * in months is extremely low ... */
+     if (CompareTimeStamps (configTime, pScrPriv->lastConfigTime) != 0)
+     {
+-	rep.status = RRSetConfigInvalidConfigTime;
+-	goto sendReply;
++	if (pScrPriv->lastConfigTime.milliseconds == stuff->configTimestamp)
++	{
++	    ErrorF("Point X: last: %lu %lu, new: %lu %lu\n",
++			    pScrPriv->lastConfigTime.months,
++			    pScrPriv->lastConfigTime.milliseconds,
++			    configTime.months,
++			    configTime.milliseconds);
++	}
++	else
++	{
++	    rep.status = RRSetConfigInvalidConfigTime;
++	    goto sendReply;
++	}
+     }
+     
+     /*
+diff -urN vnc4-4.1.1+X4.3.0/unix/xc/programs/Xserver/vnc/vncHooks.cc vnc4-4.1.1+X4.3.0+RANDR/unix/xc/programs/Xserver/vnc/vncHooks.cc
+--- vnc4-4.1.1+X4.3.0/unix/xc/programs/Xserver/vnc/vncHooks.cc	2006-06-03 16:14:57.000000000 +0400
++++ vnc4-4.1.1+X4.3.0+RANDR/unix/xc/programs/Xserver/vnc/vncHooks.cc	2006-06-03 16:14:30.000000000 +0400
+@@ -1530,3 +1530,11 @@
+ 
+   vncHooksScreen->desktop->add_changed(changed.reg);
+ }
++
++void vncHooksResizeScreen(ScreenPtr pScreen)
++{
++  vncHooksScreenPtr vncHooksScreen
++    = ((vncHooksScreenPtr)pScreen->devPrivates[vncHooksScreenIndex].ptr);
++
++  vncHooksScreen->desktop->setSize(pScreen->width, pScreen->height);
++}
+diff -urN vnc4-4.1.1+X4.3.0/unix/xc/programs/Xserver/vnc/XserverDesktop.cc vnc4-4.1.1+X4.3.0+RANDR/unix/xc/programs/Xserver/vnc/XserverDesktop.cc
+--- vnc4-4.1.1+X4.3.0/unix/xc/programs/Xserver/vnc/XserverDesktop.cc	2005-03-11 18:08:41.000000000 +0300
++++ vnc4-4.1.1+X4.3.0+RANDR/unix/xc/programs/Xserver/vnc/XserverDesktop.cc	2006-06-03 16:14:30.000000000 +0400
+@@ -193,6 +193,9 @@
+   else
+     data = new rdr::U8[pScreen->width * pScreen->height * (format.bpp/8)];
+   colourmap = this;
++#ifdef RANDR
++  initialWidth = width_;
++#endif
+ 
+   serverReset(pScreen);
+ 
+@@ -714,7 +717,11 @@
+   grabbing = true;
+ 
+   int bytesPerPixel = format.bpp/8;
++#ifdef RANDR
++  int bytesPerRow = initialWidth * bytesPerPixel;
++#else
+   int bytesPerRow = pScreen->width * bytesPerPixel;
++#endif
+ 
+   std::vector<rfb::Rect> rects;
+   std::vector<rfb::Rect>::iterator i;
+diff -urN vnc4-4.1.1+X4.3.0/unix/xc/programs/Xserver/vnc/XserverDesktop.h vnc4-4.1.1+X4.3.0+RANDR/unix/xc/programs/Xserver/vnc/XserverDesktop.h
+--- vnc4-4.1.1+X4.3.0/unix/xc/programs/Xserver/vnc/XserverDesktop.h	2005-03-11 18:08:41.000000000 +0300
++++ vnc4-4.1.1+X4.3.0+RANDR/unix/xc/programs/Xserver/vnc/XserverDesktop.h	2006-06-03 16:14:30.000000000 +0400
+@@ -68,6 +68,12 @@
+   void addClient(network::Socket* sock, bool reverse);
+   void disconnectClients();
+ 
++#ifdef RANDR
++  void setSize(int w, int h) {
++    width_ = w; height_ = h; server->setPixelBuffer(this);
++  }
++#endif
++  
+   // QueryConnect methods called from X server code
+   // getQueryTimeout()
+   //   Returns the timeout associated with a particular
+@@ -126,5 +132,9 @@
+   void* queryConnectId;
+   rfb::CharArray queryConnectAddress;
+   rfb::CharArray queryConnectUsername;
++#ifdef RANDR
++  int initialWidth;
++  int getStride() const { return initialWidth; }
++#endif
+ };
+ #endif
+diff -urN vnc4-4.1.1+X4.3.0/unix/xc/programs/Xserver/vnc/Xvnc/Imakefile vnc4-4.1.1+X4.3.0+RANDR/unix/xc/programs/Xserver/vnc/Xvnc/Imakefile
+--- vnc4-4.1.1+X4.3.0/unix/xc/programs/Xserver/vnc/Xvnc/Imakefile	2006-06-03 16:14:57.000000000 +0400
++++ vnc4-4.1.1+X4.3.0+RANDR/unix/xc/programs/Xserver/vnc/Xvnc/Imakefile	2006-06-03 16:14:30.000000000 +0400
+@@ -44,7 +44,8 @@
+ 
+ INCLUDES = -I. -I.. -I$(XBUILDINCDIR) -I$(FONTINCSRC) $(FB_DEFINES) \
+ 	   $(FBINCLUDE) -I../../mfb -I../../mi -I../../include -I../../os  \
+-           -I$(EXTINCSRC) -I$(XINCLUDESRC)  -I$(SERVERSRC)/render $(VNCINCLUDE)
++           -I$(EXTINCSRC) -I$(XINCLUDESRC)  -I$(SERVERSRC)/render \
++	   -I$(SERVERSRC)/randr $(VNCINCLUDE)
+ 
+ DEFINES = $(OS_DEFINES) $(SHMDEF) $(MMAPDEF) \
+           $(VENDOR_STRING) $(VENDOR_RELEASE) $(STD_DEFINES) ServerOSDefines \
+diff -urN vnc4-4.1.1+X4.3.0/unix/xc/programs/Xserver/vnc/Xvnc/xvnc.cc vnc4-4.1.1+X4.3.0+RANDR/unix/xc/programs/Xserver/vnc/Xvnc/xvnc.cc
+--- vnc4-4.1.1+X4.3.0/unix/xc/programs/Xserver/vnc/Xvnc/xvnc.cc	2006-06-03 16:14:57.000000000 +0400
++++ vnc4-4.1.1+X4.3.0+RANDR/unix/xc/programs/Xserver/vnc/Xvnc/xvnc.cc	2006-06-03 16:14:30.000000000 +0400
+@@ -107,6 +107,16 @@
+ #define VFB_DEFAULT_LINEBIAS 0
+ #define XWD_WINDOW_NAME_LEN 60
+ 
++#ifdef RANDR
++
++extern "C" {
++#include <randrstr.h>
++}
++
++#define RR_MAX_SCREEN_SIZES	8
++typedef struct { int width, height; } rrScreenSize;
++#endif
++
+ typedef struct
+ {
+   int scrnum;
+@@ -127,7 +137,10 @@
+   Bool pixelFormatDefined;
+   Bool rgbNotBgr;
+   int redBits, greenBits, blueBits;
+-
++#ifdef RANDR
++  int rrScreenSizesDefined;
++  rrScreenSize rrScreenSizes[RR_MAX_SCREEN_SIZES];
++#endif
+ } vfbScreenInfo, *vfbScreenInfoPtr;
+ 
+ static int vfbNumScreens;
+@@ -175,6 +188,11 @@
+     vfbScreens[i].lineBias = VFB_DEFAULT_LINEBIAS;
+     vfbScreens[i].pixelFormatDefined = FALSE;
+     vfbScreens[i].pfbMemory = NULL;
++#ifdef RANDR
++    vfbScreens[i].rrScreenSizesDefined = 0;
++    vfbScreens[i].rrScreenSizes[0].width = VFB_DEFAULT_WIDTH;
++    vfbScreens[i].rrScreenSizes[0].height = VFB_DEFAULT_HEIGHT;
++#endif
+   }
+   vfbNumScreens = 1;
+ }
+@@ -406,11 +424,45 @@
+   if (strcmp(argv[i], "-geometry") == 0)
+   {
+     if (++i >= argc) UseMsg();
++#ifdef RANDR
++    if (vfbScreens[0].rrScreenSizesDefined == RR_MAX_SCREEN_SIZES)
++    {
++      ErrorF("Too many modes\n");
++      UseMsg();
++    }
++    else
++    {
++      rrScreenSize *rrss;
++      rrss = &(vfbScreens[0].rrScreenSizes[vfbScreens[0].rrScreenSizesDefined]);
++      if (sscanf(argv[i], "%dx%d", &rrss->width, &rrss->height) != 2 ||
++	  rrss->width <= 32 && rrss->height <= 32) {
++	ErrorF("Invalid geometry %s\n", argv[i]);
++	UseMsg();
++      }
++      else
++      {
++	if (vfbScreens[0].rrScreenSizesDefined == 0) {
++	  vfbScreens[0].width = rrss->width;
++	  vfbScreens[0].height = rrss->height;
++	}
++	else
++	{
++	  if (vfbScreens[0].width < rrss->width)
++	    vfbScreens[0].width = rrss->width;
++	  if (vfbScreens[0].height < rrss->height)
++	    vfbScreens[0].height = rrss->height;
++	}
++
++	vfbScreens[0].rrScreenSizesDefined++;
++      }
++    }
++#else
+     if (sscanf(argv[i],"%dx%d",&vfbScreens[0].width,
+                &vfbScreens[0].height) != 2) {
+       ErrorF("Invalid geometry %s\n", argv[i]);
+       UseMsg();
+     }
++#endif
+     return 2;
+   }
+ 
+@@ -820,6 +872,189 @@
+   miPointerWarpCursor
+ };
+ 
++#ifdef RANDR
++
++static Bool vncRandRGetInfo (ScreenPtr pScreen, Rotation *rotations)
++{
++  vfbScreenInfoPtr pvfb = &vfbScreens[pScreen->myNum];
++  int dpi = monitorResolution ? monitorResolution : 100;
++  int i;
++
++  if (pvfb->rrScreenSizesDefined == 0)
++    pvfb->rrScreenSizesDefined = 1;	/* case without -geometry */
++
++  for (i = 0; i < pvfb->rrScreenSizesDefined; i++)
++  {
++    RRScreenSizePtr pSize;
++
++    pSize = RRRegisterSize(pScreen,
++		pvfb->rrScreenSizes[i].width, pvfb->rrScreenSizes[i].height,
++		pScreen->mmWidth, pScreen->mmHeight);
++    if (!pSize)
++      return FALSE;
++    RRRegisterRate(pScreen, pSize, 60);
++
++    if (pvfb->rrScreenSizes[i].width == pScreen->width &&
++	pvfb->rrScreenSizes[i].height == pScreen->height)
++      RRSetCurrentConfig(pScreen, RR_Rotate_0, 60, pSize);
++  }
++
++  *rotations = RR_Rotate_0;
++  return TRUE;
++}
++
++/* from hw/xfree86/common/xf86Helper.c */
++
++#include "mivalidate.h"
++static void
++xf86SetRootClip (ScreenPtr pScreen, Bool enable)
++{
++    WindowPtr	pWin = WindowTable[pScreen->myNum];
++    WindowPtr	pChild;
++    Bool	WasViewable = (Bool)(pWin->viewable);
++    Bool	anyMarked = FALSE;
++    RegionPtr	pOldClip = NULL, bsExposed;
++#ifdef DO_SAVE_UNDERS
++    Bool	dosave = FALSE;
++#endif
++    WindowPtr   pLayerWin;
++    BoxRec	box;
++
++    if (WasViewable)
++    {
++	for (pChild = pWin->firstChild; pChild; pChild = pChild->nextSib)
++	{
++	    (void) (*pScreen->MarkOverlappedWindows)(pChild,
++						     pChild,
++						     &pLayerWin);
++	}
++	(*pScreen->MarkWindow) (pWin);
++	anyMarked = TRUE;
++	if (pWin->valdata)
++	{
++	    if (HasBorder (pWin))
++	    {
++		RegionPtr	borderVisible;
++
++		borderVisible = REGION_CREATE(pScreen, NullBox, 1);
++		REGION_SUBTRACT(pScreen, borderVisible,
++				&pWin->borderClip, &pWin->winSize);
++		pWin->valdata->before.borderVisible = borderVisible;
++	    }
++	    pWin->valdata->before.resized = TRUE;
++	}
++    }
++    
++    /*
++     * Use REGION_BREAK to avoid optimizations in ValidateTree
++     * that assume the root borderClip can't change well, normally
++     * it doesn't...)
++     */
++    if (enable)
++    {
++	box.x1 = 0;
++	box.y1 = 0;
++	box.x2 = pScreen->width;
++	box.y2 = pScreen->height;
++	REGION_INIT (pScreen, &pWin->winSize, &box, 1);
++	REGION_INIT (pScreen, &pWin->borderSize, &box, 1);
++	if (WasViewable)
++	    REGION_RESET(pScreen, &pWin->borderClip, &box);
++	pWin->drawable.width = pScreen->width;
++	pWin->drawable.height = pScreen->height;
++        REGION_BREAK (pWin->drawable.pScreen, &pWin->clipList);
++    }
++    else
++    {
++	REGION_EMPTY(pScreen, &pWin->borderClip);
++	REGION_BREAK (pWin->drawable.pScreen, &pWin->clipList);
++    }
++    
++    ResizeChildrenWinSize (pWin, 0, 0, 0, 0);
++    
++    if (WasViewable)
++    {
++	if (pWin->backStorage)
++	{
++	    pOldClip = REGION_CREATE(pScreen, NullBox, 1);
++	    REGION_COPY(pScreen, pOldClip, &pWin->clipList);
++	}
++
++	if (pWin->firstChild)
++	{
++	    anyMarked |= (*pScreen->MarkOverlappedWindows)(pWin->firstChild,
++							   pWin->firstChild,
++							   (WindowPtr *)NULL);
++	}
++	else
++	{
++	    (*pScreen->MarkWindow) (pWin);
++	    anyMarked = TRUE;
++	}
++
++#ifdef DO_SAVE_UNDERS
++	if (DO_SAVE_UNDERS(pWin))
++	{
++	    dosave = (*pScreen->ChangeSaveUnder)(pLayerWin, pLayerWin);
++	}
++#endif /* DO_SAVE_UNDERS */
++
++	if (anyMarked)
++	    (*pScreen->ValidateTree)(pWin, NullWindow, VTOther);
++    }
++
++    if (pWin->backStorage &&
++	((pWin->backingStore == Always) || WasViewable))
++    {
++	if (!WasViewable)
++	    pOldClip = &pWin->clipList; /* a convenient empty region */
++	bsExposed = (*pScreen->TranslateBackingStore)
++			     (pWin, 0, 0, pOldClip,
++			      pWin->drawable.x, pWin->drawable.y);
++	if (WasViewable)
++	    REGION_DESTROY(pScreen, pOldClip);
++	if (bsExposed)
++	{
++	    RegionPtr	valExposed = NullRegion;
++    
++	    if (pWin->valdata)
++		valExposed = &pWin->valdata->after.exposed;
++	    (*pScreen->WindowExposures) (pWin, valExposed, bsExposed);
++	    if (valExposed)
++		REGION_EMPTY(pScreen, valExposed);
++	    REGION_DESTROY(pScreen, bsExposed);
++	}
++    }
++    if (WasViewable)
++    {
++	if (anyMarked)
++	    (*pScreen->HandleExposures)(pWin);
++#ifdef DO_SAVE_UNDERS
++	if (dosave)
++	    (*pScreen->PostChangeSaveUnder)(pLayerWin, pLayerWin);
++#endif /* DO_SAVE_UNDERS */
++	if (anyMarked && pScreen->PostValidateTree)
++	    (*pScreen->PostValidateTree)(pWin, NullWindow, VTOther);
++    }
++    if (pWin->realized)
++	WindowsRestructured ();
++    FlushAllOutput ();
++}
++
++extern void vncHooksResizeScreen(ScreenPtr pScreen);
++
++static Bool vncRandRSetConfig (ScreenPtr pScreen, Rotation rotation,
++		    int	rate, RRScreenSizePtr pSize)
++{
++  pScreen->width = pSize->width;
++  pScreen->height = pSize->height;
++  xf86SetRootClip(pScreen, TRUE);
++  vncHooksResizeScreen(pScreen);
++  return TRUE;
++}
++
++#endif
++
+ static Bool vfbScreenInit(int index, ScreenPtr pScreen, int argc, char** argv)
+ {
+   vfbScreenInfoPtr pvfb = &vfbScreens[index];
+@@ -942,6 +1177,20 @@
+   pScreen->backingStoreSupport = Always;
+ #endif
+ 
++#ifdef RANDR
++  if (!ret) return FALSE;
++
++  {
++    rrScrPrivPtr rp;
++		
++    ret = RRScreenInit(pScreen);
++    if (!ret) return FALSE;
++    rp = rrGetScrPriv(pScreen);
++    rp->rrGetInfo = vncRandRGetInfo;
++    rp->rrSetConfig = vncRandRSetConfig;
++  }
++#endif
++
+   return ret;
+ 
+ } /* end vfbScreenInit */

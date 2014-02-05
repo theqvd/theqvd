@@ -1,0 +1,62 @@
+Package: vnc4
+Version: 4.1.1+X4.3.0-21
+Usertags: ftbfs-gcc-4.3
+Tags: patch
+
+Your package fails to build with GCC 4.3.  Version 4.3 has not been
+released yet but I'm building with a snapshot in order to find errors
+and give people an advance warning.  In GCC 4.3, the C++ header
+dependencies have been cleaned up.  The advantage of this is that
+programs will compile faster.  The downside is that you actually
+need to directly #include everything you use (but you really should
+do this anyway, otherwise your program won't work with any compiler
+other than GCC).  Some background of this can be found at
+http://gcc.gnu.org/PR28080
+
+You can reproduce this problem with gcc-snapshot (20070326-1 or higher)
+from unstable. (Currently not available for i386, but for amd64, powerpc
+and ia64.  I hope to have i386 binaries in the archive in ~3 weeks.)
+
+> Automatic build of vnc4_4.1.1+X4.3.0-21 on coconut0 by sbuild/ia64 0.49
+...
+> c++  -DX_DISPLAY_MISSING=1  -I.. -DVNC_SOCKLEN_T=socklen_t -O2 -Wall -DPIC -fPIC -c TcpSocket.cxx
+> TcpSocket.cxx: In static member function 'static network::TcpFilter::Pattern network::TcpFilter::parsePattern(const char*)':
+> TcpSocket.cxx:448: error: 'atoi' was not declared in this scope
+> make[2]: *** [TcpSocket.o] Error 1
+
+--- unix/tx/TXImage.cxx~	2007-04-04 13:02:27.000000000 +0000
++++ unix/tx/TXImage.cxx	2007-04-04 13:02:36.000000000 +0000
+@@ -21,6 +21,7 @@
+ 
+ 
+ #include <stdio.h>
++#include <stdlib.h>
+ #include <strings.h>
+ #include <sys/types.h>
+ #include <sys/ipc.h>
+--- unix/x0vncserver/Image.cxx~	2007-04-04 13:03:18.000000000 +0000
++++ unix/x0vncserver/Image.cxx	2007-04-04 13:03:24.000000000 +0000
+@@ -21,6 +21,7 @@
+ 
+ 
+ #include <stdio.h>
++#include <stdlib.h>
+ #include <sys/types.h>
+ #include <sys/ipc.h>
+ #include <sys/shm.h>
+--- common/network/TcpSocket.cxx~	2007-04-04 13:00:25.000000000 +0000
++++ common/network/TcpSocket.cxx	2007-04-04 13:00:49.000000000 +0000
+@@ -35,6 +35,7 @@
+ #include <string.h>
+ #include <signal.h>
+ #include <fcntl.h>
++#include <cstdlib>
+ #endif
+ 
+ #include <network/TcpSocket.h>
+
+-- 
+Martin Michlmayr
+http://www.cyrius.com/
+
+

@@ -1,0 +1,19 @@
+--- vnc-4_1_2-unixsrc/unix/xc/programs/Xserver/vnc/vncExtInit.cc.vnconnect-on-x86_64	2006-08-01 19:04:17.000000000 +0100
++++ vnc-4_1_2-unixsrc/unix/xc/programs/Xserver/vnc/vncExtInit.cc	2006-08-01 18:59:22.000000000 +0100
+@@ -18,6 +18,8 @@
+ 
+ #include <stdio.h>
+ 
++#include "XserverDesktop.h"
++
+ extern "C" {
+ #define class c_class
+ #define NEED_EVENTS
+@@ -48,7 +50,6 @@
+ #undef min
+ #include <network/TcpSocket.h>
+ 
+-#include "XserverDesktop.h"
+ #include "vncHooks.h"
+ #include "vncExtInit.h"
+ 

@@ -1,0 +1,53 @@
+/* $XFree86: xc/config/cf/cross.def,v 1.3 2002/04/04 14:05:33 eich Exp $ */
+/*
+ * This file contains redefinitions of some symbols to enable
+ * cross compilation: e.g. paths for include files and paths to
+ * compiler images.  It will have to be edited to reflect these
+ * given your local configuration.
+ */
+#if 1
+#define i386Architecture
+#undef x86_64Architecture
+#undef Arm32Architecture
+
+#undef OptimizedCDebugFlags
+#define OptimizedCDebugFlags 	-g
+#define ServerCDebugFlags	-g
+#undef StandardDefines
+#define StandardDefines 	-Dlinux -D_POSIX_SOURCE \
+				-D_BSD_SOURCE -D_GNU_SOURCE -DX_LOCALE
+#undef CcCmd
+#define StdIncDir 
+#define PreIncDir 
+#undef PostIncDir
+#define PostIncDir
+#define CcCmd gcc -m32
+/*#define CcCmd arm-linux-androideabi-gcc*/
+#undef CplusplusCmd
+#define HasCplusplus YES
+#define CplusplusCmd g++ -m32
+/*#define CplusplusCmd arm-linux-androideabi-g++ */
+#define DoRanlibCmd YES
+#define RanlibCmd ranlib
+/*#define RanlibCmd arm-linux-androideabi-ranlib*/
+#undef ExtraLoadFlags 
+#define ExtraLoadFlags -static -static-libgcc
+#define FbNoPixelAddrCode
+#undef TermcapLibrary
+#define TermcapLibrary -ltermcap
+
+#undef	CppCmd	
+#define	CppCmd	cpp
+/*#define	CppCmd	arm-linux-androideabi-cpp*/
+
+#undef LdPostLib
+#define LdPostLib
+
+#undef ExtensionOSDefines
+#define ExtensionOSDefines
+
+#define ServerXdmcpDefines	/**/
+
+#define HostCcCmd gcc
+#endif
+#include <cross.rules>

@@ -1,0 +1,20 @@
+--- vnc4-4.1.1+X4.3.0_gismo-2/unix/vncviewer/CConn.cxx	2006-11-07 18:17:26.000000000 +0100
++++ vnc4-4.1.1+X4.3.0_gismo-3/unix/vncviewer/CConn.cxx	2006-11-07 18:09:38.000000000 +0100
+@@ -224,8 +224,7 @@
+ 
+     if (tcgetattr (fileno (stdin), &oldio) != 0) {
+       popup = 1;
+-    }
+-    else {
++    } else {
+       newio = oldio;
+       newio.c_lflag &= ~ECHO;
+       fprintf(stderr, "Password: ");
+@@ -243,6 +242,7 @@
+       (void) tcsetattr (fileno (stdin), TCSAFLUSH, &oldio);
+     }
+   }
++
+   if (popup) {
+     const char* secType = secTypeName(getCurrentCSecurity()->getType());
+     const char* titlePrefix = "VNC Authentication";

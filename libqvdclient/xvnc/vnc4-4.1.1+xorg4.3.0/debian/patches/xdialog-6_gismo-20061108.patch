@@ -1,0 +1,20 @@
+--- vnc4-4.1.1+X4.3.0_gismo-5/unix/vncviewer/vncviewer.man	2006-11-07 08:36:01.000000000 +0100
++++ vnc4-4.1.1+X4.3.0_gismo-6/unix/vncviewer/vncviewer.man	2006-11-08 11:53:51.000000000 +0100
+@@ -1,4 +1,4 @@
+-.TH vncviewer 1 "03 Mar 2005" "RealVNC Ltd" "Virtual Network Computing"
++.TH vncviewer 1 "08 Nov 2006" "RealVNC Ltd" "Virtual Network Computing"
+ .SH NAME
+ vncviewer \- VNC viewer for X
+ .SH SYNOPSIS
+@@ -102,6 +102,11 @@
+ .B vncconfig.
+ 
+ .TP
++.B \-XDialog
++Popup an X dialog when asking for server, username and password.  Default is to
++not popup when vncviewer is start from command line.
++
++.TP
+ .B \-passwd \fIpassword-file\fP
+ If you are on a filesystem which gives you access to the password file used by
+ the server, you can specify it here to avoid typing it in.  It will usually be

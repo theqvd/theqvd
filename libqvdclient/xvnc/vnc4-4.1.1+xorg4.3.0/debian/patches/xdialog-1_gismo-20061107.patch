@@ -1,0 +1,29 @@
+--- vnc4-4.1.1+X4.3.0/unix/vncviewer/CConn.cxx	2006-11-06 18:52:04.000000000 +0100
++++ vnc4-4.1.1+X4.3.0_gismo-1/unix/vncviewer/CConn.cxx	2006-11-07 17:48:42.000000000 +0100
+@@ -19,6 +19,8 @@
+ // CConn.cxx
+ //
+ 
++#include <termios.h>
++#include <stdio.h>
+ #include <unistd.h>
+ #include "CConn.h"
+ #include <rfb/CMsgWriter.h>
+@@ -37,8 +39,6 @@
+ #include "ServerDialog.h"
+ #include "PasswdDialog.h"
+ #include "parameters.h"
+-#include <termios.h>
+-#include <stdio.h>
+ 
+ using namespace rfb;
+ 
+@@ -50,8 +50,6 @@
+ StringParameter menuKey("MenuKey", "The key which brings up the popup menu",
+                         "F8");
+ StringParameter windowName("name", "The X window name", "");
+-#include <termios.h>
+-#include <stdio.h>
+ 
+ CConn::CConn(Display* dpy_, int argc_, char** argv_, network::Socket* sock_,
+              char* vncServerName, bool reverse)

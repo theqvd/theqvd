@@ -1,0 +1,34 @@
+From: Hein Roehrig <debian-bts@hein.roehrig.name>
+
+Here is a patch to have the -localhost option in the x0vncserver
+command as well... important when trying to secure the VNC connection
+via ssh.
+
+Thanks,
+Hein
+
+--- vnc4-4.0/x0vncserver/x0vncserver.cxx.~1~	2004-10-23 10:59:42.000000000 -0600
++++ vnc4-4.0/x0vncserver/x0vncserver.cxx	2004-10-23 11:48:41.000000000 -0600
+@@ -47,6 +47,9 @@
+ StringParameter displayname("display", "The X display", "");
+ IntParameter rfbport("rfbport", "TCP port to listen for RFB protocol",5900);
+ VncAuthPasswdFileParameter vncAuthPasswdFile;
++BoolParameter localhostOnly("localhost",
++                            "Only allow connections from localhost",
++                            false);
+ 
+ static void CleanupSignalHandler(int sig)
+ {
+@@ -230,7 +233,7 @@
+     desktop.setVNCServer(&server);
+ 
+     TcpSocket::initTcpSockets();
+-    TcpListener listener((int)rfbport);
++    TcpListener listener((int)rfbport, localhostOnly);
+     vlog.info("Listening on port %d", (int)rfbport);
+ 
+     while (true) {
+
+
+
+

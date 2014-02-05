@@ -1,0 +1,42 @@
+--- vnc4-4.1.1+X4.3.0_gismo-3/unix/vncviewer/CConn.cxx	2006-11-07 18:09:38.000000000 +0100
++++ vnc4-4.1.1+X4.3.0_gismo-4/unix/vncviewer/CConn.cxx	2006-11-07 18:47:01.000000000 +0100
+@@ -88,11 +88,20 @@
+     if (vncServerName) {
+       getHostAndPort(vncServerName, &serverHost, &serverPort);
+     } else {
+-      ServerDialog dlg(dpy, &options, &about);
+-      if (!dlg.show() || dlg.entry.getText()[0] == 0) {
+-        exit(1);
++      int popup = popupXDialog;
++      if (!popup) {
++        /* Get server */
++        fprintf(stderr, "Server: ");
++        vncServerName = new char[128];
++        fgets(vncServerName, 128, stdin);
++        getHostAndPort(vncServerName, &serverHost, &serverPort);
++      } else {
++        ServerDialog dlg(dpy, &options, &about);
++        if (!dlg.show() || dlg.entry.getText()[0] == 0) {
++          exit(1);
++        }
++        getHostAndPort(dlg.entry.getText(), &serverHost, &serverPort);
+       }
+-      getHostAndPort(dlg.entry.getText(), &serverHost, &serverPort);
+     }
+ 
+     sock = new network::TcpSocket(serverHost, serverPort);
+
+--- vnc4-4.1.1+X4.3.0_gismo-3/unix/vncviewer/vncviewer.cxx	2006-11-07 18:24:12.000000000 +0100
++++ vnc4-4.1.1+X4.3.0_gismo-4/unix/vncviewer/vncviewer.cxx	2006-11-07 18:47:30.000000000 +0100
+@@ -94,8 +94,9 @@
+ BoolParameter listenMode("listen", "Listen for connections from VNC servers",
+                          false);
+ BoolParameter popupXDialog("XDialog",
+-                           "Popup a user and password dialog. Default "
+-                           "no when running from command line",
++                           "Popup an X dialog when asking for server, "
++                           "username and password. Default no when "
++                           "running from command line",
+                            !isatty(0));
+ StringParameter geometry("geometry", "X geometry specification", "");
+ StringParameter displayname("display", "The X display", "");

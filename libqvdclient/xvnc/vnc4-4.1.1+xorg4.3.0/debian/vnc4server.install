@@ -1,0 +1,11 @@
+debian/tmp/usr/bin/vnc4server usr/bin
+debian/tmp/usr/bin/Xvnc4 usr/bin
+debian/tmp/usr/bin/x0vnc4server usr/bin
+debian/tmp/usr/lib usr
+debian/tmp/usr/share/man/man1/vnc4server.1 usr/share/man/man1
+debian/tmp/usr/share/man/man1/x0vnc4server.1 usr/share/man/man1
+debian/tmp/usr/share/man/man1/Xvnc4.1 usr/share/man/man1
+debian/tmp/usr/bin/vnc4passwd usr/bin
+debian/tmp/usr/share/man/man1/vnc4passwd.1 usr/share/man/man1
+debian/tmp/usr/bin/vnc4config usr/bin
+debian/tmp/usr/share/man/man1/vnc4config.1 usr/share/man/man1
