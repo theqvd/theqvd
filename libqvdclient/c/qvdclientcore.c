@@ -15,6 +15,8 @@
 #include <netinet/tcp.h>
 #include <arpa/inet.h>
 #include <openssl/ssl.h>
+#include <openssl/bio.h>
+#include <openssl/evp.h>
 #include <curl/curl.h>
 #include <jansson.h>
 #include <NX.h>
@@ -434,27 +436,38 @@ int _qvd_set_base64_auth(qvdclient *qvd)
   char *ptr = NULL, *content;
   size_t outlen;
   int result = 0;
-  error = Curl_base64_encode((struct SessionHandle *) qvd,
-                             qvd->userpwd, strlen(qvd->userpwd),
-                             &ptr, &outlen);
-  if (error != CURLE_OK)
-    {
-      qvd_error(qvd, "Error in getBase64Auth");
-      return 1;
-    }
-  
-  if (snprintf(qvd->authdigest, MAX_AUTHDIGEST, "%s", ptr) >= MAX_AUTHDIGEST)
+  char *digest = NULL;
+  BIO *bio, *b64;
+
+  // Digest using the openssl BIO functionality
+  b64 = BIO_new(BIO_f_base64());
+  bio = BIO_new(BIO_s_mem());
+  bio = BIO_push(b64, bio);
+  BIO_set_flags(b64, BIO_FLAGS_BASE64_NO_NL);
+  BIO_write(b64, qvd->userpwd, strlen(qvd->userpwd));
+  BIO_flush(b64);
+
+  outlen = BIO_get_mem_data(bio, &ptr);
+
+  if ( outlen >= MAX_AUTHDIGEST-1 )
     {
       qvd_error(qvd, "The authdigest string for %s is longer than %d\n", qvd->userpwd, MAX_AUTHDIGEST);
       result = 1;
-    } else 
+    }
+  else 
     {
+      // The resulting digest isn't zero terminated
+      memcpy(qvd->authdigest, ptr, outlen);
+      qvd->authdigest[outlen] = '\0';
+
 #ifdef TRACE
       qvd_printf("The conversion to base64 from <%s> is <%s>", qvd->userpwd, qvd->authdigest);
 #endif
       result = 0;
     }
-  free(ptr);
+
+  BIO_free_all(bio);
+
   
   /* hack for base64 encode of "nito@deiro.com:O3xTMCQ3" */
   /*  snprintf(qvd->authdigest, MAX_AUTHDIGEST, "%s", "bml0b0BkZWlyby5jb206TzN4VE1DUTM=");*/
