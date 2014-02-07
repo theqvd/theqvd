@@ -73,7 +73,7 @@
      }
  
 -    $grid_sizer->Add(Wx::StaticText->new($panel, -1, "Kill current VM"), 0, wxALL, 5);
-+    $grid_sizer->Add(Wx::StaticText->new($panel, -1, "Reiniciar sesion"), 0, wxALL, 5);
++    $grid_sizer->Add(Wx::StaticText->new($panel, -1, "Reinicio de sesion"), 0, wxALL, 5);
      $self->{kill_vm} = Wx::CheckBox->new ($panel, -1, '', wxDefaultPosition);
      $grid_sizer->Add($self->{kill_vm});
  
