@@ -15,27 +15,26 @@ my $di_tag = cfg('auth.auto.di_tag', 0) // 'default';
 my $maxvms = cfg('auth.auto.max_vms', 0) // 5;
 
 sub after_authenticate_basic {
-    my ($plugin, $auth) = @_;
-    my $login = $auth->{login};
-    my $user = rs(User)->search({login => $login})->first;
+    my ($plugin, $auth, $normalized_login) = @_;
+    my $user = rs(User)->search({login => $normalized_login})->first;
     my $user_id;
 
     if ($user) {
 	$user_id = $user->id;
     }
     else {
-	INFO "Auto provisioning user $login";
-	my $user_id_obj = rs(User)->create({ login => $login})
-	    // die "Unable to provision user $login";
+	INFO "Auto provisioning user $normalized_login";
+	my $user_id_obj = rs(User)->create({ login => $normalized_login})
+	    // die "Unable to provision user $normalized_login";
         $user_id = $user_id_obj->id;
     }
     $auth->{user_id} = $user_id;
 
     if (rs(VM)->search({user_id => $user_id, osf_id => $osf_id})->count == 0) {
-	INFO "Auto provisioning VM for user $login ($user_id) with OSF $osf_id";
+	INFO "Auto provisioning VM for user $normalized_login ($user_id) with OSF $osf_id";
 	my $admin = QVD::Admin->new;
 	for my $ix (1..$maxvms) {
-	    my $name = "$login-$ix";
+	    my $name = "$normalized_login-$ix";
 	    my $ok;
 	    if (rs(VM)->search({name => $name})->count == 0) {
 		$admin->cmd_vm_add(name    => $name,
@@ -46,7 +45,7 @@ sub after_authenticate_basic {
 	    }
 	    return if $ok;
 	}
-	die "Too many VM name collisions on auto provisioning for user $login";
+	die "Too many VM name collisions on auto provisioning for user $normalized_login";
     }
 }
 
@@ -56,7 +55,8 @@ __END__
 
 =head1 NAME
 
-QVD::L7R::Authenticator::Plugin::Auto - qvd-l7r authentication plugin that provisions a user account and virtual machine automatically.
+QVD::L7R::Authenticator::Plugin::Auto - qvd-l7r authentication plugin
+that provisions a user account and virtual machine automatically.
 
 =head1 DESCRIPTION
 

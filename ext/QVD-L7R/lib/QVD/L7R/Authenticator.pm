@@ -52,13 +52,13 @@ sub authenticate_basic {
     my ($auth, $login, $passwd, $l7r) = @_;
     if (defined (my $normalized_login = $auth->_normalize_login($login))) {
         DEBUG "authenticating user $login ($normalized_login) with modules @{$auth->{modules}}";
+        $auth->{login} = $login;
+        $auth->{normalized_login} = $normalized_login;
+        $auth->{passwd} = $passwd;
         for (@{$auth->{modules}}) {
             if ($_->authenticate_basic($auth, $normalized_login, $passwd, $l7r)) {
-                $auth->{login} = $login;
-                $auth->{normalized_login} = $normalized_login;
-                $auth->{passwd} = $passwd;
-                $auth->{params}{'qvd.vm.user.name'} = $normalized_login;
-                $auth->after_authenticate_basic($login, $l7r);
+                $auth->{params}{'qvd.vm.user.name'} = $auth->{normalized_login};
+                $auth->after_authenticate_basic($auth->{normalized_login}, $l7r);
                 return 1;
             }
         }
