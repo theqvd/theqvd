@@ -1462,6 +1462,17 @@ Valid options:
 EOT
 }
 
+
+
+sub _utc2localtime {
+    my $time = shift // return undef;
+    require DateTime::Format::Pg;
+    my $dt = DateTime::Format::Pg->parse_timestamp($time);
+    $dt->set_time_zone('UTC');
+    $dt->set_time_zone('local');
+    DateTime::Format::Pg->format_timestamp($dt);
+}
+
 sub cmd_vm_list {
     my ($self) = @_;
     
@@ -1488,8 +1499,8 @@ sub cmd_vm_list {
                 (defined $vmr->l7r_host ? $vmr->l7r_host->name : undef),
                 $vmr->user_state,
                 $vmr->blocked,
-                $vmr->vm_expiration_soft,
-                $vmr->vm_expiration_hard
+                _utc2localtime($vmr->vm_expiration_soft),
+                _utc2localtime($vmr->vm_expiration_hard)
             );
             push(@body, \@row);
         }

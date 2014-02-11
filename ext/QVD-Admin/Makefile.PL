@@ -18,6 +18,7 @@ WriteMakefile( NAME          => 'QVD::Admin',
                                   'Term::ReadKey' => 0,
                                   'DateTime' => 0,
                                   'Digest::SHA' => 0,
+                                  'DateTime::Format::Pg' => '0.16007',
                                   'Net::OpenSSH' => 0,
                                   'DateTime::Format::GnuAt' => '0.03' },
              );
