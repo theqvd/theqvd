@@ -11,7 +11,12 @@ $name =~ s/.*\///;
 unless ($ENV{NO_AUTO_TEE}) {
     mkdir "/var/lib/qvd";
     mkdir "/var/lib/qvd/tmp";
-    tee(*STDOUT, '>', "/var/lib/qvd/tmp/$name.out");
+    if ($name =~ /\bhkd\b/i) {
+        open STDOUT, '>', "/var/lib/qvd/tmp/$name.out";
+    }
+    else {
+        tee *STDOUT, '>', "/var/lib/qvd/tmp/$name.out";
+    }
     open STDERR, '>&STDOUT';
 
     open my $pid, '>', "/var/lib/qvd/tmp/$name.pid";

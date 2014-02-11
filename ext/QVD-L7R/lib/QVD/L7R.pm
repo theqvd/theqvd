@@ -70,10 +70,17 @@ sub post_configure_hook {
 
 sub ping_processor {
     my ($l7r) = @_;
-    my $this_host = this_host; $this_host // $l7r->throw_http_error(HTTP_SERVICE_UNAVAILABLE, 'Host is not registered in the database');
-    my $server_state = $this_host->runtime->state;
+    my $this_host = this_host or $l7r->throw_http_error(HTTP_SERVICE_UNAVAILABLE, 'Host is not registered in the database');
+    my $this_host_runtime = $this_host->runtime;
+    my $server_state = $this_host_runtime->state;
     if ($server_state eq 'running') {
-        $l7r->send_http_response_with_body(HTTP_OK, 'text/plain', [], "I am alive!\r\n");
+        if ($this_host_runtime->blocked) {
+            INFO 'Server is blocked';
+            $l7r->throw_http_error(HTTP_SERVICE_UNAVAILABLE, "Server is blocked");
+        }
+        else {
+            $l7r->send_http_response_with_body(HTTP_OK, 'text/plain', [], "I am alive!\r\n");
+        }
     } else {
         $l7r->throw_http_error(HTTP_SERVICE_UNAVAILABLE, "Server is $server_state");
     }
