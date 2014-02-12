@@ -417,12 +417,13 @@ sub _parse_datetime {
     unless ($parser) {
         require DateTime::Format::GnuAt;
         $parser = DateTime::Format::GnuAt->new;
-        $now = DateTime->now(time_zone => 'UTC');
+        $now = DateTime->now(time_zone => 'local');
     }
 
-    eval { $parser->parse_datetime($spec, now => $now) } //
+    my $ts = eval { $parser->parse_datetime($spec, now => $now) } //
         die "invalid datetime specification '$spec'";
-
+    $ts->set_time_zone('UTC');
+    $ts;
 }
 
 sub _expire_vms {
