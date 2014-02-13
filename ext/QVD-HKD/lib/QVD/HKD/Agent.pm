@@ -413,6 +413,7 @@ sub _rpc {
 sub _rpc_callback {
     my ($self, $opts, undef, $headers) = @_;
     $debug and $self->_debug("on _rpc_result");
+    delete $self->{rpc_watcher};
     my $status = $headers->{Status};
     my $error = 1;
     my $result;
@@ -507,7 +508,7 @@ sub __acquire_flock {
 
 sub leave_state {
     my $self = shift;
-    delete $self->{call_after_watcher} and DEBUG "aborting delayed method call";
+    delete $self->{call_after_watcher} and DEBUG "aborting/cleaning delayed method call";
     delete $self->{rpc_watcher}        and DEBUG "aborting RPC call";
     delete $self->{query_watcher}      and DEBUG "aborting database query";
     delete $self->{flock_watcher}      and DEBUG "aborting file locking";
