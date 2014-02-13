@@ -6,7 +6,7 @@ use Carp;
 
 use Exporter;
 
-our @EXPORT_OK = qw(croak_invalid_opts mkpath);
+our @EXPORT_OK = qw(croak_invalid_opts mkpath boolean_db2perl);
 our @CARP_NOT;
 my %CARP_NOT;
 
@@ -39,6 +39,9 @@ sub mkpath {
     return;
 }
 
-
+sub boolean_db2perl {
+    my $v = shift // return;
+    ($v eq 'f' ? undef : $v);
+}
 
 1;

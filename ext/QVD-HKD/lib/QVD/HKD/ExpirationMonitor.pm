@@ -4,6 +4,7 @@ use strict;
 use warnings;
 use Carp;
 use QVD::Log;
+use QVD::HKD::Helpers qw(boolean_db2perl);
 
 use parent qw(QVD::HKD::Agent);
 
@@ -32,17 +33,19 @@ sub new {
 
 sub _load_vm_expirations {
     my $self = shift;
+    DEBUG "Looking for expired VMs";
     $self->_query({ save_to => 'vms_to_be_expired' },
                   <<'EOQ', $self->{node_id});
 select vm_id,
-       (vm_expiration_hard < now()) as hard,
        vm_expiration_soft, vm_expiration_hard,
-       now() as really_now
+       now() as really_now, 
+       (vm_expiration_soft < now()) as soft,
+       (vm_expiration_hard < now()) as hard
     from vm_runtimes
-    where vm_state = 'running'
-      and ( vm_expiration_soft < now()
-         or vm_expiration_hard < now() )
-      and host_id = $1
+    where host_id = $1
+      and vm_state = 'running'
+      and ( (vm_expiration_soft < now())
+         or (vm_expiration_hard < now()) )
 EOQ
 
 }
@@ -51,11 +54,15 @@ sub _expire_vms {
     my $self = shift;
     for (@{$self->{vms_to_be_expired}}) {
         DEBUG join('', map { $_ // '<undef>' }
-                   "VM is expired, hard: ", $_->{hard},
-                   ", expiration_soft: ", $_->{vm_expiration_soft},
-                   ", expiration_hard: ", $_->{vm_expiration_hard},
-                   ", now: ", $_->{really_now});
-        $self->_maybe_callback(on_expired_vm => @{$_}{qw(vm_id hard vm_expiration_soft vm_expiration_hard)});
+                   "VM is expired, soft: ", $_->{soft},
+                   ", hard: ",              $_->{hard},
+                   ", expiration_soft: ",   $_->{vm_expiration_soft},
+                   ", expiration_hard: ",   $_->{vm_expiration_hard},
+                   ", now: ",               $_->{really_now});
+        for my $f (qw(hard soft)) {
+            $_->{"perl_$f"} = boolean_db2perl($_->{$f});
+        }
+        $self->_maybe_callback(on_expired_vm => @{$_}{qw(vm_id perl_hard vm_expiration_soft vm_expiration_hard)});
     }
 }
 
