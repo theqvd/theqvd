@@ -1,3 +1,24 @@
+QVD 3.4.2
+=========
+	
+	- Fix expirations bug: when hard deadline was set, VM was being
+	  stopped just after reaching soft deadline
+	- Parse dates using local TZ
+	- qvd-admin now outputs expiration dates using the local TZ.
+	- Fix for #1507: L7R was responding 'I am alive' even when the
+	  host was blocked.
+	- Improve logging for DB queries related to VM expiration on HKD.
+	- Several client UI improvements.
+
+
+QVD 3.4.1
+=========
+	
+	- Failing VM hooks were crashing the HKD
+	- Set qvd.auth.ldap.racf_detailed_error on the LDAP authentication plugin
+	- Fix the client on Darwin
+	- Fix several packing issues
+
 QVD 3.4.0
 =========
 
