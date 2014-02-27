@@ -34,7 +34,17 @@ sub _process_request {
     local $SIG{__DIE__};
     my $name = "SimpleRPC_$function";
     if (my $rpc_processor = $self->can($name)) {
-        DEBUG "SimpleRPC serving $name(". join(', ', @params).')';
+        if ($logger->is_debug) {
+            my @p = @params;
+            my @args;
+            while (@p) {
+                my $k = shift @p;
+                my $v = shift @p;
+                $v = '***' if $k =~ /passw(?:or)?d/;
+                push @args, "$k: $v";
+            }
+            DEBUG "SimpleRPC serving $name(" . join(', ', @args) . ")";
+        }
         my $data = eval { $self->$rpc_processor(@params) };
         if ($@) {
             my $saved_err = $@;

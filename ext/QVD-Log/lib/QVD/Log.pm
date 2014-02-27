@@ -41,8 +41,10 @@ my %config = ( 'log4perl.appender.LOGFILE'          => 'Log::Dispatch::FileRotat
 use Log::Log4perl qw(:levels :easy);
 Log::Log4perl::init_once(\%config);
 
+our $logger = Log::Log4perl::get_logger;
+
 use Exporter qw(import);
-our @EXPORT = qw(DEBUG WARN INFO ERROR LOGDIE);
+our @EXPORT = qw(DEBUG WARN INFO ERROR LOGDIE $logger);
 
 1;
 
