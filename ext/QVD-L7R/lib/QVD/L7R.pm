@@ -375,7 +375,12 @@ sub _release_vm {
         if ($vm->is_ephemeral && $vm->vm_state eq 'running') {
             $vm->send_vm_stop; # Clean up ephemeral VMs
         }
-        $vm->update({ real_user_id => undef });
+
+        # FIXME: the HKD should take care of reclaiming ephemeral
+        # virtual machines back into the pool:
+        # It can't be done here as...
+        #   $vm->update({ real_user_id => undef });
+
         if (defined $pid  and $pid  == $$  and
             defined $host and $host == this_host_id) {
             DEBUG 'calling clear l7r all for vm ' . $vm->id;
