@@ -16,7 +16,7 @@ WriteMakefile( NAME          => 'QVD::L7R',
 				  'QVD::SimpleRPC'        => 0,
 				  'QVD::URI'              => 0,
 				  'Test::More'            => 0,
-                                  'Disgest::SHA'          => 0,
+                                  'Digest::SHA'           => 0,
                                 },
                EXE_FILES => [qw(bin/qvd-l7r-slave)] );
 
