@@ -702,7 +702,7 @@ sub SimpleRPC_x_stop {
 
 sub SimpleRPC_x_start {
     my $self = shift;
-    INFO "starting/resuming X session. Args: " . join(' ', @_);
+    INFO "starting/resuming X session";
     _start_session(@_);
 }
 
