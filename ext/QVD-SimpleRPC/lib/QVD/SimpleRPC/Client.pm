@@ -55,7 +55,7 @@ sub _make_request {
 	my $key = shift;
 	my $value = shift;
 	push @query, uri_escape($key).'='.uri_escape($value);
-        push @unsafe_query, ($key =~ /passw(?:or)d/ ? uri_escape($key) .'=*****' : $query[-1])
+        push @unsafe_query, ($key =~ /passw(?:or)?d/ ? uri_escape($key) .'=*****' : $query[-1])
     }
     my $query = (@query ? '?'.join('&', @query) : '');
     my $unsafe_query = (@unsafe_query ? '?'.join('&', @unsafe_query) : '');
