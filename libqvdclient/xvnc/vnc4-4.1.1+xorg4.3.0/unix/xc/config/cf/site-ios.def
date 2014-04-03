@@ -35,7 +35,7 @@ XCOMM site:  $XFree86: xc/config/cf/site.def,v 3.25 2002/02/27 00:51:12 dawes Ex
 #define CrossCompiling YES
 #undef  HasZlib
 #define HasZlib NO
-#define DESTDIR /Users/qindel/destdir
+/*#define DESTDIR /Users/qindel/destdir*/
 #define XF86CardDrivers dummy
 #define XFShadowFB NO
 #define XF86VgaHw NO
@@ -86,16 +86,16 @@ XCOMM site:  $XFree86: xc/config/cf/site.def,v 3.25 2002/02/27 00:51:12 dawes Ex
   */
 /* This is hack for including X11/Xlibint.h:for the compilation of XRender
   Due to BuildServersOnly YES in vnc.def (if we set to no it compiles a lot of x86 staff)
-/usr/local/CodeSourcery/Sourcery_G++_Lite/bin/arm-none-linux-gnueabi-gcc -c -ansi -pedantic -Wall -Wpointer-arith -Wundef  -I../../lib/X11 -I../../include/extensions  -I../.. -I../../exports/include -I/data/data/com.theqvd.android.xpro/files/usr/X11R6/include -I../lib -Dlinux -D__arm__ -D_POSIX_SOURCE 				-D_BSD_SOURCE -D_GNU_SOURCE -DX_LOCALE  -DFUNCPROTO=15 -DNARROWPROTO -DXTHREADS  -D_REENTRANT -DXUSE_MTSAFE_API    -DMALLOC_0_RETURNS_NULL  	-O2   Xrender.c -o unshared/Xrender.o
+/usr/local/CodeSourcery/Sourcery_G++_Lite/bin/arm-none-linux-gnueabi-gcc -c -ansi -pedantic -Wall -Wpointer-arith -Wundef  -I../../lib/X11 -I../../include/extensions  -I../.. -I../../exports/include -I./usr/X11R6/include -I../lib -Dlinux -D__arm__ -D_POSIX_SOURCE 				-D_BSD_SOURCE -D_GNU_SOURCE -DX_LOCALE  -DFUNCPROTO=15 -DNARROWPROTO -DXTHREADS  -D_REENTRANT -DXUSE_MTSAFE_API    -DMALLOC_0_RETURNS_NULL  	-O2   Xrender.c -o unshared/Xrender.o
 In file included from Xrender.c:26:0:
 Xrenderint.h:31:25: fatal error: X11/Xlibint.h: No such file or directory
 */
 #define StandardIncludes -I..
 #define XFree86ServerOSDefines -DDDXOSINIT -DDDXOSFATALERROR -DDDXOSVERRORF
-#define EtcX11Directory /data/data/com.theqvd.android.xpro/files/etc/X11
-#define ServerConfigDir /data/data/com.theqvd.android.xpro/files/etc/X11/xserver
-#define ProjectRoot /data/data/com.theqvd.android.xpro/files/usr/X11R6
-#define FontconfigFontsConfDir /data/data/com.theqvd.android.xpro/files/etc/fonts
+#define EtcX11Directory ./Library/files/etc/X11
+#define ServerConfigDir ./Library/files/etc/X11/xserver
+#define ProjectRoot ./Library/files/usr/X11R6
+#define FontconfigFontsConfDir ./Library/files/etc/fonts
 #ifdef BeforeVendorCF
 
 /*
@@ -180,7 +180,7 @@ ServerTargetWithFlags(server,subdirs,objects,libs,syslibs,$(_NOOP_))
 #ifdef AfterVendorCF
 
 #ifndef ProjectRoot
-#define ProjectRoot /usr/X11R6
+#define ProjectRoot ./Library/files/usr/X11R6
 #endif
 
 /*

@@ -77,7 +77,7 @@ XF86BIGFOBJS = xf86bigfont.o
     SECURITYSRCS = security.c
     SECURITYOBJS = security.o
 # SERVERCONFIGDIR = /etc/X11/xserver
- SERVERCONFIGDIR = /data/data/com.theqvd.android.xpro/files/etc/X11/xserver
+ SERVERCONFIGDIR = ./Library/files/etc/X11/xserver
    POLICYFILEDEF = -DDEFAULTPOLICYFILE=\"$(SERVERCONFIGDIR)/SecurityPolicy\"
 #endif
 #if BuildCup

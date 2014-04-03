@@ -228,7 +228,7 @@ extern "C" {
     // already have been cleaned up but it doesn't hurt to try again.
     if (wellKnownSocketsCreated) {
       char sockName[64];
-      sprintf(sockName,"/data/data/com.theqvd.android.xpro/files/tmp/.X11-unix/X%s",display);
+      sprintf(sockName,"./Library/files/tmp/.X11-unix/X%s",display);
       unlink(sockName);
     }
   }
@@ -277,9 +277,9 @@ static bool displayNumFree(int num)
     return false;
   }
   char file[256];
-  sprintf(file, "/data/data/com.theqvd.android.xpro/files/tmp/.X%d-lock", num);
+  sprintf(file, "./Library/files/tmp/.X%d-lock", num);
   if (access(file, F_OK) == 0) return false;
-  sprintf(file, "/data/data/com.theqvd.android.xpro/files/tmp/.X11-unix/X%d", num);
+  sprintf(file, "./Library/files/tmp/.X11-unix/X%d", num);
   if (access(file, F_OK) == 0) return false;
   return true;
 }
