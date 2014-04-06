@@ -42,6 +42,7 @@ public final class L {
 	public static final int r_vncChoiceButton = R.id.vncChoiceButton;
 	public static final int r_allowRemoteVNCButton = R.id.allowRemoteVNCButton;
 	public static final int r_renderButton = R.id.renderButton;
+	public static final int r_xineramaButton = R.id.xineramaButton;
 	public static final int r_progressbar1 = R.id.progressbar1;
 	public static final int r_helpitem = R.id.helpitem;
 	public static final int r_aboutitem = R.id.aboutitem;
