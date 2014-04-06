@@ -119,6 +119,7 @@ const char *qvd_get_version_text(void);
 const char *qvd_get_changelog(void);
 qvdclient *qvd_init(const char *hostname, const int port, const char *username, const char *password);
 vmlist *qvd_list_of_vm(qvdclient *qvd);
+int qvd_stop_vm(qvdclient *qvd, int vm);
 int qvd_connect_to_vm(qvdclient *qvd, int id);
 void qvd_free(qvdclient *qvd);
 void qvd_set_geometry(qvdclient *qvd, const char *geometry);

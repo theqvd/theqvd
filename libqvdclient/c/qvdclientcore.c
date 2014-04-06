@@ -255,6 +255,48 @@ vmlist *qvd_list_of_vm(qvdclient *qvd) {
   return qvd->vmlist;
 }
 
+int qvd_stop_vm(qvdclient *qvd, int vm) {
+  char url[MAX_BASEURL];
+  int i;
+  long http_code = 0;
+  json_error_t error;
+  char *command = "/qvd/stop_vm";
+
+  if (!_qvd_set_certdir(qvd)) {
+    qvd_printf("Please set the cert dir");
+    return 1;
+  }
+
+  if (snprintf(url, MAX_BASEURL, "%s%s", qvd->baseurl, command) >= MAX_BASEURL) {
+    qvd_error(qvd, "Error initializing url in list_of_vm, length is longer than %d\n", MAX_BASEURL);
+    return 2;
+  }
+
+  _qvd_use_client_cert(qvd);
+  curl_easy_setopt(qvd->curl, CURLOPT_URL, url);
+  /*  curl_easy_setopt(curl, CURLOPT_WRITEDATA, &jsonBuffer); */
+  qvd->res = curl_easy_perform(qvd->curl);
+  qvd_printf("After easy_perform: %ul\n", qvd->res);
+  if (qvd->res)
+    {
+      qvd_printf("Error accessing url: <%s>, error code: %ul\n", url, qvd->res);
+      qvd_error(qvd, "Error accessing list of VMs: %s\n", curl_easy_strerror(qvd->res));
+      return 3;
+    }
+  
+  curl_easy_getinfo (qvd->curl, CURLINFO_RESPONSE_CODE, &http_code);
+  if (http_code == 401)
+    {
+      qvd_error(qvd, "Error authenticating user\n");
+      return 4;
+    }
+  qvd_printf("No error and no auth error after curl_easy_perform\n");
+  /*  QvdBufferInit(&(qvd->buffer)); */
+
+
+   return 0;
+}
+
 int qvd_connect_to_vm(qvdclient *qvd, int id)
 {
   int result, proxyFd, fd;

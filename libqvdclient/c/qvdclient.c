@@ -42,9 +42,10 @@ void help(const char *program)
 	 QVDHOST_ENV, QVDLOGIN_ENV, QVDPASSWORD_ENV, DEBUG_FLAG_ENV_VAR_NAME, DEBUG_FILE_ENV_VAR_NAME,
 	 QVDCHANGELOG
 	 );
+  printf("  -r : If there's a running session, restart it\n");
 }
 
-int parse_params(int argc, char **argv, const char **host, int *port, const char **user, const char **pass, const char **geometry, int *fullscreen, int *only_list_of_vm, int *one_vm, int *no_cert_check, const char **nx_options, const char **client_cert, const char **client_key)
+int parse_params(int argc, char **argv, const char **host, int *port, const char **user, const char **pass, const char **geometry, int *fullscreen, int *only_list_of_vm, int *one_vm, int *no_cert_check, int *restart_session, const char **nx_options, const char **client_cert, const char **client_key)
 {
   int opt, error = 0, version = 0;
   const char *program = argv[0];
@@ -107,6 +108,9 @@ int parse_params(int argc, char **argv, const char **host, int *port, const char
 	case 'k':
 	  *client_key = optarg;
 	  break;
+        case 'r':
+          *restart_session = 1;
+          break;
 	default:
 	  fprintf(stderr, "Parameter not recognized <%c>\n", opt);
 	  error = 1;
@@ -243,8 +247,7 @@ int _set_display_if_not_set(qvdclient *qvd) {
   return 0;
 }
 
-
-int qvd_connection(const char *host, int port, const char *user, const char *pass, const char *geometry, int fullscreen, int only_list_of_vm, int one_vm, int no_cert_check, const char *nx_options, const char *client_cert, const char *client_key) {
+int qvd_connection(const char *host, int port, const char *user, const char *pass, const char *geometry, int fullscreen, int only_list_of_vm, int one_vm, int no_cert_check, int restart_session, const char *nx_options, const char *client_cert, const char *client_key) {
   int vm_id;
   qvdclient *qvd;
 
@@ -301,6 +304,9 @@ int qvd_connection(const char *host, int port, const char *user, const char *pas
       return 6;
     }
 
+  if ( restart_session )
+     qvd_stop_vm(qvd, vm_id);
+
   /* Set display if not set */
   _set_display_if_not_set(qvd);
 
@@ -314,12 +320,12 @@ int qvd_connection(const char *host, int port, const char *user, const char *pas
 
 int main(int argc, char *argv[], char *envp[]) {
   const char *host = NULL, *user = NULL, *pass = NULL, *geometry = NULL, *nx_options = NULL, *cert_file = NULL, *key_file = NULL;
-  int port = 8443, fullscreen=0, only_list_of_vm=0, one_vm=0, no_cert_check=0;
+  int port = 8443, fullscreen=0, only_list_of_vm=0, one_vm=0, no_cert_check=0, restart_session = 0;
   int result, vm_id;
-  if (parse_params(argc, argv, &host, &port, &user, &pass, &geometry, &fullscreen, &only_list_of_vm, &one_vm, &no_cert_check, &nx_options, &cert_file, &key_file))
+  if (parse_params(argc, argv, &host, &port, &user, &pass, &geometry, &fullscreen, &only_list_of_vm, &one_vm, &no_cert_check, &restart_session, &nx_options, &cert_file, &key_file))
     return 1;
 
-  result = qvd_connection(host, port, user, pass, geometry, fullscreen, only_list_of_vm, one_vm, no_cert_check, nx_options, cert_file, key_file);
+  result = qvd_connection(host, port, user, pass, geometry, fullscreen, only_list_of_vm, one_vm, no_cert_check, restart_session, nx_options, cert_file, key_file);
 
   return result;
 }
