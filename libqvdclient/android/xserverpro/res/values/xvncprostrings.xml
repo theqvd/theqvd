@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="utf-8" ?>
 <resources>
     <string name="xvncpro_versionName">3.9</string>
-    <string name="xvncpro_changelog">06/04/2014 Geometry calculation update, more pixdepths, and Xinerama support\n02/03/2013 By default use AndroidVNC instead of PocketCloud view\n07/01/2013 Enable 7 depths for Xrender\n01/01/2013 3.5 Enable render interface and fix startup finish\n18/12/2012 3.4 New Xvnc binary with 7 depth layers support and default depth 24\n14/11/2012 3.3 Allow for remote Vnc connections\n3.2 01/10/20012 Added rgb.txt color mapping\n3.1 17/04/2012 Update buttons\n30/05/2012 3.0 Redesign of the xvnc program</string>
+    <string name="xvncpro_changelog">06/04/2014 Geometry calculation update, more pixdepths, and Xinerama support, GPL license in source files\n02/03/2013 By default use AndroidVNC instead of PocketCloud view\n07/01/2013 Enable 7 depths for Xrender\n01/01/2013 3.5 Enable render interface and fix startup finish\n18/12/2012 3.4 New Xvnc binary with 7 depth layers support and default depth 24\n14/11/2012 3.3 Allow for remote Vnc connections\n3.2 01/10/20012 Added rgb.txt color mapping\n3.1 17/04/2012 Update buttons\n30/05/2012 3.0 Redesign of the xvnc program</string>
     <string name="xvncpro_subject">\nXvnc Control Panel\n</string>
     <string name="xvncpro_app_name">xvncpro</string>
     <string name="app_name_xserver">xserver</string>
@@ -30,7 +30,7 @@
     <string name="android_vnc_viewer">AndroidVNC client</string>
     <string name="xvncpro_exit">exit</string>
     <string name="xvncpro_changelogtitle">Changelog</string>
-    <string name="xncpro_helpurl">http://theqvd.com/support/documentation</string>
+    <string name="xncpro_helpurl">http://docs.theqvd.com/</string>
     <string name="androidvnc_button_string">Install AndroidVnc</string>
     <string name="androidvnc_install_string">Install AndroidVnc (free), if you prefer PocketView click the AndroidVnc Toggle Button</string>
     <string name="errorincopy">Error copying files:</string>
