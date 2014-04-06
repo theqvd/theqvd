@@ -6,7 +6,20 @@ package com.theqvd.android.xpro;
 /**
  * 
  * This class exists only to highlight the differences between xvncpro and qvdclient
+ *
+ * Copyright 2009-2014 by Qindel Formacion y Servicios S.L.
  * 
+ * xvncpro is free software: you can redistribute it and/or modify
+ * it under the terms of the GNU General Public License as published by
+ * the Free Software Foundation, either version 3 of the License, or
+ * (at your option) any later version.
+ *
+ * xvncpro is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * GNU General Public License for more details.
+ *
+ *
  * @author Nito@Qindel.ES
  *
  */
@@ -42,6 +55,7 @@ public final class L {
 	public static final int r_vncChoiceButton = R.id.vncChoiceButton;
 	public static final int r_allowRemoteVNCButton = R.id.allowRemoteVNCButton;
 	public static final int r_renderButton = R.id.renderButton;
+	public static final int r_xineramaButton = R.id.xineramaButton;
 	public static final int r_progressbar1 = R.id.progressbar1;
 	public static final int r_helpitem = R.id.helpitem;
 	public static final int r_aboutitem = R.id.aboutitem;

@@ -1,5 +1,18 @@
 package com.theqvd.android.xpro;
-
+/**
+ * Copyright 2009-2014 by Qindel Formacion y Servicios S.L.
+ * 
+ * xvncpro is free software: you can redistribute it and/or modify
+ * it under the terms of the GNU General Public License as published by
+ * the Free Software Foundation, either version 3 of the License, or
+ * (at your option) any later version.
+ *
+ * xvncpro is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * GNU General Public License for more details.
+ *
+ */
 import android.app.Activity;
 import android.app.AlertDialog;
 import android.content.DialogInterface;
@@ -33,7 +46,7 @@ public class XvncproActivity extends Activity {
 	Config config;
 	private Button connectionStartButton, buttonStopX;
 	private ToggleButton androidVncToggleButton;
-	private CheckBox forceXresolutionToggleButton, keepXRunningToggleButton, allowRemoteVncToogleButton, renderButton;
+	private CheckBox forceXresolutionToggleButton, keepXRunningToggleButton, allowRemoteVncToogleButton, renderButton, xineramaButton;
 	private ProgressBar progressbar;
 	TextView consoleTextview;
 	private EditText xResolution, yResolution;
@@ -58,6 +71,7 @@ public class XvncproActivity extends Activity {
 		androidVncToggleButton = (ToggleButton) findViewById(L.r_vncChoiceButton);
 		allowRemoteVncToogleButton = (CheckBox) findViewById(L.r_allowRemoteVNCButton);
 		renderButton = (CheckBox) findViewById(L.r_renderButton);
+		xineramaButton = (CheckBox) findViewById(L.r_xineramaButton);
 		progressbar = (ProgressBar) findViewById(L.r_progressbar1);
 		
 		setConnectionStartButton();
@@ -65,6 +79,7 @@ public class XvncproActivity extends Activity {
         setResolution();
         setVncToggleButton();
         setRenderButton();
+        setXineramaButton();
         setStopOnExit();
         setAllowRemoteVncButton();
         
@@ -312,6 +327,17 @@ public class XvncproActivity extends Activity {
 			}
     	});
     }
+    void setXineramaButton() {
+    	xineramaButton.setOnClickListener(new OnClickListener() {
+			@Override
+			public void onClick(View v) {
+				Log.d(tag, "Clicked on xinerma toggle. The toggle button is "+xineramaButton.isChecked());
+				config.setAppConfig_xinerama(xineramaButton.isChecked());
+				updateButtons();
+			}
+    	});
+    }
+      
     void setStopOnExit() {
     	keepXRunningToggleButton.setOnClickListener(new OnClickListener() {
 			@Override
@@ -338,6 +364,7 @@ public class XvncproActivity extends Activity {
     	forceXresolutionToggleButton.setChecked(config.is_force_x_geometry());
     	androidVncToggleButton.setChecked(config.is_run_androidvnc_client());
      	renderButton.setChecked(config.isAppConfig_render());
+     	xineramaButton.setChecked(config.isAppConfig_xinerama());
        	keepXRunningToggleButton.setChecked(config.is_keep_x_running());
     	try {
     		if (config.prerrequisitesInstalled())

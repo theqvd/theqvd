@@ -1,5 +1,18 @@
 /**
  *  Singleton Class to hold all the configuration strings
+ *
+ * Copyright 2009-2014 by Qindel Formacion y Servicios S.L.
+ * 
+ * xvncpro is free software: you can redistribute it and/or modify
+ * it under the terms of the GNU General Public License as published by
+ * the Free Software Foundation, either version 3 of the License, or
+ * (at your option) any later version.
+ *
+ * xvncpro is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * GNU General Public License for more details.
+ *
  */
 package com.theqvd.android.xpro;
 
@@ -11,11 +24,14 @@ import android.content.SharedPreferences;
 import android.content.SharedPreferences.Editor;
 import android.content.pm.ApplicationInfo;
 import android.content.pm.PackageManager;
+import android.graphics.Point;
 import android.net.Uri;
+import android.os.Build;
 import android.os.Handler;
 import android.os.Message;
 import android.util.DisplayMetrics;
 import android.util.Log;
+import android.view.Display;
 import android.view.WindowManager;
 /**
  * 
@@ -54,7 +70,8 @@ public class Config {
 	public final static String props_use_android_vnc = "useandroidvnc";
 	public final static String props_remote_vnc = "useremotevnc";
 	public final static String props_render = "userender";
-	public final static String helpurl = "http://theqvd.com/support/documentation";
+	public final static String props_xinerama = "usexinerama";
+	public final static String helpurl = "http://docs.theqvd.com/";
 	public final static int minPixels = 32;
 	public final static int maxPixels = 10000;
 	public final static boolean debug = false;
@@ -99,7 +116,8 @@ public class Config {
 			appConfig_xvncbinary_copied = false,
 			appConfig_pocketconfig_copied = false,
 			appConfig_remote_vnc_allowed = false,
-			appConfig_render = true;
+			appConfig_render = true,
+			appConfig_xinerama = true;
 	private static int appConfig_height_pixels = 0, appConfig_width_pixels = 0,
 			appConfig_defaultHeightPixels = 0, appconfig_defaultWidthPixels = 0;
 	private static VncViewerAndroid androidvncviewer;
@@ -116,16 +134,11 @@ public class Config {
 		setTargetdir(context.getFilesDir().getAbsolutePath());
 		pocketvncconfigfullpath = getTargetdir() + "/" + Config.pocketvncconfig;
 		xvnc = getTargetdir() + "/usr/X11R6/bin/" + L.xvncbinary;
-		xvnccmd = xvnc + " :0 -br -nolisten local  -pixelformat rgb888 -PasswordFile="+getTargetdir()+"/etc/vncpasswd";
-		
-		// Set height and width
-		DisplayMetrics metrics = new DisplayMetrics();
-		((WindowManager) context.getSystemService(Context.WINDOW_SERVICE)).getDefaultDisplay().getMetrics(metrics);
-		// force landscape hack
-		appConfig_defaultHeightPixels = (metrics.heightPixels > metrics.widthPixels) ? metrics.widthPixels : metrics.heightPixels;
-		appconfig_defaultWidthPixels = (metrics.heightPixels > metrics.widthPixels) ? metrics.heightPixels : metrics.widthPixels;
+		xvnccmd = xvnc + " :0 -br -nolisten local  -pixelformat rgb888 -pixdepths 1 4 8 15 16 24 32 -PasswordFile="+getTargetdir()+"/etc/vncpasswd";
+		setHeightAndWidth();
 		load_properties();
 	}
+
 	public Config(Context c) {
 		context = c;
 		init();
@@ -135,6 +148,49 @@ public class Config {
 		activity = a;
 		init();
 	}
+
+	private void setHeightAndWidth() {
+		// Set height and width	
+		WindowManager w = activity.getWindowManager();
+		Display d = w.getDefaultDisplay();
+		DisplayMetrics metrics = new DisplayMetrics();
+		d.getMetrics(metrics);
+		// since SDK_INT = 1;
+		int widthPixels = metrics.widthPixels;
+		int heightPixels = metrics.heightPixels;
+		Log.d(tag, "setHeightAndWidth:The Build.VERSION is:"+Build.VERSION.SDK_INT+
+	    		" and the initial width and height is:"+widthPixels+","+heightPixels);
+		// includes window decorations (statusbar bar/menu bar)
+		if (Build.VERSION.SDK_INT >= 14 && Build.VERSION.SDK_INT < 17)
+		try {
+			Log.d(tag, "setHeightAndWidth:The Build.VERSION is between 14 and 17:"+Build.VERSION.SDK_INT);
+			widthPixels = (Integer) Display.class.getMethod("getRawWidth").invoke(d);
+		    heightPixels = (Integer) Display.class.getMethod("getRawHeight").invoke(d);
+		    Log.d(tag, "setHeightAndWidth:The Build.VERSION is between 14 and 17:"+Build.VERSION.SDK_INT+
+		    		" and the width and height is:"+widthPixels+","+heightPixels);
+		} catch (Exception ignored) {
+		}
+		// includes window decorations (statusbar bar/menu bar)
+		if (Build.VERSION.SDK_INT >= 17)
+		try {
+			Log.d(tag, "setHeightAndWidth:The Build.VERSION is greater than 17:"+Build.VERSION.SDK_INT);
+		    Point realSize = new Point();
+		    Display.class.getMethod("getRealSize", Point.class).invoke(d, realSize);
+		    widthPixels = realSize.x;
+		    heightPixels = realSize.y;
+		    Log.d(tag, "setHeightAndWidth:The Build.VERSION is greater than 17:"+Build.VERSION.SDK_INT+
+		    		" and the width and height is:"+widthPixels+","+heightPixels);
+		} catch (Exception ignored) {
+		}
+		
+		// force landscape hack
+		appConfig_defaultHeightPixels = (heightPixels > widthPixels) ? widthPixels : heightPixels;
+		appconfig_defaultWidthPixels = (heightPixels > widthPixels) ? heightPixels : widthPixels;
+		Log.d(tag, "setHeightAndWidth: The final and the end width and height is:"+
+				appconfig_defaultWidthPixels+","+appConfig_defaultHeightPixels);
+	}
+	
+
 	private void load_properties() {
 		SharedPreferences prefsPrivate;
 		prefsPrivate = context.getSharedPreferences("PREFS_PRIVATE", Context.MODE_PRIVATE);
@@ -147,6 +203,7 @@ public class Config {
 		appConfig_pocketconfig_copied = prefsPrivate.getBoolean(Config.props_pocketconfigcopied, appConfig_pocketconfig_copied);
 		appConfig_remote_vnc_allowed =  prefsPrivate.getBoolean(Config.props_remote_vnc, appConfig_remote_vnc_allowed);
 		appConfig_render =  prefsPrivate.getBoolean(Config.props_render, appConfig_render);
+		appConfig_xinerama =  prefsPrivate.getBoolean(Config.props_xinerama, appConfig_xinerama);
 	}
 	private void save_properties() {
 		SharedPreferences prefsPrivate;
@@ -159,6 +216,7 @@ public class Config {
 		prefsPrivateEditor.putBoolean(Config.props_pocketconfigcopied, appConfig_pocketconfig_copied);
 		prefsPrivateEditor.putBoolean(Config.props_remote_vnc, appConfig_remote_vnc_allowed);
 		prefsPrivateEditor.putBoolean(Config.props_render, appConfig_render);
+		prefsPrivateEditor.putBoolean(Config.props_xinerama, appConfig_xinerama);
 		prefsPrivateEditor.putInt(Config.props_heightpixels, appConfig_height_pixels);
 		prefsPrivateEditor.putInt(Config.props_widthpixels, appConfig_width_pixels);
 		prefsPrivateEditor.commit();
@@ -239,6 +297,13 @@ public class Config {
 	}
 	public void setAppConfig_render(boolean appConfig_render) {
 		Config.appConfig_render = appConfig_render;
+		save_properties();
+	}
+	public boolean isAppConfig_xinerama() {
+		return appConfig_xinerama;
+	}
+	public void setAppConfig_xinerama(boolean appConfig_xinerama) {
+		Config.appConfig_xinerama = appConfig_xinerama;
 		save_properties();
 	}
 	public VncViewerAndroid getAndroidvncviewer() throws XvncproException {
