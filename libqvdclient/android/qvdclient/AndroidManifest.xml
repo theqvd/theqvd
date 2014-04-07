@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="utf-8"?>
 <manifest xmlns:android="http://schemas.android.com/apk/res/android"
     package="com.theqvd.android.client"
-    android:versionCode="183610"
+    android:versionCode="233710"
     android:versionName="@string/version" >
 
     <uses-sdk android:minSdkVersion="8" android:targetSdkVersion="12"/>
@@ -38,6 +38,7 @@
                 <action android:name="android.intent.action.VIEW"></action>
                 <category android:name="android.intent.category.DEFAULT"></category>
                 <data android:scheme="x11"></data>
+                <category android:name="android.intent.category.BROWSABLE" />
             </intent-filter>            
         </activity>
         <service android:enabled="true" android:name="com.theqvd.android.xpro.XserverService" android:exported="false">
@@ -45,6 +46,7 @@
                 <action android:name="android.intent.action.MAIN"></action>
                 <action android:name="android.intent.action.VIEW"></action>
                 <category android:name="android.intent.category.DEFAULT"></category>
+                <category android:name="android.intent.category.BROWSABLE" />
                 <data android:scheme="x11"></data>
             </intent-filter>
         </service>
