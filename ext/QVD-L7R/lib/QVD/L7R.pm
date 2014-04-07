@@ -335,7 +335,7 @@ sub _takeover_vm {
             }
             $vm->set_user_state('connecting',
                                 l7r_pid => $$,
-                                l7r_host => this_host_id,
+                                l7r_host_id => this_host_id,
                                 user_cmd => undef);
         };
         unless ($@) {
@@ -346,10 +346,10 @@ sub _takeover_vm {
 
         $vm->discard_changes;
         INFO sprintf("Session acquisition failed: L7R state %s for VM %d, pid: %d, host: %d, cmd: %s, my pid: %d, \$\@: %s",
-                      $vm->user_state, $vm->id, $vm->l7r_pid, $vm->l7r_host, $vm->user_cmd, $$, $@);
+                      $vm->user_state, $vm->id, $vm->l7r_pid, $vm->l7r_host_id, $vm->user_cmd, $$, $@);
 
         $l7r->_tell_client("Aborting contending session for VM_ID: ". $vm->id);
-        my $channel = "qvd_cmd_for_user_on_host" . $vm->l7r_host;
+        my $channel = "qvd_cmd_for_user_on_host" . $vm->l7r_host_id;
         DEBUG "notifying channel '$channel'";
         $vm->send_user_abort;
         notify($channel);
@@ -371,7 +371,7 @@ sub _release_vm {
     txn_eval {
         $vm->discard_changes;
         my $pid = $vm->l7r_pid;
-        my $host = $vm->l7r_host;
+        my $host_id = $vm->l7r_host_id;
         if ($vm->is_ephemeral && $vm->vm_state eq 'running') {
             $vm->send_vm_stop; # Clean up ephemeral VMs
         }
@@ -382,13 +382,13 @@ sub _release_vm {
         #   $vm->update({ real_user_id => undef });
 
         if (defined $pid  and $pid  == $$  and
-            defined $host and $host == this_host_id) {
+            defined $host_id and $host_id == this_host_id) {
             DEBUG 'calling clear l7r all for vm ' . $vm->id;
             $vm->clear_l7r_all;
         }
         else {
             DEBUG 'not calling clear_l7r_all for vm ' . $vm->id
-                . " where pid=$pid, \$\$=$$, host=$host, this_host=". this_host_id;
+                . " where pid=$pid, \$\$=$$, host=$host_id, this_host=". this_host_id;
         }
     };
     $@ and INFO "L7R release failed but don't bother, HKD will cleanup the mess: $@";

@@ -46,7 +46,7 @@ __PACKAGE__->add_columns( vm_id          => { data_type   => 'integer' },
 					      extra       => { list => [qw/abort/] } },
 			  vma_ok_ts      => { data_type   => 'integer',
 					      is_nullable => 1 },
-			  l7r_host       => { data_type   => 'integer',
+			  l7r_host_id    => { data_type   => 'integer',
 					      is_nullable => 1 },
 			  l7r_pid        => { data_type   => 'integer',
 					      is_nullable => 1 },
@@ -75,7 +75,7 @@ __PACKAGE__->add_columns( vm_id          => { data_type   => 'integer' },
 __PACKAGE__->set_primary_key('vm_id');
 
 __PACKAGE__->belongs_to(host => 'QVD::DB::Result::Host', 'host_id', { join_type => 'LEFT' });
-__PACKAGE__->belongs_to(l7r_host => 'QVD::DB::Result::Host', 'l7r_host', { join_type => 'LEFT' });
+__PACKAGE__->belongs_to(l7r_host => 'QVD::DB::Result::Host', 'l7r_host_id', { join_type => 'LEFT' });
 __PACKAGE__->belongs_to(vm   => 'QVD::DB::Result::VM', 	 'vm_id',   { cascade_delete => 1 });
 __PACKAGE__->belongs_to(real_user => 'QVD::DB::Result::User', 'real_user_id', { cascade_delete => 0 });
 
@@ -185,7 +185,7 @@ sub set_current_di_id {
 sub clear_l7r_all {
     shift->update({ user_state => 'disconnected',
                     user_cmd => undef,
-                    l7r_host => undef,
+                    l7r_host_id => undef,
                     l7r_pid => undef })
 }
 

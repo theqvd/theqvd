@@ -50,7 +50,7 @@ sub _load_user_cmds {
                   <<'EOQ', $self->{node_id});
 update vm_runtimes
     set vm_cmd=NULL
-  where l7r_host=$1
+  where l7r_host_id=$1
     and user_state = 'connected'
     and user_cmd   = 'abort'
   returning l7r_pid, vm_id

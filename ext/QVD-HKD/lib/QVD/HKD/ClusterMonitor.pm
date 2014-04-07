@@ -103,13 +103,13 @@ sub _unassign_l7rs {
     my ($self) = @_;
     $self->_query(<<EOQ);
 update vm_runtimes
-    set user_state = 'disconnected',
-        user_cmd = NULL,
-        l7r_host = NULL,
-        l7r_pid  = NULL
+    set user_state  = 'disconnected',
+        user_cmd    = NULL,
+        l7r_host_id = NULL,
+        l7r_pid     = NULL
    from host_runtimes
    where user_state != 'disconnected'
-     and host_runtimes.host_id = vm_runtimes.l7r_host
+     and host_runtimes.host_id = vm_runtimes.l7r_host_id
      and host_runtimes.state = 'lost'
    returning vm_id
 EOQ
@@ -129,7 +129,7 @@ update vm_runtimes
     where user_state = 'connected'
       and vm_state = 'stopped'
       and user_cmd = NULL
-    returning l7r_host
+    returning l7r_host_id
 EOQ
 }
 
@@ -137,7 +137,7 @@ sub _notify_hkds {
     my $self = shift;
     if (my $hosts = delete $self->{hosts_to_be_notified}) {
         my %hosts;
-        $hosts{$_->{l7r_host}} = 1 for @$hosts;
+        $hosts{$_->{l7r_host_id}} = 1 for @$hosts;
         $self->_notify("qvd_user_cmd_for_host$_") for keys %hosts;
     }
     $self->_on_done;
