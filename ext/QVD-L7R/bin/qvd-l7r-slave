@@ -3,6 +3,16 @@
 use strict;
 use warnings;
 
-use QVD::L7R;
+use QVD::Log;
 
-QVD::L7R->new->run;
+eval {
+    require QVD::L7R;
+    QVD::L7R->new->run;
+};
+
+if ($@) {
+    ERROR "Uncaught exception: $@";
+    exit 1
+}
+
+exit 0;
