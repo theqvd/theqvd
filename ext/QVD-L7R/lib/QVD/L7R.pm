@@ -546,7 +546,7 @@ sub _wait_for_x {
             }
         }
         sleep($x_poll_time);
-        $l7r->_check_abort($vm, 1);
+        # $l7r->_check_abort($vm, 1);
     }
 }
 
