@@ -272,14 +272,15 @@ sub connect_to_vm {
     $opts->{id} = $vm_id;
 
     my %o = (
-        id                            => $opts->{id},
-        'qvd.client.keyboard'         => $opts->{keyboard},
-        'qvd.client.os'               => $NX_OS,
-        'qvd.client.link'             => $opts->{link},
-        'qvd.client.geometry'         => $opts->{geometry},
-        'qvd.client.fullscreen'       => $opts->{fullscreen},
-        'qvd.client.printing.enabled' => $self->{printing},
-        'qvd.client.usb.enabled'      => $self->{usb},
+        id                              => $opts->{id},
+        'qvd.client.keyboard'           => $opts->{keyboard},
+        'qvd.client.os'                 => $NX_OS,
+        'qvd.client.link'               => $opts->{link},
+        'qvd.client.nxproxy.extra_args' => $opts->{extra_args},
+        'qvd.client.geometry'           => $opts->{geometry},
+        'qvd.client.fullscreen'         => $opts->{fullscreen},
+        'qvd.client.printing.enabled'   => $self->{printing},
+        'qvd.client.usb.enabled'        => $self->{usb},
     );
 
     $q = join '&', map { uri_escape($_) .'='. uri_escape($o{$_}) } keys %o;
@@ -473,6 +474,8 @@ sub _run {
         @cmd = core_cfg('command.nxproxy');
     }
 
+
+	push @cmd, split(/\s+/, core_cfg('client.nxproxy.extra_args')) if ( core_cfg('client.nxproxy.extra_args') );
     push @cmd, '-S', map("$_=$o{$_}", keys %o), 'localhost:40';
 
     my $slave_cmd = core_cfg('client.slave.command', 0);

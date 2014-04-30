@@ -72,6 +72,7 @@ my $ssl = ($port =~ /43$/ ? 1 : undef);
 
 my %connect_info = (
     link          => core_cfg('client.link'),
+    extra_args    => core_cfg('client.nxproxy.extra_args'),
     slave         => core_cfg('client.slave.enable'),
     audio         => core_cfg('client.audio.enable'),
     printing      => core_cfg('client.printing.enable'),

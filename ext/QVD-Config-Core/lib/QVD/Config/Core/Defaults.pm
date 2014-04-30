@@ -140,6 +140,10 @@ client.show.settings = 0
 
 ## nxproxy's link parameter, can be: modem, isdn, adsl, wan, lan, local or a bandwidth specification (56k, 1m, 100m...)
 client.link = adsl
+
+## Extra arguments to nxproxy. Allows non-standard configurations, like defining custom link types
+client.nxproxy.extra_args =
+
 ## nxproxy's geometry parameter
 client.geometry = 1024x768
 ## nxproxy's fullscreen parameter
