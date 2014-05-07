@@ -6,4 +6,4 @@ t/Linux-Proc-Net-TCP.t
 t/pod.t
 lib/Linux/Proc/Net/TCP.pm
 docs/proc_net_tcp.txt
-docs/Re: [bug] stuck localhost TCP connections.txt
+"docs/Re: [bug] stuck localhost TCP connections.txt"

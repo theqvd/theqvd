@@ -14,18 +14,24 @@ sub read {
     my $ip4 = delete $opts{ip4};
     my $ip6 = delete $opts{ip6};
     my $mnt = delete $opts{mnt};
+    my $files = delete $opts{files};
 
     %opts and croak "Unknown option(s) ". join(", ", sort keys %opts);
 
-    $mnt = "/proc" unless defined $mnt;
-
-    unless (-d $mnt and (stat _)[12] == 0) {
-        croak "$mnt is not a proc filesystem";
-    }
-
     my @fn;
-    push @fn, "$mnt/net/tcp"  unless (defined $ip4 and not $ip4);
-    push @fn, "$mnt/net/tcp6" if (defined $ip6 ? -f "$mnt/net/tcp6" : $ip6);
+    if ($files) {
+        @fn = @$files;
+    }
+    else {
+        $mnt = "/proc" unless defined $mnt;
+
+        unless (-d $mnt and (stat _)[12] == 0) {
+            croak "$mnt is not a proc filesystem";
+        }
+
+        push @fn, "$mnt/net/tcp"  unless (defined $ip4 and not $ip4);
+        push @fn, "$mnt/net/tcp6" if (defined $ip6 ? -f "$mnt/net/tcp6" : $ip6);
+    }
 
     my @entries;
     for my $fn (@fn) {
@@ -40,7 +46,7 @@ sub read {
                          ([\dA-F]{8}(?:[\dA-F]{24})?):([\dA-F]{4})\s  # remote address and port   -  3 &  4
                          ([\dA-F]{2})\s                               # st                        -  5
                          ([\dA-F]{8}):([\dA-F]{8})\s                  # tx_queue and rx_queue     -  6 &  7
-                         (\d\d):([\dA-F]{8}|(?:F{9,}))\s              # tr and tm->when           -  8 &  9
+                         (\d\d):([\dA-F]{8}|F{9,}|1AD7F[\dA-F]{6})\s  # tr and tm->when           -  8 &  9
                          ([\dA-F]{8})\s+                              # retrnsmt                  - 10
                          (\d+)\s+                                     # uid                       - 11
                          (\d+)\s+                                     # timeout                   - 12
@@ -152,7 +158,7 @@ sub ip6                       { length(shift->[ 1]) == 32 }
 
 sub tm_when { # work around bug in Linux kernel
     my $when = shift->[9];
-    $when =~ /^F{8,}$/ ? -1 : hex $when
+    $when =~ /^(?:F{8,}|1AD7F[\dA-F]{6})$/ ? -1 : hex $when
 }
 
 
