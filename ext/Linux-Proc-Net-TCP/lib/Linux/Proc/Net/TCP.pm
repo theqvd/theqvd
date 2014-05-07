@@ -1,6 +1,6 @@
 package Linux::Proc::Net::TCP;
 
-our $VERSION = '0.05';
+our $VERSION = '0.06';
 
 use strict;
 use warnings;
@@ -326,7 +326,7 @@ Salvador FandiE<ntilde>o E<lt>sfandino@yahoo.comE<gt>
 
 =head1 COPYRIGHT AND LICENSE
 
-Copyright (C) 2010, 2012 by Qindel Formacion y Servicios S.L.
+Copyright (C) 2010, 2012, 2014 by Qindel Formacion y Servicios S.L.
 
 This library is free software; you can redistribute it and/or modify
 it under the same terms as Perl itself, either Perl version 5.10.1 or,
