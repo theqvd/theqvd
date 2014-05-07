@@ -9,6 +9,8 @@ libwebsockify.a: websockify.o websocket.o
 websocket.o: websocket.c websocket.h
 websockify.o: websockify.c websocket.h
 
+install:
+
 clean:
 	rm -f $(TARGETS) *.o *~
 
