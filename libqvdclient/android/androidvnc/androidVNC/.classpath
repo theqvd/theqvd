@@ -7,5 +7,6 @@
 	<classpathentry kind="lib" path="libs/com.antlersoft.android.contentxml.jar" sourcepath="/dbimpl/src"/>
 	<classpathentry kind="src" path="ZoomerWithKeys_src"/>
 	<classpathentry exported="true" kind="con" path="com.android.ide.eclipse.adt.LIBRARIES"/>
+	<classpathentry exported="true" kind="con" path="com.android.ide.eclipse.adt.DEPENDENCIES"/>
 	<classpathentry kind="output" path="bin/classes"/>
 </classpath>
