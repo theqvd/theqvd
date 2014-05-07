@@ -7,7 +7,7 @@ libwebsockify.a: websockify.o websocket.o
 	$(AR) cr $@ $^ 
 
 websockifyclient: websockifyclient.o libwebsockify.a
-	$(LD) $(LDFLAGS) -o $@ $^
+	$(LD) $(LDFLAGS) -o $@ $^ -lresolv
 
 websocket.o: websocket.c websocket.h
 websockify.o: websockify.c websocket.h
