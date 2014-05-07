@@ -276,7 +276,7 @@ int websockify(int verbose, const char *listen_host, int listen_port, const char
   settings.key = "";
   settings.verbose      = verbose;
   settings.ssl_only     = 0;
-  settings.daemon       = 1;
+  settings.daemon       = 0;
   settings.run_once     = 0;
   settings.handler = proxy_handler; 
   strncpy(settings.listen_host,listen_host, sizeof(settings.listen_host));
