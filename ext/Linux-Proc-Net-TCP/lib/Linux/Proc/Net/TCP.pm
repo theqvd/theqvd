@@ -36,11 +36,11 @@ sub read {
         while (<$fh>) {
             my @entry = /^\s*
                          (\d+):\s                                     # sl                        -  0
-                         ([\dA-F]{8}(?:[\dA-F]{24})?):([\dA-F]{4})\s  # local address and port    -  1 y  2
-                         ([\dA-F]{8}(?:[\dA-F]{24})?):([\dA-F]{4})\s  # remote address and port   -  3 y  4
+                         ([\dA-F]{8}(?:[\dA-F]{24})?):([\dA-F]{4})\s  # local address and port    -  1 &  2
+                         ([\dA-F]{8}(?:[\dA-F]{24})?):([\dA-F]{4})\s  # remote address and port   -  3 &  4
                          ([\dA-F]{2})\s                               # st                        -  5
-                         ([\dA-F]{8}):([\dA-F]{8})\s                  # tx_queue and rx_queue     -  6 y  7
-                         (\d\d):([\dA-F]{8}|(?:F{9,}))\s              # tr and tm->when           -  8 y  9
+                         ([\dA-F]{8}):([\dA-F]{8})\s                  # tx_queue and rx_queue     -  6 &  7
+                         (\d\d):([\dA-F]{8}|(?:F{9,}))\s              # tr and tm->when           -  8 &  9
                          ([\dA-F]{8})\s+                              # retrnsmt                  - 10
                          (\d+)\s+                                     # uid                       - 11
                          (\d+)\s+                                     # timeout                   - 12
