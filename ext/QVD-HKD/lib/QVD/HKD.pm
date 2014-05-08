@@ -42,7 +42,7 @@ use QVD::HKD::L7R;
 use QVD::HKD::L7RKiller;
 use QVD::HKD::ExpirationMonitor;
 
-use QVD::HKD::Config::Network qw(netvms netnodes net_aton net_ntoa netstart_n network_n);
+use QVD::HKD::Config::Network qw(netvms netnodes net_aton net_ntoa netstart_n network_n netmask_n);
 
 use parent qw(QVD::HKD::Agent);
 
