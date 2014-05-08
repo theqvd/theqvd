@@ -227,14 +227,22 @@ sub run {
 sub _check_tcp_ports {
     my $self = shift;
     INFO 'checking TCP ports are free';
-    my $tcp = Linux::Proc::Net::TCP->read;
-    if (grep $_ == 53, $tcp->listener_ports) {
-        ERROR "TCP port 53 is already in use";
-        $self->_on_error;
+    my $n_n = network_n($self);
+    my $nm_n = netmask_n($self);
+    my $any_n = net_aton('0.0.0.0');
+    for my $listener (Linuc::Proc::Net::TCP->read->listeners) {
+        if ($listener->local_port == 53 and $listener->ip4) {
+            my $la = $listener->local_address;
+            my $la_n = net_aton($la);
+            if ($la_n == $any_n or
+                ($la_n & $nm_n) == $n_n) {
+                ERROR "TCP port 53 is already in use for IP $la";
+                $self->_on_error;
+                return;
+            }
+        }
     }
-    else {
-        $self->_on_done;
-    }
+    $self->_on_done;
 }
 
 sub _start_db {
