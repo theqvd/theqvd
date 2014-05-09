@@ -230,7 +230,7 @@ sub _check_tcp_ports {
     my $n_n = network_n($self);
     my $nm_n = netmask_n($self);
     my $any_n = net_aton('0.0.0.0');
-    for my $listener (Linuc::Proc::Net::TCP->read->listeners) {
+    for my $listener (Linux::Proc::Net::TCP->read->listeners) {
         if ($listener->local_port == 53 and $listener->ip4) {
             my $la = $listener->local_address;
             my $la_n = net_aton($la);
