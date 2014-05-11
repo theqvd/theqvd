@@ -46,7 +46,7 @@ char USAGE[] = "Usage: [options] " \
 
 char target_host[256];
 int target_port;
-
+int websockify_loop;
 extern pipe_error;
 extern settings_t settings;
 
@@ -63,9 +63,10 @@ void do_proxy(ws_ctx_t *ws_ctx, int target) {
     tin_start = tin_end = 0;
     maxfd = client > target ? client+1 : target+1;
 
-    while (1) {
-        tv.tv_sec = 1;
-        tv.tv_usec = 0;
+    websockify_loop = 1;
+    while (websockify_loop) {
+        tv.tv_sec = 0;
+        tv.tv_usec = 200000;
 
         FD_ZERO(&rlist);
         FD_ZERO(&wlist);
@@ -290,3 +291,6 @@ int websockify(int verbose, const char *listen_host, int listen_port, const char
   start_server();
 }
 
+void websockify_stop() {
+    websockify_loop = 0;
+}

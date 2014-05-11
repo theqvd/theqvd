@@ -83,3 +83,4 @@ ssize_t ws_send(ws_ctx_t *ctx, const void *buf, size_t len);
 #define handler_emsg(...) gen_handler_msg(stderr, __VA_ARGS__);
 
 int websockify(int verbose, const char *listen_host, int listen_port, const char *tgt_host, int tgt_port);
+void websockify_stop();

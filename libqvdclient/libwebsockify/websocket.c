@@ -664,39 +664,39 @@ void signal_handler(sig) {
     }
 }
 
-void daemonize(int keepfd) {
-    int pid, i;
+/* void daemonize(int keepfd) { */
+/*     int pid, i; */
 
-    umask(0);
-    chdir("/");
-    setgid(getgid());
-    setuid(getuid());
+/*     umask(0); */
+/*     chdir("/"); */
+/*     setgid(getgid()); */
+/*     setuid(getuid()); */
 
-    /* Double fork to daemonize */
-    pid = fork();
-    if (pid<0) { fatal("fork error"); }
-    if (pid>0) { exit(0); }  // parent exits
-    setsid();                // Obtain new process group
-    pid = fork();
-    if (pid<0) { fatal("fork error"); }
-    if (pid>0) { exit(0); }  // parent exits
+/*     /\* Double fork to daemonize *\/ */
+/*     pid = fork(); */
+/*     if (pid<0) { fatal("fork error"); } */
+/*     if (pid>0) { exit(0); }  // parent exits */
+/*     setsid();                // Obtain new process group */
+/*     pid = fork(); */
+/*     if (pid<0) { fatal("fork error"); } */
+/*     if (pid>0) { exit(0); }  // parent exits */
 
-    /* Signal handling */
-    signal(SIGHUP, signal_handler);   // catch HUP
-    signal(SIGTERM, signal_handler);  // catch kill
+/*     /\* Signal handling *\/ */
+/*     signal(SIGHUP, signal_handler);   // catch HUP */
+/*     signal(SIGTERM, signal_handler);  // catch kill */
 
-    /* Close open files */
-    for (i=getdtablesize(); i>=0; --i) {
-        if (i != keepfd) {
-            close(i);
-        } else if (settings.verbose) {
-            printf("keeping fd %d\n", keepfd);
-        }
-    }
-    i=open("/dev/null", O_RDWR);  // Redirect stdin
-    dup(i);                       // Redirect stdout
-    dup(i);                       // Redirect stderr
-}
+/*     /\* Close open files *\/ */
+/*     for (i=getdtablesize(); i>=0; --i) { */
+/*         if (i != keepfd) { */
+/*             close(i); */
+/*         } else if (settings.verbose) { */
+/*             printf("keeping fd %d\n", keepfd); */
+/*         } */
+/*     } */
+/*     i=open("/dev/null", O_RDWR);  // Redirect stdin */
+/*     dup(i);                       // Redirect stdout */
+/*     dup(i);                       // Redirect stderr */
+/* } */
 
 
 void start_server() {
@@ -730,7 +730,8 @@ void start_server() {
     signal(SIGPIPE, signal_handler);  // catch pipe
 
     if (settings.daemon) {
-        daemonize(lsock);
+      ;
+      //        daemonize(lsock);
     }
 
 
