@@ -1,9 +1,0 @@
-Changes
-Makefile.PL
-MANIFEST
-README
-t/Linux-Proc-Net-TCP.t
-t/sample_tcp
-lib/Linux/Proc/Net/TCP.pm
-docs/proc_net_tcp.txt
-docs/bug_stuck_localhost_TCP_connections.txt
