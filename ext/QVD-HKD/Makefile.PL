@@ -17,6 +17,7 @@ WriteMakefile( NAME          => 'QVD::HKD',
 				  'QVD::Log' => '0',
                                   'File::Slurp' => '0',
                                   'Linux::Proc::Mountinfo' => '0.01',
+                                  'Linux::Proc::Net::TCP' => '0.07',
 				  'QVD::L7R' => '0',
 				  'QVD::VMKiller' => '0'
                                 },
