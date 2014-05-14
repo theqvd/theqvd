@@ -24,6 +24,7 @@ use AnyEvent;
 use AnyEvent::Semaphore;
 use AnyEvent::Pg::Pool;
 use Linux::Proc::Net::TCP;
+use Linux::Proc::Net::UDP;
 use Linux::Proc::Mountinfo;
 use Method::WeakCallback qw(weak_method_callback);
 use Time::HiRes ();
@@ -70,7 +71,7 @@ use Class::StateMachine::Declarative
                                                                 loading_db_config     => { enter => '_start_config',
                                                                                            on => { _on_config_reload_done => '_on_done' } },
                                                                 loading_host_row      => { enter => '_load_host_row' },
-                                                                checking_tcp_ports    => { enter => '_check_tcp_ports' },
+                                                                checking_net_ports    => { enter => '_check_net_ports' },
                                                                 checking_address      => { enter => '_check_address' },
                                                                 checking_cgroups      => { enter => '_check_cgroups' } ] },
 
@@ -224,24 +225,50 @@ sub run {
     $self->{exit}->recv;
 }
 
-sub _check_tcp_ports {
+sub _check_net_ports {
     my $self = shift;
-    INFO 'checking TCP ports are free';
     my $n_n = network_n($self);
     my $nm_n = netmask_n($self);
     my $any_n = net_aton('0.0.0.0');
+
+    my @ports = (53, 67);
+
+    INFO "checking for free TCP ports " . join(", ", @ports);
     for my $listener (Linux::Proc::Net::TCP->read->listeners) {
-        if ($listener->local_port == 53 and $listener->ip4) {
-            my $la = $listener->local_address;
-            my $la_n = net_aton($la);
-            if ($la_n == $any_n or
-                ($la_n & $nm_n) == $n_n) {
-                ERROR "TCP port 53 is already in use for IP $la";
-                $self->_on_error;
-                return;
+        if ($listener->ip4) {
+            for my $port (@ports) {
+                if ($listener->local_port == $port) {
+                    my $la = $listener->local_address;
+                    my $la_n = net_aton($la);
+                    if ($la_n == $any_n or
+                        ($la_n & $nm_n) == $n_n) {
+                        ERROR "TCP port $port is already in use for IP $la";
+                        $self->_on_error;
+                        return;
+                    }
+                }
             }
         }
     }
+
+    INFO "checking for free UDP ports " . join(", ", @ports);
+    for my $listener (@{Linux::Proc::Net::UDP->read}) {
+        if ($listener->ip4) {
+            for my $port (@ports) {
+                if ($listener->local_port == $port) {
+                    my $la = $listener->local_address;
+                    my $la_n = net_aton($la);
+                    if ($la_n == $any_n or
+                        ($la_n & $nm_n) == $n_n) {
+                        ERROR "UDP port $port is already in use for IP $la";
+                        $self->_on_error;
+                        return;
+                    }
+                }
+            }
+        }
+    }
+
     $self->_on_done;
 }
 
