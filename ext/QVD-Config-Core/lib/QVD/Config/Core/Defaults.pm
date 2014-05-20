@@ -70,14 +70,16 @@ path.cgroup.cpu.lxc = ${path.cgroup}/cpu/lxc
 path.client.pixmaps = pixmaps
 path.client.pixmaps.alt = /usr/share/pixmaps
 
+path.qvd.bin = /usr/lib/qvd/bin
+
 ## paths to external executables
 command.kvm = kvm
 command.kvm-img = kvm-img
-command.sshfs = /usr/lib/qvd/bin/sshfs
+command.sshfs = ${path.qvd.bin}/sshfs
 command.open_file = /usr/bin/xdg-open
 command.sftp-server = /usr/lib/openssh/sftp-server
 command.nxagent = /usr/bin/nxagent
-command.nxdiag = /usr/lib/qvd/bin/nxdiag.pl
+command.nxdiag = ${path.qvd.bin}/nxdiag.pl
 command.x-session = /etc/X11/Xsession
 command.brctl = /sbin/brctl
 command.ifconfig = /sbin/ifconfig
@@ -90,13 +92,13 @@ command.tar = tar
 command.umount = umount
 command.mount = mount
 command.rm = rm
-command.unionfs-fuse = /usr/lib/qvd/bin/unionfs
-command.lxc-destroy = /usr/lib/qvd/bin/lxc-destroy
-command.lxc-console = /usr/lib/qvd/bin/lxc-console
-command.lxc-create = /usr/lib/qvd/bin/lxc-create
-command.lxc-start = /usr/lib/qvd/bin/lxc-start
-command.lxc-stop = /usr/lib/qvd/bin/lxc-stop
-command.lxc-wait = /usr/lib/qvd/bin/lxc-wait
+command.unionfs-fuse = ${path.qvd.bin}/unionfs
+command.lxc-destroy = ${path.qvd.bin}/lxc-destroy
+command.lxc-console = ${path.qvd.bin}/lxc-console
+command.lxc-create = ${path.qvd.bin}/lxc-create
+command.lxc-start = ${path.qvd.bin}/lxc-start
+command.lxc-stop = ${path.qvd.bin}/lxc-stop
+command.lxc-wait = ${path.qvd.bin}/lxc-wait
 command.version.lxc = 0.7
 command.ebtables = ebtables
 command.iptables = iptables
@@ -107,7 +109,7 @@ command.nxproxy = /usr/bin/nxproxy
 command.btrfs = /sbin/btrfs
 command.ip = /sbin/ip
 command.x11vnc = /usr/bin/x11vnc
-command.qvd-l7r-slave = /usr/lib/qvd/bin/qvd-l7r-slave
+command.qvd-l7r-slave = ${path.qvd.bin}/qvd-l7r-slave
 command.windows.xming = Xming\\Xming.exe
 command.windows.pulseaudio = pulseaudio\\pulseaudio.exe
 command.windows.nxproxy = nx\\nxproxy.exe
@@ -124,7 +126,7 @@ command.darwin.sftp-server = /usr/libexec/sftp-server
 
 command.usbsrv = /usr/local/bin/usbsrv
 command.usbclnt = /usr/local/bin/usbclnt
-command.slaveclient = /usr/lib/qvd/bin/qvd-slaveclient
+command.slaveclient = ${path.qvd.bin}/qvd-slaveclient
 
 ## whether to remember password after successful connection
 client.remember_password = 0
@@ -312,7 +314,7 @@ vma.audio.enable = 0
 ## enables "slave channel" in nxagent
 vma.slave.enable = 0
 ## slave shell to execute to client requests
-vma.slave.command = /usr/lib/qvd/bin/qvd-vma-slaveserver
+vma.slave.command = ${path.qvd.bin}/qvd-vma-slaveserver
 ## enables the printing channel in nxagent
 vma.printing.enable = 0
 ## path to the VMA PID file
@@ -406,9 +408,9 @@ internal.nxagent.timeout.listening = 10
 internal.nxagent.timeout.suspending = 20
 internal.nxagent.timeout.stopping = 20
 
-internal.vma.on_printing.connected = /usr/lib/qvd/bin/qvd-printing
-internal.vma.on_printing.suspended = /usr/lib/qvd/bin/qvd-printing
-internal.vma.on_printing.stopped = /usr/lib/qvd/bin/qvd-printing
+internal.vma.on_printing.connected = ${path.qvd.bin}/qvd-printing
+internal.vma.on_printing.suspended = ${path.qvd.bin}/qvd-printing
+internal.vma.on_printing.stopped = ${path.qvd.bin}/qvd-printing
 
 internal.vma.printing.config = ${path.run}/printing.conf
 internal.vma.slave.config = ${path.run}/slave.conf
