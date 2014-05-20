@@ -119,6 +119,8 @@ command.nxagent.args.extra =
 command.x-session.args.extra =
 command.sftp-server = /usr/lib/openssh/sftp-server
 
+command.qvd-lxc-autodev = ${path.qvd.bin}/qvd-lxc-autodev
+
 command.darwin.x11 = XQuartz.app
 command.darwin.nxproxy = bin/nxproxy
 command.darwin.pulseaudio = bin/pulseaudio

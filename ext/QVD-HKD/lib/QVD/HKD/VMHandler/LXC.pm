@@ -336,11 +336,12 @@ sub _create_lxc {
     DEBUG "Local endpoint of the network device, connected to the bridge '$bridge': '$iface'";
 
     my $lxc_version = $self->_cfg('command.version.lxc');
+    my $qvd_lxc_autodev = $self->_cfg('command.qvd-lxc-autodev');
 
     # FIXME: make this template-able or configurable in some way
     print $cfg_fh <<EOC;
 lxc.autodev=1
-lxc.hook.autodev=/usr/lib/qvd/bin/qvd-lxc-autodev
+lxc.hook.autodev=$qvd_lxc_autodev
 lxc.utsname=$self->{name}
 lxc.network.type=veth
 lxc.network.veth.pair=$iface
