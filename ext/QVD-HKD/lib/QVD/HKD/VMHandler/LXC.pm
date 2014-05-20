@@ -314,7 +314,8 @@ sub _create_lxc {
     my $console;
     if ($self->_cfg('vm.serial.capture')) {
         my $captures_dir = $self->_cfg('path.serial.captures');
-        mkdir $captures_dir, 0700 or WARN "mkdir: '$captures_dir': $!";
+        mkdir $captures_dir, 0700;
+        my $err = $!;
         if (-d $captures_dir) {
             my @t = gmtime; $t[5] += 1900; $t[4] += 1;
             my $ts = sprintf("%04d-%02d-%02d-%02d:%02d:%2d-GMT0", @t[5,4,3,2,1,0]);
@@ -322,7 +323,7 @@ sub _create_lxc {
             DEBUG "Console output will be saved in '$console'";
         }
         else {
-            ERROR "Captures directory '$captures_dir' does not exist";
+            ERROR "Captures directory '$captures_dir' does not exist and can not be created: $!";
             return $self->_on_error;
         }
     }

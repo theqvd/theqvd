@@ -333,7 +333,13 @@ sub _run_cmd {
 sub __run_cmd_callback {
     my ($self, $opts, $pid, $var) = @_;
     my $rc = $var->recv;
-    DEBUG "Process $pid returned rc: $rc";
+    if (($rc >> 8) == 126) {
+        WARN "Process $pid returned rc: $rc, it probably means that the binary was not found";
+    }
+    else {
+        DEBUG "Process $pid returned rc: $rc";
+    }
+
     my $last = $self->{last_cmd_pid};
     delete $self->{last_cmd_pid} if $last and $last == $pid;
     delete $self->{cmd_timer_watcher}{$pid};
