@@ -231,7 +231,12 @@ sub _check_net_ports {
     my $nm_n = netmask_n($self);
     my $any_n = net_aton('0.0.0.0');
 
-    my @ports = (53, 67);
+    # UDP port for bootps (67) is not checked because dnsmasq binds to
+    # 0.0.0.0 with reuse port and address options set and then uses
+    # the SO_BINDTODEVICE to only receive packets on the designated
+    # interface.
+
+    my @ports = (53); # 67
 
     INFO "checking for free TCP ports " . join(", ", @ports);
     for my $listener (Linux::Proc::Net::TCP->read->listeners) {

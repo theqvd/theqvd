@@ -89,15 +89,16 @@ sub _start_dhcpd {
     DEBUG "About to run dhcpd: network bridge '$network_bridge', IP start '$dhcp_start', gateway '$dhcp_default_route', domain '$dhcp_domain'";
     $self->_make_config;
     my @dhcpd_cmd = ( 'dhcpd',
-                      '-k', '--log-dhcp',
-                      '--dhcp-range'     => "interface:$network_bridge,$dhcp_start,static",
-                      '--dhcp-option'    => "option:router,$dhcp_default_route",
-                      '--interface'      => $network_bridge,
-                      '--dhcp-hostsfile' => $dhcp_hostsfile,
-                      '-X'               => 50000,  # set the limit to the number of
-                                                    # leases served big enough to
-                                                    # ensure it will not be reached
-                                                    # ever
+                      '-k', '--log-dhcp', '--bind-interfaces',
+                      '--interface'        => $network_bridge,
+                      '--except-interface' => 'lo',
+                      '--dhcp-range'       => "interface:$network_bridge,$dhcp_start,static",
+                      '--dhcp-option'      => "option:router,$dhcp_default_route",
+                      '--dhcp-hostsfile'   => $dhcp_hostsfile,
+                      '-X'                 => 50000,  # set the limit to the number of
+                                                      # leases served big enough to
+                                                      # ensure it will not be reached
+                                                      # ever
                     );
     push @dhcpd_cmd, "--domain=$dhcp_domain" if length $dhcp_domain;
     push @dhcpd_cmd, "-d" if $debug;
