@@ -11,7 +11,7 @@ use AnyEvent::HTTP;
 use Errno qw(EAGAIN);
 use Fcntl ();
 use Fcntl::Packer ();
-use QVD::HKD::Helpers qw(croak_invalid_opts);
+use QVD::HKD::Helpers qw(croak_invalid_opts perl_quote);
 use Pg::PQ qw(:pgres);
 use QVD::Log;
 use JSON;
@@ -299,7 +299,7 @@ sub _run_cmd {
             push @cmd, < $args >;
         }
     }
-    INFO "Running command '@cmd @args'";
+    INFO "Running command " . perl_quote([@cmd, @args]);
     $opts->{outlives_state} //= $opts->{run_and_forget};
     my @extra = map { ( defined $opts->{$_}
                         ? ($_ => $opts->{$_})

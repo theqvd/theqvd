@@ -4,9 +4,10 @@ use strict;
 use warnings;
 use Carp;
 
+use Data::Dumper;
 use Exporter;
 
-our @EXPORT_OK = qw(croak_invalid_opts mkpath boolean_db2perl);
+our @EXPORT_OK = qw(croak_invalid_opts mkpath boolean_db2perl perl_quote);
 our @CARP_NOT;
 my %CARP_NOT;
 
@@ -42,6 +43,12 @@ sub mkpath {
 sub boolean_db2perl {
     my $v = shift // return;
     ($v eq 'f' ? undef : $v);
+}
+
+sub perl_quote {
+    local $Data::Dumper::Terse = 1;
+    local $Data::Dumper::Indent = 0;
+    Data::Dumper::Dumper(@_);
 }
 
 1;
