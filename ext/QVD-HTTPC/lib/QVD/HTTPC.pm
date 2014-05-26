@@ -117,7 +117,8 @@ sub _send_queued {
 		    $n = select($rv, undef, undef, $timeout);
 		}
 		else {
-		    die "socket closed unexpectedly: $!"
+			my ($const) = grep { $!{$_} } keys %!;
+		    die "socket closed unexpectedly: $const ($!)";
 		}
 	    }
 	}

@@ -684,7 +684,7 @@ sub start_file_sharing {
                 my $client = QVD::Client::SlaveClient->new();
                 eval { $client->handle_share($share) };
                 if ($@) {
-                    if ($@ =~ 'Connection refused') {
+                    if ($@ =~ 'ECONNREFUSED') {
                         sleep 1;
                         next;
                     }
