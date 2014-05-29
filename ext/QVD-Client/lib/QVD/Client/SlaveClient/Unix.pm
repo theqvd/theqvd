@@ -23,7 +23,7 @@ sub handle_share {
         headers => [
             "Authorization: Basic $self->{auth_key}",
             'Connection: Upgrade', 
-            "Upgrade: qvd:sftp/1.0;charset=$charset"
+            "Upgrade: qvd:sftp/1.0"
         ]);
     
     if ($code != HTTP_SWITCHING_PROTOCOLS) {
