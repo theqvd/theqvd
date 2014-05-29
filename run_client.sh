@@ -3,8 +3,8 @@
 # SVN versions of the various components.
 
 root=`pwd`
-
 includes=""
+perl="/usr/lib/qvd/bin/perl"
 
 for dir in `find ext -maxdepth 1 -mindepth 1 -type d | grep -v '.svn'` ; do
 	if [ -d "$dir/lib" ] ; then
@@ -12,17 +12,17 @@ for dir in `find ext -maxdepth 1 -mindepth 1 -type d | grep -v '.svn'` ; do
 	fi
 done
 
-#cd ext/QVD-Client && /usr/lib/qvd/bin/perl $includes bin/qvd-gui-client.pl
+#cd ext/QVD-Client && $perl $includes bin/qvd-gui-client.pl
 echo
-echo "cd ext/QVD-Client && perl $includes bin/qvd-gui-client.pl"
+echo "cd ext/QVD-Client && $perl $includes bin/qvd-gui-client.pl"
 echo
 
 cd ext/QVD-Client
 
 if [ "$1" == "gdb" ] ; then
-	gdb --args perl $includes bin/qvd-gui-client.pl
+	gdb --args $perl $includes bin/qvd-gui-client.pl
 else
-	perl $includes bin/qvd-gui-client.pl
+	$perl $includes bin/qvd-gui-client.pl
 fi
 
 
