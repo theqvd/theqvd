@@ -242,6 +242,31 @@ sub _become_user {
     chdir $home;
 }
 
+sub _set_environment {
+
+	# Environment doesn't get set properly when logging in through QVD,
+	# so we set it manually.
+
+	foreach my $file (qw( /etc/locale.conf /etc/default/locale /etc/environment $ENV{HOME}/.qvd_environment )) { 
+		DEBUG "Trying to load environment from $file";
+		if ( open(my $fh, '<', $file) ) {
+			DEBUG "$file opened, processing";
+
+			while(my $line = <$fh>) {
+				chomp $line;
+				my ($k, $v) = split(/=/, $line, 2);
+				$ENV{$k} = $v;
+			}
+		}
+	}
+
+    if (!$ENV{LANG}) {
+		# $LANG should be set to an UTF-8 code. Lack of this results in ?'s in
+		# filenames that use non-latin1 characters in the terminal.
+		$ENV{LANG} = cfg('vma.default.lang');
+	}
+}
+
 sub _read_line {
     my $fn = shift;
     DEBUG "_read_line($fn)";
@@ -441,6 +466,7 @@ sub _fork_monitor {
                                @nxagent_args_extra);
 		    say "running @cmd";
 		    _become_user($props{'qvd.vm.user.name'});
+			_set_environment();
 		    exec @cmd;
 		};
 		say "Unable to start X server: " .($@ || $!);

@@ -333,6 +333,7 @@ vma.user.home.path = /home
 ## default user name and groups it will belong to
 vma.user.default.name = qvd
 vma.user.default.groups =
+vma.default.lang = en_US.UTF-8
 
 # When using LXC if this flag is set, QVD will assume that the home
 # directories are not per virtual machine but per user and that they
