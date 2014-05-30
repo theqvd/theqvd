@@ -254,8 +254,11 @@ sub _set_environment {
 
 			while(my $line = <$fh>) {
 				chomp $line;
+				$line =~ s/[^\\]#.*$//; # Remove comments
 				my ($k, $v) = split(/=/, $line, 2);
-				$ENV{$k} = $v;
+				if ( defined $k && defined $v ) {
+					$ENV{$k} = $v;
+				}
 			}
 		}
 	}
