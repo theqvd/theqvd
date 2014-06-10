@@ -597,6 +597,7 @@ sub _make_nxagent_config {
 
     push @nx_args, 'media=1' if $enable_audio;
     push @nx_args, 'slave=1' if $enable_slave;
+    push @nx_args, $props{'qvd.client.nxagent.extra_args'} if ($props{'qvd.client.nxagent.extra_args'});
 
     if ($enable_printing) {
 	# FIXME: check that printing is also enabled on the client

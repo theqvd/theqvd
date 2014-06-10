@@ -276,7 +276,7 @@ sub connect_to_vm {
         'qvd.client.keyboard'           => $opts->{keyboard},
         'qvd.client.os'                 => $NX_OS,
         'qvd.client.link'               => $opts->{link},
-        'qvd.client.nxproxy.extra_args' => $opts->{extra_args},
+        'qvd.client.nxagent.extra_args' => $opts->{extra_args},
         'qvd.client.geometry'           => $opts->{geometry},
         'qvd.client.fullscreen'         => $opts->{fullscreen},
         'qvd.client.printing.enabled'   => $self->{printing},

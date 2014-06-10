@@ -351,6 +351,7 @@ sub OnClickConnect {
         usb           => core_cfg('client.usb.enable'),
         geometry      => core_cfg('client.geometry'),
         fullscreen    => core_cfg('client.fullscreen'),
+        extra_args    => core_cfg('client.nxagent.extra_args'),
         keyboard      => $self->DetectKeyboard,
         port          => $DEFAULT_PORT,
         ssl           => $USE_SSL,
