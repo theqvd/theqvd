@@ -247,6 +247,8 @@ dix_main(int argc, char *argv[], char *envp[])
     char	*xauthfile;
     HWEventQueueType	alwaysCheckForInput[2];
 
+    dispatchException=0;
+    isItTimeToYield=FALSE;
     display = "0";
 
     /* Quartz support on Mac OS X requires that the Cocoa event loop be in
