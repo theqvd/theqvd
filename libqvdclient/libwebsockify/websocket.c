@@ -698,39 +698,39 @@ void signal_handler(sig) {
 /*     dup(i);                       // Redirect stderr */
 /* } */
 
-int set_blocking(int lsock) {
-  long fcntlarg;
-  /* Set non blocking */
-  if ((fcntlarg = fcntl(lsock, F_GETFL, NULL)) < 0) {
-    perror("fcntl GETFL");
-    close(lsock);
-    return 1;
-  }
-  fcntlarg |= O_NONBLOCK;
-  if (fcntl(lsock, F_SETFL, fcntlarg) < 0) {
-    perror("fcntl SETFL");
-    close(lsock);
-    return 1;
-  }
-  return 0;
-}
+/* int set_blocking(int lsock) { */
+/*   long fcntlarg; */
+/*   /\* Set non blocking *\/ */
+/*   if ((fcntlarg = fcntl(lsock, F_GETFL, NULL)) < 0) { */
+/*     perror("fcntl GETFL"); */
+/*     close(lsock); */
+/*     return 1; */
+/*   } */
+/*   fcntlarg |= O_NONBLOCK; */
+/*   if (fcntl(lsock, F_SETFL, fcntlarg) < 0) { */
+/*     perror("fcntl SETFL"); */
+/*     close(lsock); */
+/*     return 1; */
+/*   } */
+/*   return 0; */
+/* } */
 
-int set_non_blocking(int lsock) {
-  long fcntlarg;
-  /* Set non blocking */
-  if ((fcntlarg = fcntl(lsock, F_GETFL, NULL)) < 0) {
-    perror("fcntl GETFL");
-    close(lsock);
-    return 1;
-  }
-  fcntlarg &= !O_NONBLOCK;
-  if (fcntl(lsock, F_SETFL, fcntlarg) < 0) {
-    perror("fcntl SETFL");
-    close(lsock);
-    return 1;
-  }
-  return 0;
-}
+/* int set_non_blocking(int lsock) { */
+/*   long fcntlarg; */
+/*   /\* Set non blocking *\/ */
+/*   if ((fcntlarg = fcntl(lsock, F_GETFL, NULL)) < 0) { */
+/*     perror("fcntl GETFL"); */
+/*     close(lsock); */
+/*     return 1; */
+/*   } */
+/*   fcntlarg &= !O_NONBLOCK; */
+/*   if (fcntl(lsock, F_SETFL, fcntlarg) < 0) { */
+/*     perror("fcntl SETFL"); */
+/*     close(lsock); */
+/*     return 1; */
+/*   } */
+/*   return 0; */
+/* } */
 
 void start_server() {
     int lsock, csock, pid, clilen, sopt = 1, i, res;
@@ -782,9 +782,9 @@ void start_server() {
         pipe_error = 0;
         pid = 0;
 
-	if (set_non_blocking(lsock) != 0) {
-	  return;
-	}
+	//	if (set_non_blocking(lsock) != 0) {
+	//	  return;
+	//	}
 	// Set Accept socket to non blocking to allow to cancel
 	// requests
 
@@ -822,9 +822,9 @@ void start_server() {
         handler_msg("got client connection from %s\n",
                     inet_ntoa(cli_addr.sin_addr));
 
-	if (set_blocking(lsock) != 0) {
-	  return;
-	}
+	//	if (set_blocking(lsock) != 0) {
+	//	  return;
+	//	}
 
         if (!settings.run_once) {
             handler_msg("forking handler process not supported. Abort\n");
