@@ -63,7 +63,6 @@ void do_proxy(ws_ctx_t *ws_ctx, int target) {
     tin_start = tin_end = 0;
     maxfd = client > target ? client+1 : target+1;
 
-    websockify_loop = 1;
     while (websockify_loop) {
         tv.tv_sec = 0;
         tv.tv_usec = 200000;
@@ -278,7 +277,7 @@ int websockify(int verbose, const char *listen_host, int listen_port, const char
   settings.verbose      = verbose;
   settings.ssl_only     = 0;
   settings.daemon       = 0;
-  settings.run_once     = 0;
+  settings.run_once     = 1;
   settings.handler = proxy_handler; 
   strncpy(settings.listen_host,listen_host, sizeof(settings.listen_host));
   settings.listen_host[sizeof(settings.listen_host) - 1] = '\0';
@@ -288,7 +287,11 @@ int websockify(int verbose, const char *listen_host, int listen_port, const char
   target_host[sizeof(target_host) - 1 ] = '\0';
   target_port = tgt_port;
 
-  start_server();
+  websockify_loop = 1;
+  // Allow only one simultaneous connection
+  while (websockify_loop) {
+    start_server();
+  }
 }
 
 void websockify_stop() {

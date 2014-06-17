@@ -698,11 +698,46 @@ void signal_handler(sig) {
 /*     dup(i);                       // Redirect stderr */
 /* } */
 
+int set_blocking(int lsock) {
+  long fcntlarg;
+  /* Set non blocking */
+  if ((fcntlarg = fcntl(lsock, F_GETFL, NULL)) < 0) {
+    perror("fcntl GETFL");
+    close(lsock);
+    return 1;
+  }
+  fcntlarg |= O_NONBLOCK;
+  if (fcntl(lsock, F_SETFL, fcntlarg) < 0) {
+    perror("fcntl SETFL");
+    close(lsock);
+    return 1;
+  }
+  return 0;
+}
+
+int set_non_blocking(int lsock) {
+  long fcntlarg;
+  /* Set non blocking */
+  if ((fcntlarg = fcntl(lsock, F_GETFL, NULL)) < 0) {
+    perror("fcntl GETFL");
+    close(lsock);
+    return 1;
+  }
+  fcntlarg &= !O_NONBLOCK;
+  if (fcntl(lsock, F_SETFL, fcntlarg) < 0) {
+    perror("fcntl SETFL");
+    close(lsock);
+    return 1;
+  }
+  return 0;
+}
 
 void start_server() {
-    int lsock, csock, pid, clilen, sopt = 1, i;
+    int lsock, csock, pid, clilen, sopt = 1, i, res;
     struct sockaddr_in serv_addr, cli_addr;
     ws_ctx_t *ws_ctx;
+    fd_set myset;
+    struct timeval tv;
 
 
     /* Initialize buffers */
@@ -741,37 +776,69 @@ void start_server() {
     printf("Waiting for connections on %s:%d\n",
             settings.listen_host, settings.listen_port);
 
-    while (1) {
+
+    while (websockify_loop) {
         clilen = sizeof(cli_addr);
         pipe_error = 0;
         pid = 0;
-        csock = accept(lsock, 
-                       (struct sockaddr *) &cli_addr, 
-                       &clilen);
-        if (csock < 0) {
-            error("ERROR on accept");
-            continue;
-        }
+
+	if (set_non_blocking(lsock) != 0) {
+	  return;
+	}
+	// Set Accept socket to non blocking to allow to cancel
+	// requests
+
+	while (websockify_loop) {
+	  tv.tv_sec = 0;
+	  tv.tv_usec = 200000;
+	  FD_ZERO(&myset);
+	  FD_SET(lsock, &myset);
+	  res = select(lsock+1, &myset, NULL, NULL, &tv);
+	  /* EINTR */
+	  if (res < 0 && errno == EINTR) {
+	    continue;
+	  }
+	  if (res < 0) {
+	    perror("select");
+	    return;
+	  }
+	  if (res > 0) {
+	    break;
+	  }
+	}
+	if (!websockify_loop) {
+	  fprintf(stderr, "Ending loop before accept\n");
+	  return;
+	}
+	csock = accept(lsock, 
+		       (struct sockaddr *) &cli_addr, 
+		       &clilen);
+	
+	fprintf(stderr, "After accept\n");
+	if (csock < 0) {
+	  error("ERROR on accept");
+	  continue;
+	}
         handler_msg("got client connection from %s\n",
                     inet_ntoa(cli_addr.sin_addr));
 
+	if (set_blocking(lsock) != 0) {
+	  return;
+	}
+
         if (!settings.run_once) {
-            handler_msg("forking handler process\n");
-            pid = fork();
+            handler_msg("forking handler process not supported. Abort\n");
+	    abort();
+	    //            pid = fork();
         }
 
         if (pid == 0) {  // handler process
             ws_ctx = do_handshake(csock);
             if (settings.run_once) {
-                if (ws_ctx == NULL) {
-                    // Not a real WebSocket connection
-                    continue;
-                } else {
                     // Successful connection, stop listening for new
                     // connections
                     close(lsock);
-                }
-            }
+	    }
             if (ws_ctx == NULL) {
                 handler_msg("No connection after handshake\n");
                 break;   // Child process exits
