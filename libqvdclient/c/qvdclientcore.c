@@ -345,7 +345,7 @@ int qvd_connect_to_vm(qvdclient *qvd, int id)
   qvd_printf("Before _qvd_client_loop\n");
   result = _qvd_client_loop(qvd, fd, proxyFd);
   qvd_progress(qvd, "End of QVD connection");
-  shutdown(proxyFd, 2);
+  //  shutdown(proxyFd, 2); is invoked in qvd_free
   qvd_printf("before NXTransDestroy\n");
   NXTransDestroy(NX_FD_ANY);
   qvd_printf("after NXTransDestroy\n");
@@ -728,7 +728,7 @@ int _qvd_client_loop(qvdclient *qvd, int connFd, int proxyFd)
 	    }
 	}
     } while (connFd > 0 && proxyFd > 0);
-  
+
   return result;
 }
 
