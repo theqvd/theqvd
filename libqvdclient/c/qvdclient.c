@@ -4,6 +4,7 @@
 #include <limits.h>
 #include <string.h>
 #include <openssl/ssl.h>
+#include <signal.h>
 #include "qvdclient.h"
 
 void help(const char *program)
@@ -27,6 +28,8 @@ void help(const char *program)
 	 "  -x : NX client options. Example: nx/nx,data=0,delta=0,cache=16384,pack=0:0\n"
 	 "  -c : Specify client certificate (PEM), it requires also -k. Example -c $HOME/.qvd/client.crt -k $HOME/.qvd/client.key\n"
 	 "  -k : Specify client certificate key (PEM), requires -c. Example $HOME/.qvd/client.crt -k $HOME/.qvd/client.key\n"
+	 "  -r : Restart session. That is stop the VM before issuing a vm_connect\n"
+	 "  -2 : Specify to reconnect after the connection has finished. This is for testing only.\n"
 	 "\n"
 	 "Environment variables:\n"
 	 "  %s : Specifies the host to connect to, if not specified with -h\n"
@@ -45,7 +48,7 @@ void help(const char *program)
   printf("  -r : If there's a running session, restart it\n");
 }
 
-int parse_params(int argc, char **argv, const char **host, int *port, const char **user, const char **pass, const char **geometry, int *fullscreen, int *only_list_of_vm, int *one_vm, int *no_cert_check, int *restart_session, const char **nx_options, const char **client_cert, const char **client_key)
+int parse_params(int argc, char **argv, const char **host, int *port, const char **user, const char **pass, const char **geometry, int *fullscreen, int *only_list_of_vm, int *one_vm, int *no_cert_check, int *restart_session, const char **nx_options, const char **client_cert, const char **client_key, int *twice)
 {
   int opt, error = 0, version = 0;
   const char *program = argv[0];
@@ -55,7 +58,7 @@ int parse_params(int argc, char **argv, const char **host, int *port, const char
   *user = getenv(QVDLOGIN_ENV);
   *pass = getenv(QVDPASSWORD_ENV);
 
-  while ((opt = getopt(argc, argv, "?dvh:p:u:w:g:flonx:c:k:")) != -1 )
+  while ((opt = getopt(argc, argv, "?dvh:p:u:w:g:flonx:c:k:2")) != -1 )
     {
       switch (opt)
 	{
@@ -110,6 +113,9 @@ int parse_params(int argc, char **argv, const char **host, int *port, const char
 	  break;
         case 'r':
           *restart_session = 1;
+          break;
+        case '2':
+          *twice = 1;
           break;
 	default:
 	  fprintf(stderr, "Parameter not recognized <%c>\n", opt);
@@ -320,12 +326,19 @@ int qvd_connection(const char *host, int port, const char *user, const char *pas
 
 int main(int argc, char *argv[], char *envp[]) {
   const char *host = NULL, *user = NULL, *pass = NULL, *geometry = NULL, *nx_options = NULL, *cert_file = NULL, *key_file = NULL;
-  int port = 8443, fullscreen=0, only_list_of_vm=0, one_vm=0, no_cert_check=0, restart_session = 0;
+  int port = 8443, fullscreen=0, only_list_of_vm=0, one_vm=0, no_cert_check=0, restart_session = 0, twice = 0;
   int result, vm_id;
-  if (parse_params(argc, argv, &host, &port, &user, &pass, &geometry, &fullscreen, &only_list_of_vm, &one_vm, &no_cert_check, &restart_session, &nx_options, &cert_file, &key_file))
+  signal(SIGPIPE, SIG_IGN);
+  if (parse_params(argc, argv, &host, &port, &user, &pass, &geometry, &fullscreen, &only_list_of_vm, &one_vm, &no_cert_check, &restart_session, &nx_options, &cert_file, &key_file, &twice))
     return 1;
 
   result = qvd_connection(host, port, user, pass, geometry, fullscreen, only_list_of_vm, one_vm, no_cert_check, restart_session, nx_options, cert_file, key_file);
+  if (twice) {
+    qvdclient *q2 = qvd_init(host, port, user, pass);
+    printf("Two connections requested. Result of first connection was %d\n", result);
+    sleep(10);
+    result = qvd_connection("89.140.90.39", port, user, pass, geometry, fullscreen, only_list_of_vm, one_vm, no_cert_check, restart_session, nx_options, cert_file, key_file);
+  }
 
   return result;
 }

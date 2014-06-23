@@ -174,7 +174,7 @@ qvdclient *qvd_init(const char *hostname, const int port, const char *username, 
 }
 
 void qvd_free(qvdclient *qvd) {
-  qvd_printf("Calling qvd_free\n");
+  qvd_printf("Calling qvd_free with qvd=%p, and curl=%p\n", qvd, qvd->curl);
   curl_easy_cleanup(qvd->curl);
   curl_global_cleanup();
   QvdVmListFree(qvd->vmlist);
@@ -337,6 +337,11 @@ int qvd_connect_to_vm(qvdclient *qvd, int id)
 
   curl_easy_getinfo(qvd->curl, CURLINFO_LASTSOCKET, &curlsock);  
   fd = (int) curlsock;
+  qvd_printf("QVD curl socket is %d", fd);
+  if (fd == -1) {
+      qvd_error(qvd, "Error getting recent socket from curl");
+     return 7;
+  }
 
   if ((proxyFd = _qvd_proxy_connect(qvd)) < 0)
     return 4;
@@ -345,7 +350,7 @@ int qvd_connect_to_vm(qvdclient *qvd, int id)
   qvd_printf("Before _qvd_client_loop\n");
   result = _qvd_client_loop(qvd, fd, proxyFd);
   qvd_progress(qvd, "End of QVD connection");
-  //  shutdown(proxyFd, 2); is invoked in qvd_free
+  shutdown(proxyFd, 2); // is invoked in qvd_free
   qvd_printf("before NXTransDestroy\n");
   NXTransDestroy(NX_FD_ANY);
   qvd_printf("after NXTransDestroy\n");

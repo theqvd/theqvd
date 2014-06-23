@@ -13,8 +13,9 @@
 #define BUFFER_SIZE 65536
 #include "qvdbuffer.h"
 #define QVDVERSION 101
-#define QVDABOUT "Version: 1.0.1. $Id$"
-#define QVDCHANGELOG "1.0.1 12/10/2013 in the client added support for environment vars QVDLOGIN QVDPASSWORD and QVDHOST\n"\
+#define QVDABOUT "Version: 1.1.0. $Id$"
+#define QVDCHANGELOG "1.1.0 21/06/2014 Added support for restart -r, and to reconnect twice\n"\
+                     "1.0.1 12/10/2013 in the client added support for environment vars QVDLOGIN QVDPASSWORD and QVDHOST\n"\
                      "                 and in the library support for qvd_get_changelog\n"\
                      "1.0   ////////// Initial version\n"
 /* #define DEBUG 1 */
