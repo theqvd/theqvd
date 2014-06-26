@@ -14,7 +14,7 @@
 #include "qvdbuffer.h"
 #define QVDVERSION 101
 #define QVDABOUT "Version: 1.1.0. $Id$"
-#define QVDCHANGELOG "1.1.1 26/06/2014 Upgraded curl to 7.37.0 and nxcomp to 3.5.0.22 and openssl to 1.0.1h\n"\
+#define QVDCHANGELOG "1.1.1 26/06/2014 Upgraded curl to 7.37.0 and nxcomp to 3.5.0.22 and openssl to 1.0.1h. Use implicit curl_global_init\n"\
                      "1.1.0 21/06/2014 Added support for restart -r, and to reconnect twice\n"\
                      "1.0.1 12/10/2013 in the client added support for environment vars QVDLOGIN QVDPASSWORD and QVDHOST\n"\
                      "                 and in the library support for qvd_get_changelog\n"\

@@ -99,12 +99,6 @@ qvdclient *qvd_init(const char *hostname, const int port, const char *username, 
     return NULL;
   }
 
-  if (curl_global_init(CURL_GLOBAL_ALL)) {
-    qvd_error(qvd, "Error globally initializing curl\n");
-    free(qvd);
-    return NULL;
-  }
-
   qvd->curl = curl_easy_init();
   if (!qvd->curl) {
     qvd_error(qvd, "Error initializing curl\n");
@@ -176,7 +170,6 @@ qvdclient *qvd_init(const char *hostname, const int port, const char *username, 
 void qvd_free(qvdclient *qvd) {
   qvd_printf("Calling qvd_free with qvd=%p, and curl=%p\n", qvd, qvd->curl);
   curl_easy_cleanup(qvd->curl);
-  curl_global_cleanup();
   QvdVmListFree(qvd->vmlist);
   /* nx_options should be null */
   free(qvd->nx_options);
