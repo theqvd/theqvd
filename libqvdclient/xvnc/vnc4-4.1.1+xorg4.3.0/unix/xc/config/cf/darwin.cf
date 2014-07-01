@@ -30,7 +30,7 @@ XCOMM operating system:  OSName (OSMajorVersion./**/OSMinorVersion./**/OSTeenyVe
 #define Malloc0ReturnsNull      NO
 #define HasShadowPasswd         NO
 #define HasUsableFileMmap       YES
-#define HasZlib                 YES
+/* #define HasZlib                 YES */
 #ifndef HasShm
 # define HasShm                 YES
 #endif

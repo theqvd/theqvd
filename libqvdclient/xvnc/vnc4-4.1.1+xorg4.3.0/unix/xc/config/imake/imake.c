@@ -1825,7 +1825,12 @@ isempty(char *line)
 		    (pend[5] == ' ' || pend[5] == '\t' || pend[5] == '\r' || pend[5] == '\0'))
 		{
 		    *pend = '#';
-		    strcpy(pend+1, pend+5);
+		    /* strcpy in the same buffer is not defined -- Nito@Qindel.ES. */
+		    /* strcpy(pend+1, pend+5); */
+		    char *mylongbuffer = Emalloc(strlen(pend+5) + 1);
+		    strcpy(mylongbuffer, pend+5);
+		    strcpy(pend+1, mylongbuffer);
+		    free(mylongbuffer);
 		}
 #ifdef CROSSCOMPILE
 		if (magic_make_vars)

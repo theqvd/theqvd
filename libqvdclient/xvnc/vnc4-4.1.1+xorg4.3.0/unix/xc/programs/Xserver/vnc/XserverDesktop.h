@@ -33,6 +33,7 @@ extern "C" {
 #define class c_class;
 #include <scrnintstr.h>
 #include <os.h>
+#include <sys/select.h>
 #undef class
 }
 
