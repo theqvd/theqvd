@@ -41,6 +41,9 @@ CURLcode _qvd_sslctxfun(CURL *curl, SSL_CTX *sslctx, void *parm);
 int _qvd_set_base64_auth(qvdclient *qvd);
 int _qvd_switch_protocols(qvdclient *qvd, int id);
 void _qvd_print_environ();
+int _qvd_set_certdir(qvdclient *qvd);
+int _qvd_dir_exists(qvdclient *qvd, const char *path);
+int _qvd_create_dir(qvdclient *qvd, const char *home, const char *subdir);
 int _qvd_use_client_cert(qvdclient *qvd);
 static char qvdversion[MAX_STRING_VERSION];
 
@@ -466,7 +469,7 @@ int _qvd_set_certdir(qvdclient *qvd)
     return 0;
 
   snprintf(qvd->certpath, MAX_PATH_STRING, "%s/%s", home, CERT_DIR);
-  qvd->certpath[MAX_PATH_STRING] = '\0';
+  qvd->certpath[MAX_PATH_STRING - 1] = '\0';
   if (strlen(qvd->certpath) == MAX_PATH_STRING)
     {
       qvd_error(qvd, "Cert string too long (%d) recompile program. Path is %s", MAX_PATH_STRING, qvd->certpath);
