@@ -86,3 +86,12 @@ extern int websockify_loop;
 
 int websockify(int verbose, const char *listen_host, int listen_port, const char *tgt_host, int tgt_port);
 void websockify_stop();
+void traffic(char * token);
+int encode_hixie(u_char const *src, size_t srclength, char *target, size_t targsize);
+int decode_hixie(char *src, size_t srclength, u_char *target, size_t targsize, unsigned int *opcode, unsigned int *left);
+int encode_hybi(u_char const *src, size_t srclength, char *target, size_t targsize, unsigned int opcode);
+int decode_hybi(unsigned char *src, size_t srclength, u_char *target, size_t targsize, unsigned int *opcode, unsigned int *left);
+int resolve_host(struct in_addr *sin_addr, const char *hostname);
+void start_server();
+
+
