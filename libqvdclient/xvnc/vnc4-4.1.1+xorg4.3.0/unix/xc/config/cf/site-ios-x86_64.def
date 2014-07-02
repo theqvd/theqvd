@@ -257,6 +257,8 @@ ServerTargetWithFlags(server,subdirs,objects,libs,syslibs,$(_NOOP_))
                                 -D__i386__ -D_POSIX_SOURCE \
                                 -D_BSD_SOURCE -D_GNU_SOURCE -DX_LOCALE -D__IOS__
 
+#undef ServerXdmcpDefines
+#define ServerXdmcpDefines      /**/
 
 #include <host.def>
 

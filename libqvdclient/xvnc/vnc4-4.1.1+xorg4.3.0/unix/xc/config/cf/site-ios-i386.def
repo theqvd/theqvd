@@ -261,6 +261,10 @@ ServerTargetWithFlags(server,subdirs,objects,libs,syslibs,$(_NOOP_))
                                 -DNO_ALLOCA -DX_LOCALE -DCSRG_BASED \
                                 -D__i386__ -D_POSIX_SOURCE \
                                 -D_BSD_SOURCE -D_GNU_SOURCE -DX_LOCALE -D__IOS__
+
+/* No Xdmcp */
+#undef ServerXdmcpDefines
+#define ServerXdmcpDefines      /**/
 #include <host.def>
 
 #endif /* AfterVendorCF */
