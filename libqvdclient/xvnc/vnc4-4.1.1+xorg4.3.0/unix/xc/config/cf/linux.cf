@@ -287,6 +287,8 @@ InstallNamedTargetNoClobber(install,file.ad,$(INSTAPPFLAGS),$(XAPPLOADDIR),class
 #    define BuildXF86DRI	YES
 #  elif defined(Arm32Architecture)
 #    define BuildXF86DRI	NO
+#  elif defined(Arm64Architecture)
+#    define BuildXF86DRI	NO
 #  elif defined(HPArchitecture)
 #    define BuildXF86DRI	NO
 #  elif defined(i386Architecture)
@@ -761,6 +763,16 @@ InstallNamedTargetNoClobber(install,file.ad,$(INSTAPPFLAGS),$(XAPPLOADDIR),class
 #endif /* AlphaArchitecture */
 
 #ifdef Arm32Architecture
+# define DefaultCCOptions	-fsigned-char
+# ifndef OptimizedCDebugFlags
+#  define OptimizedCDebugFlags	-O3
+# endif
+# define LinuxMachineDefines	-D__arm__ -D__arm32__ -U__arm -Uarm
+# define ServerOSDefines	XFree86ServerOSDefines -DDDXTIME -DPART_NET
+# define ServerExtraDefines	-DGCCUSESGAS XFree86ServerDefines
+#endif /* Arm32Achitecture */
+
+#ifdef Arm64Architecture
 # define DefaultCCOptions	-fsigned-char
 # ifndef OptimizedCDebugFlags
 #  define OptimizedCDebugFlags	-O3

@@ -16,6 +16,9 @@ XCOMM $XFree86: xc/config/cf/bsdLib.rules,v 3.20 2002/11/18 22:47:25 dawes Exp $
 #if !UseElfFormat
 /* a.out shared libs */
 #ifndef HasSharedLibraries
+# ifndef Arm64Architecture
+#  define HasSharedLibraries YES
+# endif
 # ifndef Arm32Architecture
 #  define HasSharedLibraries YES
 # endif

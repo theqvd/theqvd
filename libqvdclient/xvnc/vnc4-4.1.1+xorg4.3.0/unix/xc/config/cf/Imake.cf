@@ -207,6 +207,10 @@ XCOMM $XFree86: xc/config/cf/Imake.cf,v 3.81 2003/02/18 16:51:45 tsi Exp $
 #   define Arm32Architecture
 #   undef __arm32__
 # endif
+# ifdef __arm64__
+#   define Arm64Architecture
+#   undef __arm64__
+# endif
 # ifdef __vax__
 #   define VaxArchitecture
 #   undef __vax__

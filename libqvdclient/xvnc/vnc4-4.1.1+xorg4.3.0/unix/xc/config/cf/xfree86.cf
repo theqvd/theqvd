@@ -941,7 +941,7 @@ XCOMM $Xorg: xfree86.cf,v 1.4 2000/08/17 19:41:49 cpqbld Exp $
 /*
  * Intel StrongARM and Hewlett-Packard PA-RISC
  */
-#if defined(Arm32Architecture) || defined(HPArchitecture)
+#if defined(Arm32Architecture) || defined(HPArchitecture) || defined(Arm64Architecture)
 # ifndef XF86Server
 #  define XF86Server		YES
 # endif
