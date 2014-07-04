@@ -16,10 +16,10 @@ void qvd_printf(const char *format, ...);
 
 int _qvd_init_debug() {
   const char *log_file = getenv(DEBUG_FILE_ENV_VAR_NAME);
-  global_debug_file = stdout; /* setting it to stderr */
+  global_debug_file = stderr; /* setting it to stderr */
   if (log_file) {
     if ((global_debug_file = fopen(log_file, "a")) == NULL) {
-      global_debug_file = stdout;
+      global_debug_file = stderr;
       qvd_printf("Using stderr for debugging. Unable to open file %s, because of error: %s", log_file, strerror(errno));
     }
   }
