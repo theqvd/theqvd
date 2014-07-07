@@ -687,7 +687,7 @@ int _qvd_client_loop(qvdclient *qvd, int connFd, int proxyFd)
 	{
 	  ret = QvdBufferWrite(&proxyWrite, proxyFd);
 	  if (ret < 0 && errno != EINTR && errno != EAGAIN && errno != EWOULDBLOCK) {
-	    qvd_error(qvd, "Error reading from proxyFd: %d %s\n", errno, strerror(errno));
+	    qvd_error(qvd, "Error writing to proxyFd: %d %s\n", errno, strerror(errno));
 	    proxyFd = -1;
 	  }
 	}
