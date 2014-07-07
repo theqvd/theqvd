@@ -42,6 +42,10 @@ sub help_share {
 sub handle_share {
 }
 
+sub handle_mount {
+
+}
+
 sub help_open {
 }
 

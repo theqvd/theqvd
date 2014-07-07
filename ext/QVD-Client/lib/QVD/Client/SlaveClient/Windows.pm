@@ -133,4 +133,8 @@ sub handle_share {
     #INFO "** Finished. (exit code $status)\n";
 }
 
+
+sub handle_mount {
+	die "Not implemented yet";
+}
 1;

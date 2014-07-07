@@ -5,11 +5,29 @@ use warnings;
 
 our $VERSION = '0.01';
 
-use QVD::Config::Core qw(core_cfg);
+use QVD::Config::Core qw(core_cfg set_core_cfg);
 use QVD::HTTP::Headers qw(header_eq_check header_lookup);
 use QVD::HTTP::StatusCodes qw(:all);
 use QVD::HTTPD;
 use File::Spec;
+
+
+BEGIN {
+    my $user_dir = File::Spec->rel2abs(File::Spec->join((getpwuid $>)[7] // $ENV{HOME}, '.qvd'));
+	mkdir $user_dir;
+    set_core_cfg('client.log.filename', File::Spec->join($user_dir, 'qvd-vma-slaveserver.log'))
+        unless defined core_cfg('client.log.filename', 0);
+    set_core_cfg('log.level', 'DEBUG');
+    $QVD::Log::DAEMON_NAME = 'vma-slaveserver';
+
+}
+
+use QVD::Log;
+INFO "Slave server started";
+$SIG{__WARN__} = sub { WARN "@_"; };
+$SIG{__DIE__} = sub { ERROR "@_"; };
+
+
 
 use base 'QVD::HTTPD::INET';
 
@@ -17,6 +35,7 @@ my $mount_root = $ENV{HOME}.'/Redirected';
 my $open_command = core_cfg('command.open_file');
 my $command_sshfs = core_cfg('command.sshfs');
 my $authentication_key;
+my $command_sftp_server = core_cfg('command.sftp-server');
 
 BEGIN {
     my $slave_conf = core_cfg('internal.vma.slave.config');
@@ -28,6 +47,10 @@ BEGIN {
     } else {
         print STDERR "Unable to read slave auth key: $!";
     }
+}
+
+if ($^O eq 'darwin') {
+    $command_sftp_server = core_cfg('command.darwin.sftp-server');
 }
 
 sub new {
@@ -61,6 +84,12 @@ sub _url_to_mount_point {
     (my $mount_dir = $url) =~ s/.*[\/\\]//; # pick last part of path
     $mount_dir = 'ROOT' if ($mount_dir eq '');
     return $mount_dir;
+}
+
+sub _url_to_path {
+	my ($url) = @_;
+	my (undef, undef, @path) = File::Spec->splitdir($url);
+	return File::Spec->catdir(@path);
 }
 
 sub handle_put_share {
@@ -108,9 +137,58 @@ sub handle_put_share {
 
 sub handle_get_share {
     my ($self, $method, $url, $headers) = @_;
-    $self->auth($headers);
-    # We don't allow clients to mount directories *from* the VM
-    $self->send_http_error(HTTP_FORBIDDEN);
+    INFO "Handling get_share $url";
+ 
+    $self->send_http_error(HTTP_BAD_REQUEST)
+        unless header_eq_check($headers, Connection => 'Upgrade')
+            and header_lookup($headers, 'Upgrade');
+
+    my $protocol = header_lookup($headers, 'Upgrade');
+    unless ($protocol =~ m!qvd:sftp/1.0(?:;charset=(.*))?!) {
+	    $self->send_http_error(HTTP_BAD_REQUEST);
+        return;
+    }
+
+    DEBUG "Headers OK";
+
+    my $dir = _url_to_path($url);
+   
+    if (!-d $dir) {
+        $self->send_http_error(HTTP_NOT_FOUND, "Path $dir not found");
+        return;
+    }
+
+    DEBUG "Directory existence OK";
+
+    if (!-X $dir) {
+        # Only check if the directory is executable. Readability is optional,
+        # though non-listable directories are rarely used.
+        $self->send_http_error(HTTP_FORBIDDEN, "Path $dir forbidden");
+    }
+
+    DEBUG "Directory is executable, OK";
+
+	if (!-x $command_sftp_server) {
+		$self->send_http_error(HTTP_NOT_IMPLEMENTED, "SFTP support not installed on VM");
+		return;
+	}
+
+    DEBUG "SFTP command present, OK";
+
+    $self->send_http_response(HTTP_SWITCHING_PROTOCOLS);
+
+    INFO "Exporting directory $dir";
+	DEBUG "SFTP command: $command_sftp_server";
+
+    my $pid = fork();
+    if ($pid > 0) {
+        wait;
+    } else {
+        chdir $dir or die "Unable to chdir to $dir: $^E";                                                                                                  
+        exec($command_sftp_server, '-e')
+            or die "Unable to exec $command_sftp_server: $^E";
+    }
+
 }
 
 sub handle_open {

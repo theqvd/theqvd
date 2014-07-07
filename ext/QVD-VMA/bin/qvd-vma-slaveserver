@@ -3,6 +3,12 @@
 use strict;
 use warnings;
 
+BEGIN {
+    $QVD::Config::USE_DB = 0;
+    @QVD::Config::Core::FILES = ('/etc/qvd/vma.conf');
+}
+
+use QVD::Config::Core;
 use QVD::VMA::SlaveServer;
 
 my $server = QVD::VMA::SlaveServer->new();

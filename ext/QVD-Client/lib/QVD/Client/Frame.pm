@@ -452,6 +452,7 @@ sub OnConnectionStatusChanged {
         $self->{timer}->Stop();
     } elsif ($status eq 'FORWARDING') {
         $self->start_file_sharing();
+        $self->start_remote_mounts();
     } elsif ($status eq 'CLOSED') {
         $self->{timer}->Stop();
         $self->{progress_bar}->SetValue(0);
@@ -698,6 +699,63 @@ sub start_file_sharing {
         }
     }
 }
+
+sub start_remote_mounts {
+	my ($self) = @_;
+	my $num = 0;
+
+    if (core_cfg('client.slave.enable', 1)) {
+		INFO("Starting remote mounts");
+    } else {
+		INFO("Slave channel disabled, remote mounts (if any are configured) won't be started");
+		return;
+	}
+
+	while(1) {
+		my $remote_dir = core_cfg("client.mount.$num.remote", 0);
+		my $local_dir  = core_cfg("client.mount.$num.local", 0);
+		
+		last unless ( $local_dir && $remote_dir );
+
+		use QVD::Client::SlaveClient;
+		INFO("Mounting remote directory $remote_dir at $local_dir");
+
+		for (my $conn_attempt = 0; $conn_attempt < 10; $conn_attempt++) {
+			local $@;
+			my $client = QVD::Client::SlaveClient->new('localhost:12040');
+			eval { $client->handle_mount($remote_dir, $local_dir) };
+			if ($@) {
+				if ($@ =~ 'ECONNREFUSED') {
+					sleep 1;
+					next;
+				}
+				ERROR $@;
+
+				my $message = "Failed to mount remote folder $remote_dir at $local_dir:\n\n";
+				if ( $@ =~ /Server replied 404/ ) {
+					$message .= "Path $remote_dir was not found on the VM";
+				} elsif ( $@ =~ /Server replied 403/ ) {
+					$message .= "Path $remote_dir is forbidden on the VM";
+                } elsif ( $@ =~ /Server replied 501/ ) {
+					$message .= "VM lacks file sharing support. Please install the qvd-sshfs package.";
+				} else {
+					$message .= "Unrecognized error, full error message follows:\n\n$@";
+				}
+
+				my $dialog = Wx::MessageDialog->new($self, $message, "File sharing error.", wxOK | wxICON_ERROR);
+				$dialog->ShowModal();
+				$dialog->Destroy();
+
+			} else {
+				DEBUG("Remote directory $remote_dir mounted at $local_dir");
+			}
+			last;
+		}
+	
+		$num++;
+	}
+}
+
 
 # threads::shared doesn't have shared_clone on Ubuntu 9.10
 sub _shared_clone {
