@@ -593,7 +593,7 @@ int _qvd_client_loop(qvdclient *qvd, int connFd, int proxyFd)
 	  NXTransSelect(&ret, &err, &maxfds, &rfds, &wfds, &timeout);
 	  NXTransExecute(&ret, &err, &maxfds, &rfds, &wfds, &timeout);
 	}
-      if (ret == -1 && errno == EINTR)
+      if (ret == -1 && (errno == EINTR || errno == EAGAIN || errno == EWOULDBLOCK ))
 	continue;
 
       if (ret < 0)
@@ -671,15 +671,22 @@ int _qvd_client_loop(qvdclient *qvd, int connFd, int proxyFd)
 	      proxyFd = -1;
 	    }
 	  if (ret < 0)
-	    {
-	      qvd_error(qvd, "Error proxyFd read error: %s\n", strerror(errno));
-	      proxyFd = -1;
+            {
+	      if ( errno == EINTR || errno == EWOULDBLOCK || errno == EAGAIN )
+              {
+                qvd_printf("Read returned %s, retrying\n", strerror(errno));
+              }
+              else
+              {
+	        qvd_error(qvd, "Error proxyFd read error: %s\n", strerror(errno));
+	        proxyFd = -1;
+              }
 	    }
 	}
       if (proxyFd > 0 && QvdBufferCanWrite(&proxyWrite))
 	{
 	  ret = QvdBufferWrite(&proxyWrite, proxyFd);
-	  if (ret < 0 && errno != EINTR) {
+	  if (ret < 0 && errno != EINTR && errno != EAGAIN && errno != EWOULDBLOCK) {
 	    qvd_error(qvd, "Error reading from proxyFd: %d %s\n", errno, strerror(errno));
 	    proxyFd = -1;
 	  }
