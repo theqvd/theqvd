@@ -722,7 +722,7 @@ sub start_remote_mounts {
 
 		for (my $conn_attempt = 0; $conn_attempt < 10; $conn_attempt++) {
 			local $@;
-			my $client = QVD::Client::SlaveClient->new('localhost:12040');
+			my $client = QVD::Client::SlaveClient->new();
 			eval { $client->handle_mount($remote_dir, $local_dir) };
 			if ($@) {
 				if ($@ =~ 'ECONNREFUSED') {
