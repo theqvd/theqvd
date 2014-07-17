@@ -10,4 +10,9 @@ __PACKAGE__->add_columns( di_id => { data_type => 'integer' },
 __PACKAGE__->set_primary_key('di_id', 'key');
 __PACKAGE__->belongs_to(di => 'QVD::DB::Result::DI', 'di_id');
 
+sub get_has_many { qw(); }
+sub get_has_one { qw(); }
+sub get_belongs_to { qw(di); }
+
+
 1;

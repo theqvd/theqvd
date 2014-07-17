@@ -10,4 +10,9 @@ __PACKAGE__->add_columns( user_id => { data_type => 'integer' },
 __PACKAGE__->set_primary_key('user_id', 'key');
 __PACKAGE__->belongs_to(user => 'QVD::DB::Result::User', 'user_id');
 
+sub get_has_many { qw(); }
+sub get_has_one { qw(); }
+sub get_belongs_to { qw(user); }
+
+
 1;

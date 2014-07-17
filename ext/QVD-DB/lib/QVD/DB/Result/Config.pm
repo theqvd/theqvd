@@ -13,4 +13,8 @@ __PACKAGE__->add_columns(
 	);
 __PACKAGE__->set_primary_key('key');
 
+sub get_has_many { qw(); }
+sub get_has_one { qw(); }
+sub get_belongs_to { qw(); }
+
 1;

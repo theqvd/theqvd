@@ -46,8 +46,8 @@ __PACKAGE__->add_columns( vm_id          => { data_type   => 'integer' },
 					      extra       => { list => [qw/abort/] } },
 			  vma_ok_ts      => { data_type   => 'integer',
 					      is_nullable => 1 },
-			  l7r_host_id    => { data_type   => 'integer',
-					      is_nullable => 1 },
+#			  l7r_host_id    => { data_type   => 'integer',    # FIXME: COMMENTED BECAUSE TRIGGERS ERROR WHEN ASKING DB
+#					      is_nullable => 1 },
 			  l7r_pid        => { data_type   => 'integer',
 					      is_nullable => 1 },
 			  vm_address     => { data_type   => 'varchar(127)',
@@ -75,7 +75,7 @@ __PACKAGE__->add_columns( vm_id          => { data_type   => 'integer' },
 __PACKAGE__->set_primary_key('vm_id');
 
 __PACKAGE__->belongs_to(host => 'QVD::DB::Result::Host', 'host_id', { join_type => 'LEFT' });
-__PACKAGE__->belongs_to(l7r_host => 'QVD::DB::Result::Host', 'l7r_host_id', { join_type => 'LEFT' });
+#__PACKAGE__->belongs_to(l7r_host => 'QVD::DB::Result::Host', 'l7r_host_id', { join_type => 'LEFT' }); # FIXME: COMMENTED BECAUSE TRIGGERS ERROR WHEN ASKING DB
 __PACKAGE__->belongs_to(vm   => 'QVD::DB::Result::VM', 	 'vm_id',   { cascade_delete => 1 });
 __PACKAGE__->belongs_to(real_user => 'QVD::DB::Result::User', 'real_user_id', { cascade_delete => 0 });
 
@@ -87,6 +87,11 @@ __PACKAGE__->belongs_to('rel_user_cmd' => 'QVD::DB::Result::User_Cmd', 'user_cmd
 
 __PACKAGE__->belongs_to(current_di => 'QVD::DB::Result::DI', 'current_di_id');
 __PACKAGE__->belongs_to(current_osf => 'QVD::DB::Result::OSF', 'current_osf_id');
+
+sub get_has_many { qw(host vm real_user rel_vm_state rel_user_state rel_vm_cmd rel_user_cmd current_di current_osf); }
+sub get_has_one { qw(); }
+sub get_belongs_to { qw(); }
+
 
 sub set_vm_state {
     my $vm = shift;
@@ -185,7 +190,7 @@ sub set_current_di_id {
 sub clear_l7r_all {
     shift->update({ user_state => 'disconnected',
                     user_cmd => undef,
-                    l7r_host_id => undef,
+#                    l7r_host_id => undef, # FIXME: COMMENTED BECAUSE TRIGGERS ERROR WHEN ASKING DB
                     l7r_pid => undef })
 }
 

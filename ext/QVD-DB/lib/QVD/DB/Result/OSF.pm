@@ -46,4 +46,8 @@ sub delete_tag {
     return 0;
 }
 
+sub get_has_many { qw(properties dis vms); }
+sub get_has_one { qw(); }
+sub get_belongs_to { qw(); }
+
 1;

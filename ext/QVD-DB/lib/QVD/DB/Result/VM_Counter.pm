@@ -15,4 +15,9 @@ __PACKAGE__->add_columns(
 __PACKAGE__->set_primary_key('vm_id');
 __PACKAGE__->belongs_to(vm => 'QVD::DB::Result::VM', 'vm_id');
 
+sub get_has_many { qw(); }
+sub get_has_one { qw(); }
+sub get_belongs_to { qw(vm); }
+
+
 1;

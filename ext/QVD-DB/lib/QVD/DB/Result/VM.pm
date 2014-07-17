@@ -46,4 +46,9 @@ sub di {
     $self->osf->di_by_tag($tag);
 }
 
+sub get_has_many { qw(properties); }
+sub get_has_one { qw(vm_runtime counters); }
+sub get_belongs_to { qw(user osf); }
+
+
 1;

@@ -19,10 +19,10 @@ __PACKAGE__->load_namespaces(result_namespace => 'Result');
 __PACKAGE__->exception_action(sub { croak @_ ; DBIx::Class::Exception::throw(@_);});
 
 
-my $db_name   = core_cfg('database.name');
-my $db_user   = core_cfg('database.user');
-my $db_host   = core_cfg('database.host');
-my $db_passwd = core_cfg('database.password');
+my $db_name   = core_cfg('database.name'); # FIXME: INSTANTIATED IN THE CONSTRUCTOR
+my $db_user   = core_cfg('database.user'); # FIXME: INSTANTIATED IN THE CONSTRUCTOR
+my $db_host   = core_cfg('database.host'); # FIXME: INSTANTIATED IN THE CONSTRUCTOR
+my $db_passwd = core_cfg('database.password'); # FIXME: INSTANTIATED IN THE CONSTRUCTOR
 
 my $db_connect_timeout = core_cfg('internal.database.client.connect.timeout');
 my $db_keepidle        = core_cfg('internal.database.client.socket.keepidle');
@@ -30,7 +30,13 @@ my $db_keepintvl       = core_cfg('internal.database.client.socket.keepintvl');
 my $db_keepcnt         = core_cfg('internal.database.client.socket.keepcnt');
 
 sub new {
-    my $class = shift;
+    my ($class,%parameters) = @_;
+
+    $db_user = $parameters{'user'} // core_cfg('database.user');
+    $db_passwd = $parameters{'password'} // core_cfg('database.password');
+    $db_host = $parameters{'host'} // core_cfg('database.host');
+    $db_name = $parameters{'database'} // core_cfg('database.name');
+
     $class->SUPER::connect("dbi:Pg:dbname=$db_name;host=$db_host;connect_timeout=$db_connect_timeout",
 			   $db_user, $db_passwd,
                            { RaiseError => 1,

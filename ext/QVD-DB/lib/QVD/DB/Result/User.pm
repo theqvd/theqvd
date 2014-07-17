@@ -18,4 +18,9 @@ __PACKAGE__->has_many(vms => 'QVD::DB::Result::VM', 'user_id', { cascade_delete 
 __PACKAGE__->has_many(properties => 'QVD::DB::Result::User_Property',
 		      'user_id', {join_type => 'INNER'});
 
+
+sub get_has_many { qw(vms properties); }
+sub get_has_one { qw(); }
+sub get_belongs_to { qw(); }
+
 1;
