@@ -334,10 +334,8 @@ int main(int argc, char *argv[], char *envp[]) {
 
   result = qvd_connection(host, port, user, pass, geometry, fullscreen, only_list_of_vm, one_vm, no_cert_check, restart_session, nx_options, cert_file, key_file);
   if (twice) {
-    qvdclient *q2 = qvd_init(host, port, user, pass);
     printf("Two connections requested. Result of first connection was %d\n", result);
-    sleep(10);
-    result = qvd_connection("89.140.90.39", port, user, pass, geometry, fullscreen, only_list_of_vm, one_vm, no_cert_check, restart_session, nx_options, cert_file, key_file);
+    result = qvd_connection(host, port, user, pass, geometry, fullscreen, only_list_of_vm, one_vm, no_cert_check, restart_session, nx_options, cert_file, key_file);
   }
 
   return result;
