@@ -13,7 +13,7 @@
 #define BUFFER_SIZE 65536
 #include "qvdbuffer.h"
 #define QVDVERSION 113
-#define QVDABOUT "Version: 1.1.1. $Id$"
+#define QVDABOUT "Version: 1.1.3. $Id$"
 #define QVDCHANGELOG "1.1.3 21/07/2014 Fix -r switch (not in the qvdclient binary only in the lib\n" \
                      "1.1.2 18/07/2014 Fix hardcoded ip in reconnect (option -2)\n" \
                      "1.1.1 26/06/2014 Upgraded curl to 7.37.0 and nxcomp to 3.5.0.22 and openssl to 1.0.1h. Use implicit curl_global_init. Debug now goes to stderr.\n" \
