@@ -58,7 +58,7 @@ int parse_params(int argc, char **argv, const char **host, int *port, const char
   *user = getenv(QVDLOGIN_ENV);
   *pass = getenv(QVDPASSWORD_ENV);
 
-  while ((opt = getopt(argc, argv, "?dvh:p:u:w:g:flonx:c:k:2")) != -1 )
+  while ((opt = getopt(argc, argv, "?dvrh:p:u:w:g:flonx:c:k:2")) != -1 )
     {
       switch (opt)
 	{
