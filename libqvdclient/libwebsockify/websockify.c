@@ -289,9 +289,15 @@ int websockify(int verbose, const char *listen_host, int listen_port, const char
 
   websockify_loop = 1;
   // Allow only one simultaneous connection
+  int result;
   while (websockify_loop) {
-    start_server();
+    result = start_server();
+    if (result) {
+      handler_emsg("Error in start_server\n");
+      break;
+    }
   }
+  return result;
 }
 
 void websockify_stop() {
