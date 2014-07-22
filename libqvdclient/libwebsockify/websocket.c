@@ -803,7 +803,7 @@ int start_server() {
 	  }
 	  if (res < 0) {
 	    perror("select");
-	    return;
+	    return 1;
 	  }
 	  if (res > 0) {
 	    break;
