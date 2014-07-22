@@ -732,7 +732,7 @@ void signal_handler(sig) {
 /*   return 0; */
 /* } */
 
-void start_server() {
+int start_server() {
     int lsock, csock, pid, clilen, sopt = 1, i, res;
     struct sockaddr_in serv_addr, cli_addr;
     ws_ctx_t *ws_ctx;
@@ -750,7 +750,8 @@ void start_server() {
     /* Resolve listen address */
     if (settings.listen_host && (settings.listen_host[0] != '\0')) {
         if (resolve_host(&serv_addr.sin_addr, settings.listen_host) < -1) {
-            fatal("Could not resolve listen address");
+            error("Could not resolve listen address");
+	    return 1;
         }
     } else {
         serv_addr.sin_addr.s_addr = INADDR_ANY;
@@ -808,7 +809,7 @@ void start_server() {
 	}
 	if (!websockify_loop) {
 	  fprintf(stderr, "Ending loop before accept\n");
-	  return;
+	  return 0;
 	}
 	csock = accept(lsock, 
 		       (struct sockaddr *) &cli_addr, 
@@ -866,5 +867,6 @@ void start_server() {
         handler_msg("websockify exit\n");
     }
 
+    return 0;
 }
 
