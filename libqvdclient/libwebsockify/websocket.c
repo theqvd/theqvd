@@ -26,8 +26,6 @@
 #include <openssl/sha.h> /* sha1 hash */
 #include "websocket.h"
 
-int resolve_host(struct in_addr *sin_addr, const char *hostname);
-
 /*
  * Global state
  *

@@ -1,4 +1,8 @@
 #include <openssl/ssl.h>
+#include <sys/types.h> 
+#include <sys/socket.h>
+#include <netinet/in.h>
+#include <arpa/inet.h>
 
 #define BUFSIZE 65536
 #define DBUFSIZE (BUFSIZE * 3) / 4 - 20
@@ -91,6 +95,7 @@ int encode_hixie(u_char const *src, size_t srclength, char *target, size_t targs
 int decode_hixie(char *src, size_t srclength, u_char *target, size_t targsize, unsigned int *opcode, unsigned int *left);
 int encode_hybi(u_char const *src, size_t srclength, char *target, size_t targsize, unsigned int opcode);
 int decode_hybi(unsigned char *src, size_t srclength, u_char *target, size_t targsize, unsigned int *opcode, unsigned int *left);
+int resolve_host(struct in_addr *sin_addr, const char *hostname);
 int start_server();
 
 
