@@ -759,7 +759,8 @@ int start_server() {
 
     setsockopt(lsock, SOL_SOCKET, SO_REUSEADDR, (char *)&sopt, sizeof(sopt));
     if (bind(lsock, (struct sockaddr *) &serv_addr, sizeof(serv_addr)) < 0) {
-        fatal("ERROR on binding listener socket");
+        error("ERROR on binding listener socket");
+	return 1;
     }
     listen(lsock,100);
 
