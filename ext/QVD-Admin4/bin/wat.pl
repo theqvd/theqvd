@@ -5,20 +5,26 @@ use QVD::Admin4::REST;
 
 app->secrets(['QVD']);
 
-helper (_rest => sub { QVD::Admin4::REST->new(); });
+my $REST;
+
+helper (_rest => sub { $REST //= QVD::Admin4::REST->new(); });
  
 under sub {
 
     my $c = shift;
-    my $pass = $c->_rest->_auth($c->req->json);
-
-    $pass->{'status'} ? $c->render( json => { status => $pass->{'status'}}) : return 1;
+    
+    $c->session('role') && return 1;
+    $c->session(role => $c->_rest->_auth($c->req->json));
+    $c->session('role') ? return 1 : $c->render( json => { status => 401 });
 };
 
 any '/' => sub { 
 
     my $c = shift;
-    $c->render(json => $c->_rest->_admin($c->req->json));
+    my $json = $c->req->json;
+    $json->{tenant} = $c->session('role'); 
+
+    $c->render(json => $c->_rest->_admin($json));
 };
 
 

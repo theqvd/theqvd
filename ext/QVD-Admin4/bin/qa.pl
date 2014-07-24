@@ -7,38 +7,49 @@ use Getopt::Long;
 use Text::Table;
 use QVD::Config::Core;
 
-#### GET OPTIONS FROM COMMAND LINE
-
-my $table = "";
-my $action = "";
-my %filters = ();
-my %arguments = ();
 my $host = core_cfg('database.host');
 my $user = core_cfg('database.user');
 my $password = core_cfg('database.password');
 my $database = core_cfg('database.name');
 
-GetOptions( "table=s"    => \$table,
-            "action=s"   => \$action,
-            "filters=s"   => \%filters,
-            "argument=s" => \%arguments,
-	    "host=s"     => \$host,
-	    "user=s"     => \$user,
-	    "password=s" => \$password,
-	    "database=s" => \$database);
+#### GET OPTIONS FROM COMMAND LINE
+
+my $table = "";
+my $action = "";
+my $order_dir = "-desc";
+my %filters = ();
+my %arguments = ();
+my %pagination = ();
+my @order_by = ();
+my @fields = ();
+
+GetOptions( "table=s"      => \$table,
+            "action=s"     => \$action,
+            "filters=s"    => \%filters,
+	    "order_dir=s"   => \$order_dir,
+            "arguments=s"  => \%arguments,
+	    "pagination=s" => \%pagination,
+	    "order_by=s"   => \@order_by,
+	    "fields=s"     => \@fields );
 
 #### BUILD AND SEND THE QUERY
 
 my $url = "http://192.168.56.102:8080";
 my $ua = Mojo::UserAgent->new;
-my $res = $ua->post($url => json => { host => $host,
-				      user => $user,
-				      password => $password,
-				      database => $database,
-				      table     => $table,
-		                      action    => $action,
+
+my $res = $ua->post($url => json => { host       => $host,
+				      user       => $user,
+				      password   => $password,
+				      database   => $database,
+				      
+				      table      => $table,
+		                      action     => $action,
+				      order_dir  => $order_dir,
+				      pagination => \%pagination,
+				      order_by   => \@order_by,
+				      fields     => \@fields,
                                       filters    => \%filters,
-                                      arguments => \%arguments})->res;
+                                      arguments  => { relations => { tags => [qw(id tag)] }}} )->res;
 
 
 #### OUTPUT MODEL FOR Text::Table
@@ -77,6 +88,7 @@ sub print_rows_table
     my $n = 0;
     my $status     = $res->json('/status') // '';
     my $message    = $res->json('/message') // '';
+    $message =~ s/ at .+$//;
     my $properties = $res->json("/rows/$n");
 
     while ($properties = $res->json("/rows/$n")) 
@@ -100,6 +112,7 @@ sub print_status_table
 {
     my $status     = $res->json('/status') // '';
     my $message    = $res->json('/message') // '';
+    $message =~ s/ at .+$//;
 
     my $tb = Text::Table->new(@model);
     $tb->add("Status $status","$message");

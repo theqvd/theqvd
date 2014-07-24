@@ -5,7 +5,6 @@ use strict;
 use warnings;
 use Moose;
 use QVD::DB;
-use QVD::Admin4::Utils;
 use QVD::Admin4::Query;
 use Config::Properties;
 
@@ -15,9 +14,8 @@ has 'database', is => 'ro', isa => 'Str', required => 1;
 has 'user', is => 'ro', isa => 'Str', required => 1;
 has 'host', is => 'ro', isa => 'Str', required => 1;
 has 'password', is => 'ro', isa => 'Str', required => 1;
-has 'actions', is => 'ro', isa => 'QVD::Admin4::Actions';
 
-my ($DB, $ACTIONS);
+my $DB;
 
 sub BUILD
 {
@@ -28,120 +26,116 @@ sub BUILD
 		       host     => $self->host,
 		       password => $self->password) // 
 			   die "Unknown database account";
-
-    $ACTIONS = $self->load_actions // die "Unable to load actions";
 }
 
-sub _get 
-{ 
-    my $action = shift;
-    $ACTIONS->{$action} || die "Action $action non supported"; 
-}
-
-sub action
-{ 
-    my ($self, $table, $action,  $filters,$arguments) = @_; 
-    $action //= die "No action specified";
-
-    _get($action)->table($table);
-    _get($action)->filters($filters);
-    _get($action)->arguments($arguments);
-    _get($action)->_exec;
-
-    my @result = map { {$_->get_columns } } @{ _get($action)->result };
-
-    _get($action)->reset;
-    @result;
-}
-
-sub load_actions
+sub _exec
 {
-    my $self = shift;
+    my ($self, $query) = @_;
+    my $rows;
 
-    my $cfg=Config::Properties->new;
-    $cfg->load(*DATA);
+    if ($query->filter)
+    { 
+	my $filter = $query->filter;
+	$rows = $self->$filter($query->request);
+    }	
 
-    my $actions = $cfg->splitToTree(qr/\./);
+    my $action = $query->action;
+    $rows = $self->$action($query->request,$rows);
+}
 
-    while (my ($action, $params) = each %{$actions})
-    {	
- 	$params->{database} = $DB;
-	$params->{get_object} = \&{$params->{get_object}} if $params->{get_object};
-	$params->{get_result} = \&{$params->{get_result}} if $params->{get_result};
-	$actions->{$action} = QVD::Admin4::Query->new(%$params); 
+###############################
+########### ACTIONS  ##########
+###############################
+
+### BASIC SQL QUERIES
+ 
+sub select
+{
+    my ($self,$request) = @_;
+   
+    my $page = delete $request->modifiers->{page};
+
+    [$DB->resultset($request->table)->search($request->filters, 
+					     $request->modifiers)->page($page)->all];
+}
+
+sub update
+{  
+    my ($self,$request,$rows) = @_;  
+
+    [ map { $_->update($request->arguments) } @$rows ]; 
+}
+
+sub add
+{
+    my ($self,$request) = @_;  
+     
+   [ $DB->resultset($request->table)->create($request->arguments) ]; 
+}
+
+sub delete 
+{  
+    my ($self,$request,$rows) = @_;  
+
+    [ map { $_->delete }  @$rows ];
+}
+
+### RELATIONS BETWEEN TABLES
+
+sub relation     
+{  
+    my ($self,$request,$rows) = @_;  
+    my $relation = $request->arguments->{'relation'} // 
+	die "No relation specified";
+
+    [ map { $_->$relation } @$rows ]; 
+}
+
+### RETRIEVES THE VALUE OF AN SPECIFIC COLUMN
+
+sub property    
+{  
+    my ($self,$request,$rows) = @_;  
+    my $property = $request->arguments->{'property'} // 
+	die "No property specified";
+
+    [ map { {$property => $_->$property} } @$rows ]; 
+}
+
+sub get_columns
+{
+    my ($self,$request,$rows) = @_;
+
+    [map { {$_->get_columns} } @$rows];
+}
+
+
+sub collapse
+{
+    my ($self,$request,$rows) = @_;
+    my $relations = $request->arguments->{'relations'} // {}; 
+
+    my @result; 
+
+    for my $row (@$rows)
+    {
+	my $result = {$row->get_columns};
+
+	while (my ($table, $columns) = each %$relations)
+	{ 
+	    for my $obj ($row->$table)
+	    {
+		$result->{$table} //= []; 
+		push @{$result->{$table}}, { map { $_ => $obj->$_ } @$columns };
+	    }
+	}
+	
+	push @result, $result;
     }
 
-    $actions;
+    use Data::Dumper; print Dumper [@result];
+
+    [ @result ];
 }
 
 1;
-
-__DATA__
-
-select.transaction = 0
-select.iterations = 1
-select.get_object = select
-
-update.transaction = 1
-update.iterations = 1
-update.get_object = select
-update.get_result = update
-
-add.transaction = 0
-add.iterations = 1
-add.get_result = add
-
-delete.transaction = 1
-delete.iterations = 1
-delete.get_object = select
-delete.get_result = delete
-
-relation.transaction = 0
-relation.iterations = 1
-relation.get_object = select
-relation.get_result = relation
-
-property.transaction = 0
-property.iterations = 1
-property.get_object = select
-property.get_result = property
-
-start_vm.transaction = 0
-start_vm.iterations = 5
-start_vm.get_object = select
-start_vm.get_result = start_vm
-
-stop_vm.transaction = 0
-stop_vm.iterations = 5
-stop_vm.get_object = select
-stop_vm.get_result = stop_vm
-	       
-block_vm.transaction = 0
-block_vm.iterations = 1
-block_vm.get_object = select
-block_vm.get_result = block_vm
-
-unblock_vm.transaction = 0
-unblock_vm.iterations = 1
-unblock_vm.get_object = select
-unblock_vm.get_result = unblock_vm
-	
-block_host.transaction = 0
-block_host.iterations = 1
-block_host.get_object = select
-block_host.get_result = block_host
-
-unblock_host.transaction = 0
-unblock_host.iterations = 1
-unblock_host.get_object = select
-unblock_host.get_result = unblock_host
-
-diconnect_user.transaction = 0
-diconnect_user.iterations = 1
-diconnect_user.get_object = select
-diconnect_user.get_result = diconnect_user
-
-add_host.transaction = 1
-add_host.iterations = 1
-add_host.get_result = add_host
-
