@@ -3,10 +3,16 @@ use strict;
 use warnings;
 use Moose;
 
-has 'rows',       is => 'ro', isa => 'ArrayRef', default => sub {[];};
+has 'result',     is => 'ro', isa => 'HashRef', default => sub { {}; };
 has 'status',     is => 'ro', isa => 'Str', required => 1;
 has 'message',    is => 'ro', isa => 'Str', default => '';
 
+sub BUILD
+{
+    my $self = shift;
+    $self->{result}->{total} //= undef; 
+    $self->{result}->{rows} //= []; 
+}
 
 sub json
 {
@@ -14,7 +20,19 @@ sub json
 
    { status  => $self->status,
      message => $self->message,
-     rows    => $self->rows };
+     result  => $self->result };
+}
+
+sub total
+{
+    my $self = shift;
+    $self->result->{total};
+}
+
+sub rows
+{
+    my $self = shift;
+    $self->result->{rows};
 }
 
 1;

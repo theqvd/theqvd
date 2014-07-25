@@ -9,6 +9,7 @@ our $VERSION = '0.01';
 
 has 'filter',      is => 'rw', isa => 'Str';
 has 'action',      is => 'rw', isa => 'Str';
+has 'defaults',    is => 'ro', isa => 'HashRef', default => sub {{};};
 has 'tenant',      is => 'ro', isa => 'ArrayRef', required => 1;
 has 'request',     is => 'rw', isa => 'QVD::Admin4::REST::Request', required => 1;
 
@@ -20,6 +21,8 @@ sub BUILD
     die "Neither action nor filter specified" 
 	unless ($self->action || $self->filter);
 
+    $self->request->defaults($self->defaults); # Adding fefault values
+                                               # from Query configuration
     my $role = $self->request->{tenant};
 
     for my $tenant (@{$self->tenant})
@@ -29,6 +32,5 @@ sub BUILD
 
     die "Forbidden action";
 }
-
 
 1;

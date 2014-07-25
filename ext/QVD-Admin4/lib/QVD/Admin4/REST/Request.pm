@@ -53,11 +53,11 @@ sub build_join
 	 @{$self->fields}, 
 	 @{$self->order_by})
     { 
-	my ($table) = $_ =~ /^([^\.]+)\.?(.+)?$/;
-	$relations{$table}++ if $table;
+	my ($table) = $_ =~ /^([^\.]+)\.(.+)$/;
+	$relations{$table}++ if ($table && $table ne 'me');
     }
 
-    $self->modifiers->{join} = [keys %relations];
+    $self->modifiers->{join} = [ keys %relations ];
 }
 
 sub build_pagination
@@ -95,13 +95,24 @@ sub build_fields
 	    $self->modifiers->{'+select'} //= [];
 	    $self->modifiers->{'+as'}     //= [];
 	    push @{$self->modifiers->{'+select'}}, $field;
-	    push @{$self->modifiers->{'+as'}}, $column;
+	    $field =~ s/\./ /g;
+	    push @{$self->modifiers->{'+as'}}, $field;
 	}
 	else
 	{
 	    $self->modifiers->{columns} //= [];
 	    push @{$self->modifiers->{columns}}, $column;
 	}
+    }
+}
+
+sub defaults
+{
+    my ($self,$defaults) = @_;
+
+    while (my ($k,$v) = each %$defaults)
+    {
+	$self->{arguments}->{$k} //= $v;
     }
 }
 

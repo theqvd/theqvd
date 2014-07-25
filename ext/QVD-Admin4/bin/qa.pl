@@ -37,6 +37,8 @@ GetOptions( "table=s"      => \$table,
 my $url = "http://192.168.56.102:8080";
 my $ua = Mojo::UserAgent->new;
 
+#%arguments =( relations => { tags => [qw(id tag)] });
+
 my $res = $ua->post($url => json => { host       => $host,
 				      user       => $user,
 				      password   => $password,
@@ -49,7 +51,8 @@ my $res = $ua->post($url => json => { host       => $host,
 				      order_by   => \@order_by,
 				      fields     => \@fields,
                                       filters    => \%filters,
-                                      arguments  => { relations => { tags => [qw(id tag)] }}} )->res;
+                                      arguments  => \%arguments} )->res;
+
 
 
 #### OUTPUT MODEL FOR Text::Table
@@ -89,9 +92,9 @@ sub print_rows_table
     my $status     = $res->json('/status') // '';
     my $message    = $res->json('/message') // '';
     $message =~ s/ at .+$//;
-    my $properties = $res->json("/rows/$n");
+    my $properties = $res->json("/result/rows/$n");
 
-    while ($properties = $res->json("/rows/$n")) 
+    while ($properties = $res->json("/result/rows/$n")) 
     {
 	my $tb = Text::Table->new(@model);
 	$tb->add("Status $status","$message");

@@ -31,16 +31,19 @@ sub BUILD
 sub _exec
 {
     my ($self, $query) = @_;
-    my $rows;
+    my $result;
 
     if ($query->filter)
     { 
 	my $filter = $query->filter;
-	$rows = $self->$filter($query->request);
+	$result = $self->$filter($query->request);
     }	
 
     my $action = $query->action;
-    $rows = $self->$action($query->request,$rows);
+
+    $result = $self->$action($query->request,$result);
+
+    $result;
 }
 
 ###############################
@@ -48,94 +51,112 @@ sub _exec
 ###############################
 
 ### BASIC SQL QUERIES
- 
+
 sub select
 {
     my ($self,$request) = @_;
-   
-    my $page = delete $request->modifiers->{page};
 
-    [$DB->resultset($request->table)->search($request->filters, 
-					     $request->modifiers)->page($page)->all];
+    my $rs = $DB->resultset($request->table)->search($request->filters,
+						     $request->modifiers);
+
+    { total => ($rs->is_paged ? $rs->pager->total_entries : undef), 
+      rows => [$rs->all]} ;
 }
 
 sub update
 {  
-    my ($self,$request,$rows) = @_;  
+    my ($self,$request,$result) = @_;  
 
-    [ map { $_->update($request->arguments) } @$rows ]; 
+    my $rows = $result->{rows};
+    $result->{rows} = [ map { {$_->update($request->arguments)->get_columns} } @$rows ]; 
+    $result;
 }
 
 sub add
 {
     my ($self,$request) = @_;  
      
-   [ $DB->resultset($request->table)->create($request->arguments) ]; 
+    { total => 1, rows => [ $DB->resultset($request->table)->create($request->arguments) ]}; 
 }
 
 sub delete 
 {  
-    my ($self,$request,$rows) = @_;  
-
-    [ map { $_->delete }  @$rows ];
+    my ($self,$request,$result) = @_;  
+    my $rows = $result->{rows};
+    $result->{rows} = [ map { $_->delete }  @$rows ];
+    $result;
 }
 
 ### RELATIONS BETWEEN TABLES
 
 sub relation     
 {  
-    my ($self,$request,$rows) = @_;  
+    my ($self,$request,$result) = @_;  
     my $relation = $request->arguments->{'relation'} // 
 	die "No relation specified";
-
-    [ map { $_->$relation } @$rows ]; 
+    my $rows = $result->{rows};
+    $result->{rows} = [ map { $_->$relation } @$rows ]; 
+    $result;
 }
 
 ### RETRIEVES THE VALUE OF AN SPECIFIC COLUMN
 
 sub property    
 {  
-    my ($self,$request,$rows) = @_;  
+    my ($self,$request,$result) = @_;  
     my $property = $request->arguments->{'property'} // 
 	die "No property specified";
+    my $rows = $result->{rows};
+    $result->{rows} = [ map { {$property => $_->$property} } @$rows ]; 
+    $result;
+}
 
-    [ map { {$property => $_->$property} } @$rows ]; 
+sub empty
+{
+    [];
 }
 
 sub get_columns
 {
-    my ($self,$request,$rows) = @_;
-
-    [map { {$_->get_columns} } @$rows];
+    my ($self,$request,$result) = @_;
+    my $rows = $result->{rows};
+    $result->{rows} = [map { {$_->get_columns} } @$rows];
+    $result;
 }
 
+sub count
+{
+    my ($self,$request,$result) = @_;
+    $result->{rows} = [];
+    $result;
+}
 
 sub collapse
 {
-    my ($self,$request,$rows) = @_;
+    my ($self,$request,$result) = @_;
     my $relations = $request->arguments->{'relations'} // {}; 
-
-    my @result; 
+    my $rows = $result->{rows};
+    my @nrows; 
 
     for my $row (@$rows)
     {
-	my $result = {$row->get_columns};
+	my $nrows = {$row->get_columns};
 
 	while (my ($table, $columns) = each %$relations)
 	{ 
-	    for my $obj ($row->$table)
-	    {
-		$result->{$table} //= []; 
-		push @{$result->{$table}}, { map { $_ => $obj->$_ } @$columns };
-	    }
+	        for my $obj ($row->$table)
+		{
+		    $nrows->{$table} //= []; 
+		    push @{$nrows->{$table}}, { map { $_ => $obj->$_ } @$columns };
+		}
 	}
 	
-	push @result, $result;
+	push @nrows, $nrows;
     }
 
-    use Data::Dumper; print Dumper [@result];
-
-    [ @result ];
+    $result->{rows} = [ @nrows ];
+    $result;
 }
+
 
 1;

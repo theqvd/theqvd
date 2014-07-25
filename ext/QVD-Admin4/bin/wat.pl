@@ -23,7 +23,6 @@ any '/' => sub {
     my $c = shift;
     my $json = $c->req->json;
     $json->{tenant} = $c->session('role'); 
-
     $c->render(json => $c->_rest->_admin($json));
 };
 

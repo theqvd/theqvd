@@ -30,12 +30,10 @@ sub _admin
    my ($self,$json) = @_;
 
    my $request = QVD::Admin4::REST::Request->new(json => $json);
-
-   my $rows = eval { $QVD_ADMIN->_exec($self->get_query($request)) } // [];
-
+   my $result = eval { $QVD_ADMIN->_exec($self->get_query($request)) } // {};
    my $response = QVD::Admin4::REST::Response->new(message    => ($@ ? "$@" : ""),
                                                    status     => ($@ ? 1 : 0),
-                                                   rows       => $rows )->json;
+                                                   result     => $result )->json;
 }
 
 sub get_role
@@ -79,53 +77,111 @@ select.tenant = all
 select.filter = select
 select.action = get_columns
 
-collapse.tenant = all
-collapse.filter = select
-collapse.action = collapse
+user_get_list.tenant = all
+user_get_list.filter = select
+user_get_list.action = collapse
 
-update.tenant = admin
-update.filter = select
-update.action = update
+user_get_details.tenant = all
+user_get_details.filter = select
+user_get_details.action = collapse
 
-add.tenant = admin
-add.action = add
+user_update.tenant = all
+user_update.filter = select
+user_update.action = update
 
-delete.tenant = admin
-delete.filter = select
-delete.action = delete
+user_create.tenant = all
+user_create.filter = add
+user_create.action = get_columns
 
-relation.tenant = all
-relation.filter = select
-relation.action = relation
+user_delete.tenant = all
+user_delete.filter = select
+user_delete.action = delete
 
-property.tenant = all
-property.filter = select
-property.action = property
+user_get_state.tenant = all
+user_get_state.filter = select
+user_get_state.action = collapse
 
-start_vm.tenant = admin
-start_vm.filter = select
-start_vm.action = start_vm
+vm_get_list.tenant = all
+vm_get_list.filter = select
+vm_get_list.action = collapse
 
-stop_vm.tenant = admin
-stop_vm.filter = select
-stop_vm.action = stop_vm
-	       
-block_vm.tenant = admin
-block_vm.filter = select
-block_vm.action = block_vm
+vm_get_details.tenant = all
+vm_get_details.filter = select
+vm_get_details.action = collapse
 
-unblock_vm.tenant = admin
-unblock_vm.filter = select
-unblock_vm.action = unblock_vm
+vm_get_state.tenant = all
+vm_get_state.filter = select
+vm_get_state.action = get_columns
 
-block_host.tenant = admin
-block_host.filter = select
-block_host.action = block_host
+vm_update.tenant = all
+vm_update.filter = select
+vm_update.action = update
 
-unblock_host.tenant = admin
-unblock_host.filter = select
-unblock_host.action = unblock_host
+vm_create.tenant = all
+vm_create.filter = add
+vm_create.action = get_columns
 
-disconnect_user.tenant = admin
-disconnect_user.filter = select
-disconnect_user.action = diconnect_user
+vm_delete.tenant = all
+vm_delete.filter = select
+vm_delete.action = delete
+
+vm_running_stats.tenant = all
+vm_running_stats.filter = select
+vm_running_stats.action = count
+
+host_get_list.tenant = all
+host_get_list.filter = select
+host_get_list.action = get_columns
+
+host_get_details.tenant = all
+host_get_details.filter = select
+host_get_details.action = collapse
+
+host_get_state.tenant = all
+host_get_state.filter = select
+host_get_state.action = collapse
+
+host_update.tenant = all
+host_update.filter = select
+host_update.action = update
+
+host_create.tenant = all
+host_create.filter = add
+host_create.action = get_columns
+host_create.defaults.backend = 1
+host_create.defaults.frontend = 1
+
+host_delete.tenant = all
+host_delete.filter = select
+host_delete.action = delete
+
+host_running_stats.tenant = all
+host_running_stats.filter = select
+host_running_stats.action = count
+
+host_running_stats.tenant = all
+host_running_stats.filter = select
+host_running_stats.action = count
+
+osf_get_list.tenant = all
+osf_get_list.filter = select
+osf_get_list.action = collapse
+
+osf_get_details.tenant = all
+osf_get_details.filter = select
+osf_get_details.action = collapse
+
+osf_create.tenant = all
+osf_create.filter = add
+osf_create.action = get_columns
+osf_create.defaults.memory = 1
+osf_create.defaults.use_overlay = 1
+osf_create.defaults.user_storage_size = 1
+
+osf_delete.tenant = all
+osf_delete.filter = select
+osf_delete.action = delete
+
+osf_update.tenant = all
+osf_update.filter = select
+osf_update.action = update
