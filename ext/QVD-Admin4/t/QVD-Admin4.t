@@ -194,8 +194,7 @@ $t->post_ok('/' => json => { host       => '192.168.56.102',
 					     'user_id' => 2, 
 					     'osf_id' => 1,
                                              'vm_runtime.host_id' => undef,
-					     'vm_runtime.current_di_id' => undef,
-					     di_tag => 'default'}})
+					     'vm_runtime.current_di_id' => undef}})
     ->status_is(200)
     ->json_is('/message' => '')
     ->json_is('/status' => '0')
@@ -547,9 +546,9 @@ $t->post_ok('/' => json => { host       => '192.168.56.102',
     ->json_is('/status' => '0')
     ->json_is('/result/total', '1');
 
-#################################################################
-############################## HOST #############################
-#################################################################
+################################################################
+############################## OSF #############################
+################################################################
 
 ######################
 ### osf_get_list
@@ -681,6 +680,142 @@ $t->post_ok('/' => json => { host       => '192.168.56.102',
 			     order_dir  => "-desc",
 			     pagination => { offset => 1, blocked => 10 },
 			     filters    => { name => 'kubuntu' }})
+    ->status_is(200)
+    ->json_is('/message' => '')
+    ->json_is('/status' => '0');
+
+
+###############################################################
+############################## DI #############################
+###############################################################
+
+######################
+### di_get_list
+######################
+
+$t->post_ok('/' => json => { host       => '192.168.56.102',
+			     user       => 'qvd',
+			     password   => '4591',
+			     database   => 'qvddb',
+			     action     => 'di_get_list',
+			     table      => 'DI',
+			     fields     => [qw(me.id me.path me.version osf.id osf.name)],
+			     order_by   => [],
+			     arguments  => {},
+			     order_dir  => "-desc",
+			     pagination => { offset => 1, blocked => 1 },
+			     filters    => { 'me.path'   =>  '1-ubuntu-13.04-i386-qvd.tar.gz',
+			                     'me.osf_id' =>  1 }})
+    ->status_is(200)
+    ->json_is('/message' => '')
+    ->json_is('/status' => '0')
+    ->json_has('/result/rows/0')
+    ->json_is('/result/rows/0/id' => 1);
+
+######################
+### di_get_details
+######################
+
+$t->post_ok('/' => json => { host       => '192.168.56.102',
+			     user       => 'qvd',
+			     password   => '4591',
+			     database   => 'qvddb',
+			     action     => 'di_get_details',
+			     table      => 'DI',
+			     fields     => [qw(me.id me.path me.version osf.id osf.name)],
+			     order_by   => [],
+			     arguments  => {relations => { properties => [qw(key value)],
+                                                           tags => [qw(tag)] }},
+			     order_dir  => "-desc",
+			     pagination => { offset => 1, blocked => 1 },
+			     filters    => { 'me.id'     =>  '1'}})
+    ->status_is(200)
+    ->json_is('/message' => '')
+    ->json_is('/status' => '0')
+    ->json_has('/result/rows/0')
+    ->json_is('/result/rows/0/id' => 1);
+
+#####################
+### di_create
+#####################
+
+$t->post_ok('/' => json => { host       => '192.168.56.102',
+			     user       => 'qvd',
+			     password   => '4591',
+			     database   => 'qvddb',
+			     action     => 'di_create',
+			     table      => 'DI',
+			     fields     => [],
+			     order_by   => [],
+			     arguments  => { osf_id => 1, 
+					     path => '1-ubuntu-13.04-i386-qvd.tar.gz',
+                                             version => '2014-07-28-000' },
+			     order_dir  => "-desc",
+			     pagination => { offset => 1, blocked => 1 },
+			     filters    => {}})
+    ->status_is(200)
+    ->json_is('/message' => '')
+    ->json_is('/status' => '0')
+    ->json_has('/result/rows/0')
+    ->json_is('/result/rows/0/version' => '2014-07-28-000');
+
+
+
+#####################
+### di_delete
+#####################
+
+$t->post_ok('/' => json => { host       => '192.168.56.102',
+			     user       => 'qvd',
+			     password   => '4591',
+			     database   => 'qvddb',
+			     action     => 'di_delete',
+			     table      => 'DI',
+			     fields     => [],
+			     order_by   => [],
+			     arguments  => {},
+			     order_dir  => "-desc",
+			     pagination => { offset => 1, blocked => 1 },
+			     filters    => { version => [qw(2014-07-28-000)]}})
+    ->status_is(200)
+    ->json_is('/message' => '')
+    ->json_is('/status' => '0')
+    ->json_has('/result/rows/0');
+
+#####################
+### di_update
+#####################
+
+$t->post_ok('/' => json => { host       => '192.168.56.102',
+			     user       => 'qvd',
+			     password   => '4591',
+			     database   => 'qvddb',
+			     action     => 'di_update',
+			     table      => 'DI',
+			     fields     => [],
+			     order_by   => [],
+			     arguments  => { path  => 'kubuntu.gz'},
+			     order_dir  => "-desc",
+			     pagination => { offset => 1, blocked => 10 },
+			     filters    => { path =>  [qw(1-ubuntu-13.04-i386-qvd.tar.gz)]  }})
+    ->status_is(200)
+    ->json_is('/message' => '')
+    ->json_is('/status' => '0')
+    ->json_is('/result/rows/0/path' => 'kubuntu.gz');
+
+
+$t->post_ok('/' => json => { host       => '192.168.56.102',
+			     user       => 'qvd',
+			     password   => '4591',
+			     database   => 'qvddb',
+			     action     => 'di_update',
+			     table      => 'DI',
+			     fields     => [],
+			     order_by   => [],
+			     arguments  => { path => '1-ubuntu-13.04-i386-qvd.tar.gz'},
+			     order_dir  => "-desc",
+			     pagination => { offset => 1, blocked => 10 },
+			     filters    => { path => 'kubuntu.gz' }})
     ->status_is(200)
     ->json_is('/message' => '')
     ->json_is('/status' => '0');

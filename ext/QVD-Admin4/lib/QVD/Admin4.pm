@@ -95,7 +95,7 @@ sub relation
     my $relation = $request->arguments->{'relation'} // 
 	die "No relation specified";
     my $rows = $result->{rows};
-    $result->{rows} = [ map { $_->$relation } @$rows ]; 
+    $result->{rows} = [ map { {$_->$relation->get_columns} } @$rows ]; 
     $result;
 }
 

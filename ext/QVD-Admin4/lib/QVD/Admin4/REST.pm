@@ -77,6 +77,14 @@ select.tenant = all
 select.filter = select
 select.action = get_columns
 
+relation.tenant = all
+relation.filter = select
+relation.action = relation
+
+property.tenant = all
+property.filter = select
+property.action = property
+
 user_get_list.tenant = all
 user_get_list.filter = select
 user_get_list.action = collapse
@@ -185,3 +193,23 @@ osf_delete.action = delete
 osf_update.tenant = all
 osf_update.filter = select
 osf_update.action = update
+
+di_get_list.tenant = all
+di_get_list.filter = select
+di_get_list.action = get_columns
+
+di_get_details.tenant = all
+di_get_details.filter = select
+di_get_details.action = collapse
+
+di_create.tenant = all
+di_create.filter = add
+di_create.action = get_columns
+
+di_delete.tenant = all
+di_delete.filter = select
+di_delete.action = delete
+
+di_update.tenant = all
+di_update.filter = select
+di_update.action = update
