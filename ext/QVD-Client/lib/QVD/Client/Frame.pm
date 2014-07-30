@@ -8,6 +8,8 @@ use QVD::Client::Proxy;
 use base qw(Wx::Frame);
 use strict;
 use QVD::Log;
+use Locale::gettext;
+use FindBin;
 
 use constant EVT_LIST_OF_VM_LOADED => Wx::NewEventType;
 use constant EVT_CONNECTION_ERROR  => Wx::NewEventType;
@@ -72,9 +74,38 @@ sub new {
 
     my $self = $class->SUPER::new( $parent, $id, $title, $pos, $size, $style, $name );
 
+
+	
     
     
-    
+    textdomain("qvd-gui-client");
+
+    my $rootdir = "$FindBin::Bin/..";
+	my $localepath = "$rootdir/share/locale";
+
+	if ( -f "$rootdir/Build.PL" ) {
+		DEBUG "Running from source tree, using in-tree locale";
+		require Locale::Msgfmt;
+		require File::Path;
+
+
+		my @po_files = glob("$rootdir/po/*.po");
+
+		foreach my $po_file (@po_files) {
+				my ($lang) = ( $po_file =~ /po\/(.*?)\.po$/ );
+				my $d = "$localepath/$lang/LC_MESSAGES";
+				File::Path::mkpath($d) unless (-d $d);
+				DEBUG "Generating locale: $po_file => $d/qvd-gui-client.mo";
+				Locale::Msgfmt::msgfmt({ in => $po_file, out => "$d/qvd-gui-client.mo" });
+				
+		}
+	} else {
+		DEBUG "Running from installed package, using installed locale";
+	}
+
+	DEBUG "Locale path is $localepath";
+	bindtextdomain("qvd-gui-client", $localepath);
+	
     if ( core_cfg('client.show.settings') ) {
         $tab_ctl = Wx::Notebook->new($self, -1, wxDefaultPosition, wxDefaultSize, 0, "tab");
     }
@@ -82,41 +113,41 @@ sub new {
     my $panel = $self->{panel} = Wx::Panel->new($tab_ctl // $self, -1, wxDefaultPosition, wxDefaultSize, wxTAB_TRAVERSAL ); # / broken highlighter
     
     if ( $tab_ctl ) {
-        $tab_ctl->AddPage( $panel, "Connect" );
+        $tab_ctl->AddPage( $panel, gettext("Connect") );
         
         $tab_sizer = Wx::BoxSizer->new(wxVERTICAL);
         $tab_sizer->Add($tab_ctl);
         
         
         $settings_panel = Wx::Panel->new($tab_ctl, -1, wxDefaultPosition, wxDefaultSize, wxTAB_TRAVERSAL );
-        $tab_ctl->AddPage( $settings_panel, "Settings");
+        $tab_ctl->AddPage( $settings_panel, gettext("Settings"));
         my $settings_sizer = Wx::BoxSizer->new(wxVERTICAL);
         $settings_panel->SetSizer($settings_sizer);
         
 
         ###############################
-        $settings_sizer->Add( Wx::StaticText->new($settings_panel, -1, "Connection"), 0, wxALL, 5);
+        $settings_sizer->Add( Wx::StaticText->new($settings_panel, -1, gettext("Connection")), 0, wxALL, 5);
         $settings_sizer->Add( Wx::StaticLine->new($settings_panel, -1, wxDefaultPosition, wxDefaultSize, wxLI_HORIZONTAL, "line"), 0, wxEXPAND | wxLEFT | wxRIGHT, 5 );
 
 
-        $self->{audio} = Wx::CheckBox->new($settings_panel, -1, "Enable audio", wxDefaultPosition, wxDefaultSize, 0, wxDefaultValidator, "checkBox");
+        $self->{audio} = Wx::CheckBox->new($settings_panel, -1, gettext("Enable audio"), wxDefaultPosition, wxDefaultSize, 0, wxDefaultValidator, "checkBox");
         $self->{audio}->SetValue( core_cfg("client.audio.enable" ) );
         $settings_sizer->Add($self->{audio});
 
-        $self->{printing} = Wx::CheckBox->new($settings_panel, -1, "Enable printing", wxDefaultPosition, wxDefaultSize, 0, wxDefaultValidator, "checkBox");
+        $self->{printing} = Wx::CheckBox->new($settings_panel, -1, gettext("Enable printing"), wxDefaultPosition, wxDefaultSize, 0, wxDefaultValidator, "checkBox");
         $self->{printing}->SetValue( core_cfg("client.printing.enable" ) );
         $settings_sizer->Add($self->{printing});
 
-        $self->{forwarding} = Wx::CheckBox->new($settings_panel, -1, "Enable port forwarding", wxDefaultPosition, wxDefaultSize, 0, wxDefaultValidator, "checkBox");
+        $self->{forwarding} = Wx::CheckBox->new($settings_panel, -1, gettext("Enable port forwarding"), wxDefaultPosition, wxDefaultSize, 0, wxDefaultValidator, "checkBox");
         $self->{forwarding}->SetValue( core_cfg("client.slave.enable" ) );
         $settings_sizer->Add($self->{forwarding});        
         $settings_sizer->AddSpacer(5);
 
         ###############################
-        $settings_sizer->Add( Wx::StaticText->new($settings_panel, -1, "Screen"), 0, wxALL, 5);
+        $settings_sizer->Add( Wx::StaticText->new($settings_panel, -1, gettext("Screen")), 0, wxALL, 5);
         $settings_sizer->Add( Wx::StaticLine->new($settings_panel, -1, wxDefaultPosition, wxDefaultSize, wxLI_HORIZONTAL, "line"), 0, wxEXPAND | wxLEFT | wxRIGHT, 5 );
 
-        $self->{fullscreen} = Wx::CheckBox->new($settings_panel, -1, "Full screen");
+        $self->{fullscreen} = Wx::CheckBox->new($settings_panel, -1, gettext("Full screen"));
         $self->{fullscreen}->SetValue( core_cfg("client.fullscreen" ) );
         $settings_sizer->Add($self->{fullscreen}, 0, wxALL, 5);
         
@@ -132,29 +163,29 @@ sub new {
     my $grid_sizer = Wx::GridSizer->new(1, 2, 0, 0);
     $ver_sizer->Add($grid_sizer, 1, wxALL|wxEXPAND, 20);
 
-    $grid_sizer->Add(Wx::StaticText->new($panel, -1, "User"), 0, wxALL, 5);
+    $grid_sizer->Add(Wx::StaticText->new($panel, -1, gettext("User")), 0, wxALL, 5);
     $self->{username} = Wx::TextCtrl->new($panel, -1, core_cfg('client.remember_username') ?  core_cfg('client.user.name') : "");
     $grid_sizer->Add($self->{username}, 1, wxALL|wxEXPAND, 5);
 
-    $grid_sizer->Add(Wx::StaticText->new($panel, -1, "Password"), 0, wxALL, 5);
+    $grid_sizer->Add(Wx::StaticText->new($panel, -1, gettext("Password")), 0, wxALL, 5);
     $self->{password} = Wx::TextCtrl->new($panel, -1, "", wxDefaultPosition, wxDefaultSize, wxTE_PASSWORD);
     $grid_sizer->Add($self->{password}, 0, wxALL|wxEXPAND, 5);
 
     if (core_cfg('client.show.remember_password')) {
-        $grid_sizer->Add(Wx::StaticText->new($panel, -1, "Remember password"), 0, wxALL, 5);
+        $grid_sizer->Add(Wx::StaticText->new($panel, -1, gettext("Remember password")), 0, wxALL, 5);
         $self->{remember_pass} = Wx::CheckBox->new ($panel, -1, '', wxDefaultPosition);
         $self->{remember_pass}->SetValue(core_cfg('client.remember_password') ? 1 : 0);
         $grid_sizer->Add($self->{remember_pass}, 1, wxALL, 5);
     }
 
     if (!core_cfg('client.force.host.name', 0)) {
-        $grid_sizer->Add(Wx::StaticText->new($panel, -1, "Server"), 0, wxALL, 5);
+        $grid_sizer->Add(Wx::StaticText->new($panel, -1, gettext("Server")), 0, wxALL, 5);
         $self->{host} = Wx::TextCtrl->new($panel, -1, core_cfg('client.host.name'));
         $grid_sizer->Add($self->{host}, 1, wxALL|wxEXPAND, 5);
     }
 
     if (!core_cfg('client.force.link', 0)) {
-        $grid_sizer->Add(Wx::StaticText->new($panel, -1, "Connection type"), 0, wxALL, 5);             
+        $grid_sizer->Add(Wx::StaticText->new($panel, -1, gettext("Connection type")), 0, wxALL, 5);             
         my @link_options = ("Local", "ADSL", "Modem");
         $self->{link} = Wx::Choice->new($panel, -1);
         $grid_sizer->Add($self->{link}, 1, wxALL|wxEXPAND, 5);
@@ -176,7 +207,7 @@ sub new {
         $self->{link}->Select($link_select);
     }
 
-    $grid_sizer->Add(Wx::StaticText->new($panel, -1, "Kill current VM"), 0, wxALL, 5);
+    $grid_sizer->Add(Wx::StaticText->new($panel, -1, gettext("Kill current VM")), 0, wxALL, 5);
     $self->{kill_vm} = Wx::CheckBox->new ($panel, -1, '', wxDefaultPosition);
     $grid_sizer->Add($self->{kill_vm});
 
@@ -209,7 +240,7 @@ sub new {
     }
 
     # port goes here!
-    $self->{connect_button} = Wx::Button->new($panel, -1, "Connect");
+    $self->{connect_button} = Wx::Button->new($panel, -1, gettext("Connect"));
     $ver_sizer->Add($self->{connect_button}, 0, wxLEFT|wxRIGHT|wxBOTTOM|wxEXPAND, 20);
     $self->{connect_button}->SetDefault;
 
@@ -302,7 +333,7 @@ sub proxy_list_of_vm_loaded {
     } elsif (@$vm_data == 1) {
         $vm_id = $vm_data->[0]{id};
     } else {
-        die "You don't have any virtual machine available";
+        die gettext("You don't have any virtual machine available");
     }
     return $vm_id;
 }
@@ -401,7 +432,7 @@ sub OnConnectionError {
     $self->{progress_bar}->SetValue(0);
     $self->{progress_bar}->SetRange(100);
     my $message = $event->GetData;
-    my $dialog = Wx::MessageDialog->new($self, $message, "Connection error.", wxOK | wxICON_ERROR);
+    my $dialog = Wx::MessageDialog->new($self, $message, gettext("Connection error"), wxOK | wxICON_ERROR);
     $dialog->ShowModal();
     $dialog->Destroy();
     $self->EnableControls(1);
@@ -414,12 +445,12 @@ sub OnListOfVMLoaded {
         lock($vm_id);
         my $dialog = new Wx::SingleChoiceDialog(
             $self, 
-            "Select virtual machine:", 
-            "Select virtual machine", 
+            gettext("Select virtual machine:"), 
+            gettext("Select virtual machine"), 
             [
                 map { 
                     if ($_->{blocked}) {
-                        $_->{name}." (blocked)";
+                        $_->{name}.gettext(" (blocked)");
                     } else {
                         $_->{name};
                         
@@ -478,22 +509,24 @@ sub OnUnknownCert {
     # http://www.openssl.org/docs/apps/verify.html#
     
     if ( $cert_errno == 2 || $cert_errno == 20 || $cert_errno == 21 || $cert_errno == 27 ) {
-        $err_desc = "Unrecognized Certificate Authority. See the documentation for instructions on how to use your own CA.\n"; 
+        $err_desc = gettext("Unrecognized Certificate Authority. See the documentation for instructions on how to use your own CA.");
     } elsif ( $cert_errno == 9 ) {
-        $err_desc = "The ertificate is not yet valid. Make sure your clock is set correctly.\n"; 
+        $err_desc = gettext("The certificate is not yet valid. Make sure your clock is set correctly.");
     } elsif ( $cert_errno == 10 ) {
-        $err_desc = "The certificate has expired.\n"; 
+        $err_desc = gettext("The certificate has expired.");
     } elsif ( $cert_errno == 23 ) {
-        $err_desc = "The certificate has been revoked.\n";
+        $err_desc = gettext("The certificate has been revoked.");
         $no_ok_button = 1;
     } else {
-        $err_desc = "Unrecognized SSL error #$cert_errno. See the certificate information below for details.\n";
+        $err_desc = sprintf(gettext("Unrecognized SSL error #%s. See the certificate information below for details."), $cert_errno);
     }
+
+    $err_desc .= "\n";
 
     $vsizer->Add(Wx::StaticText->new($dialog, -1, $err_desc), 0, wxALL, 5);
 
-    $vsizer->Add(Wx::StaticText->new($dialog, -1, 'Certificate information:'), 0, wxALL, 5); 
-    my $tc = Wx::TextCtrl->new($dialog, -1, $cert_data ? $cert_data : 'Certificate not found, maybe HKD component is not runnning at server side.', wxDefaultPosition, [600,300], wxTE_MULTILINE|wxTE_READONLY);
+    $vsizer->Add(Wx::StaticText->new($dialog, -1, gettext('Certificate information:')), 0, wxALL, 5); 
+    my $tc = Wx::TextCtrl->new($dialog, -1, $cert_data ? $cert_data : gettext('Certificate not found, maybe HKD component is not runnning at server side.'), wxDefaultPosition, [600,300], wxTE_MULTILINE|wxTE_READONLY);
     $tc->SetFont (Wx::Font->new(12, wxDEFAULT, wxNORMAL, wxNORMAL, 0, 'Courier New'));
     $vsizer->Add($tc, 1, wxALL|wxEXPAND, 5);
 
@@ -508,12 +541,12 @@ sub OnUnknownCert {
 
     my $but_ok;
     unless ($no_ok_button) {
-        $but_ok     = Wx::Button->new($dialog, -1, 'Ok') ;
+        $but_ok     = Wx::Button->new($dialog, -1, gettext('Ok')) ;
         Wx::Event::EVT_BUTTON($dialog, $but_ok    ->GetId, sub { $but_clicked->(1) });
         $bsizer->Add($but_ok, 0, wxALL, 5);
     }
 
-    my $but_cancel = Wx::Button->new($dialog, -1, 'Cancel');
+    my $but_cancel = Wx::Button->new($dialog, -1, gettext('Cancel'));
     Wx::Event::EVT_BUTTON($dialog, $but_cancel->GetId, sub { $but_clicked->(0) });
     $bsizer->Add($but_cancel, 0, wxALL, 5);
     $vsizer->Add($bsizer);
@@ -653,7 +686,7 @@ sub SaveConfiguration {
     if ($@) {
         my $message = $@;
         my $dialog = Wx::MessageDialog->new($self, $message, 
-            "Error saving configuration", wxOK | wxICON_ERROR);
+            gettext("Error saving configuration"), wxOK | wxICON_ERROR);
         $dialog->ShowModal();
         $dialog->Destroy();
     }
@@ -731,18 +764,18 @@ sub start_remote_mounts {
 				}
 				ERROR $@;
 
-				my $message = "Failed to mount remote folder $remote_dir at $local_dir:\n\n";
+				my $message = sprintf(gettext("Failed to mount remote folder %s at %s:"), $remote_dir, $local_dir) . "\n\n";
 				if ( $@ =~ /Server replied 404/ ) {
-					$message .= "Path $remote_dir was not found on the VM";
+					$message .= sprintf(gettext("Path %s was not found on the VM"), $remote_dir);
 				} elsif ( $@ =~ /Server replied 403/ ) {
-					$message .= "Path $remote_dir is forbidden on the VM";
+					$message .= sprintf(gettext("Path %s is forbidden on the VM"), $remote_dir);
                 } elsif ( $@ =~ /Server replied 501/ ) {
-					$message .= "VM lacks file sharing support. Please install the qvd-sshfs package.";
+					$message .= gettext("VM lacks file sharing support. Please install the qvd-sshfs package.");
 				} else {
-					$message .= "Unrecognized error, full error message follows:\n\n$@";
+					$message .= gettext("Unrecognized error, full error message follows:") .  "\n\n$@";
 				}
 
-				my $dialog = Wx::MessageDialog->new($self, $message, "File sharing error.", wxOK | wxICON_ERROR);
+				my $dialog = Wx::MessageDialog->new($self, $message, gettext("File sharing error."), wxOK | wxICON_ERROR);
 				$dialog->ShowModal();
 				$dialog->Destroy();
 

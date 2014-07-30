@@ -1,0 +1,181 @@
+# Spanish translations for PACKAGE package
+# Traducciones al español para el paquete PACKAGE.
+# Copyright (C) 2014 THE PACKAGE'S COPYRIGHT HOLDER
+# This file is distributed under the same license as the PACKAGE package.
+# Qindel <vadim@qindel.com>, 2014.
+#
+msgid ""
+msgstr ""
+"Project-Id-Version: QVD\n"
+"Report-Msgid-Bugs-To: \n"
+"POT-Creation-Date: 2014-07-25 14:39+0200\n"
+"PO-Revision-Date: 2014-07-30 12:30+0100\n"
+"Last-Translator: Vadim Troshchinskiy <vadim@qindel.es>\n"
+"Language-Team: QVD Team <qvd@qindel.com>\n"
+"Language: es\n"
+"MIME-Version: 1.0\n"
+"Content-Type: text/plain; charset=ISO-8859-1\n"
+"Content-Transfer-Encoding: 8bit\n"
+"Plural-Forms: nplurals=2; plural=(n != 1);\n"
+"X-Generator: Poedit 1.5.4\n"
+
+#: /home/qindel/svn/QVD/trunk/ext/QVD-Client/lib/QVD/Client/Frame.pm:86
+#: /home/qindel/svn/QVD/trunk/ext/QVD-Client/lib/QVD/Client/Frame.pm:213
+msgid "Connect"
+msgstr "Conectar"
+
+#: /home/qindel/svn/QVD/trunk/ext/QVD-Client/lib/QVD/Client/Frame.pm:93
+msgid "Settings"
+msgstr "Ajustes"
+
+#: /home/qindel/svn/QVD/trunk/ext/QVD-Client/lib/QVD/Client/Frame.pm:99
+msgid "Connection"
+msgstr "Conexión"
+
+#: /home/qindel/svn/QVD/trunk/ext/QVD-Client/lib/QVD/Client/Frame.pm:103
+msgid "Enable audio"
+msgstr "Habilitar sonido"
+
+#: /home/qindel/svn/QVD/trunk/ext/QVD-Client/lib/QVD/Client/Frame.pm:107
+msgid "Enable printing"
+msgstr "Habilitar impresión"
+
+#: /home/qindel/svn/QVD/trunk/ext/QVD-Client/lib/QVD/Client/Frame.pm:111
+msgid "Enable port forwarding"
+msgstr "Habilitar reenvío de puertos"
+
+#: /home/qindel/svn/QVD/trunk/ext/QVD-Client/lib/QVD/Client/Frame.pm:117
+msgid "Screen"
+msgstr "Pantalla"
+
+#: /home/qindel/svn/QVD/trunk/ext/QVD-Client/lib/QVD/Client/Frame.pm:120
+msgid "Full screen"
+msgstr "Pantalla completa"
+
+#: /home/qindel/svn/QVD/trunk/ext/QVD-Client/lib/QVD/Client/Frame.pm:136
+msgid "User"
+msgstr "Usuario"
+
+#: /home/qindel/svn/QVD/trunk/ext/QVD-Client/lib/QVD/Client/Frame.pm:140
+msgid "Password"
+msgstr "Contraseña"
+
+#: /home/qindel/svn/QVD/trunk/ext/QVD-Client/lib/QVD/Client/Frame.pm:145
+msgid "Remember password"
+msgstr "Recordar contraseña"
+
+#: /home/qindel/svn/QVD/trunk/ext/QVD-Client/lib/QVD/Client/Frame.pm:152
+msgid "Server"
+msgstr "Servidor"
+
+#: /home/qindel/svn/QVD/trunk/ext/QVD-Client/lib/QVD/Client/Frame.pm:158
+msgid "Connection type"
+msgstr "Tipo de enlace"
+
+#: /home/qindel/svn/QVD/trunk/ext/QVD-Client/lib/QVD/Client/Frame.pm:180
+msgid "Kill current VM"
+msgstr "Reinicio de sesión"
+
+#: /home/qindel/svn/QVD/trunk/ext/QVD-Client/lib/QVD/Client/Frame.pm:306
+msgid "You don't have any virtual machine available"
+msgstr "No tiene ninguna máquina virtual disponible"
+
+#: /home/qindel/svn/QVD/trunk/ext/QVD-Client/lib/QVD/Client/Frame.pm:405
+msgid "Connection error"
+msgstr "Error de conexión"
+
+#: /home/qindel/svn/QVD/trunk/ext/QVD-Client/lib/QVD/Client/Frame.pm:418
+msgid "Select virtual machine:"
+msgstr "Seleccione la máquina virtual:"
+
+#: /home/qindel/svn/QVD/trunk/ext/QVD-Client/lib/QVD/Client/Frame.pm:419
+msgid "Select virtual machine"
+msgstr "Seleccione la máquina virtual"
+
+#: /home/qindel/svn/QVD/trunk/ext/QVD-Client/lib/QVD/Client/Frame.pm:423
+msgid " (blocked)"
+msgstr " (bloqueada)"
+
+#: /home/qindel/svn/QVD/trunk/ext/QVD-Client/lib/QVD/Client/Frame.pm:482
+msgid ""
+"Unrecognized Certificate Authority. See the documentation for instructions "
+"on how to use your own CA."
+msgstr ""
+"Autoridad de certificación (CA) no reconocida. Vea la documentación para "
+"instrucciones sobre como usar su propia CA."
+
+#: /home/qindel/svn/QVD/trunk/ext/QVD-Client/lib/QVD/Client/Frame.pm:484
+msgid ""
+"The certificate is not yet valid. Make sure your clock is set correctly."
+msgstr ""
+"El certificado todavía no es válido. Compruebe que su reloj esté puesto "
+"correctamente."
+
+#: /home/qindel/svn/QVD/trunk/ext/QVD-Client/lib/QVD/Client/Frame.pm:486
+msgid "The certificate has expired."
+msgstr "El certificado ha expirado."
+
+#: /home/qindel/svn/QVD/trunk/ext/QVD-Client/lib/QVD/Client/Frame.pm:488
+msgid "The certificate has been revoked."
+msgstr "El certificado ha sido revocado."
+
+#: /home/qindel/svn/QVD/trunk/ext/QVD-Client/lib/QVD/Client/Frame.pm:491
+#, perl-format
+msgid ""
+"Unrecognized SSL error #%s. See the certificate information below for "
+"details."
+msgstr ""
+"Error de SSL #%s no reconocido. Vea la información detallada que sigue para "
+"mas detalles."
+
+#: /home/qindel/svn/QVD/trunk/ext/QVD-Client/lib/QVD/Client/Frame.pm:498
+msgid "Certificate information:"
+msgstr "Información del certificado:"
+
+#: /home/qindel/svn/QVD/trunk/ext/QVD-Client/lib/QVD/Client/Frame.pm:499
+msgid ""
+"Certificate not found, maybe HKD component is not runnning at server side."
+msgstr ""
+"Certificado no encontrado. Es posible que el componente HKD no está "
+"corriendo en el servidor."
+
+#: /home/qindel/svn/QVD/trunk/ext/QVD-Client/lib/QVD/Client/Frame.pm:514
+msgid "Ok"
+msgstr "Aceptar"
+
+#: /home/qindel/svn/QVD/trunk/ext/QVD-Client/lib/QVD/Client/Frame.pm:519
+msgid "Cancel"
+msgstr "Cancelar"
+
+#: /home/qindel/svn/QVD/trunk/ext/QVD-Client/lib/QVD/Client/Frame.pm:659
+msgid "Error saving configuration"
+msgstr "Error al guardar la configuración"
+
+#: /home/qindel/svn/QVD/trunk/ext/QVD-Client/lib/QVD/Client/Frame.pm:737
+#, perl-format
+msgid "Failed to mount remote folder %s at %s:"
+msgstr "Error al montar carpeta remota %s en %s:"
+
+#: /home/qindel/svn/QVD/trunk/ext/QVD-Client/lib/QVD/Client/Frame.pm:739
+#, perl-format
+msgid "Path %s was not found on the VM"
+msgstr "La ruta %s no ha sido encontrada en la máquina virtual"
+
+#: /home/qindel/svn/QVD/trunk/ext/QVD-Client/lib/QVD/Client/Frame.pm:741
+#, perl-format
+msgid "Path %s is forbidden on the VM"
+msgstr "La ruta %s está prohibida en la máquina virtual"
+
+#: /home/qindel/svn/QVD/trunk/ext/QVD-Client/lib/QVD/Client/Frame.pm:743
+msgid "VM lacks file sharing support. Please install the qvd-sshfs package."
+msgstr ""
+"La máquina virtual no tiene soporte para compartir archivos. Por favor "
+"instale el paquete qvd-sshfs."
+
+#: /home/qindel/svn/QVD/trunk/ext/QVD-Client/lib/QVD/Client/Frame.pm:745
+msgid "Unrecognized error, full error message follows:"
+msgstr "Error no reconocido. El mensaje de error completo sigue:"
+
+#: /home/qindel/svn/QVD/trunk/ext/QVD-Client/lib/QVD/Client/Frame.pm:748
+msgid "File sharing error."
+msgstr "Error al compartir archivos"

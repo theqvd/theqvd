@@ -3,14 +3,44 @@ use strict;
 use warnings;
 use Module::Build;
 
-my $build = new Module::Build(
-               module_name   => 'QVD::Client',
+my $mod = Module::Build->subclass(
+	class => 'QVD::ModuleBuilder',
+	code => q {
+
+		sub ACTION_locale_files {
+			my ($self) = @_;
+			use File::Path qw(mkpath);
+			use Locale::Msgfmt;
+	
+			my @po_files = glob("po/*.po");
+			foreach my $po_file (@po_files) {
+				my ($lang) = ( $po_file =~ /po\/(.*?)\.po$/ );
+				my $d = "blib/locale/$lang/LC_MESSAGES";
+				mkpath($d) unless (-d $d);
+				Locale::Msgfmt::msgfmt({ in => $po_file, out => "$d/qvd-gui-client.mo" });
+				
+			}
+		}
+
+		sub ACTION_build {
+			my ($self) = @_;
+			$self->depends_on('locale_files');
+		}
+	}
+);
+
+my $build = $mod->new (
+           module_name   => 'QVD::Client',
 	       author        => 'QVD Team <qvd@qindel.com>',
 	       dist_version  => '3.3'.$ENV{BUILD_NUMBER},
 	       abstract_from => 'lib/QVD/Client.pm',
 	       PL_files      => {},
 	       pl_files      => [ qw(bin/qvd-client.pl bin/qvd-gui-client.pl bin/qvd-slaveclient bin/qvd-open) ],
-	       configure_requires => { 'Module::Build' => 0.38  },
+	       configure_requires => { 
+                  'Module::Build'  => 0.38,
+                  'Locale::Msgfmt' => 0,
+                  'File::Path'     => 0
+           },
 	       requires      => {
 				  'Crypt::OpenSSL::X509' => 0,
 				  'Cwd' => 0,
@@ -29,6 +59,7 @@ my $build = new Module::Build(
 				  'URI::Escape' => 0,
 				  'Wx' => 0,
 				  'X11::Protocol' => 0,
+                  'Locale::gettext' => 0,
 			      },
 		xpm_files    => { 
 		                  'pixmaps/qvd.xpm' => 'pixmaps/qvd.xpm',
@@ -50,12 +81,14 @@ my $build = new Module::Build(
 
 $build->install_path('pixmaps' => $build->config()->{installprefix} . "/pixmaps");
 $build->install_path('desktop' => $build->config()->{installprefix} . "/share/applications");
+$build->install_path('locale'  => $build->config()->{installprefix} . "/share/locale");
 
 $build->add_build_element('xpm');
 $build->add_build_element('ico');
 $build->add_build_element('svg');
 $build->add_build_element('png');
 $build->add_build_element('desktop');
+$build->add_build_element('po');
 
 $build->create_build_script;
 
