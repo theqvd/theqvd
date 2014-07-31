@@ -4,6 +4,11 @@ use warnings;
 use Moose;
 use QVD::Admin4;
 use QVD::Admin4::REST::Request;
+use QVD::Admin4::REST::Request::VM;
+use QVD::Admin4::REST::Request::DI;
+use QVD::Admin4::REST::Request::OSF;
+use QVD::Admin4::REST::Request::Host;
+use QVD::Admin4::REST::Request::User;
 use QVD::Admin4::REST::Response;
 use QVD::Config::Core;
 
@@ -29,8 +34,7 @@ sub _admin
 {
    my ($self,$json) = @_;
 
-   my $request = QVD::Admin4::REST::Request->new(json => $json);
-   my $result = eval { $QVD_ADMIN->_exec($self->get_query($request)) } // {};
+   my $result = eval { $QVD_ADMIN->_exec($self->get_request($json)) } // {};
    my $response = QVD::Admin4::REST::Response->new(message    => ($@ ? "$@" : ""),
                                                    status     => ($@ ? 1 : 0),
                                                    result     => $result )->json;
@@ -43,12 +47,17 @@ sub get_role
 	die "No role for this user";
 }
 
-sub get_query 
+sub get_request 
 { 
-    my ($self, $request) = @_;
-    $ACTIONS->{$request->action} || 
-	die "Action ".$request->action." non supported"; 
-    return QVD::Admin4::Query->new(%{$ACTIONS->{$request->action}}, request => $request); 
+    my ($self, $json) = @_;
+
+    $ACTIONS->{$json->{action}} || 
+	die "Action ".$json->{action}." non supported"; 
+
+    my $class = 'QVD::Admin4::REST::Request::'.$ACTIONS->{$json->{action}}->{table};
+    return $class->new(json => $json, 
+		       config => $ACTIONS->{$json->{action}}, 
+		       db => $QVD_ADMIN->_db );
 }
 
 sub load_actions
@@ -62,7 +71,21 @@ sub load_actions
 
     while (my ($action, $params) = each %{$actions})
     {	
-	$params->{tenant} = [ split ',',  $params->{tenant} ];
+	$params->{filters} = { map { $_ => 1 } (split ',', $params->{filters})} 
+	if $params->{filters};
+
+	$params->{mandatory} = { map { $_ => 1 } (split ',', $params->{mandatory})} 
+	if $params->{mandatory};
+	
+	$params->{arguments} = { map { $_ => 1 } (split ',', $params->{arguments})} 
+	if $params->{arguments};
+	
+	$params->{tenant} = [split ',', $params->{tenant}] 
+	    if $params->{tenant};
+	
+	$params->{order_by} = [split ',', $params->{order_by}] 
+	    if $params->{order_by};
+	
 	$actions->{$action} = $params;
     }
 
@@ -73,143 +96,66 @@ sub load_actions
 
 __DATA__
 
-select.tenant = all
-select.filter = select
-select.action = get_columns
-
-relation.tenant = all
-relation.filter = select
-relation.action = relation
-
-property.tenant = all
-property.filter = select
-property.action = property
-
 user_get_list.tenant = all
-user_get_list.filter = select
-user_get_list.action = collapse
+user_get_list.table = User
+user_get_list.order_by = id,login,blocked
+user_get_list.filters = login
 
 user_get_details.tenant = all
-user_get_details.filter = select
-user_get_details.action = collapse
-
-user_update.tenant = all
-user_update.filter = select
-user_update.action = update
-
-user_create.tenant = all
-user_create.filter = add
-user_create.action = get_columns
-
-user_delete.tenant = all
-user_delete.filter = select
-user_delete.action = delete
+user_get_details.table = User
+user_get_details.filters = id
+user_get_details.mandatory = id
 
 user_get_state.tenant = all
-user_get_state.filter = select
-user_get_state.action = collapse
+user_get_state.table = User
+user_get_state.filters = id
+user_get_state.mandatory = id
 
 vm_get_list.tenant = all
-vm_get_list.filter = select
-vm_get_list.action = collapse
+vm_get_list.table = VM
+vm_get_list.order_by = id,name,state,host_id,user_id,osf_id,blocked
+vm_get_list.filters = name,user_id,osf_id,di_id,host_id
 
 vm_get_details.tenant = all
-vm_get_details.filter = select
-vm_get_details.action = collapse
+vm_get_details.table = VM
+vm_get_details.filters = id
+vm_get_details.mandatory = id
 
 vm_get_state.tenant = all
-vm_get_state.filter = select
-vm_get_state.action = get_columns
-
-vm_update.tenant = all
-vm_update.filter = select
-vm_update.action = update
-
-vm_create.tenant = all
-vm_create.filter = add
-vm_create.action = get_columns
-
-vm_delete.tenant = all
-vm_delete.filter = select
-vm_delete.action = delete
-
-vm_running_stats.tenant = all
-vm_running_stats.filter = select
-vm_running_stats.action = count
+vm_get_state.table = VM
+vm_get_state.filters = id
+vm_get_state.mandatory = id
 
 host_get_list.tenant = all
-host_get_list.filter = select
-host_get_list.action = get_columns
+host_get_list.table = Host
+host_get_list.order_by = id,name,state,address,blocked
+host_get_list.filters = name,vm_id
 
 host_get_details.tenant = all
-host_get_details.filter = select
-host_get_details.action = collapse
+host_get_details.table = Host
+host_get_details.filters = id
+host_get_details.mandatory = id
 
 host_get_state.tenant = all
-host_get_state.filter = select
-host_get_state.action = collapse
-
-host_update.tenant = all
-host_update.filter = select
-host_update.action = update
-
-host_create.tenant = all
-host_create.filter = add
-host_create.action = get_columns
-host_create.defaults.backend = 1
-host_create.defaults.frontend = 1
-
-host_delete.tenant = all
-host_delete.filter = select
-host_delete.action = delete
-
-host_running_stats.tenant = all
-host_running_stats.filter = select
-host_running_stats.action = count
-
-host_running_stats.tenant = all
-host_running_stats.filter = select
-host_running_stats.action = count
+host_get_state.table = Host
+host_get_state.filters = id
+host_get_state.mandatory = id
 
 osf_get_list.tenant = all
-osf_get_list.filter = select
-osf_get_list.action = collapse
+osf_get_list.table = OSF
+osf_get_list.order_by = id,name,overlay,memory,user_storage
+osf_get_list.filters = name,vm_id,di_id
 
 osf_get_details.tenant = all
-osf_get_details.filter = select
-osf_get_details.action = collapse
-
-osf_create.tenant = all
-osf_create.filter = add
-osf_create.action = get_columns
-osf_create.defaults.memory = 1
-osf_create.defaults.use_overlay = 1
-osf_create.defaults.user_storage_size = 1
-
-osf_delete.tenant = all
-osf_delete.filter = select
-osf_delete.action = delete
-
-osf_update.tenant = all
-osf_update.filter = select
-osf_update.action = update
+osf_get_details.table = OSF
+osf_get_details.filters = id
+osf_get_details.mandatory = id
 
 di_get_list.tenant = all
-di_get_list.filter = select
-di_get_list.action = get_columns
+di_get_list.table = DI
+di_get_list.filters = disk_image,osf_id
 
 di_get_details.tenant = all
-di_get_details.filter = select
-di_get_details.action = collapse
-
-di_create.tenant = all
-di_create.filter = add
-di_create.action = get_columns
-
-di_delete.tenant = all
-di_delete.filter = select
-di_delete.action = delete
-
-di_update.tenant = all
-di_update.filter = select
-di_update.action = update
+di_get_details.table = DI
+di_get_details.filters = id
+di_get_details.mandatory = id

@@ -6,6 +6,7 @@ use Moose;
 has 'result',     is => 'ro', isa => 'HashRef', default => sub { {}; };
 has 'status',     is => 'ro', isa => 'Str', required => 1;
 has 'message',    is => 'ro', isa => 'Str', default => '';
+has 'fields',     is => 'ro', isa => 'ArrayRef', default => sub { []; };
 
 sub BUILD
 {
@@ -33,6 +34,12 @@ sub rows
 {
     my $self = shift;
     $self->result->{rows};
+}
+
+sub row
+{
+    my ($self,$values) = @_;
+    { map { $_ => $values->{$_} } @{$self->fields} };
 }
 
 1;

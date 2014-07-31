@@ -3,116 +3,123 @@ use strict;
 use warnings;
 use Moose;
 
-has 'json',    is => 'ro', isa => 'HashRef',  required => 1;
-has 'order_by', is => 'ro', isa => 'ArratRef';
-has 'order_dir', is => 'ro', isa => 'Str';
-has 'fields', is => 'ro', isa => 'ArratRef';
-has 'filters', is => 'ro', isa => 'HashRef';
-has 'arguments', is => 'ro', isa => 'HashRef';
-has 'modifiers', is => 'ro', isa => 'HashRef', default  => sub {{};};
-has 'pagination', is => 'ro', isa => 'HashRef';
-has 'tenant', is => 'ro', isa => 'Str';
-has 'action', is => 'ro', isa => 'Str';
-has 'table', is => 'ro', isa => 'Str';
+has 'db',        is => 'ro', isa => 'QVD::DB',  required => 1;
+has 'json',      is => 'ro', isa => 'HashRef',  required => 1;
+has 'config',    is => 'ro', isa => 'HashRef',  required => 1;
+has 'mapper',    is => 'ro', isa => 'Config::Properties';
+has 'modifiers', is => 'ro', isa => 'HashRef',  default => sub { {}; };
+has 'customs',   is => 'ro', isa => 'ArrayRef',  default => sub { []; };
+has 'defaults',   is => 'ro', isa => 'HashRef',  default => sub { {}; };
 
 sub BUILD
 {
     my $self = shift;
 
-    $self->{action} = $self->json->{'action'} // die "No parameter action";
-    $self->{table} = $self->json->{'table'}  // die "No parameter table";
-    $self->{tenant} = $self->json->{'tenant'} // die "No authentication tenant";
-    $self->{order_dir} = $self->json->{'order_dir'} // '-desc';
-    $self->{order_dir} =~ /^-(de|a)sc$/ || die "Non supported order_dir ".$self->{order_dir};
+    $self->json->{arguments} //= {};
+    $self->json->{filters} //= {};
+    $self->config->{arguments} //= {};
+    $self->config->{filters} //= {};
+    $self->config->{mandatory} //= {};
+    $self->config->{order_by} //= [];
 
-    $self->{pagination} = $self->json->{'pagination'} // { blocked => undef, offset => 1 };
-    $self->{order_by} = $self->json->{'order_by'}   // [];
-    $self->{fields} = $self->json->{'fields'}     // [];
-    $self->{filters} = $self->json->{'filters'}    // {};
-    $self->{arguments} = $self->json->{'arguments'}  // {}; 
-
-    $self->build_modifiers();
+    $self->modifiers->{page} = $self->json->{offset} // 1; 
+    $self->modifiers->{rows}  = $self->json->{blocked} // 1; 
 }
 
-sub build_modifiers
+sub action 
 {
     my $self = shift;
-
-    $self->build_join;
-    $self->build_pagination;
-    $self->build_order;
-    $self->build_fields;
+    $self->json->{action};
 }
 
-sub build_join
+sub table 
 {
     my $self = shift;
-    my %relations;
+    $self->config->{table};
+}
 
-    for (keys %{$self->filters}, 
-	 @{$self->fields}, 
-	 @{$self->order_by})
-    { 
-	my ($table) = $_ =~ /^([^\.]+)\.(.+)$/;
-	$relations{$table}++ if ($table && $table ne 'me');
+sub filters 
+{
+    my $self = shift;
+    my $filters = {};
+
+    exists $self->config->{filters}->{$_} ||
+	die "No such a filter $_ for this action" 
+	for keys %{$self->json->{filters}};
+
+    exists $self->json->{filters}->{$_} ||
+	die "No mandatory filter $_ in request" 
+	for keys %{$self->config->{mandatory}};
+
+    for my $filter (keys %{$self->json->{filters}})
+    {
+	my $mfil = $self->mapper->getProperty($filter) // 
+	    die "No map for $filter: $!"; 
+	$filters->{$mfil} = $self->json->{filters}->{$filter};
+    }
+    $filters;
+}
+
+sub arguments 
+{
+    my $self = shift;
+    my $arguments = {};
+
+    exists $self->config->{arguments}->{$_} ||
+	die "No such an argument $_ for this action"
+	for keys %{$self->json->{arguments}};
+
+    for my $argument (keys %{$self->json->{arguments}})
+    {
+	my $marg = $self->mapper->getProperty($argument) // 
+	    die "No map for $argument: $!"; 
+	$arguments->{$marg} = 
+	    $self->json->{arguments}->{$argument} // 
+	    $self->defaults->{$argument} // undef;
+    }
+    $arguments;
+}
+
+
+sub order_by
+{
+    my $self = shift;
+    my $order_by = { '-asc' => []};
+
+    for my $order (@{$self->config->{order_by}})
+    {
+	my $morder = $self->mapper->getProperty($order) // 
+	    die "No map for $order: $!"; 
+	push @{$order_by->{'-asc'}}, $morder;
     }
 
-    $self->modifiers->{join} = [ keys %relations ];
+    $self->modifiers->{order_by}  = $order_by;
 }
 
-sub build_pagination
+sub get_customs
 {
-    my $self = shift;
-
-    my $rows = $self->json->{pagination}->{blocked};
-    my $page = $self->json->{pagination}->{offset};
-
-    $self->modifiers->{rows}     = $rows if $rows;
-    $self->modifiers->{page}     = $page;
-}
-
-sub build_order
-{
-    my $self = shift;
-    return unless @{$self->order_by};
-
-    $self->modifiers->{order_by} = 
-    { $self->order_dir => $self->order_by };
-}
-
-sub build_fields
-{
-    my $self = shift;
-
-    for my $field (@{$self->fields})
+    my ($self,$table) = @_;
+    my $n = 1;
+    $self->{customs} = [keys %{{map {$_->key => 1 } $self->db->resultset($table)->all}}];
+    for (@{$self->customs})
     {
-	$field =~ /^([^\.]+)\.?(.+)?$/;
-	die "Bad field $field" unless $1;
-	my ($table,$column) = ($1 && $2 ? ($1,$2) : (undef,$1)); 
+	if (exists $self->json->{filters}->{$_})
+	{ 
+	    my $pr = $n eq '1' ? "properties" : "properties_$n";
+	    $self->json->{filters}->{"$pr.key"} = $_;
+	    $self->json->{filters}->{"$pr.value"} = $self->json->{filters}->{$_};
+	    delete $self->json->{filters}->{$_};
+	    @{$self->config->{filters}}{"$pr.key","$pr.value"} = qw(1 1);
+	   
+	    $self->modifiers->{join} //= [];
+	    push @{$self->modifiers->{join}}, 'properties';
 
-	if ($table)
-	{
-	    $self->modifiers->{'+select'} //= [];
-	    $self->modifiers->{'+as'}     //= [];
-	    push @{$self->modifiers->{'+select'}}, $field;
-	    $field =~ s/\./ /g;
-	    push @{$self->modifiers->{'+as'}}, $field;
+	    $self->{mapper} //= Config::Properties->new();
+	    $self->mapper->setProperty("$pr.key","$pr.key");
+	    $self->mapper->setProperty("$pr.value","$pr.value");
+
+	    $n++;
 	}
-	else
-	{
-	    $self->modifiers->{columns} //= [];
-	    push @{$self->modifiers->{columns}}, $column;
-	}
-    }
-}
-
-sub defaults
-{
-    my ($self,$defaults) = @_;
-
-    while (my ($k,$v) = each %$defaults)
-    {
-	$self->{arguments}->{$k} //= $v;
     }
 }
 

@@ -4,7 +4,8 @@ use base qw/DBIx::Class/;
 
 __PACKAGE__->load_components(qw/Core/);
 __PACKAGE__->table('users');
-__PACKAGE__->add_columns( id         => { data_type         => 'integer',
+__PACKAGE__->add_columns( blocked      => { data_type         => 'boolean' },
+			  id         => { data_type         => 'integer',
 					  is_auto_increment => 1 },
 			  login      => { data_type         => 'varchar(64)' },
 			  # FIXME: get passwords out of this table!
