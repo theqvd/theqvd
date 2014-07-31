@@ -1,0 +1,25 @@
+/********************************************************************
+*********************************************************************
+*********************************************************************
+
+                FILTERS
+                components/_filters.scss
+
+*********************************************************************
+*********************************************************************
+********************************************************************/
+.filter-control {
+  float: left;
+  margin-right: 20px;
+  width: 100%; }
+  .filter-control input[type="text"], .filter-control select {
+    -moz-box-sizing: border-box;
+    -webkit-box-sizing: border-box;
+    box-sizing: border-box;
+    width: 100%; }
+
+[name="filter_button"] {
+  margin-top: 20px;
+  float: right; }
+
+/*# sourceMappingURL=_filters.css.map */

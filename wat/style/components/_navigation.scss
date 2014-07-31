@@ -1,0 +1,155 @@
+/********************************************************************
+*********************************************************************
+*********************************************************************
+
+                MENU
+                components/_menu.scss
+
+*********************************************************************
+*********************************************************************
+********************************************************************/
+
+.menu>ul {    
+    display: -webkit-box;
+    display: -moz-box;
+    display: -ms-flexbox;
+    display: -webkit-flex;
+    display: flex;
+
+    .menu-option {
+        @extend %not-selectable;
+        display: block;
+        @include in(desktop) {
+            display: inline;
+        }
+        
+        min-width: 100px;
+        font-size: .9em;
+        padding: 8px 12px 8px 12px;
+        background: $col_whiter;
+        color: $col_blacker;
+        border: 1px solid lighten($col_brand, 20%);
+        cursor: pointer;
+
+        &:last-child {
+            border-bottom-left-radius: $menu_radius;
+            border-bottom-right-radius: $menu_radius;
+        }    
+
+        &:first-child {
+            border-top-left-radius: $menu_radius;
+            border-top-right-radius: $menu_radius;
+        }
+        
+        @include in(desktop) {
+            &:last-child {
+                border-bottom-left-radius: 0;
+                border-top-right-radius: $menu_radius;
+                border-bottom-right-radius: $menu_radius;
+            }    
+
+            &:first-child {
+                border-top-right-radius: 0;
+                border-top-left-radius: $menu_radius;
+                border-bottom-left-radius: $menu_radius;
+            }
+        }
+        
+        // Icon
+        .fa {
+            font-size: 18px;
+            margin-right: 10px;
+
+        }
+        
+        span {
+            vertical-align: bottom;
+        }
+        
+        &:active {
+            @include in(desktop) {
+                margin-bottom: -2px;
+                margin-top: 1px;
+            }
+        }
+
+    }
+
+        .menu-option--selected, .menu-option:hover {
+            background: $col_brand;
+            color: $col_whiter;
+            border: 1px solid transparent;
+        }
+
+        .menu-option--selected {
+            font-weight: bold;
+            
+            span {
+                vertical-align: baseline;
+            }
+            
+            &:active {
+                margin: 0px;
+            }            
+        }
+}
+
+
+.breadcrumbs {
+    font-size: xx-small;
+}
+
+.menu-corner {
+    @extend %invisible;
+    
+    z-index: 1000;
+    position: absolute;
+    top: 10px;
+    right: 80px;
+    display: none;
+    
+    @include in(desktop) {
+        right: 20px;
+        display: block;
+    }
+    
+    &>ul {
+        &>li {
+            display: inline;
+            margin: 5px;
+            position: relative;
+            cursor: default;
+            &>ul {
+                border: solid 1px lighten($col_brand, 30);
+                background: $col_whiter;
+                opacity: 0.9;
+                display: none;
+                position: absolute;
+                left: -9px;
+                border-bottom-left-radius: $menu_radius;
+                border-bottom-right-radius: $menu_radius;
+                &>li {
+                    span {
+                        padding: 8px;
+                        white-space: nowrap;
+                        width: 100%;
+                        &:before {
+                            margin-right: 5px;
+                        }
+                        
+                        &:hover {
+                            font-weight: bold;
+                            color: $col_whiter;
+                            background: $col_brand;
+                        }
+                    }
+                    
+                    &:last-child span {
+                        border-bottom-left-radius: $menu_radius;
+                        border-bottom-right-radius: $menu_radius;
+                    }
+                }
+            }
+        }
+    }
+}

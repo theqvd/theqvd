@@ -1,0 +1,7 @@
+{
+  "version": 3,
+  "file": "",
+  "sources": ["_general.scss"],
+  "names": [],
+  "mappings": ";;;;;;;;;;AAWA;EACI,YAAY;EACZ,WAAW;;AAGf;EACI,aAAa;EACb,WAAW;;AAGf;EACI,OAAO;EACP,iBAAiB;EACjB,aAAa"
+}

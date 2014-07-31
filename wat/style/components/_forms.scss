@@ -1,0 +1,109 @@
+/********************************************************************
+*********************************************************************
+*********************************************************************
+
+                FORMS
+                components/_forms.scss
+
+*********************************************************************
+*********************************************************************
+********************************************************************/
+
+
+select, option, input {
+	font-size: 16px;
+}
+
+option {
+    padding: 40px;
+}
+
+label {
+    display: block;
+    margin-bottom: 4px;
+    font-size: x-small;
+}
+
+select {
+    background: white;
+
+    height: 22px;
+    padding: 4px;
+    
+    &[name="selected_actions_select"] {
+        width: auto;
+        float: left;
+        margin-bottom: 10px;
+        width: 200px;
+    }
+}
+
+.actions_button, select[name="selected_actions_select"] {
+    width: 100%;
+    @include in(desktop) {
+        width: auto;
+    }
+}
+
+.action-selected {
+    width: 100%;
+    margin-left: -4px;
+}
+    
+
+input, a.button {
+    height: $height_button;
+    padding: 4px 8px;
+    line-height: 18px;
+}
+
+input[type="checkbox"], input[type="radio"] {
+    width: 18px;
+    height: 18px;
+
+    @include in(desktop) {
+        width: 14px;
+        height: 14px;
+    }
+
+}
+
+
+select, input, a.button {
+    border-radius: $form_elements_radius;
+    border-style: solid;
+    border-color: darken($col_whiter, 20%);
+    border-width: thin;
+    -webkit-box-shadow: inset 1px 1px 1px 0px #dddddd;
+       -moz-box-shadow: inset 1px 1px 1px 0px #dddddd;
+            box-shadow: inset 1px 1px 1px 0px #dddddd;
+    font-size: x-small;
+}
+
+
+// Chosen controls styles
+
+.chosen-container {
+    font-size: 12px;
+    
+    @include in(mobile) {
+        width: 100% !important;
+        margin-bottom: 10px;
+    }
+}
+
+.chosen-container-single .chosen-single {
+    height: $height_button;
+    line-height: $height_button;
+    margin-top: -2px;
+    @include linear-gradient($col_whiter);
+}
+
+.chosen-container .chosen-results li.highlighted {
+    background-color: $col_brand;
+    background-image: none;
+}
+
+.chosen-container * {
+    font-weight: normal;
+}

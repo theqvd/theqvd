@@ -1,0 +1,52 @@
+/********************************************************************
+*********************************************************************
+*********************************************************************
+
+                GENERAL: Styles that affect general group of elements
+                components/_general.scss
+
+*********************************************************************
+*********************************************************************
+********************************************************************/
+
+body {
+    background: #fdfdfd;
+    font-size: small;
+}
+
+* {
+    font-family: Taoma, Arial; 
+    font-size: small;
+}
+
+a {
+    color: $col_links;
+    text-decoration: none;
+    font-weight: bold;
+}
+
+a:hover {
+    i:before {
+        color: $col_blacker;
+    }
+}
+
+.hidden {
+    display: none;
+}
+
+.invisible {
+    visibility: hidden;
+}
+
+
+fieldset {
+    padding: 8px;
+    border: 1px solid lighten($col_brand, 40);
+    border-radius: 6px;
+    
+    legend {
+        color: lighten($col_blacker, 43);
+        text-align: right;
+    }
+}

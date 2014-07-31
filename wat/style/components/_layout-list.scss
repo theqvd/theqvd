@@ -1,0 +1,104 @@
+/********************************************************************
+*********************************************************************
+*********************************************************************
+
+                LAYOUT LIST: Layout of list view
+                components/_layout-list.scss
+
+*********************************************************************
+*********************************************************************
+********************************************************************/
+
+
+.filter {
+    display: none;
+    @include in(desktop) {
+        display: block;
+    }
+
+    margin-bottom: 15px;
+
+    width: ($width_list_side - 2) * 1%;
+    height: auto;
+
+    .filter-control {
+        margin-bottom: 10px;
+        display: block;
+    }
+
+    @if $list_side == left {
+        float: left;
+        padding-right: 2%;
+        margin-right: 2%;
+        border-right: 1px dotted darken($col_whiter, 15);
+    }
+    @else if $list_side == right {
+        float: right;
+        padding-left: 2%;
+        margin-left: 2%;
+        border-left: 1px dotted darken($col_whiter, 15);
+    }
+
+    hr {
+        border: 0px;
+        height: 1px;
+        background: darken($col_whiter, 15);
+        width: 100%;
+    }
+}
+
+.list-block {        
+    @include in(desktop) {
+        float: right;
+        width: ($width_list_content) * 1%;
+    }
+
+    .filter-mobile {
+        margin-bottom: 15px;
+
+        .filter-control {
+            margin-bottom: 10px;
+            display: block;
+        }
+    }
+
+    .list-navigation {
+        position: relative;
+        width: 100%;
+        @extend %clearfix;
+
+        @include in(desktop) {
+            margin-bottom: 0px;
+        }
+
+        .pagination {
+            margin-bottom: 10px;
+
+            @include in(desktop) {
+                margin-bottom: 10px;
+                padding: 0px;
+                height: auto;
+                width: 45%;
+                float: right;
+            }    
+        }
+
+        .action-new-item {
+            @extend %clearfix;
+            margin-bottom: 10px;
+            @include in(desktop) {
+                width: 45%;
+                float: left;
+                margin: 0px;
+                margin-left: -4px;
+            }
+        }
+
+    }
+
+    .action-selected {
+        @extend %clearfix;
+        height: 30px;
+        margin-top: 10px;
+    }    
+}

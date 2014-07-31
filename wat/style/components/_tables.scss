@@ -1,0 +1,89 @@
+/********************************************************************
+*********************************************************************
+*********************************************************************
+
+                TABLES
+                components/_tables.scss
+
+*********************************************************************
+*********************************************************************
+********************************************************************/
+
+
+/* Table list */
+
+table.list, table.details {
+    width: 100%;
+    margin-left: auto;
+    margin-right: auto;
+    background-color: $col_whiter;
+    border: 1px solid #ddd;
+    border-radius: $table_radius;
+    border-collapse:separate;
+
+    th {
+        font-weight: bold;
+        text-align: left;
+        border-bottom: #ccc solid 1px;
+        
+        .sort-icon {
+            float: right;
+        }
+        
+        &.sortable {
+            cursor: pointer;
+        }
+        
+        @extend %not-selectable;
+    
+        &.sorted {
+            background-color: $col_brand;
+            color: $col_whiter;
+        }
+    }
+
+    td, th {
+        padding: 6px 8px;
+        
+        border-right: dotted 1px darken($col_whiter, 10);
+
+        &:last-child {
+            border-right: 0px;
+        }
+    }
+
+    >tbody>tr {
+        @include alternate($col_whiter);
+    }
+    
+    tr:last-child {
+        td:first-child {
+            border-bottom-left-radius: $table_radius;
+        }        
+        td:last-child {
+            border-bottom-right-radius: $table_radius;
+        }
+    }
+}
+
+.second_row {
+    font-size: x-small;
+    margin-top: 4px;
+}
+
+td.center {
+    text-align: center;
+}
+
+// Different sizes for cells with different amount of icons
+$table_icons_size: 18;
+$table_icons_margin: 4;
+$cell_padding: 6;
+$security_margin: 5;
+@for $i from 1 through 6 {
+    $width_for_icons: ($i * ($table_icons_size + $table_icons_margin)) + $security_margin + (2 * $cell_padding);
+    .max-#{$i}-icons {
+        width: $width_for_icons * 1px;
+        min-width: $width_for_icons * 1px;
+    }
+}

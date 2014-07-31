@@ -1,0 +1,71 @@
+{
+    "id": "Id",
+    "name": "Name",
+    "state": "State",
+    "node": "Node",
+    "user": "User",
+    "osf/tag": "OSF / Tag",
+    "blocked": "Blocked",
+    "started_vms": "Started VMs",
+    "home": "Home",
+    "vms_list": "Virtual Machine list",
+    "users_list": "User list",
+    "user_details": "User details",
+    "info": "Info",
+    
+    "tMenu": {
+        "users": "Users",
+        "osfs": "OS Flavours",
+        "nodes": "Nodes",
+        "vms": "Virtual Machines",
+        "dis": "Disk Images",
+        "setup": "Setup",
+        "help": "Help",
+        "documentation": "Documentation",
+        "about": "About",
+        "admins": "Admins",
+        "tenants": "Tenants",
+        "config": "Config",
+        "customize": "Customize",
+        "logout": "Log-out"
+    }, 
+    
+    "tFilter": {
+        "search_by_name": "Search by name",
+        "user": "User",
+        "osf": "OS Flavour",
+        "node": "Node",
+        "vm": "Virtual Machine",
+        "di": "Disk Image",
+        "state": "State",
+        "advanced": "Advanced",
+        "simple": "Simple",
+        "filter_mode": "Filter mode"
+    },
+    
+    "tSelect": {
+        "all": "All",
+        "start": "Start",
+        "stop": "Stop",
+        "block": "Block",
+        "unblock": "Unblock",
+        "disconnect_user": "Disconnect user",
+        "disconnect_from_all_vms": "Disconnect from all VMs",
+        "delete": "Delete",
+        "running": "Running",
+        "stopped": "Stopped"
+    },
+    
+    "tButton": {
+        "apply_to_selected_items": "Apply to selected items", 
+        "new_vm": "New Virtual Machine",
+        "new_user": "New User",
+        "filter": "Filter"
+    },
+    
+    "tSearch": {
+        "no_results_match": "No results match"
+    },
+    
+    "qvd_web_administration_tool_by" : "QVD Web Administration Tool, by %s"
+}

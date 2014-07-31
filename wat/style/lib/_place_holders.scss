@@ -1,0 +1,46 @@
+/* INCLUDED: place_holders */
+
+// General
+
+%clearfix {
+    &::after, &::before {
+        content:"";
+        clear:both;
+    }
+    &::after{
+        display:table;
+    }
+}
+
+
+// Layout
+
+%center-wrapper {
+    width: 100%;
+    margin: 0 auto;
+    padding-left: 20px;
+    padding-right: 20px;
+}
+
+%not-selectable {
+-webkit-touch-callout: none;
+-webkit-user-select: none;
+ -khtml-user-select: none;
+   -moz-user-select: none;
+    -ms-user-select: none;
+        user-select: none;
+}
+
+%invisible {
+    visibility: hidden;
+}
+
+%invisible-fieldset {
+    padding: 0px;
+    border: 0px;
+    border-radius: 0px;
+    
+    legend {
+        display: none;
+    }
+}

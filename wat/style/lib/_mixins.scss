@@ -1,0 +1,53 @@
+/* INCLUDED: mixins */
+
+// Tables
+@mixin alternate($col : #FFFFFF){
+    &:nth-child(even) {
+        background-color: $col;
+    }    
+    &:nth-child(odd) {
+        background-color: darken($col, 4%);
+    }
+}
+
+// Layout
+@mixin width-wrapper {
+    min-width: $min_width_mobile;
+    max-width: $max_width_mobile;
+    @media screen and (min-width: $max_width_mobile) {
+        min-width: $min_width_wrapper;
+        max-width: $max_width_wrapper;
+    }
+}
+
+// Media queries
+@mixin in($media) {
+    @if $media == desktop {
+        @media screen and (min-width: $max_width_mobile) {
+            @content;
+        }
+    }
+    @else if $media == mobile {
+        @media screen and (max-width: $max_width_mobile) {
+            @content;
+        }
+    }
+}
+
+@mixin linear-gradient($col, $mode : normal) {
+    $col_a : lighten($col, 5);
+    $col_b : darken($col, 5);
+    
+    @if $mode == inverse {
+        $col_bb: $col_b; //Aux
+        $col_b: $col_a;
+        $col_a: $col_bb;
+    }
+    
+    background-color: darken($col, 5);
+    background-image: -moz-linear-gradient(top, $col_a, $col_b);
+    background-image: -webkit-gradient(linear, 0 0, 0 100%, from($col_a), to($col_b));
+    background-image: -webkit-linear-gradient(top, $col_a, $col_b);
+    background-image: -o-linear-gradient(top, $col_a, $col_b);
+    background-image: linear-gradient(to bottom, $col_a, $col_b);
+}

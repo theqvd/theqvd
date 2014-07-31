@@ -1,0 +1,718 @@
+/* INCLUDED: variables */
+/* INCLUDED: place_holders */
+.wrapper .content::after, .wrapper .content .list-block .list-navigation::after, .wrapper .content .list-block .list-navigation .action-new-item::after, .wrapper .content .list-block .action-selected::after, .footer::after, .wrapper .content::before, .wrapper .content .list-block .list-navigation::before, .wrapper .content .list-block .list-navigation .action-new-item::before, .wrapper .content .list-block .action-selected::before, .footer::before {
+  content: "";
+  clear: both; }
+.wrapper .content::after, .wrapper .content .list-block .list-navigation::after, .wrapper .content .list-block .list-navigation .action-new-item::after, .wrapper .content .list-block .action-selected::after, .footer::after {
+  display: table; }
+
+.header-wrapper .header, .wrapper {
+  width: 100%;
+  margin: 0 auto;
+  padding-left: 20px;
+  padding-right: 20px; }
+
+.menu > ul .menu-option, a.button, table.list th, table.details th {
+  -webkit-touch-callout: none;
+  -webkit-user-select: none;
+  -khtml-user-select: none;
+  -moz-user-select: none;
+  -ms-user-select: none;
+  user-select: none; }
+
+.menu-corner, .header-wrapper, .wrapper, .wrapper .menu, .wrapper .breadcrumbs, .wrapper .content, .footer {
+  visibility: hidden; }
+
+
+/* INCLUDED: mixins */
+/********************************************************************
+*********************************************************************
+*********************************************************************
+
+                RESET: Based on Eric Meyer's Reset 2.0
+                components/_reset.scss
+
+*********************************************************************
+*********************************************************************
+********************************************************************/
+/**
+ * Eric Meyer's Reset CSS v2.0 (http://meyerweb.com/eric/tools/css/reset/)
+ * http://cssreset.com
+ */
+html, body, div, span, applet, object, iframe, h1, h2, h3, h4, h5, h6, p, blockquote, pre, a, abbr, acronym, address, big, cite, code, del, dfn, em, img, ins, kbd, q, s, samp, small, strike, strong, sub, sup, tt, var, b, u, i, center, dl, dt, dd, ol, ul, li, fieldset, form, label, legend, table, caption, tbody, tfoot, thead, tr, th, td, article, aside, canvas, details, embed, figure, figcaption, footer, header, hgroup, menu, nav, output, ruby, section, summary, time, mark, audio, video {
+  margin: 0;
+  padding: 0;
+  border: 0;
+  font-size: 100%;
+  font: inherit;
+  vertical-align: baseline; }
+
+/* HTML5 display-role reset for older browsers */
+article, aside, details, figcaption, figure, footer, header, hgroup, menu, nav, section {
+  display: block; }
+
+body {
+  line-height: 1; }
+
+ol, ul {
+  list-style: none; }
+
+blockquote, q {
+  quotes: none; }
+
+blockquote:before, blockquote:after, q:before, q:after {
+  content: '';
+  content: none; }
+
+table {
+  border-collapse: collapse;
+  border-spacing: 0; }
+
+/* Added by me */
+*, *::after, *::before {
+  box-sizing: border-box; }
+
+*:focus {
+  outline-width: 0;
+  outline: none;
+  -moz-outline: none;
+  -moz-user-focus: ignore;
+  box-shadow: 0;
+  border: 0; }
+
+:focus {
+  box-shadow: 1 1 1px 0px #f36d15; }
+
+/********************************************************************
+*********************************************************************
+*********************************************************************
+
+                GENERAL: Styles that affect general group of elements
+                components/_general.scss
+
+*********************************************************************
+*********************************************************************
+********************************************************************/
+body {
+  background: #fdfdfd;
+  font-size: small; }
+
+* {
+  font-family: Taoma, Arial;
+  font-size: small; }
+
+a {
+  color: #f36d15;
+  text-decoration: none;
+  font-weight: bold; }
+
+a:hover i:before {
+  color: #222222; }
+
+.hidden {
+  display: none; }
+
+.invisible {
+  visibility: hidden; }
+
+fieldset {
+  padding: 8px;
+  border: 1px solid #fde6d7;
+  border-radius: 6px; }
+  fieldset legend {
+    color: #909090;
+    text-align: right; }
+
+/********************************************************************
+*********************************************************************
+*********************************************************************
+
+                MENU
+                components/_menu.scss
+
+*********************************************************************
+*********************************************************************
+********************************************************************/
+.menu > ul {
+  display: -webkit-box;
+  display: -moz-box;
+  display: -ms-flexbox;
+  display: -webkit-flex;
+  display: flex; }
+  .menu > ul .menu-option {
+    display: block;
+    min-width: 100px;
+    font-size: 0.9em;
+    padding: 8px 12px 8px 12px;
+    background: #fdfdfd;
+    color: #222222;
+    border: 1px solid #f8a876;
+    cursor: pointer; }
+    @media screen and (min-width: 40em) {
+      .menu > ul .menu-option {
+        display: inline; } }
+    .menu > ul .menu-option:last-child {
+      border-bottom-left-radius: 7px;
+      border-bottom-right-radius: 7px; }
+    .menu > ul .menu-option:first-child {
+      border-top-left-radius: 7px;
+      border-top-right-radius: 7px; }
+    @media screen and (min-width: 40em) {
+      .menu > ul .menu-option:last-child {
+        border-bottom-left-radius: 0;
+        border-top-right-radius: 7px;
+        border-bottom-right-radius: 7px; }
+      .menu > ul .menu-option:first-child {
+        border-top-right-radius: 0;
+        border-top-left-radius: 7px;
+        border-bottom-left-radius: 7px; } }
+    .menu > ul .menu-option .fa {
+      font-size: 18px;
+      margin-right: 10px; }
+    .menu > ul .menu-option span {
+      vertical-align: bottom; }
+    @media screen and (min-width: 40em) {
+      .menu > ul .menu-option:active {
+        margin-bottom: -2px;
+        margin-top: 1px; } }
+  .menu > ul .menu-option--selected, .menu > ul .menu-option:hover {
+    background: #f36d15;
+    color: #fdfdfd;
+    border: 1px solid transparent; }
+  .menu > ul .menu-option--selected {
+    font-weight: bold; }
+    .menu > ul .menu-option--selected span {
+      vertical-align: baseline; }
+    .menu > ul .menu-option--selected:active {
+      margin: 0px; }
+
+.breadcrumbs {
+  font-size: xx-small; }
+
+.menu-corner {
+  z-index: 1000;
+  position: absolute;
+  top: 10px;
+  right: 80px;
+  display: none; }
+  @media screen and (min-width: 40em) {
+    .menu-corner {
+      right: 20px;
+      display: block; } }
+  .menu-corner > ul > li {
+    display: inline;
+    margin: 5px;
+    position: relative;
+    cursor: default; }
+    .menu-corner > ul > li > ul {
+      border: solid 1px #fac7a7;
+      background: #fdfdfd;
+      opacity: 0.9;
+      display: none;
+      position: absolute;
+      left: -9px;
+      border-bottom-left-radius: 7px;
+      border-bottom-right-radius: 7px; }
+      .menu-corner > ul > li > ul > li span {
+        padding: 8px;
+        white-space: nowrap;
+        width: 100%; }
+        .menu-corner > ul > li > ul > li span:before {
+          margin-right: 5px; }
+        .menu-corner > ul > li > ul > li span:hover {
+          font-weight: bold;
+          color: #fdfdfd;
+          background: #f36d15; }
+      .menu-corner > ul > li > ul > li:last-child span {
+        border-bottom-left-radius: 7px;
+        border-bottom-right-radius: 7px; }
+
+/********************************************************************
+*********************************************************************
+*********************************************************************
+
+                ICONS
+                components/_icons.scss
+
+*********************************************************************
+*********************************************************************
+********************************************************************/
+.icon-play {
+  color: #00CC00; }
+
+.icon-stop, .icon-pause {
+  color: #FF0000; }
+
+.icon-warning {
+  color: #FFD600; }
+
+td i.fa {
+  font-size: 16px;
+  margin-right: 4px; }
+td i.fa-lock, td i.fa-unlock {
+  font-size: 19px;
+  vertical-align: bottom;
+  height: 18px; }
+
+/********************************************************************
+*********************************************************************
+*********************************************************************
+
+                FORMS
+                components/_forms.scss
+
+*********************************************************************
+*********************************************************************
+********************************************************************/
+select, option, input {
+  font-size: 16px; }
+
+option {
+  padding: 40px; }
+
+label {
+  display: block;
+  margin-bottom: 4px;
+  font-size: x-small; }
+
+select {
+  background: white;
+  height: 22px;
+  padding: 4px; }
+  select[name="selected_actions_select"] {
+    width: auto;
+    float: left;
+    margin-bottom: 10px;
+    width: 200px; }
+
+.actions_button, select[name="selected_actions_select"] {
+  width: 100%; }
+  @media screen and (min-width: 40em) {
+    .actions_button, select[name="selected_actions_select"] {
+      width: auto; } }
+
+.action-selected {
+  width: 100%;
+  margin-left: -4px; }
+
+input, a.button {
+  height: 25px;
+  padding: 4px 8px;
+  line-height: 18px; }
+
+input[type="checkbox"], input[type="radio"] {
+  width: 18px;
+  height: 18px; }
+  @media screen and (min-width: 40em) {
+    input[type="checkbox"], input[type="radio"] {
+      width: 14px;
+      height: 14px; } }
+
+select, input, a.button {
+  border-radius: 4px;
+  border-style: solid;
+  border-color: #cacaca;
+  border-width: thin;
+  -webkit-box-shadow: inset 1px 1px 1px 0px #dddddd;
+  -moz-box-shadow: inset 1px 1px 1px 0px #dddddd;
+  box-shadow: inset 1px 1px 1px 0px #dddddd;
+  font-size: x-small; }
+
+.chosen-container {
+  font-size: 12px; }
+  @media screen and (max-width: 40em) {
+    .chosen-container {
+      width: 100% !important;
+      margin-bottom: 10px; } }
+
+.chosen-container-single .chosen-single {
+  height: 25px;
+  line-height: 25px;
+  margin-top: -2px;
+  background-color: #f0f0f0;
+  background-image: -moz-linear-gradient(top, #ffffff, #f0f0f0);
+  background-image: -webkit-gradient(linear, 0 0, 0 100%, from(#ffffff), to(#f0f0f0));
+  background-image: -webkit-linear-gradient(top, #ffffff, #f0f0f0);
+  background-image: -o-linear-gradient(top, #ffffff, #f0f0f0);
+  background-image: linear-gradient(to bottom, #ffffff, #f0f0f0); }
+
+.chosen-container .chosen-results li.highlighted {
+  background-color: #f36d15;
+  background-image: none; }
+
+.chosen-container * {
+  font-weight: normal; }
+
+/********************************************************************
+*********************************************************************
+*********************************************************************
+
+                BUTTONS
+                components/_buttons.scss
+
+*********************************************************************
+*********************************************************************
+********************************************************************/
+/* Events */
+.event {
+  cursor: pointer; }
+
+a.button {
+  color: #fdfdfd;
+  background-color: #e35e0c;
+  background-image: -moz-linear-gradient(top, #f47a2d, #e35e0c);
+  background-image: -webkit-gradient(linear, 0 0, 0 100%, from(#f47a2d), to(#e35e0c));
+  background-image: -webkit-linear-gradient(top, #f47a2d, #e35e0c);
+  background-image: -o-linear-gradient(top, #f47a2d, #e35e0c);
+  background-image: linear-gradient(to bottom, #f47a2d, #e35e0c);
+  background-repeat: repeat-x;
+  font-size: 12px;
+  border: solid 1px #f58946;
+  -webkit-box-shadow: none;
+  -moz-box-shadow: none;
+  box-shadow: none; }
+  a.button:hover {
+    cursor: pointer;
+    font-weight: bolder; }
+    a.button:hover:before {
+      color: #fdfdfd; }
+  a.button:active {
+    color: #f0f0f0;
+    background-color: #e35e0c;
+    background-image: -moz-linear-gradient(top, #e35e0c, #f47a2d);
+    background-image: -webkit-gradient(linear, 0 0, 0 100%, from(#e35e0c), to(#f47a2d));
+    background-image: -webkit-linear-gradient(top, #e35e0c, #f47a2d);
+    background-image: -o-linear-gradient(top, #e35e0c, #f47a2d);
+    background-image: linear-gradient(to bottom, #e35e0c, #f47a2d); }
+  a.button:focus {
+    outline: 0; }
+  a.button:before {
+    margin-right: 10px;
+    color: #fdfdfd; }
+a.actions_button {
+  padding-top: 2px; }
+  a.actions_button:before {
+    font-size: 15px !important; }
+a.disabled {
+  cursor: default; }
+
+/********************************************************************
+*********************************************************************
+*********************************************************************
+
+                LAYOUT: Grids, Wrappers...
+                components/_layout.scss
+
+*********************************************************************
+*********************************************************************
+********************************************************************/
+/* Layout */
+body {
+  position: relative; }
+
+.header-wrapper {
+  height: 60px;
+  border-bottom: 2px solid #d7d7d7;
+  background: #e4e4e4; }
+  .header-wrapper .header {
+    position: relative;
+    min-width: 20em;
+    max-width: 40em; }
+    @media screen and (min-width: 40em) {
+      .header-wrapper .header {
+        min-width: 960px;
+        max-width: 1280px; } }
+    .header-wrapper .header .logo {
+      height: 55px;
+      margin: 5px 0px; }
+
+.loading {
+  font-size: 75px;
+  width: 75px;
+  color: #b1b1b1;
+  position: absolute;
+  margin: auto;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  top: 25vh; }
+  @media screen and (min-width: 40em) {
+    .loading {
+      font-size: 150px;
+      width: 150px; } }
+
+.wrapper {
+  min-width: 20em;
+  max-width: 40em;
+  background-color: white;
+  position: relative; }
+  @media screen and (min-width: 40em) {
+    .wrapper {
+      min-width: 960px;
+      max-width: 1280px; } }
+  .wrapper .menu {
+    margin-bottom: 10px;
+    margin-top: 5px; }
+    @media screen and (min-width: 40em) {
+      .wrapper .menu {
+        margin-top: 15px; } }
+  .wrapper .breadcrumbs {
+    width: 100%;
+    margin-bottom: 0px; }
+    @media screen and (min-width: 40em) {
+      .wrapper .breadcrumbs {
+        margin-bottom: 20px;
+        display: block; } }
+  .wrapper .content {
+    margin-bottom: 80px;
+    /********************************************************************
+*********************************************************************
+*********************************************************************
+
+                LAYOUT LIST: Layout of list view
+                components/_layout-list.scss
+
+*********************************************************************
+*********************************************************************
+********************************************************************/
+    /********************************************************************
+*********************************************************************
+*********************************************************************
+
+                LAYOUT DETAILS: Layout of details view
+                components/_layout-details.scss
+
+*********************************************************************
+*********************************************************************
+********************************************************************/ }
+    .wrapper .content .filter {
+      display: none;
+      margin-bottom: 15px;
+      width: 13%;
+      height: auto;
+      float: right;
+      padding-left: 2%;
+      margin-left: 2%;
+      border-left: 1px dotted #d7d7d7; }
+      @media screen and (min-width: 40em) {
+        .wrapper .content .filter {
+          display: block; } }
+      .wrapper .content .filter .filter-control {
+        margin-bottom: 10px;
+        display: block; }
+      .wrapper .content .filter hr {
+        border: 0px;
+        height: 1px;
+        background: #d7d7d7;
+        width: 100%; }
+    @media screen and (min-width: 40em) {
+      .wrapper .content .list-block {
+        float: right;
+        width: 85%; } }
+    .wrapper .content .list-block .filter-mobile {
+      margin-bottom: 15px; }
+      .wrapper .content .list-block .filter-mobile .filter-control {
+        margin-bottom: 10px;
+        display: block; }
+    .wrapper .content .list-block .list-navigation {
+      position: relative;
+      width: 100%; }
+      @media screen and (min-width: 40em) {
+        .wrapper .content .list-block .list-navigation {
+          margin-bottom: 0px; } }
+      .wrapper .content .list-block .list-navigation .pagination {
+        margin-bottom: 10px; }
+        @media screen and (min-width: 40em) {
+          .wrapper .content .list-block .list-navigation .pagination {
+            margin-bottom: 10px;
+            padding: 0px;
+            height: auto;
+            width: 45%;
+            float: right; } }
+      .wrapper .content .list-block .list-navigation .action-new-item {
+        margin-bottom: 10px; }
+        @media screen and (min-width: 40em) {
+          .wrapper .content .list-block .list-navigation .action-new-item {
+            width: 45%;
+            float: left;
+            margin: 0px;
+            margin-left: -4px; } }
+    .wrapper .content .list-block .action-selected {
+      height: 30px;
+      margin-top: 10px; }
+    .wrapper .content .details-side {
+      display: none;
+      margin-bottom: 15px;
+      width: 38%;
+      height: auto;
+      float: right;
+      padding-left: 2%;
+      margin-left: 2%;
+      border-left: 1px dotted #d7d7d7; }
+      @media screen and (min-width: 40em) {
+        .wrapper .content .details-side {
+          display: block; } }
+    @media screen and (min-width: 40em) {
+      .wrapper .content .details-block {
+        float: right;
+        width: 60%; } }
+    .wrapper .content .details-block table.details td:first-child {
+      font-weight: bold;
+      white-space: nowrap;
+      width: 1%;
+      min-width: 140px; }
+
+.footer {
+  height: 30px;
+  margin-top: 50px;
+  text-align: center;
+  color: #6f6f6f;
+  border-top: 2px solid #d7d7d7;
+  background: #e4e4e4;
+  width: 100%;
+  position: fixed;
+  bottom: 0px;
+  padding-top: 7px;
+  display: none; }
+  @media screen and (min-width: 40em) {
+    .footer {
+      display: block; } }
+
+/* Responsive generic layout */
+.desktop {
+  display: none; }
+
+@media screen and (min-width: 40em) {
+  td.desktop, th.desktop {
+    display: table-cell; }
+  span.desktop, a.desktop {
+    display: inline; }
+  div.desktop {
+    display: block; }
+  .mobile {
+    display: none; } }
+
+.inline {
+  display: inline; }
+
+/********************************************************************
+*********************************************************************
+*********************************************************************
+
+                TABLES
+                components/_tables.scss
+
+*********************************************************************
+*********************************************************************
+********************************************************************/
+/* Table list */
+table.list, table.details {
+  width: 100%;
+  margin-left: auto;
+  margin-right: auto;
+  background-color: #fdfdfd;
+  border: 1px solid #ddd;
+  border-radius: 4px;
+  border-collapse: separate; }
+  table.list th, table.details th {
+    font-weight: bold;
+    text-align: left;
+    border-bottom: #ccc solid 1px; }
+    table.list th .sort-icon, table.details th .sort-icon {
+      float: right; }
+    table.list th.sortable, table.details th.sortable {
+      cursor: pointer; }
+    table.list th.sorted, table.details th.sorted {
+      background-color: #f36d15;
+      color: #fdfdfd; }
+  table.list td, table.list th, table.details td, table.details th {
+    padding: 6px 8px;
+    border-right: dotted 1px #e4e4e4; }
+    table.list td:last-child, table.list th:last-child, table.details td:last-child, table.details th:last-child {
+      border-right: 0px; }
+  table.list > tbody > tr:nth-child(even), table.details > tbody > tr:nth-child(even) {
+    background-color: #fdfdfd; }
+  table.list > tbody > tr:nth-child(odd), table.details > tbody > tr:nth-child(odd) {
+    background-color: #f3f3f3; }
+  table.list tr:last-child td:first-child, table.details tr:last-child td:first-child {
+    border-bottom-left-radius: 4px; }
+  table.list tr:last-child td:last-child, table.details tr:last-child td:last-child {
+    border-bottom-right-radius: 4px; }
+
+.second_row {
+  font-size: x-small;
+  margin-top: 4px; }
+
+td.center {
+  text-align: center; }
+
+.max-1-icons {
+  width: 39px;
+  min-width: 39px; }
+
+.max-2-icons {
+  width: 61px;
+  min-width: 61px; }
+
+.max-3-icons {
+  width: 83px;
+  min-width: 83px; }
+
+.max-4-icons {
+  width: 105px;
+  min-width: 105px; }
+
+.max-5-icons {
+  width: 127px;
+  min-width: 127px; }
+
+.max-6-icons {
+  width: 149px;
+  min-width: 149px; }
+
+/********************************************************************
+*********************************************************************
+*********************************************************************
+
+                FILTERS
+                components/_filters.scss
+
+*********************************************************************
+*********************************************************************
+********************************************************************/
+.filter-control {
+  float: left;
+  margin-right: 20px;
+  width: 100%; }
+  .filter-control input[type="text"], .filter-control select {
+    -moz-box-sizing: border-box;
+    -webkit-box-sizing: border-box;
+    box-sizing: border-box;
+    width: 100%; }
+
+[name="filter_button"] {
+  margin-top: 20px;
+  float: right; }
+
+/********************************************************************
+*********************************************************************
+*********************************************************************
+
+                PAGINATION
+                components/_pagination.scss
+
+*********************************************************************
+*********************************************************************
+********************************************************************/
+.pagination {
+  font-size: 12px;
+  text-align: right; }
+  .pagination a {
+    height: 25px; }
+    .pagination a.prev, .pagination a.next {
+      font-size: 17px;
+      vertical-align: bottom; }
+    .pagination a:before {
+      margin-right: 2px; }
+
+/*# sourceMappingURL=style.css.map */

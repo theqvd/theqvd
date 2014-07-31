@@ -1,0 +1,51 @@
+/********************************************************************
+*********************************************************************
+*********************************************************************
+
+                LAYOUT DETAILS: Layout of details view
+                components/_layout-details.scss
+
+*********************************************************************
+*********************************************************************
+********************************************************************/
+
+.details-side {
+    display: none;
+    @include in(desktop) {
+       display: block;
+    }
+    
+    margin-bottom: 15px;
+
+    width: ($width_details_side - 2) * 1%;
+    height: auto;
+    
+    @if $details_side == left {
+        float: left;
+        padding-right: 2%;
+        margin-right: 2%;
+        border-right: 1px dotted darken($col_whiter, 15);
+    }
+    @else if $details_side == right {
+        float: right;
+        padding-left: 2%;
+        margin-left: 2%;
+        border-left: 1px dotted darken($col_whiter, 15);
+    }
+}
+
+.details-block {
+    @include in(desktop) {
+        float: right;
+        width: ($width_details_content) * 1%;
+    }
+    
+    table.details {
+        td:first-child {
+            font-weight: bold;
+            white-space: nowrap;
+            width: 1%;
+            min-width: 140px;
+        }
+    }
+}

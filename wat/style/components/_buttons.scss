@@ -1,0 +1,68 @@
+/********************************************************************
+*********************************************************************
+*********************************************************************
+
+                BUTTONS
+                components/_buttons.scss
+
+*********************************************************************
+*********************************************************************
+********************************************************************/
+
+
+/* Events */
+.event {
+	cursor: pointer;
+}
+
+a {
+    &.button {
+        @extend %not-selectable;
+        
+        color: $col_whiter;
+        @include linear-gradient($col_brand);
+
+        background-repeat: repeat-x;
+        font-size: 12px;
+        border: solid 1px lighten($col_brand, 10);
+
+        -webkit-box-shadow: none;
+           -moz-box-shadow: none;
+                box-shadow: none;
+
+        &:hover {
+            cursor: pointer;
+            font-weight: bolder;
+
+            &:before {
+                color: $col_whiter;
+            }
+        }    
+
+        &:active {
+            color: darken($col_whiter, 5);
+            @include linear-gradient($col_brand, inverse);
+        }    
+
+        &:focus {
+             outline: 0;
+        }
+
+        &:before {
+            margin-right: 10px;
+            color: $col_whiter;
+        }
+    }
+    
+    &.actions_button {
+        &:before {
+            font-size: 15px !important;
+        }
+        
+        padding-top: 2px;
+    }
+    
+    &.disabled {
+        cursor: default;
+    }
+}
