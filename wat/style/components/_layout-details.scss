@@ -2,7 +2,7 @@
 *********************************************************************
 *********************************************************************
 
-                LAYOUT DETAILS: Layout of details view
+                @LAYOUT DETAILS: Layout of details view
                 components/_layout-details.scss
 
 *********************************************************************
@@ -34,18 +34,34 @@
     }
 }
 
+.details-list, .custom-props-container {
+    padding-left: 20px;
+    
+    .details-item {
+        margin-bottom: 15px;
+        display: block;
+        &:before, i:before {
+            margin-right: 5px;
+        }
+    }
+}
+
+.custom-props-container { 
+    padding-left: 30px;
+}
+
 .details-block {
     @include in(desktop) {
         float: right;
         width: ($width_details_content) * 1%;
     }
     
-    table.details {
+    table.custom-props {
         td:first-child {
             font-weight: bold;
             white-space: nowrap;
             width: 1%;
-            min-width: 140px;
+            min-width: 120px;
         }
     }
 }

@@ -42,58 +42,13 @@
          %>
          
         <div class="action-filter">
-            <a class="js-traductable_button actions_button button fa fa-filter" name="filter_button" data-i18n>
+            <a class="js-traductable_button actions_button button2 fa fa-filter" name="filter_button" data-i18n>
                 tButton.filter
                 </a>
         </div>
     </div>
 
-    <div class="list-block">
-        <div class="list-navigation">
-            <div class="action-new-item">
-                <a class="js-traductable_button actions_button button fa fa-plus-circle" name="new_item_button" data-i18n>
-                    <%= config.new_item_text %>
-                </a>
-            </div>
-            <div class="filter-mobile mobile">
-                <% 
-                    _.each(filters, function(filter) { 
-                        switch(filter.type) {
-                            case 'text':
-                                %>
-                                    <span class="filter-control">
-                                    <label for="<%= filter.name %>" data-i18n><%= filter.label %></label>
-                                    <input type="text" name="<%= filter.name %>"/>
-                                    </span>
-                                <%
-                                break;
-                        }
-                     }); 
-                 %>
-            </div>
-            <div class="pagination">
-                <a class="fa fa-step-backward first button"></a>
-                <a class="fa fa-caret-left prev button"></a>
-                <span class="pagination_current_page">1</span>/<span class="pagination_total_pages">1</span>
-                <a class="fa fa-caret-right next button"></a>
-                <a class="fa fa-step-forward last button"></a>
-            </div>
-        </div>
-        <div class="list bb-list">
-
-        </div>
-        
-        <div class="action-selected">
-            <select name="selected_actions_select" class="chosen-single">
-                <% _.each(selected_actions, function(action) { %>
-                    <option value="<%= action.value %>" data-i18n><%= action.text %></option>
-                <% }); %>
-            </select>
-            <a class="js-traductable_button actions_button button fa fa-check" name="selected_actions_button" data-i18n>
-                tButton.apply_to_selected_items
-            </a>
-        </div>
-
+    <div class="list-block bb-list-block">
     </div>
 </div>
 

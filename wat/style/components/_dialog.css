@@ -2,27 +2,10 @@
 *********************************************************************
 *********************************************************************
 
-                @FILTERS
-                components/_filters.scss
+                @DIALOG: Styles for jQuery UI dialog
+                components/_dialog.scss
 
 *********************************************************************
 *********************************************************************
 ********************************************************************/
-
-.filter-control {
-    float: left;
-    margin-right: 20px;
-    width: 100%;
-    
-    input[type="text"], select {
-           -moz-box-sizing: border-box; 
-        -webkit-box-sizing: border-box; 
-                box-sizing: border-box;
-        width: 100%;
-    }
-}
-
-[name="filter_button"] {
-    margin-top: 20px;
-    float: right;
-}
+/*# sourceMappingURL=_dialog.css.map */

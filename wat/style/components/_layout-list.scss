@@ -2,7 +2,7 @@
 *********************************************************************
 *********************************************************************
 
-                LAYOUT LIST: Layout of list view
+                @LAYOUT LIST: Layout of list view
                 components/_layout-list.scss
 
 *********************************************************************
@@ -47,7 +47,7 @@
     }
 }
 
-.list-block {        
+.list-block, .details-side {        
     @include in(desktop) {
         float: right;
         width: ($width_list_content) * 1%;
@@ -86,6 +86,7 @@
         .action-new-item {
             @extend %clearfix;
             margin-bottom: 10px;
+            margin-top: -10px;
             @include in(desktop) {
                 width: 45%;
                 float: left;

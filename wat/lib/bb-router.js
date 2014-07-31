@@ -7,6 +7,7 @@ var currentView = {};
         var AppRouter = Backbone.Router.extend({
                 routes: {
                     "vms": "listVM",
+                    "vms/:field/:value": "listVM",
                     "vm/:id": "detailsVM",
                     "users": "listUser",
                     "user/:id": "detailsUser",
@@ -20,18 +21,33 @@ var currentView = {};
         
         
         // ------- List sections ------- //
-        app_router.on('route:listVM', function (id) {
+        app_router.on('route:listVM', function (field, value) {
             // Note the variable in the route definition being passed in here
             showLoading();
             setMenuOpt('vms');
             if (!$.isEmptyObject(currentView )) {
                 currentView.undelegateEvents();
             }
-            currentView = new VMListView();
+            
+            var params = {};
+            if (field !== null) {
+                switch(field) {
+                    case 'user':
+                        params.listFilter = {};
+                        params.listFilter.user = value;
+                        break;
+                    case 'node':
+                        params.listFilter = {};
+                        params.listFilter.node = value;
+                        break;
+                }
+            }
+            
+            currentView = new VMListView(params);
             translate();
         });        
         
-        app_router.on('route:listUser', function (id) {
+        app_router.on('route:listUser', function () {
             showLoading();
             setMenuOpt('users');
             if (!$.isEmptyObject(currentView )) {

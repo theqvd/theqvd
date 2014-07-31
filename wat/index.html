@@ -5,21 +5,40 @@
         <meta charset='utf-8' />
         
         <!-- Third party JS libraries -->
-        <script type='text/javascript' src='lib/thirds/jquery.min.js'></script>
-        <script type='text/javascript' src='lib/thirds/jquery-ui.min.js'></script>
-        <script type='text/javascript' src='lib/thirds/underscore.js'></script>
-        <script type='text/javascript' src='lib/thirds/backbone.js'></script>
-        <script type='text/javascript' src='lib/thirds/i18next-1.7.3.min.js'></script>
-        <link rel="stylesheet" href="lib/thirds/responsive-nav.css">
-        <script src="lib/thirds/responsive-nav.min.js"></script>
-        <link rel="stylesheet" href="lib/thirds/font-awesome.min.css">
-        <script src="lib/thirds/chosen.jquery.min.js"></script>
-        <link rel="stylesheet" href="lib/thirds/chosen.min.css">
+            <!-- jQuery -->
+            <script type='text/javascript' src='lib/thirds/jquery/jquery.min.js'></script>
+            
+            <!-- jQuery UI -->
+            <script type='text/javascript' src='lib/thirds/jquery-ui/jquery-ui.min.js'></script>
+            <link rel="stylesheet" href="lib/thirds/jquery-ui/jquery-ui.min.css">
+            
+            <!-- Underscore -->
+            <script type='text/javascript' src='lib/thirds/underscore/underscore.js'></script>
+            
+            <!-- Backbone.js -->
+            <script type='text/javascript' src='lib/thirds/backbone/backbone.js'></script>
+            
+            <!-- i18next -->
+            <script type='text/javascript' src='lib/thirds/i18next/i18next-1.7.3.min.js'></script>
+            
+            <!-- Responsive Nav -->
+            <link rel="stylesheet" href="lib/thirds/responsive-nav/responsive-nav.css">
+            <script src="lib/thirds/responsive-nav/responsive-nav.min.js"></script>
+            
+            <!-- Font awesome -->
+            <link rel="stylesheet" href="lib/thirds/font-awesome/css/font-awesome.min.css">
+            
+            <!-- Chosen -->
+            <script src="lib/thirds/chosen/chosen.jquery.min.js"></script>
+            <link rel="stylesheet" href="lib/thirds/chosen/chosen.min.css">
 
         <!-- Own libraries -->
-        <script type='text/javascript' src='lib/translations.js'></script>
-        <script type='text/javascript' src='lib/common.js'></script>
-        <script type='text/javascript' src='lib/bb-router.js'></script>
+            <!-- Common libraries -->
+            <script type='text/javascript' src='lib/translations.js'></script>
+            <script type='text/javascript' src='lib/common.js'></script>
+           
+            <!-- Backbone Router -->
+            <script type='text/javascript' src='lib/bb-router.js'></script>
         
             <!-- Backbone Models -->
             <script type='text/javascript' src='lib/bb-models/proto-model.js'></script>
@@ -143,6 +162,10 @@
             <div class="content bb-content"></div>                        
         </div>
         <div class="footer" data-link="<a href='http://qindel.com'>Qindel Group</a>"></div>
+        
+        <!-- Dialog layers -->
+        <div class="dialog-container js-dialog-container"></div>
+        <div class="dialog-container-template js-dialog-container-template"></div>
         
         <script type="text/javascript">
         $(document).ready(function() {

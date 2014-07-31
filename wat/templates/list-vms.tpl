@@ -24,7 +24,7 @@
                             break;
                         case 'id':
             %>
-                            <th class="cacheable sortable" data-i18n="id">
+                            <th class="cacheable sortable desktop" data-i18n="id">
                                 <%= getCached('id', cache) %>
                             </th>
             <%
@@ -109,7 +109,7 @@
                                 break;
                             case 'id':
                 %>
-                                <td>
+                                <td class="desktop">
                                     <%= model.get('id') %>
                                 </td>
                 <%

@@ -1,9 +1,9 @@
 /* INCLUDED: variables */
 /* INCLUDED: place_holders */
-.wrapper .content::after, .wrapper .content .list-block .list-navigation::after, .wrapper .content .list-block .list-navigation .action-new-item::after, .wrapper .content .list-block .action-selected::after, .footer::after, .wrapper .content::before, .wrapper .content .list-block .list-navigation::before, .wrapper .content .list-block .list-navigation .action-new-item::before, .wrapper .content .list-block .action-selected::before, .footer::before {
+.wrapper .content::after, .wrapper .content .list-block .list-navigation::after, .wrapper .content .details-side .list-navigation::after, .wrapper .content .list-block .list-navigation .action-new-item::after, .wrapper .content .details-side .list-navigation .action-new-item::after, .wrapper .content .list-block .action-selected::after, .wrapper .content .details-side .action-selected::after, .footer::after, .wrapper .content::before, .wrapper .content .list-block .list-navigation::before, .wrapper .content .details-side .list-navigation::before, .wrapper .content .list-block .list-navigation .action-new-item::before, .wrapper .content .details-side .list-navigation .action-new-item::before, .wrapper .content .list-block .action-selected::before, .wrapper .content .details-side .action-selected::before, .footer::before {
   content: "";
   clear: both; }
-.wrapper .content::after, .wrapper .content .list-block .list-navigation::after, .wrapper .content .list-block .list-navigation .action-new-item::after, .wrapper .content .list-block .action-selected::after, .footer::after {
+.wrapper .content::after, .wrapper .content .list-block .list-navigation::after, .wrapper .content .details-side .list-navigation::after, .wrapper .content .list-block .list-navigation .action-new-item::after, .wrapper .content .details-side .list-navigation .action-new-item::after, .wrapper .content .list-block .action-selected::after, .wrapper .content .details-side .action-selected::after, .footer::after {
   display: table; }
 
 .header-wrapper .header, .wrapper {
@@ -12,7 +12,7 @@
   padding-left: 20px;
   padding-right: 20px; }
 
-.menu > ul .menu-option, a.button, table.list th, table.details th {
+.menu > ul .menu-option, a.button, a.button2, table.list th, table.custom-props th {
   -webkit-touch-callout: none;
   -webkit-user-select: none;
   -khtml-user-select: none;
@@ -29,7 +29,7 @@
 *********************************************************************
 *********************************************************************
 
-                RESET: Based on Eric Meyer's Reset 2.0
+                @RESET: Based on Eric Meyer's Reset 2.0
                 components/_reset.scss
 
 *********************************************************************
@@ -87,7 +87,7 @@ table {
 *********************************************************************
 *********************************************************************
 
-                GENERAL: Styles that affect general group of elements
+                @GENERAL: Styles that affect general group of elements
                 components/_general.scss
 
 *********************************************************************
@@ -123,11 +123,29 @@ fieldset {
     color: #909090;
     text-align: right; }
 
+.h1 {
+  position: relative;
+  font-weight: bold;
+  font-size: 16px;
+  color: #6f6f6f;
+  margin-bottom: 15px; }
+  .h1 .subtitle {
+    font-weight: normal;
+    color: #a2a2a2; }
+  .h1 .fa:before {
+    margin-right: 5px; }
+
+.h2 {
+  font-weight: bold;
+  font-size: 14px;
+  color: #888888;
+  margin-bottom: 14px; }
+
 /********************************************************************
 *********************************************************************
 *********************************************************************
 
-                MENU
+                @MENU
                 components/_menu.scss
 
 *********************************************************************
@@ -231,7 +249,7 @@ fieldset {
 *********************************************************************
 *********************************************************************
 
-                ICONS
+                @ICONS
                 components/_icons.scss
 
 *********************************************************************
@@ -258,7 +276,7 @@ td i.fa-lock, td i.fa-unlock {
 *********************************************************************
 *********************************************************************
 
-                FORMS
+                @FORMS
                 components/_forms.scss
 
 *********************************************************************
@@ -295,7 +313,7 @@ select {
   width: 100%;
   margin-left: -4px; }
 
-input, a.button {
+input, a.button, a.button2 {
   height: 25px;
   padding: 4px 8px;
   line-height: 18px; }
@@ -308,7 +326,7 @@ input[type="checkbox"], input[type="radio"] {
       width: 14px;
       height: 14px; } }
 
-select, input, a.button {
+select, input, a.button, a.button2 {
   border-radius: 4px;
   border-style: solid;
   border-color: #cacaca;
@@ -347,7 +365,7 @@ select, input, a.button {
 *********************************************************************
 *********************************************************************
 
-                BUTTONS
+                @BUTTONS
                 components/_buttons.scss
 
 *********************************************************************
@@ -389,18 +407,54 @@ a.button {
   a.button:before {
     margin-right: 10px;
     color: #fdfdfd; }
+a.button2 {
+  color: #f36d15;
+  background-color: #f0f0f0;
+  background-image: -moz-linear-gradient(top, #ffffff, #f0f0f0);
+  background-image: -webkit-gradient(linear, 0 0, 0 100%, from(#ffffff), to(#f0f0f0));
+  background-image: -webkit-linear-gradient(top, #ffffff, #f0f0f0);
+  background-image: -o-linear-gradient(top, #ffffff, #f0f0f0);
+  background-image: linear-gradient(to bottom, #ffffff, #f0f0f0);
+  background-repeat: repeat-x;
+  font-size: 12px;
+  border: solid 1px #f58946;
+  -webkit-box-shadow: none;
+  -moz-box-shadow: none;
+  box-shadow: none; }
+  a.button2:hover {
+    cursor: pointer;
+    font-weight: bolder; }
+    a.button2:hover:before {
+      color: #f36d15; }
+  a.button2:active {
+    color: #e35e0c;
+    background-color: #f0f0f0;
+    background-image: -moz-linear-gradient(top, #f0f0f0, #ffffff);
+    background-image: -webkit-gradient(linear, 0 0, 0 100%, from(#f0f0f0), to(#ffffff));
+    background-image: -webkit-linear-gradient(top, #f0f0f0, #ffffff);
+    background-image: -o-linear-gradient(top, #f0f0f0, #ffffff);
+    background-image: linear-gradient(to bottom, #f0f0f0, #ffffff); }
+  a.button2:focus {
+    outline: 0; }
+  a.button2:before {
+    margin-right: 10px;
+    color: #f36d15; }
 a.actions_button {
   padding-top: 2px; }
   a.actions_button:before {
     font-size: 15px !important; }
 a.disabled {
   cursor: default; }
+a.button-right {
+  position: absolute;
+  right: 0px;
+  bottom: 0px; }
 
 /********************************************************************
 *********************************************************************
 *********************************************************************
 
-                LAYOUT: Grids, Wrappers...
+                @LAYOUT: Grids, Wrappers...
                 components/_layout.scss
 
 *********************************************************************
@@ -458,7 +512,7 @@ body {
         margin-top: 15px; } }
   .wrapper .breadcrumbs {
     width: 100%;
-    margin-bottom: 0px; }
+    margin-bottom: 15px; }
     @media screen and (min-width: 40em) {
       .wrapper .breadcrumbs {
         margin-bottom: 20px;
@@ -469,7 +523,7 @@ body {
 *********************************************************************
 *********************************************************************
 
-                LAYOUT LIST: Layout of list view
+                @LAYOUT LIST: Layout of list view
                 components/_layout-list.scss
 
 *********************************************************************
@@ -479,7 +533,7 @@ body {
 *********************************************************************
 *********************************************************************
 
-                LAYOUT DETAILS: Layout of details view
+                @LAYOUT DETAILS: Layout of details view
                 components/_layout-details.scss
 
 *********************************************************************
@@ -506,44 +560,45 @@ body {
         background: #d7d7d7;
         width: 100%; }
     @media screen and (min-width: 40em) {
-      .wrapper .content .list-block {
+      .wrapper .content .list-block, .wrapper .content .details-side {
         float: right;
         width: 85%; } }
-    .wrapper .content .list-block .filter-mobile {
+    .wrapper .content .list-block .filter-mobile, .wrapper .content .details-side .filter-mobile {
       margin-bottom: 15px; }
-      .wrapper .content .list-block .filter-mobile .filter-control {
+      .wrapper .content .list-block .filter-mobile .filter-control, .wrapper .content .details-side .filter-mobile .filter-control {
         margin-bottom: 10px;
         display: block; }
-    .wrapper .content .list-block .list-navigation {
+    .wrapper .content .list-block .list-navigation, .wrapper .content .details-side .list-navigation {
       position: relative;
       width: 100%; }
       @media screen and (min-width: 40em) {
-        .wrapper .content .list-block .list-navigation {
+        .wrapper .content .list-block .list-navigation, .wrapper .content .details-side .list-navigation {
           margin-bottom: 0px; } }
-      .wrapper .content .list-block .list-navigation .pagination {
+      .wrapper .content .list-block .list-navigation .pagination, .wrapper .content .details-side .list-navigation .pagination {
         margin-bottom: 10px; }
         @media screen and (min-width: 40em) {
-          .wrapper .content .list-block .list-navigation .pagination {
+          .wrapper .content .list-block .list-navigation .pagination, .wrapper .content .details-side .list-navigation .pagination {
             margin-bottom: 10px;
             padding: 0px;
             height: auto;
             width: 45%;
             float: right; } }
-      .wrapper .content .list-block .list-navigation .action-new-item {
-        margin-bottom: 10px; }
+      .wrapper .content .list-block .list-navigation .action-new-item, .wrapper .content .details-side .list-navigation .action-new-item {
+        margin-bottom: 10px;
+        margin-top: -10px; }
         @media screen and (min-width: 40em) {
-          .wrapper .content .list-block .list-navigation .action-new-item {
+          .wrapper .content .list-block .list-navigation .action-new-item, .wrapper .content .details-side .list-navigation .action-new-item {
             width: 45%;
             float: left;
             margin: 0px;
             margin-left: -4px; } }
-    .wrapper .content .list-block .action-selected {
+    .wrapper .content .list-block .action-selected, .wrapper .content .details-side .action-selected {
       height: 30px;
       margin-top: 10px; }
     .wrapper .content .details-side {
       display: none;
       margin-bottom: 15px;
-      width: 38%;
+      width: 43%;
       height: auto;
       float: right;
       padding-left: 2%;
@@ -552,15 +607,24 @@ body {
       @media screen and (min-width: 40em) {
         .wrapper .content .details-side {
           display: block; } }
+    .wrapper .content .details-list, .wrapper .content .custom-props-container {
+      padding-left: 20px; }
+      .wrapper .content .details-list .details-item, .wrapper .content .custom-props-container .details-item {
+        margin-bottom: 15px;
+        display: block; }
+        .wrapper .content .details-list .details-item:before, .wrapper .content .details-list .details-item i:before, .wrapper .content .custom-props-container .details-item:before, .wrapper .content .custom-props-container .details-item i:before {
+          margin-right: 5px; }
+    .wrapper .content .custom-props-container {
+      padding-left: 30px; }
     @media screen and (min-width: 40em) {
       .wrapper .content .details-block {
         float: right;
-        width: 60%; } }
-    .wrapper .content .details-block table.details td:first-child {
+        width: 55%; } }
+    .wrapper .content .details-block table.custom-props td:first-child {
       font-weight: bold;
       white-space: nowrap;
       width: 1%;
-      min-width: 140px; }
+      min-width: 120px; }
 
 .footer {
   height: 30px;
@@ -577,6 +641,17 @@ body {
   @media screen and (min-width: 40em) {
     .footer {
       display: block; } }
+
+.dialog-container, .dialog-container-template {
+  display: none; }
+
+.dialog-container-template {
+  width: 95%;
+  height: 75%; }
+  @media screen and (min-width: 40em) {
+    .dialog-container-template {
+      width: 600;
+      height: 400; } }
 
 /* Responsive generic layout */
 .desktop {
@@ -599,14 +674,14 @@ body {
 *********************************************************************
 *********************************************************************
 
-                TABLES
+                @TABLES
                 components/_tables.scss
 
 *********************************************************************
 *********************************************************************
 ********************************************************************/
 /* Table list */
-table.list, table.details {
+table.list, table.custom-props {
   width: 100%;
   margin-left: auto;
   margin-right: auto;
@@ -614,29 +689,29 @@ table.list, table.details {
   border: 1px solid #ddd;
   border-radius: 4px;
   border-collapse: separate; }
-  table.list th, table.details th {
+  table.list th, table.custom-props th {
     font-weight: bold;
     text-align: left;
     border-bottom: #ccc solid 1px; }
-    table.list th .sort-icon, table.details th .sort-icon {
+    table.list th .sort-icon, table.custom-props th .sort-icon {
       float: right; }
-    table.list th.sortable, table.details th.sortable {
+    table.list th.sortable, table.custom-props th.sortable {
       cursor: pointer; }
-    table.list th.sorted, table.details th.sorted {
+    table.list th.sorted, table.custom-props th.sorted {
       background-color: #f36d15;
       color: #fdfdfd; }
-  table.list td, table.list th, table.details td, table.details th {
+  table.list td, table.list th, table.custom-props td, table.custom-props th {
     padding: 6px 8px;
     border-right: dotted 1px #e4e4e4; }
-    table.list td:last-child, table.list th:last-child, table.details td:last-child, table.details th:last-child {
+    table.list td:last-child, table.list th:last-child, table.custom-props td:last-child, table.custom-props th:last-child {
       border-right: 0px; }
-  table.list > tbody > tr:nth-child(even), table.details > tbody > tr:nth-child(even) {
+  table.list > tbody > tr:nth-child(even), table.custom-props > tbody > tr:nth-child(even) {
     background-color: #fdfdfd; }
-  table.list > tbody > tr:nth-child(odd), table.details > tbody > tr:nth-child(odd) {
+  table.list > tbody > tr:nth-child(odd), table.custom-props > tbody > tr:nth-child(odd) {
     background-color: #f3f3f3; }
-  table.list tr:last-child td:first-child, table.details tr:last-child td:first-child {
+  table.list tr:last-child td:first-child, table.custom-props tr:last-child td:first-child {
     border-bottom-left-radius: 4px; }
-  table.list tr:last-child td:last-child, table.details tr:last-child td:last-child {
+  table.list tr:last-child td:last-child, table.custom-props tr:last-child td:last-child {
     border-bottom-right-radius: 4px; }
 
 .second_row {
@@ -674,7 +749,7 @@ td.center {
 *********************************************************************
 *********************************************************************
 
-                FILTERS
+                @FILTERS
                 components/_filters.scss
 
 *********************************************************************
@@ -698,7 +773,7 @@ td.center {
 *********************************************************************
 *********************************************************************
 
-                PAGINATION
+                @PAGINATION
                 components/_pagination.scss
 
 *********************************************************************
@@ -715,4 +790,14 @@ td.center {
     .pagination a:before {
       margin-right: 2px; }
 
+/********************************************************************
+*********************************************************************
+*********************************************************************
+
+                @DIALOG: Styles for jQuery UI dialog
+                components/_dialog.scss
+
+*********************************************************************
+*********************************************************************
+********************************************************************/
 /*# sourceMappingURL=style.css.map */

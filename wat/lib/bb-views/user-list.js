@@ -1,8 +1,4 @@
 var UserListView = ListView.extend({
-    config: {
-        'new_item_text': 'tButton.new_user'
-    },
-    
     listTemplateName: 'list-users',
     
     sortedAscUrl: 'json/list_users.json',
@@ -28,14 +24,15 @@ var UserListView = ListView.extend({
     initialize: function (params) {
         this.collection = new Users();
         
-        this.columns = this.getColumns();
-        this.selectedActions = this.getSelectedActions();
+        this.setColumns();
+        this.setSelectedActions();
+        this.setListActionButton();
 
         ListView.prototype.initialize.apply(this, [params]);
     },
     
-    getColumns: function () {
-        return [
+    setColumns: function () {
+        this.columns = [
             {
                 'name': 'checks',
                 'display': true
@@ -67,8 +64,8 @@ var UserListView = ListView.extend({
         ];
     },
     
-    getSelectedActions: function () {
-        return [
+    setSelectedActions: function () {
+        this.selectedActions = [
             {
                 'value': 'block',
                 'text': 'tSelect.block'
@@ -86,5 +83,13 @@ var UserListView = ListView.extend({
                 'text': 'tSelect.delete'
             }
         ];
-    }
+    },
+    
+    setListActionButton: function () {
+        this.listActionButton = {
+            'name': 'new_item_button',
+            'value': 'tButton.new_user',
+            'link': '#'
+        }
+    },
 });

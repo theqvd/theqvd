@@ -4,6 +4,8 @@ var UserDetailsView = DetailsView.extend({
     },
     
     detailsTemplateName: 'details-user',
+    detailsSideTemplateName: 'details-user-side',
+    sideContainer: '.bb-details-side',
     
     breadcrumbs: {
         'screen': 'home',
@@ -12,7 +14,7 @@ var UserDetailsView = DetailsView.extend({
             'screen': 'users_list',
             'link': '#/users',
             'next': {
-                'screen': 'user_details'
+                'screen': ''
             }
         }
     },
@@ -24,9 +26,28 @@ var UserDetailsView = DetailsView.extend({
         // Render Virtual Machines list on side
         var params = {};
         params.whatRender = 'list';
-        params.listContainer = '.bb-details-side';
-        params.forceListColumns = {name: true, info: true, checks: true};
+        params.listContainer = '.bb-details-side1';
+        params.forceListColumns = {checks: true, info: true, name: true};
+        params.forceSelectedActions = {disconnect: true};
+        params.forceListActionButton = null;
         
         var sideView = new VMListView(params);     
+    },
+    
+    render: function () {
+        // Add name of the model to breadcrumbs
+        this.breadcrumbs.next.next.screen = this.model.get('name');
+        
+        DetailsView.prototype.render.apply(this);
+        
+        this.templateDetailsSide = this.getTemplate(this.detailsSideTemplateName);
+        
+        this.template = _.template(
+            this.templateDetailsSide, {
+                model: this.model
+            }
+        );
+        
+        $(this.sideContainer).html(this.template);
     }
 });

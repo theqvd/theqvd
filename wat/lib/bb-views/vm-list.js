@@ -1,8 +1,4 @@
-var VMListView = ListView.extend({
-    config: {
-        'new_item_text': 'tButton.new_vm'
-    },
-    
+var VMListView = ListView.extend({  
     listTemplateName: 'list-vms',
     
     sortedAscUrl: 'json/list_vms.json',
@@ -92,13 +88,16 @@ var VMListView = ListView.extend({
     
     initialize: function (params) {
         this.collection = new VMs();
-        this.columns = this.getColumns();
-        this.selectedActions = this.getSelectedActions();
+        
+        this.setColumns();
+        this.setSelectedActions();
+        this.setListActionButton();
+        
         ListView.prototype.initialize.apply(this, [params]);
     },
     
-    getColumns: function () {
-        return [
+    setColumns: function () {
+        this.columns = [
             {
                 'name': 'checks',
                 'display': true
@@ -130,8 +129,8 @@ var VMListView = ListView.extend({
         ];
     },
     
-    getSelectedActions: function () {
-        return [
+    setSelectedActions: function () {
+        this.selectedActions = [
             {
                 'value': 'start',
                 'text': 'tSelect.start'
@@ -157,5 +156,14 @@ var VMListView = ListView.extend({
                 'text': 'tSelect.delete'
             }
         ];
-    }
+    },
+    
+    setListActionButton: function () {
+        this.listActionButton = {
+            'name': 'new_item_button',
+            'value': 'tButton.new_vm',
+            'link': '#',
+            'icon': ''
+        }
+    },
 });

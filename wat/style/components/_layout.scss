@@ -2,7 +2,7 @@
 *********************************************************************
 *********************************************************************
 
-                LAYOUT: Grids, Wrappers...
+                @LAYOUT: Grids, Wrappers...
                 components/_layout.scss
 
 *********************************************************************
@@ -79,7 +79,7 @@ body {
     .breadcrumbs {
         @extend %invisible;
         width: 100%;
-        margin-bottom: 0px;
+        margin-bottom: 15px;
         
         @include in(desktop) {
             margin-bottom: 20px;
@@ -124,8 +124,21 @@ body {
     @include in(desktop) {
         display: block;
     }
-} 
+}
 
+.dialog-container, .dialog-container-template {
+    display: none;
+}
+
+.dialog-container-template {
+    width: $dialog_mobile_width;
+    height: $dialog_mobile_height;
+    
+    @include in(desktop) {
+        width: $dialog_width;
+        height: $dialog_height;
+    }
+}
 
 
 /* Responsive generic layout */

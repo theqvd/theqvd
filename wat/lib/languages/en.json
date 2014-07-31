@@ -10,8 +10,10 @@
     "home": "Home",
     "vms_list": "Virtual Machine list",
     "users_list": "User list",
-    "user_details": "User details",
     "info": "Info",
+    "user_vms": "User's Virtual Machines",
+    "user_properties": "User properties",
+    "extended_view": "Extended view",
     
     "tMenu": {
         "users": "Users",
