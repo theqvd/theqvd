@@ -84,8 +84,9 @@ use Class::StateMachine::Declarative
                                                                  saving_loadbal_data   => { enter => '_save_loadbal_data' },
                                                                  ticking               => { enter => '_start_ticker',
                                                                                             on => { _on_db_ticked => '_on_done' } },
-                                                                 searching_zombies     => { enter => '_search_zombies' },
-                                                                 catching_zombies      => { enter => '_catch_zombies',
+                                                                 cleaningup_zombie_l7rs=> { enter => '_cleanup_zombie_l7rs' },
+                                                                 searching_zombie_vms  => { enter => '_search_zombie_vms' },
+                                                                 catching_zombie_vms   => { enter => '_catch_zombie_vms',
                                                                                             on => { _on_no_vms_are_running => '_on_done' } },
                                                                  agents                => { enter => '_start_agents' } ] } ] },
 
@@ -726,18 +727,32 @@ sub _kill_all_vms {
     $self->_call_after($self->_cfg("internal.hkd.killing.vms.retry.timeout"), '_kill_all_vms');
 }
 
-sub _search_zombies {
+sub _cleanup_zombie_l7rs {
+    # FIXME: is that enough? should we try to actually kill the process?
     my $self = shift;
-    $self->_query( { save_to => 'zombies',
+    $self->_query( { log_error => 'unable to clean up old l7r connections' },
+                   <<'EOQ', $self->{node_id});
+update vm_runtimes
+   set user_cmd = NULL,
+       l7r_host_id = NULL,
+       l7r_pid = NULL,
+       user_state = 'disconnected'
+   where l7r_host_id = $1
+EOQ
+}
+
+sub _search_zombie_vms {
+    my $self = shift;
+    $self->_query( { save_to => 'zombie_vms',
                      log_error => 'unable to retrieve list of zombie vms from table vm_runtimes' },
                    q(select vm_id from vm_runtimes where host_id=$1 and vm_state != 'stopped'), $self->{node_id});
 }
 
-sub _catch_zombies {
+sub _catch_zombie_vms {
     my $self = shift;
-    my $zombies = delete $self->{zombies};
-    if (@$zombies) {
-        for my $row (@$zombies) {
+    my $zombie_vms = delete $self->{zombie_vms};
+    if (@$zombie_vms) {
+        for my $row (@$zombie_vms) {
             my $vm = $self->_new_vm_handler($row->{vm_id});
             $vm->on_cmd('catch_zombie');
         }
