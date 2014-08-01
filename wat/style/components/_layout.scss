@@ -98,9 +98,9 @@ body {
         @import "layout-list";
         @import "layout-details";
     }
-    
-
 }
+   
+@import "layout-editor";
 
 .footer {
     @extend %invisible;

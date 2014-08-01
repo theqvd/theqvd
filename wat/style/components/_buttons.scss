@@ -15,7 +15,7 @@
 	cursor: pointer;
 }
 
-a {
+a, button {
     &.button {
         @include button($col_whiter, $col_brand);
     }    

@@ -1,0 +1,42 @@
+.editor-container {
+    margin: 10px 20px;
+    .editor-table {
+        width: 100%;
+        border-spacing: 20px;
+        border-collapse: separate;
+        
+        td:first-child {
+            font-weight: bold;
+            min-width: 50%;
+        }
+        
+        td.fa:before {
+            margin-right: 10px;
+        }
+        
+        .delete-property-button {
+            color: $col_brand;
+            cursor: pointer;
+        }
+
+        .custom-properties {
+            td {
+                position: relative;
+                
+                .delete-property-button {
+                    position: absolute;
+                    left: -20px;
+                    top: 5px;
+                }                
+                
+                .property-help {
+                    position: absolute;
+                    left: 12px;
+                    top: 6px;
+                    color: lighten($col_blacker, 50);
+                    font-weight: normal;
+                }
+            }
+        }
+    }
+}

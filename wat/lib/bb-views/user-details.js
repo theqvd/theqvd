@@ -3,6 +3,7 @@ var UserDetailsView = DetailsView.extend({
         'new_item_text': 'tButton.new_user'
     },
     
+    editorTemplateName: 'editor-user',
     detailsTemplateName: 'details-user',
     detailsSideTemplateName: 'details-user-side',
     sideContainer: '.bb-details-side',
@@ -22,6 +23,7 @@ var UserDetailsView = DetailsView.extend({
     initialize: function (params) {
         this.model = new User();
         DetailsView.prototype.initialize.apply(this, [params]);
+        //_.extend(this.events, DetailsView.prototype.events);
         
         // Render Virtual Machines list on side
         var params = {};
@@ -31,7 +33,10 @@ var UserDetailsView = DetailsView.extend({
         params.forceSelectedActions = {disconnect: true};
         params.forceListActionButton = null;
         
-        var sideView = new VMListView(params);     
+        var sideView = new VMListView(params);   
+                
+        // Binding events manually because backbone doesnt allow bind events to dialogs loaded dinamically
+        this.bindEditorEvents();
     },
     
     render: function () {
@@ -49,5 +54,24 @@ var UserDetailsView = DetailsView.extend({
         );
         
         $(this.sideContainer).html(this.template);
+    },
+    
+    editElement: function() {
+        DetailsView.prototype.editElement.apply(this);
+    },
+    
+    bindEditorEvents: function() {
+        DetailsView.prototype.bindEditorEvents.apply(this);
+
+        var that = this;
+        
+        // Toggle controls for new password
+        $(document).on('change', 'input[name="change_password"]', function() {
+            that.toggleNewPassword();
+        });
+    },
+    
+    toggleNewPassword: function () {
+        $('.new_password_row').toggle();
     }
 });

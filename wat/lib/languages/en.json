@@ -14,6 +14,17 @@
     "user_vms": "User's Virtual Machines",
     "user_properties": "User properties",
     "extended_view": "Extended view",
+    "edit_user": "Edit user",
+    "update": "Update",
+    "cancel": "Cancel",
+    "change_password": "Change password",
+    "add_property": "Add property",
+    "password": "Password",
+    "retype_password": "Re-type password",
+    "new_password": "New password",
+    "retype_new_password": "Re-type new password",
+    "property_name": "Property name",
+    "property_value": "Property value",
     
     "tMenu": {
         "users": "Users",

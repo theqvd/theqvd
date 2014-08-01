@@ -24,3 +24,4 @@ var customProps = model.get('customProps');
         </div>
     </div>
 </div>
+<div class="bb-editor-content-test"></div>

@@ -51,7 +51,7 @@ select {
 }
     
 
-input, a.button, a.button2 {
+input, .button, .button2 {
     height: $height_button;
     padding: 4px 8px;
     line-height: 18px;
@@ -69,7 +69,7 @@ input[type="checkbox"], input[type="radio"] {
 }
 
 
-select, input, a.button, a.button2 {
+select, input, .button, .button2 {
     border-radius: $form_elements_radius;
     border-style: solid;
     border-color: darken($col_whiter, 20%);

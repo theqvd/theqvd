@@ -72,6 +72,10 @@
         cursor: pointer;
         font-weight: bolder;
 
+        span {
+            font-weight: bold;
+        }
+        
         &:before {
             color: $col;
         }
