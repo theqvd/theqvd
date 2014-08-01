@@ -25,6 +25,7 @@ my $mod = Module::Build->subclass(
 		sub ACTION_build {
 			my ($self) = @_;
 			$self->depends_on('locale_files');
+			$self->SUPER::ACTION_build(@_);
 		}
 	}
 );
