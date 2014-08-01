@@ -9,18 +9,29 @@ has 'config',    is => 'ro', isa => 'HashRef',  required => 1;
 has 'mapper',    is => 'ro', isa => 'Config::Properties';
 has 'modifiers', is => 'ro', isa => 'HashRef',  default => sub { {}; };
 has 'customs',   is => 'ro', isa => 'ArrayRef',  default => sub { []; };
-has 'defaults',   is => 'ro', isa => 'HashRef',  default => sub { {}; };
+has 'defaults',  is => 'ro', isa => 'HashRef',  default => sub { {}; };
 
 sub BUILD
 {
     my $self = shift;
 
-    $self->json->{arguments} //= {};
     $self->json->{filters} //= {};
     $self->config->{arguments} //= {};
     $self->config->{filters} //= {};
     $self->config->{mandatory} //= {};
     $self->config->{order_by} //= [];
+
+    $self->json->{tenant} || 
+	die "No tenant specified in request";
+
+    $self->json->{role} || 
+	die "No role specified in request";
+
+    die "No permissions for this action"
+	unless exists $self->config->{roles}->{$self->json->{role}};
+
+    $self->json->{filters}->{tenant} = $self->json->{tenant}
+    if exists $self->config->{filters}->{tenant};
 
     $self->modifiers->{page} = $self->json->{offset} // 1; 
     $self->modifiers->{rows}  = $self->json->{blocked} // 1; 
@@ -79,7 +90,6 @@ sub arguments
     }
     $arguments;
 }
-
 
 sub order_by
 {

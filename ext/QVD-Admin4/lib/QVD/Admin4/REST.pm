@@ -25,9 +25,9 @@ sub _auth
 {
     my ($self,$json) = @_;
 
-    my %creds = map { $_ => $json->{$_} } qw(user database host password);
-    eval { $QVD_ADMIN = QVD::Admin4->new(%creds) };
-    ($@ ? 0 : $self->get_role($json->{user}));
+    $QVD_ADMIN = QVD::Admin4->new(login => $json->{login}, 
+				  password => $json->{password});
+    $QVD_ADMIN->get_credentials;
 }
 
 sub _admin
@@ -38,13 +38,6 @@ sub _admin
    my $response = QVD::Admin4::REST::Response->new(message    => ($@ ? "$@" : ""),
                                                    status     => ($@ ? 1 : 0),
                                                    result     => $result )->json;
-}
-
-sub get_role
-{
-    my ($self, $user) = @_;
-    my $role = core_cfg("role.$user") // 
-	die "No role for this user";
 }
 
 sub get_request 
@@ -80,8 +73,8 @@ sub load_actions
 	$params->{arguments} = { map { $_ => 1 } (split ',', $params->{arguments})} 
 	if $params->{arguments};
 	
-	$params->{tenant} = [split ',', $params->{tenant}] 
-	    if $params->{tenant};
+	$params->{roles} = { map { $_ => 1 } (split ',', $params->{roles})} 
+	if $params->{roles};
 	
 	$params->{order_by} = [split ',', $params->{order_by}] 
 	    if $params->{order_by};
@@ -96,66 +89,68 @@ sub load_actions
 
 __DATA__
 
-user_get_list.tenant = all
+user_get_list.roles = admin
 user_get_list.table = User
 user_get_list.order_by = id,login,blocked
-user_get_list.filters = login
+user_get_list.filters = login,tenant
+user_get_list.mandatory = tenant
 
-user_get_details.tenant = all
+user_get_details.roles = admin
 user_get_details.table = User
-user_get_details.filters = id
-user_get_details.mandatory = id
+user_get_details.filters = id,tenant
+user_get_details.mandatory = id,tenant
 
-user_get_state.tenant = all
+user_get_state.roles = admin
 user_get_state.table = User
-user_get_state.filters = id
-user_get_state.mandatory = id
+user_get_state.filters = id,tenant
+user_get_state.mandatory = id,tenant
 
-vm_get_list.tenant = all
+vm_get_list.roles = admin
 vm_get_list.table = VM
 vm_get_list.order_by = id,name,state,host_id,user_id,osf_id,blocked
-vm_get_list.filters = name,user_id,osf_id,di_id,host_id
+vm_get_list.filters = name,user_id,osf_id,di_id,host_id,tenant
+vm_get_list.mandatory = tenant
 
-vm_get_details.tenant = all
+vm_get_details.roles = admin
 vm_get_details.table = VM
-vm_get_details.filters = id
-vm_get_details.mandatory = id
+vm_get_details.filters = id,tenant
+vm_get_details.mandatory = id,tenant
 
-vm_get_state.tenant = all
+vm_get_state.roles = admin
 vm_get_state.table = VM
-vm_get_state.filters = id
-vm_get_state.mandatory = id
+vm_get_state.filters = id,tenant
+vm_get_state.mandatory = id,tenant
 
-host_get_list.tenant = all
+host_get_list.roles = admin
 host_get_list.table = Host
 host_get_list.order_by = id,name,state,address,blocked
 host_get_list.filters = name,vm_id
 
-host_get_details.tenant = all
+host_get_details.roles = admin
 host_get_details.table = Host
 host_get_details.filters = id
-host_get_details.mandatory = id
 
-host_get_state.tenant = all
+host_get_state.roles = admin
 host_get_state.table = Host
 host_get_state.filters = id
-host_get_state.mandatory = id
 
-osf_get_list.tenant = all
+osf_get_list.roles = admin
 osf_get_list.table = OSF
 osf_get_list.order_by = id,name,overlay,memory,user_storage
-osf_get_list.filters = name,vm_id,di_id
+osf_get_list.filters = name,vm_id,di_id,tenant
+osf_get_list.mandatory = tenant
 
-osf_get_details.tenant = all
+osf_get_details.roles = admin
 osf_get_details.table = OSF
-osf_get_details.filters = id
-osf_get_details.mandatory = id
+osf_get_details.filters = id,tenant
+osf_get_details.mandatory = id,tenant
 
-di_get_list.tenant = all
+di_get_list.roles = admin
 di_get_list.table = DI
-di_get_list.filters = disk_image,osf_id
+di_get_list.filters = disk_image,osf_id,tenant
+di_get_list.mandatory = tenant
 
-di_get_details.tenant = all
+di_get_details.roles = admin
 di_get_details.table = DI
-di_get_details.filters = id
-di_get_details.mandatory = id
+di_get_details.filters = id,tenant
+di_get_details.mandatory = id,tenant

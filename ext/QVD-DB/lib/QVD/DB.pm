@@ -32,11 +32,6 @@ my $db_keepcnt         = core_cfg('internal.database.client.socket.keepcnt');
 sub new {
     my ($class,%parameters) = @_;
 
-    $db_user = $parameters{'user'} // core_cfg('database.user');
-    $db_passwd = $parameters{'password'} // core_cfg('database.password');
-    $db_host = $parameters{'host'} // core_cfg('database.host');
-    $db_name = $parameters{'database'} // core_cfg('database.name');
-
     $class->SUPER::connect("dbi:Pg:dbname=$db_name;host=$db_host;connect_timeout=$db_connect_timeout",
 			   $db_user, $db_passwd,
                            { RaiseError => 1,

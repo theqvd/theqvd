@@ -10,9 +10,7 @@ use Config::Properties;
 
 our $VERSION = '0.01';
 
-has 'database', is => 'ro', isa => 'Str', required => 1;
-has 'user', is => 'ro', isa => 'Str', required => 1;
-has 'host', is => 'ro', isa => 'Str', required => 1;
+has 'login', is => 'ro', isa => 'Str', required => 1;
 has 'password', is => 'ro', isa => 'Str', required => 1;
 
 my $DB;
@@ -21,11 +19,8 @@ sub BUILD
 {
     my $self = shift;
 
-    $DB = QVD::DB->new(database => $self->database,
-		       user     => $self->user,
-		       host     => $self->host,
-		       password => $self->password) // 
-			   die "Unknown database account";
+    $DB = QVD::DB->new() // 
+	die "Unable to connect to database";
 }
 
 sub _db { $DB; }
@@ -36,6 +31,16 @@ sub _exec
 
     my $method = $request->action;
     $self->$method($request);
+}
+
+sub get_credentials
+{
+    my $self = shift;
+
+    my $user = $DB->resultset('User')->find({ login => $self->login,
+					      password => $self->password});
+
+    { tenant => $user->tenant_id, role => $user->role->name };
 }
 
 ###############################
