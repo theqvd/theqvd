@@ -28,7 +28,8 @@ sub BUILD
 	die "No role specified in request";
 
     die "No permissions for this action"
-	unless exists $self->config->{roles}->{$self->json->{role}};
+	unless (exists $self->config->{roles}->{$self->json->{role}} ||
+		exists $self->config->{roles}->{'all'});
 
     $self->json->{filters}->{tenant} = $self->json->{tenant}
     if exists $self->config->{filters}->{tenant};

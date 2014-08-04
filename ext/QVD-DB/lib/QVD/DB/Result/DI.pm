@@ -3,7 +3,7 @@ use base qw/DBIx::Class/;
 
 __PACKAGE__->load_components(qw/Core/);
 __PACKAGE__->table('dis');
-__PACKAGE__->add_columns( 
+__PACKAGE__->add_columns( blocked      => { data_type         => 'boolean' },
 			  id     => { data_type => 'integer',
                                       is_auto_increment => 1 },
                           osf_id => { data_type => 'integer' },

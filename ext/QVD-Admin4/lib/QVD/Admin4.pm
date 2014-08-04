@@ -38,7 +38,8 @@ sub get_credentials
     my $self = shift;
 
     my $user = $DB->resultset('User')->find({ login => $self->login,
-					      password => $self->password});
+					      password => $self->password}) // 
+						  die "Bad login or password";
 
     { tenant => $user->tenant_id, role => $user->role->name };
 }

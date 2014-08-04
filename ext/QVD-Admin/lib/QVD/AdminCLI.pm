@@ -1496,7 +1496,7 @@ sub cmd_vm_list {
                 (defined $vm->di ? $vm->di->version : undef),
                 (defined $vmr->host ? $vmr->host->name : undef),
                 $vmr->vm_state,
-                (defined $vmr->l7r_host ? $vmr->l7r_host->name : undef),
+                undef, # (defined $vmr->l7r_host ? $vmr->l7r_host->name : undef), # FIXME: COMMENTED BECAUSE TRIGGERS ERROR WHEN ASKING DB
                 $vmr->user_state,
                 $vmr->blocked,
                 _utc2localtime($vmr->vm_expiration_soft),
