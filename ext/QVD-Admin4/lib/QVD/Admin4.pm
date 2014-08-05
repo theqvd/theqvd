@@ -52,11 +52,14 @@ sub user_get_list
 {
     my ($self,$request) = @_;
     my $result = $self->select($request);
+    my @query = ('vms',{'vm_runtime.user_state' => 'connected'},{join => [qw(vm_runtime)]});
 
     $_ = { id => $_->id, 
-	   login => $_->login, 
+	   name => $_->login, 
 	   blocked => undef,
-	   '#vms'  => $_->vms->count  } for @{$result->{rows}};
+	   '#vms'  => $_->vms->count,
+	   '#vms_connected' => $_->search_related(@query)->count,
+	   $self->add_custom($request,$_)} for @{$result->{rows}};
     
     $result;
 }
@@ -65,12 +68,14 @@ sub user_get_details
 {
     my ($self,$request) = @_;
     my $result = $self->select($request);
+    my @query = ('vms',{'vm_runtime.user_state' => 'connected'},{join => [qw(vm_runtime)]});
 
     $_ = { id => $_->id, 
-	   login => $_->login, 
+	   name => $_->login, 
 	   blocked => undef,
 	   creation_admin => undef,
 	   creation_date => undef,
+	   '#vms_connected' => $_->search_related(@query)->count,
 	   $self->add_custom($request,$_) } for  @{$result->{rows}};
 
     $result;
@@ -103,10 +108,12 @@ sub vm_get_list
 	   di_version => undef,
 	   blocked => $_->vm_runtime->blocked,
 	   expiration_soft => $_->vm_runtime->vm_expiration_soft,
-	   expiration_hard => $_->vm_runtime->vm_expiration_hard } for @{$result->{rows}};
+	   expiration_hard => $_->vm_runtime->vm_expiration_hard,
+	   $self->add_custom($request,$_) } for @{$result->{rows}};
 
     $result;
 }
+
 
 
 sub vm_get_details
@@ -159,7 +166,8 @@ sub host_get_list
     $_ = { id => $_->id, 
 	   name => $_->name,
 	   address => $_->address,
-	   blocked => $_->runtime->blocked } for @{$result->{rows}};
+	   blocked => $_->runtime->blocked,
+	   $self->add_custom($request,$_) } for @{$result->{rows}};
 
     $result;
 }
@@ -205,7 +213,8 @@ sub osf_get_list
 	   memory => $_->memory,
 	   user_storage => $_->user_storage_size,
 	   '#vms' => $_->vms->count,
-           '#dis' => $_->dis->count } for @{$result->{rows}};
+           '#dis' => $_->dis->count,
+	   $self->add_custom($request,$_) } for @{$result->{rows}};
 
     $result;
 }
@@ -237,7 +246,8 @@ sub di_get_list
 	   osf_id => $_->osf_id,
 	   osf_name => $self->_find('OSF','id',$_->osf_id,'name'),
 	   blocked => undef,
-	   tags => [ map { { $_->get_columns } } $_->tags ] } for @{$result->{rows}};
+	   tags => [ map { { $_->get_columns } } $_->tags ],
+	   $self->add_custom($request,$_)} for @{$result->{rows}};
 
     $result;
 }
@@ -275,6 +285,7 @@ sub _find
 sub select
 {
     my ($self,$request) = @_;
+
     my $rs = $DB->resultset($request->table)->search($request->filters,
 						     $request->modifiers);
 
@@ -374,7 +385,9 @@ sub add_custom
 {
     my ($self,$request,$obj) = @_;
 
-    (map { $_ => $obj->properties->find({key => $_})->value } @{$request->customs});
+    ( properties => { map {  $_->key => $_->value  } $obj->properties->all });
+
+#    (map { $_ => $obj->properties->find({key => $_})->value } @{$request->customs});
 } 
 
 

@@ -26,7 +26,7 @@ sub BUILD
 __DATA__
 
 id             = me.id
-login          = me.login
+name           = me.login
 password       = me.password
 blocked        = me.blocked
 creation_admin = NULL

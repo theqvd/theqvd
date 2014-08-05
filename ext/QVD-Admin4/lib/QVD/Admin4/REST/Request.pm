@@ -7,6 +7,7 @@ has 'db',        is => 'ro', isa => 'QVD::DB',  required => 1;
 has 'json',      is => 'ro', isa => 'HashRef',  required => 1;
 has 'config',    is => 'ro', isa => 'HashRef',  required => 1;
 has 'mapper',    is => 'ro', isa => 'Config::Properties';
+has 'free', is => 'ro', isa => 'HashRef',  default => sub { {}; };
 has 'modifiers', is => 'ro', isa => 'HashRef',  default => sub { {}; };
 has 'customs',   is => 'ro', isa => 'ArrayRef',  default => sub { []; };
 has 'defaults',  is => 'ro', isa => 'HashRef',  default => sub { {}; };
@@ -19,6 +20,7 @@ sub BUILD
     $self->config->{arguments} //= {};
     $self->config->{filters} //= {};
     $self->config->{mandatory} //= {};
+    $self->config->{free} //= {};
     $self->config->{order_by} //= [];
 
     $self->json->{tenant} || 
@@ -66,8 +68,16 @@ sub filters
     for my $filter (keys %{$self->json->{filters}})
     {
 	my $mfil = $self->mapper->getProperty($filter) // 
-	    die "No map for $filter: $!"; 
-	$filters->{$mfil} = $self->json->{filters}->{$filter};
+	    die "No map for $filter: $!";
+
+	if ($self->config->{free}->{$filter})
+	{
+	    $filters->{$mfil} = { like => "%".$self->json->{filters}->{$filter}."%"};
+	}
+	else
+	{
+	    $filters->{$mfil} = $self->json->{filters}->{$filter};
+	}
     }
     $filters;
 }

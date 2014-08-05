@@ -5,17 +5,11 @@ use QVD::Admin4::REST;
 use Mojo::JSON qw(decode_json encode_json);
 
 app->secrets(['QVD']);
-my $REST;
+my $REST = QVD::Admin4::REST->new();
 
-helper (_rest => sub { $REST //= QVD::Admin4::REST->new(); });
+app->config(hypnotoad => {listen => ['http://192.168.3.4:3000']});
+helper (_rest => sub { $REST; });
 
-any '/wat' => sub {
-
-    my $c = shift;
-    $c->render('index');
-
-};
- 
 under sub {
 
     my $c = shift;
@@ -37,6 +31,7 @@ any '/' => sub {
 
     my $filters = delete $json->{filters};
     $json->{filters} = decode_json($filters) if $filters;
+    $c->res->headers->header('Access-Control-Allow-Origin' => '*');
     $c->render(json => $c->_rest->_admin($json));
 };
 

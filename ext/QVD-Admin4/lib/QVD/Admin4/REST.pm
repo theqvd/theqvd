@@ -36,8 +36,8 @@ sub _admin
 {
    my ($self,$json) = @_;
 
-   $QVD_ADMIN //= QVD::Admin4->new(login => $json->{login}, 
-				  password => $json->{password});
+#   $QVD_ADMIN //= QVD::Admin4->new(login => $json->{login}, 
+#				  password => $json->{password});
 
    my $result = eval { $QVD_ADMIN->_exec($self->get_request($json)) } // {};
    my $response = QVD::Admin4::REST::Response->new(message    => ($@ ? "$@" : ""),
@@ -74,6 +74,9 @@ sub load_actions
 
 	$params->{mandatory} = { map { $_ => 1 } (split ',', $params->{mandatory})} 
 	if $params->{mandatory};
+
+	$params->{free} = { map { $_ => 1 } (split ',', $params->{free})} 
+	if $params->{free};
 	
 	$params->{arguments} = { map { $_ => 1 } (split ',', $params->{arguments})} 
 	if $params->{arguments};
@@ -94,11 +97,12 @@ sub load_actions
 
 __DATA__
 
-user_get_list.roles = all
+user_get_list.roles = superadmin,admin
 user_get_list.table = User
-user_get_list.order_by = id,login,blocked
-user_get_list.filters = login,tenant
+user_get_list.order_by = id,name,blocked
+user_get_list.filters = name,tenant
 user_get_list.mandatory = tenant
+user_get_list.free = name
 
 user_get_details.roles = all
 user_get_details.table = User
@@ -115,6 +119,7 @@ vm_get_list.table = VM
 vm_get_list.order_by = id,name,state,host_id,user_id,osf_id,blocked
 vm_get_list.filters = name,user_id,osf_id,di_id,host_id,tenant
 vm_get_list.mandatory = tenant
+vm_get_list.free = name
 
 vm_get_details.roles = all
 vm_get_details.table = VM
@@ -130,6 +135,7 @@ host_get_list.roles = all
 host_get_list.table = Host
 host_get_list.order_by = id,name,state,address,blocked
 host_get_list.filters = name,vm_id
+host_get_list.free = name
 
 host_get_details.roles = all
 host_get_details.table = Host
@@ -144,6 +150,7 @@ osf_get_list.table = OSF
 osf_get_list.order_by = id,name,overlay,memory,user_storage
 osf_get_list.filters = name,vm_id,di_id,tenant
 osf_get_list.mandatory = tenant
+osf_get_list.free = name
 
 osf_get_details.roles = all
 osf_get_details.table = OSF
@@ -154,6 +161,7 @@ di_get_list.roles = all
 di_get_list.table = DI
 di_get_list.filters = disk_image,osf_id,tenant
 di_get_list.mandatory = tenant
+di_get_list.free = disk_image
 
 di_get_details.roles = all
 di_get_details.table = DI
