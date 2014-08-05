@@ -101,7 +101,7 @@ sub vm_get_list
 	   name => $_->name,
 	   host_id => $_->vm_runtime->host_id,
 	   user_id => $_->user_id,
-	   user_login => $self->_find('User','id',$_->user_id,'login'),
+	   user_name => $self->_find('User','id',$_->user_id,'login'),
 	   osf_id => $_->osf_id,
 	   osf_name => $self->_find('OSF','id',$_->osf_id,'name'),
 	   di_tag => $_->di_tag,
@@ -123,6 +123,8 @@ sub vm_get_details
 
     $_ = { id => $_->id, 
 	   name => $_->name,
+	   user_id => $_->user_id,
+	   user_name => $self->_find('User','id',$_->user_id,'login'),
 	   osf_id => $_->osf_id,
 	   osf_name => $self->_find('OSF','id',$_->osf_id,'name'),
 	   di_tag => $_->di_tag,
