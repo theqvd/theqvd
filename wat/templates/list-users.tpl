@@ -17,35 +17,40 @@
                             break;
                         case 'info':
             %>
-                            <th class="cacheable max-2-icons" data-i18n="info">
-                                <%= getCached('info', cache) %>
+                            <th class="cacheable max-2-icons" data-i18n="Info">
+                                <%= getCached('Info', cache) %>
                             </th>
             <%
                             break;
                         case 'id':
             %>
-                            <th class="cacheable sortable desktop" data-i18n="id">
-                                <%= getCached('id', cache) %>
+                            <th class="cacheable sortable desktop" data-i18n="Id">
+                                <%= getCached('Id', cache) %>
                             </th>
             <%
                             break;
                         case 'name':
             %>
-                            <th class="cacheable sortable" data-sortby="name" data-i18n="name">
-                                <%= getCached('name', cache) %>
+                            <th class="cacheable sortable" data-sortby="name" data-i18n="Name">
+                                <%= getCached('Name', cache) %>
                             </th>
             <%
                             break;
                         case 'started_vms':
             %>
-                            <th class="cacheable sortable desktop" data-sortby="started_vms" data-i18n="started_vms">
-                                <%= getCached('started_vms', cache) %>
+                            <th class="cacheable sortable desktop" data-sortby="started_vms" data-i18n="Started VMs">
+                                <%= getCached('Started VMs', cache) %>
                             </th>
             <%
                             break;
                         default:
+                            var translationAttr = 'data-i18n="' + col.name + '"';
+                            if (col.noTranslatable === true) {
+                                translationAttr = '';
+                            }
+                    
             %>
-                            <th class="cacheable sortable desktop" data-sortby="<%= col.name %>" data-i18n="<%= col.name %>">
+                            <th class="cacheable sortable desktop" data-sortby="<%= col.name %>" <%= translationAttr %>>
                                 <%= col.name %>
                             </th>
             <%
@@ -108,14 +113,22 @@
                                 <td class="desktop">
                                     <%= model.get('startedVMs') %>
                                     /
-                                    <%= model.get('nVMs') %>
+                                    <%= model.get('#vms') %>
                                 </td>
                 <%
                                 break;
                             default:
                 %>
                                 <td class="desktop">
-                                    <%= model.get(col.name) %>
+                                    <% 
+                                        if (model.get(col.name) !== undefined) {
+                                            print(model.get(col.name));
+                                        }
+                                        else if (model.get('properties') !== undefined && model.get('properties')[col.name] !== undefined) {
+                                            print(model.get('properties')[col.name]);
+                                        }
+                                    
+                                    %>
                                 </td>
                 <%
                                 break;

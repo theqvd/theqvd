@@ -44,3 +44,12 @@
         display: none;
     }
 }
+
+%no-outline {
+    outline-width: 0;
+    outline: none;
+    -moz-outline: none;
+    -moz-user-focus: ignore;
+    box-shadow: 0;
+    border: 0;
+}

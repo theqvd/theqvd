@@ -17,43 +17,43 @@
                             break;
                         case 'info':
             %>
-                            <th class="cacheable max-3-icons" data-i18n="info">
-                                <%= getCached('info', cache) %>
+                            <th class="cacheable max-3-icons" data-i18n="Info">
+                                <%= getCached('Info', cache) %>
                             </th>
             <%
                             break;
                         case 'id':
             %>
-                            <th class="cacheable sortable desktop" data-i18n="id">
-                                <%= getCached('id', cache) %>
+                            <th class="cacheable sortable desktop" data-i18n="Id">
+                                <%= getCached('Id', cache) %>
                             </th>
             <%
                             break;
                         case 'name':
             %>
-                            <th class="cacheable sortable" data-sortby="name" data-i18n="name">
-                                <%= getCached('name', cache) %>
+                            <th class="cacheable sortable" data-sortby="name" data-i18n="Name">
+                                <%= getCached('Name', cache) %>
                             </th>
             <%
                             break;
                         case 'node':
             %>
-                            <th class="cacheable sortable desktop" data-sortby="node" data-i18n="node">
-                                <%= getCached('node', cache) %>
+                            <th class="cacheable sortable desktop" data-sortby="node" data-i18n="Node">
+                                <%= getCached('Node', cache) %>
                             </th>
             <%
                             break;
                         case 'user':
             %>
-                            <th class="cacheable sortable desktop" data-sortby="user" data-i18n="user">
-                                <%= getCached('user', cache) %>
+                            <th class="cacheable sortable desktop" data-sortby="user" data-i18n="User">
+                                <%= getCached('User', cache) %>
                             </th>
             <%
                             break;
                         case 'osf/tag':
             %>
-                            <th class="cacheable sortable desktop" data-sortby="osf" data-i18n="osf/tag">
-                                <%= getCached('osf/tag', cache) %>
+                            <th class="cacheable sortable desktop" data-sortby="osf" data-i18n="OSF / Tag">
+                                <%= getCached('OSF / Tag', cache) %>
                             </th>
             <%
                             break;
@@ -93,7 +93,7 @@
                                     <% 
                                     if (model.get('blocked')) {
                                     %>
-                                        <i class="fa fa-pause icon-pause" hover-title="title.stoppedvm"></i>
+                                        <i class="fa fa-pause icon-pause" title="Stopped Virtual machine"></i>
                                         <i class="fa fa-warning icon-warning"></i>
                                         <i class="fa fa-lock"></i>
                                     <%
@@ -128,7 +128,7 @@
                 %>
                                 <td class="desktop">
                                     <a href="#">
-                                        <%= model.get('node') %>
+                                        <%= model.get('host_name') %>
                                     </a>
                                 </td>
                 <%
@@ -136,8 +136,8 @@
                             case 'user':
                 %>
                                 <td class="desktop">
-                                    <a href="#">
-                                        <%= model.get('user') %>
+                                    <a href="#/user/<%= model.get('user_id') %>">
+                                        <%= model.get('user_name') %>
                                     </a>
                                 </td>
                 <%
@@ -145,8 +145,8 @@
                             case 'osf/tag':
                 %>
                                 <td class="desktop">
-                                    <a href="#">
-                                        <%= model.get('osf') %>
+                                    <a href="#/osf/<%= model.get('osf_id') %>">
+                                        <%= model.get('osf_name') %>
                                     </a>
                                     <div class="second_row">
                                         <%= model.get('di_version') %>

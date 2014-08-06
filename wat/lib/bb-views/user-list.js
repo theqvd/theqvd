@@ -1,34 +1,59 @@
 var UserListView = ListView.extend({
     listTemplateName: 'list-users',
-    
+    editorTemplateName: 'creator-user',
     sortedAscUrl: 'json/list_users.json',
-    
     sortedDescUrl: 'json/list_users_inv.json',
     
     breadcrumbs: {
-        'screen': 'home',
+        'screen': 'Home',
         'link': '#/home',
         'next': {
-            'screen': 'users_list'
+            'screen': 'User list'
         }
     },
     
-    filters: [
+    formFilters: [
         {
-            'name': 'free_search',
+            'name': 'name',
+            'filterField': 'name',
             'type': 'text',
-            'label': 'tFilter.search_by_name'
+            'label': 'Search by name',
+            'mobile': true
+        }   ,     
+        {
+            'name': 'world',
+            'filterField': 'world',
+            'type': 'text',
+            'label': 'world',
+            'noTranslatable': true
         }
     ],
 
     initialize: function (params) {
-        this.collection = new Users();
+        if(params === undefined) {
+            params = {};
+        }
+        params.blocked = params.elementsBlock || this.elementsBlock;
+        params.offset = this.elementsOffset;
+        
+        this.collection = new Users(params);
         
         this.setColumns();
         this.setSelectedActions();
         this.setListActionButton();
+        
+        // Extend the common lists events
+        this.events = _.extend(this.events, this.eventsUsers);
 
         ListView.prototype.initialize.apply(this, [params]);
+    },
+    
+    eventsUsers: {
+        'click [name="new_user_button"]': 'newElement'
+    },
+    
+    editorDialogTitle: function () {
+        return $.i18n.t('New user');
     },
     
     setColumns: function () {
@@ -54,12 +79,9 @@ var UserListView = ListView.extend({
                 'display': true
             },
             {
-                'name': 'Office',
-                'display': true
-            },
-            {
-                'name': 'Table',
-                'display': true
+                'name': 'world',
+                'display': true,
+                'noTranslatable': true
             }
         ];
     },
@@ -68,28 +90,33 @@ var UserListView = ListView.extend({
         this.selectedActions = [
             {
                 'value': 'block',
-                'text': 'tSelect.block'
+                'text': 'Block'
             },
             {
                 'value': 'unblock',
-                'text': 'tSelect.unblock'
+                'text': 'Unblock'
             },
             {
                 'value': 'disconnect_all',
-                'text': 'tSelect.disconnect_from_all_vms'
+                'text': 'Disconnect from all VMs'
             },
             {
                 'value': 'delete',
-                'text': 'tSelect.delete'
+                'text': 'Delete'
             }
         ];
     },
     
     setListActionButton: function () {
         this.listActionButton = {
-            'name': 'new_item_button',
-            'value': 'tButton.new_user',
-            'link': '#'
+            'name': 'new_user_button',
+            'value': 'New user',
+            'link': 'javascript:'
         }
     },
+    
+    newElement: function () {
+        this.model = new User();
+        this.editElement();
+    }
 });

@@ -57,18 +57,6 @@ input, .button, .button2 {
     line-height: 18px;
 }
 
-input[type="checkbox"], input[type="radio"] {
-    width: 18px;
-    height: 18px;
-
-    @include in(desktop) {
-        width: 14px;
-        height: 14px;
-    }
-
-}
-
-
 select, input, .button, .button2 {
     border-radius: $form_elements_radius;
     border-style: solid;
@@ -79,6 +67,20 @@ select, input, .button, .button2 {
             box-shadow: inset 1px 1px 1px 0px #dddddd;
     font-size: x-small;
 }
+
+input[type="checkbox"], input[type="radio"] {
+    width: 18px;
+    height: 18px;
+    box-shadow: none;
+    border-width: 0;
+    
+    @include in(desktop) {
+        width: 14px;
+        height: 14px;
+    }
+
+}
+
 
 
 // Chosen controls styles

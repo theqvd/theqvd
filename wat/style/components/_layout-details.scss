@@ -46,22 +46,66 @@
     }
 }
 
-.custom-props-container { 
-    padding-left: 30px;
-}
-
 .details-block {
     @include in(desktop) {
         float: right;
         width: ($width_details_content) * 1%;
+    }        
+    
+    .details-list {
+        @include in(desktop) {
+            width: 40%;
+        }
     }
     
-    table.custom-props {
-        td:first-child {
+    .details-item {
+        font-size: 13px;
+        font-weight: normal;
+
+        .indented-data {
+            font-size: 14px;
             font-weight: bold;
-            white-space: nowrap;
-            width: 1%;
-            min-width: 120px;
+
+            margin-left: 14px;
+            margin-top: 6px;
+            margin-bottom: 20px;
+            div {
+                margin-bottom: 10px;
+            }
         }
+    }
+        
+    .custom-props-container {
+        @include in(desktop) {
+            position: absolute;
+            top: 30px;
+            right: 0;
+            width: $other_properties_width * 1%;
+        }
+
+        table.custom-props {
+            width: auto;
+            
+            td:first-child {
+                font-weight: normal;
+                white-space: nowrap;
+                width: 1%;
+                padding-right: 15px;
+            }
+        }
+    }
+    
+    position: relative;
+}
+
+// Virtual machines
+
+.remote_administration-buttons {
+    margin: 25px auto;
+    
+    a {
+        width: 50%;
+        display: block;
+        margin: 10px auto;
     }
 }

@@ -1,4 +1,4 @@
-<table class="editor-table-common">
+<table>
     <tr>
         <td data-i18n="change_password"></td>
         <td>
@@ -8,13 +8,13 @@
     <tr class="hidden new_password_row">
         <td data-i18n="new_password"></td>
         <td>
-            <input type="text" name="password" value="">
+            <input type="password" name="password" value="">
         </td>
     </tr>
     <tr class="hidden new_password_row">
         <td data-i18n="retype_new_password"></td>
         <td>
-            <input type="text" name="password2" value="">
+            <input type="password" name="password2" value="">
         </td>
     </tr>
  </table>

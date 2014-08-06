@@ -2,7 +2,7 @@ var ListView = MainView.extend({
     sortedBy: '',
     sortedMode: '',
     selectedActions: {},
-    filters: {},
+    formFilters: {},
     columns: [],
     elementsShown: '',
     elementsBlock: 10,
@@ -50,6 +50,9 @@ var ListView = MainView.extend({
             }            
             if (params.forceListActionButton !== undefined) {
                 this.listActionButton = params.forceListActionButton;
+            }            
+            if (params.elementsBlock !== undefined) {
+                this.elementsBlock = params.elementsBlock;
             }
             if (params.forceListColumns !== undefined) {
                 var that = this;
@@ -75,7 +78,12 @@ var ListView = MainView.extend({
     
     events: {
         'click th.sortable': 'sort',
-        'click input[class="check_all"]': 'checkAll'
+        'click input[class="check_all"]': 'checkAll',
+        'click .first': 'paginationFirst',
+        'click .prev': 'paginationPrev',
+        'click .next': 'paginationNext',
+        'click .last': 'paginationLast',
+        'click a[name="filter_button"]': 'filter'
     },
 
     sort: function (e) {
@@ -113,6 +121,43 @@ var ListView = MainView.extend({
             }
         });
     },
+    
+    filter: function () {
+        if ($.isEmptyObject(this.cache.stringsCache)) {
+            this.activeCache(this.cache);
+        }
+        
+        var filtersContainer = '.' + this.cid + ' .filter';
+        var filters = {};
+        $.each(this.formFilters, function(index, filter) {
+            var filterControl = $(filtersContainer + ' [name="' + filter.name + '"]');
+            
+            // If input text box is empty or selected option in a select is All (-1) skip filter control
+            switch(filter.type) {
+                case 'select':
+                    if (filterControl.val() == '-1') {
+                        return true;
+                    }
+                    break;
+                case 'text':
+                    if (filterControl.val() == '') {
+                        return true;
+                    }
+                    break;
+            }
+            
+            filters[filterControl.attr('data-filter-field')] = filterControl.val();
+        });
+        
+        this.collection.setFilters(filters);
+        var that = this;
+        this.collection.fetch({      
+            complete: function () {
+                that.renderList(that.listContainer);
+                addSortIcons(that);
+            }
+        });
+    },
 
     checkAll: function (e) {
         if ($(e.target).is(":checked")) {
@@ -142,7 +187,8 @@ var ListView = MainView.extend({
         // Fill the html with the template and the collection
         var template = _.template(
             this.templateListCommonList, {
-                filters: this.filters
+                formFilters: this.formFilters,
+                cid: this.cid
             });
         
         $(this.el).html(template);
@@ -157,17 +203,20 @@ var ListView = MainView.extend({
         // Fill the list
         var template = _.template(
             this.templateListCommonBlock, {
-                filters: this.filters,
+                formFilters: this.formFilters,
                 selectedActions: this.selectedActions,
-                listActionButton: this.listActionButton
+                listActionButton: this.listActionButton,
+                cid: this.cid
             }
         );
 
         $(this.listBlockContainer).html(template);
         
-        this.updatePagination();
+        this.paginationUpdate();
         
         this.renderList();
+                this.translate();
+
     },    
     
     renderList: function () {        
@@ -182,27 +231,31 @@ var ListView = MainView.extend({
         );
 
         $(this.listContainer).html(template);
-        this.updatePagination();
+        this.paginationUpdate();
+        
     },
     
     loadFilters: function () {
         var that = this;
-        $.each(this.filters, function(index, filter) {
+        $.each(this.formFilters, function(index, filter) {
             if (filter.type == 'select' && filter.fillable) {
-                var jsonUrl = 'json/tiny_list_' + filter.name + 's.json';
-
+                var jsonUrl = 'http://172.20.126.12:3000/?login=benja&password=benja&action=' + filter.name + '_tiny_list';
                 $.ajax({
                     url: jsonUrl,
-                    method: 'GET',
+                    type: 'POST',
                     async: false,
-                    contentType: 'json',
+                    dataType: 'json',
+                    processData: false,
+                    parse: true,
                     success: function (data) {
-                        $(data).each(function(i,option) {
+                        $(data.result.rows).each(function(i,option) {
                             var selected = '';
                             if (that.listFilter[filter.name] !== undefined && that.listFilter[filter.name] == option.id) {
                                 selected = 'selected="selected"';
                             }
-                            $('select[name="' + filter.name + '"]').append('<option value="' + option.id + '" ' + selected + '>' + option.name + '<\/option>');
+                            $('select[name="' + filter.name + '"]').append('<option value="' + option.id + '" ' + selected + '>' + 
+                                                                           option.name + 
+                                                                           '<\/option>');
                         });
                     }
                 });
@@ -210,12 +263,82 @@ var ListView = MainView.extend({
         });
     },
     
-    updatePagination: function () {
+    paginationUpdate: function () {        
         this.elementsShown = this.collection.length;
         var totalPages = Math.ceil(this.collection.elementsTotal/this.elementsBlock);
         var currentPage = this.elementsOffset;
         
         $('.pagination_current_page').html(currentPage);
         $('.pagination_total_pages').html(totalPages);
+    },
+
+    paginationNext: function (e) {
+        this.paginationMove($(e.target), 'next');
+    },
+
+    paginationPrev: function (e) {
+        this.paginationMove($(e.target), 'prev');
+    },
+
+    paginationFirst: function (e) {
+        this.paginationMove($(e.target), 'first');
+    },
+
+    paginationLast: function (e) {
+        this.paginationMove($(e.target), 'last');
+    },
+    
+    paginationMove: function (context, dir) {
+        if ($.isEmptyObject(this.cache.stringsCache)) {
+            this.activeCache(this.cache);
+        }
+        
+        var totalPages = Math.ceil(this.collection.elementsTotal/this.elementsBlock);
+        var currentPage = this.elementsOffset;
+        
+        // Check if the current page is first or last one to avoid out of limits situation
+        switch (dir) {
+            case 'first':
+            case 'prev':
+                // Check if the current page is the first one
+                if (currentPage == 1) {
+                    return;
+                }
+                break;
+            case 'next':
+            case 'last':
+                if (currentPage == totalPages) {
+                    return;
+                }
+                break;
+        }
+        
+        // Make pagination move
+        switch (dir) {
+            case 'first':
+                this.elementsOffset = 1;
+                break;
+            case 'prev':
+                this.elementsOffset--;
+                break;
+            case 'next':
+                this.elementsOffset++;
+                break;
+            case 'last':
+                this.elementsOffset = totalPages;
+                break;
+        }
+
+        context.find('.pagination_current_page').html(this.elementsOffset);
+        
+        this.collection.offset = this.elementsOffset;
+        
+        var that = this;
+        this.collection.fetch({      
+            complete: function () {
+                that.renderList(that.listContainer);
+                addSortIcons(that);
+            }
+        });
     }
 });

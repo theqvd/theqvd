@@ -1,26 +1,42 @@
 <%
-var customProps = model.get('customProps');
+var properties = model.get('properties');
 %>
 
-<div class="wrapper-content">
+<div class="wrapper-content <%= cid %>">
     <div class="details-side bb-details-side js-side">
     </div>
     <div class="details-block">
-        <div class="bb-details"></div>
+        <div class="bb-details details"></div>
         <div class="custom-props-container">
-            <table class="custom-props">
-                <tbody>
-                    <% _.each(customProps, function(val, key) { %>
-                        <tr>
-                            <td data-i18n><%= key %></td>
-                            <td>
-                                <%= val %>
-                            </td>
-                        </tr>
-                    <% }); %>
+            <span class="details-item fa fa-angle-right">
+                <span data-i18n>Other properties</span>
+                <%
+                if (jQuery.isEmptyObject(properties)) {
+                %>
+                <div class="indented-data" data-i18n>no_properties_found</div>
+                <%
+                }
+                else {
+                %>
+                    <table class="custom-props indented-data">
+                        <tbody>
+                            <% _.each(properties, function(val, key) { %>
+                                <tr>
+                                    <td><%= key %></td>
+                                    <td>
+                                        <%= val %>
+                                    </td>
+                                </tr>
+                            <% }); %>
 
-                </tbody>
-            </table>
+                        </tbody>
+                    </table>
+
+                <%
+                }
+                %>
+            </span>
+
         </div>
     </div>
 </div>

@@ -75,3 +75,22 @@ fieldset {
     color: lighten($col_blacker, 40);
     margin-bottom: 14px;
 }
+
+.not-selectable {
+    @extend %not-selectable;
+}
+
+.center {
+    text-align: center;
+}
+
+// States
+.ok {
+    color: darken($col_green, 10);
+}
+.warning {
+    color: darken($col_yellow, 10);
+}
+.error {
+    color: darken($col_red, 10);
+}

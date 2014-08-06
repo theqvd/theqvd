@@ -47,10 +47,66 @@
 }
 
 .ui-widget-overlay {
-    position: absolute;
+    position: fixed;
     top: 0;
     left: 0;
-    width: 100%;
-    height: 100%;
+    width: 100vw;
+    height: 100vh;
     z-index: 1001;
 }
+
+.ui-widget-content {
+    background: $col_whiter;
+}
+
+.ui-dialog {
+    top: 50px !important;
+    overflow-y: auto;
+    padding: 1px;
+    margin-bottom: 50px;
+    
+    width: $dialog_mobile_width !important;
+    height: $dialog_mobile_height !important;
+
+    @include in(desktop) {
+        width: $dialog_width !important;
+        height: $dialog_height !important;
+        height: auto !important;
+    }
+    
+    td {
+        display: block;
+        padding-bottom: 5px;
+
+        @include in(desktop) {
+            display: table-cell;
+            //padding-bottom: 0px;
+        }
+        
+        input[type="text"], input[type="password"] {
+            width: 100%;
+            @include in(desktop) {
+                width: auto;
+            }
+        }
+        
+        &:first-child {
+            @include in(desktop) {
+                text-align: right;
+                width: 120px;
+                white-space: nowrap;
+            }
+        }       
+        
+        &:last-child {
+            input[type="text"], input[type="password"] {
+                @include in(desktop) {
+                   width: 100%;
+                }
+            }
+        }
+    }
+    
+    @extend %no-outline;
+}
+

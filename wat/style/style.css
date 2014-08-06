@@ -12,7 +12,7 @@
   padding-left: 20px;
   padding-right: 20px; }
 
-.menu > ul .menu-option, a.button, button.button, a.button2, button.button2, table.list th, table.custom-props th, .ui-dialog .ui-state-hover, .ui-dialog .ui-state-focus {
+.not-selectable, .menu > ul .menu-option, a.button, button.button, a.button2, button.button2, table.list th, table.custom-props th, .ui-dialog .ui-state-hover, .ui-dialog .ui-state-focus {
   -webkit-touch-callout: none;
   -webkit-user-select: none;
   -khtml-user-select: none;
@@ -23,6 +23,14 @@
 .menu-corner, .header-wrapper, .wrapper, .wrapper .menu, .wrapper .breadcrumbs, .wrapper .content, .footer {
   visibility: hidden; }
 
+
+*:focus, .ui-dialog {
+  outline-width: 0;
+  outline: none;
+  -moz-outline: none;
+  -moz-user-focus: ignore;
+  box-shadow: 0;
+  border: 0; }
 
 /* INCLUDED: mixins */
 /********************************************************************
@@ -72,13 +80,6 @@ table {
 *, *::after, *::before {
   box-sizing: border-box; }
 
-*:focus {
-  outline-width: 0;
-  outline: none;
-  -moz-outline: none;
-  -moz-user-focus: ignore;
-  box-shadow: 0;
-  border: 0; }
 
 :focus {
   box-shadow: 1 1 1px 0px #f36d15; }
@@ -140,6 +141,19 @@ fieldset {
   font-size: 14px;
   color: #888888;
   margin-bottom: 14px; }
+
+
+.center {
+  text-align: center; }
+
+.ok {
+  color: #009900; }
+
+.warning {
+  color: #ccaa00; }
+
+.error {
+  color: #cc0000; }
 
 /********************************************************************
 *********************************************************************
@@ -272,6 +286,10 @@ td i.fa-lock, td i.fa-unlock {
   vertical-align: bottom;
   height: 18px; }
 
+.fa-centered {
+  width: 100%;
+  text-align: center; }
+
 /********************************************************************
 *********************************************************************
 *********************************************************************
@@ -318,14 +336,6 @@ input, .button, .button2 {
   padding: 4px 8px;
   line-height: 18px; }
 
-input[type="checkbox"], input[type="radio"] {
-  width: 18px;
-  height: 18px; }
-  @media screen and (min-width: 40em) {
-    input[type="checkbox"], input[type="radio"] {
-      width: 14px;
-      height: 14px; } }
-
 select, input, .button, .button2 {
   border-radius: 4px;
   border-style: solid;
@@ -335,6 +345,16 @@ select, input, .button, .button2 {
   -moz-box-shadow: inset 1px 1px 1px 0px #dddddd;
   box-shadow: inset 1px 1px 1px 0px #dddddd;
   font-size: x-small; }
+
+input[type="checkbox"], input[type="radio"] {
+  width: 18px;
+  height: 18px;
+  box-shadow: none;
+  border-width: 0; }
+  @media screen and (min-width: 40em) {
+    input[type="checkbox"], input[type="radio"] {
+      width: 14px;
+      height: 14px; } }
 
 .chosen-container {
   font-size: 12px; }
@@ -602,7 +622,7 @@ body {
     .wrapper .content .details-side {
       display: none;
       margin-bottom: 15px;
-      width: 43%;
+      width: 38%;
       height: auto;
       float: right;
       padding-left: 2%;
@@ -618,17 +638,45 @@ body {
         display: block; }
         .wrapper .content .details-list .details-item:before, .wrapper .content .details-list .details-item i:before, .wrapper .content .custom-props-container .details-item:before, .wrapper .content .custom-props-container .details-item i:before {
           margin-right: 5px; }
-    .wrapper .content .custom-props-container {
-      padding-left: 30px; }
-    @media screen and (min-width: 40em) {
-      .wrapper .content .details-block {
-        float: right;
-        width: 55%; } }
-    .wrapper .content .details-block table.custom-props td:first-child {
-      font-weight: bold;
-      white-space: nowrap;
-      width: 1%;
-      min-width: 120px; }
+    .wrapper .content .details-block {
+      position: relative; }
+      @media screen and (min-width: 40em) {
+        .wrapper .content .details-block {
+          float: right;
+          width: 60%; } }
+      @media screen and (min-width: 40em) {
+        .wrapper .content .details-block .details-list {
+          width: 40%; } }
+      .wrapper .content .details-block .details-item {
+        font-size: 13px;
+        font-weight: normal; }
+        .wrapper .content .details-block .details-item .indented-data {
+          font-size: 14px;
+          font-weight: bold;
+          margin-left: 14px;
+          margin-top: 6px;
+          margin-bottom: 20px; }
+          .wrapper .content .details-block .details-item .indented-data div {
+            margin-bottom: 10px; }
+      @media screen and (min-width: 40em) {
+        .wrapper .content .details-block .custom-props-container {
+          position: absolute;
+          top: 30px;
+          right: 0;
+          width: 50%; } }
+      .wrapper .content .details-block .custom-props-container table.custom-props {
+        width: auto; }
+        .wrapper .content .details-block .custom-props-container table.custom-props td:first-child {
+          font-weight: normal;
+          white-space: nowrap;
+          width: 1%;
+          padding-right: 15px; }
+    .wrapper .content .remote_administration-buttons {
+      margin: 25px auto; }
+      .wrapper .content .remote_administration-buttons a {
+        width: 50%;
+        display: block;
+        margin: 10px auto; }
 
 .editor-container {
   margin: 10px 20px; }
@@ -678,11 +726,11 @@ body {
 
 .dialog-container-template {
   width: 95%;
-  height: 75%; }
+  height: 75vh; }
   @media screen and (min-width: 40em) {
     .dialog-container-template {
-      width: 600;
-      height: 400; } }
+      width: 600px;
+      height: 450px; } }
 
 /* Responsive generic layout */
 .desktop {
@@ -790,7 +838,7 @@ td.center {
   float: left;
   margin-right: 20px;
   width: 100%; }
-  .filter-control input[type="text"], .filter-control select {
+  .filter-control input[type="text"], .filter-control input[type="password"], .filter-control select {
     -moz-box-sizing: border-box;
     -webkit-box-sizing: border-box;
     box-sizing: border-box;
@@ -886,11 +934,46 @@ td.center {
     overflow-y: auto; }
 
 .ui-widget-overlay {
-  position: absolute;
+  position: fixed;
   top: 0;
   left: 0;
-  width: 100%;
-  height: 100%;
+  width: 100vw;
+  height: 100vh;
   z-index: 1001; }
+
+.ui-widget-content {
+  background: #fdfdfd; }
+
+.ui-dialog {
+  top: 50px !important;
+  overflow-y: auto;
+  padding: 1px;
+  margin-bottom: 50px;
+  width: 95% !important;
+  height: 75vh !important; }
+  @media screen and (min-width: 40em) {
+    .ui-dialog {
+      width: 600px !important;
+      height: 450px !important;
+      height: auto !important; } }
+  .ui-dialog td {
+    display: block;
+    padding-bottom: 5px; }
+    @media screen and (min-width: 40em) {
+      .ui-dialog td {
+        display: table-cell; } }
+    .ui-dialog td input[type="text"], .ui-dialog td input[type="password"] {
+      width: 100%; }
+      @media screen and (min-width: 40em) {
+        .ui-dialog td input[type="text"], .ui-dialog td input[type="password"] {
+          width: auto; } }
+    @media screen and (min-width: 40em) {
+      .ui-dialog td:first-child {
+        text-align: right;
+        width: 120px;
+        white-space: nowrap; } }
+    @media screen and (min-width: 40em) {
+      .ui-dialog td:last-child input[type="text"], .ui-dialog td:last-child input[type="password"] {
+        width: 100%; } }
 
 /*# sourceMappingURL=style.css.map */

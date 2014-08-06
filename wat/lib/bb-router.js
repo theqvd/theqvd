@@ -44,7 +44,6 @@ var currentView = {};
             }
             
             currentView = new VMListView(params);
-            translate();
         });        
         
         app_router.on('route:listUser', function () {
@@ -55,7 +54,6 @@ var currentView = {};
             }
             
             currentView = new UserListView();
-            translate();
         });
         
         
@@ -68,7 +66,15 @@ var currentView = {};
                 currentView.undelegateEvents();
             }
             currentView = new UserDetailsView({"id": id});
-            translate();
+        });
+        
+        app_router.on('route:detailsVM', function (id) {
+            showLoading();
+            setMenuOpt('vms');
+            if (!$.isEmptyObject(currentView )) {
+                currentView.undelegateEvents();
+            }
+            currentView = new VMDetailsView({"id": id});
         });
         
         

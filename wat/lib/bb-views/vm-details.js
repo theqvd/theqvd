@@ -1,15 +1,15 @@
-var UserDetailsView = DetailsView.extend({
-    editorTemplateName: 'editor-user',
-    detailsTemplateName: 'details-user',
-    detailsSideTemplateName: 'details-user-side',
+var VMDetailsView = DetailsView.extend({
+    editorTemplateName: 'editor-vm',
+    detailsTemplateName: 'details-vm',
+    detailsSideTemplateName: 'details-vm-side',
     sideContainer: '.bb-details-side',
     
     breadcrumbs: {
         'screen': 'Home',
         'link': '#/home',
         'next': {
-            'screen': 'User list',
-            'link': '#/users',
+            'screen': 'Virtual machine list',
+            'link': '#/vms',
             'next': {
                 'screen': ''
             }
@@ -17,24 +17,13 @@ var UserDetailsView = DetailsView.extend({
     },
     
     editorDialogTitle: function () {
-        return $.i18n.t('Edit user') + ": " + this.model.get('name');
+        return $.i18n.t('Edit Virtual machine') + ": " + this.model.get('name');
     },
 
 
     initialize: function (params) {
-        this.model = new User(params);
+        this.model = new VM(params);
         DetailsView.prototype.initialize.apply(this, [params]);
-        //_.extend(this.events, DetailsView.prototype.events);
-        
-        // Render Virtual Machines list on side
-        params.whatRender = 'list';
-        params.listContainer = '.bb-details-side1';
-        params.forceListColumns = {checks: true, info: true, name: true};
-        params.forceSelectedActions = {disconnect: true};
-        params.forceListActionButton = null;
-        params.elementsBlock = 5;
-        
-        var sideView = new VMListView(params);
     },
     
     render: function () {
@@ -62,10 +51,10 @@ var UserDetailsView = DetailsView.extend({
         DetailsView.prototype.bindEditorEvents.apply(this);
         
         // Toggle controls for new password
-        this.bindEvent('change', 'input[name="change_password"]', this.userEditorBinds.toggleNewPassword);
+        this.bindEvent('change', 'input[name="change_password"]', this.vmEditorBinds.toggleNewPassword);
     },
     
-    userEditorBinds: {
+    vmEditorBinds: {
         toggleNewPassword: function () {
             $('.new_password_row').toggle();
         }
