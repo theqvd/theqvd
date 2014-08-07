@@ -1,6 +1,6 @@
-var ListView = MainView.extend({
+Wat.Views.ListView = Wat.Views.MainView.extend({
     sortedBy: '',
-    sortedMode: '',
+    sortedOrder: '',
     selectedActions: {},
     formFilters: {},
     columns: [],
@@ -23,7 +23,7 @@ var ListView = MainView.extend({
     */
     
     initialize: function (params) {
-        MainView.prototype.initialize.apply(this);
+        Wat.Views.MainView.prototype.initialize.apply(this);
 
         this.templateListCommonList = this.getTemplate('list-common');
         this.templateListCommonBlock = this.getTemplate('list-common-block');
@@ -32,6 +32,9 @@ var ListView = MainView.extend({
         this.readParams(params);
         
         this.render();
+        
+        // Extend the common events
+        this.extendEvents(this.eventsList);
     },
     
     readParams: function (params) {
@@ -76,21 +79,21 @@ var ListView = MainView.extend({
         }
     },
     
-    events: {
+    eventsList: {
         'click th.sortable': 'sort',
         'click input[class="check_all"]': 'checkAll',
         'click .first': 'paginationFirst',
         'click .prev': 'paginationPrev',
         'click .next': 'paginationNext',
         'click .last': 'paginationLast',
-        'click a[name="filter_button"]': 'filter'
+        'click a[name="filter_button"]': 'filter',
+        'keyup .filter-control input': 'filter',
+        'input .filter-control input': 'filter',
+        'change .filter-control select': 'filter'
     },
 
-    sort: function (e) {
-        if ($.isEmptyObject(this.cache.stringsCache)) {
-            this.activeCache(this.cache);
-        }
-        
+    // Render list sorted by a column
+    sort: function (e) { 
         // Find the TH cell, because sometimes you can click on the icon
         if ($(e.target).get(0).tagName == 'TH') {
             var sortCell = $(e.target).get(0);    
@@ -102,31 +105,32 @@ var ListView = MainView.extend({
         
         var sortedBy = $(sortCell).attr('data-sortby');
         
-        if (sortedBy !== this.sortedBy || this.sortedMode == 'DESC') {
-            this.sortedMode = 'ASC';
-            this.collection.url = this.sortedAscUrl;
+        if (sortedBy !== this.sortedBy || this.sortedOrder == '-desc') {
+            this.sortedOrder = '-asc';
         }
         else {
-            this.sortedMode = 'DESC';
-            this.collection.url = this.sortedDescUrl;
+            this.sortedOrder = '-desc';
         }
+        
 
         this.sortedBy = sortedBy;
+                
+        var sort = {'field': this.sortedBy, 'order': this.sortedOrder};
+
+        this.collection.setSort(sort);
         
-        var that = this;
-        this.collection.fetch({      
-            complete: function () {
-                that.renderList(that.listContainer);
-                addSortIcons(that);
-            }
-        });
+        // If the current offset is not the first page, trigger click on first button of pagination to go to the first page. 
+        // This button render the list so is not necessary render in this case
+        if (this.elementsOffset != 1 && false) {
+            $('.' + this.cid + ' .pagination .first').trigger('click');
+        }
+        else {   
+            this.fetchList();
+        }
     },
     
-    filter: function () {
-        if ($.isEmptyObject(this.cache.stringsCache)) {
-            this.activeCache(this.cache);
-        }
-        
+    // Get filter parameters of the form, set in collection, fetch list and render it
+    filter: function () {   
         var filtersContainer = '.' + this.cid + ' .filter';
         var filters = {};
         $.each(this.formFilters, function(index, filter) {
@@ -150,15 +154,18 @@ var ListView = MainView.extend({
         });
         
         this.collection.setFilters(filters);
-        var that = this;
-        this.collection.fetch({      
-            complete: function () {
-                that.renderList(that.listContainer);
-                addSortIcons(that);
-            }
-        });
+        
+        // If the current offset is not the first page, trigger click on first button of pagination to go to the first page. 
+        // This button render the list so is not necessary render in this case
+        if (this.elementsOffset != 1) {
+            $('.' + this.cid + ' .pagination .first').trigger('click');
+        }
+        else {   
+            this.fetchList();
+        }
     },
-
+    
+    // Set as checked all the checkboxes of a list
     checkAll: function (e) {
         if ($(e.target).is(":checked")) {
             $('.js-check-it').prop("checked", true);
@@ -166,14 +173,31 @@ var ListView = MainView.extend({
             $('.js-check-it').prop("checked", false);
         }
     },
+    
+    // Fetch collection and render list
+    fetchList: function () {
+        var that = this;
+        this.collection.fetch({      
+            complete: function () {
+                // If the cache is not already enabled, we enabled to save the required strings
+                if (!that.cache.cached) {
+                    that.enableCache();
+                }
+                that.renderList(that.listContainer);
+                addSortIcons(that);
 
+            }
+        });
+    },
+
+    // Render view with two options: all and only list with controls (list block)
     render: function () {
         var that = this;
         this.collection.fetch({      
             complete: function () {
                 switch(that.whatRender) {
                     case 'all':
-                        that.renderCommon();
+                        that.renderAll();
                         break;
                     case 'list':
                         that.renderListBlock();
@@ -183,7 +207,8 @@ var ListView = MainView.extend({
         });
     },
     
-    renderCommon: function () {
+    // Render common elements of lists and then render list with controls (list block)
+    renderAll: function () {
         // Fill the html with the template and the collection
         var template = _.template(
             this.templateListCommonList, {
@@ -193,12 +218,13 @@ var ListView = MainView.extend({
         
         $(this.el).html(template);
                 
-        this.loadFilters();
+        this.fetchFilters();
         this.printBreadcrumbs(this.breadcrumbs, '');
         
         this.renderListBlock();
     },
     
+    //Render list with controls (list block)
     renderListBlock: function () { 
         // Fill the list
         var template = _.template(
@@ -215,10 +241,14 @@ var ListView = MainView.extend({
         this.paginationUpdate();
         
         this.renderList();
-                this.translate();
-
+        
+        // Translate the strings rendered. 
+        // This translation is only done here, in the first charge. 
+        // When the list were rendered in actions such as sorting, filtering or pagination, the strings will be cached
+        this.translate();
     },    
     
+    // Render only the list. Usefull to functions such as pagination, sorting and filtering where is not necessary render controls
     renderList: function () {        
         // Fill the list
         var template = _.template(
@@ -232,10 +262,10 @@ var ListView = MainView.extend({
 
         $(this.listContainer).html(template);
         this.paginationUpdate();
-        
     },
     
-    loadFilters: function () {
+    // Fill filter selects 
+    fetchFilters: function () {
         var that = this;
         $.each(this.formFilters, function(index, filter) {
             if (filter.type == 'select' && filter.fillable) {
@@ -270,6 +300,13 @@ var ListView = MainView.extend({
         
         $('.pagination_current_page').html(currentPage);
         $('.pagination_total_pages').html(totalPages);
+        
+        if (totalPages == 1) {
+            $('.pagination a').addClass('disabled');
+        }
+        else {
+            $('.pagination a').removeClass('disabled');
+        }
     },
 
     paginationNext: function (e) {
@@ -288,11 +325,7 @@ var ListView = MainView.extend({
         this.paginationMove($(e.target), 'last');
     },
     
-    paginationMove: function (context, dir) {
-        if ($.isEmptyObject(this.cache.stringsCache)) {
-            this.activeCache(this.cache);
-        }
-        
+    paginationMove: function (context, dir, render) {
         var totalPages = Math.ceil(this.collection.elementsTotal/this.elementsBlock);
         var currentPage = this.elementsOffset;
         
@@ -333,12 +366,6 @@ var ListView = MainView.extend({
         
         this.collection.offset = this.elementsOffset;
         
-        var that = this;
-        this.collection.fetch({      
-            complete: function () {
-                that.renderList(that.listContainer);
-                addSortIcons(that);
-            }
-        });
+        this.fetchList();
     }
 });

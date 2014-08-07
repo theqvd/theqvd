@@ -1,8 +1,6 @@
-var VMListView = ListView.extend({  
+Wat.Views.VMListView = Wat.Views.ListView.extend({  
     listTemplateName: 'list-vms',
     editorTemplateName: 'creator-vm',
-    sortedAscUrl: 'json/list_vms.json',
-    sortedDescUrl: 'json/list_vms_inv.json',
     
     breadcrumbs: {
         'screen': 'Home',
@@ -95,19 +93,20 @@ var VMListView = ListView.extend({
         if(params === undefined) {
             params = {};
         }
+        params.filters = params.filters || {};
         params.blocked = params.elementsBlock || this.elementsBlock;
         params.offset = this.elementsOffset;
         
-        this.collection = new VMs(params);
+        this.collection = new Wat.Collections.VMs(params);
         
         this.setColumns();
         this.setSelectedActions();
         this.setListActionButton();
         
-        // Extend the common lists events
-        this.events = _.extend(this.events, this.eventsVMs);
+        // Extend the common events
+        this.extendEvents(this.eventsVMs);
 
-        ListView.prototype.initialize.apply(this, [params]);
+        Wat.Views.ListView.prototype.initialize.apply(this, [params]);
     },
     
     eventsVMs: {
@@ -145,7 +144,7 @@ var VMListView = ListView.extend({
                 'display': true
             },        
             {
-                'name': 'OSF / Tag',
+                'name': 'osf/tag',
                 'display': true
             }
         ];
@@ -190,7 +189,7 @@ var VMListView = ListView.extend({
     },
     
     newElement: function () {
-        this.model = new VM();
+        this.model = new Wat.Models.VM();
         this.editElement();
     }
 });

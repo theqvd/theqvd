@@ -3,14 +3,14 @@ function addSortIcons (view) {
     var sortIconHtml = '<i class="fa fa-sort sort-icon"></i>';
 
     if (view.sortedBy != '') {
-        switch(view.sortedMode) {
+        switch(view.sortedOrder) {
             case '': 
                 var sortIconHtmlSorted = sortIconHtml;
                 break;
-            case 'ASC':            
+            case '-asc':            
                 var sortIconHtmlSorted = '<i class="fa fa-sort-asc sort-icon"></i>';
                 break;
-            case 'DESC':
+            case '-desc':
                 var sortIconHtmlSorted = '<i class="fa fa-sort-desc sort-icon"></i>';
                 break;
         }

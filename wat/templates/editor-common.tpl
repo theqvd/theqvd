@@ -1,4 +1,4 @@
-<div class="editor-container">
+<div class="editor-container <%= cid %>">
     <table class="editor-table alternate">
         <tbody class="bb-editor"></tbody>
         <%
@@ -29,16 +29,19 @@
             }
         %>
         <tbody class="custom-properties">
+            <input type="hidden" class="deleted-properties" value=""/>
+
             <% 
                 _.each(model.get('properties'), function(propValue, propName) { 
             %>
                     <tr>
                         <td>
                             <i class="delete-property-button fa fa-trash-o"></i>
-                            <input type="text" class="custom_prop_name" value="<%= propName %>">
+                            <input type="hidden" class="custom-prop-name" value="<%= propName %>">
+                            <span class="custom-prop-name"><%= propName %></span>
                         </td>
                         <td>
-                            <input type="text" class="custom_prop_value" value="<%= propValue %>">
+                            <input type="text" class="custom-prop-value" data-current="<%= propValue %>" value="<%= propValue %>">
                         </td>
                     </tr>
             <%
@@ -48,11 +51,11 @@
                 <td>
                         <i class="delete-property-button fa fa-trash-o"></i>
                         <span class="property-help" data-i18n="Property name"></span>
-                        <input type="text" class="custom_prop_name">
+                        <input type="text" class="custom-prop-name">
                 </td>
                 <td>
                         <span class="property-help" data-i18n="Property value">ss</span>
-                        <input type="text" class="custom_prop_value">
+                        <input type="text" class="custom-prop-value">
                 </td>
             </tr>
             <tr>

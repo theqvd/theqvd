@@ -95,3 +95,43 @@
         color: $col;
     }
 }
+
+@mixin button--disabled ($col, $col_back) {
+    $col: $col_brand;
+    $col_back: $col_whiter;
+    
+    @extend %not-selectable;
+
+    color: darken($col_whiter, 10);
+    @include linear-gradient(lighten($col_back, 30));
+
+    background-repeat: repeat-x;
+    font-size: 12px;
+    border: solid 1px darken($col_whiter, 10);
+
+    -webkit-box-shadow: none;
+       -moz-box-shadow: none;
+            box-shadow: none;
+
+    &:hover {
+        cursor: default;
+        font-weight: normal;
+        
+        &:before {
+            color: darken($col_whiter, 10);
+        }
+    }    
+
+    &:active {
+        color: darken($col_whiter, 10);
+        @include linear-gradient(lighten($col_back, 30));
+    }    
+
+    &:focus {
+         outline: 0;
+    }
+
+    &:before {
+        color: darken($col_whiter, 10);
+    }
+}

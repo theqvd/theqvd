@@ -1,4 +1,4 @@
-var Model = Backbone.Model.extend({
+Wat.Models.Model = Backbone.Model.extend({
     defaults: {},
     id: 0,
     url: "",

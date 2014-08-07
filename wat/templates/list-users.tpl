@@ -24,7 +24,7 @@
                             break;
                         case 'id':
             %>
-                            <th class="cacheable sortable desktop" data-i18n="Id">
+                            <th class="cacheable sortable desktop max-2-icons" data-sortby="id" data-i18n="Id">
                                 <%= getCached('Id', cache) %>
                             </th>
             <%
@@ -38,7 +38,7 @@
                             break;
                         case 'started_vms':
             %>
-                            <th class="cacheable sortable desktop" data-sortby="started_vms" data-i18n="Started VMs">
+                            <th class="cacheable desktop max-6-icons" data-i18n="Started VMs">
                                 <%= getCached('Started VMs', cache) %>
                             </th>
             <%

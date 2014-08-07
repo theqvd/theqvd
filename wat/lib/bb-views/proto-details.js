@@ -1,4 +1,4 @@
-var DetailsView = MainView.extend({
+Wat.Views.DetailsView = Wat.Views.MainView.extend({
     elementId: 0,
     detailsContainer: '.bb-details',
     
@@ -8,7 +8,7 @@ var DetailsView = MainView.extend({
     */
     
     initialize: function (params) {
-        MainView.prototype.initialize.apply(this);
+        Wat.Views.MainView.prototype.initialize.apply(this);
 
         this.elementId = params.id;
         
@@ -21,9 +21,12 @@ var DetailsView = MainView.extend({
                 that.render();
             }
         });
+        
+        // Extend the common events
+        this.extendEvents(this.eventsDetails);
     },
     
-    events: {
+    eventsDetails: {
         'click .js-button-edit': 'editElement'
     },
 

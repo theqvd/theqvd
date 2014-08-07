@@ -79,8 +79,9 @@ body {
     .breadcrumbs {
         @extend %invisible;
         width: 100%;
-        margin-bottom: 15px;
-        
+        margin-bottom: 10px;
+        padding-bottom: 10px;
+
         @include in(desktop) {
             margin-bottom: 20px;
             display: block;

@@ -1,4 +1,4 @@
-var MainView = Backbone.View.extend({
+Wat.Views.MainView = Backbone.View.extend({
     el: '.bb-content',
     editorContainer: '.bb-editor',
     config: {},
@@ -14,8 +14,11 @@ var MainView = Backbone.View.extend({
         this.bindEditorEvents();
         
         // Add to the view events the parent class of this view to avoid collisions with other views events
-        this.restrictEventScope();
-
+        this.events = this.restrictEventsScope(this.events);
+        
+        // Initialize the cache structure
+        this.cache = this.getCacheStructure();
+        
         var that = this;
         this.render = _.wrap(this.render, function(render) { 
             that.beforeRender(); 
@@ -30,15 +33,23 @@ var MainView = Backbone.View.extend({
     
     afterRender: function () {
     },
+    
+    events:  {
+    },
+    
+    extendEvents: function (ev) {
+        ev = this.restrictEventsScope(ev);
+        this.events = _.extend(this.events, ev);
+    },
   
-    restrictEventScope: function () {
+    restrictEventsScope: function (events) {
         var that = this;
         var newEvents = {};
-        $.each(this.events, function(key, value) {
+        $.each(events, function(key, value) {
             var newKey = key.replace(' ', ' .' + that.cid + ' ');
             newEvents[newKey] = value;
         });
-        this.events = newEvents;
+        return newEvents;
     },
     
     printBreadcrumbs: function (bc, bcHTML) {
@@ -58,29 +69,34 @@ var MainView = Backbone.View.extend({
         }
     },
     
-    cache: {
-        stringsCache : {},
-        getCached : function (col, dictionary) {
-            if (dictionary != undefined && dictionary[col] !== undefined) {
-                return dictionary[col];
-            }
-            else {
-                return '';
-            }
-        },
-        cached : false
+    getCacheStructure: function () {
+        return {
+            stringsCache : {},
+            getCached : function (col, dictionary) {
+                if (dictionary != undefined && dictionary[col] !== undefined) {
+                    return dictionary[col];
+                }
+                else {
+                    return '';
+                }
+            },
+            cached : false
+        }
     },
     
-    activeCache: function (cache) {
-        $.each($('.cacheable'), function(index, element) {
+    // Save the translated strings with class 'cacheable' in cache to avoid new translation 
+    // when load it again in pagination, sorting, filtering...
+    enableCache: function () {
+        var that = this;
+        $.each($('.' + this.cid + ' .cacheable'), function(index, element) {
             var key = $(element).attr('data-i18n');
             var value = $(element).html();
             // Remove HTML tags from value to clean icons
             var cleanValue = value.replace(/(<([^>]+)>)/ig,"");
-            cache.stringsCache[key] = cleanValue;
+            that.cache.stringsCache[key] = cleanValue;
         });
         
-        cache.cached = true;
+        this.cache.cached = true;
     },
     
     
@@ -127,7 +143,7 @@ var MainView = Backbone.View.extend({
                     $(this).dialog('close');
                 },
                 Update: function () {
-                    
+                    that.updateElement();
                 }
             },
             open: function() {     
@@ -151,7 +167,8 @@ var MainView = Backbone.View.extend({
                 
                 that.template = _.template(
                             that.templateEditorCommon, {
-                                model: that.model
+                                model: that.model,
+                                cid: that.cid
                             }
                         );
                 
@@ -176,6 +193,49 @@ var MainView = Backbone.View.extend({
                 //$('body').css('overflow-y', 'auto');
             }
         });                
+    },
+    
+    // Update element common to every form: custom properties
+    updateElement: function () {
+        var propNames = $('.' + this.cid + '.editor-container input.custom-prop-name');
+        var propValues = $('.' + this.cid + '.editor-container input.custom-prop-value');
+        
+        var deletedProps = [];
+        var addedProps = {};
+        var updatedProps = {};
+        
+        for(i=0;i<propNames.length;i++) {
+            var name = propNames.eq(i);
+            var value = propValues.eq(i);
+            
+            if (!name.val()) {
+                continue;
+            }
+                        
+            // If the element has not data-current attribute means that it's new
+            // New properties with empty name will be ignored
+            if (name.val() !== '' && value.attr('data-current') === undefined) {
+                addedProps[name.val()] = value.val();
+            }
+            else {
+                // If the value is different of the data-current attribute means that it's different
+                if (value.attr('data-current') != value.val()) {
+                    updatedProps[name.val()] = value.val();
+                }
+            }
+        }
+        
+        // Store deleted properties from serialized list
+        var deletedPropsList = $('.' + this.cid + ' .deleted-properties').val();
+        if (deletedPropsList) {
+            deletedProps = deletedPropsList.split(separator);
+        }
+        
+        this.properties = {
+            'create' : addedProps, 
+            'update': updatedProps, 
+            'delete': deletedProps
+        };
     },
     
     // Generic function to bind events receiving the event, the selector and the callback function to be called when event is triggered
@@ -211,6 +271,27 @@ var MainView = Backbone.View.extend({
         },
 
         deleteProperty: function () {
+            // Store the name of the deleted property in a hidden field of serialized names by commas
+            var deletedProp = $(this).parent().find('input.custom-prop-name');
+            var deletedPropName = deletedProp.val();
+            var deletedPropType = deletedProp.attr('type');
+
+            // The current porperties are stored in hidden fields and the new properties in text fields
+            // We will only store the current properties in a serialized list to remove them
+            if (deletedPropType === 'hidden') {   
+                var deletedProps = $(this).parent().parent().parent().find('input.deleted-properties');
+
+                if (deletedProps.val() == "") {
+                    var deletedPropsList = [];
+                }
+                else {
+                    var deletedPropsList = deletedProps.val().split(separator);
+                }
+            
+                deletedPropsList.push(deletedPropName);
+                deletedProps.val(deletedPropsList.join(separator));
+            }
+            
             // Remove two levels above the button (tr)
             $(this).parent().parent().remove();
         },

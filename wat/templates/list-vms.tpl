@@ -24,7 +24,7 @@
                             break;
                         case 'id':
             %>
-                            <th class="cacheable sortable desktop" data-i18n="Id">
+                            <th class="cacheable sortable desktop" data-sortby="id" data-i18n="Id">
                                 <%= getCached('Id', cache) %>
                             </th>
             <%
@@ -38,21 +38,21 @@
                             break;
                         case 'node':
             %>
-                            <th class="cacheable sortable desktop" data-sortby="node" data-i18n="Node">
+                            <th class="cacheable sortable desktop" data-sortby="node_id" data-i18n="Node">
                                 <%= getCached('Node', cache) %>
                             </th>
             <%
                             break;
                         case 'user':
             %>
-                            <th class="cacheable sortable desktop" data-sortby="user" data-i18n="User">
+                            <th class="cacheable sortable desktop" data-sortby="user_name" data-i18n="User">
                                 <%= getCached('User', cache) %>
                             </th>
             <%
                             break;
                         case 'osf/tag':
             %>
-                            <th class="cacheable sortable desktop" data-sortby="osf" data-i18n="OSF / Tag">
+                            <th class="cacheable sortable desktop" data-sortby="osf_id" data-i18n="OSF / Tag">
                                 <%= getCached('OSF / Tag', cache) %>
                             </th>
             <%
@@ -149,7 +149,7 @@
                                         <%= model.get('osf_name') %>
                                     </a>
                                     <div class="second_row">
-                                        <%= model.get('di_version') %>
+                                        <%= model.get('di_tag') %>
                                     </div>
                                 </td>
                 <%

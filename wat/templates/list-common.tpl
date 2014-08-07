@@ -45,12 +45,6 @@
                 }
              }); 
          %>
-         
-        <div class="action-filter">
-            <a class="js-traductable_button actions_button button2 fa fa-filter" name="filter_button" data-i18n>
-                Filter
-                </a>
-        </div>
     </div>
 
     <div class="list-block bb-list-block">

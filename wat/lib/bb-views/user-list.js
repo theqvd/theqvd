@@ -1,8 +1,6 @@
-var UserListView = ListView.extend({
+Wat.Views.UserListView = Wat.Views.ListView.extend({
     listTemplateName: 'list-users',
     editorTemplateName: 'creator-user',
-    sortedAscUrl: 'json/list_users.json',
-    sortedDescUrl: 'json/list_users_inv.json',
     
     breadcrumbs: {
         'screen': 'Home',
@@ -36,16 +34,15 @@ var UserListView = ListView.extend({
         params.blocked = params.elementsBlock || this.elementsBlock;
         params.offset = this.elementsOffset;
         
-        this.collection = new Users(params);
+        this.collection = new Wat.Collections.Users(params);
         
         this.setColumns();
         this.setSelectedActions();
         this.setListActionButton();
         
-        // Extend the common lists events
-        this.events = _.extend(this.events, this.eventsUsers);
+        this.extendEvents(this.eventsUsers);
 
-        ListView.prototype.initialize.apply(this, [params]);
+        Wat.Views.ListView.prototype.initialize.apply(this, [params]);
     },
     
     eventsUsers: {
@@ -116,7 +113,7 @@ var UserListView = ListView.extend({
     },
     
     newElement: function () {
-        this.model = new User();
+        this.model = new Wat.Models.User();
         this.editElement();
     }
 });

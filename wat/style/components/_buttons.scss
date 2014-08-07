@@ -41,4 +41,8 @@ a, button {
         right: 0px;
         bottom: 0px;
     }
+
+    &.button.disabled, &.button2.disabled {
+        @include button--disabled();
+    }
 }

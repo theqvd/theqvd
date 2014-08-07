@@ -4,7 +4,7 @@ var currentView = {};
 
 (function (w, d, $) {
 	$(d).ready(function() {
-        var AppRouter = Backbone.Router.extend({
+        Wat.Router = Backbone.Router.extend({
                 routes: {
                     "vms": "listVM",
                     "vms/:field/:value": "listVM",
@@ -16,7 +16,7 @@ var currentView = {};
         });
         
         // Instantiate the router
-        var app_router = new AppRouter;
+        var app_router = new Wat.Router;
 
         
         
@@ -43,7 +43,7 @@ var currentView = {};
                 }
             }
             
-            currentView = new VMListView(params);
+            currentView = new Wat.Views.VMListView(params);
         });        
         
         app_router.on('route:listUser', function () {
@@ -53,7 +53,7 @@ var currentView = {};
                 currentView.undelegateEvents();
             }
             
-            currentView = new UserListView();
+            currentView = new Wat.Views.UserListView();
         });
         
         
@@ -65,7 +65,7 @@ var currentView = {};
             if (!$.isEmptyObject(currentView )) {
                 currentView.undelegateEvents();
             }
-            currentView = new UserDetailsView({"id": id});
+            currentView = new Wat.Views.UserDetailsView({"id": id});
         });
         
         app_router.on('route:detailsVM', function (id) {
@@ -74,7 +74,7 @@ var currentView = {};
             if (!$.isEmptyObject(currentView )) {
                 currentView.undelegateEvents();
             }
-            currentView = new VMDetailsView({"id": id});
+            currentView = new Wat.Views.VMDetailsView({"id": id});
         });
         
         

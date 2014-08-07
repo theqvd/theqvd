@@ -1,4 +1,4 @@
-var VMDetailsView = DetailsView.extend({
+Wat.Views.VMDetailsView = Wat.Views.DetailsView.extend({
     editorTemplateName: 'editor-vm',
     detailsTemplateName: 'details-vm',
     detailsSideTemplateName: 'details-vm-side',
@@ -22,15 +22,15 @@ var VMDetailsView = DetailsView.extend({
 
 
     initialize: function (params) {
-        this.model = new VM(params);
-        DetailsView.prototype.initialize.apply(this, [params]);
+        this.model = new Wat.Models.VM(params);
+        Wat.Views.DetailsView.prototype.initialize.apply(this, [params]);
     },
     
     render: function () {
         // Add name of the model to breadcrumbs
         this.breadcrumbs.next.next.screen = this.model.get('name');
         
-        DetailsView.prototype.render.apply(this);
+        Wat.Views.DetailsView.prototype.render.apply(this);
         
         this.templateDetailsSide = this.getTemplate(this.detailsSideTemplateName);
         
@@ -44,11 +44,11 @@ var VMDetailsView = DetailsView.extend({
     },
     
     editElement: function() {
-        DetailsView.prototype.editElement.apply(this);
+        Wat.Views.DetailsView.prototype.editElement.apply(this);
     },
     
     bindEditorEvents: function() {
-        DetailsView.prototype.bindEditorEvents.apply(this);
+        Wat.Views.DetailsView.prototype.bindEditorEvents.apply(this);
         
         // Toggle controls for new password
         this.bindEvent('change', 'input[name="change_password"]', this.vmEditorBinds.toggleNewPassword);
