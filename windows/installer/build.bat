@@ -38,6 +38,11 @@ call pp -vvv -x -gui ^
 -o qvd-client-1.exe ^
 ..\..\ext\QVD-Client\bin\qvd-gui-client.pl
 
+IF ERRORLEVEL 1 (
+	echo pp failed with error %ERRORLEVEL%
+	EXIT /B 1
+)
+
 reshacker -addoverwrite qvd-client-1.exe, qvd-client.exe, pixmaps\qvd.ico,icongroup,WINEXE,
 del qvd-client-1.exe
 
