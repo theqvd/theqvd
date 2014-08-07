@@ -98,13 +98,23 @@ sub new {
 				my $d = "$localepath/$lang/LC_MESSAGES";
 				File::Path::mkpath($d) unless (-d $d);
 				DEBUG "Generating locale: $po_file => $d/qvd-gui-client.mo";
-				Locale::Msgfmt::msgfmt({ in => $po_file, out => "$d/qvd-gui-client.mo" });
+				eval {
+					Locale::Msgfmt::msgfmt({ in => $po_file, out => "$d/qvd-gui-client.mo" });
+				};
+				if ( $@ ) {
+					WARN "Failed to convert locale from $po_file to $d/qvd-gui-client.mo";
+				}
 				
 		}
 	} else {
 		DEBUG "Running from installed package, using installed locale";
 	}
 
+	if ( ! -d $localepath ) {
+	    DEBUG "$localepath not found, trying alternative path";
+		$localepath = "$rootdir/locale";
+	}
+	
 	DEBUG "Locale path is $localepath";
 	bindtextdomain("qvd-gui-client", $localepath);
 	
