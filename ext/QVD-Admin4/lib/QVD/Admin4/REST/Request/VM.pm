@@ -15,7 +15,7 @@ sub BUILD
     $self->{mapper} = $mapper;
     $self->get_customs('VM_Property');
     $self->modifiers->{join} //= [];
-    push @{$self->modifiers->{join}}, qw(vm_runtime user);
+    push @{$self->modifiers->{join}}, qw(vm_runtime user osf);
     $self->order_by;
 }
 

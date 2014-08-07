@@ -2,12 +2,13 @@ package QVD::Admin4::REST::Request;
 use strict;
 use warnings;
 use Moose;
+use QVD::Admin4::Exception;
 
 has 'db',        is => 'ro', isa => 'QVD::DB',  required => 1;
 has 'json',      is => 'ro', isa => 'HashRef',  required => 1;
 has 'config',    is => 'ro', isa => 'HashRef',  required => 1;
 has 'mapper',    is => 'ro', isa => 'Config::Properties';
-has 'free', is => 'ro', isa => 'HashRef',  default => sub { {}; };
+has 'free',      is => 'ro', isa => 'HashRef',  default => sub { {}; };
 has 'modifiers', is => 'ro', isa => 'HashRef',  default => sub { {}; };
 has 'customs',   is => 'ro', isa => 'ArrayRef',  default => sub { []; };
 has 'defaults',  is => 'ro', isa => 'HashRef',  default => sub { {}; };
@@ -17,19 +18,20 @@ sub BUILD
     my $self = shift;
 
     $self->json->{filters} //= {};
+
     $self->config->{arguments} //= {};
     $self->config->{filters} //= {};
     $self->config->{mandatory} //= {};
     $self->config->{free} //= {};
-    $self->config->{order_by} //= [];
+    $self->config->{order_by} //= {};
 
     $self->json->{tenant} || 
-	die "No tenant specified in request";
+	QVD::Admin4::Exception->throw(code => 6);
 
     $self->json->{role} || 
-	die "No role specified in request";
+	QVD::Admin4::Exception->throw(code => 7);
 
-    die "No permissions for this action"
+    QVD::Admin4::Exception->throw(code => 8)
 	unless (exists $self->config->{roles}->{$self->json->{role}} ||
 		exists $self->config->{roles}->{'all'});
 
@@ -37,7 +39,8 @@ sub BUILD
     if exists $self->config->{filters}->{tenant};
 
     $self->modifiers->{page} = $self->json->{offset} // 1; 
-    $self->modifiers->{rows}  = $self->json->{blocked} // 1; 
+    $self->modifiers->{rows}  = $self->json->{blocked} // 10000; 
+    $self->modifiers->{distinct} = 1;
 }
 
 sub action 
@@ -58,18 +61,18 @@ sub filters
     my $filters = {};
 
     exists $self->config->{filters}->{$_} ||
-	die "No such a filter $_ for this action" 
+	QVD::Admin4::Exception->throw(code => 9)
 	for keys %{$self->json->{filters}};
 
     exists $self->json->{filters}->{$_} ||
-	die "No mandatory filter $_ in request" 
+	QVD::Admin4::Exception->throw(code => 10)
 	for keys %{$self->config->{mandatory}};
 
     for my $filter (keys %{$self->json->{filters}})
     {
 	my $mfil = $self->mapper->getProperty($filter) // 
-	    die "No map for $filter: $!";
-
+	QVD::Admin4::Exception->throw(code => 11);
+		
 	if ($self->config->{free}->{$filter})
 	{
 	    $filters->{$mfil} = { like => "%".$self->json->{filters}->{$filter}."%"};
@@ -85,19 +88,37 @@ sub filters
 sub arguments 
 {
     my $self = shift;
+    my %modifiers = @_;
     my $arguments = {};
 
-    exists $self->config->{arguments}->{$_} ||
-	die "No such an argument $_ for this action"
-	for keys %{$self->json->{arguments}};
+    return ($self->json->{arguments}->{properties} || {}) 
+	if $modifiers{custom};
+
+     exists $self->config->{arguments}->{$_} ||
+	 $_ eq 'properties'                  ||
+	QVD::Admin4::Exception->throw(code => 12)
+        for keys %{$self->json->{arguments}};
 
     for my $argument (keys %{$self->json->{arguments}})
     {
-	my $marg = $self->mapper->getProperty($argument) // 
-	    die "No map for $argument: $!"; 
-	$arguments->{$marg} = 
-	    $self->json->{arguments}->{$argument} // 
-	    $self->defaults->{$argument} // undef;
+	next if $argument eq 'properties';
+        my $marg = $self->mapper->getProperty($argument) //
+	    QVD::Admin4::Exception->throw(code => 13);
+
+        my ($table,$column) = $marg =~ /^(.+)\.(.+)$/;
+
+        if ($modifiers{related})
+        {
+            next if $table eq 'me';
+            $arguments->{$table}->{$column} =
+                $self->json->{arguments}->{$argument};
+        }
+        else
+        {
+            next unless $table eq 'me';
+            $arguments->{$column} =
+                $self->json->{arguments}->{$argument};
+        }
     }
     $arguments;
 }
@@ -105,16 +126,14 @@ sub arguments
 sub order_by
 {
     my $self = shift;
-    my $order_by = { '-asc' => []};
+    $self->json->{order_by} || return;
+    my $field = $self->json->{order_by}->{field} // return;
+    my $order = $self->json->{order_by}->{order} // '-asc';
 
-    for my $order (@{$self->config->{order_by}})
-    {
-	my $morder = $self->mapper->getProperty($order) // 
-	    die "No map for $order: $!"; 
-	push @{$order_by->{'-asc'}}, $morder;
-    }
+    $field = $self->mapper->getProperty($field) // 	    
+	QVD::Admin4::Exception->throw(code => 14);
 
-    $self->modifiers->{order_by}  = $order_by;
+    $self->modifiers->{order_by} = {$order => $field};
 }
 
 sub get_customs
@@ -124,20 +143,39 @@ sub get_customs
     $self->{customs} = [keys %{{map {$_->key => 1 } $self->db->resultset($table)->all}}];
     for (@{$self->customs})
     {
-	if (exists $self->json->{filters}->{$_})
+	if (exists $self->json->{arguments}->{$_} ||
+	    exists $self->json->{filters}->{$_} ||
+	    (exists $self->json->{order_by}->{field} &&
+	     $self->json->{order_by}->{field} eq $_))
 	{ 
-	    my $pr = $n eq '1' ? "properties" : "properties_$n";
-	    $self->json->{filters}->{"$pr.key"} = $_;
-	    $self->json->{filters}->{"$pr.value"} = $self->json->{filters}->{$_};
-	    delete $self->json->{filters}->{$_};
-	    @{$self->config->{filters}}{"$pr.key","$pr.value"} = qw(1 1);
-	   
+	    my $pr = $n eq '1' ? "properties" : "properties_$n";	   
 	    $self->modifiers->{join} //= [];
 	    push @{$self->modifiers->{join}}, 'properties';
-
 	    $self->{mapper} //= Config::Properties->new();
 	    $self->mapper->setProperty("$pr.key","$pr.key");
 	    $self->mapper->setProperty("$pr.value","$pr.value");
+
+	    if (exists $self->json->{filters}->{$_})
+	    {
+		$self->json->{filters}->{"$pr.key"} = $_;
+		$self->json->{filters}->{"$pr.value"} = { like => "%".$self->json->{filters}->{$_}."%" };
+		delete $self->json->{filters}->{$_};
+		@{$self->config->{filters}}{"$pr.key","$pr.value"} = qw(1 1);
+	    }
+
+	    if (exists $self->json->{arguments}->{$_})
+	    {
+		$self->json->{arguments}->{"$pr.key"} = $_;
+		$self->json->{arguments}->{"$pr.value"} = $self->json->{arguments}->{$_};
+		delete $self->json->{arguments}->{$_};
+		@{$self->config->{arguments}}{"$pr.key","$pr.value"} = qw(1 1);
+	    }
+
+	    if (exists $self->json->{order_by}->{field} &&
+		$self->json->{order_by}->{field} eq $_)
+	    {
+		$self->json->{order_by}->{field} = "$pr.value";
+	    }
 
 	    $n++;
 	}

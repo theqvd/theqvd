@@ -7,6 +7,7 @@ use Moose;
 use QVD::DB;
 use QVD::Admin4::Query;
 use Config::Properties;
+use QVD::Admin4::Exception;
 
 our $VERSION = '0.01';
 
@@ -20,7 +21,7 @@ sub BUILD
     my $self = shift;
 
     $DB = QVD::DB->new() // 
-	die "Unable to connect to database";
+	QVD::Admin4::Exception->throw(code=>'2');
 }
 
 sub _db { $DB; }
@@ -39,7 +40,7 @@ sub get_credentials
 
     my $user = $DB->resultset('User')->find({ login => $self->login,
 					      password => $self->password}) // 
-						  die "Bad login or password";
+						  QVD::Admin4::Exception->throw(code=>'3');
 
     { tenant => $user->tenant_id, role => $user->role->name };
 }
@@ -52,6 +53,7 @@ sub user_get_list
 {
     my ($self,$request) = @_;
     my $result = $self->select($request);
+
     my @query = ('vms',{'vm_runtime.user_state' => 'connected'},{join => [qw(vm_runtime)]});
 
     $_ = { id => $_->id, 
@@ -60,6 +62,17 @@ sub user_get_list
 	   '#vms'  => $_->vms->count,
 	   '#vms_connected' => $_->search_related(@query)->count,
 	   $self->add_custom($request,$_)} for @{$result->{rows}};
+    
+    $result;
+}
+
+sub user_tiny_list
+{
+    my ($self,$request) = @_;
+    my $result = $self->select($request);
+
+    $_ = { id => $_->id, 
+	   name => $_->login } for @{$result->{rows}};
     
     $result;
 }
@@ -80,6 +93,19 @@ sub user_get_details
 
     $result;
 }
+
+sub user_update
+{
+    my ($self,$request) = @_;
+    $self->update($request);
+}
+
+sub user_update_custom
+{
+    my ($self,$request) = @_;
+    $self->update_custom($request);
+}
+
 
 sub user_get_state
 {
@@ -114,6 +140,16 @@ sub vm_get_list
     $result;
 }
 
+sub vm_tiny_list
+{
+    my ($self,$request) = @_;
+    my $result = $self->select($request);
+
+    $_ = { id => $_->id, 
+	   name => $_->name } for @{$result->{rows}};
+    
+    $result;
+}
 
 
 sub vm_get_details
@@ -159,6 +195,18 @@ sub vm_get_state
     $result;
 }
 
+sub vm_update
+{
+    my ($self,$request) = @_;
+    $self->update($request);
+}
+
+sub vm_update_custom
+{
+    my ($self,$request) = @_;
+    $self->update_custom($request);
+}
+
 
 sub host_get_list
 {
@@ -171,6 +219,17 @@ sub host_get_list
 	   blocked => $_->runtime->blocked,
 	   $self->add_custom($request,$_) } for @{$result->{rows}};
 
+    $result;
+}
+
+sub host_tiny_list
+{
+    my ($self,$request) = @_;
+    my $result = $self->select($request);
+
+    $_ = { id => $_->id, 
+	   name => $_->name } for @{$result->{rows}};
+    
     $result;
 }
 
@@ -204,6 +263,18 @@ sub host_get_state
     $result;
 }
 
+sub host_update
+{
+    my ($self,$request) = @_;
+    $self->update($request);
+}
+
+sub host_update_custom
+{
+    my ($self,$request) = @_;
+    $self->update_custom($request);
+}
+
 sub osf_get_list
 {
     my ($self,$request) = @_;
@@ -221,6 +292,18 @@ sub osf_get_list
     $result;
 }
 
+sub osf_tiny_list
+{
+    my ($self,$request) = @_;
+    my $result = $self->select($request);
+
+    $_ = { id => $_->id, 
+	   name => $_->name } for @{$result->{rows}};
+    
+    $result;
+}
+
+
 sub osf_get_details
 {
     my ($self,$request) = @_;
@@ -236,6 +319,17 @@ sub osf_get_details
     $result;
 }
 
+sub osf_update
+{
+    my ($self,$request) = @_;
+    $self->update($request);
+}
+
+sub osf_update_custom
+{
+    my ($self,$request) = @_;
+    $self->update_custom($request);
+}
 
 sub di_get_list
 {
@@ -254,6 +348,18 @@ sub di_get_list
     $result;
 }
 
+sub di_tiny_list
+{
+    my ($self,$request) = @_;
+    my $result = $self->select($request);
+
+    $_ = { id => $_->id, 
+	   name => $_->path } for @{$result->{rows}};
+    
+    $result;
+}
+
+
 sub di_get_details
 {
     my ($self,$request) = @_;
@@ -271,9 +377,19 @@ sub di_get_details
     $result;
 }
 
-###############################
-########### ACTIONS  ##########
-###############################
+sub di_update
+{
+    my ($self,$request) = @_;
+    $self->update($request);
+}
+
+sub di_update_custom
+{
+    my ($self,$request) = @_;
+    $self->update_custom($request);
+}
+
+### BASIC SQL QUERIES
 
 sub _find
 {
@@ -282,87 +398,38 @@ sub _find
     return $r;
 }
 
-### BASIC SQL QUERIES
-
 sub select
 {
     my ($self,$request) = @_;
 
-    my $rs = $DB->resultset($request->table)->search($request->filters,
-						     $request->modifiers);
+    my $rs = eval { $DB->resultset($request->table)->search($request->filters, 
+							    $request->modifiers) };
+
+    QVD::Admin4::Exception->throw(code => ($DB->storage->_dbh->state || 4)) if $@;
 
     { total => ($rs->is_paged ? $rs->pager->total_entries : undef), 
       rows => [$rs->all]} ;
 }
 
+
 sub update
-{  
-    my ($self,$request,$result) = @_;  
-
-    my $rows = $result->{rows};
-    $result->{rows} = [ map { {$_->update($request->arguments)->get_columns} } @$rows ]; 
-    $result;
-}
-
-sub add
 {
-    my ($self,$request) = @_;  
-     
-    { total => 1, rows => [ $DB->resultset($request->table)->create($request->arguments) ]}; 
-}
+    my ($self,$request) = @_;
+    my $result = $self->select($request);
+    my $failures = {};
 
-sub delete 
-{  
-    my ($self,$request,$result) = @_;  
-    my $rows = $result->{rows};
-    $result->{rows} = [ map { $_->delete }  @$rows ];
-    $result;
-}
-
-### RELATIONS BETWEEN TABLES
-
-sub relation     
-{  
-    my ($self,$request,$result) = @_;  
-    my $relation = $request->arguments->{'relation'} // 
-	die "No relation specified";
-    my $rows = $result->{rows};
-    $result->{rows} = [ map { {$_->$relation->get_columns} } @$rows ]; 
-    $result;
-}
-
-### RETRIEVES THE VALUE OF AN SPECIFIC COLUMN
-
-sub property    
-{  
-    my ($self,$request,$result) = @_;  
-    my $property = $request->arguments->{'property'} // 
-	die "No property specified";
-    my $rows = $result->{rows};
-    $result->{rows} = [ map { {$property => $_->$property} } @$rows ]; 
-    $result;
-}
-
-sub empty
-{
-    [];
-}
-
-sub get_columns
-{
-    my ($self,$request,$result) = @_;
-    my $rows = $result->{rows};
-    $result->{rows} = [map { {$_->get_columns} } @$rows];
-
-    $result;
-}
-
-sub count
-{
-    my ($self,$request,$result) = @_;
+    for my $obj (@{$result->{rows}})
+    {
+         eval { $DB->txn_do( sub { eval { $obj->update($request->arguments) };
+				   QVD::Admin4::Exception->throw(code => ($DB->storage->_dbh->state || 4)) if $@;
+				   $self->update_related($request,$obj); } ) };      
+	 if ($@) { $failures->{$obj->id} = ($@->can('code') ? $@->code : 4); }
+    }
     $result->{rows} = [];
+    QVD::Admin4::Exception->throw(code => 1, failures => $failures) if %$failures;
     $result;
 }
+
 
 sub get_customs
 {
@@ -388,9 +455,68 @@ sub add_custom
     my ($self,$request,$obj) = @_;
 
     ( properties => { map {  $_->key => $_->value  } $obj->properties->all });
-
-#    (map { $_ => $obj->properties->find({key => $_})->value } @{$request->customs});
 } 
 
+sub update_related
+{
+    my($self,$request,$obj)=@_;
+
+    my %tables = %{$request->arguments(related => 1)};
+    
+    for (keys %tables)
+    {
+	eval { $obj->$_->update($tables{$_}) }; 
+	QVD::Admin4::Exception->throw(code => ($DB->storage->_dbh->state || 4)) if $@;
+    }
+    
+}
+
+sub update_custom
+{
+    my ($self,$request) = @_;
+
+    my $props = $request->arguments(custom => 1);
+    my $result = $self->select($request);   
+    my $failures = {};
+
+    for my $obj (@{$result->{rows}})
+    {
+	eval { $DB->txn_do( sub { while ( my ($key,$value) = each %{$props->{update}})
+				  {
+				      eval { $obj->search_related('properties', 
+								  {key => $key})->update({value => $value}) };
+		
+				      QVD::Admin4::Exception->throw(code => ($DB->storage->_dbh->state || 4)) if $@;
+				  }		
+	    
+				  for my $key (@{$props->{delete}})
+				  {
+				      eval { $obj->search_related('properties', 
+								  {key => $key})->delete };
+				      QVD::Admin4::Exception->throw(code => ($DB->storage->_dbh->state || 4)) if $@;
+				  }		
+	    
+				  while (my ($key,$value) = each %{$props->{create}})
+				  { 
+				      eval { $obj->create_related('properties',{key => $key, 
+										value => $value}) };
+
+				      QVD::Admin4::Exception->throw(code => ($DB->storage->_dbh->state || 4)) if $@;
+				  }
+	    
+				  eval { $obj->update($request->arguments) };
+				  QVD::Admin4::Exception->throw(code => ($DB->storage->_dbh->state || 4)) if $@;
+	    
+				  $self->update_related($request,$obj);       
+			    })};
+	 if ($@) { $failures->{$obj->id} = ($@->can('code') ? $@->code : 4); }
+
+	}
+
+    $result->{rows} = [];
+    QVD::Admin4::Exception->throw(code => 1, failures => $failures) if %$failures;
+    $result;
+
+}
 
 1;
