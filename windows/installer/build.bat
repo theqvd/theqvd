@@ -1,5 +1,12 @@
 
 set PATH=%PATH%;"c:\Archivos de programa\Resource Hacker\";"c:\Program files\Resource Hacker\";"c:\Archivos de programa\Inno Setup 5";"c:\Program files\Inno Setup 5"
+md locale
+
+CD ..\..\ext\QVD-Client
+perl Build.PL
+call Build
+xcopy /s /y blib\locale ..\..\windows\installer\locale
+cd ..\..\windows\installer
 
 call exetype NX\nxproxy.exe WINDOWS
 
@@ -22,6 +29,12 @@ call pp -vvv -x -gui ^
 -l C:\strawberry\c\bin\ssleay32_.dll ^
 -l C:\strawberry\c\bin\zlib1_.dll ^
 -l C:\strawberry\perl\site\lib\auto\Crypt\OpenSSL\X509\X509.dll ^
+-l C:\gettext\bin\intl.dll ^
+-l C:\gettext\bin\libasprintf-0.dll.dll ^
+-l C:\gettext\bin\libgcc_s_dw2-1.dll ^
+-l C:\gettext\bin\libgettextlib-0-18-1.dll ^
+-l C:\gettext\bin\libgettextpo-0.dll ^
+-l C:\gettext\bin\libgettextsrc-0-18-1.dll ^
 -o qvd-client-1.exe ^
 ..\..\ext\QVD-Client\bin\qvd-gui-client.pl
 

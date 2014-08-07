@@ -54,6 +54,7 @@ Source: "installer\pulseaudio\*"; DestDir: "{app}\pulseaudio"; Flags: ignorevers
 ;Source: "installer\system32\*"; DestDir: "{app}"; Flags: ignoreversion recursesubdirs createallsubdirs
 Source: "installer\Xming\*"; DestDir: "{app}\Xming"; Flags: ignoreversion recursesubdirs createallsubdirs
 Source: "installer\pixmaps\*"; DestDir: "{app}\pixmaps"; Flags: ignoreversion recursesubdirs createallsubdirs
+Source: "installer\locale\*"; DestDir: "{app}\locale"; Flags: ignoreversion recursesubdirs createallsubdirs
 Source: "installer\qvd-client.exe"; DestDir: "{app}\bin"; Flags: ignoreversion
 ; Source: "c:\Strawberry\perl\bin\libstdc++-6.dll"; DestDir: "{app}"; Flags: ignoreversion
 ; NOTE: Don't use "Flags: ignoreversion" on any shared system files
