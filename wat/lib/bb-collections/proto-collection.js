@@ -4,7 +4,9 @@ Wat.Collections.Collection = Backbone.Collection.extend({
     status: 0,
     blocked: 10,
     filters: {},
-    sort: {},
+    // Order by id by default
+    sort: {"field": "id", "order": "-asc"},
+    baseUrl: "http://172.20.126.12:3000/?login=benja&password=benja",
     
     initialize: function (params) {
         this.blocked = params.blocked;
@@ -12,13 +14,14 @@ Wat.Collections.Collection = Backbone.Collection.extend({
         this.filters = params.filters || this.filters;
     },
     
-    getUrl: function () {
-        var fullUrl = this.url  + 
+    getListUrl: function () {
+        var fullUrl = this.baseUrl  + 
+            "&action=" + this.actionPrefix + '_get_list' +
             "&offset=" + this.offset + 
             "&blocked=" + this.blocked + 
             "&filters=" + JSON.stringify(this.filters) + 
             "&order_by=" + JSON.stringify(this.sort);
-        
+
         return fullUrl;
     },
     
@@ -38,10 +41,11 @@ Wat.Collections.Collection = Backbone.Collection.extend({
 
     sync: function(method, model, options) {
         var that = this;
+        
         var params = _.extend({
-            type: 'POST',
+            type: 'GET',
             dataType: 'json',
-            url: that.getUrl(),
+            url: that.getListUrl(),
             processData: false
         }, options);
         

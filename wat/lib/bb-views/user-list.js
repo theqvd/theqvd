@@ -17,12 +17,19 @@ Wat.Views.UserListView = Wat.Views.ListView.extend({
             'type': 'text',
             'label': 'Search by name',
             'mobile': true
-        }   ,     
+        },     
         {
             'name': 'world',
             'filterField': 'world',
             'type': 'text',
             'label': 'world',
+            'noTranslatable': true
+        },     
+        {
+            'name': 'sex',
+            'filterField': 'sex',
+            'type': 'text',
+            'label': 'sex',
             'noTranslatable': true
         }
     ],
@@ -77,6 +84,11 @@ Wat.Views.UserListView = Wat.Views.ListView.extend({
             },
             {
                 'name': 'world',
+                'display': true,
+                'noTranslatable': true
+            },
+            {
+                'name': 'sex',
                 'display': true,
                 'noTranslatable': true
             }

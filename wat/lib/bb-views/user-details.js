@@ -26,20 +26,25 @@ Wat.Views.UserDetailsView = Wat.Views.DetailsView.extend({
         Wat.Views.DetailsView.prototype.initialize.apply(this, [params]);
         //_.extend(this.events, DetailsView.prototype.events);
         
+        this.renderSide();
+    },
+    
+    renderSide: function () {
         // Render Virtual Machines list on side
+        var params = {};
         params.whatRender = 'list';
         params.listContainer = '.bb-details-side1';
         params.forceListColumns = {checks: true, info: true, name: true};
         params.forceSelectedActions = {disconnect: true};
         params.forceListActionButton = null;
         params.elementsBlock = 5;
-        params.filters = {"user_id": params.id};
+        params.filters = {"user_id": this.elementId};
         
-        var sideView = new Wat.Views.VMListView(params);
+        this.sideView = new Wat.Views.VMListView(params);
     },
     
-    updateElement: function () {
-        Wat.Views.DetailsView.prototype.updateElement.apply(this);
+    updateElement: function (dialog) {
+        Wat.Views.DetailsView.prototype.updateElement.apply(this, [dialog]);
         
         // Properties to create, update and delete obtained from parent view
         var properties = this.properties;
@@ -53,10 +58,10 @@ Wat.Views.UserDetailsView = Wat.Views.DetailsView.extend({
             var password = context.find('input[name="password"]').val();
             var password2 = context.find('input[name="password2"]').val();
             if (!password || !password2) {
-                console.log('password empty');
+                console.error('password empty');
             }
             else if (password != password2) {
-                console.log('password missmatch');
+                console.error('password missmatch');
             }
             else {
                 arguments['password'] = password;
@@ -67,7 +72,14 @@ Wat.Views.UserDetailsView = Wat.Views.DetailsView.extend({
         
         arguments['blocked'] = blocked ? 1 : 0;
         
-        // TODO: Send arguments to user_update function of API
+        var filters = {"id": this.id};
+        
+        Wat.A.performAction('update_user', filters, arguments);
+        
+        this.fetchDetails();
+        this.renderSide();
+        
+        dialog.dialog('close');
     },
     
     render: function () {
@@ -76,7 +88,7 @@ Wat.Views.UserDetailsView = Wat.Views.DetailsView.extend({
         
         Wat.Views.DetailsView.prototype.render.apply(this);
         
-        this.templateDetailsSide = this.getTemplate(this.detailsSideTemplateName);
+        this.templateDetailsSide = Wat.A.getTemplate(this.detailsSideTemplateName);
         
         this.template = _.template(
             this.templateDetailsSide, {

@@ -7,7 +7,8 @@
         <td><span data-i18n>State</span></td>
         <td data-i18n>
             <% 
-                switch(model.get('state')) {
+                var vmState = model.get('state');
+                switch(vmState) {
                     case 'stopped':
                         print('Stopped');
                         break;
@@ -49,7 +50,13 @@
 </tbody>
 </table>
 <div class="remote_administration-buttons">
-    <a class="button2 fa fa-external-link" data-i18n>VNC viewer</a>
-    <a class="button2 fa fa-desktop" data-i18n>VNC local client</a>
-    <a class="button2 fa fa-terminal" data-i18n>Telnet viewer</a>
+    <%
+        var disabledClass = ' disabled ';
+        if (vmState == 'running') {
+            disabledClass = '';
+        }
+    %>
+    <a class="button2 fa fa-external-link <%= disabledClass %>" data-i18n>VNC viewer</a>
+    <a class="button2 fa fa-desktop <%= disabledClass %>" data-i18n>VNC local client</a>
+    <a class="button2 fa fa-terminal <%= disabledClass %>" data-i18n>Telnet viewer</a>
 </div>

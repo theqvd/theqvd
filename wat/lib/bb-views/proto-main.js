@@ -7,8 +7,8 @@ Wat.Views.MainView = Backbone.View.extend({
     initialize: function () {
         _.bindAll(this, 'render');
         
-        this.templateEditorCommon = this.getTemplate('editor-common');
-        this.templateEditor = this.getTemplate(this.editorTemplateName);
+        this.templateEditorCommon = Wat.A.getTemplate('editor-common');
+        this.templateEditor = Wat.A.getTemplate(this.editorTemplateName);
         
         // Binding events manually because backbone doesnt allow bind events to dialogs loaded dinamically
         this.bindEditorEvents();
@@ -99,29 +99,6 @@ Wat.Views.MainView = Backbone.View.extend({
         this.cache.cached = true;
     },
     
-    
-    getTemplate: function(templateName) {
-        if ($('#template_' + templateName).html() == undefined) {
-            var tmplDir = 'templates';
-            var tmplUrl = tmplDir + '/' + templateName + '.tpl';
-            var tmplString = '';
-
-            $.ajax({
-                url: tmplUrl,
-                method: 'GET',
-                async: false,
-                contentType: 'text',
-                success: function (data) {
-                    tmplString = data;
-                }
-            });
-
-            $('head').append('<script id="template_' + templateName + '" type="text/template">' + tmplString + '<\/script>');
-        }
-
-        return $('#template_' + templateName).html();
-    },
-    
     editorDialogTitle: function () {
         return '';
     },
@@ -143,7 +120,7 @@ Wat.Views.MainView = Backbone.View.extend({
                     $(this).dialog('close');
                 },
                 Update: function () {
-                    that.updateElement();
+                    that.updateElement($(this));
                 }
             },
             open: function() {     
@@ -157,8 +134,8 @@ Wat.Views.MainView = Backbone.View.extend({
                 var cancelButton = buttonsText[0];
                 var updateButton = buttonsText[1];
                 
-                that.translateElementContain($(cancelButton));
-                that.translateElementContain($(updateButton));
+                Wat.T.translateElementContain($(cancelButton));
+                Wat.T.translateElementContain($(updateButton));
                 
                 $(buttons).attr("class", "");
                 $(buttons).addClass("button");
@@ -183,7 +160,7 @@ Wat.Views.MainView = Backbone.View.extend({
                 $(that.editorContainer).html(that.template);
                 
                 
-                that.translateElement($(this).find('[data-i18n]'));
+                Wat.T.translateElement($(this).find('[data-i18n]'));
                 
                 $('.bb-editor-content-test').clone(true, true).appendTo('.dialog-container');
             },
@@ -196,7 +173,7 @@ Wat.Views.MainView = Backbone.View.extend({
     },
     
     // Update element common to every form: custom properties
-    updateElement: function () {
+    updateElement: function (dialog) {
         var propNames = $('.' + this.cid + '.editor-container input.custom-prop-name');
         var propValues = $('.' + this.cid + '.editor-container input.custom-prop-value');
         
@@ -237,14 +214,7 @@ Wat.Views.MainView = Backbone.View.extend({
             'delete': deletedProps
         };
     },
-    
-    // Generic function to bind events receiving the event, the selector and the callback function to be called when event is triggered
-    bindEvent: function (event, selector, callback) {
-        // First unbind event to avoid duplicated bindings
-        $(document).off(event, selector);
-        $(document).on(event, selector, callback);
-    },
-    
+
     // Events binded in classic way to works in special places like jQueryUI dialog where Backbone events doesnt work
     bindEditorEvents: function () { 
         var cidClass = '.' + this.cid + ' ';
@@ -260,9 +230,19 @@ Wat.Views.MainView = Backbone.View.extend({
         
         // Active focus on property input when click on help message becaus it is over it
         this.bindEvent('click', '.property-help', this.editorBinds.focusPropertyField);
+        
+        // Toggle controls for expire fields (it's only needed for vm form, but it can be accesible from two views: list and details)
+        this.bindEvent('change', 'input[name="expire"]', this.editorBinds.toggleExpire);
     },
     
-    // Object with the callbacks of the events binded on editor
+    // Generic function to bind events receiving the event, the selector and the callback function to be called when event is triggered
+    bindEvent: function (event, selector, callback) {
+        // First unbind event to avoid duplicated bindings
+        $(document).off(event, selector);
+        $(document).on(event, selector, callback);
+    },
+    
+    // Callbacks of the events binded on editor
     editorBinds: {
         addProperty: function () {
             var newRow = $('.template-property').clone();
@@ -270,7 +250,7 @@ Wat.Views.MainView = Backbone.View.extend({
             newRow.insertBefore('.template-property');
         },
 
-        deleteProperty: function () {
+        deleteProperty: function (rr) {
             // Store the name of the deleted property in a hidden field of serialized names by commas
             var deletedProp = $(this).parent().find('input.custom-prop-name');
             var deletedPropName = deletedProp.val();
@@ -302,65 +282,10 @@ Wat.Views.MainView = Backbone.View.extend({
 
         focusPropertyField: function () {
             $(this).parent().find('input').focus();
+        },
+        
+        toggleExpire: function () {
+            $('.expiration_row').toggle();
         }
-    },
-    
-    // Translation configuration and actions to be done when language file is loaded
-    translate: function() {
-        $.i18n.init({
-            //resGetPath: 'lib/languages/__lng__.json',
-            resGetPath: 'lib/languages/en.json',
-            useLocalStorage: false,
-            debug: false,
-            fallbackLng: 'en',
-        }, function() {            
-            // Translate all the elements with attribute 'data-i18n'
-            $('[data-i18n]').i18n();
-
-            // Other chains
-            $('.footer').html(i18n.t('QVD Web Administration Tool, by %s',  $('.footer').attr('data-link')));
-
-            // Translatable buttons
-            $.each($('.js-traductable_button'), function(index, button) {
-                var translation = i18n.t(i18n.t($(button).html().trim()));
-                $(button).html(translation);
-            });
-
-            // Convert the filter selects to library chosen style
-            var chosenOptions = {};
-            chosenOptions.no_results_text = i18n.t('No results match');
-            chosenOptions.search_contains = true;
-
-            var chosenOptionsSingle = jQuery.extend({}, chosenOptions);
-            chosenOptionsSingle.disable_search = true;
-            chosenOptionsSingle.width = "200px";
-
-            var chosenOptionsSingle100 = jQuery.extend({}, chosenOptionsSingle);
-            chosenOptionsSingle100.width = "100%"; 
-
-            var chosenOptionsAdvanced100 = jQuery.extend({}, chosenOptions);
-            chosenOptionsAdvanced100.width = "100%";
-
-            $('.filter-control select.chosen-advanced').chosen(chosenOptionsAdvanced100);
-            $('.filter-control select.chosen-single').chosen(chosenOptionsSingle100);
-            $('select.chosen-single').chosen(chosenOptionsSingle);
-
-            // After all the translations do custom actions that need to have the content translated
-            addSortIcons(currentView);
-
-            // When all is translated and loaded, hide loading spinner and show content
-            showAll();
-        });
-    },
-    
-    // Translate the content of an element passing the selector
-    translateElementContain: function(selector) {
-        var translated = i18n.t($(selector).html());
-        $(selector).html(translated);
-    },
-
-    // Translate an element with i18n standard function
-    translateElement: function(element) {
-       element.i18n();
     }
 });

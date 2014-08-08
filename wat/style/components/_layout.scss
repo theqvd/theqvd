@@ -41,18 +41,19 @@ body {
 .loading {
     font-size: 75px;
     width: 75px;
+    top: 45vh;
     @include in(desktop) {
-        font-size: 150px;
-        width: 150px;
+        font-size: 200px;
+        width: 200px;
+        top: 25vh;
     }
-    color: darken($col_whiter, 30);
+    color: darken($col_whiter, 10);
     
     position: absolute;
     margin: auto;
     left: 0;
     right: 0;
     bottom: 0;
-    top: 25vh;
 }
 
 .wrapper {

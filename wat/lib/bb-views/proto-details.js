@@ -12,18 +12,22 @@ Wat.Views.DetailsView = Wat.Views.MainView.extend({
 
         this.elementId = params.id;
         
-        this.templateDetailsCommon = this.getTemplate('details-common');
-        this.templateDetails = this.getTemplate(this.detailsTemplateName);
+        this.templateDetailsCommon = Wat.A.getTemplate('details-common');
+        this.templateDetails = Wat.A.getTemplate(this.detailsTemplateName);
 
+        this.fetchDetails();
+        
+        // Extend the common events
+        this.extendEvents(this.eventsDetails);
+    },
+    
+    fetchDetails: function () {
         var that = this;
         this.model.fetch({      
             complete: function () {
                 that.render();
             }
         });
-        
-        // Extend the common events
-        this.extendEvents(this.eventsDetails);
     },
     
     eventsDetails: {
@@ -51,6 +55,6 @@ Wat.Views.DetailsView = Wat.Views.MainView.extend({
         
         $(this.detailsContainer).html(this.template);
         
-        this.translate();
+        Wat.T.translate();
     }
 });

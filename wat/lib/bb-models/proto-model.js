@@ -3,6 +3,7 @@ Wat.Models.Model = Backbone.Model.extend({
     id: 0,
     url: "",
     detailsView: false,
+    baseUrl: "http://172.20.126.12:3000/?login=benja&password=benja",
 
     parse: function(response) {
         if (this.detailsView) {
@@ -20,9 +21,14 @@ Wat.Models.Model = Backbone.Model.extend({
     },
     
     getUrl: function () {
-        return this.url + "&filters={\"id\":" + this.id + "}";
+        return this.baseUrl + 
+            "&action=" + this.action +
+            "&filters={\"id\":" + this.id + "}";
     },
     
+    getBaseUrl: function () {
+        return this.baseUrl;
+    },
     
     sync: function(method, model, options) {
         this.detailsView = true;
@@ -36,5 +42,5 @@ Wat.Models.Model = Backbone.Model.extend({
         }, options);
         
         return $.ajax(params);
-    }
+    },
 });

@@ -10,7 +10,11 @@
             
             <!-- jQuery UI -->
             <script type='text/javascript' src='lib/thirds/jquery-ui/jquery-ui.min.js'></script>
-            <link rel="stylesheet" href="lib/thirds/jquery-ui/jquery-ui.min.css">
+            <link rel="stylesheet" href="lib/thirds/jquery-ui/jquery-ui.min.css">            
+            
+            <!-- jQuery DateTimePicker -->
+            <script type='text/javascript' src='lib/thirds/jquery-datetimepicker/jquery.datetimepicker.js'></script>
+            <link rel="stylesheet" href="lib/thirds/jquery-datetimepicker/jquery.datetimepicker.css">
             
             <!-- Underscore -->
             <script type='text/javascript' src='lib/thirds/underscore/underscore.js'></script>
@@ -36,8 +40,9 @@
             <!-- Common libraries -->
             <script type='text/javascript' src='lib/constants.js'></script>
             <script type='text/javascript' src='lib/qvd-wat.js'></script>
+            <script type='text/javascript' src='lib/actions.js'></script>
+            <script type='text/javascript' src='lib/interface.js'></script>
             <script type='text/javascript' src='lib/translations.js'></script>
-            <script type='text/javascript' src='lib/common.js'></script>
            
             <!-- Backbone Router -->
             <script type='text/javascript' src='lib/bb-router.js'></script>
@@ -134,7 +139,7 @@
                 </div>
             </div>
         </div>
-        <div class="loading"><i class="fa fa-spinner fa-spin"></i></div>
+        <div class="loading"><i class="fa fa-gear fa-spin"></i></div>
         <div class="wrapper"> 
             <div class="menu">
                 <ul class="nav-collapse">
@@ -191,6 +196,8 @@
             $('.nav-collapse').click(function() {
                 nav.close();
             });
+                        
+            $( document ).tooltip();
         });
         </script>
     </body>

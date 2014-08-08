@@ -1,5 +1,6 @@
 Wat.Models.VM = Wat.Models.Model.extend({
-    url: "http://172.20.126.12:3000/?login=benja&password=benja&action=vm_get_details",
+    action: "vm_get_details",
+    actionPrefix: 'vm_',
 
     defaults: {
         name: 'New VM',

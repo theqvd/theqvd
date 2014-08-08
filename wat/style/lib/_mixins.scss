@@ -96,13 +96,13 @@
     }
 }
 
-@mixin button--disabled ($col, $col_back) {
+@mixin button--disabled () {
     $col: $col_brand;
     $col_back: $col_whiter;
     
     @extend %not-selectable;
 
-    color: darken($col_whiter, 10);
+    color: darken($col_whiter, 20);
     @include linear-gradient(lighten($col_back, 30));
 
     background-repeat: repeat-x;
@@ -118,12 +118,12 @@
         font-weight: normal;
         
         &:before {
-            color: darken($col_whiter, 10);
+            color: darken($col_whiter, 20);
         }
     }    
 
     &:active {
-        color: darken($col_whiter, 10);
+        color: darken($col_whiter, 20);
         @include linear-gradient(lighten($col_back, 30));
     }    
 
@@ -132,6 +132,6 @@
     }
 
     &:before {
-        color: darken($col_whiter, 10);
+        color: darken($col_whiter, 20);
     }
 }

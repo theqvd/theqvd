@@ -474,7 +474,7 @@ a.button-right, button.button-right {
   right: 0px;
   bottom: 0px; }
 a.button.disabled, a.button2.disabled, button.button.disabled, button.button2.disabled {
-  color: #e4e4e4;
+  color: #cacaca;
   background-color: #f2f2f2;
   background-image: -moz-linear-gradient(top, #ffffff, #f2f2f2);
   background-image: -webkit-gradient(linear, 0 0, 0 100%, from(#ffffff), to(#f2f2f2));
@@ -491,9 +491,9 @@ a.button.disabled, a.button2.disabled, button.button.disabled, button.button2.di
     cursor: default;
     font-weight: normal; }
     a.button.disabled:hover:before, a.button2.disabled:hover:before, button.button.disabled:hover:before, button.button2.disabled:hover:before {
-      color: #e4e4e4; }
+      color: #cacaca; }
   a.button.disabled:active, a.button2.disabled:active, button.button.disabled:active, button.button2.disabled:active {
-    color: #e4e4e4;
+    color: #cacaca;
     background-color: #f2f2f2;
     background-image: -moz-linear-gradient(top, #ffffff, #f2f2f2);
     background-image: -webkit-gradient(linear, 0 0, 0 100%, from(#ffffff), to(#f2f2f2));
@@ -503,7 +503,7 @@ a.button.disabled, a.button2.disabled, button.button.disabled, button.button2.di
   a.button.disabled:focus, a.button2.disabled:focus, button.button.disabled:focus, button.button2.disabled:focus {
     outline: 0; }
   a.button.disabled:before, a.button2.disabled:before, button.button.disabled:before, button.button2.disabled:before {
-    color: #e4e4e4; }
+    color: #cacaca; }
 
 /********************************************************************
 *********************************************************************
@@ -538,17 +538,18 @@ body {
 .loading {
   font-size: 75px;
   width: 75px;
-  color: #b1b1b1;
+  top: 45vh;
+  color: #e4e4e4;
   position: absolute;
   margin: auto;
   left: 0;
   right: 0;
-  bottom: 0;
-  top: 25vh; }
+  bottom: 0; }
   @media screen and (min-width: 40em) {
     .loading {
-      font-size: 150px;
-      width: 150px; } }
+      font-size: 200px;
+      width: 200px;
+      top: 25vh; } }
 
 .wrapper {
   min-width: 20em;
@@ -905,8 +906,8 @@ td.center {
 *********************************************************************
 *********************************************************************
 
-                @DIALOG: Styles for jQuery UI dialog
-                components/_dialog.scss
+                @THIRDS: Third party libraries overrided styles
+                components/_thirds.scss
 
 *********************************************************************
 *********************************************************************
@@ -1007,5 +1008,17 @@ td.center {
     @media screen and (min-width: 40em) {
       .ui-dialog td:last-child input[type="text"], .ui-dialog td:last-child input[type="password"] {
         width: 100%; } }
+
+.xdsoft_datetimepicker .xdsoft_calendar td > div {
+  padding: 6px; }
+.xdsoft_datetimepicker .xdsoft_calendar th {
+  padding-top: 6px !important; }
+
+.xdsoft_datetimepicker .xdsoft_calendar td:hover, .xdsoft_datetimepicker .xdsoft_timepicker .xdsoft_time_box > div > div:hover {
+  background: #f36d15 !important; }
+
+.xdsoft_datetimepicker .xdsoft_calendar td.xdsoft_default, .xdsoft_datetimepicker .xdsoft_calendar td.xdsoft_current, .xdsoft_datetimepicker .xdsoft_timepicker .xdsoft_time_box > div > div.xdsoft_current {
+  background: #9a4008;
+  box-shadow: #6a2c05 0px 1px 3px 0px inset; }
 
 /*# sourceMappingURL=style.css.map */

@@ -5,7 +5,7 @@ Wat.Views.ListView = Wat.Views.MainView.extend({
     formFilters: {},
     columns: [],
     elementsShown: '',
-    elementsBlock: 10,
+    elementsBlock: 12,
     elementsOffset: 1,
     listContainer: '.bb-list',
     listBlockContainer: '.bb-list-block',
@@ -25,9 +25,9 @@ Wat.Views.ListView = Wat.Views.MainView.extend({
     initialize: function (params) {
         Wat.Views.MainView.prototype.initialize.apply(this);
 
-        this.templateListCommonList = this.getTemplate('list-common');
-        this.templateListCommonBlock = this.getTemplate('list-common-block');
-        this.listTemplate = this.getTemplate(this.listTemplateName);
+        this.templateListCommonList = Wat.A.getTemplate('list-common');
+        this.templateListCommonBlock = Wat.A.getTemplate('list-common-block');
+        this.listTemplate = Wat.A.getTemplate(this.listTemplateName);
                 
         this.readParams(params);
         
@@ -184,7 +184,7 @@ Wat.Views.ListView = Wat.Views.MainView.extend({
                     that.enableCache();
                 }
                 that.renderList(that.listContainer);
-                addSortIcons(that);
+                Wat.I.addSortIcons(that);
 
             }
         });
@@ -245,7 +245,7 @@ Wat.Views.ListView = Wat.Views.MainView.extend({
         // Translate the strings rendered. 
         // This translation is only done here, in the first charge. 
         // When the list were rendered in actions such as sorting, filtering or pagination, the strings will be cached
-        this.translate();
+        Wat.T.translate();
     },    
     
     // Render only the list. Usefull to functions such as pagination, sorting and filtering where is not necessary render controls

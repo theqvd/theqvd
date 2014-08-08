@@ -2,13 +2,14 @@
 *********************************************************************
 *********************************************************************
 
-                @DIALOG: Styles for jQuery UI dialog
-                components/_dialog.scss
+                @THIRDS: Third party libraries overrided styles
+                components/_thirds.scss
 
 *********************************************************************
 *********************************************************************
 ********************************************************************/
 
+// jQuery UI styles
 
 .ui-dialog {
     z-index: 1002;
@@ -108,5 +109,26 @@
     }
     
     @extend %no-outline;
+}
+
+// jQuery DateTimePicker styles
+
+.xdsoft_datetimepicker .xdsoft_calendar {
+    td>div {
+        padding: 6px;
+    }
+
+    th {
+        padding-top: 6px !important;
+    }
+}
+
+.xdsoft_datetimepicker .xdsoft_calendar td:hover, .xdsoft_datetimepicker .xdsoft_timepicker .xdsoft_time_box >div >div:hover {
+    background: $col_brand !important;
+}
+
+.xdsoft_datetimepicker .xdsoft_calendar td.xdsoft_default, .xdsoft_datetimepicker .xdsoft_calendar td.xdsoft_current, .xdsoft_datetimepicker .xdsoft_timepicker .xdsoft_time_box >div >div.xdsoft_current {
+    background: darken($col_brand,20);
+    box-shadow: darken($col_brand,30) 0px 1px 3px 0px inset;
 }
 
