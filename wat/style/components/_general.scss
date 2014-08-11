@@ -23,6 +23,10 @@ a {
     color: $col_links;
     text-decoration: none;
     font-weight: bold;
+    
+    i.hover {
+        color: $col_blacker;
+    }
 }
 
 a:hover {
@@ -93,4 +97,9 @@ fieldset {
 }
 .error {
     color: darken($col_red, 10);
+}
+
+
+.no-elements {
+    font-style: italic;
 }

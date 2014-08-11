@@ -3,6 +3,9 @@ Wat.Views.MainView = Backbone.View.extend({
     editorContainer: '.bb-editor',
     config: {},
     breadcrumbs: {},
+    message: 'Unknown problem',
+    // error/success/info
+    messagetype: 'error',
     
     initialize: function () {
         _.bindAll(this, 'render');
@@ -10,8 +13,10 @@ Wat.Views.MainView = Backbone.View.extend({
         this.templateEditorCommon = Wat.A.getTemplate('editor-common');
         this.templateEditor = Wat.A.getTemplate(this.editorTemplateName);
         
+        
         // Binding events manually because backbone doesnt allow bind events to dialogs loaded dinamically
         this.bindEditorEvents();
+        this.bindOtherEvents();
         
         // Add to the view events the parent class of this view to avoid collisions with other views events
         this.events = this.restrictEventsScope(this.events);
@@ -95,7 +100,6 @@ Wat.Views.MainView = Backbone.View.extend({
             var cleanValue = value.replace(/(<([^>]+)>)/ig,"");
             that.cache.stringsCache[key] = cleanValue;
         });
-        
         this.cache.cached = true;
     },
     
@@ -121,9 +125,12 @@ Wat.Views.MainView = Backbone.View.extend({
                 },
                 Update: function () {
                     that.updateElement($(this));
+                    that.showMessage();
                 }
             },
-            open: function() {     
+            open: function() {
+                // Close message just in case
+                $('.message-close').trigger('click');
                 
                 // Disable scroll on body to improve user experience with dialog scroll
                 //$('body').css('overflow-y', 'hidden');
@@ -205,7 +212,7 @@ Wat.Views.MainView = Backbone.View.extend({
         // Store deleted properties from serialized list
         var deletedPropsList = $('.' + this.cid + ' .deleted-properties').val();
         if (deletedPropsList) {
-            deletedProps = deletedPropsList.split(separator);
+            deletedProps = JSON.parse(deletedPropsList.replace(/&quot;/g, '"'));
         }
         
         this.properties = {
@@ -216,9 +223,12 @@ Wat.Views.MainView = Backbone.View.extend({
     },
 
     // Events binded in classic way to works in special places like jQueryUI dialog where Backbone events doesnt work
+    bindOtherEvents: function () {         
+        // Close message layer
+        this.bindEvent('click', '.message-close', this.otherBinds.closeMessage);
+    },
+    
     bindEditorEvents: function () { 
-        var cidClass = '.' + this.cid + ' ';
-
         // Delete custom property
         this.bindEvent('click', '.delete-property-button', this.editorBinds.deleteProperty);
         
@@ -240,6 +250,16 @@ Wat.Views.MainView = Backbone.View.extend({
         // First unbind event to avoid duplicated bindings
         $(document).off(event, selector);
         $(document).on(event, selector, callback);
+    },
+    
+    // Callbacks of the events binded on editor
+    otherBinds: {
+        closeMessage: function () {
+            if (typeof messageTimeout != 'undefined') {
+                clearTimeout(messageTimeout);
+            }
+            $('.message-container').slideUp(500);
+        }
     },
     
     // Callbacks of the events binded on editor
@@ -265,11 +285,11 @@ Wat.Views.MainView = Backbone.View.extend({
                     var deletedPropsList = [];
                 }
                 else {
-                    var deletedPropsList = deletedProps.val().split(separator);
+                    var deletedPropsList = JSON.parse(deletedProps.val().replace(/&quot;/g, '"'));
                 }
             
                 deletedPropsList.push(deletedPropName);
-                deletedProps.val(deletedPropsList.join(separator));
+                deletedProps.val(JSON.stringify(deletedPropsList).replace(/"/g, '&quot;'));
             }
             
             // Remove two levels above the button (tr)
@@ -287,5 +307,17 @@ Wat.Views.MainView = Backbone.View.extend({
         toggleExpire: function () {
             $('.expiration_row').toggle();
         }
+    },
+    
+    showMessage: function () {
+        $('.message').html(this.message);
+        $('.message-container').slideToggle(500);
+        $('.message-container').removeClass('success error info warning');
+        $('.message-container').addClass(this.messageType);
+        
+        var that = this;
+        messageTimeout = setTimeout(function() { 
+            $('.message-close').trigger('click');
+        },3000);
     }
 });

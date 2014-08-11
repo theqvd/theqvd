@@ -71,6 +71,26 @@
         </tr>
     </thead>
     <tbody>
+        <% 
+        if (models.length == 0) {
+        %>  
+            <tr>
+                <td colspan="<%= columns.length %>">
+                    <span class="no-elements cacheable" data-i18n="No elements found">
+                        <%= getCached('No elements found', cache) %>
+                    </span>
+                </td>
+            </tr>
+        <%
+        }
+        else {
+            // Store string in a hidden div only for cache it
+        %>
+            <div class="hidden cacheable" data-i18n="No elements found"></div>
+        <%
+        }
+        %>
+        
         <% _.each(models, function(model) { %>
             <tr>
                 <% 
@@ -93,14 +113,19 @@
                                     <% 
                                     if (model.get('blocked')) {
                                     %>
-                                        <i class="fa fa-pause icon-pause" title="Stopped Virtual machine"></i>
                                         <i class="fa fa-warning icon-warning"></i>
-                                        <i class="fa fa-lock"></i>
+                                        <i class="fa fa-lock" data-i18n="[title]Blocked"></i>
+                                    <%
+                                    }
+ 
+                                    if (model.get('state') == 'stopped') {
+                                    %>
+                                        <i class="fa fa-pause icon-pause" title="Stopped Virtual machine" data-i18n="[title]Stopped"></i>
                                     <%
                                     }
                                     else {
                                     %>
-                                        <i class="fa fa-play icon-play"></i>
+                                        <i class="fa fa-play icon-play" data-i18n="[title]Running"></i>
                                     <%
                                     }
                                     %>
@@ -117,7 +142,7 @@
                             case 'name':
                 %>
                                 <td>
-                                    <a href="#/vm/<%= model.get('id') %>">
+                                    <a href="#/vm/<%= model.get('id') %>" data-i18n="[title]Click for details">
                                         <i class="fa fa-search"></i>
                                         <%= model.get('name') %>
                                     </a>

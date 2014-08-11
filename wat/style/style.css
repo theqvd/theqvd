@@ -106,6 +106,8 @@ a {
   color: #f36d15;
   text-decoration: none;
   font-weight: bold; }
+  a i.hover {
+    color: #222222; }
 
 a:hover i:before {
   color: #222222; }
@@ -154,6 +156,9 @@ fieldset {
 
 .error {
   color: #cc0000; }
+
+.no-elements {
+  font-style: italic; }
 
 /********************************************************************
 *********************************************************************
@@ -318,8 +323,7 @@ select {
   select[name="selected_actions_select"] {
     width: auto;
     float: left;
-    margin-bottom: 10px;
-    width: 200px; }
+    margin-bottom: 10px; }
 
 .actions_button, select[name="selected_actions_select"] {
   width: 100%; }
@@ -574,6 +578,37 @@ body {
       .wrapper .breadcrumbs {
         margin-bottom: 20px;
         display: block; } }
+  .wrapper .message-container {
+    position: absolute;
+    top: -10px;
+    right: 10px;
+    width: 40%;
+    padding: 12px 20px;
+    border-bottom-left-radius: 20px;
+    border-bottom-right-radius: 20px;
+    opacity: 0.95;
+    border-top: 0px;
+    color: #fdfdfd;
+    font-weight: bold;
+    z-index: 999;
+    display: none; }
+    @media screen and (min-width: 40em) {
+      .wrapper .message-container {
+        top: -15px; } }
+    .wrapper .message-container.success {
+      background: #00b300; }
+    .wrapper .message-container.error {
+      background: #e60000; }
+    .wrapper .message-container.info {
+      background: #5577ff; }
+    .wrapper .message-container.warning {
+      background: #e6bf00; }
+    .wrapper .message-container .message-close {
+      position: absolute;
+      top: 6px;
+      right: 8px;
+      font-size: 24px;
+      cursor: pointer; }
   .wrapper .content {
     margin-bottom: 80px;
     /********************************************************************
@@ -709,7 +744,7 @@ body {
       .wrapper .content .remote_administration-buttons a {
         width: 50%;
         display: block;
-        margin: 10px auto; }
+        margin-bottom: 10px; }
 
 .editor-container {
   margin: 10px 20px; }

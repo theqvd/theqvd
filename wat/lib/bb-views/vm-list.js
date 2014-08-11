@@ -93,6 +93,7 @@ Wat.Views.VMListView = Wat.Views.ListView.extend({
         if(params === undefined) {
             params = {};
         }
+        
         params.filters = params.filters || {};
         params.blocked = params.elementsBlock || this.elementsBlock;
         params.offset = this.elementsOffset;

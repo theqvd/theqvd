@@ -36,10 +36,24 @@
                             </th>
             <%
                             break;
-                        case 'started_vms':
+                        case 'state':
             %>
-                            <th class="cacheable desktop max-6-icons" data-i18n="Connected VMs">
-                                <%= getCached('Connected VMs', cache) %>
+                            <th class="cacheable desktop sortable" data-sortby="state" data-i18n="State">
+                                <%= getCached('State', cache) %>
+                            </th>
+            <%
+                            break;
+                        case 'address':
+            %>
+                            <th class="cacheable desktop sortable" data-sortby="address" data-i18n="IP address">
+                                <%= getCached('IP address', cache) %>
+                            </th>
+            <%
+                            break;
+                        case '#vms':
+            %>
+                            <th class="cacheable desktop sortable" data-sortby="#vms" data-i18n="Running VMs">
+                                <%= getCached('Running VMs', cache) %>
                             </th>
             <%
                             break;
@@ -84,7 +98,18 @@
                                     if (model.get('blocked')) {
                                     %>
                                         <i class="fa fa-warning icon-warning"></i>
-                                        <i class="fa fa-lock"></i>
+                                        <i class="fa fa-lock" data-i18n="[title]Blocked"></i>
+                                    <%
+                                    }
+ 
+                                    if (model.get('state') == 'stopped') {
+                                    %>
+                                        <i class="fa fa-pause icon-pause" title="Stopped Virtual machine" data-i18n="[title]Stopped"></i>
+                                    <%
+                                    }
+                                    else {
+                                    %>
+                                        <i class="fa fa-play icon-play" data-i18n="[title]Running"></i>
                                     <%
                                     }
                                     %>
@@ -101,18 +126,43 @@
                             case 'name':
                 %>
                                 <td>
-                                    <a href="#/user/<%= model.get('id') %>" data-i18n="[title]Click for details">
+                                    <a href="#/node/<%= model.get('id') %>" data-i18n="[title]Click for details">
                                         <i class="fa fa-search"></i>
                                         <%= model.get('name') %>
                                     </a>
                                 </td>
                 <%
                                 break;
-                            case 'started_vms':
+                            case 'state':
                 %>
                                 <td class="desktop">
-                                    <%= model.get('startedVMs') %>
-                                    /
+                                    <% 
+                                        switch(model.get('state')) {
+                                            case "running":
+                                    %>
+                                                <span data-i18n>Running</span>
+                                    <%
+                                                break;
+                                            case "stopped":
+                                    %>
+                                                <span data-i18n>Stopped</span>
+                                    <%
+                                                break;
+                                        }
+                                    %>
+                                </td>
+                <%
+                                break;
+                            case 'address':
+                %>
+                                <td class="desktop">
+                                    <%= model.get('address') %>
+                                </td>
+                <%
+                                break;
+                            case '#vms':
+                %>
+                                <td class="desktop">
                                     <%= model.get('#vms') %>
                                 </td>
                 <%

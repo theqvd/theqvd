@@ -34,6 +34,8 @@ Wat.A = {
             '&filters=' + filters +
             '&arguments=' + arguments;
 
+        var result = null;
+        
         $.ajax({
             url: url,
             type: 'POST',
@@ -42,15 +44,18 @@ Wat.A = {
             processData: false,
             parse: true,
             success: function (data) {
-                console.info(data);
+                result = data;
             }
         });
+        
+        return result;
     },
 
     getApiActions: function () {
         return {
             'update_user': 'user_update_custom',
-            'update_vm': 'vm_update_custom'
+            'update_vm': 'vm_update_custom',
+            'update_node': 'host_update_custom'
         };
     }
 };

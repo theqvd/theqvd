@@ -1,5 +1,6 @@
 <div class="wrapper-content <%= cid %>">
     <div class="filter js-side">
+        <!-- ADVANCED FILTERS
         <span class="filter-control">
             <label for="filter_mode" data-i18n>Filter mode</label>
             <select class="chosen-single" name="filter_mode">
@@ -8,6 +9,7 @@
             </select>
         </span>
         <hr>
+        -->
         <% 
             _.each(formFilters, function(filter) { 
                 var translationAttr = 'data-i18n';

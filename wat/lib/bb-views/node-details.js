@@ -1,15 +1,15 @@
-Wat.Views.UserDetailsView = Wat.Views.DetailsView.extend({
-    editorTemplateName: 'editor-user',
-    detailsTemplateName: 'details-user',
-    detailsSideTemplateName: 'details-user-side',
+Wat.Views.NodeDetailsView = Wat.Views.DetailsView.extend({
+    editorTemplateName: 'editor-node',
+    detailsTemplateName: 'details-node',
+    detailsSideTemplateName: 'details-node-side',
     sideContainer: '.bb-details-side',
     
     breadcrumbs: {
         'screen': 'Home',
         'link': '#/home',
         'next': {
-            'screen': 'User list',
-            'link': '#/users',
+            'screen': 'Node list',
+            'link': '#/nodes',
             'next': {
                 'screen': ''
             }
@@ -17,12 +17,12 @@ Wat.Views.UserDetailsView = Wat.Views.DetailsView.extend({
     },
     
     editorDialogTitle: function () {
-        return $.i18n.t('Edit user') + ": " + this.model.get('name');
+        return $.i18n.t('Edit node') + ": " + this.model.get('name');
     },
 
 
     initialize: function (params) {
-        this.model = new Wat.Models.User(params);
+        this.model = new Wat.Models.Node(params);
         Wat.Views.DetailsView.prototype.initialize.apply(this, [params]);
         
         this.renderSide();
@@ -39,7 +39,7 @@ Wat.Views.UserDetailsView = Wat.Views.DetailsView.extend({
         params.forceSelectedActions = {disconnect: true};
         params.forceListActionButton = null;
         params.elementsBlock = 5;
-        params.filters = {"user_id": this.elementId};
+        params.filters = {"host_id": this.elementId};
         
         this.sideView = new Wat.Views.VMListView(params);
     },
@@ -54,29 +54,18 @@ Wat.Views.UserDetailsView = Wat.Views.DetailsView.extend({
         
         var context = $('.' + this.cid + '.editor-container');
         
-        // If change password is checked
-        if (context.find('input.js-change-password').is(':checked')) {
-            var password = context.find('input[name="password"]').val();
-            var password2 = context.find('input[name="password2"]').val();
-            if (!password || !password2) {
-                console.error('password empty');
-            }
-            else if (password != password2) {
-                console.error('password missmatch');
-            }
-            else {
-                arguments['password'] = password;
-            }
-        }
+        var name = context.find('input[name="name"]').val();
+        
+        arguments['name'] = name;
         
         var blocked = context.find('input[name="blocked"][value=1]').is(':checked');
         
         arguments['blocked'] = blocked ? 1 : 0;
         
         var filters = {"id": this.id};
-        
-        var result = Wat.A.performAction('update_user', filters, arguments);
-        
+
+        var result = Wat.A.performAction('update_node', filters, arguments);
+
         if (result.status == SUCCESS) {
             this.fetchDetails();
             this.renderSide();
@@ -115,14 +104,5 @@ Wat.Views.UserDetailsView = Wat.Views.DetailsView.extend({
     
     bindEditorEvents: function() {
         Wat.Views.DetailsView.prototype.bindEditorEvents.apply(this);
-        
-        // Toggle controls for new password
-        this.bindEvent('change', 'input[name="change_password"]', this.userEditorBinds.toggleNewPassword);
-    },
-    
-    userEditorBinds: {
-        toggleNewPassword: function () {
-            $('.new_password_row').toggle();
-        }
     }
 });

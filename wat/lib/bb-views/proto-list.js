@@ -10,7 +10,7 @@ Wat.Views.ListView = Wat.Views.MainView.extend({
     listContainer: '.bb-list',
     listBlockContainer: '.bb-list-block',
     whatRender: 'all',
-    listFilter: {},
+    filters: {},
 
     /*
     ** params:
@@ -19,7 +19,7 @@ Wat.Views.ListView = Wat.Views.MainView.extend({
     **  forceListColumns (object): List of columns that will be shown on list ignoring configuration. Format {checks: true, id: true, ...}
     **  forceListSelectedActions (object): List of actions to be performed over selected items that will be able ignoring configuration. Format {delete: true, block: true, ...}
     **  forceListActionButton (object): Override list action button with other button or with null value to not show it. Format {name: 'name of the button', value: 'text into button', link: 'href value'}
-    **  listFilter (object): Conditions under the list will be filtered. Format {user: 23, ...}
+    **  filters (object): Conditions under the list will be filtered. Format {user: 23, ...}
     */
     
     initialize: function (params) {
@@ -48,8 +48,8 @@ Wat.Views.ListView = Wat.Views.MainView.extend({
             if (params.listContainer !== undefined) {
                 this.listBlockContainer = params.listContainer;
             }                
-            if (params.listFilter !== undefined) {
-                this.listFilter = params.listFilter;
+            if (params.filters !== undefined) {
+                this.filters = params.filters;
             }            
             if (params.forceListActionButton !== undefined) {
                 this.listActionButton = params.forceListActionButton;
@@ -91,7 +91,7 @@ Wat.Views.ListView = Wat.Views.MainView.extend({
         'input .filter-control input': 'filter',
         'change .filter-control select': 'filter'
     },
-
+    
     // Render list sorted by a column
     sort: function (e) { 
         // Find the TH cell, because sometimes you can click on the icon
@@ -121,7 +121,7 @@ Wat.Views.ListView = Wat.Views.MainView.extend({
         
         // If the current offset is not the first page, trigger click on first button of pagination to go to the first page. 
         // This button render the list so is not necessary render in this case
-        if (this.elementsOffset != 1 && false) {
+        if (this.elementsOffset != 1) {
             $('.' + this.cid + ' .pagination .first').trigger('click');
         }
         else {   
@@ -130,7 +130,7 @@ Wat.Views.ListView = Wat.Views.MainView.extend({
     },
     
     // Get filter parameters of the form, set in collection, fetch list and render it
-    filter: function () {   
+    filter: function () {
         var filtersContainer = '.' + this.cid + ' .filter';
         var filters = {};
         $.each(this.formFilters, function(index, filter) {
@@ -154,10 +154,13 @@ Wat.Views.ListView = Wat.Views.MainView.extend({
         });
         
         this.collection.setFilters(filters);
+
+        // When we came from a view without elements pagination doesnt exist
+        var existsPagination = $('.' + this.cid + ' .pagination .first').length > 0;
         
         // If the current offset is not the first page, trigger click on first button of pagination to go to the first page. 
         // This button render the list so is not necessary render in this case
-        if (this.elementsOffset != 1) {
+        if (this.elementsOffset != 1 && existsPagination) {
             $('.' + this.cid + ' .pagination .first').trigger('click');
         }
         else {   
@@ -232,6 +235,7 @@ Wat.Views.ListView = Wat.Views.MainView.extend({
                 formFilters: this.formFilters,
                 selectedActions: this.selectedActions,
                 listActionButton: this.listActionButton,
+                nElements: this.collection.length,
                 cid: this.cid
             }
         );
@@ -280,7 +284,7 @@ Wat.Views.ListView = Wat.Views.MainView.extend({
                     success: function (data) {
                         $(data.result.rows).each(function(i,option) {
                             var selected = '';
-                            if (that.listFilter[filter.name] !== undefined && that.listFilter[filter.name] == option.id) {
+                            if (that.filters[filter.filterField] !== undefined && that.filters[filter.filterField] == option.id) {
                                 selected = 'selected="selected"';
                             }
                             $('select[name="' + filter.name + '"]').append('<option value="' + option.id + '" ' + selected + '>' + 
@@ -298,10 +302,10 @@ Wat.Views.ListView = Wat.Views.MainView.extend({
         var totalPages = Math.ceil(this.collection.elementsTotal/this.elementsBlock);
         var currentPage = this.elementsOffset;
         
-        $('.pagination_current_page').html(currentPage);
-        $('.pagination_total_pages').html(totalPages);
+        $('.pagination_current_page').html(currentPage || 1);
+        $('.pagination_total_pages').html(totalPages || 1);
         
-        if (totalPages == 1) {
+        if (totalPages <= 1) {
             $('.pagination a').addClass('disabled');
         }
         else {

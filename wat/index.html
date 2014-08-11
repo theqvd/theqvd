@@ -51,20 +51,25 @@
             <script type='text/javascript' src='lib/bb-models/proto-model.js'></script>
             <script type='text/javascript' src='lib/bb-models/vm.js'></script>
             <script type='text/javascript' src='lib/bb-models/user.js'></script>
+            <script type='text/javascript' src='lib/bb-models/node.js'></script>
             
             <!-- Backbone Collections -->
             <script type='text/javascript' src='lib/bb-collections/proto-collection.js'></script>
             <script type='text/javascript' src='lib/bb-collections/vms.js'></script>
             <script type='text/javascript' src='lib/bb-collections/users.js'></script>
+            <script type='text/javascript' src='lib/bb-collections/nodes.js'></script>
             
             <!-- Backbone Views -->
             <script type='text/javascript' src='lib/bb-views/proto-main.js'></script>
             <script type='text/javascript' src='lib/bb-views/proto-list.js'></script>
             <script type='text/javascript' src='lib/bb-views/proto-details.js'></script>
+            <script type='text/javascript' src='lib/bb-views/node-details.js'></script>
             <script type='text/javascript' src='lib/bb-views/vm-list.js'></script>
             <script type='text/javascript' src='lib/bb-views/user-list.js'></script>
+            <script type='text/javascript' src='lib/bb-views/node-list.js'></script>
             <script type='text/javascript' src='lib/bb-views/user-details.js'></script>
             <script type='text/javascript' src='lib/bb-views/vm-details.js'></script>
+            <script type='text/javascript' src='lib/bb-views/node-details.js'></script>
         
         <!-- Own CSS -->
         <link rel="stylesheet" type="text/css" href="style/style.css"> 
@@ -166,7 +171,10 @@
                 </ul>
             </div>
             <div id="breadcrumbs" class="breadcrumbs desktop"></div>
-
+            <div class="message-container">
+                <i class="message-close fa fa-times-circle"></i>
+                <span class="message"></span>
+            </div>
             <div class="content bb-content"></div>                        
         </div>
         <div class="footer" data-link="<a href='http://qindel.com'>Qindel Group</a>"></div>
@@ -197,7 +205,7 @@
                 nav.close();
             });
                         
-            $( document ).tooltip();
+            $( document ).tooltip({ position: { my: "left+15 center", at: "right center" } });
         });
         </script>
     </body>

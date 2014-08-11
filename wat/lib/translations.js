@@ -28,7 +28,7 @@ Wat.T = {
 
             var chosenOptionsSingle = jQuery.extend({}, chosenOptions);
             chosenOptionsSingle.disable_search = true;
-            chosenOptionsSingle.width = "200px";
+            chosenOptionsSingle.width = "150px";
 
             var chosenOptionsSingle100 = jQuery.extend({}, chosenOptionsSingle);
             chosenOptionsSingle100.width = "100%"; 

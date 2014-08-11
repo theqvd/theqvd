@@ -1,12 +1,12 @@
-Wat.Views.UserListView = Wat.Views.ListView.extend({
-    listTemplateName: 'list-users',
-    editorTemplateName: 'creator-user',
+Wat.Views.NodeListView = Wat.Views.ListView.extend({
+    listTemplateName: 'list-nodes',
+    editorTemplateName: 'creator-node',
     
     breadcrumbs: {
         'screen': 'Home',
         'link': '#/home',
         'next': {
-            'screen': 'User list'
+            'screen': 'Node list'
         }
     },
     
@@ -17,20 +17,21 @@ Wat.Views.UserListView = Wat.Views.ListView.extend({
             'type': 'text',
             'label': 'Search by name',
             'mobile': true
-        },     
+        },
         {
-            'name': 'world',
-            'filterField': 'world',
-            'type': 'text',
-            'label': 'world',
-            'noTranslatable': true
-        },     
-        {
-            'name': 'sex',
-            'filterField': 'sex',
-            'type': 'text',
-            'label': 'sex',
-            'noTranslatable': true
+            'name': 'vm',
+            'filterField': 'vm_id',
+            'type': 'select',
+            'label': 'Virtual machine',
+            'class': 'chosen-advanced',
+            'fillable': true,
+            'options': [
+                {
+                    'value': -1,
+                    'text': 'All',
+                    'selected': true
+                }
+                        ]
         }
     ],
 
@@ -41,23 +42,23 @@ Wat.Views.UserListView = Wat.Views.ListView.extend({
         params.blocked = params.elementsBlock || this.elementsBlock;
         params.offset = this.elementsOffset;
         
-        this.collection = new Wat.Collections.Users(params);
+        this.collection = new Wat.Collections.Nodes(params);
         
         this.setColumns();
         this.setSelectedActions();
         this.setListActionButton();
         
-        this.extendEvents(this.eventsUsers);
+        this.extendEvents(this.eventsNodes);
 
         Wat.Views.ListView.prototype.initialize.apply(this, [params]);
     },
     
-    eventsUsers: {
-        'click [name="new_user_button"]': 'newElement'
+    eventsNodes: {
+        'click [name="new_node_button"]': 'newElement'
     },
     
     editorDialogTitle: function () {
-        return $.i18n.t('New user');
+        return $.i18n.t('New Node');
     },
     
     setColumns: function () {
@@ -79,18 +80,20 @@ Wat.Views.UserListView = Wat.Views.ListView.extend({
                 'display': true
             },
             {
-                'name': 'started_vms',
+                'name': 'state',
+                'display': false
+            },
+            {
+                'name': 'address',
                 'display': true
             },
             {
-                'name': 'world',
-                'display': true,
-                'noTranslatable': true
+                'name': '#vms',
+                'display': true
             },
             {
-                'name': 'sex',
-                'display': true,
-                'noTranslatable': true
+                'name': 'Cosa',
+                'display': true
             }
         ];
     },
@@ -106,8 +109,8 @@ Wat.Views.UserListView = Wat.Views.ListView.extend({
                 'text': 'Unblock'
             },
             {
-                'value': 'disconnect_all',
-                'text': 'Disconnect from all VMs'
+                'value': 'stop_all',
+                'text': 'Stop all VMs'
             },
             {
                 'value': 'delete',
@@ -118,14 +121,14 @@ Wat.Views.UserListView = Wat.Views.ListView.extend({
     
     setListActionButton: function () {
         this.listActionButton = {
-            'name': 'new_user_button',
-            'value': 'New User',
+            'name': 'new_node_button',
+            'value': 'New Node',
             'link': 'javascript:'
         }
     },
     
     newElement: function () {
-        this.model = new Wat.Models.User();
+        this.model = new Wat.Models.Node();
         this.editElement();
     }
 });
