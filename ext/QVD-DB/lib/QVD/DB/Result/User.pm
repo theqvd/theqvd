@@ -21,7 +21,7 @@ __PACKAGE__->belongs_to(tenant => 'QVD::DB::Result::Tenant',  'tenant_id', { cas
 __PACKAGE__->belongs_to(role => 'QVD::DB::Result::Role', 'role_id', { cascade_delete => 0 });
 __PACKAGE__->has_many(vms => 'QVD::DB::Result::VM', 'user_id', { cascade_delete => 0 } );
 __PACKAGE__->has_many(properties => 'QVD::DB::Result::User_Property',
-		      'user_id', {join_type => 'INNER'});
+		      'user_id', {join_type => 'INNER', order_by => {'-asc' => 'key'}});
 
 
 sub get_has_many { qw(vms properties); }

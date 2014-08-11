@@ -16,6 +16,7 @@ sub BUILD
     $self->get_customs('OSF_Property');
     $self->modifiers->{join} //= [];
     push @{$self->modifiers->{join}}, qw(vms dis tenant);
+    push @{$self->modifiers->{join}}, { dis => 'tags' };
     $self->order_by;
 }
 

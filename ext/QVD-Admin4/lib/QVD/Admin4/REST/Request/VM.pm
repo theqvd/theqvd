@@ -15,7 +15,8 @@ sub BUILD
     $self->{mapper} = $mapper;
     $self->get_customs('VM_Property');
     $self->modifiers->{join} //= [];
-    push @{$self->modifiers->{join}}, qw(vm_runtime user osf);
+    push @{$self->modifiers->{join}}, qw(user osf);
+    push @{$self->modifiers->{join}}, { vm_runtime => 'host' };
     $self->order_by;
 }
 
@@ -26,6 +27,7 @@ __DATA__
 id              = me.id
 name            = me.name
 user_id         = me.user_id
+user_name       = user.login
 osf_id          = me.osf_id
 osf_name        = osf.name
 di_tag          = me.di_tag
@@ -34,6 +36,7 @@ expiration_soft = vm_runtime.vm_expiration_soft
 expiration_hard = vm_runtime.vm_expiration_hard
 state           = vm_runtime.vm_state
 host_id         = vm_runtime.host_id
+host_name       = host.name
 di_id           = vm_runtime.current_di_id
 user_state      = vm_runtime.user_state
 di_tag          = me.di_tag

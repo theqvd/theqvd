@@ -60,13 +60,17 @@ sub filters
     my $self = shift;
     my $filters = {};
 
-    exists $self->config->{filters}->{$_} ||
+    for (keys %{$self->json->{filters}})
+    {
 	QVD::Admin4::Exception->throw(code => 9)
-	for keys %{$self->json->{filters}};
+	    unless exists $self->config->{filters}->{$_};
+    }
 
-    exists $self->json->{filters}->{$_} ||
+    for (keys %{$self->config->{mandatory}})
+    {
 	QVD::Admin4::Exception->throw(code => 10)
-	for keys %{$self->config->{mandatory}};
+	    unless exists $self->json->{filters}->{$_};
+    }	
 
     for my $filter (keys %{$self->json->{filters}})
     {
@@ -151,6 +155,7 @@ sub get_customs
 	    my $pr = $n eq '1' ? "properties" : "properties_$n";	   
 	    $self->modifiers->{join} //= [];
 	    push @{$self->modifiers->{join}}, 'properties';
+
 	    $self->{mapper} //= Config::Properties->new();
 	    $self->mapper->setProperty("$pr.key","$pr.key");
 	    $self->mapper->setProperty("$pr.value","$pr.value");
@@ -174,12 +179,14 @@ sub get_customs
 	    if (exists $self->json->{order_by}->{field} &&
 		$self->json->{order_by}->{field} eq $_)
 	    {
+#		$self->json->{filters}->{"$pr.key"} = $_;
+#		@{$self->config->{filters}}{"$pr.key"} = qw(1);
 		$self->json->{order_by}->{field} = "$pr.value";
 	    }
 
 	    $n++;
 	}
-    }
+   }
 }
 
 1;

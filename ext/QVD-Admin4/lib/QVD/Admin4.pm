@@ -132,6 +132,7 @@ sub vm_get_list
 	   osf_name => $self->_find('OSF','id',$_->osf_id,'name'),
 	   di_tag => $_->di_tag,
 	   di_version => undef,
+	   state => $_->vm_runtime->vm_state,
 	   blocked => $_->vm_runtime->blocked,
 	   expiration_soft => $_->vm_runtime->vm_expiration_soft,
 	   expiration_hard => $_->vm_runtime->vm_expiration_hard,
@@ -165,7 +166,10 @@ sub vm_get_details
 	   osf_name => $self->_find('OSF','id',$_->osf_id,'name'),
 	   di_tag => $_->di_tag,
 	   di_version => $self->_find('DI','id',$_->vm_runtime->current_di_id,'version'),
-	   di_name => $self->_find('DI','id',$_->vm_runtime->current_di_id,'path'),
+	   di_name => 
+
+	       $DB->resultset('DI')->search({'osf.id' => 6, 'tags.tag' => 'default'},{ join => [qw(osf tags)] })->first->path,
+
 	   di_id      => $_->vm_runtime->current_di_id,
 	   blocked => $_->vm_runtime->blocked,
 	   state => $_->vm_runtime->vm_state,
@@ -206,7 +210,6 @@ sub vm_update_custom
     my ($self,$request) = @_;
     $self->update_custom($request);
 }
-
 
 sub host_get_list
 {
@@ -300,6 +303,18 @@ sub osf_tiny_list
     $_ = { id => $_->id, 
 	   name => $_->name } for @{$result->{rows}};
     
+    $result;
+}
+
+sub tag_tiny_list
+{
+    my ($self,$request) = @_;
+
+    my $result = $self->select($request);
+
+    $_ = { id => $_->id, 
+	   name => $_->tag } for @{$result->{rows}};
+
     $result;
 }
 
@@ -402,13 +417,19 @@ sub select
 {
     my ($self,$request) = @_;
 
-    my $rs = eval { $DB->resultset($request->table)->search($request->filters, 
-							    $request->modifiers) };
+    my $filters = $request->filters;
+    my $modifiers = $request->modifiers;
+    $modifiers->{prefetch} = $modifiers->{join} // {};
+
+    use Data::Dumper; print Dumper $filters,$modifiers;
+    my $rs = eval { $DB->resultset($request->table)->search($filters, 
+							    $modifiers) };
+    print $@ if $@;
 
     QVD::Admin4::Exception->throw(code => ($DB->storage->_dbh->state || 4)) if $@;
 
     { total => ($rs->is_paged ? $rs->pager->total_entries : undef), 
-      rows => [$rs->all]} ;
+      rows => [$rs->all] };
 }
 
 
@@ -418,9 +439,11 @@ sub update
     my $result = $self->select($request);
     my $failures = {};
 
+    my $arguments = $request->arguments;
+
     for my $obj (@{$result->{rows}})
     {
-         eval { $DB->txn_do( sub { eval { $obj->update($request->arguments) };
+         eval { $DB->txn_do( sub { eval { $obj->update($arguments) };
 				   QVD::Admin4::Exception->throw(code => ($DB->storage->_dbh->state || 4)) if $@;
 				   $self->update_related($request,$obj); } ) };      
 	 if ($@) { $failures->{$obj->id} = ($@->can('code') ? $@->code : 4); }

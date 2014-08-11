@@ -20,7 +20,7 @@ __PACKAGE__->add_unique_constraint(['name']);
 __PACKAGE__->belongs_to(tenant => 'QVD::DB::Result::Tenant',  'tenant_id', { cascade_delete => 0 });
 __PACKAGE__->has_many(vms => 'QVD::DB::Result::VM', 'osf_id', { cascade_delete => 0 } );
 __PACKAGE__->has_many(properties => 'QVD::DB::Result::OSF_Property',
-                      'osf_id', { join_type => 'INNER' });
+                      'osf_id', { join_type => 'INNER', order_by => {'-asc' => 'key'} });
 __PACKAGE__->has_many(dis => 'QVD::DB::Result::DI', 'osf_id', { cascade_delete => 0 } );
 
 sub _dis_by_tag {

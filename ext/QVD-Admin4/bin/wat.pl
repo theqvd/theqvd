@@ -33,11 +33,11 @@ under sub {
     }
 };
 
-get '/' => sub { 
+any '/' => sub { 
 
     my $c = shift;
 
-    my $json = { map { $_ => $c->param($_) } $c->param };
+    my $json = $c->req->json // { map { $_ => $c->param($_) } $c->param };
     @$json{qw(tenant role)} = ($c->session('tenant'),$c->session('role')); 
 
     $c->res->headers->header('Access-Control-Allow-Origin' => '*');
@@ -51,16 +51,6 @@ get '/' => sub {
 		    $c->_rest->_admin($json));
 
     $c->render(json => $response);
-};
-
-
-post '/' => sub { 
-
-    my $c = shift;
-    my $json = $c->req->json;
-    @$json{qw(tenant role)} = ($c->session('tenant'),$c->session('role')); 
-    $c->res->headers->header('Access-Control-Allow-Origin' => '*');
-    $c->render(json => $c->_rest->_admin($json));
 };
 
 

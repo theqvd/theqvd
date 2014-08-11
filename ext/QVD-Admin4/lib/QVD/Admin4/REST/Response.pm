@@ -39,7 +39,6 @@ sub json
      failures  => $self->failures};
 }
 
-
 1;
 
 __DATA__

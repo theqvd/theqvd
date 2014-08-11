@@ -9,6 +9,7 @@ use QVD::Admin4::REST::Request::DI;
 use QVD::Admin4::REST::Request::OSF;
 use QVD::Admin4::REST::Request::Host;
 use QVD::Admin4::REST::Request::User;
+use QVD::Admin4::REST::Request::DI_Tag;
 use QVD::Admin4::REST::Response;
 use QVD::Config::Core;
 use QVD::Admin4::Exception;
@@ -64,9 +65,9 @@ sub get_request
 
     my $class = 'QVD::Admin4::REST::Request::'.$ACTIONS->{$json->{action}}->{table};
 
-    return $class->new(json => $json, 
-		       config => $ACTIONS->{$json->{action}}, 
-		       db => $QVD_ADMIN->_db );
+    $class->new(json => $json, 
+		config => $ACTIONS->{$json->{action}}, 
+		db => $QVD_ADMIN->_db );
 }
 
 sub load_actions
@@ -145,8 +146,8 @@ user_update_custom.mandatory=id,tenant
 
 vm_get_list.roles=all
 vm_get_list.table=VM
-vm_get_list.order_by=id,name,state,host_id,user_id,osf_id,blocked
-vm_get_list.filters=name,user_id,osf_id,di_id,host_id,tenant
+vm_get_list.order_by=id,name,state,host_id,user_name,osf_name,blocked,host_name
+vm_get_list.filters=name,user_id,osf_id,di_id,host_id,tenant,state
 vm_get_list.mandatory=tenant
 vm_get_list.free=name
 
@@ -168,7 +169,7 @@ vm_get_state.mandatory=id,tenant
 
 vm_update.roles=admin,superadmin
 vm_update.table=VM
-vm_update.arguments=name,di_tag,blocked
+vm_update.arguments=name,di_tag,blocked,expiration_soft,expiration_hard
 vm_update.filters=id,tenant
 vm_update.mandatory=id,tenant
 
@@ -266,3 +267,9 @@ di_update_custom.table=DI
 di_update_custom.arguments=blocked
 di_update_custom.filters=id,tenant
 di_update_custom.mandatory=id,tenant
+
+tag_tiny_list.roles =all
+tag_tiny_list.table=DI_Tag
+tag_tiny_list.filters=osf_id
+tag_tiny_list.mandatory=osf_id
+tag_tiny_list.order_by=name

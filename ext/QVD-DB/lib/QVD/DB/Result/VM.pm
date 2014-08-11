@@ -27,7 +27,7 @@ __PACKAGE__->belongs_to(osf  => 'QVD::DB::Result::OSF',  'osf_id',  { cascade_de
 
 __PACKAGE__->has_one (vm_runtime => 'QVD::DB::Result::VM_Runtime',  'vm_id');
 __PACKAGE__->has_one (counters   => 'QVD::DB::Result::VM_Counter',  'vm_id');
-__PACKAGE__->has_many(properties => 'QVD::DB::Result::VM_Property', 'vm_id');
+__PACKAGE__->has_many(properties => 'QVD::DB::Result::VM_Property', 'vm_id', {order_by => {'-asc' => 'key'}});
 
 sub combined_properties {
     my $vm = shift;
