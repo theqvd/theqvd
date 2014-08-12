@@ -15,13 +15,6 @@
                             </th>
             <%
                             break;
-                        case 'info':
-            %>
-                            <th class="cacheable max-2-icons" data-i18n="Info">
-                                <%= getCached('Info', cache) %>
-                            </th>
-            <%
-                            break;
                         case 'id':
             %>
                             <th class="cacheable sortable desktop max-2-icons" data-sortby="id" data-i18n="Id">
@@ -29,31 +22,38 @@
                             </th>
             <%
                             break;
-                        case 'name':
+                        case 'disk_image':
             %>
-                            <th class="cacheable sortable" data-sortby="name" data-i18n="Name">
-                                <%= getCached('Name', cache) %>
+                            <th class="cacheable sortable" data-sortby="name" data-i18n="Disk image">
+                                <%= getCached('Disk image', cache) %>
                             </th>
             <%
                             break;
-                        case 'state':
+                        case 'version':
             %>
-                            <th class="cacheable desktop sortable" data-sortby="state" data-i18n="State">
-                                <%= getCached('State', cache) %>
+                            <th class="cacheable desktop sortable" data-sortby="version" data-i18n="Version">
+                                <%= getCached('Version', cache) %>
                             </th>
             <%
                             break;
-                        case 'address':
+                        case 'osf':
             %>
-                            <th class="cacheable desktop sortable" data-sortby="address" data-i18n="IP address">
-                                <%= getCached('IP address', cache) %>
+                            <th class="cacheable desktop sortable" data-sortby="osf_name" data-i18n="OS Flavour">
+                                <%= getCached('OS Flavour', cache) %>
                             </th>
             <%
                             break;
-                        case '#vms_connected':
+                        case 'default':
             %>
-                            <th class="cacheable desktop sortable" data-sortby="#vms_connected" data-i18n="Running VMs">
-                                <%= getCached('Running VMs', cache) %>
+                            <th class="cacheable desktop sortable" data-sortby="user_storage" data-i18n="Default">
+                                <%= getCached('Default', cache) %>
+                            </th>
+            <%
+                            break;
+                        case 'head':
+            %>
+                            <th class="cacheable desktop sortable" data-sortby="head" data-i18n="Head">
+                                <%= getCached('Head', cache) %>
                             </th>
             <%
                             break;
@@ -91,31 +91,6 @@
                                 </td>
                 <%
                                 break;
-                            case 'info':
-                %>
-                                <td>
-                                    <% 
-                                    if (model.get('blocked')) {
-                                    %>
-                                        <i class="fa fa-warning icon-warning"></i>
-                                        <i class="fa fa-lock" data-i18n="[title]Blocked"></i>
-                                    <%
-                                    }
- 
-                                    if (model.get('state') == 'stopped') {
-                                    %>
-                                        <i class="fa fa-pause icon-pause" title="Stopped Virtual machine" data-i18n="[title]Stopped"></i>
-                                    <%
-                                    }
-                                    else {
-                                    %>
-                                        <i class="fa fa-play icon-play" data-i18n="[title]Running"></i>
-                                    <%
-                                    }
-                                    %>
-                                </td>
-                <%
-                                break;
                             case 'id':
                 %>
                                 <td class="desktop">
@@ -123,47 +98,73 @@
                                 </td>
                 <%
                                 break;
-                            case 'name':
+                            case 'disk_image':
                 %>
                                 <td>
-                                    <a href="#/node/<%= model.get('id') %>" data-i18n="[title]Click for details">
+                                    <a href="#/di/<%= model.get('id') %>" data-i18n="[title]Click for details">
                                         <i class="fa fa-search"></i>
-                                        <%= model.get('name') %>
+                                        <%= model.get('disk_image') %>
                                     </a>
                                 </td>
                 <%
                                 break;
-                            case 'state':
+                            case 'version':
                 %>
                                 <td class="desktop">
-                                    <% 
-                                        switch(model.get('state')) {
-                                            case "running":
-                                    %>
-                                                <span data-i18n>Running</span>
+                                    <%= model.get('version') %>
+                                </td>
+                <%
+                                break;
+                            case 'osf':
+                %>
+                                <td class="desktop">
+                                    <a href="#/osf/<%= model.get('osf_id') %>">
+                                        <%= model.get('osf_name') %>
+                                    </a>
+                                </td>
+                <%
+                                break;
+                            case 'default':
+                %>
+                                <td class="desktop">
                                     <%
-                                                break;
-                                            case "stopped":
+                                    if (!model.get('default')) {
                                     %>
-                                                <span data-i18n>Stopped</span>
+                                        <span data-i18n="No">
+                                            <%= i18n.t('No') %>
+                                        </span>
                                     <%
-                                                break;
-                                        }
+                                    }
+                                    else {
+                                    %>
+                                        <span data-i18n="Yes">
+                                            <%= i18n.t('Yes') %>
+                                        </span>
+                                    <%
+                                    }
                                     %>
                                 </td>
                 <%
                                 break;
-                            case 'address':
+                            case 'head':
                 %>
                                 <td class="desktop">
-                                    <%= model.get('address') %>
-                                </td>
-                <%
-                                break;
-                            case '#vms_connected':
-                %>
-                                <td class="desktop">
-                                    <%= model.get('#vms_connected') %>
+                                    <%
+                                    if (!model.get('head')) {
+                                    %>
+                                        <span data-i18n="No">
+                                            <%= i18n.t('No') %>
+                                        </span>
+                                    <%
+                                    }
+                                    else {
+                                    %>
+                                        <span data-i18n="Yes">
+                                            <%= i18n.t('Yes') %>
+                                        </span>
+                                    <%
+                                    }
+                                    %>
                                 </td>
                 <%
                                 break;

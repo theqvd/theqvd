@@ -5,7 +5,7 @@ Wat.Views.ListView = Wat.Views.MainView.extend({
     formFilters: {},
     columns: [],
     elementsShown: '',
-    elementsBlock: 12,
+    elementsBlock: 10,
     elementsOffset: 1,
     listContainer: '.bb-list',
     listBlockContainer: '.bb-list-block',
@@ -70,11 +70,14 @@ Wat.Views.ListView = Wat.Views.MainView.extend({
             }
             if (params.forceSelectedActions !== undefined) {
                 var that = this;
+                var selectedActions = [];
                 $(this.selectedActions).each(function(index, action) {
-                    if (params.forceSelectedActions[action.value] === undefined) {
-                        delete that.selectedActions[index];
+                    if (params.forceSelectedActions[action.value] !== undefined) {
+                        selectedActions.push(action);
                     }
                 });
+                
+                this.selectedActions = selectedActions;
             }
         }
     },
@@ -165,7 +168,7 @@ Wat.Views.ListView = Wat.Views.MainView.extend({
         }
         else {   
             this.fetchList();
-        }
+        }        
     },
     
     // Set as checked all the checkboxes of a list
@@ -228,7 +231,7 @@ Wat.Views.ListView = Wat.Views.MainView.extend({
     },
     
     //Render list with controls (list block)
-    renderListBlock: function () { 
+    renderListBlock: function () {
         // Fill the list
         var template = _.template(
             this.templateListCommonBlock, {
@@ -241,9 +244,7 @@ Wat.Views.ListView = Wat.Views.MainView.extend({
         );
 
         $(this.listBlockContainer).html(template);
-        
-        this.paginationUpdate();
-        
+                
         this.renderList();
         
         // Translate the strings rendered. 
@@ -266,6 +267,7 @@ Wat.Views.ListView = Wat.Views.MainView.extend({
 
         $(this.listContainer).html(template);
         this.paginationUpdate();
+        this.selectedActionControlsUpdate();
     },
     
     // Fill filter selects 
@@ -297,6 +299,20 @@ Wat.Views.ListView = Wat.Views.MainView.extend({
         });
     },
     
+    selectedActionControlsUpdate: function () {
+        // Depend on the number of elements shown, we enabled/disabled selected elements controls
+        if (this.elementsShown > 0) {
+            $('a[name="selected_actions_button"]').removeClass('disabled chosen-disabled');
+            $('select[name="selected_actions_select"]').removeAttr('disabled');
+            $('select[name="selected_actions_select"]').next().removeClass('chosen-disabled');
+        }
+        else {
+            $('a[name="selected_actions_button"]').addClass('disabled');
+            $('select[name="selected_actions_select"]').attr('disabled', 'disabled');
+            $('select[name="selected_actions_select"]').next().addClass('chosen-disabled');
+        }
+    },
+    
     paginationUpdate: function () {        
         this.elementsShown = this.collection.length;
         var totalPages = Math.ceil(this.collection.elementsTotal/this.elementsBlock);
@@ -310,7 +326,7 @@ Wat.Views.ListView = Wat.Views.MainView.extend({
         }
         else {
             $('.pagination a').removeClass('disabled');
-        }
+        }        
     },
 
     paginationNext: function (e) {

@@ -1,12 +1,12 @@
-Wat.Views.NodeListView = Wat.Views.ListView.extend({
-    listTemplateName: 'list-nodes',
-    editorTemplateName: 'creator-node',
+Wat.Views.DIListView = Wat.Views.ListView.extend({
+    listTemplateName: 'list-di',
+    editorTemplateName: 'creator-di',
     
     breadcrumbs: {
         'screen': 'Home',
         'link': '#/home',
         'next': {
-            'screen': 'Node list'
+            'screen': 'DI list'
         }
     },
     
@@ -19,19 +19,12 @@ Wat.Views.NodeListView = Wat.Views.ListView.extend({
             'mobile': true
         },
         {
-            'name': 'vm',
-            'filterField': 'vm_id',
+            'name': 'osf',
+            'filterField': 'osf_id',
             'type': 'select',
-            'label': 'Virtual machine',
+            'label': 'OS Flavour',
             'class': 'chosen-advanced',
-            'fillable': true,
-            'options': [
-                {
-                    'value': -1,
-                    'text': 'All',
-                    'selected': true
-                }
-                        ]
+            'fillable': true
         }
     ],
 
@@ -42,23 +35,23 @@ Wat.Views.NodeListView = Wat.Views.ListView.extend({
         params.blocked = params.elementsBlock || this.elementsBlock;
         params.offset = this.elementsOffset;
         
-        this.collection = new Wat.Collections.Nodes(params);
+        this.collection = new Wat.Collections.DIs(params);
         
         this.setColumns();
         this.setSelectedActions();
         this.setListActionButton();
         
-        this.extendEvents(this.eventsNodes);
+        this.extendEvents(this.eventsDIs);
 
         Wat.Views.ListView.prototype.initialize.apply(this, [params]);
     },
     
-    eventsNodes: {
-        'click [name="new_node_button"]': 'newElement'
+    eventsDIs: {
+        'click [name="new_di_button"]': 'newElement'
     },
     
     editorDialogTitle: function () {
-        return $.i18n.t('New Node');
+        return $.i18n.t('New Disk image');
     },
     
     setColumns: function () {
@@ -68,31 +61,27 @@ Wat.Views.NodeListView = Wat.Views.ListView.extend({
                 'display': true
             },
             {
-                'name': 'info',
-                'display': true
-            },
-            {
                 'name': 'id',
                 'display': true
             },
             {
-                'name': 'name',
+                'name': 'disk_image',
                 'display': true
             },
             {
-                'name': 'state',
-                'display': false
-            },
-            {
-                'name': 'address',
+                'name': 'version',
                 'display': true
             },
             {
-                'name': '#vms_connected',
+                'name': 'osf',
                 'display': true
             },
             {
-                'name': 'Cosa',
+                'name': 'default',
+                'display': true
+            },
+            {
+                'name': 'head',
                 'display': true
             }
         ];
@@ -100,18 +89,6 @@ Wat.Views.NodeListView = Wat.Views.ListView.extend({
     
     setSelectedActions: function () {
         this.selectedActions = [
-            {
-                'value': 'block',
-                'text': 'Block'
-            },
-            {
-                'value': 'unblock',
-                'text': 'Unblock'
-            },
-            {
-                'value': 'stop_all',
-                'text': 'Stop all VMs'
-            },
             {
                 'value': 'delete',
                 'text': 'Delete'
@@ -121,14 +98,14 @@ Wat.Views.NodeListView = Wat.Views.ListView.extend({
     
     setListActionButton: function () {
         this.listActionButton = {
-            'name': 'new_node_button',
-            'value': 'New Node',
+            'name': 'new_di_button',
+            'value': 'New Disk image',
             'link': 'javascript:'
         }
     },
     
     newElement: function () {
-        this.model = new Wat.Models.Node();
+        this.model = new Wat.Models.DI();
         this.editElement();
     }
 });

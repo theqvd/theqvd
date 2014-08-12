@@ -101,6 +101,7 @@ Wat.Views.MainView = Backbone.View.extend({
             that.cache.stringsCache[key] = cleanValue;
         });
         this.cache.cached = true;
+        console.log(this.cache);
     },
     
     editorDialogTitle: function () {
@@ -166,6 +167,9 @@ Wat.Views.MainView = Backbone.View.extend({
                 
                 $(that.editorContainer).html(that.template);
                 
+                $('[name="tags"]').tagsInput({
+                    'defaultText': i18n.t('Add a tag')
+                });
                 
                 Wat.T.translateElement($(this).find('[data-i18n]'));
                 

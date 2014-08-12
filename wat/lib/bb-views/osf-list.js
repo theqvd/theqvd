@@ -1,12 +1,12 @@
-Wat.Views.NodeListView = Wat.Views.ListView.extend({
-    listTemplateName: 'list-nodes',
-    editorTemplateName: 'creator-node',
+Wat.Views.OSFListView = Wat.Views.ListView.extend({
+    listTemplateName: 'list-osf',
+    editorTemplateName: 'creator-osf',
     
     breadcrumbs: {
         'screen': 'Home',
         'link': '#/home',
         'next': {
-            'screen': 'Node list'
+            'screen': 'OSF list'
         }
     },
     
@@ -32,6 +32,21 @@ Wat.Views.NodeListView = Wat.Views.ListView.extend({
                     'selected': true
                 }
                         ]
+        },
+        {
+            'name': 'di',
+            'filterField': 'di_id',
+            'type': 'select',
+            'label': 'Disk image',
+            'class': 'chosen-advanced',
+            'fillable': true,
+            'options': [
+                {
+                    'value': -1,
+                    'text': 'All',
+                    'selected': true
+                }
+                        ]
         }
     ],
 
@@ -42,33 +57,29 @@ Wat.Views.NodeListView = Wat.Views.ListView.extend({
         params.blocked = params.elementsBlock || this.elementsBlock;
         params.offset = this.elementsOffset;
         
-        this.collection = new Wat.Collections.Nodes(params);
+        this.collection = new Wat.Collections.OSFs(params);
         
         this.setColumns();
         this.setSelectedActions();
         this.setListActionButton();
         
-        this.extendEvents(this.eventsNodes);
+        this.extendEvents(this.eventsOSFs);
 
         Wat.Views.ListView.prototype.initialize.apply(this, [params]);
     },
     
-    eventsNodes: {
-        'click [name="new_node_button"]': 'newElement'
+    eventsOSFs: {
+        'click [name="new_osf_button"]': 'newElement'
     },
     
     editorDialogTitle: function () {
-        return $.i18n.t('New Node');
+        return $.i18n.t('New OS Flavour');
     },
     
     setColumns: function () {
         this.columns = [
             {
                 'name': 'checks',
-                'display': true
-            },
-            {
-                'name': 'info',
                 'display': true
             },
             {
@@ -80,19 +91,23 @@ Wat.Views.NodeListView = Wat.Views.ListView.extend({
                 'display': true
             },
             {
-                'name': 'state',
-                'display': false
-            },
-            {
-                'name': 'address',
+                'name': 'overlay',
                 'display': true
             },
             {
-                'name': '#vms_connected',
+                'name': 'memory',
                 'display': true
             },
             {
-                'name': 'Cosa',
+                'name': 'user_storage',
+                'display': true
+            },
+            {
+                'name': '#dis',
+                'display': true
+            },
+            {
+                'name': '#vms',
                 'display': true
             }
         ];
@@ -100,18 +115,6 @@ Wat.Views.NodeListView = Wat.Views.ListView.extend({
     
     setSelectedActions: function () {
         this.selectedActions = [
-            {
-                'value': 'block',
-                'text': 'Block'
-            },
-            {
-                'value': 'unblock',
-                'text': 'Unblock'
-            },
-            {
-                'value': 'stop_all',
-                'text': 'Stop all VMs'
-            },
             {
                 'value': 'delete',
                 'text': 'Delete'
@@ -121,14 +124,14 @@ Wat.Views.NodeListView = Wat.Views.ListView.extend({
     
     setListActionButton: function () {
         this.listActionButton = {
-            'name': 'new_node_button',
-            'value': 'New Node',
+            'name': 'new_osf_button',
+            'value': 'New OS Flavour',
             'link': 'javascript:'
         }
     },
     
     newElement: function () {
-        this.model = new Wat.Models.Node();
+        this.model = new Wat.Models.OSF();
         this.editElement();
     }
 });

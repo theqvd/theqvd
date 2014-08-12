@@ -75,6 +75,12 @@ var Wat = {
                     case 'node':
                         params.filters = {"host_id": value};
                         break;
+                    case 'osf':
+                        params.filters = {"osf_id": value};
+                        break;;
+                    case 'di':
+                        params.filters = {"di_id": value};
+                        break;
                 }
             }
             
@@ -99,6 +105,26 @@ var Wat = {
             }
             
             Wat.CurrentView = new Wat.Views.NodeListView();
+        });      
+        
+        app_router.on('route:listOSF', function () {
+            Wat.I.showLoading();
+            setMenuOpt('osfs');
+            if (!$.isEmptyObject(Wat.CurrentView )) {
+                Wat.CurrentView.undelegateEvents();
+            }
+            
+            Wat.CurrentView = new Wat.Views.OSFListView();
+        });    
+        
+        app_router.on('route:listDI', function () {
+            Wat.I.showLoading();
+            setMenuOpt('dis');
+            if (!$.isEmptyObject(Wat.CurrentView )) {
+                Wat.CurrentView.undelegateEvents();
+            }
+            
+            Wat.CurrentView = new Wat.Views.DIListView();
         });
         
         
@@ -129,6 +155,24 @@ var Wat = {
                 Wat.CurrentView.undelegateEvents();
             }
             Wat.CurrentView = new Wat.Views.NodeDetailsView({"id": id});
+        });
+        
+        app_router.on('route:detailsOSF', function (id) {
+            Wat.I.showLoading();
+            setMenuOpt('osfs');
+            if (!$.isEmptyObject(Wat.CurrentView )) {
+                Wat.CurrentView.undelegateEvents();
+            }
+            Wat.CurrentView = new Wat.Views.OSFDetailsView({"id": id});
+        });
+        
+        app_router.on('route:detailsDI', function (id) {
+            Wat.I.showLoading();
+            setMenuOpt('dis');
+            if (!$.isEmptyObject(Wat.CurrentView )) {
+                Wat.CurrentView.undelegateEvents();
+            }
+            Wat.CurrentView = new Wat.Views.DIDetailsView({"id": id});
         });
         
         

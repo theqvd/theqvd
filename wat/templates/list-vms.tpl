@@ -38,7 +38,7 @@
                             break;
                         case 'node':
             %>
-                            <th class="cacheable sortable desktop" data-sortby="node_id" data-i18n="Node">
+                            <th class="cacheable sortable desktop" data-sortby="host_id" data-i18n="Node">
                                 <%= getCached('Node', cache) %>
                             </th>
             <%
@@ -52,8 +52,15 @@
                             break;
                         case 'osf/tag':
             %>
-                            <th class="cacheable sortable desktop" data-sortby="osf_id" data-i18n="OSF / Tag">
+                            <th class="cacheable sortable desktop" data-sortby="osf_name" data-i18n="OSF / Tag">
                                 <%= getCached('OSF / Tag', cache) %>
+                            </th>
+            <%
+                            break;
+                        case 'tag':
+            %>
+                            <th class="cacheable sortable desktop" data-sortby="di_tag" data-i18n="Tag">
+                                <%= getCached('Tag', cache) %>
                             </th>
             <%
                             break;
@@ -176,6 +183,13 @@
                                     <div class="second_row">
                                         <%= model.get('di_tag') %>
                                     </div>
+                                </td>
+                <%
+                                break;
+                            case 'tag':
+                %>
+                                <td class="desktop">
+                                    <%= model.get('di_tag') %>
                                 </td>
                 <%
                                 break;

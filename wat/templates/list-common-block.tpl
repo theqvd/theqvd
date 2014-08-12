@@ -34,25 +34,21 @@
     <div class="list bb-list">
 
     </div>
-
-    <%
-        var disabledClass = "";
-        var disabledAttr = "";
-        
-        if(nElements == 0) {
-            disabledClass = " disabled ";
-            disabledAttr =" disabled=\"disabled\" ";
-        }
-        
+    <% 
+    if (selectedActions.length > 0)
+    {
     %>
-    <div class="action-selected">
-        <select name="selected_actions_select" class="chosen-single"<%=disabledAttr%>>
-            <% _.each(selectedActions, function(action) { %>
-                <option value="<%= action.value %>" data-i18n><%= action.text %></option>
-            <% }); %>
-        </select>
-        <a class="js-traductable_button actions_button button fa fa-check<%=disabledClass%>" name="selected_actions_button" data-i18n>
-            Apply to selected items
-        </a>
-    </div>
+        <div class="action-selected">
+            <select name="selected_actions_select" class="chosen-single">
+                <% _.each(selectedActions, function(action) { %>
+                    <option value="<%= action.value %>" data-i18n><%= action.text %></option>
+                <% }); %>
+            </select>
+            <a class="js-traductable_button actions_button button fa fa-check" name="selected_actions_button" data-i18n>
+                Apply to selected items
+            </a>
+        </div>
+    <%
+    }
+    %>
 </div>

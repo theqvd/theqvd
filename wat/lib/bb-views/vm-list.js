@@ -106,7 +106,7 @@ Wat.Views.VMListView = Wat.Views.ListView.extend({
         
         // Extend the common events
         this.extendEvents(this.eventsVMs);
-
+        
         Wat.Views.ListView.prototype.initialize.apply(this, [params]);
     },
     
@@ -147,6 +147,10 @@ Wat.Views.VMListView = Wat.Views.ListView.extend({
             {
                 'name': 'osf/tag',
                 'display': true
+            },        
+            {
+                'name': 'tag',
+                'display': false
             }
         ];
     },

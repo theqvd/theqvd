@@ -91,6 +91,7 @@
             }
         }
         
+
         &:first-child {
             @include in(desktop) {
                 text-align: right;
@@ -105,6 +106,12 @@
                    width: 100%;
                 }
             }
+            
+            input.half100 {
+                width: 50%;
+                max-width: 100px;
+            }
+        
         }
     }
     

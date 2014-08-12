@@ -55,7 +55,9 @@ Wat.A = {
         return {
             'update_user': 'user_update_custom',
             'update_vm': 'vm_update_custom',
-            'update_node': 'host_update_custom'
+            'update_node': 'host_update_custom',
+            'update_osf': 'osf_update_custom',
+            'update_di': 'di_update_custom'
         };
     }
 };

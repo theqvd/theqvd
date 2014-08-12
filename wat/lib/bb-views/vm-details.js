@@ -92,9 +92,18 @@ Wat.Views.VMDetailsView = Wat.Views.DetailsView.extend({
         
         var filters = {"id": this.id};
         
-        Wat.A.performAction('update_vm', filters, arguments);
+        var result = Wat.A.performAction('update_vm', filters, arguments);
         
-        this.fetchDetails();
+        if (result.status == SUCCESS) {
+            this.fetchDetails();
+
+            this.message = 'Successfully updated';
+            this.messageType = 'success';
+        }
+        else {
+            this.message = 'Error updating';
+            this.messageType = 'error';
+        }
         
         dialog.dialog('close');
     },

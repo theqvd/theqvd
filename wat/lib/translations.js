@@ -1,8 +1,9 @@
 // Translation setup and utilities
 Wat.T = {
+    a: null,
     // Translation configuration and actions to be done when language file is loaded
     translate: function() {
-        $.i18n.init({
+        this.a = $.i18n.init({
             //resGetPath: 'lib/languages/__lng__.json',
             resGetPath: 'lib/languages/en.json',
             useLocalStorage: false,
