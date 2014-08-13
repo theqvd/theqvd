@@ -190,6 +190,20 @@ vm_update_custom.arguments=name,di_tag,blocked
 vm_update_custom.filters=id,tenant
 vm_update_custom.mandatory=id,tenant
 
+vm_create.roles=superadmin,admin
+vm_create.table=VM
+vm_create.arguments=name,user_id,osf_id,ip,storage,di_tag,state,user_state,blocked,tenant
+vm_create.default.di_tag=default
+vm_create.default.blocked=false
+vm_create.default.user_state=disconnected
+vm_create.default.state=stopped
+vm_create.default.SYSTEM.ip=_get_free_ip
+
+vm_delete.roles=admin,superadmin
+vm_delete.table=VM
+vm_delete.filters=id,tenant
+vm_delete.mandatory=id,tenant
+
 host_get_list.roles=all
 host_get_list.table=Host
 host_get_list.order_by=id,name,state,address,blocked
@@ -263,6 +277,17 @@ osf_update_custom.arguments=name,memory,user_storage
 osf_update_custom.filters=id,tenant
 osf_update_custom.mandatory=id,tenant
 
+osf_create.roles=superadmin,admin
+osf_create.table=OSF
+osf_create.arguments=name,memory,overlay,tenant
+osf_create.default.SYSTEM.memory=get_default_memory
+osf_create.default.SYSTEM.overlay=get_default_overlay
+
+osf_delete.roles=admin,superadmin
+osf_delete.table=OSF
+osf_delete.filters=id,tenant
+osf_delete.mandatory=id,tenant
+
 di_get_list.roles=all
 di_get_list.table=DI
 di_get_list.filters=disk_image,osf_id,tenant
@@ -291,6 +316,16 @@ di_update_custom.table=DI
 di_update_custom.arguments=blocked
 di_update_custom.filters=id,tenant
 di_update_custom.mandatory=id,tenant
+
+di_create.roles=superadmin,admin
+di_create.table=DI
+di_create.arguments=version,disk_image,osf_id,tenant
+di_create.default.SYSTEM.version=get_default_version
+
+di_delete.roles=admin,superadmin
+di_delete.table=DI
+di_delete.filters=id,tenant
+di_delete.mandatory=id,tenant
 
 tag_tiny_list.roles =all
 tag_tiny_list.table=DI_Tag

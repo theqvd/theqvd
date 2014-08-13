@@ -41,7 +41,7 @@ sub BUILD
     if exists $self->config->{filters}->{tenant};
 
     $self->modifiers->{page} = $self->json->{offset} // 1; 
-    $self->modifiers->{rows}  = $self->json->{blocked} // 10000; 
+    $self->modifiers->{rows}  = $self->json->{block} // 10000; 
     $self->modifiers->{distinct} = 1;
 }
 
@@ -211,6 +211,18 @@ sub get_customs
 	    $n++;
 	}
    }
+}
+
+sub default_system
+{
+    my $self = shift;
+
+    my $SYSTEM = delete $self->{config}->{default}->{SYSTEM} // {};
+
+    while (my ($default,$method) = each %$SYSTEM)
+    {
+	$self->{config}->{default}->{$default} = $self->$method;
+    }
 }
 
 1;

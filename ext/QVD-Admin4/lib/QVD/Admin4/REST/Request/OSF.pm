@@ -2,6 +2,7 @@ package QVD::Admin4::REST::Request::OSF;
 use strict;
 use warnings;
 use Moose;
+use QVD::Config;
 
 extends 'QVD::Admin4::REST::Request';
 
@@ -17,8 +18,13 @@ sub BUILD
     $self->modifiers->{join} //= [];
     push @{$self->modifiers->{join}}, qw(vms dis tenant);
     push @{$self->modifiers->{join}}, { dis => 'tags' };
+    $self->default_system;
     $self->order_by;
 }
+
+
+sub get_default_memory { cfg('osf.default.memory'); }
+sub get_default_overlay { cfg('osf.default.overlay'); }
 
 1;
 

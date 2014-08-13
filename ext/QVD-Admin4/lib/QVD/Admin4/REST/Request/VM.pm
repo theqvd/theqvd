@@ -2,6 +2,7 @@ package QVD::Admin4::REST::Request::VM;
 use strict;
 use warnings;
 use Moose;
+use QVD::Config::Network qw(nettop_n netstart_n net_aton net_ntoa);
 
 extends 'QVD::Admin4::REST::Request';
 
@@ -13,17 +14,36 @@ sub BUILD
     my $self = shift;
 
     $self->{mapper} = $mapper;
+    $self->{dependencies} = {vm_runtime => 1, counters => 1};
     $self->get_customs('VM_Property');
     $self->modifiers->{join} //= [];
     push @{$self->modifiers->{join}}, qw(user osf);
     push @{$self->modifiers->{join}}, { vm_runtime => 'host' };
+    $self->default_system;
     $self->order_by;
 }
+
+
+sub _get_free_ip {
+    my $self = shift;
+    my $nettop = nettop_n;
+    my $netstart = netstart_n;
+
+    my %ips = map { net_aton($_->ip) => 1 } 
+    $self->db->resultset('VM')->all;
+
+    while ($nettop-- > $netstart) {
+        return net_ntoa($nettop) unless $ips{$nettop}
+    }
+    die "No free IP addresses";
+}
+
 
 1;
 
 __DATA__
 
+storage         = me.storage
 id              = me.id
 name            = me.name
 user_id         = me.user_id

@@ -432,7 +432,7 @@ sub select
     my $rs = eval { $DB->resultset($request->table)->search($filters, 
 							    $modifiers) };
 
-    QVD::Admin4::Exception->throw(code => ($DB->storage->_dbh->state || 4)) if $@;
+    QVD::Admin4::Exception->throw(code => ($DB->storage->_dbh->err || 4)) if $@;
 
 
    { total => ($rs->is_paged ? $rs->pager->total_entries : undef), 
@@ -451,7 +451,7 @@ sub update
     for my $obj (@{$result->{rows}})
     {
          eval { $DB->txn_do( sub { eval { $obj->update($arguments) };
-				   QVD::Admin4::Exception->throw(code => ($DB->storage->_dbh->state || 4)) if $@;
+				   QVD::Admin4::Exception->throw(code => ($DB->storage->_dbh->err || 4)) if $@;
 				   $self->update_related($request,$obj); } ) };      
 	 if ($@) { $failures->{$obj->id} = ($@->can('code') ? $@->code : 4); }
     }
@@ -496,7 +496,7 @@ sub update_related
     for (keys %tables)
     {
 	eval { $obj->$_->update($tables{$_}) }; 
-	QVD::Admin4::Exception->throw(code => ($DB->storage->_dbh->state || 4)) if $@;
+	QVD::Admin4::Exception->throw(code => ($DB->storage->_dbh->err || 4)) if $@;
     }
     
 }
@@ -510,13 +510,14 @@ sub update_custom
 
     for my $obj (@{$result->{rows}})
     {
+	my $props = $request->arguments(custom => 1);
 	my $f = 
-	    sub { $self->custom_update($request,$obj);    
-		  $self->custom_delete($request,$obj);    
-		  $self->custom_create($request,$obj);
+	    sub { $self->custom_update($props->{update},$obj);    
+		  $self->custom_delete($props->{delete},$obj);    
+		  $self->custom_create($props->{create},$obj);
 		  
 		  eval { $obj->update($request->arguments) };
-		  QVD::Admin4::Exception->throw(code => ($DB->storage->_dbh->state || 4)) if $@;
+		  QVD::Admin4::Exception->throw(code => ($DB->storage->_dbh->err || 4)) if $@;
 	    
 		  $self->update_related($request,$obj); };
 	
@@ -533,48 +534,45 @@ sub update_custom
 
 sub custom_create
 {
-    my ($self,$request,$obj) = @_;
+    my ($self,$props,$obj) = @_;
 
-    my $props = $request->arguments(custom => 1);
+    my $class = ref($obj);     # FIX ME, PLEASE!!!!
+    $class =~ s/^QVD::DB::Result::(.+)$/$1/;
 
-    while (my ($key,$value) = each %{$props->{create}})
+    while (my ($key,$value) = each %$props)
     { 
-	my $t = $request->table . "_Property";
-	my $k = lc($request->table) . "_id";
+	my $t = $class . "_Property";
+	my $k = lc($class) . "_id";
 	my $a = {key => $key, value => $value, $k => $obj->id};
 	eval { $DB->resultset($t)->create($a) };
 
 	print $@ if $@;
-	QVD::Admin4::Exception->throw(code => ($DB->storage->_dbh->state || 4)) if $@;
+	QVD::Admin4::Exception->throw(code => ($DB->storage->_dbh->err || 4)) if $@;
     }
 }
 
 sub custom_update
 {
-    my ($self,$request,$obj) = @_;
+    my ($self,$props,$obj) = @_;
 
-    my $props = $request->arguments(custom => 1);
-
-    while ( my ($key,$value) = each %{$props->{update}})
+    while ( my ($key,$value) = each %$props)
     {
 	eval { $obj->search_related('properties', 
 				    {key => $key})->update({value => $value}) };
 		
-	QVD::Admin4::Exception->throw(code => ($DB->storage->_dbh->state || 4)) if $@;
+	QVD::Admin4::Exception->throw(code => ($DB->storage->_dbh->err || 4)) if $@;
     }		
 }
 
 sub custom_delete
 {
-    my ($self,$request,$obj) = @_;
+    my ($self,$props,$obj) = @_;
 
-    my $props = $request->arguments(custom => 1);
-
-    for my $key (@{$props->{delete}})
+    for my $key (@$props)
     {
 	eval { $obj->search_related('properties', 
 				    {key => $key})->delete };
-	QVD::Admin4::Exception->throw(code => ($DB->storage->_dbh->state || 4)) if $@;
+	QVD::Admin4::Exception->throw(code => ($DB->storage->_dbh->err || 4)) if $@;
     }		
 }
 
@@ -583,14 +581,31 @@ sub custom_delete
 ## ADD/DELETE ELEMENTS ##
 #########################
 
+sub _delete
+{
+    my ($self,$result,@conditions) = @_;
+    my $failures = {};
+
+    for my $obj (@{$result->{rows}})
+    {
+         eval { $self->$_($obj) || 
+		    QVD::Admin4::Exception->throw(code => 16)
+		    for @conditions; 
+		$obj->delete };
+	 if ($@) { $failures->{$obj->id} = ($@->can('code') ? $@->code : 4); }
+    }
+
+    QVD::Admin4::Exception->throw(code => 1, failures => $failures) if %$failures;
+}
+
 sub _create
 {
     my ($self,$request) = @_;
-    my $arguments = $request->arguments(default => 1);
 
+    my $arguments = $request->arguments(default => 1);
     my $host = eval { $DB->resultset($request->table)->create($arguments) };
     print $@ if $@;
-    QVD::Admin4::Exception->throw(code => ($DB->storage->_dbh->state || 4)) if $@;
+    QVD::Admin4::Exception->throw(code => ($DB->storage->_dbh->err || 4)) if $@;
     $host;
 }
 
@@ -603,7 +618,7 @@ sub _create_related
     {
 	eval { $obj->create_related($table,($related_args->{$table} || {})) };
 	print $@ if $@;
-	QVD::Admin4::Exception->throw(code => ($DB->storage->_dbh->state || 4)) if $@;
+	QVD::Admin4::Exception->throw(code => ($DB->storage->_dbh->err || 4)) if $@;
     }
 }
 
@@ -612,7 +627,7 @@ sub host_create {
 
     $DB->txn_do( sub { my $host = $self->_create($request);
 		       $self->_create_related($request,$host);
-		       $self->custom_create($request,$host)});
+		       $self->custom_create($request->arguments(custom => 1),$host)});
 
    { total => undef, 
      rows => [] };
@@ -623,7 +638,7 @@ sub host_delete {
     my ($self, $request) = @_;
 
     my $result = $self->select($request);
-    $_->delete for @{$result->{rows}};
+    $self->_delete($result);
 
    { total => undef, 
      rows => [] };
@@ -638,7 +653,7 @@ sub user_create {
 
     $DB->txn_do( sub { my $host = $self->_create($request);
 		       $self->_create_related($request,$host);
-		       $self->custom_create($request,$host)});
+		       $self->custom_create($request->arguments(custom => 1),$host)});
 
    { total => undef, 
      rows => [] };
@@ -649,7 +664,7 @@ sub user_delete {
     my ($self, $request) = @_;
 
     my $result = $self->select($request);
-    $_->delete for @{$result->{rows}};
+    $self->_delete($result);
 
    { total => undef, 
      rows => [] };
@@ -659,9 +674,12 @@ sub osf_create
 {
     my ($self,$request) = @_;
 
+    $request->{json}->{arguments}->{tenant} =
+	$request->{json}->{tenant};
+
     $DB->txn_do( sub { my $host = $self->_create($request);
 		       $self->_create_related($request,$host);
-		       $self->custom_create($request,$host)});
+		       $self->custom_create($request->arguments(custom => 1),$host)});
 
    { total => undef, 
      rows => [] };
@@ -673,46 +691,105 @@ sub osf_delete
     my ($self,$request) = @_;
 
     my $result = $self->select($request);
-    $_->delete for @{$result->{rows}};
+
+    $self->_delete($result);
 
    { total => undef, 
      rows => [] };
 }
 
+sub vm_create
+{
+    my ($self,$request) = @_;
 
-sub cmd_osf_add {
-    my ($self, %params) = @_;
-    my @required_params = qw/name memory use_overlay/;
+    $request->{json}->{arguments}->{tenant} =
+	$request->{json}->{tenant};
 
-    # FIXME: detect type of image and set use_overlay accordingly, iso => no overlay
-    $params{memory}      //= $osf_default_memory;
-    $params{use_overlay} //= $osf_default_overlay;
+    $DB->txn_do( sub { my $host = $self->_create($request);
+		       $self->_create_related($request,$host);
+		       $self->custom_create($request->arguments(custom => 1),$host)});
 
-    #die "The required parameters are ".join(", ", @required_params)
-    #    unless _set_equals([keys %params], \@required_params);
-
-    my $id;
-    txn_do {
-        my $rs = $self->get_resultset('osf');
-        my $row = $rs->create(\%params);
-        $id = $row->id;
-    };
-    $id
+   { total => undef, 
+     rows => [] };
 }
 
-sub cmd_osf_del {
-    my ($self, @args) = @_;
-    my $counter = 0;
-    my $rs = $self->get_resultset('osf');
-    while (my $osf = $rs->next) {
-        if ($osf->vms->count == 0) {
-            #warn "deleting osf ".$osf->id;
-            $osf->delete;
-            $counter++;
-        }
-    }
-    $counter
+sub vm_delete
+{
+    my ($self,$request) = @_;
+    my $result = $self->select($request);
+
+    $self->_delete($result,qw(vm_is_stopped));
+
+   { total => undef, 
+     rows => [] };
+}
+
+##############
+# CONDITIONS
+##############
+
+
+sub vm_is_stopped
+{
+    my ($self,$obj) = @_;
+    $obj->vm_runtime->vm_state eq 'stopped' ? 
+	return 1 : 
+	return 0;
 }
 
 
 1;
+
+#
+#sub di_create
+#{
+#    my ($self,$request) = @_;
+#
+#    $request->{json}->{arguments}->{tenant} =
+#	$request->{json}->{tenant};
+#    require QVD::Config;
+#    my $images_path = cfg('path.storage.images');
+#
+#    require File::Copy qw(copy move);
+#    require File::Basename qw(basename);
+#
+#    mkdir $images_path, 0755;
+#    -d $images_path or die "Directory $images_path does not exist";
+#
+#    my $src = $request->json->{disk_image};
+#    my $file = basename($src);
+#    my $tmp = "$images_path/$file.tmp-" . rand;
+#    copy($src, $tmp) or die "Unable to copy $src to $tmp: $!\n";
+#
+#    my $osf_id = $request->json->{arguments}->{osf_id};
+#    my $osf = $self->db->resultset('OSF')->search({id => $osf_id})->first;
+#
+#    my ($new_file,$id);
+#
+#    eval {
+#    $DB->txn_do( sub { $osf->delete_tag('head');
+#		       $osf->delete_tag($request->json->{arguments}->{osf_id});
+#
+#		       my $rs = $self->get_resultset('di');
+#		       my $di = $rs->create({osf_id => $osf_id, path => '', version => $version});
+#		       $id = $di->id;
+#		       rs(DI_Tag)->create({di_id => $id, tag => $version, fixed => 1});
+#		       rs(DI_Tag)->create({di_id => $id, tag => 'head'});
+#		       rs(DI_Tag)->create({di_id => $id, tag => 'default'})
+#			   unless $osf->di_by_tag('default'); 
+#		       $new_file = "$id-$file";
+#		       $di->update({path => $new_file});
+#
+#		       move($tmp, "$images_path/$new_file")
+#			   or die "Unable to move '$tmp' to its final destination at '$images_path/$new_file': $!"; }) 
+#	for (1 .. 5)
+#    };
+#
+#    if ($@) { unlink $tmp;
+#	      unlink "$images_path/$new_file" if defined $new_file;
+#	      QVD::Admin4::Exception->throw(code => 17) if $@;};
+#
+#    { total => undef, 
+#      rows => [] };
+#}
+#
