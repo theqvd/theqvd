@@ -80,5 +80,68 @@ Wat.I = {
             lang: 'en',
             format:'Y-m-d h:i'
         });
+    },
+    
+    chosenConfiguration: function () {
+        // Convert the filter selects to library chosen style
+        var chosenOptions = {};
+        chosenOptions.no_results_text = i18n.t('No results match');
+        chosenOptions.search_contains = true;
+
+        var chosenOptionsSingle = jQuery.extend({}, chosenOptions);
+        chosenOptionsSingle.disable_search = true;
+        chosenOptionsSingle.width = "150px";
+
+        var chosenOptionsSingle100 = jQuery.extend({}, chosenOptionsSingle);
+        chosenOptionsSingle100.width = "100%"; 
+
+        var chosenOptionsAdvanced100 = jQuery.extend({}, chosenOptions);
+        chosenOptionsAdvanced100.width = "100%";
+
+        $('.filter-control select.chosen-advanced').chosen(chosenOptionsAdvanced100);
+        $('.filter-control select.chosen-single').chosen(chosenOptionsSingle100);
+        $('select.chosen-single').chosen(chosenOptionsSingle);
+    },
+    
+    cornerMenuEvents: function () {
+       // Show/hide the corner menu
+       $('.js-menu-corner li:has(ul)').hover(
+          function(e)
+          {
+             $(this).find('ul').css({display: "block"});
+          },
+          function(e)
+          {
+             $(this).find('ul').css({display: "none"});
+          }
+       );
+    },
+    
+    responsiveMenuConfiguration: function () {
+        var nav = responsiveNav(".nav-collapse", {customToggle: "#toggle"});
+        var navCorner = responsiveNav(".nav-collapse-corner", {customToggle: "#toggle-corner"});
+            
+        // Hide mobile menu when click
+        $('.nav-collapse').click(function() {
+            nav.close();
+        });
+    },
+    
+    tooltipConfiguration: function () {
+        $( document ).tooltip({
+            position: { 
+                my: "left+15 center", 
+                at: "right center" 
+            } 
+        }
+                             );
+    },
+    
+    tagsInputConfiguration: function () {
+        $('[name="tags"]').tagsInput({
+            'defaultText': i18n.t('Add a tag')
+        });
+                
+        
     }
 }

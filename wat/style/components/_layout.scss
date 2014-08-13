@@ -82,7 +82,8 @@ body {
         width: 100%;
         margin-bottom: 10px;
         padding-bottom: 10px;
-
+        border-bottom: dotted 1px darken($col_whiter, 15);
+        
         @include in(desktop) {
             margin-bottom: 20px;
             display: block;

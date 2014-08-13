@@ -17,50 +17,50 @@
                             break;
                         case 'id':
             %>
-                            <th class="cacheable sortable desktop max-2-icons" data-sortby="id" data-i18n="Id">
-                                <%= getCached('Id', cache) %>
+                            <th class="sortable desktop max-2-icons" data-sortby="id" data-i18n="Id">
+                                <%= i18n.t('Id') %>
                             </th>
             <%
                             break;
                         case 'name':
             %>
-                            <th class="cacheable sortable" data-sortby="name" data-i18n="Name">
-                                <%= getCached('Name', cache) %>
+                            <th class="sortable" data-sortby="name" data-i18n="Name">
+                                <%= i18n.t('Name') %>
                             </th>
             <%
                             break;
                         case 'overlay':
             %>
-                            <th class="cacheable desktop sortable" data-sortby="overlay" data-i18n="Overlay">
-                                <%= getCached('Overlay', cache) %>
+                            <th class="desktop sortable" data-sortby="overlay" data-i18n="Overlay">
+                                <%= i18n.t('Overlay') %>
                             </th>
             <%
                             break;
                         case 'memory':
             %>
-                            <th class="cacheable desktop sortable" data-sortby="memory" data-i18n="Memory">
-                                <%= getCached('Memory', cache) %>
+                            <th class="desktop sortable" data-sortby="memory" data-i18n="Memory">
+                                <%= i18n.t('Memory') %>
                             </th>
             <%
                             break;
                         case 'user_storage':
             %>
-                            <th class="cacheable desktop sortable" data-sortby="user_storage" data-i18n="User storage">
-                                <%= getCached('User storage', cache) %>
+                            <th class="desktop sortable" data-sortby="user_storage" data-i18n="User storage">
+                                <%= i18n.t('User storage') %>
                             </th>
             <%
                             break;
                         case '#dis':
             %>
-                            <th class="cacheable desktop sortable" data-sortby="#dis" data-i18n="Disk images">
-                                <%= getCached('Disk images', cache) %>
+                            <th class="desktop sortable" data-sortby="#dis" data-i18n="Disk images">
+                                <%= i18n.t('Disk images') %>
                             </th>
             <%
                             break;
                         case '#vms':
             %>
-                            <th class="cacheable desktop sortable" data-sortby="#vms" data-i18n="Virtual machines">
-                                <%= getCached('Virtual machines', cache) %>
+                            <th class="desktop sortable" data-sortby="#vms" data-i18n="Virtual machines">
+                                <%= i18n.t('Virtual machines') %>
                             </th>
             <%
                             break;
@@ -71,7 +71,7 @@
                             }
                     
             %>
-                            <th class="cacheable sortable desktop" data-sortby="<%= col.name %>" <%= translationAttr %>>
+                            <th class="sortable desktop" data-sortby="<%= col.name %>" <%= translationAttr %>>
                                 <%= col.name %>
                             </th>
             <%

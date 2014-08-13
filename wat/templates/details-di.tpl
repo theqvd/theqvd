@@ -1,22 +1,3 @@
-<%
-var tags = [];
-var tagHead = false;
-var tagDefault = false;
-
-$(model.get('tags')).each( function (index, tag) {
-    if (tag.tag == 'head') {
-        tagHead = true;
-    }
-    else if (tag.tag == 'default') {
-        tagDefault = true;
-    }
-    else {
-        tags.push(tag.tag);
-    }
-});
-
-%>
-                
 <div class="h1">
     <span class="fa fa-file" data-i18n><%= model.get('disk_image') %></span>
     <a class="button button-right js-button-edit fa fa-pencil" href="javascript:" data-i18n>Edit</a>
@@ -41,7 +22,7 @@ $(model.get('tags')).each( function (index, tag) {
         <span data-i18n>Default</span>
         <div class="indented-data">
             <%
-                if (tagDefault) {
+                if (model.get('default')) {
             %>
                     <span data-i18n="Yes">
                         <%= i18n.t('Yes') %>
@@ -62,7 +43,7 @@ $(model.get('tags')).each( function (index, tag) {
         <span data-i18n>Head</span>
         <div class="indented-data">
             <%
-                if (tagHead) {
+                if (model.get('head')) {
             %>
                     <span data-i18n="Yes">
                         <%= i18n.t('Yes') %>
@@ -82,9 +63,16 @@ $(model.get('tags')).each( function (index, tag) {
     <span class="details-item fa fa-angle-right">
         <span data-i18n>Tags</span>
         <div class="indented-data">
+        <%
+            if (!model.get('tags')) {
+        %>
+                <span class="no-elements" data-i18n="There are not tags"></span>
+        <%
+            }
+        %>
             <ul class="tags">
                 <%
-                $(tags).each( function (index, tag) {
+                $(model.get('tags').split(',')).each( function (index, tag) {
                 %>
                     <li><%= tag %></li>
                 <%

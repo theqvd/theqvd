@@ -35,12 +35,6 @@ Wat.Views.UserListView = Wat.Views.ListView.extend({
     ],
 
     initialize: function (params) {
-        if(params === undefined) {
-            params = {};
-        }
-        params.blocked = params.elementsBlock || this.elementsBlock;
-        params.offset = this.elementsOffset;
-        
         this.collection = new Wat.Collections.Users(params);
         
         this.setColumns();
@@ -53,11 +47,7 @@ Wat.Views.UserListView = Wat.Views.ListView.extend({
     },
     
     eventsUsers: {
-        'click [name="new_user_button"]': 'newElement'
-    },
-    
-    editorDialogTitle: function () {
-        return $.i18n.t('New user');
+        
     },
     
     setColumns: function () {
@@ -124,8 +114,60 @@ Wat.Views.UserListView = Wat.Views.ListView.extend({
         }
     },
     
-    newElement: function () {
+    newElement: function (e) {
         this.model = new Wat.Models.User();
-        this.editElement();
+        this.dialogConf.title = $.i18n.t('New user');
+        Wat.Views.ListView.prototype.newElement.apply(this, [e]);
+    },
+    
+    createElement: function () {
+        Wat.Views.ListView.prototype.createElement.apply(this);
+        
+        // Properties to create, update and delete obtained from parent view
+        var properties = this.properties;
+        
+        var arguments = {'properties' : properties};
+        
+        var context = $('.' + this.cid + '.editor-container');
+        
+        var name = context.find('input[name="name"]').val();
+        arguments['name'] = name;
+        
+        var password = context.find('input[name="password"]').val();
+        var password2 = context.find('input[name="password2"]').val();
+        if (!password || !password2) {
+            console.error('password empty');
+        }
+        else if (password != password2) {
+            console.error('password missmatch');
+        }
+        else {
+            arguments['password'] = password;
+        }
+        
+        var blocked = context.find('input[name="blocked"][value=1]').is(':checked');
+        
+        arguments['blocked'] = blocked ? 1 : 0;
+        
+        console.log(arguments);
+        return;
+        
+        var filters = {"id": this.id};
+        
+        var result = Wat.A.performAction('create_user', filters, arguments);
+        
+        if (result.status == SUCCESS) {
+            this.fetchDetails();
+            this.renderSide();
+
+            this.message = 'Successfully updated';
+            this.messageType = 'success';
+        }
+        else {
+            this.message = 'Error updating';
+            this.messageType = 'error';
+        }
+        
+        dialog.dialog('close');
     }
 });

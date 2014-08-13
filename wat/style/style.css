@@ -128,9 +128,8 @@ fieldset {
 
 .h1 {
   position: relative;
-  font-weight: bold;
+  font-weight: normal;
   font-size: 16px;
-  color: #6f6f6f;
   margin-bottom: 15px; }
   .h1 .subtitle {
     font-weight: normal;
@@ -158,7 +157,9 @@ fieldset {
   color: #cc0000; }
 
 .no-elements {
-  font-style: italic; }
+  font-style: italic;
+  font-weight: normal;
+  color: #555555; }
 
 /********************************************************************
 *********************************************************************
@@ -573,7 +574,8 @@ body {
   .wrapper .breadcrumbs {
     width: 100%;
     margin-bottom: 10px;
-    padding-bottom: 10px; }
+    padding-bottom: 10px;
+    border-bottom: dotted 1px #d7d7d7; }
     @media screen and (min-width: 40em) {
       .wrapper .breadcrumbs {
         margin-bottom: 20px;
@@ -754,7 +756,8 @@ body {
     border-collapse: separate; }
     .editor-container .editor-table td:first-child {
       font-weight: bold;
-      min-width: 50%; }
+      min-width: 50%;
+      vertical-align: top; }
     .editor-container .editor-table td.fa:before {
       margin-right: 10px; }
     .editor-container .editor-table .delete-property-button {
@@ -1058,5 +1061,22 @@ td.center {
 .xdsoft_datetimepicker .xdsoft_calendar td.xdsoft_default, .xdsoft_datetimepicker .xdsoft_calendar td.xdsoft_current, .xdsoft_datetimepicker .xdsoft_timepicker .xdsoft_time_box > div > div.xdsoft_current {
   background: #9a4008;
   box-shadow: #6a2c05 0px 1px 3px 0px inset; }
+
+div.tagsinput input {
+  min-width: 80px;
+  border-color: #cacaca; }
+
+div.tagsinput span.tag {
+  color: #7e7e7e;
+  background: #f0f0f0;
+  border: 1px solid #e4e4e4;
+  height: 25px; }
+  div.tagsinput span.tag a {
+    color: #f36d15;
+    font-size: 14px; }
+
+.not_valid {
+  background: #ff9999 !important;
+  color: #fdfdfd !important; }
 
 /*# sourceMappingURL=style.css.map */

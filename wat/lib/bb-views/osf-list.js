@@ -51,12 +51,6 @@ Wat.Views.OSFListView = Wat.Views.ListView.extend({
     ],
 
     initialize: function (params) {
-        if(params === undefined) {
-            params = {};
-        }
-        params.blocked = params.elementsBlock || this.elementsBlock;
-        params.offset = this.elementsOffset;
-        
         this.collection = new Wat.Collections.OSFs(params);
         
         this.setColumns();
@@ -69,11 +63,7 @@ Wat.Views.OSFListView = Wat.Views.ListView.extend({
     },
     
     eventsOSFs: {
-        'click [name="new_osf_button"]': 'newElement'
-    },
-    
-    editorDialogTitle: function () {
-        return $.i18n.t('New OS Flavour');
+        
     },
     
     setColumns: function () {
@@ -130,8 +120,10 @@ Wat.Views.OSFListView = Wat.Views.ListView.extend({
         }
     },
     
-    newElement: function () {
+    newElement: function (e) {
         this.model = new Wat.Models.OSF();
-        this.editElement();
+        this.dialogConf.title = $.i18n.t('New OS Flavour');
+
+        Wat.Views.ListView.prototype.newElement.apply(this, [e]);
     }
 });

@@ -139,3 +139,26 @@
     box-shadow: darken($col_brand,30) 0px 1px 3px 0px inset;
 }
 
+// jQuery Tag Input
+
+div.tagsinput input {
+    min-width: 80px;
+    border-color: darken($col_whiter, 20);
+}
+    
+div.tagsinput span.tag {
+    color: darken($col_whiter, 50);
+    background: darken($col_whiter, 5);
+    border: 1px solid darken($col_whiter, 10);
+    height: 25px;
+    
+    a {
+        color: $col_brand;
+        font-size: 14px;
+    }
+}
+
+.not_valid {
+    background: lighten($col_red, 30) !important;
+    color: $col_whiter !important;
+}

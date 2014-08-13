@@ -16,11 +16,6 @@ Wat.Views.DIDetailsView = Wat.Views.DetailsView.extend({
         }
     },
     
-    editorDialogTitle: function () {
-        return $.i18n.t('Edit Disk image') + ": " + this.model.get('disk_image');
-    },
-
-
     initialize: function (params) {
         this.model = new Wat.Models.DI(params);
         Wat.Views.DetailsView.prototype.initialize.apply(this, [params]);
@@ -38,7 +33,7 @@ Wat.Views.DIDetailsView = Wat.Views.DetailsView.extend({
         params.forceListColumns = {name: true, tag: true};
         params.forceSelectedActions = {};
         params.forceListActionButton = null;
-        params.elementsBlock = 5;
+        params.block = 5;
         params.filters = {"di_id": this.elementId};
         
         this.sideView = new Wat.Views.VMListView(params);
@@ -59,7 +54,13 @@ Wat.Views.DIDetailsView = Wat.Views.DetailsView.extend({
         arguments['name'] = name;
         
         var filters = {"id": this.id};
-
+        
+        var tags = context.find('input[name="tags"]').val();
+        
+        arguments['tags'] = tags
+            
+        console.log(arguments);
+        return;
         var result = Wat.A.performAction('update_di', filters, arguments);
 
         if (result.status == SUCCESS) {
@@ -94,8 +95,10 @@ Wat.Views.DIDetailsView = Wat.Views.DetailsView.extend({
         $(this.sideContainer).html(this.template);
     },
     
-    editElement: function() {
-        Wat.Views.DetailsView.prototype.editElement.apply(this);
+    editElement: function(e) {
+        this.dialogConf.title = $.i18n.t('Disk image') + ": " + this.model.get('name');
+        
+        Wat.Views.DetailsView.prototype.editElement.apply(this, [e]);
     },
     
     bindEditorEvents: function() {

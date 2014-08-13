@@ -15,11 +15,6 @@ Wat.Views.UserDetailsView = Wat.Views.DetailsView.extend({
             }
         }
     },
-    
-    editorDialogTitle: function () {
-        return $.i18n.t('Edit user') + ": " + this.model.get('name');
-    },
-
 
     initialize: function (params) {
         this.model = new Wat.Models.User(params);
@@ -38,7 +33,7 @@ Wat.Views.UserDetailsView = Wat.Views.DetailsView.extend({
         params.forceListColumns = {checks: true, info: true, name: true};
         params.forceSelectedActions = {disconnect: true};
         params.forceListActionButton = null;
-        params.elementsBlock = 5;
+        params.block = 5;
         params.filters = {"user_id": this.elementId};
         
         this.sideView = new Wat.Views.VMListView(params);
@@ -109,8 +104,10 @@ Wat.Views.UserDetailsView = Wat.Views.DetailsView.extend({
         $(this.sideContainer).html(this.template);
     },
     
-    editElement: function() {
-        Wat.Views.DetailsView.prototype.editElement.apply(this);
+    editElement: function(e) {
+        this.dialogConf.title = $.i18n.t('Edit user') + ": " + this.model.get('name');
+        
+        Wat.Views.DetailsView.prototype.editElement.apply(this, [e]);
     },
     
     bindEditorEvents: function() {

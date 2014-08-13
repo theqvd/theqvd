@@ -29,7 +29,6 @@ input {
   -moz-box-shadow: inset 1px 1px 1px 0px #dddddd;
   box-shadow: inset 1px 1px 1px 0px #dddddd;
   border-style: solid;
-  border-color: pink;
   border-width: thin;
   padding: 4px;
   font-size: x-small; }

@@ -35,13 +35,7 @@ Wat.Views.NodeListView = Wat.Views.ListView.extend({
         }
     ],
 
-    initialize: function (params) {
-        if(params === undefined) {
-            params = {};
-        }
-        params.blocked = params.elementsBlock || this.elementsBlock;
-        params.offset = this.elementsOffset;
-        
+    initialize: function (params) { 
         this.collection = new Wat.Collections.Nodes(params);
         
         this.setColumns();
@@ -54,11 +48,7 @@ Wat.Views.NodeListView = Wat.Views.ListView.extend({
     },
     
     eventsNodes: {
-        'click [name="new_node_button"]': 'newElement'
-    },
-    
-    editorDialogTitle: function () {
-        return $.i18n.t('New Node');
+
     },
     
     setColumns: function () {
@@ -127,8 +117,10 @@ Wat.Views.NodeListView = Wat.Views.ListView.extend({
         }
     },
     
-    newElement: function () {
+    newElement: function (e) {
         this.model = new Wat.Models.Node();
-        this.editElement();
+        this.dialogConf.title = $.i18n.t('New node');
+        
+        Wat.Views.ListView.prototype.newElement.apply(this, [e]);
     }
 });

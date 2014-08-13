@@ -15,11 +15,6 @@ Wat.Views.NodeDetailsView = Wat.Views.DetailsView.extend({
             }
         }
     },
-    
-    editorDialogTitle: function () {
-        return $.i18n.t('Edit node') + ": " + this.model.get('name');
-    },
-
 
     initialize: function (params) {
         this.model = new Wat.Models.Node(params);
@@ -38,7 +33,7 @@ Wat.Views.NodeDetailsView = Wat.Views.DetailsView.extend({
         params.forceListColumns = {checks: true, info: true, name: true};
         params.forceSelectedActions = {disconnect: true};
         params.forceListActionButton = null;
-        params.elementsBlock = 5;
+        params.block = 5;
         params.filters = {"host_id": this.elementId};
         
         this.sideView = new Wat.Views.VMListView(params);
@@ -99,6 +94,8 @@ Wat.Views.NodeDetailsView = Wat.Views.DetailsView.extend({
     },
     
     editElement: function() {
+        this.dialogConf.title = $.i18n.t('Edit node') + ": " + this.model.get('name');
+        
         Wat.Views.DetailsView.prototype.editElement.apply(this);
     },
     

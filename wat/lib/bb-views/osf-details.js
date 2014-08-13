@@ -15,11 +15,6 @@ Wat.Views.OSFDetailsView = Wat.Views.DetailsView.extend({
             }
         }
     },
-    
-    editorDialogTitle: function () {
-        return $.i18n.t('Edit OS Flavour') + ": " + this.model.get('name');
-    },
-
 
     initialize: function (params) {
         this.model = new Wat.Models.OSF(params);
@@ -38,7 +33,7 @@ Wat.Views.OSFDetailsView = Wat.Views.DetailsView.extend({
         params.forceListColumns = {name: true, tag: true};
         params.forceSelectedActions = {};
         params.forceListActionButton = null;
-        params.elementsBlock = 5;
+        params.block = 5;
         params.filters = {"osf_id": this.elementId};
         
         this.sideView = new Wat.Views.VMListView(params);
@@ -102,8 +97,10 @@ Wat.Views.OSFDetailsView = Wat.Views.DetailsView.extend({
         $(this.sideContainer).html(this.template);
     },
     
-    editElement: function() {
-        Wat.Views.DetailsView.prototype.editElement.apply(this);
+    editElement: function(e) {
+        this.dialogConf.title = $.i18n.t('Edit OS Flavour') + ": " + this.model.get('name');
+        
+        Wat.Views.DetailsView.prototype.editElement.apply(this, [e]);
     },
     
     bindEditorEvents: function() {

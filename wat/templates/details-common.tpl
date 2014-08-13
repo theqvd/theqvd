@@ -13,7 +13,9 @@ var properties = model.get('properties');
                 <%
                 if (jQuery.isEmptyObject(properties)) {
                 %>
-                <div class="indented-data" data-i18n>No properties found</div>
+                <div class="indented-data no-elements">
+                    <span class="no-elements" data-i18n="There are not properties"></span>
+                </div>
                 <%
                 }
                 else {

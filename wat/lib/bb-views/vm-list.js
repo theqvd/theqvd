@@ -89,15 +89,7 @@ Wat.Views.VMListView = Wat.Views.ListView.extend({
         }
     ],
     
-    initialize: function (params) {
-        if(params === undefined) {
-            params = {};
-        }
-        
-        params.filters = params.filters || {};
-        params.blocked = params.elementsBlock || this.elementsBlock;
-        params.offset = this.elementsOffset;
-        
+    initialize: function (params) {   
         this.collection = new Wat.Collections.VMs(params);
         
         this.setColumns();
@@ -111,11 +103,7 @@ Wat.Views.VMListView = Wat.Views.ListView.extend({
     },
     
     eventsVMs: {
-        'click [name="new_vm_button"]': 'newElement'
-    },
-    
-    editorDialogTitle: function () {
-        return $.i18n.t('New Virtual machine');
+        
     },
     
     setColumns: function () {
@@ -193,8 +181,10 @@ Wat.Views.VMListView = Wat.Views.ListView.extend({
         }
     },
     
-    newElement: function () {
+    newElement: function (e) {
         this.model = new Wat.Models.VM();
-        this.editElement();
+        
+        this.dialogConf.title = $.i18n.t('New Virtual machine');
+        Wat.Views.ListView.prototype.newElement.apply(this, [e]);
     }
 });

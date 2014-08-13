@@ -29,12 +29,6 @@ Wat.Views.DIListView = Wat.Views.ListView.extend({
     ],
 
     initialize: function (params) {
-        if(params === undefined) {
-            params = {};
-        }
-        params.blocked = params.elementsBlock || this.elementsBlock;
-        params.offset = this.elementsOffset;
-        
         this.collection = new Wat.Collections.DIs(params);
         
         this.setColumns();
@@ -47,11 +41,7 @@ Wat.Views.DIListView = Wat.Views.ListView.extend({
     },
     
     eventsDIs: {
-        'click [name="new_di_button"]': 'newElement'
-    },
-    
-    editorDialogTitle: function () {
-        return $.i18n.t('New Disk image');
+
     },
     
     setColumns: function () {
@@ -104,8 +94,10 @@ Wat.Views.DIListView = Wat.Views.ListView.extend({
         }
     },
     
-    newElement: function () {
+    newElement: function (e) {
         this.model = new Wat.Models.DI();
-        this.editElement();
+        this.dialogConf.title = $.i18n.t('New Disk image');
+
+        Wat.Views.ListView.prototype.newElement.apply(this, [e]);
     }
 });

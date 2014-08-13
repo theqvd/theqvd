@@ -2,15 +2,18 @@ Wat.Collections.Collection = Backbone.Collection.extend({
     model: {},
     elementsTotal: 0,
     status: 0,
-    blocked: 10,
+    offset: 1,
+    block: 10,
     filters: {},
     // Order by id by default
     sort: {"field": "id", "order": "-asc"},
     baseUrl: "http://172.20.126.12:3000/?login=benja&password=benja",
     
     initialize: function (params) {
-        this.blocked = params.blocked;
-        this.offset = params.offset;
+        params = params || {};
+        
+        this.block = params.block || this.block;
+        this.offset = params.offset || this.offset;
         this.filters = params.filters || this.filters;
     },
     
@@ -18,7 +21,7 @@ Wat.Collections.Collection = Backbone.Collection.extend({
         var fullUrl = this.baseUrl  + 
             "&action=" + this.actionPrefix + '_get_list' +
             "&offset=" + this.offset + 
-            "&blocked=" + this.blocked + 
+            "&block=" + this.block + 
             "&filters=" + JSON.stringify(this.filters) + 
             "&order_by=" + JSON.stringify(this.sort);
 

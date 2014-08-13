@@ -17,8 +17,8 @@
             <link rel="stylesheet" href="lib/thirds/jquery-datetimepicker/jquery.datetimepicker.css">
             
             <!-- jQuery Tags Input -->
-            <script type='text/javascript' src='lib/thirds/jquery-tags-input-1.3.3/jquery.tagsinput.min.js'></script>
-            <link rel="stylesheet" href="lib/thirds/jquery-tags-input-1.3.3/jquery.tagsinput.css">
+            <script type='text/javascript' src='lib/thirds/jquery-tags-input/jquery.tagsinput.min.js'></script>
+            <link rel="stylesheet" href="lib/thirds/jquery-tags-input/jquery.tagsinput.css">
             
             <!-- Underscore -->
             <script type='text/javascript' src='lib/thirds/underscore/underscore.js'></script>
@@ -195,31 +195,5 @@
         <!-- Dialog layers -->
         <div class="dialog-container js-dialog-container"></div>
         <div class="dialog-container-template js-dialog-container-template"></div>
-        
-        <script type="text/javascript">
-        $(document).ready(function() {
-           // Show/hide the corner menu
-           $('.js-menu-corner li:has(ul)').hover(
-              function(e)
-              {
-                 $(this).find('ul').css({display: "block"});
-              },
-              function(e)
-              {
-                 $(this).find('ul').css({display: "none"});
-              }
-           );
-            
-            var nav = responsiveNav(".nav-collapse", {customToggle: "#toggle"});
-            var navCorner = responsiveNav(".nav-collapse-corner", {customToggle: "#toggle-corner"});
-            
-            // Hide mobile menu when click
-            $('.nav-collapse').click(function() {
-                nav.close();
-            });
-                        
-            $( document ).tooltip({ position: { my: "left+15 center", at: "right center" } });
-        });
-        </script>
     </body>
 </html>

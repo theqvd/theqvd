@@ -2,7 +2,7 @@
     <div class="list-navigation">
         <% if (listActionButton !== null) { %>
             <div class="action-new-item">
-                <a class="js-traductable_button actions_button button fa fa-plus-circle" name="<%= listActionButton.name %>" href="<%= listActionButton.link %>" data-i18n>
+                <a class="js-traductable_button js-button-new actions_button button fa fa-plus-circle" name="<%= listActionButton.name %>" href="<%= listActionButton.link %>" data-i18n>
                     <%= listActionButton.value %>
                 </a>
             </div>

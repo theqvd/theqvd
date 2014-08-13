@@ -33,6 +33,25 @@ Wat.Views.DetailsView = Wat.Views.MainView.extend({
     eventsDetails: {
         'click .js-button-edit': 'editElement'
     },
+     
+    editElement: function (e) {
+        var that = this;
+        
+        this.dialogConf.buttons = {
+            Cancel: function () {
+                $(this).dialog('close');
+            },
+            Update: function () {
+                that.updateElement($(this));
+                that.showMessage();
+            }
+        };
+        
+        this.dialogConf.button1Class = 'fa fa-ban';
+        this.dialogConf.button2Class = 'fa fa-save';
+        
+        this.editorElement (e);
+    },
 
     render: function () {
         // Fill the html with the template and the model

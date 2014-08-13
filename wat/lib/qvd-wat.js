@@ -49,11 +49,19 @@ var Wat = {
     
     // Interface utilities
     I: {},
+    
+    // Configuration
+    C: {},
 };
 
 
 (function (win, doc, $) {
-	$(doc).ready(function() {  
+	$(doc).ready(function() {
+        // Interface onfiguration
+        Wat.I.cornerMenuEvents();
+        Wat.I.responsiveMenuConfiguration();
+        Wat.I.tooltipConfiguration();
+        
         // Instantiate the router
         var app_router = new Wat.Router;
 
@@ -185,11 +193,13 @@ var Wat = {
         // Start Backbone history
         Backbone.history.start();
         
+        // When click on a menu option, redirect to this section
         $('.menu-option').click(function() {
             var id = $(this).attr('id');
             win.location = '#/' + id;
         });
         
+        // Set specific menu section as selected
         function setMenuOpt (opt) {
             $('.menu-option').removeClass('menu-option--selected');
             $('#' + opt).addClass('menu-option--selected');

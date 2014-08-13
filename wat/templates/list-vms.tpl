@@ -17,50 +17,50 @@
                             break;
                         case 'info':
             %>
-                            <th class="cacheable max-3-icons" data-i18n="Info">
-                                <%= getCached('Info', cache) %>
+                            <th class="max-3-icons" data-i18n="Info">
+                                <%= i18n.t('Info') %>
                             </th>
             <%
                             break;
                         case 'id':
             %>
-                            <th class="cacheable sortable desktop" data-sortby="id" data-i18n="Id">
-                                <%= getCached('Id', cache) %>
+                            <th class="sortable desktop" data-sortby="id" data-i18n="Id">
+                                <%= i18n.t('Id') %>
                             </th>
             <%
                             break;
                         case 'name':
             %>
-                            <th class="cacheable sortable" data-sortby="name" data-i18n="Name">
-                                <%= getCached('Name', cache) %>
+                            <th class="sortable" data-sortby="name" data-i18n="Name">
+                                <%= i18n.t('Name') %>
                             </th>
             <%
                             break;
                         case 'node':
             %>
-                            <th class="cacheable sortable desktop" data-sortby="host_id" data-i18n="Node">
-                                <%= getCached('Node', cache) %>
+                            <th class="sortable desktop" data-sortby="host_id" data-i18n="Node">
+                                <%= i18n.t('Node') %>
                             </th>
             <%
                             break;
                         case 'user':
             %>
-                            <th class="cacheable sortable desktop" data-sortby="user_name" data-i18n="User">
-                                <%= getCached('User', cache) %>
+                            <th class="sortable desktop" data-sortby="user_name" data-i18n="User">
+                                <%= i18n.t('User') %>
                             </th>
             <%
                             break;
                         case 'osf/tag':
             %>
-                            <th class="cacheable sortable desktop" data-sortby="osf_name" data-i18n="OSF / Tag">
-                                <%= getCached('OSF / Tag', cache) %>
+                            <th class="sortable desktop" data-sortby="osf_name" data-i18n="OSF / Tag">
+                                <%= i18n.t('OSF / Tag') %>
                             </th>
             <%
                             break;
                         case 'tag':
             %>
-                            <th class="cacheable sortable desktop" data-sortby="di_tag" data-i18n="Tag">
-                                <%= getCached('Tag', cache) %>
+                            <th class="sortable desktop" data-sortby="di_tag" data-i18n="Tag">
+                                <%= i18n.t('Tag') %>
                             </th>
             <%
                             break;
@@ -83,8 +83,8 @@
         %>  
             <tr>
                 <td colspan="<%= columns.length %>">
-                    <span class="no-elements cacheable" data-i18n="No elements found">
-                        <%= getCached('No elements found', cache) %>
+                    <span class="no-elements" data-i18n="There are not elements">
+                        <%= i18n.t('There are not elements') %>
                     </span>
                 </td>
             </tr>
@@ -93,7 +93,7 @@
         else {
             // Store string in a hidden div only for cache it
         %>
-            <div class="hidden cacheable" data-i18n="No elements found"></div>
+            <!--<div class="hidden" data-i18n="There are not elements"></div>-->
         <%
         }
         %>

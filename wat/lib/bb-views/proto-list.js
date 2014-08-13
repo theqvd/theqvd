@@ -5,8 +5,6 @@ Wat.Views.ListView = Wat.Views.MainView.extend({
     formFilters: {},
     columns: [],
     elementsShown: '',
-    elementsBlock: 10,
-    elementsOffset: 1,
     listContainer: '.bb-list',
     listBlockContainer: '.bb-list-block',
     whatRender: 'all',
@@ -28,7 +26,7 @@ Wat.Views.ListView = Wat.Views.MainView.extend({
         this.templateListCommonList = Wat.A.getTemplate('list-common');
         this.templateListCommonBlock = Wat.A.getTemplate('list-common-block');
         this.listTemplate = Wat.A.getTemplate(this.listTemplateName);
-                
+        
         this.readParams(params);
         
         this.render();
@@ -38,47 +36,47 @@ Wat.Views.ListView = Wat.Views.MainView.extend({
     },
     
     readParams: function (params) {
-        if (params !== undefined) {
-            if (params.autoRender !== undefined) {
-                this.autoRender = params.autoRender;
-            }            
-            if (params.whatRender !== undefined) {
-                this.whatRender = params.whatRender;
-            }            
-            if (params.listContainer !== undefined) {
-                this.listBlockContainer = params.listContainer;
-            }                
-            if (params.filters !== undefined) {
-                this.filters = params.filters;
-            }            
-            if (params.forceListActionButton !== undefined) {
-                this.listActionButton = params.forceListActionButton;
-            }            
-            if (params.elementsBlock !== undefined) {
-                this.elementsBlock = params.elementsBlock;
-            }
-            if (params.forceListColumns !== undefined) {
-                var that = this;
-                $(this.columns).each(function(index, column) {
-                    if (params.forceListColumns[column.name] !== undefined && params.forceListColumns[column.name]) {
-                        that.columns[index].display = true;
-                    }
-                    else {
-                        that.columns[index].display = false;
-                    }
-                });
-            }
-            if (params.forceSelectedActions !== undefined) {
-                var that = this;
-                var selectedActions = [];
-                $(this.selectedActions).each(function(index, action) {
-                    if (params.forceSelectedActions[action.value] !== undefined) {
-                        selectedActions.push(action);
-                    }
-                });
-                
-                this.selectedActions = selectedActions;
-            }
+        if(params === undefined) {
+            params = {};
+        }
+        
+        this.filters = params.filters || {};
+        this.block = params.block || this.block;
+        this.offset = params.offset || {};
+        
+        if (params.autoRender !== undefined) {
+            this.autoRender = params.autoRender;
+        }            
+        if (params.whatRender !== undefined) {
+            this.whatRender = params.whatRender;
+        }            
+        if (params.listContainer !== undefined) {
+            this.listBlockContainer = params.listContainer;
+        }                  
+        if (params.forceListActionButton !== undefined) {
+            this.listActionButton = params.forceListActionButton;
+        }            
+        if (params.forceListColumns !== undefined) {
+            var that = this;
+            $(this.columns).each(function(index, column) {
+                if (params.forceListColumns[column.name] !== undefined && params.forceListColumns[column.name]) {
+                    that.columns[index].display = true;
+                }
+                else {
+                    that.columns[index].display = false;
+                }
+            });
+        }
+        if (params.forceSelectedActions !== undefined) {
+            var that = this;
+            var selectedActions = [];
+            $(this.selectedActions).each(function(index, action) {
+                if (params.forceSelectedActions[action.value] !== undefined) {
+                    selectedActions.push(action);
+                }
+            });
+
+            this.selectedActions = selectedActions;
         }
     },
     
@@ -92,7 +90,8 @@ Wat.Views.ListView = Wat.Views.MainView.extend({
         'click a[name="filter_button"]': 'filter',
         'keyup .filter-control input': 'filter',
         'input .filter-control input': 'filter',
-        'change .filter-control select': 'filter'
+        'change .filter-control select': 'filter',
+        'click .js-button-new': 'newElement'
     },
     
     // Render list sorted by a column
@@ -124,7 +123,7 @@ Wat.Views.ListView = Wat.Views.MainView.extend({
         
         // If the current offset is not the first page, trigger click on first button of pagination to go to the first page. 
         // This button render the list so is not necessary render in this case
-        if (this.elementsOffset != 1) {
+        if (this.offset != 1) {
             $('.' + this.cid + ' .pagination .first').trigger('click');
         }
         else {   
@@ -163,7 +162,7 @@ Wat.Views.ListView = Wat.Views.MainView.extend({
         
         // If the current offset is not the first page, trigger click on first button of pagination to go to the first page. 
         // This button render the list so is not necessary render in this case
-        if (this.elementsOffset != 1 && existsPagination) {
+        if (this.offset != 1 && existsPagination) {
             $('.' + this.cid + ' .pagination .first').trigger('click');
         }
         else {   
@@ -185,10 +184,6 @@ Wat.Views.ListView = Wat.Views.MainView.extend({
         var that = this;
         this.collection.fetch({      
             complete: function () {
-                // If the cache is not already enabled, we enabled to save the required strings
-                if (!that.cache.cached) {
-                    that.enableCache();
-                }
                 that.renderList(that.listContainer);
                 Wat.I.addSortIcons(that);
 
@@ -249,7 +244,8 @@ Wat.Views.ListView = Wat.Views.MainView.extend({
         
         // Translate the strings rendered. 
         // This translation is only done here, in the first charge. 
-        // When the list were rendered in actions such as sorting, filtering or pagination, the strings will be cached
+        // When the list were rendered in actions such as sorting, filtering or pagination, 
+        // the strings will be individually translated
         Wat.T.translate();
     },    
     
@@ -259,8 +255,6 @@ Wat.Views.ListView = Wat.Views.MainView.extend({
         var template = _.template(
             this.listTemplate, {
                 models: this.collection.models,
-                getCached: this.cache.getCached,
-                cache: this.cache.stringsCache,
                 columns: this.columns
             }
         );
@@ -315,9 +309,9 @@ Wat.Views.ListView = Wat.Views.MainView.extend({
     
     paginationUpdate: function () {        
         this.elementsShown = this.collection.length;
-        var totalPages = Math.ceil(this.collection.elementsTotal/this.elementsBlock);
-        var currentPage = this.elementsOffset;
-        
+        var totalPages = Math.ceil(this.collection.elementsTotal/this.collection.block);
+        var currentPage = this.collection.offset;
+
         $('.pagination_current_page').html(currentPage || 1);
         $('.pagination_total_pages').html(totalPages || 1);
         
@@ -346,8 +340,8 @@ Wat.Views.ListView = Wat.Views.MainView.extend({
     },
     
     paginationMove: function (context, dir, render) {
-        var totalPages = Math.ceil(this.collection.elementsTotal/this.elementsBlock);
-        var currentPage = this.elementsOffset;
+        var totalPages = Math.ceil(this.collection.elementsTotal/this.collection.block);
+        var currentPage = this.collection.offset;
         
         // Check if the current page is first or last one to avoid out of limits situation
         switch (dir) {
@@ -369,23 +363,41 @@ Wat.Views.ListView = Wat.Views.MainView.extend({
         // Make pagination move
         switch (dir) {
             case 'first':
-                this.elementsOffset = 1;
+                this.collection.offset = 1;
                 break;
             case 'prev':
-                this.elementsOffset--;
+                this.collection.offset--;
                 break;
             case 'next':
-                this.elementsOffset++;
+                this.collection.offset++;
                 break;
             case 'last':
-                this.elementsOffset = totalPages;
+                this.collection.offset = totalPages;
                 break;
         }
 
-        context.find('.pagination_current_page').html(this.elementsOffset);
-        
-        this.collection.offset = this.elementsOffset;
-        
+        context.find('.pagination_current_page').html(this.collection.offset);
+                
         this.fetchList();
+    },
+    
+    newElement: function (e) {
+        var that = this;
+        
+        this.dialogConf.buttons = {
+            Cancel: function () {
+                $(this).dialog('close');
+            },
+            Create: function () {
+                that.createElement($(this));
+                that.showMessage();
+            }
+        };
+        
+        this.dialogConf.button1Class = 'fa fa-ban';
+        this.dialogConf.button2Class = 'fa fa-plus-circle';
+        
+        
+        this.editorElement(e);
     }
 });

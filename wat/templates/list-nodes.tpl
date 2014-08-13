@@ -17,43 +17,43 @@
                             break;
                         case 'info':
             %>
-                            <th class="cacheable max-2-icons" data-i18n="Info">
-                                <%= getCached('Info', cache) %>
+                            <th class="max-2-icons" data-i18n="Info">
+                                <%= i18n.t('Info') %>
                             </th>
             <%
                             break;
                         case 'id':
             %>
-                            <th class="cacheable sortable desktop max-2-icons" data-sortby="id" data-i18n="Id">
-                                <%= getCached('Id', cache) %>
+                            <th class="sortable desktop max-2-icons" data-sortby="id" data-i18n="Id">
+                                <%= i18n.t('Id') %>
                             </th>
             <%
                             break;
                         case 'name':
             %>
-                            <th class="cacheable sortable" data-sortby="name" data-i18n="Name">
-                                <%= getCached('Name', cache) %>
+                            <th class="sortable" data-sortby="name" data-i18n="Name">
+                                <%= i18n.t('Name') %>
                             </th>
             <%
                             break;
                         case 'state':
             %>
-                            <th class="cacheable desktop sortable" data-sortby="state" data-i18n="State">
-                                <%= getCached('State', cache) %>
+                            <th class="desktop sortable" data-sortby="state" data-i18n="State">
+                                <%= i18n.t('State') %>
                             </th>
             <%
                             break;
                         case 'address':
             %>
-                            <th class="cacheable desktop sortable" data-sortby="address" data-i18n="IP address">
-                                <%= getCached('IP address', cache) %>
+                            <th class="desktop sortable" data-sortby="address" data-i18n="IP address">
+                                <%= i18n.t('IP address') %>
                             </th>
             <%
                             break;
                         case '#vms_connected':
             %>
-                            <th class="cacheable desktop sortable" data-sortby="#vms_connected" data-i18n="Running VMs">
-                                <%= getCached('Running VMs', cache) %>
+                            <th class="desktop sortable" data-sortby="#vms_connected" data-i18n="Running VMs">
+                                <%= i18n.t('Running VMs') %>
                             </th>
             <%
                             break;
@@ -64,7 +64,7 @@
                             }
                     
             %>
-                            <th class="cacheable sortable desktop" data-sortby="<%= col.name %>" <%= translationAttr %>>
+                            <th class="sortable desktop" data-sortby="<%= col.name %>" <%= translationAttr %>>
                                 <%= col.name %>
                             </th>
             <%

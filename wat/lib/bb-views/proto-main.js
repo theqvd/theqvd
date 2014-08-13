@@ -6,6 +6,7 @@ Wat.Views.MainView = Backbone.View.extend({
     message: 'Unknown problem',
     // error/success/info
     messagetype: 'error',
+    dialogConf: {},
     
     initialize: function () {
         _.bindAll(this, 'render');
@@ -21,9 +22,6 @@ Wat.Views.MainView = Backbone.View.extend({
         // Add to the view events the parent class of this view to avoid collisions with other views events
         this.events = this.restrictEventsScope(this.events);
         
-        // Initialize the cache structure
-        this.cache = this.getCacheStructure();
-        
         var that = this;
         this.render = _.wrap(this.render, function(render) { 
             that.beforeRender(); 
@@ -34,12 +32,15 @@ Wat.Views.MainView = Backbone.View.extend({
     },
     
     beforeRender: function () {
+
     },
     
     afterRender: function () {
+
     },
     
     events:  {
+
     },
     
     extendEvents: function (ev) {
@@ -74,62 +75,21 @@ Wat.Views.MainView = Backbone.View.extend({
         }
     },
     
-    getCacheStructure: function () {
-        return {
-            stringsCache : {},
-            getCached : function (col, dictionary) {
-                if (dictionary != undefined && dictionary[col] !== undefined) {
-                    return dictionary[col];
-                }
-                else {
-                    return '';
-                }
-            },
-            cached : false
-        }
-    },
-    
-    // Save the translated strings with class 'cacheable' in cache to avoid new translation 
-    // when load it again in pagination, sorting, filtering...
-    enableCache: function () {
-        var that = this;
-        $.each($('.' + this.cid + ' .cacheable'), function(index, element) {
-            var key = $(element).attr('data-i18n');
-            var value = $(element).html();
-            // Remove HTML tags from value to clean icons
-            var cleanValue = value.replace(/(<([^>]+)>)/ig,"");
-            that.cache.stringsCache[key] = cleanValue;
-        });
-        this.cache.cached = true;
-        console.log(this.cache);
-    },
-    
-    editorDialogTitle: function () {
-        return '';
-    },
-    
     // Editor
-    editElement: function () {
+    editorElement: function (e) {
         var that = this;
-        
-        var dialogTitle = this.editorDialogTitle();
         
         $('.js-dialog-container').dialog({
-            title: dialogTitle,
+            dialogClass: "loadingScreenWindow",
+            title: that.dialogConf.title,
             resizable: false,
             dialogClass: 'no-close',
             collision: 'fit',
             modal: true,
-            buttons: {
-                Cancel: function () {
-                    $(this).dialog('close');
-                },
-                Update: function () {
-                    that.updateElement($(this));
-                    that.showMessage();
-                }
-            },
-            open: function() {
+            buttons: that.dialogConf.buttons,
+            open: function(e) {
+                //$(e.target).next().find('button:first').hide();
+                
                 // Close message just in case
                 $('.message-close').trigger('click');
                 
@@ -137,18 +97,24 @@ Wat.Views.MainView = Backbone.View.extend({
                 //$('body').css('overflow-y', 'hidden');
                 
                 // Buttons style
-                var buttons = $(".ui-dialog-buttonset .ui-button");
+                var buttons = $(e.target).next().find('button');
                 var buttonsText = $(".ui-dialog-buttonset .ui-button .ui-button-text");
-                var cancelButton = buttonsText[0];
-                var updateButton = buttonsText[1];
+
+                buttons.attr('class', '');
+                buttons.addClass("button");
+
+
+                var button1 = buttonsText[0];
+                var button2 = buttonsText[1];
                 
-                Wat.T.translateElementContain($(cancelButton));
-                Wat.T.translateElementContain($(updateButton));
+                Wat.T.translateElementContain($(button1));
+                Wat.T.translateElementContain($(button2));
                 
-                $(buttons).attr("class", "");
-                $(buttons).addClass("button");
-                $(cancelButton).addClass('fa fa-ban');
-                $(updateButton).addClass('fa fa-save');
+                buttons.attr("class", "");
+                buttons.addClass("button");
+
+                $(button1).addClass(that.dialogConf.button1Class);
+                $(button2).addClass(that.dialogConf.button2Class);
                 
                 that.template = _.template(
                             that.templateEditorCommon, {
@@ -167,12 +133,10 @@ Wat.Views.MainView = Backbone.View.extend({
                 
                 $(that.editorContainer).html(that.template);
                 
-                $('[name="tags"]').tagsInput({
-                    'defaultText': i18n.t('Add a tag')
-                });
+                Wat.I.tagsInputConfiguration();
                 
                 Wat.T.translateElement($(this).find('[data-i18n]'));
-                
+                                
                 $('.bb-editor-content-test').clone(true, true).appendTo('.dialog-container');
             },
             
@@ -183,8 +147,16 @@ Wat.Views.MainView = Backbone.View.extend({
         });                
     },
     
-    // Update element common to every form: custom properties
-    updateElement: function (dialog) {
+    updateElement: function () {
+        this.parseProperties();
+    },  
+    
+    createElement: function () {
+        this.parseProperties();
+    },
+    
+    // Parse properties from create/edit forms
+    parseProperties: function () {
         var propNames = $('.' + this.cid + '.editor-container input.custom-prop-name');
         var propValues = $('.' + this.cid + '.editor-container input.custom-prop-value');
         
