@@ -13,6 +13,7 @@ sub BUILD
     my $self = shift;
 
     $self->{mapper} = $mapper;
+    $self->{dependencies} = {runtime => 1, counters => 1};
     $self->get_customs('Host_Property');
     $self->modifiers->{join} //= [];
     push @{$self->modifiers->{join}}, ('runtime','vms');
@@ -28,5 +29,7 @@ id = me.id
 name = me.name
 address = me.address
 blocked =  runtime.blocked
+frontend = me.frontend
+backend =  me.backend
 state = runtime.state
 vm_id = vms.vm_id

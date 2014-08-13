@@ -62,7 +62,7 @@ sub user_get_list
 	   '#vms'  => $_->vms->count,
 	   '#vms_connected' => $_->search_related(@query)->count,
 	   $self->add_custom($request,$_)} for @{$result->{rows}};
-    
+
     $result;
 }
 
@@ -168,9 +168,14 @@ sub vm_get_details
 	   di_version => $self->_find('DI','id',$_->vm_runtime->current_di_id,'version'),
 	   di_name => 
 
-	       $DB->resultset('DI')->search({'osf.id' => 6, 'tags.tag' => 'default'},{ join => [qw(osf tags)] })->first->path,
+	       $DB->resultset('DI')->search({'osf.id' => $_->osf_id, 
+					     'tags.tag' => $_->di_tag},{ join => [qw(osf tags)] })->first->path,
 
-	   di_id      => $_->vm_runtime->current_di_id,
+	   di_id => 
+
+	       $DB->resultset('DI')->search({'osf.id' => $_->osf_id, 
+					     'tags.tag' => $_->di_tag},{ join => [qw(osf tags)] })->first->id,
+
 	   blocked => $_->vm_runtime->blocked,
 	   state => $_->vm_runtime->vm_state,
 	   host_id => $_->vm_runtime->host_id,
@@ -215,8 +220,11 @@ sub host_get_list
 {
     my ($self,$request) = @_;
     my $result = $self->select($request);
+    my @query = ('vms',{'vm_state' => 'running'});
 
     $_ = { id => $_->id, 
+	   state => $_->runtime->state,
+	   '#vms_connected' => $_->search_related(@query)->count,
 	   name => $_->name,
 	   address => $_->address,
 	   blocked => $_->runtime->blocked,
@@ -410,6 +418,7 @@ sub _find
 {
     my ($self,$table,$arg,$val,$method) = @_;
     my $r = eval { $DB->resultset($table)->find({$arg => $val})->$method };
+    print $@ if $@;
     return $r;
 }
 
@@ -419,17 +428,15 @@ sub select
 
     my $filters = $request->filters;
     my $modifiers = $request->modifiers;
-    $modifiers->{prefetch} = $modifiers->{join} // {};
-
-    use Data::Dumper; print Dumper $filters,$modifiers;
+    
     my $rs = eval { $DB->resultset($request->table)->search($filters, 
 							    $modifiers) };
-    print $@ if $@;
 
     QVD::Admin4::Exception->throw(code => ($DB->storage->_dbh->state || 4)) if $@;
 
-    { total => ($rs->is_paged ? $rs->pager->total_entries : undef), 
-      rows => [$rs->all] };
+
+   { total => ($rs->is_paged ? $rs->pager->total_entries : undef), 
+     rows => [$rs->all] };
 }
 
 
@@ -476,7 +483,7 @@ sub get_customs
 sub add_custom
 {
     my ($self,$request,$obj) = @_;
-
+    $ENV{QVD_ADMIN4_CUSTOM_JOIN_CONDITION} = undef;
     ( properties => { map {  $_->key => $_->value  } $obj->properties->all });
 } 
 
@@ -497,49 +504,215 @@ sub update_related
 sub update_custom
 {
     my ($self,$request) = @_;
-
-    my $props = $request->arguments(custom => 1);
+ 
     my $result = $self->select($request);   
     my $failures = {};
 
     for my $obj (@{$result->{rows}})
     {
-	eval { $DB->txn_do( sub { while ( my ($key,$value) = each %{$props->{update}})
-				  {
-				      eval { $obj->search_related('properties', 
-								  {key => $key})->update({value => $value}) };
-		
-				      QVD::Admin4::Exception->throw(code => ($DB->storage->_dbh->state || 4)) if $@;
-				  }		
+	my $f = 
+	    sub { $self->custom_update($request,$obj);    
+		  $self->custom_delete($request,$obj);    
+		  $self->custom_create($request,$obj);
+		  
+		  eval { $obj->update($request->arguments) };
+		  QVD::Admin4::Exception->throw(code => ($DB->storage->_dbh->state || 4)) if $@;
 	    
-				  for my $key (@{$props->{delete}})
-				  {
-				      eval { $obj->search_related('properties', 
-								  {key => $key})->delete };
-				      QVD::Admin4::Exception->throw(code => ($DB->storage->_dbh->state || 4)) if $@;
-				  }		
-	    
-				  while (my ($key,$value) = each %{$props->{create}})
-				  { 
-				      eval { $obj->create_related('properties',{key => $key, 
-										value => $value}) };
+		  $self->update_related($request,$obj); };
+	
+	eval { $DB->txn_do($f)};
 
-				      QVD::Admin4::Exception->throw(code => ($DB->storage->_dbh->state || 4)) if $@;
-				  }
-	    
-				  eval { $obj->update($request->arguments) };
-				  QVD::Admin4::Exception->throw(code => ($DB->storage->_dbh->state || 4)) if $@;
-	    
-				  $self->update_related($request,$obj);       
-			    })};
-	 if ($@) { $failures->{$obj->id} = ($@->can('code') ? $@->code : 4); }
-
-	}
+	if ($@) { $failures->{$obj->id} = ($@->can('code') ? $@->code : 4); }
+    }
 
     $result->{rows} = [];
     QVD::Admin4::Exception->throw(code => 1, failures => $failures) if %$failures;
     $result;
 
 }
+
+sub custom_create
+{
+    my ($self,$request,$obj) = @_;
+
+    my $props = $request->arguments(custom => 1);
+
+    while (my ($key,$value) = each %{$props->{create}})
+    { 
+	my $t = $request->table . "_Property";
+	my $k = lc($request->table) . "_id";
+	my $a = {key => $key, value => $value, $k => $obj->id};
+	eval { $DB->resultset($t)->create($a) };
+
+	print $@ if $@;
+	QVD::Admin4::Exception->throw(code => ($DB->storage->_dbh->state || 4)) if $@;
+    }
+}
+
+sub custom_update
+{
+    my ($self,$request,$obj) = @_;
+
+    my $props = $request->arguments(custom => 1);
+
+    while ( my ($key,$value) = each %{$props->{update}})
+    {
+	eval { $obj->search_related('properties', 
+				    {key => $key})->update({value => $value}) };
+		
+	QVD::Admin4::Exception->throw(code => ($DB->storage->_dbh->state || 4)) if $@;
+    }		
+}
+
+sub custom_delete
+{
+    my ($self,$request,$obj) = @_;
+
+    my $props = $request->arguments(custom => 1);
+
+    for my $key (@{$props->{delete}})
+    {
+	eval { $obj->search_related('properties', 
+				    {key => $key})->delete };
+	QVD::Admin4::Exception->throw(code => ($DB->storage->_dbh->state || 4)) if $@;
+    }		
+}
+
+
+#########################
+## ADD/DELETE ELEMENTS ##
+#########################
+
+sub _create
+{
+    my ($self,$request) = @_;
+    my $arguments = $request->arguments(default => 1);
+
+    my $host = eval { $DB->resultset($request->table)->create($arguments) };
+    print $@ if $@;
+    QVD::Admin4::Exception->throw(code => ($DB->storage->_dbh->state || 4)) if $@;
+    $host;
+}
+
+sub _create_related
+{
+    my ($self,$request,$obj) = @_;
+    my $related_args = $request->arguments(related => 1, default => 1);
+
+    for my $table (keys %{$request->dependencies})
+    {
+	eval { $obj->create_related($table,($related_args->{$table} || {})) };
+	print $@ if $@;
+	QVD::Admin4::Exception->throw(code => ($DB->storage->_dbh->state || 4)) if $@;
+    }
+}
+
+sub host_create {
+    my ($self, $request) = @_;
+
+    $DB->txn_do( sub { my $host = $self->_create($request);
+		       $self->_create_related($request,$host);
+		       $self->custom_create($request,$host)});
+
+   { total => undef, 
+     rows => [] };
+}
+
+sub host_delete {
+
+    my ($self, $request) = @_;
+
+    my $result = $self->select($request);
+    $_->delete for @{$result->{rows}};
+
+   { total => undef, 
+     rows => [] };
+}
+
+
+sub user_create {
+    my ($self, $request) = @_;
+
+    $request->{json}->{arguments}->{tenant} =
+	$request->{json}->{tenant};
+
+    $DB->txn_do( sub { my $host = $self->_create($request);
+		       $self->_create_related($request,$host);
+		       $self->custom_create($request,$host)});
+
+   { total => undef, 
+     rows => [] };
+}
+
+sub user_delete {
+
+    my ($self, $request) = @_;
+
+    my $result = $self->select($request);
+    $_->delete for @{$result->{rows}};
+
+   { total => undef, 
+     rows => [] };
+}
+
+sub osf_create
+{
+    my ($self,$request) = @_;
+
+    $DB->txn_do( sub { my $host = $self->_create($request);
+		       $self->_create_related($request,$host);
+		       $self->custom_create($request,$host)});
+
+   { total => undef, 
+     rows => [] };
+
+}
+
+sub osf_delete
+{
+    my ($self,$request) = @_;
+
+    my $result = $self->select($request);
+    $_->delete for @{$result->{rows}};
+
+   { total => undef, 
+     rows => [] };
+}
+
+
+sub cmd_osf_add {
+    my ($self, %params) = @_;
+    my @required_params = qw/name memory use_overlay/;
+
+    # FIXME: detect type of image and set use_overlay accordingly, iso => no overlay
+    $params{memory}      //= $osf_default_memory;
+    $params{use_overlay} //= $osf_default_overlay;
+
+    #die "The required parameters are ".join(", ", @required_params)
+    #    unless _set_equals([keys %params], \@required_params);
+
+    my $id;
+    txn_do {
+        my $rs = $self->get_resultset('osf');
+        my $row = $rs->create(\%params);
+        $id = $row->id;
+    };
+    $id
+}
+
+sub cmd_osf_del {
+    my ($self, @args) = @_;
+    my $counter = 0;
+    my $rs = $self->get_resultset('osf');
+    while (my $osf = $rs->next) {
+        if ($osf->vms->count == 0) {
+            #warn "deleting osf ".$osf->id;
+            $osf->delete;
+            $counter++;
+        }
+    }
+    $counter
+}
+
 
 1;

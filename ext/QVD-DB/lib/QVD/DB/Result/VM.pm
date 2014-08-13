@@ -27,7 +27,8 @@ __PACKAGE__->belongs_to(osf  => 'QVD::DB::Result::OSF',  'osf_id',  { cascade_de
 
 __PACKAGE__->has_one (vm_runtime => 'QVD::DB::Result::VM_Runtime',  'vm_id');
 __PACKAGE__->has_one (counters   => 'QVD::DB::Result::VM_Counter',  'vm_id');
-__PACKAGE__->has_many(properties => 'QVD::DB::Result::VM_Property', 'vm_id', {order_by => {'-asc' => 'key'}});
+__PACKAGE__->has_many(properties => 'QVD::DB::Result::VM_Property', \&custom_join_condition, 
+		      {join_type => 'LEFT', order_by => {'-asc' => 'key'}});
 
 sub combined_properties {
     my $vm = shift;
@@ -51,5 +52,13 @@ sub get_has_many { qw(properties); }
 sub get_has_one { qw(vm_runtime counters); }
 sub get_belongs_to { qw(user osf); }
 
+sub custom_join_condition
+{ 
+    my $args = shift; 
+    my $key = $ENV{QVD_ADMIN4_CUSTOM_JOIN_CONDITION};
+
+    { "$args->{foreign_alias}.vm_id" => { -ident => "$args->{self_alias}.id" },
+      "$args->{foreign_alias}.key"     => ($key ? { '=' => $key } : { -ident => "$args->{foreign_alias}.key"}) };
+}
 
 1;

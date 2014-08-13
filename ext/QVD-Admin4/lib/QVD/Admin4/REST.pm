@@ -144,6 +144,17 @@ user_update_custom.arguments=name,password,blocked
 user_update_custom.filters=id,tenant
 user_update_custom.mandatory=id,tenant
 
+user_create.roles=superadmin,admin
+user_create.table=User
+user_create.arguments=name,password,role,tenant
+user_create.default.blocked=false
+user_create.default.role=3
+
+user_delete.roles=admin,superadmin
+user_delete.table=User
+user_delete.filters=id,tenant
+user_delete.mandatory=id,tenant
+
 vm_get_list.roles=all
 vm_get_list.table=VM
 vm_get_list.order_by=id,name,state,host_id,user_name,osf_name,blocked,host_name
@@ -208,6 +219,19 @@ host_update_custom.table=Host
 host_update_custom.arguments=name,address,blocked
 host_update_custom.filters=id
 host_update_custom.mandatory=id
+
+host_create.roles=admin,superadmin
+host_create.table=Host
+host_create.arguments=name,address,frontend,backend,blocked,state
+host_create.default.backend=1
+host_create.default.frontend=1
+host_create.default.blocked=false
+host_create.default.state=stopped
+
+host_delete.roles=admin,superadmin
+host_delete.table=Host
+host_delete.filters=id
+host_delete.mandatory=id
 
 osf_get_list.roles=all
 osf_get_list.table=OSF

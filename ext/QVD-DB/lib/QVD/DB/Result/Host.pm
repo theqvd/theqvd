@@ -15,7 +15,8 @@ __PACKAGE__->set_primary_key('id');
 __PACKAGE__->add_unique_constraint(['name']);
 __PACKAGE__->add_unique_constraint(['address']);
 
-__PACKAGE__->has_many(properties => 'QVD::DB::Result::Host_Property', 'host_id', {order_by => {'-asc' => 'key'}});
+__PACKAGE__->has_many(properties => 'QVD::DB::Result::Host_Property', \&custom_join_condition, 
+		      {join_type => 'LEFT', order_by => {'-asc' => 'key'}});
 __PACKAGE__->has_many(vms        => 'QVD::DB::Result::VM_Runtime',    'host_id', { cascade_delete => 0 });
 #__PACKAGE__->has_many(vm_l7rs    => 'QVD::DB::Result::VM_Runtime',    'l7r_host_id', { cascade_delete => 0 }); #FIXME COMMENTED BECAUSE TRIGGERS ERROR WHEN ASKING DB
 __PACKAGE__->has_one (runtime    => 'QVD::DB::Result::Host_Runtime',  'host_id');
@@ -26,4 +27,14 @@ sub get_has_one { qw(runtime counters); };
 sub get_belongs_to { qw(); };
 sub get_required_cols { qw(name address frontend backend); };
 sub get_defaults { {frontend => 1, backend => 1}; };
+
+sub custom_join_condition
+{ 
+    my $args = shift; 
+    my $key = $ENV{QVD_ADMIN4_CUSTOM_JOIN_CONDITION};
+
+    { "$args->{foreign_alias}.host_id" => { -ident => "$args->{self_alias}.id" },
+      "$args->{foreign_alias}.key"     => ($key ? { '=' => $key } : { -ident => "$args->{foreign_alias}.key"}) };
+}
+
 1;

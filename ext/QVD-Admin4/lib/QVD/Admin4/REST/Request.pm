@@ -10,8 +10,8 @@ has 'config',    is => 'ro', isa => 'HashRef',  required => 1;
 has 'mapper',    is => 'ro', isa => 'Config::Properties';
 has 'free',      is => 'ro', isa => 'HashRef',  default => sub { {}; };
 has 'modifiers', is => 'ro', isa => 'HashRef',  default => sub { {}; };
+has 'dependencies', is => 'ro', isa => 'HashRef',  default => sub { {}; };
 has 'customs',   is => 'ro', isa => 'ArrayRef',  default => sub { []; };
-has 'defaults',  is => 'ro', isa => 'HashRef',  default => sub { {}; };
 
 sub BUILD
 {
@@ -20,10 +20,12 @@ sub BUILD
     $self->json->{filters} //= {};
 
     $self->config->{arguments} //= {};
+
     $self->config->{filters} //= {};
     $self->config->{mandatory} //= {};
     $self->config->{free} //= {};
     $self->config->{order_by} //= {};
+    $self->config->{default} //= {};
 
     $self->json->{tenant} || 
 	QVD::Admin4::Exception->throw(code => 6);
@@ -103,6 +105,7 @@ sub arguments
 	QVD::Admin4::Exception->throw(code => 12)
         for keys %{$self->json->{arguments}};
 
+
     for my $argument (keys %{$self->json->{arguments}})
     {
 	next if $argument eq 'properties';
@@ -124,6 +127,28 @@ sub arguments
                 $self->json->{arguments}->{$argument};
         }
     }
+
+    if ($modifiers{default})
+    {
+	for my $argument (keys %{$self->config->{default}})
+	{
+	    my $marg = $self->mapper->getProperty($argument) //
+		QVD::Admin4::Exception->throw(code => 13);
+	    my ($table,$column) = $marg =~ /^(.+)\.(.+)$/;
+
+	    if ($modifiers{related})
+	    {
+		next if $table eq 'me';
+		$arguments->{$table}->{$column} //= $self->config->{default}->{$argument};
+	    }
+	    else
+	    {
+		next unless $table eq 'me';
+		$arguments->{$column} //= $self->config->{default}->{$argument};
+	    }
+	}
+    }
+
     $arguments;
 }
 
@@ -179,8 +204,7 @@ sub get_customs
 	    if (exists $self->json->{order_by}->{field} &&
 		$self->json->{order_by}->{field} eq $_)
 	    {
-#		$self->json->{filters}->{"$pr.key"} = $_;
-#		@{$self->config->{filters}}{"$pr.key"} = qw(1);
+		$ENV{QVD_ADMIN4_CUSTOM_JOIN_CONDITION} = $_;
 		$self->json->{order_by}->{field} = "$pr.value";
 	    }
 

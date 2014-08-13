@@ -17,8 +17,8 @@ __PACKAGE__->add_columns( blocked      => { data_type         => 'boolean' },
 
 __PACKAGE__->set_primary_key('id');
 __PACKAGE__->belongs_to(osf => 'QVD::DB::Result::OSF', 'osf_id', { cascade_delete => 0 } );
-__PACKAGE__->has_many(properties => 'QVD::DB::Result::DI_Property',
-                      'di_id', { join_type => 'INNER', order_by => {'-asc' => 'key'} });
+__PACKAGE__->has_many(properties => 'QVD::DB::Result::DI_Property', \&custom_join_condition, 
+		      {join_type => 'LEFT', order_by => {'-asc' => 'key'}});
 
 __PACKAGE__->has_many(vm_runtimes => 'QVD::DB::Result::VM_Runtime', 'current_di_id', { cascade_delete => 0 });
 __PACKAGE__->has_many(tags => 'QVD::DB::Result::DI_Tag', 'di_id', { order_by => { '-desc' => 'tag' }});
@@ -46,6 +46,13 @@ sub get_has_many { qw(properties tags vm_runtimes); }
 sub get_has_one { qw(); }
 sub get_belongs_to { qw(osf); }
 
+sub custom_join_condition
+{ 
+    my $args = shift; 
+    my $key = $ENV{QVD_ADMIN4_CUSTOM_JOIN_CONDITION};
 
+    { "$args->{foreign_alias}.di_id" => { -ident => "$args->{self_alias}.id" },
+      "$args->{foreign_alias}.key"     => ($key ? { '=' => $key } : { -ident => "$args->{foreign_alias}.key"}) };
+}
 
 1;
