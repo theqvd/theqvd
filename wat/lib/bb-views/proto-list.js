@@ -27,6 +27,8 @@ Wat.Views.ListView = Wat.Views.MainView.extend({
         this.templateListCommonBlock = Wat.A.getTemplate('list-common-block');
         this.listTemplate = Wat.A.getTemplate(this.listTemplateName);
         
+        this.context = $('.' + this.cid);
+        
         this.readParams(params);
         
         this.render();
@@ -52,6 +54,7 @@ Wat.Views.ListView = Wat.Views.MainView.extend({
         }            
         if (params.listContainer !== undefined) {
             this.listBlockContainer = params.listContainer;
+            this.listContainer = this.listBlockContainer + ' ' + this.listContainer;
         }                  
         if (params.forceListActionButton !== undefined) {
             this.listActionButton = params.forceListActionButton;
@@ -123,7 +126,7 @@ Wat.Views.ListView = Wat.Views.MainView.extend({
         
         // If the current offset is not the first page, trigger click on first button of pagination to go to the first page. 
         // This button render the list so is not necessary render in this case
-        if (this.offset != 1) {
+        if (this.collection.offset != 1) {
             $('.' + this.cid + ' .pagination .first').trigger('click');
         }
         else {   
@@ -159,13 +162,13 @@ Wat.Views.ListView = Wat.Views.MainView.extend({
 
         // When we came from a view without elements pagination doesnt exist
         var existsPagination = $('.' + this.cid + ' .pagination .first').length > 0;
-        
+
         // If the current offset is not the first page, trigger click on first button of pagination to go to the first page. 
         // This button render the list so is not necessary render in this case
-        if (this.offset != 1 && existsPagination) {
+        if (this.collection.offset != 1 && existsPagination) {
             $('.' + this.cid + ' .pagination .first').trigger('click');
         }
-        else {   
+        else {
             this.fetchList();
         }        
     },
@@ -226,21 +229,36 @@ Wat.Views.ListView = Wat.Views.MainView.extend({
     },
     
     //Render list with controls (list block)
-    renderListBlock: function () {
+    renderListBlock: function (that) {
+        var that = that || this;
+
+        var targetReady = $(that.listBlockContainer).length != 0;
+
+        // Recursive call until target is ready
+        if (!targetReady) {
+            console.log('lag');
+            that.interval = setInterval(that.renderListBlock, 500, that);
+            return;
+        }
+        
+        clearInterval(that.interval);
+        
         // Fill the list
         var template = _.template(
-            this.templateListCommonBlock, {
-                formFilters: this.formFilters,
-                selectedActions: this.selectedActions,
-                listActionButton: this.listActionButton,
-                nElements: this.collection.length,
+            that.templateListCommonBlock, {
+                formFilters: that.formFilters,
+                selectedActions: that.selectedActions,
+                listActionButton: that.listActionButton,
+                nElements: that.collection.length,
                 cid: this.cid
             }
         );
 
-        $(this.listBlockContainer).html(template);
+        $(that.listBlockContainer).html(template);
+        $(that.listBlockContainer).html(template);
+        $(that.listBlockContainer).html(template);
                 
-        this.renderList();
+        that.renderList();
         
         // Translate the strings rendered. 
         // This translation is only done here, in the first charge. 
@@ -250,7 +268,7 @@ Wat.Views.ListView = Wat.Views.MainView.extend({
     },    
     
     // Render only the list. Usefull to functions such as pagination, sorting and filtering where is not necessary render controls
-    renderList: function () {        
+    renderList: function () {
         // Fill the list
         var template = _.template(
             this.listTemplate, {
@@ -258,7 +276,7 @@ Wat.Views.ListView = Wat.Views.MainView.extend({
                 columns: this.columns
             }
         );
-
+        
         $(this.listContainer).html(template);
         this.paginationUpdate();
         this.selectedActionControlsUpdate();
@@ -312,15 +330,24 @@ Wat.Views.ListView = Wat.Views.MainView.extend({
         var totalPages = Math.ceil(this.collection.elementsTotal/this.collection.block);
         var currentPage = this.collection.offset;
 
-        $('.pagination_current_page').html(currentPage || 1);
-        $('.pagination_total_pages').html(totalPages || 1);
+        var context = $('.' + this.cid);
+
+        context.find('.pagination_current_page').html(currentPage || 1);
+        context.find('.pagination_total_pages').html(totalPages || 1);
         
+        context.find('.pagination a').removeClass('disabled');
+
         if (totalPages <= 1) {
-            $('.pagination a').addClass('disabled');
+            context.find('.pagination a').addClass('disabled');
         }
-        else {
-            $('.pagination a').removeClass('disabled');
-        }        
+        else if (currentPage == 1){
+            context.find('.pagination a.first').addClass('disabled');
+            context.find('.pagination a.prev').addClass('disabled');
+        }
+        else if (currentPage == totalPages) {
+            context.find('.pagination a.next').addClass('disabled');
+            context.find('.pagination a.last').addClass('disabled');
+        }
     },
 
     paginationNext: function (e) {
@@ -375,6 +402,8 @@ Wat.Views.ListView = Wat.Views.MainView.extend({
                 this.collection.offset = totalPages;
                 break;
         }
+        
+        var context = $('.' + this.cid);
 
         context.find('.pagination_current_page').html(this.collection.offset);
                 
@@ -390,14 +419,14 @@ Wat.Views.ListView = Wat.Views.MainView.extend({
             },
             Create: function () {
                 that.createElement($(this));
-                that.showMessage();
             }
         };
         
         this.dialogConf.button1Class = 'fa fa-ban';
         this.dialogConf.button2Class = 'fa fa-plus-circle';
         
-        
+        this.dialogConf.fillCallback = this.fillEditor;
+
         this.editorElement(e);
     }
 });

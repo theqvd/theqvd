@@ -56,6 +56,14 @@ body {
     bottom: 0;
 }
 
+.mini-loading {
+    font-size: 45px;
+    width: 100%;
+    margin-top: 40px;
+    text-align: center;
+    color: darken($col_whiter, 10);
+}
+
 .wrapper {
     @extend %invisible;
 
@@ -171,6 +179,14 @@ body {
         display: block;
     }
 }
+
+.separator {
+    width: 100%;
+    margin-top: 15px;
+    margin-bottom: 20px;
+    border-bottom: dotted 1px darken($col_whiter, 15);
+}
+
 
 .dialog-container, .dialog-container-template {
     display: none;

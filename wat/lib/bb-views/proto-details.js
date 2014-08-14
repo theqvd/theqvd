@@ -21,8 +21,15 @@ Wat.Views.DetailsView = Wat.Views.MainView.extend({
         this.extendEvents(this.eventsDetails);
     },
     
-    fetchDetails: function () {
-        var that = this;
+    afterRender: function () {
+        // If this view have Side component, render it after render
+        if (this.renderSide) {
+            this.renderSide();
+        }
+    },
+    
+    fetchDetails: function (that) {
+        var that = that || this;
         this.model.fetch({      
             complete: function () {
                 that.render();
@@ -42,13 +49,15 @@ Wat.Views.DetailsView = Wat.Views.MainView.extend({
                 $(this).dialog('close');
             },
             Update: function () {
-                that.updateElement($(this));
-                that.showMessage();
+                that.dialog = $(this);
+                that.updateElement();
             }
         };
         
         this.dialogConf.button1Class = 'fa fa-ban';
         this.dialogConf.button2Class = 'fa fa-save';
+        
+        this.dialogConf.fillCallback = this.fillEditor;
         
         this.editorElement (e);
     },

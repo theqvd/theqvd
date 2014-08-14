@@ -113,7 +113,7 @@
                                 <td class="desktop">
                                     <%= model.get('startedVMs') %>
                                     /
-                                    <%= model.get('#vms') %>
+                                    <%= model.get('vms') %>
                                 </td>
                 <%
                                 break;

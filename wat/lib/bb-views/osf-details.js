@@ -19,24 +19,35 @@ Wat.Views.OSFDetailsView = Wat.Views.DetailsView.extend({
     initialize: function (params) {
         this.model = new Wat.Models.OSF(params);
         Wat.Views.DetailsView.prototype.initialize.apply(this, [params]);
-        
-        this.renderSide();
     },
     
     renderSide: function () {
-        var slideContainer = '.' + this.cid + ' .bb-details-side1';
+        var sideContainer1 = '.' + this.cid + ' .bb-details-side1';
+        var sideContainer2 = '.' + this.cid + ' .bb-details-side2';
         
         // Render Virtual Machines list on side
         var params = {};
         params.whatRender = 'list';
-        params.listContainer = slideContainer;
+        params.listContainer = sideContainer1;
         params.forceListColumns = {name: true, tag: true};
         params.forceSelectedActions = {};
         params.forceListActionButton = null;
         params.block = 5;
         params.filters = {"osf_id": this.elementId};
+        this.sideView2 = new Wat.Views.VMListView(params);
         
-        this.sideView = new Wat.Views.VMListView(params);
+        // Render Disk images list on side
+        var params = {};
+        params.whatRender = 'list';
+        params.listContainer = sideContainer2;
+        params.forceListColumns = {disk_image: true, default: true};
+        params.forceSelectedActions = {};
+        params.forceListActionButton = null;
+        params.block = 5;
+        params.filters = {"osf_id": this.elementId};
+        this.sideView2 = new Wat.Views.DIListView(params);
+        
+        
     },
     
     updateElement: function (dialog) {
@@ -63,21 +74,7 @@ Wat.Views.OSFDetailsView = Wat.Views.DetailsView.extend({
         
         var filters = {"id": this.id};
 
-        var result = Wat.A.performAction('update_osf', filters, arguments);
-
-        if (result.status == SUCCESS) {
-            this.fetchDetails();
-            this.renderSide();
-
-            this.message = 'Successfully updated';
-            this.messageType = 'success';
-        }
-        else {
-            this.message = 'Error updating';
-            this.messageType = 'error';
-        }
-        
-        dialog.dialog('close');
+        this.updateModel(arguments, filters);
     },
     
     render: function () {

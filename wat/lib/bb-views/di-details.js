@@ -19,17 +19,15 @@ Wat.Views.DIDetailsView = Wat.Views.DetailsView.extend({
     initialize: function (params) {
         this.model = new Wat.Models.DI(params);
         Wat.Views.DetailsView.prototype.initialize.apply(this, [params]);
-        
-        this.renderSide();
     },
     
     renderSide: function () {
-        var slideContainer = '.' + this.cid + ' .bb-details-side1';
+        var sideContainer = '.' + this.cid + ' .bb-details-side1';
         
         // Render Virtual Machines list on side
         var params = {};
         params.whatRender = 'list';
-        params.listContainer = slideContainer;
+        params.listContainer = sideContainer;
         params.forceListColumns = {name: true, tag: true};
         params.forceSelectedActions = {};
         params.forceListActionButton = null;
@@ -44,38 +42,27 @@ Wat.Views.DIDetailsView = Wat.Views.DetailsView.extend({
         
         // Properties to create, update and delete obtained from parent view
         var properties = this.properties;
-        
-        var arguments = {'properties' : properties};
-        
+                
         var context = $('.' + this.cid + '.editor-container');
         
-        var name = context.find('input[name="name"]').val();
+        var blocked = context.find('input[name="blocked"][value=1]').is(':checked');
+                
+        var tags = context.find('input[name="tags"]').val();
+        var def = context.find('input[name="default"][value=1]').is(':checked');
         
-        arguments['name'] = name;
+        if (def) {
+            tags += ',default';
+        }
         
         var filters = {"id": this.id};
-        
-        var tags = context.find('input[name="tags"]').val();
-        
-        arguments['tags'] = tags
+        var arguments = {
+            "properties": properties,
+            "blocked": blocked ? 1 : 0,
+            "tags": tags,
             
-        console.log(arguments);
-        return;
-        var result = Wat.A.performAction('update_di', filters, arguments);
-
-        if (result.status == SUCCESS) {
-            this.fetchDetails();
-            this.renderSide();
-
-            this.message = 'Successfully updated';
-            this.messageType = 'success';
-        }
-        else {
-            this.message = 'Error updating';
-            this.messageType = 'error';
-        }
-        
-        dialog.dialog('close');
+        };
+          
+        this.updateModel(arguments, filters);
     },
     
     render: function () {
@@ -96,9 +83,12 @@ Wat.Views.DIDetailsView = Wat.Views.DetailsView.extend({
     },
     
     editElement: function(e) {
-        this.dialogConf.title = $.i18n.t('Disk image') + ": " + this.model.get('name');
+        this.dialogConf.title = $.i18n.t('Disk image') + ": " + this.model.get('disk_image');
         
         Wat.Views.DetailsView.prototype.editElement.apply(this, [e]);
+        
+        // Configure tags inputs
+        Wat.I.tagsInputConfiguration();
     },
     
     bindEditorEvents: function() {

@@ -97,7 +97,7 @@ Wat.Views.OSFListView = Wat.Views.ListView.extend({
                 'display': true
             },
             {
-                'name': '#vms',
+                'name': 'vms',
                 'display': true
             }
         ];

@@ -78,7 +78,7 @@ Wat.Views.NodeListView = Wat.Views.ListView.extend({
                 'display': true
             },
             {
-                'name': '#vms_connected',
+                'name': 'vms_connected',
                 'display': true
             },
             {

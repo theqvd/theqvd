@@ -1,5 +1,5 @@
 Wat.Models.OSF = Wat.Models.Model.extend({
-    action: "osf_get_details",
+    actionPrefix: 'osf',
     
     defaults: {
         name: 'New OS Flavour'

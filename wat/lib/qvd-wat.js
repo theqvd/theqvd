@@ -125,14 +125,23 @@ var Wat = {
             Wat.CurrentView = new Wat.Views.OSFListView();
         });    
         
-        app_router.on('route:listDI', function () {
+        app_router.on('route:listDI', function (field, value) {
             Wat.I.showLoading();
             setMenuOpt('dis');
             if (!$.isEmptyObject(Wat.CurrentView )) {
                 Wat.CurrentView.undelegateEvents();
             }
             
-            Wat.CurrentView = new Wat.Views.DIListView();
+            var params = {};
+            if (field !== null) {
+                switch(field) {
+                    case 'osf':
+                        params.filters = {"osf_id": value};
+                        break;
+                }
+            }
+            
+            Wat.CurrentView = new Wat.Views.DIListView(params);
         });
         
         

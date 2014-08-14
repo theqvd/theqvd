@@ -1,5 +1,5 @@
 Wat.Models.Node = Wat.Models.Model.extend({
-    action: "host_get_details",
+    actionPrefix: 'host',
     
     defaults: {
         name: 'New Node'

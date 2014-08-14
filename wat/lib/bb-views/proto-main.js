@@ -78,73 +78,30 @@ Wat.Views.MainView = Backbone.View.extend({
     // Editor
     editorElement: function (e) {
         var that = this;
+        Wat.I.dialog(that.dialogConf);           
+    },
+    
+    fillEditor: function (target) {
+        var that = Wat.CurrentView;
         
-        $('.js-dialog-container').dialog({
-            dialogClass: "loadingScreenWindow",
-            title: that.dialogConf.title,
-            resizable: false,
-            dialogClass: 'no-close',
-            collision: 'fit',
-            modal: true,
-            buttons: that.dialogConf.buttons,
-            open: function(e) {
-                //$(e.target).next().find('button:first').hide();
-                
-                // Close message just in case
-                $('.message-close').trigger('click');
-                
-                // Disable scroll on body to improve user experience with dialog scroll
-                //$('body').css('overflow-y', 'hidden');
-                
-                // Buttons style
-                var buttons = $(e.target).next().find('button');
-                var buttonsText = $(".ui-dialog-buttonset .ui-button .ui-button-text");
+        // Add common parts of editor to dialog
+        that.template = _.template(
+                    that.templateEditorCommon, {
+                        model: that.model,
+                        cid: that.cid
+                    }
+                );
 
-                buttons.attr('class', '');
-                buttons.addClass("button");
+        target.html(that.template);
 
+        // Add specific parts of editor to dialog
+        that.template = _.template(
+                    that.templateEditor, {
+                        model: that.model
+                    }
+                );
 
-                var button1 = buttonsText[0];
-                var button2 = buttonsText[1];
-                
-                Wat.T.translateElementContain($(button1));
-                Wat.T.translateElementContain($(button2));
-                
-                buttons.attr("class", "");
-                buttons.addClass("button");
-
-                $(button1).addClass(that.dialogConf.button1Class);
-                $(button2).addClass(that.dialogConf.button2Class);
-                
-                that.template = _.template(
-                            that.templateEditorCommon, {
-                                model: that.model,
-                                cid: that.cid
-                            }
-                        );
-                
-                $(this).html(that.template);
-                
-                that.template = _.template(
-                            that.templateEditor, {
-                                model: that.model
-                            }
-                        );
-                
-                $(that.editorContainer).html(that.template);
-                
-                Wat.I.tagsInputConfiguration();
-                
-                Wat.T.translateElement($(this).find('[data-i18n]'));
-                                
-                $('.bb-editor-content-test').clone(true, true).appendTo('.dialog-container');
-            },
-            
-            close: function () {
-                // Re-enable scroll on body disabled when open dialog
-                //$('body').css('overflow-y', 'auto');
-            }
-        });                
+        $(that.editorContainer).html(that.template);
     },
     
     updateElement: function () {
@@ -284,16 +241,37 @@ Wat.Views.MainView = Backbone.View.extend({
             $('.expiration_row').toggle();
         }
     },
+
+    createModel: function (arguments) {
+        this.model.setOperation('create');
+        this.saveModel(arguments, {}, function(){});
+    },
     
-    showMessage: function () {
-        $('.message').html(this.message);
-        $('.message-container').slideToggle(500);
-        $('.message-container').removeClass('success error info warning');
-        $('.message-container').addClass(this.messageType);
-        
+    updateModel: function (arguments, filters) {
+        this.model.setOperation('update');
+        this.saveModel(arguments, filters, this.fetchDetails);
+    },
+    
+    saveModel: function (arguments, filters, successCallback) {
         var that = this;
-        messageTimeout = setTimeout(function() { 
-            $('.message-close').trigger('click');
-        },3000);
+        this.model.save(arguments, {filters: filters}).complete(function(e) {
+            var callResponse = e.status;
+            var response = JSON.parse(e.responseText);
+            
+            if (callResponse == 200 && response.status == SUCCESS) {
+                //successCallback();
+                that.fetchDetails ();
+                
+                that.message = 'Successfully updated';
+                that.messageType = 'success';
+            }
+            else {
+                that.message = 'Error updating';
+                that.messageType = 'error';
+            }
+
+            that.dialog.dialog('close');
+            Wat.I.showMessage({message: that.message, messageType: that.messageType});
+        });
     }
 });

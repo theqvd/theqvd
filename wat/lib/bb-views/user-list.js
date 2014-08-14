@@ -125,13 +125,23 @@ Wat.Views.UserListView = Wat.Views.ListView.extend({
         
         // Properties to create, update and delete obtained from parent view
         var properties = this.properties;
-        
-        var arguments = {'properties' : properties};
-        
+                
         var context = $('.' + this.cid + '.editor-container');
+
+        var blocked = context.find('input[name="blocked"][value=1]').is(':checked');
+        
+        var arguments = {
+            "properties" : properties.create,
+            //"blocked": blocked ? 1 : 0
+        };
         
         var name = context.find('input[name="name"]').val();
-        arguments['name'] = name;
+        if (!name) {
+            console.error('name empty');
+        }
+        else {
+            arguments["name"] = name;
+        }
         
         var password = context.find('input[name="password"]').val();
         var password2 = context.find('input[name="password2"]').val();
@@ -144,30 +154,9 @@ Wat.Views.UserListView = Wat.Views.ListView.extend({
         else {
             arguments['password'] = password;
         }
-        
-        var blocked = context.find('input[name="blocked"][value=1]').is(':checked');
-        
-        arguments['blocked'] = blocked ? 1 : 0;
-        
+                
         console.log(arguments);
-        return;
-        
-        var filters = {"id": this.id};
-        
-        var result = Wat.A.performAction('create_user', filters, arguments);
-        
-        if (result.status == SUCCESS) {
-            this.fetchDetails();
-            this.renderSide();
-
-            this.message = 'Successfully updated';
-            this.messageType = 'success';
-        }
-        else {
-            this.message = 'Error updating';
-            this.messageType = 'error';
-        }
-        
-        dialog.dialog('close');
+                
+        this.createModel(arguments);
     }
 });

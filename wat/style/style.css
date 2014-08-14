@@ -556,6 +556,13 @@ body {
       width: 200px;
       top: 25vh; } }
 
+.mini-loading {
+  font-size: 45px;
+  width: 100%;
+  margin-top: 40px;
+  text-align: center;
+  color: #e4e4e4; }
+
 .wrapper {
   min-width: 20em;
   max-width: 40em;
@@ -791,6 +798,12 @@ body {
   @media screen and (min-width: 40em) {
     .footer {
       display: block; } }
+
+.separator {
+  width: 100%;
+  margin-top: 15px;
+  margin-bottom: 20px;
+  border-bottom: dotted 1px #d7d7d7; }
 
 .dialog-container, .dialog-container-template {
   display: none; }

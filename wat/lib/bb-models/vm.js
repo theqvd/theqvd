@@ -1,5 +1,5 @@
 Wat.Models.VM = Wat.Models.Model.extend({
-    action: "vm_get_details",
+    actionPrefix: 'vm',
     
     defaults: {
         name: 'New VM',

@@ -57,9 +57,17 @@ Wat.Views.VMDetailsView = Wat.Views.DetailsView.extend({
         
         var context = $('.' + this.cid + '.editor-container');
         
-        
         var name = context.find('input[name="name"]').val();
-        arguments['name'] = name;      
+        var di_tag = context.find('input[name="di_tag"]').val(); 
+        var blocked = context.find('input[name="blocked"][value=1]').is(':checked');
+        
+        var filters = {"id": this.id};
+        var arguments = {
+            "properties": properties,
+            "name": name,
+            "di_tag": di_tag,
+            "blocked": blocked ? 1 : 0
+        };
         
         // If expire is checked
         if (context.find('input.js-expire').is(':checked')) {
@@ -79,30 +87,9 @@ Wat.Views.VMDetailsView = Wat.Views.DetailsView.extend({
             else {
                 arguments['expiration_hard'] = expiration_hard;
             }
-        }  
-        
-        var di_tag = context.find('input[name="di_tag"]').val(); 
-        arguments['di_tag'] = di_tag;
-
-        var blocked = context.find('input[name="blocked"][value=1]').is(':checked');
-        arguments['blocked'] = blocked ? 1 : 0;
-        
-        var filters = {"id": this.id};
-        
-        var result = Wat.A.performAction('update_vm', filters, arguments);
-        
-        if (result.status == SUCCESS) {
-            this.fetchDetails();
-
-            this.message = 'Successfully updated';
-            this.messageType = 'success';
         }
-        else {
-            this.message = 'Error updating';
-            this.messageType = 'error';
-        }
-        
-        dialog.dialog('close');
+                
+        this.saveModel(arguments, filters);
     },
     
     bindEditorEvents: function() {

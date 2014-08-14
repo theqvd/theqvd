@@ -99,5 +99,8 @@ Wat.Views.DIListView = Wat.Views.ListView.extend({
         this.dialogConf.title = $.i18n.t('New Disk image');
 
         Wat.Views.ListView.prototype.newElement.apply(this, [e]);
+        
+        // Configure tags inputs
+        Wat.I.tagsInputConfiguration();
     }
 });

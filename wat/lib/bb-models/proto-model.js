@@ -4,14 +4,15 @@ Wat.Models.Model = Backbone.Model.extend({
     url: "",
     detailsView: false,
     baseUrl: "http://172.20.126.12:3000/?login=benja&password=benja",
-
+    operation: '',
+    
     parse: function(response) {
-        if (this.detailsView) {
-            return response.result.rows[0];
-        }
-        else {
-            return response;
-        }
+            if (this.detailsView) {
+                return response.result.rows[0];
+            }
+            else {
+                return response;
+            }
     },
     
     initialize: function (params) {
@@ -20,14 +21,21 @@ Wat.Models.Model = Backbone.Model.extend({
         }
     },
     
-    getUrl: function () {
+    getDetailsUrl: function () {
         return this.baseUrl + 
-            "&action=" + this.action +
+            "&action=" + this.actionPrefix + "_get_details" + 
             "&filters={\"id\":" + this.id + "}";
     },
     
-    getBaseUrl: function () {
-        return this.baseUrl;
+    setOperation: function (operation) {
+        switch (operation) {
+            case 'create':
+                this.operation = this.actionPrefix + "_create";
+                break;
+            case 'update':
+                this.operation = this.actionPrefix + "_update_custom";
+                break;
+        }
     },
     
     sync: function(method, model, options) {
@@ -37,10 +45,21 @@ Wat.Models.Model = Backbone.Model.extend({
         var params = _.extend({
             type: 'POST',
             dataType: 'json',
-            url: that.getUrl(),
+            url: that.getDetailsUrl(),
             processData: false
         }, options);
         
         return $.ajax(params);
     },
+    
+    save: function(attributes, options) {        
+        options = {
+            url: this.baseUrl + 
+                "&action=" + this.operation +
+                "&filters=" + JSON.stringify(options.filters) + 
+                "&arguments=" + JSON.stringify(attributes)
+        };
+        
+        return Backbone.Model.prototype.save.call(this, attributes, options);
+    }
 });

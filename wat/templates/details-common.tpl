@@ -42,4 +42,3 @@ var properties = model.get('properties');
         </div>
     </div>
 </div>
-<div class="bb-editor-content-test"></div>

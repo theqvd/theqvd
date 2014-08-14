@@ -50,9 +50,9 @@
                             </th>
             <%
                             break;
-                        case '#vms_connected':
+                        case 'vms_connected':
             %>
-                            <th class="desktop sortable" data-sortby="#vms_connected" data-i18n="Running VMs">
+                            <th class="desktop sortable" data-sortby="vms_connected" data-i18n="Running VMs">
                                 <%= i18n.t('Running VMs') %>
                             </th>
             <%
@@ -160,10 +160,10 @@
                                 </td>
                 <%
                                 break;
-                            case '#vms_connected':
+                            case 'vms_connected':
                 %>
                                 <td class="desktop">
-                                    <%= model.get('#vms_connected') %>
+                                    <%= model.get('vms_connected') %>
                                 </td>
                 <%
                                 break;

@@ -1,6 +1,7 @@
 Wat.Router = Backbone.Router.extend({
     routes: {
         "dis": "listDI",
+        "dis/:field/:value": "listDI",
         "osfs": "listOSF",
         "nodes": "listNode",
         "vms": "listVM",

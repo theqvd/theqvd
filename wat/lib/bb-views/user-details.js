@@ -19,17 +19,15 @@ Wat.Views.UserDetailsView = Wat.Views.DetailsView.extend({
     initialize: function (params) {
         this.model = new Wat.Models.User(params);
         Wat.Views.DetailsView.prototype.initialize.apply(this, [params]);
-        
-        this.renderSide();
     },
     
     renderSide: function () {
-        var slideContainer = '.' + this.cid + ' .bb-details-side1';
+        var sideContainer = '.' + this.cid + ' .bb-details-side1';
         
         // Render Virtual Machines list on side
         var params = {};
         params.whatRender = 'list';
-        params.listContainer = slideContainer;
+        params.listContainer = sideContainer;
         params.forceListColumns = {checks: true, info: true, name: true};
         params.forceSelectedActions = {disconnect: true};
         params.forceListActionButton = null;
@@ -49,6 +47,14 @@ Wat.Views.UserDetailsView = Wat.Views.DetailsView.extend({
         
         var context = $('.' + this.cid + '.editor-container');
         
+        var blocked = context.find('input[name="blocked"][value=1]').is(':checked');
+                
+        var filters = {"id": this.id};
+        var arguments = {
+            "properties": properties,
+            "blocked": blocked ? 1 : 0
+        }
+        
         // If change password is checked
         if (context.find('input.js-change-password').is(':checked')) {
             var password = context.find('input[name="password"]').val();
@@ -64,27 +70,7 @@ Wat.Views.UserDetailsView = Wat.Views.DetailsView.extend({
             }
         }
         
-        var blocked = context.find('input[name="blocked"][value=1]').is(':checked');
-        
-        arguments['blocked'] = blocked ? 1 : 0;
-        
-        var filters = {"id": this.id};
-        
-        var result = Wat.A.performAction('update_user', filters, arguments);
-        
-        if (result.status == SUCCESS) {
-            this.fetchDetails();
-            this.renderSide();
-
-            this.message = 'Successfully updated';
-            this.messageType = 'success';
-        }
-        else {
-            this.message = 'Error updating';
-            this.messageType = 'error';
-        }
-        
-        dialog.dialog('close');
+        this.updateModel(arguments, filters);
     },
     
     render: function () {

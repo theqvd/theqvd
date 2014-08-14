@@ -19,17 +19,15 @@ Wat.Views.NodeDetailsView = Wat.Views.DetailsView.extend({
     initialize: function (params) {
         this.model = new Wat.Models.Node(params);
         Wat.Views.DetailsView.prototype.initialize.apply(this, [params]);
-        
-        this.renderSide();
     },
     
     renderSide: function () {
-        var slideContainer = '.' + this.cid + ' .bb-details-side1';
+        var sideContainer = '.' + this.cid + ' .bb-details-side1';
         
         // Render Virtual Machines list on side
         var params = {};
         params.whatRender = 'list';
-        params.listContainer = slideContainer;
+        params.listContainer = sideContainer;
         params.forceListColumns = {checks: true, info: true, name: true};
         params.forceSelectedActions = {disconnect: true};
         params.forceListActionButton = null;
@@ -44,36 +42,20 @@ Wat.Views.NodeDetailsView = Wat.Views.DetailsView.extend({
         
         // Properties to create, update and delete obtained from parent view
         var properties = this.properties;
-        
-        var arguments = {'properties' : properties};
-        
+                
         var context = $('.' + this.cid + '.editor-container');
         
         var name = context.find('input[name="name"]').val();
-        
-        arguments['name'] = name;
-        
         var blocked = context.find('input[name="blocked"][value=1]').is(':checked');
         
-        arguments['blocked'] = blocked ? 1 : 0;
-        
         var filters = {"id": this.id};
-
-        var result = Wat.A.performAction('update_node', filters, arguments);
-
-        if (result.status == SUCCESS) {
-            this.fetchDetails();
-            this.renderSide();
-
-            this.message = 'Successfully updated';
-            this.messageType = 'success';
+        var arguments = {
+            "properties": properties,
+            "name": name,
+            "blocked": blocked ? 1 : 0
         }
-        else {
-            this.message = 'Error updating';
-            this.messageType = 'error';
-        }
-        
-        dialog.dialog('close');
+
+        this.updateModel(arguments, filters);
     },
     
     render: function () {
