@@ -42,9 +42,15 @@ sub delete_tag {
     my $ditag = $di->tags->search({tag => $tag})->first;
     $ditag->delete if $ditag;
 }
-sub get_has_many { qw(properties tags vm_runtimes); }
-sub get_has_one { qw(); }
-sub get_belongs_to { qw(osf); }
+
+
+sub tags_get_columns
+{
+    my $self = shift;
+    [ map { { $_->get_columns } } $self->tags ];
+}
+
+
 
 sub custom_join_condition
 { 

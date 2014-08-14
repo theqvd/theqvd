@@ -51,3 +51,4 @@ osf_id = osf.id
 osf_name = osf.name
 tenant = osf.tenant_id
 blocked = me.blocked
+tags = me.tags_get_columns

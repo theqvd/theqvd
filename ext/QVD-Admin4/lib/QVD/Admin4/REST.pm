@@ -10,6 +10,7 @@ use QVD::Admin4::REST::Request::OSF;
 use QVD::Admin4::REST::Request::Host;
 use QVD::Admin4::REST::Request::User;
 use QVD::Admin4::REST::Request::DI_Tag;
+use QVD::Admin4::REST::Request::Config_Field;
 use QVD::Admin4::REST::Response;
 use QVD::Config::Core;
 use QVD::Admin4::Exception;
@@ -146,7 +147,7 @@ user_update_custom.mandatory=id,tenant
 
 user_create.roles=superadmin,admin
 user_create.table=User
-user_create.arguments=name,password,role,tenant
+user_create.arguments=name,password,role,blocked,tenant
 user_create.default.blocked=false
 user_create.default.role=3
 
@@ -332,3 +333,13 @@ tag_tiny_list.table=DI_Tag
 tag_tiny_list.filters=osf_id
 tag_tiny_list.mandatory=osf_id
 tag_tiny_list.order_by=name
+
+config_field_update.roles =admin,superadmin
+config_field_update.table =Config_Field
+config_field_update.filters=id
+config_field_update.mandatory=id
+config_field_update.arguments=update,get_list,get_details,filter_list,filter_details
+
+config_field_get_list.roles =admin,superadmin
+config_field_get_list.table =Config_Field
+config_field_get_list.filters=qvd_obj

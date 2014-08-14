@@ -22,11 +22,20 @@ __PACKAGE__->has_many(vms        => 'QVD::DB::Result::VM_Runtime',    'host_id',
 __PACKAGE__->has_one (runtime    => 'QVD::DB::Result::Host_Runtime',  'host_id');
 __PACKAGE__->has_one (counters   => 'QVD::DB::Result::Host_Counter',  'host_id');
 
-sub get_has_many { qw(vms properties); };
-sub get_has_one { qw(runtime counters); };
-sub get_belongs_to { qw(); };
-sub get_required_cols { qw(name address frontend backend); };
-sub get_defaults { {frontend => 1, backend => 1}; };
+sub load { return undef; }
+sub creation_admin { return undef; }
+sub creation_date { return undef; }
+sub vms_connected 
+{ 
+    my $self = shift;
+    $self->search_related('vms',{'vm_state' => 'running'})->count;
+}
+
+sub vms_count 
+{ 
+    my $self = shift;
+    $self->vms->count;
+}
 
 sub custom_join_condition
 { 

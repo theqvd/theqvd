@@ -45,6 +45,62 @@ sub get_credentials
     { tenant => $user->tenant_id, role => $user->role->name };
 }
 
+
+sub _map
+{
+    my ($self,$obj,$request,$result,@fields) = @_;
+
+    for my $field (@fields)
+    {
+	my $mfield = $request->mapper->getProperty($field);
+        my ($table,$column) = $mfield =~ /^(.+)\.(.+)$/;
+
+	$result->{$field} = 
+	    eval { $table eq "me" ? 
+		       $obj->$column : 
+		       $obj->$table->$column } // undef;
+    }
+
+    $result;
+}
+
+sub get_fields
+{
+    my ($self,$qvd_obj,$criterium) = @_;
+
+    ( map { $_->name } $DB->resultset('Config_Field')->search(
+	  {qvd_obj => $qvd_obj,
+	   $criterium => 'true'})->all);
+}
+
+sub config_field_get_list
+{
+    my ($self,$request) = @_;
+
+    my $result = $self->select($request);
+    my @fields = qw(id qvd_obj name update get_list get_details filter_list filter_details);
+
+    $_ = $self->_map($_,$request,{},@fields) 
+	for @{$result->{rows}};
+
+    $result;
+
+}
+
+
+sub config_field_update
+{
+    my ($self,$request) = @_;
+
+    my $result = $self->select($request);
+    my $arguments = $request->arguments;
+    $_->update({get_list => 0}) for @{$result->{rows}};
+
+    $result->{rows} = [];
+    $result;
+}
+
+
 ###############################
 ########## QUERIES ############
 ###############################
@@ -53,15 +109,10 @@ sub user_get_list
 {
     my ($self,$request) = @_;
     my $result = $self->select($request);
+    my @fields = $self->get_fields(qw(user get_list));
 
-    my @query = ('vms',{'vm_runtime.user_state' => 'connected'},{join => [qw(vm_runtime)]});
-
-    $_ = { id => $_->id, 
-	   name => $_->login, 
-	   blocked => undef,
-	   '#vms'  => $_->vms->count,
-	   '#vms_connected' => $_->search_related(@query)->count,
-	   $self->add_custom($request,$_)} for @{$result->{rows}};
+    $_ = $self->_map($_,$request,{$self->add_custom($request,$_)},@fields) 
+	for @{$result->{rows}};
 
     $result;
 }
@@ -71,8 +122,9 @@ sub user_tiny_list
     my ($self,$request) = @_;
     my $result = $self->select($request);
 
-    $_ = { id => $_->id, 
-	   name => $_->login } for @{$result->{rows}};
+    my @fields = qw(id name);
+    $_ = $self->_map($_,$request,{},@fields) 
+	for @{$result->{rows}};
     
     $result;
 }
@@ -81,15 +133,10 @@ sub user_get_details
 {
     my ($self,$request) = @_;
     my $result = $self->select($request);
-    my @query = ('vms',{'vm_runtime.user_state' => 'connected'},{join => [qw(vm_runtime)]});
 
-    $_ = { id => $_->id, 
-	   name => $_->login, 
-	   blocked => undef,
-	   creation_admin => undef,
-	   creation_date => undef,
-	   '#vms_connected' => $_->search_related(@query)->count,
-	   $self->add_custom($request,$_) } for  @{$result->{rows}};
+    my @fields = $self->get_fields(qw(user get_details));
+    $_ = $self->_map($_,$request,{$self->add_custom($request,$_)},@fields) 
+	for @{$result->{rows}};
 
     $result;
 }
@@ -112,9 +159,10 @@ sub user_get_state
     my ($self,$request) = @_;
     my $result = $self->select($request);
 
-    my @query = ('vms',{'vm_runtime.vm_state' => 'running'},{join => [qw(vm_runtime)]});
+    my @fields = qw(vms_connected);
+    $_ = $self->_map($_,$request,{},@fields) 
+	for @{$result->{rows}};
 
-    $_ = { '#vms' => $_->search_related(@query)->count } for @{$result->{rows}};
     $result;
 }
 
@@ -122,21 +170,9 @@ sub vm_get_list
 {
     my ($self,$request) = @_;
     my $result = $self->select($request);
-
-    $_ = { id => $_->id, 
-	   name => $_->name,
-	   host_id => $_->vm_runtime->host_id,
-	   user_id => $_->user_id,
-	   user_name => $self->_find('User','id',$_->user_id,'login'),
-	   osf_id => $_->osf_id,
-	   osf_name => $self->_find('OSF','id',$_->osf_id,'name'),
-	   di_tag => $_->di_tag,
-	   di_version => undef,
-	   state => $_->vm_runtime->vm_state,
-	   blocked => $_->vm_runtime->blocked,
-	   expiration_soft => $_->vm_runtime->vm_expiration_soft,
-	   expiration_hard => $_->vm_runtime->vm_expiration_hard,
-	   $self->add_custom($request,$_) } for @{$result->{rows}};
+    my @fields = $self->get_fields(qw(vm get_list));
+    $_ = $self->_map($_,$request,{$self->add_custom($request,$_)},@fields) 
+	for @{$result->{rows}};
 
     $result;
 }
@@ -145,52 +181,22 @@ sub vm_tiny_list
 {
     my ($self,$request) = @_;
     my $result = $self->select($request);
-
-    $_ = { id => $_->id, 
-	   name => $_->name } for @{$result->{rows}};
+    my @fields = qw(id name);
+    $_ = $self->_map($_,$request,{},@fields) 
+	for @{$result->{rows}};
     
     $result;
 }
-
 
 sub vm_get_details
 {
     my ($self,$request) = @_;
     my $result = $self->select($request);
 
-    $_ = { id => $_->id, 
-	   name => $_->name,
-	   user_id => $_->user_id,
-	   user_name => $self->_find('User','id',$_->user_id,'login'),
-	   osf_id => $_->osf_id,
-	   osf_name => $self->_find('OSF','id',$_->osf_id,'name'),
-	   di_tag => $_->di_tag,
-	   di_version => $self->_find('DI','id',$_->vm_runtime->current_di_id,'version'),
-	   di_name => 
-
-	       $DB->resultset('DI')->search({'osf.id' => $_->osf_id, 
-					     'tags.tag' => $_->di_tag},{ join => [qw(osf tags)] })->first->path,
-
-	   di_id => 
-
-	       $DB->resultset('DI')->search({'osf.id' => $_->osf_id, 
-					     'tags.tag' => $_->di_tag},{ join => [qw(osf tags)] })->first->id,
-
-	   blocked => $_->vm_runtime->blocked,
-	   state => $_->vm_runtime->vm_state,
-	   host_id => $_->vm_runtime->host_id,
-	   host_name => $self->_find('Host','id',$_->vm_runtime->host_id,'name'),
-	   ip => $_->ip,
-	   expiration_soft => $_->vm_runtime->vm_expiration_soft,
-	   expiration_hard => $_->vm_runtime->vm_expiration_hard,
-	   creation_admin => undef,
-	   creation_date => undef,
-	   next_boot_ip => $_->vm_runtime->vm_address, 
-	   ssh_port => $_->vm_runtime->vm_ssh_port,
-	   vnc_port => $_->vm_runtime->vm_vnc_port,
-	   serial_port => $_->vm_runtime->vm_serial_port,
-           $self->add_custom($request,$_)} for @{$result->{rows}};
-
+    my @fields = $self->get_fields(qw(vm get_details));
+    $_ = $self->_map($_,$request,{$self->add_custom($request,$_)},@fields) 
+	for @{$result->{rows}};
+   
     $result;
 }
 
@@ -199,8 +205,11 @@ sub vm_get_state
     my ($self,$request) = @_;
     my $result = $self->select($request);
 
-    $_ = { 'vm_state'   => $_->vm_runtime->vm_state,
-           'user_state' => $_->vm_runtime->user_state } for @{$result->{rows}};
+    my @fields = qw(state user_state);
+
+    $_ = $self->_map($_,$request,{},@fields) 
+	for @{$result->{rows}};
+
     $result;
 }
 
@@ -220,16 +229,10 @@ sub host_get_list
 {
     my ($self,$request) = @_;
     my $result = $self->select($request);
-    my @query = ('vms',{'vm_state' => 'running'});
 
-    $_ = { id => $_->id, 
-	   state => $_->runtime->state,
-	   '#vms_connected' => $_->search_related(@query)->count,
-	   name => $_->name,
-	   address => $_->address,
-	   blocked => $_->runtime->blocked,
-	   $self->add_custom($request,$_) } for @{$result->{rows}};
-
+    my @fields = $self->get_fields(qw(host get_list));
+    $_ = $self->_map($_,$request,{$self->add_custom($request,$_)},@fields) 
+	for @{$result->{rows}};
     $result;
 }
 
@@ -238,8 +241,9 @@ sub host_tiny_list
     my ($self,$request) = @_;
     my $result = $self->select($request);
 
-    $_ = { id => $_->id, 
-	   name => $_->name } for @{$result->{rows}};
+    my @fields = qw(id name);
+    $_ = $self->_map($_,$request,{},@fields) 
+	for @{$result->{rows}};
     
     $result;
 }
@@ -249,27 +253,23 @@ sub host_get_details
     my ($self,$request) = @_;
     my $result = $self->select($request);
 
-    $_ = { id => $_->id, 
-	   name => $_->name,
-	   state => $_->runtime->state,
-	   address => $_->address,
-	   load => undef,
-	   creation_admin => undef,
-	   creation_date => undef,
-	   blocked => $_->runtime->blocked,
-           $self->add_custom($request,$_) } for @{$result->{rows}};
+    my @fields = $self->get_fields(qw(host get_details));
+    $_ = $self->_map($_,$request,{$self->add_custom($request,$_)},@fields) 
+	for @{$result->{rows}};
 
     $result;
 }
+
 
 sub host_get_state
 {
     my ($self,$request) = @_;
     my $result = $self->select($request);
 
-    $_ = { state => $_->runtime->state,
-           load => undef,
-	   '#vms' => $_->vms->count } for @{$result->{rows}};
+    my @fields = qw(state load vms);
+
+    $_ = $self->_map($_,$request,{},@fields) 
+	for @{$result->{rows}};
 
     $result;
 }
@@ -291,14 +291,9 @@ sub osf_get_list
     my ($self,$request) = @_;
     my $result = $self->select($request);
 
-    $_ = { id => $_->id,
-	   name => $_->name,
-	   overlay => $_->use_overlay,
-	   memory => $_->memory,
-	   user_storage => $_->user_storage_size,
-	   '#vms' => $_->vms->count,
-           '#dis' => $_->dis->count,
-	   $self->add_custom($request,$_) } for @{$result->{rows}};
+    my @fields = $self->get_fields(qw(osf get_list));
+    $_ = $self->_map($_,$request,{$self->add_custom($request,$_)},@fields) 
+	for @{$result->{rows}};
 
     $result;
 }
@@ -308,8 +303,9 @@ sub osf_tiny_list
     my ($self,$request) = @_;
     my $result = $self->select($request);
 
-    $_ = { id => $_->id, 
-	   name => $_->name } for @{$result->{rows}};
+    my @fields = qw(id name);
+    $_ = $self->_map($_,$request,{},@fields) 
+	for @{$result->{rows}};
     
     $result;
 }
@@ -320,8 +316,9 @@ sub tag_tiny_list
 
     my $result = $self->select($request);
 
-    $_ = { id => $_->id, 
-	   name => $_->tag } for @{$result->{rows}};
+    my @fields = qw(id name);
+    $_ = $self->_map($_,$request,{},@fields) 
+	for @{$result->{rows}};
 
     $result;
 }
@@ -332,12 +329,9 @@ sub osf_get_details
     my ($self,$request) = @_;
     my $result = $self->select($request);
 
-    $_ = { id => $_->id,
-	   name => $_->name,
-	   overlay => $_->use_overlay,
-	   memory => $_->memory,
-	   user_storage => $_->user_storage_size,
-           $self->add_custom($request,$_) } for @{$result->{rows}};
+    my @fields = $self->get_fields(qw(osf get_details));
+    $_ = $self->_map($_,$request,{$self->add_custom($request,$_)},@fields) 
+	for @{$result->{rows}};
 
     $result;
 }
@@ -359,14 +353,9 @@ sub di_get_list
     my ($self,$request) = @_;
     my $result = $self->select($request);
 
-    $_ = { id => $_->id,
-	   disk_image => $_->path,
-	   version => $_->version,
-	   osf_id => $_->osf_id,
-	   osf_name => $self->_find('OSF','id',$_->osf_id,'name'),
-	   blocked => undef,
-	   tags => [ map { { $_->get_columns } } $_->tags ],
-	   $self->add_custom($request,$_)} for @{$result->{rows}};
+    my @fields = $self->get_fields(qw(di get_list));
+    $_ = $self->_map($_,$request,{$self->add_custom($request,$_)},@fields) 
+	for @{$result->{rows}};
 
     $result;
 }
@@ -375,27 +364,21 @@ sub di_tiny_list
 {
     my ($self,$request) = @_;
     my $result = $self->select($request);
-
-    $_ = { id => $_->id, 
-	   name => $_->path } for @{$result->{rows}};
+    my @fields = qw(id disk_image);
+    $_ = $self->_map($_,$request,{},@fields) 
+	for @{$result->{rows}};
     
     $result;
 }
-
 
 sub di_get_details
 {
     my ($self,$request) = @_;
     my $result = $self->select($request);
 
-    $_ = { id => $_->id,
-	   disk_image => $_->path,
-	   version => $_->version,
-	   osf_id => $_->osf_id,
-	   osf_name => $self->_find('OSF','id',$_->osf_id,'name'),
-	   blocked => undef,
-	   tags => [ map { { $_->get_columns } } $_->tags ],
-           $self->add_custom($request,$_) } for @{$result->{rows}};
+    my @fields = $self->get_fields(qw(di get_details));
+
+    $_ = $self->_map($_,$request,{$self->add_custom($request,$_)},@fields) for @{$result->{rows}};
 
     $result;
 }
@@ -450,6 +433,7 @@ sub update
 
     for my $obj (@{$result->{rows}})
     {
+
          eval { $DB->txn_do( sub { eval { $obj->update($arguments) };
 				   QVD::Admin4::Exception->throw(code => ($DB->storage->_dbh->err || 4)) if $@;
 				   $self->update_related($request,$obj); } ) };      
@@ -492,7 +476,7 @@ sub update_related
     my($self,$request,$obj)=@_;
 
     my %tables = %{$request->arguments(related => 1)};
-    
+
     for (keys %tables)
     {
 	eval { $obj->$_->update($tables{$_}) }; 
@@ -792,4 +776,62 @@ sub vm_is_stopped
 #    { total => undef, 
 #      rows => [] };
 #}
+#
+
+#sub vm_get_list
+#{
+#    my ($self,$request) = @_;
+#    my $result = $self->select($request);
+#
+#    $_ = { id => $_->id, 
+#	   name => $_->name,
+#	   host_id => $_->vm_runtime->host_id,
+#	   user_id => $_->user_id,
+#	   user_name => $self->_find('User','id',$_->user_id,'login'),
+#	   osf_id => $_->osf_id,
+#	   osf_name => $self->_find('OSF','id',$_->osf_id,'name'),
+#	   di_tag => $_->di_tag,
+#	   di_version => undef,
+#	   state => $_->vm_runtime->vm_state,
+#	   blocked => $_->vm_runtime->blocked,
+#	   expiration_soft => $_->vm_runtime->vm_expiration_soft,
+#	   expiration_hard => $_->vm_runtime->vm_expiration_hard,
+#	   $self->add_custom($request,$_) } for @{$result->{rows}};
+#
+#    $result;
+#}
+#
+#
+#    $_ = { id => $_->id, 
+#	   name => $_->name,
+#	   user_id => $_->user_id,
+#	   user_name => $self->_find('User','id',$_->user_id,'login'),
+#	   osf_id => $_->osf_id,
+#	   osf_name => $self->_find('OSF','id',$_->osf_id,'name'),
+#	   di_tag => $_->di_tag,
+#	   di_version => $self->_find('DI','id',$_->vm_runtime->current_di_id,'version'),
+#	   di_name => 
+#
+#	       $DB->resultset('DI')->search({'osf.id' => $_->osf_id, 
+#					     'tags.tag' => $_->di_tag},{ join => [qw(osf tags)] })->first->path,
+#
+#	   di_id => 
+#
+#	       $DB->resultset('DI')->search({'osf.id' => $_->osf_id, 
+#					     'tags.tag' => $_->di_tag},{ join => [qw(osf tags)] })->first->id,
+#
+#	   blocked => $_->vm_runtime->blocked,
+#	   state => $_->vm_runtime->vm_state,
+#	   host_id => $_->vm_runtime->host_id,
+#	   host_name => $self->_find('Host','id',$_->vm_runtime->host_id,'name'),
+#	   ip => $_->ip,
+#	   expiration_soft => $_->vm_runtime->vm_expiration_soft,
+#	   expiration_hard => $_->vm_runtime->vm_expiration_hard,
+#	   creation_admin => undef,
+#	   creation_date => undef,
+#	   next_boot_ip => $_->vm_runtime->vm_address, 
+#	   ssh_port => $_->vm_runtime->vm_ssh_port,
+#	   vnc_port => $_->vm_runtime->vm_vnc_port,
+#	   serial_port => $_->vm_runtime->vm_serial_port,
+#           $self->add_custom($request,$_)} for @{$result->{rows}};
 #

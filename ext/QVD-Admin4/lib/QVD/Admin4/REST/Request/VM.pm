@@ -66,3 +66,13 @@ ssh_port        = vm_runtime.vm_ssh_port
 vnc_port        = vm_runtime.vm_vnc_port
 serial_port     = vm_runtime.vm_serial_port
 tenant          = user.tenant_id
+creation_admin  = me.creation_admin
+creation_date   = me.creation_date
+next_boot_ip    = vm_runtime.vm_address 
+ssh_port        = vm_runtime.vm_ssh_port
+vnc_port        = vm_runtime.vm_vnc_port
+serial_port     = vm_runtime.vm_serial_port
+di_version      = me.di_version
+di_name         = me.di_name
+di_id           = me.di_id
+

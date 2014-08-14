@@ -41,6 +41,13 @@ sub combined_properties {
 				 $vm->properties );
 }
 
+sub host 
+{
+    my $self = shift;
+    $self->vm_runtime->host;
+}
+
+
 sub di {
     my $self = shift;
     my $tag = eval { $self->di_tag } // 'default';
@@ -48,9 +55,35 @@ sub di {
     $self->osf->di_by_tag($tag);
 }
 
-sub get_has_many { qw(properties); }
-sub get_has_one { qw(vm_runtime counters); }
-sub get_belongs_to { qw(user osf); }
+sub di_id
+{
+    my $self = shift;
+    $self->di->id;
+}
+
+sub di_version
+{
+    my $self = shift;
+    $self->di->version;
+}
+
+sub di_name
+{
+    my $self = shift;
+    $self->di->path;
+}
+
+sub creation_date
+{
+    my $self = shift;
+    return undef;
+}
+
+sub creation_admin
+{
+    my $self = shift;
+    return undef;
+}
 
 sub custom_join_condition
 { 

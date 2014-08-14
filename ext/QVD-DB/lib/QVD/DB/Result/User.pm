@@ -24,9 +24,33 @@ __PACKAGE__->has_many(properties => 'QVD::DB::Result::User_Property', \&custom_j
 		      {join_type => 'LEFT', order_by => {'-asc' => 'key'}});
 
 
-sub get_has_many { qw(vms properties); }
-sub get_has_one { qw(); }
-sub get_belongs_to { qw(); }
+sub creation_admin
+{ 
+    my $self = shift;
+    return undef;
+}
+
+sub creation_date
+{ 
+    my $self = shift;
+    return undef;
+}
+
+sub vms_count
+{
+    my $self = shift;
+
+    $self->vms->count;
+}
+
+sub vms_connected_count
+{
+    my $self = shift;
+
+    $self->search_related('vms',
+			  {'vm_runtime.user_state' => 'connected'},
+			  {join => [qw(vm_runtime)]})->count,
+}
 
 sub custom_join_condition
 { 

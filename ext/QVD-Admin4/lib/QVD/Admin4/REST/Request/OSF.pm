@@ -39,3 +39,5 @@ memory = me.memory
 vm_id  = vms.id
 di_id  = dis.id
 tenant = me.tenant_id
+vms = me.vms_count
+dis = me.dis_count

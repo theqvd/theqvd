@@ -1,4 +1,5 @@
-package QVD::Admin4::REST::Request::DI_Tag;
+
+package QVD::Admin4::REST::Request::Config_Field;
 use strict;
 use warnings;
 use Moose;
@@ -13,17 +14,17 @@ sub BUILD
     my $self = shift;
 
     $self->{mapper} = $mapper;
-    $self->modifiers->{join} //= [];
-    push @{$self->modifiers->{join}}, qw(di);
-
-    $self->order_by;
 }
 
 1;
 
 __DATA__
 
-
-osf_id = di.osf_id
-name = me.tag
 id = me.id
+name = me.name
+qvd_obj = me.qvd_obj
+get_details = me.get_details
+get_list = me.get_list
+filter_list = me.filter_list
+filter_details = me.filter_details
+update = me.update

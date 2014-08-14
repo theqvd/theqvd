@@ -48,9 +48,17 @@ sub delete_tag {
     return 0;
 }
 
-sub get_has_many { qw(properties dis vms); }
-sub get_has_one { qw(); }
-sub get_belongs_to { qw(); }
+sub vms_count
+{
+    my $self = shift;
+    $self->vms->count;
+}
+
+sub dis_count
+{
+    my $self = shift;
+    $self->dis->count;
+}
 
 sub custom_join_condition
 { 

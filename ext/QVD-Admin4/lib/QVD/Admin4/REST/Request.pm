@@ -4,14 +4,14 @@ use warnings;
 use Moose;
 use QVD::Admin4::Exception;
 
-has 'db',        is => 'ro', isa => 'QVD::DB',  required => 1;
-has 'json',      is => 'ro', isa => 'HashRef',  required => 1;
-has 'config',    is => 'ro', isa => 'HashRef',  required => 1;
+has 'db',        is => 'ro', isa => 'QVD::DB',     required => 1;
+has 'json',      is => 'ro', isa => 'HashRef',     required => 1;
+has 'config',    is => 'ro', isa => 'HashRef',     required => 1;
 has 'mapper',    is => 'ro', isa => 'Config::Properties';
-has 'free',      is => 'ro', isa => 'HashRef',  default => sub { {}; };
-has 'modifiers', is => 'ro', isa => 'HashRef',  default => sub { {}; };
+has 'free',      is => 'ro', isa => 'HashRef',     default => sub { {}; };
+has 'modifiers', is => 'ro', isa => 'HashRef',     default => sub { {}; };
 has 'dependencies', is => 'ro', isa => 'HashRef',  default => sub { {}; };
-has 'customs',   is => 'ro', isa => 'ArrayRef',  default => sub { []; };
+has 'customs',   is => 'ro', isa => 'ArrayRef',    default => sub { []; };
 
 sub BUILD
 {

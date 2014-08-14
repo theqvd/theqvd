@@ -62,9 +62,10 @@ id             = me.id
 name           = me.login
 password       = me.password
 blocked        = me.blocked
-creation_admin = NULL
-creation_date  = NULL
-custom         = ALWAYS
-vms            = AFTER
+creation_admin = me.creation_admin
+creation_date  = me.creation_date
+vms           = me.vms_count
+vms_connected = me.vms_connected_count
 tenant         = me.tenant_id
 role           = me.role_id
+
