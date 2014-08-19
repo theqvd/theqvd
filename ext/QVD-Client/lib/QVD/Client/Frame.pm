@@ -427,11 +427,11 @@ sub OnClickConnect {
 
     # Start or notify worker thread
     # Will result in the execution of a loop in RunWorkerThread.
-    if (!$self->{worker$self->_thread} || !$self->{worker$self->_thread}->is_running()) {
+    if (!$self->{worker_thread} || !$self->{worker_thread}->is_running()) {
         @_ = (); # necessary to avoid "Scalars leaked," see perldoc Wx::Thread
         my $thr = threads->create(\&RunWorkerThread, $self);
         $thr->detach();
-        $self->{worker$self->_thread} = $thr;
+        $self->{worker_thread} = $thr;
     } else {
         lock(%connect_info);
         cond_signal(%connect_info);
