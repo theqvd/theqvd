@@ -13,10 +13,9 @@ sub BUILD
     my $self = shift;
 
     $self->{mapper} = $mapper;
-    $self->modifiers->{join} //= [];
     push @{$self->modifiers->{join}}, qw(di);
-
-    $self->order_by;
+    $self->_check;
+    $self->_map;
 }
 
 1;

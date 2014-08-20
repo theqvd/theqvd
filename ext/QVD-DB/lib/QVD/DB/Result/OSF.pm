@@ -25,6 +25,7 @@ __PACKAGE__->has_many(dis => 'QVD::DB::Result::DI', 'osf_id', { cascade_delete =
 
 sub _dis_by_tag {
     my ($osf, $tag, $fixed) = @_;
+
     my %search = ('tags.tag' => $tag);
     $search{'tags.fixed'} = $fixed if defined $fixed;
     $osf->dis->search(\%search, {join => 'tags'});
@@ -39,7 +40,9 @@ sub di_by_tag {
 
 sub delete_tag {
     my ($osf, $tag) = @_;
+
     if (my $di = $osf->di_by_tag($tag, 0)) {
+
         $di->delete_tag($tag);
         # warn "$osf->delete_tag($tag) => $di";
         return 1;

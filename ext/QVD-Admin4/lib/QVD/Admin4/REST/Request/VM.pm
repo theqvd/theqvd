@@ -15,12 +15,11 @@ sub BUILD
 
     $self->{mapper} = $mapper;
     $self->{dependencies} = {vm_runtime => 1, counters => 1};
-    $self->get_customs('VM_Property');
-    $self->modifiers->{join} //= [];
     push @{$self->modifiers->{join}}, qw(user osf);
     push @{$self->modifiers->{join}}, { vm_runtime => 'host' };
-    $self->default_system;
-    $self->order_by;
+    
+    $self->_check;
+    $self->_map;
 }
 
 
@@ -40,6 +39,8 @@ sub _get_free_ip {
 
 
 1;
+
+# di_version, di_name and di_id are nnot relationships: only available as output fields
 
 __DATA__
 

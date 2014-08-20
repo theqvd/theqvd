@@ -13,15 +13,19 @@ sub BUILD
     my $self = shift;
 
     $self->{mapper} = $mapper;
+
     $self->{dependencies} = {runtime => 1, counters => 1};
-    $self->get_customs('Host_Property');
-    $self->modifiers->{join} //= [];
     push @{$self->modifiers->{join}}, ('runtime','vms');
-    $self->order_by;
+
+    $self->_check;
+    $self->_map;
 }
 
 1;
 
+# WARNING: 
+# vm_id is a has_many relationship with unambiguous filter id: only available as filter
+# vms_count and vms_connected are not relationships: only available as output fields
 
 __DATA__
 
@@ -32,7 +36,7 @@ blocked =  runtime.blocked
 frontend = me.frontend
 backend =  me.backend
 state = runtime.state
-vm_id = vms.vm_id
+vm_id = vms.vm_id 
 load = me.load
 creation_admin = me.creation_admin
 creation_date = me.creation_date

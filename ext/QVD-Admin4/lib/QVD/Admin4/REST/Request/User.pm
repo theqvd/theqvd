@@ -15,8 +15,6 @@ sub BUILD
     my $self = shift;
 
     $self->{mapper} = $mapper;
-    $self->get_customs('User_Property');
-    $self->modifiers->{join} //= [];
     push @{$self->modifiers->{join}}, qw(tenant role);
 
     $self->json->{filters}->{password} = 
@@ -35,7 +33,8 @@ sub BUILD
 	$self->normalize_login($self->json->{arguments}->{name})
 	if defined $self->json->{arguments}->{name};
 
-    $self->order_by;
+    $self->_check;
+    $self->_map;
 }
 
 sub _password_to_token 
@@ -55,6 +54,8 @@ sub normalize_login
 }
 
 1;
+
+# vms, vms_connected are nnot relationships: only available as output fields
 
 __DATA__
 

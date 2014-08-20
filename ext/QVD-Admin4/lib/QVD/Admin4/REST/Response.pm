@@ -60,7 +60,9 @@ __DATA__
 14 = Unknown order element.
 15 = Syntax errors in input json.
 16 = Condition to delete violated.
-17 = Unable to create DI.
+17 = Condition to create violated.
+18 = Imposible to change state in current state.
 23503 = Foreign Key violation.
+23502 = Lack of mandatory argument violation.
 23505 = Unique Key violation.
 

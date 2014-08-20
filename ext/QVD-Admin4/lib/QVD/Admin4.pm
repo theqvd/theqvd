@@ -5,7 +5,10 @@ use strict;
 use warnings;
 use Moose;
 use QVD::DB;
+use QVD::DB::Simple;
 use QVD::Admin4::Query;
+use QVD::Config;
+use File::Copy qw(copy move);
 use Config::Properties;
 use QVD::Admin4::Exception;
 
@@ -78,7 +81,9 @@ sub config_field_get_list
     my ($self,$request) = @_;
 
     my $result = $self->select($request);
-    my @fields = qw(id qvd_obj name update get_list get_details filter_list filter_details);
+    my @fields = qw(id qvd_obj name 
+                    get_list get_details filter_list 
+                    filter_details argument);
 
     $_ = $self->_map($_,$request,{},@fields) 
 	for @{$result->{rows}};
@@ -87,17 +92,26 @@ sub config_field_get_list
 
 }
 
+sub config_field_get_details
+{
+    my ($self,$request) = @_;
+    my $result = $self->select($request);
+
+    my @fields = qw(id qvd_obj name 
+                    get_list get_details filter_list 
+                    filter_details argument);
+
+    $_ = $self->_map($_,$request,{},@fields) 
+	for @{$result->{rows}};
+
+    $result;
+}
+
 
 sub config_field_update
 {
     my ($self,$request) = @_;
-
-    my $result = $self->select($request);
-    my $arguments = $request->arguments;
-    $_->update({get_list => 0}) for @{$result->{rows}};
-
-    $result->{rows} = [];
-    $result;
+    $self->update($request);
 }
 
 
@@ -108,9 +122,9 @@ sub config_field_update
 sub user_get_list
 {
     my ($self,$request) = @_;
+
     my $result = $self->select($request);
     my @fields = $self->get_fields(qw(user get_list));
-
     $_ = $self->_map($_,$request,{$self->add_custom($request,$_)},@fields) 
 	for @{$result->{rows}};
 
@@ -146,6 +160,7 @@ sub user_update
     my ($self,$request) = @_;
     $self->update($request);
 }
+
 
 sub user_update_custom
 {
@@ -378,7 +393,8 @@ sub di_get_details
 
     my @fields = $self->get_fields(qw(di get_details));
 
-    $_ = $self->_map($_,$request,{$self->add_custom($request,$_)},@fields) for @{$result->{rows}};
+    $_ = $self->_map($_,$request,{$self->add_custom($request,$_)},@fields) 
+	for @{$result->{rows}};
 
     $result;
 }
@@ -393,29 +409,20 @@ sub di_update_custom
 {
     my ($self,$request) = @_;
     $self->update_custom($request);
+    $self->update_tags($request);
 }
 
 ### BASIC SQL QUERIES
 
-sub _find
-{
-    my ($self,$table,$arg,$val,$method) = @_;
-    my $r = eval { $DB->resultset($table)->find({$arg => $val})->$method };
-    print $@ if $@;
-    return $r;
-}
-
 sub select
 {
     my ($self,$request) = @_;
-
-    my $filters = $request->filters;
-    my $modifiers = $request->modifiers;
     
-    my $rs = eval { $DB->resultset($request->table)->search($filters, 
-							    $modifiers) };
+    my $rs = eval { $DB->resultset($request->table)->search($request->filters, 
+							    $request->modifiers) };
 
-    QVD::Admin4::Exception->throw(code => ($DB->storage->_dbh->err || 4)) if $@;
+    QVD::Admin4::Exception->throw(code => ($DB->storage->_dbh->state || 4,
+				  message => "$@")) if $@;
 
 
    { total => ($rs->is_paged ? $rs->pager->total_entries : undef), 
@@ -425,62 +432,37 @@ sub select
 
 sub update
 {
-    my ($self,$request) = @_;
+    my ($self,$request,@conditions) = @_;
+
     my $result = $self->select($request);
     my $failures = {};
 
-    my $arguments = $request->arguments;
-
     for my $obj (@{$result->{rows}})
     {
+	eval { $self->$_($obj) for @conditions;
+	       $DB->txn_do( sub { eval { $obj->update($request->arguments) };
 
-         eval { $DB->txn_do( sub { eval { $obj->update($arguments) };
-				   QVD::Admin4::Exception->throw(code => ($DB->storage->_dbh->err || 4)) if $@;
+				   QVD::Admin4::Exception->throw(code => ($DB->storage->_dbh->state || 4),
+								 message => "$@") if $@;
 				   $self->update_related($request,$obj); } ) };      
 	 if ($@) { $failures->{$obj->id} = ($@->can('code') ? $@->code : 4); }
     }
-    $result->{rows} = [];
+
     QVD::Admin4::Exception->throw(code => 1, failures => $failures) if %$failures;
+    $result->{rows} = [];
     $result;
 }
-
-
-sub get_customs
-{
-    my ($self,$request,$result) = @_;
-
-    for my $row (@{$result->{rows}})
-    {
-	my $cols = {$row->get_columns};
-
-	for my $custom (@{$request->customs})
-	{
-	    $cols->{$custom} = $row->properties->find({key => $custom})->value;
-	}
-	$row = $cols;
-    }
-
-    $result;
-}
-
-
-sub add_custom
-{
-    my ($self,$request,$obj) = @_;
-    $ENV{QVD_ADMIN4_CUSTOM_JOIN_CONDITION} = undef;
-    ( properties => { map {  $_->key => $_->value  } $obj->properties->all });
-} 
 
 sub update_related
 {
     my($self,$request,$obj)=@_;
 
     my %tables = %{$request->arguments(related => 1)};
-
     for (keys %tables)
     {
 	eval { $obj->$_->update($tables{$_}) }; 
-	QVD::Admin4::Exception->throw(code => ($DB->storage->_dbh->err || 4)) if $@;
+	QVD::Admin4::Exception->throw(code => ($DB->storage->_dbh->state || 4),
+	                              message => "$@") if $@;
     }
     
 }
@@ -496,24 +478,24 @@ sub update_custom
     {
 	my $props = $request->arguments(custom => 1);
 	my $f = 
-	    sub { $self->custom_update($props->{update},$obj);    
-		  $self->custom_delete($props->{delete},$obj);    
-		  $self->custom_create($props->{create},$obj);
+	sub { $self->custom_update($props->{update},$obj);    
+	      $self->custom_delete($props->{delete},$obj);    
+	      $self->custom_create($props->{create},$obj);
 		  
-		  eval { $obj->update($request->arguments) };
-		  QVD::Admin4::Exception->throw(code => ($DB->storage->_dbh->err || 4)) if $@;
+	      eval { $obj->update($request->arguments) };
+	      QVD::Admin4::Exception->throw(code => ($DB->storage->_dbh->state || 4),
+					    message => "$@") if $@;
 	    
-		  $self->update_related($request,$obj); };
+	      $self->update_related($request,$obj); };
 	
 	eval { $DB->txn_do($f)};
 
 	if ($@) { $failures->{$obj->id} = ($@->can('code') ? $@->code : 4); }
     }
 
-    $result->{rows} = [];
     QVD::Admin4::Exception->throw(code => 1, failures => $failures) if %$failures;
+    $result->{rows} = [];
     $result;
-
 }
 
 sub custom_create
@@ -531,7 +513,8 @@ sub custom_create
 	eval { $DB->resultset($t)->create($a) };
 
 	print $@ if $@;
-	QVD::Admin4::Exception->throw(code => ($DB->storage->_dbh->err || 4)) if $@;
+	QVD::Admin4::Exception->throw(code => ($DB->storage->_dbh->state || 4),
+                                      message => "$@") if $@;
     }
 }
 
@@ -544,7 +527,8 @@ sub custom_update
 	eval { $obj->search_related('properties', 
 				    {key => $key})->update({value => $value}) };
 		
-	QVD::Admin4::Exception->throw(code => ($DB->storage->_dbh->err || 4)) if $@;
+	QVD::Admin4::Exception->throw(code => ($DB->storage->_dbh->state || 4),
+                                      message => "$@") if $@;
     }		
 }
 
@@ -556,7 +540,68 @@ sub custom_delete
     {
 	eval { $obj->search_related('properties', 
 				    {key => $key})->delete };
-	QVD::Admin4::Exception->throw(code => ($DB->storage->_dbh->err || 4)) if $@;
+	QVD::Admin4::Exception->throw(code => ($DB->storage->_dbh->state || 4),
+                                      message => "$@") if $@;
+    }		
+}
+
+################
+# Tag/Untag dis
+################
+
+sub update_tags
+{
+    my ($self,$request) = @_;
+ 
+    my $result = $self->select($request);   
+    my $failures = {};
+
+    for my $di (@{$result->{rows}})
+    {
+	my $tags = $request->arguments(tags => 1);
+	my $f = 
+	sub { $self->tags_delete($tags->{delete},$di);    
+	      $self->tags_create($tags->{create},$di);};
+	
+	eval { $DB->txn_do($f)};
+
+	if ($@) { $failures->{$di->id} = ($@->can('code') ? $@->code : 4); }
+    }
+
+    QVD::Admin4::Exception->throw(code => 1, failures => $failures) if %$failures;
+    $result->{rows} = [];
+    $result;
+}
+
+sub tags_create
+{
+    my ($self,$tags,$di) = @_;
+
+    for my $tag (@$tags)
+    { 	
+	eval {  $di->osf->di_by_tag($tag,'1') && QVD::Admin4::Exception->throw(code => 16);
+		$di->osf->delete_tag($tag);
+		$DB->resultset('DI_Tag')->create({di_id => $di->id, tag => $tag}) };
+	QVD::Admin4::Exception->throw(code => ($DB->storage->_dbh->state || 4),
+                                      message => "$@") if $@;
+    }
+}
+
+sub tags_delete
+{
+    my ($self,$tags,$di) = @_;
+
+    for my $tag (@$tags)
+    {
+	$tag = eval { $di->search_related('tags',{tag => $tag})->first };
+	QVD::Admin4::Exception->throw(code => ($DB->storage->_dbh->state || 4),
+                                      message => "$@") if $@;
+	$tag || next;
+	$tag->fixed && QVD::Admin4::Exception->throw(code => 16);
+	($tag->tag eq 'head' || $tag->tag eq 'default') && QVD::Admin4::Exception->throw(code => 16);
+	eval { $tag->delete };
+	QVD::Admin4::Exception->throw(code => ($DB->storage->_dbh->state || 4),
+                                      message => "$@") if $@;
     }		
 }
 
@@ -584,13 +629,18 @@ sub _delete
 
 sub _create
 {
-    my ($self,$request) = @_;
+    my ($self,$request,@conditions) = @_;
 
     my $arguments = $request->arguments(default => 1);
-    my $host = eval { $DB->resultset($request->table)->create($arguments) };
+
+    my $obj = eval { $self->$_($request) || 
+			 QVD::Admin4::Exception->throw(code => 17)
+			 for @conditions;
+		     $DB->resultset($request->table)->create($arguments) };
     print $@ if $@;
-    QVD::Admin4::Exception->throw(code => ($DB->storage->_dbh->err || 4)) if $@;
-    $host;
+    QVD::Admin4::Exception->throw(code => ($DB->storage->_dbh->state || 4),
+                                  message => "$@") if $@;
+    $obj;
 }
 
 sub _create_related
@@ -602,7 +652,8 @@ sub _create_related
     {
 	eval { $obj->create_related($table,($related_args->{$table} || {})) };
 	print $@ if $@;
-	QVD::Admin4::Exception->throw(code => ($DB->storage->_dbh->err || 4)) if $@;
+	QVD::Admin4::Exception->throw(code => ($DB->storage->_dbh->state || 4),
+                                      message => "$@") if $@;
     }
 }
 
@@ -632,12 +683,12 @@ sub host_delete {
 sub user_create {
     my ($self, $request) = @_;
 
-    $request->{json}->{arguments}->{tenant} =
+    $request->{json}->{arguments}->{straight}->{tenant_id} =
 	$request->{json}->{tenant};
 
-    $DB->txn_do( sub { my $host = $self->_create($request);
-		       $self->_create_related($request,$host);
-		       $self->custom_create($request->arguments(custom => 1),$host)});
+    $DB->txn_do( sub { my $user = $self->_create($request);
+		       $self->_create_related($request,$user);
+		       $self->custom_create($request->arguments(custom => 1),$user)});
 
    { total => undef, 
      rows => [] };
@@ -658,7 +709,7 @@ sub osf_create
 {
     my ($self,$request) = @_;
 
-    $request->{json}->{arguments}->{tenant} =
+    $request->{json}->{arguments}->{straight}->{tenant_id} =
 	$request->{json}->{tenant};
 
     $DB->txn_do( sub { my $host = $self->_create($request);
@@ -686,7 +737,7 @@ sub vm_create
 {
     my ($self,$request) = @_;
 
-    $request->{json}->{arguments}->{tenant} =
+    $request->{json}->{arguments}->{straight}->{tenant_id} =
 	$request->{json}->{tenant};
 
     $DB->txn_do( sub { my $host = $self->_create($request);
@@ -708,10 +759,38 @@ sub vm_delete
      rows => [] };
 }
 
-##############
-# CONDITIONS
-##############
+sub di_create
+{
+    my ($self,$request) = @_;
 
+    $DB->txn_do( sub { my $di = $self->_create($request);
+		       $di->update({path => $di->id .'-'.$di->path});
+		       $di->osf->delete_tag('head');
+		       $di->osf->delete_tag($di->version);
+		       $DB->resultset('DI_Tag')->create({di_id => $di->id, tag => $di->version, fixed => 1});
+		       $DB->resultset('DI_Tag')->create({di_id => $di->id, tag => 'head'});
+		       $DB->resultset('DI_Tag')->create({di_id => $di->id, tag => 'default'})
+			   unless $di->osf->di_by_tag('default');
+
+		       $self->custom_create($request->arguments(custom => 1),$di);});
+   { total => undef, 
+     rows => [] };
+}
+
+sub di_delete {
+    my ($self, $request) = @_;
+
+    my $result = $self->select($request);
+    $self->_delete($result,qw(no_vm_runtimes 
+                              no_head_default_tags));
+
+   { total => undef, 
+     rows => [] };
+}
+
+####################
+# AUXILIAR FUNCTIONS
+####################
 
 sub vm_is_stopped
 {
@@ -721,117 +800,209 @@ sub vm_is_stopped
 	return 0;
 }
 
+sub no_vm_runtimes
+{
+    my ($self,$obj) = @_;
+    $obj->vm_runtimes->count == 0;
+}
+
+sub no_head_default_tags
+{
+    my ($self,$di) = @_;
+
+    for my $tag (qw/default head/) 
+    {
+	next unless $di->has_tag($tag);
+	my @potentials = grep { $_->id ne $di->id } $di->osf->dis;
+	if (@potentials) {
+	    my $new_di = $potentials[-1];
+	    $DB->resultset('DI_Tag')->create({di_id => $new_di->id, tag => $tag});
+	}
+    }
+    return 1;
+}
+
+sub add_custom
+{
+    my ($self,$request,$obj) = @_;
+    $ENV{QVD_ADMIN4_CUSTOM_JOIN_CONDITION} = undef;
+    ( properties => { map {  $_->key => $_->value  } $obj->properties->all });
+} 
+
+###############
+## SWITCHERS ##
+###############
+
+
+sub user_block
+{
+    my ($self,$request) = @_;
+    my @conditions = qw();
+
+    $self->update($request,@conditions);
+}
+
+sub vm_block
+{
+    my ($self,$request) = @_;
+    my @conditions = qw();
+
+    $self->update($request,@conditions);
+}
+
+
+sub host_block
+{
+    my ($self,$request) = @_;
+    my @conditions = qw();
+
+    $self->update($request,@conditions);
+}
+
+
+sub vm_user_disconnect
+{
+    my ($self,$request) = @_;
+    my $result = $self->select($request);
+    my $failures = {};
+
+    for my $obj (@{$result->{rows}})
+    {
+	eval { $obj->vm_runtime->send_user_abort  };      
+	 if ($@) { $failures->{$obj->id} = 18; print $@; }
+    }
+
+    QVD::Admin4::Exception->throw(code => 1, failures => $failures) if %$failures;
+    $result->{rows} = [];
+    $result;
+}
+
+sub vm_start
+{
+    my ($self,$request) = @_;
+
+    my $result = $self->select($request);
+    my $failures = {};
+    my %host;
+
+    for my $vm (@{$result->{rows}})
+    {
+	eval { $DB->txn_do(sub {$vm->vm_runtime->can_send_vm_cmd('start') or die;
+				$self->_assign_host($vm->vm_runtime);
+				$vm->vm_runtime->send_vm_start;
+				$host{$vm->vm_runtime->host_id}++;}); 
+	       $@ or last } for (1 .. 5);
+
+	if ($@) { $failures->{$vm->id} = 18; print $@; }
+    }
+
+    notify("qvd_cmd_for_vm_on_host$_") for keys %host;
+
+    QVD::Admin4::Exception->throw(code => 1, failures => $failures) if %$failures;    
+    $result->{rows} = [];
+    $result;
+}
+
+sub vm_stop
+{
+    my ($self,$request) = @_;
+
+    my $result = $self->select($request);
+    my $failures = {};
+    my %host;
+
+    for my $vm (@{$result->{rows}})
+    {
+	eval { $DB->txn_do(sub { if ($vm->vm_runtime->can_send_vm_cmd('stop')) 
+				 {
+				     $vm->vm_runtime->send_vm_stop;
+				     $host{$vm->vm_runtime->host_id}++;
+				 }
+				 else 
+				 {
+				     if ($vm->vm_runtime->vm_state eq 'stopped' and
+					 $vm->vm_runtime->vm_cmd eq 'start') 
+				     {
+					 $vm->vm_runtime->update({ vm_cmd => undef });
+				     }
+				 }
+			   });
+	       $@ or last } for (1 .. 5);
+
+	if ($@) { $failures->{$vm->id} = 18; print $@; }
+    }
+
+    notify("qvd_cmd_for_vm_on_host$_") for keys %host;
+
+    QVD::Admin4::Exception->throw(code => 1, failures => $failures) if %$failures;    
+    $result->{rows} = [];
+    $result;
+}
+
+
+my $lb;
+sub _assign_host {
+    my ($self, $vmrt) = @_;
+    if (!defined $vmrt->host_id) {
+        $lb //= do {
+            require QVD::L7R::LoadBalancer;
+            QVD::L7R::LoadBalancer->new();
+        };
+        my $free_host = $lb->get_free_host($vmrt->vm) //
+            die "Unable to start machine, no hosts available";
+
+        $vmrt->set_host_id($free_host);
+    }
+}
+
+sub osf_block
+{
+    my ($self,$request) = @_;
+    my @conditions = qw();
+    $self->update($request,@conditions);
+}
+
+sub di_block
+{
+    my ($self,$request) = @_;
+    my @conditions = qw();
+    $self->update($request,@conditions);
+}
+
+
+sub user_unblock
+{
+    my ($self,$request) = @_;
+    my @conditions = qw();
+    $self->update($request,@conditions);
+}
+
+sub vm_unblock
+{
+    my ($self,$request) = @_;
+    my @conditions = qw();
+    $self->update($request,@conditions);
+}
+
+sub host_unblock
+{
+    my ($self,$request) = @_;
+    my @conditions = qw();
+    $self->update($request,@conditions);
+}
+
+sub osf_unblock
+{
+    my ($self,$request) = @_;
+    my @conditions = qw();
+    $self->update($request,@conditions);
+}
+
+sub di_unblock
+{
+    my ($self,$request) = @_;
+    my @conditions = qw();
+    $self->update($request,@conditions);
+}
 
 1;
-
-#
-#sub di_create
-#{
-#    my ($self,$request) = @_;
-#
-#    $request->{json}->{arguments}->{tenant} =
-#	$request->{json}->{tenant};
-#    require QVD::Config;
-#    my $images_path = cfg('path.storage.images');
-#
-#    require File::Copy qw(copy move);
-#    require File::Basename qw(basename);
-#
-#    mkdir $images_path, 0755;
-#    -d $images_path or die "Directory $images_path does not exist";
-#
-#    my $src = $request->json->{disk_image};
-#    my $file = basename($src);
-#    my $tmp = "$images_path/$file.tmp-" . rand;
-#    copy($src, $tmp) or die "Unable to copy $src to $tmp: $!\n";
-#
-#    my $osf_id = $request->json->{arguments}->{osf_id};
-#    my $osf = $self->db->resultset('OSF')->search({id => $osf_id})->first;
-#
-#    my ($new_file,$id);
-#
-#    eval {
-#    $DB->txn_do( sub { $osf->delete_tag('head');
-#		       $osf->delete_tag($request->json->{arguments}->{osf_id});
-#
-#		       my $rs = $self->get_resultset('di');
-#		       my $di = $rs->create({osf_id => $osf_id, path => '', version => $version});
-#		       $id = $di->id;
-#		       rs(DI_Tag)->create({di_id => $id, tag => $version, fixed => 1});
-#		       rs(DI_Tag)->create({di_id => $id, tag => 'head'});
-#		       rs(DI_Tag)->create({di_id => $id, tag => 'default'})
-#			   unless $osf->di_by_tag('default'); 
-#		       $new_file = "$id-$file";
-#		       $di->update({path => $new_file});
-#
-#		       move($tmp, "$images_path/$new_file")
-#			   or die "Unable to move '$tmp' to its final destination at '$images_path/$new_file': $!"; }) 
-#	for (1 .. 5)
-#    };
-#
-#    if ($@) { unlink $tmp;
-#	      unlink "$images_path/$new_file" if defined $new_file;
-#	      QVD::Admin4::Exception->throw(code => 17) if $@;};
-#
-#    { total => undef, 
-#      rows => [] };
-#}
-#
-
-#sub vm_get_list
-#{
-#    my ($self,$request) = @_;
-#    my $result = $self->select($request);
-#
-#    $_ = { id => $_->id, 
-#	   name => $_->name,
-#	   host_id => $_->vm_runtime->host_id,
-#	   user_id => $_->user_id,
-#	   user_name => $self->_find('User','id',$_->user_id,'login'),
-#	   osf_id => $_->osf_id,
-#	   osf_name => $self->_find('OSF','id',$_->osf_id,'name'),
-#	   di_tag => $_->di_tag,
-#	   di_version => undef,
-#	   state => $_->vm_runtime->vm_state,
-#	   blocked => $_->vm_runtime->blocked,
-#	   expiration_soft => $_->vm_runtime->vm_expiration_soft,
-#	   expiration_hard => $_->vm_runtime->vm_expiration_hard,
-#	   $self->add_custom($request,$_) } for @{$result->{rows}};
-#
-#    $result;
-#}
-#
-#
-#    $_ = { id => $_->id, 
-#	   name => $_->name,
-#	   user_id => $_->user_id,
-#	   user_name => $self->_find('User','id',$_->user_id,'login'),
-#	   osf_id => $_->osf_id,
-#	   osf_name => $self->_find('OSF','id',$_->osf_id,'name'),
-#	   di_tag => $_->di_tag,
-#	   di_version => $self->_find('DI','id',$_->vm_runtime->current_di_id,'version'),
-#	   di_name => 
-#
-#	       $DB->resultset('DI')->search({'osf.id' => $_->osf_id, 
-#					     'tags.tag' => $_->di_tag},{ join => [qw(osf tags)] })->first->path,
-#
-#	   di_id => 
-#
-#	       $DB->resultset('DI')->search({'osf.id' => $_->osf_id, 
-#					     'tags.tag' => $_->di_tag},{ join => [qw(osf tags)] })->first->id,
-#
-#	   blocked => $_->vm_runtime->blocked,
-#	   state => $_->vm_runtime->vm_state,
-#	   host_id => $_->vm_runtime->host_id,
-#	   host_name => $self->_find('Host','id',$_->vm_runtime->host_id,'name'),
-#	   ip => $_->ip,
-#	   expiration_soft => $_->vm_runtime->vm_expiration_soft,
-#	   expiration_hard => $_->vm_runtime->vm_expiration_hard,
-#	   creation_admin => undef,
-#	   creation_date => undef,
-#	   next_boot_ip => $_->vm_runtime->vm_address, 
-#	   ssh_port => $_->vm_runtime->vm_ssh_port,
-#	   vnc_port => $_->vm_runtime->vm_vnc_port,
-#	   serial_port => $_->vm_runtime->vm_serial_port,
-#           $self->add_custom($request,$_)} for @{$result->{rows}};
-#

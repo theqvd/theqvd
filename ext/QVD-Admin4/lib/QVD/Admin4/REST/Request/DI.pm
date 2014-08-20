@@ -2,7 +2,7 @@ package QVD::Admin4::REST::Request::DI;
 use strict;
 use warnings;
 use Moose;
-
+use File::Basename qw(basename);
 extends 'QVD::Admin4::REST::Request';
 
 my $mapper =  Config::Properties->new();
@@ -13,12 +13,16 @@ sub BUILD
     my $self = shift;
 
     $self->{mapper} = $mapper;
-    $self->get_customs('DI_Property');
-    $self->modifiers->{join} //= [];
     push @{$self->modifiers->{join}}, qw(osf vm_runtimes tags);
-    $self->default_system;
-    $self->order_by;
+
+    $self->json->{arguments}->{disk_image} = 
+	basename($self->json->{arguments}->{disk_image})
+	if defined $self->json->{arguments}->{disk_image};
+
+    $self->_check;
+    $self->_map;
 }
+
 
 sub get_default_version
 { 
@@ -28,9 +32,10 @@ sub get_default_version
     $m ++;
     $y += 1900;
 
-    my $osf_id = $self->json->{arguments}->{osf_id};
+    my $osf_id = $self->json->{arguments}->{straight}->{osf_id};
     my $osf = $self->db->resultset('OSF')->search({id => $osf_id})->first;
     my $version;
+
     for (0..999) 
     {
 	$version = sprintf("%04d-%02d-%02d-%03d", $y, $m, $d, $_);
@@ -42,12 +47,14 @@ sub get_default_version
 
 1;
 
+# tags_get_columns is not a relationship: only available as output field 
+
 __DATA__
 
 id = me.id
 disk_image = me.path
 version = me.version
-osf_id = osf.id
+osf_id = me.osf_id
 osf_name = osf.name
 tenant = osf.tenant_id
 blocked = me.blocked

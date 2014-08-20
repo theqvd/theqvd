@@ -14,19 +14,24 @@ sub BUILD
     my $self = shift;
 
     $self->{mapper} = $mapper;
-    $self->get_customs('OSF_Property');
-    $self->modifiers->{join} //= [];
+
     push @{$self->modifiers->{join}}, qw(vms dis tenant);
     push @{$self->modifiers->{join}}, { dis => 'tags' };
-    $self->default_system;
-    $self->order_by;
+    $self->_check;
+    $self->_map;
 }
 
 
 sub get_default_memory { cfg('osf.default.memory'); }
 sub get_default_overlay { cfg('osf.default.overlay'); }
 
+
 1;
+
+
+# WARNING: 
+# vm_id and di_id are has_many relationships with unambiguous filter id: only available as filter
+# vms_count and dis_count are not relationships: only available as output fields
 
 __DATA__
 

@@ -13,7 +13,7 @@ __PACKAGE__->add_columns(
 	qvd_obj => {
 	    data_type => 'varchar(64)'
 	},
-	update => {
+	argument => {
 	    data_type => 'boolean',
 	    is_nullable => 1
 	},

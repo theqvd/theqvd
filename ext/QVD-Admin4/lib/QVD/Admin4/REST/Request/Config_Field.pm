@@ -14,6 +14,8 @@ sub BUILD
     my $self = shift;
 
     $self->{mapper} = $mapper;
+    $self->_check;
+    $self->_map;
 }
 
 1;
@@ -27,4 +29,5 @@ get_details = me.get_details
 get_list = me.get_list
 filter_list = me.filter_list
 filter_details = me.filter_details
-update = me.update
+argument = me.argument
+tenant = me.tenant_id
