@@ -13,7 +13,7 @@ Wat.Views.DIListView = Wat.Views.ListView.extend({
     formFilters: [
         {
             'name': 'name',
-            'filterField': 'name',
+            'filterField': 'disk_image',
             'type': 'text',
             'label': 'Search by name',
             'mobile': true

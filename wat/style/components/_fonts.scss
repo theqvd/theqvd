@@ -1,0 +1,90 @@
+/********************************************************************
+*********************************************************************
+*********************************************************************
+
+                @FONTS
+                components/_fonts.scss
+
+*********************************************************************
+*********************************************************************
+********************************************************************/
+
+body {
+    font-size: small;
+}
+
+* {
+    font-family: Taoma, Arial; 
+    @include font-size(2);
+}
+
+.h1 {
+    font-weight: normal;
+    @include font-size(4);
+    
+    .subtitle {
+        font-weight: normal;   
+    }
+}
+
+.h2 {
+    font-weight: bold;
+    @include font-size(3);
+}
+
+// Buttons
+a, button.actions_button:before {
+    @include font-size(2);
+}
+
+// Forms
+label {
+    display: block;
+    margin-bottom: 4px;
+    @include font-size(1);
+}
+
+.chosen-container {
+    @include font-size(2);
+}
+
+input[type="text"] {
+    @include in(mobile) {
+        @include font-size(4);
+    }
+}
+
+// Layout
+
+.details-block .details-item {
+    @include font-size(3);
+}
+
+.details-block .details-item {
+    font-weight: normal;
+
+    .indented-data {
+        @include font-size(2);
+        font-weight: bold;
+    }
+}
+
+// Menu
+.menu-option {
+    @include font-size(3);
+}
+
+// Navigation
+.breadcrumbs * {
+    @include font-size(1);
+}
+
+// Pagination
+.pagination {
+    @include font-size(2);
+}
+
+// Tables
+.second_row {
+    @include font-size(1);
+}

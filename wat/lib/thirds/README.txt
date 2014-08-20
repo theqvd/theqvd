@@ -8,5 +8,4 @@ Used libraries on QVD Wat and their version, licenses and source sites:
 - jQuery DateTimePicker plugin v2.3.4 (MIT License) http://plugins.jquery.com/datetimepicker/
 - jQuery Tags Input Plugin v1.3.3 (MIT License) http://xoxco.com/projects/code/tagsinput/
 - jQuery UI v1.11.0 (MIT License) http://jqueryui.com
-- responsive-nav.js v1.0.32 (MIT License) http://responsive-nav.com/
 - Underscore.js v1.6.0 (MIT License) http://underscorejs.org

@@ -1,6 +1,18 @@
 <div class="h1">
     <span data-i18n>Remote administration</span>
 </div>
+<div class="remote_administration-buttons">
+    <%
+        var disabledClass = ' disabled ';
+        if (vmState == 'running') {
+            disabledClass = '';
+        }
+    %>
+    <a class="button2 fa fa-external-link <%= disabledClass %>" data-i18n>VNC viewer</a>
+    <a class="button2 fa fa-desktop <%= disabledClass %>" data-i18n>VNC local client</a>
+    <a class="button2 fa fa-terminal <%= disabledClass %>" data-i18n>Telnet viewer</a>
+</div>
+
 <table class="list">
 <tbody>
     <tr>
@@ -49,14 +61,3 @@
     </tr>
 </tbody>
 </table>
-<div class="remote_administration-buttons">
-    <%
-        var disabledClass = ' disabled ';
-        if (vmState == 'running') {
-            disabledClass = '';
-        }
-    %>
-    <a class="button2 fa fa-external-link <%= disabledClass %>" data-i18n>VNC viewer</a>
-    <a class="button2 fa fa-desktop <%= disabledClass %>" data-i18n>VNC local client</a>
-    <a class="button2 fa fa-terminal <%= disabledClass %>" data-i18n>Telnet viewer</a>
-</div>

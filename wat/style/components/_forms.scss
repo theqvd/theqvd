@@ -9,11 +9,6 @@
 *********************************************************************
 ********************************************************************/
 
-
-select, option, input {
-	font-size: 16px;
-}
-
 option {
     padding: 40px;
 }
@@ -21,13 +16,12 @@ option {
 label {
     display: block;
     margin-bottom: 4px;
-    font-size: x-small;
 }
 
 select {
     background: white;
 
-    height: 22px;
+    min-height: 22px;
     padding: 4px;
     
     &[name="selected_actions_select"] {
@@ -35,12 +29,19 @@ select {
         float: left;
         margin-bottom: 10px;
     }
+    
+    -webkit-appearance: normal;
 }
 
 .actions_button, select[name="selected_actions_select"] {
     width: 100%;
+    height: 60px;
+    @include font-size(3);
+    border: 1px solid darken($col_whiter, 20);
+    
     @include in(desktop) {
         width: auto;
+        height: 25px;
     }
 }
 
@@ -51,9 +52,9 @@ select {
     
 
 input, .button, .button2 {
-    height: $height_button;
     padding: 4px 8px;
-    line-height: 18px;
+    line-height: $height_button;
+    border: 1px solid darken($col_whiter, 20);
 }
 
 select, input, .button, .button2 {
@@ -64,12 +65,11 @@ select, input, .button, .button2 {
     -webkit-box-shadow: inset 1px 1px 1px 0px #dddddd;
        -moz-box-shadow: inset 1px 1px 1px 0px #dddddd;
             box-shadow: inset 1px 1px 1px 0px #dddddd;
-    font-size: x-small;
 }
 
 input[type="checkbox"], input[type="radio"] {
-    width: 18px;
-    height: 18px;
+    width: 28px;
+    height: 28px;
     box-shadow: none;
     border-width: 0;
     
@@ -77,16 +77,14 @@ input[type="checkbox"], input[type="radio"] {
         width: 14px;
         height: 14px;
     }
-
 }
+
 
 
 
 // Chosen controls styles
 
-.chosen-container {
-    font-size: 12px;
-    
+.chosen-container {    
     @include in(mobile) {
         width: 100% !important;
         margin-bottom: 10px;

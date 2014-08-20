@@ -17,7 +17,7 @@
                             break;
                         case 'id':
             %>
-                            <th class="sortable desktop max-2-icons" data-sortby="id" data-i18n="Id">
+                            <th class="sortable desktop col-width-8" data-sortby="id" data-i18n="Id">
                                 <%= i18n.t('Id') %>
                             </th>
             <%
@@ -31,28 +31,28 @@
                             break;
                         case 'version':
             %>
-                            <th class="desktop sortable" data-sortby="version" data-i18n="Version">
+                            <th class="desktop sortable col-width-15" data-sortby="version" data-i18n="Version">
                                 <%= i18n.t('Version') %>
                             </th>
             <%
                             break;
                         case 'osf':
             %>
-                            <th class="desktop sortable" data-sortby="osf_name" data-i18n="OS Flavour">
+                            <th class="desktop sortable col-width-20" data-sortby="osf_name" data-i18n="OS Flavour">
                                 <%= i18n.t('OS Flavour') %>
                             </th>
             <%
                             break;
                         case 'default':
             %>
-                            <th class="desktop sortable" data-sortby="user_storage" data-i18n="Default">
+                            <th class="desktop sortable col-width-10" data-sortby="user_storage" data-i18n="Default">
                                 <%= i18n.t('Default') %>
                             </th>
             <%
                             break;
                         case 'head':
             %>
-                            <th class="desktop sortable" data-sortby="head" data-i18n="Head">
+                            <th class="desktop sortable col-width-10" data-sortby="head" data-i18n="Head">
                                 <%= i18n.t('Head') %>
                             </th>
             <%
@@ -75,7 +75,19 @@
         </tr>
     </thead>
     <tbody>
-        <% _.each(models, function(model) { %>
+        <% 
+        if (models.length == 0) {
+        %>  
+            <tr>
+                <td colspan="<%= columns.length %>">
+                    <span class="no-elements" data-i18n="There are not elements">
+                        <%= i18n.t('There are not elements') %>
+                    </span>
+                </td>
+            </tr>
+        <%
+        }
+        _.each(models, function(model) { %>
             <tr>
                 <% 
                     _.each(columns, function(col) {

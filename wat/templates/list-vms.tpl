@@ -24,7 +24,7 @@
                             break;
                         case 'id':
             %>
-                            <th class="sortable desktop" data-sortby="id" data-i18n="Id">
+                            <th class="sortable desktop col-width-8" data-sortby="id" data-i18n="Id">
                                 <%= i18n.t('Id') %>
                             </th>
             <%
@@ -90,15 +90,7 @@
             </tr>
         <%
         }
-        else {
-            // Store string in a hidden div only for cache it
-        %>
-            <!--<div class="hidden" data-i18n="There are not elements"></div>-->
-        <%
-        }
-        %>
-        
-        <% _.each(models, function(model) { %>
+        _.each(models, function(model) { %>
             <tr>
                 <% 
                     _.each(columns, function(col) {
@@ -117,14 +109,7 @@
                             case 'info':
                 %>
                                 <td>
-                                    <% 
-                                    if (model.get('blocked')) {
-                                    %>
-                                        <i class="fa fa-warning icon-warning"></i>
-                                        <i class="fa fa-lock" data-i18n="[title]Blocked"></i>
                                     <%
-                                    }
- 
                                     if (model.get('state') == 'stopped') {
                                     %>
                                         <i class="fa fa-pause icon-pause" title="Stopped Virtual machine" data-i18n="[title]Stopped"></i>
@@ -133,6 +118,12 @@
                                     else {
                                     %>
                                         <i class="fa fa-play icon-play" data-i18n="[title]Running"></i>
+                                    <%
+                                    }
+                                    if (model.get('blocked')) {
+                                    %>
+                                        <!--<i class="fa fa-warning icon-warning"></i>-->
+                                        <i class="fa fa-lock" data-i18n="[title]Blocked"></i>
                                     <%
                                     }
                                     %>

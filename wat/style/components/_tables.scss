@@ -12,7 +12,7 @@
 
 /* Table list */
 
-table.list, table.custom-props {
+table.list, table.custom-props {    
     width: 100%;
     margin-left: auto;
     margin-right: auto;
@@ -20,6 +20,7 @@ table.list, table.custom-props {
     border: 1px solid #ddd;
     border-radius: $table_radius;
     border-collapse:separate;
+    table-layout: fixed;
 
     th {
         font-weight: bold;
@@ -67,7 +68,6 @@ table.list, table.custom-props {
 }
 
 .second_row {
-    font-size: x-small;
     margin-top: 4px;
 }
 
@@ -77,13 +77,26 @@ td.center {
 
 // Different sizes for cells with different amount of icons
 $table_icons_size: 18;
+$table_icons_size_mobile: 22;
 $table_icons_margin: 4;
 $cell_padding: 6;
 $security_margin: 5;
 @for $i from 1 through 6 {
     $width_for_icons: ($i * ($table_icons_size + $table_icons_margin)) + $security_margin + (2 * $cell_padding);
+    $width_for_icons_mobile: ($i * ($table_icons_size_mobile + $table_icons_margin)) + $security_margin + (2 * $cell_padding);
     .max-#{$i}-icons {
         width: $width_for_icons * 1px;
         min-width: $width_for_icons * 1px;
+        
+        @include in(desktop) {
+            width: $width_for_icons_mobile * 1px;
+            min-width: $width_for_icons_mobile * 1px;
+        }
+    }
+}
+
+@for $i from 1 through 100 {
+    .col-width-#{$i} {
+        width: $i * 1%;
     }
 }

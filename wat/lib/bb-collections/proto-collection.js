@@ -38,7 +38,7 @@ Wat.Collections.Collection = Backbone.Collection.extend({
 
     parse: function(response) {
         this.status = response.status;
-        this.elementsTotal = response.result.total;
+        this.elementsTotal = response.result.total || 0;
         return response.result.rows;
     },
 

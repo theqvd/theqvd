@@ -24,14 +24,6 @@ a, button {
         @include button($col_brand, $col_whiter);
     }
     
-    &.actions_button {
-        &:before {
-            font-size: 15px !important;
-        }
-        
-        padding-top: 2px;
-    }
-    
     &.disabled {
         cursor: default;
     }
@@ -39,7 +31,7 @@ a, button {
     &.button-right {
         position: absolute;
         right: 0px;
-        bottom: 0px;
+        top: 0px;
     }
 
     &.button.disabled, &.button2.disabled {

@@ -7,7 +7,7 @@ Wat.I = {
 
         if (firstLoad) {
             $('.wrapper').css('visibility','visible').hide().fadeIn('fast');
-            $('.menu').css('visibility','visible').hide().fadeIn('fast');
+            $('.menu').css('visibility','visible');
             $('.header-wrapper').css('visibility','visible').hide().fadeIn('fast');
             $('.content').css('visibility','visible').hide().fadeIn('fast');
             $('.breadcrumbs').css('visibility','visible').hide().fadeIn('fast');
@@ -107,6 +107,18 @@ Wat.I = {
             $('select.chosen-single').chosen(chosenOptionsSingle);
     },
     
+    mobileMenuConfiguration: function () {
+        $('.js-mobile-menu').click(function () {
+            $('.menu').slideToggle();
+        });
+        
+        $('.menu .menu-option').click(function () {
+            if ($('.js-mobile-menu').css('display') != 'none') {
+                $('.menu').slideUp();
+            }
+        });
+    },
+    
     cornerMenuEvents: function () {
        // Show/hide the corner menu
        $('.js-menu-corner li:has(ul)').hover(
@@ -119,16 +131,6 @@ Wat.I = {
              $(this).find('ul').css({display: "none"});
           }
        );
-    },
-    
-    responsiveMenuConfiguration: function () {
-        var nav = responsiveNav(".nav-collapse", {customToggle: "#toggle"});
-        var navCorner = responsiveNav(".nav-collapse-corner", {customToggle: "#toggle-corner"});
-            
-        // Hide mobile menu when click
-        $('.nav-collapse').click(function() {
-            nav.close();
-        });
     },
     
     tooltipConfiguration: function () {

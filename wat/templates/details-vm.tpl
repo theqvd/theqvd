@@ -1,5 +1,5 @@
-<div class="h1">
-    <span class="fa fa-cloud"><%= model.get('name') %></span>
+<div class="details-header">
+    <span class="fa fa-cloud h1"><%= model.get('name') %></span>
     <a class="button button-right js-button-edit fa fa-pencil" href="javascript:" data-i18n>Edit</a>
 </div>
 

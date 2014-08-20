@@ -1,0 +1,69 @@
+/********************************************************************
+*********************************************************************
+*********************************************************************
+
+                @FONTS
+                components/_fonts.scss
+
+*********************************************************************
+*********************************************************************
+********************************************************************/
+body {
+  font-size: small; }
+
+* {
+  font-family: Taoma, Arial;
+  font-size: 11.5px; }
+
+.h1 {
+  font-weight: normal;
+  font-size: 16px; }
+  .h1 .subtitle {
+    font-weight: normal; }
+
+.h2 {
+  font-weight: bold;
+  font-size: 14px; }
+
+a, button.actions_button:before {
+  font-size: 13px; }
+
+select, option, input {
+  font-size: 16px; }
+
+select, input, .button, .button2 {
+  font-size: x-small; }
+
+label {
+  display: block;
+  margin-bottom: 4px;
+  font-size: x-small; }
+
+.chosen-container {
+  font-size: 12px; }
+
+.details-block .details-item {
+  font-size: 13px; }
+
+.details-block .details-item {
+  font-weight: normal; }
+  .details-block .details-item .indented-data {
+    font-size: 14px;
+    font-weight: bold; }
+
+.menu-option {
+  font-size: 12px; }
+
+.breadcrumbs {
+  font-size: 10px; }
+
+.pagination {
+  font-size: 12px; }
+
+.second_row {
+  font-size: x-small; }
+
+div.tagsinput span.tag a {
+  font-size: 14px; }
+
+/*# sourceMappingURL=_fonts.css.map */

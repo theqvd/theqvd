@@ -22,13 +22,23 @@
 }
 
 td {
-    i.fa {
-        font-size: $table_icons_size + px;
+    i.fa {        
+        @include icon-size($table_icons_size_mobile + px);
+        
+        @include in(desktop) {        
+            @include icon-size($table_icons_size + px);
+        }
+        
         margin-right: 4px;
     }
     
     i.fa-lock, i.fa-unlock {
-        font-size: ($table_icons_size + 3) + px;
+        @include icon-size(($table_icons_size_mobile + 3) + px);
+        
+        @include in(desktop) {        
+            @include icon-size(($table_icons_size + 3) + px);
+        }
+        
         vertical-align: bottom;
         height: 18px;
     }

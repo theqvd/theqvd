@@ -19,6 +19,12 @@
         -webkit-box-sizing: border-box; 
                 box-sizing: border-box;
         width: 100%;
+        
+        height: 63px;
+
+        @include in(desktop) {
+            height: 25px;
+        }
     }
 }
 

@@ -16,7 +16,8 @@
     -moz-box-sizing: border-box;
     -webkit-box-sizing: border-box;
     box-sizing: border-box;
-    width: 100%; }
+    width: 100%;
+    height: 63px; }
 
 [name="filter_button"] {
   margin-top: 20px;

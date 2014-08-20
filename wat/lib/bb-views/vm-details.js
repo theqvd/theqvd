@@ -89,7 +89,7 @@ Wat.Views.VMDetailsView = Wat.Views.DetailsView.extend({
             }
         }
                 
-        this.saveModel(arguments, filters);
+        this.updateModel(arguments, filters);
     },
     
     bindEditorEvents: function() {

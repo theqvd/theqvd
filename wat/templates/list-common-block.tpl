@@ -15,7 +15,7 @@
                             %>
                                 <span class="filter-control">
                                 <label for="<%= filter.name %>" data-i18n><%= filter.label %></label>
-                                <input type="text" name="<%= filter.name %>"/>
+                                <input type="text" name="<%= filter.name %>" class="mobile-filter" data-filter-field="<%= filter.name %>"/>
                                 </span>
                             <%
                             break;

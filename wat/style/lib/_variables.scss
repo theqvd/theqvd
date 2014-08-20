@@ -17,7 +17,9 @@ $bg_body : $col_whiter;
 $min_width_wrapper : 960px;
 $max_width_wrapper : 1280px;
 $min_width_mobile : 20em;
+$min_width_mobile : 0px;
 $max_width_mobile : 40em;
+$max_width_mobile2 : 1024px;
 
 // Radius
 $form_elements_radius : 4px;
@@ -26,6 +28,7 @@ $table_radius : 4px;
 
 // Icons
 $table_icons_size : 16;
+$table_icons_size_mobile : 20;
 
 // Buttons
 $height_button: 25px;
@@ -44,5 +47,9 @@ $other_properties_width: 50;
 // Dialog
 $dialog_width: 600px;
 $dialog_height: 450px;
-$dialog_mobile_width: 95%;
-$dialog_mobile_height: 75vh;
+$dialog_mobile_width: 200%;
+$dialog_mobile_height: 100vh;
+
+// Fonts
+$font-sizes: 0.8 1 1.2 1.4;
+$font-sizes-mobile: 1 1.2 2 2.2;

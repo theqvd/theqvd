@@ -3,7 +3,7 @@
     <head>
         <title>QVD | WAT</title> 
         <meta charset='utf-8' />
-        
+        <meta name="viewport" content="width=800" />
         <!-- Third party JS libraries -->
             <!-- jQuery -->
             <script type='text/javascript' src='lib/thirds/jquery/jquery.min.js'></script>
@@ -28,10 +28,6 @@
             
             <!-- i18next -->
             <script type='text/javascript' src='lib/thirds/i18next/i18next-1.7.3.min.js'></script>
-            
-            <!-- Responsive Nav -->
-            <link rel="stylesheet" href="lib/thirds/responsive-nav/responsive-nav.css">
-            <script src="lib/thirds/responsive-nav/responsive-nav.min.js"></script>
             
             <!-- Font awesome -->
             <link rel="stylesheet" href="lib/thirds/font-awesome/css/font-awesome.min.css">
@@ -91,8 +87,7 @@
         <div class="header-wrapper">
             <div class="header">
                 <img src="images/qvd-logo-header-trans.png" class="logo">
-                <a href="#nav" class="toggle" id="toggle" aria-hidden="true"><img src="images/hamenu.png"></a>
-                <a href="#nav" class="toggle" id="toggle-corner" aria-hidden="true"><img src="images/hamenu.png"></a>
+                <a href="javascript:" class="fa fa-bars mobile-menu js-mobile-menu" id="mobile-menu"></a>
                 <div class="js-menu-corner menu-corner">
                     <ul class="nav-collapse-corner">
                         <li class="menu-option">
@@ -157,7 +152,6 @@
                 </div>
             </div>
         </div>
-        <div class="loading"><i class="fa fa-gear fa-spin"></i></div>
         <div class="wrapper"> 
             <div class="menu">
                 <ul class="nav-collapse">
@@ -184,6 +178,8 @@
                 </ul>
             </div>
             <div id="breadcrumbs" class="breadcrumbs desktop"></div>
+            <div class="loading"><i class="fa fa-gear fa-spin"></i></div>
+
             <div class="message-container">
                 <i class="message-close fa fa-times-circle"></i>
                 <span class="message"></span>

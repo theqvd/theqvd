@@ -30,7 +30,7 @@ Wat.Views.DetailsView = Wat.Views.MainView.extend({
     
     fetchDetails: function (that) {
         var that = that || this;
-        this.model.fetch({      
+        that.model.fetch({      
             complete: function () {
                 that.render();
             }

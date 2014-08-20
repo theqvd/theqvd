@@ -244,29 +244,40 @@ Wat.Views.MainView = Backbone.View.extend({
 
     createModel: function (arguments) {
         this.model.setOperation('create');
-        this.saveModel(arguments, {}, function(){});
+        
+        var messages = {
+            'success': 'Successfully created',
+            'error': 'Error creating'
+        };
+        
+        this.saveModel(arguments, {}, messages, function(){});
     },
     
     updateModel: function (arguments, filters) {
         this.model.setOperation('update');
-        this.saveModel(arguments, filters, this.fetchDetails);
+        
+        var messages = {
+            'success': 'Successfully updated',
+            'error': 'Error updating'
+        };
+        
+        this.saveModel(arguments, filters, messages, this.fetchDetails);
     },
     
-    saveModel: function (arguments, filters, successCallback) {
+    saveModel: function (arguments, filters, messages, successCallback) {
         var that = this;
         this.model.save(arguments, {filters: filters}).complete(function(e) {
             var callResponse = e.status;
             var response = JSON.parse(e.responseText);
             
             if (callResponse == 200 && response.status == SUCCESS) {
-                //successCallback();
-                that.fetchDetails ();
+                successCallback(that);
                 
-                that.message = 'Successfully updated';
+                that.message = messages.success;
                 that.messageType = 'success';
             }
             else {
-                that.message = 'Error updating';
+                that.message = message.e;
                 that.messageType = 'error';
             }
 

@@ -9,94 +9,91 @@
 *********************************************************************
 ********************************************************************/
 
-.menu>ul {    
-    display: -webkit-box;
-    display: -moz-box;
-    display: -ms-flexbox;
-    display: -webkit-flex;
-    display: flex;
+.menu {
+    display: none;
 
-    .menu-option {
-        @extend %not-selectable;
+    @include in(desktop) {
         display: block;
-        @include in(desktop) {
-            display: inline;
-        }
-        
-        min-width: 100px;
-        font-size: .9em;
-        padding: 8px 12px 8px 12px;
-        background: $col_whiter;
-        color: $col_blacker;
-        border: 1px solid lighten($col_brand, 20%);
-        cursor: pointer;
+    }
+    
+    &>ul {    
+        .menu-option {
+            @extend %not-selectable;
+            display: block;
 
-        &:last-child {
-            border-bottom-left-radius: $menu_radius;
-            border-bottom-right-radius: $menu_radius;
-        }    
+            @include in(desktop) {
+                display: inline;
+            }
 
-        &:first-child {
-            border-top-left-radius: $menu_radius;
-            border-top-right-radius: $menu_radius;
-        }
-        
-        @include in(desktop) {
+            min-width: 100px;
+            padding: 8px 12px 8px 12px;
+            background: $col_whiter;
+            color: $col_blacker;
+            border: 1px solid lighten($col_brand, 20%);
+            cursor: pointer;
+
             &:last-child {
-                border-bottom-left-radius: 0;
-                border-top-right-radius: $menu_radius;
+                border-bottom-left-radius: $menu_radius;
                 border-bottom-right-radius: $menu_radius;
             }    
 
             &:first-child {
-                border-top-right-radius: 0;
                 border-top-left-radius: $menu_radius;
-                border-bottom-left-radius: $menu_radius;
+                border-top-right-radius: $menu_radius;
             }
-        }
-        
-        // Icon
-        .fa {
-            font-size: 18px;
-            margin-right: 10px;
 
-        }
-        
-        span {
-            vertical-align: bottom;
-        }
-        
-        &:active {
             @include in(desktop) {
-                margin-bottom: -2px;
-                margin-top: 1px;
+                &:last-child {
+                    border-bottom-left-radius: 0;
+                    border-top-right-radius: $menu_radius;
+                    border-bottom-right-radius: $menu_radius;
+                }    
+
+                &:first-child {
+                    border-top-right-radius: 0;
+                    border-top-left-radius: $menu_radius;
+                    border-bottom-left-radius: $menu_radius;
+                }
             }
-        }
 
-    }
+            // Icon
+            .fa {
+                @include icon-size(18px);
+                margin-right: 10px;
 
-        .menu-option--selected, .menu-option:hover {
-            background: $col_brand;
-            color: $col_whiter;
-            border: 1px solid transparent;
-        }
+            }
 
-        .menu-option--selected {
-            font-weight: bold;
-            
             span {
-                vertical-align: baseline;
+                vertical-align: bottom;
             }
-            
+
             &:active {
-                margin: 0px;
-            }            
+                @include in(desktop) {
+                    margin-bottom: -2px;
+                    margin-top: 1px;
+                }
+            }
+
         }
-}
 
+            .menu-option--selected, .menu-option:hover {
+                background: $col_brand;
+                color: $col_whiter;
+                border: 1px solid transparent;
+            }
 
-.breadcrumbs {
-    font-size: xx-small;
+            .menu-option--selected {
+                font-weight: bold;
+
+                span {
+                    vertical-align: baseline;
+                }
+
+                &:active {
+                    margin: 0px;
+                }            
+            }
+    }
 }
 
 .menu-corner {
@@ -151,5 +148,20 @@
                 }
             }
         }
+    }
+}
+
+
+// Mobile
+
+.mobile-menu {
+    cursor: pointer;
+    position: absolute;
+    top: 5px;
+    right: 20px;
+    @include icon-size(50px);
+    
+    @include in(desktop) {
+        display: none;
     }
 }

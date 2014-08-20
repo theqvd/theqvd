@@ -14,6 +14,16 @@
 
 body {
     position: relative;
+    @include in(mobile) {
+        zoom: 2;
+    }
+}
+
+* {
+    @include in(mobile) {
+        max-width: 480px !important;
+        min-width: 0 !important;
+    }
 }
 
 .header-wrapper {
@@ -22,12 +32,14 @@ body {
     height: 60px;
     border-bottom: 2px solid darken($col_whiter, 15);
     background: darken($col_whiter, 10);
-    
+    @include width-percentage;
+
     .header {
         position: relative;    
                 
         @include width-wrapper;
-        
+        @include width-percentage;
+
         @extend %center-wrapper; 
         
         .logo {
@@ -39,25 +51,21 @@ body {
 }
 
 .loading {
-    font-size: 75px;
+    @include icon-size(75px);
     width: 75px;
-    top: 45vh;
+    top: 25vh;
     @include in(desktop) {
-        font-size: 200px;
+        @include icon-size(200px);
         width: 200px;
         top: 25vh;
     }
     color: darken($col_whiter, 10);
     
-    position: absolute;
-    margin: auto;
-    left: 0;
-    right: 0;
-    bottom: 0;
+    margin: 50px auto;
 }
 
 .mini-loading {
-    font-size: 45px;
+    @include icon-size(45px);
     width: 100%;
     margin-top: 40px;
     text-align: center;
@@ -70,10 +78,11 @@ body {
     @extend %center-wrapper;
             
     @include width-wrapper;
-    
+    @include width-percentage;
+
     background-color: white;
     position: relative;
-
+    
     .menu {
         @extend %invisible;
 
@@ -88,11 +97,13 @@ body {
     .breadcrumbs {
         @extend %invisible;
         width: 100%;
+        margin-top: 10px;
         margin-bottom: 10px;
         padding-bottom: 10px;
         border-bottom: dotted 1px darken($col_whiter, 15);
         
         @include in(desktop) {
+            margin-top: 15px;
             margin-bottom: 20px;
             display: block;
         }
@@ -136,7 +147,7 @@ body {
             position: absolute;
             top: 6px;
             right: 8px;
-            font-size: 24px;
+            @include icon-size(24px);
             cursor: pointer;
         }
     }
@@ -146,7 +157,11 @@ body {
 
         @extend %clearfix;
 
-        margin-bottom: 80px;
+        margin-bottom: 180px;
+        
+        @include in(desktop) {
+            margin-bottom: 80px;
+        }
         
         // Different view layouts
         @import "layout-list";
@@ -186,22 +201,6 @@ body {
     margin-bottom: 20px;
     border-bottom: dotted 1px darken($col_whiter, 15);
 }
-
-
-.dialog-container, .dialog-container-template {
-    display: none;
-}
-
-.dialog-container-template {
-    width: $dialog_mobile_width;
-    height: $dialog_mobile_height;
-    
-    @include in(desktop) {
-        width: $dialog_width;
-        height: $dialog_height;
-    }
-}
-
 
 /* Responsive generic layout */
 .desktop {

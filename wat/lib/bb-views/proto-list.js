@@ -91,9 +91,9 @@ Wat.Views.ListView = Wat.Views.MainView.extend({
         'click .next': 'paginationNext',
         'click .last': 'paginationLast',
         'click a[name="filter_button"]': 'filter',
-        'keyup .filter-control input': 'filter',
+        //'keyup .filter-control input': 'filter',
         'input .filter-control input': 'filter',
-        'change .filter-control select': 'filter',
+        //'change .filter-control select': 'filter',
         'click .js-button-new': 'newElement'
     },
     
@@ -135,12 +135,17 @@ Wat.Views.ListView = Wat.Views.MainView.extend({
     },
     
     // Get filter parameters of the form, set in collection, fetch list and render it
-    filter: function () {
-        var filtersContainer = '.' + this.cid + ' .filter';
+    filter: function (e) {
+        if ($(e.target).hasClass('mobile-filter')) {
+            var filtersContainer = '.' + this.cid + ' .filter-mobile';
+        }
+        else {
+            var filtersContainer = '.' + this.cid + ' .filter';
+        }
+        
         var filters = {};
         $.each(this.formFilters, function(index, filter) {
             var filterControl = $(filtersContainer + ' [name="' + filter.name + '"]');
-            
             // If input text box is empty or selected option in a select is All (-1) skip filter control
             switch(filter.type) {
                 case 'select':
@@ -336,7 +341,7 @@ Wat.Views.ListView = Wat.Views.MainView.extend({
         context.find('.pagination_total_pages').html(totalPages || 1);
         
         context.find('.pagination a').removeClass('disabled');
-
+        
         if (totalPages <= 1) {
             context.find('.pagination a').addClass('disabled');
         }
@@ -418,6 +423,7 @@ Wat.Views.ListView = Wat.Views.MainView.extend({
                 $(this).dialog('close');
             },
             Create: function () {
+                that.dialog = $(this);
                 that.createElement($(this));
             }
         };

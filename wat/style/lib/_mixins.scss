@@ -14,21 +14,35 @@
 @mixin width-wrapper {
     min-width: $min_width_mobile;
     max-width: $max_width_mobile;
-    @media screen and (min-width: $max_width_mobile) {
+    width: 200%;
+
+    @include in(desktop) {
         min-width: $min_width_wrapper;
         max-width: $max_width_wrapper;
+        width: 100%;
+    }
+}
+
+// Layout percentage
+@mixin width-percentage {
+    width: 200%;
+
+    @include in(desktop) {
+        width: 100%;
     }
 }
 
 // Media queries
 @mixin in($media) {
     @if $media == desktop {
-        @media screen and (min-width: $max_width_mobile) {
+        //@media screen and (min-width: $max_width_mobile) {
+        @media screen and (min-device-width : $max_width_mobile) {
             @content;
         }
     }
     @else if $media == mobile {
-        @media screen and (max-width: $max_width_mobile) {
+        //@media screen and (max-width: $max_width_mobile) {
+        @media only screen and (max-device-width : $max_width_mobile) {
             @content;
         }
     }
@@ -61,7 +75,7 @@
     @include linear-gradient($col_back);
 
     background-repeat: repeat-x;
-    font-size: 12px;
+    @include font-size(3);
     border: solid 1px lighten($col_brand, 10);
 
     -webkit-box-shadow: none;
@@ -106,7 +120,7 @@
     @include linear-gradient(lighten($col_back, 30));
 
     background-repeat: repeat-x;
-    font-size: 12px;
+    @include font-size(3);
     border: solid 1px darken($col_whiter, 10);
 
     -webkit-box-shadow: none;
@@ -134,4 +148,22 @@
     &:before {
         color: darken($col_whiter, 20);
     }
+}
+
+@mixin font-size($size_index) {
+    $size: nth($font-sizes-mobile, $size_index);
+    $height: $size;
+    font-size: $size * 1em;
+    line-height: $height * 1em;
+    
+    @include in(desktop) {
+        $size: nth($font-sizes, $size_index);
+        $height: $size;
+        font-size: $size * 1em;
+        line-height: $height * 1em;
+    }
+}
+
+@mixin icon-size($size) {
+    font-size: $size;
 }

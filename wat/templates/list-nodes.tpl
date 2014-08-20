@@ -24,7 +24,7 @@
                             break;
                         case 'id':
             %>
-                            <th class="sortable desktop max-2-icons" data-sortby="id" data-i18n="Id">
+                            <th class="sortable desktop col-width-8" data-sortby="id" data-i18n="Id">
                                 <%= i18n.t('Id') %>
                             </th>
             <%
@@ -52,7 +52,7 @@
                             break;
                         case 'vms_connected':
             %>
-                            <th class="desktop sortable" data-sortby="vms_connected" data-i18n="Running VMs">
+                            <th class="desktop sortable col-width-15" data-sortby="vms_connected" data-i18n="Running VMs">
                                 <%= i18n.t('Running VMs') %>
                             </th>
             <%
@@ -75,7 +75,19 @@
         </tr>
     </thead>
     <tbody>
-        <% _.each(models, function(model) { %>
+        <% 
+        if (models.length == 0) {
+        %>  
+            <tr>
+                <td colspan="<%= columns.length %>">
+                    <span class="no-elements" data-i18n="There are not elements">
+                        <%= i18n.t('There are not elements') %>
+                    </span>
+                </td>
+            </tr>
+        <%
+        }
+        _.each(models, function(model) { %>
             <tr>
                 <% 
                     _.each(columns, function(col) {

@@ -59,8 +59,8 @@ var Wat = {
 	$(doc).ready(function() {
         // Interface onfiguration
         Wat.I.cornerMenuEvents();
-        Wat.I.responsiveMenuConfiguration();
         Wat.I.tooltipConfiguration();
+        Wat.I.mobileMenuConfiguration();
         
         // Instantiate the router
         var app_router = new Wat.Router;

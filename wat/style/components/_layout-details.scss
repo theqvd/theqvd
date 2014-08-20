@@ -34,6 +34,15 @@
     }
 }
 
+.details-header, .side-header {
+    position: relative;
+    height: 40px;
+    
+    span:before {
+        margin-right: 4px;
+    }
+}
+
 .details-list, .custom-props-container {
     padding-left: 20px;
     
@@ -59,14 +68,8 @@
     }
     
     .details-item {
-        font-size: 13px;
-        font-weight: normal;
-
         .indented-data {
-            font-size: 14px;
-            font-weight: bold;
-
-            margin-left: 14px;
+            margin-left: 12px;
             margin-top: 6px;
             margin-bottom: 20px;
             div {

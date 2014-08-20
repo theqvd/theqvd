@@ -11,12 +11,6 @@
 
 body {
     background: #fdfdfd;
-    font-size: small;
-}
-
-* {
-    font-family: Taoma, Arial; 
-    font-size: small;
 }
 
 a {
@@ -43,6 +37,10 @@ a:hover {
     visibility: hidden;
 }
 
+.relative {
+    position: relative;
+}
+
 
 fieldset {
     padding: 8px;
@@ -58,12 +56,9 @@ fieldset {
 // Titles
 .h1 {
     position: relative;
-    font-weight: normal;
-    font-size: 16px;
     margin-bottom: 15px;
     
     .subtitle {
-        font-weight: normal;   
         color: lighten($col_blacker, 50);
     }
     
@@ -73,8 +68,6 @@ fieldset {
 }
 
 .h2 {
-    font-weight: bold;
-    font-size: 14px;
     color: lighten($col_blacker, 40);
     margin-bottom: 14px;
 }

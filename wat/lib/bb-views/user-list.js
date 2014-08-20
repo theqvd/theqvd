@@ -132,7 +132,7 @@ Wat.Views.UserListView = Wat.Views.ListView.extend({
         
         var arguments = {
             "properties" : properties.create,
-            //"blocked": blocked ? 1 : 0
+            "blocked": blocked ? 1 : 0
         };
         
         var name = context.find('input[name="name"]').val();
