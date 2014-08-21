@@ -176,13 +176,16 @@ Wat.Views.MainView = Backbone.View.extend({
         
         // Toggle controls for expire fields (it's only needed for vm form, but it can be accesible from two views: list and details)
         this.bindEvent('change', 'input[name="expire"]', this.editorBinds.toggleExpire);
+        
+        // Toggle controls for disk images tags retrieving when select osf (it's only needed for vm form, but it can be accesible from two views: list and details)
+        this.bindEvent('change', 'select[name="osf_id"]', this.editorBinds.fillDITags, this);
     },
     
     // Generic function to bind events receiving the event, the selector and the callback function to be called when event is triggered
-    bindEvent: function (event, selector, callback) {
+    bindEvent: function (event, selector, callback, params) {
         // First unbind event to avoid duplicated bindings
         $(document).off(event, selector);
-        $(document).on(event, selector, callback);
+        $(document).on(event, selector, params, callback);
     },
     
     // Callbacks of the events binded on editor
@@ -203,7 +206,7 @@ Wat.Views.MainView = Backbone.View.extend({
             newRow.insertBefore('.template-property');
         },
 
-        deleteProperty: function (rr) {
+        deleteProperty: function () {
             // Store the name of the deleted property in a hidden field of serialized names by commas
             var deletedProp = $(this).parent().find('input.custom-prop-name');
             var deletedPropName = deletedProp.val();
@@ -239,6 +242,27 @@ Wat.Views.MainView = Backbone.View.extend({
         
         toggleExpire: function () {
             $('.expiration_row').toggle();
+        },
+        
+        fillDITags: function (event, selected, fillSelect) {
+            var that = event.data;
+            
+            $('[name="di_tag"]').find('option').remove();
+            
+            // Fill DI Tags select on virtual machines creation form
+            var params = {
+                'action': 'tag_tiny_list',
+                'selectedId': '',
+                'controlName': 'di_tag',
+                'filters': {
+                    'osf_id': $('[name="osf_id"]').val()
+                },
+                'nameAsId': true
+            };
+
+            that.fillSelect(params);
+
+            $('[name="di_tag"]').trigger('chosen:updated');
         }
     },
 
@@ -283,6 +307,44 @@ Wat.Views.MainView = Backbone.View.extend({
 
             that.dialog.dialog('close');
             Wat.I.showMessage({message: that.message, messageType: that.messageType});
+        });
+    },
+    
+    // Fill filter selects 
+    fillSelect: function (params) {  
+        var jsonUrl = 'http://172.20.126.12:3000/?login=benja&password=benja&action=' + params.action;
+        
+        if (params.filters) {
+            jsonUrl += '&filters=' + JSON.stringify(params.filters);
+        }
+        
+        $.ajax({
+            url: jsonUrl,
+            type: 'POST',
+            async: false,
+            dataType: 'json',
+            processData: false,
+            parse: true,
+            success: function (data) {
+                $(data.result.rows).each(function(i,option) {
+                    var selected = '';
+                    
+                    var id = option.id;
+                    var name = option.name;
+                    
+                    if (params.nameAsId) {
+                        id = name;
+                    }
+                    
+                    if (params.selectedId !== undefined && params.selectedId == id) {
+                        selected = 'selected="selected"';
+                    }
+                    
+                    $('select[name="' + params.controlName + '"]').append('<option value="' + id + '" ' + selected + '>' + 
+                                                                   name + 
+                                                                   '<\/option>');
+                });
+            }
         });
     }
 });

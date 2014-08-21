@@ -2,10 +2,13 @@
     <thead>
         <tr>
             <% 
+                var printedColumns = 0;
                 _.each(columns, function(col) {
                     if (col.display == false) {
                         return;
                     }
+                    
+                    printedColumns++;
                     
                     switch(col.name) {
                         case 'checks':
@@ -17,50 +20,50 @@
                             break;
                         case 'id':
             %>
-                            <th class="sortable desktop col-width-8" data-sortby="id" data-i18n="Id">
-                                <%= i18n.t('Id') %>
+                            <th class="sortable desktop col-width-10" data-sortby="id">
+                                <i class="fa fa-sort sort-icon" data-i18n="Id"><%= i18n.t('Id') %></i>
                             </th>
             <%
                             break;
                         case 'name':
             %>
-                            <th class="sortable" data-sortby="name" data-i18n="Name">
-                                <%= i18n.t('Name') %>
+                            <th class="sortable" data-sortby="name">
+                                <i class="fa fa-sort sort-icon" data-i18n="Name"><%= i18n.t('Name') %></i>
                             </th>
             <%
                             break;
                         case 'overlay':
             %>
-                            <th class="desktop sortable" data-sortby="overlay" data-i18n="Overlay">
-                                <%= i18n.t('Overlay') %>
+                            <th class="desktop sortable col-width-10" data-sortby="overlay">
+                                <i class="fa fa-sort sort-icon" data-i18n="Overlay"><%= i18n.t('Overlay') %></i>
                             </th>
             <%
                             break;
                         case 'memory':
             %>
-                            <th class="desktop sortable" data-sortby="memory" data-i18n="Memory">
-                                <%= i18n.t('Memory') %>
+                            <th class="desktop sortable col-width-10" data-sortby="memory">
+                                <i class="fa fa-sort sort-icon" data-i18n="Memory"><%= i18n.t('Memory') %></i>
                             </th>
             <%
                             break;
                         case 'user_storage':
             %>
-                            <th class="desktop sortable" data-sortby="user_storage" data-i18n="User storage">
-                                <%= i18n.t('User storage') %>
+                            <th class="desktop sortable col-width-13" data-sortby="user_storage">
+                                <i class="fa fa-sort sort-icon" data-i18n="User storage"><%= i18n.t('User storage') %></i>
                             </th>
             <%
                             break;
-                        case '#dis':
+                        case 'dis':
             %>
-                            <th class="desktop sortable" data-sortby="#dis" data-i18n="Disk images">
-                                <%= i18n.t('Disk images') %>
+                            <th class="desktop col-width-8">
+                                <i class="fa sort-icon" data-i18n="DIs"><%= i18n.t('DIs') %></i>
                             </th>
             <%
                             break;
                         case 'vms':
             %>
-                            <th class="desktop sortable" data-sortby="vms" data-i18n="Virtual machines">
-                                <%= i18n.t('Virtual machines') %>
+                            <th class="desktop col-width-8">
+                                <i class="fa sort-icon" data-i18n="VMs"><%= i18n.t('VMs') %></i>
                             </th>
             <%
                             break;
@@ -71,8 +74,8 @@
                             }
                     
             %>
-                            <th class="sortable desktop" data-sortby="<%= col.name %>" <%= translationAttr %>>
-                                <%= col.name %>
+                            <th class="sortable desktop" data-sortby="<%= col.name %>">
+                                <i class="fa sort-icon"><%= col.name %></i>
                             </th>
             <%
                             break;
@@ -86,7 +89,7 @@
         if (models.length == 0) {
         %>  
             <tr>
-                <td colspan="<%= columns.length %>">
+                <td colspan="<%= printedColumns %>">
                     <span class="no-elements" data-i18n="There are not elements">
                         <%= i18n.t('There are not elements') %>
                     </span>
@@ -159,10 +162,10 @@
                                 </td>
                 <%
                                 break;
-                            case '#dis':
+                            case 'dis':
                 %>
                                 <td class="desktop">
-                                    <%= model.get('#dis') %>
+                                    <%= model.get('dis') %>
                                 </td>
                 <%
                                 break;

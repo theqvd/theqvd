@@ -39,7 +39,8 @@
     height: 40px;
     
     span:before {
-        margin-right: 4px;
+        margin-right: 8px;
+        margin-left: 6px;
     }
 }
 
@@ -63,7 +64,7 @@
     
     .details-list {
         @include in(desktop) {
-            width: 40%;
+            width: 50%;
         }
     }
     
@@ -103,12 +104,46 @@
 
 // Virtual machines
 
-.remote_administration-buttons {
-    margin: 25px auto;
+.remote-administration-wrapper {
+    width: 100%;
+    margin-top: 10px;
+    margin-bottom: 20px;
     
-    a {
-        width: 50%;
-        display: block;
-        margin-bottom: 10px;
+    .remote-administration-state {
+        width: 49%;
+        text-align: center;
+        display: inline-block;
+            
+        @include font-size(3);
+
+        div {        
+            &.fa {
+                @include icon-size(40px);
+            }
+            
+            margin-bottom: 15px;       
+            
+            &:last-child {
+                margin-bottom: 0px;
+            }
+        }
     }
+    
+    .remote-administration-buttons {
+        //margin: 25px auto;
+        width: 49%;
+        display: inline-block;
+        vertical-align: bottom;
+        
+        a {
+            width: 100%;
+            display: block;
+            margin-bottom: 12px;
+            
+            &:last-child {
+                margin-bottom: 0px;
+            }
+        }
+    }
+    
 }

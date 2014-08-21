@@ -93,7 +93,7 @@ Wat.Views.OSFListView = Wat.Views.ListView.extend({
                 'display': true
             },
             {
-                'name': '#dis',
+                'name': 'dis',
                 'display': true
             },
             {

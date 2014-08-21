@@ -14,7 +14,7 @@
     <tr>
         <td data-i18n>Disk image's tag</td>
         <td>
-            <input type="text" class="" name="di_tag" value="<%= model.get('di_tag') %>">
+            <select class="" name="di_tag"></select>
         </td>
     </tr>
     <tr>

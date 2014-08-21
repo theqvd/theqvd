@@ -13,6 +13,7 @@
     "Change password": "Change password",
     "Click for details": "Click for details",
     "Config": "Config",
+    "Current": "",
     "Customize": "Customize",
     "Date": "Date",
     "Default": "Default",
@@ -20,6 +21,7 @@
     "Disconnect from all VMs": "Disconnect from all VMs",
     "Disconnect user": "Disconnect user",
     "DI list": "DI list",
+    "DIs": "DIs",
     "Disk image": "Disk image",
     "Disk image's tag": "Disk image's tag",
     "Disk image's Virtual machines": "Disk image's Virtual machines",
@@ -82,6 +84,7 @@
     "Running VMs": "Running VMs",
     "SSH port": "SSH port",
     "Search by name": "Search by name",
+    "Search by disk image": "Search by disk image",
     "Serial port": "Serial port",
     "Set 0 for not use User storage": "Set 0 for not use User storage",
     "Setup": "Setup",
@@ -102,6 +105,7 @@
     "There are not elements": "There are not elements",
     "There are not properties": "There are not properties",
     "There are not tags": "There are not tags",
+    "This virtual machine will expire": "This virtual machine will expire",
     "Type": "Type",
     "Unblock": "Unblock",
     "Unblocked": "Unblocked",
@@ -119,5 +123,6 @@
     "Virtual machine": "Virtual machine",
     "Virtual machine list": "Virtual machine list",
     "Virtual machines": "Virtual machines",
+    "VMs": "VMs",
     "Yes": "Yes"
 }

@@ -5,10 +5,14 @@
         border-spacing: 20px;
         border-collapse: separate;
         
+        td {
+            padding-top: 4px;
+        }
+        
         td:first-child {
             font-weight: bold;
             min-width: 50%;
-            vertical-align: top;
+            vertical-align: middle;
         }
         
         td.fa:before {
@@ -27,13 +31,12 @@
                 .delete-property-button {
                     position: absolute;
                     left: -20px;
-                    top: 5px;
                 }                
                 
                 .property-help {
                     position: absolute;
                     left: 12px;
-                    top: 6px;
+                    top: 14px;
                     color: lighten($col_blacker, 50);
                     font-weight: normal;
                 }

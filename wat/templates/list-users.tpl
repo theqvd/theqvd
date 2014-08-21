@@ -1,11 +1,14 @@
 <table class="list">
     <thead>
         <tr>
-            <% 
+            <%                
+                var printedColumns = 0;
                 _.each(columns, function(col) {
                     if (col.display == false) {
                         return;
                     }
+                    
+                    printedColumns++;
                     
                     switch(col.name) {
                         case 'checks':
@@ -17,29 +20,29 @@
                             break;
                         case 'info':
             %>
-                            <th class="max-2-icons" data-i18n="Info">
-                                <%= i18n.t('Info') %>
+                            <th class="max-2-icons">
+                                <i class="fa sort-icon" data-i18n="Info"><%= i18n.t('Info') %></i>
                             </th>
             <%
                             break;
                         case 'id':
             %>
-                            <th class="sortable desktop col-width-8" data-sortby="id" data-i18n="Id">
-                                <%= i18n.t('Id') %>
+                            <th class="sortable desktop col-width-8" data-sortby="id">
+                                <i class="fa fa-sort sort-icon" data-i18n="Id"><%= i18n.t('Id') %></i>
                             </th>
             <%
                             break;
                         case 'name':
             %>
-                            <th class="sortable" data-sortby="name" data-i18n="Name">
-                                <%= i18n.t('Name') %>
+                            <th class="sortable" data-sortby="name">
+                                <i class="fa fa-sort sort-icon" data-i18n="Name"><%= i18n.t('Name') %></i>
                             </th>
             <%
                             break;
                         case 'started_vms':
             %>
-                            <th class="desktop max-6-icons" data-i18n="Connected VMs">
-                                <%= i18n.t('Connected VMs') %>
+                            <th class="desktop">
+                                <i class="fa fa-sort sort-icon" data-i18n="Connected VMs"><%= i18n.t('Connected VMs') %></i>
                             </th>
             <%
                             break;
@@ -50,8 +53,8 @@
                             }
                     
             %>
-                            <th class="sortable desktop" data-sortby="<%= col.name %>" <%= translationAttr %>>
-                                <%= col.name %>
+                            <th class="sortable desktop" data-sortby="<%= col.name %>">
+                                <i class="fa sort-icon"><%= col.name %></i>
                             </th>
             <%
                             break;
@@ -65,7 +68,7 @@
         if (models.length == 0) {
         %>  
             <tr>
-                <td colspan="<%= columns.length %>">
+                <td colspan="<%= printedColumns %>">
                     <span class="no-elements" data-i18n="There are not elements">
                         <%= i18n.t('There are not elements') %>
                     </span>

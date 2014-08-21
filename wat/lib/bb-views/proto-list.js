@@ -93,7 +93,7 @@ Wat.Views.ListView = Wat.Views.MainView.extend({
         'click a[name="filter_button"]': 'filter',
         //'keyup .filter-control input': 'filter',
         'input .filter-control input': 'filter',
-        //'change .filter-control select': 'filter',
+        'change .filter-control select': 'filter',
         'click .js-button-new': 'newElement'
     },
     
@@ -193,7 +193,7 @@ Wat.Views.ListView = Wat.Views.MainView.extend({
         this.collection.fetch({      
             complete: function () {
                 that.renderList(that.listContainer);
-                Wat.I.addSortIcons(that);
+                Wat.I.updateSortIcons(that);
 
             }
         });
@@ -292,26 +292,13 @@ Wat.Views.ListView = Wat.Views.MainView.extend({
         var that = this;
         $.each(this.formFilters, function(index, filter) {
             if (filter.type == 'select' && filter.fillable) {
-                var jsonUrl = 'http://172.20.126.12:3000/?login=benja&password=benja&action=' + filter.name + '_tiny_list';
-                $.ajax({
-                    url: jsonUrl,
-                    type: 'POST',
-                    async: false,
-                    dataType: 'json',
-                    processData: false,
-                    parse: true,
-                    success: function (data) {
-                        $(data.result.rows).each(function(i,option) {
-                            var selected = '';
-                            if (that.filters[filter.filterField] !== undefined && that.filters[filter.filterField] == option.id) {
-                                selected = 'selected="selected"';
-                            }
-                            $('select[name="' + filter.name + '"]').append('<option value="' + option.id + '" ' + selected + '>' + 
-                                                                           option.name + 
-                                                                           '<\/option>');
-                        });
-                    }
-                });
+                var params = {
+                    'action': filter.name + '_tiny_list',
+                    'selectedId': that.filters[filter.filterField],
+                    'controlName': filter.name
+                };
+                
+                that.fillSelect(params);
             }
         });
     },

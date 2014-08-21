@@ -27,11 +27,19 @@
         </div>
     </span>
     <span class="details-item fa fa-angle-right">
+        <span data-i18n>Tag</span>
+        <div class="indented-data">
+            <%= model.get('di_tag') %>
+        </div>
+    </span>
+    <span class="details-item fa fa-angle-right">
         <span data-i18n>Disk image</span>
         <div class="indented-data">
-            <a href="#/di/<%= model.get('di_id') %>">
-                <%= model.get('di_name') %>
-            </a>
+            <div>
+                <a href="#/di/<%= model.get('di_id') %>">
+                    <%= model.get('di_name') %>
+                </a>
+            </div>
         </div>
     </span>
     <span class="details-item fa fa-angle-right">

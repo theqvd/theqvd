@@ -186,5 +186,34 @@ Wat.Views.VMListView = Wat.Views.ListView.extend({
         
         this.dialogConf.title = $.i18n.t('New Virtual machine');
         Wat.Views.ListView.prototype.newElement.apply(this, [e]);
+        
+        // Fill OSF select on virtual machines creation form
+        var params = {
+            'action': 'osf_tiny_list',
+            'selectedId': '',
+            'controlName': 'osf_id',
+            'filters': {
+                'osf_id': this.model.get('osf_id')
+            }
+        };
+
+        this.fillSelect(params);  
+        
+        Wat.I.chosenElement('[name="osf_id"]', 'single');
+        
+        // Fill DI Tags select on virtual machines creation form
+        var params = {
+            'action': 'tag_tiny_list',
+            'selectedId': '',
+            'controlName': 'di_tag',
+            'filters': {
+                'osf_id': $('[name="osf_id"]').val()
+            },
+            'nameAsId': true
+        };
+
+        this.fillSelect(params);
+        
+        Wat.I.chosenElement('[name="di_tag"]', 'single');
     }
 });

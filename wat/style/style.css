@@ -335,8 +335,8 @@ select {
   border: 1px solid #cacaca; }
   @media screen and (min-device-width: 40em) {
     .actions_button, select[name="selected_actions_select"] {
-      font-size: 1.2em;
-      line-height: 1.2em; } }
+      font-size: 1.1em;
+      line-height: 1.1em; } }
   @media screen and (min-device-width: 40em) {
     .actions_button, select[name="selected_actions_select"] {
       width: auto;
@@ -350,6 +350,12 @@ input, .button, .button2 {
   padding: 4px 8px;
   line-height: 25px;
   border: 1px solid #cacaca; }
+
+input {
+  line-height: 20px; }
+
+.button, .button2 {
+  line-height: 25px; }
 
 select, input, .button, .button2 {
   border-radius: 4px;
@@ -424,8 +430,8 @@ a.button, button.button {
   box-shadow: none; }
   @media screen and (min-device-width: 40em) {
     a.button, button.button {
-      font-size: 1.2em;
-      line-height: 1.2em; } }
+      font-size: 1.1em;
+      line-height: 1.1em; } }
   a.button:hover, button.button:hover {
     cursor: pointer;
     font-weight: bolder; }
@@ -463,8 +469,8 @@ a.button2, button.button2 {
   box-shadow: none; }
   @media screen and (min-device-width: 40em) {
     a.button2, button.button2 {
-      font-size: 1.2em;
-      line-height: 1.2em; } }
+      font-size: 1.1em;
+      line-height: 1.1em; } }
   a.button2:hover, button.button2:hover {
     cursor: pointer;
     font-weight: bolder; }
@@ -508,8 +514,8 @@ a.button.disabled, a.button2.disabled, button.button.disabled, button.button2.di
   box-shadow: none; }
   @media screen and (min-device-width: 40em) {
     a.button.disabled, a.button2.disabled, button.button.disabled, button.button2.disabled {
-      font-size: 1.2em;
-      line-height: 1.2em; } }
+      font-size: 1.1em;
+      line-height: 1.1em; } }
   a.button.disabled:hover, a.button2.disabled:hover, button.button.disabled:hover, button.button2.disabled:hover {
     cursor: default;
     font-weight: normal; }
@@ -742,7 +748,7 @@ body {
     .wrapper .content .details-side {
       display: none;
       margin-bottom: 15px;
-      width: 38%;
+      width: 48%;
       height: auto;
       float: right;
       padding-left: 2%;
@@ -755,7 +761,8 @@ body {
       position: relative;
       height: 40px; }
       .wrapper .content .details-header span:before, .wrapper .content .side-header span:before {
-        margin-right: 4px; }
+        margin-right: 8px;
+        margin-left: 6px; }
     .wrapper .content .details-list, .wrapper .content .custom-props-container {
       padding-left: 20px; }
       .wrapper .content .details-list .details-item, .wrapper .content .custom-props-container .details-item {
@@ -768,10 +775,10 @@ body {
       @media screen and (min-device-width: 40em) {
         .wrapper .content .details-block {
           float: right;
-          width: 60%; } }
+          width: 50%; } }
       @media screen and (min-device-width: 40em) {
         .wrapper .content .details-block .details-list {
-          width: 40%; } }
+          width: 50%; } }
       .wrapper .content .details-block .details-item .indented-data {
         margin-left: 12px;
         margin-top: 6px;
@@ -791,12 +798,36 @@ body {
           white-space: nowrap;
           width: 1%;
           padding-right: 15px; }
-    .wrapper .content .remote_administration-buttons {
-      margin: 25px auto; }
-      .wrapper .content .remote_administration-buttons a {
-        width: 50%;
-        display: block;
-        margin-bottom: 10px; }
+    .wrapper .content .remote-administration-wrapper {
+      width: 100%;
+      margin-top: 10px;
+      margin-bottom: 20px; }
+      .wrapper .content .remote-administration-wrapper .remote-administration-state {
+        width: 49%;
+        text-align: center;
+        display: inline-block;
+        font-size: 2em;
+        line-height: 2em; }
+        @media screen and (min-device-width: 40em) {
+          .wrapper .content .remote-administration-wrapper .remote-administration-state {
+            font-size: 1.1em;
+            line-height: 1.1em; } }
+        .wrapper .content .remote-administration-wrapper .remote-administration-state div {
+          margin-bottom: 15px; }
+          .wrapper .content .remote-administration-wrapper .remote-administration-state div.fa {
+            font-size: 40px; }
+          .wrapper .content .remote-administration-wrapper .remote-administration-state div:last-child {
+            margin-bottom: 0px; }
+      .wrapper .content .remote-administration-wrapper .remote-administration-buttons {
+        width: 49%;
+        display: inline-block;
+        vertical-align: bottom; }
+        .wrapper .content .remote-administration-wrapper .remote-administration-buttons a {
+          width: 100%;
+          display: block;
+          margin-bottom: 12px; }
+          .wrapper .content .remote-administration-wrapper .remote-administration-buttons a:last-child {
+            margin-bottom: 0px; }
 
 .editor-container {
   margin: 10px 20px; }
@@ -804,10 +835,12 @@ body {
     width: 100%;
     border-spacing: 20px;
     border-collapse: separate; }
+    .editor-container .editor-table td {
+      padding-top: 4px; }
     .editor-container .editor-table td:first-child {
       font-weight: bold;
       min-width: 50%;
-      vertical-align: top; }
+      vertical-align: middle; }
     .editor-container .editor-table td.fa:before {
       margin-right: 10px; }
     .editor-container .editor-table .delete-property-button {
@@ -817,12 +850,11 @@ body {
       position: relative; }
       .editor-container .editor-table .custom-properties td .delete-property-button {
         position: absolute;
-        left: -20px;
-        top: 5px; }
+        left: -20px; }
       .editor-container .editor-table .custom-properties td .property-help {
         position: absolute;
         left: 12px;
-        top: 6px;
+        top: 14px;
         color: #a2a2a2;
         font-weight: normal; }
 
@@ -883,8 +915,7 @@ table.list, table.custom-props {
   background-color: #fdfdfd;
   border: 1px solid #ddd;
   border-radius: 4px;
-  border-collapse: separate;
-  table-layout: fixed; }
+  border-collapse: separate; }
   table.list th, table.custom-props th {
     font-weight: bold;
     text-align: left;
@@ -896,6 +927,16 @@ table.list, table.custom-props {
     table.list th.sorted, table.custom-props th.sorted {
       background-color: #f36d15;
       color: #fdfdfd; }
+    table.list th i, table.custom-props th i {
+      width: 100%;
+      overflow: hidden;
+      text-overflow: ellipsis;
+      white-space: nowrap;
+      font-weight: bold; }
+      table.list th i:before, table.custom-props th i:before {
+        float: right;
+        margin-left: 5px;
+        font-weight: normal; }
   table.list td, table.list th, table.custom-props td, table.custom-props th {
     padding: 6px 8px;
     border-right: dotted 1px #e4e4e4; }
@@ -909,6 +950,13 @@ table.list, table.custom-props {
     border-bottom-left-radius: 4px; }
   table.list tr:last-child td:last-child, table.custom-props tr:last-child td:last-child {
     border-bottom-right-radius: 4px; }
+
+@media screen and (min-device-width: 40em) {
+  table.list, table.custom-props {
+    table-layout: fixed; } }
+
+table.expiration-table {
+  table-layout: auto; }
 
 .second_row {
   margin-top: 4px; }
@@ -1360,8 +1408,8 @@ td.center {
     box-shadow: none; }
     @media screen and (min-device-width: 40em) {
       .ui-dialog .ui-state-hover, .ui-dialog .ui-state-focus {
-        font-size: 1.2em;
-        line-height: 1.2em; } }
+        font-size: 1.1em;
+        line-height: 1.1em; } }
     .ui-dialog .ui-state-hover:hover, .ui-dialog .ui-state-focus:hover {
       cursor: pointer;
       font-weight: bolder; }
@@ -1465,7 +1513,7 @@ td.center {
 .xdsoft_datetimepicker .xdsoft_calendar td:hover, .xdsoft_datetimepicker .xdsoft_timepicker .xdsoft_time_box > div > div:hover {
   background: #f36d15 !important; }
 
-.xdsoft_datetimepicker .xdsoft_calendar td.xdsoft_default, .xdsoft_datetimepicker .xdsoft_calendar td.xdsoft_current, .xdsoft_datetimepicker .xdsoft_timepicker .xdsoft_time_box > div > div.xdsoft_current {
+.xdsoft_datetimepicker .xdsoft_calendar td.xdsoft_default, .xdsoft_datetimepicker .xdsoft_calendar td.xdsoft_current, .xdsoft_datetimepicker .xdsoft_timepicker .xdsoft_time_box > div > div.xdsoft_current, .xdsoft_datetimepicker .xdsoft_label > .xdsoft_select > div > .xdsoft_option.xdsoft_current {
   background: #9a4008;
   box-shadow: #6a2c05 0px 1px 3px 0px inset; }
 
@@ -1503,8 +1551,8 @@ body {
 
 * {
   font-family: Taoma, Arial;
-  font-size: 1.2em;
-  line-height: 1.2em; }
+  font-size: 1.8em;
+  line-height: 1.8em; }
   @media screen and (min-device-width: 40em) {
     * {
       font-size: 1em;
@@ -1522,17 +1570,17 @@ body {
     font-weight: normal; }
 
 .h2 {
-  font-weight: bold;
+  font-weight: normal;
   font-size: 2em;
   line-height: 2em; }
   @media screen and (min-device-width: 40em) {
     .h2 {
-      font-size: 1.2em;
-      line-height: 1.2em; } }
+      font-size: 1.1em;
+      line-height: 1.1em; } }
 
 a, button.actions_button:before {
-  font-size: 1.2em;
-  line-height: 1.2em; }
+  font-size: 1.8em;
+  line-height: 1.8em; }
   @media screen and (min-device-width: 40em) {
     a, button.actions_button:before {
       font-size: 1em;
@@ -1541,16 +1589,16 @@ a, button.actions_button:before {
 label {
   display: block;
   margin-bottom: 4px;
-  font-size: 1em;
-  line-height: 1em; }
+  font-size: 1.4em;
+  line-height: 1.4em; }
   @media screen and (min-device-width: 40em) {
     label {
       font-size: 0.8em;
       line-height: 0.8em; } }
 
 .chosen-container {
-  font-size: 1.2em;
-  line-height: 1.2em; }
+  font-size: 1.8em;
+  line-height: 1.8em; }
   @media screen and (min-device-width: 40em) {
     .chosen-container {
       font-size: 1em;
@@ -1570,14 +1618,14 @@ label {
   line-height: 2em; }
   @media screen and (min-device-width: 40em) {
     .details-block .details-item {
-      font-size: 1.2em;
-      line-height: 1.2em; } }
+      font-size: 1.1em;
+      line-height: 1.1em; } }
 
 .details-block .details-item {
   font-weight: normal; }
   .details-block .details-item .indented-data {
-    font-size: 1.2em;
-    line-height: 1.2em;
+    font-size: 1.8em;
+    line-height: 1.8em;
     font-weight: bold; }
     @media screen and (min-device-width: 40em) {
       .details-block .details-item .indented-data {
@@ -1589,31 +1637,39 @@ label {
   line-height: 2em; }
   @media screen and (min-device-width: 40em) {
     .menu-option {
-      font-size: 1.2em;
-      line-height: 1.2em; } }
+      font-size: 1.1em;
+      line-height: 1.1em; } }
 
 .breadcrumbs * {
-  font-size: 1em;
-  line-height: 1em; }
+  font-size: 1.4em;
+  line-height: 1.4em; }
   @media screen and (min-device-width: 40em) {
     .breadcrumbs * {
       font-size: 0.8em;
       line-height: 0.8em; } }
 
 .pagination {
-  font-size: 1.2em;
-  line-height: 1.2em; }
+  font-size: 1.8em;
+  line-height: 1.8em; }
   @media screen and (min-device-width: 40em) {
     .pagination {
       font-size: 1em;
       line-height: 1em; } }
 
 .second_row {
-  font-size: 1em;
-  line-height: 1em; }
+  font-size: 1.4em;
+  line-height: 1.4em; }
   @media screen and (min-device-width: 40em) {
     .second_row {
       font-size: 0.8em;
       line-height: 0.8em; } }
+
+th {
+  font-size: 1.8em;
+  line-height: 1.8em; }
+  @media screen and (min-device-width: 40em) {
+    th {
+      font-size: 1em;
+      line-height: 1em; } }
 
 /*# sourceMappingURL=style.css.map */

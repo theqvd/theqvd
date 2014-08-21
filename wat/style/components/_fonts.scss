@@ -28,7 +28,7 @@ body {
 }
 
 .h2 {
-    font-weight: bold;
+    font-weight: normal;
     @include font-size(3);
 }
 
@@ -87,4 +87,8 @@ input[type="text"] {
 // Tables
 .second_row {
     @include font-size(1);
+}
+
+th {
+    @include font-size(2);
 }

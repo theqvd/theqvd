@@ -2,10 +2,13 @@
     <thead>
         <tr>
             <% 
+                var printedColumns = 0;
                 _.each(columns, function(col) {
                     if (col.display == false) {
                         return;
                     }
+                    
+                    printedColumns++;
                     
                     switch(col.name) {
                         case 'checks':
@@ -17,43 +20,43 @@
                             break;
                         case 'id':
             %>
-                            <th class="sortable desktop col-width-8" data-sortby="id" data-i18n="Id">
-                                <%= i18n.t('Id') %>
+                            <th class="sortable desktop col-width-10" data-sortby="id">
+                                <i class="fa fa-sort sort-icon" data-i18n="Id"><%= i18n.t('Id') %></i>
                             </th>
             <%
                             break;
                         case 'disk_image':
             %>
-                            <th class="sortable" data-sortby="name" data-i18n="Disk image">
-                                <%= i18n.t('Disk image') %>
+                            <th class="sortable" data-sortby="disk_image">
+                                <i class="fa fa-sort sort-icon" data-i18n="Disk image"><%= i18n.t('Disk image') %></i>
                             </th>
             <%
                             break;
                         case 'version':
             %>
-                            <th class="desktop sortable col-width-15" data-sortby="version" data-i18n="Version">
-                                <%= i18n.t('Version') %>
+                            <th class="desktop sortable col-width-14" data-sortby="version">
+                                <i class="fa fa-sort sort-icon" data-i18n="Version"><%= i18n.t('Version') %></i>
                             </th>
             <%
                             break;
                         case 'osf':
             %>
-                            <th class="desktop sortable col-width-20" data-sortby="osf_name" data-i18n="OS Flavour">
-                                <%= i18n.t('OS Flavour') %>
+                            <th class="desktop sortable" data-sortby="osf_name">
+                                <i class="fa fa-sort sort-icon" data-i18n="OS Flavour"><%= i18n.t('OS Flavour') %></i>
                             </th>
             <%
                             break;
                         case 'default':
             %>
-                            <th class="desktop sortable col-width-10" data-sortby="user_storage" data-i18n="Default">
-                                <%= i18n.t('Default') %>
+                            <th class="desktop col-width-12">
+                                <i class="fa sort-icon" data-i18n="Default"><%= i18n.t('Default') %></i>
                             </th>
             <%
                             break;
                         case 'head':
             %>
-                            <th class="desktop sortable col-width-10" data-sortby="head" data-i18n="Head">
-                                <%= i18n.t('Head') %>
+                            <th class="desktop col-width-12" data-sortby="head">
+                                <i class="fa sort-icon" data-i18n="Head"><%= i18n.t('Head') %></i>
                             </th>
             <%
                             break;
@@ -64,8 +67,8 @@
                             }
                     
             %>
-                            <th class="sortable desktop" data-sortby="<%= col.name %>" <%= translationAttr %>>
-                                <%= col.name %>
+                            <th class="sortable desktop" data-sortby="<%= col.name %>">
+                                <i class="fa sort-icon"><%= col.name %></i>
                             </th>
             <%
                             break;
@@ -79,7 +82,7 @@
         if (models.length == 0) {
         %>  
             <tr>
-                <td colspan="<%= columns.length %>">
+                <td colspan="<%= printedColumns %>">
                     <span class="no-elements" data-i18n="There are not elements">
                         <%= i18n.t('There are not elements') %>
                     </span>

@@ -31,7 +31,7 @@ Wat.T = {
         Wat.I.chosenConfiguration();
 
         // Add sort icons to header
-        Wat.I.addSortIcons();
+        Wat.I.updateSortIcons();
         
         // When all is translated and loaded, hide loading spinner and show content
         Wat.I.showAll();

@@ -57,6 +57,14 @@ input, .button, .button2 {
     border: 1px solid darken($col_whiter, 20);
 }
 
+input {
+    line-height: $height_input;
+}
+
+.button, .button2 {
+    line-height: $height_button;
+}
+
 select, input, .button, .button2 {
     border-radius: $form_elements_radius;
     border-style: solid;

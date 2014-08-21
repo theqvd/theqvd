@@ -36,7 +36,7 @@ Wat.I = {
         }
     },
     
-    addSortIcons: function (view) {
+    updateSortIcons: function (view) {
         // If not view is passed, use currentView
             if (view === undefined) {
                 view = Wat.CurrentView;
@@ -45,37 +45,33 @@ Wat.I = {
         // Get the context to the view
             var context = $('.' + view.cid);
 
-        // Add sort icons to the table headers
-            var sortIconHtml = '<i class="fa fa-sort sort-icon"></i>';
-
+        // Add sort icons to the table headers            
+            var sortClassDefault = 'fa-sort';
+            var sortClassAsc = 'fa-sort-asc';
+            var sortClassDesc = 'fa-sort-desc';
+                
             if (view.sortedBy != '') {
                 switch(view.sortedOrder) {
                     case '': 
-                        var sortIconHtmlSorted = sortIconHtml;
+                        var sortClassSorted = '';
                         break;
                     case '-asc':            
-                        var sortIconHtmlSorted = '<i class="fa fa-sort-asc sort-icon"></i>';
+                        var sortClassSorted = sortClassAsc;
                         break;
                     case '-desc':
-                        var sortIconHtmlSorted = '<i class="fa fa-sort-desc sort-icon"></i>';
+                        var sortClassSorted = sortClassDesc;
                         break;
                 }
             }
+
+            context.find('th.sortable i').removeClass(sortClassDefault + ' ' + sortClassAsc + ' ' + sortClassDesc);
+            context.find('th.sortable i').addClass(sortClassDefault);
 
             if (view.sortedBy != '') {
                 context.find('[data-sortby="' + view.sortedBy + '"]').addClass('sorted');
+                context.find('[data-sortby="' + view.sortedBy + '"] i').removeClass(sortClassDefault);
+                context.find('[data-sortby="' + view.sortedBy + '"] i').addClass(sortClassSorted);
             }
-
-            $.each(context.find('th.sortable'), function(index, cell) {        
-                var headerCont = $(cell).html();
-                if (view.sortedBy == '' || view.sortedBy != $(cell).attr('data-sortby')) {
-                    $(cell).html(headerCont + sortIconHtml);
-                }
-                else {
-                    $(cell).html(headerCont + sortIconHtmlSorted);
-                }
-            });
-
     },
     
     enableDataPickers: function () {
@@ -101,10 +97,20 @@ Wat.I = {
 
             var chosenOptionsAdvanced100 = jQuery.extend({}, chosenOptions);
             chosenOptionsAdvanced100.width = "100%";
+        
+            this.chosenOptions = {
+                'single': chosenOptionsSingle,
+                'single100': chosenOptionsSingle100,
+                'advanced100': chosenOptionsAdvanced100
+            };
 
             $('.filter-control select.chosen-advanced').chosen(chosenOptionsAdvanced100);
             $('.filter-control select.chosen-single').chosen(chosenOptionsSingle100);
             $('select.chosen-single').chosen(chosenOptionsSingle);
+    },
+    
+    chosenElement: function (selector, type) {
+        $(selector).chosen(this.chosenOptions[type]);
     },
     
     mobileMenuConfiguration: function () {

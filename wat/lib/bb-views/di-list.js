@@ -15,7 +15,7 @@ Wat.Views.DIListView = Wat.Views.ListView.extend({
             'name': 'name',
             'filterField': 'disk_image',
             'type': 'text',
-            'label': 'Search by name',
+            'label': 'Search by disk image',
             'mobile': true
         },
         {

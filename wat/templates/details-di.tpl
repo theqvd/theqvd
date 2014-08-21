@@ -1,5 +1,5 @@
 <div class="details-header">
-    <span class="fa fa-file h1" data-i18n><%= model.get('disk_image') %></span>
+    <span class="fa fa-dot-circle-o h1" data-i18n><%= model.get('disk_image') %></span>
     <a class="button button-right js-button-edit fa fa-pencil" href="javascript:" data-i18n>Edit</a>
 </div>
 

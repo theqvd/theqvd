@@ -32,13 +32,14 @@ $table_icons_size_mobile : 20;
 
 // Buttons
 $height_button: 25px;
+$height_input: 20px;
 
 // Layout
 $width_list_side: 15;
 $width_list_content: 100 - $width_list_side;
 $list_side: right;
 
-$width_details_side: 40;
+$width_details_side: 50;
 $width_details_content: 100 - $width_details_side;
 $details_side: right;
 
@@ -51,5 +52,5 @@ $dialog_mobile_width: 200%;
 $dialog_mobile_height: 100vh;
 
 // Fonts
-$font-sizes: 0.8 1 1.2 1.4;
-$font-sizes-mobile: 1 1.2 2 2.2;
+$font-sizes: 0.8 1 1.1 1.4;
+$font-sizes-mobile: 1.4 1.8 2 2.2;

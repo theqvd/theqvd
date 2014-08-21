@@ -2,10 +2,13 @@
     <thead>
         <tr>    
             <% 
+                var printedColumns = 0;
                 _.each(columns, function(col) {
                     if (col.display == false) {
                         return;
                     }
+                    
+                    printedColumns++;
                     
                     switch(col.name) {
                         case 'checks':
@@ -17,57 +20,57 @@
                             break;
                         case 'info':
             %>
-                            <th class="max-3-icons" data-i18n="Info">
-                                <%= i18n.t('Info') %>
+                            <th class="max-3-icons">
+                                <i class="fa sort-icon" data-i18n="Info"><%= i18n.t('Info') %></i>
                             </th>
             <%
                             break;
                         case 'id':
             %>
-                            <th class="sortable desktop col-width-8" data-sortby="id" data-i18n="Id">
-                                <%= i18n.t('Id') %>
+                            <th class="sortable desktop col-width-8" data-sortby="id">
+                                <i class="fa fa-sort sort-icon" data-i18n="Id"><%= i18n.t('Id') %></i>
                             </th>
             <%
                             break;
                         case 'name':
             %>
-                            <th class="sortable" data-sortby="name" data-i18n="Name">
-                                <%= i18n.t('Name') %>
+                            <th class="sortable" data-sortby="name">
+                                <i class="fa fa-sort sort-icon" data-i18n="Name"><%= i18n.t('Name') %></i>
                             </th>
             <%
                             break;
                         case 'node':
             %>
-                            <th class="sortable desktop" data-sortby="host_id" data-i18n="Node">
-                                <%= i18n.t('Node') %>
+                            <th class="sortable desktop" data-sortby="host_id">
+                                <i class="fa fa-sort sort-icon" data-i18n="Node"><%= i18n.t('Node') %></i>
                             </th>
             <%
                             break;
                         case 'user':
             %>
-                            <th class="sortable desktop" data-sortby="user_name" data-i18n="User">
-                                <%= i18n.t('User') %>
+                            <th class="sortable desktop" data-sortby="user_name">
+                                <i class="fa fa-sort sort-icon" data-i18n="User"><%= i18n.t('User') %></i>
                             </th>
             <%
                             break;
                         case 'osf/tag':
             %>
-                            <th class="sortable desktop" data-sortby="osf_name" data-i18n="OSF / Tag">
-                                <%= i18n.t('OSF / Tag') %>
+                            <th class="sortable desktop" data-sortby="osf_name">
+                                <i class="fa fa-sort sort-icon" data-i18n="OSF / Tag"><%= i18n.t('OSF / Tag') %></i>
                             </th>
             <%
                             break;
                         case 'tag':
             %>
-                            <th class="sortable desktop" data-sortby="di_tag" data-i18n="Tag">
-                                <%= i18n.t('Tag') %>
+                            <th class="sortable desktop col-width-20" data-sortby="di_tag">
+                                <i class="fa fa-sort sort-icon" data-i18n="Tag"><%= i18n.t('Tag') %></i>
                             </th>
             <%
                             break;
                         default:
             %>
-                            <th class="sortable desktop" data-sortby="<%= col.name %>" data-i18n="<%= col.name %>">
-                                <%= col.name %>
+                            <th class="sortable desktop" data-sortby="<%= col.name %>">
+                                <i class="fa sort-icon"><%= col.name %></i>
                             </th>
             <%
                             break;
@@ -82,7 +85,7 @@
         if (models.length == 0) {
         %>  
             <tr>
-                <td colspan="<%= columns.length %>">
+                <td colspan="<%= printedColumns %>">
                     <span class="no-elements" data-i18n="There are not elements">
                         <%= i18n.t('There are not elements') %>
                     </span>
@@ -120,10 +123,16 @@
                                         <i class="fa fa-play icon-play" data-i18n="[title]Running"></i>
                                     <%
                                     }
+                                    
                                     if (model.get('blocked')) {
                                     %>
-                                        <!--<i class="fa fa-warning icon-warning"></i>-->
                                         <i class="fa fa-lock" data-i18n="[title]Blocked"></i>
+                                    <%
+                                    }
+                                    
+                                    if (model.get('expiration_soft') || model.get('expiration_hard')) {
+                                    %>
+                                        <i class="fa fa-clock-o icon-info" data-i18n="[title]This virtual machine will expire"></i>
                                     <%
                                     }
                                     %>
@@ -150,7 +159,7 @@
                             case 'node':
                 %>
                                 <td class="desktop">
-                                    <a href="#">
+                                    <a href="#/node/<%= model.get('host_id') %>">
                                         <%= model.get('host_name') %>
                                     </a>
                                 </td>

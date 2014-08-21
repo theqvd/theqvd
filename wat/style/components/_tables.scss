@@ -20,7 +20,6 @@ table.list, table.custom-props {
     border: 1px solid #ddd;
     border-radius: $table_radius;
     border-collapse:separate;
-    table-layout: fixed;
 
     th {
         font-weight: bold;
@@ -40,6 +39,20 @@ table.list, table.custom-props {
         &.sorted {
             background-color: $col_brand;
             color: $col_whiter;
+        }
+        
+        i {
+            &:before {
+                float: right;
+                margin-left: 5px;
+                font-weight: normal;
+            }
+            width: 100%;
+            overflow: hidden;
+            text-overflow: ellipsis;
+            white-space: nowrap;
+            
+            font-weight: bold;
         }
     }
 
@@ -65,6 +78,16 @@ table.list, table.custom-props {
             border-bottom-right-radius: $table_radius;
         }
     }
+}
+
+table.list, table.custom-props {
+    @include in(desktop) {
+        table-layout: fixed;
+    }
+}
+
+table.expiration-table {
+    table-layout: auto;
 }
 
 .second_row {

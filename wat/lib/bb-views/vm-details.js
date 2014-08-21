@@ -45,6 +45,20 @@ Wat.Views.VMDetailsView = Wat.Views.DetailsView.extend({
         
         // Virtual machine form include a date time picker control, so we need enable it
         Wat.I.enableDataPickers();
+                
+        var params = {
+            'action': 'tag_tiny_list',
+            'selectedId': this.model.get('di_tag'),
+            'controlName': 'di_tag',
+            'filters': {
+                'osf_id': this.model.get('osf_id')
+            },
+            'nameAsId': true
+        };
+
+        this.fillSelect(params);
+        
+        Wat.I.chosenElement('[name="di_tag"]', 'single');
     },
     
     updateElement: function (dialog) {
@@ -58,7 +72,7 @@ Wat.Views.VMDetailsView = Wat.Views.DetailsView.extend({
         var context = $('.' + this.cid + '.editor-container');
         
         var name = context.find('input[name="name"]').val();
-        var di_tag = context.find('input[name="di_tag"]').val(); 
+        var di_tag = context.find('select[name="di_tag"]').val(); 
         var blocked = context.find('input[name="blocked"][value=1]').is(':checked');
         
         var filters = {"id": this.id};
