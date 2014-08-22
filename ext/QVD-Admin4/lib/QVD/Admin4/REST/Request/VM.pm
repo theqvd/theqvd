@@ -15,9 +15,23 @@ sub BUILD
 
     $self->{mapper} = $mapper;
     $self->{dependencies} = {vm_runtime => 1, counters => 1};
-    push @{$self->modifiers->{join}}, qw(user osf);
+    push @{$self->modifiers->{join}}, qw(osf);
     push @{$self->modifiers->{join}}, { vm_runtime => 'host' };
+    push @{$self->modifiers->{join}}, { user => 'tenant' };
     
+    if (defined $self->json->{filters}->{di_id})
+    {
+	my $dirs = $self->db->resultset('DI'); 
+	my $di_id = $self->json->{filters}->{di_id};
+
+	$self->json->{filters}->{osf_id} = 
+	{ -in => $dirs->search({ 'subquery.id' => $di_id,
+                                 'tags.tag' => { -ident => 'me.di_tag' } },
+			       { join => ['tags'], 
+				 alias => 'subquery'})->get_column('osf_id')->as_query };
+	delete $self->json->{filters}->{di_id};
+    }
+
     $self->_check;
     $self->_map;
 }
@@ -57,7 +71,8 @@ expiration_soft = vm_runtime.vm_expiration_soft
 expiration_hard = vm_runtime.vm_expiration_hard
 state           = vm_runtime.vm_state
 host_id         = vm_runtime.host_id
-host_name       = host.name
+host            = host.name
+host_name       = me.host_name
 di_id           = vm_runtime.current_di_id
 user_state      = vm_runtime.user_state
 di_tag          = me.di_tag
@@ -67,6 +82,7 @@ ssh_port        = vm_runtime.vm_ssh_port
 vnc_port        = vm_runtime.vm_vnc_port
 serial_port     = vm_runtime.vm_serial_port
 tenant          = user.tenant_id
+tenant_name     = tenant.name
 creation_admin  = me.creation_admin
 creation_date   = me.creation_date
 next_boot_ip    = vm_runtime.vm_address 
@@ -76,4 +92,3 @@ serial_port     = vm_runtime.vm_serial_port
 di_version      = me.di_version
 di_name         = me.di_name
 di_id           = me.di_id
-

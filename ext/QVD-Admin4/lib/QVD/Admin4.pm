@@ -44,15 +44,44 @@ sub get_credentials
     my $user = $DB->resultset('User')->find({ login => $self->login,
 					      password => $self->password}) // 
 						  QVD::Admin4::Exception->throw(code=>'3');
-
-    { tenant => $user->tenant_id, role => $user->role->name };
+    
+    $self->is_superadmin($user) ?
+	return $self->superadmin_credentials($user) :
+	return $self->normal_credentials($user);
 }
 
+sub is_superadmin
+{
+    my ($self,$user) = @_;
+    $user->login eq 'superadmin' ?# FIX ME: Take from DB Config!!!
+	return 1 : return 0;
+}
 
+sub superadmin_credentials
+{
+    my ($self,$user) = @_;
+    { tenant => [ map { $_->id } $DB->resultset('Tenant')->all ],
+      role => $user->role->name };
+}
+
+sub normal_credentials
+{
+    my ($self,$user) = @_;
+
+    { tenant => $user->tenant_id, 
+      role => $user->role->name };
+}
 sub _map
 {
     my ($self,$obj,$request,$result,@fields) = @_;
 
+    if ($request->json->{role} eq 'superadmin' &&
+	$obj->can('tenant_id'))
+    {
+	$result->{tenant_id} = $obj->tenant_id;
+	$result->{tenant_name} = $obj->tenant_name;
+    }
+    
     for my $field (@fields)
     {
 	my $mfield = $request->mapper->getProperty($field);
@@ -83,7 +112,7 @@ sub config_field_get_list
     my $result = $self->select($request);
     my @fields = qw(id qvd_obj name 
                     get_list get_details filter_list 
-                    filter_details argument);
+                    filter_details argument filter_options);
 
     $_ = $self->_map($_,$request,{},@fields) 
 	for @{$result->{rows}};
@@ -99,7 +128,7 @@ sub config_field_get_details
 
     my @fields = qw(id qvd_obj name 
                     get_list get_details filter_list 
-                    filter_details argument);
+                    filter_details argument filter_options);
 
     $_ = $self->_map($_,$request,{},@fields) 
 	for @{$result->{rows}};
@@ -429,7 +458,6 @@ sub select
      rows => [$rs->all] };
 }
 
-
 sub update
 {
     my ($self,$request,@conditions) = @_;
@@ -605,7 +633,6 @@ sub tags_delete
     }		
 }
 
-
 #########################
 ## ADD/DELETE ELEMENTS ##
 #########################
@@ -712,6 +739,7 @@ sub osf_create
     $request->{json}->{arguments}->{straight}->{tenant_id} =
 	$request->{json}->{tenant};
 
+
     $DB->txn_do( sub { my $host = $self->_create($request);
 		       $self->_create_related($request,$host);
 		       $self->custom_create($request->arguments(custom => 1),$host)});
@@ -737,8 +765,17 @@ sub vm_create
 {
     my ($self,$request) = @_;
 
-    $request->{json}->{arguments}->{straight}->{tenant_id} =
-	$request->{json}->{tenant};
+    my $tenant_id = $request->{json}->{tenant};
+    my $user_id = $request->{json}->{arguments}->{straight}->{user_id};
+    my $osf_id = $request->{json}->{arguments}->{straight}->{osf_id};
+
+    $DB->resultset('User')->search({ tenant_id => $tenant_id,
+                                     id        => $user_id   })->count
+					 || QVD::Admin4::Exception->throw(code=>'19');
+
+    $DB->resultset('OSF')->search({ tenant_id => $tenant_id,
+                                    id        => $osf_id   })->count
+					 || QVD::Admin4::Exception->throw(code=>'19');
 
     $DB->txn_do( sub { my $host = $self->_create($request);
 		       $self->_create_related($request,$host);
@@ -763,6 +800,14 @@ sub di_create
 {
     my ($self,$request) = @_;
 
+    my $tenant_id = $request->{json}->{tenant};
+    my $osf_id = $request->{json}->{arguments}->{straight}->{osf_id};
+
+    $DB->resultset('OSF')->search({ tenant_id => $tenant_id,
+                                    id        => $osf_id   })->count
+					 || QVD::Admin4::Exception->throw(code=>'19');
+
+
     $DB->txn_do( sub { my $di = $self->_create($request);
 		       $di->update({path => $di->id .'-'.$di->path});
 		       $di->osf->delete_tag('head');
@@ -772,7 +817,8 @@ sub di_create
 		       $DB->resultset('DI_Tag')->create({di_id => $di->id, tag => 'default'})
 			   unless $di->osf->di_by_tag('default');
 
-		       $self->custom_create($request->arguments(custom => 1),$di);});
+		       $self->custom_create($request->arguments(custom => 1),$di);
+                       $self->tags_create($request->arguments(tags => 1),$di);});
    { total => undef, 
      rows => [] };
 }

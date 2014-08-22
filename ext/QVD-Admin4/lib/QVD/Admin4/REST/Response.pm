@@ -62,7 +62,9 @@ __DATA__
 16 = Condition to delete violated.
 17 = Condition to create violated.
 18 = Imposible to change state in current state.
+19 = Related arguments are not part of this tenant.
 23503 = Foreign Key violation.
 23502 = Lack of mandatory argument violation.
 23505 = Unique Key violation.
+23007 = Invalid type of argument.
 

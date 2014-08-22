@@ -41,10 +41,10 @@ sub combined_properties {
 				 $vm->properties );
 }
 
-sub host 
+sub host_name 
 {
     my $self = shift;
-    $self->vm_runtime->host;
+    $self->vm_runtime->host->name;
 }
 
 
@@ -92,6 +92,18 @@ sub custom_join_condition
 
     { "$args->{foreign_alias}.vm_id" => { -ident => "$args->{self_alias}.id" },
       "$args->{foreign_alias}.key"     => ($key ? { '=' => $key } : { -ident => "$args->{foreign_alias}.key"}) };
+}
+
+sub tenant_id
+{
+    my $self = shift;
+    $self->user->tenant_id;
+}
+
+sub tenant_name
+{
+    my $self = shift;
+    $self->user->tenant->name;
 }
 
 1;

@@ -32,6 +32,10 @@ __PACKAGE__->add_columns(
 	filter_details => {
 	    data_type => 'boolean',
 	    is_nullable => 1
+	},
+	filter_options => {
+	    data_type => 'text',
+	    is_nullable => 1
 	}
 	);
 __PACKAGE__->set_primary_key('id');

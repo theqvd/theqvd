@@ -14,8 +14,8 @@ sub BUILD
     my $self = shift;
 
     $self->{mapper} = $mapper;
-
-    push @{$self->modifiers->{join}}, qw(vms dis tenant);
+    push @{$self->modifiers->{join}}, qw(tenant);
+    push @{$self->modifiers->{join}}, qw(vms dis);
     push @{$self->modifiers->{join}}, { dis => 'tags' };
     $self->_check;
     $self->_map;
@@ -44,5 +44,6 @@ memory = me.memory
 vm_id  = vms.id
 di_id  = dis.id
 tenant = me.tenant_id
+tenant_name  = tenant.name
 vms = me.vms_count
 dis = me.dis_count

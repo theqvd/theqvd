@@ -61,10 +61,11 @@ sub get_customs
 
     my $table = ref($self);
     $table =~ s/^QVD::Admin4::REST::Request::(.+)$/$1/;
+    return 1 if $table eq "DI_Tag";
+    return 1 if $table eq "Config_Field";
     $table .= "_Property";
     my $n = 0;
-    my $props = {map { $_->key => 1 } 
-		 $self->db->resultset($table)->all};
+    my $props = { map { $_->key => 1 } $self->db->resultset($table)->all };
 
     for my $custom (keys %$props)
     {
@@ -204,7 +205,7 @@ sub map_free_filters
     for my $filter (keys %{$self->config->{free}})
     {
 	$self->json->{filters}->{$filter} = 
-	    { like => $self->json->{filters}->{$filter}."%"}
+	    { like => "%".$self->json->{filters}->{$filter}."%"}
 	if exists $self->json->{filters}->{$filter};
     }
 }

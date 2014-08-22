@@ -52,6 +52,12 @@ sub vms_connected_count
 			  {join => [qw(vm_runtime)]})->count,
 }
 
+sub tenant_name
+{
+    my $self = shift;
+    $self->tenant->name;
+}
+
 sub custom_join_condition
 { 
     my $args = shift; 

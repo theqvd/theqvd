@@ -13,7 +13,8 @@ sub BUILD
     my $self = shift;
 
     $self->{mapper} = $mapper;
-    push @{$self->modifiers->{join}}, qw(osf vm_runtimes tags);
+    push @{$self->modifiers->{join}}, qw(vm_runtimes tags);
+    push @{$self->modifiers->{join}}, {osf => 'tenant'};
 
     $self->json->{arguments}->{disk_image} = 
 	basename($self->json->{arguments}->{disk_image})
@@ -59,3 +60,4 @@ osf_name = osf.name
 tenant = osf.tenant_id
 blocked = me.blocked
 tags = me.tags_get_columns
+tenant_name     = tenant.name

@@ -71,5 +71,10 @@ sub custom_join_condition
     { "$args->{foreign_alias}.osf_id" => { -ident => "$args->{self_alias}.id" },
       "$args->{foreign_alias}.key"     => ($key ? { '=' => $key } : { -ident => "$args->{foreign_alias}.key"}) };
 }
+sub tenant_name
+{
+    my $self = shift;
+    $self->tenant->name;
+}
 
 1;

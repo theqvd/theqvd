@@ -68,5 +68,6 @@ creation_date  = me.creation_date
 vms           = me.vms_count
 vms_connected = me.vms_connected_count
 tenant         = me.tenant_id
+tenant_name    = tenant.name
 role           = me.role_id
 

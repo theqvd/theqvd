@@ -3,6 +3,7 @@ package QVD::Admin4::REST::Request::Config_Field;
 use strict;
 use warnings;
 use Moose;
+use Mojo::JSON qw(decode_json encode_json);
 
 extends 'QVD::Admin4::REST::Request';
 
@@ -14,6 +15,11 @@ sub BUILD
     my $self = shift;
 
     $self->{mapper} = $mapper;
+
+    $self->json->{arguments}->{filter_options} = 
+	encode_json($self->json->{arguments}->{filter_options})
+	if defined $self->json->{arguments}->{filter_options};
+
     $self->_check;
     $self->_map;
 }
@@ -31,3 +37,4 @@ filter_list = me.filter_list
 filter_details = me.filter_details
 argument = me.argument
 tenant = me.tenant_id
+filter_options = me.filter_options
