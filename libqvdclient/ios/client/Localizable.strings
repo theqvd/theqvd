@@ -1,0 +1,30 @@
+/* 
+  Localized.strings
+  client
+
+  Created by nito on 26/10/12.
+  Copyright (c) 2012 __MyCompanyName__. All rights reserved.
+*/
+
+"login"="Login";
+"password"="Password";
+"host"="Host";
+"connect"="Connect";
+"connecting"="Connecting";
+"connected"="Connected";
+"edit"="Edit";
+"name"="Name";
+"port"="Port";
+"debug"="Debug";
+"width"="Width";
+"height"="Height";
+"widthxheight"="WxH";
+"fullscreen"="Full Screen";
+"ok"="Ok";
+"cancel"="Cancel";
+"accept"="Accept";
+"no"="No";
+"certificateAlert"="Unknown Certificate. Do you want to accept it?";
+"internalError"="Internal Error";
+"vmlistError"="Error obtaining list of VMs";
+"connectError"="Error connecting to VM";
