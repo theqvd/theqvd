@@ -38,10 +38,10 @@ Wat.Views.VMDetailsView = Wat.Views.DetailsView.extend({
         $(this.sideContainer).html(this.template);
     },
     
-    editElement: function(e) {
+    openEditElementDialog: function(e) {
         this.dialogConf.title = $.i18n.t('Edit Virtual machine') + ": " + this.model.get('name');
         
-        Wat.Views.DetailsView.prototype.editElement.apply(this, [e]);
+        Wat.Views.DetailsView.prototype.openEditElementDialog.apply(this, [e]);
         
         // Virtual machine form include a date time picker control, so we need enable it
         Wat.I.enableDataPickers();
@@ -56,9 +56,9 @@ Wat.Views.VMDetailsView = Wat.Views.DetailsView.extend({
             'nameAsId': true
         };
 
-        this.fillSelect(params);
+        Wat.A.fillSelect(params);
         
-        Wat.I.chosenElement('[name="di_tag"]', 'single');
+        Wat.I.chosenElement('[name="di_tag"]', 'single100');
     },
     
     updateElement: function (dialog) {
@@ -103,7 +103,7 @@ Wat.Views.VMDetailsView = Wat.Views.DetailsView.extend({
             }
         }
                 
-        this.updateModel(arguments, filters);
+        this.updateModel(arguments, filters, this.fetchDetails);
     },
     
     bindEditorEvents: function() {

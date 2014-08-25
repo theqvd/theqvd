@@ -83,6 +83,8 @@ Wat.Views.UserListView = Wat.Views.ListView.extend({
                 'noTranslatable': true
             }
         ];
+        
+        Wat.Views.ListView.prototype.setColumns.apply(this);
     },
     
     setSelectedActions: function () {
@@ -114,10 +116,10 @@ Wat.Views.UserListView = Wat.Views.ListView.extend({
         }
     },
     
-    newElement: function (e) {
+    openNewElementDialog: function (e) {
         this.model = new Wat.Models.User();
         this.dialogConf.title = $.i18n.t('New user');
-        Wat.Views.ListView.prototype.newElement.apply(this, [e]);
+        Wat.Views.ListView.prototype.openNewElementDialog.apply(this, [e]);
     },
     
     createElement: function () {
@@ -154,9 +156,7 @@ Wat.Views.UserListView = Wat.Views.ListView.extend({
         else {
             arguments['password'] = password;
         }
-                
-        console.log(arguments);
-                
+                        
         this.createModel(arguments);
     }
 });

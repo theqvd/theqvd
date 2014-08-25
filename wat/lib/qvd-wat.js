@@ -132,7 +132,18 @@ var Wat = {
                 Wat.CurrentView.undelegateEvents();
             }
             
-            var params = {};
+            /* 
+               NOTE: This view is always filtered by osf. When no osf is passed
+               as parameter, this filtering is performed dinamically to the
+               first OSF of the filter's combo. Due this feature, the default
+               filter will be an osf that doesn't exist: -1. In this way, we avoid
+               to charge, unnecessarily, all the DIs for a second before the 
+               definitive filter.
+            */
+            var params = {
+                filters: {"osf_id": -1}
+            }
+            
             if (field !== null) {
                 switch(field) {
                     case 'osf':

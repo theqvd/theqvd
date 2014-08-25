@@ -38,10 +38,10 @@ Wat.Views.DetailsView = Wat.Views.MainView.extend({
     },
     
     eventsDetails: {
-        'click .js-button-edit': 'editElement'
+        'click .js-button-edit': 'openEditElementDialog'
     },
      
-    editElement: function (e) {
+    openEditElementDialog: function (e) {
         var that = this;
         
         this.dialogConf.buttons = {

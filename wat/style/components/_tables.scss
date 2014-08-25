@@ -92,10 +92,19 @@ table.expiration-table {
 
 .second_row {
     margin-top: 4px;
+    line-height: 13px;
 }
 
 td.center {
     text-align: center;
+}
+
+.not-break {
+    @include in(desktop) {
+        white-space: nowrap;
+        overflow-x: hidden;
+        text-overflow: ellipsis;
+    }
 }
 
 // Different sizes for cells with different amount of icons

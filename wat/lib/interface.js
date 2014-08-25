@@ -86,6 +86,8 @@ Wat.I = {
         // Convert the filter selects to library chosen style
             var chosenOptions = {};
             chosenOptions.no_results_text = i18n.t('No results match');
+            chosenOptions.placeholder_text_single = i18n.t('Select an option');
+            chosenOptions.placeholder_text_multiple = i18n.t('Select some options');
             chosenOptions.search_contains = true;
 
             var chosenOptionsSingle = jQuery.extend({}, chosenOptions);
@@ -98,6 +100,7 @@ Wat.I = {
             var chosenOptionsAdvanced100 = jQuery.extend({}, chosenOptions);
             chosenOptionsAdvanced100.width = "100%";
         
+            // Store options to be retrieved in dinamic loads
             this.chosenOptions = {
                 'single': chosenOptionsSingle,
                 'single100': chosenOptionsSingle100,
@@ -111,6 +114,11 @@ Wat.I = {
     
     chosenElement: function (selector, type) {
         $(selector).chosen(this.chosenOptions[type]);
+    },
+    
+    updateChosenControls: function (selector) {
+        var selector = selector || 'select.chosen-advanced, select.chosen-single';
+        $(selector).trigger('chosen:updated');
     },
     
     mobileMenuConfiguration: function () {
@@ -144,7 +152,11 @@ Wat.I = {
             position: { 
                 my: "left+15 center", 
                 at: "right center" 
-            } 
+            },
+            content: function(callback) {
+                // Carriage return support
+                callback($(this).prop('title').replace('\n', '<br />')); 
+            }
         }
                              );
     },
@@ -169,10 +181,6 @@ Wat.I = {
             open: function(e) {                
                 // Close message if open
                     $('.message-close').trigger('click');
-                
-                
-                // Disable scroll on body to improve user experience with dialog scroll
-                    //$('body').css('overflow-y', 'hidden');
 
                 // Buttons style
                     var buttons = $(e.target).next().find('button');
@@ -203,23 +211,42 @@ Wat.I = {
             },
             
             close: function () {
-                // Re-enable scroll on body disabled when open dialog
-                //$('body').css('overflow-y', 'auto');
             }
         });     
     },
     
     showMessage: function (msg) {
-        $('.message').html(msg.message);
-        $('.message-container').slideDown(500);
+        if (typeof messageTimeout != 'undefined') {
+            clearTimeout(messageTimeout);
+        }       
+        
+        $("html, body").animate({ scrollTop: 0 }, 200);
+
+        if (msg.expandedMessage) {
+            var expandIcon = '<i class="fa fa-plus-square-o expand-message js-expand-message" title="' + i18n.t('See more') + '..."></i>';
+            var expandedMessage = '<article>' + msg.expandedMessage + '</article>';
+        }
+        else {
+            var expandIcon = '';
+            var expandedMessage = '';
+        }
+        
+        var summaryMessage = '<summary>' + msg.message + '</summary>';
+        
+        $('.message').html(expandIcon + summaryMessage + expandedMessage);
+        $('.message-container').hide().slideDown(500);
         $('.message-container').removeClass('success error info warning');
         $('.message-container').addClass(msg.messageType);
         
         // Success messages will be hidden automatically
         if (msg.messageType == 'success') {
-            messageTimeout = setTimeout(function() { 
+            this.messageTimeout = setTimeout(function() { 
                 $('.message-close').trigger('click');
             },3000);
         }
+    },
+    
+    clearMessageInterval: function () {
+        clearInterval(this.messageTimeout);
     }
 }

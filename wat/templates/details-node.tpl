@@ -18,7 +18,7 @@
     </span>
     <span class="details-item fa fa-angle-right">
         <% 
-        if (model.get('state')) {
+        if (model.get('state') == 'running') {
         %>
             <i class="fa fa-play icon-play" data-i18n>Running</i>
         <%

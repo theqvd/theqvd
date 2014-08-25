@@ -70,7 +70,7 @@ Wat.Views.UserDetailsView = Wat.Views.DetailsView.extend({
             }
         }
         
-        this.updateModel(arguments, filters);
+        this.updateModel(arguments, filters, this.fetchDetails);
     },
     
     render: function () {
@@ -90,10 +90,10 @@ Wat.Views.UserDetailsView = Wat.Views.DetailsView.extend({
         $(this.sideContainer).html(this.template);
     },
     
-    editElement: function(e) {
+    openEditElementDialog: function(e) {
         this.dialogConf.title = $.i18n.t('Edit user') + ": " + this.model.get('name');
         
-        Wat.Views.DetailsView.prototype.editElement.apply(this, [e]);
+        Wat.Views.DetailsView.prototype.openEditElementDialog.apply(this, [e]);
     },
     
     bindEditorEvents: function() {

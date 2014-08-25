@@ -7,7 +7,6 @@ Wat.Collections.Collection = Backbone.Collection.extend({
     filters: {},
     // Order by id by default
     sort: {"field": "id", "order": "-asc"},
-    baseUrl: "http://172.20.126.12:3000/?login=benja&password=benja",
     
     initialize: function (params) {
         params = params || {};
@@ -18,7 +17,7 @@ Wat.Collections.Collection = Backbone.Collection.extend({
     },
     
     getListUrl: function () {
-        var fullUrl = this.baseUrl  + 
+        var fullUrl = Wat.C.getBaseUrl()  + 
             "&action=" + this.actionPrefix + '_get_list' +
             "&offset=" + this.offset + 
             "&block=" + this.block + 

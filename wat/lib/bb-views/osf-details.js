@@ -56,25 +56,22 @@ Wat.Views.OSFDetailsView = Wat.Views.DetailsView.extend({
         // Properties to create, update and delete obtained from parent view
         var properties = this.properties;
         
-        var arguments = {'properties' : properties};
-        
         var context = $('.' + this.cid + '.editor-container');
         
-        var name = context.find('input[name="name"]').val();
-        
-        arguments['name'] = name;
-        
+        var name = context.find('input[name="name"]').val();        
         var memory = context.find('input[name="memory"]').val();
-        
-        arguments['memory'] = memory;
-        
         var user_storage = context.find('input[name="user_storage"]').val();
         
-        arguments['user_storage'] = user_storage;
+        arguments = {
+            properties: properties,
+            name: name,
+            memory: memory,
+            user_storage: user_storage
+        };
         
         var filters = {"id": this.id};
 
-        this.updateModel(arguments, filters);
+        this.updateModel(arguments, filters, this.fetchDetails);
     },
     
     render: function () {
@@ -94,10 +91,10 @@ Wat.Views.OSFDetailsView = Wat.Views.DetailsView.extend({
         $(this.sideContainer).html(this.template);
     },
     
-    editElement: function(e) {
+    openEditElementDialog: function(e) {
         this.dialogConf.title = $.i18n.t('Edit OS Flavour') + ": " + this.model.get('name');
         
-        Wat.Views.DetailsView.prototype.editElement.apply(this, [e]);
+        Wat.Views.DetailsView.prototype.openEditElementDialog.apply(this, [e]);
     },
     
     bindEditorEvents: function() {

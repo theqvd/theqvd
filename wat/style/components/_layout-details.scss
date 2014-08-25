@@ -22,15 +22,21 @@
     
     @if $details_side == left {
         float: left;
-        padding-right: 2%;
         margin-right: 2%;
-        border-right: 1px dotted darken($col_whiter, 15);
     }
     @else if $details_side == right {
         float: right;
-        padding-left: 2%;
         margin-left: 2%;
-        border-left: 1px dotted darken($col_whiter, 15);
+    }
+    
+    .side-component {
+        padding: 15px;
+        border: 1px solid darken($col_whiter, 7);
+        border-radius: 2px;
+        background: darken($col_whiter, 5);
+        box-shadow: 2px 2px 8px darken($col_whiter, 4);
+        
+        margin-bottom: 15px;
     }
 }
 
@@ -146,4 +152,16 @@
         }
     }
     
+}
+
+// Tags
+
+ul.tags li {
+    line-height: 20px;
+    display: list-item;
+    
+    &:before {
+        margin-right: 5px;
+        color: lighten($col_blacker, 30);
+    }
 }

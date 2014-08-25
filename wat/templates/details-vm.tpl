@@ -27,7 +27,7 @@
         </div>
     </span>
     <span class="details-item fa fa-angle-right">
-        <span data-i18n>Tag</span>
+        <span data-i18n>Disk image's tag</span>
         <div class="indented-data">
             <%= model.get('di_tag') %>
         </div>
@@ -50,7 +50,7 @@
                 var expiration_hard = model.get('expiration_hard');
                 if (!expiration_soft && !expiration_hard) {
             %>
-                    <div data-i18n>no</div>
+                    <span class="no-elements" data-i18n="No"></span>
             <%
                 }
                 else {

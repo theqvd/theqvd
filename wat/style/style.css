@@ -23,7 +23,6 @@
 .menu-corner, .header-wrapper, .wrapper, .wrapper .menu, .wrapper .breadcrumbs, .wrapper .content, .footer {
   visibility: hidden; }
 
-
 *:focus, .ui-dialog {
   outline-width: 0;
   outline: none;
@@ -80,7 +79,6 @@ table {
 *, *::after, *::before {
   box-sizing: border-box; }
 
-
 :focus {
   box-shadow: 1 1 1px 0px #f36d15; }
 
@@ -116,6 +114,9 @@ a:hover i:before {
 .relative {
   position: relative; }
 
+.center {
+  text-align: center; }
+
 fieldset {
   padding: 8px;
   border: 1px solid #fde6d7;
@@ -133,9 +134,7 @@ fieldset {
     margin-right: 5px; }
 
 .h2 {
-  color: #888888;
   margin-bottom: 14px; }
-
 
 .center {
   text-align: center; }
@@ -166,7 +165,7 @@ fieldset {
 ********************************************************************/
 .menu {
   display: none; }
-  @media screen and (min-device-width: 40em) {
+  @media screen and (min-width: 40em) {
     .menu {
       display: block; } }
   .menu > ul .menu-option {
@@ -177,7 +176,7 @@ fieldset {
     color: #222222;
     border: 1px solid #f8a876;
     cursor: pointer; }
-    @media screen and (min-device-width: 40em) {
+    @media screen and (min-width: 40em) {
       .menu > ul .menu-option {
         display: inline; } }
     .menu > ul .menu-option:last-child {
@@ -186,7 +185,7 @@ fieldset {
     .menu > ul .menu-option:first-child {
       border-top-left-radius: 7px;
       border-top-right-radius: 7px; }
-    @media screen and (min-device-width: 40em) {
+    @media screen and (min-width: 40em) {
       .menu > ul .menu-option:last-child {
         border-bottom-left-radius: 0;
         border-top-right-radius: 7px;
@@ -200,7 +199,7 @@ fieldset {
       margin-right: 10px; }
     .menu > ul .menu-option span {
       vertical-align: bottom; }
-    @media screen and (min-device-width: 40em) {
+    @media screen and (min-width: 40em) {
       .menu > ul .menu-option:active {
         margin-bottom: -2px;
         margin-top: 1px; } }
@@ -221,7 +220,7 @@ fieldset {
   top: 10px;
   right: 80px;
   display: none; }
-  @media screen and (min-device-width: 40em) {
+  @media screen and (min-width: 40em) {
     .menu-corner {
       right: 20px;
       display: block; } }
@@ -259,7 +258,7 @@ fieldset {
   top: 5px;
   right: 20px;
   font-size: 50px; }
-  @media screen and (min-device-width: 40em) {
+  @media screen and (min-width: 40em) {
     .mobile-menu {
       display: none; } }
 
@@ -285,14 +284,14 @@ fieldset {
 td i.fa {
   font-size: 20px;
   margin-right: 4px; }
-  @media screen and (min-device-width: 40em) {
+  @media screen and (min-width: 40em) {
     td i.fa {
       font-size: 16px; } }
 td i.fa-lock, td i.fa-unlock {
   font-size: 23px;
   vertical-align: bottom;
   height: 18px; }
-  @media screen and (min-device-width: 40em) {
+  @media screen and (min-width: 40em) {
     td i.fa-lock, td i.fa-unlock {
       font-size: 19px; } }
 
@@ -315,7 +314,7 @@ option {
 
 label {
   display: block;
-  margin-bottom: 4px; }
+  margin-bottom: 8px; }
 
 select {
   background: white;
@@ -330,14 +329,14 @@ select {
 .actions_button, select[name="selected_actions_select"] {
   width: 100%;
   height: 60px;
-  font-size: 2em;
-  line-height: 2em;
+  font-size: 1.8em;
+  line-height: 1.8em;
   border: 1px solid #cacaca; }
-  @media screen and (min-device-width: 40em) {
+  @media screen and (min-width: 40em) {
     .actions_button, select[name="selected_actions_select"] {
       font-size: 1.1em;
       line-height: 1.1em; } }
-  @media screen and (min-device-width: 40em) {
+  @media screen and (min-width: 40em) {
     .actions_button, select[name="selected_actions_select"] {
       width: auto;
       height: 25px; } }
@@ -371,12 +370,12 @@ input[type="checkbox"], input[type="radio"] {
   height: 28px;
   box-shadow: none;
   border-width: 0; }
-  @media screen and (min-device-width: 40em) {
+  @media screen and (min-width: 40em) {
     input[type="checkbox"], input[type="radio"] {
       width: 14px;
       height: 14px; } }
 
-@media only screen and (max-device-width: 40em) {
+@media only screen and (max-width: 40em) {
   .chosen-container {
     width: 100% !important;
     margin-bottom: 10px; } }
@@ -422,13 +421,13 @@ a.button, button.button {
   background-image: -o-linear-gradient(top, #f47a2d, #e35e0c);
   background-image: linear-gradient(to bottom, #f47a2d, #e35e0c);
   background-repeat: repeat-x;
-  font-size: 2em;
-  line-height: 2em;
+  font-size: 1.8em;
+  line-height: 1.8em;
   border: solid 1px #f58946;
   -webkit-box-shadow: none;
   -moz-box-shadow: none;
   box-shadow: none; }
-  @media screen and (min-device-width: 40em) {
+  @media screen and (min-width: 40em) {
     a.button, button.button {
       font-size: 1.1em;
       line-height: 1.1em; } }
@@ -461,13 +460,13 @@ a.button2, button.button2 {
   background-image: -o-linear-gradient(top, #ffffff, #f0f0f0);
   background-image: linear-gradient(to bottom, #ffffff, #f0f0f0);
   background-repeat: repeat-x;
-  font-size: 2em;
-  line-height: 2em;
+  font-size: 1.8em;
+  line-height: 1.8em;
   border: solid 1px #f58946;
   -webkit-box-shadow: none;
   -moz-box-shadow: none;
   box-shadow: none; }
-  @media screen and (min-device-width: 40em) {
+  @media screen and (min-width: 40em) {
     a.button2, button.button2 {
       font-size: 1.1em;
       line-height: 1.1em; } }
@@ -506,13 +505,13 @@ a.button.disabled, a.button2.disabled, button.button.disabled, button.button2.di
   background-image: -o-linear-gradient(top, #ffffff, #f2f2f2);
   background-image: linear-gradient(to bottom, #ffffff, #f2f2f2);
   background-repeat: repeat-x;
-  font-size: 2em;
-  line-height: 2em;
+  font-size: 1.8em;
+  line-height: 1.8em;
   border: solid 1px #e4e4e4;
   -webkit-box-shadow: none;
   -moz-box-shadow: none;
   box-shadow: none; }
-  @media screen and (min-device-width: 40em) {
+  @media screen and (min-width: 40em) {
     a.button.disabled, a.button2.disabled, button.button.disabled, button.button2.disabled {
       font-size: 1.1em;
       line-height: 1.1em; } }
@@ -547,11 +546,8 @@ a.button.disabled, a.button2.disabled, button.button.disabled, button.button2.di
 /* Layout */
 body {
   position: relative; }
-  @media only screen and (max-device-width: 40em) {
-    body {
-      zoom: 2; } }
 
-@media only screen and (max-device-width: 40em) {
+@media only screen and (max-width: 40em) {
   * {
     max-width: 480px !important;
     min-width: 0 !important; } }
@@ -559,25 +555,15 @@ body {
 .header-wrapper {
   height: 60px;
   border-bottom: 2px solid #d7d7d7;
-  background: #e4e4e4;
-  width: 200%; }
-  @media screen and (min-device-width: 40em) {
-    .header-wrapper {
-      width: 100%; } }
+  background: #e4e4e4; }
   .header-wrapper .header {
     position: relative;
     min-width: 0px;
-    max-width: 40em;
-    width: 200%;
-    width: 200%; }
-    @media screen and (min-device-width: 40em) {
+    max-width: 40em; }
+    @media screen and (min-width: 40em) {
       .header-wrapper .header {
         min-width: 960px;
-        max-width: 1280px;
-        width: 100%; } }
-    @media screen and (min-device-width: 40em) {
-      .header-wrapper .header {
-        width: 100%; } }
+        max-width: 1280px; } }
     .header-wrapper .header .logo {
       height: 55px;
       margin: 5px 0px; }
@@ -588,7 +574,7 @@ body {
   top: 25vh;
   color: #e4e4e4;
   margin: 50px auto; }
-  @media screen and (min-device-width: 40em) {
+  @media screen and (min-width: 40em) {
     .loading {
       font-size: 200px;
       width: 200px;
@@ -601,34 +587,30 @@ body {
   text-align: center;
   color: #e4e4e4; }
 
+.side-component .mini-loading {
+  color: #cacaca; }
+
 .wrapper {
   min-width: 0px;
   max-width: 40em;
-  width: 200%;
-  width: 200%;
   background-color: white;
   position: relative; }
-  @media screen and (min-device-width: 40em) {
+  @media screen and (min-width: 40em) {
     .wrapper {
       min-width: 960px;
-      max-width: 1280px;
-      width: 100%; } }
-  @media screen and (min-device-width: 40em) {
-    .wrapper {
-      width: 100%; } }
+      max-width: 1280px; } }
   .wrapper .menu {
     margin-bottom: 10px;
     margin-top: 5px; }
-    @media screen and (min-device-width: 40em) {
+    @media screen and (min-width: 40em) {
       .wrapper .menu {
         margin-top: 15px; } }
   .wrapper .breadcrumbs {
     width: 100%;
     margin-top: 10px;
     margin-bottom: 10px;
-    padding-bottom: 10px;
-    border-bottom: dotted 1px #d7d7d7; }
-    @media screen and (min-device-width: 40em) {
+    padding-bottom: 10px; }
+    @media screen and (min-width: 40em) {
       .wrapper .breadcrumbs {
         margin-top: 15px;
         margin-bottom: 20px;
@@ -647,7 +629,7 @@ body {
     font-weight: bold;
     z-index: 999;
     display: none; }
-    @media screen and (min-device-width: 40em) {
+    @media screen and (min-width: 40em) {
       .wrapper .message-container {
         top: -15px; } }
     .wrapper .message-container.success {
@@ -659,11 +641,35 @@ body {
     .wrapper .message-container.warning {
       background: #e6bf00; }
     .wrapper .message-container .message-close {
-      position: absolute;
+      float: right;
       top: 6px;
       right: 8px;
-      font-size: 24px;
+      font-size: 20px;
       cursor: pointer; }
+    .wrapper .message-container .message {
+      font-size: 1.8em;
+      line-height: 1.8em;
+      padding-top: 10px; }
+      @media screen and (min-width: 40em) {
+        .wrapper .message-container .message {
+          font-size: 1.1em;
+          line-height: 1.1em; } }
+      .wrapper .message-container .message summary {
+        line-height: 20px; }
+      .wrapper .message-container .message article {
+        display: none;
+        font-size: 1.2em;
+        line-height: 1.2em;
+        padding: 10px 30px; }
+        @media screen and (min-width: 40em) {
+          .wrapper .message-container .message article {
+            font-size: 0.8em;
+            line-height: 0.8em; } }
+      .wrapper .message-container .message .expand-message {
+        cursor: pointer;
+        font-size: 20px;
+        float: left;
+        margin-right: 15px; }
   .wrapper .content {
     margin-bottom: 180px;
     /********************************************************************
@@ -686,7 +692,7 @@ body {
 *********************************************************************
 *********************************************************************
 ********************************************************************/ }
-    @media screen and (min-device-width: 40em) {
+    @media screen and (min-width: 40em) {
       .wrapper .content {
         margin-bottom: 80px; } }
     .wrapper .content .filter {
@@ -698,7 +704,7 @@ body {
       padding-left: 2%;
       margin-left: 2%;
       border-left: 1px dotted #d7d7d7; }
-      @media screen and (min-device-width: 40em) {
+      @media screen and (min-width: 40em) {
         .wrapper .content .filter {
           display: block; } }
       .wrapper .content .filter .filter-control {
@@ -709,7 +715,7 @@ body {
         height: 1px;
         background: #d7d7d7;
         width: 100%; }
-    @media screen and (min-device-width: 40em) {
+    @media screen and (min-width: 40em) {
       .wrapper .content .list-block, .wrapper .content .details-side {
         float: right;
         width: 85%; } }
@@ -721,12 +727,12 @@ body {
     .wrapper .content .list-block .list-navigation, .wrapper .content .details-side .list-navigation {
       position: relative;
       width: 100%; }
-      @media screen and (min-device-width: 40em) {
+      @media screen and (min-width: 40em) {
         .wrapper .content .list-block .list-navigation, .wrapper .content .details-side .list-navigation {
           margin-bottom: 0px; } }
       .wrapper .content .list-block .list-navigation .pagination, .wrapper .content .details-side .list-navigation .pagination {
         margin-bottom: 10px; }
-        @media screen and (min-device-width: 40em) {
+        @media screen and (min-width: 40em) {
           .wrapper .content .list-block .list-navigation .pagination, .wrapper .content .details-side .list-navigation .pagination {
             margin-bottom: 10px;
             padding: 0px;
@@ -736,7 +742,7 @@ body {
       .wrapper .content .list-block .list-navigation .action-new-item, .wrapper .content .details-side .list-navigation .action-new-item {
         margin-bottom: 10px;
         margin-top: -10px; }
-        @media screen and (min-device-width: 40em) {
+        @media screen and (min-width: 40em) {
           .wrapper .content .list-block .list-navigation .action-new-item, .wrapper .content .details-side .list-navigation .action-new-item {
             width: 45%;
             float: left;
@@ -751,12 +757,17 @@ body {
       width: 48%;
       height: auto;
       float: right;
-      padding-left: 2%;
-      margin-left: 2%;
-      border-left: 1px dotted #d7d7d7; }
-      @media screen and (min-device-width: 40em) {
+      margin-left: 2%; }
+      @media screen and (min-width: 40em) {
         .wrapper .content .details-side {
           display: block; } }
+      .wrapper .content .details-side .side-component {
+        padding: 15px;
+        border: 1px solid #ebebeb;
+        border-radius: 2px;
+        background: #f0f0f0;
+        box-shadow: 2px 2px 8px #f3f3f3;
+        margin-bottom: 15px; }
     .wrapper .content .details-header, .wrapper .content .side-header {
       position: relative;
       height: 40px; }
@@ -772,11 +783,11 @@ body {
           margin-right: 5px; }
     .wrapper .content .details-block {
       position: relative; }
-      @media screen and (min-device-width: 40em) {
+      @media screen and (min-width: 40em) {
         .wrapper .content .details-block {
           float: right;
           width: 50%; } }
-      @media screen and (min-device-width: 40em) {
+      @media screen and (min-width: 40em) {
         .wrapper .content .details-block .details-list {
           width: 50%; } }
       .wrapper .content .details-block .details-item .indented-data {
@@ -785,7 +796,7 @@ body {
         margin-bottom: 20px; }
         .wrapper .content .details-block .details-item .indented-data div {
           margin-bottom: 10px; }
-      @media screen and (min-device-width: 40em) {
+      @media screen and (min-width: 40em) {
         .wrapper .content .details-block .custom-props-container {
           position: absolute;
           top: 30px;
@@ -806,9 +817,9 @@ body {
         width: 49%;
         text-align: center;
         display: inline-block;
-        font-size: 2em;
-        line-height: 2em; }
-        @media screen and (min-device-width: 40em) {
+        font-size: 1.8em;
+        line-height: 1.8em; }
+        @media screen and (min-width: 40em) {
           .wrapper .content .remote-administration-wrapper .remote-administration-state {
             font-size: 1.1em;
             line-height: 1.1em; } }
@@ -828,6 +839,12 @@ body {
           margin-bottom: 12px; }
           .wrapper .content .remote-administration-wrapper .remote-administration-buttons a:last-child {
             margin-bottom: 0px; }
+    .wrapper .content ul.tags li {
+      line-height: 20px;
+      display: list-item; }
+      .wrapper .content ul.tags li:before {
+        margin-right: 5px;
+        color: #6f6f6f; }
 
 .editor-container {
   margin: 10px 20px; }
@@ -870,7 +887,7 @@ body {
   bottom: 0px;
   padding-top: 7px;
   display: none; }
-  @media screen and (min-device-width: 40em) {
+  @media screen and (min-width: 40em) {
     .footer {
       display: block; } }
 
@@ -884,7 +901,7 @@ body {
 .desktop {
   display: none; }
 
-@media screen and (min-device-width: 40em) {
+@media screen and (min-width: 40em) {
   td.desktop, th.desktop {
     display: table-cell; }
   span.desktop, a.desktop {
@@ -951,7 +968,7 @@ table.list, table.custom-props {
   table.list tr:last-child td:last-child, table.custom-props tr:last-child td:last-child {
     border-bottom-right-radius: 4px; }
 
-@media screen and (min-device-width: 40em) {
+@media screen and (min-width: 40em) {
   table.list, table.custom-props {
     table-layout: fixed; } }
 
@@ -959,15 +976,22 @@ table.expiration-table {
   table-layout: auto; }
 
 .second_row {
-  margin-top: 4px; }
+  margin-top: 4px;
+  line-height: 13px; }
 
 td.center {
   text-align: center; }
 
+@media screen and (min-width: 40em) {
+  .not-break {
+    white-space: nowrap;
+    overflow-x: hidden;
+    text-overflow: ellipsis; } }
+
 .max-1-icons {
   width: 39px;
   min-width: 39px; }
-  @media screen and (min-device-width: 40em) {
+  @media screen and (min-width: 40em) {
     .max-1-icons {
       width: 43px;
       min-width: 43px; } }
@@ -975,7 +999,7 @@ td.center {
 .max-2-icons {
   width: 61px;
   min-width: 61px; }
-  @media screen and (min-device-width: 40em) {
+  @media screen and (min-width: 40em) {
     .max-2-icons {
       width: 69px;
       min-width: 69px; } }
@@ -983,7 +1007,7 @@ td.center {
 .max-3-icons {
   width: 83px;
   min-width: 83px; }
-  @media screen and (min-device-width: 40em) {
+  @media screen and (min-width: 40em) {
     .max-3-icons {
       width: 95px;
       min-width: 95px; } }
@@ -991,7 +1015,7 @@ td.center {
 .max-4-icons {
   width: 105px;
   min-width: 105px; }
-  @media screen and (min-device-width: 40em) {
+  @media screen and (min-width: 40em) {
     .max-4-icons {
       width: 121px;
       min-width: 121px; } }
@@ -999,7 +1023,7 @@ td.center {
 .max-5-icons {
   width: 127px;
   min-width: 127px; }
-  @media screen and (min-device-width: 40em) {
+  @media screen and (min-width: 40em) {
     .max-5-icons {
       width: 147px;
       min-width: 147px; } }
@@ -1007,7 +1031,7 @@ td.center {
 .max-6-icons {
   width: 149px;
   min-width: 149px; }
-  @media screen and (min-device-width: 40em) {
+  @media screen and (min-width: 40em) {
     .max-6-icons {
       width: 173px;
       min-width: 173px; } }
@@ -1332,7 +1356,7 @@ td.center {
     box-sizing: border-box;
     width: 100%;
     height: 63px; }
-    @media screen and (min-device-width: 40em) {
+    @media screen and (min-width: 40em) {
       .filter-control input[type="text"], .filter-control input[type="password"], .filter-control select {
         height: 25px; } }
 
@@ -1358,10 +1382,10 @@ td.center {
       font-size: 43px;
       vertical-align: bottom;
       padding-top: 0px; }
-      @media screen and (min-device-width: 40em) {
+      @media screen and (min-width: 40em) {
         .pagination a.prev:before, .pagination a.next:before {
           font-size: 23px; } }
-    @media only screen and (max-device-width: 40em) {
+    @media only screen and (max-width: 40em) {
       .pagination a {
         height: auto;
         padding-left: 20px;
@@ -1400,13 +1424,13 @@ td.center {
     background-image: -o-linear-gradient(top, #f47a2d, #e35e0c);
     background-image: linear-gradient(to bottom, #f47a2d, #e35e0c);
     background-repeat: repeat-x;
-    font-size: 2em;
-    line-height: 2em;
+    font-size: 1.8em;
+    line-height: 1.8em;
     border: solid 1px #f58946;
     -webkit-box-shadow: none;
     -moz-box-shadow: none;
     box-shadow: none; }
-    @media screen and (min-device-width: 40em) {
+    @media screen and (min-width: 40em) {
       .ui-dialog .ui-state-hover, .ui-dialog .ui-state-focus {
         font-size: 1.1em;
         line-height: 1.1em; } }
@@ -1455,9 +1479,9 @@ td.center {
   display: none; }
 
 .dialog-container-template {
-  width: 200%;
+  width: 100%;
   height: 100vh; }
-  @media screen and (min-device-width: 40em) {
+  @media screen and (min-width: 40em) {
     .dialog-container-template {
       width: 600px;
       height: 450px; } }
@@ -1467,14 +1491,14 @@ td.center {
   overflow-y: auto;
   padding: 1px;
   margin-bottom: 50px;
-  width: 200% !important;
+  width: 100% !important;
   height: 100vh !important; }
-  @media only screen and (max-device-width: 40em) {
+  @media only screen and (max-width: 40em) {
     .ui-dialog {
       position: absolute;
       left: auto !important;
       top: 0 !important; } }
-  @media screen and (min-device-width: 40em) {
+  @media screen and (min-width: 40em) {
     .ui-dialog {
       width: 600px !important;
       height: 450px !important;
@@ -1482,28 +1506,25 @@ td.center {
   .ui-dialog td {
     display: block;
     padding-bottom: 5px; }
-    @media screen and (min-device-width: 40em) {
+    @media screen and (min-width: 40em) {
       .ui-dialog td {
         display: table-cell; } }
     .ui-dialog td input[type="text"], .ui-dialog td input[type="password"] {
       width: 100%; }
-      @media screen and (min-device-width: 40em) {
+      @media screen and (min-width: 40em) {
         .ui-dialog td input[type="text"], .ui-dialog td input[type="password"] {
           width: auto; } }
-    @media screen and (min-device-width: 40em) {
+    @media screen and (min-width: 40em) {
       .ui-dialog td:first-child {
         text-align: right;
         width: 120px;
         white-space: nowrap; } }
-    @media screen and (min-device-width: 40em) {
+    @media screen and (min-width: 40em) {
       .ui-dialog td:last-child input[type="text"], .ui-dialog td:last-child input[type="password"] {
         width: 100%; } }
     .ui-dialog td:last-child input.half100 {
       width: 50%;
       max-width: 100px; }
-
-.chosen-container {
-  height: 27px; }
 
 .xdsoft_datetimepicker .xdsoft_calendar td > div {
   padding: 6px; }
@@ -1525,7 +1546,8 @@ div.tagsinput span.tag {
   color: #7e7e7e;
   background: #f0f0f0;
   border: 1px solid #e4e4e4;
-  height: 25px; }
+  height: 32px;
+  padding-top: 7px; }
   div.tagsinput span.tag a {
     color: #f36d15; }
 
@@ -1551,18 +1573,18 @@ body {
 
 * {
   font-family: Taoma, Arial;
-  font-size: 1.8em;
-  line-height: 1.8em; }
-  @media screen and (min-device-width: 40em) {
+  font-size: 1.6em;
+  line-height: 1.6em; }
+  @media screen and (min-width: 40em) {
     * {
       font-size: 1em;
       line-height: 1em; } }
 
 .h1 {
   font-weight: normal;
-  font-size: 2.2em;
-  line-height: 2.2em; }
-  @media screen and (min-device-width: 40em) {
+  font-size: 2em;
+  line-height: 2em; }
+  @media screen and (min-width: 40em) {
     .h1 {
       font-size: 1.4em;
       line-height: 1.4em; } }
@@ -1571,52 +1593,50 @@ body {
 
 .h2 {
   font-weight: normal;
-  font-size: 2em;
-  line-height: 2em; }
-  @media screen and (min-device-width: 40em) {
+  font-size: 1.8em;
+  line-height: 1.8em; }
+  @media screen and (min-width: 40em) {
     .h2 {
       font-size: 1.1em;
       line-height: 1.1em; } }
 
 a, button.actions_button:before {
-  font-size: 1.8em;
-  line-height: 1.8em; }
-  @media screen and (min-device-width: 40em) {
+  font-size: 1.6em;
+  line-height: 1.6em; }
+  @media screen and (min-width: 40em) {
     a, button.actions_button:before {
       font-size: 1em;
       line-height: 1em; } }
 
 label {
-  display: block;
-  margin-bottom: 4px;
-  font-size: 1.4em;
-  line-height: 1.4em; }
-  @media screen and (min-device-width: 40em) {
+  font-size: 1.2em;
+  line-height: 1.2em; }
+  @media screen and (min-width: 40em) {
     label {
       font-size: 0.8em;
       line-height: 0.8em; } }
 
 .chosen-container {
-  font-size: 1.8em;
-  line-height: 1.8em; }
-  @media screen and (min-device-width: 40em) {
+  font-size: 1.6em;
+  line-height: 1.6em; }
+  @media screen and (min-width: 40em) {
     .chosen-container {
       font-size: 1em;
       line-height: 1em; } }
 
-@media only screen and (max-device-width: 40em) {
+@media only screen and (max-width: 40em) {
   input[type="text"] {
-    font-size: 2.2em;
-    line-height: 2.2em; }
-    @media screen and (min-device-width: 40em) {
+    font-size: 2em;
+    line-height: 2em; }
+    @media screen and (min-width: 40em) {
       input[type="text"] {
         font-size: 1.4em;
         line-height: 1.4em; } } }
 
 .details-block .details-item {
-  font-size: 2em;
-  line-height: 2em; }
-  @media screen and (min-device-width: 40em) {
+  font-size: 1.8em;
+  line-height: 1.8em; }
+  @media screen and (min-width: 40em) {
     .details-block .details-item {
       font-size: 1.1em;
       line-height: 1.1em; } }
@@ -1624,50 +1644,50 @@ label {
 .details-block .details-item {
   font-weight: normal; }
   .details-block .details-item .indented-data {
-    font-size: 1.8em;
-    line-height: 1.8em;
+    font-size: 1.6em;
+    line-height: 1.6em;
     font-weight: bold; }
-    @media screen and (min-device-width: 40em) {
+    @media screen and (min-width: 40em) {
       .details-block .details-item .indented-data {
         font-size: 1em;
         line-height: 1em; } }
 
 .menu-option {
-  font-size: 2em;
-  line-height: 2em; }
-  @media screen and (min-device-width: 40em) {
+  font-size: 1.8em;
+  line-height: 1.8em; }
+  @media screen and (min-width: 40em) {
     .menu-option {
       font-size: 1.1em;
       line-height: 1.1em; } }
 
 .breadcrumbs * {
-  font-size: 1.4em;
-  line-height: 1.4em; }
-  @media screen and (min-device-width: 40em) {
+  font-size: 1.2em;
+  line-height: 1.2em; }
+  @media screen and (min-width: 40em) {
     .breadcrumbs * {
       font-size: 0.8em;
       line-height: 0.8em; } }
 
 .pagination {
-  font-size: 1.8em;
-  line-height: 1.8em; }
-  @media screen and (min-device-width: 40em) {
+  font-size: 1.6em;
+  line-height: 1.6em; }
+  @media screen and (min-width: 40em) {
     .pagination {
       font-size: 1em;
       line-height: 1em; } }
 
 .second_row {
-  font-size: 1.4em;
-  line-height: 1.4em; }
-  @media screen and (min-device-width: 40em) {
+  font-size: 1.2em;
+  line-height: 1.2em; }
+  @media screen and (min-width: 40em) {
     .second_row {
       font-size: 0.8em;
       line-height: 0.8em; } }
 
 th {
-  font-size: 1.8em;
-  line-height: 1.8em; }
-  @media screen and (min-device-width: 40em) {
+  font-size: 1.6em;
+  line-height: 1.6em; }
+  @media screen and (min-width: 40em) {
     th {
       font-size: 1em;
       line-height: 1em; } }

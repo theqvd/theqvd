@@ -40,7 +40,7 @@ Wat.Views.MainView = Backbone.View.extend({
     },
     
     events:  {
-
+        
     },
     
     extendEvents: function (ev) {
@@ -159,6 +159,9 @@ Wat.Views.MainView = Backbone.View.extend({
     bindOtherEvents: function () {         
         // Close message layer
         this.bindEvent('click', '.message-close', this.otherBinds.closeMessage);
+        
+        // Expand message
+        this.bindEvent('click', '.js-expand-message', this.otherBinds.toggleExtendedMessage);
     },
     
     bindEditorEvents: function () { 
@@ -195,6 +198,22 @@ Wat.Views.MainView = Backbone.View.extend({
                 clearTimeout(messageTimeout);
             }
             $('.message-container').slideUp(500);
+        },
+        
+        toggleExtendedMessage: function () { 
+            var extendedMessage = $(this).parent().find('article');
+            Wat.I.clearMessageInterval();
+            
+            if (extendedMessage.css('display') == 'none') {
+                $(this).removeClass('fa-plus-square-o');
+                $(this).addClass('fa-minus-square-o');
+            }
+            else {
+                $(this).removeClass('fa-minus-square-o');
+                $(this).addClass('fa-plus-square-o');
+            }
+            
+            extendedMessage.toggle();
         }
     },
     
@@ -244,7 +263,8 @@ Wat.Views.MainView = Backbone.View.extend({
             $('.expiration_row').toggle();
         },
         
-        fillDITags: function (event, selected, fillSelect) {
+        // Fill the select combo with the available tags in the disk images of an OSF
+        fillDITags: function (event) {
             var that = event.data;
             
             $('[name="di_tag"]').find('option').remove();
@@ -260,9 +280,9 @@ Wat.Views.MainView = Backbone.View.extend({
                 'nameAsId': true
             };
 
-            that.fillSelect(params);
+            Wat.A.fillSelect(params);
 
-            $('[name="di_tag"]').trigger('chosen:updated');
+            Wat.I.updateChosenControls('[name="di_tag"]');
         }
     },
 
@@ -274,23 +294,42 @@ Wat.Views.MainView = Backbone.View.extend({
             'error': 'Error creating'
         };
         
-        this.saveModel(arguments, {}, messages, function(){});
+        this.saveModel(arguments, {}, messages, this.fetchList);
     },
     
-    updateModel: function (arguments, filters) {
-        this.model.setOperation('update');
+    updateModel: function (arguments, filters, successCallback, model) {
+        // If not model is passed, use this.model
+        var model = model || this.model;
+        
+        model.setOperation('update');
         
         var messages = {
             'success': 'Successfully updated',
             'error': 'Error updating'
         };
         
-        this.saveModel(arguments, filters, messages, this.fetchDetails);
+        this.saveModel(arguments, filters, messages, successCallback, model);
     },
     
-    saveModel: function (arguments, filters, messages, successCallback) {
+    deleteModel: function (filters, successCallback, model) {
+        // If not model is passed, use this.model
+        var model = model || this.model;
+        
+        model.setOperation('delete');
+        
+        var messages = {
+            'success': 'Successfully deleted',
+            'error': 'Error deleting'
+        };
+        
+        this.saveModel({}, filters, messages, successCallback, model);
+    },
+    
+    saveModel: function (arguments, filters, messages, successCallback, model) {
+        var model = model || this.model;
+        
         var that = this;
-        this.model.save(arguments, {filters: filters}).complete(function(e) {
+        model.save(arguments, {filters: filters}).complete(function(e) {
             var callResponse = e.status;
             var response = JSON.parse(e.responseText);
             
@@ -301,50 +340,15 @@ Wat.Views.MainView = Backbone.View.extend({
                 that.messageType = 'success';
             }
             else {
-                that.message = message.e;
+                that.message = message.error;
                 that.messageType = 'error';
             }
 
-            that.dialog.dialog('close');
-            Wat.I.showMessage({message: that.message, messageType: that.messageType});
-        });
-    },
-    
-    // Fill filter selects 
-    fillSelect: function (params) {  
-        var jsonUrl = 'http://172.20.126.12:3000/?login=benja&password=benja&action=' + params.action;
-        
-        if (params.filters) {
-            jsonUrl += '&filters=' + JSON.stringify(params.filters);
-        }
-        
-        $.ajax({
-            url: jsonUrl,
-            type: 'POST',
-            async: false,
-            dataType: 'json',
-            processData: false,
-            parse: true,
-            success: function (data) {
-                $(data.result.rows).each(function(i,option) {
-                    var selected = '';
-                    
-                    var id = option.id;
-                    var name = option.name;
-                    
-                    if (params.nameAsId) {
-                        id = name;
-                    }
-                    
-                    if (params.selectedId !== undefined && params.selectedId == id) {
-                        selected = 'selected="selected"';
-                    }
-                    
-                    $('select[name="' + params.controlName + '"]').append('<option value="' + id + '" ' + selected + '>' + 
-                                                                   name + 
-                                                                   '<\/option>');
-                });
+            if (that.dialog) {
+                that.dialog.dialog('close');
             }
+            
+            Wat.I.showMessage({message: that.message, messageType: that.messageType});
         });
     }
 });

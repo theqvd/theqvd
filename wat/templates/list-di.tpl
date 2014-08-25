@@ -18,6 +18,13 @@
                             </th>
             <%
                             break;
+                        case 'info':
+            %>
+                            <th class="max-4-icons">
+                                <i class="fa sort-icon" data-i18n="Info"><%= i18n.t('Info') %></i>
+                            </th>
+            <%
+                            break;
                         case 'id':
             %>
                             <th class="sortable desktop col-width-10" data-sortby="id">
@@ -57,6 +64,13 @@
             %>
                             <th class="desktop col-width-12" data-sortby="head">
                                 <i class="fa sort-icon" data-i18n="Head"><%= i18n.t('Head') %></i>
+                            </th>
+            <%
+                            break;
+                        case 'tenant':
+            %>
+                            <th class="sortable desktop" data-sortby="tenant">
+                                <i class="fa fa-sort sort-icon" data-i18n="Tenant"><%= i18n.t('Tenant') %></i>
                             </th>
             <%
                             break;
@@ -102,7 +116,38 @@
                             case 'checks':
                 %>
                                 <td>
-                                    <input type="checkbox" name="check_<%= model.get('id') %>" class="check-it js-check-it">
+                                    <input type="checkbox" class="check-it js-check-it" data-id="<%= model.get('id') %>">
+                                </td>
+                <%
+                                break;
+                            case 'info':
+                %>
+                                <td>
+                                    <%
+                                    if (model.get('tags')) {
+                                    %>
+                                        <i class="fa fa-tags" title="&raquo; <%= model.get('tags').replace(/,/g,'<br /><br />&raquo; ') %>"></i>
+                                    <%
+                                    }
+                                    
+                                    if (model.get('head')) {
+                                    %>
+                                        <i class="fa fa-flag-o" data-i18n="[title]Head" title="<%= i18n.t('Head') %>"></i>
+                                    <%
+                                    }
+                                    
+                                    if (model.get('default')) {
+                                    %>
+                                        <i class="fa fa-home" data-i18n="[title]Default" title="<%= i18n.t('Default') %>"></i>
+                                    <%
+                                    }
+                                    
+                                    if (model.get('blocked')) {
+                                    %>
+                                        <i class="fa fa-lock" data-i18n="[title]Blocked" title="<%= i18n.t('Blocked') %>"></i>
+                                    <%
+                                    }
+                                    %>
                                 </td>
                 <%
                                 break;
@@ -115,7 +160,7 @@
                                 break;
                             case 'disk_image':
                 %>
-                                <td>
+                                <td class="not-break">
                                     <a href="#/di/<%= model.get('id') %>" data-i18n="[title]Click for details">
                                         <i class="fa fa-search"></i>
                                         <%= model.get('disk_image') %>
@@ -141,45 +186,15 @@
                                 break;
                             case 'default':
                 %>
-                                <td class="desktop">
-                                    <%
-                                    if (!model.get('default')) {
-                                    %>
-                                        <span data-i18n="No">
-                                            <%= i18n.t('No') %>
-                                        </span>
-                                    <%
-                                    }
-                                    else {
-                                    %>
-                                        <span data-i18n="Yes">
-                                            <%= i18n.t('Yes') %>
-                                        </span>
-                                    <%
-                                    }
-                                    %>
+                                <td class="desktop center">
+                                    <input type="radio" data-di_id="<%= model.get('id') %>" name="di_default" <%= model.get('default') ? 'checked': '' %> value="0">
                                 </td>
                 <%
                                 break;
-                            case 'head':
+                            case 'tenant':
                 %>
                                 <td class="desktop">
-                                    <%
-                                    if (!model.get('head')) {
-                                    %>
-                                        <span data-i18n="No">
-                                            <%= i18n.t('No') %>
-                                        </span>
-                                    <%
-                                    }
-                                    else {
-                                    %>
-                                        <span data-i18n="Yes">
-                                            <%= i18n.t('Yes') %>
-                                        </span>
-                                    <%
-                                    }
-                                    %>
+                                    <%= model.get('tenant_name') %>
                                 </td>
                 <%
                                 break;

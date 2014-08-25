@@ -102,7 +102,7 @@
                             case 'checks':
                 %>
                                 <td>
-                                    <input type="checkbox" name="check_<%= model.get('id') %>" class="check-it js-check-it">
+                                    <input type="checkbox" class="check-it js-check-it" data-id="<%= model.get('id') %>">
                                 </td>
                 <%
                                 break;
@@ -112,19 +112,18 @@
                                     <% 
                                     if (model.get('blocked')) {
                                     %>
-                                        <i class="fa fa-warning icon-warning"></i>
-                                        <i class="fa fa-lock" data-i18n="[title]Blocked"></i>
+                                        <i class="fa fa-lock" data-i18n="[title]Blocked" title="<%= i18n.t('Blocked') %>"></i>
                                     <%
                                     }
  
                                     if (model.get('state') == 'stopped') {
                                     %>
-                                        <i class="fa fa-pause icon-pause" title="Stopped Virtual machine" data-i18n="[title]Stopped"></i>
+                                        <i class="fa fa-pause icon-pause" data-i18n="[title]Stopped" title="<%= i18n.t('Stopped') %>"></i>
                                     <%
                                     }
                                     else {
                                     %>
-                                        <i class="fa fa-play icon-play" data-i18n="[title]Running"></i>
+                                        <i class="fa fa-play icon-play" data-i18n="[title]Running" title="<%= i18n.t('Running') %>"></i>
                                     <%
                                     }
                                     %>

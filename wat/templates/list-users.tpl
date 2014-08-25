@@ -46,6 +46,13 @@
                             </th>
             <%
                             break;
+                        case 'tenant':
+            %>
+                            <th class="sortable desktop" data-sortby="tenant">
+                                <i class="fa fa-sort sort-icon" data-i18n="Tenant"><%= i18n.t('Tenant') %></i>
+                            </th>
+            <%
+                            break;
                         default:
                             var translationAttr = 'data-i18n="' + col.name + '"';
                             if (col.noTranslatable === true) {
@@ -88,7 +95,7 @@
                             case 'checks':
                 %>
                                 <td>
-                                    <input type="checkbox" name="check_<%= model.get('id') %>" class="check-it js-check-it">
+                                    <input type="checkbox" class="check-it js-check-it" data-id="<%= model.get('id') %>">
                                 </td>
                 <%
                                 break;
@@ -98,7 +105,7 @@
                                     <% 
                                     if (model.get('blocked')) {
                                     %>
-                                        <i class="fa fa-lock" data-i18n="[title]Blocked"></i>
+                                        <i class="fa fa-lock" data-i18n="[title]Blocked" title="<%= i18n.t('Blocked') %>"></i>
                                     <%
                                     }
                                     %>
@@ -128,6 +135,13 @@
                                     <%= model.get('startedVMs') %>
                                     /
                                     <%= model.get('vms') %>
+                                </td>
+                <%
+                                break;
+                            case 'tenant':
+                %>
+                                <td class="desktop">
+                                    <%= model.get('tenant_name') %>
                                 </td>
                 <%
                                 break;

@@ -141,6 +141,8 @@ Wat.Views.VMListView = Wat.Views.ListView.extend({
                 'display': false
             }
         ];
+        
+        Wat.Views.ListView.prototype.setColumns.apply(this);
     },
     
     setSelectedActions: function () {
@@ -181,25 +183,33 @@ Wat.Views.VMListView = Wat.Views.ListView.extend({
         }
     },
     
-    newElement: function (e) {
+    openNewElementDialog: function (e) {
         this.model = new Wat.Models.VM();
         
         this.dialogConf.title = $.i18n.t('New Virtual machine');
-        Wat.Views.ListView.prototype.newElement.apply(this, [e]);
+        Wat.Views.ListView.prototype.openNewElementDialog.apply(this, [e]);
+        
+        // Fill OSF select on virtual machines creation form
+        var params = {
+            'action': 'user_tiny_list',
+            'selectedId': '',
+            'controlName': 'user_id'
+        };
+
+        Wat.A.fillSelect(params);  
+        
+        Wat.I.chosenElement('[name="user_id"]', 'advanced100');
         
         // Fill OSF select on virtual machines creation form
         var params = {
             'action': 'osf_tiny_list',
             'selectedId': '',
-            'controlName': 'osf_id',
-            'filters': {
-                'osf_id': this.model.get('osf_id')
-            }
+            'controlName': 'osf_id'
         };
 
-        this.fillSelect(params);  
+        Wat.A.fillSelect(params);  
         
-        Wat.I.chosenElement('[name="osf_id"]', 'single');
+        Wat.I.chosenElement('[name="osf_id"]', 'single100');
         
         // Fill DI Tags select on virtual machines creation form
         var params = {
@@ -212,8 +222,73 @@ Wat.Views.VMListView = Wat.Views.ListView.extend({
             'nameAsId': true
         };
 
-        this.fillSelect(params);
+        Wat.A.fillSelect(params);
         
-        Wat.I.chosenElement('[name="di_tag"]', 'single');
+        Wat.I.chosenElement('[name="di_tag"]', 'single100');
+    },
+    
+    createElement: function () {
+        Wat.Views.ListView.prototype.createElement.apply(this);
+        
+        // Properties to create, update and delete obtained from parent view
+        var properties = this.properties;
+                
+        var context = $('.' + this.cid + '.editor-container');
+
+        var blocked = context.find('input[name="blocked"][value=1]').is(':checked');
+        var user_id = context.find('select[name="user_id"]').val();
+        var osf_id = context.find('select[name="osf_id"]').val();
+        
+        var arguments = {
+            "properties" : properties.create,
+            "blocked": blocked ? 1 : 0,
+            "user_id": user_id,
+            "osf_id": osf_id
+        };
+        
+        var di_tag = context.find('select[name="di_tag"]').val();
+        
+        if (di_tag) {
+            arguments.di_tag = di_tag;
+        }
+        
+        var name = context.find('input[name="name"]').val();
+        if (!name) {
+            console.error('name empty');
+        }
+        else {
+            arguments["name"] = name;
+        }
+                
+        console.log(arguments);
+                
+        this.createModel(arguments);
+    },
+    
+    startVM: function (filters) {        
+        var messages = {
+            'success': 'Successfully started',
+            'error': 'Error starting VM'
+        }
+        
+        Wat.A.performAction ('vm_start', {}, filters, messages, this.fetchList, this);
+    },
+    
+    stopVM: function (filters) {        
+        var messages = {
+            'success': 'Successfully stopped',
+            'error': 'Error stopping VM'
+        }
+        
+        Wat.A.performAction ('vm_stop', {}, filters, messages, this.fetchList, this);
+    },
+    
+    disconnectVMUser: function (filters) {        
+        var messages = {
+            'success': 'User successfully disconnected from VM',
+            'error': 'Error disconnecting user from VM'
+        }
+        
+        Wat.A.performAction ('vm_user_disconnect', {}, filters, messages, this.fetchList, this);
     }
 });

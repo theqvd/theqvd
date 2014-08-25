@@ -41,6 +41,10 @@ a:hover {
     position: relative;
 }
 
+.center {
+    text-align: center;
+}
+
 
 fieldset {
     padding: 8px;
@@ -68,7 +72,6 @@ fieldset {
 }
 
 .h2 {
-    color: lighten($col_blacker, 40);
     margin-bottom: 14px;
 }
 

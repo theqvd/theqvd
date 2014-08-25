@@ -46,16 +46,18 @@ Wat.Views.NodeDetailsView = Wat.Views.DetailsView.extend({
         var context = $('.' + this.cid + '.editor-container');
         
         var name = context.find('input[name="name"]').val();
+        var address = context.find('input[name="address"]').val();
         var blocked = context.find('input[name="blocked"][value=1]').is(':checked');
         
         var filters = {"id": this.id};
         var arguments = {
             "properties": properties,
             "name": name,
+            "address": address,
             "blocked": blocked ? 1 : 0
         }
 
-        this.updateModel(arguments, filters);
+        this.updateModel(arguments, filters, this.fetchDetails);
     },
     
     render: function () {
@@ -75,10 +77,10 @@ Wat.Views.NodeDetailsView = Wat.Views.DetailsView.extend({
         $(this.sideContainer).html(this.template);
     },
     
-    editElement: function() {
+    openEditElementDialog: function() {
         this.dialogConf.title = $.i18n.t('Edit node') + ": " + this.model.get('name');
         
-        Wat.Views.DetailsView.prototype.editElement.apply(this);
+        Wat.Views.DetailsView.prototype.openEditElementDialog.apply(this);
     },
     
     bindEditorEvents: function() {

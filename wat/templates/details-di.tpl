@@ -19,47 +19,47 @@
         </div>
     </span>
     <span class="details-item fa fa-angle-right">
-        <span data-i18n>Default</span>
-        <div class="indented-data">
-            <%
-                if (model.get('default')) {
-            %>
-                    <span data-i18n="Yes">
-                        <%= i18n.t('Yes') %>
-                    </span>
-            <%
-                }
-                else {
-            %>
-                    <span data-i18n="No">
-                        <%= i18n.t('No') %>
-                    </span>
-            <%
-                }
-            %>
-        </div>
+        <% 
+        if (model.get('blocked')) {
+        %>
+            <i class="fa fa-lock" data-i18n>Blocked</i>
+        <%
+        }
+        else {
+        %>
+            <i class="fa fa-unlock" data-i18n>Unblocked</i>
+        <%
+        }
+        %>
     </span>
-    <span class="details-item fa fa-angle-right">
-        <span data-i18n>Head</span>
-        <div class="indented-data">
-            <%
-                if (model.get('head')) {
-            %>
-                    <span data-i18n="Yes">
-                        <%= i18n.t('Yes') %>
-                    </span>
-            <%
-                }
-                else {
-            %>
-                    <span data-i18n="No">
-                        <%= i18n.t('No') %>
-                    </span>
-            <%
-                }
-            %>
-        </div>
-    </span>
+    
+    <%
+        if (model.get('default')) {
+    %>
+            
+            <span class="details-item fa fa-angle-right">
+                <i class="fa fa-home" data-i18n>Default</i>
+            </span>
+    
+    <%
+        }
+    %>
+            
+    <%
+        if (model.get('head')) {
+    %>
+            
+            <span class="details-item fa fa-angle-right">
+                <i class="fa fa-flag-o" data-i18n>Head</i>
+                <div class="indented-data">
+                    <div class="second_row" data-i18n="Last image created on this OSF"></div>
+                </div>
+            </span>
+    
+    <%
+        }
+    %>
+    
     <span class="details-item fa fa-angle-right">
         <span data-i18n>Tags</span>
         <div class="indented-data">
@@ -72,11 +72,13 @@
         %>
             <ul class="tags">
                 <%
-                $(model.get('tags').split(',')).each( function (index, tag) {
+                if (model.get('tags')) {
+                    $(model.get('tags').split(',')).each( function (index, tag) {
                 %>
-                    <li><%= tag %></li>
+                        <li class="fa fa-tag"><%= tag %></li>
                 <%
-                });
+                    });
+                }
                 %>
             </ul>
         </div>

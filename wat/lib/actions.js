@@ -21,44 +21,78 @@ Wat.A = {
         return $('#template_' + templateName).html();
     },
     
-    performAction: function (action, filters, arguments) {
-        var baseUrl = "http://172.20.126.12:3000/?login=benja&password=benja";
-        var actions = this.getApiActions ();
-        action = actions[action];
-
-        var filters = JSON.stringify(filters);
-        var arguments = JSON.stringify(arguments);
-
-        var url = baseUrl + 
-            '&action=' + action +
-            '&filters=' + filters +
-            '&arguments=' + arguments;
-
-        var result = null;
+    performAction: function (action, arguments, filters, messages, successCallback, that) {
+        var url = Wat.C.getBaseUrl() + 
+            '&action=' + action;
+        
+        if (!$.isEmptyObject(filters)) {
+            url += '&filters=' + JSON.stringify(filters);
+        }
+        
+        if (!$.isEmptyObject(arguments)) {
+            url += '&arguments=' + JSON.stringify(arguments);
+        }
         
         $.ajax({
             url: url,
+            type: 'POST',
+            dataType: 'json',
+            processData: false,
+            parse: true,
+            success: function (data) {
+                if (data.status == 0) {
+                    successCallback(that);
+
+                    that.message = messages.success;
+                    that.messageType = 'success';
+                }
+                else {
+                    that.message = messages.error;
+                    that.messageType = 'error';
+                }
+
+                Wat.I.showMessage({message: that.message, messageType: that.messageType});
+                
+                successCallback(that);
+            }
+        });
+    },
+    
+    // Fill filter selects 
+    fillSelect: function (params) {  
+        var jsonUrl = Wat.C.getBaseUrl() + '&action=' + params.action;
+        
+        if (params.filters) {
+            jsonUrl += '&filters=' + JSON.stringify(params.filters);
+        }
+        
+        $.ajax({
+            url: jsonUrl,
             type: 'POST',
             async: false,
             dataType: 'json',
             processData: false,
             parse: true,
             success: function (data) {
-                result = data;
+                $(data.result.rows).each(function(i,option) {
+                    var selected = '';
+                    
+                    var id = option.id;
+                    var name = option.name;
+                    
+                    if (params.nameAsId) {
+                        id = name;
+                    }
+                    
+                    if (params.selectedId !== undefined && params.selectedId == id) {
+                        selected = 'selected="selected"';
+                    }
+                    
+                    $('select[name="' + params.controlName + '"]').append('<option value="' + id + '" ' + selected + '>' + 
+                                                                   name + 
+                                                                   '<\/option>');
+                });
             }
         });
-        
-        return result;
-    },
-
-    getApiActions: function () {
-        return {
-            'update_user': 'user_update_custom',
-            'update_vm': 'vm_update_custom',
-            'update_node': 'host_update_custom',
-            'update_osf': 'osf_update_custom',
-            'update_di': 'di_update_custom',
-            'create_user': 'user_create'
-        };
     }
 };

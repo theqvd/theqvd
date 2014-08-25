@@ -67,6 +67,13 @@
                             </th>
             <%
                             break;
+                        case 'tenant':
+            %>
+                            <th class="sortable desktop" data-sortby="tenant">
+                                <i class="fa fa-sort sort-icon" data-i18n="Tenant"><%= i18n.t('Tenant') %></i>
+                            </th>
+            <%
+                            break;
                         default:
             %>
                             <th class="sortable desktop" data-sortby="<%= col.name %>">
@@ -105,7 +112,7 @@
                             case 'checks':
                 %>
                                 <td>
-                                    <input type="checkbox" name="check_<%= model.get('id') %>" class="check-it js-check-it">
+                                    <input type="checkbox" class="check-it js-check-it" data-id="<%= model.get('id') %>">
                                 </td>
                 <%
                                 break;
@@ -120,19 +127,19 @@
                                     }
                                     else {
                                     %>
-                                        <i class="fa fa-play icon-play" data-i18n="[title]Running"></i>
+                                        <i class="fa fa-play icon-play" data-i18n="[title]Running" title="<%= i18n.t('Running') %>"></i>
                                     <%
                                     }
                                     
                                     if (model.get('blocked')) {
                                     %>
-                                        <i class="fa fa-lock" data-i18n="[title]Blocked"></i>
+                                        <i class="fa fa-lock" data-i18n="[title]Blocked" title="<%= i18n.t('Blocked') %>"></i>
                                     <%
                                     }
                                     
                                     if (model.get('expiration_soft') || model.get('expiration_hard')) {
                                     %>
-                                        <i class="fa fa-clock-o icon-info" data-i18n="[title]This virtual machine will expire"></i>
+                                        <i class="fa fa-clock-o icon-info" data-i18n="[title]This virtual machine will expire" title="<%= i18n.t('This virtual machine will expire') %>"></i>
                                     <%
                                     }
                                     %>
@@ -190,6 +197,13 @@
                 %>
                                 <td class="desktop">
                                     <%= model.get('di_tag') %>
+                                </td>
+                <%
+                                break;
+                            case 'tenant':
+                %>
+                                <td class="desktop">
+                                    <%= model.get('tenant_name') %>
                                 </td>
                 <%
                                 break;

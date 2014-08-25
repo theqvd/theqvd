@@ -3,7 +3,6 @@ Wat.Models.Model = Backbone.Model.extend({
     id: 0,
     url: "",
     detailsView: false,
-    baseUrl: "http://172.20.126.12:3000/?login=benja&password=benja",
     operation: '',
     
     parse: function(response) {
@@ -22,7 +21,7 @@ Wat.Models.Model = Backbone.Model.extend({
     },
     
     getDetailsUrl: function () {
-        return this.baseUrl + 
+        return Wat.C.getBaseUrl() + 
             "&action=" + this.actionPrefix + "_get_details" + 
             "&filters={\"id\":" + this.id + "}";
     },
@@ -34,6 +33,9 @@ Wat.Models.Model = Backbone.Model.extend({
                 break;
             case 'update':
                 this.operation = this.actionPrefix + "_update_custom";
+                break;
+            case 'delete':
+                this.operation = this.actionPrefix + "_delete";
                 break;
         }
     },
@@ -54,7 +56,7 @@ Wat.Models.Model = Backbone.Model.extend({
     
     save: function(attributes, options) {        
         options = {
-            url: this.baseUrl + 
+            url: Wat.C.getBaseUrl() + 
                 "&action=" + this.operation +
                 "&filters=" + JSON.stringify(options.filters) + 
                 "&arguments=" + JSON.stringify(attributes)

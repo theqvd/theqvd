@@ -1,7 +1,0 @@
-{
-  "version": 3,
-  "file": "",
-  "sources": ["_layout-editor.scss"],
-  "names": [],
-  "mappings": "AAAA;EACI,QAAQ;EAAZ,kBAAkB;IAEV,OAAO;IACP,gBAAgB;IAChB,iBAAiB;IAAzB,kBAAkB,cAAc,EAAE;MAGtB,aAAa;IACzB,kBAAkB,cAAc,EAAE,GAAG;MAGzB,cAAc"
-}

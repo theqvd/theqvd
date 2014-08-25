@@ -16,10 +16,8 @@ $bg_body : $col_whiter;
 // Wrapper
 $min_width_wrapper : 960px;
 $max_width_wrapper : 1280px;
-$min_width_mobile : 20em;
 $min_width_mobile : 0px;
 $max_width_mobile : 40em;
-$max_width_mobile2 : 1024px;
 
 // Radius
 $form_elements_radius : 4px;
@@ -48,9 +46,9 @@ $other_properties_width: 50;
 // Dialog
 $dialog_width: 600px;
 $dialog_height: 450px;
-$dialog_mobile_width: 200%;
+$dialog_mobile_width: 100%;
 $dialog_mobile_height: 100vh;
 
 // Fonts
 $font-sizes: 0.8 1 1.1 1.4;
-$font-sizes-mobile: 1.4 1.8 2 2.2;
+$font-sizes-mobile: 1.2 1.6 1.8 2;

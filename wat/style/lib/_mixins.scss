@@ -14,21 +14,10 @@
 @mixin width-wrapper {
     min-width: $min_width_mobile;
     max-width: $max_width_mobile;
-    width: 200%;
 
     @include in(desktop) {
         min-width: $min_width_wrapper;
         max-width: $max_width_wrapper;
-        width: 100%;
-    }
-}
-
-// Layout percentage
-@mixin width-percentage {
-    width: 200%;
-
-    @include in(desktop) {
-        width: 100%;
     }
 }
 
@@ -36,13 +25,13 @@
 @mixin in($media) {
     @if $media == desktop {
         //@media screen and (min-width: $max_width_mobile) {
-        @media screen and (min-device-width : $max_width_mobile) {
+        @media screen and (min-width : $max_width_mobile) {
             @content;
         }
     }
     @else if $media == mobile {
         //@media screen and (max-width: $max_width_mobile) {
-        @media only screen and (max-device-width : $max_width_mobile) {
+        @media only screen and (max-width : $max_width_mobile) {
             @content;
         }
     }

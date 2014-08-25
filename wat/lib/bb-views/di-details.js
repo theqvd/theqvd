@@ -50,19 +50,30 @@ Wat.Views.DIDetailsView = Wat.Views.DetailsView.extend({
         var tags = context.find('input[name="tags"]').val();
         var def = context.find('input[name="default"][value=1]').is(':checked');
         
-        if (def) {
+        // If we set default (only if the DI wasn't default), add this tag
+        if (def && !this.model.get('default')) {
             tags += ',default';
         }
+        
+        var baseTags = this.model.attributes.tags ? this.model.attributes.tags.split(',') : [];
+        var newTags = tags ? tags.split(',') : [];
+        var keepedTags = _.intersection(baseTags, newTags);
+        
+        var createdTags = _.difference(newTags, keepedTags);
+        var deletedTags = _.difference(baseTags, keepedTags);
         
         var filters = {"id": this.id};
         var arguments = {
             "properties": properties,
             "blocked": blocked ? 1 : 0,
-            "tags": tags,
+            "tags": {
+                'create': createdTags,
+                'delete': deletedTags
+            },
             
         };
-          
-        this.updateModel(arguments, filters);
+        
+        this.updateModel(arguments, filters, this.fetchDetails);
     },
     
     render: function () {
@@ -82,10 +93,10 @@ Wat.Views.DIDetailsView = Wat.Views.DetailsView.extend({
         $(this.sideContainer).html(this.template);
     },
     
-    editElement: function(e) {
+    openEditElementDialog: function(e) {
         this.dialogConf.title = $.i18n.t('Disk image') + ": " + this.model.get('disk_image');
         
-        Wat.Views.DetailsView.prototype.editElement.apply(this, [e]);
+        Wat.Views.DetailsView.prototype.openEditElementDialog.apply(this, [e]);
         
         // Configure tags inputs
         Wat.I.tagsInputConfiguration();

@@ -1,17 +1,19 @@
 <div class="<%= cid %>">
     <div class="list-navigation">
-        <% if (listActionButton !== null) { %>
-            <div class="action-new-item">
-                <a class="js-traductable_button js-button-new actions_button button fa fa-plus-circle" name="<%= listActionButton.name %>" href="<%= listActionButton.link %>" data-i18n>
-                    <%= listActionButton.value %>
-                </a>
-            </div>
-        <% } %>
         <div class="filter-mobile mobile">
             <% 
                 _.each(formFilters, function(filter) { 
-                    switch(filter.mobile) {
-                        case true:
+                    if (!filter.mobile) {
+                        return;
+                    }
+                    
+                    var translationAttr = 'data-i18n';
+                    if (filter.noTranslatable === true) {
+                        translationAttr = '';
+                    }
+                    
+                    switch(filter.type) {
+                        case 'text':
                             %>
                                 <span class="filter-control">
                                 <label for="<%= filter.name %>" data-i18n><%= filter.label %></label>
@@ -19,10 +21,35 @@
                                 </span>
                             <%
                             break;
+                        case 'select':
+                            %>
+                                <span class="filter-control desktop">
+                                    <label for="<%= filter.name %>" <%= translationAttr %>><%= filter.label %></label>
+                                    <select name="<%= filter.name %>" class="<%= filter.class %>" data-filter-field="<%= filter.filterField %>">
+                                        <% _.each(filter.options, function(option) { %>
+                                            <% 
+                                                var selectedAttr = '';
+                                                if(option.selected) { 
+                                                    selectedAttr = 'selected="selected"';
+                                                }
+                                            %>
+                                            <option value="<%= option.value %>" <%= selectedAttr %> <%= translationAttr %>><%= option.text %></option>
+                                        <% }); %>
+                                    </select>
+                                </span>
+                            <%
+                            break;
                     }
                  }); 
              %>
         </div>
+        <% if (listActionButton !== null) { %>
+            <div class="action-new-item">
+                <a class="js-traductable_button js-button-new actions_button button fa fa-plus-circle" name="<%= listActionButton.name %>" href="<%= listActionButton.link %>" data-i18n>
+                    <%= listActionButton.value %>
+                </a>
+            </div>
+        <% } %>
         <div class="pagination">
             <a class="fa fa-step-backward first button2"></a>
             <a class="fa fa-caret-left prev button2"></a>

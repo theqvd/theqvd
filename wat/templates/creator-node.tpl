@@ -5,4 +5,10 @@
             <input type="text" name="name" value="">
         </td>
     </tr>
+    <tr>
+        <td data-i18n="Address"></td>
+        <td>
+            <input type="text" name="address" value="">
+        </td>
+    </tr>
  </table>

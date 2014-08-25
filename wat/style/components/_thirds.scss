@@ -139,11 +139,6 @@
     @extend %no-outline;
 }
 
-// jQuery chosen
-.chosen-container {
-    height: 27px;
-}
-
 // jQuery DateTimePicker styles
 
 .xdsoft_datetimepicker .xdsoft_calendar {
@@ -177,7 +172,8 @@ div.tagsinput span.tag {
     color: darken($col_whiter, 50);
     background: darken($col_whiter, 5);
     border: 1px solid darken($col_whiter, 10);
-    height: 25px;
+    height: 32px;
+    padding-top: 7px;
     
     a {
         color: $col_brand;

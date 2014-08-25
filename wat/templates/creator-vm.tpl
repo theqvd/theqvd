@@ -6,6 +6,12 @@
         </td>
     </tr>
     <tr>
+        <td data-i18n>User</td>
+        <td>
+            <select class="" name="user_id"></select>
+        </td>
+    </tr>
+    <tr>
         <td data-i18n>OS Flavour</td>
         <td>
             <select class="" name="osf_id"></select>

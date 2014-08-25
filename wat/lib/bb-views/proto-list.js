@@ -94,7 +94,8 @@ Wat.Views.ListView = Wat.Views.MainView.extend({
         //'keyup .filter-control input': 'filter',
         'input .filter-control input': 'filter',
         'change .filter-control select': 'filter',
-        'click .js-button-new': 'newElement'
+        'click .js-button-new': 'openNewElementDialog',
+        'click [name="selected_actions_button"]': 'applySelectedAction'
     },
     
     // Render list sorted by a column
@@ -175,7 +176,7 @@ Wat.Views.ListView = Wat.Views.MainView.extend({
         }
         else {
             this.fetchList();
-        }        
+        }
     },
     
     // Set as checked all the checkboxes of a list
@@ -187,14 +188,29 @@ Wat.Views.ListView = Wat.Views.MainView.extend({
         }
     },
     
+    setColumns: function () {
+        // The superadmin have an extra field on lists: tenant
+        
+        // Every element but the nodes has tenant
+        if (Wat.C.login == 'superadmin' && this.collection.actionPrefix != 'host') {
+            this.columns.push({
+                'name': 'tenant',
+                'display': true,
+                'noTranslatable': true
+            }
+                               );
+        }
+    },
+    
     // Fetch collection and render list
-    fetchList: function () {
-        var that = this;
-        this.collection.fetch({      
+    fetchList: function (that) {
+        var that = that || this;        
+        
+        that.collection.fetch({      
             complete: function () {
                 that.renderList(that.listContainer);
                 Wat.I.updateSortIcons(that);
-
+                Wat.I.updateChosenControls();
             }
         });
     },
@@ -273,7 +289,7 @@ Wat.Views.ListView = Wat.Views.MainView.extend({
     },    
     
     // Render only the list. Usefull to functions such as pagination, sorting and filtering where is not necessary render controls
-    renderList: function () {
+    renderList: function () {        
         // Fill the list
         var template = _.template(
             this.listTemplate, {
@@ -298,7 +314,7 @@ Wat.Views.ListView = Wat.Views.MainView.extend({
                     'controlName': filter.name
                 };
                 
-                that.fillSelect(params);
+                Wat.A.fillSelect(params);
             }
         });
     },
@@ -402,7 +418,7 @@ Wat.Views.ListView = Wat.Views.MainView.extend({
         this.fetchList();
     },
     
-    newElement: function (e) {
+    openNewElementDialog: function (e) {
         var that = this;
         
         this.dialogConf.buttons = {
@@ -421,5 +437,50 @@ Wat.Views.ListView = Wat.Views.MainView.extend({
         this.dialogConf.fillCallback = this.fillEditor;
 
         this.editorElement(e);
+    },
+    
+    applySelectedAction: function () {
+        var action = $('select[name="selected_actions_select"]').val();
+        var selectedIds = [];
+        $.each($('.check-it:checked'), function (iCheck, check) {
+            selectedIds.push($(check).attr('data-id'));
+        });
+        
+        var filters = {
+            id: selectedIds
+        };
+                
+        switch(action) {
+            case 'delete':
+                var auxModel = new this.collection.model();
+                this.deleteModel(filters, this.fetchList, auxModel);
+                break;
+            case 'block':
+                var auxModel = new this.collection.model();
+                this.updateModel({blocked: 1}, filters, this.fetchList, auxModel);
+                break;
+            case 'unblock':
+                var auxModel = new this.collection.model();
+                this.updateModel({blocked: 0}, filters, this.fetchList, auxModel);
+                break;
+            // Used in VMs
+            case 'start':
+                this.startVM (filters);
+                break;
+            case 'stop':
+                this.stopVM (filters);
+                break;
+            case 'disconnect':
+                this.disconnectVMUser (filters);
+                break;
+            // Used in Nodes
+            case 'stop_all':
+                // TODO
+                break;
+            // Used in Users
+            case 'disconnect_all':
+                // TODO
+                break;
+        }
     }
 });
