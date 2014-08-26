@@ -9,45 +9,44 @@ Wat.Views.UserListView = Wat.Views.ListView.extend({
             'screen': 'User list'
         }
     },
-    
-    formFilters: [
-        {
-            'name': 'name',
-            'filterField': 'name',
-            'type': 'text',
-            'label': 'Search by name',
-            'mobile': true
-        },     
-        {
-            'name': 'world',
-            'filterField': 'world',
-            'type': 'text',
-            'label': 'world',
-            'noTranslatable': true
-        },     
-        {
-            'name': 'sex',
-            'filterField': 'sex',
-            'type': 'text',
-            'label': 'sex',
-            'noTranslatable': true
-        }
-    ],
 
     initialize: function (params) {
         this.collection = new Wat.Collections.Users(params);
         
-        this.setColumns();
-        this.setSelectedActions();
-        this.setListActionButton();
-        
-        this.extendEvents(this.eventsUsers);
-
         Wat.Views.ListView.prototype.initialize.apply(this, [params]);
     },
-    
-    eventsUsers: {
         
+    // This events will be added to view events
+    listEvents: {
+        
+    },
+    
+    setFilters: function() {
+        this.formFilters = [
+                {
+                    'name': 'name',
+                    'filterField': 'name',
+                    'type': 'text',
+                    'label': 'Search by name',
+                    'mobile': true
+                },     
+                {
+                    'name': 'world',
+                    'filterField': 'world',
+                    'type': 'text',
+                    'label': 'world',
+                    'noTranslatable': true
+                },     
+                {
+                    'name': 'sex',
+                    'filterField': 'sex',
+                    'type': 'text',
+                    'label': 'sex',
+                    'noTranslatable': true
+                }
+            ];
+        
+        Wat.Views.ListView.prototype.setFilters.apply(this);
     },
     
     setColumns: function () {

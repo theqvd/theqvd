@@ -94,18 +94,5 @@ Wat.Views.UserDetailsView = Wat.Views.DetailsView.extend({
         this.dialogConf.title = $.i18n.t('Edit user') + ": " + this.model.get('name');
         
         Wat.Views.DetailsView.prototype.openEditElementDialog.apply(this, [e]);
-    },
-    
-    bindEditorEvents: function() {
-        Wat.Views.DetailsView.prototype.bindEditorEvents.apply(this);
-        
-        // Toggle controls for new password
-        this.bindEvent('change', 'input[name="change_password"]', this.userEditorBinds.toggleNewPassword);
-    },
-    
-    userEditorBinds: {
-        toggleNewPassword: function () {
-            $('.new_password_row').toggle();
-        }
     }
 });

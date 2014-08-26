@@ -9,61 +9,60 @@ Wat.Views.OSFListView = Wat.Views.ListView.extend({
             'screen': 'OSF list'
         }
     },
-    
-    formFilters: [
-        {
-            'name': 'name',
-            'filterField': 'name',
-            'type': 'text',
-            'label': 'Search by name',
-            'mobile': true
-        },
-        {
-            'name': 'vm',
-            'filterField': 'vm_id',
-            'type': 'select',
-            'label': 'Virtual machine',
-            'class': 'chosen-advanced',
-            'fillable': true,
-            'options': [
-                {
-                    'value': -1,
-                    'text': 'All',
-                    'selected': true
-                }
-                        ]
-        },
-        {
-            'name': 'di',
-            'filterField': 'di_id',
-            'type': 'select',
-            'label': 'Disk image',
-            'class': 'chosen-advanced',
-            'fillable': true,
-            'options': [
-                {
-                    'value': -1,
-                    'text': 'All',
-                    'selected': true
-                }
-                        ]
-        }
-    ],
 
     initialize: function (params) {
         this.collection = new Wat.Collections.OSFs(params);
         
-        this.setColumns();
-        this.setSelectedActions();
-        this.setListActionButton();
-        
-        this.extendEvents(this.eventsOSFs);
-
         Wat.Views.ListView.prototype.initialize.apply(this, [params]);
     },
     
-    eventsOSFs: {
+    // This events will be added to view events
+    listEvents: {
         
+    },
+    
+    setFilters: function() {
+        this.formFilters = [
+                {
+                    'name': 'name',
+                    'filterField': 'name',
+                    'type': 'text',
+                    'label': 'Search by name',
+                    'mobile': true
+                },
+                {
+                    'name': 'vm',
+                    'filterField': 'vm_id',
+                    'type': 'select',
+                    'label': 'Virtual machine',
+                    'class': 'chosen-advanced',
+                    'fillable': true,
+                    'options': [
+                        {
+                            'value': -1,
+                            'text': 'All',
+                            'selected': true
+                        }
+                                ]
+                },
+                {
+                    'name': 'di',
+                    'filterField': 'di_id',
+                    'type': 'select',
+                    'label': 'Disk image',
+                    'class': 'chosen-advanced',
+                    'fillable': true,
+                    'options': [
+                        {
+                            'value': -1,
+                            'text': 'All',
+                            'selected': true
+                        }
+                                ]
+                }
+            ];
+        
+        Wat.Views.ListView.prototype.setFilters.apply(this);
     },
     
     setColumns: function () {

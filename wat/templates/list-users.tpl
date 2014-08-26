@@ -20,7 +20,7 @@
                             break;
                         case 'info':
             %>
-                            <th class="max-2-icons">
+                            <th class="desktop max-1-icons">
                                 <i class="fa sort-icon" data-i18n="Info"><%= i18n.t('Info') %></i>
                             </th>
             <%
@@ -84,8 +84,14 @@
         <%
         }
         _.each(models, function(model) { %>
-            <tr>
+            <tr class="row-<%= model.get('id') %>">
                 <% 
+                    var info = '';
+                    
+                    if (model.get('blocked')) {
+                        info += '<i class="fa fa-lock" data-i18n="[title]Blocked" title="' + i18n.t('Blocked') + '"></i>';
+                    }
+                                    
                     _.each(columns, function(col) {
                         if (col.display == false) {
                             return;
@@ -101,14 +107,8 @@
                                 break;
                             case 'info':
                 %>
-                                <td>
-                                    <% 
-                                    if (model.get('blocked')) {
-                                    %>
-                                        <i class="fa fa-lock" data-i18n="[title]Blocked" title="<%= i18n.t('Blocked') %>"></i>
-                                    <%
-                                    }
-                                    %>
+                                <td class="desktop">
+                                    <%= info %>
                                 </td>
                 <%
                                 break;
@@ -121,11 +121,14 @@
                                 break;
                             case 'name':
                 %>
-                                <td>
+                                <td class="js-name">
                                     <a href="#/user/<%= model.get('id') %>" data-i18n="[title]Click for details">
                                         <i class="fa fa-search"></i>
-                                        <%= model.get('name') %>
+                                        <span class="text"><%= model.get('name') %></span>
                                     </a>
+                                    <div class="mobile info-in-name-cell">
+                                        <%= info %>
+                                    </div>
                                 </td>
                 <%
                                 break;

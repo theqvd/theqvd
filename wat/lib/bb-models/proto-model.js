@@ -6,12 +6,29 @@ Wat.Models.Model = Backbone.Model.extend({
     operation: '',
     
     parse: function(response) {
-            if (this.detailsView) {
-                return response.result.rows[0];
+        if (response.result) {
+            if (response.result.rows) {
+                var view = 'detail';
             }
             else {
-                return response;
+                var view = 'error';
             }
+        }
+        else {
+            var view = 'list';
+        }
+                
+        switch (view) {
+            case 'detail':
+                return response.result.rows[0];
+                break;
+            case 'list':
+                return response;
+                break;
+            case 'error':
+                Wat.I.showMessage({messageType: 'error'}, response);
+                break;
+        }
     },
     
     initialize: function (params) {
@@ -40,9 +57,7 @@ Wat.Models.Model = Backbone.Model.extend({
         }
     },
     
-    sync: function(method, model, options) {
-        this.detailsView = true;
-        
+    sync: function(method, model, options) {        
         var that = this;
         var params = _.extend({
             type: 'POST',

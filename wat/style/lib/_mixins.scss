@@ -64,7 +64,7 @@
     @include linear-gradient($col_back);
 
     background-repeat: repeat-x;
-    @include font-size(3);
+
     border: solid 1px lighten($col_brand, 10);
 
     -webkit-box-shadow: none;
@@ -109,7 +109,7 @@
     @include linear-gradient(lighten($col_back, 30));
 
     background-repeat: repeat-x;
-    @include font-size(3);
+    
     border: solid 1px darken($col_whiter, 10);
 
     -webkit-box-shadow: none;

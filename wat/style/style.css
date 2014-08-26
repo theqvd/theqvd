@@ -80,7 +80,10 @@ table {
   box-sizing: border-box; }
 
 :focus {
-  box-shadow: 1 1 1px 0px #f36d15; }
+  box-shadow: 1 1 1px 0px #cb540a; }
+
+strong, .strong {
+  font-weight: bold; }
 
 /********************************************************************
 *********************************************************************
@@ -96,7 +99,7 @@ body {
   background: #fdfdfd; }
 
 a {
-  color: #f36d15;
+  color: #cb540a;
   text-decoration: none;
   font-weight: bold; }
   a i.hover {
@@ -119,7 +122,7 @@ a:hover i:before {
 
 fieldset {
   padding: 8px;
-  border: 1px solid #fde6d7;
+  border: 1px solid #fac7a7;
   border-radius: 6px; }
   fieldset legend {
     color: #909090;
@@ -138,6 +141,9 @@ fieldset {
 
 .center {
   text-align: center; }
+
+.uppercase {
+  text-transform: uppercase; }
 
 .ok {
   color: #009900; }
@@ -174,7 +180,7 @@ fieldset {
     padding: 8px 12px 8px 12px;
     background: #fdfdfd;
     color: #222222;
-    border: 1px solid #f8a876;
+    border: 1px solid #f58946;
     cursor: pointer; }
     @media screen and (min-width: 40em) {
       .menu > ul .menu-option {
@@ -204,7 +210,7 @@ fieldset {
         margin-bottom: -2px;
         margin-top: 1px; } }
   .menu > ul .menu-option--selected, .menu > ul .menu-option:hover {
-    background: #f36d15;
+    background: #cb540a;
     color: #fdfdfd;
     border: 1px solid transparent; }
   .menu > ul .menu-option--selected {
@@ -230,7 +236,7 @@ fieldset {
     position: relative;
     cursor: default; }
     .menu-corner > ul > li > ul {
-      border: solid 1px #fac7a7;
+      border: solid 1px #f8a876;
       background: #fdfdfd;
       opacity: 0.9;
       display: none;
@@ -247,7 +253,7 @@ fieldset {
         .menu-corner > ul > li > ul > li span:hover {
           font-weight: bold;
           color: #fdfdfd;
-          background: #f36d15; }
+          background: #cb540a; }
       .menu-corner > ul > li > ul > li:last-child span {
         border-bottom-left-radius: 7px;
         border-bottom-right-radius: 7px; }
@@ -328,14 +334,8 @@ select {
 
 .actions_button, select[name="selected_actions_select"] {
   width: 100%;
-  height: 60px;
-  font-size: 1.8em;
-  line-height: 1.8em;
+  height: 35px;
   border: 1px solid #cacaca; }
-  @media screen and (min-width: 40em) {
-    .actions_button, select[name="selected_actions_select"] {
-      font-size: 1.1em;
-      line-height: 1.1em; } }
   @media screen and (min-width: 40em) {
     .actions_button, select[name="selected_actions_select"] {
       width: auto;
@@ -347,14 +347,13 @@ select {
 
 input, .button, .button2 {
   padding: 4px 8px;
-  line-height: 25px;
-  border: 1px solid #cacaca; }
+  line-height: 30px; }
+  @media screen and (min-width: 40em) {
+    input, .button, .button2 {
+      line-height: 15px; } }
 
 input {
   line-height: 20px; }
-
-.button, .button2 {
-  line-height: 25px; }
 
 select, input, .button, .button2 {
   border-radius: 4px;
@@ -366,8 +365,8 @@ select, input, .button, .button2 {
   box-shadow: inset 1px 1px 1px 0px #dddddd; }
 
 input[type="checkbox"], input[type="radio"] {
-  width: 28px;
-  height: 28px;
+  width: 20px;
+  height: 20px;
   box-shadow: none;
   border-width: 0; }
   @media screen and (min-width: 40em) {
@@ -382,7 +381,7 @@ input[type="checkbox"], input[type="radio"] {
 
 .chosen-container-single .chosen-single {
   height: 25px;
-  line-height: 25px;
+  line-height: 20px;
   margin-top: -2px;
   background-color: #f0f0f0;
   background-image: -moz-linear-gradient(top, #ffffff, #f0f0f0);
@@ -392,7 +391,7 @@ input[type="checkbox"], input[type="radio"] {
   background-image: linear-gradient(to bottom, #ffffff, #f0f0f0); }
 
 .chosen-container .chosen-results li.highlighted {
-  background-color: #f36d15;
+  background-color: #cb540a;
   background-image: none; }
 
 .chosen-container * {
@@ -414,23 +413,17 @@ input[type="checkbox"], input[type="radio"] {
 
 a.button, button.button {
   color: #fdfdfd;
-  background-color: #e35e0c;
-  background-image: -moz-linear-gradient(top, #f47a2d, #e35e0c);
-  background-image: -webkit-gradient(linear, 0 0, 0 100%, from(#f47a2d), to(#e35e0c));
-  background-image: -webkit-linear-gradient(top, #f47a2d, #e35e0c);
-  background-image: -o-linear-gradient(top, #f47a2d, #e35e0c);
-  background-image: linear-gradient(to bottom, #f47a2d, #e35e0c);
+  background-color: #b24a09;
+  background-image: -moz-linear-gradient(top, #e35e0c, #b24a09);
+  background-image: -webkit-gradient(linear, 0 0, 0 100%, from(#e35e0c), to(#b24a09));
+  background-image: -webkit-linear-gradient(top, #e35e0c, #b24a09);
+  background-image: -o-linear-gradient(top, #e35e0c, #b24a09);
+  background-image: linear-gradient(to bottom, #e35e0c, #b24a09);
   background-repeat: repeat-x;
-  font-size: 1.8em;
-  line-height: 1.8em;
-  border: solid 1px #f58946;
+  border: solid 1px #f36a15;
   -webkit-box-shadow: none;
   -moz-box-shadow: none;
   box-shadow: none; }
-  @media screen and (min-width: 40em) {
-    a.button, button.button {
-      font-size: 1.1em;
-      line-height: 1.1em; } }
   a.button:hover, button.button:hover {
     cursor: pointer;
     font-weight: bolder; }
@@ -440,19 +433,19 @@ a.button, button.button {
       color: #fdfdfd; }
   a.button:active, button.button:active {
     color: #f0f0f0;
-    background-color: #e35e0c;
-    background-image: -moz-linear-gradient(top, #e35e0c, #f47a2d);
-    background-image: -webkit-gradient(linear, 0 0, 0 100%, from(#e35e0c), to(#f47a2d));
-    background-image: -webkit-linear-gradient(top, #e35e0c, #f47a2d);
-    background-image: -o-linear-gradient(top, #e35e0c, #f47a2d);
-    background-image: linear-gradient(to bottom, #e35e0c, #f47a2d); }
+    background-color: #b24a09;
+    background-image: -moz-linear-gradient(top, #b24a09, #e35e0c);
+    background-image: -webkit-gradient(linear, 0 0, 0 100%, from(#b24a09), to(#e35e0c));
+    background-image: -webkit-linear-gradient(top, #b24a09, #e35e0c);
+    background-image: -o-linear-gradient(top, #b24a09, #e35e0c);
+    background-image: linear-gradient(to bottom, #b24a09, #e35e0c); }
   a.button:focus, button.button:focus {
     outline: 0; }
   a.button:before, button.button:before {
     margin-right: 10px;
     color: #fdfdfd; }
 a.button2, button.button2 {
-  color: #f36d15;
+  color: #cb540a;
   background-color: #f0f0f0;
   background-image: -moz-linear-gradient(top, #ffffff, #f0f0f0);
   background-image: -webkit-gradient(linear, 0 0, 0 100%, from(#ffffff), to(#f0f0f0));
@@ -460,25 +453,19 @@ a.button2, button.button2 {
   background-image: -o-linear-gradient(top, #ffffff, #f0f0f0);
   background-image: linear-gradient(to bottom, #ffffff, #f0f0f0);
   background-repeat: repeat-x;
-  font-size: 1.8em;
-  line-height: 1.8em;
-  border: solid 1px #f58946;
+  border: solid 1px #f36a15;
   -webkit-box-shadow: none;
   -moz-box-shadow: none;
   box-shadow: none; }
-  @media screen and (min-width: 40em) {
-    a.button2, button.button2 {
-      font-size: 1.1em;
-      line-height: 1.1em; } }
   a.button2:hover, button.button2:hover {
     cursor: pointer;
     font-weight: bolder; }
     a.button2:hover span, button.button2:hover span {
       font-weight: bold; }
     a.button2:hover:before, button.button2:hover:before {
-      color: #f36d15; }
+      color: #cb540a; }
   a.button2:active, button.button2:active {
-    color: #e35e0c;
+    color: #b24a09;
     background-color: #f0f0f0;
     background-image: -moz-linear-gradient(top, #f0f0f0, #ffffff);
     background-image: -webkit-gradient(linear, 0 0, 0 100%, from(#f0f0f0), to(#ffffff));
@@ -489,7 +476,7 @@ a.button2, button.button2 {
     outline: 0; }
   a.button2:before, button.button2:before {
     margin-right: 10px;
-    color: #f36d15; }
+    color: #cb540a; }
 a.disabled, button.disabled {
   cursor: default; }
 a.button-right, button.button-right {
@@ -505,16 +492,10 @@ a.button.disabled, a.button2.disabled, button.button.disabled, button.button2.di
   background-image: -o-linear-gradient(top, #ffffff, #f2f2f2);
   background-image: linear-gradient(to bottom, #ffffff, #f2f2f2);
   background-repeat: repeat-x;
-  font-size: 1.8em;
-  line-height: 1.8em;
   border: solid 1px #e4e4e4;
   -webkit-box-shadow: none;
   -moz-box-shadow: none;
   box-shadow: none; }
-  @media screen and (min-width: 40em) {
-    a.button.disabled, a.button2.disabled, button.button.disabled, button.button2.disabled {
-      font-size: 1.1em;
-      line-height: 1.1em; } }
   a.button.disabled:hover, a.button2.disabled:hover, button.button.disabled:hover, button.button2.disabled:hover {
     cursor: default;
     font-weight: normal; }
@@ -567,6 +548,8 @@ body {
     .header-wrapper .header .logo {
       height: 55px;
       margin: 5px 0px; }
+    .header-wrapper .header .superadmin-select {
+      margin: 10px 3px; }
 
 .loading {
   font-size: 75px;
@@ -628,7 +611,8 @@ body {
     color: #fdfdfd;
     font-weight: bold;
     z-index: 999;
-    display: none; }
+    display: none;
+    opacity: 0.8; }
     @media screen and (min-width: 40em) {
       .wrapper .message-container {
         top: -15px; } }
@@ -647,8 +631,8 @@ body {
       font-size: 20px;
       cursor: pointer; }
     .wrapper .message-container .message {
-      font-size: 1.8em;
-      line-height: 1.8em;
+      font-size: 1.5em;
+      line-height: 1.5em;
       padding-top: 10px; }
       @media screen and (min-width: 40em) {
         .wrapper .message-container .message {
@@ -656,15 +640,30 @@ body {
           line-height: 1.1em; } }
       .wrapper .message-container .message summary {
         line-height: 20px; }
-      .wrapper .message-container .message article {
+      .wrapper .message-container .message article.expandedMessage {
         display: none;
-        font-size: 1.2em;
-        line-height: 1.2em;
-        padding: 10px 30px; }
+        font-size: 1em;
+        line-height: 1em;
+        padding: 14px 30px;
+        margin-top: 10px;
+        background: #e9e9e9;
+        color: #222222;
+        margin-top: 10px;
+        margin-bottom: 10px;
+        border-radius: 4px;
+        font-weight: normal; }
         @media screen and (min-width: 40em) {
-          .wrapper .message-container .message article {
+          .wrapper .message-container .message article.expandedMessage {
             font-size: 0.8em;
             line-height: 0.8em; } }
+        .wrapper .message-container .message article.expandedMessage ul {
+          margin-top: 5px;
+          margin-left: 8px; }
+          .wrapper .message-container .message article.expandedMessage ul li {
+            margin-top: 4px;
+            display: list-item; }
+            .wrapper .message-container .message article.expandedMessage ul li:before, .wrapper .message-container .message article.expandedMessage ul li i:before {
+              margin-right: 5px; }
       .wrapper .message-container .message .expand-message {
         cursor: pointer;
         font-size: 20px;
@@ -731,14 +730,22 @@ body {
         .wrapper .content .list-block .list-navigation, .wrapper .content .details-side .list-navigation {
           margin-bottom: 0px; } }
       .wrapper .content .list-block .list-navigation .pagination, .wrapper .content .details-side .list-navigation .pagination {
-        margin-bottom: 10px; }
+        margin-bottom: 10px;
+        text-align: center; }
         @media screen and (min-width: 40em) {
           .wrapper .content .list-block .list-navigation .pagination, .wrapper .content .details-side .list-navigation .pagination {
             margin-bottom: 10px;
             padding: 0px;
             height: auto;
             width: 45%;
-            float: right; } }
+            float: right;
+            text-align: right; } }
+        .wrapper .content .list-block .list-navigation .pagination a, .wrapper .content .details-side .list-navigation .pagination a {
+          padding: 3px 10px;
+          line-height: 30px; }
+          @media screen and (min-width: 40em) {
+            .wrapper .content .list-block .list-navigation .pagination a, .wrapper .content .details-side .list-navigation .pagination a {
+              line-height: 18px; } }
       .wrapper .content .list-block .list-navigation .action-new-item, .wrapper .content .details-side .list-navigation .action-new-item {
         margin-bottom: 10px;
         margin-top: -10px; }
@@ -751,6 +758,8 @@ body {
     .wrapper .content .list-block .action-selected, .wrapper .content .details-side .action-selected {
       height: 30px;
       margin-top: 10px; }
+      .wrapper .content .list-block .action-selected .chosen-container, .wrapper .content .details-side .action-selected .chosen-container {
+        margin-top: -6px; }
     .wrapper .content .details-side {
       display: none;
       margin-bottom: 15px;
@@ -817,8 +826,8 @@ body {
         width: 49%;
         text-align: center;
         display: inline-block;
-        font-size: 1.8em;
-        line-height: 1.8em; }
+        font-size: 1.5em;
+        line-height: 1.5em; }
         @media screen and (min-width: 40em) {
           .wrapper .content .remote-administration-wrapper .remote-administration-state {
             font-size: 1.1em;
@@ -861,7 +870,7 @@ body {
     .editor-container .editor-table td.fa:before {
       margin-right: 10px; }
     .editor-container .editor-table .delete-property-button {
-      color: #f36d15;
+      color: #cb540a;
       cursor: pointer; }
     .editor-container .editor-table .custom-properties td {
       position: relative; }
@@ -886,10 +895,13 @@ body {
   position: fixed;
   bottom: 0px;
   padding-top: 7px;
-  display: none; }
+  display: none;
+  vertical-align: top; }
   @media screen and (min-width: 40em) {
     .footer {
       display: block; } }
+  .footer a {
+    line-height: 14px; }
 
 .separator {
   width: 100%;
@@ -942,7 +954,7 @@ table.list, table.custom-props {
     table.list th.sortable, table.custom-props th.sortable {
       cursor: pointer; }
     table.list th.sorted, table.custom-props th.sorted {
-      background-color: #f36d15;
+      background-color: #cb540a;
       color: #fdfdfd; }
     table.list th i, table.custom-props th i {
       width: 100%;
@@ -956,6 +968,7 @@ table.list, table.custom-props {
         font-weight: normal; }
   table.list td, table.list th, table.custom-props td, table.custom-props th {
     padding: 6px 8px;
+    vertical-align: middle;
     border-right: dotted 1px #e4e4e4; }
     table.list td:last-child, table.list th:last-child, table.custom-props td:last-child, table.custom-props th:last-child {
       border-right: 0px; }
@@ -967,6 +980,9 @@ table.list, table.custom-props {
     border-bottom-left-radius: 4px; }
   table.list tr:last-child td:last-child, table.custom-props tr:last-child td:last-child {
     border-bottom-right-radius: 4px; }
+  table.list .info-in-name-cell, table.custom-props .info-in-name-cell {
+    margin-top: 8px;
+    float: right; }
 
 @media screen and (min-width: 40em) {
   table.list, table.custom-props {
@@ -1355,7 +1371,7 @@ td.center {
     -webkit-box-sizing: border-box;
     box-sizing: border-box;
     width: 100%;
-    height: 63px; }
+    height: 35px; }
     @media screen and (min-width: 40em) {
       .filter-control input[type="text"], .filter-control input[type="password"], .filter-control select {
         height: 25px; } }
@@ -1408,7 +1424,7 @@ td.center {
 .ui-dialog {
   z-index: 1002; }
   .ui-dialog .ui-dialog-titlebar {
-    background: #f36d15;
+    background: #cb540a;
     text-align: center;
     padding: 5px;
     border-bottom-left-radius: 0;
@@ -1417,23 +1433,17 @@ td.center {
       display: none; }
   .ui-dialog .ui-state-hover, .ui-dialog .ui-state-focus {
     color: #fdfdfd;
-    background-color: #e35e0c;
-    background-image: -moz-linear-gradient(top, #f47a2d, #e35e0c);
-    background-image: -webkit-gradient(linear, 0 0, 0 100%, from(#f47a2d), to(#e35e0c));
-    background-image: -webkit-linear-gradient(top, #f47a2d, #e35e0c);
-    background-image: -o-linear-gradient(top, #f47a2d, #e35e0c);
-    background-image: linear-gradient(to bottom, #f47a2d, #e35e0c);
+    background-color: #b24a09;
+    background-image: -moz-linear-gradient(top, #e35e0c, #b24a09);
+    background-image: -webkit-gradient(linear, 0 0, 0 100%, from(#e35e0c), to(#b24a09));
+    background-image: -webkit-linear-gradient(top, #e35e0c, #b24a09);
+    background-image: -o-linear-gradient(top, #e35e0c, #b24a09);
+    background-image: linear-gradient(to bottom, #e35e0c, #b24a09);
     background-repeat: repeat-x;
-    font-size: 1.8em;
-    line-height: 1.8em;
-    border: solid 1px #f58946;
+    border: solid 1px #f36a15;
     -webkit-box-shadow: none;
     -moz-box-shadow: none;
     box-shadow: none; }
-    @media screen and (min-width: 40em) {
-      .ui-dialog .ui-state-hover, .ui-dialog .ui-state-focus {
-        font-size: 1.1em;
-        line-height: 1.1em; } }
     .ui-dialog .ui-state-hover:hover, .ui-dialog .ui-state-focus:hover {
       cursor: pointer;
       font-weight: bolder; }
@@ -1443,12 +1453,12 @@ td.center {
         color: #fdfdfd; }
     .ui-dialog .ui-state-hover:active, .ui-dialog .ui-state-focus:active {
       color: #f0f0f0;
-      background-color: #e35e0c;
-      background-image: -moz-linear-gradient(top, #e35e0c, #f47a2d);
-      background-image: -webkit-gradient(linear, 0 0, 0 100%, from(#e35e0c), to(#f47a2d));
-      background-image: -webkit-linear-gradient(top, #e35e0c, #f47a2d);
-      background-image: -o-linear-gradient(top, #e35e0c, #f47a2d);
-      background-image: linear-gradient(to bottom, #e35e0c, #f47a2d); }
+      background-color: #b24a09;
+      background-image: -moz-linear-gradient(top, #b24a09, #e35e0c);
+      background-image: -webkit-gradient(linear, 0 0, 0 100%, from(#b24a09), to(#e35e0c));
+      background-image: -webkit-linear-gradient(top, #b24a09, #e35e0c);
+      background-image: -o-linear-gradient(top, #b24a09, #e35e0c);
+      background-image: linear-gradient(to bottom, #b24a09, #e35e0c); }
     .ui-dialog .ui-state-hover:focus, .ui-dialog .ui-state-focus:focus {
       outline: 0; }
     .ui-dialog .ui-state-hover:before, .ui-dialog .ui-state-focus:before {
@@ -1532,11 +1542,11 @@ td.center {
   padding-top: 6px !important; }
 
 .xdsoft_datetimepicker .xdsoft_calendar td:hover, .xdsoft_datetimepicker .xdsoft_timepicker .xdsoft_time_box > div > div:hover {
-  background: #f36d15 !important; }
+  background: #cb540a !important; }
 
 .xdsoft_datetimepicker .xdsoft_calendar td.xdsoft_default, .xdsoft_datetimepicker .xdsoft_calendar td.xdsoft_current, .xdsoft_datetimepicker .xdsoft_timepicker .xdsoft_time_box > div > div.xdsoft_current, .xdsoft_datetimepicker .xdsoft_label > .xdsoft_select > div > .xdsoft_option.xdsoft_current {
-  background: #9a4008;
-  box-shadow: #6a2c05 0px 1px 3px 0px inset; }
+  background: #6a2c05;
+  box-shadow: #391803 0px 1px 3px 0px inset; }
 
 div.tagsinput input {
   min-width: 80px;
@@ -1549,7 +1559,7 @@ div.tagsinput span.tag {
   height: 32px;
   padding-top: 7px; }
   div.tagsinput span.tag a {
-    color: #f36d15; }
+    color: #cb540a; }
 
 div.tagsinput span.tag a {
   font-size: 14px; }
@@ -1572,9 +1582,9 @@ body {
   font-size: small; }
 
 * {
-  font-family: Taoma, Arial;
-  font-size: 1.6em;
-  line-height: 1.6em; }
+  font-family: FontAwesome !important;
+  font-size: 1.3em;
+  line-height: 1.3em; }
   @media screen and (min-width: 40em) {
     * {
       font-size: 1em;
@@ -1593,49 +1603,57 @@ body {
 
 .h2 {
   font-weight: normal;
-  font-size: 1.8em;
-  line-height: 1.8em; }
+  font-size: 1.5em;
+  line-height: 1.5em; }
   @media screen and (min-width: 40em) {
     .h2 {
       font-size: 1.1em;
       line-height: 1.1em; } }
 
 a, button.actions_button:before {
-  font-size: 1.6em;
-  line-height: 1.6em; }
+  font-size: 1.3em;
+  line-height: 1.3em; }
   @media screen and (min-width: 40em) {
     a, button.actions_button:before {
       font-size: 1em;
       line-height: 1em; } }
 
+a, button {
+  font-size: 1.5em;
+  line-height: 1.5em; }
+  @media screen and (min-width: 40em) {
+    a, button {
+      font-size: 1.1em;
+      line-height: 1.1em; } }
+
 label {
-  font-size: 1.2em;
-  line-height: 1.2em; }
+  font-size: 1em;
+  line-height: 1em; }
   @media screen and (min-width: 40em) {
     label {
       font-size: 0.8em;
       line-height: 0.8em; } }
 
 .chosen-container {
-  font-size: 1.6em;
-  line-height: 1.6em; }
+  font-size: 1.3em;
+  line-height: 1.3em; }
   @media screen and (min-width: 40em) {
     .chosen-container {
       font-size: 1em;
       line-height: 1em; } }
 
-@media only screen and (max-width: 40em) {
-  input[type="text"] {
-    font-size: 2em;
-    line-height: 2em; }
-    @media screen and (min-width: 40em) {
-      input[type="text"] {
-        font-size: 1.4em;
-        line-height: 1.4em; } } }
+.actions_button, select[name="selected_actions_select"] {
+  font-size: 1.3em;
+  line-height: 1.3em;
+  line-height: 1.6em; }
+  @media screen and (min-width: 40em) {
+    .actions_button, select[name="selected_actions_select"] {
+      font-size: 1em;
+      line-height: 1em; } }
 
 .details-block .details-item {
-  font-size: 1.8em;
-  line-height: 1.8em; }
+  font-size: 1.5em;
+  line-height: 1.5em; }
   @media screen and (min-width: 40em) {
     .details-block .details-item {
       font-size: 1.1em;
@@ -1644,8 +1662,8 @@ label {
 .details-block .details-item {
   font-weight: normal; }
   .details-block .details-item .indented-data {
-    font-size: 1.6em;
-    line-height: 1.6em;
+    font-size: 1.3em;
+    line-height: 1.3em;
     font-weight: bold; }
     @media screen and (min-width: 40em) {
       .details-block .details-item .indented-data {
@@ -1653,43 +1671,54 @@ label {
         line-height: 1em; } }
 
 .menu-option {
-  font-size: 1.8em;
-  line-height: 1.8em; }
+  font-size: 1.5em;
+  line-height: 1.5em; }
   @media screen and (min-width: 40em) {
     .menu-option {
       font-size: 1.1em;
       line-height: 1.1em; } }
 
 .breadcrumbs * {
-  font-size: 1.2em;
-  line-height: 1.2em; }
+  font-size: 1em;
+  line-height: 1em; }
   @media screen and (min-width: 40em) {
     .breadcrumbs * {
       font-size: 0.8em;
       line-height: 0.8em; } }
 
 .pagination {
-  font-size: 1.6em;
-  line-height: 1.6em; }
+  font-size: 1.3em;
+  line-height: 1.3em; }
   @media screen and (min-width: 40em) {
     .pagination {
       font-size: 1em;
       line-height: 1em; } }
 
 .second_row {
-  font-size: 1.2em;
-  line-height: 1.2em; }
+  font-size: 1em;
+  line-height: 1em; }
   @media screen and (min-width: 40em) {
     .second_row {
       font-size: 0.8em;
       line-height: 0.8em; } }
 
-th {
-  font-size: 1.6em;
-  line-height: 1.6em; }
+th, td * {
+  font-size: 1em;
+  line-height: 1em; }
   @media screen and (min-width: 40em) {
-    th {
-      font-size: 1em;
-      line-height: 1em; } }
+    th, td * {
+      font-size: 0.8em;
+      line-height: 0.8em; } }
+  @media screen and (min-width: 40em) {
+    th, td * {
+      font-size: 1.3em;
+      line-height: 1.3em; }
+      @media screen and (min-width: 40em) {
+        th, td * {
+          font-size: 1em;
+          line-height: 1em; } } }
+
+.footer a {
+  font-size: inherit; }
 
 /*# sourceMappingURL=style.css.map */

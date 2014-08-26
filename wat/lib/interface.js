@@ -215,16 +215,22 @@ Wat.I = {
         });     
     },
     
-    showMessage: function (msg) {
-        if (typeof messageTimeout != 'undefined') {
-            clearTimeout(messageTimeout);
-        }       
+    updateLoginOnMenu: function (login) {
+        $('.js-menu-corner').find('.login').html(login);
+    },
+    
+    // Messages
+    showMessage: function (msg, response) {
+        // Process message to set expanded message if proceeds
+        msg = this.processMessage (msg, response);
+        
+        this.clearMessageTimeout();
         
         $("html, body").animate({ scrollTop: 0 }, 200);
 
         if (msg.expandedMessage) {
             var expandIcon = '<i class="fa fa-plus-square-o expand-message js-expand-message" title="' + i18n.t('See more') + '..."></i>';
-            var expandedMessage = '<article>' + msg.expandedMessage + '</article>';
+            var expandedMessage = '<article class="expandedMessage">' + msg.expandedMessage + '</article>';
         }
         else {
             var expandIcon = '';
@@ -246,7 +252,85 @@ Wat.I = {
         }
     },
     
-    clearMessageInterval: function () {
-        clearInterval(this.messageTimeout);
+    closeMessage: function () {
+        this.clearMessageTimeout();
+        $('.js-message-container').slideUp(500);
+    },
+    
+    setMessageTimeout: function () {
+        this.clearMessageTimeout();
+        this.messageTimeout = setTimeout(function() { 
+            $('.message-close').trigger('click');
+        },3000);
+    },
+    
+    clearMessageTimeout: function () {
+        if (this.messageTimeout) {
+            clearInterval(this.messageTimeout);
+        }
+    },
+    
+    processMessage: function (msg, response) {
+        if (!response) {
+            return msg;
+        }
+        
+        if (!msg.message) {
+            msg.message = response.message;
+        }
+        
+        switch (msg.messageType) {
+            case 'error':
+                msg.expandedMessage = msg.expandedMessage || '';
+                
+                if (response.message != msg.message) {
+                    msg.expandedMessage += '<strong>' + response.message + '</strong> <br/><br/>';
+                }
+            
+                if (response.failures && !$.isEmptyObject(response.failures)) {
+                    msg.expandedMessage += this.getTextFromFailures(response.failures) + '<br/>';
+                }
+                break;
+        }
+        
+        return msg;
+    },
+    
+    getTextFromFailures: function (failures) {
+        // Group failures by text
+        var failuresByText = {};
+        $.each(failures, function(id, text) {
+            failuresByText[text] = failuresByText[text] || [];
+            failuresByText[text].push(id);
+        });
+        
+        // Get class from the icon of the selected item from menu to use it in list
+        var elementClass = $('.menu-option--selected').find('i').attr('class');
+        
+        var failuresList = '<ul>';
+        $.each(failuresByText, function(text, ids) {
+            failuresList += '<li>';
+            failuresList += '<i class="fa fa-angle-double-right strong">' + text + '</i>';
+            failuresList += '<ul>';
+            $.each(ids, function(iId, id) {
+                if ($('.list')) {
+                    var elementName = $('.list').find('tr.row-' + id).find('.js-name .text').html();
+                    if (!elementName) {
+                        elementName = '(ID: ' + id + ')';
+                    }
+                    
+                    failuresList += '<li class="' + elementClass + '">' + elementName + '</li>';
+                }
+                else {
+                    failuresList += '<li class="' + elementClass + '">' + id + '</li>';
+                }
+            });
+            failuresList += '</ul>';
+            failuresList += '</li>';
+        });
+        
+        failuresList += '</ul>';
+        
+        return failuresList;
     }
 }

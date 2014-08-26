@@ -14,7 +14,7 @@ Wat.Models.DI = Wat.Models.Model.extend({
             return {};
         }
         
-        if (this.detailsView) {
+        if (response.result) {
             var model = response.result.rows[0];
         }
         else {
@@ -25,7 +25,7 @@ Wat.Models.DI = Wat.Models.Model.extend({
             var tags = [];
             var tagHead = false;
             var tagDefault = false;
-
+            
             $(model.tags).each( function (index, tag) {
                 if (tag.tag == 'head') {
                     tagHead = true;

@@ -58,7 +58,8 @@ table.list, table.custom-props {
 
     td, th {
         padding: 6px 8px;
-        
+        vertical-align: middle;
+
         border-right: dotted 1px darken($col_whiter, 10);
 
         &:last-child {
@@ -77,6 +78,11 @@ table.list, table.custom-props {
         td:last-child {
             border-bottom-right-radius: $table_radius;
         }
+    }
+    
+    .info-in-name-cell {
+        margin-top: 8px;
+        float: right;
     }
 }
 

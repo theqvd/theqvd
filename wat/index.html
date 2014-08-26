@@ -38,11 +38,16 @@
             <link rel="stylesheet" href="lib/thirds/chosen/chosen.min.css">
 
         <!-- Own libraries -->
-            <!-- Common libraries -->
+            <!-- Constants -->
             <script type='text/javascript' src='lib/constants.js'></script>
+            
+            <!-- Main -->
             <script type='text/javascript' src='lib/qvd-wat.js'></script>
-            <script type='text/javascript' src='lib/config.js'></script>
+            
+            <!-- Libraries -->
             <script type='text/javascript' src='lib/actions.js'></script>
+            <script type='text/javascript' src='lib/binds.js'></script>
+            <script type='text/javascript' src='lib/config.js'></script>
             <script type='text/javascript' src='lib/interface.js'></script>
             <script type='text/javascript' src='lib/translations.js'></script>
            
@@ -102,7 +107,8 @@
                                     <a href="#">
                                         <span class="fa fa-book" data-i18n>Documentation</span>
                                     </a>
-                                </li>                                <li>
+                                </li>
+                                <li>
                                     <a href="#">
                                         <span class="fa fa-asterisk" data-i18n>About</span>
                                     </a>
@@ -140,7 +146,7 @@
                         <li class="menu-option">
                             <a href="#">
                                 <i class="fa fa-user"></i>
-                                <span>admin</span>
+                                <span class="login"></span>
                             </a>
                             <ul>
                                 <li>
@@ -182,8 +188,8 @@
             <div id="breadcrumbs" class="breadcrumbs desktop"></div>
             <div class="loading"><i class="fa fa-gear fa-spin"></i></div>
 
-            <div class="message-container">
-                <i class="message-close fa fa-times-circle"></i>
+            <div class="message-container js-message-container">
+                <i class="message-close js-message-close fa fa-times-circle"></i>
                 <span class="message"></span>
             </div>
             <div class="content bb-content"></div>                        

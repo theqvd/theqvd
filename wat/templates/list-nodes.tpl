@@ -91,7 +91,7 @@
         <%
         }
         _.each(models, function(model) { %>
-            <tr>
+            <tr class="row-<%= model.get('id') %>">
                 <% 
                     _.each(columns, function(col) {
                         if (col.display == false) {
@@ -110,12 +110,6 @@
                 %>
                                 <td>
                                     <% 
-                                    if (model.get('blocked')) {
-                                    %>
-                                        <i class="fa fa-lock" data-i18n="[title]Blocked" title="<%= i18n.t('Blocked') %>"></i>
-                                    <%
-                                    }
- 
                                     if (model.get('state') == 'stopped') {
                                     %>
                                         <i class="fa fa-pause icon-pause" data-i18n="[title]Stopped" title="<%= i18n.t('Stopped') %>"></i>
@@ -124,6 +118,13 @@
                                     else {
                                     %>
                                         <i class="fa fa-play icon-play" data-i18n="[title]Running" title="<%= i18n.t('Running') %>"></i>
+                                    <%
+                                    }
+                                    
+                                    
+                                    if (model.get('blocked')) {
+                                    %>
+                                        <i class="fa fa-lock" data-i18n="[title]Blocked" title="<%= i18n.t('Blocked') %>"></i>
                                     <%
                                     }
                                     %>
@@ -139,10 +140,10 @@
                                 break;
                             case 'name':
                 %>
-                                <td>
+                                <td class="js-name">
                                     <a href="#/node/<%= model.get('id') %>" data-i18n="[title]Click for details">
                                         <i class="fa fa-search"></i>
-                                        <%= model.get('name') %>
+                                        <span class="text"><%= model.get('name') %></span>
                                     </a>
                                 </td>
                 <%

@@ -101,7 +101,7 @@
         <%
         }
         _.each(models, function(model) { %>
-            <tr>
+            <tr class="row-<%= model.get('id') %>">
                 <% 
                     _.each(columns, function(col) {
                         if (col.display == false) {
@@ -155,10 +155,10 @@
                                 break;
                             case 'name':
                 %>
-                                <td>
+                                <td class="js-name">
                                     <a href="#/vm/<%= model.get('id') %>" data-i18n="[title]Click for details">
                                         <i class="fa fa-search"></i>
-                                        <%= model.get('name') %>
+                                        <span class="text"><%= model.get('name') %></span>
                                     </a>
                                 </td>
                 <%

@@ -42,6 +42,10 @@ body {
             margin: 5px 0px;
         }
         
+        .superadmin-select {
+            margin: 10px 3px;
+        }
+        
     }
 }
 
@@ -126,6 +130,8 @@ body {
         z-index: 999;
         display: none;
         
+        opacity: 0.8;
+        
         &.success {
             background: darken($col_green, 5);
         }
@@ -159,10 +165,32 @@ body {
                 line-height: 20px;
             }
             
-            article {
+            article.expandedMessage {
                 display: none;
                 @include font-size(1);
-                padding: 10px 30px;
+                padding: 14px 30px;
+                margin-top: 10px;
+                
+                background: darken($col_whiter, 8);
+                color: $col_blacker;
+                margin-top: 10px;
+                margin-bottom: 10px;
+                border-radius: 4px;
+                
+                font-weight: normal;
+                
+                ul {
+                    margin-top: 5px;
+                    margin-left: 8px;
+                    li {
+                        margin-top: 4px;
+                        display: list-item;
+                        
+                        &:before, i:before {
+                            margin-right: 5px;
+                        }
+                    }
+                }
             }
             
             .expand-message {
@@ -214,6 +242,12 @@ body {
     
     @include in(desktop) {
         display: block;
+    }
+    
+    vertical-align: top;
+    
+    a {
+        line-height: 14px;
     }
 }
 

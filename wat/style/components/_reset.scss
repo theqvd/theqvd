@@ -72,3 +72,7 @@ table {
 :focus {
     box-shadow: 1 1 1px 0px $col_brand;
 }
+
+strong, .strong {
+    font-weight: bold;
+}

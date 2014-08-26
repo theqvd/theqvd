@@ -73,14 +73,25 @@
 
         .pagination {
             margin-bottom: 10px;
-
+            text-align: center;
+            
             @include in(desktop) {
                 margin-bottom: 10px;
                 padding: 0px;
                 height: auto;
                 width: 45%;
                 float: right;
-            }    
+                text-align: right;
+            }
+            
+            a {
+                padding: 3px 10px;
+                line-height: 30px;
+                @include in(desktop) {
+                    line-height: 18px;
+                }
+
+            }
         }
 
         .action-new-item {
@@ -101,5 +112,9 @@
         @extend %clearfix;
         height: 30px;
         margin-top: 10px;
+        
+        .chosen-container {
+            margin-top: -6px;
+        }
     }    
 }

@@ -35,13 +35,11 @@ select {
 
 .actions_button, select[name="selected_actions_select"] {
     width: 100%;
-    height: 60px;
-    @include font-size(3);
+    height: $input_height_mobile;
     border: 1px solid darken($col_whiter, 20);
-    
     @include in(desktop) {
         width: auto;
-        height: 25px;
+        height: $input_height;
     }
 }
 
@@ -53,16 +51,14 @@ select {
 
 input, .button, .button2 {
     padding: 4px 8px;
-    line-height: $height_button;
-    border: 1px solid darken($col_whiter, 20);
+    line-height: 30px;
+    @include in(desktop) {
+        line-height: 15px;
+    }
 }
 
 input {
     line-height: $height_input;
-}
-
-.button, .button2 {
-    line-height: $height_button;
 }
 
 select, input, .button, .button2 {
@@ -76,8 +72,8 @@ select, input, .button, .button2 {
 }
 
 input[type="checkbox"], input[type="radio"] {
-    width: 28px;
-    height: 28px;
+    width: 20px;
+    height: 20px;
     box-shadow: none;
     border-width: 0;
     
@@ -101,7 +97,7 @@ input[type="checkbox"], input[type="radio"] {
 
 .chosen-container-single .chosen-single {
     height: $height_button;
-    line-height: $height_button;
+    line-height: 20px;
     margin-top: -2px;
     @include linear-gradient($col_whiter);
 }

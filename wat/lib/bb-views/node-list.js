@@ -10,45 +10,44 @@ Wat.Views.NodeListView = Wat.Views.ListView.extend({
         }
     },
     
-    formFilters: [
-        {
-            'name': 'name',
-            'filterField': 'name',
-            'type': 'text',
-            'label': 'Search by name',
-            'mobile': true
-        },
-        {
-            'name': 'vm',
-            'filterField': 'vm_id',
-            'type': 'select',
-            'label': 'Virtual machine',
-            'class': 'chosen-advanced',
-            'fillable': true,
-            'options': [
-                {
-                    'value': -1,
-                    'text': 'All',
-                    'selected': true
-                }
-                        ]
-        }
-    ],
-
     initialize: function (params) { 
         this.collection = new Wat.Collections.Nodes(params);
         
-        this.setColumns();
-        this.setSelectedActions();
-        this.setListActionButton();
-        
-        this.extendEvents(this.eventsNodes);
-
         Wat.Views.ListView.prototype.initialize.apply(this, [params]);
     },
     
-    eventsNodes: {
-
+    // This events will be added to view events
+    listEvents: {
+        
+    },
+    
+    setFilters: function() {
+        this.formFilters = [
+                {
+                    'name': 'name',
+                    'filterField': 'name',
+                    'type': 'text',
+                    'label': 'Search by name',
+                    'mobile': true
+                },
+                {
+                    'name': 'vm',
+                    'filterField': 'vm_id',
+                    'type': 'select',
+                    'label': 'Virtual machine',
+                    'class': 'chosen-advanced',
+                    'fillable': true,
+                    'options': [
+                        {
+                            'value': -1,
+                            'text': 'All',
+                            'selected': true
+                        }
+                                ]
+                }
+            ];
+        
+        Wat.Views.ListView.prototype.setFilters.apply(this);
     },
     
     setColumns: function () {

@@ -39,8 +39,8 @@ Wat.A = {
             dataType: 'json',
             processData: false,
             parse: true,
-            success: function (data) {
-                if (data.status == 0) {
+            success: function (response) {
+                if (response.status == 0) {
                     successCallback(that);
 
                     that.message = messages.success;
@@ -50,8 +50,13 @@ Wat.A = {
                     that.message = messages.error;
                     that.messageType = 'error';
                 }
-
-                Wat.I.showMessage({message: that.message, messageType: that.messageType});
+                
+                var messageParams = {
+                    message: that.message,
+                    messageType: that.messageType
+                };
+                
+                Wat.I.showMessage(messageParams, response);
                 
                 successCallback(that);
             }

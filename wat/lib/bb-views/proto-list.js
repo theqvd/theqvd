@@ -1,4 +1,5 @@
 Wat.Views.ListView = Wat.Views.MainView.extend({
+    collection: {},
     sortedBy: '',
     sortedOrder: '',
     selectedActions: {},
@@ -22,7 +23,13 @@ Wat.Views.ListView = Wat.Views.MainView.extend({
     
     initialize: function (params) {
         Wat.Views.MainView.prototype.initialize.apply(this);
-
+        
+        this.setFilters();
+        this.setColumns();
+        this.setSelectedActions();
+        this.setListActionButton();
+        
+        // Templates
         this.templateListCommonList = Wat.A.getTemplate('list-common');
         this.templateListCommonBlock = Wat.A.getTemplate('list-common-block');
         this.listTemplate = Wat.A.getTemplate(this.listTemplateName);
@@ -33,8 +40,9 @@ Wat.Views.ListView = Wat.Views.MainView.extend({
         
         this.render();
         
-        // Extend the common events
-        this.extendEvents(this.eventsList);
+        // Extend the common events with the list events and events of the specific view
+        this.extendEvents(this.commonListEvents);
+        this.extendEvents(this.listEvents);
     },
     
     readParams: function (params) {
@@ -83,7 +91,7 @@ Wat.Views.ListView = Wat.Views.MainView.extend({
         }
     },
     
-    eventsList: {
+    commonListEvents: {
         'click th.sortable': 'sort',
         'click input[class="check_all"]': 'checkAll',
         'click .first': 'paginationFirst',
@@ -188,11 +196,45 @@ Wat.Views.ListView = Wat.Views.MainView.extend({
         }
     },
     
+    setFilters: function () {
+        // The superadmin have an extra filter: tenant
+        
+        // Every element but the nodes has tenant
+        if (Wat.C.isSuperadmin() && this.collection.actionPrefix != 'host') {
+            this.formFilters.unshift({
+                    'name': 'tenant',
+                    'filterField': 'tenant',
+                    'type': 'select',
+                    'label': 'Tenant',
+                    'mobile': true,
+                    'class': 'chosen-single',
+                    'options': [
+                        {
+                            'value': -1,
+                            'text': 'All',
+                            'selected': true
+                        },
+                        {
+                            'value': '1',
+                            'text': 'Madrid',
+                            'selected': false
+                        },
+                        {
+                            'value': '3',
+                            'text': 'Lisboa',
+                            'selected': false
+                        }
+                                ]
+                }
+                                 );
+        }
+    },
+    
     setColumns: function () {
         // The superadmin have an extra field on lists: tenant
         
         // Every element but the nodes has tenant
-        if (Wat.C.login == 'superadmin' && this.collection.actionPrefix != 'host') {
+        if (Wat.C.isSuperadmin() && this.collection.actionPrefix != 'host') {
             this.columns.push({
                 'name': 'tenant',
                 'display': true,

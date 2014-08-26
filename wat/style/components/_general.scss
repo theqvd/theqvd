@@ -83,6 +83,10 @@ fieldset {
     text-align: center;
 }
 
+.uppercase {
+    text-transform: uppercase;
+}
+
 // States
 .ok {
     color: darken($col_green, 10);

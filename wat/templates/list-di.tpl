@@ -20,7 +20,7 @@
                             break;
                         case 'info':
             %>
-                            <th class="max-4-icons">
+                            <th class="desktop max-4-icons">
                                 <i class="fa sort-icon" data-i18n="Info"><%= i18n.t('Info') %></i>
                             </th>
             <%
@@ -105,7 +105,7 @@
         <%
         }
         _.each(models, function(model) { %>
-            <tr>
+            <tr class="row-<%= model.get('id') %>">
                 <% 
                     _.each(columns, function(col) {
                         if (col.display == false) {
@@ -122,7 +122,7 @@
                                 break;
                             case 'info':
                 %>
-                                <td>
+                                <td class="desktop">
                                     <%
                                     if (model.get('tags')) {
                                     %>
@@ -160,10 +160,10 @@
                                 break;
                             case 'disk_image':
                 %>
-                                <td class="not-break">
+                                <td class="not-break js-name">
                                     <a href="#/di/<%= model.get('id') %>" data-i18n="[title]Click for details">
                                         <i class="fa fa-search"></i>
-                                        <%= model.get('disk_image') %>
+                                        <span class="text"><%= model.get('disk_image') %></span>
                                     </a>
                                 </td>
                 <%

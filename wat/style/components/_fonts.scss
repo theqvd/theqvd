@@ -14,7 +14,7 @@ body {
 }
 
 * {
-    font-family: Taoma, Arial; 
+    font-family: FontAwesome !important; 
     @include font-size(2);
 }
 
@@ -37,6 +37,10 @@ a, button.actions_button:before {
     @include font-size(2);
 }
 
+a, button {
+    @include font-size(3);
+}
+
 // Forms
 label {
     @include font-size(1);
@@ -46,10 +50,9 @@ label {
     @include font-size(2);
 }
 
-input[type="text"] {
-    @include in(mobile) {
-        @include font-size(4);
-    }
+.actions_button, select[name="selected_actions_select"] {
+    @include font-size(2);
+    line-height: 1.6em;
 }
 
 // Layout
@@ -87,6 +90,14 @@ input[type="text"] {
     @include font-size(1);
 }
 
-th {
-    @include font-size(2);
+th, td * {
+    @include font-size(1);
+
+    @include in(desktop) {
+        @include font-size(2);
+    }
+}
+
+.footer a {
+    font-size: inherit;
 }

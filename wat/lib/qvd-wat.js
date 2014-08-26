@@ -51,7 +51,10 @@ var Wat = {
     I: {},
     
     // Configuration
-    C: {},
+    C: {}, 
+    
+    // Binds
+    B: {},
 };
 
 
@@ -61,6 +64,7 @@ var Wat = {
         Wat.I.cornerMenuEvents();
         Wat.I.tooltipConfiguration();
         Wat.I.mobileMenuConfiguration();
+        Wat.I.updateLoginOnMenu(Wat.C.login);
         
         // Instantiate the router
         var app_router = new Wat.Router;
@@ -217,6 +221,7 @@ var Wat = {
         $('.menu-option').click(function() {
             var id = $(this).attr('id');
             win.location = '#/' + id;
+            Wat.I.closeMessage();
         });
         
         // Set specific menu section as selected

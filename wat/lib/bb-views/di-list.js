@@ -9,40 +9,38 @@ Wat.Views.DIListView = Wat.Views.ListView.extend({
             'screen': 'DI list'
         }
     },
-    
-    formFilters: [
-        {
-            'name': 'name',
-            'filterField': 'disk_image',
-            'type': 'text',
-            'label': 'Search by disk image',
-            'mobile': true
-        },
-        {
-            'name': 'osf',
-            'filterField': 'osf_id',
-            'type': 'select',
-            'label': 'OS Flavour',
-            'class': 'chosen-advanced',
-            'fillable': true,
-            'mobile': true
-        }
-    ],
 
     initialize: function (params) {
         this.collection = new Wat.Collections.DIs(params);
         
-        this.setColumns();
-        this.setSelectedActions();
-        this.setListActionButton();
-        
-        this.extendEvents(this.eventsDIs);
-
         Wat.Views.ListView.prototype.initialize.apply(this, [params]);
     },
     
-    eventsDIs: {
+    listEvents: {
         'change input[name="di_default"]': 'setDefault'
+    },
+
+    setFilters: function() {
+        this.formFilters = [
+                {
+                    'name': 'name',
+                    'filterField': 'disk_image',
+                    'type': 'text',
+                    'label': 'Search by disk image',
+                    'mobile': true
+                },
+                {
+                    'name': 'osf',
+                    'filterField': 'osf_id',
+                    'type': 'select',
+                    'label': 'OS Flavour',
+                    'class': 'chosen-advanced',
+                    'fillable': true,
+                    'mobile': true
+                }
+            ];
+        
+        Wat.Views.ListView.prototype.setFilters.apply(this);
     },
     
     setDefault: function (e) {
