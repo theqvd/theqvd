@@ -35,11 +35,9 @@
     <span class="details-item fa fa-angle-right">
         <span data-i18n>Disk image</span>
         <div class="indented-data">
-            <div>
-                <a href="#/di/<%= model.get('di_id') %>">
-                    <%= model.get('di_name') %>
-                </a>
-            </div>
+            <a href="#/di/<%= model.get('di_id') %>">
+                <%= model.get('di_name') %>
+            </a>
         </div>
     </span>
     <span class="details-item fa fa-angle-right">

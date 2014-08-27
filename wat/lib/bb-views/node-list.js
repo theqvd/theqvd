@@ -1,4 +1,5 @@
 Wat.Views.NodeListView = Wat.Views.ListView.extend({
+    shortName: 'node',
     listTemplateName: 'list-nodes',
     editorTemplateName: 'creator-node',
     
@@ -19,74 +20,6 @@ Wat.Views.NodeListView = Wat.Views.ListView.extend({
     // This events will be added to view events
     listEvents: {
         
-    },
-    
-    setFilters: function() {
-        this.formFilters = [
-                {
-                    'name': 'name',
-                    'filterField': 'name',
-                    'type': 'text',
-                    'label': 'Search by name',
-                    'mobile': true
-                },
-                {
-                    'name': 'vm',
-                    'filterField': 'vm_id',
-                    'type': 'select',
-                    'label': 'Virtual machine',
-                    'class': 'chosen-advanced',
-                    'fillable': true,
-                    'options': [
-                        {
-                            'value': -1,
-                            'text': 'All',
-                            'selected': true
-                        }
-                                ]
-                }
-            ];
-        
-        Wat.Views.ListView.prototype.setFilters.apply(this);
-    },
-    
-    setColumns: function () {
-        this.columns = [
-            {
-                'name': 'checks',
-                'display': true
-            },
-            {
-                'name': 'info',
-                'display': true
-            },
-            {
-                'name': 'id',
-                'display': true
-            },
-            {
-                'name': 'name',
-                'display': true
-            },
-            {
-                'name': 'state',
-                'display': false
-            },
-            {
-                'name': 'address',
-                'display': true
-            },
-            {
-                'name': 'vms_connected',
-                'display': true
-            },
-            {
-                'name': 'Cosa',
-                'display': true
-            }
-        ];
-        
-        Wat.Views.ListView.prototype.setColumns.apply(this);
     },
     
     setSelectedActions: function () {

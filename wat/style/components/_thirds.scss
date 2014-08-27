@@ -63,11 +63,14 @@
 
 .dialog-container, .dialog-container-template {
     display: none;
+    padding: 0;
+    
 }
 
 .dialog-container-template {
     width: $dialog_mobile_width;
     height: $dialog_mobile_height;
+    height: 100vh;
     
     @include in(desktop) {
         width: $dialog_width;

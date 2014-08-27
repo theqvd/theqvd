@@ -1,5 +1,23 @@
 // Pure interface utilities
 Wat.I = {
+    cornerMenu : {},
+    
+    listColumns: {
+        vm: [],
+        user: [],
+        node: [],
+        osf: [],
+        di: []
+    },
+    
+    formFilters: {
+        vm: [],
+        user: [],
+        node: [],
+        osf: [],
+        di: []
+    },
+    
     showAll: function () {
         var firstLoad = $('.wrapper').css('visibility') == 'hidden';
 
@@ -244,8 +262,8 @@ Wat.I = {
         $('.message-container').removeClass('success error info warning');
         $('.message-container').addClass(msg.messageType);
         
-        // Success messages will be hidden automatically
-        if (msg.messageType == 'success') {
+        // Success and info messages will be hidden automatically
+        if (msg.messageType != 'error') {
             this.messageTimeout = setTimeout(function() { 
                 $('.message-close').trigger('click');
             },3000);
@@ -332,5 +350,36 @@ Wat.I = {
         failuresList += '</ul>';
         
         return failuresList;
+    },
+    
+    fillCustomizeOptions: function (that) {
+        var customizeOptions = that.retrievedData.result.rows;
+        console.log(customizeOptions);
+        
+        var customizeOptionsTable;
+        
+        var head = '<tr><th>Field</th><th>List</th><th>Details</th><th>List filters</th></td>';
+        $('.js-customize-options table').append(head);
+
+        $.each(customizeOptions, function (iOption, option) {
+            var row = '<tr><td>' + option.name + '</td><td>' + Wat.I.controls.CheckBox({checked: option.get_list}) + '</td><td>' + Wat.I.controls.CheckBox({checked: option.get_details}) + '</td><td>' + Wat.I.controls.CheckBox({checked: option.filter_list}) + '</td></td>';
+            
+            $('.js-customize-options table').append(row);
+            console.log(option);
+        });
+    },
+    
+    controls: {
+        CheckBox: function (params) {
+            var checked = '';
+            if (params.checked){
+                checked = 'checked';
+            }
+
+            var control = '<input type="checkbox" value="1" ' + checked + '/>';
+
+            return control;
+        },
     }
+    
 }

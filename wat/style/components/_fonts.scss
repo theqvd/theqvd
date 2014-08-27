@@ -14,12 +14,30 @@ body {
 }
 
 * {
-    font-family: FontAwesome !important; 
-    @include font-size(2);
+    font-family: 'Open Sans', FontAwesome !important; 
+    
+    @include font-size(1);
+
+    @include in(desktop) {
+        @include font-size(2);
+    }
+}
+
+th, td * {
+    font-size: 14px;
+
+    @include in(desktop) {
+        @include font-size(2);
+    }
+}
+
+editor-table th, editor-table td * {
+    //@include font-size(2);
 }
 
 .h1 {
     font-weight: normal;
+    
     @include font-size(4);
     
     .subtitle {
@@ -37,8 +55,11 @@ a, button.actions_button:before {
     @include font-size(2);
 }
 
-a, button {
-    @include font-size(3);
+a.button, a.button2, button {
+    @include font-size(2);
+    @include in(desktop) {
+        @include font-size(3);
+    }
 }
 
 // Forms
@@ -55,10 +76,18 @@ label {
     line-height: 1.6em;
 }
 
+input {
+    line-height: 20px;
+}
+
 // Layout
 
-.details-block .details-item {
-    @include font-size(3);
+.details-block .details-item  {
+    font-size: 15px;
+    
+    @include in(desktop) {
+        @include font-size(3);
+    }
 }
 
 .details-block .details-item {
@@ -88,14 +117,6 @@ label {
 // Tables
 .second_row {
     @include font-size(1);
-}
-
-th, td * {
-    @include font-size(1);
-
-    @include in(desktop) {
-        @include font-size(2);
-    }
 }
 
 .footer a {

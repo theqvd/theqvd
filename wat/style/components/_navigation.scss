@@ -151,6 +151,22 @@
     }
 }
 
+.side-menu {
+    li {
+        margin-bottom: 15px;
+        
+        a {
+            &:before {
+                margin-right: 5px;
+                font-weight: normal;
+            }
+        
+            &.selected-option, &:hover {
+                font-weight: bold;
+            }
+        }
+    }
+}
 
 // Mobile
 

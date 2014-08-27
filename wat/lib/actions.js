@@ -32,7 +32,7 @@ Wat.A = {
         if (!$.isEmptyObject(arguments)) {
             url += '&arguments=' + JSON.stringify(arguments);
         }
-        
+                
         $.ajax({
             url: url,
             type: 'POST',
@@ -40,25 +40,31 @@ Wat.A = {
             processData: false,
             parse: true,
             success: function (response) {
+                that.retrievedData = response;
+
                 if (response.status == 0) {
                     successCallback(that);
+                }
+                
+                if (!$.isEmptyObject(messages)) {
+                    if (response.status == 0) {
+                        that.message = messages.success;
+                        that.messageType = 'success';
+                    }
+                    else {
+                        that.message = messages.error;
+                        that.messageType = 'error';
+                    }
 
-                    that.message = messages.success;
-                    that.messageType = 'success';
+                    var messageParams = {
+                        message: that.message,
+                        messageType: that.messageType
+                    };
+
+                    Wat.I.showMessage(messageParams, response);
                 }
-                else {
-                    that.message = messages.error;
-                    that.messageType = 'error';
-                }
                 
-                var messageParams = {
-                    message: that.message,
-                    messageType: that.messageType
-                };
-                
-                Wat.I.showMessage(messageParams, response);
-                
-                successCallback(that);
+                //successCallback(that);
             }
         });
     },
@@ -92,10 +98,12 @@ Wat.A = {
                     if (params.selectedId !== undefined && params.selectedId == id) {
                         selected = 'selected="selected"';
                     }
-                    
-                    $('select[name="' + params.controlName + '"]').append('<option value="' + id + '" ' + selected + '>' + 
+
+                    $.each($('select[name="' + params.controlName + '"]'), function () {
+                        $(this).append('<option value="' + id + '" ' + selected + '>' + 
                                                                    name + 
                                                                    '<\/option>');
+                    });
                 });
             }
         });

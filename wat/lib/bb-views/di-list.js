@@ -1,4 +1,5 @@
 Wat.Views.DIListView = Wat.Views.ListView.extend({
+    shortName: 'di',
     listTemplateName: 'list-di',
     editorTemplateName: 'creator-di',
     
@@ -18,29 +19,6 @@ Wat.Views.DIListView = Wat.Views.ListView.extend({
     
     listEvents: {
         'change input[name="di_default"]': 'setDefault'
-    },
-
-    setFilters: function() {
-        this.formFilters = [
-                {
-                    'name': 'name',
-                    'filterField': 'disk_image',
-                    'type': 'text',
-                    'label': 'Search by disk image',
-                    'mobile': true
-                },
-                {
-                    'name': 'osf',
-                    'filterField': 'osf_id',
-                    'type': 'select',
-                    'label': 'OS Flavour',
-                    'class': 'chosen-advanced',
-                    'fillable': true,
-                    'mobile': true
-                }
-            ];
-        
-        Wat.Views.ListView.prototype.setFilters.apply(this);
     },
     
     setDefault: function (e) {
@@ -63,41 +41,6 @@ Wat.Views.DIListView = Wat.Views.ListView.extend({
 
         // As the osf filter in DI list hasn't all option, we trigger the change once it is loaded to perform the filtering
         $('.filter-control [name="osf"]').trigger('change');
-    },
-    
-    setColumns: function () {
-        this.columns = [
-            {
-                'name': 'checks',
-                'display': true
-            },
-            {
-                'name': 'info',
-                'display': true
-            },
-            {
-                'name': 'id',
-                'display': true
-            },
-            {
-                'name': 'disk_image',
-                'display': true
-            },
-            {
-                'name': 'version',
-                'display': true
-            },
-            {
-                'name': 'osf',
-                'display': false
-            },
-            {
-                'name': 'default',
-                'display': true
-            }
-        ];
-        
-        Wat.Views.ListView.prototype.setColumns.apply(this);
     },
     
     setSelectedActions: function () {

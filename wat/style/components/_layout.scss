@@ -84,7 +84,7 @@ body {
             
     @include width-wrapper;
 
-    background-color: white;
+    background-color: $col_whiter;
     position: relative;
     
     .menu {
@@ -216,6 +216,7 @@ body {
         // Different view layouts
         @import "layout-list";
         @import "layout-details";
+        @import "layout-setup";
     }
 }
    

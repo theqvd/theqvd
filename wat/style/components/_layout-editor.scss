@@ -1,8 +1,17 @@
 .editor-container {
-    margin: 10px 20px;
+    margin: 0;
+    
+    @include in(desktop) {
+        margin: 10px 20px;
+    }
+    
     .editor-table {
         width: 100%;
-        border-spacing: 20px;
+        
+        @include in(desktop) {
+            border-spacing: 20px;
+        }
+        
         border-collapse: separate;
         
         td {

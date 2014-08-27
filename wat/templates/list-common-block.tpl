@@ -25,7 +25,7 @@
                             %>
                                 <span class="filter-control desktop">
                                     <label for="<%= filter.name %>" <%= translationAttr %>><%= filter.label %></label>
-                                    <select name="<%= filter.name %>" class="<%= filter.class %>" data-filter-field="<%= filter.filterField %>">
+                                    <select name="<%= filter.name %>" class="<%= filter.class %> mobile-filter" data-filter-field="<%= filter.filterField %>">
                                         <% _.each(filter.options, function(option) { %>
                                             <% 
                                                 var selectedAttr = '';

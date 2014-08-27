@@ -197,6 +197,8 @@ Wat.Views.ListView = Wat.Views.MainView.extend({
     },
     
     setFilters: function () {
+        this.formFilters = Wat.I.formFilters[this.shortName];
+
         // The superadmin have an extra filter: tenant
         
         // Every element but the nodes has tenant
@@ -231,6 +233,8 @@ Wat.Views.ListView = Wat.Views.MainView.extend({
     },
     
     setColumns: function () {
+        this.columns = Wat.I.listColumns[this.shortName];
+
         // The superadmin have an extra field on lists: tenant
         
         // Every element but the nodes has tenant
@@ -285,7 +289,6 @@ Wat.Views.ListView = Wat.Views.MainView.extend({
         
         $(this.el).html(template);
                 
-        this.fetchFilters();
         this.printBreadcrumbs(this.breadcrumbs, '');
         
         this.renderListBlock();
@@ -320,7 +323,9 @@ Wat.Views.ListView = Wat.Views.MainView.extend({
         $(that.listBlockContainer).html(template);
         $(that.listBlockContainer).html(template);
         $(that.listBlockContainer).html(template);
-                
+                        
+        this.fetchFilters();
+
         that.renderList();
         
         // Translate the strings rendered. 
@@ -487,6 +492,11 @@ Wat.Views.ListView = Wat.Views.MainView.extend({
         $.each($('.check-it:checked'), function (iCheck, check) {
             selectedIds.push($(check).attr('data-id'));
         });
+        
+        if (!selectedIds.length) {
+            Wat.I.showMessage({message: i18n.t('No items were selected') + '. ' + i18n.t('Nothing to do'), messageType: 'info'});
+            return;
+        }
         
         var filters = {
             id: selectedIds

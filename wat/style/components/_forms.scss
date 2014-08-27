@@ -98,7 +98,18 @@ input[type="checkbox"], input[type="radio"] {
 .chosen-container-single .chosen-single {
     height: $height_button;
     line-height: 20px;
-    margin-top: -2px;
+    @include in(desktop) {
+        line-height: 25px;
+    }
+    
+    span {
+        line-height: 20px;
+        @include in(desktop) {
+            line-height: 25px;
+        }
+    }
+    
+    margin-top: 2px;
     @include linear-gradient($col_whiter);
 }
 

@@ -1,4 +1,5 @@
 Wat.Views.OSFListView = Wat.Views.ListView.extend({
+    shortName: 'osf',
     listTemplateName: 'list-osf',
     editorTemplateName: 'creator-osf',
     
@@ -19,89 +20,6 @@ Wat.Views.OSFListView = Wat.Views.ListView.extend({
     // This events will be added to view events
     listEvents: {
         
-    },
-    
-    setFilters: function() {
-        this.formFilters = [
-                {
-                    'name': 'name',
-                    'filterField': 'name',
-                    'type': 'text',
-                    'label': 'Search by name',
-                    'mobile': true
-                },
-                {
-                    'name': 'vm',
-                    'filterField': 'vm_id',
-                    'type': 'select',
-                    'label': 'Virtual machine',
-                    'class': 'chosen-advanced',
-                    'fillable': true,
-                    'options': [
-                        {
-                            'value': -1,
-                            'text': 'All',
-                            'selected': true
-                        }
-                                ]
-                },
-                {
-                    'name': 'di',
-                    'filterField': 'di_id',
-                    'type': 'select',
-                    'label': 'Disk image',
-                    'class': 'chosen-advanced',
-                    'fillable': true,
-                    'options': [
-                        {
-                            'value': -1,
-                            'text': 'All',
-                            'selected': true
-                        }
-                                ]
-                }
-            ];
-        
-        Wat.Views.ListView.prototype.setFilters.apply(this);
-    },
-    
-    setColumns: function () {
-        this.columns = [
-            {
-                'name': 'checks',
-                'display': true
-            },
-            {
-                'name': 'id',
-                'display': true
-            },
-            {
-                'name': 'name',
-                'display': true
-            },
-            {
-                'name': 'overlay',
-                'display': true
-            },
-            {
-                'name': 'memory',
-                'display': true
-            },
-            {
-                'name': 'user_storage',
-                'display': true
-            },
-            {
-                'name': 'dis',
-                'display': true
-            },
-            {
-                'name': 'vms',
-                'display': true
-            }
-        ];
-        
-        Wat.Views.ListView.prototype.setColumns.apply(this);
     },
     
     setSelectedActions: function () {

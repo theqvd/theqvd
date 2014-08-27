@@ -30,8 +30,15 @@ a, button {
     
     &.button-right {
         position: absolute;
+                    
         right: 0px;
-        top: 0px;
+        top: -40px;
+        width: 100%;
+        
+        @include in(desktop) {
+            top: 0px;
+            width: auto;
+        }
     }
 
     &.button.disabled, &.button2.disabled {

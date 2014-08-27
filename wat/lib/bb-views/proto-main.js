@@ -11,7 +11,10 @@ Wat.Views.MainView = Backbone.View.extend({
         _.bindAll(this, 'render');
         
         this.templateEditorCommon = Wat.A.getTemplate('editor-common');
-        this.templateEditor = Wat.A.getTemplate(this.editorTemplateName);
+        
+        if (this.editorTemplateName) {
+            this.templateEditor = Wat.A.getTemplate(this.editorTemplateName);
+        }
         
         
         // Binding events manually because backbone doesnt allow bind events to dialogs loaded dinamically

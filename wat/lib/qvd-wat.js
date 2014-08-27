@@ -209,6 +209,18 @@ var Wat = {
         
         
         
+        // ------- Configuration sections ------- //
+        app_router.on('route:setupCustomize', function (actions) {
+            Wat.I.showLoading();
+            setMenuOpt('');
+            if (!$.isEmptyObject(Wat.CurrentView )) {
+                Wat.CurrentView.undelegateEvents();
+            }
+            Wat.CurrentView = new Wat.Views.ConfigCustomizeView();
+        });
+        
+        
+        
         // ------- Default load ------- //
         app_router.on('route:defaultRoute', function (actions) {
             console.info( actions ); 

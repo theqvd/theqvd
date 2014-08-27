@@ -42,11 +42,19 @@
 
 .details-header, .side-header {
     position: relative;
-    height: 40px;
+    
+    @include in(desktop) {
+        height: 40px;
+    }
     
     span:before {
         margin-right: 8px;
         margin-left: 6px;
+    }
+    
+    margin-top: 40px;
+    @include in(desktop) {
+        margin-top: 0px;
     }
 }
 
