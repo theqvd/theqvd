@@ -28,7 +28,8 @@ Wat.Views.ListView = Wat.Views.MainView.extend({
         this.setColumns();
         this.setSelectedActions();
         this.setListActionButton();
-        
+        this.setBreadCrumbs();
+                
         // Templates
         this.templateListCommonList = Wat.A.getTemplate('list-common');
         this.templateListCommonBlock = Wat.A.getTemplate('list-common-block');
@@ -46,9 +47,7 @@ Wat.Views.ListView = Wat.Views.MainView.extend({
     },
     
     readParams: function (params) {
-        if(params === undefined) {
-            params = {};
-        }
+        params = params || {};
         
         this.filters = params.filters || {};
         this.block = params.block || this.block;
@@ -69,7 +68,7 @@ Wat.Views.ListView = Wat.Views.MainView.extend({
         }            
         if (params.forceListColumns !== undefined) {
             var that = this;
-            $(this.columns).each(function(index, column) {
+            $.each(this.columns, function(index, column) {
                 if (params.forceListColumns[column.name] !== undefined && params.forceListColumns[column.name]) {
                     that.columns[index].display = true;
                 }
@@ -100,7 +99,7 @@ Wat.Views.ListView = Wat.Views.MainView.extend({
         'click .last': 'paginationLast',
         'click a[name="filter_button"]': 'filter',
         //'keyup .filter-control input': 'filter',
-        'input .filter-control input': 'filter',
+        'input .filter-control>input': 'filter',
         'change .filter-control select': 'filter',
         'click .js-button-new': 'openNewElementDialog',
         'click [name="selected_actions_button"]': 'applySelectedAction'
@@ -153,8 +152,8 @@ Wat.Views.ListView = Wat.Views.MainView.extend({
         }
         
         var filters = {};
-        $.each(this.formFilters, function(index, filter) {
-            var filterControl = $(filtersContainer + ' [name="' + filter.name + '"]');
+        $.each(this.formFilters, function(name, filter) {
+            var filterControl = $(filtersContainer + ' [name="' + name + '"]');
             // If input text box is empty or selected option in a select is All (-1) skip filter control
             switch(filter.type) {
                 case 'select':
@@ -197,7 +196,7 @@ Wat.Views.ListView = Wat.Views.MainView.extend({
     },
     
     setFilters: function () {
-        this.formFilters = Wat.I.formFilters[this.shortName];
+        this.formFilters = Wat.I.getFormFilters(this.shortName);
 
         // The superadmin have an extra filter: tenant
         
@@ -233,19 +232,33 @@ Wat.Views.ListView = Wat.Views.MainView.extend({
     },
     
     setColumns: function () {
-        this.columns = Wat.I.listColumns[this.shortName];
-
+        this.columns = Wat.I.getListColumns(this.shortName);
+        
         // The superadmin have an extra field on lists: tenant
         
         // Every element but the nodes has tenant
         if (Wat.C.isSuperadmin() && this.collection.actionPrefix != 'host') {
             this.columns.push({
                 'name': 'tenant',
+                'text': 'Tenant',
                 'display': true,
                 'noTranslatable': true
             }
                                );
         }
+    },
+    
+    setSelectedActions: function () {
+        this.selectedActions = Wat.I.getSelectedActions(this.shortName);
+    },
+    
+
+    setListActionButton: function () {
+        this.listActionButton = Wat.I.getListActionButton(this.shortName);
+    },
+    
+    setBreadCrumbs: function () {
+        this.breadcrumbs = Wat.I.getListBreadCrumbs(this.shortName);
     },
     
     // Fetch collection and render list
@@ -336,7 +349,8 @@ Wat.Views.ListView = Wat.Views.MainView.extend({
     },    
     
     // Render only the list. Usefull to functions such as pagination, sorting and filtering where is not necessary render controls
-    renderList: function () {        
+    renderList: function () {
+        
         // Fill the list
         var template = _.template(
             this.listTemplate, {
@@ -353,12 +367,12 @@ Wat.Views.ListView = Wat.Views.MainView.extend({
     // Fill filter selects 
     fetchFilters: function () {
         var that = this;
-        $.each(this.formFilters, function(index, filter) {
+        $.each(this.formFilters, function(name, filter) {
             if (filter.type == 'select' && filter.fillable) {
                 var params = {
-                    'action': filter.name + '_tiny_list',
+                    'action': name + '_tiny_list',
                     'selectedId': that.filters[filter.filterField],
-                    'controlName': filter.name
+                    'controlName': name
                 };
                 
                 Wat.A.fillSelect(params);

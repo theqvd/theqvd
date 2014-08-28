@@ -1,21 +1,10 @@
-Wat.Views.OSFDetailsView = Wat.Views.DetailsView.extend({
+Wat.Views.OSFDetailsView = Wat.Views.DetailsView.extend({  
+    shortName: 'osf',
     editorTemplateName: 'editor-osf',
     detailsTemplateName: 'details-osf',
     detailsSideTemplateName: 'details-osf-side',
     sideContainer: '.bb-details-side',
     
-    breadcrumbs: {
-        'screen': 'Home',
-        'link': '#/home',
-        'next': {
-            'screen': 'OSF list',
-            'link': '#/osfs',
-            'next': {
-                'screen': ''
-            }
-        }
-    },
-
     initialize: function (params) {
         this.model = new Wat.Models.OSF(params);
         Wat.Views.DetailsView.prototype.initialize.apply(this, [params]);

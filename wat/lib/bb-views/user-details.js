@@ -1,20 +1,9 @@
-Wat.Views.UserDetailsView = Wat.Views.DetailsView.extend({
+Wat.Views.UserDetailsView = Wat.Views.DetailsView.extend({  
+    shortName: 'user',
     editorTemplateName: 'editor-user',
     detailsTemplateName: 'details-user',
     detailsSideTemplateName: 'details-user-side',
     sideContainer: '.bb-details-side',
-    
-    breadcrumbs: {
-        'screen': 'Home',
-        'link': '#/home',
-        'next': {
-            'screen': 'User list',
-            'link': '#/users',
-            'next': {
-                'screen': ''
-            }
-        }
-    },
 
     initialize: function (params) {
         this.model = new Wat.Models.User(params);

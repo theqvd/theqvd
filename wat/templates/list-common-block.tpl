@@ -1,9 +1,9 @@
 <div class="<%= cid %>">
     <div class="list-navigation">
         <div class="filter-mobile mobile">
-            <% 
-                _.each(formFilters, function(filter) { 
-                    if (!filter.mobile) {
+            <%
+                $.each(formFilters, function(name, filter) { 
+                    if (!filter.display || filter.device == 'desktop') {
                         return;
                     }
                     
@@ -16,16 +16,16 @@
                         case 'text':
                             %>
                                 <span class="filter-control">
-                                <label for="<%= filter.name %>" data-i18n><%= filter.label %></label>
-                                <input type="text" name="<%= filter.name %>" class="mobile-filter" data-filter-field="<%= filter.name %>"/>
+                                <label for="<%= name %>" data-i18n><%= filter.text %></label>
+                                <input type="text" name="<%= name %>" class="mobile-filter" data-filter-field="<%= name %>"/>
                                 </span>
                             <%
                             break;
                         case 'select':
                             %>
                                 <span class="filter-control desktop">
-                                    <label for="<%= filter.name %>" <%= translationAttr %>><%= filter.label %></label>
-                                    <select name="<%= filter.name %>" class="<%= filter.class %> mobile-filter" data-filter-field="<%= filter.filterField %>">
+                                    <label for="<%= name %>" <%= translationAttr %>><%= filter.text %></label>
+                                    <select name="<%= name %>" class="<%= filter.class %> mobile-filter" data-filter-field="<%= filter.filterField %>">
                                         <% _.each(filter.options, function(option) { %>
                                             <% 
                                                 var selectedAttr = '';

@@ -2,14 +2,6 @@ Wat.Views.OSFListView = Wat.Views.ListView.extend({
     shortName: 'osf',
     listTemplateName: 'list-osf',
     editorTemplateName: 'creator-osf',
-    
-    breadcrumbs: {
-        'screen': 'Home',
-        'link': '#/home',
-        'next': {
-            'screen': 'OSF list'
-        }
-    },
 
     initialize: function (params) {
         this.collection = new Wat.Collections.OSFs(params);
@@ -18,26 +10,7 @@ Wat.Views.OSFListView = Wat.Views.ListView.extend({
     },
     
     // This events will be added to view events
-    listEvents: {
-        
-    },
-    
-    setSelectedActions: function () {
-        this.selectedActions = [
-            {
-                'value': 'delete',
-                'text': 'Delete'
-            }
-        ];
-    },
-    
-    setListActionButton: function () {
-        this.listActionButton = {
-            'name': 'new_osf_button',
-            'value': 'New OS Flavour',
-            'link': 'javascript:'
-        }
-    },
+    listEvents: {},
     
     openNewElementDialog: function (e) {
         this.model = new Wat.Models.OSF();

@@ -1,20 +1,9 @@
-Wat.Views.DIDetailsView = Wat.Views.DetailsView.extend({
+Wat.Views.DIDetailsView = Wat.Views.DetailsView.extend({  
+    shortName: 'di',
     editorTemplateName: 'editor-di',
     detailsTemplateName: 'details-di',
     detailsSideTemplateName: 'details-di-side',
     sideContainer: '.bb-details-side',
-    
-    breadcrumbs: {
-        'screen': 'Home',
-        'link': '#/home',
-        'next': {
-            'screen': 'DI list',
-            'link': '#/dis',
-            'next': {
-                'screen': ''
-            }
-        }
-    },
     
     initialize: function (params) {
         this.model = new Wat.Models.DI(params);

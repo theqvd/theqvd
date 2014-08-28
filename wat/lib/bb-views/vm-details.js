@@ -1,20 +1,9 @@
-Wat.Views.VMDetailsView = Wat.Views.DetailsView.extend({
+Wat.Views.VMDetailsView = Wat.Views.DetailsView.extend({  
+    shortName: 'vm',
     editorTemplateName: 'editor-vm',
     detailsTemplateName: 'details-vm',
     detailsSideTemplateName: 'details-vm-side',
     sideContainer: '.bb-details-side',
-    
-    breadcrumbs: {
-        'screen': 'Home',
-        'link': '#/home',
-        'next': {
-            'screen': 'Virtual machine list',
-            'link': '#/vms',
-            'next': {
-                'screen': ''
-            }
-        }
-    },
     
     initialize: function (params) {
         this.model = new Wat.Models.VM(params);

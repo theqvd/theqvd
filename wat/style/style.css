@@ -77,7 +77,8 @@ table {
 
 /* Added by me */
 *, *::after, *::before {
-  box-sizing: border-box; }
+  box-sizing: border-box;
+  letter-spacing: 1px; }
 
 :focus {
   box-shadow: 1 1 1px 0px #cb540a; }
@@ -663,8 +664,8 @@ body {
         line-height: 20px; }
       .wrapper .message-container .message article.expandedMessage {
         display: none;
-        font-size: 0.8em;
-        line-height: 0.8em;
+        font-size: 0.9em;
+        line-height: 0.9em;
         padding: 14px 30px;
         margin-top: 10px;
         background: #e9e9e9;
@@ -675,8 +676,8 @@ body {
         font-weight: normal; }
         @media screen and (min-width: 40em) {
           .wrapper .message-container .message article.expandedMessage {
-            font-size: 0.8em;
-            line-height: 0.8em; } }
+            font-size: 0.9em;
+            line-height: 0.9em; } }
         .wrapper .message-container .message article.expandedMessage ul {
           margin-top: 5px;
           margin-left: 8px; }
@@ -896,6 +897,14 @@ body {
       margin-right: 2%; }
     .wrapper .content .customize-section-selector {
       margin-bottom: 20px; }
+    .wrapper .content .customize-options .customize-block {
+      width: 49%;
+      display: inline-block;
+      vertical-align: top; }
+      .wrapper .content .customize-options .customize-block:first-child {
+        padding-right: 10px; }
+      .wrapper .content .customize-options .customize-block:last-child {
+        padding-left: 10px; }
 
 .editor-container {
   margin: 0; }
@@ -1040,7 +1049,8 @@ table.expiration-table {
 
 .second_row {
   margin-top: 4px;
-  line-height: 13px; }
+  line-height: 13px;
+  color: #888888; }
 
 td.center {
   text-align: center; }
@@ -1631,13 +1641,13 @@ body {
   font-size: small; }
 
 * {
-  font-family: 'Open Sans', FontAwesome !important;
-  font-size: 0.8em;
-  line-height: 0.8em; }
+  font-family: Lato, 'Open Sans', FontAwesome !important;
+  font-size: 0.9em;
+  line-height: 0.9em; }
   @media screen and (min-width: 40em) {
     * {
-      font-size: 0.8em;
-      line-height: 0.8em; } }
+      font-size: 0.9em;
+      line-height: 0.9em; } }
   @media screen and (min-width: 40em) {
     * {
       font-size: 1.3em;
@@ -1703,12 +1713,12 @@ a.button, a.button2, button {
           line-height: 1.1em; } } }
 
 label {
-  font-size: 0.8em;
-  line-height: 0.8em; }
+  font-size: 0.9em;
+  line-height: 0.9em; }
   @media screen and (min-width: 40em) {
     label {
-      font-size: 0.8em;
-      line-height: 0.8em; } }
+      font-size: 0.9em;
+      line-height: 0.9em; } }
 
 .chosen-container {
   font-size: 1.3em;
@@ -1761,12 +1771,12 @@ input {
       line-height: 1.1em; } }
 
 .breadcrumbs * {
-  font-size: 0.8em;
-  line-height: 0.8em; }
+  font-size: 0.9em;
+  line-height: 0.9em; }
   @media screen and (min-width: 40em) {
     .breadcrumbs * {
-      font-size: 0.8em;
-      line-height: 0.8em; } }
+      font-size: 0.9em;
+      line-height: 0.9em; } }
 
 .pagination {
   font-size: 1.3em;
@@ -1777,12 +1787,12 @@ input {
       line-height: 1em; } }
 
 .second_row {
-  font-size: 0.8em;
-  line-height: 0.8em; }
+  font-size: 0.9em;
+  line-height: 0.9em; }
   @media screen and (min-width: 40em) {
     .second_row {
-      font-size: 0.8em;
-      line-height: 0.8em; } }
+      font-size: 0.9em;
+      line-height: 0.9em; } }
 
 .footer a {
   font-size: inherit; }

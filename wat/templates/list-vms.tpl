@@ -3,14 +3,14 @@
         <tr>    
             <% 
                 var printedColumns = 0;
-                _.each(columns, function(col) {
+                $.each(columns, function(name, col) {
                     if (col.display == false) {
                         return;
                     }
                     
                     printedColumns++;
                     
-                    switch(col.name) {
+                    switch(name) {
                         case 'checks':
             %>
                             <th class="max-1-icons">
@@ -76,8 +76,8 @@
                             break;
                         default:
             %>
-                            <th class="sortable desktop" data-sortby="<%= col.name %>">
-                                <i class="fa sort-icon"><%= col.name %></i>
+                            <th class="sortable desktop" data-sortby="<%= name %>">
+                                <i class="fa sort-icon"><%= name %></i>
                             </th>
             <%
                             break;
@@ -103,12 +103,12 @@
         _.each(models, function(model) { %>
             <tr class="row-<%= model.get('id') %>">
                 <% 
-                    _.each(columns, function(col) {
+                    $.each(columns, function(name, col) {
                         if (col.display == false) {
                             return;
                         }
                     
-                        switch(col.name) {
+                        switch(name) {
                             case 'checks':
                 %>
                                 <td>
@@ -210,7 +210,7 @@
                             default:
                 %>
                                 <td class="desktop">
-                                    <%= model.get(col.name) %>
+                                    <%= model.get(name) %>
                                 </td>
                 <%
                                 break;

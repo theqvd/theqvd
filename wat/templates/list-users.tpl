@@ -3,14 +3,14 @@
         <tr>
             <%                
                 var printedColumns = 0;
-                _.each(columns, function(col) {
+                $.each(columns, function(name, col) {
                     if (col.display == false) {
                         return;
                     }
                     
                     printedColumns++;
                     
-                    switch(col.name) {
+                    switch(name) {
                         case 'checks':
             %>
                             <th class="max-1-icons">
@@ -54,14 +54,14 @@
             <%
                             break;
                         default:
-                            var translationAttr = 'data-i18n="' + col.name + '"';
+                            var translationAttr = 'data-i18n="' + name + '"';
                             if (col.noTranslatable === true) {
                                 translationAttr = '';
                             }
                     
             %>
-                            <th class="sortable desktop" data-sortby="<%= col.name %>">
-                                <i class="fa sort-icon"><%= col.name %></i>
+                            <th class="sortable desktop" data-sortby="<%= name %>">
+                                <i class="fa sort-icon"><%= name %></i>
                             </th>
             <%
                             break;
@@ -91,13 +91,12 @@
                     if (model.get('blocked')) {
                         info += '<i class="fa fa-lock" data-i18n="[title]Blocked" title="' + i18n.t('Blocked') + '"></i>';
                     }
-                                    
-                    _.each(columns, function(col) {
+                    $.each(columns, function(name, col) {
                         if (col.display == false) {
                             return;
                         }
                     
-                        switch(col.name) {
+                        switch(name) {
                             case 'checks':
                 %>
                                 <td>
@@ -152,11 +151,11 @@
                 %>
                                 <td class="desktop">
                                     <% 
-                                        if (model.get(col.name) !== undefined) {
-                                            print(model.get(col.name));
+                                        if (model.get(name) !== undefined) {
+                                            print(model.get(name));
                                         }
-                                        else if (model.get('properties') !== undefined && model.get('properties')[col.name] !== undefined) {
-                                            print(model.get('properties')[col.name]);
+                                        else if (model.get('properties') !== undefined && model.get('properties')[name] !== undefined) {
+                                            print(model.get('properties')[name]);
                                         }
                                     
                                     %>

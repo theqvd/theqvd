@@ -3,14 +3,6 @@ Wat.Views.NodeListView = Wat.Views.ListView.extend({
     listTemplateName: 'list-nodes',
     editorTemplateName: 'creator-node',
     
-    breadcrumbs: {
-        'screen': 'Home',
-        'link': '#/home',
-        'next': {
-            'screen': 'Node list'
-        }
-    },
-    
     initialize: function (params) { 
         this.collection = new Wat.Collections.Nodes(params);
         
@@ -18,38 +10,7 @@ Wat.Views.NodeListView = Wat.Views.ListView.extend({
     },
     
     // This events will be added to view events
-    listEvents: {
-        
-    },
-    
-    setSelectedActions: function () {
-        this.selectedActions = [
-            {
-                'value': 'block',
-                'text': 'Block'
-            },
-            {
-                'value': 'unblock',
-                'text': 'Unblock'
-            },
-            {
-                'value': 'stop_all',
-                'text': 'Stop all VMs'
-            },
-            {
-                'value': 'delete',
-                'text': 'Delete'
-            }
-        ];
-    },
-    
-    setListActionButton: function () {
-        this.listActionButton = {
-            'name': 'new_node_button',
-            'value': 'New Node',
-            'link': 'javascript:'
-        }
-    },
+    listEvents: {},
     
     openNewElementDialog: function (e) {
         this.model = new Wat.Models.Node();

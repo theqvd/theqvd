@@ -2,14 +2,6 @@ Wat.Views.UserListView = Wat.Views.ListView.extend({
     shortName: 'user',
     listTemplateName: 'list-users',
     editorTemplateName: 'creator-user',
-    
-    breadcrumbs: {
-        'screen': 'Home',
-        'link': '#/home',
-        'next': {
-            'screen': 'User list'
-        }
-    },
 
     initialize: function (params) {
         this.collection = new Wat.Collections.Users(params);
@@ -18,38 +10,7 @@ Wat.Views.UserListView = Wat.Views.ListView.extend({
     },
         
     // This events will be added to view events
-    listEvents: {
-        
-    },
-    
-    setSelectedActions: function () {
-        this.selectedActions = [
-            {
-                'value': 'block',
-                'text': 'Block'
-            },
-            {
-                'value': 'unblock',
-                'text': 'Unblock'
-            },
-            {
-                'value': 'disconnect_all',
-                'text': 'Disconnect from all VMs'
-            },
-            {
-                'value': 'delete',
-                'text': 'Delete'
-            }
-        ];
-    },
-    
-    setListActionButton: function () {
-        this.listActionButton = {
-            'name': 'new_user_button',
-            'value': 'New User',
-            'link': 'javascript:'
-        }
-    },
+    listEvents: {},
     
     openNewElementDialog: function (e) {
         this.model = new Wat.Models.User();

@@ -12,6 +12,8 @@ Wat.Views.DetailsView = Wat.Views.MainView.extend({
 
         this.elementId = params.id;
         
+        this.setBreadCrumbs();
+
         this.templateDetailsCommon = Wat.A.getTemplate('details-common');
         this.templateDetails = Wat.A.getTemplate(this.detailsTemplateName);
 
@@ -19,6 +21,10 @@ Wat.Views.DetailsView = Wat.Views.MainView.extend({
         
         // Extend the common events
         this.extendEvents(this.eventsDetails);
+    },
+    
+    setBreadCrumbs: function () {
+        this.breadcrumbs = Wat.I.getDetailsBreadCrumbs(this.shortName);
     },
     
     afterRender: function () {

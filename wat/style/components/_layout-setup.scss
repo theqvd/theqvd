@@ -36,3 +36,19 @@
 .customize-section-selector {
     margin-bottom: 20px;
 }
+
+.customize-options {
+    .customize-block {
+        width: 49%;
+        display: inline-block;
+        vertical-align: top;
+        
+        &:first-child {
+            padding-right: 10px;
+        }     
+        
+        &:last-child {
+            padding-left: 10px;
+        }
+    }
+}

@@ -2,15 +2,7 @@ Wat.Views.VMListView = Wat.Views.ListView.extend({
     shortName: 'vm',
     listTemplateName: 'list-vms',
     editorTemplateName: 'creator-vm',
-    
-    breadcrumbs: {
-        'screen': 'Home',
-        'link': '#/home',
-        'next': {
-            'screen': 'Virtual machine list'
-        }
-    },
-    
+        
     initialize: function (params) {   
         this.collection = new Wat.Collections.VMs(params);
         
@@ -18,47 +10,7 @@ Wat.Views.VMListView = Wat.Views.ListView.extend({
     },
     
     // This events will be added to view events
-    listEvents: {
-        
-    },
-    
-    setSelectedActions: function () {
-        this.selectedActions = [
-            {
-                'value': 'start',
-                'text': 'Start'
-            },
-            {
-                'value': 'stop',
-                'text': 'Stop'
-            },
-            {
-                'value': 'block',
-                'text': 'Block'
-            },
-            {
-                'value': 'unblock',
-                'text': 'Unblock'
-            },
-            {
-                'value': 'disconnect',
-                'text': 'Disconnect user'
-            },
-            {
-                'value': 'delete',
-                'text': 'Delete'
-            }
-        ];
-    },
-    
-    setListActionButton: function () {
-        this.listActionButton = {
-            'name': 'new_vm_button',
-            'value': 'New Virtual machine',
-            'link': 'javascript:',
-            'icon': ''
-        }
-    },
+    listEvents: {},
     
     openNewElementDialog: function (e) {
         this.model = new Wat.Models.VM();
@@ -136,9 +88,7 @@ Wat.Views.VMListView = Wat.Views.ListView.extend({
         else {
             arguments["name"] = name;
         }
-                
-        console.log(arguments);
-                
+                                
         this.createModel(arguments);
     },
     

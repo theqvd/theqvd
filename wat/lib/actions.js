@@ -32,6 +32,10 @@ Wat.A = {
         if (!$.isEmptyObject(arguments)) {
             url += '&arguments=' + JSON.stringify(arguments);
         }
+        
+        messages = messages || {};
+        
+        successCallback = successCallback || function () {};
                 
         $.ajax({
             url: url,
@@ -40,7 +44,9 @@ Wat.A = {
             processData: false,
             parse: true,
             success: function (response) {
-                that.retrievedData = response;
+                if (that) {
+                    that.retrievedData = response;
+                }
 
                 if (response.status == 0) {
                     successCallback(that);
@@ -62,9 +68,7 @@ Wat.A = {
                     };
 
                     Wat.I.showMessage(messageParams, response);
-                }
-                
-                //successCallback(that);
+                }                
             }
         });
     },

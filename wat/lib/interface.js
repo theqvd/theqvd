@@ -2,7 +2,35 @@
 Wat.I = {
     cornerMenu : {},
     
+    getCornerMenu: function () {
+        return $.extend(true, [], this.cornerMenu);
+    },
+    
     listColumns: {
+        vm: {},
+        user: {},
+        node: {},
+        osf: {},
+        di: {}
+    },
+    
+    getListColumns: function (shortName) {
+        return $.extend(true, {}, this.listColumns[shortName]);
+    },
+    
+    formFilters: {
+        vm: {},
+        user: {},
+        node: {},
+        osf: {},
+        di: {}
+    },
+    
+    getFormFilters: function (shortName) {
+        return $.extend(true, {}, this.formFilters[shortName]);
+    },
+    
+    selectedActions: {
         vm: [],
         user: [],
         node: [],
@@ -10,12 +38,53 @@ Wat.I = {
         di: []
     },
     
-    formFilters: {
-        vm: [],
-        user: [],
-        node: [],
-        osf: [],
-        di: []
+    getSelectedActions: function (shortName) {
+        return $.extend(true, [], this.selectedActions[shortName]);
+    },
+    
+    listActionButton: {
+        vm: {},
+        user: {},
+        node: {},
+        osf: {},
+        di: {}
+    },
+    
+    getListActionButton: function (shortName) {
+        return $.extend(true, [], this.listActionButton[shortName]);
+    },
+    
+    // Breadcrumbs
+    
+    homeBreadCrumbs: {
+        'screen': 'Home',
+        'link': '#/home'
+    },
+    
+    // List breadcrumbs
+    listBreadCrumbs: {
+        vm: {},
+        user: {},
+        node: {},
+        osf: {},
+        di: {}
+    },   
+        
+    getListBreadCrumbs: function (shortName) {
+        return this.listBreadCrumbs[shortName];
+    },
+    
+    // List breadcrumbs
+    detailsBreadCrumbs: {
+        vm: {},
+        user: {},
+        node: {},
+        osf: {},
+        di: {}
+    },   
+        
+    getDetailsBreadCrumbs: function (shortName) {
+        return this.detailsBreadCrumbs[shortName];
     },
     
     showAll: function () {
@@ -352,20 +421,56 @@ Wat.I = {
         return failuresList;
     },
     
-    fillCustomizeOptions: function (that) {
-        var customizeOptions = that.retrievedData.result.rows;
-        console.log(customizeOptions);
-        
-        var customizeOptionsTable;
-        
-        var head = '<tr><th>Field</th><th>List</th><th>Details</th><th>List filters</th></td>';
-        $('.js-customize-options table').append(head);
+    
+    fillCustomizeOptions: function (shortName) { 
+        var listColumns = this.listColumns[shortName]
+        var head = '<tr><th data-i18n="Column">' + i18n.t('Column') + '</th><th data-i18n="Show">' + i18n.t('Show') + '</th></td>';
+        var selector = '.js-customize-columns table';
+        $(selector + ' tr').remove();
+        $(selector).append(head);
 
-        $.each(customizeOptions, function (iOption, option) {
-            var row = '<tr><td>' + option.name + '</td><td>' + Wat.I.controls.CheckBox({checked: option.get_list}) + '</td><td>' + Wat.I.controls.CheckBox({checked: option.get_details}) + '</td><td>' + Wat.I.controls.CheckBox({checked: option.filter_list}) + '</td></td>';
+        $.each(listColumns, function (fName, field) {
+            if (field.fixed) {
+                return;
+            }
+
+            var cellContent = Wat.I.controls.CheckBox({checked: field.display});
             
-            $('.js-customize-options table').append(row);
-            console.log(option);
+            var row = '<tr><td data-i18n="' + field.text + '">' + i18n.t(field.text) + '</td><td class="center">' + cellContent + '</td></tr>';
+            
+            $(selector).append(row);
+        });
+        
+        var formFilters = this.formFilters[shortName]
+        var head = '<tr><th data-i18n="Filter">' + i18n.t('Filter') + '</th><th data-i18n="Desktop version">' + i18n.t('Desktop version') + '</th><th data-i18n="Mobile version">' + i18n.t('Mobile version') + '</th></td>';
+        var selector = '.js-customize-filters table';
+        $(selector + ' tr').remove();
+        $(selector).append(head);
+
+        $.each(formFilters, function (fName, field) {
+            if (field.fixed) {
+                return;
+            }
+
+            var cellContentDesktop = Wat.I.controls.CheckBox({checked: field.display && field.device != 'mobile'});
+            var cellContentMobile = Wat.I.controls.CheckBox({checked: field.display && field.device != 'desktop'});
+            
+            var fieldType = '';
+            switch(field.type) {
+                case 'text':
+                    fieldType = 'Text input';
+                    break;
+                case 'select':
+                    fieldType = 'Combo box';
+                    break;
+            }
+            
+            var rowField = '<td><div data-i18n="' + field.text + '">' + i18n.t(field.text) + '</div><div class="second_row" data-i18n="' + fieldType + '">' + i18n.t(fieldType) + '</div></td>';
+            var rowMobile = '<td class="center">' + cellContentDesktop + '</td>';
+            var rowDesktop = '<td class="center">' + cellContentMobile + '</td></tr>';
+            var row = '<tr>' + rowField + rowMobile + rowDesktop + '</tr>';
+            
+            $(selector).append(row);
         });
     },
     

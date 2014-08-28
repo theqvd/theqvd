@@ -2,14 +2,6 @@ Wat.Views.DIListView = Wat.Views.ListView.extend({
     shortName: 'di',
     listTemplateName: 'list-di',
     editorTemplateName: 'creator-di',
-    
-    breadcrumbs: {
-        'screen': 'Home',
-        'link': '#/home',
-        'next': {
-            'screen': 'DI list'
-        }
-    },
 
     initialize: function (params) {
         this.collection = new Wat.Collections.DIs(params);
@@ -41,31 +33,6 @@ Wat.Views.DIListView = Wat.Views.ListView.extend({
 
         // As the osf filter in DI list hasn't all option, we trigger the change once it is loaded to perform the filtering
         $('.filter-control [name="osf"]').trigger('change');
-    },
-    
-    setSelectedActions: function () {
-        this.selectedActions = [
-            {
-                'value': 'block',
-                'text': 'Block'
-            },           
-            {
-                'value': 'unblock',
-                'text': 'Unblock'
-            },
-            {
-                'value': 'delete',
-                'text': 'Delete'
-            }
-        ];
-    },
-    
-    setListActionButton: function () {
-        this.listActionButton = {
-            'name': 'new_di_button',
-            'value': 'New Disk image',
-            'link': 'javascript:'
-        }
     },
     
     openNewElementDialog: function (e) {

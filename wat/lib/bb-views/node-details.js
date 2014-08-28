@@ -1,20 +1,9 @@
-Wat.Views.NodeDetailsView = Wat.Views.DetailsView.extend({
+Wat.Views.NodeDetailsView = Wat.Views.DetailsView.extend({  
+    shortName: 'node',
     editorTemplateName: 'editor-node',
     detailsTemplateName: 'details-node',
     detailsSideTemplateName: 'details-node-side',
     sideContainer: '.bb-details-side',
-    
-    breadcrumbs: {
-        'screen': 'Home',
-        'link': '#/home',
-        'next': {
-            'screen': 'Node list',
-            'link': '#/nodes',
-            'next': {
-                'screen': ''
-            }
-        }
-    },
 
     initialize: function (params) {
         this.model = new Wat.Models.Node(params);
