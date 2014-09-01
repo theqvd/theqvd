@@ -1,7 +1,7 @@
 Wat.Views.NodeListView = Wat.Views.ListView.extend({
-    shortName: 'node',
-    listTemplateName: 'list-nodes',
-    editorTemplateName: 'creator-node',
+    qvdObj: 'host',
+    listTemplateName: 'list-hosts',
+    editorTemplateName: 'creator-host',
     
     initialize: function (params) { 
         this.collection = new Wat.Collections.Nodes(params);
@@ -14,7 +14,7 @@ Wat.Views.NodeListView = Wat.Views.ListView.extend({
     
     openNewElementDialog: function (e) {
         this.model = new Wat.Models.Node();
-        this.dialogConf.title = $.i18n.t('New node');
+        this.dialogConf.title = $.i18n.t('New host');
         
         Wat.Views.ListView.prototype.openNewElementDialog.apply(this, [e]);
     },

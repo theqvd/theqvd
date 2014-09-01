@@ -21,7 +21,7 @@
                         case 'info':
             %>
                             <th class="desktop max-1-icons">
-                                <i class="fa sort-icon" data-i18n="Info"><%= i18n.t('Info') %></i>
+                                <i class="fa fa-info-circle center normal" data-i18n="[title]Info" title="<%= i18n.t('Info') %>"></i>
                             </th>
             <%
                             break;
@@ -39,7 +39,7 @@
                             </th>
             <%
                             break;
-                        case 'started_vms':
+                        case 'connected_vms':
             %>
                             <th class="desktop">
                                 <i class="fa fa-sort sort-icon" data-i18n="Connected VMs"><%= i18n.t('Connected VMs') %></i>
@@ -131,12 +131,20 @@
                                 </td>
                 <%
                                 break;
-                            case 'started_vms':
+                            case 'connected_vms':
                 %>
                                 <td class="desktop">
-                                    <%= model.get('startedVMs') %>
-                                    /
-                                    <%= model.get('vms') %>
+                                    <% if (model.get('vms') > 0) { %>
+                                    <a href="#/vms/user/<%= model.get('id') %>">
+                                        <%= model.get('startedVMs') %>
+                                        /
+                                        <%= model.get('vms') %>
+                                    </a>
+                                    <% } else {%>
+                                        <%= model.get('startedVMs') %>
+                                        /
+                                        <%= model.get('vms') %>
+                                    <% } %>
                                 </td>
                 <%
                                 break;

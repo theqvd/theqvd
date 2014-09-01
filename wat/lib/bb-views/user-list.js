@@ -1,5 +1,5 @@
 Wat.Views.UserListView = Wat.Views.ListView.extend({
-    shortName: 'user',
+    qvdObj: 'user',
     listTemplateName: 'list-users',
     editorTemplateName: 'creator-user',
 

@@ -1,5 +1,5 @@
 Wat.Views.VMListView = Wat.Views.ListView.extend({  
-    shortName: 'vm',
+    qvdObj: 'vm',
     listTemplateName: 'list-vms',
     editorTemplateName: 'creator-vm',
         

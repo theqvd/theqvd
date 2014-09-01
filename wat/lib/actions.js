@@ -21,7 +21,11 @@ Wat.A = {
         return $('#template_' + templateName).html();
     },
     
-    performAction: function (action, arguments, filters, messages, successCallback, that) {
+    performAction: function (action, arguments, filters, messages, successCallback, that, async) {
+        if (async == undefined) {
+            async = true;
+        }
+        
         var url = Wat.C.getBaseUrl() + 
             '&action=' + action;
         
@@ -32,25 +36,23 @@ Wat.A = {
         if (!$.isEmptyObject(arguments)) {
             url += '&arguments=' + JSON.stringify(arguments);
         }
-        
+
         messages = messages || {};
         
-        successCallback = successCallback || function () {};
-                
+        successCallback = successCallback || function () {};   
         $.ajax({
             url: url,
             type: 'POST',
             dataType: 'json',
             processData: false,
             parse: true,
+            async: async,
             success: function (response) {
                 if (that) {
                     that.retrievedData = response;
                 }
 
-                if (response.status == 0) {
-                    successCallback(that);
-                }
+                successCallback(that);
                 
                 if (!$.isEmptyObject(messages)) {
                     if (response.status == 0) {

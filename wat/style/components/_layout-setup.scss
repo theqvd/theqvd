@@ -31,6 +31,10 @@
         padding-left: 2%;
         margin-left: 2%;
     }
+    
+    .h1 {
+        display: block;
+    }
 }
 
 .customize-section-selector {
@@ -49,6 +53,12 @@
         
         &:last-child {
             padding-left: 10px;
+            float: right;
         }
     }
+}
+
+a.button-update-customize {
+    float: right;
+    margin-top: 20px;
 }

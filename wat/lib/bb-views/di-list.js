@@ -1,5 +1,5 @@
 Wat.Views.DIListView = Wat.Views.ListView.extend({
-    shortName: 'di',
+    qvdObj: 'di',
     listTemplateName: 'list-di',
     editorTemplateName: 'creator-di',
 

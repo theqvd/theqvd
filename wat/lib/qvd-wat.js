@@ -64,7 +64,8 @@ var Wat = {
         Wat.I.cornerMenuEvents();
         Wat.I.tooltipConfiguration();
         Wat.I.mobileMenuConfiguration();
-        Wat.I.updateLoginOnMenu(Wat.C.login);
+        Wat.I.updateLoginOnMenu();
+        Wat.I.setCustomizationFields();
         
         // Instantiate the router
         var app_router = new Wat.Router;
@@ -84,7 +85,7 @@ var Wat = {
                     case 'user':
                         params.filters = {"user_id": value};
                         break;
-                    case 'node':
+                    case 'host':
                         params.filters = {"host_id": value};
                         break;
                     case 'osf':
@@ -111,7 +112,7 @@ var Wat = {
         
         app_router.on('route:listNode', function () {
             Wat.I.showLoading();
-            setMenuOpt('nodes');
+            setMenuOpt('hosts');
             if (!$.isEmptyObject(Wat.CurrentView )) {
                 Wat.CurrentView.undelegateEvents();
             }
@@ -182,7 +183,7 @@ var Wat = {
         
         app_router.on('route:detailsNode', function (id) {
             Wat.I.showLoading();
-            setMenuOpt('nodes');
+            setMenuOpt('hosts');
             if (!$.isEmptyObject(Wat.CurrentView )) {
                 Wat.CurrentView.undelegateEvents();
             }

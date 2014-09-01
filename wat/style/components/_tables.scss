@@ -12,14 +12,14 @@
 
 /* Table list */
 
-table.list, table.custom-props {    
+table.list, table.custom-props, table.customize-fields {    
     width: 100%;
     margin-left: auto;
     margin-right: auto;
     background-color: $col_whiter;
     border: 1px solid #ddd;
     border-radius: $table_radius;
-    border-collapse:separate;
+    border-collapse: separate;
 
     th {
         font-weight: bold;
@@ -42,7 +42,7 @@ table.list, table.custom-props {
         }
         
         i {
-            &:before {
+            &.sort-icon:before {
                 float: right;
                 margin-left: 5px;
                 font-weight: normal;

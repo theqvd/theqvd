@@ -1,5 +1,5 @@
 Wat.Views.OSFDetailsView = Wat.Views.DetailsView.extend({  
-    shortName: 'osf',
+    qvdObj: 'osf',
     editorTemplateName: 'editor-osf',
     detailsTemplateName: 'details-osf',
     detailsSideTemplateName: 'details-osf-side',
@@ -18,7 +18,7 @@ Wat.Views.OSFDetailsView = Wat.Views.DetailsView.extend({
         var params = {};
         params.whatRender = 'list';
         params.listContainer = sideContainer1;
-        params.forceListColumns = {name: true, tag: true};
+        params.forceListColumns = {info: true, name: true, tag: true};
         params.forceSelectedActions = {};
         params.forceListActionButton = null;
         params.block = 5;
@@ -29,14 +29,12 @@ Wat.Views.OSFDetailsView = Wat.Views.DetailsView.extend({
         var params = {};
         params.whatRender = 'list';
         params.listContainer = sideContainer2;
-        params.forceListColumns = {disk_image: true, default: true};
+        params.forceListColumns = {info: true, disk_image: true, default: true};
         params.forceSelectedActions = {};
         params.forceListActionButton = null;
         params.block = 5;
         params.filters = {"osf_id": this.elementId};
-        this.sideView2 = new Wat.Views.DIListView(params);
-        
-        
+        this.sideView2 = new Wat.Views.DIListView(params);    
     },
     
     updateElement: function (dialog) {

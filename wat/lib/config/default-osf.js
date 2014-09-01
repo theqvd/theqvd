@@ -1,73 +1,88 @@
-var shortName = 'osf';
+var qvdObj = 'osf';
 
 // Columns configuration on list view
-Wat.I.listColumns[shortName] = {
-    "checks": {
-        "display": true,
-        "fields": {
-            
-        },
-        "text": "checks"
+Wat.I.listColumns[qvdObj] = {
+    'checks': {
+        'display': true,
+        'fields': [],
+        'fixed': true
     },
-    "id": {
-        "display": true,
-        "fields": {
-            
-        },
-        "text": "id"
+    'id': {
+        'display': true,
+        'fields': [
+            'id'
+        ],
+        'text': 'Id'
     },
-    "name": {
-        "display": true,
-        "fields": {
-            
-        },
-        "text": "name"
+    'name': {
+        'display': true,
+        'fields': [
+            'id',
+            'name'
+        ],
+        'text': 'Name'
     },
-    "overlay": {
-        "display": true,
-        "fields": {
-            
-        },
-        "text": "overlay"
+    'overlay': {
+        'display': true,
+        'fields': [
+            'overlay'
+        ],
+        'text': 'Overlay'
     },
-    "memory": {
-        "display": true,
-        "fields": {
-            
-        },
-        "text": "memory"
+    'memory': {
+        'display': true,
+        'fields': [
+            'memory'
+        ],
+        'text': 'Memory'
     },
-    "user_storage": {
-        "display": true,
-        "fields": {
-            
-        },
-        "text": "user_storage"
+    'user_storage': {
+        'display': true,
+        'fields': [
+            'user_storage'
+        ],
+        'text': 'User storage'
     },
-    "dis": {
-        "display": true,
-        "fields": {
-            
-        },
-        "text": "dis"
+    'dis': {
+        'display': true,
+        'fields': [
+            'id',
+            'dis'
+        ],
+        'text': 'DIs'
     },
-    "vms": {
-        "display": true,
-        "fields": {
-            
-        },
-        "text": "vms"
+    'vms': {
+        'display': true,
+        'fields': [
+            'id',
+            'vms'
+        ],
+        'text': 'VMs'
+    },
+    'creation_date': {
+        'text': 'Creation date',
+        'fields': [
+            'creation_date'
+        ],
+        'display': false
+    },
+    'creation_admin': {
+        'text': 'Created by',
+        'fields': [
+            'creation_admin'
+        ],
+        'display': false
     }
 };
 
 // Filters configuration on list view
-Wat.I.formFilters[shortName] = {
+Wat.I.formFilters[qvdObj] = {
     'name': {
         'filterField': 'name',
         'type': 'text',
         'text': 'Search by name',
-        'display': true,
-        'device': 'both'
+        'displayMobile': true,
+        'displayDesktop': true
     },
     'vm': {
         'filterField': 'vm_id',
@@ -82,8 +97,8 @@ Wat.I.formFilters[shortName] = {
                 'selected': true
             }
                     ],
-        'display': true,
-        'device': 'desktop'
+        'displayMobile': false,
+        'displayDesktop': true
     },
     'di': {
         'filterField': 'di_id',
@@ -98,13 +113,13 @@ Wat.I.formFilters[shortName] = {
                 'selected': true
             }
                     ],
-        'display': true,
-        'device': 'desktop'
+        'displayMobile': false,
+        'displayDesktop': true
     }
 };
 
 // Actions of the bottom of the list (those that will be done with selected items) configuration on list view
-Wat.I.selectedActions[shortName] = [
+Wat.I.selectedActions[qvdObj] = [
             {
                 'value': 'delete',
                 'text': 'Delete'
@@ -112,21 +127,21 @@ Wat.I.selectedActions[shortName] = [
         ];
 
 // Action button (tipically New button) configuration on list view
-Wat.I.listActionButton[shortName] = {
+Wat.I.listActionButton[qvdObj] = {
             'name': 'new_osf_button',
             'value': 'New OS Flavour',
             'link': 'javascript:'
         };
 
 // Breadcrumbs configuration on list view
-$.extend(Wat.I.listBreadCrumbs[shortName], Wat.I.homeBreadCrumbs);
-Wat.I.listBreadCrumbs[shortName]['next'] = {
+$.extend(Wat.I.listBreadCrumbs[qvdObj], Wat.I.homeBreadCrumbs);
+Wat.I.listBreadCrumbs[qvdObj]['next'] = {
             'screen': 'OSF list'
         };
 
 // Breadcrumbs configuration on details view
-$.extend(true, Wat.I.detailsBreadCrumbs[shortName], Wat.I.listBreadCrumbs[shortName]);
-Wat.I.detailsBreadCrumbs[shortName].next.link = '#/osfs';
-Wat.I.detailsBreadCrumbs[shortName].next.next = {
+$.extend(true, Wat.I.detailsBreadCrumbs[qvdObj], Wat.I.listBreadCrumbs[qvdObj]);
+Wat.I.detailsBreadCrumbs[qvdObj].next.link = '#/osfs';
+Wat.I.detailsBreadCrumbs[qvdObj].next.next = {
             'screen': '' // Will be filled dinamically
         };

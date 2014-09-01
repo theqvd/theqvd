@@ -68,12 +68,12 @@ Wat.Views.ListView = Wat.Views.MainView.extend({
         }            
         if (params.forceListColumns !== undefined) {
             var that = this;
-            $.each(this.columns, function(index, column) {
-                if (params.forceListColumns[column.name] !== undefined && params.forceListColumns[column.name]) {
-                    that.columns[index].display = true;
+            $.each(this.columns, function(cName, column) {
+                if (params.forceListColumns[cName] !== undefined && params.forceListColumns[cName]) {
+                    that.columns[cName].display = true;
                 }
                 else {
-                    that.columns[index].display = false;
+                    that.columns[cName].display = false;
                 }
             });
         }
@@ -196,18 +196,18 @@ Wat.Views.ListView = Wat.Views.MainView.extend({
     },
     
     setFilters: function () {
-        this.formFilters = Wat.I.getFormFilters(this.shortName);
+        this.formFilters = Wat.I.getFormFilters(this.qvdObj);
 
         // The superadmin have an extra filter: tenant
         
-        // Every element but the nodes has tenant
+        // Every element but the hosts has tenant
         if (Wat.C.isSuperadmin() && this.collection.actionPrefix != 'host') {
-            this.formFilters.unshift({
-                    'name': 'tenant',
+            this.formFilters.tenant = {
                     'filterField': 'tenant',
                     'type': 'select',
-                    'label': 'Tenant',
-                    'mobile': true,
+                    'text': 'Tenant',
+                    'displayDesktop': true,
+                    'displayMobile': false,
                     'class': 'chosen-single',
                     'options': [
                         {
@@ -226,39 +226,37 @@ Wat.Views.ListView = Wat.Views.MainView.extend({
                             'selected': false
                         }
                                 ]
-                }
-                                 );
+                };
         }
     },
     
     setColumns: function () {
-        this.columns = Wat.I.getListColumns(this.shortName);
+        this.columns = Wat.I.getListColumns(this.qvdObj);
         
         // The superadmin have an extra field on lists: tenant
         
-        // Every element but the nodes has tenant
+        // Every element but the hosts has tenant
         if (Wat.C.isSuperadmin() && this.collection.actionPrefix != 'host') {
-            this.columns.push({
-                'name': 'tenant',
+            this.columns.tenant = {
                 'text': 'Tenant',
-                'display': true,
+                'displayDesktop': true,
+                'displayMobile': false,
                 'noTranslatable': true
-            }
-                               );
+            };
         }
     },
     
     setSelectedActions: function () {
-        this.selectedActions = Wat.I.getSelectedActions(this.shortName);
+        this.selectedActions = Wat.I.getSelectedActions(this.qvdObj);
     },
     
 
     setListActionButton: function () {
-        this.listActionButton = Wat.I.getListActionButton(this.shortName);
+        this.listActionButton = Wat.I.getListActionButton(this.qvdObj);
     },
     
     setBreadCrumbs: function () {
-        this.breadcrumbs = Wat.I.getListBreadCrumbs(this.shortName);
+        this.breadcrumbs = Wat.I.getListBreadCrumbs(this.qvdObj);
     },
     
     // Fetch collection and render list
@@ -350,7 +348,6 @@ Wat.Views.ListView = Wat.Views.MainView.extend({
     
     // Render only the list. Usefull to functions such as pagination, sorting and filtering where is not necessary render controls
     renderList: function () {
-        
         // Fill the list
         var template = _.template(
             this.listTemplate, {

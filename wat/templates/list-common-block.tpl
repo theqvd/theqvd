@@ -3,7 +3,7 @@
         <div class="filter-mobile mobile">
             <%
                 $.each(formFilters, function(name, filter) { 
-                    if (!filter.display || filter.device == 'desktop') {
+                    if (!filter.displayMobile) {
                         return;
                     }
                     

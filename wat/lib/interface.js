@@ -9,49 +9,173 @@ Wat.I = {
     listColumns: {
         vm: {},
         user: {},
-        node: {},
+        host: {},
         osf: {},
         di: {}
     },
     
-    getListColumns: function (shortName) {
-        return $.extend(true, {}, this.listColumns[shortName]);
+    getListColumns: function (qvdObj) {
+        return $.extend(true, {}, this.listColumns[qvdObj]);
+    },
+    
+    // DEPRECATED
+    getListColumnsByField: function (qvdObj) {
+        var listColumns = this.getListColumns(qvdObj);
+        
+        // Get default values for custom columns
+        var listColumnsByField = {};
+        $.each(listColumns, function (columnName, column) {
+            $.each(column.fields, function (iField, field) {
+                listColumnsByField[field] = listColumnsByField[field] || {};
+                listColumnsByField[field][columnName] = column.display;
+            });
+        });
+        
+        return listColumnsByField;
     },
     
     formFilters: {
         vm: {},
         user: {},
-        node: {},
+        host: {},
         osf: {},
         di: {}
     },
     
-    getFormFilters: function (shortName) {
-        return $.extend(true, {}, this.formFilters[shortName]);
+    getFormFilters: function (qvdObj) {
+        return $.extend(true, {}, this.formFilters[qvdObj]);
+    },
+    
+    // DEPRECATED
+    getFormFiltersByField: function (qvdObj) {
+        var formFilters = this.getFormFilters(qvdObj);
+        
+        // Get default values for custom filters
+        var formFiltersByField = {desktop: {}, mobile: {}};
+        $.each(formFilters, function (filterName, filter) {
+            // For desktop
+            formFiltersByField['desktop'][filter.filterField] = formFiltersByField['desktop'][filter.filterField] || {};
+            formFiltersByField['desktop'][filter.filterField][filterName] = filter.displayDesktop;
+            
+            // For mobile
+            formFiltersByField['mobile'][filter.filterField] = formFiltersByField['mobile'][filter.filterField] || {};
+            formFiltersByField['mobile'][filter.filterField][filterName] = filter.displayMobile;
+        });
+        
+        return formFiltersByField;
+    },
+    
+    getCurrentCustomization: function (qvdObj) {
+        var currentCustomization = {};
+
+        var listColumns = this.getListColumns(qvdObj);
+        
+        // Get default values for custom columns
+        var listColumnsByField = {};
+        $.each(listColumns, function (fieldName, column) {
+            $.each(column.fields, function (iField, field) {
+                currentCustomization[field] = currentCustomization[field] || {};
+                currentCustomization[field]['listColumns'] = currentCustomization[field]['listColumns'] || {};
+                currentCustomization[field]['listColumns'][fieldName] = column.display;
+            });
+        });
+        
+        //return listColumnsByField;
+        
+        var formFilters = this.getFormFilters(qvdObj);
+        
+        // Get default values for custom filters
+        var formFiltersByField = {desktop: {}, mobile: {}};
+        $.each(formFilters, function (fieldName, filter) {
+            var field = filter.filterField;
+            // For desktop
+            currentCustomization[field] = currentCustomization[field] || {};
+            currentCustomization[field]['desktopFilters'] = currentCustomization[field]['desktopFilters'] || {};
+            currentCustomization[field]['desktopFilters'][fieldName] = filter.displayDesktop; 
+            
+            // For mobile
+            currentCustomization[field] = currentCustomization[field] || {};
+            currentCustomization[field]['mobileFilters'] = currentCustomization[field]['mobileFilters'] || {};
+            currentCustomization[field]['mobileFilters'][fieldName] = filter.displayMobile;
+        });
+        
+        return currentCustomization;
+    },
+    
+    setCustomizationFields: function (qvdObj) {
+        var filters = {};
+
+        // If qvd object is not specified, all will be setted
+        if (qvdObj) {
+            filters.qvd_obj = qvdObj;
+        }
+        
+        Wat.A.performAction('config_field_get_list', {}, filters, {}, this.setCustomizationFieldsCallback, this, false);
+    },
+    
+    setCustomizationFieldsCallback: function (that) {
+        if (that.retrievedData.status === 0) {
+            var fields = that.retrievedData.result.rows;
+
+            $.each(fields, function (iField, field) {
+                // If field options are not defined, we keep the default options doing nothing
+                if (!field.filter_options) {
+                    return;
+                }
+                
+                var fieldName = field.name;               
+                var qvdObj = field.qvd_obj;
+                
+                // Fix bad JSON format returned by API
+                optionsJSON = field.filter_options.replace(/\\"/g,'"');
+                optionsJSON = optionsJSON.replace(/^"/,'');
+                optionsJSON = optionsJSON.replace(/"$/,'');
+                
+                var options = JSON.parse(optionsJSON);
+                
+                if (options.listColumns) {
+                    $.each(options.listColumns, function (columnName, display) {
+                        that.listColumns[qvdObj][columnName].display = display;
+                    });
+                }
+                
+                if (options.mobileFilters) {
+                    $.each(options.mobileFilters, function (columnName, display) {
+                        that.formFilters[qvdObj][columnName].displayMobile = display;
+                    });
+                }
+                
+                if (options.desktopFilters) {
+                    $.each(options.desktopFilters, function (columnName, display) {
+                        that.formFilters[qvdObj][columnName].displayDesktop = display;
+                    });
+                }
+            });            
+        }
     },
     
     selectedActions: {
         vm: [],
         user: [],
-        node: [],
+        host: [],
         osf: [],
         di: []
     },
     
-    getSelectedActions: function (shortName) {
-        return $.extend(true, [], this.selectedActions[shortName]);
+    getSelectedActions: function (qvdObj) {
+        return $.extend(true, [], this.selectedActions[qvdObj]);
     },
     
     listActionButton: {
         vm: {},
         user: {},
-        node: {},
+        host: {},
         osf: {},
         di: {}
     },
     
-    getListActionButton: function (shortName) {
-        return $.extend(true, [], this.listActionButton[shortName]);
+    getListActionButton: function (qvdObj) {
+        return $.extend(true, [], this.listActionButton[qvdObj]);
     },
     
     // Breadcrumbs
@@ -65,26 +189,26 @@ Wat.I = {
     listBreadCrumbs: {
         vm: {},
         user: {},
-        node: {},
+        host: {},
         osf: {},
         di: {}
     },   
         
-    getListBreadCrumbs: function (shortName) {
-        return this.listBreadCrumbs[shortName];
+    getListBreadCrumbs: function (qvdObj) {
+        return this.listBreadCrumbs[qvdObj];
     },
     
     // List breadcrumbs
     detailsBreadCrumbs: {
         vm: {},
         user: {},
-        node: {},
+        host: {},
         osf: {},
         di: {}
     },   
         
-    getDetailsBreadCrumbs: function (shortName) {
-        return this.detailsBreadCrumbs[shortName];
+    getDetailsBreadCrumbs: function (qvdObj) {
+        return this.detailsBreadCrumbs[qvdObj];
     },
     
     showAll: function () {
@@ -302,8 +426,8 @@ Wat.I = {
         });     
     },
     
-    updateLoginOnMenu: function (login) {
-        $('.js-menu-corner').find('.login').html(login);
+    updateLoginOnMenu: function () {
+        $('.js-menu-corner').find('.login').html(Wat.C.login);
     },
     
     // Messages
@@ -422,9 +546,9 @@ Wat.I = {
     },
     
     
-    fillCustomizeOptions: function (shortName) { 
-        var listColumns = this.listColumns[shortName]
-        var head = '<tr><th data-i18n="Column">' + i18n.t('Column') + '</th><th data-i18n="Show">' + i18n.t('Show') + '</th></td>';
+    fillCustomizeOptions: function (qvdObj) { 
+        var listColumns = this.listColumns[qvdObj]
+        var head = '<tr><th data-i18n="Column">' + i18n.t('Column') + '</th><th data-i18n="Show">' + i18n.t('Show') + '</th></tr>';
         var selector = '.js-customize-columns table';
         $(selector + ' tr').remove();
         $(selector).append(head);
@@ -436,13 +560,22 @@ Wat.I = {
 
             var cellContent = Wat.I.controls.CheckBox({checked: field.display});
             
-            var row = '<tr><td data-i18n="' + field.text + '">' + i18n.t(field.text) + '</td><td class="center">' + cellContent + '</td></tr>';
+            var fieldText = field.text;
+            
+            if (field.noTranslatable) {
+                var fieldTextTranslated = field.text;
+            }
+            else {
+                var fieldTextTranslated = i18n.t(field.text);
+            }
+            
+            var row = '<tr><td data-i18n="' + fieldText + '">' + fieldTextTranslated + '</td><td class="center">' + cellContent + '</td></tr>';
             
             $(selector).append(row);
         });
         
-        var formFilters = this.formFilters[shortName]
-        var head = '<tr><th data-i18n="Filter">' + i18n.t('Filter') + '</th><th data-i18n="Desktop version">' + i18n.t('Desktop version') + '</th><th data-i18n="Mobile version">' + i18n.t('Mobile version') + '</th></td>';
+        var formFilters = this.formFilters[qvdObj]
+        var head = '<tr><th data-i18n="Filter control">' + i18n.t('Filter control') + '</th><th data-i18n="Desktop version">' + i18n.t('Desktop version') + '</th><th data-i18n="Mobile version">' + i18n.t('Mobile version') + '</th></tr>';
         var selector = '.js-customize-filters table';
         $(selector + ' tr').remove();
         $(selector).append(head);
@@ -465,7 +598,16 @@ Wat.I = {
                     break;
             }
             
-            var rowField = '<td><div data-i18n="' + field.text + '">' + i18n.t(field.text) + '</div><div class="second_row" data-i18n="' + fieldType + '">' + i18n.t(fieldType) + '</div></td>';
+            var fieldText = field.text;
+            
+            if (field.noTranslatable) {
+                var fieldTextTranslated = field.text;
+            }
+            else {
+                var fieldTextTranslated = i18n.t(field.text);
+            }
+            
+            var rowField = '<td><div data-i18n="' + fieldText + '">' + fieldTextTranslated + '</div><div class="second_row" data-i18n="' + fieldType + '">' + i18n.t(fieldType) + '</div></td>';
             var rowMobile = '<td class="center">' + cellContentDesktop + '</td>';
             var rowDesktop = '<td class="center">' + cellContentMobile + '</td></tr>';
             var row = '<tr>' + rowField + rowMobile + rowDesktop + '</tr>';
@@ -485,6 +627,19 @@ Wat.I = {
 
             return control;
         },
-    }
+    },
     
+    getFieldTypeName: function (type) {
+        var fieldType = '';
+        switch(type) {
+            case 'text':
+                fieldType = 'Text input';
+                break;
+            case 'select':
+                fieldType = 'Combo box';
+                break;
+        }
+        
+        return fieldType;
+    }
 }

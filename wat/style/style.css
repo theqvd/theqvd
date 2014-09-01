@@ -12,7 +12,7 @@
   padding-left: 20px;
   padding-right: 20px; }
 
-.not-selectable, .menu > ul .menu-option, a.button, button.button, a.button2, button.button2, a.button.disabled, a.button2.disabled, button.button.disabled, button.button2.disabled, table.list th, table.custom-props th, .ui-dialog .ui-state-hover, .ui-dialog .ui-state-focus {
+.menu > ul .menu-option, a.button, button.button, a.button2, button.button2, a.button.disabled, a.button2.disabled, button.button.disabled, button.button2.disabled, table.list th, table.custom-props th, table.customize-fields th, .ui-dialog .ui-state-hover, .ui-dialog .ui-state-focus, .not-selectable {
   -webkit-touch-callout: none;
   -webkit-user-select: none;
   -khtml-user-select: none;
@@ -139,12 +139,6 @@ fieldset {
 
 .h2 {
   margin-bottom: 14px; }
-
-.center {
-  text-align: center; }
-
-.uppercase {
-  text-transform: uppercase; }
 
 .ok {
   color: #009900; }
@@ -895,6 +889,8 @@ body {
       float: right;
       padding-right: 2%;
       margin-right: 2%; }
+      .wrapper .content .setup-block .h1 {
+        display: block; }
     .wrapper .content .customize-section-selector {
       margin-bottom: 20px; }
     .wrapper .content .customize-options .customize-block {
@@ -904,7 +900,11 @@ body {
       .wrapper .content .customize-options .customize-block:first-child {
         padding-right: 10px; }
       .wrapper .content .customize-options .customize-block:last-child {
-        padding-left: 10px; }
+        padding-left: 10px;
+        float: right; }
+    .wrapper .content a.button-update-customize {
+      float: right;
+      margin-top: 20px; }
 
 .editor-container {
   margin: 0; }
@@ -993,7 +993,7 @@ body {
 *********************************************************************
 ********************************************************************/
 /* Table list */
-table.list, table.custom-props {
+table.list, table.custom-props, table.customize-fields {
   width: 100%;
   margin-left: auto;
   margin-right: auto;
@@ -1001,42 +1001,42 @@ table.list, table.custom-props {
   border: 1px solid #ddd;
   border-radius: 4px;
   border-collapse: separate; }
-  table.list th, table.custom-props th {
+  table.list th, table.custom-props th, table.customize-fields th {
     font-weight: bold;
     text-align: left;
     border-bottom: #ccc solid 1px; }
-    table.list th .sort-icon, table.custom-props th .sort-icon {
+    table.list th .sort-icon, table.custom-props th .sort-icon, table.customize-fields th .sort-icon {
       float: right; }
-    table.list th.sortable, table.custom-props th.sortable {
+    table.list th.sortable, table.custom-props th.sortable, table.customize-fields th.sortable {
       cursor: pointer; }
-    table.list th.sorted, table.custom-props th.sorted {
+    table.list th.sorted, table.custom-props th.sorted, table.customize-fields th.sorted {
       background-color: #cb540a;
       color: #fdfdfd; }
-    table.list th i, table.custom-props th i {
+    table.list th i, table.custom-props th i, table.customize-fields th i {
       width: 100%;
       overflow: hidden;
       text-overflow: ellipsis;
       white-space: nowrap;
       font-weight: bold; }
-      table.list th i:before, table.custom-props th i:before {
+      table.list th i.sort-icon:before, table.custom-props th i.sort-icon:before, table.customize-fields th i.sort-icon:before {
         float: right;
         margin-left: 5px;
         font-weight: normal; }
-  table.list td, table.list th, table.custom-props td, table.custom-props th {
+  table.list td, table.list th, table.custom-props td, table.custom-props th, table.customize-fields td, table.customize-fields th {
     padding: 6px 8px;
     vertical-align: middle;
     border-right: dotted 1px #e4e4e4; }
-    table.list td:last-child, table.list th:last-child, table.custom-props td:last-child, table.custom-props th:last-child {
+    table.list td:last-child, table.list th:last-child, table.custom-props td:last-child, table.custom-props th:last-child, table.customize-fields td:last-child, table.customize-fields th:last-child {
       border-right: 0px; }
-  table.list > tbody > tr:nth-child(even), table.custom-props > tbody > tr:nth-child(even) {
+  table.list > tbody > tr:nth-child(even), table.custom-props > tbody > tr:nth-child(even), table.customize-fields > tbody > tr:nth-child(even) {
     background-color: #fdfdfd; }
-  table.list > tbody > tr:nth-child(odd), table.custom-props > tbody > tr:nth-child(odd) {
+  table.list > tbody > tr:nth-child(odd), table.custom-props > tbody > tr:nth-child(odd), table.customize-fields > tbody > tr:nth-child(odd) {
     background-color: #f3f3f3; }
-  table.list tr:last-child td:first-child, table.custom-props tr:last-child td:first-child {
+  table.list tr:last-child td:first-child, table.custom-props tr:last-child td:first-child, table.customize-fields tr:last-child td:first-child {
     border-bottom-left-radius: 4px; }
-  table.list tr:last-child td:last-child, table.custom-props tr:last-child td:last-child {
+  table.list tr:last-child td:last-child, table.custom-props tr:last-child td:last-child, table.customize-fields tr:last-child td:last-child {
     border-bottom-right-radius: 4px; }
-  table.list .info-in-name-cell, table.custom-props .info-in-name-cell {
+  table.list .info-in-name-cell, table.custom-props .info-in-name-cell, table.customize-fields .info-in-name-cell {
     margin-top: 8px;
     float: right; }
 
@@ -1796,5 +1796,24 @@ input {
 
 .footer a {
   font-size: inherit; }
+
+/********************************************************************
+*********************************************************************
+*********************************************************************
+
+                @FORCED
+                components/_forced.scss
+
+*********************************************************************
+*********************************************************************
+********************************************************************/
+.center {
+  text-align: center !important; }
+
+.auto {
+  width: auto !important; }
+
+.normal {
+  font-weight: normal !important; }
 
 /*# sourceMappingURL=style.css.map */

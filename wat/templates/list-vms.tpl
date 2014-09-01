@@ -21,63 +21,63 @@
                         case 'info':
             %>
                             <th class="max-3-icons">
-                                <i class="fa sort-icon" data-i18n="Info"><%= i18n.t('Info') %></i>
+                                <i class="fa fa-info-circle center normal" data-i18n="[title]Info" title="<%= i18n.t('Info') %>"></i>
                             </th>
             <%
                             break;
                         case 'id':
             %>
                             <th class="sortable desktop col-width-8" data-sortby="id">
-                                <i class="fa fa-sort sort-icon" data-i18n="Id"><%= i18n.t('Id') %></i>
+                                <i class="fa fa-sort sort-icon" data-i18n="<%= col.text %>"><%= col.text %></i>
                             </th>
             <%
                             break;
                         case 'name':
             %>
                             <th class="sortable" data-sortby="name">
-                                <i class="fa fa-sort sort-icon" data-i18n="Name"><%= i18n.t('Name') %></i>
+                                <i class="fa fa-sort sort-icon" data-i18n="<%= col.text %>"><%= col.text %></i>
                             </th>
             <%
                             break;
-                        case 'node':
+                        case 'host':
             %>
                             <th class="sortable desktop" data-sortby="host_id">
-                                <i class="fa fa-sort sort-icon" data-i18n="Node"><%= i18n.t('Node') %></i>
+                                <i class="fa fa-sort sort-icon" data-i18n="<%= col.text %>"><%= col.text %></i>
                             </th>
             <%
                             break;
                         case 'user':
             %>
                             <th class="sortable desktop" data-sortby="user_name">
-                                <i class="fa fa-sort sort-icon" data-i18n="User"><%= i18n.t('User') %></i>
+                                <i class="fa fa-sort sort-icon" data-i18n="<%= col.text %>"><%= col.text %></i>
                             </th>
             <%
                             break;
                         case 'osf/tag':
             %>
                             <th class="sortable desktop" data-sortby="osf_name">
-                                <i class="fa fa-sort sort-icon" data-i18n="OSF / Tag"><%= i18n.t('OSF / Tag') %></i>
+                                <i class="fa fa-sort sort-icon" data-i18n="<%= col.text %>"><%= col.text %></i>
                             </th>
             <%
                             break;
                         case 'tag':
             %>
                             <th class="sortable desktop col-width-20" data-sortby="di_tag">
-                                <i class="fa fa-sort sort-icon" data-i18n="Tag"><%= i18n.t('Tag') %></i>
+                                <i class="fa fa-sort sort-icon" data-i18n="<%= col.text %>"><%= col.text %></i>
                             </th>
             <%
                             break;
                         case 'tenant':
             %>
                             <th class="sortable desktop" data-sortby="tenant">
-                                <i class="fa fa-sort sort-icon" data-i18n="Tenant"><%= i18n.t('Tenant') %></i>
+                                <i class="fa fa-sort sort-icon" data-i18n="<%= col.text %>"><%= col.text %></i>
                             </th>
             <%
                             break;
                         default:
             %>
                             <th class="sortable desktop" data-sortby="<%= name %>">
-                                <i class="fa sort-icon"><%= name %></i>
+                                <i class="fa sort-icon"><%= col.text %></i>
                             </th>
             <%
                             break;
@@ -163,10 +163,10 @@
                                 </td>
                 <%
                                 break;
-                            case 'node':
+                            case 'host':
                 %>
                                 <td class="desktop">
-                                    <a href="#/node/<%= model.get('host_id') %>">
+                                    <a href="#/host/<%= model.get('host_id') %>">
                                         <%= model.get('host_name') %>
                                     </a>
                                 </td>
@@ -177,6 +177,15 @@
                                 <td class="desktop">
                                     <a href="#/user/<%= model.get('user_id') %>">
                                         <%= model.get('user_name') %>
+                                    </a>
+                                </td>
+                <%
+                                break;
+                            case 'osf':
+                %>
+                                <td class="desktop">
+                                    <a href="#/osf/<%= model.get('osf_id') %>">
+                                        <%= model.get('osf_name') %>
                                     </a>
                                 </td>
                 <%

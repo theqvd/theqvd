@@ -1,5 +1,5 @@
 Wat.Views.DIDetailsView = Wat.Views.DetailsView.extend({  
-    shortName: 'di',
+    qvdObj: 'di',
     editorTemplateName: 'editor-di',
     detailsTemplateName: 'details-di',
     detailsSideTemplateName: 'details-di-side',

@@ -1,5 +1,5 @@
 Wat.Views.VMDetailsView = Wat.Views.DetailsView.extend({  
-    shortName: 'vm',
+    qvdObj: 'vm',
     editorTemplateName: 'editor-vm',
     detailsTemplateName: 'details-vm',
     detailsSideTemplateName: 'details-vm-side',

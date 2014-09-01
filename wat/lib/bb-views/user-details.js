@@ -1,5 +1,5 @@
 Wat.Views.UserDetailsView = Wat.Views.DetailsView.extend({  
-    shortName: 'user',
+    qvdObj: 'user',
     editorTemplateName: 'editor-user',
     detailsTemplateName: 'details-user',
     detailsSideTemplateName: 'details-user-side',
@@ -22,7 +22,7 @@ Wat.Views.UserDetailsView = Wat.Views.DetailsView.extend({
         params.forceListActionButton = null;
         params.block = 5;
         params.filters = {"user_id": this.elementId};
-        
+
         this.sideView = new Wat.Views.VMListView(params);
     },
     

@@ -1,8 +1,8 @@
 Wat.Views.NodeDetailsView = Wat.Views.DetailsView.extend({  
-    shortName: 'node',
-    editorTemplateName: 'editor-node',
-    detailsTemplateName: 'details-node',
-    detailsSideTemplateName: 'details-node-side',
+    qvdObj: 'host',
+    editorTemplateName: 'editor-host',
+    detailsTemplateName: 'details-host',
+    detailsSideTemplateName: 'details-host-side',
     sideContainer: '.bb-details-side',
 
     initialize: function (params) {
@@ -67,7 +67,7 @@ Wat.Views.NodeDetailsView = Wat.Views.DetailsView.extend({
     },
     
     openEditElementDialog: function() {
-        this.dialogConf.title = $.i18n.t('Edit node') + ": " + this.model.get('name');
+        this.dialogConf.title = $.i18n.t('Edit host') + ": " + this.model.get('name');
         
         Wat.Views.DetailsView.prototype.openEditElementDialog.apply(this);
     },

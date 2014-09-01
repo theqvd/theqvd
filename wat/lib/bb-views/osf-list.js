@@ -1,5 +1,5 @@
 Wat.Views.OSFListView = Wat.Views.ListView.extend({
-    shortName: 'osf',
+    qvdObj: 'osf',
     listTemplateName: 'list-osf',
     editorTemplateName: 'creator-osf',
 

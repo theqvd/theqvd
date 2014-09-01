@@ -172,14 +172,28 @@
                             case 'dis':
                 %>
                                 <td class="desktop">
-                                    <%= model.get('dis') %>
+                                    <% if (model.get('dis') > 0) { %>
+                                    <a href="#/dis/osf/<%= model.get('id') %>">
+                                        <%= model.get('dis') %>
+                                    </a>
+                                    <% } else {
+                                    %>
+                                        <%= model.get('dis') %>
+                                    <% } %>
                                 </td>
                 <%
                                 break;
                             case 'vms':
                 %>
                                 <td class="desktop">
-                                    <%= model.get('vms') %>
+                                    <% if (model.get('vms') > 0) { %>
+                                    <a href="#/vms/osf/<%= model.get('id') %>">
+                                        <%= model.get('vms') %>
+                                    </a>
+                                    <% } else {
+                                    %>
+                                        <%= model.get('vms') %>
+                                    <% } %>
                                 </td>
                 <%
                                 break;

@@ -1,67 +1,83 @@
-var shortName = 'di';
+var qvdObj = 'di';
 
 // Columns configuration on list view
-Wat.I.listColumns[shortName] = {
-    "checks": {
-        "display": true,
-        "fields": {
-            
-        },
-        "text": "checks"
+Wat.I.listColumns[qvdObj] = {
+    'checks': {
+        'display': true,
+        'fields': [],
+        'fixed': true,
+        'text': 'checks'
     },
-    "info": {
-        "display": true,
-        "fields": {
-            
-        },
-        "text": "info"
+    'info': {
+        'display': true,
+        'fields': [
+            'blocked',
+            'tags'
+        ],
+        'text': 'Info'
     },
-    "id": {
-        "display": true,
-        "fields": {
-            
-        },
-        "text": "id"
+    'id': {
+        'display': true,
+        'fields': [
+            'id'
+        ],
+        'text': 'Id'
     },
-    "disk_image": {
-        "display": true,
-        "fields": {
-            
-        },
-        "text": "disk_image"
+    'disk_image': {
+        'display': true,
+        'fields': [
+            'id',
+            'disk_image'
+        ],
+        'text': 'Disk image'
     },
-    "version": {
-        "display": true,
-        "fields": {
-            
-        },
-        "text": "version"
+    'version': {
+        'display': true,
+        'fields': [
+            'version'
+        ],
+        'text': 'Version'
     },
-    "osf": {
-        "display": false,
-        "fields": {
-            
-        },
-        "text": "osf"
+    'osf': {
+        'display': false,
+        'fields': [
+            'osf_id',
+            'osf_name'
+        ],
+        'text': 'OSF'
     },
-    "default": {
-        "display": true,
-        "fields": {
-            
-        },
-        "text": "default"
+    'default': {
+        'display': true,
+        'fields': [
+            'tags'
+        ],
+        'text': 'Default'
+    },
+    'creation_date': {
+        'text': 'Creation date',
+        'fields': [
+            'creation_date'
+        ],
+        'display': false
+    },
+    'creation_admin': {
+        'text': 'Created by',
+        'fields': [
+            'creation_admin'
+        ],
+        'display': false
     }
 };
 
 // Filters configuration on list view
-Wat.I.formFilters[shortName] = {
+Wat.I.formFilters[qvdObj] = {
     'name': {
         'name': 'name',
         'filterField': 'disk_image',
         'type': 'text',
         'text': 'Search by disk image',
-        'display': true,
-        'device': 'both'
+        'displayMobile': true,
+        'displayDesktop': true
     },
     'osf': {
         'name': 'osf',
@@ -70,13 +86,13 @@ Wat.I.formFilters[shortName] = {
         'text': 'OS Flavour',
         'class': 'chosen-advanced',
         'fillable': true,
-        'display': true,
-        'device': 'both'
+        'displayMobile': true,
+        'displayDesktop': true
     }
 };
 
 // Actions of the bottom of the list configuration on list view (those that will be done with selected items)
-Wat.I.selectedActions[shortName] = [
+Wat.I.selectedActions[qvdObj] = [
             {
                 'value': 'block',
                 'text': 'Block'
@@ -92,21 +108,21 @@ Wat.I.selectedActions[shortName] = [
         ];
 
 // Action button (tipically New button) configuration on list view
-Wat.I.listActionButton[shortName] = {
+Wat.I.listActionButton[qvdObj] = {
             'name': 'new_di_button',
             'value': 'New Disk image',
             'link': 'javascript:'
         };
 
 // Breadcrumbs configuration on list view
-$.extend(Wat.I.listBreadCrumbs[shortName], Wat.I.homeBreadCrumbs);
-Wat.I.listBreadCrumbs[shortName]['next'] = {
+$.extend(Wat.I.listBreadCrumbs[qvdObj], Wat.I.homeBreadCrumbs);
+Wat.I.listBreadCrumbs[qvdObj]['next'] = {
             'screen': 'DI list'
         };
 
 // Breadcrumbs configuration on details view
-$.extend(true, Wat.I.detailsBreadCrumbs[shortName], Wat.I.listBreadCrumbs[shortName]);
-Wat.I.detailsBreadCrumbs[shortName].next.link = '#/dis';
-Wat.I.detailsBreadCrumbs[shortName].next.next = {
+$.extend(true, Wat.I.detailsBreadCrumbs[qvdObj], Wat.I.listBreadCrumbs[qvdObj]);
+Wat.I.detailsBreadCrumbs[qvdObj].next.link = '#/dis';
+Wat.I.detailsBreadCrumbs[qvdObj].next.next = {
             'screen': '' // Will be filled dinamically
         };

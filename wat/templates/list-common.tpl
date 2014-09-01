@@ -12,7 +12,7 @@
         -->
         <% 
             $.each(formFilters, function(name, filter) {
-                if (!filter.display || filter.device == 'mobile') {
+                if (!filter.displayDesktop) {
                     return;
                 }
                     

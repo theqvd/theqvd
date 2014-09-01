@@ -43,7 +43,7 @@
         <tr>
             <td><span data-i18n>Node</span></td>
             <td>
-                <a href="#/node/<%= model.get('host_id') %>">
+                <a href="#/host/<%= model.get('host_id') %>">
                     <%= model.get('host_name') %>
                 </a>
             </td>

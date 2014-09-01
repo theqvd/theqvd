@@ -24,7 +24,7 @@ Wat.Views.DetailsView = Wat.Views.MainView.extend({
     },
     
     setBreadCrumbs: function () {
-        this.breadcrumbs = Wat.I.getDetailsBreadCrumbs(this.shortName);
+        this.breadcrumbs = Wat.I.getDetailsBreadCrumbs(this.qvdObj);
     },
     
     afterRender: function () {

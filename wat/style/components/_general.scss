@@ -75,18 +75,6 @@ fieldset {
     margin-bottom: 14px;
 }
 
-.not-selectable {
-    @extend %not-selectable;
-}
-
-.center {
-    text-align: center;
-}
-
-.uppercase {
-    text-transform: uppercase;
-}
-
 // States
 .ok {
     color: darken($col_green, 10);

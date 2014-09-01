@@ -21,7 +21,7 @@
                         case 'info':
             %>
                             <th class="max-2-icons">
-                                <i class="fa sort-icon" data-i18n="Info"><%= i18n.t('Info') %></i>
+                                <i class="fa fa-info-circle center normal" data-i18n="[title]Info" title="<%= i18n.t('Info') %>"></i>
                             </th>
             <%
                             break;
@@ -141,7 +141,7 @@
                             case 'name':
                 %>
                                 <td class="js-name">
-                                    <a href="#/node/<%= model.get('id') %>" data-i18n="[title]Click for details">
+                                    <a href="#/host/<%= model.get('id') %>" data-i18n="[title]Click for details">
                                         <i class="fa fa-search"></i>
                                         <span class="text"><%= model.get('name') %></span>
                                     </a>
@@ -178,7 +178,14 @@
                             case 'vms_connected':
                 %>
                                 <td class="desktop">
-                                    <%= model.get('vms_connected') %>
+                                    <% if (model.get('vms_connected') > 0) { %>
+                                    <a href="#/vms/host/<%= model.get('id') %>">
+                                        <%= model.get('vms_connected') %>
+                                    </a>
+                                    <% } else {
+                                    %>
+                                        <%= model.get('vms_connected') %>
+                                    <% } %>
                                 </td>
                 <%
                                 break;

@@ -21,7 +21,7 @@
                         case 'info':
             %>
                             <th class="desktop max-4-icons">
-                                <i class="fa sort-icon" data-i18n="Info"><%= i18n.t('Info') %></i>
+                                <i class="fa fa-info-circle center normal" data-i18n="[title]Info" title="<%= i18n.t('Info') %>"></i>
                             </th>
             <%
                             break;

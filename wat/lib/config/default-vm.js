@@ -1,7 +1,7 @@
-var shortName = 'vm';
+var qvdObj = 'vm';
 
 // Columns configuration on list view
-Wat.I.listColumns[shortName] = {
+Wat.I.listColumns[qvdObj] = {
     'checks': {
         'text': 'checks',
         'fields': [],
@@ -33,7 +33,7 @@ Wat.I.listColumns[shortName] = {
         ],
         'display': true
     },
-    'node': {
+    'host': {
         'text': 'Node',
         'fields': [
             'host_id',
@@ -141,13 +141,13 @@ Wat.I.listColumns[shortName] = {
 };
 
 // Filters configuration on list view
-Wat.I.formFilters[shortName] = {
+Wat.I.formFilters[qvdObj] = {
     'name': {
         'filterField': 'name',
         'type': 'text',
         'text': 'Search by name',
-        'display': true,
-        'device': 'both'
+        'displayMobile': true,
+        'displayDesktop': true
     },
     'state': {
         'filterField': 'state',
@@ -171,8 +171,8 @@ Wat.I.formFilters[shortName] = {
                 'selected': false
             }
                     ],
-        'display': true,
-        'device': 'desktop'
+        'displayMobile': false,
+        'displayDesktop': true
     },
     'user': {
         'filterField': 'user_id',
@@ -187,8 +187,8 @@ Wat.I.formFilters[shortName] = {
                 'selected': true
             }
                     ],
-        'display': true,
-        'device': 'desktop'
+        'displayMobile': false,
+        'displayDesktop': true
     },
     'osf': {
         'filterField': 'osf_id',
@@ -203,8 +203,8 @@ Wat.I.formFilters[shortName] = {
                 'selected': true
             }
                     ],
-        'display': true,
-        'device': 'desktop'
+        'displayMobile': false,
+        'displayDesktop': true
     },
     'host': {
         'filterField': 'host_id',
@@ -219,13 +219,13 @@ Wat.I.formFilters[shortName] = {
                 'selected': true
             }
                     ],
-        'display': true,
-        'device': 'desktop'
+        'displayMobile': false,
+        'displayDesktop': true
     }
 };
 
 // Actions of the bottom of the list (those that will be done with selected items) configuration on list view
-Wat.I.selectedActions[shortName] = [
+Wat.I.selectedActions[qvdObj] = [
             {
                 'value': 'start',
                 'text': 'Start'
@@ -253,22 +253,22 @@ Wat.I.selectedActions[shortName] = [
         ];
 
 // Action button (tipically New button) configuration on list view
-Wat.I.listActionButton[shortName] = {
+Wat.I.listActionButton[qvdObj] = {
             'name': 'new_vm_button',
             'value': 'New Virtual machine',
             'link': 'javascript:'
         };
 
 // Breadcrumbs configuration on list view
-$.extend(Wat.I.listBreadCrumbs[shortName], Wat.I.homeBreadCrumbs);
-Wat.I.listBreadCrumbs[shortName]['next'] = {
+$.extend(Wat.I.listBreadCrumbs[qvdObj], Wat.I.homeBreadCrumbs);
+Wat.I.listBreadCrumbs[qvdObj]['next'] = {
             'screen': 'Virtual machine list'
         };
 
 // Breadcrumbs configuration on details view
-$.extend(true, Wat.I.detailsBreadCrumbs[shortName], Wat.I.listBreadCrumbs[shortName]);
-Wat.I.detailsBreadCrumbs[shortName].next.link = '#/vms';
-Wat.I.detailsBreadCrumbs[shortName].next.next = {
+$.extend(true, Wat.I.detailsBreadCrumbs[qvdObj], Wat.I.listBreadCrumbs[qvdObj]);
+Wat.I.detailsBreadCrumbs[qvdObj].next.link = '#/vms';
+Wat.I.detailsBreadCrumbs[qvdObj].next.next = {
             'screen': '' // Will be filled dinamically
         };
 
