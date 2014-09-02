@@ -10,7 +10,7 @@ Wat.Views.ConfigCustomizeView = Wat.Views.MainView.extend({
 
     breadcrumbs: {
         'screen': 'Home',
-        'link': '#/home',
+        'link': '#',
         'next': {
             'screen': 'Setup',
             'link': '#/setup',
@@ -178,7 +178,8 @@ Wat.Views.ConfigCustomizeView = Wat.Views.MainView.extend({
         }
     },
     
-    render: function () { 
+    render: function () {
+
         this.templateSetupCommon = Wat.A.getTemplate(this.setupCommonTemplateName);
         var cornerMenu = Wat.I.getCornerMenu();
         

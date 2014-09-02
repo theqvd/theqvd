@@ -12,7 +12,7 @@
   padding-left: 20px;
   padding-right: 20px; }
 
-.menu > ul .menu-option, a.button, button.button, a.button2, button.button2, a.button.disabled, a.button2.disabled, button.button.disabled, button.button2.disabled, table.list th, table.custom-props th, table.customize-fields th, .ui-dialog .ui-state-hover, .ui-dialog .ui-state-focus, .not-selectable {
+.menu > ul .menu-option, a.button, button.button, a.button2, button.button2, a.button.disabled, a.button2.disabled, button.button.disabled, button.button2.disabled, .wrapper .content .home-wrapper th, .wrapper .content .home-wrapper .home-row .home-cell .summary-table th, table.list th, table.custom-props th, table.customize-fields th, .ui-dialog .ui-state-hover, .ui-dialog .ui-state-focus, .not-selectable {
   -webkit-touch-callout: none;
   -webkit-user-select: none;
   -khtml-user-select: none;
@@ -691,6 +691,16 @@ body {
 *********************************************************************
 *********************************************************************
 
+                @LAYOUT HOME: Layout of home
+                components/_layout-home.scss
+
+*********************************************************************
+*********************************************************************
+********************************************************************/
+    /********************************************************************
+*********************************************************************
+*********************************************************************
+
                 @LAYOUT LIST: Layout of list view
                 components/_layout-list.scss
 
@@ -710,6 +720,147 @@ body {
     @media screen and (min-width: 40em) {
       .wrapper .content {
         margin-bottom: 80px; } }
+    .wrapper .content .home-wrapper {
+      width: 100%;
+      margin-left: auto;
+      margin-right: auto;
+      background-color: #fdfdfd;
+      border: 1px solid #ddd;
+      border-radius: 4px;
+      border-collapse: separate;
+      display: table;
+      table-layout: fixed;
+      margin-top: 30px;
+      width: 100%;
+      padding-bottom: 20px; }
+      .wrapper .content .home-wrapper th {
+        font-weight: bold;
+        text-align: left;
+        border-bottom: #ccc solid 1px; }
+        .wrapper .content .home-wrapper th .sort-icon {
+          float: right; }
+        .wrapper .content .home-wrapper th.sortable {
+          cursor: pointer; }
+        .wrapper .content .home-wrapper th.sorted {
+          background-color: #cb540a;
+          color: #fdfdfd; }
+        .wrapper .content .home-wrapper th i {
+          width: 100%;
+          overflow: hidden;
+          text-overflow: ellipsis;
+          white-space: nowrap;
+          font-weight: bold; }
+          .wrapper .content .home-wrapper th i.sort-icon:before {
+            float: right;
+            margin-left: 5px;
+            font-weight: normal; }
+      .wrapper .content .home-wrapper td, .wrapper .content .home-wrapper th {
+        padding: 6px 8px;
+        vertical-align: middle;
+        border-right: dotted 1px #e4e4e4; }
+        .wrapper .content .home-wrapper td:last-child, .wrapper .content .home-wrapper th:last-child {
+          border-right: 0px; }
+      .wrapper .content .home-wrapper > tbody > tr:nth-child(even) {
+        background-color: #fdfdfd; }
+      .wrapper .content .home-wrapper > tbody > tr:nth-child(odd) {
+        background-color: #f3f3f3; }
+      .wrapper .content .home-wrapper tr:last-child td:first-child {
+        border-bottom-left-radius: 4px; }
+      .wrapper .content .home-wrapper tr:last-child td:last-child {
+        border-bottom-right-radius: 4px; }
+      .wrapper .content .home-wrapper .info-in-name-cell {
+        margin-top: 8px;
+        float: right; }
+      .wrapper .content .home-wrapper .home-row {
+        display: table-row; }
+        .wrapper .content .home-wrapper .home-row .home-cell {
+          display: block;
+          padding-bottom: 40px;
+          text-align: center; }
+          @media screen and (min-width: 40em) {
+            .wrapper .content .home-wrapper .home-row .home-cell {
+              display: table-cell;
+              padding-bottom: 0px; } }
+          .wrapper .content .home-wrapper .home-row .home-cell > div {
+            margin: 0 auto;
+            display: block; }
+          .wrapper .content .home-wrapper .home-row .home-cell .home-title {
+            text-align: center;
+            margin: 20px; }
+          .wrapper .content .home-wrapper .home-row .home-cell .summary-table {
+            width: 100%;
+            margin-left: auto;
+            margin-right: auto;
+            background-color: #fdfdfd;
+            border: 1px solid #ddd;
+            border-radius: 4px;
+            border-collapse: separate;
+            text-align: left;
+            width: 95%;
+            margin: 20px auto; }
+            .wrapper .content .home-wrapper .home-row .home-cell .summary-table th {
+              font-weight: bold;
+              text-align: left;
+              border-bottom: #ccc solid 1px; }
+              .wrapper .content .home-wrapper .home-row .home-cell .summary-table th .sort-icon {
+                float: right; }
+              .wrapper .content .home-wrapper .home-row .home-cell .summary-table th.sortable {
+                cursor: pointer; }
+              .wrapper .content .home-wrapper .home-row .home-cell .summary-table th.sorted {
+                background-color: #cb540a;
+                color: #fdfdfd; }
+              .wrapper .content .home-wrapper .home-row .home-cell .summary-table th i {
+                width: 100%;
+                overflow: hidden;
+                text-overflow: ellipsis;
+                white-space: nowrap;
+                font-weight: bold; }
+                .wrapper .content .home-wrapper .home-row .home-cell .summary-table th i.sort-icon:before {
+                  float: right;
+                  margin-left: 5px;
+                  font-weight: normal; }
+            .wrapper .content .home-wrapper .home-row .home-cell .summary-table td, .wrapper .content .home-wrapper .home-row .home-cell .summary-table th {
+              padding: 6px 8px;
+              vertical-align: middle;
+              border-right: dotted 1px #e4e4e4; }
+              .wrapper .content .home-wrapper .home-row .home-cell .summary-table td:last-child, .wrapper .content .home-wrapper .home-row .home-cell .summary-table th:last-child {
+                border-right: 0px; }
+            .wrapper .content .home-wrapper .home-row .home-cell .summary-table > tbody > tr:nth-child(even) {
+              background-color: #fdfdfd; }
+            .wrapper .content .home-wrapper .home-row .home-cell .summary-table > tbody > tr:nth-child(odd) {
+              background-color: #f3f3f3; }
+            .wrapper .content .home-wrapper .home-row .home-cell .summary-table tr:last-child td:first-child {
+              border-bottom-left-radius: 4px; }
+            .wrapper .content .home-wrapper .home-row .home-cell .summary-table tr:last-child td:last-child {
+              border-bottom-right-radius: 4px; }
+            .wrapper .content .home-wrapper .home-row .home-cell .summary-table .info-in-name-cell {
+              margin-top: 8px;
+              float: right; }
+            .wrapper .content .home-wrapper .home-row .home-cell .summary-table i {
+              width: 20px;
+              text-align: center; }
+            .wrapper .content .home-wrapper .home-row .home-cell .summary-table td:last-child a {
+              padding-left: 10px; }
+              @media screen and (min-width: 40em) {
+                .wrapper .content .home-wrapper .home-row .home-cell .summary-table td:last-child a {
+                  padding-left: 50px; } }
+          .wrapper .content .home-wrapper .home-row .home-cell .home-percent-wrapper {
+            position: relative;
+            width: 200px;
+            height: 200px; }
+            .wrapper .content .home-wrapper .home-row .home-cell .home-percent-wrapper .pie-chart {
+              width: 200px;
+              height: 200px;
+              position: absolute;
+              cursor: pointer; }
+            .wrapper .content .home-wrapper .home-row .home-cell .home-percent-wrapper .home-percent {
+              margin: 0;
+              margin-top: 80px;
+              position: absolute;
+              width: 200px;
+              padding: 0px;
+              color: #979797;
+              opacity: 0.5; }
     .wrapper .content .filter {
       display: none;
       margin-bottom: 15px;
@@ -1796,6 +1947,27 @@ input {
 
 .footer a {
   font-size: inherit; }
+
+.welcome-message {
+  font-size: 1.8em;
+  line-height: 1.8em;
+  text-align: center; }
+  @media screen and (min-width: 40em) {
+    .welcome-message {
+      font-size: 1.4em;
+      line-height: 1.4em; } }
+
+.home-wrapper .home-cell .home-title {
+  font-size: 20px;
+  font-weight: bold; }
+.home-wrapper .home-cell .summary-table, .home-wrapper .home-cell .summary-table a {
+  font-size: 15px; }
+  @media screen and (min-width: 40em) {
+    .home-wrapper .home-cell .summary-table, .home-wrapper .home-cell .summary-table a {
+      font-size: 17px; } }
+.home-wrapper .home-cell .home-percent-wrapper .home-percent {
+  font-weight: normal;
+  font-size: 35px; }
 
 /********************************************************************
 *********************************************************************

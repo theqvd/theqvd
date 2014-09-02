@@ -182,7 +182,7 @@ Wat.I = {
     
     homeBreadCrumbs: {
         'screen': 'Home',
-        'link': '#/home'
+        'link': '#'
     },
     
     // List breadcrumbs
@@ -356,6 +356,23 @@ Wat.I = {
              $(this).find('ul').css({display: "none"});
           }
        );
+    },
+    
+    // Set specific menu section as selected
+    setMenuOpt: function (opt) {
+        $('.menu-option').removeClass('menu-option--selected');
+        $('.menu-option[data-target="' + opt + '"]').addClass('menu-option--selected');
+    },
+    
+    renderMain: function () {
+        var templateMain = Wat.A.getTemplate('main');
+        // Fill the html with the template and the collection
+        var template = _.template(
+            templateMain, {
+                loggedIn: Wat.C.loggedIn
+            });
+        
+        $('.bb-super-wrapper').html(template);
     },
     
     tooltipConfiguration: function () {
@@ -641,5 +658,196 @@ Wat.I = {
         }
         
         return fieldType;
+    },
+    
+    drawPieChart: function (name, data, maxLoadTime) {
+        var plotSelector = '#' + name;
+        var dataStatSelector = '.js-' + name + '-data';
+        var percentStatSelector = '.js-' + name + '-percent';
+
+        var data1 = data[0];
+        var data2 = data[1];
+        var dataTotal = data1 + data2;
+        
+        var maxLoadTime = maxLoadTime || 500;
+        var speed = 30;
+        
+        var nLoads = maxLoadTime / speed;
+        
+        var step = Math.ceil(data1/nLoads);        
+
+        // Pie common parameters
+        var series = {
+                pie: {
+                    show: true,
+                    innerRadius: 0.5,
+                    label: {
+                        show: false
+                    }
+                }
+            };
+
+        var legend = {
+                show: false
+            };
+
+        var grid = {
+                hoverable: false,
+                clickable: false
+            };
+
+        var pieData = [
+            { label: "",  data: 0, color: COL_BRAND},
+            { label: "",  data: 0, color: '#DDD'}
+        ];
+
+        // First data start from 0 and second one from total to make grow effect
+        pieData[0].data = 0;
+        pieData[1].data = dataTotal;
+
+        $(dataStatSelector).html('0/' + dataTotal);
+        $(percentStatSelector).html('0%');
+
+        var plot = $.plot(plotSelector, pieData, {
+            series: series,
+            legend: legend,
+            grid: grid
+        });
+
+        if (data1 > 0 ) {
+            var growInterval = setInterval(function(){
+                // To make growing effect, first data will grow and second one decrease
+                pieData[0].data+=step;
+                pieData[1].data-=step;
+
+                if (pieData[0].data > data1) {
+                    pieData[0].data = data1;
+                    pieData[1].data = data2;
+                }
+                
+                plot.setData(pieData);
+                plot.draw();
+
+                // Upgrade data and percent stats
+                $(dataStatSelector).html(pieData[0].data + '/' + dataTotal);
+
+                var percentStat = parseInt((pieData[0].data / dataTotal) * 100);
+                $(percentStatSelector).html(percentStat + '%');
+
+                // When first data reach the real value, stop growing
+                if (pieData[0].data === data1) {
+                    clearInterval(growInterval);
+                }
+            }, speed);
+        }
+    },
+    
+    drawBarChart: function (name) {
+        var plotSelector = '#' + name;
+        
+        var rawData = [[111, 0], [123, 1],[257, 2],[288, 3],[322, 4]];
+        var dataSet = [{ label: "", data: rawData, color: COL_BRAND }];
+        var ticks = [[0, "Node 1"], [1, "Node backup"], [2, "Node in da house"], [3, "No-Node"], [4, "Yesde Node"]];
+
+        var options = {
+            series: {
+                bars: {
+                    show: true
+                }
+            },
+            bars: {
+                align: "center",
+                barWidth: 0.8,
+                horizontal: true,
+                fillColor: { colors: [{ opacity: 0.5 }, { opacity: 1}] },
+                lineWidth: 1
+            },
+            xaxis: {
+                axisLabel: "Running virtual machines",
+                axisLabelUseCanvas: false,
+                axisLabelFontSizePixels: 12,
+                axisLabelFontFamily: 'Verdana, Arial',
+                axisLabelPadding: 10,
+                max: parseInt(rawData[rawData.length-1][0] * 1.1),
+                tickColor: "#DDD",
+                tickFormatter: function (v, axis) {
+                    return v;
+                },
+                color: "black"
+            },
+            yaxis: {
+                axisLabel: "Nodes",
+                axisLabelUseCanvas: true,
+                axisLabelFontSizePixels: 12,
+                axisLabelFontFamily: 'Verdana, Arial',
+                axisLabelPadding: 3,
+                tickColor: "#DDD",
+                ticks: ticks,
+                color: "black"
+            },
+            legend: {
+                noColumns: 0,
+                labelBoxBorderColor: "#858585",
+                position: "ne"
+            },
+            grid: {
+                hoverable: true,
+                borderWidth: 1,
+                borderColor: "#CCC",
+                backgroundColor: { colors: ["#EEEEEE", "#FFFFFF"] }
+            }
+        };
+ 
+        $(document).ready(function () {
+            $.plot($(plotSelector), dataSet, options);
+            $(plotSelector).UseTooltip();
+        });
+ 
+        var previousPoint = null, previousLabel = null;
+ 
+        $.fn.UseTooltip = function () {
+            $(this).bind("plothover", function (event, pos, item) {
+                if (item) {
+                    if ((previousLabel != item.series.label) ||
+                 (previousPoint != item.dataIndex)) {
+                        previousPoint = item.dataIndex;
+                        previousLabel = item.series.label;
+                        $("#tooltip").remove();
+ 
+                        var x = item.datapoint[0];
+                        var y = item.datapoint[1];
+ 
+                        var color = item.series.color;
+                        //alert(color)
+                        //console.log(item.series.xaxis.ticks[x].label);               
+ 
+                        showTooltip(item.pageX,
+                        item.pageY,
+                        color,
+                        item.series.yaxis.ticks[y].label +
+                        " : <strong>" + x + "</strong> VMs");
+                    }
+                } else {
+                    $("#tooltip").remove();
+                    previousPoint = null;
+                }
+            });
+        };
+ 
+        function showTooltip(x, y, color, contents) {
+            $('<div id="tooltip">' + contents + '</div>').css({
+                position: 'absolute',
+                display: 'none',
+                top: y - 10,
+                left: x + 10,
+                border: '2px solid ' + color,
+                padding: '3px',
+                'font-size': '9px',
+                'border-radius': '5px',
+                'background-color': '#fff',
+                'font-family': 'Verdana, Arial, Helvetica, Tahoma, sans-serif',
+                opacity: 0.9
+            }).appendTo("body").fadeIn(200);
+        }
     }
 }

@@ -156,3 +156,77 @@
 @mixin icon-size($size) {
     font-size: $size;
 }
+
+@mixin table-base {
+    width: 100%;
+    margin-left: auto;
+    margin-right: auto;
+    background-color: $col_whiter;
+    border: 1px solid #ddd;
+    border-radius: $table_radius;
+    border-collapse: separate;
+
+    th {
+        font-weight: bold;
+        text-align: left;
+        border-bottom: #ccc solid 1px;
+        
+        .sort-icon {
+            float: right;
+        }
+        
+        &.sortable {
+            cursor: pointer;
+        }
+        
+        @extend %not-selectable;
+    
+        &.sorted {
+            background-color: $col_brand;
+            color: $col_whiter;
+        }
+        
+        i {
+            &.sort-icon:before {
+                float: right;
+                margin-left: 5px;
+                font-weight: normal;
+            }
+            width: 100%;
+            overflow: hidden;
+            text-overflow: ellipsis;
+            white-space: nowrap;
+            
+            font-weight: bold;
+        }
+    }
+
+    td, th {
+        padding: 6px 8px;
+        vertical-align: middle;
+
+        border-right: dotted 1px darken($col_whiter, 10);
+
+        &:last-child {
+            border-right: 0px;
+        }
+    }
+
+    >tbody>tr {
+        @include alternate($col_whiter);
+    }
+    
+    tr:last-child {
+        td:first-child {
+            border-bottom-left-radius: $table_radius;
+        }        
+        td:last-child {
+            border-bottom-right-radius: $table_radius;
+        }
+    }
+    
+    .info-in-name-cell {
+        margin-top: 8px;
+        float: right;
+    }
+}

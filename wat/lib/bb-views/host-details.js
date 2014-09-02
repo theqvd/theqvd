@@ -1,4 +1,4 @@
-Wat.Views.NodeDetailsView = Wat.Views.DetailsView.extend({  
+Wat.Views.HostDetailsView = Wat.Views.DetailsView.extend({  
     qvdObj: 'host',
     editorTemplateName: 'editor-host',
     detailsTemplateName: 'details-host',

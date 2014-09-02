@@ -1,7 +1,8 @@
 Wat.B = {
-    bindEvents: function () {
+    bindCommonEvents: function () {
         this.bindMessageEvents();  
         this.bindEditorEvents();  
+        this.bindNavigationEvents();  
     },
     
     // Events binded in classic way to works in special places like jQueryUI dialog where Backbone events doesnt work
@@ -46,6 +47,47 @@ Wat.B = {
                 
             // Toggle controls for new password
             this.bindEvent('change', 'input[name="change_password"]', this.userEditorBinds.toggleNewPassword);
+    },
+    
+    bindHomeEvents: function () {
+        // Pie charts events
+        this.bindEvent('mouseenter', '.js-pie-chart', this.homeBinds.pieHoverIn);
+        
+        this.bindEvent('mouseleave', '.js-pie-chart', this.homeBinds.pieHoverOut);
+        
+        this.bindEvent('click', '.js-pie-chart', this.homeBinds.pieClick);
+    },
+    
+    bindNavigationEvents: function () {
+        this.bindEvent('click', '.menu-option', this.navigationBinds.clickMenu);
+    },
+    
+    navigationBinds: {
+        // When click on a menu option, redirect to this section
+        clickMenu: function() {
+            var id = $(this).attr('data-target');
+            window.location = '#/' + id;
+            Wat.I.closeMessage();
+        }
+    },
+    
+    homeBinds: {
+        pieHoverIn: function (e) {
+            var percentLabel = $(e.target).parent().parent().find('.home-percent');
+            percentLabel.css('opacity', '1');
+            percentLabel.css('font-weight', 'bold');
+        },
+            
+        pieHoverOut: function (e) {
+            var percentLabel = $(e.target).parent().parent().find('.home-percent');
+            percentLabel.css('opacity', '0.5');
+            percentLabel.css('font-weight', 'normal');
+        },
+        
+        pieClick: function (e) {
+            var target = $(e.target).parent().attr('data-target');
+            $('.menu-option[data-target="' + target + '"]').trigger('click');
+        }
     },
     
     // Generic function to bind events receiving the event, the selector and the callback function to be called when event is triggered

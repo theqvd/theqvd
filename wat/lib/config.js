@@ -3,6 +3,7 @@ Wat.C = {
     login: 'superadmin',
     login: 'benja',
     password: '',
+    loggedIn: true,
     apiUrl: 'http://172.20.126.12:3000/',
 
     getBaseUrl: function () {

@@ -122,3 +122,34 @@ input {
 .footer a {
     font-size: inherit;
 }
+
+
+// Home
+
+.welcome-message {
+    @include font-size(4);
+    text-align: center;
+}
+
+.home-wrapper {
+    .home-cell {
+        .home-title {
+            font-size: 20px;
+            font-weight: bold;
+        }
+        
+        .summary-table, .summary-table a {
+            font-size: 15px;
+            @include in(desktop) {
+                font-size: 17px;
+            }
+        }
+        
+        .home-percent-wrapper {
+            .home-percent {
+                font-weight: normal;
+                font-size: 35px;
+            }
+        }
+    }
+}

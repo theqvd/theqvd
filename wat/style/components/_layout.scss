@@ -214,6 +214,7 @@ body {
         }
         
         // Different view layouts
+        @import "layout-home";
         @import "layout-list";
         @import "layout-details";
         @import "layout-setup";

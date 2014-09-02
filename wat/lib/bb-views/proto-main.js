@@ -16,9 +16,8 @@ Wat.Views.MainView = Backbone.View.extend({
             this.templateEditor = Wat.A.getTemplate(this.editorTemplateName);
         }
         
-        
         // Binding events manually because backbone doesnt allow bind events to dialogs loaded dinamically
-        Wat.B.bindEvents();
+        Wat.B.bindCommonEvents();
         
         // Add to the view events the parent class of this view to avoid collisions with other views events
         this.events = this.restrictEventsScope(this.events);
@@ -33,15 +32,12 @@ Wat.Views.MainView = Backbone.View.extend({
     },
     
     beforeRender: function () {
-
     },
     
     afterRender: function () {
-
     },
     
     events:  {
-        
     },
     
     extendEvents: function (ev) {

@@ -24,6 +24,9 @@ var Wat = {
         // Common view with menu and breadcrumbs
         MainView: {},
         
+        //Home
+        HomeView: {},
+        
         // List views
         ListView: {},
         UserListView: {},
@@ -34,7 +37,10 @@ var Wat = {
         DetailsView: {},
         UserDetailsView: {},
         VMDetailsView: {},
-        NodeDetailsView: {}
+        HostDetailsView: {},
+        
+        // Setup
+        ConfigCustomizeView: {}
     },
     Router: {},
     
@@ -61,6 +67,7 @@ var Wat = {
 (function (win, doc, $) {
 	$(doc).ready(function() {
         // Interface onfiguration
+        Wat.I.renderMain();
         Wat.I.cornerMenuEvents();
         Wat.I.tooltipConfiguration();
         Wat.I.mobileMenuConfiguration();
@@ -71,14 +78,7 @@ var Wat = {
         var app_router = new Wat.Router;
 
         // ------- List sections ------- //
-        app_router.on('route:listVM', function (field, value) {
-            // Note the variable in the route definition being passed in here
-            Wat.I.showLoading();
-            setMenuOpt('vms');
-            if (!$.isEmptyObject(Wat.CurrentView )) {
-                Wat.CurrentView.undelegateEvents();
-            }
-            
+        app_router.on('route:listVM', function (field, value) {            
             var params = {};
             if (field !== null) {
                 switch(field) {
@@ -90,53 +90,32 @@ var Wat = {
                         break;
                     case 'osf':
                         params.filters = {"osf_id": value};
-                        break;;
+                        break;
                     case 'di':
                         params.filters = {"di_id": value};
                         break;
+                    case 'state':
+                        params.filters = {"state": value};
+                        break;
                 }
             }
-            
-            Wat.CurrentView = new Wat.Views.VMListView(params);
+                        
+            app_router.performRoute('vms', Wat.Views.VMListView, params);
         });        
         
         app_router.on('route:listUser', function () {
-            Wat.I.showLoading();
-            setMenuOpt('users');
-            if (!$.isEmptyObject(Wat.CurrentView )) {
-                Wat.CurrentView.undelegateEvents();
-            }
-            
-            Wat.CurrentView = new Wat.Views.UserListView();
+            app_router.performRoute('users', Wat.Views.UserListView);
         });       
         
         app_router.on('route:listNode', function () {
-            Wat.I.showLoading();
-            setMenuOpt('hosts');
-            if (!$.isEmptyObject(Wat.CurrentView )) {
-                Wat.CurrentView.undelegateEvents();
-            }
-            
-            Wat.CurrentView = new Wat.Views.NodeListView();
+            app_router.performRoute('hosts', Wat.Views.NodeListView);
         });      
         
         app_router.on('route:listOSF', function () {
-            Wat.I.showLoading();
-            setMenuOpt('osfs');
-            if (!$.isEmptyObject(Wat.CurrentView )) {
-                Wat.CurrentView.undelegateEvents();
-            }
-            
-            Wat.CurrentView = new Wat.Views.OSFListView();
+            app_router.performRoute('osfs', Wat.Views.OSFListView);
         });    
         
         app_router.on('route:listDI', function (field, value) {
-            Wat.I.showLoading();
-            setMenuOpt('dis');
-            if (!$.isEmptyObject(Wat.CurrentView )) {
-                Wat.CurrentView.undelegateEvents();
-            }
-            
             /* 
                NOTE: This view is always filtered by osf. When no osf is passed
                as parameter, this filtering is performed dinamically to the
@@ -157,91 +136,47 @@ var Wat = {
                 }
             }
             
-            Wat.CurrentView = new Wat.Views.DIListView(params);
+            app_router.performRoute('dis', Wat.Views.DIListView, params);
         });
         
         
         
         // ------- Details sections ------- //
         app_router.on('route:detailsUser', function (id) {
-            Wat.I.showLoading();
-            setMenuOpt('users');
-            if (!$.isEmptyObject(Wat.CurrentView )) {
-                Wat.CurrentView.undelegateEvents();
-            }
-            Wat.CurrentView = new Wat.Views.UserDetailsView({"id": id});
+            app_router.performRoute('users', Wat.Views.UserDetailsView, {"id": id});
         });
         
         app_router.on('route:detailsVM', function (id) {
-            Wat.I.showLoading();
-            setMenuOpt('vms');
-            if (!$.isEmptyObject(Wat.CurrentView )) {
-                Wat.CurrentView.undelegateEvents();
-            }
-            Wat.CurrentView = new Wat.Views.VMDetailsView({"id": id});
+            app_router.performRoute('vms', Wat.Views.VMDetailsView, {"id": id});
         });
         
         app_router.on('route:detailsNode', function (id) {
-            Wat.I.showLoading();
-            setMenuOpt('hosts');
-            if (!$.isEmptyObject(Wat.CurrentView )) {
-                Wat.CurrentView.undelegateEvents();
-            }
-            Wat.CurrentView = new Wat.Views.NodeDetailsView({"id": id});
+            app_router.performRoute('hosts', Wat.Views.HostDetailsView, {"id": id});
         });
         
         app_router.on('route:detailsOSF', function (id) {
-            Wat.I.showLoading();
-            setMenuOpt('osfs');
-            if (!$.isEmptyObject(Wat.CurrentView )) {
-                Wat.CurrentView.undelegateEvents();
-            }
-            Wat.CurrentView = new Wat.Views.OSFDetailsView({"id": id});
+            app_router.performRoute('osfs', Wat.Views.OSFDetailsView, {"id": id});
         });
         
         app_router.on('route:detailsDI', function (id) {
-            Wat.I.showLoading();
-            setMenuOpt('dis');
-            if (!$.isEmptyObject(Wat.CurrentView )) {
-                Wat.CurrentView.undelegateEvents();
-            }
-            Wat.CurrentView = new Wat.Views.DIDetailsView({"id": id});
+            app_router.performRoute('dis', Wat.Views.DIDetailsView, {"id": id});
         });
         
         
         
         // ------- Configuration sections ------- //
         app_router.on('route:setupCustomize', function (actions) {
-            Wat.I.showLoading();
-            setMenuOpt('');
-            if (!$.isEmptyObject(Wat.CurrentView )) {
-                Wat.CurrentView.undelegateEvents();
-            }
-            Wat.CurrentView = new Wat.Views.ConfigCustomizeView();
+            app_router.performRoute('', Wat.Views.ConfigCustomizeView);
         });
         
         
         
         // ------- Default load ------- //
         app_router.on('route:defaultRoute', function (actions) {
-            console.info( actions ); 
+            app_router.performRoute('', Wat.Views.HomeView);
         });
 
         // Start Backbone history
         Backbone.history.start();
-        
-        // When click on a menu option, redirect to this section
-        $('.menu-option').click(function() {
-            var id = $(this).attr('id');
-            win.location = '#/' + id;
-            Wat.I.closeMessage();
-        });
-        
-        // Set specific menu section as selected
-        function setMenuOpt (opt) {
-            $('.menu-option').removeClass('menu-option--selected');
-            $('#' + opt).addClass('menu-option--selected');
-        }
-        
 	});
 })(window, document, jQuery)

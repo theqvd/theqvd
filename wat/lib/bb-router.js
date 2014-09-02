@@ -14,5 +14,17 @@ Wat.Router = Backbone.Router.extend({
         "user/:id": "detailsUser",
         "setup/customize": "setupCustomize",
         "*actions": "defaultRoute" // Backbone will try match the route above first
+    },
+    
+    performRoute: function (menuOpt, view, params) {
+        params = params || {};
+        
+        Wat.I.showLoading();
+        Wat.I.setMenuOpt(menuOpt);
+        if (!$.isEmptyObject(Wat.CurrentView)) {
+            Wat.CurrentView.undelegateEvents();
+        }
+
+        Wat.CurrentView = new view(params);
     }
 });
