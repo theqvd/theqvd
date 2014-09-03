@@ -344,20 +344,6 @@ Wat.I = {
         });
     },
     
-    cornerMenuEvents: function () {
-       // Show/hide the corner menu
-       $('.js-menu-corner li:has(ul)').hover(
-          function(e)
-          {
-             $(this).find('ul').css({display: "block"});
-          },
-          function(e)
-          {
-             $(this).find('ul').css({display: "none"});
-          }
-       );
-    },
-    
     // Set specific menu section as selected
     setMenuOpt: function (opt) {
         $('.menu-option').removeClass('menu-option--selected');
@@ -369,10 +355,14 @@ Wat.I = {
         // Fill the html with the template and the collection
         var template = _.template(
             templateMain, {
-                loggedIn: Wat.C.loggedIn
+                loggedIn: Wat.C.loggedIn,
+                loin: Wat.C.login,
+                cornerMenu: this.cornerMenu
             });
         
         $('.bb-super-wrapper').html(template);
+        
+        this.updateLoginOnMenu();
     },
     
     tooltipConfiguration: function () {
@@ -444,7 +434,7 @@ Wat.I = {
     },
     
     updateLoginOnMenu: function () {
-        $('.js-menu-corner').find('.login').html(Wat.C.login);
+        $('.js-menu-corner').find('.js-login').html(Wat.C.login);
     },
     
     // Messages
@@ -667,14 +657,7 @@ Wat.I = {
 
         var data1 = data[0];
         var data2 = data[1];
-        var dataTotal = data1 + data2;
-        
-        var maxLoadTime = maxLoadTime || 500;
-        var speed = 30;
-        
-        var nLoads = maxLoadTime / speed;
-        
-        var step = Math.ceil(data1/nLoads);        
+        var dataTotal = data1 + data2;      
 
         // Pie common parameters
         var series = {
@@ -715,6 +698,13 @@ Wat.I = {
         });
 
         if (data1 > 0 ) {
+            var maxLoadTime = maxLoadTime || 500;
+            var speed = 30;
+
+            var nLoads = maxLoadTime / speed;
+
+            var step = Math.ceil(data1/nLoads);
+            
             var growInterval = setInterval(function(){
                 // To make growing effect, first data will grow and second one decrease
                 pieData[0].data+=step;
@@ -742,12 +732,24 @@ Wat.I = {
         }
     },
     
-    drawBarChart: function (name) {
+    drawBarChart: function (name, data, maxLoadTime) {
         var plotSelector = '#' + name;
         
-        var rawData = [[111, 0], [123, 1],[257, 2],[288, 3],[322, 4]];
-        var dataSet = [{ label: "", data: rawData, color: COL_BRAND }];
-        var ticks = [[0, "Node 1"], [1, "Node backup"], [2, "Node in da house"], [3, "No-Node"], [4, "Yesde Node"]];
+        var maxValue = data[0].vms;
+
+        var barData = [];
+        var ticks = [];
+        var ids = [];
+        $.each(data, function (iNode, node) {
+            var index = data.length - iNode - 1;
+            // First value = 0 to increase it with growing effect
+            barData.push([0, index]);
+            ticks.push([index, node.name]);
+            ids.push(node.id);
+        });
+        
+        var maxValue = data[0].vms;
+        var dataSet = [{ label: "", data: barData, color: COL_BRAND }];
 
         var options = {
             series: {
@@ -759,31 +761,33 @@ Wat.I = {
                 align: "center",
                 barWidth: 0.8,
                 horizontal: true,
-                fillColor: { colors: [{ opacity: 0.5 }, { opacity: 1}] },
+                fillColor: { colors: [{ opacity: 0.8 }, { opacity: 1}] },
                 lineWidth: 1
             },
             xaxis: {
-                axisLabel: "Running virtual machines",
+                axisLabel: i18n.t("Running VMs"),
                 axisLabelUseCanvas: false,
                 axisLabelFontSizePixels: 12,
                 axisLabelFontFamily: 'Verdana, Arial',
                 axisLabelPadding: 10,
-                max: parseInt(rawData[rawData.length-1][0] * 1.1),
+                max: parseInt(maxValue * 1.1),
                 tickColor: "#DDD",
                 tickFormatter: function (v, axis) {
                     return v;
                 },
-                color: "black"
+                color: "black",
+                ticks: 3
             },
             yaxis: {
-                axisLabel: "Nodes",
+                axisLabel: i18n.t("Nodes"),
                 axisLabelUseCanvas: true,
                 axisLabelFontSizePixels: 12,
                 axisLabelFontFamily: 'Verdana, Arial',
                 axisLabelPadding: 3,
                 tickColor: "#DDD",
                 ticks: ticks,
-                color: "black"
+                color: "black",
+                
             },
             legend: {
                 noColumns: 0,
@@ -792,47 +796,84 @@ Wat.I = {
             },
             grid: {
                 hoverable: true,
+                clickable: true,
                 borderWidth: 1,
                 borderColor: "#CCC",
                 backgroundColor: { colors: ["#EEEEEE", "#FFFFFF"] }
             }
         };
  
-        $(document).ready(function () {
-            $.plot($(plotSelector), dataSet, options);
-            $(plotSelector).UseTooltip();
-        });
- 
+        var plot = $.plot($(plotSelector), dataSet, options);
+
+        if (barData.length > 0 ) {
+            var maxLoadTime = maxLoadTime || 500;
+            var speed = 30;
+
+            var nLoads = maxLoadTime / speed;
+
+            var load = 0;
+            var growInterval = setInterval(function() {
+                load++;
+                // To make growing effect, increase proportional part
+                $.each(data, function (iNode, node) {
+                    var index = data.length - iNode - 1;
+                    
+                    // First value = 0 to increase it with growing effect
+                    if (load >= nLoads) {
+                        barData[iNode][0] = node.vms;
+                    }
+                    else {
+                        barData[iNode][0] = parseInt((node.vms / nLoads) * load);
+                    }
+                });
+
+                dataSet = [{ label: "", data: barData, color: COL_BRAND }];
+                $.plot($(plotSelector), dataSet, options);
+
+                // After last load, clear interval
+                if (load >= nLoads) {
+                    clearInterval(growInterval);
+                }
+            }, speed);
+            
+            window.plot = plot;
+            window.barData = barData;
+        }
+        
+        // Tooltip
         var previousPoint = null, previousLabel = null;
  
-        $.fn.UseTooltip = function () {
-            $(this).bind("plothover", function (event, pos, item) {
-                if (item) {
-                    if ((previousLabel != item.series.label) ||
-                 (previousPoint != item.dataIndex)) {
-                        previousPoint = item.dataIndex;
-                        previousLabel = item.series.label;
-                        $("#tooltip").remove();
- 
-                        var x = item.datapoint[0];
-                        var y = item.datapoint[1];
- 
-                        var color = item.series.color;
-                        //alert(color)
-                        //console.log(item.series.xaxis.ticks[x].label);               
- 
-                        showTooltip(item.pageX,
-                        item.pageY,
-                        color,
-                        item.series.yaxis.ticks[y].label +
-                        " : <strong>" + x + "</strong> VMs");
-                    }
-                } else {
+        $(plotSelector).bind("plothover", function (event, pos, item) {
+            if (item) {
+                $(this).css('cursor', 'pointer');
+                if ((previousLabel != item.series.label) ||
+             (previousPoint != item.dataIndex)) {
+                    previousPoint = item.dataIndex;
+                    previousLabel = item.series.label;
                     $("#tooltip").remove();
-                    previousPoint = null;
+
+                    var x = item.datapoint[0];
+                    var y = item.datapoint[1];
+
+                    var color = item.series.color;
+
+                    showTooltip(item.pageX,
+                    item.pageY,
+                    color,
+                    "<strong>" + x + "</strong> VMs");
                 }
-            });
-        };
+            } else {
+                $(this).css('cursor', 'default');
+                $("#tooltip").remove();
+                previousPoint = null;
+            }
+        });
+        
+        $(plotSelector).bind("plotclick", function (event, pos, item) {
+			if (item) {
+				window.location = "#/host/" + ids[item.dataIndex];
+			}
+		});
  
         function showTooltip(x, y, color, contents) {
             $('<div id="tooltip">' + contents + '</div>').css({

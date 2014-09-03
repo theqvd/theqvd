@@ -4,71 +4,35 @@
             <img src="images/qvd-logo-header-trans.png" class="logo">
         </a>
         <a href="javascript:" class="fa fa-bars mobile-menu js-mobile-menu" id="mobile-menu"></a>
-        <% if (loggedIn) { %>
-            <div class="js-menu-corner menu-corner">
-                <ul class="nav-collapse-corner">
+        <% 
+            var cornerMenuPrint = $.extend(true, {}, cornerMenu);
+            if (!loggedIn) {
+                delete cornerMenuPrint.setup;
+                delete cornerMenuPrint.user;
+            } 
+        %>
+
+        <div class="js-menu-corner menu-corner">
+            <ul class="nav-collapse-corner">
+                <% $.each(cornerMenuPrint, function (iMenu, menuOpt) { %>
                     <li class="menu-option">
-                        <a href="#">
-                            <i class="fa fa-support"></i>
-                            <span data-i18n>Help</span>
+                        <a href="<%= menuOpt.link %>">
+                            <i class="<%= menuOpt.iconClass %>"></i>
+                            <span class="<%= menuOpt.textClass %>" data-i18n><%= menuOpt.text %></span>
                         </a>
                         <ul>
-                            <li>
-                                <a href="#">
-                                    <span class="fa fa-book" data-i18n>Documentation</span>
-                                </a>
-                            </li>
-                            <li>
-                                <a href="#">
-                                    <span class="fa fa-asterisk" data-i18n>About</span>
-                                </a>
-                            </li>
+                            <% $.each(menuOpt.subMenu, function (iSubMenu, subMenuOpt) { %>
+                                <li>
+                                    <a href="<%= subMenuOpt.link %>">
+                                        <span class="<%= subMenuOpt.iconClass %>" data-i18n><%= subMenuOpt.text %></span>
+                                    </a>
+                                </li>
+                            <% }); %>
                         </ul>
                     </li>
-                    <li class="menu-option menu-option--selected">
-                        <a href="#">
-                            <i class="fa fa-wrench"></i>
-                            <span data-i18n>Setup</span>
-                        </a>
-                        <ul>
-                            <li>
-                                <a href="#">
-                                    <span class="fa fa-suitcase" data-i18n>Admins</span>
-                                </a>
-                            </li>
-                            <li>
-                                <a href="#">
-                                    <span class="fa fa-building" data-i18n>Tenants</span>
-                                </a>
-                            </li>
-                            <li>
-                                <a href="#">
-                                    <span class="fa fa-file-text-o" data-i18n>Config</span>
-                                </a>
-                            </li>
-                            <li>
-                                <a href="#/setup/customize">
-                                    <span class="fa fa-columns" data-i18n>Customize</span>
-                                </a>
-                            </li>
-                        </ul>
-                    </li>
-                    <li class="menu-option">
-                        <a href="javascript:">
-                            <i class="fa fa-user"></i>
-                            <span class="login"></span>
-                        </a>
-                        <ul>
-                            <li>
-                                <a href="#">
-                                    <span class="fa fa-power-off" data-i18n>Log-out</span>
-                                </a>
-                            </li>
-                        </ul>
-                    </li>
-                </ul>
-            </div>
-        <% } %>
+                <% }); %>
+            </ul>
+        </div>
 
         </div>
 </div>

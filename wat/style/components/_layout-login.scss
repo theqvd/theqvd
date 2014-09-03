@@ -1,0 +1,60 @@
+/********************************************************************
+*********************************************************************
+*********************************************************************
+
+                @LAYOUT LOGIN: Layout of login
+                components/_layout-login.scss
+
+*********************************************************************
+*********************************************************************
+********************************************************************/
+
+.login-box {
+    width: 650px;   
+    height: 300px;
+    margin: 50px auto;
+    border-radius: 20px;
+    border: 3px solid darken($col_whiter, 15);
+    background: darken($col_whiter, 10);
+    display: table;
+    table-layout: fixed;
+    padding: 30px 20px;
+    
+    .login-side {
+        display: table-cell;
+        width: 240px;
+        text-align: center;
+    }
+    
+    .login-main {
+        display: table-cell;
+        vertical-align: middle;
+        border-left: 2px dotted darken($col_whiter, 20);
+        
+        .login-form {
+            text-align:left;
+            margin: 0 auto;
+            width: 220px;
+            font-size: 1.2em;
+            &>div {
+                &.login-user, &.login-password {
+                    padding-bottom: 20px;
+                    
+                    &>div:first-child {
+                        padding-bottom: 5px;
+                        padding-left: 5px;
+                    }
+                    
+                    input {
+                        width: 100%;
+                    }
+                }
+                
+                &.login-button {
+                    text-align: right;
+                    padding-top: 5px;
+                }
+            }
+        }
+    }
+}

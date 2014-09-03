@@ -1,6 +1,5 @@
 Wat.Views.HomeView = Wat.Views.MainView.extend({
     homeTemplateName: 'home',
-    selectedSection: 'user',
 
     breadcrumbs: {
         'screen': 'Home'
@@ -36,9 +35,47 @@ Wat.Views.HomeView = Wat.Views.MainView.extend({
     },
     
     loadData: function () {
-        Wat.I.drawPieChart('running-nodes', [12, 21]);
-        Wat.I.drawPieChart('running-vms', [285, 310]);
+        var runningNodesData = [2, 1];
+        Wat.I.drawPieChart('running-nodes', runningNodesData);
         
-        Wat.I.drawBarChart('nodes-more-vms');
+        var runningVMSData = [285, 13];
+        Wat.I.drawPieChart('running-vms', runningVMSData);
+        
+        // Trick to draw bar chart when the div where it will be located will be rendered
+        // We know that it is rendered when CSS width attribute change from 'XXX%' to 'XXXpx'
+
+        var barsInterval = setTimeout(function () {
+            if ($('#nodes-more-vms').css('width').indexOf("%") == -1) {
+            var nodesMoreVMSData = [
+                {
+                    'id': 32,
+                    'name': 'First Node',
+                    'vms': 321
+                },
+                {
+                    'id': 322,
+                    'name': 'Node due',
+                    'vms': 234
+                },
+                {
+                    'id': 3,
+                    'name': 'Trua Noden',
+                    'vms': 111
+                },
+                {
+                    'id': 1,
+                    'name': 'Cuatreren Noers',
+                    'vms': 56
+                },
+                {
+                    'id': 666,
+                    'name': 'Chinconochento',
+                    'vms': 21
+                }
+            ];
+                Wat.I.drawBarChart('nodes-more-vms', nodesMoreVMSData);
+                clearInterval(barsInterval);
+            }
+        }, 50);
     }
 });

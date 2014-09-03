@@ -48,12 +48,13 @@ Wat.I.cornerMenu = {
         
         user: {
             text: '',
-            link: '#/user',
+            link: 'javascript:',
             iconClass: 'fa fa-user',
+            textClass: 'js-login',
             subMenu: {
                 logout: {
                     text: 'Log-out',
-                    link: '#/user/logout',
+                    link: '#/logout',
                     iconClass: 'fa fa-power-off' 
                 }
             }

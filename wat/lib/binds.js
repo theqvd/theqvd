@@ -60,6 +60,38 @@ Wat.B = {
     
     bindNavigationEvents: function () {
         this.bindEvent('click', '.menu-option', this.navigationBinds.clickMenu);
+        
+        // Show/hide the corner menu
+        this.bindEvent('mouseenter', '.js-menu-corner li:has(ul)', this.navigationBinds.cornerMenuHoverIn);
+        
+        this.bindEvent('mouseleave', '.js-menu-corner li:has(ul)', this.navigationBinds.cornerMenuHoverOut);
+    },
+    
+    bindLoginEvents: function () {
+        this.bindEvent('click', '.js-login-button', this.loginBinds.tryLogIn);
+    },
+    
+    loginBinds: {
+        tryLogIn: function() {
+            var user = $('input[name="admin_user"]').val();
+            var password = $('input[name="admin_password"]').val();
+            
+            if (!user || !password) {
+                Wat.I.showMessage({message: "Empty fields", messageType: "error"});
+                return;
+            }
+            
+            if (user != 'sergio' && user != 'benja' && user != 'superadmin') {
+                Wat.I.showMessage({message: "User doesnt exist", messageType: "error"});
+                return;
+            }
+            
+            Wat.C.logIn(user);
+            
+            Wat.I.renderMain();
+            
+            Wat.Router.app_router.performRoute('', Wat.Views.HomeView);
+        }
     },
     
     navigationBinds: {
@@ -68,6 +100,15 @@ Wat.B = {
             var id = $(this).attr('data-target');
             window.location = '#/' + id;
             Wat.I.closeMessage();
+        },
+        
+        cornerMenuHoverIn: function (e) {
+            console.log('in');
+            $(this).find('ul').css({display: "block"});
+        },
+        
+        cornerMenuHoverOut: function (e) {
+            $(this).find('ul').css({display: "none"});
         }
     },
     

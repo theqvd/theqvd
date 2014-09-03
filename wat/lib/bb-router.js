@@ -1,5 +1,6 @@
 Wat.Router = Backbone.Router.extend({
     routes: {
+        "logout": "logout",
         "dis": "listDI",
         "dis/:field/:value": "listDI",
         "osfs": "listOSF",
@@ -18,6 +19,10 @@ Wat.Router = Backbone.Router.extend({
     
     performRoute: function (menuOpt, view, params) {
         params = params || {};
+        
+        if (!Wat.C.isLogged()) {
+            view = Wat.Views.LoginView;
+        }
         
         Wat.I.showLoading();
         Wat.I.setMenuOpt(menuOpt);
