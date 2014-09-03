@@ -30,7 +30,14 @@ my $db_keepintvl       = core_cfg('internal.database.client.socket.keepintvl');
 my $db_keepcnt         = core_cfg('internal.database.client.socket.keepcnt');
 
 sub new {
-    my $class = shift;
+    my ($class, %opts) = @_;
+    if ($opts{'trim_spaces'}) {
+        if ($db_user =~ /\s$/ or $db_passwd =~ /\s$/) {
+            warn "WARN: trailing whitepace detected in either DB username and/or password. Trying again without them...\n\n"
+        }
+        $db_user =~ s/\s*$//;
+        $db_passwd =~ s/\s*$//;
+    }
     $class->SUPER::connect("dbi:Pg:dbname=$db_name;host=$db_host;connect_timeout=$db_connect_timeout",
 			   $db_user, $db_passwd,
                            { RaiseError => 1,

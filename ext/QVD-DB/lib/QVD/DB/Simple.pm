@@ -15,7 +15,11 @@ my $db;
 sub db {
     unless (defined $db) {
         $db = QVD::DB->new;
-        $db->storage->dbh_do(sub { $_[1]->do("set session time zone 'UTC'") })
+        eval { $db->storage->dbh_do(sub { $_[1]->do("set session time zone 'UTC'") }); };
+        if ($@ and $@ =~ /password authentication failed/) {
+            $db = QVD::DB->new (trim_spaces => 1);
+            $db->storage->dbh_do(sub { $_[1]->do("set session time zone 'UTC'") });
+        }
     }
     $db;
 }
