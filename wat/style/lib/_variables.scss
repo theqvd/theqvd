@@ -15,7 +15,7 @@ $bg_body : $col_whiter;
 
 // Wrapper
 $min_width_wrapper : 960px;
-$max_width_wrapper : 1280px;
+$max_width_wrapper : 2048px;
 $min_width_mobile : 0px;
 $max_width_mobile : 40em;
 
@@ -45,7 +45,7 @@ $width_setup_side: 15;
 $width_setup_content: 100 - $width_setup_side;
 $setup_side: left;
 
-$width_details_side: 50;
+$width_details_side: 40;
 $width_details_content: 100 - $width_details_side;
 $details_side: right;
 

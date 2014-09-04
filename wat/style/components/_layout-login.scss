@@ -10,8 +10,12 @@
 ********************************************************************/
 
 .login-box {
-    width: 650px;   
-    height: 300px;
+    width: 90%;
+    height: 250px;
+    @include in(desktop) {
+        width: 650px;   
+        height: 300px;
+    }
     margin: 50px auto;
     border-radius: 20px;
     border: 3px solid darken($col_whiter, 15);
@@ -21,21 +25,28 @@
     padding: 30px 20px;
     
     .login-side {
-        display: table-cell;
+        display: none;
+        @include in(desktop) {
+            display: table-cell;
+        }
         width: 240px;
         text-align: center;
+        border-right: 2px dotted darken($col_whiter, 20);
     }
     
     .login-main {
         display: table-cell;
         vertical-align: middle;
-        border-left: 2px dotted darken($col_whiter, 20);
         
         .login-form {
             text-align:left;
             margin: 0 auto;
-            width: 220px;
-            font-size: 1.2em;
+            width: 180px;
+            font-size: 1.1em;
+            @include in(desktop) {
+                width: 220px;
+                font-size: 1.2em;
+            }
             &>div {
                 &.login-user, &.login-password {
                     padding-bottom: 20px;

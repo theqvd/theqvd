@@ -61,49 +61,52 @@ Wat.B = {
     bindNavigationEvents: function () {
         this.bindEvent('click', '.menu-option', this.navigationBinds.clickMenu);
         
+        this.bindEvent('click', '.js-mobile-menu', this.navigationBinds.clickMenuMobile);
+        
         // Show/hide the corner menu
         this.bindEvent('mouseenter', '.js-menu-corner li:has(ul)', this.navigationBinds.cornerMenuHoverIn);
         
         this.bindEvent('mouseleave', '.js-menu-corner li:has(ul)', this.navigationBinds.cornerMenuHoverOut);
+                
     },
     
     bindLoginEvents: function () {
         this.bindEvent('click', '.js-login-button', this.loginBinds.tryLogIn);
+        
+        this.bindEvent('keydown', 'input[name="admin_user"], input[name="admin_password"]', this.loginBinds.pushKeyOnLoginInput);
     },
     
     loginBinds: {
         tryLogIn: function() {
-            var user = $('input[name="admin_user"]').val();
-            var password = $('input[name="admin_password"]').val();
-            
-            if (!user || !password) {
-                Wat.I.showMessage({message: "Empty fields", messageType: "error"});
-                return;
+            Wat.C.tryLogin();
+        },
+        
+        pushKeyOnLoginInput: function (e) {
+            // If press enter, trigger login button
+            if (e.which == 13 ) {
+                $('.js-login-button').trigger('click');
             }
-            
-            if (user != 'sergio' && user != 'benja' && user != 'superadmin') {
-                Wat.I.showMessage({message: "User doesnt exist", messageType: "error"});
-                return;
-            }
-            
-            Wat.C.logIn(user);
-            
-            Wat.I.renderMain();
-            
-            Wat.Router.app_router.performRoute('', Wat.Views.HomeView);
         }
     },
     
     navigationBinds: {
         // When click on a menu option, redirect to this section
         clickMenu: function() {
+            // If in mobule mode, hide menu when click
+            if ($('.js-mobile-menu').css('display') != 'none') {
+                $('.menu').slideUp();
+            }
+            
             var id = $(this).attr('data-target');
             window.location = '#/' + id;
             Wat.I.closeMessage();
         },
         
+        clickMenuMobile: function () {
+            $('.menu').slideToggle();
+        },
+        
         cornerMenuHoverIn: function (e) {
-            console.log('in');
             $(this).find('ul').css({display: "block"});
         },
         

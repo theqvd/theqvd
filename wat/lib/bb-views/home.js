@@ -36,10 +36,10 @@ Wat.Views.HomeView = Wat.Views.MainView.extend({
     
     loadData: function () {
         var runningNodesData = [2, 1];
-        Wat.I.drawPieChart('running-nodes', runningNodesData);
+        Wat.I.G.drawPieChart('running-nodes', runningNodesData);
         
         var runningVMSData = [285, 13];
-        Wat.I.drawPieChart('running-vms', runningVMSData);
+        Wat.I.G.drawPieChart('running-vms', runningVMSData);
         
         // Trick to draw bar chart when the div where it will be located will be rendered
         // We know that it is rendered when CSS width attribute change from 'XXX%' to 'XXXpx'
@@ -73,7 +73,7 @@ Wat.Views.HomeView = Wat.Views.MainView.extend({
                     'vms': 21
                 }
             ];
-                Wat.I.drawBarChart('nodes-more-vms', nodesMoreVMSData);
+                Wat.I.G.drawBarChart('nodes-more-vms', nodesMoreVMSData);
                 clearInterval(barsInterval);
             }
         }, 50);

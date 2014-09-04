@@ -10,6 +10,15 @@
     }
 }
 
+@mixin alternate-cols($col : #FFFFFF){
+    &>td:nth-child(even) {
+        background-color: $col;
+    }    
+    &>td:nth-child(odd) {
+        background-color: darken($col, 4%);
+    }
+}
+
 // Layout
 @mixin width-wrapper {
     min-width: $min_width_mobile;
@@ -157,7 +166,7 @@
     font-size: $size;
 }
 
-@mixin table-base {
+@mixin table-base ($alternate: alternate-rows) {
     width: 100%;
     margin-left: auto;
     margin-right: auto;
@@ -170,7 +179,7 @@
         font-weight: bold;
         text-align: left;
         border-bottom: #ccc solid 1px;
-        
+
         .sort-icon {
             float: right;
         }
@@ -201,19 +210,32 @@
         }
     }
 
-    td, th {
-        padding: 6px 8px;
-        vertical-align: middle;
+    tr {
+        td, th {
+            padding: 6px 8px;
+            vertical-align: middle;
 
-        border-right: dotted 1px darken($col_whiter, 10);
+            border-right: dotted 1px darken($col_whiter, 10);
+            border-bottom: dotted 1px darken($col_whiter, 10);
 
+            &:last-child {
+                border-right: 0px;
+            }
+        }
+        
         &:last-child {
-            border-right: 0px;
+            td {
+                border-bottom: 0;
+            }
         }
     }
 
     >tbody>tr {
-        @include alternate($col_whiter);
+        @if $alternate == alternate-rows {
+            @include alternate($col_whiter);
+        } @else if $alternate == alternate-cols {
+            @include alternate-cols($col_whiter);
+        }
     }
     
     tr:last-child {

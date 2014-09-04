@@ -47,6 +47,96 @@ body {
         }
         
     }
+    
+    .message-container {
+        position: absolute;
+        top: 60px;
+
+        right: 5%;
+        width: 90%;
+        @include in(desktop) {
+            right: 20px;
+            width: 40%;
+        }
+        
+        padding: 12px 20px;
+        border-bottom-left-radius: 20px;
+        border-bottom-right-radius: 20px;
+        opacity: 0.9;
+        border-top: 0px;
+        color: $col_whiter;
+        font-weight: bold;
+        z-index: 999;
+        display: none;
+                
+        &.success {
+            background: darken($col_green, 5);
+        }
+        
+        &.error {
+            background: darken($col_red, 5);
+        }
+        
+        &.info {
+            background: darken($col_blue, 5);
+        }
+        
+        &.warning {
+            background: darken($col_yellow, 5);
+        }
+
+        .message-close {
+            float:right;
+            //position: absolute;
+            top: 6px;
+            right: 8px;
+            @include icon-size(20px);
+            cursor: pointer;
+        }
+        
+        .message {
+            padding-top: 10px;
+            
+            summary {
+                line-height: 20px;
+            }
+            
+            article.expandedMessage {
+                display: none;
+                @include font-size(1);
+                padding: 14px 30px;
+                margin-top: 10px;
+                
+                background: darken($col_whiter, 8);
+                color: $col_blacker;
+                margin-top: 10px;
+                margin-bottom: 10px;
+                border-radius: 4px;
+                
+                font-weight: normal;
+                
+                ul {
+                    margin-top: 5px;
+                    margin-left: 8px;
+                    li {
+                        margin-top: 4px;
+                        display: list-item;
+                        
+                        &:before, i:before {
+                            margin-right: 5px;
+                        }
+                    }
+                }
+            }
+            
+            .expand-message {
+                cursor: pointer;
+                @include icon-size(20px);
+                float:left;
+                margin-right: 15px;
+            }
+        }
+    }
 }
 
 .loading {
@@ -112,96 +202,6 @@ body {
         }
     }
     
-    .message-container {
-        position: absolute;
-        top: -10px;
-        @include in(desktop) {
-            top: -15px;
-        }
-        right: 10px;
-        width: 40%;
-        padding: 12px 20px;
-        border-bottom-left-radius: 20px;
-        border-bottom-right-radius: 20px;
-        opacity: 0.95;
-        border-top: 0px;
-        color: $col_whiter;
-        font-weight: bold;
-        z-index: 999;
-        display: none;
-        
-        opacity: 0.8;
-        
-        &.success {
-            background: darken($col_green, 5);
-        }
-        
-        &.error {
-            background: darken($col_red, 5);
-        }
-        
-        &.info {
-            background: darken($col_blue, 5);
-        }
-        
-        &.warning {
-            background: darken($col_yellow, 5);
-        }
-
-        .message-close {
-            float:right;
-            //position: absolute;
-            top: 6px;
-            right: 8px;
-            @include icon-size(20px);
-            cursor: pointer;
-        }
-        
-        .message {
-            @include font-size(3);
-            padding-top: 10px;
-            
-            summary {
-                line-height: 20px;
-            }
-            
-            article.expandedMessage {
-                display: none;
-                @include font-size(1);
-                padding: 14px 30px;
-                margin-top: 10px;
-                
-                background: darken($col_whiter, 8);
-                color: $col_blacker;
-                margin-top: 10px;
-                margin-bottom: 10px;
-                border-radius: 4px;
-                
-                font-weight: normal;
-                
-                ul {
-                    margin-top: 5px;
-                    margin-left: 8px;
-                    li {
-                        margin-top: 4px;
-                        display: list-item;
-                        
-                        &:before, i:before {
-                            margin-right: 5px;
-                        }
-                    }
-                }
-            }
-            
-            .expand-message {
-                cursor: pointer;
-                @include icon-size(20px);
-                float:left;
-                margin-right: 15px;
-            }
-        }
-    }
-    
     .content {
         @extend %invisible;
 
@@ -209,9 +209,10 @@ body {
 
         margin-bottom: 180px;
         
-        @include in(desktop) {
-            margin-bottom: 80px;
-        }
+        display: table;
+        width: 100%;
+        margin: 0 auto;
+        margin-bottom: 80px;
         
         // Different view layouts
         @import "layout-home";
@@ -239,7 +240,7 @@ body {
     
     position: fixed;
     bottom: 0px;
-    padding-top: 7px;
+    padding: 7px;
     
     display: none;
     

@@ -38,7 +38,7 @@
         </div>
     </div>
 
-    <table class="list">
+    <table class="details fixed">
     <tbody>
         <tr>
             <td><span data-i18n>Node</span></td>

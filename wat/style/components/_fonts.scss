@@ -19,7 +19,7 @@ body {
     @include font-size(1);
 
     @include in(desktop) {
-        @include font-size(2);
+        @include font-size(3);
     }
 }
 
@@ -33,6 +33,12 @@ th, td * {
 
 editor-table th, editor-table td * {
     //@include font-size(2);
+}
+
+table.expiration-table td {
+    @include in(mobile) {
+        font-size: 11px;
+    }
 }
 
 .h1 {
@@ -92,11 +98,6 @@ input {
 
 .details-block .details-item {
     font-weight: normal;
-
-    .indented-data {
-        @include font-size(2);
-        font-weight: bold;
-    }
 }
 
 // Menu
@@ -117,10 +118,24 @@ input {
 // Tables
 .second_row {
     @include font-size(1);
+    line-height: 1.2em;
+    font-weight: normal;
+}
+
+.footer {
+    @include in(mobile) {
+        font-size: 9px;
+        line-height: 9px;
+    }
 }
 
 .footer a {
-    font-size: inherit;
+    font-size: 9px;
+    line-height: 9px;
+
+    @include in(desktop) {
+        font-size: inherit;
+    }
 }
 
 
@@ -151,5 +166,15 @@ input {
                 font-size: 35px;
             }
         }
+    }
+}
+
+// Messages
+
+.message-container .message {
+    font-size: 1.1em;
+
+    @include in(desktop) {
+        @include font-size(3);
     }
 }

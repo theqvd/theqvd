@@ -29,11 +29,11 @@ Wat.A = {
         var url = Wat.C.getBaseUrl() + 
             '&action=' + action;
         
-        if (!$.isEmptyObject(filters)) {
+        if (filters && !$.isEmptyObject(filters)) {
             url += '&filters=' + JSON.stringify(filters);
         }
         
-        if (!$.isEmptyObject(arguments)) {
+        if (arguments && !$.isEmptyObject(arguments)) {
             url += '&arguments=' + JSON.stringify(arguments);
         }
 
@@ -47,6 +47,25 @@ Wat.A = {
             processData: false,
             parse: true,
             async: async,
+            error: function (response) {
+                if (that) {
+                    that.retrievedData = response;
+                }
+                
+                successCallback(that);
+
+                if (!$.isEmptyObject(messages)) {
+                    that.message = messages.error;
+                    that.messageType = 'error';
+
+                    var messageParams = {
+                        message: that.message,
+                        messageType: that.messageType
+                    };
+
+                    Wat.I.showMessage(messageParams, response);
+                }                   
+            },
             success: function (response) {
                 if (that) {
                     that.retrievedData = response;

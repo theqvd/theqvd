@@ -3,45 +3,51 @@
     <a class="button button-right js-button-edit fa fa-pencil" href="javascript:" data-i18n>Edit</a>
 </div>
 
-<div class="details-list">
-    <span class="details-item fa fa-angle-right">
-        <span data-i18n>Id</span>
-        <div class="indented-data">
+<table class="details details-list">
+    <tr>
+        <td data-i18n>Id</td>
+        <td>
             <%= model.get('id') %>
-        </div>
-    </span>
-    <span class="details-item fa fa-angle-right">
-        <span data-i18n>IP address</span>
-        <div class="indented-data">
+        </td>
+    </tr>
+    <tr>
+        <td data-i18n>IP address</td>
+        <td>
             <%= model.get('address') %>
-        </div>
-    </span>
-    <span class="details-item fa fa-angle-right">
-        <% 
+        </td>
+    </tr>
+    <tr>
+        <td data-i18n>State</td>
+        <td>
+            <% 
         if (model.get('state') == 'running') {
-        %>
-            <i class="fa fa-play icon-play" data-i18n>Running</i>
-        <%
-        }
-        else {
-        %>
-            <i class="fa fa-pause icon-stop" data-i18n>Stopped</i>
-        <%
-        }
-        %>
-    </span>
-    <span class="details-item fa fa-angle-right">
-        <% 
-        if (model.get('blocked')) {
-        %>
-            <i class="fa fa-lock" data-i18n>Blocked</i>
-        <%
-        }
-        else {
-        %>
-            <i class="fa fa-unlock" data-i18n>Unblocked</i>
-        <%
-        }
-        %>
-    </span>
-</div>
+            %>
+            <i class="fa fa-play icon-play" data-i18n="[title]Running"></i>
+            <%
+            }
+            else {
+            %>
+            <i class="fa fa-pause icon-stop" data-i18n="[title]Stopped"></i>
+            <%
+            }
+            %>
+        </td>
+    </tr>
+    <tr>
+        <td data-i18n>Blocking</td>
+        <td>
+            <% 
+            if (model.get('blocked')) {
+            %>
+                <i class="fa fa-lock" data-i18n="[title]Blocked"></i>
+            <%
+            }
+            else {
+            %>
+                <i class="fa fa-unlock" data-i18n="[title]Unblocked"></i>
+            <%
+            }
+            %>
+        </td>
+    </tr>
+</table>

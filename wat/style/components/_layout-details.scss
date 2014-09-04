@@ -59,11 +59,8 @@
 }
 
 .details-list, .custom-props-container {
-    padding-left: 20px;
-    
     .details-item {
-        margin-bottom: 15px;
-        display: block;
+        margin-bottom: 5px;
         &:before, i:before {
             margin-right: 5px;
         }
@@ -79,36 +76,43 @@
     .details-list {
         @include in(desktop) {
             width: 50%;
+            margin: 0;
         }
     }
     
-    .details-item {
-        .indented-data {
-            margin-left: 12px;
-            margin-top: 6px;
-            margin-bottom: 20px;
-            div {
-                margin-bottom: 10px;
-            }
-        }
-    }
+    display: table;
+    width: 100%;
         
     .custom-props-container {
+        margin-top: 20px;
         @include in(desktop) {
+            margin-top: 0px;
             position: absolute;
-            top: 30px;
+            top: 40px;
             right: 0;
             width: $other_properties_width * 1%;
+            padding-left: 20px;
         }
 
         table.custom-props {
             width: auto;
-            
+            margin-top: 10px;
             td:first-child {
                 font-weight: normal;
                 white-space: nowrap;
                 width: 1%;
                 padding-right: 15px;
+            }
+        }
+        
+        .details-item {
+            border: 0;
+            display: block;
+            
+            &> span {
+                width: 100%;
+                display: block;
+                background: transparent;
             }
         }
     }

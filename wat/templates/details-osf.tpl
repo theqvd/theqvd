@@ -3,28 +3,28 @@
     <a class="button button-right js-button-edit fa fa-pencil" href="javascript:" data-i18n>Edit</a>
 </div>
 
-<div class="details-list">
-    <span class="details-item fa fa-angle-right">
-        <span data-i18n>Id</span>
-        <div class="indented-data">
+<table class="details details-list">
+    <tr>
+        <td data-i18n>Id</td>
+        <td>
             <%= model.get('id') %>
-        </div>
-    </span>
-    <span class="details-item fa fa-angle-right">
-        <span data-i18n>Overlay</span>
-        <div class="indented-data">
+        </td>
+    </tr>
+    <tr>
+        <td data-i18n>Overlay</td>
+        <td>
             <%= model.get('overlay') %>
-        </div>
-    </span>
-    <span class="details-item fa fa-angle-right">
-        <span data-i18n>Memory</span>
-        <div class="indented-data">
+        </td>
+    </tr>
+    <tr>
+        <td data-i18n>Memory</td>
+        <td>
             <%= model.get('memory') %> MB
-        </div>
-    </span>
-    <span class="details-item fa fa-angle-right">
-        <span data-i18n>User storage</span>
-        <div class="indented-data">
+        </td>
+    </tr>
+    <tr>
+        <td data-i18n>User storage</td>
+        <td>
             <%
             if (!model.get('user_storage')) {
             %>
@@ -37,6 +37,6 @@
                 print(model.get('user_storage')  + " MB");
             }
             %>
-        </div>
+        </td>
     </span>
-</div>
+</table>

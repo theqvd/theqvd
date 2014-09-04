@@ -1,3 +1,4 @@
+
 <div class="header-wrapper">
     <div class="header">
         <a href="#">
@@ -35,6 +36,10 @@
         </div>
 
         </div>
+        <div class="message-container js-message-container">
+            <i class="message-close js-message-close fa fa-times-circle"></i>
+            <span class="message"></span>
+        </div>
 </div>
 <div class="wrapper"> 
     <% if (loggedIn) { %>
@@ -66,10 +71,6 @@
     <% } %>
     <div class="loading"><i class="fa fa-gear fa-spin"></i></div>
 
-    <div class="message-container js-message-container">
-        <i class="message-close js-message-close fa fa-times-circle"></i>
-        <span class="message"></span>
-    </div>
     <div class="content bb-content"></div>                        
 </div>
 <div class="footer" data-link="<a href='http://qindel.com'>Qindel Group</a>"></div>

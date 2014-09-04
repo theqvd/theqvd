@@ -3,43 +3,50 @@
     <a class="button button-right js-button-edit fa fa-pencil" href="javascript:" data-i18n>Edit</a>
 </div>
 
-<div class="details-list">
-    <span class="details-item fa fa-angle-right">
-        <span data-i18n>Id</span>
-        <div class="indented-data">
+<table class="details details-list">
+    <tr>
+        <td data-i18n>Id</td>
+        <td>
             <%= model.get('id') %>
-        </div>
-    </span>
-    <span class="details-item fa fa-angle-right">
-        <span data-i18n>OS Flavour</span>
-        <div class="indented-data">
+        </td>
+    </tr>
+    <tr>
+        <td data-i18n>OS Flavour</td>
+        <td>
             <a href="#/osf/<%= model.get('osf_id') %>">
                 <%= model.get('osf_name') %>
             </a>
-        </div>
-    </span>
-    <span class="details-item fa fa-angle-right">
-        <% 
-        if (model.get('blocked')) {
-        %>
-            <i class="fa fa-lock" data-i18n>Blocked</i>
-        <%
-        }
-        else {
-        %>
-            <i class="fa fa-unlock" data-i18n>Unblocked</i>
-        <%
-        }
-        %>
-    </span>
+        </td>
+    </tr>
+    <tr>
+        <td data-i18n>Blocking</td>
+        <td>
+            <% 
+            if (model.get('blocked')) {
+            %>
+                <i class="fa fa-lock" data-i18n="[title]Blocked"></i>
+            <%
+            }
+            else {
+            %>
+                <i class="fa fa-unlock" data-i18n="[title]Unblocked"></i>
+            <%
+            }
+            %>
+        </td>
+    </tr>
     
     <%
         if (model.get('default')) {
     %>
-            
-            <span class="details-item fa fa-angle-right">
-                <i class="fa fa-home" data-i18n>Default</i>
-            </span>
+            <tr>
+                <td>
+                    <span data-i18n>Default</span>
+                </td>
+                <td>
+                    <i class="fa fa-home"></i>
+                </td>
+            </tr>
     
     <%
         }
@@ -48,21 +55,25 @@
     <%
         if (model.get('head')) {
     %>
-            
-            <span class="details-item fa fa-angle-right">
-                <i class="fa fa-flag-o" data-i18n>Head</i>
-                <div class="indented-data">
-                    <div class="second_row" data-i18n="Last image created on this OSF"></div>
-                </div>
-            </span>
+           <tr> 
+                <td>
+                    <span data-i18n>Head</span>
+                </td>
+                <td>
+                    <i class="fa fa-flag-o"></i>
+                    <div>
+                        <div class="second_row" data-i18n="Last image created on this OSF"></div>
+                    </div>
+                </td>
+            </tr>
     
     <%
         }
     %>
     
-    <span class="details-item fa fa-angle-right">
-        <span data-i18n>Tags</span>
-        <div class="indented-data">
+    <tr>
+        <td data-i18n>Tags</td>
+        <td>
         <%
             if (!model.get('tags')) {
         %>
@@ -81,6 +92,6 @@
                 }
                 %>
             </ul>
-        </div>
-    </span>
-</div>
+        </td>
+    </tr>
+</table>

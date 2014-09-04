@@ -8,7 +8,7 @@ var properties = model.get('properties');
     <div class="details-block">
         <div class="bb-details details"></div>
         <div class="custom-props-container">
-            <span class="details-item fa fa-angle-right">
+            <span class="details-item">
                 <span data-i18n>Other properties</span>
                 <%
                 if (jQuery.isEmptyObject(properties)) {

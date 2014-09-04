@@ -91,6 +91,11 @@ Wat.Views.VMDetailsView = Wat.Views.DetailsView.extend({
                 arguments['expiration_hard'] = expiration_hard;
             }
         }
+        else {
+            // Delete the expiration if exist
+            //arguments['expiration_soft'] = '';
+            //arguments['expiration_hard'] = '';
+        }
                 
         this.updateModel(arguments, filters, this.fetchDetails);
     },

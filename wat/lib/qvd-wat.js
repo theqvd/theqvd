@@ -69,12 +69,19 @@ var Wat = {
 
 (function (win, doc, $) {
 	$(doc).ready(function() {
+        // Remember login from cookies
+        Wat.C.rememberLogin();
         // Interface onfiguration
         Wat.I.renderMain();
         //Wat.I.bindCornerMenuEvents();
         Wat.I.tooltipConfiguration();
-        Wat.I.mobileMenuConfiguration();
-        Wat.I.setCustomizationFields();
+        
+        // Binding events manually because backbone doesnt allow bind events to dialogs loaded dinamically
+        Wat.B.bindCommonEvents();
+        
+        if (Wat.C.isLogged()) {
+            Wat.I.setCustomizationFields();
+        }
 
         
         // Instantiate the router

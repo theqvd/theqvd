@@ -12,13 +12,26 @@
 
 /* Table list */
 
-table.list, table.custom-props, table.customize-fields {    
-    @include table-base;
+table.list, table.customize-fields {    
+    @include table-base (alternate-rows);
+}
+
+table.custom-props, table.details {    
+    @include table-base (alternate-cols);
 }
 
 table.list, table.custom-props {
     @include in(desktop) {
         table-layout: fixed;
+    }
+}
+
+table.details, table.custom-props {
+    td:first-child {
+        vertical-align: top;
+    }
+    td:last-child {
+        font-weight: bold;
     }
 }
 
@@ -32,8 +45,17 @@ table.expiration-table {
     color: lighten($col_blacker, 40);
 }
 
-td.center {
-    text-align: center;
+td.inner-table {
+    padding: 0 !important;
+    
+    table {
+        width: 100%;
+    }
+    
+}
+
+.fixed {
+    table-layout: fixed;
 }
 
 .not-break {
