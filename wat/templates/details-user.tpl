@@ -5,13 +5,13 @@
 
 <table class="details details-list">
     <tr">
-        <td data-i18n>Id</td>
+        <td><i class="fa fa-male"></i><span data-i18n>Id</span></td>
         <td>
             <%= model.get('id') %>
         </td>
     </tr>
     <tr>
-        <td data-i18n>Blocking</td>
+        <td><i class="fa fa-lock"></i><span data-i18n>Blocking</span></td>
         <td>
             <% 
             if (model.get('blocked')) {

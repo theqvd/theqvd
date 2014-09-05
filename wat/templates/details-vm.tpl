@@ -5,13 +5,13 @@
 
 <table class="details details-list">
     <tr>
-        <td data-i18n>Id</td>
+        <td><i class="fa fa-male"></i><span data-i18n>Id</span></td>
         <td>
             <%= model.get('id') %>
         </td>
     </tr>    
     <tr>
-        <td data-i18n>User</td>
+        <td><i class="<%= CLASS_ICON_USERS %>"></i><span data-i18n>User</span></td>
         <td>
             <a href="#/user/<%= model.get('user_id') %>">
                 <%= model.get('user_name') %>
@@ -19,7 +19,7 @@
         </td>
     </tr>
     <tr>
-        <td data-i18n>OS Flavour</td>
+        <td><i class="<%= CLASS_ICON_OSFS %>"></i><span data-i18n>OS Flavour</span></td>
         <td>
             <a href="#/osf/<%= model.get('osf_id') %>">
                 <%= model.get('osf_name') %>
@@ -27,13 +27,13 @@
         </td>
     </tr>
     <tr>
-        <td data-i18n>Disk image's tag</td>
+        <td><i class="fa fa-tag"></i><span data-i18n>Image tag</span></td>
         <td>
             <%= model.get('di_tag') %>
         </td>
     </tr>
     <tr>
-        <td data-i18n>Disk image</td>
+        <td><i class="<%= CLASS_ICON_DIS %>"></i><span data-i18n>Disk image</span></td>
         <td>
             <a href="#/di/<%= model.get('di_id') %>">
                 <%= model.get('di_name') %>
@@ -41,7 +41,7 @@
         </td>
     </tr>
     <tr>
-        <td data-i18n>Expiration</td>
+        <td><i class="fa fa-warning"></i><span data-i18n>Expiration</span></td>
             <%
                 var expiration_soft = model.get('expiration_soft');
                 var expiration_hard = model.get('expiration_hard');
@@ -60,14 +60,13 @@
                             <tr>
                                 <td class="warning" data-i18n>Soft</td>
                                 <td class="warning"><%= model.get('expiration_soft') %></td>
-                                <td class="warning"><i class="fa fa-warning fa-centered"></i></td>
+                                <td class="warning"><i class="fa fa-info-circle fa-centered"></i></td>
                             </tr>
                             <tr>
                                 <td class="ok" data-i18n>Hard</td>
                                 <td class="ok"><%= model.get('expiration_hard') %></td>
                                 <td class="ok"><i class="fa fa-info-circle fa-centered"></td>
                             </tr>
-                        </tbody>
                     </table>
                 </td>
             <%
@@ -75,7 +74,7 @@
             %>
     </tr>
     <tr>
-        <td data-i18n>Blocking</td>
+        <td><i class="fa fa-lock"></i><span data-i18n>Blocking</span></td>
         <td>
             <% 
             if (model.get('blocked')) {

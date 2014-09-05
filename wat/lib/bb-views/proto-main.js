@@ -203,7 +203,7 @@ Wat.Views.MainView = Backbone.View.extend({
                 that.messageType = 'success';
             }
             else {
-                that.message = message.error;
+                that.message = messages.error;
                 that.messageType = 'error';
             }
 

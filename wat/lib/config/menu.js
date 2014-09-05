@@ -7,7 +7,7 @@ Wat.I.cornerMenu = {
             subMenu: {
                 documentation: {
                     text: 'Documentation',
-                    link: '#/help/documentation',
+                    link: 'http://docs.theqvd.com/',
                     iconClass: 'fa fa-book' 
                 },
                 about: {

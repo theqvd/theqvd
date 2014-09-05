@@ -5,7 +5,6 @@
             <%
             if (model.get('default')) {
             %>
-                <div data-i18n="Yes"></div>
                 <div class="second_row" data-i18n>
                     To change this value, set another Disk image of the same OSF as default
                 </div>

@@ -79,7 +79,7 @@
                 margin-bottom: 10px;
                 padding: 0px;
                 height: auto;
-                width: 45%;
+                //width: 49%;
                 float: right;
                 text-align: right;
             }
@@ -110,11 +110,30 @@
 
     .action-selected {
         @extend %clearfix;
-        height: 30px;
-        margin-top: 10px;
+        margin-top: 15px;
+        width: 100%;
+        
+        @include in(desktop) {
+            float: left;
+            width: auto;
+        }
         
         .chosen-container {
             margin-top: -6px;
         }
-    }    
+        
+        .action-selected-select {
+            margin-bottom: 10px;
+            width: 100%;
+        } 
+        
+        .action-selected-button {
+            width: 100%;
+        }        
+    }
+    
+    .shown-elements {
+        margin-top: 9px;
+        float:right;
+    }
 }

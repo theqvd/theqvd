@@ -1,5 +1,6 @@
 // Config
 Wat.C = {
+    version: '1.7',
     login: '',
     password: '',
     loggedIn: false,

@@ -5,25 +5,25 @@
 
 <table class="details details-list">
     <tr>
-        <td data-i18n>Id</td>
+        <td><i class="fa fa-male"></i><span data-i18n>Id</span></td>
         <td>
             <%= model.get('id') %>
         </td>
     </tr>
     <tr>
-        <td data-i18n>Overlay</td>
+        <td><i class="fa fa-exchange"></i><span data-i18n>Overlay</span></td>
         <td>
             <%= model.get('overlay') %>
         </td>
     </tr>
     <tr>
-        <td data-i18n>Memory</td>
+        <td><i class="fa fa-bolt"></i><span data-i18n>Memory</span></td>
         <td>
             <%= model.get('memory') %> MB
         </td>
     </tr>
     <tr>
-        <td data-i18n>User storage</td>
+        <td><i class="fa fa-archive"></i><span data-i18n>User storage</span></td>
         <td>
             <%
             if (!model.get('user_storage')) {

@@ -82,11 +82,7 @@
 
     &:hover {
         cursor: pointer;
-        font-weight: bolder;
-
-        span {
-            font-weight: bold;
-        }
+        border-color: darken($col_brand, 10);
         
         &:before {
             color: $col;
@@ -179,7 +175,8 @@
         font-weight: bold;
         text-align: left;
         border-bottom: #ccc solid 1px;
-
+        background: darken($col_whiter, 15); 
+        
         .sort-icon {
             float: right;
         }
@@ -212,7 +209,7 @@
 
     tr {
         td, th {
-            padding: 6px 8px;
+            padding: 8px 8px;
             vertical-align: middle;
 
             border-right: dotted 1px darken($col_whiter, 10);

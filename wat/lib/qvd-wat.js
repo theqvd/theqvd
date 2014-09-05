@@ -43,7 +43,10 @@ var Wat = {
         HostDetailsView: {},
         
         // Setup
-        ConfigCustomizeView: {}
+        ConfigCustomizeView: {},
+        
+        // Help
+        AboutView: {}
     },
     Router: {},
     
@@ -177,6 +180,12 @@ var Wat = {
         // ------- Configuration sections ------- //
         Wat.Router.app_router.on('route:setupCustomize', function (actions) {
             Wat.Router.app_router.performRoute('', Wat.Views.ConfigCustomizeView);
+        });    
+        
+        
+        // ------- Help sections ------- //
+        Wat.Router.app_router.on('route:about', function (actions) {
+            Wat.Router.app_router.performRoute('', Wat.Views.AboutView);
         });
         
         

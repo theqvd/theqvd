@@ -14,13 +14,15 @@ Wat.Router = Backbone.Router.extend({
         "users": "listUser",
         "user/:id": "detailsUser",
         "setup/customize": "setupCustomize",
+        "help/about": "about",
         "*actions": "defaultRoute" // Backbone will try match the route above first
     },
     
     performRoute: function (menuOpt, view, params) {
         params = params || {};
-        
+
         if (!Wat.C.isLogged()) {
+            Wat.I.renderMain();
             view = Wat.Views.LoginView;
         }
         

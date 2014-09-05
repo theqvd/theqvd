@@ -1,11 +1,9 @@
-Wat.Views.LoginView = Wat.Views.MainView.extend({
-    loginTemplateName: 'login',
+Wat.Views.AboutView = Wat.Views.MainView.extend({
+    aboutTemplateName: 'help-about',
     
     initialize: function (params) {
         Wat.Views.MainView.prototype.initialize.apply(this, [params]);
-        
-        Wat.B.bindLoginEvents();
-
+                
         this.render();
     },
     
@@ -13,11 +11,11 @@ Wat.Views.LoginView = Wat.Views.MainView.extend({
     },
     
     render: function () {
-        this.templateLogin = Wat.A.getTemplate(this.loginTemplateName);
+        this.templateAbout = Wat.A.getTemplate(this.aboutTemplateName);
         
         // Fill the html with the template
         this.template = _.template(
-            this.templateLogin, {
+            this.templateAbout, { version: Wat.C.version
             }
         );
         

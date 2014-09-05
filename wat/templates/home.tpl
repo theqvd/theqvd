@@ -1,11 +1,11 @@
 <div class="welcome-message">
-    Welcome to QVD's Web Administration Tool
+    <span class="welcome" data-i18n="Welcome to QVD's Web Administration Tool"></span>
 </div>
 
 <div class="home-wrapper">
     <div class="home-row">
         <div class="home-cell">
-            <div class="home-title" data-i18n="">Running virtual machines</div>
+            <div class="home-title" data-i18n>Running virtual machines</div>
             <div class="home-percent-wrapper">
                 <div class="js-running-vms-percent home-title home-percent js-home-percent"></div>
                 <div id="running-vms" class="pie-chart js-pie-chart" data-target="vms" width="200px" height="200px"></div>

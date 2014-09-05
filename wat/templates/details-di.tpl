@@ -5,13 +5,13 @@
 
 <table class="details details-list">
     <tr>
-        <td data-i18n>Id</td>
+        <td><i class="fa fa-male"></i><span data-i18n>Id</span></td>
         <td>
             <%= model.get('id') %>
         </td>
     </tr>
     <tr>
-        <td data-i18n>OS Flavour</td>
+        <td><i class="<%= CLASS_ICON_OSFS %>"></i><span data-i18n>OS Flavour</span></td>
         <td>
             <a href="#/osf/<%= model.get('osf_id') %>">
                 <%= model.get('osf_name') %>
@@ -19,7 +19,7 @@
         </td>
     </tr>
     <tr>
-        <td data-i18n>Blocking</td>
+        <td><i class="fa fa-lock"></i><span data-i18n>Blocking</span></td>
         <td>
             <% 
             if (model.get('blocked')) {
@@ -40,11 +40,9 @@
         if (model.get('default')) {
     %>
             <tr>
+                <td><i class="fa fa-home"></i><span data-i18n>Default</span></td>
                 <td>
-                    <span data-i18n>Default</span>
-                </td>
-                <td>
-                    <i class="fa fa-home"></i>
+                    <div class="second_row" data-i18n="Default image for this OSF"></div>
                 </td>
             </tr>
     
@@ -56,14 +54,9 @@
         if (model.get('head')) {
     %>
            <tr> 
+                <td><i class="fa fa-flag-o"></i><span data-i18n>Head</span></td>
                 <td>
-                    <span data-i18n>Head</span>
-                </td>
-                <td>
-                    <i class="fa fa-flag-o"></i>
-                    <div>
-                        <div class="second_row" data-i18n="Last image created on this OSF"></div>
-                    </div>
+                    <div class="second_row" data-i18n="Last image created on this OSF"></div>
                 </td>
             </tr>
     
@@ -72,7 +65,7 @@
     %>
     
     <tr>
-        <td data-i18n>Tags</td>
+        <td><i class="fa fa-tags"></i><span data-i18n>Tags</span></td>
         <td>
         <%
             if (!model.get('tags')) {

@@ -1,9 +1,9 @@
 /* INCLUDED: variables */
 /* INCLUDED: place_holders */
-.wrapper .content::after, .wrapper .content .list-block .list-navigation::after, .wrapper .content .details-side .list-navigation::after, .wrapper .content .list-block .list-navigation .action-new-item::after, .wrapper .content .details-side .list-navigation .action-new-item::after, .wrapper .content .list-block .action-selected::after, .wrapper .content .details-side .action-selected::after, .footer::after, .wrapper .content::before, .wrapper .content .list-block .list-navigation::before, .wrapper .content .details-side .list-navigation::before, .wrapper .content .list-block .list-navigation .action-new-item::before, .wrapper .content .details-side .list-navigation .action-new-item::before, .wrapper .content .list-block .action-selected::before, .wrapper .content .details-side .action-selected::before, .footer::before {
+.wrapper .content::after, .wrapper .content .list-block .list-navigation::after, .wrapper .content .details-side .list-navigation::after, .wrapper .content .list-block .list-navigation .action-new-item::after, .wrapper .content .details-side .list-navigation .action-new-item::after, .wrapper .content .list-block .action-selected::after, .wrapper .content .details-side .action-selected::after, .footer::after, .clear::after, .wrapper .content::before, .wrapper .content .list-block .list-navigation::before, .wrapper .content .details-side .list-navigation::before, .wrapper .content .list-block .list-navigation .action-new-item::before, .wrapper .content .details-side .list-navigation .action-new-item::before, .wrapper .content .list-block .action-selected::before, .wrapper .content .details-side .action-selected::before, .footer::before, .clear::before {
   content: "";
   clear: both; }
-.wrapper .content::after, .wrapper .content .list-block .list-navigation::after, .wrapper .content .details-side .list-navigation::after, .wrapper .content .list-block .list-navigation .action-new-item::after, .wrapper .content .details-side .list-navigation .action-new-item::after, .wrapper .content .list-block .action-selected::after, .wrapper .content .details-side .action-selected::after, .footer::after {
+.wrapper .content::after, .wrapper .content .list-block .list-navigation::after, .wrapper .content .details-side .list-navigation::after, .wrapper .content .list-block .list-navigation .action-new-item::after, .wrapper .content .details-side .list-navigation .action-new-item::after, .wrapper .content .list-block .action-selected::after, .wrapper .content .details-side .action-selected::after, .footer::after, .clear::after {
   display: table; }
 
 .header-wrapper .header, .wrapper {
@@ -153,7 +153,7 @@ fieldset {
   font-style: italic;
   font-weight: normal;
   color: #555555;
-  margin-top: 10px; }
+  margin-top: 6px; }
 
 /********************************************************************
 *********************************************************************
@@ -293,7 +293,10 @@ fieldset {
 
 td i.fa {
   font-size: 20px;
-  margin-right: 4px; }
+  width: 18px;
+  line-height: 18px;
+  margin-right: 4px;
+  text-align: center; }
   @media screen and (min-width: 40em) {
     td i.fa {
       font-size: 16px; } }
@@ -344,10 +347,6 @@ select {
     .actions_button, select[name="selected_actions_select"] {
       width: auto;
       height: 25px; } }
-
-.action-selected {
-  width: 100%;
-  margin-left: -4px; }
 
 input, .button, .button2 {
   padding: 4px 8px;
@@ -438,9 +437,7 @@ a.button, button.button {
   box-shadow: none; }
   a.button:hover, button.button:hover {
     cursor: pointer;
-    font-weight: bolder; }
-    a.button:hover span, button.button:hover span {
-      font-weight: bold; }
+    border-color: #9a4008; }
     a.button:hover:before, button.button:hover:before {
       color: #fdfdfd; }
   a.button:active, button.button:active {
@@ -471,9 +468,7 @@ a.button2, button.button2 {
   box-shadow: none; }
   a.button2:hover, button.button2:hover {
     cursor: pointer;
-    font-weight: bolder; }
-    a.button2:hover span, button.button2:hover span {
-      font-weight: bold; }
+    border-color: #9a4008; }
     a.button2:hover:before, button.button2:hover:before {
       color: #cb540a; }
   a.button2:active, button.button2:active {
@@ -552,15 +547,15 @@ body {
 
 .header-wrapper {
   height: 60px;
-  border-bottom: 2px solid #d7d7d7;
-  background: #e4e4e4; }
+  border-bottom: 2px solid #cacaca;
+  background: #d7d7d7; }
   .header-wrapper .header {
     position: relative;
     min-width: 0px;
     max-width: 40em; }
     @media screen and (min-width: 40em) {
       .header-wrapper .header {
-        min-width: 960px;
+        min-width: 1024px;
         max-width: 2048px; } }
     .header-wrapper .header .logo {
       height: 55px;
@@ -662,7 +657,7 @@ body {
   position: relative; }
   @media screen and (min-width: 40em) {
     .wrapper {
-      min-width: 960px;
+      min-width: 1024px;
       max-width: 2048px; } }
   .wrapper .menu {
     margin-bottom: 10px;
@@ -741,7 +736,8 @@ body {
       .wrapper .content .home-wrapper th {
         font-weight: bold;
         text-align: left;
-        border-bottom: #ccc solid 1px; }
+        border-bottom: #ccc solid 1px;
+        background: #d7d7d7; }
         .wrapper .content .home-wrapper th .sort-icon {
           float: right; }
         .wrapper .content .home-wrapper th.sortable {
@@ -760,7 +756,7 @@ body {
             margin-left: 5px;
             font-weight: normal; }
       .wrapper .content .home-wrapper tr td, .wrapper .content .home-wrapper tr th {
-        padding: 6px 8px;
+        padding: 8px 8px;
         vertical-align: middle;
         border-right: dotted 1px #e4e4e4;
         border-bottom: dotted 1px #e4e4e4; }
@@ -812,7 +808,8 @@ body {
             .wrapper .content .home-wrapper .home-row .home-cell .summary-table th {
               font-weight: bold;
               text-align: left;
-              border-bottom: #ccc solid 1px; }
+              border-bottom: #ccc solid 1px;
+              background: #d7d7d7; }
               .wrapper .content .home-wrapper .home-row .home-cell .summary-table th .sort-icon {
                 float: right; }
               .wrapper .content .home-wrapper .home-row .home-cell .summary-table th.sortable {
@@ -831,7 +828,7 @@ body {
                   margin-left: 5px;
                   font-weight: normal; }
             .wrapper .content .home-wrapper .home-row .home-cell .summary-table tr td, .wrapper .content .home-wrapper .home-row .home-cell .summary-table tr th {
-              padding: 6px 8px;
+              padding: 8px 8px;
               vertical-align: middle;
               border-right: dotted 1px #e4e4e4;
               border-bottom: dotted 1px #e4e4e4; }
@@ -886,7 +883,8 @@ body {
         .wrapper .content .home-wrapper .log-table th {
           font-weight: bold;
           text-align: left;
-          border-bottom: #ccc solid 1px; }
+          border-bottom: #ccc solid 1px;
+          background: #d7d7d7; }
           .wrapper .content .home-wrapper .log-table th .sort-icon {
             float: right; }
           .wrapper .content .home-wrapper .log-table th.sortable {
@@ -905,7 +903,7 @@ body {
               margin-left: 5px;
               font-weight: normal; }
         .wrapper .content .home-wrapper .log-table tr td, .wrapper .content .home-wrapper .log-table tr th {
-          padding: 6px 8px;
+          padding: 8px 8px;
           vertical-align: middle;
           border-right: dotted 1px #e4e4e4;
           border-bottom: dotted 1px #e4e4e4; }
@@ -975,7 +973,6 @@ body {
             margin-bottom: 10px;
             padding: 0px;
             height: auto;
-            width: 45%;
             float: right;
             text-align: right; } }
         .wrapper .content .list-block .list-navigation .pagination a, .wrapper .content .details-side .list-navigation .pagination a {
@@ -994,10 +991,22 @@ body {
             margin: 0px;
             margin-left: -4px; } }
     .wrapper .content .list-block .action-selected, .wrapper .content .details-side .action-selected {
-      height: 30px;
-      margin-top: 10px; }
+      margin-top: 15px;
+      width: 100%; }
+      @media screen and (min-width: 40em) {
+        .wrapper .content .list-block .action-selected, .wrapper .content .details-side .action-selected {
+          float: left;
+          width: auto; } }
       .wrapper .content .list-block .action-selected .chosen-container, .wrapper .content .details-side .action-selected .chosen-container {
         margin-top: -6px; }
+      .wrapper .content .list-block .action-selected .action-selected-select, .wrapper .content .details-side .action-selected .action-selected-select {
+        margin-bottom: 10px;
+        width: 100%; }
+      .wrapper .content .list-block .action-selected .action-selected-button, .wrapper .content .details-side .action-selected .action-selected-button {
+        width: 100%; }
+    .wrapper .content .list-block .shown-elements, .wrapper .content .details-side .shown-elements {
+      margin-top: 9px;
+      float: right; }
     .wrapper .content .details-side {
       display: none;
       margin-bottom: 15px;
@@ -1047,7 +1056,7 @@ body {
         margin-top: 20px; }
         @media screen and (min-width: 40em) {
           .wrapper .content .details-block .custom-props-container {
-            margin-top: 0px;
+            margin-top: -25px;
             position: absolute;
             top: 40px;
             right: 0;
@@ -1102,8 +1111,7 @@ body {
       line-height: 20px;
       display: list-item; }
       .wrapper .content ul.tags li:before {
-        margin-right: 5px;
-        color: #6f6f6f; }
+        margin-right: 5px; }
     .wrapper .content .setup-side {
       width: 13%;
       height: auto;
@@ -1217,8 +1225,8 @@ body {
   margin-top: 50px;
   text-align: center;
   color: #6f6f6f;
-  border-top: 2px solid #d7d7d7;
-  background: #e4e4e4;
+  border-top: 2px solid #cacaca;
+  background: #d7d7d7;
   width: 100%;
   position: fixed;
   bottom: 0px;
@@ -1276,7 +1284,8 @@ table.list, table.customize-fields {
   table.list th, table.customize-fields th {
     font-weight: bold;
     text-align: left;
-    border-bottom: #ccc solid 1px; }
+    border-bottom: #ccc solid 1px;
+    background: #d7d7d7; }
     table.list th .sort-icon, table.customize-fields th .sort-icon {
       float: right; }
     table.list th.sortable, table.customize-fields th.sortable {
@@ -1295,7 +1304,7 @@ table.list, table.customize-fields {
         margin-left: 5px;
         font-weight: normal; }
   table.list tr td, table.list tr th, table.customize-fields tr td, table.customize-fields tr th {
-    padding: 6px 8px;
+    padding: 8px 8px;
     vertical-align: middle;
     border-right: dotted 1px #e4e4e4;
     border-bottom: dotted 1px #e4e4e4; }
@@ -1326,7 +1335,8 @@ table.custom-props, table.details {
   table.custom-props th, table.details th {
     font-weight: bold;
     text-align: left;
-    border-bottom: #ccc solid 1px; }
+    border-bottom: #ccc solid 1px;
+    background: #d7d7d7; }
     table.custom-props th .sort-icon, table.details th .sort-icon {
       float: right; }
     table.custom-props th.sortable, table.details th.sortable {
@@ -1345,7 +1355,7 @@ table.custom-props, table.details {
         margin-left: 5px;
         font-weight: normal; }
   table.custom-props tr td, table.custom-props tr th, table.details tr td, table.details tr th {
-    padding: 6px 8px;
+    padding: 8px 8px;
     vertical-align: middle;
     border-right: dotted 1px #e4e4e4;
     border-bottom: dotted 1px #e4e4e4; }
@@ -1371,6 +1381,9 @@ table.custom-props, table.details {
 
 table.details td:first-child, table.custom-props td:first-child {
   vertical-align: top; }
+  @media only screen and (max-width: 40em) {
+    table.details td:first-child i.fa, table.custom-props td:first-child i.fa {
+      display: none; } }
 table.details td:last-child, table.custom-props td:last-child {
   font-weight: bold; }
 
@@ -1379,7 +1392,6 @@ table.expiration-table {
 
 .second_row {
   margin-top: 4px;
-  line-height: 13px;
   color: #888888; }
 
 td.inner-table {
@@ -1401,48 +1413,48 @@ td.inner-table {
   min-width: 39px; }
   @media screen and (min-width: 40em) {
     .max-1-icons {
-      width: 43px;
-      min-width: 43px; } }
+      width: 41px;
+      min-width: 41px; } }
 
 .max-2-icons {
   width: 61px;
   min-width: 61px; }
   @media screen and (min-width: 40em) {
     .max-2-icons {
-      width: 69px;
-      min-width: 69px; } }
+      width: 65px;
+      min-width: 65px; } }
 
 .max-3-icons {
   width: 83px;
   min-width: 83px; }
   @media screen and (min-width: 40em) {
     .max-3-icons {
-      width: 95px;
-      min-width: 95px; } }
+      width: 89px;
+      min-width: 89px; } }
 
 .max-4-icons {
   width: 105px;
   min-width: 105px; }
   @media screen and (min-width: 40em) {
     .max-4-icons {
-      width: 121px;
-      min-width: 121px; } }
+      width: 113px;
+      min-width: 113px; } }
 
 .max-5-icons {
   width: 127px;
   min-width: 127px; }
   @media screen and (min-width: 40em) {
     .max-5-icons {
-      width: 147px;
-      min-width: 147px; } }
+      width: 137px;
+      min-width: 137px; } }
 
 .max-6-icons {
   width: 149px;
   min-width: 149px; }
   @media screen and (min-width: 40em) {
     .max-6-icons {
-      width: 173px;
-      min-width: 173px; } }
+      width: 161px;
+      min-width: 161px; } }
 
 .col-width-1 {
   width: 1%; }
@@ -1838,9 +1850,7 @@ td.inner-table {
     box-shadow: none; }
     .ui-dialog .ui-state-hover:hover, .ui-dialog .ui-state-focus:hover {
       cursor: pointer;
-      font-weight: bolder; }
-      .ui-dialog .ui-state-hover:hover span, .ui-dialog .ui-state-focus:hover span {
-        font-weight: bold; }
+      border-color: #9a4008; }
       .ui-dialog .ui-state-hover:hover:before, .ui-dialog .ui-state-focus:hover:before {
         color: #fdfdfd; }
     .ui-dialog .ui-state-hover:active, .ui-dialog .ui-state-focus:active {
@@ -1975,10 +1985,10 @@ div.tagsinput span.tag a {
 *********************************************************************
 ********************************************************************/
 body {
-  font-size: small; }
+  font-size: 14px; }
 
 * {
-  font-family: Lato, 'Open Sans', FontAwesome !important;
+  font-family: 'Droid Sans', Lato, 'Open Sans', FontAwesome !important;
   font-size: 0.9em;
   line-height: 0.9em; }
   @media screen and (min-width: 40em) {
@@ -2119,15 +2129,13 @@ input {
       font-size: 1em;
       line-height: 1em; } }
 
+td {
+  font-size: 14px; }
+
 .second_row {
   font-size: 0.9em;
-  line-height: 0.9em;
-  line-height: 1.2em;
+  line-height: 1.3em;
   font-weight: normal; }
-  @media screen and (min-width: 40em) {
-    .second_row {
-      font-size: 0.9em;
-      line-height: 0.9em; } }
 
 @media only screen and (max-width: 40em) {
   .footer {

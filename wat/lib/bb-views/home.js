@@ -32,6 +32,9 @@ Wat.Views.HomeView = Wat.Views.MainView.extend({
         Wat.T.translate();
         
         this.printBreadcrumbs(this.breadcrumbs, '');
+        
+                console.log($('[data-i18n]'));
+
     },
     
     loadData: function () {

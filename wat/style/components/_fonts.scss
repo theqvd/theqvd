@@ -10,11 +10,11 @@
 ********************************************************************/
 
 body {
-    font-size: small;
+    font-size: 14px;
 }
 
 * {
-    font-family: Lato, 'Open Sans', FontAwesome !important; 
+    font-family: 'Droid Sans', Lato, 'Open Sans', FontAwesome !important; 
     
     @include font-size(1);
 
@@ -116,9 +116,14 @@ input {
 }
 
 // Tables
+
+td {
+    font-size: 14px;
+}
+
 .second_row {
-    @include font-size(1);
-    line-height: 1.2em;
+    font-size: 0.9em;
+    line-height: 1.3em;
     font-weight: normal;
 }
 

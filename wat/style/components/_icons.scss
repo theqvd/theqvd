@@ -25,11 +25,14 @@ td {
     i.fa {        
         @include icon-size($table_icons_size_mobile + px);
         
-        @include in(desktop) {        
+        @include in(desktop) {
             @include icon-size($table_icons_size + px);
         }
         
+        width: 18px;
+        line-height: 18px;
         margin-right: 4px;
+        text-align: center;
     }
     
     i.fa-lock, i.fa-unlock {

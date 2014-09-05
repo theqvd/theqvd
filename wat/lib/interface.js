@@ -323,7 +323,7 @@ Wat.I = {
 
             $('.filter-control select.chosen-advanced').chosen(chosenOptionsAdvanced100);
             $('.filter-control select.chosen-single').chosen(chosenOptionsSingle100);
-            $('select.chosen-single').chosen(chosenOptionsSingle);
+            $('select.chosen-single').chosen(chosenOptionsSingle100);
     },
     
     chosenElement: function (selector, type) {

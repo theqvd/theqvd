@@ -61,21 +61,35 @@
     <div class="list bb-list">
 
     </div>
+    <div class="shown-elements second_row">
+        <span data=i18n>Shown:</span>
+        <span class="elements-shown"></span>
+        /
+        <span class="elements-total"></span>
+    </div>
+    <div class="mobile clear"></div>
+
     <% 
     if (selectedActions.length > 0)
     {
     %>
         <div class="action-selected">
-            <select name="selected_actions_select" class="chosen-single">
-                <% _.each(selectedActions, function(action) { %>
-                    <option value="<%= action.value %>" data-i18n><%= action.text %></option>
-                <% }); %>
-            </select>
-            <a class="js-traductable_button actions_button button fa fa-check" name="selected_actions_button" data-i18n>
-                Apply to selected items
-            </a>
+            <div class="action-selected-select">
+                <select name="selected_actions_select" class="chosen-single">
+                    <% _.each(selectedActions, function(action) { %>
+                        <option value="<%= action.value %>" data-i18n><%= action.text %></option>
+                    <% }); %>
+                </select>
+            </div>
+            <div class="action-selected-button">
+                <a class="js-traductable_button actions_button button fa fa-check" name="selected_actions_button" data-i18n>
+                    Apply to selected items
+                </a>
+            </div>
+            <div class="clear"></div>
         </div>
     <%
     }
     %>
+    <div class="clear"></div>
 </div>

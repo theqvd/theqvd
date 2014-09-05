@@ -16,6 +16,7 @@ Wat.T = {
     // After all the translations do custom actions that need to have the content translated
     afterTranslate: function () {
         // Translate all the elements with attribute 'data-i18n'
+        
         $('[data-i18n]').i18n();
 
         // Other chains
@@ -35,6 +36,7 @@ Wat.T = {
         
         // When all is translated and loaded, hide loading spinner and show content
         Wat.I.showAll();
+        
     },
     
     // Translate the content of an element passing the selector
@@ -46,5 +48,5 @@ Wat.T = {
     // Translate an element with i18n standard function
     translateElement: function(element) {
        element.i18n();
-    }
+    }    
 }

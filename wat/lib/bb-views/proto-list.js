@@ -319,14 +319,13 @@ Wat.Views.ListView = Wat.Views.MainView.extend({
         }
         
         clearInterval(that.interval);
-        
+
         // Fill the list
         var template = _.template(
             that.templateListCommonBlock, {
                 formFilters: that.formFilters,
                 selectedActions: that.selectedActions,
                 listActionButton: that.listActionButton,
-                nElements: that.collection.length,
                 cid: this.cid
             }
         );
@@ -358,6 +357,7 @@ Wat.Views.ListView = Wat.Views.MainView.extend({
         
         $(this.listContainer).html(template);
         this.paginationUpdate();
+        this.shownElementsLabelUpdate();
         this.selectedActionControlsUpdate();
     },
     
@@ -375,6 +375,16 @@ Wat.Views.ListView = Wat.Views.MainView.extend({
                 Wat.A.fillSelect(params);
             }
         });
+    },
+    
+    shownElementsLabelUpdate: function () {
+        var context = $('.' + this.cid);
+
+        var elementsShown = this.collection.length;
+        var elementsTotal = this.collection.elementsTotal;
+
+        context.find(' .shown-elements .elements-shown').html(elementsShown);
+        context.find(' .shown-elements .elements-total').html(elementsTotal);
     },
     
     selectedActionControlsUpdate: function () {
@@ -468,12 +478,8 @@ Wat.Views.ListView = Wat.Views.MainView.extend({
                 this.collection.offset = totalPages;
                 break;
         }
-        
-        var context = $('.' + this.cid);
-
-        context.find('.pagination_current_page').html(this.collection.offset);
-                
-        this.fetchList();
+                             
+        this.fetchList();        
     },
     
     openNewElementDialog: function (e) {

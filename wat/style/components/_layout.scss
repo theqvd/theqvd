@@ -27,8 +27,8 @@ body {
     @extend %invisible;
 
     height: 60px;
-    border-bottom: 2px solid darken($col_whiter, 15);
-    background: darken($col_whiter, 10);
+    border-bottom: 2px solid darken($col_whiter, 20);
+    background: darken($col_whiter, 15);
 
     .header {
         position: relative;    
@@ -234,8 +234,8 @@ body {
     color: lighten($col_blacker, 30%);
     @extend %clearfix;
     
-    border-top: 2px solid darken($col_whiter, 15);
-    background: darken($col_whiter, 10);
+    border-top: 2px solid darken($col_whiter, 20);
+    background: darken($col_whiter, 15);
     width: 100%;
     
     position: fixed;
@@ -286,4 +286,8 @@ body {
 
 .inline {
     display: inline;
+}
+
+.clear {
+    @extend %clearfix;
 }

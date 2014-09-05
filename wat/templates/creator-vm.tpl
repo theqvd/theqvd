@@ -18,7 +18,7 @@
         </td>
     </tr>
     <tr>
-        <td data-i18n>Disk image's tag</td>
+        <td data-i18n>Image tag</td>
         <td>
             <select class="" name="di_tag"></select>
         </td>

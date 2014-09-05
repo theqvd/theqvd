@@ -21,7 +21,7 @@
                         case 'info':
             %>
                             <th class="desktop max-1-icons">
-                                <i class="fa fa-info-circle center normal" data-i18n="[title]Info" title="<%= i18n.t('Info') %>"></i>
+                                <i class="fa fa-info-circle normal" data-i18n="[title]Info" title="<%= i18n.t('Info') %>"></i>
                             </th>
             <%
                             break;
@@ -42,7 +42,7 @@
                         case 'connected_vms':
             %>
                             <th class="desktop">
-                                <i class="fa fa-sort sort-icon" data-i18n="Connected VMs"><%= i18n.t('Connected VMs') %></i>
+                                <i data-i18n="Connected VMs"><%= i18n.t('Connected VMs') %></i>
                             </th>
             <%
                             break;

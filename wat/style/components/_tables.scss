@@ -29,6 +29,11 @@ table.list, table.custom-props {
 table.details, table.custom-props {
     td:first-child {
         vertical-align: top;
+        i.fa {
+            @include in(mobile) {                
+                display: none;
+            }
+        }
     }
     td:last-child {
         font-weight: bold;
@@ -41,7 +46,6 @@ table.expiration-table {
 
 .second_row {
     margin-top: 4px;
-    line-height: 13px;
     color: lighten($col_blacker, 40);
 }
 
@@ -68,7 +72,7 @@ td.inner-table {
 
 // Different sizes for cells with different amount of icons
 $table_icons_size: 18;
-$table_icons_size_mobile: 22;
+$table_icons_size_mobile: 20;
 $table_icons_margin: 4;
 $cell_padding: 6;
 $security_margin: 5;
