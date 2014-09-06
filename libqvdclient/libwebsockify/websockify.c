@@ -114,8 +114,8 @@ void do_proxy(ws_ctx_t *ws_ctx, int target) {
             bytes = send(target, ws_ctx->tout_buf + tout_start, len, 0);
             if (pipe_error) { break; }
             if (bytes < 0) {
-                handler_emsg("target connection error: %s\n",
-                             strerror(errno));
+                handler_emsg("target connection error (%d): %s\n",
+                             target, strerror(errno));
                 break;
             }
             tout_start += bytes;
