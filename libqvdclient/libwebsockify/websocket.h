@@ -79,7 +79,7 @@ ssize_t ws_send(ws_ctx_t *ctx, const void *buf, size_t len);
 
 #define gen_handler_msg(stream, ...) \
     if (! settings.daemon) { \
-        fprintf(stream, "  %d: ", settings.handler_id); \
+        fprintf(stream, "libwebsockify  %d: ", settings.handler_id); \
         fprintf(stream, __VA_ARGS__); \
     }
 
