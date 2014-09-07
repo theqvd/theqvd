@@ -59,7 +59,7 @@ void do_proxy(ws_ctx_t *ws_ctx, int target) {
     unsigned int tin_start, tin_end;
     ssize_t len, bytes;
 
-    tout_start = tout_end = cout_start = cout_end;
+    tout_start = tout_end = cout_start = cout_end = 0;
     tin_start = tin_end = 0;
     maxfd = client > target ? client+1 : target+1;
 
