@@ -2,7 +2,6 @@ Wat.Models.DI = Wat.Models.Model.extend({
     actionPrefix: 'di',
     
     defaults: {
-        name: 'New Disk image',
         blocked: 0
     },
     

@@ -3,6 +3,7 @@ Wat.B = {
         this.bindMessageEvents();  
         this.bindEditorEvents();  
         this.bindNavigationEvents();  
+        this.bindFormEvents();  
     },
     
     // Events binded in classic way to works in special places like jQueryUI dialog where Backbone events doesnt work
@@ -18,6 +19,10 @@ Wat.B = {
         
         // Expand message
         this.bindEvent('mouseleave', '.js-message-container', this.messageBinds.hoverOutMessage);
+    },
+    
+    bindFormEvents: function () {
+        this.bindEvent('keydown', '[data-required]', this.formBinds.pressValidatedField);
     },
     
     bindEditorEvents: function () {
@@ -61,7 +66,7 @@ Wat.B = {
     bindNavigationEvents: function () {
         this.bindEvent('click', '.menu-option', this.navigationBinds.clickMenu);
         
-        this.bindEvent('click', '.js-mobile-menu', this.navigationBinds.clickMenuMobile);
+        this.bindEvent('click', '.js-mobile-menu-hamburger', this.navigationBinds.clickMenuMobile);
         
         // Show/hide the corner menu
         this.bindEvent('mouseenter', '.js-menu-corner li:has(ul)', this.navigationBinds.cornerMenuHoverIn);
@@ -89,11 +94,20 @@ Wat.B = {
         }
     },
     
+    formBinds: {
+        pressValidatedField : function (e) {
+            if ($(e.target).hasClass('not_valid')) {
+                $(e.target).removeClass('not_valid');
+                $(e.target).parent().find('.validation-message').remove();
+            }
+        }
+    },
+    
     navigationBinds: {
         // When click on a menu option, redirect to this section
         clickMenu: function() {
             // If in mobule mode, hide menu when click
-            if ($('.js-mobile-menu').css('display') != 'none') {
+            if ($('.js-mobile-menu-hamburger').css('display') != 'none') {
                 $('.menu').slideUp();
             }
             
@@ -103,7 +117,7 @@ Wat.B = {
         },
         
         clickMenuMobile: function () {
-            $('.menu').slideToggle();
+            $('.js-menu-mobile').slideToggle();
         },
         
         cornerMenuHoverIn: function (e) {

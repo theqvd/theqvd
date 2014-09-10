@@ -142,17 +142,20 @@ Wat.Views.ConfigCustomizeView = Wat.Views.MainView.extend({
         var id = 0;
         var name = '';
         var qvdObj = '';
-
+        
         // The search by name is substring, so in example for 'id' search, it retrieve host_id, name_id...
         $.each(params.retrievedData.result.rows, function(iRow, row) {
+            console.log(params.fieldName);
+            console.log(row);
             if (row.name == params.fieldName) {
+                console.log(row);
                 id = row.id;
                 name = row.name;
                 qvdObj = row.qvd_obj;
                 return false;
             }
         });            
-
+        
         var newOptions = params.fieldOptions;
 
         Wat.A.performAction('config_field_update', {'filter_options': newOptions}, {id: id}, {}, that.updateCustomFieldDiscount, params, false);

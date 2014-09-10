@@ -14,7 +14,8 @@ Wat.I.listColumns[qvdObj] = {
             'block',
             'state',
             'expiration_soft',
-            'expiration_hard'
+            'expiration_hard',
+            'user_state'
         ],
         'display': true
     },

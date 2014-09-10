@@ -49,6 +49,10 @@ table.expiration-table {
     color: lighten($col_blacker, 40);
 }
 
+.second_row--error {
+    color: darken($col_red, 10);
+}
+
 td.inner-table {
     padding: 0 !important;
     
@@ -73,8 +77,8 @@ td.inner-table {
 // Different sizes for cells with different amount of icons
 $table_icons_size: 18;
 $table_icons_size_mobile: 20;
-$table_icons_margin: 4;
-$cell_padding: 6;
+$table_icons_margin: 6;
+$cell_padding: 8;
 $security_margin: 5;
 @for $i from 1 through 6 {
     $width_for_icons: ($i * ($table_icons_size + $table_icons_margin)) + $security_margin + (2 * $cell_padding);

@@ -10,6 +10,8 @@ Wat.Views.ListView = Wat.Views.MainView.extend({
     listBlockContainer: '.bb-list-block',
     whatRender: 'all',
     filters: {},
+    selectedItems: [],
+    selectedAll: false,
 
     /*
     ** params:
@@ -34,6 +36,7 @@ Wat.Views.ListView = Wat.Views.MainView.extend({
         this.templateListCommonList = Wat.A.getTemplate('list-common');
         this.templateListCommonBlock = Wat.A.getTemplate('list-common-block');
         this.listTemplate = Wat.A.getTemplate(this.listTemplateName);
+        this.templateSelectChecks = Wat.A.getTemplate('dialog-select-checks');
         
         this.context = $('.' + this.cid);
         
@@ -92,7 +95,8 @@ Wat.Views.ListView = Wat.Views.MainView.extend({
     
     commonListEvents: {
         'click th.sortable': 'sort',
-        'click input[class="check_all"]': 'checkAll',
+        'click input.check_all': 'checkAll',
+        'click input.check-it': 'checkOne',
         'click .first': 'paginationFirst',
         'click .prev': 'paginationPrev',
         'click .next': 'paginationNext',
@@ -176,6 +180,9 @@ Wat.Views.ListView = Wat.Views.MainView.extend({
         // When we came from a view without elements pagination doesnt exist
         var existsPagination = $('.' + this.cid + ' .pagination .first').length > 0;
 
+        this.selectedItems = [];
+        this.selectedAll = true;
+        
         // If the current offset is not the first page, trigger click on first button of pagination to go to the first page. 
         // This button render the list so is not necessary render in this case
         if (this.collection.offset != 1 && existsPagination) {
@@ -187,12 +194,88 @@ Wat.Views.ListView = Wat.Views.MainView.extend({
     },
     
     // Set as checked all the checkboxes of a list
-    checkAll: function (e) {
+    checkAll: function (e) {        
         if ($(e.target).is(":checked")) {
-            $('.js-check-it').prop("checked", true);
+            var hiddenElements = $('.elements-total').html() > $('.elements-shown').html();
+            var that = this;
+            
+            if (hiddenElements) {
+                var dialogConf = {
+                    title: '<i class="fa fa-question"></i>',
+                    buttons : {
+                        "Select only visible items": function () {
+                            $('.js-check-it').prop("checked", true);
+                            that.selectedItems = [];
+                            $.each($('.js-check-it'), function (iCheckbox, checkbox) {
+                                that.selectedItems.push($(checkbox).attr('data-id'));
+                            });
+                            $(this).dialog('close');
+                            Wat.I.updateSelectedItems(that.selectedItems.length);
+                        },
+                        "Select all": function () {
+                            $('.js-check-it').prop("checked", true);
+                            Wat.A.performAction(that.qvdObj + '_all_ids', {}, that.collection.filters, {}, that.storeAllSelectedIds, that, false);
+                            $(this).dialog('close');
+                            Wat.I.updateSelectedItems(that.selectedItems.length);
+                            that.selectedAll = true;
+                        }
+                    },
+                    button1Class : 'fa fa-eye',
+                    button2Class : 'fa fa-th',
+                    fillCallback : this.fillCheckSelector
+                }
+
+                Wat.I.dialog(dialogConf);
+            }
+            else {
+                $('.js-check-it').prop("checked", true);
+            }
         } else {
             $('.js-check-it').prop("checked", false);
+            this.selectedItems = [];
+            this.selectedAll = false;
+            Wat.I.updateSelectedItems(this.selectedItems.length);
         }
+        
+        Wat.I.updateSelectedItems(this.selectedItems.length);
+    },
+    
+    storeAllSelectedIds: function (that) {
+        that.selectedItems = that.retrievedData.result.rows;
+    },
+    
+    fillCheckSelector: function (target) {
+        var that = Wat.CurrentView;
+        
+        // Add common parts of editor to dialog
+        that.template = _.template(
+                    that.templateSelectChecks, {
+                    }
+                );
+
+        target.html(that.template);
+    },
+    
+    checkOne: function (e) {
+        var itemId = parseInt($(e.target).attr('data-id'));
+        if ($(e.target).is(":checked")) {
+            this.selectedItems.push(itemId);
+        }
+        else {
+            var posItem = $.inArray(itemId, this.selectedItems);
+            this.selectedItems.splice( posItem, 1 );
+        }
+        
+        if (this.selectedItems.length == this.collection.elementsTotal) {
+            this.selectedAll = true;
+            $('.check_all').prop("checked", true);
+        }
+        else {
+            this.selectedAll = false;
+            $('.check_all').prop("checked", false);
+        }
+        
+        Wat.I.updateSelectedItems(this.selectedItems.length);
     },
     
     setFilters: function () {
@@ -351,7 +434,9 @@ Wat.Views.ListView = Wat.Views.MainView.extend({
         var template = _.template(
             this.listTemplate, {
                 models: this.collection.models,
-                columns: this.columns
+                columns: this.columns,
+                selectedItems: this.selectedItems,
+                selectedAll: this.selectedAll
             }
         );
         
@@ -359,6 +444,8 @@ Wat.Views.ListView = Wat.Views.MainView.extend({
         this.paginationUpdate();
         this.shownElementsLabelUpdate();
         this.selectedActionControlsUpdate();
+        
+        Wat.I.updateSelectedItems(this.selectedItems.length);
     },
     
     // Fill filter selects 
@@ -503,20 +590,16 @@ Wat.Views.ListView = Wat.Views.MainView.extend({
         this.editorElement(e);
     },
     
-    applySelectedAction: function () {
+    applySelectedAction: function () {        
         var action = $('select[name="selected_actions_select"]').val();
-        var selectedIds = [];
-        $.each($('.check-it:checked'), function (iCheck, check) {
-            selectedIds.push($(check).attr('data-id'));
-        });
         
-        if (!selectedIds.length) {
+        if (!this.selectedItems.length) {
             Wat.I.showMessage({message: i18n.t('No items were selected') + '. ' + i18n.t('Nothing to do'), messageType: 'info'});
             return;
         }
         
         var filters = {
-            id: selectedIds
+            id: this.selectedItems
         };
                 
         switch(action) {

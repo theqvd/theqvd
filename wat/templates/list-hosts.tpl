@@ -12,9 +12,10 @@
                     
                     switch(name) {
                         case 'checks':
+                            var checkedAttr = selectedAll ? 'checked' : '';
             %>
                             <th class="max-1-icons">
-                                <input type="checkbox" class="check_all">
+                                <input type="checkbox" class="check_all" <%= checkedAttr %>>
                             </th>
             <%
                             break;
@@ -100,9 +101,11 @@
                     
                         switch(name) {
                             case 'checks':
+                                var checkedAttr = $.inArray(parseInt(model.get('id')), selectedItems) > -1 ? 'checked' : '';
+
                 %>
                                 <td>
-                                    <input type="checkbox" class="check-it js-check-it" data-id="<%= model.get('id') %>">
+                                    <input type="checkbox" class="check-it js-check-it" data-id="<%= model.get('id') %>" <%= checkedAttr %>>
                                 </td>
                 <%
                                 break;

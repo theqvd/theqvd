@@ -4,7 +4,7 @@
         <a href="#">
             <img src="images/qvd-logo-header-trans.png" class="logo">
         </a>
-        <a href="javascript:" class="fa fa-bars mobile-menu js-mobile-menu" id="mobile-menu"></a>
+        <a href="javascript:" class="fa fa-bars mobile-menu js-mobile-menu-hamburger" id="mobile-menu"></a>
         <% 
             var cornerMenuPrint = $.extend(true, {}, cornerMenu);
             if (!loggedIn) {
@@ -43,7 +43,31 @@
 </div>
 <div class="wrapper"> 
     <% if (loggedIn) { %>
-        <div class="menu">
+        <div class="menu desktop">
+            <ul>
+                <li class="menu-option" data-target="users">
+                    <i class="<%= CLASS_ICON_USERS %>"></i>
+                    <span data-i18n>Users</span>
+                </li>
+                <li class="menu-option" data-target="vms">
+                    <i class="<%= CLASS_ICON_VMS %>"></i>
+                    <span data-i18n>Virtual machines</span>
+                </li>
+                <li class="menu-option" data-target="hosts">
+                    <i class="<%= CLASS_ICON_NODES %>"></i>
+                    <span data-i18n>Nodes</span>
+                </li>
+                <li class="menu-option" data-target="osfs">
+                    <i class="<%= CLASS_ICON_OSFS %>"></i>
+                    <span data-i18n>OS Flavours</span>
+                </li>
+                <li class="menu-option" data-target="dis">
+                    <i class="<%= CLASS_ICON_DIS %>"></i>
+                    <span data-i18n>Disk images</span>
+                </li>
+            </ul>
+        </div>
+        <div class="menu mobile js-menu-mobile">
             <ul class="nav-collapse">
                 <li class="menu-option" data-target="users">
                     <i class="<%= CLASS_ICON_USERS %>"></i>
@@ -64,6 +88,10 @@
                 <li class="menu-option" data-target="dis">
                     <i class="<%= CLASS_ICON_DIS %>"></i>
                     <span data-i18n>Disk images</span>
+                </li>
+                <li class="menu-option" data-target="logout">
+                    <i class="<%= CLASS_ICON_LOGOUT %>"></i>
+                    <span data-i18n>Logout</span>
                 </li>
             </ul>
         </div>

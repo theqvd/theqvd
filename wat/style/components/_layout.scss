@@ -18,7 +18,7 @@ body {
 
 * {
     @include in(mobile) {
-        max-width: 480px !important;
+        //max-width: 50em !important;
         min-width: 0 !important;
     }
 }
@@ -268,16 +268,16 @@ body {
 }
 
 @include in(desktop) {
+    .desktop {
+        display: block;
+    }
+    
     td.desktop, th.desktop {
         display: table-cell;
     }    
     span.desktop, a.desktop {
         display: inline;
     }    
-    
-    div.desktop {
-        display: block;
-    }
     
     .mobile {
         display: none;

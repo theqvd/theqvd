@@ -11,8 +11,6 @@ Wat.Views.HomeView = Wat.Views.MainView.extend({
         Wat.B.bindHomeEvents();
         
         this.render();
-        
-        this.loadData();
     },
     
     events: {
@@ -30,11 +28,11 @@ Wat.Views.HomeView = Wat.Views.MainView.extend({
         $(this.el).html(this.template);
         
         Wat.T.translate();
-        
-        this.printBreadcrumbs(this.breadcrumbs, '');
-        
-                console.log($('[data-i18n]'));
 
+        //Security margin for load successfuly the graphs
+        setTimeout (this.loadData, 100);
+
+        this.printBreadcrumbs(this.breadcrumbs, '');
     },
     
     loadData: function () {

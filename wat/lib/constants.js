@@ -5,6 +5,7 @@ CLASS_ICON_VMS = 'fa fa-cloud';
 CLASS_ICON_NODES = 'fa fa-hdd-o';
 CLASS_ICON_OSFS = 'fa fa-flask';
 CLASS_ICON_DIS = 'fa fa-dot-circle-o';
+CLASS_ICON_LOGOUT = 'fa fa-power-off';
 
 COL_BRAND = '#cb540a';
 COL_BRAND_DARK = '#9a4008';

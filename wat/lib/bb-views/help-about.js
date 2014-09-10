@@ -1,6 +1,18 @@
 Wat.Views.AboutView = Wat.Views.MainView.extend({
     aboutTemplateName: 'help-about',
     
+    breadcrumbs: {
+        'screen': 'Home',
+        'link': '#',
+        'next': {
+            'screen': 'Help',
+            'link': '#/help',
+            'next': {
+                'screen': 'About'
+            }
+        }
+    },
+    
     initialize: function (params) {
         Wat.Views.MainView.prototype.initialize.apply(this, [params]);
                 
@@ -21,6 +33,8 @@ Wat.Views.AboutView = Wat.Views.MainView.extend({
         
         $(this.el).html(this.template);
         
-        Wat.T.translate();        
+        this.printBreadcrumbs(this.breadcrumbs, '');
+
+        Wat.T.translate();       
     }
 });

@@ -71,6 +71,16 @@ var Wat = {
 
 
 (function (win, doc, $) {
+    // Extend jQuery with pseudo selector :blank
+    (function($) {
+        $.extend($.expr[":"], {
+            // http://docs.jquery.com/Plugins/Validation/blank
+            blank: function(a) {
+                return !$.trim(a.value);
+            },
+        });
+    })(jQuery);
+    
 	$(doc).ready(function() {
         // Remember login from cookies
         Wat.C.rememberLogin();

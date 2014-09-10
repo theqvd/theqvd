@@ -43,7 +43,7 @@ Wat.Views.VMListView = Wat.Views.ListView.extend({
         // Fill DI Tags select on virtual machines creation form
         var params = {
             'action': 'tag_tiny_list',
-            'selectedId': '',
+            'selectedId': 'default',
             'controlName': 'di_tag',
             'filters': {
                 'osf_id': $('[name="osf_id"]').val()
@@ -57,7 +57,11 @@ Wat.Views.VMListView = Wat.Views.ListView.extend({
     },
     
     createElement: function () {
-        Wat.Views.ListView.prototype.createElement.apply(this);
+        var valid = Wat.Views.ListView.prototype.createElement.apply(this);
+        
+        if (!valid) {
+            return;
+        }
         
         // Properties to create, update and delete obtained from parent view
         var properties = this.properties;
@@ -69,7 +73,7 @@ Wat.Views.VMListView = Wat.Views.ListView.extend({
         var osf_id = context.find('select[name="osf_id"]').val();
         
         var arguments = {
-            "properties" : properties.create,
+            "propertyChanges" : properties.create,
             "blocked": blocked ? 1 : 0,
             "user_id": user_id,
             "osf_id": osf_id
@@ -82,10 +86,7 @@ Wat.Views.VMListView = Wat.Views.ListView.extend({
         }
         
         var name = context.find('input[name="name"]').val();
-        if (!name) {
-            console.error('name empty');
-        }
-        else {
+        if (name) {
             arguments["name"] = name;
         }
                                 

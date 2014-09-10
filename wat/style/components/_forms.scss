@@ -78,7 +78,9 @@ input[type="checkbox"], input[type="radio"] {
     }
 }
 
-
+.mandatory-label:after {
+    content: "(*)";
+}
 
 
 // Chosen controls styles

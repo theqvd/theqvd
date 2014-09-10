@@ -12,15 +12,16 @@
                     
                     switch(name) {
                         case 'checks':
+                            var checkedAttr = selectedAll ? 'checked' : '';
             %>
                             <th class="max-1-icons">
-                                <input type="checkbox" class="check_all">
+                                <input type="checkbox" class="check_all" <%= checkedAttr %>>
                             </th>
             <%
                             break;
                         case 'info':
             %>
-                            <th class="max-3-icons">
+                            <th class="max-4-icons">
                                 <i class="fa fa-info-circle normal" data-i18n="[title]Info" title="<%= i18n.t('Info') %>"></i>
                             </th>
             <%
@@ -110,9 +111,11 @@
                     
                         switch(name) {
                             case 'checks':
+                                var checkedAttr = $.inArray(parseInt(model.get('id')), selectedItems) > -1 ? 'checked' : '';
+
                 %>
                                 <td>
-                                    <input type="checkbox" class="check-it js-check-it" data-id="<%= model.get('id') %>">
+                                    <input type="checkbox" class="check-it js-check-it" data-id="<%= model.get('id') %>" <%= checkedAttr %>>
                                 </td>
                 <%
                                 break;
@@ -122,12 +125,23 @@
                                     <%
                                     if (model.get('state') == 'stopped') {
                                     %>
-                                        <i class="fa fa-pause icon-pause" title="Stopped Virtual machine" data-i18n="[title]Stopped"></i>
+                                        <i class="fa fa-pause error" title="Stopped Virtual machine" data-i18n="[title]Stopped"></i>
+                                    <%
+                                    }
+                                    else if (model.get('state') == 'running'){
+                                    %>
+                                        <i class="fa fa-play ok" data-i18n="[title]Running" title="<%= i18n.t('Running') %>"></i>
                                     <%
                                     }
                                     else {
                                     %>
-                                        <i class="fa fa-play icon-play" data-i18n="[title]Running" title="<%= i18n.t('Running') %>"></i>
+                                        <i class="fa fa-spinner fa-spin" title="<%= model.get('state') %>"></i>
+                                    <%
+                                    }
+                                    
+                                    if (model.get('user_state') == 'connected') {
+                                    %>
+                                        <i class="fa fa-user ok" title="User connected" data-i18n="[title]Connected"></i>
                                     <%
                                     }
                                     

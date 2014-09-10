@@ -68,7 +68,8 @@
 
 @mixin button ($col, $col_back) {
     @extend %not-selectable;
-
+    z-index: 2;
+    
     color: $col;
     @include linear-gradient($col_back);
 

@@ -2,13 +2,18 @@
     <tr>
         <td data-i18n="Disk image"></td>
         <td>
-            <input type="text" name="disk_image" value="">
+            <input type="text" name="disk_image" value="" data-required>
         </td>
     </tr>
     <tr>
         <td data-i18n="Version"></td>
         <td>
             <input type="text" name="version" value="">
+            <div class="second_row" data-i18n>
+                <%=
+                    '(' + i18n.t('Leave it blank for set automatic version based en creation date') + ')'
+                %>
+            </div>
         </td>
     </tr>
     <tr>

@@ -11,14 +11,14 @@
                     case 'stopped':
             %>
                         <div class="error" data-i18n>Stopped</div>
-                        <div class="fa fa-pause icon-pause"></div>
+                        <div class="fa fa-pause error"></div>
                         <div class="address invisible"><%=model.get('ip')%></div>
             <%
                         break;
                     case 'running':
             %>
                         <div class="ok" data-i18n>Running</div>
-                        <div class="fa fa-play icon-play"></div>
+                        <div class="fa fa-play ok"></div>
                         <div class="address"><%=model.get('ip')%></div>
             <%
                         break;

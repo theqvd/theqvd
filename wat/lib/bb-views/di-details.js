@@ -27,7 +27,11 @@ Wat.Views.DIDetailsView = Wat.Views.DetailsView.extend({
     },
     
     updateElement: function (dialog) {
-        Wat.Views.DetailsView.prototype.updateElement.apply(this, [dialog]);
+        var valid = Wat.Views.DetailsView.prototype.updateElement.apply(this, [dialog]);
+        
+        if (!valid) {
+            return;
+        }
         
         // Properties to create, update and delete obtained from parent view
         var properties = this.properties;
@@ -43,7 +47,7 @@ Wat.Views.DIDetailsView = Wat.Views.DetailsView.extend({
         if (def && !this.model.get('default')) {
             tags += ',default';
         }
-        
+                
         var baseTags = this.model.attributes.tags ? this.model.attributes.tags.split(',') : [];
         var newTags = tags ? tags.split(',') : [];
         var keepedTags = _.intersection(baseTags, newTags);
@@ -53,9 +57,9 @@ Wat.Views.DIDetailsView = Wat.Views.DetailsView.extend({
         
         var filters = {"id": this.id};
         var arguments = {
-            "properties": properties,
+            "propertyChanges": properties,
             "blocked": blocked ? 1 : 0,
-            "tags": {
+            "tagChanges": {
                 'create': createdTags,
                 'delete': deletedTags
             },
@@ -67,7 +71,7 @@ Wat.Views.DIDetailsView = Wat.Views.DetailsView.extend({
     
     render: function () {
         // Add name of the model to breadcrumbs
-        this.breadcrumbs.next.next.screen = this.model.get('name');
+        this.breadcrumbs.next.next.screen = this.model.get('disk_image');
         
         Wat.Views.DetailsView.prototype.render.apply(this);
         

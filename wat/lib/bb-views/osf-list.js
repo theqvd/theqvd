@@ -20,7 +20,11 @@ Wat.Views.OSFListView = Wat.Views.ListView.extend({
     },
     
     createElement: function () {
-        Wat.Views.ListView.prototype.createElement.apply(this);
+        var valid = Wat.Views.ListView.prototype.createElement.apply(this);
+        
+        if (!valid) {
+            return;
+        }
         
         // Properties to create, update and delete obtained from parent view
         var properties = this.properties;
@@ -32,17 +36,14 @@ Wat.Views.OSFListView = Wat.Views.ListView.extend({
         var user_storage = context.find('input[name="user_storage"]').val();
         
         arguments = {
-            properties: properties.create,
+            propertyChanges: properties.create,
             name: name,
             memory: memory || 256,
-            //user_storage: user_storage
+            user_storage: user_storage
         };
         
         var name = context.find('input[name="name"]').val();
-        if (!name) {
-            console.error('name empty');
-        }
-        else {
+        if (name) {
             arguments["name"] = name;
         }
                         

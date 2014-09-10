@@ -2,7 +2,7 @@
     <tr>
         <td data-i18n>Name</td>
         <td>
-            <input type="text" class="" name="name">
+            <input type="text" class="" name="name" data-required>
         </td>
     </tr>
     <tr>

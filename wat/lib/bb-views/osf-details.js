@@ -38,7 +38,11 @@ Wat.Views.OSFDetailsView = Wat.Views.DetailsView.extend({
     },
     
     updateElement: function (dialog) {
-        Wat.Views.DetailsView.prototype.updateElement.apply(this, [dialog]);
+        var valid = Wat.Views.DetailsView.prototype.updateElement.apply(this, [dialog]);
+        
+        if (!valid) {
+            return;
+        }
         
         // Properties to create, update and delete obtained from parent view
         var properties = this.properties;
@@ -50,7 +54,7 @@ Wat.Views.OSFDetailsView = Wat.Views.DetailsView.extend({
         var user_storage = context.find('input[name="user_storage"]').val();
         
         arguments = {
-            properties: properties,
+            propertyChanges: properties,
             name: name,
             memory: memory,
             user_storage: user_storage

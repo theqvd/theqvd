@@ -86,10 +86,30 @@ fieldset {
     color: darken($col_red, 10);
 }
 
+.error-404 {
+    text-align: center;
+    i.fa {
+        font-size: 90px;
+        color: lighten($col_blacker, 50);
+    }    
+    div {
+        font-size: 50px;
+        color: lighten($col_blacker, 50);
+    }
+}
+
 
 .no-elements {
     font-style: italic;
     font-weight: normal;
     color: lighten($col_blacker, 20);
     margin-top: 6px;
+}
+
+.dialog-advice {
+    padding: 10px;
+    
+    div {
+        margin-bottom: 12px;
+    }
 }

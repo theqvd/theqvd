@@ -16,6 +16,7 @@ Wat.Views.DetailsView = Wat.Views.MainView.extend({
 
         this.templateDetailsCommon = Wat.A.getTemplate('details-common');
         this.templateDetails = Wat.A.getTemplate(this.detailsTemplateName);
+        this.template404 = Wat.A.getTemplate('404');
 
         this.fetchDetails();
         
@@ -68,27 +69,39 @@ Wat.Views.DetailsView = Wat.Views.MainView.extend({
         this.editorElement (e);
     },
 
-    render: function () {
-        // Fill the html with the template and the model
-        this.template = _.template(
-            this.templateDetailsCommon, {
-                model: this.model,
-                cid: this.cid
-            }
-        );
+    render: function () {    
+        if (this.breadcrumbs.next.next.screen === undefined) {
+            this.template = _.template(
+                this.template404, {
+                }
+            );
+
+            $(this.el).html(this.template);
+            
+            this.breadcrumbs.next.next.screen = '-';
+            this.printBreadcrumbs(this.breadcrumbs, '');
+        }
+        else { 
+            // Fill the html with the template and the model
+            this.template = _.template(
+                this.templateDetailsCommon, {
+                    model: this.model,
+                    cid: this.cid
+                }
+            );
+
+            $(this.el).html(this.template);
         
-        $(this.el).html(this.template);
-        
-        this.printBreadcrumbs(this.breadcrumbs, '');
-        
-        this.template = _.template(
-            this.templateDetails, {
-                model: this.model
-            }
-        );
-        
-        $(this.detailsContainer).html(this.template);
-        
+            this.printBreadcrumbs(this.breadcrumbs, '');
+
+            this.template = _.template(
+                this.templateDetails, {
+                    model: this.model
+                }
+            );
+
+            $(this.detailsContainer).html(this.template);
+        }
         Wat.T.translate();
     }
 });

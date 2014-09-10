@@ -100,10 +100,18 @@ Wat.Views.MainView = Backbone.View.extend({
     
     updateElement: function () {
         this.parseProperties();
+        
+        var context = '.editor-container.' + this.cid;
+        
+        return Wat.I.validateForm(context);
     },  
     
     createElement: function () {
         this.parseProperties();
+        
+        var context = '.editor-container.' + this.cid;
+        
+        return Wat.I.validateForm(context);
     },
     
     // Parse properties from create/edit forms

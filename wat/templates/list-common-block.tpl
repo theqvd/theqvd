@@ -62,7 +62,7 @@
 
     </div>
     <div class="shown-elements second_row">
-        <span data=i18n>Shown:</span>
+        <span data=i18n>Shown</span>:
         <span class="elements-shown"></span>
         /
         <span class="elements-total"></span>
@@ -73,6 +73,10 @@
     if (selectedActions.length > 0)
     {
     %>
+        <div class="selected-elements second_row">
+            <span data=i18n>Selected</span>:
+            <span class="elements-selected">0</span>
+        </div>
         <div class="action-selected">
             <div class="action-selected-select">
                 <select name="selected_actions_select" class="chosen-single">

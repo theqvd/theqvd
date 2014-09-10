@@ -16,7 +16,7 @@
         </div>
 
         <div class="home-cell">
-            <div class="home-title" data-i18n="">Summary</div>
+            <div class="home-title" data-i18n>Summary</div>
             <table class="summary-table">
                 <tr>
                     <td class="max-1-icons">
@@ -89,7 +89,7 @@
         </div>
         
         <div class="home-cell">
-            <div class="home-title" data-i18n="">Running nodes</div>
+            <div class="home-title" data-i18n>Running nodes</div>
             <div class="home-percent-wrapper">
                 <div class="js-running-nodes-percent home-title home-percent js-home-percent"></div>
                 <div id="running-nodes" class="pie-chart js-pie-chart" data-target="hosts" width="200px" height="200px"></div>

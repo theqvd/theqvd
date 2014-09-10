@@ -20,7 +20,11 @@ Wat.Views.NodeListView = Wat.Views.ListView.extend({
     },
     
     createElement: function () {
-        Wat.Views.ListView.prototype.createElement.apply(this);
+        var valid = Wat.Views.ListView.prototype.createElement.apply(this);
+        
+        if (!valid) {
+            return;
+        }
         
         // Properties to create, update and delete obtained from parent view
         var properties = this.properties;
@@ -30,23 +34,17 @@ Wat.Views.NodeListView = Wat.Views.ListView.extend({
         var blocked = context.find('input[name="blocked"][value=1]').is(':checked');
         
         var arguments = {
-            "properties" : properties.create,
+            "propertyChanges" : properties.create,
             "blocked": blocked ? 1 : 0
         };
         
         var name = context.find('input[name="name"]').val();
-        if (!name) {
-            console.error('name empty');
-        }
-        else {
+        if (name) {
             arguments["name"] = name;
         }     
         
         var address = context.find('input[name="address"]').val();
-        if (!name) {
-            console.error('address empty');
-        }
-        else {
+        if (name) {
             arguments["address"] = address;
         }
                         

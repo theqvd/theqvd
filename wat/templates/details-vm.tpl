@@ -1,3 +1,4 @@
+<%console.log(model);%>
 <div class="details-header">
     <span class="fa fa-cloud h1"><%= model.get('name') %></span>
     <a class="button button-right js-button-edit fa fa-pencil" href="javascript:" data-i18n>Edit</a>
@@ -9,13 +10,47 @@
         <td>
             <%= model.get('id') %>
         </td>
-    </tr>    
+    </tr>  
+    <tr>
+        <td><i class="fa fa-heart"></i><span data-i18n>State</span></td>
+        <td>
+            <% 
+            if (model.get('state') == 'running') {
+            %>
+                <i class="fa fa-play ok" data-i18n="[title]Running"></i>
+            <%
+            }
+            else {
+            %>
+                <i class="fa fa-pause error" data-i18n="[title]Stopped"></i>
+            <%
+            }
+            %>
+        </td>
+    </tr>
     <tr>
         <td><i class="<%= CLASS_ICON_USERS %>"></i><span data-i18n>User</span></td>
         <td>
             <a href="#/user/<%= model.get('user_id') %>">
                 <%= model.get('user_name') %>
             </a>
+        </td>
+    </tr>    
+    <tr>
+        <td><i class="fa fa-plug"></i><span data-i18n>User state</span></td>
+        <td>
+            <% 
+            if (model.get('user_state') == 'connected') {
+            %>
+                <i class="fa fa-user ok" data-i18n="[title]Connected"></i>
+            <%
+            }
+            else {
+            %>                
+                <i class="fa fa-user error" data-i18n="[title]Disconnected"></i>
+            <%
+            }
+            %>
         </td>
     </tr>
     <tr>
@@ -57,16 +92,26 @@
                 <td class="inner-table">
                     <table class="expiration-table">
                         <tbody>
-                            <tr>
-                                <td class="warning" data-i18n>Soft</td>
-                                <td class="warning"><%= model.get('expiration_soft') %></td>
-                                <td class="warning"><i class="fa fa-info-circle fa-centered"></i></td>
-                            </tr>
-                            <tr>
-                                <td class="ok" data-i18n>Hard</td>
-                                <td class="ok"><%= model.get('expiration_hard') %></td>
-                                <td class="ok"><i class="fa fa-info-circle fa-centered"></td>
-                            </tr>
+                            <%
+                                if (expiration_soft) {
+                            %>
+                                <tr>
+                                    <td class="warning" data-i18n>Soft</td>
+                                    <td class="warning"><%= model.get('expiration_soft') %></td>
+                                    <td class="warning"><i class="fa fa-info-circle fa-centered"></i></td>
+                                </tr>
+                            <%
+                                }
+                                if (expiration_hard) {
+                            %>
+                                <tr>
+                                    <td class="ok" data-i18n>Hard</td>
+                                    <td class="ok"><%= model.get('expiration_hard') %></td>
+                                    <td class="ok"><i class="fa fa-info-circle fa-centered"></td>
+                                </tr>
+                            <%
+                                }
+                            %>
                     </table>
                 </td>
             <%

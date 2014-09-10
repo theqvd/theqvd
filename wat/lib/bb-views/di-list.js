@@ -18,7 +18,7 @@ Wat.Views.DIListView = Wat.Views.ListView.extend({
         
         var filters = {"id": di_id};
         var arguments = {
-            "tags": {
+            "tagChanges": {
                 'create': ['default'],
             },
         };
@@ -57,7 +57,11 @@ Wat.Views.DIListView = Wat.Views.ListView.extend({
     },
     
     createElement: function () {
-        Wat.Views.ListView.prototype.createElement.apply(this);
+        var valid = Wat.Views.ListView.prototype.createElement.apply(this);
+        
+        if (!valid) {
+            return;
+        }
         
         // Properties to create, update and delete obtained from parent view
         var properties = this.properties;
@@ -68,16 +72,13 @@ Wat.Views.DIListView = Wat.Views.ListView.extend({
         var osf_id = context.find('select[name="osf_id"]').val();
         
         var arguments = {
-            "properties" : properties.create,
+            "propertyChanges" : properties.create,
             "blocked": blocked ? 1 : 0,
             "osf_id": osf_id
         };
         
         var disk_image = context.find('input[name="disk_image"]').val();
-        if (!disk_image) {
-            console.error('disk image empty');
-        }
-        else {
+        if (disk_image) {
             arguments["disk_image"] = disk_image;
         }   
         
@@ -94,7 +95,7 @@ Wat.Views.DIListView = Wat.Views.ListView.extend({
             tags += ',default';
         }
         
-        arguments.tags = tags ? tags.split(',') : [];
+        arguments.tagChanges = tags ? tags.split(',') : [];
                         
         this.createModel(arguments);
     }

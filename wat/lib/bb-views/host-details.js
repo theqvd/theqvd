@@ -27,7 +27,11 @@ Wat.Views.HostDetailsView = Wat.Views.DetailsView.extend({
     },
     
     updateElement: function (dialog) {
-        Wat.Views.DetailsView.prototype.updateElement.apply(this, [dialog]);
+        var valid = Wat.Views.DetailsView.prototype.updateElement.apply(this, [dialog]);
+        
+        if (!valid) {
+            return;
+        }
         
         // Properties to create, update and delete obtained from parent view
         var properties = this.properties;
@@ -40,7 +44,7 @@ Wat.Views.HostDetailsView = Wat.Views.DetailsView.extend({
         
         var filters = {"id": this.id};
         var arguments = {
-            "properties": properties,
+            "propertyChanges": properties,
             "name": name,
             "address": address,
             "blocked": blocked ? 1 : 0

@@ -51,12 +51,18 @@ Wat.Views.VMDetailsView = Wat.Views.DetailsView.extend({
     },
     
     updateElement: function (dialog) {
-        Wat.Views.DetailsView.prototype.updateElement.apply(this, [dialog]);
+        var valid = Wat.Views.DetailsView.prototype.updateElement.apply(this, [dialog]);
+        
+        if (!valid) {
+            return;
+        }
         
         // Properties to create, update and delete obtained from parent view
         var properties = this.properties;
         
-        var arguments = {'properties' : properties};
+        var arguments = {
+            'propertyChanges' : properties
+        };
         
         var context = $('.' + this.cid + '.editor-container');
         
@@ -66,7 +72,7 @@ Wat.Views.VMDetailsView = Wat.Views.DetailsView.extend({
         
         var filters = {"id": this.id};
         var arguments = {
-            "properties": properties,
+            "propertyChanges": properties,
             "name": name,
             "di_tag": di_tag,
             "blocked": blocked ? 1 : 0
@@ -77,17 +83,11 @@ Wat.Views.VMDetailsView = Wat.Views.DetailsView.extend({
             var expiration_soft = context.find('input[name="expiration_soft"]').val();
             var expiration_hard = context.find('input[name="expiration_hard"]').val();
             
-            if (!expiration_soft) {
-                console.error('undefined soft expiration');
-            }
-            else {
+            if (expiration_soft) {
                 arguments['expiration_soft'] = expiration_soft;
             }
             
-            if (!expiration_hard) {
-                console.error('undefined hard expiration');
-            }
-            else {
+            if (expiration_hard) {
                 arguments['expiration_hard'] = expiration_hard;
             }
         }

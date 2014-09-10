@@ -18,8 +18,12 @@ Wat.Views.UserListView = Wat.Views.ListView.extend({
         Wat.Views.ListView.prototype.openNewElementDialog.apply(this, [e]);
     },
     
-    createElement: function () {
-        Wat.Views.ListView.prototype.createElement.apply(this);
+    createElement: function () {    
+        var valid = Wat.Views.ListView.prototype.createElement.apply(this);
+        
+        if (!valid) {
+            return;
+        }
         
         // Properties to create, update and delete obtained from parent view
         var properties = this.properties;
@@ -29,27 +33,18 @@ Wat.Views.UserListView = Wat.Views.ListView.extend({
         var blocked = context.find('input[name="blocked"][value=1]').is(':checked');
         
         var arguments = {
-            "properties" : properties.create,
+            "propertyChanges" : properties.create,
             "blocked": blocked ? 1 : 0
         };
         
         var name = context.find('input[name="name"]').val();
-        if (!name) {
-            console.error('name empty');
-        }
-        else {
+        if (name) {
             arguments["name"] = name;
         }
         
         var password = context.find('input[name="password"]').val();
         var password2 = context.find('input[name="password2"]').val();
-        if (!password || !password2) {
-            console.error('password empty');
-        }
-        else if (password != password2) {
-            console.error('password missmatch');
-        }
-        else {
+        if (password && password2 && password == password2) {
             arguments['password'] = password;
         }
                         

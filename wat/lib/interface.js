@@ -381,7 +381,6 @@ Wat.I = {
     dialog: function (dialogConf) {
         $('.js-dialog-container').dialog({
             dialogClass: "loadingScreenWindow",
-            title: dialogConf.title,
             resizable: false,
             dialogClass: 'no-close',
             collision: 'fit',
@@ -391,6 +390,9 @@ Wat.I = {
                 // Close message if open
                     $('.message-close').trigger('click');
 
+                // Set title content manually to support HTML
+                    $('.ui-dialog-titlebar').html(dialogConf.title);
+                
                 // Buttons style
                     var buttons = $(e.target).next().find('button');
                     var buttonsText = $(".ui-dialog-buttonset .ui-button .ui-button-text");
@@ -639,5 +641,48 @@ Wat.I = {
         }
         
         return fieldType;
+    },
+    
+    
+    validateForm: function (context) {
+        var blankControls = $( context + " input[data-required]:blank:visible" );
+        if(blankControls.length > 0) {
+            blankControls.addClass('not_valid');
+            blankControls.parent().find('.validation-message').remove();
+            blankControls.parent().append('<div class="second_row--error validation-message">' + i18n.t('Required field') + '</div>');
+            return false;
+        }
+        
+        var equalControls = $( context + " input[data-equal]:visible" );
+        var equalValues = {};
+        
+        var returnFalse = false;
+        
+        $.each(equalControls, function (iEqual, equal) {
+            var equalID = $(equal).attr('data-equal');
+            if (equalValues[equalID]) {
+                if (equalValues[equalID] != $(equal).val()) {
+                    $(equal).addClass('not_valid');
+                    $(equal).parent().find('.validation-message').remove();
+                    $(equal).parent().append('<div class="second_row--error validation-message">' + i18n.t('Value doesnt match') + '</div>');
+                    returnFalse = true;
+                }
+            }
+            else {
+                equalValues[equalID] = $(equal).val();
+            }
+        });
+        
+        if (returnFalse) {
+            return false;
+        }
+        
+        return true;
+    },
+    
+    
+    // Update the indicator of selected intems situated under the list table
+    updateSelectedItems: function (selectedItemns) {        
+        $('.elements-selected').html(selectedItemns);
     }
 }

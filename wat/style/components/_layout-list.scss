@@ -112,6 +112,7 @@
         @extend %clearfix;
         margin-top: 15px;
         width: 100%;
+        clear: both;
         
         @include in(desktop) {
             float: left;
@@ -134,6 +135,11 @@
     
     .shown-elements {
         margin-top: 9px;
-        float:right;
+        float: right;
+    }    
+    
+    .selected-elements {
+        margin-top: 9px;
+        float: left;
     }
 }

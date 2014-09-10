@@ -26,8 +26,12 @@ Wat.Views.UserDetailsView = Wat.Views.DetailsView.extend({
         this.sideView = new Wat.Views.VMListView(params);
     },
     
-    updateElement: function (dialog) {
-        Wat.Views.DetailsView.prototype.updateElement.apply(this, [dialog]);
+    updateElement: function (dialog) {        
+        var valid = Wat.Views.DetailsView.prototype.updateElement.apply(this, [dialog]);
+        
+        if (!valid) {
+            return;
+        }
         
         // Properties to create, update and delete obtained from parent view
         var properties = this.properties;
@@ -40,7 +44,7 @@ Wat.Views.UserDetailsView = Wat.Views.DetailsView.extend({
                 
         var filters = {"id": this.id};
         var arguments = {
-            "properties": properties,
+            "propertyChanges": properties,
             "blocked": blocked ? 1 : 0
         }
         
@@ -48,13 +52,7 @@ Wat.Views.UserDetailsView = Wat.Views.DetailsView.extend({
         if (context.find('input.js-change-password').is(':checked')) {
             var password = context.find('input[name="password"]').val();
             var password2 = context.find('input[name="password2"]').val();
-            if (!password || !password2) {
-                console.error('password empty');
-            }
-            else if (password != password2) {
-                console.error('password missmatch');
-            }
-            else {
+            if (password && password2 && password == password2) {
                 arguments['password'] = password;
             }
         }
