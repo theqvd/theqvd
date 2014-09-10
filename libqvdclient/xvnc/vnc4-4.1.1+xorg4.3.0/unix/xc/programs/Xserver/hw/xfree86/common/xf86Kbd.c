@@ -41,13 +41,13 @@
 #if defined(KDGKBTYPE) && \
 	!defined(Lynx) && \
 	!defined(__UNIXOS2__) && !defined(__mips__) && \
-	!defined(__arm32__) && !defined(__GNU__) && !defined(__QNX__)
+	!defined(__arm32__) && !defined(__arm64__) && !defined(__GNU__) && !defined(__QNX__)
 #define HAS_GETKBTYPE
 #endif
 #if defined(GIO_KEYMAP) && \
 	!defined(Lynx) && \
 	!defined(__UNIXOS2__) && !defined(__mips__) && \
-	!defined(__arm32__) && !defined(__GNU__) && !defined(DGUX) && \
+	!defined(__arm32__) && !defined(__arm64__) && !defined(__GNU__) && !defined(DGUX) && \
 	!defined(__QNX__)
 #define HAS_GETKEYMAP
 

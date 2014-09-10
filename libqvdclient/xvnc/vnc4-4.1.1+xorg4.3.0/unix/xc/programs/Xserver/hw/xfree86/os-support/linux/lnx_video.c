@@ -563,8 +563,8 @@ xf86DisableInterrupts()
 	    if (iopl(3) || ioperm(0, 1024, 1))
 			return (FALSE);
 #endif
-#if defined(__alpha__) || defined(__mc68000__) || defined(__powerpc__) || defined(__sparc__) || defined(__mips__) || defined(__arm__) || defined(__sh__) || defined(__ia64__) || defined(__hppa__)
-#else
+#if defined(__alpha__) || defined(__mc68000__) || defined(__powerpc__) || defined(__sparc__) || defined(__mips__) || defined(__arm__) || defined(__arm64__) || defined(__sh__) || defined(__ia64__) || defined(__hppa__)
+#elses
 # ifdef __GNUC__
 #  if defined(__ia64__)
 #   if 0
@@ -595,7 +595,7 @@ xf86EnableInterrupts()
 	    if (iopl(3) || ioperm(0, 1024, 1))
 			return;
 #endif
-#if defined(__alpha__) || defined(__mc68000__) || defined(__powerpc__) || defined(__sparc__) || defined(__mips__) || defined(__arm__) || defined(__sh__) || defined(__ia64__) || defined(__hppa__)
+#if defined(__alpha__) || defined(__mc68000__) || defined(__powerpc__) || defined(__sparc__) || defined(__mips__) || defined(__arm__) || defined(__arm64__) || defined(__sh__) || defined(__ia64__) || defined(__hppa__)
 #else
 # ifdef __GNUC__
 #  if defined(__ia64__)

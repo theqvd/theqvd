@@ -16,7 +16,7 @@
 
 /* Added check so that asm/page.h is not included for hppa arch */
 /* Ola Lundqvist, to work around Debian Bug#485958 & Bug#486104*/
-#if !defined(__hppa__) && !defined(__mips__) && !defined(__alpha__) && !defined(__arm__)
+#if !defined(__hppa__) && !defined(__mips__) && !defined(__alpha__) && !defined(__arm__) && !defined(__arm64__)
 # include "asm/page.h"	/* #define for PAGE_* */
 #endif
 

@@ -379,6 +379,9 @@ char *cpp_argv[ARGUMENTS] = {
 # ifdef __arm__
 	"-D__arm__",
 # endif
+# ifdef __arm64__
+	"-D__arm64__",
+# endif
 # ifdef __s390x__
        "-D__s390x__",
 # endif

@@ -340,7 +340,7 @@ typedef struct _CHIPSRec {
     CHIPSEntPtr		entityPrivate;
     unsigned char	storeMSS;
     unsigned char	storeIOSS;
-#ifdef __arm32__
+#if defined(__arm32__) || defined(__arm64__)
 #ifdef __NetBSD__
     int			TVMode;
 #endif

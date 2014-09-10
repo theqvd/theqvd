@@ -1063,6 +1063,14 @@ LOOKUP xfree86LookupTab[] = {
    SYMFUNC(inw)
    SYMFUNC(inl)
 #endif
+#if defined(__arm64__)
+   SYMFUNC(outw)
+   SYMFUNC(outb)
+   SYMFUNC(outl)
+   SYMFUNC(inb)
+   SYMFUNC(inw)
+   SYMFUNC(inl)
+#endif
 
 #ifdef __FreeBSD__
    SYMFUNC(sysctlbyname)

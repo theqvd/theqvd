@@ -1090,7 +1090,7 @@ cfb8SegmentSS1Rect (pDrawable, pGC, nseg, pSegInit)
     int	    drawn;
     cfbPrivGCPtr    devPriv;
 
-#if defined(__arm32__) && PSZ != 8
+#if (defined(__arm32__) || defined(__arm64__)) && PSZ != 8
     /* XXX -JJK */
     /* There is a painting bug when PSZ != 8; I need to track it down! */
     cfbSegmentSS(pDrawable, pGC, nseg, pSegInit);
@@ -1158,7 +1158,7 @@ cfb8LineSS1Rect (pDrawable, pGC, mode, npt, pptInit)
     int x1, y1, x2, y2;
     DDXPointPtr pptInitOrig = pptInit;
 
-#if defined(__arm32__) && PSZ != 8
+#if (defined(__arm32__) || defined(__arm64__)) && PSZ != 8
     /* XXX -JJK */
     /* There is a painting bug when PSZ != 8; I need to track it down! */
     cfbLineSS(pDrawable, pGC, mode, npt, pptInit);

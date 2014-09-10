@@ -335,6 +335,7 @@ Xalloc (unsigned long amount)
     defined(__mips__) || \
     defined(__powerpc__) || \
     defined(__arm32__) || \
+    defined(__arm64__) || \
     defined(__ia64__) || defined(ia64) || \
     defined(__s390x__) || defined(__s390__)
     amount = (amount + (sizeof(long)-1)) & ~(sizeof(long)-1);

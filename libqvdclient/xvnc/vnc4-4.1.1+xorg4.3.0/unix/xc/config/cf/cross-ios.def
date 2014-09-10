@@ -56,8 +56,7 @@
 /* #undef	CppCmd	 */
 /* #define	CppCmd	arm-linux-androideabi-cpp*/
 /* #define	CppCmd	gcc -E -traditional-cpp */
-/* #define	CppCmd	/usr/local/bin/cpp-4.7 -traditional-cpp */
-/* #define	CppCmd	/usr/local/bin/cpp-4.7 */
+#define	CppCmd	/opt/local/bin/cpp-mp-4.7 -traditional-cpp
 
 #undef LdPostLib
 #define LdPostLib

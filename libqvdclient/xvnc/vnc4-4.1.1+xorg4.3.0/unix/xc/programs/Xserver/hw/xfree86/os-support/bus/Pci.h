@@ -219,6 +219,12 @@
 #  define INCLUDE_XF86_MAP_PCI_MEM
 #  define INCLUDE_XF86_NO_DOMAIN
 # endif
+#elif defined(__arm64__)
+# if defined(linux)
+#  define ARCH_PCI_INIT linuxPciInit
+#  define INCLUDE_XF86_MAP_PCI_MEM
+#  define INCLUDE_XF86_NO_DOMAIN
+# endif
 #elif defined(__hppa__)
 # if defined(linux)
 #  define ARCH_PCI_INIT linuxPciInit

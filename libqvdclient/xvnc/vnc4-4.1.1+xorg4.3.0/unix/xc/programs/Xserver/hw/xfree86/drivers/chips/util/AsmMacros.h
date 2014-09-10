@@ -130,7 +130,7 @@ unsigned long port;
    return ret;
 }
 #else
-#ifdef __arm32__
+#if defined(__arm32__) || defined(__arm64__)
 unsigned int IOPortBase;  /* Memory mapped I/O port area */
 
 static __inline__ void
@@ -189,7 +189,7 @@ inl(port)
 
 	return(*(volatile unsigned long*)(((unsigned short)(port))+IOPortBase));
 }
-#else /* __arm32__ */
+#else /* __arm32__ || __arm64__*/
 #if defined(Lynx) && defined(__powerpc__)
 extern unsigned char *ioBase;
 
@@ -390,7 +390,7 @@ inl(port)
 #endif /* linux && __alpha__ */
 #endif /* __FreeBSD__ && __alpha__ */
 
-#if defined(linux) || defined(__arm32__) || (defined(Lynx) && defined(__powerpc__))
+#if defined(linux) || defined(__arm32__) || defined(__arm64__) || (defined(Lynx) && defined(__powerpc__))
 
 #define intr_disable()
 #define intr_enable()

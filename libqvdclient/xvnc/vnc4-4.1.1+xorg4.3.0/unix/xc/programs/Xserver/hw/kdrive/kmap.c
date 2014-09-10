@@ -67,7 +67,7 @@ KdMapDevice (CARD32 addr, CARD32 size)
     void    *a;
     int	    fd;
 
-#ifdef __arm__
+#if defined(__arm__) || defined(__arm64__)
     fd = open ("/dev/mem", O_RDWR|O_SYNC);
 #else
     fd = open ("/dev/mem", O_RDWR);
