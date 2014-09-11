@@ -180,8 +180,7 @@ Wat.Views.ListView = Wat.Views.MainView.extend({
         // When we came from a view without elements pagination doesnt exist
         var existsPagination = $('.' + this.cid + ' .pagination .first').length > 0;
 
-        this.selectedItems = [];
-        this.selectedAll = true;
+        this.resetSelectedItems ();
         
         // If the current offset is not the first page, trigger click on first button of pagination to go to the first page. 
         // This button render the list so is not necessary render in this case
@@ -191,69 +190,6 @@ Wat.Views.ListView = Wat.Views.MainView.extend({
         else {
             this.fetchList();
         }
-    },
-    
-    // Set as checked all the checkboxes of a list
-    checkAll: function (e) {        
-        if ($(e.target).is(":checked")) {
-            var hiddenElements = $('.elements-total').html() > $('.elements-shown').html();
-            var that = this;
-            
-            if (hiddenElements) {
-                var dialogConf = {
-                    title: '<i class="fa fa-question"></i>',
-                    buttons : {
-                        "Select only visible items": function () {
-                            $('.js-check-it').prop("checked", true);
-                            that.selectedItems = [];
-                            $.each($('.js-check-it'), function (iCheckbox, checkbox) {
-                                that.selectedItems.push($(checkbox).attr('data-id'));
-                            });
-                            $(this).dialog('close');
-                            Wat.I.updateSelectedItems(that.selectedItems.length);
-                        },
-                        "Select all": function () {
-                            $('.js-check-it').prop("checked", true);
-                            Wat.A.performAction(that.qvdObj + '_all_ids', {}, that.collection.filters, {}, that.storeAllSelectedIds, that, false);
-                            $(this).dialog('close');
-                            Wat.I.updateSelectedItems(that.selectedItems.length);
-                            that.selectedAll = true;
-                        }
-                    },
-                    button1Class : 'fa fa-eye',
-                    button2Class : 'fa fa-th',
-                    fillCallback : this.fillCheckSelector
-                }
-
-                Wat.I.dialog(dialogConf);
-            }
-            else {
-                $('.js-check-it').prop("checked", true);
-            }
-        } else {
-            $('.js-check-it').prop("checked", false);
-            this.selectedItems = [];
-            this.selectedAll = false;
-            Wat.I.updateSelectedItems(this.selectedItems.length);
-        }
-        
-        Wat.I.updateSelectedItems(this.selectedItems.length);
-    },
-    
-    storeAllSelectedIds: function (that) {
-        that.selectedItems = that.retrievedData.result.rows;
-    },
-    
-    fillCheckSelector: function (target) {
-        var that = Wat.CurrentView;
-        
-        // Add common parts of editor to dialog
-        that.template = _.template(
-                    that.templateSelectChecks, {
-                    }
-                );
-
-        target.html(that.template);
     },
     
     checkOne: function (e) {
@@ -276,6 +212,73 @@ Wat.Views.ListView = Wat.Views.MainView.extend({
         }
         
         Wat.I.updateSelectedItems(this.selectedItems.length);
+    },
+    
+    // Set as checked all the checkboxes of a list and store the IDs
+    checkAll: function (e) {        
+        if ($(e.target).is(":checked")) {
+            var hiddenElements = this.collection.elementsTotal > this.collection.length;
+            var that = this;
+            
+            if (hiddenElements) {
+                var dialogConf = {
+                    title: '<i class="fa fa-question"></i>',
+                    buttons : {
+                        "Select only visible items": function () {
+                            $('.js-check-it').prop("checked", true);
+                            that.selectedItems = [];
+                            $.each($('.js-check-it'), function (iCheckbox, checkbox) {
+                                that.selectedItems.push(parseInt($(checkbox).attr('data-id')));
+                            });
+                            $(this).dialog('close');
+                            Wat.I.updateSelectedItems(that.selectedItems.length);
+                        },
+                        "Select all": function () {
+                            $('.js-check-it').prop("checked", true);
+                            Wat.A.performAction(that.qvdObj + '_all_ids', {}, that.collection.filters, {}, that.storeAllSelectedIds, that, false);
+                            $(this).dialog('close');
+                            Wat.I.updateSelectedItems(that.selectedItems.length);
+                            that.selectedAll = true;
+                        }
+                    },
+                    button1Class : 'fa fa-eye',
+                    button2Class : 'fa fa-th',
+                    fillCallback : this.fillCheckSelector
+                }
+
+                Wat.I.dialog(dialogConf);
+            }
+            else {
+                $('.js-check-it').prop("checked", true);
+                that.selectedItems = [];
+                $.each($('.js-check-it'), function (iCheckbox, checkbox) {
+                    that.selectedItems.push(parseInt($(checkbox).attr('data-id')));
+                });
+                Wat.I.updateSelectedItems(that.selectedItems.length);
+            }
+        } else {
+            $('.js-check-it').prop("checked", false);
+            this.resetSelectedItems ();
+            Wat.I.updateSelectedItems(this.selectedItems.length);
+        }
+        
+        Wat.I.updateSelectedItems(this.selectedItems.length);
+    },
+    
+    storeAllSelectedIds: function (that) {
+        that.selectedItems = that.retrievedData.result.rows;
+    },
+    
+    fillCheckSelector: function (target) {
+        var that = Wat.CurrentView;
+        
+        // Add common parts of editor to dialog
+        that.template = _.template(
+                    that.templateSelectChecks, {
+                    }
+                );
+
+        target.html(that.template);
     },
     
     setFilters: function () {
@@ -590,40 +593,76 @@ Wat.Views.ListView = Wat.Views.MainView.extend({
         this.editorElement(e);
     },
     
-    applySelectedAction: function () {        
+    applySelectedAction: function () { 
         var action = $('select[name="selected_actions_select"]').val();
-        
+
         if (!this.selectedItems.length) {
             Wat.I.showMessage({message: i18n.t('No items were selected') + '. ' + i18n.t('Nothing to do'), messageType: 'info'});
             return;
         }
-        
-        var filters = {
+
+        this.applyFilters = {
             id: this.selectedItems
         };
-                
+
+        var elementsOutOfView = false;
+        if (this.collection.block < this.selectedItems.length) {
+            elementsOutOfView = true;
+        }
+        else {
+            $.each(this.selectedItems, function (iId, item) {
+                if ($('.check-it[data-id="' + item + '"]').html() == undefined) {
+                    elementsOutOfView = true;
+                    return false;
+                }
+            });
+        }
+
+        var that = this;
         switch(action) {
             case 'delete':
-                var auxModel = new this.collection.model();
-                this.deleteModel(filters, this.fetchList, auxModel);
+                Wat.I.confirm('dialog-confirm-undone', that.applyDelete, that);
                 break;
             case 'block':
-                var auxModel = new this.collection.model();
-                this.updateModel({blocked: 1}, filters, this.fetchList, auxModel);
+                if (elementsOutOfView) {
+                    Wat.I.confirm('dialog-confirm-out-of-view', that.applyBlock, that);
+                }
+                else {
+                    that.applyBlock(that);
+                }
                 break;
             case 'unblock':
-                var auxModel = new this.collection.model();
-                this.updateModel({blocked: 0}, filters, this.fetchList, auxModel);
+                if (elementsOutOfView) {
+                    Wat.I.confirm('dialog-confirm-out-of-view', that.applyUnblock, that);
+                }
+                else {
+                    that.applyUnblock(that);
+                }
                 break;
             // Used in VMs
             case 'start':
-                this.startVM (filters);
+                if (elementsOutOfView) {
+                    Wat.I.confirm('dialog-confirm-out-of-view', that.applyStart, that);
+                }
+                else {
+                    that.applyStart(that);
+                }
                 break;
             case 'stop':
-                this.stopVM (filters);
+                if (elementsOutOfView) {
+                    Wat.I.confirm('dialog-confirm-out-of-view', that.applyStop, that);
+                }
+                else {
+                    that.applyStop(that);
+                }
                 break;
             case 'disconnect':
-                this.disconnectVMUser (filters);
+                if (elementsOutOfView) {
+                    Wat.I.confirm('dialog-confirm-out-of-view', that.applyDisconnect, that);
+                }
+                else {
+                    that.applyDisconnect(that);
+                }
                 break;
             // Used in Nodes
             case 'stop_all':
@@ -633,6 +672,29 @@ Wat.Views.ListView = Wat.Views.MainView.extend({
             case 'disconnect_all':
                 // TODO
                 break;
-        }
+        };
+    },
+                                               
+    applyDelete: function (that) {
+        var auxModel = new that.collection.model();  
+        that.resetSelectedItems ();
+        that.deleteModel(that.applyFilters, that.fetchList, auxModel);
+    },
+                                               
+    applyBlock: function (that) {
+        var auxModel = new that.collection.model();
+        that.resetSelectedItems ();
+        that.updateModel({blocked: 1}, that.applyFilters, that.fetchList, auxModel);
+    },
+                                               
+    applyUnblock: function (that) {
+        var auxModel = new that.collection.model();
+        that.resetSelectedItems ();
+        that.updateModel({blocked: 0}, that.applyFilters, that.fetchList, auxModel);
+    },
+    
+    resetSelectedItems: function () {
+        this.selectedAll = false;
+        this.selectedItems = [];
     }
 });

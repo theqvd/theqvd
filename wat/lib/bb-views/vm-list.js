@@ -118,5 +118,21 @@ Wat.Views.VMListView = Wat.Views.ListView.extend({
         }
         
         Wat.A.performAction ('vm_user_disconnect', {}, filters, messages, this.fetchList, this);
-    }
+    },
+    
+    // Different functions applyed to the selected items in list view
+    applyStart: function (that) {
+        that.startVM (that.applyFilters);
+        that.resetSelectedItems ();
+    },
+    
+    applyStop: function (that) {
+        that.stopVM (that.applyFilters);
+        that.resetSelectedItems ();
+    },
+    
+    applyDisconnect: function (that) {
+        that.disconnectVMUser (that.applyFilters);
+        that.resetSelectedItems ();
+    },
 });

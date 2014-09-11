@@ -684,5 +684,28 @@ Wat.I = {
     // Update the indicator of selected intems situated under the list table
     updateSelectedItems: function (selectedItemns) {        
         $('.elements-selected').html(selectedItemns);
+    },
+    
+    confirm: function (templateName, successCallback, that) {        
+        var dialogConf = {
+            title: '<i class="fa fa-question"></i>',
+            buttons : {
+                "Cancel": function () {
+                    $(this).dialog('close');
+                },
+                "Accept": function () {
+                    $(this).dialog('close');
+                    successCallback(that);
+                }
+            },
+            button1Class : 'fa fa-ban',
+            button2Class : 'fa fa-check',
+            fillCallback : function(target) {
+                target.html(Wat.A.getTemplate(templateName));
+            }
+        }
+        
+        $("html, body").animate({ scrollTop: 0 }, 200);
+        this.dialog(dialogConf);
     }
 }
