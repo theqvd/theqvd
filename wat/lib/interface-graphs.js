@@ -84,8 +84,6 @@ Wat.I.G = {
     drawBarChart: function (name, data, loadTime) {
         var plotSelector = '#' + name;
         
-        var maxValue = data[0].vms;
-
         var barData = [];
         var ticks = [];
         var ids = [];
@@ -97,7 +95,7 @@ Wat.I.G = {
             ids.push(node.id);
         });
         
-        var maxValue = data[0].vms;
+        var maxValue = data[0].number_of_vms;
         var dataSet = [{ label: "", data: barData, color: COL_BRAND }];
 
         var options = {
@@ -169,10 +167,10 @@ Wat.I.G = {
                     
                     // First value = 0 to increase it with growing effect
                     if (load >= nLoads) {
-                        barData[iNode][0] = node.vms;
+                        barData[iNode][0] = node.number_of_vms;
                     }
                     else {
-                        barData[iNode][0] = parseInt((node.vms / nLoads) * load);
+                        barData[iNode][0] = parseInt((node.number_of_vms / nLoads) * load);
                     }
                 });
 

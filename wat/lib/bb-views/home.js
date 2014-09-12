@@ -30,53 +30,47 @@ Wat.Views.HomeView = Wat.Views.MainView.extend({
         Wat.T.translate();
 
         //Security margin for load successfuly the graphs
-        setTimeout (this.loadData, 100);
+        //setTimeout (this.loadData, 100);
+        
+        Wat.A.performAction('qvd_objects_statistics', {}, {}, {}, this.loadData, this);
 
         this.printBreadcrumbs(this.breadcrumbs, '');
     },
     
-    loadData: function () {
-        var runningNodesData = [2, 1];
-        Wat.I.G.drawPieChart('running-nodes', runningNodesData);
+    loadData: function (that) {
+        var stats = that.retrievedData.result;
+console.log(stats);
+        var runningNodesData = [stats.Host.running, stats.Host.total - stats.Host.running];
+        Wat.I.G.drawPieChart('running-hosts', runningNodesData);
         
-        var runningVMSData = [285, 13];
+        var runningVMSData = [stats.VM.running, stats.VM.total - stats.VM.running];
         Wat.I.G.drawPieChart('running-vms', runningVMSData);
         
         // Trick to draw bar chart when the div where it will be located will be rendered
         // We know that it is rendered when CSS width attribute change from 'XXX%' to 'XXXpx'
 
         var barsInterval = setTimeout(function () {
-            if ($('#nodes-more-vms').css('width').indexOf("%") == -1) {
-            var nodesMoreVMSData = [
-                {
-                    'id': 32,
-                    'name': 'First Node',
-                    'vms': 321
-                },
-                {
-                    'id': 322,
-                    'name': 'Node due',
-                    'vms': 234
-                },
-                {
-                    'id': 3,
-                    'name': 'Trua Noden',
-                    'vms': 111
-                },
-                {
-                    'id': 1,
-                    'name': 'Cuatreren Noers',
-                    'vms': 56
-                },
-                {
-                    'id': 666,
-                    'name': 'Chinconochento',
-                    'vms': 21
-                }
-            ];
-                Wat.I.G.drawBarChart('nodes-more-vms', nodesMoreVMSData);
-                clearInterval(barsInterval);
+            if ($('#hosts-more-vms').css('width').indexOf("%") == -1) {
+            var hostsMoreVMSData = [];
+            
+            $.each(stats.Host.population, function (iPop, population) {
+                hostsMoreVMSData.push(population);
+            });
+                
+            Wat.I.G.drawBarChart('hosts-more-vms', hostsMoreVMSData);
+            clearInterval(barsInterval);
             }
         }, 50);
+        
+        $('.js-summary-users').html(stats.User.total);
+        $('.js-summary-vms').html(stats.VM.total);
+        $('.js-summary-hosts').html(stats.Host.total);
+        $('.js-summary-osfs').html(stats.OSF.total);
+        $('.js-summary-dis').html(stats.DI.total);
+        
+        $('.js-summary-blocked-users').html(stats.User.blocked);
+        $('.js-summary-blocked-vms').html(stats.VM.blocked);
+        $('.js-summary-blocked-hosts').html(stats.Host.blocked);
+        $('.js-summary-blocked-dis').html(stats.DI.blocked);
     }
 });

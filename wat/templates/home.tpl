@@ -28,7 +28,7 @@
                         </a>
                     </td>
                     <td>
-                        <span class="summary-data js-summary-users">58</span>
+                        <span class="summary-data js-summary-users"><i class="fa fa-gear fa-spin"></i></span>
                     </td>
                 </tr>
                 <tr>    
@@ -41,7 +41,7 @@
                         </a>
                     </td>
                     <td>
-                        <span class="summary-data js-summary-vms">31</span>
+                        <span class="summary-data js-summary-vms"><i class="fa fa-gear fa-spin"></i></span>
                     </td>
                 </tr>
                 <tr>
@@ -54,7 +54,7 @@
                         </a>
                     </td>
                     <td>
-                        <span class="summary-data js-summary-nodes">3</span>
+                        <span class="summary-data js-summary-hosts"><i class="fa fa-gear fa-spin"></i></span>
                     </td>
                 </tr>
                 <tr>
@@ -67,7 +67,7 @@
                         </a>
                     </td>
                     <td>
-                        <span class="summary-data js-summary-osfs">3</span>
+                        <span class="summary-data js-summary-osfs"><i class="fa fa-gear fa-spin"></i></span>
                     </td>
                 </tr>
                 <tr>
@@ -80,7 +80,7 @@
                         </a>
                     </td>
                     <td>
-                        <span class="summary-data js-summary-dis">14</span>
+                        <span class="summary-data js-summary-dis"><i class="fa fa-gear fa-spin"></i></span>
                     </td>
                 </tr>
             </table>
@@ -91,11 +91,11 @@
         <div class="home-cell">
             <div class="home-title" data-i18n>Running nodes</div>
             <div class="home-percent-wrapper">
-                <div class="js-running-nodes-percent home-title home-percent js-home-percent"></div>
-                <div id="running-nodes" class="pie-chart js-pie-chart" data-target="hosts" width="200px" height="200px"></div>
+                <div class="js-running-hosts-percent home-title home-percent js-home-percent"></div>
+                <div id="running-hosts" class="pie-chart js-pie-chart" data-target="hosts" width="200px" height="200px"></div>
             </div>
             <a href="#/hosts">
-                <div class="js-running-nodes-data home-title"></div>
+                <div class="js-running-hosts-data home-title"></div>
             </a>
         </div>
     </div>
@@ -135,7 +135,7 @@
                         Virtual machine 2
                     </td>
                     <td>
-                        <span class="summary-data js-summary-nodes">5 days</span>
+                        <span class="summary-data js-summary-hosts">5 days</span>
                     </td>
                 </tr>
                 <tr>
@@ -153,7 +153,7 @@
         </div>
         <div class="home-cell">
             <div class="home-title" data-i18n>Nodes with more running VMs</div>
-            <div id="nodes-more-vms" class="bar-chart js-bar-chart" style="width:95%;height:200px;"></div>
+            <div id="hosts-more-vms" class="bar-chart js-bar-chart" style="width:95%;height:200px;"></div>
         </div>
         <div class="home-cell">
             <div class="home-title" data-i18n>Blocked elements</div>
@@ -168,7 +168,7 @@
                         </a>
                     </td>
                     <td>
-                        <span class="summary-data js-summary-users">0</span>
+                        <span class="summary-data js-summary-blocked-users"><i class="fa fa-gear fa-spin"></i></span>
                     </td>
                 </tr>
                 <tr>    
@@ -181,7 +181,7 @@
                         </a>
                     </td>
                     <td>
-                        <span class="summary-data js-summary-vms">0</span>
+                        <span class="summary-data js-summary-blocked-vms"><i class="fa fa-gear fa-spin"></i></span>
                     </td>
                 </tr>
                 <tr>
@@ -194,7 +194,7 @@
                         </a>
                     </td>
                     <td>
-                        <span class="summary-data js-summary-nodes">3</span>
+                        <span class="summary-data js-summary-blocked-hosts"><i class="fa fa-gear fa-spin"></i></span>
                     </td>
                 </tr>
                 <tr>
@@ -207,7 +207,7 @@
                         </a>
                     </td>
                     <td>
-                        <span class="summary-data js-summary-dis">0</span>
+                        <span class="summary-data js-summary-blocked-dis"><i class="fa fa-gear fa-spin"></i></span>
                     </td>
                 </tr>
             </table>
