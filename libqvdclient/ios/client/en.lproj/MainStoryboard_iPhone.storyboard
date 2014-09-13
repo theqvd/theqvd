@@ -120,13 +120,13 @@
                         <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMaxY="YES"/>
                         <subviews>
                             <navigationBar contentMode="scaleToFill" id="ldn-1x-biN">
-                                <rect key="frame" x="0.0" y="0.0" width="480" height="44"/>
+                                <rect key="frame" x="0.0" y="0.0" width="480" height="48"/>
                                 <autoresizingMask key="autoresizingMask" widthSizable="YES" flexibleMaxY="YES"/>
                                 <items>
                                     <navigationItem title="Loading VM List" id="K7i-zl-LLk">
                                         <barButtonItem key="leftBarButtonItem" title="Cancel" id="F3D-kl-Uxq">
                                             <connections>
-                                                <segue destination="Uo5-at-ZgM" kind="modal" identifier="segueFromVMListToView" id="iaL-cc-pjX"/>
+                                                <segue destination="Uo5-at-ZgM" kind="modal" identifier="backToMain" id="iaL-cc-pjX"/>
                                             </connections>
                                         </barButtonItem>
                                     </navigationItem>
@@ -168,13 +168,13 @@
                         <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMaxY="YES"/>
                         <subviews>
                             <navigationBar contentMode="scaleToFill" id="3P9-ew-gBo">
-                                <rect key="frame" x="0.0" y="0.0" width="480" height="44"/>
+                                <rect key="frame" x="0.0" y="0.0" width="480" height="48"/>
                                 <autoresizingMask key="autoresizingMask" widthSizable="YES" flexibleMaxY="YES"/>
                                 <items>
                                     <navigationItem title="Connecting to VM" id="42C-Qd-9B3">
                                         <barButtonItem key="leftBarButtonItem" title="Cancel" id="Y6F-8g-96l">
                                             <connections>
-                                                <segue destination="Uo5-at-ZgM" kind="modal" identifier="segueFromVMConnectToView" id="JQD-eu-d75"/>
+                                                <segue destination="Uo5-at-ZgM" kind="modal" identifier="backToMain" id="JQD-eu-d75"/>
                                             </connections>
                                         </barButtonItem>
                                     </navigationItem>
@@ -214,13 +214,13 @@
                         <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMaxY="YES"/>
                         <subviews>
                             <navigationBar contentMode="scaleToFill" id="T5Q-zh-Q01">
-                                <rect key="frame" x="0.0" y="0.0" width="480" height="44"/>
+                                <rect key="frame" x="0.0" y="0.0" width="480" height="48"/>
                                 <autoresizingMask key="autoresizingMask" widthSizable="YES" flexibleMaxY="YES"/>
                                 <items>
                                     <navigationItem title="Title" id="5t7-gO-8Ti" userLabel="nav_item_select_back_firstcontroller">
                                         <barButtonItem key="leftBarButtonItem" title="Back" id="hiG-iJ-jFy" userLabel="selectbacktomain">
                                             <connections>
-                                                <segue destination="Uo5-at-ZgM" kind="modal" identifier="segueFromSelectVMToView" id="3B1-DD-Ksr"/>
+                                                <segue destination="Uo5-at-ZgM" kind="modal" identifier="backToMain" id="3B1-DD-Ksr"/>
                                             </connections>
                                         </barButtonItem>
                                     </navigationItem>
@@ -263,7 +263,7 @@
                     <simulatedOrientationMetrics key="simulatedOrientationMetrics" orientation="landscapeRight"/>
                     <connections>
                         <outlet property="novncwebview" destination="rp2-nl-c1K" id="2f2-NG-oJb"/>
-                        <segue destination="Uo5-at-ZgM" kind="modal" identifier="segueShowToView" id="Avi-bZ-Kc5"/>
+                        <segue destination="Uo5-at-ZgM" kind="modal" identifier="backToMain" id="Avi-bZ-Kc5"/>
                     </connections>
                 </viewController>
                 <placeholder placeholderIdentifier="IBFirstResponder" id="phP-GG-pti" userLabel="First Responder" sceneMemberID="firstResponder"/>
@@ -279,13 +279,13 @@
                         <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMaxY="YES"/>
                         <subviews>
                             <navigationBar contentMode="scaleToFill" id="T0p-CE-n4s" userLabel="NavigationBarEdit">
-                                <rect key="frame" x="0.0" y="-8" width="480" height="44"/>
+                                <rect key="frame" x="0.0" y="-8" width="480" height="48"/>
                                 <autoresizingMask key="autoresizingMask" widthSizable="YES" flexibleMaxY="YES"/>
                                 <items>
                                     <navigationItem title="Edit view (1/2)" id="Bd2-2m-5Dr" userLabel="nav_item_edit_back_firstcontroller">
                                         <barButtonItem key="leftBarButtonItem" title="back" id="OKd-bT-mop" userLabel="editbacktomain">
                                             <connections>
-                                                <segue destination="Uo5-at-ZgM" kind="modal" id="LLq-X3-Af1"/>
+                                                <segue destination="Uo5-at-ZgM" kind="modal" identifier="backToMain" id="LLq-X3-Af1"/>
                                             </connections>
                                         </barButtonItem>
                                         <barButtonItem key="rightBarButtonItem" title="next" id="5M7-EP-ywc" userLabel="edittoedit2">
@@ -362,7 +362,7 @@
                                 <nil key="highlightedColor"/>
                             </label>
                             <pickerView contentMode="scaleToFill" id="dHB-kr-paR" userLabel="selectLinkTypePicker">
-                                <rect key="frame" x="115" y="153" width="220" height="216"/>
+                                <rect key="frame" x="115" y="153" width="224" height="216"/>
                                 <autoresizingMask key="autoresizingMask" widthSizable="YES" flexibleMaxY="YES"/>
                                 <rect key="contentStretch" x="0.0" y="0.0" width="0.5" height="0.49999999999999961"/>
                                 <connections>
@@ -401,13 +401,13 @@
                         <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMaxY="YES"/>
                         <subviews>
                             <navigationBar contentMode="scaleToFill" id="DqH-rS-P3f">
-                                <rect key="frame" x="0.0" y="-11" width="480" height="44"/>
+                                <rect key="frame" x="0.0" y="-11" width="480" height="48"/>
                                 <autoresizingMask key="autoresizingMask" widthSizable="YES" flexibleMaxY="YES"/>
                                 <items>
                                     <navigationItem title="Edit view (2/2)" id="aeW-du-YLt" userLabel="nav_item_edit_back_firstcontroller">
                                         <barButtonItem key="leftBarButtonItem" title="back" id="anc-uV-Bqe" userLabel="editbacktomain">
                                             <connections>
-                                                <segue destination="NZa-Vx-WDc" kind="modal" id="U3X-UT-jXO"/>
+                                                <segue destination="NZa-Vx-WDc" kind="modal" identifier="backToMain" id="U3X-UT-jXO"/>
                                             </connections>
                                         </barButtonItem>
                                         <barButtonItem key="rightBarButtonItem" title="Home" id="AZh-y9-goA" userLabel="Home">
@@ -534,8 +534,8 @@
         <simulatedScreenMetrics key="destination"/>
     </simulatedMetricsContainer>
     <inferredMetricsTieBreakers>
+        <segue reference="3B1-DD-Ksr"/>
         <segue reference="y0s-mZ-PaV"/>
-        <segue reference="LLq-X3-Af1"/>
         <segue reference="FEg-63-yLs"/>
     </inferredMetricsTieBreakers>
 </document>

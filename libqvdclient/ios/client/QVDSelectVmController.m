@@ -79,7 +79,7 @@
     NSLog(@"QVDVMSelectVmController: prepareForSegue %@ : %@", segueId, sender);
     if ([segueId isEqualToString:@"segueFromSelectVMToVMConnect"]) {        
         return;
-    } else if ([segueId isEqualToString:@"segueFromSelectVMToView"]) {
+    } else if ([segueId isEqualToString:@"backToMain"]) {
         [ self.clientWrapper freeResources ];
         return;
     }

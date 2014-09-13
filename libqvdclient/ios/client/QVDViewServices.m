@@ -164,23 +164,32 @@
         
         if ([ controllerClass isEqualToString:@"QVDVMConnectController"]) {
             [ viewController dismissViewControllerAnimated:YES  completion:^{
-                [ viewController performDelayedSegueWithIdentifier:@"segueFromVMConnectToView" ];
+                [ viewController performDelayedSegueWithIdentifier:@"backToMain" ];
             }];
+            return allstopped;
         } else if ([ controllerClass isEqualToString:@"QVDShowVmController"]) {
             [ viewController dismissViewControllerAnimated:YES  completion:^{
-                [ viewController performDelayedSegueWithIdentifier:@"segueShowToView"];
+                [ viewController performDelayedSegueWithIdentifier:@"backToMain"];
             }];
+            return allstopped;
         } else if ([ controllerClass isEqualToString:@"QVDViewController"]) {
             // No action already in ViewController
             return allstopped;
         } else if ([ controllerClass isEqualToString:@"QVDEditViewController"]) {
             // No action
             return allstopped;
-        } else if ([ controllerClass isEqualToString:@"QVDVMListController"]) {
+        } else if ([ controllerClass isEqualToString:@"QVDEditViewController2"]) {
             // No action
             return allstopped;
+        } else if ([ controllerClass isEqualToString:@"QVDVMListController"]) {
+            [ viewController dismissViewControllerAnimated:YES  completion:^{
+                [ viewController performDelayedSegueWithIdentifier:@"backToMain"];
+            }];
+            return allstopped;
         } else if ([ controllerClass isEqualToString:@"QVDSelectVmController"]) {
-            // No action
+            [ viewController dismissViewControllerAnimated:YES  completion:^{
+                [ viewController performDelayedSegueWithIdentifier:@"backToMain"];
+            }];
             return allstopped;
         } else {
             [ QVDError fatalAlert:@"Internal Error" withMessage:@"Unknown Controller class in QVDViewServices handleAllStopped"];

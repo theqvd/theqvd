@@ -47,7 +47,7 @@
                                     <color key="titleShadowColor" white="0.5" alpha="1" colorSpace="calibratedWhite"/>
                                 </state>
                                 <connections>
-                                    <segue destination="Tu8-rV-uJi" kind="modal" identifier="segueViewToEdit" id="F4N-KK-NVD"/>
+                                    <segue destination="Tu8-rV-uJi" kind="modal" identifier="segueFromViewToVMList" id="F4N-KK-NVD"/>
                                 </connections>
                             </button>
                             <label opaque="NO" clipsSubviews="YES" userInteractionEnabled="NO" contentMode="left" text="login_t" lineBreakMode="tailTruncation" baselineAdjustment="alignBaselines" adjustsFontSizeToFit="NO" id="fQW-lb-utx">
@@ -379,7 +379,7 @@
                                     <navigationItem title="Loading VM List" id="Os1-uo-eOc">
                                         <barButtonItem key="leftBarButtonItem" title="Cancel" id="JmH-px-IZF">
                                             <connections>
-                                                <segue destination="2" kind="modal" identifier="segueFromVMListToView" id="l5i-6K-qRf"/>
+                                                <segue destination="2" kind="modal" identifier="backToMain" id="l5i-6K-qRf"/>
                                             </connections>
                                         </barButtonItem>
                                     </navigationItem>
@@ -428,7 +428,7 @@
                                     <navigationItem title="Connecting to VM" id="aPD-uv-Ch9">
                                         <barButtonItem key="leftBarButtonItem" title="Cancel" id="Vny-Rq-Xom">
                                             <connections>
-                                                <segue destination="2" kind="modal" identifier="segueFromVMConnectToView" id="jag-wX-9j0"/>
+                                                <segue destination="2" kind="modal" identifier="backToMain" id="jag-wX-9j0"/>
                                             </connections>
                                         </barButtonItem>
                                     </navigationItem>
@@ -475,7 +475,7 @@
                                     <navigationItem title="Title" id="xcV-Xr-EGz" userLabel="nav_item_select_back_firstcontroller">
                                         <barButtonItem key="leftBarButtonItem" title="Back" id="NH0-K9-2iI" userLabel="selectbacktomain">
                                             <connections>
-                                                <segue destination="2" kind="modal" identifier="segueFromSelectVMToView" id="uOw-mA-pD1"/>
+                                                <segue destination="2" kind="modal" identifier="backToMain" id="uOw-mA-pD1"/>
                                             </connections>
                                         </barButtonItem>
                                     </navigationItem>
@@ -517,7 +517,7 @@
                     <simulatedOrientationMetrics key="simulatedOrientationMetrics" orientation="landscapeRight"/>
                     <connections>
                         <outlet property="novncwebview" destination="RUe-60-QCO" id="SBQ-VS-gcF"/>
-                        <segue destination="2" kind="modal" identifier="segueShowToView" id="nNk-rf-MmH"/>
+                        <segue destination="2" kind="modal" identifier="backToMain" id="nNk-rf-MmH"/>
                     </connections>
                 </viewController>
                 <placeholder placeholderIdentifier="IBFirstResponder" id="xLE-mk-P04" userLabel="First Responder" sceneMemberID="firstResponder"/>
@@ -534,8 +534,8 @@
         <simulatedScreenMetrics key="destination"/>
     </simulatedMetricsContainer>
     <inferredMetricsTieBreakers>
-        <segue reference="F4N-KK-NVD"/>
-        <segue reference="nNk-rf-MmH"/>
+        <segue reference="NBt-rS-ubd"/>
+        <segue reference="jag-wX-9j0"/>
         <segue reference="7DN-aa-BgA"/>
     </inferredMetricsTieBreakers>
 </document>

@@ -61,7 +61,7 @@
 - (void) prepareForSegue:(UIStoryboardSegue *)segue sender:(id)sender {
     NSString *segueId = [segue identifier];
     NSLog(@"QVDShowVmController: prepareForSegue %@ : %@", segueId, sender);
-    if ([segueId isEqualToString:@"segueShowToView"]) {
+    if ([segueId isEqualToString:@"backToMain"]) {
         return;
     }
     
@@ -150,9 +150,9 @@
     }
     // TODO review ShowToView...
 //    [ self dismissViewControllerAnimated:YES completion:^{
-//        [ self performSegueWithIdentifier:@"segueShowToView" sender:self];
+//        [ self performSegueWithIdentifier:@"backToMain" sender:self];
 //    }];
-    [ self performDelayedSegueWithIdentifier:@"segueShowToView" ];
+    [ self performDelayedSegueWithIdentifier:@"backToMain" ];
 }
 
 - (BOOL) webView:(UIWebView *)webView shouldStartLoadWithRequest:(NSURLRequest *)request navigationType:(UIWebViewNavigationType)navigationType {

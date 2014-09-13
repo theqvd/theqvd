@@ -93,7 +93,7 @@
         return;
     } else if ([segueId isEqualToString:@"segueFromVMListToVMConnect"]) {
         return;
-    } else if ([segueId isEqualToString:@"segueFromVMListToView"]) {
+    } else if ([segueId isEqualToString:@"backToMain"]) {
         // Ignore any results from vm list setting delegate to nil
         [ self.vmlistServices setStatusUpdateDelegate:nil ];
         [ self.vmlistServices stop ];
@@ -176,7 +176,7 @@
         NSString *m = [[NSString alloc] initWithFormat:@"Error: %@", self.clientWrapper.lastError];
         // Start over and free resources
         [ QVDError errorAlert:localizedTitle withMessage:m];
-        [ self performDelayedSegueWithIdentifier:@"segueFromVMListToView" ];
+        [ self performDelayedSegueWithIdentifier:@"backToMain" ];
         return;
     }
     

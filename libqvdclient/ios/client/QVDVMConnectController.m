@@ -85,7 +85,7 @@
     if ([segueId isEqualToString:@"segueFromVMConnectToShow"]) {
         NSLog(@"QVDVMConnectController: Going to Show");
         return;
-    } else if ([segueId isEqualToString:@"segueFromVMConnectToView"]) {
+    } else if ([segueId isEqualToString:@"backToMain"]) {
         NSLog(@"QVDVMConnectController: Going back to View, stopping VMServices");
         [ viewServices stop ];
         return;
