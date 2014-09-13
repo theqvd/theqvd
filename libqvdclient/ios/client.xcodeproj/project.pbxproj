@@ -23,7 +23,7 @@
 		4722FD58192EA9C600C5ACB8 /* QVDService.m in Sources */ = {isa = PBXBuildFile; fileRef = 4722FD57192EA9C600C5ACB8 /* QVDService.m */; };
 		472572BA196ECE2C00864966 /* QVDEditViewController2.m in Sources */ = {isa = PBXBuildFile; fileRef = 472572B9196ECE2C00864966 /* QVDEditViewController2.m */; };
 		472572BD1971078300864966 /* QVDConfig.m in Sources */ = {isa = PBXBuildFile; fileRef = 472572BC1971078300864966 /* QVDConfig.m */; };
-		4730610F1914B02A00A696B1 /* libqvdxvnc.a in Frameworks */ = {isa = PBXBuildFile; fileRef = 4730610E1914B02A00A696B1 /* libqvdxvnc.a */; };
+		4727325119C0ED2F00A50FE6 /* libqvdxvnc.a in Frameworks */ = {isa = PBXBuildFile; fileRef = 4727325019C0ED2F00A50FE6 /* libqvdxvnc.a */; };
 		47306B5F1914B2B700A696B1 /* vncpasswd in CopyFiles */ = {isa = PBXBuildFile; fileRef = 473061151914B06A00A696B1 /* vncpasswd */; };
 		47306B611914B2CD00A696B1 /* SecurityPolicy in CopyFiles */ = {isa = PBXBuildFile; fileRef = 473061131914B05900A696B1 /* SecurityPolicy */; };
 		47306B631914B2EA00A696B1 /* rgb.txt in CopyFiles */ = {isa = PBXBuildFile; fileRef = 473061111914B05100A696B1 /* rgb.txt */; };
@@ -1339,6 +1339,7 @@
 		4730708E1914BE8100A696B1 /* QVDXvncWrapperService.m in Sources */ = {isa = PBXBuildFile; fileRef = 4730708D1914BE8100A696B1 /* QVDXvncWrapperService.m */; };
 		4749DAFE196C34A40083B170 /* libcurl.a in Frameworks */ = {isa = PBXBuildFile; fileRef = 4749DAFD196C34A40083B170 /* libcurl.a */; };
 		47626E3F19292E1300EB0F10 /* noVNC in Resources */ = {isa = PBXBuildFile; fileRef = 47626E3E19292E1300EB0F10 /* noVNC */; };
+		4764FD2619BC36E7001720E8 /* libwebsockify.a in Frameworks */ = {isa = PBXBuildFile; fileRef = 4764FD2519BC36E7001720E8 /* libwebsockify.a */; };
 		476B8749163AB9B7003555C4 /* UIKit.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 476B8748163AB9B7003555C4 /* UIKit.framework */; };
 		476B874B163AB9B7003555C4 /* Foundation.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 476B874A163AB9B7003555C4 /* Foundation.framework */; };
 		476B874D163AB9B7003555C4 /* CoreGraphics.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 476B874C163AB9B7003555C4 /* CoreGraphics.framework */; };
@@ -1380,7 +1381,6 @@
 		47E9B5B5193E37DD00468FC9 /* QVDVmListService.m in Sources */ = {isa = PBXBuildFile; fileRef = 47E9B5B4193E37DD00468FC9 /* QVDVmListService.m */; };
 		47E9B5B9193E571700468FC9 /* QVDVMConnectService.m in Sources */ = {isa = PBXBuildFile; fileRef = 47E9B5B8193E571700468FC9 /* QVDVMConnectService.m */; };
 		47F93275191AECA0000BEC07 /* openssl in Resources */ = {isa = PBXBuildFile; fileRef = 47F93274191AEC9F000BEC07 /* openssl */; };
-		47F93277191AF0F1000BEC07 /* libwebsockify.a in Frameworks */ = {isa = PBXBuildFile; fileRef = 47F93276191AF0F1000BEC07 /* libwebsockify.a */; };
 		F26C038816785E8400633CAE /* libqvdclient.a in Frameworks */ = {isa = PBXBuildFile; fileRef = F26C038716785E8400633CAE /* libqvdclient.a */; };
 /* End PBXBuildFile section */
 
@@ -2834,7 +2834,7 @@
 		472572B9196ECE2C00864966 /* QVDEditViewController2.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = QVDEditViewController2.m; sourceTree = "<group>"; };
 		472572BB1971078300864966 /* QVDConfig.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = QVDConfig.h; sourceTree = "<group>"; };
 		472572BC1971078300864966 /* QVDConfig.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = QVDConfig.m; sourceTree = "<group>"; };
-		4730610E1914B02A00A696B1 /* libqvdxvnc.a */ = {isa = PBXFileReference; lastKnownFileType = archive.ar; path = libqvdxvnc.a; sourceTree = "<group>"; };
+		4727325019C0ED2F00A50FE6 /* libqvdxvnc.a */ = {isa = PBXFileReference; lastKnownFileType = archive.ar; path = libqvdxvnc.a; sourceTree = "<group>"; };
 		473061101914B03900A696B1 /* qvdxvnc.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = qvdxvnc.h; sourceTree = "<group>"; };
 		473061111914B05100A696B1 /* rgb.txt */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text; path = rgb.txt; sourceTree = "<group>"; };
 		473061131914B05900A696B1 /* SecurityPolicy */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text; path = SecurityPolicy; sourceTree = "<group>"; };
@@ -4152,6 +4152,7 @@
 		4730708D1914BE8100A696B1 /* QVDXvncWrapperService.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = QVDXvncWrapperService.m; sourceTree = "<group>"; };
 		4749DAFD196C34A40083B170 /* libcurl.a */ = {isa = PBXFileReference; lastKnownFileType = archive.ar; path = libcurl.a; sourceTree = "<group>"; };
 		47626E3E19292E1300EB0F10 /* noVNC */ = {isa = PBXFileReference; lastKnownFileType = folder; path = noVNC; sourceTree = "<group>"; };
+		4764FD2519BC36E7001720E8 /* libwebsockify.a */ = {isa = PBXFileReference; lastKnownFileType = archive.ar; path = libwebsockify.a; sourceTree = "<group>"; };
 		476B8744163AB9B7003555C4 /* client.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = client.app; sourceTree = BUILT_PRODUCTS_DIR; };
 		476B8748163AB9B7003555C4 /* UIKit.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = UIKit.framework; path = System/Library/Frameworks/UIKit.framework; sourceTree = SDKROOT; };
 		476B874A163AB9B7003555C4 /* Foundation.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = Foundation.framework; path = System/Library/Frameworks/Foundation.framework; sourceTree = SDKROOT; };
@@ -4211,7 +4212,6 @@
 		47EC36C519657B97008AD485 /* curlbuild.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = curlbuild.h; sourceTree = "<group>"; };
 		47F931DA191AE4B7000BEC07 /* websocket.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = websocket.h; sourceTree = "<group>"; };
 		47F93274191AEC9F000BEC07 /* openssl */ = {isa = PBXFileReference; lastKnownFileType = folder; path = openssl; sourceTree = "<group>"; };
-		47F93276191AF0F1000BEC07 /* libwebsockify.a */ = {isa = PBXFileReference; lastKnownFileType = archive.ar; path = libwebsockify.a; sourceTree = "<group>"; };
 		F26C038416785E5800633CAE /* qvdbuffer.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = qvdbuffer.h; sourceTree = "<group>"; };
 		F26C038516785E5800633CAE /* qvdclient.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = qvdclient.h; sourceTree = "<group>"; };
 		F26C038616785E5800633CAE /* qvdvm.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = qvdvm.h; sourceTree = "<group>"; };
@@ -4227,11 +4227,11 @@
 				478F55551964124500644524 /* libresolv.dylib in Frameworks */,
 				4749DAFE196C34A40083B170 /* libcurl.a in Frameworks */,
 				476B8749163AB9B7003555C4 /* UIKit.framework in Frameworks */,
+				4727325119C0ED2F00A50FE6 /* libqvdxvnc.a in Frameworks */,
+				4764FD2619BC36E7001720E8 /* libwebsockify.a in Frameworks */,
 				476B874B163AB9B7003555C4 /* Foundation.framework in Frameworks */,
 				476B874D163AB9B7003555C4 /* CoreGraphics.framework in Frameworks */,
 				F26C038816785E8400633CAE /* libqvdclient.a in Frameworks */,
-				4730610F1914B02A00A696B1 /* libqvdxvnc.a in Frameworks */,
-				47F93277191AF0F1000BEC07 /* libwebsockify.a in Frameworks */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -4284,7 +4284,7 @@
 			isa = PBXGroup;
 			children = (
 				473061101914B03900A696B1 /* qvdxvnc.h */,
-				4730610E1914B02A00A696B1 /* libqvdxvnc.a */,
+				4727325019C0ED2F00A50FE6 /* libqvdxvnc.a */,
 				473050261914A97400A696B1 /* x11files */,
 			);
 			name = xvnc;
@@ -5850,7 +5850,7 @@
 			children = (
 				47F93274191AEC9F000BEC07 /* openssl */,
 				47F931DA191AE4B7000BEC07 /* websocket.h */,
-				47F93276191AF0F1000BEC07 /* libwebsockify.a */,
+				4764FD2519BC36E7001720E8 /* libwebsockify.a */,
 			);
 			name = websockify;
 			sourceTree = "<group>";
@@ -6137,10 +6137,10 @@
 				);
 				OTHER_LDFLAGS = "";
 				PRODUCT_NAME = "$(TARGET_NAME)";
-				PROVISIONING_PROFILE = "4B323070-E4B3-4A24-AF69-7B98FD2DCAC9";
+				PROVISIONING_PROFILE = "8868ce00-a2c7-4be3-bd80-888bb7004696";
 				REZ_SEARCH_PATHS = "${SRCROOT}/**";
 				USER_HEADER_SEARCH_PATHS = "${SRCROOT}/**";
-				VALID_ARCHS = "$(ARCHS_STANDARD)";
+				VALID_ARCHS = "armv7s armv7";
 				WRAPPER_EXTENSION = app;
 			};
 			name = ipad;
@@ -6261,10 +6261,10 @@
 				OTHER_CFLAGS = "-DQVD_IOS_DEBUG=1";
 				OTHER_LDFLAGS = "";
 				PRODUCT_NAME = "$(TARGET_NAME)";
-				PROVISIONING_PROFILE = "4B323070-E4B3-4A24-AF69-7B98FD2DCAC9";
+				PROVISIONING_PROFILE = "8868ce00-a2c7-4be3-bd80-888bb7004696";
 				REZ_SEARCH_PATHS = "${SRCROOT}/**";
 				USER_HEADER_SEARCH_PATHS = "${SRCROOT}/**";
-				VALID_ARCHS = "$(ARCHS_STANDARD)";
+				VALID_ARCHS = "armv7s armv7";
 				WRAPPER_EXTENSION = app;
 			};
 			name = Debug;
@@ -6291,10 +6291,10 @@
 				);
 				OTHER_LDFLAGS = "";
 				PRODUCT_NAME = "$(TARGET_NAME)";
-				PROVISIONING_PROFILE = "4B323070-E4B3-4A24-AF69-7B98FD2DCAC9";
+				PROVISIONING_PROFILE = "8868ce00-a2c7-4be3-bd80-888bb7004696";
 				REZ_SEARCH_PATHS = "${SRCROOT}/**";
 				USER_HEADER_SEARCH_PATHS = "${SRCROOT}/**";
-				VALID_ARCHS = "$(ARCHS_STANDARD)";
+				VALID_ARCHS = "armv7s armv7";
 				WRAPPER_EXTENSION = app;
 			};
 			name = Release;
@@ -6397,10 +6397,10 @@
 				);
 				OTHER_LDFLAGS = "";
 				PRODUCT_NAME = "$(TARGET_NAME)";
-				PROVISIONING_PROFILE = "4B323070-E4B3-4A24-AF69-7B98FD2DCAC9";
+				PROVISIONING_PROFILE = "8868ce00-a2c7-4be3-bd80-888bb7004696";
 				REZ_SEARCH_PATHS = "${SRCROOT}/**";
 				USER_HEADER_SEARCH_PATHS = "${SRCROOT}/**";
-				VALID_ARCHS = "$(ARCHS_STANDARD)";
+				VALID_ARCHS = "armv7s armv7";
 				WRAPPER_EXTENSION = app;
 			};
 			name = Distribution;

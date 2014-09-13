@@ -31,7 +31,7 @@
                                 <textInputTraits key="textInputTraits"/>
                             </textField>
                             <button opaque="NO" contentMode="scaleToFill" contentHorizontalAlignment="center" contentVerticalAlignment="center" buttonType="roundedRect" lineBreakMode="middleTruncation" id="5jy-7k-DWo">
-                                <rect key="frame" x="234" y="279" width="97" height="37"/>
+                                <rect key="frame" x="234" y="240" width="97" height="37"/>
                                 <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMaxY="YES"/>
                                 <state key="normal" title="connect_t">
                                     <color key="titleShadowColor" white="0.5" alpha="1" colorSpace="calibratedWhite"/>
@@ -41,7 +41,7 @@
                                 </connections>
                             </button>
                             <button opaque="NO" contentMode="scaleToFill" contentHorizontalAlignment="center" contentVerticalAlignment="center" buttonType="roundedRect" lineBreakMode="middleTruncation" id="9QK-jl-CLQ" userLabel="edit_view_button">
-                                <rect key="frame" x="358" y="279" width="97" height="37"/>
+                                <rect key="frame" x="358" y="240" width="97" height="37"/>
                                 <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMaxY="YES"/>
                                 <state key="normal" title="edit_t">
                                     <color key="titleShadowColor" white="0.5" alpha="1" colorSpace="calibratedWhite"/>
@@ -75,15 +75,15 @@
                                 <rect key="frame" x="358" y="122" width="110" height="110"/>
                                 <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMaxY="YES"/>
                             </imageView>
-                            <label opaque="NO" clipsSubviews="YES" userInteractionEnabled="NO" contentMode="left" text="restartvm_t" lineBreakMode="tailTruncation" baselineAdjustment="alignBaselines" adjustsFontSizeToFit="NO" id="LAp-JC-Lhw" userLabel="Label - restartvm_t">
-                                <rect key="frame" x="141" y="245" width="87" height="21"/>
+                            <label hidden="YES" opaque="NO" clipsSubviews="YES" userInteractionEnabled="NO" contentMode="left" text="restartvm_t" lineBreakMode="tailTruncation" baselineAdjustment="alignBaselines" adjustsFontSizeToFit="NO" id="LAp-JC-Lhw" userLabel="Label - restartvm_t">
+                                <rect key="frame" x="141" y="308" width="87" height="21"/>
                                 <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMaxY="YES"/>
                                 <fontDescription key="fontDescription" type="system" pointSize="17"/>
                                 <color key="textColor" cocoaTouchSystemColor="darkTextColor"/>
                                 <nil key="highlightedColor"/>
                             </label>
-                            <switch opaque="NO" contentMode="scaleToFill" horizontalHuggingPriority="750" verticalHuggingPriority="750" contentHorizontalAlignment="center" contentVerticalAlignment="center" id="sz3-BQ-0p5" userLabel="Switch - restart_switch">
-                                <rect key="frame" x="234" y="240" width="51" height="31"/>
+                            <switch hidden="YES" opaque="NO" contentMode="scaleToFill" horizontalHuggingPriority="750" verticalHuggingPriority="750" contentHorizontalAlignment="center" contentVerticalAlignment="center" id="sz3-BQ-0p5" userLabel="Switch - restart_switch">
+                                <rect key="frame" x="234" y="303" width="51" height="31"/>
                                 <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMaxY="YES"/>
                             </switch>
                         </subviews>
@@ -453,7 +453,7 @@
                     <connections>
                         <outlet property="connectToVMActivityIndicator" destination="6Dj-w5-Qbk" id="KLx-vH-NZ6"/>
                         <outlet property="connectToVMLabel" destination="sOn-ap-3x3" id="Dqw-Ar-nOL"/>
-                        <segue destination="V4v-lW-yLT" kind="modal" identifier="segueFromVMConnectToShow" id="JvF-nT-5LU"/>
+                        <segue destination="V4v-lW-yLT" kind="modal" identifier="segueFromVMConnectToShow" id="4Ka-xy-3a3"/>
                     </connections>
                 </viewController>
                 <placeholder placeholderIdentifier="IBFirstResponder" id="c5F-gx-oMv" userLabel="First Responder" sceneMemberID="firstResponder"/>
@@ -506,18 +506,17 @@
         <scene sceneID="ViP-4B-YWC">
             <objects>
                 <viewController storyboardIdentifier="ShowVm" id="V4v-lW-yLT" userLabel="QVDShowVmController" customClass="QVDShowVmController" sceneMemberID="viewController">
-                    <webView key="view" multipleTouchEnabled="YES" contentMode="scaleToFill" keyboardDisplayRequiresUserAction="NO" id="mu9-3J-5R7">
+                    <webView key="view" contentMode="scaleToFill" id="RUe-60-QCO">
                         <rect key="frame" x="0.0" y="0.0" width="1024" height="768"/>
                         <autoresizingMask key="autoresizingMask" widthSizable="YES" heightSizable="YES"/>
                         <color key="backgroundColor" red="1" green="1" blue="1" alpha="1" colorSpace="calibratedRGB"/>
                         <simulatedOrientationMetrics key="simulatedOrientationMetrics" orientation="landscapeRight"/>
-                        <dataDetectorType key="dataDetectorTypes" link="YES"/>
                     </webView>
                     <toolbarItems/>
                     <simulatedToolbarMetrics key="simulatedBottomBarMetrics"/>
                     <simulatedOrientationMetrics key="simulatedOrientationMetrics" orientation="landscapeRight"/>
                     <connections>
-                        <outlet property="novncwebview" destination="mu9-3J-5R7" id="jfm-dZ-iNp"/>
+                        <outlet property="novncwebview" destination="RUe-60-QCO" id="SBQ-VS-gcF"/>
                         <segue destination="2" kind="modal" identifier="segueShowToView" id="nNk-rf-MmH"/>
                     </connections>
                 </viewController>
@@ -535,8 +534,8 @@
         <simulatedScreenMetrics key="destination"/>
     </simulatedMetricsContainer>
     <inferredMetricsTieBreakers>
-        <segue reference="jag-wX-9j0"/>
-        <segue reference="7DN-aa-BgA"/>
         <segue reference="F4N-KK-NVD"/>
+        <segue reference="nNk-rf-MmH"/>
+        <segue reference="7DN-aa-BgA"/>
     </inferredMetricsTieBreakers>
 </document>

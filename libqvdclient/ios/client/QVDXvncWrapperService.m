@@ -138,7 +138,10 @@ static char passwdargchr[MAXPATH];
             passwdargchr,
             "-fp", fontpathchr
 #ifdef QVD_IOS_DEBUG
-            ,"-ac",
+            ,"-ac"
+            ,"-Log", "*:stderr:100"
+//            ,"-logfile","/tmp/xvnc.log"
+//            ,"-logverbose","100"
 #endif
             // TODO should we allow remote connections?
         };

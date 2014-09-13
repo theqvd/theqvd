@@ -104,12 +104,12 @@
 - (void) performDelayedSegueWithIdentifier:(NSString *)identifier {
     NSLog(@"%@ performDelayedSegueWithIdentifier %@", self, identifier);
     if (self.hasAppeared) {
-        //__weak typeof(self) weakSelf = self;
-//        dispatch_async(dispatch_get_main_queue(), ^{
-            [ self performSegueWithIdentifier:identifier sender:self];
-            self.pendingSegue = nil;
-//            weakSelf.pendingSegueController = nil;
-//        });
+        __weak typeof(self) weakSelf = self;
+        dispatch_async(dispatch_get_main_queue(), ^{
+            [ weakSelf performSegueWithIdentifier:identifier sender:weakSelf];
+            weakSelf.pendingSegue = nil;
+            weakSelf.pendingSegueController = nil;
+        });
         return;
     }
     self.pendingSegue = identifier;

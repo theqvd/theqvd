@@ -117,8 +117,8 @@
                 NSLog(@"QVDViewService: handleAllstarted segue already performed: %@. Skipping new segue", segueName);
                 return allstarted;
             }
-                [ viewController performDelayedSegueWithIdentifier:segueName];
-                seguePerformed = YES;
+            [ viewController performDelayedSegueWithIdentifier:segueName];
+            seguePerformed = YES;
             return allstarted;
                                 //});
         }
