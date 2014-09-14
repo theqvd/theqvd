@@ -517,7 +517,7 @@
                     <simulatedOrientationMetrics key="simulatedOrientationMetrics" orientation="landscapeRight"/>
                     <connections>
                         <outlet property="novncwebview" destination="RUe-60-QCO" id="SBQ-VS-gcF"/>
-                        <segue destination="2" kind="modal" identifier="backToMain" id="nNk-rf-MmH"/>
+                        <segue destination="2" kind="modal" identifier="backToMain" id="Vj8-W6-mWz"/>
                     </connections>
                 </viewController>
                 <placeholder placeholderIdentifier="IBFirstResponder" id="xLE-mk-P04" userLabel="First Responder" sceneMemberID="firstResponder"/>
@@ -534,8 +534,8 @@
         <simulatedScreenMetrics key="destination"/>
     </simulatedMetricsContainer>
     <inferredMetricsTieBreakers>
-        <segue reference="F4N-KK-NVD"/>
-        <segue reference="jag-wX-9j0"/>
         <segue reference="7DN-aa-BgA"/>
+        <segue reference="Vj8-W6-mWz"/>
+        <segue reference="F4N-KK-NVD"/>
     </inferredMetricsTieBreakers>
 </document>

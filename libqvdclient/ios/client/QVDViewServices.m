@@ -163,9 +163,9 @@
 //        }];
         
         if ([ controllerClass isEqualToString:@"QVDVMConnectController"]) {
-            [ viewController dismissViewControllerAnimated:YES  completion:^{
+           // [ viewController dismissViewControllerAnimated:YES  completion:^{
                 [ viewController performDelayedSegueWithIdentifier:@"backToMain" ];
-            }];
+           // }];
             return allstopped;
         } else if ([ controllerClass isEqualToString:@"QVDShowVmController"]) {
             [ viewController dismissViewControllerAnimated:YES  completion:^{
