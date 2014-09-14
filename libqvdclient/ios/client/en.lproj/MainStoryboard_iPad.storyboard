@@ -47,7 +47,7 @@
                                     <color key="titleShadowColor" white="0.5" alpha="1" colorSpace="calibratedWhite"/>
                                 </state>
                                 <connections>
-                                    <segue destination="Tu8-rV-uJi" kind="modal" identifier="segueFromViewToVMList" id="F4N-KK-NVD"/>
+                                    <segue destination="Tu8-rV-uJi" kind="modal" identifier="" id="F4N-KK-NVD"/>
                                 </connections>
                             </button>
                             <label opaque="NO" clipsSubviews="YES" userInteractionEnabled="NO" contentMode="left" text="login_t" lineBreakMode="tailTruncation" baselineAdjustment="alignBaselines" adjustsFontSizeToFit="NO" id="fQW-lb-utx">
@@ -534,7 +534,7 @@
         <simulatedScreenMetrics key="destination"/>
     </simulatedMetricsContainer>
     <inferredMetricsTieBreakers>
-        <segue reference="NBt-rS-ubd"/>
+        <segue reference="F4N-KK-NVD"/>
         <segue reference="jag-wX-9j0"/>
         <segue reference="7DN-aa-BgA"/>
     </inferredMetricsTieBreakers>
