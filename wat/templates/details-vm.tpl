@@ -1,4 +1,3 @@
-<%console.log(model);%>
 <div class="details-header">
     <span class="fa fa-cloud h1"><%= model.get('name') %></span>
     <a class="button button-right js-button-edit fa fa-pencil" href="javascript:" data-i18n>Edit</a>
@@ -97,7 +96,7 @@
                             %>
                                 <tr>
                                     <td class="warning" data-i18n>Soft</td>
-                                    <td class="warning"><%= model.get('expiration_soft') %></td>
+                                    <td class="warning"><%= model.get('expiration_soft').replace('T',' ') %></td>
                                     <td class="warning"><i class="fa fa-info-circle fa-centered"></i></td>
                                 </tr>
                             <%
@@ -106,7 +105,7 @@
                             %>
                                 <tr>
                                     <td class="ok" data-i18n>Hard</td>
-                                    <td class="ok"><%= model.get('expiration_hard') %></td>
+                                    <td class="ok"><%= model.get('expiration_hard').replace('T',' ') %></td>
                                     <td class="ok"><i class="fa fa-info-circle fa-centered"></td>
                                 </tr>
                             <%

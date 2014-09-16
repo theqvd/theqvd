@@ -1,6 +1,11 @@
 Wat.Views.DetailsView = Wat.Views.MainView.extend({
     elementId: 0,
     detailsContainer: '.bb-details',
+    sideContainer: '.bb-details-side',
+
+    editorTemplateName: '',
+    detailsTemplateName: '',
+    detailsSideTemplateName: '',
     
     /*
     ** params:
@@ -11,6 +16,11 @@ Wat.Views.DetailsView = Wat.Views.MainView.extend({
         Wat.Views.MainView.prototype.initialize.apply(this);
 
         this.elementId = params.id;
+        
+        // Define template names from qvd Object type
+        this.editorTemplateName = 'editor-' + this.qvdObj,
+        this.detailsTemplateName = 'details-' + this.qvdObj,
+        this.detailsSideTemplateName = 'details-' + this.qvdObj + '-side',
         
         this.setBreadCrumbs();
 
@@ -46,27 +56,6 @@ Wat.Views.DetailsView = Wat.Views.MainView.extend({
     
     eventsDetails: {
         'click .js-button-edit': 'openEditElementDialog'
-    },
-     
-    openEditElementDialog: function (e) {
-        var that = this;
-        
-        this.dialogConf.buttons = {
-            Cancel: function () {
-                $(this).dialog('close');
-            },
-            Update: function () {
-                that.dialog = $(this);
-                that.updateElement();
-            }
-        };
-        
-        this.dialogConf.button1Class = 'fa fa-ban';
-        this.dialogConf.button2Class = 'fa fa-save';
-        
-        this.dialogConf.fillCallback = this.fillEditor;
-        
-        this.editorElement (e);
     },
 
     render: function () {    

@@ -1,7 +1,5 @@
 Wat.Views.UserListView = Wat.Views.ListView.extend({
     qvdObj: 'user',
-    listTemplateName: 'list-users',
-    editorTemplateName: 'creator-user',
 
     initialize: function (params) {
         this.collection = new Wat.Collections.Users(params);

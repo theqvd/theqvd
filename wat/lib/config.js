@@ -17,14 +17,17 @@ Wat.C = {
     
     logOut: function () {
         $.removeCookie('qvdWatLoggedInUser', { path: '/' });
+        $.removeCookie('qvdWatLoggedInPassword', { path: '/' });
         this.loggedIn = false;
         this.login = '';
     },
     
-    logIn: function (login) {
+    logIn: function (login, password) {
         this.login = login;
+        this.password = password;
         this.loggedIn = true;
         $.cookie('qvdWatLoggedInUser', login, { expires: this.loginExpirationDays, path: '/' });
+        $.cookie('qvdWatLoggedInPassword', password, { expires: this.loginExpirationDays, path: '/' });
         window.location = '#';
     },
     
@@ -42,6 +45,7 @@ Wat.C = {
         if ($.cookie('qvdWatLoggedInUser')) {
             this.loggedIn = true;
             this.login = $.cookie('qvdWatLoggedInUser');
+            this.password = $.cookie('qvdWatLoggedInPassword');
         }
         else {
             this.loggedIn = false;
@@ -59,18 +63,19 @@ Wat.C = {
         }
         
         this.login = user;
+        this.password = password;
         
         Wat.A.performAction('host_tiny_list', {}, {}, {}, this.checkLogin, this);
     },
     
     checkLogin: function (that) {
-        if (!that.retrievedData.result) {
+        if (!that.retrievedData.result || $.isEmptyObject(that.retrievedData.result)) {
             Wat.I.showMessage({message: "Wrong user or password", messageType: "error"});
             that.login = '';
             return;
         }
         
-        Wat.C.logIn(that.login);
+        Wat.C.logIn(that.login, that.password);
 
         Wat.I.renderMain();
 

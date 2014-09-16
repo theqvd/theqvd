@@ -12,10 +12,6 @@ Wat.Views.MainView = Backbone.View.extend({
         
         this.templateEditorCommon = Wat.A.getTemplate('editor-common');
         
-        if (this.editorTemplateName) {
-            this.templateEditor = Wat.A.getTemplate(this.editorTemplateName);
-        }
-        
         // Add to the view events the parent class of this view to avoid collisions with other views events
         this.events = this.restrictEventsScope(this.events);
         
@@ -77,15 +73,16 @@ Wat.Views.MainView = Backbone.View.extend({
     
     fillEditor: function (target) {
         var that = Wat.CurrentView;
-        
+
         // Add common parts of editor to dialog
         that.template = _.template(
                     that.templateEditorCommon, {
-                        model: that.model,
+                        blocked: that.model.attributes.blocked,
+                        properties: that.model.attributes.properties,
                         cid: that.cid
                     }
                 );
-
+        
         target.html(that.template);
 
         // Add specific parts of editor to dialog
@@ -96,6 +93,32 @@ Wat.Views.MainView = Backbone.View.extend({
                 );
 
         $(that.editorContainer).html(that.template);
+    },
+    
+    fillMassiveEditor: function (target) {
+        var that = Wat.CurrentView;
+
+        // Add common parts of editor to dialog
+        that.template = _.template(
+                    that.templateEditorCommon, {
+                        blocked: undefined,
+                        properties: [],
+                        cid: that.cid
+                    }
+                );
+        
+        target.html(that.template);
+
+        // Add specific parts of editor to dialog
+        that.template = _.template(
+                    that.templateEditor, {
+                        model: that.model
+                    }
+                );
+
+        $(that.editorContainer).html(that.template);
+        
+        that.configureMassiveEditor (that);
     },
     
     updateElement: function () {
@@ -226,5 +249,29 @@ Wat.Views.MainView = Backbone.View.extend({
             
             Wat.I.showMessage(messageParams, response);
         });
+    },
+    
+     
+    openEditElementDialog: function (e) {
+        var that = this;
+                    
+        this.templateEditor = Wat.A.getTemplate(this.editorTemplateName);
+
+        this.dialogConf.buttons = {
+            Cancel: function () {
+                $(this).dialog('close');
+            },
+            Update: function () {
+                that.dialog = $(this);
+                that.updateElement();
+            }
+        };
+        
+        this.dialogConf.button1Class = 'fa fa-ban';
+        this.dialogConf.button2Class = 'fa fa-save';
+        
+        this.dialogConf.fillCallback = this.fillEditor;
+        
+        this.editorElement (e);
     }
 });

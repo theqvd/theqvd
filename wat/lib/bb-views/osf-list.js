@@ -1,7 +1,5 @@
 Wat.Views.OSFListView = Wat.Views.ListView.extend({
     qvdObj: 'osf',
-    listTemplateName: 'list-osf',
-    editorTemplateName: 'creator-osf',
 
     initialize: function (params) {
         this.collection = new Wat.Collections.OSFs(params);

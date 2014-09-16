@@ -10,6 +10,7 @@
             if (!loggedIn) {
                 delete cornerMenuPrint.setup;
                 delete cornerMenuPrint.user;
+                delete cornerMenuPrint.help.subMenu.about;
             } 
         %>
 

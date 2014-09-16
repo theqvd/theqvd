@@ -1,9 +1,5 @@
 Wat.Views.VMDetailsView = Wat.Views.DetailsView.extend({  
     qvdObj: 'vm',
-    editorTemplateName: 'editor-vm',
-    detailsTemplateName: 'details-vm',
-    detailsSideTemplateName: 'details-vm-side',
-    sideContainer: '.bb-details-side',
     
     initialize: function (params) {
         this.model = new Wat.Models.VM(params);
@@ -59,10 +55,6 @@ Wat.Views.VMDetailsView = Wat.Views.DetailsView.extend({
         
         // Properties to create, update and delete obtained from parent view
         var properties = this.properties;
-        
-        var arguments = {
-            'propertyChanges' : properties
-        };
         
         var context = $('.' + this.cid + '.editor-container');
         

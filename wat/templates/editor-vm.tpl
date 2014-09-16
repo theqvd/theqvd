@@ -34,13 +34,13 @@
     <tr class="<%= expirationRowClass %>">
         <td data-i18n>Soft expiration</td>
         <td>
-            <input type="text" class="datetimepicker" name="expiration_soft" value="<%= model.get('expiration_soft') %>">
+            <input type="text" class="datetimepicker" name="expiration_soft" value="<%= model.get('expiration_soft') ? model.get('expiration_soft').replace('T',' ') : '' %>">
         </td>
     </tr>
     <tr class="<%= expirationRowClass %>">
         <td data-i18n>Hard expiration</td>
         <td>
-            <input type="text" class="datetimepicker" name="expiration_hard" value="<%= model.get('expiration_hard') %>">
+            <input type="text" class="datetimepicker" name="expiration_hard" value="<%= model.get('expiration_hard') ? model.get('expiration_hard').replace('T',' ') : '' %>">
         </td>
     </tr>
  </table>

@@ -1,7 +1,5 @@
 Wat.Views.DIListView = Wat.Views.ListView.extend({
     qvdObj: 'di',
-    listTemplateName: 'list-di',
-    editorTemplateName: 'creator-di',
 
     initialize: function (params) {
         this.collection = new Wat.Collections.DIs(params);

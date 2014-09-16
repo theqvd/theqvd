@@ -1,12 +1,8 @@
 Wat.Views.HostDetailsView = Wat.Views.DetailsView.extend({  
     qvdObj: 'host',
-    editorTemplateName: 'editor-host',
-    detailsTemplateName: 'details-host',
-    detailsSideTemplateName: 'details-host-side',
-    sideContainer: '.bb-details-side',
 
     initialize: function (params) {
-        this.model = new Wat.Models.Node(params);
+        this.model = new Wat.Models.Host(params);
         Wat.Views.DetailsView.prototype.initialize.apply(this, [params]);
     },
     

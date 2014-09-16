@@ -95,42 +95,66 @@ Wat.A = {
     },
     
     // Fill filter selects 
-    fillSelect: function (params) {  
-        var jsonUrl = Wat.C.getBaseUrl() + '&action=' + params.action;
-        
-        if (params.filters) {
-            jsonUrl += '&filters=' + JSON.stringify(params.filters);
-        }
-        
-        $.ajax({
-            url: jsonUrl,
-            type: 'POST',
-            async: false,
-            dataType: 'json',
-            processData: false,
-            parse: true,
-            success: function (data) {
-                $(data.result.rows).each(function(i,option) {
+    fillSelect: function (params) {
+        // Some starting options can be added as first options
+        if (params.startingOptions) {
+            $.each($('select[name="' + params.controlName + '"]'), function () {
+                var combo = $(this);
+                $.each(params.startingOptions, function (id, name) {
                     var selected = '';
-                    
-                    var id = option.id;
-                    var name = option.name;
-                    
-                    if (params.nameAsId) {
-                        id = name;
-                    }
-                    
                     if (params.selectedId !== undefined && params.selectedId == id) {
                         selected = 'selected="selected"';
                     }
-
-                    $.each($('select[name="' + params.controlName + '"]'), function () {
-                        $(this).append('<option value="' + id + '" ' + selected + '>' + 
-                                                                   name + 
-                                                                   '<\/option>');
-                    });
+                    combo.append('<option value="' + id + '" ' + selected + '>' + 
+                                                               name + 
+                                                               '<\/option>');
                 });
+            });
+        }
+
+        // If action is defined, add retrieved items from ajax to select
+        if (params.action) {
+            var jsonUrl = Wat.C.getBaseUrl() + '&action=' + params.action;
+
+            if (params.filters) {
+                jsonUrl += '&filters=' + JSON.stringify(params.filters);
             }
-        });
+
+            $.ajax({
+                url: jsonUrl,
+                type: 'POST',
+                async: false,
+                dataType: 'json',
+                processData: false,
+                parse: true,
+                success: function (data) {
+                    $(data.result.rows).each(function(i,option) {
+                        var selected = '';
+
+                        var id = option.id;
+                        var name = option.name;
+                        
+                        if (params.nameAsId) {
+                            id = name;
+                        }
+
+                        // If one option is defined in starting options, will be ignored
+                        if (params.startingOptions && params.startingOptions[id]) {
+                            return;
+                        }
+
+                        if (params.selectedId !== undefined && params.selectedId == id) {
+                            selected = 'selected="selected"';
+                        }
+
+                        $.each($('select[name="' + params.controlName + '"]'), function () {
+                            $(this).append('<option value="' + id + '" ' + selected + '>' + 
+                                                                       name + 
+                                                                       '<\/option>');
+                        });
+                    });
+                }
+            });
+        }
     }
 };

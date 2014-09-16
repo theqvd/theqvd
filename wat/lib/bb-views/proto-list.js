@@ -12,6 +12,9 @@ Wat.Views.ListView = Wat.Views.MainView.extend({
     filters: {},
     selectedItems: [],
     selectedAll: false,
+    listTemplateName: '',
+    editorTemplateName: '',
+    massiveEditorTemplateName: '',
 
     /*
     ** params:
@@ -26,12 +29,19 @@ Wat.Views.ListView = Wat.Views.MainView.extend({
     initialize: function (params) {
         Wat.Views.MainView.prototype.initialize.apply(this);
         
+        // Define template names from qvd Object type
+        this.listTemplateName = 'list-' + this.qvdObj;
+        this.editorTemplateName = 'creator-' + this.qvdObj;
+        this.massiveEditorTemplateName = 'massive-editor-' + this.qvdObj;
+        
         this.setFilters();
         this.setColumns();
         this.setSelectedActions();
         this.setListActionButton();
         this.setBreadCrumbs();
                 
+        this.resetSelectedItems();
+        
         // Templates
         this.templateListCommonList = Wat.A.getTemplate('list-common');
         this.templateListCommonBlock = Wat.A.getTemplate('list-common-block');
@@ -575,6 +585,8 @@ Wat.Views.ListView = Wat.Views.MainView.extend({
     openNewElementDialog: function (e) {
         var that = this;
         
+        this.templateEditor = Wat.A.getTemplate(this.editorTemplateName);
+        
         this.dialogConf.buttons = {
             Cancel: function () {
                 $(this).dialog('close');
@@ -591,6 +603,28 @@ Wat.Views.ListView = Wat.Views.MainView.extend({
         this.dialogConf.fillCallback = this.fillEditor;
 
         this.editorElement(e);
+    },
+    
+    openMassiveChangesDialog: function (that) {        
+        that.templateEditor = Wat.A.getTemplate(that.massiveEditorTemplateName);
+        
+        that.dialogConf.buttons = {
+            Cancel: function () {
+                $(this).dialog('close');
+            },
+            Update: function () {
+                that.dialog = $(this);
+                that.updateMassiveElement($(this), that.selectedItems);
+            }
+        };
+        
+        that.dialogConf.button1Class = 'fa fa-ban';
+        that.dialogConf.button2Class = 'fa fa-save';
+        
+        that.dialogConf.fillCallback = that.fillMassiveEditor;
+        that.dialogConf.title = i18n.t('Massive changes over __counter__ elements', {counter: that.selectedItems.length});
+
+        that.editorElement();
     },
     
     applySelectedAction: function () { 
@@ -639,6 +673,16 @@ Wat.Views.ListView = Wat.Views.MainView.extend({
                     that.applyUnblock(that);
                 }
                 break;
+            case 'massive_changes':
+                // The function that will open the Massive changes dialog is: openMassiveChangesDialog
+                // Each qvd object have the option of do things before with setupMassiveChangesDialog and after with configureMassiveEditor                
+                if (elementsOutOfView) {
+                    Wat.I.confirm('dialog-confirm-out-of-view', that.setupMassiveChangesDialog, that);
+                }
+                else {
+                    that.setupMassiveChangesDialog(that);
+                }
+                break;
             // Used in VMs
             case 'start':
                 if (elementsOutOfView) {
@@ -664,7 +708,7 @@ Wat.Views.ListView = Wat.Views.MainView.extend({
                     that.applyDisconnect(that);
                 }
                 break;
-            // Used in Nodes
+            // Used in Hosts
             case 'stop_all':
                 // TODO
                 break;
@@ -696,5 +740,55 @@ Wat.Views.ListView = Wat.Views.MainView.extend({
     resetSelectedItems: function () {
         this.selectedAll = false;
         this.selectedItems = [];
-    }
+    },
+    
+    setupMassiveChangesDialog: function (that) {
+        that.openMassiveChangesDialog(that);
+        // Overrided from specific list view if necessary
+    },
+    
+    configureMassiveEditor: function (that) {
+        // Overrided from specific list view if necessary
+    },
+    
+    updateMassiveElement: function (dialog, id) {
+        var valid = Wat.Views.ListView.prototype.updateElement.apply(this, [dialog]);
+        
+        if (!valid) {
+            return;
+        }
+        
+        // Properties to create, update and delete obtained from parent view
+        var properties = this.properties;
+        
+        var arguments = {
+            'propertyChanges' : properties
+        };
+                
+        var filters = {"id": id};
+
+        this.resetSelectedItems();
+
+        
+        var auxModel = {};
+        
+        switch (this.qvdObj) {
+            case 'user':
+                auxModel = new Wat.Models.User();
+                break;
+            case 'vm':
+                auxModel = new Wat.Models.VM();
+                break;
+            case 'host':
+                auxModel = new Wat.Models.Host();
+                break;
+            case 'osf':
+                auxModel = new Wat.Models.OSF();
+                break;
+            case 'di':
+                auxModel = new Wat.Models.DI();
+                break;
+        }
+        this.updateModel(arguments, filters, this.fetchList, auxModel);
+    },
 });

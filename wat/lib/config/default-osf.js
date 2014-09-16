@@ -123,6 +123,10 @@ Wat.I.selectedActions[qvdObj] = [
             {
                 'value': 'delete',
                 'text': 'Delete'
+            },
+            {
+                'value': 'massive_changes',
+                'text': 'Massive changes'
             }
         ];
 

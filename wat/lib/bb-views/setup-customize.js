@@ -145,10 +145,7 @@ Wat.Views.ConfigCustomizeView = Wat.Views.MainView.extend({
         
         // The search by name is substring, so in example for 'id' search, it retrieve host_id, name_id...
         $.each(params.retrievedData.result.rows, function(iRow, row) {
-            console.log(params.fieldName);
-            console.log(row);
             if (row.name == params.fieldName) {
-                console.log(row);
                 id = row.id;
                 name = row.name;
                 qvdObj = row.qvd_obj;

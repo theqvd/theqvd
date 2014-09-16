@@ -1,9 +1,5 @@
 Wat.Views.OSFDetailsView = Wat.Views.DetailsView.extend({  
     qvdObj: 'osf',
-    editorTemplateName: 'editor-osf',
-    detailsTemplateName: 'details-osf',
-    detailsSideTemplateName: 'details-osf-side',
-    sideContainer: '.bb-details-side',
     
     initialize: function (params) {
         this.model = new Wat.Models.OSF(params);

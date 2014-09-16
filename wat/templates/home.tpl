@@ -28,7 +28,7 @@
                         </a>
                     </td>
                     <td>
-                        <span class="summary-data js-summary-users"><i class="fa fa-gear fa-spin"></i></span>
+                        <span class="summary-data js-summary-users"><%= stats.User.total %></span>
                     </td>
                 </tr>
                 <tr>    
@@ -41,7 +41,7 @@
                         </a>
                     </td>
                     <td>
-                        <span class="summary-data js-summary-vms"><i class="fa fa-gear fa-spin"></i></span>
+                        <span class="summary-data js-summary-vms"><%= stats.VM.total %></span>
                     </td>
                 </tr>
                 <tr>
@@ -54,7 +54,7 @@
                         </a>
                     </td>
                     <td>
-                        <span class="summary-data js-summary-hosts"><i class="fa fa-gear fa-spin"></i></span>
+                        <span class="summary-data js-summary-hosts"><%= stats.Host.total %></span>
                     </td>
                 </tr>
                 <tr>
@@ -67,7 +67,7 @@
                         </a>
                     </td>
                     <td>
-                        <span class="summary-data js-summary-osfs"><i class="fa fa-gear fa-spin"></i></span>
+                        <span class="summary-data js-summary-osfs"><%= stats.OSF.total %></span>
                     </td>
                 </tr>
                 <tr>
@@ -80,7 +80,7 @@
                         </a>
                     </td>
                     <td>
-                        <span class="summary-data js-summary-dis"><i class="fa fa-gear fa-spin"></i></span>
+                        <span class="summary-data js-summary-dis"><%= stats.DI.total %></span>
                     </td>
                 </tr>
             </table>
@@ -104,52 +104,54 @@
     <div class="home-row">
         <div class="home-cell">
             <div class="home-title" data-i18n>VMs close to expire</div>
-            <table class="summary-table">
-                <tr>
-                    <td class="max-1-icons">
-                        <i class="fa fa-warning error"></i>
-                    </td>                    
-                    <td>
-                        Virtual machine 1
-                    </td>
-                    <td>
-                        <span class="summary-data js-summary-users">1 days</span>
-                    </td>
-                </tr>
-                <tr>    
-                    <td class="max-1-icons">
-                        <i class="fa fa-warning warning"></i>
-                    </td>        
-                    <td>
-                        Virtual machine 34
-                    </td>
-                    <td>
-                        <span class="summary-data js-summary-vms">2 days</span>
-                    </td>
-                </tr>
-                <tr>
-                    <td class="max-1-icons">
-                        <i class="fa fa-warning error"></i>
-                    </td>       
-                    <td>
-                        Virtual machine 2
-                    </td>
-                    <td>
-                        <span class="summary-data js-summary-hosts">5 days</span>
-                    </td>
-                </tr>
-                <tr>
-                    <td class="max-1-icons">
-                        <i class="fa fa-warning error"></i>
-                    </td>                
-                    <td>
-                        Virtual machine 13
-                    </td>
-                    <td>
-                        <span class="summary-data js-summary-dis">8 days</span>
-                    </td>
-                </tr>
-            </table>
+            <%
+                if (stats.VM.expiration.length == 0) {
+            %>
+                <div class="no-elements" data-18n>There are not VMS close to expire</div>
+            <%
+                }
+                else {
+            %>
+                    <table class="summary-table">
+                    <% 
+                        $.each(stats.VM.expiration, function (iExp, exp) {
+                            var priorityClass = '';
+                            var remainingTime = '';
+                            var remainingTimeAttr = '';
+                            if (exp.remaining_time.days < 1) {
+                                priorityClass = 'error';
+                                remainingTime = exp.remaining_time.hours + ':' + exp.remaining_time.minutes + ':' + exp.remaining_time.seconds;
+                            }
+                            else if(exp.remaining_time.days < 7) {
+                                priorityClass = 'warning';
+                                remainingTimeAttr = 'data-days="' + exp.remaining_time.days + '"';
+                            }
+                            else {
+                                priorityClass = 'ok';
+                                remainingTimeAttr = 'data-days="+7"';
+                            }                    
+                            %>
+                            <tr>
+                                <td class="max-1-icons">
+                                    <i class="fa fa-warning <%= priorityClass %>"></i>
+                                </td>                    
+                                <td>
+                                    <a href="#/vm/<%= exp.id %>">
+                                        <%= exp.name %>
+                                    </a>
+                                </td>
+                                <td>
+                                    <span class="summary-data js-summary-users" <%= remainingTimeAttr %>><%= remainingTime %></span>
+                                </td>
+                            </tr>
+                            <%
+                        }); 
+                    %>
+                    </table>
+                    
+                <%
+                    }
+                %>
         </div>
         <div class="home-cell">
             <div class="home-title" data-i18n>Nodes with more running VMs</div>
@@ -168,7 +170,7 @@
                         </a>
                     </td>
                     <td>
-                        <span class="summary-data js-summary-blocked-users"><i class="fa fa-gear fa-spin"></i></span>
+                        <span class="summary-data js-summary-blocked-users"><%= stats.User.blocked %></span>
                     </td>
                 </tr>
                 <tr>    
@@ -181,7 +183,7 @@
                         </a>
                     </td>
                     <td>
-                        <span class="summary-data js-summary-blocked-vms"><i class="fa fa-gear fa-spin"></i></span>
+                        <span class="summary-data js-summary-blocked-vms"><%= stats.VM.blocked %></span>
                     </td>
                 </tr>
                 <tr>
@@ -194,7 +196,7 @@
                         </a>
                     </td>
                     <td>
-                        <span class="summary-data js-summary-blocked-hosts"><i class="fa fa-gear fa-spin"></i></span>
+                        <span class="summary-data js-summary-blocked-hosts"><%= stats.Host.blocked %></span>
                     </td>
                 </tr>
                 <tr>
@@ -207,45 +209,10 @@
                         </a>
                     </td>
                     <td>
-                        <span class="summary-data js-summary-blocked-dis"><i class="fa fa-gear fa-spin"></i></span>
+                        <span class="summary-data js-summary-blocked-dis"><%= stats.DI.blocked %></span>
                     </td>
                 </tr>
             </table>
         </div>
     </div>
-</div>
-<div class="home-wrapper">
-    <div class="home-row">
-        <div class="home-cell">
-            <div class="home-title" data-i18n>Activity log</div>
-        </div>
-    </div>
-    
-    <table class="log-table">
-        <tr>
-            <td>a</td>
-            <td>a</td>
-            <td>a</td>
-        </tr>
-        <tr>
-            <td>b</td>
-            <td>b</td>
-            <td>b</td>
-        </tr>
-        <tr>
-            <td>v</td>
-            <td>v</td>
-            <td>v</td>
-        </tr>
-        <tr>
-            <td>d</td>
-            <td>d</td>
-            <td>d</td>
-        </tr>
-        <tr>
-            <td>t</td>
-            <td>t</td>
-            <td>t</td>
-        </tr>
-    </table>
 </div>

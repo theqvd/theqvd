@@ -1,4 +1,4 @@
-Wat.Collections.Nodes = Wat.Collections.Collection.extend({
-    model: Wat.Models.Node,
+Wat.Collections.Hosts = Wat.Collections.Collection.extend({
+    model: Wat.Models.Host,
     actionPrefix: 'host'
 });

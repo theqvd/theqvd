@@ -9,7 +9,7 @@ var Wat = {
         // Models
         User: {},
         VM: {},
-        Node: {}
+        Host: {}
     },
     Collections: {
         // Common collection with connection method
@@ -18,7 +18,7 @@ var Wat = {
         // Collections
         Users: {},
         VMs: {},
-        Nodes: {}
+        Hosts: {}
     },
     Views: {
         // Common view with menu and breadcrumbs
@@ -34,7 +34,7 @@ var Wat = {
         ListView: {},
         UserListView: {},
         VMListView: {},
-        NodeListView: {},
+        HostListView: {},
         
         // Details views
         DetailsView: {},
@@ -130,8 +130,8 @@ var Wat = {
             Wat.Router.app_router.performRoute('users', Wat.Views.UserListView);
         });       
         
-        Wat.Router.app_router.on('route:listNode', function () {
-            Wat.Router.app_router.performRoute('hosts', Wat.Views.NodeListView);
+        Wat.Router.app_router.on('route:listHost', function () {
+            Wat.Router.app_router.performRoute('hosts', Wat.Views.HostListView);
         });      
         
         Wat.Router.app_router.on('route:listOSF', function () {
@@ -173,7 +173,7 @@ var Wat = {
             Wat.Router.app_router.performRoute('vms', Wat.Views.VMDetailsView, {"id": id});
         });
         
-        Wat.Router.app_router.on('route:detailsNode', function (id) {
+        Wat.Router.app_router.on('route:detailsHost', function (id) {
             Wat.Router.app_router.performRoute('hosts', Wat.Views.HostDetailsView, {"id": id});
         });
         

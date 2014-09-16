@@ -3,7 +3,7 @@
         <tbody class="bb-editor"></tbody>
         <%
             // If the model has the blocked attr, will appear on editor
-            if (model.get('blocked') !== undefined) {
+            if (blocked !== undefined) {
         %>
                 <tbody class="blocked-śelector">
                     <tr>
@@ -13,7 +13,7 @@
                                 var blockedChecked = '';
                                 var unblockedChecked = 'checked';
 
-                                if (model.get('blocked')) {
+                                if (blocked) {
                                     blockedChecked = 'checked';
                                     unblockedChecked = '';
                                 }
@@ -32,7 +32,7 @@
             <input type="hidden" class="deleted-properties" value=""/>
 
             <% 
-                _.each(model.get('properties'), function(propValue, propName) { 
+                _.each(properties, function(propValue, propName) { 
             %>
                     <tr>
                         <td>

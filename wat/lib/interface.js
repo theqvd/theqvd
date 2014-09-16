@@ -292,7 +292,7 @@ Wat.I = {
         $('.datetimepicker').datetimepicker({
             dayOfWeekStart: 1,
             lang: 'en',
-            format:'Y-m-d h:i'
+            format:'Y-m-d H:i'
         });
     },
     

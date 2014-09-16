@@ -1,9 +1,5 @@
 Wat.Views.DIDetailsView = Wat.Views.DetailsView.extend({  
     qvdObj: 'di',
-    editorTemplateName: 'editor-di',
-    detailsTemplateName: 'details-di',
-    detailsSideTemplateName: 'details-di-side',
-    sideContainer: '.bb-details-side',
     
     initialize: function (params) {
         this.model = new Wat.Models.DI(params);

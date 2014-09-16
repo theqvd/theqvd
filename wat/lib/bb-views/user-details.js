@@ -1,9 +1,5 @@
 Wat.Views.UserDetailsView = Wat.Views.DetailsView.extend({  
     qvdObj: 'user',
-    editorTemplateName: 'editor-user',
-    detailsTemplateName: 'details-user',
-    detailsSideTemplateName: 'details-user-side',
-    sideContainer: '.bb-details-side',
 
     initialize: function (params) {
         this.model = new Wat.Models.User(params);
