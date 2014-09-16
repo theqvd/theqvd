@@ -564,7 +564,7 @@ xf86DisableInterrupts()
 			return (FALSE);
 #endif
 #if defined(__alpha__) || defined(__mc68000__) || defined(__powerpc__) || defined(__sparc__) || defined(__mips__) || defined(__arm__) || defined(__arm64__) || defined(__sh__) || defined(__ia64__) || defined(__hppa__)
-#elses
+#else
 # ifdef __GNUC__
 #  if defined(__ia64__)
 #   if 0
