@@ -12,6 +12,7 @@ has 'free',      is => 'ro', isa => 'HashRef',     default => sub { {}; };
 has 'modifiers', is => 'ro', isa => 'HashRef',     default => sub { {}; };
 has 'dependencies', is => 'ro', isa => 'HashRef',  default => sub { {}; };
 has 'customs',   is => 'ro', isa => 'HashRef',    default => sub { {}; };
+has 'administrator', is => 'ro', isa => 'QVD::DB::Result::Administrator';
 
 ######################
 # CHECKING FUNCTIONS #
@@ -33,6 +34,8 @@ sub _check
 # It stablish a default empty structre
 # just in case same field has not been specified in input
 
+
+
 sub stablish_default_structure
 {
     my $self = shift;
@@ -42,15 +45,23 @@ sub stablish_default_structure
     $self->config->{filters} //= {};
     $self->config->{mandatory} //= {};
     $self->config->{free} //= {};
-    $self->config->{order_by} //= {};
+    $self->config->{order_by} //= [];
     $self->config->{default} //= {};
 
-    $self->modifiers->{page} = $self->json->{offset} // 1; 
-    $self->modifiers->{rows}  = $self->json->{block} // 10000; 
     $self->modifiers->{distinct} = 1;
     $self->modifiers->{join} //= [];
+    
+    $self->get_pagination;
     $self->get_customs; # It instantiates $self->{customs} with custom
 }                       # properties keys concerning the object itself
+
+sub get_pagination
+{
+    my $self = shift;
+    return if $self->config->{type} eq 'all_ids';
+    $self->modifiers->{page} = $self->json->{offset} // 1; 
+    $self->modifiers->{rows}  = $self->json->{block} // 10000; 
+}
 
 # It instantiates $self->{customs} with custom
 # properties keys concerning the object itself
@@ -63,6 +74,10 @@ sub get_customs
     $table =~ s/^QVD::Admin4::REST::Request::(.+)$/$1/;
     return 1 if $table eq "DI_Tag";
     return 1 if $table eq "Config_Field";
+    return 1 if $table eq "Administrator";
+    return 1 if $table eq "Tenant";
+    return 1 if $table eq "Role";
+    return 1 if $table eq "ACL";
     $table .= "_Property";
     my $n = 0;
     my $props = { map { $_->key => 1 } $self->db->resultset($table)->all };
@@ -91,18 +106,20 @@ sub get_customs
 sub check_credentials_values
 {
     my $self = shift;
-    $self->json->{tenant} || 
-	QVD::Admin4::Exception->throw(code => 6);
+	
+    return unless
+	defined $self->config->{filters}->{tenant};
 
-    $self->json->{role} || 
-	QVD::Admin4::Exception->throw(code => 7);
-
-    QVD::Admin4::Exception->throw(code => 8)
-	unless (exists $self->config->{roles}->{$self->json->{role}} ||
-		exists $self->config->{roles}->{'all'});
-
-    $self->json->{filters}->{tenant} = $self->json->{tenant}
-    if exists $self->config->{filters}->{tenant};
+    if ($self->administrator->is_superadmin)
+    {
+	$self->json->{filters}->{tenant} //= 
+	    [map { $_->id } $self->db->resultset('Tenant')->all];
+    }
+    else
+    {
+	$self->json->{filters}->{tenant} = 
+	    [$self->administrator->tenant_id];
+    }
 }
 
 # It checks that filters provided by the input
@@ -139,8 +156,9 @@ sub check_arguments
     my $self = shift;
 
     exists $self->config->{arguments}->{$_} ||
-	$_ eq 'properties'                  ||
-	$_ eq 'tags'                        ||
+	$_ eq 'propertyChanges'             ||
+	$_ eq 'tagChanges'                  ||
+	$_ eq 'aclChanges'                  ||
     exists $self->{customs}->{$_}           ||
 	QVD::Admin4::Exception->throw(code => 12)
         for keys %{$self->json->{arguments}};
@@ -222,9 +240,11 @@ sub map_arguments
 
     for my $argument (keys %{$self->json->{arguments}})
     {
-	next if ($argument eq 'properties' || $argument eq 'tags');
+	next if ($argument eq 'propertyChanges' || 
+		 $argument eq 'tagChanges'     ||
+		 $argument eq 'aclChanges');
 	my $value = 
-	    delete $self->json->{arguments}->{$argument};
+	    delete $self->json->{arguments}->{$argument} // undef;
 	$self->instantiate_argument($argument,$value);  
 	    
     }
@@ -269,6 +289,8 @@ sub instantiate_argument
 {
     my ($self,$argument,$value) = @_;
 
+    $value = undef if $value eq ''; # WARNING: Is this the right solution to all fields??
+
     my $marg = $self->mapper->getProperty($argument) //
 	QVD::Admin4::Exception->throw(code => 13);
 
@@ -285,19 +307,42 @@ sub instantiate_argument
 sub map_order_by
 {
     my $self = shift;
-    $self->json->{order_by} || return;
-    my $field = $self->json->{order_by}->{field} // return;
+
+    my $fields = $self->get_order_criteria // return;
     my $order = $self->json->{order_by}->{order} // '-asc';
 
-    if (exists $self->{customs}->{$field})
-    { 
-	$ENV{QVD_ADMIN4_CUSTOM_JOIN_CONDITION} = $field;
-	$field = $self->{customs}->{$field} . ".value";
-    }
-    $field = $self->mapper->getProperty($field) // 	    
-	QVD::Admin4::Exception->throw(code => 14);
+    $_ = $self->mapper->getProperty($_) // 	    
+	QVD::Admin4::Exception->throw(code => 14) 
+	for @$fields;
 
-    $self->modifiers->{order_by} = {$order => $field};
+    $self->modifiers->{order_by} = {$order => $fields};
+}
+
+sub get_order_criteria
+{
+    my $self = shift;
+    my @fields;
+
+    if (exists $self->json->{order_by} &&
+	exists $self->json->{order_by}->{field})
+    {
+	@fields = ref($self->json->{order_by}->{field})  ?
+	    @{$self->json->{order_by}->{field}}          :
+	    $self->json->{order_by}->{field};
+    }
+    else
+    {
+	@fields = @{$self->config->{order_by}};
+    }
+
+    if ($fields[0] && 
+	exists $self->{customs}->{$fields[0]}) # FIX ME!!!
+    { 
+	$ENV{QVD_ADMIN4_CUSTOM_JOIN_CONDITION} = $fields[0];
+	@fields = $self->{customs}->{$fields[0]} . ".value";
+    }
+
+    @fields ? return \@fields : return undef;
 }
 
 #####################################
@@ -310,14 +355,17 @@ sub arguments
     my $self = shift;
     my %modifiers = @_;
 
-    return $self->json->{arguments}->{properties} || {}
+    return $self->json->{arguments}->{propertyChanges} || {}
     if $modifiers{custom};
 
     return $self->json->{arguments}->{related} || {}
     if $modifiers{related};
 
-    return $self->json->{arguments}->{tags} || {}
+    return $self->json->{arguments}->{tagChanges} || {}
     if $modifiers{tags};
+
+    return $self->json->{arguments}->{aclChanges} || {}
+    if $modifiers{acls};
 
     return $self->json->{arguments}->{straight} || {};
 }

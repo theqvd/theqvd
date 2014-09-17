@@ -16,6 +16,8 @@ sub BUILD
     push @{$self->modifiers->{join}}, qw(vm_runtimes tags);
     push @{$self->modifiers->{join}}, {osf => 'tenant'};
 
+# create function get_basename_in_disk_image
+
     $self->json->{arguments}->{disk_image} = 
 	basename($self->json->{arguments}->{disk_image})
 	if defined $self->json->{arguments}->{disk_image};
@@ -33,7 +35,8 @@ sub get_default_version
     $m ++;
     $y += 1900;
 
-    my $osf_id = $self->json->{arguments}->{straight}->{osf_id};
+    my $osf_id = $self->json->{arguments}->{straight}->{osf_id}  //
+	QVD::Admin4::Exception->throw(code=>'23502'); # FIX ME: PREVIOUS REVISION OF MANDATORY ARGUMENTS
     my $osf = $self->db->resultset('OSF')->search({id => $osf_id})->first;
     my $version;
 

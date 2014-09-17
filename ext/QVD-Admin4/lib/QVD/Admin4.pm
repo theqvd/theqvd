@@ -11,11 +11,12 @@ use QVD::Config;
 use File::Copy qw(copy move);
 use Config::Properties;
 use QVD::Admin4::Exception;
+use DateTime;
+use List::Util qw(sum);
 
 our $VERSION = '0.01';
 
-has 'login', is => 'ro', isa => 'Str', required => 1;
-has 'password', is => 'ro', isa => 'Str', required => 1;
+has 'administrator', is => 'ro', isa => 'QVD::DB::Result::Administrator';
 
 my $DB;
 
@@ -39,49 +40,29 @@ sub _exec
 
 sub get_credentials
 {
-    my $self = shift;
+    my ($self,%params) = @_;
 
-    my $user = $DB->resultset('User')->find({ login => $self->login,
-					      password => $self->password}) // 
-						  QVD::Admin4::Exception->throw(code=>'3');
-    
-    $self->is_superadmin($user) ?
-	return $self->superadmin_credentials($user) :
-	return $self->normal_credentials($user);
+    my $admin = eval { $DB->resultset('Administrator')->find(\%params) };
+    return undef unless $admin;
+
+    $self->{administrator} = $admin;
+
+    return { login => $admin->name,
+	     tenant => $admin->tenant_id };
 }
 
-sub is_superadmin
-{
-    my ($self,$user) = @_;
-    $user->login eq 'superadmin' ?# FIX ME: Take from DB Config!!!
-	return 1 : return 0;
-}
+# Nombre genérico
 
-sub superadmin_credentials
-{
-    my ($self,$user) = @_;
-    { tenant => [ map { $_->id } $DB->resultset('Tenant')->all ],
-      role => $user->role->name };
-}
-
-sub normal_credentials
-{
-    my ($self,$user) = @_;
-
-    { tenant => $user->tenant_id, 
-      role => $user->role->name };
-}
 sub _map
 {
     my ($self,$obj,$request,$result,@fields) = @_;
 
-    if ($request->json->{role} eq 'superadmin' &&
-	$obj->can('tenant_id'))
+    if ($self->administrator->is_superadmin)
     {
-	$result->{tenant_id} = $obj->tenant_id;
-	$result->{tenant_name} = $obj->tenant_name;
+	if ($obj->can('tenant_id')) { $result->{tenant_id} = $obj->tenant_id; } 
+	if ($obj->can('tenant_name')) { $result->{tenant_name} = $obj->tenant_name; }
     }
-    
+
     for my $field (@fields)
     {
 	my $mfield = $request->mapper->getProperty($field);
@@ -91,6 +72,7 @@ sub _map
 	    eval { $table eq "me" ? 
 		       $obj->$column : 
 		       $obj->$table->$column } // undef;
+	print $@ if $@;
     }
 
     $result;
@@ -163,11 +145,25 @@ sub user_get_list
 sub user_tiny_list
 {
     my ($self,$request) = @_;
+
     my $result = $self->select($request);
 
     my @fields = qw(id name);
     $_ = $self->_map($_,$request,{},@fields) 
 	for @{$result->{rows}};
+    
+    $result;
+}
+
+
+sub user_all_ids
+{
+    my ($self,$request) = @_;
+
+    my $result = $self->select($request);
+
+    my @fields = qw(id);
+    $_ = $_->id for @{$result->{rows}};
     
     $result;
 }
@@ -232,6 +228,18 @@ sub vm_tiny_list
     $result;
 }
 
+sub vm_all_ids
+{
+    my ($self,$request) = @_;
+
+    my $result = $self->select($request);
+
+    my @fields = qw(id);
+    $_ = $_->id for @{$result->{rows}};
+    
+    $result;
+}
+
 sub vm_get_details
 {
     my ($self,$request) = @_;
@@ -292,6 +300,18 @@ sub host_tiny_list
     $result;
 }
 
+sub host_all_ids
+{
+    my ($self,$request) = @_;
+
+    my $result = $self->select($request);
+
+    my @fields = qw(id);
+    $_ = $_->id for @{$result->{rows}};
+    
+    $result;
+}
+
 sub host_get_details
 {
     my ($self,$request) = @_;
@@ -303,7 +323,6 @@ sub host_get_details
 
     $result;
 }
-
 
 sub host_get_state
 {
@@ -354,6 +373,18 @@ sub osf_tiny_list
     $result;
 }
 
+sub osf_all_ids
+{
+    my ($self,$request) = @_;
+
+    my $result = $self->select($request);
+
+    my @fields = qw(id);
+    $_ = $_->id for @{$result->{rows}};
+    
+    $result;
+}
+
 sub tag_tiny_list
 {
     my ($self,$request) = @_;
@@ -364,6 +395,18 @@ sub tag_tiny_list
     $_ = $self->_map($_,$request,{},@fields) 
 	for @{$result->{rows}};
 
+    $result;
+}
+
+sub tag_all_ids
+{
+    my ($self,$request) = @_;
+
+    my $result = $self->select($request);
+
+    my @fields = qw(id);
+    $_ = $_->id for @{$result->{rows}};
+    
     $result;
 }
 
@@ -415,6 +458,20 @@ sub di_tiny_list
     $result;
 }
 
+sub di_all_ids
+{
+    my ($self,$request) = @_;
+
+    my $result = $self->select($request);
+
+    my @fields = qw(id);
+
+    $_ = $_->id for @{$result->{rows}};
+    
+    $result;
+}
+
+
 sub di_get_details
 {
     my ($self,$request) = @_;
@@ -446,7 +503,7 @@ sub di_update_custom
 sub select
 {
     my ($self,$request) = @_;
-    
+
     my $rs = eval { $DB->resultset($request->table)->search($request->filters, 
 							    $request->modifiers) };
 
@@ -454,7 +511,7 @@ sub select
 				  message => "$@")) if $@;
 
 
-   { total => ($rs->is_paged ? $rs->pager->total_entries : undef), 
+   { total => ($rs->is_paged ? $rs->pager->total_entries : $rs->count), 
      rows => [$rs->all] };
 }
 
@@ -473,6 +530,8 @@ sub update
 				   QVD::Admin4::Exception->throw(code => ($DB->storage->_dbh->state || 4),
 								 message => "$@") if $@;
 				   $self->update_related($request,$obj); } ) };      
+# La excepción no tiene por qué ser un objeto!!
+
 	 if ($@) { $failures->{$obj->id} = ($@->can('code') ? $@->code : 4); }
     }
 
@@ -506,9 +565,10 @@ sub update_custom
     {
 	my $props = $request->arguments(custom => 1);
 	my $f = 
-	sub { $self->custom_update($props->{update},$obj);    
+	sub { 
+	      #$self->custom_update($props->{update},$obj);   
+	      $self->custom_create($props->{set},$obj); 
 	      $self->custom_delete($props->{delete},$obj);    
-	      $self->custom_create($props->{create},$obj);
 		  
 	      eval { $obj->update($request->arguments) };
 	      QVD::Admin4::Exception->throw(code => ($DB->storage->_dbh->state || 4),
@@ -538,7 +598,7 @@ sub custom_create
 	my $t = $class . "_Property";
 	my $k = lc($class) . "_id";
 	my $a = {key => $key, value => $value, $k => $obj->id};
-	eval { $DB->resultset($t)->create($a) };
+	eval { $DB->resultset($t)->update_or_create($a) };
 
 	print $@ if $@;
 	QVD::Admin4::Exception->throw(code => ($DB->storage->_dbh->state || 4),
@@ -816,9 +876,10 @@ sub di_create
 		       $DB->resultset('DI_Tag')->create({di_id => $di->id, tag => 'head'});
 		       $DB->resultset('DI_Tag')->create({di_id => $di->id, tag => 'default'})
 			   unless $di->osf->di_by_tag('default');
-
+		       my $tags = $request->arguments(tags => 1);
+		       $tags = exists $tags->{create} ? $tags->{create} : [];
 		       $self->custom_create($request->arguments(custom => 1),$di);
-                       $self->tags_create($request->arguments(tags => 1),$di);});
+                       $self->tags_create($tags,$di);});
    { total => undef, 
      rows => [] };
 }
@@ -1051,4 +1112,446 @@ sub di_unblock
     $self->update($request,@conditions);
 }
 
+##################################
+## GENERAL STATISTICS FUNCTIONS ##
+##################################
+
+my $JSON_TO_DBIX = { User => { blocked => 'me.blocked',
+                               tenant  => 'me.tenant_id'}, # FIX ME, PLEASE
+                     VM   => { blocked => 'vm_runtime.blocked',
+			       state   => 'vm_runtime.vm_state',
+                               tenant => 'user.tenant_id' },
+		     Host => { blocked => 'runtime.blocked',
+			       state   => 'runtime.state' },
+		     OSF  => { tenant => 'me.tenant_id' },
+		     DI   => { blocked => 'me.blocked',
+                               tenant => 'osf.tenant_id'}};
+
+sub qvd_objects_statistics
+{
+    my $self = shift;
+    my $STATISTICS = {};
+
+    $STATISTICS->{$_}->{total} = 
+	$self->get_total_number_of_qvd_objects($_)
+	for qw(User VM Host OSF DI);
+
+    $STATISTICS->{$_}->{blocked} = 
+	$self->get_number_of_blocked_qvd_objects($_)
+	for qw(User VM Host DI);
+
+    $STATISTICS->{$_}->{running} = 
+	$self->get_number_of_running_qvd_objects($_)
+	for qw(VM Host);
+
+    $STATISTICS->{VM}->{expiration} = 
+	$self->get_vms_with_expitarion_date();
+
+    $STATISTICS->{Host}->{population} = 
+	$self->get_the_most_populated_hosts();
+
+    $STATISTICS;
+}
+
+sub get_total_number_of_qvd_objects
+{
+    my ($self,$qvd_obj) = @_;
+    $qvd_obj =~ /^User|VM|Host|OSF|DI$/ ||
+	QVD::Admin4::Exception->throw(code=>'4');
+
+    $DB->resultset($qvd_obj)->search(
+	{  }, {})->count;
+}
+
+sub get_number_of_blocked_qvd_objects
+{
+    my ($self,$qvd_obj) = @_;
+    $qvd_obj =~ /^User|VM|Host|DI$/ ||
+	QVD::Admin4::Exception->throw(code=>'4');
+
+    my $filter = $JSON_TO_DBIX->{$qvd_obj}->{blocked};
+    my ($related_table) = $filter =~ /^(.+)\.(.+)$/;
+    my $join = $related_table eq 'me' ? 
+	[] : [$related_table];
+
+
+    $DB->resultset($qvd_obj)->search(
+	{ $filter => 'true' }, {join => $join})->count;
+}
+
+sub get_number_of_running_qvd_objects
+{
+    my ($self,$qvd_obj) = @_;
+    $qvd_obj =~ /^VM|Host$/ ||
+	QVD::Admin4::Exception->throw(code=>'4');
+    my $filter = $JSON_TO_DBIX->{$qvd_obj}->{state};
+    my ($related_table) = $filter =~ /^(.+)\.(.+)$/;
+    my $join = $related_table eq 'me' ? 
+	[] : [$related_table];
+
+    $DB->resultset($qvd_obj)->search(
+	{ $filter => 'running' },{join => $join})->count;
+}
+
+sub get_vms_with_expitarion_date
+{
+    my ($self) = @_;
+
+    my $is_not_null = 'IS NOT NULL';
+    my $rs = $DB->resultset('VM')->search(
+	{ -or => [ { 'vm_runtime.vm_expiration_hard'  => \$is_not_null }, 
+		   { 'vm_runtime.vm_expiration_soft'  => \$is_not_null } ] },
+	{ join => [qw(vm_runtime)]});
+
+    my $now = DateTime->now();
+
+    [ sort { DateTime->compare($a->{expiration},$b->{expiration}) }
+      grep { sum(values %{$_->{remaining_time}}) > 0 }
+      map {{ name            => $_->name, 
+	     id              => $_->id,
+	     expiration      => $_->vm_runtime->vm_expiration_hard,
+	     remaining_time  => $self->calculate_date_time_difference($now,
+								      $_->vm_runtime->vm_expiration_hard) }}
+
+      $rs->all ];
+}
+
+sub calculate_date_time_difference
+{
+    my ($self,$now,$then) = @_;
+    my @time_units = qw(days hours minutes seconds);
+    my %time_difference;
+
+    @time_difference{@time_units} = $then->subtract_datetime($now)->in_units(@time_units);
+    \%time_difference;
+}
+
+sub get_the_most_populated_hosts
+{
+    my ($self) = @_;
+
+    my $rs = $DB->resultset('Host')->search({ 'vms.vm_state' => 'running'}, 
+					    { distinct => 1, 
+                                              join => [qw(vms)] });
+    return [] unless $rs->count;
+
+    my @hosts = sort { $b->{number_of_vms} <=> $a->{number_of_vms} }
+                map {{ name          => $_->name, 
+		       id            => $_->id,
+		       number_of_vms => $_->vms_connected }} 
+                $rs->all;
+    my $array_limit = $#hosts > 5 ? 5 : $#hosts;    
+    return [@hosts[0 .. $array_limit]];
+}
+
+###################
+###################
+# ADMIN FUNCTIONS
+###################
+###################
+
+sub admin_tiny_list
+{
+    my ($self,$request) = @_;
+    my $result = $self->select($request);
+
+    my @fields = qw(id name);
+    $_ = $self->_map($_,$request,{},@fields) 
+	for @{$result->{rows}};
+    
+    $result;
+}
+
+sub admin_get_list
+{
+    my ($self,$request) = @_;
+    my $result = $self->select($request);
+
+    my @fields = qw(id name tenant_name tenant);
+    $_ = $self->_map($_,$request,{},@fields) 
+	for @{$result->{rows}};
+    
+    $result;
+}
+
+sub admin_get_details
+{
+    my ($self,$request) = @_;
+    my $result = $self->select($request);
+
+    my @fields = qw(id name tenant_name tenant);
+    $_ = $self->_map($_,$request,{},@fields) 
+	for @{$result->{rows}};
+    
+    $result;
+}
+
+
+sub admin_delete {
+
+    my ($self, $request) = @_;
+
+    my $result = $self->select($request);
+    $self->_delete($result);
+
+   { total => undef, 
+     rows => [] };
+}
+
+sub admin_update
+{
+    my ($self,$request) = @_;
+    $self->update($request);
+}
+
+sub admin_create {
+    my ($self, $request) = @_;
+
+    unless ($self->administrator->is_superadmin)
+    {
+	$request->{json}->{arguments}->{straight}->{tenant_id} =
+	    $self->administrator->tenant_id;
+    }
+
+    $DB->txn_do( sub { my $admin = $self->_create($request);
+		       $self->_create_related($request,$admin);
+		       $self->custom_create($request->arguments(custom => 1),$admin)});
+
+   { total => undef, 
+     rows => [] };
+}
+
+sub tenant_tiny_list
+{
+    my ($self,$request) = @_;
+    my $result = $self->select($request);
+
+    my @fields = qw(id name);
+    $_ = $self->_map($_,$request,{},@fields) 
+	for @{$result->{rows}};
+    
+    $result;
+}
+
+sub tenant_get_list
+{
+    my ($self,$request) = @_;
+    my $result = $self->select($request);
+
+    my @fields = qw(id name);
+    $_ = $self->_map($_,$request,{},@fields) 
+	for @{$result->{rows}};
+    
+    $result;
+}
+
+sub tenant_get_details
+{
+    my ($self,$request) = @_;
+    my $result = $self->select($request);
+
+    my @fields = qw(id name);
+    $_ = $self->_map($_,$request,{},@fields) 
+	for @{$result->{rows}};
+    
+    $result;
+}
+
+sub tenant_update
+{
+    my ($self,$request) = @_;
+    $self->update($request);
+}
+
+sub tenant_create {
+    my ($self, $request) = @_;
+
+    
+    $DB->txn_do( sub { my $admin = $self->_create($request);
+		       $self->_create_related($request,$admin);
+		       $self->custom_create($request->arguments(custom => 1),$admin)});
+
+
+   { total => undef, 
+     rows => [] };
+}
+
+sub tenant_delete {
+
+    my ($self, $request) = @_;
+
+    my $result = $self->select($request);
+    $self->_delete($result);
+
+   { total => undef, 
+     rows => [] };
+}
+
+sub role_tiny_list
+{
+    my ($self,$request) = @_;
+    my $result = $self->select($request);
+
+    my @fields = qw(id name);
+    $_ = $self->_map($_,$request,{},@fields) 
+	for @{$result->{rows}};
+    
+    $result;
+}
+
+sub role_get_details
+{
+    my ($self,$request) = @_;
+    my $result = $self->select($request);
+
+    my @fields = qw(id name roles all_acls
+                    positive_acls negative_acls all_roles roles);
+    $_ = $self->_map($_,$request,{},@fields) 
+	for @{$result->{rows}};
+    
+    $result;
+}
+
+
+sub acl_tiny_list
+{
+    my ($self,$request) = @_;
+    my $result = $self->select($request);
+
+    my @fields = qw(id name);
+    $_ = $self->_map($_,$request,{},@fields) 
+	for @{$result->{rows}};
+    
+    $result;
+}
+
+
+sub role_assign_acls
+{
+    my ($self,$request) = @_;
+    my $result = $self->select($request);   
+    my $failures = {};
+
+    for my $role (@{$result->{rows}})
+    {
+	my $acls = $request->arguments(acls => 1);
+	my $f = 
+	sub { #$self->assing_roles($acls->{assign_roles},$role);    
+	      #$self->unassing_roles($acls->{unassing_roles},$role);
+	      $self->assign_acls($acls->{assign_acls},$role);    
+	      $self->unassign_acls($acls->{unassign_acls},$role);};
+	
+	eval { $DB->txn_do($f)};
+
+	if ($@) { $failures->{$role->id} = ($@->can('code') ? $@->code : 4); }
+    }
+
+    QVD::Admin4::Exception->throw(code => 1, failures => $failures) if %$failures;
+    $result->{rows} = [];
+    $result;
+}
+
+
+sub assign_acls
+{
+    my ($self,$acls,$role) = @_;
+
+    for my $acl_id (@$acls)
+    { 	
+	next if $role->is_allowed_to($acl_id);
+	my $negative_acl = $role->has_negative_acl($acl_id);
+	if ($negative_acl) { $negative_acl->search_related('roles',
+							   { role_id => $role->id, 
+							     acl_id => $acl_id})->first->delete; 
+			     next;}
+
+	eval { $DB->resultset('ACL_Setting')->create({role_id => $role->id,
+						      acl_id  => $acl_id,
+						      positive => 1 }) };
+	print $@ if $@;
+	QVD::Admin4::Exception->throw(code => ($DB->storage->_dbh->state || 4),
+				      message => "$@") if $@;
+    }
+}
+
+sub unassign_acls
+{
+    my ($self,$acls,$role) = @_;
+
+    for my $acl_id (@$acls)
+    { 	
+	next unless $role->is_allowed_to($acl_id);
+	my $positive_acl = $role->has_positive_acl($acl_id);
+	if ($positive_acl) { $positive_acl->search_related('roles',
+							   { role_id => $role->id, 
+							     acl_id => $acl_id})->first->delete; 
+			     next;}
+
+	eval { $DB->resultset('ACL_Setting')->create({role_id => $role->id,
+						      acl_id  => $acl_id,
+						      positive => 0 }) };
+	print $@ if $@;
+	QVD::Admin4::Exception->throw(code => ($DB->storage->_dbh->state || 4),
+				      message => "$@") if $@;
+    }
+}
+
+sub assign_roles
+{
+    my ($self,$roles_to_assign,$this_role) = @_;
+
+    for my $role_to_assign_id (@$roles_to_assign)
+    { 	
+	my $role_to_assign = $DB->resultset('Role')->search(
+	    {id => $role_to_assign_id})->first;
+	QVD::Admin4::Exception->throw(code => 20) 
+	    unless $role_to_assign;
+	QVD::Admin4::Exception->throw(code => 21)
+	    if $this_role->overlaps_with_role($role_to_assign);
+
+	my %acl_ids =  %{$role_to_assign->get_nested_acls};
+	$DB->resultset('ACL_Setting')->search({role_id => $this_role->id,
+					       acl_id  => [keys %acl_ids],
+					       positive => 1})->delete_all;
+
+	eval { $DB->resultset('Inheritance_Roles_Rel')->create(
+		   {inherited_id => $roles_to_assign_id,
+                    inheritor_id => $this_role->id}) };
+
+	print $@ if $@;
+	QVD::Admin4::Exception->throw(code => ($DB->storage->_dbh->state || 4),
+				      message => "$@") if $@;
+    }
+}
+
+sub unassign_roles
+{
+    my ($self,$roles_to_unassign,$this_role) = @_;
+
+    for my $role_to_unassign_id (@$roles_to_unassign)
+    { 	
+	my $role_to_unassign = $DB->resultset('Role')->search(
+	    {id => $role_to_unassign_id})->first;
+	QVD::Admin4::Exception->throw(code => 20) 
+	    unless $role_to_unassign;
+
+	eval { $DB->resultset('Inheritance_Roles_Rel')->search(
+		   {inherited_id => $roles_to_assign_id,
+                    inheritor_id => $this_role->id})->delete_all };
+
+	print $@ if $@;
+	QVD::Admin4::Exception->throw(code => ($DB->storage->_dbh->state || 4),
+				      message => "$@") if $@;
+    }
+
+    my %acl_ids =  %{$this_role->get_nested_acls(no_myself => 1)};
+    
+    defined $acl_ids{$_->acl_id} || $_->delete
+	for $DB->resultset('ACL_Setting')->search({role_id => $this_role->id,
+						   positive => 0})->all;
+
+}
+
+
 1;
+

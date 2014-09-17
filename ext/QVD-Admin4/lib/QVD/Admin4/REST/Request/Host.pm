@@ -15,8 +15,8 @@ sub BUILD
     $self->{mapper} = $mapper;
 
     $self->{dependencies} = {runtime => 1, counters => 1};
-    push @{$self->modifiers->{join}}, ('runtime','vms');
-
+    push @{$self->modifiers->{join}}, ('runtime');
+    push @{$self->modifiers->{join}}, { vms => 'host'};
     $self->_check;
     $self->_map;
 }
@@ -36,7 +36,7 @@ blocked =  runtime.blocked
 frontend = me.frontend
 backend =  me.backend
 state = runtime.state
-vm_id = vms.vm_id 
+vm_id = vms.vm_id
 load = me.load
 creation_admin = me.creation_admin
 creation_date = me.creation_date

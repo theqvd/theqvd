@@ -10,8 +10,7 @@ use QVD::Log;
 #   user_* => l7r_*
 #   user_ip => l7r_client_ip
 
-
-__PACKAGE__->load_components(qw/Core/);
+__PACKAGE__->load_components(qw/Core InflateColumn::DateTime/);
 __PACKAGE__->table('vm_runtimes');
 __PACKAGE__->add_columns( vm_id          => { data_type   => 'integer' },
 			  host_id        => { data_type   => 'integer',
@@ -74,7 +73,7 @@ __PACKAGE__->add_columns( vm_id          => { data_type   => 'integer' },
 
 __PACKAGE__->set_primary_key('vm_id');
 
-__PACKAGE__->belongs_to(host => 'QVD::DB::Result::Host', 'host_id', { join_type => 'LEFT' });
+__PACKAGE__->belongs_to(host => 'QVD::DB::Result::Host', 'host_id', { join_type =>  'LEFT' });
 #__PACKAGE__->belongs_to(l7r_host => 'QVD::DB::Result::Host', 'l7r_host_id', { join_type => 'LEFT' }); # FIXME: COMMENTED BECAUSE TRIGGERS ERROR WHEN ASKING DB
 __PACKAGE__->belongs_to(vm   => 'QVD::DB::Result::VM', 	 'vm_id',   { cascade_delete => 1 });
 __PACKAGE__->belongs_to(real_user => 'QVD::DB::Result::User', 'real_user_id', { cascade_delete => 0 });

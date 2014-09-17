@@ -47,7 +47,8 @@ sub delete_tag {
 sub tags_get_columns
 {
     my $self = shift;
-    [ map { { $_->get_columns } } $self->tags ];
+    [ sort { $a->{tag} cmp $b->{tag} }
+      map { { $_->get_columns } } $self->tags ];
 }
 
 

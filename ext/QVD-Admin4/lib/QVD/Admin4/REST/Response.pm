@@ -63,6 +63,8 @@ __DATA__
 17 = Condition to create violated.
 18 = Imposible to change state in current state.
 19 = Related arguments are not part of this tenant.
+20 = Unknow role.
+21 = Invalid role: overlapping condition violated.
 23503 = Foreign Key violation.
 23502 = Lack of mandatory argument violation.
 23505 = Unique Key violation.

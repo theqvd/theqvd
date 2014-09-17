@@ -18,7 +18,8 @@ sub BUILD
     push @{$self->modifiers->{join}}, qw(osf);
     push @{$self->modifiers->{join}}, { vm_runtime => 'host' };
     push @{$self->modifiers->{join}}, { user => 'tenant' };
-    
+
+# Create function ->get_di_id_subquery    
     if (defined $self->json->{filters}->{di_id})
     {
 	my $dirs = $self->db->resultset('DI'); 
@@ -75,7 +76,6 @@ host            = host.name
 host_name       = me.host_name
 di_id           = vm_runtime.current_di_id
 user_state      = vm_runtime.user_state
-di_tag          = me.di_tag
 ip              = me.ip
 next_boot_ip    = vm_runtime.vm_address 
 ssh_port        = vm_runtime.vm_ssh_port

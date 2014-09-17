@@ -17,7 +17,7 @@ __PACKAGE__->add_unique_constraint(['address']);
 
 __PACKAGE__->has_many(properties => 'QVD::DB::Result::Host_Property', \&custom_join_condition, 
 		      {join_type => 'LEFT', order_by => {'-asc' => 'key'}});
-__PACKAGE__->has_many(vms        => 'QVD::DB::Result::VM_Runtime',    'host_id', { cascade_delete => 0 });
+__PACKAGE__->has_many(vms        => 'QVD::DB::Result::VM_Runtime',    'host_id',  { cascade_delete => 0 });
 #__PACKAGE__->has_many(vm_l7rs    => 'QVD::DB::Result::VM_Runtime',    'l7r_host_id', { cascade_delete => 0 }); #FIXME COMMENTED BECAUSE TRIGGERS ERROR WHEN ASKING DB
 __PACKAGE__->has_one (runtime    => 'QVD::DB::Result::Host_Runtime',  'host_id');
 __PACKAGE__->has_one (counters   => 'QVD::DB::Result::Host_Counter',  'host_id');
