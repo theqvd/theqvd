@@ -39,11 +39,16 @@ sub combined_properties {
 				 $vm->properties );
 }
 
-sub di {
-    my $self = shift;
-    my $tag = eval { $self->di_tag } // 'default';
-    #warn "tag: $tag";
-    $self->osf->di_by_tag($tag);
-}
+__PACKAGE__->belongs_to(di => 'QVD::DB::Result::DI',
+			sub {
+  			  my $args = shift;
+ 			  my $in = <<EOIN;
+ IN ( SELECT dis.id from dis, di_tags
+       WHERE di_tags.di_id = dis.id
+         AND di_tags.tag = $args->{self_alias}.di_tag )
+EOIN
+  			  return { "$args->{foreign_alias}.osf_id" => {-ident => "$args->{self_alias}.osf_id"},
+				   "$args->{foreign_alias}.id" => \$in };
+			});
 
 1;
