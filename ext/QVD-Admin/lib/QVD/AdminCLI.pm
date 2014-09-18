@@ -1476,7 +1476,7 @@ sub _utc2localtime {
 sub cmd_vm_list {
     my ($self) = @_;
     
-    my $rs = $self->get_resultset('vm')->search({}, { order_by => 'id',
+    my $rs = $self->get_resultset('vm')->search({}, { order_by => 'me.id',
 						      prefetch => ['user', 'osf', 'di',
 								   { vm_runtime => ['host', 'real_user'] } ] });
     
