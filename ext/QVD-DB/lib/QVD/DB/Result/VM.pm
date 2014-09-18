@@ -43,12 +43,13 @@ __PACKAGE__->belongs_to(di => 'QVD::DB::Result::DI',
 			sub {
   			  my $args = shift;
  			  my $in = <<EOIN;
- IN ( SELECT dis.id from dis, di_tags
-       WHERE di_tags.di_id = dis.id
-         AND di_tags.tag = $args->{self_alias}.di_tag )
+ SELECT dis.id from dis, di_tags
+  WHERE di_tags.di_id = dis.id
+    AND di_tags.tag = $args->{self_alias}.di_tag
 EOIN
   			  return { "$args->{foreign_alias}.osf_id" => {-ident => "$args->{self_alias}.osf_id"},
-				   "$args->{foreign_alias}.id" => \$in };
+				   "$args->{foreign_alias}.id" => { -in => \$in } };
+
 			});
 
 1;
