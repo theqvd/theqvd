@@ -1458,7 +1458,7 @@ di_tag: Use the disk image with tag "t". Change takes effect on VM start.
 Valid options:
     -f [--filter] FILTER : edits virtual machines matched by FILTER
     --force              : perform the operation without asking
-    -q [--quiet]         : don't print messages
+    -q [--quiet]         : do not print messages
 EOT
 }
 
@@ -1476,7 +1476,9 @@ sub _utc2localtime {
 sub cmd_vm_list {
     my ($self) = @_;
     
-    my $rs = $self->get_resultset('vm')->search({}, {order_by => 'id'});
+    my $rs = $self->get_resultset('vm')->search({}, { order_by => 'id',
+						      prefetch => ['user', 'osf', 'di',
+								   { vm_runtime => ['host', 'real_user'] } ] });
     
     my @header = ("Id","Name","User","RealUser","Ip","OSF", "DI_Tag", "DI", "Host","State","L7R","UserState","Blocked",
                   "Expire soft", "Expire hard");
