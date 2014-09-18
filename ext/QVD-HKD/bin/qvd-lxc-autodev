@@ -5,3 +5,5 @@
 cd ${LXC_ROOTFS_MOUNT}/dev
 
 mknod -m 666 fuse c 10 229
+exit 0
+
