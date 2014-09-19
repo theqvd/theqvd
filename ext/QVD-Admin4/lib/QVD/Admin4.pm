@@ -708,6 +708,7 @@ sub _delete
 		    QVD::Admin4::Exception->throw(code => 16)
 		    for @conditions; 
 		$obj->delete };
+	 print $@ if $@;
 	 if ($@) { $failures->{$obj->id} = ($@->can('code') ? $@->code : 4); }
     }
 
@@ -1244,11 +1245,11 @@ sub get_the_most_populated_hosts
     return [@hosts[0 .. $array_limit]];
 }
 
-###################
+
 ###################
 # ADMIN FUNCTIONS
 ###################
-###################
+
 
 sub admin_tiny_list
 {
@@ -1267,7 +1268,7 @@ sub admin_get_list
     my ($self,$request) = @_;
     my $result = $self->select($request);
 
-    my @fields = qw(id name tenant_name tenant);
+    my @fields = qw(id name);
     $_ = $self->_map($_,$request,{},@fields) 
 	for @{$result->{rows}};
     
@@ -1279,7 +1280,7 @@ sub admin_get_details
     my ($self,$request) = @_;
     my $result = $self->select($request);
 
-    my @fields = qw(id name tenant_name tenant);
+    my @fields = qw(id name acls roles);
     $_ = $self->_map($_,$request,{},@fields) 
 	for @{$result->{rows}};
     
@@ -1302,6 +1303,7 @@ sub admin_update
 {
     my ($self,$request) = @_;
     $self->update($request);
+    $self->admin_assign_roles($request);
 }
 
 sub admin_create {
@@ -1371,7 +1373,6 @@ sub tenant_create {
 		       $self->_create_related($request,$admin);
 		       $self->custom_create($request->arguments(custom => 1),$admin)});
 
-
    { total => undef, 
      rows => [] };
 }
@@ -1399,19 +1400,29 @@ sub role_tiny_list
     $result;
 }
 
-sub role_get_details
+sub role_get_list
 {
     my ($self,$request) = @_;
     my $result = $self->select($request);
 
-    my @fields = qw(id name roles all_acls
-                    positive_acls negative_acls all_roles roles);
+    my @fields = qw(id name);
     $_ = $self->_map($_,$request,{},@fields) 
 	for @{$result->{rows}};
     
     $result;
 }
 
+sub role_get_details
+{
+    my ($self,$request) = @_;
+    my $result = $self->select($request);
+
+    my @fields = qw(id name inherited_roles own_acls inherited_acls);
+    $_ = $self->_map($_,$request,{},@fields) 
+	for @{$result->{rows}};
+    
+    $result;
+}
 
 sub acl_tiny_list
 {
@@ -1426,23 +1437,41 @@ sub acl_tiny_list
 }
 
 
+sub acl_get_list
+{
+    my ($self,$request) = @_;
+    my $result = $self->select($request);
+
+    my @fields = qw(id name roles);
+    $_ = $self->_map($_,$request,{},@fields) 
+	for @{$result->{rows}};
+    
+    $result;
+}
+
+
+sub role_update
+{
+    my ($self,$request) = @_;
+
+    $self->update($request);
+    $self->role_assign_acls($request);
+}
+
 sub role_assign_acls
 {
     my ($self,$request) = @_;
+
     my $result = $self->select($request);   
     my $failures = {};
+    my $acls = $request->arguments(acls => 1);
 
     for my $role (@{$result->{rows}})
     {
-	my $acls = $request->arguments(acls => 1);
-	my $f = 
-	sub { #$self->assing_roles($acls->{assign_roles},$role);    
-	      #$self->unassing_roles($acls->{unassing_roles},$role);
-	      $self->assign_acls($acls->{assign_acls},$role);    
-	      $self->unassign_acls($acls->{unassign_acls},$role);};
-	
-	eval { $DB->txn_do($f)};
-
+	eval { $DB->txn_do(sub { $self->assign_roles($acls->{assign_roles},$role);    
+				 $self->unassign_roles($acls->{unassign_roles},$role);
+				 $self->assign_acls($acls->{assign_acls},$role);    
+				 $self->unassign_acls($acls->{unassign_acls},$role); }) };
 	if ($@) { $failures->{$role->id} = ($@->can('code') ? $@->code : 4); }
     }
 
@@ -1451,48 +1480,39 @@ sub role_assign_acls
     $result;
 }
 
-
 sub assign_acls
 {
-    my ($self,$acls,$role) = @_;
+    my ($self,$acl_ids,$role) = @_;
 
-    for my $acl_id (@$acls)
+    for my $acl_id (@$acl_ids)
     { 	
-	next if $role->is_allowed_to($acl_id);
-	my $negative_acl = $role->has_negative_acl($acl_id);
-	if ($negative_acl) { $negative_acl->search_related('roles',
-							   { role_id => $role->id, 
-							     acl_id => $acl_id})->first->delete; 
-			     next;}
-
-	eval { $DB->resultset('ACL_Setting')->create({role_id => $role->id,
-						      acl_id  => $acl_id,
-						      positive => 1 }) };
-	print $@ if $@;
-	QVD::Admin4::Exception->throw(code => ($DB->storage->_dbh->state || 4),
-				      message => "$@") if $@;
+	my $acl = $DB->resultset('ACL')->search(
+	    { id => $acl_id })->first;
+	QVD::Admin4::Exception->throw(code => 21) 
+	    unless $acl; 
+	next if $role->is_allowed_to($acl->name);
+	$role->has_negative_acl($acl->name) ?
+	    $role->unassign_acls($acl->id) :
+	    $role->assign_acl($acl->id,1);
     }
 }
 
 sub unassign_acls
 {
-    my ($self,$acls,$role) = @_;
+    my ($self,$acl_ids,$role) = @_;
 
-    for my $acl_id (@$acls)
+    for my $acl_id (@$acl_ids)
     { 	
-	next unless $role->is_allowed_to($acl_id);
-	my $positive_acl = $role->has_positive_acl($acl_id);
-	if ($positive_acl) { $positive_acl->search_related('roles',
-							   { role_id => $role->id, 
-							     acl_id => $acl_id})->first->delete; 
-			     next;}
+	my $acl = $DB->resultset('ACL')->search(
+	    { id => $acl_id })->first;
+	QVD::Admin4::Exception->throw(code => 21)
+	    unless $acl; 
 
-	eval { $DB->resultset('ACL_Setting')->create({role_id => $role->id,
-						      acl_id  => $acl_id,
-						      positive => 0 }) };
-	print $@ if $@;
-	QVD::Admin4::Exception->throw(code => ($DB->storage->_dbh->state || 4),
-				      message => "$@") if $@;
+	next unless $role->is_allowed_to($acl->name);
+
+	$role->has_positive_acl($acl->name) ?
+	    $role->unassign_acls($acl->id) :
+	    $role->assign_acl($acl->id,0);
     }
 }
 
@@ -1506,21 +1526,10 @@ sub assign_roles
 	    {id => $role_to_assign_id})->first;
 	QVD::Admin4::Exception->throw(code => 20) 
 	    unless $role_to_assign;
-	QVD::Admin4::Exception->throw(code => 21)
-	    if $this_role->overlaps_with_role($role_to_assign);
 
-	my %acl_ids =  %{$role_to_assign->get_nested_acls};
-	$DB->resultset('ACL_Setting')->search({role_id => $this_role->id,
-					       acl_id  => [keys %acl_ids],
-					       positive => 1})->delete_all;
-
-	eval { $DB->resultset('Inheritance_Roles_Rel')->create(
-		   {inherited_id => $roles_to_assign_id,
-                    inheritor_id => $this_role->id}) };
-
-	print $@ if $@;
-	QVD::Admin4::Exception->throw(code => ($DB->storage->_dbh->state || 4),
-				      message => "$@") if $@;
+	my @acl_ids = [$role_to_assign->_get_inherited_acls(return_value => 'id')];
+	$this_role->unassign_acls(\@acl_ids);
+	$this_role->assign_role($role_to_assign->id);
     }
 }
 
@@ -1534,24 +1543,74 @@ sub unassign_roles
 	    {id => $role_to_unassign_id})->first;
 	QVD::Admin4::Exception->throw(code => 20) 
 	    unless $role_to_unassign;
-
-	eval { $DB->resultset('Inheritance_Roles_Rel')->search(
-		   {inherited_id => $roles_to_assign_id,
-                    inheritor_id => $this_role->id})->delete_all };
-
-	print $@ if $@;
-	QVD::Admin4::Exception->throw(code => ($DB->storage->_dbh->state || 4),
-				      message => "$@") if $@;
+	$this_role->unassign_roles($role_to_unassign->id);
     }
 
-    my %acl_ids =  %{$this_role->get_nested_acls(no_myself => 1)};
-    
-    defined $acl_ids{$_->acl_id} || $_->delete
-	for $DB->resultset('ACL_Setting')->search({role_id => $this_role->id,
-						   positive => 0})->all;
+    my %acl_ids = map { $_->id => 1 } $this_role->_get_only_inherited_acls(return_value => 'id');
 
+    defined $acl_ids{$_} || $this_role->unassign_acls($_,0)
+    for $this_role->_get_own_acls(return_value => 'id', positive => 0);
 }
 
+sub role_create {
+    my ($self, $request) = @_;
+    
+    $DB->txn_do( sub { my $role = $self->_create($request);
+		       $self->_create_related($request,$role);
+                       $self->role_assign_acls($request,$role);});
+   { total => undef, 
+     rows => [] };
+}
+
+
+sub role_delete {
+
+    my ($self, $request) = @_;
+
+    my $result = $self->select($request);
+    $self->_delete($result);
+
+   { total => undef, 
+     rows => [] };
+}
+
+sub admin_assign_roles
+{
+    my ($self,$request) = @_;
+
+    my $result = $self->select($request);   
+    my $failures = {};
+    my $roles = $request->arguments(acls => 1);
+
+    for my $admin (@{$result->{rows}})
+    {
+	eval { $DB->txn_do(sub { $self->add_role_to_admin($roles->{assign_roles},$admin);
+				 $self->del_role_to_admin($roles->{unassign_roles},$admin); }) };
+	if ($@) { $failures->{$admin->id} = ($@->can('code') ? $@->code : 4); }
+    }
+
+    QVD::Admin4::Exception->throw(code => 1, failures => $failures) if %$failures;
+    $result->{rows} = [];
+    $result;
+}
+
+sub del_role_to_admin
+{
+    my ($self,$role_ids,$admin) = @_;
+    $DB->resultset('Role_Assignment_Relation')->search(
+	{role_id => $role_ids,
+	 administrator_id => $admin->id})->delete_all;
+}
+
+sub add_role_to_admin
+{
+    my ($self,$role_ids,$admin) = @_;
+
+
+    eval { $DB->resultset('Role_Assignment_Relation')->create(
+	       {role_id => $_,
+		administrator_id => $admin->id}) } for @$role_ids;
+}
 
 1;
 

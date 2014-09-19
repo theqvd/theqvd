@@ -13,7 +13,7 @@ sub BUILD
     my $self = shift;
 
     $self->{mapper} = $mapper;
-
+    push @{$self->modifiers->{join}}, { roles => { role => { administrators => 'administrator' }}};
     $self->_check;
     $self->_map;
 }
@@ -24,3 +24,6 @@ __DATA__
 
 id = me.id
 name = me.name
+role_id = role.id
+admin_id = administrator.id
+roles = me.get_roles_with_this_acl

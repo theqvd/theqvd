@@ -15,7 +15,7 @@ sub BUILD
     my $self = shift;
 
     $self->{mapper} = $mapper;
-    push @{$self->modifiers->{join}}, qw(tenant role);
+    push @{$self->modifiers->{join}}, qw(tenant);
 
     $self->json->{filters}->{password} = 
 	$self->_password_to_token($self->json->{filters}->{password})

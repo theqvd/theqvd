@@ -113,8 +113,8 @@ sub load_actions
 	$params->{arguments} = { map { $_ => 1 } (split ',', $params->{arguments})} 
 	if $params->{arguments};
 	
-	$params->{roles} = { map { $_ => 1 } (split ',', $params->{roles})} 
-	if $params->{roles};
+	$params->{acls} = { map { $_ => 1 } (split ',', $params->{acls})} 
+	if $params->{acls};
 	
 	$params->{order_by} = [split ',', $params->{order_by}] 
 	    if $params->{order_by};
@@ -131,6 +131,7 @@ __DATA__
 
 user_get_list.type=list
 user_get_list.roles=superadmin,admin,user
+user_get_list.acls=see_user
 user_get_list.table=User
 user_get_list.filters=name,tenant
 user_get_list.mandatory=tenant
@@ -138,6 +139,7 @@ user_get_list.free=name
 
 user_tiny_list.type=tiny
 user_tiny_list.roles=superadmin,admin,user
+user_tiny_list.acls=see_user
 user_tiny_list.table=User
 user_tiny_list.order_by=name
 user_tiny_list.filters=tenant
@@ -145,6 +147,7 @@ user_tiny_list.mandatory=tenant
 
 user_all_ids.type=all_ids
 user_all_ids.roles=superadmin,admin,user
+user_all_ids.acls=see_user
 user_all_ids.table=User
 user_all_ids.filters=name,tenant
 user_all_ids.mandatory=tenant
@@ -152,18 +155,21 @@ user_all_ids.free=name
 
 user_get_details.type=details
 user_get_details.roles=superadmin,admin,user
+user_get_details.acls=see_user
 user_get_details.table=User
 user_get_details.filters=id,tenant
 user_get_details.mandatory=id,tenant
 
 user_get_state.type=state
 user_get_state.roles=superadmin,admin,user
+user_get_state.acls=see_user
 user_get_state.table=User
 user_get_state.filters=id,tenant
 user_get_state.mandatory=id,tenant
 
 user_update.type=update
 user_update.roles=admin,superadmin
+user_update.acls=update_user
 user_update.table=User
 user_update.arguments=name,password,blocked
 user_update.filters=id,tenant
@@ -171,6 +177,7 @@ user_update.mandatory=id,tenant
 
 user_update_custom.type=update_custom
 user_update_custom.roles=admin,superadmin
+user_update_custom.acls=update_user
 user_update_custom.table=User
 user_update_custom.arguments=name,password,blocked
 user_update_custom.filters=id,tenant
@@ -178,6 +185,7 @@ user_update_custom.mandatory=id,tenant
 
 user_create.type=create
 user_create.roles=admin,superadmin
+user_create.acls=create_user
 user_create.table=User
 user_create.arguments=name,password,role,blocked,tenant
 user_create.default.blocked=false
@@ -185,6 +193,7 @@ user_create.default.role=3
 
 user_delete.type=delete
 user_delete.roles=admin,superadmin
+user_delete.acls=delete_user
 user_delete.table=User
 user_delete.filters=id,tenant
 user_delete.mandatory=id,tenant
@@ -475,8 +484,8 @@ admin_tiny_list.order_by=name
 admin_get_list.type=list
 admin_get_list.roles =superadmin,admin
 admin_get_list.table =Administrator
-admin_get_list.filters=tenant,name
-admin_get_list.free=name
+admin_get_list.filters=tenant,name,acl_id,acl_name,role_id,role_name
+admin_get_list.free=name,acl_name,role_name
 admin_get_list.order_by=name
 
 admin_get_details.type=details
@@ -544,9 +553,13 @@ tenant_delete.mandatory=id,tenant
 role_tiny_list.type=tiny
 role_tiny_list.roles =superadmin,admin
 role_tiny_list.table =Role
-role_tiny_list.filters=name
-role_tiny_list.free=name
 role_tiny_list.order_by=name
+
+role_get_list.type=tiny
+role_get_list.roles =superadmin,admin
+role_get_list.table =Role
+role_get_list.filters=name,acl_id,acl_name,nested_role_id,nested_role_name
+role_get_list.free=name,acl_name,nested_role_name
 
 role_get_details.type=details
 role_get_details.roles =superadmin,admin
@@ -560,15 +573,31 @@ acl_tiny_list.filters=name
 acl_tiny_list.free=name
 acl_tiny_list.order_by=name
 
+acl_get_list.type=list
+acl_get_list.roles =superadmin,admin
+acl_get_list.table =ACL
+acl_get_list.filters=name,role_id,admin_id
+
 acl_create.type=create
 acl_create.roles =superadmin,admin
 acl_create.table =ACL
 acl_create.arguments =name,password,tenant
 
-role_assign_acls.type=update_custom
-role_assign_acls.roles=admin,superadmin
-role_assign_acls.table=Role
-role_assign_acls.filters=id
-role_assign_acls.mandatory=id
+role_update.type=update_custom
+role_update.roles=admin,superadmin
+role_update.table=Role
+role_update.filters=id
+role_update.mandatory=id
+
+role_create.type=create
+role_create.roles =superadmin,admin
+role_create.table =Role
+role_create.arguments =name
+
+role_delete.type=delete
+role_delete.roles=admin,superadmin
+role_delete.table=Role
+role_delete.filters=id
+role_delete.mandatory=id
 
 qvd_objects_statistics.type=general

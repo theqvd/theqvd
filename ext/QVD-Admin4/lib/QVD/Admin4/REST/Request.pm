@@ -41,6 +41,7 @@ sub stablish_default_structure
     my $self = shift;
 
     $self->json->{filters} //= {};
+    $self->config->{acls} //= {};
     $self->config->{arguments} //= {};
     $self->config->{filters} //= {};
     $self->config->{mandatory} //= {};
@@ -107,6 +108,10 @@ sub check_credentials_values
 {
     my $self = shift;
 	
+    $self->administrator->is_allowed_to($_) || 
+	QVD::Admin4::Exception->throw(code => 8)
+	for keys %{$self->config->{acls}};
+
     return unless
 	defined $self->config->{filters}->{tenant};
 

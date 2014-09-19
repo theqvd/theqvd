@@ -22,4 +22,9 @@ sub get_roles
     map { $_->role } $self->roles;
 }
 
+sub get_roles_with_this_acl
+{
+    my $self = shift;
+    [map { $_->name } $self->get_roles];
+}
 1;

@@ -14,7 +14,8 @@ sub BUILD
 
     $self->{mapper} = $mapper;
 
-    push @{$self->modifiers->{join}}, qw(acls roles);
+    push @{$self->modifiers->{join}}, {roles => 'inherited', 
+				       acls => 'acl'};
 
     $self->_check;
     $self->_map;
@@ -26,10 +27,11 @@ __DATA__
 
 id = me.id
 name = me.name
-all_acls = me.get_nested_acls
-positive_acls = me.get_positive_acls_columns
-negative_acls = me.get_negative_acls_columns
-all_roles = me.get_nested_roles
-roles = me.get_roles
-acl_id = acls.acl_id
-
+own_acls = me.get_own_acls
+inherited_acls = me.get_inherited_acls_kk
+own_roles = me.get_own_roles
+inherited_roles = me.get_inherited_roles_kk
+acl_id = acl.id
+acl_name = acl.name
+nested_role_id = inherited.id
+nested_role_name = inherited.name

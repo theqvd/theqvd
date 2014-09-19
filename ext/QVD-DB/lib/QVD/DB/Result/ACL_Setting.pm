@@ -14,7 +14,7 @@ __PACKAGE__->add_columns(id          => { data_type => 'integer',
 
 __PACKAGE__->set_primary_key('id');
 __PACKAGE__->add_unique_constraint([qw(role_id acl_id)]);
-__PACKAGE__->belongs_to(acl => 'QVD::DB::Result::ACL', 'acl_id', { cascade_delete => 0 } );
-__PACKAGE__->belongs_to(role => 'QVD::DB::Result::Role', 'role_id', { cascade_delete => 0 } );
+__PACKAGE__->belongs_to(acl => 'QVD::DB::Result::ACL', 'acl_id');
+__PACKAGE__->belongs_to(role => 'QVD::DB::Result::Role', 'role_id');
 
 1;

@@ -14,6 +14,8 @@ sub BUILD
 
     $self->{mapper} = $mapper;
     push @{$self->modifiers->{join}}, qw(tenant);
+    push @{$self->modifiers->{join}}, { roles => { role => { acls => 'acl' }}};
+
     $self->json->{filters}->{password} = 
 	$self->_password_to_token($self->json->{filters}->{password})
 	if defined $self->json->{filters}->{password};
@@ -60,3 +62,9 @@ name = me.name
 password = me.password
 tenant = me.tenant_id
 tenant_name = tenant.name
+acls = me.get_acls
+roles = me.get_roles
+acl_id = acl.id
+acl_name = acl.name
+role_id = role.id
+role_name = role.name

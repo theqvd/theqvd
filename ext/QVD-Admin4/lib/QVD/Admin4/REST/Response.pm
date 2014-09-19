@@ -51,7 +51,7 @@ __DATA__
 5 = Action non supported.
 6 = Unable to assign tenant to user: permissions problem.
 7 = Unable to assign role to user: permissions problem.
-8 = Forbidden action for this user.
+8 = Forbidden action for this administrator.
 9 = Inappropiate filter for this action.
 10 = No mandatory filter for this action.
 11 = Unknown filter for this action.
@@ -64,7 +64,7 @@ __DATA__
 18 = Imposible to change state in current state.
 19 = Related arguments are not part of this tenant.
 20 = Unknow role.
-21 = Invalid role: overlapping condition violated.
+21 = Unknown acl
 23503 = Foreign Key violation.
 23502 = Lack of mandatory argument violation.
 23505 = Unique Key violation.
