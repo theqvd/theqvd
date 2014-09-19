@@ -9,3 +9,6 @@ CLASS_ICON_LOGOUT = 'fa fa-power-off';
 
 COL_BRAND = '#cb540a';
 COL_BRAND_DARK = '#9a4008';
+
+QVD_OBJS_WITH_PROPERTIES = ['user', 'vm', 'host', 'osf', 'di'];
+QVD_OBJS_CLASSIFIED_BY_TENANT = ['user', 'vm', 'osf', 'di', 'admin'];

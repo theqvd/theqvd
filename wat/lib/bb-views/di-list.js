@@ -70,7 +70,7 @@ Wat.Views.DIListView = Wat.Views.ListView.extend({
         var osf_id = context.find('select[name="osf_id"]').val();
         
         var arguments = {
-            "propertyChanges" : properties.create,
+            "propertyChanges" : properties.set,
             "blocked": blocked ? 1 : 0,
             "osf_id": osf_id
         };

@@ -66,20 +66,10 @@ Wat.Views.DIDetailsView = Wat.Views.DetailsView.extend({
     },
     
     render: function () {
-        // Add name of the model to breadcrumbs
+        // Add name of the image disk to breadcrumbs because in this case is not 'name'
         this.breadcrumbs.next.next.screen = this.model.get('disk_image');
         
         Wat.Views.DetailsView.prototype.render.apply(this);
-        
-        this.templateDetailsSide = Wat.A.getTemplate(this.detailsSideTemplateName);
-        
-        this.template = _.template(
-            this.templateDetailsSide, {
-                model: this.model
-            }
-        );
-        
-        $(this.sideContainer).html(this.template);
     },
     
     openEditElementDialog: function(e) {

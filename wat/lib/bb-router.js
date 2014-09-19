@@ -14,6 +14,12 @@ Wat.Router = Backbone.Router.extend({
         "users": "listUser",
         "user/:id": "detailsUser",
         "setup/customize": "setupCustomize",
+        "setup/tenants": "setupTenant",
+        "setup/admins": "setupAdmin",
+        "setup/admin/:id": "detailsAdmin",
+        "setup/roles": "setupRole",
+        "setup/role/:id": "detailsRole",
+        "setup/config": "setupConfig",
         "help/about": "about",
         "*actions": "defaultRoute" // Backbone will try match the route above first
     },

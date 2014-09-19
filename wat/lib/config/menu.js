@@ -24,9 +24,14 @@ Wat.I.cornerMenu = {
             iconClass: 'fa fa-wrench',
             subMenu: {
                 admins: {
-                    text: 'Admins',
+                    text: 'Administrators',
                     link: '#/setup/admins',
                     iconClass: 'fa fa-suitcase' 
+                },
+                roles: {
+                    text: 'Roles',
+                    link: '#/setup/roles',
+                    iconClass: 'fa fa-graduation-cap' 
                 },
                 tenants: {
                     text: 'Tenants',

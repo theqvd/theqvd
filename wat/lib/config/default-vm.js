@@ -266,6 +266,7 @@ Wat.I.listActionButton[qvdObj] = {
 
 // Breadcrumbs configuration on list view
 $.extend(Wat.I.listBreadCrumbs[qvdObj], Wat.I.homeBreadCrumbs);
+
 Wat.I.listBreadCrumbs[qvdObj]['next'] = {
             'screen': 'Virtual machine list'
         };

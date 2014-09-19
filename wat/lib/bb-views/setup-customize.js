@@ -1,4 +1,4 @@
-Wat.Views.ConfigCustomizeView = Wat.Views.MainView.extend({
+Wat.Views.SetupCustomizeView = Wat.Views.MainView.extend({
     setupCommonTemplateName: 'setup-common',
     setupCustomizeTemplateName: 'setup-customize',
     setupCustomizeFormTemplateName: 'setup-customize-form',
@@ -21,7 +21,6 @@ Wat.Views.ConfigCustomizeView = Wat.Views.MainView.extend({
     },
     
     initialize: function (params) {
-        //this.model = new Wat.Models.DI(params);
         Wat.Views.MainView.prototype.initialize.apply(this, [params]);
 
         this.render();
@@ -29,6 +28,7 @@ Wat.Views.ConfigCustomizeView = Wat.Views.MainView.extend({
     
     events: {
         'change select[name="obj-qvd-select"]': 'changeSection',
+        'change select[name="tenant-select"]': 'changeSection',
         'click a.button-update-customize': 'updateCustomize'
     },
     
@@ -194,7 +194,7 @@ Wat.Views.ConfigCustomizeView = Wat.Views.MainView.extend({
         );
         
         $(this.el).html(this.template);
-                
+        
         this.renderBlock();
     },
     
@@ -208,6 +208,14 @@ Wat.Views.ConfigCustomizeView = Wat.Views.MainView.extend({
         );
         
         $(this.setupContainer).html(this.template);
+        
+        // Fill OSF select on virtual machines creation form
+        var params = {
+            'action': 'tenant_tiny_list',
+            'controlName': 'tenant-select'
+        };
+        
+        Wat.A.fillSelect(params);  
         
         this.renderForm();
     },

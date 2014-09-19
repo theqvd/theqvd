@@ -1,4 +1,3 @@
-<form class="form">
 <table>
     <tr>
         <td data-i18n="Name" class="mandatory-label"></td>
@@ -19,4 +18,3 @@
         </td>
     </tr>
  </table>
- </form>

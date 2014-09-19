@@ -194,7 +194,11 @@ Wat.I = {
         user: {},
         host: {},
         osf: {},
-        di: {}
+        di: {},
+        admin: {},
+        tenant: {},
+        role: {},
+        acl: {}
     },   
         
     getListBreadCrumbs: function (qvdObj) {
@@ -207,7 +211,11 @@ Wat.I = {
         user: {},
         host: {},
         osf: {},
-        di: {}
+        di: {},
+        admin: {},
+        tenant: {},
+        role: {},
+        acl: {}
     },   
         
     getDetailsBreadCrumbs: function (qvdObj) {

@@ -134,6 +134,12 @@
                             margin-right: 5px;
                         }
                         
+                
+                        &.fa-graduation-cap:before {
+                            margin-right: 2px;
+                            margin-left: -2px;
+                        }
+                        
                         &:hover {
                             font-weight: bold;
                             color: $col_whiter;
@@ -159,6 +165,11 @@
             &:before {
                 margin-right: 5px;
                 font-weight: normal;
+            }
+            
+            &.fa-graduation-cap:before {
+                margin-right: 2px;
+                margin-left: -2px;
             }
         
             &.selected-option, &:hover {

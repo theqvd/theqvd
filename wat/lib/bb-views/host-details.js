@@ -49,23 +49,6 @@ Wat.Views.HostDetailsView = Wat.Views.DetailsView.extend({
         this.updateModel(arguments, filters, this.fetchDetails);
     },
     
-    render: function () {
-        // Add name of the model to breadcrumbs
-        this.breadcrumbs.next.next.screen = this.model.get('name');
-        
-        Wat.Views.DetailsView.prototype.render.apply(this);
-        
-        this.templateDetailsSide = Wat.A.getTemplate(this.detailsSideTemplateName);
-        
-        this.template = _.template(
-            this.templateDetailsSide, {
-                model: this.model
-            }
-        );
-        
-        $(this.sideContainer).html(this.template);
-    },
-    
     openEditElementDialog: function() {
         this.dialogConf.title = $.i18n.t('Edit host') + ": " + this.model.get('name');
         

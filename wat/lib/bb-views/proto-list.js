@@ -28,7 +28,7 @@ Wat.Views.ListView = Wat.Views.MainView.extend({
     
     initialize: function (params) {
         Wat.Views.MainView.prototype.initialize.apply(this);
-        
+
         // Define template names from qvd Object type
         this.listTemplateName = 'list-' + this.qvdObj;
         this.editorTemplateName = 'creator-' + this.qvdObj;
@@ -57,6 +57,7 @@ Wat.Views.ListView = Wat.Views.MainView.extend({
         // Extend the common events with the list events and events of the specific view
         this.extendEvents(this.commonListEvents);
         this.extendEvents(this.listEvents);
+        
     },
     
     readParams: function (params) {
@@ -297,7 +298,8 @@ Wat.Views.ListView = Wat.Views.MainView.extend({
         // The superadmin have an extra filter: tenant
         
         // Every element but the hosts has tenant
-        if (Wat.C.isSuperadmin() && this.collection.actionPrefix != 'host') {
+        var classifiedByTenant = $.inArray(this.collection.actionPrefix, QVD_OBJS_CLASSIFIED_BY_TENANT) != -1;
+        if (Wat.C.isSuperadmin() && classifiedByTenant) {
             this.formFilters.tenant = {
                     'filterField': 'tenant',
                     'type': 'select',
@@ -305,21 +307,12 @@ Wat.Views.ListView = Wat.Views.MainView.extend({
                     'displayDesktop': true,
                     'displayMobile': false,
                     'class': 'chosen-single',
+                    'fillable': true,
                     'options': [
                         {
                             'value': -1,
                             'text': 'All',
                             'selected': true
-                        },
-                        {
-                            'value': '1',
-                            'text': 'Madrid',
-                            'selected': false
-                        },
-                        {
-                            'value': '3',
-                            'text': 'Lisboa',
-                            'selected': false
                         }
                                 ]
                 };
@@ -395,7 +388,7 @@ Wat.Views.ListView = Wat.Views.MainView.extend({
             });
         
         $(this.el).html(template);
-                
+
         this.printBreadcrumbs(this.breadcrumbs, '');
         
         this.renderListBlock();
@@ -410,7 +403,7 @@ Wat.Views.ListView = Wat.Views.MainView.extend({
         // Recursive call until target is ready
         if (!targetReady) {
             console.log('lag');
-            that.interval = setInterval(that.renderListBlock, 500, that);
+            that.interval = setInterval(that.renderListBlock, 11500, that);
             return;
         }
         
@@ -625,6 +618,32 @@ Wat.Views.ListView = Wat.Views.MainView.extend({
         that.dialogConf.title = i18n.t('Massive changes over __counter__ elements', {counter: that.selectedItems.length});
 
         that.editorElement();
+    },
+    
+    fillMassiveEditor: function (target) {
+        var that = Wat.CurrentView;
+
+        // Add common parts of editor to dialog
+        that.template = _.template(
+                    that.templateEditorCommon, {
+                        blocked: undefined,
+                        properties: [],
+                        cid: that.cid
+                    }
+                );
+        
+        target.html(that.template);
+
+        // Add specific parts of editor to dialog
+        that.template = _.template(
+                    that.templateEditor, {
+                        model: that.model
+                    }
+                );
+
+        $(that.editorContainer).html(that.template);
+        
+        that.configureMassiveEditor (that);
     },
     
     applySelectedAction: function () { 

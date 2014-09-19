@@ -22,7 +22,7 @@
             </div>
             <div class="login-button">
                 <div>
-                    <a class="fa fa-key button js-login-button">Login</a>
+                    <a class="fa fa-sign-in button js-login-button">Login</a>
                 </div>
             </div>
         </div>

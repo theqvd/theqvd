@@ -6,23 +6,6 @@ Wat.Views.VMDetailsView = Wat.Views.DetailsView.extend({
         Wat.Views.DetailsView.prototype.initialize.apply(this, [params]);
     },
     
-    render: function () {
-        // Add name of the model to breadcrumbs
-        this.breadcrumbs.next.next.screen = this.model.get('name');
-        
-        Wat.Views.DetailsView.prototype.render.apply(this);
-        
-        this.templateDetailsSide = Wat.A.getTemplate(this.detailsSideTemplateName);
-        
-        this.template = _.template(
-            this.templateDetailsSide, {
-                model: this.model
-            }
-        );
-        
-        $(this.sideContainer).html(this.template);
-    },
-    
     openEditElementDialog: function(e) {
         this.dialogConf.title = $.i18n.t('Edit Virtual machine') + ": " + this.model.get('name');
         

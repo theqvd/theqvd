@@ -58,8 +58,24 @@ Wat.Views.DetailsView = Wat.Views.MainView.extend({
         'click .js-button-edit': 'openEditElementDialog'
     },
 
-    render: function () {    
-        if (this.breadcrumbs.next.next.screen === undefined) {
+    render: function () {        
+        
+        // If screen attribute of last breadcrumb is not defined, element wasnt found
+        var lastScreen = undefined;
+        var nextBread = this.breadcrumbs.next;
+        while (1) {
+            if (!nextBread.next) {
+                lastScreen = nextBread.screen;
+                break;
+            }
+            
+            nextBread = nextBread.next;
+        }
+        
+        // Add name of the model to breadcrumbs if not exist
+        nextBread.screen = nextBread.screen || this.model.get('name');
+        
+        if (lastScreen === undefined) {
             this.template = _.template(
                 this.template404, {
                 }
@@ -67,7 +83,7 @@ Wat.Views.DetailsView = Wat.Views.MainView.extend({
 
             $(this.el).html(this.template);
             
-            this.breadcrumbs.next.next.screen = '-';
+            nextBread.screen = '-';
             this.printBreadcrumbs(this.breadcrumbs, '');
         }
         else { 
@@ -75,6 +91,7 @@ Wat.Views.DetailsView = Wat.Views.MainView.extend({
             this.template = _.template(
                 this.templateDetailsCommon, {
                     model: this.model,
+                    enabledProperties: $.inArray(this.qvdObj, QVD_OBJS_WITH_PROPERTIES) != -1,
                     cid: this.cid
                 }
             );
@@ -91,6 +108,17 @@ Wat.Views.DetailsView = Wat.Views.MainView.extend({
 
             $(this.detailsContainer).html(this.template);
         }
+        
+        this.templateDetailsSide = Wat.A.getTemplate(this.detailsSideTemplateName);
+        
+        this.template = _.template(
+            this.templateDetailsSide, {
+                model: this.model
+            }
+        );
+        
+        $(this.sideContainer).html(this.template);
+        
         Wat.T.translate();
     }
 });

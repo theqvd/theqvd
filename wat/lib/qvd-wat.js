@@ -43,7 +43,11 @@ var Wat = {
         HostDetailsView: {},
         
         // Setup
-        ConfigCustomizeView: {},
+        SetupCustomizeView: {},
+        SetupConfigView: {},
+        SetupTenantsView: {},
+        SetupAdminsView: {},
+        SetupRolesView: {},
         
         // Help
         AboutView: {}
@@ -188,8 +192,26 @@ var Wat = {
         
         
         // ------- Configuration sections ------- //
-        Wat.Router.app_router.on('route:setupCustomize', function (actions) {
-            Wat.Router.app_router.performRoute('', Wat.Views.ConfigCustomizeView);
+        Wat.Router.app_router.on('route:setupCustomize', function () {
+            Wat.Router.app_router.performRoute('', Wat.Views.SetupCustomizeView);
+        });    
+        Wat.Router.app_router.on('route:setupConfig', function () {
+            Wat.Router.app_router.performRoute('', Wat.Views.SetupConfigView);
+        });    
+        Wat.Router.app_router.on('route:setupTenant', function () {
+            Wat.Router.app_router.performRoute('', Wat.Views.SetupTenantsView);
+        });    
+        Wat.Router.app_router.on('route:setupAdmin', function () {
+            Wat.Router.app_router.performRoute('', Wat.Views.SetupAdminsView);
+        });
+        Wat.Router.app_router.on('route:detailsAdmin', function (id) {
+            Wat.Router.app_router.performRoute('', Wat.Views.SetupAdminDetailsView, {"id": id});
+        });    
+        Wat.Router.app_router.on('route:setupRole', function () {
+            Wat.Router.app_router.performRoute('', Wat.Views.SetupRolesView);
+        });        
+        Wat.Router.app_router.on('route:detailsRole', function (id) {
+            Wat.Router.app_router.performRoute('', Wat.Views.SetupRoleDetailsView, {"id": id});
         });    
         
         

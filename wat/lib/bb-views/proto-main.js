@@ -34,6 +34,9 @@ Wat.Views.MainView = Backbone.View.extend({
     },
     
     extendEvents: function (ev) {
+        if (ev == undefined) {
+            return;
+        }
         ev = this.restrictEventsScope(ev);
         this.events = _.extend(this.events, ev);
     },
@@ -55,7 +58,6 @@ Wat.Views.MainView = Backbone.View.extend({
         else {
             bcHTML += '<span data-i18n>' + bc.screen + '</span>';
         }
-
         if (bc.next != undefined) {
             bcHTML += ' <i class="fa fa-angle-double-right"></i> ';
             this.printBreadcrumbs (bc.next, bcHTML);
@@ -73,12 +75,13 @@ Wat.Views.MainView = Backbone.View.extend({
     
     fillEditor: function (target) {
         var that = Wat.CurrentView;
-
+        
         // Add common parts of editor to dialog
         that.template = _.template(
                     that.templateEditorCommon, {
                         blocked: that.model.attributes.blocked,
                         properties: that.model.attributes.properties,
+                        enabledProperties: $.inArray(that.qvdObj, QVD_OBJS_WITH_PROPERTIES) != -1,
                         cid: that.cid
                     }
                 );
@@ -93,32 +96,6 @@ Wat.Views.MainView = Backbone.View.extend({
                 );
 
         $(that.editorContainer).html(that.template);
-    },
-    
-    fillMassiveEditor: function (target) {
-        var that = Wat.CurrentView;
-
-        // Add common parts of editor to dialog
-        that.template = _.template(
-                    that.templateEditorCommon, {
-                        blocked: undefined,
-                        properties: [],
-                        cid: that.cid
-                    }
-                );
-        
-        target.html(that.template);
-
-        // Add specific parts of editor to dialog
-        that.template = _.template(
-                    that.templateEditor, {
-                        model: that.model
-                    }
-                );
-
-        $(that.editorContainer).html(that.template);
-        
-        that.configureMassiveEditor (that);
     },
     
     updateElement: function () {
@@ -143,8 +120,7 @@ Wat.Views.MainView = Backbone.View.extend({
         var propValues = $('.' + this.cid + '.editor-container input.custom-prop-value');
         
         var deletedProps = [];
-        var addedProps = {};
-        var updatedProps = {};
+        var setProps = {};
         
         for(i=0;i<propNames.length;i++) {
             var name = propNames.eq(i);
@@ -157,12 +133,12 @@ Wat.Views.MainView = Backbone.View.extend({
             // If the element has not data-current attribute means that it's new
             // New properties with empty name will be ignored
             if (name.val() !== '' && value.attr('data-current') === undefined) {
-                addedProps[name.val()] = value.val();
+                setProps[name.val()] = value.val();
             }
             else {
                 // If the value is different of the data-current attribute means that it's different
                 if (value.attr('data-current') != value.val()) {
-                    updatedProps[name.val()] = value.val();
+                    setProps[name.val()] = value.val();
                 }
             }
         }
@@ -174,8 +150,7 @@ Wat.Views.MainView = Backbone.View.extend({
         }
         
         this.properties = {
-            'create' : addedProps, 
-            'update': updatedProps, 
+            'set' : setProps, 
             'delete': deletedProps
         };
     },

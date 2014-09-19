@@ -37,8 +37,24 @@
     }
 }
 
-.customize-section-selector {
-    margin-bottom: 20px;
+.customize-section-selectors {
+    display: table;
+    table-layout: fixed;
+    min-width: 500px;
+    margin-bottom: 10px;
+    .customize-section-selector {
+        margin-bottom: 20px;
+        display: table-cell;
+        width: 50%;
+        
+        &:first-child {
+            padding-right: 20px;
+        }
+        
+        &:last-child {
+            padding-left: 20px;
+        }
+    }
 }
 
 .customize-options {

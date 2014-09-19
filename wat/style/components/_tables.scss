@@ -96,6 +96,6 @@ $security_margin: 5;
 
 @for $i from 1 through 100 {
     .col-width-#{$i} {
-        width: $i * 1%;
+        width: $i * 1% !important;
     }
 }

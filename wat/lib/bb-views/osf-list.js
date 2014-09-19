@@ -34,7 +34,7 @@ Wat.Views.OSFListView = Wat.Views.ListView.extend({
         var user_storage = context.find('input[name="user_storage"]').val();
         
         arguments = {
-            propertyChanges: properties.create,
+            propertyChanges: properties.set,
             name: name,
             memory: memory || 256,
             user_storage: user_storage
@@ -46,5 +46,40 @@ Wat.Views.OSFListView = Wat.Views.ListView.extend({
         }
                         
         this.createModel(arguments);
-    }
+    },
+    
+    updateMassiveElement: function (dialog, id) {
+        var valid = Wat.Views.ListView.prototype.updateElement.apply(this, [dialog]);
+        
+        if (!valid) {
+            return;
+        }
+        
+        // Properties to create, update and delete obtained from parent view
+        var properties = this.properties;
+        
+        var arguments = {
+            'propertyChanges' : properties
+        };
+        
+        var context = $('.' + this.cid + '.editor-container');
+        
+        var memory = context.find('input[name="memory"]').val();
+        var user_storage = context.find('input[name="user_storage"]').val();
+        
+        var filters = {"id": id};
+        
+        if (memory != '') {
+            arguments["memory"] = memory;
+        }
+        
+        if (user_storage != '') {
+            arguments["user_storage"] = user_storage;
+        }
+        
+        this.resetSelectedItems();
+        
+        var auxModel = new Wat.Models.OSF();
+        this.updateModel(arguments, filters, this.fetchList, auxModel);
+    },
 });

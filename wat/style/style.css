@@ -264,6 +264,9 @@ fieldset {
         width: 100%; }
         .menu-corner > ul > li > ul > li span:before {
           margin-right: 5px; }
+        .menu-corner > ul > li > ul > li span.fa-graduation-cap:before {
+          margin-right: 2px;
+          margin-left: -2px; }
         .menu-corner > ul > li > ul > li span:hover {
           font-weight: bold;
           color: #fdfdfd;
@@ -277,6 +280,9 @@ fieldset {
   .side-menu li a:before {
     margin-right: 5px;
     font-weight: normal; }
+  .side-menu li a.fa-graduation-cap:before {
+    margin-right: 2px;
+    margin-left: -2px; }
   .side-menu li a.selected-option, .side-menu li a:hover {
     font-weight: bold; }
 
@@ -1153,8 +1159,19 @@ body {
       margin-right: 2%; }
       .wrapper .content .setup-block .h1 {
         display: block; }
-    .wrapper .content .customize-section-selector {
-      margin-bottom: 20px; }
+    .wrapper .content .customize-section-selectors {
+      display: table;
+      table-layout: fixed;
+      min-width: 500px;
+      margin-bottom: 10px; }
+      .wrapper .content .customize-section-selectors .customize-section-selector {
+        margin-bottom: 20px;
+        display: table-cell;
+        width: 50%; }
+        .wrapper .content .customize-section-selectors .customize-section-selector:first-child {
+          padding-right: 20px; }
+        .wrapper .content .customize-section-selectors .customize-section-selector:last-child {
+          padding-left: 20px; }
     .wrapper .content .customize-options .customize-block {
       width: 49%;
       display: inline-block;
@@ -1486,304 +1503,304 @@ td.inner-table {
       min-width: 177px; } }
 
 .col-width-1 {
-  width: 1%; }
+  width: 1% !important; }
 
 .col-width-2 {
-  width: 2%; }
+  width: 2% !important; }
 
 .col-width-3 {
-  width: 3%; }
+  width: 3% !important; }
 
 .col-width-4 {
-  width: 4%; }
+  width: 4% !important; }
 
 .col-width-5 {
-  width: 5%; }
+  width: 5% !important; }
 
 .col-width-6 {
-  width: 6%; }
+  width: 6% !important; }
 
 .col-width-7 {
-  width: 7%; }
+  width: 7% !important; }
 
 .col-width-8 {
-  width: 8%; }
+  width: 8% !important; }
 
 .col-width-9 {
-  width: 9%; }
+  width: 9% !important; }
 
 .col-width-10 {
-  width: 10%; }
+  width: 10% !important; }
 
 .col-width-11 {
-  width: 11%; }
+  width: 11% !important; }
 
 .col-width-12 {
-  width: 12%; }
+  width: 12% !important; }
 
 .col-width-13 {
-  width: 13%; }
+  width: 13% !important; }
 
 .col-width-14 {
-  width: 14%; }
+  width: 14% !important; }
 
 .col-width-15 {
-  width: 15%; }
+  width: 15% !important; }
 
 .col-width-16 {
-  width: 16%; }
+  width: 16% !important; }
 
 .col-width-17 {
-  width: 17%; }
+  width: 17% !important; }
 
 .col-width-18 {
-  width: 18%; }
+  width: 18% !important; }
 
 .col-width-19 {
-  width: 19%; }
+  width: 19% !important; }
 
 .col-width-20 {
-  width: 20%; }
+  width: 20% !important; }
 
 .col-width-21 {
-  width: 21%; }
+  width: 21% !important; }
 
 .col-width-22 {
-  width: 22%; }
+  width: 22% !important; }
 
 .col-width-23 {
-  width: 23%; }
+  width: 23% !important; }
 
 .col-width-24 {
-  width: 24%; }
+  width: 24% !important; }
 
 .col-width-25 {
-  width: 25%; }
+  width: 25% !important; }
 
 .col-width-26 {
-  width: 26%; }
+  width: 26% !important; }
 
 .col-width-27 {
-  width: 27%; }
+  width: 27% !important; }
 
 .col-width-28 {
-  width: 28%; }
+  width: 28% !important; }
 
 .col-width-29 {
-  width: 29%; }
+  width: 29% !important; }
 
 .col-width-30 {
-  width: 30%; }
+  width: 30% !important; }
 
 .col-width-31 {
-  width: 31%; }
+  width: 31% !important; }
 
 .col-width-32 {
-  width: 32%; }
+  width: 32% !important; }
 
 .col-width-33 {
-  width: 33%; }
+  width: 33% !important; }
 
 .col-width-34 {
-  width: 34%; }
+  width: 34% !important; }
 
 .col-width-35 {
-  width: 35%; }
+  width: 35% !important; }
 
 .col-width-36 {
-  width: 36%; }
+  width: 36% !important; }
 
 .col-width-37 {
-  width: 37%; }
+  width: 37% !important; }
 
 .col-width-38 {
-  width: 38%; }
+  width: 38% !important; }
 
 .col-width-39 {
-  width: 39%; }
+  width: 39% !important; }
 
 .col-width-40 {
-  width: 40%; }
+  width: 40% !important; }
 
 .col-width-41 {
-  width: 41%; }
+  width: 41% !important; }
 
 .col-width-42 {
-  width: 42%; }
+  width: 42% !important; }
 
 .col-width-43 {
-  width: 43%; }
+  width: 43% !important; }
 
 .col-width-44 {
-  width: 44%; }
+  width: 44% !important; }
 
 .col-width-45 {
-  width: 45%; }
+  width: 45% !important; }
 
 .col-width-46 {
-  width: 46%; }
+  width: 46% !important; }
 
 .col-width-47 {
-  width: 47%; }
+  width: 47% !important; }
 
 .col-width-48 {
-  width: 48%; }
+  width: 48% !important; }
 
 .col-width-49 {
-  width: 49%; }
+  width: 49% !important; }
 
 .col-width-50 {
-  width: 50%; }
+  width: 50% !important; }
 
 .col-width-51 {
-  width: 51%; }
+  width: 51% !important; }
 
 .col-width-52 {
-  width: 52%; }
+  width: 52% !important; }
 
 .col-width-53 {
-  width: 53%; }
+  width: 53% !important; }
 
 .col-width-54 {
-  width: 54%; }
+  width: 54% !important; }
 
 .col-width-55 {
-  width: 55%; }
+  width: 55% !important; }
 
 .col-width-56 {
-  width: 56%; }
+  width: 56% !important; }
 
 .col-width-57 {
-  width: 57%; }
+  width: 57% !important; }
 
 .col-width-58 {
-  width: 58%; }
+  width: 58% !important; }
 
 .col-width-59 {
-  width: 59%; }
+  width: 59% !important; }
 
 .col-width-60 {
-  width: 60%; }
+  width: 60% !important; }
 
 .col-width-61 {
-  width: 61%; }
+  width: 61% !important; }
 
 .col-width-62 {
-  width: 62%; }
+  width: 62% !important; }
 
 .col-width-63 {
-  width: 63%; }
+  width: 63% !important; }
 
 .col-width-64 {
-  width: 64%; }
+  width: 64% !important; }
 
 .col-width-65 {
-  width: 65%; }
+  width: 65% !important; }
 
 .col-width-66 {
-  width: 66%; }
+  width: 66% !important; }
 
 .col-width-67 {
-  width: 67%; }
+  width: 67% !important; }
 
 .col-width-68 {
-  width: 68%; }
+  width: 68% !important; }
 
 .col-width-69 {
-  width: 69%; }
+  width: 69% !important; }
 
 .col-width-70 {
-  width: 70%; }
+  width: 70% !important; }
 
 .col-width-71 {
-  width: 71%; }
+  width: 71% !important; }
 
 .col-width-72 {
-  width: 72%; }
+  width: 72% !important; }
 
 .col-width-73 {
-  width: 73%; }
+  width: 73% !important; }
 
 .col-width-74 {
-  width: 74%; }
+  width: 74% !important; }
 
 .col-width-75 {
-  width: 75%; }
+  width: 75% !important; }
 
 .col-width-76 {
-  width: 76%; }
+  width: 76% !important; }
 
 .col-width-77 {
-  width: 77%; }
+  width: 77% !important; }
 
 .col-width-78 {
-  width: 78%; }
+  width: 78% !important; }
 
 .col-width-79 {
-  width: 79%; }
+  width: 79% !important; }
 
 .col-width-80 {
-  width: 80%; }
+  width: 80% !important; }
 
 .col-width-81 {
-  width: 81%; }
+  width: 81% !important; }
 
 .col-width-82 {
-  width: 82%; }
+  width: 82% !important; }
 
 .col-width-83 {
-  width: 83%; }
+  width: 83% !important; }
 
 .col-width-84 {
-  width: 84%; }
+  width: 84% !important; }
 
 .col-width-85 {
-  width: 85%; }
+  width: 85% !important; }
 
 .col-width-86 {
-  width: 86%; }
+  width: 86% !important; }
 
 .col-width-87 {
-  width: 87%; }
+  width: 87% !important; }
 
 .col-width-88 {
-  width: 88%; }
+  width: 88% !important; }
 
 .col-width-89 {
-  width: 89%; }
+  width: 89% !important; }
 
 .col-width-90 {
-  width: 90%; }
+  width: 90% !important; }
 
 .col-width-91 {
-  width: 91%; }
+  width: 91% !important; }
 
 .col-width-92 {
-  width: 92%; }
+  width: 92% !important; }
 
 .col-width-93 {
-  width: 93%; }
+  width: 93% !important; }
 
 .col-width-94 {
-  width: 94%; }
+  width: 94% !important; }
 
 .col-width-95 {
-  width: 95%; }
+  width: 95% !important; }
 
 .col-width-96 {
-  width: 96%; }
+  width: 96% !important; }
 
 .col-width-97 {
-  width: 97%; }
+  width: 97% !important; }
 
 .col-width-98 {
-  width: 98%; }
+  width: 98% !important; }
 
 .col-width-99 {
-  width: 99%; }
+  width: 99% !important; }
 
 .col-width-100 {
-  width: 100%; }
+  width: 100% !important; }
 
 /********************************************************************
 *********************************************************************
@@ -1930,7 +1947,7 @@ td.inner-table {
   @media screen and (min-width: 40em) {
     .dialog-container-template {
       width: 600px;
-      height: 450px; } }
+      height: 550px; } }
 
 .ui-dialog {
   top: 50px !important;
@@ -1947,7 +1964,7 @@ td.inner-table {
   @media screen and (min-width: 40em) {
     .ui-dialog {
       width: 600px !important;
-      height: 450px !important;
+      height: 550px !important;
       height: auto !important; } }
   .ui-dialog td {
     display: block;
