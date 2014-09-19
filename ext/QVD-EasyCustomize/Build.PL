@@ -5,7 +5,7 @@ use Module::Build;
 
 my $builder = Module::Build->new(
     module_name         => 'QVD::EasyCustomize',
-    license             => 'Artistic_2_0',
+    license             => 'GPL3',
     dist_author         => q{QVD Team <qvd@theqvd.com>},
     dist_version_from   => 'lib/QVD/EasyCustomize.pm',
     dist_abstract       => 'QVD::EasyCustomize',
