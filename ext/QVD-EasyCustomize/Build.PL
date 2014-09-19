@@ -8,6 +8,7 @@ my $builder = Module::Build->new(
     license             => 'Artistic_2_0',
     dist_author         => q{QVD Team <qvd@theqvd.com>},
     dist_version_from   => 'lib/QVD/EasyCustomize.pm',
+    dist_abstract       => 'QVD::EasyCustomize',
     release_status      => 'stable',
     configure_requires => {
         'Module::Build' => 0,
@@ -16,8 +17,11 @@ my $builder = Module::Build->new(
         'Test::More' => 0,
     },
     requires => {
-        #'ABC'              => 1.6,
-        #'Foo::Bar::Module' => 5.0401,
+        'QVD::Admin'      => 0,
+        'Log::Log4perl'   => 0,
+        'Pod::Usage'      => 0,
+        'Log::Log4perl'   => 0,
+        'Term::ReadKey'   => 0,
     },
     add_to_cleanup     => [ 'QVD-EasyCustomize-*' ],
     create_makefile_pl => 'traditional',
