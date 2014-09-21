@@ -1019,12 +1019,21 @@ xf86WriteMmio32Be(__volatile__ void *base, const unsigned long offset,
 #    endif /* __arm32__ */
 
 #    if defined(__arm64__)
-#     define ldq_u(p)	(*((unsigned long  *)(p)))
-#     define ldl_u(p)	(*((unsigned int   *)(p)))
-#     define ldw_u(p)	(*((unsigned short *)(p)))
-#     define stq_u(v,p)	(*(unsigned long  *)(p)) = (v)
-#     define stl_u(v,p)	(*(unsigned int   *)(p)) = (v)
-#     define stw_u(v,p)	(*(unsigned short *)(p)) = (v)
+#    define ldq_u(p)	ldl_u(p)
+#    define ldl_u(p)	((*(unsigned char *)(p))	| \
+			(*((unsigned char *)(p)+1)<<8)	| \
+			(*((unsigned char *)(p)+2)<<16)	| \
+			(*((unsigned char *)(p)+3)<<24))
+#    define ldw_u(p)	((*(unsigned char *)(p)) | \
+			(*((unsigned char *)(p)+1)<<8))
+
+#    define stq_u(v,p)	stl_u(v,p)
+#    define stl_u(v,p)	(*(unsigned char *)(p)) = (v); \
+				(*((unsigned char *)(p)+1)) = ((v) >> 8);  \
+				(*((unsigned char *)(p)+2)) = ((v) >> 16); \
+				(*((unsigned char *)(p)+3)) = ((v) >> 24)
+#    define stw_u(v,p)	(*(unsigned char *)(p)) = (v); \
+				(*((unsigned char *)(p)+1)) = ((v) >> 8)
 #     define mem_barrier()	/* NOP */
 #     define write_mem_barrier()	/* NOP */
 #    endif /* __arm64__ */

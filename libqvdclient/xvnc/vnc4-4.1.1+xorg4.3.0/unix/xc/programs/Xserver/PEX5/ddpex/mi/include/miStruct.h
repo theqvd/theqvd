@@ -67,6 +67,7 @@ typedef struct {
 #if defined(__alpha) || defined(__alpha__) || \
     defined(ia64) || defined(__ia64__) || \
     defined(__s390x__) || \
+    defined(__arm64__) || \
     defined(x86_64) || defined (__x86_64__)
 	ddUSHORT		unused0;
 	ddUSHORT		unused1;

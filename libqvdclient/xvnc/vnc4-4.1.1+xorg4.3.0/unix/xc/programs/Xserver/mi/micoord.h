@@ -50,6 +50,7 @@
     defined(__i386__) || defined(i386) || \
     defined(__ia64__) || defined(ia64) || \
     defined(__s390x__) || defined(__s390__) || \
+    defined(__arm64__) || \
     defined(__x86_64__) || defined(x86_64)
 #define GetHighWord(x) (((int) (x)) >> 16)
 #else

@@ -65,6 +65,7 @@ SOFTWARE.
     defined(__ia64__) || defined(ia64) || \
     defined(__sparc64__) || \
     defined(__s390x__) || \
+    defined(__arm64__) || \
     (defined(__hppa__) && defined(__LP64__)) || \
     defined(__x86_64__) || defined(x86_64)
 #define LONG64
