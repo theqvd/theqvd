@@ -13,6 +13,7 @@ use Config::Properties;
 use QVD::Admin4::Exception;
 use DateTime;
 use List::Util qw(sum);
+use QVD::Config::Network qw(nettop_n netstart_n net_aton net_ntoa);
 
 our $VERSION = '0.01';
 
@@ -1610,6 +1611,42 @@ sub add_role_to_admin
     eval { $DB->resultset('Role_Assignment_Relation')->create(
 	       {role_id => $_,
 		administrator_id => $admin->id}) } for @$role_ids;
+}
+
+
+sub _get_free_ip {
+    my $self = shift;
+    my $nettop = nettop_n;
+    my $netstart = netstart_n;
+
+    my %ips = map { net_aton($_->ip) => 1 } 
+    $self->db->resultset('VM')->all;
+
+    while ($nettop-- > $netstart) {
+        return net_ntoa($nettop) unless $ips{$nettop}
+    }
+    die "No free IP addresses";
+}
+
+sub get_default_version
+{ 
+    my $self = shift;
+
+    my ($y, $m, $d) = (localtime)[5, 4, 3];
+    $m ++;
+    $y += 1900;
+
+    my $osf_id = $self->json->{arguments}->{straight}->{osf_id}  //
+	QVD::Admin4::Exception->throw(code=>'23502'); # FIX ME: PREVIOUS REVISION OF MANDATORY ARGUMENTS
+    my $osf = $self->db->resultset('OSF')->search({id => $osf_id})->first;
+    my $version;
+
+    for (0..999) 
+    {
+	$version = sprintf("%04d-%02d-%02d-%03d", $y, $m, $d, $_);
+	last unless $osf->di_by_tag($version);
+    }
+    $version;
 }
 
 1;
