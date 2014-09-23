@@ -6,6 +6,7 @@ use Moose;
 has 'status',  is => 'ro', isa => 'Int', required => 1;
 has 'result', is => 'ro', isa => 'HashRef', default => sub {{};};
 has 'failures', is => 'ro', isa => 'HashRef', default => sub {{};};
+has 'qvd_object_model', is => 'ro', isa => 'QVD::Admin4::REST::Model';
 
 my $mapper =  Config::Properties->new();
 $mapper->load(*DATA);
@@ -14,11 +15,50 @@ sub BUILD
 {
     my $self = shift;
     
+    $self->map_result_from_dbix_objects_to_output_info
+	if $self->qvd_object_model;
+    
     while (my ($id, $code) = each %{$self->failures})
     {
 	$self->failures->{$id} = $self->message($code);
 	$self->{status} = 1;
     }
+}
+
+sub map_result_from_dbix_objects_to_output_info
+{
+    my $self = shift;
+    return unless defined $self->result->{rows};
+    $_ = $self->map_dbix_object_to_output_info($_)
+	for @{$self->result->{rows}};
+
+    $self->map_result_to_list_of_ids
+	if $self->qvd_object_model->type_of_action eq 'all_ids';
+}
+
+sub map_result_from_dbix_objects_to_output_info
+{
+    my ($self,$dbix_object) = @_;
+    my $result = {};
+
+    for my $field_key ($qvd_object_model->fields)
+    {
+	my $dbix_field_key = $qvd_object_model->map_field_to_dbix_format($field_key);
+        my ($table,$column) = $dbix_field_key =~ /^(.+)\.(.+)$/;
+
+	$result->{$field_key} = 
+	    eval { $table eq "me" ? 
+		       $obj->$column : 
+		       $obj->$table->$column } // undef;
+	print $@ if $@;
+    }
+}
+
+sub map_result_to_list_of_ids
+{
+    my $self = shift;
+    $self->result->{rows} = 
+	[ map { $_->{id} } @{$self->result->{rows}} ];
 }
 
 sub message
