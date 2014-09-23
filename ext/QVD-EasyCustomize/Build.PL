@@ -3,11 +3,13 @@ use strict;
 use warnings FATAL => 'all';
 use Module::Build;
 
+my $SUF_VERSION = defined $ENV{BUILD_NUMBER} ? ".$ENV{BUILD_NUMBER}" : '';
+
 my $builder = Module::Build->new(
     module_name         => 'QVD::EasyCustomize',
     license             => 'gpl',
     dist_author         => q{QVD Team <qvd@theqvd.com>},
-    dist_version_from   => 'lib/QVD/EasyCustomize.pm',
+    dist_version        => '3.5'.$SUF_VERSION,
     dist_abstract       => 'QVD::EasyCustomize',
     release_status      => 'stable',
     configure_requires => {
