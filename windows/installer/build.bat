@@ -10,6 +10,11 @@ cd ..\..\windows\installer
 
 call exetype NX\nxproxy.exe WINDOWS
 
+REM This environment variable tells the client it's being called in a PP
+REM build. That will make it exit automatically. This makes automated
+REM builds work.
+SET QVD_PP_BUILD=1
+
 call pp -vvv -x -gui ^
 -I ..\..\ext\IO-Socket-Forwarder\lib ^
 -I ..\..\ext\QVD-Config\lib ^
@@ -38,7 +43,7 @@ call pp -vvv -x -gui ^
 -o qvd-client-1.exe ^
 ..\..\ext\QVD-Client\bin\qvd-gui-client.pl
 
-IF ERRORLEVEL 1 (
+IF ERRORLEVEL 1 ( 
 	echo pp failed with error %ERRORLEVEL%
 	EXIT /B 1
 )

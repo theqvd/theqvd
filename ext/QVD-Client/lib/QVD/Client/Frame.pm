@@ -297,6 +297,13 @@ sub new {
     $self->{proc_pid} = undef;
     $self->{log} = "";
 
+	if( $ENV{QVD_PP_BUILD} ) {
+		INFO "Being called from PP build. Exiting.";
+		$self->Close();
+		$self->Destroy();
+		exit(0);
+	}
+	
     return $self;
 }
 
