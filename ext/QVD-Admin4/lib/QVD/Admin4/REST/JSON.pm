@@ -23,6 +23,18 @@ sub BUILD
 		@{$self->available_nested_queries}}; # TODO: Parse nested queries  
 }
 
+sub offset
+{
+    my $self = shift;
+    return $self->json->{offset};
+}
+
+sub block
+{
+    my $self = shift;
+    return $self->json->{block};
+}
+
 sub action
 {
 	my $self = shift;
@@ -39,6 +51,18 @@ sub arguments
 {
 	my $self = shift;
 	return $self->json->{arguments} || {};
+}
+
+sub filters_list
+{
+    my $self = shift;
+    keys %{$self->filters};
+}
+
+sub arguments_list
+{
+    my $self = shift;
+    keys %{$self->arguments};
 }
 
 sub order_criteria
@@ -105,13 +129,13 @@ sub has_order_criterium
     return 0;
 }
 
-sub get_filter
+sub get_filter_value
 {
     my ($self,$filter) = @_;
     return $self->filters->{$filter};
 }
 
-sub get_argument
+sub get_argument_value
 {
     my ($self,$argument) = @_;
     return $self->arguments->{$argument};

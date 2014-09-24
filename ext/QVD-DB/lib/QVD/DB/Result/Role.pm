@@ -11,9 +11,9 @@ __PACKAGE__->add_columns(id => { data_type => 'integer',
 
 __PACKAGE__->set_primary_key('id');
 __PACKAGE__->add_unique_constraint(['name']);
-__PACKAGE__->has_many(administrators => 'QVD::DB::Result::Role_Assignment_Relation', 'role_id', { cascade_delete => 0 } );
-__PACKAGE__->has_many(acls => 'QVD::DB::Result::ACL_Setting', 'role_id');
-__PACKAGE__->has_many(roles => 'QVD::DB::Result::Inheritance_Roles_Rel', 'inheritor_id', { cascade_delete => 0 } );
+__PACKAGE__->has_many(administrators => 'QVD::DB::Result::Administrator_Role_Relation', 'role_id', { cascade_delete => 0 } );
+__PACKAGE__->has_many(acls => 'QVD::DB::Result::ACL_Role_Relation', 'role_id');
+__PACKAGE__->has_many(roles => 'QVD::DB::Result::Role_Role_Relation', 'inheritor_id', { cascade_delete => 0 } );
 
 sub get_positive_acls_columns
 {

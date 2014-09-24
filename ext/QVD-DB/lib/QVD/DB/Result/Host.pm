@@ -46,4 +46,12 @@ sub custom_join_condition
       "$args->{foreign_alias}.key"     => ($key ? { '=' => $key } : { -ident => "$args->{foreign_alias}.key"}) };
 }
 
+
+sub get_properties_key_value
+{
+    my $self = self;
+
+    ( properties => { map {  $_->key => $_->value  } $self->properties->all });
+} 
+
 1;

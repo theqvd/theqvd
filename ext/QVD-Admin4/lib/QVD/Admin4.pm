@@ -6,7 +6,6 @@ use warnings;
 use Moose;
 use QVD::DB;
 use QVD::DB::Simple;
-use QVD::Admin4::Query;
 use QVD::Config;
 use File::Copy qw(copy move);
 use Config::Properties;
@@ -14,12 +13,15 @@ use QVD::Admin4::Exception;
 use DateTime;
 use List::Util qw(sum);
 use QVD::Config::Network qw(nettop_n netstart_n net_aton net_ntoa);
-
 our $VERSION = '0.01';
 
 has 'administrator', is => 'ro', isa => 'QVD::DB::Result::Administrator';
 
 my $DB;
+
+#########################
+## STARTING THE OBJECT ##
+#########################
 
 sub BUILD
 {
@@ -31,14 +33,6 @@ sub BUILD
 
 sub _db { $DB; }
 
-sub _exec
-{
-    my ($self, $request) = @_;
-
-    my $method = $request->action;
-    $self->$method($request);
-}
-
 sub get_credentials
 {
     my ($self,%params) = @_;
@@ -46,460 +40,21 @@ sub get_credentials
     my $admin = eval { $DB->resultset('Administrator')->find(\%params) };
     return undef unless $admin;
 
+    $admin->set_tenants_scoop(
+	[ map { $_->id } 
+	  $DB->resultset('Tenant')->search()->all ])
+	if $admin->is_superadmin;
+
     $self->{administrator} = $admin;
 
     return { login => $admin->name,
 	     tenant => $admin->tenant_id };
 }
 
-# Nombre genérico
 
-sub _map
-{
-    my ($self,$obj,$request,$result,@fields) = @_;
-
-    if ($self->administrator->is_superadmin)
-    {
-	if ($obj->can('tenant_id')) { $result->{tenant_id} = $obj->tenant_id; } 
-	if ($obj->can('tenant_name')) { $result->{tenant_name} = $obj->tenant_name; }
-    }
-
-    for my $field (@fields)
-    {
-	my $mfield = $request->mapper->getProperty($field);
-        my ($table,$column) = $mfield =~ /^(.+)\.(.+)$/;
-
-	$result->{$field} = 
-	    eval { $table eq "me" ? 
-		       $obj->$column : 
-		       $obj->$table->$column } // undef;
-	print $@ if $@;
-    }
-
-    $result;
-}
-
-sub get_fields
-{
-    my ($self,$qvd_obj,$criterium) = @_;
-
-    ( map { $_->name } $DB->resultset('Config_Field')->search(
-	  {qvd_obj => $qvd_obj,
-	   $criterium => 'true'})->all);
-}
-
-sub config_field_get_list
-{
-    my ($self,$request) = @_;
-
-    my $result = $self->select($request);
-    my @fields = qw(id qvd_obj name 
-                    get_list get_details filter_list 
-                    filter_details argument filter_options);
-
-    $_ = $self->_map($_,$request,{},@fields) 
-	for @{$result->{rows}};
-
-    $result;
-
-}
-
-sub config_field_get_details
-{
-    my ($self,$request) = @_;
-    my $result = $self->select($request);
-
-    my @fields = qw(id qvd_obj name 
-                    get_list get_details filter_list 
-                    filter_details argument filter_options);
-
-    $_ = $self->_map($_,$request,{},@fields) 
-	for @{$result->{rows}};
-
-    $result;
-}
-
-
-sub config_field_update
-{
-    my ($self,$request) = @_;
-    $self->update($request);
-}
-
-
-###############################
-########## QUERIES ############
-###############################
-
-sub user_get_list
-{
-    my ($self,$request) = @_;
-
-    my $result = $self->select($request);
-    my @fields = $self->get_fields(qw(user get_list));
-    $_ = $self->_map($_,$request,{$self->add_custom($request,$_)},@fields) 
-	for @{$result->{rows}};
-
-    $result;
-}
-
-sub user_tiny_list
-{
-    my ($self,$request) = @_;
-
-    my $result = $self->select($request);
-
-    my @fields = qw(id name);
-    $_ = $self->_map($_,$request,{},@fields) 
-	for @{$result->{rows}};
-    
-    $result;
-}
-
-
-sub user_all_ids
-{
-    my ($self,$request) = @_;
-
-    my $result = $self->select($request);
-
-    my @fields = qw(id);
-    $_ = $_->id for @{$result->{rows}};
-    
-    $result;
-}
-
-sub user_get_details
-{
-    my ($self,$request) = @_;
-    my $result = $self->select($request);
-
-    my @fields = $self->get_fields(qw(user get_details));
-    $_ = $self->_map($_,$request,{$self->add_custom($request,$_)},@fields) 
-	for @{$result->{rows}};
-
-    $result;
-}
-
-sub user_update
-{
-    my ($self,$request) = @_;
-    $self->update($request);
-}
-
-
-sub user_update_custom
-{
-    my ($self,$request) = @_;
-    $self->update_custom($request);
-}
-
-
-sub user_get_state
-{
-    my ($self,$request) = @_;
-    my $result = $self->select($request);
-
-    my @fields = qw(vms_connected);
-    $_ = $self->_map($_,$request,{},@fields) 
-	for @{$result->{rows}};
-
-    $result;
-}
-
-sub vm_get_list
-{
-    my ($self,$request) = @_;
-    my $result = $self->select($request);
-    my @fields = $self->get_fields(qw(vm get_list));
-    $_ = $self->_map($_,$request,{$self->add_custom($request,$_)},@fields) 
-	for @{$result->{rows}};
-
-    $result;
-}
-
-sub vm_tiny_list
-{
-    my ($self,$request) = @_;
-    my $result = $self->select($request);
-    my @fields = qw(id name);
-    $_ = $self->_map($_,$request,{},@fields) 
-	for @{$result->{rows}};
-    
-    $result;
-}
-
-sub vm_all_ids
-{
-    my ($self,$request) = @_;
-
-    my $result = $self->select($request);
-
-    my @fields = qw(id);
-    $_ = $_->id for @{$result->{rows}};
-    
-    $result;
-}
-
-sub vm_get_details
-{
-    my ($self,$request) = @_;
-    my $result = $self->select($request);
-
-    my @fields = $self->get_fields(qw(vm get_details));
-    $_ = $self->_map($_,$request,{$self->add_custom($request,$_)},@fields) 
-	for @{$result->{rows}};
-   
-    $result;
-}
-
-sub vm_get_state
-{
-    my ($self,$request) = @_;
-    my $result = $self->select($request);
-
-    my @fields = qw(state user_state);
-
-    $_ = $self->_map($_,$request,{},@fields) 
-	for @{$result->{rows}};
-
-    $result;
-}
-
-sub vm_update
-{
-    my ($self,$request) = @_;
-    $self->update($request);
-}
-
-sub vm_update_custom
-{
-    my ($self,$request) = @_;
-    $self->update_custom($request);
-}
-
-sub host_get_list
-{
-    my ($self,$request) = @_;
-    my $result = $self->select($request);
-
-    my @fields = $self->get_fields(qw(host get_list));
-    $_ = $self->_map($_,$request,{$self->add_custom($request,$_)},@fields) 
-	for @{$result->{rows}};
-    $result;
-}
-
-sub host_tiny_list
-{
-    my ($self,$request) = @_;
-    my $result = $self->select($request);
-
-    my @fields = qw(id name);
-    $_ = $self->_map($_,$request,{},@fields) 
-	for @{$result->{rows}};
-    
-    $result;
-}
-
-sub host_all_ids
-{
-    my ($self,$request) = @_;
-
-    my $result = $self->select($request);
-
-    my @fields = qw(id);
-    $_ = $_->id for @{$result->{rows}};
-    
-    $result;
-}
-
-sub host_get_details
-{
-    my ($self,$request) = @_;
-    my $result = $self->select($request);
-
-    my @fields = $self->get_fields(qw(host get_details));
-    $_ = $self->_map($_,$request,{$self->add_custom($request,$_)},@fields) 
-	for @{$result->{rows}};
-
-    $result;
-}
-
-sub host_get_state
-{
-    my ($self,$request) = @_;
-    my $result = $self->select($request);
-
-    my @fields = qw(state load vms);
-
-    $_ = $self->_map($_,$request,{},@fields) 
-	for @{$result->{rows}};
-
-    $result;
-}
-
-sub host_update
-{
-    my ($self,$request) = @_;
-    $self->update($request);
-}
-
-sub host_update_custom
-{
-    my ($self,$request) = @_;
-    $self->update_custom($request);
-}
-
-sub osf_get_list
-{
-    my ($self,$request) = @_;
-    my $result = $self->select($request);
-
-    my @fields = $self->get_fields(qw(osf get_list));
-    $_ = $self->_map($_,$request,{$self->add_custom($request,$_)},@fields) 
-	for @{$result->{rows}};
-
-    $result;
-}
-
-sub osf_tiny_list
-{
-    my ($self,$request) = @_;
-    my $result = $self->select($request);
-
-    my @fields = qw(id name);
-    $_ = $self->_map($_,$request,{},@fields) 
-	for @{$result->{rows}};
-    
-    $result;
-}
-
-sub osf_all_ids
-{
-    my ($self,$request) = @_;
-
-    my $result = $self->select($request);
-
-    my @fields = qw(id);
-    $_ = $_->id for @{$result->{rows}};
-    
-    $result;
-}
-
-sub tag_tiny_list
-{
-    my ($self,$request) = @_;
-
-    my $result = $self->select($request);
-
-    my @fields = qw(id name);
-    $_ = $self->_map($_,$request,{},@fields) 
-	for @{$result->{rows}};
-
-    $result;
-}
-
-sub tag_all_ids
-{
-    my ($self,$request) = @_;
-
-    my $result = $self->select($request);
-
-    my @fields = qw(id);
-    $_ = $_->id for @{$result->{rows}};
-    
-    $result;
-}
-
-
-sub osf_get_details
-{
-    my ($self,$request) = @_;
-    my $result = $self->select($request);
-
-    my @fields = $self->get_fields(qw(osf get_details));
-    $_ = $self->_map($_,$request,{$self->add_custom($request,$_)},@fields) 
-	for @{$result->{rows}};
-
-    $result;
-}
-
-sub osf_update
-{
-    my ($self,$request) = @_;
-    $self->update($request);
-}
-
-sub osf_update_custom
-{
-    my ($self,$request) = @_;
-    $self->update_custom($request);
-}
-
-sub di_get_list
-{
-    my ($self,$request) = @_;
-    my $result = $self->select($request);
-
-    my @fields = $self->get_fields(qw(di get_list));
-    $_ = $self->_map($_,$request,{$self->add_custom($request,$_)},@fields) 
-	for @{$result->{rows}};
-
-    $result;
-}
-
-sub di_tiny_list
-{
-    my ($self,$request) = @_;
-    my $result = $self->select($request);
-    my @fields = qw(id disk_image);
-    $_ = $self->_map($_,$request,{},@fields) 
-	for @{$result->{rows}};
-    
-    $result;
-}
-
-sub di_all_ids
-{
-    my ($self,$request) = @_;
-
-    my $result = $self->select($request);
-
-    my @fields = qw(id);
-
-    $_ = $_->id for @{$result->{rows}};
-    
-    $result;
-}
-
-
-sub di_get_details
-{
-    my ($self,$request) = @_;
-    my $result = $self->select($request);
-
-    my @fields = $self->get_fields(qw(di get_details));
-
-    $_ = $self->_map($_,$request,{$self->add_custom($request,$_)},@fields) 
-	for @{$result->{rows}};
-
-    $result;
-}
-
-sub di_update
-{
-    my ($self,$request) = @_;
-    $self->update($request);
-}
-
-sub di_update_custom
-{
-    my ($self,$request) = @_;
-    $self->update_custom($request);
-    $self->update_tags($request);
-}
-
-### BASIC SQL QUERIES
+#####################
+### GENERIC FUNCTIONS
+#####################
 
 sub select
 {
@@ -507,32 +62,32 @@ sub select
 
     my $rs = eval { $DB->resultset($request->table)->search($request->filters, 
 							    $request->modifiers) };
-
     QVD::Admin4::Exception->throw(code => ($DB->storage->_dbh->state || 4,
 				  message => "$@")) if $@;
-
-
    { total => ($rs->is_paged ? $rs->pager->total_entries : $rs->count), 
      rows => [$rs->all] };
 }
 
 sub update
 {
-    my ($self,$request,@conditions) = @_;
+   my ($self,$request) = @_;
+   my $result = $self->select($request);
+   $self->_update($request,$result);
+}
 
-    my $result = $self->select($request);
+sub _update
+{
+    my ($self,$request,$result,@conditions) = @_;
+
     my $failures = {};
 
     for my $obj (@{$result->{rows}})
     {
 	eval { $self->$_($obj) for @conditions;
 	       $DB->txn_do( sub { eval { $obj->update($request->arguments) };
-
-				   QVD::Admin4::Exception->throw(code => ($DB->storage->_dbh->state || 4),
-								 message => "$@") if $@;
-				   $self->update_related($request,$obj); } ) };      
-# La excepción no tiene por qué ser un objeto!!
-
+				  QVD::Admin4::Exception->throw(code => ($DB->storage->_dbh->state || 4),
+								message => "$@") if $@;
+				  $self->update_related_objects($request,$obj);
 	 if ($@) { $failures->{$obj->id} = ($@->can('code') ? $@->code : 4); }
     }
 
@@ -541,11 +96,11 @@ sub update
     $result;
 }
 
-sub update_related
+sub update_related_objects
 {
     my($self,$request,$obj)=@_;
 
-    my %tables = %{$request->arguments(related => 1)};
+    my %tables = %{$request->related_objects_arguments};
     for (keys %tables)
     {
 	eval { $obj->$_->update($tables{$_}) }; 
@@ -555,37 +110,135 @@ sub update_related
     
 }
 
-sub update_custom
+
+sub exec_nested_queries_in_request
 {
-    my ($self,$request) = @_;
- 
-    my $result = $self->select($request);   
+    my ($self,$nested_queries,$result) = @_;
+
     my $failures = {};
 
     for my $obj (@{$result->{rows}})
     {
-	my $props = $request->arguments(custom => 1);
-	my $f = 
-	sub { 
-	      #$self->custom_update($props->{update},$obj);   
-	      $self->custom_create($props->{set},$obj); 
-	      $self->custom_delete($props->{delete},$obj);    
-		  
-	      eval { $obj->update($request->arguments) };
-	      QVD::Admin4::Exception->throw(code => ($DB->storage->_dbh->state || 4),
-					    message => "$@") if $@;
-	    
-	      $self->update_related($request,$obj); };
-	
-	eval { $DB->txn_do($f)};
-
-	if ($@) { $failures->{$obj->id} = ($@->can('code') ? $@->code : 4); }
+	eval { $self->$_($obj) for @conditions;
+	       $DB->txn_do( sub { eval { $obj->update($request->arguments) };
+				  QVD::Admin4::Exception->throw(code => ($DB->storage->_dbh->state || 4),
+								message => "$@") if $@;
+				  $self->update_related_objects($request,$obj);
+	 if ($@) { $failures->{$obj->id} = ($@->can('code') ? $@->code : 4); }
     }
 
     QVD::Admin4::Exception->throw(code => 1, failures => $failures) if %$failures;
     $result->{rows} = [];
     $result;
 }
+
+
+sub exec_over_searcin_request
+{
+    my($self,$request,$obj)=@_;
+    my %nested_queries = %{$request->nested_queries};
+
+    my $acls_nested_query = $nested_queries{aclChanges}; 
+    $self->change_acls_in_nested_request($acls_nested_query,$obj)
+	if defined $acls_nested_query;
+
+    my $tags_nested_query = $nested_queries{tagChanges}; 
+    $self->change_tags_in_nested_request($tags_nested_query,$obj)
+	if defined $tags_nested_query;
+
+    my $cp_nested_query = $nested_queries{propertiesChanges}; 
+    $self->change_custom_properties_in_nested_request($cp_nested_query,$obj)
+	if defined $cp_nested_query;
+}
+
+sub change_acls_in_nested_request
+{
+    my ($self,$nested_query,$obj) = @_;
+
+}
+
+
+sub change_tags_in_nested_request
+{
+    my ($self,$nested_query,$obj) = @_;
+
+}
+
+sub change_custom_properties_in_nested_request
+{
+    my ($self,$nested_query,$obj) = @_;
+
+}
+
+    $self->custom_create($props->{set},$obj); 
+    $self->custom_delete($props->{delete},$obj);    
+    $self->tags_delete($tags->{delete},$di);    
+    $self->tags_create($tags->{create},$di);};
+$self->assign_roles($acls->{assign_roles},$role);    
+$self->unassign_roles($acls->{unassign_roles},$role);
+$self->assign_acls($acls->{assign_acls},$role);    
+$self->unassign_acls($acls->{unassign_acls},$role); }) };	
+$self->add_role_to_admin($roles->{assign_roles},$admin);
+$self->del_role_to_admin($roles->{unassign_roles},$admin);
+
+}
+
+sub delete
+{
+    my ($self,$result) = @_;
+    my $failures = {};
+
+    for my $obj (@{$result->{rows}})
+    {
+         eval { $self->$_($obj) || 
+		    QVD::Admin4::Exception->throw(code => 16)
+		    for @conditions; 
+		$obj->delete };
+	 print $@ if $@;
+	 if ($@) { $failures->{$obj->id} = ($@->can('code') ? $@->code : 4); }
+    }
+
+    QVD::Admin4::Exception->throw(code => 1, failures => $failures) if %$failures;
+}
+
+sub create
+{
+    my ($self,$request,@conditions) = @_;
+
+    my $arguments = $request->arguments(default => 1);
+
+    my $obj = eval { $self->$_($request) || 
+			 QVD::Admin4::Exception->throw(code => 17)
+			 for @conditions;
+		     $DB->resultset($request->table)->create($arguments) };
+    print $@ if $@;
+    QVD::Admin4::Exception->throw(code => ($DB->storage->_dbh->state || 4),
+                                  message => "$@") if $@;
+    $obj;
+# Meter create related y nested
+}
+
+sub create_related
+{
+    my ($self,$request,$obj) = @_;
+    my $related_args = $request->arguments(related => 1, default => 1);
+
+    for my $table (keys %{$request->dependencies})
+    {
+	eval { $obj->create_related($table,($related_args->{$table} || {})) };
+	print $@ if $@;
+	QVD::Admin4::Exception->throw(code => ($DB->storage->_dbh->state || 4),
+                                      message => "$@") if $@;
+    }
+}
+
+sub create_nested
+{
+
+}
+#########################
+##### NESTED QUERIES ####
+#########################
 
 sub custom_create
 {
@@ -634,33 +287,6 @@ sub custom_delete
     }		
 }
 
-################
-# Tag/Untag dis
-################
-
-sub update_tags
-{
-    my ($self,$request) = @_;
- 
-    my $result = $self->select($request);   
-    my $failures = {};
-
-    for my $di (@{$result->{rows}})
-    {
-	my $tags = $request->arguments(tags => 1);
-	my $f = 
-	sub { $self->tags_delete($tags->{delete},$di);    
-	      $self->tags_create($tags->{create},$di);};
-	
-	eval { $DB->txn_do($f)};
-
-	if ($@) { $failures->{$di->id} = ($@->can('code') ? $@->code : 4); }
-    }
-
-    QVD::Admin4::Exception->throw(code => 1, failures => $failures) if %$failures;
-    $result->{rows} = [];
-    $result;
-}
 
 sub tags_create
 {
@@ -694,134 +320,99 @@ sub tags_delete
     }		
 }
 
-#########################
-## ADD/DELETE ELEMENTS ##
-#########################
-
-sub _delete
+sub assign_acls
 {
-    my ($self,$result,@conditions) = @_;
-    my $failures = {};
+    my ($self,$acl_ids,$role) = @_;
 
-    for my $obj (@{$result->{rows}})
-    {
-         eval { $self->$_($obj) || 
-		    QVD::Admin4::Exception->throw(code => 16)
-		    for @conditions; 
-		$obj->delete };
-	 print $@ if $@;
-	 if ($@) { $failures->{$obj->id} = ($@->can('code') ? $@->code : 4); }
-    }
-
-    QVD::Admin4::Exception->throw(code => 1, failures => $failures) if %$failures;
-}
-
-sub _create
-{
-    my ($self,$request,@conditions) = @_;
-
-    my $arguments = $request->arguments(default => 1);
-
-    my $obj = eval { $self->$_($request) || 
-			 QVD::Admin4::Exception->throw(code => 17)
-			 for @conditions;
-		     $DB->resultset($request->table)->create($arguments) };
-    print $@ if $@;
-    QVD::Admin4::Exception->throw(code => ($DB->storage->_dbh->state || 4),
-                                  message => "$@") if $@;
-    $obj;
-}
-
-sub _create_related
-{
-    my ($self,$request,$obj) = @_;
-    my $related_args = $request->arguments(related => 1, default => 1);
-
-    for my $table (keys %{$request->dependencies})
-    {
-	eval { $obj->create_related($table,($related_args->{$table} || {})) };
-	print $@ if $@;
-	QVD::Admin4::Exception->throw(code => ($DB->storage->_dbh->state || 4),
-                                      message => "$@") if $@;
+    for my $acl_id (@$acl_ids)
+    { 	
+	my $acl = $DB->resultset('ACL')->search(
+	    { id => $acl_id })->first;
+	QVD::Admin4::Exception->throw(code => 21) 
+	    unless $acl; 
+	next if $role->is_allowed_to($acl->name);
+	$role->has_negative_acl($acl->name) ?
+	    $role->unassign_acls($acl->id) :
+	    $role->assign_acl($acl->id,1);
     }
 }
 
-sub host_create {
-    my ($self, $request) = @_;
-
-    $DB->txn_do( sub { my $host = $self->_create($request);
-		       $self->_create_related($request,$host);
-		       $self->custom_create($request->arguments(custom => 1),$host)});
-
-   { total => undef, 
-     rows => [] };
-}
-
-sub host_delete {
-
-    my ($self, $request) = @_;
-
-    my $result = $self->select($request);
-    $self->_delete($result);
-
-   { total => undef, 
-     rows => [] };
-}
-
-
-sub user_create {
-    my ($self, $request) = @_;
-
-    $request->{json}->{arguments}->{straight}->{tenant_id} =
-	$request->{json}->{tenant};
-
-    $DB->txn_do( sub { my $user = $self->_create($request);
-		       $self->_create_related($request,$user);
-		       $self->custom_create($request->arguments(custom => 1),$user)});
-
-   { total => undef, 
-     rows => [] };
-}
-
-sub user_delete {
-
-    my ($self, $request) = @_;
-
-    my $result = $self->select($request);
-    $self->_delete($result);
-
-   { total => undef, 
-     rows => [] };
-}
-
-sub osf_create
+sub unassign_acls
 {
-    my ($self,$request) = @_;
+    my ($self,$acl_ids,$role) = @_;
 
-    $request->{json}->{arguments}->{straight}->{tenant_id} =
-	$request->{json}->{tenant};
+    for my $acl_id (@$acl_ids)
+    { 	
+	my $acl = $DB->resultset('ACL')->search(
+	    { id => $acl_id })->first;
+	QVD::Admin4::Exception->throw(code => 21)
+	    unless $acl; 
 
+	next unless $role->is_allowed_to($acl->name);
 
-    $DB->txn_do( sub { my $host = $self->_create($request);
-		       $self->_create_related($request,$host);
-		       $self->custom_create($request->arguments(custom => 1),$host)});
-
-   { total => undef, 
-     rows => [] };
-
+	$role->has_positive_acl($acl->name) ?
+	    $role->unassign_acls($acl->id) :
+	    $role->assign_acl($acl->id,0);
+    }
 }
 
-sub osf_delete
+sub assign_roles
 {
-    my ($self,$request) = @_;
+    my ($self,$roles_to_assign,$this_role) = @_;
 
-    my $result = $self->select($request);
+    for my $role_to_assign_id (@$roles_to_assign)
+    { 	
+	my $role_to_assign = $DB->resultset('Role')->search(
+	    {id => $role_to_assign_id})->first;
+	QVD::Admin4::Exception->throw(code => 20) 
+	    unless $role_to_assign;
 
-    $self->_delete($result);
-
-   { total => undef, 
-     rows => [] };
+	my @acl_ids = [$role_to_assign->_get_inherited_acls(return_value => 'id')];
+	$this_role->unassign_acls(\@acl_ids);
+	$this_role->assign_role($role_to_assign->id);
+    }
 }
+
+sub unassign_roles
+{
+    my ($self,$roles_to_unassign,$this_role) = @_;
+
+    for my $role_to_unassign_id (@$roles_to_unassign)
+    { 	
+	my $role_to_unassign = $DB->resultset('Role')->search(
+	    {id => $role_to_unassign_id})->first;
+	QVD::Admin4::Exception->throw(code => 20) 
+	    unless $role_to_unassign;
+	$this_role->unassign_roles($role_to_unassign->id);
+    }
+
+    my %acl_ids = map { $_->id => 1 } $this_role->_get_only_inherited_acls(return_value => 'id');
+
+    defined $acl_ids{$_} || $this_role->unassign_acls($_,0)
+    for $this_role->_get_own_acls(return_value => 'id', positive => 0);
+}
+
+sub del_role_to_admin
+{
+    my ($self,$role_ids,$admin) = @_;
+    $DB->resultset('Role_Assignment_Relation')->search(
+	{role_id => $role_ids,
+	 administrator_id => $admin->id})->delete_all;
+}
+
+sub add_role_to_admin
+{
+    my ($self,$role_ids,$admin) = @_;
+
+
+    eval { $DB->resultset('Role_Assignment_Relation')->create(
+	       {role_id => $_,
+		administrator_id => $admin->id}) } for @$role_ids;
+}
+
+#############################
+###### AD HOC FUNCTIONS #####
+#############################
 
 sub vm_create
 {
@@ -895,77 +486,6 @@ sub di_delete {
 
    { total => undef, 
      rows => [] };
-}
-
-####################
-# AUXILIAR FUNCTIONS
-####################
-
-sub vm_is_stopped
-{
-    my ($self,$obj) = @_;
-    $obj->vm_runtime->vm_state eq 'stopped' ? 
-	return 1 : 
-	return 0;
-}
-
-sub no_vm_runtimes
-{
-    my ($self,$obj) = @_;
-    $obj->vm_runtimes->count == 0;
-}
-
-sub no_head_default_tags
-{
-    my ($self,$di) = @_;
-
-    for my $tag (qw/default head/) 
-    {
-	next unless $di->has_tag($tag);
-	my @potentials = grep { $_->id ne $di->id } $di->osf->dis;
-	if (@potentials) {
-	    my $new_di = $potentials[-1];
-	    $DB->resultset('DI_Tag')->create({di_id => $new_di->id, tag => $tag});
-	}
-    }
-    return 1;
-}
-
-sub add_custom
-{
-    my ($self,$request,$obj) = @_;
-    $ENV{QVD_ADMIN4_CUSTOM_JOIN_CONDITION} = undef;
-    ( properties => { map {  $_->key => $_->value  } $obj->properties->all });
-} 
-
-###############
-## SWITCHERS ##
-###############
-
-
-sub user_block
-{
-    my ($self,$request) = @_;
-    my @conditions = qw();
-
-    $self->update($request,@conditions);
-}
-
-sub vm_block
-{
-    my ($self,$request) = @_;
-    my @conditions = qw();
-
-    $self->update($request,@conditions);
-}
-
-
-sub host_block
-{
-    my ($self,$request) = @_;
-    my @conditions = qw();
-
-    $self->update($request,@conditions);
 }
 
 
@@ -1064,54 +584,91 @@ sub _assign_host {
     }
 }
 
-sub osf_block
+##########################
+### AUXILIAR FUNCTIONS ###
+##########################
+
+sub vm_is_stopped
 {
-    my ($self,$request) = @_;
-    my @conditions = qw();
-    $self->update($request,@conditions);
+    my ($self,$obj) = @_;
+    $obj->vm_runtime->vm_state eq 'stopped' ? 
+	return 1 : 
+	return 0;
 }
 
-sub di_block
+sub no_vm_runtimes
 {
-    my ($self,$request) = @_;
-    my @conditions = qw();
-    $self->update($request,@conditions);
+    my ($self,$obj) = @_;
+    $obj->vm_runtimes->count == 0;
+}
+
+sub no_head_default_tags
+{
+    my ($self,$di) = @_;
+
+    for my $tag (qw/default head/) 
+    {
+	next unless $di->has_tag($tag);
+	my @potentials = grep { $_->id ne $di->id } $di->osf->dis;
+	if (@potentials) {
+	    my $new_di = $potentials[-1];
+	    $DB->resultset('DI_Tag')->create({di_id => $new_di->id, tag => $tag});
+	}
+    }
+    return 1;
+}
+
+sub _get_free_ip {
+    my $self = shift;
+    my $nettop = nettop_n;
+    my $netstart = netstart_n;
+
+    my %ips = map { net_aton($_->ip) => 1 } 
+    $self->db->resultset('VM')->all;
+
+    while ($nettop-- > $netstart) {
+        return net_ntoa($nettop) unless $ips{$nettop}
+    }
+    die "No free IP addresses";
+}
+
+sub get_default_version
+{ 
+    my $self = shift;
+
+    my ($y, $m, $d) = (localtime)[5, 4, 3];
+    $m ++;
+    $y += 1900;
+
+    my $osf_id = $self->json->{arguments}->{straight}->{osf_id}  //
+	QVD::Admin4::Exception->throw(code=>'23502'); # FIX ME: PREVIOUS REVISION OF MANDATORY ARGUMENTS
+    my $osf = $self->db->resultset('OSF')->search({id => $osf_id})->first;
+    my $version;
+
+    for (0..999) 
+    {
+	$version = sprintf("%04d-%02d-%02d-%03d", $y, $m, $d, $_);
+	last unless $osf->di_by_tag($version);
+    }
+    $version;
 }
 
 
-sub user_unblock
-{
-    my ($self,$request) = @_;
-    my @conditions = qw();
-    $self->update($request,@conditions);
-}
+sub get_di_id_subquery
+{    
+my $self = shift; 
+   if (defined $self->json->{filters}->{di_id})
+    {
+	my $dirs = $self->db->resultset('DI'); 
+	my $di_id = $self->json->{filters}->{di_id};
 
-sub vm_unblock
-{
-    my ($self,$request) = @_;
-    my @conditions = qw();
-    $self->update($request,@conditions);
-}
-
-sub host_unblock
-{
-    my ($self,$request) = @_;
-    my @conditions = qw();
-    $self->update($request,@conditions);
-}
-
-sub osf_unblock
-{
-    my ($self,$request) = @_;
-    my @conditions = qw();
-    $self->update($request,@conditions);
-}
-
-sub di_unblock
-{
-    my ($self,$request) = @_;
-    my @conditions = qw();
-    $self->update($request,@conditions);
+	$self->json->{filters}->{osf_id} = 
+	{ -in => $dirs->search({ 'subquery.id' => $di_id,
+                                 'tags.tag' => { -ident => 'me.di_tag' } },
+			       { join => ['tags'], 
+				 alias => 'subquery'})->get_column('osf_id')->as_query };
+	delete $self->json->{filters}->{di_id};
+    }
 }
 
 ##################################
@@ -1244,409 +801,6 @@ sub get_the_most_populated_hosts
                 $rs->all;
     my $array_limit = $#hosts > 5 ? 5 : $#hosts;    
     return [@hosts[0 .. $array_limit]];
-}
-
-
-###################
-# ADMIN FUNCTIONS
-###################
-
-
-sub admin_tiny_list
-{
-    my ($self,$request) = @_;
-    my $result = $self->select($request);
-
-    my @fields = qw(id name);
-    $_ = $self->_map($_,$request,{},@fields) 
-	for @{$result->{rows}};
-    
-    $result;
-}
-
-sub admin_get_list
-{
-    my ($self,$request) = @_;
-    my $result = $self->select($request);
-
-    my @fields = qw(id name);
-    $_ = $self->_map($_,$request,{},@fields) 
-	for @{$result->{rows}};
-    
-    $result;
-}
-
-sub admin_get_details
-{
-    my ($self,$request) = @_;
-    my $result = $self->select($request);
-
-    my @fields = qw(id name acls roles);
-    $_ = $self->_map($_,$request,{},@fields) 
-	for @{$result->{rows}};
-    
-    $result;
-}
-
-
-sub admin_delete {
-
-    my ($self, $request) = @_;
-
-    my $result = $self->select($request);
-    $self->_delete($result);
-
-   { total => undef, 
-     rows => [] };
-}
-
-sub admin_update
-{
-    my ($self,$request) = @_;
-    $self->update($request);
-    $self->admin_assign_roles($request);
-}
-
-sub admin_create {
-    my ($self, $request) = @_;
-
-    unless ($self->administrator->is_superadmin)
-    {
-	$request->{json}->{arguments}->{straight}->{tenant_id} =
-	    $self->administrator->tenant_id;
-    }
-
-    $DB->txn_do( sub { my $admin = $self->_create($request);
-		       $self->_create_related($request,$admin);
-		       $self->custom_create($request->arguments(custom => 1),$admin)});
-
-   { total => undef, 
-     rows => [] };
-}
-
-sub tenant_tiny_list
-{
-    my ($self,$request) = @_;
-    my $result = $self->select($request);
-
-    my @fields = qw(id name);
-    $_ = $self->_map($_,$request,{},@fields) 
-	for @{$result->{rows}};
-    
-    $result;
-}
-
-sub tenant_get_list
-{
-    my ($self,$request) = @_;
-    my $result = $self->select($request);
-
-    my @fields = qw(id name);
-    $_ = $self->_map($_,$request,{},@fields) 
-	for @{$result->{rows}};
-    
-    $result;
-}
-
-sub tenant_get_details
-{
-    my ($self,$request) = @_;
-    my $result = $self->select($request);
-
-    my @fields = qw(id name);
-    $_ = $self->_map($_,$request,{},@fields) 
-	for @{$result->{rows}};
-    
-    $result;
-}
-
-sub tenant_update
-{
-    my ($self,$request) = @_;
-    $self->update($request);
-}
-
-sub tenant_create {
-    my ($self, $request) = @_;
-
-    
-    $DB->txn_do( sub { my $admin = $self->_create($request);
-		       $self->_create_related($request,$admin);
-		       $self->custom_create($request->arguments(custom => 1),$admin)});
-
-   { total => undef, 
-     rows => [] };
-}
-
-sub tenant_delete {
-
-    my ($self, $request) = @_;
-
-    my $result = $self->select($request);
-    $self->_delete($result);
-
-   { total => undef, 
-     rows => [] };
-}
-
-sub role_tiny_list
-{
-    my ($self,$request) = @_;
-    my $result = $self->select($request);
-
-    my @fields = qw(id name);
-    $_ = $self->_map($_,$request,{},@fields) 
-	for @{$result->{rows}};
-    
-    $result;
-}
-
-sub role_get_list
-{
-    my ($self,$request) = @_;
-    my $result = $self->select($request);
-
-    my @fields = qw(id name);
-    $_ = $self->_map($_,$request,{},@fields) 
-	for @{$result->{rows}};
-    
-    $result;
-}
-
-sub role_get_details
-{
-    my ($self,$request) = @_;
-    my $result = $self->select($request);
-
-    my @fields = qw(id name inherited_roles own_acls inherited_acls);
-    $_ = $self->_map($_,$request,{},@fields) 
-	for @{$result->{rows}};
-    
-    $result;
-}
-
-sub acl_tiny_list
-{
-    my ($self,$request) = @_;
-    my $result = $self->select($request);
-
-    my @fields = qw(id name);
-    $_ = $self->_map($_,$request,{},@fields) 
-	for @{$result->{rows}};
-    
-    $result;
-}
-
-
-sub acl_get_list
-{
-    my ($self,$request) = @_;
-    my $result = $self->select($request);
-
-    my @fields = qw(id name roles);
-    $_ = $self->_map($_,$request,{},@fields) 
-	for @{$result->{rows}};
-    
-    $result;
-}
-
-
-sub role_update
-{
-    my ($self,$request) = @_;
-
-    $self->update($request);
-    $self->role_assign_acls($request);
-}
-
-sub role_assign_acls
-{
-    my ($self,$request) = @_;
-
-    my $result = $self->select($request);   
-    my $failures = {};
-    my $acls = $request->arguments(acls => 1);
-
-    for my $role (@{$result->{rows}})
-    {
-	eval { $DB->txn_do(sub { $self->assign_roles($acls->{assign_roles},$role);    
-				 $self->unassign_roles($acls->{unassign_roles},$role);
-				 $self->assign_acls($acls->{assign_acls},$role);    
-				 $self->unassign_acls($acls->{unassign_acls},$role); }) };
-	if ($@) { $failures->{$role->id} = ($@->can('code') ? $@->code : 4); }
-    }
-
-    QVD::Admin4::Exception->throw(code => 1, failures => $failures) if %$failures;
-    $result->{rows} = [];
-    $result;
-}
-
-sub assign_acls
-{
-    my ($self,$acl_ids,$role) = @_;
-
-    for my $acl_id (@$acl_ids)
-    { 	
-	my $acl = $DB->resultset('ACL')->search(
-	    { id => $acl_id })->first;
-	QVD::Admin4::Exception->throw(code => 21) 
-	    unless $acl; 
-	next if $role->is_allowed_to($acl->name);
-	$role->has_negative_acl($acl->name) ?
-	    $role->unassign_acls($acl->id) :
-	    $role->assign_acl($acl->id,1);
-    }
-}
-
-sub unassign_acls
-{
-    my ($self,$acl_ids,$role) = @_;
-
-    for my $acl_id (@$acl_ids)
-    { 	
-	my $acl = $DB->resultset('ACL')->search(
-	    { id => $acl_id })->first;
-	QVD::Admin4::Exception->throw(code => 21)
-	    unless $acl; 
-
-	next unless $role->is_allowed_to($acl->name);
-
-	$role->has_positive_acl($acl->name) ?
-	    $role->unassign_acls($acl->id) :
-	    $role->assign_acl($acl->id,0);
-    }
-}
-
-sub assign_roles
-{
-    my ($self,$roles_to_assign,$this_role) = @_;
-
-    for my $role_to_assign_id (@$roles_to_assign)
-    { 	
-	my $role_to_assign = $DB->resultset('Role')->search(
-	    {id => $role_to_assign_id})->first;
-	QVD::Admin4::Exception->throw(code => 20) 
-	    unless $role_to_assign;
-
-	my @acl_ids = [$role_to_assign->_get_inherited_acls(return_value => 'id')];
-	$this_role->unassign_acls(\@acl_ids);
-	$this_role->assign_role($role_to_assign->id);
-    }
-}
-
-sub unassign_roles
-{
-    my ($self,$roles_to_unassign,$this_role) = @_;
-
-    for my $role_to_unassign_id (@$roles_to_unassign)
-    { 	
-	my $role_to_unassign = $DB->resultset('Role')->search(
-	    {id => $role_to_unassign_id})->first;
-	QVD::Admin4::Exception->throw(code => 20) 
-	    unless $role_to_unassign;
-	$this_role->unassign_roles($role_to_unassign->id);
-    }
-
-    my %acl_ids = map { $_->id => 1 } $this_role->_get_only_inherited_acls(return_value => 'id');
-
-    defined $acl_ids{$_} || $this_role->unassign_acls($_,0)
-    for $this_role->_get_own_acls(return_value => 'id', positive => 0);
-}
-
-sub role_create {
-    my ($self, $request) = @_;
-    
-    $DB->txn_do( sub { my $role = $self->_create($request);
-		       $self->_create_related($request,$role);
-                       $self->role_assign_acls($request,$role);});
-   { total => undef, 
-     rows => [] };
-}
-
-
-sub role_delete {
-
-    my ($self, $request) = @_;
-
-    my $result = $self->select($request);
-    $self->_delete($result);
-
-   { total => undef, 
-     rows => [] };
-}
-
-sub admin_assign_roles
-{
-    my ($self,$request) = @_;
-
-    my $result = $self->select($request);   
-    my $failures = {};
-    my $roles = $request->arguments(acls => 1);
-
-    for my $admin (@{$result->{rows}})
-    {
-	eval { $DB->txn_do(sub { $self->add_role_to_admin($roles->{assign_roles},$admin);
-				 $self->del_role_to_admin($roles->{unassign_roles},$admin); }) };
-	if ($@) { $failures->{$admin->id} = ($@->can('code') ? $@->code : 4); }
-    }
-
-    QVD::Admin4::Exception->throw(code => 1, failures => $failures) if %$failures;
-    $result->{rows} = [];
-    $result;
-}
-
-sub del_role_to_admin
-{
-    my ($self,$role_ids,$admin) = @_;
-    $DB->resultset('Role_Assignment_Relation')->search(
-	{role_id => $role_ids,
-	 administrator_id => $admin->id})->delete_all;
-}
-
-sub add_role_to_admin
-{
-    my ($self,$role_ids,$admin) = @_;
-
-
-    eval { $DB->resultset('Role_Assignment_Relation')->create(
-	       {role_id => $_,
-		administrator_id => $admin->id}) } for @$role_ids;
-}
-
-
-sub _get_free_ip {
-    my $self = shift;
-    my $nettop = nettop_n;
-    my $netstart = netstart_n;
-
-    my %ips = map { net_aton($_->ip) => 1 } 
-    $self->db->resultset('VM')->all;
-
-    while ($nettop-- > $netstart) {
-        return net_ntoa($nettop) unless $ips{$nettop}
-    }
-    die "No free IP addresses";
-}
-
-sub get_default_version
-{ 
-    my $self = shift;
-
-    my ($y, $m, $d) = (localtime)[5, 4, 3];
-    $m ++;
-    $y += 1900;
-
-    my $osf_id = $self->json->{arguments}->{straight}->{osf_id}  //
-	QVD::Admin4::Exception->throw(code=>'23502'); # FIX ME: PREVIOUS REVISION OF MANDATORY ARGUMENTS
-    my $osf = $self->db->resultset('OSF')->search({id => $osf_id})->first;
-    my $version;
-
-    for (0..999) 
-    {
-	$version = sprintf("%04d-%02d-%02d-%03d", $y, $m, $d, $_);
-	last unless $osf->di_by_tag($version);
-    }
-    $version;
 }
 
 1;

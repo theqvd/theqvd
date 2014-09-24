@@ -9,10 +9,9 @@ has 'current_qvd_administrator', is => 'ro', isa => 'QVD::DB::Result::Administra
 has 'qvd_object', is => 'ro', isa => 'Str', required => 1;
 has 'type_of_action', is => 'ro', isa => 'Str', required => 1;
 
-
 my $MODEL_INFO = { avaliable_filters => [],
-		   available_arguments => [],
 		   available_fields => [],
+		   available_arguments => [],
 		   subchain_filters => [],
 		   mandatory_arguments => [],
 		   mandatory_filters => [],
@@ -21,33 +20,92 @@ my $MODEL_INFO = { avaliable_filters => [],
 		   filters_to_dbix_format_mapper => {},
 		   arguments_to_dbix_format_mapper => {},
 		   fields_to_dbix_format_mapper => {},
-		   argument_values_normalizator => {},
+		   order_criteria_to_dbix_format_mapper => {},
+		   values_normalizator => {},
 		   dbix_join_value => {},
 		   dbix_has_one_relationships => {},
 };
 
-my $AVAILABLE_FILTERS = { details => [qw(id tenant_id)],
-			  tiny => [qw(tenant_id)],
-			  delete => [qw(id tenant_id)],
-			  update => [qw(id tenant_id)],
-			  state => [qw(id tenant_id)],
-			  'exec' => [qw(id tenant_id)] };
 
-my $MANDATORY_FILTERS = { list => [qw(tenant_id)],
-			  details => [qw(id tenant_id)], 
-			  tiny => [qw(tenant_id)],
-			  delete => [qw(id tenant_id)], 
-			  update=> [qw(id tenant_id)], 
-			  state => [qw(id tenant_id)], 
-			  all_ids => [qw(tenant_id)], 
-			  'exec' => [qw(id tenant_id)]};
+my $AVAILABLE_FILTERS = { list => { default => [],
+				    VM => [qw(storage id name user_id user_name osf_id osf_name di_tag blocked 
+                                              expiration_soft expiration_hard state host_id host_name host_name di_id 
+                                              user_state ip next_boot_ip ssh_port vnc_port serial_port tenant_id tenant_name 
+                                              creation_admin creation_date )],
+				    DI_Tag => [qw(osf_id name id )],
+				    User => [qw(id name blocked creation_admin creation_date tenant_id tenant_name )],
+				    Host => [qw(id name address blocked frontend backend state vm_id creation_admin creation_date )],
+				    DI => [qw(id disk_image version osf_id osf_name tenant_id blocked tenant_name )],
+				    OSF => [qw(id name overlay user_storage memory vm_id di_id tenant_id tenant_name )],
+				    ACL => [qw(id name role_id admin_id )],
+				    Role => [qw(name acl_id role_id nested_acl_name nested_role_name id admin_id admin_name )],
+				    Administrator => [qw(name tenant_id tenant_name role_id acl_id id role_name acl_name )]},
 
-my $SUBCHAIN_FILTERS = { list => [qw(name)] };
+			  all_ids => { default => [],
+				       VM => [qw(storage id name user_id user_name osf_id osf_name di_tag blocked expiration_soft 
+                                              expiration_hard state host_id host_name host_name di_id user_state ip next_boot_ip ssh_port 
+                                              vnc_port serial_port tenant_id tenant_name creation_admin creation_date )],
+				       DI_Tag => [qw(osf_id name id )],
+				       User => [qw(id name blocked creation_admin creation_date tenant_id tenant_name )],
+				       Host => [qw(id name address blocked frontend backend state vm_id creation_admin creation_date )],
+				       DI => [qw(id disk_image version osf_id osf_name tenant_id blocked tenant_name )],
+				       OSF => [qw(id name overlay user_storage memory vm_id di_id tenant_id tenant_name )],
+				       ACL => [qw(id name role_id admin_id )],
+				       Role => [qw(name acl_id role_id nested_acl_name nested_role_name id admin_id admin_name )],
+				       Administrator => [qw(name tenant_id tenant_name role_id acl_id id role_name acl_name )]},
 
-my $AVAILABLE_FIELDS = { tiny => [qw(id name)],
-			 all_ids_actions => [qw(id)]};
+			  details => { default => [qw(id tenant_id)] },
+			  tiny => { default => [qw(tenant_id)]},
+			  delete => { default => [qw(id tenant_id)]},
+			  update => { default => [qw(id tenant_id)]},
+			  state => { default => [qw(id tenant_id)],
+				     User => [qw(number_of_vms_connected)],
+				     VM => [qw(state user_state)],
+				     Host => [qw(number_of_vms_connected)]},
+			  'exec' => { default => [qw(id tenant_id)]} };
 
-my $DEFAULT_ORDER_CRITERIA = { tiny => [qw(name)]};
+my $AVAILABLE_FIELDS = { list => { default => [],
+				   OSF => [qw(id name overlay user_storage memory vm_id di_id  number_of_vms number_of_dis )];
+				   Role => [qw(name own_acls inherited_acls inherited_roles id )];
+				   DI => [qw(id disk_image version osf_id osf_name  blocked tags  properties )];
+				   VM => [qw(storage id name user_id user_name osf_id osf_name di_tag blocked expiration_soft expiration_hard 
+                                          state host_id host_name host_name di_id user_state ip next_boot_ip ssh_port vnc_port serial_port 
+                                           creation_admin creation_date di_version di_name di_id properties )];
+				   ACL => [qw(id name roles admins )];
+				   Administrator => [qw(name  roles acls id )];
+				   User => [qw(id name  blocked creation_admin creation_date number_of_vms number_of_vms_connected  properties )];
+				   Host => [qw(id name address blocked frontend backend state vm_id load creation_admin creation_date number_of_vms_connected number_of_vms properties )];
+				   DI_Tag => [qw(osf_id name id )] },
+				   tiny => { default => [qw(id name)]},
+
+			 all_ids_actions => { defauly => [],
+					      OSF => [qw(id name overlay user_storage memory vm_id di_id  number_of_vms number_of_dis )],
+					      Role => [qw(name own_acls inherited_acls inherited_roles id )],
+					      DI => [qw(id disk_image version osf_id osf_name  blocked tags  properties )],
+					      VM => [qw(storage id name user_id user_name osf_id osf_name di_tag blocked expiration_soft expiration_hard 
+                                                     state host_id host_name host_name di_id user_state ip next_boot_ip ssh_port vnc_port serial_port 
+                                                      creation_admin creation_date di_version di_name di_id properties )],
+					      ACL => [qw(id name roles admins )],
+					      Administrator => [qw(name roles acls id )],
+					      User => [qw(id name  blocked creation_admin creation_date number_of_vms number_of_vms_connected  properties )],
+					      Host => [qw(id name address blocked frontend backend state vm_id load creation_admin creation_date number_of_vms_connected number_of_vms properties )],
+					      DI_Tag => [qw(osf_id name id )] }
+};
+
+my $MANDATORY_FILTERS = { list => { default => [qw(tenant_id)]},
+			  details => { default => [qw(id tenant_id)]}, 
+			  tiny => { default => [qw(tenant_id)]},
+			  delete => { default => [qw(id tenant_id)]}, 
+			  update=> { default => [qw(id tenant_id)]}, 
+			  state => { default => [qw(id tenant_id)]}, 
+			  all_ids => { default => [qw(tenant_id)]}, 
+			  'exec' => { default => [qw(id tenant_id)]}};
+
+my $SUBCHAIN_FILTERS = { list => { default => [qw(name)],
+				   Administrator => [qw(name role_name acl_name)],
+				   Role => [qw(name nested_role_name acl_name)]}};
+
+my $DEFAULT_ORDER_CRITERIA = { tiny => { default => { [qw(name)] }}};
 
 my $AVAILABLE_ARGUMENTS = { User => [qw(name password blocked)],
                             VM => [qw(name di_tag blocked expiration_soft expiration_hard storage)],
@@ -185,12 +243,12 @@ my $FILTERS_TO_DBIX_FORMAT_MAPPER =
 
     Role => {
 	'name' => 'me.name',
-	'acl_id' => 'acls.acl_id',
-	'nested_role_id' => 'roles.role_id',
-	'acl_name' => 'acl.name',
-	'nested_role_name' => 'role_2.name',
+	'acl_id' => 'acl_rels.acl_id',
+	'nested_role_id' => 'role_rels.inherited_id',
+	'acl_name' => 'acls.name',
+#	'nested_role_name' => 'role_2.name',
 	'id' => 'me.id',
-	'admin_id' => 'admins.admin_id',
+	'admin_id' => 'admin_rels.admin_id',
 	'admin_name' => 'admin.name',
     },
     Tenant => {
@@ -200,6 +258,9 @@ my $FILTERS_TO_DBIX_FORMAT_MAPPER =
 };
 
 my $ARGUMENTS_TO_DBIX_FORMAT_MAPPER = 
+    $FILTERS_TO_DBIX_FORMAT_MAPPER;
+
+my $ORDER_CRITERIA_TO_DBIX_FORMAT_MAPPER = 
     $FILTERS_TO_DBIX_FORMAT_MAPPER;
 
 my $FIELDS_TO_DBIX_FORMAT_MAPPER = 
@@ -330,200 +391,115 @@ my $FIELDS_TO_DBIX_FORMAT_MAPPER =
 	'id' => 'me.id'
     }
 };
-my $ARGUMENT_VALUES_NORMALIZATOR = { DI => { disk_image => \&basename_disk_image},
+my $VALUES_NORMALIZATOR = { DI => { disk_image => \&basename_disk_image},
 				     User => { name => \&normalize_name, 
 					       password => \&password_to_token }};
 my $DBIX_JOIN_VALUE = { User => [qw(tenant)],
                         VM => ['osf', { vm_runtime => 'host' }, { user => 'tenant' }],
-			Host => ['runtime',{ vms => 'host'}],
+			Host => ['runtime', { vms => 'host'}],
 			OSF => [ qw(tenant vms dis), { dis => 'tags' }],
 			DI => [qw(vm_runtimes tags), {osf => 'tenant'}],
 			DI_Tag => [qw(di)],
-			Role => [{roles => 'inherited', acls => 'acl'}],
-			Administrator => [qw(tenant), { roles => { role => { acls => 'acl' }}}],
-			ACL => [{ roles => { role => { administrators => 'administrator' }}}]};
+			Role => [{roles => 'inherited'}, { acl_rels => 'acls'}],
+			Administrator => [qw(tenant), { role_rels => { roles => { acl_rels => 'acls' }}}],
+			ACL => [{ role_rels => { roles => { admin_rels => 'adminis' }}}]};
 
 my $DBIX_HAS_ONE_RELATIONSHIPS = { VM => [qw(vm_runtime counters)],
                                    Host => [qw(runtime counters)]};
-	      
+
 sub BUILD
 {
     my $self = shift;
 
-    $self->set_avaliable_filters;
-    $self->set_available_arguments;
-    $self->set_available_fields;
-    $self->subchain_filters;
-    $self->set_mandatory_arguments;
-    $self->set_mandatory_filters;
-    $self->set_default_argument_values;
-    $self->set_default_order_criteria;
-    $self->set_filters_to_dbix_format_mapper;
-    $self->set_arguments_to_dbix_format_mapper;
-    $self->set_fields_to_dbix_format_mapper;
-    $self->set_argument_values_normalizator;
-    $self->set_dbix_join_value;
-    $self->set_dbix_has_one_relationships;
-
-};
-
-sub set_avaliable_filters
-{
-    my $self = shift;
-
-    $MODEL_INFO->{avaliable_filters} = 
-	$AVAILABLE_FILTERS->{$self->qvd_object} //
-	$AVAILABLE_FILTERS->{$self->type_of_action} // [];
-
-}
-
-sub set_subchain_filters
-{
-    my $self = shift;
-
-    if ($self->qvd_object eq 'Administrator' && $self->type_of_action eq 'list') 
-    { $MODEL_INFO->{subchain_filters} = [qw(name role_name acl_name)]; return;}
-
-    if ($self->qvd_object eq 'Role' && $self->type_of_action eq 'list') 
-    { $MODEL_INFO->{subchain_filters} = [qw(name nested_role_name acl_name)]; return;}
-
-    $MODEL_INFO->{subchain_filters} = 
-	$SUBCHAIN_FILTERS->{$self->qvd_object} // 
-	$SUBCHAIN_FILTERS->{$self->type_of_action} // [];
-}
-
-sub set_default_order_criteria
-{
-    my $self = shift;
-    $MODEL_INFO->{default_order_criteria} = 
-	$DEFAULT_ORDER_CRITERIA->{$self->qvd_object} //
-	$DEFAULT_ORDER_CRITERIA->{$self->type_of_action} // [];
-}
-
-sub set_available_arguments
-{
-    my $self = shift;
-
-    $MODEL_INFO->{avaliable_arguments} = 
-	$AVAILABLE_ARGUMENTS->{$self->qvd_object} //
-	$AVAILABLE_ARGUMENTS->{$self->type_of_action} // [];
-
-}
-
-sub set_available_fields
-{
-    my $self = shift;
+    $self->set_info_by_type_of_action_and_qvd_object(
+	'avaliable_filters',$AVAILABLE_FILTERS);
     
-    if ($self->type_of_action eq 'state') 
-    { $self->set_available_fields_for_state_action; return;}
+    $self->set_info_by_type_of_action_and_qvd_object(
+	'avaliable_fields',$AVAILABLE_FIELDS);
 
-    $MODEL_INFO->{avaliable_fields} = 
-	$AVAILABLE_FIELDS->{$self->qvd_object} //
-	$AVAILABLE_FIELDS->{$self->type_of_action} // [];
+    $sekf->set_tenant_fields
+	if $self->current_qvd_administrator->is_superadmin;
+
+    $self->set_info_by_type_of_action_and_qvd_object(
+	'subchain_filters',$SUBCHAIN_FILTERS);
+
+    $self->set_info_by_type_of_action_and_qvd_object(
+	'default_order_criteria',$DEFAULT_ORDER_CRITERIA);
+
+    $self->set_info_by_qvd_object(
+	'available_arguments',$AVAILABLE_ARGUMENTS);
+
+    $self->set_info_by_qvd_object(
+	'mandatory_arguments',$MANDATORY_ARGUMENTS);
+
+    $self->set_info_by_qvd_object(
+	'mandatory_filters',$MANDATORY_FILTERS);
+
+    $self->set_info_by_qvd_object(
+	'default_argument_values',$DEFAULT_ARGUMENT_VALUES);
+
+    $self->set_info_by_qvd_object(
+	'filters_to_dbix_format_mapper',$FILTERS_TO_DBIX_FORMAT_MAPPER);
+
+    $self->set_info_by_qvd_object(
+	'arguments_to_dbix_format_mapper',$ARGUMENTS_TO_DBIX_FORMAT_MAPPER);
+
+    $self->set_info_by_qvd_object(
+	'fields_to_dbix_format_mapper',$FIELDS_TO_DBIX_FORMAT_MAPPER);
+
+    $self->set_info_by_qvd_object(
+	'order_criteria_to_dbix_format_mapper',$ORDER_CRITERIA_TO_DBIX_FORMAT_MAPPER);
+
+    $self->set_info_by_qvd_object(
+	'values_normalizator',$VALUES_NORMALIZATOR);
+
+    $self->set_info_by_qvd_object(
+	'dbix_join_value',$DBIX_JOIN_VALUE);
+
+    $self->set_info_by_qvd_object(
+	'dbix_has_one_relationships',$DBIX_HAS_ONE_RELATIONSHIPS);
 }
 
-sub set_available_fields_for_state_action
+sub set_tenant_fields
 {
     my $self = shift;
 
-    if ($self->qvd_object eq 'User')
+    push @{$MODEL_INFO->{available_fields}},'tenant_id'
+	if defined $FIELDS_TO_DBIX_FORMAT_MAPPER->{$self->qvd_object}->{tenant_id};
+
+    push @{$MODEL_INFO->{available_fields}},'tenant_name'
+	if defined $FIELDS_TO_DBIX_FORMAT_MAPPER->{$self->qvd_object}->{tenant_name};
+}
+
+sub set_info_by_type_of_action_and_qvd_object
+{
+    my ($self,$INFO_REPO,$model_info_key) = @_;
+
+    if (defined $INFO_REPO->{$self->type_of_action} )
     {
-	$MODEL_INFO->{avaliable_fields} = [qw(number_of_vms_connected)];
+	$MODEL_INFO->{$model_info_key} = 
+	    $INFO_REPO->{$self->type_of_action}->{$self->qvd_object} //
+	    $INFO_REPO->{$self->type_of_action}->{default} // [];
     }
-    elsif ($self->qvd_object eq 'VM')
+    else
     {
-	$MODEL_INFO->{avaliable_fields} = [qw(state user_state)];
-    }
-    elsif ($self->qvd_object eq 'Host')
-    {
-	$MODEL_INFO->{avaliable_fields} = [qw(number_of_vms_connected)];
+	$MODEL_INFO->{avaliable_filters} = [];
     }
 }
 
-sub set_mandatory_arguments
+sub set_info_by_qvd_object
 {
-    my $self = shift;
-    $MODEL_INFO->{mandatory_arguments} = 
-	$MANDATORY_ARGUMENTS->{$self->qvd_objects} // 
-	$MANDATORY_ARGUMENTS->{$self->type_of_action} // [];
-}
+    my ($self,$INFO_REPO,$model_info_key) = @_;
 
-sub set_mandatory_filters
-{
-    my $self = shift;
-
-    $MODEL_INFO->{mandatory_filters} = 
-	$MANDATORY_FILTERS->{$self->qvd_objects} // 
-	$MANDATORY_FILTERS->{$self->type_of_action} // [];
-}
-
-sub set_default_argument_values
-{
-    my $self = shift;
-    $MODEL_INFO->{default_argument_values} = 
-	$DEFAULT_ARGUMENT_VALUES->{$self->qvd_object} // 
-	$DEFAULT_ARGUMENT_VALUES->{$self->type_of_action} // {};
-}
-
-
-sub set_filters_to_dbix_format_mapper
-{
-    my $self = shift;
-    $MODEL_INFO->{filters_to_dbix_format_mapper} = 
-	$FILTERS_TO_DBIX_FORMAT_MAPPER->{$self->qvd_object} // 
-	$FILTERS_TO_DBIX_FORMAT_MAPPER->{$self->type_of_action} // {};
-
-}
-
-sub set_arguments_to_dbix_format_mapper
-{
-    my $self = shift;
-    $MODEL_INFO->{arguments_to_dbix_format_mapper} = 
-	$ARGUMENTS_TO_DBIX_FORMAT_MAPPER->{$self->qvd_object} //
-	$ARGUMENTS_TO_DBIX_FORMAT_MAPPER->{$self->type_of_action} // {};
-
-}
-
-sub set_fields_to_dbix_format_mapper
-{
-    my $self = shift;
-    $MODEL_INFO->{fields_to_dbix_format_mapper} = 
-	$FIELDS_TO_DBIX_FORMAT_MAPPER->{$self->qvd_object} // 
-	$FIELDS_TO_DBIX_FORMAT_MAPPER->{$self->type_of_action} // {};
-
-}
-
-sub set_argument_values_normalizator
-{
-    my $self = shift;
-    $MODEL_INFO->{argument_values_normalizator} = 
-	$ARGUMENT_VALUES_NORMALIZATOR->{$self->qvd_object} // 
-	$ARGUMENT_VALUES_NORMALIZATOR->{$self->type_of_action} // {};
-
-}
-
-sub set_dbix_join_value
-{
-    my $self = shift;
-    $MODEL_INFO->{dbix_join_value} = 
-	$DBIX_JOIN_VALUE->{$self->qvd_object} // 
-	$DBIX_JOIN_VALUE->{$self->type_of_action} // [];
-}
-
-sub set_dbix_has_one_relationships
-{
-    my $self = shift;
-    $MODEL_INFO->{dbix_has_one_relationships} = 
-	$DBIX_HAS_ONE_RELATIONSHIPS->{$self->qvd_object} // 
-	$DBIX_HAS_ONE_RELATIONSHIPS->{$self->type_of_action} // [];
-
+    $MODEL_INFO->{model_info_key} = 
+	$INFO_REPO->{$self->qvd_object} // [];
 }
 
 ############
 ###########
 ##########
 
-sub get_avaliable_filters
+sub avaliable_filters
 {
     my $self = shift;
 
@@ -531,7 +507,7 @@ sub get_avaliable_filters
     @$filters;
 }
 
-sub get_subchain_filters
+sub subchain_filters
 {
     my $self = shift;
 
@@ -539,35 +515,35 @@ sub get_subchain_filters
     @$filters;
 }
 
-sub get_default_order_criteria
+sub default_order_criteria
 {
     my $self = shift;
     my $order_criteria =  $MODEL_INFO->{default_order_criteria} // [];
     @$order_criteria;
 }
 
-sub get_available_arguments
+sub available_arguments
 {
     my $self = shift;
     my $args = $MODEL_INFO->{avaliable_arguments} // [];
     @$args;
 }
 
-sub get_available_fields
+sub available_fields
 {
     my $self = shift;
     my $fields =  $MODEL_INFO->{avaliable_fields} // [];
     @$fields;
 }
 
-sub get_mandatory_arguments
+sub mandatory_arguments
 {
     my $self = shift;
     my $args =  $MODEL_INFO->{mandatory_arguments} // [];
     @$args;
 }
 
-sub get_mandatory_filters
+sub mandatory_filters
 {
     my $self = shift;
 
@@ -575,44 +551,51 @@ sub get_mandatory_filters
     @$filters;
 }
 
-sub get_default_argument_values
+sub default_argument_values
 {
     my $self = shift;
     return $MODEL_INFO->{default_argument_values} || {};
 }
 
 
-sub get_filters_to_dbix_format_mapper
+sub filters_to_dbix_format_mapper
 {
     my $self = shift;
     return $MODEL_INFO->{filters_to_dbix_format_mapper} || {};
 }
 
-sub get_arguments_to_dbix_format_mapper
+sub order_criteria_to_dbix_format_mapper
+{
+    my $self = shift;
+    return $MODEL_INFO->{order_criteria_to_dbix_format_mapper} || {};
+}
+
+
+sub arguments_to_dbix_format_mapper
 {
     my $self = shift;
     return $MODEL_INFO->{arguments_to_dbix_format_mapper} || {};
 }
 
-sub get_fields_to_dbix_format_mapper
+sub fields_to_dbix_format_mapper
 {
     my $self = shift;
     return $MODEL_INFO->{fields_to_dbix_format_mapper} || {};
 }
 
-sub get_argument_values_normalizator
+sub values_normalizator
 {
     my $self = shift;
-    return $MODEL_INFO->{argument_values_normalizator} || {};
+    return $MODEL_INFO->{values_normalizator} || {};
 }
 
-sub get_dbix_join_value
+sub dbix_join_value
 {
     my $self = shift;
     return $MODEL_INFO->{dbix_join_value} || [];
 }
 
-sub get_dbix_has_one_relationships
+sub dbix_has_one_relationships
 {
     my $self = shift;
     my $rels = $MODEL_INFO->{dbix_has_one_relationships} // [];
@@ -624,72 +607,72 @@ sub get_dbix_has_one_relationships
 #################
 
 
-sub is_avaliable_filter
+sub avaliable_filter
 {
     my $self = shift;
     my $filter = shift;
     $_ eq $filter && return 1
-	for $self->get_avaliable_filters;
+	for $self->avaliable_filters;
 
     return 0;
 }
 
-sub is_subchain_filter
+sub subchain_filter
 {
     my $self = shift;
     my $filter = shift;
 
     $_ eq $filter && return 1
-	for $self->get_subchain_filters;
+	for $self->subchain_filters;
     return 0;
 }
 
-sub is_default_order_criterium
+sub default_order_criterium
 {
     my $self = shift;
     my $order_criterium = shift;
     $_ eq $order_criterium && return 1
-	for $self->get_default_order_criteria;
+	for $self->default_order_criteria;
     return 1;
 }
 
-sub is_available_argument
+sub available_argument
 {
     my $self = shift;
     my $argument = shift;
 
     $_ eq $argument && return 1
-	for $self->get_available_arguments;
+	for $self->available_arguments;
 
     return 0;
 }
 
-sub is_available_field
+sub available_field
 {
     my $self = shift;
     my $field = shift;
     $_ eq $field && return 1
-	for $self->get_available_fields;
+	for $self->available_fields;
 
     return 0;
 }
 
-sub is_mandatory_argument
+sub mandatory_argument
 {
     my $self = shift;
     my $argument = shift;
 
     $_ eq $argument && return 1
-	for $self->get_mandatory_arguments;
+	for $self->mandatory_arguments;
     return 0;
 }
 
-sub is_mandatory_filter
+sub mandatory_filter
 {
     my $self = shift;
     my $filter = shift;
     $_ eq $filter && return 1
-	for $self->get_mandatory_filters;
+	for $self->mandatory_filters;
     return 0;
 }
 
@@ -698,42 +681,60 @@ sub get_default_argument_value
     my $self = shift;
     my $arg = shift;
 
-    return $self->get_default_argument_values->{$arg};
+    my $def = $self->default_argument_values->{$arg} // return; 
+    return ref($def) ? $def->() : $def;
 }
-
 
 sub map_filter_to_dbix_format
 {
     my $self = shift;
     my $filter = shift;
-
-    return $self->get_filters_to_dbix_format_mapper->{$filter};
+    $filter = $self->filters_to_dbix_format_mapper->{$filter};
+    defined $filter
+    || die "No mapping available to filter $filter";
+    return $filter;
 }
 
 sub map_argument_to_dbix_format
 {
     my $self = shift;
     my $argument = shift;
-
-    return $self->get_arguments_to_dbix_format_mapper->{$argument};
+    $argument = $self->arguments_to_dbix_format_mapper->{$argument};
+    defined $argument
+    || die "No mapping available to argument $argument";
+    $argument;
 }
 
 sub map_field_to_dbix_format
 {
     my $self = shift;
     my $field = shift;
+    $field = $self->fields_to_dbix_format_mapper->{$field};
+    defined $field
+    || die "No mapping available to field $field";
 
-    return $self->get_fields_to_dbix_format_mapper->{$field};
+    return $field;
 }
 
-sub map_argument_value_normalized
+sub map_order_criteria_to_dbix_format
 {
     my $self = shift;
-    my $argument = shift;
+    my $oc = shift;
+    $oc = $self->order_criteria_to_dbix_format_mapper->{$field};
+    defined $oc ||  die "No mapping available to order_criteria $field";
 
-    return $self->get_argument_values_normalizator->{$argument};
+    return $oc;
 }
 
+sub normalize_value
+{
+    my $self = shift;
+    my $value = shift;
+
+    my $norm = $self->values_normalizator->{$argument} // 
+	return $value; 
+    return ref($norm) ? $self->$norm($value) : $norm;
+}
 
 sub get_default_memory { cfg('osf.default.memory'); }
 sub get_default_overlay { cfg('osf.default.overlay'); }

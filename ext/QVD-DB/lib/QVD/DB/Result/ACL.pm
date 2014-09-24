@@ -12,7 +12,7 @@ __PACKAGE__->add_columns(id          => { data_type => 'integer',
 
 __PACKAGE__->set_primary_key('id');
 __PACKAGE__->add_unique_constraint([qw(name)]);
-__PACKAGE__->has_many(roles => 'QVD::DB::Result::ACL_Setting', 'acl_id', { cascade_delete => 0 } );
+__PACKAGE__->has_many(roles => 'QVD::DB::Result::ACL_Role_Relation', 'acl_id', { cascade_delete => 0 } );
 
 
 

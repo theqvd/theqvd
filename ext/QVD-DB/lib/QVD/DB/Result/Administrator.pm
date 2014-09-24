@@ -14,7 +14,7 @@ __PACKAGE__->add_columns( tenant_id  => { data_type         => 'integer' },
 
 __PACKAGE__->set_primary_key('id');
 __PACKAGE__->add_unique_constraint([qw(name tenant_id)]);
-__PACKAGE__->has_many(roles => 'QVD::DB::Result::Role_Assignment_Relation', 'administrator_id');
+__PACKAGE__->has_many(roles => 'QVD::DB::Result::Administrator_Role_Relation', 'administrator_id');
 __PACKAGE__->belongs_to(tenant => 'QVD::DB::Result::Tenant',  'tenant_id', { cascade_delete => 0 });
 
 sub is_superadmin
@@ -70,6 +70,26 @@ sub is_allowed_to
 	$role->is_allowed_to($acl_name) && return 1;
     }
     return 0;
+}
+
+sub set_tenants_scoop
+{
+    my $self = shift;
+    my $tenants_ids = shift;
+    $self->{tenants_scoop} = $tenants_ids;
+}
+
+sub tenants_scoop
+{
+    my $self = shift;
+    my $tenants_ids = shift;
+    return [$self->tenant_id]
+	unless $self->is_superadmin;
+
+    die "No tenants scoop assigned to superadmin"
+	unless defined $self->{tenants_scoop};
+
+    return $self->{tenants_scoop};
 }
 
 1;

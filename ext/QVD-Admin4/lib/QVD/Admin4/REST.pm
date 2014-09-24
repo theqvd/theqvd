@@ -400,7 +400,8 @@ sub get_request
 
     QVD::Admin4::REST::Request->new(qvd_object_model => $qvd_object_model, 
 				    json_wrapper => $json_wrapper, 
-				    db_qvd_config_provider => QVD::Admin4::DBConfigProvider->new());
+				    db_qvd_config_provider => QVD::Admin4::DBConfigProvider->new(
+					db => $QVD_ADMIN->db));
 }
 
 
