@@ -27,6 +27,7 @@ my $builder = Module::Build->new(
     },
     add_to_cleanup     => [ 'QVD-EasyCustomize-*' ],
     create_makefile_pl => 'traditional',
+    pl_files           => [ qw(bin/qvd-easy-customize.pl) ],
 );
 
 $builder->create_build_script();
