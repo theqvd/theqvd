@@ -4,10 +4,13 @@ use warnings;
 use Moose;
 use QVD::Config;
 use File::Basename qw(basename);
+use QVD::Admin4::DBConfigProvider;
 
 has 'current_qvd_administrator', is => 'ro', isa => 'QVD::DB::Result::Administrator', required => 1;
 has 'qvd_object', is => 'ro', isa => 'Str', required => 1;
 has 'type_of_action', is => 'ro', isa => 'Str', required => 1;
+
+my $DBConfigProvider;
 
 my $MODEL_INFO = { avaliable_filters => [],
 		   available_fields => [],
@@ -23,7 +26,7 @@ my $MODEL_INFO = { avaliable_filters => [],
 		   order_criteria_to_dbix_format_mapper => {},
 		   values_normalizator => {},
 		   dbix_join_value => {},
-		   dbix_has_one_relationships => {},
+		   dbix_has_one_relationships => [],
 };
 
 
@@ -108,7 +111,7 @@ my $SUBCHAIN_FILTERS = { list => { default => [qw(name)],
 my $DEFAULT_ORDER_CRITERIA = { tiny => { default => { [qw(name)] }}};
 
 my $AVAILABLE_ARGUMENTS = { User => [qw(name password blocked)],
-                            VM => [qw(name di_tag blocked expiration_soft expiration_hard storage)],
+                            VM => [qw(name di_tag ip blocked expiration_soft expiration_hard storage)],
                             Host => [qw(name address blocked)],
                             OSF => [qw(name memory user_storage)],
                             DI => [qw(update)],
@@ -117,7 +120,7 @@ my $AVAILABLE_ARGUMENTS = { User => [qw(name password blocked)],
 			    Administrator => [qw(name password)]};
 
 my $MANDATORY_ARGUMENTS = { User => [qw(name password tenant_id)],
-			    VM => [qw(name user_id osf_id ip di_tag state user_state blocked)],
+			    VM => [qw(name user_id ip osf_id ip di_tag state user_state blocked)],
 			    Host => [qw(name address frontend backend blocked state)],
 			    OSF => [qw(name memory overlay user_storage tenant_id)],
                             DI => [qw(version disk_image osf_id blocked)],
@@ -128,7 +131,8 @@ my $MANDATORY_ARGUMENTS = { User => [qw(name password tenant_id)],
 my $DEFAULT_ARGUMENT_VALUES = { User => { blocked => 'false' },
                                 VM => { di_tag => 'default',
                                         blocked => 'false',
-				        user_state => 'stopped' },
+				        user_state => 'stopped',
+				        ip => \&get_free_ip},
                                 Host => { backend => 'true',
 					  frontend => 'true',
 					  blocked => 'false',
@@ -410,6 +414,8 @@ my $DBIX_HAS_ONE_RELATIONSHIPS = { VM => [qw(vm_runtime counters)],
 sub BUILD
 {
     my $self = shift;
+
+    $DBConfigProvider = QVD::Admin4::DBConfigProvider->new();
 
     $self->set_info_by_type_of_action_and_qvd_object(
 	'avaliable_filters',$AVAILABLE_FILTERS);
@@ -754,6 +760,20 @@ sub normalize_name
     $login = lc($login)  
 	unless cfg('model.user.login.case-sensitive');
     $login;
+}
+
+sub get_free_ip {
+
+    my $nettop = nettop_n;
+    my $netstart = netstart_n;
+
+    my %ips = map { net_aton($_->ip) => 1 } 
+    $DBConfigProvider->db->resultset('VM')->all;
+
+    while ($nettop-- > $netstart) {
+        return net_ntoa($nettop) unless $ips{$nettop}
+    }
+    die "No free IP addresses";
 }
     
 1;

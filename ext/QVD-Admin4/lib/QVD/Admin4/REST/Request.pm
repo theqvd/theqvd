@@ -3,10 +3,10 @@ use strict;
 use warnings;
 use Moose;
 use QVD::Admin4::Exception;
+use QVD::Admin4::DBConfigProvider;
 
 has 'json_wrapper', is => 'ro', isa => 'QVD::Admin4::REST::JSON', required => 1;
 has 'qvd_object_model', is => 'ro', isa => 'QVD::Admin4::REST::Model', required => 1;
-has 'db_qvd_config_provider', is => 'ro', isa => QVD::Admin4::DBConfigProvider;
 has 'modifiers', is => 'ro', isa => 'HashRef', default => sub { { distinct => 1, join => [], order_by = { '-asc' => []} }; };
 has 'filters', is => 'ro', isa 'HashRef', default => sub { {}; };
 has 'arguments', is => 'ro', isa 'HashRef', default => sub { {}; };
@@ -14,15 +14,26 @@ has 'related_objects_arguments', is => 'ro', isa 'HashRef', default => sub { {};
 has 'nested_queries', is => 'ro', isa 'HashRef', default => sub { {}; };
 
 my $ADMIN;
+my $DBConfigProvider;
 
 sub BUILD 
 {
     my $self = shift;
     $ADMIN = $self->qvd_object_model->current_qvd_administrator;
+    $DBConfigProvider = QVD::Admin4::DBConfigProvider->new();
 
     $self->forze_filtering_by_tenant;
     $self->forze_tenant_assignment_in_creation;
     $self->switch_custom_properties_json2request;
+
+    $self->forze_default_version_in_json_for_di if
+	($self->qvd_object_model->qvd_object eq 'DI' &&
+	$self->qvd_object_model->type_of_action('create') &&
+	 not $self->json_wrapper->has_argument('version'));
+
+    $self->switch_di_id_filter_into_osf_id_in_vm if 
+	$self->json_wrapper->has_filter('di_id') &&
+	$self->qvd_object_model->qvd_object eq 'VM';
 
     $self->check_filters_validity_in_json;
     $self->check_arguments_validity_in_json;
@@ -36,6 +47,38 @@ sub BUILD
     $self->set_order_by_in_request;
 }
 
+sub forze_default_version_in_json_for_di
+{ 
+    my $self = shift;
+    my $osf_id = $self->json_wrapper->get_filter_value('di_id') // return;
+
+    my ($y, $m, $d) = (localtime)[5, 4, 3]; $m ++; $y += 1900;
+    my $osf = $DBConfigProvider->db->resultset('OSF')->search({id => $osf_id})->first;
+    my $version;
+
+    for (0..999) 
+    {
+	$version = sprintf("%04d-%02d-%02d-%03d", $y, $m, $d, $_);
+	last unless $osf->di_by_tag($version);
+    }
+    
+    $self->json_wrapper->forze_argument_addition('version',$version);
+}
+
+sub switch_di_id_filter_into_osf_id_for_vm
+{
+    my $self = shift;
+    my $di_rs = $DBConfigProvider->db->resultset('DI'); 
+    my $di_id = $self->json_wrapper->get_filter_value('di_id');
+    $self->json_wrapper->forze_filter_deletion('di_id');
+    
+    $self->set_filter($self->qvd_object_model->map_filter_to_dbix_format('osf_id'),
+		      { -in => $di_rs->search({ 'subquery.id' => $di_id,
+						'tags.tag' => { -ident => 'me.di_tag' } },
+					      { join => ['tags'], 
+						alias => 'subquery'})->get_column('osf_id')->as_query });
+}
+
 sub action 
 {
     my $self = shift;
@@ -46,6 +89,12 @@ sub table
 {
     my $self = shift;
     $self->qvd_object_model->qvd_object;
+}
+
+sub dependencies
+{
+    my $self = shift;
+    $self->qvd_object_model->dbix_has_one_relationships;
 }
 
 sub set_filter
@@ -103,7 +152,7 @@ sub forze_filtering_by_tenant
 	$self->json_wrapper->forze_filter_deletion('tenant_id');
     }
 
-    $self->set_filter('tenant_id',$ADMIN->tenant_scoop);
+    $self->json_wrapper>forze_filter_addition('tenant_id',$ADMIN->tenant_scoop);
 }
 
 sub forze_tenant_assignment_in_creation
@@ -112,15 +161,14 @@ sub forze_tenant_assignment_in_creation
 	
     return if $ADMIN->is_superadmin; # It must be provided in the input
     return unless $self->qvd_object_model->mandatory_argument('tenant_id');
-
-    $self->instantiate_argument('tenant_id',$ADMIN->tenant_id);
+    $self->json_wrapper>forze_argumet_addition('tenant_id',$ADMIN->tenant_id);
 }
 
 sub switch_custom_properties_json2request
 {
     my $self = shift;
     my @custom_properties_keys = 
-	$self->db_qvd_config_provider->
+	$DBConfigProvider->
 	get_custom_properties_keys($self->qvd_object_model->qvd_object);
 
     my $found_properties = 0;
@@ -265,6 +313,7 @@ sub set_nested_queries_in_request
     my $self = shift;
     $self->{nested_queries} = $self->json_wrapper->nested_queries;
 }
+
 
 1;
 

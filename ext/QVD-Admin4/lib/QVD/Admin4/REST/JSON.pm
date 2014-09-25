@@ -13,14 +13,11 @@ my $NESTED_QUERIES;
 
 sub BUILD
 {
-	my $self = shift;
+    my $self = shift;
 	
-	$self->json->{filters}->{tenant} = $self->tenant 
-		if $self->tenant;
-	
-	$self->json->{arguments} //= {};
-	$NESTED_QUERIES = {map { $_ => (delete $self->json->{arguments}->{$_} || {}) } 
-		@{$self->available_nested_queries}}; # TODO: Parse nested queries  
+    $self->json->{arguments} //= {};
+    $NESTED_QUERIES = {map { $_ => (delete $self->json->{arguments}->{$_} || {}) } 
+		       @{$self->available_nested_queries}}; # TODO: Parse nested queries  
 }
 
 sub offset
@@ -167,6 +164,27 @@ sub forze_order_criterium_deletion
     
     $self->json->{order_by}->{field} = 
 	[ grep { $_ ne $order_criterium } @{$self->order_criteria} ];
+}
+
+sub forze_filter_addition
+{
+    my ($self,$key,$value) = @_;
+    $self->json->{filters}->{$key} = $value;
+}
+
+sub forze_argument_addition
+{
+    my ($self,$key,$value) = @_;
+    $self->json->{arguments}->{$key} = $value;
+}
+
+sub forze_order_criterium_addition
+{
+    my ($self,$order_criterium) = @_;
+    
+    my $order_criteria = $self->order_criteria;
+    push @$order_criteria,$order_criterium;
+    $self->json->{order_by}->{order} = $order_criteria;
 }
 
 1;

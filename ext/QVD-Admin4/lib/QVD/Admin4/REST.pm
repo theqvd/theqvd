@@ -3,11 +3,12 @@ use strict;
 use warnings;
 use Moose;
 use QVD::Admin4;
-use QVD::Admin4::DBConfigProvider;
 use QVD::Admin4::REST::Request;
 use QVD::Admin4::REST::Model;
 use QVD::Admin4::REST::JSON;
 use QVD::Admin4::Exception;
+
+has 'administrator', is => 'ro', isa => 'QVD::DB::Result::Administrator';
 
 my $QVD_ADMIN;
 my $ACTIONS =
@@ -308,6 +309,25 @@ sub BUILD
     $QVD_ADMIN = QVD::Admin4->new();
 }
 
+sub get_credentials
+{
+    my ($self,%params) = @_;
+
+    my $admin = eval { $QVD_ADMIN->_db->resultset('Administrator')->find(\%params) };
+    return undef unless $admin;
+
+    $admin->set_tenants_scoop(
+	[ map { $_->id } 
+	  $QVD_ADMIN->_db->resultset('Tenant')->search()->all ])
+	if $admin->is_superadmin;
+
+    $self->{administrator} = $admin;
+
+    return { login => $admin->name,
+	     tenant => $admin->tenant_id };
+}
+
+
 sub load_user
 {
     my ($self,%params) = @_;
@@ -320,7 +340,7 @@ sub load_user
     $params{tenant_id} = delete $params{tenant};
 
     my $uid = 
-	eval { $QVD_ADMIN->get_credentials(%params) } // undef;
+	eval { $self->get_credentials(%params) } // undef;
 }
 
 sub validate_user
@@ -334,7 +354,7 @@ sub validate_user
     $params{name} = delete $params{login};
 
     my $uid = 
-	eval { $QVD_ADMIN->get_credentials(%params) } // undef;
+	eval { $self->get_credentials(%params) } // undef;
 }
 
 sub _admin
@@ -351,7 +371,7 @@ sub _admin
    $self->exec_action_without_qvd_object_model($action)
        if $action->{type_of_action} eq 'general';
 
-   my $qvd_object_model = QVD::Admin4::REST::Model(current_qvd_administrator => $QVD_ADMIN->administrator,
+   my $qvd_object_model = QVD::Admin4::REST::Model(current_qvd_administrator => $self->administrator,
 						   qvd_object => $action->{qvd_object},
 						   type_of_action => $action->{type_of_action});
 
@@ -388,7 +408,7 @@ sub available_action_for_current_admin
 {
     my ($self,$action) = @_;
 
-    $QVD_ADMIN->administrator->is_allowed_to($_) || return 0
+    $self->administrator->is_allowed_to($_) || return 0
 	for @{$action->{acls}};
     return 1;
 }
@@ -399,9 +419,7 @@ sub get_request
     my ($self, $json_wrapper,$qvd_object_model) = @_;
 
     QVD::Admin4::REST::Request->new(qvd_object_model => $qvd_object_model, 
-				    json_wrapper => $json_wrapper, 
-				    db_qvd_config_provider => QVD::Admin4::DBConfigProvider->new(
-					db => $QVD_ADMIN->db));
+				    json_wrapper => $json_wrapper);
 }
 
 

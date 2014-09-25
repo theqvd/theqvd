@@ -15,8 +15,6 @@ use List::Util qw(sum);
 use QVD::Config::Network qw(nettop_n netstart_n net_aton net_ntoa);
 our $VERSION = '0.01';
 
-has 'administrator', is => 'ro', isa => 'QVD::DB::Result::Administrator';
-
 my $DB;
 
 #########################
@@ -32,25 +30,6 @@ sub BUILD
 }
 
 sub _db { $DB; }
-
-sub get_credentials
-{
-    my ($self,%params) = @_;
-
-    my $admin = eval { $DB->resultset('Administrator')->find(\%params) };
-    return undef unless $admin;
-
-    $admin->set_tenants_scoop(
-	[ map { $_->id } 
-	  $DB->resultset('Tenant')->search()->all ])
-	if $admin->is_superadmin;
-
-    $self->{administrator} = $admin;
-
-    return { login => $admin->name,
-	     tenant => $admin->tenant_id };
-}
-
 
 #####################
 ### GENERIC FUNCTIONS
@@ -70,24 +49,42 @@ sub select
 
 sub update
 {
-   my ($self,$request) = @_;
-   my $result = $self->select($request);
-   $self->_update($request,$result);
-}
-
-sub _update
-{
-    my ($self,$request,$result,@conditions) = @_;
-
+    my ($self,$request,%modifiers) = @_;
+    my $result = $self->select($request);
     my $failures = {};
+
+    my $conditions = $modifiers{conditions} // [];
+    my $methods_for_nested_queries = $modifiers{methods_for_nested_queries} // [];
 
     for my $obj (@{$result->{rows}})
     {
-	eval { $self->$_($obj) for @conditions;
+	eval { $self->$_($obj) for @$conditions;
 	       $DB->txn_do( sub { eval { $obj->update($request->arguments) };
 				  QVD::Admin4::Exception->throw(code => ($DB->storage->_dbh->state || 4),
 								message => "$@") if $@;
 				  $self->update_related_objects($request,$obj);
+				  $self->$_($request,$obj) for @$methods_for_nested_queries } );
+
+	 if ($@) { $failures->{$obj->id} = ($@->can('code') ? $@->code : 4); }
+    }
+    QVD::Admin4::Exception->throw(code => 1, failures => $failures) if %$failures;
+    $result->{rows} = [];
+    $result;
+}
+
+sub delete
+{
+    my ($self,$result,%modifiers) = @_;
+    my $failures = {};
+
+    my $conditions = $modifiers{conditions} // [];
+    for my $obj (@{$result->{rows}})
+    {
+         eval { $self->$_($obj) || 
+		    QVD::Admin4::Exception->throw(code => 16)
+		    for @$conditions; 
+		$obj->delete };
+	 print $@ if $@;
 	 if ($@) { $failures->{$obj->id} = ($@->can('code') ? $@->code : 4); }
     }
 
@@ -95,6 +92,32 @@ sub _update
     $result->{rows} = [];
     $result;
 }
+
+sub create
+{
+    my ($self,$request,%modifiers) = @_;
+    my $result = $self->select($request);
+    my $failures = {};
+
+    my $conditions = $modifiers{conditions} // [];
+    my $methods_for_nested_queries = $modifiers{methods_for_nested_queries} // [];
+
+    eval { $DB->txn_do( sub { $self->$_($request) || QVD::Admin4::Exception->throw(code => 17)
+				  for @$conditions;
+			      my $obj = $DB->resultset($request->table)->create($request->arguments);
+			      $self->create_related_objects($request,$obj);
+			      $self->$_($request,$obj) for @$methods_for_nested_queries  } ) };
+
+    print $@ if $@;
+    QVD::Admin4::Exception->throw(code => ($DB->storage->_dbh->state || 4),
+                                  message => "$@") if $@;
+    $result->{rows} = [];
+    $result;
+}
+
+###################################################
+#### NESTED QUERIES WHEN CREATING AND UPDATING ####
+###################################################
 
 sub update_related_objects
 {
@@ -106,124 +129,104 @@ sub update_related_objects
 	eval { $obj->$_->update($tables{$_}) }; 
 	QVD::Admin4::Exception->throw(code => ($DB->storage->_dbh->state || 4),
 	                              message => "$@") if $@;
-    }
-    
+    }    
 }
 
-
-sub exec_nested_queries_in_request
-{
-    my ($self,$nested_queries,$result) = @_;
-
-    my $failures = {};
-
-    for my $obj (@{$result->{rows}})
-    {
-	eval { $self->$_($obj) for @conditions;
-	       $DB->txn_do( sub { eval { $obj->update($request->arguments) };
-				  QVD::Admin4::Exception->throw(code => ($DB->storage->_dbh->state || 4),
-								message => "$@") if $@;
-				  $self->update_related_objects($request,$obj);
-	 if ($@) { $failures->{$obj->id} = ($@->can('code') ? $@->code : 4); }
-    }
-
-    QVD::Admin4::Exception->throw(code => 1, failures => $failures) if %$failures;
-    $result->{rows} = [];
-    $result;
-}
-
-
-sub exec_over_searcin_request
+sub update_custom_properties
 {
     my($self,$request,$obj)=@_;
-    my %nested_queries = %{$request->nested_queries};
 
-    my $acls_nested_query = $nested_queries{aclChanges}; 
-    $self->change_acls_in_nested_request($acls_nested_query,$obj)
-	if defined $acls_nested_query;
+    my $nested_queries = $request->nested_queries // return;
+    my $custom_prop_queries = $nested_queries->{propertyChanges} // return;
+    my $cp_set_query = $custom_prop_queries->{set};
+    my $cp_del_query = $custom_prop_queries->{delete}; 
 
-    my $tags_nested_query = $nested_queries{tagChanges}; 
-    $self->change_tags_in_nested_request($tags_nested_query,$obj)
-	if defined $tags_nested_query;
+    $self->custom_properties_set($cp_set_query)
+	if defined $cp_set_query;
 
-    my $cp_nested_query = $nested_queries{propertiesChanges}; 
-    $self->change_custom_properties_in_nested_request($cp_nested_query,$obj)
-	if defined $cp_nested_query;
+    $self->custom_properties_del($cp_set_query)
+	if defined $cp_del_query;
 }
 
-sub change_acls_in_nested_request
+sub update_related_tags
 {
-    my ($self,$nested_query,$obj) = @_;
+    my($self,$request,$obj)=@_;
 
+    my $nested_queries = $request->nested_queries // return;
+    my $tags_queries = $nested_queries->{tagsChanges} // return;
+    my $tags_create_query = $tags_queries->{create};
+    my $tags_delete_query = $tags_queries->{delete}; 
+
+    $self->tags_create($tags_create_query)
+	if defined $tags_create_query;
+
+    $self->tags_delete($tags_delete_query)
+	if defined $tags_delete_query;
 }
 
-
-sub change_tags_in_nested_request
+sub update_role_acls
 {
-    my ($self,$nested_query,$obj) = @_;
+    my($self,$request,$obj)=@_;
 
+    my $nested_queries = $request->nested_queries // return;
+    $nested_queries = $nested_queries->{aclsChanges} // return;
+    my $roles_assign_query = $nested_queries->{assign_roles};
+    my $acls_assign_query = $nested_queries->{assign_acls};
+    my $roles_unassign_query = $nested_queries->{unassign_roles}; 
+    my $acls_unassign_query = $nested_queries->{unassign_acls}; 
+
+    $self->add_roles_to_role($roles_assign_query)
+	if defined $roles_assign_query;
+
+    $self->del_roles_to_role($roles_unassign_query)
+	if defined $roles_unassign_query;
+
+    $self->add_acls_to_role($acls_assign_query)
+	if defined $acls_assign_query;
+
+    $self->del_acls_to_role($acls_unassign_query)
+	if defined $acls_unassign_query;
 }
 
-sub change_custom_properties_in_nested_request
+sub update_admin_roles
 {
-    my ($self,$nested_query,$obj) = @_;
+    my($self,$request,$obj)=@_;
 
+    my $nested_queries = $request->nested_queries // return;
+    $nested_queries = $nested_queries->{rolesChanges} // return;
+    my $roles_assign_query = $nested_queries->{assign_roles};
+    my $roles_unassign_query = $nested_queries->{unassign_roles}; 
+
+    $self->add_roles_to_admin($roles_assign_query)
+	if defined $roles_assign_query;
+
+    $self->del_roles_to_admin($roles_unassign_query)
+	if defined $roles_unassign_query;
 }
 
-    $self->custom_create($props->{set},$obj); 
-    $self->custom_delete($props->{delete},$obj);    
-    $self->tags_delete($tags->{delete},$di);    
-    $self->tags_create($tags->{create},$di);};
-$self->assign_roles($acls->{assign_roles},$role);    
-$self->unassign_roles($acls->{unassign_roles},$role);
-$self->assign_acls($acls->{assign_acls},$role);    
-$self->unassign_acls($acls->{unassign_acls},$role); }) };	
-$self->add_role_to_admin($roles->{assign_roles},$admin);
-$self->del_role_to_admin($roles->{unassign_roles},$admin);
-
-}
-
-sub delete
+sub update_admin_roles
 {
-    my ($self,$result) = @_;
-    my $failures = {};
+    my($self,$request,$obj)=@_;
 
-    for my $obj (@{$result->{rows}})
-    {
-         eval { $self->$_($obj) || 
-		    QVD::Admin4::Exception->throw(code => 16)
-		    for @conditions; 
-		$obj->delete };
-	 print $@ if $@;
-	 if ($@) { $failures->{$obj->id} = ($@->can('code') ? $@->code : 4); }
-    }
+    my $nested_queries = $request->nested_queries // return;
+    my $tags_queries = $nested_queries->{tagsChanges} // return;
+    my $tags_create_query = $tags_queries->{create};
+    my $tags_delete_query = $tags_queries->{delete}; 
 
-    QVD::Admin4::Exception->throw(code => 1, failures => $failures) if %$failures;
+    $self->tags_create($tags_create_query)
+	if defined $tags_create_query;
+
+    $self->tags_delete($tags_delete_query)
+	if defined $tags_delete_query;
 }
 
-sub create
-{
-    my ($self,$request,@conditions) = @_;
 
-    my $arguments = $request->arguments(default => 1);
-
-    my $obj = eval { $self->$_($request) || 
-			 QVD::Admin4::Exception->throw(code => 17)
-			 for @conditions;
-		     $DB->resultset($request->table)->create($arguments) };
-    print $@ if $@;
-    QVD::Admin4::Exception->throw(code => ($DB->storage->_dbh->state || 4),
-                                  message => "$@") if $@;
-    $obj;
-# Meter create related y nested
-}
-
-sub create_related
+sub create_related_objects
 {
     my ($self,$request,$obj) = @_;
-    my $related_args = $request->arguments(related => 1, default => 1);
+    my $related_args = $request->related_objects_arguments;
 
-    for my $table (keys %{$request->dependencies})
+    for my $table ($request->dependencies)
     {
 	eval { $obj->create_related($table,($related_args->{$table} || {})) };
 	print $@ if $@;
@@ -232,15 +235,65 @@ sub create_related
     }
 }
 
-sub create_nested
+sub create_custom_properties
 {
+    my($self,$request,$obj)=@_;
 
+    my $nested_queries = $request->nested_queries // return;
+    my $custom_prop_queries = $nested_queries->{properties} // return;
+
+    $self->custom_properties_set($custom_prop_queries);
 }
+
+sub create_related_tags
+{
+    my($self,$request,$di)=@_;
+
+    $di->osf->delete_tag('head');
+    $di->osf->delete_tag($di->version);
+    $DB->resultset('DI_Tag')->create({di_id => $di->id, tag => $di->version, fixed => 1});
+    $DB->resultset('DI_Tag')->create({di_id => $di->id, tag => 'head'});
+    $DB->resultset('DI_Tag')->create({di_id => $di->id, tag => 'default'})
+	unless $di->osf->di_by_tag('default');
+
+    my $nested_queries = $request->nested_queries // return;
+    my $tags_queries = $nested_queries->{tags} // return;
+
+    $self->tags_create($tags_queries)
+}
+
+sub create_role_acls
+{
+    my($self,$request,$obj)=@_;
+
+    my $nested_queries = $request->nested_queries // return;
+    $nested_queries = $nested_queries->{aclsChanges} // return;
+    my $roles_assign_query = $nested_queries->{assign_roles};
+    my $acls_assign_query = $nested_queries->{assign_acls};
+
+    $self->add_roles_to_role($roles_assign_query)
+	if defined $roles_assign_query;
+
+    $self->add_acls_to_role($acls_assign_query)
+	if defined $acls_assign_query;
+}
+
+sub create_admin_roles
+{
+    my($self,$request,$obj)=@_;
+
+    my $nested_queries = $request->nested_queries // return;
+    $nested_queries = $nested_queries->{roles} // return;
+
+    $self->add_roles_to_admin($roles_assign_query)
+	if defined $roles_assign_query;
+}
+
 #########################
 ##### NESTED QUERIES ####
 #########################
 
-sub custom_create
+sub custom_properties_set
 {
     my ($self,$props,$obj) = @_;
 
@@ -260,21 +313,7 @@ sub custom_create
     }
 }
 
-sub custom_update
-{
-    my ($self,$props,$obj) = @_;
-
-    while ( my ($key,$value) = each %$props)
-    {
-	eval { $obj->search_related('properties', 
-				    {key => $key})->update({value => $value}) };
-		
-	QVD::Admin4::Exception->throw(code => ($DB->storage->_dbh->state || 4),
-                                      message => "$@") if $@;
-    }		
-}
-
-sub custom_delete
+sub custom_properties_del
 {
     my ($self,$props,$obj) = @_;
 
@@ -320,7 +359,7 @@ sub tags_delete
     }		
 }
 
-sub assign_acls
+sub add_acls_to_role
 {
     my ($self,$acl_ids,$role) = @_;
 
@@ -337,7 +376,7 @@ sub assign_acls
     }
 }
 
-sub unassign_acls
+sub del_acls_to_role
 {
     my ($self,$acl_ids,$role) = @_;
 
@@ -356,7 +395,7 @@ sub unassign_acls
     }
 }
 
-sub assign_roles
+sub add_roles_to_role
 {
     my ($self,$roles_to_assign,$this_role) = @_;
 
@@ -373,7 +412,7 @@ sub assign_roles
     }
 }
 
-sub unassign_roles
+sub del_roles_to_role
 {
     my ($self,$roles_to_unassign,$this_role) = @_;
 
@@ -392,20 +431,20 @@ sub unassign_roles
     for $this_role->_get_own_acls(return_value => 'id', positive => 0);
 }
 
-sub del_role_to_admin
+sub del_roles_to_admin
 {
     my ($self,$role_ids,$admin) = @_;
-    $DB->resultset('Role_Assignment_Relation')->search(
+    $DB->resultset('Role_Administrator_Relation')->search(
 	{role_id => $role_ids,
 	 administrator_id => $admin->id})->delete_all;
 }
 
-sub add_role_to_admin
+sub add_roles_to_admin
 {
     my ($self,$role_ids,$admin) = @_;
 
 
-    eval { $DB->resultset('Role_Assignment_Relation')->create(
+    eval { $DB->resultset('Role_Administrator_Relation')->create(
 	       {role_id => $_,
 		administrator_id => $admin->id}) } for @$role_ids;
 }
@@ -414,28 +453,63 @@ sub add_role_to_admin
 ###### AD HOC FUNCTIONS #####
 #############################
 
-sub vm_create
+sub update_with_custom_properties
 {
     my ($self,$request) = @_;
 
-    my $tenant_id = $request->{json}->{tenant};
-    my $user_id = $request->{json}->{arguments}->{straight}->{user_id};
-    my $osf_id = $request->{json}->{arguments}->{straight}->{osf_id};
+    $self->update($request, methods_for_nested_queries => 
+		  [qw(update_custom_properties)]);
 
-    $DB->resultset('User')->search({ tenant_id => $tenant_id,
-                                     id        => $user_id   })->count
-					 || QVD::Admin4::Exception->throw(code=>'19');
+}
 
-    $DB->resultset('OSF')->search({ tenant_id => $tenant_id,
-                                    id        => $osf_id   })->count
-					 || QVD::Admin4::Exception->throw(code=>'19');
+sub create_with_custom_properties
+{
+    my ($self,$request) = @_;
 
-    $DB->txn_do( sub { my $host = $self->_create($request);
-		       $self->_create_related($request,$host);
-		       $self->custom_create($request->arguments(custom => 1),$host)});
+    $self->create($request, methods_for_nested_queries => 
+		  [qw(create_custom_properties)]);
 
-   { total => undef, 
-     rows => [] };
+}
+
+sub di_update
+{
+    my ($self,$request) = @_;
+
+    $self->update($request, methods_for_nested_queries => 
+		  [qw(update_custom_properties
+                      update_related_tags)]);
+}
+
+sub role_update
+{
+    my ($self,$request) = @_;
+
+    $self->update($request, methods_for_nested_queries => 
+		  [qw(update_role_acls)]);
+}
+
+sub role_create
+{
+    my ($self,$request) = @_;
+
+    $self->create($request, methods_for_nested_queries => 
+		  [qw(create_role_acls)]);
+}
+
+sub admin_update
+{
+    my ($self,$request) = @_;
+
+    $self->update($request, methods_for_nested_queries => 
+		  [qw(update_admin_roles)]);
+}
+
+sub admin_create
+{
+    my ($self,$request) = @_;
+
+    $self->create($request, methods_for_nested_queries => 
+		  [qw(create_admin_roles)]);
 }
 
 sub vm_delete
@@ -443,49 +517,25 @@ sub vm_delete
     my ($self,$request) = @_;
     my $result = $self->select($request);
 
-    $self->_delete($result,qw(vm_is_stopped));
-
-   { total => undef, 
-     rows => [] };
+    $self->delete($result,conditions => [qw(vm_is_stopped)]);
 }
+
 
 sub di_create
 {
     my ($self,$request) = @_;
+# $di->update({path => $di->id .'-'.$di->path});
 
-    my $tenant_id = $request->{json}->{tenant};
-    my $osf_id = $request->{json}->{arguments}->{straight}->{osf_id};
-
-    $DB->resultset('OSF')->search({ tenant_id => $tenant_id,
-                                    id        => $osf_id   })->count
-					 || QVD::Admin4::Exception->throw(code=>'19');
-
-
-    $DB->txn_do( sub { my $di = $self->_create($request);
-		       $di->update({path => $di->id .'-'.$di->path});
-		       $di->osf->delete_tag('head');
-		       $di->osf->delete_tag($di->version);
-		       $DB->resultset('DI_Tag')->create({di_id => $di->id, tag => $di->version, fixed => 1});
-		       $DB->resultset('DI_Tag')->create({di_id => $di->id, tag => 'head'});
-		       $DB->resultset('DI_Tag')->create({di_id => $di->id, tag => 'default'})
-			   unless $di->osf->di_by_tag('default');
-		       my $tags = $request->arguments(tags => 1);
-		       $tags = exists $tags->{create} ? $tags->{create} : [];
-		       $self->custom_create($request->arguments(custom => 1),$di);
-                       $self->tags_create($tags,$di);});
-   { total => undef, 
-     rows => [] };
+  $self->create($request, methods_for_nested_queries => 
+		  [qw(create_related_tags)]);
 }
 
 sub di_delete {
     my ($self, $request) = @_;
 
     my $result = $self->select($request);
-    $self->_delete($result,qw(no_vm_runtimes 
-                              no_head_default_tags));
-
-   { total => undef, 
-     rows => [] };
+    $self->delete($request,conditions => [qw(di_no_vm_runtimes 
+                                          di_no_head_default_tags)]);
 }
 
 
@@ -517,7 +567,7 @@ sub vm_start
     for my $vm (@{$result->{rows}})
     {
 	eval { $DB->txn_do(sub {$vm->vm_runtime->can_send_vm_cmd('start') or die;
-				$self->_assign_host($vm->vm_runtime);
+				$self->vm_assign_host($vm->vm_runtime);
 				$vm->vm_runtime->send_vm_start;
 				$host{$vm->vm_runtime->host_id}++;}); 
 	       $@ or last } for (1 .. 5);
@@ -568,9 +618,12 @@ sub vm_stop
     $result;
 }
 
+##########################
+### AUXILIAR FUNCTIONS ###
+##########################
 
 my $lb;
-sub _assign_host {
+sub vm_assign_host {
     my ($self, $vmrt) = @_;
     if (!defined $vmrt->host_id) {
         $lb //= do {
@@ -584,25 +637,21 @@ sub _assign_host {
     }
 }
 
-##########################
-### AUXILIAR FUNCTIONS ###
-##########################
-
 sub vm_is_stopped
 {
-    my ($self,$obj) = @_;
-    $obj->vm_runtime->vm_state eq 'stopped' ? 
+    my ($self,$vm) = @_;
+    $vm->vm_runtime->vm_state eq 'stopped' ? 
 	return 1 : 
 	return 0;
 }
 
-sub no_vm_runtimes
+sub di_no_vm_runtimes
 {
-    my ($self,$obj) = @_;
-    $obj->vm_runtimes->count == 0;
+    my ($self,$di) = @_;
+    $di->vm_runtimes->count == 0;
 }
 
-sub no_head_default_tags
+sub di_no_head_default_tags
 {
     my ($self,$di) = @_;
 
@@ -618,58 +667,6 @@ sub no_head_default_tags
     return 1;
 }
 
-sub _get_free_ip {
-    my $self = shift;
-    my $nettop = nettop_n;
-    my $netstart = netstart_n;
-
-    my %ips = map { net_aton($_->ip) => 1 } 
-    $self->db->resultset('VM')->all;
-
-    while ($nettop-- > $netstart) {
-        return net_ntoa($nettop) unless $ips{$nettop}
-    }
-    die "No free IP addresses";
-}
-
-sub get_default_version
-{ 
-    my $self = shift;
-
-    my ($y, $m, $d) = (localtime)[5, 4, 3];
-    $m ++;
-    $y += 1900;
-
-    my $osf_id = $self->json->{arguments}->{straight}->{osf_id}  //
-	QVD::Admin4::Exception->throw(code=>'23502'); # FIX ME: PREVIOUS REVISION OF MANDATORY ARGUMENTS
-    my $osf = $self->db->resultset('OSF')->search({id => $osf_id})->first;
-    my $version;
-
-    for (0..999) 
-    {
-	$version = sprintf("%04d-%02d-%02d-%03d", $y, $m, $d, $_);
-	last unless $osf->di_by_tag($version);
-    }
-    $version;
-}
-
-
-sub get_di_id_subquery
-{    
-my $self = shift; 
-   if (defined $self->json->{filters}->{di_id})
-    {
-	my $dirs = $self->db->resultset('DI'); 
-	my $di_id = $self->json->{filters}->{di_id};
-
-	$self->json->{filters}->{osf_id} = 
-	{ -in => $dirs->search({ 'subquery.id' => $di_id,
-                                 'tags.tag' => { -ident => 'me.di_tag' } },
-			       { join => ['tags'], 
-				 alias => 'subquery'})->get_column('osf_id')->as_query };
-	delete $self->json->{filters}->{di_id};
-    }
-}
 
 ##################################
 ## GENERAL STATISTICS FUNCTIONS ##
