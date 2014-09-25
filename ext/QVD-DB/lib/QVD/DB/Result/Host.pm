@@ -49,7 +49,7 @@ sub custom_join_condition
 
 sub get_properties_key_value
 {
-    my $self = self;
+    my $self = shift;
 
     ( properties => { map {  $_->key => $_->value  } $self->properties->all });
 } 

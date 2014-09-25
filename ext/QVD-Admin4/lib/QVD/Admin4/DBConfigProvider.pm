@@ -25,3 +25,5 @@ sub get_custom_properties_keys
 
     @properties_keys;
 }
+
+1;

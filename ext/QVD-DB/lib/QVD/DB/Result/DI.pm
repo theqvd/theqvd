@@ -77,7 +77,7 @@ sub tenant_name
 
 sub get_properties_key_value
 {
-    my $self = self;
+    my $self = shift;
 
     ( properties => { map {  $_->key => $_->value  } $self->properties->all });
 } 

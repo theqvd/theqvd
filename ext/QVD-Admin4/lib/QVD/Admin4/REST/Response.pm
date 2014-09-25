@@ -41,10 +41,10 @@ sub map_dbix_object_to_output_info
     my ($self,$dbix_object) = @_;
     my $result = {};
 
-    for my $field_key ($self->qvd_object_model->fields)
+    for my $field_key ($self->qvd_object_model->available_fields)
     {
 	my $dbix_field_key = $self->qvd_object_model->map_field_to_dbix_format($field_key);
-        my ($table,$column) = $dbix_field_key =~ /^(.+)\.(.+)$/;
+	my ($table,$column) = $dbix_field_key =~ /^(.+)\.(.+)$/;
 
 	$result->{$field_key} = 
 	    eval { $table eq "me" ? 
@@ -52,6 +52,7 @@ sub map_dbix_object_to_output_info
 		       $dbix_object->$table->$column } // undef;
 	print $@ if $@;
     }
+    $result;
 }
 
 sub map_result_to_list_of_ids

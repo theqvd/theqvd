@@ -13,21 +13,22 @@ has 'type_of_action', is => 'ro', isa => 'Str', required => 1;
 
 my $DBConfigProvider;
 
-my $MODEL_INFO = { avaliable_filters => [],
-		   available_fields => [],
-		   available_arguments => [],
-		   subchain_filters => [],
-		   mandatory_arguments => [],
-		   mandatory_filters => [],
-		   default_argument_values => {},
-		   default_order_criteria => [],
-		   filters_to_dbix_format_mapper => {},
-		   arguments_to_dbix_format_mapper => {},
-		   fields_to_dbix_format_mapper => {},
-		   order_criteria_to_dbix_format_mapper => {},
-		   values_normalizator => {},
-		   dbix_join_value => {},
-		   dbix_has_one_relationships => [],
+my $MODEL_INFO = { 
+#available_filters => [],
+#available_fields => [],
+#available_arguments => [],
+#subchain_filters => [],
+#mandatory_arguments => [],
+#mandatory_filters => [],
+#default_argument_values => {},
+#default_order_criteria => [],
+#filters_to_dbix_format_mapper => {},
+#arguments_to_dbix_format_mapper => {},
+#fields_to_dbix_format_mapper => {},
+#order_criteria_to_dbix_format_mapper => {},
+#values_normalizator => {},
+#dbix_join_value => {},
+#dbix_has_one_relationships => [],
 };
 
 
@@ -42,6 +43,7 @@ my $AVAILABLE_FILTERS = { list => { default => [],
 				    DI => [qw(id disk_image version osf_id osf_name tenant_id blocked tenant_name )],
 				    OSF => [qw(id name overlay user_storage memory vm_id di_id tenant_id tenant_name )],
 				    ACL => [qw(id name role_id admin_id )],
+				    Tenant => [qw(id name)],
 				    Role => [qw(name acl_id role_id nested_acl_name nested_role_name id admin_id admin_name )],
 				    Administrator => [qw(name tenant_id tenant_name role_id acl_id id role_name acl_name )]},
 
@@ -56,17 +58,39 @@ my $AVAILABLE_FILTERS = { list => { default => [],
 				       OSF => [qw(id name overlay user_storage memory vm_id di_id tenant_id tenant_name )],
 				       ACL => [qw(id name role_id admin_id )],
 				       Role => [qw(name acl_id role_id nested_acl_name nested_role_name id admin_id admin_name )],
+				       Tenant => [qw(id name)],
 				       Administrator => [qw(name tenant_id tenant_name role_id acl_id id role_name acl_name )]},
 
-			  details => { default => [qw(id tenant_id)] },
-			  tiny => { default => [qw(tenant_id)]},
-			  delete => { default => [qw(id tenant_id)]},
-			  update => { default => [qw(id tenant_id)]},
+			  details => { default => [qw(id tenant_id)],
+                                       Host => [qw(id)],
+				       Role => [qw(id)],
+				       ACL => [qw(id)],
+                                       Tenant => [qw(id)] },
+			  tiny => { default => [qw(tenant_id)],
+                                    Host => [qw()],
+				    Role => [qw()],
+				    ACL => [qw()],
+                                    Tenant => [qw()]},
+			  delete => { default => [qw(id tenant_id)],
+				      Host => [qw(id)],
+				      ACL => [qw(id)],
+				      Role => [qw(id)],
+				      Tenant => [qw(id)]},
+			  update => { default => [qw(id tenant_id)],
+				      Host => [qw()],
+				      ACL => [qw()],
+				      Role => [qw()],
+				      Tenant => [qw()]},
 			  state => { default => [qw(id tenant_id)],
-				     User => [qw(number_of_vms_connected)],
-				     VM => [qw(state user_state)],
-				     Host => [qw(number_of_vms_connected)]},
-			  'exec' => { default => [qw(id tenant_id)]} };
+				     Host => [qw(id)],
+				     ACL => [qw(id)],
+				     Role => [qw(id)],
+				     Tenant => [qw(id)]},
+			  'exec' => { default => [qw(id tenant_id)],
+				      Host => [qw(id)],
+				      ACL => [qw(id)],
+				      Role => [qw(id)],
+				      Tenant => [qw(id)]} };
 
 my $AVAILABLE_FIELDS = { list => { default => [],
 				   OSF => [qw(id name overlay user_storage memory vm_id di_id  number_of_vms number_of_dis )],
@@ -77,10 +101,11 @@ my $AVAILABLE_FIELDS = { list => { default => [],
                                            creation_admin creation_date di_version di_name di_id properties )],
 				   ACL => [qw(id name roles admins )],
 				   Administrator => [qw(name  roles acls id )],
+				   Tenant => [qw(id name)],
 				   User => [qw(id name  blocked creation_admin creation_date number_of_vms number_of_vms_connected  properties )],
 				   Host => [qw(id name address blocked frontend backend state vm_id load creation_admin creation_date number_of_vms_connected number_of_vms properties )],
 				   DI_Tag => [qw(osf_id name id )] },
-				   tiny => { default => [qw(id name)]},
+			 tiny => { default => [qw(id name)]},
 
 			 all_ids_actions => { defauly => [],
 					      OSF => [qw(id name overlay user_storage memory vm_id di_id  number_of_vms number_of_dis )],
@@ -90,26 +115,61 @@ my $AVAILABLE_FIELDS = { list => { default => [],
                                                      state host_id host_name host_name di_id user_state ip next_boot_ip ssh_port vnc_port serial_port 
                                                       creation_admin creation_date di_version di_name di_id properties )],
 					      ACL => [qw(id name roles admins )],
+					      Tenant => [qw(id name)],
 					      Administrator => [qw(name roles acls id )],
 					      User => [qw(id name  blocked creation_admin creation_date number_of_vms number_of_vms_connected  properties )],
 					      Host => [qw(id name address blocked frontend backend state vm_id load creation_admin creation_date number_of_vms_connected number_of_vms properties )],
-					      DI_Tag => [qw(osf_id name id )] }
-};
+					      DI_Tag => [qw(osf_id name id )] },
+			state => { User => [qw(number_of_vms_connected)],
+				   VM => [qw(state user_state)],
+				   Host => [qw(number_of_vms_connected)]}};
 
-my $MANDATORY_FILTERS = { list => { default => [qw(tenant_id)]},
-			  details => { default => [qw(id tenant_id)]}, 
-			  tiny => { default => [qw(tenant_id)]},
-			  delete => { default => [qw(id tenant_id)]}, 
-			  update=> { default => [qw(id tenant_id)]}, 
-			  state => { default => [qw(id tenant_id)]}, 
-			  all_ids => { default => [qw(tenant_id)]}, 
-			  'exec' => { default => [qw(id tenant_id)]}};
+my $MANDATORY_FILTERS = { list => { default => [qw(tenant_id)],
+				    Host => [qw()],
+				    ACL => [qw()],
+				    Role => [qw()],
+				    Tenant => [qw()]},
+			  details => { default => [qw(id tenant_id)],
+				       Host => [qw(id)],
+				       ACL => [qw(id)],
+				       Role => [qw(id)],
+				       Tenant => [qw(id)]}, 
+			  tiny => { default => [qw(tenant_id)],
+				    Host => [qw()],
+				    ACL => [qw()],
+				    Role => [qw()],
+				    Tenant => [qw()]},
+			  delete => { default => [qw(id tenant_id)],
+				      Host => [qw(id)],
+				      ACL => [qw(id)],
+				      Role => [qw(id)],
+				      Tenant => [qw(id)]}, 
+			  update=> { default => [qw(id tenant_id)],
+				     Host => [qw(id)],
+				     ACL => [qw(id)],
+				     Role => [qw(id)],
+				     Tenant => [qw(id)]}, 
+			  state => { default => [qw(id tenant_id)],
+				     Host => [qw(id)],
+				     ACL => [qw(id)],
+				     Role => [qw(id)],
+				     Tenant => [qw(id)]}, 
+			  all_ids => { default => [qw(tenant_id)],
+				       Host => [qw()],
+				       ACL => [qw()],
+				       Role => [qw()],
+				       Tenant => [qw()]}, 
+			  'exec' => { default => [qw(id tenant_id)],
+				      Host => [qw(id)],
+				      ACL => [qw(id)],
+				      Role => [qw(id)],
+				      Tenant => [qw(id)]}};
 
 my $SUBCHAIN_FILTERS = { list => { default => [qw(name)],
 				   Administrator => [qw(name role_name acl_name)],
 				   Role => [qw(name nested_role_name acl_name)]}};
 
-my $DEFAULT_ORDER_CRITERIA = { tiny => { default => { [qw(name)] }}};
+my $DEFAULT_ORDER_CRITERIA = { tiny => { default =>  [qw(name)] }};
 
 my $AVAILABLE_ARGUMENTS = { User => [qw(name password blocked)],
                             VM => [qw(name di_tag ip blocked expiration_soft expiration_hard storage)],
@@ -419,10 +479,10 @@ sub BUILD
     $DBConfigProvider = QVD::Admin4::DBConfigProvider->new();
 
     $self->set_info_by_type_of_action_and_qvd_object(
-	'avaliable_filters',$AVAILABLE_FILTERS);
-    
+	'available_filters',$AVAILABLE_FILTERS);
+
     $self->set_info_by_type_of_action_and_qvd_object(
-	'avaliable_fields',$AVAILABLE_FIELDS);
+	'available_fields',$AVAILABLE_FIELDS);
 
     $self->set_tenant_fields
 	if $self->current_qvd_administrator->is_superadmin;
@@ -480,37 +540,33 @@ sub set_tenant_fields
 
 sub set_info_by_type_of_action_and_qvd_object
 {
-    my ($self,$INFO_REPO,$model_info_key) = @_;
+    my ($self,$model_info_key,$INFO_REPO) = @_;
 
     if (defined $INFO_REPO->{$self->type_of_action} )
     {
 	$MODEL_INFO->{$model_info_key} = 
 	    $INFO_REPO->{$self->type_of_action}->{$self->qvd_object} //
-	    $INFO_REPO->{$self->type_of_action}->{default} // [];
-    }
-    else
-    {
-	$MODEL_INFO->{avaliable_filters} = [];
+	    $INFO_REPO->{$self->type_of_action}->{default};
     }
 }
 
 sub set_info_by_qvd_object
 {
-    my ($self,$INFO_REPO,$model_info_key) = @_;
+    my ($self,$model_info_key,$INFO_REPO) = @_;
 
-    $MODEL_INFO->{model_info_key} = 
-	$INFO_REPO->{$self->qvd_object} // [];
+    $MODEL_INFO->{$model_info_key} = 
+	$INFO_REPO->{$self->qvd_object};
 }
 
 ############
 ###########
 ##########
 
-sub avaliable_filters
+sub available_filters
 {
     my $self = shift;
+   my $filters =  $MODEL_INFO->{available_filters} // [];
 
-   my $filters =  $MODEL_INFO->{avaliable_filters} // [];
     @$filters;
 }
 
@@ -525,21 +581,23 @@ sub subchain_filters
 sub default_order_criteria
 {
     my $self = shift;
-    my $order_criteria =  $MODEL_INFO->{default_order_criteria} // [];
+
+    my $order_criteria = $MODEL_INFO->{default_order_criteria} // [];
     @$order_criteria;
 }
 
 sub available_arguments
 {
     my $self = shift;
-    my $args = $MODEL_INFO->{avaliable_arguments} // [];
+    my $args = $MODEL_INFO->{available_arguments} // [];
     @$args;
 }
 
 sub available_fields
 {
     my $self = shift;
-    my $fields =  $MODEL_INFO->{avaliable_fields} // [];
+
+    my $fields = $MODEL_INFO->{available_fields} // [];
     @$fields;
 }
 
@@ -614,12 +672,12 @@ sub dbix_has_one_relationships
 #################
 
 
-sub avaliable_filter
+sub available_filter
 {
     my $self = shift;
     my $filter = shift;
     $_ eq $filter && return 1
-	for $self->avaliable_filters;
+	for $self->available_filters;
 
     return 0;
 }
@@ -696,41 +754,43 @@ sub map_filter_to_dbix_format
 {
     my $self = shift;
     my $filter = shift;
-    $filter = $self->filters_to_dbix_format_mapper->{$filter};
-    defined $filter
-    || die "No mapping available to filter $filter";
-    return $filter;
+
+    my $mapped_filter = $self->filters_to_dbix_format_mapper->{$filter};
+    defined $mapped_filter
+    || die "No mapping available for filter $filter";
+    return $mapped_filter;
 }
 
 sub map_argument_to_dbix_format
 {
     my $self = shift;
     my $argument = shift;
-    $argument = $self->arguments_to_dbix_format_mapper->{$argument};
-    defined $argument
-    || die "No mapping available to argument $argument";
-    $argument;
+    my $mapped_argument = $self->arguments_to_dbix_format_mapper->{$argument};
+    defined $mapped_argument
+    || die "No mapping available for argument $argument";
+    $mapped_argument;
 }
 
 sub map_field_to_dbix_format
 {
     my $self = shift;
     my $field = shift;
-    $field = $self->fields_to_dbix_format_mapper->{$field};
-    defined $field
-    || die "No mapping available to field $field";
 
-    return $field;
+    my $mapped_field = $self->fields_to_dbix_format_mapper->{$field};
+    defined $mapped_field
+    || die "No mapping available for field $field";
+
+    return $mapped_field;
 }
 
 sub map_order_criteria_to_dbix_format
 {
     my $self = shift;
     my $oc = shift;
-    $oc = $self->order_criteria_to_dbix_format_mapper->{$oc};
-    defined $oc ||  die "No mapping available to order_criteria $oc";
+    my $mapped_oc = $self->order_criteria_to_dbix_format_mapper->{$oc};
+    defined $mapped_oc ||  die "No mapping available for order_criteria $oc";
 
-    return $oc;
+    return $mapped_oc;
 }
 
 sub normalize_value

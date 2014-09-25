@@ -170,7 +170,7 @@ di_tiny_list => { type_of_action => 'tiny',
 		  admin4method => 'select',
 		  qvd_object => 'DI'},
 
-di_get_list => { type_of_action => 'list',
+di_get_details => { type_of_action => 'details',
 		 admin4method => 'select',
 		 qvd_object => 'DI'},
 
@@ -274,8 +274,8 @@ role_delete => { type_of_action => 'delete',
 		 admin4method => 'delete',
 		 qvd_object => 'Role'},
 
-qvd_objects_statistics { type_of_action =>  'general',
-			 admin4method => 'qvd_objects_statistics'},
+qvd_objects_statistics => { type_of_action =>  'general',
+			    admin4method => 'qvd_objects_statistics'},
 };
 
 sub BUILD
@@ -346,9 +346,9 @@ sub _admin
    $self->exec_action_without_qvd_object_model($action)
        if $action->{type_of_action} eq 'general';
 
-   my $qvd_object_model = QVD::Admin4::REST::Model(current_qvd_administrator => $self->administrator,
-						   qvd_object => $action->{qvd_object},
-						   type_of_action => $action->{type_of_action});
+   my $qvd_object_model = QVD::Admin4::REST::Model->new(current_qvd_administrator => $self->administrator,
+							qvd_object => $action->{qvd_object},
+							type_of_action => $action->{type_of_action});
 
    my $admin4method = $action->{admin4method};
    my $result = eval { $QVD_ADMIN->$admin4method($self->get_request($json_wrapper,$qvd_object_model)) } // {};

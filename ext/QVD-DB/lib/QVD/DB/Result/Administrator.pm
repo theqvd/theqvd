@@ -14,7 +14,7 @@ __PACKAGE__->add_columns( tenant_id  => { data_type         => 'integer' },
 
 __PACKAGE__->set_primary_key('id');
 __PACKAGE__->add_unique_constraint([qw(name tenant_id)]);
-__PACKAGE__->has_many(roles => 'QVD::DB::Result::Administrator_Role_Relation', 'administrator_id');
+__PACKAGE__->has_many(roles => 'QVD::DB::Result::Role_Administrator_Relation', 'administrator_id');
 __PACKAGE__->belongs_to(tenant => 'QVD::DB::Result::Tenant',  'tenant_id', { cascade_delete => 0 });
 
 sub is_superadmin

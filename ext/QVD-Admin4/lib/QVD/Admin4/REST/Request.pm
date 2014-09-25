@@ -28,7 +28,7 @@ sub BUILD
 
     $self->forze_default_version_in_json_for_di if
 	($self->qvd_object_model->qvd_object eq 'DI' &&
-	$self->qvd_object_model->type_of_action('create') &&
+	$self->qvd_object_model->type_of_action eq 'create' &&
 	 not $self->json_wrapper->has_argument('version'));
 
     $self->switch_di_id_filter_into_osf_id_in_vm if 
@@ -151,8 +151,10 @@ sub forze_filtering_by_tenant
 	return if $ADMIN->is_superadmin;
 	$self->json_wrapper->forze_filter_deletion('tenant_id');
     }
-
-    $self->json_wrapper>forze_filter_addition('tenant_id',$ADMIN->tenant_scoop);
+    else
+    {
+	$self->json_wrapper->forze_filter_addition('tenant_id',$ADMIN->tenants_scoop);
+    }
 }
 
 sub forze_tenant_assignment_in_creation
@@ -197,7 +199,7 @@ sub check_filters_validity_in_json
 
     $self->json_wrapper->has_filter($_) ||
 	QVD::Admin4::Exception->throw(code => 10)
-	for $self->qvd_objec_model->mandatory_filters;
+	for $self->qvd_object_model->mandatory_filters;
 }
 
 sub check_arguments_validity_in_json
@@ -267,7 +269,7 @@ sub set_arguments_in_request_with_defaults
 
     for my $key ($self->qvd_object_model->mandatory_arguments)
     {
-	next if $self->json_wrapper->has_arguments($key);
+	next if $self->json_wrapper->has_argument($key);
 	my $key_dbix_format = 
 	    $self->qvd_object_model->map_argument_to_dbix_format($key);
 	my $value = $self->qvd_object_model->get_default_argument_value($key);
@@ -278,7 +280,7 @@ sub set_arguments_in_request_with_defaults
 sub instantiate_argument
 {
     my ($self,$dbix_key,$value) = @_;
-    $value = undef if $value eq '';
+    $value = undef if $value && $value eq '';
     # WARNING: Is this the right solution to all fields??
 
     my ($table,$column) = $dbix_key =~ /^(.+)\.(.+)$/;
@@ -294,8 +296,9 @@ sub set_order_by_in_request
     my $self = shift;
 
     my $order_direction = $self->json_wrapper->order_direction // '-asc';
-    my $order_criteria = $self->json_wrapper->order_criteria //
-	$self->qvd_object_model->get_default_order_criteria;
+    my $order_criteria = $self->json_wrapper->order_criteria;
+    $order_criteria = [$self->qvd_object_model->default_order_criteria] 
+	unless  @$order_criteria;
 
     $self->modifiers->{order_by}->{'-desc'} =
 	delete $self->modifiers->{order_by}->{'-asc'}

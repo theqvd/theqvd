@@ -64,7 +64,8 @@ sub update
 				  $self->update_related_objects($request,$obj);
 				  $self->$_($request,$obj) for @$methods_for_nested_queries } );
 
-	 if ($@) { $failures->{$obj->id} = ($@->can('code') ? $@->code : 4); }
+	       if ($@) { $failures->{$obj->id} = ($@->can('code') ? $@->code : 4); }
+	}
     }
     QVD::Admin4::Exception->throw(code => 1, failures => $failures) if %$failures;
     $result->{rows} = [];
@@ -201,22 +202,6 @@ sub update_admin_roles
 
     $self->del_roles_to_admin($roles_unassign_query)
 	if defined $roles_unassign_query;
-}
-
-sub update_admin_roles
-{
-    my($self,$request,$obj)=@_;
-
-    my $nested_queries = $request->nested_queries // return;
-    my $tags_queries = $nested_queries->{tagsChanges} // return;
-    my $tags_create_query = $tags_queries->{create};
-    my $tags_delete_query = $tags_queries->{delete}; 
-
-    $self->tags_create($tags_create_query)
-	if defined $tags_create_query;
-
-    $self->tags_delete($tags_delete_query)
-	if defined $tags_delete_query;
 }
 
 
