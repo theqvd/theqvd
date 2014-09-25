@@ -7,11 +7,11 @@ use QVD::Admin4::DBConfigProvider;
 
 has 'json_wrapper', is => 'ro', isa => 'QVD::Admin4::REST::JSON', required => 1;
 has 'qvd_object_model', is => 'ro', isa => 'QVD::Admin4::REST::Model', required => 1;
-has 'modifiers', is => 'ro', isa => 'HashRef', default => sub { { distinct => 1, join => [], order_by = { '-asc' => []} }; };
-has 'filters', is => 'ro', isa 'HashRef', default => sub { {}; };
-has 'arguments', is => 'ro', isa 'HashRef', default => sub { {}; };
-has 'related_objects_arguments', is => 'ro', isa 'HashRef', default => sub { {}; };
-has 'nested_queries', is => 'ro', isa 'HashRef', default => sub { {}; };
+has 'modifiers', is => 'ro', isa => 'HashRef', default => sub { { distinct => 1, join => [], order_by => { '-asc' => []}  }};
+has 'filters', is => 'ro', isa => 'HashRef', default => sub { {}; };
+has 'arguments', is => 'ro', isa =>'HashRef', default => sub { {}; };
+has 'related_objects_arguments', is => 'ro', isa => 'HashRef', default => sub { {}; };
+has 'nested_queries', is => 'ro', isa => 'HashRef', default => sub { {}; };
 
 my $ADMIN;
 my $DBConfigProvider;
@@ -100,25 +100,25 @@ sub dependencies
 sub set_filter
 {
     my ($self,$key,$val) = @_;
-    $self->filters->{$key} = $value;
+    $self->filters->{$key} = $val;
 }
 
 sub set_argument
 {
     my ($self,$key,$val) = @_;
-    $self->arguments->{$key} = $value;
+    $self->arguments->{$key} = $val;
 }
 
 sub set_nested_query
 {
     my ($self,$key,$val) = @_;
-    $self->nested_queries->{$key} = $value;
+    $self->nested_queries->{$key} = $val;
 }
 
 sub set_related_object_argument
 {
     my ($self,$rel_object,$key,$val) = @_;
-    $self->related_object_arguments->{$rel_object}->{$key} = $value;
+    $self->related_object_arguments->{$rel_object}->{$key} = $val;
 }
 
 sub add_to_join
@@ -238,7 +238,7 @@ sub set_filters_in_request
 	my $key_dbix_format = 
 	    $self->qvd_object_model->map_filter_to_dbix_format($key);
 	my $value = $self->json_wrapper->get_filter_value($key);
-	my $value_normalized = $self->qvd_object_model->normalize_value($value);
+	my $value_normalized = $self->qvd_object_model->normalize_value($key,$value);
 	$value_normalized = { like => "%".$value_normalized."%"} 
 	if $self->qvd_object_model->subchain_filter($key);
 	$self->set_filter($key_dbix_format,$value_normalized);
@@ -254,7 +254,7 @@ sub set_arguments_in_request
 	my $key_dbix_format = 
 	    $self->qvd_object_model->map_argument_to_dbix_format($key);
 	my $value = $self->json_wrapper->get_argument_value($key);
-	my $value_normalized = $self->qvd_object_model->normalize_value($value);
+	my $value_normalized = $self->qvd_object_model->normalize_value($key,$value);
 	$self->instantiate_argument($key_dbix_format,$value_normalized);
     }
     $self->set_arguments_in_request_with_defaults;

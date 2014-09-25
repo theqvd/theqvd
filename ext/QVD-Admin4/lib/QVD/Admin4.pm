@@ -12,7 +12,6 @@ use Config::Properties;
 use QVD::Admin4::Exception;
 use DateTime;
 use List::Util qw(sum);
-use QVD::Config::Network qw(nettop_n netstart_n net_aton net_ntoa);
 our $VERSION = '0.01';
 
 my $DB;
@@ -285,8 +284,8 @@ sub create_admin_roles
     my $nested_queries = $request->nested_queries // return;
     $nested_queries = $nested_queries->{roles} // return;
 
-    $self->add_roles_to_admin($roles_assign_query)
-	if defined $roles_assign_query;
+    $self->add_roles_to_admin($nested_queries)
+	if defined $nested_queries;
 }
 
 #########################

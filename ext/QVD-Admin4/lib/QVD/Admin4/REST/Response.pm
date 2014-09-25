@@ -36,20 +36,20 @@ sub map_result_from_dbix_objects_to_output_info
 	if $self->qvd_object_model->type_of_action eq 'all_ids';
 }
 
-sub map_result_from_dbix_objects_to_output_info
+sub map_dbix_object_to_output_info
 {
     my ($self,$dbix_object) = @_;
     my $result = {};
 
-    for my $field_key ($qvd_object_model->fields)
+    for my $field_key ($self->qvd_object_model->fields)
     {
-	my $dbix_field_key = $qvd_object_model->map_field_to_dbix_format($field_key);
+	my $dbix_field_key = $self->qvd_object_model->map_field_to_dbix_format($field_key);
         my ($table,$column) = $dbix_field_key =~ /^(.+)\.(.+)$/;
 
 	$result->{$field_key} = 
 	    eval { $table eq "me" ? 
-		       $obj->$column : 
-		       $obj->$table->$column } // undef;
+		       $dbix_object->$column : 
+		       $dbix_object->$table->$column } // undef;
 	print $@ if $@;
     }
 }

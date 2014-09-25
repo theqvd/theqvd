@@ -2,6 +2,7 @@ package QVD::Admin4::REST::Model;
 use strict;
 use warnings;
 use Moose;
+use QVD::Config::Network qw(nettop_n netstart_n net_aton net_ntoa);
 use QVD::Config;
 use File::Basename qw(basename);
 use QVD::Admin4::DBConfigProvider;
@@ -68,16 +69,16 @@ my $AVAILABLE_FILTERS = { list => { default => [],
 			  'exec' => { default => [qw(id tenant_id)]} };
 
 my $AVAILABLE_FIELDS = { list => { default => [],
-				   OSF => [qw(id name overlay user_storage memory vm_id di_id  number_of_vms number_of_dis )];
-				   Role => [qw(name own_acls inherited_acls inherited_roles id )];
-				   DI => [qw(id disk_image version osf_id osf_name  blocked tags  properties )];
+				   OSF => [qw(id name overlay user_storage memory vm_id di_id  number_of_vms number_of_dis )],
+				   Role => [qw(name own_acls inherited_acls inherited_roles id )],
+				   DI => [qw(id disk_image version osf_id osf_name  blocked tags  properties )],
 				   VM => [qw(storage id name user_id user_name osf_id osf_name di_tag blocked expiration_soft expiration_hard 
                                           state host_id host_name host_name di_id user_state ip next_boot_ip ssh_port vnc_port serial_port 
-                                           creation_admin creation_date di_version di_name di_id properties )];
-				   ACL => [qw(id name roles admins )];
-				   Administrator => [qw(name  roles acls id )];
-				   User => [qw(id name  blocked creation_admin creation_date number_of_vms number_of_vms_connected  properties )];
-				   Host => [qw(id name address blocked frontend backend state vm_id load creation_admin creation_date number_of_vms_connected number_of_vms properties )];
+                                           creation_admin creation_date di_version di_name di_id properties )],
+				   ACL => [qw(id name roles admins )],
+				   Administrator => [qw(name  roles acls id )],
+				   User => [qw(id name  blocked creation_admin creation_date number_of_vms number_of_vms_connected  properties )],
+				   Host => [qw(id name address blocked frontend backend state vm_id load creation_admin creation_date number_of_vms_connected number_of_vms properties )],
 				   DI_Tag => [qw(osf_id name id )] },
 				   tiny => { default => [qw(id name)]},
 
@@ -423,7 +424,7 @@ sub BUILD
     $self->set_info_by_type_of_action_and_qvd_object(
 	'avaliable_fields',$AVAILABLE_FIELDS);
 
-    $sekf->set_tenant_fields
+    $self->set_tenant_fields
 	if $self->current_qvd_administrator->is_superadmin;
 
     $self->set_info_by_type_of_action_and_qvd_object(
@@ -726,8 +727,8 @@ sub map_order_criteria_to_dbix_format
 {
     my $self = shift;
     my $oc = shift;
-    $oc = $self->order_criteria_to_dbix_format_mapper->{$field};
-    defined $oc ||  die "No mapping available to order_criteria $field";
+    $oc = $self->order_criteria_to_dbix_format_mapper->{$oc};
+    defined $oc ||  die "No mapping available to order_criteria $oc";
 
     return $oc;
 }
@@ -735,9 +736,11 @@ sub map_order_criteria_to_dbix_format
 sub normalize_value
 {
     my $self = shift;
+    my $key = shift;
     my $value = shift;
 
-    my $norm = $self->values_normalizator->{$argument} // 
+    $self->values_normalizator->{$self->qvd_object} || return $value;
+    my $norm = $self->values_normalizator->{$self->qvd_object}->{$key} // 
 	return $value; 
     return ref($norm) ? $self->$norm($value) : $norm;
 }
