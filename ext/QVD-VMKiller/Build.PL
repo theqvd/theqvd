@@ -20,6 +20,7 @@ my $build = new Module::Build(
 	},
 
 	requires => {
+		'Linux::Fuser' => 0, 
 		'Proc::ProcessTable' => 0,
         	'QVD::Config' => '0',
                 'QVD::Log' => '0',
