@@ -14,7 +14,10 @@ Wat.I = {
         user: {},
         host: {},
         osf: {},
-        di: {}
+        di: {},
+        role: {},
+        admin: {},
+        acl: {}
     },
     
     getListColumns: function (qvdObj) {
@@ -117,7 +120,7 @@ Wat.I = {
     },
     
     setCustomizationFieldsCallback: function (that) {
-        if (that.retrievedData.status === 0) {
+        if (that.retrievedData.status === 0 && that.retrievedData.result) {
             var fields = that.retrievedData.result.rows;
 
             $.each(fields, function (iField, field) {
@@ -319,6 +322,8 @@ Wat.I = {
             var chosenOptionsSingle100 = jQuery.extend({}, chosenOptionsSingle);
             chosenOptionsSingle100.width = "100%"; 
 
+            var chosenOptionsAdvanced = jQuery.extend({}, chosenOptions);
+        
             var chosenOptionsAdvanced100 = jQuery.extend({}, chosenOptions);
             chosenOptionsAdvanced100.width = "100%";
         
@@ -326,6 +331,7 @@ Wat.I = {
             this.chosenOptions = {
                 'single': chosenOptionsSingle,
                 'single100': chosenOptionsSingle100,
+                'advanced': chosenOptionsAdvanced,
                 'advanced100': chosenOptionsAdvanced100
             };
 

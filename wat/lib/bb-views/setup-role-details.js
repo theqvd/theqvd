@@ -35,6 +35,23 @@ Wat.Views.SetupRoleDetailsView = Wat.Views.DetailsView.extend({
         this.embedContent();
     },
     
+    renderSide: function () {
+        var sideContainer = '.' + this.cid + ' .bb-details-side1';
+        
+        // Render ACLs list on side
+        var params = {};
+        params.whatRender = 'list';
+        params.listContainer = sideContainer;
+        params.forceListColumns = {checks: true, info: true, name: true, roles: true};
+        //params.forceSelectedActions = {};
+        params.forceListActionButton = null;
+        params.block = 5;
+        params.filters = {"id": this.elementId};
+        params.action = 'get_acls_in_roles';
+        
+        this.sideView = new Wat.Views.SetupACLsView(params);
+    },
+    
     embedContent: function () {
         $(this.secondaryContainer).html('<div class="bb-content-secondary"></div>');
 
@@ -46,23 +63,43 @@ Wat.Views.SetupRoleDetailsView = Wat.Views.DetailsView.extend({
         this.dialogConf.title = $.i18n.t('Edit Role') + ": " + this.model.get('name');
         
         Wat.Views.DetailsView.prototype.openEditElementDialog.apply(this, [e]);
-        
-        // Virtual machine form include a date time picker control, so we need enable it
-        Wat.I.enableDataPickers();
                 
         var params = {
-            'action': 'tag_tiny_list',
-            'selectedId': this.model.get('di_tag'),
-            'controlName': 'di_tag',
+            'action': 'role_tiny_list',
+            'selectedId': '',
+            'controlName': 'inherit_role',
             'filters': {
-                'osf_id': this.model.get('osf_id')
+            }
+        };
+
+        Wat.A.fillSelect(params);
+        
+        // Remove from inherited roles selector, current role and already inherited ones
+        $('select[name="inherit_role"] option[value="' + this.elementId + '"]').remove();
+        $.each(this.model.get('inherited_roles'), function (roleId) {
+            $('select[name="inherit_role"] option[value="' + roleId + '"]').remove();
+        });
+        
+        Wat.I.chosenElement('[name="inherit_role"]', 'advanced');
+        
+        
+        var params = {
+            'action': 'acl_tiny_list',
+            'selectedId': '',
+            'controlName': 'role_acls',
+            'filters': {
             },
             'nameAsId': true
         };
 
         Wat.A.fillSelect(params);
         
-        Wat.I.chosenElement('[name="di_tag"]', 'single100');
+        // Remove from inherited roles selector, current role and already inherited ones
+        $.each(this.model.get('own_acls').positive, function (iAcl, acl) {
+            $('select[name="role_acls"] option[value="' + acl + '"]').remove();
+        });
+        
+        Wat.I.chosenElement('[name="role_acls"]', 'advanced');
     },
     
     updateElement: function (dialog) {

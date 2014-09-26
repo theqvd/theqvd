@@ -15,7 +15,8 @@ Wat.Views.ListView = Wat.Views.MainView.extend({
     listTemplateName: '',
     editorTemplateName: '',
     massiveEditorTemplateName: '',
-
+    customCollection: false,
+    
     /*
     ** params:
     **  whatRender (string): What part of view render (all/list). Default 'all'
@@ -66,7 +67,7 @@ Wat.Views.ListView = Wat.Views.MainView.extend({
         this.filters = params.filters || {};
         this.block = params.block || this.block;
         this.offset = params.offset || {};
-        
+              
         if (params.autoRender !== undefined) {
             this.autoRender = params.autoRender;
         }            
@@ -82,6 +83,7 @@ Wat.Views.ListView = Wat.Views.MainView.extend({
         }            
         if (params.forceListColumns !== undefined) {
             var that = this;
+            
             $.each(this.columns, function(cName, column) {
                 if (params.forceListColumns[cName] !== undefined && params.forceListColumns[cName]) {
                     that.columns[cName].display = true;
@@ -364,6 +366,7 @@ Wat.Views.ListView = Wat.Views.MainView.extend({
     // Render view with two options: all and only list with controls (list block)
     render: function () {
         var that = this;
+        
         this.collection.fetch({      
             complete: function () {
                 switch(that.whatRender) {
@@ -399,11 +402,9 @@ Wat.Views.ListView = Wat.Views.MainView.extend({
         var that = that || this;
 
         var targetReady = $(that.listBlockContainer).length != 0;
-
-        // Recursive call until target is ready
+        
+        // Target is not ready
         if (!targetReady) {
-            console.log('lag');
-            that.interval = setInterval(that.renderListBlock, 11500, that);
             return;
         }
         

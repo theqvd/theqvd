@@ -6,8 +6,15 @@ Wat.I.listColumns[qvdObj] = {
         'display': true,
         'fields': [],
         'fixed': true,
-        'text': '',
-        'fixed': true
+        'text': 'checks'
+    },
+    'info': {
+        'display': true,
+        'fields': [
+            'blocked',
+            'tags'
+        ],
+        'text': 'Info'
     },
     'id': {
         'display': true,
@@ -23,6 +30,13 @@ Wat.I.listColumns[qvdObj] = {
             'name'
         ],
         'text': 'Name'
+    },
+    'roles': {
+        'display': true,
+        'fields': [
+            'roles'
+        ],
+        'text': 'Roles'
     }
 };
         

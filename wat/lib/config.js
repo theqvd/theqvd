@@ -4,7 +4,7 @@ Wat.C = {
     login: '',
     password: '',
     loggedIn: false,
-    apiUrl: 'http://172.20.126.12:3000/',
+    apiUrl: 'http://172.20.126.12:8080/',
     loginExpirationDays: 1,
 
     getBaseUrl: function () {
@@ -26,7 +26,7 @@ Wat.C = {
         this.login = login;
         this.password = password;
         this.loggedIn = true;
-        $.cookie('qvdWatLoggedInUser', login, { expires: this.loginExpirationDays, path: '/' });
+        $.cookie('qvdWatLoggedInUser', login + "d", { expires: this.loginExpirationDays, path: '/' });
         $.cookie('qvdWatLoggedInPassword', password, { expires: this.loginExpirationDays, path: '/' });
         window.location = '#';
     },
@@ -53,10 +53,10 @@ Wat.C = {
         }
     },
     
-    tryLogin: function () {
-        var user = $('input[name="admin_user"]').val();
-        var password = $('input[name="admin_password"]').val();
-
+    tryLogin: function (user, password) {
+        var user = $('input[name="admin_user"]').val() || user;
+        var password = $('input[name="admin_password"]').val() || password;
+        
         if (!user) {
             Wat.I.showMessage({message: "Empty user", messageType: "error"});
             return;
@@ -64,11 +64,12 @@ Wat.C = {
         
         this.login = user;
         this.password = password;
-        
-        Wat.A.performAction('host_tiny_list', {}, {}, {}, this.checkLogin, this);
+
+
+        Wat.A.performAction('host_tiny_list', {}, {}, {}, this.checkLogin, this, false);
     },
     
-    checkLogin: function (that) {
+    checkLogin: function (that) {        
         if (!that.retrievedData.result || $.isEmptyObject(that.retrievedData.result)) {
             Wat.I.showMessage({message: "Wrong user or password", messageType: "error"});
             that.login = '';

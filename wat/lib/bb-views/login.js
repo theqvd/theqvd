@@ -1,6 +1,7 @@
 Wat.Views.LoginView = Wat.Views.MainView.extend({
     loginTemplateName: 'login',
-    
+    qvdObj: 'login',
+
     initialize: function (params) {
         Wat.Views.MainView.prototype.initialize.apply(this, [params]);
         

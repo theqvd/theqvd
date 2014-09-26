@@ -22,7 +22,7 @@
             }); 
             %>
             
-            <%= acls.join(' | ') %>
+            <%= acls.join('<br>') %>
         </td>
     </tr>
     <tr>
@@ -38,7 +38,7 @@
                 }); 
             %>
                     
-            <%= roles.join(' | ') %>
+            <%= roles.join('<br>') %>
         </td>
     </tr>
 </table>

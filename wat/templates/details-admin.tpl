@@ -26,7 +26,7 @@
                 }); 
             %>
                     
-            <%= acls.join(' | ') %>
+            <%= acls.join('<br>') %>
         </td>
     </tr>
     <tr>

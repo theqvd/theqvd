@@ -1242,13 +1242,14 @@ body {
         border-spacing: 20px; } }
     .editor-container .editor-table td {
       padding-top: 4px; }
-    .editor-container .editor-table td:first-child {
+    .editor-container .editor-table > tbody > tr > td:first-child {
       font-weight: bold;
       min-width: 50%;
-      vertical-align: middle; }
+      vertical-align: middle;
+      text-align: right; }
     .editor-container .editor-table td.fa:before {
       margin-right: 10px; }
-    .editor-container .editor-table .delete-property-button {
+    .editor-container .editor-table .delete-property-button, .editor-container .editor-table .add-inherit-role-button, .editor-container .editor-table .delete-inherit-role-button, .editor-container .editor-table .add-acl-button, .editor-container .editor-table .delete-acl-button {
       color: #cb540a;
       cursor: pointer; }
     .editor-container .editor-table .custom-properties td {
@@ -1417,6 +1418,11 @@ table.custom-props, table.details {
   table.custom-props .info-in-name-cell, table.details .info-in-name-cell {
     margin-top: 8px;
     float: right; }
+
+table.manage-roles, table.manage-acls {
+  width: 100%; }
+  table.manage-roles td, table.manage-acls td {
+    text-align: left; }
 
 @media screen and (min-width: 40em) {
   table.list, table.custom-props {
@@ -1950,7 +1956,7 @@ td.inner-table {
       height: 550px; } }
 
 .ui-dialog {
-  top: 50px !important;
+  top: 20px !important;
   overflow-y: auto;
   padding: 1px;
   margin-bottom: 50px;
@@ -1979,7 +1985,6 @@ td.inner-table {
           width: auto; } }
     @media screen and (min-width: 40em) {
       .ui-dialog td:first-child {
-        text-align: right;
         width: 120px;
         white-space: nowrap; } }
     @media screen and (min-width: 40em) {

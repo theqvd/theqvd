@@ -14,11 +14,12 @@ Wat.Collections.Collection = Backbone.Collection.extend({
         this.block = params.block || this.block;
         this.offset = params.offset || this.offset;
         this.filters = params.filters || this.filters;
+        this.action = params.action || this.actionPrefix + '_get_list';
     },
     
     getListUrl: function () {
         var fullUrl = Wat.C.getBaseUrl()  + 
-            "&action=" + this.actionPrefix + '_get_list' +
+            "&action=" + this.action +
             "&offset=" + this.offset + 
             "&block=" + this.block + 
             "&filters=" + JSON.stringify(this.filters) + 

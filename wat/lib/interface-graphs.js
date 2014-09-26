@@ -1,6 +1,12 @@
 Wat.I.G = {
     drawPieChart: function (name, data, loadTime) {
         var plotSelector = '#' + name;
+        
+        // If container is not loaded in dom, do nothing
+        if ($(plotSelector).html() == undefined) {
+            return;
+        }
+        
         var dataStatSelector = '.js-' + name + '-data';
         var percentStatSelector = '.js-' + name + '-percent';
 
@@ -94,8 +100,8 @@ Wat.I.G = {
             ticks.push([index, node.name]);
             ids.push(node.id);
         });
-        
-        var maxValue = data[0].number_of_vms;
+
+        var maxValue = data.length > 0 ? data[0].number_of_vms : 10;
         var dataSet = [{ label: "", data: barData, color: COL_BRAND }];
 
         var options = {

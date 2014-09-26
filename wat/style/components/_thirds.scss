@@ -46,6 +46,7 @@
         overflow-y: auto;
         padding-left: 30px;
         padding-right: 30px;
+        //height: 80% !important;
     }
 }
 
@@ -81,7 +82,7 @@
 }
 
 .ui-dialog {
-    top: 50px !important;
+    top: 20px !important;
     overflow-y: auto;
     padding: 1px;
     margin-bottom: 50px;
@@ -99,6 +100,7 @@
         width: $dialog_width !important;
         height: $dialog_height !important;
         height: auto !important;
+        //height: 85vh !important;
     }
     
     td {
@@ -120,7 +122,6 @@
 
         &:first-child {
             @include in(desktop) {
-                text-align: right;
                 width: 120px;
                 white-space: nowrap;
             }

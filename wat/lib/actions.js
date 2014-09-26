@@ -1,7 +1,7 @@
 Wat.A = {
     getTemplate: function(templateName) {
         if ($('#template_' + templateName).html() == undefined) {
-            var tmplDir = 'templates';
+            var tmplDir = APP_PATH + 'templates';
             var tmplUrl = tmplDir + '/' + templateName + '.tpl';
             var tmplString = '';
 
@@ -38,7 +38,7 @@ Wat.A = {
         }
 
         messages = messages || {};
-        
+        var that2 = that;
         successCallback = successCallback || function () {};   
         $.ajax({
             url: url,
@@ -66,7 +66,7 @@ Wat.A = {
                     Wat.I.showMessage(messageParams, response);
                 }                   
             },
-            success: function (response) {
+            success: function (response, result, raw) {
                 if (that) {
                     that.retrievedData = response;
                 }

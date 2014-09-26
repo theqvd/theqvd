@@ -65,6 +65,23 @@ Wat.Views.SetupAdminDetailsView = Wat.Views.DetailsView.extend({
         Wat.I.chosenElement('[name="di_tag"]', 'single100');
     },
     
+    renderSide: function () {
+        var sideContainer = '.' + this.cid + ' .bb-details-side1';
+        
+        // Render ACLs list on side
+        var params = {};
+        params.whatRender = 'list';
+        params.listContainer = sideContainer;
+        params.forceListColumns = {info: true, name: true, roles: true};
+        params.forceSelectedActions = {};
+        params.forceListActionButton = null;
+        params.block = 5;
+        params.filters = {"id": this.elementId};
+        params.action = 'get_acls_in_admins';
+        
+        this.sideView = new Wat.Views.SetupACLsView(params);
+    },
+    
     updateElement: function (dialog) {
         var valid = Wat.Views.DetailsView.prototype.updateElement.apply(this, [dialog]);
         

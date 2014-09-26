@@ -52,6 +52,20 @@ Wat.B = {
                 
             // Toggle controls for new password
             this.bindEvent('change', 'input[name="change_password"]', this.userEditorBinds.toggleNewPassword);
+        
+        // Roles editor
+        
+            // Delete ACL
+            this.bindEvent('click', '.js-delete-acl-button', this.roleEditorBinds.deleteAcl);
+
+            // Add ACL
+            this.bindEvent('click', '.js-add-acl-button', this.roleEditorBinds.addAcl);
+
+            // Add inherited Role
+            this.bindEvent('click', '.js-add-inherit-role-button', this.roleEditorBinds.addRole);
+
+            // Delete inherited Role
+            this.bindEvent('click', '.js-delete-inherit-role-button', this.roleEditorBinds.deleteRole);
     },
     
     bindHomeEvents: function () {
@@ -269,5 +283,41 @@ Wat.B = {
         toggleNewPassword: function () {
             $('.new_password_row').toggle();
         }
+    },
+    
+    roleEditorBinds: {
+        deleteAcl: function () {
+            // Add deleted item to the select
+            var aclId = $(this).attr('data-id');
+            var aclName = $(this).attr('data-name');
+            
+            $('select[name="role_acls"]').append('<option value="' + aclId + '">' + 
+                                                               aclName + 
+                                                               '<\/option>');
+            
+            $('select[name="role_acls"]').trigger('chosen:updated');
+            
+            // Remove item
+            $(this).parent().parent().remove();
+        },
+        addAcl: function () {
+        },
+        deleteRole: function () {
+            // Add deleted item to the select
+            var roleId = $(this).attr('data-id');
+            var roleName = $(this).attr('data-name');
+            
+            $('select[name="inherit_role"]').append('<option value="' + roleId + '">' + 
+                                                               roleName + 
+                                                               '<\/option>');
+            
+            $('select[name="inherit_role"]').trigger('chosen:updated');
+            
+            // Remove item
+            $(this).parent().parent().remove();
+        },
+        addRole: function () {
+            var role = $('select[name="inherit_role"]').val();
+        },
     }
 }

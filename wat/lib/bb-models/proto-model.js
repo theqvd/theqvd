@@ -1,7 +1,6 @@
 Wat.Models.Model = Backbone.Model.extend({
     defaults: {},
     id: 0,
-    url: "",
     detailsView: false,
     operation: '',
     
@@ -17,7 +16,7 @@ Wat.Models.Model = Backbone.Model.extend({
         else {
             var view = 'list';
         }
-                
+        
         switch (view) {
             case 'detail':
                 return response.result.rows[0];
@@ -37,7 +36,7 @@ Wat.Models.Model = Backbone.Model.extend({
         }
     },
     
-    getDetailsUrl: function () {
+    url: function () {
         return Wat.C.getBaseUrl() + 
             "&action=" + this.actionPrefix + "_get_details" + 
             "&filters={\"id\":" + this.id + "}";
@@ -62,7 +61,7 @@ Wat.Models.Model = Backbone.Model.extend({
         var params = _.extend({
             type: 'POST',
             dataType: 'json',
-            url: that.getDetailsUrl(),
+            url: that.url(),
             processData: false
         }, options);
         

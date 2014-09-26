@@ -1,5 +1,7 @@
 SUCCESS = 0;
 
+APP_PATH = './';
+
 CLASS_ICON_USERS = 'fa fa-users';
 CLASS_ICON_VMS = 'fa fa-cloud';
 CLASS_ICON_NODES = 'fa fa-hdd-o';

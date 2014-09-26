@@ -1,6 +1,7 @@
 Wat.Views.HomeView = Wat.Views.MainView.extend({
     homeTemplateName: 'home',
-
+    qvdObj: 'home',
+    
     breadcrumbs: {
         'screen': 'Home'
     },
@@ -37,27 +38,30 @@ Wat.Views.HomeView = Wat.Views.MainView.extend({
         this.printBreadcrumbs(this.breadcrumbs, '');
     },
     
-    loadData: function (stats) {        
+    loadData: function (stats) {
+        if (!stats) {
+            return;
+        }
         var runningHostsData = [stats.Host.running, stats.Host.total - stats.Host.running];
         Wat.I.G.drawPieChart('running-hosts', runningHostsData);
         
         var runningVMSData = [stats.VM.running, stats.VM.total - stats.VM.running];
         Wat.I.G.drawPieChart('running-vms', runningVMSData);
-        
-        // Trick to draw bar chart when the div where it will be located will be rendered
-        // We know that it is rendered when CSS width attribute change from 'XXX%' to 'XXXpx'
 
-        var barsInterval = setInterval(function () {
-            if ($('#hosts-more-vms').css('width').indexOf("%") == -1) {
-            var hostsMoreVMSData = [];
-            
-            $.each(stats.Host.population, function (iPop, population) {
-                hostsMoreVMSData.push(population);
-            });
-                
-            Wat.I.G.drawBarChart('hosts-more-vms', hostsMoreVMSData);
-            clearInterval(barsInterval);
-            }
-        }, 50);
+        if ($('#hosts-more-vms').html() != undefined) {
+            // Trick to draw bar chart when the div where it will be located will be rendered
+            // We know that it is rendered when CSS width attribute change from 'XXX%' to 'XXXpx'
+            setTimeout(function () {
+                if ($('#hosts-more-vms').css('width').indexOf("%") == -1) {
+                var hostsMoreVMSData = [];
+
+                $.each(stats.Host.population, function (iPop, population) {
+                    hostsMoreVMSData.push(population);
+                });
+
+                Wat.I.G.drawBarChart('hosts-more-vms', hostsMoreVMSData);
+                }
+            }, 50);
+        }
     }
 });
