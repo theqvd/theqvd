@@ -290,11 +290,11 @@ vm.network.domain=
 ## for LXC's lxc.network.veth.pair parameter
 internal.vm.network.device.prefix = qvd
 ## start of DHCP range. There's no sensible default value
-# vm.network.ip.start=10.0.0.100
-
+#vm.network.ip.start=10.0.0.100
+vm.network.ip.start=10.0.0.100
 ## QVD private network netmask. There's no sensible default value
-# vm.network.ip.netmask=255.255.0.0
-
+#vm.network.ip.netmask=255.255.0.0
+vm.network.netmask=255.255.0.0
 vm.network.use_dhcp = 1
 
 # high bytes of the MAC address, the IP is used for the low bytes.

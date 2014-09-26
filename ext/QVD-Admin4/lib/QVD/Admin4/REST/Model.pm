@@ -77,10 +77,10 @@ my $AVAILABLE_FILTERS = { list => { default => [],
 				      Role => [qw(id)],
 				      Tenant => [qw(id)]},
 			  update => { default => [qw(id tenant_id)],
-				      Host => [qw()],
-				      ACL => [qw()],
-				      Role => [qw()],
-				      Tenant => [qw()]},
+				      Host => [qw(id)],
+				      ACL => [qw(id)],
+				      Role => [qw(id)],
+				      Tenant => [qw(id)]},
 			  state => { default => [qw(id tenant_id)],
 				     Host => [qw(id)],
 				     ACL => [qw(id)],
@@ -175,13 +175,13 @@ my $AVAILABLE_ARGUMENTS = { User => [qw(name password blocked)],
                             VM => [qw(name di_tag ip blocked expiration_soft expiration_hard storage)],
                             Host => [qw(name address blocked)],
                             OSF => [qw(name memory user_storage)],
-                            DI => [qw(update)],
+                            DI => [qw(blocked disk_image)],
 			    Tenant => [qw(name)],
 			    Role => [qw(name)],
 			    Administrator => [qw(name password)]};
 
-my $MANDATORY_ARGUMENTS = { User => [qw(name password tenant_id)],
-			    VM => [qw(name user_id ip osf_id ip di_tag state user_state blocked)],
+my $MANDATORY_ARGUMENTS = { User => [qw(name password tenant_id blocked)],
+			    VM => [qw(name user_id ip osf_id di_tag state user_state blocked)],
 			    Host => [qw(name address frontend backend blocked state)],
 			    OSF => [qw(name memory overlay user_storage tenant_id)],
                             DI => [qw(version disk_image osf_id blocked)],
@@ -192,15 +192,16 @@ my $MANDATORY_ARGUMENTS = { User => [qw(name password tenant_id)],
 my $DEFAULT_ARGUMENT_VALUES = { User => { blocked => 'false' },
                                 VM => { di_tag => 'default',
                                         blocked => 'false',
-				        user_state => 'stopped',
+				        user_state => 'disconnected',
+				        state => 'stopped',
 				        ip => \&get_free_ip},
                                 Host => { backend => 'true',
 					  frontend => 'true',
 					  blocked => 'false',
 					  state => 'stopped'},
                                 OSF => { memory => \&get_default_memory,
-				         overlay => \&get_default_memory,
-				         storage => 0 },
+				         overlay => \&get_default_overlay,
+				         user_storage => 0 },
 				DI => { blocked => 'false' }};    
 
 my $FILTERS_TO_DBIX_FORMAT_MAPPER = 
@@ -356,9 +357,12 @@ my $FIELDS_TO_DBIX_FORMAT_MAPPER =
 
     Role => {
 	'name' => 'me.name',
-	'own_acls' => 'me.get_own_acls_info',
-	'inherited_acls' => 'me.get_inherited_acls_info',
-	'inherited_roles' => 'me.get_inherited_roles_info_without_me',
+#	'own_acls' => 'me.get_own_acls_info',
+#	'inherited_acls' => 'me.get_inherited_acls_info',
+#	'inherited_roles' => 'me.get_inherited_roles_info_without_me',
+	'own_acls' => 'me.get_own_acls',
+	'inherited_acls' => 'me.get_inherited_acls_kk',
+	'inherited_roles' => 'me.get_inherited_roles_kk',
 	'id' => 'me.id',
     },
 
@@ -465,9 +469,9 @@ my $DBIX_JOIN_VALUE = { User => [qw(tenant)],
 			OSF => [ qw(tenant vms dis), { dis => 'tags' }],
 			DI => [qw(vm_runtimes tags), {osf => 'tenant'}],
 			DI_Tag => [qw(di)],
-			Role => [{roles => 'inherited'}, { acl_rels => 'acls'}],
-			Administrator => [qw(tenant), { role_rels => { roles => { acl_rels => 'acls' }}}],
-			ACL => [{ role_rels => { roles => { admin_rels => 'adminis' }}}]};
+			Role => [{role_rels => 'inherited'}, { acl_rels => 'acl'}],
+			Administrator => [qw(tenant), { role_rels => { role => { acl_rels => 'acl' }}}],
+			ACL => [{ role_rels => { role => { admin_rels => 'admin' }}}]};
 
 my $DBIX_HAS_ONE_RELATIONSHIPS = { VM => [qw(vm_runtime counters)],
                                    Host => [qw(runtime counters)]};
@@ -499,7 +503,7 @@ sub BUILD
     $self->set_info_by_qvd_object(
 	'mandatory_arguments',$MANDATORY_ARGUMENTS);
 
-    $self->set_info_by_qvd_object(
+    $self->set_info_by_type_of_action_and_qvd_object(
 	'mandatory_filters',$MANDATORY_FILTERS);
 
     $self->set_info_by_qvd_object(
@@ -546,7 +550,11 @@ sub set_info_by_type_of_action_and_qvd_object
     {
 	$MODEL_INFO->{$model_info_key} = 
 	    $INFO_REPO->{$self->type_of_action}->{$self->qvd_object} //
-	    $INFO_REPO->{$self->type_of_action}->{default};
+	    $INFO_REPO->{$self->type_of_action}->{default} // undef;
+    }
+    else
+    {
+	$MODEL_INFO->{$model_info_key} = undef;
     }
 }
 
@@ -555,7 +563,7 @@ sub set_info_by_qvd_object
     my ($self,$model_info_key,$INFO_REPO) = @_;
 
     $MODEL_INFO->{$model_info_key} = 
-	$INFO_REPO->{$self->qvd_object};
+	$INFO_REPO->{$self->qvd_object} // undef;
 }
 
 ############

@@ -7,7 +7,7 @@ use 5.010;
 our $VERSION = '0.01';
 
 has 'json', is => 'ro', isa => 'HashRef', required => '1';
-has 'available_nested_queries', is => 'ro', isa => 'ArrayRef', default => sub {[qw(aclChanges tagChanges propertyChanges)];};
+has 'available_nested_queries', is => 'ro', isa => 'ArrayRef', default => sub {[qw(__roles_changes__ __acls_changes__ __tags_changes__ __properties_changes__ __properties__ __tags__ __acls__ __roles__)];};
 
 my $NESTED_QUERIES;
 

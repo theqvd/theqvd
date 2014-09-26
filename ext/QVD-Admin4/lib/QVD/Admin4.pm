@@ -51,21 +51,19 @@ sub update
     my ($self,$request,%modifiers) = @_;
     my $result = $self->select($request);
     my $failures = {};
-
+ 
     my $conditions = $modifiers{conditions} // [];
     my $methods_for_nested_queries = $modifiers{methods_for_nested_queries} // [];
 
     for my $obj (@{$result->{rows}})
     {
-	eval { $self->$_($obj) for @$conditions;
-	       $DB->txn_do( sub { eval { $obj->update($request->arguments) };
-				  QVD::Admin4::Exception->throw(code => ($DB->storage->_dbh->state || 4),
-								message => "$@") if $@;
+	eval { $DB->txn_do( sub { $self->$_($obj) || QVD::Admin4::Exception->throw(code => 16)
+				      for @$conditions;
+				  $obj->update($request->arguments);
 				  $self->update_related_objects($request,$obj);
-				  $self->$_($request,$obj) for @$methods_for_nested_queries } );
-
-	       if ($@) { $failures->{$obj->id} = ($@->can('code') ? $@->code : 4); }
-	}
+				  $self->$_($request,$obj) for @$methods_for_nested_queries })};
+	print $@ if $@;
+	if ($@) { $failures->{$obj->id} = ($@->can('code') ? $@->code : 4); }
     }
     QVD::Admin4::Exception->throw(code => 1, failures => $failures) if %$failures;
     $result->{rows} = [];
@@ -74,14 +72,13 @@ sub update
 
 sub delete
 {
-    my ($self,$result,%modifiers) = @_;
+    my ($self,$request,%modifiers) = @_;
     my $failures = {};
-
+    my $result = $self->select($request);
     my $conditions = $modifiers{conditions} // [];
     for my $obj (@{$result->{rows}})
     {
-         eval { $self->$_($obj) || 
-		    QVD::Admin4::Exception->throw(code => 16)
+         eval { $self->$_($obj) || QVD::Admin4::Exception->throw(code => 16)
 		    for @$conditions; 
 		$obj->delete };
 	 print $@ if $@;
@@ -137,14 +134,14 @@ sub update_custom_properties
     my($self,$request,$obj)=@_;
 
     my $nested_queries = $request->nested_queries // return;
-    my $custom_prop_queries = $nested_queries->{propertyChanges} // return;
+    my $custom_prop_queries = $nested_queries->{__properties_changes__} // return;
     my $cp_set_query = $custom_prop_queries->{set};
     my $cp_del_query = $custom_prop_queries->{delete}; 
 
-    $self->custom_properties_set($cp_set_query)
+    $self->custom_properties_set($cp_set_query,$obj)
 	if defined $cp_set_query;
 
-    $self->custom_properties_del($cp_set_query)
+    $self->custom_properties_del($cp_del_query,$obj)
 	if defined $cp_del_query;
 }
 
@@ -153,14 +150,14 @@ sub update_related_tags
     my($self,$request,$obj)=@_;
 
     my $nested_queries = $request->nested_queries // return;
-    my $tags_queries = $nested_queries->{tagsChanges} // return;
+    my $tags_queries = $nested_queries->{__tags_changes__} // return;
     my $tags_create_query = $tags_queries->{create};
     my $tags_delete_query = $tags_queries->{delete}; 
 
-    $self->tags_create($tags_create_query)
+    $self->tags_create($tags_create_query,$obj)
 	if defined $tags_create_query;
 
-    $self->tags_delete($tags_delete_query)
+    $self->tags_delete($tags_delete_query,$obj)
 	if defined $tags_delete_query;
 }
 
@@ -169,22 +166,22 @@ sub update_role_acls
     my($self,$request,$obj)=@_;
 
     my $nested_queries = $request->nested_queries // return;
-    $nested_queries = $nested_queries->{aclsChanges} // return;
+    $nested_queries = $nested_queries->{__acls_changes__} // return;
     my $roles_assign_query = $nested_queries->{assign_roles};
     my $acls_assign_query = $nested_queries->{assign_acls};
     my $roles_unassign_query = $nested_queries->{unassign_roles}; 
     my $acls_unassign_query = $nested_queries->{unassign_acls}; 
 
-    $self->add_roles_to_role($roles_assign_query)
+    $self->add_roles_to_role($roles_assign_query,$obj)
 	if defined $roles_assign_query;
 
-    $self->del_roles_to_role($roles_unassign_query)
+    $self->del_roles_to_role($roles_unassign_query,$obj)
 	if defined $roles_unassign_query;
 
-    $self->add_acls_to_role($acls_assign_query)
+    $self->add_acls_to_role($acls_assign_query,$obj)
 	if defined $acls_assign_query;
 
-    $self->del_acls_to_role($acls_unassign_query)
+    $self->del_acls_to_role($acls_unassign_query,$obj)
 	if defined $acls_unassign_query;
 }
 
@@ -193,14 +190,14 @@ sub update_admin_roles
     my($self,$request,$obj)=@_;
 
     my $nested_queries = $request->nested_queries // return;
-    $nested_queries = $nested_queries->{rolesChanges} // return;
+    $nested_queries = $nested_queries->{__roles_changes__} // return;
     my $roles_assign_query = $nested_queries->{assign_roles};
     my $roles_unassign_query = $nested_queries->{unassign_roles}; 
 
-    $self->add_roles_to_admin($roles_assign_query)
+    $self->add_roles_to_admin($roles_assign_query,$obj)
 	if defined $roles_assign_query;
 
-    $self->del_roles_to_admin($roles_unassign_query)
+    $self->del_roles_to_admin($roles_unassign_query,$obj)
 	if defined $roles_unassign_query;
 }
 
@@ -224,9 +221,9 @@ sub create_custom_properties
     my($self,$request,$obj)=@_;
 
     my $nested_queries = $request->nested_queries // return;
-    my $custom_prop_queries = $nested_queries->{properties} // return;
+    my $custom_prop_queries = $nested_queries->{__properties__} // return;
 
-    $self->custom_properties_set($custom_prop_queries);
+    $self->custom_properties_set($custom_prop_queries,$obj);
 }
 
 sub create_related_tags
@@ -241,9 +238,9 @@ sub create_related_tags
 	unless $di->osf->di_by_tag('default');
 
     my $nested_queries = $request->nested_queries // return;
-    my $tags_queries = $nested_queries->{tags} // return;
+    my $tags_queries = $nested_queries->{__tags__} // return;
 
-    $self->tags_create($tags_queries)
+    $self->tags_create($tags_queries,$di)
 }
 
 sub create_role_acls
@@ -251,14 +248,14 @@ sub create_role_acls
     my($self,$request,$obj)=@_;
 
     my $nested_queries = $request->nested_queries // return;
-    $nested_queries = $nested_queries->{aclsChanges} // return;
+    $nested_queries = $nested_queries->{__acls__} // return;
     my $roles_assign_query = $nested_queries->{assign_roles};
     my $acls_assign_query = $nested_queries->{assign_acls};
 
-    $self->add_roles_to_role($roles_assign_query)
+    $self->add_roles_to_role($roles_assign_query,$obj)
 	if defined $roles_assign_query;
 
-    $self->add_acls_to_role($acls_assign_query)
+    $self->add_acls_to_role($acls_assign_query,$obj)
 	if defined $acls_assign_query;
 }
 
@@ -267,9 +264,9 @@ sub create_admin_roles
     my($self,$request,$obj)=@_;
 
     my $nested_queries = $request->nested_queries // return;
-    $nested_queries = $nested_queries->{roles} // return;
+    $nested_queries = $nested_queries->{__roles__} // return;
 
-    $self->add_roles_to_admin($nested_queries)
+    $self->add_roles_to_admin($nested_queries,$obj)
 	if defined $nested_queries;
 }
 
@@ -353,6 +350,7 @@ sub add_acls_to_role
 	    { id => $acl_id })->first;
 	QVD::Admin4::Exception->throw(code => 21) 
 	    unless $acl; 
+
 	next if $role->is_allowed_to($acl->name);
 	$role->has_negative_acl($acl->name) ?
 	    $role->unassign_acls($acl->id) :
@@ -409,7 +407,7 @@ sub del_roles_to_role
 	$this_role->unassign_roles($role_to_unassign->id);
     }
 
-    my %acl_ids = map { $_->id => 1 } $this_role->_get_only_inherited_acls(return_value => 'id');
+    my %acl_ids = map { $_ => 1 } $this_role->_get_only_inherited_acls(return_value => 'id');
 
     defined $acl_ids{$_} || $this_role->unassign_acls($_,0)
     for $this_role->_get_own_acls(return_value => 'id', positive => 0);
@@ -499,9 +497,8 @@ sub admin_create
 sub vm_delete
 {
     my ($self,$request) = @_;
-    my $result = $self->select($request);
 
-    $self->delete($result,conditions => [qw(vm_is_stopped)]);
+    $self->delete($request,conditions => [qw(vm_is_stopped)]);
 }
 
 
@@ -511,13 +508,13 @@ sub di_create
 # $di->update({path => $di->id .'-'.$di->path});
 
   $self->create($request, methods_for_nested_queries => 
-		  [qw(create_related_tags)]);
+		  [qw(create_custom_properties 
+                      create_related_tags)]);
 }
 
 sub di_delete {
     my ($self, $request) = @_;
 
-    my $result = $self->select($request);
     $self->delete($request,conditions => [qw(di_no_vm_runtimes 
                                           di_no_head_default_tags)]);
 }

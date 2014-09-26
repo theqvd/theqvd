@@ -106,6 +106,7 @@ __DATA__
 19 = Related arguments are not part of this tenant.
 20 = Unknow role.
 21 = Unknown acl
+23 = Condition to update violated.
 23503 = Foreign Key violation.
 23502 = Lack of mandatory argument violation.
 23505 = Unique Key violation.

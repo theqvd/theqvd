@@ -11,9 +11,9 @@ __PACKAGE__->add_columns(id => { data_type => 'integer',
 
 __PACKAGE__->set_primary_key('id');
 __PACKAGE__->add_unique_constraint(['name']);
-__PACKAGE__->has_many(administrators => 'QVD::DB::Result::Administrator_Role_Relation', 'role_id', { cascade_delete => 0 } );
-__PACKAGE__->has_many(acls => 'QVD::DB::Result::ACL_Role_Relation', 'role_id');
-__PACKAGE__->has_many(roles => 'QVD::DB::Result::Role_Role_Relation', 'inheritor_id', { cascade_delete => 0 } );
+__PACKAGE__->has_many(admin_rels => 'QVD::DB::Result::Administrator_Role_Relation', 'role_id', { cascade_delete => 0 } );
+__PACKAGE__->has_many(acl_rels => 'QVD::DB::Result::ACL_Role_Relation', 'role_id');
+__PACKAGE__->has_many(role_rels => 'QVD::DB::Result::Role_Role_Relation', 'inheritor_id', { cascade_delete => 0 } );
 
 sub get_positive_acls_columns
 {
@@ -30,7 +30,7 @@ sub get_negative_acls_columns
 sub get_acls
 {
     my ($self) = @_;
-    [map { $_->acl } $self->acls];
+    [map { $_->acl } $self->acl_rels];
 }
 
 sub get_positive_acls
@@ -39,7 +39,7 @@ sub get_positive_acls
 
     [map { $_->acl }
      grep { $_->positive }
-     $self->acls];
+     $self->acl_rels];
 }
 
 sub get_negative_acls
@@ -48,13 +48,13 @@ sub get_negative_acls
 
     [map { $_->acl }
      grep { not $_->positive }
-     $self->acls];
+     $self->acl_rels];
 }
 
 sub get_roles
 {
     my $self = shift;
-    [map { $_->inherited } $self->roles];
+    [map { $_->inherited } $self->role_rels];
 }
 
 sub get_roles_columns
@@ -192,10 +192,10 @@ sub _get_own_roles
 
     $mods{return_value} //= 'name';
 
-    return map { $_->inherited->name } $self->roles if $mods{return_value} eq 'name';
-    return map { $_->inherited } $self->roles if $mods{return_value} eq 'object';
-    return map { $_->inherited->id } $self->roles if $mods{return_value} eq 'id';
-    return map { $_->inherited->get_columns } $self->roles if $mods{return_value} eq 'columns';
+    return map { $_->inherited->name } $self->role_rels if $mods{return_value} eq 'name';
+    return map { $_->inherited } $self->role_rels if $mods{return_value} eq 'object';
+    return map { $_->inherited->id } $self->role_rels if $mods{return_value} eq 'id';
+    return map { $_->inherited->get_columns } $self->role_rels if $mods{return_value} eq 'columns';
 }
 
 sub _get_inherited_roles
@@ -249,8 +249,8 @@ sub _get_own_acls
     $mods{return_value} //= 'name';
 
     my @acls = $mods{positive} ?
-	map {$_->acl} grep { $_->positive } $self->acls :
-	map {$_->acl} grep { not $_->positive } $self->acls ;
+	map {$_->acl} grep { $_->positive } $self->acl_rels :
+	map {$_->acl} grep { not $_->positive } $self->acl_rels ;
 
     return map { $_->name } @acls if $mods{return_value} eq 'name';
     return map { $_->id } @acls if $mods{return_value} eq 'id';
@@ -286,8 +286,8 @@ sub _get_only_inherited_acls
     {
 	my ($nested_str,$flat_str) = 
 	    $self->get_nested_roles_structure_rec;
-	$acls{keys %{$nested_str->{$self->name}->{acls}}} =
-		  values %{$nested_str->{$self->name}->{acls}};
+	@acls{keys %{$nested_str->{$self->name}->{acls}}} =
+	    values %{$nested_str->{$self->name}->{acls}};
     }
 
     return keys %acls if $mods{return_value} eq 'name';
@@ -302,7 +302,7 @@ sub assign_acl
 {
     my ($self,$acl_id,$positive) = @_;
 
-    $self->create_related('acls', { acl_id => $acl_id,
+    $self->create_related('acl_rels', { acl_id => $acl_id,
 			            positive => $positive });
 }
 
@@ -311,21 +311,22 @@ sub unassign_acls
     my ($self,$acl_ids) = @_;
 
     $_->delete for 
-	$self->search_related('acls', { acl_id => $acl_ids })->all;
+	$self->search_related('acl_rels', { acl_id => $acl_ids })->all;
 }
 
 sub assign_role
 {
     my ($self,$role_id) = @_;
 
-    $self->create_related('roles', { inherited_id => $role_id });
+    $self->create_related('role_rels', { inherited_id => $role_id });
 }
 
 sub unassign_roles
 {
     my ($self,$role_ids) = @_;
 
-    $self->search_related('roles', { inherited_id => $role_ids })->delete_all;
+    my $rs = $self->search_related('role_rels', { inherited_id => $role_ids });
+    $_->delete for $rs->all;
 }
 
 sub get_own_acls
