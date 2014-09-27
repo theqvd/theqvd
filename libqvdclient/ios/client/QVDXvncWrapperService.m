@@ -53,10 +53,12 @@ static char passwdargchr[MAXPATH];
 
 - (NSString *) getGeometry {
     CGRect screenRect = [[UIScreen mainScreen] bounds];
-    CGFloat screenWidth = screenRect.size.width - NOVNC_TOP_FRAME_HEIGHT;
-    //CGFloat screenWidth = screenRect.size.width;
+    CGFloat screenWidth = screenRect.size.width;
     CGFloat screenHeight = screenRect.size.height;
-    NSString* geometry_v = [NSString stringWithFormat:@"%dx%d", (int)screenHeight, (int)screenWidth];
+    // Assume that landscape mode is enforced
+    CGFloat currentWidth = MAX(screenWidth, screenHeight);
+    CGFloat currentHeight = MIN(screenWidth, screenHeight) - NOVNC_TOP_FRAME_HEIGHT;
+    NSString* geometry_v = [NSString stringWithFormat:@"%dx%d", (int)currentWidth, (int)currentHeight];
     return geometry_v;
 }
 

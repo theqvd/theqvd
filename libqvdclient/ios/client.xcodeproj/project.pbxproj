@@ -7,6 +7,7 @@
 	objects = {
 
 /* Begin PBXBuildFile section */
+		4715928919D68C1A00764991 /* libqvdxvnc.a in Frameworks */ = {isa = PBXBuildFile; fileRef = 4715928819D68C1A00764991 /* libqvdxvnc.a */; };
 		471AC6C31973E2A400740B8A /* qvd_logo_76x76.png in Resources */ = {isa = PBXBuildFile; fileRef = 471AC6C01973E2A400740B8A /* qvd_logo_76x76.png */; };
 		471AC6C41973E2A400740B8A /* qvd_logo_120x120.png in Resources */ = {isa = PBXBuildFile; fileRef = 471AC6C11973E2A400740B8A /* qvd_logo_120x120.png */; };
 		471AC6C51973E2A400740B8A /* qvd_logo_144x144.png in Resources */ = {isa = PBXBuildFile; fileRef = 471AC6C21973E2A400740B8A /* qvd_logo_144x144.png */; };
@@ -23,7 +24,6 @@
 		4722FD58192EA9C600C5ACB8 /* QVDService.m in Sources */ = {isa = PBXBuildFile; fileRef = 4722FD57192EA9C600C5ACB8 /* QVDService.m */; };
 		472572BA196ECE2C00864966 /* QVDEditViewController2.m in Sources */ = {isa = PBXBuildFile; fileRef = 472572B9196ECE2C00864966 /* QVDEditViewController2.m */; };
 		472572BD1971078300864966 /* QVDConfig.m in Sources */ = {isa = PBXBuildFile; fileRef = 472572BC1971078300864966 /* QVDConfig.m */; };
-		4727325119C0ED2F00A50FE6 /* libqvdxvnc.a in Frameworks */ = {isa = PBXBuildFile; fileRef = 4727325019C0ED2F00A50FE6 /* libqvdxvnc.a */; };
 		47306B5F1914B2B700A696B1 /* vncpasswd in CopyFiles */ = {isa = PBXBuildFile; fileRef = 473061151914B06A00A696B1 /* vncpasswd */; };
 		47306B611914B2CD00A696B1 /* SecurityPolicy in CopyFiles */ = {isa = PBXBuildFile; fileRef = 473061131914B05900A696B1 /* SecurityPolicy */; };
 		47306B631914B2EA00A696B1 /* rgb.txt in CopyFiles */ = {isa = PBXBuildFile; fileRef = 473061111914B05100A696B1 /* rgb.txt */; };
@@ -2800,6 +2800,7 @@
 
 /* Begin PBXFileReference section */
 		471288B3197D050C008DF598 /* curlbuild-64.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = "curlbuild-64.h"; sourceTree = "<group>"; };
+		4715928819D68C1A00764991 /* libqvdxvnc.a */ = {isa = PBXFileReference; lastKnownFileType = archive.ar; path = libqvdxvnc.a; sourceTree = "<group>"; };
 		471AC6C01973E2A400740B8A /* qvd_logo_76x76.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = qvd_logo_76x76.png; sourceTree = "<group>"; };
 		471AC6C11973E2A400740B8A /* qvd_logo_120x120.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = qvd_logo_120x120.png; sourceTree = "<group>"; };
 		471AC6C21973E2A400740B8A /* qvd_logo_144x144.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = qvd_logo_144x144.png; sourceTree = "<group>"; };
@@ -2833,7 +2834,6 @@
 		472572B9196ECE2C00864966 /* QVDEditViewController2.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = QVDEditViewController2.m; sourceTree = "<group>"; };
 		472572BB1971078300864966 /* QVDConfig.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = QVDConfig.h; sourceTree = "<group>"; };
 		472572BC1971078300864966 /* QVDConfig.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = QVDConfig.m; sourceTree = "<group>"; };
-		4727325019C0ED2F00A50FE6 /* libqvdxvnc.a */ = {isa = PBXFileReference; lastKnownFileType = archive.ar; path = libqvdxvnc.a; sourceTree = "<group>"; };
 		473061101914B03900A696B1 /* qvdxvnc.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = qvdxvnc.h; sourceTree = "<group>"; };
 		473061111914B05100A696B1 /* rgb.txt */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text; path = rgb.txt; sourceTree = "<group>"; };
 		473061131914B05900A696B1 /* SecurityPolicy */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text; path = SecurityPolicy; sourceTree = "<group>"; };
@@ -4225,7 +4225,7 @@
 				478F55551964124500644524 /* libresolv.dylib in Frameworks */,
 				4749DAFE196C34A40083B170 /* libcurl.a in Frameworks */,
 				476B8749163AB9B7003555C4 /* UIKit.framework in Frameworks */,
-				4727325119C0ED2F00A50FE6 /* libqvdxvnc.a in Frameworks */,
+				4715928919D68C1A00764991 /* libqvdxvnc.a in Frameworks */,
 				4764FD2619BC36E7001720E8 /* libwebsockify.a in Frameworks */,
 				476B874B163AB9B7003555C4 /* Foundation.framework in Frameworks */,
 				476B874D163AB9B7003555C4 /* CoreGraphics.framework in Frameworks */,
@@ -4281,7 +4281,7 @@
 			isa = PBXGroup;
 			children = (
 				473061101914B03900A696B1 /* qvdxvnc.h */,
-				4727325019C0ED2F00A50FE6 /* libqvdxvnc.a */,
+				4715928819D68C1A00764991 /* libqvdxvnc.a */,
 				473050261914A97400A696B1 /* x11files */,
 			);
 			name = xvnc;
@@ -6083,6 +6083,10 @@
 			isa = XCBuildConfiguration;
 			buildSettings = {
 				ALWAYS_SEARCH_USER_PATHS = NO;
+				ARCHS = (
+					armv7,
+					armv7s,
+				);
 				CLANG_CXX_LIBRARY = "compiler-default";
 				CLANG_ENABLE_OBJC_ARC = YES;
 				CLANG_WARN_BOOL_CONVERSION = YES;
@@ -6109,7 +6113,7 @@
 				SDKROOT = iphoneos;
 				TARGETED_DEVICE_FAMILY = "1,2";
 				VALIDATE_PRODUCT = YES;
-				VALID_ARCHS = armv7;
+				VALID_ARCHS = "armv7s armv7";
 			};
 			name = ipad;
 		};
@@ -6168,6 +6172,10 @@
 			isa = XCBuildConfiguration;
 			buildSettings = {
 				ALWAYS_SEARCH_USER_PATHS = NO;
+				ARCHS = (
+					armv7,
+					armv7s,
+				);
 				CLANG_CXX_LIBRARY = "compiler-default";
 				CLANG_ENABLE_OBJC_ARC = YES;
 				CLANG_WARN_BOOL_CONVERSION = YES;
@@ -6201,7 +6209,7 @@
 				PROVISIONING_PROFILE = "";
 				SDKROOT = iphoneos;
 				TARGETED_DEVICE_FAMILY = "1,2";
-				VALID_ARCHS = armv7;
+				VALID_ARCHS = "armv7s armv7";
 			};
 			name = Debug;
 		};
@@ -6209,6 +6217,10 @@
 			isa = XCBuildConfiguration;
 			buildSettings = {
 				ALWAYS_SEARCH_USER_PATHS = NO;
+				ARCHS = (
+					armv7,
+					armv7s,
+				);
 				CLANG_CXX_LIBRARY = "compiler-default";
 				CLANG_ENABLE_OBJC_ARC = YES;
 				CLANG_WARN_BOOL_CONVERSION = YES;
@@ -6235,7 +6247,7 @@
 				SDKROOT = iphoneos;
 				TARGETED_DEVICE_FAMILY = "1,2";
 				VALIDATE_PRODUCT = YES;
-				VALID_ARCHS = armv7;
+				VALID_ARCHS = "armv7s armv7";
 			};
 			name = Release;
 		};
@@ -6346,6 +6358,10 @@
 			isa = XCBuildConfiguration;
 			buildSettings = {
 				ALWAYS_SEARCH_USER_PATHS = NO;
+				ARCHS = (
+					armv7,
+					armv7s,
+				);
 				CLANG_CXX_LIBRARY = "compiler-default";
 				CLANG_ENABLE_OBJC_ARC = YES;
 				CLANG_WARN_BOOL_CONVERSION = YES;
@@ -6372,7 +6388,7 @@
 				SDKROOT = iphoneos;
 				TARGETED_DEVICE_FAMILY = "1,2";
 				VALIDATE_PRODUCT = YES;
-				VALID_ARCHS = armv7;
+				VALID_ARCHS = "armv7s armv7";
 			};
 			name = Distribution;
 		};
