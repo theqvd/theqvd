@@ -1349,7 +1349,6 @@
 		476B875C163AB9B7003555C4 /* MainStoryboard_iPhone.storyboard in Resources */ = {isa = PBXBuildFile; fileRef = 476B875A163AB9B7003555C4 /* MainStoryboard_iPhone.storyboard */; };
 		476B875F163AB9B7003555C4 /* MainStoryboard_iPad.storyboard in Resources */ = {isa = PBXBuildFile; fileRef = 476B875D163AB9B7003555C4 /* MainStoryboard_iPad.storyboard */; };
 		476B8762163AB9B7003555C4 /* QVDViewController.m in Sources */ = {isa = PBXBuildFile; fileRef = 476B8761163AB9B7003555C4 /* QVDViewController.m */; };
-		476B876A163AB9B7003555C4 /* SenTestingKit.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 476B8769163AB9B7003555C4 /* SenTestingKit.framework */; };
 		476B876B163AB9B7003555C4 /* UIKit.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 476B8748163AB9B7003555C4 /* UIKit.framework */; };
 		476B876C163AB9B7003555C4 /* Foundation.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 476B874A163AB9B7003555C4 /* Foundation.framework */; };
 		476B8774163AB9B7003555C4 /* InfoPlist.strings in Resources */ = {isa = PBXBuildFile; fileRef = 476B8772163AB9B7003555C4 /* InfoPlist.strings */; };
@@ -4167,8 +4166,7 @@
 		476B875E163AB9B7003555C4 /* en */ = {isa = PBXFileReference; lastKnownFileType = file.storyboard; name = en; path = en.lproj/MainStoryboard_iPad.storyboard; sourceTree = "<group>"; };
 		476B8760163AB9B7003555C4 /* QVDViewController.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = QVDViewController.h; sourceTree = "<group>"; };
 		476B8761163AB9B7003555C4 /* QVDViewController.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = QVDViewController.m; sourceTree = "<group>"; };
-		476B8768163AB9B7003555C4 /* clientTests.octest */ = {isa = PBXFileReference; explicitFileType = wrapper.cfbundle; includeInIndex = 0; path = clientTests.octest; sourceTree = BUILT_PRODUCTS_DIR; };
-		476B8769163AB9B7003555C4 /* SenTestingKit.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = SenTestingKit.framework; path = Library/Frameworks/SenTestingKit.framework; sourceTree = DEVELOPER_DIR; };
+		476B8768163AB9B7003555C4 /* clientTests.xctest */ = {isa = PBXFileReference; explicitFileType = wrapper.cfbundle; includeInIndex = 0; path = clientTests.xctest; sourceTree = BUILT_PRODUCTS_DIR; };
 		476B8771163AB9B7003555C4 /* clientTests-Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = "clientTests-Info.plist"; sourceTree = "<group>"; };
 		476B8773163AB9B7003555C4 /* en */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; name = en; path = en.lproj/InfoPlist.strings; sourceTree = "<group>"; };
 		476B8775163AB9B7003555C4 /* clientTests.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = clientTests.h; sourceTree = "<group>"; };
@@ -4239,7 +4237,6 @@
 			isa = PBXFrameworksBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
-				476B876A163AB9B7003555C4 /* SenTestingKit.framework in Frameworks */,
 				476B876B163AB9B7003555C4 /* UIKit.framework in Frameworks */,
 				476B876C163AB9B7003555C4 /* Foundation.framework in Frameworks */,
 			);
@@ -5713,7 +5710,7 @@
 			isa = PBXGroup;
 			children = (
 				476B8744163AB9B7003555C4 /* client.app */,
-				476B8768163AB9B7003555C4 /* clientTests.octest */,
+				476B8768163AB9B7003555C4 /* clientTests.xctest */,
 			);
 			name = Products;
 			sourceTree = "<group>";
@@ -5727,7 +5724,6 @@
 				476B8748163AB9B7003555C4 /* UIKit.framework */,
 				476B874A163AB9B7003555C4 /* Foundation.framework */,
 				476B874C163AB9B7003555C4 /* CoreGraphics.framework */,
-				476B8769163AB9B7003555C4 /* SenTestingKit.framework */,
 			);
 			name = Frameworks;
 			sourceTree = "<group>";
@@ -5901,8 +5897,8 @@
 			);
 			name = clientTests;
 			productName = clientTests;
-			productReference = 476B8768163AB9B7003555C4 /* clientTests.octest */;
-			productType = "com.apple.product-type.bundle";
+			productReference = 476B8768163AB9B7003555C4 /* clientTests.xctest */;
+			productType = "com.apple.product-type.bundle.unit-test";
 		};
 /* End PBXNativeTarget section */
 
@@ -5911,8 +5907,8 @@
 			isa = PBXProject;
 			attributes = {
 				CLASSPREFIX = QVD;
-				LastTestingUpgradeCheck = 0510;
-				LastUpgradeCheck = 0510;
+				LastTestingUpgradeCheck = 0600;
+				LastUpgradeCheck = 0600;
 				TargetAttributes = {
 					476B8743163AB9B7003555C4 = {
 						DevelopmentTeam = MA65P2J3XT;
@@ -6094,9 +6090,11 @@
 				CLANG_WARN_EMPTY_BODY = YES;
 				CLANG_WARN_ENUM_CONVERSION = YES;
 				CLANG_WARN_INT_CONVERSION = YES;
+				CLANG_WARN_UNREACHABLE_CODE = YES;
 				CLANG_WARN__DUPLICATE_METHOD_MATCH = YES;
 				CODE_SIGN_IDENTITY = "iPhone Developer";
 				COPY_PHASE_STRIP = YES;
+				ENABLE_STRICT_OBJC_MSGSEND = YES;
 				GCC_C_LANGUAGE_STANDARD = gnu99;
 				GCC_VERSION = com.apple.compilers.llvm.clang.1_0;
 				GCC_WARN_64_TO_32_BIT_CONVERSION = YES;
@@ -6151,7 +6149,7 @@
 				BUNDLE_LOADER = "$(BUILT_PRODUCTS_DIR)/client.app/client";
 				FRAMEWORK_SEARCH_PATHS = (
 					"$(SDKROOT)/Developer/Library/Frameworks",
-					"$(DEVELOPER_LIBRARY_DIR)/Frameworks",
+					"$(inherited)",
 				);
 				GCC_PRECOMPILE_PREFIX_HEADER = YES;
 				GCC_PREFIX_HEADER = "client/client-Prefix.pch";
@@ -6163,7 +6161,6 @@
 				);
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				TEST_HOST = "$(BUNDLE_LOADER)";
-				WRAPPER_EXTENSION = octest;
 			};
 			name = ipad;
 		};
@@ -6178,9 +6175,11 @@
 				CLANG_WARN_EMPTY_BODY = YES;
 				CLANG_WARN_ENUM_CONVERSION = YES;
 				CLANG_WARN_INT_CONVERSION = YES;
+				CLANG_WARN_UNREACHABLE_CODE = YES;
 				CLANG_WARN__DUPLICATE_METHOD_MATCH = YES;
 				CODE_SIGN_IDENTITY = "iPhone Developer";
 				COPY_PHASE_STRIP = NO;
+				ENABLE_STRICT_OBJC_MSGSEND = YES;
 				GCC_C_LANGUAGE_STANDARD = gnu99;
 				GCC_DYNAMIC_NO_PIC = NO;
 				GCC_OPTIMIZATION_LEVEL = 0;
@@ -6197,7 +6196,7 @@
 				GCC_WARN_UNUSED_FUNCTION = YES;
 				GCC_WARN_UNUSED_VARIABLE = YES;
 				IPHONEOS_DEPLOYMENT_TARGET = 7.0;
-				ONLY_ACTIVE_ARCH = NO;
+				ONLY_ACTIVE_ARCH = YES;
 				OTHER_CFLAGS = "-DQVD_IOS_DEBUG=1";
 				PROVISIONING_PROFILE = "";
 				SDKROOT = iphoneos;
@@ -6217,9 +6216,11 @@
 				CLANG_WARN_EMPTY_BODY = YES;
 				CLANG_WARN_ENUM_CONVERSION = YES;
 				CLANG_WARN_INT_CONVERSION = YES;
+				CLANG_WARN_UNREACHABLE_CODE = YES;
 				CLANG_WARN__DUPLICATE_METHOD_MATCH = YES;
 				CODE_SIGN_IDENTITY = "iPhone Developer";
 				COPY_PHASE_STRIP = YES;
+				ENABLE_STRICT_OBJC_MSGSEND = YES;
 				GCC_C_LANGUAGE_STANDARD = gnu99;
 				GCC_VERSION = com.apple.compilers.llvm.clang.1_0;
 				GCC_WARN_64_TO_32_BIT_CONVERSION = YES;
@@ -6305,7 +6306,7 @@
 				BUNDLE_LOADER = "$(BUILT_PRODUCTS_DIR)/client.app/client";
 				FRAMEWORK_SEARCH_PATHS = (
 					"$(SDKROOT)/Developer/Library/Frameworks",
-					"$(DEVELOPER_LIBRARY_DIR)/Frameworks",
+					"$(inherited)",
 				);
 				GCC_PRECOMPILE_PREFIX_HEADER = YES;
 				GCC_PREFIX_HEADER = "client/client-Prefix.pch";
@@ -6317,7 +6318,6 @@
 				);
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				TEST_HOST = "$(BUNDLE_LOADER)";
-				WRAPPER_EXTENSION = octest;
 			};
 			name = Debug;
 		};
@@ -6327,7 +6327,7 @@
 				BUNDLE_LOADER = "$(BUILT_PRODUCTS_DIR)/client.app/client";
 				FRAMEWORK_SEARCH_PATHS = (
 					"$(SDKROOT)/Developer/Library/Frameworks",
-					"$(DEVELOPER_LIBRARY_DIR)/Frameworks",
+					"$(inherited)",
 				);
 				GCC_PRECOMPILE_PREFIX_HEADER = YES;
 				GCC_PREFIX_HEADER = "client/client-Prefix.pch";
@@ -6339,7 +6339,6 @@
 				);
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				TEST_HOST = "$(BUNDLE_LOADER)";
-				WRAPPER_EXTENSION = octest;
 			};
 			name = Release;
 		};
@@ -6354,9 +6353,11 @@
 				CLANG_WARN_EMPTY_BODY = YES;
 				CLANG_WARN_ENUM_CONVERSION = YES;
 				CLANG_WARN_INT_CONVERSION = YES;
+				CLANG_WARN_UNREACHABLE_CODE = YES;
 				CLANG_WARN__DUPLICATE_METHOD_MATCH = YES;
 				CODE_SIGN_IDENTITY = "iPhone Developer";
 				COPY_PHASE_STRIP = YES;
+				ENABLE_STRICT_OBJC_MSGSEND = YES;
 				GCC_C_LANGUAGE_STANDARD = gnu99;
 				GCC_VERSION = com.apple.compilers.llvm.clang.1_0;
 				GCC_WARN_64_TO_32_BIT_CONVERSION = YES;
@@ -6411,7 +6412,7 @@
 				BUNDLE_LOADER = "$(BUILT_PRODUCTS_DIR)/client.app/client";
 				FRAMEWORK_SEARCH_PATHS = (
 					"$(SDKROOT)/Developer/Library/Frameworks",
-					"$(DEVELOPER_LIBRARY_DIR)/Frameworks",
+					"$(inherited)",
 				);
 				GCC_PRECOMPILE_PREFIX_HEADER = YES;
 				GCC_PREFIX_HEADER = "client/client-Prefix.pch";
@@ -6423,7 +6424,6 @@
 				);
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				TEST_HOST = "$(BUNDLE_LOADER)";
-				WRAPPER_EXTENSION = octest;
 			};
 			name = Distribution;
 		};
