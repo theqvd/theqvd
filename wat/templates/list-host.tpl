@@ -183,11 +183,11 @@
                                 <td class="desktop">
                                     <% if (model.get('vms_connected') > 0) { %>
                                     <a href="#/vms/host/<%= model.get('id') %>">
-                                        <%= model.get('vms_connected') %>
+                                        <%= model.get('number_of_vms_connected') %>
                                     </a>
                                     <% } else {
                                     %>
-                                        <%= model.get('vms_connected') %>
+                                        <%= model.get('number_of_vms_connected') %>
                                     <% } %>
                                 </td>
                 <%

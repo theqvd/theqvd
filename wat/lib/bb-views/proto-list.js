@@ -627,6 +627,10 @@ Wat.Views.ListView = Wat.Views.MainView.extend({
         // Add common parts of editor to dialog
         that.template = _.template(
                     that.templateEditorCommon, {
+                        classifiedByTenant: 0,
+                        editorMode: 'massive_edit',
+                        isSuperadmin: Wat.C.isSuperadmin(), 
+                        enabledProperties: 1, 
                         blocked: undefined,
                         properties: [],
                         cid: that.cid
@@ -782,7 +786,7 @@ Wat.Views.ListView = Wat.Views.MainView.extend({
         var properties = this.properties;
         
         var arguments = {
-            'propertyChanges' : properties
+            '__properties_changes__' : properties
         };
                 
         var filters = {"id": id};

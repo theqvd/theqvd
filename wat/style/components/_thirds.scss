@@ -115,7 +115,7 @@
         input[type="text"], input[type="password"] {
             width: 100%;
             @include in(desktop) {
-                width: auto;
+                //width: auto;
             }
         }
         

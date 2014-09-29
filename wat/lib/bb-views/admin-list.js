@@ -1,4 +1,4 @@
-Wat.Views.SetupAdminsView = Wat.Views.ListView.extend({
+Wat.Views.AdminListView = Wat.Views.ListView.extend({
     setupCommonTemplateName: 'setup-common',
     sideContainer: '.bb-setup-side',
     secondaryContainer: '.bb-setup',

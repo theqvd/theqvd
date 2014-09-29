@@ -48,7 +48,7 @@ Wat.Models.Model = Backbone.Model.extend({
                 this.operation = this.actionPrefix + "_create";
                 break;
             case 'update':
-                this.operation = this.actionPrefix + "_update_custom";
+                this.operation = this.actionPrefix + "_update";
                 break;
             case 'delete':
                 this.operation = this.actionPrefix + "_delete";

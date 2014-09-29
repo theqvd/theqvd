@@ -4,7 +4,7 @@ Wat.C = {
     login: '',
     password: '',
     loggedIn: false,
-    apiUrl: 'http://172.20.126.12:8080/',
+    apiUrl: 'http://172.20.126.12:3000/',
     loginExpirationDays: 1,
 
     getBaseUrl: function () {
@@ -26,7 +26,8 @@ Wat.C = {
         this.login = login;
         this.password = password;
         this.loggedIn = true;
-        $.cookie('qvdWatLoggedInUser', login + "d", { expires: this.loginExpirationDays, path: '/' });
+
+        $.cookie('qvdWatLoggedInUser', login, { expires: this.loginExpirationDays, path: '/' });
         $.cookie('qvdWatLoggedInPassword', password, { expires: this.loginExpirationDays, path: '/' });
         window.location = '#';
     },
@@ -61,10 +62,9 @@ Wat.C = {
             Wat.I.showMessage({message: "Empty user", messageType: "error"});
             return;
         }
-        
+
         this.login = user;
         this.password = password;
-
 
         Wat.A.performAction('host_tiny_list', {}, {}, {}, this.checkLogin, this, false);
     },
@@ -75,7 +75,7 @@ Wat.C = {
             that.login = '';
             return;
         }
-        
+
         Wat.C.logIn(that.login, that.password);
 
         Wat.I.renderMain();

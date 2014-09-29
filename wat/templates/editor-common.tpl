@@ -5,7 +5,7 @@
             // If the model has the blocked attr, will appear on editor
             if (blocked !== undefined) {
         %>
-                <tbody class="blocked-śelector">
+                <tbody class="blocked-selector">
                     <tr>
                         <td data-i18n="Blocked"></td>
                         <td>
@@ -27,9 +27,20 @@
                 </tbody>
         <%
             }
+            // If the user is superadmin, show tenants select in creation form
+            if (classifiedByTenant && editorMode == 'create' && isSuperadmin) {
         %>
-        
+                <tbody class="tenant-selector">
+                    <tr>
+                        <td data-i18n>Tenant</td>
+                        <td>
+                            <select class="" name="tenant_id"></select>
+                        </td>
+                    </tr>
+                </tbody>
         <%
+            }
+
             if (enabledProperties) {
         %>
             <tbody class="custom-properties">

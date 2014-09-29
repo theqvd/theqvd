@@ -50,7 +50,7 @@ Wat.Views.OSFDetailsView = Wat.Views.DetailsView.extend({
         var user_storage = context.find('input[name="user_storage"]').val();
         
         arguments = {
-            propertyChanges: properties,
+            __properties_changes__: properties,
             name: name,
             memory: memory,
             user_storage: user_storage

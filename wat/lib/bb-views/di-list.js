@@ -70,7 +70,7 @@ Wat.Views.DIListView = Wat.Views.ListView.extend({
         var osf_id = context.find('select[name="osf_id"]').val();
         
         var arguments = {
-            "propertyChanges" : properties.set,
+            "__properties__" : properties.set,
             "blocked": blocked ? 1 : 0,
             "osf_id": osf_id
         };
@@ -93,7 +93,7 @@ Wat.Views.DIListView = Wat.Views.ListView.extend({
             tags += ',default';
         }
         
-        arguments.tagChanges = tags ? tags.split(',') : [];
+        arguments.__tags__ = tags ? tags.split(',') : [];
                         
         this.createModel(arguments);
     }

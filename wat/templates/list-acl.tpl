@@ -40,29 +40,10 @@
                             </th>
             <%
                             break;
-                        case 'connected_vms':
+                        case 'roles':
             %>
-                            <th class="desktop">
-                                <i data-i18n="Connected VMs"><%= i18n.t('Connected VMs') %></i>
-                            </th>
-            <%
-                            break;
-                        case 'tenant':
-            %>
-                            <th class="sortable desktop" data-sortby="tenant">
-                                <i class="fa fa-sort sort-icon" data-i18n="Tenant"><%= i18n.t('Tenant') %></i>
-                            </th>
-            <%
-                            break;
-                        default:
-                            var translationAttr = 'data-i18n="' + name + '"';
-                            if (col.noTranslatable === true) {
-                                translationAttr = '';
-                            }
-                    
-            %>
-                            <th class="sortable desktop" data-sortby="<%= name %>">
-                                <i class="fa sort-icon"><%= name %></i>
+                            <th>
+                                <%= i18n.t('Roles') %>
                             </th>
             <%
                             break;
@@ -89,9 +70,6 @@
                 <% 
                     var info = '';
                     
-                    if (model.get('blocked')) {
-                        info += '<i class="fa fa-lock" data-i18n="[title]Blocked" title="' + i18n.t('Blocked') + '"></i>';
-                    }
                     $.each(columns, function(name, col) {
                         if (col.display == false) {
                             return;
@@ -110,7 +88,13 @@
                             case 'info':
                 %>
                                 <td class="desktop">
-                                    <%= info %>
+                                    <%
+                                    if (model.get('disabled')) {
+                                    %>
+                                        <i class="fa fa-ban" data-i18n="[title]Disabled" title="<%= i18n.t('Disabled') %>"></i>
+                                    <%
+                                    }
+                                    %>
                                 </td>
                 <%
                                 break;
@@ -124,52 +108,14 @@
                             case 'name':
                 %>
                                 <td class="js-name">
-                                    <a href="#/user/<%= model.get('id') %>" data-i18n="[title]Click for details">
-                                        <i class="fa fa-search"></i>
-                                        <span class="text"><%= model.get('name') %></span>
-                                    </a>
-                                    <div class="mobile info-in-name-cell">
-                                        <%= info %>
-                                    </div>
+                                    <span class="text"><%= model.get('name') %></span>
                                 </td>
                 <%
                                 break;
-                            case 'connected_vms':
+                            case 'roles':
                 %>
                                 <td class="desktop">
-                                    <% if (model.get('vms') > 0) { %>
-                                    <a href="#/vms/user/<%= model.get('id') %>">
-                                        <%= model.get('number_of_vms_connected') %>
-                                        /
-                                        <%= model.get('number_of_vms') %>
-                                    </a>
-                                    <% } else {%>
-                                        <%= model.get('number_of_vms_connected') %>
-                                        /
-                                        <%= model.get('number_of_vms') %>
-                                    <% } %>
-                                </td>
-                <%
-                                break;
-                            case 'tenant':
-                %>
-                                <td class="desktop">
-                                    <%= model.get('tenant_name') %>
-                                </td>
-                <%
-                                break;
-                            default:
-                %>
-                                <td class="desktop">
-                                    <% 
-                                        if (model.get(name) !== undefined) {
-                                            print(model.get(name));
-                                        }
-                                        else if (model.get('properties') !== undefined && model.get('properties')[name] !== undefined) {
-                                            print(model.get('properties')[name]);
-                                        }
-                                    
-                                    %>
+                                    <%= model.get('roles') %>
                                 </td>
                 <%
                                 break;

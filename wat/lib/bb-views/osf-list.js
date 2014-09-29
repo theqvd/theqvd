@@ -34,7 +34,7 @@ Wat.Views.OSFListView = Wat.Views.ListView.extend({
         var user_storage = context.find('input[name="user_storage"]').val();
         
         arguments = {
-            propertyChanges: properties.set,
+            __properties__: properties.set,
             name: name,
             memory: memory || 256,
             user_storage: user_storage
@@ -59,7 +59,7 @@ Wat.Views.OSFListView = Wat.Views.ListView.extend({
         var properties = this.properties;
         
         var arguments = {
-            'propertyChanges' : properties
+            '__properties_changes__' : properties
         };
         
         var context = $('.' + this.cid + '.editor-container');

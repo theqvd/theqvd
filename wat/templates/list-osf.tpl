@@ -177,11 +177,11 @@
                                 <td class="desktop">
                                     <% if (model.get('dis') > 0) { %>
                                     <a href="#/dis/osf/<%= model.get('id') %>">
-                                        <%= model.get('dis') %>
+                                        <%= model.get('number_of_dis') %>
                                     </a>
                                     <% } else {
                                     %>
-                                        <%= model.get('dis') %>
+                                        <%= model.get('number_of_dis') %>
                                     <% } %>
                                 </td>
                 <%
@@ -191,11 +191,11 @@
                                 <td class="desktop">
                                     <% if (model.get('vms') > 0) { %>
                                     <a href="#/vms/osf/<%= model.get('id') %>">
-                                        <%= model.get('vms') %>
+                                        <%= model.get('number_of_vms') %>
                                     </a>
                                     <% } else {
                                     %>
-                                        <%= model.get('vms') %>
+                                        <%= model.get('number_of_vms') %>
                                     <% } %>
                                 </td>
                 <%

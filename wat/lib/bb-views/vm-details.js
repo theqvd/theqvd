@@ -47,7 +47,7 @@ Wat.Views.VMDetailsView = Wat.Views.DetailsView.extend({
         
         var filters = {"id": this.id};
         var arguments = {
-            "propertyChanges": properties,
+            "__properties_changes__": properties,
             "name": name,
             "di_tag": di_tag,
             "blocked": blocked ? 1 : 0

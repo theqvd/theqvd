@@ -67,6 +67,7 @@ Wat.A = {
                 }                   
             },
             success: function (response, result, raw) {
+                //console.log(raw.getAllResponseHeaders());
                 if (that) {
                     that.retrievedData = response;
                 }
@@ -127,7 +128,7 @@ Wat.A = {
                 dataType: 'json',
                 processData: false,
                 parse: true,
-                success: function (data) {
+                success: function (data, d, dd) {
                     $(data.result.rows).each(function(i,option) {
                         var selected = '';
 

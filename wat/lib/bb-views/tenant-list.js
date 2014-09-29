@@ -1,4 +1,4 @@
-Wat.Views.SetupTenantsView = Wat.Views.ListView.extend({
+Wat.Views.TenantListView = Wat.Views.ListView.extend({
     setupCommonTemplateName: 'setup-common',
     listTemplateName: 'setup-tenants',
     sideContainer: '.bb-setup-side',

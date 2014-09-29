@@ -1,11 +1,11 @@
-Wat.Views.SetupAdminDetailsView = Wat.Views.DetailsView.extend({  
+Wat.Views.RoleDetailsView = Wat.Views.DetailsView.extend({  
     setupCommonTemplateName: 'setup-common',
-    setupOption: 'admins',
+    setupOption: 'roles',
     secondaryContainer: '.bb-setup',
-    qvdObj: 'admin',
+    qvdObj: 'role',
 
     initialize: function (params) {
-        this.model = new Wat.Models.Admin(params);
+        this.model = new Wat.Models.Role(params);
         
         this.params = params;
         
@@ -35,6 +35,23 @@ Wat.Views.SetupAdminDetailsView = Wat.Views.DetailsView.extend({
         this.embedContent();
     },
     
+    renderSide: function () {
+        var sideContainer = '.' + this.cid + ' .bb-details-side1';
+        
+        // Render ACLs list on side
+        var params = {};
+        params.whatRender = 'list';
+        params.listContainer = sideContainer;
+        params.forceListColumns = {checks: true, info: true, name: true, roles: true};
+        //params.forceSelectedActions = {};
+        params.forceListActionButton = null;
+        params.block = 5;
+        params.filters = {"id": this.elementId};
+        params.action = 'get_acls_in_roles';
+        
+        this.sideView = new Wat.Views.ACLListView(params);
+    },
+    
     embedContent: function () {
         $(this.secondaryContainer).html('<div class="bb-content-secondary"></div>');
 
@@ -43,43 +60,46 @@ Wat.Views.SetupAdminDetailsView = Wat.Views.DetailsView.extend({
     },
     
     openEditElementDialog: function(e) {
-        this.dialogConf.title = $.i18n.t('Edit Administrator') + ": " + this.model.get('name');
+        this.dialogConf.title = $.i18n.t('Edit Role') + ": " + this.model.get('name');
         
         Wat.Views.DetailsView.prototype.openEditElementDialog.apply(this, [e]);
-        
-        // Virtual machine form include a date time picker control, so we need enable it
-        Wat.I.enableDataPickers();
                 
         var params = {
-            'action': 'tag_tiny_list',
-            'selectedId': this.model.get('di_tag'),
-            'controlName': 'di_tag',
+            'action': 'role_tiny_list',
+            'selectedId': '',
+            'controlName': 'inherit_role',
             'filters': {
-                'osf_id': this.model.get('osf_id')
+            }
+        };
+
+        Wat.A.fillSelect(params);
+        
+        // Remove from inherited roles selector, current role and already inherited ones
+        $('select[name="inherit_role"] option[value="' + this.elementId + '"]').remove();
+        $.each(this.model.get('inherited_roles'), function (roleId) {
+            $('select[name="inherit_role"] option[value="' + roleId + '"]').remove();
+        });
+        
+        Wat.I.chosenElement('[name="inherit_role"]', 'advanced');
+        
+        
+        var params = {
+            'action': 'acl_tiny_list',
+            'selectedId': '',
+            'controlName': 'role_acls',
+            'filters': {
             },
             'nameAsId': true
         };
 
         Wat.A.fillSelect(params);
         
-        Wat.I.chosenElement('[name="di_tag"]', 'single100');
-    },
-    
-    renderSide: function () {
-        var sideContainer = '.' + this.cid + ' .bb-details-side1';
+        // Remove from inherited roles selector, current role and already inherited ones
+        $.each(this.model.get('own_acls').positive, function (iAcl, acl) {
+            $('select[name="role_acls"] option[value="' + acl + '"]').remove();
+        });
         
-        // Render ACLs list on side
-        var params = {};
-        params.whatRender = 'list';
-        params.listContainer = sideContainer;
-        params.forceListColumns = {info: true, name: true, roles: true};
-        params.forceSelectedActions = {};
-        params.forceListActionButton = null;
-        params.block = 5;
-        params.filters = {"id": this.elementId};
-        params.action = 'get_acls_in_admins';
-        
-        this.sideView = new Wat.Views.SetupACLsView(params);
+        Wat.I.chosenElement('[name="role_acls"]', 'advanced');
     },
     
     updateElement: function (dialog) {
@@ -100,7 +120,7 @@ Wat.Views.SetupAdminDetailsView = Wat.Views.DetailsView.extend({
         
         var filters = {"id": this.id};
         var arguments = {
-            "propertyChanges": properties,
+            "__properties_changes__": properties,
             "name": name,
             "di_tag": di_tag,
             "blocked": blocked ? 1 : 0

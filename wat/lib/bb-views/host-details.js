@@ -40,7 +40,7 @@ Wat.Views.HostDetailsView = Wat.Views.DetailsView.extend({
         
         var filters = {"id": this.id};
         var arguments = {
-            "propertyChanges": properties,
+            "__properties_changes__": properties,
             "name": name,
             "address": address,
             "blocked": blocked ? 1 : 0

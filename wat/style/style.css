@@ -1980,9 +1980,7 @@ td.inner-table {
         display: table-cell; } }
     .ui-dialog td input[type="text"], .ui-dialog td input[type="password"] {
       width: 100%; }
-      @media screen and (min-width: 40em) {
-        .ui-dialog td input[type="text"], .ui-dialog td input[type="password"] {
-          width: auto; } }
+      @media screen and (min-width: 40em) { }
     @media screen and (min-width: 40em) {
       .ui-dialog td:first-child {
         width: 120px;

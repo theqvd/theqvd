@@ -71,7 +71,7 @@ Wat.Views.VMListView = Wat.Views.ListView.extend({
         var osf_id = context.find('select[name="osf_id"]').val();
         
         var arguments = {
-            "propertyChanges" : properties.set,
+            "__properties__" : properties.set,
             "blocked": blocked ? 1 : 0,
             "user_id": user_id,
             "osf_id": osf_id
@@ -186,7 +186,7 @@ Wat.Views.VMListView = Wat.Views.ListView.extend({
         var properties = this.properties;
         
         var arguments = {
-            'propertyChanges' : properties
+            '__properties_changes__' : properties
         };
         
         var context = $('.' + this.cid + '.editor-container');

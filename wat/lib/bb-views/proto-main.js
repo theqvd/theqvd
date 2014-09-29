@@ -76,9 +76,16 @@ Wat.Views.MainView = Backbone.View.extend({
     fillEditor: function (target) {
         var that = Wat.CurrentView;
         
+        var isSuperadmin = Wat.C.isSuperadmin();
+        var editorMode = that.collection ? 'create' : 'edit';
+        var classifiedByTenant = $.inArray(that.qvdObj, QVD_OBJS_CLASSIFIED_BY_TENANT) != -1;
+
         // Add common parts of editor to dialog
         that.template = _.template(
                     that.templateEditorCommon, {
+                        classifiedByTenant: classifiedByTenant,
+                        isSuperadmin: isSuperadmin,
+                        editorMode: editorMode,
                         blocked: that.model.attributes.blocked,
                         properties: that.model.attributes.properties,
                         enabledProperties: $.inArray(that.qvdObj, QVD_OBJS_WITH_PROPERTIES) != -1,
@@ -87,6 +94,17 @@ Wat.Views.MainView = Backbone.View.extend({
                 );
         
         target.html(that.template);
+        
+        if (editorMode == 'create' && isSuperadmin && classifiedByTenant) {
+            
+            var params = {
+                'action': 'tenant_tiny_list',
+                'selectedId': 0,
+                'controlName': 'tenant_id'
+            };
+
+            Wat.A.fillSelect(params);
+        }
 
         // Add specific parts of editor to dialog
         that.template = _.template(

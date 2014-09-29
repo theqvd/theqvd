@@ -31,7 +31,7 @@ Wat.Views.UserListView = Wat.Views.ListView.extend({
         var blocked = context.find('input[name="blocked"][value=1]').is(':checked');
         
         var arguments = {
-            "propertyChanges" : properties.set,
+            "__properties__" : properties.set,
             "blocked": blocked ? 1 : 0
         };
         
