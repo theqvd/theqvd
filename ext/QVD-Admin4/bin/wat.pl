@@ -51,13 +51,18 @@ any '/' => sub {
 
     my $c = shift;
         
-    my $json = $c->req->json // { map { $_ => $c->param($_) } $c->param };
+    my $json = $c->req->json;
     $c->res->headers->header('Access-Control-Allow-Origin' => '*');
 
-    eval { $json->{filters} = decode_json($json->{filters}) if exists $json->{filters};
-	   $json->{arguments} = decode_json($json->{arguments}) if exists $json->{arguments};
-	   $json->{order_by} = decode_json($json->{order_by}) if exists $json->{order_by} };
-
+    unless ($json)
+    {
+	$json =  { map { $_ => $c->param($_) } $c->param };
+	eval { $json->{filters} = decode_json($json->{filters}) if exists $json->{filters};
+	       $json->{arguments} = decode_json($json->{arguments}) if exists $json->{arguments};
+	       $json->{order_by} = decode_json($json->{order_by}) if exists $json->{order_by} };
+    }
+    
+    print $@ if $@;
     my $response = ($@ ? 
 		    QVD::Admin4::REST::Response->new(status => 15)->json  :
 		    $c->_rest->_admin($json));

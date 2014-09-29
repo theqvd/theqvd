@@ -1,15 +1,20 @@
 package QVD::Admin4::REST::Model;
 use strict;
 use warnings;
-use Moose;
+use Moo;
+use MooX::Types::MooseLike;
 use QVD::Config::Network qw(nettop_n netstart_n net_aton net_ntoa);
 use QVD::Config;
 use File::Basename qw(basename);
 use QVD::Admin4::DBConfigProvider;
 
-has 'current_qvd_administrator', is => 'ro', isa => 'QVD::DB::Result::Administrator', required => 1;
-has 'qvd_object', is => 'ro', isa => 'Str', required => 1;
-has 'type_of_action', is => 'ro', isa => 'Str', required => 1;
+has 'current_qvd_administrator', is => 'ro', isa => 
+    sub { die "Invalid type for attribute current_qvd_administrator" 
+	      unless ref(+shift) eq 'QVD::DB::Result::Administrator'; }, required => 1;
+has 'qvd_object', is => 'ro', isa => sub {die "Invalid type for attribute qvd_object" 
+					      if ref(+shift);}, required => 1;
+has 'type_of_action', is => 'ro', isa => sub {die "Invalid type for attribute type_of_action" 
+						  if ref(+shift);}, required => 1;
 
 my $DBConfigProvider;
 
@@ -34,27 +39,27 @@ my $MODEL_INFO = {
 
 my $AVAILABLE_FILTERS = { list => { default => [],
 				    VM => [qw(storage id name user_id user_name osf_id osf_name di_tag blocked 
-                                              expiration_soft expiration_hard state host_id host_name host_name di_id 
+                                              expiration_soft expiration_hard state host_id host_name di_id 
                                               user_state ip next_boot_ip ssh_port vnc_port serial_port tenant_id tenant_name 
                                               creation_admin creation_date )],
-				    DI_Tag => [qw(osf_id name id )],
+				    DI_Tag => [qw(osf_id name id tenant_id tenant_name)],
 				    User => [qw(id name blocked creation_admin creation_date tenant_id tenant_name )],
 				    Host => [qw(id name address blocked frontend backend state vm_id creation_admin creation_date )],
-				    DI => [qw(id disk_image version osf_id osf_name tenant_id blocked tenant_name )],
+				    DI => [qw(id disk_image version osf_id osf_name tenant_id blocked tenant_name tag)],
 				    OSF => [qw(id name overlay user_storage memory vm_id di_id tenant_id tenant_name )],
-				    ACL => [qw(id name role_id admin_id )],
+				    ACL => [qw(id name )],
 				    Tenant => [qw(id name)],
-				    Role => [qw(name acl_id role_id nested_acl_name nested_role_name id admin_id admin_name )],
-				    Administrator => [qw(name tenant_id tenant_name role_id acl_id id role_name acl_name )]},
+				    Role => [qw(name id )],
+				    Administrator => [qw(name tenant_id tenant_name id )]},
 
 			  all_ids => { default => [],
 				       VM => [qw(storage id name user_id user_name osf_id osf_name di_tag blocked expiration_soft 
-                                              expiration_hard state host_id host_name host_name di_id user_state ip next_boot_ip ssh_port 
+                                              expiration_hard state host_id host_name  di_id user_state ip next_boot_ip ssh_port 
                                               vnc_port serial_port tenant_id tenant_name creation_admin creation_date )],
-				       DI_Tag => [qw(osf_id name id )],
+				       DI_Tag => [qw(osf_id name id tenant_id tenant_name)],
 				       User => [qw(id name blocked creation_admin creation_date tenant_id tenant_name )],
 				       Host => [qw(id name address blocked frontend backend state vm_id creation_admin creation_date )],
-				       DI => [qw(id disk_image version osf_id osf_name tenant_id blocked tenant_name )],
+				       DI => [qw(id disk_image version osf_id osf_name tenant_id blocked tenant_name tag)],
 				       OSF => [qw(id name overlay user_storage memory vm_id di_id tenant_id tenant_name )],
 				       ACL => [qw(id name role_id admin_id )],
 				       Role => [qw(name acl_id role_id nested_acl_name nested_role_name id admin_id admin_name )],
@@ -93,17 +98,30 @@ my $AVAILABLE_FILTERS = { list => { default => [],
 				      Tenant => [qw(id)]} };
 
 my $AVAILABLE_FIELDS = { list => { default => [],
-				   OSF => [qw(id name overlay user_storage memory vm_id di_id  number_of_vms number_of_dis )],
+				   OSF => [qw(id name overlay user_storage memory  number_of_vms number_of_dis )],
 				   Role => [qw(name own_acls inherited_acls inherited_roles id )],
 				   DI => [qw(id disk_image version osf_id osf_name  blocked tags  properties )],
 				   VM => [qw(storage id name user_id user_name osf_id osf_name di_tag blocked expiration_soft expiration_hard 
-                                          state host_id host_name host_name di_id user_state ip next_boot_ip ssh_port vnc_port serial_port 
+                                          state host_id host_name  di_id user_state ip next_boot_ip ssh_port vnc_port serial_port 
                                            creation_admin creation_date di_version di_name di_id properties )],
 				   ACL => [qw(id name roles admins )],
 				   Administrator => [qw(name  roles acls id )],
 				   Tenant => [qw(id name)],
 				   User => [qw(id name  blocked creation_admin creation_date number_of_vms number_of_vms_connected  properties )],
-				   Host => [qw(id name address blocked frontend backend state vm_id load creation_admin creation_date number_of_vms_connected number_of_vms properties )],
+				   Host => [qw(id name address blocked frontend backend state  load creation_admin creation_date number_of_vms_connected number_of_vms properties )],
+				   DI_Tag => [qw(osf_id name id )] },
+			 details => { default => [],
+				   OSF => [qw(id name overlay user_storage memory  number_of_vms number_of_dis )],
+				   Role => [qw(name own_acls inherited_acls inherited_roles id )],
+				   DI => [qw(id disk_image version osf_id osf_name  blocked tags  properties )],
+				   VM => [qw(storage id name user_id user_name osf_id osf_name di_tag blocked expiration_soft expiration_hard 
+                                          state host_id host_name  di_id user_state ip next_boot_ip ssh_port vnc_port serial_port 
+                                           creation_admin creation_date di_version di_name di_id properties )],
+				   ACL => [qw(id name roles admins )],
+				   Administrator => [qw(name  roles acls id )],
+				   Tenant => [qw(id name)],
+				   User => [qw(id name  blocked creation_admin creation_date number_of_vms number_of_vms_connected  properties )],
+				   Host => [qw(id name address blocked frontend backend state  load creation_admin creation_date number_of_vms_connected number_of_vms properties )],
 				   DI_Tag => [qw(osf_id name id )] },
 			 tiny => { default => [qw(id name)]},
 
@@ -112,7 +130,7 @@ my $AVAILABLE_FIELDS = { list => { default => [],
 					      Role => [qw(name own_acls inherited_acls inherited_roles id )],
 					      DI => [qw(id disk_image version osf_id osf_name  blocked tags  properties )],
 					      VM => [qw(storage id name user_id user_name osf_id osf_name di_tag blocked expiration_soft expiration_hard 
-                                                     state host_id host_name host_name di_id user_state ip next_boot_ip ssh_port vnc_port serial_port 
+                                                     state host_id host_name di_id user_state ip next_boot_ip ssh_port vnc_port serial_port 
                                                       creation_admin creation_date di_version di_name di_id properties )],
 					      ACL => [qw(id name roles admins )],
 					      Tenant => [qw(id name)],
@@ -172,9 +190,9 @@ my $SUBCHAIN_FILTERS = { list => { default => [qw(name)],
 my $DEFAULT_ORDER_CRITERIA = { tiny => { default =>  [qw(name)] }};
 
 my $AVAILABLE_ARGUMENTS = { User => [qw(name password blocked)],
-                            VM => [qw(name di_tag ip blocked expiration_soft expiration_hard storage)],
+                            VM => [qw(name ip blocked expiration_soft expiration_hard storage)],
                             Host => [qw(name address blocked)],
-                            OSF => [qw(name memory user_storage)],
+                            OSF => [qw(name memory user_storage overlay)],
                             DI => [qw(blocked disk_image)],
 			    Tenant => [qw(name)],
 			    Role => [qw(name)],
@@ -209,14 +227,14 @@ my $FILTERS_TO_DBIX_FORMAT_MAPPER =
 
     ACL => {
 	'id' => 'me.id',
-	'name' => 'me.name',
-	'role_id' => 'roles.id',
-	'admin_id' => 'admins.id',
+	'name' => 'me.name'
     },
 
     DI_Tag => {
 	'osf_id' => 'di.osf_id',
 	'name' => 'me.tag',
+	'tenant_id' => 'tenant.id',
+	'tenant_name' => 'tenant.name',
 	'id' => 'me.id',
     },
     
@@ -263,6 +281,7 @@ my $FILTERS_TO_DBIX_FORMAT_MAPPER =
 	'version' => 'me.version',
 	'osf_id' => 'me.osf_id',
 	'osf_name' => 'osf.name',
+	'tag' => 'tags.tag',
 	'tenant_id' => 'osf.tenant_id',
 	'blocked' => 'me.blocked',
 	'tenant_name' => 'tenant.name',
@@ -293,7 +312,6 @@ my $FILTERS_TO_DBIX_FORMAT_MAPPER =
 	'state' => 'vm_runtime.vm_state',
 	'host_id' => 'vm_runtime.host_id',
 	'host_name' => 'host.name',
-	'host_name' => 'me.host_name',
 	'di_id' => 'vm_runtime.current_di_id',
 	'user_state' => 'vm_runtime.user_state',
 	'ip' => 'me.ip',
@@ -309,13 +327,7 @@ my $FILTERS_TO_DBIX_FORMAT_MAPPER =
 
     Role => {
 	'name' => 'me.name',
-	'acl_id' => 'acl_rels.acl_id',
-	'nested_role_id' => 'role_rels.inherited_id',
-	'acl_name' => 'acls.name',
-#	'nested_role_name' => 'role_2.name',
 	'id' => 'me.id',
-	'admin_id' => 'admin_rels.admin_id',
-	'admin_name' => 'admin.name',
     },
     Tenant => {
 	'name' => 'me.name',
@@ -346,7 +358,6 @@ my $FIELDS_TO_DBIX_FORMAT_MAPPER =
 	'frontend' => 'me.frontend',
 	'backend' => 'me.backend',
 	'state' => 'runtime.state',
-	'vm_id' => 'vms.vm_id',
 	'load' => 'me.load',
 	'creation_admin' => 'me.creation_admin',
 	'creation_date' => 'me.creation_date',
@@ -392,8 +403,6 @@ my $FIELDS_TO_DBIX_FORMAT_MAPPER =
 	'overlay' => 'me.use_overlay',
 	'user_storage' => 'me.user_storage_size',
 	'memory' => 'me.memory',
-	'vm_id' => 'vms.id',
-	'di_id' => 'dis.id',
 	'tenant_id' => 'me.tenant_id',
 	'tenant_name' => 'tenant.name',
 	'number_of_vms' => 'me.vms_count',
@@ -414,7 +423,6 @@ my $FIELDS_TO_DBIX_FORMAT_MAPPER =
 	'expiration_hard' => 'vm_runtime.vm_expiration_hard',
 	'state' => 'vm_runtime.vm_state',
 	'host_id' => 'vm_runtime.host_id',
-	'host_name' => 'host.name',
 	'host_name' => 'me.host_name',
 	'di_id' => 'vm_runtime.current_di_id',
 	'user_state' => 'vm_runtime.user_state',
@@ -442,7 +450,7 @@ my $FIELDS_TO_DBIX_FORMAT_MAPPER =
 	'tenant_id' => 'osf.tenant_id',
 	'blocked' => 'me.blocked',
 	'tags' => 'me.tags_get_columns',
-	'tenant_name' => 'tenant.name',
+	'tenant_name' => 'osf.tenant_name',
 	'properties' => 'me.get_properties_key_value',
     },
 
@@ -461,14 +469,14 @@ my $FIELDS_TO_DBIX_FORMAT_MAPPER =
     }
 };
 my $VALUES_NORMALIZATOR = { DI => { disk_image => \&basename_disk_image},
-				     User => { name => \&normalize_name, 
-					       password => \&password_to_token }};
+			    User => { name => \&normalize_name, 
+				      password => \&password_to_token }};
 my $DBIX_JOIN_VALUE = { User => [qw(tenant)],
                         VM => ['osf', { vm_runtime => 'host' }, { user => 'tenant' }],
 			Host => ['runtime', { vms => 'host'}],
-			OSF => [ qw(tenant vms dis), { dis => 'tags' }],
+			OSF => [ qw(tenant vms), { dis => 'tags' }],
 			DI => [qw(vm_runtimes tags), {osf => 'tenant'}],
-			DI_Tag => [qw(di)],
+			DI_Tag => [{di => {osf => 'tenant'}}],
 			Role => [{role_rels => 'inherited'}, { acl_rels => 'acl'}],
 			Administrator => [qw(tenant), { role_rels => { role => { acl_rels => 'acl' }}}],
 			ACL => [{ role_rels => { role => { admin_rels => 'admin' }}}]};
@@ -807,15 +815,16 @@ sub normalize_value
     my $key = shift;
     my $value = shift;
 
-    $self->values_normalizator->{$self->qvd_object} || return $value;
-    my $norm = $self->values_normalizator->{$self->qvd_object}->{$key} // 
+    $self->values_normalizator || return $value;
+    my $norm = $self->values_normalizator->{$key} // 
 	return $value; 
+
     return ref($norm) ? $self->$norm($value) : $norm;
 }
 
 sub get_default_memory { cfg('osf.default.memory'); }
 sub get_default_overlay { cfg('osf.default.overlay'); }
-sub basename_disk_image { basename(+shift); };
+sub basename_disk_image { my $self = shift; basename(+shift); };
 
 sub password_to_token 
 {

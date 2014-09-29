@@ -1,12 +1,12 @@
 package QVD::Admin4::REST::Response;
 use strict;
 use warnings;
-use Moose;
+use Moo;
 
-has 'status',  is => 'ro', isa => 'Int', required => 1;
-has 'result', is => 'ro', isa => 'HashRef', default => sub {{};};
-has 'failures', is => 'ro', isa => 'HashRef', default => sub {{};};
-has 'qvd_object_model', is => 'ro', isa => 'QVD::Admin4::REST::Model';
+has 'status',  is => 'ro', isa => sub { die "Invalid type" if ref(+shift); }, required => 1;
+has 'result', is => 'ro', isa => sub { die "Invalid type" unless ref(+shift) eq 'HASH'; }, default => sub {{};};
+has 'failures', is => 'ro', isa => sub { die "Invalid type" unless ref(+shift) eq 'HASH'; }, default => sub {{};};
+has 'qvd_object_model', is => 'ro', isa => sub { die "Invalid type" unless ref(+shift) eq 'QVD::Admin4::REST::Model'; };
 
 my $mapper =  Config::Properties->new();
 $mapper->load(*DATA);
@@ -31,7 +31,7 @@ sub map_result_from_dbix_objects_to_output_info
     return unless defined $self->result->{rows};
     $_ = $self->map_dbix_object_to_output_info($_)
 	for @{$self->result->{rows}};
-
+    
     $self->map_result_to_list_of_ids
 	if $self->qvd_object_model->type_of_action eq 'all_ids';
 }
@@ -107,6 +107,7 @@ __DATA__
 20 = Unknow role.
 21 = Unknown acl
 23 = Condition to update violated.
+24 = Problems when building responde info.
 23503 = Foreign Key violation.
 23502 = Lack of mandatory argument violation.
 23505 = Unique Key violation.

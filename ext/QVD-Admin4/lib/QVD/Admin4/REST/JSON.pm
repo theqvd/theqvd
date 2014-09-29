@@ -2,12 +2,23 @@ package QVD::Admin4::REST::JSON;
 
 use strict;
 use warnings;
-use Moose;
+use Moo;
+use MooX::Types::MooseLike;
 use 5.010;
 our $VERSION = '0.01';
 
-has 'json', is => 'ro', isa => 'HashRef', required => '1';
-has 'available_nested_queries', is => 'ro', isa => 'ArrayRef', default => sub {[qw(__roles_changes__ __acls_changes__ __tags_changes__ __properties_changes__ __properties__ __tags__ __acls__ __roles__)];};
+has 'json', is => 'ro', isa => sub { die "Invalid type for attribute json" 
+					 unless ref(+shift) eq 'HASH'; }, required => '1';
+has 'available_nested_queries', is => 'ro', isa => sub { die "Invalid type for attribute available_nested_queries" 
+							     unless ref(+shift) eq 'ARRAY'; }, 
+                                             default => sub {[qw(__roles_changes__ 
+                                                                 __acls_changes__ 
+                                                                 __tags_changes__ 
+                                                                 __properties_changes__ 
+                                                                 __properties__ 
+                                                                 __tags__ 
+                                                                 __acls__ 
+                                                                 __roles__)];};
 
 my $NESTED_QUERIES;
 

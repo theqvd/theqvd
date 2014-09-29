@@ -1,17 +1,25 @@
 package QVD::Admin4::REST::Request;
 use strict;
 use warnings;
-use Moose;
+use Moo;
 use QVD::Admin4::Exception;
 use QVD::Admin4::DBConfigProvider;
 
-has 'json_wrapper', is => 'ro', isa => 'QVD::Admin4::REST::JSON', required => 1;
-has 'qvd_object_model', is => 'ro', isa => 'QVD::Admin4::REST::Model', required => 1;
-has 'modifiers', is => 'ro', isa => 'HashRef', default => sub { { distinct => 1, join => [], order_by => { '-asc' => []}  }};
-has 'filters', is => 'ro', isa => 'HashRef', default => sub { {}; };
-has 'arguments', is => 'ro', isa =>'HashRef', default => sub { {}; };
-has 'related_objects_arguments', is => 'ro', isa => 'HashRef', default => sub { {}; };
-has 'nested_queries', is => 'ro', isa => 'HashRef', default => sub { {}; };
+has 'json_wrapper', is => 'ro', isa => sub { die "Invalid type for attribute json_wrapper" 
+						 unless ref(+shift) eq 'QVD::Admin4::REST::JSON'; }, required => 1;
+has 'qvd_object_model', is => 'ro', isa => sub { die "Invalid type for attribute qvd_object_model" 
+						     unless ref(+shift) eq 'QVD::Admin4::REST::Model'; } , required => 1;
+has 'modifiers', is => 'ro', isa => sub { die "Invalid type for attribute modifiers" 
+					      unless ref(+shift) eq 'HASH'; }, 
+                             default => sub { { distinct => 1, join => [], order_by => { '-asc' => []}  }};
+has 'filters', is => 'ro', isa => sub { die "Invalid type for attribute failures" 
+					    unless ref(+shift) eq 'HASH'; }, default => sub { {}; };
+has 'arguments', is => 'ro', isa => sub { die "Invalid type for attribute arguments" 
+					      unless ref(+shift) eq 'HASH'; }, default => sub { {}; };
+has 'related_objects_arguments', is => 'ro', isa => sub { die "Invalid type for attribute related_objects_arguments" 
+							      unless ref(+shift) eq 'HASH'; }, default => sub { {}; };
+has 'nested_queries', is => 'ro', isa => sub { die "Invalid type for attribute nested_queries" 
+						   unless ref(+shift) eq 'HASH'; }, default => sub { {}; };
 
 my $ADMIN;
 my $DBConfigProvider;
@@ -68,7 +76,7 @@ sub forze_default_version_in_json_for_di
     $self->json_wrapper->forze_argument_addition('version',$version);
 }
 
-sub switch_di_id_filter_into_osf_id_for_vm
+sub switch_di_id_filter_into_osf_id_in_vm
 {
     my $self = shift;
     my $di_rs = $DBConfigProvider->db->resultset('DI'); 
@@ -246,6 +254,7 @@ sub set_filters_in_request
 	    $self->qvd_object_model->map_filter_to_dbix_format($key);
 	my $value = $self->json_wrapper->get_filter_value($key);
 	my $value_normalized = $self->qvd_object_model->normalize_value($key,$value);
+
 	$value_normalized = { like => "%".$value_normalized."%"} 
 	if $self->qvd_object_model->subchain_filter($key);
 	$self->set_filter($key_dbix_format,$value_normalized);

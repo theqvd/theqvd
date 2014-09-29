@@ -3,7 +3,7 @@ package QVD::Admin4;
 use 5.010;
 use strict;
 use warnings;
-use Moose;
+use Moo;
 use QVD::DB;
 use QVD::DB::Simple;
 use QVD::Config;
@@ -407,6 +407,7 @@ sub del_roles_to_role
 	$this_role->unassign_roles($role_to_unassign->id);
     }
 
+    return unless @$roles_to_unassign; 
     my %acl_ids = map { $_ => 1 } $this_role->_get_only_inherited_acls(return_value => 'id');
 
     defined $acl_ids{$_} || $this_role->unassign_acls($_,0)

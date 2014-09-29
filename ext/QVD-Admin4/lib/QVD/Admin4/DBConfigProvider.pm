@@ -1,7 +1,7 @@
 package QVD::Admin4::DBConfigProvider;
 use strict;
 use warnings;
-use Moose;
+use Moo;
 
 my $DB;
 
