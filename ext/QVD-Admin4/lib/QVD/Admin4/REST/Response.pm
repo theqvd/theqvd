@@ -8,16 +8,45 @@ has 'result', is => 'ro', isa => sub { die "Invalid type" unless ref(+shift) eq 
 has 'failures', is => 'ro', isa => sub { die "Invalid type" unless ref(+shift) eq 'HASH'; }, default => sub {{};};
 has 'qvd_object_model', is => 'ro', isa => sub { die "Invalid type" unless ref(+shift) eq 'QVD::Admin4::REST::Model'; };
 
-my $mapper =  Config::Properties->new();
-$mapper->load(*DATA);
+my $mapper = 
+{
+    0 => 'Successful completion',
+    1 => 'Undefined error',
+    2 => 'Unable to connect to database',
+    3 => 'Unable to log in in database',
+    4 => 'Internal server error',
+    5 => 'Action non supported',
+    6 => 'Unable to assign tenant to user: permissions problem',
+    7 => 'Unable to assign role to user: permissions problem',
+    8 => 'Forbidden action for this administrator',
+    9 => 'Inappropiate filter for this action',
+    10 => 'No mandatory filter for this action',
+    11 => 'Unknown filter for this action',
+    12 => 'Innapropiate argument for this action',
+    13 => 'Unknown argument for this action',
+    14 => 'Unknown order element',
+    15 => 'Syntax errors in input json',
+    16 => 'Condition to delete violated',
+    17 => 'Condition to create violated',
+    18 => 'Imposible to change state in current state',
+    19 => 'Related arguments are not part of this tenant',
+    20 => 'Unknow role',
+    21 => 'Unknown acl',
+    23 => 'Condition to update violated',
+    24 => 'Problems when building response info',
+    23503 => 'Foreign Key violation',
+    23502 => 'Lack of mandatory argument violation',
+    23505 => 'Unique Key violation',
+    23007 => 'Invalid type of argument',
+};
 
 sub BUILD
 {
     my $self = shift;
     
-    $self->map_result_from_dbix_objects_to_output_info
-	if $self->qvd_object_model;
-    
+    eval { $self->map_result_from_dbix_objects_to_output_info
+	       if $self->qvd_object_model };
+    $self->{status} = 24 if ($@ && (not $self->status));
     while (my ($id, $code) = each %{$self->failures})
     {
 	$self->failures->{$id} = $self->message($code);
@@ -31,7 +60,7 @@ sub map_result_from_dbix_objects_to_output_info
     return unless defined $self->result->{rows};
     $_ = $self->map_dbix_object_to_output_info($_)
 	for @{$self->result->{rows}};
-    
+
     $self->map_result_to_list_of_ids
 	if $self->qvd_object_model->type_of_action eq 'all_ids';
 }
@@ -66,7 +95,7 @@ sub message
 {
     my $self = shift;
     my $status = shift // $self->status;
-    $mapper->getProperty($status) || 
+    return $mapper->{$status} || 
 	'No translation to code '.$status.': ask Batman...';
 }
 
@@ -82,34 +111,5 @@ sub json
 
 1;
 
-__DATA__
 
-0 = Successful completion.
-1 = Undefined error.
-2 = Unable to connect to database.
-3 = Unable to log in in database.
-4 = Internal server error.
-5 = Action non supported.
-6 = Unable to assign tenant to user: permissions problem.
-7 = Unable to assign role to user: permissions problem.
-8 = Forbidden action for this administrator.
-9 = Inappropiate filter for this action.
-10 = No mandatory filter for this action.
-11 = Unknown filter for this action.
-12 = Innapropiate argument for this action
-13 = Unknown argument for this action.
-14 = Unknown order element.
-15 = Syntax errors in input json.
-16 = Condition to delete violated.
-17 = Condition to create violated.
-18 = Imposible to change state in current state.
-19 = Related arguments are not part of this tenant.
-20 = Unknow role.
-21 = Unknown acl
-23 = Condition to update violated.
-24 = Problems when building responde info.
-23503 = Foreign Key violation.
-23502 = Lack of mandatory argument violation.
-23505 = Unique Key violation.
-23007 = Invalid type of argument.
 

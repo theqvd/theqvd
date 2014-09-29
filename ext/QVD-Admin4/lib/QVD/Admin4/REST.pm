@@ -348,7 +348,7 @@ sub _admin
    $self->available_action_for_current_admin($action) // 
        return QVD::Admin4::REST::Response->new(status => 8)->json;
 
-   $self->exec_action_without_qvd_object_model($action)
+   return $self->exec_action_without_qvd_object_model($action)
        if $action->{type_of_action} eq 'general';
 
    my $qvd_object_model = QVD::Admin4::REST::Model->new(current_qvd_administrator => $self->administrator,
@@ -361,12 +361,11 @@ sub _admin
    my $general_status = ($@ && (( $@->can('code') && $@->code) || 1)) || 0;
    my $individual_failures = ($@ && $@->can('failures')) ? $@->failures  : {};
    
-   my $response = eval { QVD::Admin4::REST::Response->new(qvd_object_model => $qvd_object_model,
+   my $response = eval {QVD::Admin4::REST::Response->new(qvd_object_model => $qvd_object_model,
 							  status   => $general_status,
 							  result   => $result,
 							  failures => $individual_failures) };
-
-   $@ ? return QVD::Admin4::REST::Response->new(status => 24)->json : return $response->json;
+   return $response->json;
 }
 
 sub exec_action_without_qvd_object_model
@@ -382,7 +381,7 @@ sub exec_action_without_qvd_object_model
     my $response = eval { QVD::Admin4::REST::Response->new(status   => $general_status,
 							   result   => $result,
 							   failures => $individual_failures) };
-    $@ ? return QVD::Admin4::REST::Response->new(status => 24)->json : return $response->json;
+    return $response->json;
 }
 
 sub available_action_for_current_admin

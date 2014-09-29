@@ -2,7 +2,6 @@ package QVD::Admin4::REST::Model;
 use strict;
 use warnings;
 use Moo;
-use MooX::Types::MooseLike;
 use QVD::Config::Network qw(nettop_n netstart_n net_aton net_ntoa);
 use QVD::Config;
 use File::Basename qw(basename);
@@ -75,7 +74,8 @@ my $AVAILABLE_FILTERS = { list => { default => [],
                                     Host => [qw()],
 				    Role => [qw()],
 				    ACL => [qw()],
-                                    Tenant => [qw()]},
+                                    Tenant => [qw()],
+                                    DI_Tag => [qw(tenant_id osf_id)]},
 			  delete => { default => [qw(id tenant_id)],
 				      Host => [qw(id)],
 				      ACL => [qw(id)],
@@ -108,7 +108,7 @@ my $AVAILABLE_FIELDS = { list => { default => [],
 				   Administrator => [qw(name  roles acls id )],
 				   Tenant => [qw(id name)],
 				   User => [qw(id name  blocked creation_admin creation_date number_of_vms number_of_vms_connected  properties )],
-				   Host => [qw(id name address blocked frontend backend state  load creation_admin creation_date number_of_vms_connected number_of_vms properties )],
+				   Host => [qw(id name address blocked frontend backend state  load creation_admin creation_date number_of_vms_connected properties )],
 				   DI_Tag => [qw(osf_id name id )] },
 			 details => { default => [],
 				   OSF => [qw(id name overlay user_storage memory  number_of_vms number_of_dis )],
@@ -190,7 +190,7 @@ my $SUBCHAIN_FILTERS = { list => { default => [qw(name)],
 my $DEFAULT_ORDER_CRITERIA = { tiny => { default =>  [qw(name)] }};
 
 my $AVAILABLE_ARGUMENTS = { User => [qw(name password blocked)],
-                            VM => [qw(name ip blocked expiration_soft expiration_hard storage)],
+                            VM => [qw(name ip blocked expiration_soft expiration_hard storage di_tag)],
                             Host => [qw(name address blocked)],
                             OSF => [qw(name memory user_storage overlay)],
                             DI => [qw(blocked disk_image)],

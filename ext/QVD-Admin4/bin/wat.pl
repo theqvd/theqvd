@@ -1,17 +1,17 @@
-#!/usr/bin/env perl
+#!/usr/lib/qvd/bin/perl
 use Mojolicious::Lite;
-use lib::glob '/home/benjamin/WAT/ext/*/lib/';
+use lib::glob '/home/qindel/WAT/*/lib/';
 use QVD::Admin4::REST;
 use Mojo::JSON qw(decode_json encode_json);
 use QVD::Admin4::REST::Response;
 use Mojolicious::Plugin::Authentication;
-
+use Data::Dumper;
 my $REST = QVD::Admin4::REST->new();
 
 app->secrets(['Lucky Ben']);
-#app->sessions->cookie_name('amazingwat');
-app->sessions->default_expiration(0);
-app->config(hypnotoad => {listen => ['http://192.168.3.4:3000']});
+app->sessions->cookie_name('amazingwat');
+#app->sessions->default_expiration(0);
+app->config(hypnotoad => {listen => ['http://192.168.3.5:3000']});
 helper (_rest => sub { $REST; });
 
 plugin 'authentication', 
@@ -21,14 +21,15 @@ plugin 'authentication',
 			   $uid;},
     validate_user => sub { my ($c,$login,$password) = @_;
 			   $c->_rest->validate_user(login    => $login, 
-						    password => $password);}
+						    password => $password);
+			 
+}
 };
 
 under sub {
 
     my $c = shift;
 
-#   print $c->cookie('amazingwat');
     my $json = $c->req->json // 
     { map { $_ => $c->param($_) } $c->param };
  
@@ -50,7 +51,7 @@ under sub {
 any '/' => sub { 
 
     my $c = shift;
-        
+
     my $json = $c->req->json;
     $c->res->headers->header('Access-Control-Allow-Origin' => '*');
 

@@ -3,7 +3,6 @@ package QVD::Admin4::REST::JSON;
 use strict;
 use warnings;
 use Moo;
-use MooX::Types::MooseLike;
 use 5.010;
 our $VERSION = '0.01';
 
