@@ -15,17 +15,9 @@ __PACKAGE__->has_many(admin_rels => 'QVD::DB::Result::Role_Administrator_Relatio
 __PACKAGE__->has_many(acl_rels => 'QVD::DB::Result::ACL_Role_Relation', 'role_id');
 __PACKAGE__->has_many(role_rels => 'QVD::DB::Result::Role_Role_Relation', 'inheritor_id', { cascade_delete => 0 } );
 
-sub get_positive_acls_columns
-{
-    my $self = shift;
-    [ map {{$_->get_columns}} @{$self->get_positive_acls}];
-}
 
-sub get_negative_acls_columns
-{
-    my $self = shift;
-    [ map {{$_->get_columns}} @{$self->get_negative_acls}];
-}
+# FUNCTIONS TO GET DIRECT INFO FROM
+# THE ROLE OBJECT ITSELF
 
 sub get_acls
 {
@@ -57,54 +49,6 @@ sub get_roles
     [map { $_->inherited } $self->role_rels];
 }
 
-sub get_roles_columns
-{
-    my $self = shift;
-    [map {{$_->get_columns }} @{$self->get_roles}];
-}
-
-sub get_nested_acls
-{
-    my ($self,%mods) = @_;
-
-    my %acls = $mods{no_myself} ? () :
-	map { $_->id => [$self->name] } @{$self->get_positive_acls};
-
-    for my $role (@{$self->get_roles})
-    {	
-	my $nested_roles = $role->get_nested_acls;
-
-	for my $nested_role_id (keys %$nested_roles)
-	{
-	    $acls{$nested_role_id} //= [];
-	    push @{$acls{$nested_role_id}}, 
-	    @{$nested_roles->{$nested_role_id}};
-	}
-    }
-
-    delete $acls{$_->id}
-    for @{$self->get_negative_acls};
-    
-    \%acls;
-}
-
-sub get_nested_roles
-{
-    my $self = shift;
-    my @roles = ($self->name);
-
-    push @roles, @{$_->get_nested_roles}
-	for @{$self->get_roles};
-    \@roles;
-}
-
-sub is_allowed_to
-{
-    my ($self,$acl_name) = @_;
-    my @acls = $self->_get_inherited_acls;
-    $_ eq $acl_name && return 1 for @acls;
-}
-
 sub has_negative_acl
 {
     my ($self,$acl_name) = @_;
@@ -121,41 +65,22 @@ sub has_positive_acl
 }
 
 
-sub overlaps_with_role
-{
-    my ($self,$other_role) = @_;
-
-    for my $a_role (@{$self->get_nested_roles})
-    {
-	for my $b_role (@{$other_role->get_nested_roles})
-	{
-	    return 1 if $a_role eq $b_role;
-
-	}
-    }
-    return 0;
-}
-
-sub is_able_to
+sub is_allowed_to
 {
     my ($self,$acl_name) = @_;
+    my @acls = $self->_get_inherited_acls;
+    $_ eq $acl_name && return 1 for @acls;
+}
 
-    my $nested_roles_structure = 
-	$self->get_nested_roles_structure;
-    my $acls =  $nested_roles_structure->{$self->name}->{acls};
-    defined $acls->{$acl_name} ? return 1 : return 0;
-} 
-
-
-sub get_nested_roles_structure
+sub get_master_roles_structure
 {
     my $self = shift;
     my ($nested_str,$flat_str) = 
-	$self->get_nested_roles_structure_rec;
+	$self->build_master_roles_structure;
     return $nested_str;
 }
 
-sub get_nested_roles_structure_rec
+sub build_master_roles_structure
 {
     my $self = shift;
     my $nested_str = shift // {};
@@ -173,8 +98,8 @@ sub get_nested_roles_structure_rec
 	    defined $flat_str->{$nested_role->name};
 
 	my ($ns,$fs) = 
-	    $nested_role->get_nested_roles_structure_rec($nested_str->{$self->name}->{nested},
-							 $flat_str);
+	    $nested_role->build_master_roles_structure($nested_str->{$self->name}->{nested},
+						       $flat_str);
 
 	@{$nested_str->{$self->name}->{acls}}{keys %{$ns->{$nested_role->name}->{acls}}} = 
 	    values %{$ns->{$nested_role->name}->{acls}}; 
@@ -205,40 +130,12 @@ sub _get_inherited_roles
     $mods{return_value} //= 'name';
 
     my ($nested_str,$flat_str) = 
-	$self->get_nested_roles_structure_rec;
+	$self->build_master_roles_structure;
 
     return keys %$flat_str if $mods{return_value} eq 'name';
     return values %$flat_str if $mods{return_value} eq 'object';
     return map { $_->id } values %$flat_str if $mods{return_value} eq 'id';
     return map { $_->get_columns } values %$flat_str if $mods{return_value} eq 'columns';
-}
-
-sub kk
-{
-    my $self = shift;
-
-    my ($nested_str,$flat_str) = 
-	$self->get_nested_roles_structure_rec;
-
-    $self->_get_nested_roles_structure_rec($nested_str->{$self->name}->{nested});
-}
-
-sub _get_nested_roles_structure_rec
-{
-    my ($self,$old_structure,$new_structure) = @_;
-    $old_structure //= {};
-    $new_structure //= {};
-
-    for my $node_name (keys %$old_structure)
-    {
-	my $node_id = $old_structure->{$node_name}->{matrix}->id;
-	$new_structure->{$node_id} = { name => $node_name,
-				       inherited => {}};
-	$self->_get_nested_roles_structure_rec(
-	    $old_structure->{$node_name}->{nested},
-	    $new_structure->{$node_id}->{inherited});
-    }
-    $new_structure;
 }
 
 sub _get_own_acls
@@ -266,7 +163,7 @@ sub _get_inherited_acls
     $mods{return_value} //= 'name';
 
     my ($nested_str,$flat_str) = 
-	$self->get_nested_roles_structure_rec;
+	$self->build_master_roles_structure;
     my $acls =  $nested_str->{$self->name}->{acls};
 
     return keys %$acls if $mods{return_value} eq 'name';
@@ -285,7 +182,7 @@ sub _get_only_inherited_acls
     for my $role ($self->_get_own_acls(return_value => 'object'))
     {
 	my ($nested_str,$flat_str) = 
-	    $self->get_nested_roles_structure_rec;
+	    $self->build_master_roles_structure;
 	@acls{keys %{$nested_str->{$self->name}->{acls}}} =
 	    values %{$nested_str->{$self->name}->{acls}};
     }
@@ -329,39 +226,38 @@ sub unassign_roles
     $_->delete for $rs->all;
 }
 
-sub get_own_acls
-{
-    my $self = shift;
-    { positive => [$self->_get_own_acls],
-      negative => [$self->_get_own_acls(positive => 0)]};
-}
 
-sub get_inherited_acls_kk
+#################
+
+sub get_acls_info
 {
     my $self = shift;
-    my $out = {};
+    my $acls_info = [];
 
     for my $acl ($self->_get_inherited_acls(return_value => 'object'))
     {
-	my @roles = grep { $_->is_allowed_to($acl->name) } 
-	$self->_get_inherited_roles(return_value => 'object');
-	
-	$out->{$acl->name}->{roles} = [map { $_->name } @roles]; 
-    }
-    $out;
-} 
+	my $acl_info = {};
+	$acl_info->{name} = $acl->name;
+	$acl_info->{roles} = [];
 
-sub get_own_roles
-{
-    my $self = shift;
-    [$self->_get_own_roles];
+	push @{$acl_info->{roles}},$self->name
+	    if $self->has_positive_acl($acl->name);
+
+	for my $role (@{$self->get_roles})
+	{
+	    push @{$acl_info->{roles}}, $role->name
+		if $role->is_allowed_to($acl->name);
+	}
+	push @$acls_info, $acl_info;
+    }
+    $acls_info;
 }
 
-sub get_inherited_roles_kk
+sub get_roles_info
 {
     my $self = shift;
-    $self->kk;
-} 
+    [map { { id => $_->id, name => $_->name } } @{$self->get_roles} ];
+}
 
 
 1;

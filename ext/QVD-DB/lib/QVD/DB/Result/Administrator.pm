@@ -38,33 +38,25 @@ sub tenant_name
 sub get_roles_info
 {
     my $self = shift;
-    $out = {};
 
-    for my $role ($self->roles)
-    {
-	$out->{$role->id} = { name => $role->name, inherited => $role->kk };
-    }
-    $out;
+    [map { { id => $_->id, name => $_->name } } $self->roles ];
 }
 
 sub get_acls_info
 {
     my $self = shift;
-    my %acls;
+    my $acls_info;
 
     for my $role ($self->roles)
     {
-	for my $acl ($role->_get_inherited_acls(return_value => 'object'))
+	for my $acl_info (@{$role->get_acls_info})
 	{
-	    my @roles = grep { $_->is_allowed_to($acl->name) } 
-	    $role->_get_inherited_roles(return_value => 'object');
-	    $acls{$acl->name}->{roles} //= []; 
-	    my %roles = map { $_ => 1 } @{$acls{$acl->name}->{roles}},
-	    map { $_->name => 1 } @roles;
-	    $acls{$acl->name}->{roles} = [keys %roles];
+	    $acls_info->{$acl_info->{name}} = 
+	    { map { $_ => 1 } @{$acl_info->{roles}}};
 	}
     }
-    \%acls;
+ 
+   [ map { { name => $_, roles => [keys %{$acls_info->{$_}}] } } keys %$acls_info ];
 }
 
 sub is_allowed_to
