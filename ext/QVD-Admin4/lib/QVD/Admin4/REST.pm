@@ -195,6 +195,10 @@ tag_get_list => { type_of_action => 'list',
 		   admin4method => 'select',
 		   qvd_object => 'DI_Tag'},
 
+tag_get_details => { type_of_action => 'details',
+		   admin4method => 'select',
+		   qvd_object => 'DI_Tag'},
+
 tag_all_ids => { type_of_action => 'all_ids',
 		 admin4method => 'select',
 		 qvd_object => 'DI_Tag'},
@@ -208,6 +212,10 @@ admin_get_list => { type_of_action => 'list',
 		    qvd_object => 'Administrator' },
 
 admin_get_details => { type_of_action => 'details',
+		       admin4method => 'select',
+		       qvd_object => 'Administrator'},
+
+admin_all_ids => { type_of_action => 'all_ids',
 		       admin4method => 'select',
 		       qvd_object => 'Administrator'},
 
@@ -235,6 +243,10 @@ tenant_get_details => { type_of_action => 'details',
 			admin4method => 'select',
 			qvd_object => 'Tenant'},
 
+tenant_all_ids => { type_of_action => 'all_ids',
+			admin4method => 'select',
+			qvd_object => 'Tenant'},
+
 tenant_update => { type_of_action => 'update',
 		   admin4method => 'update',
 		   qvd_object => 'Tenant'},
@@ -259,6 +271,10 @@ role_get_details => { type_of_action => 'details',
 		      admin4method => 'select',
 		      qvd_object => 'Role'},
 
+role_all_ids => { type_of_action => 'all_ids',
+		      admin4method => 'select',
+		      qvd_object => 'Role'},
+
 get_acls_in_role => { type_of_action => 'general',
 		      admin4method => 'get_acls_in_role'},
 
@@ -270,6 +286,14 @@ acl_tiny_list => { type_of_action => 'tiny',
 		   qvd_object => 'ACL'},
 
 acl_get_list => { type_of_action => 'list',
+		  admin4method => 'select',
+		  qvd_object => 'ACL'},
+
+acl_all_ids => { type_of_action => 'all_ids',
+		  admin4method => 'select',
+		  qvd_object => 'ACL'},
+
+acl_get_details => { type_of_action => 'details',
 		  admin4method => 'select',
 		  qvd_object => 'ACL'},
 

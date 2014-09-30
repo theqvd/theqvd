@@ -89,6 +89,7 @@ sub map_dbix_object_to_output_info
 sub map_result_to_list_of_ids
 {
     my $self = shift;
+
     $self->result->{rows} = 
 	[ map { $_->{id} } @{$self->result->{rows}} ];
 }

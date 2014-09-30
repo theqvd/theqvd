@@ -112,19 +112,7 @@ my $AVAILABLE_FIELDS = { list => { default => [],
 			 tiny => { default => [qw(id name)],
 				   DI => [qw(id disk_image)]},
 
-			 all_ids_actions => { defauly => [],
-					      OSF => [qw(id name overlay user_storage memory vm_id di_id  number_of_vms number_of_dis )],
-					      Role => [qw(name acls roles id )],
-					      DI => [qw(id disk_image version osf_id osf_name  blocked tags  properties )],
-					      VM => [qw(storage id name user_id user_name osf_id osf_name di_tag blocked expiration_soft expiration_hard 
-                                                     state host_id host_name di_id user_state ip next_boot_ip ssh_port vnc_port serial_port 
-                                                      creation_admin creation_date di_version di_name di_id properties )],
-					      ACL => [qw(id name)],
-					      Tenant => [qw(id name)],
-					      Administrator => [qw(name roles acls id )],
-					      User => [qw(id name  blocked creation_admin creation_date number_of_vms number_of_vms_connected  properties )],
-					      Host => [qw(id name address blocked frontend backend state vm_id load creation_admin creation_date number_of_vms_connected number_of_vms properties )],
-					      DI_Tag => [qw(osf_id name id )] },
+			 all_ids => { default => [qw(id)]},
 			state => { User => [qw(number_of_vms_connected)],
 				   VM => [qw(state user_state)],
 				   Host => [qw(number_of_vms_connected)]}};
