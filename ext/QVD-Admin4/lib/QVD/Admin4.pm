@@ -600,28 +600,6 @@ sub vm_stop
     $result;
 }
 
-sub get_acls_in_role_or_admin
-{
-    my ($self,$request) = @_;
-    my $result = $self->select($request);
-    my $acls_info = {};
-
-    for my $role_or_admin (@{$result->{rows}})
-    {
-	for my $acl_info (@{$role_or_admin->get_acls_info})
-	{
-	    $acls_info->{$acl_info->{name}} = 
-	    { map { $_ => 1 } @{$acl_info->{roles}}};
-	}
-    }
-    $result->{rows} =   
-	[ sort { $a->{name} cmp $b->{name} } 
-	  map { { name => $_, 
-		  roles => [keys %{$acls_info->{$_}}] } } 
-	  keys %$acls_info ];
-    $result->{total} = 1;
-    $result;
-}
 
 ##########################
 ### AUXILIAR FUNCTIONS ###
@@ -670,6 +648,61 @@ sub di_no_head_default_tags
 	}
     }
     return 1;
+}
+
+######################################
+## GENERAL FUNCTIONS; WITHOUT REQUEST
+######################################
+
+sub get_acls_in_role
+{
+    my ($self,$json_wrapper) = @_;
+    my $id = $json_wrapper->get_filter_value('id') // 
+	QVD::Admin4::Exception->throw(code=>'10');
+    my $roles = 
+	[$DB->resultset('Role')->search({id => $id})->all];
+    return $self->get_acls_in_role_or_admin($roles,$json_wrapper);
+}
+
+sub get_acls_in_admin
+{
+    my ($self,$json_wrapper) = @_;
+    my $id = $json_wrapper->get_filter_value('id') // 
+	QVD::Admin4::Exception->throw(code=>'10');
+    my $admins = 
+	[$DB->resultset('Administrator')->search({id => $id})->all];
+    return $self->get_acls_in_role_or_admin($admins,$json_wrapper);
+}
+
+sub get_acls_in_role_or_admin
+{
+    my ($self,$role_or_admins,$json_wrapper) = @_;
+    my $acls_info = {};
+    my $order_criteria = $json_wrapper->order_criteria;
+    my $order_direction = $json_wrapper->order_direction // '-asc';
+
+    for my $role_or_admin (@$role_or_admins)
+    {
+	for my $acl_info (@{$role_or_admin->get_acls_info})
+	{
+	    $acls_info->{$acl_info->{name}} = 
+	    { map { $_ => 1 } @{$acl_info->{roles}}};
+	}
+    }
+
+    my @acls_info = map { { name => $_, 
+			    roles => [keys %{$acls_info->{$_}}] } } keys %$acls_info;
+    my $total_acls = @acls_info;
+
+    if (@$order_criteria)
+    {
+	@acls_info = $order_direction eq '-asc' ?
+	    sort { $a->{name} cmp $b->{name} } @acls_info :
+	    sort { $b->{name} cmp $a->{name} } @acls_info;
+    }
+
+    { rows => \@acls_info,
+      total => $total_acls };
 }
 
 

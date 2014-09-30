@@ -46,7 +46,7 @@ sub BUILD
     
     eval { $self->map_result_from_dbix_objects_to_output_info
 	       if $self->qvd_object_model };
-    if $@ { use Data::Dumper; print $@; 
+    if ($@) { use Data::Dumper; print $@; 
 	    print Dumper $self->qvd_object_model->qvd_object; 
 	    print Dumper $self->qvd_object_model->type_of_action; }
 

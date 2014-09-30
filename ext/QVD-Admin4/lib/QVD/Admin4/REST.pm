@@ -259,13 +259,11 @@ role_get_details => { type_of_action => 'details',
 		      admin4method => 'select',
 		      qvd_object => 'Role'},
 
-get_acls_in_role => { type_of_action => 'details',
-		      admin4method => 'get_acls_in_role_or_admin',
-		      qvd_object => 'Role'},
+get_acls_in_role => { type_of_action => 'general',
+		      admin4method => 'get_acls_in_role'},
 
-get_acls_in_admin => { type_of_action => 'details',
-		      admin4method => 'get_acls_in_role_or_admin',
-		      qvd_object => 'Administrator'},
+get_acls_in_admin => { type_of_action => 'general',
+		      admin4method => 'get_acls_in_admin'},
 
 acl_tiny_list => { type_of_action => 'tiny',
 		   admin4method => 'select',
@@ -356,7 +354,7 @@ sub process_query
    $self->available_action_for_current_admin($action) // 
        return QVD::Admin4::REST::Response->new(status => 8)->json;
 
-   return $self->process_query_without_qvd_object_model($action)
+   return $self->process_query_without_qvd_object_model($action,$json_wrapper)
        if $action->{type_of_action} eq 'general';
 
    my $qvd_object_model = QVD::Admin4::REST::Model->new(current_qvd_administrator => $self->administrator,
@@ -378,10 +376,10 @@ sub process_query
 
 sub process_query_without_qvd_object_model
 {
-    my ($self,$action) = @_;
+    my ($self,$action,$json_wrapper) = @_;
 
     my $admin4method = $action->{admin4method};
-    my $result = eval { $QVD_ADMIN->$admin4method() } // {};
+    my $result = eval { $QVD_ADMIN->$admin4method($json_wrapper) } // {};
     print $@ if $@;
     my $general_status = ($@ && (( $@->can('code') && $@->code) || 1)) || 0;
     my $individual_failures = ($@ && $@->can('failures')) ? $@->failures  : {};
