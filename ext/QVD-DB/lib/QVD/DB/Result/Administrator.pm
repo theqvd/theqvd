@@ -39,7 +39,9 @@ sub get_roles_info
 {
     my $self = shift;
 
-    [map { { id => $_->id, name => $_->name } } $self->roles ];
+    [ sort { $a->{name} cmp $b->{name} } 
+      map { { id => $_->id, name => $_->name } } 
+      $self->roles ];
 }
 
 sub get_acls_info
@@ -56,7 +58,9 @@ sub get_acls_info
 	}
     }
  
-   [ map { { name => $_, roles => [keys %{$acls_info->{$_}}] } } keys %$acls_info ];
+   [ sort { $a->{name} cmp $b->{name} } 
+     map { { name => $_, roles => [keys %{$acls_info->{$_}}] } } 
+     keys %$acls_info ];
 }
 
 sub is_allowed_to

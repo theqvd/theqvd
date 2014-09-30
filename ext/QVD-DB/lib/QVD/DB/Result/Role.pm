@@ -250,13 +250,15 @@ sub get_acls_info
 	}
 	push @$acls_info, $acl_info;
     }
-    $acls_info;
+    [ sort { $a->{name} cmp $b->{name} } @$acls_info ];
 }
 
 sub get_roles_info
 {
     my $self = shift;
-    [map { { id => $_->id, name => $_->name } } @{$self->get_roles} ];
+    [ sort { $a->{name} cmp $b->{name} }
+      map { { id => $_->id, name => $_->name } } 
+      @{$self->get_roles} ];
 }
 
 

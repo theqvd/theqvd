@@ -1,11 +1,11 @@
 #!/usr/lib/qvd/bin/perl
 use Mojolicious::Lite;
-use lib::glob '/home/qindel/WAT/*/lib/';
+use lib::glob '/home/benjamin/WAT/ext/*/lib/';
 use QVD::Admin4::REST;
 use Mojo::JSON qw(decode_json encode_json);
 use QVD::Admin4::REST::Response;
 use Mojolicious::Plugin::Authentication;
-use Data::Dumper;
+
 my $REST = QVD::Admin4::REST->new();
 
 app->secrets(['Lucky Ben']);

@@ -57,7 +57,8 @@ $t->post_ok('/' => json => { login    => 'superadmin',
 		             password => 'superadmin',              
 		             action   => 'vm_update',
 			     filters    => { id => 4 },
-			     arguments => { storage => 10, 
+			     arguments => { di_tag =>'kkk' ,
+			                    storage => 10, 
 					    name => 'buenavm', 
 					    blocked => 1,
 					    expiration_soft => '10/10/2014',
@@ -88,7 +89,8 @@ $t->post_ok('/' => json => { login    => 'superadmin',
 		             password => 'superadmin',              
 		             action   => 'vm_update',
 			     filters    => { id => 4 },
-			     arguments => { storage => undef, 
+			     arguments => { di_tag =>'default' ,
+			                    storage => undef, 
 					    name => 'kkdevm', 
 					    blocked => 0,
 					    expiration_soft => undef,
@@ -243,8 +245,10 @@ $t->post_ok('/' => json => { login    => 'superadmin',
 			     filters => {id => 5}}) 
     ->status_is(200, 'admin_get_details HTTP STATUS')
     ->json_is('/result/rows/0/name' => 'youradmin', 'admin_get_details HAS CHANGED')
-    ->json_has('/result/rows/0/roles/4','admin_get_details HAS CHANGED')
-    ->json_hasnt('/result/rows/0/roles/1','admin_get_details HAS CHANGED')
+    ->json_is('/result/rows/0/roles/0/name','superpringao', 'admin_get_details HAS CHANGED')
+    ->json_hasnt('/result/rows/0/roles/1/','admin_get_details HAS CHANGED')
+    ->json_is('/result/rows/0/acls/0/name','user_see', 'admin_get_details HAS CHANGED')
+    ->json_hasnt('/result/rows/0/acls/1/','admin_get_details HAS CHANGED')
     ->json_is('/status' => '0', 'admin_get_details API STATUS');
 
 $t->post_ok('/' => json => { login    => 'superadmin',              
@@ -314,12 +318,12 @@ $t->post_ok('/' => json => { login    => 'superadmin',
     ->json_is('/status' => '0', 'role_get_details API STATUS')
 
     ->json_is('/result/rows/0/name' => 'superpringate', 'role_get_details HAS CHANGED')
-    ->json_has('/result/rows/0/inherited_roles/1', 'role_get_details HAS CHANGED')
-    ->json_has('/result/rows/0/inherited_acls/user_see', 'role_get_details HAS CHANGED')
-    ->json_has('/result/rows/0/inherited_acls/user_delete', 'role_get_details HAS CHANGED')
-    ->json_has('/result/rows/0/inherited_acls/user_update', 'role_get_details HAS CHANGED')
-    ->json_is('/result/rows/0/own_acls/positive/0' => 'user_update', 'role_get_details HAS CHANGED')
-    ->json_is('/result/rows/0/own_acls/negative/0' => 'user_create', 'role_get_details HAS CHANGED')
+    ->json_is('/result/rows/0/roles/0/name','spy', 'role_get_details HAS CHANGED')
+    ->json_hasnt('/result/rows/0/roles/1/','role_get_details HAS CHANGED')
+    ->json_is('/result/rows/0/acls/0/name', 'user_delete', 'role_get_details HAS CHANGED')
+    ->json_is('/result/rows/0/acls/1/name','user_see', 'role_get_details HAS CHANGED')
+    ->json_is('/result/rows/0/acls/2/name','user_update', 'role_get_details HAS CHANGED')
+    ->json_hasnt('/result/rows/0/acls/3/', 'role_get_details HAS CHANGED')
 ;
 
 
