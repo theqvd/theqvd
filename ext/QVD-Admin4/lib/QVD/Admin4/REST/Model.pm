@@ -99,7 +99,7 @@ my $AVAILABLE_FILTERS = { list => { default => [],
 
 my $AVAILABLE_FIELDS = { list => { default => [],
 				   OSF => [qw(id name overlay user_storage memory  number_of_vms number_of_dis )],
-				   Role => [qw(name own_acls inherited_acls inherited_roles id )],
+				   Role => [qw(name roles acls id )],
 				   DI => [qw(id disk_image version osf_id osf_name  blocked tags  properties )],
 				   VM => [qw(storage id name user_id user_name osf_id osf_name di_tag blocked expiration_soft expiration_hard 
                                           state host_id host_name  di_id user_state ip next_boot_ip ssh_port vnc_port serial_port 
@@ -112,7 +112,7 @@ my $AVAILABLE_FIELDS = { list => { default => [],
 				   DI_Tag => [qw(osf_id name id )] },
 			 details => { default => [],
 				   OSF => [qw(id name overlay user_storage memory  number_of_vms number_of_dis )],
-				   Role => [qw(name own_acls inherited_acls inherited_roles id )],
+				   Role => [qw(name acls roles id )],
 				   DI => [qw(id disk_image version osf_id osf_name  blocked tags  properties )],
 				   VM => [qw(storage id name user_id user_name osf_id osf_name di_tag blocked expiration_soft expiration_hard 
                                           state host_id host_name  di_id user_state ip next_boot_ip ssh_port vnc_port serial_port 
@@ -127,7 +127,7 @@ my $AVAILABLE_FIELDS = { list => { default => [],
 
 			 all_ids_actions => { defauly => [],
 					      OSF => [qw(id name overlay user_storage memory vm_id di_id  number_of_vms number_of_dis )],
-					      Role => [qw(name own_acls inherited_acls inherited_roles id )],
+					      Role => [qw(name acls roles id )],
 					      DI => [qw(id disk_image version osf_id osf_name  blocked tags  properties )],
 					      VM => [qw(storage id name user_id user_name osf_id osf_name di_tag blocked expiration_soft expiration_hard 
                                                      state host_id host_name di_id user_state ip next_boot_ip ssh_port vnc_port serial_port 
@@ -346,8 +346,6 @@ my $FIELDS_TO_DBIX_FORMAT_MAPPER =
     ACL => {
 	'id' => 'me.id',
 	'name' => 'me.name',
-	'roles' => 'me.get_roles_info',
-	'admins' => 'me.get_admins_info',
     },
 
     Host => {
@@ -368,12 +366,8 @@ my $FIELDS_TO_DBIX_FORMAT_MAPPER =
 
     Role => {
 	'name' => 'me.name',
-#	'own_acls' => 'me.get_own_acls_info',
-#	'inherited_acls' => 'me.get_inherited_acls_info',
-#	'inherited_roles' => 'me.get_inherited_roles_info_without_me',
-	'own_acls' => 'me.get_own_acls',
-	'inherited_acls' => 'me.get_inherited_acls_kk',
-	'inherited_roles' => 'me.get_inherited_roles_kk',
+	'acls' => 'me.get_acls_info',
+	'roles' => 'me.get_roles_info',
 	'id' => 'me.id',
     },
 

@@ -46,6 +46,7 @@ sub BUILD
     
     eval { $self->map_result_from_dbix_objects_to_output_info
 	       if $self->qvd_object_model };
+    print $@ if $@;
     $self->{status} = 24 if ($@ && (not $self->status));
     while (my ($id, $code) = each %{$self->failures})
     {
