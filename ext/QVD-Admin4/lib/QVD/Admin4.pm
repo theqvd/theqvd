@@ -600,6 +600,29 @@ sub vm_stop
     $result;
 }
 
+sub get_acls_in_role_or_admin
+{
+    my ($self,$request) = @_;
+    my $result = $self->select($request);
+    my $acls_info = {};
+
+    for my $role_or_admin (@{$result->{rows}})
+    {
+	for my $acl_info (@{$role_or_admin->get_acls_info})
+	{
+	    $acls_info->{$acl_info->{name}} = 
+	    { map { $_ => 1 } @{$acl_info->{roles}}};
+	}
+    }
+    $result->{rows} =   
+	[ sort { $a->{name} cmp $b->{name} } 
+	  map { { name => $_, 
+		  roles => [keys %{$acls_info->{$_}}] } } 
+	  keys %$acls_info ];
+    $result->{total} = 1;
+    $result;
+}
+
 ##########################
 ### AUXILIAR FUNCTIONS ###
 ##########################

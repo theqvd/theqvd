@@ -259,6 +259,14 @@ role_get_details => { type_of_action => 'details',
 		      admin4method => 'select',
 		      qvd_object => 'Role'},
 
+get_acls_in_role => { type_of_action => 'details',
+		      admin4method => 'get_acls_in_role_or_admin',
+		      qvd_object => 'Role'},
+
+get_acls_in_admin => { type_of_action => 'details',
+		      admin4method => 'get_acls_in_role_or_admin',
+		      qvd_object => 'Administrator'},
+
 acl_tiny_list => { type_of_action => 'tiny',
 		   admin4method => 'select',
 		   qvd_object => 'ACL'},
@@ -348,7 +356,7 @@ sub process_query
    $self->available_action_for_current_admin($action) // 
        return QVD::Admin4::REST::Response->new(status => 8)->json;
 
-   return $self->process_query_action_without_qvd_object_model($action)
+   return $self->process_query_without_qvd_object_model($action)
        if $action->{type_of_action} eq 'general';
 
    my $qvd_object_model = QVD::Admin4::REST::Model->new(current_qvd_administrator => $self->administrator,
