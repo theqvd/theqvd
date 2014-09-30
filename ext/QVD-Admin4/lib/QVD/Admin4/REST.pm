@@ -337,7 +337,7 @@ sub validate_user
 	eval { $self->get_credentials(%params) } // undef;
 }
 
-sub _admin
+sub process_query
 {
    my ($self,$json) = @_;
 
@@ -348,7 +348,7 @@ sub _admin
    $self->available_action_for_current_admin($action) // 
        return QVD::Admin4::REST::Response->new(status => 8)->json;
 
-   return $self->exec_action_without_qvd_object_model($action)
+   return $self->process_query_action_without_qvd_object_model($action)
        if $action->{type_of_action} eq 'general';
 
    my $qvd_object_model = QVD::Admin4::REST::Model->new(current_qvd_administrator => $self->administrator,
@@ -368,7 +368,7 @@ sub _admin
    return $response->json;
 }
 
-sub exec_action_without_qvd_object_model
+sub process_query_without_qvd_object_model
 {
     my ($self,$action) = @_;
 
