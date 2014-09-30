@@ -5,6 +5,7 @@ require "$FindBin::Bin/../bin/wat.pl";
 
 my $t = Test::Mojo->new;
 
+
 #################
 ### user_get_list
 #################
@@ -25,6 +26,19 @@ $t->post_ok('/' => json => { login    => 'superadmin',
     ->json_is('/status' => '0', 'user_get_list API STATUS')
     ->json_has('/result/rows/0/', 'user_get_list NO UNDERGENERATE')
     ->json_hasnt('/result/rows/1/' => 'user_get_list NO OVERGENERATE');
+
+##################
+### user_tiny_list
+##################
+
+$t->post_ok('/' => json => { login    => 'superadmin',              
+		             password => 'superadmin',              
+		             action   => 'user_tiny_list',
+			     filters    => { tenant_id => 1}}) 
+    ->status_is(200, 'user_tiny_list HTTP STATUS')
+    ->json_is('/status' => '0', 'user_tiny_list API STATUS')
+    ->json_has('/result/rows/3/', 'user_tiny_list NO UNDERGENERATE')
+    ->json_hasnt('/result/rows/4/' => 'user_tiny_list NO OVERGENERATE');
 
 #################
 ### vm_get_list
@@ -64,6 +78,20 @@ $t->post_ok('/' => json => { login    => 'superadmin',
     ->json_has('/result/rows/0/', 'vm_get_list NO UNDERGENERATE')
     ->json_hasnt('/result/rows/1/' => 'vm_get_list NO OVERGENERATE');
 
+
+##################
+### vm_tiny_list
+##################
+
+$t->post_ok('/' => json => { login    => 'superadmin',              
+		             password => 'superadmin',              
+		             action   => 'vm_tiny_list',
+			     filters    => { tenant_id => 1}}) 
+    ->status_is(200, 'user_tiny_list HTTP STATUS')
+    ->json_is('/status' => '0', 'vm_tiny_list API STATUS')
+    ->json_has('/result/rows/1/', 'vm_tiny_list NO UNDERGENERATE')
+    ->json_hasnt('/result/rows/2/' => 'vm_tiny_list NO OVERGENERATE');
+
 #################
 ### host_get_list
 #################
@@ -87,6 +115,19 @@ $t->post_ok('/' => json => { login    => 'superadmin',
     ->json_has('/result/rows/0/', 'host_get_list NO UNDERGENERATE')
     ->json_hasnt('/result/rows/1/' => 'host_get_list NO OVERGENERATE');
 
+##################
+### host_tiny_list
+##################
+
+$t->post_ok('/' => json => { login    => 'superadmin',              
+		             password => 'superadmin',              
+		             action   => 'host_tiny_list',
+			     filters    => {}}) 
+    ->status_is(200, 'host_tiny_list HTTP STATUS')
+    ->json_is('/status' => '0', 'host_tiny_list API STATUS')
+    ->json_has('/result/rows/2/', 'host_tiny_list NO UNDERGENERATE')
+    ->json_hasnt('/result/rows/3/' => 'host_tiny_list NO OVERGENERATE');
+
 #################
 ### osf_get_list
 #################
@@ -108,6 +149,19 @@ $t->post_ok('/' => json => { login    => 'superadmin',
     ->json_is('/status' => '0', 'osf_get_list API STATUS')
     ->json_has('/result/rows/0/', 'osf_get_list NO UNDERGENERATE')
     ->json_hasnt('/result/rows/1/' => 'osf_get_list NO OVERGENERATE');
+
+##################
+### osf_tiny_list
+##################
+
+$t->post_ok('/' => json => { login    => 'superadmin',              
+		             password => 'superadmin',              
+		             action   => 'osf_tiny_list',
+			     filters    => { tenant_id => 1 }}) 
+    ->status_is(200, 'osf_tiny_list HTTP STATUS')
+    ->json_is('/status' => '0', 'osf_tiny_list API STATUS')
+    ->json_has('/result/rows/0/', 'osf_tiny_list NO UNDERGENERATE')
+    ->json_hasnt('/result/rows/1/' => 'osf_tiny_list NO OVERGENERATE');
 
 #################
 ### di_get_list
@@ -131,6 +185,19 @@ $t->post_ok('/' => json => { login    => 'superadmin',
     ->json_is('/status' => '0', 'di_get_list API STATUS')
     ->json_has('/result/rows/0/', 'di_get_list NO UNDERGENERATE')
     ->json_hasnt('/result/rows/1/' => 'di_get_list NO OVERGENERATE');
+
+##################
+### di_tiny_list
+##################
+
+$t->post_ok('/' => json => { login    => 'superadmin',              
+		             password => 'superadmin',              
+		             action   => 'di_tiny_list',
+			     filters    => { tenant_id => 1 }}) 
+    ->status_is(200, 'di_tiny_list HTTP STATUS')
+    ->json_is('/status' => '0', 'di_tiny_list API STATUS')
+    ->json_has('/result/rows/0/', 'di_tiny_list NO UNDERGENERATE')
+    ->json_hasnt('/result/rows/3/' => 'di_tiny_list NO OVERGENERATE');
 
 #################
 ### tag_get_list

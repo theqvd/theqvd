@@ -22,6 +22,17 @@ sub get_has_many { qw(); }
 sub get_has_one { qw(); }
 sub get_belongs_to { qw(di); }
 
+sub tenant_id
+{
+    my $self = shift;
+    $self->di->osf->tenant_id;
+}
+
+sub tenant_name
+{
+    my $self = shift;
+    $self->di->osf->tenant_name;
+}
 
 
 1;

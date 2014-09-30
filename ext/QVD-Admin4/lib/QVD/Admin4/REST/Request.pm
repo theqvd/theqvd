@@ -27,6 +27,7 @@ my $DBConfigProvider;
 sub BUILD 
 {
     my $self = shift;
+
     $ADMIN = $self->qvd_object_model->current_qvd_administrator;
     $DBConfigProvider = QVD::Admin4::DBConfigProvider->new();
 
@@ -323,7 +324,7 @@ sub set_order_by_in_request
     for my $order_criterium (@$order_criteria)
     {
 	$self->add_to_order_by(
-	    $self->qvd_object_model->map_argument_to_dbix_format($order_criterium));
+	    $self->qvd_object_model->map_order_criteria_to_dbix_format($order_criterium));
     }
 }
 
