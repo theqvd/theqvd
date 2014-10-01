@@ -59,6 +59,7 @@ sub update
     {
 	eval { $DB->txn_do( sub { $self->$_($obj) || QVD::Admin4::Exception->throw(code => 16)
 				      for @$conditions;
+				  $self->is_a_trivial_update($obj,$request);
 				  eval { $obj->update($request->arguments) };
 				  QVD::Admin4::Exception->throw(code => $DB->storage->_dbh->state,
 								message => "$@") if $@;
@@ -76,6 +77,14 @@ sub is_a_trivial_update
 {
     my ($self,$object,$request) = @_;
 
+    my $arguments = $request->arguments;
+    use Data::Dumper; print Dumper $arguments;
+    my %tables = %{$request->related_objects_arguments};
+    for (keys %tables)
+    {
+#	eval { $obj->$_->update($tables{$_}) }; 
+
+    }    
 }
 
 sub delete
@@ -103,7 +112,7 @@ sub delete
 sub create
 {
     my ($self,$request,%modifiers) = @_;
-    my $result = $self->select($request);
+    my $result;
     my $failures = {};
 
     my $conditions = $modifiers{conditions} // [];
@@ -119,7 +128,7 @@ sub create
 		       $self->create_related_objects($request,$obj);
 		       $self->$_($request,$obj) for @$methods_for_nested_queries;
 		       $result->{rows} = [ $obj ] } );
-
+    $result->{total} = 1;
     $result;
 }
 

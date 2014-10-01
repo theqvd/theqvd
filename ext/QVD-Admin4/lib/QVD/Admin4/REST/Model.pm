@@ -471,9 +471,6 @@ sub BUILD
     $self->set_info_by_type_of_action_and_qvd_object(
 	'available_fields',$AVAILABLE_FIELDS,1);
 
-    $self->set_tenant_fields
-	if $self->current_qvd_administrator->is_superadmin;
-
     $self->set_info_by_type_of_action_and_qvd_object(
 	'subchain_filters',$SUBCHAIN_FILTERS);
 
@@ -512,6 +509,9 @@ sub BUILD
 
     $self->set_info_by_qvd_object(
 	'dbix_has_one_relationships',$DBIX_HAS_ONE_RELATIONSHIPS);
+
+    $self->set_tenant_fields
+	if $self->current_qvd_administrator->is_superadmin; # The last one. It depends on others
 }
 
 sub initialize_info_model 
@@ -541,10 +541,10 @@ sub set_tenant_fields
     my $self = shift;
 
     push @{$self->{model_info}->{available_fields}},'tenant_id'
-	if $self->available_filter('tenant_id');
+	if defined $self->fields_to_dbix_format_mapper->{tenant_id};
 
     push @{$self->{model_info}->{available_fields}},'tenant_name'
-	if $self->available_filter('tenant_name');
+	if defined $self->fields_to_dbix_format_mapper->{tenant_name};
 }
 
 sub set_info_by_type_of_action_and_qvd_object
