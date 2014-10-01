@@ -1331,11 +1331,11 @@ ALTER TABLE ONLY user_states
 
 
 --
--- Name: users_login; Type: CONSTRAINT; Schema: public; Owner: qvd; Tablespace: 
+-- Name: users_login_tenant_id; Type: CONSTRAINT; Schema: public; Owner: qvd; Tablespace: 
 --
 
 ALTER TABLE ONLY users
-    ADD CONSTRAINT users_login UNIQUE (login);
+    ADD CONSTRAINT users_login_tenant_id UNIQUE (login, tenant_id);
 
 
 --

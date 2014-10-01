@@ -71,6 +71,7 @@ sub is_allowed_to
     {
 	$role->is_allowed_to($acl_name) && return 1;
     }
+
     return 0;
 }
 

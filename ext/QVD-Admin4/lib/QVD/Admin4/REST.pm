@@ -17,42 +17,42 @@ my $ACTIONS =
 
 user_get_list => {type_of_action => 'list',
 		  admin4method => 'select',
-		  acls => ['see_user'],
+		  acls => ['user_see'],
 		  qvd_object => 'User'},
 
 user_tiny_list => {type_of_action => 'tiny',
 		  admin4method => 'select',
-		   acls => ['see_user'],
+		   acls => ['user_see'],
 		   qvd_object => 'User'},
 
 user_all_ids => { type_of_action => 'all_ids',
 		  admin4method => 'select',
-		  acls => ['see_user'],
+		  acls => ['user_see'],
 		  qvd_object => 'User'},
 
 user_get_details => { type_of_action => 'details',
 		      admin4method => 'select',
-		      acls => ['see_user'],
+		      acls => ['user_see'],
 		      qvd_object => 'User' },
 
 user_get_state => { type_of_action => 'state',
 		    admin4method => 'select',
-		    acls => ['see_user'],
+		    acls => ['user_see'],
 		    qvd_object => 'User' },
 
 user_update => { type_of_action => 'update',
 		 admin4method => 'update_with_custom_properties',
-		 acls => ['update_user'],
+		 acls => ['user_update'],
 		 qvd_object => 'User' },
 
 user_create => { type_of_action => 'create',
 		 admin4method => 'create_with_custom_properties',
-		 acls => ['create_user'],
+		 acls => ['user_create'],
 		 qvd_object => 'User'},
 
 user_delete => { type_of_action => 'delete',
 		 admin4method => 'delete',
-		 acls => ['delete_user'],
+		 acls => ['user_delete'],
 		 qvd_object => 'User'},
 
 vm_get_list => { type_of_action => 'list',
@@ -375,7 +375,7 @@ sub process_query
    my $action = $ACTIONS->{$json_wrapper->action} // 
        return QVD::Admin4::REST::Response->new(status => 5)->json;
 
-   $self->available_action_for_current_admin($action) // 
+   $self->available_action_for_current_admin($action) || 
        return QVD::Admin4::REST::Response->new(status => 8)->json;
 
    return $self->process_query_without_qvd_object_model($action,$json_wrapper)
@@ -420,6 +420,7 @@ sub available_action_for_current_admin
 
     $self->administrator->is_allowed_to($_) || return 0
 	for @{$action->{acls}};
+
     return 1;
 }
 

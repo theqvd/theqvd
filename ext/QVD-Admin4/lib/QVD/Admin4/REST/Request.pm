@@ -161,8 +161,8 @@ sub forze_filtering_by_tenant
     return unless $self->qvd_object_model->available_filter('tenant_id');
     if ($self->json_wrapper->has_filter('tenant_id'))
     {
-	return if $ADMIN->is_superadmin;
-	$self->json_wrapper->forze_filter_deletion('tenant_id');
+	QVD::Admin4::Exception->throw(code => 9) 
+	    unless $ADMIN->is_superadmin;
     }
     else
     {
