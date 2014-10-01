@@ -1,7 +1,12 @@
 #!/usr/bin/perl -w
 use strict;
+use Cwd;
+use Win32::Console::ANSI;
+use Term::ANSIColor;
+
 $| = 1;
 
+my $color = 1;
 my $prog = $ENV{PROGRAMFILES};
 my $swperl = 'C:\strawberry';
 
@@ -38,7 +43,7 @@ foreach my $dir (@paths) {
 	$ENV{PATH} .= ";\"$dir\"";
 }
 
-print "PATH: $ENV{PATH}\n";
+msg("PATH: $ENV{PATH}\n");
 
 # This environment variable tells the client it's being called in a PP
 # build. That will make it exit automatically. This makes automated
@@ -46,26 +51,34 @@ print "PATH: $ENV{PATH}\n";
 
 $ENV{QVD_PP_BUILD} = 1;
 
-print "Looking for wxWidgets DLL directory... ";
+msg("Looking for wxWidgets DLL directory... ");
 my $wxglob = $swperl . '\perl\site\lib\Alien\wxWidgets\msw*';
 my $wxdir  = glob($wxglob);
 die "Failed to match $wxglob" unless ( -d $wxdir );
-print "$wxdir\n";
+msg("$wxdir\n");
 
-print "Looking for wxWidgets DLLs...\n";
+msg("Looking for wxWidgets DLLs...\n");
 
 foreach my $pat ( 'wxbase*.dll', 'wxmsw*_adv_*.dll', 'wxmsw*_core_*.dll') {
     my $wxglob   = "$wxdir\\lib\\$pat";
 	my @dllpaths = grep { !/(net|xml)/ } glob( $wxglob );
 	die "Failed to match $wxglob" unless ( @dllpaths );
-	print "\t$pat:\n";
+	msg("\t$pat:\n");
 	
 	foreach my $f (@dllpaths) {
-		print "\t\t$f\n";
+		msg("\t\t$f\n");
 	}
 	
 	push @dlls, @dllpaths;
 }
+
+msg("Generating locale...\n");
+my $installer_dir = getcwd();
+chdir("..\\..\\ext\\QVD-Client") or die "Can't chdir to QVD-Client directory";
+run("Build.PL");
+run("Build");
+run("xcopy", "/s", "/y", "blib\\locale", "..\\..\\windows\\installer\\locale");
+chdir($installer_dir);
 
 
 run("exetype", "NX\\nxproxy.exe", "WINDOWS");
@@ -87,6 +100,8 @@ unlink glob('..\Output\*');
 
 run("perl ..\\script.pl >..\\script.iss");
 run("ISCC.exe ..\\script.iss");
+
+msg("Done!");
 
 
 
@@ -127,7 +142,13 @@ sub mklist {
 sub run {
 	my @args = @_;
 	my $cmd = join(' ', @args);
-	print STDERR "Running: $cmd\n";
-	
+	msg("Running: $cmd\n");
 	!system(@args) or die "Failed to run $cmd: $!";
+}
+
+sub msg {
+	my ($msg) = @_;
+	print color 'bold green' if ($color);
+	print $msg;
+	print color 'reset';
 }
