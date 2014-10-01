@@ -1,4 +1,4 @@
-module( "Virtual machine tests", {
+module( "Host tests", {
     setup: function() {
         // prepare something for all following tests
         this.server = sinon.fakeServer.create();
@@ -14,10 +14,10 @@ module( "Virtual machine tests", {
     }
 });
     
-    test("Virtual machine details processing", function() {
+    test("Host details processing", function() {
         var callback = sinon.spy();
         
-        var fakeValues = WatTests.fakeValues.vm;
+        var fakeValues = WatTests.fakeValues.host;
         
         // Number of Assertions we Expect
         expect( Object.keys(fakeValues).length + 2 );
@@ -35,7 +35,7 @@ module( "Virtual machine tests", {
 
         this.server.respondWith(
                                     "POST", 
-                                    Wat.C.apiUrl + '?login=superadmin&password=superadmin&action=vm_get_details&filters={"id":' + fakeValues.id + '}',
+                                    Wat.C.apiUrl + '?login=superadmin&password=superadmin&action=host_get_details&filters={"id":' + fakeValues.id + '}',
                                     [
                                         200, 
                                         { "Content-Type": "application/json" },
@@ -43,7 +43,7 @@ module( "Virtual machine tests", {
                                     ]
                                );
         
-        Wat.Router.app_router.trigger('route:detailsVM', [fakeValues.id]);        
+        Wat.Router.app_router.trigger('route:detailsHost', [fakeValues.id]);        
         
         // Bind to the change event on the model
         Wat.CurrentView.model.bind('change', callback);
@@ -54,10 +54,10 @@ module( "Virtual machine tests", {
         
         $.each(fakeValues, function (fieldName, fieldValue) {
             if (typeof fieldValue == 'object') {
-                deepEqual(callback.getCall(0).args[0].attributes[fieldName], fieldValue, "Virtual machine fetching should recover '" + fieldName + "' properly (Random generated: " + JSON.stringify(fieldValue) + ")");
+                deepEqual(callback.getCall(0).args[0].attributes[fieldName], fieldValue, "Host fetching should recover '" + fieldName + "' properly (Random generated: " + JSON.stringify(fieldValue) + ")");
             }
             else {
-                equal(callback.getCall(0).args[0].attributes[fieldName], fieldValue, "Virtual machine fetching should recover '" + fieldName + "' properly (Random generated: " + fieldValue + ")");
+                equal(callback.getCall(0).args[0].attributes[fieldName], fieldValue, "Host fetching should recover '" + fieldName + "' properly (Random generated: " + fieldValue + ")");
             }
         });
 

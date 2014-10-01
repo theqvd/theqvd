@@ -88,7 +88,7 @@ Wat.Views.VMListView = Wat.Views.ListView.extend({
             arguments["name"] = name;
         }
                                 
-        this.createModel(arguments);
+        this.createModel(arguments, this.fetchList);
     },
     
     startVM: function (filters) {        

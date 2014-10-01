@@ -4,8 +4,6 @@
         <meta charset="utf-8">
         <title>QUnit and Backbone Example</title>
         <link rel="stylesheet" href="http://code.jquery.com/qunit/qunit-1.11.0.css">
-        <script src="http://underscorejs.org/underscore.js"></script>
-        <script src="http://backbonejs.org/backbone.js"></script>
     </head>
     <body>
         <div id="qunit"></div>
@@ -161,8 +159,13 @@
             
             
             <!-- Tests -->
+            <script src="./js/tests-lib.js"></script>
+            <script src="./js/tests-setup.js"></script>
             <script src="./js/tests-common.js"></script>
             <script src="./js/tests-user.js"></script>
+            <script src="./js/tests-osf.js"></script>
+            <script src="./js/tests-di.js"></script>
+            <script src="./js/tests-host.js"></script>
             <script src="./js/tests-vm.js"></script>
     </body>
 </html>

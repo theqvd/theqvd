@@ -39,6 +39,7 @@ Wat.A = {
 
         messages = messages || {};
         var that2 = that;
+
         successCallback = successCallback || function () {};   
         $.ajax({
             url: url,
@@ -47,7 +48,7 @@ Wat.A = {
             processData: false,
             parse: true,
             async: async,
-            error: function (response) {
+            error: function (response, a, b, c) {
                 if (that) {
                     that.retrievedData = response;
                 }

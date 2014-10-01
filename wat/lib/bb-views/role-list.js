@@ -83,6 +83,6 @@ Wat.Views.RoleListView = Wat.Views.ListView.extend({
             "tenant": tenant
         };
                                 
-        this.createModel(arguments);
+        this.createModel(arguments, this.fetchList);
     },
 });

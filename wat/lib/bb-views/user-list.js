@@ -46,6 +46,6 @@ Wat.Views.UserListView = Wat.Views.ListView.extend({
             arguments['password'] = password;
         }
                         
-        this.createModel(arguments);
+        this.createModel(arguments, this.fetchList);
     }
 });

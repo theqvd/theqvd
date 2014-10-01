@@ -1,6 +1,24 @@
 Wat.Views.HomeView = Wat.Views.MainView.extend({
     homeTemplateName: 'home',
     qvdObj: 'home',
+    defaultStats: {
+        User: {
+            total: 0,
+        },
+        VM: {
+            total: 0,
+            expiration: []
+        },
+        Host: {
+            total: 0,
+        },
+        OSF: {
+            total: 0,
+        },
+        DI: {
+            total: 0,
+        }
+    },
     
     breadcrumbs: {
         'screen': 'Home'
@@ -20,6 +38,10 @@ Wat.Views.HomeView = Wat.Views.MainView.extend({
     render: function () {
         var stats = this.retrievedData.result;
 
+        if (stats == undefined) {
+            stats = this.defaultStats;
+        }
+        
         this.templateHome = Wat.A.getTemplate(this.homeTemplateName);
         
         // Fill the html with the template and the model

@@ -36,7 +36,7 @@ Wat.Models.DI = Wat.Models.Model.extend({
                     tags.push(tag.tag);
                 }
             });
-
+            
             model.tags = tags.join(',');
             model.default = tagDefault ? 1 : 0;
             model.head = tagHead ? 1 : 0;

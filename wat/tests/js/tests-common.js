@@ -2,16 +2,6 @@ QUnit.jUnitReport = function(data) {
     //console.log(data.xml);
 };
 
-function getRandomInt () {
-    return parseInt(Math.random().toString().substring(16));
-}
-function getRandomStr () {
-    return Math.random().toString(36).substring(7);
-}
-
-// Override configuration constants
-APP_PATH = '../';
-
 module( "Backbone tests", {
     setup: function() {
         // prepare something for all following tests
@@ -22,7 +12,7 @@ module( "Backbone tests", {
 });
     test("Models instantiation", function() {
         // Instantiate Local Contact Backbone Model Object
-        var models = {
+        WatTests.models = {
             acl: new Wat.Models.ACL(),
             admin: new Wat.Models.Admin(),
             di: new Wat.Models.DI(),
@@ -35,17 +25,17 @@ module( "Backbone tests", {
         }
 
         // Number of Assertions we Expect
-        expect( Object.keys(models).length );
+        expect( Object.keys(WatTests.models).length );
 
         // Default Attribute Value Assertions
-        $.each(models, function (modelName, model) {
+        $.each(WatTests.models, function (modelName, model) {
             equal( model.actionPrefix, modelName, "Model " + modelName + " is initialized");
         });
     });  
 
     test("Collections instantiation", function() {
         // Instantiate Local Contact Backbone Collection Object
-        var collections = {
+        WatTests.collections = {
             acl: new Wat.Collections.ACLs(),
             admin: new Wat.Collections.Admins(),
             di: new Wat.Collections.DIs(),
@@ -58,10 +48,10 @@ module( "Backbone tests", {
         }
 
         // Number of Assertions we Expect
-        expect( Object.keys(collections).length );
+        expect( Object.keys(WatTests.collections).length );
 
         // Default Attribute Value Assertions
-        $.each(collections, function (collectionName, collection) {
+        $.each(WatTests.collections, function (collectionName, collection) {
             equal( collection.actionPrefix, collectionName, "Collection " + collectionName + "s is initialized");
         });
     });  
@@ -128,5 +118,7 @@ module( "View tests", {
             Wat.Router.app_router.trigger('route:list' + view);        
 
             equal(Wat.CurrentView.qvdObj, view.toLowerCase(), view + " view rendered");
+            
+            WatTests.listViews[view.toLowerCase()] = _.extend({}, Wat.CurrentView);
         });
     });

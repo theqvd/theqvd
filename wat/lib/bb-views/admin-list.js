@@ -85,6 +85,6 @@ Wat.Views.AdminListView = Wat.Views.ListView.extend({
             "tenant": tenant
         };
                             
-        this.createModel(arguments);
+        this.createModel(arguments, this.fetchList);
     },
 });

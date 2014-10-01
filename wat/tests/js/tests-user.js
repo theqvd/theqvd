@@ -1,4 +1,4 @@
-module( "Users tests", {
+module( "Users Fake tests", {
     setup: function() {
         // prepare something for all following tests
         this.server = sinon.fakeServer.create();
@@ -14,26 +14,14 @@ module( "Users tests", {
     }
 });
     
-    test("User details call", function() {
+    test("User details processing", function() {
         var callback = sinon.spy();
         
-        var fakeValues = {};
-
-        fakeValues.id = getRandomInt();
-        fakeValues.name = getRandomStr();
-        fakeValues.tenant_name = getRandomStr();
-        fakeValues.tenant_id = getRandomInt();
-        fakeValues.number_of_vms = getRandomInt();
-        fakeValues.number_of_vms_connected = getRandomInt();
-        fakeValues.blocked = getRandomInt() > 100 ? 1 : 0;
-        fakeValues.properties = {
-            'property 1': getRandomStr(),
-            'property N': getRandomStr()
-        };
-        
+        var fakeValues = WatTests.fakeValues.user;
+                
         // Number of Assertions we Expect
         expect( Object.keys(fakeValues).length + 2 );
-        
+                
         var fakeResponse = {
             "failures": {},
             "status": 0,
@@ -66,12 +54,117 @@ module( "Users tests", {
         
         $.each(fakeValues, function (fieldName, fieldValue) {
             if (typeof fieldValue == 'object') {
-                deepEqual(callback.getCall(0).args[0].attributes[fieldName], fieldValue, "Virtual machine fetching should recover '" + fieldName + "' properly (Random generated: " + JSON.stringify(fieldValue) + ")");
+                deepEqual(callback.getCall(0).args[0].attributes[fieldName], fieldValue, "User fetching should recover '" + fieldName + "' properly (Random generated: " + JSON.stringify(fieldValue) + ")");
             }
             else {
-                equal(callback.getCall(0).args[0].attributes[fieldName], fieldValue, "Virtual machine fetching should recover '" + fieldName + "' properly (Random generated: " + fieldValue + ")");
+                equal(callback.getCall(0).args[0].attributes[fieldName], fieldValue, "User fetching should recover '" + fieldName + "' properly (Random generated: " + fieldValue + ")");
             }
         });
 
         deepEqual(callback.getCall(0).args[0], Wat.CurrentView.model, "Spied result and Backbone model should be equal");
+    });
+
+module( "Users Real tests", {
+    setup: function() {
+        // prepare something for all following tests
+        
+        // Fake Login
+        Wat.C.logOut();
+        Wat.C.logIn('superadmin', 'superadmin');
+    },
+    teardown: function() {
+        // clean up after each test
+        Wat.C.logOut();
+    }
+});
+
+    QUnit.asyncTest("User CRUD", function() {
+        // Number of Assertions we Expect
+        var assertions = 0;
+        assertions += Object.keys(WatTests.fakeValues.user).length * 2; // Create & Update verifications. (Password will not be verified because is not returned)
+        assertions +=3; // Create, Update and Delete verifications
+        
+        expect(assertions);
+        
+        Wat.Router.app_router.trigger('route:listUser');
+        
+        Wat.CurrentView.model = new Wat.Models.User();
+        
+        //////////////////////////////////////////////////////////////////
+        // Create User
+        //////////////////////////////////////////////////////////////////
+        Wat.CurrentView.createModel(WatTests.values.user, function (e) { 
+            if(e.retrievedData.status == 0) {
+                WatTests.values.user.id = e.retrievedData.result.rows[0].id;
+            }
+            equal(e.retrievedData.status, 0, "User created succesfully (" + JSON.stringify(WatTests.values.user) + ")");
+            
+            //////////////////////////////////////////////////////////////////
+            // After create, get list of users matching by the created name
+            //////////////////////////////////////////////////////////////////
+            WatTests.models.user = new Wat.Models.User({
+                id: WatTests.values.user.id
+            });            
+            
+            WatTests.models.user.fetch({      
+                complete: function () {
+                    $.each (WatTests.fakeValues.user, function (fieldName) {
+                        var valRetrieved = WatTests.models.user.attributes[fieldName];
+
+                        if (fieldName == 'properties' && WatTests.values.user['__properties__'] != undefined) {
+                            deepEqual(valRetrieved, WatTests.values.user['__properties__'], "User field '" + fieldName + "' retrieved successfully and match with created value (" + JSON.stringify(valRetrieved) + ")");
+                        }
+                        else if (WatTests.values.user[fieldName] != undefined) {
+                            equal(valRetrieved, WatTests.values.user[fieldName], "User field '" + fieldName + "' retrieved successfully and match with created value (" + valRetrieved + ")");
+                        }
+                        else {
+                            notEqual(WatTests.models.user.attributes[fieldName], undefined, "User field '" + fieldName + "' retrieved successfully (" + valRetrieved + ")");
+                        }
+                    });
+                    
+                    // Perform changes in testing user values
+                    performUpdation(WatTests.values.user, WatTests.updateValues.user);
+                    
+                    //////////////////////////////////////////////////////////////////
+                    // After get list of users, update it
+                    //////////////////////////////////////////////////////////////////
+                    Wat.CurrentView.updateModel(WatTests.updateValues.user, {'id': WatTests.values.user.id}, function (e) { 
+                        equal(e.retrievedData.status, 0, "User updated succesfully (" + JSON.stringify(WatTests.updateValues.user) + ")");
+                        
+                        //////////////////////////////////////////////////////////////////
+                        // After update, get list of users matching by name
+                        //////////////////////////////////////////////////////////////////
+                        WatTests.models.user.fetch({   
+                            complete: function (e) {
+                                WatTests.values.user.id = WatTests.models.user.attributes['id'];
+                                $.each (WatTests.fakeValues.user, function (fieldName) {
+                                    var valRetrieved = WatTests.models.user.attributes[fieldName];
+
+                                    if (fieldName == 'properties' && WatTests.values.user['__properties__'] != undefined) {
+                                        deepEqual(valRetrieved, WatTests.values.user['__properties__'], "User field '" + fieldName + "' retrieved successfully and match with created value (" + JSON.stringify(valRetrieved) + ")");
+                                    }
+                                    else if (WatTests.values.user[fieldName] != undefined) {
+                                        equal(valRetrieved, WatTests.values.user[fieldName], "User field '" + fieldName + "' retrieved successfully and match with created value (" + valRetrieved + ")");
+                                    }
+                                    else {
+                                        notEqual(WatTests.models.user.attributes[fieldName], undefined, "User field '" + fieldName + "' retrieved successfully (" + valRetrieved + ")");
+                                    }
+                                });
+
+
+                                //////////////////////////////////////////////////////////////////
+                                // After match the updated user, delete it
+                                //////////////////////////////////////////////////////////////////
+                                Wat.CurrentView.deleteModel({'id': WatTests.values.user.id}, function (e) { 
+                                    equal(e.retrievedData.status, 0, "User deleted succesfully (ID: " + JSON.stringify(WatTests.values.user.id) + ")");
+                                    
+                                    // Unblock task runner
+                                    start();
+                                }, Wat.CurrentView.model);
+                            }
+                        });
+                    }, Wat.CurrentView.model);
+                }
+            });
+        });
     });

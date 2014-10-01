@@ -11,6 +11,12 @@
         </td>
     </tr>
     <tr>
+        <td><i class="fa fa-ticket"></i><span data-i18n>Version</span></td>
+        <td>
+            <%= model.get('version') %>
+        </td>
+    </tr>
+    <tr>
         <td><i class="<%= CLASS_ICON_OSFS %>"></i><span data-i18n>OS Flavour</span></td>
         <td>
             <a href="#/osf/<%= model.get('osf_id') %>">

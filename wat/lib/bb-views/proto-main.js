@@ -173,15 +173,15 @@ Wat.Views.MainView = Backbone.View.extend({
         };
     },
     
-    createModel: function (arguments) {
+    createModel: function (arguments, successCallback) {
         this.model.setOperation('create');
         
         var messages = {
             'success': 'Successfully created',
             'error': 'Error creating'
         };
-        
-        this.saveModel(arguments, {}, messages, this.fetchList);
+
+        this.saveModel(arguments, {}, messages, successCallback);        
     },
     
     updateModel: function (arguments, filters, successCallback, model) {
@@ -219,8 +219,8 @@ Wat.Views.MainView = Backbone.View.extend({
         model.save(arguments, {filters: filters}).complete(function(e) {
             var callResponse = e.status;
             var response = JSON.parse(e.responseText);
-            
             if (callResponse == 200 && response.status == SUCCESS) {
+                that.retrievedData = response;
                 successCallback(that);
                 
                 that.message = messages.success;

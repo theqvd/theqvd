@@ -95,6 +95,6 @@ Wat.Views.DIListView = Wat.Views.ListView.extend({
         
         arguments.__tags__ = tags ? tags.split(',') : [];
                         
-        this.createModel(arguments);
+        this.createModel(arguments, this.fetchList);
     }
 });

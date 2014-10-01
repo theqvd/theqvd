@@ -1,4 +1,5 @@
 SUCCESS = 0;
+FORBIDDEN = 8;
 
 APP_PATH = './';
 

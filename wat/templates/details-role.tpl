@@ -17,7 +17,7 @@
         <td>
             <%
             var acls = [];
-            $.each(model.get('own_acls').positive, function (iAcl, acl) {
+            $.each(model.get('acls'), function (iAcl, acl) {
                 acls.push(acl);
             }); 
             %>
@@ -33,7 +33,7 @@
         <td>
             <%
                 var roles = [];
-                $.each(model.get('inherited_roles'), function (iRole, role) {
+                $.each(model.get('roles'), function (iRole, role) {
                     roles.push(role.name);
                 }); 
             %>

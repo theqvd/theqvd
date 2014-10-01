@@ -45,7 +45,7 @@ Wat.Views.OSFListView = Wat.Views.ListView.extend({
             arguments["name"] = name;
         }
                         
-        this.createModel(arguments);
+        this.createModel(arguments, this.fetchList);
     },
     
     updateMassiveElement: function (dialog, id) {

@@ -79,6 +79,6 @@ Wat.Views.TenantListView = Wat.Views.ListView.extend({
             "name": name
         };
                                 
-        this.createModel(arguments);
+        this.createModel(arguments, this.fetchList);
     },
 });

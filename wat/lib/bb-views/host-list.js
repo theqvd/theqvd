@@ -46,6 +46,6 @@ Wat.Views.HostListView = Wat.Views.ListView.extend({
             arguments["address"] = address;
         }
                         
-        this.createModel(arguments);
+        this.createModel(arguments, this.fetchList);
     }
 });
