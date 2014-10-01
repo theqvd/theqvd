@@ -104,7 +104,7 @@ unlink glob('..\Output\*');
 run("perl ..\\script.pl >..\\script.iss");
 run("ISCC.exe ..\\script.iss");
 
-msg("Done!");
+msg("Done!\n");
 
 
 
