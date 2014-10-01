@@ -16,8 +16,8 @@ my $mapper =
     3 => 'Unable to log in in database',
     4 => 'Internal server error',
     5 => 'Action non supported',
-    6 => 'Unable to assign tenant to user: permissions problem',
-    7 => 'Unable to assign role to user: permissions problem',
+    6 => 'Unable to assign tenant to admin: permissions problem',
+    7 => 'Unable to assign role to admin: permissions problem',
     8 => 'Forbidden action for this administrator',
     9 => 'Inappropiate filter for this action',
     10 => 'No mandatory filter for this action',
@@ -113,6 +113,3 @@ sub json
 }
 
 1;
-
-
-

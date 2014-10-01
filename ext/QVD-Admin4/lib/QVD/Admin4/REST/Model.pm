@@ -115,7 +115,8 @@ my $AVAILABLE_FIELDS = { list => { default => [],
 			 all_ids => { default => [qw(id)]},
 			state => { User => [qw(number_of_vms_connected)],
 				   VM => [qw(state user_state)],
-				   Host => [qw(number_of_vms_connected)]}};
+				   Host => [qw(number_of_vms_connected)]},
+                         create => { 'default' => [qw(id)]}};
 
 my $MANDATORY_FILTERS = { list => { default => [qw(tenant_id)],
 				    Host => [qw()],

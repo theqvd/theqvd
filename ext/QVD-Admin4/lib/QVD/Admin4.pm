@@ -40,8 +40,8 @@ sub select
 
     my $rs = eval { $DB->resultset($request->table)->search($request->filters, 
 							    $request->modifiers) };
-    QVD::Admin4::Exception->throw(code => ($DB->storage->_dbh->state || 4,
-				  message => "$@")) if $@;
+    QVD::Admin4::Exception->throw(code => $DB->storage->_dbh->state,
+				  message => "$@") if $@;
    { total => ($rs->is_paged ? $rs->pager->total_entries : $rs->count), 
      rows => [$rs->all] };
 }
@@ -59,7 +59,9 @@ sub update
     {
 	eval { $DB->txn_do( sub { $self->$_($obj) || QVD::Admin4::Exception->throw(code => 16)
 				      for @$conditions;
-				  $obj->update($request->arguments);
+				  eval { $obj->update($request->arguments) };
+				  QVD::Admin4::Exception->throw(code => $DB->storage->_dbh->state,
+								message => "$@") if $@;
 				  $self->update_related_objects($request,$obj);
 				  $self->$_($request,$obj) for @$methods_for_nested_queries })};
 	print $@ if $@;
@@ -68,6 +70,12 @@ sub update
     QVD::Admin4::Exception->throw(code => 1, failures => $failures) if %$failures;
     $result->{rows} = [];
     $result;
+}
+
+sub is_a_trivial_update
+{
+    my ($self,$object,$request) = @_;
+
 }
 
 sub delete
@@ -80,7 +88,9 @@ sub delete
     {
          eval { $self->$_($obj) || QVD::Admin4::Exception->throw(code => 16)
 		    for @$conditions; 
-		$obj->delete };
+		eval { $obj->delete };
+		QVD::Admin4::Exception->throw(code => $DB->storage->_dbh->state,
+					      message => "$@") if $@ };
 	 print $@ if $@;
 	 if ($@) { $failures->{$obj->id} = ($@->can('code') ? $@->code : 4); }
     }
@@ -99,16 +109,17 @@ sub create
     my $conditions = $modifiers{conditions} // [];
     my $methods_for_nested_queries = $modifiers{methods_for_nested_queries} // [];
 
-    eval { $DB->txn_do( sub { $self->$_($request) || QVD::Admin4::Exception->throw(code => 17)
-				  for @$conditions;
-			      my $obj = $DB->resultset($request->table)->create($request->arguments);
-			      $self->create_related_objects($request,$obj);
-			      $self->$_($request,$obj) for @$methods_for_nested_queries  } ) };
+    $DB->txn_do( sub { $self->$_($request) || QVD::Admin4::Exception->throw(code => 17)
+			   for @$conditions;
+		       my $obj = eval {$DB->resultset($request->table)->create($request->arguments)};
+		       print $@ if $@;
+		       QVD::Admin4::Exception->throw(code => $DB->storage->_dbh->state,
+						     message => "$@") if $@;
 
-    print $@ if $@;
-    QVD::Admin4::Exception->throw(code => ($DB->storage->_dbh->state || 4),
-                                  message => "$@") if $@;
-    $result->{rows} = [];
+		       $self->create_related_objects($request,$obj);
+		       $self->$_($request,$obj) for @$methods_for_nested_queries;
+		       $result->{rows} = [ $obj ] } );
+
     $result;
 }
 
@@ -124,7 +135,7 @@ sub update_related_objects
     for (keys %tables)
     {
 	eval { $obj->$_->update($tables{$_}) }; 
-	QVD::Admin4::Exception->throw(code => ($DB->storage->_dbh->state || 4),
+	QVD::Admin4::Exception->throw(code => $DB->storage->_dbh->state,
 	                              message => "$@") if $@;
     }    
 }
@@ -211,7 +222,7 @@ sub create_related_objects
     {
 	eval { $obj->create_related($table,($related_args->{$table} || {})) };
 	print $@ if $@;
-	QVD::Admin4::Exception->throw(code => ($DB->storage->_dbh->state || 4),
+	QVD::Admin4::Exception->throw(code => $DB->storage->_dbh->state,
                                       message => "$@") if $@;
     }
 }
@@ -230,12 +241,18 @@ sub create_related_tags
 {
     my($self,$request,$di)=@_;
 
+    eval {
+
     $di->osf->delete_tag('head');
     $di->osf->delete_tag($di->version);
     $DB->resultset('DI_Tag')->create({di_id => $di->id, tag => $di->version, fixed => 1});
     $DB->resultset('DI_Tag')->create({di_id => $di->id, tag => 'head'});
     $DB->resultset('DI_Tag')->create({di_id => $di->id, tag => 'default'})
-	unless $di->osf->di_by_tag('default');
+	unless $di->osf->di_by_tag('default')
+    };
+
+    QVD::Admin4::Exception->throw(code => $DB->storage->_dbh->state,
+				  message => "$@") if $@;
 
     my $nested_queries = $request->nested_queries // return;
     my $tags_queries = $nested_queries->{__tags__} // return;
@@ -289,7 +306,7 @@ sub custom_properties_set
 	eval { $DB->resultset($t)->update_or_create($a) };
 
 	print $@ if $@;
-	QVD::Admin4::Exception->throw(code => ($DB->storage->_dbh->state || 4),
+	QVD::Admin4::Exception->throw(code => $DB->storage->_dbh->state,
                                       message => "$@") if $@;
     }
 }
@@ -302,7 +319,7 @@ sub custom_properties_del
     {
 	eval { $obj->search_related('properties', 
 				    {key => $key})->delete };
-	QVD::Admin4::Exception->throw(code => ($DB->storage->_dbh->state || 4),
+	QVD::Admin4::Exception->throw(code => $DB->storage->_dbh->state,
                                       message => "$@") if $@;
     }		
 }
@@ -317,7 +334,7 @@ sub tags_create
 	eval {  $di->osf->di_by_tag($tag,'1') && QVD::Admin4::Exception->throw(code => 16);
 		$di->osf->delete_tag($tag);
 		$DB->resultset('DI_Tag')->create({di_id => $di->id, tag => $tag}) };
-	QVD::Admin4::Exception->throw(code => ($DB->storage->_dbh->state || 4),
+	QVD::Admin4::Exception->throw(code => $DB->storage->_dbh->state,
                                       message => "$@") if $@;
     }
 }
@@ -329,13 +346,13 @@ sub tags_delete
     for my $tag (@$tags)
     {
 	$tag = eval { $di->search_related('tags',{tag => $tag})->first };
-	QVD::Admin4::Exception->throw(code => ($DB->storage->_dbh->state || 4),
+	QVD::Admin4::Exception->throw(code => $DB->storage->_dbh->state,
                                       message => "$@") if $@;
 	$tag || next;
 	$tag->fixed && QVD::Admin4::Exception->throw(code => 16);
 	($tag->tag eq 'head' || $tag->tag eq 'default') && QVD::Admin4::Exception->throw(code => 16);
 	eval { $tag->delete };
-	QVD::Admin4::Exception->throw(code => ($DB->storage->_dbh->state || 4),
+	QVD::Admin4::Exception->throw(code => $DB->storage->_dbh->state,
                                       message => "$@") if $@;
     }		
 }
@@ -353,8 +370,8 @@ sub add_acls_to_role
 
 	next if $role->is_allowed_to($acl->name);
 	$role->has_negative_acl($acl->name) ?
-	    $role->unassign_acls($acl->id) :
-	    $role->assign_acl($acl->id,1);
+	    $self->unassign_acls_to_role($role,$acl->id) :
+	    $self->assign_acl_to_role($role,$acl->id,1);
     }
 }
 
@@ -372,8 +389,8 @@ sub del_acls_to_role
 	next unless $role->is_allowed_to($acl->name);
 
 	$role->has_positive_acl($acl->name) ?
-	    $role->unassign_acls($acl->id) :
-	    $role->assign_acl($acl->id,0);
+	    $self->unassign_acls_to_role($role,$acl->id) :
+	    $self->assign_acl_to_role($role,$acl->id,0);
     }
 }
 
@@ -389,8 +406,8 @@ sub add_roles_to_role
 	    unless $role_to_assign;
 
 	my @acl_ids = [$role_to_assign->_get_inherited_acls(return_value => 'id')];
-	$this_role->unassign_acls(\@acl_ids);
-	$this_role->assign_role($role_to_assign->id);
+	$self->unassign_acls_to_role($this_role,\@acl_ids);
+	$self->assign_role_to_role($this_role,$role_to_assign->id);
     }
 }
 
@@ -404,33 +421,90 @@ sub del_roles_to_role
 	    {id => $role_to_unassign_id})->first;
 	QVD::Admin4::Exception->throw(code => 20) 
 	    unless $role_to_unassign;
-	$this_role->unassign_roles($role_to_unassign->id);
+
+	$self->unassign_roles_to_role($this_role,$role_to_unassign->id);
     }
 
     return unless @$roles_to_unassign; 
     my %acl_ids = map { $_ => 1 } $this_role->_get_only_inherited_acls(return_value => 'id');
 
-    defined $acl_ids{$_} || $this_role->unassign_acls($_,0)
+    defined $acl_ids{$_} || $self->unassign_acls_to_role($this_role,$_,0)
     for $this_role->_get_own_acls(return_value => 'id', positive => 0);
 }
+
+#############
+
+sub assign_acl_to_role
+{
+    my ($self,$role,$acl_id,$positive) = @_;
+
+    eval { $role->create_related('acl_rels', { acl_id => $acl_id,
+					       positive => $positive }) };
+    QVD::Admin4::Exception->throw(code => $DB->storage->_dbh->state,
+				  message => "$@") if $@;
+}
+
+sub unassign_acls_to_role
+{
+    my ($self,$role,$acl_ids) = @_;
+
+    for ($role->search_related('acl_rels', { acl_id => $acl_ids })->all)
+    {
+	eval { $_->delete };
+	QVD::Admin4::Exception->throw(code => $DB->storage->_dbh->state,
+				      message => "$@") if $@;
+    } 	
+}
+
+sub assign_role_to_role
+{
+    my ($self,$role,$role_id) = @_;
+
+    eval { $role->create_related('role_rels', { inherited_id => $role_id }) };
+    QVD::Admin4::Exception->throw(code => $DB->storage->_dbh->state,
+				  message => "$@") if $@;
+}
+
+sub unassign_roles_to_role
+{
+    my ($self,$role,$role_ids) = @_;
+
+    my $rs = $role->search_related('role_rels', { inherited_id => $role_ids });
+    for ($rs->all)
+    {
+	eval { $_->delete };
+	QVD::Admin4::Exception->throw(code => $DB->storage->_dbh->state,
+				      message => "$@") if $@;
+    }
+}
+
+###########
 
 sub del_roles_to_admin
 {
     my ($self,$role_ids,$admin) = @_;
-    $DB->resultset('Role_Administrator_Relation')->search(
-	{role_id => $role_ids,
-	 administrator_id => $admin->id})->delete_all;
+
+    eval{
+
+	$DB->resultset('Role_Administrator_Relation')->search(
+	    {role_id => $role_ids,
+	     administrator_id => $admin->id})->delete_all
+    };
+
+    QVD::Admin4::Exception->throw(code => $DB->storage->_dbh->state,
+				  message => "$@") if $@
 }
 
 sub add_roles_to_admin
 {
     my ($self,$role_ids,$admin) = @_;
 
-
     eval { $DB->resultset('Role_Administrator_Relation')->create(
 	       {role_id => $_,
 		administrator_id => $admin->id}) } for @$role_ids;
 }
+
+
 
 #############################
 ###### AD HOC FUNCTIONS #####
