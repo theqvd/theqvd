@@ -10,6 +10,8 @@ $| = 1;
 my $color = 1;
 my $prog = $ENV{PROGRAMFILES};
 my $swperl = 'C:\strawberry';
+my $gettext = "C:\\gettext";
+
 
 my @paths = (
 	"$prog\\Resource Hacker",
@@ -36,7 +38,14 @@ my @dlls = (
 	"$swperl\\c\\bin\\libeay32_.dll",
 	"$swperl\\c\\bin\\ssleay32_.dll",
 	"$swperl\\c\\bin\\zlib1_.dll",
-	"$swperl\\perl\\site\\lib\\auto\\Crypt\\OpenSSL\\X509\\X509.dll"
+	"$swperl\\perl\\site\\lib\\auto\\Crypt\\OpenSSL\\X509\\X509.dll",
+	"$swperl\\c\\bin\\libiconv-2_.dll",
+	"$gettext\\bin\\intl.dll",
+	"$gettext\\bin\\libasprintf-0.dll",
+	"$gettext\\bin\\libgcc_s_dw2-1.dll",
+	"$gettext\\bin\\libgettextlib-0-18-1.dll",
+	"$gettext\\bin\\libgettextpo-0.dll",
+	"$gettext\\bin\\libgettextsrc-0-18-1.dll"
 );
 
 foreach my $dir (@paths) {
