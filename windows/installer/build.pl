@@ -3,6 +3,7 @@ use strict;
 use Cwd;
 use Win32::Console::ANSI;
 use Term::ANSIColor;
+use File::Copy::Recursive qw(dircopy);
 
 $| = 1;
 
@@ -77,7 +78,9 @@ my $installer_dir = getcwd();
 chdir("..\\..\\ext\\QVD-Client") or die "Can't chdir to QVD-Client directory";
 run("Build.PL");
 run("Build");
-run("xcopy", "/s", "/y", "blib\\locale", "..\\..\\windows\\installer\\locale");
+
+msg("Copying locale files...\n");
+dircopy("blib\\locale", "..\\..\\windows\\installer\\locale") or die "Failed to copy locale files";
 chdir($installer_dir);
 
 
