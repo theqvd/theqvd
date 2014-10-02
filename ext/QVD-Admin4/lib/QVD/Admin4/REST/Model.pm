@@ -32,7 +32,7 @@ my $AVAILABLE_FILTERS = { list => { default => [],
 				    Host => [qw(id name address blocked frontend backend state vm_id creation_admin creation_date )],
 				    DI => [qw(id disk_image version osf_id osf_name tenant_id blocked tenant_name tag)],
 				    OSF => [qw(id name overlay user_storage memory vm_id di_id tenant_id tenant_name )],
-				    ACL => [qw(id name )],
+				    ACL => [qw(id name role_id admin_id)],
 				    Tenant => [qw(id name)],
 				    Role => [qw(name id )],
 				    Administrator => [qw(name tenant_id tenant_name id )]},
@@ -98,7 +98,7 @@ my $AVAILABLE_FIELDS = { list => { default => [],
 				   DI_Tag => [qw(osf_id name id )] },
 			 details => { default => [],
 				   OSF => [qw(id name overlay user_storage memory  number_of_vms number_of_dis properties )],
-				   Role => [qw(name acls roles id )],
+				   Role => [qw(name acls own_acls roles id )],
 				   DI => [qw(id disk_image version osf_id osf_name  blocked tags  properties )],
 				   VM => [qw(storage id name user_id user_name osf_id osf_name di_tag blocked expiration_soft expiration_hard 
                                           state host_id host_name  di_id user_state ip next_boot_ip ssh_port vnc_port serial_port 
@@ -204,7 +204,9 @@ my $FILTERS_TO_DBIX_FORMAT_MAPPER =
 
     ACL => {
 	'id' => 'me.id',
-	'name' => 'me.name'
+	'name' => 'me.name',
+	'role_id' => 'role.id',
+	'admin_id' => 'admin.id',
     },
 
     DI_Tag => {
@@ -344,6 +346,7 @@ my $FIELDS_TO_DBIX_FORMAT_MAPPER =
     Role => {
 	'name' => 'me.name',
 	'acls' => 'me.get_acls_info',
+	'own_acls' => 'me.get_positive_acls_info',
 	'roles' => 'me.get_roles_info',
 	'id' => 'me.id',
     },

@@ -230,33 +230,42 @@ sub unassign_roles
 sub get_acls_info
 {
     my $self = shift;
-    my $acls_info = [];
+    my $acls_info = {};
 
     for my $acl ($self->_get_inherited_acls(return_value => 'object'))
     {
 	my $acl_info = {};
 	$acl_info->{name} = $acl->name;
-	$acl_info->{roles} = [];
+	$acl_info->{roles} = {};
 
-	push @{$acl_info->{roles}},$self->name
+	$acl_info->{roles}->{$self->id} = $self->name
 	    if $self->has_positive_acl($acl->name);
 
 	for my $role (@{$self->get_roles})
 	{
-	    push @{$acl_info->{roles}}, $role->name
+	    $acl_info->{roles}->{$role->id} = $role->name
 		if $role->is_allowed_to($acl->name);
 	}
-	push @$acls_info, $acl_info;
+	$acls_info->{$acl->id} = $acl_info;
     }
-    [ sort { $a->{name} cmp $b->{name} } @$acls_info ];
+    $acls_info;
 }
 
 sub get_roles_info
 {
     my $self = shift;
-    [ sort { $a->{name} cmp $b->{name} }
-      map { { id => $_->id, name => $_->name } } 
-      @{$self->get_roles} ];
+    
+    my $out = {};
+    $out->{$_->id} = $_->name for @{$self->get_roles};
+    $out; 
+}
+
+sub get_positive_acls_info
+{
+    my $self = shift;
+    my $out = {};
+    $out->{$_->id} = $_->name for @{$self->get_positive_acls};
+    $out; 
 }
 
 

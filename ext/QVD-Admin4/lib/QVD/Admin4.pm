@@ -734,9 +734,10 @@ sub get_acls_in_roles
 {
     my ($self,$json_wrapper) = @_;
     my $id = $json_wrapper->get_filter_value('id') // 
-	QVD::Admin4::Exception->throw(code=>'10');
+        QVD::Admin4::Exception->throw(code=>'10');
+
     my $roles = 
-	[$DB->resultset('Role')->search({id => $id})->all];
+        [$DB->resultset('Role')->search({id => $id})->all];
     return $self->get_acls_in_role_or_admin($roles,$json_wrapper);
 }
 
@@ -744,9 +745,9 @@ sub get_acls_in_admins
 {
     my ($self,$json_wrapper) = @_;
     my $id = $json_wrapper->get_filter_value('id') // 
-	QVD::Admin4::Exception->throw(code=>'10');
+        QVD::Admin4::Exception->throw(code=>'10');
     my $admins = 
-	[$DB->resultset('Administrator')->search({id => $id})->all];
+        [$DB->resultset('Administrator')->search({id => $id})->all];
     return $self->get_acls_in_role_or_admin($admins,$json_wrapper);
 }
 
@@ -756,34 +757,46 @@ sub get_acls_in_role_or_admin
     my $acls_info = {};
     my $order_criteria = $json_wrapper->order_criteria;
     my $order_direction = $json_wrapper->order_direction // '-asc';
+    my $block = $json_wrapper->block;
+    my $offset = $json_wrapper->offset // 1;
 
     for my $role_or_admin (@$role_or_admins)
     {
-	for my $acl_info (@{$role_or_admin->get_acls_info})
-	{
-	    $acls_info->{$acl_info->{name}} = 
-	    { map { $_ => { name => $_, 
-			    id => $DB->resultset('Role')->find({name => $_})->id }} 
-	      @{$acl_info->{roles}} };
+	my $role_acls_info = $role_or_admin->get_acls_info;
+        for my $acl_id (keys %{$role_or_admin->get_acls_info})
+        {
+	    my $acl_info = $role_acls_info->{$acl_id}; 
+	    while (my ($role_id, $role_name) = each %{$acl_info->{roles}}) 
+	    {
+		$acls_info->{$acl_id}->{roles}->{$role_id} = $role_name;
+		$acls_info->{$acl_id}->{name} = $acl_info->{name};
+	    }
 	}
     }
 
-    my @acls_info = map { { name => $_, 
-			    roles => [values %{$acls_info->{$_}}] } } keys %$acls_info;
+    my @acls_info = map { { id => $_,
+			    name => $acls_info->{$_}->{name}, 
+                            roles => $acls_info->{$_}->{roles} } } keys %$acls_info;
 
     my $total_acls = @acls_info;
 
     if (@$order_criteria)
     {
-	@acls_info = $order_direction eq '-asc' ?
-	    sort { $a->{name} cmp $b->{name} } @acls_info :
-	    sort { $b->{name} cmp $a->{name} } @acls_info;
+        @acls_info = $order_direction eq '-asc' ?
+            sort { $a->{name} cmp $b->{name} } @acls_info :
+            sort { $b->{name} cmp $a->{name} } @acls_info;
+    }
+
+    if (defined $block)
+    {
+	my $s = ($block * $offset) - $block;
+	my $f = ($block * $offset) - 1;
+	@acls_info = @acls_info[$s .. $f];
     }
 
     { rows => \@acls_info,
       total => $total_acls };
 }
-
 
 ##################################
 ## GENERAL STATISTICS FUNCTIONS ##

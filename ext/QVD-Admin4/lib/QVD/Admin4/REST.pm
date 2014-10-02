@@ -275,19 +275,19 @@ role_all_ids => { type_of_action => 'all_ids',
 		      admin4method => 'select',
 		      qvd_object => 'Role'},
 
-get_acls_in_roles => { type_of_action => 'general',
-		      admin4method => 'get_acls_in_roles'},
-
-get_acls_in_admins => { type_of_action => 'general',
-		      admin4method => 'get_acls_in_admins'},
-
 acl_tiny_list => { type_of_action => 'tiny',
 		   admin4method => 'select',
 		   qvd_object => 'ACL'},
 
 acl_get_list => { type_of_action => 'list',
-		  admin4method => 'select',
+		  admin4method => 'acl_get_list',
 		  qvd_object => 'ACL'},
+
+get_acls_in_roles => { type_of_action => 'general',
+		      admin4method => 'get_acls_in_roles'},
+
+get_acls_in_admins => { type_of_action => 'general',
+		      admin4method => 'get_acls_in_admins'},
 
 acl_all_ids => { type_of_action => 'all_ids',
 		  admin4method => 'select',
@@ -390,7 +390,6 @@ sub process_query
    print $@ if $@;
    my $general_status = ($@ && (( $@->can('code') && $@->code) || 1)) || 0;
    my $individual_failures = ($@ && $@->can('failures')) ? $@->failures  : {};
-   
    my $response = eval {QVD::Admin4::REST::Response->new(qvd_object_model => $qvd_object_model,
 							  status   => $general_status,
 							  result   => $result,
@@ -407,7 +406,6 @@ sub process_query_without_qvd_object_model
     print $@ if $@;
     my $general_status = ($@ && (( $@->can('code') && $@->code) || 1)) || 0;
     my $individual_failures = ($@ && $@->can('failures')) ? $@->failures  : {};
-   
     my $response = eval { QVD::Admin4::REST::Response->new(status   => $general_status,
 							   result   => $result,
 							   failures => $individual_failures) };

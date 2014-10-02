@@ -19,12 +19,19 @@ __PACKAGE__->has_many(role_rels => 'QVD::DB::Result::ACL_Role_Relation', 'acl_id
 sub get_roles
 {
     my $self = shift;
-    map { $_->role } $self->roles;
+    map { $_->role } $self->role_rels;
 }
 
-sub get_roles_with_this_acl
+sub get_roles_ids
 {
     my $self = shift;
-    [map { $_->name } $self->get_roles];
+    map { $_->id } $self->get_roles;
 }
+
+sub get_roles_names
+{
+    my $self = shift;
+    map { $_->name } $self->get_roles;
+}
+
 1;
