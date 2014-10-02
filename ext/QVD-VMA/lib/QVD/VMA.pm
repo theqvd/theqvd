@@ -304,7 +304,7 @@ sub _save_nxagent_state_and_call_hook {
     DEBUG "_save_nxagent_state_and_call_hook: " . join(', ', @_);
 
     _save_nxagent_state(@_);
-    _call_printing_hook;
+    _call_printing_hook if $enable_printing;
     _call_state_hook;
 }
 sub _save_nxagent_pid   { _write_line($nxagent_pid_fn, shift) }
@@ -313,7 +313,7 @@ sub _delete_nxagent_state_and_pid_and_call_hook {
     DEBUG "deleting pid and state files";
     unlink $nxagent_pid_fn;
     unlink $nxagent_state_fn;
-    _call_printing_hook;
+    _call_printing_hook if $enable_printing;
     _call_state_hook;
 }
 
@@ -599,8 +599,7 @@ sub _make_nxagent_config {
     push @nx_args, 'slave=1' if $enable_slave;
     push @nx_args, $props{'qvd.client.nxagent.extra_args'} if ($props{'qvd.client.nxagent.extra_args'});
 
-    if ($enable_printing) {
-	# FIXME: check that printing is also enabled on the client
+    if ($enable_printing && $props{'qvd.client.printing.enabled'}) {
 	my $channel = $props{'qvd.client.os'} eq 'windows' ? 'smb' : 'cups';
 	push @nx_args, "$channel=$printing_port" ;
     }
