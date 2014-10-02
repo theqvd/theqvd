@@ -40,7 +40,7 @@ sub get_roles_info
     my $self = shift;
 
     my $out = {};
-    $out->{$_->id} = $_->name for @{$self->roles};
+    $out->{$_->id} = $_->name for $self->roles;
     $out; 
 }
 
