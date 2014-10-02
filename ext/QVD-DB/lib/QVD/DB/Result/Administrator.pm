@@ -53,8 +53,7 @@ sub get_acls_info
     {
 	for my $acl_info (@{$role->get_acls_info})
 	{
-	    $acls_info->{$acl_info->{name}} = 
-	    { map { $_ => 1 } @{$acl_info->{roles}}};
+	    $acls_info->{$acl_info->{name}}->{$role->name} = 1;
 	}
     }
  

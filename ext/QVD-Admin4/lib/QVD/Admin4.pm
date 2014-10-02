@@ -50,8 +50,8 @@ sub update
 {
     my ($self,$request,%modifiers) = @_;
     my $result = $self->select($request);
-    my $failures = {};
- 
+    QVD::Admin4::Exception->throw(code => 25) unless $result->{total};
+    my $failures = {}; 
     my $conditions = $modifiers{conditions} // [];
     my $methods_for_nested_queries = $modifiers{methods_for_nested_queries} // [];
 
@@ -59,7 +59,7 @@ sub update
     {
 	eval { $DB->txn_do( sub { $self->$_($obj) || QVD::Admin4::Exception->throw(code => 16)
 				      for @$conditions;
-#				  $self->is_a_trivial_update($obj,$request) && QVD::Admin4::Exception->throw(code => 25) ;
+
 				  eval { $obj->update($request->arguments) };
 				  QVD::Admin4::Exception->throw(code => $DB->storage->_dbh->state,
 								message => "$@") if $@;
@@ -77,9 +77,12 @@ sub update
 sub delete
 {
     my ($self,$request,%modifiers) = @_;
-    my $failures = {};
     my $result = $self->select($request);
+    QVD::Admin4::Exception->throw(code => 25) unless $result->{total};
+
+    my $failures = {};
     my $conditions = $modifiers{conditions} // [];
+
     for my $obj (@{$result->{rows}})
     {
          eval { $self->$_($obj) || QVD::Admin4::Exception->throw(code => 16)
@@ -745,7 +748,7 @@ sub di_no_head_default_tags
 ## GENERAL FUNCTIONS; WITHOUT REQUEST
 ######################################
 
-sub get_acls_in_role
+sub get_acls_in_roles
 {
     my ($self,$json_wrapper) = @_;
     my $id = $json_wrapper->get_filter_value('id') // 
@@ -755,7 +758,7 @@ sub get_acls_in_role
     return $self->get_acls_in_role_or_admin($roles,$json_wrapper);
 }
 
-sub get_acls_in_admin
+sub get_acls_in_admins
 {
     my ($self,$json_wrapper) = @_;
     my $id = $json_wrapper->get_filter_value('id') // 
@@ -777,12 +780,15 @@ sub get_acls_in_role_or_admin
 	for my $acl_info (@{$role_or_admin->get_acls_info})
 	{
 	    $acls_info->{$acl_info->{name}} = 
-	    { map { $_ => 1 } @{$acl_info->{roles}}};
+	    { map { $_ => { name => $_, 
+			    id => $DB->resultset('Role')->find({name => $_})->id }} 
+	      @{$acl_info->{roles}} };
 	}
     }
 
     my @acls_info = map { { name => $_, 
-			    roles => [keys %{$acls_info->{$_}}] } } keys %$acls_info;
+			    roles => [values %{$acls_info->{$_}}] } } keys %$acls_info;
+
     my $total_acls = @acls_info;
 
     if (@$order_criteria)

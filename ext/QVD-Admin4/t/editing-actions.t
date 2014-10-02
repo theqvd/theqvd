@@ -389,8 +389,8 @@ $t->post_ok('/' => json => { login    => 'superadmin',
 						   assign_acls => ['1'], 
 						   unassign_roles => ['6'], 
 						   unassign_acls => [] }}}) 
-    ->status_is(200, '2º role_update HTTP STATUS')
-    ->json_is('/status' => '0', '2º role_update API STATUS');
+    ->status_is(200, '4º role_update HTTP STATUS')
+    ->json_is('/status' => '0', '4º role_update API STATUS');
 
 
 ##

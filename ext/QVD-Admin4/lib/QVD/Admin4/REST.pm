@@ -275,11 +275,11 @@ role_all_ids => { type_of_action => 'all_ids',
 		      admin4method => 'select',
 		      qvd_object => 'Role'},
 
-get_acls_in_role => { type_of_action => 'general',
-		      admin4method => 'get_acls_in_role'},
+get_acls_in_roles => { type_of_action => 'general',
+		      admin4method => 'get_acls_in_roles'},
 
-get_acls_in_admin => { type_of_action => 'general',
-		      admin4method => 'get_acls_in_admin'},
+get_acls_in_admins => { type_of_action => 'general',
+		      admin4method => 'get_acls_in_admins'},
 
 acl_tiny_list => { type_of_action => 'tiny',
 		   admin4method => 'select',
