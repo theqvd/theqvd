@@ -39,8 +39,9 @@ sub get_roles_info
 {
     my $self = shift;
 
-    {  map { $_->id  => $_->name } 
-      $self->roles };
+    my $out = {};
+    $out->{$_->id} = $_->name for @{$self->roles};
+    $out; 
 }
 
 sub get_acls_info

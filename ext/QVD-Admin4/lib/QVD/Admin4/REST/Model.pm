@@ -98,13 +98,13 @@ my $AVAILABLE_FIELDS = { list => { default => [],
 				   DI_Tag => [qw(osf_id name id )] },
 			 details => { default => [],
 				   OSF => [qw(id name overlay user_storage memory  number_of_vms number_of_dis properties )],
-				   Role => [qw(name acls own_acls roles id )],
+				   Role => [qw(name acls roles id )],
 				   DI => [qw(id disk_image version osf_id osf_name  blocked tags  properties )],
 				   VM => [qw(storage id name user_id user_name osf_id osf_name di_tag blocked expiration_soft expiration_hard 
                                           state host_id host_name  di_id user_state ip next_boot_ip ssh_port vnc_port serial_port 
                                            creation_admin creation_date di_version di_name di_id properties )],
 				   ACL => [qw(id name)],
-				   Administrator => [qw(name  roles acls id )],
+				   Administrator => [qw(name  roles  id )],
 				   Tenant => [qw(id name)],
 				   User => [qw(id name  blocked creation_admin creation_date number_of_vms number_of_vms_connected  properties )],
 				   Host => [qw(id name address blocked frontend backend state  load creation_admin creation_date number_of_vms_connected number_of_vms properties )],
@@ -345,8 +345,8 @@ my $FIELDS_TO_DBIX_FORMAT_MAPPER =
 
     Role => {
 	'name' => 'me.name',
-	'acls' => 'me.get_acls_info',
-	'own_acls' => 'me.get_positive_acls_info',
+	'acls' => 'me.get_positive_acls_info',
+#	'own_acls' => 'me.get_positive_acls_info',
 	'roles' => 'me.get_roles_info',
 	'id' => 'me.id',
     },
