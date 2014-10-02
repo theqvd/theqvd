@@ -559,7 +559,8 @@ sub _on_l7r_connection {
     my $l7r = QVD::HKD::L7R->new(config => $self->{config},
                                  db => $self->{db},
                                  node_id => $self->{node_id},
-                                 on_stopped => weak_method_callback($self, '_on_l7r_stopped'));
+                                 on_stopped => weak_method_callback($self, '_on_l7r_stopped')) or
+              die "Couldn't create new L7R object";
     if (my $pid = $l7r->run($fh)) {
         INFO "New L7R process started, PID: $pid";
         $self->{l7r}{$pid} = $l7r;

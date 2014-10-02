@@ -38,12 +38,18 @@ sub new {
     my @args = ( host => cfg('l7r.address'),
                  port => cfg('l7r.port') );
     if(cfg('l7r.use_ssl')) {
+        if (!-r cfg('path.l7r.ssl.key'))  { ERROR sprintf "SSL key file '%s' isn't readable",  cfg('path.l7r.ssl.key'); }
+        if (!-r cfg('path.l7r.ssl.cert')) { ERROR sprintf "SSL cert file '%s' isn't readable", cfg('path.l7r.ssl.cert'); }
+        return;
         push @args, ( SSL           => 1,
                       SSL_key_file  => cfg('path.l7r.ssl.key'),
                       SSL_cert_file => cfg('path.l7r.ssl.cert'));
 
         # handle the case where we require the client to have a valid certificate:
         if (cfg('l7r.client.cert.require')) {
+            if (!-r cfg('path.l7r.ssl.ca'))  { ERROR sprintf "SSL ca file '%s' isn't readable",  cfg('path.l7r.ssl.ca'); }
+            if (!-r cfg('path.l7r.ssl.crl')) { ERROR sprintf "SSL crl file '%s' isn't readable", cfg('path.l7r.ssl.crl'); }
+            return;
             push @args, ( SSL_verify_mode => 0x03, # 0x01 => verify peer,
                                                    # 0x02 => fail verification if no peer certificate exists
                           SSL_ca_file     => cfg('path.l7r.ssl.ca'));
