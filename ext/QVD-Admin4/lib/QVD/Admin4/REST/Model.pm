@@ -84,7 +84,7 @@ my $AVAILABLE_FILTERS = { list => { default => [],
 				      Tenant => [qw(id)]} };
 
 my $AVAILABLE_FIELDS = { list => { default => [],
-				   OSF => [qw(id name overlay user_storage memory  number_of_vms number_of_dis )],
+				   OSF => [qw(id name overlay user_storage memory  number_of_vms number_of_dis properties )],
 				   Role => [qw(name roles acls id )],
 				   DI => [qw(id disk_image version osf_id osf_name blocked tags  properties )],
 				   VM => [qw(storage id name user_id user_name osf_id osf_name di_tag blocked expiration_soft expiration_hard 
@@ -97,7 +97,7 @@ my $AVAILABLE_FIELDS = { list => { default => [],
 				   Host => [qw(id name address blocked frontend backend state  load creation_admin creation_date number_of_vms_connected properties )],
 				   DI_Tag => [qw(osf_id name id )] },
 			 details => { default => [],
-				   OSF => [qw(id name overlay user_storage memory  number_of_vms number_of_dis )],
+				   OSF => [qw(id name overlay user_storage memory  number_of_vms number_of_dis properties )],
 				   Role => [qw(name acls roles id )],
 				   DI => [qw(id disk_image version osf_id osf_name  blocked tags  properties )],
 				   VM => [qw(storage id name user_id user_name osf_id osf_name di_tag blocked expiration_soft expiration_hard 
@@ -380,6 +380,7 @@ my $FIELDS_TO_DBIX_FORMAT_MAPPER =
 	'tenant_name' => 'tenant.name',
 	'number_of_vms' => 'me.vms_count',
 	'number_of_dis' => 'me.dis_count',
+	'properties' => 'me.get_properties_key_value',
     },
 
     VM => {

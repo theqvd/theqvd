@@ -59,7 +59,7 @@ sub update
     {
 	eval { $DB->txn_do( sub { $self->$_($obj) || QVD::Admin4::Exception->throw(code => 16)
 				      for @$conditions;
-				  $self->is_a_trivial_update($obj,$request);
+#				  $self->is_a_trivial_update($obj,$request) && QVD::Admin4::Exception->throw(code => 25) ;
 				  eval { $obj->update($request->arguments) };
 				  QVD::Admin4::Exception->throw(code => $DB->storage->_dbh->state,
 								message => "$@") if $@;
@@ -73,19 +73,6 @@ sub update
     $result;
 }
 
-sub is_a_trivial_update
-{
-    my ($self,$object,$request) = @_;
-
-    my $arguments = $request->arguments;
-    use Data::Dumper; print Dumper $arguments;
-    my %tables = %{$request->related_objects_arguments};
-    for (keys %tables)
-    {
-#	eval { $obj->$_->update($tables{$_}) }; 
-
-    }    
-}
 
 sub delete
 {
@@ -687,6 +674,27 @@ sub vm_stop
 ##########################
 ### AUXILIAR FUNCTIONS ###
 ##########################
+
+sub is_a_trivial_update
+{
+    my ($self,$object,$request) = @_;
+    
+    while (my ($arg_key,$arg_value) = each %{$request->arguments})
+    {
+	return 0 unless defined $object->$arg_key;
+	return 0 if $object->$arg_key ne $arg_value;
+    }
+
+    while (my ($related_obj, $arguments) = each %{$request->related_objects_arguments})
+    {
+	while (my ($arg_key,$arg_value) = each %{$request->related_objects_arguments})
+	{
+	    return 0 unless defined $object->$related_obj->$arg_key;
+	    return 0 if $object->$related_obj->$arg_key ne $arg_value;
+	}
+    }    
+    return 1;
+}
 
 my $lb;
 sub vm_assign_host {

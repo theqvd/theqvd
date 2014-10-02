@@ -77,7 +77,6 @@ sub tenant_name
     $self->tenant->name;
 }
 
-
 sub get_properties_key_value
 {
     my $self = shift;
