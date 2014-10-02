@@ -35,6 +35,7 @@ my $mapper =
     23 => 'Condition to update violated',
     24 => 'Problems when building response info',
     25 => 'Trivial operation. Nothing has been changed',
+    26 => 'Imposible to add role. No loops in inheritance relations allowed',
     23503 => 'Foreign Key violation',
     23502 => 'Lack of mandatory argument violation',
     23505 => 'Unique Key violation',

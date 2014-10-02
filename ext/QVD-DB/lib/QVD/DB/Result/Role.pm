@@ -94,9 +94,6 @@ sub build_master_roles_structure
 
     for my $nested_role (@{$self->get_roles})
     {
-	return ($nested_str,$flat_str) if
-	    defined $flat_str->{$nested_role->name};
-
 	my ($ns,$fs) = 
 	    $nested_role->build_master_roles_structure($nested_str->{$self->name}->{nested},
 						       $flat_str);
@@ -164,6 +161,7 @@ sub _get_inherited_acls
 
     my ($nested_str,$flat_str) = 
 	$self->build_master_roles_structure;
+
     my $acls =  $nested_str->{$self->name}->{acls};
 
     return keys %$acls if $mods{return_value} eq 'name';

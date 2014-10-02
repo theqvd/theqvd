@@ -459,6 +459,9 @@ sub assign_role_to_role
 {
     my ($self,$role,$role_id) = @_;
 
+    $role_id eq $_ && QVD::Admin4::Exception->throw(code => 26)
+	for $role->_get_inherited_roles(return_value => 'id');
+
     eval { $role->create_related('role_rels', { inherited_id => $role_id }) };
     QVD::Admin4::Exception->throw(code => $DB->storage->_dbh->state,
 				  message => "$@") if $@;
@@ -677,27 +680,6 @@ sub vm_stop
 ##########################
 ### AUXILIAR FUNCTIONS ###
 ##########################
-
-sub is_a_trivial_update
-{
-    my ($self,$object,$request) = @_;
-    
-    while (my ($arg_key,$arg_value) = each %{$request->arguments})
-    {
-	return 0 unless defined $object->$arg_key;
-	return 0 if $object->$arg_key ne $arg_value;
-    }
-
-    while (my ($related_obj, $arguments) = each %{$request->related_objects_arguments})
-    {
-	while (my ($arg_key,$arg_value) = each %{$request->related_objects_arguments})
-	{
-	    return 0 unless defined $object->$related_obj->$arg_key;
-	    return 0 if $object->$related_obj->$arg_key ne $arg_value;
-	}
-    }    
-    return 1;
-}
 
 my $lb;
 sub vm_assign_host {
