@@ -30,6 +30,7 @@ import android.widget.CompoundButton;
 import android.widget.EditText;
 import android.widget.Spinner;
 import android.widget.TextView;
+import com.theqvd.android.xpro.*;
 
 /**
  * @author Michael A. MacDonald

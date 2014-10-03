@@ -3,8 +3,6 @@
  */
 package android.androidVNC;
 
-import com.theqvd.android.xpro.R;
-
 import android.app.Activity;
 import android.app.Dialog;
 import android.content.pm.PackageInfo;
@@ -19,7 +17,7 @@ import android.view.View;
 import android.view.MenuItem.OnMenuItemClickListener;
 import android.widget.Button;
 import android.widget.TextView;
-
+import com.theqvd.android.xpro.*;
 /**
  * @author Michael A. MacDonald
  *

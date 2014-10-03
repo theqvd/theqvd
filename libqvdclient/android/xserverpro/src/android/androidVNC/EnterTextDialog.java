@@ -18,6 +18,7 @@ import android.view.View;
 import android.widget.Button;
 import android.widget.EditText;
 import android.widget.ImageButton;
+import com.theqvd.android.xpro.*;
 
 /**
  * @author Michael A. MacDonald

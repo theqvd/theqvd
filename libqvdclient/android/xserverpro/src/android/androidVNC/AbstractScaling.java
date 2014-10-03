@@ -3,9 +3,8 @@
  */
 package android.androidVNC;
 
-import com.theqvd.android.xpro.R;
-
 import android.widget.ImageView;
+import com.theqvd.android.xpro.*;
 
 /**
  * @author Michael A. MacDonald

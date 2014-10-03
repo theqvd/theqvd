@@ -56,12 +56,13 @@ public class VncViewerAndroid implements VncViewer {
 	}
 	@Override
 	public boolean isInstalled() {
-		return config.packageInstalled(vncpackage);
+		// It is bundled with XServerPro
+		return true;
 	}
 
 	@Override
 	public void install() {
-		config.installPackage(vncpackage);
+		// Noop
 	}
 	@Override
 	public String getButtonText() {

@@ -14,7 +14,6 @@ import android.widget.EditText;
 import com.antlersoft.android.bc.BCFactory;
 import com.antlersoft.android.contentxml.SqliteElement;
 import com.antlersoft.android.contentxml.SqliteElement.ReplaceStrategy;
-import com.theqvd.android.xpro.R;
 
 import java.io.File;
 import java.io.FileOutputStream;
@@ -23,11 +22,13 @@ import java.io.InputStreamReader;
 import java.io.OutputStreamWriter;
 import java.io.Reader;
 import java.io.Writer;
+
 import java.net.MalformedURLException;
 import java.net.URL;
 import java.net.URLConnection;
 
 import org.xml.sax.SAXException;
+import com.theqvd.android.xpro.*;
 
 /**
  * @author Michael A. MacDonald

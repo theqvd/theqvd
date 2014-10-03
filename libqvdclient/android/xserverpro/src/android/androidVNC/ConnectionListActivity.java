@@ -27,8 +27,8 @@ import android.os.Bundle;
 import android.view.View;
 import android.widget.ListView;
 import android.widget.SimpleCursorAdapter;
-
 import java.util.ArrayList;
+import com.theqvd.android.xpro.*;
 
 /**
  * @author Michael A. MacDonald
@@ -88,7 +88,7 @@ public class ConnectionListActivity extends ListActivity {
 		if (connection.Gen_read(database.getReadableDatabase(), id))
 		{
             // create shortcut if requested
-            ShortcutIconResource icon = Intent.ShortcutIconResource.fromContext(this, R.drawable.icon);
+            ShortcutIconResource icon = Intent.ShortcutIconResource.fromContext(this, R.drawable.ic_xvnc);
 
             Intent intent = new Intent();
             

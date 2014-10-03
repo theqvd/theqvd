@@ -5,7 +5,6 @@ package android.androidVNC;
 
 import com.antlersoft.android.db.FieldAccessor;
 import com.antlersoft.android.db.TableInterface;
-
 /**
  * Interface specification for table storing sent text; the last N text items sent are stored in a table
  * and will be recalled on demand

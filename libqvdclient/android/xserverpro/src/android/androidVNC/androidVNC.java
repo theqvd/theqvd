@@ -42,8 +42,7 @@ import android.widget.TextView;
 
 import java.util.ArrayList;
 import java.util.Collections;
-
-import com.theqvd.android.xpro.R;
+import com.theqvd.android.xpro.*;
 
 public class androidVNC extends Activity {
 	private EditText ipText;

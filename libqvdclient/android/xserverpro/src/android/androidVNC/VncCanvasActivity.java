@@ -25,8 +25,8 @@ import java.util.ArrayList;
 import java.util.List;
 
 import com.antlersoft.android.bc.BCFactory;
+
 import com.antlersoft.android.zoomer.ZoomControls;
-import com.theqvd.android.xpro.R;
 
 import android.app.Activity;
 import android.app.Dialog;
@@ -56,6 +56,7 @@ import android.widget.AdapterView.OnItemClickListener;
 import android.widget.Button;
 import android.view.inputmethod.InputMethodManager;
 import android.content.Context;
+import com.theqvd.android.xpro.*;
 
 public class VncCanvasActivity extends Activity {
 
