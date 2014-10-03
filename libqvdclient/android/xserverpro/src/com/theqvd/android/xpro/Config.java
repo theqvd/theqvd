@@ -37,7 +37,7 @@ import android.view.WindowManager;
  * 
  * Class to hold all the configuration strings + the persistent configuration
  * of the application stored in the property files
- * 
+ *
  * @author nito
  *
  */
