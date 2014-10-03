@@ -260,6 +260,23 @@ sub get_roles_info
     $out; 
 }
 
+
+sub get_roles_with_its_acls_info
+{
+    my $self = shift;
+    
+    my $out = {};
+
+    for (@{$self->get_roles})
+    {
+	$out->{$_->id}->{name} = $_->name;
+	$out->{$_->id}->{acls} = [$_->_get_inherited_acls];
+    }
+
+    $out; 
+}
+
+
 sub get_positive_acls_info
 {
     my $self = shift;

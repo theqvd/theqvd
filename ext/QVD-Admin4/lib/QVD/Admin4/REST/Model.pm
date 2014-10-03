@@ -347,7 +347,7 @@ my $FIELDS_TO_DBIX_FORMAT_MAPPER =
 	'name' => 'me.name',
 	'acls' => 'me.get_positive_acls_info',
 	'all_acls' => 'me.get_acls_info',
-	'roles' => 'me.get_roles_info',
+	'roles' => 'me.get_roles_with_its_acls_info',
 	'id' => 'me.id',
     },
 
