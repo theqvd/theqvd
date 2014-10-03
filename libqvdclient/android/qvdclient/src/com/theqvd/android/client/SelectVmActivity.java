@@ -20,7 +20,7 @@ public class SelectVmActivity extends ListActivity implements OnItemClickListene
 	public final static String returnedvmorder = "returned_vm_order";
     @Override
     public void onCreate(Bundle savedInstanceState) {
-    	tag = getResources().getString(R.string.app_name) + "-SelectVmActivity-" +java.util.Map.Entry.class.getSimpleName();
+    	tag = getResources().getString(R.string.app_name_qvd) + "-SelectVmActivity-" +java.util.Map.Entry.class.getSimpleName();
     	super.onCreate(savedInstanceState);
 //    	setContentView(R.layout.selectvm);
     	// Use Listview see tutorial in Android

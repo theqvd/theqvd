@@ -37,7 +37,7 @@ public class EditConnectionActivity extends Activity implements OnItemSelectedLi
 	
 	@Override
     public void onCreate(Bundle savedInstanceState) {
-    	tag = getResources().getString(R.string.app_name) + "-EditConnectionActivity-" +java.util.Map.Entry.class.getSimpleName();
+    	tag = getResources().getString(R.string.app_name_qvd) + "-EditConnectionActivity-" +java.util.Map.Entry.class.getSimpleName();
         super.onCreate(savedInstanceState);
         setContentView(R.layout.editconnection);
         Log.i(tag, "launched activity: EditConnectionActivity with currconnection:"+ConnectionDB.currconnection.dump());

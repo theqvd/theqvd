@@ -47,7 +47,7 @@ public class Qvdconnection implements Runnable {
 	Qvdconnection(QvdclientActivity context, Connection c, Handler h) {
 		this.activity = context;
 		setConnection(c);
-		tag = this.activity.getResources().getString(R.string.app_name) + "-Qvdconnection-" +java.util.Map.Entry.class.getSimpleName();
+		tag = this.activity.getResources().getString(R.string.app_name_qvd) + "-Qvdconnection-" +java.util.Map.Entry.class.getSimpleName();
 		handler = h;
 		certhandler = new AcceptUnknownCertHandler(activity, handler);
 		connectionprogress = new ConnectionProgress(activity);

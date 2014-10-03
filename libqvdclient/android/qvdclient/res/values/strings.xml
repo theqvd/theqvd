@@ -2,7 +2,7 @@
 <resources>
     <string name="version">1.9.4</string>
     <string name="changelog">1.9.4 07/04/2014 Support browsable url\n1.9.3 07/04/2013 Update xvncpro to 3.9\n1.9.2 03/2/2013 Update xncpro to 3.8\n1.9.1 07/01/2013 xvncpro update\n1.9 06/1/2013 Merged with xvncpro\n1.8 18/12/2023 Updated Xvnc support 24 bits and race condition bug\n1.7 5/10/2012 Updated Xvncpro\n1.6.1 05/10/2012 Xvnc bug fix\n1.6 04/10/2012 Support client certificates\n1.5 01/10/2012 Added rgb.txt file to X server\n1.4 22/09/2012 Minor correction in theme\n1.3 21/09/2012 Error in theme for older devices corrected\n1.2 19/09/2012 Fix theme to allow menus for Nexus 7\n1.1 Correct URL for the Xvncpro documentation\n1.0 New version:\n  includes embedded X server\n  support for Pocketview VNC\n  and improved security</string>
-    <string name="app_name">qvdclient</string>
+    <string name="app_name_qvd">qvdclient</string>
     <string name="description">descriptionvalue</string>
     <string name="username_text">login</string>
     <string name="password_text">password</string>
@@ -36,7 +36,7 @@
     <string name="help_url">http://theqvd.com/support/documentation</string>
     <string name="save">Save</string>
     <string name="newconnection">New Connection</string>
-    <string name="delete_connection">del</string>
+    <string name="delete_connection_short">del</string>
     <string name="unabletodelete_alert">You cannot delete the New Connection, it does not exist</string>
     <string name="unabletodelete_alerttitle">Unable to delete non saved connection</string>
     <string name="ok">OK</string>

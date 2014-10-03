@@ -115,7 +115,7 @@ public class ConnectionDB extends SQLiteOpenHelper {
     ConnectionDB(Context context) {
         super(context, db_name, null, db_version);
         ConnectionDB.context = context;
-    	tag = context.getResources().getString(R.string.app_name) + "-ConnectionDB-" +java.util.Map.Entry.class.getSimpleName();
+    	tag = context.getResources().getString(R.string.app_name_qvd) + "-ConnectionDB-" +java.util.Map.Entry.class.getSimpleName();
         db = getWritableDatabase();
         insertStatement = db.compileStatement(db_table_insert);
         deleteStatement = db.compileStatement(db_table_delete);
