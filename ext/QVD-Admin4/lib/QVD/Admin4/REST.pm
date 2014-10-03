@@ -280,7 +280,7 @@ acl_tiny_list => { type_of_action => 'tiny',
 		   qvd_object => 'ACL'},
 
 acl_get_list => { type_of_action => 'list',
-		  admin4method => 'acl_get_list',
+		  admin4method => 'select',
 		  qvd_object => 'ACL'},
 
 get_acls_in_roles => { type_of_action => 'general',

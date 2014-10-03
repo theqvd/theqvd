@@ -457,12 +457,15 @@ sub unassign_acls_to_role
 
 sub assign_role_to_role
 {
-    my ($self,$role,$role_id) = @_;
+    my ($self,$inheritor_role,$inherited_role_id) = @_;
 
-    $role_id eq $_ && QVD::Admin4::Exception->throw(code => 26)
-	for $role->_get_inherited_roles(return_value => 'id');
+    my $inherited_role = $DB->resultset('Role')->find({id => $inherited_role_id}) //
+	QVD::Admin4::Exception->throw(code => 20);
 
-    eval { $role->create_related('role_rels', { inherited_id => $role_id }) };
+    $inheritor_role->id eq $_ && QVD::Admin4::Exception->throw(code => 26)
+	for $inherited_role->_get_inherited_roles(return_value => 'id');
+
+    eval { $inheritor_role->create_related('role_rels', { inherited_id => $inherited_role_id }) };
     QVD::Admin4::Exception->throw(code => $DB->storage->_dbh->state,
 				  message => "$@") if $@;
 }
@@ -789,8 +792,11 @@ sub get_acls_in_role_or_admin
 
     if (defined $block)
     {
+	my $l = $total_acls - 1;
 	my $s = ($block * $offset) - $block;
 	my $f = ($block * $offset) - 1;
+	$f = $l if $f > $l;
+
 	@acls_info = @acls_info[$s .. $f];
     }
 
