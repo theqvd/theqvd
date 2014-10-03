@@ -85,7 +85,7 @@ my $AVAILABLE_FILTERS = { list => { default => [],
 
 my $AVAILABLE_FIELDS = { list => { default => [],
 				   OSF => [qw(id name overlay user_storage memory  number_of_vms number_of_dis properties )],
-				   Role => [qw(name roles acls id all_acls)],
+				   Role => [qw(name roles acls id )],
 				   DI => [qw(id disk_image version osf_id osf_name blocked tags  properties )],
 				   VM => [qw(storage id name user_id user_name osf_id osf_name di_tag blocked expiration_soft expiration_hard 
                                           state host_id host_name  di_id user_state ip next_boot_ip ssh_port vnc_port serial_port 
@@ -98,7 +98,7 @@ my $AVAILABLE_FIELDS = { list => { default => [],
 				   DI_Tag => [qw(osf_id name id )] },
 			 details => { default => [],
 				   OSF => [qw(id name overlay user_storage memory  number_of_vms number_of_dis properties )],
-				   Role => [qw(name acls roles id all_acls)],
+				   Role => [qw(name acls roles id )],
 				   DI => [qw(id disk_image version osf_id osf_name  blocked tags  properties )],
 				   VM => [qw(storage id name user_id user_name osf_id osf_name di_tag blocked expiration_soft expiration_hard 
                                           state host_id host_name  di_id user_state ip next_boot_ip ssh_port vnc_port serial_port 
@@ -345,8 +345,7 @@ my $FIELDS_TO_DBIX_FORMAT_MAPPER =
 
     Role => {
 	'name' => 'me.name',
-	'acls' => 'me.get_positive_acls_info',
-	'all_acls' => 'me.get_acls_info',
+	'acls' => 'me.get_positive_and_negative_acls_info',
 	'roles' => 'me.get_roles_with_its_acls_info',
 	'id' => 'me.id',
     },

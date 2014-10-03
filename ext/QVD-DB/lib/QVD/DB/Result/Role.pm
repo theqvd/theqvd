@@ -276,6 +276,14 @@ sub get_roles_with_its_acls_info
     $out; 
 }
 
+sub get_positive_and_negative_acls_info
+{
+    my $self = shift;
+    my $out = { positive => {}, negative => {}};
+    $out->{positive}->{$_->id} = $_->name for @{$self->get_positive_acls};
+    $out->{negative}->{$_->id} = $_->name for @{$self->get_negative_acls};
+    $out; 
+}
 
 sub get_positive_acls_info
 {
