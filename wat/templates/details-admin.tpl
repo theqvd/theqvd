@@ -20,21 +20,14 @@
         <td><i class="fa fa-graduation-cap"></i><span data-i18n>Assigned roles</span></td>
         <td>
             <%
-                var acls = [];
-                $.each(model.get('roles'), function (iAcl, acl) {
-                    acls.push(acl.name);
-                }); 
+                $.each(model.get('roles'), function (iRole, role) {
             %>
-                    
-            <%= acls.join('<br>') %>
+                    <a href="#/setup/role/<%= iRole %>" data-i18n="[title]Click for details">
+                        <span class="text"><%= role %></span>
+                    </a>
+            <%
+                }); 
+            %>  
         </td>
     </tr>
-    <tr>
-<!--
-    <td><i class="fa fa-sitemap"></i><span data-i18n>Inherited roles</span></td>
-        <td>
-            <%= JSON.stringify(model.get('roles')) %>
-        </td>
-    </tr>
--->
 </table>

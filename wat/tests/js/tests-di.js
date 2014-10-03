@@ -76,3 +76,4 @@ module( "Disk image tests", {
         
         deepEqual(callback.getCall(0).args[0], Wat.CurrentView.model, "Spied result and Backbone model should be equal");
     });
+

@@ -62,10 +62,10 @@ Wat.B = {
             this.bindEvent('click', '.js-add-acl-button', this.roleEditorBinds.addAcl);
 
             // Add inherited Role
-            this.bindEvent('click', '.js-add-inherit-role-button', this.roleEditorBinds.addRole);
+            this.bindEvent('click', '.js-add-role-button', this.roleEditorBinds.addRole);
 
             // Delete inherited Role
-            this.bindEvent('click', '.js-delete-inherit-role-button', this.roleEditorBinds.deleteRole);
+            this.bindEvent('click', '.js-delete-role-button', this.roleEditorBinds.deleteRole);
     },
     
     bindHomeEvents: function () {
@@ -192,7 +192,6 @@ Wat.B = {
         },
         
         hoverInMessage: function (e) {
-            $(e.target).css('opacity', 1);
             Wat.I.clearMessageTimeout();
         },
         
@@ -200,9 +199,7 @@ Wat.B = {
             if ($(e.target).find('.expandedMessage').css('display') != 'none') {
                 return;
             }
-            
-            $(e.target).css('opacity', 0.8);
-            
+                        
             // Error messages need to be closed manually
             if (!$(e.target).hasClass('error')) {
                 Wat.I.setMessageTimeout();
@@ -227,17 +224,7 @@ Wat.B = {
             // The current porperties are stored in hidden fields and the new properties in text fields
             // We will only store the current properties in a serialized list to remove them
             if (deletedPropType === 'hidden') {   
-                var deletedProps = $(this).parent().parent().parent().find('input.deleted-properties');
-
-                if (deletedProps.val() == "") {
-                    var deletedPropsList = [];
-                }
-                else {
-                    var deletedPropsList = JSON.parse(deletedProps.val().replace(/&quot;/g, '"'));
-                }
-            
-                deletedPropsList.push(deletedPropName);
-                deletedProps.val(JSON.stringify(deletedPropsList).replace(/"/g, '&quot;'));
+                Wat.CurrentView.deleteProps.push(deletedPropName);
             }
             
             // Remove two levels above the button (tr)
@@ -297,27 +284,57 @@ Wat.B = {
             
             $('select[name="role_acls"]').trigger('chosen:updated');
             
+            // If item was previously added, delete from add list. Otherwise, push to delete list
+            if ($.inArray(aclId, Wat.CurrentView.addACLs) != -1) {
+                Wat.CurrentView.addACLs.splice( $.inArray(aclId, Wat.CurrentView.addACLs), 1 );
+            }
+            else {
+                Wat.CurrentView.deleteACLs.push(aclId);
+            }
+            
             // Remove item
             $(this).parent().parent().remove();
         },
         addAcl: function () {
+            var aclId = $('select[name="role_acls"]').val();
+            var aclName = $('select[name="role_acls"] option:selected').html();
+            
+            var cellContent = '<i class="delete-acl-button js-delete-acl-button fa fa-trash-o" data-id="' + aclId + '" data-name="' + aclName + '"></i>\n' + aclName;
+            
+            $('<tr><td>' + cellContent + '</td></tr>').insertAfter('.manage-acls tr:first-child');
+            
+            $('select[name="role_acls"] option:selected').remove();
+            $('select[name="role_acls"]').trigger('chosen:updated');
+            
+            Wat.CurrentView.addACLs.push(aclId);
         },
         deleteRole: function () {
-            // Add deleted item to the select
             var roleId = $(this).attr('data-id');
-            var roleName = $(this).attr('data-name');
             
-            $('select[name="inherit_role"]').append('<option value="' + roleId + '">' + 
-                                                               roleName + 
-                                                               '<\/option>');
-            
-            $('select[name="inherit_role"]').trigger('chosen:updated');
-            
-            // Remove item
-            $(this).parent().parent().remove();
+            var filters = {
+                id: Wat.CurrentView.id
+            };
+            var arguments = {
+                "__acls_changes__": {
+                    unassign_roles: [roleId]
+                }
+            };
+
+            Wat.CurrentView.updateModel(arguments, filters, function() {Wat.CurrentView.embedContent()});
         },
         addRole: function () {
-            var role = $('select[name="inherit_role"]').val();
+            var roleId = $('select[name="role"]').val();
+            
+            var filters = {
+                id: Wat.CurrentView.id
+            };
+            var arguments = {
+                "__acls_changes__": {
+                    assign_roles: [roleId]
+                }
+            };
+            
+            Wat.CurrentView.updateModel(arguments, filters, function() {Wat.CurrentView.embedContent()});
         },
     }
 }

@@ -49,8 +49,8 @@ body {
     }
     
     .message-container {
-        position: absolute;
-        top: 60px;
+        position: fixed;
+        top: 0px;
 
         right: 5%;
         width: 90%;
@@ -62,11 +62,10 @@ body {
         padding: 12px 20px;
         border-bottom-left-radius: 20px;
         border-bottom-right-radius: 20px;
-        opacity: 0.9;
         border-top: 0px;
         color: $col_whiter;
         font-weight: bold;
-        z-index: 999;
+        z-index: 1001;
         display: none;
                 
         &.success {
@@ -222,12 +221,15 @@ body {
         @import "layout-login";
     }
 }
-   
+
+@import "layout-roles";
 @import "layout-editor";
 
 .footer {
     @extend %invisible;
 
+    z-index: 1000;
+    
     height: 30px;
     margin-top: 50px;
     text-align: center;

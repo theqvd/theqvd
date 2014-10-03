@@ -6,6 +6,12 @@ Wat.Views.AdminDetailsView = Wat.Views.DetailsView.extend({
 
     initialize: function (params) {
         this.model = new Wat.Models.Admin(params);
+                
+        this.setBreadCrumbs();
+       
+        // Clean previous item name
+        this.breadcrumbs.next.next.next.screen="";
+        
         
         this.params = params;
         
@@ -51,28 +57,34 @@ Wat.Views.AdminDetailsView = Wat.Views.DetailsView.extend({
         Wat.I.enableDataPickers();
                 
         var params = {
-            'action': 'tag_tiny_list',
-            'selectedId': this.model.get('di_tag'),
-            'controlName': 'di_tag',
+            'action': 'role_tiny_list',
+            'selectedId': '',
+            'controlName': 'role',
             'filters': {
-                'osf_id': this.model.get('osf_id')
-            },
-            'nameAsId': true
+            }
         };
 
         Wat.A.fillSelect(params);
         
-        Wat.I.chosenElement('[name="di_tag"]', 'single100');
+        $.each(this.model.get('roles'), function (iRole, role) {
+            $('select[name="role"] option[value="' + iRole + '"]').remove();
+        });
+        
+        Wat.I.chosenElement('[name="role"]', 'single100');
     },
     
     renderSide: function () {
         var sideContainer = '.' + this.cid + ' .bb-details-side1';
-        
+
         // Render ACLs list on side
         var params = {};
         params.whatRender = 'list';
         params.listContainer = sideContainer;
-        params.forceListColumns = {info: true, name: true, roles: true};
+        params.forceListColumns = {name: true};
+        // If Administrator has more than one role assigned, show origin of ACLs
+        if (this.model.attributes.roles.length > 1) {
+            params.forceListColumns.roles = true;
+        }
         params.forceSelectedActions = {};
         params.forceListActionButton = null;
         params.block = 5;
@@ -94,37 +106,17 @@ Wat.Views.AdminDetailsView = Wat.Views.DetailsView.extend({
         
         var context = $('.' + this.cid + '.editor-container');
         
-        var name = context.find('input[name="name"]').val();
-        var di_tag = context.find('select[name="di_tag"]').val(); 
-        var blocked = context.find('input[name="blocked"][value=1]').is(':checked');
-        
         var filters = {"id": this.id};
         var arguments = {
-            "__properties_changes__": properties,
-            "name": name,
-            "di_tag": di_tag,
-            "blocked": blocked ? 1 : 0
+            "__roles_changes__": {
+                assign_roles: this.addRoles,
+                unassign_roles: this.deleteRoles
+            }
         };
         
-        // If expire is checked
-        if (context.find('input.js-expire').is(':checked')) {
-            var expiration_soft = context.find('input[name="expiration_soft"]').val();
-            var expiration_hard = context.find('input[name="expiration_hard"]').val();
-            
-            if (expiration_soft != undefined) {
-                arguments['expiration_soft'] = expiration_soft;
-            }
-            
-            if (expiration_hard != undefined) {
-                arguments['expiration_hard'] = expiration_hard;
-            }
-        }
-        else {
-            // Delete the expiration if exist
-            arguments['expiration_soft'] = '';
-            arguments['expiration_hard'] = '';
-        }
-                
+        this.addRoles = [];
+        this.deleteRoles = [];
+        
         this.updateModel(arguments, filters, this.fetchDetails);
     },
     

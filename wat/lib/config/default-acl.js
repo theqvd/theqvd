@@ -54,8 +54,12 @@ Wat.I.formFilters[qvdObj] = {
 // Actions of the bottom of the list (those that will be done with selected items) configuration on list view
 Wat.I.selectedActions[qvdObj] = [
             {
-                'value': 'delete',
-                'text': 'Delete'
+                'value': 'disable',
+                'text': 'Disable'
+            },
+            {
+                'value': 'enable',
+                'text': 'Enable'
             }
         ];
 

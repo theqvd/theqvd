@@ -15,3 +15,4 @@ COL_BRAND_DARK = '#9a4008';
 
 QVD_OBJS_WITH_PROPERTIES = ['user', 'vm', 'host', 'osf', 'di'];
 QVD_OBJS_CLASSIFIED_BY_TENANT = ['user', 'vm', 'osf', 'di', 'admin'];
+QVD_OBJS_EXIST_IN_SUPERTENANT = ['role', 'admin'];

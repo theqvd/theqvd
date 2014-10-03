@@ -72,7 +72,23 @@ WatTests.values = {
             "user_storage": getRandomInt(),
             "tenant_id": 1
         },
-        di: {},
+        di: {
+            "__properties__" : {
+                "prop1": getRandomStr(),
+                "prop2": getRandomStr(),
+                "propN": getRandomStr()
+            },
+            "__tags__" : [
+                getRandomStr(),
+                getRandomStr(),
+                getRandomStr()
+            ],
+            "disk_image": getRandomStr(),
+            "version": getRandomStr(),
+            "blocked": getRandomStr() > 127 ? 1 : 0,
+            "tenant_id": 1,
+            "osf_id": 0
+        },
         tenant: {},
         admin: {},
         role: {},
@@ -89,7 +105,7 @@ WatTests.updateValues = {
                     "prop2" // Delete property
                 ]
             },
-            "blocked": WatTests.values.blocked ? 0 : 1, // Change blocked status
+            "blocked": WatTests.values.user.blocked ? 0 : 1, // Change blocked status
             "password": getRandomStr()
         },
         vm: {},
@@ -108,7 +124,26 @@ WatTests.updateValues = {
             "memory": getRandomInt(),
             "user_storage": getRandomInt()
         },
-        di: {},
+        di: {
+            "__properties_changes__" : {
+                "set": {
+                    "prop3": getRandomStr(), // Add new property
+                    "propN": getRandomStr()  // Update property
+                },
+                "delete": [
+                    "prop2" // Delete property
+                ]
+            },
+            "__tags_changes__" : {
+                "create": [
+                    getRandomStr() // Add new tag
+                ],
+                "delete": [
+                    WatTests.values.di.__tags__[0] // Delete property
+                ]
+            },
+            "blocked": WatTests.values.di.blocked ? 0 : 1 // Change blocked status
+        },
         tenant: {},
         admin: {},
         role: {},

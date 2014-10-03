@@ -1,0 +1,46 @@
+.acls-management {
+    select[multiple] {
+        width: 100%;
+    }
+
+    .roles-acls-calculated {
+        float: right;
+        font-weight: bold;
+    }
+
+    .inherited-role-wrapper {
+        width: auto;
+        margin: 5px;
+        float: left;
+    }
+    
+    .inherited-role-table {
+        width: auto;
+        min-width: 150px;
+        th {
+            .fa {
+                display: inline;
+                font-weight: normal;
+            }
+            
+            text-align: center;
+        }
+    }
+    
+    .button {
+        float: right;
+        margin-top: 5px;
+    }
+}
+
+.delete-property-button, .add-role-button, .delete-role-button, .add-acl-button, .delete-acl-button {
+    color: $col_brand;
+    cursor: pointer;
+}
+
+.role-acls-wrapper {
+    height: 175px;
+    overflow-y: auto;
+    overflow-x: hidden;
+    padding: 5px;
+}

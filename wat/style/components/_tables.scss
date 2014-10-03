@@ -52,6 +52,10 @@ table.expiration-table {
     table-layout: auto;
 }
 
+table.roles-inherit-table {
+    width: 100%;
+}
+
 .second_row {
     margin-top: 4px;
     color: lighten($col_blacker, 40);

@@ -21,7 +21,6 @@
         &>tbody>tr>td:first-child {
             font-weight: bold;
             min-width: 50%;
-            vertical-align: middle;
             text-align: right;
             // border-right: #ddd dotted 1px;
             // padding-right: 10px;
@@ -29,11 +28,6 @@
         
         td.fa:before {
             margin-right: 10px;
-        }
-        
-        .delete-property-button, .add-inherit-role-button, .delete-inherit-role-button, .add-acl-button, .delete-acl-button {
-            color: $col_brand;
-            cursor: pointer;
         }
 
         .custom-properties {

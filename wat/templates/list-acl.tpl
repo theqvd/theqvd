@@ -1,7 +1,7 @@
 <table class="list">
     <thead>
         <tr>
-            <%                
+            <%    
                 var printedColumns = 0;
                 $.each(columns, function(name, col) {
                     if (col.display == false) {
@@ -43,7 +43,7 @@
                         case 'roles':
             %>
                             <th>
-                                <%= i18n.t('Roles') %>
+                                <%= i18n.t('Role') %>
                             </th>
             <%
                             break;
@@ -81,7 +81,13 @@
 
                 %>
                                 <td>
+                                <%
+                                    if ($.inArray(filters.id, Object.keys(model.get('roles'))) == -1) {
+                                %>
                                     <input type="checkbox" class="check-it js-check-it" data-id="<%= model.get('id') %>" <%= checkedAttr %>>
+                                <%
+                                    }
+                                %>
                                 </td>
                 <%
                                 break;
@@ -115,7 +121,16 @@
                             case 'roles':
                 %>
                                 <td class="desktop">
-                                    <%= model.get('roles') %>
+                <%
+                    $.each(model.get('roles'), function (iRole, role) {
+                %>
+                        <a href="#/setup/role/<%= iRole %>" data-i18n="[title]Click for details">
+                            <span class="text"><%= role %></span>
+                        </a>
+                <%
+                    }); 
+                %>  
+
                                 </td>
                 <%
                                 break;

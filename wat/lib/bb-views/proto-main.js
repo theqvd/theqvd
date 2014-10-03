@@ -6,6 +6,11 @@ Wat.Views.MainView = Backbone.View.extend({
     // error/success/info
     messagetype: 'error',
     dialogConf: {},
+    deleteProps: [],
+    deleteACLs: [],
+    addACLs: [],
+    deleteRoles: [],
+    addRoles: [],
     
     initialize: function () {
         _.bindAll(this, 'render');
@@ -104,6 +109,9 @@ Wat.Views.MainView = Backbone.View.extend({
             };
 
             Wat.A.fillSelect(params);
+            
+            // Remove supertenant from tenant selector
+            $('select[name="tenant_id"] option[value="0"]').remove();
         }
 
         // Add specific parts of editor to dialog
@@ -161,16 +169,13 @@ Wat.Views.MainView = Backbone.View.extend({
             }
         }
         
-        // Store deleted properties from serialized list
-        var deletedPropsList = $('.' + this.cid + ' .deleted-properties').val();
-        if (deletedPropsList) {
-            deletedProps = JSON.parse(deletedPropsList.replace(/&quot;/g, '"'));
-        }
-        
         this.properties = {
             'set' : setProps, 
-            'delete': deletedProps
+            'delete': this.deleteProps
         };
+        
+        // Restore deleteProps array
+        this.deleteProps = [];
     },
     
     createModel: function (arguments, successCallback) {

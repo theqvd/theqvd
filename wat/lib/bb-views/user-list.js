@@ -45,6 +45,11 @@ Wat.Views.UserListView = Wat.Views.ListView.extend({
         if (password && password2 && password == password2) {
             arguments['password'] = password;
         }
+        
+        if (Wat.C.isSuperadmin) {
+            var tenant_id = context.find('select[name="tenant_id"]').val();
+            arguments['tenant_id'] = tenant_id;
+        }
                         
         this.createModel(arguments, this.fetchList);
     }

@@ -441,6 +441,7 @@ Wat.Views.ListView = Wat.Views.MainView.extend({
         var template = _.template(
             this.listTemplate, {
                 models: this.collection.models,
+                filters: this.collection.filters,
                 columns: this.columns,
                 selectedItems: this.selectedItems,
                 selectedAll: this.selectedAll
@@ -458,6 +459,9 @@ Wat.Views.ListView = Wat.Views.MainView.extend({
     // Fill filter selects 
     fetchFilters: function () {
         var that = this;
+                
+        var existsInSupertenant = $.inArray(that.qvdObj, QVD_OBJS_EXIST_IN_SUPERTENANT) != -1;
+
         $.each(this.formFilters, function(name, filter) {
             if (filter.type == 'select' && filter.fillable) {
                 var params = {
@@ -467,6 +471,12 @@ Wat.Views.ListView = Wat.Views.MainView.extend({
                 };
                 
                 Wat.A.fillSelect(params);
+
+                // In tenant case (except in admins list) has not sense show supertenant in filters
+                if (!existsInSupertenant && name == 'tenant') {
+                    // Remove supertenant from tenant selector
+                    $('select[name="tenant"] option[value="0"]').remove();
+                }
             }
         });
     },

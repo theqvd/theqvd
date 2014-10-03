@@ -8,7 +8,7 @@
     <tr>
         <td data-i18n>ACLs</td>
         <td>
-            <table class="manage-roles">
+            <table class="manage-acls">
                 <tr>
                     <td>
                         <i class="add-acl-button js-add-acl-button fa fa-plus-circle"></i>
@@ -16,11 +16,11 @@
                     </td>
                 </tr>
         <%
-            $.each(model.get('own_acls').positive, function (iAcl, acl) {
+            $.each(model.get('acls'), function (iAcl, acl) {
         %>
                 <tr>
                     <td>            
-                        <i class="delete-acl-button js-delete-acl-button fa fa-trash-o" data-id="<%= acl %>" data-name="<%= acl %>"></i>
+                        <i class="delete-acl-button js-delete-acl-button fa fa-trash-o" data-id="<%= iAcl %>" data-name="<%= acl %>"></i>
                         <%= acl %>
                     </td>
                 </tr>
@@ -36,17 +36,17 @@
             <table class="manage-roles">
                 <tr>
                     <td>
-                        <i class="add-inherit-role-button js-add-inherit-role-button fa fa-plus-circle"></i>
-                        <select name="inherit_role"></select>
+                        <i class="add-role-button js-add-role-button fa fa-plus-circle"></i>
+                        <select name="role"></select>
                     </td>
                 </tr>
         <%
-            $.each(model.get('inherited_roles'), function (iRole, role) {
+            $.each(model.get('roles'), function (iRole, role) {
         %>
                 <tr>
                     <td>            
-                        <i class="delete-inherit-role-button js-delete-inherit-role-button fa fa-trash-o" data-id="<%= iRole %>" data-name="<%= role.name %>"></i>
-                        <%= role.name %>
+                        <i class="delete-role-button js-delete-role-button fa fa-trash-o" data-id="<%= iRole %>" data-name="<%= role %>"></i>
+                        <%= role %>
                     </td>
                 </tr>
         <%

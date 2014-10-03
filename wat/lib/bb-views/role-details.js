@@ -7,6 +7,11 @@ Wat.Views.RoleDetailsView = Wat.Views.DetailsView.extend({
     initialize: function (params) {
         this.model = new Wat.Models.Role(params);
         
+        this.setBreadCrumbs();
+       
+        // Clean previous 
+        this.breadcrumbs.next.next.next.screen="";
+
         this.params = params;
         
         this.renderSetupCommon();
@@ -42,14 +47,39 @@ Wat.Views.RoleDetailsView = Wat.Views.DetailsView.extend({
         var params = {};
         params.whatRender = 'list';
         params.listContainer = sideContainer;
-        params.forceListColumns = {checks: true, info: true, name: true, roles: true};
-        //params.forceSelectedActions = {};
+        params.forceListColumns = {name: true, roles: true};
+        params.forceSelectedActions = {};
         params.forceListActionButton = null;
-        params.block = 5;
+        params.block = 10;
         params.filters = {"id": this.elementId};
         params.action = 'get_acls_in_roles';
         
         this.sideView = new Wat.Views.ACLListView(params);
+    },
+    
+    render: function () {
+        Wat.Views.DetailsView.prototype.render.apply(this);
+
+        var params = {
+            'action': 'role_tiny_list',
+            'selectedId': '',
+            'controlName': 'role',
+            'filters': {
+            }
+        };
+
+        Wat.A.fillSelect(params);
+        
+        // Remove from inherited roles selector, current role and already inherited ones
+        $('select[name="role"] option[value="' + this.elementId + '"]').remove();
+ 
+        $.each(this.model.get('roles'), function (iRole, role) {
+            $('select[name="role"] option[value="' + iRole + '"]').remove();
+        });
+        
+        Wat.I.chosenConfiguration();
+        
+        Wat.I.chosenElement('[name="role"]', 'advanced100');
     },
     
     embedContent: function () {
@@ -67,7 +97,7 @@ Wat.Views.RoleDetailsView = Wat.Views.DetailsView.extend({
         var params = {
             'action': 'role_tiny_list',
             'selectedId': '',
-            'controlName': 'inherit_role',
+            'controlName': 'role',
             'filters': {
             }
         };
@@ -75,12 +105,13 @@ Wat.Views.RoleDetailsView = Wat.Views.DetailsView.extend({
         Wat.A.fillSelect(params);
         
         // Remove from inherited roles selector, current role and already inherited ones
-        $('select[name="inherit_role"] option[value="' + this.elementId + '"]').remove();
-        $.each(this.model.get('inherited_roles'), function (roleId) {
-            $('select[name="inherit_role"] option[value="' + roleId + '"]').remove();
+        $('select[name="role"] option[value="' + this.elementId + '"]').remove();
+
+        $.each(this.model.get('roles'), function (iRole, role) {
+            $('select[name="role"] option[value="' + iRole + '"]').remove();
         });
         
-        Wat.I.chosenElement('[name="inherit_role"]', 'advanced');
+        Wat.I.chosenElement('[name="role"]', 'advanced100');
         
         
         var params = {
@@ -88,18 +119,17 @@ Wat.Views.RoleDetailsView = Wat.Views.DetailsView.extend({
             'selectedId': '',
             'controlName': 'role_acls',
             'filters': {
-            },
-            'nameAsId': true
+            }
         };
 
         Wat.A.fillSelect(params);
         
         // Remove from inherited roles selector, current role and already inherited ones
-        $.each(this.model.get('own_acls').positive, function (iAcl, acl) {
-            $('select[name="role_acls"] option[value="' + acl + '"]').remove();
+        $.each(this.model.get('acls'), function (iAcl, acl) {
+            $('select[name="role_acls"] option[value="' + iAcl + '"]').remove();
         });
         
-        Wat.I.chosenElement('[name="role_acls"]', 'advanced');
+        Wat.I.chosenElement('[name="role_acls"]', 'advanced100');
     },
     
     updateElement: function (dialog) {
@@ -109,42 +139,26 @@ Wat.Views.RoleDetailsView = Wat.Views.DetailsView.extend({
             return;
         }
         
-        // Properties to create, update and delete obtained from parent view
-        var properties = this.properties;
-        
         var context = $('.' + this.cid + '.editor-container');
         
         var name = context.find('input[name="name"]').val();
-        var di_tag = context.find('select[name="di_tag"]').val(); 
-        var blocked = context.find('input[name="blocked"][value=1]').is(':checked');
         
         var filters = {"id": this.id};
         var arguments = {
-            "__properties_changes__": properties,
             "name": name,
-            "di_tag": di_tag,
-            "blocked": blocked ? 1 : 0
+            "__acls_changes__": {
+                assign_acls: this.addACLs,
+                unassign_acls: this.deleteACLs,
+                assign_roles: this.addRoles,
+                unassign_roles: this.deleteRoles
+            }
         };
         
-        // If expire is checked
-        if (context.find('input.js-expire').is(':checked')) {
-            var expiration_soft = context.find('input[name="expiration_soft"]').val();
-            var expiration_hard = context.find('input[name="expiration_hard"]').val();
-            
-            if (expiration_soft != undefined) {
-                arguments['expiration_soft'] = expiration_soft;
-            }
-            
-            if (expiration_hard != undefined) {
-                arguments['expiration_hard'] = expiration_hard;
-            }
-        }
-        else {
-            // Delete the expiration if exist
-            arguments['expiration_soft'] = '';
-            arguments['expiration_hard'] = '';
-        }
-                
+        this.addACLs = [];
+        this.deleteACLs = [];
+        this.addRoles = [];
+        this.deleteRoles = [];
+        
         this.updateModel(arguments, filters, this.fetchDetails);
     },
     

@@ -44,7 +44,12 @@ Wat.Views.OSFListView = Wat.Views.ListView.extend({
         if (name) {
             arguments["name"] = name;
         }
-                        
+                 
+        if (Wat.C.isSuperadmin) {
+            var tenant_id = context.find('select[name="tenant_id"]').val();
+            arguments['tenant_id'] = tenant_id;
+        }
+        
         this.createModel(arguments, this.fetchList);
     },
     

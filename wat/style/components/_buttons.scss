@@ -45,3 +45,8 @@ a, button {
         @include button--disabled();
     }
 }
+
+.button-under-floating-box {
+    position: relative;
+    width: 100%;
+}
