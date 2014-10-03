@@ -276,6 +276,21 @@ sub get_roles_with_its_acls_info
     $out; 
 }
 
+sub number_of_acls
+{
+    my $self = shift;
+    my $roles_with_its_acls = $self->get_roles_with_its_acls_info;
+    my %acls;
+
+    while (my ($role_id,$role_info) = each %$roles_with_its_acls)
+    {
+	@acls{@{$role_info->{acls}}} = @{$role_info->{acls}};
+    }
+
+    my @acls = keys %acls;
+    my $acls = @acls;
+}
+
 sub get_positive_and_negative_acls_info
 {
     my $self = shift;
@@ -292,6 +307,5 @@ sub get_positive_acls_info
     $out->{$_->id} = $_->name for @{$self->get_positive_acls};
     $out; 
 }
-
 
 1;
