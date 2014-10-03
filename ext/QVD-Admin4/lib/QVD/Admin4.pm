@@ -177,10 +177,16 @@ sub update_role_acls
 
     my $nested_queries = $request->nested_queries // return;
     $nested_queries = $nested_queries->{__acls_changes__} // return;
+
+    $self->coherent_acls_nested_query($nested_queries) 
+	|| QVD::Admin4::Exception->throw(code=>'27');
+
     my $roles_assign_query = $nested_queries->{assign_roles};
-    my $acls_assign_query = $nested_queries->{assign_acls};
     my $roles_unassign_query = $nested_queries->{unassign_roles}; 
-    my $acls_unassign_query = $nested_queries->{unassign_acls}; 
+    my $positive_acls_assign_query = $nested_queries->{assign_positive_acls};
+    my $negative_acls_assign_query = $nested_queries->{assign_negative_acls};
+    my $positive_acls_unassign_query = $nested_queries->{unassign_positive_acls}; 
+    my $negative_acls_unassign_query = $nested_queries->{unassign_negative_acls}; 
 
     $self->add_roles_to_role($roles_assign_query,$obj)
 	if defined $roles_assign_query;
@@ -188,11 +194,50 @@ sub update_role_acls
     $self->del_roles_to_role($roles_unassign_query,$obj)
 	if defined $roles_unassign_query;
 
-    $self->add_acls_to_role($acls_assign_query,$obj)
-	if defined $acls_assign_query;
+    $self->add_acls_to_role($positive_acls_assign_query,$obj,1)
+	if defined $positive_acls_assign_query;
 
-    $self->del_acls_to_role($acls_unassign_query,$obj)
-	if defined $acls_unassign_query;
+    $self->add_acls_to_role($negative_acls_assign_query,$obj,0)
+	if defined $negative_acls_assign_query;
+
+    $self->del_acls_to_role($positive_acls_unassign_query,$obj)
+	if defined $positive_acls_unassign_query;
+
+    $self->del_acls_to_role($negative_acls_unassign_query,$obj)
+	if defined $negative_acls_unassign_query;
+}
+
+
+sub coherent_acls_nested_query
+{
+    my ($self,$nested_query) = @_;
+
+    $nested_query->{assign_positive_acls} //= [];
+    $nested_query->{assign_negative_acls} //= [];
+    $nested_query->{unassign_positive_acls} //= []; 
+    $nested_query->{unassign_negative_acls} //= []; 
+
+    my %positive_acls_to_assign = map { $_ => 1 } 
+    @{$nested_query->{assign_positive_acls}};
+    my %negative_acls_to_assign = map { $_ => 1 } 
+    @{$nested_query->{assign_negative_acls}};
+    my %positive_acls_to_unassign = map { $_ => 1 } 
+    @{$nested_query->{unassign_positive_acls}}; 
+    my %negative_acls_to_unassign = map { $_ => 1 } 
+    @{$nested_query->{unassign_negative_acls}}; 
+
+    exists $negative_acls_to_assign{$_} && return 0 
+	for (keys %positive_acls_to_assign);
+
+    exists $negative_acls_to_unassign{$_} && return 0 
+	for (keys %positive_acls_to_unassign);
+
+    exists $negative_acls_to_unassign{$_} && return 0 
+	for (keys %negative_acls_to_assign);
+
+    exists $positive_acls_to_unassign{$_} && return 0 
+	for (keys %positive_acls_to_assign);
+    return 1;
 }
 
 sub update_admin_roles
@@ -265,14 +310,22 @@ sub create_role_acls
 
     my $nested_queries = $request->nested_queries // return;
     $nested_queries = $nested_queries->{__acls__} // return;
+
+    $self->coherent_acls_nested_query($nested_queries) 
+	|| QVD::Admin4::Exception->throw(code=>'27');
+
     my $roles_assign_query = $nested_queries->{assign_roles};
-    my $acls_assign_query = $nested_queries->{assign_acls};
+    my $positive_acls_assign_query = $nested_queries->{assign_positive_acls};
+    my $negative_acls_assign_query = $nested_queries->{assign_negative_acls};
 
     $self->add_roles_to_role($roles_assign_query,$obj)
 	if defined $roles_assign_query;
 
-    $self->add_acls_to_role($acls_assign_query,$obj)
-	if defined $acls_assign_query;
+    $self->add_acls_to_role($positive_acls_assign_query,$obj,1)
+	if defined $positive_acls_assign_query;
+
+    $self->add_acls_to_role($negative_acls_assign_query,$obj,0)
+	if defined $negative_acls_assign_query;
 }
 
 sub create_admin_roles
@@ -358,7 +411,7 @@ sub tags_delete
 
 sub add_acls_to_role
 {
-    my ($self,$acl_ids,$role) = @_;
+    my ($self,$acl_ids,$role,$positive) = @_;
 
     for my $acl_id (@$acl_ids)
     { 	
@@ -367,10 +420,10 @@ sub add_acls_to_role
 	QVD::Admin4::Exception->throw(code => 21) 
 	    unless $acl; 
 
-	next if $role->is_allowed_to($acl->name);
-	$role->has_negative_acl($acl->name) ?
-	    $self->unassign_acls_to_role($role,$acl->id) :
-	    $self->assign_acl_to_role($role,$acl->id,1);
+#	next if $role->is_allowed_to($acl->name);
+#	$role->has_negative_acl($acl->name) ?
+#	    $self->unassign_acls_to_role($role,$acl->id) :
+	    $self->assign_acl_to_role($role,$acl->id,$positive);
     }
 }
 
@@ -385,11 +438,11 @@ sub del_acls_to_role
 	QVD::Admin4::Exception->throw(code => 21)
 	    unless $acl; 
 
-	next unless $role->is_allowed_to($acl->name);
-
-	$role->has_positive_acl($acl->name) ?
-	    $self->unassign_acls_to_role($role,$acl->id) :
-	    $self->assign_acl_to_role($role,$acl->id,0);
+#	next unless $role->is_allowed_to($acl->name);
+#	$role->has_positive_acl($acl->name) ?
+#	    $self->unassign_acls_to_role($role,$acl->id) :
+#	    $self->assign_acl_to_role($role,$acl->id,0);
+	$self->unassign_acls_to_role($role,$acl->id);
     }
 }
 
@@ -404,8 +457,8 @@ sub add_roles_to_role
 	QVD::Admin4::Exception->throw(code => 20) 
 	    unless $role_to_assign;
 
-	my @acl_ids = [$role_to_assign->_get_inherited_acls(return_value => 'id')];
-	$self->unassign_acls_to_role($this_role,\@acl_ids);
+#	my @acl_ids = [$role_to_assign->_get_inherited_acls(return_value => 'id')];
+#	$self->unassign_acls_to_role($this_role,\@acl_ids);
 	$self->assign_role_to_role($this_role,$role_to_assign->id);
     }
 }
@@ -424,11 +477,11 @@ sub del_roles_to_role
 	$self->unassign_roles_to_role($this_role,$role_to_unassign->id);
     }
 
-    return unless @$roles_to_unassign; 
-    my %acl_ids = map { $_ => 1 } $this_role->_get_only_inherited_acls(return_value => 'id');
+#    return unless @$roles_to_unassign; 
+#    my %acl_ids = map { $_ => 1 } $this_role->_get_only_inherited_acls(return_value => 'id');
 
-    defined $acl_ids{$_} || $self->unassign_acls_to_role($this_role,$_,0)
-    for $this_role->_get_own_acls(return_value => 'id', positive => 0);
+#    defined $acl_ids{$_} || $self->unassign_acls_to_role($this_role,$_,0)
+#    for $this_role->_get_own_acls(return_value => 'id', positive => 0);
 }
 
 #############
