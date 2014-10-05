@@ -77,7 +77,7 @@ public class QvdclientActivity extends Activity
     @Override
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        tag = getResources().getString(R.string.app_name) + "-QvdclientActivity-" +java.util.Map.Entry.class.getSimpleName();
+        tag = getResources().getString(R.string.app_name_qvd) + "-QvdclientActivity-" +java.util.Map.Entry.class.getSimpleName();
         connectiondb = new ConnectionDB(this.getBaseContext());
         Connection c = getLastConnection();
         ConnectionDB.currconnection = c != null ? c : ConnectionDB.currconnection;

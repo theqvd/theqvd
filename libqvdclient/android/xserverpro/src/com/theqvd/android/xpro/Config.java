@@ -104,7 +104,7 @@ public class Config {
 	
 	
 	public static String getAbout(String version) {
-		return "XVnc\nLicense: Licensed under the GPLv3.\nAuthor: Nito@Qindel.ES\nSponsored: http://theqvd.com\nVersion: "+version+"\nRevision: $Revision$\nDate: $Date$";
+		return "XVnc\nLicense: Licensed under the GPLv3.\nAuthor: support@theqvd.com\nSponsored: http://theqvd.com\nVersion: "+version+"\nRevision: $Revision$\nDate: $Date$";
 	}
 	// Class info
 	static final String tag = L.xvncbinary + "-Config-" +java.util.Map.Entry.class.getSimpleName();

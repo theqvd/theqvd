@@ -6,9 +6,9 @@
 	<classpathentry exported="true" kind="con" path="com.android.ide.eclipse.adt.LIBRARIES"/>
 	<classpathentry kind="lib" path="libs/qvdclientjni-0.2.0.jar"/>
 	<classpathentry exported="true" kind="con" path="com.android.ide.eclipse.adt.DEPENDENCIES"/>
-	<classpathentry combineaccessrules="false" kind="src" path="/ZoomerWithKeys"/>
-	<classpathentry kind="lib" path="/ZoomerWithKeys/bin/zoomerwithkeys.jar"/>
 	<classpathentry kind="lib" path="libs/com.antlersoft.android.contentxml.jar"/>
 	<classpathentry kind="lib" path="libs/com.antlersoft.android.db.jar"/>
+	<classpathentry combineaccessrules="false" kind="src" path="/ZoomerWithKeys"/>
+	<classpathentry kind="lib" path="/ZoomerWithKeys/bin/zoomerwithkeys.jar"/>
 	<classpathentry kind="output" path="bin/classes"/>
 </classpath>

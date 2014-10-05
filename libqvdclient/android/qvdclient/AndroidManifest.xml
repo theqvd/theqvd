@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="utf-8"?>
 <manifest xmlns:android="http://schemas.android.com/apk/res/android"
     package="com.theqvd.android.client"
-    android:versionCode="233710"
+    android:versionCode="248400"
     android:versionName="@string/version" >
 
     <uses-sdk android:minSdkVersion="8" android:targetSdkVersion="12"/>
@@ -56,7 +56,7 @@
 	      <category android:name="android.intent.category.LAUNCHER"></category>
 	    </intent-filter>
 	</activity>
-        <activity android:screenOrientation="landscape" android:configChanges="orientation|keyboardHidden" android:name="android.androidVNC.VncCanvasActivity">
+    <activity android:screenOrientation="landscape" android:configChanges="orientation|keyboardHidden" android:name="android.androidVNC.VncCanvasActivity">
 	  <intent-filter>
 	    <action android:name="android.intent.action.VIEW"></action>
 	  </intent-filter>
