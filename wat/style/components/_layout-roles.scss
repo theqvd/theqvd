@@ -1,4 +1,4 @@
-.acls-management {
+.acls-management {    
     select[multiple] {
         width: 100%;
     }
@@ -16,7 +16,7 @@
     
     .inherited-role-table {
         width: auto;
-        min-width: 150px;
+        min-width: 175px;
         th {
             .fa {
                 display: inline;
@@ -27,8 +27,21 @@
         }
     }
     
+    td.acls {
+        vertical-align: top;
+        .acls-list {
+            height:  150px;
+            overflow-x: auto;
+        }
+    }
+    
     .button {
         float: right;
+        margin-top: 5px;
+    }
+    
+    .side_to_side_select {
+        height: 150px;
         margin-top: 5px;
     }
 }
@@ -42,5 +55,14 @@
     height: 175px;
     overflow-y: auto;
     overflow-x: hidden;
-    padding: 5px;
+    padding: 0px;
+    
+    table {
+        width: 90%;
+    }
+}
+
+td[data-disabled] {
+    color: #aaa;
+    text-decoration: line-through;
 }

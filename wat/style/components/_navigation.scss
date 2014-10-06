@@ -160,7 +160,8 @@
 .side-menu {
     li {
         margin-bottom: 15px;
-        
+        cursor: pointer;
+
         a {
             &:before {
                 margin-right: 5px;
@@ -190,5 +191,15 @@
     
     @include in(desktop) {
         display: none;
+    }
+}
+
+
+.submenu ul {
+    margin-bottom: 20px;
+    float: right;
+    
+    .menu-option {
+        padding: 4px 8px 4px 8px;
     }
 }

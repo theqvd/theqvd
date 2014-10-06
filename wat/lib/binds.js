@@ -3,7 +3,7 @@ Wat.B = {
         this.bindMessageEvents();  
         this.bindEditorEvents();  
         this.bindNavigationEvents();  
-        this.bindFormEvents();  
+        this.bindFormEvents(); 
     },
     
     // Events binded in classic way to works in special places like jQueryUI dialog where Backbone events doesnt work
@@ -55,11 +55,17 @@ Wat.B = {
         
         // Roles editor
         
-            // Delete ACL
-            this.bindEvent('click', '.js-delete-acl-button', this.roleEditorBinds.deleteAcl);
+            // Delete positive ACL
+            this.bindEvent('click', '.js-delete-positive-acl-button', this.roleEditorBinds.deleteAcl, 'positive');
 
-            // Add ACL
-            this.bindEvent('click', '.js-add-acl-button', this.roleEditorBinds.addAcl);
+            // Add positive ACL
+            this.bindEvent('click', '.js-add-positive-acl-button', this.roleEditorBinds.addAcl, 'positive'); 
+        
+            // Delete negative ACL
+            this.bindEvent('click', '.js-delete-negative-acl-button', this.roleEditorBinds.deleteAcl, 'negative');
+
+            // Add negative ACL
+            this.bindEvent('click', '.js-add-negative-acl-button', this.roleEditorBinds.addAcl, 'negative');
 
             // Add inherited Role
             this.bindEvent('click', '.js-add-role-button', this.roleEditorBinds.addRole);
@@ -78,7 +84,9 @@ Wat.B = {
     },
     
     bindNavigationEvents: function () {
-        this.bindEvent('click', '.menu-option', this.navigationBinds.clickMenu);
+        this.bindEvent('click', '.menu-option[data-target]', this.navigationBinds.clickMenu);
+        
+        this.bindEvent('click', '.js-submenu-option', this.navigationBinds.clickSubMenu);
         
         this.bindEvent('click', '.js-mobile-menu-hamburger', this.navigationBinds.clickMenuMobile);
         
@@ -128,6 +136,17 @@ Wat.B = {
             var id = $(this).attr('data-target');
             window.location = '#/' + id;
             Wat.I.closeMessage();
+        },        
+        
+        // When click on a submenu option, show properly subsection
+        clickSubMenu: function() {
+            var submenu = $(this).attr('data-show-submenu');
+            
+            $(this).parent().find('li').removeClass('menu-option--selected');
+            $('table.acls-management').hide();
+            $(this).addClass('menu-option--selected');
+            $('table.' + submenu).show();
+            console.log('table.' + submenu);
         },
         
         clickMenuMobile: function () {
@@ -273,40 +292,69 @@ Wat.B = {
     },
     
     roleEditorBinds: {
-        deleteAcl: function () {
-            // Add deleted item to the select
-            var aclId = $(this).attr('data-id');
-            var aclName = $(this).attr('data-name');
+        deleteAcl: function (e) {
+            // type can be 'positive' or 'negative'
+            var type = e.data;
             
-            $('select[name="role_acls"]').append('<option value="' + aclId + '">' + 
-                                                               aclName + 
-                                                               '<\/option>');
+            var acls = $('select[name="acl_' + type + '_on_role"]').val();
             
-            $('select[name="role_acls"]').trigger('chosen:updated');
+            var filters = {
+                id: Wat.CurrentView.id
+            };
             
-            // If item was previously added, delete from add list. Otherwise, push to delete list
-            if ($.inArray(aclId, Wat.CurrentView.addACLs) != -1) {
-                Wat.CurrentView.addACLs.splice( $.inArray(aclId, Wat.CurrentView.addACLs), 1 );
-            }
-            else {
-                Wat.CurrentView.deleteACLs.push(aclId);
-            }
+            var changes = {};
+            changes["unassign_" + type + "_acls"] = acls;
             
-            // Remove item
-            $(this).parent().parent().remove();
+            var arguments = {
+                "__acls_changes__": changes
+            };
+            
+            Wat.CurrentView.updateModel(arguments, filters, function() {
+                Wat.CurrentView.model.fetch({      
+                    complete: function () {
+                        Wat.CurrentView.renderManagerInheritedRoles();
+                        Wat.CurrentView.renderManagerExcludedACLs();
+                        Wat.CurrentView.renderManagerACLs();
+                        Wat.CurrentView.renderSide();
+                        var selectedSubmenuOption = $('.js-submenu-option.menu-option--selected').attr('data-show-submenu');
+                        console.log(selectedSubmenuOption);
+                        $('.acls-management').hide();
+                        $('.' + selectedSubmenuOption).show();
+                    }
+                });
+            });
         },
-        addAcl: function () {
-            var aclId = $('select[name="role_acls"]').val();
-            var aclName = $('select[name="role_acls"] option:selected').html();
+        addAcl: function (e) {
+            // type can be 'positive' or 'negative'
+            var type = e.data;
             
-            var cellContent = '<i class="delete-acl-button js-delete-acl-button fa fa-trash-o" data-id="' + aclId + '" data-name="' + aclName + '"></i>\n' + aclName;
+            var acls = $('select[name="acl_' + type + '"]').val();
             
-            $('<tr><td>' + cellContent + '</td></tr>').insertAfter('.manage-acls tr:first-child');
+            var filters = {
+                id: Wat.CurrentView.id
+            };
             
-            $('select[name="role_acls"] option:selected').remove();
-            $('select[name="role_acls"]').trigger('chosen:updated');
+            var changes = {};
+            changes["assign_" + type + "_acls"] = acls;
             
-            Wat.CurrentView.addACLs.push(aclId);
+            var arguments = {
+                "__acls_changes__": changes
+            };
+            
+            Wat.CurrentView.updateModel(arguments, filters, function() {
+                Wat.CurrentView.model.fetch({      
+                    complete: function () {
+                        Wat.CurrentView.renderManagerInheritedRoles();
+                        Wat.CurrentView.renderManagerExcludedACLs();
+                        Wat.CurrentView.renderManagerACLs();
+                        Wat.CurrentView.renderSide();
+                        var selectedSubmenuOption = $('.js-submenu-option.menu-option--selected').attr('data-show-submenu');
+                        console.log(selectedSubmenuOption);
+                        $('.acls-management').hide();
+                        $('.' + selectedSubmenuOption).show();
+                    }
+                });
+            });
         },
         deleteRole: function () {
             var roleId = $(this).attr('data-id');
@@ -320,7 +368,15 @@ Wat.B = {
                 }
             };
 
-            Wat.CurrentView.updateModel(arguments, filters, function() {Wat.CurrentView.embedContent()});
+            
+            Wat.CurrentView.updateModel(arguments, filters, function() {
+                Wat.CurrentView.model.fetch({      
+                    complete: function () {
+                        Wat.CurrentView.renderManagerInheritedRoles();
+                        Wat.CurrentView.renderSide();
+                    }
+                });
+            });
         },
         addRole: function () {
             var roleId = $('select[name="role"]').val();
@@ -334,7 +390,14 @@ Wat.B = {
                 }
             };
             
-            Wat.CurrentView.updateModel(arguments, filters, function() {Wat.CurrentView.embedContent()});
+            Wat.CurrentView.updateModel(arguments, filters, function() {
+                Wat.CurrentView.model.fetch({      
+                    complete: function () {
+                        Wat.CurrentView.renderManagerInheritedRoles();
+                        Wat.CurrentView.renderSide();
+                    }
+                });
+            });
         },
     }
 }

@@ -451,8 +451,6 @@ Wat.I = {
         
         this.clearMessageTimeout();
         
-        //$("html, body").animate({ scrollTop: 0 }, 200);
-
         if (msg.expandedMessage) {
             var expandIcon = '<i class="fa fa-plus-square-o expand-message js-expand-message"></i>';
             var expandedMessage = '<article class="expandedMessage">' + msg.expandedMessage + '</article>';

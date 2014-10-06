@@ -124,9 +124,11 @@
                 <%
                     $.each(model.get('roles'), function (iRole, role) {
                 %>
-                        <a href="#/setup/role/<%= iRole %>" data-i18n="[title]Click for details">
-                            <span class="text"><%= role %></span>
-                        </a>
+                        <div>
+                            <a href="#/setup/role/<%= iRole %>">
+                                <span class="text"><%= role %></span>
+                            </a>
+                        </div>
                 <%
                     }); 
                 %>  

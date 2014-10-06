@@ -163,6 +163,8 @@
     "There are not properties": "There are not properties",
     "There are not tags": "There are not tags",
     "There are not VMS close to expire": "There are not VMS close to expire",
+    "Some ACLs cannot be excluded due are already defined in role": "Some ACLs are already defined in role and can't be excluded",
+    "Some ACLs cannot be added due are already excluded from role": "Some ACLs are already excluded from role and can't be added",
     "This action cannot be undone": "This action cannot be undone",
     "This virtual machine will expire": "This virtual machine will expire",
     "Type": "Type",

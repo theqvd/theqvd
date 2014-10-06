@@ -276,7 +276,8 @@ fieldset {
         border-bottom-right-radius: 7px; }
 
 .side-menu li {
-  margin-bottom: 15px; }
+  margin-bottom: 15px;
+  cursor: pointer; }
   .side-menu li a:before {
     margin-right: 5px;
     font-weight: normal; }
@@ -295,6 +296,12 @@ fieldset {
   @media screen and (min-width: 40em) {
     .mobile-menu {
       display: none; } }
+
+.submenu ul {
+  margin-bottom: 20px;
+  float: right; }
+  .submenu ul .menu-option {
+    padding: 4px 8px 4px 8px; }
 
 /********************************************************************
 *********************************************************************
@@ -1244,14 +1251,22 @@ body {
   float: left; }
 .acls-management .inherited-role-table {
   width: auto;
-  min-width: 150px; }
+  min-width: 175px; }
   .acls-management .inherited-role-table th {
     text-align: center; }
     .acls-management .inherited-role-table th .fa {
       display: inline;
       font-weight: normal; }
+.acls-management td.acls {
+  vertical-align: top; }
+  .acls-management td.acls .acls-list {
+    height: 150px;
+    overflow-x: auto; }
 .acls-management .button {
   float: right;
+  margin-top: 5px; }
+.acls-management .side_to_side_select {
+  height: 150px;
   margin-top: 5px; }
 
 .delete-property-button, .add-role-button, .delete-role-button, .add-acl-button, .delete-acl-button {
@@ -1262,7 +1277,13 @@ body {
   height: 175px;
   overflow-y: auto;
   overflow-x: hidden;
-  padding: 5px; }
+  padding: 0px; }
+  .role-acls-wrapper table {
+    width: 90%; }
+
+td[data-disabled] {
+  color: #aaa;
+  text-decoration: line-through; }
 
 .editor-container {
   margin: 0; }
@@ -2058,6 +2079,9 @@ div.tagsinput span.tag a {
 .not_valid {
   background: #ff3333 !important;
   color: #fdfdfd !important; }
+
+.chosen-container-multi input {
+  height: 25px !important; }
 
 /********************************************************************
 *********************************************************************

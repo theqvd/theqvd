@@ -60,6 +60,24 @@ Wat.Views.RoleDetailsView = Wat.Views.DetailsView.extend({
     render: function () {
         Wat.Views.DetailsView.prototype.render.apply(this);
 
+        this.renderManagerInheritedRoles();   
+        this.renderManagerACLs();
+        this.renderManagerExcludedACLs();
+        
+        // Trigger click on first menu option by default
+        $('[data-show-submenu="acls-management-acls"]').trigger('click');
+    },
+    
+    renderManagerInheritedRoles: function () {
+        var inheritedRolesTemplate = Wat.A.getTemplate('details-role-inherited-roles');
+        // Fill the html with the template and the model
+        this.template = _.template(
+            inheritedRolesTemplate, {
+                model: this.model
+            }
+        );
+        $('.bb-role-inherited-roles').html(this.template);
+        
         var params = {
             'action': 'role_tiny_list',
             'selectedId': '',
@@ -80,56 +98,74 @@ Wat.Views.RoleDetailsView = Wat.Views.DetailsView.extend({
         Wat.I.chosenConfiguration();
         
         Wat.I.chosenElement('[name="role"]', 'advanced100');
+    },    
+    
+    renderManagerACLs: function () {
+        var aclsRolesTemplate = Wat.A.getTemplate('details-role-acls');
+        $('.bb-role-acls').html(aclsRolesTemplate);
+        
+        var params = {
+            'action': 'acl_tiny_list',
+            'selectedId': '',
+            'controlName': 'acl_positive',
+            'filters': {
+            }
+        };
+
+        Wat.A.fillSelect(params);
+        
+        // Set selected acls on rigth side and delete it from left side
+        $.each(this.model.get('acls').positive, function (iAcl, acl) {
+            $('select[name="acl_positive"] option[value="' + iAcl + '"]').remove();
+            $('select[name="acl_positive_on_role"]').append('<option value="' + iAcl + '">' + acl + '</option>');
+        });   
+        
+        // Disable acls that exist in negative mode
+        $.each(this.model.get('acls').negative, function (iAcl, acl) {
+            $('select[name="acl_positive"] option[value="' + iAcl + '"]').remove();
+        });
+        
+        
+        var excludedRolesTemplate = Wat.A.getTemplate('details-role-excluded-acls');
+        $('.bb-role-excluded-acls').html(excludedRolesTemplate);
+        
+        var params = {
+            'action': 'acl_tiny_list',
+            'selectedId': '',
+            'controlName': 'acl_negative',
+            'filters': {
+            }
+        };
+
+        Wat.A.fillSelect(params);
+        
+        // Set selected acls on rigth side and delete it from left side
+        $.each(this.model.get('acls').negative, function (iAcl, acl) {
+            $('select[name="acl_negative"] option[value="' + iAcl + '"]').remove();
+            $('select[name="acl_negative_on_role"]').append('<option value="' + iAcl + '">' + acl + '</option>');
+        });
+        
+        // Disable acls that exist in positive mode
+        $.each(this.model.get('acls').positive, function (iAcl, acl) {
+            $('select[name="acl_negative"] option[value="' + iAcl + '"]').remove();
+        });
+    },    
+    
+    renderManagerExcludedACLs: function () {
+
     },
     
     embedContent: function () {
         $(this.secondaryContainer).html('<div class="bb-content-secondary"></div>');
 
         this.el = '.bb-content-secondary';
-        Wat.Views.DetailsView.prototype.initialize.apply(this, [this.params]);
+        Wat.Views.DetailsView.prototype.initialize.apply(this, [this.params]);        
     },
     
     openEditElementDialog: function(e) {
         this.dialogConf.title = $.i18n.t('Edit Role') + ": " + this.model.get('name');
         
         Wat.Views.DetailsView.prototype.openEditElementDialog.apply(this, [e]);
-                
-        var params = {
-            'action': 'role_tiny_list',
-            'selectedId': '',
-            'controlName': 'role',
-            'filters': {
-            }
-        };
-
-        Wat.A.fillSelect(params);
-        
-        // Remove from inherited roles selector, current role and already inherited ones
-        $('select[name="role"] option[value="' + this.elementId + '"]').remove();
-
-        $.each(this.model.get('roles'), function (iRole, role) {
-            $('select[name="role"] option[value="' + iRole + '"]').remove();
-        });
-        
-        Wat.I.chosenElement('[name="role"]', 'advanced100');
-        
-        
-        var params = {
-            'action': 'acl_tiny_list',
-            'selectedId': '',
-            'controlName': 'role_acls',
-            'filters': {
-            }
-        };
-
-        Wat.A.fillSelect(params);
-        
-        // Remove from inherited roles selector, current role and already inherited ones
-        $.each(this.model.get('acls'), function (iAcl, acl) {
-            $('select[name="role_acls"] option[value="' + iAcl + '"]').remove();
-        });
-        
-        Wat.I.chosenElement('[name="role_acls"]', 'advanced100');
     },
     
     updateElement: function (dialog) {
@@ -145,19 +181,8 @@ Wat.Views.RoleDetailsView = Wat.Views.DetailsView.extend({
         
         var filters = {"id": this.id};
         var arguments = {
-            "name": name,
-            "__acls_changes__": {
-                assign_acls: this.addACLs,
-                unassign_acls: this.deleteACLs,
-                assign_roles: this.addRoles,
-                unassign_roles: this.deleteRoles
-            }
+            "name": name
         };
-        
-        this.addACLs = [];
-        this.deleteACLs = [];
-        this.addRoles = [];
-        this.deleteRoles = [];
         
         this.updateModel(arguments, filters, this.fetchDetails);
     },
