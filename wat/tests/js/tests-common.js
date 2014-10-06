@@ -1,5 +1,6 @@
+// XML Output in jUnit style for jenkins integration
 QUnit.jUnitReport = function(data) {
-    //console.log(data.xml);
+    console.log(data.xml);
 };
 
 module( "Backbone tests", {
