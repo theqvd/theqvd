@@ -86,6 +86,7 @@ sub map_dbix_object_to_output_info
 		       $dbix_object->$table->$column } // undef;
 	print $@ if $@;
     }
+#    $result->{kk} = $dbix_object->get_column('kk');
     $result;
 }
 

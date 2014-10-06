@@ -786,76 +786,60 @@ sub di_no_head_default_tags
 ## GENERAL FUNCTIONS; WITHOUT REQUEST
 ######################################
 
-sub get_acls_in_roles
-{
-    my ($self,$json_wrapper) = @_;
-    my $id = $json_wrapper->get_filter_value('id') // 
-        QVD::Admin4::Exception->throw(code=>'10');
-
-    my $roles = 
-        [$DB->resultset('Role')->search({id => $id})->all];
-    return $self->get_acls_in_role_or_admin($roles,$json_wrapper);
-}
-
 sub get_acls_in_admins
 {
     my ($self,$json_wrapper) = @_;
-    my $id = $json_wrapper->get_filter_value('id') // 
+    my $admin_ids = $json_wrapper->get_filter_value('id') // 
         QVD::Admin4::Exception->throw(code=>'10');
-    my $admins = 
-        [$DB->resultset('Administrator')->search({id => $id})->all];
-    return $self->get_acls_in_role_or_admin($admins,$json_wrapper);
+    $admin_ids = [$admin_ids] unless ref($admin_ids); 
+
+    my %distinct_role_ids;
+
+    for my $admin ($DB->resultset('Administrator')->search({id => $admin_ids})->all)
+    {
+	$distinct_role_ids{$_->id} = 1 for  $admin->roles;
+    }
+
+    my $role_ids = [keys %distinct_role_ids];
+
+    $json_wrapper->forze_filter_deletion('id');
+    $json_wrapper->forze_filter_addition('id',$role_ids);
+
+    return $self->get_acls_in_roles($json_wrapper);
 }
 
-sub get_acls_in_role_or_admin
+
+sub get_acls_in_roles
 {
-    my ($self,$role_or_admins,$json_wrapper) = @_;
-    my $acls_info = {};
-    my $order_criteria = $json_wrapper->order_criteria;
+    my ($self,$json_wrapper) = @_;
+    my $role_ids = $json_wrapper->get_filter_value('id') // 
+        QVD::Admin4::Exception->throw(code=>'10');
+    $role_ids = [$role_ids] unless ref($role_ids); 
+    my $roles = [$DB->resultset('Role')->search({id => $role_ids})->all];
+    my %acls_ids;
+
+    for my $role (@$roles)
+    {
+	$acls_ids{$_} = 1 for $role->_get_inherited_acls(return_value => 'id');
+    }
+
+    my $acls_ids = [keys %acls_ids];
+    my $order_criteria = $json_wrapper->order_criteria // [];
     my $order_direction = $json_wrapper->order_direction // '-asc';
-    my $block = $json_wrapper->block;
+    my $block = $json_wrapper->block // 10000;
     my $offset = $json_wrapper->offset // 1;
 
-    for my $role_or_admin (@$role_or_admins)
-    {
-	my $role_acls_info = $role_or_admin->get_acls_info;
-        for my $acl_id (keys %{$role_or_admin->get_acls_info})
-        {
-	    my $acl_info = $role_acls_info->{$acl_id}; 
-	    while (my ($role_id, $role_name) = each %{$acl_info->{roles}}) 
-	    {
-		$acls_info->{$acl_id}->{roles}->{$role_id} = $role_name;
-		$acls_info->{$acl_id}->{name} = $acl_info->{name};
-	    }
-	}
-    }
+    my $modifiers = { order_by => 
+		      { $order_direction => $order_criteria },
+                      page => $block,
+		      rows => $offset };
 
-    my @acls_info = map { { id => $_,
-			    name => $acls_info->{$_}->{name}, 
-                            roles => $acls_info->{$_}->{roles} } } keys %$acls_info;
+    my $acls_rs = $DB->resultset('ACL')->search({id => $acls_ids});
 
-    my $total_acls = @acls_info;
-
-    if (@$order_criteria)
-    {
-        @acls_info = $order_direction eq '-asc' ?
-            sort { $a->{name} cmp $b->{name} } @acls_info :
-            sort { $b->{name} cmp $a->{name} } @acls_info;
-    }
-
-    if (defined $block)
-    {
-	my $l = $total_acls - 1;
-	my $s = ($block * $offset) - $block;
-	my $f = ($block * $offset) - 1;
-	$f = $l if $f > $l;
-
-	@acls_info = @acls_info[$s .. $f];
-    }
-
-    { rows => \@acls_info,
-      total => $total_acls };
+   { total => ($acls_rs->is_paged ? $acls_rs->pager->total_entries : $acls_rs->count), 
+     rows => [map { $_->get_name_id_and_roles($roles) } $acls_rs->all] };
 }
+
 
 ##################################
 ## GENERAL STATISTICS FUNCTIONS ##
@@ -991,3 +975,75 @@ sub get_the_most_populated_hosts
 
 1;
 
+#
+#sub get_acls_in_roles
+#{
+#    my ($self,$json_wrapper) = @_;
+#    my $id = $json_wrapper->get_filter_value('id') // 
+#        QVD::Admin4::Exception->throw(code=>'10');
+#
+#    my $roles = 
+#        [$DB->resultset('Role')->search({id => $id})->all];
+#    return $self->get_acls_in_role_or_admin($roles,$json_wrapper);
+#}
+#
+#sub get_acls_in_admins
+#{
+#    my ($self,$json_wrapper) = @_;
+#    my $id = $json_wrapper->get_filter_value('id') // 
+#        QVD::Admin4::Exception->throw(code=>'10');
+#    my $admins = 
+#        [$DB->resultset('Administrator')->search({id => $id})->all];
+#    return $self->get_acls_in_role_or_admin($admins,$json_wrapper);
+#}
+#
+#sub get_acls_in_role_or_admin
+#{
+#    my ($self,$role_or_admins,$json_wrapper) = @_;
+#    my $acls_info = {};
+#    my $order_criteria = $json_wrapper->order_criteria;
+#    my $order_direction = $json_wrapper->order_direction // '-asc';
+#    my $block = $json_wrapper->block;
+#    my $offset = $json_wrapper->offset // 1;
+#
+#    for my $role_or_admin (@$role_or_admins)
+#    {
+#	my $role_acls_info = $role_or_admin->get_acls_info;
+#        for my $acl_id (keys %{$role_or_admin->get_acls_info})
+#        {
+#	    my $acl_info = $role_acls_info->{$acl_id}; 
+#	    while (my ($role_id, $role_name) = each %{$acl_info->{roles}}) 
+#	    {
+#		$acls_info->{$acl_id}->{roles}->{$role_id} = $role_name;
+#		$acls_info->{$acl_id}->{name} = $acl_info->{name};
+#	    }
+#	}
+#    }
+#
+#    my @acls_info = map { { id => $_,
+#			    name => $acls_info->{$_}->{name}, 
+#                            roles => $acls_info->{$_}->{roles} } } keys %$acls_info;
+#
+#    my $total_acls = @acls_info;
+#
+#    if (@$order_criteria)
+#    {
+#        @acls_info = $order_direction eq '-asc' ?
+#            sort { $a->{name} cmp $b->{name} } @acls_info :
+#            sort { $b->{name} cmp $a->{name} } @acls_info;
+#    }
+#
+#    if (defined $block)
+#    {
+#	my $l = $total_acls - 1;
+#	my $s = ($block * $offset) - $block;
+#	my $f = ($block * $offset) - 1;
+#	$f = $l if $f > $l;
+#
+#	@acls_info = @acls_info[$s .. $f];
+#    }
+#
+#    { rows => \@acls_info,
+#      total => $total_acls };
+#}
+#

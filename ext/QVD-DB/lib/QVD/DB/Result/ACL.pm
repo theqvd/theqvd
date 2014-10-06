@@ -34,4 +34,16 @@ sub get_roles_names
     map { $_->name } $self->get_roles;
 }
 
+sub get_name_id_and_roles
+{
+    my ($self,$roles) = @_;
+    my $out = { id => $self->id, name => $self->name};
+    my @roles = $roles ? 
+	grep { $_->is_allowed_to($self->name) } @$roles : 
+	$self->roles;
+
+    $out->{roles}->{$_->id} = $_->name for @roles;
+    $out;
+}
+
 1;
