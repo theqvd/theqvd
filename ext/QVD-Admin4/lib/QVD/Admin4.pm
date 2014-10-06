@@ -831,10 +831,10 @@ sub get_acls_in_roles
 
     my $modifiers = { order_by => 
 		      { $order_direction => $order_criteria },
-                      page => $block,
-		      rows => $offset };
+                      page => $offset,
+		      rows => $block };
 
-    my $acls_rs = $DB->resultset('ACL')->search({id => $acls_ids});
+    my $acls_rs = $DB->resultset('ACL')->search({id => $acls_ids},$modifiers);
 
    { total => ($acls_rs->is_paged ? $acls_rs->pager->total_entries : $acls_rs->count), 
      rows => [map { $_->get_name_id_and_roles($roles) } $acls_rs->all] };
