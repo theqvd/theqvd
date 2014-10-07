@@ -1,9 +1,3 @@
-<%
-    var totalAddedACLs = Object.keys(model.get('acls').positive).length;
-    var totalFilteredACLs = Object.keys(model.get('acls').negative).length;
-    var totalInheritedACLs = model.get('number_of_acls');
-%>
-
 <div class="details-header">
     <span class="fa fa-graduation-cap h1" data-i18n><%= model.get('name') %></span>
     <a class="button button-right js-button-edit fa fa-pencil" href="javascript:" data-i18n>Edit</a>
@@ -37,6 +31,5 @@
     </ul>
 </div>
 
-<div class="bb-role-inherited-roles"></div>
-<div class="bb-role-acls"></div>
-<div class="bb-role-excluded-acls"></div>
+<div class="bb-role-inherited-roles role-inherited-roles"></div>
+<div class="bb-role-acls role-acls"></div>

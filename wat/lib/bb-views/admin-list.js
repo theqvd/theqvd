@@ -84,7 +84,12 @@ Wat.Views.AdminListView = Wat.Views.ListView.extend({
             "password": password,
             "tenant": tenant
         };
-                            
+                   
+        
+        if (Wat.C.isSuperadmin) {
+            var tenant_id = context.find('select[name="tenant_id"]').val();
+            arguments['tenant_id'] = tenant_id;
+        }
         this.createModel(arguments, this.fetchList);
     },
 });

@@ -75,7 +75,7 @@
 
     background-repeat: repeat-x;
 
-    border: solid 1px lighten($col_brand, 10);
+    border: solid 1px lighten($col_back, 10);
 
     -webkit-box-shadow: none;
        -moz-box-shadow: none;
@@ -83,7 +83,7 @@
 
     &:hover {
         cursor: pointer;
-        border-color: darken($col_brand, 10);
+        border-color: darken($col_back, 10);
         
         &:before {
             color: $col;

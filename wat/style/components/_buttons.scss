@@ -22,6 +22,14 @@ a, button {
     
     &.button2 {
         @include button($col_brand, $col_whiter);
+    }    
+    
+    &.button--green {
+        @include button($col_whiter, darken($col_green, 20));
+    }
+    
+    &.button--red {
+        @include button($col_whiter, darken($col_red, 20));
     }
     
     &.disabled {
@@ -49,4 +57,8 @@ a, button {
 .button-under-floating-box {
     position: relative;
     width: 100%;
+}
+
+.button-icon:before {
+    margin: 0px !important;
 }

@@ -146,7 +146,6 @@ Wat.B = {
             $('table.acls-management').hide();
             $(this).addClass('menu-option--selected');
             $('table.' + submenu).show();
-            console.log('table.' + submenu);
         },
         
         clickMenuMobile: function () {
@@ -298,6 +297,11 @@ Wat.B = {
             
             var acls = $('select[name="acl_' + type + '_on_role"]').val();
             
+            if (!acls) {
+                Wat.I.showMessage({message: i18n.t('No items were selected') + '. ' + i18n.t('Nothing to do'), messageType: 'info'});
+                return;
+            }
+            
             var filters = {
                 id: Wat.CurrentView.id
             };
@@ -312,14 +316,7 @@ Wat.B = {
             Wat.CurrentView.updateModel(arguments, filters, function() {
                 Wat.CurrentView.model.fetch({      
                     complete: function () {
-                        Wat.CurrentView.renderManagerInheritedRoles();
-                        Wat.CurrentView.renderManagerExcludedACLs();
-                        Wat.CurrentView.renderManagerACLs();
-                        Wat.CurrentView.renderSide();
-                        var selectedSubmenuOption = $('.js-submenu-option.menu-option--selected').attr('data-show-submenu');
-                        console.log(selectedSubmenuOption);
-                        $('.acls-management').hide();
-                        $('.' + selectedSubmenuOption).show();
+                        Wat.CurrentView.afterUpdateAcls();
                     }
                 });
             });
@@ -328,7 +325,12 @@ Wat.B = {
             // type can be 'positive' or 'negative'
             var type = e.data;
             
-            var acls = $('select[name="acl_' + type + '"]').val();
+            var acls = $('select[name="acl_available"]').val();
+            
+            if (!acls) {
+                Wat.I.showMessage({message: i18n.t('No items were selected') + '. ' + i18n.t('Nothing to do'), messageType: 'info'});
+                return;
+            }
             
             var filters = {
                 id: Wat.CurrentView.id
@@ -344,14 +346,7 @@ Wat.B = {
             Wat.CurrentView.updateModel(arguments, filters, function() {
                 Wat.CurrentView.model.fetch({      
                     complete: function () {
-                        Wat.CurrentView.renderManagerInheritedRoles();
-                        Wat.CurrentView.renderManagerExcludedACLs();
-                        Wat.CurrentView.renderManagerACLs();
-                        Wat.CurrentView.renderSide();
-                        var selectedSubmenuOption = $('.js-submenu-option.menu-option--selected').attr('data-show-submenu');
-                        console.log(selectedSubmenuOption);
-                        $('.acls-management').hide();
-                        $('.' + selectedSubmenuOption).show();
+                        Wat.CurrentView.afterUpdateAcls();
                     }
                 });
             });
@@ -363,7 +358,7 @@ Wat.B = {
                 id: Wat.CurrentView.id
             };
             var arguments = {
-                "__acls_changes__": {
+                "__roles_changes__": {
                     unassign_roles: [roleId]
                 }
             };
@@ -372,8 +367,7 @@ Wat.B = {
             Wat.CurrentView.updateModel(arguments, filters, function() {
                 Wat.CurrentView.model.fetch({      
                     complete: function () {
-                        Wat.CurrentView.renderManagerInheritedRoles();
-                        Wat.CurrentView.renderSide();
+                        Wat.CurrentView.afterUpdateRoles();
                     }
                 });
             });
@@ -381,11 +375,16 @@ Wat.B = {
         addRole: function () {
             var roleId = $('select[name="role"]').val();
             
+            if (!roleId) {
+                Wat.I.showMessage({message: i18n.t('No items were selected') + '. ' + i18n.t('Nothing to do'), messageType: 'info'});
+                return;
+            }
+            
             var filters = {
                 id: Wat.CurrentView.id
             };
             var arguments = {
-                "__acls_changes__": {
+                "__roles_changes__": {
                     assign_roles: [roleId]
                 }
             };
@@ -393,8 +392,7 @@ Wat.B = {
             Wat.CurrentView.updateModel(arguments, filters, function() {
                 Wat.CurrentView.model.fetch({      
                     complete: function () {
-                        Wat.CurrentView.renderManagerInheritedRoles();
-                        Wat.CurrentView.renderSide();
+                        Wat.CurrentView.afterUpdateRoles();
                     }
                 });
             });

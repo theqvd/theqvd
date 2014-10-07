@@ -46,7 +46,7 @@
                 </tr>
                 <tr>
                     <td class="max-1-icons">
-                        <i class="<%= CLASS_ICON_NODES %>"></i>
+                        <i class="<%= CLASS_ICON_HOSTS %>"></i>
                     </td>       
                     <td>
                         <a href="#/hosts" data-i18n="Nodes">
@@ -188,7 +188,7 @@
                 </tr>
                 <tr>
                     <td class="max-1-icons">
-                        <i class="<%= CLASS_ICON_NODES %>"></i>
+                        <i class="<%= CLASS_ICON_HOSTS %>"></i>
                     </td>       
                     <td>
                         <a href="#/hosts" data-i18n="Nodes">

@@ -21,8 +21,16 @@
     text-align: left !important;
 }
 
+.fleft {
+    float: left !important;
+}
+
 .right {
     text-align: right !important;
+}
+
+.fright {
+    float: right !important;
 }
 
 .auto {
@@ -31,4 +39,8 @@
 
 .normal {
     font-weight: normal !important;
+}
+
+.block {
+    display: block !important;
 }

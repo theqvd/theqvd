@@ -65,6 +65,10 @@ table.roles-inherit-table {
     color: darken($col_red, 10);
 }
 
+th .second_row {
+    color: $col_blacker;
+}
+
 td.inner-table {
     padding: 0 !important;
     

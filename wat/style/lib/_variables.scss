@@ -4,8 +4,8 @@
 $col_whiter : #fdfdfd;
 $col_blacker: #222222;
 $col_links_old : #ff8d13;
-$col_brand: darken(#f36d15, 10);
-$col_links : $col_brand;
+$col_brand: darken(#f36d15, 5);
+$col_links : darken($col_brand, 5);
 $col_green : #00CC00;
 $col_red : #FF0000;
 $col_yellow : #FFD600;
@@ -34,7 +34,7 @@ $height_input: 20px;
 
 // Form controls
 $input_height_mobile: 35px;
-$input_height: 25px;
+$input_height: 28px;
 
 // Layout
 $width_list_side: 15;

@@ -62,7 +62,6 @@ Wat.Views.RoleDetailsView = Wat.Views.DetailsView.extend({
 
         this.renderManagerInheritedRoles();   
         this.renderManagerACLs();
-        this.renderManagerExcludedACLs();
         
         // Trigger click on first menu option by default
         $('[data-show-submenu="acls-management-acls"]').trigger('click');
@@ -107,52 +106,53 @@ Wat.Views.RoleDetailsView = Wat.Views.DetailsView.extend({
         var params = {
             'action': 'acl_tiny_list',
             'selectedId': '',
-            'controlName': 'acl_positive',
+            'controlName': 'acl_available',
             'filters': {
             }
         };
 
         Wat.A.fillSelect(params);
         
-        // Set selected acls on rigth side and delete it from left side
+        // Set selected acls on acl list and delete it from available side
         $.each(this.model.get('acls').positive, function (iAcl, acl) {
-            $('select[name="acl_positive"] option[value="' + iAcl + '"]').remove();
+            $('select[name="acl_available"] option[value="' + iAcl + '"]').remove();
             $('select[name="acl_positive_on_role"]').append('<option value="' + iAcl + '">' + acl + '</option>');
         });   
         
         // Disable acls that exist in negative mode
         $.each(this.model.get('acls').negative, function (iAcl, acl) {
-            $('select[name="acl_positive"] option[value="' + iAcl + '"]').remove();
+            $('select[name="acl_available"] option[value="' + iAcl + '"]').remove();
         });
         
-        
-        var excludedRolesTemplate = Wat.A.getTemplate('details-role-excluded-acls');
-        $('.bb-role-excluded-acls').html(excludedRolesTemplate);
-        
-        var params = {
-            'action': 'acl_tiny_list',
-            'selectedId': '',
-            'controlName': 'acl_negative',
-            'filters': {
-            }
-        };
-
-        Wat.A.fillSelect(params);
-        
-        // Set selected acls on rigth side and delete it from left side
+        // Set selected acls on excluded list and delete it from available side
         $.each(this.model.get('acls').negative, function (iAcl, acl) {
-            $('select[name="acl_negative"] option[value="' + iAcl + '"]').remove();
+            $('select[name="acl_available"] option[value="' + iAcl + '"]').remove();
             $('select[name="acl_negative_on_role"]').append('<option value="' + iAcl + '">' + acl + '</option>');
         });
         
         // Disable acls that exist in positive mode
         $.each(this.model.get('acls').positive, function (iAcl, acl) {
-            $('select[name="acl_negative"] option[value="' + iAcl + '"]').remove();
+            $('select[name="acl_available"] option[value="' + iAcl + '"]').remove();
         });
-    },    
+    },  
     
-    renderManagerExcludedACLs: function () {
-
+    afterUpdateRoles: function () {
+        this.renderManagerInheritedRoles();
+        $('.bb-details-side1').html(HTML_MINI_LOADING);
+        this.renderSide();
+        var selectedSubmenuOption = $('.js-submenu-option.menu-option--selected').attr('data-show-submenu');
+        $('.acls-management').hide();
+        $('.' + selectedSubmenuOption).show();
+    },
+    
+    afterUpdateAcls: function () {
+        this.renderManagerInheritedRoles();
+        this.renderManagerACLs();
+        $('.bb-details-side1').html(HTML_MINI_LOADING);
+        this.renderSide();
+        var selectedSubmenuOption = $('.js-submenu-option.menu-option--selected').attr('data-show-submenu');
+        $('.acls-management').hide();
+        $('.' + selectedSubmenuOption).show();
     },
     
     embedContent: function () {

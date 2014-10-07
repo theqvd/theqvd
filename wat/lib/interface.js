@@ -3,6 +3,7 @@ Wat.I = {
     // Graphs
     G: {},
     
+    menu : {},
     cornerMenu : {},
     
     getCornerMenu: function () {
@@ -360,6 +361,8 @@ Wat.I = {
         // Fill the html with the template and the collection
         var template = _.template(
             templateMain, {
+                menu: Wat.I.menu,
+                mobileMenu: Wat.I.mobileMenu,
                 loggedIn: Wat.C.loggedIn,
                 loin: Wat.C.login,
                 cornerMenu: this.cornerMenu

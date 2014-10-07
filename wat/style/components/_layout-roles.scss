@@ -1,4 +1,10 @@
-.acls-management {    
+.admin-roles, .role-inherited-roles, role-acls {
+    clear:both;
+}
+
+.acls-management { 
+    table-layout: auto !important;
+    
     select[multiple] {
         width: 100%;
     }
@@ -16,7 +22,7 @@
     
     .inherited-role-table {
         width: auto;
-        min-width: 175px;
+        min-width: 200px;
         th {
             .fa {
                 display: inline;
@@ -29,19 +35,27 @@
     
     td.acls {
         vertical-align: top;
+        padding: 8px 5px;
+        width: 30%;
+     
         .acls-list {
-            height:  150px;
+            height:  157px;
             overflow-x: auto;
+        }
+        
+        span {
+            font-weight: bold;
         }
     }
     
     .button {
-        float: right;
+        text-align: center;
         margin-top: 5px;
+        width: 100%;
     }
     
     .side_to_side_select {
-        height: 150px;
+        height: 250px;
         margin-top: 5px;
     }
 }
@@ -52,7 +66,7 @@
 }
 
 .role-acls-wrapper {
-    height: 175px;
+    height: 275px;
     overflow-y: auto;
     overflow-x: hidden;
     padding: 0px;
@@ -65,4 +79,24 @@
 td[data-disabled] {
     color: #aaa;
     text-decoration: line-through;
+    color: darken($col_red, 10);
+}
+
+td.vbutton {
+    width: 20px;
+    padding: 23px 0px !important;
+    vertical-align: top !important;
+    
+    .button {
+        height: 250px;
+        padding-top: 120px;
+    }
+}
+
+select[name="acl_negative_on_role"] option, .acls_negative {
+    color: darken($col_red, 10);
+}
+
+select[name="acl_positive_on_role"] option, .acls_positive {
+    color: darken($col_green, 10);
 }

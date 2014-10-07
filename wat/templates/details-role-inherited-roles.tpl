@@ -1,9 +1,14 @@
-<table class="list details-list acls-management acls-management-inherit-roles col-width-100">  
+<table class="list details-list acls-management acls-management-inherit-roles col-width-100 hidden">   
     <tr>
-        <th colspan="2">
-            <span data-i18n>Roles whose ACLs will be inherited</span>
+        <th colspan="5">
+            <span data-i18n>
+                Inherit roles
+            </span>
+            <div class="second_row fa fa-info-circle block" data-i18n>
+                Excluded ACLs will not be inherited
+            </div>
         </th>
-    </tr>   
+    </tr>
     <tr>
         <td colspan="2">
             <table class="roles-inherit-table">
@@ -23,7 +28,7 @@
                 %>
                 <tr>
                     <td>
-                        <span data-i18n>Inherited roles</span>
+                        <i class="fa fa-sitemap"></i><span data-i18n>Inherited roles</span>
                     </td>
                 </tr>
                 <%
@@ -78,7 +83,7 @@
                                                 }
                                             %>  
                                                 </div>                                    
-                                                <a class="button2 button-under-floating-box delete-role-button js-delete-role-button fa fa-trash-o" href="javascript:" data-id="<%= iRole %>" data-i18n>Delete</a>
+                                                <a class="button button-under-floating-box delete-role-button js-delete-role-button fa fa-trash-o" href="javascript:" data-id="<%= iRole %>" data-i18n>Delete</a>
                                             </td>
                                         </tr>
                                     </table>

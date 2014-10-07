@@ -77,3 +77,139 @@ module( "Disk image tests", {
         deepEqual(callback.getCall(0).args[0], Wat.CurrentView.model, "Spied result and Backbone model should be equal");
     });
 
+
+module( "Disk images Real tests", {
+    setup: function() {
+        // prepare something for all following tests
+        
+        // Fake Login
+        Wat.C.logOut();
+        Wat.C.logIn('superadmin', 'superadmin');
+    },
+    teardown: function() {
+        // clean up after each test
+        Wat.C.logOut();
+    }
+});
+
+    QUnit.asyncTest("Disk images CRUD", function() {
+        // Number of Assertions we Expect
+        var assertions = 0;
+        assertions += Object.keys(WatTests.fakeValues.di).length * 2; // Create & Update verifications. (Password will not be verified because is not returned)
+        assertions +=2; // Create and Delete dependences (OSF)
+        assertions +=3; // Create, Update and Delete verifications
+        
+        expect(assertions);
+        
+        Wat.Router.app_router.trigger('route:listOSF');
+        
+        Wat.CurrentView.model = new Wat.Models.OSF();
+        
+        //////////////////////////////////////////////////////////////////
+        // Create dependency OSF
+        //////////////////////////////////////////////////////////////////
+        Wat.CurrentView.createModel(WatTests.values.osf, function (e) { 
+            if(e.retrievedData.status == 0) {
+                WatTests.values.osf.id = e.retrievedData.result.rows[0].id;
+            }
+            equal(e.retrievedData.status, 0, "OSF created succesfully (" + JSON.stringify(WatTests.values.osf) + ")");
+            
+            Wat.Router.app_router.trigger('route:listDI');
+
+            Wat.CurrentView.model = new Wat.Models.DI();
+            
+            // Create DI associated to the created OSF
+            WatTests.values.di.osf_id = WatTests.values.osf.id;
+            
+            //////////////////////////////////////////////////////////////////
+            // Create DI
+            //////////////////////////////////////////////////////////////////
+            Wat.CurrentView.createModel(WatTests.values.di, function (e) { 
+                if(e.retrievedData.status == 0) {
+                    WatTests.values.di.id = e.retrievedData.result.rows[0].id;
+                }
+                equal(e.retrievedData.status, 0, "DI created succesfully (" + JSON.stringify(WatTests.values.di) + ")");
+
+
+                //////////////////////////////////////////////////////////////////
+                // After create, get list of dis matching by the created name
+                //////////////////////////////////////////////////////////////////
+                WatTests.models.di = new Wat.Models.DI({
+                    id: WatTests.values.di.id
+                });            
+
+                WatTests.models.di.fetch({      
+                    complete: function () {
+                        $.each (WatTests.fakeValues.di, function (fieldName) {
+                            var valRetrieved = WatTests.models.di.attributes[fieldName];
+
+                            if (fieldName == 'properties' && WatTests.values.di['__properties__'] != undefined) {
+                                deepEqual(valRetrieved, WatTests.values.di['__properties__'], "DI field '" + fieldName + "' retrieved successfully and match with created value (" + JSON.stringify(valRetrieved) + ")");
+                            }
+                            else if (WatTests.values.di[fieldName] != undefined) {
+                                equal(valRetrieved, WatTests.values.di[fieldName], "DI field '" + fieldName + "' retrieved successfully and match with created value (" + valRetrieved + ")");
+                            }
+                            else {
+                                notEqual(WatTests.models.di.attributes[fieldName], undefined, "DI field '" + fieldName + "' retrieved successfully (" + valRetrieved + ")");
+                            }
+                        });
+
+                        // Perform changes in testing osf values
+                        performUpdation(WatTests.values.di, WatTests.updateValues.di);
+
+                        //////////////////////////////////////////////////////////////////
+                        // After get list of DIs, update it
+                        //////////////////////////////////////////////////////////////////
+                        Wat.CurrentView.updateModel(WatTests.updateValues.di, {'id': WatTests.values.di.id}, function (e) { 
+                            equal(e.retrievedData.status, 0, "DI updated succesfully (" + JSON.stringify(WatTests.updateValues.di) + ")");
+
+                            //////////////////////////////////////////////////////////////////
+                            // After update, get list of di matching by name
+                            //////////////////////////////////////////////////////////////////
+                            WatTests.models.di.fetch({   
+                                complete: function (e) {
+                                    WatTests.values.di.id = WatTests.models.di.attributes['id'];
+                                    $.each (WatTests.fakeValues.di, function (fieldName) {
+                                        var valRetrieved = WatTests.models.di.attributes[fieldName];
+
+                                        if (fieldName == 'properties' && WatTests.values.di['__properties__'] != undefined) {
+                                            deepEqual(valRetrieved, WatTests.values.di['__properties__'], "DI field '" + fieldName + "' retrieved successfully and match with created value (" + JSON.stringify(valRetrieved) + ")");
+                                        }
+                                        else if (WatTests.values.di[fieldName] != undefined) {
+                                            equal(valRetrieved, WatTests.values.di[fieldName], "DI field '" + fieldName + "' retrieved successfully and match with created value (" + valRetrieved + ")");
+                                        }
+                                        else {
+                                            notEqual(WatTests.models.di.attributes[fieldName], undefined, "DI field '" + fieldName + "' retrieved successfully (" + valRetrieved + ")");
+                                        }
+                                    });
+
+
+                                    //////////////////////////////////////////////////////////////////
+                                    // After match the updated di, delete it
+                                    //////////////////////////////////////////////////////////////////
+                                    Wat.CurrentView.deleteModel({'id': WatTests.values.di.id}, function (e) { 
+                                        equal(e.retrievedData.status, 0, "DI deleted succesfully (ID: " + JSON.stringify(WatTests.values.di.id) + ")");
+
+                                        //////////////////////////////////////////////////////////////////
+                                        // After delete di, delete the dependency osf
+                                        //////////////////////////////////////////////////////////////////
+                                        
+                                        Wat.Router.app_router.trigger('route:listOSF');
+
+                                        Wat.CurrentView.model = new Wat.Models.OSF();
+                                        
+                                        Wat.CurrentView.deleteModel({'id': WatTests.values.di.osf_id}, function (e) { 
+                                            equal(e.retrievedData.status, 0, "OSF deleted succesfully (ID: " + JSON.stringify(WatTests.values.osf.id) + ")");
+
+                                            // Unblock task runner
+                                            start();
+                                        }, Wat.CurrentView.model);
+                                    }, Wat.CurrentView.model);
+                                }
+                            });
+                        }, Wat.CurrentView.model);
+                    }
+                });
+            });
+        });
+    });

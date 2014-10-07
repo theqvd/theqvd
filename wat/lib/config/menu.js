@@ -65,3 +65,33 @@ Wat.I.cornerMenu = {
             }
         }
 };
+
+Wat.I.menu = {
+    users: {
+        icon: CLASS_ICON_USERS,
+        text: 'Users'
+    },
+    vms: {
+        icon: CLASS_ICON_VMS,
+        text: 'Virtual machines'
+    },
+    hosts: {
+        icon: CLASS_ICON_HOSTS,
+        text: 'Nodes'
+    },
+    osfs: {
+        icon: CLASS_ICON_OSFS,
+        text: 'OS Flavours'
+    },
+    dis: {
+        icon: CLASS_ICON_DIS,
+        text: 'Disk images'
+    }
+};
+
+Wat.I.mobileMenu = _.extend({}, Wat.I.menu);
+
+Wat.I.mobileMenu.logout = {
+    icon: CLASS_ICON_LOGOUT,
+    text: 'Logout'
+}

@@ -16,18 +16,6 @@
             <%= model.get('tenant_name') %>
         </td>
     </tr>
-    <tr>
-        <td><i class="fa fa-graduation-cap"></i><span data-i18n>Assigned roles</span></td>
-        <td>
-            <%
-                $.each(model.get('roles'), function (iRole, role) {
-            %>
-                    <a href="#/setup/role/<%= iRole %>" data-i18n="[title]Click for details">
-                        <span class="text"><%= role %></span>
-                    </a>
-            <%
-                }); 
-            %>  
-        </td>
-    </tr>
 </table>
+
+<div class="bb-admin-roles admin-roles"></div>

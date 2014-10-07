@@ -17,10 +17,4 @@
             <input type="password" name="password2" value="" data-required data-equal="password">
         </td>
     </tr>
-    <tr>
-        <td data-i18n>Tenant</td>
-        <td>
-            <select class="" name="tenant"></select>
-        </td>
-    </tr>
  </table>

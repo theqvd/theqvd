@@ -18,6 +18,45 @@ Wat.Views.AdminDetailsView = Wat.Views.DetailsView.extend({
         this.renderSetupCommon();
     },
     
+    render: function () {
+        Wat.Views.DetailsView.prototype.render.apply(this);
+
+        this.renderManagerRoles();
+    },
+    
+    
+    renderManagerRoles: function () {
+        var inheritedRolesTemplate = Wat.A.getTemplate('details-admin-roles');
+        // Fill the html with the template and the model
+        this.template = _.template(
+            inheritedRolesTemplate, {
+                model: this.model
+            }
+        );
+        $('.bb-admin-roles').html(this.template);
+
+        var params = {
+            'action': 'role_tiny_list',
+            'selectedId': '',
+            'controlName': 'role',
+            'filters': {
+            }
+        };
+
+        Wat.A.fillSelect(params);
+        
+        // Remove from inherited roles selector, current role and already inherited ones
+        $('select[name="role"] option[value="' + this.elementId + '"]').remove();
+ 
+        $.each(this.model.get('roles'), function (iRole, role) {
+            $('select[name="role"] option[value="' + iRole + '"]').remove();
+        });
+        
+        Wat.I.chosenConfiguration();
+        
+        Wat.I.chosenElement('[name="role"]', 'advanced100');
+    },    
+    
     renderSetupCommon: function () {
 
         this.templateSetupCommon = Wat.A.getTemplate(this.setupCommonTemplateName);
@@ -46,6 +85,12 @@ Wat.Views.AdminDetailsView = Wat.Views.DetailsView.extend({
 
         this.el = '.bb-content-secondary';
         Wat.Views.DetailsView.prototype.initialize.apply(this, [this.params]);
+    },
+    
+    afterUpdateRoles: function () {
+        this.renderManagerRoles();
+        $('.bb-details-side1').html(HTML_MINI_LOADING);
+        this.renderSide();
     },
     
     openEditElementDialog: function(e) {
@@ -80,14 +125,14 @@ Wat.Views.AdminDetailsView = Wat.Views.DetailsView.extend({
         var params = {};
         params.whatRender = 'list';
         params.listContainer = sideContainer;
-        params.forceListColumns = {name: true};
+        params.forceListColumns = {name: true, roles: true};
         // If Administrator has more than one role assigned, show origin of ACLs
         if (this.model.attributes.roles.length > 1) {
             params.forceListColumns.roles = true;
         }
         params.forceSelectedActions = {};
         params.forceListActionButton = null;
-        params.block = 5;
+        params.block = 10;
         params.filters = {"id": this.elementId};
         params.action = 'get_acls_in_admins';
         
@@ -101,21 +146,17 @@ Wat.Views.AdminDetailsView = Wat.Views.DetailsView.extend({
             return;
         }
         
-        // Properties to create, update and delete obtained from parent view
-        var properties = this.properties;
-        
-        var context = $('.' + this.cid + '.editor-container');
-        
         var filters = {"id": this.id};
-        var arguments = {
-            "__roles_changes__": {
-                assign_roles: this.addRoles,
-                unassign_roles: this.deleteRoles
-            }
-        };
+        var arguments = {};
         
-        this.addRoles = [];
-        this.deleteRoles = [];
+        // If change password is checked
+        if (context.find('input.js-change-password').is(':checked')) {
+            var password = context.find('input[name="password"]').val();
+            var password2 = context.find('input[name="password2"]').val();
+            if (password && password2 && password == password2) {
+                arguments['password'] = password;
+            }
+        }
         
         this.updateModel(arguments, filters, this.fetchDetails);
     },
