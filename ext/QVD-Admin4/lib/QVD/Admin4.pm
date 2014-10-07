@@ -181,18 +181,10 @@ sub update_role_acls
     $self->coherent_acls_nested_query($nested_queries) 
 	|| QVD::Admin4::Exception->throw(code=>'27');
 
-    my $roles_assign_query = $nested_queries->{assign_roles};
-    my $roles_unassign_query = $nested_queries->{unassign_roles}; 
     my $positive_acls_assign_query = $nested_queries->{assign_positive_acls};
     my $negative_acls_assign_query = $nested_queries->{assign_negative_acls};
     my $positive_acls_unassign_query = $nested_queries->{unassign_positive_acls}; 
     my $negative_acls_unassign_query = $nested_queries->{unassign_negative_acls}; 
-
-    $self->add_roles_to_role($roles_assign_query,$obj)
-	if defined $roles_assign_query;
-
-    $self->del_roles_to_role($roles_unassign_query,$obj)
-	if defined $roles_unassign_query;
 
     $self->add_acls_to_role($positive_acls_assign_query,$obj,1)
 	if defined $positive_acls_assign_query;
@@ -205,6 +197,23 @@ sub update_role_acls
 
     $self->del_acls_to_role($negative_acls_unassign_query,$obj)
 	if defined $negative_acls_unassign_query;
+}
+
+sub update_role_roles
+{
+    my($self,$request,$obj)=@_;
+
+    my $nested_queries = $request->nested_queries // return;
+    $nested_queries = $nested_queries->{__roles_changes__} // return;
+
+    my $roles_assign_query = $nested_queries->{assign_roles};
+    my $roles_unassign_query = $nested_queries->{unassign_roles}; 
+
+    $self->add_roles_to_role($roles_assign_query,$obj)
+	if defined $roles_assign_query;
+
+    $self->del_roles_to_role($roles_unassign_query,$obj)
+	if defined $roles_unassign_query;
 }
 
 
@@ -314,12 +323,8 @@ sub create_role_acls
     $self->coherent_acls_nested_query($nested_queries) 
 	|| QVD::Admin4::Exception->throw(code=>'27');
 
-    my $roles_assign_query = $nested_queries->{assign_roles};
-    my $positive_acls_assign_query = $nested_queries->{assign_positive_acls};
-    my $negative_acls_assign_query = $nested_queries->{assign_negative_acls};
-
-    $self->add_roles_to_role($roles_assign_query,$obj)
-	if defined $roles_assign_query;
+    my $positive_acls_assign_query = $nested_queries->{positive};
+    my $negative_acls_assign_query = $nested_queries->{negative};
 
     $self->add_acls_to_role($positive_acls_assign_query,$obj,1)
 	if defined $positive_acls_assign_query;
@@ -327,6 +332,19 @@ sub create_role_acls
     $self->add_acls_to_role($negative_acls_assign_query,$obj,0)
 	if defined $negative_acls_assign_query;
 }
+
+sub create_role_roles
+{
+    my($self,$request,$obj)=@_;
+
+    my $nested_queries = $request->nested_queries // return;
+    my $roles = $nested_queries->{__roles__} // return;
+
+    $self->add_roles_to_role($roles,$obj)
+	if defined $roles;
+
+}
+
 
 sub create_admin_roles
 {
@@ -600,7 +618,7 @@ sub role_update
     my ($self,$request) = @_;
 
     $self->update($request, methods_for_nested_queries => 
-		  [qw(update_role_acls)]);
+		  [qw(update_role_roles update_role_acls)]);
 }
 
 sub role_create
@@ -608,7 +626,7 @@ sub role_create
     my ($self,$request) = @_;
 
     $self->create($request, methods_for_nested_queries => 
-		  [qw(create_role_acls)]);
+		  [qw(create_role_roles create_role_acls)]);
 }
 
 sub admin_update
@@ -786,29 +804,6 @@ sub di_no_head_default_tags
 ## GENERAL FUNCTIONS; WITHOUT REQUEST
 ######################################
 
-sub get_acls_in_admins
-{
-    my ($self,$json_wrapper) = @_;
-    my $admin_ids = $json_wrapper->get_filter_value('id') // 
-        QVD::Admin4::Exception->throw(code=>'10');
-    $admin_ids = [$admin_ids] unless ref($admin_ids); 
-
-    my %distinct_role_ids;
-
-    for my $admin ($DB->resultset('Administrator')->search({id => $admin_ids})->all)
-    {
-	$distinct_role_ids{$_->id} = 1 for  $admin->roles;
-    }
-
-    my $role_ids = [keys %distinct_role_ids];
-
-    $json_wrapper->forze_filter_deletion('id');
-    $json_wrapper->forze_filter_addition('id',$role_ids);
-
-    return $self->get_acls_in_roles($json_wrapper);
-}
-
-
 sub get_acls_in_roles
 {
     my ($self,$json_wrapper) = @_;
@@ -816,29 +811,49 @@ sub get_acls_in_roles
         QVD::Admin4::Exception->throw(code=>'10');
     $role_ids = [$role_ids] unless ref($role_ids); 
     my $roles = [$DB->resultset('Role')->search({id => $role_ids})->all];
-    my %acls_ids;
+    $self->get_acls_in_roles_or_admins($json_wrapper,$roles);
+}
 
-    for my $role (@$roles)
+sub get_acls_in_admins
+{
+    my ($self,$json_wrapper) = @_;
+    my $admin_ids = $json_wrapper->get_filter_value('id') // 
+        QVD::Admin4::Exception->throw(code=>'10');
+    $admin_ids = [$admin_ids] unless ref($admin_ids); 
+    my $admins = [$DB->resultset('Administrator')->search({id => $admin_ids})->all];
+    $self->get_acls_in_roles_or_admins($json_wrapper,$admins);
+}
+
+sub get_acls_in_roles_or_admins
+{
+    my ($self,$json_wrapper,$roles_or_admins) = @_;
+    my $acls_info;
+
+    for my $role_or_admin (@$roles_or_admins)
     {
-	$acls_ids{$_} = 1 for $role->_get_inherited_acls(return_value => 'id');
+	my $role_or_admin_acls_info = $role_or_admin->get_acls_info;
+        for my $acl_id (keys %$role_or_admin_acls_info)
+        {
+	    my $acl_info = $role_or_admin_acls_info->{$acl_id}; 
+	    while (my ($role_id, $role_name) = each %{$acl_info->{roles}}) 
+	    {
+		$acls_info->{$acl_id}->{roles}->{$role_id} = $role_name;
+		$acls_info->{$acl_id}->{name} = $acl_info->{name};
+		$acls_info->{$acl_id}->{id} = $acl_id;
+	    }
+	}
     }
-
-    my $acls_ids = [keys %acls_ids];
-    my $order_criteria = $json_wrapper->order_criteria // [];
-    my $order_direction = $json_wrapper->order_direction // '-asc';
-    my $block = $json_wrapper->block // 10000;
-    my $offset = $json_wrapper->offset // 1;
-
-    my $modifiers = { order_by => 
-		      { $order_direction => $order_criteria },
-                      page => $offset,
-		      rows => $block };
-
-    my $acls_rs = $DB->resultset('ACL')->search({id => $acls_ids},$modifiers);
+ 
+    my $acls_rs = $DB->resultset('ACL')->search({id => [keys %$acls_info]},
+	{ order_by => { ($json_wrapper->order_direction || '-asc') => 
+			($json_wrapper->order_criteria || []) },
+	  page => ($json_wrapper->offset || 1),
+	  rows => ($json_wrapper->block || 10000) });
 
    { total => ($acls_rs->is_paged ? $acls_rs->pager->total_entries : $acls_rs->count), 
-     rows => [map { $_->get_name_id_and_roles($roles) } $acls_rs->all] };
+     rows => [map { $acls_info->{$_->id} } $acls_rs->all] };
 }
+
 
 
 ##################################
@@ -975,6 +990,9 @@ sub get_the_most_populated_hosts
 
 1;
 
+#
+#
+#
 #
 #sub get_acls_in_roles
 #{
