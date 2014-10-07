@@ -4,31 +4,22 @@ use lib::glob '/home/benjamin/WAT/ext/*/lib/';
 use QVD::Admin4::REST;
 use Mojo::JSON qw(decode_json encode_json);
 use QVD::Admin4::REST::Response;
-use Mojolicious::Plugin::Authentication;
+use QVD::DB;
+use MojoX::Session;
 
 my $QVD_ADMIN4_API = QVD::Admin4::REST->new();
 
-app->secrets(['Lucky Ben']);
-app->sessions->cookie_name('amazingwat');
-#app->sessions->default_expiration(0);
 app->config(hypnotoad => {listen => ['http://192.168.3.5:3000']});
 helper (qvd_admin4_api => sub { $QVD_ADMIN4_API; });
-
-plugin 'authentication', 
-{
-    load_user     => sub { my ($c,$uid) = @_; 
-			   $c->qvd_admin4_api->load_user(%$uid);
-			   $uid;},
-    validate_user => sub { my ($c,$login,$password) = @_;
-			   $c->qvd_admin4_api->validate_user(login    => $login, 
-							     password => $password);
-			 
-}
-};
 
 under sub {
 
     my $c = shift;
+
+    my $session = MojoX::Session->new( 
+	store  => [dbi => {dbh => QVD::DB->new()->storage->dbh}],
+	transport => 'cookie',
+	tx => $c->tx );
 
     my $json = $c->req->json // 
     { map { $_ => $c->param($_) } $c->param };
@@ -36,21 +27,53 @@ under sub {
     if (defined $json->{login} &&
 	defined $json->{password})
     {
-	$c->logout;
-	$c->authenticate($json->{login},
-			 $json->{password}); 
+	my $admin = $c->qvd_admin4_api->validate_user(login    => $json->{login}, 
+						      password => $json->{password});
+	if ($admin)
+	{
+	    $c->qvd_admin4_api->load_user($admin);
+	    $session->create;
+	    $session->flush; 
+	    $session->data(admin_id => $admin->id);
+	    $session->flush; 
+	    return 1;
+	} 
+	else
+	{
+	    $c->render(json => 
+		       QVD::Admin4::REST::Response->new(status => 3)->json);
+	    return 0;
+	}
     }
-
-    $c->is_user_authenticated && return 1;
-
-    $c->render(json => 
-	QVD::Admin4::REST::Response->new(status => 3)->json);
-    return 0;
+    elsif ($session->load) 
+    {
+        if ($session->is_expired)
+	{  
+	    $session->flush; 
+	    $c->render(json => 
+		       QVD::Admin4::REST::Response->new(status => 29)->json);
+	    return 0;
+	}
+	else
+	{
+	    $session->extend_expires;
+	    $session->flush; 
+	    $c->qvd_admin4_api->load_user($session->data('admin_id'));
+	    return 1;
+	}
+    }
+    else 
+    {
+	$c->render(json => 
+		   QVD::Admin4::REST::Response->new(status => 29)->json);
+	return 0;
+    }
 };
 
 any '/' => sub { 
 
     my $c = shift;
+    $c->render(text => "Hola...");
 
     my $json = $c->req->json;
     $c->res->headers->header('Access-Control-Allow-Origin' => '*');
@@ -70,7 +93,6 @@ any '/' => sub {
 
     $c->render(json => $response);
 };
-
 
 app->start;
 

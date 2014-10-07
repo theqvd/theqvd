@@ -61,8 +61,8 @@ $t->post_ok('/' => json => { login    => 'superadmin',
 			                    storage => 10, 
 					    name => 'buenavm', 
 					    blocked => 1,
-					    expiration_soft => '10/10/2014',
-					    expiration_hard => '10/10/2014',
+					    expiration_soft => '2014-10-10T00:00:00',
+					    expiration_hard => '2014-10-10T00:00:00',
 					    ip => '10.0.255.200',
 					    __properties_changes__ => { set => { kk => 'kk'}, 
 									delete => ['world']}}}) 
@@ -78,8 +78,8 @@ $t->post_ok('/' => json => { login    => 'superadmin',
     ->json_is('/result/rows/0/name' => 'buenavm', 'vm_get_details HAS CHANGED')
     ->json_is('/result/rows/0/storage' => '10', 'vm_get_details HAS CHANGED')
     ->json_is('/result/rows/0/blocked' => '1', 'vm_get_details HAS CHANGED')
-    ->json_is('/result/rows/0/expiration_soft' => '10/10/2014', 'vm_get_details HAS CHANGED')
-    ->json_is('/result/rows/0/expiration_hard' => '10/10/2014', 'vm_get_details HAS CHANGED')
+    ->json_is('/result/rows/0/expiration_soft' => '2014-10-10T00:00:00', 'vm_get_details HAS CHANGED')
+    ->json_is('/result/rows/0/expiration_hard' => '2014-10-10T00:00:00', 'vm_get_details HAS CHANGED')
     ->json_is('/result/rows/0/ip' => '10.0.255.200', 'vm_get_details HAS CHANGED')
     ->json_is('/result/rows/0/properties/kk' => 'kk', 'vm_get_details HAS CHANGED')
     ->json_hasnt('/result/rows/0/properties/world','vm_get_details HAS CHANGED');
@@ -245,10 +245,8 @@ $t->post_ok('/' => json => { login    => 'superadmin',
 			     filters => {id => 5}}) 
     ->status_is(200, 'admin_get_details HTTP STATUS')
     ->json_is('/result/rows/0/name' => 'youradmin', 'admin_get_details HAS CHANGED')
-    ->json_is('/result/rows/0/roles/0/name','superpringao', 'admin_get_details HAS CHANGED')
-    ->json_hasnt('/result/rows/0/roles/1/','admin_get_details HAS CHANGED')
-    ->json_is('/result/rows/0/acls/0/name','user_see', 'admin_get_details HAS CHANGED')
-    ->json_hasnt('/result/rows/0/acls/1/','admin_get_details HAS CHANGED')
+    ->json_is('/result/rows/0/roles/4','superpringao', 'admin_get_details HAS CHANGED')
+    ->json_hasnt('/result/rows/roles/1/','admin_get_details HAS CHANGED')
     ->json_is('/status' => '0', 'admin_get_details API STATUS');
 
 $t->post_ok('/' => json => { login    => 'superadmin',              

@@ -270,7 +270,7 @@ sub get_roles_with_its_acls_info
     for (@{$self->get_roles})
     {
 	$out->{$_->id}->{name} = $_->name;
-	$out->{$_->id}->{acls} = [$_->_get_inherited_acls];
+	$out->{$_->id}->{acls} = [ sort $_->_get_inherited_acls ];
     }
 
     $out; 

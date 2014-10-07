@@ -15,6 +15,9 @@ my $QVD_ADMIN;
 my $ACTIONS =
 {
 
+current_admin_setup => {type_of_action => 'admin_config_provider',
+		       admin4method => 'current_admin_setup'},
+
 user_get_list => {type_of_action => 'list',
 		  admin4method => 'select',
 		  acls => ['user_see'],
@@ -319,64 +322,44 @@ sub BUILD
     $QVD_ADMIN = QVD::Admin4->new();
 }
 
-sub get_credentials
-{
-    my ($self,%params) = @_;
-
-    my $admin = eval { $QVD_ADMIN->_db->resultset('Administrator')->find(\%params) };
-    return undef unless $admin;
-
-    $admin->set_tenants_scoop(
-	[ map { $_->id } 
-	  $QVD_ADMIN->_db->resultset('Tenant')->search()->all ])
-	if $admin->is_superadmin;
-
-    $self->{administrator} = $admin;
-
-    return { login => $admin->name,
-	     tenant => $admin->tenant_id };
-}
-
-
-sub load_user
-{
-    my ($self,%params) = @_;
-
-    return undef unless 
-	defined $params{tenant} && 
-	defined $params{login};
-
-    $params{name} = delete $params{login};
-    $params{tenant_id} = delete $params{tenant};
-
-    my $uid = 
-	eval { $self->get_credentials(%params) } // undef;
-}
-
 sub validate_user
 {
     my ($self,%params) = @_;
 
-    return undef unless 
-	defined $params{password} && 
-	defined $params{login};
-
-    $params{name} = delete $params{login};
-
-    my $uid = 
-	eval { $self->get_credentials(%params) } // undef;
+    $params{name} = delete $params{login}; # FIX ME IN DB!!!
+    my $admin = eval { $QVD_ADMIN->_db->resultset('Administrator')->find(\%params) };
+    return $admin;
 }
+
+sub load_user
+{
+    my ($self,$admin) = @_;
+
+    $admin = $self->validate_user(id => $admin) 
+	unless ref($admin);
+
+    $self->{administrator} = $admin;
+    $admin->set_tenants_scoop(
+	[ map { $_->id } 
+	  $QVD_ADMIN->_db->resultset('Tenant')->search()->all ])
+	if $admin->is_superadmin;
+}
+
 
 sub process_query
 {
    my ($self,$json) = @_;
 
    my $json_wrapper = QVD::Admin4::REST::JSON->new(json => $json);
+
    my $action = $ACTIONS->{$json_wrapper->action} // 
        return QVD::Admin4::REST::Response->new(status => 5)->json;
 
    $self->available_action_for_current_admin($action) || 
        return QVD::Admin4::REST::Response->new(status => 8)->json;
+
+   return $self->process_admin_config_provider_query($action,$json_wrapper)
+       if $action->{type_of_action} eq 'admin_config_provider';
 
    return $self->process_query_without_qvd_object_model($action,$json_wrapper)
        if $action->{type_of_action} eq 'general';
@@ -395,6 +378,22 @@ sub process_query
 							  result   => $result,
 							  failures => $individual_failures) };
    return $response->json;
+}
+
+sub process_admin_config_provider_query
+{ 
+    my ($self,$action,$json_wrapper) = @_;
+
+    my $admin4method = $action->{admin4method};
+    my $result = eval { $QVD_ADMIN->$admin4method($self->administrator,$json_wrapper) } // {};
+    print $@ if $@;
+    my $general_status = ($@ && (( $@->can('code') && $@->code) || 1)) || 0;
+    my $individual_failures = ($@ && $@->can('failures')) ? $@->failures  : {};
+    my $response = eval { QVD::Admin4::REST::Response->new(status   => $general_status,
+							   result   => $result,
+							   failures => $individual_failures) };
+    return $response->json;
+
 }
 
 sub process_query_without_qvd_object_model

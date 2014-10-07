@@ -23,6 +23,18 @@ sub roles
     my @roles = map { $_->role } $self->role_rels;
 }
 
+sub acls
+{
+    my $self = shift;
+    my %acls;
+
+    for my $role ($self->roles)
+    {
+	$acls{$_} = 1 for $role->_get_inherited_acls;
+    }
+    keys %acls;
+}
+
 sub is_superadmin
 {
     my $self = shift;

@@ -340,6 +340,8 @@ sub create_role_roles
     my $nested_queries = $request->nested_queries // return;
     my $roles = $nested_queries->{__roles__} // return;
 
+    use Data::Dumper; print Dumper $roles;
+
     $self->add_roles_to_role($roles,$obj)
 	if defined $roles;
 
@@ -803,6 +805,11 @@ sub di_no_head_default_tags
 ######################################
 ## GENERAL FUNCTIONS; WITHOUT REQUEST
 ######################################
+sub current_admin_setup
+{
+    my ($self,$administrator,$json_wrapper) = @_;
+   { acls => [ $administrator->acls ]};
+}
 
 sub get_acls_in_roles
 {

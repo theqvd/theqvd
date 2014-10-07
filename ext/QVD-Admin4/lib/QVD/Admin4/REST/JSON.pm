@@ -26,7 +26,7 @@ sub BUILD
     my $self = shift;
 	
     $self->json->{arguments} //= {};
-    $NESTED_QUERIES = {map { $_ => (delete $self->json->{arguments}->{$_} || {}) } 
+    $NESTED_QUERIES = {map { $_ => delete $self->json->{arguments}->{$_} } 
 		       @{$self->available_nested_queries}}; # TODO: Parse nested queries  
 }
 

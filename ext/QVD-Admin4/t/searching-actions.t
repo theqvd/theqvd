@@ -110,7 +110,7 @@ $t->post_ok('/' => json => { login    => 'superadmin',
     ->status_is(200, 'vm_get_list HTTP STATUS')
     ->json_is('/status' => '0', 'vm_get_list API STATUS')
     ->json_has('/result/rows/0/', 'vm_get_list NO UNDERGENERATE')
-    ->json_hasnt('/result/rows/1/' => 'vm_get_list NO OVERGENERATE');
+    ->json_hasnt('/result/rows/2/' => 'vm_get_list NO OVERGENERATE');
 
 
 #################
@@ -162,7 +162,7 @@ $t->post_ok('/' => json => { login    => 'superadmin',
     ->status_is(200, 'vm_all_ids HTTP STATUS')
     ->json_is('/status' => '0', 'vm_all_ids API STATUS')
     ->json_is('/result/rows/0/', 4, 'vm_all_ids NO UNDERGENERATE')
-    ->json_hasnt('/result/rows/1/' => 'vm_all_ids NO OVERGENERATE');
+    ->json_hasnt('/result/rows/2/' => 'vm_all_ids NO OVERGENERATE');
 
 ##################
 ### vm_tiny_list
@@ -616,7 +616,7 @@ $t->post_ok('/' => json => { login    => 'superadmin',
     ->status_is(200, 'role_get_list HTTP STATUS')
     ->json_is('/status' => '0', 'role_tiny_list API STATUS')
     ->json_has('/result/rows/0/', 'role_tiny_list NO UNDERGENERATE')
-    ->json_hasnt('/result/rows/7/' => 'role_tiny_list NO OVERGENERATE');
+    ->json_hasnt('/result/rows/10/' => 'role_tiny_list NO OVERGENERATE');
 
 #################
 ### acl_get_list
