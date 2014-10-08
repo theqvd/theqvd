@@ -261,7 +261,8 @@ Wat.I.selectedActions[qvdObj] = [
 Wat.I.listActionButton[qvdObj] = {
             'name': 'new_vm_button',
             'value': 'New Virtual machine',
-            'link': 'javascript:'
+            'link': 'javascript:',
+            'acl': 'vm_create'
         };
 
 // Breadcrumbs configuration on list view

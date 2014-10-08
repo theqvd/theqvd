@@ -134,7 +134,8 @@ Wat.I.selectedActions[qvdObj] = [
 Wat.I.listActionButton[qvdObj] = {
             'name': 'new_osf_button',
             'value': 'New OS Flavour',
-            'link': 'javascript:'
+            'link': 'javascript:',
+            'acl': 'osf_create'
         };
 
 // Breadcrumbs configuration on list view

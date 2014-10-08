@@ -133,10 +133,10 @@
                             case 'name':
                 %>
                                 <td class="js-name">
-                                    <a href="#/osf/<%= model.get('id') %>" data-i18n="[title]Click for details">
-                                        <i class="fa fa-search"></i>
+                                    <%= Wat.C.ifACL('<a href="#/osf/' + model.get('id') + '" data-i18n="[title]Click for details">', 'osf_see') %>
+                                    <%= Wat.C.ifACL('<i class="fa fa-search"></i>', 'osf_see') %>
                                         <span class="text"><%= model.get('name') %></span>
-                                    </a>
+                                    <%= Wat.C.ifACL('</a>', 'osf_see') %>
                                 </td>
                 <%
                                 break;
@@ -175,7 +175,7 @@
                             case 'dis':
                 %>
                                 <td class="desktop">
-                                    <% if (model.get('dis') > 0) { %>
+                                    <% if (model.get('number_of_dis') > 0 && Wat.C.checkACL('di_see')) { %>
                                     <a href="#/dis/osf/<%= model.get('id') %>">
                                         <%= model.get('number_of_dis') %>
                                     </a>
@@ -189,7 +189,7 @@
                             case 'vms':
                 %>
                                 <td class="desktop">
-                                    <% if (model.get('vms') > 0) { %>
+                                    <% if (model.get('number_of_vms') > 0 && Wat.C.checkACL('vm_see')) { %>
                                     <a href="#/vms/osf/<%= model.get('id') %>">
                                         <%= model.get('number_of_vms') %>
                                     </a>

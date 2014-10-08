@@ -23,14 +23,6 @@ Wat.I.listColumns[qvdObj] = {
             'name'
         ],
         'text': 'Name'
-    },
-    'tenant': {
-        'display': true,
-        'fields': [
-            'tenant_id',
-            'tenant_name'
-        ],
-        'text': 'Name'
     }
 };
         
@@ -57,7 +49,8 @@ Wat.I.selectedActions[qvdObj] = [
 Wat.I.listActionButton[qvdObj] = {
             'name': 'new_admin_button',
             'value': 'New Administrator',
-            'link': 'javascript:'
+            'link': 'javascript:',
+            'acl': 'admin_create'
         };
 
 // Breadcrumbs configuration on list view

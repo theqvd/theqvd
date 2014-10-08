@@ -53,6 +53,8 @@ Wat.C = {
             this.loggedIn = false;
             this.login = '';
         }
+        
+        Wat.A.performAction('current_admin_setup', {}, {}, {}, this.checkLogin, this, false);
     },
     
     tryLogin: function (user, password) {
@@ -81,24 +83,38 @@ Wat.C = {
         Wat.C.acls = that.retrievedData.result.acls;
         Wat.C.configureVisibility();
         
-        Wat.C.logIn(that.login, that.password);
+        if (Wat.CurrentView.qvdObj == 'login') {
+            Wat.C.logIn(that.login, that.password);
+                
+            Wat.I.renderMain();
 
-        Wat.I.renderMain();
-
-        Wat.Router.app_router.performRoute('', Wat.Views.HomeView);
+            Wat.Router.app_router.performRoute('', Wat.Views.HomeView);
+            
+            window.location.reload();
+        }
     },
     
     checkACL: function (acl) {
         return $.inArray(acl, this.acls) != -1;
     },
     
+    ifACL: function (string, acl) {
+        if (this.checkACL(acl)) {
+            return string;
+        }
+        else {
+            return '';
+        }
+    },
+    
     configureVisibility: function () {
+        // Menu visibility
         var aclMenu = {
-            'see_di' : 'dis',
-            'see_host' : 'hosts',
-            'see_osf' : 'osfs',
-            'see_user' : 'users',
-            'see_vm' : 'vms',
+            'di_see' : 'dis',
+            'host_see' : 'hosts',
+            'osf_see' : 'osfs',
+            'user_see' : 'users',
+            'vm_see' : 'vms',
         };
         
         var that = this;
@@ -106,6 +122,23 @@ Wat.C = {
         $.each(aclMenu, function (acl, menu) {
             if (!that.checkACL(acl)) {
                 delete Wat.I.menu[menu];
+            }
+        });
+        
+        // Corner menu visibility
+        var aclCornerMenu = {
+            'administrator_see' : 'admins',
+            'role_see' : 'roles',
+            'tenant_see' : 'tenants',
+            'config_see' : 'config',
+            'customize_see' : 'customize',
+        };
+        
+        var that = this;
+        
+        $.each(aclCornerMenu, function (acl, menu) {
+            if (!that.checkACL(acl)) {
+                delete Wat.I.cornerMenu.setup.subMenu[menu];
             }
         });
     }

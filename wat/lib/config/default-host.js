@@ -131,7 +131,8 @@ Wat.I.selectedActions[qvdObj] = [
 Wat.I.listActionButton[qvdObj] = {
             'name': 'new_host_button',
             'value': 'New Node',
-            'link': 'javascript:'
+            'link': 'javascript:',
+            'acl': 'host_create'
         };
 
 // Breadcrumbs configuration on list view

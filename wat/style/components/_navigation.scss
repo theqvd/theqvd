@@ -53,6 +53,10 @@
                     border-top-right-radius: 0;
                     border-top-left-radius: $menu_radius;
                     border-bottom-left-radius: $menu_radius;
+                }  
+
+                &:first-child:last-child {
+                    border-radius: $menu_radius;
                 }
             }
 

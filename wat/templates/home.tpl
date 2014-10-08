@@ -4,6 +4,7 @@
 
 <div class="home-wrapper">
     <div class="home-row">
+        <% if (Wat.C.checkACL('vm_see')) { %>
         <div class="home-cell">
             <div class="home-title" data-i18n>Running virtual machines</div>
             <div class="home-percent-wrapper">
@@ -14,10 +15,13 @@
                 <div class="js-running-vms-data home-title"></div>
             </a>
         </div>
+        <% } %>
+
 
         <div class="home-cell">
             <div class="home-title" data-i18n>Summary</div>
             <table class="summary-table">
+                <% if (Wat.C.checkACL('user_see')) { %>
                 <tr>
                     <td class="max-1-icons">
                         <i class="<%= CLASS_ICON_USERS %>"></i>
@@ -31,6 +35,7 @@
                         <span class="summary-data js-summary-users"><%= stats.User.total %></span>
                     </td>
                 </tr>
+                <% } if (Wat.C.checkACL('vm_see')) { %>
                 <tr>    
                     <td class="max-1-icons">
                         <i class="<%= CLASS_ICON_VMS %>"></i>
@@ -44,6 +49,7 @@
                         <span class="summary-data js-summary-vms"><%= stats.VM.total %></span>
                     </td>
                 </tr>
+                <% } if (Wat.C.checkACL('host_see')) { %>
                 <tr>
                     <td class="max-1-icons">
                         <i class="<%= CLASS_ICON_HOSTS %>"></i>
@@ -57,6 +63,7 @@
                         <span class="summary-data js-summary-hosts"><%= stats.Host.total %></span>
                     </td>
                 </tr>
+                <% } if (Wat.C.checkACL('osf_see')) { %>
                 <tr>
                     <td class="max-1-icons">
                         <i class="<%= CLASS_ICON_OSFS %>"></i>
@@ -70,6 +77,7 @@
                         <span class="summary-data js-summary-osfs"><%= stats.OSF.total %></span>
                     </td>
                 </tr>
+                <% } if (Wat.C.checkACL('di_see')) { %>
                 <tr>
                     <td class="max-1-icons">
                         <i class="<%= CLASS_ICON_DIS %>"></i>
@@ -83,11 +91,13 @@
                         <span class="summary-data js-summary-dis"><%= stats.DI.total %></span>
                     </td>
                 </tr>
+                <% } %>
             </table>
             <table id="summary">
             </table>
         </div>
         
+        <% if (Wat.C.checkACL('host_see')) { %>
         <div class="home-cell">
             <div class="home-title" data-i18n>Running nodes</div>
             <div class="home-percent-wrapper">
@@ -98,10 +108,12 @@
                 <div class="js-running-hosts-data home-title"></div>
             </a>
         </div>
+        <% } %>
     </div>
 </div>
 <div class="home-wrapper">
     <div class="home-row">
+        <% if (Wat.C.checkACL('vm_see')) { %>
         <div class="home-cell">
             <div class="home-title" data-i18n>VMs close to expire</div>
             <%
@@ -153,13 +165,16 @@
                     }
                 %>
         </div>
+        <% } if (Wat.C.checkACL('host_see')) { %>
         <div class="home-cell">
             <div class="home-title" data-i18n>Nodes with more running VMs</div>
             <div id="hosts-more-vms" class="bar-chart js-bar-chart" style="width:95%;height:200px;"></div>
         </div>
+        <% } %>
         <div class="home-cell">
             <div class="home-title" data-i18n>Blocked elements</div>
             <table class="summary-table">
+                <% if (Wat.C.checkACL('user_see')) { %>
                 <tr>
                     <td class="max-1-icons">
                         <i class="<%= CLASS_ICON_USERS %>"></i>
@@ -173,6 +188,7 @@
                         <span class="summary-data js-summary-blocked-users"><%= stats.User.blocked %></span>
                     </td>
                 </tr>
+                <% } if (Wat.C.checkACL('vm_see')) { %>
                 <tr>    
                     <td class="max-1-icons">
                         <i class="<%= CLASS_ICON_VMS %>"></i>
@@ -186,6 +202,7 @@
                         <span class="summary-data js-summary-blocked-vms"><%= stats.VM.blocked %></span>
                     </td>
                 </tr>
+                <% } if (Wat.C.checkACL('host_see')) { %>
                 <tr>
                     <td class="max-1-icons">
                         <i class="<%= CLASS_ICON_HOSTS %>"></i>
@@ -199,6 +216,7 @@
                         <span class="summary-data js-summary-blocked-hosts"><%= stats.Host.blocked %></span>
                     </td>
                 </tr>
+                <% } if (Wat.C.checkACL('di_see')) { %>
                 <tr>
                     <td class="max-1-icons">
                         <i class="<%= CLASS_ICON_DIS %>"></i>
@@ -212,6 +230,7 @@
                         <span class="summary-data js-summary-blocked-dis"><%= stats.DI.blocked %></span>
                     </td>
                 </tr>
+                <% } %>
             </table>
         </div>
     </div>

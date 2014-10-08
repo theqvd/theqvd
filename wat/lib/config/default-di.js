@@ -115,7 +115,8 @@ Wat.I.selectedActions[qvdObj] = [
 Wat.I.listActionButton[qvdObj] = {
             'name': 'new_di_button',
             'value': 'New Disk image',
-            'link': 'javascript:'
+            'link': 'javascript:',
+            'acl': 'di_create'
         };
 
 // Breadcrumbs configuration on list view

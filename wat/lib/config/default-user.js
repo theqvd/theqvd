@@ -131,7 +131,8 @@ Wat.I.selectedActions[qvdObj] = [
 Wat.I.listActionButton[qvdObj] = {
             'name': 'new_user_button',
             'value': 'New User',
-            'link': 'javascript:'
+            'link': 'javascript:',
+            'acl': 'user_create'
         };
 
 // Breadcrumbs configuration on list view

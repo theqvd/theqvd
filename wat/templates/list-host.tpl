@@ -144,10 +144,10 @@
                             case 'name':
                 %>
                                 <td class="js-name">
-                                    <a href="#/host/<%= model.get('id') %>" data-i18n="[title]Click for details">
-                                        <i class="fa fa-search"></i>
+                                    <%= Wat.C.ifACL('<a href="#/host/' + model.get('id') + '" data-i18n="[title]Click for details">', 'host_see') %>
+                                    <%= Wat.C.ifACL('<i class="fa fa-search"></i>', 'host_see') %>
                                         <span class="text"><%= model.get('name') %></span>
-                                    </a>
+                                    <%= Wat.C.ifACL('</a>', 'host_see') %>
                                 </td>
                 <%
                                 break;
@@ -181,7 +181,7 @@
                             case 'vms_connected':
                 %>
                                 <td class="desktop">
-                                    <% if (model.get('vms_connected') > 0) { %>
+                                    <% if (model.get('number_of_vms_connected') > 0 && Wat.C.checkACL('vm_see')) { %>
                                     <a href="#/vms/host/<%= model.get('id') %>">
                                         <%= model.get('number_of_vms_connected') %>
                                     </a>

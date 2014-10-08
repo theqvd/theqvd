@@ -164,10 +164,10 @@
                             case 'disk_image':
                 %>
                                 <td class="not-break js-name">
-                                    <a href="#/di/<%= model.get('id') %>" data-i18n="[title]Click for details">
-                                        <i class="fa fa-search"></i>
+                                    <%= Wat.C.ifACL('<a href="#/di/' + model.get('id') + '" data-i18n="[title]Click for details">', 'di_see') %>
+                                    <%= Wat.C.ifACL('<i class="fa fa-search"></i>', 'di_see') %>
                                         <span class="text"><%= model.get('disk_image') %></span>
-                                    </a>
+                                    <%= Wat.C.ifACL('</a>', 'di_see') %>
                                 </td>
                 <%
                                 break;
@@ -181,9 +181,9 @@
                             case 'osf':
                 %>
                                 <td class="desktop">
-                                    <a href="#/osf/<%= model.get('osf_id') %>">
+                                    <%= Wat.C.ifACL('<a href="#/osf/' + model.get('id') + '">', 'osf_see') %>
                                         <%= model.get('osf_name') %>
-                                    </a>
+                                    <%= Wat.C.ifACL('</a>', 'osf_see') %>
                                 </td>
                 <%
                                 break;

@@ -101,7 +101,13 @@ Wat.Views.RoleDetailsView = Wat.Views.DetailsView.extend({
     
     renderManagerACLs: function () {
         var aclsRolesTemplate = Wat.A.getTemplate('details-role-acls');
-        $('.bb-role-acls').html(aclsRolesTemplate);
+        
+        // Fill the html with the template and the model
+        this.template = _.template(
+            aclsRolesTemplate, {}
+        );
+        
+        $('.bb-role-acls').html(this.template);
         
         var params = {
             'action': 'acl_tiny_list',

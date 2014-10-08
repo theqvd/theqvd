@@ -170,46 +170,47 @@
                             case 'name':
                 %>
                                 <td class="js-name">
-                                    <a href="#/vm/<%= model.get('id') %>" data-i18n="[title]Click for details">
-                                        <i class="fa fa-search"></i>
+                                    <%= Wat.C.ifACL('<a href="#/vm/' + model.get('id') + '" data-i18n="[title]Click for details">', 'vm_see') %>
+                                    <%= Wat.C.ifACL('<i class="fa fa-search"></i>', 'vm_see') %>
                                         <span class="text"><%= model.get('name') %></span>
-                                    </a>
+                                    <%= Wat.C.ifACL('</a>', 'vm_see') %>
                                 </td>
                 <%
                                 break;
                             case 'host':
                 %>
                                 <td class="desktop">
-                                    <a href="#/host/<%= model.get('host_id') %>">
+                                    <%= Wat.C.ifACL('<a href="#/host/' + model.get('host_id') + '">', 'host_see') %>
                                         <%= model.get('host_name') %>
-                                    </a>
+                                    <%= Wat.C.ifACL('</a>', 'host_see') %>
                                 </td>
                 <%
                                 break;
                             case 'user':
                 %>
                                 <td class="desktop">
-                                    <a href="#/user/<%= model.get('user_id') %>">
+                                    <%= Wat.C.ifACL('<a href="#/user/' + model.get('user_id') + '">', 'user_see') %>
                                         <%= model.get('user_name') %>
-                                    </a>
+                                    <%= Wat.C.ifACL('</a>', 'user_see') %>
                                 </td>
                 <%
                                 break;
                             case 'osf':
                 %>
                                 <td class="desktop">
-                                    <a href="#/osf/<%= model.get('osf_id') %>">
+                                    <%= Wat.C.ifACL('<a href="#/osf/' + model.get('osf_id') + '">', 'osf_see') %>
                                         <%= model.get('osf_name') %>
-                                    </a>
+                                    <%= Wat.C.ifACL('</a>', 'osf_see') %>
                                 </td>
                 <%
                                 break;
                             case 'osf/tag':
                 %>
                                 <td class="desktop">
-                                    <a href="#/osf/<%= model.get('osf_id') %>">
+                                    <%= Wat.C.ifACL('<a href="#/osf/' + model.get('osf_id') + '">', 'osf_see') %>
                                         <%= model.get('osf_name') %>
-                                    </a>
+                                    <%= Wat.C.ifACL('</a>', 'osf_see') %>
+                                    
                                     <div class="second_row">
                                         <%= model.get('di_tag') %>
                                     </div>

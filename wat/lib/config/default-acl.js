@@ -67,7 +67,8 @@ Wat.I.selectedActions[qvdObj] = [
 Wat.I.listActionButton[qvdObj] = {
             'name': 'new_role_button',
             'value': 'New Role',
-            'link': 'javascript:'
+            'link': 'javascript:',
+            'acl': 'role_create'
         };
 
 // Breadcrumbs configuration on list view

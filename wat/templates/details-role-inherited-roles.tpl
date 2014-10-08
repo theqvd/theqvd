@@ -2,7 +2,7 @@
     <tr>
         <th colspan="5">
             <span data-i18n>
-                Inherit roles
+                Inherited roles
             </span>
             <div class="second_row fa fa-info-circle block" data-i18n>
                 Excluded ACLs will not be inherited
@@ -12,6 +12,7 @@
     <tr>
         <td colspan="2">
             <table class="roles-inherit-table">
+                <% if(Wat.C.checkACL('role_manage_roles')) { %>
                 <tr>
                     <td>
                         <span data-i18n>Select a role to be inerithed</span>
@@ -34,6 +35,8 @@
                 <%
                     }
                 %>
+                <% } %>
+
                 <tr>
                     <td>
                         <%
@@ -82,8 +85,10 @@
                                             <%
                                                 }
                                             %>  
-                                                </div>                                    
+                                                </div>   
+                                                <% if(Wat.C.checkACL('role_manage_roles')) { %>
                                                 <a class="button button-under-floating-box delete-role-button js-delete-role-button fa fa-trash-o" href="javascript:" data-id="<%= iRole %>" data-i18n>Delete</a>
+                                                <% } %>
                                             </td>
                                         </tr>
                                     </table>

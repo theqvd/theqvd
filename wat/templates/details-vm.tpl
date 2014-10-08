@@ -1,6 +1,8 @@
 <div class="details-header">
     <span class="fa fa-cloud h1"><%= model.get('name') %></span>
+    <% if(Wat.C.checkACL('vm_update')) { %>
     <a class="button button-right js-button-edit fa fa-pencil" href="javascript:" data-i18n>Edit</a>
+    <% } %>
 </div>
 
 <table class="details details-list">

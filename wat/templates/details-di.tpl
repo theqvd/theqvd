@@ -1,6 +1,8 @@
 <div class="details-header">
     <span class="fa fa-dot-circle-o h1" data-i18n><%= model.get('disk_image') %></span>
+    <% if(Wat.C.checkACL('di_update')) { %>
     <a class="button button-right js-button-edit fa fa-pencil" href="javascript:" data-i18n>Edit</a>
+    <% } %>
 </div>
 
 <table class="details details-list">

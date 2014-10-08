@@ -49,7 +49,8 @@ Wat.I.selectedActions[qvdObj] = [
 Wat.I.listActionButton[qvdObj] = {
             'name': 'new_tenant_button',
             'value': 'New Tenant',
-            'link': 'javascript:'
+            'link': 'javascript:',
+            'acl': 'tenant_create'
         };
 
 // Breadcrumbs configuration on list view

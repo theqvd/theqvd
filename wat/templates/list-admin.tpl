@@ -33,16 +33,15 @@
                             </th>
             <%
                             break;
-                        case 'tenant':
-            %>
-                            <th class="sortable" data-sortby="tenant_name">
-                                <i class="fa fa-sort sort-icon" data-i18n="Tenant"><%= i18n.t('Tenant') %></i>
-                            </th>
-            <%
-                            break;
                     }
                 });
             %>
+            
+            <% if (Wat.C.isSuperadmin()) { %>
+                <th class="sortable" data-sortby="tenant_name">
+                    <i class="fa fa-sort sort-icon" data-i18n="Tenant"><%= i18n.t('Tenant') %></i>
+                </th>
+            <% } %>
         </tr>
     </thead>
     <tbody>
@@ -91,26 +90,25 @@
                             case 'name':
                 %>
                                 <td class="js-name">
-                                    <a href="#/setup/admin/<%= model.get('id') %>" data-i18n="[title]Click for details">
-                                        <i class="fa fa-search"></i>
+                                    <%= Wat.C.ifACL('<a href="#/setup/admin/' + model.get('id') + '" data-i18n="[title]Click for details">', 'administrator_see') %>
+                                    <%= Wat.C.ifACL('<i class="fa fa-search"></i>', 'administrator_see') %>
                                         <span class="text"><%= model.get('name') %></span>
-                                    </a>
+                                    <%= Wat.C.ifACL('</a>', 'administrator_see') %>
                                     <div class="mobile info-in-name-cell">
                                         <%= info %>
                                     </div>
                                 </td>
                 <%
                                 break;
-                            case 'tenant':
-                %>
-                                <td class="js-tenant">
-                                    <span class="text"><%= model.get('tenant_name') %></span>
-                                </td>
-                <%
-                                break;
                         }
                     });
                 %>
+                
+                <% if (Wat.C.isSuperadmin ()) { %>
+                    <td class="js-tenant">
+                        <span class="text"><%= model.get('tenant_name') %></span>
+                    </td>
+                <% } %>
             </tr>
         <% }); %>
     </tbody>
