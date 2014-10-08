@@ -13,7 +13,7 @@
         <td class="acls acls_negative">
             <span data-i18n>Excluded ACLs</span>
             <select name="acl_negative_on_role" class="side_to_side_select" multiple></select>
-            <a class="button fa fa-trash js-delete-negative-acl-button" data-i18n>Delete selected</a>
+            <a class="button fa fa-trash js-delete-negative-acl-button disabled" data-i18n>Delete selected</a>
         </td>
         <td class="vbutton">
             <a class="button button--red button-icon fa fa-arrow-left js-add-negative-acl-button" data-i18n></a>
@@ -28,7 +28,7 @@
         <td class="acls acls_positive">
             <span data-i18n>ACLs on role</span>
             <select name="acl_positive_on_role" class="side_to_side_select" multiple></select>
-            <a class="button fa fa-trash js-delete-positive-acl-button" data-i18n>Delete selected</a>
+            <a class="button fa fa-trash js-delete-positive-acl-button disabled" data-i18n>Delete selected</a>
         </td>
     </tr>
 </table>

@@ -57,23 +57,7 @@ Wat.Views.DIListView = Wat.Views.ListView.extend({
             };
             
             // Add an event to the tenant select change
-            Wat.B.bindEvent('change', '[name="tenant_id"]', function () {
-                var params = {
-                    'action': 'osf_tiny_list',
-                    'selectedId': '',
-                    'controlName': 'osf_id',
-                    'filters': {
-                        'tenant_id': $(this).val()
-                    }
-                };
-                
-                // Remove all osf options and fill filtering with new selected tenant
-                $('[name="osf_id"] option').remove();
-                Wat.A.fillSelect(params); 
-                
-                // Update chosen control for osf
-                $('[name="osf_id"]').trigger('chosen:updated');
-            });
+            Wat.B.bindEvent('change', '[name="tenant_id"]', Wat.B.editorBinds.filterTenantOSFs);
         }
         
         Wat.A.fillSelect(params);  

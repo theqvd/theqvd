@@ -119,6 +119,11 @@ Wat.Views.RoleDetailsView = Wat.Views.DetailsView.extend({
             $('select[name="acl_positive_on_role"]').append('<option value="' + iAcl + '">' + acl + '</option>');
         });   
         
+        // Enable delete button when select any element of list
+        Wat.B.bindEvent('change', 'select[name="acl_positive_on_role"]', function () { 
+            $('.js-delete-positive-acl-button').removeClass('disabled');
+        });
+        
         // Disable acls that exist in negative mode
         $.each(this.model.get('acls').negative, function (iAcl, acl) {
             $('select[name="acl_available"] option[value="' + iAcl + '"]').remove();
@@ -128,6 +133,11 @@ Wat.Views.RoleDetailsView = Wat.Views.DetailsView.extend({
         $.each(this.model.get('acls').negative, function (iAcl, acl) {
             $('select[name="acl_available"] option[value="' + iAcl + '"]').remove();
             $('select[name="acl_negative_on_role"]').append('<option value="' + iAcl + '">' + acl + '</option>');
+        });
+        
+        // Enable delete button when select any element of list
+        Wat.B.bindEvent('change', 'select[name="acl_negative_on_role"]', function () { 
+            $('.js-delete-negative-acl-button').removeClass('disabled');
         });
         
         // Disable acls that exist in positive mode

@@ -281,6 +281,27 @@ Wat.B = {
             Wat.A.fillSelect(params);
 
             Wat.I.updateChosenControls('[name="di_tag"]');
+        },
+        
+        filterTenantOSFs: function () {
+            var params = {
+                'action': 'osf_tiny_list',
+                'selectedId': '',
+                'controlName': 'osf_id',
+                'filters': {
+                    'tenant_id': $(this).val()
+                }
+            };
+
+            // Remove all osf options and fill filtering with new selected tenant
+            $('[name="osf_id"] option').remove();
+            Wat.A.fillSelect(params); 
+
+            // Update chosen control for osf
+            $('[name="osf_id"]').trigger('chosen:updated');
+
+            // Trigger change event to update tags
+            $('[name="osf_id"]').trigger('change');
         }
     },
     
@@ -292,6 +313,11 @@ Wat.B = {
     
     roleEditorBinds: {
         deleteAcl: function (e) {
+            // Disabled buttons have no effect
+            if ($(this).hasClass('disabled')) {
+                return;
+            }
+            
             // type can be 'positive' or 'negative'
             var type = e.data;
             
