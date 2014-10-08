@@ -112,6 +112,8 @@ Wat.Views.MainView = Backbone.View.extend({
             
             // Remove supertenant from tenant selector
             $('select[name="tenant_id"] option[value="0"]').remove();
+            
+            Wat.I.chosenElement('[name="tenant_id"]', 'single100');
         }
 
         // Add specific parts of editor to dialog

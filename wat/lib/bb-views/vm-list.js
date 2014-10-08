@@ -33,9 +33,39 @@ Wat.Views.VMListView = Wat.Views.ListView.extend({
             'selectedId': '',
             'controlName': 'osf_id'
         };
-
-        Wat.A.fillSelect(params);  
         
+        // If exist tenant control (in superadmin cases) show osfs of selected tenant
+        if ($('[name="tenant_id"]').val() != undefined) {
+            // Add the tenant id to the osf select filling
+            params.filters = {
+                'tenant_id': $('[name="tenant_id"]').val()
+            };
+            
+            // Add an event to the tenant select change
+            Wat.B.bindEvent('change', '[name="tenant_id"]', function () {
+                var params = {
+                    'action': 'osf_tiny_list',
+                    'selectedId': '',
+                    'controlName': 'osf_id',
+                    'filters': {
+                        'tenant_id': $(this).val()
+                    }
+                };
+                
+                // Remove all osf options and fill filtering with new selected tenant
+                $('[name="osf_id"] option').remove();
+                Wat.A.fillSelect(params); 
+                
+                // Update chosen control for osf
+                $('[name="osf_id"]').trigger('chosen:updated');
+                
+                // Trigger change event to update tags
+                $('[name="osf_id"]').trigger('change');
+            });
+        }
+
+        Wat.A.fillSelect(params); 
+                
         Wat.I.chosenElement('[name="osf_id"]', 'single100');
         
         // Fill DI Tags select on virtual machines creation form
