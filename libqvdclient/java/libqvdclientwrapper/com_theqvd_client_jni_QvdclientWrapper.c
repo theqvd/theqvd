@@ -180,6 +180,11 @@ JNINativeMethod methods[] = {
     (void *) Java_com_theqvd_client_jni_QvdclientWrapper_qvd_1c_1list_1of_1vm
   },
   {
+    "qvd_c_stop_vm",
+    "(JI)I",
+    (void *) Java_com_theqvd_client_jni_QvdclientWrapper_qvd_1c_1stop_1vm
+  },
+  {
     "qvd_c_set_geometry",
     "(JII)V",
     (void *) Java_com_theqvd_client_jni_QvdclientWrapper_qvd_1c_1set_1geometry
@@ -458,7 +463,7 @@ int progress_callback(qvdclient *qvd, const char *message)
  * Signature: ()Ljava/lang/String;
  */
 JNIEXPORT jstring JNICALL Java_com_theqvd_client_jni_QvdclientWrapper_qvd_1c_1get_1version_1text
-(JNIEnv *env, jobject obj) {
+(JNIEnv *env, jclass class) {
   const char *version = qvd_get_version_text();
   return (*env)->NewStringUTF(env, version);
 }
@@ -469,7 +474,7 @@ JNIEXPORT jstring JNICALL Java_com_theqvd_client_jni_QvdclientWrapper_qvd_1c_1ge
  * Signature: ()I
  */
 JNIEXPORT jint JNICALL Java_com_theqvd_client_jni_QvdclientWrapper_qvd_1c_1get_1version
-(JNIEnv *env, jobject obj) {
+(JNIEnv *env, jclass class) {
   jint version;
   version = qvd_get_version();
   return version;
@@ -697,6 +702,46 @@ JNIEXPORT jint JNICALL Java_com_theqvd_client_jni_QvdclientWrapper_qvd_1c_1conne
   jint result = qvd_connect_to_vm(qvd, vm_id);
   return result;
 }
+
+/*
+ * Calls qvd_stop_vm
+ */
+JNIEXPORT jint JNICALL Java_com_theqvd_client_jni_QvdclientWrapper_qvd_1c_1stop_1vm
+(JNIEnv *env, jobject obj, jlong qvd_c_pointer, jint vm_id)
+{
+  qvdclient *qvd; 
+  int vm_id_int;
+  jobject vm;
+  struct callbackhandler_environment_struct *callbackhandler_env = NULL;
+
+  qvd=_set_qvdclient(qvd_c_pointer);
+  qvd_printf("c_qvd_connect_to_vm(%p,%d)\n", qvd, vm_id);
+
+  /* Set the certificate handler here */
+  /*  memory leak handling if the list_of_vm is called twice, should be NULL
+   *  if not allocated before
+   */
+  free(qvd->userdata);
+  callbackhandler_env = malloc(sizeof(struct callbackhandler_environment_struct));
+  /* Might be null if the object has not been asigned */
+  callbackhandler_env->unknowncertCallbackHandler = (*env)->GetObjectField(env, obj, certificatehandler_fid);
+  qvd_printf("certificateHandler: %p, jvm: %p\n", callbackhandler_env->unknowncertCallbackHandler, callbackhandler_env->jvm);  
+  callbackhandler_env->progressCallbackHandler = (*env)->GetObjectField(env, obj, progresshandler_fid);
+  qvd_printf("progressCallbackHandler: %p, jvm: %p\n", callbackhandler_env->progressCallbackHandler, callbackhandler_env->jvm);  
+  if ((*env)->GetJavaVM(env, &(callbackhandler_env->jvm)) < 0) {
+    qvd_error(qvd, "Error obtaining the JavaVM pointer\n");
+    return 7;
+  }
+  qvd->userdata = (void *) callbackhandler_env;
+  qvd_printf("progressCallbackHandler: %p, jvm: %p\n", callbackhandler_env->progressCallbackHandler, callbackhandler_env->jvm);  
+  qvd_printf("certificateHandler: %p, jvm: %p\n", callbackhandler_env->unknowncertCallbackHandler, callbackhandler_env->jvm);  
+  qvd_set_unknown_cert_callback(qvd, accept_unknown_cert_callback);
+
+  vm_id_int = vm_id;
+  jint result = qvd_stop_vm(qvd, vm_id);
+  return result;
+}
+
 
 /*
  * set geometry

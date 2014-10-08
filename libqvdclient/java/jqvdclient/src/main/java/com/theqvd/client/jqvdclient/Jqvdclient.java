@@ -69,8 +69,7 @@ public class Jqvdclient {
             // you can parse additional arguments if you want.
             // parser.parseArgument("more","args");
             if (version) {
-        		QvdclientWrapper q = new QvdclientWrapper();
-        		System.out.print(q.get_version_text());
+        		System.out.print(QvdclientWrapper.get_version_text());
             	return;
             }
             // after parsing arguments, you should check

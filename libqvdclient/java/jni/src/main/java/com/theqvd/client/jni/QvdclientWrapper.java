@@ -28,12 +28,13 @@ public class QvdclientWrapper {
 	private long qvd_c_pointer = 0;
 	private final static String library = "qvdclientwrapper";
 	private final int MAX_SCREEN_SIZE = 32565;
-	private native String qvd_c_get_version_text();
-	private native int qvd_c_get_version();
+	private native static String qvd_c_get_version_text();
+	private native static int qvd_c_get_version();
 	private native long qvd_c_init(Qvdclient q);
 	private native void qvd_c_free(long qvdclient);
 	private native int qvd_c_connect_to_vm(long qvdclient, int i);
 	private native Vm[] qvd_c_list_of_vm(long qvdclient);
+	private native int qvd_c_stop_vm(long qvdclient, int i);
 	private native void qvd_c_set_geometry(long qvdclient, int width, int height);
 	private native void qvd_c_set_fullscreen(long qvdclient);
 	private native void qvd_c_set_nofullscreen(long qvdclient);
@@ -54,11 +55,11 @@ public class QvdclientWrapper {
 	private QvdUnknownCertificateHandler certificateHandler = null;
 	private QvdProgressHandler progressHandler = null;
 	
-	public int get_version() {
+	public static int get_version() {
 		return qvd_c_get_version();
 	}
 	
-	public String get_version_text() {
+	public static String get_version_text() {
 		return qvd_c_get_version_text();
 	}
 	
@@ -123,7 +124,42 @@ public class QvdclientWrapper {
 			throw new QvdException(qvd_c_get_last_error_message(qvd_c_pointer));
 		}
 	}
-	
+
+
+	public void qvd_stop_vm(int vm_id) throws QvdException {
+		if (qvd_c_pointer == 0) {
+			throw new QvdException("Error in qvd_stop_vm. qvd_c_pointer is 0 and it should not be, have you called qvd_init?");
+		}
+		if (qvdclient.getVmlist() == null) {
+			throw new QvdException("You are trying to stop a vm but no list of vms is available." +
+					"Have you called qvd_list_of_vm, or does the user has any vm?");
+		}
+		if (vm_id < 0) {
+			throw new QvdException("You are trying to connect to a vm not available vm_id="+ vm_id);
+		}
+		Vm vlist[] = qvdclient.getVmlist();
+		Vm v;
+		int i;
+		boolean found = false;
+		String vliststr="";
+		for (i = 0; i < vlist.length; i ++)
+		{
+			v = vlist[i];
+			vliststr += v + ";";
+			found |= v.getId() == vm_id;
+			if (found) {
+				break;
+			}
+		}
+		if (!found)
+		{
+			throw new QvdException("You are trying to stop a vm not available vm_id="+ vm_id + ". Vmlist="+vliststr);
+		}
+
+		if (qvd_c_stop_vm(this.qvd_c_pointer, vm_id) != 0) {
+			throw new QvdException(qvd_c_get_last_error_message(qvd_c_pointer));
+		}
+	}	
 	
 	public void qvd_free() throws QvdException {
 		if (qvd_c_pointer == 0) {
