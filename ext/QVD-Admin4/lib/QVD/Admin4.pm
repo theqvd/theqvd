@@ -431,38 +431,38 @@ sub tags_delete
 
 sub add_acls_to_role
 {
-    my ($self,$acl_ids,$role,$positive) = @_;
+    my ($self,$acl_names,$role,$positive) = @_;
 
-    for my $acl_id (@$acl_ids)
+    for my $acl_name (@$acl_names)
     { 	
 	my $acl = $DB->resultset('ACL')->search(
-	    { id => $acl_id })->first;
+	    { name => $acl_name })->first;
 	QVD::Admin4::Exception->throw(code => 21) 
 	    unless $acl; 
 
 #	next if $role->is_allowed_to($acl->name);
 #	$role->has_negative_acl($acl->name) ?
-#	    $self->unassign_acls_to_role($role,$acl->id) :
-	    $self->assign_acl_to_role($role,$acl->id,$positive);
+#	    $self->unassign_acls_to_role($role,$acl->name) :
+	    $self->assign_acl_to_role($role,$acl->name,$positive);
     }
 }
 
 sub del_acls_to_role
 {
-    my ($self,$acl_ids,$role) = @_;
+    my ($self,$acl_names,$role) = @_;
 
-    for my $acl_id (@$acl_ids)
+    for my $acl_name (@$acl_names)
     { 	
 	my $acl = $DB->resultset('ACL')->search(
-	    { id => $acl_id })->first;
+	    { name => $acl_name })->first;
 	QVD::Admin4::Exception->throw(code => 21)
 	    unless $acl; 
 
 #	next unless $role->is_allowed_to($acl->name);
 #	$role->has_positive_acl($acl->name) ?
-#	    $self->unassign_acls_to_role($role,$acl->id) :
-#	    $self->assign_acl_to_role($role,$acl->id,0);
-	$self->unassign_acls_to_role($role,$acl->id);
+#	    $self->unassign_acls_to_role($role,$acl->name) :
+#	    $self->assign_acl_to_role($role,$acl->name,0);
+	$self->unassign_acl_to_role($role,$acl->name);
     }
 }
 
@@ -508,19 +508,23 @@ sub del_roles_to_role
 
 sub assign_acl_to_role
 {
-    my ($self,$role,$acl_id,$positive) = @_;
+    my ($self,$role,$acl_name,$positive) = @_;
 
+    my $acl_id = eval { $DB->resultset('ACL')->find({name => $acl_name})->id }
+    // QVD::Admin4::Exception->throw(code=>'21');
     eval { $role->create_related('acl_rels', { acl_id => $acl_id,
 					       positive => $positive }) };
     QVD::Admin4::Exception->throw(code => $DB->storage->_dbh->state,
 				  message => "$@") if $@;
 }
 
-sub unassign_acls_to_role
+sub unassign_acl_to_role
 {
-    my ($self,$role,$acl_ids) = @_;
+    my ($self,$role,$acl_name) = @_;
 
-    for ($role->search_related('acl_rels', { acl_id => $acl_ids })->all)
+    my $acl_id = eval { $DB->resultset('ACL')->find({name => $acl_name})->id }
+    // QVD::Admin4::Exception->throw(code=>'21');
+    for ($role->search_related('acl_rels', { acl_id => $acl_id })->all)
     {
 	eval { $_->delete };
 	QVD::Admin4::Exception->throw(code => $DB->storage->_dbh->state,

@@ -30,6 +30,19 @@ SET default_tablespace = '';
 SET default_with_oids = false;
 
 --
+-- Name: session; Type: TABLE; Schema: public; Owner: qvd; Tablespace: 
+--
+
+CREATE TABLE session (
+        sid          character varying(40) NOT NULL,
+    	data         text,
+    	expires      integer NOT NULL
+);
+
+ALTER TABLE public.session OWNER TO qvd;
+
+
+--
 -- Name: configs; Type: TABLE; Schema: public; Owner: qvd; Tablespace: 
 --
 
@@ -1073,6 +1086,14 @@ COPY vms (id, name, user_id, osf_id, di_tag, ip, storage) FROM stdin;
 SELECT pg_catalog.setval('vms_id_seq', 1, false);
 
 --
+-- Name: session_pkey; Type: CONSTRAINT; Schema: public; Owner: qvd; Tablespace: 
+--
+
+ALTER TABLE ONLY session
+    ADD CONSTRAINT session_pkey PRIMARY KEY (sid);
+
+
+--
 -- Name: tenants_pkey; Type: CONSTRAINT; Schema: public; Owner: qvd; Tablespace: 
 --
 
@@ -1283,11 +1304,11 @@ ALTER TABLE ONLY osf_properties
 
 
 --
--- Name: osfs_name; Type: CONSTRAINT; Schema: public; Owner: qvd; Tablespace: 
+-- Name: osfs_name_tenant_id; Type: CONSTRAINT; Schema: public; Owner: qvd; Tablespace: 
 --
 
 ALTER TABLE ONLY osfs
-    ADD CONSTRAINT osfs_name UNIQUE (name);
+    ADD CONSTRAINT osfs_name_tenant_id UNIQUE (name, tenant_id);
 
 
 --

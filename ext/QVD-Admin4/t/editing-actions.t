@@ -222,6 +222,79 @@ $t->post_ok('/' => json => { login    => 'superadmin',
     ->status_is(200, 'di_update HTTP STATUS')
     ->json_is('/status' => '0', 'di_update API STATUS');
 
+$t->post_ok('/' => json => { login    => 'superadmin',              
+		             password => 'superadmin',              
+		             action   => 'di_get_details',
+			     filters    => { id => 1 }}) 
+    ->status_is(200, 'di_get_details HTTP STATUS')
+    ->json_is('/status' => '0', 'di_get_details API STATUS')
+    ->json_is('/result/rows/0/tags/1/tag' => 'kkk', 'di_get_details HAS CHANGED');
+
+
+$t->post_ok('/' => json => { login    => 'superadmin',              
+		             password => 'superadmin',              
+		             action   => 'di_update',
+			     filters    => { id => 5 },
+			     arguments => {__tags_changes__ => { create => ['kkk']}}}) 
+    ->status_is(200, 'di_update HTTP STATUS')
+    ->json_is('/status' => '0', 'di_update API STATUS');
+
+$t->post_ok('/' => json => { login    => 'superadmin',              
+		             password => 'superadmin',              
+		             action   => 'di_get_details',
+			     filters    => { id => 5 }}) 
+    ->status_is(200, 'di_get_details HTTP STATUS')
+    ->json_is('/status' => '0', 'di_get_details API STATUS')
+    ->json_is('/result/rows/0/tags/3/tag' => 'kkk', 'di_get_details HAS CHANGED');
+
+$t->post_ok('/' => json => { login    => 'superadmin',              
+		             password => 'superadmin',              
+		             action   => 'di_get_details',
+			     filters    => { id => 1 }}) 
+    ->status_is(200, 'di_get_details HTTP STATUS')
+    ->json_is('/status' => '0', 'di_get_details API STATUS')
+    ->json_hasnt('/result/rows/0/tags/1/', 'di_get_details HAS CHANGED');
+
+$t->post_ok('/' => json => { login    => 'superadmin',              
+		             password => 'superadmin',              
+		             action   => 'di_update',
+			     filters    => { id => 1 },
+			     arguments => {__tags_changes__ => { create => ['kkk']}}}) 
+    ->status_is(200, 'di_update HTTP STATUS')
+    ->json_is('/status' => '0', 'di_update API STATUS');
+
+$t->post_ok('/' => json => { login    => 'superadmin',              
+		             password => 'superadmin',              
+		             action   => 'di_update',
+			     filters    => { id => 5 },
+			     arguments => {__tags_changes__ => { delete => ['default']}}}) 
+    ->status_is(200, 'di_update HTTP STATUS')
+    ->json_is('/status' => '1', 'di_update API STATUS');
+
+$t->post_ok('/' => json => { login    => 'superadmin',              
+		             password => 'superadmin',              
+		             action   => 'di_update',
+			     filters    => { id => 5 },
+			     arguments => {__tags_changes__ => { delete => ['head']}}}) 
+    ->status_is(200, 'di_update HTTP STATUS')
+    ->json_is('/status' => '1', 'di_update API STATUS');
+
+$t->post_ok('/' => json => { login    => 'superadmin',              
+		             password => 'superadmin',              
+		             action   => 'di_update',
+			     filters    => { id => 5 },
+			     arguments => {__tags_changes__ => { create => ['2014-09-26-002']}}}) 
+    ->status_is(200, 'di_update HTTP STATUS')
+    ->json_is('/status' => '1', 'di_update API STATUS');
+
+$t->post_ok('/' => json => { login    => 'superadmin',              
+		             password => 'superadmin',              
+		             action   => 'di_update',
+			     filters    => { id => 1 },
+			     arguments => {__tags_changes__ => { create => ['2014-09-26-002']}}}) 
+    ->status_is(200, 'di_update HTTP STATUS')
+    ->json_is('/status' => '1', 'di_update API STATUS');
+
 
 #################
 ### admin_update
@@ -300,10 +373,10 @@ $t->post_ok('/' => json => { login    => 'superadmin',
 		             action   => 'role_update',
 			     filters    => {id => 4 },
 	                     arguments => {name => 'superpringate',
-					   __acls_changes__ => { assign_roles => ['1'], 
-								 assign_acls => ['4'], 
-								 unassign_roles => [], 
-								 unassign_acls => ['2'] }}}) 
+					   __roles_changes__ => { assign_roles => ['1'] }, 
+					   __acls_changes__ => { unassign_positive_acls => ['1'], 
+								 assign_positive_acls => ['4'], 
+								 assign_negative_acls => ['2']}}}) 
     ->status_is(200, '1º role_update HTTP STATUS')
     ->json_is('/status' => '0', '1º role_update API STATUS');
 
@@ -314,63 +387,16 @@ $t->post_ok('/' => json => { login    => 'superadmin',
 			     filters    => {id => 4 }}) 
     ->status_is(200, '1º role_get_details HTTP STATUS')
     ->json_is('/status' => '0', '1º role_get_details API STATUS')
-
     ->json_is('/result/rows/0/name' => 'superpringate', '1º role_get_details HAS CHANGED')
-    ->json_is('/result/rows/0/roles/0/name','spy', '1º role_get_details HAS CHANGED')
-    ->json_hasnt('/result/rows/0/roles/1/','1º role_get_details HAS CHANGED')
-    ->json_is('/result/rows/0/acls/0/name', 'user_delete', '1º role_get_details HAS CHANGED')
-    ->json_is('/result/rows/0/acls/1/name','user_see', '1º role_get_details HAS CHANGED')
-    ->json_is('/result/rows/0/acls/2/name','user_update', '1º role_get_details HAS CHANGED')
-    ->json_hasnt('/result/rows/0/acls/3/', '1º role_get_details HAS CHANGED')
+    ->json_is('/result/rows/0/roles/1/name','spy', '1º role_get_details HAS CHANGED')
+    ->json_is('/result/rows/0/roles/1/acls/0/','user_create', '1º role_get_details HAS CHANGED')
+    ->json_is('/result/rows/0/roles/1/acls/1/','user_delete', '1º role_get_details HAS CHANGED')
+    ->json_is('/result/rows/0/roles/1/acls/2/','user_see', '1º role_get_details HAS CHANGED')
+    ->json_hasnt('/result/rows/0/roles/1/acls/3/', '1º role_get_details HAS CHANGED')
+    ->json_hasnt('/result/rows/0/acls/positive/1', '1º role_get_details HAS CHANGED')
+    ->json_is('/result/rows/0/acls/positive/4/', 'user_update', '1º role_get_details HAS CHANGED')
+    ->json_is('/result/rows/0/acls/negative/2/', 'user_create', '1º role_get_details HAS CHANGED')
 ;
-
-$t->post_ok('/' => json => { login    => 'superadmin',              
-		             password => 'superadmin',              
-		             action   => 'role_update',
-			     filters    => {id => 4 },
-	                     arguments => {__acls_changes__ => { assign_roles => ['6'], 
-								 assign_acls => [], 
-								 unassign_roles => ['1'], 
-								 unassign_acls => ['3'] }}}) 
-    ->status_is(200, '2º role_update HTTP STATUS')
-    ->json_is('/status' => '0', '2º role_update API STATUS');
-
-
-$t->post_ok('/' => json => { login    => 'superadmin',              
-		             password => 'superadmin',              
-		             action   => 'role_get_details',
-			     filters    => {id => 4 }}) 
-    ->status_is(200, '2º role_get_details HTTP STATUS')
-    ->json_is('/status' => '0', '2º role_get_details API STATUS')
-    ->json_is('/result/rows/0/roles/0/name','theworst', '2º role_get_details HAS CHANGED')
-    ->json_hasnt('/result/rows/0/roles/1/','2º role_get_details HAS CHANGED')
-    ->json_is('/result/rows/0/acls/0/name', 'user_create', '2º role_get_details HAS CHANGED')
-    ->json_is('/result/rows/0/acls/1/name', 'user_update', '2º role_get_details HAS CHANGED')
-    ->json_hasnt('/result/rows/0/acls/2/', '2º role_get_details HAS CHANGED');
-
-
-$t->post_ok('/' => json => { login    => 'superadmin',              
-		             password => 'superadmin',              
-		             action   => 'role_update',
-			     filters    => {id => 4 },
-	                     arguments => {__acls_changes__ => { assign_roles => [], 
-								 assign_acls => ['3'], 
-								 unassign_roles => [], 
-								 unassign_acls => ['4'] }}}) 
-    ->status_is(200, '3º role_update HTTP STATUS')
-    ->json_is('/status' => '0', '3º role_update API STATUS');
-
-$t->post_ok('/' => json => { login    => 'superadmin',              
-		             password => 'superadmin',              
-		             action   => 'role_get_details',
-			     filters    => {id => 4 }}) 
-    ->status_is(200, '3º role_get_details HTTP STATUS')
-    ->json_is('/status' => '0', '3º role_get_details API STATUS')
-    ->json_is('/result/rows/0/roles/0/name','theworst', '3º role_get_details HAS CHANGED')
-    ->json_hasnt('/result/rows/0/roles/1/','3º role_get_details HAS CHANGED')
-    ->json_is('/result/rows/0/acls/0/name', 'user_create', '3º role_get_details HAS CHANGED')
-    ->json_is('/result/rows/0/acls/1/name', 'user_delete', '3º role_get_details HAS CHANGED')
-    ->json_hasnt('/result/rows/0/acls/2/', '3º role_get_details HAS CHANGED');
 
 #############################
 #############################
@@ -383,19 +409,33 @@ $t->post_ok('/' => json => { login    => 'superadmin',
 		             action   => 'role_update',
 			     filters    => {id => 4 },
 	                     arguments => {name => 'superpringao',
-			     __acls_changes__ => { assign_roles => [], 
-						   assign_acls => ['1'], 
-						   unassign_roles => ['6'], 
-						   unassign_acls => [] }}}) 
-    ->status_is(200, '4º role_update HTTP STATUS')
-    ->json_is('/status' => '0', '4º role_update API STATUS');
+			     __roles_changes__ => { unassign_roles => ['1'] }, 
+			     __acls_changes__ => { unassign_negative_acls => ['2'], 
+						   unassign_positive_acls => ['4'], 
+						   assign_positive_acls => ['1']}}}) 
+    ->status_is(200, '2º role_get_details HTTP STATUS')
+    ->json_is('/status' => '0', '2º role_get_details API STATUS');
 
 
-##
+$t->post_ok('/' => json => { login    => 'superadmin',              
+		             password => 'superadmin',              
+		             action   => 'role_get_details',
+			     filters    => {id => 4 }}) 
+    ->status_is(200, '1º role_get_details HTTP STATUS')
+    ->json_is('/status' => '0', '2º role_get_details API STATUS')
+    ->json_is('/result/rows/0/name' => 'superpringao', '2º role_get_details HAS CHANGED')
+    ->json_hasnt('/result/rows/0/roles/1/', '2º role_get_details HAS CHANGED')
+    ->json_is('/result/rows/0/acls/positive/1', 'user_see', '2º role_get_details HAS CHANGED')
+    ->json_hasnt('/result/rows/0/acls/positive/4/', '2º role_get_details HAS CHANGED')
+    ->json_hasnt('/result/rows/0/acls/negative/2/', '2º role_get_details HAS CHANGED')
+    ;
+
+
+
 done_testing();
-##
+
 ###################################
 ###################################
 ###################################
-##
-#
+
+

@@ -294,18 +294,16 @@ sub number_of_acls
 sub get_positive_and_negative_acls_info
 {
     my $self = shift;
-    my $out = { positive => {}, negative => {}};
-    $out->{positive}->{$_->id} = $_->name for @{$self->get_positive_acls};
-    $out->{negative}->{$_->id} = $_->name for @{$self->get_negative_acls};
+    my $out = { positive => [], negative => []};
+    $out->{positive} = [ sort map { $_->name }  @{$self->get_positive_acls}];
+    $out->{negative} = [ sort map { $_->name } @{$self->get_negative_acls}];
     $out; 
 }
 
 sub get_positive_acls_info
 {
     my $self = shift;
-    my $out = {};
-    $out->{$_->id} = $_->name for @{$self->get_positive_acls};
-    $out; 
+    [ sort map { $_->name }  @{$self->get_positive_acls}];
 }
 
 1;
