@@ -28,7 +28,13 @@ sub creation_date { return undef; }
 sub vms_connected 
 { 
     my $self = shift;
-    $self->search_related('vms',{'vm_state' => 'running'})->count;
+    my $count = 0;
+    for my $vm ($self->vms->all)
+    {
+	$count++ if ($vm->user_state &&
+		     $vm->user_state eq 'connected');
+    }
+    $count;
 }
 
 sub vms_count 

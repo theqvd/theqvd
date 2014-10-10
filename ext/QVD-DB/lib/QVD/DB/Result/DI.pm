@@ -51,8 +51,6 @@ sub tags_get_columns
       map { { $_->get_columns } } $self->tags ];
 }
 
-
-
 sub custom_join_condition
 { 
     my $args = shift; 

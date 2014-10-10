@@ -44,13 +44,17 @@ sub vms_count
 sub vms_connected_count
 {
     my $self = shift;
-
-    $self->search_related('vms',
-			  {'vm_runtime.user_state' => 'connected'},
-			  {join => [qw(vm_runtime)]})->count,
+    my $count = 0;
+    for my $vm ($self->vms->all)
+    {
+	$count++ if ($vm->vm_runtime->user_state &&
+		     $vm->vm_runtime->user_state eq 'connected');
+    }
+    $count;
 }
 
 sub tenant_name
+
 {
     my $self = shift;
     $self->tenant->name;

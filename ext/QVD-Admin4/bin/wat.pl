@@ -73,7 +73,6 @@ under sub {
 any '/' => sub { 
 
     my $c = shift;
-    $c->render(text => "Hola...");
 
     my $json = $c->req->json;
     $c->res->headers->header('Access-Control-Allow-Origin' => '*');

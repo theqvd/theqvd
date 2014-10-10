@@ -139,6 +139,12 @@ sub add_to_join
     push @{$self->modifiers->{join}}, $key;
 }
 
+sub add_to_prefetch
+{
+    my ($self,$key) = @_;
+    push @{$self->modifiers->{prefetch}}, $key;
+}
+
 sub add_to_order_by
 {
     my ($self,$key) = @_;
@@ -187,6 +193,7 @@ sub switch_custom_properties_json2request
 	get_custom_properties_keys($self->qvd_object_model->qvd_object);
 
     my $found_properties = 0;
+
     for my $property_key (@custom_properties_keys)
     {
 	next unless $self->json_wrapper->has_filter($property_key);
@@ -339,6 +346,8 @@ sub set_tables_to_join_in_request
     my $self = shift;
     $self->add_to_join($_) 
 	for @{$self->qvd_object_model->dbix_join_value};
+
+    $self->add_to_prefetch($_) 
+	for @{$self->qvd_object_model->dbix_prefetch_value};
 }
 1;
-

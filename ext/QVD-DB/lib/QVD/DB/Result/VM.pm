@@ -30,6 +30,7 @@ __PACKAGE__->has_one (counters   => 'QVD::DB::Result::VM_Counter',  'vm_id');
 __PACKAGE__->has_many(properties => 'QVD::DB::Result::VM_Property', \&custom_join_condition, 
 		      {join_type => 'LEFT', order_by => {'-asc' => 'key'}});
 
+
 sub combined_properties {
     my $vm = shift;
 

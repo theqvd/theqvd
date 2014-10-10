@@ -2,6 +2,7 @@ package QVD::Admin4::REST::Response;
 use strict;
 use warnings;
 use Moo;
+use Data::Dumper; 
 
 has 'status',  is => 'ro', isa => sub { die "Invalid type" if ref(+shift); }, required => 1;
 has 'result', is => 'ro', isa => sub { die "Invalid type" unless ref(+shift) eq 'HASH'; }, default => sub {{};};
@@ -88,7 +89,7 @@ sub map_dbix_object_to_output_info
 		       $dbix_object->$table->$column } // undef;
 	print $@ if $@;
     }
-#    $result->{kk} = $dbix_object->get_column('kk');
+
     $result;
 }
 

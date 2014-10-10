@@ -37,11 +37,15 @@ sub _db { $DB; }
 sub select
 {
     my ($self,$request) = @_;
+    my $modifiers = $request->modifiers;
 
     my $rs = eval { $DB->resultset($request->table)->search($request->filters, 
-							    $request->modifiers) };
-    QVD::Admin4::Exception->throw(code => $DB->storage->_dbh->state,
+							    $modifiers) };
+
+   QVD::Admin4::Exception->throw(code => $DB->storage->_dbh->state,
 				  message => "$@") if $@;
+
+    use Data::Dumper; print Dumper $rs->as_query;
    { total => ($rs->is_paged ? $rs->pager->total_entries : $rs->count), 
      rows => [$rs->all] };
 }

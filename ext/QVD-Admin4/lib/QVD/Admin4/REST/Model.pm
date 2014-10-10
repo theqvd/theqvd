@@ -160,6 +160,7 @@ my $MANDATORY_FILTERS = { list => { default => [qw(tenant_id)],
 				      Tenant => [qw(id)]}};
 
 my $SUBCHAIN_FILTERS = { list => { default => [qw(name)],
+				   DI => [qw(disk_image)],
 				   Administrator => [qw(name role_name acl_name)],
 				   Role => [qw(name nested_role_name acl_name)]}};
 
@@ -448,7 +449,9 @@ my $FIELDS_TO_DBIX_FORMAT_MAPPER =
 my $VALUES_NORMALIZATOR = { DI => { disk_image => \&basename_disk_image},
 			    User => { name => \&normalize_name, 
 				      password => \&password_to_token }};
-my $DBIX_JOIN_VALUE = { User => [qw(tenant)],
+
+
+my $DBIX_JOIN_VALUE = { User => [qw(tenant), { vms => 'vm_runtime'}],
                         VM => ['osf', { vm_runtime => 'host' }, { user => 'tenant' }],
 			Host => ['runtime', { vms => 'host'}],
 			OSF => [ qw(tenant vms), { dis => 'tags' }],
@@ -457,6 +460,25 @@ my $DBIX_JOIN_VALUE = { User => [qw(tenant)],
 			Role => [{role_rels => 'inherited'}, { acl_rels => 'acl'}],
 			Administrator => [qw(tenant), { role_rels => { role => { acl_rels => 'acl' }}}],
 			ACL => [{ role_rels => { role => { admin_rels => 'admin' }}}]};
+
+my $DBIX_PREFETCH_VALUE = { list => { User => $DBIX_JOIN_VALUE->{User},
+				      VM => $DBIX_JOIN_VALUE->{VM},
+				      Host => $DBIX_JOIN_VALUE->{Host},
+				      OSF => $DBIX_JOIN_VALUE->{OSF},
+				      DI => $DBIX_JOIN_VALUE->{DI},
+				      DI_Tag => $DBIX_JOIN_VALUE->{DI_Tag},
+				      Role => $DBIX_JOIN_VALUE->{Role},
+				      Administrator => $DBIX_JOIN_VALUE->{Administrator},
+				      ACL => $DBIX_JOIN_VALUE->{ACL} },
+			    details => { User => $DBIX_JOIN_VALUE->{User},
+					 VM => $DBIX_JOIN_VALUE->{VM},
+					 Host => $DBIX_JOIN_VALUE->{Host},
+					 OSF => $DBIX_JOIN_VALUE->{OSF},
+					 DI => $DBIX_JOIN_VALUE->{DI},
+					 DI_Tag => $DBIX_JOIN_VALUE->{DI_Tag},
+					 Role => $DBIX_JOIN_VALUE->{Role},
+					 Administrator => $DBIX_JOIN_VALUE->{Administrator},
+					 ACL => $DBIX_JOIN_VALUE->{ACL} }};
 
 my $DBIX_HAS_ONE_RELATIONSHIPS = { VM => [qw(vm_runtime counters)],
                                    Host => [qw(runtime counters)]};
@@ -511,11 +533,13 @@ sub BUILD
     $self->set_info_by_qvd_object(
 	'dbix_join_value',$DBIX_JOIN_VALUE);
 
+    $self->set_info_by_type_of_action_and_qvd_object(
+	'dbix_prefetch_value',$DBIX_PREFETCH_VALUE);
+
     $self->set_info_by_qvd_object(
 	'dbix_has_one_relationships',$DBIX_HAS_ONE_RELATIONSHIPS);
 
-    $self->set_tenant_fields
-	if $self->current_qvd_administrator->is_superadmin; # The last one. It depends on others
+    $self->set_tenant_fields;  # The last one. It depends on others
 }
 
 sub initialize_info_model 
@@ -535,7 +559,8 @@ sub initialize_info_model
   fields_to_dbix_format_mapper => {},                                                      
   order_criteria_to_dbix_format_mapper => {},                                              
   values_normalizator => {},                                                               
-  dbix_join_value => {},                                                                   
+  dbix_join_value => [],                                                                   
+  dbix_prefetch_value => [],                                                                   
   dbix_has_one_relationships => []
 };
 }
@@ -543,6 +568,10 @@ sub initialize_info_model
 sub set_tenant_fields
 {
     my $self = shift;
+
+    return unless $self->type_of_action =~ /^list|details$/;
+
+    return unless $self->current_qvd_administrator->is_superadmin;
 
     push @{$self->{model_info}->{available_fields}},'tenant_id'
 	if defined $self->fields_to_dbix_format_mapper->{tenant_id};
@@ -677,6 +706,12 @@ sub dbix_join_value
 {
     my $self = shift;
     return $self->{model_info}->{dbix_join_value} || [];
+}
+
+sub dbix_prefetch_value
+{
+    my $self = shift;
+    return $self->{model_info}->{dbix_prefetch_value} || [];
 }
 
 sub dbix_has_one_relationships
