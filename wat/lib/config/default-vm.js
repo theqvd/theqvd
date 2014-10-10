@@ -24,7 +24,7 @@ Wat.I.listColumns[qvdObj] = {
         'fields': [
             'id'
         ],
-        'display': true
+        'display': false,
     },
     'name': {
         'text': 'Name',

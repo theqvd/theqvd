@@ -44,7 +44,7 @@ Wat.I.cornerMenu = {
                     iconClass: 'fa fa-file-text-o' 
                 },
                 customize: {
-                    text: 'Customize',
+                    text: 'Views',
                     link: '#/setup/customize',
                     iconClass: 'fa fa-columns' 
                 }

@@ -302,6 +302,25 @@ Wat.B = {
 
             // Trigger change event to update tags
             $('[name="osf_id"]').trigger('change');
+        },
+        
+        filterTenantUsers: function () {
+            console.log('filterusers');
+            var params = {
+                'action': 'user_tiny_list',
+                'selectedId': '',
+                'controlName': 'user_id',
+                'filters': {
+                    'tenant_id': $(this).val()
+                }
+            };
+
+            // Remove all osf options and fill filtering with new selected tenant
+            $('[name="user_id"] option').remove();
+            Wat.A.fillSelect(params); 
+
+            // Update chosen control for user
+            $('[name="user_id"]').trigger('chosen:updated');
         }
     },
     

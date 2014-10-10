@@ -8,7 +8,7 @@ Wat.I.listColumns[qvdObj] = {
         'fixed': true
     },
     'id': {
-        'display': true,
+        'display': false,
         'fields': [
             'id'
         ],

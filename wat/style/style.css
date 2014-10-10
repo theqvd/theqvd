@@ -81,7 +81,7 @@ table {
   letter-spacing: 1px; }
 
 :focus {
-  box-shadow: 1 1 1px 0px #b24a09; }
+  box-shadow: 1 1 1px 0px #e35e0c; }
 
 strong, .strong {
   font-weight: bold; }
@@ -104,7 +104,7 @@ body {
   background: #fdfdfd; }
 
 a {
-  color: #9a4008;
+  color: #cb540a;
   text-decoration: none;
   font-weight: bold; }
   a i.hover {
@@ -127,7 +127,7 @@ a:hover i:before {
 
 fieldset {
   padding: 8px;
-  border: 1px solid #f9b78e;
+  border: 1px solid #fcd6bf;
   border-radius: 6px; }
   fieldset legend {
     color: #b2b2b2;
@@ -194,7 +194,7 @@ fieldset {
     padding: 8px 12px 8px 12px;
     background: #fdfdfd;
     color: #444;
-    border: 1px solid #f47a2d;
+    border: 1px solid #f7985e;
     cursor: pointer; }
     @media screen and (min-width: 40em) {
       .menu > ul .menu-option {
@@ -226,7 +226,7 @@ fieldset {
         margin-bottom: -2px;
         margin-top: 1px; } }
   .menu > ul .menu-option--selected, .menu > ul .menu-option:hover {
-    background: #b24a09;
+    background: #e35e0c;
     color: #fdfdfd;
     border: 1px solid transparent; }
   .menu > ul .menu-option--selected {
@@ -252,7 +252,7 @@ fieldset {
     position: relative;
     cursor: default; }
     .menu-corner > ul > li > ul {
-      border: solid 1px #f7985e;
+      border: solid 1px #f9b78e;
       background: #fdfdfd;
       opacity: 0.9;
       display: none;
@@ -272,7 +272,7 @@ fieldset {
         .menu-corner > ul > li > ul > li span:hover {
           font-weight: bold;
           color: #fdfdfd;
-          background: #b24a09; }
+          background: #e35e0c; }
       .menu-corner > ul > li > ul > li:last-child span {
         border-bottom-left-radius: 7px;
         border-bottom-right-radius: 7px; }
@@ -435,7 +435,7 @@ input[type="checkbox"], input[type="radio"] {
         line-height: 25px; } }
 
 .chosen-container .chosen-results li.highlighted {
-  background-color: #b24a09;
+  background-color: #e35e0c;
   background-image: none; }
 
 .chosen-container * {
@@ -458,30 +458,30 @@ input[type="checkbox"], input[type="radio"] {
 a.button, button.button {
   z-index: 2;
   color: #fdfdfd;
-  background-color: #9a4008;
-  background-image: -moz-linear-gradient(top, #cb540a, #9a4008);
-  background-image: -webkit-gradient(linear, 0 0, 0 100%, from(#cb540a), to(#9a4008));
-  background-image: -webkit-linear-gradient(top, #cb540a, #9a4008);
-  background-image: -o-linear-gradient(top, #cb540a, #9a4008);
-  background-image: linear-gradient(to bottom, #cb540a, #9a4008);
+  background-color: #cb540a;
+  background-image: -moz-linear-gradient(top, #f36a15, #cb540a);
+  background-image: -webkit-gradient(linear, 0 0, 0 100%, from(#f36a15), to(#cb540a));
+  background-image: -webkit-linear-gradient(top, #f36a15, #cb540a);
+  background-image: -o-linear-gradient(top, #f36a15, #cb540a);
+  background-image: linear-gradient(to bottom, #f36a15, #cb540a);
   background-repeat: repeat-x;
-  border: solid 1px #6a2c05;
+  border: solid 1px #9a4008;
   -webkit-box-shadow: none;
   -moz-box-shadow: none;
   box-shadow: none; }
   a.button:hover, button.button:hover {
     cursor: pointer;
-    border-color: #823607; }
+    border-color: #b24a09; }
     a.button:hover:before, button.button:hover:before {
       color: #fdfdfd; }
   a.button:active, button.button:active {
     color: #f0f0f0;
-    background-color: #9a4008;
-    background-image: -moz-linear-gradient(top, #9a4008, #cb540a);
-    background-image: -webkit-gradient(linear, 0 0, 0 100%, from(#9a4008), to(#cb540a));
-    background-image: -webkit-linear-gradient(top, #9a4008, #cb540a);
-    background-image: -o-linear-gradient(top, #9a4008, #cb540a);
-    background-image: linear-gradient(to bottom, #9a4008, #cb540a); }
+    background-color: #cb540a;
+    background-image: -moz-linear-gradient(top, #cb540a, #f36a15);
+    background-image: -webkit-gradient(linear, 0 0, 0 100%, from(#cb540a), to(#f36a15));
+    background-image: -webkit-linear-gradient(top, #cb540a, #f36a15);
+    background-image: -o-linear-gradient(top, #cb540a, #f36a15);
+    background-image: linear-gradient(to bottom, #cb540a, #f36a15); }
   a.button:focus, button.button:focus {
     outline: 0; }
   a.button:before, button.button:before {
@@ -489,7 +489,7 @@ a.button, button.button {
     color: #fdfdfd; }
 a.button2, button.button2 {
   z-index: 2;
-  color: #b24a09;
+  color: #e35e0c;
   background-color: #f0f0f0;
   background-image: -moz-linear-gradient(top, #ffffff, #f0f0f0);
   background-image: -webkit-gradient(linear, 0 0, 0 100%, from(#ffffff), to(#f0f0f0));
@@ -505,9 +505,9 @@ a.button2, button.button2 {
     cursor: pointer;
     border-color: #e4e4e4; }
     a.button2:hover:before, button.button2:hover:before {
-      color: #b24a09; }
+      color: #e35e0c; }
   a.button2:active, button.button2:active {
-    color: #9a4008;
+    color: #cb540a;
     background-color: #f0f0f0;
     background-image: -moz-linear-gradient(top, #f0f0f0, #ffffff);
     background-image: -webkit-gradient(linear, 0 0, 0 100%, from(#f0f0f0), to(#ffffff));
@@ -518,7 +518,7 @@ a.button2, button.button2 {
     outline: 0; }
   a.button2:before, button.button2:before {
     margin-right: 10px;
-    color: #b24a09; }
+    color: #e35e0c; }
 a.button--green, button.button--green {
   z-index: 2;
   color: #fdfdfd;
@@ -847,7 +847,7 @@ body {
         .wrapper .content .home-wrapper th.sortable {
           cursor: pointer; }
         .wrapper .content .home-wrapper th.sorted {
-          background-color: #b24a09;
+          background-color: #e35e0c;
           color: #fdfdfd; }
         .wrapper .content .home-wrapper th i {
           width: 100%;
@@ -919,7 +919,7 @@ body {
               .wrapper .content .home-wrapper .home-row .home-cell .summary-table th.sortable {
                 cursor: pointer; }
               .wrapper .content .home-wrapper .home-row .home-cell .summary-table th.sorted {
-                background-color: #b24a09;
+                background-color: #e35e0c;
                 color: #fdfdfd; }
               .wrapper .content .home-wrapper .home-row .home-cell .summary-table th i {
                 width: 100%;
@@ -994,7 +994,7 @@ body {
           .wrapper .content .home-wrapper .log-table th.sortable {
             cursor: pointer; }
           .wrapper .content .home-wrapper .log-table th.sorted {
-            background-color: #b24a09;
+            background-color: #e35e0c;
             color: #fdfdfd; }
           .wrapper .content .home-wrapper .log-table th i {
             width: 100%;
@@ -1345,7 +1345,7 @@ body {
     margin-top: 5px; }
 
 .delete-property-button, .add-role-button, .delete-role-button, .add-acl-button, .delete-acl-button {
-  color: #b24a09;
+  color: #e35e0c;
   cursor: pointer; }
 
 .role-acls-wrapper {
@@ -1481,7 +1481,7 @@ table.list, table.customize-fields {
     table.list th.sortable, table.customize-fields th.sortable {
       cursor: pointer; }
     table.list th.sorted, table.customize-fields th.sorted {
-      background-color: #b24a09;
+      background-color: #e35e0c;
       color: #fdfdfd; }
     table.list th i, table.customize-fields th i {
       width: 100%;
@@ -1532,7 +1532,7 @@ table.custom-props, table.details {
     table.custom-props th.sortable, table.details th.sortable {
       cursor: pointer; }
     table.custom-props th.sorted, table.details th.sorted {
-      background-color: #b24a09;
+      background-color: #e35e0c;
       color: #fdfdfd; }
     table.custom-props th i, table.details th i {
       width: 100%;
@@ -2032,7 +2032,7 @@ td.inner-table {
 .ui-dialog {
   z-index: 1002; }
   .ui-dialog .ui-dialog-titlebar {
-    background: #b24a09;
+    background: #e35e0c;
     text-align: center;
     padding: 5px;
     border-bottom-left-radius: 0;
@@ -2042,30 +2042,30 @@ td.inner-table {
   .ui-dialog .ui-state-hover, .ui-dialog .ui-state-focus {
     z-index: 2;
     color: #fdfdfd;
-    background-color: #9a4008;
-    background-image: -moz-linear-gradient(top, #cb540a, #9a4008);
-    background-image: -webkit-gradient(linear, 0 0, 0 100%, from(#cb540a), to(#9a4008));
-    background-image: -webkit-linear-gradient(top, #cb540a, #9a4008);
-    background-image: -o-linear-gradient(top, #cb540a, #9a4008);
-    background-image: linear-gradient(to bottom, #cb540a, #9a4008);
+    background-color: #cb540a;
+    background-image: -moz-linear-gradient(top, #f36a15, #cb540a);
+    background-image: -webkit-gradient(linear, 0 0, 0 100%, from(#f36a15), to(#cb540a));
+    background-image: -webkit-linear-gradient(top, #f36a15, #cb540a);
+    background-image: -o-linear-gradient(top, #f36a15, #cb540a);
+    background-image: linear-gradient(to bottom, #f36a15, #cb540a);
     background-repeat: repeat-x;
-    border: solid 1px #6a2c05;
+    border: solid 1px #9a4008;
     -webkit-box-shadow: none;
     -moz-box-shadow: none;
     box-shadow: none; }
     .ui-dialog .ui-state-hover:hover, .ui-dialog .ui-state-focus:hover {
       cursor: pointer;
-      border-color: #823607; }
+      border-color: #b24a09; }
       .ui-dialog .ui-state-hover:hover:before, .ui-dialog .ui-state-focus:hover:before {
         color: #fdfdfd; }
     .ui-dialog .ui-state-hover:active, .ui-dialog .ui-state-focus:active {
       color: #f0f0f0;
-      background-color: #9a4008;
-      background-image: -moz-linear-gradient(top, #9a4008, #cb540a);
-      background-image: -webkit-gradient(linear, 0 0, 0 100%, from(#9a4008), to(#cb540a));
-      background-image: -webkit-linear-gradient(top, #9a4008, #cb540a);
-      background-image: -o-linear-gradient(top, #9a4008, #cb540a);
-      background-image: linear-gradient(to bottom, #9a4008, #cb540a); }
+      background-color: #cb540a;
+      background-image: -moz-linear-gradient(top, #cb540a, #f36a15);
+      background-image: -webkit-gradient(linear, 0 0, 0 100%, from(#cb540a), to(#f36a15));
+      background-image: -webkit-linear-gradient(top, #cb540a, #f36a15);
+      background-image: -o-linear-gradient(top, #cb540a, #f36a15);
+      background-image: linear-gradient(to bottom, #cb540a, #f36a15); }
     .ui-dialog .ui-state-hover:focus, .ui-dialog .ui-state-focus:focus {
       outline: 0; }
     .ui-dialog .ui-state-hover:before, .ui-dialog .ui-state-focus:before {
@@ -2150,11 +2150,11 @@ td.inner-table {
   padding-top: 6px !important; }
 
 .xdsoft_datetimepicker .xdsoft_calendar td:hover, .xdsoft_datetimepicker .xdsoft_timepicker .xdsoft_time_box > div > div:hover {
-  background: #b24a09 !important; }
+  background: #e35e0c !important; }
 
 .xdsoft_datetimepicker .xdsoft_calendar td.xdsoft_default, .xdsoft_datetimepicker .xdsoft_calendar td.xdsoft_current, .xdsoft_datetimepicker .xdsoft_timepicker .xdsoft_time_box > div > div.xdsoft_current, .xdsoft_datetimepicker .xdsoft_label > .xdsoft_select > div > .xdsoft_option.xdsoft_current {
-  background: #512204;
-  box-shadow: #210e02 0px 1px 3px 0px inset; }
+  background: #823607;
+  box-shadow: #512204 0px 1px 3px 0px inset; }
 
 div.tagsinput input {
   min-width: 80px;
@@ -2167,7 +2167,7 @@ div.tagsinput span.tag {
   height: 32px;
   padding-top: 7px; }
   div.tagsinput span.tag a {
-    color: #b24a09; }
+    color: #e35e0c; }
 
 div.tagsinput span.tag a {
   font-size: 14px; }

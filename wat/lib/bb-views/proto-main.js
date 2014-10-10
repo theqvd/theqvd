@@ -74,12 +74,11 @@ Wat.Views.MainView = Backbone.View.extend({
     
     // Editor
     editorElement: function (e) {
-        var that = this;
-        Wat.I.dialog(that.dialogConf);           
+        Wat.I.dialog(this.dialogConf, this);           
     },
     
-    fillEditor: function (target) {
-        var that = Wat.CurrentView;
+    fillEditor: function (target, that) {
+        var that = that || Wat.CurrentView;
         
         var isSuperadmin = Wat.C.isSuperadmin();
         var editorMode = that.collection ? 'create' : 'edit';

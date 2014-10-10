@@ -15,7 +15,7 @@ Wat.Views.SetupCustomizeView = Wat.Views.MainView.extend({
             'screen': 'Setup',
             'link': '#/setup',
             'next': {
-                'screen': 'Customize'
+                'screen': 'Views'
             }
         }
     },
@@ -38,6 +38,8 @@ Wat.Views.SetupCustomizeView = Wat.Views.MainView.extend({
     },
     
     updateCustomize: function (e) {
+        return;
+        
         var qvdObj = this.selectedSection;
                     
         var newCustomization = {};

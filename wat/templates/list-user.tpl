@@ -49,7 +49,7 @@
                             break;
                         case 'tenant':
             %>
-                            <th class="sortable desktop" data-sortby="tenant">
+                            <th class="sortable desktop" data-sortby="tenant_name">
                                 <i class="fa fa-sort sort-icon" data-i18n="Tenant"><%= i18n.t('Tenant') %></i>
                             </th>
             <%

@@ -16,7 +16,7 @@ Wat.Views.DIListView = Wat.Views.ListView.extend({
         
         var filters = {"id": di_id};
         var arguments = {
-            "tagChanges": {
+            "__tags_changes__": {
                 'create': ['default'],
             },
         };

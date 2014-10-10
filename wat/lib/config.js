@@ -5,6 +5,7 @@ Wat.C = {
     password: '',
     loggedIn: false,
     apiUrl: 'http://172.20.126.12:3000/',
+    //apiUrl: 'http://172.26.9.42:3000/',
     loginExpirationDays: 1,
     acls: [],
 
@@ -90,11 +91,12 @@ Wat.C = {
 
             Wat.Router.app_router.performRoute('', Wat.Views.HomeView);
             
-            window.location.reload();
+            //window.location.reload();
         }
     },
     
     checkACL: function (acl) {
+        return true;
         return $.inArray(acl, this.acls) != -1;
     },
     

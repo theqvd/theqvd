@@ -16,16 +16,52 @@ Wat.Views.VMListView = Wat.Views.ListView.extend({
         this.dialogConf.title = $.i18n.t('New Virtual machine');
         Wat.Views.ListView.prototype.openNewElementDialog.apply(this, [e]);
         
-        // Fill OSF select on virtual machines creation form
-        var params = {
-            'action': 'user_tiny_list',
-            'selectedId': '',
-            'controlName': 'user_id'
-        };
+        // If main view is user view, we are creating a virtual machine from user details view. 
+        // User and tenant (if exists) controls will be removed
+        if (Wat.CurrentView.qvdObj == 'user') {
+            $('[name="user_id"]').parent().parent().remove();
 
-        Wat.A.fillSelect(params);  
-        
-        Wat.I.chosenElement('[name="user_id"]', 'advanced100');
+            var userHidden = document.createElement('input');
+            userHidden.type = "hidden";
+            userHidden.name = "user_id";
+            userHidden.value = Wat.CurrentView.model.get('id');
+            $('.editor-container').append(userHidden);
+                        
+            if ($('[name="tenant_id"]').val() != undefined) {
+                $('[name="tenant_id"]').parent().parent().remove();
+                
+                var tenantHidden = document.createElement('input');
+                tenantHidden.type = "hidden";
+                tenantHidden.name = "tenant_id";
+                tenantHidden.value = Wat.CurrentView.model.get('tenant_id');
+                $('.editor-container').append(tenantHidden);
+                
+                console.log(tenantHidden);
+            }
+        }
+        else {
+            // Fill Users select on virtual machines creation form
+            var params = {
+                'action': 'user_tiny_list',
+                'selectedId': '',
+                'controlName': 'user_id'
+            };
+
+            // If exist tenant control (in superadmin cases) show users of selected tenant
+            if ($('[name="tenant_id"]').val() != undefined) {
+                // Add the tenant id to the osf select filling
+                params.filters = {
+                    'tenant_id': $('[name="tenant_id"]').val()
+                };
+
+                // Add an event to the tenant select change
+                Wat.B.bindEvent('change', 'select[name="tenant_id"]', Wat.B.editorBinds.filterTenantUsers);
+            }
+            
+            Wat.A.fillSelect(params);  
+
+            Wat.I.chosenElement('[name="user_id"]', 'advanced100');
+        }
         
         // Fill OSF select on virtual machines creation form
         var params = {
@@ -78,7 +114,7 @@ Wat.Views.VMListView = Wat.Views.ListView.extend({
         var context = $('.' + this.cid + '.editor-container');
 
         var blocked = context.find('input[name="blocked"][value=1]').is(':checked');
-        var user_id = context.find('select[name="user_id"]').val();
+        var user_id = context.find('[name="user_id"]').val();
         var osf_id = context.find('select[name="osf_id"]').val();
         
         var arguments = {
@@ -100,7 +136,7 @@ Wat.Views.VMListView = Wat.Views.ListView.extend({
         }
         
         if (Wat.C.isSuperadmin) {
-            var tenant_id = context.find('select[name="tenant_id"]').val();
+            var tenant_id = context.find('[name="tenant_id"]').val();
             arguments['tenant_id'] = tenant_id;
         }
         

@@ -121,7 +121,7 @@ Wat.A = {
             if (params.filters) {
                 jsonUrl += '&filters=' + JSON.stringify(params.filters);
             }
-
+            
             $.ajax({
                 url: jsonUrl,
                 type: 'POST',
@@ -130,6 +130,7 @@ Wat.A = {
                 processData: false,
                 parse: true,
                 success: function (data, d, dd) {
+                    var optGroup = '';
                     $(data.result.rows).each(function(i,option) {
                         var selected = '';
 
@@ -148,6 +149,13 @@ Wat.A = {
                         if (params.selectedId !== undefined && params.selectedId == id) {
                             selected = 'selected="selected"';
                         }
+                        
+/*                        if (params.action == 'acl_tiny_list') {
+                            console.log(name);
+                            var startWith = 'user_';
+                            var regExp = new RegExp('^' + startWith);
+                            console.log(name.match(regExp) ? 1 : 0);
+                        }*/
                         
                         $.each($('select[name="' + params.controlName + '"]'), function () {
                             $(this).append('<option value="' + id + '" ' + selected + '>' + 

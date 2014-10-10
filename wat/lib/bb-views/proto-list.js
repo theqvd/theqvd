@@ -279,7 +279,13 @@ Wat.Views.ListView = Wat.Views.MainView.extend({
     },
     
     storeAllSelectedIds: function (that) {
-        that.selectedItems = that.retrievedData.result.rows;
+        var maxSelectableItems = 2000;
+        if (that.retrievedData.result.rows.length > maxSelectableItems) {
+            that.selectedItems = that.retrievedData.result.rows.slice(0, maxSelectableItems);
+        }
+        else {
+            that.selectedItems = that.retrievedData.result.rows;
+        }
     },
     
     fillCheckSelector: function (target) {
@@ -303,7 +309,7 @@ Wat.Views.ListView = Wat.Views.MainView.extend({
         var classifiedByTenant = $.inArray(this.collection.actionPrefix, QVD_OBJS_CLASSIFIED_BY_TENANT) != -1;
         if (Wat.C.isSuperadmin() && classifiedByTenant) {
             this.formFilters.tenant = {
-                    'filterField': 'tenant',
+                    'filterField': 'tenant_id',
                     'type': 'select',
                     'text': 'Tenant',
                     'displayDesktop': true,
@@ -600,7 +606,7 @@ Wat.Views.ListView = Wat.Views.MainView.extend({
                 that.createElement($(this));
             }
         };
-        
+
         this.dialogConf.button1Class = 'fa fa-ban';
         this.dialogConf.button2Class = 'fa fa-plus-circle';
         
@@ -647,7 +653,7 @@ Wat.Views.ListView = Wat.Views.MainView.extend({
                     }
                 );
         
-        target.html(that.template);
+        this.templateEditorCommon = Wat.A.getTemplate('editor-common');
 
         // Add specific parts of editor to dialog
         that.template = _.template(

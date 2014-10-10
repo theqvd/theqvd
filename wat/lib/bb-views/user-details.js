@@ -13,9 +13,8 @@ Wat.Views.UserDetailsView = Wat.Views.DetailsView.extend({
         var params = {};
         params.whatRender = 'list';
         params.listContainer = sideContainer;
-        params.forceListColumns = {checks: true, info: true, name: true};
-        params.forceSelectedActions = {disconnect: true};
-        params.forceListActionButton = null;
+        params.forceListColumns = {info: true, name: true};
+        params.forceSelectedActions = {};
         params.block = 5;
         params.filters = {"user_id": this.elementId};
 

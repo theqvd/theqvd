@@ -17,11 +17,19 @@ Wat.I.listColumns[qvdObj] = {
         'text': 'Info'
     },
     'id': {
-        'display': true,
+        'display': false,
         'fields': [
             'id'
         ],
         'text': 'Id'
+    },
+    'osf': {
+        'display': true,
+        'fields': [
+            'osf_id',
+            'osf_name'
+        ],
+        'text': 'OSF'
     },
     'disk_image': {
         'display': true,
@@ -38,16 +46,8 @@ Wat.I.listColumns[qvdObj] = {
         ],
         'text': 'Version'
     },
-    'osf': {
-        'display': false,
-        'fields': [
-            'osf_id',
-            'osf_name'
-        ],
-        'text': 'OSF'
-    },
     'default': {
-        'display': true,
+        'display': false,
         'fields': [
             'tags'
         ],
@@ -87,7 +87,14 @@ Wat.I.formFilters[qvdObj] = {
         'class': 'chosen-advanced',
         'fillable': true,
         'displayMobile': true,
-        'displayDesktop': true
+        'displayDesktop': true,
+        'options': [
+            {
+                'value': -1,
+                'text': 'All',
+                'selected': true
+            }
+                    ],
     }
 };
 

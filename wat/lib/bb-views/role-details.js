@@ -114,15 +114,16 @@ Wat.Views.RoleDetailsView = Wat.Views.DetailsView.extend({
             'selectedId': '',
             'controlName': 'acl_available',
             'filters': {
-            }
+            },
+            'nameAsId': true
         };
 
         Wat.A.fillSelect(params);
         
         // Set selected acls on acl list and delete it from available side
         $.each(this.model.get('acls').positive, function (iAcl, acl) {
-            $('select[name="acl_available"] option[value="' + iAcl + '"]').remove();
-            $('select[name="acl_positive_on_role"]').append('<option value="' + iAcl + '">' + acl + '</option>');
+            $('select[name="acl_available"] option[value="' + acl + '"]').remove();
+            $('select[name="acl_positive_on_role"]').append('<option value="' + acl + '">' + acl + '</option>');
         });   
         
         // Enable delete button when select any element of list
@@ -130,15 +131,15 @@ Wat.Views.RoleDetailsView = Wat.Views.DetailsView.extend({
             $('.js-delete-positive-acl-button').removeClass('disabled');
         });
         
-        // Disable acls that exist in negative mode
+        // Remove acls that exist in negative mode
         $.each(this.model.get('acls').negative, function (iAcl, acl) {
-            $('select[name="acl_available"] option[value="' + iAcl + '"]').remove();
+            $('select[name="acl_available"] option[value="' + acl + '"]').remove();
         });
         
         // Set selected acls on excluded list and delete it from available side
         $.each(this.model.get('acls').negative, function (iAcl, acl) {
-            $('select[name="acl_available"] option[value="' + iAcl + '"]').remove();
-            $('select[name="acl_negative_on_role"]').append('<option value="' + iAcl + '">' + acl + '</option>');
+            $('select[name="acl_available"] option[value="' + acl + '"]').remove();
+            $('select[name="acl_negative_on_role"]').append('<option value="' + acl + '">' + acl + '</option>');
         });
         
         // Enable delete button when select any element of list
@@ -146,9 +147,9 @@ Wat.Views.RoleDetailsView = Wat.Views.DetailsView.extend({
             $('.js-delete-negative-acl-button').removeClass('disabled');
         });
         
-        // Disable acls that exist in positive mode
+        // Remove acls that exist in positive mode
         $.each(this.model.get('acls').positive, function (iAcl, acl) {
-            $('select[name="acl_available"] option[value="' + iAcl + '"]').remove();
+            $('select[name="acl_available"] option[value="' + acl + '"]').remove();
         });
     },  
     

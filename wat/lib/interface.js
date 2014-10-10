@@ -110,6 +110,7 @@ Wat.I = {
     },
     
     setCustomizationFields: function (qvdObj) {
+        return;
         var filters = {};
 
         // If qvd object is not specified, all will be setted
@@ -395,7 +396,7 @@ Wat.I = {
         
     },
     
-    dialog: function (dialogConf) {
+    dialog: function (dialogConf, that) {
         $('.js-dialog-container').dialog({
             dialogClass: "loadingScreenWindow",
             resizable: false,
@@ -432,7 +433,7 @@ Wat.I = {
                     $(button2).addClass(dialogConf.button2Class);
                 
                 // Call to the callback function that will fill the dialog
-                    dialogConf.fillCallback($(this));
+                    dialogConf.fillCallback($(this), that);
                 
                 // Translate dialog strings
                     Wat.T.translateElement($(this).find('[data-i18n]'));
@@ -697,8 +698,8 @@ Wat.I = {
     
     
     // Update the indicator of selected intems situated under the list table
-    updateSelectedItems: function (selectedItemns) {        
-        $('.elements-selected').html(selectedItemns);
+    updateSelectedItems: function (selectedItems) { 
+        $('.elements-selected').html(selectedItems);
     },
     
     confirm: function (templateName, successCallback, that) {        
