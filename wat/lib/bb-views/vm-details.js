@@ -43,14 +43,12 @@ Wat.Views.VMDetailsView = Wat.Views.DetailsView.extend({
         
         var name = context.find('input[name="name"]').val();
         var di_tag = context.find('select[name="di_tag"]').val(); 
-        var blocked = context.find('input[name="blocked"][value=1]').is(':checked');
         
         var filters = {"id": this.id};
         var arguments = {
             "__properties_changes__": properties,
             "name": name,
-            "di_tag": di_tag,
-            "blocked": blocked ? 1 : 0
+            "di_tag": di_tag
         };
         
         // If expire is checked

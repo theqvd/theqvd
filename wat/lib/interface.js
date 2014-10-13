@@ -689,6 +689,16 @@ Wat.I = {
             }
         });
         
+        var anySelectedControls = $('[data-any-selected]');
+        $.each(anySelectedControls, function (iAny, any) {
+            if (!$(any).val()) {
+                $(any).parent().find('.chosen-single').addClass('not_valid');
+                $(any).parent().find('.validation-message').remove();
+                $(any).parent().append('<div class="second_row--error validation-message">' + i18n.t('No value is selected') + '</div>');
+                returnFalse = true;
+            }
+        });
+        
         if (returnFalse) {
             return false;
         }

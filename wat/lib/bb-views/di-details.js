@@ -33,9 +33,7 @@ Wat.Views.DIDetailsView = Wat.Views.DetailsView.extend({
         var properties = this.properties;
                 
         var context = $('.' + this.cid + '.editor-container');
-        
-        var blocked = context.find('input[name="blocked"][value=1]').is(':checked');
-                
+                        
         var tags = context.find('input[name="tags"]').val();
         var def = context.find('input[name="default"][value=1]').is(':checked');
         
@@ -54,7 +52,6 @@ Wat.Views.DIDetailsView = Wat.Views.DetailsView.extend({
         var filters = {"id": this.id};
         var arguments = {
             "__properties_changes__": properties,
-            "blocked": blocked ? 1 : 0,
             "__tags_changes__": {
                 'create': createdTags,
                 'delete': deletedTags

@@ -1,8 +1,51 @@
 <div class="details-header">
     <span class="fa fa-cloud h1"><%= model.get('name') %></span>
-    <% if(Wat.C.checkACL('vm_update')) { %>
-    <a class="button button-right js-button-edit fa fa-pencil" href="javascript:" data-i18n>Edit</a>
+    <% if(Wat.C.checkACL('vm_delete')) { %>
+    <a class="button fleft button-icon js-button-delete fa fa-trash" href="javascript:" data-i18n="[title]Delete"></a>
     <% } %>
+    
+    <% if(Wat.C.checkACL('vm_update')) { %>
+    <a class="button fright button-icon js-button-edit fa fa-pencil" href="javascript:" data-i18n="[title]Edit"></a>
+    <% } %>
+    
+    <% 
+    if (Wat.C.checkACL('vm_update')) {
+        if (model.get('state') == 'running') { 
+    %>
+            <a class="button fright button-icon js-button-stop-vm fa fa-stop fright" href="javascript:" data-i18n="[title]Stop"></a>
+    <% 
+        }
+        else { 
+    %>
+            <a class="button fright button-icon js-button-start-vm fa fa-play fright" href="javascript:" data-i18n="[title]Start"></a>
+    <% 
+        }
+    } 
+    %>
+    
+    <% 
+    if (Wat.C.checkACL('vm_update')) {
+        if(model.get('blocked')) {
+    %>
+            <a class="button button-icon js-button-unblock fa fa-unlock fright" href="javascript:" data-i18n="[title]Unblock"></a>
+    <%
+        } 
+        else { 
+    %>
+            <a class="button button-icon js-button-block fa fa-lock fright" href="javascript:" data-i18n="[title]Block"></a>
+    <%
+        }
+    }
+    %>
+    
+    <% 
+    if (Wat.C.checkACL('vm_update') && model.get('user_state') == 'connected') {
+    %>
+        <a class="button button-icon js-button-disconnect-user fa fa-plug fright" href="javascript:" data-i18n="[title]Disconnect user"></a>
+    <%
+    }
+    %>  
+    
 </div>
 
 <table class="details details-list">
@@ -18,12 +61,18 @@
             <% 
             if (model.get('state') == 'running') {
             %>
-                <i class="fa fa-play ok" data-i18n="[title]Running"></i>
+                <!--
+                <i class="fa fa-play" data-i18n="[title]Running"></i>
+                -->
+                <span data-i18n>Running</span>
             <%
             }
             else {
             %>
-                <i class="fa fa-pause error" data-i18n="[title]Stopped"></i>
+                <!--
+                <i class="fa fa-stop" data-i18n="[title]Stopped"></i>
+                -->
+                <span data-i18n>Stopped</span>
             <%
             }
             %>
@@ -43,12 +92,18 @@
             <% 
             if (model.get('user_state') == 'connected') {
             %>
+                <!--
                 <i class="fa fa-user ok" data-i18n="[title]Connected"></i>
+                -->
+                <span data-i18n>Connected</span>
             <%
             }
             else {
-            %>                
-                <i class="fa fa-user error" data-i18n="[title]Disconnected"></i>
+            %>         
+                <!--
+                <i class="fa fa-user" data-i18n="[title]Disconnected"></i>
+                -->
+                <span data-i18n>Disconnected</span>
             <%
             }
             %>
@@ -125,12 +180,18 @@
             <% 
             if (model.get('blocked')) {
             %>
+                <!--
                 <i class="fa fa-lock" data-i18n="[title]Blocked"></i>
+                -->
+                <span data-i18n>Blocked</span>
             <%
             }
             else {
             %>
+                <!--
                 <i class="fa fa-unlock" data-i18n="[title]Unblocked"></i>
+                -->
+                <span data-i18n>Unblocked</span>
             <%
             }
             %>

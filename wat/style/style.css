@@ -1144,6 +1144,18 @@ body {
       @media screen and (min-width: 40em) {
         .wrapper .content .details-header, .wrapper .content .side-header {
           margin-top: 0px; } }
+      .wrapper .content .details-header .button.fright, .wrapper .content .side-header .button.fright {
+        margin-left: 4px; }
+    .wrapper .content .details-header {
+      border: 1px solid #ebebeb;
+      border-radius: 2px;
+      background: #f0f0f0;
+      box-shadow: 2px 2px 8px #f3f3f3;
+      margin-bottom: 10px;
+      height: 50px;
+      padding-top: 10px;
+      padding-left: 5px;
+      padding-right: 5px; }
     .wrapper .content .details-list .details-item, .wrapper .content .custom-props-container .details-item {
       margin-bottom: 5px; }
       .wrapper .content .details-list .details-item:before, .wrapper .content .details-list .details-item i:before, .wrapper .content .custom-props-container .details-item:before, .wrapper .content .custom-props-container .details-item i:before {
@@ -1167,7 +1179,7 @@ body {
           .wrapper .content .details-block .custom-props-container {
             margin-top: -25px;
             position: absolute;
-            top: 40px;
+            top: 85px;
             right: 0;
             width: 50%;
             padding-left: 20px; } }
@@ -1234,8 +1246,6 @@ body {
       float: right;
       padding-right: 2%;
       margin-right: 2%; }
-      .wrapper .content .setup-block .h1 {
-        display: block; }
     .wrapper .content .customize-section-selectors {
       display: table;
       table-layout: fixed;

@@ -35,8 +35,6 @@ Wat.Views.VMListView = Wat.Views.ListView.extend({
                 tenantHidden.name = "tenant_id";
                 tenantHidden.value = Wat.CurrentView.model.get('tenant_id');
                 $('.editor-container').append(tenantHidden);
-                
-                console.log(tenantHidden);
             }
         }
         else {

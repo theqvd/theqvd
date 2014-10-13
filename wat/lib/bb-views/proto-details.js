@@ -55,7 +55,10 @@ Wat.Views.DetailsView = Wat.Views.MainView.extend({
     },
     
     eventsDetails: {
-        'click .js-button-edit': 'openEditElementDialog'
+        'click .js-button-edit': 'openEditElementDialog',
+        'click .js-button-unblock': 'applyUnblock' ,
+        'click .js-button-block': 'applyBlock', 
+        'click .js-button-delete': 'askDelete' 
     },
 
     render: function () {        
@@ -120,5 +123,38 @@ Wat.Views.DetailsView = Wat.Views.MainView.extend({
         $(this.sideContainer).html(this.template);
         
         Wat.T.translate();
+    },
+    
+    applyBlock: function () {
+        this.updateModel({blocked: 1}, {id: this.elementId}, this.fetchDetails);
+    },   
+    
+    applyUnblock: function () {
+        this.updateModel({blocked: 0}, {id: this.elementId}, this.fetchDetails);
+    },  
+    
+    askDelete: function () {
+        Wat.I.confirm('dialog-confirm-undone', this.applyDelete, this);
+    },
+        
+    applyDelete: function (that) {
+        that.deleteModel({id: that.elementId}, that.afterDelete, that.model);
+    },
+    
+    afterDelete: function (that) {
+        //Find the last link to rederect to it after deletion
+        var lastLink = '';
+        var crumb = that.breadcrumbs;
+        while (1) {
+            if (crumb.link != undefined) {
+                lastLink = crumb.link;
+                crumb = crumb.next;
+            }
+            else {
+                break;
+            }
+        }
+        
+        window.location = lastLink;
     }
 });

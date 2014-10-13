@@ -23,6 +23,9 @@ Wat.B = {
     
     bindFormEvents: function () {
         this.bindEvent('keydown', '[data-required]', this.formBinds.pressValidatedField);
+        
+        // Chosen controls hack
+        this.bindEvent('click', '.not_valid', this.formBinds.pressValidatedField);
     },
     
     bindEditorEvents: function () {
@@ -121,6 +124,12 @@ Wat.B = {
             if ($(e.target).hasClass('not_valid')) {
                 $(e.target).removeClass('not_valid');
                 $(e.target).parent().find('.validation-message').remove();
+            }
+            
+            // Chosen controls hack
+            if ($(e.target).parent().hasClass('not_valid')) {
+                $(e.target).parent().removeClass('not_valid');
+                $(e.target).parent().parent().parent().find('.validation-message').remove();
             }
         }
     },

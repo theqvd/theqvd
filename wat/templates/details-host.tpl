@@ -1,8 +1,27 @@
 <div class="details-header">
     <span class="fa fa-hdd-o h1" data-i18n><%= model.get('name') %></span>
-    <% if(Wat.C.checkACL('host_update')) { %>
-    <a class="button button-right js-button-edit fa fa-pencil" href="javascript:" data-i18n>Edit</a>
+    <% if(Wat.C.checkACL('di_delete')) { %>
+    <a class="button fleft button-icon js-button-delete fa fa-trash" href="javascript:" data-i18n="[title]Delete"></a>
     <% } %>
+    <% if(Wat.C.checkACL('host_update')) { %>
+    <a class="button fright button-icon js-button-edit fa fa-pencil" href="javascript:" data-i18n="[title]Edit"></a>
+    <% } %>
+    
+    <% 
+    if (Wat.C.checkACL('host_update')) {
+        if(model.get('blocked')) {
+    %>
+            <a class="button button-icon js-button-unblock fa fa-unlock fright" href="javascript:" data-i18n="[title]Unblock"></a>
+    <%
+        } 
+        else { 
+    %>
+            <a class="button button-icon js-button-block fa fa-lock fright" href="javascript:" data-i18n="[title]Block"></a>
+    <%
+        }
+    }
+    %>
+    
 </div>
 
 <table class="details details-list">
@@ -24,12 +43,12 @@
             <% 
         if (model.get('state') == 'running') {
             %>
-            <i class="fa fa-play icon-play" data-i18n="[title]Running"></i>
+            <span data-i18n>Running</span>
             <%
             }
             else {
             %>
-            <i class="fa fa-pause icon-stop" data-i18n="[title]Stopped"></i>
+            <span data-i18n>Stopped</span>
             <%
             }
             %>
@@ -41,12 +60,12 @@
             <% 
             if (model.get('blocked')) {
             %>
-                <i class="fa fa-lock" data-i18n="[title]Blocked"></i>
+                <span data-i18n>Blocked</span>
             <%
             }
             else {
             %>
-                <i class="fa fa-unlock" data-i18n="[title]Unblocked"></i>
+                <span data-i18n>Unblocked</span>
             <%
             }
             %>

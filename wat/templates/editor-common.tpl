@@ -1,32 +1,6 @@
 <div class="editor-container <%= cid %>">
     <table class="editor-table alternate">
-        <tbody class="bb-editor"></tbody>
         <%
-            // If the model has the blocked attr, will appear on editor
-            if (blocked !== undefined) {
-        %>
-                <tbody class="blocked-selector">
-                    <tr>
-                        <td data-i18n="Blocked"></td>
-                        <td>
-                            <%
-                                var blockedChecked = '';
-                                var unblockedChecked = 'checked';
-
-                                if (blocked) {
-                                    blockedChecked = 'checked';
-                                    unblockedChecked = '';
-                                }
-                            %>
-                            <input type="radio" name="blocked" <%= unblockedChecked %> value="0">
-                            <i class="fa fa-unlock"></i>
-                            <input type="radio" name="blocked" <%= blockedChecked %> value="1">
-                            <i class="fa fa-lock"></i>
-                        </td>
-                    </tr>
-                </tbody>
-        <%
-            }
             // If the user is superadmin, show tenants select in creation form
             if (classifiedByTenant && editorMode == 'create' && isSuperadmin) {
         %>
@@ -40,7 +14,11 @@
                 </tbody>
         <%
             }
-
+        %>
+        
+        <tbody class="bb-editor"></tbody>
+        
+        <%
             if (enabledProperties) {
         %>
             <tbody class="custom-properties">

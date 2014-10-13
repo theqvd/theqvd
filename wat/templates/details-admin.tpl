@@ -1,7 +1,11 @@
 <div class="details-header">
     <span class="fa fa-suitcase h1" data-i18n><%= model.get('name') %></span>
+    <% if(Wat.C.checkACL('administrator_delete')) { %>
+    <a class="button fleft button-icon js-button-delete fa fa-trash" href="javascript:" data-i18n="[title]Delete"></a>
+    <% } %>
+    
     <% if(Wat.C.checkACL('administrator_update')) { %>
-    <a class="button button-right js-button-edit fa fa-pencil" href="javascript:" data-i18n>Edit</a>
+    <a class="button fright button-icon js-button-edit fa fa-pencil" href="javascript:" data-i18n="[title]Edit"></a>
     <% } %>
 </div>
 

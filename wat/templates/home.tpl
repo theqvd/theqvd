@@ -167,7 +167,7 @@
         </div>
         <% } if (Wat.C.checkACL('host_see')) { %>
         <div class="home-cell">
-            <div class="home-title" data-i18n>Nodes with more running VMs</div>
+            <div class="home-title" data-i18n>Nodes with most running VMs</div>
             <div id="hosts-more-vms" class="bar-chart js-bar-chart" style="width:95%;height:200px;"></div>
         </div>
         <% } %>

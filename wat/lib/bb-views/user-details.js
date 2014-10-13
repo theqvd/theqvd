@@ -34,13 +34,10 @@ Wat.Views.UserDetailsView = Wat.Views.DetailsView.extend({
         var arguments = {'properties' : properties};
         
         var context = $('.' + this.cid + '.editor-container');
-        
-        var blocked = context.find('input[name="blocked"][value=1]').is(':checked');
-                
+                        
         var filters = {"id": this.id};
         var arguments = {
-            "__properties_changes__": properties,
-            "blocked": blocked ? 1 : 0
+            "__properties_changes__": properties
         }
         
         // If change password is checked

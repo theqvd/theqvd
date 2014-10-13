@@ -36,14 +36,12 @@ Wat.Views.HostDetailsView = Wat.Views.DetailsView.extend({
         
         var name = context.find('input[name="name"]').val();
         var address = context.find('input[name="address"]').val();
-        var blocked = context.find('input[name="blocked"][value=1]').is(':checked');
         
         var filters = {"id": this.id};
         var arguments = {
             "__properties_changes__": properties,
             "name": name,
-            "address": address,
-            "blocked": blocked ? 1 : 0
+            "address": address
         }
 
         this.updateModel(arguments, filters, this.fetchDetails);

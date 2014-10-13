@@ -10,15 +10,15 @@
                 switch(vmState) {
                     case 'stopped':
             %>
-                        <div class="error" data-i18n>Stopped</div>
-                        <div class="fa fa-pause error"></div>
+                        <div data-i18n>Stopped</div>
+                        <div class="fa fa-stop"></div>
                         <div class="address invisible"><%=model.get('ip')%></div>
             <%
                         break;
                     case 'running':
             %>
-                        <div class="ok" data-i18n>Running</div>
-                        <div class="fa fa-play ok"></div>
+                        <div data-i18n>Running</div>
+                        <div class="fa fa-play"></div>
                         <div class="address"><%=model.get('ip')%></div>
             <%
                         break;

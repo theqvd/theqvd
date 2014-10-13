@@ -23,14 +23,6 @@ Wat.I.listColumns[qvdObj] = {
         ],
         'text': 'Id'
     },
-    'osf': {
-        'display': true,
-        'fields': [
-            'osf_id',
-            'osf_name'
-        ],
-        'text': 'OSF'
-    },
     'disk_image': {
         'display': true,
         'fields': [
@@ -38,6 +30,14 @@ Wat.I.listColumns[qvdObj] = {
             'disk_image'
         ],
         'text': 'Disk image'
+    },
+    'osf': {
+        'display': true,
+        'fields': [
+            'osf_id',
+            'osf_name'
+        ],
+        'text': 'OSF'
     },
     'version': {
         'display': true,

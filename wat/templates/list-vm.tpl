@@ -125,12 +125,12 @@
                                     <%
                                     if (model.get('state') == 'stopped') {
                                     %>
-                                        <i class="fa fa-pause error" title="Stopped Virtual machine" data-i18n="[title]Stopped"></i>
+                                        <i class="fa fa-stop" title="Stopped Virtual machine" data-i18n="[title]Stopped"></i>
                                     <%
                                     }
                                     else if (model.get('state') == 'running'){
                                     %>
-                                        <i class="fa fa-play ok" data-i18n="[title]Running" title="<%= i18n.t('Running') %>"></i>
+                                        <i class="fa fa-play" data-i18n="[title]Running" title="<%= i18n.t('Running') %>"></i>
                                     <%
                                     }
                                     else {

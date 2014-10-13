@@ -115,12 +115,12 @@
                                     <% 
                                     if (model.get('state') == 'stopped') {
                                     %>
-                                        <i class="fa fa-pause icon-pause" data-i18n="[title]Stopped" title="<%= i18n.t('Stopped') %>"></i>
+                                        <i class="fa fa-stop" data-i18n="[title]Stopped" title="<%= i18n.t('Stopped') %>"></i>
                                     <%
                                     }
                                     else {
                                     %>
-                                        <i class="fa fa-play icon-play" data-i18n="[title]Running" title="<%= i18n.t('Running') %>"></i>
+                                        <i class="fa fa-play" data-i18n="[title]Running" title="<%= i18n.t('Running') %>"></i>
                                     <%
                                     }
                                     

@@ -1,4 +1,4 @@
-<table class="list details-list acls-management acls-management-acls col-width-100 hidden">
+<table class="list acls-management acls-management-acls col-width-100 hidden">
     <tr>
         <th colspan="5">
             <span data-i18n>
