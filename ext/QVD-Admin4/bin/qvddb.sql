@@ -528,7 +528,7 @@ ALTER TABLE public.tenants_id_seq OWNER TO qvd;
 
 
 --
--- Name: administrators; Type: TABLE; Schema: public; Owner: qvd; Tablespace: 
+-- Name: tenants; Type: TABLE; Schema: public; Owner: qvd; Tablespace: 
 --
 
 CREATE TABLE tenants (
@@ -544,6 +544,43 @@ ALTER TABLE public.tenants OWNER TO qvd;
 --
 
 ALTER SEQUENCE tenants_id_seq OWNED BY tenants.id;
+
+
+--
+-- Name: tenant_views_id_seq; Type: SEQUENCE; Schema: public; Owner: qvd
+--
+
+CREATE SEQUENCE tenant_views_id_seq
+    START WITH 1
+    INCREMENT BY 1
+    NO MINVALUE
+    NO MAXVALUE
+    CACHE 1;
+
+
+ALTER TABLE public.tenant_views_id_seq OWNER TO qvd;
+
+
+--
+-- Name: tenant_views; Type: TABLE; Schema: public; Owner: qvd; Tablespace: 
+--
+
+CREATE TABLE tenant_views (
+    id integer NOT NULL,
+    tenant_id integer NOT NULL,
+    acl_id integer NOT NULL,
+    positive boolean NOT NULL
+);
+
+
+ALTER TABLE public.tenant_views OWNER TO qvd;
+
+--
+-- Name: tenant_views_id_seq; Type: SEQUENCE OWNED BY; Schema: public; Owner: qvd
+--
+
+ALTER SEQUENCE tenant_views_id_seq OWNED BY tenant_views.id;
+
 
 --
 -- Name: administrators_id_seq; Type: SEQUENCE; Schema: public; Owner: qvd
@@ -580,6 +617,43 @@ ALTER TABLE public.administrators OWNER TO qvd;
 --
 
 ALTER SEQUENCE administrators_id_seq OWNED BY administrators.id;
+
+
+--
+-- Name: administrator_views_id_seq; Type: SEQUENCE; Schema: public; Owner: qvd
+--
+
+CREATE SEQUENCE administrator_views_id_seq
+    START WITH 1
+    INCREMENT BY 1
+    NO MINVALUE
+    NO MAXVALUE
+    CACHE 1;
+
+
+ALTER TABLE public.administrator_views_id_seq OWNER TO qvd;
+
+
+--
+-- Name: administrator_views; Type: TABLE; Schema: public; Owner: qvd; Tablespace: 
+--
+
+CREATE TABLE administrator_views (
+    id integer NOT NULL,
+    administrator_id integer NOT NULL,
+    acl_id integer NOT NULL,
+    positive boolean NOT NULL
+);
+
+
+ALTER TABLE public.administrator_views OWNER TO qvd;
+
+--
+-- Name: administrators_id_seq; Type: SEQUENCE OWNED BY; Schema: public; Owner: qvd
+--
+
+ALTER SEQUENCE administrator_views_id_seq OWNED BY administrator_views.id;
+
 
 --
 -- Name: roles_id_seq; Type: SEQUENCE; Schema: public; Owner: qvd
@@ -831,6 +905,17 @@ ALTER TABLE ONLY users ALTER COLUMN id SET DEFAULT nextval('users_id_seq'::regcl
 
 ALTER TABLE ONLY vms ALTER COLUMN id SET DEFAULT nextval('vms_id_seq'::regclass);
 
+--
+-- Name: id; Type: DEFAULT; Schema: public; Owner: qvd
+--
+
+ALTER TABLE ONLY tenant_views ALTER COLUMN id SET DEFAULT nextval('tenant_views_id_seq'::regclass);
+
+--
+-- Name: id; Type: DEFAULT; Schema: public; Owner: qvd
+--
+
+ALTER TABLE ONLY administrator_views ALTER COLUMN id SET DEFAULT nextval('administrator_views_id_seq'::regclass);
 
 --
 -- Data for Name: configs; Type: TABLE DATA; Schema: public; Owner: qvd
@@ -1164,6 +1249,36 @@ ALTER TABLE ONLY di_properties
 
 ALTER TABLE ONLY di_tags
     ADD CONSTRAINT di_tags_pkey PRIMARY KEY (id);
+
+
+--
+-- Name: administrator_views_pkey; Type: CONSTRAINT; Schema: public; Owner: qvd; Tablespace: 
+--
+
+ALTER TABLE ONLY administrator_views
+    ADD CONSTRAINT administrator_views_pkey PRIMARY KEY (id);
+
+--
+-- Name: tenant_views_pkey; Type: CONSTRAINT; Schema: public; Owner: qvd; Tablespace: 
+--
+
+ALTER TABLE ONLY tenant_views
+    ADD CONSTRAINT tenant_views_pkey PRIMARY KEY (id);
+
+
+--
+-- Name: tenant_views_tenant_id_acl_id; Type: CONSTRAINT; Schema: public; Owner: qvd; Tablespace: 
+--
+
+ALTER TABLE ONLY tenant_views
+    ADD CONSTRAINT tenant_views_tenant_id_acl_id UNIQUE (tenant_id, acl_id);
+
+--
+-- Name: administrator_views_administrator_id_acl_id; Type: CONSTRAINT; Schema: public; Owner: qvd; Tablespace: 
+--
+
+ALTER TABLE ONLY administrator_views
+    ADD CONSTRAINT administrator_views_administrator_id_acl_id UNIQUE (administrator_id, acl_id);
 
 
 --
@@ -1626,6 +1741,57 @@ CREATE INDEX vms_idx_osf_id ON vms USING btree (osf_id);
 
 CREATE INDEX vms_idx_user_id ON vms USING btree (user_id);
 
+--
+-- Name: tenant_views_idx_tenant_id; Type: INDEX; Schema: public; Owner: qvd; Tablespace: 
+--
+
+CREATE INDEX tenant_views_idx_tenant_id ON tenant_views USING btree (tenant_id);
+
+--
+-- Name: tenant_views_idx_acl_id; Type: INDEX; Schema: public; Owner: qvd; Tablespace: 
+--
+
+CREATE INDEX tenant_views_idx_acl_id ON tenant_views USING btree (acl_id);
+
+--
+-- Name: administrator_views_idx_administrator_id; Type: INDEX; Schema: public; Owner: qvd; Tablespace: 
+--
+
+CREATE INDEX administrator_views_idx_administrator_id ON administrator_views USING btree (administrator_id);
+
+--
+-- Name: administrator_views_idx_acl_id; Type: INDEX; Schema: public; Owner: qvd; Tablespace: 
+--
+
+CREATE INDEX administrator_views_idx_acl_id ON administrator_views USING btree (acl_id);
+
+--
+-- Name: tenant_views_tenant_id_fkey; Type: FK CONSTRAINT; Schema: public; Owner: qvd
+--
+
+ALTER TABLE ONLY tenant_views
+    ADD CONSTRAINT tenant_views_tenant_id_fkey FOREIGN KEY (tenant_id) REFERENCES tenants(id) ON UPDATE CASCADE ON DELETE CASCADE DEFERRABLE;
+
+--
+-- Name: tenant_views_acl_id_fkey; Type: FK CONSTRAINT; Schema: public; Owner: qvd
+--
+
+ALTER TABLE ONLY tenant_views
+    ADD CONSTRAINT tenant_views_acl_id_fkey FOREIGN KEY (acl_id) REFERENCES acls(id) ON UPDATE CASCADE ON DELETE CASCADE DEFERRABLE;
+
+--
+-- Name: administrator_views_administrator_id_fkey; Type: FK CONSTRAINT; Schema: public; Owner: qvd
+--
+
+ALTER TABLE ONLY administrator_views
+    ADD CONSTRAINT administrator_views_administrator_id_fkey FOREIGN KEY (administrator_id) REFERENCES administrators(id) ON UPDATE CASCADE ON DELETE CASCADE DEFERRABLE;
+
+--
+-- Name: administrators_views_acl_id_fkey; Type: FK CONSTRAINT; Schema: public; Owner: qvd
+--
+
+ALTER TABLE ONLY administrator_views
+    ADD CONSTRAINT administrator_views_acl_id_fkey FOREIGN KEY (acl_id) REFERENCES acls(id) ON UPDATE CASCADE ON DELETE CASCADE DEFERRABLE;
 
 --
 -- Name: di_properties_di_id_fkey; Type: FK CONSTRAINT; Schema: public; Owner: qvd

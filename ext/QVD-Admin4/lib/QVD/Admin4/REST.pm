@@ -312,8 +312,70 @@ role_delete => { type_of_action => 'delete',
 		 admin4method => 'delete',
 		 qvd_object => 'Role'},
 
+
+tenant_view_tiny_list => { type_of_action => 'tiny',
+			   admin4method => 'select',
+			   qvd_object => 'Tenant_View'},
+
+tenant_view_get_list => { type_of_action => 'list',
+			  admin4method => 'select',
+			  qvd_object => 'Tenant_View'},
+
+tenant_view_get_details => { type_of_action => 'details',
+			     admin4method => 'select',
+			     qvd_object => 'Tenant_View'},
+
+tenant_view_all_ids => { type_of_action => 'all_ids',
+			 admin4method => 'select',
+			 qvd_object => 'Tenant_View'},
+
+tenant_view_update => { type_of_action => 'update',
+			admin4method => 'update',
+			qvd_object => 'Tenant_View'},
+
+tenant_view_create => { type_of_action => 'create',
+			admin4method => 'create',
+			qvd_object => 'Tenant_View'},
+
+tenant_view_delete => { type_of_action => 'delete',
+			admin4method => 'delete',
+			qvd_object => 'Tenant_View'},
+
+
+
+admin_view_tiny_list => { type_of_action => 'tiny',
+			   admin4method => 'select',
+			   qvd_object => 'Administrator_View'},
+
+admin_view_get_list => { type_of_action => 'list',
+			  admin4method => 'select',
+			  qvd_object => 'Administrator_View'},
+
+admin_view_get_details => { type_of_action => 'details',
+			     admin4method => 'select',
+			     qvd_object => 'Administrator_View'},
+
+admin_view_all_ids => { type_of_action => 'all_ids',
+			 admin4method => 'select',
+			 qvd_object => 'Administrator_View'},
+
+admin_view_update => { type_of_action => 'update',
+			admin4method => 'update',
+			qvd_object => 'Administrator_View'},
+
+admin_view_create => { type_of_action => 'create',
+			admin4method => 'create',
+			qvd_object => 'Administrator_View'},
+
+admin_view_delete => { type_of_action => 'delete',
+			admin4method => 'delete',
+			qvd_object => 'Administrator_View'},
+
+
 qvd_objects_statistics => { type_of_action =>  'general',
 			    admin4method => 'qvd_objects_statistics'},
+
+
 };
 
 sub BUILD

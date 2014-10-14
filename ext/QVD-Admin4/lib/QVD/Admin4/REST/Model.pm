@@ -35,7 +35,9 @@ my $AVAILABLE_FILTERS = { list => { default => [],
 				    ACL => [qw(id name role_id admin_id)],
 				    Tenant => [qw(id name)],
 				    Role => [qw(name id )],
-				    Administrator => [qw(name tenant_id tenant_name id )]},
+				    Administrator => [qw(name tenant_id tenant_name id )],
+				    Tenant_View => [qw(id tenant_id tenant_name acl_id acl_name positive)],
+				    Administrator_View => [qw(id admin_id admin_name acl_id acl_name tenant_id tenant_name positive)]},
 
 			  all_ids => { default => [],
 				       VM => [qw(storage id name user_id user_name osf_id osf_name di_tag blocked expiration_soft 
@@ -49,7 +51,9 @@ my $AVAILABLE_FILTERS = { list => { default => [],
 				       ACL => [qw(id name role_id admin_id )],
 				       Role => [qw(name acl_id role_id nested_acl_name nested_role_name id admin_id admin_name )],
 				       Tenant => [qw(id name)],
-				       Administrator => [qw(name tenant_id tenant_name role_id acl_id id role_name acl_name )]},
+				       Administrator => [qw(name tenant_id tenant_name role_id acl_id id role_name acl_name )],
+				    Tenant_View => [qw(id tenant_id tenant_name acl_id acl_name positive)],
+				    Administrator_View => [qw(id tenant_id tenant_name acl_id acl_name admin_id admin_name positive)]},
 
 			  details => { default => [qw(id tenant_id)],
                                        Host => [qw(id)],
@@ -95,7 +99,9 @@ my $AVAILABLE_FIELDS = { list => { default => [],
 				   Tenant => [qw(id name)],
 				   User => [qw(id name  blocked creation_admin creation_date number_of_vms number_of_vms_connected  properties )],
 				   Host => [qw(id name address blocked frontend backend state  load creation_admin creation_date number_of_vms_connected properties )],
-				   DI_Tag => [qw(osf_id name id )] },
+				   DI_Tag => [qw(osf_id name id )],
+				    Tenant_View => [qw(id tenant_id tenant_name acl_id acl_name positive)],
+				    Administrator_View => [qw(id tenant_id tenant_name admin_id admin_name acl_id acl_name positive)] },
 			 details => { default => [],
 				   OSF => [qw(id name overlay user_storage memory  number_of_vms number_of_dis properties )],
 				   Role => [qw(name acls roles id number_of_acls)],
@@ -108,9 +114,13 @@ my $AVAILABLE_FIELDS = { list => { default => [],
 				   Tenant => [qw(id name)],
 				   User => [qw(id name  blocked creation_admin creation_date number_of_vms number_of_vms_connected  properties )],
 				   Host => [qw(id name address blocked frontend backend state  load creation_admin creation_date number_of_vms_connected number_of_vms properties )],
-				   DI_Tag => [qw(osf_id name id )] },
+				   DI_Tag => [qw(osf_id name id )],
+				    Tenant_View => [qw(id tenant_id tenant_name acl_id acl_name positive)],
+				    Administrator_View => [qw(id admin_id admin_name tenant_id tenant_name acl_id acl_name positive)] },
 			 tiny => { default => [qw(id name)],
-				   DI => [qw(id disk_image)]},
+				   DI => [qw(id disk_image)],
+				   Tenant_View => [qw(id)],
+				   Administrator_View => [qw(id)]},
 
 			 all_ids => { default => [qw(id)]},
 			state => { User => [qw(number_of_vms_connected)],
@@ -167,7 +177,9 @@ my $SUBCHAIN_FILTERS = { list => { default => [qw(name)],
 my $COMMODIN_FILTERS = { tiny => { ACL => [qw(name)]}};
 
 my $DEFAULT_ORDER_CRITERIA = { tiny => { default =>  [qw(name)],
-                                         DI => [qw(disk_image)] }};
+                                         DI => [qw(disk_image)],
+					 Tenant_View => [qw(acl_name)],
+					 Administrator_View => [qw(acl_name)] }};
 
 my $AVAILABLE_ARGUMENTS = { User => [qw(name password blocked)],
                             VM => [qw(name ip blocked expiration_soft expiration_hard storage di_tag)],
@@ -176,7 +188,9 @@ my $AVAILABLE_ARGUMENTS = { User => [qw(name password blocked)],
                             DI => [qw(blocked disk_image)],
 			    Tenant => [qw(name)],
 			    Role => [qw(name)],
-			    Administrator => [qw(name password)]};
+			    Administrator => [qw(name password)],
+			    Tenant_View => [qw(positive)],
+			    Administrator_View => [qw(positive)]};
 
 my $MANDATORY_ARGUMENTS = { User => [qw(name password tenant_id blocked)],
 			    VM => [qw(name user_id ip osf_id di_tag state user_state blocked)],
@@ -185,7 +199,9 @@ my $MANDATORY_ARGUMENTS = { User => [qw(name password tenant_id blocked)],
                             DI => [qw(version disk_image osf_id blocked)],
 			    Tenant => [qw(name)],
 			    Role => [qw(name)],
-                            Administrator => [qw(name password tenant_id)]}; 
+                            Administrator => [qw(name password tenant_id)],
+			    Tenant_View => [qw(tenant_id acl_id positive)],
+			    Administrator_View => [qw(admin_id acl_id positive)]}; 
 
 my $DEFAULT_ARGUMENT_VALUES = { User => { blocked => 'false' },
                                 VM => { di_tag => 'default',
@@ -200,11 +216,12 @@ my $DEFAULT_ARGUMENT_VALUES = { User => { blocked => 'false' },
                                 OSF => { memory => \&get_default_memory,
 				         overlay => \&get_default_overlay,
 				         user_storage => 0 },
-				DI => { blocked => 'false' }};    
+				DI => { blocked => 'false' },
+			    Tenant_View => { positive => 0 },
+			    Administrator_View =>  { positive => 0 }};
 
 my $FILTERS_TO_DBIX_FORMAT_MAPPER = 
 {
-
     ACL => {
 	'id' => 'me.id',
 	'name' => 'me.name',
@@ -311,10 +328,31 @@ my $FILTERS_TO_DBIX_FORMAT_MAPPER =
 	'name' => 'me.name',
 	'id' => 'me.id',
     },
+
     Tenant => {
 	'name' => 'me.name',
 	'id' => 'me.id'
-    }
+    },
+    
+    Tenant_View => { 	
+	'id' => 'me.id', 
+	'tenant_id' => 'me.tenant_id', 
+	'acl_id' => 'me.acl_id', 
+	'tenant_name' => 'tenant.name', 
+	'acl_name' => 'acl.name',
+	'positive' => 'me.positive' 
+    },
+
+    Administrator_View =>  {
+	'id' => 'me.id',  
+	'tenant_id' => 'tenant.id', 
+	'tenant_name' => 'tenant.name', 
+	'admin_id' => 'me.administrator_id', 
+	'acl_id' => 'me.acl_id', 
+	'admin_name' => 'administrator.name', 
+	'acl_name' => 'acl.name',
+	'positive' => 'me.positive' }
+
 };
 
 my $ARGUMENTS_TO_DBIX_FORMAT_MAPPER = 
@@ -446,8 +484,28 @@ my $FIELDS_TO_DBIX_FORMAT_MAPPER =
     Tenant => {
 	'name' => 'me.name',
 	'id' => 'me.id'
-    }
+    },
+
+    Tenant_View => { 	
+	'id' => 'me.id', 
+	'tenant_id' => 'me.tenant_id', 
+	'acl_id' => 'me.acl_id', 
+	'tenant_name' => 'tenant.name', 
+	'acl_name' => 'acl.name',
+	'positive' => 'me.positive'
+    },
+
+    Administrator_View =>  {
+	'id' => 'me.id',  
+	'tenant_id' => 'administrator.tenant_id', 
+	'tenant_name' => 'administrator.tenant_name', 
+	'admin_id' => 'me.administrator_id', 
+	'acl_id' => 'me.acl_id', 
+	'admin_name' => 'administrator.name', 
+	'acl_name' => 'acl.name',
+	'positive' => 'me.positive' }
 };
+
 my $VALUES_NORMALIZATOR = { 
                             DI => { disk_image => \&basename_disk_image},
 			    User => { name => \&normalize_name, 
@@ -462,7 +520,9 @@ my $DBIX_JOIN_VALUE = { User => [qw(tenant), { vms => 'vm_runtime'}],
 			DI_Tag => [{di => {osf => 'tenant'}}],
 			Role => [{role_rels => 'inherited'}, { acl_rels => 'acl'}],
 			Administrator => [qw(tenant), { role_rels => { role => { acl_rels => 'acl' }}}],
-			ACL => [{ role_rels => { role => { admin_rels => 'admin' }}}]};
+			ACL => [{ role_rels => { role => { admin_rels => 'admin' }}}],
+                        Tenant_View => [ qw(tenant acl)],
+			Administrator_View => [ qw(acl), { administrator => 'tenant' }] };
 
 my $DBIX_PREFETCH_VALUE = { list => { User => $DBIX_JOIN_VALUE->{User},
 				      VM => $DBIX_JOIN_VALUE->{VM},
@@ -472,7 +532,9 @@ my $DBIX_PREFETCH_VALUE = { list => { User => $DBIX_JOIN_VALUE->{User},
 				      DI_Tag => $DBIX_JOIN_VALUE->{DI_Tag},
 				      Role => $DBIX_JOIN_VALUE->{Role},
 				      Administrator => $DBIX_JOIN_VALUE->{Administrator},
-				      ACL => $DBIX_JOIN_VALUE->{ACL} },
+				      ACL => $DBIX_JOIN_VALUE->{ACL},
+                                      Tenant_View => $DBIX_JOIN_VALUE->{Tenant_View},
+				      Administrator_View => $DBIX_JOIN_VALUE->{Administrator_View}},
 			    details => { User => $DBIX_JOIN_VALUE->{User},
 					 VM => $DBIX_JOIN_VALUE->{VM},
 					 Host => $DBIX_JOIN_VALUE->{Host},
@@ -481,7 +543,9 @@ my $DBIX_PREFETCH_VALUE = { list => { User => $DBIX_JOIN_VALUE->{User},
 					 DI_Tag => $DBIX_JOIN_VALUE->{DI_Tag},
 					 Role => $DBIX_JOIN_VALUE->{Role},
 					 Administrator => $DBIX_JOIN_VALUE->{Administrator},
-					 ACL => $DBIX_JOIN_VALUE->{ACL} }};
+					 ACL => $DBIX_JOIN_VALUE->{ACL},
+                                      Tenant_View => $DBIX_JOIN_VALUE->{Tenant_View},
+				      Administrator_View => $DBIX_JOIN_VALUE->{Administrator_View} }};
 
 my $DBIX_HAS_ONE_RELATIONSHIPS = { VM => [qw(vm_runtime counters)],
                                    Host => [qw(runtime counters)]};
