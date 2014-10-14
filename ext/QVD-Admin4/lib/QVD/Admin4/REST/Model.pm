@@ -59,7 +59,7 @@ my $AVAILABLE_FILTERS = { list => { default => [],
 			  tiny => { default => [qw(tenant_id)],
                                     Host => [qw()],
 				    Role => [qw()],
-				    ACL => [qw()],
+				    ACL => [qw(name)],
                                     Tenant => [qw()],
                                     DI_Tag => [qw(tenant_id osf_id)]},
 			  delete => { default => [qw(id tenant_id)],
@@ -163,6 +163,8 @@ my $SUBCHAIN_FILTERS = { list => { default => [qw(name)],
 				   DI => [qw(disk_image)],
 				   Administrator => [qw(name role_name acl_name)],
 				   Role => [qw(name nested_role_name acl_name)]}};
+
+my $COMMODIN_FILTERS = { tiny => { ACL => [qw(name)]}};
 
 my $DEFAULT_ORDER_CRITERIA = { tiny => { default =>  [qw(name)],
                                          DI => [qw(disk_image)] }};
@@ -446,7 +448,8 @@ my $FIELDS_TO_DBIX_FORMAT_MAPPER =
 	'id' => 'me.id'
     }
 };
-my $VALUES_NORMALIZATOR = { DI => { disk_image => \&basename_disk_image},
+my $VALUES_NORMALIZATOR = { 
+                            DI => { disk_image => \&basename_disk_image},
 			    User => { name => \&normalize_name, 
 				      password => \&password_to_token }};
 
@@ -501,6 +504,9 @@ sub BUILD
 	'subchain_filters',$SUBCHAIN_FILTERS);
 
     $self->set_info_by_type_of_action_and_qvd_object(
+	'commodin_filters',$COMMODIN_FILTERS);
+
+    $self->set_info_by_type_of_action_and_qvd_object(
 	'default_order_criteria',$DEFAULT_ORDER_CRITERIA);
 
     $self->set_info_by_qvd_object(
@@ -549,7 +555,8 @@ sub initialize_info_model
 { available_filters => [],                                                                 
   available_fields => [],                                                                  
   available_arguments => [],                                                               
-  subchain_filters => [],                                                                  
+  subchain_filters => [],                                                                 
+  commodin_filters => [],                                                                  
   mandatory_arguments => [],                                                               
   mandatory_filters => [],                                                                 
   default_argument_values => {},                                                           
@@ -623,6 +630,14 @@ sub subchain_filters
     my $self = shift;
 
     my $filters = $self->{model_info}->{subchain_filters} // [];
+    @$filters;
+}
+
+sub commodin_filters
+{
+    my $self = shift;
+
+    my $filters = $self->{model_info}->{commodin_filters} // [];
     @$filters;
 }
 
@@ -743,6 +758,16 @@ sub subchain_filter
 
     $_ eq $filter && return 1
 	for $self->subchain_filters;
+    return 0;
+}
+
+sub commodin_filter
+{
+    my $self = shift;
+    my $filter = shift;
+
+    $_ eq $filter && return 1
+	for $self->commodin_filters;
     return 0;
 }
 

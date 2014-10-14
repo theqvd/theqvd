@@ -200,7 +200,7 @@ sub switch_custom_properties_json2request
 
 	$found_properties++;
 	my $property_value = $self->json_wrapper->get_filter_value($property_key);
-	$property_value = { like => "%".$property_value."%"};
+	$property_value = { ILIKE => "%".$property_value."%"};
 	my $property_dbix_key = $found_properties > 1 ?
 	    "properties_$found_properties" : 'properties';
 	$self->json_wrapper->forze_filter_deletion($property_key);
@@ -263,8 +263,15 @@ sub set_filters_in_request
 	my $value = $self->json_wrapper->get_filter_value($key);
 	my $value_normalized = $self->qvd_object_model->normalize_value($key,$value);
 
-	$value_normalized = { like => "%".$value_normalized."%"} 
-	if $self->qvd_object_model->subchain_filter($key);
+	if ($self->qvd_object_model->subchain_filter($key))
+	{
+	    $value_normalized = { ILIKE => "%".$value_normalized."%"};
+	}
+	elsif ($self->qvd_object_model->commodin_filter($key))
+	{
+	    $value_normalized = { ILIKE => $value_normalized }; 
+	}
+
 	$self->set_filter($key_dbix_format,$value_normalized);
     }
 }

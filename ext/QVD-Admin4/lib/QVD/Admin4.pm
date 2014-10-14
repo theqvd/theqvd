@@ -12,6 +12,7 @@ use Config::Properties;
 use QVD::Admin4::Exception;
 use DateTime;
 use List::Util qw(sum);
+use File::Basename qw(basename dirname);
 our $VERSION = '0.01';
 
 my $DB;
@@ -37,15 +38,13 @@ sub _db { $DB; }
 sub select
 {
     my ($self,$request) = @_;
-    my $modifiers = $request->modifiers;
 
     my $rs = eval { $DB->resultset($request->table)->search($request->filters, 
-							    $modifiers) };
+							    $request->modifiers) };
 
    QVD::Admin4::Exception->throw(code => $DB->storage->_dbh->state,
 				  message => "$@") if $@;
 
-    use Data::Dumper; print Dumper $rs->as_query;
    { total => ($rs->is_paged ? $rs->pager->total_entries : $rs->count), 
      rows => [$rs->all] };
 }
@@ -666,11 +665,33 @@ sub vm_delete
 sub di_create
 {
     my ($self,$request) = @_;
-# $di->update({path => $di->id .'-'.$di->path});
 
-  $self->create($request, methods_for_nested_queries => 
-		  [qw(create_custom_properties 
-                      create_related_tags)]);
+    my $images_path  = cfg('path.storage.images');
+    QVD::Admin4::Exception->throw(code=>'31')
+	unless -d $images_path;
+
+    my $staging_path = cfg('path.storage.staging');
+    QVD::Admin4::Exception->throw(code=>'32')
+	unless -d $staging_path;
+
+    my $staging_file = basename($request->arguments->{path});
+    QVD::Admin4::Exception->throw(code=>'33')
+	unless -e "$staging_path/$staging_file";
+
+    my $result = $self->create($request, methods_for_nested_queries => 
+			     [qw(create_custom_properties create_related_tags)]);
+    my $di = @{$result->{rows}}[0];
+    my $images_file  = $di->id . '-' . $staging_file;
+    $di->update({path => $images_file});
+
+    for (1 .. 5)
+    {
+	eval { copy("$staging_path/$staging_file","$images_path/$images_file") };
+	$@ ? print $@ : last;
+    }
+    if ($@) { $di->delete; QVD::Admin4::Exception->throw(code=>'30');}
+
+    $result;
 }
 
 sub di_delete {
@@ -713,7 +734,7 @@ sub vm_start
 				$vm->vm_runtime->send_vm_start;
 				$host{$vm->vm_runtime->host_id}++;}); 
 	       $@ or last } for (1 .. 5);
-
+	print $@ if $@;
 	if ($@) { $failures->{$vm->id} = 18; print $@; }
     }
 
@@ -859,7 +880,9 @@ sub get_acls_in_roles_or_admins
 	}
     }
  
-    my $acls_rs = $DB->resultset('ACL')->search({id => [keys %$acls_info]},
+    my $acls_name = $json_wrapper->get_filter_value('name') // '%';
+    my $acls_rs = $DB->resultset('ACL')->search({id => [keys %$acls_info], 
+						 name => { like => $acls_name }},
 	{ order_by => { ($json_wrapper->order_direction || '-asc') => 
 			($json_wrapper->order_criteria || []) },
 	  page => ($json_wrapper->offset || 1),
@@ -868,8 +891,6 @@ sub get_acls_in_roles_or_admins
    { total => ($acls_rs->is_paged ? $acls_rs->pager->total_entries : $acls_rs->count), 
      rows => [map { $acls_info->{$_->id} } $acls_rs->all] };
 }
-
-
 
 ##################################
 ## GENERAL STATISTICS FUNCTIONS ##
