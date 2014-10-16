@@ -834,53 +834,47 @@ sub di_no_head_default_tags
 ######################################
 ## GENERAL FUNCTIONS; WITHOUT REQUEST
 ######################################
+
 sub current_admin_setup
 {
     my ($self,$administrator,$json_wrapper) = @_;
    { acls => [ $administrator->acls ]};
 }
 
-sub get_acls_in_roles
-{
-    my ($self,$json_wrapper) = @_;
-    my $role_ids = $json_wrapper->get_filter_value('id') // 
-        QVD::Admin4::Exception->throw(code=>'10');
-    $role_ids = [$role_ids] unless ref($role_ids); 
-    my $roles = [$DB->resultset('Role')->search({id => $role_ids})->all];
-    $self->get_acls_in_roles_or_admins($json_wrapper,$roles);
-}
-
-sub get_acls_in_admins
-{
-    my ($self,$json_wrapper) = @_;
-    my $admin_ids = $json_wrapper->get_filter_value('id') // 
-        QVD::Admin4::Exception->throw(code=>'10');
-    $admin_ids = [$admin_ids] unless ref($admin_ids); 
-    my $admins = [$DB->resultset('Administrator')->search({id => $admin_ids})->all];
-    $self->get_acls_in_roles_or_admins($json_wrapper,$admins);
-}
-
 sub get_acls_in_roles_or_admins
 {
-    my ($self,$json_wrapper,$roles_or_admins) = @_;
+    my ($self,$json_wrapper) = @_;
+    my $role_id = $json_wrapper->get_filter_value('role_id');
+    my $admin_id = $json_wrapper->get_filter_value('admin_id');
+    QVD::Admin4::Exception->throw(code=>'10') unless $role_id || $admin_id; 
+    QVD::Admin4::Exception->throw(code=>'9') if $role_id && $admin_id; 
+
+    if ($role_id &&  not ref($role_id)) { $role_id = [$role_id];}
+    if ($admin_id &&  not ref($admin_id)) { $admin_id = [$admin_id];}
+
+    my $role_ids = $admin_id ?
+	[map { $_->role_id } $DB->resultset('Role_Administrator_Relation')->search(
+	     {administrator_id => $admin_id})->all ] : $role_id;
+
+    my $inherited_acls_db_table = 
+	$self->get_inherited_acls_db_table($role_ids);
+    my $inherited_acls_tree = 
+	$self->get_inherited_acls_tree($inherited_acls_db_table);
+
     my $acls_info;
 
-    for my $role_or_admin (@$roles_or_admins)
+    for my $role_id (@$role_ids)
     {
-	my $role_or_admin_acls_info = $role_or_admin->get_acls_info;
-        for my $acl_id (keys %$role_or_admin_acls_info)
-        {
-	    my $acl_info = $role_or_admin_acls_info->{$acl_id}; 
-	    while (my ($role_id, $role_name) = each %{$acl_info->{roles}}) 
-	    {
-		$acls_info->{$acl_id}->{roles}->{$role_id} = $role_name;
-		$acls_info->{$acl_id}->{name} = $acl_info->{name};
-		$acls_info->{$acl_id}->{id} = $acl_id;
-	    }
+	for my $acl_id (keys %{$inherited_acls_tree->{$role_id}->{acls}->{1}})
+	{
+	    $acls_info->{$acl_id} = $inherited_acls_tree->{$role_id}->{acls}->{1}->{$acl_id};
+	    $acls_info->{$acl_id}->{roles} //= [];
+	    push @{$acls_info->{$acl_id}->{roles}},
+	    $inherited_acls_tree->{$role_id}->{name};
 	}
     }
- 
-    my $acls_name = $json_wrapper->get_filter_value('name') // '%';
+
+    my $acls_name = $json_wrapper->get_filter_value('acl_name') // '%';
     my $acls_rs = $DB->resultset('ACL')->search({id => [keys %$acls_info], 
 						 name => { like => $acls_name }},
 	{ order_by => { ($json_wrapper->order_direction || '-asc') => 
@@ -891,6 +885,93 @@ sub get_acls_in_roles_or_admins
    { total => ($acls_rs->is_paged ? $acls_rs->pager->total_entries : $acls_rs->count), 
      rows => [map { $acls_info->{$_->id} } $acls_rs->all] };
 }
+
+sub get_inherited_acls_tree
+{
+    my ($self,$db_acls_inheritance_info) = @_;
+
+    my $tree;
+    for my $row (@$db_acls_inheritance_info)
+    {
+	$tree->{@{$row}[1]}->{id} //= @{$row}[1];
+	$tree->{@{$row}[1]}->{name} //= @{$row}[2];
+	$tree->{@{$row}[1]}->{roles} //= {};
+	$tree->{@{$row}[1]}->{acls} //= { 1 => {}, 0 => {}};
+
+	$tree->{@{$row}[0]}->{roles}->{@{$row}[1]} = $tree->{@{$row}[1]}
+	unless @{$row}[0] eq @{$row}[1];
+
+	$tree->{@{$row}[1]}->{acls}->{@{$row}[5]}->{@{$row}[3]} = { id => @{$row}[3], 
+								      name => @{$row}[4]};
+    }
+
+    $self->percolate_acls_in_inherited_roles_tree($tree->{$_}) 
+	for keys %$tree;
+    $tree;
+}
+
+sub get_inherited_acls_db_table
+{
+    my ($self,$role_ids) = @_;
+
+    my $sql_role_ids = join(', ',@$role_ids); 
+    my $sql = "
+      with recursive all_role_role_relations(inheritor_id, inherited_id) as ( 
+        
+          select inheritor_id, inherited_id 
+          from role_role_relations 
+          where inheritor_id in ($sql_role_ids) 
+
+          union 
+
+          select p.inheritor_id, p.inherited_id 
+          from all_role_role_relations pr, role_role_relations p 
+          where pr.inherited_id=p.inheritor_id  ) 
+
+      select a.inheritor_id, a.inherited_id, d.name, b.acl_id, c.name, b.positive 
+      from all_role_role_relations a 
+      join acl_role_relations b on (a.inherited_id=b.role_id) 
+      join acls c on (c.id=b.acl_id) 
+      join roles d on (d.id=a.inherited_id) 
+
+      union 
+
+      select e.id, e.id, e.name, f.acl_id, g.name, f.positive 
+      from roles e 
+      join acl_role_relations f on (e.id=f.role_id) 
+      join acls g on (g.id=f.acl_id) 
+      where e.id in ($sql_role_ids)";
+
+    my $dbh = $DB->storage->dbh;
+    my $sth = $dbh->prepare($sql);
+    $sth->execute;
+
+    $sth->fetchall_arrayref();
+}
+
+
+sub percolate_acls_in_inherited_roles_tree
+{
+    my ($self,$current_role) = @_;
+
+    my @inherited_acls;
+
+    for my $inherited_role (values %{$current_role->{roles}})
+    {
+	push @inherited_acls, $self->percolate_acls_in_inherited_roles_tree($inherited_role);
+    }
+
+    for my $acl (@inherited_acls)
+    {
+	$current_role->{acls}->{1}->{$acl->{id}}->{id} //=  $acl->{id};
+	$current_role->{acls}->{1}->{$acl->{id}}->{name} //=  $acl->{name};
+    }
+    
+    $current_role->{acls}->{0} //= {};
+    delete $current_role->{acls}->{1}->{$_} for keys %{$current_role->{acls}->{0}};
+    $current_role->{acls}->{1} //= {};
+    return values %{$current_role->{acls}->{1}};
+} 
 
 ##################################
 ## GENERAL STATISTICS FUNCTIONS ##
