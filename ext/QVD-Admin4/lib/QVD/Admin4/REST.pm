@@ -287,10 +287,10 @@ acl_get_list => { type_of_action => 'list',
 		  qvd_object => 'ACL'},
 
 get_acls_in_roles => { type_of_action => 'general',
-		      admin4method => 'get_acls_in_roles_or_admins'},
+		      admin4method => 'get_acls_in_roles'},
 
 get_acls_in_admins => { type_of_action => 'general',
-		      admin4method => 'get_acls_in_roles_or_admins'},
+		      admin4method => 'get_acls_in_admins'},
 
 acl_all_ids => { type_of_action => 'all_ids',
 		  admin4method => 'select',

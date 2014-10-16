@@ -2,7 +2,7 @@ package QVD::DB::Result::Role;
 use base qw/DBIx::Class/;
 use strict;
 use warnings;
-
+use QVD::DB;
 __PACKAGE__->load_components(qw/Core/);
 __PACKAGE__->table('roles');
 __PACKAGE__->add_columns(id => { data_type => 'integer',
@@ -15,7 +15,7 @@ __PACKAGE__->has_many(admin_rels => 'QVD::DB::Result::Role_Administrator_Relatio
 __PACKAGE__->has_many(acl_rels => 'QVD::DB::Result::ACL_Role_Relation', 'role_id');
 __PACKAGE__->has_many(role_rels => 'QVD::DB::Result::Role_Role_Relation', 'inheritor_id', { cascade_delete => 0 } );
 
-
+my $DB;
 # FUNCTIONS TO GET DIRECT INFO FROM
 # THE ROLE OBJECT ITSELF
 
@@ -68,8 +68,8 @@ sub has_positive_acl
 sub is_allowed_to
 {
     my ($self,$acl_name) = @_;
-    my @acls = $self->_get_inherited_acls;
-    $_ eq $acl_name && return 1 for @acls;
+    my %acls = map { $_ => 1 } $self->get_acls_fast;
+    defined $acls{$acl_name} ? return 1 : return 0;
 }
 
 sub get_master_roles_structure
@@ -305,5 +305,96 @@ sub get_positive_acls_info
     my $self = shift;
     [ sort map { $_->name }  @{$self->get_positive_acls}];
 }
+
+
+#####################
+#### NEW VERSION ####
+#####################
+
+
+sub get_acls_fast
+{
+    my $self = shift;
+
+    my $tree = $self->get_full_acls_inheritance_tree;
+    map { $_->{name}} values %{$tree->{$self->id}->{iacls}};
+}
+sub get_full_acls_inheritance_tree
+{
+    my $self = shift;
+
+    my $sql_role_ids = $self->id; 
+    my $sql = "
+      with recursive all_role_role_relations(inheritor_id, inherited_id) as ( 
+        
+          select inheritor_id, inherited_id 
+          from role_role_relations 
+          where inheritor_id in ($sql_role_ids) 
+
+          union 
+
+          select p.inheritor_id, p.inherited_id 
+          from all_role_role_relations pr, role_role_relations p 
+          where pr.inherited_id=p.inheritor_id  ) 
+
+      select a.inheritor_id, a.inherited_id, d.name, b.acl_id, c.name, b.positive 
+      from all_role_role_relations a 
+      join acl_role_relations b on (a.inherited_id=b.role_id) 
+      join acls c on (c.id=b.acl_id) 
+      join roles d on (d.id=a.inherited_id) 
+
+      union 
+
+      select e.id, e.id, e.name, f.acl_id, g.name, f.positive 
+      from roles e 
+      join acl_role_relations f on (e.id=f.role_id) 
+      join acls g on (g.id=f.acl_id) 
+      where e.id in ($sql_role_ids)";
+
+    $DB //= QVD::DB->new();
+    my $dbh = $DB->storage->dbh;
+    my $sth = $dbh->prepare($sql);
+    $sth->execute;
+
+    my $tree;
+    for my $row (@{$sth->fetchall_arrayref()})
+    {
+	$tree->{@{$row}[1]}->{id} //= @{$row}[1];
+	$tree->{@{$row}[1]}->{name} //= @{$row}[2];
+	$tree->{@{$row}[1]}->{roles} //= {};
+	$tree->{@{$row}[1]}->{acls} //= { 1 => {}, 0 => {}};
+
+	$tree->{@{$row}[0]}->{roles}->{@{$row}[1]} = $tree->{@{$row}[1]}
+	unless @{$row}[0] eq @{$row}[1];
+
+	$tree->{@{$row}[1]}->{acls}->{@{$row}[5]}->{@{$row}[3]} = { id => @{$row}[3], 
+								    name => @{$row}[4]};
+	$tree->{@{$row}[1]}->{acls}->{@{$row}[5]}->{@{$row}[3]}->{roles}->{@{$row}[1]}->{id} = @{$row}[1]; 
+	$tree->{@{$row}[1]}->{acls}->{@{$row}[5]}->{@{$row}[3]}->{roles}->{@{$row}[1]}->{name} = @{$row}[2]; 
+    }
+
+    $self->percolate_acls_in_inherited_roles_tree($tree->{$_}) 
+	for keys %$tree;
+    $tree;
+}
+
+sub percolate_acls_in_inherited_roles_tree
+{
+    my ($self,$current_role) = @_;
+
+    $current_role->{acls}->{1} //= {};    
+    $current_role->{acls}->{0} //= {};
+    my @inherited_acls;
+
+    push @inherited_acls, $self->percolate_acls_in_inherited_roles_tree($_) for
+	values %{$current_role->{roles}};
+    
+    $current_role->{iacls}->{$_->{id}} = { id => $_->{id}, name => $_->{name}  }
+    for @inherited_acls, values %{$current_role->{acls}->{1}};
+
+    delete $current_role->{iacls}->{$_} for keys %{$current_role->{acls}->{0}};
+
+    return values %{$current_role->{iacls}};
+} 
 
 1;

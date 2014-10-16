@@ -27,12 +27,16 @@ sub roles
 sub acls
 {
     my $self = shift;
+    return $self->{acls_cache} if 
+	defined $self->{acls_cache};
     my %acls;
 
     for my $role ($self->roles)
     {
-	$acls{$_} = 1 for $role->_get_inherited_acls;
+	$acls{$_} = 1 for $role->get_acls_fast;
     }
+    $self->{acls_cache} = [keys %acls];
+
     keys %acls;
 }
 
@@ -78,13 +82,8 @@ sub get_acls_info
 sub is_allowed_to
 {
     my ($self,$acl_name) = @_;
-
-    for my $role ($self->roles)
-    {
-	$role->is_allowed_to($acl_name) && return 1;
-    }
-
-    return 0;
+    my %acls = map { $_ => 1 } $self->acls;
+    defined $acls{$acl_name} ? return 1 : return 0;
 }
 
 sub set_tenants_scoop
