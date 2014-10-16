@@ -1,4 +1,4 @@
-<div class="side-component">
+<div class="side-component js-side-component1">
     <div class="side-header">
         <span class="h2" data-i18n>Effective ACLs</span>
     </div>

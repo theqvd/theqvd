@@ -7,6 +7,10 @@ Wat.Views.DIDetailsView = Wat.Views.DetailsView.extend({
     },
     
     renderSide: function () {
+        if (this.checkSide({'di.see-details.vm-list': '.js-side-component1'}) === false) {
+            return;
+        }
+        
         var sideContainer = '.' + this.cid + ' .bb-details-side1';
         
         // Render Virtual Machines list on side
@@ -20,6 +24,16 @@ Wat.Views.DIDetailsView = Wat.Views.DetailsView.extend({
         params.filters = {"di_id": this.elementId};
         
         this.sideView = new Wat.Views.VMListView(params);
+    },
+    
+    applyDefault: function () {
+        var arguments = {
+            "__tags_changes__": {
+                'create': ['default'],
+            }
+        }
+        
+        this.updateModel(arguments, {id: this.elementId}, this.fetchDetails);
     },
     
     updateElement: function (dialog) {

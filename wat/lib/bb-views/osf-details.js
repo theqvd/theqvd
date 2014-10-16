@@ -7,30 +7,42 @@ Wat.Views.OSFDetailsView = Wat.Views.DetailsView.extend({
     },
     
     renderSide: function () {
-        var sideContainer1 = '.' + this.cid + ' .bb-details-side1';
-        var sideContainer2 = '.' + this.cid + ' .bb-details-side2';
+        var sideCheck = this.checkSide({'osf.see-details.vm-list': '.js-side-component1', 'osf.see-details.di-list': '.js-side-component2'});
+
+        if (sideCheck === false) {
+            return;
+        }
         
-        // Render Virtual Machines list on side
-        var params = {};
-        params.whatRender = 'list';
-        params.listContainer = sideContainer1;
-        params.forceListColumns = {info: true, name: true, tag: true};
-        params.forceSelectedActions = {};
-        params.forceListActionButton = null;
-        params.block = 5;
-        params.filters = {"osf_id": this.elementId};
-        this.sideView2 = new Wat.Views.VMListView(params);
+        if (sideCheck['osf.see-details.vm-list']) { 
+            var sideContainer1 = '.' + this.cid + ' .bb-details-side1';
+
+            // Render Virtual Machines list on side
+            var params = {};
+            params.whatRender = 'list';
+            params.listContainer = sideContainer1;
+            params.forceListColumns = {info: true, name: true, tag: true};
+            params.forceSelectedActions = {};
+            params.forceListActionButton = null;
+            params.block = 5;
+            params.filters = {"osf_id": this.elementId};
+            this.sideView2 = new Wat.Views.VMListView(params);
+        }
         
-        // Render Disk images list on side
-        var params = {};
-        params.whatRender = 'list';
-        params.listContainer = sideContainer2;
-        params.forceListColumns = {info: true, disk_image: true, default: true};
-        params.forceSelectedActions = {};
-        params.forceListActionButton = null;
-        params.block = 5;
-        params.filters = {"osf_id": this.elementId};
-        this.sideView2 = new Wat.Views.DIListView(params);    
+        
+        if (sideCheck['osf.see-details.di-list']) { 
+            var sideContainer2 = '.' + this.cid + ' .bb-details-side2';
+
+            // Render Disk images list on side
+            var params = {};
+            params.whatRender = 'list';
+            params.listContainer = sideContainer2;
+            params.forceListColumns = {info: true, disk_image: true, default: true};
+            params.forceSelectedActions = {};
+            params.forceListActionButton = null;
+            params.block = 5;
+            params.filters = {"osf_id": this.elementId};
+            this.sideView2 = new Wat.Views.DIListView(params);  
+        }
     },
     
     updateElement: function (dialog) {

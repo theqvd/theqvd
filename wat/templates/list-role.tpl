@@ -84,10 +84,10 @@
                             case 'name':
                 %>
                                 <td class="js-name">
-                                    <%= Wat.C.ifACL('<a href="#/setup/role/' + model.get('id') + '" data-i18n="[title]Click for details">', 'role_see') %>
-                                    <%= Wat.C.ifACL('<i class="fa fa-search"></i>', 'role_see') %>
+                                    <%= Wat.C.ifACL('<a href="#/setup/role/' + model.get('id') + '" data-i18n="[title]Click for details">', 'role.see-details.') %>
+                                    <%= Wat.C.ifACL('<i class="fa fa-search"></i>', 'role.see-details.') %>
                                         <span class="text"><%= model.get('name') %></span>
-                                    <%= Wat.C.ifACL('</a>', 'role_see') %>
+                                    <%= Wat.C.ifACL('</a>', 'role.see-details.') %>
                                     <div class="mobile info-in-name-cell">
                                         <%= info %>
                                     </div>

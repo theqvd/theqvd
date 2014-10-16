@@ -7,10 +7,11 @@
         <a href="javascript:" class="fa fa-bars mobile-menu js-mobile-menu-hamburger" id="mobile-menu"></a>
         <% 
             var cornerMenuPrint = $.extend(true, {}, cornerMenu);
+
             if (!loggedIn) {
                 delete cornerMenuPrint.setup;
                 delete cornerMenuPrint.user;
-                delete cornerMenuPrint.help.subMenu.about;
+                //delete cornerMenuPrint.help.subMenu.about;
             } 
         %>
 

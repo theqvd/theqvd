@@ -1,14 +1,14 @@
 <div class="details-header">
     <span class="fa fa-hdd-o h1" data-i18n><%= model.get('name') %></span>
-    <% if(Wat.C.checkACL('di_delete')) { %>
+    <% if(Wat.C.checkACL('host.delete.')) { %>
     <a class="button fleft button-icon js-button-delete fa fa-trash" href="javascript:" data-i18n="[title]Delete"></a>
     <% } %>
-    <% if(Wat.C.checkACL('host_update')) { %>
+    <% if(Wat.C.checkGroupACL('hostEdit')) { %>
     <a class="button fright button-icon js-button-edit fa fa-pencil" href="javascript:" data-i18n="[title]Edit"></a>
     <% } %>
     
     <% 
-    if (Wat.C.checkACL('host_update')) {
+    if (Wat.C.checkACL('host.update.block')) {
         if(model.get('blocked')) {
     %>
             <a class="button button-icon js-button-unblock fa fa-unlock fright" href="javascript:" data-i18n="[title]Unblock"></a>

@@ -12,7 +12,7 @@
     <tr>
         <td colspan="2">
             <table class="roles-inherit-table">
-                <% if(Wat.C.checkACL('role_manage_roles')) { %>
+                <% if(Wat.C.checkACL('role.update.assign-role')) { %>
                 <tr>
                     <td>
                         <span data-i18n>Select a role to be inerithed</span>
@@ -86,7 +86,7 @@
                                                 }
                                             %>  
                                                 </div>   
-                                                <% if(Wat.C.checkACL('role_manage_roles')) { %>
+                                                <% if(Wat.C.checkACL('role.update.assign-role')) { %>
                                                 <a class="button button-under-floating-box delete-role-button js-delete-role-button fa fa-trash-o" href="javascript:" data-id="<%= iRole %>" data-i18n>Delete</a>
                                                 <% } %>
                                             </td>

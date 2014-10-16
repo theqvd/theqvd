@@ -7,6 +7,10 @@ Wat.Views.HostDetailsView = Wat.Views.DetailsView.extend({
     },
     
     renderSide: function () {
+        if (this.checkSide({'host.see-details.vm-list': '.js-side-component1'}) === false) {
+            return;
+        }
+        
         var sideContainer = '.' + this.cid + ' .bb-details-side1';
         
         // Render Virtual Machines list on side

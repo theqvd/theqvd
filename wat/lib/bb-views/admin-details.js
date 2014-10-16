@@ -119,15 +119,19 @@ Wat.Views.AdminDetailsView = Wat.Views.DetailsView.extend({
     },
     
     renderSide: function () {
+        if (this.checkSide({'administrator.see-details.acl-list': '.js-side-component1'}) === false) {
+            return;
+        }
+        
         var sideContainer = '.' + this.cid + ' .bb-details-side1';
 
         // Render ACLs list on side
         var params = {};
         params.whatRender = 'list';
         params.listContainer = sideContainer;
-        params.forceListColumns = {name: true, roles: true};
-        // If Administrator has more than one role assigned, show origin of ACLs
-        if (this.model.attributes.roles.length > 1) {
+        params.forceListColumns = {name: true};
+        // If Administrator has permission and more than one role assigned, show origin of ACLs
+        if (Wat.C.checkACL('role.see-details.acl-list-roles') && this.model.attributes.roles.length > 1) {
             params.forceListColumns.roles = true;
         }
         params.forceSelectedActions = {};

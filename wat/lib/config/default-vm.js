@@ -5,6 +5,8 @@ Wat.I.listColumns[qvdObj] = {
     'checks': {
         'text': 'checks',
         'fields': [],
+        'groupAcls': 'vmMassiveActions',
+        'aclsLogic': 'OR',
         'display': true,
         'fixed': true
     },
@@ -17,6 +19,8 @@ Wat.I.listColumns[qvdObj] = {
             'expiration_hard',
             'user_state'
         ],
+        'groupAcls': 'vmInfoIcons',
+        'aclsLogic': 'OR',
         'display': true
     },
     'id': {
@@ -24,6 +28,7 @@ Wat.I.listColumns[qvdObj] = {
         'fields': [
             'id'
         ],
+        'acls': 'vm.see-main.id',
         'display': false,
     },
     'name': {
@@ -40,6 +45,7 @@ Wat.I.listColumns[qvdObj] = {
             'host_id',
             'host_name'
         ],
+        'acls': 'vm.see-main.host',
         'display': true
     },
     'user': {
@@ -48,6 +54,7 @@ Wat.I.listColumns[qvdObj] = {
             'user_id',
             'user_name'
         ],
+        'acls': 'vm.see-main.user',
         'display': true
     },
     'osf': {
@@ -56,6 +63,7 @@ Wat.I.listColumns[qvdObj] = {
             'osf_id',
             'osf_name'
         ],
+        'acls': 'vm.see-main.osf',
         'display': false
     },
     'osf\/tag': {
@@ -66,6 +74,11 @@ Wat.I.listColumns[qvdObj] = {
             'di_tag',
             'di_id'
         ],
+        'acls': [
+            'vm.see-main.osf',
+            'vm.see-main.osf-tag'
+        ],
+        'aclsLogic': 'AND',
         'display': true
     },
     'tag': {
@@ -73,6 +86,7 @@ Wat.I.listColumns[qvdObj] = {
         'fields': [
             'di_tag'
         ],
+        'acls': 'vm.see-main.osf-tag',
         'display': false
     },
     'di_version': {
@@ -80,6 +94,7 @@ Wat.I.listColumns[qvdObj] = {
         'fields': [
             'di_version'
         ],
+        'acls': 'vm.see-main.di-version',
         'display': false
     },
     'disk_image': {
@@ -88,6 +103,7 @@ Wat.I.listColumns[qvdObj] = {
             'di_name',
             'di_id'
         ],
+        'acls': 'vm.see-main.di',
         'display': false
     },
     'ip': {
@@ -95,6 +111,7 @@ Wat.I.listColumns[qvdObj] = {
         'fields': [
             'ip'
         ],
+        'acls': 'vm.see-main.ip',
         'display': false
     },
     'next_boot_ip': {
@@ -102,6 +119,7 @@ Wat.I.listColumns[qvdObj] = {
         'fields': [
             'next_boot_ip'
         ],
+        'acls': 'vm.see-main.next-boot-ip',
         'display': false
     },
     'serial_port': {
@@ -109,6 +127,7 @@ Wat.I.listColumns[qvdObj] = {
         'fields': [
             'serial_port'
         ],
+        'acls': 'vm.see-main.port-serial',
         'display': false
     },
     'ssh_port': {
@@ -116,6 +135,7 @@ Wat.I.listColumns[qvdObj] = {
         'fields': [
             'ssh_port'
         ],
+        'acls': 'vm.see-main.port-ssh',
         'display': false
     },
     'vnc_port': {
@@ -123,6 +143,7 @@ Wat.I.listColumns[qvdObj] = {
         'fields': [
             'vnc_port'
         ],
+        'acls': 'vm.see-main.port-vnc',
         'display': false
     },
     'creation_date': {
@@ -130,6 +151,7 @@ Wat.I.listColumns[qvdObj] = {
         'fields': [
             'creation_date'
         ],
+        'acls': 'vm.see-main.creation-date',
         'display': false
     },
     'creation_admin': {
@@ -137,6 +159,7 @@ Wat.I.listColumns[qvdObj] = {
         'fields': [
             'creation_admin'
         ],
+        'acls': 'vm.see-main.created-by',
         'display': false
     }
 };
@@ -173,7 +196,8 @@ Wat.I.formFilters[qvdObj] = {
             }
                     ],
         'displayMobile': false,
-        'displayDesktop': true
+        'displayDesktop': true,
+        'acls': 'vm.see-main.state'
     },
     'user': {
         'filterField': 'user_id',
@@ -189,7 +213,8 @@ Wat.I.formFilters[qvdObj] = {
             }
                     ],
         'displayMobile': false,
-        'displayDesktop': true
+        'displayDesktop': true,
+        'acls': 'vm.see-main.user'
     },
     'osf': {
         'filterField': 'osf_id',
@@ -205,7 +230,8 @@ Wat.I.formFilters[qvdObj] = {
             }
                     ],
         'displayMobile': false,
-        'displayDesktop': true
+        'displayDesktop': true,
+        'acls': 'vm.see-main.osf'
     },
     'host': {
         'filterField': 'host_id',
@@ -221,7 +247,8 @@ Wat.I.formFilters[qvdObj] = {
             }
                     ],
         'displayMobile': false,
-        'displayDesktop': true
+        'displayDesktop': true,
+        'acls': 'vm.see-main.host'
     }
 };
 
@@ -229,31 +256,39 @@ Wat.I.formFilters[qvdObj] = {
 Wat.I.selectedActions[qvdObj] = [
             {
                 'value': 'start',
-                'text': 'Start'
+                'text': 'Start',
+                'acls': 'vm.update-massive.state'
             },
             {
                 'value': 'stop',
-                'text': 'Stop'
+                'text': 'Stop',
+                'acls': 'vm.update-massive.state'
             },
             {
                 'value': 'block',
-                'text': 'Block'
+                'text': 'Block',
+                'acls': 'vm.update-massive.block'
             },
             {
                 'value': 'unblock',
-                'text': 'Unblock'
+                'text': 'Unblock',
+                'acls': 'vm.update-massive.block'
             },
             {
                 'value': 'disconnect',
-                'text': 'Disconnect user'
+                'text': 'Disconnect user',
+                'acls': 'vm.update-massive.disconnect-user'
             },
             {
                 'value': 'delete',
-                'text': 'Delete'
+                'text': 'Delete',
+                'acls': 'vm.delete-massive.'
             },
             {
                 'value': 'massive_changes',
-                'text': 'Massive changes'
+                'text': 'Edit',
+                'groupAcls': 'vmMassiveEdit',
+                'aclsLogic': 'OR'
             }
         ];
 
@@ -262,7 +297,7 @@ Wat.I.listActionButton[qvdObj] = {
             'name': 'new_vm_button',
             'value': 'New Virtual machine',
             'link': 'javascript:',
-            'acl': 'vm_create'
+            'acl': 'vm.create.'
         };
 
 // Breadcrumbs configuration on list view
@@ -275,6 +310,7 @@ Wat.I.listBreadCrumbs[qvdObj]['next'] = {
 // Breadcrumbs configuration on details view
 $.extend(true, Wat.I.detailsBreadCrumbs[qvdObj], Wat.I.listBreadCrumbs[qvdObj]);
 Wat.I.detailsBreadCrumbs[qvdObj].next.link = '#/vms';
+Wat.I.detailsBreadCrumbs[qvdObj].next.linkACL = 'vm.see-main.';
 Wat.I.detailsBreadCrumbs[qvdObj].next.next = {
             'screen': '' // Will be filled dinamically
         };

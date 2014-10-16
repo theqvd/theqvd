@@ -58,7 +58,9 @@ Wat.Views.DetailsView = Wat.Views.MainView.extend({
         'click .js-button-edit': 'openEditElementDialog',
         'click .js-button-unblock': 'applyUnblock' ,
         'click .js-button-block': 'applyBlock', 
-        'click .js-button-delete': 'askDelete' 
+        'click .js-button-delete': 'askDelete',
+        'click .js-button-default': 'applyDefault',
+        'click .js-button-start-vm': 'startVM'
     },
 
     render: function () {        
@@ -156,5 +158,33 @@ Wat.Views.DetailsView = Wat.Views.MainView.extend({
         }
         
         window.location = lastLink;
+    },
+    
+    // Check some acls to show or not the side of a details view
+    // If no acl pass, return false, otherwise return an object with acls and true or false if pass or not
+    checkSide: function (acls) {
+        var nAcls = acls.length;
+        var pass = 0;
+        var result = {};
+        
+        $.each(acls, function (acl, layer) {
+            if (Wat.C.checkACL(acl)) {
+                pass++;
+                result[acl] = true;
+            }
+            else {
+                result[acl] = false;
+                $(layer).hide();
+            }
+        });
+        
+        if (!pass) {
+            $('.js-details-side').hide();
+            $('.js-details-block').addClass('col-width-100');
+            return false;
+        }
+        //$('.js-details-side').show();
+        //$('.js-details-block').removeClass('col-width-100');
+        return result;
     }
 });

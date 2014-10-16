@@ -301,8 +301,12 @@ Wat.Views.ListView = Wat.Views.MainView.extend({
     },
     
     setFilters: function () {
+        // Get Filters from configuration
         this.formFilters = Wat.I.getFormFilters(this.qvdObj);
 
+        // Check filters on columns to remove forbidden ones
+        Wat.C.purgeConfigData(this.formFilters);
+        
         // The superadmin have an extra filter: tenant
         
         // Every element but the hosts has tenant
@@ -328,7 +332,11 @@ Wat.Views.ListView = Wat.Views.MainView.extend({
     },
     
     setColumns: function () {
+        // Get Columns from configuration
         this.columns = Wat.I.getListColumns(this.qvdObj);
+        
+        // Check acls on columns to remove forbidden ones
+        Wat.C.purgeConfigData(this.columns);
         
         // The superadmin have an extra field on lists: tenant
         
@@ -344,9 +352,12 @@ Wat.Views.ListView = Wat.Views.MainView.extend({
     },
     
     setSelectedActions: function () {
+        // Get Actions from configuration
         this.selectedActions = Wat.I.getSelectedActions(this.qvdObj);
+        
+        // Check actions on columns to remove forbidden ones
+        Wat.C.purgeConfigData(this.selectedActions);
     },
-    
 
     setListActionButton: function () {
         this.listActionButton = Wat.I.getListActionButton(this.qvdObj);
@@ -653,6 +664,8 @@ Wat.Views.ListView = Wat.Views.MainView.extend({
                     }
                 );
         
+        target.html(that.template);
+
         this.templateEditorCommon = Wat.A.getTemplate('editor-common');
 
         // Add specific parts of editor to dialog

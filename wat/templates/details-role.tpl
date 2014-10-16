@@ -1,9 +1,9 @@
 <div class="details-header">
     <span class="fa fa-graduation-cap h1" data-i18n><%= model.get('name') %></span>
-    <% if(Wat.C.checkACL('role_delete')) { %>
+    <% if(Wat.C.checkACL('role.delete.')) { %>
     <a class="button fleft button-icon js-button-delete fa fa-trash" href="javascript:" data-i18n="[title]Delete"></a>
     <% } %>
-    <% if(Wat.C.checkACL('role_update')) { %>
+    <% if(Wat.C.checkGroupACL('roleEdit')) { %>
     <a class="button fright button-icon js-button-edit fa fa-pencil" href="javascript:" data-i18n="[title]Edit"></a>
     <% } %>
 </div>

@@ -5,15 +5,16 @@ Wat.I.listColumns[qvdObj] = {
     'checks': {
         'display': true,
         'fields': [],
+        'acls': 'role.delete-massive.',
         'fixed': true,
-        'text': '',
-        'fixed': true
+        'text': ''
     },
     'id': {
         'display': false,
         'fields': [
             'id'
         ],
+        'acls': 'role.see-main.id',
         'text': 'Id'
     },
     'name': {
@@ -41,7 +42,8 @@ Wat.I.formFilters[qvdObj] = {
 Wat.I.selectedActions[qvdObj] = [
             {
                 'value': 'delete',
-                'text': 'Delete'
+                'text': 'Delete',
+                'acls': 'role.delete-massive.'
             }
         ];
 
@@ -50,7 +52,7 @@ Wat.I.listActionButton[qvdObj] = {
             'name': 'new_role_button',
             'value': 'New Role',
             'link': 'javascript:',
-            'acl': 'role_create'
+            'acl': 'role.create.'
         };
 
 // Breadcrumbs configuration on list view
@@ -71,6 +73,7 @@ Wat.I.detailsBreadCrumbs[qvdObj].next = {
             'next': {
                 'screen': 'Roles',
                 'link': '#/setup/roles',
+                'linkACL': 'role.see-main.',
                 'next': {
                     'screen': '' // Will be filled dinamically
                 }

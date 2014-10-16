@@ -5,15 +5,16 @@ Wat.I.listColumns[qvdObj] = {
     'checks': {
         'display': true,
         'fields': [],
+        'acls': 'tenant.delete-massive.',
         'fixed': true,
-        'text': '',
-        'fixed': true
+        'text': ''
     },
     'id': {
         'display': true,
         'fields': [
             'id'
         ],
+        'acls': 'tenant.see-main.id',
         'text': 'Id'
     },
     'name': {
@@ -41,7 +42,8 @@ Wat.I.formFilters[qvdObj] = {
 Wat.I.selectedActions[qvdObj] = [
             {
                 'value': 'delete',
-                'text': 'Delete'
+                'text': 'Delete',
+                'acls': 'tenant.delete-massive.'
             }
         ];
 
@@ -50,7 +52,7 @@ Wat.I.listActionButton[qvdObj] = {
             'name': 'new_tenant_button',
             'value': 'New Tenant',
             'link': 'javascript:',
-            'acl': 'tenant_create'
+            'acl': 'tenant.create.'
         };
 
 // Breadcrumbs configuration on list view

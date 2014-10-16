@@ -1,5 +1,5 @@
 // Corner menu configuration values
-Wat.I.cornerMenu = {
+Wat.I.cornerMenuOriginal = {
         help: {
             text: 'Help',
             link: '#/help',
@@ -66,7 +66,7 @@ Wat.I.cornerMenu = {
         }
 };
 
-Wat.I.menu = {
+Wat.I.menuOriginal = {
     users: {
         icon: CLASS_ICON_USERS,
         text: 'Users'
@@ -89,9 +89,9 @@ Wat.I.menu = {
     }
 };
 
-Wat.I.mobileMenu = _.extend({}, Wat.I.menu);
+Wat.I.mobileMenuOriginal = _.extend({}, Wat.I.menuOriginal);
 
-Wat.I.mobileMenu.logout = {
+Wat.I.mobileMenuOriginal.logout = {
     icon: CLASS_ICON_LOGOUT,
     text: 'Logout'
 }

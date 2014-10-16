@@ -207,7 +207,9 @@ Wat.I = {
     },   
         
     getListBreadCrumbs: function (qvdObj) {
-        return this.listBreadCrumbs[qvdObj];
+        var breadcrumbs = this.listBreadCrumbs[qvdObj];
+        
+        return breadcrumbs;
     },
     
     // List breadcrumbs
@@ -224,7 +226,27 @@ Wat.I = {
     },   
         
     getDetailsBreadCrumbs: function (qvdObj) {
-        return this.detailsBreadCrumbs[qvdObj];
+        var breadcrumbs = this.detailsBreadCrumbs[qvdObj];
+        
+        this.applyBredcrumbsACLs(breadcrumbs);
+        
+        return breadcrumbs;
+    },
+    
+    applyBredcrumbsACLs: function (breadcrumbs) {
+        var level = breadcrumbs;
+        while (1) {
+            if (level.linkACL != undefined && !Wat.C.checkACL(level.linkACL)) {
+                delete level.link;
+            }
+            
+            if (level.next != undefined) {
+                level = level.next;
+            }
+            else {
+                break;
+            }
+        }
     },
     
     showAll: function () {

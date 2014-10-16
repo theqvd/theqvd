@@ -125,9 +125,9 @@
                     $.each(model.get('roles'), function (iRole, role) {
                 %>
                         <div>
-                            <%= Wat.C.ifACL('<a href="#/setup/role/' + iRole + '">', 'role_see') %>
+                            <%= Wat.C.ifACL('<a href="#/setup/role/' + iRole + '">', 'role.see-details.') %>
                                 <span class="text"><%= role %></span>
-                            <%= Wat.C.ifACL('</a>', 'role_see') %>
+                            <%= Wat.C.ifACL('</a>', 'role.see-details.') %>
                         </div>
                 <%
                     }); 

@@ -5,6 +5,7 @@ Wat.I.listColumns[qvdObj] = {
     'checks': {
         'display': true,
         'fields': [],
+        'acls': 'administrator.delete-massive.',
         'fixed': true,
         'text': '',
         'fixed': true
@@ -14,6 +15,7 @@ Wat.I.listColumns[qvdObj] = {
         'fields': [
             'id'
         ],
+        'acls': 'administrator.see-main.id',
         'text': 'Id'
     },
     'name': {
@@ -41,7 +43,8 @@ Wat.I.formFilters[qvdObj] = {
 Wat.I.selectedActions[qvdObj] = [
             {
                 'value': 'delete',
-                'text': 'Delete'
+                'text': 'Delete',
+                'acls': 'administrator.delete-massive.'
             }
         ];
 
@@ -50,7 +53,7 @@ Wat.I.listActionButton[qvdObj] = {
             'name': 'new_admin_button',
             'value': 'New Administrator',
             'link': 'javascript:',
-            'acl': 'admin_create'
+            'acl': 'administrator.create.'
         };
 
 // Breadcrumbs configuration on list view
@@ -71,6 +74,7 @@ Wat.I.detailsBreadCrumbs[qvdObj].next = {
             'next': {
                 'screen': 'Administrators',
                 'link': '#/setup/admins',
+                'linkACL': 'administrator.see-main.',
                 'next': {
                     'screen': '' // Will be filled dinamically
                 }

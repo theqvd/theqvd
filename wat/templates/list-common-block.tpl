@@ -86,7 +86,7 @@
                 </select>
             </div>
             <div class="action-selected-button">
-                <a class="js-traductable_button actions_button button fa fa-check" name="selected_actions_button" data-i18n>
+                <a class="js-traductable_button actions_button button fa fa-check-square-o" name="selected_actions_button" data-i18n>
                     Apply to selected items
                 </a>
             </div>

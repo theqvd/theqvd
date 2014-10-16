@@ -164,10 +164,10 @@
                             case 'disk_image':
                 %>
                                 <td class="not-break js-name">
-                                    <%= Wat.C.ifACL('<a href="#/di/' + model.get('id') + '" data-i18n="[title]Click for details">', 'di_see') %>
-                                    <%= Wat.C.ifACL('<i class="fa fa-search"></i>', 'di_see') %>
+                                    <%= Wat.C.ifACL('<a href="#/di/' + model.get('id') + '" data-i18n="[title]Click for details">', 'di.see-details.') %>
+                                    <%= Wat.C.ifACL('<i class="fa fa-search"></i>', 'di.see-details.') %>
                                         <span class="text"><%= model.get('disk_image') %></span>
-                                    <%= Wat.C.ifACL('</a>', 'di_see') %>
+                                    <%= Wat.C.ifACL('</a>', 'di.see-details.') %>
                                 </td>
                 <%
                                 break;
@@ -181,9 +181,9 @@
                             case 'osf':
                 %>
                                 <td class="desktop">
-                                    <%= Wat.C.ifACL('<a href="#/osf/' + model.get('id') + '">', 'osf_see') %>
+                                    <%= Wat.C.ifACL('<a href="#/osf/' + model.get('id') + '">', 'osf.see-details.') %>
                                         <%= model.get('osf_name') %>
-                                    <%= Wat.C.ifACL('</a>', 'osf_see') %>
+                                    <%= Wat.C.ifACL('</a>', 'osf.see-details.') %>
                                 </td>
                 <%
                                 break;
@@ -191,6 +191,15 @@
                 %>
                                 <td class="desktop center">
                                     <input type="radio" data-di_id="<%= model.get('id') %>" name="di_default" <%= model.get('default') ? 'checked': '' %> value="0">
+                                </td>
+                <%
+                                break;
+                            case 'head':
+                %>
+                                <td class="desktop center">
+                                    <% if (model.get('head')) { %>
+                                        <i class="fa fa-flag-o" data-i18n="[title]Head" title="Head"></i>
+                                    <% } %>
                                 </td>
                 <%
                                 break;

@@ -5,6 +5,15 @@ Wat.I.listColumns[qvdObj] = {
     'checks': {
         'display': true,
         'fields': [],
+        'acls': [
+            'osf.delete-massive.',
+            'osf.update-massive.memory',
+            'osf.update-massive.user-storage',
+            'osf.update-massive.properties-create',
+            'osf.update-massive.properties-update',
+            'osf.update-massive.properties-delete'
+        ],
+        'aclsLogic': 'OR',
         'fixed': true
     },
     'id': {
@@ -12,6 +21,7 @@ Wat.I.listColumns[qvdObj] = {
         'fields': [
             'id'
         ],
+        'acls': 'osf.see-main.id',
         'text': 'Id'
     },
     'name': {
@@ -27,6 +37,7 @@ Wat.I.listColumns[qvdObj] = {
         'fields': [
             'overlay'
         ],
+        'acls': 'osf.see-main.overlay',
         'text': 'Overlay'
     },
     'memory': {
@@ -34,6 +45,7 @@ Wat.I.listColumns[qvdObj] = {
         'fields': [
             'memory'
         ],
+        'acls': 'osf.see-main.memory',
         'text': 'Memory'
     },
     'user_storage': {
@@ -41,6 +53,7 @@ Wat.I.listColumns[qvdObj] = {
         'fields': [
             'user_storage'
         ],
+        'acls': 'osf.see-main.user-storage',
         'text': 'User storage'
     },
     'dis': {
@@ -49,6 +62,7 @@ Wat.I.listColumns[qvdObj] = {
             'id',
             'dis'
         ],
+        'acls': 'osf.see-main.dis-info',
         'text': 'DIs'
     },
     'vms': {
@@ -57,6 +71,7 @@ Wat.I.listColumns[qvdObj] = {
             'id',
             'vms'
         ],
+        'acls': 'osf.see-main.vms-info',
         'text': 'VMs'
     },
     'creation_date': {
@@ -64,6 +79,7 @@ Wat.I.listColumns[qvdObj] = {
         'fields': [
             'creation_date'
         ],
+        'acls': 'osf.see-main.creation-date',
         'display': false
     },
     'creation_admin': {
@@ -71,6 +87,7 @@ Wat.I.listColumns[qvdObj] = {
         'fields': [
             'creation_admin'
         ],
+        'acls': 'osf.see-main.created-by',
         'display': false
     }
 };
@@ -98,7 +115,8 @@ Wat.I.formFilters[qvdObj] = {
             }
                     ],
         'displayMobile': false,
-        'displayDesktop': true
+        'displayDesktop': true,
+        'acls': 'osf.see-main.vms-info'
     },
     'di': {
         'filterField': 'di_id',
@@ -114,7 +132,8 @@ Wat.I.formFilters[qvdObj] = {
             }
                     ],
         'displayMobile': false,
-        'displayDesktop': true
+        'displayDesktop': true,
+        'acls': 'osf.see-main.dis-info'
     }
 };
 
@@ -122,11 +141,14 @@ Wat.I.formFilters[qvdObj] = {
 Wat.I.selectedActions[qvdObj] = [
             {
                 'value': 'delete',
-                'text': 'Delete'
+                'text': 'Delete',
+                'acls': 'osf.delete-massive.'
             },
             {
                 'value': 'massive_changes',
-                'text': 'Massive changes'
+                'text': 'Edit',
+                'groupAcls': 'osfMassiveEdit',
+                'aclsLogic': 'OR'
             }
         ];
 
@@ -135,7 +157,7 @@ Wat.I.listActionButton[qvdObj] = {
             'name': 'new_osf_button',
             'value': 'New OS Flavour',
             'link': 'javascript:',
-            'acl': 'osf_create'
+            'acl': 'osf.create.'
         };
 
 // Breadcrumbs configuration on list view
@@ -147,6 +169,7 @@ Wat.I.listBreadCrumbs[qvdObj]['next'] = {
 // Breadcrumbs configuration on details view
 $.extend(true, Wat.I.detailsBreadCrumbs[qvdObj], Wat.I.listBreadCrumbs[qvdObj]);
 Wat.I.detailsBreadCrumbs[qvdObj].next.link = '#/osfs';
+Wat.I.detailsBreadCrumbs[qvdObj].next.linkACL = 'osf.see-main.';
 Wat.I.detailsBreadCrumbs[qvdObj].next.next = {
             'screen': '' // Will be filled dinamically
         };

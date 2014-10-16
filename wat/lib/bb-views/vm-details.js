@@ -84,5 +84,14 @@ Wat.Views.VMDetailsView = Wat.Views.DetailsView.extend({
         toggleNewPassword: function () {
             $('.new_password_row').toggle();
         }
-    }
+    },
+    
+    startVM: function () {
+        var messages = {
+            'success': 'Successfully started',
+            'error': 'Error starting VM'
+        }
+        
+        Wat.A.performAction ('vm_start', {}, {id: this.elementId}, messages, this.fetchDetails, this);
+    },
 });

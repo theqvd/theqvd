@@ -1,15 +1,15 @@
 <div class="details-header">
     <span class="fa fa-cloud h1"><%= model.get('name') %></span>
-    <% if(Wat.C.checkACL('vm_delete')) { %>
+    <% if(Wat.C.checkACL('vm.delete.')) { %>
     <a class="button fleft button-icon js-button-delete fa fa-trash" href="javascript:" data-i18n="[title]Delete"></a>
     <% } %>
     
-    <% if(Wat.C.checkACL('vm_update')) { %>
+    <% if(Wat.C.checkGroupACL('vmEdit')) { %>
     <a class="button fright button-icon js-button-edit fa fa-pencil" href="javascript:" data-i18n="[title]Edit"></a>
     <% } %>
     
     <% 
-    if (Wat.C.checkACL('vm_update')) {
+    if (Wat.C.checkACL('vm.update.state')) {
         if (model.get('state') == 'running') { 
     %>
             <a class="button fright button-icon js-button-stop-vm fa fa-stop fright" href="javascript:" data-i18n="[title]Stop"></a>
@@ -24,7 +24,7 @@
     %>
     
     <% 
-    if (Wat.C.checkACL('vm_update')) {
+    if (Wat.C.checkACL('vm.update.block')) {
         if(model.get('blocked')) {
     %>
             <a class="button button-icon js-button-unblock fa fa-unlock fright" href="javascript:" data-i18n="[title]Unblock"></a>
@@ -39,7 +39,7 @@
     %>
     
     <% 
-    if (Wat.C.checkACL('vm_update') && model.get('user_state') == 'connected') {
+    if (Wat.C.checkACL('vm.update.disconnect-user') && model.get('user_state') == 'connected') {
     %>
         <a class="button button-icon js-button-disconnect-user fa fa-plug fright" href="javascript:" data-i18n="[title]Disconnect user"></a>
     <%

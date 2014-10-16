@@ -170,46 +170,46 @@
                             case 'name':
                 %>
                                 <td class="js-name">
-                                    <%= Wat.C.ifACL('<a href="#/vm/' + model.get('id') + '" data-i18n="[title]Click for details">', 'vm_see') %>
-                                    <%= Wat.C.ifACL('<i class="fa fa-search"></i>', 'vm_see') %>
+                                    <%= Wat.C.ifACL('<a href="#/vm/' + model.get('id') + '" data-i18n="[title]Click for details">', 'vm.see-details.') %>
+                                    <%= Wat.C.ifACL('<i class="fa fa-search"></i>', 'vm.see-details.') %>
                                         <span class="text"><%= model.get('name') %></span>
-                                    <%= Wat.C.ifACL('</a>', 'vm_see') %>
+                                    <%= Wat.C.ifACL('</a>', 'vm.see-details.') %>
                                 </td>
                 <%
                                 break;
                             case 'host':
                 %>
                                 <td class="desktop">
-                                    <%= Wat.C.ifACL('<a href="#/host/' + model.get('host_id') + '">', 'host_see') %>
+                                    <%= Wat.C.ifACL('<a href="#/host/' + model.get('host_id') + '">', 'host.see-details.') %>
                                         <%= model.get('host_name') %>
-                                    <%= Wat.C.ifACL('</a>', 'host_see') %>
+                                    <%= Wat.C.ifACL('</a>', 'host.see-details.') %>
                                 </td>
                 <%
                                 break;
                             case 'user':
                 %>
                                 <td class="desktop">
-                                    <%= Wat.C.ifACL('<a href="#/user/' + model.get('user_id') + '">', 'user_see') %>
+                                    <%= Wat.C.ifACL('<a href="#/user/' + model.get('user_id') + '">', 'user.see-details.') %>
                                         <%= model.get('user_name') %>
-                                    <%= Wat.C.ifACL('</a>', 'user_see') %>
+                                    <%= Wat.C.ifACL('</a>', 'user.see-details.') %>
                                 </td>
                 <%
                                 break;
                             case 'osf':
                 %>
                                 <td class="desktop">
-                                    <%= Wat.C.ifACL('<a href="#/osf/' + model.get('osf_id') + '">', 'osf_see') %>
+                                    <%= Wat.C.ifACL('<a href="#/osf/' + model.get('osf_id') + '">', 'osf.see-details.') %>
                                         <%= model.get('osf_name') %>
-                                    <%= Wat.C.ifACL('</a>', 'osf_see') %>
+                                    <%= Wat.C.ifACL('</a>', 'osf.see-details.') %>
                                 </td>
                 <%
                                 break;
                             case 'osf/tag':
                 %>
                                 <td class="desktop">
-                                    <%= Wat.C.ifACL('<a href="#/osf/' + model.get('osf_id') + '">', 'osf_see') %>
+                                    <%= Wat.C.ifACL('<a href="#/osf/' + model.get('osf_id') + '">', 'osf.see-details.') %>
                                         <%= model.get('osf_name') %>
-                                    <%= Wat.C.ifACL('</a>', 'osf_see') %>
+                                    <%= Wat.C.ifACL('</a>', 'osf.see-details.') %>
                                     
                                     <div class="second_row">
                                         <%= model.get('di_tag') %>

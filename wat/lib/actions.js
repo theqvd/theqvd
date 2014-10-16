@@ -107,7 +107,14 @@ Wat.A = {
                     if (params.selectedId !== undefined && params.selectedId == id) {
                         selected = 'selected="selected"';
                     }
-                    combo.append('<option value="' + id + '" ' + selected + '>' + 
+                    
+                    var additionalAttributes = '';
+                    if (params.translateOptions !== undefined && $.inArray(id, params.translateOptions) != -1) {
+                        additionalAttributes = 'data-i18n';
+                        combo.attr('data-contain-i18n', '');
+                    }
+                    
+                    combo.append('<option ' + additionalAttributes + ' value="' + id + '" ' + selected + '>' + 
                                                                name + 
                                                                '<\/option>');
                 });

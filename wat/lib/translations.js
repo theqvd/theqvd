@@ -18,7 +18,10 @@ Wat.T = {
         // Translate all the elements with attribute 'data-i18n'
         
         $('[data-i18n]').i18n();
-        
+
+        // Force chosen to selects that contain any option with data-i18n attribute
+        $('select[data-contain-i18n]').trigger('chosen:updated');
+
         // Translate the "X days" strings
         $.each($('[data-days]'), function (iDays, days) {
             var daysTranslated = i18n.t('__count__ days', {'count': $(days).attr('data-days')});

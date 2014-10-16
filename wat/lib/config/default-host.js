@@ -5,6 +5,15 @@ Wat.I.listColumns[qvdObj] = {
     'checks': {
         'display': true,
         'fields': [],
+        'acls': [
+            'host.delete-massive.',
+            'host.update-massive.block',
+            'host.update-massive.stop-vms',
+            'host.update-massive.properties-create',
+            'host.update-massive.properties-update',
+            'host.update-massive.properties-delete'
+        ],
+        'aclsLogic': 'OR',
         'fixed': true
     },
     'info': {
@@ -13,6 +22,11 @@ Wat.I.listColumns[qvdObj] = {
             'state',
             'blocked'
         ],
+        'acls': [
+            'host.see-main.block',
+            'host.see-main.state'
+        ],
+        'aclsLogic': 'OR',
         'text': 'Info'
     },
     'id': {
@@ -20,6 +34,7 @@ Wat.I.listColumns[qvdObj] = {
         'fields': [
             'id'
         ],
+        'acls': 'host.see-main.id',
         'text': 'Id'
     },
     'name': {
@@ -35,6 +50,7 @@ Wat.I.listColumns[qvdObj] = {
         'fields': [
             'state'
         ],
+        'acls': 'host.see-main.state',
         'text': 'State'
     },
     'address': {
@@ -42,6 +58,7 @@ Wat.I.listColumns[qvdObj] = {
         'fields': [
             'address'
         ],
+        'acls': 'host.see-main.address',
         'text': 'IP address'
     },
     'vms_connected': {
@@ -50,6 +67,7 @@ Wat.I.listColumns[qvdObj] = {
             'id',
             'vms_connected'
         ],
+        'acls': 'host.see-main.vms-info',
         'text': 'Running VMs'
     },
     'creation_date': {
@@ -57,6 +75,7 @@ Wat.I.listColumns[qvdObj] = {
         'fields': [
             'creation_date'
         ],
+        'acls': 'host.see-main.creation-date',
         'display': false
     },
     'creation_admin': {
@@ -64,6 +83,7 @@ Wat.I.listColumns[qvdObj] = {
         'fields': [
             'creation_admin'
         ],
+        'acls': 'host.see-main.created-by',
         'display': false
     },
     'Cosa': {
@@ -71,6 +91,7 @@ Wat.I.listColumns[qvdObj] = {
         'fields': [
             'Cosa'
         ],
+        'acls': 'host.see-main.properties',
         'property': true,
         'text': 'Cosa'
     }
@@ -99,7 +120,8 @@ Wat.I.formFilters[qvdObj] = {
             }
                     ],
         'displayMobile': false,
-        'displayDesktop': true
+        'displayDesktop': true,
+        'acls': 'host.see-main.vms-info'
     }
 };
 
@@ -107,23 +129,29 @@ Wat.I.formFilters[qvdObj] = {
 Wat.I.selectedActions[qvdObj] = [
             {
                 'value': 'block',
-                'text': 'Block'
+                'text': 'Block',
+                'acls': 'host.update-massive.block'
             },
             {
                 'value': 'unblock',
-                'text': 'Unblock'
+                'text': 'Unblock',
+                'acls': 'host.update-massive.block'
             },
             {
                 'value': 'stop_all',
-                'text': 'Stop all VMs'
+                'text': 'Stop all VMs',
+                'acls': 'vm.update-massive.state'
             },
             {
                 'value': 'delete',
-                'text': 'Delete'
+                'text': 'Delete',
+                'acls': 'host.delete-massive.'
             },
             {
                 'value': 'massive_changes',
-                'text': 'Massive changes'
+                'text': 'Edit',
+                'groupAcls': 'hostMassiveEdit',
+                'aclsLogic': 'OR'
             }
         ];
 
@@ -132,7 +160,7 @@ Wat.I.listActionButton[qvdObj] = {
             'name': 'new_host_button',
             'value': 'New Node',
             'link': 'javascript:',
-            'acl': 'host_create'
+            'acl': 'host.create.'
         };
 
 // Breadcrumbs configuration on list view
@@ -144,6 +172,7 @@ Wat.I.listBreadCrumbs[qvdObj]['next'] = {
 // Breadcrumbs configuration on details view
 $.extend(true, Wat.I.detailsBreadCrumbs[qvdObj], Wat.I.listBreadCrumbs[qvdObj]);
 Wat.I.detailsBreadCrumbs[qvdObj].next.link = '#/hosts';
+Wat.I.detailsBreadCrumbs[qvdObj].next.linkACL = 'host.see-main.';
 Wat.I.detailsBreadCrumbs[qvdObj].next.next = {
             'screen': '' // Will be filled dinamically
         };

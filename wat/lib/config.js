@@ -8,6 +8,7 @@ Wat.C = {
     //apiUrl: 'http://172.26.9.42:3000/',
     loginExpirationDays: 1,
     acls: [],
+    aclGroups: {},
 
     getBaseUrl: function () {
         return this.apiUrl + "?login=" + this.login + "&password=" + this.password;
@@ -95,9 +96,54 @@ Wat.C = {
         }
     },
     
-    checkACL: function (acl) {
-        return true;
-        return $.inArray(acl, this.acls) != -1;
+    // Given an ACL or an array of ACLs, check if it pass or not due the user configuration
+    // Params:
+    //      acl: string or array of acls
+    //      logic: OR/AND to calculate the pass condition if is array
+    checkACL: function (acl, logic) {
+        if ($.isArray(acl)) {
+            var pass = 0;
+            var that = this;
+            $.each(acl, function (i, anAcl) {
+                if ($.inArray(anAcl, that.acls) != -1) {
+                    pass++;
+                }
+            });
+            
+            switch(logic) {
+                case 'OR':
+                    if (pass > 0) {
+                        return true;
+                    }
+                    break;
+                case 'AND':
+                default:
+                    if (pass == acl.length) {
+                        return true;
+                    }
+                    break;
+            }
+        }
+        else {
+            return $.inArray(acl, this.acls) != -1;
+        }
+        
+        return false;
+    },
+    
+    // Check all the ACLs of predifened groups. If any of them is available, return true
+    checkGroupACL: function (group) {
+        var aclGranted = false;
+        
+        var that = this;
+        $.each(this.aclGroups[group], function (iAcl, acl) {
+            if (that.checkACL(acl)) {
+                aclGranted = true;
+                return false;
+            }
+        });
+        
+        return aclGranted;
     },
     
     ifACL: function (string, acl) {
@@ -109,14 +155,35 @@ Wat.C = {
         }
     },
     
-    configureVisibility: function () {
+    purgeConfigData: function (data) {
+        var that = this;
+        
+        // Check acls on data items to remove forbidden ones
+        $.each(data, function (item, itemConfig) {
+            if (itemConfig.groupAcls != undefined) {
+                itemConfig.acls = that.aclGroups[itemConfig.groupAcls];
+            }
+            if (itemConfig.acls != undefined) {
+                if (!that.checkACL(itemConfig.acls, itemConfig.aclsLogic)) {
+                    delete data[item];
+                }
+            }
+        });
+        
+        return data;
+    },
+    
+    configureVisibility: function () {        
+        Wat.I.menu = $.extend(true, {}, Wat.I.menuOriginal);
+        Wat.I.mobileMenu = $.extend(true, {}, Wat.I.mobileMenuOriginal);
+
         // Menu visibility
         var aclMenu = {
-            'di_see' : 'dis',
-            'host_see' : 'hosts',
-            'osf_see' : 'osfs',
-            'user_see' : 'users',
-            'vm_see' : 'vms',
+            'di.see-main.' : 'dis',
+            'host.see-main.' : 'hosts',
+            'osf.see-main.' : 'osfs',
+            'user.see-main.' : 'users',
+            'vm.see-main.' : 'vms',
         };
         
         var that = this;
@@ -124,16 +191,19 @@ Wat.C = {
         $.each(aclMenu, function (acl, menu) {
             if (!that.checkACL(acl)) {
                 delete Wat.I.menu[menu];
+                delete Wat.I.mobileMenu[menu];
             }
         });
+
+        Wat.I.cornerMenu = $.extend(true, {}, Wat.I.cornerMenuOriginal);
         
         // Corner menu visibility
         var aclCornerMenu = {
-            'administrator_see' : 'admins',
-            'role_see' : 'roles',
-            'tenant_see' : 'tenants',
-            'config_see' : 'config',
-            'customize_see' : 'customize',
+            'administrator.see-main.' : 'admins',
+            'role.see-main.' : 'roles',
+            'tenant.see-main.' : 'tenants',
+            'config.see-main.' : 'config',
+            'views.see-main.' : 'customize',
         };
         
         var that = this;
@@ -143,5 +213,9 @@ Wat.C = {
                 delete Wat.I.cornerMenu.setup.subMenu[menu];
             }
         });
+        
+        if ($.isEmptyObject(Wat.I.cornerMenu.setup.subMenu)) {
+            delete Wat.I.cornerMenu.setup;
+        }
     }
 }

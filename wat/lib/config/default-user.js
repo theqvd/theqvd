@@ -6,6 +6,8 @@ Wat.I.listColumns[qvdObj] = {
         'display': true,
         'fields': [],
         'fixed': true,
+        'groupAcls': 'userMassiveActions',
+        'aclsLogic': 'OR',
         'text': '',
         'fixed': true
     },
@@ -14,6 +16,7 @@ Wat.I.listColumns[qvdObj] = {
         'fields': [
             'blocked'
         ],
+        'acls': 'user.see-main.block',
         'text': 'Info'
     },
     'id': {
@@ -21,6 +24,7 @@ Wat.I.listColumns[qvdObj] = {
         'fields': [
             'id'
         ],
+        'acls': 'user.see-main.id',
         'text': 'Id'
     },
     'name': {
@@ -35,9 +39,10 @@ Wat.I.listColumns[qvdObj] = {
         'display': true,
         'fields': [
             'id',
-            'vms',
-            'vms_connected'
+            'number_of_vms',
+            'number_of_vms_connected'
         ],
+        'acls': 'user.see-main.vms-info',
         'text': 'Connected VMs'
     },
     'creation_date': {
@@ -45,6 +50,7 @@ Wat.I.listColumns[qvdObj] = {
         'fields': [
             'creation_date'
         ],
+        'acls': 'user.see-main.creation-date',
         'display': false
     },
     'creation_admin': {
@@ -52,6 +58,7 @@ Wat.I.listColumns[qvdObj] = {
         'fields': [
             'creation_admin'
         ],
+        'acls': 'user.see-main.created-by',
         'display': false
     },
     'world': {
@@ -60,6 +67,7 @@ Wat.I.listColumns[qvdObj] = {
         'fields': [
             'world'
         ],
+        'acls': 'user.see-main.properties',
         'property': true,
         'text': 'world'
     },
@@ -69,6 +77,7 @@ Wat.I.listColumns[qvdObj] = {
         'fields': [
             'sex'
         ],
+        'acls': 'user.see-main.properties',
         'property': true,
         'text': 'sex'
     }
@@ -90,7 +99,8 @@ Wat.I.formFilters[qvdObj] = {
         'noTranslatable': true,
         'displayMobile': false,
         'displayDesktop': true,
-        'property': true
+        'property': true,
+        'acls': 'user.see-main.properties',
     },     
     'sex': {
         'filterField': 'sex',
@@ -99,7 +109,8 @@ Wat.I.formFilters[qvdObj] = {
         'noTranslatable': true,
         'displayMobile': false,
         'displayDesktop': true,
-        'property': true
+        'property': true,
+        'acls': 'user.see-main.properties',
     }
 };
 
@@ -107,23 +118,29 @@ Wat.I.formFilters[qvdObj] = {
 Wat.I.selectedActions[qvdObj] = [
             {
                 'value': 'block',
-                'text': 'Block'
+                'text': 'Block',
+                'acls': 'user.update-massive.block'
             },
             {
                 'value': 'unblock',
-                'text': 'Unblock'
+                'text': 'Unblock',
+                'acls': 'user.update-massive.block'
             },
             {
                 'value': 'disconnect_all',
-                'text': 'Disconnect from all VMs'
+                'text': 'Disconnect from all VMs',
+                'acls': 'vm.update-massive.disconnect-user'
             },
             {
                 'value': 'delete',
-                'text': 'Delete'
+                'text': 'Delete',
+                'acls': 'user.delete-massive.'
             },
             {
                 'value': 'massive_changes',
-                'text': 'Massive changes'
+                'text': 'Edit',
+                'groupAcls': 'userMassiveEdit',
+                'aclsLogic': 'OR'
             }
         ];
 
@@ -132,7 +149,7 @@ Wat.I.listActionButton[qvdObj] = {
             'name': 'new_user_button',
             'value': 'New User',
             'link': 'javascript:',
-            'acl': 'user_create'
+            'acl': 'user.create.'
         };
 
 // Breadcrumbs configuration on list view
@@ -144,6 +161,7 @@ Wat.I.listBreadCrumbs[qvdObj]['next'] = {
 // Breadcrumbs configuration on details view
 $.extend(true, Wat.I.detailsBreadCrumbs[qvdObj], Wat.I.listBreadCrumbs[qvdObj]);
 Wat.I.detailsBreadCrumbs[qvdObj].next.link = '#/users';
+Wat.I.detailsBreadCrumbs[qvdObj].next.linkACL = 'user.see-main.';
 Wat.I.detailsBreadCrumbs[qvdObj].next.next = {
             'screen': '' // Will be filled dinamically
         };

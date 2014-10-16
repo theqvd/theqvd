@@ -133,10 +133,10 @@
                             case 'name':
                 %>
                                 <td class="js-name">
-                                    <%= Wat.C.ifACL('<a href="#/osf/' + model.get('id') + '" data-i18n="[title]Click for details">', 'osf_see') %>
-                                    <%= Wat.C.ifACL('<i class="fa fa-search"></i>', 'osf_see') %>
+                                    <%= Wat.C.ifACL('<a href="#/osf/' + model.get('id') + '" data-i18n="[title]Click for details">', 'osf.see-details.') %>
+                                    <%= Wat.C.ifACL('<i class="fa fa-search"></i>', 'osf.see-details.') %>
                                         <span class="text"><%= model.get('name') %></span>
-                                    <%= Wat.C.ifACL('</a>', 'osf_see') %>
+                                    <%= Wat.C.ifACL('</a>', 'osf.see-details.') %>
                                 </td>
                 <%
                                 break;
@@ -175,7 +175,7 @@
                             case 'dis':
                 %>
                                 <td class="desktop">
-                                    <% if (model.get('number_of_dis') > 0 && Wat.C.checkACL('di_see')) { %>
+                                    <% if (model.get('number_of_dis') > 0 && Wat.C.checkACL('di.see-main.')) { %>
                                     <a href="#/dis/osf/<%= model.get('id') %>">
                                         <%= model.get('number_of_dis') %>
                                     </a>
@@ -189,7 +189,7 @@
                             case 'vms':
                 %>
                                 <td class="desktop">
-                                    <% if (model.get('number_of_vms') > 0 && Wat.C.checkACL('vm_see')) { %>
+                                    <% if (model.get('number_of_vms') > 0 && Wat.C.checkACL('vm.see-main.')) { %>
                                     <a href="#/vms/osf/<%= model.get('id') %>">
                                         <%= model.get('number_of_vms') %>
                                     </a>
