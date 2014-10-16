@@ -56,7 +56,9 @@ Wat.C = {
             this.login = '';
         }
         
-        Wat.A.performAction('current_admin_setup', {}, {}, {}, this.checkLogin, this, false);
+        if (this.login && this.password) {
+            Wat.A.performAction('current_admin_setup', {}, {}, {}, this.checkLogin, this, false);
+        }
     },
     
     tryLogin: function (user, password) {

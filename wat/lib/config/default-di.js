@@ -130,23 +130,19 @@ Wat.I.formFilters[qvdObj] = {
 
 // Actions of the bottom of the list configuration on list view (those that will be done with selected items)
 Wat.I.selectedActions[qvdObj] = {
-    {
-        'value': 'block',
+    'block': {
         'text': 'Block',
         'acls': 'di.update-massive.block'
     },           
-    {
-        'value': 'unblock',
+    'unblock': {
         'text': 'Unblock',
         'acls': 'di.update-massive.block'
     },
-    {
-        'value': 'delete',
+    'delete': {
         'text': 'Delete',
         'acls': 'di.delete-massive.'
     },
-    {
-        'value': 'massive_changes',
+    'massive_changes': {
         'text': 'Edit',
         'groupAcls': 'diMassiveEdit',
         'aclsLogic': 'OR'
