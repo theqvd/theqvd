@@ -126,34 +126,29 @@ Wat.I.formFilters[qvdObj] = {
 };
 
 // Actions of the bottom of the list (those that will be done with selected items) configuration on list view
-Wat.I.selectedActions[qvdObj] = [
-            {
-                'value': 'block',
-                'text': 'Block',
-                'acls': 'host.update-massive.block'
-            },
-            {
-                'value': 'unblock',
-                'text': 'Unblock',
-                'acls': 'host.update-massive.block'
-            },
-            {
-                'value': 'stop_all',
-                'text': 'Stop all VMs',
-                'acls': 'vm.update-massive.state'
-            },
-            {
-                'value': 'delete',
-                'text': 'Delete',
-                'acls': 'host.delete-massive.'
-            },
-            {
-                'value': 'massive_changes',
-                'text': 'Edit',
-                'groupAcls': 'hostMassiveEdit',
-                'aclsLogic': 'OR'
-            }
-        ];
+Wat.I.selectedActions[qvdObj] = {
+    'block': {
+        'text': 'Block',
+        'acls': 'host.update-massive.block'
+    },
+    'unblock': {
+        'text': 'Unblock',
+        'acls': 'host.update-massive.block'
+    },
+    'stop_all': {
+        'text': 'Stop all VMs',
+        'acls': 'vm.update-massive.state'
+    },
+    'delete': {
+        'text': 'Delete',
+        'acls': 'host.delete-massive.'
+    },
+    'massive_changes': {
+        'text': 'Edit',
+        'groupAcls': 'hostMassiveEdit',
+        'aclsLogic': 'OR'
+    }
+};
 
 // Action button (tipically New button) configuration on list view
 Wat.I.listActionButton[qvdObj] = {

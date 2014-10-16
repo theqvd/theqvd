@@ -39,13 +39,12 @@ Wat.I.formFilters[qvdObj] = {
 };
 
 // Actions of the bottom of the list (those that will be done with selected items) configuration on list view
-Wat.I.selectedActions[qvdObj] = [
-            {
-                'value': 'delete',
-                'text': 'Delete',
-                'acls': 'role.delete-massive.'
-            }
-        ];
+Wat.I.selectedActions[qvdObj] = {
+    'delete': {
+        'text': 'Delete',
+        'acls': 'role.delete-massive.'
+    }
+};
 
 // Action button (tipically New button) configuration on list view
 Wat.I.listActionButton[qvdObj] = {

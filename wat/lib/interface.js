@@ -171,7 +171,7 @@ Wat.I = {
     },
     
     getSelectedActions: function (qvdObj) {
-        return $.extend(true, [], this.selectedActions[qvdObj]);
+        return $.extend(true, {}, this.selectedActions[qvdObj]);
     },
     
     listActionButton: {

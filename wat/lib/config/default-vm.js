@@ -253,44 +253,37 @@ Wat.I.formFilters[qvdObj] = {
 };
 
 // Actions of the bottom of the list (those that will be done with selected items) configuration on list view
-Wat.I.selectedActions[qvdObj] = [
-            {
-                'value': 'start',
-                'text': 'Start',
-                'acls': 'vm.update-massive.state'
-            },
-            {
-                'value': 'stop',
-                'text': 'Stop',
-                'acls': 'vm.update-massive.state'
-            },
-            {
-                'value': 'block',
-                'text': 'Block',
-                'acls': 'vm.update-massive.block'
-            },
-            {
-                'value': 'unblock',
-                'text': 'Unblock',
-                'acls': 'vm.update-massive.block'
-            },
-            {
-                'value': 'disconnect',
-                'text': 'Disconnect user',
-                'acls': 'vm.update-massive.disconnect-user'
-            },
-            {
-                'value': 'delete',
-                'text': 'Delete',
-                'acls': 'vm.delete-massive.'
-            },
-            {
-                'value': 'massive_changes',
-                'text': 'Edit',
-                'groupAcls': 'vmMassiveEdit',
-                'aclsLogic': 'OR'
-            }
-        ];
+Wat.I.selectedActions[qvdObj] = {
+    'start': {
+        'text': 'Start',
+        'acls': 'vm.update-massive.state'
+    },
+    'stop': {
+        'text': 'Stop',
+        'acls': 'vm.update-massive.state'
+    },
+    'block': {
+        'text': 'Block',
+        'acls': 'vm.update-massive.block'
+    },
+    'unblock': {
+        'text': 'Unblock',
+        'acls': 'vm.update-massive.block'
+    },
+    'disconnect': {
+        'text': 'Disconnect user',
+        'acls': 'vm.update-massive.disconnect-user'
+    },
+    'delete': {
+        'text': 'Delete',
+        'acls': 'vm.delete-massive.'
+    },
+    'massive_changes': {
+        'text': 'Edit',
+        'groupAcls': 'vmMassiveEdit',
+        'aclsLogic': 'OR'
+    }
+};
 
 // Action button (tipically New button) configuration on list view
 Wat.I.listActionButton[qvdObj] = {

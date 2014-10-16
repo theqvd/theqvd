@@ -70,7 +70,7 @@
     <div class="mobile clear"></div>
 
     <% 
-    if (selectedActions.length > 0)
+    if (Object.keys(selectedActions).length > 0)
     {
     %>
         <div class="selected-elements second_row">
@@ -80,8 +80,8 @@
         <div class="action-selected">
             <div class="action-selected-select">
                 <select name="selected_actions_select" class="chosen-single">
-                    <% _.each(selectedActions, function(action) { %>
-                        <option value="<%= action.value %>" data-i18n><%= action.text %></option>
+                    <% $.each(selectedActions, function(action, actionConfig) { console.log(action);console.log(actionConfig);%>
+                        <option value="<%= action %>" data-i18n><%= actionConfig.text %></option>
                     <% }); %>
                 </select>
             </div>

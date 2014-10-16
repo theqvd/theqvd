@@ -138,19 +138,17 @@ Wat.I.formFilters[qvdObj] = {
 };
 
 // Actions of the bottom of the list (those that will be done with selected items) configuration on list view
-Wat.I.selectedActions[qvdObj] = [
-            {
-                'value': 'delete',
-                'text': 'Delete',
-                'acls': 'osf.delete-massive.'
-            },
-            {
-                'value': 'massive_changes',
-                'text': 'Edit',
-                'groupAcls': 'osfMassiveEdit',
-                'aclsLogic': 'OR'
-            }
-        ];
+Wat.I.selectedActions[qvdObj] = {
+    'delete': {
+        'text': 'Delete',
+        'acls': 'osf.delete-massive.'
+    },
+    'massive_changes': {
+        'text': 'Edit',
+        'groupAcls': 'osfMassiveEdit',
+        'aclsLogic': 'OR'
+    }
+};
 
 // Action button (tipically New button) configuration on list view
 Wat.I.listActionButton[qvdObj] = {
