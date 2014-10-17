@@ -477,12 +477,8 @@ sub available_action_for_current_admin
 {
     my ($self,$action) = @_;
 
-    $self->administrator->is_allowed_to($_) || return 0
-	for @{$action->{acls}};
-
-    return 1;
+    $self->administrator->re_is_allowed_to(@{$action->{acls}});
 }
-
 
 sub get_request 
 { 

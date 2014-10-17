@@ -81,9 +81,32 @@ sub get_acls_info
 
 sub is_allowed_to
 {
-    my ($self,$acl_name) = @_;
+    my ($self,@acl_names) = @_;
     my %acls = map { $_ => 1 } $self->acls;
-    defined $acls{$acl_name} ? return 1 : return 0;
+
+    for my $acl_name (@acl_names)
+    {
+	return 0 unless defined $acls{$acl_name};
+    }
+    return 1;
+}
+
+
+sub re_is_allowed_to
+{
+    my ($self,@acl_res) = @_;
+    my %acls = map { $_ => 1 } ;
+
+    for my $acl_re (@acl_res)
+    {
+	my $flag = 0;
+	for my $acl_name ($self->acls)
+	{
+	    if ($acl_name =~ /$acl_re/) { $flag = 1; last; }
+	}
+	return 0 unless $flag;
+    }
+    return 1;
 }
 
 sub set_tenants_scoop

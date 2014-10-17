@@ -46,8 +46,14 @@ sub BUILD
 	$self->qvd_object_model->qvd_object eq 'VM';
 
     $self->check_filters_validity_in_json;
-    $self->check_arguments_validity_in_json;
-    $self->check_nested_queries_validity_in_json;
+    $self->check_update_arguments_validity_in_json if
+	$self->qvd_object_model->type_of_action eq 'update'
+    $self->check_create_arguments_validity_in_json if
+	$self->qvd_object_model->type_of_action eq 'create'
+    $self->check_nested_creation_validity_in_json if
+	$self->qvd_object_model->type_of_action eq 'create'
+    $self->check_nested_update_validity_in_json if
+	$self->qvd_object_model->type_of_action eq 'update'
     $self->check_order_by_validity_in_json;
 
     $self->set_pagination_in_request;
@@ -218,34 +224,74 @@ sub check_filters_validity_in_json
 	QVD::Admin4::Exception->throw(code => 9)
 	for $self->json_wrapper->filters_list;
 
+    my $admin = $self->qvd_object_model->current_qvd_administrator;
+
+    $admin->is_allowed_to($self->qvd_object_model->get_acls_for_filter($_)) || 
+	QVD::Admin4::Exception->throw(code => 34)
+	for $self->json_wrapper->filters_list;
+
     $self->json_wrapper->has_filter($_) ||
 	QVD::Admin4::Exception->throw(code => 10)
 	for $self->qvd_object_model->mandatory_filters;
 }
 
-sub check_arguments_validity_in_json
+sub check_update_arguments_validity_in_json
 {
     my $self = shift;
+    my $admin = $self->qvd_object_model->current_qvd_administrator;
 
-    if ($self->qvd_object_model->type_of_action eq 'update')
-    {
-	$self->qvd_object_model->available_argument($_) || 
-	    QVD::Admin4::Exception->throw(code => 12)
-	    for $self->json_wrapper->arguments_list;
-    }
+    $self->qvd_object_model->available_argument($_) || 
+	QVD::Admin4::Exception->throw(code => 12)
+	for $self->json_wrapper->arguments_list;
 
-    if ($self->qvd_object_model->type_of_action eq 'create')
+    for my $arg_key ($self->json_wrapper->arguments_list)
     {
-	$self->json_wrapper->has_argument($_) || 
-	    defined $self->qvd_object_model->get_default_argument_value($_) ||
-	    QVD::Admin4::Exception->throw(code => 23502)
-	    for $self->qvd_object_model->mandatory_arguments;
+	my $arg_val = $self->json_wrapper->get_argument_value;
+	my $method = ref($arg_val) && scalar @$arg_val > 1 ? 
+	    'get_acls_for_argument_in_massive_update' : 
+	    'get_acls_for_argument_in_update' ;
+
+	$admin->is_allowed_to($self->qvd_object_model->$method($_)) || 
+	    QVD::Admin4::Exception->throw(code => 35);
     }
 }
 
-sub check_nested_queries_validity_in_json
+sub check_create_arguments_validity_in_json
 {
     my $self = shift;
+    my $admin = $self->qvd_object_model->current_qvd_administrator;
+
+    $self->json_wrapper->has_argument($_) || 
+	defined $self->qvd_object_model->get_default_argument_value($_) ||
+	QVD::Admin4::Exception->throw(code => 23502)
+	for $self->qvd_object_model->mandatory_arguments;
+    
+    $admin->is_allowed_to($self->qvd_object_model->get_acls_for_argument_in_creation($_)) || 
+	QVD::Admin4::Exception->throw(code => 35)
+	for $self->json_wrapper->arguments_list;
+}
+
+sub check_nested_creation_validity_in_json
+{
+    my $self = shift;
+}
+
+sub check_nested_update_validity_in_json
+{
+    my $self = shift;
+}
+
+sub check_editing_permissions
+{
+    my ($self,$arg_or_nq,$creation_or_update,$key,$val) = @_;
+
+    my $method = ref($val) && scalar @$val > 1 ? 
+	"get_acls_for_$arg_or_nq_in_massive_creation_$creation_or_update" : 
+	"get_acls_for_nested_query_in_$creation_or_update" ;
+	      
+    $admin->is_allowed_to(
+	$self->qvd_object_model->$method($key)) || 
+	QVD::Admin4::Exception->throw(code => 35);
 }
 
 sub check_order_by_validity_in_json
@@ -275,7 +321,6 @@ sub set_filters_in_request
 	$self->set_filter($key_dbix_format,$value_normalized);
     }
 }
-
 
 sub set_arguments_in_request
 {

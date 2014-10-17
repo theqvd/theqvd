@@ -311,7 +311,6 @@ sub get_positive_acls_info
 #### NEW VERSION ####
 #####################
 
-
 sub get_acls_fast
 {
     my $self = shift;

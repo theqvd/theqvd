@@ -44,6 +44,9 @@ my $mapper =
     31 => 'Unable to find images directory in filesystem',
     32 => 'Unable to find staging directory in filesystem',
     33 => 'Unable to find disk image in staging directory',
+    34 => 'Forbidden filter for this administrator',
+    35 => 'Forbidden argument for this administrator',
+    36 => 'Forbidden field for this administrator',
     23503 => 'Foreign Key violation',
     23502 => 'Lack of mandatory argument violation',
     23505 => 'Unique Key violation',
@@ -81,8 +84,11 @@ sub map_dbix_object_to_output_info
 {
     my ($self,$dbix_object) = @_;
     my $result = {};
+    my $admin = $self->qvd_object_model->current_qvd_administrator;
+    my @available_fields = grep  { $admin->is_allowed_to($self->qvd_object_model->get_acls_for_argument($_)) }
+	$self->qvd_object_model->available_fields;
 
-    for my $field_key ($self->qvd_object_model->available_fields)
+    for my $field_key (@available_fields)
     {
 	my $dbix_field_key = $self->qvd_object_model->map_field_to_dbix_format($field_key);
 	my ($table,$column) = $dbix_field_key =~ /^(.+)\.(.+)$/;

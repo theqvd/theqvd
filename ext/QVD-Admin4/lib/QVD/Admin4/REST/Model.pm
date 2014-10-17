@@ -22,6 +22,347 @@ has 'model_info', is => 'ro', isa => sub {die "Invalid type for attribute model_
 
 my $DBConfigProvider;
 
+
+my $ACLS_FOR_FILTERS = {
+
+    VM => { storage => [],
+	    id => [],
+	    name => [],
+	    user_id => [],
+	    user_name => [],
+	    osf_id => [],
+	    osf_name => [],
+	    di_tag => [],
+	    blocked => [], 
+	    expiration_soft => [],
+	    expiration_hard => [],
+	    state host_id => [],
+	    host_name di_id => [], 
+	    user_state => [],
+	    ip => [],
+	    next_boot_ip => [],
+	    ssh_port => [],
+	    vnc_port => [],
+	    serial_port => [],
+	    tenant_id => [],
+	    tenant_name => [], 
+	    creation_admin => [],
+	    creation_date => [] },
+
+    DI_Tag => { osf_id => [], 
+		name => [],
+		id => [],
+		tenant_id => [],
+		tenant_name => [] },
+
+    User => { id => [],
+	      name => [],
+	      blocked => [],
+	      creation_admin => [],
+	      creation_date => [],
+	      tenant_id => [],
+	      tenant_name => [] },
+
+    Host => { id => [],
+	      name => [],
+	      address => [],
+	      blocked => [],
+	      frontend => [],
+	      backend => [],
+	      state => [],
+	      vm_id => [],
+	      creation_admin => [],
+	      creation_date => [] },
+
+    DI => { id => [],
+	    disk_image => [],
+	    version => [],
+	    osf_id => [],
+	    osf_name => [],
+	    tenant_id => [],
+	    blocked => [],
+	    tenant_name => [],
+	    tag => [] },
+
+    OSF => { id => [],
+	     name => [],
+	     overlay => [],
+	     user_storage => [],
+	     memory => [],
+	     vm_id => [],
+	     di_id => [],
+	     tenant_id => [],
+	     tenant_name => [] },
+
+    ACL => { id => [],
+	     name => [],
+	     role_id => [],
+	     admin_id => [] },
+
+    Tenant => { id => [],
+		name => []},
+
+    Role => { name => [],
+	      id => [] },
+
+    Administrator => { name => [],
+		       tenant_id => [],
+		       tenant_name => [],
+		       id => [] },
+
+    Tenant_View => { id => [],
+		     tenant_id => [],
+		     tenant_name => [],
+		     acl_id => [],
+		     acl_name => [],
+		     positive => [] },
+
+    Administrator_View => { id => [],
+			    admin_id => [],
+			    admin_name => [],
+			    acl_id => [],
+			    acl_name => [],
+			    tenant_id => [],
+			    tenant_name => [],
+			    positive => []},
+};
+
+my $ACLS_FOR_FIELDS = {
+
+    OSF => { id => [],
+	     name => [],
+	     overlay => [],
+	     user_storage => [],
+	     memory => [],
+	     number_of_vms => [],
+	     number_of_dis => [],
+	     properties => [] },
+
+    Role => { name => [],
+	      roles => [],
+	      acls => [],
+	      id => [],
+	      number_of_acls => [] },
+
+    DI => { id => [],
+	    disk_image => [],
+	    version => [],
+	    osf_id => [],
+	    osf_name => [],
+	    blocked => [],
+	    tags => [],
+	    properties => []  },
+
+    VM => { storage => [],
+	    id => [],
+	    name => [],
+	    user_id => [],
+	    user_name => [],
+	    osf_id => [],
+	    osf_name => [],
+	    di_tag => [],
+	    blocked => [],
+	    expiration_soft => [],
+	    expiration_hard => [],
+	    state => [],
+	    host_id => [],
+	    host_name => [],
+	    di_id => [],
+	    user_state => [],
+	    ip => [],
+	    next_boot_ip => [],
+	    ssh_port => [],
+	    vnc_port => [],
+	    serial_port => [], 
+	    creation_admin => [],
+	    creation_date => [],
+	    di_version => [],
+	    di_name => [],
+	    di_id => [],
+	    properties => [] },
+
+    ACL => { id => [],
+	     name => [] },
+
+    Administrator => { name => [],
+		       roles => [],
+		       id => [] },
+
+    Tenant => { id => [],
+		name => [] },
+
+    User => { id => [],
+	      name => [],
+	      blocked => [],
+	      creation_admin => [],
+	      creation_date => [],
+	      number_of_vms => [],
+	      number_of_vms_connected => [],
+	      properties => [] },
+
+    Host => { id => [],
+	      name => [],
+	      address => [],
+	      blocked => [],
+	      frontend => [],
+	      backend => [],
+	      state => [],
+	      load => [],
+	      creation_admin => [],
+	      creation_date => [],
+	      number_of_vms_connected => [],
+	      properties => [] },
+
+    DI_Tag => { osf_id => [],
+		name id => [] },
+
+    Tenant_View => { id => [],
+		     tenant_id => [],
+		     tenant_name => [],
+		     acl_id => [],
+		     acl_name => [],
+		     positive => [] },
+
+    Administrator_View => { id => [],
+			    tenant_id => [],
+			    tenant_name => [],
+			    admin_id => [],
+			    admin_name => [],
+			    acl_id => [],
+			    acl_name => [],
+			    positive => []}
+};
+
+my $ACLS_FOR_ARGUMENTS_IN_UPDATE = { User => { name => [],
+					       password => [],
+					       blocked => [],
+					       __properties_changes_set => [],
+					       __properties_changes_delete => []},
+				     VM => { name => [],
+					     ip => [],
+					     blocked => [],
+					     expiration_soft => [],
+					     expiration_hard => [],
+					     storage => [],
+					     di_tag => [],
+					     __properties_changes_set => [],
+					     __properties_changes_delete => [] },
+				     Host => { name => [],
+					       address => [],
+					       blocked => [],
+					       __properties_changes_set => [],
+					       __properties_changes_delete => [] },
+				     OSF => { name => [],
+					      memory => [],
+					      user_storage => [],
+					      overlay => [],
+					      __properties_changes_set => [],
+					      __properties_changes_delete => [] },
+				     DI => { blocked => [],
+					     disk_image => [],
+					     __properties_changes_set => [],
+					     __properties_changes_delete => [],
+					     __tags_changes_add => [],
+					     __tags_changes_delete => []},
+				     Tenant => { name => [] },
+				     Role => { name => [],
+					       __acls_changes_assign_positive_acls => [],
+					       __acls_changes_unassign_positive_acls => [],
+					       __acls_changes_assign_negative_acls => [],
+					       __acls_changes_unassign_negative_acls => [],
+					       __roles_changes_assign_roles => [],
+					       __roles_changes_unassign_roles => [] },
+				     Administrator => { name => [],
+							password => [],
+							__roles_changes_assign_roles => [],
+							__roles_changes_unassign_roles => [] },
+				     Tenant_View => { positive => [] },
+				     Administrator_View => { positive => []}};
+
+
+my $ACLS_FOR_ARGUMENTS_IN_MASSIVE_UPDATE = { User => { name => [],
+					       password => [],
+					       blocked => [],
+					       __properties_changes_set => [],
+					       __properties_changes_delete => []},
+				     VM => { name => [],
+					     ip => [],
+					     blocked => [],
+					     expiration_soft => [],
+					     expiration_hard => [],
+					     storage => [],
+					     di_tag => [],
+					     __properties_changes_set => [],
+					     __properties_changes_delete => [] },
+				     Host => { name => [],
+					       address => [],
+					       blocked => [],
+					       __properties_changes_set => [],
+					       __properties_changes_delete => [] },
+				     OSF => { name => [],
+					      memory => [],
+					      user_storage => [],
+					      overlay => [],
+					      __properties_changes_set => [],
+					      __properties_changes_delete => [] },
+				     DI => { blocked => [],
+					     disk_image => [],
+					     __properties_changes_set => [],
+					     __properties_changes_delete => [],
+					     __tags_changes_add => [],
+					     __tags_changes_delete => []},
+				     Tenant => { name => [] },
+				     Role => { name => [],
+					       __acls_changes_assign_positive_acls => [],
+					       __acls_changes_unassign_positive_acls => [],
+					       __acls_changes_assign_negative_acls => [],
+					       __acls_changes_unassign_negative_acls => [],
+					       __roles_changes_assign_roles => [],
+					       __roles_changes_unassign_roles => [] },
+				     Administrator => { name => [],
+							password => [],
+							__roles_changes_assign_roles => [],
+							__roles_changes_unassign_roles => [] },
+				     Tenant_View => { positive => [] },
+				     Administrator_View => { positive => []}};
+
+
+my $ACLS_FOR_ARGUMENTS_IN_CREATION = { User => { name => [],
+					       password => [],
+					       blocked => [],
+					       __properties__ => []},
+				     VM => { name => [],
+					     ip => [],
+					     blocked => [],
+					     expiration_soft => [],
+					     expiration_hard => [],
+					     storage => [],
+					     di_tag => [],
+					     __properties__ },
+				     Host => { name => [],
+					       address => [],
+					       blocked => [],
+					       __properties__ },
+				     OSF => { name => [],
+					      memory => [],
+					      user_storage => [],
+					      overlay => [],
+					      __properties__ },
+				     DI => { blocked => [],
+					     disk_image => [],
+					     __properties__,
+					     __tags__},
+				     Tenant => { name => [] },
+				     Role => { name => [],
+					       __acls__,
+					       __roles__ },
+				     Administrator => { name => [],
+							password => [],
+							__roles__ },
+				     Tenant_View => { positive => [] },
+				     Administrator_View => { positive => []}};
+
+
 my $AVAILABLE_FILTERS = { list => { default => [],
 				    VM => [qw(storage id name user_id user_name osf_id osf_name di_tag blocked 
                                               expiration_soft expiration_hard state host_id host_name di_id 
@@ -181,6 +522,31 @@ my $DEFAULT_ORDER_CRITERIA = { tiny => { default =>  [qw(name)],
 					 Tenant_View => [qw(acl_name)],
 					 Administrator_View => [qw(acl_name)] }};
 
+my $AVAILABLE_NESTED_QUERIES = { create => { User => [qw(__properties__)],
+					     VM => [qw(__properties__)],
+					     Host => [qw(__properties__)],
+					     OSF => [qw(__properties__)],
+					     DI => [qw(__properties__ __tags__)],
+					     Tenant => [qw()],
+					     Role => [{ __acls__ => [qw(positive negative)]}, qw(__roles__)],
+					     Administrator => [qw(__roles__)],
+					     Tenant_View => [qw()],
+					     Administrator_View => [qw()]},
+
+				 update => { User => [{ __properties_changes__ => [qw(set delete)]}],
+					     VM => [{ __properties_changes__ => [qw(set delete)]}],
+					     Host => [{ __properties_changes__ => [qw(set delete)]}],
+					     OSF => [{ __properties_changes__ => [qw(set delete)]}],
+					     DI => [{ __properties_changes__ => [qw(set delete)]}, {__tags_changes__ => [qw(add delete)]}],
+					     Tenant => [qw()],
+					     Role => [{__acls_changes__ => [qw(assign_positive_acls unassign_positive_acls
+                                                                               assign_negative_acls unassign_positive_acls))],
+						      __roles_changes__ => [qw(assign_roles unassign_roles)])],
+					     Administrator => [qw(__roles_changes__)],
+					     Tenant_View => [qw()],
+					     Administrator_View => [qw()]}};
+
+
 my $AVAILABLE_ARGUMENTS = { User => [qw(name password blocked)],
                             VM => [qw(name ip blocked expiration_soft expiration_hard storage di_tag)],
                             Host => [qw(name address blocked)],
@@ -191,6 +557,7 @@ my $AVAILABLE_ARGUMENTS = { User => [qw(name password blocked)],
 			    Administrator => [qw(name password)],
 			    Tenant_View => [qw(positive)],
 			    Administrator_View => [qw(positive)]};
+
 
 my $MANDATORY_ARGUMENTS = { User => [qw(name password tenant_id blocked)],
 			    VM => [qw(name user_id ip osf_id di_tag state user_state blocked)],
@@ -982,5 +1349,72 @@ sub get_free_ip {
     }
     die "No free IP addresses";
 }
+
+##################
+######## ACLS
+##################
+
+sub get_acls_for_filter
+{
+    my ($self,$filter) = @_;
+    $self->get_acls($ACLS_FOR_FILTERS,$filter);
+}
+
+sub get_acls_for_fileds
+{
+    my ($self,$field) = @_;
+    $self->get_acls($ACLS_FOR_FIELDS,$field);
+}
+
+sub get_acls_for_arguments_in_creation
+{
+    my ($self,$arg) = @_;
+    $self->get_acls($ACLS_FOR_ARGUMENTS_IN_CREATION,$arg);
+}
+
+sub get_acls_for_arguments_in_update
+{
+    my ($self,$arg) = @_;
+    $self->get_acls($ACLS_FOR_ARGUMENTS_IN_UPDATE,$arg);
+}
     
+sub get_acls_for_arguments_in_massive_update
+{
+    my ($self,$arg) = @_;
+    $self->get_acls(
+	$ACLS_FOR_ARGUMENTS_IN_MASSIVE_UPDATE,$arg);
+}
+
+sub get_acls_for_nested_query_in_creation
+{
+    my ($self,@nested_args) = @_;
+    my $arg = join('_',@nested_args);
+    $self->get_acls_for_arguments_in_creation(
+	$ACLS_FOR_ARGUMENTS_IN_CREATION,$arg);
+}
+
+sub get_acls_for_nested_query_in_update
+{
+    my ($self,@nested_args) = @_;
+    my $arg = join('_',@nested_args);
+    $self->get_acls_for_arguments_in_update(
+	$ACLS_FOR_ARGUMENTS_IN_UPDATE,$arg);
+}
+    
+sub get_acls_for_nested_query_in_massive_update
+{
+    my ($self,@nested_args) = @_;
+    my $arg = join('_',@nested_args);
+    $self->get_acls_for_arguments_in_massive_update(
+	$ACLS_FOR_ARGUMENTS_IN_MASSIVE_UPDATE,$arg);
+}
+
+sub get_acls
+{
+    my ($self,$filter,$REPO) = @_;
+    return () unless defined $REPO->{$self->qvd_object};
+    return () unless defined $REPO->{$self->qvd_object}->{$filter};
+    my @acls = @{$REPO->{$self->qvd_object}->{$filter}};
+}
+
 1;
