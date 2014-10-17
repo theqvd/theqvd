@@ -7,13 +7,13 @@ Wat.Views.OSFDetailsView = Wat.Views.DetailsView.extend({
     },
     
     renderSide: function () {
-        var sideCheck = this.checkSide({'osf.see-details.vm-list': '.js-side-component1', 'osf.see-details.di-list': '.js-side-component2'});
+        var sideCheck = this.checkSide({'osf.see.vm-list': '.js-side-component1', 'osf.see.di-list': '.js-side-component2'});
 
         if (sideCheck === false) {
             return;
         }
         
-        if (sideCheck['osf.see-details.vm-list']) { 
+        if (sideCheck['osf.see.vm-list']) { 
             var sideContainer1 = '.' + this.cid + ' .bb-details-side1';
 
             // Render Virtual Machines list on side
@@ -29,7 +29,7 @@ Wat.Views.OSFDetailsView = Wat.Views.DetailsView.extend({
         }
         
         
-        if (sideCheck['osf.see-details.di-list']) { 
+        if (sideCheck['osf.see.di-list']) { 
             var sideContainer2 = '.' + this.cid + ' .bb-details-side2';
 
             // Render Disk images list on side

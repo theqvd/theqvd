@@ -28,50 +28,58 @@
     <% } %>
 </div>
 
-<table class="details details-list">
-    <tr>
-        <td><i class="fa fa-male"></i><span data-i18n>Id</span></td>
-        <td>
-            <%= model.get('id') %>
-        </td>
-    </tr>
-    <tr>
-        <td><i class="fa fa-cloud"></i><span data-i18n>Connected VMs</span></td>
-        <td>
-            <% if (model.get('number_of_vms') > 0 && Wat.C.checkACL('vm.see-main.')) { %>
-            <a href="#/vms/user/<%= model.get('id') %>">
-                <%= model.get('number_of_vms_connected') %>
-                /
-                <%= model.get('number_of_vms') %>
-            </a>
-            <% } else {%>
-                <%= model.get('number_of_vms_connected') %>
-                /
-                <%= model.get('number_of_vms') %>
-            <% } %>
-        </td>
-    </tr>
-    <tr>
-        <td><i class="fa fa-lock"></i><span data-i18n>Blocking</span></td>
-        <td>
-            <% 
-            if (model.get('blocked')) {
-            %>
-                <!--
-                <i class="fa fa-lock" data-i18n="[title]Blocked"></i>
-                -->
-                <span data-i18n>Blocked</span>
-            <%
-            }
-            else {
-            %>
-                <!--
-                <i class="fa fa-unlock" data-i18n="[title]Unblocked"></i>
-                -->
-                <span data-i18n>Unblocked</span>
-            <%
-            }
-            %>
-        </td>
-    </tr>
+<table class="details details-list <% if (!enabledProperties) { %> col-width-100 <% } %>">
+    <% 
+    if (detailsFields['id'] != undefined) { 
+    %>
+        <tr>
+            <td><i class="fa fa-male"></i><span data-i18n>Id</span></td>
+            <td>
+                <%= model.get('id') %>
+            </td>
+        </tr>
+    <% 
+    }
+    if (detailsFields['connected_vms'] != undefined) { 
+    %>
+        <tr>
+            <td><i class="fa fa-cloud"></i><span data-i18n>Connected VMs</span></td>
+            <td>
+                <% if (model.get('number_of_vms') > 0 && Wat.C.checkACL('vm.see-main.')) { %>
+                <a href="#/vms/user/<%= model.get('id') %>">
+                    <%= model.get('number_of_vms_connected') %>
+                    /
+                    <%= model.get('number_of_vms') %>
+                </a>
+                <% } else {%>
+                    <%= model.get('number_of_vms_connected') %>
+                    /
+                    <%= model.get('number_of_vms') %>
+                <% } %>
+            </td>
+        </tr>
+    <% 
+    }
+    if (detailsFields['block'] != undefined) { 
+    %>
+        <tr>
+            <td><i class="fa fa-lock"></i><span data-i18n>Blocking</span></td>
+            <td>
+                <% 
+                if (model.get('blocked')) {
+                %>
+                    <span data-i18n>Blocked</span>
+                <%
+                }
+                else {
+                %>
+                    <span data-i18n>Unblocked</span>
+                <%
+                }
+                %>
+            </td>
+        </tr>
+    <% 
+    }
+    %>
 </table>

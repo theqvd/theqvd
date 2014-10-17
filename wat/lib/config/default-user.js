@@ -1,7 +1,7 @@
 var qvdObj = 'user';
 
 // Columns configuration on list view
-Wat.I.listColumns[qvdObj] = {
+Wat.I.listFields[qvdObj] = {
     'checks': {
         'display': true,
         'fields': [],
@@ -16,7 +16,7 @@ Wat.I.listColumns[qvdObj] = {
         'fields': [
             'blocked'
         ],
-        'acls': 'user.see-main.block',
+        'acls': 'user.see.block',
         'text': 'Info'
     },
     'id': {
@@ -24,7 +24,7 @@ Wat.I.listColumns[qvdObj] = {
         'fields': [
             'id'
         ],
-        'acls': 'user.see-main.id',
+        'acls': 'user.see.id',
         'text': 'Id'
     },
     'name': {
@@ -42,7 +42,7 @@ Wat.I.listColumns[qvdObj] = {
             'number_of_vms',
             'number_of_vms_connected'
         ],
-        'acls': 'user.see-main.vms-info',
+        'acls': 'user.see.vms-info',
         'text': 'Connected VMs'
     },
     'creation_date': {
@@ -50,7 +50,7 @@ Wat.I.listColumns[qvdObj] = {
         'fields': [
             'creation_date'
         ],
-        'acls': 'user.see-main.creation-date',
+        'acls': 'user.see.creation-date',
         'display': false
     },
     'creation_admin': {
@@ -58,7 +58,7 @@ Wat.I.listColumns[qvdObj] = {
         'fields': [
             'creation_admin'
         ],
-        'acls': 'user.see-main.created-by',
+        'acls': 'user.see.created-by',
         'display': false
     },
     'world': {
@@ -67,7 +67,7 @@ Wat.I.listColumns[qvdObj] = {
         'fields': [
             'world'
         ],
-        'acls': 'user.see-main.properties',
+        'acls': 'user.see.properties',
         'property': true,
         'text': 'world'
     },
@@ -77,9 +77,55 @@ Wat.I.listColumns[qvdObj] = {
         'fields': [
             'sex'
         ],
-        'acls': 'user.see-main.properties',
+        'acls': 'user.see.properties',
         'property': true,
         'text': 'sex'
+    }
+};
+
+// Fields configuration on details view
+Wat.I.detailsFields[qvdObj] = {
+    'id': {
+        'display': true,
+        'fields': [
+            'id'
+        ],
+        'acls': 'user.see.id',
+        'text': 'Id'
+    },
+    'block': {
+        'display': true,
+        'fields': [
+            'id'
+        ],
+        'acls': 'user.see.block',
+        'text': 'Blocking'
+    },
+    'connected_vms': {
+        'display': true,
+        'fields': [
+            'id',
+            'number_of_vms',
+            'number_of_vms_connected'
+        ],
+        'acls': 'user.see.vms-info',
+        'text': 'Connected VMs'
+    },
+    'creation_date': {
+        'text': 'Creation date',
+        'fields': [
+            'creation_date'
+        ],
+        'acls': 'user.see.creation-date',
+        'display': true
+    },
+    'creation_admin': {
+        'text': 'Created by',
+        'fields': [
+            'creation_admin'
+        ],
+        'acls': 'user.see.created-by',
+        'display': true
     }
 };
         
@@ -100,7 +146,7 @@ Wat.I.formFilters[qvdObj] = {
         'displayMobile': false,
         'displayDesktop': true,
         'property': true,
-        'acls': 'user.see-main.properties',
+        'acls': 'user.see.properties',
     },     
     'sex': {
         'filterField': 'sex',
@@ -110,7 +156,7 @@ Wat.I.formFilters[qvdObj] = {
         'displayMobile': false,
         'displayDesktop': true,
         'property': true,
-        'acls': 'user.see-main.properties',
+        'acls': 'user.see.properties',
     }
 };
 

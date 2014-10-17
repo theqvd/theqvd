@@ -24,51 +24,69 @@
     
 </div>
 
-<table class="details details-list">
-    <tr>
-        <td><i class="fa fa-male"></i><span data-i18n>Id</span></td>
-        <td>
-            <%= model.get('id') %>
-        </td>
-    </tr>
-    <tr>
-        <td><i class="fa fa-ellipsis-h"></i><span data-i18n>IP address</span></td>
-        <td>
-            <%= model.get('address') %>
-        </td>
-    </tr>
-    <tr>
-        <td><i class="fa fa-heart"></i><span data-i18n>State</span></td>
-        <td>
-            <% 
-        if (model.get('state') == 'running') {
-            %>
-            <span data-i18n>Running</span>
-            <%
-            }
-            else {
-            %>
-            <span data-i18n>Stopped</span>
-            <%
-            }
-            %>
-        </td>
-    </tr>
-    <tr>
-        <td><i class="fa fa-lock"></i><span data-i18n>Blocking</span></td>
-        <td>
-            <% 
-            if (model.get('blocked')) {
-            %>
-                <span data-i18n>Blocked</span>
-            <%
-            }
-            else {
-            %>
-                <span data-i18n>Unblocked</span>
-            <%
-            }
-            %>
-        </td>
-    </tr>
+<table class="details details-list <% if (!enabledProperties) { %> col-width-100 <% } %>">
+    <% 
+    if (detailsFields['id'] != undefined) { 
+    %>
+        <tr>
+            <td><i class="fa fa-male"></i><span data-i18n>Id</span></td>
+            <td>
+                <%= model.get('id') %>
+            </td>
+        </tr>  
+    <% 
+    }
+    if (detailsFields['address'] != undefined) { 
+    %>
+        <tr>
+            <td><i class="fa fa-ellipsis-h"></i><span data-i18n>IP address</span></td>
+            <td>
+                <%= model.get('address') %>
+            </td>
+        </tr>
+    <% 
+    }
+    if (detailsFields['state'] != undefined) { 
+    %>
+        <tr>
+            <td><i class="fa fa-heart"></i><span data-i18n>State</span></td>
+            <td>
+                <% 
+            if (model.get('state') == 'running') {
+                %>
+                <span data-i18n>Running</span>
+                <%
+                }
+                else {
+                %>
+                <span data-i18n>Stopped</span>
+                <%
+                }
+                %>
+            </td>
+        </tr>
+    <% 
+    }
+    if (detailsFields['block'] != undefined) { 
+    %>
+        <tr>
+            <td><i class="fa fa-lock"></i><span data-i18n>Blocking</span></td>
+            <td>
+                <% 
+                if (model.get('blocked')) {
+                %>
+                    <span data-i18n>Blocked</span>
+                <%
+                }
+                else {
+                %>
+                    <span data-i18n>Unblocked</span>
+                <%
+                }
+                %>
+            </td>
+        </tr>
+    <% 
+    }
+    %>
 </table>

@@ -56,10 +56,10 @@ $.merge(Wat.C.aclGroups.userMassiveActions, Wat.C.aclGroups.userMassiveEdit);
 // Virtual Machine ACL groups
 ///////////////////////////////
 Wat.C.aclGroups.vmInfoIcons = [
-    'vm.see-main.block',
-    'vm.see-main.state',
-    'vm.see-main.expiration',
-    'vm.see-main.user-state'
+    'vm.see.block',
+    'vm.see.state',
+    'vm.see.expiration',
+    'vm.see.user-state'
 ];
 Wat.C.aclGroups.vmEdit = [
     'vm.update.name',

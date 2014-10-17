@@ -56,8 +56,8 @@ Wat.Views.SetupCustomizeView = Wat.Views.MainView.extend({
                     columnsByField[field][fieldName] = checked;
                     
                     newCustomization[field] = newCustomization[field] || {};
-                    newCustomization[field]['listColumns'] = newCustomization[field]['listColumns'] || {};
-                    newCustomization[field]['listColumns'][fieldName] = checked;
+                    newCustomization[field]['listFields'] = newCustomization[field]['listFields'] || {};
+                    newCustomization[field]['listFields'][fieldName] = checked;
                 });
             });
         

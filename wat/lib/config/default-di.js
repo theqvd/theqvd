@@ -1,7 +1,7 @@
 var qvdObj = 'di';
 
 // Columns configuration on list view
-Wat.I.listColumns[qvdObj] = {
+Wat.I.listFields[qvdObj] = {
     'checks': {
         'display': true,
         'fields': [],
@@ -25,8 +25,8 @@ Wat.I.listColumns[qvdObj] = {
             'tags'
         ],
         'acls': [
-            'di.see-main.block',
-            'di.see-main.tags'
+            'di.see.block',
+            'di.see.tags'
         ],
         'aclsLogic': 'OR',
         'text': 'Info'
@@ -36,7 +36,7 @@ Wat.I.listColumns[qvdObj] = {
         'fields': [
             'id'
         ],
-        'acls': 'di.see-main.id',
+        'acls': 'di.see.id',
         'text': 'Id'
     },
     'disk_image': {
@@ -53,7 +53,7 @@ Wat.I.listColumns[qvdObj] = {
             'osf_id',
             'osf_name'
         ],
-        'acls': 'di.see-main.osf',
+        'acls': 'di.see.osf',
         'text': 'OSF'
     },
     'version': {
@@ -61,7 +61,7 @@ Wat.I.listColumns[qvdObj] = {
         'fields': [
             'version'
         ],
-        'acls': 'di.see-main.version',
+        'acls': 'di.see.version',
         'text': 'Version'
     },
     'default': {
@@ -69,7 +69,7 @@ Wat.I.listColumns[qvdObj] = {
         'fields': [
             'tags'
         ],
-        'acls': 'di.see-main.default',
+        'acls': 'di.see.default',
         'text': 'Default'
     },
     'head': {
@@ -77,15 +77,15 @@ Wat.I.listColumns[qvdObj] = {
         'fields': [
             'tags'
         ],
-        'acls': 'di.see-main.head',
-        'text': 'Default'
+        'acls': 'di.see.head',
+        'text': 'Head'
     },
     'creation_date': {
         'text': 'Creation date',
         'fields': [
             'creation_date'
         ],
-        'acls': 'di.see-main.creation-date',
+        'acls': 'di.see.creation-date',
         'display': false
     },
     'creation_admin': {
@@ -93,10 +93,96 @@ Wat.I.listColumns[qvdObj] = {
         'fields': [
             'creation_admin'
         ],
-        'acls': 'di.see-main.created-by',
+        'acls': 'di.see.created-by',
         'display': false
     }
 };
+
+// Fields configuration on details view
+Wat.I.detailsFields[qvdObj] = {
+    'id': {
+        'display': false,
+        'fields': [
+            'id'
+        ],
+        'acls': 'di.see.id',
+        'text': 'Id'
+    },
+    'disk_image': {
+        'display': true,
+        'fields': [
+            'id',
+            'disk_image'
+        ],
+        'text': 'Disk image'
+    },
+    'block': {
+        'display': true,
+        'fields': [
+            'id'
+        ],
+        'acls': 'di.see.block',
+        'text': 'Blocking'
+    },
+    'tags': {
+        'display': true,
+        'fields': [
+            'id'
+        ],
+        'acls': 'di.see.tags',
+        'text': 'Tags'
+    },
+    'osf': {
+        'display': true,
+        'fields': [
+            'osf_id',
+            'osf_name'
+        ],
+        'acls': 'di.see.osf',
+        'text': 'OS Flavour'
+    },
+    'version': {
+        'display': true,
+        'fields': [
+            'version'
+        ],
+        'acls': 'di.see.version',
+        'text': 'Version'
+    },
+    'default': {
+        'display': false,
+        'fields': [
+            'tags'
+        ],
+        'acls': 'di.see.default',
+        'text': 'Default'
+    },
+    'head': {
+        'display': false,
+        'fields': [
+            'tags'
+        ],
+        'acls': 'di.see.head',
+        'text': 'Head'
+    },
+    'creation_date': {
+        'text': 'Creation date',
+        'fields': [
+            'creation_date'
+        ],
+        'acls': 'di.see.creation-date',
+        'display': false
+    },
+    'creation_admin': {
+        'text': 'Created by',
+        'fields': [
+            'creation_admin'
+        ],
+        'acls': 'di.see.created-by',
+        'display': false
+    }
+};
+
 
 // Filters configuration on list view
 Wat.I.formFilters[qvdObj] = {
@@ -124,7 +210,7 @@ Wat.I.formFilters[qvdObj] = {
                 'selected': true
             }
                     ],
-        'acls': 'di.see-main.osf'
+        'acls': 'di.see.osf'
     }
 };
 

@@ -8,40 +8,58 @@
     <% } %>
 </div>
 
-<table class="details details-list">
-    <tr>
-        <td><i class="fa fa-male"></i><span data-i18n>Id</span></td>
-        <td>
-            <%= model.get('id') %>
-        </td>
-    </tr>
-    <tr>
-        <td><i class="fa fa-exchange"></i><span data-i18n>Overlay</span></td>
-        <td>
-            <%= model.get('overlay') %>
-        </td>
-    </tr>
-    <tr>
-        <td><i class="fa fa-bolt"></i><span data-i18n>Memory</span></td>
-        <td>
-            <%= model.get('memory') %> MB
-        </td>
-    </tr>
-    <tr>
-        <td><i class="fa fa-archive"></i><span data-i18n>User storage</span></td>
-        <td>
-            <%
-            if (!model.get('user_storage')) {
-            %>
-                <span data-i18n="No">
-                    <%= i18n.t('No') %>
-                </span>
-            <%
-            }
-            else {
-                print(model.get('user_storage')  + " MB");
-            }
-            %>
-        </td>
-    </span>
+<table class="details details-list <% if (!enabledProperties) { %> col-width-100 <% } %>">
+    <% 
+    if (detailsFields['id'] != undefined) { 
+    %>
+        <tr>
+            <td><i class="fa fa-male"></i><span data-i18n>Id</span></td>
+            <td>
+                <%= model.get('id') %>
+            </td>
+        </tr>  
+    <% 
+    }
+    if (detailsFields['overlay'] != undefined) { 
+    %>
+        <tr>
+            <td><i class="fa fa-exchange"></i><span data-i18n>Overlay</span></td>
+            <td>
+                <%= model.get('overlay') %>
+            </td>
+        </tr>
+    <% 
+    }
+    if (detailsFields['memory'] != undefined) { 
+    %>
+        <tr>
+            <td><i class="fa fa-bolt"></i><span data-i18n>Memory</span></td>
+            <td>
+                <%= model.get('memory') %> MB
+            </td>
+        </tr>
+    <% 
+    }
+    if (detailsFields['user_storage'] != undefined) { 
+    %>
+        <tr>
+            <td><i class="fa fa-archive"></i><span data-i18n>User storage</span></td>
+            <td>
+                <%
+                if (!model.get('user_storage')) {
+                %>
+                    <span data-i18n="No">
+                        <%= i18n.t('No') %>
+                    </span>
+                <%
+                }
+                else {
+                    print(model.get('user_storage')  + " MB");
+                }
+                %>
+            </td>
+        </tr>
+    <% 
+    }
+    %>
 </table>

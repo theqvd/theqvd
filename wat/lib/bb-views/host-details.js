@@ -7,7 +7,7 @@ Wat.Views.HostDetailsView = Wat.Views.DetailsView.extend({
     },
     
     renderSide: function () {
-        if (this.checkSide({'host.see-details.vm-list': '.js-side-component1'}) === false) {
+        if (this.checkSide({'host.see.vm-list': '.js-side-component1'}) === false) {
             return;
         }
         

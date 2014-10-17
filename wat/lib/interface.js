@@ -10,7 +10,7 @@ Wat.I = {
         return $.extend(true, [], this.cornerMenu);
     },
     
-    listColumns: {
+    detailsFields: {
         vm: {},
         user: {},
         host: {},
@@ -21,24 +21,39 @@ Wat.I = {
         acl: {}
     },
     
+    getDetailsFields: function (qvdObj) {
+        return $.extend(true, {}, this.detailsFields[qvdObj]);
+    },   
+    
+    listFields: {
+        vm: {},
+        user: {},
+        host: {},
+        osf: {},
+        di: {},
+        role: {},
+        admin: {},
+        acl: {}
+    }, 
+    
     getListColumns: function (qvdObj) {
-        return $.extend(true, {}, this.listColumns[qvdObj]);
+        return $.extend(true, {}, this.listFields[qvdObj]);
     },
     
     // DEPRECATED
     getListColumnsByField: function (qvdObj) {
-        var listColumns = this.getListColumns(qvdObj);
+        var listFields = this.getListColumns(qvdObj);
         
         // Get default values for custom columns
-        var listColumnsByField = {};
-        $.each(listColumns, function (columnName, column) {
+        var listFieldsByField = {};
+        $.each(listFields, function (columnName, column) {
             $.each(column.fields, function (iField, field) {
-                listColumnsByField[field] = listColumnsByField[field] || {};
-                listColumnsByField[field][columnName] = column.display;
+                listFieldsByField[field] = listFieldsByField[field] || {};
+                listFieldsByField[field][columnName] = column.display;
             });
         });
         
-        return listColumnsByField;
+        return listFieldsByField;
     },
     
     formFilters: {
@@ -75,19 +90,19 @@ Wat.I = {
     getCurrentCustomization: function (qvdObj) {
         var currentCustomization = {};
 
-        var listColumns = this.getListColumns(qvdObj);
+        var listFields = this.getListColumns(qvdObj);
         
         // Get default values for custom columns
-        var listColumnsByField = {};
-        $.each(listColumns, function (fieldName, column) {
+        var listFieldsByField = {};
+        $.each(listFields, function (fieldName, column) {
             $.each(column.fields, function (iField, field) {
                 currentCustomization[field] = currentCustomization[field] || {};
-                currentCustomization[field]['listColumns'] = currentCustomization[field]['listColumns'] || {};
-                currentCustomization[field]['listColumns'][fieldName] = column.display;
+                currentCustomization[field]['listFields'] = currentCustomization[field]['listFields'] || {};
+                currentCustomization[field]['listFields'][fieldName] = column.display;
             });
         });
         
-        //return listColumnsByField;
+        //return listFieldsByField;
         
         var formFilters = this.getFormFilters(qvdObj);
         
@@ -141,9 +156,9 @@ Wat.I = {
                 
                 var options = JSON.parse(optionsJSON);
                 
-                if (options.listColumns) {
-                    $.each(options.listColumns, function (columnName, display) {
-                        that.listColumns[qvdObj][columnName].display = display;
+                if (options.listFields) {
+                    $.each(options.listFields, function (columnName, display) {
+                        that.listFields[qvdObj][columnName].display = display;
                     });
                 }
                 
@@ -585,13 +600,13 @@ Wat.I = {
     
     
     fillCustomizeOptions: function (qvdObj) { 
-        var listColumns = this.listColumns[qvdObj]
+        var listFields = this.listFields[qvdObj]
         var head = '<tr><th data-i18n="Column">' + i18n.t('Column') + '</th><th data-i18n="Show">' + i18n.t('Show') + '</th></tr>';
         var selector = '.js-customize-columns table';
         $(selector + ' tr').remove();
         $(selector).append(head);
 
-        $.each(listColumns, function (fName, field) {
+        $.each(listFields, function (fName, field) {
             if (field.fixed) {
                 return;
             }

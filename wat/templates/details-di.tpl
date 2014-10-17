@@ -28,94 +28,107 @@
     
 </div>
 
-<table class="details details-list">
-    <tr>
-        <td><i class="fa fa-male"></i><span data-i18n>Id</span></td>
-        <td>
-            <%= model.get('id') %>
-        </td>
-    </tr>
-    <tr>
-        <td><i class="fa fa-ticket"></i><span data-i18n>Version</span></td>
-        <td>
-            <%= model.get('version') %>
-        </td>
-    </tr>
-    <tr>
-        <td><i class="<%= CLASS_ICON_OSFS %>"></i><span data-i18n>OS Flavour</span></td>
-        <td>
-            <a href="#/osf/<%= model.get('osf_id') %>">
-                <%= model.get('osf_name') %>
-            </a>
-        </td>
-    </tr>
-    <tr>
-        <td><i class="fa fa-lock"></i><span data-i18n>Blocking</span></td>
-        <td>
-            <% 
-            if (model.get('blocked')) {
-            %>
-                <span data-i18n>Blocked</span>
-            <%
-            }
-            else {
-            %>
-                <span data-i18n>Unblocked</span>
-            <%
-            }
-            %>
-        </td>
-    </tr>
-    
-    <%
-        if (model.get('default')) {
+<table class="details details-list <% if (!enabledProperties) { %> col-width-100 <% } %>">
+    <% 
+    if (detailsFields['id'] != undefined) { 
     %>
-            <tr>
-                <td><i class="fa fa-home"></i><span data-i18n>Default</span></td>
-                <td>
-                    <div class="second_row" data-i18n="Default image for this OSF"></div>
-                </td>
-            </tr>
-    
-    <%
-        }
+        <tr>
+            <td><i class="fa fa-male"></i><span data-i18n>Id</span></td>
+            <td>
+                <%= model.get('id') %>
+            </td>
+        </tr>  
+    <% 
+    }
+    if (detailsFields['version'] != undefined) { 
     %>
-            
-    <%
-        if (model.get('head')) {
+        <tr>
+            <td><i class="fa fa-ticket"></i><span data-i18n>Version</span></td>
+            <td>
+                <%= model.get('version') %>
+            </td>
+        </tr>
+    <% 
+    }
+    if (detailsFields['osf'] != undefined) { 
     %>
-           <tr> 
-                <td><i class="fa fa-flag-o"></i><span data-i18n>Head</span></td>
-                <td>
-                    <div class="second_row" data-i18n="Last image created on this OSF"></div>
-                </td>
-            </tr>
-    
-    <%
-        }
+        <tr>
+            <td><i class="<%= CLASS_ICON_OSFS %>"></i><span data-i18n>OS Flavour</span></td>
+            <td>
+                <a href="#/osf/<%= model.get('osf_id') %>">
+                    <%= model.get('osf_name') %>
+                </a>
+            </td>
+        </tr>
+    <% 
+    }
+    if (detailsFields['block'] != undefined) { 
     %>
-    
-    <tr>
-        <td><i class="fa fa-tags"></i><span data-i18n>Tags</span></td>
-        <td>
-        <%
-            if (!model.get('tags')) {
-        %>
-                <span class="no-elements" data-i18n="There are not tags"></span>
-        <%
-            }
-        %>
-            <ul class="tags">
-                <%
-                if (model.get('tags')) {
-                    $(model.get('tags').split(',')).each( function (index, tag) {
+        <tr>
+            <td><i class="fa fa-lock"></i><span data-i18n>Blocking</span></td>
+            <td>
+                <% 
+                if (model.get('blocked')) {
                 %>
-                        <li class="fa fa-tag"><%= tag %></li>
+                    <span data-i18n>Blocked</span>
                 <%
-                    });
+                }
+                else {
+                %>
+                    <span data-i18n>Unblocked</span>
+                <%
                 }
                 %>
-            </ul>
-        </td>
-    </tr>
+            </td>
+        </tr>
+    <% 
+    }
+    if (detailsFields['default'] != undefined && model.get('default')) { 
+    %>
+        <tr>
+            <td><i class="fa fa-home"></i><span data-i18n>Default</span></td>
+            <td>
+                <div class="second_row" data-i18n="Default image for this OSF"></div>
+            </td>
+        </tr>
+    <% 
+    }
+    if (detailsFields['head'] != undefined && model.get('head')) { 
+    %>
+        <tr> 
+            <td><i class="fa fa-flag-o"></i><span data-i18n>Head</span></td>
+            <td>
+                <div class="second_row" data-i18n="Last image created on this OSF"></div>
+            </td>
+        </tr>
+    <% 
+    }
+    if (detailsFields['tags'] != undefined) { 
+    %>
+        <tr>
+            <td><i class="fa fa-tags"></i><span data-i18n>Tags</span></td>
+            <td>
+            <%
+                if (!model.get('tags')) {
+            %>
+                    <span class="no-elements" data-i18n="There are not tags"></span>
+            <%
+                }
+            %>
+                <ul class="tags">
+                    <%
+                    if (model.get('tags')) {
+                        $(model.get('tags').split(',')).each( function (index, tag) {
+                    %>
+                            <li class="fa fa-tag"><%= tag %></li>
+                    <%
+                        });
+                    }
+                    %>
+                </ul>
+            </td>
+        </tr>
+    <% 
+    }
+    %>
 </table>

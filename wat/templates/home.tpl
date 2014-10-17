@@ -85,7 +85,7 @@
                     <td>
                         <%= Wat.C.ifACL('<a href="#/dis" data-i18n="Disk images">', 'di.see-main.') %>
                             <%= i18n.t('Disk images') %>
-                        <%= Wat.C.ifACL('</a>', 'di.see-main.') %>
+                        <%= Wat.C.ifACL('</a>', 'di.see.') %>
                     </td>
                     <td>
                         <span class="summary-data js-summary-dis"><%= stats.DI.total %></span>
@@ -104,9 +104,9 @@
                 <div class="js-running-hosts-percent home-title home-percent js-home-percent"></div>
                 <div id="running-hosts" class="pie-chart js-pie-chart" data-target="hosts" width="200px" height="200px"></div>
             </div>
-            <%= Wat.C.ifACL('<a href="#/hosts">', 'host.see-main.') %>
+            <%= Wat.C.ifACL('<a href="#/hosts">', 'host.see.') %>
                 <div class="js-running-hosts-data home-title"></div>
-            <%= Wat.C.ifACL('</a>', 'host.see-main.') %>
+            <%= Wat.C.ifACL('</a>', 'host.see.') %>
         </div>
         <% } %>
     </div>
@@ -180,9 +180,9 @@
                         <i class="<%= CLASS_ICON_USERS %>"></i>
                     </td>                    
                     <td>
-                        <%= Wat.C.ifACL('<a href="#/users" data-i18n="Users">', 'user.see-main.') %>
+                        <%= Wat.C.ifACL('<a href="#/users" data-i18n="Users">', 'user.see.') %>
                             <%= i18n.t('Users') %>
-                        <%= Wat.C.ifACL('</a>', 'user.see-main.') %>
+                        <%= Wat.C.ifACL('</a>', 'user.see.') %>
                     </td>
                     <td>
                         <span class="summary-data js-summary-blocked-users"><%= stats.User.blocked %></span>
@@ -194,9 +194,9 @@
                         <i class="<%= CLASS_ICON_VMS %>"></i>
                     </td>        
                     <td>
-                        <%= Wat.C.ifACL('<a href="#/vms" data-i18n="Virtual machines">', 'vm.see-main.') %>
+                        <%= Wat.C.ifACL('<a href="#/vms" data-i18n="Virtual machines">', 'vm.see.') %>
                             <%= i18n.t('Virtual machines') %>
-                        <%= Wat.C.ifACL('</a>', 'vm.see-main.') %>
+                        <%= Wat.C.ifACL('</a>', 'vm.see.') %>
                     </td>
                     <td>
                         <span class="summary-data js-summary-blocked-vms"><%= stats.VM.blocked %></span>
@@ -208,9 +208,9 @@
                         <i class="<%= CLASS_ICON_HOSTS %>"></i>
                     </td>       
                     <td>
-                        <%= Wat.C.ifACL('<a href="#/hosts" data-i18n="Nodes">', 'host.see-main.') %>
+                        <%= Wat.C.ifACL('<a href="#/hosts" data-i18n="Nodes">', 'host.see.') %>
                             <%= i18n.t('Nodes') %>
-                        <%= Wat.C.ifACL('</a>', 'host.see-main.') %>
+                        <%= Wat.C.ifACL('</a>', 'host.see.') %>
                     </td>
                     <td>
                         <span class="summary-data js-summary-blocked-hosts"><%= stats.Host.blocked %></span>
@@ -222,9 +222,9 @@
                         <i class="<%= CLASS_ICON_DIS %>"></i>
                     </td>                
                     <td>
-                        <%= Wat.C.ifACL('<a href="#/dis" data-i18n="Disk images">', 'di.see-main.') %>
+                        <%= Wat.C.ifACL('<a href="#/dis" data-i18n="Disk images">', 'di.see.') %>
                             <%= i18n.t('Disk images') %>
-                        <%= Wat.C.ifACL('</a>', 'di.see-main.') %>
+                        <%= Wat.C.ifACL('</a>', 'di.see.') %>
                     </td>
                     <td>
                         <span class="summary-data js-summary-blocked-dis"><%= stats.DI.blocked %></span>

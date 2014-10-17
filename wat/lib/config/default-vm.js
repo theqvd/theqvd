@@ -1,7 +1,7 @@
 var qvdObj = 'vm';
 
 // Columns configuration on list view
-Wat.I.listColumns[qvdObj] = {
+Wat.I.listFields[qvdObj] = {
     'checks': {
         'text': 'checks',
         'fields': [],
@@ -28,7 +28,7 @@ Wat.I.listColumns[qvdObj] = {
         'fields': [
             'id'
         ],
-        'acls': 'vm.see-main.id',
+        'acls': 'vm.see.id',
         'display': false,
     },
     'name': {
@@ -45,7 +45,7 @@ Wat.I.listColumns[qvdObj] = {
             'host_id',
             'host_name'
         ],
-        'acls': 'vm.see-main.host',
+        'acls': 'vm.see.host',
         'display': true
     },
     'user': {
@@ -54,7 +54,7 @@ Wat.I.listColumns[qvdObj] = {
             'user_id',
             'user_name'
         ],
-        'acls': 'vm.see-main.user',
+        'acls': 'vm.see.user',
         'display': true
     },
     'osf': {
@@ -63,7 +63,7 @@ Wat.I.listColumns[qvdObj] = {
             'osf_id',
             'osf_name'
         ],
-        'acls': 'vm.see-main.osf',
+        'acls': 'vm.see.osf',
         'display': false
     },
     'osf\/tag': {
@@ -75,8 +75,8 @@ Wat.I.listColumns[qvdObj] = {
             'di_id'
         ],
         'acls': [
-            'vm.see-main.osf',
-            'vm.see-main.osf-tag'
+            'vm.see.osf',
+            'vm.see.di-tag'
         ],
         'aclsLogic': 'AND',
         'display': true
@@ -86,7 +86,7 @@ Wat.I.listColumns[qvdObj] = {
         'fields': [
             'di_tag'
         ],
-        'acls': 'vm.see-main.osf-tag',
+        'acls': 'vm.see.di-tag',
         'display': false
     },
     'di_version': {
@@ -94,7 +94,7 @@ Wat.I.listColumns[qvdObj] = {
         'fields': [
             'di_version'
         ],
-        'acls': 'vm.see-main.di-version',
+        'acls': 'vm.see.di-version',
         'display': false
     },
     'disk_image': {
@@ -103,7 +103,7 @@ Wat.I.listColumns[qvdObj] = {
             'di_name',
             'di_id'
         ],
-        'acls': 'vm.see-main.di',
+        'acls': 'vm.see.di',
         'display': false
     },
     'ip': {
@@ -111,7 +111,7 @@ Wat.I.listColumns[qvdObj] = {
         'fields': [
             'ip'
         ],
-        'acls': 'vm.see-main.ip',
+        'acls': 'vm.see.ip',
         'display': false
     },
     'next_boot_ip': {
@@ -119,7 +119,7 @@ Wat.I.listColumns[qvdObj] = {
         'fields': [
             'next_boot_ip'
         ],
-        'acls': 'vm.see-main.next-boot-ip',
+        'acls': 'vm.see.next-boot-ip',
         'display': false
     },
     'serial_port': {
@@ -127,7 +127,7 @@ Wat.I.listColumns[qvdObj] = {
         'fields': [
             'serial_port'
         ],
-        'acls': 'vm.see-main.port-serial',
+        'acls': 'vm.see.port-serial',
         'display': false
     },
     'ssh_port': {
@@ -135,7 +135,7 @@ Wat.I.listColumns[qvdObj] = {
         'fields': [
             'ssh_port'
         ],
-        'acls': 'vm.see-main.port-ssh',
+        'acls': 'vm.see.port-ssh',
         'display': false
     },
     'vnc_port': {
@@ -143,7 +143,7 @@ Wat.I.listColumns[qvdObj] = {
         'fields': [
             'vnc_port'
         ],
-        'acls': 'vm.see-main.port-vnc',
+        'acls': 'vm.see.port-vnc',
         'display': false
     },
     'creation_date': {
@@ -151,7 +151,7 @@ Wat.I.listColumns[qvdObj] = {
         'fields': [
             'creation_date'
         ],
-        'acls': 'vm.see-main.creation-date',
+        'acls': 'vm.see.creation-date',
         'display': false
     },
     'creation_admin': {
@@ -159,8 +159,169 @@ Wat.I.listColumns[qvdObj] = {
         'fields': [
             'creation_admin'
         ],
-        'acls': 'vm.see-main.created-by',
+        'acls': 'vm.see.created-by',
         'display': false
+    }
+};
+
+// Fields configuration on details view
+Wat.I.detailsFields[qvdObj] = {
+    'id': {
+        'text': 'Id',
+        'fields': [
+            'id'
+        ],
+        'acls': 'vm.see.id',
+        'display': false,
+    },
+    'name': {
+        'text': 'Name',
+        'fields': [
+            'id',
+            'name'
+        ],
+        'display': true
+    },
+    'block': {
+        'display': true,
+        'fields': [
+            'id'
+        ],
+        'acls': 'vm.see.block',
+        'text': 'Blocking'
+    },
+    'host': {
+        'text': 'Node',
+        'fields': [
+            'host_id',
+            'host_name'
+        ],
+        'acls': 'vm.see.host',
+        'display': true
+    },
+    'user': {
+        'text': 'User',
+        'fields': [
+            'user_id',
+            'user_name'
+        ],
+        'acls': 'vm.see.user',
+        'display': true
+    },
+    'user_state': {
+        'text': 'User state',
+        'fields': [
+            'user_state'
+        ],
+        'acls': 'vm.see.user-state',
+        'display': true
+    },
+    'state': {
+        'text': 'State',
+        'fields': [
+            'state'
+        ],
+        'acls': 'vm.see.state',
+        'display': true
+    },
+    'osf': {
+        'text': 'OS Flavour',
+        'fields': [
+            'osf_id',
+            'osf_name'
+        ],
+        'acls': 'vm.see.osf',
+        'display': false
+    },
+    'tag': {
+        'text': 'Tag',
+        'fields': [
+            'di_tag'
+        ],
+        'acls': 'vm.see.di-tag',
+        'display': false
+    },
+    'di_version': {
+        'text': 'DI version',
+        'fields': [
+            'di_version'
+        ],
+        'acls': 'vm.see.di-version',
+        'display': false
+    },
+    'disk_image': {
+        'text': 'Disk image',
+        'fields': [
+            'di_name',
+            'di_id'
+        ],
+        'acls': 'vm.see.di',
+        'display': false
+    },
+    'expiration': {
+        'text': 'Info',
+        'fields': [
+            'expiration_soft',
+            'expiration_hard'
+        ],
+        'acls': 'vm.see.expiration',
+        'display': true
+    },
+    'ip': {
+        'text': 'IP address',
+        'fields': [
+            'ip'
+        ],
+        'acls': 'vm.see.ip',
+        'display': false
+    },
+    'next_boot_ip': {
+        'text': 'Next boot IP',
+        'fields': [
+            'next_boot_ip'
+        ],
+        'acls': 'vm.see.next-boot-ip',
+        'display': false
+    },
+    'serial_port': {
+        'text': 'Serial port',
+        'fields': [
+            'serial_port'
+        ],
+        'acls': 'vm.see.port-serial',
+        'display': false
+    },
+    'ssh_port': {
+        'text': 'SSH port',
+        'fields': [
+            'ssh_port'
+        ],
+        'acls': 'vm.see.port-ssh',
+        'display': false
+    },
+    'vnc_port': {
+        'text': 'VNC port',
+        'fields': [
+            'vnc_port'
+        ],
+        'acls': 'vm.see.port-vnc',
+        'display': false
+    },
+    'creation_date': {
+        'text': 'Creation date',
+        'fields': [
+            'creation_date'
+        ],
+        'acls': 'vm.see.creation-date',
+        'display': true
+    },
+    'creation_admin': {
+        'text': 'Created by',
+        'fields': [
+            'creation_admin'
+        ],
+        'acls': 'vm.see.created-by',
+        'display': true
     }
 };
 
@@ -197,7 +358,7 @@ Wat.I.formFilters[qvdObj] = {
                     ],
         'displayMobile': false,
         'displayDesktop': true,
-        'acls': 'vm.see-main.state'
+        'acls': 'vm.see.state'
     },
     'user': {
         'filterField': 'user_id',
@@ -214,7 +375,7 @@ Wat.I.formFilters[qvdObj] = {
                     ],
         'displayMobile': false,
         'displayDesktop': true,
-        'acls': 'vm.see-main.user'
+        'acls': 'vm.see.user'
     },
     'osf': {
         'filterField': 'osf_id',
@@ -231,7 +392,7 @@ Wat.I.formFilters[qvdObj] = {
                     ],
         'displayMobile': false,
         'displayDesktop': true,
-        'acls': 'vm.see-main.osf'
+        'acls': 'vm.see.osf'
     },
     'host': {
         'filterField': 'host_id',
@@ -248,7 +409,7 @@ Wat.I.formFilters[qvdObj] = {
                     ],
         'displayMobile': false,
         'displayDesktop': true,
-        'acls': 'vm.see-main.host'
+        'acls': 'vm.see.host'
     }
 };
 

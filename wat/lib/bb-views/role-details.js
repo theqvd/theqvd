@@ -59,7 +59,7 @@ Wat.Views.RoleDetailsView = Wat.Views.DetailsView.extend({
     },
     
     renderSide: function () {
-        if (this.checkSide({'role.see-details.acl-list': '.js-side-component1'}) === false) {
+        if (this.checkSide({'role.see.acl-list': '.js-side-component1'}) === false) {
             return;
         }
         
@@ -71,13 +71,13 @@ Wat.Views.RoleDetailsView = Wat.Views.DetailsView.extend({
         params.listContainer = sideContainer;
         params.forceListColumns = {name: true};
         // If Administrator has permission show origin of ACLs
-        if (Wat.C.checkACL('role.see-details.acl-list-roles')) {
+        if (Wat.C.checkACL('role.see.acl-list-roles')) {
             params.forceListColumns.roles = true;
         }
         params.forceSelectedActions = {};
         params.forceListActionButton = null;
         params.block = 20;
-        params.filters = {"id": this.elementId};
+        params.filters = {"role_id": this.elementId};
         params.action = 'get_acls_in_roles';
         
         this.sideView = new Wat.Views.ACLListView(params);

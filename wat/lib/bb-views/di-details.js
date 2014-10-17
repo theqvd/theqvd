@@ -7,7 +7,7 @@ Wat.Views.DIDetailsView = Wat.Views.DetailsView.extend({
     },
     
     renderSide: function () {
-        if (this.checkSide({'di.see-details.vm-list': '.js-side-component1'}) === false) {
+        if (this.checkSide({'di.see.vm-list': '.js-side-component1'}) === false) {
             return;
         }
         
@@ -79,6 +79,7 @@ Wat.Views.DIDetailsView = Wat.Views.DetailsView.extend({
     render: function () {
         // Add name of the image disk to breadcrumbs because in this case is not 'name'
         this.breadcrumbs.next.next.screen = this.model.get('disk_image');
+        this.notFound = this.model.attributes.disk_image == undefined;
         
         Wat.Views.DetailsView.prototype.render.apply(this);
     },

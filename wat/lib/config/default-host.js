@@ -1,7 +1,7 @@
 var qvdObj = 'host';
 
 // Columns configuration on list view
-Wat.I.listColumns[qvdObj] = {
+Wat.I.listFields[qvdObj] = {
     'checks': {
         'display': true,
         'fields': [],
@@ -23,8 +23,8 @@ Wat.I.listColumns[qvdObj] = {
             'blocked'
         ],
         'acls': [
-            'host.see-main.block',
-            'host.see-main.state'
+            'host.see.block',
+            'host.see.state'
         ],
         'aclsLogic': 'OR',
         'text': 'Info'
@@ -34,7 +34,7 @@ Wat.I.listColumns[qvdObj] = {
         'fields': [
             'id'
         ],
-        'acls': 'host.see-main.id',
+        'acls': 'host.see.id',
         'text': 'Id'
     },
     'name': {
@@ -50,7 +50,7 @@ Wat.I.listColumns[qvdObj] = {
         'fields': [
             'state'
         ],
-        'acls': 'host.see-main.state',
+        'acls': 'host.see.state',
         'text': 'State'
     },
     'address': {
@@ -58,7 +58,7 @@ Wat.I.listColumns[qvdObj] = {
         'fields': [
             'address'
         ],
-        'acls': 'host.see-main.address',
+        'acls': 'host.see.address',
         'text': 'IP address'
     },
     'vms_connected': {
@@ -67,7 +67,7 @@ Wat.I.listColumns[qvdObj] = {
             'id',
             'vms_connected'
         ],
-        'acls': 'host.see-main.vms-info',
+        'acls': 'host.see.vms-info',
         'text': 'Running VMs'
     },
     'creation_date': {
@@ -75,7 +75,7 @@ Wat.I.listColumns[qvdObj] = {
         'fields': [
             'creation_date'
         ],
-        'acls': 'host.see-main.creation-date',
+        'acls': 'host.see.creation-date',
         'display': false
     },
     'creation_admin': {
@@ -83,7 +83,7 @@ Wat.I.listColumns[qvdObj] = {
         'fields': [
             'creation_admin'
         ],
-        'acls': 'host.see-main.created-by',
+        'acls': 'host.see.created-by',
         'display': false
     },
     'Cosa': {
@@ -91,9 +91,78 @@ Wat.I.listColumns[qvdObj] = {
         'fields': [
             'Cosa'
         ],
-        'acls': 'host.see-main.properties',
+        'acls': 'host.see.properties',
         'property': true,
         'text': 'Cosa'
+    }
+};
+
+// Fields configuration on details view
+Wat.I.detailsFields[qvdObj] = {
+    'id': {
+        'display': false,
+        'fields': [
+            'id'
+        ],
+        'acls': 'host.see.id',
+        'text': 'Id'
+    },
+    'name': {
+        'display': true,
+        'fields': [
+            'id',
+            'name'
+        ],
+        'text': 'Name'
+    },
+    'block': {
+        'display': true,
+        'fields': [
+            'id'
+        ],
+        'acls': 'host.see.block',
+        'text': 'Blocking'
+    },
+    'state': {
+        'display': false,
+        'fields': [
+            'state'
+        ],
+        'acls': 'host.see.state',
+        'text': 'State'
+    },
+    'address': {
+        'display': true,
+        'fields': [
+            'address'
+        ],
+        'acls': 'host.see.address',
+        'text': 'IP address'
+    },
+    'vms_connected': {
+        'display': true,
+        'fields': [
+            'id',
+            'vms_connected'
+        ],
+        'acls': 'host.see.vms-info',
+        'text': 'Running VMs'
+    },
+    'creation_date': {
+        'text': 'Creation date',
+        'fields': [
+            'creation_date'
+        ],
+        'acls': 'host.see.creation-date',
+        'display': false
+    },
+    'creation_admin': {
+        'text': 'Created by',
+        'fields': [
+            'creation_admin'
+        ],
+        'acls': 'host.see.created-by',
+        'display': false
     }
 };
 
@@ -121,7 +190,7 @@ Wat.I.formFilters[qvdObj] = {
                     ],
         'displayMobile': false,
         'displayDesktop': true,
-        'acls': 'host.see-main.vms-info'
+        'acls': 'host.see.vms-info'
     }
 };
 

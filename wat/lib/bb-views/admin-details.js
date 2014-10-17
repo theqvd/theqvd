@@ -119,7 +119,7 @@ Wat.Views.AdminDetailsView = Wat.Views.DetailsView.extend({
     },
     
     renderSide: function () {
-        if (this.checkSide({'administrator.see-details.acl-list': '.js-side-component1'}) === false) {
+        if (this.checkSide({'administrator.see.acl-list': '.js-side-component1'}) === false) {
             return;
         }
         
@@ -131,13 +131,13 @@ Wat.Views.AdminDetailsView = Wat.Views.DetailsView.extend({
         params.listContainer = sideContainer;
         params.forceListColumns = {name: true};
         // If Administrator has permission and more than one role assigned, show origin of ACLs
-        if (Wat.C.checkACL('role.see-details.acl-list-roles') && this.model.attributes.roles.length > 1) {
+        if (Wat.C.checkACL('role.see.acl-list-roles') && this.model.attributes.roles.length > 1) {
             params.forceListColumns.roles = true;
         }
         params.forceSelectedActions = {};
         params.forceListActionButton = null;
         params.block = 10;
-        params.filters = {"id": this.elementId};
+        params.filters = {"admin_id": this.elementId};
         params.action = 'get_acls_in_admins';
         
         this.sideView = new Wat.Views.ACLListView(params);

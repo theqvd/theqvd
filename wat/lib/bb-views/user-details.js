@@ -7,7 +7,7 @@ Wat.Views.UserDetailsView = Wat.Views.DetailsView.extend({
     },
     
     renderSide: function () {
-        if (this.checkSide({'user.see-details.vm-list': '.js-side-component1'}) === false) {
+        if (this.checkSide({'user.see.vm-list': '.js-side-component1'}) === false) {
             return;
         }
         

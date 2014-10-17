@@ -1,7 +1,7 @@
 var qvdObj = 'osf';
 
 // Columns configuration on list view
-Wat.I.listColumns[qvdObj] = {
+Wat.I.listFields[qvdObj] = {
     'checks': {
         'display': true,
         'fields': [],
@@ -21,7 +21,7 @@ Wat.I.listColumns[qvdObj] = {
         'fields': [
             'id'
         ],
-        'acls': 'osf.see-main.id',
+        'acls': 'osf.see.id',
         'text': 'Id'
     },
     'name': {
@@ -37,7 +37,7 @@ Wat.I.listColumns[qvdObj] = {
         'fields': [
             'overlay'
         ],
-        'acls': 'osf.see-main.overlay',
+        'acls': 'osf.see.overlay',
         'text': 'Overlay'
     },
     'memory': {
@@ -45,7 +45,7 @@ Wat.I.listColumns[qvdObj] = {
         'fields': [
             'memory'
         ],
-        'acls': 'osf.see-main.memory',
+        'acls': 'osf.see.memory',
         'text': 'Memory'
     },
     'user_storage': {
@@ -53,7 +53,7 @@ Wat.I.listColumns[qvdObj] = {
         'fields': [
             'user_storage'
         ],
-        'acls': 'osf.see-main.user-storage',
+        'acls': 'osf.see.user-storage',
         'text': 'User storage'
     },
     'dis': {
@@ -62,7 +62,7 @@ Wat.I.listColumns[qvdObj] = {
             'id',
             'dis'
         ],
-        'acls': 'osf.see-main.dis-info',
+        'acls': 'osf.see.dis-info',
         'text': 'DIs'
     },
     'vms': {
@@ -71,7 +71,7 @@ Wat.I.listColumns[qvdObj] = {
             'id',
             'vms'
         ],
-        'acls': 'osf.see-main.vms-info',
+        'acls': 'osf.see.vms-info',
         'text': 'VMs'
     },
     'creation_date': {
@@ -79,7 +79,7 @@ Wat.I.listColumns[qvdObj] = {
         'fields': [
             'creation_date'
         ],
-        'acls': 'osf.see-main.creation-date',
+        'acls': 'osf.see.creation-date',
         'display': false
     },
     'creation_admin': {
@@ -87,7 +87,86 @@ Wat.I.listColumns[qvdObj] = {
         'fields': [
             'creation_admin'
         ],
-        'acls': 'osf.see-main.created-by',
+        'acls': 'osf.see.created-by',
+        'display': false
+    }
+};
+
+
+// Fields configuration on details view
+Wat.I.detailsFields[qvdObj] = {
+    'id': {
+        'display': false,
+        'fields': [
+            'id'
+        ],
+        'acls': 'osf.see.id',
+        'text': 'Id'
+    },
+    'name': {
+        'display': true,
+        'fields': [
+            'id',
+            'name'
+        ],
+        'text': 'Name'
+    },
+    'overlay': {
+        'display': true,
+        'fields': [
+            'overlay'
+        ],
+        'acls': 'osf.see.overlay',
+        'text': 'Overlay'
+    },
+    'memory': {
+        'display': true,
+        'fields': [
+            'memory'
+        ],
+        'acls': 'osf.see.memory',
+        'text': 'Memory'
+    },
+    'user_storage': {
+        'display': true,
+        'fields': [
+            'user_storage'
+        ],
+        'acls': 'osf.see.user-storage',
+        'text': 'User storage'
+    },
+    'dis': {
+        'display': true,
+        'fields': [
+            'id',
+            'dis'
+        ],
+        'acls': 'osf.see.dis-info',
+        'text': 'DIs'
+    },
+    'vms': {
+        'display': true,
+        'fields': [
+            'id',
+            'vms'
+        ],
+        'acls': 'osf.see.vms-info',
+        'text': 'VMs'
+    },
+    'creation_date': {
+        'text': 'Creation date',
+        'fields': [
+            'creation_date'
+        ],
+        'acls': 'osf.see.creation-date',
+        'display': false
+    },
+    'creation_admin': {
+        'text': 'Created by',
+        'fields': [
+            'creation_admin'
+        ],
+        'acls': 'osf.see.created-by',
         'display': false
     }
 };
@@ -116,7 +195,7 @@ Wat.I.formFilters[qvdObj] = {
                     ],
         'displayMobile': false,
         'displayDesktop': true,
-        'acls': 'osf.see-main.vms-info'
+        'acls': 'osf.see.vms-info'
     },
     'di': {
         'filterField': 'di_id',
@@ -133,7 +212,7 @@ Wat.I.formFilters[qvdObj] = {
                     ],
         'displayMobile': false,
         'displayDesktop': true,
-        'acls': 'osf.see-main.dis-info'
+        'acls': 'osf.see.dis-info'
     }
 };
 

@@ -1,7 +1,7 @@
 var qvdObj = 'admin';
 
 // Columns configuration on list view
-Wat.I.listColumns[qvdObj] = {
+Wat.I.listFields[qvdObj] = {
     'checks': {
         'display': true,
         'fields': [],
@@ -15,7 +15,7 @@ Wat.I.listColumns[qvdObj] = {
         'fields': [
             'id'
         ],
-        'acls': 'administrator.see-main.id',
+        'acls': 'administrator.see.id',
         'text': 'Id'
     },
     'name': {

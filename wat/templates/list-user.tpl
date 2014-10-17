@@ -137,7 +137,7 @@
                             case 'connected_vms':
                 %>
                                 <td class="desktop">
-                                    <% if (model.get('number_of_vms') > 0 && Wat.C.checkACL('vm.see-main.')) { %>
+                                    <% if (model.get('number_of_vms') > 0 && Wat.C.checkACL('vm.see.')) { %>
                                     <a href="#/vms/user/<%= model.get('id') %>">
                                         <%= model.get('number_of_vms_connected') %>
                                         /

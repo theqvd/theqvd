@@ -175,7 +175,7 @@
                             case 'dis':
                 %>
                                 <td class="desktop">
-                                    <% if (model.get('number_of_dis') > 0 && Wat.C.checkACL('di.see-main.')) { %>
+                                    <% if (model.get('number_of_dis') > 0 && Wat.C.checkACL('di.see.')) { %>
                                     <a href="#/dis/osf/<%= model.get('id') %>">
                                         <%= model.get('number_of_dis') %>
                                     </a>
@@ -189,7 +189,7 @@
                             case 'vms':
                 %>
                                 <td class="desktop">
-                                    <% if (model.get('number_of_vms') > 0 && Wat.C.checkACL('vm.see-main.')) { %>
+                                    <% if (model.get('number_of_vms') > 0 && Wat.C.checkACL('vm.see.')) { %>
                                     <a href="#/vms/osf/<%= model.get('id') %>">
                                         <%= model.get('number_of_vms') %>
                                     </a>
