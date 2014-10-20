@@ -8,26 +8,37 @@ our $VERSION = '0.01';
 
 has 'json', is => 'ro', isa => sub { die "Invalid type for attribute json" 
 					 unless ref(+shift) eq 'HASH'; }, required => '1';
-has 'available_nested_queries', is => 'ro', isa => sub { die "Invalid type for attribute available_nested_queries" 
-							     unless ref(+shift) eq 'ARRAY'; }, 
-                                             default => sub {[qw(__roles_changes__ 
-                                                                 __acls_changes__ 
-                                                                 __tags_changes__ 
-                                                                 __properties_changes__ 
-                                                                 __properties__ 
-                                                                 __tags__ 
-                                                                 __acls__ 
-                                                                 __roles__)];};
-
-my $NESTED_QUERIES;
 
 sub BUILD
 {
     my $self = shift;
-	
+    $self->get_flatten_nested_queries;	
+}
+
+sub get_flatten_nested_queries
+{
+    my $self = shift;
+
     $self->json->{arguments} //= {};
-    $NESTED_QUERIES = {map { $_ => delete $self->json->{arguments}->{$_} } 
-		       @{$self->available_nested_queries}}; # TODO: Parse nested queries  
+    my $NQ = 
+    {map { $_ => delete $self->json->{arguments}->{$_} }
+     grep { $_ =~ /^__.+__$/ }
+     keys %{$self->json->{arguments}}};
+
+    for my $matrix_key (keys %$NQ)
+    {
+	next if $matrix_key eq '__properties__'; # FIX MEE!!!
+	defined $NQ->{$matrix_key} && ref($NQ->{$matrix_key}) &&
+	    ref($NQ->{$matrix_key}) eq 'HASH' || next;
+
+	for my $nested_key (keys %{$NQ->{$matrix_key}})
+	{
+	    $NQ->{$matrix_key.$nested_key} = $NQ->{$matrix_key}->{$nested_key};
+	}
+    
+	delete $NQ->{$matrix_key};
+    }
+    $self->{nested_queries} = $NQ;
 }
 
 sub offset
@@ -102,11 +113,32 @@ sub order_direction
 	}
 }
 
+
+sub nested_queries_list
+{
+    my $self = shift;
+    keys %{$self->nested_queries};
+}
+
+sub has_nested_query
+{
+    my ($self,$nq) = @_;
+
+    $_ eq $nq && return 1
+	for keys %{$self->nested_queries};
+    return 0;
+}
+
+sub get_nested_query_value
+{
+    my ($self,$nq) = @_;
+    return $self->nested_queries->{$nq};
+}
+
 sub nested_queries
 {
-	my ($self,$nested_query_key) = @_;
-	return $NESTED_QUERIES unless $nested_query_key;
-	return $NESTED_QUERIES->{$nested_query_key} || {};
+    my $self = shift;
+    return $self->{nested_queries} || {};
 }
 
 sub has_filter

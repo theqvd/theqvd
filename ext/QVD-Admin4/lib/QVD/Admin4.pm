@@ -56,7 +56,6 @@ sub update
     QVD::Admin4::Exception->throw(code => 25) unless $result->{total};
     my $failures = {}; 
     my $conditions = $modifiers{conditions} // [];
-    my $methods_for_nested_queries = $modifiers{methods_for_nested_queries} // [];
 
     for my $obj (@{$result->{rows}})
     {
@@ -67,7 +66,7 @@ sub update
 				  QVD::Admin4::Exception->throw(code => $DB->storage->_dbh->state,
 								message => "$@") if $@;
 				  $self->update_related_objects($request,$obj);
-				  $self->$_($request,$obj) for @$methods_for_nested_queries })};
+				  $self->exec_nested_queries($request,$obj);} ) };
 	print $@ if $@;
 	if ($@) { $failures->{$obj->id} = ($@->can('code') ? $@->code : 4); }
     }
@@ -107,9 +106,7 @@ sub create
     my ($self,$request,%modifiers) = @_;
     my $result;
     my $failures = {};
-
     my $conditions = $modifiers{conditions} // [];
-    my $methods_for_nested_queries = $modifiers{methods_for_nested_queries} // [];
 
     $DB->txn_do( sub { $self->$_($request) || QVD::Admin4::Exception->throw(code => 17)
 			   for @$conditions;
@@ -119,7 +116,7 @@ sub create
 						     message => "$@") if $@;
 
 		       $self->create_related_objects($request,$obj);
-		       $self->$_($request,$obj) for @$methods_for_nested_queries;
+		       $self->exec_nested_queries($request,$obj);
 		       $result->{rows} = [ $obj ] } );
     $result->{total} = 1;
     $result;
@@ -142,133 +139,6 @@ sub update_related_objects
     }    
 }
 
-sub update_custom_properties
-{
-    my($self,$request,$obj)=@_;
-
-    my $nested_queries = $request->nested_queries // return;
-    my $custom_prop_queries = $nested_queries->{__properties_changes__} // return;
-    my $cp_set_query = $custom_prop_queries->{set};
-    my $cp_del_query = $custom_prop_queries->{delete}; 
-
-    $self->custom_properties_set($cp_set_query,$obj)
-	if defined $cp_set_query;
-
-    $self->custom_properties_del($cp_del_query,$obj)
-	if defined $cp_del_query;
-}
-
-sub update_related_tags
-{
-    my($self,$request,$obj)=@_;
-
-    my $nested_queries = $request->nested_queries // return;
-    my $tags_queries = $nested_queries->{__tags_changes__} // return;
-    my $tags_create_query = $tags_queries->{create};
-    my $tags_delete_query = $tags_queries->{delete}; 
-
-    $self->tags_create($tags_create_query,$obj)
-	if defined $tags_create_query;
-
-    $self->tags_delete($tags_delete_query,$obj)
-	if defined $tags_delete_query;
-}
-
-sub update_role_acls
-{
-    my($self,$request,$obj)=@_;
-
-    my $nested_queries = $request->nested_queries // return;
-    $nested_queries = $nested_queries->{__acls_changes__} // return;
-
-    $self->coherent_acls_nested_query($nested_queries) 
-	|| QVD::Admin4::Exception->throw(code=>'27');
-
-    my $positive_acls_assign_query = $nested_queries->{assign_positive_acls};
-    my $negative_acls_assign_query = $nested_queries->{assign_negative_acls};
-    my $positive_acls_unassign_query = $nested_queries->{unassign_positive_acls}; 
-    my $negative_acls_unassign_query = $nested_queries->{unassign_negative_acls}; 
-
-    $self->add_acls_to_role($positive_acls_assign_query,$obj,1)
-	if defined $positive_acls_assign_query;
-
-    $self->add_acls_to_role($negative_acls_assign_query,$obj,0)
-	if defined $negative_acls_assign_query;
-
-    $self->del_acls_to_role($positive_acls_unassign_query,$obj)
-	if defined $positive_acls_unassign_query;
-
-    $self->del_acls_to_role($negative_acls_unassign_query,$obj)
-	if defined $negative_acls_unassign_query;
-}
-
-sub update_role_roles
-{
-    my($self,$request,$obj)=@_;
-
-    my $nested_queries = $request->nested_queries // return;
-    $nested_queries = $nested_queries->{__roles_changes__} // return;
-
-    my $roles_assign_query = $nested_queries->{assign_roles};
-    my $roles_unassign_query = $nested_queries->{unassign_roles}; 
-
-    $self->add_roles_to_role($roles_assign_query,$obj)
-	if defined $roles_assign_query;
-
-    $self->del_roles_to_role($roles_unassign_query,$obj)
-	if defined $roles_unassign_query;
-}
-
-
-sub coherent_acls_nested_query
-{
-    my ($self,$nested_query) = @_;
-
-    $nested_query->{assign_positive_acls} //= [];
-    $nested_query->{assign_negative_acls} //= [];
-    $nested_query->{unassign_positive_acls} //= []; 
-    $nested_query->{unassign_negative_acls} //= []; 
-
-    my %positive_acls_to_assign = map { $_ => 1 } 
-    @{$nested_query->{assign_positive_acls}};
-    my %negative_acls_to_assign = map { $_ => 1 } 
-    @{$nested_query->{assign_negative_acls}};
-    my %positive_acls_to_unassign = map { $_ => 1 } 
-    @{$nested_query->{unassign_positive_acls}}; 
-    my %negative_acls_to_unassign = map { $_ => 1 } 
-    @{$nested_query->{unassign_negative_acls}}; 
-
-    exists $negative_acls_to_assign{$_} && return 0 
-	for (keys %positive_acls_to_assign);
-
-    exists $negative_acls_to_unassign{$_} && return 0 
-	for (keys %positive_acls_to_unassign);
-
-    exists $negative_acls_to_unassign{$_} && return 0 
-	for (keys %negative_acls_to_assign);
-
-    exists $positive_acls_to_unassign{$_} && return 0 
-	for (keys %positive_acls_to_assign);
-    return 1;
-}
-
-sub update_admin_roles
-{
-    my($self,$request,$obj)=@_;
-
-    my $nested_queries = $request->nested_queries // return;
-    $nested_queries = $nested_queries->{__roles_changes__} // return;
-    my $roles_assign_query = $nested_queries->{assign_roles};
-    my $roles_unassign_query = $nested_queries->{unassign_roles}; 
-
-    $self->add_roles_to_admin($roles_assign_query,$obj)
-	if defined $roles_assign_query;
-
-    $self->del_roles_to_admin($roles_unassign_query,$obj)
-	if defined $roles_unassign_query;
-}
-
-
 sub create_related_objects
 {
     my ($self,$request,$obj) = @_;
@@ -283,84 +153,17 @@ sub create_related_objects
     }
 }
 
-sub create_custom_properties
+sub exec_nested_queries
 {
     my($self,$request,$obj)=@_;
 
-    my $nested_queries = $request->nested_queries // return;
-    my $custom_prop_queries = $nested_queries->{__properties__} // return;
-
-    $self->custom_properties_set($custom_prop_queries,$obj);
+    my %nq = %{$request->nested_queries};
+    for (keys %nq)
+    {
+	$self->$_($nq{$_},$obj); 
+    }    
 }
 
-sub create_related_tags
-{
-    my($self,$request,$di)=@_;
-
-    eval {
-
-    $di->osf->delete_tag('head');
-    $di->osf->delete_tag($di->version);
-    $DB->resultset('DI_Tag')->create({di_id => $di->id, tag => $di->version, fixed => 1});
-    $DB->resultset('DI_Tag')->create({di_id => $di->id, tag => 'head'});
-    $DB->resultset('DI_Tag')->create({di_id => $di->id, tag => 'default'})
-	unless $di->osf->di_by_tag('default')
-    };
-
-    QVD::Admin4::Exception->throw(code => $DB->storage->_dbh->state,
-				  message => "$@") if $@;
-
-    my $nested_queries = $request->nested_queries // return;
-    my $tags_queries = $nested_queries->{__tags__} // return;
-
-    $self->tags_create($tags_queries,$di)
-}
-
-sub create_role_acls
-{
-    my($self,$request,$obj)=@_;
-
-    my $nested_queries = $request->nested_queries // return;
-    $nested_queries = $nested_queries->{__acls__} // return;
-
-    $self->coherent_acls_nested_query($nested_queries) 
-	|| QVD::Admin4::Exception->throw(code=>'27');
-
-    my $positive_acls_assign_query = $nested_queries->{positive};
-    my $negative_acls_assign_query = $nested_queries->{negative};
-
-    $self->add_acls_to_role($positive_acls_assign_query,$obj,1)
-	if defined $positive_acls_assign_query;
-
-    $self->add_acls_to_role($negative_acls_assign_query,$obj,0)
-	if defined $negative_acls_assign_query;
-}
-
-sub create_role_roles
-{
-    my($self,$request,$obj)=@_;
-
-    my $nested_queries = $request->nested_queries // return;
-    my $roles = $nested_queries->{__roles__} // return;
-
-    use Data::Dumper; print Dumper $roles;
-
-    $self->add_roles_to_role($roles,$obj)
-	if defined $roles;
-
-}
-
-
-sub create_admin_roles
-{
-    my($self,$request,$obj)=@_;
-
-    my $nested_queries = $request->nested_queries // return;
-    $nested_queries = $nested_queries->{__roles__} // return;
-
-    $self->add_roles_to_admin($nested_queries,$obj)
-	if defined $nested_queries;
-}
 
 #########################
 ##### NESTED QUERIES ####
@@ -404,6 +207,10 @@ sub tags_create
 {
     my ($self,$tags,$di) = @_;
 
+
+    QVD::Admin4::Exception->throw(code => $DB->storage->_dbh->state,
+				  message => "$@") if $@;
+
     for my $tag (@$tags)
     { 	
 	eval {  $di->osf->di_by_tag($tag,'1') && QVD::Admin4::Exception->throw(code => 16);
@@ -434,7 +241,7 @@ sub tags_delete
 
 sub add_acls_to_role
 {
-    my ($self,$acl_names,$role,$positive) = @_;
+    my ($self,$acl_names,$role) = @_;
 
     for my $acl_name (@$acl_names)
     { 	
@@ -443,10 +250,9 @@ sub add_acls_to_role
 	QVD::Admin4::Exception->throw(code => 21) 
 	    unless $acl; 
 
-#	next if $role->is_allowed_to($acl->name);
-#	$role->has_negative_acl($acl->name) ?
-#	    $self->unassign_acls_to_role($role,$acl->name) :
-	    $self->assign_acl_to_role($role,$acl->name,$positive);
+	$role->has_negative_acl($acl->name) ?
+	    $self->switch_acl_sign_in_role($role,$acl->name) :
+	    $self->assign_acl_to_role($role,$acl->name,1);
     }
 }
 
@@ -461,11 +267,9 @@ sub del_acls_to_role
 	QVD::Admin4::Exception->throw(code => 21)
 	    unless $acl; 
 
-#	next unless $role->is_allowed_to($acl->name);
-#	$role->has_positive_acl($acl->name) ?
-#	    $self->unassign_acls_to_role($role,$acl->name) :
-#	    $self->assign_acl_to_role($role,$acl->name,0);
-	$self->unassign_acl_to_role($role,$acl->name);
+	$role->has_positive_acl($acl->name) ?
+	    $self->switch_acl_sign_in_role($role,$acl->name) :
+	    $self->assign_acl_to_role($role,$acl->name,0);
     }
 }
 
@@ -497,7 +301,7 @@ sub del_roles_to_role
 	QVD::Admin4::Exception->throw(code => 20) 
 	    unless $role_to_unassign;
 
-	$self->unassign_roles_to_role($this_role,$role_to_unassign->id);
+	$self->unassign_role_to_role($this_role,$role_to_unassign->id);
     }
 
 #    return unless @$roles_to_unassign; 
@@ -509,6 +313,26 @@ sub del_roles_to_role
 
 #############
 
+sub switch_acl_sign_in_role
+{
+    my ($self,$role,$acl_name) = @_;
+
+    my $acl_id = eval { $DB->resultset('ACL')->find({name => $acl_name})->id }
+    // QVD::Admin4::Exception->throw(code=>'21');
+
+    my $acl_role_rel = eval { $DB->resultset('ACL_Role_Relation')->find(
+				  {role_id => $role->id,
+				   acl_id => $acl_id }) }
+    // QVD::Admin4::Exception->throw(code=>'21');
+
+    eval { $acl_role_rel->update({ positive => $acl_role_rel->positive ? 0 : 1 }) };
+
+    print $@ if $@;
+    QVD::Admin4::Exception->throw(code => $DB->storage->_dbh->state,
+				  message => "$@") if $@;
+}
+
+
 sub assign_acl_to_role
 {
     my ($self,$role,$acl_name,$positive) = @_;
@@ -517,6 +341,7 @@ sub assign_acl_to_role
     // QVD::Admin4::Exception->throw(code=>'21');
     eval { $role->create_related('acl_rels', { acl_id => $acl_id,
 					       positive => $positive }) };
+    print $@ if $@;
     QVD::Admin4::Exception->throw(code => $DB->storage->_dbh->state,
 				  message => "$@") if $@;
 }
@@ -530,6 +355,7 @@ sub unassign_acl_to_role
     for ($role->search_related('acl_rels', { acl_id => $acl_id })->all)
     {
 	eval { $_->delete };
+	print $@ if $@;
 	QVD::Admin4::Exception->throw(code => $DB->storage->_dbh->state,
 				      message => "$@") if $@;
     } 	
@@ -546,11 +372,13 @@ sub assign_role_to_role
 	for $inherited_role->_get_inherited_roles(return_value => 'id');
 
     eval { $inheritor_role->create_related('role_rels', { inherited_id => $inherited_role_id }) };
+
+    print $@ if $@;
     QVD::Admin4::Exception->throw(code => $DB->storage->_dbh->state,
 				  message => "$@") if $@;
 }
 
-sub unassign_roles_to_role
+sub unassign_role_to_role
 {
     my ($self,$role,$role_ids) = @_;
 
@@ -558,6 +386,8 @@ sub unassign_roles_to_role
     for ($rs->all)
     {
 	eval { $_->delete };
+
+	print $@ if $@;
 	QVD::Admin4::Exception->throw(code => $DB->storage->_dbh->state,
 				      message => "$@") if $@;
     }
@@ -595,65 +425,6 @@ sub add_roles_to_admin
 ###### AD HOC FUNCTIONS #####
 #############################
 
-sub update_with_custom_properties
-{
-    my ($self,$request) = @_;
-
-    $self->update($request, methods_for_nested_queries => 
-		  [qw(update_custom_properties)]);
-
-}
-
-sub create_with_custom_properties
-{
-    my ($self,$request) = @_;
-
-    $self->create($request, methods_for_nested_queries => 
-		  [qw(create_custom_properties)]);
-
-}
-
-sub di_update
-{
-    my ($self,$request) = @_;
-
-    $self->update($request, methods_for_nested_queries => 
-		  [qw(update_custom_properties
-                      update_related_tags)]);
-}
-
-sub role_update
-{
-    my ($self,$request) = @_;
-
-    $self->update($request, methods_for_nested_queries => 
-		  [qw(update_role_roles update_role_acls)]);
-}
-
-sub role_create
-{
-    my ($self,$request) = @_;
-
-    $self->create($request, methods_for_nested_queries => 
-		  [qw(create_role_roles create_role_acls)]);
-}
-
-sub admin_update
-{
-    my ($self,$request) = @_;
-
-    $self->update($request, methods_for_nested_queries => 
-		  [qw(update_admin_roles)]);
-}
-
-sub admin_create
-{
-    my ($self,$request) = @_;
-
-    $self->create($request, methods_for_nested_queries => 
-		  [qw(create_admin_roles)]);
-}
-
 sub vm_delete
 {
     my ($self,$request) = @_;
@@ -681,6 +452,17 @@ sub di_create
     my $result = $self->create($request, methods_for_nested_queries => 
 			     [qw(create_custom_properties create_related_tags)]);
     my $di = @{$result->{rows}}[0];
+
+    eval {
+
+    $di->osf->delete_tag('head');
+    $di->osf->delete_tag($di->version);
+    $DB->resultset('DI_Tag')->create({di_id => $di->id, tag => $di->version, fixed => 1});
+    $DB->resultset('DI_Tag')->create({di_id => $di->id, tag => 'head'});
+    $DB->resultset('DI_Tag')->create({di_id => $di->id, tag => 'default'})
+	unless $di->osf->di_by_tag('default')
+    };
+
     my $images_file  = $di->id . '-' . $staging_file;
     $di->update({path => $images_file});
 
@@ -700,7 +482,6 @@ sub di_delete {
     $self->delete($request,conditions => [qw(di_no_vm_runtimes 
                                           di_no_head_default_tags)]);
 }
-
 
 sub vm_user_disconnect
 {
@@ -858,8 +639,9 @@ sub get_acls_in_admins
 	for my $acl_id (keys %{$inherited_acls_tree->{$role->id}->{iacls}})
 	{
 	    $acls_info->{$acl_id} = $inherited_acls_tree->{$role->id}->{iacls}->{$acl_id};
-	    $acls_info->{$acl_id}->{roles} //= [];
-	    push @{$acls_info->{$acl_id}->{roles}}, $inherited_acls_tree->{$role->id}->{name};
+	    $acls_info->{$acl_id}->{roles} //= {};
+            $acls_info->{$acl_id}->{roles}->{$role->id} =
+                $inherited_acls_tree->{$role->id}->{name};
 	}
     }
 
@@ -890,11 +672,12 @@ sub get_acls_in_roles
 	for my $acl_id (keys %{$inherited_acls_tree->{$role->id}->{iacls}})
 	{
 	    $acls_info->{$acl_id} = $inherited_acls_tree->{$role->id}->{iacls}->{$acl_id};
-	    $acls_info->{$acl_id}->{roles} = 
-		defined $inherited_acls_tree->{$role->id}->{acls}->{1}->{$acl_id} ? [$role->name] : [];
-	    push @{$acls_info->{$acl_id}->{roles}},
-	    map { $_->{name} } grep { defined $_->{iacls}->{$acl_id} }
-	    values %{$inherited_acls_tree->{$role->id}->{roles}};
+	    $acls_info->{$acl_id}->{roles}->{$role->id} = $role->name if
+                defined $inherited_acls_tree->{$role->id}->{acls}->{1}->{$acl_id};
+
+            $acls_info->{$acl_id}->{roles}->{$_->{id}} = $_->{name}
+                for grep { defined $_->{iacls}->{$acl_id} }
+                    values %{$inherited_acls_tree->{$role->id}->{roles}};
 	}
     }
 

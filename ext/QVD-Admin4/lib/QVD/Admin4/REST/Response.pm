@@ -47,6 +47,8 @@ my $mapper =
     34 => 'Forbidden filter for this administrator',
     35 => 'Forbidden argument for this administrator',
     36 => 'Forbidden field for this administrator',
+    37 => 'Innapropiate nested query for this action',
+    38 => 'Forbidden nested query for this administrator',
     23503 => 'Foreign Key violation',
     23502 => 'Lack of mandatory argument violation',
     23505 => 'Unique Key violation',
@@ -85,7 +87,7 @@ sub map_dbix_object_to_output_info
     my ($self,$dbix_object) = @_;
     my $result = {};
     my $admin = $self->qvd_object_model->current_qvd_administrator;
-    my @available_fields = grep  { $admin->is_allowed_to($self->qvd_object_model->get_acls_for_argument($_)) }
+    my @available_fields = grep  { $admin->is_allowed_to($self->qvd_object_model->get_acls_for_field($_)) }
 	$self->qvd_object_model->available_fields;
 
     for my $field_key (@available_fields)

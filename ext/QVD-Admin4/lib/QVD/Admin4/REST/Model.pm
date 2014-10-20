@@ -36,8 +36,10 @@ my $ACLS_FOR_FILTERS = {
 	    blocked => [], 
 	    expiration_soft => [],
 	    expiration_hard => [],
-	    state host_id => [],
-	    host_name di_id => [], 
+	    state => [],
+	    host_id => [],
+	    host_name => [],
+	    di_id => [], 
 	    user_state => [],
 	    ip => [],
 	    next_boot_ip => [],
@@ -214,7 +216,8 @@ my $ACLS_FOR_FIELDS = {
 	      properties => [] },
 
     DI_Tag => { osf_id => [],
-		name id => [] },
+		name => [],
+		id => [] },
 
     Tenant_View => { id => [],
 		     tenant_id => [],
@@ -245,37 +248,35 @@ my $ACLS_FOR_ARGUMENTS_IN_UPDATE = { User => { name => [],
 					     expiration_hard => [],
 					     storage => [],
 					     di_tag => [],
-					     __properties_changes_set => [],
-					     __properties_changes_delete => [] },
+					     __properties_changes__set => [],
+					     __properties_changes__delete => [] },
 				     Host => { name => [],
 					       address => [],
 					       blocked => [],
-					       __properties_changes_set => [],
-					       __properties_changes_delete => [] },
+					       __properties_changes__set => [],
+					       __properties_changes__delete => [] },
 				     OSF => { name => [],
 					      memory => [],
 					      user_storage => [],
 					      overlay => [],
-					      __properties_changes_set => [],
-					      __properties_changes_delete => [] },
+					      __properties_changes__set => [],
+					      __properties_changes__delete => [] },
 				     DI => { blocked => [],
 					     disk_image => [],
-					     __properties_changes_set => [],
-					     __properties_changes_delete => [],
-					     __tags_changes_add => [],
-					     __tags_changes_delete => []},
+					     __properties_changes__set => [],
+					     __properties_changes__delete => [],
+					     __tags_changes__create => [],
+					     __tags_changes__delete => []},
 				     Tenant => { name => [] },
 				     Role => { name => [],
-					       __acls_changes_assign_positive_acls => [],
-					       __acls_changes_unassign_positive_acls => [],
-					       __acls_changes_assign_negative_acls => [],
-					       __acls_changes_unassign_negative_acls => [],
-					       __roles_changes_assign_roles => [],
-					       __roles_changes_unassign_roles => [] },
+					       __acls_changes__assign_acls => [],
+					       __acls_changes__unassign_acls => [],
+					       __roles_changes__assign_roles => [],
+					       __roles_changes__unassign_roles => [] },
 				     Administrator => { name => [],
 							password => [],
-							__roles_changes_assign_roles => [],
-							__roles_changes_unassign_roles => [] },
+							__roles_changes__assign_roles => [],
+							__roles_changes__unassign_roles => [] },
 				     Tenant_View => { positive => [] },
 				     Administrator_View => { positive => []}};
 
@@ -283,8 +284,8 @@ my $ACLS_FOR_ARGUMENTS_IN_UPDATE = { User => { name => [],
 my $ACLS_FOR_ARGUMENTS_IN_MASSIVE_UPDATE = { User => { name => [],
 					       password => [],
 					       blocked => [],
-					       __properties_changes_set => [],
-					       __properties_changes_delete => []},
+					       __properties_changes__set => [],
+					       __properties_changes__delete => []},
 				     VM => { name => [],
 					     ip => [],
 					     blocked => [],
@@ -292,37 +293,35 @@ my $ACLS_FOR_ARGUMENTS_IN_MASSIVE_UPDATE = { User => { name => [],
 					     expiration_hard => [],
 					     storage => [],
 					     di_tag => [],
-					     __properties_changes_set => [],
-					     __properties_changes_delete => [] },
+					     __properties_changes__set => [],
+					     __properties_changes__delete => [] },
 				     Host => { name => [],
 					       address => [],
 					       blocked => [],
-					       __properties_changes_set => [],
-					       __properties_changes_delete => [] },
+					       __properties_changes__set => [],
+					       __properties_changes__delete => [] },
 				     OSF => { name => [],
 					      memory => [],
 					      user_storage => [],
 					      overlay => [],
-					      __properties_changes_set => [],
-					      __properties_changes_delete => [] },
+					      __properties_changes__set => [],
+					      __properties_changes__delete => [] },
 				     DI => { blocked => [],
 					     disk_image => [],
-					     __properties_changes_set => [],
-					     __properties_changes_delete => [],
-					     __tags_changes_add => [],
-					     __tags_changes_delete => []},
+					     __properties_changes__set => [],
+					     __properties_changes__delete => [],
+					     __tags_changes__create => [],
+					     __tags_changes__delete => []},
 				     Tenant => { name => [] },
 				     Role => { name => [],
-					       __acls_changes_assign_positive_acls => [],
-					       __acls_changes_unassign_positive_acls => [],
-					       __acls_changes_assign_negative_acls => [],
-					       __acls_changes_unassign_negative_acls => [],
-					       __roles_changes_assign_roles => [],
-					       __roles_changes_unassign_roles => [] },
+					       __acls_changes__assign_acls => [],
+					       __acls_changes__unassign_acls => [],
+					       __roles_changes__assign_roles => [],
+					       __roles_changes__unassign_roles => [] },
 				     Administrator => { name => [],
 							password => [],
-							__roles_changes_assign_roles => [],
-							__roles_changes_unassign_roles => [] },
+							__roles_changes__assign_roles => [],
+							__roles_changes__unassign_roles => [] },
 				     Tenant_View => { positive => [] },
 				     Administrator_View => { positive => []}};
 
@@ -338,27 +337,27 @@ my $ACLS_FOR_ARGUMENTS_IN_CREATION = { User => { name => [],
 					     expiration_hard => [],
 					     storage => [],
 					     di_tag => [],
-					     __properties__ },
+					     __properties__ => [] },
 				     Host => { name => [],
 					       address => [],
 					       blocked => [],
-					       __properties__ },
+					       __properties__ => [] },
 				     OSF => { name => [],
 					      memory => [],
 					      user_storage => [],
 					      overlay => [],
-					      __properties__ },
+					      __properties__ => []},
 				     DI => { blocked => [],
 					     disk_image => [],
-					     __properties__,
-					     __tags__},
+					     __properties__ => [],
+					     __tags__ => []},
 				     Tenant => { name => [] },
 				     Role => { name => [],
-					       __acls__,
-					       __roles__ },
+					       __acls__=> [],
+					       __roles__ => [] },
 				     Administrator => { name => [],
 							password => [],
-							__roles__ },
+							__roles__ => []},
 				     Tenant_View => { positive => [] },
 				     Administrator_View => { positive => []}};
 
@@ -528,24 +527,66 @@ my $AVAILABLE_NESTED_QUERIES = { create => { User => [qw(__properties__)],
 					     OSF => [qw(__properties__)],
 					     DI => [qw(__properties__ __tags__)],
 					     Tenant => [qw()],
-					     Role => [{ __acls__ => [qw(positive negative)]}, qw(__roles__)],
+					     Role => [qw(__acls__ __roles__)],
 					     Administrator => [qw(__roles__)],
 					     Tenant_View => [qw()],
 					     Administrator_View => [qw()]},
 
-				 update => { User => [{ __properties_changes__ => [qw(set delete)]}],
-					     VM => [{ __properties_changes__ => [qw(set delete)]}],
-					     Host => [{ __properties_changes__ => [qw(set delete)]}],
-					     OSF => [{ __properties_changes__ => [qw(set delete)]}],
-					     DI => [{ __properties_changes__ => [qw(set delete)]}, {__tags_changes__ => [qw(add delete)]}],
+				 update => { User => [qw(__properties_changes__set __properties_changes__delete)],
+					     VM => [qw(__properties_changes__set __properties_changes__delete)],
+					     Host => [qw(__properties_changes__set __properties_changes__delete)],
+					     OSF => [qw(__properties_changes__set __properties_changes__delete)],
+					     DI => [qw(__properties_changes__set __properties_changes__delete 
+                                                       __tags_changes__create __tags_changes__delete)],
 					     Tenant => [qw()],
-					     Role => [{__acls_changes__ => [qw(assign_positive_acls unassign_positive_acls
-                                                                               assign_negative_acls unassign_positive_acls))],
-						      __roles_changes__ => [qw(assign_roles unassign_roles)])],
-					     Administrator => [qw(__roles_changes__)],
+					     Role => [qw(__acls_changes__assign_acls 
+                                                         __acls_changes__unassign_acls
+						         __roles_changes__assign_roles 
+                                                         __roles_changes__unassign_roles)],
+					     Administrator => [qw(__roles_changes__assign_roles __roles_changes__unassign_roles)],
 					     Tenant_View => [qw()],
 					     Administrator_View => [qw()]}};
 
+
+
+my $NESTED_QUERIES_TO_ADMIN4_MAPPER = 
+{ User => { __properties__ => 'custom_properties_set',
+	    __properties_changes__set => 'custom_properties_set',
+	    __properties_changes__delete => 'custom_properties_del'},
+  
+  VM => { __properties__ => 'custom_properties_set',
+	  __properties_changes__set => 'custom_properties_set',
+	  __properties_changes__delete => 'custom_properties_del'},
+  
+  Host => { __properties__ => 'custom_properties_set',
+	    __properties_changes__set => 'custom_properties_set',
+	    __properties_changes__delete => 'custom_properties_del' },
+  
+  OSF => { __properties__ => 'custom_properties_set',
+	   __properties_changes__set => 'custom_properties_set',
+	   __properties_changes__delete => 'custom_properties_del'},
+  
+  DI => { __properties__ => 'custom_properties_set',
+	  __tags__ => 'tags_create',
+	  __properties_changes__set => 'custom_properties_set',
+	  __properties_changes__delete => 'custom_properties_del', 
+	  __tags_changes__create => 'tags_create',
+	  __tags_changes__delete => 'tags_delete'},
+  Tenant => {},
+
+  Role => { __acls__ => 'add_acls_to_role',
+	    __roles__ => 'add_roles_to_role',
+	    __acls_changes__assign_acls  => 'add_acls_to_role',
+	    __acls_changes__unassign_acls => 'del_acls_to_role',
+	    __roles_changes__assign_roles => 'add_roles_to_role', 
+	    __roles_changes__unassign_roles => 'del_roles_to_role'},
+
+  Administrator => { __roles__ => 'add_roles_to_admin',
+		     __roles_changes__assign_roles => 'add_roles_to_admin',
+		     __roles_changes__unassign_roles => 'del_roles_to_admin' },
+  Tenant_View => {},
+  Administrator_View => {}
+};
 
 my $AVAILABLE_ARGUMENTS = { User => [qw(name password blocked)],
                             VM => [qw(name ip blocked expiration_soft expiration_hard storage di_tag)],
@@ -926,6 +967,9 @@ sub BUILD
     $self->initialize_info_model;
 
     $self->set_info_by_type_of_action_and_qvd_object(
+	'available_nested_queries',$AVAILABLE_NESTED_QUERIES);
+
+    $self->set_info_by_type_of_action_and_qvd_object(
 	'available_filters',$AVAILABLE_FILTERS);
 
     $self->set_info_by_type_of_action_and_qvd_object(
@@ -965,6 +1009,9 @@ sub BUILD
 	'order_criteria_to_dbix_format_mapper',$ORDER_CRITERIA_TO_DBIX_FORMAT_MAPPER);
 
     $self->set_info_by_qvd_object(
+	'nested_queries_to_admin4_mapper',$NESTED_QUERIES_TO_ADMIN4_MAPPER);
+
+    $self->set_info_by_qvd_object(
 	'values_normalizator',$VALUES_NORMALIZATOR);
 
     $self->set_info_by_qvd_object(
@@ -986,6 +1033,7 @@ sub initialize_info_model
 { available_filters => [],                                                                 
   available_fields => [],                                                                  
   available_arguments => [],                                                               
+  available_nested_queries => [],                                                               
   subchain_filters => [],                                                                 
   commodin_filters => [],                                                                  
   mandatory_arguments => [],                                                               
@@ -996,6 +1044,7 @@ sub initialize_info_model
   arguments_to_dbix_format_mapper => {},                                                   
   fields_to_dbix_format_mapper => {},                                                      
   order_criteria_to_dbix_format_mapper => {},                                              
+  nested_queries_to_admin4_mapper => {},                                              
   values_normalizator => {},                                                               
   dbix_join_value => [],                                                                   
   dbix_prefetch_value => [],                                                                   
@@ -1047,6 +1096,14 @@ sub set_info_by_qvd_object
 ############
 ###########
 ##########
+
+sub available_nested_queries
+{
+    my $self = shift;
+   my $nq =  $self->{model_info}->{available_nested_queries} // [];
+
+    @$nq;
+}
 
 sub available_filters
 {
@@ -1117,6 +1174,12 @@ sub default_argument_values
 }
 
 
+sub nested_queries_to_admin4_mapper
+{
+    my $self = shift;
+    return $self->{model_info}->{nested_queries_to_admin4_mapper} || {};
+}
+
 sub filters_to_dbix_format_mapper
 {
     my $self = shift;
@@ -1171,6 +1234,15 @@ sub dbix_has_one_relationships
 ################
 #################
 
+sub available_nested_query
+{
+    my $self = shift;
+    my $nq = shift;
+    $_ eq $nq && return 1
+	for $self->available_nested_queries;
+
+    return 0;
+}
 
 sub available_filter
 {
@@ -1281,6 +1353,16 @@ sub map_argument_to_dbix_format
     $mapped_argument;
 }
 
+sub map_nested_query_to_admin4
+{
+    my $self = shift;
+    my $nq = shift;
+    my $mapped_nq = $self->nested_queries_to_admin4_mapper->{$nq};
+    defined $mapped_nq
+    || die "No mapping available for nested query $nq";
+    $mapped_nq;
+}
+
 sub map_field_to_dbix_format
 {
     my $self = shift;
@@ -1360,25 +1442,25 @@ sub get_acls_for_filter
     $self->get_acls($ACLS_FOR_FILTERS,$filter);
 }
 
-sub get_acls_for_fileds
+sub get_acls_for_field
 {
     my ($self,$field) = @_;
     $self->get_acls($ACLS_FOR_FIELDS,$field);
 }
 
-sub get_acls_for_arguments_in_creation
+sub get_acls_for_argument_in_creation
 {
     my ($self,$arg) = @_;
     $self->get_acls($ACLS_FOR_ARGUMENTS_IN_CREATION,$arg);
 }
 
-sub get_acls_for_arguments_in_update
+sub get_acls_for_argument_in_update
 {
     my ($self,$arg) = @_;
     $self->get_acls($ACLS_FOR_ARGUMENTS_IN_UPDATE,$arg);
 }
     
-sub get_acls_for_arguments_in_massive_update
+sub get_acls_for_argument_in_massive_update
 {
     my ($self,$arg) = @_;
     $self->get_acls(
@@ -1387,31 +1469,28 @@ sub get_acls_for_arguments_in_massive_update
 
 sub get_acls_for_nested_query_in_creation
 {
-    my ($self,@nested_args) = @_;
-    my $arg = join('_',@nested_args);
-    $self->get_acls_for_arguments_in_creation(
-	$ACLS_FOR_ARGUMENTS_IN_CREATION,$arg);
+    my ($self,$nq) = @_;
+    $self->get_acls(
+	$ACLS_FOR_ARGUMENTS_IN_CREATION,$nq);
 }
 
 sub get_acls_for_nested_query_in_update
 {
-    my ($self,@nested_args) = @_;
-    my $arg = join('_',@nested_args);
-    $self->get_acls_for_arguments_in_update(
-	$ACLS_FOR_ARGUMENTS_IN_UPDATE,$arg);
+    my ($self,$nq) = @_;
+    $self->get_acls(
+	$ACLS_FOR_ARGUMENTS_IN_UPDATE,$nq);
 }
     
 sub get_acls_for_nested_query_in_massive_update
 {
-    my ($self,@nested_args) = @_;
-    my $arg = join('_',@nested_args);
-    $self->get_acls_for_arguments_in_massive_update(
-	$ACLS_FOR_ARGUMENTS_IN_MASSIVE_UPDATE,$arg);
+    my ($self,$nq) = @_;
+    $self->get_acls(
+	$ACLS_FOR_ARGUMENTS_IN_MASSIVE_UPDATE,$nq);
 }
 
 sub get_acls
 {
-    my ($self,$filter,$REPO) = @_;
+    my ($self,$REPO,$filter) = @_;
     return () unless defined $REPO->{$self->qvd_object};
     return () unless defined $REPO->{$self->qvd_object}->{$filter};
     my @acls = @{$REPO->{$self->qvd_object}->{$filter}};

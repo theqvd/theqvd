@@ -47,13 +47,11 @@ sub BUILD
 
     $self->check_filters_validity_in_json;
     $self->check_update_arguments_validity_in_json if
-	$self->qvd_object_model->type_of_action eq 'update'
+	$self->qvd_object_model->type_of_action eq 'update';
     $self->check_create_arguments_validity_in_json if
-	$self->qvd_object_model->type_of_action eq 'create'
-    $self->check_nested_creation_validity_in_json if
-	$self->qvd_object_model->type_of_action eq 'create'
-    $self->check_nested_update_validity_in_json if
-	$self->qvd_object_model->type_of_action eq 'update'
+	$self->qvd_object_model->type_of_action eq 'create';
+    $self->check_nested_queries_validity_in_json if
+	$self->qvd_object_model->type_of_action =~ /^(cre|upd)ate$/;
     $self->check_order_by_validity_in_json;
 
     $self->set_pagination_in_request;
@@ -121,16 +119,16 @@ sub set_filter
     $self->filters->{$key} = $val;
 }
 
+sub set_nested_query
+{
+    my ($self,$nq,$val) = @_;
+    $self->nested_queries->{$nq} = $val;
+}
+
 sub set_argument
 {
     my ($self,$key,$val) = @_;
     $self->arguments->{$key} = $val;
-}
-
-sub set_nested_query
-{
-    my ($self,$key,$val) = @_;
-    $self->nested_queries->{$key} = $val;
 }
 
 sub set_related_object_argument
@@ -244,16 +242,14 @@ sub check_update_arguments_validity_in_json
 	QVD::Admin4::Exception->throw(code => 12)
 	for $self->json_wrapper->arguments_list;
 
-    for my $arg_key ($self->json_wrapper->arguments_list)
-    {
-	my $arg_val = $self->json_wrapper->get_argument_value;
-	my $method = ref($arg_val) && scalar @$arg_val > 1 ? 
-	    'get_acls_for_argument_in_massive_update' : 
-	    'get_acls_for_argument_in_update' ;
+    my $id = $self->json_wrapper->get_argument_value('id');
+    my $method = ref($id) && scalar @$id > 1 ? 
+	'get_acls_for_argument_in_massive_update' : 
+	'get_acls_for_argument_in_update' ;
 
-	$admin->is_allowed_to($self->qvd_object_model->$method($_)) || 
-	    QVD::Admin4::Exception->throw(code => 35);
-    }
+    $admin->is_allowed_to($self->qvd_object_model->$method($_)) || 
+	QVD::Admin4::Exception->throw(code => 35) 
+	for $self->json_wrapper->arguments_list
 }
 
 sub check_create_arguments_validity_in_json
@@ -271,27 +267,32 @@ sub check_create_arguments_validity_in_json
 	for $self->json_wrapper->arguments_list;
 }
 
-sub check_nested_creation_validity_in_json
+sub check_nested_queries_validity_in_json
 {
     my $self = shift;
-}
+    my $admin = $self->qvd_object_model->current_qvd_administrator;
+    my $type_of_action = $self->qvd_object_model->type_of_action;
+    my $method;
 
-sub check_nested_update_validity_in_json
-{
-    my $self = shift;
-}
+    if ($type_of_action eq 'create')
+    {
+	$method = 'get_acls_for_nested_query_in_creation';
+    }
+    elsif ($type_of_action eq 'update')
+    {
+	my $id = $self->json_wrapper->get_argument_value('id');
+	$method = ref($id) && scalar @$id > 1 ? 
+	    'get_acls_for_nested_query_in_massive_update' : 
+	    'get_acls_for_nested_query_in_update' ;
+    }
 
-sub check_editing_permissions
-{
-    my ($self,$arg_or_nq,$creation_or_update,$key,$val) = @_;
+    $self->qvd_object_model->available_nested_query($_) || 
+	QVD::Admin4::Exception->throw(code => 37)
+	for $self->json_wrapper->nested_queries_list;
 
-    my $method = ref($val) && scalar @$val > 1 ? 
-	"get_acls_for_$arg_or_nq_in_massive_creation_$creation_or_update" : 
-	"get_acls_for_nested_query_in_$creation_or_update" ;
-	      
-    $admin->is_allowed_to(
-	$self->qvd_object_model->$method($key)) || 
-	QVD::Admin4::Exception->throw(code => 35);
+    $admin->is_allowed_to($self->qvd_object_model->$method($_)) || 
+	QVD::Admin4::Exception->throw(code => 38) 
+	for $self->json_wrapper->nested_queries_list
 }
 
 sub check_order_by_validity_in_json
@@ -390,7 +391,15 @@ sub set_order_by_in_request
 sub set_nested_queries_in_request
 {
     my $self = shift;
-    $self->{nested_queries} = $self->json_wrapper->nested_queries;
+
+    for my $nq ($self->json_wrapper->nested_queries_list)
+    {
+	my $admin4method = 
+	    $self->qvd_object_model->map_nested_query_to_admin4($nq);
+	my $value = $self->json_wrapper->get_nested_query_value($nq);
+
+	$self->set_nested_query($admin4method,$value);
+    }
 }
 
 sub set_tables_to_join_in_request

@@ -95,7 +95,6 @@ sub is_allowed_to
 sub re_is_allowed_to
 {
     my ($self,@acl_res) = @_;
-    my %acls = map { $_ => 1 } ;
 
     for my $acl_re (@acl_res)
     {

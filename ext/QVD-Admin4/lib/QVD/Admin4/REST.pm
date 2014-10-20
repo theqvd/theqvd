@@ -44,12 +44,12 @@ user_get_state => { type_of_action => 'state',
 		    qvd_object => 'User' },
 
 user_update => { type_of_action => 'update',
-		 admin4method => 'update_with_custom_properties',
+		 admin4method => 'update',
 #		 acls => ['user_update'],
 		 qvd_object => 'User' },
 
 user_create => { type_of_action => 'create',
-		 admin4method => 'create_with_custom_properties',
+		 admin4method => 'create',
 #		 acls => ['user_create'],
 		 qvd_object => 'User'},
 
@@ -79,7 +79,7 @@ vm_get_state => { type_of_action => 'state',
 		  qvd_object => 'VM'},
 
 vm_update => { type_of_action => 'update',
-	       admin4method => 'update_with_custom_properties',
+	       admin4method => 'update',
 	       qvd_object => 'VM'},
 
 vm_user_disconnect => { type_of_action => 'exec',
@@ -95,7 +95,7 @@ vm_stop => { type_of_action => 'exec',
 	     qvd_object => 'VM' },
 
 vm_create => { type_of_action => 'create',
-	       admin4method => 'create_with_custom_properties',
+	       admin4method => 'create',
 	       qvd_object => 'VM'},
 
 vm_delete => { type_of_action => 'delete',
@@ -123,11 +123,11 @@ host_get_state => { type_of_action => 'state',
 		    qvd_object => 'Host'},
 
 host_update => { type_of_action => 'update', 
-		 admin4method => 'update_with_custom_properties',
+		 admin4method => 'update',
 		 qvd_object => 'Host' },
 
 host_create => { type_of_action => 'create',
-		 admin4method => 'create_with_custom_properties',
+		 admin4method => 'create',
 		 qvd_object => 'Host'},
 
 host_delete => { type_of_action => 'delete',
@@ -151,11 +151,11 @@ osf_get_details => { type_of_action => 'details',
 		     qvd_object => 'OSF'},
 
 osf_update => {  type_of_action => 'update',
-		 admin4method => 'update_with_custom_properties',
+		 admin4method => 'update',
 		 qvd_object => 'OSF' },
 
 osf_create => { type_of_action => 'create',
-		admin4method => 'create_with_custom_properties',
+		admin4method => 'create',
 		qvd_object => 'OSF'},
 
 osf_delete => { type_of_action => 'delete',
@@ -179,7 +179,7 @@ di_get_details => { type_of_action => 'details',
 		 qvd_object => 'DI'},
 
 di_update => { type_of_action => 'update',
-	       admin4method => 'di_update',
+	       admin4method => 'update',
 	       qvd_object => 'DI'},
 
 di_create => { type_of_action => 'create',
@@ -223,11 +223,11 @@ admin_all_ids => { type_of_action => 'all_ids',
 		       qvd_object => 'Administrator'},
 
 admin_create => { type_of_action => 'create',
-		  admin4method => 'admin_create',
+		  admin4method => 'create',
 		  qvd_object => 'Administrator'},
 
 admin_update => { type_of_action => 'update',
-		  admin4method => 'admin_update',
+		  admin4method => 'update',
 		  qvd_object => 'Administrator'},
 
 admin_delete => { type_of_action => 'delete',
@@ -301,11 +301,11 @@ acl_get_details => { type_of_action => 'details',
 		  qvd_object => 'ACL'},
 
 role_update => { type_of_action => 'update',
-		 admin4method => 'role_update',
+		 admin4method => 'update',
 		 qvd_object => 'Role'},
 
 role_create => { type_of_action => 'create',
-		 admin4method => 'role_create',
+		 admin4method => 'create',
 		 qvd_object => 'Role'},
 
 role_delete => { type_of_action => 'delete',
