@@ -245,6 +245,8 @@ sub add_acls_to_role
 
     for my $acl_name (@$acl_names)
     { 	
+	next if $role->has_positive_acl($acl_name);
+
 	my $acl = $DB->resultset('ACL')->search(
 	    { name => $acl_name })->first;
 	QVD::Admin4::Exception->throw(code => 21) 
@@ -262,6 +264,8 @@ sub del_acls_to_role
 
     for my $acl_name (@$acl_names)
     { 	
+	next if $role->has_negative_acl($acl_name);
+
 	my $acl = $DB->resultset('ACL')->search(
 	    { name => $acl_name })->first;
 	QVD::Admin4::Exception->throw(code => 21)
