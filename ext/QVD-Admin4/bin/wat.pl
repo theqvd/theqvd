@@ -13,7 +13,7 @@ package MojoX::Session::Transport::WAT
 
     sub get {
         my ($self) = @_;
-	my $sid = $self->tx->req->headers->header('sid');
+	my $sid = $self->tx->req->params->param('sid');
 	return $sid;
     }
 
@@ -94,8 +94,7 @@ any '/' => sub {
 
     my $json = $c->req->json;
     $c->res->headers->header('Access-Control-Allow-Origin' => '*');
-    $c->res->headers->header('Access-Control-Expose-Headers' => 'sid');
-
+#    $c->res->headers->header('Access-Control-Expose-Headers' => 'sid');
     unless ($json)
     {
 	$json =  { map { $_ => $c->param($_) } $c->param };
@@ -109,6 +108,7 @@ any '/' => sub {
 		    QVD::Admin4::REST::Response->new(status => 15)->json  :
 		    $c->qvd_admin4_api->process_query($json));
 
+    $response->{sid} = $c->res->headers->header('sid');
     $c->render(json => $response);
 };
 
