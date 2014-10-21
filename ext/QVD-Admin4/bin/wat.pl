@@ -7,6 +7,24 @@ use QVD::Admin4::REST::Response;
 use QVD::DB;
 use MojoX::Session;
 
+package MojoX::Session::Transport::WAT
+{
+    use base qw(MojoX::Session::Transport);
+
+    sub get {
+        my ($self) = @_;
+	my $sid = $self->tx->req->headers->header('sid');
+	return $sid;
+    }
+
+    sub set {
+        my ($self, $sid, $expires) = @_;
+	$self->tx->res->headers->header('sid' => $sid);
+	return 1;
+    }
+}
+
+
 my $QVD_ADMIN4_API = QVD::Admin4::REST->new();
 
 app->config(hypnotoad => {listen => ['http://192.168.3.5:3000']});
@@ -18,7 +36,7 @@ under sub {
 
     my $session = MojoX::Session->new( 
 	store  => [dbi => {dbh => QVD::DB->new()->storage->dbh}],
-	transport => 'cookie',
+	transport => MojoX::Session::Transport::WAT->new(),
 	tx => $c->tx );
 
     my $json = $c->req->json // 
@@ -76,6 +94,7 @@ any '/' => sub {
 
     my $json = $c->req->json;
     $c->res->headers->header('Access-Control-Allow-Origin' => '*');
+    $c->res->headers->header('Access-Control-Expose-Headers' => 'sid');
 
     unless ($json)
     {
