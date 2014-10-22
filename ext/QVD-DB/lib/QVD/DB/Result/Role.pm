@@ -232,12 +232,16 @@ sub get_acls_info
     my $self = shift;
     my $acls_info = {};
 
+    use Data::Dumper; print Dumper "ESTAMOS";
+
     for my $acl ($self->_get_inherited_acls(return_value => 'object'))
     {
+	print Dumper $acl->name;
 	my $acl_info = {};
 	$acl_info->{name} = $acl->name;
 	$acl_info->{roles} = {};
 
+	$acl_info->{roles}->{$self->id} = $self->name;
 	$acl_info->{roles}->{$self->id} = $self->name
 	    if $self->has_positive_acl($acl->name);
 
@@ -336,40 +340,47 @@ sub get_full_acls_inheritance_tree
           from all_role_role_relations pr, role_role_relations p 
           where pr.inherited_id=p.inheritor_id  ) 
 
-      select a.inheritor_id, a.inherited_id, d.name, b.acl_id, c.name, b.positive 
+      select a.inheritor_id, a.inherited_id, d.name, e.name, b.acl_id, c.name, b.positive 
       from all_role_role_relations a 
       join acl_role_relations b on (a.inherited_id=b.role_id) 
       join acls c on (c.id=b.acl_id) 
-      join roles d on (d.id=a.inherited_id) 
+      join roles d on (d.id=a.inheritor_id) 
+      join roles e on (e.id=a.inherited_id) 
 
       union 
 
-      select e.id, e.id, e.name, f.acl_id, g.name, f.positive 
-      from roles e 
-      join acl_role_relations f on (e.id=f.role_id) 
-      join acls g on (g.id=f.acl_id) 
-      where e.id in ($sql_role_ids)";
+      select f.id, f.id, f.name, f.name, g.acl_id, h.name, g.positive 
+      from roles f 
+      join acl_role_relations g on (f.id=g.role_id) 
+      join acls h on (h.id=g.acl_id) 
+      where f.id in ($sql_role_ids)";
 
     $DB //= QVD::DB->new();
     my $dbh = $DB->storage->dbh;
     my $sth = $dbh->prepare($sql);
     $sth->execute;
+    my $ff = $sth->fetchall_arrayref();
 
     my $tree;
-    for my $row (@{$sth->fetchall_arrayref()})
+    for my $row (@$ff)
     {
 	$tree->{@{$row}[1]}->{id} //= @{$row}[1];
-	$tree->{@{$row}[1]}->{name} //= @{$row}[2];
+	$tree->{@{$row}[1]}->{name} //= @{$row}[3];
 	$tree->{@{$row}[1]}->{roles} //= {};
 	$tree->{@{$row}[1]}->{acls} //= { 1 => {}, 0 => {}};
+
+	$tree->{@{$row}[0]}->{id} //= @{$row}[0];
+	$tree->{@{$row}[0]}->{name} //= @{$row}[2];
+	$tree->{@{$row}[0]}->{roles} //= {};
+	$tree->{@{$row}[0]}->{acls} //= { 1 => {}, 0 => {}};
 
 	$tree->{@{$row}[0]}->{roles}->{@{$row}[1]} = $tree->{@{$row}[1]}
 	unless @{$row}[0] eq @{$row}[1];
 
-	$tree->{@{$row}[1]}->{acls}->{@{$row}[5]}->{@{$row}[3]} = { id => @{$row}[3], 
-								    name => @{$row}[4]};
-	$tree->{@{$row}[1]}->{acls}->{@{$row}[5]}->{@{$row}[3]}->{roles}->{@{$row}[1]}->{id} = @{$row}[1]; 
-	$tree->{@{$row}[1]}->{acls}->{@{$row}[5]}->{@{$row}[3]}->{roles}->{@{$row}[1]}->{name} = @{$row}[2]; 
+	$tree->{@{$row}[1]}->{acls}->{@{$row}[6]}->{@{$row}[4]} = { id => @{$row}[4], 
+								    name => @{$row}[5]};
+	$tree->{@{$row}[1]}->{acls}->{@{$row}[6]}->{@{$row}[4]}->{roles}->{@{$row}[1]}->{id} = @{$row}[1]; 
+	$tree->{@{$row}[1]}->{acls}->{@{$row}[6]}->{@{$row}[4]}->{roles}->{@{$row}[1]}->{name} = @{$row}[3]; 
     }
 
     $self->percolate_acls_in_inherited_roles_tree($tree->{$_}) 
