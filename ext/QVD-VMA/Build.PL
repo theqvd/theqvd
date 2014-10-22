@@ -34,7 +34,10 @@ my $build = new Module::Build(
                 'Config::Properties' => 0,
                 'Test::More' => 0 
 	}, 
-	etc_files=> { "etc/vma_defaults.conf"  => "$vma_dst/qvd-vma" },
+	etc_files=> {
+        "etc/vma_defaults.conf"  => "$vma_dst/qvd-vma",
+        "etc/vma.conf"           => "/etc/qvd/vma.conf",
+    },
 	install_path => { 'etc' => '/etc' },
 );
 
