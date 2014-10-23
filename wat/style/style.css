@@ -1394,6 +1394,11 @@ select[name="acl_positive_on_role"] option, .acls_positive {
   .subbranch-piece:first-child {
     vertical-align: middle; }
 
+.acl-tree-selector + div {
+  display: block;
+  margin-top: 5px;
+  margin-bottom: 15px; }
+
 .editor-container {
   margin: 0; }
   @media screen and (min-width: 40em) {

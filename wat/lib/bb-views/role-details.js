@@ -26,14 +26,36 @@ Wat.Views.RoleDetailsView = Wat.Views.DetailsView.extend({
         'click .js-branch-button': 'toggleBranch',
         'change .js-branch-check': 'checkBranch',
         'change .js-acl-check': 'checkACL',
+        'change .js-acl-tree-selector': 'toggleTree',
+    },
+    
+    toggleTree: function (e) {
+        // Hide all trees
+        $('.js-acls-tree').hide();
+        
+        // Close all branches
+        $('.js-branch-button').attr('data-open',1);
+        $('.js-branch-button').trigger('click');
+        
+        // Show selected tree
+        switch ($(e.target).val()) {
+            case 'sections':
+                $('.js-sections-tree').show();
+                break;
+            case 'actions':
+                $('.js-actions-tree').show();
+                break;
+        }
     },
     
     // Show-Hide ACL branch
     toggleBranch: function (e) {
         var branch = $(e.target).attr('data-branch');
+        var treeKind = $(e.target).attr('data-tree-kind');
         
         //branchDiv.append('<div class="subbranch">' + branch + '</div>');
         this.currentBranchDiv = $(e.target).parent();
+        this.currentTreeKind = treeKind;
         this.currentBranch = branch;
         
         if ($(e.target).attr('data-open') == '1') {
@@ -46,7 +68,18 @@ Wat.Views.RoleDetailsView = Wat.Views.DetailsView.extend({
             $(e.target).addClass('fa-minus-square-o');
             $(e.target).removeClass('fa-plus-square-o');
             $(e.target).attr('data-open', 1);
-            Wat.A.performAction('acl_tiny_list', {}, {'name': branch + '.%'}, {}, this.fillBranch, this);
+            
+            var filters = {};
+            switch (treeKind) {
+                case 'actions':
+                    filters = {'name': '%.' + branch + '.%'};
+                    break;
+                case 'sections':
+                    filters = {'name': branch + '.%'};
+                    break;
+            }
+            
+            Wat.A.performAction('acl_tiny_list', {}, filters, {}, this.fillBranch, this);
         }
     },
     
@@ -68,7 +101,16 @@ Wat.Views.RoleDetailsView = Wat.Views.DetailsView.extend({
             that.currentBranchDiv.append(subbranch);
         });
         
-        Wat.A.performAction('get_acls_in_roles', {}, {'acl_name': that.currentBranch + '.%', 'role_id': that.id}, {}, that.fillEffectiveBranch, that);
+        switch (that.currentTreeKind) {
+            case 'actions':
+                filters = {'acl_name': '%.' + that.currentBranch + '.%', 'role_id': that.id};
+                break;
+            case 'sections':
+                filters = {'acl_name': that.currentBranch + '.%', 'role_id': that.id};
+                break;
+        }
+        
+        Wat.A.performAction('get_acls_in_roles', {}, filters, {}, that.fillEffectiveBranch, that);
     },
     
     // Set as checked the effective roles and added the inherit icon with inherited roles title
@@ -97,11 +139,21 @@ Wat.Views.RoleDetailsView = Wat.Views.DetailsView.extend({
         $(e.target).parent().find('input').prop('checked', checked);
         
         var branch = $(e.target).attr('data-branch');
+        var treeKind = $(e.target).attr('data-tree-kind');
         
         this.groupACLChecked = checked;
                 
+        switch (treeKind) {
+            case 'actions':
+                filters = {'name': '%.' + branch + '.%'};
+                break;
+            case 'sections':
+                filters = {'name': branch + '.%'};
+                break;
+        }
+        
         // Retrieve acls of a branch to change them
-        Wat.A.performAction('acl_tiny_list', {}, {'name': branch + '.%'}, {}, this.performACLGroupCheck, this);
+        Wat.A.performAction('acl_tiny_list', {}, filters, {}, this.performACLGroupCheck, this);
     },
     
     // Assign-unassign acls of a branch
@@ -182,9 +234,7 @@ Wat.Views.RoleDetailsView = Wat.Views.DetailsView.extend({
     
     render: function () {
         Wat.Views.DetailsView.prototype.render.apply(this);
-
-        this.renderManagerACLs();
-
+        
         if (Wat.C.checkACL('role.see.inherited-roles')) {
             this.renderManagerInheritedRoles();   
         }
@@ -231,20 +281,7 @@ Wat.Views.RoleDetailsView = Wat.Views.DetailsView.extend({
         }, 100);
     },    
     
-    renderManagerACLs: function () {
-        var aclsRolesTemplate = Wat.A.getTemplate('details-role-acls');
-        
-        // Fill the html with the template and the model
-        this.template = _.template(
-            aclsRolesTemplate, {}
-        );
-        
-        $('.bb-role-acls').html(this.template);
-        
-        this.fillACLCombos();
-    },
-    
-    renderACLsTree: function (that) {
+    renderACLsTree: function () {
         var aclsRolesTemplate = Wat.A.getTemplate('details-role-acls-tree');
         
         // Fill the html with the template and the model
@@ -256,94 +293,8 @@ Wat.Views.RoleDetailsView = Wat.Views.DetailsView.extend({
         );
         
         $('.bb-details-side1').html(this.template);
-    },
-    
-    fillACLCombos: function () {
-        $('select[name="acl_available"] option').remove();
-        $('select[name="acl_positive_on_role"] option').remove();
-        $('select[name="acl_negative_on_role"] option').remove();
         
-        var params = {
-            'action': 'acl_tiny_list',
-            'selectedId': '',
-            'controlName': 'acl_available',
-            'filters': {
-            },
-            'nameAsId': true
-        };
-        
-        if (this.filterSection != '-1' && this.filterAction != '-1') {
-            params.filters.name = this.filterSection + '.' + this.filterAction + '.%';
-        }
-        else if (this.filterSection != '-1') {
-            params.filters.name = this.filterSection + '.%';
-        }
-        else if (this.filterAction != '-1') {
-            params.filters.name = '%.' + this.filterAction + '.%';
-        }
-
-        Wat.A.fillSelect(params);
-        
-        this.fillACLsFilters();
-        
-        // Set selected acls on acl list and delete it from available side
-        $.each(this.model.get('acls').positive, function (iAcl, acl) {
-            if ($('select[name="acl_available"] option[value="' + acl + '"]').val() != undefined) {
-                $('select[name="acl_available"] option[value="' + acl + '"]').remove();
-                $('select[name="acl_positive_on_role"]').append('<option value="' + acl + '">' + acl + '</option>');
-            }
-        });   
-        
-        // Enable delete button when select any element of list
-        Wat.B.bindEvent('change', 'select[name="acl_positive_on_role"]', function () { 
-            $('.js-delete-positive-acl-button').removeClass('disabled');
-        });
-        
-        // Set selected acls on excluded list and delete it from available side
-        $.each(this.model.get('acls').negative, function (iAcl, acl) {
-            if ($('select[name="acl_available"] option[value="' + acl + '"]').val() != undefined) {
-                //$('select[name="acl_available"] option[value="' + acl + '"]').remove();
-                $('select[name="acl_negative_on_role"]').append('<option value="' + acl + '">' + acl + '</option>');
-            }
-        });
-        
-        // Enable delete button when select any element of list
-        Wat.B.bindEvent('change', 'select[name="acl_negative_on_role"]', function () { 
-            $('.js-delete-negative-acl-button').removeClass('disabled');
-        });
-        
-        // Remove acls that exist in positive mode
-        $.each(this.model.get('acls').positive, function (iAcl, acl) {
-            $('select[name="acl_available"] option[value="' + acl + '"]').remove();
-        });
-        
-    },
-    
-    fillACLsFilters: function () {
-        // Fill filter selects
-        var params = {
-            'startingOptions': ACL_SECTIONS,
-            'selectedId': this.filterSection,
-            'controlName': 'section',
-            'translateOptions': ['-1'],
-            'filters': {
-            }
-        };
-
-        Wat.A.fillSelect(params);
-        Wat.I.chosenElement('[name="section"]', 'single');
-
-        var params = {
-            'startingOptions': ACL_ACTIONS,
-            'selectedId': this.filterAction,
-            'controlName': 'action',
-            'translateOptions': ['-1'],
-            'filters': {
-            }
-        };
-
-        Wat.A.fillSelect(params);
-        Wat.I.chosenElement('[name="action"]', 'single');
+        Wat.I.chosenElement('select.js-acl-tree-selector', 'single');
     },
     
     afterUpdateRoles: function () {
