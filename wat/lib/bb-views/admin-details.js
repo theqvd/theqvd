@@ -22,6 +22,127 @@ Wat.Views.AdminDetailsView = Wat.Views.DetailsView.extend({
         Wat.Views.DetailsView.prototype.render.apply(this);
 
         this.renderManagerRoles();
+        this.renderACLsTree();
+    },
+    
+    renderACLsTree: function () {
+        var aclsAdminsTemplate = Wat.A.getTemplate('details-admin-acls-tree');
+        
+        // Fill the html with the template and the model
+        this.template = _.template(
+            aclsAdminsTemplate, {
+                sections: ACL_SECTIONS,
+                actions: ACL_ACTIONS
+            }
+        );
+        
+        $('.bb-details-side1').html(this.template);
+        
+        Wat.I.chosenElement('select.js-acl-tree-selector', 'single');
+    },
+    
+    events: {
+        'click .js-branch-button': 'toggleBranch',
+        'change .js-acl-tree-selector': 'toggleTree',
+    },
+    
+    toggleTree: function (e) {
+        // Hide all trees
+        $('.js-acls-tree').hide();
+        
+        // Close all branches
+        $('.js-branch-button').attr('data-open',1);
+        $('.js-branch-button').trigger('click');
+        
+        // Show selected tree
+        switch ($(e.target).val()) {
+            case 'sections':
+                $('.js-sections-tree').show();
+                break;
+            case 'actions':
+                $('.js-actions-tree').show();
+                break;
+        }
+    },
+    
+    // Show-Hide ACL branch
+    toggleBranch: function (e) {
+        var branch = $(e.target).attr('data-branch');
+        var treeKind = $(e.target).attr('data-tree-kind');
+        
+        //branchDiv.append('<div class="subbranch">' + branch + '</div>');
+        this.currentBranchDiv = $(e.target).parent();
+        this.currentTreeKind = treeKind;
+        this.currentBranch = branch;
+        
+        if ($(e.target).attr('data-open') == '1') {
+            $(e.target).addClass('fa-plus-square-o');
+            $(e.target).removeClass('fa-minus-square-o');
+            $(e.target).attr('data-open', 0);
+            this.currentBranchDiv.find('.subbranch').remove();
+        }
+        else {
+            $(e.target).addClass('fa-minus-square-o');
+            $(e.target).removeClass('fa-plus-square-o');
+            $(e.target).attr('data-open', 1);
+            
+            var filters = {};
+            switch (treeKind) {
+                case 'actions':
+                    filters = {'name': '%.' + branch + '.%'};
+                    break;
+                case 'sections':
+                    filters = {'name': branch + '.%'};
+                    break;
+            }
+            
+            Wat.A.performAction('acl_tiny_list', {}, filters, {}, this.fillBranch, this);
+        }
+    },
+    
+    // Fill branch with retreived ACLs from API
+    fillBranch: function (that) {
+        $.each(that.retrievedData.result.rows, function (iACL, acl) {
+            var subbranch = '';
+            subbranch += '<div class="subbranch hidden" data-acl-id="' + acl.id + '">';
+                subbranch += '<span class="subbranch-piece">';
+                    subbranch += acl.name;
+                subbranch += '</span>';
+                subbranch += '<span class="subbranch-piece">';
+                    subbranch += '<i class="fa fa-sitemap acl-inheritance hidden" data-acl-id="' + acl.id + '" title=""></i>';
+                subbranch += '</span>';
+            subbranch += '</div>';
+            that.currentBranchDiv.append(subbranch);
+        });
+        
+        switch (that.currentTreeKind) {
+            case 'actions':
+                filters = {'acl_name': '%.' + that.currentBranch + '.%', 'admin_id': that.id};
+                break;
+            case 'sections':
+                filters = {'acl_name': that.currentBranch + '.%', 'admin_id': that.id};
+                break;
+        }
+        
+        Wat.A.performAction('get_acls_in_admins', {}, filters, {}, that.fillEffectiveBranch, that);
+    },
+    
+    // Set as checked the effective roles and added the inherit icon with inherited roles title
+    fillEffectiveBranch: function (that) {
+        $.each(that.retrievedData.result.rows, function (iACL, acl) {
+            that.currentBranchDiv.find('div.subbranch[data-acl-id="' + acl.id + '"]').show();
+            
+            if (Object.keys(acl.roles).length > 0) {
+                that.currentBranchDiv.find('i[data-acl-id="' + acl.id + '"].acl-inheritance').show();
+                
+                var roles = [];
+                $.each(acl.roles, function (iRole, role) {
+                    roles.push(role); 
+                });
+                var titleRole = $.i18n.t('Inherited from roles') + ':<br/><br/>&raquo;' + roles.join('<br/><br/>&raquo;');
+                that.currentBranchDiv.find('i[data-acl-id="' + acl.id + '"].acl-inheritance').attr('title', titleRole);
+            }
+        });
     },
     
     
@@ -120,7 +241,7 @@ Wat.Views.AdminDetailsView = Wat.Views.DetailsView.extend({
     },
     
     renderSide: function () {
-        if (this.checkSide({'administrator.see.acl-list': '.js-side-component1'}) === false) {
+/*        if (this.checkSide({'administrator.see.acl-list': '.js-side-component1'}) === false) {
             return;
         }
         
@@ -141,7 +262,7 @@ Wat.Views.AdminDetailsView = Wat.Views.DetailsView.extend({
         params.filters = {"admin_id": this.elementId};
         params.action = 'get_acls_in_admins';
         
-        this.sideView = new Wat.Views.ACLListView(params);
+        this.sideView = new Wat.Views.ACLListView(params);*/
     },
     
     updateElement: function (dialog) {

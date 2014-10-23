@@ -89,13 +89,13 @@ Wat.Views.RoleDetailsView = Wat.Views.DetailsView.extend({
             var subbranch = '';
             subbranch += '<div class="subbranch">';
                 subbranch += '<span class="subbranch-piece">';
-                    subbranch += '<input type="checkbox" class="js-acl-check" data-acl="' + acl.name + '" data-acl-id="' + acl.id + '"/>';
+                    subbranch += '<input type="checkbox" class="js-acl-check acl-check" data-acl="' + acl.name + '" data-acl-id="' + acl.id + '"/>';
                 subbranch += '</span>';
                 subbranch += '<span class="subbranch-piece">';
                     subbranch += acl.name;
                 subbranch += '</span>';
                 subbranch += '<span class="subbranch-piece">';
-                    subbranch += '<i class="fa fa-sitemap inheritance hidden" data-acl-id="' + acl.id + '" title=""></i>';
+                    subbranch += '<i class="fa fa-sitemap acl-inheritance hidden" data-acl-id="' + acl.id + '" title=""></i>';
                 subbranch += '</span>';
             subbranch += '</div>';
             that.currentBranchDiv.append(subbranch);
@@ -118,16 +118,16 @@ Wat.Views.RoleDetailsView = Wat.Views.DetailsView.extend({
         $.each(that.retrievedData.result.rows, function (iACL, acl) {
             that.currentBranchDiv.find('input[data-acl-id="' + acl.id + '"]').prop('checked', true);
             delete acl.roles[that.id];
-            
+
             if (Object.keys(acl.roles).length > 0) {
-                that.currentBranchDiv.find('i[data-acl-id="' + acl.id + '"].inheritance').show();
+                that.currentBranchDiv.find('i[data-acl-id="' + acl.id + '"].acl-inheritance').show();
                 
                 var roles = [];
                 $.each(acl.roles, function (iRole, role) {
                     roles.push(role); 
                 });
                 var titleRole = $.i18n.t('Inherited from roles') + ':<br/><br/>&raquo;' + roles.join('<br/><br/>&raquo;');
-                that.currentBranchDiv.find('i[data-acl-id="' + acl.id + '"].inheritance').attr('title', titleRole);
+                that.currentBranchDiv.find('i[data-acl-id="' + acl.id + '"].acl-inheritance').attr('title', titleRole);
             }
         });
     },

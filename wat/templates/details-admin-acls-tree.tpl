@@ -10,10 +10,7 @@
     %>
         <div class="acls-branch">
             <a class="js-branch-button branch-button fa fa-plus-square-o" href="javascript:" data-branch="<%= branch %>" data-tree-kind="sections" data-open="0"></a>
-            <input type="checkbox" class="js-branch-check branch-check" data-branch="<%= branch %>" data-tree-kind="sections"/>
-                <span class="branch-text">
-                    <%= branch %>  
-                </span>
+                <%= branch %>  
         </div>
     <%
     });
@@ -25,10 +22,7 @@
     %>
         <div class="acls-branch">
             <a class="js-branch-button branch-button fa fa-plus-square-o" href="javascript:" data-branch="<%= branch %>" data-tree-kind="actions" data-open="0"></a>
-            <input type="checkbox" class="js-branch-check branch-check" data-branch="<%= branch %>" data-tree-kind="actions"/>
-                <span class="branch-text">
-                    <%= branch %>  
-                </span>
+                <%= branch %>  
         </div>
     <%
     });

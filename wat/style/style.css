@@ -1385,7 +1385,7 @@ select[name="acl_positive_on_role"] option, .acls_positive {
   color: #009900; }
 
 .subbranch {
-  margin-left: 20px; }
+  margin-left: 30px; }
 
 .subbranch-piece {
   margin-right: 5px;
@@ -1398,6 +1398,27 @@ select[name="acl_positive_on_role"] option, .acls_positive {
   display: block;
   margin-top: 5px;
   margin-bottom: 15px; }
+
+.acls-branch, .subbranch {
+  line-height: 25px;
+  display: table; }
+
+.branch-button {
+  margin-right: 5px; }
+  .branch-button:before {
+    font-size: 22px; }
+
+.branch-check, .acl-check {
+  width: 18px !important;
+  height: 18px !important; }
+
+.branch-text, .subbranch-piece {
+  vertical-align: top; }
+
+.acl-inheritance {
+  margin-right: 5px; }
+  .acl-inheritance:before {
+    font-size: 22px; }
 
 .editor-container {
   margin: 0; }
