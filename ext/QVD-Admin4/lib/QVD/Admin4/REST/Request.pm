@@ -41,10 +41,8 @@ sub BUILD
 	$self->qvd_object_model->type_of_action eq 'create' &&
 	 not $self->json_wrapper->has_argument('version'));
 
-    $self->switch_di_id_filter_into_osf_id_in_vm if 
-	$self->json_wrapper->has_filter('di_id') &&
-	$self->qvd_object_model->qvd_object eq 'VM';
-
+    $self->check_acls_for_deleting if
+	$self->qvd_object_model->type_of_action eq 'delete';
     $self->check_filters_validity_in_json;
     $self->check_update_arguments_validity_in_json if
 	$self->qvd_object_model->type_of_action eq 'update';
@@ -79,20 +77,6 @@ sub forze_default_version_in_json_for_di
     }
     
     $self->json_wrapper->forze_argument_addition('version',$version);
-}
-
-sub switch_di_id_filter_into_osf_id_in_vm
-{
-    my $self = shift;
-    my $di_rs = $DBConfigProvider->db->resultset('DI'); 
-    my $di_id = $self->json_wrapper->get_filter_value('di_id');
-    $self->json_wrapper->forze_filter_deletion('di_id');
-    
-    $self->set_filter($self->qvd_object_model->map_filter_to_dbix_format('osf_id'),
-		      { -in => $di_rs->search({ 'subquery.id' => $di_id,
-						'tags.tag' => { -ident => 'me.di_tag' } },
-					      { join => ['tags'], 
-						alias => 'subquery'})->get_column('osf_id')->as_query });
 }
 
 sub action 
@@ -197,10 +181,14 @@ sub switch_custom_properties_json2request
 	get_custom_properties_keys($self->qvd_object_model->qvd_object);
 
     my $found_properties = 0;
+    my $admin = $self->qvd_object_model->current_qvd_administrator;
 
     for my $property_key (@custom_properties_keys)
     {
 	next unless $self->json_wrapper->has_filter($property_key);
+
+	$admin->is_allowed_to($self->qvd_object_model->get_acls_for_filter('properties')) # PROVISIONAL
+	    || QVD::Admin4::Exception->throw(code => 34);
 
 	$found_properties++;
 	my $property_value = $self->json_wrapper->get_filter_value($property_key);
@@ -233,6 +221,18 @@ sub check_filters_validity_in_json
 	for $self->qvd_object_model->mandatory_filters;
 }
 
+sub check_acls_for_deleting
+{
+    my $self = shift;
+    my $id = $self->json_wrapper->get_filter_value('id');
+    return unless ref($id) && scalar @$id > 1;
+
+    my $admin = $self->qvd_object_model->current_qvd_administrator;
+    $admin->is_allowed_to($self->qvd_object_model->get_acls_for_delete_massive) 
+	|| QVD::Admin4::Exception->throw(code => 35);
+}
+
+
 sub check_update_arguments_validity_in_json
 {
     my $self = shift;
@@ -242,7 +242,7 @@ sub check_update_arguments_validity_in_json
 	QVD::Admin4::Exception->throw(code => 12)
 	for $self->json_wrapper->arguments_list;
 
-    my $id = $self->json_wrapper->get_argument_value('id');
+    my $id = $self->json_wrapper->get_filter_value('id');
     my $method = ref($id) && scalar @$id > 1 ? 
 	'get_acls_for_argument_in_massive_update' : 
 	'get_acls_for_argument_in_update' ;
@@ -280,7 +280,7 @@ sub check_nested_queries_validity_in_json
     }
     elsif ($type_of_action eq 'update')
     {
-	my $id = $self->json_wrapper->get_argument_value('id');
+	my $id = $self->json_wrapper->get_filter_value('id');
 	$method = ref($id) && scalar @$id > 1 ? 
 	    'get_acls_for_nested_query_in_massive_update' : 
 	    'get_acls_for_nested_query_in_update' ;
@@ -411,4 +411,5 @@ sub set_tables_to_join_in_request
     $self->add_to_prefetch($_) 
 	for @{$self->qvd_object_model->dbix_prefetch_value};
 }
+
 1;

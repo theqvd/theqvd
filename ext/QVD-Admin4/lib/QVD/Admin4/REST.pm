@@ -20,42 +20,42 @@ current_admin_setup => {type_of_action => 'admin_config_provider',
 
 user_get_list => {type_of_action => 'list',
 		  admin4method => 'select',
-#		  acls => ['user_see'],
+		  acls => [qr/^user\.see-main\.$/],
 		  qvd_object => 'User'},
 
 user_tiny_list => {type_of_action => 'tiny',
 		  admin4method => 'select',
-#		   acls => ['user_see'],
+		   acls => [qr/^user\.see-main\.$/],
 		   qvd_object => 'User'},
 
 user_all_ids => { type_of_action => 'all_ids',
 		  admin4method => 'select',
-#		  acls => ['user_see'],
+		  acls => [qr/^user\.see-main\.$/],
 		  qvd_object => 'User'},
 
 user_get_details => { type_of_action => 'details',
 		      admin4method => 'select',
-#		      acls => ['user_see'],
+		      acls => [qr/^user\.see-details\.$/],
 		      qvd_object => 'User' },
 
 user_get_state => { type_of_action => 'state',
 		    admin4method => 'select',
-#		    acls => ['user_see'],
+		    acls => [qr/^user\.see-vm-list-state\.$/],
 		    qvd_object => 'User' },
 
 user_update => { type_of_action => 'update',
 		 admin4method => 'update',
-#		 acls => ['user_update'],
+		 acls => [qr/^user\.update\./],
 		 qvd_object => 'User' },
 
 user_create => { type_of_action => 'create',
 		 admin4method => 'create',
-#		 acls => ['user_create'],
+		 acls => [qr/^user\.create\.$/],
 		 qvd_object => 'User'},
 
 user_delete => { type_of_action => 'delete',
 		 admin4method => 'delete',
-#		 acls => ['user_delete'],
+		 acls => [qr/^user\.delete\.$/],
 		 qvd_object => 'User'},
 
 vm_get_list => { type_of_action => 'list',
@@ -432,13 +432,17 @@ sub process_query
 
    my $admin4method = $action->{admin4method};
    my $result = eval { $QVD_ADMIN->$admin4method($self->get_request($json_wrapper,$qvd_object_model)) } // {};
+   use Data::Dumper; print Dumper "2";
    print $@ if $@;
    my $general_status = ($@ && (( $@->can('code') && $@->code) || 1)) || 0;
    my $individual_failures = ($@ && $@->can('failures')) ? $@->failures  : {};
+
    my $response = eval {QVD::Admin4::REST::Response->new(qvd_object_model => $qvd_object_model,
 							  status   => $general_status,
 							  result   => $result,
 							  failures => $individual_failures) };
+
+   use Data::Dumper; print Dumper "3";
    return $response->json;
 }
 
@@ -484,8 +488,12 @@ sub get_request
 { 
     my ($self, $json_wrapper,$qvd_object_model) = @_;
 
-    QVD::Admin4::REST::Request->new(qvd_object_model => $qvd_object_model, 
+my $r =    QVD::Admin4::REST::Request->new(qvd_object_model => $qvd_object_model, 
 				    json_wrapper => $json_wrapper);
+
+    use Data::Dumper; print Dumper "1";
+
+    $r;
 }
 
 

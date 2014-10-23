@@ -22,7 +22,6 @@ has 'model_info', is => 'ro', isa => sub {die "Invalid type for attribute model_
 
 my $DBConfigProvider;
 
-
 my $ACLS_FOR_FILTERS = {
 
     VM => { storage => [],
@@ -58,7 +57,8 @@ my $ACLS_FOR_FILTERS = {
 		tenant_name => [] },
 
     User => { id => [],
-	      name => [],
+	      properties => [qw(user.filter.properties)], # PROVISIONAL
+	      name => [qw(user.filter.name)],
 	      blocked => [],
 	      creation_admin => [],
 	      creation_date => [],
@@ -193,14 +193,14 @@ my $ACLS_FOR_FIELDS = {
     Tenant => { id => [],
 		name => [] },
 
-    User => { id => [],
+    User => { id => [qw(user.see.id)],
 	      name => [],
-	      blocked => [],
-	      creation_admin => [],
-	      creation_date => [],
+	      blocked => [qw(user.see.block)],
+	      creation_admin => [qw(user.see.created-by)],
+	      creation_date => [qw(user.see.creation-date)],
 	      number_of_vms => [],
-	      number_of_vms_connected => [],
-	      properties => [] },
+	      number_of_vms_connected => [qw(user.see.vm-list-state)],
+	      properties => [qw(user.see.properties)] },
 
     Host => { id => [],
 	      name => [],
@@ -237,10 +237,10 @@ my $ACLS_FOR_FIELDS = {
 };
 
 my $ACLS_FOR_ARGUMENTS_IN_UPDATE = { User => { name => [],
-					       password => [],
-					       blocked => [],
-					       __properties_changes_set => [],
-					       __properties_changes_delete => []},
+					       password => [qw(user.update.password)],
+					       blocked => [qw(user.update.block)],
+					       __properties_changes_set => [qw(user.update.properties-update user.update.properties-create)],
+					       __properties_changes_delete => [qw(user.update.properties-delete)]},
 				     VM => { name => [],
 					     ip => [],
 					     blocked => [],
@@ -281,14 +281,15 @@ my $ACLS_FOR_ARGUMENTS_IN_UPDATE = { User => { name => [],
 				     Administrator_View => { positive => []}};
 
 
-my $ACLS_FOR_ARGUMENTS_IN_MASSIVE_UPDATE = { User => { name => [],
-					       password => [],
-					       blocked => [],
-					       __properties_changes__set => [],
-					       __properties_changes__delete => []},
-				     VM => { name => [],
-					     ip => [],
-					     blocked => [],
+my $ACLS_FOR_ARGUMENTS_IN_MASSIVE_UPDATE = { User => { '***delete***' => ['user.delete-massive.'], # MAYBE A NEW VARIABLE?
+						       name => [],
+						       password => [],
+						       blocked => [qw(user.update-massive.block)],
+						       __properties_changes__set => [qw(user.update-massive.properties-update user.update-massive.properties-create)],
+						       __properties_changes__delete => [qw(user.update-massive.properties-delete)]},
+					     VM => { name => [],
+						     ip => [],
+						     blocked => [],
 					     expiration_soft => [],
 					     expiration_hard => [],
 					     storage => [],
@@ -329,7 +330,7 @@ my $ACLS_FOR_ARGUMENTS_IN_MASSIVE_UPDATE = { User => { name => [],
 my $ACLS_FOR_ARGUMENTS_IN_CREATION = { User => { name => [],
 					       password => [],
 					       blocked => [],
-					       __properties__ => []},
+					       __properties__ => [qw(user.update.properties-create)]},
 				     VM => { name => [],
 					     ip => [],
 					     blocked => [],
@@ -719,7 +720,7 @@ my $FILTERS_TO_DBIX_FORMAT_MAPPER =
 	'state' => 'vm_runtime.vm_state',
 	'host_id' => 'vm_runtime.host_id',
 	'host_name' => 'host.name',
-	'di_id' => 'vm_runtime.current_di_id',
+	'di_id' => 'di.id',
 	'user_state' => 'vm_runtime.user_state',
 	'ip' => 'me.ip',
 	'next_boot_ip' => 'vm_runtime.vm_address',
@@ -850,7 +851,7 @@ my $FIELDS_TO_DBIX_FORMAT_MAPPER =
 	'state' => 'vm_runtime.vm_state',
 	'host_id' => 'vm_runtime.host_id',
 	'host_name' => 'me.host_name',
-	'di_id' => 'vm_runtime.current_di_id',
+	'di_id' => 'di.id',
 	'user_state' => 'vm_runtime.user_state',
 	'ip' => 'me.ip',
 	'next_boot_ip' => 'vm_runtime.vm_address',
@@ -886,7 +887,6 @@ my $FIELDS_TO_DBIX_FORMAT_MAPPER =
 	'tenant_id' => 'me.tenant_id',
 	'tenant_name' => 'me.tenant_name',
 	'roles' => 'me.get_roles_info',
-#	'acls' => 'me.get_acls_info',
 	'id' => 'me.id',
     },
     Tenant => {
@@ -921,7 +921,7 @@ my $VALUES_NORMALIZATOR = {
 
 
 my $DBIX_JOIN_VALUE = { User => [qw(tenant), { vms => 'vm_runtime'}],
-                        VM => ['osf', { vm_runtime => 'host' }, { user => 'tenant' }],
+                        VM => ['di', 'osf', { vm_runtime => 'host' }, { user => 'tenant' }],
 			Host => ['runtime', { vms => 'host'}],
 			OSF => [ qw(tenant vms), { dis => 'tags' }],
 			DI => [qw(vm_runtimes tags), {osf => 'tenant'}],
@@ -1486,6 +1486,13 @@ sub get_acls_for_nested_query_in_massive_update
     my ($self,$nq) = @_;
     $self->get_acls(
 	$ACLS_FOR_ARGUMENTS_IN_MASSIVE_UPDATE,$nq);
+}
+
+sub get_acls_for_delete_massive
+{
+    my $self = shift;
+    $self->get_acls(
+	$ACLS_FOR_ARGUMENTS_IN_MASSIVE_UPDATE,'***delete***');
 }
 
 sub get_acls

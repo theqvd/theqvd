@@ -24,7 +24,6 @@ package MojoX::Session::Transport::WAT
     }
 }
 
-
 my $QVD_ADMIN4_API = QVD::Admin4::REST->new();
 
 app->config(hypnotoad => {listen => ['http://192.168.3.5:3000']});
@@ -94,7 +93,7 @@ any '/' => sub {
 
     my $json = $c->req->json;
     $c->res->headers->header('Access-Control-Allow-Origin' => '*');
-#    $c->res->headers->header('Access-Control-Expose-Headers' => 'sid');
+
     unless ($json)
     {
 	$json =  { map { $_ => $c->param($_) } $c->param };

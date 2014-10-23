@@ -27,13 +27,13 @@ sub roles
 sub acls
 {
     my $self = shift;
-    return $self->{acls_cache} if 
+    return @{$self->{acls_cache}} if 
 	defined $self->{acls_cache};
     my %acls;
 
     for my $role ($self->roles)
     {
-	$acls{$_} = 1 for $role->get_acls_fast;
+	$acls{$_} = 1 for $role->get_all_acl_names;
     }
     $self->{acls_cache} = [keys %acls];
 
@@ -61,24 +61,6 @@ sub get_roles_info
     $out; 
 }
 
-sub get_acls_info
-{
-    my $self = shift;
-    my $acls_info;
-
-    for my $role ($self->roles)
-    {
-	my $role_acls_info = $role->get_acls_info;
-	for my $acl_id (keys %$role_acls_info)
-	{
-	    my $acl_info = $role_acls_info->{$acl_id}; 
-	    $acls_info->{$acl_id}->{name} = $acl_info->{name};   
-	    $acls_info->{$acl_id}->{roles}->{$role->id} = $role->name;
-	}
-    }
-    $acls_info;
-}
-
 sub is_allowed_to
 {
     my ($self,@acl_names) = @_;
@@ -88,6 +70,7 @@ sub is_allowed_to
     {
 	return 0 unless defined $acls{$acl_name};
     }
+
     return 1;
 }
 

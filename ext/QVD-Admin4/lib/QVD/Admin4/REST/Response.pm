@@ -2,7 +2,6 @@ package QVD::Admin4::REST::Response;
 use strict;
 use warnings;
 use Moo;
-use Data::Dumper; 
 
 has 'status',  is => 'ro', isa => sub { die "Invalid type" if ref(+shift); }, required => 1;
 has 'result', is => 'ro', isa => sub { die "Invalid type" unless ref(+shift) eq 'HASH'; }, default => sub {{};};
@@ -108,7 +107,6 @@ sub map_dbix_object_to_output_info
 sub map_result_to_list_of_ids
 {
     my $self = shift;
-
     $self->result->{rows} = 
 	[ map { $_->{id} } @{$self->result->{rows}} ];
 }

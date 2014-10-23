@@ -29,7 +29,18 @@ __PACKAGE__->has_one (vm_runtime => 'QVD::DB::Result::VM_Runtime',  'vm_id');
 __PACKAGE__->has_one (counters   => 'QVD::DB::Result::VM_Counter',  'vm_id');
 __PACKAGE__->has_many(properties => 'QVD::DB::Result::VM_Property', \&custom_join_condition, 
 		      {join_type => 'LEFT', order_by => {'-asc' => 'key'}});
+__PACKAGE__->belongs_to(di => 'QVD::DB::Result::DI',
+			sub {
+  			  my $args = shift;
+ 			  my $in = <<EOIN;
+ SELECT dis.id from dis, di_tags
+  WHERE di_tags.di_id = dis.id
+    AND di_tags.tag = $args->{self_alias}.di_tag
+EOIN
+  			  return { "$args->{foreign_alias}.osf_id" => {-ident => "$args->{self_alias}.osf_id"},
+				   "$args->{foreign_alias}.id" => { -in => \$in } };
 
+			});
 
 sub combined_properties {
     my $vm = shift;
@@ -46,14 +57,6 @@ sub host_name
 {
     my $self = shift;
     $self->vm_runtime->host->name;
-}
-
-
-sub di {
-    my $self = shift;
-    my $tag = eval { $self->di_tag } // 'default';
-    #warn "tag: $tag";
-    $self->osf->di_by_tag($tag);
 }
 
 sub di_id

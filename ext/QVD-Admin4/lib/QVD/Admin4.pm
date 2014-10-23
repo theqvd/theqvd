@@ -39,6 +39,7 @@ sub select
 {
     my ($self,$request) = @_;
 
+    use Data::Dumper; print Dumper $_->name for $DB->resultset('User_View')->search({},{ prefetch => [qw(properties)], bind => [["276","6777"]] })->all();
     my $rs = eval { $DB->resultset($request->table)->search($request->filters, 
 							    $request->modifiers) };
 
@@ -245,16 +246,10 @@ sub add_acls_to_role
 
     for my $acl_name (@$acl_names)
     { 	
-	next if $role->has_positive_acl($acl_name);
-
-	my $acl = $DB->resultset('ACL')->search(
-	    { name => $acl_name })->first;
-	QVD::Admin4::Exception->throw(code => 21) 
-	    unless $acl; 
-
-	$role->has_negative_acl($acl->name) ?
-	    $self->switch_acl_sign_in_role($role,$acl->name) :
-	    $self->assign_acl_to_role($role,$acl->name,1);
+	next if $role->has_own_positive_acl($acl_name);
+	$role->has_own_negative_acl($acl_name) ?
+	    $self->switch_acl_sign_in_role($role,$acl_name) :
+	    $self->assign_acl_to_role($role,$acl_name,1);
     }
 }
 
@@ -264,16 +259,17 @@ sub del_acls_to_role
 
     for my $acl_name (@$acl_names)
     { 	
-	next if $role->has_negative_acl($acl_name);
+	next unless $role->is_allowed_to($acl_name);
+	
+	if ($role->has_own_positive_acl($acl_name)) 
+	{
+	    $self->unassign_acl_to_role($role,$acl_name);
+	}
 
-	my $acl = $DB->resultset('ACL')->search(
-	    { name => $acl_name })->first;
-	QVD::Admin4::Exception->throw(code => 21)
-	    unless $acl; 
-
-	$role->has_positive_acl($acl->name) ?
-	    $self->switch_acl_sign_in_role($role,$acl->name) :
-	    $self->assign_acl_to_role($role,$acl->name,0);
+	if ($role->has_inherited_acl($acl_name))
+	{
+	    $self->assign_acl_to_role($role,$acl_name,0);
+	}
     }
 }
 
@@ -282,15 +278,15 @@ sub add_roles_to_role
     my ($self,$roles_to_assign,$this_role) = @_;
 
     for my $role_to_assign_id (@$roles_to_assign)
-    { 	
-	my $role_to_assign = $DB->resultset('Role')->search(
-	    {id => $role_to_assign_id})->first;
-	QVD::Admin4::Exception->throw(code => 20) 
-	    unless $role_to_assign;
-
-#	my @acl_ids = [$role_to_assign->_get_inherited_acls(return_value => 'id')];
-#	$self->unassign_acls_to_role($this_role,\@acl_ids);
-	$self->assign_role_to_role($this_role,$role_to_assign->id);
+    {
+	$self->assign_role_to_role($this_role,$role_to_assign_id);
+	my $nested_role;
+	for my $neg_acl_name ($this_role->get_negative_own_acl_names)
+	{
+	    $nested_role //= $DB->resultset('Role')->find({id => $role_to_assign_id});
+	    $self->unassign_acl_to_role($this_role,$neg_acl_name) 
+		 if $nested_role->is_allowed_to($neg_acl_name);
+	}
     }
 }
 
@@ -298,21 +294,16 @@ sub del_roles_to_role
 {
     my ($self,$roles_to_unassign,$this_role) = @_;
 
-    for my $role_to_unassign_id (@$roles_to_unassign)
-    { 	
-	my $role_to_unassign = $DB->resultset('Role')->search(
-	    {id => $role_to_unassign_id})->first;
-	QVD::Admin4::Exception->throw(code => 20) 
-	    unless $role_to_unassign;
+    $self->unassign_role_to_role($this_role,$_) 
+	for @$roles_to_unassign;
 
-	$self->unassign_role_to_role($this_role,$role_to_unassign->id);
+    $this_role->reload_full_acls_inheritance_tree;
+    for my $neg_acl_name ($this_role->get_negative_own_acl_names)
+    {
+	$self->unassign_acl_to_role($this_role,$neg_acl_name) 
+	    unless $this_role->has_inherited_acl($neg_acl_name);
+
     }
-
-#    return unless @$roles_to_unassign; 
-#    my %acl_ids = map { $_ => 1 } $this_role->_get_only_inherited_acls(return_value => 'id');
-
-#    defined $acl_ids{$_} || $self->unassign_acls_to_role($this_role,$_,0)
-#    for $this_role->_get_own_acls(return_value => 'id', positive => 0);
 }
 
 #############
@@ -373,7 +364,7 @@ sub assign_role_to_role
 	QVD::Admin4::Exception->throw(code => 20);
 
     $inheritor_role->id eq $_ && QVD::Admin4::Exception->throw(code => 26)
-	for $inherited_role->_get_inherited_roles(return_value => 'id');
+	for $inherited_role->get_all_inherited_role_ids;
 
     eval { $inheritor_role->create_related('role_rels', { inherited_id => $inherited_role_id }) };
 
@@ -390,7 +381,6 @@ sub unassign_role_to_role
     for ($rs->all)
     {
 	eval { $_->delete };
-
 	print $@ if $@;
 	QVD::Admin4::Exception->throw(code => $DB->storage->_dbh->state,
 				      message => "$@") if $@;
@@ -625,7 +615,6 @@ sub current_admin_setup
     my ($self,$administrator,$json_wrapper) = @_;
    { acls => [ $administrator->acls ]};
 }
-
 
 sub get_acls_in_admins
 {
