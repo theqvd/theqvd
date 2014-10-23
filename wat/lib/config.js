@@ -26,18 +26,21 @@ Wat.C = {
     
     logOut: function () {
         $.removeCookie('qvdWatSid', { path: '/' });
+        $.removeCookie('qvdWatLogin', { path: '/' });
         this.loggedIn = false;
+        this.sid = '';
         this.login = '';
     },
     
-    logIn: function (sid) {
+    logIn: function (sid, login) {
         this.loggedIn = true;
         $.cookie('qvdWatSid', sid, { expires: this.loginExpirationDays, path: '/' });
+        $.cookie('qvdWatLogin', login, { expires: this.loginExpirationDays, path: '/' });
         window.location = '#';
     },
     
     isLogged: function () {
-        if (this.loggedIn && this.sid != '' && $.cookie('qvdWatSid') && $.cookie('qvdWatSid') == this.sid) {
+        if (this.loggedIn && this.sid != '' && $.cookie('qvdWatSid') && $.cookie('qvdWatSid') == this.sid && this.login != '' && $.cookie('qvdWatLogin') && $.cookie('qvdWatLogin') == this.login) {
             return true;
         }
         else {
@@ -47,13 +50,15 @@ Wat.C = {
     },
     
     rememberLogin: function () {
-        if ($.cookie('qvdWatSid')) {
+        if ($.cookie('qvdWatSid') && $.cookie('qvdWatLogin')) {
             this.loggedIn = true;
             this.sid = $.cookie('qvdWatSid');
+            this.login = $.cookie('qvdWatLogin');
         }
         else {
             this.loggedIn = false;
             this.sid = '';
+            this.login = '';
         }
         
         if (this.sid) {
@@ -77,11 +82,11 @@ Wat.C = {
     },
     
     checkLogin: function (that) {   
-        that.login = '';
         that.password = '';
 
         if (!that.retrievedData.result || $.isEmptyObject(that.retrievedData.result)) {
             Wat.I.showMessage({message: "Wrong user or password", messageType: "error"});
+            that.login = '';
             that.sid = '';
             return;
         }
@@ -91,7 +96,7 @@ Wat.C = {
         Wat.C.configureVisibility();
         
         if (Wat.CurrentView.qvdObj == 'login') {
-            Wat.C.logIn(that.sid);
+            Wat.C.logIn(that.sid, that.login);
                 
             Wat.I.renderMain();
 
@@ -220,5 +225,15 @@ Wat.C = {
         if ($.isEmptyObject(Wat.I.cornerMenu.setup.subMenu)) {
             delete Wat.I.cornerMenu.setup;
         }
+    },
+    
+    sessionExpired: function (response) {
+        if (response.status == STATUS_NOT_LOGIN) {
+            Wat.Router.app_router.trigger('route:logout');
+            Wat.I.showMessage({'message': $.i18n.t('Your session has expired. Please log in again'), 'messageType': 'error'});
+            return true;
+        }
+        
+        return false;
     }
 }

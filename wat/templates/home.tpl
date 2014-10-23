@@ -104,9 +104,9 @@
                 <div class="js-running-hosts-percent home-title home-percent js-home-percent"></div>
                 <div id="running-hosts" class="pie-chart js-pie-chart" data-target="hosts" width="200px" height="200px"></div>
             </div>
-            <%= Wat.C.ifACL('<a href="#/hosts">', 'host.see.') %>
+            <%= Wat.C.ifACL('<a href="#/hosts">', 'host.see-main.') %>
                 <div class="js-running-hosts-data home-title"></div>
-            <%= Wat.C.ifACL('</a>', 'host.see.') %>
+            <%= Wat.C.ifACL('</a>', 'host.see-main.') %>
         </div>
         <% } %>
     </div>

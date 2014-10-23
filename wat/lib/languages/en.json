@@ -206,5 +206,6 @@
     "VMs": "VMs",
     "Welcome to QVD's Web Administration Tool": "Welcome to QVD's Web Administration Tool",
     "Yes": "Yes",
-    "You can either select only the visible items or all of them, including the items currently out of view due to pagination": "You can either select only the visible items or all of them, including the items currently out of view due to pagination"
+    "You can either select only the visible items or all of them, including the items currently out of view due to pagination": "You can either select only the visible items or all of them, including the items currently out of view due to pagination",
+    "Your session has expired. Please log in again": "Your session has expired. Please log in again"
 }

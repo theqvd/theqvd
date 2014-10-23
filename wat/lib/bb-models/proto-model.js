@@ -5,6 +5,10 @@ Wat.Models.Model = Backbone.Model.extend({
     operation: '',
     
     parse: function(response) {
+        if (Wat.C.sessionExpired(response)) {
+            return;
+        }
+        
         if (response.result) {
             if (response.result.rows) {
                 var view = 'detail';

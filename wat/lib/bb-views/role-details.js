@@ -352,7 +352,6 @@ Wat.Views.RoleDetailsView = Wat.Views.DetailsView.extend({
     
     afterUpdateAcls: function () {
         this.renderManagerInheritedRoles();
-        this.renderManagerACLs();
         $('.bb-details-side1').html(HTML_MINI_LOADING);
         this.renderSide();
         var selectedSubmenuOption = $('.js-submenu-option.menu-option--selected').attr('data-show-submenu');

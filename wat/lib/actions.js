@@ -68,11 +68,15 @@ Wat.A = {
                 }                   
             },
             success: function (response, result, raw) {
+                if (Wat.C.sessionExpired(response)) {
+                    return;
+                }
+                
                 if (raw.getResponseHeader('sid')) {
                     Wat.C.sid = raw.getResponseHeader('sid');
                 }
                 else {
-                    console.log('NO SID FOUND');
+                    //console.log('NO SID FOUND');
                 }
                 
                 if (that) {
@@ -144,7 +148,11 @@ Wat.A = {
                 dataType: 'json',
                 processData: false,
                 parse: true,
-                success: function (data, d, dd) {
+                success: function (data) {
+                    if (Wat.C.sessionExpired(data)) {
+                        return;
+                    }
+                    
                     var optGroup = '';
                     $(data.result.rows).each(function(i,option) {
                         var selected = '';

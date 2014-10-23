@@ -37,6 +37,10 @@ Wat.Collections.Collection = Backbone.Collection.extend({
     },
 
     parse: function(response) {
+        if (Wat.C.sessionExpired(response)) {
+            return;
+        }
+        
         this.status = response.status;
         this.elementsTotal = response.result.total || 0;
         return response.result.rows;
@@ -52,13 +56,6 @@ Wat.Collections.Collection = Backbone.Collection.extend({
             processData: false
         }, options);
         
-        try {
-        a = $.ajax(params).complete(function(e) { if (e.readyState == 0) { console.info(e.readyState); } });
-        }
-        catch (err) {
-            console.log(err);
-        }
-        
-        return a;
+        return $.ajax(params);
     }
 });

@@ -74,7 +74,7 @@ module( "Login tests", {
         this.clock.restore();
 
         // Number of Assertions we Expect     
-        expect( 3 );
+        expect( 4 );
         
         Wat.Router.app_router.trigger('route:defaultRoute');        
         
@@ -86,7 +86,8 @@ module( "Login tests", {
 
         equal(Wat.CurrentView.qvdObj, "home", "Home access granted after auth");
         
-        equal($.cookie('qvdWatSid'), Wat.C.sid, "User stored in cookies");
+        equal($.cookie('qvdWatSid'), Wat.C.sid, "Session ID stored in cookies");
+        equal($.cookie('qvdWatLogin'), Wat.C.login, "User stored in cookies");
     });
 
 var standardViews = [

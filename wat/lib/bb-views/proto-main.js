@@ -263,7 +263,7 @@ Wat.Views.MainView = Backbone.View.extend({
                 }
             }
             
-            if (callResponse == 200 && response.status == SUCCESS) {
+            if (callResponse == 200 && response.status == STATUS_SUCCESS) {
                 that.retrievedData = response;
                 successCallback(that);
                 
