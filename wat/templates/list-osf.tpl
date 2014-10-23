@@ -142,8 +142,8 @@
                                 break;
                             case 'overlay':
                 %>
-                                <td class="desktop">
-                                    <%= model.get('overlay') %>
+                                <td class="desktop center">
+                                    <%= model.get('overlay') ? '<span class="fa fa-check"></span>' : '' %>
                                 </td>
                 <%
                                 break;

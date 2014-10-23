@@ -1,16 +1,11 @@
-module( "Virtual machine tests", {
+module( "Virtual machine fake tests", {
     setup: function() {
         // prepare something for all following tests
         this.server = sinon.fakeServer.create();
-        
-        // Fake Login
-        Wat.C.logOut();
-        Wat.C.logIn('superadmin', 'superadmin');
     },
     teardown: function() {
         // clean up after each test
         this.server.restore();
-        Wat.C.logOut();
     }
 });
     
@@ -34,14 +29,14 @@ module( "Virtual machine tests", {
         };
 
         this.server.respondWith(
-                                    "POST", 
-                                    Wat.C.apiUrl + '?login=superadmin&password=superadmin&action=vm_get_details&filters={"id":' + fakeValues.id + '}',
-                                    [
-                                        200, 
-                                        { "Content-Type": "application/json" },
-                                        JSON.stringify(fakeResponse)
-                                    ]
-                               );
+            "POST", 
+            Wat.C.apiUrl + '?sid=' + Wat.C.sid  + '&action=vm_get_details&filters={"id":' + fakeValues.id + '}',
+            [
+                200, 
+                { "Content-Type": "application/json" },
+                JSON.stringify(fakeResponse)
+            ]
+       );
         
         Wat.Router.app_router.trigger('route:detailsVM', [fakeValues.id]);        
         

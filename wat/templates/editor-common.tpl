@@ -29,12 +29,25 @@
                 %>
                         <tr>
                             <td>
-                                <i class="delete-property-button fa fa-trash-o"></i>
+                                <% if (enabledDeleteProperties) { %>
+                                    <i class="delete-property-button fa fa-trash-o"></i>
+                                <% } %>
                                 <input type="hidden" class="custom-prop-name" value="<%= propName %>">
                                 <span class="custom-prop-name"><%= propName %></span>
                             </td>
                             <td>
-                                <input type="text" class="custom-prop-value" data-current="<%= propValue %>" value="<%= propValue %>">
+                                <% 
+                                if (enabledUpdateProperties) { 
+                                %>
+                                    <input type="text" class="custom-prop-value" data-current="<%= propValue %>" value="<%= propValue %>">
+                                <% 
+                                }
+                                else { 
+                                %>
+                                    <%= propValue %>
+                                <% 
+                                } 
+                                %>
                             </td>
                         </tr>
                 <%
@@ -51,12 +64,14 @@
                             <input type="text" class="custom-prop-value">
                     </td>
                 </tr>
-                <tr>
-                    <td>
-                        <a class="button2 add-property-button fa fa-plus-circle" data-i18n="Add property"></a>
-                    </td>
-                    <td></td>
-                </tr>
+                <% if (enabledCreateProperties) { %>
+                    <tr>
+                        <td>
+                            <a class="button2 add-property-button fa fa-plus-circle" data-i18n="Add property"></a>
+                        </td>
+                        <td></td>
+                    </tr>
+                <% } %>
             </tbody>
         <%
             }

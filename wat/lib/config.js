@@ -9,9 +9,15 @@ Wat.C = {
     loginExpirationDays: 1,
     acls: [],
     aclGroups: {},
+    sid: '',
 
     getBaseUrl: function () {
-        return this.apiUrl + "?login=" + this.login + "&password=" + this.password;
+        if (this.login && this.password) {
+            return this.apiUrl + "?login=" + this.login + "&password=" + this.password;
+        }
+        else {
+            return this.apiUrl + "?sid=" + this.sid;
+        }
     },
     
     isSuperadmin: function () {
@@ -19,24 +25,19 @@ Wat.C = {
     },
     
     logOut: function () {
-        $.removeCookie('qvdWatLoggedInUser', { path: '/' });
-        $.removeCookie('qvdWatLoggedInPassword', { path: '/' });
+        $.removeCookie('qvdWatSid', { path: '/' });
         this.loggedIn = false;
         this.login = '';
     },
     
-    logIn: function (login, password) {
-        this.login = login;
-        this.password = password;
+    logIn: function (sid) {
         this.loggedIn = true;
-
-        $.cookie('qvdWatLoggedInUser', login, { expires: this.loginExpirationDays, path: '/' });
-        $.cookie('qvdWatLoggedInPassword', password, { expires: this.loginExpirationDays, path: '/' });
+        $.cookie('qvdWatSid', sid, { expires: this.loginExpirationDays, path: '/' });
         window.location = '#';
     },
     
     isLogged: function () {
-        if (this.loggedIn && this.login != '' && $.cookie('qvdWatLoggedInUser') && $.cookie('qvdWatLoggedInUser') == this.login) {
+        if (this.loggedIn && this.sid != '' && $.cookie('qvdWatSid') && $.cookie('qvdWatSid') == this.sid) {
             return true;
         }
         else {
@@ -46,17 +47,16 @@ Wat.C = {
     },
     
     rememberLogin: function () {
-        if ($.cookie('qvdWatLoggedInUser')) {
+        if ($.cookie('qvdWatSid')) {
             this.loggedIn = true;
-            this.login = $.cookie('qvdWatLoggedInUser');
-            this.password = $.cookie('qvdWatLoggedInPassword');
+            this.sid = $.cookie('qvdWatSid');
         }
         else {
             this.loggedIn = false;
-            this.login = '';
+            this.sid = '';
         }
         
-        if (this.login && this.password) {
+        if (this.sid) {
             Wat.A.performAction('current_admin_setup', {}, {}, {}, this.checkLogin, this, false);
         }
     },
@@ -76,10 +76,13 @@ Wat.C = {
         Wat.A.performAction('current_admin_setup', {}, {}, {}, this.checkLogin, this, false);
     },
     
-    checkLogin: function (that) {        
+    checkLogin: function (that) {   
+        that.login = '';
+        that.password = '';
+
         if (!that.retrievedData.result || $.isEmptyObject(that.retrievedData.result)) {
             Wat.I.showMessage({message: "Wrong user or password", messageType: "error"});
-            that.login = '';
+            that.sid = '';
             return;
         }
 
@@ -88,13 +91,11 @@ Wat.C = {
         Wat.C.configureVisibility();
         
         if (Wat.CurrentView.qvdObj == 'login') {
-            Wat.C.logIn(that.login, that.password);
+            Wat.C.logIn(that.sid);
                 
             Wat.I.renderMain();
 
             Wat.Router.app_router.performRoute('', Wat.Views.HomeView);
-            
-            //window.location.reload();
         }
     },
     

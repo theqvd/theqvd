@@ -206,7 +206,7 @@ Wat.Views.ListView = Wat.Views.MainView.extend({
     },
     
     checkOne: function (e) {
-        var itemId = parseInt($(e.target).attr('data-id'));
+        var itemId = $(e.target).attr('data-id');
         if ($(e.target).is(":checked")) {
             this.selectedItems.push(itemId);
         }
@@ -360,7 +360,11 @@ Wat.Views.ListView = Wat.Views.MainView.extend({
     },
 
     setListActionButton: function () {
+        // Get Action button from configuration
         this.listActionButton = Wat.I.getListActionButton(this.qvdObj);
+        
+        // Check actions on columns to remove forbidden ones
+        Wat.C.purgeConfigData(this.listActionButton);
     },
     
     setBreadCrumbs: function () {
@@ -768,6 +772,9 @@ Wat.Views.ListView = Wat.Views.MainView.extend({
             // Used in Users
             case 'disconnect_all':
                 // TODO
+                break;
+            case 'delete_acl':
+                Wat.I.confirm('dialog-confirm-undone', that.applyDeleteACL, that);
                 break;
         };
     },

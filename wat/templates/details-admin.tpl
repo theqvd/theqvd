@@ -10,13 +10,19 @@
 </div>
 
 <table class="details details-list col-width-100">
-    <tr">
+    <% 
+    if (Wat.C.checkACL('administrator.see.id')) { 
+    %>
+    <tr>
         <td><i class="fa fa-male"></i><span data-i18n>Id</span></td>
         <td>
             <%= model.get('id') %>
         </td>
     </tr>
-    <% if(Wat.C.isSuperadmin()) { %>
+    <% 
+    }
+    if(Wat.C.isSuperadmin()) { 
+    %>
     <tr>
         <td><i class="fa fa-building"></i><span data-i18n>Tenant</span></td>
         <td>

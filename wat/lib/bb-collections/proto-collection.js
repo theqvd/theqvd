@@ -46,12 +46,19 @@ Wat.Collections.Collection = Backbone.Collection.extend({
         var that = this;
         
         var params = _.extend({
-            type: 'GET',
+            type: 'POST',
             dataType: 'json',
             url: that.getListUrl(),
             processData: false
         }, options);
         
-        return $.ajax(params);
+        try {
+        a = $.ajax(params).complete(function(e) { if (e.readyState == 0) { console.info(e.readyState); } });
+        }
+        catch (err) {
+            console.log(err);
+        }
+        
+        return a;
     }
 });

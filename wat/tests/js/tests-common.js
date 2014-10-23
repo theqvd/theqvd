@@ -1,7 +1,10 @@
 // XML Output in jUnit style for jenkins integration
 QUnit.jUnitReport = function(data) {
-    console.log(data.xml);
+    //console.log(data.xml);
 };
+
+QUnit.begin(function( details ) {
+});
 
 module( "Backbone tests", {
     setup: function() {
@@ -59,65 +62,57 @@ module( "Backbone tests", {
 
 module( "Login tests", {
     setup: function() {
-        // prepare something for all following tests
         Wat.C.logOut();
+        // prepare something for all following tests
     },
     teardown: function() {
         // clean up after each test
-        Wat.C.logOut();
+        
     }
 });
     test("Login with superadmin", function() {   
         this.clock.restore();
 
         // Number of Assertions we Expect     
-        expect( 4 );
+        expect( 3 );
         
         Wat.Router.app_router.trigger('route:defaultRoute');        
         
         equal(Wat.CurrentView.qvdObj, "login", "Login screen is loaded before auth");
-
+    
         Wat.C.tryLogin("superadmin", "superadmin");
-        
+
         Wat.Router.app_router.trigger('route:defaultRoute');        
 
         equal(Wat.CurrentView.qvdObj, "home", "Home access granted after auth");
         
-        equal($.cookie('qvdWatLoggedInUser'), "superadmin", "User stored in cookies");
-        equal($.cookie('qvdWatLoggedInPassword'), "superadmin", "Password stored in cookies");
+        equal($.cookie('qvdWatSid'), Wat.C.sid, "User stored in cookies");
     });
 
+var standardViews = [
+    'User',
+    'VM',
+    'OSF',
+    'DI',
+    'Host'
+];
+       
 module( "View tests", {
     setup: function() {
         // prepare something for all following tests
-        this.server = sinon.fakeServer.create();
-        
-        // Fake Login
-        Wat.C.logOut();
-        Wat.C.logIn('superadmin', 'superadmin');
     },
     teardown: function() {
         // clean up after each test
-        this.server.restore();
-        Wat.C.logOut();
     }
 });
 
-    var standardViews = [
-        'User',
-        'VM',
-        'OSF',
-        'DI',
-        'Host'
-    ];
-
-    $.each(standardViews, function (i, view) {
-        test("Load " + view + " list view", function() {
+    $.each(standardViews, function (i, view) {        
+        test("Load " + view + " list view", function() {    
             // Number of Assertions we Expect     
             expect( 1 );
 
             Wat.Router.app_router.trigger('route:list' + view);        
-
+            
             equal(Wat.CurrentView.qvdObj, view.toLowerCase(), view + " view rendered");
             
             WatTests.listViews[view.toLowerCase()] = _.extend({}, Wat.CurrentView);

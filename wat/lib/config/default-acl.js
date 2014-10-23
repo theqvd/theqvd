@@ -37,6 +37,15 @@ Wat.I.listFields[qvdObj] = {
             'roles'
         ],
         'text': 'Roles'
+    },
+    'name_roles': {
+        'display': true,
+        'fields': [
+            'id',
+            'name',
+            'roles'
+        ],
+        'text': 'Roles'
     }
 };
         
@@ -53,10 +62,7 @@ Wat.I.formFilters[qvdObj] = {
 
 // Actions of the bottom of the list (those that will be done with selected items) configuration on list view
 Wat.I.selectedActions[qvdObj] = {
-    'disable': {
-        'text': 'Disable'
-    },
-    'enable': {
-        'text': 'Enable'
+    'delete_acl': {
+        'text': 'Delete',
     }
 };

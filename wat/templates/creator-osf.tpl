@@ -5,6 +5,9 @@
             <input type="text" name="name" value="" data-required>
         </td>
     </tr>
+    <% 
+    if (Wat.C.checkACL('osf.create.memory')) { 
+    %>
     <tr>
         <td data-i18n>Memory</td>
         <td>
@@ -16,6 +19,10 @@
             </div>
         </td>
     </tr>
+    <% 
+    }
+    if (Wat.C.checkACL('osf.create.user-storage')) { 
+    %>
     <tr>
         <td data-i18n>User storage</td>
         <td>
@@ -27,4 +34,5 @@
             </div>
         </td>
     </tr>
+    <% } %>
  </table>

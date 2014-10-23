@@ -2,15 +2,10 @@ module( "Users Fake tests", {
     setup: function() {
         // prepare something for all following tests
         this.server = sinon.fakeServer.create();
-        
-        // Fake Login
-        Wat.C.logOut();
-        Wat.C.logIn('superadmin', 'superadmin');
     },
     teardown: function() {
         // clean up after each test
         this.server.restore();
-        Wat.C.logOut();
     }
 });
     
@@ -34,20 +29,20 @@ module( "Users Fake tests", {
         };
 
         this.server.respondWith(
-                                    "POST", 
-                                    Wat.C.apiUrl + '?login=superadmin&password=superadmin&action=user_get_details&filters={"id":' + fakeValues.id + '}',
-                                    [
-                                        200, 
-                                        { "Content-Type": "application/json" },
-                                        JSON.stringify(fakeResponse)
-                                    ]
-                               );
+            "POST", 
+            Wat.C.apiUrl + '?sid=' + Wat.C.sid  + '&action=user_get_details&filters={"id":' + fakeValues.id + '}',
+            [
+                200, 
+                { "Content-Type": "application/json" },
+                JSON.stringify(fakeResponse)
+            ]
+       );
         
-        Wat.Router.app_router.trigger('route:detailsUser', [fakeValues.id]);        
-        
+        Wat.Router.app_router.trigger('route:detailsUser', [fakeValues.id]);
+
         // Bind to the change event on the model
         Wat.CurrentView.model.bind('change', callback);
-                
+
         this.server.respond();
         
         ok(callback.called, "Server call");
@@ -67,14 +62,9 @@ module( "Users Fake tests", {
 module( "Users Real tests", {
     setup: function() {
         // prepare something for all following tests
-        
-        // Fake Login
-        Wat.C.logOut();
-        Wat.C.logIn('superadmin', 'superadmin');
     },
     teardown: function() {
         // clean up after each test
-        Wat.C.logOut();
     }
 });
 

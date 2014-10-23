@@ -1348,8 +1348,7 @@ body {
       font-weight: bold; }
   .acls-management .button {
     text-align: center;
-    margin-top: 5px;
-    width: 100%; }
+    vertical-align: bottom; }
   .acls-management .side_to_side_select {
     height: 250px;
     margin-top: 5px; }
@@ -1384,6 +1383,16 @@ select[name="acl_negative_on_role"] option, .acls_negative {
 
 select[name="acl_positive_on_role"] option, .acls_positive {
   color: #009900; }
+
+.subbranch {
+  margin-left: 20px; }
+
+.subbranch-piece {
+  margin-right: 5px;
+  line-height: 25px;
+  padding-bottom: 4px; }
+  .subbranch-piece:first-child {
+    vertical-align: middle; }
 
 .editor-container {
   margin: 0; }
@@ -2269,14 +2278,6 @@ a.button, a.button2, button {
     a.button, a.button2, button {
       font-size: 1em;
       line-height: 1em; } }
-  @media screen and (min-width: 40em) {
-    a.button, a.button2, button {
-      font-size: 1.5em;
-      line-height: 1.5em; }
-      @media screen and (min-width: 40em) {
-        a.button, a.button2, button {
-          font-size: 1.1em;
-          line-height: 1.1em; } } }
 
 label {
   font-size: 0.9em;

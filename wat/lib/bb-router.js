@@ -26,18 +26,17 @@ Wat.Router = Backbone.Router.extend({
     
     performRoute: function (menuOpt, view, params) {
         params = params || {};
-
         if (!Wat.C.isLogged()) {
             Wat.I.renderMain();
             view = Wat.Views.LoginView;
         }
-        
+
         Wat.I.showLoading();
         Wat.I.setMenuOpt(menuOpt);
         if (!$.isEmptyObject(Wat.CurrentView)) {
             Wat.CurrentView.undelegateEvents();
         }
-
+        
         Wat.CurrentView = new view(params);
     }
 });

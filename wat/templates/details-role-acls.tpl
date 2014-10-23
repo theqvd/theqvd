@@ -18,18 +18,6 @@
         </td>
     </tr>
     <tr>
-        <td class="acls acls_negative">
-            <span data-i18n>Excluded ACLs</span>
-            <select name="acl_negative_on_role" class="side_to_side_select" multiple></select>
-            <% if(Wat.C.checkACL('role.update.assign-acl')) { %>
-            <a class="button fa fa-trash js-delete-negative-acl-button disabled" data-i18n>Delete selected</a>
-            <% } %>
-        </td>
-        <% if(Wat.C.checkACL('role.update.assign-acl')) { %>
-        <td class="vbutton">
-            <a class="button button--red button-icon fa fa-arrow-left js-add-negative-acl-button" data-i18n></a>
-        </td>
-        <% } %>
         <% if(Wat.C.checkACL('role.update.assign-acl')) { %>
         <td class="acls acls_available">
             <span data-i18n>Available ACLs</span>
@@ -38,7 +26,7 @@
         <% } %>
         <% if(Wat.C.checkACL('role.update.assign-acl')) { %>
         <td class="vbutton">
-            <a class="button button--green button-icon fa fa-arrow-right js-add-positive-acl-button" data-i18n></a>
+            <a class="button button-icon fa fa-arrow-right js-add-positive-acl-button" data-i18n></a>
         </td>
         <% } %>
         <td class="acls acls_positive">

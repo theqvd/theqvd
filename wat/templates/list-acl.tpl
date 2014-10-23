@@ -26,13 +26,6 @@
                             </th>
             <%
                             break;
-                        case 'id':
-            %>
-                            <th class="sortable desktop col-width-8" data-sortby="id">
-                                <i class="fa fa-sort sort-icon" data-i18n="Id"><%= i18n.t('Id') %></i>
-                            </th>
-            <%
-                            break;
                         case 'name':
             %>
                             <th class="sortable" data-sortby="name">
@@ -44,6 +37,13 @@
             %>
                             <th>
                                 <%= i18n.t('Role') %>
+                            </th>
+            <%
+                            break;
+                        case 'name_roles':
+            %>
+                            <th class="sortable" data-sortby="name">
+                                <i class="fa fa-sort sort-icon" data-i18n="Name"><%= i18n.t('Name') %></i>
                             </th>
             <%
                             break;
@@ -84,7 +84,7 @@
                                 <%
                                     if ($.inArray(filters.id, Object.keys(model.get('roles'))) == -1) {
                                 %>
-                                    <input type="checkbox" class="check-it js-check-it" data-id="<%= model.get('id') %>" <%= checkedAttr %>>
+                                    <input type="checkbox" class="check-it js-check-it" data-id="<%= model.get('name') %>" <%= checkedAttr %>>
                                 <%
                                     }
                                 %>
@@ -104,13 +104,6 @@
                                 </td>
                 <%
                                 break;
-                            case 'id':
-                %>
-                                <td class="desktop">
-                                    <%= model.get('id') %>
-                                </td>
-                <%
-                                break;
                             case 'name':
                 %>
                                 <td class="js-name">
@@ -121,18 +114,46 @@
                             case 'roles':
                 %>
                                 <td class="desktop">
+                                    <%
+                                        $.each(model.get('roles'), function (iRole, role) {
+                                    %>
+                                            <div>
+                                                <%= Wat.C.ifACL('<a href="#/setup/role/' + iRole + '">', 'role.see-details.') %>
+                                                    <span class="text"><%= role %></span>
+                                                <%= Wat.C.ifACL('</a>', 'role.see-details.') %>
+                                            </div>
+                                    <%
+                                        }); 
+                                    %>  
+                                </td>
                 <%
-                    $.each(model.get('roles'), function (iRole, role) {
+                                break;
+                            case 'name_roles':
                 %>
-                        <div>
-                            <%= Wat.C.ifACL('<a href="#/setup/role/' + iRole + '">', 'role.see-details.') %>
-                                <span class="text"><%= role %></span>
-                            <%= Wat.C.ifACL('</a>', 'role.see-details.') %>
-                        </div>
-                <%
-                    }); 
-                %>  
-
+                                <td class="desktop">
+                                    <div class="text"><%= model.get('name') %></div>
+                                    <div class="second_row">
+                                    <span data-i18n>Roles</span>: 
+                                    <%
+                                        var firstPrinted = false;
+                                        $.each(model.get('roles'), function (iRole, role) {
+                                            if (firstPrinted) {
+                                                print(' | ');
+                                            }
+                                            else {
+                                                firstPrinted = true;
+                                            }
+                                    %>
+                                            <span>
+                                                <%= Wat.C.ifACL('<a href="#/setup/role/' + iRole + '">', 'role.see-details.') %>
+                                                    <span class="text"><%= role %></span>
+                                                <%= Wat.C.ifACL('</a>', 'role.see-details.') %>
+                                            </span>
+                                            
+                                    <%
+                                        }); 
+                                    %>  
+                                    </div>
                                 </td>
                 <%
                                 break;

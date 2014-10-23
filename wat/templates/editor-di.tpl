@@ -6,7 +6,7 @@
             if (model.get('default')) {
             %>
                 <div class="second_row" data-i18n>
-                    To change this value, set another Disk image of the same OSF as default
+                    This disk image is already setted as default. To change this, another disk image of the same OSF must be setted as default
                 </div>
             <%
             }
@@ -18,10 +18,16 @@
             %>
         </td>
     </tr>
-    <tr>
-        <td data-i18n>Tags</td>
-        <td>
-            <input type="text" class="" name="tags" value="<%= model.get('tags') %>">
-        </td>
-    </tr>
+    <% 
+    if (Wat.C.checkACL('di.update.tags')) { 
+    %>
+        <tr>
+            <td data-i18n>Tags</td>
+            <td>
+                <input type="text" class="" name="tags" value="<%= model.get('tags') %>">
+            </td>
+        </tr>
+    <% 
+    } 
+    %>
  </table>

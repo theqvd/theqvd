@@ -63,9 +63,6 @@ a, button.actions_button:before {
 
 a.button, a.button2, button {
     @include font-size(2);
-    @include in(desktop) {
-        @include font-size(3);
-    }
 }
 
 // Forms

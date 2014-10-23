@@ -17,22 +17,141 @@ Wat.Views.RoleDetailsView = Wat.Views.DetailsView.extend({
 
         this.params = params;
         
+        Wat.I.chosenConfiguration();
+
         this.renderSetupCommon();
     },
     
     events: {
-        'change select[name="section"]': 'changeSectionFilter',
-        'change select[name="action"]': 'changeActionFilter',
+        'click .js-branch-button': 'toggleBranch',
+        'change .js-branch-check': 'checkBranch',
+        'change .js-acl-check': 'checkACL',
     },
     
-    changeActionFilter: function (e) {
-        this.filterAction = $(e.target).val();
-        this.fillACLCombos();
-    },   
+    // Show-Hide ACL branch
+    toggleBranch: function (e) {
+        var branch = $(e.target).attr('data-branch');
+        
+        //branchDiv.append('<div class="subbranch">' + branch + '</div>');
+        this.currentBranchDiv = $(e.target).parent();
+        this.currentBranch = branch;
+        
+        if ($(e.target).attr('data-open') == '1') {
+            $(e.target).addClass('fa-plus-square-o');
+            $(e.target).removeClass('fa-minus-square-o');
+            $(e.target).attr('data-open', 0);
+            this.currentBranchDiv.find('.subbranch').remove();
+        }
+        else {
+            $(e.target).addClass('fa-minus-square-o');
+            $(e.target).removeClass('fa-plus-square-o');
+            $(e.target).attr('data-open', 1);
+            Wat.A.performAction('acl_tiny_list', {}, {'name': branch + '.%'}, {}, this.fillBranch, this);
+        }
+    },
     
-    changeSectionFilter: function (e) {
-        this.filterSection = $(e.target).val();
-        this.fillACLCombos();
+    // Fill branch with retreived ACLs from API
+    fillBranch: function (that) {
+        $.each(that.retrievedData.result.rows, function (iACL, acl) {
+            var subbranch = '';
+            subbranch += '<div class="subbranch">';
+                subbranch += '<span class="subbranch-piece">';
+                    subbranch += '<input type="checkbox" class="js-acl-check" data-acl="' + acl.name + '" data-acl-id="' + acl.id + '"/>';
+                subbranch += '</span>';
+                subbranch += '<span class="subbranch-piece">';
+                    subbranch += acl.name;
+                subbranch += '</span>';
+                subbranch += '<span class="subbranch-piece">';
+                    subbranch += '<i class="fa fa-sitemap inheritance hidden" data-acl-id="' + acl.id + '" title=""></i>';
+                subbranch += '</span>';
+            subbranch += '</div>';
+            that.currentBranchDiv.append(subbranch);
+        });
+        
+        Wat.A.performAction('get_acls_in_roles', {}, {'acl_name': that.currentBranch + '.%', 'role_id': that.id}, {}, that.fillEffectiveBranch, that);
+    },
+    
+    // Set as checked the effective roles and added the inherit icon with inherited roles title
+    fillEffectiveBranch: function (that) {
+        $.each(that.retrievedData.result.rows, function (iACL, acl) {
+            that.currentBranchDiv.find('input[data-acl-id="' + acl.id + '"]').prop('checked', true);
+            delete acl.roles[that.id];
+            
+            if (Object.keys(acl.roles).length > 0) {
+                that.currentBranchDiv.find('i[data-acl-id="' + acl.id + '"].inheritance').show();
+                
+                var roles = [];
+                $.each(acl.roles, function (iRole, role) {
+                    roles.push(role); 
+                });
+                var titleRole = $.i18n.t('Inherited from roles') + ':<br/><br/>&raquo;' + roles.join('<br/><br/>&raquo;');
+                that.currentBranchDiv.find('i[data-acl-id="' + acl.id + '"].inheritance').attr('title', titleRole);
+            }
+        });
+    },
+    
+    // Check all the acls of a branch triggered when check branch
+    checkBranch: function (e) {
+        var checked = $(e.target).is(':checked');
+        
+        $(e.target).parent().find('input').prop('checked', checked);
+        
+        var branch = $(e.target).attr('data-branch');
+        
+        this.groupACLChecked = checked;
+                
+        // Retrieve acls of a branch to change them
+        Wat.A.performAction('acl_tiny_list', {}, {'name': branch + '.%'}, {}, this.performACLGroupCheck, this);
+    },
+    
+    // Assign-unassign acls of a branch
+    performACLGroupCheck: function (that) {        
+        var branchACLs = that.retrievedData.result.rows;
+        
+        var acls = [];
+        $.each(branchACLs, function (iACL, acl) {
+            acls.push(acl.name);
+        });
+               
+        if (that.groupACLChecked) {
+            that.applyChangeACL({
+                assign_acls: acls
+            });
+        }
+        else {
+            that.applyChangeACL({
+                unassign_acls: acls
+            });
+        }
+    },
+    
+    // Assign-unassign ACL triggered when check an ACL
+    checkACL: function (e) {
+        var checked = $(e.target).is(':checked');
+        
+        if (checked) {
+            this.applyChangeACL({
+                assign_acls: [$(e.target).attr('data-acl')]
+            });
+        }
+        else {
+            this.applyChangeACL({
+                unassign_acls: [$(e.target).attr('data-acl')]
+            });
+        }
+    },
+    
+    // Unpdate ACL changs on Model
+    applyChangeACL: function (aclChange) {
+        var that = this;
+        
+        var context = $('.' + that.cid);
+
+        var arguments = {
+            __acls_changes__: aclChange
+        };
+
+        that.updateModel(arguments, {id: that.id}, function () {});
     },
     
     renderSetupCommon: function () {
@@ -59,35 +178,21 @@ Wat.Views.RoleDetailsView = Wat.Views.DetailsView.extend({
     },
     
     renderSide: function () {
-        if (this.checkSide({'role.see.acl-list': '.js-side-component1'}) === false) {
-            return;
-        }
-        
-        var sideContainer = '.' + this.cid + ' .bb-details-side1';
-        
-        // Render ACLs list on side
-        var params = {};
-        params.whatRender = 'list';
-        params.listContainer = sideContainer;
-        params.forceListColumns = {name: true};
-        // If Administrator has permission show origin of ACLs
-        if (Wat.C.checkACL('role.see.acl-list-roles')) {
-            params.forceListColumns.roles = true;
-        }
-        params.forceSelectedActions = {};
-        params.forceListActionButton = null;
-        params.block = 20;
-        params.filters = {"role_id": this.elementId};
-        params.action = 'get_acls_in_roles';
-        
-        this.sideView = new Wat.Views.ACLListView(params);
     },
     
     render: function () {
         Wat.Views.DetailsView.prototype.render.apply(this);
 
-        this.renderManagerInheritedRoles();   
         this.renderManagerACLs();
+
+        if (Wat.C.checkACL('role.see.inherited-roles')) {
+            this.renderManagerInheritedRoles();   
+        }
+        else {
+            $('.js-menu-roles').hide();
+        }
+        
+        this.renderACLsTree();
         
         // Trigger click on first menu option by default
         $('[data-show-submenu="acls-management-acls"]').trigger('click');
@@ -120,9 +225,10 @@ Wat.Views.RoleDetailsView = Wat.Views.DetailsView.extend({
             $('select[name="role"] option[value="' + iRole + '"]').remove();
         });
         
-        Wat.I.chosenConfiguration();
-        
-        Wat.I.chosenElement('[name="role"]', 'advanced100');
+        // Hack to avoid delays
+        setTimeout(function(){
+            Wat.I.chosenElement('[name="role"]', 'advanced');
+        }, 100);
     },    
     
     renderManagerACLs: function () {
@@ -136,6 +242,20 @@ Wat.Views.RoleDetailsView = Wat.Views.DetailsView.extend({
         $('.bb-role-acls').html(this.template);
         
         this.fillACLCombos();
+    },
+    
+    renderACLsTree: function (that) {
+        var aclsRolesTemplate = Wat.A.getTemplate('details-role-acls-tree');
+        
+        // Fill the html with the template and the model
+        this.template = _.template(
+            aclsRolesTemplate, {
+                sections: ACL_SECTIONS,
+                actions: ACL_ACTIONS
+            }
+        );
+        
+        $('.bb-details-side1').html(this.template);
     },
     
     fillACLCombos: function () {
@@ -182,7 +302,7 @@ Wat.Views.RoleDetailsView = Wat.Views.DetailsView.extend({
         // Set selected acls on excluded list and delete it from available side
         $.each(this.model.get('acls').negative, function (iAcl, acl) {
             if ($('select[name="acl_available"] option[value="' + acl + '"]').val() != undefined) {
-                $('select[name="acl_available"] option[value="' + acl + '"]').remove();
+                //$('select[name="acl_available"] option[value="' + acl + '"]').remove();
                 $('select[name="acl_negative_on_role"]').append('<option value="' + acl + '">' + acl + '</option>');
             }
         });
@@ -201,22 +321,8 @@ Wat.Views.RoleDetailsView = Wat.Views.DetailsView.extend({
     
     fillACLsFilters: function () {
         // Fill filter selects
-        var aclCat1 = {'-1': 'All'};
-        var aclCat2 = {'-1': 'All'};
-        $.each($('select[name="acl_available"] option'), function (i,v) {
-            var cat1 = $(v).val().split('.')[0];
-            var cat2 = $(v).val().split('.')[1];
-            
-            if ($.inArray(cat1, Object.keys(aclCat1)) == -1) {
-                aclCat1[cat1] = cat1;
-            }            
-            if ($.inArray(cat2, Object.keys(aclCat2)) == -1) {
-                aclCat2[cat2] = cat2;
-            }
-        });
-        
         var params = {
-            'startingOptions': aclCat1,
+            'startingOptions': ACL_SECTIONS,
             'selectedId': this.filterSection,
             'controlName': 'section',
             'translateOptions': ['-1'],
@@ -225,11 +331,10 @@ Wat.Views.RoleDetailsView = Wat.Views.DetailsView.extend({
         };
 
         Wat.A.fillSelect(params);
-        Wat.A.fillSelect(params);
         Wat.I.chosenElement('[name="section"]', 'single');
 
         var params = {
-            'startingOptions': aclCat2,
+            'startingOptions': ACL_ACTIONS,
             'selectedId': this.filterAction,
             'controlName': 'action',
             'translateOptions': ['-1'],
@@ -242,12 +347,7 @@ Wat.Views.RoleDetailsView = Wat.Views.DetailsView.extend({
     },
     
     afterUpdateRoles: function () {
-        this.renderManagerInheritedRoles();
-        $('.bb-details-side1').html(HTML_MINI_LOADING);
-        this.renderSide();
-        var selectedSubmenuOption = $('.js-submenu-option.menu-option--selected').attr('data-show-submenu');
-        $('.acls-management').hide();
-        $('.' + selectedSubmenuOption).show();
+        this.render();
     },
     
     afterUpdateAcls: function () {

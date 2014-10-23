@@ -80,7 +80,7 @@
         <div class="action-selected">
             <div class="action-selected-select">
                 <select name="selected_actions_select" class="chosen-single">
-                    <% $.each(selectedActions, function(action, actionConfig) { console.log(action);console.log(actionConfig);%>
+                    <% $.each(selectedActions, function(action, actionConfig) { %>
                         <option value="<%= action %>" data-i18n><%= actionConfig.text %></option>
                     <% }); %>
                 </select>

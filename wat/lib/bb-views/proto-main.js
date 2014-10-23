@@ -83,7 +83,32 @@ Wat.Views.MainView = Backbone.View.extend({
         var isSuperadmin = Wat.C.isSuperadmin();
         var editorMode = that.collection ? 'create' : 'edit';
         var classifiedByTenant = $.inArray(that.qvdObj, QVD_OBJS_CLASSIFIED_BY_TENANT) != -1;
+        var enabledProperties = $.inArray(that.qvdObj, QVD_OBJS_WITH_PROPERTIES) != -1;
+        var enabledCreateProperties = true;
+        var enabledUpdateProperties = true;
+        var enabledDeleteProperties = true;
 
+        if (enabledProperties) {
+            switch (editorMode) {
+                case 'edit':
+                        if (!Wat.C.checkACL(Wat.CurrentView.qvdObj + '.update.properties-create')) {
+                            var enabledCreateProperties = false;
+                        }
+                        if (!Wat.C.checkACL(Wat.CurrentView.qvdObj + '.update.properties-update')) {
+                            var enabledUpdateProperties = false;
+                        }
+                        if (!Wat.C.checkACL(Wat.CurrentView.qvdObj + '.update.properties-delete')) {
+                            var enabledDeleteProperties = false;
+                        }
+                    break;
+                case 'create':
+                        if (!Wat.C.checkACL(Wat.CurrentView.qvdObj + '.create.properties')) {
+                            enabledProperties = false;
+                        }
+                    break;
+            }
+        }
+        
         // Add common parts of editor to dialog
         that.template = _.template(
                     that.templateEditorCommon, {
@@ -92,7 +117,10 @@ Wat.Views.MainView = Backbone.View.extend({
                         editorMode: editorMode,
                         blocked: that.model.attributes.blocked,
                         properties: that.model.attributes.properties,
-                        enabledProperties: $.inArray(that.qvdObj, QVD_OBJS_WITH_PROPERTIES) != -1,
+                        enabledProperties: enabledProperties,
+                        enabledCreateProperties: enabledCreateProperties,
+                        enabledUpdateProperties: enabledUpdateProperties,
+                        enabledDeleteProperties: enabledDeleteProperties,
                         cid: that.cid
                     }
                 );
@@ -222,9 +250,19 @@ Wat.Views.MainView = Backbone.View.extend({
         var model = model || this.model;
         
         var that = this;
-        model.save(arguments, {filters: filters}).complete(function(e) {
+        model.save(arguments, {filters: filters}).complete(function(e, a, b) {
             var callResponse = e.status;
-            var response = JSON.parse(e.responseText);
+            var response = {status: e.status};
+            
+            if (e.responseText) {
+                try {
+                    response = JSON.parse(e.responseText);
+                }
+                catch (err) {
+                    //console.log (e.responseText);
+                }
+            }
+            
             if (callResponse == 200 && response.status == SUCCESS) {
                 that.retrievedData = response;
                 successCallback(that);

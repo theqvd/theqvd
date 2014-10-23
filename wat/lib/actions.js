@@ -41,14 +41,14 @@ Wat.A = {
         var that2 = that;
 
         successCallback = successCallback || function () {};   
-        $.ajax({
+        var params = {
             url: url,
             type: 'POST',
             dataType: 'json',
             processData: false,
             parse: true,
             async: async,
-            error: function (response, a, b, c) {
+            error: function (response) {
                 if (that) {
                     that.retrievedData = response;
                 }
@@ -68,7 +68,13 @@ Wat.A = {
                 }                   
             },
             success: function (response, result, raw) {
-                //console.log(raw.getAllResponseHeaders());
+                if (raw.getResponseHeader('sid')) {
+                    Wat.C.sid = raw.getResponseHeader('sid');
+                }
+                else {
+                    console.log('NO SID FOUND');
+                }
+                
                 if (that) {
                     that.retrievedData = response;
                 }
@@ -93,7 +99,9 @@ Wat.A = {
                     Wat.I.showMessage(messageParams, response);
                 }                
             }
-        });
+        };
+        
+        $.ajax(params);
     },
     
     // Fill filter selects 
@@ -128,7 +136,7 @@ Wat.A = {
             if (params.filters) {
                 jsonUrl += '&filters=' + JSON.stringify(params.filters);
             }
-            
+
             $.ajax({
                 url: jsonUrl,
                 type: 'POST',
@@ -158,10 +166,8 @@ Wat.A = {
                         }
                         
 /*                        if (params.action == 'acl_tiny_list') {
-                            console.log(name);
                             var startWith = 'user_';
                             var regExp = new RegExp('^' + startWith);
-                            console.log(name.match(regExp) ? 1 : 0);
                         }*/
                         
                         $.each($('select[name="' + params.controlName + '"]'), function () {

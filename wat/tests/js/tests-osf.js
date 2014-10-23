@@ -1,16 +1,11 @@
-module( "OS Flavour tests", {
+module( "OS Flavour fake tests", {
     setup: function() {
         // prepare something for all following tests
         this.server = sinon.fakeServer.create();
-        
-        // Fake Login
-        Wat.C.logOut();
-        Wat.C.logIn('superadmin', 'superadmin');
     },
     teardown: function() {
         // clean up after each test
         this.server.restore();
-        Wat.C.logOut();
     }
 });
     
@@ -34,14 +29,14 @@ module( "OS Flavour tests", {
         };
 
         this.server.respondWith(
-                                    "POST", 
-                                    Wat.C.apiUrl + '?login=superadmin&password=superadmin&action=osf_get_details&filters={"id":' + fakeValues.id + '}',
-                                    [
-                                        200, 
-                                        { "Content-Type": "application/json" },
-                                        JSON.stringify(fakeResponse)
-                                    ]
-                               );
+            "POST", 
+            Wat.C.apiUrl + '?sid=' + Wat.C.sid  + '&action=osf_get_details&filters={"id":' + fakeValues.id + '}',
+            [
+                200, 
+                { "Content-Type": "application/json" },
+                JSON.stringify(fakeResponse)
+            ]
+       );
         
         Wat.Router.app_router.trigger('route:detailsOSF', [fakeValues.id]);        
         
@@ -70,12 +65,9 @@ module( "OS Flavours Real tests", {
         // prepare something for all following tests
         
         // Fake Login
-        Wat.C.logOut();
-        Wat.C.logIn('superadmin', 'superadmin');
     },
     teardown: function() {
         // clean up after each test
-        Wat.C.logOut();
     }
 });
 
@@ -106,6 +98,7 @@ module( "OS Flavours Real tests", {
             WatTests.models.osf = new Wat.Models.OSF({
                 id: WatTests.values.osf.id
             });            
+            
             
             WatTests.models.osf.fetch({      
                 complete: function () {

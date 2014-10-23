@@ -4,6 +4,7 @@ Wat.I = {
     G: {},
     
     menu : {},
+    mobileMenu : {},
     cornerMenu : {},
     
     getCornerMenu: function () {

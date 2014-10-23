@@ -18,3 +18,31 @@ QVD_OBJS_CLASSIFIED_BY_TENANT = ['user', 'vm', 'osf', 'di', 'admin'];
 QVD_OBJS_EXIST_IN_SUPERTENANT = ['role', 'admin'];
 
 HTML_MINI_LOADING = '<div class="mini-loading"><i class="fa fa-gear fa-spin"></i></div>';
+
+ACL_SECTIONS = {
+    "-1": "All",
+    "administrator": "administrator",
+    "config": "config",
+    "di": "di",
+    "host": "host",
+    "osf": "osf",
+    "role": "role",
+    "tenant": "tenant",
+    "user": "user",
+    "views": "views",
+    "vm": "vm"
+};
+
+ACL_ACTIONS = {
+    "-1": "All",
+    "create": "create",
+    "delete": "delete",
+    "delete-massive": "delete-massive",
+    "see": "see",
+    "see-details": "see-details",
+    "see-main": "see-main",
+    "update": "update",
+    "filter": "filter",
+    "stats": "stats",
+    "update-massive": "update-massive"
+}

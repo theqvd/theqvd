@@ -9,17 +9,9 @@
     <tr>
         <td colspan="2">
             <table class="roles-inherit-table">
-                <tr>
-                    <td>
-                        <span data-i18n>Select a role to be assigned</span>
-                    </td>
-                </tr>
-                <tr>
-                    <td>
-                        <select name="role"></select>
-                        <a class="button add-role-button js-add-role-button fa fa-graduation-cap" href="javascript:" data-i18n>Assign</a>
-                    </td>
-                </tr>
+                <%
+                if (Wat.C.checkACL('administrator.see.roles')) { 
+                %>
                 <tr>
                     <td>
                         <%
@@ -27,7 +19,7 @@
                         %>
                             <div>
                                 <%
-                                    if (Wat.C.checkACL('role.update.assign-role')) {
+                                    if (Wat.C.checkACL('administrator.update.assign-role')) {
                                 %>
                                         <i class="delete-role-button js-delete-role-button fa fa-trash-o" data-id="<%= iRole %>" data-name="<%= role %>"></i>
                                 <%
@@ -50,6 +42,19 @@
                         %>
                     </td>
                 </tr>
+                <% 
+                }
+                if (Wat.C.checkACL('administrator.update.assign-role')) { 
+                %>
+                    <tr>
+                        <td>
+                            <select name="role"></select>
+                            <a class="button add-role-button js-add-role-button fa fa-graduation-cap" href="javascript:" data-i18n>Assign</a>
+                        </td>
+                    </tr>
+                <% 
+                }   
+                %>
             </table>
         </td>
     </tr>

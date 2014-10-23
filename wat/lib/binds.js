@@ -314,7 +314,6 @@ Wat.B = {
         },
         
         filterTenantUsers: function () {
-            console.log('filterusers');
             var params = {
                 'action': 'user_tiny_list',
                 'selectedId': '',
@@ -361,7 +360,7 @@ Wat.B = {
             };
             
             var changes = {};
-            changes["unassign_" + type + "_acls"] = acls;
+            changes["unassign_acls"] = acls;
             
             var arguments = {
                 "__acls_changes__": changes
@@ -391,7 +390,7 @@ Wat.B = {
             };
             
             var changes = {};
-            changes["assign_" + type + "_acls"] = acls;
+            changes["assign_acls"] = acls;
             
             var arguments = {
                 "__acls_changes__": changes
@@ -428,11 +427,6 @@ Wat.B = {
         },
         addRole: function () {
             var roleId = $('select[name="role"]').val();
-            
-            if (!roleId) {
-                Wat.I.showMessage({message: i18n.t('No items were selected') + '. ' + i18n.t('Nothing to do'), messageType: 'info'});
-                return;
-            }
             
             var filters = {
                 id: Wat.CurrentView.id

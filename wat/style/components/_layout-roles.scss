@@ -49,8 +49,7 @@
     
     .button {
         text-align: center;
-        margin-top: 5px;
-        width: 100%;
+        vertical-align: bottom;
     }
     
     .side_to_side_select {
@@ -98,4 +97,20 @@ select[name="acl_negative_on_role"] option, .acls_negative {
 
 select[name="acl_positive_on_role"] option, .acls_positive {
     color: darken($col_green, 10);
+}
+
+
+.subbranch {
+    margin-left: 20px;
+}
+
+.subbranch-piece {
+    margin-right: 5px;
+    line-height: 25px;
+    
+    padding-bottom: 4px;
+    
+    &:first-child {
+        vertical-align: middle;
+    }
 }

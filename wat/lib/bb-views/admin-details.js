@@ -54,7 +54,10 @@ Wat.Views.AdminDetailsView = Wat.Views.DetailsView.extend({
         
         Wat.I.chosenConfiguration();
         
-        Wat.I.chosenElement('[name="role"]', 'advanced100');
+        // Hack to avoid delays
+        setTimeout(function(){
+            Wat.I.chosenElement('[name="role"]', 'advanced');
+        }, 100);
     },    
     
     renderSetupCommon: function () {
@@ -88,9 +91,7 @@ Wat.Views.AdminDetailsView = Wat.Views.DetailsView.extend({
     },
     
     afterUpdateRoles: function () {
-        this.renderManagerRoles();
-        $('.bb-details-side1').html(HTML_MINI_LOADING);
-        this.renderSide();
+        this.render();
     },
     
     openEditElementDialog: function(e) {
@@ -131,7 +132,7 @@ Wat.Views.AdminDetailsView = Wat.Views.DetailsView.extend({
         params.listContainer = sideContainer;
         params.forceListColumns = {name: true};
         // If Administrator has permission and more than one role assigned, show origin of ACLs
-        if (Wat.C.checkACL('role.see.acl-list-roles') && this.model.attributes.roles.length > 1) {
+        if (Wat.C.checkACL('administrator.see.acl-list-roles')) {
             params.forceListColumns.roles = true;
         }
         params.forceSelectedActions = {};
