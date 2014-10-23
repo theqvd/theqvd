@@ -208,10 +208,10 @@ Wat.Views.ListView = Wat.Views.MainView.extend({
     checkOne: function (e) {
         var itemId = $(e.target).attr('data-id');
         if ($(e.target).is(":checked")) {
-            this.selectedItems.push(itemId);
+            this.selectedItems.push(parseInt(itemId));
         }
         else {
-            var posItem = $.inArray(itemId, this.selectedItems);
+            var posItem = $.inArray(parseInt(itemId), this.selectedItems);
             this.selectedItems.splice( posItem, 1 );
         }
         
@@ -800,6 +800,8 @@ Wat.Views.ListView = Wat.Views.MainView.extend({
     resetSelectedItems: function () {
         this.selectedAll = false;
         this.selectedItems = [];
+        $('.js-check-it').prop('checked', false);
+        $('.check_all').prop('checked', false);
     },
     
     setupMassiveChangesDialog: function (that) {
