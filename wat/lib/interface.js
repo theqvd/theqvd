@@ -18,7 +18,7 @@ Wat.I = {
         osf: {},
         di: {},
         role: {},
-        admin: {},
+        administrator: {},
         acl: {}
     },
     
@@ -33,7 +33,7 @@ Wat.I = {
         osf: {},
         di: {},
         role: {},
-        admin: {},
+        administrator: {},
         acl: {}
     }, 
     
@@ -216,7 +216,7 @@ Wat.I = {
         host: {},
         osf: {},
         di: {},
-        admin: {},
+        administrator: {},
         tenant: {},
         role: {},
         acl: {}
@@ -235,7 +235,7 @@ Wat.I = {
         host: {},
         osf: {},
         di: {},
-        admin: {},
+        administrator: {},
         tenant: {},
         role: {},
         acl: {}

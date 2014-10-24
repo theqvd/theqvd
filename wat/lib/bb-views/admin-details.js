@@ -2,7 +2,7 @@ Wat.Views.AdminDetailsView = Wat.Views.DetailsView.extend({
     setupCommonTemplateName: 'setup-common',
     setupOption: 'admins',
     secondaryContainer: '.bb-setup',
-    qvdObj: 'admin',
+    qvdObj: 'administrator',
 
     initialize: function (params) {
         this.model = new Wat.Models.Admin(params);
@@ -33,7 +33,7 @@ Wat.Views.AdminDetailsView = Wat.Views.DetailsView.extend({
             return;
         }
         
-        var aclsAdminsTemplate = Wat.A.getTemplate('details-admin-acls-tree');
+        var aclsAdminsTemplate = Wat.A.getTemplate('details-administrator-acls-tree');
         
         // Fill the html with the template and the model
         this.template = _.template(
@@ -160,7 +160,7 @@ Wat.Views.AdminDetailsView = Wat.Views.DetailsView.extend({
     
     
     renderManagerRoles: function () {
-        var inheritedRolesTemplate = Wat.A.getTemplate('details-admin-roles');
+        var inheritedRolesTemplate = Wat.A.getTemplate('details-administrator-roles');
         // Fill the html with the template and the model
         this.template = _.template(
             inheritedRolesTemplate, {

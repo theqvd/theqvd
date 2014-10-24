@@ -392,7 +392,13 @@ Wat.Views.ListView = Wat.Views.MainView.extend({
             complete: function () {
                 switch(that.whatRender) {
                     case 'all':
-                        that.renderAll();
+                        // If user have not access to main section, redirect to home
+                        if (!Wat.C.checkACL(that.qvdObj + '.see-main.')) {
+                            window.location = '#';
+                        }
+                        else {
+                            that.renderAll();
+                        }
                         break;
                     case 'list':
                         that.renderListBlock();

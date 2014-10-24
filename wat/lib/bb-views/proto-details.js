@@ -65,6 +65,12 @@ Wat.Views.DetailsView = Wat.Views.MainView.extend({
     },
 
     render: function () {
+        // If user have not access to main section, redirect to home
+        if (!Wat.C.checkACL(this.qvdObj + '.see-details.')) {
+            window.location = '#';
+            return;
+        }
+        
         if (this.notFound == undefined) {
             this.notFound = this.model.attributes.name == undefined;
         }

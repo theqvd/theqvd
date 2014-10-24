@@ -1,4 +1,4 @@
-var qvdObj = 'admin';
+var qvdObj = 'administrator';
 
 // Columns configuration on list view
 Wat.I.listFields[qvdObj] = {

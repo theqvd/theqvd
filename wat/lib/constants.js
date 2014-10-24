@@ -20,8 +20,8 @@ COL_BRAND_DARK = '#9a4008';
 
 // Classification of Qvd Objects
 QVD_OBJS_WITH_PROPERTIES = ['user', 'vm', 'host', 'osf', 'di'];
-QVD_OBJS_CLASSIFIED_BY_TENANT = ['user', 'vm', 'osf', 'di', 'admin'];
-QVD_OBJS_EXIST_IN_SUPERTENANT = ['role', 'admin'];
+QVD_OBJS_CLASSIFIED_BY_TENANT = ['user', 'vm', 'osf', 'di', 'administrator'];
+QVD_OBJS_EXIST_IN_SUPERTENANT = ['role', 'administrator'];
 
 // Html pieces
 HTML_MINI_LOADING = '<div class="mini-loading"><i class="fa fa-gear fa-spin"></i></div>';
