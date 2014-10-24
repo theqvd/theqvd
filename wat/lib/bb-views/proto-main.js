@@ -19,7 +19,6 @@ Wat.Views.MainView = Backbone.View.extend({
         
         // Add to the view events the parent class of this view to avoid collisions with other views events
         this.events = this.restrictEventsScope(this.events);
-        this.template403 = Wat.A.getTemplate('403');
 
         var that = this;
         this.render = _.wrap(this.render, function(render) { 

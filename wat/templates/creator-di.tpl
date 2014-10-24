@@ -14,7 +14,7 @@
             <input type="text" name="version" value="">
             <div class="second_row" data-i18n>
                 <%=
-                    '(' + i18n.t('Leave it blank for set automatic version based en creation date') + ')'
+                    '(' + i18n.t('Leave it blank for set automatic version based on creation date') + ')'
                 %>
             </div>
         </td>
