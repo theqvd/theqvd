@@ -144,10 +144,12 @@ select[name="acl_positive_on_role"] option, .acls_positive {
     width: 18px !important;
     height: 18px !important;
     vertical-align: middle;
+    margin-right: 5px;
 }
 
 .branch-text, .subbranch-piece {
     vertical-align: top;
+    margin-left: 2px;
 }
 
 .acl-inheritance {
