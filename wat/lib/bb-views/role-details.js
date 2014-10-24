@@ -78,6 +78,8 @@ Wat.Views.RoleDetailsView = Wat.Views.DetailsView.extend({
                     filters = {'name': branch + '.%'};
                     break;
             }
+                        
+            this.currentBranchDiv.append(HTML_MINI_LOADING);
             
             Wat.A.performAction('acl_tiny_list', {}, filters, {}, this.fillBranch, this);
         }
@@ -87,20 +89,24 @@ Wat.Views.RoleDetailsView = Wat.Views.DetailsView.extend({
     fillBranch: function (that) {
         $.each(that.retrievedData.result.rows, function (iACL, acl) {
             var subbranch = '';
-            subbranch += '<div class="subbranch">';
-                subbranch += '<span class="subbranch-piece">';
-                    subbranch += '<input type="checkbox" class="js-acl-check acl-check" data-acl="' + acl.name + '" data-acl-id="' + acl.id + '"/>';
-                subbranch += '</span>';
+            subbranch += '<div class="subbranch disabled-branch hidden" data-acl="' + acl.name + '" data-acl-id="' + acl.id + '">';
+                if (Wat.C.checkACL('role.update.assign-acl')) {
+                    subbranch += '<span class="subbranch-piece">';
+                        subbranch += '<input type="checkbox" class="js-acl-check acl-check" data-acl="' + acl.name + '" data-acl-id="' + acl.id + '"/>';
+                    subbranch += '</span>';
+                }
                 subbranch += '<span class="subbranch-piece">';
                     subbranch += acl.name;
                 subbranch += '</span>';
-                subbranch += '<span class="subbranch-piece">';
-                    subbranch += '<i class="fa fa-sitemap acl-inheritance hidden" data-acl-id="' + acl.id + '" title=""></i>';
-                subbranch += '</span>';
+                if (Wat.C.checkACL('role.see.acl-list-roles')) {
+                    subbranch += '<span class="subbranch-piece">';
+                        subbranch += '<i class="fa fa-sitemap acl-inheritance hidden" data-acl-id="' + acl.id + '" title=""></i>';
+                    subbranch += '</span>';
+                }
             subbranch += '</div>';
             that.currentBranchDiv.append(subbranch);
         });
-        
+                
         switch (that.currentTreeKind) {
             case 'actions':
                 filters = {'acl_name': '%.' + that.currentBranch + '.%', 'role_id': that.id};
@@ -115,8 +121,17 @@ Wat.Views.RoleDetailsView = Wat.Views.DetailsView.extend({
     
     // Set as checked the effective roles and added the inherit icon with inherited roles title
     fillEffectiveBranch: function (that) {
+        // If we cant update acls, we only show effective acls
+        var showNotVisibleAcls = Wat.C.checkACL('role.update.assign-acl');
+        
         $.each(that.retrievedData.result.rows, function (iACL, acl) {
             that.currentBranchDiv.find('input[data-acl-id="' + acl.id + '"]').prop('checked', true);
+            that.currentBranchDiv.find('div.subbranch[data-acl-id="' + acl.id + '"]').removeClass('disabled-branch');
+            
+            if (!showNotVisibleAcls) {
+                that.currentBranchDiv.find('div.subbranch[data-acl-id="' + acl.id + '"]').show();
+            }
+
             delete acl.roles[that.id];
 
             if (Object.keys(acl.roles).length > 0) {
@@ -130,6 +145,37 @@ Wat.Views.RoleDetailsView = Wat.Views.DetailsView.extend({
                 that.currentBranchDiv.find('i[data-acl-id="' + acl.id + '"].acl-inheritance').attr('title', titleRole);
             }
         });
+        
+        if (showNotVisibleAcls) {
+            // We check if any of the acls of this branch is in negative acls to draw roles procedence
+            $.each(that.currentBranchDiv.find('.subbranch'), function (iBranch, branch) {
+                var aclName = $(branch).attr('data-acl');
+                var aclId = $(branch).attr('data-acl-id');
+                var negativeACLs = that.model.attributes.acls.negative;
+                var inheritedRoles = that.model.attributes.roles;
+
+                if ($.inArray(aclName, negativeACLs) != -1) { 
+
+                    that.currentBranchDiv.find('i[data-acl-id="' + aclId + '"].acl-inheritance').show();
+
+                    var roles = [];
+                    $.each(inheritedRoles, function (iRole, role) {
+                        if ($.inArray(aclName, role.acls) != -1) { 
+                            roles.push(role.name); 
+                        }
+                    });
+
+                    var titleRole = $.i18n.t('Inherited from roles') + ':<br/><br/>&raquo;' + roles.join('<br/><br/>&raquo;');
+                    that.currentBranchDiv.find('i[data-acl-id="' + aclId + '"].acl-inheritance').attr('title', titleRole);                
+                }
+            });
+        }
+        
+        // Only if we can update acls, not effective acls are shown
+        if (showNotVisibleAcls) {
+            that.currentBranchDiv.find('.subbranch').fadeIn();
+        }
+        that.currentBranchDiv.find('.mini-loading').hide();
     },
     
     // Check all the acls of a branch triggered when check branch
@@ -180,16 +226,21 @@ Wat.Views.RoleDetailsView = Wat.Views.DetailsView.extend({
     // Assign-unassign ACL triggered when check an ACL
     checkACL: function (e) {
         var checked = $(e.target).is(':checked');
+        var aclName = $(e.target).attr('data-acl');
+        var currentSubBranch = $(e.target).parent().parent();
         
         if (checked) {
             this.applyChangeACL({
-                assign_acls: [$(e.target).attr('data-acl')]
+                assign_acls: [ aclName]
             });
+            currentSubBranch.removeClass('disabled-branch');
+
         }
         else {
             this.applyChangeACL({
-                unassign_acls: [$(e.target).attr('data-acl')]
+                unassign_acls: [ aclName]
             });
+            currentSubBranch.addClass('disabled-branch');
         }
     },
     
@@ -282,6 +333,13 @@ Wat.Views.RoleDetailsView = Wat.Views.DetailsView.extend({
     },    
     
     renderACLsTree: function () {
+        // If acl list is not visible, we destroy div and increase the details layer to fill the gap
+        if (!Wat.C.checkACL('role.see.acl-list')) { 
+            $('.js-details-side').remove();
+            $('.details-block').addClass('col-width-100');
+            return;
+        }
+
         var aclsRolesTemplate = Wat.A.getTemplate('details-role-acls-tree');
         
         // Fill the html with the template and the model

@@ -113,9 +113,6 @@ a {
 a:hover i:before {
   color: #444; }
 
-.hidden {
-  display: none; }
-
 .invisible {
   visibility: hidden; }
 
@@ -1400,17 +1397,22 @@ select[name="acl_positive_on_role"] option, .acls_positive {
   margin-bottom: 15px; }
 
 .acls-branch, .subbranch {
-  line-height: 25px;
+  line-height: 27px;
   display: table; }
+  .acls-branch .mini-loading, .subbranch .mini-loading {
+    margin-top: 0px;
+    margin-left: 30px; }
 
 .branch-button {
-  margin-right: 5px; }
+  margin-right: 5px;
+  vertical-align: bottom; }
   .branch-button:before {
     font-size: 22px; }
 
 .branch-check, .acl-check {
   width: 18px !important;
-  height: 18px !important; }
+  height: 18px !important;
+  vertical-align: middle; }
 
 .branch-text, .subbranch-piece {
   vertical-align: top; }
@@ -1418,7 +1420,10 @@ select[name="acl_positive_on_role"] option, .acls_positive {
 .acl-inheritance {
   margin-right: 5px; }
   .acl-inheritance:before {
-    font-size: 22px; }
+    font-size: 20px; }
+
+.disabled-branch {
+  color: #aaa; }
 
 .editor-container {
   margin: 0; }
@@ -2456,5 +2461,9 @@ td {
 
 .block {
   display: block !important; }
+
+/* Hidden will have not important to open the possibility of use $().show() */
+.hidden {
+  display: none; }
 
 /*# sourceMappingURL=style.css.map */

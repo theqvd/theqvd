@@ -30,5 +30,11 @@ if (Wat.C.checkACL('role.see.id')) {
 %>
 
 <div class="bb-role-inherited-roles role-inherited-roles"></div>
-<div class="bb-role-acls role-acls"></div>
-<div class="bb-role-acls-tree role-acls-tree"></div>
+
+<% 
+if (Wat.C.checkACL('role.see.acl-list')) { 
+%>
+    <div class="bb-role-acls-tree role-acls-tree"></div>
+<% 
+} 
+%>

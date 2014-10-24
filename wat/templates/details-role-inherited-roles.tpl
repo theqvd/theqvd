@@ -16,7 +16,7 @@
                         %>
                             <div>
                                 <%
-                                    if (Wat.C.checkACL('administrator.update.assign-role')) {
+                                    if (Wat.C.checkACL('role.update.assign-role')) {
                                 %>
                                         <i class="delete-role-button js-delete-role-button fa fa-trash-o" data-id="<%= iRole %>" data-name="<%= role %>"></i>
                                 <%

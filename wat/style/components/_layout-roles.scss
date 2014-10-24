@@ -122,12 +122,19 @@ select[name="acl_positive_on_role"] option, .acls_positive {
 }
 
 .acls-branch, .subbranch {
-    line-height: 25px;
+    line-height: 27px;
     display: table;
+    
+    .mini-loading {
+        margin-top: 0px;
+        margin-left: 30px;
+    }
 }
 
 .branch-button {
     margin-right: 5px;
+    vertical-align: bottom;
+    
     &:before {
         font-size: 22px;
     }
@@ -136,6 +143,7 @@ select[name="acl_positive_on_role"] option, .acls_positive {
 .branch-check, .acl-check {
     width: 18px !important;
     height: 18px !important;
+    vertical-align: middle;
 }
 
 .branch-text, .subbranch-piece {
@@ -145,6 +153,10 @@ select[name="acl_positive_on_role"] option, .acls_positive {
 .acl-inheritance {
     margin-right: 5px;
     &:before {
-        font-size: 22px;
+        font-size: 20px;
     }
+}
+
+.disabled-branch {
+    color: #aaa;
 }

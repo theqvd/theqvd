@@ -10,6 +10,7 @@ Wat.A = {
                 method: 'GET',
                 async: false,
                 contentType: 'text',
+                cache: false,
                 success: function (data) {
                     tmplString = data;
                 }

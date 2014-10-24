@@ -26,6 +26,13 @@ Wat.Views.AdminDetailsView = Wat.Views.DetailsView.extend({
     },
     
     renderACLsTree: function () {
+        // If acl list is not visible, we destroy div and increase the details layer to fill the gap
+        if (!Wat.C.checkACL('administrator.see.acl-list')) { 
+            $('.js-details-side').remove();
+            $('.details-block').addClass('col-width-100');
+            return;
+        }
+        
         var aclsAdminsTemplate = Wat.A.getTemplate('details-admin-acls-tree');
         
         // Fill the html with the template and the model
@@ -96,6 +103,8 @@ Wat.Views.AdminDetailsView = Wat.Views.DetailsView.extend({
                     break;
             }
             
+            this.currentBranchDiv.append(HTML_MINI_LOADING);
+            
             Wat.A.performAction('acl_tiny_list', {}, filters, {}, this.fillBranch, this);
         }
     },
@@ -108,9 +117,11 @@ Wat.Views.AdminDetailsView = Wat.Views.DetailsView.extend({
                 subbranch += '<span class="subbranch-piece">';
                     subbranch += acl.name;
                 subbranch += '</span>';
-                subbranch += '<span class="subbranch-piece">';
-                    subbranch += '<i class="fa fa-sitemap acl-inheritance hidden" data-acl-id="' + acl.id + '" title=""></i>';
-                subbranch += '</span>';
+                if (Wat.C.checkACL('administrator.see.acl-list-roles')) {
+                    subbranch += '<span class="subbranch-piece">';
+                        subbranch += '<i class="fa fa-graduation-cap acl-inheritance hidden" data-acl-id="' + acl.id + '" title=""></i>';
+                    subbranch += '</span>';
+                }
             subbranch += '</div>';
             that.currentBranchDiv.append(subbranch);
         });
@@ -139,10 +150,12 @@ Wat.Views.AdminDetailsView = Wat.Views.DetailsView.extend({
                 $.each(acl.roles, function (iRole, role) {
                     roles.push(role); 
                 });
-                var titleRole = $.i18n.t('Inherited from roles') + ':<br/><br/>&raquo;' + roles.join('<br/><br/>&raquo;');
+                var titleRole = $.i18n.t('Defined on roles') + ':<br/><br/>&raquo;' + roles.join('<br/><br/>&raquo;');
                 that.currentBranchDiv.find('i[data-acl-id="' + acl.id + '"].acl-inheritance').attr('title', titleRole);
             }
         });
+        
+        that.currentBranchDiv.find('.mini-loading').hide();
     },
     
     

@@ -44,3 +44,8 @@
 .block {
     display: block !important;
 }
+
+/* Hidden will have not important to open the possibility of use $().show() */
+.hidden {
+    display: none;
+}
