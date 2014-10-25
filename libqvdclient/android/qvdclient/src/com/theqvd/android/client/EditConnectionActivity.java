@@ -227,7 +227,7 @@ public class EditConnectionActivity extends Activity implements OnItemSelectedLi
     		} else { 
     			Log.e(tag, "resultcode for request " + requestCode +  			   		
     					"is not ok " + resultCode);
-    			Toast.makeText(this, getResources().getString((R.string.nofilechosen)), Toast.LENGTH_SHORT);
+    			//Toast.makeText(this, getResources().getString((R.string.nofilechosen)), Toast.LENGTH_SHORT);
     		}
     		break;
     	case PICKFILE_REQUEST_CODE_KEY:
@@ -238,7 +238,7 @@ public class EditConnectionActivity extends Activity implements OnItemSelectedLi
     		} else { 
     			Log.e(tag, "resultcode for request " + requestCode +  			   		
     					"is not ok " + resultCode);
-    			Toast.makeText(this, getResources().getString((R.string.nofilechosen)), Toast.LENGTH_SHORT);
+    			//Toast.makeText(this, getResources().getString((R.string.nofilechosen)), Toast.LENGTH_SHORT);
     		}
     		break;
     	case INSTALLPACKAGE:
@@ -248,12 +248,12 @@ public class EditConnectionActivity extends Activity implements OnItemSelectedLi
     		} else { 
     			Log.e(tag, "resultcode for request " + requestCode +  			   		
     					"is not ok " + resultCode);
-    			Toast.makeText(this, getResources().getString((R.string.errorinstallfilemgr_alert)), Toast.LENGTH_LONG);
+    			//Toast.makeText(this, getResources().getString((R.string.errorinstallfilemgr_alert)), Toast.LENGTH_LONG);
     		}
     		break;
     	default:
     		Log.e(tag, "Unknown requestCode " + requestCode);
-    		Toast.makeText(this, "Unknown requestCode " + requestCode, Toast.LENGTH_LONG);
+    		//Toast.makeText(this, "Unknown requestCode " + requestCode, Toast.LENGTH_LONG);
     	}
     }
     private void setCerts() {
@@ -296,13 +296,8 @@ public class EditConnectionActivity extends Activity implements OnItemSelectedLi
     	Log.i(tag, "Requesting installation of "+packagename);
     	Intent goToMarket = new Intent(Intent.ACTION_VIEW).setData(Uri.parse("market://details?id="+packagename));
 //    	goToMarket.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
-    	if (this == null) {
-    		Log.i(tag, "Calling installPackage withouth startActivityForResult because activity is null");
-    		this.startActivity(goToMarket);
-    	} else {
-    		Log.d(tag, "Calling installPackage with startActivityForResult because activity is non null");
-    		this.startActivityForResult(goToMarket, INSTALLPACKAGE);
-    	}
+    	Log.d(tag, "Calling installPackage with startActivityForResult because activity is non null");
+    	this.startActivityForResult(goToMarket, INSTALLPACKAGE);
     }
     
     private class Choosefile implements View.OnClickListener {
