@@ -7,6 +7,7 @@ use QVD::Admin4::REST::Response;
 use QVD::DB;
 use MojoX::Session;
 
+
 package MojoX::Session::Transport::WAT
 {
     use base qw(MojoX::Session::Transport);
@@ -32,6 +33,9 @@ helper (qvd_admin4_api => sub { $QVD_ADMIN4_API; });
 under sub {
 
     my $c = shift;
+
+    $c->res->headers->header('Access-Control-Allow-Origin' => '*');
+    $c->res->headers->header('Access-Control-Expose-Headers' => 'sid');
 
     my $session = MojoX::Session->new( 
 	store  => [dbi => {dbh => QVD::DB->new()->storage->dbh}],
@@ -74,7 +78,19 @@ under sub {
 	else
 	{
 	    $session->extend_expires;
-	    $session->flush; 
+
+	    for (1 .. 5)
+            {
+                eval { $session->flush };
+                $@ ? print $@ : last;
+            }
+            if ($@)
+            {
+                $c->render(json =>
+                           QVD::Admin4::REST::Response->new(status => 39)->json);
+                return 0;
+            }
+
 	    $c->qvd_admin4_api->load_user($session->data('admin_id'));
 	    return 1;
 	}
@@ -92,7 +108,6 @@ any '/' => sub {
     my $c = shift;
 
     my $json = $c->req->json;
-    $c->res->headers->header('Access-Control-Allow-Origin' => '*');
 
     unless ($json)
     {

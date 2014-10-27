@@ -10,7 +10,6 @@ use QVD::Admin4::Exception;
 
 has 'administrator', is => 'ro', isa => sub { die "Invalid type for attribute administrator" 
 						  unless ref(+shift) eq 'QVD::DB::Result::Administrator'; };
-
 my $QVD_ADMIN;
 my $ACTIONS =
 {
@@ -19,7 +18,7 @@ current_admin_setup => {type_of_action => 'admin_config_provider',
 		       admin4method => 'current_admin_setup'},
 
 user_get_list => {type_of_action => 'list',
-		  admin4method => 'select',
+		  admin4method => 'select_with_properties',
 		  acls => [qr/^user\.see-main\.$/],
 		  qvd_object => 'User'},
 
@@ -34,7 +33,7 @@ user_all_ids => { type_of_action => 'all_ids',
 		  qvd_object => 'User'},
 
 user_get_details => { type_of_action => 'details',
-		      admin4method => 'select',
+		      admin4method => 'select_with_properties',
 		      acls => [qr/^user\.see-details\.$/],
 		      qvd_object => 'User' },
 
@@ -59,7 +58,7 @@ user_delete => { type_of_action => 'delete',
 		 qvd_object => 'User'},
 
 vm_get_list => { type_of_action => 'list',
-		 admin4method => 'select',
+		 admin4method => 'select_with_properties',
 		 qvd_object => 'VM'},
 
 vm_all_ids => { type_of_action => 'all_ids',
@@ -71,7 +70,7 @@ vm_tiny_list => { type_of_action => 'tiny',
 		  qvd_object => 'VM'},
 
 vm_get_details => { type_of_action => 'details',
-		    admin4method => 'select',
+		    admin4method => 'select_with_properties',
 		    qvd_object => 'VM'},
 
 vm_get_state => { type_of_action => 'state',
@@ -103,7 +102,7 @@ vm_delete => { type_of_action => 'delete',
 	       qvd_object => 'VM'},
 
 host_get_list => { type_of_action => 'list',
-		   admin4method => 'select',
+		   admin4method => 'select_with_properties',
 		   qvd_object => 'Host'},
 
 host_all_ids => { type_of_action => 'all_ids',
@@ -115,7 +114,7 @@ host_tiny_list => { type_of_action => 'tiny',
 		    qvd_object => 'Host'},
 
 host_get_details => { type_of_action => 'details',
-		      admin4method => 'select',
+		      admin4method => 'select_with_properties',
 		      qvd_object => 'Host'},
 
 host_get_state => { type_of_action => 'state',
@@ -135,7 +134,7 @@ host_delete => { type_of_action => 'delete',
 		 qvd_object => 'Host'},
 
 osf_get_list => { type_of_action => 'list',
-		  admin4method => 'select',
+		  admin4method => 'select_with_properties',
 		  qvd_object => 'OSF'},
 
 osf_all_ids => { type_of_action => 'all_ids',
@@ -147,7 +146,7 @@ osf_tiny_list => { type_of_action => 'tiny',
 		   qvd_object => 'OSF'},
 
 osf_get_details => { type_of_action => 'details',
-		     admin4method => 'select',
+		     admin4method => 'select_with_properties',
 		     qvd_object => 'OSF'},
 
 osf_update => {  type_of_action => 'update',
@@ -163,7 +162,7 @@ osf_delete => { type_of_action => 'delete',
 		qvd_object => 'OSF'},
 
 di_get_list => { type_of_action => 'list',
-		 admin4method => 'select',
+		 admin4method => 'di_select',
 		 qvd_object => 'DI'},
 
 di_all_ids => { type_of_action => 'all_ids',
@@ -175,7 +174,7 @@ di_tiny_list => { type_of_action => 'tiny',
 		  qvd_object => 'DI'},
 
 di_get_details => { type_of_action => 'details',
-		 admin4method => 'select',
+		 admin4method => 'di_select',
 		 qvd_object => 'DI'},
 
 di_update => { type_of_action => 'update',
@@ -432,7 +431,7 @@ sub process_query
 
    my $admin4method = $action->{admin4method};
    my $result = eval { $QVD_ADMIN->$admin4method($self->get_request($json_wrapper,$qvd_object_model)) } // {};
-   use Data::Dumper; print Dumper "2";
+
    print $@ if $@;
    my $general_status = ($@ && (( $@->can('code') && $@->code) || 1)) || 0;
    my $individual_failures = ($@ && $@->can('failures')) ? $@->failures  : {};
@@ -442,7 +441,6 @@ sub process_query
 							  result   => $result,
 							  failures => $individual_failures) };
 
-   use Data::Dumper; print Dumper "3";
    return $response->json;
 }
 
@@ -488,12 +486,8 @@ sub get_request
 { 
     my ($self, $json_wrapper,$qvd_object_model) = @_;
 
-my $r =    QVD::Admin4::REST::Request->new(qvd_object_model => $qvd_object_model, 
+    QVD::Admin4::REST::Request->new(qvd_object_model => $qvd_object_model, 
 				    json_wrapper => $json_wrapper);
-
-    use Data::Dumper; print Dumper "1";
-
-    $r;
 }
 
 

@@ -2,11 +2,14 @@ package QVD::Admin4::REST::Response;
 use strict;
 use warnings;
 use Moo;
+use QVD::DB;
 
 has 'status',  is => 'ro', isa => sub { die "Invalid type" if ref(+shift); }, required => 1;
 has 'result', is => 'ro', isa => sub { die "Invalid type" unless ref(+shift) eq 'HASH'; }, default => sub {{};};
 has 'failures', is => 'ro', isa => sub { die "Invalid type" unless ref(+shift) eq 'HASH'; }, default => sub {{};};
 has 'qvd_object_model', is => 'ro', isa => sub { die "Invalid type" unless ref(+shift) eq 'QVD::Admin4::REST::Model'; };
+
+my $NON_PREFETCHED_INFO;
 
 my $mapper = 
 {
@@ -48,6 +51,7 @@ my $mapper =
     36 => 'Forbidden field for this administrator',
     37 => 'Innapropiate nested query for this action',
     38 => 'Forbidden nested query for this administrator',
+    39 => 'Concurrent update problem while updating expiration time in session',
     23503 => 'Foreign Key violation',
     23502 => 'Lack of mandatory argument violation',
     23505 => 'Unique Key violation',
@@ -94,6 +98,13 @@ sub map_dbix_object_to_output_info
 	my $dbix_field_key = $self->qvd_object_model->map_field_to_dbix_format($field_key);
 	my ($table,$column) = $dbix_field_key =~ /^(.+)\.(.+)$/;
 
+	if ($table eq 'EXTRA')
+	{
+	    $result->{$field_key} = eval { $self->$field_key($dbix_object->id) } // undef;
+	    print $@ if $2;
+	    next;
+	}
+
 	$result->{$field_key} = 
 	    eval { $table eq "me" ? 
 		       $dbix_object->$column : 
@@ -122,11 +133,28 @@ sub message
 sub json
 {
     my $self = shift;
+
+    delete $self->result->{extra};
     
    { status  => $self->status,
      message => $self->message,
      result  => $self->result,
      failures  => $self->failures};
+}
+
+sub properties
+{
+    my ($self,$holder_id) = @_;
+    my $props = eval { $self->result->{extra}->{properties}->{$holder_id} } // ();
+    my $out =   { map {  $_->key => $_->value } @$props };
+}
+
+sub tags
+{
+    my ($self,$holder_id) = @_;
+
+    my $tags = eval { $self->result->{extra}->{tags}->{$holder_id} } // ();
+    my $out =   [ sort { $a->{tag} cmp $b->{tag} } map {  { $_->get_columns } } @$tags ];
 }
 
 1;

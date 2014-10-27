@@ -789,8 +789,7 @@ my $FIELDS_TO_DBIX_FORMAT_MAPPER =
 	'creation_admin' => 'me.creation_admin',
 	'creation_date' => 'me.creation_date',
 	'number_of_vms_connected' => 'me.vms_connected',
-	'number_of_vms' => 'me.vms_count',
-	'properties' => 'me.get_properties_key_value',
+	'properties' => 'EXTRA.properties',
     },
 
     Role => {
@@ -812,7 +811,7 @@ my $FIELDS_TO_DBIX_FORMAT_MAPPER =
 	'number_of_vms_connected' => 'me.vms_connected_count',
 	'tenant_id' => 'me.tenant_id',
 	'tenant_name' => 'tenant.name',
-	'properties' => 'me.get_properties_key_value',
+	'properties' => 'EXTRA.properties',
     },
 
     DI_Tag => {
@@ -833,7 +832,7 @@ my $FIELDS_TO_DBIX_FORMAT_MAPPER =
 	'tenant_name' => 'tenant.name',
 	'number_of_vms' => 'me.vms_count',
 	'number_of_dis' => 'me.dis_count',
-	'properties' => 'me.get_properties_key_value',
+	'properties' => 'EXTRA.properties',
     },
 
     VM => {
@@ -865,7 +864,7 @@ my $FIELDS_TO_DBIX_FORMAT_MAPPER =
 	'di_version' => 'me.di_version',
 	'di_name' => 'me.di_name',
 	'di_id' => 'me.di_id',
-	'properties' => 'me.get_properties_key_value',
+	'properties' => 'EXTRA.properties',
     },
 
     DI => {
@@ -876,9 +875,9 @@ my $FIELDS_TO_DBIX_FORMAT_MAPPER =
 	'osf_name' => 'osf.name',
 	'tenant_id' => 'osf.tenant_id',
 	'blocked' => 'me.blocked',
-	'tags' => 'me.tags_get_columns',
+	'tags' => 'EXTRA.tags',
 	'tenant_name' => 'osf.tenant_name',
-	'properties' => 'me.get_properties_key_value',
+	'properties' => 'EXTRA.properties',
     },
 
     Administrator => {
@@ -922,7 +921,7 @@ my $VALUES_NORMALIZATOR = {
 
 my $DBIX_JOIN_VALUE = { User => [qw(tenant), { vms => 'vm_runtime'}],
                         VM => ['di', 'osf', { vm_runtime => 'host' }, { user => 'tenant' }],
-			Host => ['runtime', { vms => 'host'}],
+			Host => ['runtime', 'vms'],
 			OSF => [ qw(tenant vms), { dis => 'tags' }],
 			DI => [qw(vm_runtimes tags), {osf => 'tenant'}],
 			DI_Tag => [{di => {osf => 'tenant'}}],
@@ -932,28 +931,29 @@ my $DBIX_JOIN_VALUE = { User => [qw(tenant), { vms => 'vm_runtime'}],
                         Tenant_View => [ qw(tenant acl)],
 			Administrator_View => [ qw(acl), { administrator => 'tenant' }] };
 
-my $DBIX_PREFETCH_VALUE = { list => { User => $DBIX_JOIN_VALUE->{User},
-				      VM => $DBIX_JOIN_VALUE->{VM},
-				      Host => $DBIX_JOIN_VALUE->{Host},
-				      OSF => $DBIX_JOIN_VALUE->{OSF},
-				      DI => $DBIX_JOIN_VALUE->{DI},
-				      DI_Tag => $DBIX_JOIN_VALUE->{DI_Tag},
-				      Role => $DBIX_JOIN_VALUE->{Role},
-				      Administrator => $DBIX_JOIN_VALUE->{Administrator},
-				      ACL => $DBIX_JOIN_VALUE->{ACL},
-                                      Tenant_View => $DBIX_JOIN_VALUE->{Tenant_View},
-				      Administrator_View => $DBIX_JOIN_VALUE->{Administrator_View}},
-			    details => { User => $DBIX_JOIN_VALUE->{User},
-					 VM => $DBIX_JOIN_VALUE->{VM},
-					 Host => $DBIX_JOIN_VALUE->{Host},
-					 OSF => $DBIX_JOIN_VALUE->{OSF},
-					 DI => $DBIX_JOIN_VALUE->{DI},
-					 DI_Tag => $DBIX_JOIN_VALUE->{DI_Tag},
-					 Role => $DBIX_JOIN_VALUE->{Role},
-					 Administrator => $DBIX_JOIN_VALUE->{Administrator},
-					 ACL => $DBIX_JOIN_VALUE->{ACL},
-                                      Tenant_View => $DBIX_JOIN_VALUE->{Tenant_View},
-				      Administrator_View => $DBIX_JOIN_VALUE->{Administrator_View} }};
+my $DBIX_PREFETCH_VALUE = { list => { User => [qw(tenant)],
+				      VM => ['di', 'osf', { vm_runtime => 'host' }, { user => 'tenant' }],
+				      Host => ['runtime'],
+				      OSF => [ qw(tenant)],
+				      DI => [{osf => 'tenant'}],
+				      DI_Tag => [{di => {osf => 'tenant'}}],
+				      Role => [{role_rels => 'inherited'}, { acl_rels => 'acl'}],
+				      Administrator => [qw(tenant), { role_rels => { role => { acl_rels => 'acl' }}}],
+				      ACL => [{ role_rels => { role => { admin_rels => 'admin' }}}],
+				      Tenant_View => [ qw(tenant acl)],
+				      Administrator_View => [ qw(acl), { administrator => 'tenant' }] },
+
+			    details => {User => [qw(tenant)],
+					VM => ['di', 'osf', { vm_runtime => 'host' }, { user => 'tenant' }],
+					Host => ['runtime'],
+					OSF => [ qw(tenant)],
+					DI => [{osf => 'tenant'}],
+					DI_Tag => [{di => {osf => 'tenant'}}],
+					Role => [{role_rels => 'inherited'}, { acl_rels => 'acl'}],
+					Administrator => [qw(tenant), { role_rels => { role => { acl_rels => 'acl' }}}],
+					ACL => [{ role_rels => { role => { admin_rels => 'admin' }}}],
+					Tenant_View => [ qw(tenant acl)],
+					Administrator_View => [ qw(acl), { administrator => 'tenant' }]}};
 
 my $DBIX_HAS_ONE_RELATIONSHIPS = { VM => [qw(vm_runtime counters)],
                                    Host => [qw(runtime counters)]};

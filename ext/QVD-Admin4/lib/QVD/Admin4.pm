@@ -39,15 +39,15 @@ sub select
 {
     my ($self,$request) = @_;
 
-    use Data::Dumper; print Dumper $_->name for $DB->resultset('User_View')->search({},{ prefetch => [qw(properties)], bind => [["276","6777"]] })->all();
     my $rs = eval { $DB->resultset($request->table)->search($request->filters, 
 							    $request->modifiers) };
 
-   QVD::Admin4::Exception->throw(code => $DB->storage->_dbh->state,
+    QVD::Admin4::Exception->throw(code => $DB->storage->_dbh->state,
 				  message => "$@") if $@;
 
-   { total => ($rs->is_paged ? $rs->pager->total_entries : $rs->count), 
-     rows => [$rs->all] };
+    { total => ($rs->is_paged ? $rs->pager->total_entries : $rs->count), 
+      rows => [$rs->all],
+      extra => {}};
 }
 
 sub update
@@ -120,6 +120,7 @@ sub create
 		       $self->exec_nested_queries($request,$obj);
 		       $result->{rows} = [ $obj ] } );
     $result->{total} = 1;
+    $result->{extra} = {};
     $result;
 }
 
@@ -413,11 +414,44 @@ sub add_roles_to_admin
 		administrator_id => $admin->id}) } for @$role_ids;
 }
 
-
-
 #############################
 ###### AD HOC FUNCTIONS #####
 #############################
+
+sub di_select
+{
+    my ($self,$request) = @_;
+    my $result = $self->select_with_properties($request);   
+
+    my $ids = [ map {$_->id} @{$result->{rows}} ]; 
+
+    for my $tag ($DB->resultset('DI_Tag')->search({di_id => $ids})->all)
+    {
+	$result->{extra}->{tags}->{$tag->di_id} //= [];
+	push @{$result->{extra}->{tags}->{$tag->di_id}}, $tag;
+    }
+
+    $result;
+}
+
+sub select_with_properties
+{
+    my ($self,$request) = @_;
+    my $result = $self->select($request);
+
+    my $ids = [ map {$_->id} @{$result->{rows}} ]; 
+    my $table =  $request->table . "_Property";
+    my $fkey = lc($request->table) . "_id";
+
+    for my $property ($DB->resultset($table)->search({$fkey => $ids})->all)
+    {
+	$result->{extra}->{properties}->{$property->$fkey} //= [];
+	push @{$result->{extra}->{properties}->{$property->$fkey}}, $property;
+    }
+
+    $result;
+}
+
 
 sub vm_delete
 {
