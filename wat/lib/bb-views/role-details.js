@@ -18,7 +18,7 @@ Wat.Views.RoleDetailsView = Wat.Views.DetailsView.extend({
         this.params = params;
         
         Wat.I.chosenConfiguration();
-
+        
         this.renderSetupCommon();
     },
     
@@ -96,7 +96,7 @@ Wat.Views.RoleDetailsView = Wat.Views.DetailsView.extend({
                     subbranch += '</span>';
                 }
                 subbranch += '<span class="subbranch-piece">';
-                    subbranch += acl.name;
+                    subbranch += ACLS[acl.name];
                 subbranch += '</span>';
                 if (Wat.C.checkACL('role.see.acl-list-roles')) {
                     subbranch += '<span class="subbranch-piece">';
@@ -185,6 +185,9 @@ Wat.Views.RoleDetailsView = Wat.Views.DetailsView.extend({
         $(e.target).parent().find('input').prop('checked', checked);
         
         var branch = $(e.target).attr('data-branch');
+        this.checkedBranch = branch;
+        console.log(this.checkedBranch);
+        
         var treeKind = $(e.target).attr('data-tree-kind');
         
         this.groupACLChecked = checked;
@@ -228,6 +231,7 @@ Wat.Views.RoleDetailsView = Wat.Views.DetailsView.extend({
         var checked = $(e.target).is(':checked');
         var aclName = $(e.target).attr('data-acl');
         var currentSubBranch = $(e.target).parent().parent();
+        this.checkedBranch = this.currentBranch;
         
         if (checked) {
             this.applyChangeACL({
@@ -245,16 +249,67 @@ Wat.Views.RoleDetailsView = Wat.Views.DetailsView.extend({
     },
     
     // Unpdate ACL changs on Model
-    applyChangeACL: function (aclChange) {
-        var that = this;
-        
-        var context = $('.' + that.cid);
+    applyChangeACL: function (aclChange) {        
+        var context = $('.' + this.cid);
 
         var arguments = {
             __acls_changes__: aclChange
         };
 
-        that.updateModel(arguments, {id: that.id}, function () {});
+        this.updateModel(arguments, {id: this.id}, this.getBranchStats);
+    },
+    
+    getBranchStats: function (that) {
+        var treeKind = $('.js-acl-tree-selector').val();
+
+        var aclPattern = '';
+        switch(treeKind) {
+            case 'sections':
+                aclPattern = that.checkedBranch + '.%';
+                break;
+            case 'actions':
+                aclPattern = '%.' + that.checkedBranch + '.%';
+                break;
+        }
+
+        Wat.A.performAction('number_of_acls_in_role', {}, {"role_id": that.id, "acl_pattern": [aclPattern]}, {}, that.updateBranchStats, that);
+    },
+    
+    updateBranchStats: function (that) {
+        var treeKind = $('.js-acl-tree-selector').val();
+        
+        var aclPattern = '';
+        switch(treeKind) {
+            case 'sections':
+                aclPattern = that.checkedBranch + '.%';
+                break;
+            case 'actions':
+                aclPattern = '%.' + that.checkedBranch + '.%';
+                break;
+        }
+        
+        var effectiveACLs = that.retrievedData.result[aclPattern].effective;
+        var totalACLs = that.retrievedData.result[aclPattern].total;
+        
+        $('span.js-effective-count[data-branch="' + that.checkedBranch + '"]').html(effectiveACLs);
+        
+        console.log(effectiveACLs);
+        console.log(totalACLs);
+        if (totalACLs == effectiveACLs) {
+            $('input.js-branch-check[data-branch="' + that.checkedBranch + '"]').prop('checked', true);
+            $('div.js-acls-branch[data-branch="' + that.checkedBranch + '"]').find('div.subbranch').removeClass('disabled-branch');
+        }
+        else {
+            $('input.js-branch-check[data-branch="' + that.checkedBranch + '"]').prop('checked', false);
+        }
+
+        if (effectiveACLs == 0) {
+            $('div.js-acls-branch[data-branch="' + that.checkedBranch + '"]').addClass('disabled-branch');
+            $('div.js-acls-branch[data-branch="' + that.checkedBranch + '"]').find('div.subbranch').addClass('disabled-branch');
+        }
+        else {
+            $('div.js-acls-branch[data-branch="' + that.checkedBranch + '"]').removeClass('disabled-branch');
+        }
     },
     
     renderSetupCommon: function () {
@@ -293,7 +348,10 @@ Wat.Views.RoleDetailsView = Wat.Views.DetailsView.extend({
             $('.js-menu-roles').hide();
         }
         
-        this.renderACLsTree();
+        this.aclPatterns = $.extend(ACL_SECTIONS_PATTERNS, ACL_ACTIONS_PATTERNS);
+        var aclPatternsArray = _.toArray(this.aclPatterns);
+        
+        Wat.A.performAction('number_of_acls_in_role', {}, {"role_id": this.id, "acl_pattern": aclPatternsArray}, {}, this.renderACLsTree, this);
         
         // Trigger click on first menu option by default
         $('[data-show-submenu="acls-management-acls"]').trigger('click');
@@ -332,7 +390,9 @@ Wat.Views.RoleDetailsView = Wat.Views.DetailsView.extend({
         }, 100);
     },    
     
-    renderACLsTree: function () {
+    renderACLsTree: function (that) {
+        var branchStats = that.retrievedData.result;
+
         // If acl list is not visible, we destroy div and increase the details layer to fill the gap
         if (!Wat.C.checkACL('role.see.acl-list')) { 
             $('.js-details-side').remove();
@@ -343,16 +403,20 @@ Wat.Views.RoleDetailsView = Wat.Views.DetailsView.extend({
         var aclsRolesTemplate = Wat.A.getTemplate('details-role-acls-tree');
         
         // Fill the html with the template and the model
-        this.template = _.template(
+        that.template = _.template(
             aclsRolesTemplate, {
                 sections: ACL_SECTIONS,
-                actions: ACL_ACTIONS
+                actions: ACL_ACTIONS,
+                aclPatterns: that.aclPatterns,
+                branchStats: branchStats
             }
         );
         
-        $('.bb-details-side1').html(this.template);
+        $('.bb-details-side1').html(that.template);
         
         Wat.I.chosenElement('select.js-acl-tree-selector', 'single');
+        
+        Wat.T.translate();
     },
     
     afterUpdateRoles: function () {

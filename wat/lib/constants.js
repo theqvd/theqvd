@@ -25,31 +25,3 @@ QVD_OBJS_EXIST_IN_SUPERTENANT = ['role', 'administrator'];
 
 // Html pieces
 HTML_MINI_LOADING = '<div class="mini-loading"><i class="fa fa-gear fa-spin"></i></div>';
-
-// Acl classification sections and actions
-ACL_SECTIONS = {
-    "administrator": "Administrators",
-    "my-admin-area": "My area",
-    "config": "Configuration",
-    "di": "Disk images",
-    "host": "Nodes",
-    "osf": "OS Flavours",
-    "role": "Roles",
-    "tenant": "Tenants",
-    "user": "Users",
-    "views": "Views",
-    "vm": "Virtual machines"
-};
-
-ACL_ACTIONS = {
-    "create": "Create",
-    "delete": "Delete one by one",
-    "delete-massive": "Delete massively",
-    "see": "See",
-    "see-details": "See details view",
-    "see-main": "See main section",
-    "update": "Update one by one",
-    "update-massive": "Update massively",
-    "filter": "Filters",
-    "stats": "Statistics"
-}

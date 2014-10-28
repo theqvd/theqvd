@@ -115,7 +115,7 @@ Wat.Views.AdminDetailsView = Wat.Views.DetailsView.extend({
             var subbranch = '';
             subbranch += '<div class="subbranch hidden" data-acl-id="' + acl.id + '">';
                 subbranch += '<span class="subbranch-piece">';
-                    subbranch += acl.name;
+                    subbranch += ACLS[acl.name];
                 subbranch += '</span>';
                 if (Wat.C.checkACL('administrator.see.acl-list-roles')) {
                     subbranch += '<span class="subbranch-piece">';
