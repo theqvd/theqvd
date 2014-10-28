@@ -10,7 +10,9 @@ __PACKAGE__->add_columns(id          => { data_type => 'integer',
                                            is_auto_increment => 1 },
                          acl_id  => { data_type => 'integer' },
 			 administrator_id  => { data_type => 'integer' },
-                         positive  => { data_type => 'boolean' });
+                         positive  => { data_type => 'boolean' },
+			 view_type  => { data_type => 'varchar(64)' },
+			 device_type  => { data_type => 'varchar(64)' });
 
 __PACKAGE__->set_primary_key('id');
 __PACKAGE__->add_unique_constraint([qw(administrator_id acl_id)]);
