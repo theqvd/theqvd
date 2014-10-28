@@ -565,11 +565,17 @@ ALTER TABLE public.tenant_views_id_seq OWNER TO qvd;
 -- Name: tenant_views; Type: TABLE; Schema: public; Owner: qvd; Tablespace: 
 --
 
+CREATE TYPE device_types_enum AS ENUM ('mobile', 'desktop');
+
+CREATE TYPE view_types_enum AS ENUM ('details', 'list');
+
 CREATE TABLE tenant_views (
     id integer NOT NULL,
     tenant_id integer NOT NULL,
     acl_id integer NOT NULL,
-    positive boolean NOT NULL
+    positive boolean NOT NULL,
+    device_type device_types_enum NOT NULL,
+    view_type view_types_enum NOT NULL
 );
 
 
@@ -642,7 +648,9 @@ CREATE TABLE administrator_views (
     id integer NOT NULL,
     administrator_id integer NOT NULL,
     acl_id integer NOT NULL,
-    positive boolean NOT NULL
+    positive boolean NOT NULL,
+    device_type device_types_enum NOT NULL,
+    view_type view_types_enum NOT NULL
 );
 
 
