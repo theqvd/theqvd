@@ -625,15 +625,20 @@ sub di_no_head_default_tags
 ## GENERAL FUNCTIONS; WITHOUT REQUEST
 ######################################
 
+
+
 sub get_properties_by_qvd_object
 {
    my ($self,$json_wrapper) = @_;
-    my $qvd_object = $json_wrapper->get_filter_value('qvd_object') //
+    my $qvd_object = lc $json_wrapper->get_filter_value('qvd_object') //
 	QVD::Admin4::Exception->throw(code=>'10');
-   $qvd_object =~ /^User|VM|Host|OSF|DI$/ || 
+   $qvd_object =~ /^user|vm|host|osf|di$/ || 
        QVD::Admin4::Exception->throw(code=>'41');
 
-   my $rs =  $DB->resultset($qvd_object."_Property")->search(
+   my %tables = (user => 'User_Property', vm => 'VM_Property',
+                 host => 'Host_Property', osf => 'OSF_Property', di => 'DI_Property');
+
+   my $rs =  $DB->resultset($tables{$qvd_object})->search(
        {},{ order_by => { ($json_wrapper->order_direction || '-asc') => 
 			      ($json_wrapper->order_criteria || []) },
 		page => ($json_wrapper->offset || 1),
