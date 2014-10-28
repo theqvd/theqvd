@@ -52,10 +52,12 @@ my $mapper =
     37 => 'Innapropiate nested query for this action',
     38 => 'Forbidden nested query for this administrator',
     39 => 'Concurrent update problem while updating expiration time in session',
+    40 => 'Unknown administrator',
     23503 => 'Foreign Key violation',
     23502 => 'Lack of mandatory argument violation',
     23505 => 'Unique Key violation',
     23007 => 'Invalid type of argument',
+    '22P02' => 'Invalid type of argument in enumeration field'
 };
 
 sub BUILD
@@ -96,19 +98,8 @@ sub map_dbix_object_to_output_info
     for my $field_key (@available_fields)
     {
 	my $dbix_field_key = $self->qvd_object_model->map_field_to_dbix_format($field_key);
-	my ($table,$column) = $dbix_field_key =~ /^(.+)\.(.+)$/;
-
-	if ($table eq 'EXTRA')
-	{
-	    $result->{$field_key} = eval { $self->$field_key($dbix_object->id) } // undef;
-	    print $@ if $2;
-	    next;
-	}
-
-	$result->{$field_key} = 
-	    eval { $table eq "me" ? 
-		       $dbix_object->$column : 
-		       $dbix_object->$table->$column } // undef;
+	my ($info_provider,$method) = $self->get_info_provider_and_method($dbix_field_key,$dbix_object);
+	$result->{$field_key} = eval { $info_provider->$method } // undef;
 	print $@ if $@;
     }
 
@@ -142,19 +133,13 @@ sub json
      failures  => $self->failures};
 }
 
-sub properties
+sub get_info_provider_and_method
 {
-    my ($self,$holder_id) = @_;
-    my $props = eval { $self->result->{extra}->{properties}->{$holder_id} } // ();
-    my $out =   { map {  $_->key => $_->value } @$props };
+    my ($self,$dbix_field_key,$dbix_object) = @_;
+    my ($table,$column) = $dbix_field_key =~ /^(.+)\.(.+)$/;
+   
+    return ($dbix_object,$column) if $table eq 'me';
+    return ($self->result->{extra}->{$dbix_object->id},$column) if $table eq 'view';
+    return ($dbix_object->$table,$column);
 }
-
-sub tags
-{
-    my ($self,$holder_id) = @_;
-
-    my $tags = eval { $self->result->{extra}->{tags}->{$holder_id} } // ();
-    my $out =   [ sort { $a->{tag} cmp $b->{tag} } map {  { $_->get_columns } } @$tags ];
-}
-
 1;

@@ -11,7 +11,7 @@ __PACKAGE__->result_source_instance->view_definition(
 
 "SELECT me.id              as id, 
         COUNT(vm_runtimes) as number_of_vms_connected, 
-        COUNT(vms)         as number_of_vms, 
+        COUNT(vms)         as number_of_vms
 
  FROM      users me 
  LEFT JOIN vms vms         ON(vms.user_id=me.id) 

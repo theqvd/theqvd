@@ -22,6 +22,23 @@ has 'model_info', is => 'ro', isa => sub {die "Invalid type for attribute model_
 
 my $DBConfigProvider;
 
+my $RELATED_VIEWS_IN_DB = {
+
+    list => {    User => [qw(User_View)],
+		 VM => [qw(VM_View)],
+		 Host => [qw(Host_View)],
+		 OSF => [qw(OSF_View)],
+		 DI => [qw(DI_View)] },
+
+    details => {    User => [qw(User_View)],
+		    VM => [qw(VM_View)],
+		    Host => [qw(Host_View)],
+		    OSF => [qw(OSF_View)],
+		    DI => [qw(DI_View)] },
+		 
+};
+
+
 my $ACLS_FOR_FILTERS = {
 
     VM => { storage => [],
@@ -112,21 +129,23 @@ my $ACLS_FOR_FILTERS = {
 		       tenant_name => [],
 		       id => [] },
 
-    Tenant_View => { id => [],
+    Tenant_Views_Setup => { id => [],
 		     tenant_id => [],
 		     tenant_name => [],
-		     acl_id => [],
-		     acl_name => [],
-		     positive => [] },
+		     field => [],
+		     visible => [],
+		     view_type => [],
+		     device_type => [] },
 
-    Administrator_View => { id => [],
+    Administrator_Views_Setup => { id => [],
 			    admin_id => [],
 			    admin_name => [],
-			    acl_id => [],
-			    acl_name => [],
+			    field => [],
 			    tenant_id => [],
 			    tenant_name => [],
-			    positive => []},
+			    visible => [],
+			    view_type => [],
+			    device_type => []},
 };
 
 my $ACLS_FOR_FIELDS = {
@@ -219,21 +238,22 @@ my $ACLS_FOR_FIELDS = {
 		name => [],
 		id => [] },
 
-    Tenant_View => { id => [],
+    Tenant_Views_Setup => { id => [],
 		     tenant_id => [],
 		     tenant_name => [],
-		     acl_id => [],
-		     acl_name => [],
-		     positive => [] },
+		     field => [],
+		     visible => [],
+		     view_type => [],
+		     device_type => [] },
 
-    Administrator_View => { id => [],
+    Administrator_Views_Setup => { id => [],
 			    tenant_id => [],
 			    tenant_name => [],
 			    admin_id => [],
-			    admin_name => [],
-			    acl_id => [],
-			    acl_name => [],
-			    positive => []}
+			    field => [],
+			    visible => [],
+			    view_type => [],
+			    device_type => []}
 };
 
 my $ACLS_FOR_ARGUMENTS_IN_UPDATE = { User => { name => [],
@@ -277,8 +297,12 @@ my $ACLS_FOR_ARGUMENTS_IN_UPDATE = { User => { name => [],
 							password => [],
 							__roles_changes__assign_roles => [],
 							__roles_changes__unassign_roles => [] },
-				     Tenant_View => { positive => [] },
-				     Administrator_View => { positive => []}};
+				     Tenant_Views_Setup => { visible => [],
+                                                      view_type => [],
+                                                      device_type => [] },
+				     Administrator_Views_Setup => { visible => [],
+							     view_type => [],
+							     device_type => []}};
 
 
 my $ACLS_FOR_ARGUMENTS_IN_MASSIVE_UPDATE = { User => { '***delete***' => ['user.delete-massive.'], # MAYBE A NEW VARIABLE?
@@ -323,8 +347,12 @@ my $ACLS_FOR_ARGUMENTS_IN_MASSIVE_UPDATE = { User => { '***delete***' => ['user.
 							password => [],
 							__roles_changes__assign_roles => [],
 							__roles_changes__unassign_roles => [] },
-				     Tenant_View => { positive => [] },
-				     Administrator_View => { positive => []}};
+				     Tenant_Views_Setup => { visible => [],
+							     view_type => [],
+							     device_type => [] },
+					     Administrator_Views_Setup => { visible => [],
+									    view_type => [],
+									    device_type => []}};
 
 
 my $ACLS_FOR_ARGUMENTS_IN_CREATION = { User => { name => [],
@@ -359,8 +387,12 @@ my $ACLS_FOR_ARGUMENTS_IN_CREATION = { User => { name => [],
 				     Administrator => { name => [],
 							password => [],
 							__roles__ => []},
-				     Tenant_View => { positive => [] },
-				     Administrator_View => { positive => []}};
+				     Tenant_Views_Setup => { visible => [],
+                                                      view_type => [],
+                                                      device_type => [] },
+				     Administrator_Views_Setup => { visible => [],
+							     view_type => [],
+							     device_type => []}};
 
 
 my $AVAILABLE_FILTERS = { list => { default => [],
@@ -377,8 +409,8 @@ my $AVAILABLE_FILTERS = { list => { default => [],
 				    Tenant => [qw(id name)],
 				    Role => [qw(name id )],
 				    Administrator => [qw(name tenant_id tenant_name id )],
-				    Tenant_View => [qw(id tenant_id tenant_name acl_id acl_name positive)],
-				    Administrator_View => [qw(id admin_id admin_name acl_id acl_name tenant_id tenant_name positive)]},
+				    Tenant_Views_Setup => [qw(id tenant_id tenant_name field visible view_type device_type)],
+				    Administrator_Views_Setup => [qw(id admin_id admin_name field tenant_id tenant_name visible view_type device_type)]},
 
 			  all_ids => { default => [],
 				       VM => [qw(storage id name user_id user_name osf_id osf_name di_tag blocked expiration_soft 
@@ -393,8 +425,8 @@ my $AVAILABLE_FILTERS = { list => { default => [],
 				       Role => [qw(name acl_id role_id nested_acl_name nested_role_name id admin_id admin_name )],
 				       Tenant => [qw(id name)],
 				       Administrator => [qw(name tenant_id tenant_name role_id acl_id id role_name acl_name )],
-				    Tenant_View => [qw(id tenant_id tenant_name acl_id acl_name positive)],
-				    Administrator_View => [qw(id tenant_id tenant_name acl_id acl_name admin_id admin_name positive)]},
+				    Tenant_Views_Setup => [qw(id tenant_id tenant_name field visible view_type device_type)],
+				    Administrator_Views_Setup => [qw(id tenant_id tenant_name field admin_id admin_name visible view_type device_type)]},
 
 			  details => { default => [qw(id tenant_id)],
                                        Host => [qw(id)],
@@ -441,8 +473,8 @@ my $AVAILABLE_FIELDS = { list => { default => [],
 				   User => [qw(id name  blocked creation_admin creation_date number_of_vms number_of_vms_connected  properties )],
 				   Host => [qw(id name address blocked frontend backend state  load creation_admin creation_date number_of_vms_connected properties )],
 				   DI_Tag => [qw(osf_id name id )],
-				    Tenant_View => [qw(id tenant_id tenant_name acl_id acl_name positive)],
-				    Administrator_View => [qw(id tenant_id tenant_name admin_id admin_name acl_id acl_name positive)] },
+				    Tenant_Views_Setup => [qw(id tenant_id tenant_name field visible view_type device_type)],
+				    Administrator_Views_Setup => [qw(id tenant_id tenant_name admin_id admin_name field visible view_type device_type)] },
 			 details => { default => [],
 				   OSF => [qw(id name overlay user_storage memory  number_of_vms number_of_dis properties )],
 				   Role => [qw(name acls roles id number_of_acls)],
@@ -456,12 +488,12 @@ my $AVAILABLE_FIELDS = { list => { default => [],
 				   User => [qw(id name  blocked creation_admin creation_date number_of_vms number_of_vms_connected  properties )],
 				   Host => [qw(id name address blocked frontend backend state  load creation_admin creation_date number_of_vms_connected number_of_vms properties )],
 				   DI_Tag => [qw(osf_id name id )],
-				    Tenant_View => [qw(id tenant_id tenant_name acl_id acl_name positive)],
-				    Administrator_View => [qw(id admin_id admin_name tenant_id tenant_name acl_id acl_name positive)] },
+				    Tenant_Views_Setup => [qw(id tenant_id tenant_name field visible view_type device_type)],
+				    Administrator_Views_Setup => [qw(id admin_id admin_name tenant_id tenant_name field visible view_type device_type)] },
 			 tiny => { default => [qw(id name)],
 				   DI => [qw(id disk_image)],
-				   Tenant_View => [qw(id)],
-				   Administrator_View => [qw(id)]},
+				   Tenant_Views_Setup => [qw(id)],
+				   Administrator_Views_Setup => [qw(id)]},
 
 			 all_ids => { default => [qw(id)]},
 			state => { User => [qw(number_of_vms_connected)],
@@ -519,8 +551,8 @@ my $COMMODIN_FILTERS = { tiny => { ACL => [qw(name)]}};
 
 my $DEFAULT_ORDER_CRITERIA = { tiny => { default =>  [qw(name)],
                                          DI => [qw(disk_image)],
-					 Tenant_View => [qw(acl_name)],
-					 Administrator_View => [qw(acl_name)] }};
+					 Tenant_Views_Setup => [qw(field)],
+					 Administrator_Views_Setup => [qw(field)] }};
 
 my $AVAILABLE_NESTED_QUERIES = { create => { User => [qw(__properties__)],
 					     VM => [qw(__properties__)],
@@ -530,8 +562,8 @@ my $AVAILABLE_NESTED_QUERIES = { create => { User => [qw(__properties__)],
 					     Tenant => [qw()],
 					     Role => [qw(__acls__ __roles__)],
 					     Administrator => [qw(__roles__)],
-					     Tenant_View => [qw()],
-					     Administrator_View => [qw()]},
+					     Tenant_Views_Setup => [qw()],
+					     Administrator_Views_Setup => [qw()]},
 
 				 update => { User => [qw(__properties_changes__set __properties_changes__delete)],
 					     VM => [qw(__properties_changes__set __properties_changes__delete)],
@@ -545,8 +577,8 @@ my $AVAILABLE_NESTED_QUERIES = { create => { User => [qw(__properties__)],
 						         __roles_changes__assign_roles 
                                                          __roles_changes__unassign_roles)],
 					     Administrator => [qw(__roles_changes__assign_roles __roles_changes__unassign_roles)],
-					     Tenant_View => [qw()],
-					     Administrator_View => [qw()]}};
+					     Tenant_Views_Setup => [qw()],
+					     Administrator_Views_Setup => [qw()]}};
 
 
 
@@ -585,8 +617,8 @@ my $NESTED_QUERIES_TO_ADMIN4_MAPPER =
   Administrator => { __roles__ => 'add_roles_to_admin',
 		     __roles_changes__assign_roles => 'add_roles_to_admin',
 		     __roles_changes__unassign_roles => 'del_roles_to_admin' },
-  Tenant_View => {},
-  Administrator_View => {}
+  Tenant_Views_Setup => {},
+  Administrator_Views_Setup => {}
 };
 
 my $AVAILABLE_ARGUMENTS = { User => [qw(name password blocked)],
@@ -597,8 +629,8 @@ my $AVAILABLE_ARGUMENTS = { User => [qw(name password blocked)],
 			    Tenant => [qw(name)],
 			    Role => [qw(name)],
 			    Administrator => [qw(name password)],
-			    Tenant_View => [qw(positive)],
-			    Administrator_View => [qw(positive)]};
+			    Tenant_Views_Setup => [qw(visible view_type device_type)],
+			    Administrator_Views_Setup => [qw(visible view_type device_type)]};
 
 
 my $MANDATORY_ARGUMENTS = { User => [qw(name password tenant_id blocked)],
@@ -609,8 +641,8 @@ my $MANDATORY_ARGUMENTS = { User => [qw(name password tenant_id blocked)],
 			    Tenant => [qw(name)],
 			    Role => [qw(name)],
                             Administrator => [qw(name password tenant_id)],
-			    Tenant_View => [qw(tenant_id acl_id positive)],
-			    Administrator_View => [qw(admin_id acl_id positive)]}; 
+			    Tenant_Views_Setup => [qw(tenant_id field visible view_type device_type)],
+			    Administrator_Views_Setup => [qw(admin_id field visible view_type device_type)]}; 
 
 my $DEFAULT_ARGUMENT_VALUES = { User => { blocked => 'false' },
                                 VM => { di_tag => 'default',
@@ -626,8 +658,8 @@ my $DEFAULT_ARGUMENT_VALUES = { User => { blocked => 'false' },
 				         overlay => \&get_default_overlay,
 				         user_storage => 0 },
 				DI => { blocked => 'false' },
-			    Tenant_View => { positive => 0 },
-			    Administrator_View =>  { positive => 0 }};
+			    Tenant_Views_Setup => { visible => 0 },
+			    Administrator_Views_Setup =>  { visible => 0 }};
 
 my $FILTERS_TO_DBIX_FORMAT_MAPPER = 
 {
@@ -743,24 +775,27 @@ my $FILTERS_TO_DBIX_FORMAT_MAPPER =
 	'id' => 'me.id'
     },
     
-    Tenant_View => { 	
+    Tenant_Views_Setup => { 	
 	'id' => 'me.id', 
 	'tenant_id' => 'me.tenant_id', 
-	'acl_id' => 'me.acl_id', 
+	'field' => 'me.field', 
 	'tenant_name' => 'tenant.name', 
-	'acl_name' => 'acl.name',
-	'positive' => 'me.positive' 
+	'visible' => 'me.visible',
+	'view_type' => 'me.view_type',
+	'device_type' => 'me.device_type' 
     },
 
-    Administrator_View =>  {
+    Administrator_Views_Setup =>  {
 	'id' => 'me.id',  
 	'tenant_id' => 'tenant.id', 
 	'tenant_name' => 'tenant.name', 
 	'admin_id' => 'me.administrator_id', 
-	'acl_id' => 'me.acl_id', 
+	'field' => 'me.field', 
 	'admin_name' => 'administrator.name', 
-	'acl_name' => 'acl.name',
-	'positive' => 'me.positive' }
+	'visible' => 'me.visible',
+	'view_type' => 'me.view_type',
+	'device_type' => 'me.device_type' 
+ }
 
 };
 
@@ -788,8 +823,8 @@ my $FIELDS_TO_DBIX_FORMAT_MAPPER =
 	'load' => 'me.load',
 	'creation_admin' => 'me.creation_admin',
 	'creation_date' => 'me.creation_date',
-	'number_of_vms_connected' => 'me.vms_connected',
-	'properties' => 'EXTRA.properties',
+	'number_of_vms_connected' => 'view.number_of_vms_connected',
+	'properties' => 'view.properties',
     },
 
     Role => {
@@ -807,11 +842,11 @@ my $FIELDS_TO_DBIX_FORMAT_MAPPER =
 	'blocked' => 'me.blocked',
 	'creation_admin' => 'me.creation_admin',
 	'creation_date' => 'me.creation_date',
-	'number_of_vms' => 'me.vms_count',
-	'number_of_vms_connected' => 'me.vms_connected_count',
+	'number_of_vms' => 'view.number_of_vms',
+	'number_of_vms_connected' => 'view.number_of_vms_connected',
 	'tenant_id' => 'me.tenant_id',
 	'tenant_name' => 'tenant.name',
-	'properties' => 'EXTRA.properties',
+	'properties' => 'view.properties',
     },
 
     DI_Tag => {
@@ -830,9 +865,9 @@ my $FIELDS_TO_DBIX_FORMAT_MAPPER =
 	'memory' => 'me.memory',
 	'tenant_id' => 'me.tenant_id',
 	'tenant_name' => 'tenant.name',
-	'number_of_vms' => 'me.vms_count',
-	'number_of_dis' => 'me.dis_count',
-	'properties' => 'EXTRA.properties',
+	'number_of_vms' => 'view.number_of_vms',
+	'number_of_dis' => 'view.number_of_dis',
+	'properties' => 'view.properties',
     },
 
     VM => {
@@ -864,7 +899,7 @@ my $FIELDS_TO_DBIX_FORMAT_MAPPER =
 	'di_version' => 'me.di_version',
 	'di_name' => 'me.di_name',
 	'di_id' => 'me.di_id',
-	'properties' => 'EXTRA.properties',
+	'properties' => 'view.properties',
     },
 
     DI => {
@@ -875,9 +910,9 @@ my $FIELDS_TO_DBIX_FORMAT_MAPPER =
 	'osf_name' => 'osf.name',
 	'tenant_id' => 'osf.tenant_id',
 	'blocked' => 'me.blocked',
-	'tags' => 'EXTRA.tags',
+	'tags' => 'view.tags',
 	'tenant_name' => 'osf.tenant_name',
-	'properties' => 'EXTRA.properties',
+	'properties' => 'view.properties',
     },
 
     Administrator => {
@@ -893,24 +928,27 @@ my $FIELDS_TO_DBIX_FORMAT_MAPPER =
 	'id' => 'me.id'
     },
 
-    Tenant_View => { 	
+    Tenant_Views_Setup => { 	
 	'id' => 'me.id', 
 	'tenant_id' => 'me.tenant_id', 
-	'acl_id' => 'me.acl_id', 
+	'field' => 'me.field', 
 	'tenant_name' => 'tenant.name', 
-	'acl_name' => 'acl.name',
-	'positive' => 'me.positive'
+	'visible' => 'me.visible',
+	'view_type' => 'me.view_type',
+	'device_type' => 'me.device_type' 
     },
 
-    Administrator_View =>  {
+    Administrator_Views_Setup =>  {
 	'id' => 'me.id',  
 	'tenant_id' => 'administrator.tenant_id', 
 	'tenant_name' => 'administrator.tenant_name', 
 	'admin_id' => 'me.administrator_id', 
-	'acl_id' => 'me.acl_id', 
-	'admin_name' => 'administrator.name', 
-	'acl_name' => 'acl.name',
-	'positive' => 'me.positive' }
+	'field' => 'me.field', 
+	'admin_name' => 'administrator.name',
+	'field' => 'me.field',
+	'view_type' => 'me.view_type',
+	'device_type' => 'me.device_type' 
+ }
 };
 
 my $VALUES_NORMALIZATOR = { 
@@ -928,8 +966,8 @@ my $DBIX_JOIN_VALUE = { User => [qw(tenant), { vms => 'vm_runtime'}],
 			Role => [{role_rels => 'inherited'}, { acl_rels => 'acl'}],
 			Administrator => [qw(tenant), { role_rels => { role => { acl_rels => 'acl' }}}],
 			ACL => [{ role_rels => { role => { admin_rels => 'admin' }}}],
-                        Tenant_View => [ qw(tenant acl)],
-			Administrator_View => [ qw(acl), { administrator => 'tenant' }] };
+                        Tenant_Views_Setup => [ qw(tenant)],
+			Administrator_Views_Setup => [ { administrator => 'tenant' }] };
 
 my $DBIX_PREFETCH_VALUE = { list => { User => [qw(tenant)],
 				      VM => ['di', 'osf', { vm_runtime => 'host' }, { user => 'tenant' }],
@@ -940,8 +978,8 @@ my $DBIX_PREFETCH_VALUE = { list => { User => [qw(tenant)],
 				      Role => [{role_rels => 'inherited'}, { acl_rels => 'acl'}],
 				      Administrator => [qw(tenant), { role_rels => { role => { acl_rels => 'acl' }}}],
 				      ACL => [{ role_rels => { role => { admin_rels => 'admin' }}}],
-				      Tenant_View => [ qw(tenant acl)],
-				      Administrator_View => [ qw(acl), { administrator => 'tenant' }] },
+				      Tenant_Views_Setup => [ qw(tenant)],
+				      Administrator_Views_Setup => [ { administrator => 'tenant' }] },
 
 			    details => {User => [qw(tenant)],
 					VM => ['di', 'osf', { vm_runtime => 'host' }, { user => 'tenant' }],
@@ -952,8 +990,8 @@ my $DBIX_PREFETCH_VALUE = { list => { User => [qw(tenant)],
 					Role => [{role_rels => 'inherited'}, { acl_rels => 'acl'}],
 					Administrator => [qw(tenant), { role_rels => { role => { acl_rels => 'acl' }}}],
 					ACL => [{ role_rels => { role => { admin_rels => 'admin' }}}],
-					Tenant_View => [ qw(tenant acl)],
-					Administrator_View => [ qw(acl), { administrator => 'tenant' }]}};
+					Tenant_Views_Setup => [ qw(tenant)],
+					Administrator_Views_Setup => [ { administrator => 'tenant' }]}};
 
 my $DBIX_HAS_ONE_RELATIONSHIPS = { VM => [qw(vm_runtime counters)],
                                    Host => [qw(runtime counters)]};
@@ -965,6 +1003,9 @@ sub BUILD
     $DBConfigProvider = QVD::Admin4::DBConfigProvider->new();
 
     $self->initialize_info_model;
+
+    $self->set_info_by_type_of_action_and_qvd_object(
+	'related_views_in_db',$RELATED_VIEWS_IN_DB);
 
     $self->set_info_by_type_of_action_and_qvd_object(
 	'available_nested_queries',$AVAILABLE_NESTED_QUERIES);
@@ -1030,7 +1071,8 @@ sub initialize_info_model
 {
     my $self = shift;
     $self->{model_info} =
-{ available_filters => [],                                                                 
+{ related_views_in_db => [],
+  available_filters => [],                                                                 
   available_fields => [],                                                                  
   available_arguments => [],                                                               
   available_nested_queries => [],                                                               
@@ -1097,26 +1139,38 @@ sub set_info_by_qvd_object
 ###########
 ##########
 
+sub related_views_in_db
+{
+    my $self = shift;
+    my $views = $self->{model_info}->{related_views_in_db} // [];
+    @$views;
+}
+
+sub related_view
+{
+    my $self = shift;
+    my $views = $self->{model_info}->{related_views_in_db} // [];
+    my @views = @$views;
+    return $views[0];
+}
+
 sub available_nested_queries
 {
     my $self = shift;
-   my $nq =  $self->{model_info}->{available_nested_queries} // [];
-
+    my $nq =  $self->{model_info}->{available_nested_queries} // [];
     @$nq;
 }
 
 sub available_filters
 {
     my $self = shift;
-   my $filters =  $self->{model_info}->{available_filters} // [];
-
+    my $filters =  $self->{model_info}->{available_filters} // [];
     @$filters;
 }
 
 sub subchain_filters
 {
     my $self = shift;
-
     my $filters = $self->{model_info}->{subchain_filters} // [];
     @$filters;
 }
@@ -1233,6 +1287,16 @@ sub dbix_has_one_relationships
 #################
 ################
 #################
+
+sub related_view_in_db
+{
+    my $self = shift;
+    my $view = shift;
+    $_ eq $view && return 1
+	for $self->related_views_in_db;
+    return 0;
+}
+
 
 sub available_nested_query
 {

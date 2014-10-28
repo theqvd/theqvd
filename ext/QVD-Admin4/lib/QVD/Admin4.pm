@@ -47,7 +47,23 @@ sub select
 
     { total => ($rs->is_paged ? $rs->pager->total_entries : $rs->count), 
       rows => [$rs->all],
-      extra => {}};
+      extra => $self->get_extra_info_from_related_views($request) };
+}
+
+
+sub get_extra_info_from_related_views
+{
+    my ($self,$request) = @_;
+    my $extra = {};
+    
+    my $view_name = $request->related_view;
+    return $extra unless $view_name;
+
+    my $vrs = eval { $DB->resultset($view_name)->search() };
+    QVD::Admin4::Exception->throw(code => $DB->storage->_dbh->state,
+				  message => "$@") if $@;
+    $extra->{$_->id} = $_ for $vrs->all;        
+    $extra;
 }
 
 sub update
@@ -418,41 +434,6 @@ sub add_roles_to_admin
 ###### AD HOC FUNCTIONS #####
 #############################
 
-sub di_select
-{
-    my ($self,$request) = @_;
-    my $result = $self->select_with_properties($request);   
-
-    my $ids = [ map {$_->id} @{$result->{rows}} ]; 
-
-    for my $tag ($DB->resultset('DI_Tag')->search({di_id => $ids})->all)
-    {
-	$result->{extra}->{tags}->{$tag->di_id} //= [];
-	push @{$result->{extra}->{tags}->{$tag->di_id}}, $tag;
-    }
-
-    $result;
-}
-
-sub select_with_properties
-{
-    my ($self,$request) = @_;
-    my $result = $self->select($request);
-
-    my $ids = [ map {$_->id} @{$result->{rows}} ]; 
-    my $table =  $request->table . "_Property";
-    my $fkey = lc($request->table) . "_id";
-
-    for my $property ($DB->resultset($table)->search({$fkey => $ids})->all)
-    {
-	$result->{extra}->{properties}->{$property->$fkey} //= [];
-	push @{$result->{extra}->{properties}->{$property->$fkey}}, $property;
-    }
-
-    $result;
-}
-
-
 sub vm_delete
 {
     my ($self,$request) = @_;
@@ -647,7 +628,14 @@ sub di_no_head_default_tags
 sub current_admin_setup
 {
     my ($self,$administrator,$json_wrapper) = @_;
-   { acls => [ $administrator->acls ]};
+
+    my @tenant_views = $DB->resultset('Tenant_Views_Setup')->search({tenant_id => $administrator->tenant_id})->all;
+    my @admin_views = $DB->resultset('Administrator_Views_Setup')->search({administrator_id => $administrator->id})->all;
+    my %views = map { $_->field => $_ } @tenant_views;
+    $views{$_->field} = $_ for  @admin_views;
+
+   { acls => [ $administrator->acls ],
+     views => [ map { { $_->get_columns } } values %views ]};
 }
 
 sub get_acls_in_admins
@@ -718,6 +706,47 @@ sub get_acls_in_roles
 
    { total => ($acls_rs->is_paged ? $acls_rs->pager->total_entries : $acls_rs->count), 
      rows => [map { $acls_info->{$_->id} } $acls_rs->all] };
+}
+
+sub get_number_of_acls_in_role
+{
+    my ($self,$json_wrapper) = @_;
+    $self->get_number_of_acls_in_role_or_admin('Role',$json_wrapper);
+}
+
+sub get_number_of_acls_in_admin
+{
+    my ($self,$json_wrapper) = @_;
+    $self->get_number_of_acls_in_role_or_admin('Administrator',$json_wrapper);
+}
+
+sub get_number_of_acls_in_role_or_admin
+{
+    my ($self,$table,$json_wrapper) = @_;
+
+    my $acl_patterns = $json_wrapper->get_filter_value('acl_pattern') //
+	QVD::Admin4::Exception->throw(code=>'10');
+    $acl_patterns = ref($acl_patterns) ? $acl_patterns : [$acl_patterns];
+    my $id = $json_wrapper->get_filter_value($table eq 'Role' ? 'role_id' : 'admin_id') // 
+	QVD::Admin4::Exception->throw(code=>'10'); 
+
+    my $object = $DB->resultset($table)->find({ id => $id }) //
+	QVD::Admin4::Exception->throw(code=>  $table eq 'Role' ? 20 : 40 );
+
+    my $output;
+    for my $acl_pattern (@$acl_patterns)
+    {
+	my $rs = $DB->resultset('ACL')->search({ name => { ilike => $acl_pattern }});
+	my $total_number_of_acls = $rs->count;
+	my @available_acls_in_role = grep { $object->is_allowed_to($_->name) } $rs->all;
+	my $available_acls_in_role = @available_acls_in_role;
+ 
+	$output->{$acl_pattern} = 
+	{ total => $total_number_of_acls,
+	  effective => $available_acls_in_role };
+    }
+
+    $output;
 }
 
 

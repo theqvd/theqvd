@@ -21,6 +21,9 @@ has 'related_objects_arguments', is => 'ro', isa => sub { die "Invalid type for 
 has 'nested_queries', is => 'ro', isa => sub { die "Invalid type for attribute nested_queries" 
 						   unless ref(+shift) eq 'HASH'; }, default => sub { {}; };
 
+has 'related_views', is => 'ro', isa => sub { die "Invalid type for attribute related_views" 
+						   unless ref(+shift) eq 'ARRAY'; }, default => sub { []; };
+
 my $ADMIN;
 my $DBConfigProvider;
 
@@ -56,6 +59,7 @@ sub BUILD
     $self->set_filters_in_request;
     $self->set_arguments_in_request;
     $self->set_nested_queries_in_request;
+    $self->set_related_views_in_request;
     $self->set_order_by_in_request;
     $self->set_tables_to_join_in_request;
 }
@@ -107,6 +111,12 @@ sub set_nested_query
 {
     my ($self,$nq,$val) = @_;
     $self->nested_queries->{$nq} = $val;
+}
+
+sub add_to_related_views
+{
+    my ($self,$key) = @_;
+    push @{$self->related_views}, $key;
 }
 
 sub set_argument
@@ -410,6 +420,20 @@ sub set_tables_to_join_in_request
 
     $self->add_to_prefetch($_) 
 	for @{$self->qvd_object_model->dbix_prefetch_value};
+}
+
+sub set_related_views_in_request
+{
+    my $self = shift;
+
+    $self->add_to_related_views($_) 
+	for $self->qvd_object_model->related_views_in_db;
+}
+
+sub related_view
+{
+    my $self = shift;
+    $self->qvd_object_model->related_view;
 }
 
 1;

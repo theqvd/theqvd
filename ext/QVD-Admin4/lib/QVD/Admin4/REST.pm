@@ -18,7 +18,7 @@ current_admin_setup => {type_of_action => 'admin_config_provider',
 		       admin4method => 'current_admin_setup'},
 
 user_get_list => {type_of_action => 'list',
-		  admin4method => 'select_with_properties',
+		  admin4method => 'select',
 		  acls => [qr/^user\.see-main\.$/],
 		  qvd_object => 'User'},
 
@@ -33,7 +33,7 @@ user_all_ids => { type_of_action => 'all_ids',
 		  qvd_object => 'User'},
 
 user_get_details => { type_of_action => 'details',
-		      admin4method => 'select_with_properties',
+		      admin4method => 'select',
 		      acls => [qr/^user\.see-details\.$/],
 		      qvd_object => 'User' },
 
@@ -58,7 +58,7 @@ user_delete => { type_of_action => 'delete',
 		 qvd_object => 'User'},
 
 vm_get_list => { type_of_action => 'list',
-		 admin4method => 'select_with_properties',
+		 admin4method => 'select',
 		 qvd_object => 'VM'},
 
 vm_all_ids => { type_of_action => 'all_ids',
@@ -70,7 +70,7 @@ vm_tiny_list => { type_of_action => 'tiny',
 		  qvd_object => 'VM'},
 
 vm_get_details => { type_of_action => 'details',
-		    admin4method => 'select_with_properties',
+		    admin4method => 'select',
 		    qvd_object => 'VM'},
 
 vm_get_state => { type_of_action => 'state',
@@ -102,7 +102,7 @@ vm_delete => { type_of_action => 'delete',
 	       qvd_object => 'VM'},
 
 host_get_list => { type_of_action => 'list',
-		   admin4method => 'select_with_properties',
+		   admin4method => 'select',
 		   qvd_object => 'Host'},
 
 host_all_ids => { type_of_action => 'all_ids',
@@ -114,7 +114,7 @@ host_tiny_list => { type_of_action => 'tiny',
 		    qvd_object => 'Host'},
 
 host_get_details => { type_of_action => 'details',
-		      admin4method => 'select_with_properties',
+		      admin4method => 'select',
 		      qvd_object => 'Host'},
 
 host_get_state => { type_of_action => 'state',
@@ -134,7 +134,7 @@ host_delete => { type_of_action => 'delete',
 		 qvd_object => 'Host'},
 
 osf_get_list => { type_of_action => 'list',
-		  admin4method => 'select_with_properties',
+		  admin4method => 'select',
 		  qvd_object => 'OSF'},
 
 osf_all_ids => { type_of_action => 'all_ids',
@@ -146,7 +146,7 @@ osf_tiny_list => { type_of_action => 'tiny',
 		   qvd_object => 'OSF'},
 
 osf_get_details => { type_of_action => 'details',
-		     admin4method => 'select_with_properties',
+		     admin4method => 'select',
 		     qvd_object => 'OSF'},
 
 osf_update => {  type_of_action => 'update',
@@ -162,7 +162,7 @@ osf_delete => { type_of_action => 'delete',
 		qvd_object => 'OSF'},
 
 di_get_list => { type_of_action => 'list',
-		 admin4method => 'di_select',
+		 admin4method => 'select',
 		 qvd_object => 'DI'},
 
 di_all_ids => { type_of_action => 'all_ids',
@@ -174,7 +174,7 @@ di_tiny_list => { type_of_action => 'tiny',
 		  qvd_object => 'DI'},
 
 di_get_details => { type_of_action => 'details',
-		 admin4method => 'di_select',
+		 admin4method => 'select',
 		 qvd_object => 'DI'},
 
 di_update => { type_of_action => 'update',
@@ -314,66 +314,71 @@ role_delete => { type_of_action => 'delete',
 
 tenant_view_tiny_list => { type_of_action => 'tiny',
 			   admin4method => 'select',
-			   qvd_object => 'Tenant_View'},
+			   qvd_object => 'Tenant_Views_Setup'},
 
 tenant_view_get_list => { type_of_action => 'list',
 			  admin4method => 'select',
-			  qvd_object => 'Tenant_View'},
+			  qvd_object => 'Tenant_Views_Setup'},
 
 tenant_view_get_details => { type_of_action => 'details',
 			     admin4method => 'select',
-			     qvd_object => 'Tenant_View'},
+			     qvd_object => 'Tenant_Views_Setup'},
 
 tenant_view_all_ids => { type_of_action => 'all_ids',
 			 admin4method => 'select',
-			 qvd_object => 'Tenant_View'},
+			 qvd_object => 'Tenant_Views_Setup'},
 
 tenant_view_update => { type_of_action => 'update',
 			admin4method => 'update',
-			qvd_object => 'Tenant_View'},
+			qvd_object => 'Tenant_Views_Setup'},
 
 tenant_view_create => { type_of_action => 'create',
 			admin4method => 'create',
-			qvd_object => 'Tenant_View'},
+			qvd_object => 'Tenant_Views_Setup'},
 
 tenant_view_delete => { type_of_action => 'delete',
 			admin4method => 'delete',
-			qvd_object => 'Tenant_View'},
+			qvd_object => 'Tenant_Views_Setup'},
 
 
 
 admin_view_tiny_list => { type_of_action => 'tiny',
 			   admin4method => 'select',
-			   qvd_object => 'Administrator_View'},
+			   qvd_object => 'Administrator_Views_Setup'},
 
 admin_view_get_list => { type_of_action => 'list',
 			  admin4method => 'select',
-			  qvd_object => 'Administrator_View'},
+			  qvd_object => 'Administrator_Views_Setup'},
 
 admin_view_get_details => { type_of_action => 'details',
 			     admin4method => 'select',
-			     qvd_object => 'Administrator_View'},
+			     qvd_object => 'Administrator_Views_Setup'},
 
 admin_view_all_ids => { type_of_action => 'all_ids',
 			 admin4method => 'select',
-			 qvd_object => 'Administrator_View'},
+			 qvd_object => 'Administrator_Views_Setup'},
 
 admin_view_update => { type_of_action => 'update',
 			admin4method => 'update',
-			qvd_object => 'Administrator_View'},
+			qvd_object => 'Administrator_Views_Setup'},
 
 admin_view_create => { type_of_action => 'create',
 			admin4method => 'create',
-			qvd_object => 'Administrator_View'},
+			qvd_object => 'Administrator_Views_Setup'},
 
 admin_view_delete => { type_of_action => 'delete',
 			admin4method => 'delete',
-			qvd_object => 'Administrator_View'},
+			qvd_object => 'Administrator_Views_Setup'},
 
 
 qvd_objects_statistics => { type_of_action =>  'general',
 			    admin4method => 'qvd_objects_statistics'},
 
+number_of_acls_in_role => { type_of_action =>  'general',
+			    admin4method => 'get_number_of_acls_in_role'},
+
+number_of_acls_in_admin => { type_of_action =>  'general',
+			    admin4method => 'get_number_of_acls_in_admin'},
 
 };
 
