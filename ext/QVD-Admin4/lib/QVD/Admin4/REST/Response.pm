@@ -53,6 +53,7 @@ my $mapper =
     38 => 'Forbidden nested query for this administrator',
     39 => 'Concurrent update problem while updating expiration time in session',
     40 => 'Unknown administrator',
+    41 => 'Unknown QVD object. Available QVD objects are: VM, User, Host, OSF and DI',
     23503 => 'Foreign Key violation',
     23502 => 'Lack of mandatory argument violation',
     23505 => 'Unique Key violation',

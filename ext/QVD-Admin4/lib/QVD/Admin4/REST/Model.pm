@@ -945,7 +945,7 @@ my $FIELDS_TO_DBIX_FORMAT_MAPPER =
 	'admin_id' => 'me.administrator_id', 
 	'field' => 'me.field', 
 	'admin_name' => 'administrator.name',
-	'field' => 'me.field',
+	'visible' => 'me.visible',
 	'view_type' => 'me.view_type',
 	'device_type' => 'me.device_type' 
  }

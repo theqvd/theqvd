@@ -380,6 +380,9 @@ number_of_acls_in_role => { type_of_action =>  'general',
 number_of_acls_in_admin => { type_of_action =>  'general',
 			    admin4method => 'get_number_of_acls_in_admin'},
 
+properties_by_qvd_object => { type_of_action =>  'general',
+			      admin4method => 'get_properties_by_qvd_object'},
+
 };
 
 sub BUILD

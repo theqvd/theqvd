@@ -625,6 +625,26 @@ sub di_no_head_default_tags
 ## GENERAL FUNCTIONS; WITHOUT REQUEST
 ######################################
 
+sub get_properties_by_qvd_object
+{
+   my ($self,$json_wrapper) = @_;
+    my $qvd_object = $json_wrapper->get_filter_value('qvd_object') //
+	QVD::Admin4::Exception->throw(code=>'10');
+   $qvd_object =~ /^User|VM|Host|OSF|DI$/ || 
+       QVD::Admin4::Exception->throw(code=>'41');
+
+   my $rs =  $DB->resultset($qvd_object."_Property")->search(
+       {},{ order_by => { ($json_wrapper->order_direction || '-asc') => 
+			      ($json_wrapper->order_criteria || []) },
+		page => ($json_wrapper->offset || 1),
+		rows => ($json_wrapper->block || 10000) });
+
+   my %props = map { $_->key => 1 } $rs->all;
+   my @props = sort keys %props; 
+   { total => scalar @props, 
+     rows => \@props };
+}
+
 sub current_admin_setup
 {
     my ($self,$administrator,$json_wrapper) = @_;

@@ -648,7 +648,7 @@ CREATE TABLE administrator_views_setups (
     field varchar(64) NOT NULL,
     visible boolean NOT NULL,
     device_type device_types_enum NOT NULL,
-    view_type view_types_enum NOT NULL
+    view_type varchar(64) NOT NULL
 );
 
 
