@@ -96,7 +96,7 @@ sub ping_processor {
 sub list_of_vm_processor {
     my ($l7r, $method, $url, $headers) = @_;
     my $this_host = this_host; $this_host // $l7r->throw_http_error(HTTP_SERVICE_UNAVAILABLE, 'Host is not registered in the database');
-    $this_host->counters->incr_http_requests;
+    txn_do { $this_host->counters->incr_http_requests; };
     DEBUG 'method list_of_vm requested';
     my $auth = $l7r->_authenticate_user($headers);
     if ($this_host->runtime->blocked) {
@@ -137,7 +137,7 @@ sub generate_slave_key {
 sub connect_to_vm_processor {
     my ($l7r, $method, $url, $headers) = @_;
     my $this_host = this_host; $this_host // $l7r->throw_http_error(HTTP_SERVICE_UNAVAILABLE, 'Host is not registered in the database');
-    $this_host->counters->incr_http_requests;
+    txn_do { $this_host->counters->incr_http_requests; };
     DEBUG 'method connect_to_vm requested';
     my $auth = $l7r->_authenticate_user($headers);
     my $user_id = $auth->user_id;
@@ -224,7 +224,7 @@ sub connect_to_vm_processor {
 sub stop_vm_processor {
     my ($l7r, $method, $url, $headers) = @_;
     my $this_host = this_host; $this_host // $l7r->throw_http_error(HTTP_SERVICE_UNAVAILABLE, 'Host is not registered in the database');
-    $this_host->counters->incr_http_requests;
+    txn_do { $this_host->counters->incr_http_requests; };
     DEBUG 'method stop_vm requested';
     my $auth = $l7r->_authenticate_user($headers);
     my $user_id = $auth->user_id;
@@ -308,12 +308,12 @@ sub _authenticate_user {
 		    return $auth;
 		}
                 $auth = QVD::L7R::Authenticator->new;
-		$this_host->counters->incr_auth_attempts;
+		txn_do { $this_host->counters->incr_auth_attempts; };
                 if ($auth->authenticate_basic($login, $passwd, $l7r)) {
 		    INFO "Accepted connection from user $login from ip:port ".
 			$l7r->{server}->{client}->peerhost().":".$l7r->{server}->{client}->peerport();
 		    $l7r->{_auth} = $auth;
-		    $this_host->counters->incr_auth_ok;
+		    txn_do { $this_host->counters->incr_auth_ok; };
                     return $auth;
                 }
                 INFO "Failed login attempt from user $login";
@@ -567,13 +567,13 @@ sub _run_forwarder {
 
     $l7r->_tell_client("Connecting X session for VM_ID: " . $vm->id);
 
-    $this_host->counters->incr_nx_attempts;
+    txn_do { $this_host->counters->incr_nx_attempts; };
     my $socket = IO::Socket::INET->new(PeerAddr => $vm_address,
                                        PeerPort => $vm_x_port,
                                        Proto => 'tcp',
                                        KeepAlive => 1)
         or LOGDIE "Unable to connect to X server  on VM VM_ID: " . $vm->id .  ": $!";
-    $this_host->counters->incr_nx_ok;
+    txn_do { $this_host->counters->incr_nx_ok; };
 
     DEBUG "Socket connected to X server on VM VM_ID: " . $vm->id;
 
@@ -596,7 +596,7 @@ sub _run_forwarder {
     my $t0 = time;
     forward_sockets($l7r->{server}{client}, $socket);
     DEBUG "Session terminated on VM VM_ID: " . $vm->id ;
-    $this_host->counters->incr_short_sessions if time - $t0 < $short_session;
+    txn_do { $this_host->counters->incr_short_sessions } if time - $t0 < $short_session;
 }
 
 sub _vma_client {

@@ -22,7 +22,13 @@ __PACKAGE__->belongs_to(host => 'QVD::DB::Result::Host', 'host_id');
 sub _incr_field {
     my ($host, $field) = @_;
 
-    $host->update ({ $field => 1 + $host->$field });
+    for (1..5) {
+        eval { $host->update ({ $field => 1 + $host->$field }); };
+        last unless $@;
+        if ($@ =~ /could not serialize access due to concurrent update/) {
+            select undef, undef, undef, 0.2 + rand 0.3;
+        }
+    }
 }
 
 sub incr_http_requests  { shift->_incr_field ('http_requests'); }
