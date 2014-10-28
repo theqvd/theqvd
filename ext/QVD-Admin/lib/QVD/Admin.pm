@@ -602,6 +602,17 @@ sub cmd_osf_add {
     #die "The required parameters are ".join(", ", @required_params)
     #    unless _set_equals([keys %params], \@required_params);
 
+    if ($params{'user_storage_size'}) {
+        $params{'user_storage_size'} =~ s/\s+//g;
+        if ($params{'user_storage_size'} =~ /^(.*)kb?$/i) {
+            $params{'user_storage_size'} = int ($1 * 1024);
+        } elsif ($params{'user_storage_size'} =~ /^(.*)mb?$/i) {
+            $params{'user_storage_size'} = int ($1 * 1024*1024);
+        } elsif ($params{'user_storage_size'} =~ /^(.*)gb?$/i) {
+            $params{'user_storage_size'} = int ($1 * 1024*1024*1024);
+        }
+    }
+
     my $id;
     txn_do {
         my $rs = $self->get_resultset('osf');
