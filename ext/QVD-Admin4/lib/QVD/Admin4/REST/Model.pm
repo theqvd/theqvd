@@ -22,615 +22,506 @@ has 'model_info', is => 'ro', isa => sub {die "Invalid type for attribute model_
 
 my $DBConfigProvider;
 
-my $RELATED_VIEWS_IN_DB = {
+my $RELATED_VIEWS_IN_DB = 
+{   
+    list => { User => [qw(User_View)],
+	      VM => [qw(VM_View)],
+	      Host => [qw(Host_View)],
+	      OSF => [qw(OSF_View)],
+	      DI => [qw(DI_View)] },
 
-    list => {    User => [qw(User_View)],
+    details => { User => [qw(User_View)],
 		 VM => [qw(VM_View)],
 		 Host => [qw(Host_View)],
 		 OSF => [qw(OSF_View)],
-		 DI => [qw(DI_View)] },
-
-    details => {    User => [qw(User_View)],
-		    VM => [qw(VM_View)],
-		    Host => [qw(Host_View)],
-		    OSF => [qw(OSF_View)],
-		    DI => [qw(DI_View)] },
-		 
+		 DI => [qw(DI_View)] },		 
 };
 
+my $ACLS_FOR_FILTERS = 
+{
+    VM => { properties => [qw(vm.filter.properties)], # PROVISIONAL
+	    name => [qw(vm.filter.name)],
+	    user_id => [qw(vm.filter.user)],
+	    user_name => [qw(vm.filter.user)],
+	    osf_id => [qw(vm.filter.osf)],
+	    osf_name => [qw(vm.filter.osf)],
+	    state => [qw(vm.filter.state)],
+	    host_id => [qw(vm.filter.host)],
+	    host_name => [qw(vm.filter.host)]},
 
-my $ACLS_FOR_FILTERS = {
+    User => { properties => [qw(user.filter.properties)], 
+	      name => [qw(user.filter.name)]},
 
-    VM => { storage => [],
-	    id => [],
-	    name => [],
-	    user_id => [],
-	    user_name => [],
-	    osf_id => [],
-	    osf_name => [],
-	    di_tag => [],
-	    blocked => [], 
-	    expiration_soft => [],
-	    expiration_hard => [],
-	    state => [],
-	    host_id => [],
-	    host_name => [],
-	    di_id => [], 
-	    user_state => [],
-	    ip => [],
-	    next_boot_ip => [],
-	    ssh_port => [],
-	    vnc_port => [],
-	    serial_port => [],
-	    tenant_id => [],
-	    tenant_name => [], 
-	    creation_admin => [],
-	    creation_date => [] },
+    Host => { properties => [qw(host.filter.properties)],
+	      name => [qw(host.filter.name)],
+	      vm_id => [qw(host.filter.vm)]},
 
-    DI_Tag => { osf_id => [], 
-		name => [],
-		id => [],
-		tenant_id => [],
-		tenant_name => [] },
+    DI => { properties => [qw(di.filter.properties)],
+	    disk_image => [qw(host.filter.disk-image)],
+	    osf_id => [qw(host.filter.osf)],
+	    osf_name => [qw(host.filter.osf)],
 
-    User => { id => [],
-	      properties => [qw(user.filter.properties)], # PROVISIONAL
-	      name => [qw(user.filter.name)],
-	      blocked => [],
-	      creation_admin => [],
-	      creation_date => [],
-	      tenant_id => [],
-	      tenant_name => [] },
-
-    Host => { id => [],
-	      name => [],
-	      address => [],
-	      blocked => [],
-	      frontend => [],
-	      backend => [],
-	      state => [],
-	      vm_id => [],
-	      creation_admin => [],
-	      creation_date => [] },
-
-    DI => { id => [],
-	    disk_image => [],
-	    version => [],
-	    osf_id => [],
-	    osf_name => [],
-	    tenant_id => [],
-	    blocked => [],
-	    tenant_name => [],
-	    tag => [] },
-
-    OSF => { id => [],
-	     name => [],
-	     overlay => [],
-	     user_storage => [],
-	     memory => [],
-	     vm_id => [],
-	     di_id => [],
-	     tenant_id => [],
-	     tenant_name => [] },
-
-    ACL => { id => [],
-	     name => [],
-	     role_id => [],
-	     admin_id => [] },
-
-    Tenant => { id => [],
-		name => []},
-
-    Role => { name => [],
-	      id => [] },
-
-    Administrator => { name => [],
-		       tenant_id => [],
-		       tenant_name => [],
-		       id => [] },
-
-    Tenant_Views_Setup => { id => [],
-		     tenant_id => [],
-		     tenant_name => [],
-		     field => [],
-		     visible => [],
-		     view_type => [],
-		     device_type => [],
-                     qvd_object => [],
-                     property => []},
-
-    Administrator_Views_Setup => { id => [],
-			    admin_id => [],
-			    admin_name => [],
-			    field => [],
-			    tenant_id => [],
-			    tenant_name => [],
-			    visible => [],
-			    view_type => [],
-			    device_type => [],
-				   qvd_object => [],
-				   property => []},
+    OSF => { properties => [qw(osf.filter.properties)],
+	     name => [qw(osf.filter.name)],
+	     vm_id => [qw(osf.filter.vm)],
+	     di_id => [qw(osf.filter.di)]},
 };
 
-my $ACLS_FOR_FIELDS = {
+my $ACLS_FOR_FIELDS = 
+{
+    OSF => { id => [qw(osf.see.id)],
+	     creation_admin => [qw(osf.see.created-by)],
+	     creation_date => [qw(osf.see.creation-date)],
+	     name => [qw(osf.see.name)],
+	     overlay => [qw(osf.see.overlay)],
+	     user_storage => [qw(osf.see.user-storage)],
+	     memory => [qw(osf.see.memory)],
+	     number_of_vms => [qw(osf.see.vms-info osf.see.vm-list)], # quedan vm-list-block|default|default-update|expiration|head|state|tags
+	     number_of_dis => [qw(osf.see.dis-info osf.see.di-list)],
+	     properties => [qw(osf.see.properties)] },
 
-    OSF => { id => [],
-	     name => [],
-	     overlay => [],
-	     user_storage => [],
-	     memory => [],
-	     number_of_vms => [],
-	     number_of_dis => [],
-	     properties => [] },
+    Role => { roles => [qw(role.see.acl-list role.see.acl-list-roles role.see.inherited-roles)],
+	      acls => [qw(role.see.acl-list)],
+	      id => [qw(role.see.id)],
+	      number_of_acls => [qw(role.see.acl-list)] },
 
-    Role => { name => [],
-	      roles => [],
-	      acls => [],
-	      id => [],
-	      number_of_acls => [] },
+    DI => { id => [qw(di.see.id)],                      # di.see.vm-list-block|expiration|state
+	    creation_admin => [qw(di.see.created-by)],
+	    creation_date => [qw(di.see.creation-date)],
+	    version => [qw(di.see.version)],
+	    osf_id => [qw(di.see.osf)],
+	    osf_name => [qw(di.see.osf)],
+	    blocked => [qw(di.see.block)],
+	    tags => [qw(di.see.default di.see.head di.see.tags)],
+	    properties => [qw(di.see.properties)]  },
 
-    DI => { id => [],
-	    disk_image => [],
-	    version => [],
-	    osf_id => [],
-	    osf_name => [],
-	    blocked => [],
-	    tags => [],
-	    properties => []  },
-
-    VM => { storage => [],
-	    id => [],
-	    name => [],
-	    user_id => [],
-	    user_name => [],
-	    osf_id => [],
-	    osf_name => [],
-	    di_tag => [],
-	    blocked => [],
-	    expiration_soft => [],
-	    expiration_hard => [],
-	    state => [],
-	    host_id => [],
-	    host_name => [],
-	    di_id => [],
-	    user_state => [],
-	    ip => [],
-	    next_boot_ip => [],
-	    ssh_port => [],
-	    vnc_port => [],
-	    serial_port => [], 
-	    creation_admin => [],
-	    creation_date => [],
-	    di_version => [],
-	    di_name => [],
-	    di_id => [],
-	    properties => [] },
-
-    ACL => { id => [],
-	     name => [] },
-
-    Administrator => { name => [],
-		       roles => [],
-		       id => [] },
-
-    Tenant => { id => [],
-		name => [] },
+    VM => { id => [qw(vm.see.id)],
+	    user_id => [qw(vm.see.user)],
+	    user_name => [qw(vm.see.user)],
+	    osf_id => [qw(vm.see.osf)],
+	    osf_name => [qw(vm.see.osf)],
+	    di_tag => [qw(vm.see.di-tag)],
+	    blocked => [qw(vm.see.block)],
+	    expiration_soft => [qw(vm.see.expiration)],
+	    expiration_hard => [qw(vm.see.expiration)],
+	    state => [qw(vm.see.state)],
+	    host_id => [qw(vm.see.host)],
+	    host_name => [qw(vm.see.host)],
+	    di_id => [qw(vm.see.di)],
+	    user_state => [qw(vm.see.user-state)],
+	    ip => [qw(vm.see.ip)],
+	    next_boot_ip => [qw(vm.see.next-boot-ip)],
+	    ssh_port => [qw(vm.see.port-ssh)],
+	    vnc_port => [qw(vm.see.port-vnc)],
+	    serial_port => [qw(vm.see.port-serial)], 
+	    creation_admin => [qw(vm.see.created-by)],
+	    creation_date => [qw(vm.see.creation-date)],
+	    di_version => [qw(vm.see.di-version)],
+	    di_name => [qw(vm.see.di)],
+	    di_id => [qw(vm.see.di)],
+	    properties => [qw(vm-see-properties)] },
+ 
+   Administrator => { roles => [qw(administrator.see.roles 
+                                   administrator.see.acl-list 
+                                   administrator.see.acl-list-roles)],
+		       id => [qw(administrator.see.id)] },
 
     User => { id => [qw(user.see.id)],
-	      name => [],
 	      blocked => [qw(user.see.block)],
 	      creation_admin => [qw(user.see.created-by)],
 	      creation_date => [qw(user.see.creation-date)],
-	      number_of_vms => [],
+	      number_of_vms => [qw(user.see.vm-list user.see.vms-info)], # user.see.vm-list-block|expiration|state
 	      number_of_vms_connected => [qw(user.see.vm-list-state)],
 	      properties => [qw(user.see.properties)] },
 
-    Host => { id => [],
-	      name => [],
-	      address => [],
-	      blocked => [],
-	      frontend => [],
-	      backend => [],
-	      state => [],
-	      load => [],
-	      creation_admin => [],
-	      creation_date => [],
-	      number_of_vms_connected => [],
-	      properties => [] },
-
-    DI_Tag => { osf_id => [],
-		name => [],
-		id => [] },
-
-    Tenant_Views_Setup => { id => [],
-		     tenant_id => [],
-		     tenant_name => [],
-		     field => [],
-		     visible => [],
-		     view_type => [],
-		     device_type => [],
-                     qvd_object => [],
-                     property => [] },
-
-    Administrator_Views_Setup => { id => [],
-			    tenant_id => [],
-			    tenant_name => [],
-			    admin_id => [],
-			    field => [],
-			    visible => [],
-			    view_type => [],
-			    device_type => [],
-				   qvd_object => [],
-				   property => []}
+    Host => { id => [qw(host.see.id)],
+	      address => [qw(host.see.address)],
+	      blocked => [qw(host.see.block)],
+	      state => [qw(host.see.state)],
+	      creation_admin => [qw(host.see.created-by)],
+	      creation_date => [qw(host.see.creation-date)],
+	      number_of_vms_connected => [qw(host.see.vm-list host.see.vms-info)],
+	      properties => [qw(host.see.properties)] },
 };
 
-my $ACLS_FOR_ARGUMENTS_IN_UPDATE = { User => { name => [],
-					       password => [qw(user.update.password)],
-					       blocked => [qw(user.update.block)],
-					       __properties_changes_set => [qw(user.update.properties-update user.update.properties-create)],
-					       __properties_changes_delete => [qw(user.update.properties-delete)]},
-				     VM => { name => [],
-					     ip => [],
-					     blocked => [],
-					     expiration_soft => [],
-					     expiration_hard => [],
-					     storage => [],
-					     di_tag => [],
-					     __properties_changes__set => [],
-					     __properties_changes__delete => [] },
-				     Host => { name => [],
-					       address => [],
-					       blocked => [],
-					       __properties_changes__set => [],
-					       __properties_changes__delete => [] },
-				     OSF => { name => [],
-					      memory => [],
-					      user_storage => [],
-					      overlay => [],
-					      __properties_changes__set => [],
-					      __properties_changes__delete => [] },
-				     DI => { blocked => [],
-					     disk_image => [],
-					     __properties_changes__set => [],
-					     __properties_changes__delete => [],
-					     __tags_changes__create => [],
-					     __tags_changes__delete => []},
-				     Tenant => { name => [] },
-				     Role => { name => [],
-					       __acls_changes__assign_acls => [],
-					       __acls_changes__unassign_acls => [],
-					       __roles_changes__assign_roles => [],
-					       __roles_changes__unassign_roles => [] },
-				     Administrator => { name => [],
-							password => [],
-							__roles_changes__assign_roles => [],
-							__roles_changes__unassign_roles => [] },
-				     Tenant_Views_Setup => { visible => [],
-                                                      view_type => [],
-                                                      device_type => [],
-							     qvd_object => [],
-							     property => [] },
-				     Administrator_Views_Setup => { visible => [] }};
+my $ACLS_FOR_ARGUMENTS_IN_UPDATE = 
+{ 
+    User => { password => [qw(user.update.password)],
+	      blocked => [qw(user.update.block)],
+	      __properties_changes_set => [qw(user.update.properties-update user.update.properties-create)],
+	      __properties_changes_delete => [qw(user.update.properties-delete)]},
+
+    VM => { name => [qw(vm.update.name)],
+	    blocked => [qw(vm.update.block)],
+	    expiration_soft => [qw(vm.update.expiration)],
+	    expiration_hard => [qw(vm.update.expiration)],
+	    di_tag => [qw(vm.update.di-tag)],
+	    __properties_changes__set => [qw(vm.update.properties-update vm.update.properties-create)],
+	    __properties_changes__delete => [qw(vm.update.properties-delete)] },
+
+    Host => { name => [qw(host.update.name)],
+	      address => [qw(host.update.address)],
+	      blocked => [qw(host.update.block)],
+	      __properties_changes__set => [qw(host.update.properties-update host.update.properties-create)],
+	      __properties_changes__delete => [qw(host.update.properties-delete)] },
+
+    OSF => { name => [qw(osf.update.name)],
+	     memory => [qw(osf.update.memory)],
+	     user_storage => [qw(osf.update.user-storage)],
+	     __properties_changes__set => [qw(osf.update.properties-update osf.update.properties-create)],
+	     __properties_changes__delete => [qw(osf.update.properties-delete)] },
+
+    DI => { blocked => [qw(di.update.block)],
+	    __properties_changes__set => [qw(di.update.properties-update di.update.properties-create)],
+	    __properties_changes__delete => [qw(di.update.properties-delete)],
+	    __tags_changes__create => [qw(di.update.tags di.update.default)],
+	    __tags_changes__delete => [qw(di.update.tags di.update.default)]},
+
+    Role => { name => [qw(role.update.name)],
+	      __acls_changes__assign_acls => [qw(role.update.assign-acl)],
+	      __acls_changes__unassign_acls => [qw(role.update.assign-acl)],
+	      __roles_changes__assign_roles => [qw(role.update.assign-role)],
+	      __roles_changes__unassign_roles => [qw(role.update.assign-role)] },
+
+    Administrator => { password => [qw(administrator.update.password)],
+		       __roles_changes__assign_roles => [qw(administrator.update.assign-role)],
+		       __roles_changes__unassign_roles => [qw(administrator.update.assign-role)] },
+
+    Tenant_Views_Setup => { visible => [qw(views.update.columns)] },  
+    Administrator_Views_Setup => { visible => [qw(views.update.columns)] }
+
+};
 
 
-my $ACLS_FOR_ARGUMENTS_IN_MASSIVE_UPDATE = { User => { '***delete***' => ['user.delete-massive.'], # MAYBE A NEW VARIABLE?
-						       name => [],
-						       password => [],
-						       blocked => [qw(user.update-massive.block)],
-						       __properties_changes__set => [qw(user.update-massive.properties-update user.update-massive.properties-create)],
-						       __properties_changes__delete => [qw(user.update-massive.properties-delete)]},
-					     VM => { name => [],
-						     ip => [],
-						     blocked => [],
-					     expiration_soft => [],
-					     expiration_hard => [],
-					     storage => [],
-					     di_tag => [],
-					     __properties_changes__set => [],
-					     __properties_changes__delete => [] },
-				     Host => { name => [],
-					       address => [],
-					       blocked => [],
-					       __properties_changes__set => [],
-					       __properties_changes__delete => [] },
-				     OSF => { name => [],
-					      memory => [],
-					      user_storage => [],
-					      overlay => [],
-					      __properties_changes__set => [],
-					      __properties_changes__delete => [] },
-				     DI => { blocked => [],
-					     disk_image => [],
-					     __properties_changes__set => [],
-					     __properties_changes__delete => [],
-					     __tags_changes__create => [],
-					     __tags_changes__delete => []},
-				     Tenant => { name => [] },
-				     Role => { name => [],
-					       __acls_changes__assign_acls => [],
-					       __acls_changes__unassign_acls => [],
-					       __roles_changes__assign_roles => [],
-					       __roles_changes__unassign_roles => [] },
-				     Administrator => { name => [],
-							password => [],
-							__roles_changes__assign_roles => [],
-							__roles_changes__unassign_roles => [] },
-				     Tenant_Views_Setup => { visible => [],
-							     view_type => [],
-							     device_type => [] },
-					     Administrator_Views_Setup => { visible => []}};
+my $ACLS_FOR_ARGUMENTS_IN_MASSIVE_UPDATE = 
+{ 
+    User => { '***delete***' => ['user.delete-massive.'], # MAYBE A NEW VARIABLE?
+	      blocked => [qw(user.update-massive.block)],
+	      __properties_changes__set => [qw(user.update-massive.properties-update 
+                                               user.update-massive.properties-create)],
+	      __properties_changes__delete => [qw(user.update-massive.properties-delete)]},
+
+    VM => { '***delete***' => ['vm.delete-massive.'],
+	    blocked => [qw(vm.update-massive.block)],
+	    expiration_soft => [qw(vm.update-massive.expiration)],
+	    expiration_hard => [qw(vm.update-massive.expiration)],
+	    di_tag => [qw(vm.update-massive.di-tag)],
+	    __properties_changes__set => [qw(vm.update-massive.properties-update 
+                                             vm.update-massive.properties-create)],
+	    __properties_changes__delete => [qw(vm.update-massive.properties-delete)] },
+
+    Host => { '***delete***' => ['host.delete-massive.'],
+	      blocked => [qw(host.update-massive.block)],
+	      __properties_changes__set => [qw(host.update-massive.properties-update 
+                                               host.update-massive.properties-create)],
+	      __properties_changes__delete => [qw(host.update-massive.properties-delete)] },
+	
+    OSF => { '***delete***' => ['osf.delete-massive.'],
+	     memory => [qw(osf.update-massive.memory)],
+	     user_storage => [qw(osf.update-massive.user-storage)],
+	     __properties_changes__set => [qw(osf.update-massive.properties-update 
+                                              osf.update-massive.properties-create)],
+	     __properties_changes__delete => [qw(osf.update-massive.properties-delete)] },
+	
+    DI => { '***delete***' => ['di.delete-massive.'],
+	    blocked => [qw(di.update-massive.block)],
+	    __properties_changes__set => [qw(di.update-massive.properties-update 
+                                             di.update-massive.properties-create)],
+	    __properties_changes__delete => [qw(di.update-massive.properties-delete)],
+	    __tags_changes__create => [qw(di.update-massive.tags)],
+	    __tags_changes__delete => [qw(di.update-massive.tags-delete)]},
+	
+    Tenant => { '***delete***' => ['tenant.delete-massive.']},
+
+    Role => { '***delete***' => ['role.delete-massive.'] },
+
+    Administrator => { '***delete***' => ['administrator.delete-massive.']}
+
+};
 
 
-my $ACLS_FOR_ARGUMENTS_IN_CREATION = { User => { name => [],
-					       password => [],
-					       blocked => [],
-					       __properties__ => [qw(user.update.properties-create)]},
-				     VM => { name => [],
-					     ip => [],
-					     blocked => [],
-					     expiration_soft => [],
-					     expiration_hard => [],
-					     storage => [],
-					     di_tag => [],
-					     __properties__ => [] },
-				     Host => { name => [],
-					       address => [],
-					       blocked => [],
-					       __properties__ => [] },
-				     OSF => { name => [],
-					      memory => [],
-					      user_storage => [],
-					      overlay => [],
-					      __properties__ => []},
-				     DI => { blocked => [],
-					     disk_image => [],
-					     __properties__ => [],
-					     __tags__ => []},
-				     Tenant => { name => [] },
-				     Role => { name => [],
-					       __acls__=> [],
-					       __roles__ => [] },
-				     Administrator => { name => [],
-							password => [],
-							__roles__ => []},
-				     Tenant_Views_Setup => { visible => [],
-                                                      view_type => [],
-                                                      device_type => [] },
-				     Administrator_Views_Setup => { visible => [],
-								    view_type => [],
-								    device_type => [],
-								    qvd_object => [],
-								    property => []}};
+my $ACLS_FOR_ARGUMENTS_IN_CREATION = 
+{ 
+    User => { __properties__ => [qw(user.create.properties)]},
+    
+    VM => { di_tag => [qw(vm.create.di-tag)],
+	    __properties__ => [qw(vm.create.properties)] },
+    
+    Host => {__properties__ => [qw(host.create.properties)] },
 
+    OSF => { memory => [qw(osf.create.memory)],
+	     user_storage => [qw(osf.create.user-storage)],
+	     __properties__ => [qw(osf.create.properties)]},
 
-my $AVAILABLE_FILTERS = { list => { default => [],
-				    VM => [qw(storage id name user_id user_name osf_id osf_name di_tag blocked 
-                                              expiration_soft expiration_hard state host_id host_name di_id 
-                                              user_state ip next_boot_ip ssh_port vnc_port serial_port tenant_id tenant_name 
-                                              creation_admin creation_date )],
-				    DI_Tag => [qw(osf_id name id tenant_id tenant_name)],
-				    User => [qw(id name blocked creation_admin creation_date tenant_id tenant_name )],
-				    Host => [qw(id name address blocked frontend backend state vm_id creation_admin creation_date )],
-				    DI => [qw(id disk_image version osf_id osf_name tenant_id blocked tenant_name tag)],
-				    OSF => [qw(id name overlay user_storage memory vm_id di_id tenant_id tenant_name )],
-				    ACL => [qw(id name role_id admin_id)],
-				    Tenant => [qw(id name)],
-				    Role => [qw(name id )],
-				    Administrator => [qw(name tenant_id tenant_name id )],
-				    Tenant_Views_Setup => [qw(id tenant_id tenant_name field visible view_type device_type qvd_object property)],
-				    Administrator_Views_Setup => [qw(id admin_id admin_name field tenant_id tenant_name visible view_type device_type qvd_object property)]},
+    DI => { version => [qw(di.create.version)],
+	    __properties__ => [qw(di.create.properties)],
+	    __tags__ => [qw(di.create.tags di.create.defaulr)]}
 
-			  all_ids => { default => [],
-				       VM => [qw(storage id name user_id user_name osf_id osf_name di_tag blocked expiration_soft 
-                                              expiration_hard state host_id host_name  di_id user_state ip next_boot_ip ssh_port 
-                                              vnc_port serial_port tenant_id tenant_name creation_admin creation_date )],
-				       DI_Tag => [qw(osf_id name id tenant_id tenant_name)],
-				       User => [qw(id name blocked creation_admin creation_date tenant_id tenant_name )],
-				       Host => [qw(id name address blocked frontend backend state vm_id creation_admin creation_date )],
-				       DI => [qw(id disk_image version osf_id osf_name tenant_id blocked tenant_name tag)],
-				       OSF => [qw(id name overlay user_storage memory vm_id di_id tenant_id tenant_name )],
-				       ACL => [qw(id name role_id admin_id )],
-				       Role => [qw(name acl_id role_id nested_acl_name nested_role_name id admin_id admin_name )],
-				       Tenant => [qw(id name)],
-				       Administrator => [qw(name tenant_id tenant_name role_id acl_id id role_name acl_name )],
-				    Tenant_Views_Setup => [qw(id tenant_id tenant_name field visible view_type device_type qvd_object property)],
-				    Administrator_Views_Setup => [qw(id tenant_id tenant_name field admin_id admin_name visible view_type device_type qvd_object property)]},
+};
 
-			  details => { default => [qw(id tenant_id)],
-                                       Host => [qw(id)],
-				       Role => [qw(id)],
-				       ACL => [qw(id)],
-                                       Tenant => [qw(id)] },
-			  tiny => { default => [qw(tenant_id)],
-                                    Host => [qw()],
-				    Role => [qw()],
-				    ACL => [qw(name)],
-                                    Tenant => [qw()],
-                                    DI_Tag => [qw(tenant_id osf_id)]},
-			  delete => { default => [qw(id tenant_id)],
-				      Host => [qw(id)],
-				      ACL => [qw(id)],
-				      Role => [qw(id)],
-				      Tenant => [qw(id)],
-				      Tenant_Views_Setup => [qw(id tenant_id field visible view_type device_type qvd_object property)],
-				      Administrator_Views_Setup => [qw(id tenant_id field admin_id admin_name visible view_type device_type qvd_object property)]},
-			  update => { default => [qw(id tenant_id)],
-				      Host => [qw(id)],
-				      ACL => [qw(id)],
-				      Role => [qw(id)],
-				      Tenant => [qw(id)]},
-			  state => { default => [qw(id tenant_id)],
-				     Host => [qw(id)],
-				     ACL => [qw(id)],
-				     Role => [qw(id)],
-				     Tenant => [qw(id)]},
-			  'exec' => { default => [qw(id tenant_id)],
-				      Host => [qw(id)],
-				      ACL => [qw(id)],
-				      Role => [qw(id)],
-				      Tenant => [qw(id)]} };
+my $AVAILABLE_FILTERS = 
+{ 
+    list => { default => [],
 
-my $AVAILABLE_FIELDS = { list => { default => [],
-				   OSF => [qw(id name overlay user_storage memory  number_of_vms number_of_dis properties )],
-				   Role => [qw(name roles acls id number_of_acls)],
-				   DI => [qw(id disk_image version osf_id osf_name blocked tags  properties )],
-				   VM => [qw(storage id name user_id user_name osf_id osf_name di_tag blocked expiration_soft expiration_hard 
-                                          state host_id host_name  di_id user_state ip next_boot_ip ssh_port vnc_port serial_port 
-                                           creation_admin creation_date di_version di_name di_id properties )],
-				   ACL => [qw(id name)],
-				   Administrator => [qw(name roles id )],
-				   Tenant => [qw(id name)],
-				   User => [qw(id name  blocked creation_admin creation_date number_of_vms number_of_vms_connected  properties )],
-				   Host => [qw(id name address blocked frontend backend state  load creation_admin creation_date number_of_vms_connected properties )],
-				   DI_Tag => [qw(osf_id name id )],
-				    Tenant_Views_Setup => [qw(id tenant_id tenant_name field visible view_type device_type qvd_object property)],
-				    Administrator_Views_Setup => [qw(id tenant_id tenant_name admin_id admin_name field visible view_type device_type qvd_object property)] },
-			 details => { default => [],
-				   OSF => [qw(id name overlay user_storage memory  number_of_vms number_of_dis properties )],
-				   Role => [qw(name acls roles id number_of_acls)],
-				   DI => [qw(id disk_image version osf_id osf_name  blocked tags  properties )],
-				   VM => [qw(storage id name user_id user_name osf_id osf_name di_tag blocked expiration_soft expiration_hard 
-                                          state host_id host_name  di_id user_state ip next_boot_ip ssh_port vnc_port serial_port 
-                                           creation_admin creation_date di_version di_name di_id properties )],
-				   ACL => [qw(id name)],
-				   Administrator => [qw(name roles id )],
-				   Tenant => [qw(id name)],
-				   User => [qw(id name  blocked creation_admin creation_date number_of_vms number_of_vms_connected  properties )],
-				   Host => [qw(id name address blocked frontend backend state  load creation_admin creation_date number_of_vms_connected number_of_vms properties )],
-				   DI_Tag => [qw(osf_id name id )],
-				    Tenant_Views_Setup => [qw(id tenant_id tenant_name field visible view_type device_type qvd_object property)],
-				    Administrator_Views_Setup => [qw(id admin_id admin_name tenant_id tenant_name field visible view_type device_type qvd_object property)] },
-			 tiny => { default => [qw(id name)],
-				   DI => [qw(id disk_image)],
-				   Tenant_Views_Setup => [qw(id)],
-				   Administrator_Views_Setup => [qw(id)]},
+	      VM => [qw(storage id name user_id user_name osf_id osf_name di_tag blocked 
+                        expiration_soft expiration_hard state host_id host_name di_id 
+                        user_state ip next_boot_ip ssh_port vnc_port serial_port tenant_id tenant_name 
+                        creation_admin creation_date )],
 
-			 all_ids => { default => [qw(id)]},
-			state => { User => [qw(number_of_vms_connected)],
-				   VM => [qw(state user_state)],
-				   Host => [qw(number_of_vms_connected)]},
-                         create => { 'default' => [qw(id)]}};
+	      DI_Tag => [qw(osf_id name id tenant_id tenant_name)],
 
-my $MANDATORY_FILTERS = { list => { default => [qw(tenant_id)],
-				    Host => [qw()],
-				    ACL => [qw()],
-				    Role => [qw()],
-				    Tenant => [qw()]},
-			  details => { default => [qw(id tenant_id)],
-				       Host => [qw(id)],
-				       ACL => [qw(id)],
-				       Role => [qw(id)],
-				       Tenant => [qw(id)]}, 
-			  tiny => { default => [qw(tenant_id)],
-				    Host => [qw()],
-				    ACL => [qw()],
-				    Role => [qw()],
-				    Tenant => [qw()]},
-			  delete => { default => [qw(id tenant_id)],
-				      Host => [qw(id)],
-				      ACL => [qw(id)],
-				      Role => [qw(id)],
-				      Tenant => [qw(id)],
-				    Tenant_Views_Setup => [qw(tenant_id field view_type device_type qvd_object)],
-				    Administrator_Views_Setup => [qw(admin_id field  view_type device_type qvd_object)]}, 
-			  update=> { default => [qw(id tenant_id)],
-				     Host => [qw(id)],
-				     ACL => [qw(id)],
-				     Role => [qw(id)],
-				     Tenant => [qw(id)]}, 
-			  state => { default => [qw(id tenant_id)],
-				     Host => [qw(id)],
-				     ACL => [qw(id)],
-				     Role => [qw(id)],
-				     Tenant => [qw(id)]}, 
-			  all_ids => { default => [qw(tenant_id)],
-				       Host => [qw()],
-				       ACL => [qw()],
-				       Role => [qw()],
-				       Tenant => [qw()]}, 
-			  'exec' => { default => [qw(id tenant_id)],
-				      Host => [qw(id)],
-				      ACL => [qw(id)],
-				      Role => [qw(id)],
-				      Tenant => [qw(id)]}};
+	      User => [qw(id name blocked creation_admin creation_date tenant_id tenant_name )],
 
-my $SUBCHAIN_FILTERS = { list => { default => [qw(name)],
-				   DI => [qw(disk_image)],
-				   Administrator => [qw(name role_name acl_name)],
-				   Role => [qw(name nested_role_name acl_name)]}};
+	      Host => [qw(id name address blocked frontend backend state vm_id creation_admin creation_date )],
 
-my $COMMODIN_FILTERS = { tiny => { ACL => [qw(name)]}};
+	      DI => [qw(id disk_image version osf_id osf_name tenant_id blocked tenant_name tag)],
 
-my $DEFAULT_ORDER_CRITERIA = { tiny => { default =>  [qw(name)],
-                                         DI => [qw(disk_image)],
-					 Tenant_Views_Setup => [qw(field)],
-					 Administrator_Views_Setup => [qw(field)] }};
+	      OSF => [qw(id name overlay user_storage memory vm_id di_id tenant_id tenant_name )],
 
-my $AVAILABLE_NESTED_QUERIES = { create => { User => [qw(__properties__)],
-					     VM => [qw(__properties__)],
-					     Host => [qw(__properties__)],
-					     OSF => [qw(__properties__)],
-					     DI => [qw(__properties__ __tags__)],
-					     Tenant => [qw()],
-					     Role => [qw(__acls__ __roles__)],
-					     Administrator => [qw(__roles__)],
-					     Tenant_Views_Setup => [qw()],
-					     Administrator_Views_Setup => [qw()]},
+	      ACL => [qw(id name role_id admin_id)],
 
-				 update => { User => [qw(__properties_changes__set __properties_changes__delete)],
-					     VM => [qw(__properties_changes__set __properties_changes__delete)],
-					     Host => [qw(__properties_changes__set __properties_changes__delete)],
-					     OSF => [qw(__properties_changes__set __properties_changes__delete)],
-					     DI => [qw(__properties_changes__set __properties_changes__delete 
-                                                       __tags_changes__create __tags_changes__delete)],
-					     Tenant => [qw()],
-					     Role => [qw(__acls_changes__assign_acls 
-                                                         __acls_changes__unassign_acls
-						         __roles_changes__assign_roles 
-                                                         __roles_changes__unassign_roles)],
-					     Administrator => [qw(__roles_changes__assign_roles __roles_changes__unassign_roles)],
-					     Tenant_Views_Setup => [qw()],
-					     Administrator_Views_Setup => [qw()]}};
+	      Tenant => [qw(id name)],
+
+	      Role => [qw(name id )],
+
+	      Administrator => [qw(name tenant_id tenant_name id )],
+
+	      Tenant_Views_Setup => [qw(id tenant_id tenant_name field visible view_type device_type qvd_object property)],
+
+	      Administrator_Views_Setup => [qw(id admin_id admin_name field tenant_id tenant_name visible 
+                                               view_type device_type qvd_object property)]},
+
+    all_ids => { default => [],
+		 VM => [qw(storage id name user_id user_name osf_id osf_name di_tag blocked expiration_soft 
+                           expiration_hard state host_id host_name  di_id user_state ip next_boot_ip ssh_port 
+                           vnc_port serial_port tenant_id tenant_name creation_admin creation_date )],
+
+		 DI_Tag => [qw(osf_id name id tenant_id tenant_name)],
+
+		 User => [qw(id name blocked creation_admin creation_date tenant_id tenant_name )],
+
+		 Host => [qw(id name address blocked frontend backend state vm_id creation_admin creation_date )],
+
+		 DI => [qw(id disk_image version osf_id osf_name tenant_id blocked tenant_name tag)],
+
+		 OSF => [qw(id name overlay user_storage memory vm_id di_id tenant_id tenant_name )],
+
+		 ACL => [qw(id name role_id admin_id )],
+
+		 Role => [qw(name acl_id role_id nested_acl_name nested_role_name id admin_id admin_name )],
+
+		 Tenant => [qw(id name)],
+
+		 Administrator => [qw(name tenant_id tenant_name role_id acl_id id role_name acl_name )],
+
+		 Tenant_Views_Setup => [qw(id tenant_id tenant_name field visible view_type device_type qvd_object property)],
+
+		 Administrator_Views_Setup => [qw(id tenant_id tenant_name field admin_id admin_name visible view_type 
+                                                  device_type qvd_object property)]},
+
+    details => { default => [qw(id tenant_id)], Host => [qw(id)], Role => [qw(id)], ACL => [qw(id)], Tenant => [qw(id)] },
+		
+    tiny => { default => [qw(tenant_id)], Host => [qw()], Role => [qw()], ACL => [qw(name)], Tenant => [qw()], DI_Tag => [qw(tenant_id osf_id)]},
+
+    delete => { default => [qw(id tenant_id)], Host => [qw(id)], ACL => [qw(id)], Role => [qw(id)], Tenant => [qw(id)]},
+
+    update => { default => [qw(id tenant_id)], Host => [qw(id)], ACL => [qw(id)], Role => [qw(id)], Tenant => [qw(id)]},
+
+    state => { default => [qw(id tenant_id)], Host => [qw(id)], ACL => [qw(id)], Role => [qw(id)], Tenant => [qw(id)]},
+    
+    'exec' => { default => [qw(id tenant_id)], Host => [qw(id)], ACL => [qw(id)], Role => [qw(id)], Tenant => [qw(id)]} 
+
+};
+
+my $AVAILABLE_FIELDS = 
+{ 
+    list => { default => [],
+
+	      OSF => [qw(id name overlay user_storage memory  number_of_vms number_of_dis properties )],
+
+	      Role => [qw(name roles acls id number_of_acls)],
+
+	      DI => [qw(id disk_image version osf_id osf_name blocked tags  properties )],
+
+	      VM => [qw(storage id name user_id user_name osf_id osf_name di_tag blocked expiration_soft expiration_hard 
+                        state host_id host_name  di_id user_state ip next_boot_ip ssh_port vnc_port serial_port 
+                        creation_admin creation_date di_version di_name di_id properties )],
+
+	      ACL => [qw(id name)],
+
+	      Administrator => [qw(name roles id )],
+
+	      Tenant => [qw(id name)],
+				   
+	      User => [qw(id name  blocked creation_admin creation_date number_of_vms number_of_vms_connected  properties )],
+
+	      Host => [qw(id name address blocked frontend backend state  load creation_admin creation_date number_of_vms_connected properties )],
+
+	      DI_Tag => [qw(osf_id name id )],
+
+	      Tenant_Views_Setup => [qw(id tenant_id tenant_name field visible view_type device_type qvd_object property)],
+
+	      Administrator_Views_Setup => [qw(id tenant_id tenant_name admin_id admin_name field visible view_type 
+                                               device_type qvd_object property)] },
+
+    details => { default => [],
+		 
+		 OSF => [qw(id name overlay user_storage memory  number_of_vms number_of_dis properties )],
+		 
+		 Role => [qw(name acls roles id number_of_acls)],
+		
+		 DI => [qw(id disk_image version osf_id osf_name  blocked tags  properties )],
+		
+		 VM => [qw(storage id name user_id user_name osf_id osf_name di_tag blocked expiration_soft expiration_hard 
+                           state host_id host_name  di_id user_state ip next_boot_ip ssh_port vnc_port serial_port 
+                           creation_admin creation_date di_version di_name di_id properties )],
+
+		 ACL => [qw(id name)],
+
+		 Administrator => [qw(name roles id )],
+
+		 Tenant => [qw(id name)],
+
+		 User => [qw(id name  blocked creation_admin creation_date number_of_vms number_of_vms_connected  properties )],
+
+		 Host => [qw(id name address blocked frontend backend state  load creation_admin creation_date 
+                             number_of_vms_connected number_of_vms properties )],
+
+		 DI_Tag => [qw(osf_id name id )],
+
+		 Tenant_Views_Setup => [qw(id tenant_id tenant_name field visible view_type device_type qvd_object property)],
+
+		 Administrator_Views_Setup => [qw(id admin_id admin_name tenant_id tenant_name field visible view_type 
+                                                  device_type qvd_object property)] },
+
+    tiny => { default => [qw(id name)],
+
+	      DI => [qw(id disk_image)],
+
+	      Tenant_Views_Setup => [qw(id)],
+
+	      Administrator_Views_Setup => [qw(id)]},
+
+    all_ids => { default => [qw(id)]},
+
+    state => { User => [qw(number_of_vms_connected)],
+	       
+	       VM => [qw(state user_state)],
+	       
+	       Host => [qw(number_of_vms_connected)]},
+    
+    create => { 'default' => [qw(id)]}
+
+};
+
+my $MANDATORY_FILTERS = 
+{ 
+    list => { default => [qw(tenant_id)], Host => [qw()], ACL => [qw()], Role => [qw()], Tenant => [qw()]},
+
+    details => { default => [qw(id tenant_id)], Host => [qw(id)], ACL => [qw(id)], Role => [qw(id)], Tenant => [qw(id)]}, 
+
+    tiny => { default => [qw(tenant_id)], Host => [qw()], ACL => [qw()], Role => [qw()], Tenant => [qw()]},
+
+    delete => { default => [qw(id tenant_id)], Host => [qw(id)], ACL => [qw(id)], Role => [qw(id)], Tenant => [qw(id)]},
+
+    update=> { default => [qw(id tenant_id)], Host => [qw(id)], ACL => [qw(id)], Role => [qw(id)], Tenant => [qw(id)]}, 
+
+    state => { default => [qw(id tenant_id)], Host => [qw(id)], ACL => [qw(id)], Role => [qw(id)], Tenant => [qw(id)]}, 
+
+    all_ids => { default => [qw(tenant_id)], Host => [qw()], ACL => [qw()], Role => [qw()], Tenant => [qw()]}, 
+    
+    'exec' => { default => [qw(id tenant_id)], Host => [qw(id)], ACL => [qw(id)], Role => [qw(id)], Tenant => [qw(id)]}};
+
+my $SUBCHAIN_FILTERS = 
+{ 
+    list => { default => [qw(name)],
+	      DI => [qw(disk_image)],
+	      Administrator => [qw(name role_name acl_name)],
+	      Role => [qw(name nested_role_name acl_name)]}
+};
+
+my $COMMODIN_FILTERS = 
+{ 
+tiny => { ACL => [qw(name)]}
+};
+
+my $DEFAULT_ORDER_CRITERIA = 
+{ 
+    tiny => { default =>  [qw(name)],
+	      DI => [qw(disk_image)],
+	      Tenant_Views_Setup => [qw(field)],
+	      Administrator_Views_Setup => [qw(field)] }
+};
+
+my $AVAILABLE_NESTED_QUERIES = 
+{ 
+    create => { User => [qw(__properties__)],
+		VM => [qw(__properties__)],
+		Host => [qw(__properties__)],
+		OSF => [qw(__properties__)],
+		DI => [qw(__properties__ __tags__)],
+		Tenant => [qw()],
+		Role => [qw(__acls__ __roles__)],
+		Administrator => [qw(__roles__)],
+		Tenant_Views_Setup => [qw()],
+		Administrator_Views_Setup => [qw()]},
+
+    update => { User => [qw(__properties_changes__set __properties_changes__delete)],
+		VM => [qw(__properties_changes__set __properties_changes__delete)],
+		Host => [qw(__properties_changes__set __properties_changes__delete)],
+		OSF => [qw(__properties_changes__set __properties_changes__delete)],
+		DI => [qw(__properties_changes__set __properties_changes__delete 
+                          __tags_changes__create __tags_changes__delete)],
+	        Tenant => [qw()],
+		Role => [qw(__acls_changes__assign_acls 
+                            __acls_changes__unassign_acls
+			    __roles_changes__assign_roles 
+                            __roles_changes__unassign_roles)],
+		Administrator => [qw(__roles_changes__assign_roles __roles_changes__unassign_roles)],
+		Tenant_Views_Setup => [qw()],
+		Administrator_Views_Setup => [qw()]}
+};
 
 
 
 my $NESTED_QUERIES_TO_ADMIN4_MAPPER = 
-{ User => { __properties__ => 'custom_properties_set',
+{ 
+    User => { __properties__ => 'custom_properties_set',
+	      __properties_changes__set => 'custom_properties_set',
+	      __properties_changes__delete => 'custom_properties_del'},
+  
+    VM => { __properties__ => 'custom_properties_set',
 	    __properties_changes__set => 'custom_properties_set',
 	    __properties_changes__delete => 'custom_properties_del'},
+    
+    Host => { __properties__ => 'custom_properties_set',
+	      __properties_changes__set => 'custom_properties_set',
+	      __properties_changes__delete => 'custom_properties_del' },
   
-  VM => { __properties__ => 'custom_properties_set',
-	  __properties_changes__set => 'custom_properties_set',
-	  __properties_changes__delete => 'custom_properties_del'},
+    OSF => { __properties__ => 'custom_properties_set',
+	     __properties_changes__set => 'custom_properties_set',
+	     __properties_changes__delete => 'custom_properties_del'},
   
-  Host => { __properties__ => 'custom_properties_set',
+    DI => { __properties__ => 'custom_properties_set',
+	    __tags__ => 'tags_create',
 	    __properties_changes__set => 'custom_properties_set',
-	    __properties_changes__delete => 'custom_properties_del' },
-  
-  OSF => { __properties__ => 'custom_properties_set',
-	   __properties_changes__set => 'custom_properties_set',
-	   __properties_changes__delete => 'custom_properties_del'},
-  
-  DI => { __properties__ => 'custom_properties_set',
-	  __tags__ => 'tags_create',
-	  __properties_changes__set => 'custom_properties_set',
-	  __properties_changes__delete => 'custom_properties_del', 
-	  __tags_changes__create => 'tags_create',
-	  __tags_changes__delete => 'tags_delete'},
-  Tenant => {},
+	    __properties_changes__delete => 'custom_properties_del', 
+	    __tags_changes__create => 'tags_create',
+	    __tags_changes__delete => 'tags_delete'},
+    Tenant => {},
 
-  Role => { __acls__ => 'add_acls_to_role',
-	    __roles__ => 'add_roles_to_role',
-	    __acls_changes__assign_acls  => 'add_acls_to_role',
-	    __acls_changes__unassign_acls => 'del_acls_to_role',
-	    __roles_changes__assign_roles => 'add_roles_to_role', 
-	    __roles_changes__unassign_roles => 'del_roles_to_role'},
+    Role => { __acls__ => 'add_acls_to_role',
+	      __roles__ => 'add_roles_to_role',
+	      __acls_changes__assign_acls  => 'add_acls_to_role',
+	      __acls_changes__unassign_acls => 'del_acls_to_role',
+	      __roles_changes__assign_roles => 'add_roles_to_role', 
+	      __roles_changes__unassign_roles => 'del_roles_to_role'},
 
-  Administrator => { __roles__ => 'add_roles_to_admin',
-		     __roles_changes__assign_roles => 'add_roles_to_admin',
-		     __roles_changes__unassign_roles => 'del_roles_to_admin' },
-  Tenant_Views_Setup => {},
-  Administrator_Views_Setup => {}
+    Administrator => { __roles__ => 'add_roles_to_admin',
+		       __roles_changes__assign_roles => 'add_roles_to_admin',
+		       __roles_changes__unassign_roles => 'del_roles_to_admin' },
+    Tenant_Views_Setup => {},
+    Administrator_Views_Setup => {}
 };
 
 my $AVAILABLE_ARGUMENTS = { User => [qw(name password blocked)],
@@ -656,22 +547,31 @@ my $MANDATORY_ARGUMENTS = { User => [qw(name password tenant_id blocked)],
 			    Tenant_Views_Setup => [qw(tenant_id field visible view_type device_type qvd_object property)],
 			    Administrator_Views_Setup => [qw(admin_id field visible view_type device_type qvd_object property)]}; 
 
-my $DEFAULT_ARGUMENT_VALUES = { User => { blocked => 'false' },
-                                VM => { di_tag => 'default',
-                                        blocked => 'false',
-				        user_state => 'disconnected',
-				        state => 'stopped',
-				        ip => \&get_free_ip},
-                                Host => { backend => 'true',
-					  frontend => 'true',
-					  blocked => 'false',
-					  state => 'stopped'},
-                                OSF => { memory => \&get_default_memory,
-				         overlay => \&get_default_overlay,
-				         user_storage => 0 },
-				DI => { blocked => 'false' },
-			    Tenant_Views_Setup => { visible => 0, property => 0 },
-			    Administrator_Views_Setup =>  { visible => 0, property => 0 }};
+my $DEFAULT_ARGUMENT_VALUES = 
+{
+    User => { blocked => 'false' },
+
+    VM => { di_tag => 'default',
+	    blocked => 'false',
+	    user_state => 'disconnected',
+	    state => 'stopped',
+	    ip => \&get_free_ip},
+
+    Host => { backend => 'true',
+	      frontend => 'true',
+	      blocked => 'false',
+	      state => 'stopped'},
+
+    OSF => { memory => \&get_default_memory,
+	     overlay => \&get_default_overlay,
+	     user_storage => 0 },
+
+    DI => { blocked => 'false' },
+
+    Tenant_Views_Setup => { visible => 0, property => 0 },
+
+    Administrator_Views_Setup =>  { visible => 0, property => 0 }
+};
 
 my $FILTERS_TO_DBIX_FORMAT_MAPPER = 
 {
@@ -971,50 +871,72 @@ my $FIELDS_TO_DBIX_FORMAT_MAPPER =
  }
 };
 
-my $VALUES_NORMALIZATOR = { 
-                            DI => { disk_image => \&basename_disk_image},
-			    User => { name => \&normalize_name, 
-				      password => \&password_to_token }};
+my $VALUES_NORMALIZATOR = 
+{ 
+    DI => { disk_image => \&basename_disk_image},
+
+    User => { name => \&normalize_name, 
+	      password => \&password_to_token }
+};
 
 
-my $DBIX_JOIN_VALUE = { User => [qw(tenant), { vms => 'vm_runtime'}],
-                        VM => ['di', 'osf', { vm_runtime => 'host' }, { user => 'tenant' }],
-			Host => ['runtime', 'vms'],
-			OSF => [ qw(tenant vms), { dis => 'tags' }],
-			DI => [qw(vm_runtimes tags), {osf => 'tenant'}],
-			DI_Tag => [{di => {osf => 'tenant'}}],
-			Role => [{role_rels => 'inherited'}, { acl_rels => 'acl'}],
-			Administrator => [qw(tenant), { role_rels => { role => { acl_rels => 'acl' }}}],
-			ACL => [{ role_rels => { role => { admin_rels => 'admin' }}}],
-                        Tenant_Views_Setup => [ qw(tenant)],
-			Administrator_Views_Setup => [ { administrator => 'tenant' }] };
+my $DBIX_JOIN_VALUE = 
+{ 
+    User => [qw(tenant), { vms => 'vm_runtime'}],
+ 
+    VM => ['di', 'osf', { vm_runtime => 'host' }, { user => 'tenant' }],
+  
+    Host => ['runtime', 'vms'],
 
-my $DBIX_PREFETCH_VALUE = { list => { User => [qw(tenant)],
-				      VM => ['di', 'osf', { vm_runtime => 'host' }, { user => 'tenant' }],
-				      Host => ['runtime'],
-				      OSF => [ qw(tenant)],
-				      DI => [{osf => 'tenant'}],
-				      DI_Tag => [{di => {osf => 'tenant'}}],
-				      Role => [{role_rels => 'inherited'}, { acl_rels => 'acl'}],
-				      Administrator => [qw(tenant), { role_rels => { role => { acl_rels => 'acl' }}}],
-				      ACL => [{ role_rels => { role => { admin_rels => 'admin' }}}],
-				      Tenant_Views_Setup => [ qw(tenant)],
-				      Administrator_Views_Setup => [ { administrator => 'tenant' }] },
+    OSF => [ qw(tenant vms), { dis => 'tags' }],
 
-			    details => {User => [qw(tenant)],
-					VM => ['di', 'osf', { vm_runtime => 'host' }, { user => 'tenant' }],
-					Host => ['runtime'],
-					OSF => [ qw(tenant)],
-					DI => [{osf => 'tenant'}],
-					DI_Tag => [{di => {osf => 'tenant'}}],
-					Role => [{role_rels => 'inherited'}, { acl_rels => 'acl'}],
-					Administrator => [qw(tenant), { role_rels => { role => { acl_rels => 'acl' }}}],
-					ACL => [{ role_rels => { role => { admin_rels => 'admin' }}}],
-					Tenant_Views_Setup => [ qw(tenant)],
-					Administrator_Views_Setup => [ { administrator => 'tenant' }]}};
+    DI => [qw(vm_runtimes tags), {osf => 'tenant'}],
 
-my $DBIX_HAS_ONE_RELATIONSHIPS = { VM => [qw(vm_runtime counters)],
-                                   Host => [qw(runtime counters)]};
+    DI_Tag => [{di => {osf => 'tenant'}}],
+
+    Role => [{role_rels => 'inherited'}, { acl_rels => 'acl'}],
+		
+    Administrator => [qw(tenant), { role_rels => { role => { acl_rels => 'acl' }}}],
+    
+    ACL => [{ role_rels => { role => { admin_rels => 'admin' }}}],
+    
+    Tenant_Views_Setup => [ qw(tenant)],
+
+    Administrator_Views_Setup => [ { administrator => 'tenant' }] 
+};
+
+my $DBIX_PREFETCH_VALUE = 
+{ 
+    list => { User => [qw(tenant)],
+	      VM => ['di', 'osf', { vm_runtime => 'host' }, { user => 'tenant' }],
+	      Host => ['runtime'],
+	      OSF => [ qw(tenant)],
+	      DI => [{osf => 'tenant'}],
+	      DI_Tag => [{di => {osf => 'tenant'}}],
+	      Role => [{role_rels => 'inherited'}, { acl_rels => 'acl'}],
+	      Administrator => [qw(tenant), { role_rels => { role => { acl_rels => 'acl' }}}],
+	      ACL => [{ role_rels => { role => { admin_rels => 'admin' }}}],
+	      Tenant_Views_Setup => [ qw(tenant)],
+	      Administrator_Views_Setup => [ { administrator => 'tenant' }] },
+
+    details => {User => [qw(tenant)],
+		VM => ['di', 'osf', { vm_runtime => 'host' }, { user => 'tenant' }],
+		Host => ['runtime'],
+		OSF => [ qw(tenant)],
+		DI => [{osf => 'tenant'}],
+		DI_Tag => [{di => {osf => 'tenant'}}],
+		Role => [{role_rels => 'inherited'}, { acl_rels => 'acl'}],
+		Administrator => [qw(tenant), { role_rels => { role => { acl_rels => 'acl' }}}],
+		ACL => [{ role_rels => { role => { admin_rels => 'admin' }}}],
+		Tenant_Views_Setup => [ qw(tenant)],
+		Administrator_Views_Setup => [ { administrator => 'tenant' }]}
+};
+
+my $DBIX_HAS_ONE_RELATIONSHIPS = 
+{ 
+    VM => [qw(vm_runtime counters)],
+    Host => [qw(runtime counters)]
+};
 
 sub BUILD
 {
@@ -1091,26 +1013,27 @@ sub initialize_info_model
 {
     my $self = shift;
     $self->{model_info} =
-{ related_views_in_db => [],
-  available_filters => [],                                                                 
-  available_fields => [],                                                                  
-  available_arguments => [],                                                               
-  available_nested_queries => [],                                                               
-  subchain_filters => [],                                                                 
-  commodin_filters => [],                                                                  
-  mandatory_arguments => [],                                                               
-  mandatory_filters => [],                                                                 
-  default_argument_values => {},                                                           
-  default_order_criteria => [],                                                            
-  filters_to_dbix_format_mapper => {},                                                     
-  arguments_to_dbix_format_mapper => {},                                                   
-  fields_to_dbix_format_mapper => {},                                                      
-  order_criteria_to_dbix_format_mapper => {},                                              
-  nested_queries_to_admin4_mapper => {},                                              
-  values_normalizator => {},                                                               
-  dbix_join_value => [],                                                                   
-  dbix_prefetch_value => [],                                                                   
-  dbix_has_one_relationships => []
+{ 
+    related_views_in_db => [],
+    available_filters => [],                                                                 
+    available_fields => [],                                                                  
+    available_arguments => [],                                                               
+    available_nested_queries => [],                                                               
+    subchain_filters => [],                                                                 
+    commodin_filters => [],                                                                  
+    mandatory_arguments => [],                                                               
+    mandatory_filters => [],                                                                 
+    default_argument_values => {},                                                           
+    default_order_criteria => [],                                                            
+    filters_to_dbix_format_mapper => {},                                                     
+    arguments_to_dbix_format_mapper => {},                                                   
+    fields_to_dbix_format_mapper => {},                                                      
+    order_criteria_to_dbix_format_mapper => {},                                              
+    nested_queries_to_admin4_mapper => {},                                              
+    values_normalizator => {},                                                               
+    dbix_join_value => [],                                                                   
+    dbix_prefetch_value => [],                                                                   
+    dbix_has_one_relationships => []
 };
 }
 
