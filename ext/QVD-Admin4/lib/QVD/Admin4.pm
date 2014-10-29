@@ -142,13 +142,11 @@ sub create
 
 sub create_or_update
 {
-    my ($self,$request,%modifiers) = @_;
+    my ($self,$request) = @_;
     my $result;
     my $failures = {};
-    my $key = $modifiers{key};
-    $key = {key => $key} if $key;
 
-    $DB->txn_do( sub { my $obj = eval {$DB->resultset($request->table)->update_or_create($request->arguments,$key)};
+    $DB->txn_do( sub { my $obj = eval {$DB->resultset($request->table)->update_or_create($request->arguments)};
 		       print $@ if $@;
 		       QVD::Admin4::Exception->throw(code => $DB->storage->_dbh->state,
 						     message => "$@") if $@;
@@ -451,19 +449,6 @@ sub add_roles_to_admin
 #############################
 ###### AD HOC FUNCTIONS #####
 #############################
-
-
-sub admin_view_set
-{
-    my ($self,$request) = @_;
-    $self->create_or_update($request, key => 'administrators_views_setups_tenant_id_field');
-}
-
-sub tenant_view_set
-{
-    my ($self,$request) = @_;
-    $self->create_or_update($request,key => 'tenant_views_setups_tenant_id_field');
-}
 
 
 sub vm_delete
