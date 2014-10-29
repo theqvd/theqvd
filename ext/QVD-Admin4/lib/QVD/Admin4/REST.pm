@@ -337,7 +337,7 @@ tenant_view_create => { type_of_action => 'create',
 			qvd_object => 'Tenant_Views_Setup'},
 
 tenant_view_set => { type_of_action => 'create',
-			admin4method => 'create_or_update',
+			admin4method => 'tenant_view_set',
 			qvd_object => 'Tenant_Views_Setup'},
 
 tenant_view_delete => { type_of_action => 'delete',
@@ -371,7 +371,7 @@ admin_view_create => { type_of_action => 'create',
 			qvd_object => 'Administrator_Views_Setup'},
 
 admin_view_set => { type_of_action => 'create',
-			admin4method => 'create_or_update',
+			admin4method => 'admin_view_set',
 			qvd_object => 'Administrator_Views_Setup'},
 
 admin_view_delete => { type_of_action => 'delete',
