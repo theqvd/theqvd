@@ -135,7 +135,9 @@ my $ACLS_FOR_FILTERS = {
 		     field => [],
 		     visible => [],
 		     view_type => [],
-		     device_type => [] },
+		     device_type => [],
+                     qvd_object => [],
+                     property => []},
 
     Administrator_Views_Setup => { id => [],
 			    admin_id => [],
@@ -145,7 +147,9 @@ my $ACLS_FOR_FILTERS = {
 			    tenant_name => [],
 			    visible => [],
 			    view_type => [],
-			    device_type => []},
+			    device_type => [],
+				   qvd_object => [],
+				   property => []},
 };
 
 my $ACLS_FOR_FIELDS = {
@@ -244,7 +248,9 @@ my $ACLS_FOR_FIELDS = {
 		     field => [],
 		     visible => [],
 		     view_type => [],
-		     device_type => [] },
+		     device_type => [],
+                     qvd_object => [],
+                     property => [] },
 
     Administrator_Views_Setup => { id => [],
 			    tenant_id => [],
@@ -253,7 +259,9 @@ my $ACLS_FOR_FIELDS = {
 			    field => [],
 			    visible => [],
 			    view_type => [],
-			    device_type => []}
+			    device_type => [],
+				   qvd_object => [],
+				   property => []}
 };
 
 my $ACLS_FOR_ARGUMENTS_IN_UPDATE = { User => { name => [],
@@ -299,10 +307,10 @@ my $ACLS_FOR_ARGUMENTS_IN_UPDATE = { User => { name => [],
 							__roles_changes__unassign_roles => [] },
 				     Tenant_Views_Setup => { visible => [],
                                                       view_type => [],
-                                                      device_type => [] },
-				     Administrator_Views_Setup => { visible => [],
-							     view_type => [],
-							     device_type => []}};
+                                                      device_type => [],
+							     qvd_object => [],
+							     property => [] },
+				     Administrator_Views_Setup => { visible => [] }};
 
 
 my $ACLS_FOR_ARGUMENTS_IN_MASSIVE_UPDATE = { User => { '***delete***' => ['user.delete-massive.'], # MAYBE A NEW VARIABLE?
@@ -350,9 +358,7 @@ my $ACLS_FOR_ARGUMENTS_IN_MASSIVE_UPDATE = { User => { '***delete***' => ['user.
 				     Tenant_Views_Setup => { visible => [],
 							     view_type => [],
 							     device_type => [] },
-					     Administrator_Views_Setup => { visible => [],
-									    view_type => [],
-									    device_type => []}};
+					     Administrator_Views_Setup => { visible => []}};
 
 
 my $ACLS_FOR_ARGUMENTS_IN_CREATION = { User => { name => [],
@@ -391,8 +397,10 @@ my $ACLS_FOR_ARGUMENTS_IN_CREATION = { User => { name => [],
                                                       view_type => [],
                                                       device_type => [] },
 				     Administrator_Views_Setup => { visible => [],
-							     view_type => [],
-							     device_type => []}};
+								    view_type => [],
+								    device_type => [],
+								    qvd_object => [],
+								    property => []}};
 
 
 my $AVAILABLE_FILTERS = { list => { default => [],
@@ -409,8 +417,8 @@ my $AVAILABLE_FILTERS = { list => { default => [],
 				    Tenant => [qw(id name)],
 				    Role => [qw(name id )],
 				    Administrator => [qw(name tenant_id tenant_name id )],
-				    Tenant_Views_Setup => [qw(id tenant_id tenant_name field visible view_type device_type)],
-				    Administrator_Views_Setup => [qw(id admin_id admin_name field tenant_id tenant_name visible view_type device_type)]},
+				    Tenant_Views_Setup => [qw(id tenant_id tenant_name field visible view_type device_type qvd_object property)],
+				    Administrator_Views_Setup => [qw(id admin_id admin_name field tenant_id tenant_name visible view_type device_type qvd_object property)]},
 
 			  all_ids => { default => [],
 				       VM => [qw(storage id name user_id user_name osf_id osf_name di_tag blocked expiration_soft 
@@ -425,8 +433,8 @@ my $AVAILABLE_FILTERS = { list => { default => [],
 				       Role => [qw(name acl_id role_id nested_acl_name nested_role_name id admin_id admin_name )],
 				       Tenant => [qw(id name)],
 				       Administrator => [qw(name tenant_id tenant_name role_id acl_id id role_name acl_name )],
-				    Tenant_Views_Setup => [qw(id tenant_id tenant_name field visible view_type device_type)],
-				    Administrator_Views_Setup => [qw(id tenant_id tenant_name field admin_id admin_name visible view_type device_type)]},
+				    Tenant_Views_Setup => [qw(id tenant_id tenant_name field visible view_type device_type qvd_object property)],
+				    Administrator_Views_Setup => [qw(id tenant_id tenant_name field admin_id admin_name visible view_type device_type qvd_object property)]},
 
 			  details => { default => [qw(id tenant_id)],
                                        Host => [qw(id)],
@@ -443,7 +451,9 @@ my $AVAILABLE_FILTERS = { list => { default => [],
 				      Host => [qw(id)],
 				      ACL => [qw(id)],
 				      Role => [qw(id)],
-				      Tenant => [qw(id)]},
+				      Tenant => [qw(id)],
+				      Tenant_Views_Setup => [qw(id tenant_id field visible view_type device_type qvd_object property)],
+				      Administrator_Views_Setup => [qw(id tenant_id field admin_id admin_name visible view_type device_type qvd_object property)]},
 			  update => { default => [qw(id tenant_id)],
 				      Host => [qw(id)],
 				      ACL => [qw(id)],
@@ -473,8 +483,8 @@ my $AVAILABLE_FIELDS = { list => { default => [],
 				   User => [qw(id name  blocked creation_admin creation_date number_of_vms number_of_vms_connected  properties )],
 				   Host => [qw(id name address blocked frontend backend state  load creation_admin creation_date number_of_vms_connected properties )],
 				   DI_Tag => [qw(osf_id name id )],
-				    Tenant_Views_Setup => [qw(id tenant_id tenant_name field visible view_type device_type)],
-				    Administrator_Views_Setup => [qw(id tenant_id tenant_name admin_id admin_name field visible view_type device_type)] },
+				    Tenant_Views_Setup => [qw(id tenant_id tenant_name field visible view_type device_type qvd_object property)],
+				    Administrator_Views_Setup => [qw(id tenant_id tenant_name admin_id admin_name field visible view_type device_type qvd_object property)] },
 			 details => { default => [],
 				   OSF => [qw(id name overlay user_storage memory  number_of_vms number_of_dis properties )],
 				   Role => [qw(name acls roles id number_of_acls)],
@@ -488,8 +498,8 @@ my $AVAILABLE_FIELDS = { list => { default => [],
 				   User => [qw(id name  blocked creation_admin creation_date number_of_vms number_of_vms_connected  properties )],
 				   Host => [qw(id name address blocked frontend backend state  load creation_admin creation_date number_of_vms_connected number_of_vms properties )],
 				   DI_Tag => [qw(osf_id name id )],
-				    Tenant_Views_Setup => [qw(id tenant_id tenant_name field visible view_type device_type)],
-				    Administrator_Views_Setup => [qw(id admin_id admin_name tenant_id tenant_name field visible view_type device_type)] },
+				    Tenant_Views_Setup => [qw(id tenant_id tenant_name field visible view_type device_type qvd_object property)],
+				    Administrator_Views_Setup => [qw(id admin_id admin_name tenant_id tenant_name field visible view_type device_type qvd_object property)] },
 			 tiny => { default => [qw(id name)],
 				   DI => [qw(id disk_image)],
 				   Tenant_Views_Setup => [qw(id)],
@@ -520,7 +530,9 @@ my $MANDATORY_FILTERS = { list => { default => [qw(tenant_id)],
 				      Host => [qw(id)],
 				      ACL => [qw(id)],
 				      Role => [qw(id)],
-				      Tenant => [qw(id)]}, 
+				      Tenant => [qw(id)],
+				    Tenant_Views_Setup => [qw(tenant_id field view_type device_type qvd_object)],
+				    Administrator_Views_Setup => [qw(admin_id field  view_type device_type qvd_object)]}, 
 			  update=> { default => [qw(id tenant_id)],
 				     Host => [qw(id)],
 				     ACL => [qw(id)],
@@ -629,8 +641,8 @@ my $AVAILABLE_ARGUMENTS = { User => [qw(name password blocked)],
 			    Tenant => [qw(name)],
 			    Role => [qw(name)],
 			    Administrator => [qw(name password)],
-			    Tenant_Views_Setup => [qw(visible view_type device_type)],
-			    Administrator_Views_Setup => [qw(visible view_type device_type)]};
+			    Tenant_Views_Setup => [qw(visible)],
+			    Administrator_Views_Setup => [qw(visible)]};
 
 
 my $MANDATORY_ARGUMENTS = { User => [qw(name password tenant_id blocked)],
@@ -641,8 +653,8 @@ my $MANDATORY_ARGUMENTS = { User => [qw(name password tenant_id blocked)],
 			    Tenant => [qw(name)],
 			    Role => [qw(name)],
                             Administrator => [qw(name password tenant_id)],
-			    Tenant_Views_Setup => [qw(tenant_id field visible view_type device_type)],
-			    Administrator_Views_Setup => [qw(admin_id field visible view_type device_type)]}; 
+			    Tenant_Views_Setup => [qw(tenant_id field visible view_type device_type qvd_object property)],
+			    Administrator_Views_Setup => [qw(admin_id field visible view_type device_type qvd_object property)]}; 
 
 my $DEFAULT_ARGUMENT_VALUES = { User => { blocked => 'false' },
                                 VM => { di_tag => 'default',
@@ -658,8 +670,8 @@ my $DEFAULT_ARGUMENT_VALUES = { User => { blocked => 'false' },
 				         overlay => \&get_default_overlay,
 				         user_storage => 0 },
 				DI => { blocked => 'false' },
-			    Tenant_Views_Setup => { visible => 0 },
-			    Administrator_Views_Setup =>  { visible => 0 }};
+			    Tenant_Views_Setup => { visible => 0, property => 0 },
+			    Administrator_Views_Setup =>  { visible => 0, property => 0 }};
 
 my $FILTERS_TO_DBIX_FORMAT_MAPPER = 
 {
@@ -782,7 +794,9 @@ my $FILTERS_TO_DBIX_FORMAT_MAPPER =
 	'tenant_name' => 'tenant.name', 
 	'visible' => 'me.visible',
 	'view_type' => 'me.view_type',
-	'device_type' => 'me.device_type' 
+	'device_type' => 'me.device_type',
+	'qvd_object' => 'me.qvd_object',
+	'property' => 'me.property'
     },
 
     Administrator_Views_Setup =>  {
@@ -794,7 +808,9 @@ my $FILTERS_TO_DBIX_FORMAT_MAPPER =
 	'admin_name' => 'administrator.name', 
 	'visible' => 'me.visible',
 	'view_type' => 'me.view_type',
-	'device_type' => 'me.device_type' 
+	'device_type' => 'me.device_type',
+	'qvd_object' => 'me.qvd_object',
+	'property' => 'me.property' 
  }
 
 };
@@ -935,7 +951,9 @@ my $FIELDS_TO_DBIX_FORMAT_MAPPER =
 	'tenant_name' => 'tenant.name', 
 	'visible' => 'me.visible',
 	'view_type' => 'me.view_type',
-	'device_type' => 'me.device_type' 
+	'device_type' => 'me.device_type',
+	'qvd_object' => 'me.qvd_object',
+	'property' => 'me.property'  
     },
 
     Administrator_Views_Setup =>  {
@@ -947,7 +965,9 @@ my $FIELDS_TO_DBIX_FORMAT_MAPPER =
 	'admin_name' => 'administrator.name',
 	'visible' => 'me.visible',
 	'view_type' => 'me.view_type',
-	'device_type' => 'me.device_type' 
+	'device_type' => 'me.device_type',
+	'qvd_object' => 'me.qvd_object',
+	'property' => 'me.property'  
  }
 };
 

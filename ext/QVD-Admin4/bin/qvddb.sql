@@ -566,6 +566,7 @@ ALTER TABLE public.tenant_views_setups_id_seq OWNER TO qvd;
 --
 
 CREATE TYPE device_types_enum AS ENUM ('mobile', 'desktop');
+CREATE TYPE qvd_objects_enum AS ENUM ('user', 'vm', 'host', 'osf', 'di');
 
 CREATE TABLE tenant_views_setups (
     id integer NOT NULL,
@@ -573,7 +574,9 @@ CREATE TABLE tenant_views_setups (
     field varchar(64) NOT NULL,
     visible boolean NOT NULL,
     device_type device_types_enum NOT NULL,
-    view_type varchar(64) NOT NULL
+    view_type varchar(64) NOT NULL,
+    qvd_object  qvd_objects_enum NOT NULL,
+    property  boolean NOT NULL
 );
 
 
@@ -648,7 +651,9 @@ CREATE TABLE administrator_views_setups (
     field varchar(64) NOT NULL,
     visible boolean NOT NULL,
     device_type device_types_enum NOT NULL,
-    view_type varchar(64) NOT NULL
+    view_type varchar(64) NOT NULL,
+    qvd_object  qvd_objects_enum NOT NULL,
+    property  boolean NOT NULL
 );
 
 
@@ -1277,14 +1282,14 @@ ALTER TABLE ONLY tenant_views_setups
 --
 
 ALTER TABLE ONLY tenant_views_setups
-    ADD CONSTRAINT tenant_views_setups_tenant_id_field UNIQUE (tenant_id, field);
+    ADD CONSTRAINT tenant_views_setups_unique UNIQUE (tenant_id, field, view_type, device_type, qvd_object, property);
 
 --
 -- Name: administrator_views_setups_administrator_id_field; Type: CONSTRAINT; Schema: public; Owner: qvd; Tablespace: 
 --
 
 ALTER TABLE ONLY administrator_views_setups
-    ADD CONSTRAINT administrator_views_setups_administrator_id_field UNIQUE (administrator_id, field);
+    ADD CONSTRAINT administrator_views_setups_unique UNIQUE (administrator_id, field, view_type, device_type, qvd_object, property);
 
 
 --
