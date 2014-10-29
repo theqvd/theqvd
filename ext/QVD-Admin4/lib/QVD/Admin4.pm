@@ -140,6 +140,23 @@ sub create
     $result;
 }
 
+sub create_or_update
+{
+    my ($self,$request,%modifiers) = @_;
+    my $result;
+    my $failures = {};
+    my $conditions = $modifiers{conditions} // [];
+
+    $DB->txn_do( sub { my $obj = eval {$DB->resultset($request->table)->update_or_create($request->arguments)};
+		       print $@ if $@;
+		       QVD::Admin4::Exception->throw(code => $DB->storage->_dbh->state,
+						     message => "$@") if $@;
+		       $result->{rows} = [ $obj ] } );
+    $result->{total} = 1;
+    $result->{extra} = {};
+    $result;
+}
+
 ###################################################
 #### NESTED QUERIES WHEN CREATING AND UPDATING ####
 ###################################################
