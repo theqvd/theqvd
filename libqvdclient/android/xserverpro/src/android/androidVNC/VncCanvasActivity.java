@@ -57,6 +57,7 @@ import android.widget.Button;
 import android.view.inputmethod.InputMethodManager;
 import android.content.Context;
 import com.theqvd.android.xpro.*;
+import com.theqvd.android.client.*;
 
 public class VncCanvasActivity extends Activity {
 

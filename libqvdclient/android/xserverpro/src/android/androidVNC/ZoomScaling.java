@@ -7,6 +7,7 @@ import android.graphics.Matrix;
 import android.util.Log;
 import android.widget.ImageView.ScaleType;
 import com.theqvd.android.xpro.*;
+import com.theqvd.android.client.*;
 
 /**
  * @author Michael A. MacDonald

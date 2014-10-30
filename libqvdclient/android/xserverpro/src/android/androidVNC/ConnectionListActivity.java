@@ -29,6 +29,7 @@ import android.widget.ListView;
 import android.widget.SimpleCursorAdapter;
 import java.util.ArrayList;
 import com.theqvd.android.xpro.*;
+import com.theqvd.android.client.*;
 
 /**
  * @author Michael A. MacDonald
