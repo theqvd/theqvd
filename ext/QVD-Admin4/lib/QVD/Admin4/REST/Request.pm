@@ -197,7 +197,7 @@ sub switch_custom_properties_json2request
     {
 	next unless $self->json_wrapper->has_filter($property_key);
 
-	$admin->is_allowed_to($self->qvd_object_model->get_acls_for_filter('properties')) # PROVISIONAL
+	$admin->re_is_allowed_to($self->qvd_object_model->get_acls_for_filter('properties')) # PROVISIONAL
 	    || QVD::Admin4::Exception->throw(code => 34);
 
 	$found_properties++;
@@ -222,7 +222,7 @@ sub check_filters_validity_in_json
 
     my $admin = $self->qvd_object_model->current_qvd_administrator;
 
-    $admin->is_allowed_to($self->qvd_object_model->get_acls_for_filter($_)) || 
+    $admin->re_is_allowed_to($self->qvd_object_model->get_acls_for_filter($_)) || 
 	QVD::Admin4::Exception->throw(code => 34)
 	for $self->json_wrapper->filters_list;
 
@@ -238,7 +238,7 @@ sub check_acls_for_deleting
     return unless ref($id) && scalar @$id > 1;
 
     my $admin = $self->qvd_object_model->current_qvd_administrator;
-    $admin->is_allowed_to($self->qvd_object_model->get_acls_for_delete_massive) 
+    $admin->re_is_allowed_to($self->qvd_object_model->get_acls_for_delete_massive) 
 	|| QVD::Admin4::Exception->throw(code => 35);
 }
 
@@ -257,7 +257,7 @@ sub check_update_arguments_validity_in_json
 	'get_acls_for_argument_in_massive_update' : 
 	'get_acls_for_argument_in_update' ;
 
-    $admin->is_allowed_to($self->qvd_object_model->$method($_)) || 
+    $admin->re_is_allowed_to($self->qvd_object_model->$method($_)) || 
 	QVD::Admin4::Exception->throw(code => 35) 
 	for $self->json_wrapper->arguments_list
 }
@@ -272,7 +272,7 @@ sub check_create_arguments_validity_in_json
 	QVD::Admin4::Exception->throw(code => 23502)
 	for $self->qvd_object_model->mandatory_arguments;
     
-    $admin->is_allowed_to($self->qvd_object_model->get_acls_for_argument_in_creation($_)) || 
+    $admin->re_is_allowed_to($self->qvd_object_model->get_acls_for_argument_in_creation($_)) || 
 	QVD::Admin4::Exception->throw(code => 35)
 	for $self->json_wrapper->arguments_list;
 }
@@ -300,7 +300,7 @@ sub check_nested_queries_validity_in_json
 	QVD::Admin4::Exception->throw(code => 37)
 	for $self->json_wrapper->nested_queries_list;
 
-    $admin->is_allowed_to($self->qvd_object_model->$method($_)) || 
+    $admin->re_is_allowed_to($self->qvd_object_model->$method($_)) || 
 	QVD::Admin4::Exception->throw(code => 38) 
 	for $self->json_wrapper->nested_queries_list
 }

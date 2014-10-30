@@ -14,20 +14,19 @@ my $QVD_ADMIN;
 my $ACTIONS =
 {
 
-current_admin_setup => {type_of_action => 'admin_config_provider',
-		       admin4method => 'current_admin_setup'},
-
 user_get_list => {type_of_action => 'list',
 		  admin4method => 'select',
 		  acls => [qr/^user\.see-main\./],
 		  qvd_object => 'User'},
 
 user_tiny_list => {type_of_action => 'tiny',
-		  admin4method => 'select',
+		   admin4method => 'select',
+		   acls => [qr/^vm\.(create\.|filter\.user)$/],
 		   qvd_object => 'User'},
 
 user_all_ids => { type_of_action => 'all_ids',
 		  admin4method => 'select',
+		  acls => [qr/^user\.[^.]-massive\./],
 		  qvd_object => 'User'},
 
 user_get_details => { type_of_action => 'details',
@@ -57,15 +56,17 @@ user_delete => { type_of_action => 'delete',
 
 vm_get_list => { type_of_action => 'list',
 		 admin4method => 'select',
-		 acls => [qr/^vm\.see-main\./],
+		 acls => [qr/^(vm\.see-main\.|[^.]+\.see\.vm-list)$/],
 		 qvd_object => 'VM'},
 
 vm_all_ids => { type_of_action => 'all_ids',
 		admin4method => 'select',
+		acls => [qr/^vm\.[^.]-massive\./],
 		qvd_object => 'VM'},
 
 vm_tiny_list => { type_of_action => 'tiny',
 		  admin4method => 'select',
+		   acls => [qr/^(host|osf)\.filter\.vm$/],
 		  qvd_object => 'VM'},
 
 vm_get_details => { type_of_action => 'details',
@@ -83,19 +84,19 @@ vm_update => { type_of_action => 'update',
 	       acls => [qr/^vm\.update\./],
 	       qvd_object => 'VM'},
 
-vm_user_disconnect => { type_of_action => 'exec',
+vm_user_disconnect => { type_of_action => 'update',
 			admin4method => 'vm_user_disconnect',
 			acls => [qr/^vm\.update(-massive)?\.disconnect-user$/],
 			qvd_object => 'VM'},
 
-vm_start => { type_of_action => 'exec',
+vm_start => { type_of_action => 'upsate',
 	      admin4method => 'vm_start',
 	     acls => [qr/^vm\.update(-massive)?\.state$/],
 	      qvd_object => 'VM'},
 
-vm_stop => { type_of_action => 'exec',
+vm_stop => { type_of_action => 'update',
 	     admin4method => 'vm_stop',
-	     acls => [qr/^(vm\.update\.state|host\.update(-massive)?\.stop-vms)$/],
+	     acls => [qr/^(vm\.update(-massive)?\.state|host\.update(-massive)?\.stop-vms)$/],
 	     qvd_object => 'VM' },
 
 vm_create => { type_of_action => 'create',
@@ -115,10 +116,12 @@ host_get_list => { type_of_action => 'list',
 
 host_all_ids => { type_of_action => 'all_ids',
 		  admin4method => 'select',
+		  acls => [qr/^host\.[^.]-massive\./],
 		  qvd_object => 'Host'},
 
 host_tiny_list => { type_of_action => 'tiny',
 		    admin4method => 'select',
+		    acls => [qr/^vm\.filter\.host$/],
 		    qvd_object => 'Host'},
 
 host_get_details => { type_of_action => 'details',
@@ -148,15 +151,17 @@ host_delete => { type_of_action => 'delete',
 
 osf_get_list => { type_of_action => 'list',
 		  admin4method => 'select',
-		   acls => [qr/^osf\.see-main\./],
+		  acls => [qr/^osf\.see-main\./],
 		  qvd_object => 'OSF'},
 
 osf_all_ids => { type_of_action => 'all_ids',
 		 admin4method => 'select',
+		 acls => [qr/^osf\.[^.]-massive\./],
 		 qvd_object => 'OSF'},
 
 osf_tiny_list => { type_of_action => 'tiny',
 		   admin4method => 'select',
+		   acls => [qr/^(di|vm)\.(create\.|filter\.(di|vm))$/],
 		   qvd_object => 'OSF'},
 
 osf_get_details => { type_of_action => 'details',
@@ -181,15 +186,17 @@ osf_delete => { type_of_action => 'delete',
 
 di_get_list => { type_of_action => 'list',
 		 admin4method => 'select',
-		 acls => [qr/^di\.see-main\./],
+		 acls => [qr/^(di\.see-main\.|[^.]+\.see\.di-list)$/],
 		 qvd_object => 'DI'},
 
 di_all_ids => { type_of_action => 'all_ids',
 		admin4method => 'select',
+		acls => [qr/^di\.[^.]-massive\./],
 		qvd_object => 'DI'},
 
 di_tiny_list => { type_of_action => 'tiny',
 		  admin4method => 'select',
+		  acls => [qr/^osf\.filter\.di$/],
 		  qvd_object => 'DI'},
 
 di_get_details => { type_of_action => 'details',
@@ -216,24 +223,6 @@ tag_tiny_list => { type_of_action => 'tiny',
 		   admin4method => 'select',
 		   qvd_object => 'DI_Tag'},
 
-tag_get_list => { type_of_action => 'list',
-		   admin4method => 'select',
-		   acls => [qr/^di\.see-details\./],
-		   qvd_object => 'DI_Tag'},
-
-tag_get_details => { type_of_action => 'details',
-		   admin4method => 'select',
-		   acls => [qr/^di\.see-details\./],
-		   qvd_object => 'DI_Tag'},
-
-tag_all_ids => { type_of_action => 'all_ids',
-		 admin4method => 'select',
-		 qvd_object => 'DI_Tag'},
-
-admin_tiny_list => { type_of_action => 'tiny',
-		     admin4method => 'select',
-		     qvd_object => 'Administrator'},
-
 admin_get_list => { type_of_action => 'list',
 		    admin4method => 'select',
 		    acls => [qr/^administrator\.see-main\./],
@@ -246,6 +235,7 @@ admin_get_details => { type_of_action => 'details',
 
 admin_all_ids => { type_of_action => 'all_ids',
 		   admin4method => 'select',
+		   acls => [qr/^administrator\.[^.]-massive\./],
 		   qvd_object => 'Administrator'},
 
 admin_create => { type_of_action => 'create',
@@ -279,6 +269,7 @@ tenant_get_details => { type_of_action => 'details',
 
 tenant_all_ids => { type_of_action => 'all_ids',
 		    admin4method => 'select',
+		    acls => [qr/^tenant\.[^.]-massive\./],
 		    qvd_object => 'Tenant'},
 
 tenant_update => { type_of_action => 'update',
@@ -298,6 +289,7 @@ tenant_delete => { type_of_action => 'delete',
 
 role_tiny_list => { type_of_action => 'tiny',
 		    admin4method => 'select',
+		   acls => [qr/^(administrator\.see|role\.see\.inherited)\.roles$/],
 		    qvd_object => 'Role'},
 
 role_get_list => { type_of_action => 'list',
@@ -312,46 +304,30 @@ role_get_details => { type_of_action => 'details',
 
 role_all_ids => { type_of_action => 'all_ids',
 		  admin4method => 'select',
+		  acls => [qr/^role\.[^.]-massive\./],
 		  qvd_object => 'Role'},
 
 acl_tiny_list => { type_of_action => 'tiny',
 		   admin4method => 'select',
+		   acls => [qr/^(role|administrator)\.see\.acl-list$/],
 		   qvd_object => 'ACL'},
 
-acl_get_list => { type_of_action => 'list',
-		  admin4method => 'select',
-		  acls => [qr/^administrator\.see\.acl-list$/],
-		  qvd_object => 'ACL'},
-
 get_acls_in_roles => { type_of_action => 'general',
-		       acls => [qr/^administrator\.see\.acl-list$/,
-			        qr/^administrator\.see\.acl-list-roles$/],
+		       acls => [qr/^administrator\.see\.acl-list$/],
 		       admin4method => 'get_acls_in_roles'},
 
 get_acls_in_admins => { type_of_action => 'general',
-			acls => [qr/^administrator\.see\.acl-list$/,
-				 qr/^administrator\.see\.acl-list-roles$/],
+			acls => [qr/^administrator\.see\.acl-list$/],
 		      admin4method => 'get_acls_in_admins'},
 
 
 number_of_acls_in_role => { type_of_action =>  'general',
-			    acls => [qr/^administrator\.see\.acl-list$/,
-				     qr/^administrator\.see\.acl-list-roles$/],
+			    acls => [qr/^administrator\.see\.acl-list$/],
 			    admin4method => 'get_number_of_acls_in_role'},
 
 number_of_acls_in_admin => { type_of_action =>  'general',
-			     acls => [qr/^administrator\.see\.acl-list$/,
-				      qr/^administrator\.see\.acl-list-roles$/],
+			     acls => [qr/^administrator\.see\.acl-list$/],
 			     admin4method => 'get_number_of_acls_in_admin'},
-
-acl_all_ids => { type_of_action => 'all_ids',
-		 admin4method => 'select',
-		 qvd_object => 'ACL'},
-
-acl_get_details => { type_of_action => 'details',
-		     admin4method => 'select',
-		     acls => [qr/^administrator\.see\.acl-list$/],
-		     qvd_object => 'ACL'},
 
 role_update => { type_of_action => 'update',
 		 admin4method => 'update',
@@ -368,35 +344,10 @@ role_delete => { type_of_action => 'delete',
 		 acls => [qr/^role\.delete\./],
 		 qvd_object => 'Role'},
 
-tenant_view_tiny_list => { type_of_action => 'tiny',
-			   admin4method => 'select',
-			   acls => [qr/^views\.see-main\./],
-			   qvd_object => 'Tenant_Views_Setup'},
-
 tenant_view_get_list => { type_of_action => 'list',
 			  admin4method => 'select',
 			  acls => [qr/^views\.see-main\./],
 			  qvd_object => 'Tenant_Views_Setup'},
-
-tenant_view_get_details => { type_of_action => 'details',
-			     admin4method => 'select',
-			     acls => [qr/^views\.see-main\./],
-			     qvd_object => 'Tenant_Views_Setup'},
-
-tenant_view_all_ids => { type_of_action => 'all_ids',
-			 admin4method => 'select',
-			 acls => [qr/^views\.see-main\./],
-			 qvd_object => 'Tenant_Views_Setup'},
-
-tenant_view_update => { type_of_action => 'update',
-			admin4method => 'update',
-			acls => [qr/^views\.update\./],
-			qvd_object => 'Tenant_Views_Setup'},
-
-tenant_view_create => { type_of_action => 'create',
-			admin4method => 'create',
-			acls => [qr/^views\.update\./],
-			qvd_object => 'Tenant_Views_Setup'},
 
 tenant_view_set => { type_of_action => 'create',
 		     admin4method => 'create_or_update',
@@ -406,37 +357,12 @@ tenant_view_set => { type_of_action => 'create',
 tenant_view_delete => { type_of_action => 'delete',
 			admin4method => 'delete',
 			acls => [qr/^views\.update\./],
-			qvd_object => 'Tenant_Views_Setup'},
-
-admin_view_tiny_list => { type_of_action => 'tiny',
-			  admin4method => 'select',
-			  acls => [qr/^views\.see-main\./],
-			  qvd_object => 'Administrator_Views_Setup'},
+		       qvd_object => 'Tenant_Views_Setup'},
 
 admin_view_get_list => { type_of_action => 'list',
 			 admin4method => 'select',
 			 acls => [qr/^views\.see-main\./],
 			 qvd_object => 'Administrator_Views_Setup'},
-
-admin_view_get_details => { type_of_action => 'details',
-			    admin4method => 'select',
-			    acls => [qr/^views\.see-main\./],
-			    qvd_object => 'Administrator_Views_Setup'},
-
-admin_view_all_ids => { type_of_action => 'all_ids',
-			admin4method => 'select',
-			acls => [qr/^views\.see-main\./],
-			qvd_object => 'Administrator_Views_Setup'},
-
-admin_view_update => { type_of_action => 'update',
-			admin4method => 'update',
-		       acls => [qr/^views\.update\./],
-		       qvd_object => 'Administrator_Views_Setup'},
-
-admin_view_create => { type_of_action => 'create',
-		       admin4method => 'create',
-		       acls => [qr/^views\.update\./],
-		       qvd_object => 'Administrator_Views_Setup'},
 
 admin_view_set => { type_of_action => 'create',
 		    admin4method => 'create_or_update',
@@ -447,6 +373,9 @@ admin_view_delete => { type_of_action => 'delete',
 		       admin4method => 'delete',
 		       acls => [qr/^views\.update\./],
 		       qvd_object => 'Administrator_Views_Setup'},
+
+current_admin_setup => {type_of_action => 'general',
+		       admin4method => 'current_admin_setup'},
 
 qvd_objects_statistics => { type_of_action =>  'general',
 			    admin4method => 'qvd_objects_statistics',
@@ -500,7 +429,6 @@ sub load_user
 	if $admin->is_superadmin;
 }
 
-
 sub process_query
 {
    my ($self,$json) = @_;
@@ -512,9 +440,6 @@ sub process_query
 
    $self->available_action_for_current_admin($action) || 
        return QVD::Admin4::REST::Response->new(status => 8)->json;
-
-   return $self->process_admin_config_provider_query($action,$json_wrapper)
-       if $action->{type_of_action} eq 'admin_config_provider';
 
    return $self->process_query_without_qvd_object_model($action,$json_wrapper)
        if $action->{type_of_action} eq 'general';
@@ -538,28 +463,12 @@ sub process_query
    return $response->json;
 }
 
-sub process_admin_config_provider_query
-{ 
-    my ($self,$action,$json_wrapper) = @_;
-
-    my $admin4method = $action->{admin4method};
-    my $result = eval { $QVD_ADMIN->$admin4method($self->administrator,$json_wrapper) } // {};
-    print $@ if $@;
-    my $general_status = ($@ && (( $@->can('code') && $@->code) || 1)) || 0;
-    my $individual_failures = ($@ && $@->can('failures')) ? $@->failures  : {};
-    my $response = eval { QVD::Admin4::REST::Response->new(status   => $general_status,
-							   result   => $result,
-							   failures => $individual_failures) };
-    return $response->json;
-
-}
-
 sub process_query_without_qvd_object_model
 {
     my ($self,$action,$json_wrapper) = @_;
 
     my $admin4method = $action->{admin4method};
-    my $result = eval { $QVD_ADMIN->$admin4method($json_wrapper) } // {};
+    my $result = eval { $QVD_ADMIN->$admin4method($self->administrator,$json_wrapper) } // {};
     print $@ if $@;
     my $general_status = ($@ && (( $@->can('code') && $@->code) || 1)) || 0;
     my $individual_failures = ($@ && $@->can('failures')) ? $@->failures  : {};

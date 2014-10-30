@@ -39,223 +39,227 @@ my $RELATED_VIEWS_IN_DB =
 
 my $ACLS_FOR_FILTERS = 
 {
-    VM => { properties => [qw(vm.filter.properties)], # PROVISIONAL
-	    name => [qw(vm.filter.name)],
-	    user_id => [qw(vm.filter.user)],
-	    user_name => [qw(vm.filter.user)],
-	    osf_id => [qw(vm.filter.osf)],
-	    osf_name => [qw(vm.filter.osf)],
-	    state => [qw(vm.filter.state)],
-	    host_id => [qw(vm.filter.host)],
-	    host_name => [qw(vm.filter.host)]},
+    VM => { properties => [qr/^vm\.filter\.properties$/], 
+	    name => [qr/^vm\.filter\.name$/],
+	    user_id => [qr/^vm\.filter\.user$/],
+	    user_name => [qr/^vm\.filter\.user$/],
+	    osf_id => [qr/^vm\.filter\.osf$/],
+	    osf_name => [qr/^vm\.filter\.osf$/],
+	    state => [qr/^vm\.filter\.state$/],
+	    host_id => [qr/^vm\.filter\.host$/],
+	    host_name => [qr/^vm\.filter\.host$/]},
 
-    User => { properties => [qw(user.filter.properties)], 
-	      name => [qw(user.filter.name)]},
+    User => { properties => [qr/^user\.filter\.properties$/], 
+	      name => [qr/^user\.filter\.name$/]},
 
-    Host => { properties => [qw(host.filter.properties)],
-	      name => [qw(host.filter.name)],
-	      vm_id => [qw(host.filter.vm)]},
+    Host => { properties => [qr/^host\.filter\.properties$/],
+	      name => [qr/^host\.filter\.name$/],
+	      vm_id => [qr/^host\.filter\.vm$/]},
 
-    DI => { properties => [qw(di.filter.properties)],
-	    disk_image => [qw(host.filter.disk-image)],
-	    osf_id => [qw(host.filter.osf)],
-	    osf_name => [qw(host.filter.osf)],
+    DI => { properties => [qr/^di\.filter\.properties$/],
+	    disk_image => [qr/^host\.filter\.disk-image$/],
+	    osf_id => [qr/^host\.filter\.osf$/],
+	    osf_name => [qr/^host\.filter\.osf$/]},
 
-    OSF => { properties => [qw(osf.filter.properties)],
-	     name => [qw(osf.filter.name)],
-	     vm_id => [qw(osf.filter.vm)],
-	     di_id => [qw(osf.filter.di)]},
+    OSF => { properties => [qr/^osf\.filter\.properties$/],
+	     name => [qr/^osf\.filter\.name$/],
+	     vm_id => [qr/^osf\.filter\.vm$/],
+	     di_id => [qr/^osf\.filter\.di$/]},
+
+    Administrator => { name => [qr/^administrator\.filter\.name$/] },	    
+
+    Role => { name => [qr/^role\.filter\.name$/] },	    
+
+    Tenant => { name => [qr/^tenant\.filter\.name$/] }
 };
 
 my $ACLS_FOR_FIELDS = 
 {
-    OSF => { id => [qw(osf.see.id)],
-	     creation_admin => [qw(osf.see.created-by)],
-	     creation_date => [qw(osf.see.creation-date)],
-	     name => [qw(osf.see.name)],
-	     overlay => [qw(osf.see.overlay)],
-	     user_storage => [qw(osf.see.user-storage)],
-	     memory => [qw(osf.see.memory)],
-	     number_of_vms => [qw(osf.see.vms-info osf.see.vm-list)], # quedan vm-list-block|default|default-update|expiration|head|state|tags
-	     number_of_dis => [qw(osf.see.dis-info osf.see.di-list)],
-	     properties => [qw(osf.see.properties)] },
+    OSF => { creation_admin => [qr/^osf\.see\.created-by$/],
+	     creation_date => [qr/^osf\.see\.creation-date$/],
+	     overlay => [qr/^osf\.see\.overlay$/],
+	     user_storage => [qr/^osf\.see\.user-storage$/],
+	     memory => [qr/^osf\.see\.memory$/],
+	     number_of_vms => [qr/^osf\.see\.vms-info$/],
+	     number_of_dis => [qr/^osf\.see\.dis-info$/],
+	     properties => [qr/^osf\.see\.properties$/] },
 
-    Role => { roles => [qw(role.see.acl-list role.see.acl-list-roles role.see.inherited-roles)],
-	      acls => [qw(role.see.acl-list)],
-	      id => [qw(role.see.id)],
-	      number_of_acls => [qw(role.see.acl-list)] },
+    Role => { roles => [qr/^role\.see\.acl-list$/, 
+			qr/^role\.see\.acl-list-roles$/, 
+			qr/^role\.see\.inherited-roles$/],
+	      acls => [qr/^role\.see\.acl-list$/],
+	      number_of_acls => [qr/^role\.see\.acl-list$/] },
 
-    DI => { id => [qw(di.see.id)],                      # di.see.vm-list-block|expiration|state
-	    creation_admin => [qw(di.see.created-by)],
-	    creation_date => [qw(di.see.creation-date)],
-	    version => [qw(di.see.version)],
-	    osf_id => [qw(di.see.osf)],
-	    osf_name => [qw(di.see.osf)],
-	    blocked => [qw(di.see.block)],
-	    tags => [qw(di.see.default di.see.head di.see.tags)],
-	    properties => [qw(di.see.properties)]  },
+    DI => { creation_admin => [qr/^di\.see\.created-by$/],
+	    creation_date => [qr/^di\.see\.creation-date$/],
+	    version => [qr/^di\.see\.version$/],
+	    osf_id => [qr/^di\.see\.osf$/],
+	    osf_name => [qr/^di\.see\.osf$/],
+	    blocked => [qr/^di\.see\.block$/],
+	    tags => [qr/^(di\.see\.|[^.]+\.see\.di-list-)(tags|default|head)$/],
+	    properties => [qr/^di\.see\.properties$/]  },
 
-    VM => { id => [qw(vm.see.id)],
-	    user_id => [qw(vm.see.user)],
-	    user_name => [qw(vm.see.user)],
-	    osf_id => [qw(vm.see.osf)],
-	    osf_name => [qw(vm.see.osf)],
-	    di_tag => [qw(vm.see.di-tag)],
-	    blocked => [qw(vm.see.block)],
-	    expiration_soft => [qw(vm.see.expiration)],
-	    expiration_hard => [qw(vm.see.expiration)],
-	    state => [qw(vm.see.state)],
-	    host_id => [qw(vm.see.host)],
-	    host_name => [qw(vm.see.host)],
-	    di_id => [qw(vm.see.di)],
-	    user_state => [qw(vm.see.user-state)],
-	    ip => [qw(vm.see.ip)],
-	    next_boot_ip => [qw(vm.see.next-boot-ip)],
-	    ssh_port => [qw(vm.see.port-ssh)],
-	    vnc_port => [qw(vm.see.port-vnc)],
-	    serial_port => [qw(vm.see.port-serial)], 
-	    creation_admin => [qw(vm.see.created-by)],
-	    creation_date => [qw(vm.see.creation-date)],
-	    di_version => [qw(vm.see.di-version)],
-	    di_name => [qw(vm.see.di)],
-	    di_id => [qw(vm.see.di)],
-	    properties => [qw(vm-see-properties)] },
+    VM => { user_id => [qr/^vm\.see\.user$/],
+	    user_name => [qr/^vm\.see\.user$/],
+	    osf_id => [qr/^vm\.see\.osf$/],
+	    osf_name => [qr/^vm\.see\.osf$/],
+	    di_tag => [qr/^vm\.see\.di-tag$/],
+	    blocked => [qr/^(vm\.see\.|[^.]+\.see\.vm-list-)block$/],
+	    expiration_soft => [qr/^(vm\.see\.|[^.]+\.see\.vm-list-)expiration$/],
+	    expiration_hard => [qr/^(vm\.see\.|[^.]+\.see\.vm-list-)expiration$/],
+	    state => [qr/^(vm\.see\.|[^.]+\.see\.vm-list-)state$/],
+	    host_id => [qr/^vm\.see\.host$/],
+	    host_name => [qr/^vm\.see\.host$/],
+	    di_id => [qr/^vm\.see\.di$/],
+	    user_state => [qr/^vm\.see\.user-state$/],
+	    ip => [qr/^vm\.see\.ip$/],
+	    next_boot_ip => [qr/^vm\.see\.next-boot-ip$/],
+	    ssh_port => [qr/^vm\.see\.port-ssh$/],
+	    vnc_port => [qr/^vm\.see\.port-vnc$/],
+	    serial_port => [qr/^vm\.see\.port-serial$/], 
+	    creation_admin => [qr/^vm\.see\.created-by$/],
+	    creation_date => [qr/^vm\.see\.creation-date$/],
+	    di_version => [qr/^vm\.see\.di-version$/],
+	    di_name => [qr/^vm\.see\.di$/],
+	    di_id => [qr/^vm\.see\.di$/],
+	    properties => [qr/^vm-see-properties$/] },
  
-   Administrator => { roles => [qw(administrator.see.roles 
-                                   administrator.see.acl-list 
-                                   administrator.see.acl-list-roles)],
-		       id => [qw(administrator.see.id)] },
+   Administrator => { roles => [qr/^administrator\.see\.roles 
+                                   administrator\.see\.acl-list 
+                                   administrator\.see\.acl-list-roles$/],
+		       id => [qr/^administrator\.see\.id$/] },
 
-    User => { id => [qw(user.see.id)],
-	      blocked => [qw(user.see.block)],
-	      creation_admin => [qw(user.see.created-by)],
-	      creation_date => [qw(user.see.creation-date)],
-	      number_of_vms => [qw(user.see.vm-list user.see.vms-info)], # user.see.vm-list-block|expiration|state
-	      number_of_vms_connected => [qw(user.see.vm-list-state)],
-	      properties => [qw(user.see.properties)] },
+    User => { id => [qr/^user\.see\.id$/],
+	      blocked => [qr/^user\.see\.block$/],
+	      creation_admin => [qr/^user\.see\.created-by$/],
+	      creation_date => [qr/^user\.see\.creation-date$/],
+	      number_of_vms => [qr/^user\.see\.vms-info$/],
+	      number_of_vms_connected => [qr/^user\.see\.vm-list-state$/],
+	      properties => [qr/^user\.see\.properties$/] },
 
-    Host => { id => [qw(host.see.id)],
-	      address => [qw(host.see.address)],
-	      blocked => [qw(host.see.block)],
-	      state => [qw(host.see.state)],
-	      creation_admin => [qw(host.see.created-by)],
-	      creation_date => [qw(host.see.creation-date)],
-	      number_of_vms_connected => [qw(host.see.vm-list host.see.vms-info)],
-	      properties => [qw(host.see.properties)] },
+    Host => { id => [qr/^host\.see\.id$/],
+	      address => [qr/^host\.see\.address$/],
+	      blocked => [qr/^host\.see\.block$/],
+	      state => [qr/^host\.see\.state$/],
+	      creation_admin => [qr/^host\.see\.created-by$/],
+	      creation_date => [qr/^host\.see\.creation-date$/],
+	      number_of_vms_connected => [qr/^host\.see\.vms-info$/],
+	      properties => [qr/^host\.see\.properties$/] },
 };
 
 my $ACLS_FOR_ARGUMENTS_IN_UPDATE = 
 { 
-    User => { password => [qw(user.update.password)],
-	      blocked => [qw(user.update.block)],
-	      __properties_changes_set => [qw(user.update.properties-update user.update.properties-create)],
-	      __properties_changes_delete => [qw(user.update.properties-delete)]},
+    User => { password => [qr/^user\.update\.password$/],
+	      blocked => [qr/^user\.update\.block$/],
+	      __properties_changes_set => [qr/^user\.update\.properties-(cre|upd)ate$/],
+	      __properties_changes_delete => [qr/^user\.update\.properties-delete$/]},
 
-    VM => { name => [qw(vm.update.name)],
-	    blocked => [qw(vm.update.block)],
-	    expiration_soft => [qw(vm.update.expiration)],
-	    expiration_hard => [qw(vm.update.expiration)],
-	    di_tag => [qw(vm.update.di-tag)],
-	    __properties_changes__set => [qw(vm.update.properties-update vm.update.properties-create)],
-	    __properties_changes__delete => [qw(vm.update.properties-delete)] },
+    VM => { '***start***' => [qr/^vm\.update\.state$/], 
+	    '***stop***' => [qr/^(vm\.update\.state|host\.update\.stop-vms)$/],
+	    '***disconnect***' => [qr/^vm\.update\.disconnect-user$/], 
+	    name => [qr/^vm\.update\.name$/],
+	    blocked => [qr/^vm\.update\.block$/],
+	    expiration_soft => [qr/^vm\.update\.expiration$/],
+	    expiration_hard => [qr/^vm\.update\.expiration$/],
+	    di_tag => [qr/^vm\.update\.di-tag$/],
+	    __properties_changes__set => [qr/^vm\.update\.properties-(cre|upd)ate$/],
+	    __properties_changes__delete => [qr/^vm\.update\.properties-delete$/] },
 
-    Host => { name => [qw(host.update.name)],
-	      address => [qw(host.update.address)],
-	      blocked => [qw(host.update.block)],
-	      __properties_changes__set => [qw(host.update.properties-update host.update.properties-create)],
-	      __properties_changes__delete => [qw(host.update.properties-delete)] },
+    Host => { name => [qr/^host\.update\.name$/],
+	      address => [qr/^host\.update\.address$/],
+	      blocked => [qr/^host\.update\.block$/],
+	      __properties_changes__set => [qr/^host\.update\.properties-(cre|upd)ate$/],
+	      __properties_changes__delete => [qr/^host\.update\.properties-delete$/] },
 
-    OSF => { name => [qw(osf.update.name)],
-	     memory => [qw(osf.update.memory)],
-	     user_storage => [qw(osf.update.user-storage)],
-	     __properties_changes__set => [qw(osf.update.properties-update osf.update.properties-create)],
-	     __properties_changes__delete => [qw(osf.update.properties-delete)] },
+    OSF => { name => [qr/^osf\.update\.name$/],
+	     memory => [qr/^osf\.update\.memory$/],
+	     user_storage => [qr/^osf\.update\.user-storage$/],
+	     __properties_changes__set => [qr/^osf\.update\.properties-(cre|upd)ate$/],
+	     __properties_changes__delete => [qr/^osf\.update\.properties-delete$/] },
 
-    DI => { blocked => [qw(di.update.block)],
-	    __properties_changes__set => [qw(di.update.properties-update di.update.properties-create)],
-	    __properties_changes__delete => [qw(di.update.properties-delete)],
-	    __tags_changes__create => [qw(di.update.tags di.update.default)],
-	    __tags_changes__delete => [qw(di.update.tags di.update.default)]},
+    DI => { blocked => [qr/^di\.update\.block$/],
+	    __properties_changes__set => [qr/^di\.update\.properties-(cre|upd)ate$/],
+	    __properties_changes__delete => [qr/^di\.update\.properties-delete$/],
+	    __tags_changes__create => [qr/^di\.update\.tags di\.update\.default$/],
+	    __tags_changes__delete => [qr/^di\.update\.tags di\.update\.default$/]},
 
-    Role => { name => [qw(role.update.name)],
-	      __acls_changes__assign_acls => [qw(role.update.assign-acl)],
-	      __acls_changes__unassign_acls => [qw(role.update.assign-acl)],
-	      __roles_changes__assign_roles => [qw(role.update.assign-role)],
-	      __roles_changes__unassign_roles => [qw(role.update.assign-role)] },
+    Role => { name => [qr/^role\.update\.name$/],
+	      __acls_changes__assign_acls => [qr/^role\.update\.assign-acl$/],
+	      __acls_changes__unassign_acls => [qr/^role\.update\.assign-acl$/],
+	      __roles_changes__assign_roles => [qr/^role\.update\.assign-role$/],
+	      __roles_changes__unassign_roles => [qr/^role\.update\.assign-role$/] },
 
-    Administrator => { password => [qw(administrator.update.password)],
-		       __roles_changes__assign_roles => [qw(administrator.update.assign-role)],
-		       __roles_changes__unassign_roles => [qw(administrator.update.assign-role)] },
+    Administrator => { password => [qr/^administrator\.update\.password$/],
+		       __roles_changes__assign_roles => [qr/^administrator\.update\.assign-role$/],
+		       __roles_changes__unassign_roles => [qr/^administrator\.update\.assign-role$/] },
 
-    Tenant_Views_Setup => { visible => [qw(views.update.columns)] },  
-    Administrator_Views_Setup => { visible => [qw(views.update.columns)] }
+    Tenant_Views_Setup => { visible => [qr/^views\.update\.columns$/] },  
+    Administrator_Views_Setup => { visible => [qr/^views\.update\.columns$/] }
 
 };
 
 
 my $ACLS_FOR_ARGUMENTS_IN_MASSIVE_UPDATE = 
 { 
-    User => { '***delete***' => ['user.delete-massive.'], # MAYBE A NEW VARIABLE?
-	      blocked => [qw(user.update-massive.block)],
-	      __properties_changes__set => [qw(user.update-massive.properties-update 
-                                               user.update-massive.properties-create)],
-	      __properties_changes__delete => [qw(user.update-massive.properties-delete)]},
+    User => { '***delete***' => [qr/^user\.delete-massive\.$/], # MAYBE A NEW VARIABLE?
+	      blocked => [qr/^user\.update-massive\.block$/],
+	      __properties_changes__set => [qr/^user\.update-massive\.properties-(cre|upd)ate$/],
+	      __properties_changes__delete => [qr/^user\.update-massive\.properties-delete$/]},
 
-    VM => { '***delete***' => ['vm.delete-massive.'],
-	    blocked => [qw(vm.update-massive.block)],
-	    expiration_soft => [qw(vm.update-massive.expiration)],
-	    expiration_hard => [qw(vm.update-massive.expiration)],
-	    di_tag => [qw(vm.update-massive.di-tag)],
-	    __properties_changes__set => [qw(vm.update-massive.properties-update 
-                                             vm.update-massive.properties-create)],
-	    __properties_changes__delete => [qw(vm.update-massive.properties-delete)] },
+    VM => { '***delete***' => [qr/^vm\.delete-massive\.$/],
+	    '***start***' => [qr/^vm\.update-massive\.state$/], 
+	    '***stop***' => [qr/^(vm\.update-massive\.state|host\.update-massive\.stop-vms)$/],
+	    '***disconnect***' => [qr/^vm\.update-massive\.disconnect-user$/], 
+	    blocked => [qr/^vm\.update-massive\.block$/],
+	    expiration_soft => [qr/^vm\.update-massive\.expiration$/],
+	    expiration_hard => [qr/^vm\.update-massive\.expiration$/],
+	    di_tag => [qr/^vm\.update-massive\.di-tag$/],
+	    __properties_changes__set => [qr/^vm\.update-massive\.properties-(cre|upd)ate$/],
+	    __properties_changes__delete => [qr/^vm\.update-massive\.properties-delete$/] },
 
-    Host => { '***delete***' => ['host.delete-massive.'],
-	      blocked => [qw(host.update-massive.block)],
-	      __properties_changes__set => [qw(host.update-massive.properties-update 
-                                               host.update-massive.properties-create)],
-	      __properties_changes__delete => [qw(host.update-massive.properties-delete)] },
+    Host => { '***delete***' => [qr/^host\.delete-massive\.$/],
+	      blocked => [qr/^host\.update-massive\.block$/],
+	      __properties_changes__set => [qr/^host\.update-massive\.properties-(cre|upd)ate$/],
+	      __properties_changes__delete => [qr/^host\.update-massive\.properties-delete$/] },
 	
-    OSF => { '***delete***' => ['osf.delete-massive.'],
-	     memory => [qw(osf.update-massive.memory)],
-	     user_storage => [qw(osf.update-massive.user-storage)],
-	     __properties_changes__set => [qw(osf.update-massive.properties-update 
-                                              osf.update-massive.properties-create)],
-	     __properties_changes__delete => [qw(osf.update-massive.properties-delete)] },
+    OSF => { '***delete***' => [qr/^osf\.delete-massive\.$/],
+	     memory => [qr/^osf\.update-massive\.memory$/],
+	     user_storage => [qr/^osf\.update-massive\.user-storage$/],
+	     __properties_changes__set => [qr/^osf\.update-massive\.properties-(cre|upd)ate$/],
+	     __properties_changes__delete => [qr/^osf\.update-massive\.properties-delete$/] },
 	
-    DI => { '***delete***' => ['di.delete-massive.'],
-	    blocked => [qw(di.update-massive.block)],
-	    __properties_changes__set => [qw(di.update-massive.properties-update 
-                                             di.update-massive.properties-create)],
-	    __properties_changes__delete => [qw(di.update-massive.properties-delete)],
-	    __tags_changes__create => [qw(di.update-massive.tags)],
-	    __tags_changes__delete => [qw(di.update-massive.tags-delete)]},
+    DI => { '***delete***' => [qr/^di\.delete-massive\.$/],
+	    blocked => [qr/^di\.update-massive\.block$/],
+	    __properties_changes__set => [qr/^di\.update-massive\.properties-(cre|upd)ate$/],
+	    __properties_changes__delete => [qr/^di\.update-massive\.properties-delete$/],
+	    __tags_changes__create => [qr/^di\.update-massive\.tags$/],
+	    __tags_changes__delete => [qr/^di\.update-massive\.tags-delete$/]},
 	
-    Tenant => { '***delete***' => ['tenant.delete-massive.']},
+    Tenant => { '***delete***' => [qr/^tenant\.delete-massive\.$/]},
 
-    Role => { '***delete***' => ['role.delete-massive.'] },
+    Role => { '***delete***' => [qr/^role\.delete-massive\.$/] },
 
-    Administrator => { '***delete***' => ['administrator.delete-massive.']}
+    Administrator => { '***delete***' => [qr/^administrator\.delete-massive\.$/]}
 
 };
 
 
 my $ACLS_FOR_ARGUMENTS_IN_CREATION = 
 { 
-    User => { __properties__ => [qw(user.create.properties)]},
+    User => { __properties__ => [qr/^user\.create\.properties$/]},
     
-    VM => { di_tag => [qw(vm.create.di-tag)],
-	    __properties__ => [qw(vm.create.properties)] },
+    VM => { di_tag => [qr/^vm\.create\.di-tag$/],
+	    __properties__ => [qr/^vm\.create\.properties$/] },
     
-    Host => {__properties__ => [qw(host.create.properties)] },
+    Host => {__properties__ => [qr/^host\.create\.properties$/] },
 
-    OSF => { memory => [qw(osf.create.memory)],
-	     user_storage => [qw(osf.create.user-storage)],
-	     __properties__ => [qw(osf.create.properties)]},
+    OSF => { memory => [qr/^osf\.create\.memory$/],
+	     user_storage => [qr/^osf\.create\.user-storage$/],
+	     __properties__ => [qr/^osf\.create\.properties$/]},
 
-    DI => { version => [qw(di.create.version)],
-	    __properties__ => [qw(di.create.properties)],
-	    __tags__ => [qw(di.create.tags di.create.defaulr)]}
+    DI => { version => [qr/^di\.create\.version$/],
+	    __properties__ => [qr/^di\.create\.properties$/],
+	    __tags__ => [qr/^di\.create\.tags di\.create\.defaulr$/]}
 
 };
 
@@ -328,9 +332,6 @@ my $AVAILABLE_FILTERS =
     update => { default => [qw(id tenant_id)], Host => [qw(id)], ACL => [qw(id)], Role => [qw(id)], Tenant => [qw(id)]},
 
     state => { default => [qw(id tenant_id)], Host => [qw(id)], ACL => [qw(id)], Role => [qw(id)], Tenant => [qw(id)]},
-    
-    'exec' => { default => [qw(id tenant_id)], Host => [qw(id)], ACL => [qw(id)], Role => [qw(id)], Tenant => [qw(id)]} 
-
 };
 
 my $AVAILABLE_FIELDS = 
@@ -429,8 +430,7 @@ my $MANDATORY_FILTERS =
     state => { default => [qw(id tenant_id)], Host => [qw(id)], ACL => [qw(id)], Role => [qw(id)], Tenant => [qw(id)]}, 
 
     all_ids => { default => [qw(tenant_id)], Host => [qw()], ACL => [qw()], Role => [qw()], Tenant => [qw()]}, 
-    
-    'exec' => { default => [qw(id tenant_id)], Host => [qw(id)], ACL => [qw(id)], Role => [qw(id)], Tenant => [qw(id)]}};
+};
 
 my $SUBCHAIN_FILTERS = 
 { 
@@ -525,7 +525,7 @@ my $NESTED_QUERIES_TO_ADMIN4_MAPPER =
 };
 
 my $AVAILABLE_ARGUMENTS = { User => [qw(name password blocked)],
-                            VM => [qw(name ip blocked expiration_soft expiration_hard storage di_tag)],
+                            VM => [qw(name ip blocked expiration_soft expiration_hard storage di_tag ***start*** ***stop*** ***disconnect***)],
                             Host => [qw(name address blocked)],
                             OSF => [qw(name memory user_storage overlay)],
                             DI => [qw(blocked disk_image)],

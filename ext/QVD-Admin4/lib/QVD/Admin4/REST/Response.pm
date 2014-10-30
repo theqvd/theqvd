@@ -93,7 +93,7 @@ sub map_dbix_object_to_output_info
     my ($self,$dbix_object) = @_;
     my $result = {};
     my $admin = $self->qvd_object_model->current_qvd_administrator;
-    my @available_fields = grep  { $admin->is_allowed_to($self->qvd_object_model->get_acls_for_field($_)) }
+    my @available_fields = grep  { $admin->re_is_allowed_to($self->qvd_object_model->get_acls_for_field($_)) }
 	$self->qvd_object_model->available_fields;
 
     for my $field_key (@available_fields)

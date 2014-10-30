@@ -13,6 +13,9 @@ use QVD::Admin4::Exception;
 use DateTime;
 use List::Util qw(sum);
 use File::Basename qw(basename dirname);
+use QVD::Admin4::REST::Model;
+use QVD::Admin4::REST::Request;
+
 our $VERSION = '0.01';
 
 my $DB;
@@ -240,7 +243,6 @@ sub custom_properties_del
 sub tags_create
 {
     my ($self,$tags,$di) = @_;
-
 
     QVD::Admin4::Exception->throw(code => $DB->storage->_dbh->state,
 				  message => "$@") if $@;
@@ -643,38 +645,50 @@ sub di_no_head_default_tags
 ######################################
 
 
-
 sub get_properties_by_qvd_object
 {
-   my ($self,$json_wrapper) = @_;
-    my $qvd_object = lc $json_wrapper->get_filter_value('qvd_object') //
+   my ($self,$admin,$json) = @_;
+    my $qvd_object = lc $json->forze_filter_deletion('qvd_object') //
 	QVD::Admin4::Exception->throw(code=>'10');
    $qvd_object =~ /^user|vm|host|osf|di$/ || 
        QVD::Admin4::Exception->throw(code=>'41');
 
-   my %tables = (user => 'User_Property', vm => 'VM_Property',
-                 host => 'Host_Property', osf => 'OSF_Property', di => 'DI_Property');
+   my %tables = (user => 'User', vm => 'VM',
+                 host => 'Host', osf => 'OSF', di => 'DI');
 
-   my $rs =  $DB->resultset($tables{$qvd_object})->search(
-       {},{ order_by => { ($json_wrapper->order_direction || '-asc') => 
-			      ($json_wrapper->order_criteria || []) },
-		page => ($json_wrapper->offset || 1),
-		rows => ($json_wrapper->block || 10000) });
+   my $model = 
+       QVD::Admin4::REST::Model->new(current_qvd_administrator => $admin,
+				     qvd_object => $tables{$qvd_object},
+				     type_of_action => 'list');
 
-   my %props = map { $_->key => 1 } $rs->all;
-   my @props = sort keys %props; 
-   { total => scalar @props, 
-     rows => \@props };
+    my $req = QVD::Admin4::REST::Request->new(qvd_object_model => $model, 
+					      json_wrapper => $json);
+   use Data::Dumper; print Dumper $DB->resultset('User_Properties_List_View')->search({},{ bind => [1] })->first->properties;
+   my $view = $self->get_extra_info_from_related_views($req);
+   my @props = map { keys %{$_->properties} } values %$view;
+   my %props = map { $_ => 1 } @props;
+
+   { total => scalar keys %props, 
+     rows => [sort keys %props ] };
 }
+
 
 sub current_admin_setup
 {
     my ($self,$administrator,$json_wrapper) = @_;
 
-    my @tenant_views = $DB->resultset('Tenant_Views_Setup')->search({tenant_id => $administrator->tenant_id})->all;
-    my @admin_views = $DB->resultset('Administrator_Views_Setup')->search({administrator_id => $administrator->id})->all;
-    my %views = map { $_->field => $_ } @tenant_views;
-    $views{$_->field} = $_ for  @admin_views;
+    my $f =
+        sub { my $obj = shift;
+              my @methods = qw(field qvd_object view_type                                                                                                                                     
+                               device_type property);
+              my $out; $out .= $obj->$_ for @methods; $out; };
+
+    my @tenant_views = $DB->resultset('Tenant_Views_Setup')->search(
+        {tenant_id => $administrator->tenant_id})->all;
+    my @admin_views = $DB->resultset('Administrator_Views_Setup')->search(
+        {administrator_id => $administrator->id})->all;
+    my %views = map { $f->($_) => $_ } @tenant_views;
+    $views{$f->($_)} = $_ for  @admin_views;
 
    { acls => [ $administrator->acls ],
      views => [ map { { $_->get_columns } } values %views ]};
@@ -682,7 +696,7 @@ sub current_admin_setup
 
 sub get_acls_in_admins
 {
-    my ($self,$json_wrapper) = @_;
+    my ($self,$admin,$json_wrapper) = @_;
     my $admin_id = $json_wrapper->get_filter_value('admin_id') //
 	QVD::Admin4::Exception->throw(code=>'10');
     $admin_id = [$admin_id] unless ref($admin_id);
@@ -716,7 +730,7 @@ sub get_acls_in_admins
 
 sub get_acls_in_roles
 {
-    my ($self,$json_wrapper) = @_;
+    my ($self,$admin,$json_wrapper) = @_;
     my $role_id = $json_wrapper->get_filter_value('role_id') //
 	QVD::Admin4::Exception->throw(code=>'10');
     $role_id = [$role_id] unless ref($role_id);
@@ -752,13 +766,13 @@ sub get_acls_in_roles
 
 sub get_number_of_acls_in_role
 {
-    my ($self,$json_wrapper) = @_;
+    my ($self,$admin,$json_wrapper) = @_;
     $self->get_number_of_acls_in_role_or_admin('Role',$json_wrapper);
 }
 
 sub get_number_of_acls_in_admin
 {
-    my ($self,$json_wrapper) = @_;
+    my ($self,$admin,$json_wrapper) = @_;
     $self->get_number_of_acls_in_role_or_admin('Administrator',$json_wrapper);
 }
 
@@ -809,7 +823,8 @@ my $JSON_TO_DBIX = { User => { blocked => 'me.blocked',
 
 sub qvd_objects_statistics
 {
-    my $self = shift;
+    my ($self,$admin) = @_;
+
     my $STATISTICS = {};
 
     $STATISTICS->{$_}->{total} = 
