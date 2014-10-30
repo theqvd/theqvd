@@ -41,7 +41,7 @@ Wat.I.cornerMenuOriginal = {
                 config: {
                     text: 'Config',
                     link: '#/setup/config',
-                    iconClass: 'fa fa-file-text-o' 
+                    iconClass: 'fa fa-sliders' 
                 },
                 customize: {
                     text: 'Views',
@@ -57,6 +57,11 @@ Wat.I.cornerMenuOriginal = {
             iconClass: 'fa fa-user',
             textClass: 'js-login',
             subMenu: {
+                my_area: {
+                    text: 'Profile',
+                    link: '#/profile',
+                    iconClass: 'fa fa-archive' 
+                },
                 logout: {
                     text: 'Log-out',
                     link: '#/logout',

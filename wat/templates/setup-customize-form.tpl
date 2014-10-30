@@ -12,9 +12,9 @@
                     return;
                 }
         %>  
-                <tr>
+                <tr class="<%= field.property ? 'js-is-property' : '' %>" data-name="<%= fName %>">
                     <td class="center">
-                        <div data-name="<%= fName %>" data-fields="<%= field.fields.join(',') %>">
+                        <div class="js-field-check" data-name="<%= fName %>" data-fields="<%= field.fields.join(',') %>">
                             <%= Wat.I.controls.CheckBox({checked: field.display}) %>
                         </div>
                     </td>
@@ -37,7 +37,7 @@
                 }
                 else {
         %>
-                    <span data-i18n="<%=field.text%>">
+                    <span data-i18n="<%= field.text %>">
                         <%= i18n.t(field.text) %>
                     </span>
         <%
@@ -48,6 +48,19 @@
         <%
         });
         %>
+            <tr class="js-is-property js-column-property-template hidden" data-name="">
+                <td class="center">
+                    <div class="js-field-check" data-name="" data-fields="">
+                        <%= Wat.I.controls.CheckBox({checked: false}) %>
+                    </div>
+                </td>
+                <td>
+                    <span class="second_row"><span data-i18n="Property"></span>:</span>
+
+                    <span class="js-prop-name">
+                    </span>
+                </td>
+            </tr>
     </table>
 </div>
 <div class="js-customize-filters customize-filters customize-block">
@@ -64,7 +77,7 @@
                     return;
                 } 
         %>  
-                <tr>
+                <tr class="<%= filter.property ? 'js-is-property' : '' %>" data-name="<%= fName %>">
                     <td class="center">
                         <div  data-name="<%= fName %>" data-field="<%= filter.filterField %>" class="js-desktop-fields">
                             <%= Wat.I.controls.CheckBox({checked: filter.displayDesktop}) %>
@@ -107,7 +120,26 @@
         <%
         });
         %>
+            <tr class="js-is-property js-filter-property-template hidden" data-name="">
+                <td class="center">
+                    <div class="js-desktop-fields" data-name="" data-fields="">
+                        <%= Wat.I.controls.CheckBox({checked: false}) %>
+                    </div>
+                </td>
+                <td class="center">
+                    <div class="js-mobile-fields" data-name="" data-field="">
+                        <%= Wat.I.controls.CheckBox({checked: false}) %>
+                    </div>
+                </td>
+                <td>
+                    <span class="second_row"><span data-i18n="Property"></span>:</span>
+                    
+                    <span class="js-prop-name">
+                    </span>
+                    
+                    <div class="second_row" data-i18n="Combo box"><%= i18n.t('Combo box') %></div>
+                </td>
+            </tr>
     </table>
 </div>
 </div>
-<a class="button button-update-customize" data-i18n="Update"><%= i18n.t('Update') %></a>

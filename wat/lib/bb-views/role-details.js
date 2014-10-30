@@ -186,7 +186,6 @@ Wat.Views.RoleDetailsView = Wat.Views.DetailsView.extend({
         
         var branch = $(e.target).attr('data-branch');
         this.checkedBranch = branch;
-        console.log(this.checkedBranch);
         
         var treeKind = $(e.target).attr('data-tree-kind');
         
@@ -293,8 +292,6 @@ Wat.Views.RoleDetailsView = Wat.Views.DetailsView.extend({
         
         $('span.js-effective-count[data-branch="' + that.checkedBranch + '"]').html(effectiveACLs);
         
-        console.log(effectiveACLs);
-        console.log(totalACLs);
         if (totalACLs == effectiveACLs) {
             $('input.js-branch-check[data-branch="' + that.checkedBranch + '"]').prop('checked', true);
             $('div.js-acls-branch[data-branch="' + that.checkedBranch + '"]').find('div.subbranch').removeClass('disabled-branch');

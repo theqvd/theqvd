@@ -60,28 +60,10 @@ Wat.I.listFields[qvdObj] = {
         ],
         'acls': 'user.see.created-by',
         'display': false
-    },
-    'world': {
-        'display': true,
-        'noTranslatable': true,
-        'fields': [
-            'world'
-        ],
-        'acls': 'user.see.properties',
-        'property': true,
-        'text': 'world'
-    },
-    'sex': {
-        'display': true,
-        'noTranslatable': true,
-        'fields': [
-            'sex'
-        ],
-        'acls': 'user.see.properties',
-        'property': true,
-        'text': 'sex'
     }
 };
+
+Wat.I.listDefaultFields[qvdObj] = $.extend({}, Wat.I.listFields[qvdObj]);
 
 // Fields configuration on details view
 Wat.I.detailsFields[qvdObj] = {
@@ -128,6 +110,8 @@ Wat.I.detailsFields[qvdObj] = {
         'display': true
     }
 };
+
+Wat.I.detailsDefaultFields[qvdObj] = $.extend({}, Wat.I.detailsFields[qvdObj]);
         
 // Filters configuration on list view
 Wat.I.formFilters[qvdObj] = {
@@ -137,28 +121,10 @@ Wat.I.formFilters[qvdObj] = {
         'text': 'Search by name',
         'displayMobile': true,
         'displayDesktop': true
-    },     
-    'world': {
-        'filterField': 'world',
-        'type': 'text',
-        'text': 'world',
-        'noTranslatable': true,
-        'displayMobile': false,
-        'displayDesktop': true,
-        'property': true,
-        'acls': 'user.see.properties',
-    },     
-    'sex': {
-        'filterField': 'sex',
-        'type': 'text',
-        'text': 'sex',
-        'noTranslatable': true,
-        'displayMobile': false,
-        'displayDesktop': true,
-        'property': true,
-        'acls': 'user.see.properties',
     }
 };
+
+Wat.I.formDefaultFilters[qvdObj] = $.extend({}, Wat.I.formFilters[qvdObj]);
 
 // Actions of the bottom of the list (those that will be done with selected items) configuration on list view
 Wat.I.selectedActions[qvdObj] = {

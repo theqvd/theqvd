@@ -22,10 +22,16 @@ Wat.Views.AdminDetailsView = Wat.Views.DetailsView.extend({
         Wat.Views.DetailsView.prototype.render.apply(this);
 
         this.renderManagerRoles();
-        this.renderACLsTree();
+        
+        this.aclPatterns = $.extend(ACL_SECTIONS_PATTERNS, ACL_ACTIONS_PATTERNS);
+        var aclPatternsArray = _.toArray(this.aclPatterns);
+        
+        Wat.A.performAction('number_of_acls_in_admin', {}, {"admin_id": this.id, "acl_pattern": aclPatternsArray}, {}, this.renderACLsTree, this);
     },
     
-    renderACLsTree: function () {
+    renderACLsTree: function (that) {
+        var branchStats = that.retrievedData.result;
+
         // If acl list is not visible, we destroy div and increase the details layer to fill the gap
         if (!Wat.C.checkACL('administrator.see.acl-list')) { 
             $('.js-details-side').remove();
@@ -36,16 +42,20 @@ Wat.Views.AdminDetailsView = Wat.Views.DetailsView.extend({
         var aclsAdminsTemplate = Wat.A.getTemplate('details-administrator-acls-tree');
         
         // Fill the html with the template and the model
-        this.template = _.template(
+        that.template = _.template(
             aclsAdminsTemplate, {
                 sections: ACL_SECTIONS,
-                actions: ACL_ACTIONS
+                actions: ACL_ACTIONS,
+                aclPatterns: that.aclPatterns,
+                branchStats: branchStats
             }
         );
         
-        $('.bb-details-side1').html(this.template);
+        $('.bb-details-side1').html(that.template);
         
         Wat.I.chosenElement('select.js-acl-tree-selector', 'single');
+        
+        Wat.T.translate();
     },
     
     events: {
@@ -179,9 +189,6 @@ Wat.Views.AdminDetailsView = Wat.Views.DetailsView.extend({
 
         Wat.A.fillSelect(params);
         
-        // Remove from inherited roles selector, current role and already inherited ones
-        $('select[name="role"] option[value="' + this.elementId + '"]').remove();
- 
         $.each(this.model.get('roles'), function (iRole, role) {
             $('select[name="role"] option[value="' + iRole + '"]').remove();
         });

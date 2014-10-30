@@ -97,6 +97,8 @@ Wat.I.listFields[qvdObj] = {
     }
 };
 
+Wat.I.listDefaultFields[qvdObj] = $.extend({}, Wat.I.listFields[qvdObj]);
+
 // Fields configuration on details view
 Wat.I.detailsFields[qvdObj] = {
     'id': {
@@ -166,6 +168,8 @@ Wat.I.detailsFields[qvdObj] = {
     }
 };
 
+Wat.I.detailsDefaultFields[qvdObj] = $.extend({}, Wat.I.detailsFields[qvdObj]);
+
 // Filters configuration on list view
 Wat.I.formFilters[qvdObj] = {
     'name': {
@@ -193,6 +197,8 @@ Wat.I.formFilters[qvdObj] = {
         'acls': 'host.see.vms-info'
     }
 };
+
+Wat.I.formDefaultFilters[qvdObj] = $.extend({}, Wat.I.formFilters[qvdObj]);
 
 // Actions of the bottom of the list (those that will be done with selected items) configuration on list view
 Wat.I.selectedActions[qvdObj] = {

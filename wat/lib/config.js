@@ -93,6 +93,11 @@ Wat.C = {
 
         // Store retrieved acls
         Wat.C.acls = that.retrievedData.result.acls;
+        
+        // Store views configuration
+        Wat.C.storeViewsConfiguration(that.retrievedData.result.views);
+        
+        // Configure visability
         Wat.C.configureVisibility();
         
         if (Wat.CurrentView.qvdObj == 'login') {
@@ -102,6 +107,50 @@ Wat.C = {
 
             Wat.Router.app_router.performRoute('', Wat.Views.HomeView);
         }
+    },
+    
+    storeViewsConfiguration: function (viewsConfiguration) {
+        $.each (viewsConfiguration, function (iView, view) {
+            switch (view.view_type) {
+                case 'list_column':
+                    if (!Wat.I.listFields[view.qvd_object][view.field]) {
+                        Wat.I.listFields[view.qvd_object][view.field] = {
+                            'display': view.visible,
+                            'noTranslatable': true,
+                            'fields': [
+                                view.field
+                            ],
+                            'acls': view.qvd_object + '.see.properties',
+                            'property': true,
+                            'text': view.field
+                        };
+                    }
+                    
+                    Wat.I.listFields[view.qvd_object][view.field].display = view.visible;
+                    break;
+                case 'filter':
+                    if (!Wat.I.formFilters[view.qvd_object][view.field]) {
+                        Wat.I.formFilters[view.qvd_object][view.field] = {
+                            'filterField': view.field,
+                            'type': 'select',
+                            'text': view.field,
+                            'noTranslatable': true,
+                            'property': true,
+                            'acls': view.qvd_object + '.see.properties',
+                        };
+                    }
+                    
+                    switch (view.device_type) {
+                        case 'mobile':
+                            Wat.I.formFilters[view.qvd_object][view.field].displayMobile = view.visible;
+                            break;
+                        case 'desktop':
+                            Wat.I.formFilters[view.qvd_object][view.field].displayDesktop = view.visible;
+                            break;
+                    }
+                    break;
+            }
+        });
     },
     
     // Given an ACL or an array of ACLs, check if it pass or not due the user configuration

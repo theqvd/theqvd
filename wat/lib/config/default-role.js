@@ -26,6 +26,8 @@ Wat.I.listFields[qvdObj] = {
         'text': 'Name'
     }
 };
+
+Wat.I.listDefaultFields[qvdObj] = $.extend({}, Wat.I.listFields[qvdObj]);
         
 // Filters configuration on list view
 Wat.I.formFilters[qvdObj] = {
@@ -37,6 +39,8 @@ Wat.I.formFilters[qvdObj] = {
         'displayDesktop': true
     }
 };
+
+Wat.I.formDefaultFilters[qvdObj] = $.extend({}, Wat.I.formFilters[qvdObj]);
 
 // Actions of the bottom of the list (those that will be done with selected items) configuration on list view
 Wat.I.selectedActions[qvdObj] = {

@@ -1387,7 +1387,8 @@ select[name="acl_positive_on_role"] option, .acls_positive {
 .subbranch-piece {
   margin-right: 5px;
   line-height: 25px;
-  padding-bottom: 4px; }
+  padding-bottom: 4px;
+  font-size: 12px; }
   .subbranch-piece:first-child {
     vertical-align: middle; }
 
@@ -1419,10 +1420,16 @@ select[name="acl_positive_on_role"] option, .acls_positive {
   vertical-align: top;
   margin-left: 2px; }
 
+.subbranch-piece {
+  font-size: 10px; }
+
+.branch-text {
+  font-size: 12px; }
+
 .acl-inheritance {
   margin-right: 5px; }
   .acl-inheritance:before {
-    font-size: 20px; }
+    font-size: 15px; }
 
 .disabled-branch {
   color: #aaa; }

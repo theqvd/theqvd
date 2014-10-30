@@ -48,6 +48,8 @@ Wat.I.listFields[qvdObj] = {
         'text': 'Roles'
     }
 };
+
+Wat.I.listDefaultFields[qvdObj] = $.extend({}, Wat.I.listFields[qvdObj]);
         
 // Filters configuration on list view
 Wat.I.formFilters[qvdObj] = {

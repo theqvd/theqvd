@@ -174,11 +174,6 @@ Wat.A = {
                             selected = 'selected="selected"';
                         }
                         
-/*                        if (params.action == 'acl_tiny_list') {
-                            var startWith = 'user_';
-                            var regExp = new RegExp('^' + startWith);
-                        }*/
-                        
                         $.each($('select[name="' + params.controlName + '"]'), function () {
                             $(this).append('<option value="' + id + '" ' + selected + '>' + 
                                                                        name + 

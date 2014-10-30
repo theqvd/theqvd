@@ -20,6 +20,17 @@ Wat.I = {
         role: {},
         administrator: {},
         acl: {}
+    }, 
+    
+    detailsDefaultFields: {
+        vm: {},
+        user: {},
+        host: {},
+        osf: {},
+        di: {},
+        role: {},
+        administrator: {},
+        acl: {}
     },
     
     getDetailsFields: function (qvdObj) {
@@ -35,10 +46,57 @@ Wat.I = {
         role: {},
         administrator: {},
         acl: {}
+    },
+    
+    listDefaultFields: {
+        vm: {},
+        user: {},
+        host: {},
+        osf: {},
+        di: {},
+        role: {},
+        administrator: {},
+        acl: {}
+    }, 
+    
+    getTenantListColumns: function (qvdObj, tenantId, that) {
+        var defaultListColumns = this.getListDefaultColumns(qvdObj);
+        
+        Wat.A.performAction('tenant_view_get_list', {}, {"tenant_id": tenantId, "view_type": "list_column", "qvd_object": qvdObj}, {}, function () {}, this, false);
+        
+        if (this.retrievedData.status != STATUS_SUCCESS) {
+            return {};
+        }
+        
+        $.each(this.retrievedData.result.rows, function (iRegister, register) {
+            if (defaultListColumns[register.field]) {
+                defaultListColumns[register.field].display = register.visible;
+            }
+            else {
+                defaultListColumns[register.field] = {
+                    'display': register.visible,
+                    'noTranslatable': true,
+                    'fields': [
+                        register.field
+                    ],
+                    'acls': qvdObj + '.see.properties',
+                    'property': true,
+                    'text': register.field
+                };
+            }            
+        });
+              
+        that.currentListColumns = defaultListColumns;
+        
+        return defaultListColumns;
     }, 
     
     getListColumns: function (qvdObj) {
         return $.extend(true, {}, this.listFields[qvdObj]);
+    },
+    
+    getListDefaultColumns: function (qvdObj) {
+        return $.extend(true, {}, this.listDefaultFields[qvdObj]);
     },
     
     // DEPRECATED
@@ -63,10 +121,58 @@ Wat.I = {
         host: {},
         osf: {},
         di: {}
+    }, 
+    
+    formDefaultFilters: {
+        vm: {},
+        user: {},
+        host: {},
+        osf: {},
+        di: {}
     },
+    
+    getTenantFormFilters: function (qvdObj, tenantId, that) {
+        var defaultFormFilters = this.getFormDefaultFilters(qvdObj);
+        
+        Wat.A.performAction('tenant_view_get_list', {}, {"tenant_id": tenantId, "view_type": "filter", "qvd_object": qvdObj}, {}, function () {}, this, false);
+        
+        if (this.retrievedData.status != STATUS_SUCCESS) {
+            return {};
+        }
+               
+        $.each(this.retrievedData.result.rows, function (iRegister, register) {
+            if (!defaultFormFilters[register.field]) {
+                defaultFormFilters[register.field] = {
+                    'filterField': register.field,
+                    'type': 'select',
+                    'text': register.field,
+                    'noTranslatable': true,
+                    'property': true,
+                    'acls': qvdObj + '.see.properties',
+                };
+            }     
+            
+            switch (register.device_type) {
+                case 'mobile':
+                    defaultFormFilters[register.field].displayMobile = register.visible;
+                    break;
+                case 'desktop':
+                    defaultFormFilters[register.field].displayDesktop = register.visible;
+                    break;
+            }
+        });
+        
+        that.currentFormFilters = defaultFormFilters;
+
+        return defaultFormFilters;
+    }, 
     
     getFormFilters: function (qvdObj) {
         return $.extend(true, {}, this.formFilters[qvdObj]);
+    },   
+    
+    getFormDefaultFilters: function (qvdObj) {
+        return $.extend(true, {}, this.formDefaultFilters[qvdObj]);
     },
     
     // DEPRECATED
@@ -510,7 +616,7 @@ Wat.I = {
         $('.message-container').addClass(msg.messageType);
         
         // Success and info messages will be hidden automatically
-        if (msg.messageType != 'error') {
+        if (msg.messageType != 'error' && msg.messageType != 'warning') {
             this.messageTimeout = setTimeout(function() { 
                 $('.message-close').trigger('click');
             },3000);

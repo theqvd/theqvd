@@ -7,6 +7,7 @@ Wat.Views.SetupCustomizeView = Wat.Views.MainView.extend({
     setupFormContainer: '.bb-customize-form',
     setupOption: 'customize',
     selectedSection: 'user',
+    selectedTenant: '0',
 
     breadcrumbs: {
         'screen': 'Home',
@@ -29,159 +30,154 @@ Wat.Views.SetupCustomizeView = Wat.Views.MainView.extend({
     events: {
         'change select[name="obj-qvd-select"]': 'changeSection',
         'change select[name="tenant-select"]': 'changeSection',
-        'click a.button-update-customize': 'updateCustomize'
+        'change .js-desktop-fields>input': 'checkDesktopFilter',
+        'change .js-mobile-fields>input': 'checkMobileFilter',
+        'change .js-field-check>input': 'checkListColumn',
+    },
+    
+    checkDesktopFilter: function (e) {
+        var checked = $(e.target).is(':checked');
+        var fieldName = $(e.target).parent().attr('data-name');
+        
+        var qvdObj = this.selectedSection;
+        var tenantId = this.selectedTenant;
+        var currentFilters = this.currentFormFilters;
+        
+        if (!currentFilters[fieldName] || currentFilters[fieldName].displayDesktop != checked) {
+            var args = {
+                'tenant_id': tenantId,
+                'field': fieldName,
+                'view_type': 'filter',
+                'device_type': 'desktop',
+                'visible': checked,
+                'qvd_object': qvdObj,
+                'property': !currentFilters[fieldName] || currentFilters[fieldName].property
+            };
+
+            Wat.A.performAction('tenant_view_set', args, {}, {'error': i18n.t('Error updating'), 'success': i18n.t('Successfully updated')}, function () {}, this, false);
+            
+            if (this.retrievedData.status == STATUS_SUCCESS) {
+                // If update is perfermed successfuly, update in memory
+                if (currentFilters[fieldName]) {
+                    this.currentFormFilters[fieldName].displayDesktop = checked;
+                }
+                else {
+                    this.currentFormFilters[fieldName] = {
+                        acls: qvdObj + ".see.properties",
+                        displayDesktop: checked,
+                        displayMobile: 0,
+                        filterField: fieldName,
+                        noTranslatable: true,
+                        property: true,
+                        text: fieldName,
+                        type: "select",
+                    };
+                }
+            }
+            else {
+                // If update fails, change ckeckbox to previous state
+                $(e.target).prop('checked', !checked);
+            }
+        }
+    },
+    
+    checkMobileFilter: function (e) {
+        var checked = $(e.target).is(':checked');
+        var fieldName = $(e.target).parent().attr('data-name');
+        
+        var qvdObj = this.selectedSection;
+        var tenantId = this.selectedTenant;
+        var currentFilters = this.currentFormFilters;
+        
+        if (!currentFilters[fieldName] || currentFilters[fieldName].displayMobile != checked) {
+            var args = {
+                'tenant_id': tenantId,
+                'field': fieldName,
+                'view_type': 'filter',
+                'device_type': 'mobile',
+                'visible': checked,
+                'qvd_object': qvdObj,
+                'property': !currentFilters[fieldName] || currentFilters[fieldName].property
+            };
+
+            Wat.A.performAction('tenant_view_set', args, {}, {'error': i18n.t('Error updating'), 'success': i18n.t('Successfully updated')}, function () {}, this, false);
+            
+            if (this.retrievedData.status == STATUS_SUCCESS) {
+                // If update is perfermed successfuly, update in memory
+                if (currentFilters[fieldName]) {
+                    this.currentFormFilters[fieldName].displayMobile = checked;
+                }
+                else {
+                    this.currentFormFilters[fieldName] = {
+                        acls: qvdObj + ".see.properties",
+                        displayDesktop: 0,
+                        displayMobile: checked,
+                        filterField: fieldName,
+                        noTranslatable: true,
+                        property: true,
+                        text: fieldName,
+                        type: "select",
+                    };
+                }
+            }
+            else {
+                // If update fails, change ckeckbox to previous state
+                $(e.target).prop('checked', !checked);
+            }
+        }
+    },
+    
+    checkListColumn: function (e) {
+        var checked = $(e.target).is(':checked');
+        var fieldName = $(e.target).parent().attr('data-name');
+        
+        var qvdObj = this.selectedSection;
+        var tenantId = this.selectedTenant;
+        var currentColumns = this.currentListColumns;
+        
+        if (!currentColumns[fieldName] || currentColumns[fieldName].display != checked) {
+            var args = {
+                'tenant_id': tenantId,
+                'field': fieldName,
+                'view_type': 'list_column',
+                'device_type': 'desktop',
+                'visible': checked,
+                'qvd_object': qvdObj,
+                'property': !currentColumns[fieldName] || currentColumns[fieldName].property
+            };
+
+            Wat.A.performAction('tenant_view_set', args, {}, {'error': i18n.t('Error updating'), 'success': i18n.t('Successfully updated')}, function () {}, this, false);
+            
+            if (this.retrievedData.status == STATUS_SUCCESS) {
+                // If update is perfermed successfuly, update in memory
+                if (currentColumns[fieldName]) {
+                    this.currentListColumns[fieldName].display = checked;
+                }
+                else {
+                    this.currentListColumns = {
+                        acls: qvdObj + ".see.properties",
+                        display: checked,
+                        fields: [fieldName],
+                        noTranslatable: true,
+                        property: true,
+                        text: fieldName,
+                    };
+                }
+            }
+            else {
+                // If update fails, change ckeckbox to previous state
+                $(e.target).prop('checked', !checked);
+            }
+        }
     },
     
     changeSection: function (e) {
-        this.selectedSection = $(e.target).val();
+        this.selectedSection = $('select[name="obj-qvd-select"]').val();
+        this.selectedTenant = $('select[name="tenant-select"]').val();
         this.renderForm();
     },
     
-    updateCustomize: function (e) {
-        return;
-        
-        var qvdObj = this.selectedSection;
-                    
-        var newCustomization = {};
-
-        // Get the columns checked and compare with current ones
-            var currentColumns = Wat.I.getListColumns(qvdObj);
-            var columnsByField = {};
-            $.each($('.customize-columns input[type="checkbox"]'), function (iCheckbox, checkbox) { 
-                var checked = $(checkbox).is(':checked');
-                var fieldName = $(checkbox).parent().attr('data-name');
-                var fields = $(checkbox).parent().attr('data-fields').split(',');
-                $.each(fields, function (iField, field) {
-                    columnsByField[field] = columnsByField[field] || {};
-                    columnsByField[field][fieldName] = checked;
-                    
-                    newCustomization[field] = newCustomization[field] || {};
-                    newCustomization[field]['listFields'] = newCustomization[field]['listFields'] || {};
-                    newCustomization[field]['listFields'][fieldName] = checked;
-                });
-            });
-        
-        // Get the filters checked and compare with current ones
-            var currentFilters = Wat.I.getFormFilters(qvdObj);
-            var currentFiltersByField = Wat.I.getFormFiltersByField(qvdObj);
-
-            // Mobile
-                var mobileFiltersByField = {};
-                $.each($('.customize-filters .js-mobile-fields input[type="checkbox"]'), function (iCheckbox, checkbox) { 
-                    var checked = $(checkbox).is(':checked');
-                    var fieldName = $(checkbox).parent().attr('data-name');
-                    var field = $(checkbox).parent().attr('data-field');
-
-                    mobileFiltersByField[field] = mobileFiltersByField[field] || {};
-                    mobileFiltersByField[field][fieldName] = checked;
-                    
-                    newCustomization[field] = newCustomization[field] || {};
-                    newCustomization[field]['mobileFilters'] = newCustomization[field]['mobileFilters'] || {};
-                    newCustomization[field]['mobileFilters'][fieldName] = checked;
-                });
-        
-            // Desktop
-                var desktopFiltersByField = {};
-                $.each($('.customize-filters .js-desktop-fields input[type="checkbox"]'), function (iCheckbox, checkbox) { 
-                    var checked = $(checkbox).is(':checked');
-                    var fieldName = $(checkbox).parent().attr('data-name');
-                    var field = $(checkbox).parent().attr('data-field');
-                    
-                    desktopFiltersByField[field] = desktopFiltersByField[field] || {};
-                    desktopFiltersByField[field][fieldName] = checked;
-                    
-                    newCustomization[field] = newCustomization[field] || {};
-                    newCustomization[field]['desktopFilters'] = newCustomization[field]['desktopFilters'] || {};
-                    newCustomization[field]['desktopFilters'][fieldName] = checked;
-                });
-        
-        // Compare new customization with current customization to perform changes
-            var currentCustomization = Wat.I.getCurrentCustomization(qvdObj);
-            var customizationChanges = {}
-            
-            $.each(newCustomization, function (nameColumn, column) {
-                var somethingChanges = false;
-                $.each(column, function (nameSection, section) {
-                    if (JSON.stringify(currentCustomization[nameColumn][nameSection]) != JSON.stringify(section)) {
-                        somethingChanges = true;
-                        // If we find any difference, we break out the loop (not olny this iteration)
-                        return false;
-                    }
-                });
-                       
-                if (somethingChanges) {
-                    customizationChanges[nameColumn] = column;
-                }
-            });
-
-        // Perform changes
-            if ($.isEmptyObject(customizationChanges)) {
-                Wat.I.showMessage({message: i18n.t('No changes were detected') + '. ' + i18n.t('Nothing to do'), messageType: 'info'});
-            }
-            else {
-                var that = this;
-                
-                that.temp = that.temp || {};
-                that.temp.customModifications = Object.keys(customizationChanges).length;
-
-                $.each (customizationChanges, function (fieldName, field) {   
-                    var params = {
-                        fieldName: fieldName,
-                        fieldOptions: JSON.stringify(field),
-                        that: that,
-                        qvdObj: qvdObj
-                    };
-
-                    Wat.A.performAction('config_field_get_list', {}, {qvd_obj: qvdObj, name: fieldName}, {}, that.updateCustomField, params);
-                });
-            }
-
-    },
-    
-    updateCustomField: function (params) {
-        var that = params.that;
-        
-        var id = 0;
-        var name = '';
-        var qvdObj = '';
-        
-        // The search by name is substring, so in example for 'id' search, it retrieve host_id, name_id...
-        $.each(params.retrievedData.result.rows, function(iRow, row) {
-            if (row.name == params.fieldName) {
-                id = row.id;
-                name = row.name;
-                qvdObj = row.qvd_obj;
-                return false;
-            }
-        });            
-        
-        var newOptions = params.fieldOptions;
-
-        Wat.A.performAction('config_field_update', {'filter_options': newOptions}, {id: id}, {}, that.updateCustomFieldDiscount, params, false);
-    },
-    
-    updateCustomFieldDiscount: function (params) {
-        var that = params.that;
-        
-        if (params.retrievedData.status != 0) {
-            Wat.I.showMessage({message: 'Error updating', messageType: "error"});
-            return;
-        }
-        
-        that.temp.customModifications--;
-
-        if (that.temp.customModifications == 0) {
-            delete that.temp.customModifications;
-            
-            // Update interface data using database
-            Wat.I.setCustomizationFields(params.qvdObj);
-
-            Wat.I.showMessage({message: 'Successfully updated', messageType: "success"});
-        }
-    },
-    
     render: function () {
-
         this.templateSetupCommon = Wat.A.getTemplate(this.setupCommonTemplateName);
         var cornerMenu = Wat.I.getCornerMenu();
         
@@ -224,11 +220,11 @@ Wat.Views.SetupCustomizeView = Wat.Views.MainView.extend({
     
     renderForm: function () {
         this.templateSetupFormCustomize = Wat.A.getTemplate(this.setupCustomizeFormTemplateName);
-        
+                
         this.template = _.template(
             this.templateSetupFormCustomize, {
-                filters: Wat.I.getFormFilters(this.selectedSection),
-                columns: Wat.I.getListColumns(this.selectedSection)
+                filters: Wat.I.getTenantFormFilters (this.selectedSection, this.selectedTenant, this),
+                columns: Wat.I.getTenantListColumns (this.selectedSection, this.selectedTenant, this)
             }
         );
         
@@ -237,5 +233,43 @@ Wat.Views.SetupCustomizeView = Wat.Views.MainView.extend({
         Wat.T.translate();
         
         this.printBreadcrumbs(this.breadcrumbs, '');
+        
+        Wat.A.performAction('properties_by_qvd_object', {}, {qvd_object: this.selectedSection}, {}, this.addProperties, this, false);
+    },
+    
+    addProperties: function (that) {
+        var objProperties = that.retrievedData.result.rows;
+        
+        // Add properties retrieved from QVD Objects
+        var templatePropertiesColumns = $('.js-column-property-template');
+        var templatePropertiesFilters = $('.js-filter-property-template');
+        
+        $.each(objProperties, function (iProp, prop) {  
+            // If any property doesnt exist in database configuration, we add it to the editor
+            if (!that.currentListColumns[prop]) {    
+                // Add property to columns table
+                var propRow = templatePropertiesColumns.clone();
+                propRow.removeClass('hidden');
+                propRow.find('.js-prop-name').html(prop);
+                propRow.attr('data-name', prop);
+                propRow.find('.js-field-check').attr('data-name', prop);
+                propRow.find('.js-field-check').attr('data-fields', prop);
+                propRow.insertBefore(templatePropertiesColumns);
+            }
+
+            // If any property doesnt exist in database configuration, we add it to the editor
+            if (!that.currentFormFilters[prop]) {    
+                // Add property to filters table
+                var propRow = templatePropertiesFilters.clone();
+                propRow.removeClass('hidden');
+                propRow.find('.js-prop-name').html(prop);
+                propRow.attr('data-name', prop);
+                propRow.find('.js-desktop-fields').attr('data-name', prop);
+                propRow.find('.js-mobile-fields').attr('data-name', prop);
+                propRow.find('.js-desktop-fields').attr('data-fields', prop);
+                propRow.find('.js-mobile-fields').attr('data-fields', prop);
+                propRow.insertBefore(templatePropertiesFilters);
+            }
+        });
     }
 });

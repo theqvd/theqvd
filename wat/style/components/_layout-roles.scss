@@ -113,6 +113,8 @@ select[name="acl_positive_on_role"] option, .acls_positive {
     &:first-child {
         vertical-align: middle;
     }
+    
+    font-size: 12px;
 }
 
 .acl-tree-selector+div {
@@ -152,10 +154,18 @@ select[name="acl_positive_on_role"] option, .acls_positive {
     margin-left: 2px;
 }
 
+.subbranch-piece {
+    font-size: 10px;
+}
+
+.branch-text {
+    font-size: 12px;
+}
+
 .acl-inheritance {
     margin-right: 5px;
     &:before {
-        font-size: 20px;
+        font-size: 15px;
     }
 }
 
