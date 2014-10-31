@@ -28,6 +28,21 @@
                 <option data-i18n="Disk images" value="di" <%= selectedSection == "di" ? 'selected' : '' %>></option>
             <%
             }
+            if (!limitByACLs || Wat.C.checkACL('tenant.see-main.')) {
+            %>
+                <option data-i18n="Tenants" value="tenant" <%= selectedSection == "tenant" ? 'selected' : '' %>></option>
+            <%
+            }
+            if (!limitByACLs || Wat.C.checkACL('administrator.see-main.')) {
+            %>
+                <option data-i18n="Administrators" value="admin" <%= selectedSection == "admin" ? 'selected' : '' %>></option>
+            <%
+            }
+            if (!limitByACLs || Wat.C.checkACL('tenant.see-main.')) {
+            %>
+                <option data-i18n="Roles" value="role" <%= selectedSection == "role" ? 'selected' : '' %>></option>
+            <%
+            }
             %>
         </select>
     </div>

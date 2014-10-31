@@ -30,7 +30,8 @@ Wat.I.listFields[qvdObj] = {
             'id',
             'name'
         ],
-        'text': 'Name'
+        'text': 'Name',
+        'fixed': true
     },
     'overlay': {
         'display': true,

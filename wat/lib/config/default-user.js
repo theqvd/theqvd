@@ -33,7 +33,8 @@ Wat.I.listFields[qvdObj] = {
             'id',
             'name'
         ],
-        'text': 'Name'
+        'text': 'Name',
+        'fixed': true
     },
     'connected_vms': {
         'display': true,

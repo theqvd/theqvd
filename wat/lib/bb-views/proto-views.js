@@ -257,7 +257,12 @@ Wat.Views.ViewsView = Wat.Views.MainView.extend({
         Wat.A.performAction('properties_by_qvd_object', {}, args, {}, this.addProperties, this, false);
     },
     
-    addProperties: function (that) {    
+    addProperties: function (that) {
+        // If this section havent support properties, do nothing here
+        if ($.inArray(that.selectedSection, QVD_OBJS_WITH_PROPERTIES) == -1) {
+            return;
+        }
+        
         var objProperties = that.retrievedData.result.rows;
         
         // Add properties retrieved from QVD Objects

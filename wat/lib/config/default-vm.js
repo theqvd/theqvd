@@ -37,7 +37,8 @@ Wat.I.listFields[qvdObj] = {
             'id',
             'name'
         ],
-        'display': true
+        'display': true,
+        'fixed': true
     },
     'host': {
         'text': 'Node',
