@@ -4,6 +4,10 @@ use warnings;
 use Moo;
 use QVD::Admin4;
 use QVD::Admin4::REST::Request;
+use QVD::Admin4::REST::Response;
+use QVD::Admin4::REST::Statistics::Request;
+use QVD::Admin4::REST::Statistics::Response;
+use QVD::Admin4::REST::Response;
 use QVD::Admin4::REST::Model;
 use QVD::Admin4::REST::JSON;
 use QVD::Admin4::Exception;
@@ -377,26 +381,16 @@ admin_view_delete => { type_of_action => 'delete',
 current_admin_setup => {type_of_action => 'general',
 		       admin4method => 'current_admin_setup'},
 
-qvd_objects_statistics => { type_of_action =>  'general',
-			    admin4method => 'qvd_objects_statistics',
-			    acls => [qr/vm.stats.running-vms/,
-				     qr/vm.stats.summary/,
-				     qr/vm.stats.close-to-expire/,
-				     qr/host.stats.top-hosts-most-vms/,
-				     qr/vm.stats.blocked/,
-				     qr/host.stats.running-hosts/,
-				     qr/user.stats.summary/,
-				     qr/user.stats.blocked/,
-				     qr/host.stats.summary/,
-				     qr/host.stats.blocked/,
-				     qr/osf.stats.summary/,
-				     qr/di.stats.summary/,
-				     qr/di.stats.blocked/]},
 
 properties_by_qvd_object => { type_of_action =>  'general',
-			      acls => [qr/^user\.see-main\./,qr/^vm\.see-main\./,
-				       qr/^host\.see-main\./,qr/^osf\.see-main\./,qr/^di\.see-main\./],
+			      acls => [qr/^views\.see-main\./],
 			      admin4method => 'get_properties_by_qvd_object'},
+
+
+qvd_objects_statistics => { type_of_action =>  'statistics',
+			    admin4method => 'qvd_objects_statistics',
+			    acls => [qr/^[^.]\.stats\./]},
+
 
 };
 
@@ -444,6 +438,9 @@ sub process_query
    return $self->process_query_without_qvd_object_model($action,$json_wrapper)
        if $action->{type_of_action} eq 'general';
 
+   return $self->process_statistics_query($action,$json_wrapper)
+       if $action->{type_of_action} eq 'statistics';
+
    my $qvd_object_model = QVD::Admin4::REST::Model->new(current_qvd_administrator => $self->administrator,
 							qvd_object => $action->{qvd_object},
 							type_of_action => $action->{type_of_action});
@@ -478,6 +475,23 @@ sub process_query_without_qvd_object_model
     return $response->json;
 }
 
+sub process_statistics_query
+{
+    my ($self,$action,$json_wrapper) = @_;
+
+    my $request = QVD::Admin4::REST::Statistics::Request->new(administrator => $self->administrator,
+							      json_wrapper => $json_wrapper);
+    eval 
+    {
+	$request$QVD_ADMIN->$_($self->administrator)
+    }
+    
+    my $general_status = ($@ && (( $@->can('code') && $@->code) || 1)) || 0;
+    my $response = eval { QVD::Admin4::REST::Response->new(status   => $general_status,
+							   result   => $result) };
+    return $response->json;
+}
+
 sub available_action_for_current_admin
 {
     my ($self,$action) = @_;
@@ -491,6 +505,89 @@ sub get_request
 
     QVD::Admin4::REST::Request->new(qvd_object_model => $qvd_object_model, 
 				    json_wrapper => $json_wrapper);
+}
+
+
+######################
+### QVD STATISTICS ###
+######################
+
+sub qvd_object_statistics
+{
+    my $self = shift;
+    my $out;
+    my @actions = qw(users_statistict vms_statistics
+                     hosts_statistics osf_statistics di_statistics);
+    for my $action (@actions)
+    {
+	my $acls = $ACTIONS->{$action}->{acls} // [];
+	next unless $self->administrator->re_is_allowed_to(@$acls);
+
+	my $method = lc $qvd_object . 's_statistics';
+	$out->{$qvd_object} = $self->$method($admin);
+    }
+    $out;
+}
+
+sub users_statistics
+{
+    my ($self,$admin) = @_;
+    my $out;
+
+    $out->{total} = $self->users_total_number($admin,$json);
+    $out->{blocked} = $self->blocked_users_total_number($admin,$json)
+	if $admin->is_allowed_to('user.stats.blocked');
+    $out;
+}
+
+sub vms_statistics
+{
+    my ($self,$admin) = @_;
+    my $out;
+
+    $out->{total} = $self->vms_total_number($admin,$json);
+    $out->{blocked} = $self->blocked_vms_total_number($admin,$json)
+	if $admin->is_allowed_to('vm.stats.blocked');
+    $out->{running} = $self->running_qvd_object_total_number($admin,$json)
+	if $admin->is_allowed_to('vm.stats.running-vms');
+    $out->{expiration} = $self->get_vms_with_expitarion_date($admin,$json)
+	if $admin->is_allowed_to('vm.stats.close-to-expire');
+    $out;
+}
+
+sub hosts_statistics
+{
+    my ($self,$admin) = @_;
+
+    my $out;
+    $out->{total} =$self->hosts_total_number($admin,$json);
+    $out->{blocked} = $self->blocked_hosts_total_number($admin,$json)
+	if $admin->is_allowed_to('host.stats.blocked');
+    $out->{running} = $self->running_hosts_total_number($admin,$json)
+	if $admin->is_allowed_to('host.stats.running-vms');
+    $out->{population} = $self->get_the_most_populated_hosts($admin,$json)
+	if $admin->is_allowed_to('host.stats.top-hosts-most-vms');
+    $out;
+}
+
+sub osfs_statistics
+{
+    my ($self,$admin) = @_;
+
+    my $out;
+    $out->{total} = $self->osfs_total_number($admin,$json);
+    $out;
+}
+
+sub dis_statistics
+{
+    my ($self,$admin) = @_;
+
+    my $out;
+    $out->{total} = $self->dis_total_number($admin,$json);
+    $out->{blocked} = $self->blocked_dis_total_number($admin,$json)
+	if $admin->is_allowed_to('dis.stats.blocked');
+    $out;
 }
 
 

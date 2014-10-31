@@ -566,7 +566,7 @@ ALTER TABLE public.tenant_views_setups_id_seq OWNER TO qvd;
 --
 
 CREATE TYPE device_types_enum AS ENUM ('mobile', 'desktop');
-CREATE TYPE qvd_objects_enum AS ENUM ('user', 'vm', 'host', 'osf', 'di');
+CREATE TYPE qvd_objects_enum AS ENUM ('user', 'vm', 'host', 'osf', 'di', 'tenant', 'administrator', 'role');
 
 CREATE TABLE tenant_views_setups (
     id integer NOT NULL,

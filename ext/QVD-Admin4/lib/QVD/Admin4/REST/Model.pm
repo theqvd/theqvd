@@ -259,7 +259,7 @@ my $ACLS_FOR_ARGUMENTS_IN_CREATION =
 
     DI => { version => [qr/^di\.create\.version$/],
 	    __properties__ => [qr/^di\.create\.properties$/],
-	    __tags__ => [qr/^di\.create\.tags di\.create\.defaulr$/]}
+	    __tags__ => [qr/^di\.create\.(tags|default)$/]}
 
 };
 

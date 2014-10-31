@@ -644,32 +644,38 @@ sub di_no_head_default_tags
 ## GENERAL FUNCTIONS; WITHOUT REQUEST
 ######################################
 
-
 sub get_properties_by_qvd_object
 {
-   my ($self,$admin,$json) = @_;
+    my ($self,$admin,$json) = @_;
     my $qvd_object = lc $json->forze_filter_deletion('qvd_object') //
-	QVD::Admin4::Exception->throw(code=>'10');
-   $qvd_object =~ /^user|vm|host|osf|di$/ || 
+        QVD::Admin4::Exception->throw(code=>'10');
+   $qvd_object =~ /^user|vm|host|osf|di$/ ||
        QVD::Admin4::Exception->throw(code=>'41');
 
-   my %tables = (user => 'User', vm => 'VM',
-                 host => 'Host', osf => 'OSF', di => 'DI');
+    my $tenant_id =  $json->forze_filter_deletion('tenant_id');
 
-   my $model = 
-       QVD::Admin4::REST::Model->new(current_qvd_administrator => $admin,
-				     qvd_object => $tables{$qvd_object},
-				     type_of_action => 'list');
+    my %tables = (user=>'User',vm =>'VM',host=>'Host',osf=>'OSF',di =>'DI');
 
-    my $req = QVD::Admin4::REST::Request->new(qvd_object_model => $model, 
-					      json_wrapper => $json);
-   use Data::Dumper; print Dumper $DB->resultset('User_Properties_List_View')->search({},{ bind => [1] })->first->properties;
-   my $view = $self->get_extra_info_from_related_views($req);
-   my @props = map { keys %{$_->properties} } values %$view;
-   my %props = map { $_ => 1 } @props;
+    my $tenants_scoop = defined $tenant_id && $admin->is_superadmin ?
+        $tenant_id : $admin->tenants_scoop;
 
-   { total => scalar keys %props, 
-     rows => [sort keys %props ] };
+    $tenants_scoop = [$tenants_scoop] unless ref($tenants_scoop);
+
+    my $filters = $qvd_object eq 'host' ? {} :
+    {tenant_id => { IN =>  $tenants_scoop }};
+
+    my $rs = $DB->resultset($tables{$qvd_object}.'_Properties_List_View')->
+        search($filters);
+
+    my %props;
+    for my $props_in_tenant (map { $_->properties } $rs->all)
+    {
+        $props{$_} = 1 for @$props_in_tenant;
+    }
+
+    { total => scalar keys %props,
+      rows => [sort keys %props ] };
+
 }
 
 
@@ -810,93 +816,104 @@ sub get_number_of_acls_in_role_or_admin
 ## GENERAL STATISTICS FUNCTIONS ##
 ##################################
 
-my $JSON_TO_DBIX = { User => { blocked => 'me.blocked',
-                               tenant  => 'me.tenant_id'}, # FIX ME, PLEASE
-                     VM   => { blocked => 'vm_runtime.blocked',
-			       state   => 'vm_runtime.vm_state',
-                               tenant => 'user.tenant_id' },
-		     Host => { blocked => 'runtime.blocked',
-			       state   => 'runtime.state' },
-		     OSF  => { tenant => 'me.tenant_id' },
-		     DI   => { blocked => 'me.blocked',
-                               tenant => 'osf.tenant_id'}};
+sub users_total_number
+{
+    my ($self,$admin) = @_;
+    $DB->resultset('User')->search(
+	{'me.tenant_id' => $admin->tenants_scoop})->count;
+}
 
-sub qvd_objects_statistics
+sub blocked_users_total_number
+{
+    my ($self,$admin) = @_;
+    $DB->resultset('User')->search(
+	{ 'me.blocked' => 'true',
+	  'me.tenant_id' => $admin->tenants_scoop})->count;
+}
+
+sub vms_total_number
+{
+    my ($self,$admin) = @_;
+    $DB->resultset('VM')->search(
+	{'user.tenant_id' => $admin->tenants_scoop},
+	{ join => [qw(user)] })->count;
+}
+
+sub blocked_vms_total_number
+{
+    my ($self,$admin) = @_;
+    $DB->resultset('User')->search(
+	{ 'vm_runtime.blocked' => 'true',
+	  'user.tenant_id' => $admin->tenants_scoop }, 
+	{ join => [qw(vm_runtime user)] })->count;
+}
+
+sub running_vms_total_number
+{
+    my ($self,$admin) = @_;
+    $DB->resultset('User')->search(
+	{ 'vm_runtime.vm_state' => 'running',
+	  'user.tenant_id' => $admin->tenants_scoop }, 
+	{ join => [qw(vm_runtime user)] })->count;
+}
+
+sub hosts_total_number
+{
+    my ($self,$admin) = @_;
+    $DB->resultset('Host')->search()->count;
+}
+
+sub blocked_hosts_total_number
 {
     my ($self,$admin) = @_;
 
-    my $STATISTICS = {};
-
-    $STATISTICS->{$_}->{total} = 
-	$self->get_total_number_of_qvd_objects($_)
-	for qw(User VM Host OSF DI);
-
-    $STATISTICS->{$_}->{blocked} = 
-	$self->get_number_of_blocked_qvd_objects($_)
-	for qw(User VM Host DI);
-
-    $STATISTICS->{$_}->{running} = 
-	$self->get_number_of_running_qvd_objects($_)
-	for qw(VM Host);
-
-    $STATISTICS->{VM}->{expiration} = 
-	$self->get_vms_with_expitarion_date();
-
-    $STATISTICS->{Host}->{population} = 
-	$self->get_the_most_populated_hosts();
-
-    $STATISTICS;
+    $DB->resultset('Host')->search(
+	{ 'runtime.blocked' => 'true' },
+	{ join => [qw(runtime)] })->count;
 }
 
-sub get_total_number_of_qvd_objects
+sub running_hosts_total_number
 {
-    my ($self,$qvd_obj) = @_;
-    $qvd_obj =~ /^User|VM|Host|OSF|DI$/ ||
-	QVD::Admin4::Exception->throw(code=>'4');
-
-    $DB->resultset($qvd_obj)->search(
-	{  }, {})->count;
+    my ($self,$admin) = @_;
+    $DB->resultset('Host')->search(
+	{ 'runtime.state' => 'running' },
+	{ join => [qw(runtime)] })->count;
 }
 
-sub get_number_of_blocked_qvd_objects
+sub osfs_total_number
 {
-    my ($self,$qvd_obj) = @_;
-    $qvd_obj =~ /^User|VM|Host|DI$/ ||
-	QVD::Admin4::Exception->throw(code=>'4');
-
-    my $filter = $JSON_TO_DBIX->{$qvd_obj}->{blocked};
-    my ($related_table) = $filter =~ /^(.+)\.(.+)$/;
-    my $join = $related_table eq 'me' ? 
-	[] : [$related_table];
-
-
-    $DB->resultset($qvd_obj)->search(
-	{ $filter => 'true' }, {join => $join})->count;
+    my ($self,$admin) = @_;
+    $DB->resultset('OSF')->search(
+	{'me.tenant_id' => $admin->tenants_scoop})->count;
 }
 
-sub get_number_of_running_qvd_objects
+sub dis_total_number
 {
-    my ($self,$qvd_obj) = @_;
-    $qvd_obj =~ /^VM|Host$/ ||
-	QVD::Admin4::Exception->throw(code=>'4');
-    my $filter = $JSON_TO_DBIX->{$qvd_obj}->{state};
-    my ($related_table) = $filter =~ /^(.+)\.(.+)$/;
-    my $join = $related_table eq 'me' ? 
-	[] : [$related_table];
-
-    $DB->resultset($qvd_obj)->search(
-	{ $filter => 'running' },{join => $join})->count;
+    my ($self,$admin) = @_;
+    $DB->resultset('DI')->search(
+	{ 'osf.tenant_id' => $admin->tenants_scoop }, 
+	{ join => [qw(osf)] })->count;
 }
 
-sub get_vms_with_expitarion_date
+sub blocked_dis_total_number
 {
-    my ($self) = @_;
+    my ($self,$admin) = @_;
+    $DB->resultset('DI')->search(
+	{ 'osf.tenant_id' => $admin->tenants_scoop,
+	  'me.blocked' => 'true' }, 
+	{ join => [qw(osf)] })->count;
+}
+
+sub vms_with_expitarion_date
+{
+    my ($self,$admin) = @_;
 
     my $is_not_null = 'IS NOT NULL';
     my $rs = $DB->resultset('VM')->search(
 	{ -or => [ { 'vm_runtime.vm_expiration_hard'  => \$is_not_null }, 
 		   { 'vm_runtime.vm_expiration_soft'  => \$is_not_null } ] },
-	{ join => [qw(vm_runtime)]});
+	{ join => [qw(vm_runtime)],
+	  prefetch => [qw(vm_runtime)]});
 
     my $now = DateTime->now();
 
@@ -921,9 +938,9 @@ sub calculate_date_time_difference
     \%time_difference;
 }
 
-sub get_the_most_populated_hosts
+sub the_most_populated_hosts
 {
-    my ($self) = @_;
+    my ($self,$admin) = @_;
 
     my $rs = $DB->resultset('Host')->search({ 'vms.vm_state' => 'running'}, 
 					    { distinct => 1, 
@@ -938,5 +955,6 @@ sub get_the_most_populated_hosts
     my $array_limit = $#hosts > 5 ? 5 : $#hosts;    
     return [@hosts[0 .. $array_limit]];
 }
+
 
 1;
