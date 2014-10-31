@@ -35,7 +35,7 @@
             }
             if (!limitByACLs || Wat.C.checkACL('administrator.see-main.')) {
             %>
-                <option data-i18n="Administrators" value="admin" <%= selectedSection == "admin" ? 'selected' : '' %>></option>
+                <option data-i18n="Administrators" value="administrator" <%= selectedSection == "administrator" ? 'selected' : '' %>></option>
             <%
             }
             if (!limitByACLs || Wat.C.checkACL('tenant.see-main.')) {
