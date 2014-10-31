@@ -1,5 +1,22 @@
+<%
+    var nFilters = 0;
+    $.each(formFilters, function(name, filter) {
+        if (!filter.displayDesktop) {
+            return;
+        }
+        
+        nFilters++;
+    });
+    
+    var filtersClass = '';
+    var listBlockClass = '';
+    if (nFilters == 0) {
+        filtersClass = 'hidden-forced';
+        listBlockClass = 'col-width-100';
+    }
+%>
 <div class="wrapper-content <%= cid %>">
-    <div class="filter js-side">
+    <div class="filter js-side <%= filtersClass %>">
         <!-- ADVANCED FILTERS
         <span class="filter-control">
             <label for="filter_mode" data-i18n>Filter mode</label>
@@ -53,7 +70,7 @@
          %>
     </div>
 
-    <div class="list-block bb-list-block">
+    <div class="list-block bb-list-block <%= listBlockClass %>">
     </div>
 </div>
 

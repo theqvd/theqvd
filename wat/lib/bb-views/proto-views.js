@@ -63,6 +63,10 @@ Wat.Views.ViewsView = Wat.Views.MainView.extend({
                         type: "text",
                     };
                 }
+                
+                if (this.viewKind == 'admin') {
+                    Wat.I.formFilters[qvdObj][fieldName] = this.currentFilters[fieldName];
+                }
             }
             else {
                 // If update fails, change ckeckbox to previous state
@@ -108,6 +112,10 @@ Wat.Views.ViewsView = Wat.Views.MainView.extend({
                         type: "text",
                     };
                 }
+                
+                if (this.viewKind == 'admin') {
+                    Wat.I.formFilters[qvdObj][fieldName] = this.currentFilters[fieldName];
+                }
             }
             else {
                 // If update fails, change ckeckbox to previous state
@@ -142,7 +150,7 @@ Wat.Views.ViewsView = Wat.Views.MainView.extend({
                     this.currentColumns[fieldName].display = checked;
                 }
                 else {
-                    this.currentColumns = {
+                    this.currentColumns[fieldName] = {
                         acls: qvdObj + ".see.properties",
                         display: checked,
                         fields: [fieldName],
@@ -150,6 +158,10 @@ Wat.Views.ViewsView = Wat.Views.MainView.extend({
                         property: true,
                         text: fieldName,
                     };
+                }
+                
+                if (this.viewKind == 'admin') {
+                    Wat.I.listFields[qvdObj][fieldName] = this.currentColumns[fieldName];
                 }
             }
             else {
@@ -292,9 +304,7 @@ Wat.Views.ViewsView = Wat.Views.MainView.extend({
                     args['tenant_id'] = this.selectedTenant;
                 }
                 break;
-        }
-        
-        console.info(args);
+        }        
     }
 
 });

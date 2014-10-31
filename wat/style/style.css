@@ -2475,4 +2475,7 @@ td {
 .hidden {
   display: none; }
 
+.hidden-forced {
+  display: none !important; }
+
 /*# sourceMappingURL=style.css.map */
