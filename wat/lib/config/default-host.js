@@ -85,15 +85,6 @@ Wat.I.listFields[qvdObj] = {
         ],
         'acls': 'host.see.created-by',
         'display': false
-    },
-    'Cosa': {
-        'display': true,
-        'fields': [
-            'Cosa'
-        ],
-        'acls': 'host.see.properties',
-        'property': true,
-        'text': 'Cosa'
     }
 };
 

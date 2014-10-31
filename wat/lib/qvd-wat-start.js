@@ -138,13 +138,16 @@
         
         
         
-         // ------- Log-out ------- //
+         // ------- Current administrator ------- //
         Wat.Router.app_router.on('route:logout', function (actions) {
             Wat.C.logOut();
             
             Wat.I.renderMain();
             
             Wat.Router.app_router.performRoute();
+        });          
+        Wat.Router.app_router.on('route:profile', function (actions) {
+            Wat.Router.app_router.performRoute('', Wat.Views.ProfileView);
         });       
         
         

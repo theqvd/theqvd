@@ -50,7 +50,10 @@ var Wat = {
         RoleListView: {},
         
         // Help
-        AboutView: {}
+        AboutView: {},
+        
+        // Current administrator
+        Profile: {}
     },
     Router: {},
     

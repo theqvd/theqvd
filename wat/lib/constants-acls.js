@@ -2,7 +2,7 @@
 
 ACL_SECTIONS = {
     "administrator": "Administrators",
-    "my-admin-area": "My area",
+    "my-admin-area": "Personal area",
     "config": "Configuration",
     "di": "Disk images",
     "host": "Nodes",

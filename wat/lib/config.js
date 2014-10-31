@@ -10,6 +10,8 @@ Wat.C = {
     acls: [],
     aclGroups: {},
     sid: '',
+    tenantID: -1,
+    adminID: -1,
 
     getBaseUrl: function () {
         if (this.login && this.password) {
@@ -21,7 +23,7 @@ Wat.C = {
     },
     
     isSuperadmin: function () {
-        return this.login == 'superadmin';
+        return this.tenantID == 0;
     },
     
     logOut: function () {
@@ -90,15 +92,25 @@ Wat.C = {
             that.sid = '';
             return;
         }
-
+        
         // Store retrieved acls
         Wat.C.acls = that.retrievedData.result.acls;
+        
+        // Restore possible residous views configuration to default values
+        Wat.I.restoreListColumns();
+        Wat.I.restoreFormFilters();
         
         // Store views configuration
         Wat.C.storeViewsConfiguration(that.retrievedData.result.views);
         
         // Configure visability
         Wat.C.configureVisibility();
+        
+        // Store tenant ID
+        Wat.C.tenantID = that.retrievedData.result.tenant_id;
+        
+        // Store admin ID
+        Wat.C.adminID = that.retrievedData.result.admin_id;
         
         if (Wat.CurrentView.qvdObj == 'login') {
             Wat.C.logIn(that.sid, that.login);
@@ -132,11 +144,11 @@ Wat.C = {
                     if (!Wat.I.formFilters[view.qvd_object][view.field]) {
                         Wat.I.formFilters[view.qvd_object][view.field] = {
                             'filterField': view.field,
-                            'type': 'select',
+                            'type': 'text',
                             'text': view.field,
                             'noTranslatable': true,
                             'property': true,
-                            'acls': view.qvd_object + '.see.properties',
+                            'acls': view.qvd_object + '.filter.properties',
                         };
                     }
                     

@@ -312,22 +312,27 @@ Wat.Views.ListView = Wat.Views.MainView.extend({
         // Every element but the hosts has tenant
         var classifiedByTenant = $.inArray(this.collection.actionPrefix, QVD_OBJS_CLASSIFIED_BY_TENANT) != -1;
         if (Wat.C.isSuperadmin() && classifiedByTenant) {
-            this.formFilters.tenant = {
-                    'filterField': 'tenant_id',
-                    'type': 'select',
-                    'text': 'Tenant',
-                    'displayDesktop': true,
-                    'displayMobile': false,
-                    'class': 'chosen-single',
-                    'fillable': true,
-                    'options': [
-                        {
-                            'value': -1,
-                            'text': 'All',
-                            'selected': true
-                        }
-                                ]
-                };
+            var tenantFilter = { tenant: 
+                                    {
+                                        'filterField': 'tenant_id',
+                                        'type': 'select',
+                                        'text': 'Tenant',
+                                        'displayDesktop': true,
+                                        'displayMobile': false,
+                                        'class': 'chosen-single',
+                                        'fillable': true,
+                                        'options': [
+                                            {
+                                                'value': -1,
+                                                'text': 'All',
+                                                'selected': true
+                                            }
+                                                    ]
+                                    }
+                               };
+            
+            // Add tenant filter at the begining
+            this.formFilters = $.extend (tenantFilter, this.formFilters);
         }
     },
     

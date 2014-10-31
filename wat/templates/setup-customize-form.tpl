@@ -11,6 +11,19 @@
                 if (field.fixed) {
                     return;
                 }
+                
+                if (limitByACLs) {                        
+                    if (field.groupAcls) {
+                        if (!Wat.C.checkGroupACL(field.groupAcls)) {
+                            return;
+                        }
+                    }
+                    else if (field.acls) {
+                        if (!Wat.C.checkACL(field.acls)) {
+                            return;
+                        }
+                    }
+                }
         %>  
                 <tr class="<%= field.property ? 'js-is-property' : '' %>" data-name="<%= fName %>">
                     <td class="center">
@@ -75,7 +88,20 @@
         $.each(filters, function(fName, filter) {
                 if (filter.fixed) {
                     return;
-                } 
+                }
+                
+                if (limitByACLs) {
+                    if (filter.groupAcls) {
+                        if (!Wat.C.checkGroupACL(filter.groupAcls)) {
+                            return;
+                        }
+                    }
+                    else if (filter.acls) {
+                        if (!Wat.C.checkACL(filter.acls)) {
+                            return;
+                        }
+                    }
+                }
         %>  
                 <tr class="<%= filter.property ? 'js-is-property' : '' %>" data-name="<%= fName %>">
                     <td class="center">
@@ -137,7 +163,7 @@
                     <span class="js-prop-name">
                     </span>
                     
-                    <div class="second_row" data-i18n="Combo box"><%= i18n.t('Combo box') %></div>
+                    <div class="second_row" data-i18n="Text input"><%= i18n.t('Text input') %></div>
                 </td>
             </tr>
     </table>

@@ -62,7 +62,16 @@ Wat.I = {
     getTenantListColumns: function (qvdObj, tenantId, that) {
         var defaultListColumns = this.getListDefaultColumns(qvdObj);
         
-        Wat.A.performAction('tenant_view_get_list', {}, {"tenant_id": tenantId, "view_type": "list_column", "qvd_object": qvdObj}, {}, function () {}, this, false);
+        var args = {
+            "view_type": "list_column", 
+            "qvd_object": qvdObj
+        };
+        
+        if (tenantId != undefined ) {
+            args.tenant_id = tenantId;
+        }
+        
+        Wat.A.performAction('tenant_view_get_list', {}, args, {}, function () {}, this, false);
         
         if (this.retrievedData.status != STATUS_SUCCESS) {
             return {};
@@ -99,20 +108,8 @@ Wat.I = {
         return $.extend(true, {}, this.listDefaultFields[qvdObj]);
     },
     
-    // DEPRECATED
-    getListColumnsByField: function (qvdObj) {
-        var listFields = this.getListColumns(qvdObj);
-        
-        // Get default values for custom columns
-        var listFieldsByField = {};
-        $.each(listFields, function (columnName, column) {
-            $.each(column.fields, function (iField, field) {
-                listFieldsByField[field] = listFieldsByField[field] || {};
-                listFieldsByField[field][columnName] = column.display;
-            });
-        });
-        
-        return listFieldsByField;
+    restoreListColumns: function () {
+        this.listFields = $.extend(true, {}, this.listDefaultFields);
     },
     
     formFilters: {
@@ -134,7 +131,16 @@ Wat.I = {
     getTenantFormFilters: function (qvdObj, tenantId, that) {
         var defaultFormFilters = this.getFormDefaultFilters(qvdObj);
         
-        Wat.A.performAction('tenant_view_get_list', {}, {"tenant_id": tenantId, "view_type": "filter", "qvd_object": qvdObj}, {}, function () {}, this, false);
+        var args = {
+            "view_type": "filter", 
+            "qvd_object": qvdObj
+        };
+        
+        if (tenantId != undefined ) {
+            args.tenant_id = tenantId;
+        }
+        
+        Wat.A.performAction('tenant_view_get_list', {}, args, {}, function () {}, this, false);
         
         if (this.retrievedData.status != STATUS_SUCCESS) {
             return {};
@@ -144,11 +150,11 @@ Wat.I = {
             if (!defaultFormFilters[register.field]) {
                 defaultFormFilters[register.field] = {
                     'filterField': register.field,
-                    'type': 'select',
+                    'type': 'text',
                     'text': register.field,
                     'noTranslatable': true,
                     'property': true,
-                    'acls': qvdObj + '.see.properties',
+                    'acls': qvdObj + '.filter.properties',
                 };
             }     
             
@@ -173,6 +179,10 @@ Wat.I = {
     
     getFormDefaultFilters: function (qvdObj) {
         return $.extend(true, {}, this.formDefaultFilters[qvdObj]);
+    },
+        
+    restoreFormFilters: function () {
+        this.formFilters = $.extend(true, {}, this.formDefaultFilters);
     },
     
     // DEPRECATED

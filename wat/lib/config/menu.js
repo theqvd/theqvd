@@ -44,7 +44,7 @@ Wat.I.cornerMenuOriginal = {
                     iconClass: 'fa fa-sliders' 
                 },
                 customize: {
-                    text: 'Views',
+                    text: 'Default views',
                     link: '#/setup/customize',
                     iconClass: 'fa fa-columns' 
                 }
@@ -58,7 +58,7 @@ Wat.I.cornerMenuOriginal = {
             textClass: 'js-login',
             subMenu: {
                 my_area: {
-                    text: 'Profile',
+                    text: 'Personal area',
                     link: '#/profile',
                     iconClass: 'fa fa-archive' 
                 },

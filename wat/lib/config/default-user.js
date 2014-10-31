@@ -120,7 +120,8 @@ Wat.I.formFilters[qvdObj] = {
         'type': 'text',
         'text': 'Search by name',
         'displayMobile': true,
-        'displayDesktop': true
+        'displayDesktop': true,
+        'acls': 'user.filter.name'
     }
 };
 
