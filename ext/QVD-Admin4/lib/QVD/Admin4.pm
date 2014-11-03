@@ -41,7 +41,7 @@ sub _db { $DB; }
 sub select
 {
     my ($self,$request) = @_;
-
+# modified
     my $rs = eval { $DB->resultset($request->table)->search($request->filters, 
 							    $request->modifiers) };
 
