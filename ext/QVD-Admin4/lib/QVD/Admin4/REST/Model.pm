@@ -180,8 +180,8 @@ my $ACLS_FOR_ARGUMENTS_IN_UPDATE =
     DI => { blocked => [qr/^di\.update\.block$/],
 	    __properties_changes__set => [qr/^di\.update\.properties-(cre|upd)ate$/],
 	    __properties_changes__delete => [qr/^di\.update\.properties-delete$/],
-	    __tags_changes__create => [qr/^di\.update\.tags di\.update\.default$/],
-	    __tags_changes__delete => [qr/^di\.update\.tags di\.update\.default$/]},
+	    __tags_changes__create => [qr/^di\.update\.(tags|defaults)$/],
+	    __tags_changes__delete => [qr/^di\.update\.(tags|defaults)$/]},
 
     Role => { name => [qr/^role\.update\.name$/],
 	      __acls_changes__assign_acls => [qr/^role\.update\.assign-acl$/],
