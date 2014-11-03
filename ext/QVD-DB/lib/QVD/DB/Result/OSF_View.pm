@@ -10,10 +10,12 @@ __PACKAGE__->result_source_instance->view_definition(
 
 "SELECT me.id            as id, 
         json_agg(properties)   as properties_json,
-        COUNT(vms) as number_of_vms
+        COUNT(vms) as number_of_vms,
+        COUNT(dis) as number_of_dis
  FROM      osfs me 
  LEFT JOIN osf_properties properties ON(properties.osf_id=me.id) 
- LEFT JOIN vms vms ON(vms.osf_id=me.id) 
+ LEFT JOIN vms vms ON(vms.osf_id=me.id)
+ LEFT JOIN dis dis ON(dis.osf_id=me.id)  
  GROUP BY me.id"
 
 );
@@ -27,6 +29,10 @@ __PACKAGE__->add_columns(
 	data_type => 'JSON',
     },
     'number_of_vms' => {
+	data_type => 'integer',
+    },
+
+    'number_of_dis' => {
 	data_type => 'integer',
     },
 

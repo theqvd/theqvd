@@ -816,14 +816,14 @@ sub get_number_of_acls_in_role_or_admin
 ## GENERAL STATISTICS FUNCTIONS ##
 ##################################
 
-sub users_total_number
+sub users_count
 {
     my ($self,$admin) = @_;
     $DB->resultset('User')->search(
 	{'me.tenant_id' => $admin->tenants_scoop})->count;
 }
 
-sub blocked_users_total_number
+sub blocked_users_count
 {
     my ($self,$admin) = @_;
     $DB->resultset('User')->search(
@@ -831,7 +831,7 @@ sub blocked_users_total_number
 	  'me.tenant_id' => $admin->tenants_scoop})->count;
 }
 
-sub vms_total_number
+sub vms_count
 {
     my ($self,$admin) = @_;
     $DB->resultset('VM')->search(
@@ -839,31 +839,31 @@ sub vms_total_number
 	{ join => [qw(user)] })->count;
 }
 
-sub blocked_vms_total_number
+sub blocked_vms_count
 {
     my ($self,$admin) = @_;
-    $DB->resultset('User')->search(
+    $DB->resultset('VM')->search(
 	{ 'vm_runtime.blocked' => 'true',
 	  'user.tenant_id' => $admin->tenants_scoop }, 
 	{ join => [qw(vm_runtime user)] })->count;
 }
 
-sub running_vms_total_number
+sub running_vms_count
 {
     my ($self,$admin) = @_;
-    $DB->resultset('User')->search(
+    $DB->resultset('VM')->search(
 	{ 'vm_runtime.vm_state' => 'running',
 	  'user.tenant_id' => $admin->tenants_scoop }, 
 	{ join => [qw(vm_runtime user)] })->count;
 }
 
-sub hosts_total_number
+sub hosts_count
 {
     my ($self,$admin) = @_;
     $DB->resultset('Host')->search()->count;
 }
 
-sub blocked_hosts_total_number
+sub blocked_hosts_count
 {
     my ($self,$admin) = @_;
 
@@ -872,7 +872,7 @@ sub blocked_hosts_total_number
 	{ join => [qw(runtime)] })->count;
 }
 
-sub running_hosts_total_number
+sub running_hosts_count
 {
     my ($self,$admin) = @_;
     $DB->resultset('Host')->search(
@@ -880,14 +880,14 @@ sub running_hosts_total_number
 	{ join => [qw(runtime)] })->count;
 }
 
-sub osfs_total_number
+sub osfs_count
 {
     my ($self,$admin) = @_;
     $DB->resultset('OSF')->search(
 	{'me.tenant_id' => $admin->tenants_scoop})->count;
 }
 
-sub dis_total_number
+sub dis_count
 {
     my ($self,$admin) = @_;
     $DB->resultset('DI')->search(
@@ -895,7 +895,7 @@ sub dis_total_number
 	{ join => [qw(osf)] })->count;
 }
 
-sub blocked_dis_total_number
+sub blocked_dis_count
 {
     my ($self,$admin) = @_;
     $DB->resultset('DI')->search(
@@ -938,7 +938,7 @@ sub calculate_date_time_difference
     \%time_difference;
 }
 
-sub the_most_populated_hosts
+sub top_five_populated_hosts
 {
     my ($self,$admin) = @_;
 

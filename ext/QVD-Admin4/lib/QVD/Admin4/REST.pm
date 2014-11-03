@@ -5,9 +5,6 @@ use Moo;
 use QVD::Admin4;
 use QVD::Admin4::REST::Request;
 use QVD::Admin4::REST::Response;
-use QVD::Admin4::REST::Statistics::Request;
-use QVD::Admin4::REST::Statistics::Response;
-use QVD::Admin4::REST::Response;
 use QVD::Admin4::REST::Model;
 use QVD::Admin4::REST::JSON;
 use QVD::Admin4::Exception;
@@ -30,7 +27,7 @@ user_tiny_list => {type_of_action => 'tiny',
 
 user_all_ids => { type_of_action => 'all_ids',
 		  admin4method => 'select',
-		  acls => [qr/^user\.[^.]-massive\./],
+		  acls => [qr/^user\.[^.]+-massive\./],
 		  qvd_object => 'User'},
 
 user_get_details => { type_of_action => 'details',
@@ -65,7 +62,7 @@ vm_get_list => { type_of_action => 'list',
 
 vm_all_ids => { type_of_action => 'all_ids',
 		admin4method => 'select',
-		acls => [qr/^vm\.[^.]-massive\./],
+		acls => [qr/^vm\.[^.]+-massive\./],
 		qvd_object => 'VM'},
 
 vm_tiny_list => { type_of_action => 'tiny',
@@ -120,7 +117,7 @@ host_get_list => { type_of_action => 'list',
 
 host_all_ids => { type_of_action => 'all_ids',
 		  admin4method => 'select',
-		  acls => [qr/^host\.[^.]-massive\./],
+		  acls => [qr/^host\.[^.]+-massive\./],
 		  qvd_object => 'Host'},
 
 host_tiny_list => { type_of_action => 'tiny',
@@ -160,7 +157,7 @@ osf_get_list => { type_of_action => 'list',
 
 osf_all_ids => { type_of_action => 'all_ids',
 		 admin4method => 'select',
-		 acls => [qr/^osf\.[^.]-massive\./],
+		 acls => [qr/^osf\.[^.]+-massive\./],
 		 qvd_object => 'OSF'},
 
 osf_tiny_list => { type_of_action => 'tiny',
@@ -195,7 +192,7 @@ di_get_list => { type_of_action => 'list',
 
 di_all_ids => { type_of_action => 'all_ids',
 		admin4method => 'select',
-		acls => [qr/^di\.[^.]-massive\./],
+		acls => [qr/^di\.[^.]+-massive\./],
 		qvd_object => 'DI'},
 
 di_tiny_list => { type_of_action => 'tiny',
@@ -239,7 +236,7 @@ admin_get_details => { type_of_action => 'details',
 
 admin_all_ids => { type_of_action => 'all_ids',
 		   admin4method => 'select',
-		   acls => [qr/^administrator\.[^.]-massive\./],
+		   acls => [qr/^administrator\.[^.]+-massive\./],
 		   qvd_object => 'Administrator'},
 
 admin_create => { type_of_action => 'create',
@@ -273,7 +270,7 @@ tenant_get_details => { type_of_action => 'details',
 
 tenant_all_ids => { type_of_action => 'all_ids',
 		    admin4method => 'select',
-		    acls => [qr/^tenant\.[^.]-massive\./],
+		    acls => [qr/^tenant\.[^.]+-massive\./],
 		    qvd_object => 'Tenant'},
 
 tenant_update => { type_of_action => 'update',
@@ -308,7 +305,7 @@ role_get_details => { type_of_action => 'details',
 
 role_all_ids => { type_of_action => 'all_ids',
 		  admin4method => 'select',
-		  acls => [qr/^role\.[^.]-massive\./],
+		  acls => [qr/^role\.[^.]+-massive\./],
 		  qvd_object => 'Role'},
 
 acl_tiny_list => { type_of_action => 'tiny',
@@ -387,11 +384,21 @@ properties_by_qvd_object => { type_of_action =>  'general',
 			      admin4method => 'get_properties_by_qvd_object'},
 
 
-qvd_objects_statistics => { type_of_action =>  'statistics',
-			    admin4method => 'qvd_objects_statistics',
-			    acls => [qr/^[^.]\.stats\./]},
-
-
+qvd_objects_statistics => { type_of_action =>  'multiple',
+			    admin4method => { users_count => { acls => [qr/^user\.stats/] },
+					      blocked_users_count => { acls => [qr/^user\.stats\.blocked$/]},
+					      vms_count => { acls => [qr/^vm\.stats/] },
+					      blocked_vms_count => { acls => [qr/^vm\.stats\.blocked$/] },
+					      running_vms_count => { acls => [qr/^vm\.stats\.running-vms$/] },
+					      hosts_count => { acls => [qr/^host\.stats/] },
+					      blocked_hosts_count => { acls => [qr/^host\.stats\.blocked$/] },
+					      running_hosts_count => { acls => [qr/^host\.stats\.running-hosts$/] },
+					      osfs_count => { acls => [qr/^osf\.stats/] },
+					      dis_count => { acls => [qr/^di\.stats/] },
+					      blocked_dis_count => { acls => [qr/^di\.stats\.blocked$/] },
+					      vms_with_expitarion_date => { acls => [qr/^vm\.stats\.close-to-expire$/] },
+					      top_five_populated_hosts => { acls => [qr/^host\.stats\.top-hosts-most-vms$/] } },
+			    acls => [qr/^[^.]+\.stats\./]},
 };
 
 sub BUILD
@@ -438,8 +445,8 @@ sub process_query
    return $self->process_query_without_qvd_object_model($action,$json_wrapper)
        if $action->{type_of_action} eq 'general';
 
-   return $self->process_statistics_query($action,$json_wrapper)
-       if $action->{type_of_action} eq 'statistics';
+   return $self->process_multiple_query($action,$json_wrapper)
+       if $action->{type_of_action} eq 'multiple';
 
    my $qvd_object_model = QVD::Admin4::REST::Model->new(current_qvd_administrator => $self->administrator,
 							qvd_object => $action->{qvd_object},
@@ -475,22 +482,28 @@ sub process_query_without_qvd_object_model
     return $response->json;
 }
 
-sub process_statistics_query
+sub process_multiple_query
 {
     my ($self,$action,$json_wrapper) = @_;
 
-    my $request = QVD::Admin4::REST::Statistics::Request->new(administrator => $self->administrator,
-							      json_wrapper => $json_wrapper);
-    eval 
+    my $admin4methods = $action->{admin4method};
+    my $result = {};
+
+    while ( my ($method,$acls) = each %$admin4methods)
     {
-	$request$QVD_ADMIN->$_($self->administrator)
+	next unless $self->available_action_for_current_admin($acls);
+	$result->{$method} = eval { $QVD_ADMIN->$method($self->administrator,$json_wrapper) };
+	print $@ if $@;
     }
     
     my $general_status = ($@ && (( $@->can('code') && $@->code) || 1)) || 0;
+    my $individual_failures = ($@ && $@->can('failures')) ? $@->failures  : {};
     my $response = eval { QVD::Admin4::REST::Response->new(status   => $general_status,
-							   result   => $result) };
+							   result   => $result,
+							   failures => $individual_failures) };
     return $response->json;
 }
+
 
 sub available_action_for_current_admin
 {
@@ -505,89 +518,6 @@ sub get_request
 
     QVD::Admin4::REST::Request->new(qvd_object_model => $qvd_object_model, 
 				    json_wrapper => $json_wrapper);
-}
-
-
-######################
-### QVD STATISTICS ###
-######################
-
-sub qvd_object_statistics
-{
-    my $self = shift;
-    my $out;
-    my @actions = qw(users_statistict vms_statistics
-                     hosts_statistics osf_statistics di_statistics);
-    for my $action (@actions)
-    {
-	my $acls = $ACTIONS->{$action}->{acls} // [];
-	next unless $self->administrator->re_is_allowed_to(@$acls);
-
-	my $method = lc $qvd_object . 's_statistics';
-	$out->{$qvd_object} = $self->$method($admin);
-    }
-    $out;
-}
-
-sub users_statistics
-{
-    my ($self,$admin) = @_;
-    my $out;
-
-    $out->{total} = $self->users_total_number($admin,$json);
-    $out->{blocked} = $self->blocked_users_total_number($admin,$json)
-	if $admin->is_allowed_to('user.stats.blocked');
-    $out;
-}
-
-sub vms_statistics
-{
-    my ($self,$admin) = @_;
-    my $out;
-
-    $out->{total} = $self->vms_total_number($admin,$json);
-    $out->{blocked} = $self->blocked_vms_total_number($admin,$json)
-	if $admin->is_allowed_to('vm.stats.blocked');
-    $out->{running} = $self->running_qvd_object_total_number($admin,$json)
-	if $admin->is_allowed_to('vm.stats.running-vms');
-    $out->{expiration} = $self->get_vms_with_expitarion_date($admin,$json)
-	if $admin->is_allowed_to('vm.stats.close-to-expire');
-    $out;
-}
-
-sub hosts_statistics
-{
-    my ($self,$admin) = @_;
-
-    my $out;
-    $out->{total} =$self->hosts_total_number($admin,$json);
-    $out->{blocked} = $self->blocked_hosts_total_number($admin,$json)
-	if $admin->is_allowed_to('host.stats.blocked');
-    $out->{running} = $self->running_hosts_total_number($admin,$json)
-	if $admin->is_allowed_to('host.stats.running-vms');
-    $out->{population} = $self->get_the_most_populated_hosts($admin,$json)
-	if $admin->is_allowed_to('host.stats.top-hosts-most-vms');
-    $out;
-}
-
-sub osfs_statistics
-{
-    my ($self,$admin) = @_;
-
-    my $out;
-    $out->{total} = $self->osfs_total_number($admin,$json);
-    $out;
-}
-
-sub dis_statistics
-{
-    my ($self,$admin) = @_;
-
-    my $out;
-    $out->{total} = $self->dis_total_number($admin,$json);
-    $out->{blocked} = $self->blocked_dis_total_number($admin,$json)
-	if $admin->is_allowed_to('dis.stats.blocked');
-    $out;
 }
 
 
