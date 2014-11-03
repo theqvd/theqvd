@@ -81,6 +81,7 @@ sub map_result_from_dbix_objects_to_output_info
 {
     my $self = shift;
     return unless defined $self->result->{rows};
+
     $_ = $self->map_dbix_object_to_output_info($_)
 	for @{$self->result->{rows}};
 

@@ -240,6 +240,7 @@ sub get_role_names_ids
     my $self = shift;
     my $role_id = shift // $self->id;
     my $tree = $self->get_full_acls_inheritance_tree;
+
     values %{$tree->{$role_id}->{roles}};
 }
 
@@ -308,8 +309,8 @@ sub load_full_acls_inheritance_tree
 
       select a.inheritor_id, a.inherited_id, d.name, e.name, b.acl_id, c.name, b.positive 
       from all_role_role_relations a 
-      join acl_role_relations b on (a.inherited_id=b.role_id) 
-      join acls c on (c.id=b.acl_id) 
+      left join acl_role_relations b on (a.inherited_id=b.role_id) 
+      left join acls c on (c.id=b.acl_id) 
       join roles d on (d.id=a.inheritor_id) 
       join roles e on (e.id=a.inherited_id) 
 
@@ -319,6 +320,7 @@ sub load_full_acls_inheritance_tree
       from roles f 
       join acl_role_relations g on (f.id=g.role_id) 
       join acls h on (h.id=g.acl_id) 
+
       where f.id in ($sql_role_ids)";
 
     $DB //= QVD::DB->new();
@@ -342,6 +344,8 @@ sub load_full_acls_inheritance_tree
 
 	$tree->{@{$row}[0]}->{roles}->{@{$row}[1]} = $tree->{@{$row}[1]}
 	unless @{$row}[0] eq @{$row}[1];
+
+	next unless defined @{$row}[4];
 
 	$tree->{@{$row}[1]}->{acls}->{@{$row}[6]}->{@{$row}[4]} = { id => @{$row}[4], 
 								    name => @{$row}[5]};

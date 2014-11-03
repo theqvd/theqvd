@@ -1,6 +1,6 @@
 #!/usr/lib/qvd/bin/perl
 use Mojolicious::Lite;
-use lib::glob '/home/benjamin/WAT/ext/*/lib/';
+use lib::glob '/home/qindel/WAT/*/lib/';
 use QVD::Admin4::REST;
 use Mojo::JSON qw(decode_json encode_json);
 use QVD::Admin4::REST::Response;
@@ -41,6 +41,7 @@ under sub {
 	store  => [dbi => {dbh => QVD::DB->new()->storage->dbh}],
 	transport => MojoX::Session::Transport::WAT->new(),
 	tx => $c->tx );
+#    $session->expires_delta(60);
 
     my $json = $c->req->json // 
     { map { $_ => $c->param($_) } $c->param };

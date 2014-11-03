@@ -19,8 +19,8 @@ __PACKAGE__->result_source_instance->view_definition(
 
 __PACKAGE__->add_columns(
  
-    'tenant_id' => {
-	data_type => 'integer'
+    tenant_id => {
+	data_type => 'integer' 
     },
     'properties' => {
 	data_type => 'ARRAY',

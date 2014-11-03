@@ -396,8 +396,8 @@ qvd_objects_statistics => { type_of_action =>  'multiple',
 					      osfs_count => { acls => [qr/^osf\.stats/] },
 					      dis_count => { acls => [qr/^di\.stats/] },
 					      blocked_dis_count => { acls => [qr/^di\.stats\.blocked$/] },
-					      vms_with_expitarion_date => { acls => [qr/^vm\.stats\.close-to-expire$/] },
-					      top_five_populated_hosts => { acls => [qr/^host\.stats\.top-hosts-most-vms$/] } },
+					      vms_with_expiration_date => { acls => [qr/^vm\.stats\.close-to-expire$/] },
+					      top_populated_hosts => { acls => [qr/^host\.stats\.top-hosts-most-vms$/] } },
 			    acls => [qr/^[^.]+\.stats\./]},
 };
 

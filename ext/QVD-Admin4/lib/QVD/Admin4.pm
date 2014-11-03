@@ -465,20 +465,19 @@ sub di_create
 {
     my ($self,$request) = @_;
 
-    my $images_path  = cfg('path.storage.images');
-    QVD::Admin4::Exception->throw(code=>'31')
-	unless -d $images_path;
+#    my $images_path  = cfg('path.storage.images');
+#    QVD::Admin4::Exception->throw(code=>'31')
+#	unless -d $images_path;
 
-    my $staging_path = cfg('path.storage.staging');
-    QVD::Admin4::Exception->throw(code=>'32')
-	unless -d $staging_path;
+#    my $staging_path = cfg('path.storage.staging');
+#    QVD::Admin4::Exception->throw(code=>'32')
+#	unless -d $staging_path;
 
-    my $staging_file = basename($request->arguments->{path});
-    QVD::Admin4::Exception->throw(code=>'33')
-	unless -e "$staging_path/$staging_file";
+#    my $staging_file = basename($request->arguments->{path});
+#    QVD::Admin4::Exception->throw(code=>'33')
+#	unless -e "$staging_path/$staging_file";
 
-    my $result = $self->create($request, methods_for_nested_queries => 
-			     [qw(create_custom_properties create_related_tags)]);
+    my $result = $self->create($request);
     my $di = @{$result->{rows}}[0];
 
     eval {
@@ -491,15 +490,15 @@ sub di_create
 	unless $di->osf->di_by_tag('default')
     };
 
-    my $images_file  = $di->id . '-' . $staging_file;
-    $di->update({path => $images_file});
+#    my $images_file  = $di->id . '-' . $staging_file;
+#    $di->update({path => $images_file});
 
-    for (1 .. 5)
-    {
-	eval { copy("$staging_path/$staging_file","$images_path/$images_file") };
-	$@ ? print $@ : last;
-    }
-    if ($@) { $di->delete; QVD::Admin4::Exception->throw(code=>'30');}
+#    for (1 .. 5)
+#    {
+#	eval { copy("$staging_path/$staging_file","$images_path/$images_file") };
+#	$@ ? print $@ : last;
+#    }
+#    if ($@) { $di->delete; QVD::Admin4::Exception->throw(code=>'30');}
 
     $result;
 }
@@ -696,7 +695,9 @@ sub current_admin_setup
     my %views = map { $f->($_) => $_ } @tenant_views;
     $views{$f->($_)} = $_ for  @admin_views;
 
-   { acls => [ $administrator->acls ],
+   { admin_id => $administrator->id,
+     tenant_id => $administrator->tenant_id,
+     acls => [ $administrator->acls ],
      views => [ map { { $_->get_columns } } values %views ]};
 }
 
@@ -713,10 +714,11 @@ sub get_acls_in_admins
 		      {administrator_id => $admin_id})->all)
     {
 	my $inherited_acls_tree = $role->get_full_acls_inheritance_tree;
+
 	for my $acl_id (keys %{$inherited_acls_tree->{$role->id}->{iacls}})
 	{
-	    $acls_info->{$acl_id} = $inherited_acls_tree->{$role->id}->{iacls}->{$acl_id};
-	    $acls_info->{$acl_id}->{roles} //= {};
+	    $acls_info->{$acl_id}->{name} = $inherited_acls_tree->{$role->id}->{iacls}->{$acl_id}->{name};
+	    $acls_info->{$acl_id}->{id} = $acl_id;
             $acls_info->{$acl_id}->{roles}->{$role->id} =
                 $inherited_acls_tree->{$role->id}->{name};
 	}
@@ -904,7 +906,7 @@ sub blocked_dis_count
 	{ join => [qw(osf)] })->count;
 }
 
-sub vms_with_expitarion_date
+sub vms_with_expiration_date
 {
     my ($self,$admin) = @_;
 
@@ -938,7 +940,7 @@ sub calculate_date_time_difference
     \%time_difference;
 }
 
-sub top_five_populated_hosts
+sub top_populated_hosts
 {
     my ($self,$admin) = @_;
 

@@ -8,15 +8,14 @@ __PACKAGE__->load_components(qw/Core/);
 __PACKAGE__->table('administrator_views');
 __PACKAGE__->add_columns(id          => { data_type => 'integer',
                                            is_auto_increment => 1 },
-                         acl_id  => { data_type => 'integer' },
+                         field  => { data_type => 'varchar(64)' },
 			 administrator_id  => { data_type => 'integer' },
                          positive  => { data_type => 'boolean' },
 			 view_type  => { data_type => 'varchar(64)' },
 			 device_type  => { data_type => 'varchar(64)' });
 
 __PACKAGE__->set_primary_key('id');
-__PACKAGE__->add_unique_constraint([qw(administrator_id acl_id)]);
-__PACKAGE__->belongs_to(acl => 'QVD::DB::Result::ACL', 'acl_id');
+__PACKAGE__->add_unique_constraint([qw(administrator_id field)]);
 __PACKAGE__->belongs_to(administrator => 'QVD::DB::Result::Administrator', 'administrator_id');
 
 1;

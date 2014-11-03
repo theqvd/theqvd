@@ -124,9 +124,7 @@ my $ACLS_FOR_FIELDS =
 	    di_id => [qr/^vm\.see\.di$/],
 	    properties => [qr/^vm-see-properties$/] },
  
-   Administrator => { roles => [qr/^administrator\.see\.roles 
-                                   administrator\.see\.acl-list 
-                                   administrator\.see\.acl-list-roles$/],
+   Administrator => { roles => [qr/^administrator\.see\.roles$/],
 		       id => [qr/^administrator\.see\.id$/] },
 
     User => { id => [qr/^user\.see\.id$/],
