@@ -367,7 +367,7 @@ sub set_arguments_in_request_with_defaults
 sub instantiate_argument
 {
     my ($self,$dbix_key,$value) = @_;
-    $value = undef if $value && $value eq '';
+    $value = undef if defined $value && $value eq '';
     # WARNING: Is this the right solution to all fields??
 
     my ($table,$column) = $dbix_key =~ /^(.+)\.(.+)$/;

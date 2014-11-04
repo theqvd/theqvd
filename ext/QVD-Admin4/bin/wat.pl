@@ -36,7 +36,7 @@ under sub {
 
     $c->res->headers->header('Access-Control-Allow-Origin' => '*');
     $c->res->headers->header('Access-Control-Expose-Headers' => 'sid');
-
+#    $c->res->headers->header('Access-Control-Allow-Headers' => 'accept, content-type');
     my $session = MojoX::Session->new( 
 	store  => [dbi => {dbh => QVD::DB->new()->storage->dbh}],
 	transport => MojoX::Session::Transport::WAT->new(),

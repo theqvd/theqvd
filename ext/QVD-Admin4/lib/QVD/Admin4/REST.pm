@@ -314,7 +314,7 @@ acl_tiny_list => { type_of_action => 'tiny',
 		   qvd_object => 'ACL'},
 
 get_acls_in_roles => { type_of_action => 'general',
-		       acls => [qr/^administrator\.see\.acl-list$/],
+		       acls => [qr/^role\.see\.acl-list$/],
 		       admin4method => 'get_acls_in_roles'},
 
 get_acls_in_admins => { type_of_action => 'general',
@@ -323,7 +323,7 @@ get_acls_in_admins => { type_of_action => 'general',
 
 
 number_of_acls_in_role => { type_of_action =>  'general',
-			    acls => [qr/^administrator\.see\.acl-list$/],
+			    acls => [qr/^role\.see\.acl-list$/],
 			    admin4method => 'get_number_of_acls_in_role'},
 
 number_of_acls_in_admin => { type_of_action =>  'general',

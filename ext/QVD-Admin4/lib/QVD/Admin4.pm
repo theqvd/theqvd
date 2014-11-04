@@ -41,9 +41,8 @@ sub _db { $DB; }
 sub select
 {
     my ($self,$request) = @_;
-# modified
-    my $rs = eval { $DB->resultset($request->table)->search($request->filters, 
-							    $request->modifiers) };
+
+    my $rs = eval { $DB->resultset($request->table)->search($request->filters,$request->modifiers) };
 
     QVD::Admin4::Exception->throw(code => $DB->storage->_dbh->state,
 				  message => "$@") if $@;
@@ -281,7 +280,7 @@ sub add_acls_to_role
 
     for my $acl_name (@$acl_names)
     { 	
-	next if $role->has_own_positive_acl($acl_name);
+	next if $role->is_allowed_to($acl_name);
 	$role->has_own_negative_acl($acl_name) ?
 	    $self->switch_acl_sign_in_role($role,$acl_name) :
 	    $self->assign_acl_to_role($role,$acl_name,1);
@@ -316,11 +315,12 @@ sub add_roles_to_role
     {
 	$self->assign_role_to_role($this_role,$role_to_assign_id);
 	my $nested_role;
-	for my $neg_acl_name ($this_role->get_negative_own_acl_names)
+	for my $own_acl_name ($this_role->get_negative_own_acl_names,
+			      $this_role->get_positive_own_acl_names)
 	{
 	    $nested_role //= $DB->resultset('Role')->find({id => $role_to_assign_id});
-	    $self->unassign_acl_to_role($this_role,$neg_acl_name) 
-		 if $nested_role->is_allowed_to($neg_acl_name);
+	    $self->unassign_acl_to_role($this_role,$own_acl_name) 
+		if $nested_role->is_allowed_to($own_acl_name);
 	}
     }
 }
@@ -507,7 +507,8 @@ sub di_delete {
     my ($self, $request) = @_;
 
     $self->delete($request,conditions => [qw(di_no_vm_runtimes 
-                                          di_no_head_default_tags)]);
+                                             di_no_dependant_vms
+                                             di_no_head_default_tags)]);
 }
 
 sub vm_user_disconnect
@@ -623,6 +624,16 @@ sub di_no_vm_runtimes
     $di->vm_runtimes->count == 0;
 }
 
+
+sub di_no_dependant_vms
+{
+    my ($self,$di) = @_;
+    my $rs = $DB->resultset('VM')->search({'di.id' => $di->id }, 
+					  { join => [qw(di)] });
+    $rs->count ? return 0 : return 1;
+}
+
+
 sub di_no_head_default_tags
 {
     my ($self,$di) = @_;
@@ -638,6 +649,8 @@ sub di_no_head_default_tags
     }
     return 1;
 }
+
+
 
 ######################################
 ## GENERAL FUNCTIONS; WITHOUT REQUEST
