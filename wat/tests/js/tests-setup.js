@@ -59,8 +59,28 @@ WatTests.values = {
             "password": getRandomStr(),
             "tenant_id": 1
         },
-        vm: {},
-        host: {},
+        vm: {
+            "__properties__" : {
+                "prop1": getRandomStr(),
+                "prop2": getRandomStr(),
+                "propN": getRandomStr()
+            },
+            "blocked": getRandomStr() > 127 ? 1 : 0,
+            "name": getRandomStr(),
+            "user_id": 0,
+            "osf_id": 0,
+            "di_tag": 'default'
+        },
+        host: {
+            "__properties__" : {
+                "prop1": getRandomStr(),
+                "prop2": getRandomStr(),
+                "propN": getRandomStr()
+            },
+            "blocked": getRandomStr() > 127 ? 1 : 0,
+            "name": getRandomStr(),
+            "address": getRandomStr()
+        },
         osf: {
             "__properties__" : {
                 "prop1": getRandomStr(),

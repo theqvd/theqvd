@@ -1,4 +1,4 @@
-module( "Host fake tests", {
+module( "Hosts fake tests", {
     setup: function() {
         // prepare something for all following tests
         this.server = sinon.fakeServer.create();
@@ -57,4 +57,105 @@ module( "Host fake tests", {
         });
 
         deepEqual(callback.getCall(0).args[0], Wat.CurrentView.model, "Spied result and Backbone model should be equal");
+    });
+
+
+module( "Hosts Real tests", {
+    setup: function() {
+        // prepare something for all following tests
+    },
+    teardown: function() {
+        // clean up after each test
+    }
+});
+
+    QUnit.asyncTest("Host CRUD", function() {
+        // Number of Assertions we Expect
+        var assertions = 0;
+        assertions += Object.keys(WatTests.fakeValues.host).length * 2; // Create & Update verifications.
+        assertions +=3; // Create, Update and Delete verifications
+        
+        expect(assertions);
+        
+        Wat.Router.app_router.trigger('route:listHost');
+        
+        Wat.CurrentView.model = new Wat.Models.Host();
+        
+        //////////////////////////////////////////////////////////////////
+        // Create Host
+        //////////////////////////////////////////////////////////////////
+        Wat.CurrentView.createModel(WatTests.values.host, function (e) { 
+            if(e.retrievedData.status == 0) {
+                WatTests.values.host.id = e.retrievedData.result.rows[0].id;
+            }
+            equal(e.retrievedData.status, 0, "Host created succesfully (" + JSON.stringify(WatTests.values.host) + ")");
+            
+            //////////////////////////////////////////////////////////////////
+            // After create, get list of users matching by the created name
+            //////////////////////////////////////////////////////////////////
+            WatTests.models.host = new Wat.Models.Host({
+                id: WatTests.values.host.id
+            });            
+            
+            WatTests.models.host.fetch({      
+                complete: function () {
+                    $.each (WatTests.fakeValues.host, function (fieldName) {
+                        var valRetrieved = WatTests.models.host.attributes[fieldName];
+
+                        if (fieldName == 'properties' && WatTests.values.host['__properties__'] != undefined) {
+                            deepEqual(valRetrieved, WatTests.values.host['__properties__'], "Host field '" + fieldName + "' retrieved successfully and match with created value (" + JSON.stringify(valRetrieved) + ")");
+                        }
+                        else if (WatTests.values.host[fieldName] != undefined) {
+                            equal(valRetrieved, WatTests.values.host[fieldName], "Host field '" + fieldName + "' retrieved successfully and match with created value (" + valRetrieved + ")");
+                        }
+                        else {
+                            notEqual(WatTests.models.host.attributes[fieldName], undefined, "Host field '" + fieldName + "' retrieved successfully (" + valRetrieved + ")");
+                        }
+                    });
+                    
+                    // Perform changes in testing host values
+                    performUpdation(WatTests.values.host, WatTests.updateValues.host);
+                    
+                    //////////////////////////////////////////////////////////////////
+                    // After get list of hosts, update it
+                    //////////////////////////////////////////////////////////////////
+                    Wat.CurrentView.updateModel(WatTests.updateValues.host, {'id': WatTests.values.host.id}, function (e) { 
+                        equal(e.retrievedData.status, 0, "Host updated succesfully (" + JSON.stringify(WatTests.updateValues.host) + ")");
+                        
+                        //////////////////////////////////////////////////////////////////
+                        // After update, get list of hosts matching by name
+                        //////////////////////////////////////////////////////////////////
+                        WatTests.models.host.fetch({   
+                            complete: function (e) {
+                                WatTests.values.host.id = WatTests.models.host.attributes['id'];
+                                $.each (WatTests.fakeValues.host, function (fieldName) {
+                                    var valRetrieved = WatTests.models.host.attributes[fieldName];
+
+                                    if (fieldName == 'properties' && WatTests.values.host['__properties__'] != undefined) {
+                                        deepEqual(valRetrieved, WatTests.values.host['__properties__'], "Host field '" + fieldName + "' retrieved successfully and match with created value (" + JSON.stringify(valRetrieved) + ")");
+                                    }
+                                    else if (WatTests.values.host[fieldName] != undefined) {
+                                        equal(valRetrieved, WatTests.values.host[fieldName], "Host field '" + fieldName + "' retrieved successfully and match with created value (" + valRetrieved + ")");
+                                    }
+                                    else {
+                                        notEqual(WatTests.models.host.attributes[fieldName], undefined, "Host field '" + fieldName + "' retrieved successfully (" + valRetrieved + ")");
+                                    }
+                                });
+
+
+                                //////////////////////////////////////////////////////////////////
+                                // After match the updated user, delete it
+                                //////////////////////////////////////////////////////////////////
+                                Wat.CurrentView.deleteModel({'id': WatTests.values.host.id}, function (e) { 
+                                    equal(e.retrievedData.status, 0, "Host deleted succesfully (ID: " + JSON.stringify(WatTests.values.host.id) + ")");
+                                    
+                                    // Unblock task runner
+                                    start();
+                                }, Wat.CurrentView.model);
+                            }
+                        });
+                    }, Wat.CurrentView.model);
+                }
+            });
+        });
     });

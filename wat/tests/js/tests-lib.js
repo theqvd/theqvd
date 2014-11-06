@@ -8,10 +8,7 @@ function getRandomStr () {
 
 function performUpdation (values, updateValues) {
     $.each(updateValues, function (fieldName, fieldValue) {
-        if (fieldName != '__properties_changes__') {
-            values[fieldName] = fieldValue;
-        }
-        else {
+        if (fieldName == '__properties_changes__') {
             $.each(fieldValue.delete, function (i, propertyName) {
                 delete values['__properties__'][propertyName];
             });
@@ -19,6 +16,14 @@ function performUpdation (values, updateValues) {
             $.each(fieldValue.set, function (propertyName, propertyValue) {
                 values['__properties__'][propertyName] = propertyValue;
             });
+        }
+        else if (fieldName == '__tags_changes__') {
+            values['__tags__'] = _.difference(values['__tags__'], fieldValue.delete);
+            
+            values['__tags__'] = _.union(values['__tags__'], fieldValue.create);
+        }
+        else {
+            values[fieldName] = fieldValue;
         }
     });
 }
