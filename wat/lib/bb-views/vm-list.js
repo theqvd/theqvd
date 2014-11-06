@@ -111,20 +111,21 @@ Wat.Views.VMListView = Wat.Views.ListView.extend({
                 
         var context = $('.' + this.cid + '.editor-container');
 
-        var blocked = context.find('input[name="blocked"][value=1]').is(':checked');
         var user_id = context.find('[name="user_id"]').val();
         var osf_id = context.find('select[name="osf_id"]').val();
         
         var arguments = {
-            "__properties__" : properties.set,
-            "blocked": blocked ? 1 : 0,
             "user_id": user_id,
             "osf_id": osf_id
         };
         
+        if (!$.isEmptyObject(properties.set)) {
+            arguments["__properties__"] = properties.set;
+        }
+        
         var di_tag = context.find('select[name="di_tag"]').val();
         
-        if (di_tag) {
+        if (di_tag && Wat.C.checkACL('vm.create.di-tag')) {
             arguments.di_tag = di_tag;
         }
         
@@ -235,9 +236,11 @@ Wat.Views.VMListView = Wat.Views.ListView.extend({
         // Properties to create, update and delete obtained from parent view
         var properties = this.properties;
         
-        var arguments = {
-            '__properties_changes__' : properties
-        };
+        var arguments = {};
+        
+        if (properties.delete.length > 0 || !$.isEmptyObject(properties.set)) {
+            arguments["__properties_changes__"] = properties;
+        }
         
         var context = $('.' + this.cid + '.editor-container');
         
@@ -245,24 +248,25 @@ Wat.Views.VMListView = Wat.Views.ListView.extend({
         
         var filters = {"id": id};
         
-        if (di_tag != '') {
+        if (di_tag != '' && Wat.C.checkACL('vm.update-massive.di-tag')) {
             arguments["di_tag"] = di_tag;
         }
         
-        
-        // If expire is checked
-        if (context.find('input.js-expire').is(':checked')) {
-            var expiration_soft = context.find('input[name="expiration_soft"]').val();
-            var expiration_hard = context.find('input[name="expiration_hard"]').val();
-            
-            if (expiration_soft != undefined) {
-                arguments['expiration_soft'] = expiration_soft;
+        if (Wat.C.checkACL('vm.update-massive.expiration')) {
+            // If expire is checked
+            if (context.find('input.js-expire').is(':checked')) {
+                var expiration_soft = context.find('input[name="expiration_soft"]').val();
+                var expiration_hard = context.find('input[name="expiration_hard"]').val();
+
+                if (expiration_soft != undefined) {
+                    arguments['expiration_soft'] = expiration_soft;
+                }
+
+                if (expiration_hard != undefined) {
+                    arguments['expiration_hard'] = expiration_hard;
+                }
             }
-            
-            if (expiration_hard != undefined) {
-                arguments['expiration_hard'] = expiration_hard;
-            }
-        }        
+        }
         
         this.resetSelectedItems();
         

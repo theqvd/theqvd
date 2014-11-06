@@ -125,7 +125,7 @@
                                     <%
                                     if (model.get('state') == 'stopped') {
                                     %>
-                                        <i class="fa fa-stop" title="Stopped Virtual machine" data-i18n="[title]Stopped"></i>
+                                        <i class="fa fa-stop" title="<%= i18n.t('Stopped') %>" data-i18n="[title]Stopped"></i>
                                     <%
                                     }
                                     else if (model.get('state') == 'running'){
@@ -141,7 +141,7 @@
                                     
                                     if (model.get('user_state') == 'connected') {
                                     %>
-                                        <i class="fa fa-user ok" title="User connected" data-i18n="[title]Connected"></i>
+                                        <i class="fa fa-user ok" title="<%= i18n.t('Connected') %>" data-i18n="[title]Connected"></i>
                                     <%
                                     }
                                     

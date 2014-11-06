@@ -82,6 +82,10 @@ Wat.Views.RoleListView = Wat.Views.ListView.extend({
             "name": name,
             "tenant": tenant
         };
+        
+        // Go to first page and order by ID desc to got the last created element in first place
+        this.collection.sort = {"field": "id", "order": "-desc"};
+        $('div.pagination>.first').trigger('click');
                                 
         this.createModel(arguments, this.fetchList);
     },

@@ -32,9 +32,12 @@ Wat.Views.HostListView = Wat.Views.ListView.extend({
         var blocked = context.find('input[name="blocked"][value=1]').is(':checked');
         
         var arguments = {
-            "__properties__" : properties.set,
             "blocked": blocked ? 1 : 0
         };
+        
+        if (!$.isEmptyObject(properties.set)) {
+            arguments["__properties__"] = properties.set;
+        }
         
         var name = context.find('input[name="name"]').val();
         if (name) {

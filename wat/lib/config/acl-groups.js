@@ -82,6 +82,13 @@ Wat.C.aclGroups.vmMassiveActions = [
     'vm.update-massive.disconnect-user',
     'vm.update-massive.state'
 ];
+Wat.C.aclGroups.vmRemoteAdminDetails = [
+    'vm.see.host',
+    'vm.see.next-boot-ip',
+    'vm.see.port-ssh',
+    'vm.see.port-vnc',
+    'vm.see.port-serial',
+];
 
 // Massive actions include massive edit ACLs
 $.merge(Wat.C.aclGroups.vmMassiveActions, Wat.C.aclGroups.vmMassiveEdit);

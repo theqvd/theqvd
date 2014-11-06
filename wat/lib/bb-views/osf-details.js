@@ -61,12 +61,23 @@ Wat.Views.OSFDetailsView = Wat.Views.DetailsView.extend({
         var memory = context.find('input[name="memory"]').val();
         var user_storage = context.find('input[name="user_storage"]').val();
         
-        arguments = {
-            __properties_changes__: properties,
-            name: name,
-            memory: memory,
-            user_storage: user_storage
-        };
+        arguments = {};
+        
+        if (Wat.C.checkACL('osf.update.name')) {
+            arguments['name'] = name;
+        }        
+        
+        if (Wat.C.checkACL('osf.update.memory')) {
+            arguments['memory'] = memory;
+        }   
+        
+        if (Wat.C.checkACL('osf.update.user-storage')) {
+            arguments['user_storage'] = user_storage;
+        }
+        
+        if (properties.delete.length > 0 || !$.isEmptyObject(properties.set)) {
+            arguments["__properties_changes__"] = properties;
+        }
         
         var filters = {"id": this.id};
 

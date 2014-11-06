@@ -1432,7 +1432,10 @@ select[name="acl_positive_on_role"] option, .acls_positive {
     font-size: 15px; }
 
 .disabled-branch {
-  color: #aaa; }
+  color: #666; }
+
+select[name="role"] {
+  min-width: 200px; }
 
 .editor-container {
   margin: 0; }

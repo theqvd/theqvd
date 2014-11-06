@@ -265,10 +265,14 @@ Wat.Views.ViewsView = Wat.Views.MainView.extend({
         
         var objProperties = that.retrievedData.result.rows;
         
+        if (!objProperties) {
+            return;
+        }
+        
         // Add properties retrieved from QVD Objects
         var templatePropertiesColumns = $('.js-column-property-template');
         var templatePropertiesFilters = $('.js-filter-property-template');
-        
+
         $.each(objProperties, function (iProp, prop) {  
             // If any property doesnt exist in database configuration, we add it to the editor
             if (!that.currentColumns[prop]) {    

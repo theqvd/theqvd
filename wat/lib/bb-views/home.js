@@ -64,10 +64,11 @@ Wat.Views.HomeView = Wat.Views.MainView.extend({
         if (!stats) {
             return;
         }
-        var runningHostsData = [stats.Host.running, stats.Host.total - stats.Host.running];
+        
+        var runningHostsData = [stats.running_hosts_count, stats.hosts_count - stats.running_hosts_count];
         Wat.I.G.drawPieChart('running-hosts', runningHostsData);
         
-        var runningVMSData = [stats.VM.running, stats.VM.total - stats.VM.running];
+        var runningVMSData = [stats.running_vms_count, stats.vms_count - stats.running_vms_count];
         Wat.I.G.drawPieChart('running-vms', runningVMSData);
 
         if ($('#hosts-more-vms').html() != undefined) {
@@ -77,7 +78,7 @@ Wat.Views.HomeView = Wat.Views.MainView.extend({
                 if ($('#hosts-more-vms').css('width').indexOf("%") == -1) {
                 var hostsMoreVMSData = [];
 
-                $.each(stats.Host.population, function (iPop, population) {
+                $.each(stats.top_populated_hosts, function (iPop, population) {
                     hostsMoreVMSData.push(population);
                 });
 

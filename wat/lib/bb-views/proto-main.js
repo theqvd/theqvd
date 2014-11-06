@@ -138,7 +138,11 @@ Wat.Views.MainView = Backbone.View.extend({
             Wat.A.fillSelect(params);
             
             // Remove supertenant from tenant selector
-            $('select[name="tenant_id"] option[value="0"]').remove();
+            var existsInSupertenant = $.inArray(that.qvdObj, QVD_OBJS_EXIST_IN_SUPERTENANT) != -1;
+
+            if (!existsInSupertenant) {
+                $('select[name="tenant_id"] option[value="0"]').remove();
+            }
             
             Wat.I.chosenElement('[name="tenant_id"]', 'single100');
         }
@@ -177,6 +181,19 @@ Wat.Views.MainView = Backbone.View.extend({
         var deletedProps = [];
         var setProps = {};
         
+        switch(this.viewKind) {
+            case 'list':
+                var createPropertiesACL = this.qvdObj + '.update-massive.properties-create';
+                var updatePropertiesACL = this.qvdObj + '.update-massive.properties-update';
+                var deletePropertiesACL = this.qvdObj + '.update-massive.properties-delete';
+                break;
+            case 'details':
+                var createPropertiesACL = this.qvdObj + '.update.properties-create';
+                var updatePropertiesACL = this.qvdObj + '.update.properties-update';
+                var deletePropertiesACL = this.qvdObj + '.update.properties-delete';
+                break;    
+        }
+        
         for(i=0;i<propNames.length;i++) {
             var name = propNames.eq(i);
             var value = propValues.eq(i);
@@ -187,15 +204,19 @@ Wat.Views.MainView = Backbone.View.extend({
                         
             // If the element has not data-current attribute means that it's new
             // New properties with empty name will be ignored
-            if (name.val() !== '' && value.attr('data-current') === undefined) {
+            if (name.val() !== '' && value.attr('data-current') === undefined && Wat.C.checkACL(createPropertiesACL)) {
                 setProps[name.val()] = value.val();
             }
             else {
                 // If the value is different of the data-current attribute means that it's different
-                if (value.attr('data-current') != value.val()) {
+                if (value.attr('data-current') != value.val() && Wat.C.checkACL(updatePropertiesACL)) {
                     setProps[name.val()] = value.val();
                 }
             }
+        }
+        
+        if (!Wat.C.checkACL(deletePropertiesACL)) {
+            this.deleteProps = [];
         }
         
         this.properties = {

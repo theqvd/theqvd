@@ -7,6 +7,8 @@ Wat.Views.DetailsView = Wat.Views.MainView.extend({
     detailsTemplateName: '',
     detailsSideTemplateName: '',
     
+    viewKind: 'details',
+    
     /*
     ** params:
     **  id (numeric): Id of the element which details will be shown

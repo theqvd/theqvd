@@ -25,6 +25,23 @@ Wat.I.listFields[qvdObj] = {
         ],
         'text': 'Name',
         'fixed': true
+    },
+    'acls': {
+        'display': true,
+        'fields': [
+            'number_of_acls',
+            'acls'
+        ],
+        'acls': 'role.see.acl-list',
+        'text': 'ACLs',
+    },
+    'roles': {
+        'display': true,
+        'fields': [
+            'roles'
+        ],
+        'acls': 'role.see.acl-list-roles',
+        'text': 'Inherited roles',
     }
 };
 

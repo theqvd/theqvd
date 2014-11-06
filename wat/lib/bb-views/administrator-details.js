@@ -31,7 +31,6 @@ Wat.Views.AdminDetailsView = Wat.Views.DetailsView.extend({
     
     renderACLsTree: function (that) {
         var branchStats = that.retrievedData.result;
-
         // If acl list is not visible, we destroy div and increase the details layer to fill the gap
         if (!Wat.C.checkACL('administrator.see.acl-list')) { 
             $('.js-details-side').remove();
@@ -170,6 +169,10 @@ Wat.Views.AdminDetailsView = Wat.Views.DetailsView.extend({
     
     
     renderManagerRoles: function () {
+        if (!Wat.C.checkACL('administrator.see.roles')) { 
+            return;
+        }
+
         var inheritedRolesTemplate = Wat.A.getTemplate('details-administrator-roles');
         // Fill the html with the template and the model
         this.template = _.template(
@@ -178,7 +181,7 @@ Wat.Views.AdminDetailsView = Wat.Views.DetailsView.extend({
             }
         );
         $('.bb-admin-roles').html(this.template);
-
+        
         var params = {
             'action': 'role_tiny_list',
             'selectedId': '',
@@ -295,12 +298,16 @@ Wat.Views.AdminDetailsView = Wat.Views.DetailsView.extend({
         var filters = {"id": this.id};
         var arguments = {};
         
-        // If change password is checked
-        if (context.find('input.js-change-password').is(':checked')) {
-            var password = context.find('input[name="password"]').val();
-            var password2 = context.find('input[name="password2"]').val();
-            if (password && password2 && password == password2) {
-                arguments['password'] = password;
+        var context = $('.' + this.cid + '.editor-container');
+
+        if (Wat.C.checkACL('administrator.update.password')) {
+            // If change password is checked
+            if (context.find('input.js-change-password').is(':checked')) {
+                var password = context.find('input[name="password"]').val();
+                var password2 = context.find('input[name="password2"]').val();
+                if (password && password2 && password == password2) {
+                    arguments['password'] = password;
+                }
             }
         }
         

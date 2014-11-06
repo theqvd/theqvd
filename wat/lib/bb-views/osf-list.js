@@ -34,11 +34,21 @@ Wat.Views.OSFListView = Wat.Views.ListView.extend({
         var user_storage = context.find('input[name="user_storage"]').val();
         
         arguments = {
-            __properties__: properties.set,
             name: name,
-            memory: memory || 256,
-            user_storage: user_storage
+            memory: DEFAULT_OSF_MEMORY
         };
+        
+        if (memory && Wat.C.checkACL('osf.create.memory')) {
+            arguments['memory'] = memory;
+        }  
+        
+        if (Wat.C.checkACL('osf.create.user-storage')) {
+            arguments['user_storage'] = user_storage;
+        }
+        
+        if (!$.isEmptyObject(properties.set)) {
+            arguments["__properties__"] = properties.set;
+        }
         
         var name = context.find('input[name="name"]').val();
         if (name) {
@@ -63,9 +73,11 @@ Wat.Views.OSFListView = Wat.Views.ListView.extend({
         // Properties to create, update and delete obtained from parent view
         var properties = this.properties;
         
-        var arguments = {
-            '__properties_changes__' : properties
-        };
+        var arguments = {};
+        
+        if (properties.delete.length > 0 || !$.isEmptyObject(properties.set)) {
+            arguments["__properties_changes__"] = properties;
+        }
         
         var context = $('.' + this.cid + '.editor-container');
         
@@ -74,11 +86,11 @@ Wat.Views.OSFListView = Wat.Views.ListView.extend({
         
         var filters = {"id": id};
         
-        if (memory != '') {
+        if (memory != '' && Wat.C.checkACL('osf.update-massive.memory')) {
             arguments["memory"] = memory;
         }
         
-        if (user_storage != '') {
+        if (user_storage != '' && Wat.C.checkACL('osf.update-massive.user-storage')) {
             arguments["user_storage"] = user_storage;
         }
         

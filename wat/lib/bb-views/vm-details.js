@@ -45,29 +45,39 @@ Wat.Views.VMDetailsView = Wat.Views.DetailsView.extend({
         var di_tag = context.find('select[name="di_tag"]').val(); 
         
         var filters = {"id": this.id};
-        var arguments = {
-            "__properties_changes__": properties,
-            "name": name,
-            "di_tag": di_tag
-        };
+        var arguments = {};
         
-        // If expire is checked
-        if (context.find('input.js-expire').is(':checked')) {
-            var expiration_soft = context.find('input[name="expiration_soft"]').val();
-            var expiration_hard = context.find('input[name="expiration_hard"]').val();
-            
-            if (expiration_soft != undefined) {
-                arguments['expiration_soft'] = expiration_soft;
-            }
-            
-            if (expiration_hard != undefined) {
-                arguments['expiration_hard'] = expiration_hard;
-            }
+        if (Wat.C.checkACL('vm.update.name')) {
+            arguments['name'] = name;
+        }     
+        
+        if (Wat.C.checkACL('vm.update.di-tag')) {
+            arguments['di_tag'] = di_tag;
         }
-        else {
-            // Delete the expiration if exist
-            arguments['expiration_soft'] = '';
-            arguments['expiration_hard'] = '';
+        
+        if (properties.delete.length > 0 || !$.isEmptyObject(properties.set)) {
+            arguments["__properties_changes__"] = properties;
+        }
+        
+        if (Wat.C.checkACL('vm.update.expiration')) {
+            // If expire is checked
+            if (context.find('input.js-expire').is(':checked')) {
+                var expiration_soft = context.find('input[name="expiration_soft"]').val();
+                var expiration_hard = context.find('input[name="expiration_hard"]').val();
+
+                if (expiration_soft != undefined) {
+                    arguments['expiration_soft'] = expiration_soft;
+                }
+
+                if (expiration_hard != undefined) {
+                    arguments['expiration_hard'] = expiration_hard;
+                }
+            }
+            else {
+                // Delete the expiration if exist
+                arguments['expiration_soft'] = '';
+                arguments['expiration_hard'] = '';
+            }
         }
                 
         this.updateModel(arguments, filters, this.fetchDetails);

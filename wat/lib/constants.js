@@ -23,5 +23,8 @@ QVD_OBJS_WITH_PROPERTIES = ['user', 'vm', 'host', 'osf', 'di'];
 QVD_OBJS_CLASSIFIED_BY_TENANT = ['user', 'vm', 'osf', 'di', 'administrator'];
 QVD_OBJS_EXIST_IN_SUPERTENANT = ['role', 'administrator'];
 
+// Default values
+DEFAULT_OSF_MEMORY = 256;
+
 // Html pieces
 HTML_MINI_LOADING = '<div class="mini-loading"><i class="fa fa-gear fa-spin"></i></div>';

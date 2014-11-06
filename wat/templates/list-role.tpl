@@ -33,6 +33,20 @@
                             </th>
             <%
                             break;
+                        case 'acls':
+            %>
+                            <th>
+                                <i data-i18n="ACLs"><%= i18n.t('ACLs') %></i>
+                            </th>
+            <%
+                            break;
+                        case 'roles':
+            %>
+                            <th>
+                                <i data-i18n="Inherited roles"><%= i18n.t('Inherited roles') %></i>
+                            </th>
+            <%
+                            break;
                     }
                 });
             %>
@@ -91,6 +105,20 @@
                                     <div class="mobile info-in-name-cell">
                                         <%= info %>
                                     </div>
+                                </td>
+                <%
+                                break;
+                            case 'acls':
+                %>
+                                <td class="desktop">
+                                    <%= model.get('number_of_acls') + model.get('acls').positive.length %>
+                                </td>
+                <%
+                                break;
+                            case 'roles':
+                %>
+                                <td class="desktop">
+                                    <%= Object.keys(model.get('roles')).length %>
                                 </td>
                 <%
                                 break;

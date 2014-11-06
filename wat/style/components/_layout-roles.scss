@@ -170,5 +170,9 @@ select[name="acl_positive_on_role"] option, .acls_positive {
 }
 
 .disabled-branch {
-    color: #aaa;
+    color: #666;
+}
+
+select[name="role"] { 
+    min-width: 200px;
 }

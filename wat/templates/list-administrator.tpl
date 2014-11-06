@@ -19,6 +19,13 @@
                             </th>
             <%
                             break;
+                        case 'info':
+            %>
+                            <th class="max-1-icons">
+                                <i class="fa fa-info-circle normal" data-i18n="[title]Info" title="<%= i18n.t('Info') %>"></i>
+                            </th>
+            <%
+                            break;
                         case 'id':
             %>
                             <th class="sortable desktop col-width-8" data-sortby="id">
@@ -77,6 +84,28 @@
                 %>
                                 <td>
                                     <input type="checkbox" class="check-it js-check-it" data-id="<%= model.get('id') %>" <%= checkedAttr %>>
+                                </td>
+                <%
+                                break;
+                            case 'info':
+                %>
+                                <td>
+                                    <%
+                                    if (Object.keys(model.get('roles')).length == 0) {
+                                    %>
+                                        <i class="fa fa-warning warning" title="<%= i18n.t('No assigned roles') %>" data-i18n="[title]No assigned roles"></i>
+                                    <%
+                                    }
+                                    else {
+                                        var roles = [];
+                                        $.each(model.get('roles'), function (iRole, role) {
+                                            roles.push(role);
+                                        });
+                                    %>
+                                        <i class="fa fa-graduation-cap" title="&raquo; <%= roles.join(',').replace(/,/g,'<br /><br />&raquo; ') %>"></i>
+                                    <%
+                                    }
+                                    %>
                                 </td>
                 <%
                                 break;

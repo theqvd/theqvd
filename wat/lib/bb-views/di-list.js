@@ -81,10 +81,13 @@ Wat.Views.DIListView = Wat.Views.ListView.extend({
         var osf_id = context.find('select[name="osf_id"]').val();
         
         var arguments = {
-            "__properties__" : properties.set,
             "blocked": blocked ? 1 : 0,
             "osf_id": osf_id
         };
+        
+        if (!$.isEmptyObject(properties.set)) {
+            arguments["__properties__"] = properties.set;
+        }
         
         var disk_image = context.find('input[name="disk_image"]').val();
         if (disk_image) {
@@ -92,19 +95,21 @@ Wat.Views.DIListView = Wat.Views.ListView.extend({
         }   
         
         var version = context.find('input[name="version"]').val();
-        if (version) {
+        if (version && Wat.C.checkACL('di.create.version')) {
             arguments["version"] = version;
         }
         
         var tags = context.find('input[name="tags"]').val();
+        tags = tags && Wat.C.checkACL('di.create.tags') ? tags.split(',') : [];
+        
         var def = context.find('input[name="default"][value=1]').is(':checked');
         
         // If we set default add this tag
-        if (def) {
-            tags += ',default';
+        if (def && Wat.C.checkACL('di.create.default')) {
+            tags.push('default');
         }
         
-        arguments['__tags__'] = tags ? tags.split(',') : [];
+        arguments['__tags__'] = tags;
              
         if (Wat.C.isSuperadmin) {
             var tenant_id = context.find('select[name="tenant_id"]').val();

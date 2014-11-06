@@ -17,6 +17,8 @@ Wat.Views.ListView = Wat.Views.MainView.extend({
     massiveEditorTemplateName: '',
     customCollection: false,
     
+    viewKind: 'list',
+    
     /*
     ** params:
     **  whatRender (string): What part of view render (all/list). Default 'all'
@@ -310,7 +312,7 @@ Wat.Views.ListView = Wat.Views.MainView.extend({
         // The superadmin have an extra filter: tenant
         
         // Every element but the hosts has tenant
-        var classifiedByTenant = $.inArray(this.collection.actionPrefix, QVD_OBJS_CLASSIFIED_BY_TENANT) != -1;
+        var classifiedByTenant = $.inArray(this.qvdObj, QVD_OBJS_CLASSIFIED_BY_TENANT) != -1;
         if (Wat.C.isSuperadmin() && classifiedByTenant) {
             var tenantFilter = { tenant: 
                                     {
@@ -666,13 +668,21 @@ Wat.Views.ListView = Wat.Views.MainView.extend({
     fillMassiveEditor: function (target) {
         var that = Wat.CurrentView;
 
+        var enabledProperties = $.inArray(that.qvdObj, QVD_OBJS_WITH_PROPERTIES) != -1;
+        var enabledCreateProperties = true;
+        var enabledUpdateProperties = false;
+        var enabledDeleteProperties = false;
+        
         // Add common parts of editor to dialog
         that.template = _.template(
                     that.templateEditorCommon, {
                         classifiedByTenant: 0,
                         editorMode: 'massive_edit',
                         isSuperadmin: Wat.C.isSuperadmin(), 
-                        enabledProperties: 1, 
+                        enabledProperties: enabledProperties, 
+                        enabledCreateProperties: enabledCreateProperties,
+                        enabledUpdateProperties: enabledUpdateProperties,
+                        enabledDeleteProperties: enabledDeleteProperties,
                         blocked: undefined,
                         properties: [],
                         cid: that.cid
@@ -834,14 +844,15 @@ Wat.Views.ListView = Wat.Views.MainView.extend({
         // Properties to create, update and delete obtained from parent view
         var properties = this.properties;
         
-        var arguments = {
-            '__properties_changes__' : properties
-        };
-                
+        var arguments = {};
+        
+        if (properties.delete.length > 0 || !$.isEmptyObject(properties.set)) {
+            arguments['__properties_changes__'] = properties;
+        }
+        
         var filters = {"id": id};
 
         this.resetSelectedItems();
-
         
         var auxModel = {};
         
@@ -862,6 +873,7 @@ Wat.Views.ListView = Wat.Views.MainView.extend({
                 auxModel = new Wat.Models.DI();
                 break;
         }
+        
         this.updateModel(arguments, filters, this.fetchList, auxModel);
     },
 });

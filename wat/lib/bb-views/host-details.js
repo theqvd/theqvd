@@ -42,10 +42,17 @@ Wat.Views.HostDetailsView = Wat.Views.DetailsView.extend({
         var address = context.find('input[name="address"]').val();
         
         var filters = {"id": this.id};
-        var arguments = {
-            "__properties_changes__": properties,
-            "name": name,
-            "address": address
+        var arguments = {};
+        
+        if (Wat.C.checkACL('host.update.name')) {
+            arguments['name'] = name;
+        }        
+        if (Wat.C.checkACL('host.update.address')) {
+            arguments['address'] = address;
+        }
+
+        if (properties.delete.length > 0 || !$.isEmptyObject(properties.set)) {
+            arguments["__properties_changes__"] = properties;
         }
 
         this.updateModel(arguments, filters, this.fetchDetails);

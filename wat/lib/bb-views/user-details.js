@@ -40,16 +40,20 @@ Wat.Views.UserDetailsView = Wat.Views.DetailsView.extend({
         var context = $('.' + this.cid + '.editor-container');
                         
         var filters = {"id": this.id};
-        var arguments = {
-            "__properties_changes__": properties
+        var arguments = {};
+        
+        if (properties.delete.length > 0 || !$.isEmptyObject(properties.set)) {
+            arguments["__properties_changes__"] = properties;
         }
         
-        // If change password is checked
-        if (context.find('input.js-change-password').is(':checked')) {
-            var password = context.find('input[name="password"]').val();
-            var password2 = context.find('input[name="password2"]').val();
-            if (password && password2 && password == password2) {
-                arguments['password'] = password;
+        if (Wat.C.checkACL('user.update.password')) {
+            // If change password is checked
+            if (context.find('input.js-change-password').is(':checked')) {
+                var password = context.find('input[name="password"]').val();
+                var password2 = context.find('input[name="password2"]').val();
+                if (password && password2 && password == password2) {
+                    arguments['password'] = password;
+                }
             }
         }
         

@@ -17,7 +17,6 @@
         </div>
         <% } %>
 
-
         <div class="home-cell">
             <div class="home-title" data-i18n>Summary</div>
             <table class="summary-table">
@@ -32,7 +31,7 @@
                         <%= Wat.C.ifACL('</a>', 'user.see-main.') %>
                     </td>
                     <td>
-                        <span class="summary-data js-summary-users"><%= stats.User.total %></span>
+                        <span class="summary-data js-summary-users"><%= stats.users_count %></span>
                     </td>
                 </tr>
                 <% } if (Wat.C.checkACL('vm.stats.summary')) { %>
@@ -46,7 +45,7 @@
                         <%= Wat.C.ifACL('</a>', 'vm.see-main.') %>
                     </td>
                     <td>
-                        <span class="summary-data js-summary-vms"><%= stats.VM.total %></span>
+                        <span class="summary-data js-summary-vms"><%= stats.vms_count %></span>
                     </td>
                 </tr>
                 <% } if (Wat.C.checkACL('host.stats.summary')) { %>
@@ -60,7 +59,7 @@
                         <%= Wat.C.ifACL('</a>', 'host.see-main.') %>
                     </td>
                     <td>
-                        <span class="summary-data js-summary-hosts"><%= stats.Host.total %></span>
+                        <span class="summary-data js-summary-hosts"><%= stats.hosts_count %></span>
                     </td>
                 </tr>
                 <% } if (Wat.C.checkACL('osf.stats.summary')) { %>
@@ -74,7 +73,7 @@
                         <%= Wat.C.ifACL('</a>', 'osf.see-main.') %>
                     </td>
                     <td>
-                        <span class="summary-data js-summary-osfs"><%= stats.OSF.total %></span>
+                        <span class="summary-data js-summary-osfs"><%= stats.osfs_count %></span>
                     </td>
                 </tr>
                 <% } if (Wat.C.checkACL('di.stats.summary')) { %>
@@ -88,7 +87,7 @@
                         <%= Wat.C.ifACL('</a>', 'di.see.') %>
                     </td>
                     <td>
-                        <span class="summary-data js-summary-dis"><%= stats.DI.total %></span>
+                        <span class="summary-data js-summary-dis"><%= stats.dis_count %></span>
                     </td>
                 </tr>
                 <% } %>
@@ -117,7 +116,7 @@
         <div class="home-cell">
             <div class="home-title" data-i18n>VMs close to expire</div>
             <%
-                if (stats.VM.expiration.length == 0) {
+                if (stats.vms_with_expiration_date.length == 0) {
             %>
                 <div class="no-elements" data-18n>There are not VMS close to expire</div>
             <%
@@ -125,8 +124,9 @@
                 else {
             %>
                     <table class="summary-table">
+
                     <% 
-                        $.each(stats.VM.expiration, function (iExp, exp) {
+                        $.each(stats.vms_with_expiration_date, function (iExp, exp) {
                             var priorityClass = '';
                             var remainingTime = '';
                             var remainingTimeAttr = '';
@@ -185,7 +185,7 @@
                         <%= Wat.C.ifACL('</a>', 'user.see.') %>
                     </td>
                     <td>
-                        <span class="summary-data js-summary-blocked-users"><%= stats.User.blocked %></span>
+                        <span class="summary-data js-summary-blocked-users"><%= stats.blocked_users_count %></span>
                     </td>
                 </tr>
                 <% } if (Wat.C.checkACL('vm.stats.blocked')) { %>
@@ -199,7 +199,7 @@
                         <%= Wat.C.ifACL('</a>', 'vm.see.') %>
                     </td>
                     <td>
-                        <span class="summary-data js-summary-blocked-vms"><%= stats.VM.blocked %></span>
+                        <span class="summary-data js-summary-blocked-vms"><%= stats.blocked_vms_count %></span>
                     </td>
                 </tr>
                 <% } if (Wat.C.checkACL('host.stats.blocked')) { %>
@@ -213,7 +213,7 @@
                         <%= Wat.C.ifACL('</a>', 'host.see.') %>
                     </td>
                     <td>
-                        <span class="summary-data js-summary-blocked-hosts"><%= stats.Host.blocked %></span>
+                        <span class="summary-data js-summary-blocked-hosts"><%= stats.blocked_hosts_count %></span>
                     </td>
                 </tr>
                 <% } if (Wat.C.checkACL('di.stats.blocked')) { %>
@@ -227,7 +227,7 @@
                         <%= Wat.C.ifACL('</a>', 'di.see.') %>
                     </td>
                     <td>
-                        <span class="summary-data js-summary-blocked-dis"><%= stats.DI.blocked %></span>
+                        <span class="summary-data js-summary-blocked-dis"><%= stats.blocked_dis_count %></span>
                     </td>
                 </tr>
                 <% } %>

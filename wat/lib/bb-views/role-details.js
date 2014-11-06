@@ -454,9 +454,11 @@ Wat.Views.RoleDetailsView = Wat.Views.DetailsView.extend({
         var name = context.find('input[name="name"]').val();
         
         var filters = {"id": this.id};
-        var arguments = {
-            "name": name
-        };
+        var arguments = {};
+        
+        if (Wat.C.checkACL('role.update.name')) {
+            arguments['name'] = name;
+        }
         
         this.updateModel(arguments, filters, this.fetchDetails);
     },

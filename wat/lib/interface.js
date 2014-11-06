@@ -591,6 +591,9 @@ Wat.I = {
                 
                 // Translate dialog strings
                     Wat.T.translateElement($(this).find('[data-i18n]'));
+                
+                // Focus on first text input
+                    $(this).find('input[type="text"]').eq(0).trigger('focus');
             },
             
             close: function () {
@@ -628,7 +631,7 @@ Wat.I = {
         // Success and info messages will be hidden automatically
         if (msg.messageType != 'error' && msg.messageType != 'warning') {
             this.messageTimeout = setTimeout(function() { 
-                $('.message-close').trigger('click');
+                Wat.I.closeMessage();
             },3000);
         }
     },

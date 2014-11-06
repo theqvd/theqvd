@@ -10,6 +10,14 @@ Wat.I.listFields[qvdObj] = {
         'text': '',
         'fixed': true
     },
+    'info': {
+        'text': 'Info',
+        'fields': [
+            'roles'
+        ],
+        'acls': 'administrator.see.roles',
+        'display': true
+    },
     'id': {
         'display': false,
         'fields': [

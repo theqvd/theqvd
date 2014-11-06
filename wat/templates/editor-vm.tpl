@@ -1,10 +1,12 @@
 <table>
+    <% if (Wat.C.checkACL('vm.update.name')) { %>
     <tr>
         <td data-i18n>Name</td>
         <td>
             <input type="text" class="" name="name" value="<%= model.get('name') %>" data-required>
         </td>
     </tr>
+    <% } %>
     <tr>
         <td data-i18n>OS Flavour</td>
         <td>
