@@ -122,7 +122,7 @@ my $ACLS_FOR_FIELDS =
 	    di_version => [qr/^vm\.see\.di-version$/],
 	    di_name => [qr/^vm\.see\.di$/],
 	    di_id => [qr/^vm\.see\.di$/],
-	    properties => [qr/^vm-see-properties$/] },
+	    properties => [qr/^vm\.see\.properties$/] },
  
    Administrator => { roles => [qr/^administrator\.see\.roles$/],
 		       id => [qr/^administrator\.see\.id$/] },

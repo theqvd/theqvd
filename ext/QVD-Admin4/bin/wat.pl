@@ -1,9 +1,9 @@
 #!/usr/lib/qvd/bin/perl
 use Mojolicious::Lite;
-use lib::glob '/home/qindel/WAT/*/lib/';
+use lib::glob '/home/benjamin/wat/*/lib/';
 use QVD::Admin4::REST;
 use Mojo::JSON qw(decode_json encode_json);
-use QVD::Admin4::REST::Response;
+use QVD::Admin4::Exception;
 use QVD::DB;
 use MojoX::Session;
 
@@ -63,7 +63,7 @@ under sub {
 	else
 	{
 	    $c->render(json => 
-		       QVD::Admin4::REST::Response->new(status => 3)->json);
+		       QVD::Admin4::Exception->new(code =>23)->json);
 	    return 0;
 	}
     }
@@ -73,7 +73,7 @@ under sub {
 	{  
 	    $session->flush; 
 	    $c->render(json => 
-		       QVD::Admin4::REST::Response->new(status => 29)->json);
+		       QVD::Admin4::Exception->new(code => 24)->json);
 	    return 0;
 	}
 	else
@@ -88,7 +88,7 @@ under sub {
             if ($@)
             {
                 $c->render(json =>
-                           QVD::Admin4::REST::Response->new(status => 39)->json);
+                           QVD::Admin4::Exception->new(code => 25)->json);
                 return 0;
             }
 
@@ -99,7 +99,7 @@ under sub {
     else 
     {
 	$c->render(json => 
-		   QVD::Admin4::REST::Response->new(status => 29)->json);
+		   QVD::Admin4::Exception->new(code => 22)->json);
 	return 0;
     }
 };
@@ -120,7 +120,7 @@ any '/' => sub {
     
     print $@ if $@;
     my $response = ($@ ? 
-		    QVD::Admin4::REST::Response->new(status => 15)->json  :
+		    QVD::Admin4::Exception->new(code => 31)->json  :
 		    $c->qvd_admin4_api->process_query($json));
 
     $response->{sid} = $c->res->headers->header('sid');

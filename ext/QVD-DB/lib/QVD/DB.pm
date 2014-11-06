@@ -7,7 +7,7 @@ use strict;
 
 use Carp;
 use DBIx::Class::Exception;
-
+use DBIx::Error;
 use Socket qw(IPPROTO_TCP SOL_SOCKET SO_KEEPALIVE);
 use Socket::Linux qw(TCP_KEEPIDLE TCP_KEEPINTVL TCP_KEEPCNT);
 
@@ -35,6 +35,9 @@ sub new {
     $class->SUPER::connect("dbi:Pg:dbname=$db_name;host=$db_host;connect_timeout=$db_connect_timeout",
 			   $db_user, $db_passwd,
                            { RaiseError => 1,
+			     HandleError => DBIx::Error->HandleError,
+			     ShowErrorStatement => 1,
+			     unsafe => 1,
 			     AutoCommit => 1,
                              quote_char => '"',
 			     name_sep   => '.',

@@ -104,12 +104,16 @@ sub dependencies
 sub set_filter
 {
     my ($self,$key,$val) = @_;
+    $val = undef if defined $val && $val eq '';
+    $key = undef if defined $key && $key eq '';
     $self->filters->{$key} = $val;
 }
 
 sub set_nested_query
 {
     my ($self,$nq,$val) = @_;
+    $val = undef if defined $val && $val eq '';
+    $nq = undef if defined $nq && $nq eq '';
     $self->nested_queries->{$nq} = $val;
 }
 
@@ -122,6 +126,8 @@ sub add_to_related_views
 sub set_argument
 {
     my ($self,$key,$val) = @_;
+    $val = undef if defined $val && $val eq '';
+    $key = undef if defined $key && $key eq '';
     $self->arguments->{$key} = $val;
 }
 
