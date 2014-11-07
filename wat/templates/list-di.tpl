@@ -127,25 +127,25 @@
                 %>
                                 <td class="desktop">
                                     <%
-                                    if (model.get('tags')) {
+                                    if (model.get('tags') && (!infoRestrictions || infoRestrictions.tags)) {
                                     %>
                                         <i class="fa fa-tags" title="&raquo; <%= model.get('tags').replace(/,/g,'<br /><br />&raquo; ') %>"></i>
                                     <%
                                     }
                                     
-                                    if (model.get('head')) {
+                                    if (model.get('head') && (!infoRestrictions || infoRestrictions.head)) {
                                     %>
                                         <i class="fa fa-flag-o" data-i18n="[title]Head" title="<%= i18n.t('Head') %>"></i>
                                     <%
                                     }
                                     
-                                    if (model.get('default')) {
+                                    if (model.get('default') && (!infoRestrictions || infoRestrictions.default)) {
                                     %>
                                         <i class="fa fa-home" data-i18n="[title]Default" title="<%= i18n.t('Default') %>"></i>
                                     <%
                                     }
                                     
-                                    if (model.get('blocked')) {
+                                    if (model.get('blocked') && (!infoRestrictions || infoRestrictions.block)) {
                                     %>
                                         <i class="fa fa-lock" data-i18n="[title]Blocked" title="<%= i18n.t('Blocked') %>"></i>
                                     <%

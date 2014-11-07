@@ -3,7 +3,7 @@ Wat.Views.DIListView = Wat.Views.ListView.extend({
 
     initialize: function (params) {
         this.collection = new Wat.Collections.DIs(params);
-        
+
         Wat.Views.ListView.prototype.initialize.apply(this, [params]);
     },
     

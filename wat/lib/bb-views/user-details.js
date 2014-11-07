@@ -17,7 +17,27 @@ Wat.Views.UserDetailsView = Wat.Views.DetailsView.extend({
         var params = {};
         params.whatRender = 'list';
         params.listContainer = sideContainer;
-        params.forceListColumns = {info: true, name: true};
+        params.forceListColumns = {name: true};
+        
+        if (Wat.C.checkGroupACL('userVmEmbeddedInfo')) {
+            params.forceListColumns['info'] = true;
+        }
+
+        // Check ACLs to show or not info icons in Users list
+        params.forceInfoRestrictions = {};
+        if (Wat.C.checkACL('user.see.vm-list-block')) {
+            params.forceInfoRestrictions.block = true;
+        }
+        if (Wat.C.checkACL('user.see.vm-list-expiration')) {
+            params.forceInfoRestrictions.expiration = true;
+        }
+        if (Wat.C.checkACL('user.see.vm-list-state')) {
+            params.forceInfoRestrictions.state = true;
+        }
+        if (Wat.C.checkACL('user.see.vm-list-user-state')) {
+            params.forceInfoRestrictions.user_state = true;
+        }
+        
         params.forceSelectedActions = {};
         params.block = 5;
         params.filters = {"user_id": this.elementId};

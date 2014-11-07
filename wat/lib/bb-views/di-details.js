@@ -18,6 +18,26 @@ Wat.Views.DIDetailsView = Wat.Views.DetailsView.extend({
         params.whatRender = 'list';
         params.listContainer = sideContainer;
         params.forceListColumns = {name: true, tag: true};
+        
+        if (Wat.C.checkGroupACL('diVmEmbeddedInfo')) {
+            params.forceListColumns['info'] = true;
+        }
+
+        // Check ACLs to show or not info icons in DIs list
+        params.forceInfoRestrictions = {};
+        if (Wat.C.checkACL('di.see.vm-list-block')) {
+            params.forceInfoRestrictions.block = true;
+        }
+        if (Wat.C.checkACL('di.see.vm-list-expiration')) {
+            params.forceInfoRestrictions.expiration = true;
+        }
+        if (Wat.C.checkACL('di.see.vm-list-state')) {
+            params.forceInfoRestrictions.state = true;
+        }
+        if (Wat.C.checkACL('di.see.vm-list-user-state')) {
+            params.forceInfoRestrictions.user_state = true;
+        }
+        
         params.forceSelectedActions = {};
         params.forceListActionButton = null;
         params.block = 5;

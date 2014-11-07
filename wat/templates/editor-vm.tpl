@@ -8,12 +8,6 @@
     </tr>
     <% } %>
     <tr>
-        <td data-i18n>OS Flavour</td>
-        <td>
-            <%= model.get('osf_name') %>
-        </td>
-    </tr>
-    <tr>
         <td data-i18n>Image tag</td>
         <td>
             <select class="" name="di_tag"></select>

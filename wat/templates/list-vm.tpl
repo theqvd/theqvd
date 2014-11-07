@@ -123,35 +123,43 @@
                 %>
                                 <td>
                                     <%
-                                    if (model.get('state') == 'stopped') {
+                                    if (!infoRestrictions || infoRestrictions.state) {
                                     %>
-                                        <i class="fa fa-stop" title="<%= i18n.t('Stopped') %>" data-i18n="[title]Stopped"></i>
+                                        <%
+                                        if (model.get('state') == 'stopped') {
+                                        %>
+                                            <i class="fa fa-stop" title="<%= i18n.t('Stopped') %>" data-i18n="[title]Stopped"></i>
+                                        <%
+                                        }
+                                        else if (model.get('state') == 'running'){
+                                        %>
+                                            <i class="fa fa-play" data-i18n="[title]Running" title="<%= i18n.t('Running') %>"></i>
+                                        <%
+                                        }
+                                        else {
+                                        %>
+                                            <i class="fa fa-spinner fa-spin" title="<%= model.get('state') %>"></i>
+                                        <%
+                                        }
+                                        %>
                                     <%
                                     }
-                                    else if (model.get('state') == 'running'){
                                     %>
-                                        <i class="fa fa-play" data-i18n="[title]Running" title="<%= i18n.t('Running') %>"></i>
-                                    <%
-                                    }
-                                    else {
-                                    %>
-                                        <i class="fa fa-spinner fa-spin" title="<%= model.get('state') %>"></i>
-                                    <%
-                                    }
                                     
-                                    if (model.get('user_state') == 'connected') {
+                                    <%
+                                    if (model.get('user_state') == 'connected' && (!infoRestrictions || infoRestrictions.user_state)) {
                                     %>
                                         <i class="fa fa-user ok" title="<%= i18n.t('Connected') %>" data-i18n="[title]Connected"></i>
                                     <%
                                     }
                                     
-                                    if (model.get('blocked')) {
+                                    if (model.get('blocked') && (!infoRestrictions || infoRestrictions.block)) {
                                     %>
                                         <i class="fa fa-lock" data-i18n="[title]Blocked" title="<%= i18n.t('Blocked') %>"></i>
                                     <%
                                     }
                                     
-                                    if (model.get('expiration_soft') || model.get('expiration_hard')) {
+                                    if ((model.get('expiration_soft') || model.get('expiration_hard')) && (!infoRestrictions || infoRestrictions.expiration)) {
                                     %>
                                         <i class="fa fa-clock-o icon-info" data-i18n="[title]This virtual machine will expire" title="<%= i18n.t('This virtual machine will expire') %>"></i>
                                     <%

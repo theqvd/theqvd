@@ -16,6 +16,7 @@ Wat.Views.ListView = Wat.Views.MainView.extend({
     editorTemplateName: '',
     massiveEditorTemplateName: '',
     customCollection: false,
+    infoRestrictions: false,
     
     viewKind: 'list',
     
@@ -80,6 +81,9 @@ Wat.Views.ListView = Wat.Views.MainView.extend({
             this.listBlockContainer = params.listContainer;
             this.listContainer = this.listBlockContainer + ' ' + this.listContainer;
         }                  
+        if (params.forceInfoRestrictions !== undefined) {
+            this.infoRestrictions = params.forceInfoRestrictions;
+        }
         if (params.forceListActionButton !== undefined) {
             this.listActionButton = params.forceListActionButton;
         }            
@@ -341,7 +345,7 @@ Wat.Views.ListView = Wat.Views.MainView.extend({
     setColumns: function () {
         // Get Columns from configuration
         this.columns = Wat.I.getListColumns(this.qvdObj);
-        
+                
         // Check acls on columns to remove forbidden ones
         Wat.C.purgeConfigData(this.columns);
         
@@ -478,7 +482,8 @@ Wat.Views.ListView = Wat.Views.MainView.extend({
                 filters: this.collection.filters,
                 columns: this.columns,
                 selectedItems: this.selectedItems,
-                selectedAll: this.selectedAll
+                selectedAll: this.selectedAll,
+                infoRestrictions: this.infoRestrictions
             }
         );
         
