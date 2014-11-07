@@ -171,7 +171,7 @@ sub forze_filtering_by_tenant
     return unless $self->qvd_object_model->available_filter('tenant_id');
     if ($self->json_wrapper->has_filter('tenant_id'))
     {
-	QVD::Admin4::Exception->throw(code => 9) 
+	QVD::Admin4::Exception->throw(code => 32, object => 'tenant_id') 
 	    unless $ADMIN->is_superadmin;
     }
     else
@@ -204,7 +204,7 @@ sub switch_custom_properties_json2request
 	next unless $self->json_wrapper->has_filter($property_key);
 
 	$admin->re_is_allowed_to($self->qvd_object_model->get_acls_for_filter('properties')) # PROVISIONAL
-	    || QVD::Admin4::Exception->throw(code => 34);
+	    || QVD::Admin4::Exception->throw(code => 271, object => 'properties');
 
 	$found_properties++;
 	my $property_value = $self->json_wrapper->get_filter_value($property_key);
@@ -223,17 +223,17 @@ sub check_filters_validity_in_json
     my $self = shift;
 
     $self->qvd_object_model->available_filter($_) || 
-	QVD::Admin4::Exception->throw(code => 9)
+	QVD::Admin4::Exception->throw(code => 32, object => $_)
 	for $self->json_wrapper->filters_list;
 
     my $admin = $self->qvd_object_model->current_qvd_administrator;
 
     $admin->re_is_allowed_to($self->qvd_object_model->get_acls_for_filter($_)) || 
-	QVD::Admin4::Exception->throw(code => 34)
+	QVD::Admin4::Exception->throw(code => 271, object => $_)
 	for $self->json_wrapper->filters_list;
 
     $self->json_wrapper->has_filter($_) ||
-	QVD::Admin4::Exception->throw(code => 10)
+	QVD::Admin4::Exception->throw(code => 33, object => $_)
 	for $self->qvd_object_model->mandatory_filters;
 }
 
@@ -245,7 +245,7 @@ sub check_acls_for_deleting
 
     my $admin = $self->qvd_object_model->current_qvd_administrator;
     $admin->re_is_allowed_to($self->qvd_object_model->get_acls_for_delete_massive) 
-	|| QVD::Admin4::Exception->throw(code => 35);
+	|| QVD::Admin4::Exception->throw(code => 273);
 }
 
 
@@ -255,16 +255,16 @@ sub check_update_arguments_validity_in_json
     my $admin = $self->qvd_object_model->current_qvd_administrator;
 
     $self->qvd_object_model->available_argument($_) || 
-	QVD::Admin4::Exception->throw(code => 12)
+	QVD::Admin4::Exception->throw(code => 34, object => $_)
 	for $self->json_wrapper->arguments_list;
 
     my $id = $self->json_wrapper->get_filter_value('id');
-    my $method = ref($id) && scalar @$id > 1 ? 
-	'get_acls_for_argument_in_massive_update' : 
-	'get_acls_for_argument_in_update' ;
+    my ($method,$code) = ref($id) && scalar @$id > 1 ? 
+	('get_acls_for_argument_in_massive_update',273) : 
+	('get_acls_for_argument_in_update',272) ;
 
     $admin->re_is_allowed_to($self->qvd_object_model->$method($_)) || 
-	QVD::Admin4::Exception->throw(code => 35) 
+	QVD::Admin4::Exception->throw(code => $code, object => $_) 
 	for $self->json_wrapper->arguments_list
 }
 
@@ -275,11 +275,11 @@ sub check_create_arguments_validity_in_json
 
     $self->json_wrapper->has_argument($_) || 
 	defined $self->qvd_object_model->get_default_argument_value($_) ||
-	QVD::Admin4::Exception->throw(code => 23502)
+	QVD::Admin4::Exception->throw(code => 35 , object => $_)
 	for $self->qvd_object_model->mandatory_arguments;
     
     $admin->re_is_allowed_to($self->qvd_object_model->get_acls_for_argument_in_creation($_)) || 
-	QVD::Admin4::Exception->throw(code => 35)
+	QVD::Admin4::Exception->throw(code => 272, object => $_)
 	for $self->json_wrapper->arguments_list;
 }
 
@@ -288,7 +288,7 @@ sub check_nested_queries_validity_in_json
     my $self = shift;
     my $admin = $self->qvd_object_model->current_qvd_administrator;
     my $type_of_action = $self->qvd_object_model->type_of_action;
-    my $method;
+    my ($method,$code);
 
     if ($type_of_action eq 'create')
     {
@@ -297,17 +297,17 @@ sub check_nested_queries_validity_in_json
     elsif ($type_of_action eq 'update')
     {
 	my $id = $self->json_wrapper->get_filter_value('id');
-	$method = ref($id) && scalar @$id > 1 ? 
-	    'get_acls_for_nested_query_in_massive_update' : 
-	    'get_acls_for_nested_query_in_update' ;
+	($method,$code) = ref($id) && scalar @$id > 1 ? 
+	    ('get_acls_for_nested_query_in_massive_update',273) : 
+	    ('get_acls_for_nested_query_in_update',272) ;
     }
 
     $self->qvd_object_model->available_nested_query($_) || 
-	QVD::Admin4::Exception->throw(code => 37)
+	QVD::Admin4::Exception->throw(code => 34, object => $_)
 	for $self->json_wrapper->nested_queries_list;
 
     $admin->re_is_allowed_to($self->qvd_object_model->$method($_)) || 
-	QVD::Admin4::Exception->throw(code => 38) 
+	QVD::Admin4::Exception->throw(code => $code, object => $_) 
 	for $self->json_wrapper->nested_queries_list
 }
 

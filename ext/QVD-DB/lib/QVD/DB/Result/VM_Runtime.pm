@@ -2,7 +2,7 @@ package QVD::DB::Result::VM_Runtime;
 
 use strict;
 use warnings;
-
+use QVD::Admin4::Exception;
 use parent qw(DBIx::Class);
 use QVD::Log;
 

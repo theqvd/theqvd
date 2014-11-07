@@ -84,7 +84,7 @@ vm_user_disconnect => { type_of_action => 'update',
 			acls => [qr/^vm\.update(-massive)?\.disconnect-user$/],
 			qvd_object => 'VM'},
 
-vm_start => { type_of_action => 'upsate',
+vm_start => { type_of_action => 'update',
 	      admin4method => 'vm_start',
 	     acls => [qr/^vm\.update(-massive)?\.state$/],
 	      qvd_object => 'VM'},

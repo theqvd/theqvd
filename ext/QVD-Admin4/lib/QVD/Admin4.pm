@@ -32,7 +32,7 @@ sub BUILD
     my $self = shift;
 
     $DB = eval { QVD::DB->new() }; 
-    QVD::Admin4::Exception->throw(code=>'21') if $@;
+    QVD::Admin4::Exception->throw(code=>'2100') if $@;
 
     $DB->exception_action( DBIx::Error->exception_action );
 }
@@ -78,7 +78,7 @@ sub update
 {
     my ($self,$request,%modifiers) = @_;
     my $result = $self->select($request);
-    QVD::Admin4::Exception->throw(code => 13) unless $result->{total};
+    QVD::Admin4::Exception->throw(code => 1300) unless $result->{total};
     my $conditions = $modifiers{conditions} // [];
 
     my $failures;
@@ -212,7 +212,7 @@ sub custom_properties_set
 
     while (my ($key,$value) = each %$props)
     { 
-	$key = undef if defined $key && $key eq '';
+	$key = undef if defined $key && $key eq ''; # FIX ME
 	$value = undef if defined $value && $value eq '';
 	my $t = $class . "_Property";
 	my $k = lc($class) . "_id";
@@ -220,7 +220,7 @@ sub custom_properties_set
 
 	eval { $DB->resultset($t)->update_or_create($a) };
 	QVD::Admin4::Exception->throw(exception => $@, 
-				      query => 'set properties') if $@;
+				      query => 'properties') if $@;
     }
 }
 
@@ -230,12 +230,11 @@ sub custom_properties_del
 
     for my $key (@$props)
     {
-	$key = undef if defined $key && $key eq '';
-	my @props = eval { $obj->search_related('properties', 
-						{key => $key})->all };
+	$key = undef if defined $key && $key eq ''; # FIX ME
+	eval { $obj->search_related('properties', 
+				    {key => $key})->delete_all };
 	QVD::Admin4::Exception->throw(exception => $@, 
-				      query => 'properties') if $@;
-	$_->delete for @props;		
+				      query => 'properties') if $@;	
     }
 }
 
@@ -245,22 +244,21 @@ sub tags_create
 
     for my $tag (@$tags)
     { 	
-	$tag = undef if defined $tag && $tag eq '';
-        my $old_tag = 
-	    eval { $DB->resultset('DI_Tag')->search({'me.tag' => $tag,
-						     'osf.id' => $di->osf_id},
-						    {join => [{ di => 'osf' }]})->first };
-	QVD::Admin4::Exception->throw(exception => $@, 
-				      query => 'tags') if $@;	
+	$tag = undef if defined $tag && $tag eq ''; # FIX ME	
+	eval
+	{
+	    my $old_tag = $DB->resultset('DI_Tag')->search({'me.tag' => $tag,
+							    'osf.id' => $di->osf_id},
+							   {join => [{ di => 'osf' }]})->first;
+	    $old_tag->fixed ? 
+		QVD::Admin4::Exception->throw(code => 63) : 
+		$old_tag->delete if $old_tag;
 
-	if ($old_tag) 
-	{ 
-	    $old_tag->fixed ? QVD::Admin4::Exception->throw(code => 63) : $old_tag->delete;
-	}
+	    $DB->resultset('DI_Tag')->create({di_id => $di->id, tag => $tag});
+	};
 
-	eval { $DB->resultset('DI_Tag')->create({di_id => $di->id, tag => $tag}) };
 	QVD::Admin4::Exception->throw(exception => $@, 
-				      query => 'tags') if $@;	
+				      query => 'tags') if $@;
     }
 }
 
@@ -270,16 +268,18 @@ sub tags_delete
 
     for my $tag (@$tags)
     {
-	$tag = undef if defined $tag && $tag eq '';
-	$tag = eval { $di->search_related('tags',{tag => $tag})->first };
-	QVD::Admin4::Exception->throw(exception => $@, query => 'tags')
-	    if $@;
-	$tag || next;
-
-	($tag->fixed || $tag->tag eq 'head' || $tag->tag eq 'default') 
-	    && QVD::Admin4::Exception->throw(code => 64);
-	$tag->delete;
-    }		
+	$tag = undef if defined $tag && $tag eq ''; # FIX ME
+	eval 
+	{ 
+	    $tag = $di->search_related('tags',{tag => $tag})->first // next;	    
+	    ($tag->fixed || $tag->tag eq 'head' || $tag->tag eq 'default') 
+		&& QVD::Admin4::Exception->throw(code => 64);
+	    $tag->delete;
+	};
+	
+	QVD::Admin4::Exception->throw(exception => $@, 
+				      query => 'tags') if $@;
+    }
 }
 
 sub add_acls_to_role
@@ -361,16 +361,19 @@ sub switch_acl_sign_in_role
 {
     my ($self,$role,$acl_name) = @_;
 
-    my $acl = eval { $DB->resultset('ACL')->find({name => $acl_name}) };
+    eval 
+    {
+	my $acl = $DB->resultset('ACL')->find({name => $acl_name}) 
+	    // QVD::Admin4::Exception->throw(code => 66);
+
+	my $acl_role_rel = $DB->resultset('ACL_Role_Relation')->find(
+	    {role_id => $role->id,
+	     acl_id => $acl->id });
+
+	$acl_role_rel->update({ positive => $acl_role_rel->positive ? 0 : 1 });
+    };
     QVD::Admin4::Exception->throw(exception => $@, 
 				  query => 'acls') if $@;
-    $acl || QVD::Admin4::Exception->throw(code => 66);
-
-    my $acl_role_rel = $DB->resultset('ACL_Role_Relation')->find(
-	{role_id => $role->id,
-	 acl_id => $acl->id });
-
-    $acl_role_rel->update({ positive => $acl_role_rel->positive ? 0 : 1 });
 }
 
 
@@ -378,13 +381,14 @@ sub assign_acl_to_role
 {
     my ($self,$role,$acl_name,$positive) = @_;
 
-    my $acl = eval { $DB->resultset('ACL')->find({name => $acl_name}) };
-    QVD::Admin4::Exception->throw(exception => $@, 
-				  query => 'acls') if $@;
-    $acl || QVD::Admin4::Exception->throw(code => 66);
+    eval
+    {
+	my $acl = $DB->resultset('ACL')->find({name => $acl_name})
+	    // QVD::Admin4::Exception->throw(code => 66);
 
-    eval { $role->create_related('acl_rels', { acl_id => $acl->id,
-					       positive => $positive }) };
+	$role->create_related('acl_rels', { acl_id => $acl->id,
+					    positive => $positive });
+    };
     QVD::Admin4::Exception->throw(exception => $@, 
 				  query => 'acls') if $@;
 }
@@ -393,28 +397,31 @@ sub unassign_acl_to_role
 {
     my ($self,$role,$acl_name) = @_;
 
-    my $acl = eval { $DB->resultset('ACL')->find({name => $acl_name}) };
+    eval
+    {
+	my $acl = $DB->resultset('ACL')->find({name => $acl_name})
+	    // QVD::Admin4::Exception->throw(code => 66);
+
+	$role->search_related('acl_rels', { acl_id => $acl->id })->delete_all;
+    };
     QVD::Admin4::Exception->throw(exception => $@, 
 				  query => 'acls') if $@;
-    $acl || QVD::Admin4::Exception->throw(code => 66);
-
-    $role->search_related('acl_rels', { acl_id => $acl->id })->delete_all;
 }
 
 sub assign_role_to_role
 {
     my ($self,$inheritor_role,$inherited_role_id) = @_;
 
-    my $inherited_role = eval { $DB->resultset('Role')->find({id => $inherited_role_id}) };
-    QVD::Admin4::Exception->throw(exception => $@, 
-				  query => 'roles') if $@;
-
-    $inherited_role || QVD::Admin4::Exception->throw(code => 65);
+    eval
+    {
+	my $inherited_role = $DB->resultset('Role')->find({id => $inherited_role_id})
+	    // QVD::Admin4::Exception->throw(code => 65);
     
-    $inheritor_role->id eq $_ && QVD::Admin4::Exception->throw(code => 67)
-	for $inherited_role->get_all_inherited_role_ids;
+	$inheritor_role->id eq $_ && QVD::Admin4::Exception->throw(code => 67)
+	    for $inherited_role->get_all_inherited_role_ids;
 
-    eval { $inheritor_role->create_related('role_rels', { inherited_id => $inherited_role_id }) };
+	$inheritor_role->create_related('role_rels', { inherited_id => $inherited_role_id });
+    };
     QVD::Admin4::Exception->throw(exception => $@, 
 				  query => 'roles') if $@;
 }
@@ -423,11 +430,9 @@ sub unassign_role_to_role
 {
     my ($self,$role,$role_ids) = @_;
 
-    my @role_rels = eval { $role->search_related('role_rels', { inherited_id => $role_ids })->all };
+    eval { $role->search_related('role_rels', { inherited_id => $role_ids })->delete_all };
     QVD::Admin4::Exception->throw(exception => $@, 
 				  query => 'roles') if $@;
-
-    $_->delete for @role_rels;
 }
 
 ###########
@@ -436,13 +441,11 @@ sub del_roles_to_admin
 {
     my ($self,$role_ids,$admin) = @_;
 
-    my @rels = eval { $DB->resultset('Role_Administrator_Relation')->search(
-			  {role_id => $role_ids,
-			   administrator_id => $admin->id})->all };
+    eval { $DB->resultset('Role_Administrator_Relation')->search(
+	       {role_id => $role_ids,
+		administrator_id => $admin->id})->delete_all };
     QVD::Admin4::Exception->throw(exception => $@, 
 				  query => 'roles') if $@;
-
-    $_->delete for @rels;
 }
 
 sub add_roles_to_admin
@@ -451,13 +454,15 @@ sub add_roles_to_admin
 
     for my $role_id (@$role_ids)
     {
-	my $role = eval { $DB->resultset('Role')->find({id => $role_id}) };
-	QVD::Admin4::Exception->throw(exception => $@, 
-				      query => 'roles') if $@;
-	$role || QVD::Admin4::Exception->throw(code => 65);
+	eval
+	{
+	    my $role = $DB->resultset('Role')->find({id => $role_id})
+		// QVD::Admin4::Exception->throw(code => 65);
 
-	eval { $role->create_related('admin_rels', 
-				     { administrator_id => $admin->id }) };
+	    $role->create_related('admin_rels', 
+				  { administrator_id => $admin->id });
+	};
+
 	QVD::Admin4::Exception->throw(exception => $@, 
 				      query => 'roles') if $@;
     }
@@ -481,19 +486,22 @@ sub di_create
     my ($self,$request) = @_;
 
     my $images_path  = cfg('path.storage.images');
-    QVD::Admin4::Exception->throw(code=>'31')
+    QVD::Admin4::Exception->throw(code=>'281')
 	unless -d $images_path;
 
     my $staging_path = cfg('path.storage.staging');
-    QVD::Admin4::Exception->throw(code=>'32')
+    QVD::Admin4::Exception->throw(code=>'282')
 	unless -d $staging_path;
 
     my $staging_file = basename($request->arguments->{path});
-    QVD::Admin4::Exception->throw(code=>'33')
+    QVD::Admin4::Exception->throw(code=>'283')
 	unless -e "$staging_path/$staging_file";
 
     my $result = $self->create($request);
     my $di = @{$result->{rows}}[0];
+
+    eval 
+    {
 
     $di->osf->delete_tag('head');
     $di->osf->delete_tag($di->version);
@@ -501,6 +509,11 @@ sub di_create
     $DB->resultset('DI_Tag')->create({di_id => $di->id, tag => 'head'});
     $DB->resultset('DI_Tag')->create({di_id => $di->id, tag => 'default'})
 	unless $di->osf->di_by_tag('default');
+
+    };
+
+    QVD::Admin4::Exception->throw(exception => $@, 
+				  query => 'tags') if $@;	
 
     my $images_file  = $di->id . '-' . $staging_file;
     $di->update({path => $images_file});
@@ -510,7 +523,7 @@ sub di_create
 	eval { copy("$staging_path/$staging_file","$images_path/$images_file") };
 	$@ ? print $@ : last;
     }
-    if ($@) { $di->delete; QVD::Admin4::Exception->throw(code=>'30');}
+    if ($@) { $di->delete; QVD::Admin4::Exception->throw(code=>'280');}
 
     $result;
 }
@@ -528,13 +541,16 @@ sub vm_user_disconnect
     my ($self,$request) = @_;
     my $result = $self->select($request);
 
-    for my $obj (@{$result->{rows}})
+    my $failures;
+    for my $vm (@{$result->{rows}})
     {
-	eval { $obj->vm_runtime->send_user_abort  };      
-	 if ($@) { $result->{failures}->{$obj->id} = 18; print $@; }
+	eval { $vm->vm_runtime->send_user_abort  };      
+	next unless $@;
+	my %args = (code => 211, object => $vm->vm_runtime->user_state);
+	$failures->{$vm->id} = QVD::Admin4::Exception->new(%args)->json; 
     }
-    QVD::Admin4::Exception->throw(code => 1) 
-	if exists $result->{failures}; 
+    QVD::Admin4::Exception->throw(failures => $failures) 
+	if defined $failures;  
 
     $result->{rows} = [];
     $result;
@@ -545,23 +561,26 @@ sub vm_start
     my ($self,$request) = @_;
 
     my $result = $self->select($request);
-    my %host;
+    my ($failures, %host);
+
+    my $f = sub { my $vm = shift; 
+		  $vm->vm_runtime->can_send_vm_cmd('start')  ||
+		  QVD::Admin4::Exception->new(code => 212, 
+					      object => $vm->vm_runtime->vm_state);
+		  $self->vm_assign_host($vm->vm_runtime);
+		  $vm->vm_runtime->send_vm_start;
+		  $host{$vm->vm_runtime->host_id}++;};
 
     for my $vm (@{$result->{rows}})
     {
-	eval { $DB->txn_do(sub {$vm->vm_runtime->can_send_vm_cmd('start') or die;
-				$self->vm_assign_host($vm->vm_runtime);
-				$vm->vm_runtime->send_vm_start;
-				$host{$vm->vm_runtime->host_id}++;}); 
-	       $@ or last } for (1 .. 5);
-# Hay que mandar códigos y cotejar aquí qué ha pasado
-
-	if ($@) { $result->{failures}->{$vm->id} = 18; print $@; }
+	for (1 .. 5) { eval { $DB->txn_do($f->($vm)) }; $@ or last; } 
+	next unless $@;
+	$failures->{$vm->id} = QVD::Admin4::Exception->new(exception => $@)->json; 
     }
 
     notify("qvd_cmd_for_vm_on_host$_") for keys %host;
-    QVD::Admin4::Exception->throw(code => 1) 
-	if exists $result->{failures}; 
+    QVD::Admin4::Exception->throw(failures => $failures) 
+	if defined $failures;  
 
     $result->{rows} = [];
     $result;
@@ -572,32 +591,28 @@ sub vm_stop
     my ($self,$request) = @_;
 
     my $result = $self->select($request);
-    my %host;
+    my ($failures, %host);
+
+    my $f = sub { my $vm = shift; 
+		  $vm->vm_runtime->send_vm_stop;
+		  $host{$vm->vm_runtime->host_id}++;};
 
     for my $vm (@{$result->{rows}})
     {
-	eval { $DB->txn_do(sub { if ($vm->vm_runtime->can_send_vm_cmd('stop')) 
-				 {
-				     $vm->vm_runtime->send_vm_stop;
-				     $host{$vm->vm_runtime->host_id}++;
-				 }
-				 else 
-				 {
-				     if ($vm->vm_runtime->vm_state eq 'stopped' and
-					 $vm->vm_runtime->vm_cmd eq 'start') 
-				     {
-					 $vm->vm_runtime->update({ vm_cmd => undef });
-				     }
-				 }
-			   });
-	       $@ or last } for (1 .. 5);
+	for (1 .. 5) { eval { $DB->txn_do($f->($vm)) }; $@ or last; } 
+	next unless $@;
+	my %args = (code => 213, object => $vm->vm_runtime->vm_state);
+	$failures->{$vm->id} = QVD::Admin4::Exception->new(%args)->json; 
 
-	if ($@) { $result->{failures}->{$vm->id} = 18; print $@; }
+	$vm->vm_runtime->update({ vm_cmd => undef })
+	    if $vm->vm_runtime->vm_state eq 'stopped' &&
+	    $vm->vm_runtime->vm_cmd                   &&
+	    $vm->vm_runtime->vm_cmd eq 'start'; 
     }
 
     notify("qvd_cmd_for_vm_on_host$_") for keys %host;
-    QVD::Admin4::Exception->throw(code => 1) 
-	if exists $result->{failures}; 
+    QVD::Admin4::Exception->throw(failures => $failures) 
+	if defined $failures;  
 
     $result->{rows} = [];
     $result;
@@ -616,8 +631,8 @@ sub vm_assign_host {
             require QVD::L7R::LoadBalancer;
             QVD::L7R::LoadBalancer->new();
         };
-        my $free_host = $lb->get_free_host($vmrt->vm) //
-            die "Unable to start machine, no hosts available";
+        my $free_host = eval { $lb->get_free_host($vmrt->vm) } //
+	    QVD::Admin4::Exception->throw(code => 214);
 
         $vmrt->set_host_id($free_host);
     }
