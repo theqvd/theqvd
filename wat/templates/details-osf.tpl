@@ -25,7 +25,7 @@
         <tr>
             <td><i class="fa fa-exchange"></i><span data-i18n>Overlay</span></td>
             <td>
-                <%= model.get('overlay') %>
+                <%= model.get('overlay') ? '<span class="fa fa-check"></span>' : '<span class="fa fa-remove"></span>' %>
             </td>
         </tr>
     <% 

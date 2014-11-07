@@ -143,7 +143,7 @@
                             case 'overlay':
                 %>
                                 <td class="desktop center">
-                                    <%= model.get('overlay') ? '<span class="fa fa-check"></span>' : '' %>
+                                    <%= model.get('overlay') ? '<span class="fa fa-check"></span>' : '<span class="fa fa-remove"></span>' %>
                                 </td>
                 <%
                                 break;
