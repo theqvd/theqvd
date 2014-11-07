@@ -159,7 +159,12 @@ Wat.A = {
                         var selected = '';
 
                         var id = option.id;
-                        var name = option.name;
+                        if (params.action == 'di_tiny_list') {
+                            var name = option.disk_image;
+                        }
+                        else {
+                            var name = option.name;
+                        }
                         
                         if (params.nameAsId) {
                             id = name;
