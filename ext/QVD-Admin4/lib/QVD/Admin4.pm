@@ -1025,38 +1025,39 @@ sub config_get
 
    { total => $total,
      rows => [ map {{ $_ => cfg($_) }} @keys ] };
-
 }
 
 sub config_set
 {
     my ($self,$request) = @_;
 
-    $self->create_or_update($request);
-    notify(qvd_config_changed);
+    my $result = $self->create_or_update($request);
+    notify(qvd_config_changed) if $result->{total};
+    $result;
 }
 
 sub config_default
 {
     my ($self,$request) = @_;
 
-    $self->delete($request);
-    notify(qvd_config_changed);
+    my $result = $self->delete($request);
+    notify(qvd_config_changed) if $result->{total};
+    $result;
 }
  
 
 
 sub config_ssl {
     my ($self,$admin,$json_wrapper) = @_;
-    my $cert = $json_wrapper->get_filter_value('cert') //
-	QVD::Admin4::Exception->throw(code=>'6220', object => 'cert');
+    my $cert = $json_wrapper->get_argument_value('cert') //
+	QVD::Admin4::Exception->throw(code=>'6240', object => 'cert');
 
-    my $key = $json_wrapper->get_filter_value('key') //
-	QVD::Admin4::Exception->throw(code=>'6220', object => 'key');
+    my $key = $json_wrapper->get_argument_value('key') //
+	QVD::Admin4::Exception->throw(code=>'6240', object => 'key');
 
-    my $crl = $json_wrapper->get_filter_value('crl');
+    my $crl = $json_wrapper->get_argument_value('crl');
 
-    my $ca = $json_wrapper->get_filter_value('ca');
+    my $ca = $json_wrapper->get_argument_value('ca');
 
     rs(SSL_Config)->update_or_create({ key => 'l7r.ssl.cert',
                                        value => $cert });
@@ -1081,7 +1082,8 @@ sub config_ssl {
 
     notify(qvd_config_changed);
 
-    1
+    { total => 1,
+     rows => [ ] };
 }
 
 

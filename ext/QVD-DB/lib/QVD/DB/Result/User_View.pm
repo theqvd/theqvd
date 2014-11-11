@@ -44,7 +44,7 @@ sub properties
 {
     my $self = shift;
 
-    my $properties = decode_json $self->properties_json;
+    my $properties = decode_json($self->properties_json);
     my $out = { map { $_->{key} => $_->{value} } grep { defined $_->{key}  } @$properties };
 }
 

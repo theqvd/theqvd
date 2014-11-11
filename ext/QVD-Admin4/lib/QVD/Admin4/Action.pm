@@ -17,7 +17,7 @@ config_get => { type_of_action =>  'general',
 		acls => [qr/^config\.see-main\./],
 		admin4method => 'config_get'},
 
-config_set => { type_of_action =>  'update',
+config_set => { type_of_action =>  'create',
 		qvd_object => 'Config',
 		acls => [qr/^config\.update\./],
 		admin4method => 'create_or_update'},

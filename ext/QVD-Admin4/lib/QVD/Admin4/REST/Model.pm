@@ -418,7 +418,7 @@ my $AVAILABLE_FIELDS =
 	       
 	       Host => [qw(number_of_vms_connected)]},
     
-    create => { 'default' => [qw(id)]}
+    create => { 'default' => [qw(id)], Config => [qw(key)]}
 
 };
 

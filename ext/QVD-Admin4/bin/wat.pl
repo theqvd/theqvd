@@ -2,7 +2,7 @@
 use Mojolicious::Lite;
 use lib::glob '/home/benjamin/wat/*/lib/';
 use QVD::Admin4::REST;
-use Mojo::JSON qw(decode_json encode_json);
+use Mojo::JSON qw(encode_json decode_json);
 use QVD::Admin4::Exception;
 use QVD::DB;
 use MojoX::Session;

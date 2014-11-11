@@ -2,6 +2,7 @@ package QVD::DB::Result::DI_View;
 
 use base qw/DBIx::Class::Core/;
 use Mojo::JSON qw(decode_json);
+
 __PACKAGE__->table_class('DBIx::Class::ResultSource::View');
 
 __PACKAGE__->table('dis_view');
@@ -37,7 +38,7 @@ sub properties
 {
     my $self = shift;
 
-    my $properties = decode_json $self->properties_json;
+    my $properties = decode_json($self->properties_json);
     my $out = { map { $_->{key} => $_->{value} } grep { defined $_->{key}  } @$properties };
 }
 
@@ -45,7 +46,7 @@ sub tags
 {
     my $self = shift;
 
-    my $tags = decode_json $self->tags_json;
+    my $tags = decode_json($self->tags_json);
     my $out = [ sort { $a->{tag} cmp $b->{tag} }  
 		map { { id => $_->{id}, tag => $_->{tag}, fixed => $_->{fixed}  } } 
 		@$tags ];
