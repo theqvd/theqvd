@@ -54,10 +54,10 @@ sub process_query
 
        my $action = QVD::Admin4::Action->new(name => $json_wrapper->action );
 
-       QVD::Admin4::Exception->throw(code => 26) 
+       QVD::Admin4::Exception->throw(code => 4100) 
 	   unless $action->available;
 
-       QVD::Admin4::Exception->throw(code => 27) 
+       QVD::Admin4::Exception->throw(code => 4210) 
 	   unless $action->available_for_admin($self->administrator);
 
        my $qvd_object_model = $self->get_qvd_object_model($action) 
@@ -76,7 +76,7 @@ sub process_query
        $response = $err;
    } catch ($err) {
        print $err;
-       $response = QVD::Admin4::Exception->new(code => 11);
+       $response = QVD::Admin4::Exception->new(code => 1100);
    }
 
    return $response->json;

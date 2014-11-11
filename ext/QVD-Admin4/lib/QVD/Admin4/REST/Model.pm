@@ -265,6 +265,8 @@ my $AVAILABLE_FILTERS =
 { 
     list => { default => [],
 
+	      Config => [qw(key value)],
+	      
 	      VM => [qw(storage id name user_id user_name osf_id osf_name di_tag blocked 
                         expiration_soft expiration_hard state host_id host_name di_id 
                         user_state ip next_boot_ip ssh_port vnc_port serial_port tenant_id tenant_name 
@@ -294,6 +296,9 @@ my $AVAILABLE_FILTERS =
                                                view_type device_type qvd_object property)]},
 
     all_ids => { default => [],
+
+		 Config => [qw(key value)],
+
 		 VM => [qw(storage id name user_id user_name osf_id osf_name di_tag blocked expiration_soft 
                            expiration_hard state host_id host_name  di_id user_state ip next_boot_ip ssh_port 
                            vnc_port serial_port tenant_id tenant_name creation_admin creation_date )],
@@ -321,13 +326,13 @@ my $AVAILABLE_FILTERS =
 		 Administrator_Views_Setup => [qw(id tenant_id tenant_name field admin_id admin_name visible view_type 
                                                   device_type qvd_object property)]},
 
-    details => { default => [qw(id tenant_id)], Host => [qw(id)], Role => [qw(id)], ACL => [qw(id)], Tenant => [qw(id)] },
+    details => { Config => [qw(key value)], default => [qw(id tenant_id)], Host => [qw(id)], Role => [qw(id)], ACL => [qw(id)], Tenant => [qw(id)] },
 		
     tiny => { default => [qw(tenant_id)], Host => [qw()], Role => [qw()], ACL => [qw(name)], Tenant => [qw()], DI_Tag => [qw(tenant_id osf_id)]},
 
-    delete => { default => [qw(id tenant_id)], Host => [qw(id)], ACL => [qw(id)], Role => [qw(id)], Tenant => [qw(id)]},
+    delete => { default => [qw(id tenant_id)], Host => [qw(id)], ACL => [qw(id)], Role => [qw(id)], Tenant => [qw(id)], Config => [qw(key)]},
 
-    update => { default => [qw(id tenant_id)], Host => [qw(id)], ACL => [qw(id)], Role => [qw(id)], Tenant => [qw(id)]},
+    update => { default => [qw(id tenant_id)], Host => [qw(id)], ACL => [qw(id)], Role => [qw(id)], Tenant => [qw(id)], Config => [qw(key)]},
 
     state => { default => [qw(id tenant_id)], Host => [qw(id)], ACL => [qw(id)], Role => [qw(id)], Tenant => [qw(id)]},
 };
@@ -335,6 +340,8 @@ my $AVAILABLE_FILTERS =
 my $AVAILABLE_FIELDS = 
 { 
     list => { default => [],
+
+	      Config => [qw(key value)],
 
 	      OSF => [qw(id name overlay user_storage memory  number_of_vms number_of_dis properties )],
 
@@ -365,6 +372,8 @@ my $AVAILABLE_FIELDS =
 
     details => { default => [],
 		 
+		 Config => [qw(key value)],
+
 		 OSF => [qw(id name overlay user_storage memory  number_of_vms number_of_dis properties )],
 		 
 		 Role => [qw(name acls roles id number_of_acls)],
@@ -415,19 +424,19 @@ my $AVAILABLE_FIELDS =
 
 my $MANDATORY_FILTERS = 
 { 
-    list => { default => [qw(tenant_id)], Host => [qw()], ACL => [qw()], Role => [qw()], Tenant => [qw()]},
+    list => { default => [qw(tenant_id)], Host => [qw()], ACL => [qw()], Role => [qw()], Tenant => [qw()], Config => [qw()]},
 
     details => { default => [qw(id tenant_id)], Host => [qw(id)], ACL => [qw(id)], Role => [qw(id)], Tenant => [qw(id)]}, 
 
     tiny => { default => [qw(tenant_id)], Host => [qw()], ACL => [qw()], Role => [qw()], Tenant => [qw()]},
 
-    delete => { default => [qw(id tenant_id)], Host => [qw(id)], ACL => [qw(id)], Role => [qw(id)], Tenant => [qw(id)]},
+    delete => { default => [qw(id tenant_id)], Host => [qw(id)], ACL => [qw(id)], Role => [qw(id)], Tenant => [qw(id)], Config => [qw(key)]},
 
-    update=> { default => [qw(id tenant_id)], Host => [qw(id)], ACL => [qw(id)], Role => [qw(id)], Tenant => [qw(id)]}, 
+    update=> { default => [qw(id tenant_id)], Host => [qw(id)], ACL => [qw(id)], Role => [qw(id)], Tenant => [qw(id)], Config => [qw(key)]}, 
 
     state => { default => [qw(id tenant_id)], Host => [qw(id)], ACL => [qw(id)], Role => [qw(id)], Tenant => [qw(id)]}, 
 
-    all_ids => { default => [qw(tenant_id)], Host => [qw()], ACL => [qw()], Role => [qw()], Tenant => [qw()]}, 
+    all_ids => { default => [qw(tenant_id)], Host => [qw()], ACL => [qw()], Role => [qw()], Tenant => [qw()], Config => [qw()]}, 
 };
 
 my $SUBCHAIN_FILTERS = 
@@ -440,7 +449,8 @@ my $SUBCHAIN_FILTERS =
 
 my $COMMODIN_FILTERS = 
 { 
-tiny => { ACL => [qw(name)]}
+tiny => { ACL => [qw(name)]},
+list => {Config => [qw(key value)]}
 };
 
 my $DEFAULT_ORDER_CRITERIA = 
@@ -448,7 +458,8 @@ my $DEFAULT_ORDER_CRITERIA =
     tiny => { default =>  [qw(name)],
 	      DI => [qw(disk_image)],
 	      Tenant_Views_Setup => [qw(field)],
-	      Administrator_Views_Setup => [qw(field)] }
+	      Administrator_Views_Setup => [qw(field)],
+              Config => [qw(key)] }
 };
 
 my $AVAILABLE_NESTED_QUERIES = 
@@ -522,7 +533,8 @@ my $NESTED_QUERIES_TO_ADMIN4_MAPPER =
     Administrator_Views_Setup => {}
 };
 
-my $AVAILABLE_ARGUMENTS = { User => [qw(name password blocked)],
+my $AVAILABLE_ARGUMENTS = { Config => [qw(value)],
+			    User => [qw(name password blocked)],
                             VM => [qw(name ip blocked expiration_soft expiration_hard storage di_tag ***start*** ***stop*** ***disconnect***)],
                             Host => [qw(name address blocked)],
                             OSF => [qw(name memory user_storage overlay)],
@@ -534,7 +546,8 @@ my $AVAILABLE_ARGUMENTS = { User => [qw(name password blocked)],
 			    Administrator_Views_Setup => [qw(visible)]};
 
 
-my $MANDATORY_ARGUMENTS = { User => [qw(name password tenant_id blocked)],
+my $MANDATORY_ARGUMENTS = { Config => [qw(key value)],
+			    User => [qw(name password tenant_id blocked)],
 			    VM => [qw(name user_id ip osf_id di_tag state user_state blocked)],
 			    Host => [qw(name address frontend backend blocked state)],
 			    OSF => [qw(name memory overlay user_storage tenant_id)],
@@ -573,6 +586,11 @@ my $DEFAULT_ARGUMENT_VALUES =
 
 my $FILTERS_TO_DBIX_FORMAT_MAPPER = 
 {
+    Config => {
+	'key' => 'me.key',
+	'value' => 'me.value'
+    },
+
     ACL => {
 	'id' => 'me.id',
 	'name' => 'me.name',
@@ -721,6 +739,11 @@ my $ORDER_CRITERIA_TO_DBIX_FORMAT_MAPPER =
 
 my $FIELDS_TO_DBIX_FORMAT_MAPPER = 
 {
+    Config => {
+	'key' => 'me.key',
+	'value' => 'me.value'
+    },
+
     ACL => {
 	'id' => 'me.id',
 	'name' => 'me.name',

@@ -9,6 +9,24 @@ has 'name', is => 'ro', isa => sub { die "Invalid type for attribute name" if re
 my $ACTIONS =
 {
 
+config_ssl => { type_of_action =>  'general',
+		acls => [qr/^config\.update\./],
+		admin4method => 'config_ssl'},
+
+config_get => { type_of_action =>  'general',
+		acls => [qr/^config\.see-main\./],
+		admin4method => 'config_get'},
+
+config_set => { type_of_action =>  'update',
+		qvd_object => 'Config',
+		acls => [qr/^config\.update\./],
+		admin4method => 'create_or_update'},
+
+config_default => { type_of_action =>  'delete',
+		   qvd_object => 'Config',
+		   acls => [qr/^config\.update\./],
+		   admin4method => 'delete'},
+
 user_get_list => {type_of_action => 'list',
 		  admin4method => 'select',
 		  acls => [qr/^user\.see-main\./],

@@ -161,7 +161,7 @@ sub json
 {
     my $self = shift;
     { status => $self->code, 
-      message => $self->build_message,
+      message => $self->message,
       $self->failures ? (failures => $self->failures) : () };
 }
 

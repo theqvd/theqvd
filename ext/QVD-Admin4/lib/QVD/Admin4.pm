@@ -18,6 +18,7 @@ use QVD::Admin4::REST::Request;
 use Data::Dumper;
 use DBIx::Error;
 use TryCatch;
+use Data::Page;
 
 our $VERSION = '0.01';
 
@@ -103,7 +104,7 @@ sub delete
 {
     my ($self,$request,%modifiers) = @_;
     my $result = $self->select($request);
-    QVD::Admin4::Exception->throw(code => 13) unless $result->{total};
+    QVD::Admin4::Exception->throw(code => 1300) unless $result->{total};
 
     my $conditions = $modifiers{conditions} // [];
     my $failures;
@@ -251,7 +252,7 @@ sub tags_create
 							    'osf.id' => $di->osf_id},
 							   {join => [{ di => 'osf' }]})->first;
 	    $old_tag->fixed ? 
-		QVD::Admin4::Exception->throw(code => 63) : 
+		QVD::Admin4::Exception->throw(code => 7330) : 
 		$old_tag->delete if $old_tag;
 
 	    $DB->resultset('DI_Tag')->create({di_id => $di->id, tag => $tag});
@@ -273,7 +274,7 @@ sub tags_delete
 	{ 
 	    $tag = $di->search_related('tags',{tag => $tag})->first // next;	    
 	    ($tag->fixed || $tag->tag eq 'head' || $tag->tag eq 'default') 
-		&& QVD::Admin4::Exception->throw(code => 64);
+		&& QVD::Admin4::Exception->throw(code => 7340);
 	    $tag->delete;
 	};
 	
@@ -364,7 +365,7 @@ sub switch_acl_sign_in_role
     eval 
     {
 	my $acl = $DB->resultset('ACL')->find({name => $acl_name}) 
-	    // QVD::Admin4::Exception->throw(code => 66);
+	    // QVD::Admin4::Exception->throw(code => 6360);
 
 	my $acl_role_rel = $DB->resultset('ACL_Role_Relation')->find(
 	    {role_id => $role->id,
@@ -384,7 +385,7 @@ sub assign_acl_to_role
     eval
     {
 	my $acl = $DB->resultset('ACL')->find({name => $acl_name})
-	    // QVD::Admin4::Exception->throw(code => 66);
+	    // QVD::Admin4::Exception->throw(code => 6360);
 
 	$role->create_related('acl_rels', { acl_id => $acl->id,
 					    positive => $positive });
@@ -400,7 +401,7 @@ sub unassign_acl_to_role
     eval
     {
 	my $acl = $DB->resultset('ACL')->find({name => $acl_name})
-	    // QVD::Admin4::Exception->throw(code => 66);
+	    // QVD::Admin4::Exception->throw(code => 6360);
 
 	$role->search_related('acl_rels', { acl_id => $acl->id })->delete_all;
     };
@@ -415,9 +416,9 @@ sub assign_role_to_role
     eval
     {
 	my $inherited_role = $DB->resultset('Role')->find({id => $inherited_role_id})
-	    // QVD::Admin4::Exception->throw(code => 65);
+	    // QVD::Admin4::Exception->throw(code => 6370);
     
-	$inheritor_role->id eq $_ && QVD::Admin4::Exception->throw(code => 67)
+	$inheritor_role->id eq $_ && QVD::Admin4::Exception->throw(code => 7350)
 	    for $inherited_role->get_all_inherited_role_ids;
 
 	$inheritor_role->create_related('role_rels', { inherited_id => $inherited_role_id });
@@ -457,7 +458,7 @@ sub add_roles_to_admin
 	eval
 	{
 	    my $role = $DB->resultset('Role')->find({id => $role_id})
-		// QVD::Admin4::Exception->throw(code => 65);
+		// QVD::Admin4::Exception->throw(code => 6370);
 
 	    $role->create_related('admin_rels', 
 				  { administrator_id => $admin->id });
@@ -486,15 +487,15 @@ sub di_create
     my ($self,$request) = @_;
 
     my $images_path  = cfg('path.storage.images');
-    QVD::Admin4::Exception->throw(code=>'281')
+    QVD::Admin4::Exception->throw(code=>'2220')
 	unless -d $images_path;
 
     my $staging_path = cfg('path.storage.staging');
-    QVD::Admin4::Exception->throw(code=>'282')
+    QVD::Admin4::Exception->throw(code=>'2230')
 	unless -d $staging_path;
 
     my $staging_file = basename($request->arguments->{path});
-    QVD::Admin4::Exception->throw(code=>'283')
+    QVD::Admin4::Exception->throw(code=>'2240')
 	unless -e "$staging_path/$staging_file";
 
     my $result = $self->create($request);
@@ -523,7 +524,7 @@ sub di_create
 	eval { copy("$staging_path/$staging_file","$images_path/$images_file") };
 	$@ ? print $@ : last;
     }
-    if ($@) { $di->delete; QVD::Admin4::Exception->throw(code=>'280');}
+    if ($@) { $di->delete; QVD::Admin4::Exception->throw(code=>'2210');}
 
     $result;
 }
@@ -546,7 +547,7 @@ sub vm_user_disconnect
     {
 	eval { $vm->vm_runtime->send_user_abort  };      
 	next unless $@;
-	my %args = (code => 211, object => $vm->vm_runtime->user_state);
+	my %args = (code => 5110, object => $vm->vm_runtime->user_state);
 	$failures->{$vm->id} = QVD::Admin4::Exception->new(%args)->json; 
     }
     QVD::Admin4::Exception->throw(failures => $failures) 
@@ -565,7 +566,7 @@ sub vm_start
 
     my $f = sub { my $vm = shift; 
 		  $vm->vm_runtime->can_send_vm_cmd('start')  ||
-		  QVD::Admin4::Exception->new(code => 212, 
+		  QVD::Admin4::Exception->new(code => 5130, 
 					      object => $vm->vm_runtime->vm_state);
 		  $self->vm_assign_host($vm->vm_runtime);
 		  $vm->vm_runtime->send_vm_start;
@@ -601,7 +602,7 @@ sub vm_stop
     {
 	for (1 .. 5) { eval { $DB->txn_do($f->($vm)) }; $@ or last; } 
 	next unless $@;
-	my %args = (code => 213, object => $vm->vm_runtime->vm_state);
+	my %args = (code => 5120, object => $vm->vm_runtime->vm_state);
 	$failures->{$vm->id} = QVD::Admin4::Exception->new(%args)->json; 
 
 	$vm->vm_runtime->update({ vm_cmd => undef })
@@ -632,7 +633,7 @@ sub vm_assign_host {
             QVD::L7R::LoadBalancer->new();
         };
         my $free_host = eval { $lb->get_free_host($vmrt->vm) } //
-	    QVD::Admin4::Exception->throw(code => 214);
+	    QVD::Admin4::Exception->throw(code => 5140);
 
         $vmrt->set_host_id($free_host);
     }
@@ -641,14 +642,14 @@ sub vm_assign_host {
 sub vm_is_stopped
 {
     my ($self,$vm) = @_;
-    QVD::Admin4::Exception->throw(code => 61, query => 'delete') 
+    QVD::Admin4::Exception->throw(code => 7310, query => 'delete') 
 	unless $vm->vm_runtime->vm_state eq 'stopped';
 }
 
 sub di_no_vm_runtimes
 {
     my ($self,$di) = @_;
-    QVD::Admin4::Exception->throw(code => 62, query => 'delete') 
+    QVD::Admin4::Exception->throw(code => 7320, query => 'delete') 
 	unless $di->vm_runtimes->count == 0;
 }
 
@@ -658,7 +659,7 @@ sub di_no_dependant_vms
     my ($self,$di) = @_;
     my $rs = $DB->resultset('VM')->search({'di.id' => $di->id }, 
 					  { join => [qw(di)] });
-        QVD::Admin4::Exception->throw(code => 522, query => 'delete') 
+        QVD::Admin4::Exception->throw(code => 7120, query => 'delete') 
 	    if $rs->count;
 }
 
@@ -688,9 +689,9 @@ sub get_properties_by_qvd_object
 {
     my ($self,$admin,$json) = @_;
     my $qvd_object = lc $json->forze_filter_deletion('qvd_object') //
-        QVD::Admin4::Exception->throw(code=>'10');
+        QVD::Admin4::Exception->throw(code=>'6220', object => 'qvd_object');
    $qvd_object =~ /^user|vm|host|osf|di$/ ||
-       QVD::Admin4::Exception->throw(code=>'41');
+       QVD::Admin4::Exception->throw(code=>'6320');
 
     my $tenant_id =  $json->forze_filter_deletion('tenant_id');
 
@@ -745,7 +746,7 @@ sub get_acls_in_admins
 {
     my ($self,$admin,$json_wrapper) = @_;
     my $admin_id = $json_wrapper->get_filter_value('admin_id') //
-	QVD::Admin4::Exception->throw(code=>'10');
+	QVD::Admin4::Exception->throw(code=>'6220', object => 'admin_id');
     $admin_id = [$admin_id] unless ref($admin_id);
     
     my $acls_info;
@@ -780,7 +781,7 @@ sub get_acls_in_roles
 {
     my ($self,$admin,$json_wrapper) = @_;
     my $role_id = $json_wrapper->get_filter_value('role_id') //
-	QVD::Admin4::Exception->throw(code=>'10');
+	QVD::Admin4::Exception->throw(code=>'6220', object => 'role_id');
     $role_id = [$role_id] unless ref($role_id);
     
     my $acls_info;
@@ -829,13 +830,13 @@ sub get_number_of_acls_in_role_or_admin
     my ($self,$table,$json_wrapper) = @_;
 
     my $acl_patterns = $json_wrapper->get_filter_value('acl_pattern') //
-	QVD::Admin4::Exception->throw(code=>'10');
+	QVD::Admin4::Exception->throw(code=>'6220', object => 'acl_pattern');
     $acl_patterns = ref($acl_patterns) ? $acl_patterns : [$acl_patterns];
     my $id = $json_wrapper->get_filter_value($table eq 'Role' ? 'role_id' : 'admin_id') // 
-	QVD::Admin4::Exception->throw(code=>'10'); 
+	QVD::Admin4::Exception->throw(code=>'6220', object => $table eq 'Role' ? 'role_id' : 'admin_id'); 
 
     my $object = $DB->resultset($table)->find({ id => $id }) //
-	QVD::Admin4::Exception->throw(code=>  $table eq 'Role' ? 20 : 40 );
+	QVD::Admin4::Exception->throw(code=>  $table eq 'Role' ? 6370 : 6360);
 
     my $output;
     for my $acl_pattern (@$acl_patterns)
@@ -996,6 +997,93 @@ sub top_populated_hosts
     my $array_limit = $#hosts > 5 ? 5 : $#hosts;    
     return [@hosts[0 .. $array_limit]];
 }
+
+######################
+####### CONFIG #######
+######################
+
+sub config_get
+{
+    my ($self,$table,$json_wrapper) = @_;
+
+    my $cp = $json_wrapper->get_filter_value('key');
+    my @keys = $cp ? grep { $_ =~ /\Q$cp\E/ } cfg_keys : cfg_keys ;
+
+    use Data::Dumper; print Dumper \@keys;
+
+    my $od = $json_wrapper->order_direction // '-asc';
+
+    my $total = scalar @keys;
+    my $block = $json_wrapper->block // $total - 1;
+    my $offset = $json_wrapper->offset // 1;
+
+    my $page = Data::Page->new($total, $block, $offset);
+
+    @keys = sort { $a cmp $b } @keys;
+    @keys = reverse @keys if $od eq '-desc'; 
+    @keys = $page->splice(\@keys);
+
+   { total => $total,
+     rows => [ map {{ $_ => cfg($_) }} @keys ] };
+
+}
+
+sub config_set
+{
+    my ($self,$request) = @_;
+
+    $self->create_or_update($request);
+    notify(qvd_config_changed);
+}
+
+sub config_default
+{
+    my ($self,$request) = @_;
+
+    $self->delete($request);
+    notify(qvd_config_changed);
+}
+ 
+
+
+sub config_ssl {
+    my ($self,$admin,$json_wrapper) = @_;
+    my $cert = $json_wrapper->get_filter_value('cert') //
+	QVD::Admin4::Exception->throw(code=>'6220', object => 'cert');
+
+    my $key = $json_wrapper->get_filter_value('key') //
+	QVD::Admin4::Exception->throw(code=>'6220', object => 'key');
+
+    my $crl = $json_wrapper->get_filter_value('crl');
+
+    my $ca = $json_wrapper->get_filter_value('ca');
+
+    rs(SSL_Config)->update_or_create({ key => 'l7r.ssl.cert',
+                                       value => $cert });
+    rs(SSL_Config)->update_or_create({ key => 'l7r.ssl.key',
+                                       value => $key });
+
+    if (defined $crl) {
+        rs(SSL_Config)->update_or_create({ key => 'l7r.ssl.crl',
+                                           value => $crl })
+    }
+    else {
+        rs(SSL_Config)->search({ key => 'l7r.ssl.crl' })->delete;
+    }
+
+    if (defined $ca) {
+        rs(SSL_Config)->update_or_create({key => 'l7r.ssl.ca',
+                                          value => $ca });
+    }
+    else {
+        rs(SSL_Config)->search({ key => 'l7r.ssl.ca' })->delete;
+    }
+
+    notify(qvd_config_changed);
+
+    1
+}
+
 
 
 1;
