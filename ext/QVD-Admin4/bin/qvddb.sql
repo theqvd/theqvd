@@ -1176,6 +1176,553 @@ COPY vms (id, name, user_id, osf_id, di_tag, ip, storage) FROM stdin;
 
 
 --
+-- Data for Name: acls; Type: TABLE DATA; Schema: public; Owner: qvd
+--
+
+COPY tenants (id, name) FROM stdin;
+0	*
+\.
+
+--
+-- Data for Name: acls; Type: TABLE DATA; Schema: public; Owner: qvd
+--
+
+COPY administrators (id, name, password, tenant_id) FROM stdin;
+1	superadmin	superadmin	0
+\.
+
+
+--
+-- Data for Name: acls; Type: TABLE DATA; Schema: public; Owner: qvd
+--
+
+COPY roles (id, name) FROM stdin;
+1	master
+\.
+
+--
+-- Data for Name: acls; Type: TABLE DATA; Schema: public; Owner: qvd
+--
+
+COPY role_administrator_relations (role_id, administrator_id) FROM stdin;
+1	1
+\.
+
+
+--
+-- Data for Name: acls; Type: TABLE DATA; Schema: public; Owner: qvd
+--
+
+COPY acls (id, name) FROM stdin;
+1	di.filter.disk-image
+2	di.filter.osf
+3	host.filter.name
+4	host.filter.vm
+5	osf.filter.di
+6	osf.filter.name
+7	osf.filter.vm
+8	user.filter.name
+9	user.filter.properties
+10	vm.filter.host
+11	vm.filter.name
+12	vm.filter.osf
+13	vm.filter.properties
+14	vm.filter.state
+15	vm.filter.user
+16	di.see.vm-list
+17	di.see.block
+18	di.see.created-by
+19	di.see.creation-date
+20	di.see.default
+21	di.see.head
+22	di.see.id
+23	di.see.osf
+24	di.see.properties
+25	di.see.tags
+26	di.see.version
+27	vm.see.user-state
+28	user.see.vm-list-state
+29	user.see.vm-list-block
+30	user.see.vm-list-expiration
+31	host.see.vm-list-state
+32	host.see.vm-list-block
+33	host.see.vm-list-expiration
+34	osf.see.vm-list-state
+35	osf.see.vm-list-block
+36	osf.see.vm-list-expiration
+41	di.see.vm-list-state
+42	di.see.vm-list-block
+43	di.see.vm-list-expiration
+44	administrator.see.acl-list
+45	administrator.see.roles
+46	administrator.see.acl-list-roles
+47	role.see.acl-list
+48	role.see.acl-list-roles
+49	role.see.id
+50	role.see.inherited-roles
+51	host.see.address
+52	host.see.created-by
+53	host.see.creation-date
+54	host.see.id
+55	host.see.properties
+56	host.see.vms-info
+57	host.see.state
+58	osf.see.created-by
+59	osf.see.creation-date
+60	osf.see.id
+61	osf.see.memory
+62	osf.see.dis-info
+63	osf.see.vms-info
+64	osf.see.overlay
+65	osf.see.properties
+66	osf.see.user-storage
+67	user.see.block
+68	user.see.created-by
+69	user.see.creation-date
+70	user.see.id
+71	user.see.properties
+72	user.see.vms-info
+73	vm.see.block
+74	vm.see.created-by
+75	vm.see.creation-date
+76	vm.see.di
+77	vm.see.di-version
+78	vm.see.host
+79	vm.see.id
+80	vm.see.ip
+81	vm.see.next-boot-ip
+82	vm.see.osf
+83	vm.see.di-tag
+84	vm.see.port-serial
+85	vm.see.port-ssh
+86	vm.see.port-vnc
+87	vm.see.properties
+88	vm.see.state
+89	vm.see.user
+90	host.see.block
+91	administrator.see.id
+92	vm.see.expiration
+93	administrator.create.
+94	di.create.
+95	host.create.
+96	osf.create.
+97	role.create.
+98	tenant.create.
+99	user.create.
+100	vm.create.
+101	user.create.properties
+102	vm.create.properties
+103	vm.create.di-tag
+104	host.create.properties
+105	osf.create.properties
+106	osf.create.memory
+107	osf.create.user-storage
+108	di.create.version
+109	di.create.tags
+110	di.create.default
+111	administrator.delete.
+112	di.delete.
+113	host.delete.
+114	osf.delete.
+115	role.delete.
+116	user.delete.
+117	vm.delete.
+118	di.delete-massive.
+119	host.delete-massive.
+120	osf.delete-massive.
+121	role.delete-massive.
+122	tenant.delete-massive.
+123	user.delete-massive.
+124	vm.delete-massive.
+125	administrator.delete-massive.
+126	administrator.see-details.
+127	host.see-details.
+128	host.see.vm-list
+129	osf.see.di-list
+130	osf.see-details.
+131	osf.see.vm-list
+132	role.see-details.
+133	user.see-details.
+134	user.see.vm-list
+135	vm.see-details.
+136	di.see-details.
+137	administrator.see-main.
+138	config.see-main.
+139	di.see-main.
+140	host.see-main.
+141	osf.see-main.
+142	role.see-main.
+143	tenant.see-main.
+144	tenant.see.id
+145	user.see-main.
+146	views.see-main.
+147	vm.see-main.
+148	vm.stats.running-vms
+149	vm.stats.summary
+150	vm.stats.close-to-expire
+151	host.stats.top-hosts-most-vms
+152	vm.stats.blocked
+153	host.stats.running-hosts
+154	user.stats.summary
+155	user.stats.blocked
+156	host.stats.summary
+157	host.stats.blocked
+158	osf.stats.summary
+38	osf.see.di-list-default
+39	osf.see.di-list-default-update
+40	osf.see.di-list-head
+159	di.stats.summary
+160	di.stats.blocked
+161	administrator.update.password
+162	config.update.
+163	di.update.block
+164	di.update.properties-create
+165	di.update.properties-delete
+166	di.update.properties-update
+167	di.update.tags
+168	host.update.address
+169	host.update.block
+170	host.update.name
+171	host.update.properties-create
+172	host.update.stop-vms
+173	osf.update.memory
+174	osf.update.name
+175	osf.update.properties-create
+176	osf.update.properties-delete
+177	osf.update.properties-update
+178	osf.update.user-storage
+179	role.update.name
+180	user.update.block
+181	user.update.password
+182	user.update.properties-create
+183	user.update.properties-delete
+184	user.update.properties-update
+185	views.update.columns
+186	views.update.filters-desktop
+187	views.update.filters-mobile
+188	vm.update.block
+189	vm.update.di-tag
+190	vm.update.disconnect-user
+191	vm.update.expiration
+192	vm.update.name
+193	vm.update.properties-create
+194	vm.update.properties-delete
+195	vm.update.properties-update
+196	vm.update.state
+197	administrator.update.assign-role
+198	role.update.assign-acl
+199	role.update.assign-role
+200	host.update.properties-update
+201	host.update.properties-delete
+202	di.update.default
+203	di.update-massive.block
+204	di.update-massive.properties-create
+205	di.update-massive.properties-delete
+206	di.update-massive.properties-update
+207	di.update-massive.tags
+208	di.update-massive.tags-delete
+209	host.update-massive.block
+210	host.update-massive.properties-create
+211	osf.update-massive.memory
+212	osf.update-massive.properties-create
+213	osf.update-massive.properties-delete
+214	osf.update-massive.properties-update
+215	osf.update-massive.user-storage
+216	user.update-massive.block
+217	user.update-massive.properties-create
+218	user.update-massive.properties-delete
+219	user.update-massive.properties-update
+220	vm.update-massive.block
+221	vm.update-massive.di-tag
+222	vm.update-massive.disconnect-user
+223	vm.update-massive.expiration
+224	vm.update-massive.properties-create
+225	vm.update-massive.properties-delete
+226	vm.update-massive.properties-update
+227	vm.update-massive.state
+228	host.update-massive.properties-update
+229	host.update-massive.properties-delete
+230	osf.filter.properties
+231	host.filter.properties
+232	di.filter.properties
+233	di.create.properties
+234	host.update-massive.stop-vms
+235	my-admin-area.update.columns
+236	my-admin-area.update.filters-desktop
+237	my-admin-area.update.filters-mobile
+238	my-admin-area.see-main.
+239	my-admin-area.update.password
+240	tenant.delete.
+241	administrator.filter.name
+242	role.filter.name
+243	tenant.filter.name
+37	osf.see.di-list-tags
+244	osf.see.di-list-block
+245	di.see.vm-list-user-state
+246	host.see.vm-list-user-state
+247	osf.see.vm-list-user-state
+248	user.see.vm-list-user-state
+\.
+
+--
+-- Data for Name: acls; Type: TABLE DATA; Schema: public; Owner: qvd
+--
+
+
+COPY acl_role_relations (acl_id, role_id) FROM stdin;
+1	1
+2	1
+3	1
+4	1
+5	1
+6	1
+7	1
+8	1
+9	1
+10	1
+11	1
+12	1
+13	1
+14	1
+15	1
+16	1
+17	1
+18	1
+19	1
+20	1
+21	1
+22	1
+23	1
+24	1
+25	1
+26	1
+27	1
+28	1
+29	1
+30	1
+31	1
+32	1
+33	1
+34	1
+35	1
+36	1
+41	1
+42	1
+43	1
+44	1
+45	1
+46	1
+47	1
+48	1
+49	1
+50	1
+51	1
+52	1
+53	1
+54	1
+55	1
+56	1
+57	1
+58	1
+59	1
+60	1
+61	1
+62	1
+63	1
+64	1
+65	1
+66	1
+67	1
+68	1
+69	1
+70	1
+71	1
+72	1
+73	1
+74	1
+75	1
+76	1
+77	1
+78	1
+79	1
+80	1
+81	1
+82	1
+83	1
+84	1
+85	1
+86	1
+87	1
+88	1
+89	1
+90	1
+91	1
+92	1
+93	1
+94	1
+95	1
+96	1
+97	1
+98	1
+99	1
+100	1
+101	1
+102	1
+103	1
+104	1
+105	1
+106	1
+107	1
+108	1
+109	1
+110	1
+111	1
+112	1
+113	1
+114	1
+115	1
+116	1
+117	1
+118	1
+119	1
+120	1
+121	1
+122	1
+123	1
+124	1
+125	1
+126	1
+127	1
+128	1
+129	1
+130	1
+131	1
+132	1
+133	1
+134	1
+135	1
+136	1
+137	1
+138	1
+139	1
+140	1
+141	1
+142	1
+143	1
+144	1
+145	1
+146	1
+147	1
+148	1
+149	1
+150	1
+151	1
+152	1
+153	1
+154	1
+155	1
+156	1
+157	1
+158	1
+38	1
+39	1
+40	1
+159	1
+160	1
+161	1
+162	1
+163	1
+164	1
+165	1
+166	1
+167	1
+168	1
+169	1
+170	1
+171	1
+172	1
+173	1
+174	1
+175	1
+176	1
+177	1
+178	1
+179	1
+180	1
+181	1
+182	1
+183	1
+184	1
+185	1
+186	1
+187	1
+188	1
+189	1
+190	1
+191	1
+192	1
+193	1
+194	1
+195	1
+196	1
+197	1
+198	1
+199	1
+200	1
+201	1
+202	1
+203	1
+204	1
+205	1
+206	1
+207	1
+208	1
+209	1
+210	1
+211	1
+212	1
+213	1
+214	1
+215	1
+216	1
+217	1
+218	1
+219	1
+220	1
+221	1
+222	1
+223	1
+224	1
+225	1
+226	1
+227	1
+228	1
+229	1
+230	1
+231	1
+232	1
+233	1
+234	1
+235	1
+236	1
+237	1
+238	1
+239	1
+240	1
+241	1
+242	1
+243	1
+37	1
+244	1
+245	1
+246	1
+247	1
+248	1
+\.
+
+
+
+--
 -- Name: vms_id_seq; Type: SEQUENCE SET; Schema: public; Owner: qvd
 --
 
