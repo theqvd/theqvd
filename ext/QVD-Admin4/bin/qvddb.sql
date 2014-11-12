@@ -217,7 +217,8 @@ CREATE TABLE hosts (
     name character varying(127) NOT NULL,
     address character varying(127) NOT NULL,
     frontend boolean NOT NULL,
-    backend boolean NOT NULL
+    backend boolean NOT NULL,
+    l7r_host integer
 );
 
 
@@ -447,6 +448,7 @@ CREATE TABLE vm_runtimes (
     vma_ok_ts integer,
     l7r_host integer,
     l7r_pid integer,
+    l7r_host_id integer, 
     vm_address character varying(127),
     vm_vma_port integer,
     vm_x_port integer,
@@ -2498,7 +2500,6 @@ ALTER TABLE ONLY vm_runtimes
 
 ALTER TABLE ONLY vm_runtimes
     ADD CONSTRAINT vm_runtimes_vm_state_fkey FOREIGN KEY (vm_state) REFERENCES vm_states(name) ON UPDATE CASCADE ON DELETE CASCADE DEFERRABLE;
-
 
 --
 -- Name: vms_osf_id_fkey; Type: FK CONSTRAINT; Schema: public; Owner: qvd

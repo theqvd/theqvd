@@ -27,7 +27,7 @@ package MojoX::Session::Transport::WAT
 
 my $QVD_ADMIN4_API = QVD::Admin4::REST->new();
 
-app->config(hypnotoad => {listen => ['http://192.168.3.5:3000']});
+app->config(hypnotoad => {listen => ['http://192.168.56.101:3000']});
 helper (qvd_admin4_api => sub { $QVD_ADMIN4_API; });
 
 under sub {
@@ -120,7 +120,7 @@ any '/' => sub {
     
     print $@ if $@;
     my $response = ($@ ? 
-		    QVD::Admin4::Exception->new(code => 31)->json  :
+		    QVD::Admin4::Exception->new(code => 6100)->json  :
 		    $c->qvd_admin4_api->process_query($json));
 
     $response->{sid} = $c->res->headers->header('sid');

@@ -564,17 +564,18 @@ sub vm_start
     my $result = $self->select($request);
     my ($failures, %host);
 
-    my $f = sub { my $vm = shift; 
+    for my $vm (@{$result->{rows}})
+    {
+	for (1 .. 5) { eval { $DB->txn_do( sub {
+
 		  $vm->vm_runtime->can_send_vm_cmd('start')  ||
-		  QVD::Admin4::Exception->new(code => 5130, 
+		  QVD::Admin4::Exception->throw(code => 5130, 
 					      object => $vm->vm_runtime->vm_state);
 		  $self->vm_assign_host($vm->vm_runtime);
 		  $vm->vm_runtime->send_vm_start;
-		  $host{$vm->vm_runtime->host_id}++;};
+		  $host{$vm->vm_runtime->host_id}++; }
 
-    for my $vm (@{$result->{rows}})
-    {
-	for (1 .. 5) { eval { $DB->txn_do($f->($vm)) }; $@ or last; } 
+				  ) }; $@ or last; } 
 	next unless $@;
 	$failures->{$vm->id} = QVD::Admin4::Exception->new(exception => $@)->json; 
     }
@@ -594,13 +595,14 @@ sub vm_stop
     my $result = $self->select($request);
     my ($failures, %host);
 
-    my $f = sub { my $vm = shift; 
-		  $vm->vm_runtime->send_vm_stop;
-		  $host{$vm->vm_runtime->host_id}++;};
-
     for my $vm (@{$result->{rows}})
     {
-	for (1 .. 5) { eval { $DB->txn_do($f->($vm)) }; $@ or last; } 
+	for (1 .. 5) { eval { $DB->txn_do( sub {
+
+		  $vm->vm_runtime->send_vm_stop;
+		  $host{$vm->vm_runtime->host_id}++; }
+
+				  ) }; $@ or last; } 
 	next unless $@;
 	my %args = (code => 5120, object => $vm->vm_runtime->vm_state);
 	$failures->{$vm->id} = QVD::Admin4::Exception->new(%args)->json; 
@@ -1009,12 +1011,10 @@ sub config_get
     my $cp = $json_wrapper->get_filter_value('key');
     my @keys = $cp ? grep { $_ =~ /\Q$cp\E/ } cfg_keys : cfg_keys ;
 
-    use Data::Dumper; print Dumper \@keys;
-
     my $od = $json_wrapper->order_direction // '-asc';
 
     my $total = scalar @keys;
-    my $block = $json_wrapper->block // $total - 1;
+    my $block = $json_wrapper->block // $total;
     my $offset = $json_wrapper->offset // 1;
 
     my $page = Data::Page->new($total, $block, $offset);
