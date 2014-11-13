@@ -1006,7 +1006,7 @@ sub top_populated_hosts
 
 sub config_get
 {
-    my ($self,$table,$json_wrapper) = @_;
+    my ($self,$admin,$json_wrapper) = @_;
 
     my $cp = $json_wrapper->get_filter_value('key');
     my @keys = $cp ? grep { $_ =~ /\Q$cp\E/ } cfg_keys : cfg_keys ;
@@ -1030,9 +1030,8 @@ sub config_get
 sub config_set
 {
     my ($self,$request) = @_;
-
     my $result = $self->create_or_update($request);
-    notify(qvd_config_changed) if $result->{total};
+    notify(qvd_config_changed);
     $result;
 }
 
@@ -1041,7 +1040,7 @@ sub config_default
     my ($self,$request) = @_;
 
     my $result = $self->delete($request);
-    notify(qvd_config_changed) if $result->{total};
+    notify(qvd_config_changed);
     $result;
 }
  

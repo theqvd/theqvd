@@ -2455,6 +2455,13 @@ ALTER TABLE ONLY vm_runtimes
 
 
 --
+-- Name: vm_runtimes_host_id_fkey; Type: FK CONSTRAINT; Schema: public; Owner: qvd
+--
+
+ALTER TABLE ONLY vm_runtimes
+    ADD CONSTRAINT vm_runtimes_l7r_host_id_fkey FOREIGN KEY (l7r_host_id) REFERENCES hosts(id) ON UPDATE CASCADE DEFERRABLE;
+
+--
 -- Name: vm_runtimes_real_user_id_fkey; Type: FK CONSTRAINT; Schema: public; Owner: qvd
 --
 

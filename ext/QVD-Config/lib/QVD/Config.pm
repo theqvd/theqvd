@@ -17,7 +17,9 @@ our $USE_DB //= 1;
 my $cfg;
 
 sub reload {
+
     if ($USE_DB) {
+
 	# we load the database module on demand in order to avoid circular
 	# dependencies
 	require QVD::DB::Simple;
@@ -28,7 +30,9 @@ sub reload {
 sub cfg {
     my $key = shift;
     my $mandatory = shift // 1;
+
     if ($USE_DB) {
+
 	if ($key =~ /^l7r\.ssl\./) {
 	    # SSL keys are only loaded on demand.
 	    require QVD::DB::Simple;
@@ -42,6 +46,7 @@ sub cfg {
 	    return $value;
 	}
     }
+
     my $v = core_cfg($key, 0);
     if ($mandatory and not defined $v) {
         LOGDIE "mandatory configuration entry $key missing";
