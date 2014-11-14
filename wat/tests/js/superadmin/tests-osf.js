@@ -89,7 +89,6 @@ function osfTestReal () {
             // Create OSF
             //////////////////////////////////////////////////////////////////
             Wat.CurrentView.createModel(WatTests.values.osf, function (e) { 
-                console.info(e.retrievedData.status);
                 equal(e.retrievedData.status, STATUS_SUCCESS, "OSF created succesfully (" + JSON.stringify(WatTests.values.osf) + ")");
 
                 if(e.retrievedData.status == STATUS_SUCCESS) {
