@@ -37,7 +37,6 @@ Wat.Router = Backbone.Router.extend({
         if (!$.isEmptyObject(Wat.CurrentView)) {
             Wat.CurrentView.undelegateEvents();
         }
-        Wat.CurrentView.qvdObj = 'porras';
         
         Wat.CurrentView = new view(params);
     }

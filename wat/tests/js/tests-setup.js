@@ -103,7 +103,7 @@ WatTests.values = {
                 getRandomStr(),
                 getRandomStr()
             ],
-            "disk_image": getRandomStr(),
+            "disk_image": 'kk.gz',
             "version": getRandomStr(),
             "blocked": getRandomStr() > 127 ? 1 : 0,
             "tenant_id": 1,
@@ -128,7 +128,20 @@ WatTests.updateValues = {
             "blocked": WatTests.values.user.blocked ? 0 : 1, // Change blocked status
             "password": getRandomStr()
         },
-        vm: {},
+        vm: {
+            "__properties_changes__" : {
+                "set": {
+                    "prop3": getRandomStr(), // Add new property
+                    "propN": getRandomStr()  // Update property
+                },
+                "delete": [
+                    "prop2" // Delete property
+                ]
+            },
+            "name": getRandomStr(),
+            "blocked": WatTests.values.user.blocked ? 0 : 1, // Change blocked status
+            "di_tag": 'default',
+        },
         host: {},
         osf: {
             "__properties_changes__" : {
@@ -249,7 +262,7 @@ WatTests.fakeValues = {
         },
         di: {
             id: getRandomInt(),
-            disk_image: getRandomStr(),
+            disk_image: 'kk.gz',
             tenant_name: getRandomStr(),
             tenant_id: getRandomInt(),
             osf_name: getRandomStr(),
@@ -297,3 +310,13 @@ WatTests.fakeValues = {
         role: {},
         acl: {}
     };
+
+
+// XML Output in jUnit style for jenkins integration
+QUnit.jUnitReport = function(data) {
+    console.log(data.xml);
+};
+
+QUnit.begin(function( details ) {
+    
+});

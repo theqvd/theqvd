@@ -30,7 +30,7 @@ Wat.Views.AdminDetailsView = Wat.Views.DetailsView.extend({
     },
     
     renderACLsTree: function (that) {
-        var branchStats = that.retrievedData.result;
+        var branchStats = that.retrievedData;
         // If acl list is not visible, we destroy div and increase the details layer to fill the gap
         if (!Wat.C.checkACL('administrator.see.acl-list')) { 
             $('.js-details-side').remove();
@@ -120,7 +120,7 @@ Wat.Views.AdminDetailsView = Wat.Views.DetailsView.extend({
     
     // Fill branch with retreived ACLs from API
     fillBranch: function (that) {
-        $.each(that.retrievedData.result.rows, function (iACL, acl) {
+        $.each(that.retrievedData.rows, function (iACL, acl) {
             var subbranch = '';
             subbranch += '<div class="subbranch hidden" data-acl-id="' + acl.id + '">';
                 subbranch += '<span class="subbranch-piece">';
@@ -149,7 +149,7 @@ Wat.Views.AdminDetailsView = Wat.Views.DetailsView.extend({
     
     // Set as checked the effective roles and added the inherit icon with inherited roles title
     fillEffectiveBranch: function (that) {
-        $.each(that.retrievedData.result.rows, function (iACL, acl) {
+        $.each(that.retrievedData.rows, function (iACL, acl) {
             that.currentBranchDiv.find('div.subbranch[data-acl-id="' + acl.id + '"]').show();
             
             if (Object.keys(acl.roles).length > 0) {

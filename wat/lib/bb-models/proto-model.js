@@ -9,13 +9,8 @@ Wat.Models.Model = Backbone.Model.extend({
             return;
         }
         
-        if (response.result) {
-            if (response.result.rows) {
-                var view = 'detail';
-            }
-            else {
-                var view = 'error';
-            }
+        if (response.rows) {
+            var view = 'detail';
         }
         else {
             var view = 'list';
@@ -23,7 +18,7 @@ Wat.Models.Model = Backbone.Model.extend({
         
         switch (view) {
             case 'detail':
-                return response.result.rows[0];
+                return response.rows[0];
                 break;
             case 'list':
                 return response;

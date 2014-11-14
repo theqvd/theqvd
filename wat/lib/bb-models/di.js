@@ -13,8 +13,13 @@ Wat.Models.DI = Wat.Models.Model.extend({
             return {};
         }
         
-        if (response.result) {
-            var model = response.result.rows[0];
+        if (response) {
+            if (response.rows) {
+                var model = response.rows[0];
+            }
+            else {
+                var model = response;
+            }
         }
         else {
             var model = response;

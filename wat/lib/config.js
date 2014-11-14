@@ -85,8 +85,7 @@ Wat.C = {
     
     checkLogin: function (that) {   
         that.password = '';
-
-        if (!that.retrievedData.result || $.isEmptyObject(that.retrievedData.result)) {
+        if (!that.retrievedData.acls || $.isEmptyObject(that.retrievedData.acls)) {
             Wat.I.showMessage({message: "Wrong user or password", messageType: "error"});
             that.login = '';
             that.sid = '';
@@ -94,23 +93,23 @@ Wat.C = {
         }
         
         // Store retrieved acls
-        Wat.C.acls = that.retrievedData.result.acls;
+        Wat.C.acls = that.retrievedData.acls;
         
         // Restore possible residous views configuration to default values
         Wat.I.restoreListColumns();
         Wat.I.restoreFormFilters();
         
         // Store views configuration
-        Wat.C.storeViewsConfiguration(that.retrievedData.result.views);
+        Wat.C.storeViewsConfiguration(that.retrievedData.views);
         
         // Configure visability
         Wat.C.configureVisibility();
         
         // Store tenant ID
-        Wat.C.tenantID = that.retrievedData.result.tenant_id;
+        Wat.C.tenantID = that.retrievedData.tenant_id;
         
         // Store admin ID
-        Wat.C.adminID = that.retrievedData.result.admin_id;
+        Wat.C.adminID = that.retrievedData.admin_id;
         
         if (Wat.CurrentView.qvdObj == 'login') {
             Wat.C.logIn(that.sid, that.login);

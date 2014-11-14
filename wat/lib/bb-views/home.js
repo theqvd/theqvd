@@ -25,7 +25,6 @@ Wat.Views.HomeView = Wat.Views.MainView.extend({
     },
     
     initialize: function (params) {
-        //this.model = new Wat.Models.DI(params);
         Wat.Views.MainView.prototype.initialize.apply(this, [params]);
         Wat.B.bindHomeEvents();
         
@@ -36,7 +35,7 @@ Wat.Views.HomeView = Wat.Views.MainView.extend({
     },
     
     render: function () {
-        var stats = this.retrievedData.result;
+        var stats = this.retrievedData;
 
         if (stats == undefined) {
             stats = this.defaultStats;

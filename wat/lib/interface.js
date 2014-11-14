@@ -77,7 +77,7 @@ Wat.I = {
             return {};
         }
         
-        $.each(this.retrievedData.result.rows, function (iRegister, register) {
+        $.each(this.retrievedData.rows, function (iRegister, register) {
             if (defaultListColumns[register.field]) {
                 defaultListColumns[register.field].display = register.visible;
             }
@@ -146,7 +146,7 @@ Wat.I = {
             return {};
         }
                
-        $.each(this.retrievedData.result.rows, function (iRegister, register) {
+        $.each(this.retrievedData.rows, function (iRegister, register) {
             if (!defaultFormFilters[register.field]) {
                 defaultFormFilters[register.field] = {
                     'filterField': register.field,
@@ -254,8 +254,8 @@ Wat.I = {
     },
     
     setCustomizationFieldsCallback: function (that) {
-        if (that.retrievedData.status === 0 && that.retrievedData.result) {
-            var fields = that.retrievedData.result.rows;
+        if (that.retrievedData.status === 0 && that.retrievedData) {
+            var fields = that.retrievedData.rows;
 
             $.each(fields, function (iField, field) {
                 // If field options are not defined, we keep the default options doing nothing
@@ -537,6 +537,11 @@ Wat.I = {
             content: function(callback) {
                 // Carriage return support
                 callback($(this).prop('title').replace('\n', '<br />')); 
+            },
+            open: function (event, ui) {
+                $(ui.tooltip).mouseleave(function() {
+                    $(ui.tooltip).hide();
+                });
             }
         }
                              );
@@ -546,8 +551,6 @@ Wat.I = {
         $('[name="tags"]').tagsInput({
             'defaultText': i18n.t('Add a tag')
         });
-                
-        
     },
     
     dialog: function (dialogConf, that) {

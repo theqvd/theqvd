@@ -286,11 +286,11 @@ Wat.Views.ListView = Wat.Views.MainView.extend({
     
     storeAllSelectedIds: function (that) {
         var maxSelectableItems = 2000;
-        if (that.retrievedData.result.rows.length > maxSelectableItems) {
-            that.selectedItems = that.retrievedData.result.rows.slice(0, maxSelectableItems);
+        if (that.retrievedData.rows.length > maxSelectableItems) {
+            that.selectedItems = that.retrievedData.rows.slice(0, maxSelectableItems);
         }
         else {
-            that.selectedItems = that.retrievedData.result.rows;
+            that.selectedItems = that.retrievedData.rows;
         }
     },
     
@@ -399,17 +399,17 @@ Wat.Views.ListView = Wat.Views.MainView.extend({
     render: function () {
         var that = this;
         
+        // If user have not access to main section, redirect to home
+        if (that.whatRender && !Wat.C.checkACL(that.qvdObj + '.see-main.')) {
+            Wat.Router.app_router.trigger('route:defaultRoute');
+            return;
+        }
+        
         this.collection.fetch({      
             complete: function () {
                 switch(that.whatRender) {
                     case 'all':
-                        // If user have not access to main section, redirect to home
-                        if (!Wat.C.checkACL(that.qvdObj + '.see-main.')) {
-                            window.location = '#';
-                        }
-                        else {
-                            that.renderAll();
-                        }
+                        that.renderAll();
                         break;
                     case 'list':
                         that.renderListBlock();

@@ -155,7 +155,7 @@ Wat.A = {
                     }
                     
                     var optGroup = '';
-                    $(data.result.rows).each(function(i,option) {
+                    $(data.rows).each(function(i,option) {
                         var selected = '';
 
                         var id = option.id;

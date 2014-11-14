@@ -9,7 +9,7 @@
                     }
             %>
                     <li>
-                        <a href="<%= option.link %>" class="<%= option.iconClass %> <%= selectedClass %>" data-i18n="<%= option.text %>"><%= i18n.t(option.text) %></a>
+                        <a href="<%= option.link %>" class="<%= option.iconClass %> <%= selectedClass %>" data-i18n="<%= option.text %>"><%= $.i18n.t(option.text) %></a>
                     </li>
             <%
                 });

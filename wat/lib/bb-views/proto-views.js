@@ -263,7 +263,7 @@ Wat.Views.ViewsView = Wat.Views.MainView.extend({
             return;
         }
         
-        var objProperties = that.retrievedData.result.rows;
+        var objProperties = that.retrievedData.rows;
         
         if (!objProperties) {
             return;

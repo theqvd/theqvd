@@ -104,7 +104,7 @@
                 </td>
             </tr>
         <%
-        }
+        }                
         _.each(models, function(model) { %>
             <tr class="row-<%= model.get('id') %>">
                 <% 
@@ -112,7 +112,7 @@
                         if (col.display == false) {
                             return;
                         }
-                    
+
                         switch(name) {
                             case 'checks':
                                 var checkedAttr = $.inArray(parseInt(model.get('id')), selectedItems) > -1 ? 'checked' : '';
@@ -127,6 +127,7 @@
                 %>
                                 <td class="desktop">
                                     <%
+                                    
                                     if (model.get('tags') && (!infoRestrictions || infoRestrictions.tags)) {
                                     %>
                                         <i class="fa fa-tags" title="&raquo; <%= model.get('tags').replace(/,/g,'<br /><br />&raquo; ') %>"></i>

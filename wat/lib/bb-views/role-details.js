@@ -87,7 +87,7 @@ Wat.Views.RoleDetailsView = Wat.Views.DetailsView.extend({
     
     // Fill branch with retreived ACLs from API
     fillBranch: function (that) {
-        $.each(that.retrievedData.result.rows, function (iACL, acl) {
+        $.each(that.retrievedData.rows, function (iACL, acl) {
             var subbranch = '';
             subbranch += '<div class="subbranch disabled-branch hidden" data-acl="' + acl.name + '" data-acl-id="' + acl.id + '">';
                 if (Wat.C.checkACL('role.update.assign-acl')) {
@@ -124,7 +124,7 @@ Wat.Views.RoleDetailsView = Wat.Views.DetailsView.extend({
         // If we cant update acls, we only show effective acls
         var showNotVisibleAcls = Wat.C.checkACL('role.update.assign-acl');
         
-        $.each(that.retrievedData.result.rows, function (iACL, acl) {
+        $.each(that.retrievedData.rows, function (iACL, acl) {
             that.currentBranchDiv.find('input[data-acl-id="' + acl.id + '"]').prop('checked', true);
             that.currentBranchDiv.find('div.subbranch[data-acl-id="' + acl.id + '"]').removeClass('disabled-branch');
             
@@ -206,7 +206,7 @@ Wat.Views.RoleDetailsView = Wat.Views.DetailsView.extend({
     
     // Assign-unassign acls of a branch
     performACLGroupCheck: function (that) {        
-        var branchACLs = that.retrievedData.result.rows;
+        var branchACLs = that.retrievedData.rows;
         
         var acls = [];
         $.each(branchACLs, function (iACL, acl) {
@@ -287,8 +287,8 @@ Wat.Views.RoleDetailsView = Wat.Views.DetailsView.extend({
                 break;
         }
         
-        var effectiveACLs = that.retrievedData.result[aclPattern].effective;
-        var totalACLs = that.retrievedData.result[aclPattern].total;
+        var effectiveACLs = that.retrievedData[aclPattern].effective;
+        var totalACLs = that.retrievedData[aclPattern].total;
         
         $('span.js-effective-count[data-branch="' + that.checkedBranch + '"]').html(effectiveACLs);
         
@@ -388,7 +388,7 @@ Wat.Views.RoleDetailsView = Wat.Views.DetailsView.extend({
     },    
     
     renderACLsTree: function (that) {
-        var branchStats = that.retrievedData.result;
+        var branchStats = that.retrievedData;
 
         // If acl list is not visible, we destroy div and increase the details layer to fill the gap
         if (!Wat.C.checkACL('role.see.acl-list')) { 

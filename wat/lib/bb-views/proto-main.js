@@ -235,7 +235,7 @@ Wat.Views.MainView = Backbone.View.extend({
             'success': 'Successfully created',
             'error': 'Error creating'
         };
-
+        
         this.saveModel(arguments, {}, messages, successCallback);        
     },
     
@@ -284,10 +284,10 @@ Wat.Views.MainView = Backbone.View.extend({
                 }
             }
             
+            that.retrievedData = response;
+            successCallback(that);
+            
             if (callResponse == 200 && response.status == STATUS_SUCCESS) {
-                that.retrievedData = response;
-                successCallback(that);
-                
                 that.message = messages.success;
                 that.messageType = 'success';
             }
