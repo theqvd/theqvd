@@ -688,7 +688,9 @@ ALTER TABLE public.roles_id_seq OWNER TO qvd;
 
 CREATE TABLE roles (
     id integer NOT NULL,
-    name character varying(64) NOT NULL
+    name character varying(64) NOT NULL,
+    inner boolean NOT NULL,
+    fixed boolean NOT NULL
 );
 
 

@@ -30,6 +30,7 @@ my $QVD_ADMIN4_API = QVD::Admin4::REST->new();
 app->config(hypnotoad => {listen => ['http://192.168.56.101:3000']});
 helper (qvd_admin4_api => sub { $QVD_ADMIN4_API; });
 
+
 under sub {
 
     my $c = shift;
@@ -104,6 +105,7 @@ under sub {
     }
 };
 
+
 any '/' => sub { 
 
     my $c = shift;
@@ -127,5 +129,13 @@ any '/' => sub {
     $c->render(json => $response);
 };
 
-app->start;
+websocket '/echo' => sub {
+    my $c = shift;
+    $c->app->log->debug('WebSocket opened.');
+    $c->on(message => sub {
+	my ($c, $msg) = @_;
+	$c->app->log->debug("WebSocket $msg");
+	$c->send("echo: $msg"); }); 
+};
 
+app->start;

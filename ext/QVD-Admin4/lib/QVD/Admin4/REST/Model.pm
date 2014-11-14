@@ -286,7 +286,7 @@ my $AVAILABLE_FILTERS =
 
 	      Tenant => [qw(id name)],
 
-	      Role => [qw(name id )],
+	      Role => [qw(name id fixed inner)],
 
 	      Administrator => [qw(name tenant_id tenant_name id )],
 
@@ -315,7 +315,7 @@ my $AVAILABLE_FILTERS =
 
 		 ACL => [qw(id name role_id admin_id )],
 
-		 Role => [qw(name acl_id role_id nested_acl_name nested_role_name id admin_id admin_name )],
+		 Role => [qw(name id fixed inner)],
 
 		 Tenant => [qw(id name)],
 
@@ -345,7 +345,7 @@ my $AVAILABLE_FIELDS =
 
 	      OSF => [qw(id name overlay user_storage memory  number_of_vms number_of_dis properties )],
 
-	      Role => [qw(name roles acls id number_of_acls)],
+	      Role => [qw(name roles acls id number_of_acls fixed inner)],
 
 	      DI => [qw(id disk_image version osf_id osf_name blocked tags  properties )],
 
@@ -376,7 +376,7 @@ my $AVAILABLE_FIELDS =
 
 		 OSF => [qw(id name overlay user_storage memory  number_of_vms number_of_dis properties )],
 		 
-		 Role => [qw(name acls roles id number_of_acls)],
+		 Role => [qw(name acls roles id number_of_acls fixed inner)],
 		
 		 DI => [qw(id disk_image version osf_id osf_name  blocked tags  properties )],
 		
@@ -553,7 +553,7 @@ my $MANDATORY_ARGUMENTS = { Config => [qw(key value)],
 			    OSF => [qw(name memory overlay user_storage tenant_id)],
                             DI => [qw(version disk_image osf_id blocked)],
 			    Tenant => [qw(name)],
-			    Role => [qw(name)],
+			    Role => [qw(name fixed inner)],
                             Administrator => [qw(name password tenant_id)],
 			    Tenant_Views_Setup => [qw(tenant_id field visible view_type device_type qvd_object property)],
 			    Administrator_Views_Setup => [qw(admin_id field visible view_type device_type qvd_object property)]}; 
@@ -578,6 +578,8 @@ my $DEFAULT_ARGUMENT_VALUES =
 	     user_storage => 0 },
 
     DI => { blocked => 'false' },
+
+    Role => { fixed => 'false', inner => 'false' },
 
     Tenant_Views_Setup => { visible => 0, property => 0 },
 
