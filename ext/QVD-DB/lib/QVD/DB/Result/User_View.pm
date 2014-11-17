@@ -11,8 +11,8 @@ __PACKAGE__->result_source_instance->view_definition(
 
 "SELECT me.id                                as id, 
         json_agg(properties)   as properties_json,
-        COUNT(vm_runtimes) as number_of_vms_connected, 
-        COUNT(vms)         as number_of_vms
+        COUNT(DISTINCT vm_runtimes) as number_of_vms_connected, 
+        COUNT(DISTINCT vms)         as number_of_vms
 
  FROM      users me 
  LEFT JOIN user_properties properties ON(properties.user_id=me.id) 

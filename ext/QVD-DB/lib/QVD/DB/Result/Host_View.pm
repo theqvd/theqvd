@@ -10,7 +10,7 @@ __PACKAGE__->result_source_instance->view_definition(
 
 "SELECT me.id            as id, 
         json_agg(properties)   as properties_json,
-        COUNT(vm_runtimes) as number_of_vms_connected
+        COUNT(DISTINCT vm_runtimes) as number_of_vms_connected
  FROM      hosts me 
  LEFT JOIN host_properties properties ON(properties.host_id=me.id) 
  LEFT JOIN vm_runtimes vm_runtimes ON(vm_runtimes.host_id=me.id and vm_runtimes.vm_state='running') 
