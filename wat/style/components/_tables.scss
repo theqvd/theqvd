@@ -54,6 +54,9 @@ table.expiration-table {
 
 table.roles-inherit-table {
     width: 100%;
+    tr:first-child>td>div {
+        padding-bottom: 4px;
+    }
 }
 
 .second_row {

@@ -141,6 +141,10 @@ Wat.A = {
             if (params.filters) {
                 jsonUrl += '&filters=' + JSON.stringify(params.filters);
             }
+            
+            if (params.order_by) {
+                jsonUrl += '&order_by=' + JSON.stringify(params.order_by);
+            }
 
             $.ajax({
                 url: jsonUrl,

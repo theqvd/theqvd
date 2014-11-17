@@ -369,6 +369,10 @@ Wat.Views.RoleDetailsView = Wat.Views.DetailsView.extend({
             'selectedId': '',
             'controlName': 'role',
             'filters': {
+            },
+            'order_by': {
+                "field": ["internal","name"],
+                "order": "-asc"
             }
         };
 

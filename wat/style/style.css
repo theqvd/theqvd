@@ -1424,7 +1424,8 @@ select[name="acl_positive_on_role"] option, .acls_positive {
   font-size: 10px; }
 
 .branch-text {
-  font-size: 12px; }
+  font-size: 12px;
+  font-weight: bold; }
 
 .acl-inheritance {
   margin-right: 5px; }
@@ -1649,6 +1650,8 @@ table.expiration-table {
 
 table.roles-inherit-table {
   width: 100%; }
+  table.roles-inherit-table tr:first-child > td > div {
+    padding-bottom: 4px; }
 
 .second_row {
   margin-top: 4px;

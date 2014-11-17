@@ -187,6 +187,7 @@ Wat.Views.AdminDetailsView = Wat.Views.DetailsView.extend({
             'selectedId': '',
             'controlName': 'role',
             'filters': {
+                'internal': false
             }
         };
 
