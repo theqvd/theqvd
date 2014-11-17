@@ -482,6 +482,7 @@
     "Zero items selected, no item has been changed": "Zero items selected, no item has been changed", 
     "No connection to database": "No connection to database", 
     "Unable to copy disk image from staging": "Unable to copy disk image from staging", 
+    "Unable to copy whole disk image (lack of space?)": "Unable to copy whole disk image (lack of space?)", 
     "Unable to find images directory in filesystem": "Unable to find images directory in filesystem", 
     "Unable to find staging directory in filesystem": "Unable to find staging directory in filesystem", 
     "Unable to find disk image in staging directory": "Unable to find disk image in staging directory", 

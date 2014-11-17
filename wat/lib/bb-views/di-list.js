@@ -42,6 +42,17 @@ Wat.Views.DIListView = Wat.Views.ListView.extend({
         // Configure tags inputs
         Wat.I.tagsInputConfiguration();
         
+        // Fill disk images of staging folder select on disk images creation form
+        var params = {
+            'action': 'dis_in_staging',
+            'controlName': 'disk_image',
+            'nameAsId': true
+        };
+        
+        Wat.A.fillSelect(params); 
+        
+        Wat.I.chosenElement('[name="disk_image"]', 'advanced100');
+
         // Fill OSF select on virtual machines creation form
         var params = {
             'action': 'osf_tiny_list',
@@ -89,7 +100,7 @@ Wat.Views.DIListView = Wat.Views.ListView.extend({
             arguments["__properties__"] = properties.set;
         }
         
-        var disk_image = context.find('input[name="disk_image"]').val();
+        var disk_image = context.find('select[name="disk_image"]').val();
         if (disk_image) {
             arguments["disk_image"] = disk_image;
         }   

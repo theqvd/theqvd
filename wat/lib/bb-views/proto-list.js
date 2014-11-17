@@ -388,6 +388,13 @@ Wat.Views.ListView = Wat.Views.MainView.extend({
         
         that.collection.fetch({      
             complete: function () {
+                // If loaded page is not the first one and is empty, go to previous page
+                if (that.collection.offset > 1 && that.collection.length == 0) {
+                    that.collection.offset--;
+                    that.fetchList(that);
+                    return;
+                }
+                
                 that.renderList(that.listContainer);
                 Wat.I.updateSortIcons(that);
                 Wat.I.updateChosenControls();
@@ -631,10 +638,11 @@ Wat.Views.ListView = Wat.Views.MainView.extend({
         this.templateEditor = Wat.A.getTemplate(this.editorTemplateName);
         
         this.dialogConf.buttons = {
-            Cancel: function () {
+            Cancel: function (e) {
                 $(this).dialog('close');
             },
-            Create: function () {
+            Create: function (e) {
+                $(e.target).addClass('fa-spin');
                 that.dialog = $(this);
                 that.createElement($(this));
             }

@@ -11,11 +11,11 @@ loginTest();
 //viewTest();
 
 // Tests simulating server response
-/*userTestFake();
+userTestFake();
 vmTestFake();
 hostTestFake();
 osfTestFake();
-diTestFake();*/
+diTestFake();
 
 // Tests calling API
 userTestReal();

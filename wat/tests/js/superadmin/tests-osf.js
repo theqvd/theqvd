@@ -21,11 +21,9 @@ function osfTestFake () {
             var fakeResponse = {
                 "failures": {},
                 "status": 0,
-                "result": {
-                    "rows" : [
-                        fakeValues
-                    ]
-                },
+                "rows" : [
+                    fakeValues
+                ],
                 "message": "Successful completion."
             };
 

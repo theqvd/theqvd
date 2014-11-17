@@ -2,7 +2,7 @@
     <tr>
         <td data-i18n="Disk image"></td>
         <td>
-            <input type="text" name="disk_image" value="" data-required>
+            <select class="" name="disk_image" data-any-selected></select>
         </td>
     </tr>
     <% 

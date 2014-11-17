@@ -459,7 +459,8 @@ Wat.I = {
         $('.datetimepicker').datetimepicker({
             dayOfWeekStart: 1,
             lang: 'en',
-            format:'Y-m-d H:i'
+            format:'Y-m-d H:i',
+            minDate: 0
         });
     },
     
@@ -684,7 +685,6 @@ Wat.I = {
     },
     
     getTextFromFailures: function (failures) {
-        console.warn(failures);
         // Group failures by text
         var failuresByText = {};
         $.each(failures, function(id, text) {
@@ -700,7 +700,6 @@ Wat.I = {
             failuresList += '<li>';
             failuresList += '<i class="fa fa-angle-double-right strong" data-i18n>' + $.i18n.t(text) + '</i>';
             failuresList += '<ul>';
-            console.log('"' + i18n.t('Unable to remove;') + '"');
             $.each(ids, function(iId, id) {
                 if ($('.list')) {
                     var elementName = $('.list').find('tr.row-' + id).find('.js-name .text').html();

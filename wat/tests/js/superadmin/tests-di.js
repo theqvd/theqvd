@@ -18,11 +18,9 @@ function diTestFake () {
             var fakeResponse = {
                 "failures": {},
                 "status": 0,
-                "result": {
-                    "rows" : [
-                        jQuery.extend({}, fakeValues)
-                    ]
-                },
+                "rows" : [
+                    jQuery.extend({}, fakeValues)
+                ],
                 "message": "Successful completion."
             };
 

@@ -21,12 +21,10 @@ function userTestFake () {
             var fakeResponse = {
                 "failures": {},
                 "status": 0,
-                "result": {
-                    "rows" : [
-                        fakeValues
-                    ]
-                },
-                "message": "Successful completion."
+                "rows" : [
+                    fakeValues
+                ],
+                "message": "Successful completion"
             };
 
             this.server.respondWith(
@@ -47,7 +45,7 @@ function userTestFake () {
             this.server.respond();
 
             ok(callback.called, "Server call");
-
+                        
             $.each(fakeValues, function (fieldName, fieldValue) {
                 if (typeof fieldValue == 'object') {
                     deepEqual(callback.getCall(0).args[0].attributes[fieldName], fieldValue, "User fetching should recover '" + fieldName + "' properly (Random generated: " + JSON.stringify(fieldValue) + ")");
