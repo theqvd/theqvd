@@ -17,10 +17,11 @@ my $code2message_mapper =
 
     1100 => 'Internal server error',
     1200 => 'Action not accomplished for all elements',
-    1300 => 'Zero items selected: no item has been changed',
+    1300 => 'Zero items selected, no item has been changed',
 
     2100 => 'No connection to database',
     2210 => 'Unable to copy disk image from staging',
+    2211 => 'Unable to copy whole disk image from staging',
     2220 => 'Unable to find images directory in filesystem',
     2230 => 'Unable to find staging directory in filesystem',
     2240 => 'Unable to find disk image in staging directory',
@@ -39,7 +40,7 @@ my $code2message_mapper =
     5110 => 'Unable to disconnect user in current state',
     5120 => 'Unable to stop VM in current state',
     5130 => 'Unable to start VM in current state',
-    5140 => 'Unable to assign host: no host available',
+    5140 => 'Unable to assign host, no host available',
 
     6100 => 'Syntax errors in input json',
     6210 => 'Inappropiate filter for this action',
@@ -60,8 +61,8 @@ my $code2message_mapper =
     6450 => 'No role provided',
 
     7100 => 'Refered related items don\'t exist',
-    7110 => 'Unable to accomplish: refered related items don\'t exist',
-    7120 => 'Unable to remove: other items depend on it',
+    7110 => 'Unable to accomplish, refered related items don\'t exist',
+    7120 => 'Unable to remove, other items depend on it',
     7200 => 'This element already exists',
     7210 => 'This property already exists',
     7220 => 'This acl has already been assigned',
@@ -70,7 +71,7 @@ my $code2message_mapper =
     7320 => 'Unable to remove DI. There are VMs running with it',
     7330 => 'Unable to reassign a Tag fixed to another DI',
     7340 => 'Fixed, Head and Default Tags cannot be deleted',
-    7350 => 'Forbidden role assignment: inherited role inherits from inheritor'
+    7350 => 'Forbidden role assignment, inherited role inherits from inheritor'
 };
 
 
@@ -137,7 +138,7 @@ sub message
 {
     my $self = shift;
     my $message = $code2message_mapper->{$self->code};
-    $message .= ": ".$self->object if defined $self->object;
+    $message .= " (".$self->object.")" if defined $self->object;
     $message; 
 }
 

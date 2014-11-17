@@ -768,6 +768,8 @@ my $FIELDS_TO_DBIX_FORMAT_MAPPER =
 
     Role => {
 	'name' => 'me.name',
+	'fixed' => 'me.fixed',
+	'internal' => 'me.internal',
 	'acls' => 'me.get_positive_and_negative_acls_info',
 	'roles' => 'me.get_roles_with_its_acls_info',
 	'id' => 'me.id',
@@ -936,9 +938,7 @@ my $DBIX_PREFETCH_VALUE =
 	      OSF => [ qw(tenant)],
 	      DI => [{osf => 'tenant'}],
 	      DI_Tag => [{di => {osf => 'tenant'}}],
-	      Role => [{role_rels => 'inherited'}, { acl_rels => 'acl'}],
-	      Administrator => [qw(tenant), { role_rels => { role => { acl_rels => 'acl' }}}],
-	      ACL => [{ role_rels => { role => { admin_rels => 'admin' }}}],
+	      Administrator => [qw(tenant)],
 	      Tenant_Views_Setup => [ qw(tenant)],
 	      Administrator_Views_Setup => [ { administrator => 'tenant' }] },
 
@@ -948,9 +948,7 @@ my $DBIX_PREFETCH_VALUE =
 		OSF => [ qw(tenant)],
 		DI => [{osf => 'tenant'}],
 		DI_Tag => [{di => {osf => 'tenant'}}],
-		Role => [{role_rels => 'inherited'}, { acl_rels => 'acl'}],
-		Administrator => [qw(tenant), { role_rels => { role => { acl_rels => 'acl' }}}],
-		ACL => [{ role_rels => { role => { admin_rels => 'admin' }}}],
+		Administrator => [qw(tenant)],
 		Tenant_Views_Setup => [ qw(tenant)],
 		Administrator_Views_Setup => [ { administrator => 'tenant' }]}
 };

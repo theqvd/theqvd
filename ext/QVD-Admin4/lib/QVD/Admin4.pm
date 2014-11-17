@@ -526,6 +526,13 @@ sub di_create
     }
     if ($@) { $di->delete; QVD::Admin4::Exception->throw(code=>'2210');}
 
+    my $staging_file_size = -s "$staging_path/$staging_file";
+    my $images_file_size = -s "$images_path/$images_file";
+
+    unless ($staging_file_size == $images_file_size) 
+    { $di->delete; unlink "$images_path/$images_file";
+      QVD::Admin4::Exception->throw(code=>'2211');}
+
     $result;
 }
 
@@ -637,7 +644,7 @@ sub dis_in_staging
     opendir $dir, $staging_path;
     my @files = grep { $_ !~ /^\.{1,2}$/ } readdir $dir; 
 
-    { rows => [map { { name => $_ } } @files} , total => scalar @files };
+    { rows => [map { { name => $_ } } @files ] , total => scalar @files };
 }
 
 my $lb;
