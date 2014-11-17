@@ -637,7 +637,7 @@ sub dis_in_staging
     opendir $dir, $staging_path;
     my @files = grep { $_ !~ /^\.{1,2}$/ } readdir $dir; 
 
-    { rows => \@files , total => scalar @files };
+    { rows => [map { { name => $_ } } @files} , total => scalar @files };
 }
 
 my $lb;
