@@ -4,7 +4,7 @@ ALL_STATUS = {
 
     1100: 'Internal server error',
     1200: 'Action not accomplished for all elements',
-    1300: 'Zero items selected: no item has been changed',
+    1300: 'Zero items selected, no item has been changed',
 
     2100: 'No connection to database',
     2210: 'Unable to copy disk image from staging',
@@ -26,7 +26,7 @@ ALL_STATUS = {
     5110: 'Unable to disconnect user in current state',
     5120: 'Unable to stop VM in current state',
     5130: 'Unable to start VM in current state',
-    5140: 'Unable to assign host: no host available',
+    5140: 'Unable to assign host, no host available',
 
     6100: 'Syntax errors in input json',
     6210: 'Inappropiate filter for this action',
@@ -47,8 +47,8 @@ ALL_STATUS = {
     6450: 'No role provided',
 
     7100: 'Refered related items don\'t exist',
-    7110: 'Unable to accomplish: refered related items don\'t exist',
-    7120: 'Unable to remove: other items depend on it',
+    7110: 'Unable to accomplish, refered related items don\'t exist',
+    7120: 'Unable to remove, other items depend on it',
     7200: 'This element already exists',
     7210: 'This property already exists',
     7220: 'This acl has already been assigned',

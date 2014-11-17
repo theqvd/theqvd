@@ -8,7 +8,7 @@ Wat.T = {
             //resGetPath: 'lib/languages/__lng__.json',
             resGetPath: APP_PATH + 'lib/languages/en.json',
             useLocalStorage: false,
-            debug: false,
+            debug: true,
             fallbackLng: 'en',
         }, this.afterTranslate);
     },

@@ -670,7 +670,7 @@ Wat.I = {
             case 'error':
                 msg.expandedMessage = msg.expandedMessage || '';
                 
-                if (response.message != msg.message) {
+                if (response.message != msg.message && response.message) {
                     msg.expandedMessage += '<strong>' + response.message + '</strong> <br/><br/>';
                 }
             
@@ -684,11 +684,12 @@ Wat.I = {
     },
     
     getTextFromFailures: function (failures) {
+        console.warn(failures);
         // Group failures by text
         var failuresByText = {};
         $.each(failures, function(id, text) {
-            failuresByText[text] = failuresByText[text] || [];
-            failuresByText[text].push(id);
+            failuresByText[text.message] = failuresByText[text.message] || [];
+            failuresByText[text.message].push(id);
         });
         
         // Get class from the icon of the selected item from menu to use it in list
@@ -697,8 +698,9 @@ Wat.I = {
         var failuresList = '<ul>';
         $.each(failuresByText, function(text, ids) {
             failuresList += '<li>';
-            failuresList += '<i class="fa fa-angle-double-right strong">' + text + '</i>';
+            failuresList += '<i class="fa fa-angle-double-right strong" data-i18n>' + $.i18n.t(text) + '</i>';
             failuresList += '<ul>';
+            console.log('"' + i18n.t('Unable to remove;') + '"');
             $.each(ids, function(iId, id) {
                 if ($('.list')) {
                     var elementName = $('.list').find('tr.row-' + id).find('.js-name .text').html();

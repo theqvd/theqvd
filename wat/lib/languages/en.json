@@ -228,8 +228,7 @@
     "Yes": "Yes",
     "You can either select only the visible items or all of them, including the items currently out of view due to pagination": "You can either select only the visible items or all of them, including the items currently out of view due to pagination",
     "Your session has expired. Please log in again": "Your session has expired. Please log in again",
-    /*
-    // ACLS
+    "#######NOTRANSLATE#######_ACLS": "",
     "Create administrators": "Create administrators", 
     "Delete administrators": "Delete administrators", 
     "Delete administrators (massive)": "Delete administrators (massive)", 
@@ -476,12 +475,11 @@
     "Delete properties when update virtual machines": "Delete properties when update virtual machines", 
     "Change properties when update virtual machines": "Change properties when update virtual machines", 
     "Start-Stop virtual machines": "Start-Stop virtual machines",
-    
-    // API STATUS
+    "#######NOTRANSLATE#######_API_STATUS": "",
     "Successful completion": "Successful completion", 
     "Internal server error": "Internal server error", 
     "Action not accomplished for all elements": "Action not accomplished for all elements", 
-    "Zero items selected: no item has been changed": "Zero items selected: no item has been changed", 
+    "Zero items selected, no item has been changed": "Zero items selected, no item has been changed", 
     "No connection to database": "No connection to database", 
     "Unable to copy disk image from staging": "Unable to copy disk image from staging", 
     "Unable to find images directory in filesystem": "Unable to find images directory in filesystem", 
@@ -499,7 +497,7 @@
     "Unable to disconnect user in current state": "Unable to disconnect user in current state", 
     "Unable to stop VM in current state": "Unable to stop VM in current state", 
     "Unable to start VM in current state": "Unable to start VM in current state", 
-    "Unable to assign host: no host available": "Unable to assign host: no host available", 
+    "Unable to assign host, no host available": "Unable to assign host, no host available", 
     "Syntax errors in input json": "Syntax errors in input json", 
     "Inappropiate filter for this action": "Inappropiate filter for this action", 
     "No mandatory filter for this action": "No mandatory filter for this action", 
@@ -518,8 +516,8 @@
     "No acl provided": "No acl provided", 
     "No role provided": "No role provided", 
     "Refered related items don't exist": "Refered related items don't exist", 
-    "Unable to accomplish: refered related items don't exist": "Unable to accomplish: refered related items don't exist", 
-    "Unable to remove: other items depend on it": "Unable to remove: other items depend on it", 
+    "Unable to accomplish, refered related items don't exist": "Unable to accomplish, refered related items don't exist", 
+    "Unable to remove, other items depend on it": "Unable to remove, other items depend on it", 
     "This element already exists": "This element already exists", 
     "This property already exists": "This property already exists", 
     "This acl has already been assigned": "This acl has already been assigned", 
@@ -528,6 +526,5 @@
     "Unable to remove DI. There are VMs running with it": "Unable to remove DI. There are VMs running with it", 
     "Unable to reassign a Tag fixed to another DI": "Unable to reassign a Tag fixed to another DI", 
     "Fixed, Head and Default Tags cannot be deleted": "Fixed, Head and Default Tags cannot be deleted", 
-    "Forbidden role assignment: inherited role inherits from inheritor": "Forbidden role assignment: inherited role inherits from inheritor", 
-    */
+    "Forbidden role assignment, inherited role inherits from inheritor": "Forbidden role assignment, inherited role inherits from inheritor"
 }
