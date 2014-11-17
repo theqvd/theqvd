@@ -626,6 +626,20 @@ sub vm_stop
 ### AUXILIAR FUNCTIONS ###
 ##########################
 
+sub dis_in_staging
+{
+    my $self = shift;
+
+    my $staging_path = cfg('path.storage.staging');
+    QVD::Admin4::Exception->throw(code=>'2230')
+	unless -d $staging_path;
+    my $dir;
+    opendir $dir, $staging_path;
+    my @files = grep { $_ !~ /^\.{1,2}$/ } readdir $dir; 
+
+    { rows => \@files , total => scalar @files };
+}
+
 my $lb;
 sub vm_assign_host {
     my ($self, $vmrt) = @_;

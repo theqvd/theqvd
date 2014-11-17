@@ -286,7 +286,7 @@ my $AVAILABLE_FILTERS =
 
 	      Tenant => [qw(id name)],
 
-	      Role => [qw(name id fixed inner)],
+	      Role => [qw(name id fixed internal)],
 
 	      Administrator => [qw(name tenant_id tenant_name id )],
 
@@ -315,7 +315,7 @@ my $AVAILABLE_FILTERS =
 
 		 ACL => [qw(id name role_id admin_id )],
 
-		 Role => [qw(name id fixed inner)],
+		 Role => [qw(name id fixed internal)],
 
 		 Tenant => [qw(id name)],
 
@@ -345,7 +345,7 @@ my $AVAILABLE_FIELDS =
 
 	      OSF => [qw(id name overlay user_storage memory  number_of_vms number_of_dis properties )],
 
-	      Role => [qw(name roles acls id number_of_acls fixed inner)],
+	      Role => [qw(name roles acls id number_of_acls fixed internal)],
 
 	      DI => [qw(id disk_image version osf_id osf_name blocked tags  properties )],
 
@@ -376,7 +376,7 @@ my $AVAILABLE_FIELDS =
 
 		 OSF => [qw(id name overlay user_storage memory  number_of_vms number_of_dis properties )],
 		 
-		 Role => [qw(name acls roles id number_of_acls fixed inner)],
+		 Role => [qw(name acls roles id number_of_acls fixed internal)],
 		
 		 DI => [qw(id disk_image version osf_id osf_name  blocked tags  properties )],
 		
@@ -553,7 +553,7 @@ my $MANDATORY_ARGUMENTS = { Config => [qw(key value)],
 			    OSF => [qw(name memory overlay user_storage tenant_id)],
                             DI => [qw(version disk_image osf_id blocked)],
 			    Tenant => [qw(name)],
-			    Role => [qw(name fixed inner)],
+			    Role => [qw(name fixed internal)],
                             Administrator => [qw(name password tenant_id)],
 			    Tenant_Views_Setup => [qw(tenant_id field visible view_type device_type qvd_object property)],
 			    Administrator_Views_Setup => [qw(admin_id field visible view_type device_type qvd_object property)]}; 
@@ -579,7 +579,7 @@ my $DEFAULT_ARGUMENT_VALUES =
 
     DI => { blocked => 'false' },
 
-    Role => { fixed => 'false', inner => 'false' },
+    Role => { fixed => 'false', internal => 'false' },
 
     Tenant_Views_Setup => { visible => 0, property => 0 },
 

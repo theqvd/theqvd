@@ -7,7 +7,6 @@ use QVD::Admin4::Exception;
 use QVD::DB;
 use MojoX::Session;
 
-
 package MojoX::Session::Transport::WAT
 {
     use base qw(MojoX::Session::Transport);
@@ -28,8 +27,9 @@ package MojoX::Session::Transport::WAT
 my $QVD_ADMIN4_API = QVD::Admin4::REST->new();
 
 app->config(hypnotoad => {listen => ['http://192.168.56.101:3000']});
-helper (qvd_admin4_api => sub { $QVD_ADMIN4_API; });
 
+helper (qvd_admin4_api => sub { $QVD_ADMIN4_API; });
+helper (events_notifier => sub { $QVD_ADMIN4_API->_db->mypool; });
 
 under sub {
 
@@ -132,10 +132,15 @@ any '/' => sub {
 websocket '/echo' => sub {
     my $c = shift;
     $c->app->log->debug('WebSocket opened.');
-    $c->on(message => sub {
-	my ($c, $msg) = @_;
-	$c->app->log->debug("WebSocket $msg");
-	$c->send("echo: $msg"); }); 
+
+    $c->send("echo:"); 
+# Probar con Mojolicious/Plugin/PgAsync.pm
+    my $en = $c->events_notifier;
+    $en->listen('kkk',
+		on_notify => 
+		sub { use Data::Dumper; 
+		      print Dumper [@_];
+		      $c->send("Hola!"); });
 };
 
 app->start;

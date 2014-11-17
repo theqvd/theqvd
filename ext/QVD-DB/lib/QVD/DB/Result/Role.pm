@@ -8,7 +8,7 @@ __PACKAGE__->table('roles');
 __PACKAGE__->add_columns(id => { data_type => 'integer',
                                  is_auto_increment => 1 },
                           name => { data_type => 'varchar(64)' },
-                          inner => { data_type => 'boolean' },
+                          internal => { data_type => 'boolean' },
                           fixed => { data_type => 'boolean' });
 
 __PACKAGE__->set_primary_key('id');

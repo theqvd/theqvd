@@ -283,6 +283,7 @@ sub __queue_next_notify {
 
 sub _db {
     my $self = shift;
+
     $self->{db} = shift if @_;
     $self->{db};
 }

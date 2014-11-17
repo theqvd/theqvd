@@ -21,6 +21,8 @@ sub BUILD
     $QVD_ADMIN = QVD::Admin4->new();
 }
 
+sub _db { $QVD_ADMIN->_db; };
+
 sub validate_user
 {
     my ($self,%params) = @_;

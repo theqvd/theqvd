@@ -9,6 +9,10 @@ has 'name', is => 'ro', isa => sub { die "Invalid type for attribute name" if re
 my $ACTIONS =
 {
 
+dis_in_staging => { type_of_action =>  'general',
+		    acls => [qr/^di\.create\./],
+		    admin4method => 'dis_in_staging'},
+
 config_ssl => { type_of_action =>  'general',
 		acls => [qr/^config\.update\./],
 		admin4method => 'config_ssl'},
