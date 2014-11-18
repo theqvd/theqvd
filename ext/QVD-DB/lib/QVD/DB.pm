@@ -12,7 +12,6 @@ use Socket qw(IPPROTO_TCP SOL_SOCKET SO_KEEPALIVE);
 use Socket::Linux qw(TCP_KEEPIDLE TCP_KEEPINTVL TCP_KEEPCNT);
 
 use QVD::Config::Core;
-use AnyEvent::Pg::Pool;
 use parent qw(DBIx::Class::Schema);
 
 __PACKAGE__->load_namespaces(result_namespace => 'Result');
@@ -42,16 +41,6 @@ sub new {
                              quote_char => '"',
 			     name_sep   => '.',
 			     on_connect_call => \&_make_pg_socket_keepalive });
-}
-
-sub mypool
-{
-    my $self = shift;
-
-    AnyEvent::Pg::Pool->new( {host     => $db_host,
-			      dbname   => $db_name,
-			      user     => $db_user,
-			      password => $db_passwd } );             
 }
 
 sub _make_pg_socket_keepalive {

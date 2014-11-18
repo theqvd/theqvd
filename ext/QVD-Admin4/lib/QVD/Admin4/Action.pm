@@ -9,6 +9,14 @@ has 'name', is => 'ro', isa => sub { die "Invalid type for attribute name" if re
 my $ACTIONS =
 {
 
+get_listen  => { type_of_action =>  'general',
+		 acls => [],
+		 admin4method => 'get_listen'},
+
+get_stream  => { type_of_action =>  'general',
+		 acls => [],
+		 admin4method => 'get_stream'},
+
 dis_in_staging => { type_of_action =>  'general',
 		    acls => [qr/^di\.create\./],
 		    admin4method => 'dis_in_staging'},
@@ -421,6 +429,7 @@ qvd_objects_statistics => { type_of_action =>  'multiple',
 sub available
 {
     my $self = shift;
+
     exists $ACTIONS->{$self->name} ? 
 	return 1 : 
 	return 0;

@@ -1106,6 +1106,20 @@ sub config_ssl {
      rows => [ ] };
 }
 
+my $l;
 
+sub get_listen
+{
+    my $self = shift;
+    return { total => 1, rows => [ "listening ".$l++ ] }; 
+}
+
+my $s;
+
+sub get_stream
+{
+    my $self = shift;
+    return { total => 1, rows => [ "streaming ".$s++ ] }; 
+}
 
 1;
