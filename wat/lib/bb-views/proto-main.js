@@ -11,6 +11,7 @@ Wat.Views.MainView = Backbone.View.extend({
     addACLs: [],
     deleteRoles: [],
     addRoles: [],
+    currentMenu: '', // platform-setup
     
     initialize: function () {
         _.bindAll(this, 'render');
@@ -272,6 +273,8 @@ Wat.Views.MainView = Backbone.View.extend({
         
         var that = this;
         model.save(arguments, {filters: filters}).complete(function(e, a, b) {
+            Wat.I.loadingUnblock();
+
             var callResponse = e.status;
             var response = {status: e.status};
             

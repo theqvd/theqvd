@@ -394,6 +394,19 @@ Wat.I = {
             $('.breadcrumbs').css('visibility','visible').hide().fadeIn('fast');
             $('.menu-corner').css('visibility','visible');
         }
+                    
+        $('.menu').hide();
+
+        if ($.inArray(Wat.CurrentView.qvdObj, QVD_OBJS_SETUP) != -1) {
+            $('.js-setup-menu').show();
+            $('.js-menu-option-setup').hide();
+            $('.js-menu-option-platform').show();
+        }
+        else {
+            $('.js-platform-menu').show();
+            $('.js-menu-option-platform').hide();
+            $('.js-menu-option-setup').show();
+        }
     },
 
     showContent: function () {
@@ -517,16 +530,31 @@ Wat.I = {
         // Fill the html with the template and the collection
         var template = _.template(
             templateMain, {
-                menu: Wat.I.menu,
-                mobileMenu: Wat.I.mobileMenu,
                 loggedIn: Wat.C.loggedIn,
-                loin: Wat.C.login,
                 cornerMenu: this.cornerMenu
             });
         
         $('.bb-super-wrapper').html(template);
         
+        if (Wat.C.loggedIn) {
+            this.renderMenu();
+        }
+        
         this.updateLoginOnMenu();
+    },
+    
+    renderMenu: function () {
+        var templateMenu = Wat.A.getTemplate('menu');
+
+        // Fill the html with the template and the collection
+        var template = _.template(
+            templateMenu, {
+                setupMenu: Wat.I.setupMenu,
+                menu: Wat.I.menu,
+                mobileMenu: Wat.I.mobileMenu
+            });
+
+        $('.bb-menu').html(template);
     },
     
     tooltipConfiguration: function () {
@@ -894,5 +922,22 @@ Wat.I = {
         
         $("html, body").animate({ scrollTop: 0 }, 200);
         this.dialog(dialogConf);
+    },
+    
+    loadingBlock: function (message) {
+        $('.loading-big-message').html(message);
+        $('.loading-big').show();
+        $('html, body').css({
+            'overflow': 'hidden',
+            'height': '100%'
+        });
+    },
+    
+    loadingUnblock: function () {
+        $('.loading-big').hide();
+        $('html, body').css({
+            'overflow': 'auto',
+            'height': 'auto'
+        });
     }
 }

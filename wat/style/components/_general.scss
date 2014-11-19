@@ -114,3 +114,35 @@ fieldset {
         margin-bottom: 12px;
     }
 }
+
+.loading-big {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100vw;
+    height: 100vh;
+    background: darken($col_whiter, 20);
+    opacity: 0.8;
+    z-index: 2000;
+    
+    i {
+        font-size: 200px;
+        color: $col_whiter;
+    }
+    
+    .loading-big-message {
+        font-size: 24px;
+        color: $col_whiter;
+        margin-bottom: 50px;
+    }
+    
+    .loading-big-box {
+        background: black;
+        border-radius: 15px;
+        width: 70vw;
+        height: 70vh;
+        margin: 70px auto;
+        text-align: center;
+        padding: 50px;
+    }
+}

@@ -109,25 +109,25 @@
         
         // ------- Configuration sections ------- //
         Wat.Router.app_router.on('route:setupCustomize', function () {
-            Wat.Router.app_router.performRoute('', Wat.Views.SetupCustomizeView);
+            Wat.Router.app_router.performRoute('views', Wat.Views.SetupCustomizeView);
         });    
         Wat.Router.app_router.on('route:setupConfig', function () {
-            Wat.Router.app_router.performRoute('', Wat.Views.SetupConfigView);
+            Wat.Router.app_router.performRoute('config', Wat.Views.SetupConfigView);
         });    
         Wat.Router.app_router.on('route:listTenant', function () {
-            Wat.Router.app_router.performRoute('', Wat.Views.TenantListView);
+            Wat.Router.app_router.performRoute('tenants', Wat.Views.TenantListView);
         });    
         Wat.Router.app_router.on('route:listAdmin', function () {
-            Wat.Router.app_router.performRoute('', Wat.Views.AdminListView);
+            Wat.Router.app_router.performRoute('admins', Wat.Views.AdminListView);
         });
         Wat.Router.app_router.on('route:detailsAdmin', function (id) {
-            Wat.Router.app_router.performRoute('', Wat.Views.AdminDetailsView, {"id": id});
+            Wat.Router.app_router.performRoute('admins', Wat.Views.AdminDetailsView, {"id": id});
         });    
         Wat.Router.app_router.on('route:listRole', function () {
-            Wat.Router.app_router.performRoute('', Wat.Views.RoleListView);
+            Wat.Router.app_router.performRoute('roles', Wat.Views.RoleListView);
         });        
         Wat.Router.app_router.on('route:detailsRole', function (id) {
-            Wat.Router.app_router.performRoute('', Wat.Views.RoleDetailsView, {"id": id});
+            Wat.Router.app_router.performRoute('roles', Wat.Views.RoleDetailsView, {"id": id});
         });    
         
         
@@ -148,6 +148,9 @@
         });          
         Wat.Router.app_router.on('route:profile', function (actions) {
             Wat.Router.app_router.performRoute('', Wat.Views.ProfileView);
+        });             
+        Wat.Router.app_router.on('route:myviews', function (actions) {
+            Wat.Router.app_router.performRoute('', Wat.Views.MyViewsView);
         });       
         
         

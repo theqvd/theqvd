@@ -13,15 +13,16 @@ Wat.Router = Backbone.Router.extend({
         "host/:id": "detailsHost",
         "users": "listUser",
         "user/:id": "detailsUser",
-        "setup/customize": "setupCustomize",
-        "setup/tenants": "listTenant",
-        "setup/admins": "listAdmin",
-        "setup/admin/:id": "detailsAdmin",
-        "setup/roles": "listRole",
-        "setup/role/:id": "detailsRole",
-        "setup/config": "setupConfig",
+        "views": "setupCustomize",
+        "tenants": "listTenant",
+        "admins": "listAdmin",
+        "admin/:id": "detailsAdmin",
+        "roles": "listRole",
+        "role/:id": "detailsRole",
+        "config": "setupConfig",
         "help/about": "about",
         "profile": "profile",
+        "myviews": "myviews",
         "*actions": "defaultRoute" // Backbone will try match the route above first
     },
     
@@ -34,6 +35,7 @@ Wat.Router = Backbone.Router.extend({
 
         Wat.I.showLoading();
         Wat.I.setMenuOpt(menuOpt);
+        
         if (!$.isEmptyObject(Wat.CurrentView)) {
             Wat.CurrentView.undelegateEvents();
         }

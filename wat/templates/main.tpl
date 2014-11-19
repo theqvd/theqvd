@@ -18,16 +18,16 @@
         <div class="js-menu-corner menu-corner">
             <ul class="nav-collapse-corner">
                 <% $.each(cornerMenuPrint, function (iMenu, menuOpt) { %>
-                    <li class="menu-option">
+                    <li class="menu-option js-menu-option-<%= iMenu %>">
                         <a href="<%= menuOpt.link %>">
-                            <i class="<%= menuOpt.iconClass %>"></i>
+                            <i class="<%= menuOpt.icon %>"></i>
                             <span class="<%= menuOpt.textClass %>" data-i18n><%= menuOpt.text %></span>
                         </a>
                         <ul>
                             <% $.each(menuOpt.subMenu, function (iSubMenu, subMenuOpt) { %>
                                 <li>
                                     <a href="<%= subMenuOpt.link %>">
-                                        <span class="<%= subMenuOpt.iconClass %>" data-i18n><%= subMenuOpt.text %></span>
+                                        <span class="<%= subMenuOpt.icon %>" data-i18n><%= subMenuOpt.text %></span>
                                     </a>
                                 </li>
                             <% }); %>
@@ -43,38 +43,8 @@
             <span class="message"></span>
         </div>
 </div>
-<div class="wrapper"> 
-    <% if (loggedIn) { %>
-        <div class="menu desktop">
-            <ul>
-                <%
-                    $.each(menu, function (target, option) {
-                %>
-                    <li class="menu-option" data-target="<%= target %>">
-                        <i class="<%= option.icon %>"></i>
-                        <span data-i18n><%= option.text %></span>
-                    </li>
-                <%
-                    });
-                %>
-            </ul>
-        </div>
-        <div class="menu mobile js-menu-mobile">
-            <ul class="nav-collapse">
-                <%
-                    $.each(mobileMenu, function (target, option) {
-                %>
-                    <li class="menu-option" data-target="<%= target %>">
-                        <i class="<%= option.icon %>"></i>
-                        <span data-i18n><%= option.text %></span>
-                    </li>
-                <%
-                    });
-                %>
-            </ul>
-        </div>
-        <div id="breadcrumbs" class="breadcrumbs desktop"></div>
-    <% } %>
+<div class="wrapper">
+    <div class="bb-menu"></div>
     <div class="loading"><i class="fa fa-gear fa-spin"></i></div>
 
     <div class="content bb-content"></div>                        

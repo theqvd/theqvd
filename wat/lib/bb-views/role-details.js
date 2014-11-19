@@ -320,7 +320,8 @@ Wat.Views.RoleDetailsView = Wat.Views.DetailsView.extend({
                 model: this.model,
                 cid: this.cid,
                 selectedOption: this.setupOption,
-                setupMenu: cornerMenu.setup.subMenu
+                setupMenu: null,
+                //setupMenu: cornerMenu.setup.subMenu
             }
         );
         

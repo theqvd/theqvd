@@ -93,7 +93,7 @@ Wat.I.detailsBreadCrumbs[qvdObj].next = {
             'link': '#/setup',
             'next': {
                 'screen': 'Roles',
-                'link': '#/setup/roles',
+                'link': '#/roles',
                 'linkACL': 'role.see-main.',
                 'next': {
                     'screen': '' // Will be filled dinamically

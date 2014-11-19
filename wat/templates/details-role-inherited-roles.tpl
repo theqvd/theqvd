@@ -23,7 +23,7 @@
                                     }
                                 %>
                                 
-                                <%= Wat.C.ifACL('<a href="#/setup/role/' + iRole + '">', 'role.see-details.') %>
+                                <%= Wat.C.ifACL('<a href="#/role/' + iRole + '">', 'role.see-details.') %>
                                 <span class="text"><%= role.name %></span>
                                 <%= Wat.C.ifACL('</a>', 'role.see-details.') %>
                             </div>

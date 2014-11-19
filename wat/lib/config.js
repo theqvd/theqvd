@@ -243,7 +243,11 @@ Wat.C = {
     
     configureVisibility: function () {        
         Wat.I.menu = $.extend(true, {}, Wat.I.menuOriginal);
+        Wat.I.setupMenu = $.extend(true, {}, Wat.I.menuSetupOriginal);
         Wat.I.mobileMenu = $.extend(true, {}, Wat.I.mobileMenuOriginal);
+        Wat.I.cornerMenu = $.extend(true, {}, Wat.I.cornerMenuOriginal);
+
+        var that = this;
 
         // Menu visibility
         var aclMenu = {
@@ -254,33 +258,34 @@ Wat.C = {
             'vm.see-main.' : 'vms',
         };
         
-        var that = this;
         
         $.each(aclMenu, function (acl, menu) {
             if (!that.checkACL(acl)) {
                 delete Wat.I.menu[menu];
                 delete Wat.I.mobileMenu[menu];
+                delete Wat.I.cornerMenu.platform.subMenu[menu];
             }
         });
-
-        Wat.I.cornerMenu = $.extend(true, {}, Wat.I.cornerMenuOriginal);
         
-        // Corner menu visibility
-        var aclCornerMenu = {
-            'administrator.see-main.' : 'admins',
+        // Menu visibility
+        var aclSetupMenu = {
             'role.see-main.' : 'roles',
+            'administrator.see-main.' : 'admins',
             'tenant.see-main.' : 'tenants',
             'config.see-main.' : 'config',
-            'views.see-main.' : 'customize',
+            'views.see-main.' : 'views',
         };
         
-        var that = this;
-        
-        $.each(aclCornerMenu, function (acl, menu) {
+        $.each(aclSetupMenu, function (acl, menu) {
             if (!that.checkACL(acl)) {
+                delete Wat.I.setupMenu[menu];
                 delete Wat.I.cornerMenu.setup.subMenu[menu];
             }
         });
+        
+        if (Wat.I.cornerMenu.setup && !$.isEmptyObject(Wat.I.cornerMenu.setup.subMenu)) {
+            Wat.I.cornerMenu.setup.link = Wat.I.cornerMenu.setup.subMenu[Object.keys(Wat.I.cornerMenu.setup.subMenu)[0]].link;
+        }
         
         if ($.isEmptyObject(Wat.I.cornerMenu.setup.subMenu)) {
             delete Wat.I.cornerMenu.setup;

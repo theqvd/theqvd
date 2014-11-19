@@ -12,7 +12,6 @@ Wat.Views.AdminDetailsView = Wat.Views.DetailsView.extend({
         // Clean previous item name
         this.breadcrumbs.next.next.next.screen="";
         
-        
         this.params = params;
         
         this.renderSetupCommon();
@@ -216,7 +215,8 @@ Wat.Views.AdminDetailsView = Wat.Views.DetailsView.extend({
                 model: this.model,
                 cid: this.cid,
                 selectedOption: this.setupOption,
-                setupMenu: cornerMenu.setup.subMenu
+                setupMenu: null,
+                //setupMenu: cornerMenu.setup.subMenu
             }
         );
         

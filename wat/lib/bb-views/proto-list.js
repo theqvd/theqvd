@@ -642,7 +642,8 @@ Wat.Views.ListView = Wat.Views.MainView.extend({
                 $(this).dialog('close');
             },
             Create: function (e) {
-                $(e.target).addClass('fa-spin');
+                //$(e.target).addClass('fa-spin');
+                Wat.I.loadingBlock($.i18n.t('Please, wait while action is performed') + '<br><br>' + $.i18n.t('Do not close or refresh the window'));
                 that.dialog = $(this);
                 that.createElement($(this));
             }

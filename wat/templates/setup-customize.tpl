@@ -1,3 +1,13 @@
+ <%
+ if (viewKind == 'tenant') {
+ %>
+    <div class="details-header">
+        <span data-i18n class="fa fa-info-circle">Definition of default elements shown in WAT's sections</span>. 
+        <span data-i18n class="fa fa-info-circle">Each administrator will be able to customize his own views overriding this configuration</span>.
+    </div>
+ <%
+ }
+ %>
  <div class="customize-section-selectors">
     <div class="customize-section-selector">
         <label for="obj-qvd-select">Section</label>

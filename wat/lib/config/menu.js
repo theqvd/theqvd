@@ -1,96 +1,56 @@
-// Corner menu configuration values
-Wat.I.cornerMenuOriginal = {
-        help: {
-            text: 'Help',
-            link: '#/help',
-            iconClass: 'fa fa-support',
-            subMenu: {
-                documentation: {
-                    text: 'Documentation',
-                    link: 'http://docs.theqvd.com/',
-                    iconClass: 'fa fa-book' 
-                },
-                about: {
-                    text: 'About',
-                    link: '#/help/about',
-                    iconClass: 'fa fa-asterisk' 
-                }
-            }
-        },
-        
-        setup: {
-            text: 'Setup',
-            link: '#/setup',
-            iconClass: 'fa fa-wrench',
-            subMenu: {
-                admins: {
-                    text: 'Administrators',
-                    link: '#/setup/admins',
-                    iconClass: 'fa fa-suitcase' 
-                },
-                roles: {
-                    text: 'Roles',
-                    link: '#/setup/roles',
-                    iconClass: 'fa fa-graduation-cap' 
-                },
-                tenants: {
-                    text: 'Tenants',
-                    link: '#/setup/tenants',
-                    iconClass: 'fa fa-building' 
-                },
-                config: {
-                    text: 'Config',
-                    link: '#/setup/config',
-                    iconClass: 'fa fa-sliders' 
-                },
-                customize: {
-                    text: 'Default views',
-                    link: '#/setup/customize',
-                    iconClass: 'fa fa-columns' 
-                }
-            }
-        },
-        
-        user: {
-            text: '',
-            link: 'javascript:',
-            iconClass: 'fa fa-user',
-            textClass: 'js-login',
-            subMenu: {
-                my_area: {
-                    text: 'Personal area',
-                    link: '#/profile',
-                    iconClass: 'fa fa-archive' 
-                },
-                logout: {
-                    text: 'Log-out',
-                    link: '#/logout',
-                    iconClass: 'fa fa-power-off' 
-                }
-            }
-        }
+Wat.I.menuSetupOriginal = {
+    admins: {
+        text: 'Administrators',
+        link: '#/admins',
+        icon: CLASS_ICON_ADMINS
+    },
+    roles: {
+        text: 'Roles',
+        link: '#/roles',
+        icon: CLASS_ICON_ROLES
+    },
+    tenants: {
+        text: 'Tenants',
+        link: '#/tenants',
+        icon: CLASS_ICON_TENANTS 
+    },
+    config: {
+        text: 'Config',
+        link: '#/config',
+        icon: CLASS_ICON_CONFIG
+    },
+    views: {
+        text: 'Default views',
+        link: '#/views',
+        icon: CLASS_ICON_VIEWS
+    }
 };
 
 Wat.I.menuOriginal = {
     users: {
         icon: CLASS_ICON_USERS,
-        text: 'Users'
+        text: 'Users',
+        link: '#/users',
     },
     vms: {
         icon: CLASS_ICON_VMS,
-        text: 'Virtual machines'
+        text: 'Virtual machines',
+        link: '#/vms',
     },
     hosts: {
         icon: CLASS_ICON_HOSTS,
-        text: 'Nodes'
+        text: 'Nodes',
+        link: '#/hosts',
     },
     osfs: {
         icon: CLASS_ICON_OSFS,
-        text: 'OS Flavours'
+        text: 'OS Flavours',
+        link: '#/osfs',
     },
     dis: {
         icon: CLASS_ICON_DIS,
-        text: 'Disk images'
+        text: 'Disk images',
+        link: '#/dis',
     }
 };
 
@@ -100,3 +60,57 @@ Wat.I.mobileMenuOriginal.logout = {
     icon: CLASS_ICON_LOGOUT,
     text: 'Logout'
 }
+
+// Corner menu configuration values
+Wat.I.cornerMenuOriginal = {
+        help: {
+            text: 'Help',
+            link: '#/help',
+            icon: 'fa fa-support',
+            subMenu: {
+                documentation: {
+                    text: 'Documentation',
+                    link: 'http://docs.theqvd.com/',
+                    icon: 'fa fa-book' 
+                },
+                about: {
+                    text: 'About',
+                    link: '#/help/about',
+                    icon: 'fa fa-asterisk' 
+                }
+            }
+        },
+        
+        platform: {
+            text: 'Platform',
+            link: '#',
+            icon: 'fa fa-bug',
+            subMenu: _.extend({}, Wat.I.menuOriginal)
+        },
+    
+        setup: {
+            text: 'Setup',
+            link: '#/setup',
+            icon: 'fa fa-wrench',
+            subMenu: _.extend({}, Wat.I.menuSetupOriginal)
+        },
+        
+        user: {
+            text: '',
+            link: 'javascript:',
+            icon: 'fa fa-user',
+            textClass: 'js-login',
+            subMenu: {
+                my_area: {
+                    text: 'Personal area',
+                    link: '#/profile',
+                    icon: 'fa fa-archive' 
+                },
+                logout: {
+                    text: 'Log-out',
+                    link: '#/logout',
+                    icon: 'fa fa-power-off' 
+                }
+            }
+        }
+};

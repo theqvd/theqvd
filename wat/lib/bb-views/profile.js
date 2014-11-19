@@ -1,5 +1,10 @@
-Wat.Views.ProfileView = Wat.Views.ViewsView.extend({
-    setupOption: 'views',
+Wat.Views.ProfileView = Wat.Views.MainView.extend({
+    setupCommonTemplateName: 'setup-common',
+    setupOption: 'admins',
+    secondaryContainer: '.bb-setup',
+    qvdObj: 'profile',
+    
+    setupOption: 'profile',
     
     limitByACLs: true,
     
@@ -11,44 +16,59 @@ Wat.Views.ProfileView = Wat.Views.ViewsView.extend({
         'screen': 'Home',
         'link': '#',
         'next': {
-            'screen': 'Personal area'
+            'screen': 'Personal area',
+            'link': '#/profile',
+            'next': {
+                'screen': 'Profile'
+            }
         }
     },
     
     initialize: function (params) {
-        Wat.Views.ViewsView.prototype.initialize.apply(this, [params]);
+        Wat.Views.MainView.prototype.initialize.apply(this, [params]);
         
         // Get side menu
         this.sideMenu = {
-            'password': {
-                iconClass: 'fa fa-user',
-                link: '#',
-                text: 'My profile'
-            },
-            'password': {
-                iconClass: 'fa fa-key',
-                link: '#',
-                text: 'Change password'
+            'profile': {
+                icon: 'fa fa-user',
+                link: '#profile',
+                text: 'Profile'
             },
             'views': {
-                iconClass: 'fa fa-columns',
-                link: '#',
+                icon: 'fa fa-columns',
+                link: '#myviews',
                 text: 'Customize views'
             }
         };
         
-        // Get filters and columns
-        this.currentFilters = Wat.I.getFormFilters(this.selectedSection);
-        this.currentColumns = Wat.I.getListColumns(this.selectedSection);
-        
         this.render();
     },
     
-    renderForm: function () {
-        // Get filters and columns
-        this.currentFilters = Wat.I.getFormFilters(this.selectedSection);
-        this.currentColumns = Wat.I.getListColumns(this.selectedSection);
+    render: function () {
+        this.templateProfile = Wat.A.getTemplate(this.setupCommonTemplateName);
         
-        Wat.Views.ViewsView.prototype.renderForm.apply(this);
+        this.template = _.template(
+            this.templateProfile, {
+                model: this.model,
+                cid: this.cid,
+                selectedOption: this.setupOption,
+                setupMenu: this.sideMenu
+            }
+        );
+
+        $('.bb-content').html(this.template);
+        
+        this.templateProfile = Wat.A.getTemplate('profile');
+        
+        this.template = _.template(
+            this.templateProfile, {
+                login: Wat.C.login
+            }
+        );
+
+        $('.bb-setup').html(this.template);
+        Wat.T.translate();
+        
+        this.printBreadcrumbs(this.breadcrumbs, '');
     }
 });

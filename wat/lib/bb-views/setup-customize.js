@@ -1,5 +1,6 @@
 Wat.Views.SetupCustomizeView = Wat.Views.ViewsView.extend({
     setupOption: 'customize',
+    qvdObj: 'views',
 
     limitByACLs: false,
     
@@ -24,7 +25,8 @@ Wat.Views.SetupCustomizeView = Wat.Views.ViewsView.extend({
                 
         // Get side menu
         var cornerMenu = Wat.I.getCornerMenu();
-        this.sideMenu = cornerMenu.setup.subMenu;
+        this.sideMenu = null;
+        //this.sideMenu = cornerMenu.setup.subMenu;
         
         // Get filters and columns
         this.currentFilters = Wat.I.getTenantFormFilters (this.selectedSection, this.selectedTenant, this);

@@ -133,6 +133,12 @@ CLASS_ICON_HOSTS = 'fa fa-hdd-o';
 CLASS_ICON_OSFS = 'fa fa-flask';
 CLASS_ICON_DIS = 'fa fa-dot-circle-o';
 CLASS_ICON_LOGOUT = 'fa fa-power-off';
+CLASS_ICON_ADMINS = 'fa fa-suitcase';
+CLASS_ICON_ROLES = 'fa fa-graduation-cap';
+CLASS_ICON_TENANTS = 'fa fa-building'; 
+CLASS_ICON_CONFIG = 'fa fa-sliders'; 
+CLASS_ICON_VIEWS = 'fa fa-columns'; 
+
 
 // Colours
 COL_BRAND = '#cb540a';
@@ -142,6 +148,8 @@ COL_BRAND_DARK = '#9a4008';
 QVD_OBJS_WITH_PROPERTIES = ['user', 'vm', 'host', 'osf', 'di'];
 QVD_OBJS_CLASSIFIED_BY_TENANT = ['user', 'vm', 'osf', 'di', 'administrator'];
 QVD_OBJS_EXIST_IN_SUPERTENANT = ['role', 'administrator'];
+QVD_OBJS_PLATFORM = ['user', 'vm', 'host', 'osf', 'di'];
+QVD_OBJS_SETUP = ['role', 'administrator', 'tenant', 'config', 'views'];
 
 // Default values
 DEFAULT_OSF_MEMORY = 256;
