@@ -67,7 +67,7 @@ under sub {
 	else
 	{
 	    $c->render(json => 
-		       QVD::Admin4::Exception->new(code =>23)->json);
+		       QVD::Admin4::Exception->new(code =>3200)->json);
 	    return 0;
 	}
     }
@@ -77,7 +77,7 @@ under sub {
 	{  
 	    $session->flush; 
 	    $c->render(json => 
-		       QVD::Admin4::Exception->new(code => 24)->json);
+		       QVD::Admin4::Exception->new(code => 3300)->json);
 	    return 0;
 	}
 	else
@@ -92,7 +92,7 @@ under sub {
             if ($@)
             {
                 $c->render(json =>
-                           QVD::Admin4::Exception->new(code => 25)->json);
+                           QVD::Admin4::Exception->new(code => 3400)->json);
                 return 0;
             }
 
@@ -103,21 +103,21 @@ under sub {
     else 
     {
 	$c->render(json => 
-		   QVD::Admin4::Exception->new(code => 22)->json);
+		   QVD::Admin4::Exception->new(code => 3100)->json);
 	return 0;
     }
 };
 
-get '/' => sub {
+get '/index' => sub {
 
     my $c = shift;
     my $json = $c->get_input_json;
-    $c->stash(action => $json->{action}, 
+    $c->stash(query => $json, 
 	      sid => $c->res->headers->header('sid'));
     $c->render(template => 'index');
 };
 
-any '/api' => sub {
+any '/' => sub {
 
     my $c = shift;
     my $json = $c->get_input_json;
@@ -125,44 +125,41 @@ any '/api' => sub {
     $c->render(json => $response);
 };
 
-websocket '/listen/:action' => sub {
+websocket '/stream' => sub {
     my $c = shift;
-    my $action = $c->stash('action');
-    my $loop = Mojo::IOLoop->singleton;
-    $c->app->log->debug("WebSocket LISTEN opened");
+    my $json = $c->get_input_json;
 
-    my $recurring = $loop->recurring(1 => sub { 
-	my $response = $c->process_api_query({action => $action }); 
-	$c->send(${$response->{rows}}[0]); });
+    $c->app->log->debug("WebSocket stream opened");
+
+    my $recurring = Mojo::IOLoop->recurring(1 => sub { 
+	my $response = $c->process_api_query($json); 
+	$c->send(encode_json($response)); });
 
     $c->on(finish => sub {
 	my ($c, $code) = @_;
-	$c->app->log->debug("WebSocket LISTEN closed with status $code");
-	$loop->remove($recurring);});
+	$c->app->log->debug("WebSocket stream closed with status $code");
+	Mojo::IOLoop->remove($recurring);});
 };
 
-websocket '/stream/:action' => sub {
+websocket '/notify' => sub {
     my $c = shift;
-    my $action = $c->stash('action');
-    my $loop = Mojo::IOLoop->singleton;
-    $c->app->log->debug("WebSocket STREAM opened");
-    $c->inactivity_timeout(3000);
+    my $json = $c->get_input_json;
 
-    my $tx = $c->tx;
-    my ($cb,$pg_listener); $cb = 
-	sub { $pg_listener = $loop->delay(
-		  sub { my $delay = shift;
-			$c->pg_listen('foo', $delay->begin);},
-		  sub { my $delay = shift;
-			$c->app->log->debug('FOO notified');
-			my $response = $c->process_api_query({action => $action }); 
-			$c->send(${$response->{rows}}[0]); $cb->();},); };
+    $c->app->log->debug("WebSocket notify opened");
+    $c->inactivity_timeout(3000); 
+
+    my $cb; $cb = sub { 
+	$c->pg_listen('foo', sub { 
+	    $c->app->log->debug('FOO notified');
+	    my $response = $c->process_api_query($json); 
+	    $c->send(encode_json($response)); $cb->();} );};
+
+    $c->send(encode_json($c->process_api_query($json)));
     $cb->();
     
     $c->on(finish => sub {
 	my ($c, $code) = @_;
-	$c->app->log->debug("WebSocket STREAM closed with status $code");
-	$loop->remove($pg_listener); });
+	$c->app->log->debug("WebSocket notify closed with status $code");});
 };
 
 sub get_input_json
@@ -203,21 +200,34 @@ __DATA__
 <title>Web Sockets Proofs</title>
 <script type="text/javascript">
 
-    var listen = new WebSocket('<%= "ws://localhost:3000/listen/$action?sid=$sid" %>');
-    listen.onmessage = function (event) { document.getElementById("listen").innerHTML = event.data };
-     var stream = new WebSocket('<%= "ws://localhost:3000/stream/$action?sid=$sid" %>');
-    stream.onmessage = function (event) { document.getElementById("stream").innerHTML = event.data };
+      var stream = new WebSocket('ws://localhost:3000/stream?login=superadmin&password=superadmin&action=qvd_objects_statistics');
+      stream.onmessage = function (event) { obj = JSON.parse(event.data); 
+                                            document.getElementById("total").innerHTML = obj.vms_count;
+                                            document.getElementById("blocked").innerHTML = obj.blocked_vms_count;
+                                            document.getElementById("running").innerHTML = obj.running_vms_count;};
+      var notify = new WebSocket('ws://localhost:3000/notify?login=superadmin&password=superadmin&action=vm_get_state&filters={"id":"1"}');
+      notify.onmessage = function (event) { obj = JSON.parse(event.data); 
+                                            document.getElementById("state").innerHTML = obj.rows[0].state;
+                                            document.getElementById("user_state").innerHTML = obj.rows[0].user_state; };
 
 </script>
 
 </head>
 <body>
     <h1>Web Sockets Proofs</h1>
-    <a href="http://localhost:3000/api?login=superadmin&password=superadmin&action=user_get_list">bye bye</a>
+    <a href="http://localhost:3000/?login=superadmin&password=superadmin&action=user_get_list">bye bye</a>
     <hr/>
-    <section>LISTEN<br/><div id="listen"></div></section>
-    <br/>
-    <section>STREAM<br/><div id="stream"></div></section>
+    <section>
+    <h3>VMs in QVD</h3>
+    Total: <span id="total"></span></br>
+    Blocked: <span id="blocked"></span></br>
+    Running: <span id="running"></span></br>
+    </section>
+    <section>
+    <h3>VM1 Monitoring</h3>
+    State: <span id="state"></span></br>
+    User state: <span id="user_state"></span></br>
+    </section>
 </body>
 
 </html>

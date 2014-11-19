@@ -350,7 +350,7 @@ my $AVAILABLE_FIELDS =
 	      DI => [qw(id disk_image version osf_id osf_name blocked tags  properties )],
 
 	      VM => [qw(storage id name user_id user_name osf_id osf_name di_tag blocked expiration_soft expiration_hard 
-                        state host_id host_name  di_id user_state ip next_boot_ip ssh_port vnc_port serial_port 
+                        state host_id host_name  di_id user_state ip mac next_boot_ip ssh_port vnc_port serial_port 
                         creation_admin creation_date di_version di_name di_id properties )],
 
 	      ACL => [qw(id name)],
@@ -381,7 +381,7 @@ my $AVAILABLE_FIELDS =
 		 DI => [qw(id disk_image version osf_id osf_name  blocked tags  properties )],
 		
 		 VM => [qw(storage id name user_id user_name osf_id osf_name di_tag blocked expiration_soft expiration_hard 
-                           state host_id host_name  di_id user_state ip next_boot_ip ssh_port vnc_port serial_port 
+                           state host_id host_name  di_id user_state ip mac next_boot_ip ssh_port vnc_port serial_port 
                            creation_admin creation_date di_version di_name di_id properties )],
 
 		 ACL => [qw(id name)],
@@ -829,6 +829,7 @@ my $FIELDS_TO_DBIX_FORMAT_MAPPER =
 	'di_id' => 'di.id',
 	'user_state' => 'vm_runtime.user_state',
 	'ip' => 'me.ip',
+	'mac' => 'me.vm_mac',
 	'next_boot_ip' => 'vm_runtime.vm_address',
 	'ssh_port' => 'vm_runtime.vm_ssh_port',
 	'vnc_port' => 'vm_runtime.vm_vnc_port',

@@ -2510,6 +2510,14 @@ ALTER TABLE ONLY vm_runtimes
 ALTER TABLE ONLY vm_runtimes
     ADD CONSTRAINT vm_runtimes_vm_state_fkey FOREIGN KEY (vm_state) REFERENCES vm_states(name) ON UPDATE CASCADE ON DELETE CASCADE DEFERRABLE;
 
+
+--
+-- Name: vm_runtimes_consisten_expiration_dates; Type: FK CONSTRAINT; Schema: public; Owner: qvd
+--
+
+ALTER TABLE ONLY vm_runtimes 
+      ADD CONSTRAINT vm_runtimes_consisten_expiration_dates CHECK (vm_expiration_hard >= vm_expiration_soft);
+
 --
 -- Name: vms_osf_id_fkey; Type: FK CONSTRAINT; Schema: public; Owner: qvd
 --

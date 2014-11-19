@@ -7,6 +7,7 @@ use Moo;
 use QVD::DB;
 use QVD::DB::Simple;
 use QVD::Config;
+use QVD::Config::Core;
 use File::Copy qw(copy move);
 use Config::Properties;
 use QVD::Admin4::Exception;
@@ -50,7 +51,7 @@ sub select
 
     my @rows;
     my $rs;
-
+   
     eval { $rs = $DB->resultset($request->table)->search($request->filters,$request->modifiers);
 	   @rows = $rs->all };
 
@@ -86,7 +87,6 @@ sub update
     for my $obj (@{$result->{rows}})
     {
 	eval { $DB->txn_do( sub { $self->$_($obj) for @$conditions;
-
 				  $obj->update($request->arguments);
 				  $self->update_related_objects($request,$obj);
 				  $self->exec_nested_queries($request,$obj);} ) };
@@ -472,7 +472,6 @@ sub add_roles_to_admin
 #############################
 ###### AD HOC FUNCTIONS #####
 #############################
-
 
 sub vm_delete
 {
@@ -1045,7 +1044,9 @@ sub config_get
     @keys = $page->splice(\@keys);
 
    { total => $total,
-     rows => [ map {{ $_ => cfg($_) }} @keys ] };
+     rows => [ map {{ key => $_, 
+		      operative_value => cfg($_), 
+		      default_value => eval{ core_cfg($_) } }} @keys ] };
 }
 
 sub config_set
@@ -1053,6 +1054,7 @@ sub config_set
     my ($self,$request) = @_;
     my $result = $self->create_or_update($request);
     notify(qvd_config_changed);
+    QVD::Config::reload();
     $result;
 }
 
@@ -1060,12 +1062,35 @@ sub config_default
 {
     my ($self,$request) = @_;
 
-    my $result = $self->delete($request);
+    my $result = $self->delete($request, conditions => [qw(is_custom_config)]);
     notify(qvd_config_changed);
+    QVD::Config::reload();
     $result;
 }
  
+sub config_delete
+{
+    my ($self,$request) = @_;
 
+    my $result = $self->delete($request, conditions => [qw(is_not_custom_config)]);
+    notify(qvd_config_changed);
+    QVD::Config::reload();
+    $result;
+}
+ 
+sub is_not_custom_config
+{
+    my ($self,$obj) = @_;
+    QVD::Admin4::Exception->throw(code=>'7372') if core_cfg($obj->key);
+    return 1;
+}
+
+sub is_custom_config
+{
+    my ($self,$obj) = @_;
+    QVD::Admin4::Exception->throw(code=>'7371') unless core_cfg($obj->key);
+    return 1;
+}
 
 sub config_ssl {
     my ($self,$admin,$json_wrapper) = @_;
@@ -1106,20 +1131,5 @@ sub config_ssl {
      rows => [ ] };
 }
 
-my $l;
-
-sub get_listen
-{
-    my $self = shift;
-    return { total => 1, rows => [ "listening ".$l++ ] }; 
-}
-
-my $s;
-
-sub get_stream
-{
-    my $self = shift;
-    return { total => 1, rows => [ "streaming ".$s++ ] }; 
-}
 
 1;

@@ -71,7 +71,10 @@ my $code2message_mapper =
     7320 => 'Unable to remove DI. There are VMs running with it',
     7330 => 'Unable to reassign a Tag fixed to another DI',
     7340 => 'Fixed, Head and Default Tags cannot be deleted',
-    7350 => 'Forbidden role assignment, inherited role inherits from inheritor'
+    7350 => 'Forbidden role assignment, inherited role inherits from inheritor',
+    7360 => 'Incompatible expiration dates. Soft date must precede the hard one',
+    7371 => 'Non core config items haven\'t default value',
+    7372 => 'Unable to remove a core config item'
 };
 
 
@@ -87,7 +90,10 @@ my $exception2code_mapper =
     'DBIx::Error::ForeignKeyViolation' => { default => 7100, update => 7110, create => 7110, set => 7110, delete => 7120},
 
     'DBIx::Error::UniqueViolation' => { default => 7200, properties => 7210, acls => 7220, roles => 7230},
+
+    'DBIx::Error::CheckViolation' => { default => 1100, vm_runtimes_consisten_expiration_dates => 7360},
 };
+
 
 sub BUILD
 {
@@ -147,15 +153,20 @@ sub figure_out_code_from_exception
     my $self = shift;
     my $e = ref($self->exception) // 'default';
     $e = 'default' unless exists $exception2code_mapper->{$e}; 
-    my $q = $self->query // 'default';
-    $q = 'default' unless exists $exception2code_mapper->{$e}->{$q}; 
+
+    my ($q) = $e eq 'DBIx::Error::CheckViolation' ?
+	$self->exception->message  =~ /^.+?violates check constraint "([^"]+)"/ :
+	$self->query;
+    $q //= 'default';
+    $q = 'default' unless exists $exception2code_mapper->{$e}->{$q}; 	
+    
     $self->{code} = $exception2code_mapper->{$e}->{$q}; 
 }
 
 sub figure_out_code_from_failures
 {
     my $self = shift;
-    $self->{code} = 12;
+    $self->{code} = 1200;
 }
 
 sub json

@@ -118,4 +118,15 @@ sub get_properties_key_value
     ( properties => { map {  $_->key => $_->value  } $self->properties->all });
 } 
 
+sub vm_mac
+{
+    my $self = shift;
+    my $ip = $self->ip // return;
+    my (undef, @hex) = map sprintf('%02x', $_), split /\./, $ip;
+    use QVD::Config;
+    my $mac_prefix = cfg('vm.network.mac.prefix');
+    join(':', $mac_prefix, @hex);
+
+}
+
 1;

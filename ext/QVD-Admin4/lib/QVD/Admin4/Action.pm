@@ -9,14 +9,6 @@ has 'name', is => 'ro', isa => sub { die "Invalid type for attribute name" if re
 my $ACTIONS =
 {
 
-get_listen  => { type_of_action =>  'general',
-		 acls => [],
-		 admin4method => 'get_listen'},
-
-get_stream  => { type_of_action =>  'general',
-		 acls => [],
-		 admin4method => 'get_stream'},
-
 dis_in_staging => { type_of_action =>  'general',
 		    acls => [qr/^di\.create\./],
 		    admin4method => 'dis_in_staging'},
@@ -38,6 +30,11 @@ config_default => { type_of_action =>  'delete',
 		   qvd_object => 'Config',
 		   acls => [qr/^config\.update\./],
 		   admin4method => 'config_default'},
+
+config_delete => { type_of_action =>  'delete',
+		   qvd_object => 'Config',
+		   acls => [qr/^config\.update\./],
+		   admin4method => 'config_delete'},
 
 user_get_list => {type_of_action => 'list',
 		  admin4method => 'select',

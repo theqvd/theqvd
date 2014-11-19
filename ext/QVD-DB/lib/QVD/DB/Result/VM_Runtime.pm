@@ -189,7 +189,7 @@ sub set_current_di_id {
 sub clear_l7r_all {
     shift->update({ user_state => 'disconnected',
                     user_cmd => undef,
-#                    l7r_host_id => undef, # FIXME: COMMENTED BECAUSE TRIGGERS ERROR WHEN ASKING DB
+                    l7r_host_id => undef, # FIXME: COMMENTED BECAUSE TRIGGERS ERROR WHEN ASKING DB
                     l7r_pid => undef })
 }
 
