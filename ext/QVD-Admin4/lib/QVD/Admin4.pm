@@ -1030,8 +1030,9 @@ sub config_get
 
     my $cp = $json_wrapper->get_filter_value('key');
     my $cp_re = $json_wrapper->get_filter_value('key_re');
-    my $re = $cp_re ? qr/$cp_re/ : qr/\Q$cp\E/;
-    my @keys = ($cp || $cp_re) ? grep { $_ =~ /$re/ } cfg_keys : cfg_keys ;
+    my @keys = cfg_keys;
+    @keys = grep { $_ =~ /\Q$cp\E/ } @keys if $cp;
+    @keys = grep { $_ =~ /$cp_re/ } @keys if $cp_re;
 
 
     my $od = $json_wrapper->order_direction // '-asc';
