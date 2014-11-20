@@ -549,13 +549,13 @@ sub cmd_di_untag {
     txn_do {
         my $old = rs(DI_Tag)->search({tag => $tag, di_id => $di_id})->first;
         $old or die "DI $di_id is not tagged as $tag\n";
-        my $osf_id = $old->osf_id;
         $old->fixed and die "DI $di_id tag $tag is fixed\n";
         $old->delete;
 
+        my $osf_id = rs(DI)->find($di_id)->osf_id;
         my $rs = rs(VM_Runtime)->search( { 'vm.osf_id' => $osf_id,
                                            'vm.di_tag' => $tag,
-                                           'vm_state' => { ne => 'stopped' },
+                                           'vm_state' => { '!=' => 'stopped' },
                                            'current_di_id' => $di_id },
                                          { join => 'vm' } );
         $self->_expire_vms($rs, \%params);
