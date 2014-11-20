@@ -340,6 +340,7 @@ sub _create_lxc {
 
     # FIXME: make this template-able or configurable in some way
     print $cfg_fh <<EOC;
+lxc.aa_profile=unconfined
 lxc.autodev=1
 lxc.hook.autodev=$qvd_lxc_autodev
 lxc.utsname=$self->{name}
