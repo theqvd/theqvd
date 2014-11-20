@@ -1,3 +1,39 @@
+QVD-3.5.0
+=========
+	- Fix #1511: leave printers not configured by QVD untouched
+	- Fix #1507: L7R was responding 'I am alive' even when the host was blocked
+	- Improve the detection of network ports already being used
+	- Fix file sharing under non-English locales
+	- Several qvd-vm-killer fixes
+	- Use overlayfs by default
+	- Allow passing extra nxagent arguments from remote client
+	- Improve heuristics to avoid passwords being loged
+	- Fix error condition on the session stealing mechanism
+	- Remove L7R daemon, now the L7R is launched by the HKD
+
+QVD 3.4.6
+=========
+
+	- Fix bug #1657: command "qa di untag" was broken
+
+QVD 3.4.5
+=========
+
+	- Fix bug #1541, #1528
+	- Allow pass some extra-custom parameters to nxagent from client
+
+QVD 3.4.4
+=========
+
+	- Fix bug #1514: passwords could still be leaked into logs.
+
+QVD 3.4.3
+=========
+
+	- Fix bug #1523: VM real_user_id slot was being unset at the wrong
+	  time.
+	- Fix bug #1514: add heuristics to hide passwords on logs.
+
 QVD 3.4.2
 =========
 	
