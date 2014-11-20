@@ -1,6 +1,6 @@
 #!/usr/lib/qvd/bin/perl
 use Mojolicious::Lite;
-use lib::glob '/home/qindel/WAT/*/lib/';
+use lib::glob '/home/benjamin/wat/*/lib/';
 use QVD::Admin4::REST;
 use Mojo::JSON qw(encode_json decode_json);
 use QVD::Admin4::Exception;

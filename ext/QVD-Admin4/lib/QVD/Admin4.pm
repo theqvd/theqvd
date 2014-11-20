@@ -1050,7 +1050,7 @@ sub config_get
    { total => $total,
      rows => [ map {{ key => $_, 
 		      operative_value => cfg($_), 
-		      default_value => (eval{ core_cfg($_)} || undef) }} @keys ] };
+		      default_value => (defined eval{ core_cfg($_)} || undef) }} @keys ] };
 }
 
 sub config_set
@@ -1085,14 +1085,14 @@ sub config_delete
 sub is_not_custom_config
 {
     my ($self,$obj) = @_;
-    QVD::Admin4::Exception->throw(code=>'7372') if core_cfg($obj->key);
+    QVD::Admin4::Exception->throw(code=>'7372') if defined eval { core_cfg($obj->key) };
     return 1;
 }
 
 sub is_custom_config
 {
     my ($self,$obj) = @_;
-    QVD::Admin4::Exception->throw(code=>'7371') unless core_cfg($obj->key);
+    QVD::Admin4::Exception->throw(code=>'7371') unless defined eval { core_cfg($obj->key) };
     return 1;
 }
 
