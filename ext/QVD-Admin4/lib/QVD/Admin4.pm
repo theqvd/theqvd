@@ -1029,7 +1029,10 @@ sub config_get
     my ($self,$admin,$json_wrapper) = @_;
 
     my $cp = $json_wrapper->get_filter_value('key');
-    my @keys = $cp ? grep { $_ =~ /\Q$cp\E/ } cfg_keys : cfg_keys ;
+    my $cp_re = $json_wrapper->get_filter_value('key_re');
+    my $re = $cp_re ? qr/$cp_re/ : qr/\Q$cp\E/;
+    my @keys = ($cp || $cp_re) ? grep { $_ =~ /$re/ } cfg_keys : cfg_keys ;
+
 
     my $od = $json_wrapper->order_direction // '-asc';
 
