@@ -1050,7 +1050,7 @@ sub config_get
    { total => $total,
      rows => [ map {{ key => $_, 
 		      operative_value => cfg($_), 
-		      default_value => eval{ core_cfg($_) } }} @keys ] };
+		      default_value => (eval{ core_cfg($_)} || undef) }} @keys ] };
 }
 
 sub config_set

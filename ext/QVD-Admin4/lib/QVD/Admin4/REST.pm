@@ -81,9 +81,14 @@ sub process_query
        $response = QVD::Admin4::Exception->new(code => 1100);
    }
 
-   return $response->json;
+   $response;
 }
 
+sub get_channel
+{
+   my ($self,$json) = @_;
+   QVD::Admin4::Action->new(name => $json->action )->channel;
+}
 
 sub process_standard_query
 {

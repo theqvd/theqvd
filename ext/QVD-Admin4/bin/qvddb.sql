@@ -1466,6 +1466,7 @@ COPY acls (id, name) FROM stdin;
 246	host.see.vm-list-user-state
 247	osf.see.vm-list-user-state
 248	user.see.vm-list-user-state
+249	vm.see.mac
 \.
 
 --

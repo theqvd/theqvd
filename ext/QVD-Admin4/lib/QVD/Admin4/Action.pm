@@ -432,6 +432,13 @@ sub available
 	return 0;
 }
 
+
+sub channel
+{
+    my $self = shift;
+    $ACTIONS->{$self->name}->{'channel'};
+}
+
 sub type
 {
     my $self = shift;

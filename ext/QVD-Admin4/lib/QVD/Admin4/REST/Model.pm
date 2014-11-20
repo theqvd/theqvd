@@ -113,6 +113,7 @@ my $ACLS_FOR_FIELDS =
 	    di_id => [qr/^vm\.see\.di$/],
 	    user_state => [qr/^vm\.see\.user-state$/],
 	    ip => [qr/^vm\.see\.ip$/],
+	    mac => [qr/^vm\.see\.mac$/],
 	    next_boot_ip => [qr/^vm\.see\.next-boot-ip$/],
 	    ssh_port => [qr/^vm\.see\.port-ssh$/],
 	    vnc_port => [qr/^vm\.see\.port-vnc$/],

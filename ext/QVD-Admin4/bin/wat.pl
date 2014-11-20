@@ -6,7 +6,9 @@ use Mojo::JSON qw(encode_json decode_json);
 use QVD::Admin4::Exception;
 use QVD::Config;
 use MojoX::Session;
-app->config(hypnotoad => {listen => ['http://192.168.3.5:3000']});
+use File::Copy qw(copy move);
+use Mojo::IOLoop::ForkCall;
+app->config(hypnotoad => {listen => ['http://192.168.56.101:3000']});
 
 my $QVD_ADMIN4_API = QVD::Admin4::REST->new();
 my $DB_CONNECTION_INFO = "dbi:Pg:dbname=".cfg('database.name').";host=".cfg('database.host');
@@ -30,10 +32,10 @@ package MojoX::Session::Transport::WAT
 
 plugin PgAsync => {dbi => [$DB_CONNECTION_INFO,cfg('database.user'),cfg('database.password'), 
 			   {AutoCommit => 1, RaiseError => 1}]};
-
 helper (qvd_admin4_api => sub { $QVD_ADMIN4_API; });
 helper (get_input_json => \&get_input_json);
 helper (process_api_query => \&process_api_query);
+helper (get_api_channel => \&get_api_channel);
 
 under sub {
 
@@ -122,71 +124,103 @@ any '/' => sub {
     my $c = shift;
     my $json = $c->get_input_json;
     my $response = $c->process_api_query($json);
-    $c->render(json => $response);
+    $c->render(json => $response->json);
 };
 
-websocket '/stream' => sub {
+websocket '/ws' => sub {
     my $c = shift;
-    my $json = $c->get_input_json;
 
-    $c->app->log->debug("WebSocket stream opened");
-
-    my $recurring = Mojo::IOLoop->recurring(1 => sub { 
-	my $response = $c->process_api_query($json); 
-	$c->send(encode_json($response)); });
-
-    $c->on(finish => sub {
-	my ($c, $code) = @_;
-	$c->app->log->debug("WebSocket stream closed with status $code");
-	Mojo::IOLoop->remove($recurring);});
-};
-
-websocket '/notify' => sub {
-    my $c = shift;
-    my $json = $c->get_input_json;
-
-    $c->app->log->debug("WebSocket notify opened");
+    $c->app->log->debug("WebSocket opened");
     $c->inactivity_timeout(3000); 
+    my ($json,$res,$channel) = 
+	($c->get_input_json, undef, 'foo');
 
-    my $cb; $cb = sub { 
-	$c->pg_listen('foo', sub { 
-	    $c->app->log->debug('FOO notified');
-	    my $response = $c->process_api_query($json); 
-	    $c->send(encode_json($response)); $cb->();} );};
+    my $cb = 
+    sub { $res = $c->process_api_query($json); 
+	  $channel = eval { $res->channel } // 'foo';
+	  $c->send(encode_json($res->json)); };
+ 
+    $c->on(message => sub {
+	my ($c,$msg) = @_;
 
-    $c->send(encode_json($c->process_api_query($json)));
-    $cb->();
+	$c->app->log->debug("Signal $msg received in WebSocket");
+	$c->pg_listen($channel, sub { 
+	    $c->app->log->debug("$channel notified"); $cb->();});
+	$c->pg(q/NOTIFY foo/,sub{}); });
     
     $c->on(finish => sub {
 	my ($c, $code) = @_;
-	$c->app->log->debug("WebSocket notify closed with status $code");});
+	$c->app->log->debug("WebSocket closed with status $code");});
+	   
 };
+
+websocket 'staging' => sub {
+    my $c = shift;
+    $c->inactivity_timeout(3000); 
+    $c->app->log->debug("Staging WebSocket opened");
+    my $images_path  = cfg('path.storage.images');
+    $c->render(json => QVD::Admin4::Exception->new(code => 2220)->json) 
+	unless -d $images_path;
+	
+    my $staging_path = cfg('path.storage.staging');
+    $c->render(json => QVD::Admin4::Exception->new(code => 2230)->json) 
+	unless -d $staging_path;
+
+    my $staging_file = 'ubuntu-13.04-i386-qvd.tar.gz';
+    $c->render(json => QVD::Admin4::Exception->new(code => 2240)->json) 
+	unless -e "$staging_path/$staging_file";
+    my $images_file = "ws-$staging_file";
+
+    $c->on(message => sub { my ($c,$msg) = @_;
+			    my $sf_size = -s "$staging_path/$staging_file";
+			    my $if_size = eval { -s "$images_path/$images_file" } // 0;
+			    $c->send("$if_size/$sf_size"); });
+
+    my $fc = Mojo::IOLoop::ForkCall->new;
+    $fc = $fc->run( 
+	sub { $c->app->log->debug("Starting copy"); 
+	      copy(shift,shift);},
+	[("$staging_path/$staging_file",
+	  "$images_path/$images_file")], 
+	sub { $c->app->log->debug("Copy accomplished"); 
+	      unlink "$images_path/$images_file";
+	      $c->send('end'); }
+	);
+};
+
+
+
 
 sub get_input_json
 {
     my $c = shift;
     my $json = $c->req->json;
-    unless ($json)
-    {
-        $json =  { map { $_ => $c->param($_) } $c->param };
-        eval { $json->{filters} = decode_json($json->{filters}) if exists $json->{filters};
-               $json->{arguments} = decode_json($json->{arguments}) if exists $json->{arguments};
-               $json->{order_by} = decode_json($json->{order_by}) if exists $json->{order_by} };
-    }
+    return $json if $json;
+    $json =  { map { $_ => $c->param($_) } $c->param };
+    
+    eval 
+    { 
+	$json->{filters} = decode_json($json->{filters}) if exists $json->{filters};
+	$json->{arguments} = decode_json($json->{arguments}) if exists $json->{arguments};
+	$json->{order_by} = decode_json($json->{order_by}) if exists $json->{order_by} 
+    };
+    
+    $c->render(json => QVD::Admin4::Exception->new(code => 6100)->json) if $@;
     $json;
 }
 
 sub process_api_query
 {
     my ($c,$json) = @_;
+    my $res = $c->qvd_admin4_api->process_query($json);
+    $res->{sid} = $c->res->headers->header('sid');
+    $res;
+}
 
-    print $@ if $@;
-    my $response = ($@ ?
-                    QVD::Admin4::Exception->new(code => 6100)->json  :
-                    $c->qvd_admin4_api->process_query($json));
-
-    $response->{sid} = $c->res->headers->header('sid');
-    $response;
+sub get_api_channel
+{
+    my ($c,$json) = @_;
+    $c->qvd_admin4_api->get_channel($json);
 }
 
 
@@ -200,33 +234,63 @@ __DATA__
 <title>Web Sockets Proofs</title>
 <script type="text/javascript">
 
-      var stream = new WebSocket('ws://localhost:3000/stream?login=superadmin&password=superadmin&action=qvd_objects_statistics');
-      stream.onmessage = function (event) { obj = JSON.parse(event.data); 
-                                            document.getElementById("total").innerHTML = obj.vms_count;
-                                            document.getElementById("blocked").innerHTML = obj.blocked_vms_count;
-                                            document.getElementById("running").innerHTML = obj.running_vms_count;};
-      var notify = new WebSocket('ws://localhost:3000/notify?login=superadmin&password=superadmin&action=vm_get_state&filters={"id":"1"}');
-      notify.onmessage = function (event) { obj = JSON.parse(event.data); 
-                                            document.getElementById("state").innerHTML = obj.rows[0].state;
-                                            document.getElementById("user_state").innerHTML = obj.rows[0].user_state; };
+      var ws = new WebSocket('ws://localhost:3000/ws?login=superadmin&password=superadmin&action=qvd_objects_statistics');
+
+      ws.onopen = 
+        function (event) 
+        { 
+              staging.send('start');
+        };
+
+      ws.onmessage = 
+        function (event) 
+        { 
+              obj = JSON.parse(event.data); 
+              document.getElementById("total").innerHTML = obj.vms_count;
+              document.getElementById("blocked").innerHTML = obj.blocked_vms_count;
+              document.getElementById("running").innerHTML = obj.running_vms_count;
+              ws.send(JSON.stringify("restart"));
+        };
+
+      var staging = new WebSocket('ws://localhost:3000/staging?login=superadmin&password=superadmin');
+
+      staging.onopen = 
+        function (event) 
+        { 
+              staging.send('start');
+        };
+
+      staging.onmessage = 
+        function (event) 
+        { 
+              msg = event.data; 
+              if ( msg != 'end') 
+              {
+                  document.getElementById("copy").innerHTML = msg;
+                  staging.send("restart");
+              }
+              else
+              {
+                  staging.close();
+              }
+        };
 
 </script>
 
 </head>
 <body>
     <h1>Web Sockets Proofs</h1>
-    <a href="http://localhost:3000/?login=superadmin&password=superadmin&action=user_get_list">bye bye</a>
+<!--    <a href="http://localhost:3000/?login=superadmin&password=superadmin&action=user_get_list">bye bye</a> -->
     <hr/>
-    <section>
+<!--    <section>
     <h3>VMs in QVD</h3>
     Total: <span id="total"></span></br>
     Blocked: <span id="blocked"></span></br>
     Running: <span id="running"></span></br>
-    </section>
+    </section> -->
     <section>
-    <h3>VM1 Monitoring</h3>
-    State: <span id="state"></span></br>
-    User state: <span id="user_state"></span></br>
+    <h3>DI Copy Progress</h3>
+    Copy state: <span id="copy"></span></br>
     </section>
 </body>
 
