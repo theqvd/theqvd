@@ -166,7 +166,6 @@ Wat.Views.ListView = Wat.Views.MainView.extend({
     
     // Get filter parameters of the form, set in collection, fetch list and render it
     filter: function (e) {
-        console.log('aaa');
         if ($(e.target).hasClass('mobile-filter')) {
             var filtersContainer = '.' + this.cid + ' .filter-mobile';
         }
