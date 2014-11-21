@@ -7,6 +7,7 @@ use QVD::Admin4::Exception;
 use QVD::Config;
 use MojoX::Session;
 use File::Copy qw(copy move);
+use File::Basename qw(basename dirname);
 use Mojo::IOLoop::ForkCall;
 app->config(hypnotoad => {listen => ['http://192.168.56.101:3000']});
 
@@ -154,42 +155,98 @@ websocket '/ws' => sub {
 	   
 };
 
-websocket 'staging' => sub {
+#######################
+#######################
+
+$ENV{MOJO_MAX_MESSAGE_SIZE} = 0;
+
+app->hook(after_build_tx => sub {
+    my ($tx, $app) = @_;
+    $tx->req->on(progress => sub{
+        my $message = shift;
+        return unless my $len = $message->headers->content_length;
+        my $size = $message->content->progress;
+        say 'Progress: ', $size == $len ? 100 : int($size / ($len / 100)), '%', " size: $size";
+    })
+});
+
+post '/di/upload' => sub {
+
     my $c = shift;
-    $c->inactivity_timeout(3000); 
-    $c->app->log->debug("Staging WebSocket opened");
-    my $images_path  = cfg('path.storage.images');
-    $c->render(json => QVD::Admin4::Exception->new(code => 2220)->json) 
-	unless -d $images_path;
-	
+    my $file = $c->req->upload('file');
+};
+
+
+#######################
+#######################
+
+websocket '/di/download' => sub {
+
+    my $c = shift;
+    my $url = $c->param('url');
+
     my $staging_path = cfg('path.storage.staging');
     $c->render(json => QVD::Admin4::Exception->new(code => 2230)->json) 
 	unless -d $staging_path;
+    my $file = basename($url);
 
-    my $staging_file = 'ubuntu-13.04-i386-qvd.tar.gz';
-    $c->render(json => QVD::Admin4::Exception->new(code => 2240)->json) 
-	unless -e "$staging_path/$staging_file";
-    my $images_file = "ws-$staging_file";
+    my $tx = $c->ua->build_tx(GET => $url);
 
-    $c->on(message => sub { my ($c,$msg) = @_;
-			    my $sf_size = -s "$staging_path/$staging_file";
-			    my $if_size = eval { -s "$images_path/$images_file" } // 0;
-			    $c->send("$if_size/$sf_size"); });
+    $tx->res->on(progress => sub{
+        my $message = shift;
+        return unless my $len = $message->headers->content_length;
+        my $size = $message->content->progress;
+	$c->session(len => $len, siz => $size);
+	});
 
+    Mojo::IOLoop->recurring(1 => sub { 	use Data::Dumper; print Dumper $c->session;my ($len,$size) = ($c->session('len'),$c->session('siz')); ; $c->send("Lenght: $len, Size: $size");});
+		       	 
     my $fc = Mojo::IOLoop::ForkCall->new;
-    $fc = $fc->run( 
-	sub { $c->app->log->debug("Starting copy"); 
-	      copy(shift,shift);},
-	[("$staging_path/$staging_file",
-	  "$images_path/$images_file")], 
-	sub { $c->app->log->debug("Copy accomplished"); 
-	      unlink "$images_path/$images_file";
-	      $c->send('end'); }
+    $fc->run( 
+	sub { $c->ua->start($tx); return 1;},
+	sub { $tx->res->content->asset->move_to($staging_path."/".$file); }
 	);
 };
 
 
+websocket '/staging' => sub {
+    my $c = shift;
+    $c->inactivity_timeout(3000); 
+    $c->app->log->debug("Staging WebSocket opened");
+    my $json = $c->get_input_json;
 
+    my $images_path  = cfg('path.storage.images');
+    $c->send(encode_json(QVD::Admin4::Exception->new(code => 2220)->json)) 
+	unless -d $images_path;
+	
+    my $staging_path = cfg('path.storage.staging');
+    $c->send(encode_json(QVD::Admin4::Exception->new(code => 2230)->json)) 
+	unless -d $staging_path;
+
+    my $staging_file = $json->{arguments}->{disk_image};
+    $c->send(encode_json(QVD::Admin4::Exception->new(code => 2240)->json)) 
+	unless -e "$staging_path/$staging_file";
+    my $images_file = $staging_file; 
+
+    $c->on(message => sub { my ($c,$msg) = @_;
+			    my $sf_size = -s "$staging_path/$staging_file";
+			    my $if_size = eval { -s "$images_path/$images_file" } // 0;
+			    my $percentage = (($if_size * 100) / $sf_size);
+			    $c->send(encode_json({ status => 100, 
+						   total_size => $sf_size, 
+						   copy_size => $if_size,
+                                                   percentage => $percentage.'%' }));});
+
+    my $fc = Mojo::IOLoop::ForkCall->new;
+    $fc->run( 
+	sub { $c->app->log->debug("Starting copy"); 
+	      my $response = $c->qvd_admin4_api->process_query($json);
+	      return $response->json; },
+	sub { my ($fc, $err, $response) = @_;
+	      $c->app->log->debug("Copy accomplished, $err");
+	      $c->send(encode_json($response)); }
+	);
+};
 
 sub get_input_json
 {
@@ -228,6 +285,25 @@ app->start;
 
 __DATA__
 
+@@ upload.html.ep
+<!DOCTYPE html>
+<html>
+  <head><title>Streaming multipart upload</title></head>
+  <body>
+    %= form_for upload => (enctype => 'multipart/form-data') => begin
+      <br>File: 
+    %= file_field 'disk_image'
+      <br>OSF: 
+    %= text_field 'osf_id'
+      <br>Login: 
+    %= text_field 'login' 
+      <br>Password 
+    %= text_field 'password'
+      %= submit_button 'Upload'
+    % end
+  </body>
+</html>
+
 @@ index.html.ep
 <html>
 <head>
@@ -252,28 +328,44 @@ __DATA__
               ws.send(JSON.stringify("restart"));
         };
 
-      var staging = new WebSocket('ws://localhost:3000/staging?login=superadmin&password=superadmin');
+      var staging = new WebSocket('ws://localhost:3000/staging?login=superadmin&password=superadmin&action=di_create&arguments={"disk_image":"ubuntu-13.04-i386-qvd.tar.gz","o_id":"1"}');
 
       staging.onopen = 
         function (event) 
         { 
-              staging.send('start');
+
         };
 
       staging.onmessage = 
         function (event) 
         { 
-              msg = event.data; 
-              if ( msg != 'end') 
+              obj = JSON.parse(event.data); 
+              if ( obj.status == '100') 
               {
-                  document.getElementById("copy").innerHTML = msg;
+                  document.getElementById("copy").innerHTML = obj.percentage;
                   staging.send("restart");
               }
               else
               {
+                  document.getElementById("response").innerHTML = event.data;
                   staging.close();
               }
         };
+
+
+      var download = new WebSocket('ws://localhost:3000/di/download?login=superadmin&password=superadmin&url=https://s3.amazonaws.com/QVD_Images/3.4/lxc/opensuse-12.3-qvd.tar.gz');
+
+      download.onopen = 
+        function (event) 
+        { 
+        };
+
+      download.onmessage = 
+        function (event) 
+        {  
+         document.getElementById("download").innerHTML = event.data;
+        };
+
 
 </script>
 
@@ -291,7 +383,13 @@ __DATA__
     <section>
     <h3>DI Copy Progress</h3>
     Copy state: <span id="copy"></span></br>
+    Json response: <span id="response"></span></br>
     </section>
+    <section>
+    <h3>DI Download Progress</h3>
+    Download state: <span id="download"></span></br>
+    </section>
+
 </body>
 
 </html>
