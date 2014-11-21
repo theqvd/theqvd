@@ -1024,6 +1024,17 @@ sub top_populated_hosts
 ####### CONFIG #######
 ######################
 
+
+sub config_preffix_get
+{
+    my @keys = cfg_keys; 
+    ($_) = $_ =~ m/^([^.]+)/ for @keys;
+    my %preffix = map { $_ => 1 } @keys;
+    my @preffix = keys %preffix; 
+    { total => scalar @preffix,
+      rows => \@preffix };
+}
+
 sub config_get
 {
     my ($self,$admin,$json_wrapper) = @_;
@@ -1050,7 +1061,7 @@ sub config_get
    { total => $total,
      rows => [ map {{ key => $_, 
 		      operative_value => cfg($_), 
-		      default_value => (defined eval{ core_cfg($_)} || undef) }} @keys ] };
+		      default_value => (defined eval{ core_cfg($_)} ? core_cfg($_) : undef) }} @keys ] };
 }
 
 sub config_set
