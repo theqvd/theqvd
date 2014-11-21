@@ -93,6 +93,8 @@ Wat.B = {
         
         this.bindEvent('click', '.js-mobile-menu-hamburger', this.navigationBinds.clickMenuMobile);
         
+        this.bindEvent('click', '.js-delete-filter-note', this.navigationBinds.clickDeleteFilterNote);
+        
         // Show/hide the corner menu
         this.bindEvent('mouseenter', '.js-menu-corner li:has(ul)', this.navigationBinds.cornerMenuHoverIn);
         
@@ -141,7 +143,7 @@ Wat.B = {
             if ($('.js-mobile-menu-hamburger').css('display') != 'none') {
                 $('.menu').slideUp();
             }
-            
+                        
             var id = $(this).attr('data-target');
             window.location = '#/' + id;
             Wat.I.closeMessage();
@@ -167,6 +169,23 @@ Wat.B = {
         
         cornerMenuHoverOut: function (e) {
             $(this).find('ul').css({display: "none"});
+        },
+        
+        clickDeleteFilterNote: function (e) {
+            var name = $(e.target).attr('data-filter-name');
+            var type = $(e.target).attr('data-filter-type');
+            
+            switch(type) {
+                case 'select':
+                    $('[name="' + name + '"]').val(-1);
+                    $('[name="' + name + '"]').trigger('chosen:updated');
+                    $('[name="' + name + '"]:not(.mobile-filter)').trigger('change');
+                    break;
+                case 'text':
+                    $('[name="' + name + '"]').val('');
+                    $('[name="' + name + '"]:not(.mobile-filter)').trigger('input');
+                    break;
+            }           
         }
     },
     

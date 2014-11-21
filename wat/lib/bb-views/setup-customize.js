@@ -12,8 +12,7 @@ Wat.Views.SetupCustomizeView = Wat.Views.ViewsView.extend({
         'screen': 'Home',
         'link': '#',
         'next': {
-            'screen': 'Setup',
-            'link': '#/setup',
+            'screen': 'WAT Management',
             'next': {
                 'screen': 'Views'
             }

@@ -121,7 +121,6 @@ Wat.Views.ListView = Wat.Views.MainView.extend({
         'click .next': 'paginationNext',
         'click .last': 'paginationLast',
         'click a[name="filter_button"]': 'filter',
-        //'keyup .filter-control input': 'filter',
         'input .filter-control>input': 'filter',
         'change .filter-control select': 'filter',
         'click .js-button-new': 'openNewElementDialog',
@@ -167,6 +166,7 @@ Wat.Views.ListView = Wat.Views.MainView.extend({
     
     // Get filter parameters of the form, set in collection, fetch list and render it
     filter: function (e) {
+        console.log('aaa');
         if ($(e.target).hasClass('mobile-filter')) {
             var filtersContainer = '.' + this.cid + ' .filter-mobile';
         }
@@ -175,19 +175,30 @@ Wat.Views.ListView = Wat.Views.MainView.extend({
         }
         
         var filters = {};
+        var filterNotes = {};
         $.each(this.formFilters, function(name, filter) {
             var filterControl = $(filtersContainer + ' [name="' + name + '"]');
             // If input text box is empty or selected option in a select is All (-1) skip filter control
             switch(filter.type) {
                 case 'select':
-                    if (filterControl.val() == '-1') {
+                    if (filterControl.val() == '-1' || filterControl.val() == undefined) {
                         return true;
                     }
+                    filterNotes[filterControl.attr('name')] = {
+                        'label': $('label[for="' + filterControl.attr('name') + '"]').html(),
+                        'value': filterControl.find('option:selected').html(),
+                        'type': filter.type
+                    };
                     break;
                 case 'text':
-                    if (filterControl.val() == '') {
+                    if (filterControl.val() == '' || filterControl.val() == undefined) {
                         return true;
                     }
+                    filterNotes[filterControl.attr('name')] = {
+                        'label': $('label[for="' + filterControl.attr('name') + '"]').html(),
+                        'value': filterControl.val(),
+                        'type': filter.type
+                    };
                     break;
             }
             
@@ -208,6 +219,18 @@ Wat.Views.ListView = Wat.Views.MainView.extend({
         }
         else {
             this.fetchList();
+        }
+        
+        // Show-Hide filter notes
+        if ($.isEmptyObject(filterNotes)) {
+            $('.js-filter-notes').hide();
+        }
+        else {
+            $('.filter-notes-list li').remove();
+            $.each(filterNotes, function(fNoteName, fNote) {
+                $('.js-filter-notes-list').append('<li><a href="javascript:" class="js-delete-filter-note fa fa-trash" data-filter-name="' + fNoteName + '" data-filter-type="' + fNote.type + '"></a>' + fNote.label + ': ' + fNote.value + '</li>');
+            });
+            $('.js-filter-notes').show();
         }
     },
     

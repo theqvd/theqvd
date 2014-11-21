@@ -12,7 +12,6 @@ Wat.Views.MyViewsView = Wat.Views.ViewsView.extend({
         'link': '#',
         'next': {
             'screen': 'Personal area',
-            'link': '#/profile',
             'next': {
                 'screen': 'Customize views'
             }

@@ -79,8 +79,7 @@ Wat.I.listActionButton[qvdObj] = {
 // Breadcrumbs configuration on list view
 $.extend(Wat.I.listBreadCrumbs[qvdObj], Wat.I.homeBreadCrumbs);
 Wat.I.listBreadCrumbs[qvdObj]['next'] = {
-            'screen': 'Setup',
-            'link': '#/setup',
+            'screen': 'WAT Management',
             'next': {
                 'screen': 'Roles'
             }
@@ -89,8 +88,7 @@ Wat.I.listBreadCrumbs[qvdObj]['next'] = {
 // Breadcrumbs configuration on details view
 $.extend(true, Wat.I.detailsBreadCrumbs[qvdObj], Wat.I.listBreadCrumbs[qvdObj]);
 Wat.I.detailsBreadCrumbs[qvdObj].next = {
-            'screen': 'Setup',
-            'link': '#/setup',
+            'screen': 'WAT Management',
             'next': {
                 'screen': 'Roles',
                 'link': '#/roles',

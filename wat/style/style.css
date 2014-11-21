@@ -195,6 +195,28 @@ fieldset {
     text-align: center;
     padding: 50px; }
 
+.filter-notes {
+  border: 1px #b6b600 solid;
+  padding: 8px;
+  border-radius: 4px;
+  background: #f6f7af;
+  margin-top: -20px;
+  margin-bottom: 15px;
+  min-height: 40px; }
+  .filter-notes .fa:before {
+    margin-right: 4px; }
+  .filter-notes .filter-notes-list {
+    display: block;
+    margin-top: 15px;
+    margin-bottom: 10px; }
+    .filter-notes .filter-notes-list li {
+      display: inline;
+      margin-right: 15px;
+      border: 1px solid #666;
+      padding: 5px;
+      background: #FFF;
+      border-radius: 3px; }
+
 /********************************************************************
 *********************************************************************
 *********************************************************************
@@ -250,7 +272,6 @@ fieldset {
   .menu > ul .token-prefix-option, .menu > ul .token-prefix-option:active {
     float: left;
     margin-bottom: 10px;
-    text-align: center;
     width: 100%; }
   .menu > ul .menu-option--selected, .menu > ul .menu-option:hover, .menu > ul .token-prefix-option--selected, .menu > ul .token-prefix-option:hover {
     background: #e35e0c;

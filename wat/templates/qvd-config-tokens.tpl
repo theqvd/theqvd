@@ -3,7 +3,7 @@
 var prefixes = [];
 var prefix = '';
 var miscTokens = [];
-console.info(configTokens);
+
 $.each(configTokens, function (iTok, tok) {
     var token = tok.key;
     var value = tok.operative_value;

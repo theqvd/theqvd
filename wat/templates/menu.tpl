@@ -55,3 +55,8 @@
     </ul>
 </div>
 <div id="breadcrumbs" class="breadcrumbs desktop"></div>
+<div class="desktop filter-notes js-filter-notes hidden">
+    <i class="fa fa-filter" data-i18n="">Enabled filters</i>
+    <ul class="filter-notes-list js-filter-notes-list">
+    </ul>
+</div>
