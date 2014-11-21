@@ -398,14 +398,13 @@ Wat.I = {
         $('.menu').hide();
 
         if ($.inArray(Wat.CurrentView.qvdObj, QVD_OBJS_SETUP) != -1) {
-            $('.js-setup-menu').show();
-            $('.js-menu-option-setup').hide();
-            $('.js-menu-option-platform').show();
+            $('.js-wat-management-menu').show();
+        }
+        else if (Wat.CurrentView.qvdObj == 'config') {
+            $('.js-qvd-config-menu').show();
         }
         else {
             $('.js-platform-menu').show();
-            $('.js-menu-option-platform').hide();
-            $('.js-menu-option-setup').show();
         }
     },
 
@@ -549,6 +548,7 @@ Wat.I = {
         // Fill the html with the template and the collection
         var template = _.template(
             templateMenu, {
+                configMenu: Wat.I.configMenu,
                 setupMenu: Wat.I.setupMenu,
                 menu: Wat.I.menu,
                 mobileMenu: Wat.I.mobileMenu

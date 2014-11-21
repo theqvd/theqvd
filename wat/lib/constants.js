@@ -58,7 +58,10 @@ ALL_STATUS = {
     7320: 'Unable to remove DI. There are VMs running with it',
     7330: 'Unable to reassign a Tag fixed to another DI',
     7340: 'Fixed, Head and Default Tags cannot be deleted',
-    7350: 'Forbidden role assignment: inherited role inherits from inheritor'
+    7350: 'Forbidden role assignment: inherited role inherits from inheritor',
+    7360: 'Incompatible expiration dates. Soft date must precede the hard one',
+    7371: 'Non core config items haven\'t default value',
+    7372: 'Unable to remove a core config item'
 };
 
 STATUS_SUCCESS = 0;
@@ -120,6 +123,10 @@ STATUS_TAG_NOT_ASSIGNED_DUE_FIXED = 7330;
 STATUS_TAG_NOT_DELETED_DUE_FIXED = 7340;
 STATUS_ROLE_NOT_ASSIGNED_DUE_LOOP = 7350;
 
+STATUS_INCOMPATIBLE_EXPIRATION = 7360;
+STATUS_NOT_DEFAULT_CONFIG_TOKEN = 7371;
+STATUS_UNABLE_REMOVE_CONFIG_TOKEN = 7372;
+
 STATUS_FORBIDDEN = 8;
 STATUS_FOREIGN_KEY = 23503;
 
@@ -149,10 +156,14 @@ QVD_OBJS_WITH_PROPERTIES = ['user', 'vm', 'host', 'osf', 'di'];
 QVD_OBJS_CLASSIFIED_BY_TENANT = ['user', 'vm', 'osf', 'di', 'administrator'];
 QVD_OBJS_EXIST_IN_SUPERTENANT = ['role', 'administrator'];
 QVD_OBJS_PLATFORM = ['user', 'vm', 'host', 'osf', 'di'];
-QVD_OBJS_SETUP = ['role', 'administrator', 'tenant', 'config', 'views'];
+QVD_OBJS_SETUP = ['role', 'administrator', 'tenant', 'views'];
 
 // Default values
 DEFAULT_OSF_MEMORY = 256;
+
+// Config
+UNCLASSIFIED_CONFIG_CATEGORY = 'unclassified';
+UNCLASSIFIED_CONFIG_REGEXP = '^((?!\\.).)*$';
 
 // Html pieces
 HTML_MINI_LOADING = '<div class="mini-loading"><i class="fa fa-gear fa-spin"></i></div>';

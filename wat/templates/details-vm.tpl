@@ -87,6 +87,16 @@
         </tr>
     <% 
     }
+    if (detailsFields['mac'] != undefined) { 
+    %>
+        <tr>
+            <td><i class="fa fa-ellipsis-h"></i><span data-i18n>MAC address</span></td>
+            <td>
+                <%= model.get('mac') %>
+            </td>
+        </tr>  
+    <% 
+    }
     if (detailsFields['user'] != undefined) { 
     %>
         <tr>

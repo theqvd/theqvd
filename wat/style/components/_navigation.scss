@@ -17,7 +17,7 @@
     }
     
     &>ul {    
-        .menu-option {
+        .menu-option, .token-prefix-option {
             @extend %not-selectable;
             display: block;
 
@@ -79,14 +79,21 @@
             }
 
         }
+        
+        .token-prefix-option, .token-prefix-option:active {
+            float: left;
+            margin-bottom: 10px;
+            text-align: center;
+            width: 100%;
+        }
 
-            .menu-option--selected, .menu-option:hover {
+            .menu-option--selected, .menu-option:hover, .token-prefix-option--selected, .token-prefix-option:hover {
                 background: $col_brand;
                 color: $col_whiter;
                 border: 1px solid transparent;
             }
 
-            .menu-option--selected {
+            .menu-option--selected, .token-prefix-option--selected {
                 font-weight: bold;
 
                 span {
@@ -206,4 +213,10 @@
     .menu-option {
         padding: 4px 8px 4px 8px;
     }
+}
+
+.secondary-menu {
+    display: block !important;
+    visibility: visible !important;
+    margin-top: 0px !important;
 }

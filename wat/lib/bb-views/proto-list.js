@@ -352,7 +352,8 @@ Wat.Views.ListView = Wat.Views.MainView.extend({
         // The superadmin have an extra field on lists: tenant
         
         // Every element but the hosts has tenant
-        if (Wat.C.isSuperadmin() && this.collection.actionPrefix != 'host') {
+        var classifiedByTenant = $.inArray(this.qvdObj, QVD_OBJS_CLASSIFIED_BY_TENANT) != -1;
+        if (Wat.C.isSuperadmin() && classifiedByTenant) {
             this.columns.tenant = {
                 'text': 'Tenant',
                 'displayDesktop': true,
@@ -642,8 +643,9 @@ Wat.Views.ListView = Wat.Views.MainView.extend({
                 $(this).dialog('close');
             },
             Create: function (e) {
-                //$(e.target).addClass('fa-spin');
-                Wat.I.loadingBlock($.i18n.t('Please, wait while action is performed') + '<br><br>' + $.i18n.t('Do not close or refresh the window'));
+                if (Wat.CurrentView.qvdObj == 'di') {
+                    Wat.I.loadingBlock($.i18n.t('Please, wait while action is performed') + '<br><br>' + $.i18n.t('Do not close or refresh the window'));
+                }
                 that.dialog = $(this);
                 that.createElement($(this));
             }

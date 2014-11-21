@@ -269,6 +269,7 @@ ACLS = {
     "vm.see.host": "See virtual machine's Node",
     "vm.see.id": "See virtual machine's ID",
     "vm.see.ip": "See virtual machine's IP address",
+    "vm.see.mac": "See virtual machine's MAC address",
     "vm.see.next-boot-ip": "See virtual machine's IP address for next boot",
     "vm.see.osf": "See virtual machine's OS Flavour",
     "vm.see.port-serial": "See virtual machine's Serial port",

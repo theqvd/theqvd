@@ -30,7 +30,9 @@ if (setupMenu) {
 else 
 {
 %>
-<div class="bb-setup setup"></div>
+<div class="wrapper-content <%= cid %>">
+    <div class="bb-setup setup"></div>
+</div>
 <%
 }
 %>

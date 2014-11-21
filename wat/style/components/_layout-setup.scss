@@ -74,3 +74,20 @@ a.button-update-customize {
     float: right;
     margin-top: 20px;
 }
+
+.config-table {
+    margin-bottom: 3px;
+    table-layout: fixed;
+    
+    th {
+        cursor: pointer;
+    }
+    
+    .fa:before {
+        margin-right: 5px;
+    }
+}
+
+.action-new-token {
+    margin-bottom: 10px;
+}

@@ -317,7 +317,7 @@ Wat.Views.MainView = Backbone.View.extend({
         var that = this;
                     
         this.templateEditor = Wat.A.getTemplate(this.editorTemplateName);
-
+        
         this.dialogConf.buttons = {
             Cancel: function () {
                 $(this).dialog('close');

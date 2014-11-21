@@ -52,10 +52,10 @@ body {
         position: fixed;
         top: 0px;
 
-        right: 5%;
+        left: 5%;
         width: 90%;
         @include in(desktop) {
-            right: 20px;
+            left: 20px;
             width: 40%;
         }
         

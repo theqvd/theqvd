@@ -1,3 +1,11 @@
+Wat.I.menuConfigOriginal = {
+    config: {
+        text: 'QVD Config',
+        link: '#/config',
+        icon: CLASS_ICON_CONFIG
+    }
+};
+
 Wat.I.menuSetupOriginal = {
     admins: {
         text: 'Administrators',
@@ -13,11 +21,6 @@ Wat.I.menuSetupOriginal = {
         text: 'Tenants',
         link: '#/tenants',
         icon: CLASS_ICON_TENANTS 
-    },
-    config: {
-        text: 'Config',
-        link: '#/config',
-        icon: CLASS_ICON_CONFIG
     },
     views: {
         text: 'Default views',
@@ -89,10 +92,17 @@ Wat.I.cornerMenuOriginal = {
         },
     
         setup: {
-            text: 'Setup',
+            text: 'WAT Management',
             link: '#/setup',
             icon: 'fa fa-wrench',
             subMenu: _.extend({}, Wat.I.menuSetupOriginal)
+        },
+    
+        config: {
+            text: 'QVD Config',
+            link: '#/config',
+            icon: CLASS_ICON_CONFIG,
+            subMenu: {}
         },
         
         user: {

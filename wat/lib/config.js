@@ -85,7 +85,9 @@ Wat.C = {
     
     checkLogin: function (that) {   
         that.password = '';
+        
         if (!that.retrievedData.acls || $.isEmptyObject(that.retrievedData.acls)) {
+            Wat.C.logOut();
             Wat.I.showMessage({message: "Wrong user or password", messageType: "error"});
             that.login = '';
             that.sid = '';
@@ -243,6 +245,7 @@ Wat.C = {
     
     configureVisibility: function () {        
         Wat.I.menu = $.extend(true, {}, Wat.I.menuOriginal);
+        Wat.I.configMenu = $.extend(true, {}, Wat.I.menuConfigOriginal);
         Wat.I.setupMenu = $.extend(true, {}, Wat.I.menuSetupOriginal);
         Wat.I.mobileMenu = $.extend(true, {}, Wat.I.mobileMenuOriginal);
         Wat.I.cornerMenu = $.extend(true, {}, Wat.I.cornerMenuOriginal);
@@ -272,7 +275,6 @@ Wat.C = {
             'role.see-main.' : 'roles',
             'administrator.see-main.' : 'admins',
             'tenant.see-main.' : 'tenants',
-            'config.see-main.' : 'config',
             'views.see-main.' : 'views',
         };
         
@@ -285,10 +287,18 @@ Wat.C = {
         
         if (Wat.I.cornerMenu.setup && !$.isEmptyObject(Wat.I.cornerMenu.setup.subMenu)) {
             Wat.I.cornerMenu.setup.link = Wat.I.cornerMenu.setup.subMenu[Object.keys(Wat.I.cornerMenu.setup.subMenu)[0]].link;
+        }        
+        
+        if (Wat.I.cornerMenu.platform && !$.isEmptyObject(Wat.I.cornerMenu.platform.subMenu)) {
+            Wat.I.cornerMenu.platform.link = Wat.I.cornerMenu.platform.subMenu[Object.keys(Wat.I.cornerMenu.platform.subMenu)[0]].link;
         }
         
         if ($.isEmptyObject(Wat.I.cornerMenu.setup.subMenu)) {
             delete Wat.I.cornerMenu.setup;
+        }
+        
+        if (!that.checkACL('config.see-main.')) {
+            delete Wat.I.cornerMenu.config;
         }
     },
     

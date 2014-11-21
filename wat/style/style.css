@@ -12,7 +12,7 @@
   padding-left: 20px;
   padding-right: 20px; }
 
-.menu > ul .menu-option, a.button, button.button, a.button2, button.button2, a.button--green, button.button--green, a.button--red, button.button--red, a.button.disabled, a.button2.disabled, button.button.disabled, button.button2.disabled, .wrapper .content .home-wrapper th, .wrapper .content .home-wrapper .home-row .home-cell .summary-table th, .wrapper .content .home-wrapper .log-table th, table.list th, table.customize-fields th, table.custom-props th, table.details th, .ui-dialog .ui-state-hover, .ui-dialog .ui-state-focus, .not-selectable {
+.menu > ul .menu-option, .menu > ul .token-prefix-option, a.button, button.button, a.button2, button.button2, a.button--green, button.button--green, a.button--red, button.button--red, a.button.disabled, a.button2.disabled, button.button.disabled, button.button2.disabled, .wrapper .content .home-wrapper th, .wrapper .content .home-wrapper .home-row .home-cell .summary-table th, .wrapper .content .home-wrapper .log-table th, table.list th, table.customize-fields th, table.custom-props th, table.details th, .ui-dialog .ui-state-hover, .ui-dialog .ui-state-focus, .not-selectable {
   -webkit-touch-callout: none;
   -webkit-user-select: none;
   -khtml-user-select: none;
@@ -210,7 +210,7 @@ fieldset {
   @media screen and (min-width: 40em) {
     .menu {
       display: block; } }
-  .menu > ul .menu-option {
+  .menu > ul .menu-option, .menu > ul .token-prefix-option {
     display: block;
     min-width: 100px;
     padding: 8px 12px 8px 12px;
@@ -219,43 +219,48 @@ fieldset {
     border: 1px solid #f7985e;
     cursor: pointer; }
     @media screen and (min-width: 40em) {
-      .menu > ul .menu-option {
+      .menu > ul .menu-option, .menu > ul .token-prefix-option {
         display: inline; } }
-    .menu > ul .menu-option:last-child {
+    .menu > ul .menu-option:last-child, .menu > ul .token-prefix-option:last-child {
       border-bottom-left-radius: 7px;
       border-bottom-right-radius: 7px; }
-    .menu > ul .menu-option:first-child {
+    .menu > ul .menu-option:first-child, .menu > ul .token-prefix-option:first-child {
       border-top-left-radius: 7px;
       border-top-right-radius: 7px; }
     @media screen and (min-width: 40em) {
-      .menu > ul .menu-option:last-child {
+      .menu > ul .menu-option:last-child, .menu > ul .token-prefix-option:last-child {
         border-bottom-left-radius: 0;
         border-top-right-radius: 7px;
         border-bottom-right-radius: 7px; }
-      .menu > ul .menu-option:first-child {
+      .menu > ul .menu-option:first-child, .menu > ul .token-prefix-option:first-child {
         border-top-right-radius: 0;
         border-top-left-radius: 7px;
         border-bottom-left-radius: 7px; }
-      .menu > ul .menu-option:first-child:last-child {
+      .menu > ul .menu-option:first-child:last-child, .menu > ul .token-prefix-option:first-child:last-child {
         border-radius: 7px; } }
-    .menu > ul .menu-option .fa {
+    .menu > ul .menu-option .fa, .menu > ul .token-prefix-option .fa {
       font-size: 18px;
       margin-right: 10px; }
-    .menu > ul .menu-option span {
+    .menu > ul .menu-option span, .menu > ul .token-prefix-option span {
       vertical-align: bottom; }
     @media screen and (min-width: 40em) {
-      .menu > ul .menu-option:active {
+      .menu > ul .menu-option:active, .menu > ul .token-prefix-option:active {
         margin-bottom: -2px;
         margin-top: 1px; } }
-  .menu > ul .menu-option--selected, .menu > ul .menu-option:hover {
+  .menu > ul .token-prefix-option, .menu > ul .token-prefix-option:active {
+    float: left;
+    margin-bottom: 10px;
+    text-align: center;
+    width: 100%; }
+  .menu > ul .menu-option--selected, .menu > ul .menu-option:hover, .menu > ul .token-prefix-option--selected, .menu > ul .token-prefix-option:hover {
     background: #e35e0c;
     color: #fdfdfd;
     border: 1px solid transparent; }
-  .menu > ul .menu-option--selected {
+  .menu > ul .menu-option--selected, .menu > ul .token-prefix-option--selected {
     font-weight: bold; }
-    .menu > ul .menu-option--selected span {
+    .menu > ul .menu-option--selected span, .menu > ul .token-prefix-option--selected span {
       vertical-align: baseline; }
-    .menu > ul .menu-option--selected:active {
+    .menu > ul .menu-option--selected:active, .menu > ul .token-prefix-option--selected:active {
       margin: 0px; }
 
 .menu-corner {
@@ -327,6 +332,11 @@ fieldset {
   .submenu ul .menu-option {
     padding: 4px 8px 4px 8px; }
 
+.secondary-menu {
+  display: block !important;
+  visibility: visible !important;
+  margin-top: 0px !important; }
+
 /********************************************************************
 *********************************************************************
 *********************************************************************
@@ -366,6 +376,9 @@ td i.fa-lock, td i.fa-unlock {
 .fa-centered {
   width: 100%;
   text-align: center; }
+
+.fa:before {
+  font-weight: normal; }
 
 /********************************************************************
 *********************************************************************
@@ -692,7 +705,7 @@ body {
   .header-wrapper .message-container {
     position: fixed;
     top: 0px;
-    right: 5%;
+    left: 5%;
     width: 90%;
     padding: 12px 20px;
     border-bottom-left-radius: 20px;
@@ -704,7 +717,7 @@ body {
     display: none; }
     @media screen and (min-width: 40em) {
       .header-wrapper .message-container {
-        right: 20px;
+        left: 20px;
         width: 40%; } }
     .header-wrapper .message-container.success {
       background: #00b300; }
@@ -1293,6 +1306,15 @@ body {
     .wrapper .content a.button-update-customize {
       float: right;
       margin-top: 20px; }
+    .wrapper .content .config-table {
+      margin-bottom: 3px;
+      table-layout: fixed; }
+      .wrapper .content .config-table th {
+        cursor: pointer; }
+      .wrapper .content .config-table .fa:before {
+        margin-right: 5px; }
+    .wrapper .content .action-new-token {
+      margin-bottom: 10px; }
     .wrapper .content .login-box {
       width: 90%;
       height: 250px;

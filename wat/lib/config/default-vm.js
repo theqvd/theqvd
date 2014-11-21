@@ -123,6 +123,14 @@ Wat.I.listFields[qvdObj] = {
         'acls': 'vm.see.next-boot-ip',
         'display': false
     },
+    'mac': {
+        'text': 'MAC address',
+        'fields': [
+            'mac'
+        ],
+        'acls': 'vm.see.mac',
+        'display': false
+    },
     'serial_port': {
         'text': 'Serial port',
         'fields': [
@@ -285,6 +293,14 @@ Wat.I.detailsFields[qvdObj] = {
         ],
         'acls': 'vm.see.next-boot-ip',
         'display': false
+    },
+    'mac': {
+        'text': 'MAC address',
+        'fields': [
+            'mac'
+        ],
+        'acls': 'vm.see.mac',
+        'display': true
     },
     'serial_port': {
         'text': 'Serial port',

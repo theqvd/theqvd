@@ -9,7 +9,7 @@
                     }
                     
                     printedColumns++;
-                    
+
                     switch(name) {
                         case 'checks':
                             var checkedAttr = selectedAll ? 'checked' : '';
@@ -34,7 +34,7 @@
             <%
                             break;
                     }
-                });
+                });                    
             %>
         </tr>
     </thead>
