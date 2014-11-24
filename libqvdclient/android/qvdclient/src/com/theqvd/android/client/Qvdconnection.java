@@ -3,6 +3,13 @@ package com.theqvd.android.client;
 import java.io.IOException;
 import java.net.InetSocketAddress;
 import java.net.Socket;
+
+import android.accounts.Account;
+import android.accounts.AccountManager;
+import android.accounts.AccountManagerCallback;
+import android.accounts.AccountManagerFuture;
+import android.accounts.AuthenticatorException;
+import android.accounts.OperationCanceledException;
 import android.app.AlertDialog;
 import android.app.Notification;
 import android.app.NotificationManager;
@@ -38,6 +45,8 @@ public class Qvdconnection implements Runnable {
 	private Handler handler;
 	private ConnectionProgress connectionprogress;
 	private boolean running, connecting;
+	private Account selectedaccount;
+	private String googleauthtoken;
 
 	private Exception exception;
 	/*
@@ -71,6 +80,14 @@ public class Qvdconnection implements Runnable {
 		}
 		
 		try {
+			if (connection.isGoogleauthentication()) {
+				Log.d(tag, "Use google authentication");
+				googleAuth(connection);
+				Log.d(tag, "Used google authentication user="+connection.getLogin()+";pass="+connection.getPassword());
+				if (connection.getPassword() == "") {
+					throw new QvdException("Error in Authenticate against google");
+				}
+			}
 			qvd.qvd_init(connection.getHost(),
 					connection.getPort(),
 					connection.getLogin(),
@@ -128,6 +145,106 @@ public class Qvdconnection implements Runnable {
 		WaitForXAndRunConnect w = new WaitForXAndRunConnect();
 		w.execute();
 	}
+	
+    /* 
+     * Select the account used to authenticate
+     */
+    // TODO let the user choose the account
+    private void googleAuth(Connection c) throws QvdException {
+    	AccountManager am = AccountManager.get(this.activity.getApplicationContext());
+    	Account account[] = am.getAccountsByType("com.google");
+    	int i;
+    	for (i=0; i < account.length; i ++) {
+    		Log.d(tag, "Account is <"+account[i].name + "> type <" + account[i].type + "> to string:" + account[i].toString());
+    	}
+    	if (account.length < 1) {
+    		Log.e(tag, "No account found");
+    		throw new QvdException("No account found");
+    	}
+    	selectedaccount = account[0];
+    	Log.d(tag, "Selected first account "+selectedaccount);
+    	
+    	//Toast.makeText(this, "Selected first account "+selectedaccount, Toast.LENGTH_LONG).show();
+    	GoogleAuthenticationCallback authcallback = new GoogleAuthenticationCallback(); 
+
+//    	@SuppressWarnings(UNUSED)
+		AccountManagerFuture<Bundle> amf = 
+    			am.getAuthToken(selectedaccount, "oauth2:https://mail.google.com/", null, this.activity, authcallback, null);
+    	try {
+			Bundle bundle = amf.getResult();
+			c.setLogin(selectedaccount.name);
+	    	c.setPassword(bundle.getString(AccountManager.KEY_AUTHTOKEN));
+		} catch (OperationCanceledException e) {
+			throw new QvdException("Google Auth cancelled" + e.toString());
+		} catch (AuthenticatorException e) {
+			throw new QvdException("Google Auth exception" + e.toString());
+		} catch (IOException e) {
+			throw new QvdException("Google Auth io error" + e.toString());
+		}
+    	
+    	
+//    	GET https://www.googleapis.com/oauth2/v1/tokeninfo?access_token=ya29.AHES6ZSw0WdfQrZRu7irytsBDA5mvqQztD43y-nVXyA8zg --> 200 OK
+//    	{
+//    	 "issued_to": "442575845966-mde4be7eingpb5pntfs839jipsetro6s.apps.googleusercontent.com",
+//    	 "audience": "442575845966-mde4be7eingpb5pntfs839jipsetro6s.apps.googleusercontent.com",
+//    	 "scope": "https://mail.google.com/",
+//    	 "expires_in": 3393,
+//    	 "access_type": "online"
+//    	}
+    }
+
+	
+	private class GoogleAuthenticationCallback implements AccountManagerCallback<Bundle> {
+    	Bundle bundle;
+        String connectionError;
+
+    	
+
+    	private boolean authenticate(AccountManagerFuture<Bundle> amf) {
+    		connectionError = "";
+    		try {
+				bundle = amf.getResult();
+//				connection.setPassword("");
+		    	Log.d(tag, "Obtained bundle with "+bundle +";KEY_ACCOUNT_NAME="+bundle.getString(AccountManager.KEY_ACCOUNT_TYPE)+
+		    			";KEY_ACCOUNT_TYPE="+bundle.getString(AccountManager.KEY_ACCOUNT_TYPE)+
+		    			";KEY_ACCOUNTS="+bundle.getString(AccountManager.KEY_ACCOUNTS)+
+		    			";KEY_AUTHTOKEN="+bundle.getString(AccountManager.KEY_AUTHTOKEN)
+		    			);
+		    	googleauthtoken = bundle.getString(AccountManager.KEY_AUTHTOKEN);
+//		    	connection.setPassword(bundle.getString(AccountManager.KEY_AUTHTOKEN));
+//		    	ConnectionDB.currconnection.setLogin(connection.getLogin());
+//		    	ConnectionDB.currconnection.setPassword(connection.getPassword());
+		    	Log.d(tag, "authenticate. username="+connection.getLogin()+"; pass="+connection.getPassword());
+		    	return true;
+			} catch (OperationCanceledException e) {
+				connectionError = "Authentication cancelled " + e.toString();
+			} catch (AuthenticatorException e) {
+				connectionError = "Authentication error " + e.toString();
+			} catch (IOException e) {
+                connectionError = "Authentication I/O error " + e.toString();
+			}
+			Log.e(tag, connectionError);
+    		return false;
+    	}
+		@Override
+		public void run(AccountManagerFuture<Bundle> amf) {
+			boolean result;
+			Log.d(tag, "AccountManagerFuture " + amf);
+			result = authenticate(amf); 
+			if (!result) {
+				Log.d(tag, "First try of authenticate failed, invalidating cache and trying again");
+				AccountManager am = AccountManager.get(activity.getApplicationContext());
+				am.invalidateAuthToken(selectedaccount.type, selectedaccount.name);
+				result = authenticate(amf);
+			}
+			Log.d(tag, "result of authentication was "+result);
+			// TODO invoke GetList...
+//			Toast.makeText(AndroidauthActivity.this, "No account returning", Toast.LENGTH_LONG).show();
+			
+
+		}
+    }
+
 	
 	private class GetVMList extends AsyncTask<Void, Void, Void> {
 
@@ -211,7 +328,7 @@ public class Qvdconnection implements Runnable {
 			b.putString(QvdclientActivity.messageTitle, title);
 			b.putString(QvdclientActivity.messageText, text);
 			m.setData(b);
-			Log.e(tag, "Error getting vmlist:" + e.toString());
+			Log.e(tag, "Error connecting to vm:" + e.toString());
 			handler.sendMessage(m);
 			
 		} finally {

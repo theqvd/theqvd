@@ -12,7 +12,7 @@ public class Connection implements Comparable<Connection> {
 	private String name, host, link, login, password, keyboard, os, xserverhost, client_cert, client_key;
 	private int port, height, width, xserverport;
 	private static int defaultHeight=600, defaultWidth=800;
-	private boolean fullscreen, debug, uselocalxserver, useclientcert;
+	private boolean fullscreen, debug, uselocalxserver, useclientcert, googleauthentication;
 	
 	public Connection() {
 		name = "";
@@ -36,6 +36,7 @@ public class Connection implements Comparable<Connection> {
 		useclientcert = false;
 		client_cert = "";
 		client_key = "";
+		googleauthentication = false;
 	}
 	public Connection(Connection c) {
 		name = new String(c.name);
@@ -56,6 +57,7 @@ public class Connection implements Comparable<Connection> {
 		useclientcert = c.useclientcert;
 		client_cert = c.client_cert;
 		client_key = c.client_key;
+		googleauthentication = c.googleauthentication;
 	}
 	@Override
 	public String toString() {
@@ -67,7 +69,8 @@ public class Connection implements Comparable<Connection> {
 				";width="+width+";height:"+height+";fullscreen:"+fullscreen+
 				";os:"+os+";debug:"+debug+";xserverport="+xserverport+
 				";uselocalx:"+uselocalxserver+";usecert:"+useclientcert+
-				";certfile:"+client_cert+";keyfile:"+client_key;
+				";certfile:"+client_cert+";keyfile:"+client_key+
+				";googleauth:"+googleauthentication;
 	}
 	// We consider two objects equal if the name is equal
 	@Override
@@ -236,6 +239,12 @@ public class Connection implements Comparable<Connection> {
 	}
 	public void setUseclientcert(boolean useclientcert) {
 		this.useclientcert = useclientcert;
+	}
+	public boolean isGoogleauthentication() {
+		return googleauthentication;
+	}
+	public void setGoogleauthentication(boolean g) {
+		this.googleauthentication = g;
 	}
 
 

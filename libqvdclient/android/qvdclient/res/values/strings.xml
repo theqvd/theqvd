@@ -36,6 +36,10 @@
     <string name="help_url">http://docs.theqvd.com/</string>
     <string name="save">Save</string>
     <string name="newconnection">New Connection</string>
+    <string name="democonnection">Demo Connection</string>
+    <string name="democonnectionlogin">My Gmail credentials</string>
+    <string name="democonnectionpass">My Gmail credentials</string>
+    <string name="democonnectionhost">demo.theqvd.com</string>
     <string name="delete_connection_short">del</string>
     <string name="unabletodelete_alert">You cannot delete the New Connection, it does not exist</string>
     <string name="unabletodelete_alerttitle">Unable to delete non saved connection</string>
@@ -91,4 +95,5 @@
     <string name="installfilemgr">install file mgr</string>
     <string name="errorinstallfilemgr_alert">Error installing File Manager</string>
     <string name="nofilechosen">No file has been chosen</string>
+    <string name="usegoogleauth_text">GoogleAuth</string>
 </resources>

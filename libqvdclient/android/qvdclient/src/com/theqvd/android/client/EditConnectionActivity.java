@@ -1,7 +1,7 @@
 package com.theqvd.android.client;
 
 import java.io.File;
-
+import android.annotation.SuppressLint;
 import android.app.Activity;
 import android.app.AlertDialog;
 import android.content.DialogInterface;
@@ -28,7 +28,7 @@ public class EditConnectionActivity extends Activity implements OnItemSelectedLi
 	private ArrayAdapter<CharSequence> adapter;
 	private Button save, cancel, help, clientcert, clientkey;
 	private EditText name, login, password, host, port, width, height, keyboard, certfile, keyfile;
-	private ToggleButton nofullscreen, debug, nolocalx, useclientcert;
+	private ToggleButton nofullscreen, debug, nolocalx, useclientcert, googleauth;
 	
 	private final static int PICKFILE_REQUEST_CODE_CERT = 21;
 	private final static int PICKFILE_REQUEST_CODE_KEY = 22;
@@ -58,6 +58,7 @@ public class EditConnectionActivity extends Activity implements OnItemSelectedLi
         setLocalX();
         setUseClientCerts();
         setCerts();
+        setGoogleauth();
     }
     /*
      * The database connection is closed
@@ -122,6 +123,7 @@ public class EditConnectionActivity extends Activity implements OnItemSelectedLi
     	ConnectionDB.currconnection.setClient_cert(certfile.getText().toString());
     	ConnectionDB.currconnection.setClient_key(keyfile.getText().toString());
     	ConnectionDB.currconnection.setUseclientcert(useclientcert.isChecked());
+    	ConnectionDB.currconnection.setGoogleauthentication(googleauth.isChecked());
     	if (useclientcert.isChecked() && !verifycertfiles()) {
     		ConnectionDB.currconnection.setUseclientcert(false);
     		useclientcert.setChecked(false);
@@ -266,6 +268,17 @@ public class EditConnectionActivity extends Activity implements OnItemSelectedLi
     	updateCertFilesButtons();
     	clientcert.setOnClickListener(new Choosefile(PICKFILE_REQUEST_CODE_CERT));
     	clientkey.setOnClickListener(new Choosefile(PICKFILE_REQUEST_CODE_KEY));
+    }
+    @SuppressLint("NewApi")
+	private void setGoogleauth() {
+    	googleauth = (ToggleButton) findViewById(R.id.googleauth);
+    	googleauth.setChecked(ConnectionDB.currconnection.isGoogleauthentication());
+    	googleauth.setOnClickListener(new OnClickListener() {
+        	public void onClick(View v) {
+        		Log.d(tag, "Clicked on use qvd auth now value is "+googleauth.isChecked());
+        		ConnectionDB.currconnection.setGoogleauthentication(googleauth.isChecked());  	
+        	}
+        });
     }
     
     private void updateCertFilesButtons() {

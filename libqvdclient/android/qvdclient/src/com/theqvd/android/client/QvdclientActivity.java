@@ -454,11 +454,23 @@ public class QvdclientActivity extends Activity
     	
     }
     
+    private Connection demoConnection() {
+    	Connection democonnection = new Connection();
+    	democonnection.setName(getResources().getString(R.string.democonnection));
+    	democonnection.setLogin(getResources().getString(R.string.democonnectionlogin));
+    	democonnection.setPassword(getResources().getString(R.string.democonnectionpass));
+    	democonnection.setHost(getResources().getString(R.string.democonnectionhost));
+    	democonnection.setGoogleauthentication(true);
+    	return democonnection;
+    }
     /*
      * Returns the list of all the connections in the database
      */
     private List<Connection> getArrayOfConnections() {
     	ArrayList<Connection> a = new ArrayList<Connection>();
+    	// TODO add demo connection
+//    	Connection democonnection = demoConnection();
+//    	a.add(democonnection);
 		Connection newconnection = new Connection();
 		newconnection.setName(getResources().getString(R.string.newconnection));
 		a.add(newconnection);

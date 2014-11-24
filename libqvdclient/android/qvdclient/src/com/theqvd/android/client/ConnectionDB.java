@@ -33,7 +33,7 @@ public class ConnectionDB extends SQLiteOpenHelper {
 	private static String tag;
 	private static Context context;
 
-    private static final int db_version = 6;
+    private static final int db_version = 7;
     private static final String db_name = "connectiondb";
     private static final String db_table_name = "connectiondb";
     private static final String c_name = "name";
@@ -52,11 +52,12 @@ public class ConnectionDB extends SQLiteOpenHelper {
     private static final String c_useclientcert = "useclientcert";
     private static final String c_client_cert = "clientcert";
     private static final String c_client_key = "clientkey";
+    private static final String c_usegoogleauth = "googleauth";
     private static final String[] column_names = {
     	c_name, c_host, c_port, c_login, c_password,
     	c_link, c_os, c_keyboard, c_fullscreen, c_width,
     	c_height, c_debug, c_localx, c_useclientcert,
-    	c_client_cert, c_client_key
+    	c_client_cert, c_client_key, c_usegoogleauth
     	};
     private static final String db_table_create =
                 "CREATE TABLE " + db_table_name + 
@@ -78,6 +79,7 @@ public class ConnectionDB extends SQLiteOpenHelper {
                 c_useclientcert + " BOOLEAN," +
                 c_client_cert + " TEXT," +
                 c_client_key + " TEXT," +
+                c_usegoogleauth + " BOOLEAN," +
                 "UNIQUE (" + c_name +")" +
                 ");";
     private static final String db_table_drop =
@@ -89,9 +91,10 @@ public class ConnectionDB extends SQLiteOpenHelper {
     	         c_os+","+c_keyboard+","+c_fullscreen+","+
     	         c_width+","+c_height+","+c_debug+","+c_localx+","+
     	         c_useclientcert+","+
-    	         c_client_cert+","+c_client_key+
+    	         c_client_cert+","+c_client_key+","+
+    	         c_usegoogleauth+
     				") " +
-    		" VALUES (?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?)";
+    		" VALUES (?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?)";
     private static final String db_table_delete =
     		"DELETE FROM " + db_table_name + 
     		" WHERE (name = ?)";
@@ -105,6 +108,7 @@ public class ConnectionDB extends SQLiteOpenHelper {
     	"ALTER TABLE "+db_table_name+" ADD COLUMN "+c_useclientcert+" BOOLEAN", // oldVersion=3
     	"ALTER TABLE "+db_table_name+" ADD COLUMN "+c_client_cert+" TEXT", // oldVersion=4
     	"ALTER TABLE "+db_table_name+" ADD COLUMN "+c_client_key+" TEXT", // oldVersion=5
+    	"ALTER TABLE "+db_table_name+" ADD COLUMN "+c_usegoogleauth+" BOOLEAN", // oldVersion=6
     };
     private static SQLiteDatabase db;
     private static SQLiteStatement insertStatement, deleteStatement, existsStatement;
@@ -176,6 +180,7 @@ public class ConnectionDB extends SQLiteOpenHelper {
 			con.setUseclientcert(cursor.getInt(cursor.getColumnIndexOrThrow(c_useclientcert)) != 0);
 			con.setClient_cert(cursor.getString(cursor.getColumnIndexOrThrow(c_client_cert)));
 			con.setClient_key(cursor.getString(cursor.getColumnIndexOrThrow(c_client_key)));
+			con.setGoogleauthentication(cursor.getInt(cursor.getColumnIndexOrThrow(c_usegoogleauth)) != 0);
 			c.add(con);
 		}
 		
@@ -212,6 +217,7 @@ public class ConnectionDB extends SQLiteOpenHelper {
 		con.setUseclientcert(cursor.getInt(cursor.getColumnIndexOrThrow(c_useclientcert)) != 0);
 		con.setClient_cert(cursor.getString(cursor.getColumnIndexOrThrow(c_client_cert)));
 		con.setClient_key(cursor.getString(cursor.getColumnIndexOrThrow(c_client_key)));
+		con.setGoogleauthentication(cursor.getInt(cursor.getColumnIndexOrThrow(c_usegoogleauth)) != 0);
 		return con;
 	}
 	public void addConnection(Connection c) throws SQLException {
@@ -237,6 +243,7 @@ public class ConnectionDB extends SQLiteOpenHelper {
 		insertStatement.bindLong(14, c.isUseclientcert() ? 1 : 0);
 		insertStatement.bindString(15, c.getClient_cert());
 		insertStatement.bindString(16, c.getClient_key());
+		insertStatement.bindLong(17, c.isGoogleauthentication() ? 1 : 0);
 		Long id = insertStatement.executeInsert();
 		Log.i(tag, "inserted entry "+c+" with id " + id+". Debug is:"+c.isDebug());
 	}
