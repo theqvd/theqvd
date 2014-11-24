@@ -185,25 +185,6 @@ Wat.I = {
         this.formFilters = $.extend(true, {}, this.formDefaultFilters);
     },
     
-    // DEPRECATED
-    getFormFiltersByField: function (qvdObj) {
-        var formFilters = this.getFormFilters(qvdObj);
-        
-        // Get default values for custom filters
-        var formFiltersByField = {desktop: {}, mobile: {}};
-        $.each(formFilters, function (filterName, filter) {
-            // For desktop
-            formFiltersByField['desktop'][filter.filterField] = formFiltersByField['desktop'][filter.filterField] || {};
-            formFiltersByField['desktop'][filter.filterField][filterName] = filter.displayDesktop;
-            
-            // For mobile
-            formFiltersByField['mobile'][filter.filterField] = formFiltersByField['mobile'][filter.filterField] || {};
-            formFiltersByField['mobile'][filter.filterField][filterName] = filter.displayMobile;
-        });
-        
-        return formFiltersByField;
-    },
-    
     getCurrentCustomization: function (qvdObj) {
         var currentCustomization = {};
 
@@ -220,9 +201,8 @@ Wat.I = {
         });
         
         //return listFieldsByField;
-        
         var formFilters = this.getFormFilters(qvdObj);
-        
+
         // Get default values for custom filters
         var formFiltersByField = {desktop: {}, mobile: {}};
         $.each(formFilters, function (fieldName, filter) {
@@ -394,14 +374,24 @@ Wat.I = {
             $('.breadcrumbs').css('visibility','visible').hide().fadeIn('fast');
             $('.menu-corner').css('visibility','visible');
         }
-                    
+        
+        this.showMenu();
+    },
+    
+    showMenu: function () {       
         $('.menu').hide();
-
+        
         if ($.inArray(Wat.CurrentView.qvdObj, QVD_OBJS_SETUP) != -1) {
             $('.js-wat-management-menu').show();
         }
         else if (Wat.CurrentView.qvdObj == 'config') {
             $('.js-qvd-config-menu').show();
+        }
+        else if (Wat.CurrentView.qvdObj == 'help') {
+            $('.js-qvd-help-menu').show();
+        }
+        else if (Wat.CurrentView.qvdObj == 'user') {
+            $('.js-qvd-user-menu').show();
         }
         else {
             $('.js-platform-menu').show();
@@ -548,6 +538,8 @@ Wat.I = {
         // Fill the html with the template and the collection
         var template = _.template(
             templateMenu, {
+                userMenu: Wat.I.userMenu,
+                helpMenu: Wat.I.helpMenu,
                 configMenu: Wat.I.configMenu,
                 setupMenu: Wat.I.setupMenu,
                 menu: Wat.I.menu,

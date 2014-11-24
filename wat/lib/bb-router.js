@@ -20,7 +20,7 @@ Wat.Router = Backbone.Router.extend({
         "roles": "listRole",
         "role/:id": "detailsRole",
         "config": "setupConfig",
-        "help/about": "about",
+        "about": "about",
         "profile": "profile",
         "myviews": "myviews",
         "*actions": "defaultRoute" // Backbone will try match the route above first

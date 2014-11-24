@@ -245,6 +245,8 @@ Wat.C = {
     
     configureVisibility: function () {        
         Wat.I.menu = $.extend(true, {}, Wat.I.menuOriginal);
+        Wat.I.userMenu = $.extend(true, {}, Wat.I.menuUserOriginal);
+        Wat.I.helpMenu = $.extend(true, {}, Wat.I.menuHelpOriginal);
         Wat.I.configMenu = $.extend(true, {}, Wat.I.menuConfigOriginal);
         Wat.I.setupMenu = $.extend(true, {}, Wat.I.menuSetupOriginal);
         Wat.I.mobileMenu = $.extend(true, {}, Wat.I.mobileMenuOriginal);

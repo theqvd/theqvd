@@ -133,7 +133,7 @@
         
         // ------- Help sections ------- //
         Wat.Router.app_router.on('route:about', function (actions) {
-            Wat.Router.app_router.performRoute('', Wat.Views.AboutView);
+            Wat.Router.app_router.performRoute('about', Wat.Views.AboutView);
         });
         
         
@@ -147,10 +147,10 @@
             Wat.Router.app_router.performRoute();
         });          
         Wat.Router.app_router.on('route:profile', function (actions) {
-            Wat.Router.app_router.performRoute('', Wat.Views.ProfileView);
+            Wat.Router.app_router.performRoute('profile', Wat.Views.ProfileView);
         });             
         Wat.Router.app_router.on('route:myviews', function (actions) {
-            Wat.Router.app_router.performRoute('', Wat.Views.MyViewsView);
+            Wat.Router.app_router.performRoute('myviews', Wat.Views.MyViewsView);
         });       
         
         

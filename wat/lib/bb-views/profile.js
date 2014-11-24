@@ -2,7 +2,7 @@ Wat.Views.ProfileView = Wat.Views.DetailsView.extend({
     setupCommonTemplateName: 'setup-common',
     setupOption: 'admins',
     secondaryContainer: '.bb-setup',
-    qvdObj: 'profile',
+    qvdObj: 'user',
     
     setupOption: 'profile',
     
@@ -16,10 +16,7 @@ Wat.Views.ProfileView = Wat.Views.DetailsView.extend({
         'screen': 'Home',
         'link': '#',
         'next': {
-            'screen': 'Personal area',
-            'next': {
-                'screen': 'Profile'
-            }
+            'screen': 'Profile'
         }
     },
     
@@ -32,20 +29,7 @@ Wat.Views.ProfileView = Wat.Views.DetailsView.extend({
         this.model = new Wat.Models.Admin(params);
         
         this.editorTemplateName = 'editor-profile',
-            
-        // Get side menu
-        this.sideMenu = {
-            'profile': {
-                icon: 'fa fa-user',
-                link: '#profile',
-                text: 'Profile'
-            },
-            'views': {
-                icon: 'fa fa-columns',
-                link: '#myviews',
-                text: 'Customize views'
-            }
-        };
+
         
         this.render();
     },

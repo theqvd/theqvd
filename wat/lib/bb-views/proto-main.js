@@ -15,7 +15,7 @@ Wat.Views.MainView = Backbone.View.extend({
     
     initialize: function () {
         _.bindAll(this, 'render');
-        
+                
         this.templateEditorCommon = Wat.A.getTemplate('editor-common');
         
         // Add to the view events the parent class of this view to avoid collisions with other views events

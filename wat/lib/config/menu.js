@@ -1,8 +1,39 @@
+Wat.I.menuUserOriginal = {
+    profile: {
+        text: 'Profile',
+        link: '#/profile',
+        icon: CLASS_ICON_PERSONALAREA 
+    },
+    myviews: {
+        text: 'Customize views',
+        link: '#/myviews',
+        icon: CLASS_ICON_VIEWS 
+    },
+    logout: {
+        text: 'Log-out',
+        link: '#/logout',
+        icon: CLASS_ICON_LOGOUT 
+    }
+};
+
 Wat.I.menuConfigOriginal = {
     config: {
         text: 'QVD Config',
         link: '#/config',
         icon: CLASS_ICON_CONFIG
+    }
+};
+
+Wat.I.menuHelpOriginal = {
+    about: {
+        text: 'About',
+        link: '#/about',
+        icon: 'fa fa-asterisk' 
+    },
+    documentation: {
+        text: 'Documentation',
+        link: 'http://docs.theqvd.com/',
+        icon: 'fa fa-book' 
     }
 };
 
@@ -68,33 +99,22 @@ Wat.I.mobileMenuOriginal.logout = {
 Wat.I.cornerMenuOriginal = {
         help: {
             text: 'Help',
-            link: '#/help',
-            icon: 'fa fa-support',
-            subMenu: {
-                documentation: {
-                    text: 'Documentation',
-                    link: 'http://docs.theqvd.com/',
-                    icon: 'fa fa-book' 
-                },
-                about: {
-                    text: 'About',
-                    link: '#/help/about',
-                    icon: 'fa fa-asterisk' 
-                }
-            }
+            link: '#/about',
+            icon: CLASS_ICON_HELP,
+            subMenu: _.extend({}, Wat.I.menuHelpOriginal)
         },
         
         platform: {
             text: 'Platform',
             link: '#',
-            icon: 'fa fa-bug',
+            icon: CLASS_ICON_PLATFORM,
             subMenu: _.extend({}, Wat.I.menuOriginal)
         },
     
         setup: {
             text: 'WAT Management',
             link: '#/setup',
-            icon: 'fa fa-wrench',
+            icon: CLASS_ICON_WATMANAGE,
             subMenu: _.extend({}, Wat.I.menuSetupOriginal)
         },
     
@@ -107,20 +127,9 @@ Wat.I.cornerMenuOriginal = {
         
         user: {
             text: '',
-            link: 'javascript:',
-            icon: 'fa fa-user',
+            link: '#/profile',
+            icon: CLASS_ICON_USER,
             textClass: 'js-login',
-            subMenu: {
-                my_area: {
-                    text: 'Personal area',
-                    link: '#/profile',
-                    icon: 'fa fa-archive' 
-                },
-                logout: {
-                    text: 'Log-out',
-                    link: '#/logout',
-                    icon: 'fa fa-power-off' 
-                }
-            }
+            subMenu: _.extend({}, Wat.I.menuUserOriginal)
         }
 };

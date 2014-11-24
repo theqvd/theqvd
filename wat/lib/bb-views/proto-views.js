@@ -47,7 +47,7 @@ Wat.Views.ViewsView = Wat.Views.MainView.extend({
             Wat.A.performAction(this.setAction, args, {}, {'error': i18n.t('Error updating'), 'success': i18n.t('Successfully updated')}, function () {}, this, false);
             
             if (this.retrievedData.status == STATUS_SUCCESS) {
-                // If update is perfermed successfuly, update in memory
+                // If update is performed successfuly, update in memory
                 if (this.currentFilters[fieldName]) {
                     this.currentFilters[fieldName].displayDesktop = checked;
                 }
@@ -231,7 +231,7 @@ Wat.Views.ViewsView = Wat.Views.MainView.extend({
     
     renderForm: function () {
         this.templateSetupFormCustomize = Wat.A.getTemplate(this.setupCustomizeFormTemplateName);
-                
+        
         this.template = _.template(
             this.templateSetupFormCustomize, {
                 filters: this.currentFilters,
@@ -265,8 +265,11 @@ Wat.Views.ViewsView = Wat.Views.MainView.extend({
         
         var objProperties = that.retrievedData.rows;
         
+        // Hide every property rows
+        $('.js-is-property').hide();
+        
         if (!objProperties) {
-            return;
+            //return;
         }
         
         // Add properties retrieved from QVD Objects
@@ -275,22 +278,25 @@ Wat.Views.ViewsView = Wat.Views.MainView.extend({
 
         $.each(objProperties, function (iProp, prop) {  
             // If any property doesnt exist in database configuration, we add it to the editor
-            if (!that.currentColumns[prop]) {    
+            if (!that.currentColumns[prop]) {
                 // Add property to columns table
                 var propRow = templatePropertiesColumns.clone();
-                propRow.removeClass('hidden');
+                propRow.show();
                 propRow.find('.js-prop-name').html(prop);
                 propRow.attr('data-name', prop);
                 propRow.find('.js-field-check').attr('data-name', prop);
                 propRow.find('.js-field-check').attr('data-fields', prop);
                 propRow.insertBefore(templatePropertiesColumns);
             }
+            else {
+                $('.js-is-property[data-name="' + prop + '"]').show();
+            }
 
             // If any property doesnt exist in database configuration, we add it to the editor
             if (!that.currentFilters[prop]) {    
                 // Add property to filters table
                 var propRow = templatePropertiesFilters.clone();
-                propRow.removeClass('hidden');
+                propRow.show();
                 propRow.find('.js-prop-name').html(prop);
                 propRow.attr('data-name', prop);
                 propRow.find('.js-desktop-fields').attr('data-name', prop);
@@ -298,6 +304,9 @@ Wat.Views.ViewsView = Wat.Views.MainView.extend({
                 propRow.find('.js-desktop-fields').attr('data-fields', prop);
                 propRow.find('.js-mobile-fields').attr('data-fields', prop);
                 propRow.insertBefore(templatePropertiesFilters);
+            }
+            else {
+                $('.js-is-property[data-name="' + prop + '"]').show();
             }
         });
     },

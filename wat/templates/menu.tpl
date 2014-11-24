@@ -1,44 +1,74 @@
-<div class="js-platform-menu menu desktop">
-    <ul>
-        <%
-            $.each(menu, function (target, option) {
-        %>
-            <li class="menu-option" data-target="<%= target %>">
-                <i class="<%= option.icon %>"></i>
-                <span data-i18n><%= option.text %></span>
-            </li>
-        <%
-            });
-        %>
-    </ul>
-</div>
-<div class="js-wat-management-menu menu desktop">
-    <ul>
-        <%
-            $.each(setupMenu, function (target, option) {
-        %>
-            <li class="menu-option" data-target="<%= target %>">
-                <i class="<%= option.icon %>"></i>
-                <span data-i18n><%= option.text %></span>
-            </li>
-        <%
-            });
-        %>
-    </ul>
-</div>
-<div class="js-qvd-config-menu menu desktop">
-    <ul>
-        <%
-            $.each(configMenu, function (target, option) {
-        %>
-            <li class="menu-option" data-target="<%= target %>">
-                <i class="<%= option.icon %>"></i>
-                <span data-i18n><%= option.text %></span>
-            </li>
-        <%
-            });
-        %>
-    </ul>
+<div class="desktop">
+    <div class="js-platform-menu menu">
+        <ul>
+            <%
+                $.each(menu, function (target, option) {
+            %>
+                <li class="menu-option" data-target="<%= target %>">
+                    <i class="<%= option.icon %>"></i>
+                    <span data-i18n><%= option.text %></span>
+                </li>
+            <%
+                });
+            %>
+        </ul>
+    </div>
+    <div class="js-wat-management-menu menu">
+        <ul>
+            <%
+                $.each(setupMenu, function (target, option) {
+            %>
+                <li class="menu-option" data-target="<%= target %>">
+                    <i class="<%= option.icon %>"></i>
+                    <span data-i18n><%= option.text %></span>
+                </li>
+            <%
+                });
+            %>
+        </ul>
+    </div>
+    <div class="js-qvd-config-menu menu">
+        <ul>
+            <%
+                $.each(configMenu, function (target, option) {
+            %>
+                <li class="menu-option" data-target="<%= target %>">
+                    <i class="<%= option.icon %>"></i>
+                    <span data-i18n><%= option.text %></span>
+                </li>
+            <%
+                });
+            %>
+        </ul>
+    </div>
+    <div class="js-qvd-help-menu menu">
+        <ul>
+            <%
+                $.each(helpMenu, function (target, option) {
+            %>
+                <li class="menu-option" data-target="<%= target %>">
+                    <i class="<%= option.icon %>"></i>
+                    <span data-i18n><%= option.text %></span>
+                </li>
+            <%
+                });
+            %>
+        </ul>
+    </div>
+    <div class="js-qvd-user-menu menu">
+        <ul>
+            <%
+                $.each(userMenu, function (target, option) {
+            %>
+                <li class="menu-option" data-target="<%= target %>">
+                    <i class="<%= option.icon %>"></i>
+                    <span data-i18n><%= option.text %></span>
+                </li>
+            <%
+                });
+            %>
+        </ul>
+    </div>
 </div>
 <div class="menu mobile js-menu-mobile">
     <ul class="nav-collapse">

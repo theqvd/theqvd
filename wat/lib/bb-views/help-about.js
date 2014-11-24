@@ -1,12 +1,12 @@
 Wat.Views.AboutView = Wat.Views.MainView.extend({
     aboutTemplateName: 'help-about',
+    qvdObj: 'help',
     
     breadcrumbs: {
         'screen': 'Home',
         'link': '#',
         'next': {
             'screen': 'Help',
-            'link': '#/help',
             'next': {
                 'screen': 'About'
             }
@@ -15,7 +15,6 @@ Wat.Views.AboutView = Wat.Views.MainView.extend({
     
     initialize: function (params) {
         Wat.Views.MainView.prototype.initialize.apply(this, [params]);
-                
         this.render();
     },
     

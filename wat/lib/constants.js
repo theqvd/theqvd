@@ -145,7 +145,12 @@ CLASS_ICON_ROLES = 'fa fa-graduation-cap';
 CLASS_ICON_TENANTS = 'fa fa-building'; 
 CLASS_ICON_CONFIG = 'fa fa-sliders'; 
 CLASS_ICON_VIEWS = 'fa fa-columns'; 
-
+CLASS_ICON_HELP = 'fa fa-support';
+CLASS_ICON_PLATFORM = 'fa fa-bug';
+CLASS_ICON_WATMANAGE = 'fa fa-wrench';
+CLASS_ICON_LOGOUT = 'fa fa-power-off';
+CLASS_ICON_PERSONALAREA = 'fa fa-archive';
+CLASS_ICON_USER = 'fa fa-user';
 
 // Colours
 COL_BRAND = '#cb540a';
