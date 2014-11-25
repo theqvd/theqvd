@@ -32,6 +32,7 @@ Wat.C = {
         this.loggedIn = false;
         this.sid = '';
         this.login = '';
+        this.acls = [];
     },
     
     logIn: function (sid, login) {
@@ -263,7 +264,6 @@ Wat.C = {
             'vm.see-main.' : 'vms',
         };
         
-        
         $.each(aclMenu, function (acl, menu) {
             if (!that.checkACL(acl)) {
                 delete Wat.I.menu[menu];
@@ -294,6 +294,14 @@ Wat.C = {
         if (Wat.I.cornerMenu.platform && !$.isEmptyObject(Wat.I.cornerMenu.platform.subMenu)) {
             Wat.I.cornerMenu.platform.link = Wat.I.cornerMenu.platform.subMenu[Object.keys(Wat.I.cornerMenu.platform.subMenu)[0]].link;
         }
+
+        if (Wat.C.acls.length == 0) {
+            delete Wat.I.cornerMenu.help;
+        }
+        
+        if ($.isEmptyObject(Wat.I.cornerMenu.platform.subMenu)) {
+            delete Wat.I.cornerMenu.platform;
+        }        
         
         if ($.isEmptyObject(Wat.I.cornerMenu.setup.subMenu)) {
             delete Wat.I.cornerMenu.setup;

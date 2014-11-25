@@ -135,6 +135,9 @@
         Wat.Router.app_router.on('route:about', function (actions) {
             Wat.Router.app_router.performRoute('about', Wat.Views.AboutView);
         });
+        Wat.Router.app_router.on('route:documentation', function (actions) {
+            Wat.Router.app_router.performRoute('documentation', Wat.Views.DocView);
+        });
         
         
         
@@ -142,6 +145,7 @@
         Wat.Router.app_router.on('route:logout', function (actions) {
             Wat.C.logOut();
             
+            Wat.C.configureVisibility();
             Wat.I.renderMain();
             
             Wat.Router.app_router.performRoute();

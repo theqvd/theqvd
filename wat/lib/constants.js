@@ -162,6 +162,9 @@ QVD_OBJS_CLASSIFIED_BY_TENANT = ['user', 'vm', 'osf', 'di', 'administrator'];
 QVD_OBJS_EXIST_IN_SUPERTENANT = ['role', 'administrator'];
 QVD_OBJS_PLATFORM = ['user', 'vm', 'host', 'osf', 'di'];
 QVD_OBJS_SETUP = ['role', 'administrator', 'tenant', 'views'];
+QVD_OBJS_USERAREA = ['profile', 'myviews'];
+QVD_OBJS_HELP = ['about', 'documentation'];
+QVD_OBJS_QVDCONFIG = ['config'];
 
 // Default values
 DEFAULT_OSF_MEMORY = 256;

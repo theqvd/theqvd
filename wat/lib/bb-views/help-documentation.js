@@ -1,6 +1,6 @@
-Wat.Views.AboutView = Wat.Views.MainView.extend({
-    aboutTemplateName: 'help-about',
-    qvdObj: 'about',
+Wat.Views.DocView = Wat.Views.MainView.extend({
+    docTemplateName: 'help-documentation',
+    qvdObj: 'documentation',
     
     breadcrumbs: {
         'screen': 'Home',
@@ -8,7 +8,7 @@ Wat.Views.AboutView = Wat.Views.MainView.extend({
         'next': {
             'screen': 'Help',
             'next': {
-                'screen': 'About'
+                'screen': 'Documentation'
             }
         }
     },
@@ -22,12 +22,11 @@ Wat.Views.AboutView = Wat.Views.MainView.extend({
     },
     
     render: function () {
-        this.templateAbout = Wat.A.getTemplate(this.aboutTemplateName);
+        this.templateDoc = Wat.A.getTemplate(this.docTemplateName);
         
         // Fill the html with the template
         this.template = _.template(
-            this.templateAbout, { version: Wat.C.version
-            }
+            this.templateDoc, {}
         );
         
         $(this.el).html(this.template);

@@ -384,16 +384,16 @@ Wat.I = {
         if ($.inArray(Wat.CurrentView.qvdObj, QVD_OBJS_SETUP) != -1) {
             $('.js-wat-management-menu').show();
         }
-        else if (Wat.CurrentView.qvdObj == 'config') {
+        else if ($.inArray(Wat.CurrentView.qvdObj, QVD_OBJS_QVDCONFIG) != -1) {
             $('.js-qvd-config-menu').show();
         }
-        else if (Wat.CurrentView.qvdObj == 'help') {
+        else if ($.inArray(Wat.CurrentView.qvdObj, QVD_OBJS_HELP) != -1) {
             $('.js-qvd-help-menu').show();
         }
-        else if (Wat.CurrentView.qvdObj == 'user') {
+        else if ($.inArray(Wat.CurrentView.qvdObj, QVD_OBJS_USERAREA) != -1) {
             $('.js-qvd-user-menu').show();
         }
-        else {
+        else if ($.inArray(Wat.CurrentView.qvdObj, QVD_OBJS_PLATFORM) != -1) {
             $('.js-platform-menu').show();
         }
     },

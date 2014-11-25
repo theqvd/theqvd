@@ -1,0 +1,1 @@
+Read the <a href="http://docs.theqvd.com/">QVD online documentation</a>.

@@ -32,7 +32,7 @@ Wat.I.menuHelpOriginal = {
     },
     documentation: {
         text: 'Documentation',
-        link: 'http://docs.theqvd.com/',
+        link: '#/documentation',
         icon: 'fa fa-book' 
     }
 };

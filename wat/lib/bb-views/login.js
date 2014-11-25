@@ -6,7 +6,7 @@ Wat.Views.LoginView = Wat.Views.MainView.extend({
         Wat.Views.MainView.prototype.initialize.apply(this, [params]);
         
         Wat.B.bindLoginEvents();
-
+        
         this.render();
     },
     
