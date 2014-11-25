@@ -25,16 +25,15 @@ Wat.Views.SetupCustomizeView = Wat.Views.ViewsView.extend({
         // Get side menu
         var cornerMenu = Wat.I.getCornerMenu();
         this.sideMenu = null;
-        //this.sideMenu = cornerMenu.setup.subMenu;
-        
-        // Get filters and columns
-        this.currentFilters = Wat.I.getTenantFormFilters (this.selectedSection, this.selectedTenant, this);
-        this.currentColumns = Wat.I.getTenantListColumns (this.selectedSection, this.selectedTenant, this);
         
         this.render();
     },
     
     renderForm: function () {
+        // Get filters and columns
+        this.currentFilters = Wat.I.getTenantFormFilters (this.selectedSection, this.selectedTenant, this);
+        this.currentColumns = Wat.I.getTenantListColumns (this.selectedSection, this.selectedTenant, this);
+        
         Wat.Views.ViewsView.prototype.renderForm.apply(this);
     }
 });

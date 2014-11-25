@@ -165,6 +165,14 @@ Wat.B = {
         
         cornerMenuHoverIn: function (e) {
             $(this).find('ul').css({display: "block"});
+            
+            // If the submenu layer has overflow in the screen, add negative margin left to adapt to the visible area
+            var divRigth = $(this).find('ul').offset().left + $(this).find('ul').width();
+            var winWidth = $(window).width();
+
+            if (divRigth > winWidth) {
+                $(this).find('ul').css('margin-left', (winWidth - divRigth - 5) + 'px');
+            }
         },
         
         cornerMenuHoverOut: function (e) {

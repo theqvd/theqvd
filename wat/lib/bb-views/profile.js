@@ -2,7 +2,7 @@ Wat.Views.ProfileView = Wat.Views.DetailsView.extend({
     setupCommonTemplateName: 'setup-common',
     setupOption: 'admins',
     secondaryContainer: '.bb-setup',
-    qvdObj: 'user',
+    qvdObj: 'profile',
     
     setupOption: 'profile',
     

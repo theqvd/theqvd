@@ -7,7 +7,7 @@ Wat.Views.MyViewsView = Wat.Views.ViewsView.extend({
     
     viewKind: 'admin',
     
-    qvdObj: 'user',
+    qvdObj: 'myviews',
     
     breadcrumbs: {
         'screen': 'Home',
@@ -20,10 +20,15 @@ Wat.Views.MyViewsView = Wat.Views.ViewsView.extend({
     initialize: function (params) {
         Wat.Views.ViewsView.prototype.initialize.apply(this, [params]);
         
+        this.render();
+    },
+    
+    renderForm: function (params) {
         // Get filters and columns
         this.currentFilters = Wat.I.getFormFilters(this.selectedSection);
         this.currentColumns = Wat.I.getListColumns(this.selectedSection);
         
-        this.render();
+        Wat.Views.ViewsView.prototype.renderForm.apply(this, [params]);
+
     }
 });

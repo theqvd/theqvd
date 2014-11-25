@@ -173,7 +173,7 @@ Wat.Views.ViewsView = Wat.Views.MainView.extend({
     
     changeSection: function (e) {
         this.selectedSection = $('select[name="obj-qvd-select"]').val();
-        
+
         if (Wat.C.isSuperadmin()) {
             this.selectedTenant = $('select[name="tenant-select"]').val();
         }
@@ -245,70 +245,6 @@ Wat.Views.ViewsView = Wat.Views.MainView.extend({
         Wat.T.translate();
         
         this.printBreadcrumbs(this.breadcrumbs, '');
-        
-        var args = {
-            qvd_object: this.selectedSection
-        };
-        
-        if (Wat.C.isSuperadmin() && this.selectedTenant != 0) {
-            args.tenant_id = this.selectedTenant;
-        }
-        
-        Wat.A.performAction('properties_by_qvd_object', {}, args, {}, this.addProperties, this, false);
-    },
-    
-    addProperties: function (that) {
-        // If this section havent support properties, do nothing here
-        if ($.inArray(that.selectedSection, QVD_OBJS_WITH_PROPERTIES) == -1) {
-            return;
-        }
-        
-        var objProperties = that.retrievedData.rows;
-        
-        // Hide every property rows
-        $('.js-is-property').hide();
-        
-        if (!objProperties) {
-            //return;
-        }
-        
-        // Add properties retrieved from QVD Objects
-        var templatePropertiesColumns = $('.js-column-property-template');
-        var templatePropertiesFilters = $('.js-filter-property-template');
-
-        $.each(objProperties, function (iProp, prop) {  
-            // If any property doesnt exist in database configuration, we add it to the editor
-            if (!that.currentColumns[prop]) {
-                // Add property to columns table
-                var propRow = templatePropertiesColumns.clone();
-                propRow.show();
-                propRow.find('.js-prop-name').html(prop);
-                propRow.attr('data-name', prop);
-                propRow.find('.js-field-check').attr('data-name', prop);
-                propRow.find('.js-field-check').attr('data-fields', prop);
-                propRow.insertBefore(templatePropertiesColumns);
-            }
-            else {
-                $('.js-is-property[data-name="' + prop + '"]').show();
-            }
-
-            // If any property doesnt exist in database configuration, we add it to the editor
-            if (!that.currentFilters[prop]) {    
-                // Add property to filters table
-                var propRow = templatePropertiesFilters.clone();
-                propRow.show();
-                propRow.find('.js-prop-name').html(prop);
-                propRow.attr('data-name', prop);
-                propRow.find('.js-desktop-fields').attr('data-name', prop);
-                propRow.find('.js-mobile-fields').attr('data-name', prop);
-                propRow.find('.js-desktop-fields').attr('data-fields', prop);
-                propRow.find('.js-mobile-fields').attr('data-fields', prop);
-                propRow.insertBefore(templatePropertiesFilters);
-            }
-            else {
-                $('.js-is-property[data-name="' + prop + '"]').show();
-            }
-        });
     },
     
     addIDToArgs: function (args) {

@@ -65,7 +65,7 @@ Wat.C = {
         }
         
         if (this.sid) {
-            Wat.A.performAction('current_admin_setup', {}, {}, {}, this.checkLogin, this, false);
+            Wat.A.performAction('current_admin_setup', {}, VIEWS_COMBINATION, {}, this.checkLogin, this, false);
         }
     },
     
@@ -81,7 +81,7 @@ Wat.C = {
         this.login = user;
         this.password = password;
 
-        Wat.A.performAction('current_admin_setup', {}, {}, {}, this.checkLogin, this, false);
+        Wat.A.performAction('current_admin_setup', {}, VIEWS_COMBINATION, {}, this.checkLogin, this, false);
     },
     
     checkLogin: function (that) {   
