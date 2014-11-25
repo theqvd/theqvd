@@ -20,6 +20,7 @@ use Data::Dumper;
 use DBIx::Error;
 use TryCatch;
 use Data::Page;
+use Clone qw(clone);
 
 our $VERSION = '0.01';
 
@@ -735,47 +736,59 @@ sub get_properties_by_qvd_object
 sub current_admin_setup
 {
     my ($self,$administrator,$json_wrapper) = @_;
-    my @qvd_objects = qw(user vm host osf di);
+
+    my $views_combination = $json_wrapper->get_filter_value('views_combination') //
+	QVD::Admin4::Exception->throw(code=>'6220', object => 'views_combination');
+    my @qvd_objects_with_props = qw(user vm host osf di);
     my @view_keys = qw(field qvd_object view_type device_type property);
 
     my $f =
         sub { my $obj = shift;
               my $out; $out .= $obj->$_ for @view_keys; $out; };
+    my $g =
+        sub { my $hash = shift;
+              my $out; $out .= $hash->{$_} for @view_keys; $out; };
 
-    my %properties = map { $_ => {} } @qvd_objects;
-    for my $qvd_object (@qvd_objects)
+    my %properties = map { $_ => {} } @qvd_objects_with_props;
+    for my $qvd_object (@qvd_objects_with_props)
     {
 	$properties{$qvd_object} = { map { $_ => 1 }
 	@{$self->get_properties_by_qvd_object($administrator,$qvd_object)} };
     }
 
-    my @tenant_views = grep {(not $_->{property}) || defined $properties{$_->qvd_object}->{$_->field}  } 
+    my @tenant_views = grep {(not $_->property) || defined $properties{$_->qvd_object}->{$_->field}  } 
     $DB->resultset('Tenant_Views_Setup')->search({tenant_id => $administrator->tenant_id})->all;
 
-    my @admin_views = grep {(not $_->{property}) || defined $properties{$_->qvd_object}->{$_->field}} 
+    my @admin_views = grep {(not $_->property) || defined $properties{$_->qvd_object}->{$_->field}} 
     $DB->resultset('Administrator_Views_Setup')->search({administrator_id => $administrator->id})->all;
 
     my %views = map { $f->($_) => $_ } @tenant_views;
     $views{$f->($_)} = $_ for  @admin_views;
     
     my @extra_views;
-    for my $qvd_object (@qvd_objects)
+    for my $qvd_object (@qvd_objects_with_props)
     {
-	while (my ($property, $value) = each %{$properties{$qvd_object}})
+	for my $view_model (@$views_combination)
 	{
-	    next if defined $value;
-	    my $extra_view = { map { $_ => undef } @view_keys };
-	    $extra_view->{field} = $property;
-	    $extra_view->{property} = 1;
-	    $extra_view->{visible} = 0;
-	    push @extra_views, $extra_view; 
+
+	    for my $property (keys %{$properties{$qvd_object}})
+	    {
+		my $view = clone $view_model;
+		$view->{field} = $property;
+		$view->{qvd_object} = $qvd_object;
+		$view->{property} = 1;
+		$view->{visible} = 0;
+		push @extra_views, $view unless 
+		    defined $views{$g->($view)};
+	    }
 	}
     }
 
    { admin_id => $administrator->id,
      tenant_id => $administrator->tenant_id,
      acls => [ $administrator->acls ],
-     views => [@extra_views, (map { { $_->get_columns } } values %views) ]};
+     views => [sort { $a->{property} <=> $b->{property} || $a->{field} cmp $b->{field} }
+	       (@extra_views, (map { { $_->get_columns } } values %views)) ]};
 }
 
 sub get_acls_in_admins
