@@ -1200,8 +1200,8 @@ COPY administrators (id, name, password, tenant_id) FROM stdin;
 -- Data for Name: acls; Type: TABLE DATA; Schema: public; Owner: qvd
 --
 
-COPY roles (id, name) FROM stdin;
-1	master
+COPY roles (id, name, fixed, internal) FROM stdin;
+1	master	false	false
 \.
 
 --
