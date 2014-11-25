@@ -702,25 +702,17 @@ sub di_no_head_default_tags
 }
 
 
-
 ######################################
 ## GENERAL FUNCTIONS; WITHOUT REQUEST
 ######################################
 
 sub get_properties_by_qvd_object
 {
-    my ($self,$admin,$json) = @_;
-    my $qvd_object = lc $json->forze_filter_deletion('qvd_object') //
-        QVD::Admin4::Exception->throw(code=>'6220', object => 'qvd_object');
-   $qvd_object =~ /^user|vm|host|osf|di$/ ||
-       QVD::Admin4::Exception->throw(code=>'6320');
-
-    my $tenant_id =  $json->forze_filter_deletion('tenant_id');
+    my ($self,$admin,$qvd_object) = @_;
 
     my %tables = (user=>'User',vm =>'VM',host=>'Host',osf=>'OSF',di =>'DI');
 
-    my $tenants_scoop = defined $tenant_id && $admin->is_superadmin ?
-        $tenant_id : $admin->tenants_scoop;
+    my $tenants_scoop = $admin->tenants_scoop;
 
     $tenants_scoop = [$tenants_scoop] unless ref($tenants_scoop);
 
@@ -736,32 +728,54 @@ sub get_properties_by_qvd_object
         $props{$_} = 1 for @$props_in_tenant;
     }
 
-    { total => scalar keys %props,
-      rows => [sort keys %props ] };
+    [sort keys %props ];
 }
 
 
 sub current_admin_setup
 {
     my ($self,$administrator,$json_wrapper) = @_;
+    my @qvd_objects = qw(user vm host osf di);
+    my @view_keys = qw(field qvd_object view_type device_type property);
 
     my $f =
         sub { my $obj = shift;
-              my @methods = qw(field qvd_object view_type                                                                                                                                     
-                               device_type property);
-              my $out; $out .= $obj->$_ for @methods; $out; };
+              my $out; $out .= $obj->$_ for @view_keys; $out; };
 
-    my @tenant_views = $DB->resultset('Tenant_Views_Setup')->search(
-        {tenant_id => $administrator->tenant_id})->all;
-    my @admin_views = $DB->resultset('Administrator_Views_Setup')->search(
-        {administrator_id => $administrator->id})->all;
+    my %properties = map { $_ => {} } @qvd_objects;
+    for my $qvd_object (@qvd_objects)
+    {
+	$properties{$qvd_object} = { map { $_ => 1 }
+	@{$self->get_properties_by_qvd_object($administrator,$qvd_object)} };
+    }
+
+    my @tenant_views = grep {(not $_->{property}) || defined $properties{$_->qvd_object}->{$_->field}  } 
+    $DB->resultset('Tenant_Views_Setup')->search({tenant_id => $administrator->tenant_id})->all;
+
+    my @admin_views = grep {(not $_->{property}) || defined $properties{$_->qvd_object}->{$_->field}} 
+    $DB->resultset('Administrator_Views_Setup')->search({administrator_id => $administrator->id})->all;
+
     my %views = map { $f->($_) => $_ } @tenant_views;
     $views{$f->($_)} = $_ for  @admin_views;
+    
+    my @extra_views;
+    for my $qvd_object (@qvd_objects)
+    {
+	while (my ($property, $value) = each %{$properties{$qvd_object}})
+	{
+	    next if defined $value;
+	    my $extra_view = { map { $_ => undef } @view_keys };
+	    $extra_view->{field} = $property;
+	    $extra_view->{property} = 1;
+	    $extra_view->{visible} = 0;
+	    push @extra_views, $extra_view; 
+	}
+    }
 
    { admin_id => $administrator->id,
      tenant_id => $administrator->tenant_id,
      acls => [ $administrator->acls ],
-     views => [ map { { $_->get_columns } } values %views ]};
+     views => [@extra_views, (map { { $_->get_columns } } values %views) ]};
 }
 
 sub get_acls_in_admins
@@ -1024,13 +1038,17 @@ sub top_populated_hosts
 ####### CONFIG #######
 ######################
 
-
 sub config_preffix_get
 {
     my @keys = cfg_keys; 
-    ($_) = $_ =~ m/^([^.]+)/ for @keys;
-    my %preffix = map { $_ => 1 } @keys;
-    my @preffix = keys %preffix; 
+    my %preffix;
+
+    for (@keys)
+    {
+	next unless m/^([^.]+)\./;
+	$preffix{$1} = 1;
+    }
+    my @preffix = sort keys %preffix; 
     { total => scalar @preffix,
       rows => \@preffix };
 }
