@@ -516,8 +516,7 @@ sub di_create
     QVD::Admin4::Exception->throw(exception => $@, 
 				  query => 'tags') if $@;	
 
-    my $images_file  = $di->id . '-' . $staging_file;
-    $di->update({path => $images_file});
+    my $images_file = $staging_file;
 
     for (1 .. 5)
     {
@@ -532,6 +531,9 @@ sub di_create
     unless ($staging_file_size == $images_file_size) 
     { $di->delete; unlink "$images_path/$images_file";
       QVD::Admin4::Exception->throw(code=>'2211');}
+
+    $di->update({path => $di->id . '-' . $staging_file});
+    move("$images_path/$images_file","$images_path/".$di->id . '-' . $staging_file);
 
     $result;
 }
@@ -1062,6 +1064,7 @@ sub config_preffix_get
 	$preffix{$1} = 1;
     }
     my @preffix = sort keys %preffix; 
+
     { total => scalar @preffix,
       rows => \@preffix };
 }

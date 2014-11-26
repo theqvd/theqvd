@@ -32,6 +32,7 @@ my $code2message_mapper =
     3400 => 'Problems to update expiration time in session',
 
     4100 => 'Unavailable action',
+    4110 => 'Invalid or null action name provided',
     4210 => 'Forbidden action for this administrator',
     4220 => 'Forbidden filter for this administrator',
     4230 => 'Forbidden argument for this administrator',

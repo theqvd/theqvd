@@ -4,7 +4,7 @@ use warnings;
 use Moo;
 use QVD::Admin4::Exception;
 
-has 'name', is => 'ro', isa => sub { die "Invalid type for attribute name" if ref(+shift); }, required => 1;
+has 'name', is => 'ro', isa => sub { my $name = shift; die "Invalid type for attribute name" if ref($name) || (not defined $name) || $name eq ''; }, required => 1;
 
 my $ACTIONS =
 {
@@ -431,16 +431,17 @@ sub available
 {
     my $self = shift;
 
+    defined 
     exists $ACTIONS->{$self->name} ? 
 	return 1 : 
 	return 0;
 }
 
 
-sub channel
+sub channels
 {
     my $self = shift;
-    $ACTIONS->{$self->name}->{'channel'};
+    $ACTIONS->{$self->name}->{'channels'} || [];
 }
 
 sub type

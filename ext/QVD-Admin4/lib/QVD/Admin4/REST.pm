@@ -54,7 +54,8 @@ sub process_query
    try {
        my $json_wrapper = QVD::Admin4::REST::JSON->new(json => $json);
 
-       my $action = QVD::Admin4::Action->new(name => $json_wrapper->action );
+       my $action = eval { QVD::Admin4::Action->new(name => $json_wrapper->action ) }
+       // QVD::Admin4::Exception->throw(code => 4110);
 
        QVD::Admin4::Exception->throw(code => 4100) 
 	   unless $action->available;
@@ -81,13 +82,13 @@ sub process_query
        $response = QVD::Admin4::Exception->new(code => 1100);
    }
 
-   $response;
+   $response->json;
 }
 
-sub get_channel
+sub get_channels
 {
-   my ($self,$json) = @_;
-   QVD::Admin4::Action->new(name => $json->action )->channel;
+   my ($self,$action_name) = @_;
+   QVD::Admin4::Action->new(name => $action_name )->channels;
 }
 
 sub process_standard_query
