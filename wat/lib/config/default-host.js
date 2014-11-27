@@ -133,11 +133,11 @@ Wat.I.detailsFields[qvdObj] = {
         'acls': 'host.see.address',
         'text': 'IP address'
     },
-    'vms_connected': {
+    'connected_vms': {
         'display': true,
         'fields': [
             'id',
-            'vms_connected'
+            'number_of_vms_connected'
         ],
         'acls': 'host.see.vms-info',
         'text': 'Running VMs'

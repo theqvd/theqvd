@@ -74,4 +74,7 @@ var Wat = {
     
     // Binds
     B: {},
+    
+    // Web Sockets
+    WS: {}
 };

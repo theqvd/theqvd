@@ -137,16 +137,16 @@
                             case 'connected_vms':
                 %>
                                 <td class="desktop">
-                                    <% if (model.get('number_of_vms') > 0 && Wat.C.checkACL('vm.see.')) { %>
-                                    <a href="#/vms/user/<%= model.get('id') %>">
-                                        <%= model.get('number_of_vms_connected') %>
+                                    <% if (model.get('number_of_vms') > 0) { %>
+                                    <%= Wat.C.ifACL('<a href="#/vms/user/' + model.get('id') + '">', 'vm.see-main.') %>
+                                        <span data-wsupdate="number_of_vms_connected" data-id="<%= model.get('id') %>"><%= model.get('number_of_vms_connected') %></span>
                                         /
-                                        <%= model.get('number_of_vms') %>
-                                    </a>
+                                        <span data-wsupdate="number_of_vms" data-id="<%= model.get('id') %>"><%= model.get('number_of_vms') %></span>
+                                    <%= Wat.C.ifACL('</a>', 'vm.see-details.') %>
                                     <% } else {%>
-                                        <%= model.get('number_of_vms_connected') %>
+                                        <span data-wsupdate="number_of_vms_connected" data-id="<%= model.get('id') %>"><%= model.get('number_of_vms_connected') %></span>
                                         /
-                                        <%= model.get('number_of_vms') %>
+                                        <span data-wsupdate="number_of_vms" data-id="<%= model.get('id') %>"><%= model.get('number_of_vms') %></span>
                                     <% } %>
                                 </td>
                 <%

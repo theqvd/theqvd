@@ -26,7 +26,8 @@ Wat.Views.AboutView = Wat.Views.MainView.extend({
         
         // Fill the html with the template
         this.template = _.template(
-            this.templateAbout, { version: Wat.C.version
+            this.templateAbout, { 
+                version: Wat.C.version
             }
         );
         

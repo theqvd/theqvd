@@ -514,7 +514,7 @@ Wat.I = {
         $('.menu-option[data-target="' + opt + '"]').addClass('menu-option--selected');
     },
     
-    renderMain: function () {
+    renderMain: function () {        
         var templateMain = Wat.A.getTemplate('main');
         // Fill the html with the template and the collection
         var template = _.template(

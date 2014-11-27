@@ -99,4 +99,12 @@ Wat.Views.OSFListView = Wat.Views.ListView.extend({
         var auxModel = new Wat.Models.OSF();
         this.updateModel(arguments, filters, this.fetchList, auxModel);
     },
+    
+    renderList: function () {
+        Wat.Views.ListView.prototype.renderList.apply(this);
+            
+        var fields = ['number_of_vms', 'number_of_dis'];
+
+        Wat.WS.openListWebsockets(this.qvdObj, this.collection.models, fields);
+    }
 });

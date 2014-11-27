@@ -11,16 +11,16 @@
                     switch(vmState) {
                         case 'stopped':
                 %>
-                            <div data-i18n>Stopped</div>
-                            <div class="fa fa-stop"></div>
-                            <div class="address invisible"><%=model.get('ip')%></div>
+                            <div data-i18n data-wsupdate="state-text" data-id="<%= model.get('id') %>">Stopped</div>
+                            <div class="fa fa-stop" data-wsupdate="state" data-id="<%= model.get('id') %>"></div>
+                            <div class="address invisible" data-wsupdate="ip" data-id="<%= model.get('id') %>"><%=model.get('ip')%></div>
                 <%
                             break;
                         case 'running':
                 %>
-                            <div data-i18n>Running</div>
-                            <div class="fa fa-play"></div>
-                            <div class="address"><%=model.get('ip')%></div>
+                            <div data-i18n data-wsupdate="state-text" data-id="<%= model.get('id') %>">Running</div>
+                            <div class="fa fa-play" data-wsupdate="state" data-id="<%= model.get('id') %>"></div>
+                            <div class="address" data-wsupdate="ip" data-id="<%= model.get('id') %>"><%=model.get('ip')%></div>
                 <%
                             break;
                     }
@@ -45,10 +45,10 @@
             <% if (Wat.C.checkACL('vm.see.host')) { %>
             <tr>
                 <td><span data-i18n>Node</span></td>
-                <td>
-                    <a href="#/host/<%= model.get('host_id') %>">
+                <td data-wsupdate="host" data-id="<%= model.get('id') %>">
+                    <%= Wat.C.ifACL('<a href="#/host/' + model.get('host_id') + '">', 'host.see-details.') %>
                         <%= model.get('host_name') %>
-                    </a>
+                    <%= Wat.C.ifACL('</a>', 'host.see-details.') %>
                 </td>
             </tr>
             <% } %>
@@ -75,19 +75,19 @@
             <% if (Wat.C.checkACL('vm.see.port-ssh')) { %>
             <tr>
                 <td><span data-i18n>SSH port</span></td>
-                <td><%= model.get('ssh_port') %></td>
+                <td data-wsupdate="ssh_port" data-id="<%= model.get('id') %>"><%= model.get('ssh_port') %></td>
             </tr>
             <% } %>
             <% if (Wat.C.checkACL('vm.see.port-vnc')) { %>
             <tr>
                 <td><span data-i18n>VNC port</span></td>
-                <td><%= model.get('vnc_port') %></td>
+                <td data-wsupdate="vnc_port" data-id="<%= model.get('id') %>"><%= model.get('vnc_port') %></td>
             </tr>
             <% } %>
             <% if (Wat.C.checkACL('vm.see.port-serial')) { %>
             <tr>
                 <td><span data-i18n>Serial port</span></td>
-                <td><%= model.get('serial_port') %></td>
+                <td data-wsupdate="serial_port" data-id="<%= model.get('id') %>"><%= model.get('serial_port') %></td>
             </tr>
             <% } %>
         </tbody>

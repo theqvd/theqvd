@@ -55,5 +55,13 @@ Wat.Views.UserListView = Wat.Views.ListView.extend({
         }
                         
         this.createModel(arguments, this.fetchList);
+    },
+    
+    renderList: function () {
+        Wat.Views.ListView.prototype.renderList.apply(this);
+            
+        var fields = ['number_of_vms_connected', 'number_of_vms'];
+
+        Wat.WS.openListWebsockets(this.qvdObj, this.collection.models, fields);
     }
 });

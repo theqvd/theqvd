@@ -84,5 +84,13 @@ Wat.Views.UserDetailsView = Wat.Views.DetailsView.extend({
         this.dialogConf.title = $.i18n.t('Edit user') + ": " + this.model.get('name');
         
         Wat.Views.DetailsView.prototype.openEditElementDialog.apply(this, [e]);
+    },
+    
+    render: function () {
+        Wat.Views.DetailsView.prototype.render.apply(this);
+            
+        var fields = ['number_of_vms', 'number_of_vms_connected'];
+        
+        Wat.WS.openDetailsWebsockets(this.qvdObj, this.model, fields);
     }
 });

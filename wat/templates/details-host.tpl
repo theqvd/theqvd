@@ -54,12 +54,12 @@
                 <% 
             if (model.get('state') == 'running') {
                 %>
-                <span data-i18n>Running</span>
+                <span data-i18n data-wsupdate="state-text" data-id="<%= model.get('id') %>">Running</span>
                 <%
                 }
                 else {
                 %>
-                <span data-i18n>Stopped</span>
+                <span data-i18n data-wsupdate="state-text" data-id="<%= model.get('id') %>">Stopped</span>
                 <%
                 }
                 %>
@@ -84,6 +84,22 @@
                 <%
                 }
                 %>
+            </td>
+        </tr>
+    <% 
+    }
+    if (detailsFields['connected_vms'] != undefined) { 
+    %>
+        <tr>
+            <td><i class="fa fa-cloud"></i><span data-i18n>Running VMs</span></td>
+            <td>
+                <% if (model.get('number_of_vms_connected') > 0) { %>
+                <%= Wat.C.ifACL('<a href="#/vms/host/' + model.get('id') + '">', 'vm.see-main.') %>
+                    <span data-wsupdate="number_of_vms_connected" data-id="<%= model.get('id') %>"><%= model.get('number_of_vms_connected') %></span>
+                </a>
+                <% } else {%>
+                    <span data-wsupdate="number_of_vms_connected" data-id="<%= model.get('id') %>"><%= model.get('number_of_vms_connected') %></span>
+                <% } %>
             </td>
         </tr>
     <% 

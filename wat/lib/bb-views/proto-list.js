@@ -220,16 +220,18 @@ Wat.Views.ListView = Wat.Views.MainView.extend({
             this.fetchList();
         }
         
-        // Show-Hide filter notes
-        if ($.isEmptyObject(filterNotes)) {
-            $('.js-filter-notes').hide();
-        }
-        else {
-            $('.filter-notes-list li').remove();
-            $.each(filterNotes, function(fNoteName, fNote) {
-                $('.js-filter-notes-list').append('<li><a href="javascript:" class="js-delete-filter-note fa fa-trash" data-filter-name="' + fNoteName + '" data-filter-type="' + fNote.type + '"></a>' + fNote.label + ': ' + fNote.value + '</li>');
-            });
-            $('.js-filter-notes').show();
+        // Show-Hide filter notes only when view is not embeded
+        if (this.cid == Wat.CurrentView.cid) {
+            if ($.isEmptyObject(filterNotes)) {
+                $('.js-filter-notes').hide();
+            }
+            else {
+                $('.filter-notes-list li').remove();
+                $.each(filterNotes, function(fNoteName, fNote) {
+                    $('.js-filter-notes-list').append('<li><a href="javascript:" class="js-delete-filter-note fa fa-trash" data-filter-name="' + fNoteName + '" data-filter-type="' + fNote.type + '"></a>' + fNote.label + ': ' + fNote.value + '</li>');
+                });
+                $('.js-filter-notes').show();
+            }
         }
     },
     

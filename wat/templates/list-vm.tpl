@@ -128,17 +128,17 @@
                                         <%
                                         if (model.get('state') == 'stopped') {
                                         %>
-                                            <i class="fa fa-stop" title="<%= i18n.t('Stopped') %>" data-i18n="[title]Stopped"></i>
+                                            <i class="fa fa-stop" title="<%= i18n.t('Stopped') %>" data-i18n="[title]Stopped" data-wsupdate="state" data-id="<%= model.get('id') %>"></i>
                                         <%
                                         }
                                         else if (model.get('state') == 'running'){
                                         %>
-                                            <i class="fa fa-play" data-i18n="[title]Running" title="<%= i18n.t('Running') %>"></i>
+                                            <i class="fa fa-play" data-i18n="[title]Running" title="<%= i18n.t('Running') %>" data-wsupdate="state" data-id="<%= model.get('id') %>"></i>
                                         <%
                                         }
                                         else {
                                         %>
-                                            <i class="fa fa-spinner fa-spin" title="<%= model.get('state') %>"></i>
+                                            <i class="fa fa-spinner fa-spin" title="<%= model.get('state') %>" data-wsupdate="state" data-id="<%= model.get('id') %>"></i>
                                         <%
                                         }
                                         %>
@@ -147,11 +147,13 @@
                                     %>
                                     
                                     <%
+                                    var userStateHiddenClass = 'hidden';
                                     if (model.get('user_state') == 'connected' && (!infoRestrictions || infoRestrictions.user_state)) {
-                                    %>
-                                        <i class="fa fa-user ok" title="<%= i18n.t('Connected') %>" data-i18n="[title]Connected"></i>
-                                    <%
+                                        userStateHiddenClass = '';
                                     }
+                                    %>
+                                        <i class="fa fa-user <%= userStateHiddenClass %>" title="<%= i18n.t('Connected') %>" data-i18n="[title]Connected" data-wsupdate="user_state" data-id="<%= model.get('id') %>"></i>
+                                    <%
                                     
                                     if (model.get('blocked') && (!infoRestrictions || infoRestrictions.block)) {
                                     %>
@@ -187,7 +189,7 @@
                                 break;
                             case 'host':
                 %>
-                                <td class="desktop">
+                                <td class="desktop" data-wsupdate="host" data-id="<%= model.get('id') %>">
                                     <%= Wat.C.ifACL('<a href="#/host/' + model.get('host_id') + '">', 'host.see-details.') %>
                                         <%= model.get('host_name') %>
                                     <%= Wat.C.ifACL('</a>', 'host.see-details.') %>
@@ -241,7 +243,7 @@
                                 break;
                             default:
                 %>
-                                <td class="desktop">
+                                <td class="desktop" data-wsupdate="<%= name %>" data-id="<%= model.get('id') %>">
                                     <%= model.get(name) %>
                                 </td>
                 <%

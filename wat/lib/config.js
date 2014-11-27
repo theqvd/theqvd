@@ -4,8 +4,13 @@ Wat.C = {
     login: '',
     password: '',
     loggedIn: false,
+    // Openstack
     apiUrl: 'http://172.20.126.12:3000/',
-    //apiUrl: 'http://172.26.9.42:3000/',
+    apiWSUrl: 'ws://172.20.126.12:3000/ws',
+    
+    // Benja
+    //apiUrl: 'http://172.26.9.42/',
+    //apiWSUrl: 'ws://172.26.9.42/ws',
     loginExpirationDays: 1,
     acls: [],
     aclGroups: {},

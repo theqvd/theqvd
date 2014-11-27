@@ -42,6 +42,7 @@ Wat.Router = Backbone.Router.extend({
         
         if (!$.isEmptyObject(Wat.CurrentView)) {
             Wat.CurrentView.undelegateEvents();
+            Wat.WS.closeAllWebsockets();
         }
         
         Wat.CurrentView = new view(params);

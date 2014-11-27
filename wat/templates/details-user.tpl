@@ -23,9 +23,17 @@
     %>
     
     
-    <% if(Wat.C.checkACL('vm.update.disconnect-user') && model.get('number_of_vms_connected') > -10) { %>
-        <a class="button button-icon js-button-disconnect-all-vms fa fa-plug fright" href="javascript:" data-i18n="[title]Disconnect from all VMS"></a>
-    <% } %>
+    <% 
+    if(Wat.C.checkACL('vm.update.disconnect-user')) { 
+        var hiddenClass = 'hidden';
+        if (model.get('number_of_vms_connected') > 0) {
+            hiddenClass = '';
+        }
+    %>
+        <a class="button button-icon js-button-disconnect-all-vms fa fa-plug fright <%= hiddenClass %>" href="javascript:" data-i18n="[title]Disconnect from all VMS"></a>
+    <% 
+    } 
+    %>
 </div>
 
 <table class="details details-list <% if (!enabledProperties) { %> col-width-100 <% } %>">
@@ -45,16 +53,16 @@
         <tr>
             <td><i class="fa fa-cloud"></i><span data-i18n>Connected VMs</span></td>
             <td>
-                <% if (model.get('number_of_vms') > 0 && Wat.C.checkACL('vm.see-main.')) { %>
-                <a href="#/vms/user/<%= model.get('id') %>">
-                    <%= model.get('number_of_vms_connected') %>
+                <% if (model.get('number_of_vms') > 0) { %>
+                <%= Wat.C.ifACL('<a href="#/vms/user/' + model.get('id') + '">', 'vm.see-main.') %>
+                    <span data-wsupdate="number_of_vms_connected" data-id="<%= model.get('id') %>"><%= model.get('number_of_vms_connected') %></span>
                     /
-                    <%= model.get('number_of_vms') %>
+                    <span data-wsupdate="number_of_vms" data-id="<%= model.get('id') %>"><%= model.get('number_of_vms') %></span>
                 </a>
                 <% } else {%>
-                    <%= model.get('number_of_vms_connected') %>
+                    <span data-wsupdate="number_of_vms_connected" data-id="<%= model.get('id') %>"><%= model.get('number_of_vms_connected') %></span>
                     /
-                    <%= model.get('number_of_vms') %>
+                    <span data-wsupdate="number_of_vms" data-id="<%= model.get('id') %>"><%= model.get('number_of_vms') %></span>
                 <% } %>
             </td>
         </tr>

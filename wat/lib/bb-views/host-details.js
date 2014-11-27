@@ -86,5 +86,13 @@ Wat.Views.HostDetailsView = Wat.Views.DetailsView.extend({
     
     bindEditorEvents: function() {
         Wat.Views.DetailsView.prototype.bindEditorEvents.apply(this);
+    },
+    
+    render: function () {
+        Wat.Views.DetailsView.prototype.render.apply(this);
+            
+        var fields = ['state', 'number_of_vms_connected'];
+
+        Wat.WS.openDetailsWebsockets(this.qvdObj, this.model, fields);
     }
 });

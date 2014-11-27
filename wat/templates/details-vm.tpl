@@ -12,12 +12,12 @@
     if (Wat.C.checkACL('vm.update.state')) {
         if (model.get('state') == 'running') { 
     %>
-            <a class="button fright button-icon js-button-stop-vm fa fa-stop fright" href="javascript:" data-i18n="[title]Stop"></a>
+            <a class="button fright button-icon js-button-stop-vm fa fa-stop fright" href="javascript:" data-i18n="[title]Stop" data-wsupdate="state-button" data-id="<%= model.get('id') %>"></a>
     <% 
         }
         else { 
     %>
-            <a class="button fright button-icon js-button-start-vm fa fa-play fright" href="javascript:" data-i18n="[title]Start"></a>
+            <a class="button fright button-icon js-button-start-vm fa fa-play fright" href="javascript:" data-i18n="[title]Start" data-wsupdate="state-button" data-id="<%= model.get('id') %>"></a>
     <% 
         }
     } 
@@ -68,23 +68,27 @@
                 <% 
                 if (model.get('state') == 'running') {
                 %>
-                    <!--
-                    <i class="fa fa-play" data-i18n="[title]Running"></i>
-                    -->
-                    <span data-i18n>Running</span>
+                    <span data-i18n data-wsupdate="state-text" data-id="<%= model.get('id') %>">Running</span>
                 <%
                 }
                 else {
                 %>
-                    <!--
-                    <i class="fa fa-stop" data-i18n="[title]Stopped"></i>
-                    -->
-                    <span data-i18n>Stopped</span>
+                    <span data-i18n data-wsupdate="state-text" data-id="<%= model.get('id') %>">Stopped</span>
                 <%
                 }
                 %>
             </td>
         </tr>
+    <% 
+    }
+    if (detailsFields['ip'] != undefined) { 
+    %>
+        <tr>
+            <td><i class="fa fa-ellipsis-h"></i><span data-i18n>IP address</span></td>
+            <td>
+                <%= model.get('ip') %>
+            </td>
+        </tr>  
     <% 
     }
     if (detailsFields['mac'] != undefined) { 
@@ -117,18 +121,12 @@
                 <% 
                 if (model.get('user_state') == 'connected') {
                 %>
-                    <!--
-                    <i class="fa fa-user ok" data-i18n="[title]Connected"></i>
-                    -->
-                    <span data-i18n>Connected</span>
+                    <span data-i18n data-wsupdate="user_state-text" data-id="<%= model.get('id') %>">Connected</span>
                 <%
                 }
                 else {
-                %>         
-                    <!--
-                    <i class="fa fa-user" data-i18n="[title]Disconnected"></i>
-                    -->
-                    <span data-i18n>Disconnected</span>
+                %>
+                    <span data-i18n data-wsupdate="user_state-text" data-id="<%= model.get('id') %>">Disconnected</span>
                 <%
                 }
                 %>
