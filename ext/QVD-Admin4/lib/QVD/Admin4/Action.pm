@@ -6,6 +6,101 @@ use QVD::Admin4::Exception;
 
 has 'name', is => 'ro', isa => sub { my $name = shift; die "Invalid type for attribute name" if ref($name) || (not defined $name) || $name eq ''; }, required => 1;
 
+# CHANNELS
+# VMS: vm_created_or_removed, vm_blocked_or_unblocked, vm_state_changed, vm_expiration_date_changed
+
+#create or replace function vm_created_or_removed_notify () returns trigger
+#as $$ BEGIN notify vm_created_or_removed; RETURN NULL; END; $$ 
+#language plpgsql;
+
+# CREATE TRIGGER vm_created_or_removed_trigger AFTER INSERT OR DELETE ON vms EXECUTE PROCEDURE vm_created_or_removed_notify();
+
+#create or replace function vm_blocked_or_unblocked_notify () returns trigger
+#as $$ BEGIN notify vm_blocked_or_unblocked; RETURN NULL; END; $$ 
+#language plpgsql;
+
+# CREATE TRIGGER vm_blocked_or_unblocked_trigger AFTER UPDATE blocked ON vm_runtimes EXECUTE PROCEDURE notify_in_channel();
+
+#create or replace function vm_state_changed_notify () returns trigger
+#as $$ BEGIN notify vm_state_changed; RETURN NULL; END; $$ 
+#language plpgsql;
+
+# CREATE TRIGGER vm_state_changed_trigger AFTER UPDATE vm_state ON vm_runtimes EXECUTE PROCEDURE vm_state_changed_notify();
+
+#create or replace function vm_expiration_date_changed_notify () returns trigger
+#as $$ BEGIN notify vm_expiration_date_changed; RETURN NULL; END; $$ 
+#language plpgsql;
+
+# CREATE TRIGGER vm_expiration_date_changed_trigger AFTER UPDATE vm_expiration_soft, vm_expiration_hard  vm_runtimes EXECUTE PROCEDURE vm_expiration_date_changed_notify();
+
+# HOSTS: host_created_or_removed, host_blocked_or_unblocked, host_state_changed
+
+#create or replace function host_created_or_removed_notify () returns trigger
+#as $$ BEGIN notify host_created_or_removed; RETURN NULL; END; $$ 
+#language plpgsql;
+
+# CREATE TRIGGER host_created_or_removed_trigger AFTER INSERT OR DELETE ON hosts EXECUTE PROCEDURE host_created_or_removed_notify();
+
+#create or replace function host_blocked_or_unblocked_notify () returns trigger
+#as $$ BEGIN notify host_blocked_or_unblocked; RETURN NULL; END; $$ 
+#language plpgsql;
+
+# CREATE TRIGGER host_blocked_or_unblocked_trigger AFTER UPDATE OF blocked ON host_runtimes EXECUTE PROCEDURE host_blocked_or_unblocked_notify();
+
+#create or replace function host_state_changed_notify () returns trigger
+#as $$ BEGIN notify host_state_changed; RETURN NULL; END; $$ 
+#language plpgsql;
+
+# CREATE TRIGGER host_state_changed_trigger AFTER UPDATE OF state ON host_runtimes EXECUTE PROCEDURE host_state_changed_notify();
+
+# USERS: user_created_or_removed, user_blocked_or_unblocked, user_state_changed
+
+#create or replace function user_created_or_removed_notify () returns trigger
+#as $$ BEGIN notify user_created_or_removed; RETURN NULL; END; $$ 
+#language plpgsql;
+
+# CREATE TRIGGER user_created_or_removed_trigger AFTER INSERT OR DELETE ON users EXECUTE PROCEDURE user_created_or_removed_notify();
+
+#create or replace function user_blocked_or_unblocked_notify () returns trigger
+#as $$ BEGIN notify user_blocked_or_unblocked; RETURN NULL; END; $$ 
+#language plpgsql;
+
+# CREATE TRIGGER user_blocked_or_unblocked_trigger AFTER UPDATE OF blocked ON users EXECUTE PROCEDURE user_blocked_or_unblocked_notify();
+
+#create or replace function user_state_changed_trigger_notify () returns trigger
+#as $$ BEGIN notify user_state_changed_trigger; RETURN NULL; END; $$ 
+#language plpgsql;
+
+# CREATE TRIGGER user_state_changed_trigger AFTER UPDATE OF user_state ON vm_runtimes EXECUTE PROCEDURE user_state_changed_notify();
+
+# OSF: osf_created_or_removed, osf_blocked_or_unblocked
+
+#create or replace function osf_created_or_removed_notify () returns trigger
+#as $$ BEGIN notify osf_created_or_removed; RETURN NULL; END; $$ 
+#language plpgsql;
+
+# CREATE TRIGGER osf_created_or_removed_trigger AFTER INSERT OR DELETE ON osfs EXECUTE PROCEDURE osf_created_or_removed_notify();
+
+#create or replace function osf_blocked_or_unblocked_notify () returns trigger
+#as $$ BEGIN notify osf_blocked_or_unblocked; RETURN NULL; END; $$ 
+#language plpgsql;
+
+# CREATE TRIGGER osf_blocked_or_unblocked_trigger AFTER UPDATE OF blocked ON osfs EXECUTE PROCEDURE osf_blocked_or_unblocked_notify();
+
+# DI: di_created_or_removed, di_blocked_or_unblocked
+
+#create or replace function di_created_or_removed_notify () returns trigger
+#as $$ BEGIN notify di_created_or_removed; RETURN NULL; END; $$ 
+#language plpgsql;
+
+# CREATE TRIGGER di_created_or_removed_trigger AFTER INSERT OR DELETE ON dis EXECUTE PROCEDURE di_created_or_removed_notify();
+
+#create or replace function di_blocked_or_unblocked_notify () returns trigger
+#as $$ BEGIN notify di_blocked_or_unblocked; RETURN NULL; END; $$ 
+#language plpgsql;
+
+# CREATE TRIGGER di_blocked_or_unblocked_trigger AFTER UPDATE OF blocked ON dis EXECUTE PROCEDURE di_blocked_or_unblocked_notify();
+
 my $ACTIONS =
 {
 
@@ -57,6 +152,7 @@ user_all_ids => { type_of_action => 'all_ids',
 
 user_get_details => { type_of_action => 'details',
 		      admin4method => 'select',
+		      channels => [qw(user_state_changed vm_state_changed user_state_changed)],
 		      acls => [qr/^user\.see-details\./],
 		      qvd_object => 'User' },
 
@@ -97,6 +193,7 @@ vm_tiny_list => { type_of_action => 'tiny',
 
 vm_get_details => { type_of_action => 'details',
 		    admin4method => 'select',
+		    channels => [qw(vm_state_changed user_state_changed)],
 		    acls => [qr/^vm\.see-details\./],
 		    qvd_object => 'VM'},
 
@@ -152,7 +249,8 @@ host_tiny_list => { type_of_action => 'tiny',
 
 host_get_details => { type_of_action => 'details',
 		      admin4method => 'select',
-		   acls => [qr/^host\.see-details\./],
+		      channels => [qw(host_state_changed vm_state_changed)],
+		      acls => [qr/^host\.see-details\./],
 		      qvd_object => 'Host'},
 
 host_get_state => { type_of_action => 'state',
@@ -192,6 +290,7 @@ osf_tiny_list => { type_of_action => 'tiny',
 
 osf_get_details => { type_of_action => 'details',
 		     admin4method => 'select',
+		     channels => [qw(vm_created_or_deleted di_created_or_delated)],
 		     acls => [qr/^osf\.see-details\./],
 		     qvd_object => 'OSF'},
 
@@ -227,6 +326,7 @@ di_tiny_list => { type_of_action => 'tiny',
 
 di_get_details => { type_of_action => 'details',
 		    admin4method => 'select',
+		     channels => [qw(vm_created_or_deleted)],
 		    acls => [qr/^di\.see-details\./],
 		    qvd_object => 'DI'},
 
@@ -410,6 +510,11 @@ properties_by_qvd_object => { type_of_action =>  'general',
 
 
 qvd_objects_statistics => { type_of_action =>  'multiple',
+			    channels => [qw(vm_created_or_removed vm_blocked_or_unblocked vm_state_changed vm_expiration_date_changed
+                                            host_created_or_removed host_blocked_or_unblocked host_state_changed
+                                            user_created_or_removed user_blocked_or_unblocked user_state_changed
+                                            osf_created_or_removed osf_blocked_or_unblocked
+                                            di_created_or_removed di_blocked_or_unblocked)],
 			    admin4methods => { users_count => { acls => [qr/^user\.stats/] },
 					       blocked_users_count => { acls => [qr/^user\.stats\.blocked$/]},
 					       vms_count => { acls => [qr/^vm\.stats/] },

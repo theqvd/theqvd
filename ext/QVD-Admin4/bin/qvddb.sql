@@ -2590,6 +2590,90 @@ ALTER TABLE ONLY acl_role_relations
 ALTER TABLE ONLY acl_role_relations
     ADD CONSTRAINT acl_role_relations_acl_id_roles_id_fkey FOREIGN KEY (role_id) REFERENCES roles(id) ON UPDATE CASCADE ON DELETE CASCADE DEFERRABLE;
 
+
+
+--- Channels
+
+
+create or replace function vm_created_or_removed_notify () returns trigger
+as $$ BEGIN listen vm_created_or_removed; notify vm_created_or_removed; RETURN NULL; END; $$ 
+language plpgsql;
+
+CREATE TRIGGER vm_created_or_removed_trigger AFTER INSERT OR DELETE ON vms EXECUTE PROCEDURE vm_created_or_removed_notify();
+
+create or replace function vm_blocked_or_unblocked_notify () returns trigger
+as $$ BEGIN listen vm_blocked_or_unblocked; notify vm_blocked_or_unblocked; RETURN NULL; END; $$ 
+language plpgsql;
+
+CREATE TRIGGER vm_blocked_or_unblocked_trigger AFTER UPDATE OF blocked ON vm_runtimes EXECUTE PROCEDURE vm_blocked_or_unblocked_notify();
+
+create or replace function vm_state_changed_notify () returns trigger
+as $$ BEGIN listen vm_state_changed; notify vm_state_changed; RETURN NULL; END; $$ 
+language plpgsql;
+
+CREATE TRIGGER vm_state_changed_trigger AFTER UPDATE OF vm_state ON vm_runtimes EXECUTE PROCEDURE vm_state_changed_notify();
+
+create or replace function vm_expiration_date_changed_notify () returns trigger
+as $$ BEGIN listen vm_expiration_date_changed; notify vm_expiration_date_changed; RETURN NULL; END; $$ 
+language plpgsql;
+
+CREATE TRIGGER vm_expiration_date_changed_trigger AFTER UPDATE OF vm_expiration_soft, vm_expiration_hard ON vm_runtimes EXECUTE PROCEDURE vm_expiration_date_changed_notify();
+
+create or replace function host_created_or_removed_notify () returns trigger
+as $$ BEGIN listen host_created_or_removed; notify host_created_or_removed; RETURN NULL; END; $$ 
+language plpgsql;
+
+CREATE TRIGGER host_created_or_removed_trigger AFTER INSERT OR DELETE ON hosts EXECUTE PROCEDURE host_created_or_removed_notify();
+
+create or replace function host_blocked_or_unblocked_notify () returns trigger
+as $$ BEGIN listen host_blocked_or_unblocked; notify host_blocked_or_unblocked; RETURN NULL; END; $$ 
+language plpgsql;
+
+CREATE TRIGGER host_blocked_or_unblocked_trigger AFTER UPDATE OF blocked ON host_runtimes EXECUTE PROCEDURE host_blocked_or_unblocked_notify();
+
+create or replace function host_state_changed_notify () returns trigger
+as $$ BEGIN listen host_state_changed; notify host_state_changed; RETURN NULL; END; $$ 
+language plpgsql;
+
+CREATE TRIGGER host_state_changed_trigger AFTER UPDATE OF state ON host_runtimes EXECUTE PROCEDURE host_state_changed_notify();
+
+create or replace function user_created_or_removed_notify () returns trigger
+as $$ BEGIN listen user_created_or_removed; notify user_created_or_removed; RETURN NULL; END; $$ 
+language plpgsql;
+
+CREATE TRIGGER user_created_or_removed_trigger AFTER INSERT OR DELETE ON users EXECUTE PROCEDURE user_created_or_removed_notify();
+
+create or replace function user_blocked_or_unblocked_notify () returns trigger
+as $$ BEGIN listen user_blocked_or_unblocked; notify user_blocked_or_unblocked; RETURN NULL; END; $$ 
+language plpgsql;
+
+CREATE TRIGGER user_blocked_or_unblocked_trigger AFTER UPDATE OF blocked ON users EXECUTE PROCEDURE user_blocked_or_unblocked_notify();
+
+create or replace function user_state_changed_notify () returns trigger
+as $$ BEGIN listen user_state_changed_trigger; notify user_state_changed_trigger; RETURN NULL; END; $$ 
+language plpgsql;
+
+CREATE TRIGGER user_state_changed_trigger AFTER UPDATE OF user_state ON vm_runtimes EXECUTE PROCEDURE user_state_changed_notify();
+
+create or replace function osf_created_or_removed_notify () returns trigger
+as $$ BEGIN listen osf_created_or_removed; notify osf_created_or_removed; RETURN NULL; END; $$ 
+language plpgsql;
+
+CREATE TRIGGER osf_created_or_removed_trigger AFTER INSERT OR DELETE ON osfs EXECUTE PROCEDURE osf_created_or_removed_notify();
+
+create or replace function di_created_or_removed_notify () returns trigger
+as $$ BEGIN notify di_created_or_removed; notify di_created_or_removed; RETURN NULL; END; $$ 
+language plpgsql;
+
+CREATE TRIGGER di_created_or_removed_trigger AFTER INSERT OR DELETE ON dis EXECUTE PROCEDURE di_created_or_removed_notify();
+
+create or replace function di_blocked_or_unblocked_notify () returns trigger
+as $$ BEGIN listen di_blocked_or_unblocked; notify di_blocked_or_unblocked; RETURN NULL; END; $$ 
+language plpgsql;
+
+CREATE TRIGGER di_blocked_or_unblocked_trigger AFTER UPDATE OF blocked ON dis EXECUTE PROCEDURE di_blocked_or_unblocked_notify();
+
+
 --
 -- Name: public; Type: ACL; Schema: -; Owner: postgres
 --

@@ -85,32 +85,34 @@ get '/proofs' => 'proofs';
 
 websocket '/ws' => sub {
     my $c = shift;
-
     $c->app->log->debug("WebSocket opened");
     $c->inactivity_timeout(30);
-    
-    my ($timer,$listener); 
-    
+     
     my $json = $c->get_input_json;
-    my $res = $c->process_api_query($json);
-    my $action = $json->{action};
-    my @channels = @{$c->get_api_channels($action)};
-    push @channels, 'foo' unless @channels; 
-    $c->send(encode_json($res));
 
+    my $cb = sub {
+	my $res = $c->process_api_query($json);
+	$c->send(encode_json($res));
+    };
+
+    for my $channel ($c->get_api_channels($json))
+    {
+	$c->app->log->debug("WebSocket listening on channel $channel");
+	my $rcb; $rcb = 
+	sub { $c->pg_listen($channel, sub { 
+	    $c->app->log->debug("WebSocket $channel signal received");
+	    $cb->();$rcb->();});};
+	$rcb->();
+    }
+
+    $cb->();
+
+    my $timer;
     $c->on(message => sub {
         my ($c, $msg) = @_;
         $c->app->log->debug("WebSocket $msg signal received");
-        
 	Mojo::IOLoop->remove($timer) if $timer;
-	$timer = Mojo::IOLoop->timer(25 => sub { $c->send('AKN');});
- 
-	my $channel = 'foo';
-	Mojo::IOLoop->delay(sub { my $delay = shift;
-				  $c->pg_listen($channel, $delay->begin);},
-			    sub {$res = $c->process_api_query($json);
-				 $c->send(encode_json($res));});
-	});
+	$timer = Mojo::IOLoop->timer(5 => sub { $c->send('AKN');});});
 
     $c->on(finish => sub {
         my ($c, $code) = @_;
@@ -155,7 +157,8 @@ sub process_api_query
 sub get_api_channels
 {
     my ($c,$json) = @_;
-    $c->qvd_admin4_api->get_channels($json);
+    my $channels = $c->qvd_admin4_api->get_channels($json->{action}) // [];
+    @$channels;
 }
 
 sub get_auth_method
@@ -219,10 +222,10 @@ __DATA__
 <head>                                                                                                                                                                                        
 <title>Web Sockets Proofs</title>                                                                                                                                                             
 <script type="text/javascript">                                                                                                                                                               
-      var ws = new WebSocket('ws://localhost:3000/ws?login=superadmin&password=superadmin&action=vm_get_details&filters={"id":"4"}');                                                    
+      var ws = new WebSocket('ws://localhost:3000/ws?login=superadmin&password=superadmin&action=qvd_objects_statistics');                                                    
       ws.onmessage =                                                                                                                                                                          
         function (event)                                                                                                                                                                      
-        {                                                                                                                                                                                     
+        {                                                                                                                                                                                    
               document.getElementById("state").innerHTML = event.data;                                                                                                                       
               ws.send('Hello!!');                                                                                                                                                             
         };                                                                                                                                                                                    
