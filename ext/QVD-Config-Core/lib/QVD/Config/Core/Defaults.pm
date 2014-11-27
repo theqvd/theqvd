@@ -152,6 +152,9 @@ client.nxproxy.extra_args =
 ## Sent to the VM side and applied there.
 client.nxagent.extra_args =
 
+## Extra arguments for sshfs. These have been determined as reasonable defaults.
+client.sshfs.extra_args=-o atomic_o_trunc -o idmap=user
+
 ## nxproxy's geometry parameter
 client.geometry = 1024x768
 ## nxproxy's fullscreen parameter
