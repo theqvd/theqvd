@@ -1,6 +1,8 @@
 Wat.WS.changeWebsocketVm = function (id, field, data) {
    switch (field) {
         case 'state':
+            // Add this effect when data will be received only when change
+            // $('[data-wsupdate="state"][data-id="' + id + '"]').fadeOut().fadeIn();
             switch (data) {
                 case 'running':
                     $('[data-wsupdate="state"][data-id="' + id + '"]').attr('class', 'fa fa-play');

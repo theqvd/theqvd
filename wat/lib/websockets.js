@@ -21,6 +21,7 @@ Wat.WS = {
                 
                 if (received_msg != 'ACK') {
                     var received_obj = JSON.parse(received_msg);
+                    
                     if (received_obj.rows) {
                         var data = received_obj.rows[0][field];
                     }
