@@ -142,6 +142,11 @@ Wat.Views.DetailsView = Wat.Views.MainView.extend({
         }
         
         Wat.T.translate();
+        
+        // Open websockets for live fields
+        if (this.liveFields) {
+            Wat.WS.openDetailsWebsockets(this.qvdObj, this.model, this.liveFields);
+        }
     },
     
     applyBlock: function () {

@@ -27,7 +27,7 @@ $.each(configTokens, function (iTok, tok) {
                 if (dvalue == undefined) {
             %>
                     <option value="delete">Delete</option>
-            <% } else if (dvalue != value) { console.info(tok);%>
+            <% } else if (dvalue != value) { %>
                     <option value="set_default">Restore to default value</option>
             <% } %>
             </select>

@@ -1,5 +1,6 @@
 Wat.Views.UserDetailsView = Wat.Views.DetailsView.extend({  
     qvdObj: 'user',
+    liveFields: ['number_of_vms_connected', 'number_of_vms'],
 
     initialize: function (params) {
         this.model = new Wat.Models.User(params);
@@ -84,13 +85,5 @@ Wat.Views.UserDetailsView = Wat.Views.DetailsView.extend({
         this.dialogConf.title = $.i18n.t('Edit user') + ": " + this.model.get('name');
         
         Wat.Views.DetailsView.prototype.openEditElementDialog.apply(this, [e]);
-    },
-    
-    render: function () {
-        Wat.Views.DetailsView.prototype.render.apply(this);
-            
-        var fields = ['number_of_vms', 'number_of_vms_connected'];
-        
-        Wat.WS.openDetailsWebsockets(this.qvdObj, this.model, fields);
     }
 });

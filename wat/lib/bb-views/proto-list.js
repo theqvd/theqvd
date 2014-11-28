@@ -525,6 +525,11 @@ Wat.Views.ListView = Wat.Views.MainView.extend({
         this.selectedActionControlsUpdate();
         
         Wat.I.updateSelectedItems(this.selectedItems.length);
+        
+        // Open websockets for live fields
+        if (this.liveFields) {
+            Wat.WS.openListWebsockets(this.qvdObj, this.collection.models, this.liveFields);
+        }
     },
     
     // Fill filter selects 

@@ -20,7 +20,14 @@ Wat.WS = {
                 var received_msg = evt.data;
                 
                 if (received_msg != 'ACK') {
-                    var data = JSON.parse(received_msg).rows[0][field];
+                    var received_obj = JSON.parse(received_msg);
+                    if (received_obj.rows) {
+                        var data = received_obj.rows[0][field];
+                    }
+                    else {
+                        var data = received_obj[field];
+                    }
+                    
                     if (Wat.WS.debug) {
                         console.info("Message is received: ");
                         console.info(action + ' : ' + filters.id + ' : ' + field + ' : ' + data);
@@ -62,6 +69,18 @@ Wat.WS = {
         });
     },
     
+    openStatsWebsockets: function (qvdObj, fields) {
+        var that = this;
+
+        var filters = {
+            id: null
+        };
+        
+        $.each(fields, function (iField, field) {
+            that.openWebsocket(qvdObj, 'qvd_objects_statistics', filters, field, that.changeWebsocket);
+        });
+    },
+    
     openListWebsockets: function (qvdObj, models, fields) {
         var that = this;
                 
@@ -95,6 +114,9 @@ Wat.WS = {
                 break;
             case 'osf':
                 Wat.WS.changeWebsocketOsf(id, field, data);
+                break;
+            case 'home':
+                Wat.WS.changeWebsocketStats(field, data);
                 break;
         }
     }

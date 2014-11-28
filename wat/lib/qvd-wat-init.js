@@ -76,5 +76,14 @@ var Wat = {
     B: {},
     
     // Web Sockets
-    WS: {}
+    WS: {
+        websockets: [],
+        debug: false,
+        openWebsocket: function () {},
+        closeAllWebsockets: function () {},
+        openStatsWebsockets: function () {},
+        openListWebsockets: function () {},    
+        openDetailsWebsockets: function () {},
+        changeWebsocket: function () {}
+    }
 };

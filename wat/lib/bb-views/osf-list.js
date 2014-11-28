@@ -1,5 +1,6 @@
 Wat.Views.OSFListView = Wat.Views.ListView.extend({
     qvdObj: 'osf',
+    liveFields: ['number_of_vms', 'number_of_dis'],
 
     initialize: function (params) {
         this.collection = new Wat.Collections.OSFs(params);
@@ -98,13 +99,5 @@ Wat.Views.OSFListView = Wat.Views.ListView.extend({
         
         var auxModel = new Wat.Models.OSF();
         this.updateModel(arguments, filters, this.fetchList, auxModel);
-    },
-    
-    renderList: function () {
-        Wat.Views.ListView.prototype.renderList.apply(this);
-            
-        var fields = ['number_of_vms', 'number_of_dis'];
-
-        Wat.WS.openListWebsockets(this.qvdObj, this.collection.models, fields);
     }
 });

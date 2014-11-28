@@ -21,12 +21,8 @@ Wat.T = {
 
         // Force chosen to selects that contain any option with data-i18n attribute
         $('select[data-contain-i18n]').trigger('chosen:updated');
-
-        // Translate the "X days" strings
-        $.each($('[data-days]'), function (iDays, days) {
-            var daysTranslated = i18n.t('__count__ days', {'count': $(days).attr('data-days')});
-            $(days).html(daysTranslated);
-        });
+        
+        Wat.T.translateXDays();
 
         // Other chains
         $('.footer').html(i18n.t('QVD Web Administration Tool, by %s',  $('.footer').attr('data-link')));
@@ -57,5 +53,13 @@ Wat.T = {
     // Translate an element with i18n standard function
     translateElement: function(element) {
        element.i18n();
-    }    
+    },
+    
+    translateXDays: function() {
+        // Translate the "X days" strings
+        $.each($('[data-days]'), function (iDays, days) {
+            var daysTranslated = i18n.t('__count__ days', {'count': $(days).attr('data-days')});
+            $(days).html(daysTranslated);
+        });
+    }
 }

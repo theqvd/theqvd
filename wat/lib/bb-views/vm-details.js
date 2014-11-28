@@ -1,6 +1,7 @@
 Wat.Views.VMDetailsView = Wat.Views.DetailsView.extend({  
     qvdObj: 'vm',
-    
+    liveFields: ['state', 'user_state', 'ip', 'host_id', 'host', 'ssh_port', 'vnc_port', 'serial_port'],
+
     initialize: function (params) {
         this.model = new Wat.Models.VM(params);
         Wat.Views.DetailsView.prototype.initialize.apply(this, [params]);
@@ -103,13 +104,5 @@ Wat.Views.VMDetailsView = Wat.Views.DetailsView.extend({
         }
         
         Wat.A.performAction ('vm_start', {}, {id: this.elementId}, messages, this.fetchDetails, this);
-    },
-    
-    render: function () {
-        Wat.Views.DetailsView.prototype.render.apply(this);
-            
-        var fields = ['state', 'user_state', 'ip', 'host_id', 'host', 'ssh_port', 'vnc_port', 'serial_port'];
-
-        Wat.WS.openDetailsWebsockets(this.qvdObj, this.model, fields);
     }
 });

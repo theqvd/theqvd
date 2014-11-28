@@ -1,6 +1,7 @@
 Wat.Views.OSFDetailsView = Wat.Views.DetailsView.extend({  
     qvdObj: 'osf',
-    
+    liveFields: ['number_of_vms', 'number_of_dis'],
+
     initialize: function (params) {
         this.model = new Wat.Models.OSF(params);
         Wat.Views.DetailsView.prototype.initialize.apply(this, [params]);
@@ -136,13 +137,5 @@ Wat.Views.OSFDetailsView = Wat.Views.DetailsView.extend({
     
     bindEditorEvents: function() {
         Wat.Views.DetailsView.prototype.bindEditorEvents.apply(this);
-    },
-    
-    render: function () {
-        Wat.Views.DetailsView.prototype.render.apply(this);
-            
-        var fields = ['number_of_vms', 'number_of_dis'];
-
-        Wat.WS.openDetailsWebsockets(this.qvdObj, this.model, fields);
     }
 });

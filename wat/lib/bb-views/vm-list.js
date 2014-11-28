@@ -1,6 +1,7 @@
 Wat.Views.VMListView = Wat.Views.ListView.extend({  
     qvdObj: 'vm',
-        
+    liveFields: ['state', 'user_state', 'ip', 'host_id', 'host', 'ssh_port', 'vnc_port', 'serial_port'],
+
     initialize: function (params) {   
         this.collection = new Wat.Collections.VMs(params);
         
@@ -272,13 +273,5 @@ Wat.Views.VMListView = Wat.Views.ListView.extend({
         
         var auxModel = new Wat.Models.VM();
         this.updateModel(arguments, filters, this.fetchList, auxModel);
-    },
-    
-    renderList: function () {
-        Wat.Views.ListView.prototype.renderList.apply(this);
-            
-        var fields = ['state', 'user_state', 'ip', 'host_id', 'host', 'ssh_port', 'vnc_port', 'serial_port'];
-
-        Wat.WS.openListWebsockets(this.qvdObj, this.collection.models, fields);
     }
 });

@@ -1,5 +1,6 @@
 Wat.Views.UserListView = Wat.Views.ListView.extend({
     qvdObj: 'user',
+    liveFields: ['number_of_vms_connected', 'number_of_vms'],
 
     initialize: function (params) {
         this.collection = new Wat.Collections.Users(params);
@@ -55,13 +56,5 @@ Wat.Views.UserListView = Wat.Views.ListView.extend({
         }
                         
         this.createModel(arguments, this.fetchList);
-    },
-    
-    renderList: function () {
-        Wat.Views.ListView.prototype.renderList.apply(this);
-            
-        var fields = ['number_of_vms_connected', 'number_of_vms'];
-
-        Wat.WS.openListWebsockets(this.qvdObj, this.collection.models, fields);
     }
 });
