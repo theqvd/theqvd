@@ -468,9 +468,8 @@ public class QvdclientActivity extends Activity
      */
     private List<Connection> getArrayOfConnections() {
     	ArrayList<Connection> a = new ArrayList<Connection>();
-    	// TODO add demo connection
-//    	Connection democonnection = demoConnection();
-//    	a.add(democonnection);
+    	Connection democonnection = demoConnection();
+    	a.add(democonnection);
 		Connection newconnection = new Connection();
 		newconnection.setName(getResources().getString(R.string.newconnection));
 		a.add(newconnection);
