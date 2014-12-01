@@ -9,8 +9,23 @@ use MojoX::Session;
 use File::Copy qw(copy move);
 use File::Basename qw(basename dirname);
 use Mojo::IOLoop::ForkCall;
+use AnyEvent::Pg::Pool;
 
 # MojoX::Session::Transport::WAT Package 
+
+my $pool = AnyEvent::Pg::Pool->new( {host     => cfg('database.host'),
+				     dbname   => cfg('database.name'),
+				     user     => cfg('database.user'),
+				     password => cfg('database.password') },
+				    timeout            => cfg('internal.database.pool.connection.timeout'),
+				    global_timeout     => cfg('internal.database.pool.connection.global_timeout'),
+				    connection_delay   => cfg('internal.database.pool.connection.delay'),
+				    connection_retries => cfg('internal.database.pool.connection.retries'),
+				    size               => cfg('internal.database.pool.size'),
+				    on_connect_error   => sub {},
+				    on_transient_error => sub {},
+                                    );
+
 
 package MojoX::Session::Transport::WAT
 {
@@ -31,9 +46,6 @@ package MojoX::Session::Transport::WAT
 
 # GENERAL CONFIG AND PLUGINS
 
-my $DB_CONNECTION_INFO = "dbi:Pg:dbname=".cfg('database.name').";host=".cfg('database.host');
-plugin PgAsync => {dbi => [$DB_CONNECTION_INFO,cfg('database.user'),cfg('database.password'), 
-			   {AutoCommit => 1, RaiseError => 1}]};
 app->config(hypnotoad => {listen => ['http://192.168.56.101:3000']});
 my $QVD_ADMIN4_API = QVD::Admin4::REST->new();
 
@@ -92,12 +104,7 @@ websocket '/ws' => sub {
 
     for my $channel ($c->get_api_channels($json))
     {
-	$c->app->log->debug("WebSocket listening on channel $channel");
-	my $rcb; $rcb = 
-	sub { $c->pg_listen($channel, sub { 
-	    $c->app->log->debug("WebSocket $channel signal received");
-	    $notification = 1; $rcb->();});};
-	$rcb->();
+	$pool->listen($channel,on_notify => sub { $notification = 1; });
     }
 
     my $recurring = Mojo::IOLoop->recurring(
