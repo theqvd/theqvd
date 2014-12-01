@@ -100,7 +100,10 @@ websocket '/ws' => sub {
     $c->app->log->debug("WebSocket opened");
     $c->inactivity_timeout(30);     
     my $json = $c->get_input_json;
-    my $notification = 1;
+    my $notification = 0;
+
+    my $res = $c->process_api_query($json);
+    $c->send(encode_json($res));
 
     for my $channel ($c->get_api_channels($json))
     {
@@ -128,7 +131,6 @@ websocket '/ws' => sub {
         $c->app->log->debug("WebSocket closed with status $code");});
 
 };
-
 
 app->start;
 
@@ -230,7 +232,17 @@ __DATA__
 <head>                                                                                                                                                                                        
 <title>Web Sockets Proofs</title>                                                                                                                                                             
 <script type="text/javascript">                                                                                                                                                               
-    alert("Hola!!!");
+    
+      var copy = new WebSocket('ws://172.26.9.42:8080/copy?login=superadmin&password=superadmin&disk_image=ubuntu-13.04-i386-qvd.tar.gz');
+
+      copy.onmessage =                                                                                                                                                                          
+        function (event)                                                                                                                                                                      
+        {                                                                                                                                                                                    
+           obj = JSON.parse(event.data);
+           document.getElementById("dis_copy").innerHTML = obj.percentage;                                                                                                                       
+              
+        };                                                                                                                                                                                    
+
       var ws = new WebSocket('ws://172.26.9.42:8080/ws?login=superadmin&password=superadmin&action=qvd_objects_statistics');                                                    
       ws.onmessage =                                                                                                                                                                          
         function (event)                                                                                                                                                                      
@@ -252,6 +264,7 @@ __DATA__
                 document.getElementById("hosts_running").innerHTML = obj.running_hosts_count;                                                                                                                                    document.getElementById("dis_total").innerHTML = obj.dis_count;                                                                                                                       
                 document.getElementById("dis_blocked").innerHTML = obj.blocked_dis_count;                                                                                                                    
                 document.getElementById("osfs_total").innerHTML = obj.osfs_count;
+                ws.send('Hello!!');
               }
               
         };                                                                                                                                                                                    
@@ -264,7 +277,7 @@ __DATA__
 <div>VMs Blocked: <span id="vms_blocked"></span></div><br/>
 <div>VMs Running: <span id="vms_running"></span></div><br/>
 <hr/>
-<div>Users Total: <span id="users_total"></span></div>
+<div>Users Total: <span id="users_total"></span></div><br/>
 <div>Users Blocked: <span id="users_blocked"></span></div><br/>
 <hr/>
 <div>Hosts Total: <span id="hosts_total"></span></div><br/>
@@ -273,6 +286,7 @@ __DATA__
 <hr>
 <div>DIs Total: <span id="dis_total"></span></div><br/>
 <div>DIs Blocked: <span id="dis_blocked"></span></div><br/>
+<div>DI Copy Progress: <span id="dis_copy"></span></div><br/>
 <hr/>
 <div>OSFs Total: <span id="osfs_total"></span></div><br/>
 
