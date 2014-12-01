@@ -86,14 +86,9 @@ get '/proofs' => 'proofs';
 websocket '/ws' => sub {
     my $c = shift;
     $c->app->log->debug("WebSocket opened");
-    $c->inactivity_timeout(30);
-     
+    $c->inactivity_timeout(30);     
     my $json = $c->get_input_json;
-
-    my $cb = sub {
-	my $res = $c->process_api_query($json);
-	$c->send(encode_json($res));
-    };
+    my $notification = 1;
 
     for my $channel ($c->get_api_channels($json))
     {
@@ -101,11 +96,16 @@ websocket '/ws' => sub {
 	my $rcb; $rcb = 
 	sub { $c->pg_listen($channel, sub { 
 	    $c->app->log->debug("WebSocket $channel signal received");
-	    $cb->();$rcb->();});};
+	    $notification = 1; $rcb->();});};
 	$rcb->();
     }
 
-    $cb->();
+    my $recurring = Mojo::IOLoop->recurring(
+	2 => sub { return 1 unless $notification;
+		   $c->app->log->debug("WebSocket refreshing information");
+		   my $res = $c->process_api_query($json);
+		   $c->send(encode_json($res));
+		   $notification = 0;});
 
     my $timer;
     $c->on(message => sub {
@@ -117,6 +117,7 @@ websocket '/ws' => sub {
     $c->on(finish => sub {
         my ($c, $code) = @_;
         Mojo::IOLoop->remove($timer) if $timer;
+        Mojo::IOLoop->remove($recurring) if $recurring;
         $c->app->log->debug("WebSocket closed with status $code");});
 
 };
@@ -222,18 +223,52 @@ __DATA__
 <head>                                                                                                                                                                                        
 <title>Web Sockets Proofs</title>                                                                                                                                                             
 <script type="text/javascript">                                                                                                                                                               
-      var ws = new WebSocket('ws://localhost:3000/ws?login=superadmin&password=superadmin&action=qvd_objects_statistics');                                                    
+    alert("Hola!!!");
+      var ws = new WebSocket('ws://172.26.9.42:8080/ws?login=superadmin&password=superadmin&action=qvd_objects_statistics');                                                    
       ws.onmessage =                                                                                                                                                                          
         function (event)                                                                                                                                                                      
         {                                                                                                                                                                                    
-              document.getElementById("state").innerHTML = event.data;                                                                                                                       
-              ws.send('Hello!!');                                                                                                                                                             
+              if (event.data == 'AKN')
+              {
+                ws.send('Hello!!');
+              }
+              else
+              {
+                obj = JSON.parse(event.data);
+                document.getElementById("vms_total").innerHTML = obj.vms_count;                                                                                                                       
+                document.getElementById("vms_blocked").innerHTML = obj.blocked_vms_count;                                                                                                                       
+                document.getElementById("vms_running").innerHTML = obj.running_vms_count;                                                                                                                       
+                document.getElementById("users_total").innerHTML = obj.users_count;                                                                                                                       
+                document.getElementById("users_blocked").innerHTML = obj.blocked_users_count;                                                                                                                    
+                document.getElementById("hosts_total").innerHTML = obj.hosts_count;                                                                                                                    
+                document.getElementById("hosts_blocked").innerHTML = obj.blocked_hosts_count;                                                                                                                    
+                document.getElementById("hosts_running").innerHTML = obj.running_hosts_count;                                                                                                                                    document.getElementById("dis_total").innerHTML = obj.dis_count;                                                                                                                       
+                document.getElementById("dis_blocked").innerHTML = obj.blocked_dis_count;                                                                                                                    
+                document.getElementById("osfs_total").innerHTML = obj.osfs_count;
+              }
+              
         };                                                                                                                                                                                    
                                                                                                                                                                                               
 </script>                                                                                                                                                                                     
 </head>                                                                                                                                                                                       
 <body>                                                                                                                                                                                        
-<div id="state"></div>                                                                                                                                                                        
+
+<div>VMs Total: <span id="vms_total"></span></div><br/>
+<div>VMs Blocked: <span id="vms_blocked"></span></div><br/>
+<div>VMs Running: <span id="vms_running"></span></div><br/>
+<hr/>
+<div>Users Total: <span id="users_total"></span></div>
+<div>Users Blocked: <span id="users_blocked"></span></div><br/>
+<hr/>
+<div>Hosts Total: <span id="hosts_total"></span></div><br/>
+<div>Hosts Blocked: <span id="hosts_blocked"></span></div><br/>
+<div>Hosts Running: <span id="hosts_running"></span></div><br/>
+<hr>
+<div>DIs Total: <span id="dis_total"></span></div><br/>
+<div>DIs Blocked: <span id="dis_blocked"></span></div><br/>
+<hr/>
+<div>OSFs Total: <span id="osfs_total"></span></div><br/>
+
 </body>                                                                                                                                                                                       
 </html>                                                                                                                                                                                       
 
