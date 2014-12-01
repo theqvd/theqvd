@@ -174,7 +174,6 @@ Wat.Views.ListView = Wat.Views.MainView.extend({
         }
         
         var filters = {};
-        var filterNotes = {};
         $.each(this.formFilters, function(name, filter) {
             var filterControl = $(filtersContainer + ' [name="' + name + '"]');
             // If input text box is empty or selected option in a select is All (-1) skip filter control
@@ -183,21 +182,11 @@ Wat.Views.ListView = Wat.Views.MainView.extend({
                     if (filterControl.val() == '-1' || filterControl.val() == undefined) {
                         return true;
                     }
-                    filterNotes[filterControl.attr('name')] = {
-                        'label': $('label[for="' + filterControl.attr('name') + '"]').html(),
-                        'value': filterControl.find('option:selected').html(),
-                        'type': filter.type
-                    };
                     break;
                 case 'text':
                     if (filterControl.val() == '' || filterControl.val() == undefined) {
                         return true;
                     }
-                    filterNotes[filterControl.attr('name')] = {
-                        'label': $('label[for="' + filterControl.attr('name') + '"]').html(),
-                        'value': filterControl.val(),
-                        'type': filter.type
-                    };
                     break;
             }
             
@@ -219,9 +208,41 @@ Wat.Views.ListView = Wat.Views.MainView.extend({
         else {
             this.fetchList();
         }
-        
+    },
+    
+    updateFilterNotes: function () {
         // Show-Hide filter notes only when view is not embeded
         if (this.cid == Wat.CurrentView.cid) {
+            var filtersContainer = '.' + this.cid + ' .filter';
+            
+            var filterNotes = {};
+            $.each(this.formFilters, function(name, filter) {
+                var filterControl = $(filtersContainer + ' [name="' + name + '"]');
+                // If input text box is empty or selected option in a select is All (-1) skip filter control
+                switch(filter.type) {
+                    case 'select':
+                        if (filterControl.val() == '-1' || filterControl.val() == undefined) {
+                            return true;
+                        }
+                        filterNotes[filterControl.attr('name')] = {
+                            'label': $('label[for="' + filterControl.attr('name') + '"]').html(),
+                            'value': filterControl.find('option:selected').html(),
+                            'type': filter.type
+                        };
+                        break;
+                    case 'text':
+                        if (filterControl.val() == '' || filterControl.val() == undefined) {
+                            return true;
+                        }
+                        filterNotes[filterControl.attr('name')] = {
+                            'label': $('label[for="' + filterControl.attr('name') + '"]').html(),
+                            'value': filterControl.val(),
+                            'type': filter.type
+                        };
+                        break;
+                }
+            });
+        
             if ($.isEmptyObject(filterNotes)) {
                 $('.js-filter-notes').hide();
             }
@@ -530,6 +551,8 @@ Wat.Views.ListView = Wat.Views.MainView.extend({
         if (this.liveFields) {
             Wat.WS.openListWebsockets(this.qvdObj, this.collection.models, this.liveFields);
         }
+        
+        this.updateFilterNotes();
     },
     
     // Fill filter selects 
