@@ -1407,7 +1407,7 @@ COPY acl_role_relations (id, acl_id, role_id, positive) FROM stdin;
 -- Name: acl_role_relations_id_seq; Type: SEQUENCE SET; Schema: public; Owner: qvd
 --
 
-SELECT pg_catalog.setval('acl_role_relations_id_seq', 1030, true);
+SELECT pg_catalog.setval('acl_role_relations_id_seq', 1031, true);
 
 
 --
@@ -1696,6 +1696,10 @@ COPY administrator_views_setups (id, administrator_id, field, visible, device_ty
 42	1	serial_port	f	desktop	list_column	f	vm
 41	1	ssh_port	f	desktop	list_column	f	vm
 43	1	vnc_port	f	desktop	list_column	f	vm
+44	10	connected_vms	t	desktop	list_column	f	user
+45	10	info	t	desktop	list_column	f	user
+46	10	dis	t	desktop	list_column	f	osf
+47	10	vms	t	desktop	list_column	f	osf
 \.
 
 
@@ -1703,7 +1707,7 @@ COPY administrator_views_setups (id, administrator_id, field, visible, device_ty
 -- Name: administrator_views_setups_id_seq; Type: SEQUENCE SET; Schema: public; Owner: qvd
 --
 
-SELECT pg_catalog.setval('administrator_views_setups_id_seq', 43, true);
+SELECT pg_catalog.setval('administrator_views_setups_id_seq', 47, true);
 
 
 --
@@ -1712,7 +1716,6 @@ SELECT pg_catalog.setval('administrator_views_setups_id_seq', 43, true);
 
 COPY administrators (id, name, password, tenant_id) FROM stdin;
 3	ana	ana	1
-10	maria_root	maria	1
 11	manolo_op	manolo	1
 12	gabriel_root	gabriel	7
 13	gemma_op	gemma	7
@@ -1723,6 +1726,7 @@ COPY administrators (id, name, password, tenant_id) FROM stdin;
 18	truman	truman	1
 19	bigbro	bigbro	0
 1	superadmin	superadmin	0
+10	maria_root	maria_root	1
 \.
 
 
@@ -1738,6 +1742,19 @@ SELECT pg_catalog.setval('administrators_id_seq', 19, true);
 --
 
 COPY configs (key, value) FROM stdin;
+vm.network.netmask	24
+vm.network.gateway	10.3.15.1
+vm.network.bridge	qvdnet0
+vm.hypervisor	lxc
+vm.lxc.unionfs.bind.ro	0
+vm.lxc.unionfs.type	unionfs-fuse
+command.unionfs-fuse	/usr/bin/unionfs-fuse
+log.level	ALL
+log.devel	DEBUG
+client.use_ssl	1
+l7r.use_ssl	1
+client.ssl.use_cert	1
+vm.network.ip.start	10.3.15.50
 \.
 
 
@@ -1776,8 +1793,9 @@ COPY di_tags (id, di_id, tag, fixed) FROM stdin;
 106	20	v12	f
 1122	16	head	f
 1376	21	head	f
-590	14	default	f
-1275	14	head	f
+1520	4	default	f
+1521	4	Real Ubuntu	t
+1522	4	head	f
 \.
 
 
@@ -1785,7 +1803,7 @@ COPY di_tags (id, di_id, tag, fixed) FROM stdin;
 -- Name: di_tags_id_seq; Type: SEQUENCE SET; Schema: public; Owner: qvd
 --
 
-SELECT pg_catalog.setval('di_tags_id_seq', 1519, true);
+SELECT pg_catalog.setval('di_tags_id_seq', 1522, true);
 
 
 --
@@ -1801,6 +1819,7 @@ COPY dis (id, osf_id, path, blocked, version) FROM stdin;
 21	17	gSLES-14.tgz	f	2014-11-04-001
 16	15	mSLES-12.tgz	f	2014-11-04-000
 14	14	mUbuntu-12.tgz	t	2014-11-04-000
+4	14	4-ubuntu-13.04-i386-qvd.tar.gz	f	Real Ubuntu
 \.
 
 
@@ -1808,7 +1827,7 @@ COPY dis (id, osf_id, path, blocked, version) FROM stdin;
 -- Name: dis_id_seq; Type: SEQUENCE SET; Schema: public; Owner: qvd
 --
 
-SELECT pg_catalog.setval('dis_id_seq', 225, true);
+SELECT pg_catalog.setval('dis_id_seq', 226, true);
 
 
 --
@@ -1844,9 +1863,9 @@ COPY host_properties (host_id, key, value) FROM stdin;
 --
 
 COPY host_runtimes (host_id, pid, ok_ts, usable_ram, usable_cpu, state, blocked, cmd) FROM stdin;
-1	\N	\N	\N	\N	stopped	f	\N
 4	\N	\N	\N	\N	stopped	f	\N
 3	\N	\N	\N	\N	stopped	f	\N
+1	1447	2014-12-02 13:38:04.169139	3080.136	5590.208	running	f	\N
 \.
 
 
@@ -1868,9 +1887,9 @@ lost
 --
 
 COPY hosts (id, name, address, frontend, backend) FROM stdin;
-1	Host 1	1.1.1.1	t	t
 3	Host 2	2.2.2.2	t	t
 4	Host 3	3.3.3.3	t	t
+1	QVD4	10.3.15.1	t	t
 \.
 
 
@@ -3058,6 +3077,24 @@ eee8d0bd686e4e3129834262b401b5cc5571639b	BQgDAAAAAQiBAAAACGFkbWluX2lk\n	14174460
 9d619d6e90ceb13477eea32588c01b9838081724	BQgDAAAAAQiSAAAACGFkbWluX2lk\n	1417233667
 ab617c7770c16ff8b5035c18adc33d6b4c253394	BQgDAAAAAQiSAAAACGFkbWluX2lk\n	1417233667
 28f46de030635d9cbd72344f8b734962491135c2	BQgDAAAAAQiBAAAACGFkbWluX2lk\n	1417449525
+6bd7706605928ea8a538c09d08bb64d0514a59c8	BQkDAAAAAQiBAAAACGFkbWluX2lk\n	1417513248
+11fdac02f9b2da4d98196d0ee2f92abd8f036843	BQkDAAAAAQiBAAAACGFkbWluX2lk\n	1417521835
+f276b663864246527bee49790c6a70c2640d1fcf	BQkDAAAAAQiBAAAACGFkbWluX2lk\n	1417520314
+4ce7225ef62a1e93d3d97d4a1b7faaab3fe5c1e5	BQkDAAAAAQiBAAAACGFkbWluX2lk\n	1417520364
+e7a70905b330eab1f7a01068881e3f6fcfd78883	BQkDAAAAAQiBAAAACGFkbWluX2lk\n	1417518195
+5789221f2ef58db3989d716e805f30c71a9fd486	BQkDAAAAAQiBAAAACGFkbWluX2lk\n	1417521707
+c48b077858f4db4d2dc48156a2f4e6ee2a9bb854	BQkDAAAAAQiBAAAACGFkbWluX2lk\n	1417521744
+168b9545f6e40e994e3e30147a7b6a3dd21d882b	BQkDAAAAAQiKAAAACGFkbWluX2lk\n	1417517310
+6de846891836be2c4f620e341c64b0a97230555d	BQkDAAAAAQiBAAAACGFkbWluX2lk\n	1417516419
+1b809b4fd363ccb3ddb0dc0c25e43f74f0b54c62	BQkDAAAAAQiBAAAACGFkbWluX2lk\n	1417523245
+facf4e6e509c3addd0ccfee038149eac53cd8ce0	BQkDAAAAAQiBAAAACGFkbWluX2lk\n	1417528799
+9d49c15bff93628f87ae1398ddde9db403df9697	BQkDAAAAAQiBAAAACGFkbWluX2lk\n	1417518226
+0716479ca1c5633a07b71fbe720797d8ff7e3186	BQkDAAAAAQiBAAAACGFkbWluX2lk\n	1417518465
+9c239306fab0f19a3d9694953b5990a0fd94b7b5	BQkDAAAAAQiBAAAACGFkbWluX2lk\n	1417516045
+12731d07f985c65f523a10849a06dcf81f8566ef	BQkDAAAAAQiBAAAACGFkbWluX2lk\n	1417519822
+271f7f4a6e1b01dc35f5e9a83e51caa45258a7b5	BQkDAAAAAQiBAAAACGFkbWluX2lk\n	1417526722
+291f12f8ff7d68ca04b3d6e84f4a83802e435b62	BQkDAAAAAQiBAAAACGFkbWluX2lk\n	1417526763
+4f4d7cc7e44d66fcdc8450e37db514c360c35d9b	BQkDAAAAAQiBAAAACGFkbWluX2lk\n	1417526778
 \.
 
 
@@ -3075,55 +3112,32 @@ COPY ssl_configs (key, value) FROM stdin;
 
 COPY tenant_views_setups (id, tenant_id, field, visible, device_type, view_type, qvd_object, property) FROM stdin;
 100	0	id	f	desktop	list_column	tenant	f
-60	0	edificio	f	mobile	filter	user	t
-57	0	feeling	f	desktop	list_column	user	t
-64	0	edificio	t	desktop	filter	user	t
-67	0	sex	f	mobile	filter	user	t
-83	0	gat	f	desktop	filter	user	t
-84	0	chuches	f	mobile	filter	user	t
-54	0	edificio	t	desktop	list_column	user	t
 71	0	user	t	mobile	filter	vm	f
 72	0	user	t	desktop	filter	vm	f
-55	0	world	t	desktop	list_column	user	t
 66	0	creation_date	f	desktop	list_column	user	f
 51	0	creation_admin	f	desktop	list_column	user	f
-53	0	casa	t	desktop	list_column	user	t
-70	0	world	f	desktop	filter	user	t
-68	0	sex	f	desktop	filter	user	t
-65	0	feeling	f	desktop	filter	user	t
-62	0	calle	f	desktop	filter	user	t
-73	0	Service Pack	f	desktop	list_column	osf	t
-74	0	Service Pack	t	mobile	filter	osf	t
-75	0	Service Pack	f	desktop	filter	osf	t
 76	1	id	t	desktop	list_column	host	f
 77	1	state	t	desktop	list_column	host	f
 78	1	creation_date	t	desktop	list_column	host	f
 79	1	creation_admin	t	desktop	list_column	host	f
-63	0	casa	t	desktop	filter	user	t
-58	0	calle	f	mobile	filter	user	t
 86	0	state	t	mobile	filter	vm	f
 87	0	name	t	desktop	filter	vm	f
 88	0	next_boot_ip	t	desktop	list_column	vm	f
-82	0	chuches	f	desktop	list_column	user	t
-69	0	world	t	mobile	filter	user	t
-61	0	feeling	f	mobile	filter	user	t
-59	0	casa	f	mobile	filter	user	t
 89	0	connected_vms	t	desktop	list_column	user	f
 81	0	name	t	desktop	filter	user	f
-52	0	calle	t	desktop	list_column	user	t
 90	0	info	t	desktop	list_column	user	f
 80	0	name	t	mobile	filter	user	f
 91	1	name	f	mobile	filter	user	f
-92	1	calle	f	desktop	list_column	user	t
 93	1	id	f	desktop	list_column	user	f
 94	1	vms_connected	f	desktop	list_column	host	f
 95	1	dis	f	desktop	list_column	osf	f
 96	1	vms	f	desktop	list_column	osf	f
 97	1	overlay	t	desktop	list_column	osf	f
-85	0	gat	f	desktop	list_column	user	t
 98	1	id	f	desktop	list_column	vm	f
 99	1	id	f	desktop	list_column	tenant	f
 101	0	name	f	mobile	filter	tenant	f
+102	1	connected_vms	f	desktop	list_column	user	f
+103	1	info	f	desktop	list_column	user	f
 \.
 
 
@@ -3131,7 +3145,7 @@ COPY tenant_views_setups (id, tenant_id, field, visible, device_type, view_type,
 -- Name: tenant_views_setups_id_seq; Type: SEQUENCE SET; Schema: public; Owner: qvd
 --
 
-SELECT pg_catalog.setval('tenant_views_setups_id_seq', 101, true);
+SELECT pg_catalog.setval('tenant_views_setups_id_seq', 103, true);
 
 
 --
@@ -3226,10 +3240,8 @@ busy
 --
 
 COPY vm_counters (vm_id, run_attempts, run_ok) FROM stdin;
-3	0	0
 4	0	0
 5	0	0
-6	0	0
 7	0	0
 8	0	0
 9	0	0
@@ -3237,10 +3249,9 @@ COPY vm_counters (vm_id, run_attempts, run_ok) FROM stdin;
 102	0	0
 103	0	0
 104	0	0
-105	0	0
-106	0	0
-107	0	0
-108	0	0
+6	1	0
+3	3	0
+111	5	5
 \.
 
 
@@ -3260,21 +3271,18 @@ COPY vm_properties (vm_id, key, value) FROM stdin;
 --
 
 COPY vm_runtimes (vm_id, host_id, current_osf_id, current_di_id, user_ip, real_user_id, vm_state, vm_state_ts, vm_cmd, vm_pid, user_state, user_state_ts, user_cmd, vma_ok_ts, l7r_host, l7r_pid, vm_address, vm_vma_port, vm_x_port, vm_ssh_port, vm_vnc_port, vm_mon_port, vm_serial_port, blocked, vm_expiration_soft, vm_expiration_hard, l7r_host_id) FROM stdin;
-6	\N	\N	\N	\N	\N	stopped	\N	\N	\N	disconnected	\N	\N	\N	\N	\N	\N	\N	\N	\N	\N	\N	\N	f	\N	\N	\N
 7	\N	\N	\N	\N	\N	stopped	\N	\N	\N	disconnected	\N	\N	\N	\N	\N	\N	\N	\N	\N	\N	\N	\N	f	\N	\N	\N
 8	\N	\N	\N	\N	\N	stopped	\N	\N	\N	disconnected	\N	\N	\N	\N	\N	\N	\N	\N	\N	\N	\N	\N	f	\N	\N	\N
 9	\N	\N	\N	\N	\N	stopped	\N	\N	\N	disconnected	\N	\N	\N	\N	\N	\N	\N	\N	\N	\N	\N	\N	f	\N	\N	\N
 10	\N	\N	\N	\N	\N	stopped	\N	\N	\N	disconnected	\N	\N	\N	\N	\N	\N	\N	\N	\N	\N	\N	\N	f	\N	\N	\N
-3	\N	\N	\N	\N	\N	stopped	\N	\N	\N	disconnected	\N	\N	\N	\N	\N	\N	\N	\N	\N	\N	\N	\N	t	\N	\N	\N
 4	\N	\N	\N	\N	\N	stopped	\N	\N	\N	disconnected	\N	\N	\N	\N	\N	\N	\N	\N	\N	\N	\N	\N	f	\N	2014-12-02 12:22:00	\N
 5	\N	\N	\N	\N	\N	stopped	\N	\N	\N	disconnected	\N	\N	\N	\N	\N	\N	\N	\N	\N	\N	\N	\N	f	\N	2014-11-30 12:22:00	\N
 102	\N	\N	\N	\N	\N	stopped	\N	\N	\N	disconnected	\N	\N	\N	\N	\N	\N	\N	\N	\N	\N	\N	\N	f	\N	\N	\N
 103	\N	\N	\N	\N	\N	stopped	\N	\N	\N	disconnected	\N	\N	\N	\N	\N	\N	\N	\N	\N	\N	\N	\N	f	\N	\N	\N
 104	\N	\N	\N	\N	\N	stopped	\N	\N	\N	disconnected	\N	\N	\N	\N	\N	\N	\N	\N	\N	\N	\N	\N	f	\N	\N	\N
-105	\N	\N	\N	\N	\N	stopped	\N	\N	\N	disconnected	\N	\N	\N	\N	\N	\N	\N	\N	\N	\N	\N	\N	f	\N	\N	\N
-106	\N	\N	\N	\N	\N	stopped	\N	\N	\N	disconnected	\N	\N	\N	\N	\N	\N	\N	\N	\N	\N	\N	\N	f	\N	\N	\N
-107	\N	\N	\N	\N	\N	stopped	\N	\N	\N	disconnected	\N	\N	\N	\N	\N	\N	\N	\N	\N	\N	\N	\N	f	\N	\N	\N
-108	\N	\N	\N	\N	\N	stopped	\N	\N	\N	disconnected	\N	\N	\N	\N	\N	\N	\N	\N	\N	\N	\N	\N	f	\N	\N	\N
+6	\N	\N	\N	\N	\N	stopped	\N	\N	\N	disconnected	\N	\N	\N	\N	\N	\N	\N	\N	\N	\N	\N	\N	f	\N	\N	\N
+111	1	\N	4	\N	\N	running	\N	\N	\N	disconnected	\N	\N	\N	\N	\N	10.3.15.254	3030	4100	22	0	0	2008	f	\N	\N	\N
+3	\N	\N	\N	\N	\N	stopped	\N	\N	\N	disconnected	\N	\N	\N	\N	\N	\N	\N	\N	\N	\N	\N	\N	f	\N	\N	\N
 \.
 
 
@@ -3308,10 +3316,7 @@ COPY vms (id, name, user_id, osf_id, di_tag, ip, storage) FROM stdin;
 102	a	19	17	default	10.0.255.254	\N
 103	b	19	17	default	10.0.255.253	\N
 104	c	19	17	default	10.0.255.244	\N
-105	aaa	17	15	2014-11-04-000	10.0.255.243	\N
-106	aaaa	17	15	2014-11-04-000	10.0.255.242	\N
-107	aaaaaaa	17	15	2014-11-04-000	10.0.255.241	\N
-108	aaaaaaaaaaad	17	15	2014-11-04-000	10.0.255.240	\N
+111	Machine REAL	17	14	Real Ubuntu	10.3.15.254	\N
 \.
 
 
@@ -3319,7 +3324,7 @@ COPY vms (id, name, user_id, osf_id, di_tag, ip, storage) FROM stdin;
 -- Name: vms_id_seq; Type: SEQUENCE SET; Schema: public; Owner: qvd
 --
 
-SELECT pg_catalog.setval('vms_id_seq', 109, true);
+SELECT pg_catalog.setval('vms_id_seq', 111, true);
 
 
 --
