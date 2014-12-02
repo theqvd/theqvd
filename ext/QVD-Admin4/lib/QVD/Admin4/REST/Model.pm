@@ -394,7 +394,7 @@ my $AVAILABLE_FIELDS =
 		 User => [qw(id name  blocked creation_admin creation_date number_of_vms number_of_vms_connected  properties )],
 
 		 Host => [qw(id name address blocked frontend backend state  load creation_admin creation_date 
-                             number_of_vms_connected number_of_vms properties )],
+                             number_of_vms_connected properties )],
 
 		 DI_Tag => [qw(osf_id name id )],
 
@@ -699,6 +699,8 @@ my $FILTERS_TO_DBIX_FORMAT_MAPPER =
     Role => {
 	'name' => 'me.name',
 	'id' => 'me.id',
+	'fixed' => 'me.fixed',
+	'internal' => 'me.internal',
     },
 
     Tenant => {
