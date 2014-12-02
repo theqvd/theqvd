@@ -5,8 +5,8 @@ Wat.C = {
     password: '',
     loggedIn: false,
     // Openstack
-    //apiUrl: 'http://172.20.126.12:3000/',
-    //apiWSUrl: 'ws://172.20.126.12:3000/ws',
+    apiUrl: 'http://172.20.126.16:3000/',
+    apiWSUrl: 'ws://172.20.126.16:3000/ws',
     
     // Benja
     apiUrl: 'http://172.26.9.42/',

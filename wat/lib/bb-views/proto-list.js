@@ -605,8 +605,6 @@ Wat.Views.ListView = Wat.Views.MainView.extend({
     },
     
     paginationUpdate: function () {  
-        Wat.WS.closeViewWebsockets(this.cid);
-
         this.elementsShown = this.collection.length;
         var totalPages = Math.ceil(this.collection.elementsTotal/this.collection.block);
         var currentPage = this.collection.offset;

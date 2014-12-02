@@ -58,7 +58,7 @@ Wat.WS = {
             // The browser doesn't support WebSocket
             if (Wat.WS.debug) {
                 console.error("WebSocket NOT supported by your Browser!");
-            }
+            } 
         }
     },
     
@@ -69,7 +69,7 @@ Wat.WS = {
         });
     },
     
-    closeViewWebsockets: function (view) {
+    closeViewWebsockets: function (view) {        
         if (this.websockets[view] == undefined) {
             return;
         }
@@ -105,6 +105,8 @@ Wat.WS = {
     },
     
     openListWebsockets: function (qvdObj, models, fields, cid) {
+        this.closeViewWebsockets(cid);
+
         var that = this;
                 
         $.each(models, function (iModel, model) {

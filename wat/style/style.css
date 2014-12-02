@@ -1010,6 +1010,9 @@ body {
             .wrapper .content .home-wrapper .home-row .home-cell .summary-table i {
               width: 20px;
               text-align: center; }
+            .wrapper .content .home-wrapper .home-row .home-cell .summary-table td:last-child {
+              font-weight: bold;
+              font-size: 1em; }
           .wrapper .content .home-wrapper .home-row .home-cell .bar-chart .flot-base, .wrapper .content .home-wrapper .home-row .home-cell .bar-chart .flot-text, .wrapper .content .home-wrapper .home-row .home-cell .bar-chart .flot-overlay {
             top: -6px !important; }
           .wrapper .content .home-wrapper .home-row .home-cell .home-percent-wrapper {
