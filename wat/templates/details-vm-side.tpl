@@ -23,6 +23,20 @@
                             <div class="address" data-wsupdate="ip" data-id="<%= model.get('id') %>"><%=model.get('ip')%></div>
                 <%
                             break;
+                        case 'starting':
+                %>
+                            <div data-i18n data-wsupdate="state-text" data-id="<%= model.get('id') %>">Starting</div>
+                            <div class="fa fa-spinning" data-wsupdate="state" data-id="<%= model.get('id') %>"></div>
+                            <div class="address" data-wsupdate="ip" data-id="<%= model.get('id') %>"><%=model.get('ip')%></div>
+                <%
+                            break;
+                        case 'stopping':
+                %>
+                            <div data-i18n data-wsupdate="state-text" data-id="<%= model.get('id') %>">Stopping</div>
+                            <div class="fa fa-spinning" data-wsupdate="state" data-id="<%= model.get('id') %>"></div>
+                            <div class="address" data-wsupdate="ip" data-id="<%= model.get('id') %>"><%=model.get('ip')%></div>
+                <%
+                            break;
                     }
                 %>
             </div>

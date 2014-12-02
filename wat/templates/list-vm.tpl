@@ -241,6 +241,17 @@
                                 </td>
                 <%
                                 break;
+                            case 'ip':
+                                var invisibleClass = 'invisible';
+                                if (model.get('state') == 'running') {
+                                    invisibleClass = '';
+                                }
+                %>
+                                <td class="desktop">
+                                    <span class="<%= invisibleClass %>" data-wsupdate="<%= name %>" data-id="<%= model.get('id') %>"><%= model.get(name) %></span>
+                                </td>
+                <%
+                                break;
                             default:
                 %>
                                 <td class="desktop" data-wsupdate="<%= name %>" data-id="<%= model.get('id') %>">

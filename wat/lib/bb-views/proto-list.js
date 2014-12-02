@@ -549,7 +549,7 @@ Wat.Views.ListView = Wat.Views.MainView.extend({
         
         // Open websockets for live fields
         if (this.liveFields) {
-            Wat.WS.openListWebsockets(this.qvdObj, this.collection.models, this.liveFields);
+            Wat.WS.openListWebsockets(this.qvdObj, this.collection.models, this.liveFields, this.cid);
         }
         
         this.updateFilterNotes();
@@ -604,7 +604,9 @@ Wat.Views.ListView = Wat.Views.MainView.extend({
         }
     },
     
-    paginationUpdate: function () {        
+    paginationUpdate: function () {  
+        Wat.WS.closeViewWebsockets(this.cid);
+
         this.elementsShown = this.collection.length;
         var totalPages = Math.ceil(this.collection.elementsTotal/this.collection.block);
         var currentPage = this.collection.offset;

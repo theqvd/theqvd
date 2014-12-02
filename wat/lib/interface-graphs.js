@@ -129,7 +129,7 @@ Wat.I.G = {
         ];
 
         $(dataStatSelector).html(data1 + '/' + dataTotal);
-        $(percentStatSelector).html((data1 / dataTotal) * 100 + '%');
+        $(percentStatSelector).html(parseInt((data1 / dataTotal) * 100) + '%');
 
         var plot = $.plot(plotSelector, pieData, {
             series: series,

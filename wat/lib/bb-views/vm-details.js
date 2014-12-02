@@ -1,6 +1,6 @@
 Wat.Views.VMDetailsView = Wat.Views.DetailsView.extend({  
     qvdObj: 'vm',
-    liveFields: ['state', 'user_state', 'ip', 'host_id', 'host', 'ssh_port', 'vnc_port', 'serial_port'],
+    liveFields: ['state', 'user_state', 'ip', 'host_id', 'host_name', 'ssh_port', 'vnc_port', 'serial_port'],
 
     initialize: function (params) {
         this.model = new Wat.Models.VM(params);
@@ -99,10 +99,19 @@ Wat.Views.VMDetailsView = Wat.Views.DetailsView.extend({
     
     startVM: function () {
         var messages = {
-            'success': 'Successfully started',
+            'success': 'Successfully require to be started',
             'error': 'Error starting VM'
         }
         
-        Wat.A.performAction ('vm_start', {}, {id: this.elementId}, messages, this.fetchDetails, this);
+        Wat.A.performAction ('vm_start', {}, {id: this.elementId}, messages, function(){}, this);
+    },
+    
+    stopVM: function () {
+        var messages = {
+            'success': 'Successfully required to be stopped',
+            'error': 'Error stopping VM'
+        }
+        
+        Wat.A.performAction ('vm_stop', {}, {id: this.elementId}, messages, function(){}, this);
     }
 });

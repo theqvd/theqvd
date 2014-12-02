@@ -63,7 +63,8 @@ Wat.Views.DetailsView = Wat.Views.MainView.extend({
         'click .js-button-block': 'applyBlock', 
         'click .js-button-delete': 'askDelete',
         'click .js-button-default': 'applyDefault',
-        'click .js-button-start-vm': 'startVM'
+        'click .js-button-start-vm': 'startVM',
+        'click .js-button-stop-vm': 'stopVM'
     },
 
     render: function () {
@@ -89,8 +90,10 @@ Wat.Views.DetailsView = Wat.Views.MainView.extend({
             nextBread = nextBread.next;
         }
         
-        // Add name of the model to breadcrumbs if not exist
-        nextBread.screen = nextBread.screen || this.model.get('name');
+        if (this.qvdObj != 'di') {
+            // Add name of the model to breadcrumbs if not exist
+            nextBread.screen = this.model.get('name');
+        }
         
         if (this.notFound) {
             this.template = _.template(
@@ -145,7 +148,7 @@ Wat.Views.DetailsView = Wat.Views.MainView.extend({
         
         // Open websockets for live fields
         if (this.liveFields) {
-            Wat.WS.openDetailsWebsockets(this.qvdObj, this.model, this.liveFields);
+            Wat.WS.openDetailsWebsockets(this.qvdObj, this.model, this.liveFields, this.cid);
         }
     },
     

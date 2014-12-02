@@ -194,6 +194,8 @@
     "Stopped": "Stopped",
     "Stopping": "Stopping",
     "Successfully created": "Successfully created",
+    "Successfully required to be started": "Successfully required to be started",
+    "Successfully required to be stopped": "Successfully required to be stopped",
     "Successfully updated": "Successfully updated",
     "Summary": "Summary",
     "Tags": "Tags",

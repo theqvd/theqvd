@@ -81,12 +81,11 @@ Wat.Views.HomeView = Wat.Views.MainView.extend({
         this.printBreadcrumbs(this.breadcrumbs, '');
         
         // Open websockets for live fields
-        Wat.WS.openStatsWebsockets(this.qvdObj, this.liveFields);
+        Wat.WS.openStatsWebsockets(this.qvdObj, this.liveFields, this.cid);
     },
     
     renderVmsExpire: function () {
         this.templateHomeVmsExpire = Wat.A.getTemplate(this.homeTemplateVmsExpireName);
-        
         // Fill the html with the template and the model
         this.template = _.template(
             this.templateHomeVmsExpire, {

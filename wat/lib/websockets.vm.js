@@ -8,21 +8,30 @@ Wat.WS.changeWebsocketVm = function (id, field, data) {
                     $('[data-wsupdate="state"][data-id="' + id + '"]').attr('class', 'fa fa-play');
                     $('[data-wsupdate="state"][data-id="' + id + '"]').attr('title', i18n.t('Running'));                                
                     $('[data-wsupdate="state-text"][data-id="' + id + '"]').html(i18n.t('Running'));                                
-                    $('[data-wsupdate="state-button"][data-id="' + id + '"]').removeClass('js-button-start-vm fa-start').addClass('js-button-stop-vm fa-stop').attr('title', i18n.t('Stop')).removeClass('disabled');                                   
-                    $('[data-wsupdate="ip"][data-id="' + id + '"]').removeClass('invisible');                             
+                    $('[data-wsupdate="state-button"][data-id="' + id + '"]').removeClass('js-button-start-vm fa-play').addClass('js-button-stop-vm fa-stop').attr('title', i18n.t('Stop'));                                   
+                    $('[data-wsupdate="ip"][data-id="' + id + '"]').removeClass('invisible');   
+                    $('.remote-administration-buttons a').removeClass('disabled');                                       
                     break;
                 case 'stopped':
                     $('[data-wsupdate="state"][data-id="' + id + '"]').attr('class', 'fa fa-stop');
                     $('[data-wsupdate="state"][data-id="' + id + '"]').attr('title', i18n.t('Stopped'));
                     $('[data-wsupdate="state-text"][data-id="' + id + '"]').html(i18n.t('Stopped'));
-                    $('[data-wsupdate="state-button"][data-id="' + id + '"]').removeClass('js-button-stop-vm fa-stop').addClass('js-button-start-vm fa-start').attr('title', i18n.t('Start')).removeClass('disabled');                                       
+                    $('[data-wsupdate="state-button"][data-id="' + id + '"]').removeClass('js-button-stop-vm fa-stop').addClass('js-button-start-vm fa-play').attr('title', i18n.t('Start'));                                       
                     $('[data-wsupdate="ip"][data-id="' + id + '"]').addClass('invisible');                           
                     break;
-                default:
+                case 'starting':
                     $('[data-wsupdate="state"][data-id="' + id + '"]').attr('class', 'fa fa-spinner fa-spin');
-                    $('[data-wsupdate="state"][data-id="' + id + '"]').attr('title',  data);
-                    $('[data-wsupdate="state-text"][data-id="' + id + '"]').html(data);  
-                    $('[data-wsupdate="state-button"][data-id="' + id + '"]').addClass('disabled');                                       
+                    $('[data-wsupdate="state"][data-id="' + id + '"]').attr('title', i18n.t('Starting'));
+                    $('[data-wsupdate="state-text"][data-id="' + id + '"]').html(i18n.t('Starting'));  
+                    $('[data-wsupdate="state-button"][data-id="' + id + '"]').removeClass('js-button-start-vm fa-play').addClass('js-button-stop-vm fa-stop').attr('title', i18n.t('Stop'));   
+                    $('[data-wsupdate="ip"][data-id="' + id + '"]').removeClass('invisible');  
+                    break;
+                case 'stopping':
+                    $('[data-wsupdate="state"][data-id="' + id + '"]').attr('class', 'fa fa-spinner fa-spin');
+                    $('[data-wsupdate="state"][data-id="' + id + '"]').attr('title', i18n.t('Stopping'));
+                    $('[data-wsupdate="state-text"][data-id="' + id + '"]').html(i18n.t('Stopping'));  
+                    $('[data-wsupdate="state-button"][data-id="' + id + '"]').removeClass('js-button-start-vm fa-play').addClass('js-button-stop-vm fa-stop').attr('title', i18n.t('Stop'));   
+                    $('.remote-administration-buttons a').addClass('disabled');                                       
                     $('[data-wsupdate="ip"][data-id="' + id + '"]').removeClass('invisible');  
                     break;
             }
@@ -47,8 +56,14 @@ Wat.WS.changeWebsocketVm = function (id, field, data) {
         case 'host_id':
             $('[data-wsupdate="host"][data-id="' + id + '"] a').attr('href', '#/host/' + data); 
             break;
-        case 'host':
-            $('[data-wsupdate="host"][data-id="' + id + '"] a').html(data); 
+        case 'host_name':
+            if ($('[data-wsupdate="host"][data-id="' + id + '"] a').length > 0) {
+                var hostNameContainer = $('[data-wsupdate="host"][data-id="' + id + '"] a');
+            }
+            else {
+                var hostNameContainer = $('[data-wsupdate="host"][data-id="' + id + '"]');
+            }
+            hostNameContainer.html(data); 
             break;
     }
 }
