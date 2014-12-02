@@ -589,6 +589,7 @@ sub vm_start
 	$failures->{$vm->id} = QVD::Admin4::Exception->new(exception => $@)->json; 
     }
 
+    notify("qvd_admin4_vm_start");
     notify("qvd_cmd_for_vm_on_host$_") for keys %host;
     QVD::Admin4::Exception->throw(failures => $failures) 
 	if defined $failures;  
@@ -622,6 +623,7 @@ sub vm_stop
 	    $vm->vm_runtime->vm_cmd eq 'start'; 
     }
 
+    notify("qvd_admin4_vm_stop");
     notify("qvd_cmd_for_vm_on_host$_") for keys %host;
     QVD::Admin4::Exception->throw(failures => $failures) 
 	if defined $failures;  
@@ -1043,7 +1045,7 @@ sub top_populated_hosts
     my @hosts = sort { $b->{number_of_vms} <=> $a->{number_of_vms} }
                 map {{ name          => $_->name, 
 		       id            => $_->id,
-		       number_of_vms => $_->vms_connected }} 
+		       number_of_vms => $_->vms_count }} 
                 $rs->all;
     my $array_limit = $#hosts > 5 ? 5 : $#hosts;    
     return [@hosts[0 .. $array_limit]];
@@ -1102,7 +1104,7 @@ sub config_set
 {
     my ($self,$request) = @_;
     my $result = $self->create_or_update($request);
-    notify(qvd_config_changed);
+#    notify(qvd_config_changed);
     QVD::Config::reload();
     $result;
 }
@@ -1112,7 +1114,7 @@ sub config_default
     my ($self,$request) = @_;
 
     my $result = $self->delete($request, conditions => [qw(is_custom_config)]);
-    notify(qvd_config_changed);
+#    notify(qvd_config_changed);
     QVD::Config::reload();
     $result;
 }
@@ -1122,7 +1124,7 @@ sub config_delete
     my ($self,$request) = @_;
 
     my $result = $self->delete($request, conditions => [qw(is_not_custom_config)]);
-    notify(qvd_config_changed);
+#    notify(qvd_config_changed);
     QVD::Config::reload();
     $result;
 }
