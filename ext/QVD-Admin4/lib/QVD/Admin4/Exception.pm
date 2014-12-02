@@ -21,7 +21,7 @@ my $code2message_mapper =
 
     2100 => 'No connection to database',
     2210 => 'Unable to copy disk image from staging',
-    2211 => 'Unable to copy whole disk image from staging',
+    2211 => 'Unable to copy whole disk image (lack of space?)',
     2220 => 'Unable to find images directory in filesystem',
     2230 => 'Unable to find staging directory in filesystem',
     2240 => 'Unable to find disk image in staging directory',

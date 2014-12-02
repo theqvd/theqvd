@@ -1,4 +1,4 @@
-#!/usr/lib/qvd/bin/perl
+#!/usr/lib/qvd/bin/perl                                                                                                                                                                                                                                                                                                                                                                     
 use Mojolicious::Lite;
 use lib::glob '/home/benjamin/wat/*/lib/';
 use QVD::Admin4::REST;
@@ -7,7 +7,6 @@ use QVD::Admin4::Exception;
 use QVD::Config;
 use MojoX::Session;
 use File::Copy qw(copy move);
-use File::Basename qw(basename dirname);
 use Mojo::IOLoop::ForkCall;
 use AnyEvent::Pg::Pool;
 
@@ -32,13 +31,13 @@ package MojoX::Session::Transport::WAT
     use base qw(MojoX::Session::Transport);
 
     sub get {
-        my ($self) = @_;
+	my ($self) = @_;
 	my $sid = $self->tx->req->params->param('sid');
 	return $sid;
     }
 
     sub set {
-        my ($self, $sid, $expires) = @_;
+	my ($self, $sid, $expires) = @_;
 	$self->tx->res->headers->header('sid' => $sid);
 	return 1;
     }
@@ -122,7 +121,7 @@ websocket '/ws' => sub {
         my ($c, $msg) = @_;
         $c->app->log->debug("WebSocket $msg signal received");
 	Mojo::IOLoop->remove($timer) if $timer;
-	$timer = Mojo::IOLoop->timer(5 => sub { $c->send('AKN');});});
+	$timer = Mojo::IOLoop->timer(25 => sub { $c->send('AKN');});});
 
     $c->on(finish => sub {
         my ($c, $code) = @_;
@@ -144,14 +143,14 @@ sub get_input_json
     my $json = $c->req->json;
     return $json if $json;
     $json =  { map { $_ => $c->param($_) } $c->param };
-    
-    eval 
-    { 
-	$json->{filters} = decode_json($json->{filters}) if exists $json->{filters};
-	$json->{arguments} = decode_json($json->{arguments}) if exists $json->{arguments};
-	$json->{order_by} = decode_json($json->{order_by}) if exists $json->{order_by} 
+
+    eval
+    {
+        $json->{filters} = decode_json($json->{filters}) if exists $json->{filters};
+        $json->{arguments} = decode_json($json->{arguments}) if exists $json->{arguments};
+        $json->{order_by} = decode_json($json->{order_by}) if exists $json->{order_by}
     };
-    
+
     $c->render(json => QVD::Admin4::Exception->new(code => 6100)->json) if $@;
     $json;
 }
@@ -233,20 +232,10 @@ __DATA__
 <title>Web Sockets Proofs</title>                                                                                                                                                             
 <script type="text/javascript">                                                                                                                                                               
     
-      var copy = new WebSocket('ws://172.26.9.42:8080/copy?login=superadmin&password=superadmin&disk_image=ubuntu-13.04-i386-qvd.tar.gz');
-
-      copy.onmessage =                                                                                                                                                                          
-        function (event)                                                                                                                                                                      
-        {                                                                                                                                                                                    
-           obj = JSON.parse(event.data);
-           document.getElementById("dis_copy").innerHTML = obj.percentage;                                                                                                                       
-              
-        };                                                                                                                                                                                    
-
-      var ws = new WebSocket('ws://172.26.9.42:8080/ws?login=superadmin&password=superadmin&action=qvd_objects_statistics');                                                    
+      var ws = new WebSocket('ws://localhost/ws?login=superadmin&password=superadmin&action=qvd_objects_statistics');                                                    
       ws.onmessage =                                                                                                                                                                          
         function (event)                                                                                                                                                                      
-        {                                                                                                                                                                                    
+        {                                                                                                                                                                                   
               if (event.data == 'AKN')
               {
                 ws.send('Hello!!');
@@ -261,9 +250,11 @@ __DATA__
                 document.getElementById("users_blocked").innerHTML = obj.blocked_users_count;                                                                                                                    
                 document.getElementById("hosts_total").innerHTML = obj.hosts_count;                                                                                                                    
                 document.getElementById("hosts_blocked").innerHTML = obj.blocked_hosts_count;                                                                                                                    
-                document.getElementById("hosts_running").innerHTML = obj.running_hosts_count;                                                                                                                                    document.getElementById("dis_total").innerHTML = obj.dis_count;                                                                                                                       
+                document.getElementById("hosts_running").innerHTML = obj.running_hosts_count;                                                                                                                
+                document.getElementById("dis_total").innerHTML = obj.dis_count;                                                                                                                       
                 document.getElementById("dis_blocked").innerHTML = obj.blocked_dis_count;                                                                                                                    
                 document.getElementById("osfs_total").innerHTML = obj.osfs_count;
+
                 ws.send('Hello!!');
               }
               
