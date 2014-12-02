@@ -37,16 +37,20 @@ my $RELATED_VIEWS_IN_DB =
 		 DI => [qw(DI_View)] },		 
 };
 
+
+my $RRRRR = {};
+
 my $ACLS_FOR_FILTERS = 
 {
     VM => { properties => [qr/^vm\.filter\.properties$/], 
 	    name => [qr/^vm\.filter\.name$/],
-	    user_id => [qr/^vm\.filter\.user$/],
+	    user_id => [qr/^vm\.filter\.user|user\.see\.vm-list$/],
 	    user_name => [qr/^vm\.filter\.user$/],
-	    osf_id => [qr/^vm\.filter\.osf$/],
+	    osf_id => [qr/^vm\.filter\.osf|osf\.see\.vm-list$/],
 	    osf_name => [qr/^vm\.filter\.osf$/],
+	    di_id => [qr/^vm\.filter\.di|di\.see\.vm-list$/],
 	    state => [qr/^vm\.filter\.state$/],
-	    host_id => [qr/^vm\.filter\.host$/],
+	    host_id => [qr/^vm\.filter\.host|host\.see\.vm-list$/],
 	    host_name => [qr/^vm\.filter\.host$/]},
 
     User => { properties => [qr/^user\.filter\.properties$/], 
@@ -57,9 +61,9 @@ my $ACLS_FOR_FILTERS =
 	      vm_id => [qr/^host\.filter\.vm$/]},
 
     DI => { properties => [qr/^di\.filter\.properties$/],
-	    disk_image => [qr/^host\.filter\.disk-image$/],
-	    osf_id => [qr/^host\.filter\.osf$/],
-	    osf_name => [qr/^host\.filter\.osf$/]},
+	    disk_image => [qr/^di\.filter\.disk-image$/],
+	    osf_id => [qr/^di\.filter\.osf|osf\.see\.di-list$/],
+	    osf_name => [qr/^di\.filter\.osf$/]},
 
     OSF => { properties => [qr/^osf\.filter\.properties$/],
 	     name => [qr/^osf\.filter\.name$/],
@@ -179,8 +183,8 @@ my $ACLS_FOR_ARGUMENTS_IN_UPDATE =
     DI => { blocked => [qr/^di\.update\.block$/],
 	    __properties_changes__set => [qr/^di\.update\.properties-(cre|upd)ate$/],
 	    __properties_changes__delete => [qr/^di\.update\.properties-delete$/],
-	    __tags_changes__create => [qr/^di\.update\.(tags|defaults)$/],
-	    __tags_changes__delete => [qr/^di\.update\.(tags|defaults)$/]},
+	    __tags_changes__create => [qr/^(di\.update\.(tags|defaults)|osf\.see\.di-list-default-update)$/],
+	    __tags_changes__delete => [qr/^(di\.update\.(tags|defaults)|osf\.see\.di-list-default-update)$/]},
 
     Role => { name => [qr/^role\.update\.name$/],
 	      __acls_changes__assign_acls => [qr/^role\.update\.assign-acl$/],
@@ -329,7 +333,7 @@ my $AVAILABLE_FILTERS =
 
     details => { Config => [qw(key value)], default => [qw(id tenant_id)], Host => [qw(id)], Role => [qw(id)], ACL => [qw(id)], Tenant => [qw(id)] },
 		
-    tiny => { default => [qw(tenant_id)], Host => [qw()], Role => [qw()], ACL => [qw(name)], Tenant => [qw()], DI_Tag => [qw(tenant_id osf_id)]},
+    tiny => { default => [qw(tenant_id)], Host => [qw()], Role => [qw(internal fixed)], ACL => [qw(name)], Tenant => [qw()], DI_Tag => [qw(tenant_id osf_id)]},
 
     delete => { default => [qw(id tenant_id)], Host => [qw(id)], ACL => [qw(id)], Role => [qw(id)], Tenant => [qw(id)], Config => [qw(key)]},
 
@@ -394,7 +398,7 @@ my $AVAILABLE_FIELDS =
 		 User => [qw(id name  blocked creation_admin creation_date number_of_vms number_of_vms_connected  properties )],
 
 		 Host => [qw(id name address blocked frontend backend state  load creation_admin creation_date 
-                             number_of_vms_connected properties )],
+                             number_of_vms_connected number_of_vms properties )],
 
 		 DI_Tag => [qw(osf_id name id )],
 
@@ -698,9 +702,9 @@ my $FILTERS_TO_DBIX_FORMAT_MAPPER =
 
     Role => {
 	'name' => 'me.name',
-	'id' => 'me.id',
 	'fixed' => 'me.fixed',
 	'internal' => 'me.internal',
+	'id' => 'me.id',
     },
 
     Tenant => {
