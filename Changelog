@@ -1,4 +1,4 @@
-QVD-3.5.0
+QVD 3.5.0
 =========
 	- Fix #1511: leave printers not configured by QVD untouched
 	- Fix #1507: L7R was responding 'I am alive' even when the host was blocked
