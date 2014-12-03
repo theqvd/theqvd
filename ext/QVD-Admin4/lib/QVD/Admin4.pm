@@ -498,6 +498,22 @@ sub di_create
     QVD::Admin4::Exception->throw(code=>'2240')
 	unless -e "$staging_path/$staging_file";
 
+    my $images_file = $staging_file;
+
+    for (1 .. 5)
+    {
+	eval { copy("$staging_path/$staging_file","$images_path/$images_file") };
+	$@ ? print $@ : last;
+    }
+    if ($@) { QVD::Admin4::Exception->throw(code=>'2210');}
+
+    my $staging_file_size = -s "$staging_path/$staging_file";
+    my $images_file_size = -s "$images_path/$images_file";
+
+    unless ($staging_file_size == $images_file_size) 
+    { unlink "$images_path/$images_file";
+      QVD::Admin4::Exception->throw(code=>'2211');}
+
     my $result = $self->create($request);
     my $di = @{$result->{rows}}[0];
 
@@ -515,22 +531,6 @@ sub di_create
 
     QVD::Admin4::Exception->throw(exception => $@, 
 				  query => 'tags') if $@;	
-
-    my $images_file = $staging_file;
-
-    for (1 .. 5)
-    {
-	eval { copy("$staging_path/$staging_file","$images_path/$images_file") };
-	$@ ? print $@ : last;
-    }
-    if ($@) { $di->delete; QVD::Admin4::Exception->throw(code=>'2210');}
-
-    my $staging_file_size = -s "$staging_path/$staging_file";
-    my $images_file_size = -s "$images_path/$images_file";
-
-    unless ($staging_file_size == $images_file_size) 
-    { $di->delete; unlink "$images_path/$images_file";
-      QVD::Admin4::Exception->throw(code=>'2211');}
 
     $di->update({path => $di->id . '-' . $staging_file});
     move("$images_path/$images_file","$images_path/".$di->id . '-' . $staging_file);

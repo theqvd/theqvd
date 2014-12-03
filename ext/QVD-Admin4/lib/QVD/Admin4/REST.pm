@@ -91,6 +91,12 @@ sub get_channels
    QVD::Admin4::Action->new(name => $action_name )->channels;
 }
 
+sub get_size
+{
+   my ($self,$action_name) = @_;
+   QVD::Admin4::Action->new(name => $action_name )->size;
+}
+
 sub process_standard_query
 {
     my ($self,$action,$json_wrapper,$qvd_object_model) = @_;

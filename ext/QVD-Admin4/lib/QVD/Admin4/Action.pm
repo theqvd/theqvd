@@ -6,6 +6,7 @@ use QVD::Admin4::Exception;
 
 has 'name', is => 'ro', isa => sub { my $name = shift; die "Invalid type for attribute name" if ref($name) || (not defined $name) || $name eq ''; }, required => 1;
 
+my $AVAILABLE_ACTION_SIZES = { default => 'normal', normal => 'normal', heavy => 'heavy' };
 
 my $ACTIONS =
 {
@@ -243,6 +244,7 @@ di_update => { type_of_action => 'update',
 
 di_create => { type_of_action => 'create',
 	       admin4method => 'di_create',
+	       size => $AVAILABLE_ACTION_SIZES->{heavy},
 	       acls => [qr/^di\.create\./],
 	       qvd_object => 'DI'},
 
@@ -453,6 +455,13 @@ sub channels
 {
     my $self = shift;
     $ACTIONS->{$self->name}->{'channels'} || [];
+}
+
+sub size
+{
+    my $self = shift;
+    $ACTIONS->{$self->name}->{'size'} || 
+	$AVAILABLE_ACTION_SIZES->{default};
 }
 
 sub type

@@ -53,7 +53,8 @@ my $QVD_ADMIN4_API = QVD::Admin4::REST->new();
 helper (qvd_admin4_api => sub { $QVD_ADMIN4_API; });
 helper (get_input_json => \&get_input_json);
 helper (process_api_query => \&process_api_query);
-helper (get_api_channels => \&get_api_channels);
+helper (get_action_channels => \&get_action_channels);
+helper (get_action_size => \&get_action_size);
 helper (get_auth_method => \&get_auth_method);
 helper (create_session => \&create_session);
 helper (update_session => \&update_session);
@@ -87,7 +88,9 @@ any '/' => sub {
 
     my $c = shift;
     my $json = $c->get_input_json;
+    my $action_size = $c->get_action_size($json);
     my $response = $c->process_api_query($json);
+
     $c->render(json => $response);
 };
 
@@ -104,7 +107,7 @@ websocket '/ws' => sub {
     my $res = $c->process_api_query($json);
     $c->send(encode_json($res));
 
-    for my $channel ($c->get_api_channels($json))
+    for my $channel ($c->get_action_channels($json))
     {
 	$pool->listen($channel,on_notify => sub { $notification = 1; });
     }
@@ -129,6 +132,36 @@ websocket '/ws' => sub {
         Mojo::IOLoop->remove($recurring) if $recurring;
         $c->app->log->debug("WebSocket closed with status $code");});
 
+};
+
+
+websocket '/copy' => sub {
+    my $c = shift;
+
+    $c->app->log->debug("Staging WebSocket opened");
+    my $json = $c->get_input_json;
+    my $images_path  = cfg('path.storage.images');
+    my $staging_path = cfg('path.storage.staging');
+    my $staging_file = eval { $json->{filters}->{disk_image} } // $c->send('END');
+    $c->send('END') unless -e "$staging_path/$staging_file";
+    my $images_file = $staging_file; 
+    my ($source_size,$target_size) = (0,0);
+
+    my $cb = sub {
+	my $new_source_size = eval { -s "$staging_path/$staging_file" } // 0;
+	my $new_target_size = eval { -s "$images_path/$images_file" } // 0;
+	my $response = $new_target_size < $target_size ? 'END' :
+	    encode_json({ source_size => $source_size,
+			  target_size => $target_size});
+	($source_size,$target_size) = ($new_source_size,$new_target_size);
+	$c->send($response); };
+
+    my $recurring = Mojo::IOLoop->recurring(0.25 => sub { $cb->(); });
+
+    $c->on(finish => sub {
+        my ($c, $code) = @_;
+	Mojo::IOLoop->remove($recurring);
+        $c->app->log->debug("Staging WebSocket closed with status $code");});
 };
 
 app->start;
@@ -158,16 +191,45 @@ sub get_input_json
 sub process_api_query
 {
     my ($c,$json) = @_;
-    my $res = $c->qvd_admin4_api->process_query($json);
-    $res->{sid} = $c->res->headers->header('sid');
-    $res;
+
+    my ($action_name,$action_size,$response) = 
+	($json->{action}, $c->get_action_size($json),undef);
+
+    if ($action_size eq 'heavy')
+    {
+	my $fc = Mojo::IOLoop::ForkCall->new;
+	$fc->run( 
+	    sub { $c->qvd_admin4_api->process_query($json);},
+	    sub { my ($fc, $err) = @_;
+		  my $status = $err ? ": $err" : " successfully";
+		  $c->app->log->debug("Heavy action $action_name finished$status"); }
+	);
+
+	$response = 
+	{ status => 1000, 
+	  message => 'Heavy action running in background'}; 
+    }
+    else
+    {
+	$response = $c->qvd_admin4_api->process_query($json);
+    }
+ 
+    $response->{sid} = $c->res->headers->header('sid');
+    return $response;
 }
 
-sub get_api_channels
+sub get_action_channels
 {
     my ($c,$json) = @_;
     my $channels = $c->qvd_admin4_api->get_channels($json->{action}) // [];
     @$channels;
+}
+
+sub get_action_size
+{
+    my ($c,$json) = @_;
+    my $size = $c->qvd_admin4_api->get_size($json->{action}) 
+	// 'normal';
 }
 
 sub get_auth_method
@@ -231,8 +293,23 @@ __DATA__
 <head>                                                                                                                                                                                        
 <title>Web Sockets Proofs</title>                                                                                                                                                             
 <script type="text/javascript">                                                                                                                                                               
-    
-      var ws = new WebSocket('ws://localhost/ws?login=superadmin&password=superadmin&action=qvd_objects_statistics');                                                    
+
+      var staging = new WebSocket('ws://localhost:3000/copy?login=superadmin&password=superadmin&filters={"disk_image":"ubuntu-13.04-i386-qvd.tar.gz"}');                                                    
+      staging.onmessage =                                                                                                                                                                          
+        function (event)                                                                                                                                                                      
+        {                                                                                                                                                                                   
+                if (event.data == 'END') 
+                { 
+                   staging.close();
+                }
+                else
+                {
+                   obj = JSON.parse(event.data);
+                   document.getElementById("dis_copy").innerHTML = obj.target_size ;                                                                                                                       
+                }
+        };                                                                                                                                                                                    
+
+      var ws = new WebSocket('ws://localhost:3000/ws?login=superadmin&password=superadmin&action=qvd_objects_statistics');                                                    
       ws.onmessage =                                                                                                                                                                          
         function (event)                                                                                                                                                                      
         {                                                                                                                                                                                   
