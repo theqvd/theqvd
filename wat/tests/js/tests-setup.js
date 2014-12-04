@@ -103,7 +103,7 @@ WatTests.values = {
                 getRandomStr(),
                 getRandomStr()
             ],
-            "disk_image": 'kk.gz',
+            "disk_image": 'fake.tgz',
             "version": getRandomStr(),
             "blocked": getRandomStr() > 127 ? 1 : 0,
             "tenant_id": 1,
@@ -262,7 +262,7 @@ WatTests.fakeValues = {
         },
         di: {
             id: getRandomInt(),
-            disk_image: 'kk.gz',
+            disk_image: 'fake.tgz',
             tenant_name: getRandomStr(),
             tenant_id: getRandomInt(),
             osf_name: getRandomStr(),

@@ -1,6 +1,6 @@
 // Config
 Wat.C = {
-    version: '1.7',
+    version: '1.7o',
     login: '',
     password: '',
     loggedIn: false,
@@ -9,8 +9,8 @@ Wat.C = {
     apiWSUrl: 'ws://172.20.126.16:3000/ws',
     
     // Benja
-    apiUrl: 'http://172.26.9.42/',
-    apiWSUrl: 'ws://172.26.9.42/ws',
+    // apiUrl: 'http://172.26.9.42/',
+    // apiWSUrl: 'ws://172.26.9.42/ws',
     loginExpirationDays: 1,
     acls: [],
     aclGroups: {},
