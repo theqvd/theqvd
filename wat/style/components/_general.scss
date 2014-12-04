@@ -126,14 +126,25 @@ fieldset {
     z-index: 2000;
     
     i {
-        font-size: 200px;
+        font-size: 150px;
         color: $col_whiter;
     }
     
     .loading-big-message {
         font-size: 24px;
         color: $col_whiter;
-        margin-bottom: 50px;
+        margin-bottom: 20px;
+    }
+    
+    .loading-little-message {
+        color: $col_whiter;
+        margin-top: 20px;
+    }
+    
+    .loading-block {
+        width: 150px;
+        height: 150px;
+        margin: 0 auto;
     }
     
     .loading-big-box {

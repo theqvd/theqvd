@@ -180,12 +180,19 @@ fieldset {
   opacity: 0.8;
   z-index: 2000; }
   .loading-big i {
-    font-size: 200px;
+    font-size: 150px;
     color: #fdfdfd; }
   .loading-big .loading-big-message {
     font-size: 24px;
     color: #fdfdfd;
-    margin-bottom: 50px; }
+    margin-bottom: 20px; }
+  .loading-big .loading-little-message {
+    color: #fdfdfd;
+    margin-top: 20px; }
+  .loading-big .loading-block {
+    width: 150px;
+    height: 150px;
+    margin: 0 auto; }
   .loading-big .loading-big-box {
     background: black;
     border-radius: 15px;

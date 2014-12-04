@@ -4,13 +4,21 @@ Wat.C = {
     login: '',
     password: '',
     loggedIn: false,
+    // Openstack preprod
+    apiUrl: 'http://172.20.126.12:3000/',
+    apiWSUrl: 'ws://172.20.126.12:3000/ws',  
+    apiAddress: '172.20.126.12:3000',  
+    
     // Openstack
     apiUrl: 'http://172.20.126.16:3000/',
     apiWSUrl: 'ws://172.20.126.16:3000/ws',
-    
+    apiAddress: '172.20.126.16:3000',  
+
     // Benja
-    // apiUrl: 'http://172.26.9.42/',
-    // apiWSUrl: 'ws://172.26.9.42/ws',
+    //apiUrl: 'http://172.26.9.42/',
+    //apiWSUrl: 'ws://172.26.9.42/ws',
+    //apiAddress: '172.26.9.42',  
+
     loginExpirationDays: 1,
     acls: [],
     aclGroups: {},
@@ -203,7 +211,7 @@ Wat.C = {
         else {
             return $.inArray(acl, this.acls) != -1;
         }
-        
+
         return false;
     },
     

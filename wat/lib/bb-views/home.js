@@ -42,6 +42,7 @@ Wat.Views.HomeView = Wat.Views.MainView.extend({
     },
     
     initialize: function (params) {
+        console.log('home');
         Wat.Views.MainView.prototype.initialize.apply(this, [params]);
         Wat.B.bindHomeEvents();
         
@@ -85,6 +86,9 @@ Wat.Views.HomeView = Wat.Views.MainView.extend({
     },
     
     renderVmsExpire: function () {
+        if (!this.stats.vms_with_expiration_date) {
+            return;
+        }
         this.templateHomeVmsExpire = Wat.A.getTemplate(this.homeTemplateVmsExpireName);
         // Fill the html with the template and the model
         this.template = _.template(

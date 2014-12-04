@@ -452,8 +452,10 @@ Wat.Views.ListView = Wat.Views.MainView.extend({
     render: function () {
         var that = this;
         
+        var embeddedView = that.qvdObj != Wat.CurrentView.qvdObj;
+        
         // If user have not access to main section, redirect to home
-        if (that.whatRender && !Wat.C.checkACL(that.qvdObj + '.see-main.')) {
+        if (!embeddedView && that.whatRender && !Wat.C.checkACL(that.qvdObj + '.see-main.')) {
             Wat.Router.app_router.trigger('route:defaultRoute');
             return;
         }
@@ -695,9 +697,6 @@ Wat.Views.ListView = Wat.Views.MainView.extend({
                 $(this).dialog('close');
             },
             Create: function (e) {
-                if (Wat.CurrentView.qvdObj == 'di') {
-                    Wat.I.loadingBlock($.i18n.t('Please, wait while action is performed') + '<br><br>' + $.i18n.t('Do not close or refresh the window'));
-                }
                 that.dialog = $(this);
                 that.createElement($(this));
             }

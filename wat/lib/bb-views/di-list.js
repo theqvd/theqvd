@@ -127,6 +127,39 @@ Wat.Views.DIListView = Wat.Views.ListView.extend({
             arguments['tenant_id'] = tenant_id;
         }
         
-        this.createModel(arguments, this.fetchList);
+        //this.createModel(arguments, this.fetchList);
+        this.heavyCreate(arguments);
+    },
+    
+    heavyCreate: function (args) {
+        // Di creation is a heavy operation. Screen will be blocked and a progress graph shown
+        Wat.I.loadingBlock($.i18n.t('Please, wait while action is performed') + '<br><br>' + $.i18n.t('Do not close or refresh the window'));
+        Wat.WS.openWebsocket (this.qvdObj, 'di_create', {}, args, [], this.creatingProcess, 'staging');
+    },
+    
+    creatingProcess: function (qvdObj, id, data, ws) {
+        if (data.status == 1000) {
+            if (data.total_size == 0) {
+                var percent = 100;
+            }
+            else {
+                var percent = parseInt((data.copy_size / data.total_size) * 100);
+            }
+            
+            var progressData = [data.copy_size, data.total_size - data.copy_size];
+            Wat.I.G.drawPieChartSimple('loading-block', progressData);
+            
+            $('.loading-little-message').html(parseInt(data.copy_size/(1024*1024)) + 'MB / ' + parseInt(data.total_size/(1024*1024)) + 'MB');
+        }
+        
+        if (data.status == STATUS_SUCCESS) {
+            if (ws.readyState == 1) {
+                ws.close();
+            }           
+            Wat.I.loadingUnblock();
+            $(".ui-dialog-buttonset button:first-child").trigger('click');
+            Wat.CurrentView.fetchList();
+            Wat.I.showMessage({message: i18n.t('Successfully created'), messageType: 'success'});
+        }
     }
 });

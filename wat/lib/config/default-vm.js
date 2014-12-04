@@ -98,7 +98,7 @@ Wat.I.listFields[qvdObj] = {
         'acls': 'vm.see.di-version',
         'display': false
     },
-    'disk_image': {
+    'di_name': {
         'text': 'Disk image',
         'fields': [
             'di_name',

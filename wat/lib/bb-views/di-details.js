@@ -106,7 +106,7 @@ Wat.Views.DIDetailsView = Wat.Views.DetailsView.extend({
         this.breadcrumbs.next.next.screen = this.model.get('disk_image');
         this.notFound = this.model.attributes.disk_image == undefined;
         
-        Wat.Views.DetailsView.prototype.render.apply(this);
+        Wat.Views.DetailsView.prototype.render.apply(this);        
     },
     
     openEditElementDialog: function(e) {
