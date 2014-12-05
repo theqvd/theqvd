@@ -42,7 +42,6 @@ Wat.Views.HomeView = Wat.Views.MainView.extend({
     },
     
     initialize: function (params) {
-        console.log('home');
         Wat.Views.MainView.prototype.initialize.apply(this, [params]);
         Wat.B.bindHomeEvents();
         

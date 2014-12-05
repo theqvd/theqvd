@@ -17,14 +17,12 @@ Wat.WS.changeWebsocketVm = function (id, field, data) {
                     $('[data-wsupdate="state"][data-id="' + id + '"]').attr('title', i18n.t('Stopped'));
                     $('[data-wsupdate="state-text"][data-id="' + id + '"]').html(i18n.t('Stopped'));
                     $('[data-wsupdate="state-button"][data-id="' + id + '"]').removeClass('js-button-stop-vm fa-stop').addClass('js-button-start-vm fa-play').attr('title', i18n.t('Start'));                                       
-                    $('[data-wsupdate="ip"][data-id="' + id + '"]').addClass('invisible');                           
                     break;
                 case 'starting':
                     $('[data-wsupdate="state"][data-id="' + id + '"]').attr('class', 'fa fa-spinner fa-spin');
                     $('[data-wsupdate="state"][data-id="' + id + '"]').attr('title', i18n.t('Starting'));
                     $('[data-wsupdate="state-text"][data-id="' + id + '"]').html(i18n.t('Starting'));  
                     $('[data-wsupdate="state-button"][data-id="' + id + '"]').removeClass('js-button-start-vm fa-play').addClass('js-button-stop-vm fa-stop').attr('title', i18n.t('Stop'));   
-                    $('[data-wsupdate="ip"][data-id="' + id + '"]').removeClass('invisible');  
                     break;
                 case 'stopping':
                     $('[data-wsupdate="state"][data-id="' + id + '"]').attr('class', 'fa fa-spinner fa-spin');
@@ -32,7 +30,6 @@ Wat.WS.changeWebsocketVm = function (id, field, data) {
                     $('[data-wsupdate="state-text"][data-id="' + id + '"]').html(i18n.t('Stopping'));  
                     $('[data-wsupdate="state-button"][data-id="' + id + '"]').removeClass('js-button-start-vm fa-play').addClass('js-button-stop-vm fa-stop').attr('title', i18n.t('Stop'));   
                     $('.remote-administration-buttons a').addClass('disabled');                                       
-                    $('[data-wsupdate="ip"][data-id="' + id + '"]').removeClass('invisible');  
                     break;
             }
             break;

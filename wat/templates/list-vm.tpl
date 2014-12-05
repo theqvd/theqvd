@@ -242,13 +242,30 @@
                 <%
                                 break;
                             case 'ip':
-                                var invisibleClass = 'invisible';
-                                if (model.get('state') == 'running') {
-                                    invisibleClass = '';
-                                }
                 %>
                                 <td class="desktop">
-                                    <span class="<%= invisibleClass %>" data-wsupdate="<%= name %>" data-id="<%= model.get('id') %>"><%= model.get(name) %></span>
+                                    <span class="" data-wsupdate="<%= name %>" data-id="<%= model.get('id') %>"><%= model.get(name) %></span>
+                                    <% if (Wat.C.checkACL('vm.see.next-boot-ip') && model.get('next_boot_ip') && model.get('next_boot_ip') != model.get('ip')) { %>
+                                    <div class="second_row"><span data-i18n>Next<span/>: <%= model.get('next_boot_ip') %></div>
+                                    <% } %>
+                                </td>
+                <%
+                                break;
+                            case 'di_name':
+                %>
+                                <td class="desktop">
+                                    <%= Wat.C.ifACL('<a href="#/di/' + model.get('di_id') + '" data-i18n="[title]Click for details">', 'di.see-details.') %>
+                                        <%= model.get('di_name') %>
+                                    <%= Wat.C.ifACL('</a>', 'di.see-details.') %>
+                                </td>
+                <%
+                                break;
+                            case 'di_version':
+                %>
+                                <td class="desktop">
+                                    <%= Wat.C.ifACL('<a href="#/di/' + model.get('di_id') + '" data-i18n="[title]Click for details">', 'di.see-details.') %>
+                                        <%= model.get('di_version') %>
+                                    <%= Wat.C.ifACL('</a>', 'di.see-details.') %>
                                 </td>
                 <%
                                 break;
