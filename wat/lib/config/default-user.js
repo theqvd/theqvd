@@ -123,6 +123,31 @@ Wat.I.formFilters[qvdObj] = {
         'displayMobile': true,
         'displayDesktop': true,
         'acls': 'user.filter.name'
+    },
+    'blocked': {
+        'filterField': 'blocked',
+        'type': 'select',
+        'text': 'Blocking',
+        'class': 'chosen-advanced',
+        'fillable': false,
+        'options': [
+            {
+                'value': -1,
+                'text': 'All',
+                'selected': true
+            },
+            {
+                'value': 1,
+                'text': 'Blocked'
+            },
+            {
+                'value': 0,
+                'text': 'Unblocked'
+            }
+                    ],
+        'displayMobile': false,
+        'displayDesktop': true,
+        'acls': 'user.filter.block'
     }
 };
 

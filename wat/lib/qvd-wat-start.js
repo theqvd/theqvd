@@ -50,18 +50,42 @@
                     case 'state':
                         params.filters = {"state": value};
                         break;
+                    case 'blocked':
+                        params.filters = {"blocked": value};
+                        break;
                 }
             }
                         
             Wat.Router.app_router.performRoute('vms', Wat.Views.VMListView, params);
         });        
         
-        Wat.Router.app_router.on('route:listUser', function () {
-            Wat.Router.app_router.performRoute('users', Wat.Views.UserListView);
+        Wat.Router.app_router.on('route:listUser', function (field, value) {   
+            var params = {};
+            if (field !== null) {
+                switch(field) {
+                    case 'blocked':
+                        params.filters = {"blocked": value};
+                        break;
+                }
+            }
+            
+            Wat.Router.app_router.performRoute('users', Wat.Views.UserListView, params);
         });       
         
-        Wat.Router.app_router.on('route:listHost', function () {
-            Wat.Router.app_router.performRoute('hosts', Wat.Views.HostListView);
+        Wat.Router.app_router.on('route:listHost', function (field, value) {   
+            var params = {};
+            if (field !== null) {
+                switch(field) {
+                    case 'state':
+                        params.filters = {"state": value};
+                        break;
+                    case 'blocked':
+                        params.filters = {"blocked": value};
+                        break;
+                }
+            }
+            
+            Wat.Router.app_router.performRoute('hosts', Wat.Views.HostListView, params);
         });      
         
         Wat.Router.app_router.on('route:listOSF', function () {
@@ -75,6 +99,9 @@
                 switch(field) {
                     case 'osf':
                         params.filters = {"osf_id": value};
+                        break;
+                    case 'blocked':
+                        params.filters = {"blocked": value};
                         break;
                 }
             }

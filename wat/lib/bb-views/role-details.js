@@ -90,7 +90,7 @@ Wat.Views.RoleDetailsView = Wat.Views.DetailsView.extend({
         $.each(that.retrievedData.rows, function (iACL, acl) {
             var subbranch = '';
             subbranch += '<div class="subbranch disabled-branch hidden" data-acl="' + acl.name + '" data-acl-id="' + acl.id + '">';
-                if (Wat.C.checkACL('role.update.assign-acl')) {
+                if (Wat.C.checkACL('role.update.assign-acl') && !that.model.get('fixed')) {
                     subbranch += '<span class="subbranch-piece">';
                         subbranch += '<input type="checkbox" class="js-acl-check acl-check" data-acl="' + acl.name + '" data-acl-id="' + acl.id + '"/>';
                     subbranch += '</span>';
@@ -410,7 +410,8 @@ Wat.Views.RoleDetailsView = Wat.Views.DetailsView.extend({
                 sections: ACL_SECTIONS,
                 actions: ACL_ACTIONS,
                 aclPatterns: that.aclPatterns,
-                branchStats: branchStats
+                branchStats: branchStats,
+                model: that.model
             }
         );
         

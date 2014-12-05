@@ -32,7 +32,9 @@ Wat.WS = {
                     callback(qvdObj, filters.id, data, ws);
                 }
                 setTimeout(function () {
-                    ws.send("AKN");
+                    if (ws.readyState == WS_OPEN) {
+                        ws.send("AKN");
+                    }
                 }, 500);
             };
             
@@ -71,7 +73,7 @@ Wat.WS = {
         
         $.each(this.websockets[view], function (iWs, ws) {
             var closeTry = setInterval(function () {
-                if (ws.readyState == 1) {
+                if (ws.readyState == WS_OPEN) {
                     ws.close();
                     clearInterval(closeTry);
                 }

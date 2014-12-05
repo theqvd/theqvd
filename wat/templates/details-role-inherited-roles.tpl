@@ -17,15 +17,28 @@
                             <div>
                                 <%
                                     if (Wat.C.checkACL('role.update.assign-role')) {
+                                        var classFixed = '';
+                                        if (role.fixed) {
+                                            classFixed = 'invisible';
+                                        }
                                 %>
-                                        <i class="delete-role-button js-delete-role-button fa fa-trash-o" data-id="<%= iRole %>" data-name="<%= role %>"></i>
+                                        <i class="delete-role-button js-delete-role-button fa fa-trash-o <%= classFixed %>" data-id="<%= iRole %>" data-name="<%= role %>"></i>
                                 <%
                                     }
-                                %>
                                 
-                                <%= Wat.C.ifACL('<a href="#/role/' + iRole + '">', 'role.see-details.') %>
-                                <span class="text"><%= role.name %></span>
-                                <%= Wat.C.ifACL('</a>', 'role.see-details.') %>
+                                if (role.fixed) {
+                                %>
+                                    <span class="text"><%= role.name %></span>
+                                <%
+                                }
+                                else {
+                                %>
+                                    <%= Wat.C.ifACL('<a href="#/role/' + iRole + '">', 'role.see-details.') %>
+                                    <span class="text"><%= role.name %></span>
+                                    <%= Wat.C.ifACL('</a>', 'role.see-details.') %>
+                                <%
+                                }
+                                %>
                             </div>
                         <%
                             }); 
@@ -40,7 +53,7 @@
                     </td>
                 </tr>
                 
-                <% if(Wat.C.checkACL('role.update.assign-role')) { %>
+                <% if(Wat.C.checkACL('role.update.assign-role') && !model.get('fixed')) { %>
                 <tr>
                     <td>
                         <select name="role"></select>

@@ -169,7 +169,34 @@ Wat.I.formFilters[qvdObj] = {
         'type': 'text',
         'text': 'Search by name',
         'displayMobile': true,
-        'displayDesktop': true
+        'displayDesktop': true,
+        'acls': 'host.filter.name'
+    },
+    'state': {
+        'filterField': 'state',
+        'type': 'select',
+        'text': 'State',
+        'class': 'chosen-single',
+        'options': [
+            {
+                'value': -1,
+                'text': 'All',
+                'selected': true
+            },
+            {
+                'value': 'running',
+                'text': 'Running',
+                'selected': false
+            },
+            {
+                'value': 'stopped',
+                'text': 'Stopped',
+                'selected': false
+            }
+                    ],
+        'displayMobile': false,
+        'displayDesktop': true,
+        'acls': 'host.filter.state'
     },
     'vm': {
         'filterField': 'vm_id',
@@ -186,7 +213,32 @@ Wat.I.formFilters[qvdObj] = {
                     ],
         'displayMobile': false,
         'displayDesktop': true,
-        'acls': 'host.see.vms-info'
+        'acls': 'host.filter.vm'
+    },
+    'blocked': {
+        'filterField': 'blocked',
+        'type': 'select',
+        'text': 'Blocking',
+        'class': 'chosen-advanced',
+        'fillable': false,
+        'options': [
+            {
+                'value': -1,
+                'text': 'All',
+                'selected': true
+            },
+            {
+                'value': 1,
+                'text': 'Blocked'
+            },
+            {
+                'value': 0,
+                'text': 'Unblocked'
+            }
+                    ],
+        'displayMobile': false,
+        'displayDesktop': true,
+        'acls': 'host.filter.block'
     }
 };
 

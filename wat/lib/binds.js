@@ -212,7 +212,7 @@ Wat.B = {
         
         pieClick: function (e) {
             var target = $(e.target).parent().attr('data-target');
-            $('.menu-option[data-target="' + target + '"]').trigger('click');
+            window.location = '#/' + target;
         }
     },
     

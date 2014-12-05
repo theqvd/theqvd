@@ -183,7 +183,8 @@ Wat.I.formFilters[qvdObj] = {
         'type': 'text',
         'text': 'Search by name',
         'displayMobile': true,
-        'displayDesktop': true
+        'displayDesktop': true,
+        'acls': 'osf.filter.name'
     },
     'vm': {
         'filterField': 'vm_id',
@@ -200,7 +201,7 @@ Wat.I.formFilters[qvdObj] = {
                     ],
         'displayMobile': false,
         'displayDesktop': true,
-        'acls': 'osf.see.vms-info'
+        'acls': 'osf.filter.vm'
     },
     'di': {
         'filterField': 'di_id',
@@ -217,7 +218,7 @@ Wat.I.formFilters[qvdObj] = {
                     ],
         'displayMobile': false,
         'displayDesktop': true,
-        'acls': 'osf.see.dis-info'
+        'acls': 'osf.filter.di'
     }
 };
 

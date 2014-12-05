@@ -26,13 +26,6 @@ Wat.Views.DIListView = Wat.Views.ListView.extend({
         this.updateModel(arguments, filters, this.fetchList, auxModel);
     },
     
-    fetchFilters: function () {
-        Wat.Views.ListView.prototype.fetchFilters.apply(this);
-
-        // As the osf filter in DI list hasn't all option, we trigger the change once it is loaded to perform the filtering
-        $('.filter-control [name="osf"]').trigger('change');
-    },
-    
     openNewElementDialog: function (e) {
         this.model = new Wat.Models.DI();
         this.dialogConf.title = $.i18n.t('New Disk image');
@@ -153,7 +146,7 @@ Wat.Views.DIListView = Wat.Views.ListView.extend({
         }
         
         if (data.status == STATUS_SUCCESS) {
-            if (ws.readyState == 1) {
+            if (ws.readyState == WS_OPEN) {
                 ws.close();
             }           
             Wat.I.loadingUnblock();

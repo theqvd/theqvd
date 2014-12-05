@@ -37,7 +37,7 @@
                 if (filter.noTranslatable === true) {
                     translationAttr = '';
                 }
-                
+
                 switch(filter.type) {
                     case 'text':
                         %>

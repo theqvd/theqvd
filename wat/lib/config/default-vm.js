@@ -353,7 +353,8 @@ Wat.I.formFilters[qvdObj] = {
         'type': 'text',
         'text': 'Search by name',
         'displayMobile': true,
-        'displayDesktop': true
+        'displayDesktop': true,
+        'acls': 'vm.filter.name'
     },
     'state': {
         'filterField': 'state',
@@ -379,7 +380,7 @@ Wat.I.formFilters[qvdObj] = {
                     ],
         'displayMobile': false,
         'displayDesktop': true,
-        'acls': 'vm.see.state'
+        'acls': 'vm.filter.state'
     },
     'user': {
         'filterField': 'user_id',
@@ -396,7 +397,7 @@ Wat.I.formFilters[qvdObj] = {
                     ],
         'displayMobile': false,
         'displayDesktop': true,
-        'acls': 'vm.see.user'
+        'acls': 'vm.filter.user'
     },
     'osf': {
         'filterField': 'osf_id',
@@ -413,7 +414,7 @@ Wat.I.formFilters[qvdObj] = {
                     ],
         'displayMobile': false,
         'displayDesktop': true,
-        'acls': 'vm.see.osf'
+        'acls': 'vm.filter.osf'
     },
     'host': {
         'filterField': 'host_id',
@@ -430,7 +431,32 @@ Wat.I.formFilters[qvdObj] = {
                     ],
         'displayMobile': false,
         'displayDesktop': true,
-        'acls': 'vm.see.host'
+        'acls': 'vm.filter.host'
+    },
+    'blocked': {
+        'filterField': 'blocked',
+        'type': 'select',
+        'text': 'Blocking',
+        'class': 'chosen-single',
+        'fillable': false,
+        'options': [
+            {
+                'value': -1,
+                'text': 'All',
+                'selected': true
+            },
+            {
+                'value': 1,
+                'text': 'Blocked'
+            },
+            {
+                'value': 0,
+                'text': 'Unblocked'
+            }
+                    ],
+        'displayMobile': false,
+        'displayDesktop': true,
+        'acls': 'vm.filter.block'
     }
 };
 

@@ -564,19 +564,28 @@ Wat.Views.ListView = Wat.Views.MainView.extend({
         var existsInSupertenant = $.inArray(that.qvdObj, QVD_OBJS_EXIST_IN_SUPERTENANT) != -1;
 
         $.each(this.formFilters, function(name, filter) {
-            if (filter.type == 'select' && filter.fillable) {
-                var params = {
-                    'action': name + '_tiny_list',
-                    'selectedId': that.filters[filter.filterField],
-                    'controlName': name
-                };
-                
-                Wat.A.fillSelect(params);
+            if (filter.fillable) {
+                if (filter.type == 'select') {
+                    var params = {
+                        'action': name + '_tiny_list',
+                        'selectedId': that.filters[filter.filterField],
+                        'controlName': name
+                    };
 
-                // In tenant case (except in admins list) has not sense show supertenant in filters
-                if (!existsInSupertenant && name == 'tenant') {
-                    // Remove supertenant from tenant selector
-                    $('select[name="tenant"] option[value="0"]').remove();
+                    Wat.A.fillSelect(params);
+
+                    // In tenant case (except in admins list) has not sense show supertenant in filters
+                    if (!existsInSupertenant && name == 'tenant') {
+                        // Remove supertenant from tenant selector
+                        $('select[name="tenant"] option[value="0"]').remove();
+                    }
+                }
+            }
+            else {
+                // If any field setted as not fillable is filtered, update it on control
+                if (that.filters[filter.filterField] != undefined) {         
+                    $('.filter-control').find('[name="' + name + '"] option[value="' + that.filters[filter.filterField] + '"]').prop('selected', true);
+                    $('.filter-control').find('[name="' + name + '"]').trigger('chosen:updated');
                 }
             }
         });
