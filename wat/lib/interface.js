@@ -67,7 +67,7 @@ Wat.I = {
             "qvd_object": qvdObj
         };
         
-        if (tenantId != undefined ) {
+        if (tenantId != undefined && tenantId != 0) {
             args.tenant_id = tenantId;
         }
         
@@ -136,7 +136,7 @@ Wat.I = {
             "qvd_object": qvdObj
         };
         
-        if (tenantId != undefined ) {
+        if (tenantId != undefined && tenantId != 0) {
             args.tenant_id = tenantId;
         }
         
