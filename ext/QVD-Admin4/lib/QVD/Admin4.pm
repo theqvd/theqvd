@@ -481,6 +481,8 @@ sub vm_delete
     $self->delete($request,conditions => [qw(vm_is_stopped)]);
 }
 
+###############################
+###############################
 
 sub di_create
 {
@@ -488,55 +490,57 @@ sub di_create
 
     my $images_path  = cfg('path.storage.images');
     QVD::Admin4::Exception->throw(code=>'2220')
-	unless -d $images_path;
+        unless -d $images_path;
 
     my $staging_path = cfg('path.storage.staging');
     QVD::Admin4::Exception->throw(code=>'2230')
-	unless -d $staging_path;
+        unless -d $staging_path;
 
     my $staging_file = basename($request->arguments->{path});
     QVD::Admin4::Exception->throw(code=>'2240')
-	unless -e "$staging_path/$staging_file";
+        unless -e "$staging_path/$staging_file";
 
     my $images_file = $staging_file;
 
     for (1 .. 5)
     {
-	eval { copy("$staging_path/$staging_file","$images_path/$images_file") };
-	$@ ? print $@ : last;
+        eval { copy("$staging_path/$staging_file","$images_path/$images_file") };
+        $@ ? print $@ : last;
     }
     if ($@) { QVD::Admin4::Exception->throw(code=>'2210');}
 
     my $staging_file_size = -s "$staging_path/$staging_file";
     my $images_file_size = -s "$images_path/$images_file";
 
-    unless ($staging_file_size == $images_file_size) 
+    unless ($staging_file_size == $images_file_size)
     { unlink "$images_path/$images_file";
       QVD::Admin4::Exception->throw(code=>'2211');}
 
     my $result = $self->create($request);
     my $di = @{$result->{rows}}[0];
 
-    eval 
+    eval
     {
-
     $di->osf->delete_tag('head');
     $di->osf->delete_tag($di->version);
     $DB->resultset('DI_Tag')->create({di_id => $di->id, tag => $di->version, fixed => 1});
     $DB->resultset('DI_Tag')->create({di_id => $di->id, tag => 'head'});
     $DB->resultset('DI_Tag')->create({di_id => $di->id, tag => 'default'})
-	unless $di->osf->di_by_tag('default');
-
+        unless $di->osf->di_by_tag('default');
     };
 
-    QVD::Admin4::Exception->throw(exception => $@, 
-				  query => 'tags') if $@;	
+    QVD::Admin4::Exception->throw(exception => $@,
+                                  query => 'tags') if $@;
 
     $di->update({path => $di->id . '-' . $staging_file});
     move("$images_path/$images_file","$images_path/".$di->id . '-' . $staging_file);
 
     $result;
 }
+
+##########################################
+##########################################
+
 
 sub di_delete {
     my ($self, $request) = @_;
@@ -710,6 +714,28 @@ sub di_no_head_default_tags
 ######################################
 ## GENERAL FUNCTIONS; WITHOUT REQUEST
 ######################################
+
+sub tenant_view_get_list 
+{
+    my ($self,$administrator,$json_wrapper) = @_;
+
+    my $tenant_id = $json_wrapper->get_filter_value('tenant_id');
+    defined $tenant_id && ($administrator->is_superadmin ||
+	QVD::Admin4::Exception->throw(code=>'4220', object => 'tenant_id'));  
+    $tenant_id //= $administrator->tenant_id; 
+
+    my $qvd_object = $json_wrapper->get_filter_value('qvd_object') //
+	QVD::Admin4::Exception->throw(code=>'6220', object => 'qvd_object');
+
+    $qvd_object =~ /^vm|user|osf|host|di$/ || 
+	QVD::Admin4::Exception->throw(code=>'6320', object => 'qvd_object');
+
+    my $rs = $DB->resultset('Tenant_Views_Setups_View')->search({},{bind => [$tenant_id, $qvd_object]});
+
+    { total => ($rs->is_paged ? $rs->pager->total_entries : $rs->count), 
+      rows => [map {{$_->get_columns}} $rs->all] };
+}
+
 
 sub get_properties_by_qvd_object
 {

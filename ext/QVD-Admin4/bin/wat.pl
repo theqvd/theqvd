@@ -134,35 +134,35 @@ websocket '/ws' => sub {
 
 };
 
-
-websocket '/copy' => sub {
+websocket '/staging' => sub {
     my $c = shift;
-
+    $c->inactivity_timeout(3000);
     $c->app->log->debug("Staging WebSocket opened");
     my $json = $c->get_input_json;
     my $images_path  = cfg('path.storage.images');
     my $staging_path = cfg('path.storage.staging');
-    my $staging_file = eval { $json->{filters}->{disk_image} } // $c->send('END');
-    $c->send('END') unless -e "$staging_path/$staging_file";
-    my $images_file = $staging_file; 
-    my ($source_size,$target_size) = (0,0);
+    my $staging_file = eval { $json->{arguments}->{disk_image} } // '';
+    my $images_file = $staging_file;
 
-    my $cb = sub {
-	my $new_source_size = eval { -s "$staging_path/$staging_file" } // 0;
-	my $new_target_size = eval { -s "$images_path/$images_file" } // 0;
-	my $response = $new_target_size < $target_size ? 'END' :
-	    encode_json({ source_size => $source_size,
-			  target_size => $target_size});
-	($source_size,$target_size) = ($new_source_size,$new_target_size);
-	$c->send($response); };
+    $c->on(message => sub { my ($c,$msg) = @_;
+                            my $sf_size = eval { -s "$staging_path/$staging_file" } // 0;
+                            my $if_size = eval { -s "$images_path/$images_file" } // 0;
+                            $c->send(encode_json({ status => 1000,
+                                                   total_size => $sf_size,
+                                                   copy_size => $if_size }));});
 
-    my $recurring = Mojo::IOLoop->recurring(0.25 => sub { $cb->(); });
-
-    $c->on(finish => sub {
-        my ($c, $code) = @_;
-	Mojo::IOLoop->remove($recurring);
-        $c->app->log->debug("Staging WebSocket closed with status $code");});
+    my $fc = Mojo::IOLoop::ForkCall->new;
+    $fc->run(
+        sub { $c->app->log->debug("Starting copy");
+              my $response = $c->qvd_admin4_api->process_query($json);
+              return $response; },
+        sub { my ($fc, $err, $response) = @_;
+	      $err //= 'no error signals';
+              $c->app->log->debug("Copy finished: $err");
+              $c->send(encode_json($response)); }
+        );
 };
+
 
 app->start;
 
@@ -192,28 +192,7 @@ sub process_api_query
 {
     my ($c,$json) = @_;
 
-    my ($action_name,$action_size,$response) = 
-	($json->{action}, $c->get_action_size($json),undef);
-
-    if ($action_size eq 'heavy')
-    {
-	my $fc = Mojo::IOLoop::ForkCall->new;
-	$fc->run( 
-	    sub { $c->qvd_admin4_api->process_query($json);},
-	    sub { my ($fc, $err) = @_;
-		  my $status = $err ? ": $err" : " successfully";
-		  $c->app->log->debug("Heavy action $action_name finished$status"); }
-	);
-
-	$response = 
-	{ status => 1000, 
-	  message => 'Heavy action running in background'}; 
-    }
-    else
-    {
-	$response = $c->qvd_admin4_api->process_query($json);
-    }
- 
+    my $response = $c->qvd_admin4_api->process_query($json);
     $response->{sid} = $c->res->headers->header('sid');
     return $response;
 }
@@ -294,22 +273,32 @@ __DATA__
 <title>Web Sockets Proofs</title>                                                                                                                                                             
 <script type="text/javascript">                                                                                                                                                               
 
-      var staging = new WebSocket('ws://localhost:3000/copy?login=superadmin&password=superadmin&filters={"disk_image":"ubuntu-13.04-i386-qvd.tar.gz"}');                                                    
+      var staging = new WebSocket('ws://localhost:3000/staging?login=superadmin&password=superadmin&action=di_create&arguments={"disk_image":"ubuntu-13.04-i386-qvd.tar.gz","osf_id":"1"}');                     
+      staging.onopen =                                                                                                                                                                          
+        function (event)                                                                                                                                                                      
+        { 
+            staging.send('Hola');
+        };
+                               
       staging.onmessage =                                                                                                                                                                          
         function (event)                                                                                                                                                                      
         {                                                                                                                                                                                   
-                if (event.data == 'END') 
+                obj = JSON.parse(event.data);
+                
+                if (obj.status == 1000) 
                 { 
-                   staging.close();
+                   document.getElementById("dis_copy_progress").innerHTML = obj.copy_size ;
+                   staging.send('Hola');
                 }
                 else
                 {
-                   obj = JSON.parse(event.data);
-                   document.getElementById("dis_copy").innerHTML = obj.target_size ;                                                                                                                       
+                   document.getElementById("dis_copy_status").innerHTML = obj.status ;
+                   staging.close();
                 }
         };                                                                                                                                                                                    
 
       var ws = new WebSocket('ws://localhost:3000/ws?login=superadmin&password=superadmin&action=qvd_objects_statistics');                                                    
+
       ws.onmessage =                                                                                                                                                                          
         function (event)                                                                                                                                                                      
         {                                                                                                                                                                                   
@@ -354,7 +343,8 @@ __DATA__
 <hr>
 <div>DIs Total: <span id="dis_total"></span></div><br/>
 <div>DIs Blocked: <span id="dis_blocked"></span></div><br/>
-<div>DI Copy Progress: <span id="dis_copy"></span></div><br/>
+<div>DI Copy Progress: <span id="dis_copy_progress"></span></div><br/>
+<div>DI Copy Status: <span id="dis_copy_status"></span></div><br/>
 <hr/>
 <div>OSFs Total: <span id="osfs_total"></span></div><br/>
 
