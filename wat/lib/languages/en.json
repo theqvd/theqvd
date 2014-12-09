@@ -308,6 +308,7 @@
     "Filter nodes by blocking state": "Filter nodes by blocking state", 
     "Filter nodes by name": "Filter nodes by name", 
     "Filter nodes by properties": "Filter nodes by properties", 
+    "Filter nodes by running state": "Filter nodes by running state", 
     "Filter nodes by virtual machines": "Filter nodes by virtual machines", 
     "Access to node's details view": "Access to node's details view", 
     "Access to node's main section": "Access to node's main section", 

@@ -115,6 +115,7 @@ ACLS = {
     "host.filter.block": "Filter nodes by blocking state",
     "host.filter.name": "Filter nodes by name",
     "host.filter.properties": "Filter nodes by properties",
+    "host.filter.state": "Filter nodes by running state",
     "host.filter.vm": "Filter nodes by virtual machines",
     "host.see-details.": "Access to node's details view",
     "host.see-main.": "Access to node's main section",

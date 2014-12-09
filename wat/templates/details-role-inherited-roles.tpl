@@ -12,21 +12,21 @@
                 <tr>
                     <td>
                         <%
+                            var classFixed = '';
+                            if (model.get('fixed')) {
+                                classFixed = 'invisible';
+                            }
                             $.each(model.get('roles'), function (iRole, role) {
                         %>
                             <div>
                                 <%
                                     if (Wat.C.checkACL('role.update.assign-role')) {
-                                        var classFixed = '';
-                                        if (role.fixed) {
-                                            classFixed = 'invisible';
-                                        }
                                 %>
                                         <i class="delete-role-button js-delete-role-button fa fa-trash-o <%= classFixed %>" data-id="<%= iRole %>" data-name="<%= role %>"></i>
                                 <%
                                     }
                                 
-                                if (role.fixed) {
+                                if (role.internal) {
                                 %>
                                     <span class="text"><%= role.name %></span>
                                 <%
