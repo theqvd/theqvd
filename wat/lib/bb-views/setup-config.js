@@ -70,6 +70,14 @@ Wat.Views.SetupConfigView = Wat.Views.MainView.extend({
     
     processTokensRenderTokens: function (that) {
         that.configTokens = that.retrievedData.rows
+        
+        // If there are not tokens in this prefix, render everything again selecting first prefix
+        if (that.configTokens.length == 0) {
+            that.currentTokensPrefix = '';
+            Wat.A.performAction('config_preffix_get', {}, {}, {}, that.processPrefixes, that);
+            return;
+        }
+        
         that.renderConfigurationTokens();
     },
     
@@ -227,8 +235,13 @@ Wat.Views.SetupConfigView = Wat.Views.MainView.extend({
         if (that.currentTokensPrefix == UNCLASSIFIED_CONFIG_CATEGORY) {
             Wat.A.performAction('config_get', {}, {'key_re': UNCLASSIFIED_CONFIG_REGEXP}, {}, that.processTokensRenderTokens, that);
         }
-        else {
+        else if ($.inArray(that.currentTokensPrefix, that.prefixes) != -1) {
+			// If the prefix of the changed token exist, render it after change
             Wat.A.performAction('config_get', {}, {'key_re':'^' + that.currentTokensPrefix + '\\.'}, {}, that.processTokensRenderTokens, that);
+        }
+        else {
+			// If the prefix of the changed token doesnt exist, render all to create this new prefix in side menu
+            Wat.A.performAction('config_preffix_get', {}, {}, {}, that.processPrefixes, that);
         }
     }
 });
