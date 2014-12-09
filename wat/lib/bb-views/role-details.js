@@ -370,6 +370,7 @@ Wat.Views.RoleDetailsView = Wat.Views.DetailsView.extend({
             'selectedId': '',
             'controlName': 'role',
             'filters': {
+                "internal": false
             },
             'order_by': {
                 "field": ["internal","name"],
@@ -377,6 +378,11 @@ Wat.Views.RoleDetailsView = Wat.Views.DetailsView.extend({
             }
         };
 
+        Wat.A.fillSelect(params);
+        
+        params.filters.internal = true;
+        params.group = "Internal roles";
+        
         Wat.A.fillSelect(params);
         
         // Remove from inherited roles selector, current role and already inherited ones

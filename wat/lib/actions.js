@@ -115,6 +115,7 @@ Wat.A = {
         if (params.startingOptions) {
             $.each($('select[name="' + params.controlName + '"]'), function () {
                 var combo = $(this);
+                
                 $.each(params.startingOptions, function (id, name) {
                     var selected = '';
                     if (params.selectedId !== undefined && params.selectedId == id) {
@@ -157,37 +158,52 @@ Wat.A = {
                     if (Wat.C.sessionExpired(data)) {
                         return;
                     }
-                    
-                    var optGroup = '';
-                    $(data.rows).each(function(i,option) {
-                        var selected = '';
+                    $.each($('select[name="' + params.controlName + '"]'), function () {
+                        var combo = $(this);
+                        
+                        var options = '';
+                        
+                        if (params.group) {
+                            //combo.append('<optgroup label="' + params.group + '">');
+                        }
 
-                        var id = option.id;
-                        if (params.action == 'di_tiny_list') {
-                            var name = option.disk_image;
+                        var optGroup = '';
+                        $(data.rows).each(function(i,option) {
+                            var selected = '';
+
+                            var id = option.id;
+                            if (params.action == 'di_tiny_list') {
+                                var name = option.disk_image;
+                            }
+                            else {
+                                var name = option.name;
+                            }
+
+                            if (params.nameAsId) {
+                                id = name;
+                            }
+
+                            // If one option is defined in starting options, will be ignored
+                            if (params.startingOptions && params.startingOptions[id]) {
+                                return;
+                            }
+
+                            if (params.selectedId !== undefined && params.selectedId == id) {
+                                selected = 'selected="selected"';
+                            }
+
+                            options += '<option value="' + id + '" ' + selected + '>' + 
+                                                                        name + 
+                                                                        '<\/option>';
+                        });
+
+                        if (params.group) {
+                            combo.append('<optgroup data-i18n="[label]' + params.group + '">' + options + '</optgroup>');
                         }
                         else {
-                            var name = option.name;
-                        }
-                        
-                        if (params.nameAsId) {
-                            id = name;
+                            combo.append(options);
                         }
 
-                        // If one option is defined in starting options, will be ignored
-                        if (params.startingOptions && params.startingOptions[id]) {
-                            return;
-                        }
-
-                        if (params.selectedId !== undefined && params.selectedId == id) {
-                            selected = 'selected="selected"';
-                        }
-                        
-                        $.each($('select[name="' + params.controlName + '"]'), function () {
-                            $(this).append('<option value="' + id + '" ' + selected + '>' + 
-                                                                       name + 
-                                                                       '<\/option>');
-                        });
                     });
                 }
             });
