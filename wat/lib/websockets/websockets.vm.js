@@ -48,7 +48,7 @@ Wat.WS.changeWebsocketVm = function (id, field, data) {
         case 'ssh_port':
         case 'vnc_port':
         case 'serial_port':
-            $('[data-wsupdate="' + field + '"][data-id="' + id + '"]').html(data); 
+            $('[data-wsupdate="' + field + '"][data-id="' + id + '"]').html(data == 0 ? '' : data); 
             break;
         case 'host_id':
             $('[data-wsupdate="host"][data-id="' + id + '"] a').attr('href', '#/host/' + data); 

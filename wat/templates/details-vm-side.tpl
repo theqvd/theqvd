@@ -89,19 +89,19 @@
             <% if (Wat.C.checkACL('vm.see.port-ssh')) { %>
             <tr>
                 <td><span data-i18n>SSH port</span></td>
-                <td data-wsupdate="ssh_port" data-id="<%= model.get('id') %>"><%= model.get('ssh_port') %></td>
+                <td data-wsupdate="ssh_port" data-id="<%= model.get('id') %>"><%= model.get('ssh_port') == 0 ? '' : model.get('ssh_port') %></td>
             </tr>
             <% } %>
             <% if (Wat.C.checkACL('vm.see.port-vnc')) { %>
             <tr>
                 <td><span data-i18n>VNC port</span></td>
-                <td data-wsupdate="vnc_port" data-id="<%= model.get('id') %>"><%= model.get('vnc_port') %></td>
+                <td data-wsupdate="vnc_port" data-id="<%= model.get('id') %>"><%= model.get('vnc_port') == 0 ? '' : model.get('vnc_port') %></td>
             </tr>
             <% } %>
             <% if (Wat.C.checkACL('vm.see.port-serial')) { %>
             <tr>
                 <td><span data-i18n>Serial port</span></td>
-                <td data-wsupdate="serial_port" data-id="<%= model.get('id') %>"><%= model.get('serial_port') %></td>
+                <td data-wsupdate="serial_port" data-id="<%= model.get('id') %>"><%= model.get('serial_port') == 0 ? '' : model.get('serial_port') %></td>
             </tr>
             <% } %>
         </tbody>
