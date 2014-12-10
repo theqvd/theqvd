@@ -73,13 +73,13 @@ Wat.Views.HomeView = Wat.Views.MainView.extend({
         $(this.el).html(this.template);  
         
         this.renderVmsExpire ();
-        
-        Wat.T.translate();
-        
+                
         this.loadData(this.stats);
         
         this.printBreadcrumbs(this.breadcrumbs, '');
         
+        Wat.T.translate();
+
         // Open websockets for live fields
         Wat.WS.openStatsWebsockets(this.qvdObj, this.liveFields, this.cid);
     },

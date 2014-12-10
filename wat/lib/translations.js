@@ -5,8 +5,8 @@ Wat.T = {
         var that = this;
         
         $.i18n.init({
-            //resGetPath: 'lib/languages/__lng__.json',
-            resGetPath: APP_PATH + 'lib/languages/en.json',
+            resGetPath: 'lib/languages/__lng__.json',
+            //resGetPath: APP_PATH + 'lib/languages/en.json',
             useLocalStorage: false,
             debug: false,
             fallbackLng: 'en',
