@@ -309,8 +309,8 @@ fieldset {
     .menu-corner > ul > li.menu-option-current {
       border-bottom: 2px dotted #e35e0c;
       border-top: 2px dotted #e35e0c;
-      padding-top: 3px;
-      padding-bottom: 3px; }
+      padding-top: 2px;
+      padding-bottom: 1px; }
     .menu-corner > ul > li > ul {
       border: solid 1px #f9b78e;
       background: #fdfdfd;

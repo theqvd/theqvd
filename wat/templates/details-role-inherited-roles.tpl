@@ -57,6 +57,8 @@
                 <tr>
                     <td>
                         <select name="role"></select>
+                    </td>                    
+                    <td class="col-width-1">
                         <a class="button add-role-button js-add-role-button fa fa-sitemap" href="javascript:" data-i18n>Inherit</a>
                     </td>
                 </tr>

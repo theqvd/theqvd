@@ -199,9 +199,7 @@ Wat.Views.AdminDetailsView = Wat.Views.DetailsView.extend({
         Wat.I.chosenConfiguration();
         
         // Hack to avoid delays
-        setTimeout(function(){
-            Wat.I.chosenElement('[name="role"]', 'advanced');
-        }, 100);
+        Wat.I.chosenElement('[name="role"]', 'advanced100');
     },    
     
     renderSetupCommon: function () {

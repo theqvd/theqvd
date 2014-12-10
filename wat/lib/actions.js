@@ -198,7 +198,7 @@ Wat.A = {
                         });
 
                         if (params.group) {
-                            combo.append('<optgroup data-i18n="[label]' + params.group + '">' + options + '</optgroup>');
+                            combo.append('<optgroup label="' + params.group + '">' + options + '</optgroup>');
                         }
                         else {
                             combo.append(options);

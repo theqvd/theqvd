@@ -375,13 +375,14 @@ Wat.Views.RoleDetailsView = Wat.Views.DetailsView.extend({
             'order_by': {
                 "field": ["internal","name"],
                 "order": "-asc"
-            }
+            },
+            'group': $.i18n.t("Roles")
         };
 
         Wat.A.fillSelect(params);
         
         params.filters.internal = true;
-        params.group = "Internal roles";
+        params.group = $.i18n.t("Internal roles");
         
         Wat.A.fillSelect(params);
         
@@ -391,11 +392,8 @@ Wat.Views.RoleDetailsView = Wat.Views.DetailsView.extend({
         $.each(this.model.get('roles'), function (iRole, role) {
             $('select[name="role"] option[value="' + iRole + '"]').remove();
         });
-        
-        // Hack to avoid delays
-        setTimeout(function(){
-            Wat.I.chosenElement('[name="role"]', 'advanced');
-        }, 100);
+                   
+        Wat.I.chosenElement('[name="role"]', 'advanced100');
     },    
     
     renderACLsTree: function (that) {
