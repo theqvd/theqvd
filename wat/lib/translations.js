@@ -1,7 +1,7 @@
 // Translation setup and utilities
 Wat.T = {
     // Translation configuration and actions to be done when language file is loaded
-    translate: function() {
+    initTranslate: function() {
         var that = this;
         
         $.i18n.init({
@@ -10,11 +10,11 @@ Wat.T = {
             useLocalStorage: false,
             debug: false,
             fallbackLng: 'en',
-        }, this.afterTranslate);
+        }, this.translate);
     },
     
     // After all the translations do custom actions that need to have the content translated
-    afterTranslate: function () {
+    translate: function () {
         // Translate all the elements with attribute 'data-i18n'
         
         $('[data-i18n]').i18n();

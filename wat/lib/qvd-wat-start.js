@@ -12,6 +12,9 @@
     })(jQuery);
     
 	$(doc).ready(function() {
+        // Load translation file
+        Wat.T.initTranslate();
+        
         // Remember login from cookies
         Wat.C.rememberLogin();
         // Interface onfiguration

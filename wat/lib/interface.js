@@ -374,28 +374,6 @@ Wat.I = {
             $('.breadcrumbs').css('visibility','visible').hide().fadeIn('fast');
             $('.menu-corner').css('visibility','visible');
         }
-        
-        this.showMenu();
-    },
-    
-    showMenu: function () {       
-        $('.menu').hide();
-        
-        if ($.inArray(Wat.CurrentView.qvdObj, QVD_OBJS_SETUP) != -1) {
-            $('.js-wat-management-menu').show();
-        }
-        else if ($.inArray(Wat.CurrentView.qvdObj, QVD_OBJS_QVDCONFIG) != -1) {
-            $('.js-qvd-config-menu').show();
-        }
-        else if ($.inArray(Wat.CurrentView.qvdObj, QVD_OBJS_HELP) != -1) {
-            $('.js-qvd-help-menu').show();
-        }
-        else if ($.inArray(Wat.CurrentView.qvdObj, QVD_OBJS_USERAREA) != -1) {
-            $('.js-qvd-user-menu').show();
-        }
-        else if ($.inArray(Wat.CurrentView.qvdObj, QVD_OBJS_PLATFORM) != -1) {
-            $('.js-platform-menu').show();
-        }
     },
 
     showContent: function () {
@@ -516,10 +494,15 @@ Wat.I = {
         
         // Change styles on corner menu current option
         var menu = $('.menu-option[data-target="' + opt + '"]').attr('data-menu');
+        
         $('.js-menu-corner .menu-option').removeClass('menu-option-current');
         $('.js-menu-corner .js-menu-option-' + menu).addClass('menu-option-current');
         
-        
+        if (opt == 'home' || !opt) {
+            var menu = 'platform';
+        }
+        $('.menu').hide();
+        $('.js-' + menu + '-menu').show();
     },
     
     renderMain: function () {        

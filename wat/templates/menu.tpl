@@ -13,7 +13,7 @@
             %>
         </ul>
     </div>
-    <div class="js-wat-management-menu menu">
+    <div class="js-wat-menu menu">
         <ul>
             <%
                 $.each(setupMenu, function (target, option) {
@@ -27,7 +27,7 @@
             %>
         </ul>
     </div>
-    <div class="js-qvd-config-menu menu">
+    <div class="js-config-menu menu">
         <ul>
             <%
                 $.each(configMenu, function (target, option) {
@@ -41,7 +41,7 @@
             %>
         </ul>
     </div>
-    <div class="js-qvd-help-menu menu">
+    <div class="js-help-menu menu">
         <ul>
             <%
                 $.each(helpMenu, function (target, option) {
@@ -55,7 +55,7 @@
             %>
         </ul>
     </div>
-    <div class="js-qvd-user-menu menu">
+    <div class="js-user-menu menu">
         <ul>
             <%
                 $.each(userMenu, function (target, option) {
