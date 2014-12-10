@@ -190,6 +190,9 @@ Wat.Views.SetupConfigView = Wat.Views.MainView.extend({
         Wat.Views.ListView.prototype.openNewElementDialog.apply(this, [e]);
         
         Wat.I.chosenElement('[name="tenant"]', 'single100');
+        
+        // Set initial prefix to the current one
+        $('[name="key"]').val(this.currentTokensPrefix + '.');
     },
     
     createElement: function () {

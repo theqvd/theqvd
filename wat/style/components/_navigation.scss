@@ -144,6 +144,7 @@
                 left: -9px;
                 border-bottom-left-radius: $menu_radius;
                 border-bottom-right-radius: $menu_radius;
+                z-index: 3;
                 &>li {
                     span {
                         padding: 8px;

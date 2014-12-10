@@ -319,7 +319,8 @@ fieldset {
       position: absolute;
       left: -9px;
       border-bottom-left-radius: 7px;
-      border-bottom-right-radius: 7px; }
+      border-bottom-right-radius: 7px;
+      z-index: 3; }
       .menu-corner > ul > li > ul > li span {
         padding: 8px;
         white-space: nowrap;
