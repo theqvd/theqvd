@@ -6,18 +6,7 @@ Wat.Views.TenantListView = Wat.Views.ListView.extend({
     setupOption: 'tenants',
     selectedSection: 'user',
     qvdObj: 'tenant',
-    
-    breadcrumbs: {
-        'screen': 'Home',
-        'link': '#',
-        'next': {
-            'screen': 'Setup',
-            'link': '#/setup',
-            'next': {
-                'screen': 'Tenants'
-            }
-        }
-    },
+
     
     initialize: function (params) {
         params.whatRender = 'list';
@@ -42,7 +31,7 @@ Wat.Views.TenantListView = Wat.Views.ListView.extend({
                 cid: this.cid,
                 selectedOption: this.setupOption,
                 setupMenu: null,
-                //setupMenu: cornerMenu.setup.subMenu
+                //setupMenu: cornerMenu.wat.subMenu
             }
         );
         

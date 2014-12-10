@@ -216,7 +216,7 @@ Wat.Views.AdminDetailsView = Wat.Views.DetailsView.extend({
                 cid: this.cid,
                 selectedOption: this.setupOption,
                 setupMenu: null,
-                //setupMenu: cornerMenu.setup.subMenu
+                //setupMenu: cornerMenu.wat.subMenu
             }
         );
         

@@ -510,8 +510,16 @@ Wat.I = {
     
     // Set specific menu section as selected
     setMenuOpt: function (opt) {
+        // Set as selected the menu option
         $('.menu-option').removeClass('menu-option--selected');
         $('.menu-option[data-target="' + opt + '"]').addClass('menu-option--selected');
+        
+        // Change styles on corner menu current option
+        var menu = $('.menu-option[data-target="' + opt + '"]').attr('data-menu');
+        $('.js-menu-corner .menu-option').removeClass('menu-option-current');
+        $('.js-menu-corner .js-menu-option-' + menu).addClass('menu-option-current');
+        
+        
     },
     
     renderMain: function () {        

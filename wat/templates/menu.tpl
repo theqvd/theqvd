@@ -4,7 +4,7 @@
             <%
                 $.each(menu, function (target, option) {
             %>
-                <li class="menu-option" data-target="<%= target %>">
+                <li class="menu-option" data-target="<%= target %>" data-menu="platform">
                     <i class="<%= option.icon %>"></i>
                     <span data-i18n><%= option.text %></span>
                 </li>
@@ -18,7 +18,7 @@
             <%
                 $.each(setupMenu, function (target, option) {
             %>
-                <li class="menu-option" data-target="<%= target %>">
+                <li class="menu-option" data-target="<%= target %>" data-menu="wat">
                     <i class="<%= option.icon %>"></i>
                     <span data-i18n><%= option.text %></span>
                 </li>
@@ -32,7 +32,7 @@
             <%
                 $.each(configMenu, function (target, option) {
             %>
-                <li class="menu-option" data-target="<%= target %>">
+                <li class="menu-option" data-target="<%= target %>" data-menu="config">
                     <i class="<%= option.icon %>"></i>
                     <span data-i18n><%= option.text %></span>
                 </li>
@@ -46,7 +46,7 @@
             <%
                 $.each(helpMenu, function (target, option) {
             %>
-                <li class="menu-option" data-target="<%= target %>">
+                <li class="menu-option" data-target="<%= target %>" data-menu="help">
                     <i class="<%= option.icon %>"></i>
                     <span data-i18n><%= option.text %></span>
                 </li>
@@ -60,7 +60,7 @@
             <%
                 $.each(userMenu, function (target, option) {
             %>
-                <li class="menu-option" data-target="<%= target %>">
+                <li class="menu-option" data-target="<%= target %>" data-menu="user">
                     <i class="<%= option.icon %>"></i>
                     <span data-i18n><%= option.text %></span>
                 </li>

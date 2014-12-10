@@ -28,7 +28,7 @@ Wat.Views.AdminListView = Wat.Views.ListView.extend({
                 cid: this.cid,
                 selectedOption: this.setupOption,
                 setupMenu: null,
-                //setupMenu: cornerMenu.setup.subMenu
+                //setupMenu: cornerMenu.wat.subMenu
             }
         );
         

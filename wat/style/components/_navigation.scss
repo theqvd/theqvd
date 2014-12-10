@@ -120,12 +120,21 @@
         display: block;
     }
     
+    
     &>ul {
         &>li {
             display: inline;
             margin: 5px;
             position: relative;
             cursor: default;
+        
+            &.menu-option-current {
+                border-bottom: 2px dotted $col_brand;
+                border-top: 2px dotted $col_brand;
+                padding-top: 3px;
+                padding-bottom: 3px;
+            }
+            
             &>ul {
                 border: solid 1px lighten($col_brand, 30);
                 background: $col_whiter;

@@ -111,9 +111,9 @@ Wat.I.cornerMenuOriginal = {
             subMenu: _.extend({}, Wat.I.menuOriginal)
         },
     
-        setup: {
+        wat: {
             text: 'WAT Management',
-            link: '#/setup',
+            link: '#',
             icon: CLASS_ICON_WATMANAGE,
             subMenu: _.extend({}, Wat.I.menuSetupOriginal)
         },

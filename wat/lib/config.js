@@ -296,12 +296,12 @@ Wat.C = {
         $.each(aclSetupMenu, function (acl, menu) {
             if (!that.checkACL(acl)) {
                 delete Wat.I.setupMenu[menu];
-                delete Wat.I.cornerMenu.setup.subMenu[menu];
+                delete Wat.I.cornerMenu.wat.subMenu[menu];
             }
         });
         
-        if (Wat.I.cornerMenu.setup && !$.isEmptyObject(Wat.I.cornerMenu.setup.subMenu)) {
-            Wat.I.cornerMenu.setup.link = Wat.I.cornerMenu.setup.subMenu[Object.keys(Wat.I.cornerMenu.setup.subMenu)[0]].link;
+        if (Wat.I.cornerMenu.wat && !$.isEmptyObject(Wat.I.cornerMenu.wat.subMenu)) {
+            Wat.I.cornerMenu.wat.link = Wat.I.cornerMenu.wat.subMenu[Object.keys(Wat.I.cornerMenu.wat.subMenu)[0]].link;
         }        
         
         if (Wat.I.cornerMenu.platform && !$.isEmptyObject(Wat.I.cornerMenu.platform.subMenu)) {
@@ -316,8 +316,8 @@ Wat.C = {
             delete Wat.I.cornerMenu.platform;
         }        
         
-        if ($.isEmptyObject(Wat.I.cornerMenu.setup.subMenu)) {
-            delete Wat.I.cornerMenu.setup;
+        if ($.isEmptyObject(Wat.I.cornerMenu.wat.subMenu)) {
+            delete Wat.I.cornerMenu.wat;
         }
         
         if (!that.checkACL('config.see-main.')) {

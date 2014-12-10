@@ -306,6 +306,11 @@ fieldset {
     margin: 5px;
     position: relative;
     cursor: default; }
+    .menu-corner > ul > li.menu-option-current {
+      border-bottom: 2px dotted #e35e0c;
+      border-top: 2px dotted #e35e0c;
+      padding-top: 3px;
+      padding-bottom: 3px; }
     .menu-corner > ul > li > ul {
       border: solid 1px #f9b78e;
       background: #fdfdfd;

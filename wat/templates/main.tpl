@@ -9,7 +9,7 @@
             var cornerMenuPrint = $.extend(true, {}, cornerMenu);
 
             if (!loggedIn) {
-                delete cornerMenuPrint.setup;
+                delete cornerMenuPrint.wat;
                 delete cornerMenuPrint.user;
                 //delete cornerMenuPrint.help.subMenu.about;
             } 
