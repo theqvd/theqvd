@@ -39,7 +39,7 @@ int initIds(JNIEnv *env) {
       qvd_printf("Error finding class for Qvdclient");
       return -1;
     }
-  
+
   temp = (*env)->FindClass(env, "com/theqvd/client/jni/Vm");
   vm_cls = (*env)->NewGlobalRef(env, temp);
   (*env)->DeleteLocalRef(env, temp);
@@ -64,7 +64,7 @@ int initIds(JNIEnv *env) {
        qvd_printf("Error finding field id for host in class Qvdclient");
        return -1;
      }
-   
+
    qvdclient_fid = (*env)->GetFieldID(env, qvdclientwrapper_cls, "qvdclient", "Lcom/theqvd/client/jni/Qvdclient;");
    if (qvdclient_fid == NULL)
      {
@@ -101,14 +101,14 @@ int initIds(JNIEnv *env) {
        qvd_printf("Error finding field id for username in class Qvdclient");
        return -1;
      }
-   
+
    password_fid = (*env)->GetFieldID(env, qvdclient_cls, "password", "Ljava/lang/String;");
    if (password_fid == NULL)
      {
        qvd_printf("Error finding field id for password in class Qvdclient");
        return -1;
      }
-   
+
    vm_id_fid = (*env)->GetFieldID(env, vm_cls, "id", "I");
    if (vm_id_fid == NULL)
      {
@@ -122,21 +122,21 @@ int initIds(JNIEnv *env) {
        qvd_printf("Error finding field id for name in class Vm");
        return -1;
      }
-   
+
    vm_state_fid = (*env)->GetFieldID(env, vm_cls, "state", "Ljava/lang/String;");
    if (vm_state_fid == NULL)
      {
        qvd_printf("Error finding field id for state in class Vm");
        return -1;
      }
-   
+
    vm_blocked_fid = (*env)->GetFieldID(env, vm_cls, "blocked", "I");
    if (vm_blocked_fid == NULL)
      {
       qvd_printf("Error finding field blocked in class Vm");
       return -1;
      }
-   
+
    vm_constructor_mid = (*env)->GetMethodID(env, vm_cls, "<init>", "(ILjava/lang/String;Ljava/lang/String;I)V");
    if (vm_constructor_mid == NULL)
      {
@@ -278,7 +278,7 @@ jint JNI_OnLoad(JavaVM* vm, void* reserved)
 }
 
 
-inline jlong _set_c_pointer(qvdclient *qvd) 
+inline jlong _set_c_pointer(qvdclient *qvd)
 {
   jlong qvd_c_pointer = 0L;
 #if UINTPTR_MAX == 0xffffffff
@@ -308,7 +308,7 @@ inline qvdclient *_set_qvdclient(jlong qvd_c_pointer)
 /* wtf */
 #error Not a 32 bit or 64 bit architecture
 #endif
-  
+
   return qvd;
 }
 
@@ -318,7 +318,7 @@ inline qvdclient *_set_qvdclient(jlong qvd_c_pointer)
  * certificateHandler of the class QvdClientWrapper
  * It gets from the qvd->userdata which points to a struct of callbackhandler_environment_struct
  * A pointer to the jvm and one to the QvdclientWrapper->unknowncertCallbackHandler object
- * From there we get the class of the certifcateHandler and the 
+ * From there we get the class of the certifcateHandler and the
  * method certificate_verification, which we invoke, and return the result.
  */
 int accept_unknown_cert_callback(qvdclient *qvd, const char *cert_pem_str, const char *cert_pem_data)
@@ -387,7 +387,7 @@ int accept_unknown_cert_callback(qvdclient *qvd, const char *cert_pem_str, const
   qvd_printf("After CallBooleanMethod response, %d\n", response);
   (*env)->DeleteLocalRef(env, jcert_pem_str);
   (*env)->DeleteLocalRef(env, jcert_pem_data);
- 
+
   return response;
 
 }
@@ -399,7 +399,7 @@ int accept_unknown_cert_callback(qvdclient *qvd, const char *cert_pem_str, const
  */
 int progress_callback(qvdclient *qvd, const char *message)
 {
-  /* TODO rename callbackhandler_environment_struct and reuse it for this case */ 
+  /* TODO rename callbackhandler_environment_struct and reuse it for this case */
   jstring message_str;
   struct callbackhandler_environment_struct *callbackhandler_env;
   JNIEnv *env;
@@ -497,7 +497,7 @@ JNIEXPORT jlong JNICALL Java_com_theqvd_client_jni_QvdclientWrapper_qvd_1c_1init
   const char *username_c, *password_c, *host_c;
   int port_c;
 
-  qvd_printf("qvd_c_init\n");  
+  qvd_printf("qvd_c_init\n");
 
   host = (*env)->GetObjectField(env, qvdclnt, host_fid);
   host_c = (*env)->GetStringUTFChars(env, host, NULL);
@@ -594,7 +594,7 @@ jobject _construct_vm(JNIEnv *env, vm *data)
 JNIEXPORT jobjectArray JNICALL Java_com_theqvd_client_jni_QvdclientWrapper_qvd_1c_1list_1of_1vm
 (JNIEnv *env, jobject obj, jlong qvd_c_pointer)
 {
-  qvdclient *qvd; 
+  qvdclient *qvd;
   vmlist *vms, *ptr;
   jobjectArray jarray_of_vms;
   jobject vm;
@@ -613,15 +613,15 @@ JNIEXPORT jobjectArray JNICALL Java_com_theqvd_client_jni_QvdclientWrapper_qvd_1
   callbackhandler_env = malloc(sizeof(struct callbackhandler_environment_struct));
   /* Might be null if the object has not been asigned */
   callbackhandler_env->unknowncertCallbackHandler = (*env)->GetObjectField(env, obj, certificatehandler_fid);
-  qvd_printf("certificateHandler: %p, jvm: %p\n", callbackhandler_env->unknowncertCallbackHandler, callbackhandler_env->jvm);  
+  qvd_printf("certificateHandler: %p, jvm: %p\n", callbackhandler_env->unknowncertCallbackHandler, callbackhandler_env->jvm);
   callbackhandler_env->progressCallbackHandler = (*env)->GetObjectField(env, obj, progresshandler_fid);
-  qvd_printf("progressCallbackHandler: %p, jvm: %p\n", callbackhandler_env->progressCallbackHandler, callbackhandler_env->jvm);  
+  qvd_printf("progressCallbackHandler: %p, jvm: %p\n", callbackhandler_env->progressCallbackHandler, callbackhandler_env->jvm);
   if ((*env)->GetJavaVM(env, &(callbackhandler_env->jvm)) < 0) {
     qvd_error(qvd, "Error obtaining the JavaVM pointer\n");
     return NULL;
   }
   qvd->userdata = (void *) callbackhandler_env;
-  qvd_printf("certificateHandler: %p, jvm: %p\n", callbackhandler_env->unknowncertCallbackHandler, callbackhandler_env->jvm);  
+  qvd_printf("certificateHandler: %p, jvm: %p\n", callbackhandler_env->unknowncertCallbackHandler, callbackhandler_env->jvm);
   qvd_set_unknown_cert_callback(qvd, accept_unknown_cert_callback);
 
   vms = qvd_list_of_vm(qvd);
@@ -670,7 +670,7 @@ JNIEXPORT jobjectArray JNICALL Java_com_theqvd_client_jni_QvdclientWrapper_qvd_1
 JNIEXPORT jint JNICALL Java_com_theqvd_client_jni_QvdclientWrapper_qvd_1c_1connect_1to_1vm
 (JNIEnv *env, jobject obj, jlong qvd_c_pointer, jint vm_id)
 {
-  qvdclient *qvd; 
+  qvdclient *qvd;
   int vm_id_int;
   jobject vm;
   struct callbackhandler_environment_struct *callbackhandler_env = NULL;
@@ -686,16 +686,16 @@ JNIEXPORT jint JNICALL Java_com_theqvd_client_jni_QvdclientWrapper_qvd_1c_1conne
   callbackhandler_env = malloc(sizeof(struct callbackhandler_environment_struct));
   /* Might be null if the object has not been asigned */
   callbackhandler_env->unknowncertCallbackHandler = (*env)->GetObjectField(env, obj, certificatehandler_fid);
-  qvd_printf("certificateHandler: %p, jvm: %p\n", callbackhandler_env->unknowncertCallbackHandler, callbackhandler_env->jvm);  
+  qvd_printf("certificateHandler: %p, jvm: %p\n", callbackhandler_env->unknowncertCallbackHandler, callbackhandler_env->jvm);
   callbackhandler_env->progressCallbackHandler = (*env)->GetObjectField(env, obj, progresshandler_fid);
-  qvd_printf("progressCallbackHandler: %p, jvm: %p\n", callbackhandler_env->progressCallbackHandler, callbackhandler_env->jvm);  
+  qvd_printf("progressCallbackHandler: %p, jvm: %p\n", callbackhandler_env->progressCallbackHandler, callbackhandler_env->jvm);
   if ((*env)->GetJavaVM(env, &(callbackhandler_env->jvm)) < 0) {
     qvd_error(qvd, "Error obtaining the JavaVM pointer\n");
     return 7;
   }
   qvd->userdata = (void *) callbackhandler_env;
-  qvd_printf("progressCallbackHandler: %p, jvm: %p\n", callbackhandler_env->progressCallbackHandler, callbackhandler_env->jvm);  
-  qvd_printf("certificateHandler: %p, jvm: %p\n", callbackhandler_env->unknowncertCallbackHandler, callbackhandler_env->jvm);  
+  qvd_printf("progressCallbackHandler: %p, jvm: %p\n", callbackhandler_env->progressCallbackHandler, callbackhandler_env->jvm);
+  qvd_printf("certificateHandler: %p, jvm: %p\n", callbackhandler_env->unknowncertCallbackHandler, callbackhandler_env->jvm);
   qvd_set_unknown_cert_callback(qvd, accept_unknown_cert_callback);
 
   vm_id_int = vm_id;
@@ -709,7 +709,7 @@ JNIEXPORT jint JNICALL Java_com_theqvd_client_jni_QvdclientWrapper_qvd_1c_1conne
 JNIEXPORT jint JNICALL Java_com_theqvd_client_jni_QvdclientWrapper_qvd_1c_1stop_1vm
 (JNIEnv *env, jobject obj, jlong qvd_c_pointer, jint vm_id)
 {
-  qvdclient *qvd; 
+  qvdclient *qvd;
   int vm_id_int;
   jobject vm;
   struct callbackhandler_environment_struct *callbackhandler_env = NULL;
@@ -725,16 +725,16 @@ JNIEXPORT jint JNICALL Java_com_theqvd_client_jni_QvdclientWrapper_qvd_1c_1stop_
   callbackhandler_env = malloc(sizeof(struct callbackhandler_environment_struct));
   /* Might be null if the object has not been asigned */
   callbackhandler_env->unknowncertCallbackHandler = (*env)->GetObjectField(env, obj, certificatehandler_fid);
-  qvd_printf("certificateHandler: %p, jvm: %p\n", callbackhandler_env->unknowncertCallbackHandler, callbackhandler_env->jvm);  
+  qvd_printf("certificateHandler: %p, jvm: %p\n", callbackhandler_env->unknowncertCallbackHandler, callbackhandler_env->jvm);
   callbackhandler_env->progressCallbackHandler = (*env)->GetObjectField(env, obj, progresshandler_fid);
-  qvd_printf("progressCallbackHandler: %p, jvm: %p\n", callbackhandler_env->progressCallbackHandler, callbackhandler_env->jvm);  
+  qvd_printf("progressCallbackHandler: %p, jvm: %p\n", callbackhandler_env->progressCallbackHandler, callbackhandler_env->jvm);
   if ((*env)->GetJavaVM(env, &(callbackhandler_env->jvm)) < 0) {
     qvd_error(qvd, "Error obtaining the JavaVM pointer\n");
     return 7;
   }
   qvd->userdata = (void *) callbackhandler_env;
-  qvd_printf("progressCallbackHandler: %p, jvm: %p\n", callbackhandler_env->progressCallbackHandler, callbackhandler_env->jvm);  
-  qvd_printf("certificateHandler: %p, jvm: %p\n", callbackhandler_env->unknowncertCallbackHandler, callbackhandler_env->jvm);  
+  qvd_printf("progressCallbackHandler: %p, jvm: %p\n", callbackhandler_env->progressCallbackHandler, callbackhandler_env->jvm);
+  qvd_printf("certificateHandler: %p, jvm: %p\n", callbackhandler_env->unknowncertCallbackHandler, callbackhandler_env->jvm);
   qvd_set_unknown_cert_callback(qvd, accept_unknown_cert_callback);
 
   vm_id_int = vm_id;
@@ -750,7 +750,7 @@ static char qvd_geometry_string[16]; /* see MAX_GEOMETRY in the java class*/
 JNIEXPORT void JNICALL Java_com_theqvd_client_jni_QvdclientWrapper_qvd_1c_1set_1geometry
 (JNIEnv *env, jobject obj, jlong qvd_c_pointer, jint width, jint height)
 {
-  qvdclient *qvd; 
+  qvdclient *qvd;
   qvd=_set_qvdclient(qvd_c_pointer);
   qvd_printf("c_qvd_set_geometry(%p,%d,%d)\n", qvd,width,height);
   sprintf(qvd_geometry_string, "%dx%d", width, height);
@@ -761,7 +761,7 @@ JNIEXPORT void JNICALL Java_com_theqvd_client_jni_QvdclientWrapper_qvd_1c_1set_1
 JNIEXPORT void JNICALL Java_com_theqvd_client_jni_QvdclientWrapper_qvd_1c_1set_1fullscreen
 (JNIEnv *env, jobject obj, jlong qvd_c_pointer)
 {
-  qvdclient *qvd; 
+  qvdclient *qvd;
   qvd=_set_qvdclient(qvd_c_pointer);
   qvd_printf("c_qvd_set_fullscreen(%p)\n", qvd);
   qvd_set_fullscreen(qvd);
@@ -771,7 +771,7 @@ JNIEXPORT void JNICALL Java_com_theqvd_client_jni_QvdclientWrapper_qvd_1c_1set_1
 JNIEXPORT void JNICALL Java_com_theqvd_client_jni_QvdclientWrapper_qvd_1c_1set_1nofullscreen
   (JNIEnv *env, jobject obj, jlong qvd_c_pointer)
 {
-  qvdclient *qvd; 
+  qvdclient *qvd;
   qvd=_set_qvdclient(qvd_c_pointer);
   qvd_printf("c_qvd_set_nofullscreen(%p)\n", qvd);
   qvd_set_nofullscreen(qvd);
@@ -783,13 +783,13 @@ JNIEXPORT void JNICALL Java_com_theqvd_client_jni_QvdclientWrapper_qvd_1c_1set_1
 {
   qvd_printf("Message before setting debug\n");
   qvd_set_debug();
-  qvd_printf("Message after setting debug\n");  
+  qvd_printf("Message after setting debug\n");
 }
 /* set display */
 JNIEXPORT void JNICALL Java_com_theqvd_client_jni_QvdclientWrapper_qvd_1c_1set_1display
   (JNIEnv *env, jobject obj, jlong qvd_c_pointer, jstring display)
 {
-  qvdclient *qvd; 
+  qvdclient *qvd;
   const jbyte *str;
 
   qvd=_set_qvdclient(qvd_c_pointer);
@@ -806,7 +806,7 @@ JNIEXPORT void JNICALL Java_com_theqvd_client_jni_QvdclientWrapper_qvd_1c_1set_1
 JNIEXPORT jstring JNICALL Java_com_theqvd_client_jni_QvdclientWrapper_qvd_1c_1get_1last_1error_1message
 (JNIEnv *env, jobject obj, jlong qvd_c_pointer)
 {
-  qvdclient *qvd; 
+  qvdclient *qvd;
   qvd=_set_qvdclient(qvd_c_pointer);
   return (*env)->NewStringUTF(env, qvd_get_last_error(qvd));
 }
@@ -814,7 +814,7 @@ JNIEXPORT jstring JNICALL Java_com_theqvd_client_jni_QvdclientWrapper_qvd_1c_1ge
 JNIEXPORT void JNICALL Java_com_theqvd_client_jni_QvdclientWrapper_qvd_1c_1set_1home
 (JNIEnv *env, jobject obj, jlong qvd_c_pointer, jstring home)
 {
-  qvdclient *qvd; 
+  qvdclient *qvd;
   const jbyte *str;
 
   qvd=_set_qvdclient(qvd_c_pointer);
@@ -831,7 +831,7 @@ JNIEXPORT void JNICALL Java_com_theqvd_client_jni_QvdclientWrapper_qvd_1c_1set_1
 JNIEXPORT void JNICALL Java_com_theqvd_client_jni_QvdclientWrapper_qvd_1c_1set_1useragent
   (JNIEnv *env, jobject obj, jlong qvd_c_pointer, jstring useragent)
 {
-  qvdclient *qvd; 
+  qvdclient *qvd;
   const jbyte *str;
 
   qvd=_set_qvdclient(qvd_c_pointer);
@@ -847,7 +847,7 @@ JNIEXPORT void JNICALL Java_com_theqvd_client_jni_QvdclientWrapper_qvd_1c_1set_1
 
 JNIEXPORT void JNICALL Java_com_theqvd_client_jni_QvdclientWrapper_qvd_1c_1set_1os
 (JNIEnv *env, jobject obj, jlong qvd_c_pointer, jstring os) {
-  qvdclient *qvd; 
+  qvdclient *qvd;
   const jbyte *str;
 
   qvd=_set_qvdclient(qvd_c_pointer);
@@ -863,7 +863,7 @@ JNIEXPORT void JNICALL Java_com_theqvd_client_jni_QvdclientWrapper_qvd_1c_1set_1
 
 JNIEXPORT void JNICALL Java_com_theqvd_client_jni_QvdclientWrapper_qvd_1c_1set_1no_1cert_1check
 (JNIEnv *env, jobject obj, jlong qvd_c_pointer) {
-  qvdclient *qvd; 
+  qvdclient *qvd;
   qvd=_set_qvdclient(qvd_c_pointer);
   qvd_printf("Setting no certificate check\n");
   qvd_set_no_cert_check(qvd);
@@ -871,7 +871,7 @@ JNIEXPORT void JNICALL Java_com_theqvd_client_jni_QvdclientWrapper_qvd_1c_1set_1
 
 JNIEXPORT void JNICALL Java_com_theqvd_client_jni_QvdclientWrapper_qvd_1c_1set_1strict_1cert_1check
 (JNIEnv *env, jobject obj, jlong qvd_c_pointer) {
-  qvdclient *qvd; 
+  qvdclient *qvd;
   qvd=_set_qvdclient(qvd_c_pointer);
   qvd_printf("Setting strict certificate check\n");
   qvd_set_strict_cert_check(qvd);
@@ -879,7 +879,7 @@ JNIEXPORT void JNICALL Java_com_theqvd_client_jni_QvdclientWrapper_qvd_1c_1set_1
 
 JNIEXPORT void JNICALL Java_com_theqvd_client_jni_QvdclientWrapper_qvd_1c_1set_1progress_1callback
 (JNIEnv *env, jobject obj, jlong qvd_c_pointer) {
-  qvdclient *qvd; 
+  qvdclient *qvd;
   qvd=_set_qvdclient(qvd_c_pointer);
   qvd_printf("Setting progress callback\n");
   qvd_set_progress_callback(qvd, progress_callback);
@@ -887,7 +887,7 @@ JNIEXPORT void JNICALL Java_com_theqvd_client_jni_QvdclientWrapper_qvd_1c_1set_1
 
 JNIEXPORT void JNICALL Java_com_theqvd_client_jni_QvdclientWrapper_qvd_1c_1set_1no_1progress_1callback
 (JNIEnv *env, jobject obj, jlong qvd_c_pointer) {
-  qvdclient *qvd; 
+  qvdclient *qvd;
   qvd=_set_qvdclient(qvd_c_pointer);
   qvd_printf("Setting no progress callback\n");
   qvd_set_progress_callback(qvd, NULL);
@@ -896,7 +896,7 @@ JNIEXPORT void JNICALL Java_com_theqvd_client_jni_QvdclientWrapper_qvd_1c_1set_1
 
 JNIEXPORT void JNICALL Java_com_theqvd_client_jni_QvdclientWrapper_qvd_1c_1set_1link
 (JNIEnv *env, jobject obj, jlong qvd_c_pointer, jstring link) {
-  qvdclient *qvd; 
+  qvdclient *qvd;
   const jbyte *str;
 
   qvd=_set_qvdclient(qvd_c_pointer);
@@ -913,7 +913,7 @@ JNIEXPORT void JNICALL Java_com_theqvd_client_jni_QvdclientWrapper_qvd_1c_1set_1
 JNIEXPORT void JNICALL Java_com_theqvd_client_jni_QvdclientWrapper_qvd_1c_1set_1nx_1options
   (JNIEnv *env, jobject obj, jlong qvd_c_pointer, jstring nx_options)
 {
-  qvdclient *qvd; 
+  qvdclient *qvd;
   const jbyte *str;
 
   qvd=_set_qvdclient(qvd_c_pointer);
@@ -930,7 +930,7 @@ JNIEXPORT void JNICALL Java_com_theqvd_client_jni_QvdclientWrapper_qvd_1c_1set_1
 JNIEXPORT void JNICALL Java_com_theqvd_client_jni_QvdclientWrapper_qvd_1c_1set_1cert_1files
   (JNIEnv *env, jobject obj, jlong qvd_c_pointer, jstring client_cert, jstring client_key)
 {
-  qvdclient *qvd; 
+  qvdclient *qvd;
   const jbyte *client_cert_c, *client_key_c;
 
   qvd=_set_qvdclient(qvd_c_pointer);
@@ -954,9 +954,19 @@ JNIEXPORT void JNICALL Java_com_theqvd_client_jni_QvdclientWrapper_qvd_1c_1set_1
 JNIEXPORT void JNICALL Java_com_theqvd_client_jni_QvdclientWrapper_qvd_1c_1end_1connection
   (JNIEnv *env, jobject obj, jlong qvd_c_pointer)
 {
-  qvdclient *qvd; 
+  qvdclient *qvd;
 
   qvd=_set_qvdclient(qvd_c_pointer);
 
   qvd_end_connection(qvd);
+}
+
+JNIEXPORT jint JNICALL Java_com_theqvd_client_jni_QvdclientWrapper_qvd_1c_1payment_1required
+  (JNIEnv *env, jobject obj, jlong qvd_c_pointer)
+{
+  qvdclient *qvd;
+
+  qvd=_set_qvdclient(qvd_c_pointer);
+
+  return qvd_payment_required(qvd);
 }

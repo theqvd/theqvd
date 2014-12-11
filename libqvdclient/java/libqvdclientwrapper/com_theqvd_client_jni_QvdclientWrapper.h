@@ -199,6 +199,14 @@ JNIEXPORT void JNICALL Java_com_theqvd_client_jni_QvdclientWrapper_qvd_1c_1set_1
 JNIEXPORT void JNICALL Java_com_theqvd_client_jni_QvdclientWrapper_qvd_1c_1end_1connection
   (JNIEnv *, jobject, jlong);
 
+/*
+ * Class:     com_theqvd_client_jni_QvdclientWrapper
+ * Method:    qvd_c_payment_required
+ * Signature: (J)I
+ */
+JNIEXPORT jint JNICALL Java_com_theqvd_client_jni_QvdclientWrapper_qvd_1c_1payment_1required
+  (JNIEnv *, jobject, jlong);
+
 #ifdef __cplusplus
 }
 #endif
