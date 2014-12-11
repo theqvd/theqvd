@@ -78,7 +78,7 @@ qvdclient *qvd_init(const char *hostname, const int port, const char *username, 
     qvd_error(qvd, "Error allocating memory: %s", strerror(errno));
     return NULL;
   }
-  
+
   if (snprintf(qvd->userpwd, MAX_USERPWD, "%s:%s", username, password) >= MAX_USERPWD) {
     qvd_error(qvd, "Error initializing userpwd (string too long)\n");
     free(qvd);
@@ -155,6 +155,7 @@ qvdclient *qvd_init(const char *hostname, const int port, const char *username, 
   qvd->progress_callback = NULL;
   qvd->userdata = NULL;
   qvd->nx_options = NULL;
+  qvd->payment_required=0;
 
   *(qvd->display) = '\0';
   *(qvd->home) = '\0';
@@ -166,7 +167,7 @@ qvdclient *qvd_init(const char *hostname, const int port, const char *username, 
     return NULL;
   }
   QvdVmListInit(qvd->vmlist);
-  
+
   return qvd;
 }
 
@@ -214,11 +215,17 @@ vmlist *qvd_list_of_vm(qvdclient *qvd) {
       qvd_error(qvd, "Error accessing list of VMs: %s\n", curl_easy_strerror(qvd->res));
       return NULL;
     }
-  
+
   curl_easy_getinfo (qvd->curl, CURLINFO_RESPONSE_CODE, &http_code);
   if (http_code == 401)
     {
       qvd_error(qvd, "Error authenticating user\n");
+      return NULL;
+    }
+  if (http_code == 402)
+    {
+      qvd->payment_required = 1;
+      qvd_error(qvd, "Error no subscription available\n");
       return NULL;
     }
   qvd_printf("No error and no auth error after curl_easy_perform\n");
@@ -240,12 +247,12 @@ vmlist *qvd_list_of_vm(qvdclient *qvd) {
     json_t *obj = json_array_get(vmList, i);
     int id, blocked;
     char *name, *state;
-    json_unpack(obj, "{s:i,s:s,s:i,s:s}", 
+    json_unpack(obj, "{s:i,s:s,s:i,s:s}",
 		"id", &id,
 		"state", &state,
 		"blocked", &blocked,
 		"name", &name);
-    qvd_printf("VM ID:%d NAME:%s STATE:%s BLOCKED:%d\n", 
+    qvd_printf("VM ID:%d NAME:%s STATE:%s BLOCKED:%d\n",
 	       id, name, state, blocked);
     QvdVmListAppendVm(qvd, qvd->vmlist, QvdVmNew(id, name, state, blocked));
   }
@@ -286,7 +293,7 @@ int qvd_stop_vm(qvdclient *qvd, int vm) {
       qvd_error(qvd, "Error accessing list of VMs: %s\n", curl_easy_strerror(qvd->res));
       return 3;
     }
-  
+
   curl_easy_getinfo (qvd->curl, CURLINFO_RESPONSE_CODE, &http_code);
   if (http_code == 401)
     {
@@ -331,7 +338,7 @@ int qvd_connect_to_vm(qvdclient *qvd, int id)
   if (result)
     return result;
 
-  curl_easy_getinfo(qvd->curl, CURLINFO_LASTSOCKET, &curlsock);  
+  curl_easy_getinfo(qvd->curl, CURLINFO_LASTSOCKET, &curlsock);
   fd = (int) curlsock;
   qvd_printf("QVD curl socket is %d", fd);
   if (fd == -1) {
@@ -504,7 +511,7 @@ int _qvd_set_base64_auth(qvdclient *qvd)
       qvd_error(qvd, "The authdigest string for %s is longer than %d\n", qvd->userpwd, MAX_AUTHDIGEST);
       result = 1;
     }
-  else 
+  else
     {
       // The resulting digest isn't zero terminated
       memcpy(qvd->authdigest, ptr, outlen);
@@ -518,7 +525,7 @@ int _qvd_set_base64_auth(qvdclient *qvd)
 
   BIO_free_all(bio);
 
-  
+
   /* hack for base64 encode of "nito@deiro.com:O3xTMCQ3" */
   /*  snprintf(qvd->authdigest, MAX_AUTHDIGEST, "%s", "bml0b0BkZWlyby5jb206TzN4VE1DUTM=");*/
   return result;
@@ -548,10 +555,10 @@ int _qvd_proxy_connect(qvdclient *qvd)
  * _qvd_client_loop
  *            --------------------
  *            |                  |
- * proxyFd ---| _qvd_client_loop |---connFd            
+ * proxyFd ---| _qvd_client_loop |---connFd
  * (X display)|                  | (curl to remote host)
  *            --------------------
- * 
+ *
  *       -----   proxyRead  ---->
  *      <-----   proxyWrite ----
  *
@@ -628,7 +635,7 @@ int _qvd_client_loop(qvdclient *qvd, int connFd, int proxyFd)
 	      if (read == 0)
 		{
 		  qvd_printf("Setting connFd to 0, End of stream\n");
-		  connFd = -1; 
+		  connFd = -1;
 		}
 	      numunsupportedprotocolerrs = 0;
 	      break;
@@ -740,7 +747,7 @@ int _qvd_client_loop(qvdclient *qvd, int connFd, int proxyFd)
   return result;
 }
 
-size_t _qvd_write_buffer_callback(void *contents, size_t size, size_t nmemb, void *buffer) 
+size_t _qvd_write_buffer_callback(void *contents, size_t size, size_t nmemb, void *buffer)
 {
     size_t realsize = size*nmemb;
     size_t bytes_written = QvdBufferAppend((QvdBuffer*)buffer, contents, realsize);
@@ -796,7 +803,7 @@ V/qvd     ( 7551): Before select on send socket is: 43
 V/qvd     ( 7551): 0 input received was <HTTP/1.1 403 Forbidden
 V/qvd     ( 7551): Content-Type: text/plain
 V/qvd     ( 7551): Content-Length: 56
-V/qvd     ( 7551): 
+V/qvd     ( 7551):
 V/qvd     ( 7551): >
 V/qvd     ( 7551): 1 input received was <The requested virtual machine is offline for maintenance>
 
@@ -840,13 +847,13 @@ V/qvd     ( 7551): 1 input received was <The requested virtual machine is offlin
 	content_length = -1;
 	if (sscanf(ptr, "%d", &content_length) != 1) {
 	  qvd_printf("Error parsing content-length setting to -1: %d", content_length);
-	  content_length = -1;	  
+	  content_length = -1;
 	}
       }
       while (bytes_received < BUFFER_SIZE) {
 	qvd_printf("Waiting for extra data after found 2xx, 3xx, 4xx or 5xx code <%s>", qvd->buffer.data);
 	select(socket+1, &myset, &zero, &zero, NULL);
-       
+
 	ptr = qvd->buffer.data;
 	ptr += bytes_received;
 	/* TODO implement callback for info */
@@ -867,7 +874,7 @@ V/qvd     ( 7551): 1 input received was <The requested virtual machine is offlin
 	  qvd_error(qvd, "Error: <%s>", content);
 	  return 8;
 	}
-     
+
       }
     }
 
@@ -901,7 +908,7 @@ void _qvd_print_environ()
 /* arrays for certificate chain and errors */
 #define MAX_CERTS 20
 X509 *certificate[MAX_CERTS];
-long certificate_error[MAX_CERTS]; 
+long certificate_error[MAX_CERTS];
 
 int _qvd_dir_exists(qvdclient *qvd, const char *path)
 {
@@ -989,15 +996,15 @@ int _qvd_save_certificate(qvdclient *qvd, X509 *cert, int depth, BUF_MEM *biomem
 
 int _qvd_verify_cert_callback(int preverify_ok, X509_STORE_CTX *x509_ctx)
 {
-  
+
   SSL    *ssl;
   SSL_CTX *sslctx;
   qvdclient *qvd ;
 
   ssl = X509_STORE_CTX_get_ex_data(x509_ctx, SSL_get_ex_data_X509_STORE_CTX_idx());
   sslctx = SSL_get_SSL_CTX(ssl);
-  qvd = SSL_CTX_get_ex_data(sslctx, _qvd_ssl_index); 
- 
+  qvd = SSL_CTX_get_ex_data(sslctx, _qvd_ssl_index);
+
   X509 *cert = X509_STORE_CTX_get_current_cert(x509_ctx);
   int depth = X509_STORE_CTX_get_error_depth(x509_ctx);
   int err = X509_STORE_CTX_get_error(x509_ctx);
@@ -1033,7 +1040,7 @@ int _qvd_verify_cert_callback(int preverify_ok, X509_STORE_CTX *x509_ctx)
   X509_NAME_oneline(X509_get_subject_name(certificate[depth]), subject, 256);
 
   snprintf(cert_info, 1023, "Serial: %lu\n\nIssuer: %s\n\nValidity:\n\tNot before: %s\n\tNot after: %s\n\nSubject: %s\n",
-	   ASN1_INTEGER_get(X509_get_serialNumber(certificate[depth])), issuer, 
+	   ASN1_INTEGER_get(X509_get_serialNumber(certificate[depth])), issuer,
 	   X509_get_notBefore(certificate[depth])->data, X509_get_notAfter(cert)->data, subject);
   cert_info[1023] = '\0';
   result = qvd->ssl_verify_callback(qvd, cert_info, biomem->data);
@@ -1062,9 +1069,9 @@ CURLcode _qvd_sslctxfun(CURL *curl, SSL_CTX *sslctx, void *parm)
   SSL_CTX_set_verify(sslctx, SSL_VERIFY_PEER, _qvd_verify_cert_callback);
 
   return CURLE_OK;
-} 
+}
 
-/* 
+/*
  * Returns 1 if client certificates are used and 0 otherwise
  */
 int _qvd_use_client_cert(qvdclient *qvd)
@@ -1124,4 +1131,9 @@ void qvd_set_cert_files(qvdclient *qvd, const char *client_cert, const char *cli
 void qvd_end_connection(qvdclient *qvd)
 {
   qvd->end_connection=1;
+}
+
+int qvd_payment_required(qvdclient *qvd)
+{
+  return qvd->payment_required;
 }
