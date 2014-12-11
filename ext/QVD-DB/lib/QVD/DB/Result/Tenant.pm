@@ -8,6 +8,7 @@ __PACKAGE__->load_components(qw/Core/);
 __PACKAGE__->table('tenants');
 __PACKAGE__->add_columns( id          => { data_type => 'integer',
                                            is_auto_increment => 1 },
+			  language      => { data_type         => 'varchar(64)' },
                           name        => { data_type => 'varchar(80)' });
 
 __PACKAGE__->set_primary_key('id');

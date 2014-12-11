@@ -52,7 +52,7 @@ sub select
 
     my @rows;
     my $rs;
-   
+
     eval { $rs = $DB->resultset($request->table)->search($request->filters,$request->modifiers);
 	   @rows = $rs->all };
 
@@ -73,7 +73,8 @@ sub get_extra_info_from_related_views
     return $extra unless $view_name;
 
     my $vrs = $DB->resultset($view_name)->search();
-    $extra->{$_->id} = $_ for $vrs->all;        
+    $extra->{$_->id} = $_ for $vrs->all;
+
     $extra;
 }
 
@@ -715,110 +716,29 @@ sub di_no_head_default_tags
 ## GENERAL FUNCTIONS; WITHOUT REQUEST
 ######################################
 
-sub tenant_view_get_list 
-{
-    my ($self,$administrator,$json_wrapper) = @_;
-
-    my $tenant_id = $json_wrapper->get_filter_value('tenant_id');
-    defined $tenant_id && ($administrator->is_superadmin ||
-	QVD::Admin4::Exception->throw(code=>'4220', object => 'tenant_id'));  
-    $tenant_id //= $administrator->tenant_id; 
-
-    my $qvd_object = $json_wrapper->get_filter_value('qvd_object') //
-	QVD::Admin4::Exception->throw(code=>'6220', object => 'qvd_object');
-
-    $qvd_object =~ /^vm|user|osf|host|di$/ || 
-	QVD::Admin4::Exception->throw(code=>'6320', object => 'qvd_object');
-
-    my $rs = $DB->resultset('Tenant_Views_Setups_View')->search({},{bind => [$tenant_id, $qvd_object]});
-
-    { total => ($rs->is_paged ? $rs->pager->total_entries : $rs->count), 
-      rows => [map {{$_->get_columns}} $rs->all] };
-}
-
-
-sub get_properties_by_qvd_object
-{
-    my ($self,$admin,$qvd_object) = @_;
-
-    my %tables = (user=>'User',vm =>'VM',host=>'Host',osf=>'OSF',di =>'DI');
-
-    my $tenants_scoop = $admin->tenants_scoop;
-
-    $tenants_scoop = [$tenants_scoop] unless ref($tenants_scoop);
-
-    my $filters = $qvd_object eq 'host' ? {} :
-    {tenant_id => { IN =>  $tenants_scoop }};
-
-    my $rs = $DB->resultset($tables{$qvd_object}.'_Properties_List_View')->
-        search($filters);
-
-    my %props;
-    for my $props_in_tenant (map { $_->properties } $rs->all)
-    {
-        $props{$_} = 1 for @$props_in_tenant;
-    }
-
-    [sort keys %props ];
-}
-
-
 sub current_admin_setup
 {
     my ($self,$administrator,$json_wrapper) = @_;
 
-    my $views_combination = $json_wrapper->get_filter_value('views_combination') //
-	QVD::Admin4::Exception->throw(code=>'6220', object => 'views_combination');
-    my @qvd_objects_with_props = qw(user vm host osf di);
-    my @view_keys = qw(field qvd_object view_type device_type property);
-
     my $f =
         sub { my $obj = shift;
-              my $out; $out .= $obj->$_ for @view_keys; $out; };
-    my $g =
-        sub { my $hash = shift;
-              my $out; $out .= $hash->{$_} for @view_keys; $out; };
+              my @methods = qw(field qvd_object view_type device_type property);
+              my $out; $out .= $obj->$_ for @methods; $out; };
 
-    my %properties = map { $_ => {} } @qvd_objects_with_props;
-    for my $qvd_object (@qvd_objects_with_props)
-    {
-	$properties{$qvd_object} = { map { $_ => 1 }
-	@{$self->get_properties_by_qvd_object($administrator,$qvd_object)} };
-    }
-
-    my @tenant_views = grep {(not $_->property) || defined $properties{$_->qvd_object}->{$_->field}  } 
-    $DB->resultset('Tenant_Views_Setup')->search({tenant_id => $administrator->tenant_id})->all;
-
-    my @admin_views = grep {(not $_->property) || defined $properties{$_->qvd_object}->{$_->field}} 
-    $DB->resultset('Administrator_Views_Setup')->search({administrator_id => $administrator->id})->all;
-
+    my @tenant_views = $DB->resultset('Tenant_Views_Setup')->search(
+        {tenant_id => $administrator->tenant_id})->all;
+    my @admin_views = $DB->resultset('Administrator_Views_Setup')->search(
+        {administrator_id => $administrator->id})->all;
     my %views = map { $f->($_) => $_ } @tenant_views;
     $views{$f->($_)} = $_ for  @admin_views;
-    
-    my @extra_views;
-    for my $qvd_object (@qvd_objects_with_props)
-    {
-	for my $view_model (@$views_combination)
-	{
 
-	    for my $property (keys %{$properties{$qvd_object}})
-	    {
-		my $view = clone $view_model;
-		$view->{field} = $property;
-		$view->{qvd_object} = $qvd_object;
-		$view->{property} = 1;
-		$view->{visible} = 0;
-		push @extra_views, $view unless 
-		    defined $views{$g->($view)};
-	    }
-	}
-    }
-
-   { admin_id => $administrator->id,
+    { admin_language => $administrator->required_language,
+      tenant_language => $administrator->tenant_language,
+      admin_id => $administrator->id,
      tenant_id => $administrator->tenant_id,
      acls => [ $administrator->acls ],
-     views => [sort { $a->{property} <=> $b->{property} || $a->{field} cmp $b->{field} }
-	       (@extra_views, (map { { $_->get_columns } } values %views)) ]};
+      views => [ sort { $a->{property} <=> $b->{property} || $a->{field} cmp $b->{field} }
+			map { { $_->get_columns } } values %views ]};
 }
 
 sub get_acls_in_admins

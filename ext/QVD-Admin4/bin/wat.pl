@@ -1,6 +1,6 @@
 #!/usr/lib/qvd/bin/perl                                                                                                                                                                                                                                                                                                                                                                     
 use Mojolicious::Lite;
-use lib::glob '/home/benjamin/wat/*/lib/';
+use lib::glob '/home/ubuntu/wat/*/lib/';
 use QVD::Admin4::REST;
 use Mojo::JSON qw(encode_json decode_json);
 use QVD::Admin4::Exception;
@@ -45,7 +45,7 @@ package MojoX::Session::Transport::WAT
 
 # GENERAL CONFIG AND PLUGINS
 
-app->config(hypnotoad => {listen => ['http://192.168.56.101:3000']});
+app->config(hypnotoad => {listen => ['http://192.168.3.7:3000']});
 my $QVD_ADMIN4_API = QVD::Admin4::REST->new();
 
 # HELPERS
@@ -87,6 +87,7 @@ under sub {
 any '/' => sub {
 
     my $c = shift;
+    $c->inactivity_timeout(30000);     
     my $json = $c->get_input_json;
     my $action_size = $c->get_action_size($json);
     my $response = $c->process_api_query($json);
@@ -100,7 +101,7 @@ get '/proofs' => 'proofs';
 websocket '/ws' => sub {
     my $c = shift;
     $c->app->log->debug("WebSocket opened");
-    $c->inactivity_timeout(30);     
+    $c->inactivity_timeout(30000);     
     my $json = $c->get_input_json;
     my $notification = 0;
 
@@ -134,11 +135,14 @@ websocket '/ws' => sub {
 
 };
 
+
+
 websocket '/staging' => sub {
     my $c = shift;
     $c->inactivity_timeout(3000);
     $c->app->log->debug("Staging WebSocket opened");
     my $json = $c->get_input_json;
+
     my $images_path  = cfg('path.storage.images');
     my $staging_path = cfg('path.storage.staging');
     my $staging_file = eval { $json->{arguments}->{disk_image} } // '';
@@ -157,12 +161,11 @@ websocket '/staging' => sub {
               my $response = $c->qvd_admin4_api->process_query($json);
               return $response; },
         sub { my ($fc, $err, $response) = @_;
-	      $err //= 'no error signals';
-              $c->app->log->debug("Copy finished: $err");
+              $err //= '';
+              $c->app->log->debug("Copy accomplished, $err");
               $c->send(encode_json($response)); }
         );
 };
-
 
 app->start;
 
@@ -250,7 +253,7 @@ sub update_session
     
     my ($bool,$exception) = (1, undef);
 
-    $session->extend_expires;
+    $session->extend_expires; 
     $c->qvd_admin4_api->load_user($session->data('admin_id'));
 
     for (1 .. 5) { eval { $session->flush }; last unless $@;}

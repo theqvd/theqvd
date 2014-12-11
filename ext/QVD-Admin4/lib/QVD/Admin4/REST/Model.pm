@@ -289,11 +289,11 @@ my $AVAILABLE_FILTERS =
 
 	      ACL => [qw(id name role_id admin_id)],
 
-	      Tenant => [qw(id name)],
+	      Tenant => [qw(id name language)],
 
 	      Role => [qw(name id fixed internal)],
 
-	      Administrator => [qw(name tenant_id tenant_name id )],
+	      Administrator => [qw(name tenant_id tenant_name id language)],
 
 	      Tenant_Views_Setup => [qw(id tenant_id tenant_name field visible view_type device_type qvd_object property)],
 
@@ -322,9 +322,9 @@ my $AVAILABLE_FILTERS =
 
 		 Role => [qw(name id fixed internal)],
 
-		 Tenant => [qw(id name)],
+		 Tenant => [qw(id name language)],
 
-		 Administrator => [qw(name tenant_id tenant_name role_id acl_id id role_name acl_name )],
+		 Administrator => [qw(name tenant_id tenant_name role_id acl_id id role_name acl_name language)],
 
 		 Tenant_Views_Setup => [qw(id tenant_id tenant_name field visible view_type device_type qvd_object property)],
 
@@ -338,6 +338,8 @@ my $AVAILABLE_FILTERS =
     delete => { default => [qw(id tenant_id)], Host => [qw(id)], ACL => [qw(id)], Role => [qw(id)], Tenant => [qw(id)], Config => [qw(key)]},
 
     update => { default => [qw(id tenant_id)], Host => [qw(id)], ACL => [qw(id)], Role => [qw(id)], Tenant => [qw(id)], Config => [qw(key)]},
+
+    exec => { default => [qw(id tenant_id)], VM => [qw(id tenant_id host_id user_id)]},
 
     state => { default => [qw(id tenant_id)], Host => [qw(id)], ACL => [qw(id)], Role => [qw(id)], Tenant => [qw(id)]},
 };
@@ -360,9 +362,9 @@ my $AVAILABLE_FIELDS =
 
 	      ACL => [qw(id name)],
 
-	      Administrator => [qw(name roles id )],
+	      Administrator => [qw(name roles id language)],
 
-	      Tenant => [qw(id name)],
+	      Tenant => [qw(id name language)],
 				   
 	      User => [qw(id name  blocked creation_admin creation_date number_of_vms number_of_vms_connected  properties )],
 
@@ -391,9 +393,9 @@ my $AVAILABLE_FIELDS =
 
 		 ACL => [qw(id name)],
 
-		 Administrator => [qw(name roles id )],
+		 Administrator => [qw(name roles id language)],
 
-		 Tenant => [qw(id name)],
+		 Tenant => [qw(id name language)],
 
 		 User => [qw(id name  blocked creation_admin creation_date number_of_vms number_of_vms_connected  properties )],
 
@@ -439,6 +441,8 @@ my $MANDATORY_FILTERS =
 
     update=> { default => [qw(id tenant_id)], Host => [qw(id)], ACL => [qw(id)], Role => [qw(id)], Tenant => [qw(id)], Config => [qw(key)]}, 
 
+    exec => { default => [qw(id tenant_id)], VM => [qw()]}, 
+
     state => { default => [qw(id tenant_id)], Host => [qw(id)], ACL => [qw(id)], Role => [qw(id)], Tenant => [qw(id)]}, 
 
     all_ids => { default => [qw(tenant_id)], Host => [qw()], ACL => [qw()], Role => [qw()], Tenant => [qw()], Config => [qw()]}, 
@@ -464,7 +468,13 @@ my $DEFAULT_ORDER_CRITERIA =
 	      DI => [qw(disk_image)],
 	      Tenant_Views_Setup => [qw(field)],
 	      Administrator_Views_Setup => [qw(field)],
+              Config => [qw(key)] },
+
+    list => { default =>  [qw()],
+	      Tenant_Views_Setup => [qw(field)],
+	      Administrator_Views_Setup => [qw(field)],
               Config => [qw(key)] }
+
 };
 
 my $AVAILABLE_NESTED_QUERIES = 
@@ -544,9 +554,9 @@ my $AVAILABLE_ARGUMENTS = { Config => [qw(value)],
                             Host => [qw(name address blocked)],
                             OSF => [qw(name memory user_storage overlay)],
                             DI => [qw(blocked disk_image)],
-			    Tenant => [qw(name)],
+			    Tenant => [qw(name language)],
 			    Role => [qw(name)],
-			    Administrator => [qw(name password)],
+			    Administrator => [qw(name password language)],
 			    Tenant_Views_Setup => [qw(visible)],
 			    Administrator_Views_Setup => [qw(visible)]};
 
@@ -586,6 +596,10 @@ my $DEFAULT_ARGUMENT_VALUES =
 
     Role => { fixed => 'false', internal => 'false' },
 
+    Tenant => { language => 'auto'},
+
+    Administrator => { language => 'auto'},
+
     Tenant_Views_Setup => { visible => 0, property => 0 },
 
     Administrator_Views_Setup =>  { visible => 0, property => 0 }
@@ -615,6 +629,7 @@ my $FILTERS_TO_DBIX_FORMAT_MAPPER =
     
     Administrator => {
 	'name' => 'me.name',
+	'language' => 'me.language',
 	'password' => 'me.password',
 	'tenant_id' => 'me.tenant_id',
 	'tenant_name' => 'tenant.name',
@@ -688,6 +703,8 @@ my $FILTERS_TO_DBIX_FORMAT_MAPPER =
 	'host_id' => 'vm_runtime.host_id',
 	'host_name' => 'host.name',
 	'di_id' => 'di.id',
+	'di_version' => 'di.version',
+	'di_name' => 'di.path',
 	'user_state' => 'vm_runtime.user_state',
 	'ip' => 'me.ip',
 	'next_boot_ip' => 'vm_runtime.vm_address',
@@ -709,7 +726,8 @@ my $FILTERS_TO_DBIX_FORMAT_MAPPER =
 
     Tenant => {
 	'name' => 'me.name',
-	'id' => 'me.id'
+	'id' => 'me.id',
+	'language' => 'me.language'
     },
     
     Tenant_Views_Setup => { 	
@@ -846,8 +864,8 @@ my $FIELDS_TO_DBIX_FORMAT_MAPPER =
 	'creation_admin' => 'me.creation_admin',
 	'creation_date' => 'me.creation_date',
 	'di_version' => 'di.version',
-	'di_name' => 'me.di_name',
-	'di_id' => 'me.di_id',
+	'di_name' => 'di.path',
+	'di_id' => 'di.id',
 	'properties' => 'view.properties',
     },
 
@@ -866,6 +884,7 @@ my $FIELDS_TO_DBIX_FORMAT_MAPPER =
 
     Administrator => {
 	'name' => 'me.name',
+	'language' => 'me.language',
 	'password' => 'me.password',
 	'tenant_id' => 'me.tenant_id',
 	'tenant_name' => 'me.tenant_name',
@@ -874,7 +893,8 @@ my $FIELDS_TO_DBIX_FORMAT_MAPPER =
     },
     Tenant => {
 	'name' => 'me.name',
-	'id' => 'me.id'
+	'id' => 'me.id',
+	'language' => 'me.language'
     },
 
     Tenant_Views_Setup => { 	
@@ -915,7 +935,7 @@ my $VALUES_NORMALIZATOR =
 
 my $DBIX_JOIN_VALUE = 
 { 
-    User => [qw(tenant), { vms => 'vm_runtime'}],
+    User => [qw(tenant)],
  
     VM => ['di', 'osf', { vm_runtime => 'host' }, { user => 'tenant' }],
   

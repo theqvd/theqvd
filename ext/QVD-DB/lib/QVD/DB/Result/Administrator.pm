@@ -7,6 +7,7 @@ __PACKAGE__->add_columns( tenant_id  => { data_type         => 'integer' },
                           id         => { data_type         => 'integer',
 					  is_auto_increment => 1 },
 			  name      => { data_type         => 'varchar(64)' },
+			  language      => { data_type         => 'varchar(64)' },
 			  # FIXME: get passwords out of this table!
                           # FIXME: omg encrypt passwords!!
 			  password   => { data_type         => 'varchar(64)',
@@ -51,6 +52,7 @@ sub tenant_name
     my $self = shift;
     $self->tenant->name;
 }
+
 
 sub get_roles_info
 {
@@ -109,6 +111,21 @@ sub tenants_scoop
 	unless defined $self->{tenants_scoop};
 
     return $self->{tenants_scoop};
+}
+
+sub required_language
+{
+    my $self = shift;
+
+    $self->language eq 'default' ? 
+	return $self->tenant->language : 
+	return $self->language; 
+}
+
+sub tenant_language
+{
+    my $self = shift;
+    $self->tenant->language;
 }
 
 1;

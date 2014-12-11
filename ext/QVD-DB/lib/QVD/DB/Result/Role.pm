@@ -31,6 +31,8 @@ sub get_roles_with_its_acls_info
 
     for ($self->get_role_names_ids)
     {
+	$out->{$_->{id}}->{fixed} = $_->{fixed};
+	$out->{$_->{id}}->{internal} = $_->{internal};
 	$out->{$_->{id}}->{name} = $_->{name};
 	$out->{$_->{id}}->{acls} = [ sort $self->get_all_acl_names($_->{id}) ];
     }
@@ -309,7 +311,7 @@ sub load_full_acls_inheritance_tree
           from all_role_role_relations pr, role_role_relations p 
           where pr.inherited_id=p.inheritor_id  ) 
 
-      select a.inheritor_id, a.inherited_id, d.name, e.name, b.acl_id, c.name, b.positive 
+      select a.inheritor_id, a.inherited_id, d.name, e.name, b.acl_id, c.name, b.positive, d.fixed, d.internal, e.fixed, e.internal 
       from all_role_role_relations a 
       left join acl_role_relations b on (a.inherited_id=b.role_id) 
       left join acls c on (c.id=b.acl_id) 
@@ -318,7 +320,7 @@ sub load_full_acls_inheritance_tree
 
       union 
 
-      select f.id, f.id, f.name, f.name, g.acl_id, h.name, g.positive 
+      select f.id, f.id, f.name, f.name, g.acl_id, h.name, g.positive, f.fixed, f.internal, f.fixed, f.internal  
       from roles f 
       join acl_role_relations g on (f.id=g.role_id) 
       join acls h on (h.id=g.acl_id) 
@@ -336,11 +338,15 @@ sub load_full_acls_inheritance_tree
     {
 	$tree->{@{$row}[1]}->{id} //= @{$row}[1];
 	$tree->{@{$row}[1]}->{name} //= @{$row}[3];
+	$tree->{@{$row}[1]}->{fixed} //= @{$row}[9];
+	$tree->{@{$row}[1]}->{internal} //= @{$row}[10];
 	$tree->{@{$row}[1]}->{roles} //= {};
 	$tree->{@{$row}[1]}->{acls} //= { 1 => {}, 0 => {}};
 
 	$tree->{@{$row}[0]}->{id} //= @{$row}[0];
 	$tree->{@{$row}[0]}->{name} //= @{$row}[2];
+	$tree->{@{$row}[0]}->{fixed} //= @{$row}[7];
+	$tree->{@{$row}[0]}->{internal} //= @{$row}[8];
 	$tree->{@{$row}[0]}->{roles} //= {};
 	$tree->{@{$row}[0]}->{acls} //= { 1 => {}, 0 => {}};
 
