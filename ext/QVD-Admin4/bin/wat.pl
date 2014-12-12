@@ -59,6 +59,7 @@ helper (get_auth_method => \&get_auth_method);
 helper (create_session => \&create_session);
 helper (update_session => \&update_session);
 helper (reject_access => \&reject_access);
+helper (create_di => \&create_di);
 
 #######################
 ### Routes Handlers ###
@@ -136,17 +137,16 @@ websocket '/ws' => sub {
 };
 
 
-
 websocket '/staging' => sub {
     my $c = shift;
     $c->inactivity_timeout(3000);
     $c->app->log->debug("Staging WebSocket opened");
     my $json = $c->get_input_json;
-
     my $images_path  = cfg('path.storage.images');
     my $staging_path = cfg('path.storage.staging');
     my $staging_file = eval { $json->{arguments}->{disk_image} } // '';
-    my $images_file = $staging_file;
+    my $images_file = $staging_file . '-tmp'. rand;
+    $json->{parameters}->{tmp_file_name} = $images_file;
 
     $c->on(message => sub { my ($c,$msg) = @_;
                             my $sf_size = eval { -s "$staging_path/$staging_file" } // 0;
@@ -161,8 +161,8 @@ websocket '/staging' => sub {
               my $response = $c->qvd_admin4_api->process_query($json);
               return $response; },
         sub { my ($fc, $err, $response) = @_;
-              $err //= '';
-              $c->app->log->debug("Copy accomplished, $err");
+	      $err //= 'no error signals';
+              $c->app->log->debug("Copy finished: $err");
               $c->send(encode_json($response)); }
         );
 };
@@ -172,6 +172,24 @@ app->start;
 #################
 ### FUNCTIONS ###
 #################
+
+sub create_di
+{
+    my ($c,$fs,$copy_response,$db_query_request) = @_;
+    
+    return $copy_response unless $copy_response->{status} eq '0000';
+    my $db_query_response = $c->qvd_admin4_api->process_query($db_query_request);
+
+    unless ($db_query_response->{status})
+    {
+	my $di_name_normalization = $c->qvd_admin4_api->process_query(
+	    { action => 'normalize_di_path', 
+	      filters => { filesystem => $fs}});
+
+	return $di_name_normalization unless $di_name_normalization->{status} eq '0000';
+    }
+    $db_query_response;
+}
 
 sub get_input_json
 {
@@ -276,7 +294,7 @@ __DATA__
 <title>Web Sockets Proofs</title>                                                                                                                                                             
 <script type="text/javascript">                                                                                                                                                               
 
-      var staging = new WebSocket('ws://localhost:3000/staging?login=superadmin&password=superadmin&action=di_create&arguments={"disk_image":"ubuntu-13.04-i386-qvd.tar.gz","osf_id":"1"}');                     
+      var staging = new WebSocket('ws://172.20.126.16:8080/staging?login=superadmin&password=superadmin&action=di_create&arguments={"disk_image":"ubuntu-13.04-i386-qvd.tar.gz","osf_id":"14"}');                     
       staging.onopen =                                                                                                                                                                          
         function (event)                                                                                                                                                                      
         { 
@@ -300,56 +318,12 @@ __DATA__
                 }
         };                                                                                                                                                                                    
 
-      var ws = new WebSocket('ws://localhost:3000/ws?login=superadmin&password=superadmin&action=qvd_objects_statistics');                                                    
-
-      ws.onmessage =                                                                                                                                                                          
-        function (event)                                                                                                                                                                      
-        {                                                                                                                                                                                   
-              if (event.data == 'AKN')
-              {
-                ws.send('Hello!!');
-              }
-              else
-              {
-                obj = JSON.parse(event.data);
-                document.getElementById("vms_total").innerHTML = obj.vms_count;                                                                                                                       
-                document.getElementById("vms_blocked").innerHTML = obj.blocked_vms_count;                                                                                                                       
-                document.getElementById("vms_running").innerHTML = obj.running_vms_count;                                                                                                                       
-                document.getElementById("users_total").innerHTML = obj.users_count;                                                                                                                       
-                document.getElementById("users_blocked").innerHTML = obj.blocked_users_count;                                                                                                                    
-                document.getElementById("hosts_total").innerHTML = obj.hosts_count;                                                                                                                    
-                document.getElementById("hosts_blocked").innerHTML = obj.blocked_hosts_count;                                                                                                                    
-                document.getElementById("hosts_running").innerHTML = obj.running_hosts_count;                                                                                                                
-                document.getElementById("dis_total").innerHTML = obj.dis_count;                                                                                                                       
-                document.getElementById("dis_blocked").innerHTML = obj.blocked_dis_count;                                                                                                                    
-                document.getElementById("osfs_total").innerHTML = obj.osfs_count;
-
-                ws.send('Hello!!');
-              }
-              
-        };                                                                                                                                                                                    
-                                                                                                                                                                                              
+ 
 </script>                                                                                                                                                                                     
 </head>                                                                                                                                                                                       
 <body>                                                                                                                                                                                        
-
-<div>VMs Total: <span id="vms_total"></span></div><br/>
-<div>VMs Blocked: <span id="vms_blocked"></span></div><br/>
-<div>VMs Running: <span id="vms_running"></span></div><br/>
-<hr/>
-<div>Users Total: <span id="users_total"></span></div><br/>
-<div>Users Blocked: <span id="users_blocked"></span></div><br/>
-<hr/>
-<div>Hosts Total: <span id="hosts_total"></span></div><br/>
-<div>Hosts Blocked: <span id="hosts_blocked"></span></div><br/>
-<div>Hosts Running: <span id="hosts_running"></span></div><br/>
-<hr>
-<div>DIs Total: <span id="dis_total"></span></div><br/>
-<div>DIs Blocked: <span id="dis_blocked"></span></div><br/>
 <div>DI Copy Progress: <span id="dis_copy_progress"></span></div><br/>
 <div>DI Copy Status: <span id="dis_copy_status"></span></div><br/>
-<hr/>
-<div>OSFs Total: <span id="osfs_total"></span></div><br/>
 
 </body>                                                                                                                                                                                       
 </html>                                                                                                                                                                                       

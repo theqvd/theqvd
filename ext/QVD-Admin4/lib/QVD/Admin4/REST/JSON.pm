@@ -65,6 +65,12 @@ sub filters
 	return $self->json->{filters} || {};
 }
 
+sub parameters
+{
+	my $self = shift;
+	return $self->json->{parameters} || {};
+}
+
 sub arguments
 {
 	my $self = shift;
@@ -75,6 +81,12 @@ sub filters_list
 {
     my $self = shift;
     keys %{$self->filters};
+}
+
+sub parameters_list
+{
+    my $self = shift;
+    keys %{$self->parameters};
 }
 
 sub arguments_list
@@ -150,6 +162,15 @@ sub has_filter
     return 0;
 }
 
+sub has_parameter
+{
+    my ($self,$parameter) = @_;
+
+    $_ eq $parameter && return 1
+	for keys %{$self->parameters};
+    return 0;
+}
+
 sub has_argument
 {
     my ($self,$argument) = @_;
@@ -174,6 +195,12 @@ sub get_filter_value
     return $self->filters->{$filter};
 }
 
+sub get_parameter_value
+{
+    my ($self,$parameter) = @_;
+    return $self->parameters->{$parameter};
+}
+
 sub get_argument_value
 {
     my ($self,$argument) = @_;
@@ -194,6 +221,12 @@ sub forze_filter_deletion
     delete $self->json->{filters}->{$filter};
 }
 
+sub forze_parameter_deletion
+{
+    my ($self,$parameter) = @_;
+    delete $self->json->{parameters}->{$parameter};
+}
+
 sub forze_argument_deletion
 {
     my ($self,$argument) = @_;
@@ -212,6 +245,12 @@ sub forze_filter_addition
 {
     my ($self,$key,$value) = @_;
     $self->json->{filters}->{$key} = $value;
+}
+
+sub forze_parameter_addition
+{
+    my ($self,$key,$value) = @_;
+    $self->json->{parameters}->{$key} = $value;
 }
 
 sub forze_argument_addition

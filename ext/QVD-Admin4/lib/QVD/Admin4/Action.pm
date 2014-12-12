@@ -11,6 +11,18 @@ my $AVAILABLE_ACTION_SIZES = { default => 'normal', normal => 'normal', heavy =>
 my $ACTIONS =
 {
 
+get_di_location_in_fs => {type_of_action =>  'general',
+			  acls => [qr/^di\.create\./],
+			  admin4method => 'get_di_location_in_fs'},
+
+copy_di_to_images_path => {type_of_action =>  'general',
+			  acls => [qr/^di\.create\./],
+			  admin4method => 'copy_di_to_images_path'},
+
+normalize_di_path => {type_of_action =>  'general',
+		      acls => [qr/^di\.create\./],
+		      admin4method => 'normalize_di_path'},
+
 dis_in_staging => { type_of_action =>  'general',
 		    acls => [qr/^di\.create\./],
 		    admin4method => 'dis_in_staging'},

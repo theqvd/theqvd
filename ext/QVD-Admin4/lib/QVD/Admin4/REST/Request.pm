@@ -72,6 +72,9 @@ sub forze_default_version_in_json_for_di
 
     my ($y, $m, $d) = (localtime)[5, 4, 3]; $m ++; $y += 1900;
     my $osf = $DBConfigProvider->db->resultset('OSF')->search({id => $osf_id})->first;
+
+    QVD::Admin4::Exception->throw(code => 7100, object => 'osf_id') unless $osf; 
+
     my $version;
 
     for (0..999) 
@@ -81,6 +84,18 @@ sub forze_default_version_in_json_for_di
     }
     
     $self->json_wrapper->forze_argument_addition('version',$version);
+}
+
+sub parameters
+{
+    my $self = shift;
+    $self->json_wrapper->parameters;
+}
+
+sub get_parameter_value
+{
+    my ($self,$p) = @_;
+    $self->json_wrapper->get_parameter_value($p);
 }
 
 sub action 
