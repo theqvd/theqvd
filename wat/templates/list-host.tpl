@@ -158,12 +158,12 @@
                                         switch(model.get('state')) {
                                             case "running":
                                     %>
-                                                <span data-i18n>Running</span>
+                                                <span data-i18n="Running"></span>
                                     <%
                                                 break;
                                             case "stopped":
                                     %>
-                                                <span data-i18n>Stopped</span>
+                                                <span data-i18n="Stopped"></span>
                                     <%
                                                 break;
                                         }

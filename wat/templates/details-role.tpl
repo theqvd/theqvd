@@ -1,5 +1,5 @@
 <div class="details-header">
-    <span class="fa fa-graduation-cap h1" data-i18n><%= model.get('name') %></span>
+    <span class="<%= CLASS_ICON_ROLES %> h1"><%= model.get('name') %></span>
     <% if(Wat.C.checkACL('role.delete.') && !model.get('fixed')) { %>
     <a class="button fleft button-icon js-button-delete fa fa-trash" href="javascript:" data-i18n="[title]Delete"></a>
     <% } %>
@@ -16,7 +16,7 @@ if (Wat.C.checkACL('role.see.id')) {
         if (Wat.C.checkACL('role.see.id')) { 
         %>
         <tr>
-            <td><i class="fa fa-male"></i><span data-i18n>Id</span></td>
+            <td><i class="fa fa-male"></i><span data-i18n="Id"></span></td>
             <td>
                 <%= model.get('id') %>
             </td>

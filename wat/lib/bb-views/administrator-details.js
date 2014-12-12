@@ -52,7 +52,7 @@ Wat.Views.AdminDetailsView = Wat.Views.DetailsView.extend({
         $('.bb-details-side1').html(that.template);
         
         Wat.I.chosenElement('select.js-acl-tree-selector', 'single');
-        
+
         Wat.T.translate();
     },
     
@@ -122,9 +122,7 @@ Wat.Views.AdminDetailsView = Wat.Views.DetailsView.extend({
         $.each(that.retrievedData.rows, function (iACL, acl) {
             var subbranch = '';
             subbranch += '<div class="subbranch hidden" data-acl-id="' + acl.id + '">';
-                subbranch += '<span class="subbranch-piece">';
-                    subbranch += ACLS[acl.name];
-                subbranch += '</span>';
+                subbranch += '<span class="subbranch-piece" data-i18n="' + ACLS[acl.name] + '"></span>';
                 if (Wat.C.checkACL('administrator.see.acl-list-roles')) {
                     subbranch += '<span class="subbranch-piece">';
                         subbranch += '<i class="fa fa-graduation-cap acl-inheritance hidden" data-acl-id="' + acl.id + '" title=""></i>';
@@ -198,7 +196,6 @@ Wat.Views.AdminDetailsView = Wat.Views.DetailsView.extend({
         
         Wat.I.chosenConfiguration();
         
-        // Hack to avoid delays
         Wat.I.chosenElement('[name="role"]', 'advanced100');
     },    
     

@@ -133,7 +133,7 @@
                                 <td class="desktop">
                                     <div class="text"><%= model.get('name') %></div>
                                     <div class="second_row">
-                                    <span data-i18n>Roles</span>: 
+                                    <span data-i18n="Roles"></span>: 
                                     <%
                                         var firstPrinted = false;
                                         $.each(model.get('roles'), function (iRole, role) {

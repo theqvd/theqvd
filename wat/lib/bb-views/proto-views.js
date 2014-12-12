@@ -241,10 +241,10 @@ Wat.Views.ViewsView = Wat.Views.MainView.extend({
         );
         
         $(this.setupFormContainer).html(this.template);
+                
+        this.printBreadcrumbs(this.breadcrumbs, '');
         
         Wat.T.translate();
-        
-        this.printBreadcrumbs(this.breadcrumbs, '');
     },
     
     addIDToArgs: function (args) {

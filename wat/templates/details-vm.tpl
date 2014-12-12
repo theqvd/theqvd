@@ -53,7 +53,7 @@
     if (detailsFields['id'] != undefined) { 
     %>
         <tr>
-            <td><i class="fa fa-male"></i><span data-i18n>Id</span></td>
+            <td><i class="fa fa-male"></i><span data-i18n="Id"></span></td>
             <td>
                 <%= model.get('id') %>
             </td>
@@ -63,7 +63,7 @@
     if (detailsFields['state'] != undefined) { 
     %>
         <tr>
-            <td><i class="fa fa-heart"></i><span data-i18n>State</span></td>
+            <td><i class="fa fa-heart"></i><span data-i18n="State"></span></td>
             <td>
                 <% 
                 if (model.get('state') == 'running') {
@@ -84,7 +84,7 @@
     if (detailsFields['ip'] != undefined) { 
     %>
         <tr>
-            <td><i class="fa fa-ellipsis-h"></i><span data-i18n>IP address</span></td>
+            <td><i class="fa fa-ellipsis-h"></i><span data-i18n="IP address"></span></td>
             <td>
                 <%= model.get('ip') %>
             </td>
@@ -94,7 +94,7 @@
     if (detailsFields['mac'] != undefined) { 
     %>
         <tr>
-            <td><i class="fa fa-ellipsis-h"></i><span data-i18n>MAC address</span></td>
+            <td><i class="fa fa-ellipsis-h"></i><span data-i18n="MAC address"></span></td>
             <td>
                 <%= model.get('mac') %>
             </td>
@@ -104,7 +104,7 @@
     if (detailsFields['user'] != undefined) { 
     %>
         <tr>
-            <td><i class="<%= CLASS_ICON_USERS %>"></i><span data-i18n>User</span></td>
+            <td><i class="<%= CLASS_ICON_USERS %>"></i><span data-i18n="User"></span></td>
             <td>
                 <a href="#/user/<%= model.get('user_id') %>">
                     <%= model.get('user_name') %>
@@ -116,7 +116,7 @@
     if (detailsFields['user_state'] != undefined) { 
     %>
         <tr>
-            <td><i class="fa fa-plug"></i><span data-i18n>User state</span></td>
+            <td><i class="fa fa-plug"></i><span data-i18n="User state"></span></td>
             <td>
                 <% 
                 if (model.get('user_state') == 'connected') {
@@ -137,7 +137,7 @@
     if (detailsFields['osf'] != undefined) { 
     %>
         <tr>
-            <td><i class="<%= CLASS_ICON_OSFS %>"></i><span data-i18n>OS Flavour</span></td>
+            <td><i class="<%= CLASS_ICON_OSFS %>"></i><span data-i18n="OS Flavour"></span></td>
             <td>
                 <a href="#/osf/<%= model.get('osf_id') %>">
                     <%= model.get('osf_name') %>
@@ -149,7 +149,7 @@
     if (detailsFields['tag'] != undefined) { 
     %>
         <tr>
-            <td><i class="fa fa-tag"></i><span data-i18n>Image tag</span></td>
+            <td><i class="fa fa-tag"></i><span data-i18n="Image tag"></span></td>
             <td>
                 <%= model.get('di_tag') %>
             </td>
@@ -159,7 +159,7 @@
     if (detailsFields['disk_image'] != undefined) { 
     %>
         <tr>
-            <td><i class="<%= CLASS_ICON_DIS %>"></i><span data-i18n>Disk image</span></td>
+            <td><i class="<%= CLASS_ICON_DIS %>"></i><span data-i18n="Disk image"></span></td>
             <td>
                 <a href="#/di/<%= model.get('di_id') %>">
                     <%= model.get('di_name') %>
@@ -171,7 +171,7 @@
     if (detailsFields['expiration'] != undefined) { 
     %>
         <tr>
-            <td><i class="fa fa-warning"></i><span data-i18n>Expiration</span></td>
+            <td><i class="fa fa-warning"></i><span data-i18n="Expiration"></span></td>
                 <%
                     var expiration_soft = model.get('expiration_soft');
                     var expiration_hard = model.get('expiration_hard');
@@ -191,7 +191,7 @@
                                     if (expiration_soft) {
                                 %>
                                     <tr>
-                                        <td class="warning" data-i18n>Soft</td>
+                                        <td class="warning" data-i18n="Soft"></td>
                                         <td class="warning"><%= model.get('expiration_soft').replace('T',' ') %></td>
                                         <td class="warning"><i class="fa fa-info-circle fa-centered"></i></td>
                                     </tr>
@@ -200,7 +200,7 @@
                                     if (expiration_hard) {
                                 %>
                                     <tr>
-                                        <td class="ok" data-i18n>Hard</td>
+                                        <td class="ok" data-i18n="Hard"></td>
                                         <td class="ok"><%= model.get('expiration_hard').replace('T',' ') %></td>
                                         <td class="ok"><i class="fa fa-info-circle fa-centered"></td>
                                     </tr>
@@ -218,7 +218,7 @@
     if (detailsFields['block'] != undefined) { 
     %>
         <tr>
-            <td><i class="fa fa-lock"></i><span data-i18n>Blocking</span></td>
+            <td><i class="fa fa-lock"></i><span data-i18n="Blocking"></span></td>
             <td>
                 <% 
                 if (model.get('blocked')) {
@@ -226,7 +226,7 @@
                     <!--
                     <i class="fa fa-lock" data-i18n="[title]Blocked"></i>
                     -->
-                    <span data-i18n>Blocked</span>
+                    <span data-i18n="Blocked"></span>
                 <%
                 }
                 else {
@@ -234,7 +234,7 @@
                     <!--
                     <i class="fa fa-unlock" data-i18n="[title]Unblocked"></i>
                     -->
-                    <span data-i18n>Unblocked</span>
+                    <span data-i18n="Unblocked"></span>
                 <%
                 }
                 %>

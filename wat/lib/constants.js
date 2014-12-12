@@ -192,3 +192,16 @@ VIEWS_COMBINATION = {
         ]
 };
 
+// Languages
+WAT_LANGUAGES = {
+    "en": "English",
+    "es": "Spanish"
+};
+
+WAT_LANGUAGE_TENANT_OPTIONS = $.extend({
+    "auto": "Auto"
+}, WAT_LANGUAGES);
+
+WAT_LANGUAGE_ADMIN_OPTIONS = $.extend({
+    "default": "Default",
+}, WAT_LANGUAGE_TENANT_OPTIONS);

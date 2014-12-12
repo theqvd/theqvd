@@ -1,9 +1,7 @@
 <table class="list details-list acls-management acls-management-inherit-roles col-width-100">   
     <tr>
         <th colspan="5">
-            <span data-i18n>
-                Inherited roles
-            </span>
+            <span data-i18n="Inherited roles"></span>
         </th>
     </tr>
     <tr>
@@ -46,7 +44,7 @@
                         <%
                             if (Object.keys(model.get('roles')).length == 0) {
                         %>
-                                <span data-i18n>No elements found</span>
+                                <span data-i18n="No elements found"></span>
                         <%
                             }
                         %>
@@ -59,7 +57,7 @@
                         <select name="role"></select>
                     </td>                    
                     <td class="col-width-1">
-                        <a class="button add-role-button js-add-role-button fa fa-sitemap" href="javascript:" data-i18n>Inherit</a>
+                        <a class="button add-role-button js-add-role-button fa fa-sitemap" href="javascript:" data-i18n="Inherit"></a>
                     </td>
                 </tr>
                 <% } %>

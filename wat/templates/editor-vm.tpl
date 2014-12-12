@@ -1,14 +1,14 @@
 <table>
     <% if (Wat.C.checkACL('vm.update.name')) { %>
     <tr>
-        <td data-i18n>Name</td>
+        <td data-i18n="Name"></td>
         <td>
             <input type="text" class="" name="name" value="<%= model.get('name') %>" data-required>
         </td>
     </tr>
     <% } %>
     <tr>
-        <td data-i18n>Image tag</td>
+        <td data-i18n="Image tag"></td>
         <td>
             <select class="" name="di_tag"></select>
         </td>
@@ -22,19 +22,19 @@
         }
     %>
     <tr>
-        <td data-i18n>Expire</td>
+        <td data-i18n="Expire"></td>
         <td>
             <input type="checkbox" class="js-expire" name="expire" value="1" <%= expirationChecked %>>
         </td>
     </tr>
     <tr class="<%= expirationRowClass %>">
-        <td data-i18n>Soft expiration</td>
+        <td data-i18n="Soft expiration"></td>
         <td>
             <input type="text" class="datetimepicker" name="expiration_soft" value="<%= model.get('expiration_soft') ? model.get('expiration_soft').replace('T',' ') : '' %>">
         </td>
     </tr>
     <tr class="<%= expirationRowClass %>">
-        <td data-i18n>Hard expiration</td>
+        <td data-i18n="Hard expiration"></td>
         <td>
             <input type="text" class="datetimepicker" name="expiration_hard" value="<%= model.get('expiration_hard') ? model.get('expiration_hard').replace('T',' ') : '' %>">
         </td>

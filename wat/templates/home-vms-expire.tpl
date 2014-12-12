@@ -1,8 +1,8 @@
-<div class="home-title" data-i18n>VMs close to expire</div>
+<div class="home-title" data-i18n="VMs close to expire"></div>
 <%
 if (vms_with_expiration_date.length == 0) {
 %>
-    <div class="no-elements" data-18n>There are not VMS close to expire</div>
+    <div class="no-elements" data-i18n="There are not VMS close to expire"></div>
 <%
 }
 else {

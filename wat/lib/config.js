@@ -111,6 +111,10 @@ Wat.C = {
         // Store retrieved acls
         Wat.C.acls = that.retrievedData.acls;
         
+        // Store language
+        Wat.C.language = that.retrievedData.admin_language;
+        Wat.C.tenantLanguage = that.retrievedData.tenant_language;
+        
         // Restore possible residous views configuration to default values
         Wat.I.restoreListColumns();
         Wat.I.restoreFormFilters();

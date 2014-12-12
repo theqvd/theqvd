@@ -22,18 +22,16 @@ $.each(configTokens, function (iTok, tok) {
         </td>
         <td style="width: 300px;">
             <select data-token="<%= token %>" class="token-action-select">
-                <option value="save">Save</option>
+                <option value="save" data-i18n="Save"></option>
             <%
                 if (dvalue == undefined) {
             %>
-                    <option value="delete">Delete</option>
+                    <option value="delete" data-i18n="Delete"></option>
             <% } else if (dvalue != value) { %>
-                    <option value="set_default">Restore to default value</option>
+                    <option value="set_default" data-i18n="Restore to default value"></option>
             <% } %>
             </select>
-            <a class="js-traductable_button actions_button button fa fa-cog" class="token_actions_button" data-token="<%= token %>" data-i18n>
-                Apply
-            </a>
+            <a class="js-traductable_button actions_button button fa fa-cog" class="token_actions_button" data-token="<%= token %>" data-i18n="Apply"></a>
         </td>
     </tr>
 <%

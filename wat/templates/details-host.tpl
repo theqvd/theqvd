@@ -1,5 +1,5 @@
 <div class="details-header">
-    <span class="fa fa-hdd-o h1" data-i18n><%= model.get('name') %></span>
+    <span class="fa fa-hdd-o h1"><%= model.get('name') %></span>
     <% if(Wat.C.checkACL('host.delete.')) { %>
     <a class="button fleft button-icon js-button-delete fa fa-trash" href="javascript:" data-i18n="[title]Delete"></a>
     <% } %>
@@ -29,7 +29,7 @@
     if (detailsFields['id'] != undefined) { 
     %>
         <tr>
-            <td><i class="fa fa-male"></i><span data-i18n>Id</span></td>
+            <td><i class="fa fa-male"></i><span data-i18n="Id"></span></td>
             <td>
                 <%= model.get('id') %>
             </td>
@@ -39,7 +39,7 @@
     if (detailsFields['address'] != undefined) { 
     %>
         <tr>
-            <td><i class="fa fa-ellipsis-h"></i><span data-i18n>IP address</span></td>
+            <td><i class="fa fa-ellipsis-h"></i><span data-i18n="IP address"></span></td>
             <td>
                 <%= model.get('address') %>
             </td>
@@ -49,7 +49,7 @@
     if (detailsFields['state'] != undefined) { 
     %>
         <tr>
-            <td><i class="fa fa-heart"></i><span data-i18n>State</span></td>
+            <td><i class="fa fa-heart"></i><span data-i18n="State"></span></td>
             <td>
                 <% 
             if (model.get('state') == 'running') {
@@ -70,17 +70,17 @@
     if (detailsFields['block'] != undefined) { 
     %>
         <tr>
-            <td><i class="fa fa-lock"></i><span data-i18n>Blocking</span></td>
+            <td><i class="fa fa-lock"></i><span data-i18n="Blocking"></span></td>
             <td>
                 <% 
                 if (model.get('blocked')) {
                 %>
-                    <span data-i18n>Blocked</span>
+                    <span data-i18n="Blocked"></span>
                 <%
                 }
                 else {
                 %>
-                    <span data-i18n>Unblocked</span>
+                    <span data-i18n="Unblocked"></span>
                 <%
                 }
                 %>
@@ -91,7 +91,7 @@
     if (detailsFields['connected_vms'] != undefined) { 
     %>
         <tr>
-            <td><i class="fa fa-cloud"></i><span data-i18n>Running VMs</span></td>
+            <td><i class="fa fa-cloud"></i><span data-i18n="Running VMs"></span></td>
             <td>
                 <% if (model.get('number_of_vms_connected') > 0) { %>
                 <%= Wat.C.ifACL('<a href="#/vms/host/' + model.get('id') + '">', 'vm.see-main.') %>

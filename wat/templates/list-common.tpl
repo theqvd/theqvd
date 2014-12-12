@@ -19,10 +19,10 @@
     <div class="filter js-side <%= filtersClass %>">
         <!-- ADVANCED FILTERS
         <span class="filter-control">
-            <label for="filter_mode" data-i18n>Filter mode</label>
+            <label for="filter_mode" data-i18n="Filter mode"></label>
             <select class="chosen-single" name="filter_mode">
-                <option value="simple" selected="selected" data-i18n>Simple</option>
-                <option value="advanced" data-i18n>Advanced</option>
+                <option value="simple" selected="selected" data-i18n="Simple"></option>
+                <option value="advanced" data-i18n="Advanced"></option>
             </select>
         </span>
         <hr>

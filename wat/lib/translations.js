@@ -1,12 +1,23 @@
 // Translation setup and utilities
 Wat.T = {
     // Translation configuration and actions to be done when language file is loaded
-    initTranslate: function() {
-        var that = this;
+    initTranslate: function(lan) {        
+        lan = lan || Wat.C.language;
         
+        // If language is not among the WAT supported languages, check the tenant language
+        if ($.inArray(lan, Object.keys(WAT_LANGUAGES)) == -1) {
+            // If language is default, check if tenant language is among the WAT supported languages
+            if (lan == 'default' && $.inArray(Wat.C.tenantLanguage, Object.keys(WAT_LANGUAGES)) != -1) {
+                lan = Wat.C.tenantLanguage;
+            }
+            else {
+                // If language is not supported, set auto mode to detect it from browser
+                lan = '__lng__';
+            }
+        }
+
         $.i18n.init({
-            resGetPath: 'lib/languages/__lng__.json',
-            //resGetPath: APP_PATH + 'lib/languages/en.json',
+            resGetPath: APP_PATH + 'lib/languages/' + lan + '.json',
             useLocalStorage: false,
             debug: false,
             fallbackLng: 'en',
@@ -38,6 +49,9 @@ Wat.T = {
 
         // Add sort icons to header
         Wat.I.updateSortIcons();
+        
+        // Update all the chosen select controls
+        $('select').trigger('chosen:updated');
         
         // When all is translated and loaded, hide loading spinner and show content
         Wat.I.showAll();

@@ -1,7 +1,7 @@
-<span data-i18n>Classified by</span>
+<span data-i18n="Classified by"></span>
 <select class="js-acl-tree-selector acl-tree-selector">
-    <option value="sections" data-i18n>Sections</option>
-    <option value="actions" data-i18n>Actions</option>
+    <option value="sections" data-i18n="Sections"></option>
+    <option value="actions" data-i18n="Actions"></option>
 </select>
 
 <div class="acls-tree js-acls-tree js-sections-tree">

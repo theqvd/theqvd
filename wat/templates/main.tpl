@@ -21,13 +21,13 @@
                     <li class="menu-option js-menu-option-<%= iMenu %>">
                         <a href="<%= menuOpt.link %>">
                             <i class="<%= menuOpt.icon %>"></i>
-                            <span class="<%= menuOpt.textClass %>" data-i18n><%= menuOpt.text %></span>
+                            <span class="<%= menuOpt.textClass %>" data-i18n="<%= menuOpt.text %>"></span>
                         </a>
                         <ul>
                             <% $.each(menuOpt.subMenu, function (iSubMenu, subMenuOpt) { %>
                                 <li>
                                     <a href="<%= subMenuOpt.link %>">
-                                        <span class="<%= subMenuOpt.icon %>" data-i18n><%= subMenuOpt.text %></span>
+                                        <span class="<%= subMenuOpt.icon %>" data-i18n="<%= subMenuOpt.text %>"></span>
                                     </a>
                                 </li>
                             <% }); %>

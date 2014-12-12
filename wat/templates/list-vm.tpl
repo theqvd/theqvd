@@ -246,7 +246,7 @@
                                 <td class="desktop">
                                     <span class="" data-wsupdate="<%= name %>" data-id="<%= model.get('id') %>"><%= model.get(name) %></span>
                                     <% if (Wat.C.checkACL('vm.see.next-boot-ip') && model.get('next_boot_ip') && model.get('next_boot_ip') != model.get('ip')) { %>
-                                    <div class="second_row"><span data-i18n>Next<span/>: <%= model.get('next_boot_ip') %></div>
+                                    <div class="second_row"><span data-i18n="Next"></span>: <%= model.get('next_boot_ip') %></div>
                                     <% } %>
                                 </td>
                 <%

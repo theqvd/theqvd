@@ -6,7 +6,7 @@
             %>
                 <li class="menu-option" data-target="<%= target %>" data-menu="platform">
                     <i class="<%= option.icon %>"></i>
-                    <span data-i18n><%= option.text %></span>
+                    <span data-i18n="<%= option.text %>"></span>
                 </li>
             <%
                 });
@@ -20,7 +20,7 @@
             %>
                 <li class="menu-option" data-target="<%= target %>" data-menu="wat">
                     <i class="<%= option.icon %>"></i>
-                    <span data-i18n><%= option.text %></span>
+                    <span data-i18n="<%= option.text %>"></span>
                 </li>
             <%
                 });
@@ -34,7 +34,7 @@
             %>
                 <li class="menu-option" data-target="<%= target %>" data-menu="config">
                     <i class="<%= option.icon %>"></i>
-                    <span data-i18n><%= option.text %></span>
+                    <span data-i18n="<%= option.text %>"></span>
                 </li>
             <%
                 });
@@ -48,7 +48,7 @@
             %>
                 <li class="menu-option" data-target="<%= target %>" data-menu="help">
                     <i class="<%= option.icon %>"></i>
-                    <span data-i18n><%= option.text %></span>
+                    <span data-i18n="<%= option.text %>"></span>
                 </li>
             <%
                 });
@@ -62,7 +62,7 @@
             %>
                 <li class="menu-option" data-target="<%= target %>" data-menu="user">
                     <i class="<%= option.icon %>"></i>
-                    <span data-i18n><%= option.text %></span>
+                    <span data-i18n="<%= option.text %>"></span>
                 </li>
             <%
                 });
@@ -77,7 +77,7 @@
         %>
             <li class="menu-option" data-target="<%= target %>">
                 <i class="<%= option.icon %>"></i>
-                <span data-i18n><%= option.text %></span>
+                <span data-i18n="<%= option.text %>"></span>
             </li>
         <%
             });

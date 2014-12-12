@@ -72,14 +72,12 @@ Wat.Views.HomeView = Wat.Views.MainView.extend({
         
         $(this.el).html(this.template);  
         
+        this.printBreadcrumbs(this.breadcrumbs, '');
+
         this.renderVmsExpire ();
                 
         this.loadData(this.stats);
         
-        this.printBreadcrumbs(this.breadcrumbs, '');
-        
-        Wat.T.translate();
-
         // Open websockets for live fields
         Wat.WS.openStatsWebsockets(this.qvdObj, this.liveFields, this.cid);
     },
@@ -97,6 +95,8 @@ Wat.Views.HomeView = Wat.Views.MainView.extend({
         );
         
         $(".bb-vms-expire").html(this.template);
+        
+        Wat.T.translate();
     },
     
     loadData: function (stats) {

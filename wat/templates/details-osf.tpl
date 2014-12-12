@@ -1,5 +1,5 @@
 <div class="details-header">
-    <span class="fa fa-flask h1" data-i18n><%= model.get('name') %></span>
+    <span class="fa fa-flask h1"><%= model.get('name') %></span>
     <% if(Wat.C.checkACL('osf.delete.')) { %>
     <a class="button fleft button-icon js-button-delete fa fa-trash" href="javascript:" data-i18n="[title]Delete"></a>
     <% } %>
@@ -13,7 +13,7 @@
     if (detailsFields['id'] != undefined) { 
     %>
         <tr>
-            <td><i class="fa fa-male"></i><span data-i18n>Id</span></td>
+            <td><i class="fa fa-male"></i><span data-i18n="Id"></span></td>
             <td>
                 <%= model.get('id') %>
             </td>
@@ -23,7 +23,7 @@
     if (detailsFields['overlay'] != undefined) { 
     %>
         <tr>
-            <td><i class="fa fa-exchange"></i><span data-i18n>Overlay</span></td>
+            <td><i class="fa fa-exchange"></i><span data-i18n="Overlay"></span></td>
             <td>
                 <%= model.get('overlay') ? '<span class="fa fa-check"></span>' : '<span class="fa fa-remove"></span>' %>
             </td>
@@ -33,7 +33,7 @@
     if (detailsFields['memory'] != undefined) { 
     %>
         <tr>
-            <td><i class="fa fa-bolt"></i><span data-i18n>Memory</span></td>
+            <td><i class="fa fa-bolt"></i><span data-i18n="Memory"></span></td>
             <td>
                 <%= model.get('memory') %> MB
             </td>
@@ -43,7 +43,7 @@
     if (detailsFields['user_storage'] != undefined) { 
     %>
         <tr>
-            <td><i class="fa fa-archive"></i><span data-i18n>User storage</span></td>
+            <td><i class="fa fa-archive"></i><span data-i18n="User storage"></span></td>
             <td>
                 <%
                 if (!model.get('user_storage')) {
@@ -64,7 +64,7 @@
     if (detailsFields['vms'] != undefined) { 
     %>
         <tr>
-            <td><i class="<%= CLASS_ICON_VMS %>"></i><span data-i18n>VMs</span></td>
+            <td><i class="<%= CLASS_ICON_VMS %>"></i><span data-i18n="VMs"></span></td>
             <td>
                 <%= Wat.C.ifACL('<a href="#/vms/osf/' + model.get('id') + '">', 'vm.see-main.') %>
                 <span data-wsupdate="number_of_vms" data-id="<%= model.get('id') %>"><%= model.get('number_of_vms') %></span>
@@ -76,7 +76,7 @@
     if (detailsFields['dis'] != undefined) { 
     %>
         <tr>
-            <td><i class="<%= CLASS_ICON_DIS %>"></i><span data-i18n>DIs</span></td>
+            <td><i class="<%= CLASS_ICON_DIS %>"></i><span data-i18n="DIs"></span></td>
             <td>
                 <%= Wat.C.ifACL('<a href="#/dis/osf/' + model.get('id') + '">', 'di.see-main.') %>
                 <span data-wsupdate="number_of_dis" data-id="<%= model.get('id') %>"><%= model.get('number_of_dis') %></span>

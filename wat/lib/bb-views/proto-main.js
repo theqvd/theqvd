@@ -59,10 +59,10 @@ Wat.Views.MainView = Backbone.View.extend({
     
     printBreadcrumbs: function (bc, bcHTML) {
         if (bc.link != undefined) {
-            bcHTML += '<a href="' + bc.link + '" data-i18n>' + bc.screen + '</a>';
+            bcHTML += '<a href="' + bc.link + '" data-i18n="' + bc.screen + '"></a>';
         }
         else {
-            bcHTML += '<span data-i18n>' + bc.screen + '</span>';
+            bcHTML += '<span data-i18n="' + bc.screen + '">' + bc.screen + '</span>';
         }
         if (bc.next != undefined) {
             bcHTML += ' <i class="fa fa-angle-double-right"></i> ';

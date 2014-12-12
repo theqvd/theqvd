@@ -1,5 +1,5 @@
 <div class="details-header">
-    <span class="fa fa-user h1" data-i18n><%= model.get('name') %></span>
+    <span class="fa fa-user h1"><%= model.get('name') %></span>
     <% if(Wat.C.checkACL('user.delete.')) { %>
     <a class="button fleft button-icon js-button-delete fa fa-trash" href="javascript:" data-i18n="[title]Delete"></a>
     <% } %>
@@ -41,7 +41,7 @@
     if (detailsFields['id'] != undefined) { 
     %>
         <tr>
-            <td><i class="fa fa-male"></i><span data-i18n>Id</span></td>
+            <td><i class="fa fa-male"></i><span data-i18n="Id"></span></td>
             <td>
                 <%= model.get('id') %>
             </td>
@@ -51,7 +51,7 @@
     if (detailsFields['connected_vms'] != undefined) { 
     %>
         <tr>
-            <td><i class="fa fa-cloud"></i><span data-i18n>Connected VMs</span></td>
+            <td><i class="fa fa-cloud"></i><span data-i18n="Connected VMs"></span></td>
             <td>
                 <% if (model.get('number_of_vms') > 0) { %>
                 <%= Wat.C.ifACL('<a href="#/vms/user/' + model.get('id') + '">', 'vm.see-main.') %>
@@ -71,17 +71,17 @@
     if (detailsFields['block'] != undefined) { 
     %>
         <tr>
-            <td><i class="fa fa-lock"></i><span data-i18n>Blocking</span></td>
+            <td><i class="fa fa-lock"></i><span data-i18n="Blocking"></span></td>
             <td>
                 <% 
                 if (model.get('blocked')) {
                 %>
-                    <span data-i18n>Blocked</span>
+                    <span data-i18n="Blocked"></span>
                 <%
                 }
                 else {
                 %>
-                    <span data-i18n>Unblocked</span>
+                    <span data-i18n="Unblocked"></span>
                 <%
                 }
                 %>

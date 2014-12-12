@@ -12,7 +12,7 @@ var properties = model.get('properties');
         %>
             <div class="custom-props-container">
                 <span class="details-item">
-                    <span data-i18n>Other properties</span>
+                    <span data-i18n="Other properties"></span>
                     <%
                     if (jQuery.isEmptyObject(properties)) {
                     %>

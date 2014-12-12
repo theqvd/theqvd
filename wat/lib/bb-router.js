@@ -17,6 +17,7 @@ Wat.Router = Backbone.Router.extend({
         "user/:id": "detailsUser",
         "views": "setupCustomize",
         "tenants": "listTenant",
+        "tenant/:id": "detailsTenant",
         "admins": "listAdmin",
         "admin/:id": "detailsAdmin",
         "roles": "listRole",

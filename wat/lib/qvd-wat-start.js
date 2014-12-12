@@ -12,13 +12,15 @@
     })(jQuery);
     
 	$(doc).ready(function() {
+        // Remember login from cookies
+        Wat.C.rememberLogin();
+        
         // Load translation file
         Wat.T.initTranslate();
         
-        // Remember login from cookies
-        Wat.C.rememberLogin();
         // Interface onfiguration
         Wat.I.renderMain();
+        
         //Wat.I.bindCornerMenuEvents();
         Wat.I.tooltipConfiguration();
         
@@ -146,6 +148,9 @@
         });    
         Wat.Router.app_router.on('route:listTenant', function () {
             Wat.Router.app_router.performRoute('tenants', Wat.Views.TenantListView);
+        });            
+        Wat.Router.app_router.on('route:detailsTenant', function (id) {
+            Wat.Router.app_router.performRoute('tenants', Wat.Views.TenantDetailsView, {"id": id});
         });    
         Wat.Router.app_router.on('route:listAdmin', function () {
             Wat.Router.app_router.performRoute('admins', Wat.Views.AdminListView);

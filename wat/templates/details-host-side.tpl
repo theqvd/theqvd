@@ -1,8 +1,8 @@
 <div class="side-component js-side-component1">
     <div class="side-header">
-        <span class="h2" data-i18n>Virtual machines</span>
+        <span class="h2" data-i18n="Virtual machines"></span>
         <% if (Wat.C.checkACL('vm.see-main.')) { %>
-        <a class="button2 button-right fa fa-arrows-h" href="#/vms/host/<%= model.get('id') %>" data-i18n>Extended view</a>
+        <a class="button2 button-right fa fa-arrows-h" href="#/vms/host/<%= model.get('id') %>" data-i18n="Extended view"></a>
         <% } %>
     </div>
     <div class="bb-details-side1">

@@ -32,6 +32,22 @@ Wat.C.aclGroups.roleMassiveActions = [
 $.merge(Wat.C.aclGroups.roleMassiveActions, Wat.C.aclGroups.roleMassiveEdit);
 
 ///////////////////////////////
+// Tenants ACL groups
+///////////////////////////////
+Wat.C.aclGroups.tenantEdit = [
+    'tenant.update.name',
+    'tenant.update.language'
+];
+
+Wat.C.aclGroups.tenantMassiveEdit = [];
+
+Wat.C.aclGroups.tenantMassiveActions = [
+    'tenant.delete-massive.',
+];
+// Massive actions include massive edit ACLs
+$.merge(Wat.C.aclGroups.tenantMassiveActions, Wat.C.aclGroups.tenantMassiveEdit);
+
+///////////////////////////////
 // User ACL groups
 ///////////////////////////////
 Wat.C.aclGroups.userEdit = [

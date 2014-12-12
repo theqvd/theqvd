@@ -92,14 +92,14 @@ Wat.Views.SetupConfigView = Wat.Views.MainView.extend({
         );
 
         $('.bb-config-tokens').html(this.template);
-        
-        Wat.T.translate();
-        
+                
         this.printBreadcrumbs(this.breadcrumbs, '');
         
         Wat.I.chosenConfiguration();
-
+        
         Wat.I.chosenElement('.token-action-select', 'single');
+        
+        Wat.T.translate();
     },
     
     events: {

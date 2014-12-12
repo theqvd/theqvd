@@ -1,5 +1,5 @@
 <div class="details-header">
-    <span class="fa fa-dot-circle-o h1" data-i18n><%= model.get('disk_image') %></span>
+    <span class="fa fa-dot-circle-o h1"><%= model.get('disk_image') %></span>
     <% if(Wat.C.checkACL('di.delete.')) { %>
     <a class="button fleft button-icon js-button-delete fa fa-trash" href="javascript:" data-i18n="[title]Delete"></a>
     <% } %>
@@ -23,7 +23,7 @@
     %>
     
     <% if(Wat.C.checkACL('di.update.default') && !model.get('default')) { %>
-    <a class="button fright button-icon js-button-default fa fa-home" href="javascript:" data-i18n="[title]Set as by default"></a>
+    <a class="button fright button-icon js-button-default fa fa-home" href="javascript:" data-i18n="[title]Set by default"></a>
     <% } %>
     
 </div>
@@ -33,7 +33,7 @@
     if (detailsFields['id'] != undefined) { 
     %>
         <tr>
-            <td><i class="fa fa-male"></i><span data-i18n>Id</span></td>
+            <td><i class="fa fa-male"></i><span data-i18n="Id"></span></td>
             <td>
                 <%= model.get('id') %>
             </td>
@@ -43,7 +43,7 @@
     if (detailsFields['version'] != undefined) { 
     %>
         <tr>
-            <td><i class="fa fa-ticket"></i><span data-i18n>Version</span></td>
+            <td><i class="fa fa-ticket"></i><span data-i18n="Version"></span></td>
             <td>
                 <%= model.get('version') %>
             </td>
@@ -53,7 +53,7 @@
     if (detailsFields['osf'] != undefined) { 
     %>
         <tr>
-            <td><i class="<%= CLASS_ICON_OSFS %>"></i><span data-i18n>OS Flavour</span></td>
+            <td><i class="<%= CLASS_ICON_OSFS %>"></i><span data-i18n="OS Flavour"></span></td>
             <td>
                 <a href="#/osf/<%= model.get('osf_id') %>">
                     <%= model.get('osf_name') %>
@@ -65,17 +65,17 @@
     if (detailsFields['block'] != undefined) { 
     %>
         <tr>
-            <td><i class="fa fa-lock"></i><span data-i18n>Blocking</span></td>
+            <td><i class="fa fa-lock"></i><span data-i18n="Blocking"></span></td>
             <td>
                 <% 
                 if (model.get('blocked')) {
                 %>
-                    <span data-i18n>Blocked</span>
+                    <span data-i18n="Blocked"></span>
                 <%
                 }
                 else {
                 %>
-                    <span data-i18n>Unblocked</span>
+                    <span data-i18n="Unblocked"></span>
                 <%
                 }
                 %>
@@ -86,7 +86,7 @@
     if (detailsFields['default'] != undefined && model.get('default')) { 
     %>
         <tr>
-            <td><i class="fa fa-home"></i><span data-i18n>Default</span></td>
+            <td><i class="fa fa-home"></i><span data-i18n="Default"></span></td>
             <td>
                 <div class="second_row" data-i18n="Default image for this OSF"></div>
             </td>
@@ -96,7 +96,7 @@
     if (detailsFields['head'] != undefined && model.get('head')) { 
     %>
         <tr> 
-            <td><i class="fa fa-flag-o"></i><span data-i18n>Head</span></td>
+            <td><i class="fa fa-flag-o"></i><span data-i18n="Head"></span></td>
             <td>
                 <div class="second_row" data-i18n="Last image created on this OSF"></div>
             </td>
@@ -106,7 +106,7 @@
     if (detailsFields['tags'] != undefined) { 
     %>
         <tr>
-            <td><i class="fa fa-tags"></i><span data-i18n>Tags</span></td>
+            <td><i class="fa fa-tags"></i><span data-i18n="Tags"></span></td>
             <td>
             <%
                 if (!model.get('tags')) {

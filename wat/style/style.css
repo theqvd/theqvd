@@ -101,7 +101,8 @@ html {
   overflow-y: scroll; }
 
 body {
-  background: #fdfdfd; }
+  background: #fdfdfd;
+  height: 100vh !important; }
 
 a {
   color: #cb540a;
@@ -2230,7 +2231,8 @@ td.inner-table {
   .ui-dialog .dialog-container {
     overflow-y: auto;
     padding-left: 30px;
-    padding-right: 30px; }
+    padding-right: 30px;
+    min-height: 60vh !important; }
 
 .ui-widget-overlay {
   position: fixed;

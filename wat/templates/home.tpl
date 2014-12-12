@@ -6,7 +6,7 @@
     <div class="home-row">
         <% if (Wat.C.checkACL('vm.stats.running-vms')) { %>
         <div class="home-cell">
-            <div class="home-title" data-i18n>Running virtual machines</div>
+            <div class="home-title" data-i18n="Running virtual machines"></div>
             <div class="home-percent-wrapper">
                 <div class="js-running-vms-percent home-title home-percent js-home-percent"></div>
                 <div id="running-vms" class="pie-chart js-pie-chart" data-target="vms/state/running" width="200px" height="200px"></div>
@@ -18,7 +18,7 @@
         <% } %>
 
         <div class="home-cell">
-            <div class="home-title" data-i18n>Summary</div>
+            <div class="home-title" data-i18n="Summary"></div>
             <table class="summary-table">
                 <% if (Wat.C.checkACL('user.stats.summary')) { %>
                 <tr>
@@ -98,7 +98,7 @@
         
         <% if (Wat.C.checkACL('host.stats.running-hosts')) { %>
         <div class="home-cell">
-            <div class="home-title" data-i18n>Running nodes</div>
+            <div class="home-title" data-i18n="Running nodes"></div>
             <div class="home-percent-wrapper">
                 <div class="js-running-hosts-percent home-title home-percent js-home-percent"></div>
                 <div id="running-hosts" class="pie-chart js-pie-chart" data-target="hosts/state/running" width="200px" height="200px"></div>
@@ -117,12 +117,12 @@
         <% } %>
         <% if (Wat.C.checkACL('host.stats.top-hosts-most-vms')) { %>
         <div class="home-cell">
-            <div class="home-title" data-i18n>Nodes with most running VMs</div>
+            <div class="home-title" data-i18n="Nodes with most running VMs"></div>
             <div id="hosts-more-vms" class="bar-chart js-bar-chart" style="width:95%;height:200px;"></div>
         </div>
         <% } %>
         <div class="home-cell">
-            <div class="home-title" data-i18n>Blocked elements</div>
+            <div class="home-title" data-i18n="Blocked elements"></div>
             <table class="summary-table">
                 <% if (Wat.C.checkACL('user.stats.blocked')) { %>
                 <tr>

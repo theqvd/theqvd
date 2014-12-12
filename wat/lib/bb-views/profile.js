@@ -30,7 +30,6 @@ Wat.Views.ProfileView = Wat.Views.DetailsView.extend({
         
         this.editorTemplateName = 'editor-profile',
 
-        
         this.render();
     },
     
@@ -52,15 +51,18 @@ Wat.Views.ProfileView = Wat.Views.DetailsView.extend({
         
         this.template = _.template(
             this.templateProfile, {
-                login: Wat.C.login
+                login: Wat.C.login,
+                language: Wat.C.language,
+                tenantLanguage: Wat.C.tenantLanguage
             }
         );
 
         $('.bb-setup').html(this.template);
-        Wat.T.translate();
         
         this.printBreadcrumbs(this.breadcrumbs, '');
-        
+
+        Wat.T.translate();
+
         // Extend the common events
         this.extendEvents(this.eventsDetails);
     },
@@ -69,6 +71,9 @@ Wat.Views.ProfileView = Wat.Views.DetailsView.extend({
         this.dialogConf.title = $.i18n.t('Edit Profile');
         
         Wat.Views.DetailsView.prototype.openEditElementDialog.apply(this, [e]);
+        
+        Wat.I.chosenConfiguration();
+        Wat.I.chosenElement('select[name="language"]', 'single');
     },
     
     updateElement: function (dialog) {
@@ -83,17 +88,31 @@ Wat.Views.ProfileView = Wat.Views.DetailsView.extend({
         
         var context = $('.' + this.cid + '.editor-container');
 
-        if (Wat.C.checkACL('administrator.update.password')) {
-            // If change password is checked
-            if (context.find('input.js-change-password').is(':checked')) {
-                var password = context.find('input[name="password"]').val();
-                var password2 = context.find('input[name="password2"]').val();
-                if (password && password2 && password == password2) {
-                    arguments['password'] = password;
-                }
+        // If change password is checked
+        if (context.find('input.js-change-password').is(':checked')) {
+            var password = context.find('input[name="password"]').val();
+            var password2 = context.find('input[name="password2"]').val();
+            if (password && password2 && password == password2) {
+                arguments['password'] = password;
             }
         }
         
-        this.updateModel(arguments, filters, this.fetchDetails);
+        // Set language
+        var language = context.find('select[name="language"]').val();
+        arguments['language'] = language;
+        
+        // Store new language to make things after update
+        this.newLanguage = language;
+        
+        this.updateModel(arguments, filters, this.afterUpdateElement);
     },
+    
+    afterUpdateElement: function (that) {
+        // If change is made succesfully check new language to ender again and translate
+        if (that.retrievedData.status == STATUS_SUCCESS && Wat.C.language != that.newLanguage) {
+            Wat.C.language = that.newLanguage;
+            that.render();
+            Wat.T.initTranslate();
+        }
+    }
 });

@@ -16,7 +16,7 @@
                         case 'text':
                             %>
                                 <span class="filter-control">
-                                <label for="<%= name %>" data-i18n><%= filter.text %></label>
+                                <label for="<%= name %>" data-i18n="<%= filter.text %>"></label>
                                 <input type="text" name="<%= name %>" class="mobile-filter" data-filter-field="<%= name %>"/>
                                 </span>
                             <%
@@ -45,9 +45,7 @@
         </div>
         <% if (listActionButton !== null && Wat.C.checkACL(listActionButton.acl)) { %>
             <div class="action-new-item">
-                <a class="js-traductable_button js-button-new actions_button button fa fa-plus-circle" name="<%= listActionButton.name %>" href="<%= listActionButton.link %>" data-i18n>
-                    <%= listActionButton.value %>
-                </a>
+                <a class="js-traductable_button js-button-new actions_button button fa fa-plus-circle" name="<%= listActionButton.name %>" href="<%= listActionButton.link %>" data-i18n="<%= listActionButton.value %>"></a>
             </div>
         <% } %>
         <div class="pagination">
@@ -81,14 +79,12 @@
             <div class="action-selected-select">
                 <select name="selected_actions_select" class="chosen-single">
                     <% $.each(selectedActions, function(action, actionConfig) { %>
-                        <option value="<%= action %>" data-i18n><%= actionConfig.text %></option>
+                        <option value="<%= action %>" data-i18n="<%= actionConfig.text %>"></option>
                     <% }); %>
                 </select>
             </div>
             <div class="action-selected-button">
-                <a class="js-traductable_button actions_button button fa fa-check-square-o" name="selected_actions_button" data-i18n>
-                    Apply to selected items
-                </a>
+                <a class="js-traductable_button actions_button button fa fa-check-square-o" name="selected_actions_button" data-i18n="Apply to selected items"></a>
             </div>
             <div class="clear"></div>
         </div>

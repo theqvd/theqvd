@@ -90,14 +90,12 @@ Wat.Views.RoleDetailsView = Wat.Views.DetailsView.extend({
         $.each(that.retrievedData.rows, function (iACL, acl) {
             var subbranch = '';
             subbranch += '<div class="subbranch disabled-branch hidden" data-acl="' + acl.name + '" data-acl-id="' + acl.id + '">';
-                if (Wat.C.checkACL('role.update.assign-acl') && !that.model.get('fixed')) {
+                if (Wat.C.checkACL('role.update.assign-acl') && !that.model.get('fixed1')) {
                     subbranch += '<span class="subbranch-piece">';
                         subbranch += '<input type="checkbox" class="js-acl-check acl-check" data-acl="' + acl.name + '" data-acl-id="' + acl.id + '"/>';
                     subbranch += '</span>';
                 }
-                subbranch += '<span class="subbranch-piece">';
-                    subbranch += ACLS[acl.name];
-                subbranch += '</span>';
+                subbranch += '<span class="subbranch-piece" data-i18n="' + ACLS[acl.name] + '"></span>';
                 if (Wat.C.checkACL('role.see.acl-list-roles')) {
                     subbranch += '<span class="subbranch-piece">';
                         subbranch += '<i class="fa fa-sitemap acl-inheritance hidden" data-acl-id="' + acl.id + '" title=""></i>';
@@ -106,7 +104,9 @@ Wat.Views.RoleDetailsView = Wat.Views.DetailsView.extend({
             subbranch += '</div>';
             that.currentBranchDiv.append(subbranch);
         });
-                
+        
+        Wat.T.translate();
+        
         switch (that.currentTreeKind) {
             case 'actions':
                 filters = {'acl_name': '%.' + that.currentBranch + '.%', 'role_id': that.id};
