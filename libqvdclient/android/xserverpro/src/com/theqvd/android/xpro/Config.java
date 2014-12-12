@@ -134,6 +134,14 @@ public class Config {
 		setTargetdir(context.getFilesDir().getAbsolutePath());
 		pocketvncconfigfullpath = getTargetdir() + "/" + Config.pocketvncconfig;
 		xvnc = getTargetdir() + "/usr/X11R6/bin/" + L.xvncbinary;
+		if (android.os.Build.CPU_ABI == "x86") {
+			xvnc += "i386";
+		} else if (android.os.Build.CPU_ABI.startsWith("arm")) {
+			// do not do anything
+		} else {
+			Log.e(tag, "Unknown CPU_ABI is neither x86 and not arm*");
+			// TODO throw error here?
+		}
 		xvnccmd = xvnc + " :0 -br -nolisten local  -pixelformat rgb888 -pixdepths 1 4 8 15 16 24 32 -PasswordFile="+getTargetdir()+"/etc/vncpasswd";
 		setHeightAndWidth();
 		load_properties();
