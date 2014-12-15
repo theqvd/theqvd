@@ -172,28 +172,41 @@ Wat.Views.SetupConfigView = Wat.Views.MainView.extend({
         
         switch(action) {
             case 'save':
-                var arguments = {
+                this.configActionArguments = {
                     "key": token,
                     "value": value
                 };
-
-                Wat.A.performAction('config_set', arguments, {}, {'error': i18n.t('Error updating'), 'success': i18n.t('Successfully updated')}, this.afterChangeToken, this, false);
+                
+                Wat.I.confirm('dialog-config-change', this.applySave, this);
+                
                 break;
             case 'set_default':
-                var filters = {
+                this.configActionFilters = {
                     "key": token,
                 };
-
-                Wat.A.performAction('config_default', {}, filters, {'error': i18n.t('Error updating'), 'success': i18n.t('Successfully updated')}, this.afterChangeToken, this, false);
+                
+                Wat.I.confirm('dialog-config-change', this.applySetDefault, this);
                 break;
             case 'delete':
-                var filters = {
+                this.configActionFilters = {
                     "key": token,
                 };
-
-                Wat.A.performAction('config_delete', {}, filters, {'error': i18n.t('Error deleting'), 'success': i18n.t('Successfully deleted')}, this.afterChangeToken, this, false);
+                
+                Wat.I.confirm('dialog-config-change', this.applyDelete, this);
                 break;
         }
+    },
+    
+    applySave: function (that) {
+        Wat.A.performAction('config_set', that.configActionArguments, {}, {'error': i18n.t('Error updating'), 'success': i18n.t('Successfully updated')}, that.afterChangeToken, that, false);
+    },
+        
+    applySetDefault: function (that) {
+        Wat.A.performAction('config_default', {}, that.configActionFilters, {'error': i18n.t('Error updating'), 'success': i18n.t('Successfully updated')}, that.afterChangeToken, that, false);
+    },
+        
+    applyDelete: function (that) {
+        Wat.A.performAction('config_delete', {}, that.configActionFilters, {'error': i18n.t('Error deleting'), 'success': i18n.t('Successfully deleted')}, that.afterChangeToken, that, false);
     },
     
     openNewElementDialog: function (e) {
