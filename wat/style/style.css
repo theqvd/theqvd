@@ -788,7 +788,7 @@ body {
         @media screen and (min-width: 40em) {
           .header-wrapper .message-container .message article.expandedMessage {
             font-size: 0.9em;
-            line-height: 0.9em; } }
+            line-height: 1.2em; } }
         .header-wrapper .message-container .message article.expandedMessage ul {
           margin-top: 5px;
           margin-left: 8px; }
@@ -1285,7 +1285,7 @@ body {
         @media screen and (min-width: 40em) {
           .wrapper .content .remote-administration-wrapper .remote-administration-state {
             font-size: 1.1em;
-            line-height: 1.1em; } }
+            line-height: 1.4em; } }
         .wrapper .content .remote-administration-wrapper .remote-administration-state div {
           margin-bottom: 15px; }
           .wrapper .content .remote-administration-wrapper .remote-administration-state div.fa {
@@ -2357,7 +2357,7 @@ body {
   @media screen and (min-width: 40em) {
     * {
       font-size: 0.9em;
-      line-height: 0.9em; } }
+      line-height: 1.2em; } }
   @media screen and (min-width: 40em) {
     * {
       font-size: 1.5em;
@@ -2365,7 +2365,7 @@ body {
       @media screen and (min-width: 40em) {
         * {
           font-size: 1.1em;
-          line-height: 1.1em; } } }
+          line-height: 1.4em; } } }
 
 th, td * {
   font-size: 14px; }
@@ -2376,7 +2376,7 @@ th, td * {
       @media screen and (min-width: 40em) {
         th, td * {
           font-size: 1em;
-          line-height: 1em; } } }
+          line-height: 1.3em; } } }
 
 @media only screen and (max-width: 40em) {
   table.expiration-table td {
@@ -2389,7 +2389,7 @@ th, td * {
   @media screen and (min-width: 40em) {
     .h1 {
       font-size: 1.4em;
-      line-height: 1.4em; } }
+      line-height: 1.7em; } }
   .h1 .subtitle {
     font-weight: normal; }
 
@@ -2400,7 +2400,7 @@ th, td * {
   @media screen and (min-width: 40em) {
     .h2 {
       font-size: 1.1em;
-      line-height: 1.1em; } }
+      line-height: 1.4em; } }
 
 a, button.actions_button:before {
   font-size: 1.3em;
@@ -2408,7 +2408,7 @@ a, button.actions_button:before {
   @media screen and (min-width: 40em) {
     a, button.actions_button:before {
       font-size: 1em;
-      line-height: 1em; } }
+      line-height: 1.3em; } }
 
 a.button, a.button2, button {
   font-size: 1.3em;
@@ -2416,7 +2416,7 @@ a.button, a.button2, button {
   @media screen and (min-width: 40em) {
     a.button, a.button2, button {
       font-size: 1em;
-      line-height: 1em; } }
+      line-height: 1.3em; } }
 
 label {
   font-size: 0.9em;
@@ -2424,7 +2424,7 @@ label {
   @media screen and (min-width: 40em) {
     label {
       font-size: 0.9em;
-      line-height: 0.9em; } }
+      line-height: 1.2em; } }
 
 .chosen-container {
   font-size: 1.3em;
@@ -2432,7 +2432,7 @@ label {
   @media screen and (min-width: 40em) {
     .chosen-container {
       font-size: 1em;
-      line-height: 1em; } }
+      line-height: 1.3em; } }
 
 .actions_button, select[name="selected_actions_select"] {
   font-size: 1.3em;
@@ -2441,7 +2441,7 @@ label {
   @media screen and (min-width: 40em) {
     .actions_button, select[name="selected_actions_select"] {
       font-size: 1em;
-      line-height: 1em; } }
+      line-height: 1.3em; } }
 
 input {
   line-height: 20px; }
@@ -2455,7 +2455,7 @@ input {
       @media screen and (min-width: 40em) {
         .details-block .details-item {
           font-size: 1.1em;
-          line-height: 1.1em; } } }
+          line-height: 1.4em; } } }
 
 .details-block .details-item {
   font-weight: normal; }
@@ -2466,7 +2466,7 @@ input {
   @media screen and (min-width: 40em) {
     .menu-option {
       font-size: 1.1em;
-      line-height: 1.1em; } }
+      line-height: 1.4em; } }
 
 .breadcrumbs * {
   font-size: 0.9em;
@@ -2474,7 +2474,7 @@ input {
   @media screen and (min-width: 40em) {
     .breadcrumbs * {
       font-size: 0.9em;
-      line-height: 0.9em; } }
+      line-height: 1.2em; } }
 
 .pagination {
   font-size: 1.3em;
@@ -2482,7 +2482,7 @@ input {
   @media screen and (min-width: 40em) {
     .pagination {
       font-size: 1em;
-      line-height: 1em; } }
+      line-height: 1.3em; } }
 
 td {
   font-size: 14px; }
@@ -2511,7 +2511,7 @@ td {
   @media screen and (min-width: 40em) {
     .welcome-message {
       font-size: 1.4em;
-      line-height: 1.4em; } }
+      line-height: 1.7em; } }
 
 .home-wrapper .home-cell .home-title {
   font-size: 20px;
@@ -2534,7 +2534,7 @@ td {
       @media screen and (min-width: 40em) {
         .message-container .message {
           font-size: 1.1em;
-          line-height: 1.1em; } } }
+          line-height: 1.4em; } } }
 
 /********************************************************************
 *********************************************************************

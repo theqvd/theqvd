@@ -155,7 +155,7 @@
         $size: nth($font-sizes, $size_index);
         $height: $size;
         font-size: $size * 1em;
-        line-height: $height * 1em;
+        line-height: ($height + 0.3) * 1em;
     }
 }
 
