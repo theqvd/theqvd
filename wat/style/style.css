@@ -450,7 +450,8 @@ select {
 
 input, .button, .button2 {
   padding: 4px 8px;
-  line-height: 30px; }
+  line-height: 30px;
+  border-color: #ccc; }
   @media screen and (min-width: 40em) {
     input, .button, .button2 {
       line-height: 15px; } }
@@ -1353,6 +1354,12 @@ body {
         margin-right: 5px; }
     .wrapper .content .action-new-token {
       margin-bottom: 10px; }
+    .wrapper .content .config-search-box {
+      padding-bottom: 10px;
+      margin-bottom: 10px;
+      border-bottom: 1px dotted #d7d7d7; }
+      .wrapper .content .config-search-box input {
+        width: 100%; }
     .wrapper .content .login-box {
       width: 90%;
       height: 250px;

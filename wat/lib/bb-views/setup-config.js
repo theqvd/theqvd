@@ -72,7 +72,7 @@ Wat.Views.SetupConfigView = Wat.Views.MainView.extend({
         that.configTokens = that.retrievedData.rows
         
         // If there are not tokens in this prefix, render everything again selecting first prefix
-        if (that.configTokens.length == 0) {
+        if (that.configTokens.length == 0 && $('input[name="config_search"]').val() == '') {
             that.currentTokensPrefix = '';
             Wat.A.performAction('config_preffix_get', {}, {}, {}, that.processPrefixes, that);
             return;
@@ -107,6 +107,18 @@ Wat.Views.SetupConfigView = Wat.Views.MainView.extend({
         'click .token-prefix-option': 'clickPrefixOption',
         'click .js-button-new': 'openNewElementDialog',
         'click .actions_button': 'performTokenAction',
+        'input [name="config_search"]': 'filter'
+    },
+    
+    filter: function (e) {
+        var search = $(e.target).val();
+        if (search == '') {
+            $('.token-prefix-option').eq(0).trigger('click');
+        }
+        else {
+            $('.token-prefix-option').removeClass('token-prefix-option--selected');
+            Wat.A.performAction('config_get', {}, {'key': search}, {}, this.processTokensRenderTokens, this);
+        }
     },
     
     clickPrefixOption: function (e) {

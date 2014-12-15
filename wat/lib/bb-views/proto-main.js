@@ -37,6 +37,7 @@ Wat.Views.MainView = Backbone.View.extend({
     },
     
     events:  {
+        'input .filter-control>input': 'filter'
     },
     
     extendEvents: function (ev) {

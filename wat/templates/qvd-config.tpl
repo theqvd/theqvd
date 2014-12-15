@@ -1,6 +1,9 @@
 <div class="wrapper-content <%= cid %>"> 
     <div class="menu secondary-menu setup-side">
-    
+    <div class="config-search-box">
+        <label for="config_search" data-i18n="Search"></label>
+        <input name="config_search"/>
+    </div>
     <%
         $.each(prefixes, function (iprefix, prefix) {
         var currentClass = '';

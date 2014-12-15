@@ -47,6 +47,7 @@ select {
 input, .button, .button2 {
     padding: 4px 8px;
     line-height: 30px;
+    border-color: #ccc;
     @include in(desktop) {
         line-height: 15px;
     }
