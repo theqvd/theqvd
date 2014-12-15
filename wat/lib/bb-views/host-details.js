@@ -18,7 +18,7 @@ Wat.Views.HostDetailsView = Wat.Views.DetailsView.extend({
         var params = {};
         params.whatRender = 'list';
         params.listContainer = sideContainer;
-        params.forceListColumns = {checks: true, name: true};
+        params.forceListColumns = {name: true};
 
         if (Wat.C.checkGroupACL('hostVmEmbeddedInfo')) {
             params.forceListColumns['info'] = true;
@@ -39,7 +39,7 @@ Wat.Views.HostDetailsView = Wat.Views.DetailsView.extend({
             params.forceInfoRestrictions.user_state = true;
         }
         
-        params.forceSelectedActions = {disconnect: true};
+        params.forceSelectedActions = {};
         params.forceListActionButton = null;
         params.block = 5;
         params.filters = {"host_id": this.elementId};

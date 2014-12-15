@@ -51,5 +51,15 @@ Wat.Views.HostListView = Wat.Views.ListView.extend({
         }
                         
         this.createModel(arguments, this.fetchList);
+    },
+    
+    
+    applyStopAll: function (that) {
+        var stopAllFilters = {
+            'host_id': that.applyFilters['id']
+        };
+        
+        that.stopVM (stopAllFilters);
+        that.resetSelectedItems ();
     }
 });

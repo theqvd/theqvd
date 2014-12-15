@@ -864,7 +864,12 @@ Wat.Views.ListView = Wat.Views.MainView.extend({
                 break;
             // Used in Hosts
             case 'stop_all':
-                // TODO
+                if (elementsOutOfView) {
+                    Wat.I.confirm('dialog-confirm-out-of-view', that.applyStopAll, that);
+                }
+                else {
+                    that.applyStopAll(that);
+                }
                 break;
             // Used in Users
             case 'disconnect_all':

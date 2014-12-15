@@ -334,5 +334,15 @@ Wat.Views.MainView = Backbone.View.extend({
         this.dialogConf.fillCallback = this.fillEditor;
         
         this.editorElement (e);
+    },
+    
+    
+    stopVM: function (filters) {        
+        var messages = {
+            'success': 'Successfully required to be stopped',
+            'error': 'Error stopping VM'
+        }
+        
+        Wat.A.performAction ('vm_stop', {}, filters, messages, function(){}, this);
     }
 });
