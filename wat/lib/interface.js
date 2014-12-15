@@ -636,9 +636,11 @@ Wat.I = {
             var expandedMessage = '';
         }
         
-        var summaryMessage = '<summary>' + msg.message + '</summary>';
+        var summaryMessage = '<summary data-i18n="' + msg.message + '"></summary>';
         
         $('.message').html(expandIcon + summaryMessage + expandedMessage);
+        Wat.T.translate();
+
         $('.message-container').hide().slideDown(500);
         $('.message-container').removeClass('success error info warning');
         $('.message-container').addClass(msg.messageType);
@@ -683,7 +685,7 @@ Wat.I = {
                 msg.expandedMessage = msg.expandedMessage || '';
                 
                 if (response.message != msg.message && response.message) {
-                    msg.expandedMessage += '<strong>' + response.message + '</strong> <br/><br/>';
+                    msg.expandedMessage += '<strong data-i18n="' + response.message + '"></strong> <br/><br/>';
                 }
             
                 if (response.failures && !$.isEmptyObject(response.failures)) {
@@ -709,7 +711,7 @@ Wat.I = {
         var failuresList = '<ul>';
         $.each(failuresByText, function(text, ids) {
             failuresList += '<li>';
-            failuresList += '<i class="fa fa-angle-double-right strong" data-i18n="' + $.i18n.t(text) + '"></i>';
+            failuresList += '<i class="fa fa-angle-double-right strong" data-i18n="' + text + '"></i>';
             failuresList += '<ul>';
             $.each(ids, function(iId, id) {
                 if ($('.list')) {

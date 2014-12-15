@@ -5,7 +5,7 @@
             <%
             if (model.get('default')) {
             %>
-                <div class="second_row" data-i18n="This disk image is already setted as default. To change this, another disk image of the same OSF must be setted as default"></div>
+                <div class="second_row" data-i18n="This disk image is already setted as default - To change this, another disk image of the same OSF must be setted as default"></div>
             <%
             }
             else {

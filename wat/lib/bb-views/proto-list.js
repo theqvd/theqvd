@@ -121,7 +121,6 @@ Wat.Views.ListView = Wat.Views.MainView.extend({
         'click .next': 'paginationNext',
         'click .last': 'paginationLast',
         'click a[name="filter_button"]': 'filter',
-        'input .filter-control>input': 'filter',
         'change .filter-control select': 'filter',
         'click .js-button-new': 'openNewElementDialog',
         'click [name="selected_actions_button"]': 'applySelectedAction'

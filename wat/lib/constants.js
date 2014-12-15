@@ -14,8 +14,8 @@ ALL_STATUS = {
     2240: 'Unable to find disk image in staging directory',
 
     3100: 'No credentials provided for authentication',
-    3200: 'Wrong login or password. Login again',
-    3300: 'Session expired. Login again',
+    3200: 'Wrong login or password - Login again',
+    3300: 'Session expired - Login again',
     3400: 'Problems to update expiration time in session',
 
     4100: 'Unavailable action',
@@ -54,12 +54,12 @@ ALL_STATUS = {
     7210: 'This property already exists',
     7220: 'This acl has already been assigned',
     7230: 'This role has already been assigned',
-    7310: 'Unable to remove VM. This VM is running',
-    7320: 'Unable to remove DI. There are VMs running with it',
+    7310: 'Unable to remove VM - This VM is running',
+    7320: 'Unable to remove DI - There are VMs running with it',
     7330: 'Unable to reassign a Tag fixed to another DI',
     7340: 'Fixed, Head and Default Tags cannot be deleted',
     7350: 'Forbidden role assignment: inherited role inherits from inheritor',
-    7360: 'Incompatible expiration dates. Soft date must precede the hard one',
+    7360: 'Incompatible expiration dates - Soft date must precede the hard one',
     7371: 'Non core config items haven\'t default value',
     7372: 'Unable to remove a core config item'
 };
