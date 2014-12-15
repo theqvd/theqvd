@@ -98,7 +98,7 @@ Wat.Views.RoleDetailsView = Wat.Views.DetailsView.extend({
                 subbranch += '<span class="subbranch-piece" data-i18n="' + ACLS[acl.name] + '"></span>';
                 if (Wat.C.checkACL('role.see.acl-list-roles')) {
                     subbranch += '<span class="subbranch-piece">';
-                        subbranch += '<i class="fa fa-sitemap acl-inheritance hidden" data-acl-id="' + acl.id + '" title=""></i>';
+                        subbranch += '<i class="' + CLASS_ICON_ROLES + ' acl-inheritance hidden" data-acl-id="' + acl.id + '" title=""></i>';
                     subbranch += '</span>';
                 }
             subbranch += '</div>';

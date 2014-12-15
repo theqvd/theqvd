@@ -125,13 +125,15 @@ Wat.Views.AdminDetailsView = Wat.Views.DetailsView.extend({
                 subbranch += '<span class="subbranch-piece" data-i18n="' + ACLS[acl.name] + '"></span>';
                 if (Wat.C.checkACL('administrator.see.acl-list-roles')) {
                     subbranch += '<span class="subbranch-piece">';
-                        subbranch += '<i class="fa fa-graduation-cap acl-inheritance hidden" data-acl-id="' + acl.id + '" title=""></i>';
+                        subbranch += '<i class="' + CLASS_ICON_ROLES + ' acl-inheritance hidden" data-acl-id="' + acl.id + '" title=""></i>';
                     subbranch += '</span>';
                 }
             subbranch += '</div>';
             that.currentBranchDiv.append(subbranch);
         });
         
+        Wat.T.translate();
+
         switch (that.currentTreeKind) {
             case 'actions':
                 filters = {'acl_name': '%.' + that.currentBranch + '.%', 'admin_id': that.id};
