@@ -108,7 +108,7 @@ Wat.Views.VMDetailsView = Wat.Views.DetailsView.extend({
     
     stopVM: function () {
         var messages = {
-            'success': 'Successfully required to be stopped',
+            'success': 'Stop request successfully performed',
             'error': 'Error stopping VM'
         }
         

@@ -64,7 +64,8 @@ Wat.Views.DetailsView = Wat.Views.MainView.extend({
         'click .js-button-delete': 'askDelete',
         'click .js-button-default': 'applyDefault',
         'click .js-button-start-vm': 'startVM',
-        'click .js-button-stop-vm': 'stopVM'
+        'click .js-button-stop-vm': 'stopVM',
+        'click .js-button-disconnect-all-vms': 'applyDisconnectAll'
     },
 
     render: function () {

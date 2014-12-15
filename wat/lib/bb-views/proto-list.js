@@ -873,7 +873,12 @@ Wat.Views.ListView = Wat.Views.MainView.extend({
                 break;
             // Used in Users
             case 'disconnect_all':
-                // TODO
+                if (elementsOutOfView) {
+                    Wat.I.confirm('dialog-confirm-out-of-view', that.applyDisconnectAll, that);
+                }
+                else {
+                    that.applyDisconnectAll(that);
+                }
                 break;
             case 'delete_acl':
                 Wat.I.confirm('dialog-confirm-undone', that.applyDeleteACL, that);

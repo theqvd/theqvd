@@ -85,5 +85,18 @@ Wat.Views.UserDetailsView = Wat.Views.DetailsView.extend({
         this.dialogConf.title = $.i18n.t('Edit user') + ": " + this.model.get('name');
         
         Wat.Views.DetailsView.prototype.openEditElementDialog.apply(this, [e]);
+    },
+    
+    applyDisconnectAll: function () {
+        var disconnectAllFilters = {
+            'user_id': [this.id]
+        };
+        
+        var messages = {
+            'success': 'User successfully disconnected from all VMs',
+            'error': 'Error disconnecting user from all VMs'
+        };
+        
+        this.disconnectVMUser (disconnectAllFilters, messages);
     }
 });

@@ -152,15 +152,6 @@ Wat.Views.VMListView = Wat.Views.ListView.extend({
         Wat.A.performAction ('vm_start', {}, filters, messages, function(){}, this);
     },
     
-    disconnectVMUser: function (filters) {        
-        var messages = {
-            'success': 'User successfully disconnected from VM',
-            'error': 'Error disconnecting user from VM'
-        }
-        
-        Wat.A.performAction ('vm_user_disconnect', {}, filters, messages, this.fetchList, this);
-    },
-    
     // Different functions applyed to the selected items in list view
     applyStart: function (that) {
         that.startVM (that.applyFilters);
