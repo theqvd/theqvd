@@ -4,6 +4,12 @@ var prefixes = [];
 var prefix = '';
 var miscTokens = [];
 
+if (configTokens.length == 0) {
+%>
+    <td data-i18n="No elements found"></td>
+<%
+}
+
 $.each(configTokens, function (iTok, tok) {
     var token = tok.key;
     var value = tok.operative_value;
