@@ -148,8 +148,8 @@ function diTestReal () {
                                 else if (WatTests.values.di[fieldName] != undefined) {
                                     
                                     if (fieldName == 'disk_image') {
-                                        equal(valRetrieved, WatTests.values.di[fieldName], "DI field '" + fieldName + "' retrieved successfully and match with created value (" + valRetrieved + ")");
-/*                                        equal(valRetrieved, WatTests.values.di['id'] + '-' + WatTests.values.di[fieldName], "DI field '" + fieldName + "' retrieved successfully and match with created value (" + valRetrieved + ")");*/
+/*                                        equal(valRetrieved, WatTests.values.di[fieldName], "DI field '" + fieldName + "' retrieved successfully and match with created value (" + valRetrieved + ")");*/
+                                        equal(valRetrieved, WatTests.values.di['id'] + '-' + WatTests.values.di[fieldName], "DI field '" + fieldName + "' retrieved successfully and match with created value (" + valRetrieved + ")");
                                     }
                                     else {
                                         equal(valRetrieved, WatTests.values.di[fieldName], "DI field '" + fieldName + "' retrieved successfully and match with created value (" + valRetrieved + ")");
@@ -183,8 +183,8 @@ function diTestReal () {
                                             }
                                             else if (WatTests.values.di[fieldName] != undefined) {
                                                 if (fieldName == 'disk_image') {
-                                                    equal(valRetrieved, WatTests.values.di[fieldName], "DI field '" + fieldName + "' retrieved successfully and match with created value (" + valRetrieved + ")");
-/*                                                  equal(valRetrieved, WatTests.values.di['id'] + '-' + WatTests.values.di[fieldName], "DI field '" + fieldName + "' retrieved successfully and match with created value (" + valRetrieved + ")");*/
+/*                                                    equal(valRetrieved, WatTests.values.di[fieldName], "DI field '" + fieldName + "' retrieved successfully and match with created value (" + valRetrieved + ")");*/
+                                                  equal(valRetrieved, WatTests.values.di['id'] + '-' + WatTests.values.di[fieldName], "DI field '" + fieldName + "' retrieved successfully and match with created value (" + valRetrieved + ")");
                                                 }
                                                 else {
                                                     equal(valRetrieved, WatTests.values.di[fieldName], "DI field '" + fieldName + "' retrieved successfully and match with created value (" + valRetrieved + ")");
