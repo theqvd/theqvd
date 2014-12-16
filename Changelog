@@ -11,10 +11,20 @@ QVD 3.5.0
 	- Fix error condition on the session stealing mechanism
 	- Remove L7R daemon, now the L7R is launched by the HKD
 
+=======
+QVD 3.4.7
+=========
+	- Allow passing arguments to sshfs
+
 QVD 3.4.6
 =========
 
 	- Fix bug #1657: command "qa di untag" was broken
+	- Fix bugs #1243, #1432
+	- Locale fixes
+	- Charset fixes
+	- Mounting VM folders on the client side
+	- USB sharing
 
 QVD 3.4.5
 =========
