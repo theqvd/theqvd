@@ -319,6 +319,7 @@ fieldset {
       display: none;
       position: absolute;
       left: -9px;
+      top: 18px;
       border-bottom-left-radius: 7px;
       border-bottom-right-radius: 7px;
       z-index: 3; }

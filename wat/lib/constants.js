@@ -23,6 +23,7 @@ ALL_STATUS = {
     4220: 'Forbidden filter for this administrator',
     4230: 'Forbidden argument for this administrator',
     4240: 'Forbidden massive action for this administrator',
+    4250: 'Forbidden field for this administrator',
 
     5110: 'Unable to disconnect user in current state',
     5120: 'Unable to stop VM in current state',
@@ -34,6 +35,7 @@ ALL_STATUS = {
     6220: 'No mandatory filter for this action',
     6230: 'Inappropiate argument for this action',
     6240: 'No mandatory argument for this action',
+    6250: 'Inappropiate field for this action',
     6310: 'Invalid value',
     6320: 'Invalid filter value',
     6330: 'Invalid argument value',
@@ -86,6 +88,7 @@ STATUS_FORBIDDEN_ACTION = 4210;
 STATUS_FORBIDDEN_FILTER = 4220;
 STATUS_FORBIDDEN_ARGUMENT = 4230;
 STATUS_FORBIDDEN_MASSIVE_ACTION = 4240;
+STATUS_FORBIDDEN_FIELD = 4250;
 
 STATUS_UNABLE_DISCONNECT_USER = 5110;
 STATUS_UNABLE_STOP_VM = 5120;
@@ -97,6 +100,7 @@ STATUS_INNAPPROPIATE_FLTER = 6210;
 STATUS_NO_MANDATORY_FILTER = 6220;
 STATUS_INNAPPROPIATE_ARGUMENT = 6230;
 STATUS_NO_MANDATORY_ARGUMENT = 6240;
+STATUS_INAPPROPIATE_FIELD = 6250;
 STATUS_INVALID_VALUE = 6310;
 STATUS_INVALID_FILTER = 6320;
 STATUS_INVALID_ARGUMENT = 6330;
