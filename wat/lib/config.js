@@ -333,9 +333,9 @@ Wat.C = {
         if (!Wat.Router.app_router) {
             return false;
         }
-        else if (response.status == STATUS_NOT_LOGIN) {
+        else if (response.status == STATUS_NOT_LOGIN || response.status == STATUS_SESSION_EXPIRED) {
             Wat.Router.app_router.trigger('route:logout');
-            Wat.I.showMessage({'message': $.i18n.t('Your session has expired - Please log in again'), 'messageType': 'error'});
+            Wat.I.showMessage({'message': ALL_STATUS[response.status], 'messageType': 'error'});
             return true;
         }
         

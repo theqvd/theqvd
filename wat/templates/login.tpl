@@ -5,24 +5,20 @@
     <div class="login-main">
         <div class="login-form">
             <div class="login-user">
-                <div>
-                    User
-                </div>
+                <div data-i18n="User"></div>
                 <div>
                     <input type="text" name="admin_user" />
                 </div>
             </div>
             <div class="login-password">
-                <div>
-                    Password
-                </div>
+                <div data-i18n="Password"></div>
                 <div>
                     <input type="password" name="admin_password" />
                 </div>
             </div>
             <div class="login-button">
                 <div>
-                    <a class="fa fa-sign-in button js-login-button">Login</a>
+                    <a class="fa fa-sign-in button js-login-button" data-i18n="Log-in"></a>
                 </div>
             </div>
         </div>

@@ -138,6 +138,9 @@ Wat.Views.SetupConfigView = Wat.Views.MainView.extend({
     selectPrefixMenu: function (prefix) {
         $('.token-prefix-option').removeClass('token-prefix-option--selected');
         $('.token-prefix-option[data-prefix="' + prefix + '"]').addClass('token-prefix-option--selected');
+        
+        // Go to start of the page
+        $('html, body').animate({ scrollTop: 0 }, 'slow');
     },
     
     clickTokenHeader: function (e) {
@@ -198,15 +201,15 @@ Wat.Views.SetupConfigView = Wat.Views.MainView.extend({
     },
     
     applySave: function (that) {
-        Wat.A.performAction('config_set', that.configActionArguments, {}, {'error': i18n.t('Error updating'), 'success': i18n.t('Successfully updated')}, that.afterChangeToken, that, false);
+        Wat.A.performAction('config_set', that.configActionArguments, {}, {'error': i18n.t('Error updating'), 'success': 'Successfully updated'}, that.afterChangeToken, that, false);
     },
         
     applySetDefault: function (that) {
-        Wat.A.performAction('config_default', {}, that.configActionFilters, {'error': i18n.t('Error updating'), 'success': i18n.t('Successfully updated')}, that.afterChangeToken, that, false);
+        Wat.A.performAction('config_default', {}, that.configActionFilters, {'error': i18n.t('Error updating'), 'success': 'Successfully updated'}, that.afterChangeToken, that, false);
     },
         
     applyDelete: function (that) {
-        Wat.A.performAction('config_delete', {}, that.configActionFilters, {'error': i18n.t('Error deleting'), 'success': i18n.t('Successfully deleted')}, that.afterChangeToken, that, false);
+        Wat.A.performAction('config_delete', {}, that.configActionFilters, {'error': i18n.t('Error deleting'), 'success': 'Successfully deleted'}, that.afterChangeToken, that, false);
     },
     
     openNewElementDialog: function (e) {
