@@ -9,6 +9,9 @@ use MojoX::Session;
 use File::Copy qw(copy move);
 use Mojo::IOLoop::ForkCall;
 use AnyEvent::Pg::Pool;
+use Mojo::Log;
+
+app->log( Mojo::Log->new( path => '/var/log/wat.log', level => 'debug' ) );
 
 # MojoX::Session::Transport::WAT Package 
 
@@ -256,7 +259,11 @@ sub update_session
     my ($bool,$exception) = (1, undef);
 
     $session->extend_expires; 
-    $c->qvd_admin4_api->load_user($session->data('admin_id'));
+
+    my $admin = $c->qvd_admin4_api->validate_user(id => $session->data('admin_id'));
+    return (0,QVD::Admin4::Exception->new(code =>3200)) 
+	unless $admin;
+    $c->qvd_admin4_api->load_user($admin);
 
     for (1 .. 5) { eval { $session->flush }; last unless $@;}
     ($bool,$exception) = (0,QVD::Admin4::Exception->new(code => 3400)) if $@;
