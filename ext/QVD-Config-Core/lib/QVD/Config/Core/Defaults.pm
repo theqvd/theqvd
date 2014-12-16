@@ -499,3 +499,5 @@ internal.hkd.agent.l7rmonitor.delay = 60
 internal.hkd.agent.l7rkiller.delay = 61
 
 internal.hkd.agent.config.delay = 10
+
+wat.multitenant = 0

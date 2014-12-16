@@ -47,6 +47,7 @@ sub BUILD
     $self->check_acls_for_deleting if
 	$self->qvd_object_model->type_of_action eq 'delete';
     $self->check_filters_validity_in_json;
+    $self->check_fields_validity_in_json;
     $self->check_update_arguments_validity_in_json if
 	$self->qvd_object_model->type_of_action eq 'update';
     $self->check_create_arguments_validity_in_json if
@@ -90,6 +91,12 @@ sub parameters
 {
     my $self = shift;
     $self->json_wrapper->parameters;
+}
+
+sub fields
+{
+    my $self = shift;
+    $self->json_wrapper->fields;
 }
 
 sub get_parameter_value
@@ -250,6 +257,20 @@ sub check_filters_validity_in_json
     $self->json_wrapper->has_filter($_) ||
 	QVD::Admin4::Exception->throw(code => 6220, object => $_)
 	for $self->qvd_object_model->mandatory_filters;
+}
+
+sub check_fields_validity_in_json
+{
+    my $self = shift;
+    my $admin = $self->qvd_object_model->current_qvd_administrator;
+
+    $self->qvd_object_model->available_field($_) || 
+	QVD::Admin4::Exception->throw(code => 6250, object => $_)
+	for $self->json_wrapper->fields_list;
+
+    $admin->re_is_allowed_to($self->qvd_object_model->get_acls_for_field($_)) || 
+	QVD::Admin4::Exception->throw(code => 4250, object => $_)
+	for $self->json_wrapper->fields_list;
 }
 
 sub check_acls_for_deleting

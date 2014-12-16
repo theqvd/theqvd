@@ -65,6 +65,7 @@ sub filters
 	return $self->json->{filters} || {};
 }
 
+
 sub parameters
 {
 	my $self = shift;
@@ -109,6 +110,20 @@ sub order_criteria
 	{
 		return [];
 	}			 
+}
+
+
+sub fields
+{
+    my $self = shift;
+    $self->json->{fields} || [];
+}
+
+sub fields_list
+{
+    my $self = shift;
+    my $ref = $self->fields;
+    return @$ref;
 }
 
 sub order_direction
@@ -168,6 +183,15 @@ sub has_parameter
 
     $_ eq $parameter && return 1
 	for keys %{$self->parameters};
+    return 0;
+}
+
+sub has_field
+{
+    my ($self,$field) = @_;
+
+    $_ eq $field && return 1
+	for $self->fields_list;
     return 0;
 }
 

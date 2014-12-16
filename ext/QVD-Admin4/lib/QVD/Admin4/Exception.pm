@@ -27,8 +27,8 @@ my $code2message_mapper =
     2240 => 'Unable to find disk image in staging directory',
 
     3100 => 'No credentials provided for authentication',
-    3200 => 'Wrong login or password. Login again',
-    3300 => 'Session expired. Login again',
+    3200 => 'Wrong login or password - Login again',
+    3300 => 'Session expired - Login again',
     3400 => 'Problems to update expiration time in session',
 
     4100 => 'Unavailable action',
@@ -37,6 +37,7 @@ my $code2message_mapper =
     4220 => 'Forbidden filter for this administrator',
     4230 => 'Forbidden argument for this administrator',
     4240 => 'Forbidden massive action for this administrator',
+    4250 => 'Forbidden field for this administrator',
 
     5110 => 'Unable to disconnect user in current state',
     5120 => 'Unable to stop VM in current state',
@@ -48,6 +49,7 @@ my $code2message_mapper =
     6220 => 'No mandatory filter for this action',
     6230 => 'Inappropiate argument for this action',
     6240 => 'No mandatory argument for this action',
+    6250 => 'Inappropiate field for this action',
     6310 => 'Invalid value',
     6320 => 'Invalid filter value',
     6330 => 'Invalid argument value',
@@ -68,12 +70,12 @@ my $code2message_mapper =
     7210 => 'This property already exists',
     7220 => 'This acl has already been assigned',
     7230 => 'This role has already been assigned',
-    7310 => 'Unable to remove VM. This VM is running',
-    7320 => 'Unable to remove DI. There are VMs running with it',
+    7310 => 'Unable to remove VM - This VM is running',
+    7320 => 'Unable to remove DI - There are VMs running with it',
     7330 => 'Unable to reassign a Tag fixed to another DI',
     7340 => 'Fixed, Head and Default Tags cannot be deleted',
     7350 => 'Forbidden role assignment, inherited role inherits from inheritor',
-    7360 => 'Incompatible expiration dates. Soft date must precede the hard one',
+    7360 => 'Incompatible expiration dates - Soft date must precede the hard one',
     7371 => 'Non core config items haven\'t default value',
     7372 => 'Unable to remove a core config item'
 };

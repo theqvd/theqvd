@@ -5,6 +5,7 @@ use Moo;
 
 has 'result', is => 'ro', isa => sub { die "Invalid type" unless ref(+shift) eq 'HASH'; }, default => sub {{};};
 has 'qvd_object_model', is => 'ro', isa => sub { die "Invalid type" unless ref(+shift) eq 'QVD::Admin4::REST::Model'; };
+has 'json_wrapper', is => 'ro', isa => sub { die "Invalid type" unless ref(+shift) eq 'QVD::Admin4::REST::JSON'; };
 
 sub BUILD
 {
@@ -31,8 +32,10 @@ sub map_dbix_object_to_output_info
     my ($self,$dbix_object) = @_;
     my $result = {};
     my $admin = $self->qvd_object_model->current_qvd_administrator;
-    my @available_fields =  grep  { $admin->re_is_allowed_to($self->qvd_object_model->get_acls_for_field($_)) }
-	$self->qvd_object_model->available_fields;
+
+    my @available_fields =  $self->qvd_object_model->available_fields;
+    @available_fields = grep { $self->json_wrapper->has_field($_) } @available_fields if $self->json_wrapper->fields_list;
+    @available_fields = grep  { $admin->re_is_allowed_to($self->qvd_object_model->get_acls_for_field($_)) } @available_fields;
 
     for my $field_key (@available_fields)
     {

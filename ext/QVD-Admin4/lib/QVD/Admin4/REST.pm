@@ -10,6 +10,7 @@ use QVD::Admin4::REST::JSON;
 use QVD::Admin4::Exception;
 use QVD::Admin4::Action;
 use TryCatch;
+use QVD::Config;
 
 has 'administrator', is => 'ro', isa => sub { die "Invalid type for attribute administrator" 
 						  unless ref(+shift) eq 'QVD::DB::Result::Administrator'; };
@@ -29,6 +30,9 @@ sub validate_user
 
     $params{name} = delete $params{login}; # FIX ME IN DB!!!
     my $admin = eval { $QVD_ADMIN->_db->resultset('Administrator')->find(\%params) };
+    return undef unless $admin;
+   
+    return undef if $admin->is_superadmin && (not cfg('wat.multitenant'));
     return $admin;
 }
 
@@ -70,6 +74,7 @@ sub process_query
        my $result = $self->$restmethod($action,$json_wrapper,$qvd_object_model);
 
        my %args = (status => 0, result => $result);
+       $args{json_wrapper} = $json_wrapper;
        $args{qvd_object_model} = $qvd_object_model
 	   if $qvd_object_model;
 

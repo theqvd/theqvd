@@ -59,7 +59,6 @@ helper (get_auth_method => \&get_auth_method);
 helper (create_session => \&create_session);
 helper (update_session => \&update_session);
 helper (reject_access => \&reject_access);
-helper (create_di => \&create_di);
 
 #######################
 ### Routes Handlers ###
@@ -173,23 +172,6 @@ app->start;
 ### FUNCTIONS ###
 #################
 
-sub create_di
-{
-    my ($c,$fs,$copy_response,$db_query_request) = @_;
-    
-    return $copy_response unless $copy_response->{status} eq '0000';
-    my $db_query_response = $c->qvd_admin4_api->process_query($db_query_request);
-
-    unless ($db_query_response->{status})
-    {
-	my $di_name_normalization = $c->qvd_admin4_api->process_query(
-	    { action => 'normalize_di_path', 
-	      filters => { filesystem => $fs}});
-
-	return $di_name_normalization unless $di_name_normalization->{status} eq '0000';
-    }
-    $db_query_response;
-}
 
 sub get_input_json
 {
@@ -202,7 +184,9 @@ sub get_input_json
     {
         $json->{filters} = decode_json($json->{filters}) if exists $json->{filters};
         $json->{arguments} = decode_json($json->{arguments}) if exists $json->{arguments};
-        $json->{order_by} = decode_json($json->{order_by}) if exists $json->{order_by}
+        $json->{order_by} = decode_json($json->{order_by}) if exists $json->{order_by};
+        $json->{fields} = decode_json($json->{fields}) if exists $json->{fields};
+        $json->{parameters} = decode_json($json->{parameters}) if exists $json->{parameters}
     };
 
     $c->render(json => QVD::Admin4::Exception->new(code => 6100)->json) if $@;
