@@ -1,9 +1,9 @@
 <div class="details-header">
     <span class="<%= CLASS_ICON_ROLES %> h1"><%= model.get('name') %></span>
-    <% if(Wat.C.checkACL('role.delete.') && !model.get('fixed')) { %>
+    <% if(Wat.C.checkACL('role.delete.') && !model.get('fixed2')) { %>
     <a class="button fleft button-icon js-button-delete fa fa-trash" href="javascript:" data-i18n="[title]Delete"></a>
     <% } %>
-    <% if(Wat.C.checkGroupACL('roleEdit') && !model.get('fixed')) { %>
+    <% if(Wat.C.checkGroupACL('roleEdit') && !model.get('fixed2')) { %>
     <a class="button fright button-icon js-button-edit fa fa-pencil" href="javascript:" data-i18n="[title]Edit"></a>
     <% } %>
 </div>

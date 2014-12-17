@@ -1,11 +1,24 @@
-Wat.Views.TenantDetailsView = Wat.Views.DetailsView.extend({  
-    qvdObj: 'tenant',
-
-    initialize: function (params) {
-        console.log(Wat.C.tenantID);
-        console.log(params);
+Wat.Views.ConfigWatView = Wat.Views.DetailsView.extend({  
+    qvdObj: 'configwat',
+    
+    initialize: function () {
+        var params = {id: Wat.C.tenantID};
         this.model = new Wat.Models.Tenant(params);
         Wat.Views.DetailsView.prototype.initialize.apply(this, [params]);
+    },
+    
+    setBreadCrumbs: function () {
+        this.breadcrumbs = {
+            'screen': 'Home',
+            'link': '#',
+            'next': {
+                'screen': 'WAT Config'
+            }
+        };
+    },
+    
+    setViewACL: function () {
+        this.viewACL = 'config.wat.';
     },
     
     updateElement: function (dialog) {        
@@ -17,20 +30,14 @@ Wat.Views.TenantDetailsView = Wat.Views.DetailsView.extend({
         
         var context = $('.' + this.cid + '.editor-container');
                         
-        var filters = {"id": this.id};
+        var filters = {"id": Wat.C.tenantID};
         var arguments = {};
         
-        
-        var name = context.find('input[name="name"]').val();
         var language = context.find('select[name="language"]').val(); 
-        
-        if (Wat.C.checkACL('tenant.update.name')) {
-            arguments['name'] = name;
-        }    
         
         this.oldLanguage = this.model.get('language');
         
-        if (Wat.C.checkACL('tenant.update.language')) {
+        if (Wat.C.checkACL('config.wat.')) {
             arguments['language'] = language;
         }     
         
@@ -53,14 +60,14 @@ Wat.Views.TenantDetailsView = Wat.Views.DetailsView.extend({
         // If change is made succesfully check new language to ender again and translate
         if (that.retrievedData.status == STATUS_SUCCESS && that.oldLanguage != that.newLanguage) {
             // If administratos has changed the language of his tenant and his language is default, translate interface
-            if (Wat.C.tenantID == that.model.get('id') && Wat.C.language == 'default') {
+            if (Wat.C.language == 'default') {
                 Wat.T.initTranslate();
             }
         }
     },
     
     openEditElementDialog: function(e) {
-        this.dialogConf.title = $.i18n.t('Edit tenant') + ": " + this.model.get('name');
+        this.dialogConf.title = $.i18n.t('WAT Config');
         
         Wat.Views.DetailsView.prototype.openEditElementDialog.apply(this, [e]);
     }

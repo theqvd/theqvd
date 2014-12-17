@@ -25,6 +25,7 @@ Wat.Views.DetailsView = Wat.Views.MainView.extend({
         this.detailsSideTemplateName = 'details-' + this.qvdObj + '-side',
         
         this.setBreadCrumbs();
+        this.setViewACL();
         this.setDetailsFields();
 
         this.templateDetailsCommon = Wat.A.getTemplate('details-common');
@@ -39,6 +40,10 @@ Wat.Views.DetailsView = Wat.Views.MainView.extend({
     
     setBreadCrumbs: function () {
         this.breadcrumbs = Wat.I.getDetailsBreadCrumbs(this.qvdObj);
+    }, 
+    
+    setViewACL: function () {
+        this.viewACL = this.qvdObj + '.see-details.';
     },
     
     afterRender: function () {
@@ -70,7 +75,7 @@ Wat.Views.DetailsView = Wat.Views.MainView.extend({
 
     render: function () {
         // If user have not access to main section, redirect to home
-        if (!Wat.C.checkACL(this.qvdObj + '.see-details.')) {
+        if (!Wat.C.checkACL(this.viewACL)) {
             window.location = '#';
             return;
         }
@@ -91,7 +96,7 @@ Wat.Views.DetailsView = Wat.Views.MainView.extend({
             nextBread = nextBread.next;
         }
         
-        if (this.qvdObj != 'di') {
+        if (this.qvdObj != 'di' && this.qvdObj != 'configwat') {
             // Add name of the model to breadcrumbs if not exist
             nextBread.screen = this.model.get('name');
         }

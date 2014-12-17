@@ -291,6 +291,7 @@ Wat.C = {
         
         // Menu visibility
         var aclSetupMenu = {
+            'config.wat.' : 'watconfig',
             'role.see-main.' : 'roles',
             'administrator.see-main.' : 'admins',
             'tenant.see-main.' : 'tenants',
@@ -324,7 +325,7 @@ Wat.C = {
             delete Wat.I.cornerMenu.wat;
         }
         
-        if (!that.checkACL('config.see-main.')) {
+        if (!that.checkACL('config.qvd.')) {
             delete Wat.I.cornerMenu.config;
         }
     },

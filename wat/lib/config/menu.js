@@ -38,6 +38,11 @@ Wat.I.menuHelpOriginal = {
 };
 
 Wat.I.menuSetupOriginal = {
+    watconfig: {
+        text: 'WAT Config',
+        link: '#/watconfig',
+        icon: CLASS_ICON_WATCONFIG
+    },
     admins: {
         text: 'Administrators',
         link: '#/admins',

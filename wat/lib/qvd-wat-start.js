@@ -145,6 +145,9 @@
         });    
         Wat.Router.app_router.on('route:setupConfig', function () {
             Wat.Router.app_router.performRoute('config', Wat.Views.SetupConfigView);
+        });       
+        Wat.Router.app_router.on('route:watConfig', function () {
+            Wat.Router.app_router.performRoute('watconfig', Wat.Views.ConfigWatView);
         });    
         Wat.Router.app_router.on('route:listTenant', function () {
             Wat.Router.app_router.performRoute('tenants', Wat.Views.TenantListView);
