@@ -26,6 +26,7 @@ has 'related_views', is => 'ro', isa => sub { die "Invalid type for attribute re
 
 my $ADMIN;
 my $DBConfigProvider;
+my $LOGICAL_OPERATORS = { -and => 1,  -or => 1 };
 
 sub BUILD 
 {
@@ -34,7 +35,12 @@ sub BUILD
     $ADMIN = $self->qvd_object_model->current_qvd_administrator;
     $DBConfigProvider = QVD::Admin4::DBConfigProvider->new();
 
+    $self->hide_recovery_mode_administrator
+	if $self->qvd_object_model->qvd_object eq 'Administrator';
+
     $self->forze_filtering_by_tenant;
+    $self->forze_filtering_tenants_by_tenant
+        if $self->qvd_object_model->qvd_object eq 'Tenant';
     $self->forze_tenant_assignment_in_creation
 	if $self->qvd_object_model->type_of_action eq 'create';
     $self->switch_custom_properties_json2request;
@@ -63,6 +69,21 @@ sub BUILD
     $self->set_related_views_in_request;
     $self->set_order_by_in_request;
     $self->set_tables_to_join_in_request;
+}
+
+
+sub hide_recovery_mode_administrator
+{
+    my $self = shift;
+
+    my $ids = $self->json_wrapper->has_filter('id') ?
+	$self->json_wrapper->get_filter_value('id') : [];
+    $ids = [$ids] unless ref($ids);
+
+    my $sql = 'NOT IN (0)';
+    my $key = @$ids ? '-and' : 'me.id';
+    my $value = @$ids ? ['me.id' => \$sql, 'me.id' => $ids ] : \$sql;
+    $self->set_filter($key,$value);
 }
 
 sub forze_default_version_in_json_for_di
@@ -128,7 +149,25 @@ sub set_filter
     my ($self,$key,$val) = @_;
     $val = undef if defined $val && $val eq '';
     $key = undef if defined $key && $key eq '';
-    $self->filters->{$key} = $val;
+
+    if (exists $LOGICAL_OPERATORS->{$key})
+    {
+	$self->add_term_to_logical_filter(
+	    $key,$val);
+    }
+    else
+    {
+	$self->filters->{$key} = $val;
+    }
+}
+
+sub add_term_to_logical_filter
+{
+    my ($self,$operator,$val) = @_;
+
+    my $list = $self->filters->{$operator} // [];
+    push @$list, @$val;
+    $self->filters->{$operator} = $list;
 }
 
 sub set_nested_query
@@ -200,6 +239,23 @@ sub forze_filtering_by_tenant
     {
 	$self->json_wrapper->forze_filter_addition('tenant_id',$ADMIN->tenants_scoop);
     }
+}
+
+sub forze_filtering_tenants_by_tenant
+{
+    my $self = shift;
+    my %scoop = map { $_ => 1 } @{$ADMIN->tenants_scoop};
+    my $ids = $self->json_wrapper->has_filter('id') ?
+	$self->json_wrapper->get_filter_value('id') :
+	$ADMIN->tenants_scoop;
+    $ids = [$ids] unless ref($ids);
+    my @ids = grep { exists $scoop{$_} } @$ids;
+
+    $self->json_wrapper->forze_filter_deletion('id')
+	if $self->json_wrapper->has_filter('id');
+    
+    $self->json_wrapper->forze_filter_addition(
+	'id',\@ids);
 }
 
 sub forze_tenant_assignment_in_creation

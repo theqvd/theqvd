@@ -32,16 +32,16 @@ config_ssl => { type_of_action =>  'general',
 		admin4method => 'config_ssl'},
 
 config_get => { type_of_action =>  'general',
-		acls => [qr/^config\.see-main\./],
+		acls => [qr/^config\.qvd\./],
 		admin4method => 'config_get'},
 
 config_preffix_get => { type_of_action =>  'general',
-			acls => [qr/^config\.see-main\./],
+			acls => [qr/^config\.qvd\./],
 			admin4method => 'config_preffix_get'},
 
 config_set => { type_of_action =>  'create',
 		qvd_object => 'Config',
-		acls => [qr/^config\.update\./],
+		acls => [qr/^config\.qvd\./],
 		admin4method => 'config_set'},
 
 config_default => { type_of_action =>  'delete',
@@ -310,7 +310,7 @@ tenant_get_list => { type_of_action => 'list',
 
 tenant_get_details => { type_of_action => 'details',
 			admin4method => 'select',
-			acls => [qr/^tenant\.see-details\./],
+			acls => [qr/^(config\.wat|tenant\.see-details)\./],
 			qvd_object => 'Tenant'},
 
 tenant_all_ids => { type_of_action => 'all_ids',
@@ -320,7 +320,7 @@ tenant_all_ids => { type_of_action => 'all_ids',
 
 tenant_update => { type_of_action => 'update',
 		   admin4method => 'update',
-		   acls => [qr/^tenant\.update\./],
+		   acls => [qr/^(config\.wat|tenant\.update)\./],
 		   qvd_object => 'Tenant'},
 
 tenant_create => { type_of_action => 'create',

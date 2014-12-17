@@ -1,5 +1,6 @@
 package QVD::DB::Result::Administrator;
 use base qw/DBIx::Class/;
+use QVD::Admin4::AclsOverwriteList;
 
 __PACKAGE__->load_components(qw/Core/);
 __PACKAGE__->table('administrators');
@@ -30,15 +31,36 @@ sub acls
     my $self = shift;
     return @{$self->{acls_cache}} if 
 	defined $self->{acls_cache};
-    my %acls;
+    my $acls = {};
 
     for my $role ($self->roles)
     {
-	$acls{$_} = 1 for $role->get_all_acl_names;
+	$acls->{$_} = 1 for $role->get_all_acl_names;
     }
-    $self->{acls_cache} = [keys %acls];
 
-    keys %acls;
+    $self->adjust_acls_with_overwrite_lists($acls);
+
+    $self->{acls_cache} = [keys %$acls];
+
+    keys %$acls;
+}
+
+sub adjust_acls_with_overwrite_lists
+{
+    my ($self,$acls) = @_;
+
+    my @lists; push @lists,QVD::Admin4::AclsOverwriteList->new(name => $_)
+	for qw(tenant_admin_acls_restrictions recovery_admin_acls);
+
+    for my $list (@lists)
+    {
+	$acls->{$_} = 1 for $list->get_positive_acls_list;
+    }
+
+    for my $list (@lists)
+    {
+       delete $acls->{$_} for $list->get_negative_acls_list;
+    }
 }
 
 sub is_superadmin
