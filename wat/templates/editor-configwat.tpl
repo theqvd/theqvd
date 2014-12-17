@@ -1,5 +1,5 @@
 <table>
-    <% if (Wat.C.checkACL('tenant.update.language')) { %>
+    <% if (Wat.C.checkACL('config.wat.')) { %>
     <tr>
         <td data-i18n="Language"></td>
         <td>
