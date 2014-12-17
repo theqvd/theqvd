@@ -20,7 +20,7 @@ Wat.I.menuConfigOriginal = {
     config: {
         text: 'QVD Config',
         link: '#/config',
-        icon: CLASS_ICON_CONFIG
+        icon: CLASS_ICON_QVDCONFIG
     }
 };
 
@@ -124,10 +124,10 @@ Wat.I.cornerMenuOriginal = {
         },
     
         config: {
-            text: 'QVD Config',
+            text: 'QVD Management',
             link: '#/config',
-            icon: CLASS_ICON_CONFIG,
-            subMenu: {}
+            icon: CLASS_ICON_QVDMANAGE,
+            subMenu: _.extend({}, Wat.I.menuConfigOriginal)
         },
         
         user: {

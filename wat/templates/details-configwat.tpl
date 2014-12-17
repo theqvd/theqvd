@@ -1,5 +1,5 @@
 <div class="details-header">
-    <span class="<%= CLASS_ICON_TENANTS %> h1" data-i18n="WAT Config"></span>
+    <span class="<%= CLASS_ICON_WATCONFIG %> h1" data-i18n="WAT Config"></span>
     <% if(Wat.C.checkACL('config.wat.')) { %>
     <a class="button fright button-icon js-button-edit fa fa-pencil" href="javascript:" data-i18n="[title]Edit"></a>
     <% } %>

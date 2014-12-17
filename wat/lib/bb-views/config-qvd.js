@@ -17,7 +17,10 @@ Wat.Views.SetupConfigView = Wat.Views.MainView.extend({
         'screen': 'Home',
         'link': '#',
         'next': {
-            'screen': 'QVD Config'
+            'screen': 'QVD Management',
+            'next': {
+                'screen': 'QVD Config'
+            }
         }
     },
     
@@ -141,6 +144,9 @@ Wat.Views.SetupConfigView = Wat.Views.MainView.extend({
         
         // Go to start of the page
         $('html, body').animate({ scrollTop: 0 }, 'slow');
+        
+        // Empty search input
+        $('input[name="config_search"]').val('');
     },
     
     clickTokenHeader: function (e) {

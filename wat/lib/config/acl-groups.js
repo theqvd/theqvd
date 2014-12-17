@@ -228,5 +228,24 @@ Wat.C.aclGroups.diVmEmbeddedInfo = [
     'di.see.vm-list-state',
     'di.see.vm-list-expiration',
     'di.see.vm-list-user-state'
-];                                            
-                                              
+];
+
+
+///////////////////////////////
+// Statistics
+///////////////////////////////
+Wat.C.aclGroups.statisticsSummaryObjects = [
+    'user.stats.summary',
+    'vm.stats.summary',
+    'host.stats.summary',
+    'osf.stats.summary',
+    'di.stats.summary'
+];
+
+      
+Wat.C.aclGroups.statisticsBlockedObjects = [
+    'user.stats.blocked',
+    'vm.stats.blocked',
+    'host.stats.blocked',
+    'di.stats.blocked'
+];

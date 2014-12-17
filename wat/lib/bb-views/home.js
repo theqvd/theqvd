@@ -54,7 +54,7 @@ Wat.Views.HomeView = Wat.Views.MainView.extend({
     render: function () {
         var stats = this.retrievedData;
         
-        if (stats == undefined) {
+        if (stats == undefined || this.retrievedData.status != STATUS_SUCCESS) {
             stats = this.stats;
         }
 

@@ -54,6 +54,7 @@ Wat.Views.TenantDetailsView = Wat.Views.DetailsView.extend({
         if (that.retrievedData.status == STATUS_SUCCESS && that.oldLanguage != that.newLanguage) {
             // If administratos has changed the language of his tenant and his language is default, translate interface
             if (Wat.C.tenantID == that.model.get('id') && Wat.C.language == 'default') {
+                Wat.C.tenantLanguage = that.newLanguage;
                 Wat.T.initTranslate();
             }
         }

@@ -12,7 +12,10 @@ Wat.Views.ConfigWatView = Wat.Views.DetailsView.extend({
             'screen': 'Home',
             'link': '#',
             'next': {
-                'screen': 'WAT Config'
+                'screen': 'WAT Management',
+                'next': {
+                    'screen': 'WAT Config'
+                }
             }
         };
     },
@@ -61,6 +64,7 @@ Wat.Views.ConfigWatView = Wat.Views.DetailsView.extend({
         if (that.retrievedData.status == STATUS_SUCCESS && that.oldLanguage != that.newLanguage) {
             // If administratos has changed the language of his tenant and his language is default, translate interface
             if (Wat.C.language == 'default') {
+                Wat.C.tenantLanguage = that.newLanguage;
                 Wat.T.initTranslate();
             }
         }
