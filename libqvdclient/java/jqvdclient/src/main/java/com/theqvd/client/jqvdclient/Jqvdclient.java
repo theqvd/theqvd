@@ -130,7 +130,12 @@ public class Jqvdclient {
 		}
 		q.qvd_list_of_vm();
 		Vm vmlist[] = q.getQvdclient().getVmlist();
-		
+		System.out.println("Payment required is "+q.qvd_payment_required());
+		if (q.qvd_payment_required()) {
+			System.err.println("QVD payment required");
+			q.qvd_free();
+			return ;
+		}
 		if (vmlist.length == 0) {
 			System.err.println("No VM available. Num of vms:" + vmlist.length);
 			q.qvd_free();

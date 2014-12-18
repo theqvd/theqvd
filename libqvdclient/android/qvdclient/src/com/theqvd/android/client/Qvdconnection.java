@@ -44,7 +44,7 @@ public class Qvdconnection implements Runnable {
 	private AcceptUnknownCertHandler certhandler;
 	private Handler handler;
 	private ConnectionProgress connectionprogress;
-	private boolean running, connecting;
+	private boolean running, connecting, paymentRequired;
 	private Account selectedaccount;
 	private String googleauthtoken;
 
@@ -105,6 +105,7 @@ public class Qvdconnection implements Runnable {
 			}
 			Log.d(tag, "The qvd object is "+qvd.toString());
 			qvd.qvd_list_of_vm();
+			paymentRequired = false ;// qvd.qvd_payment_required();
 			vmlist = qvd.getQvdclient().getVmlist();
 			Log.d(tag,"The vm list is "+vmlist);
 			if (vmlist == null) {
@@ -248,6 +249,11 @@ public class Qvdconnection implements Runnable {
 	
 	private class GetVMList extends AsyncTask<Void, Void, Void> {
 
+		// 
+		@Override
+		protected void onPreExecute() {
+			paymentRequired = false;
+		}
 		// Run the vm_list in a different thread
 		@Override
 		protected Void doInBackground(Void... arg0) {
@@ -257,7 +263,6 @@ public class Qvdconnection implements Runnable {
 		// called when doInBackground finishes
 		@Override
 		protected void onPostExecute(Void result) {
-
 			if (vmlist == null) {
 				// The alert was already issued
 				setRunning(false);
@@ -268,8 +273,14 @@ public class Qvdconnection implements Runnable {
 			switch (vmlist.length) {
 			case 0:
 				setRunning(false);
-				sendAlert(activity.getResources().getString(R.string.novmsavailabletitle), 
-						activity.getResources().getString(R.string.novmsavailable));
+				if (paymentRequired) {
+					// TODO What do we do if payment is required...
+					sendAlert(activity.getResources().getString(R.string.novmsavailabletitle), 
+							activity.getResources().getString(R.string.novmsavailable));
+				} else {
+					sendAlert(activity.getResources().getString(R.string.novmsavailabletitle), 
+							activity.getResources().getString(R.string.novmsavailable));
+				}
 				break;
 			case 1:
 				setVmid(vmlist[0].getId());
