@@ -2,8 +2,6 @@ Wat.Views.TenantDetailsView = Wat.Views.DetailsView.extend({
     qvdObj: 'tenant',
 
     initialize: function (params) {
-        console.log(Wat.C.tenantID);
-        console.log(params);
         this.model = new Wat.Models.Tenant(params);
         Wat.Views.DetailsView.prototype.initialize.apply(this, [params]);
     },
@@ -23,12 +21,18 @@ Wat.Views.TenantDetailsView = Wat.Views.DetailsView.extend({
         
         var name = context.find('input[name="name"]').val();
         var language = context.find('select[name="language"]').val(); 
+        var block = context.find('select[name="block"]').val();
         
         if (Wat.C.checkACL('tenant.update.name')) {
             arguments['name'] = name;
+        }     
+        
+        if (Wat.C.checkACL('tenant.update.block')) {
+            arguments['block'] = block;
         }    
         
         this.oldLanguage = this.model.get('language');
+        this.oldBlock = this.model.get('block');
         
         if (Wat.C.checkACL('tenant.update.language')) {
             arguments['language'] = language;
@@ -36,6 +40,7 @@ Wat.Views.TenantDetailsView = Wat.Views.DetailsView.extend({
         
         // Store new language to make things after update
         this.newLanguage = language;
+        this.newBlock = block;
         
         this.updateModel(arguments, filters, this.afterUpdateElement);
     },
@@ -51,11 +56,16 @@ Wat.Views.TenantDetailsView = Wat.Views.DetailsView.extend({
         that.fetchDetails();
 
         // If change is made succesfully check new language to ender again and translate
-        if (that.retrievedData.status == STATUS_SUCCESS && that.oldLanguage != that.newLanguage) {
+        if (that.retrievedData.status == STATUS_SUCCESS && Wat.C.tenantID == that.model.get('id')) {
             // If administratos has changed the language of his tenant and his language is default, translate interface
-            if (Wat.C.tenantID == that.model.get('id') && Wat.C.language == 'default') {
-                Wat.C.tenantLanguage = that.newLanguage;
-                Wat.T.initTranslate();
+            if (that.oldLanguage != that.newLanguage) {
+                if (Wat.C.language == 'default') {
+                    Wat.C.tenantLanguage = that.newLanguage;
+                    Wat.T.initTranslate();
+                }
+            }
+            if (that.oldBlock != that.newBlock) {
+                Wat.C.tenantBlock = that.newBlock;
             }
         }
     },
@@ -64,5 +74,8 @@ Wat.Views.TenantDetailsView = Wat.Views.DetailsView.extend({
         this.dialogConf.title = $.i18n.t('Edit tenant') + ": " + this.model.get('name');
         
         Wat.Views.DetailsView.prototype.openEditElementDialog.apply(this, [e]);
+        
+        Wat.I.chosenElement('select[name="language"]', 'single');
+        Wat.I.chosenElement('select[name="block"]', 'single');
     }
 });

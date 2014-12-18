@@ -24,6 +24,12 @@ if (Wat.C.checkACL('config.wat.')) {
                 %>
             </td>
         </tr>
+        <tr>
+            <td><i class="fa fa-globe"></i><span data-i18n="Block size"></span></td>
+            <td>
+                <span><%= model.get('block') %></span>
+            </td>
+        </tr>
     </table>
 <% 
 } 

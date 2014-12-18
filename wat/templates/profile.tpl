@@ -24,4 +24,14 @@
             %>
         </td>
     </tr>
+    <tr>
+        <td><i class="fa fa-globe"></i><span data-i18n="Block size"></span></td>
+        <td>
+            <% if (block == 0) { %>
+                <span data-i18n="Default"></span>
+            <% } else { %>
+                <span><%= block %></span>
+            <% } %>
+        </td>
+    </tr>
 </table>

@@ -35,4 +35,30 @@
             </select>
         </td>
     </tr>
+    <tr>
+        <td data-i18n="Block size"></td>
+        <td>
+            <select class="" name="block">
+                <%
+                    $.each(WAT_BLOCK_SIZES_ADMIN, function (blockSize, blockSizeText) {
+                        var selected = '';
+                        if (blockSize == Wat.C.block) {
+                            selected = 'selected="selected"';
+                        }
+                        
+                        if (blockSize == 0) {
+                %>
+                        <option <%= selected %> value="<%= blockSize %>" data-i18n="<%= blockSizeText %>"></option>
+                <%
+                        }
+                        else {
+                %>
+                        <option <%= selected %> value="<%= blockSize %>"><%= blockSizeText %></option>
+                <%
+                        }
+                    });
+                %>
+            </select>
+        </td>
+    </tr>
  </table>

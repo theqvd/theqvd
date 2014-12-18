@@ -115,6 +115,10 @@ Wat.C = {
         Wat.C.language = that.retrievedData.admin_language;
         Wat.C.tenantLanguage = that.retrievedData.tenant_language;
         
+        // Store block
+        Wat.C.block = that.retrievedData.admin_block;
+        Wat.C.tenantBlock = that.retrievedData.tenant_block;
+        
         // Restore possible residous views configuration to default values
         Wat.I.restoreListColumns();
         Wat.I.restoreFormFilters();
@@ -341,5 +345,14 @@ Wat.C = {
         }
         
         return false;
+    },
+    
+    getBlock: function () {
+        if (this.block == 0) {
+            return this.tenantBlock;
+        }
+        else {
+            return this.block;
+        }
     }
 }

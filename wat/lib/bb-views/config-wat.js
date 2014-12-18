@@ -37,15 +37,19 @@ Wat.Views.ConfigWatView = Wat.Views.DetailsView.extend({
         var arguments = {};
         
         var language = context.find('select[name="language"]').val(); 
+        var block = context.find('select[name="block"]').val(); 
         
         this.oldLanguage = this.model.get('language');
+        this.oldBlock = this.model.get('block');
         
         if (Wat.C.checkACL('config.wat.')) {
             arguments['language'] = language;
+            arguments['block'] = block;
         }     
         
         // Store new language to make things after update
         this.newLanguage = language;
+        this.newBlock = block;
         
         this.updateModel(arguments, filters, this.afterUpdateElement);
     },
@@ -61,11 +65,19 @@ Wat.Views.ConfigWatView = Wat.Views.DetailsView.extend({
         that.fetchDetails();
 
         // If change is made succesfully check new language to ender again and translate
-        if (that.retrievedData.status == STATUS_SUCCESS && that.oldLanguage != that.newLanguage) {
-            // If administratos has changed the language of his tenant and his language is default, translate interface
-            if (Wat.C.language == 'default') {
-                Wat.C.tenantLanguage = that.newLanguage;
-                Wat.T.initTranslate();
+        if (that.retrievedData.status == STATUS_SUCCESS) {
+            if (that.oldLanguage != that.newLanguage) {
+                // If administratos has changed the language of his tenant and his language is default, translate interface
+                if (Wat.C.language == 'default') {
+                    Wat.C.tenantLanguage = that.newLanguage;
+                    Wat.T.initTranslate();
+                }
+            }
+            if (that.oldBlock != that.newBlock) {
+                // If administratos has changed the language of his tenant and his language is default, translate interface
+                if (Wat.C.block == 0) {
+                    Wat.C.tenantBlock = that.newBlock;
+                }
             }
         }
     },
@@ -74,5 +86,8 @@ Wat.Views.ConfigWatView = Wat.Views.DetailsView.extend({
         this.dialogConf.title = $.i18n.t('WAT Config');
         
         Wat.Views.DetailsView.prototype.openEditElementDialog.apply(this, [e]);
+        
+        Wat.I.chosenElement('select[name="language"]', 'single');
+        Wat.I.chosenElement('select[name="block"]', 'single');
     }
 });

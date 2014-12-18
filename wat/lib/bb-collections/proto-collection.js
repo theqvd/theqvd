@@ -3,7 +3,7 @@ Wat.Collections.Collection = Backbone.Collection.extend({
     elementsTotal: 0,
     status: 0,
     offset: 1,
-    block: 10,
+
     filters: {},
     // Order by id by default
     sort: {"field": "id", "order": "-asc"},
@@ -11,7 +11,7 @@ Wat.Collections.Collection = Backbone.Collection.extend({
     initialize: function (params) {
         params = params || {};
         
-        this.block = params.block || this.block;
+        this.block = params.block || Wat.C.getBlock();
         this.offset = params.offset || this.offset;
         this.filters = params.filters || this.filters;
         this.action = params.action || this.actionPrefix + '_get_list';

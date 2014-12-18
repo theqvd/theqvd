@@ -8,10 +8,11 @@
     <% } %>
 </div>
 
-<% 
-if (Wat.C.checkACL('tenant.see.language')) { 
-%>
+
     <table class="details details-list col-width-100">
+    <% 
+    if (Wat.C.checkACL('tenant.see.language')) { 
+    %>
         <tr>
             <td><i class="fa fa-globe"></i><span data-i18n="Language"></span></td>
             <td>
@@ -27,7 +28,17 @@ if (Wat.C.checkACL('tenant.see.language')) {
                 %>
             </td>
         </tr>
+    <% 
+    } 
+    if (Wat.C.checkACL('tenant.see.block')) { 
+    %>
+        <tr>
+            <td><i class="fa fa-globe"></i><span data-i18n="Block size"></span></td>
+            <td>
+                <span><%= model.get('block') %></span>
+            </td>
+        </tr>
+    <% 
+    } 
+    %>
     </table>
-<% 
-} 
-%>

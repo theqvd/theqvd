@@ -203,7 +203,6 @@ WAT_LANGUAGES = {
     "en": "English",
     "es": "Spanish"
 };
-
 WAT_LANGUAGE_TENANT_OPTIONS = $.extend({
     "auto": "Auto"
 }, WAT_LANGUAGES);
@@ -211,3 +210,16 @@ WAT_LANGUAGE_TENANT_OPTIONS = $.extend({
 WAT_LANGUAGE_ADMIN_OPTIONS = $.extend({
     "default": "Default",
 }, WAT_LANGUAGE_TENANT_OPTIONS);
+
+
+// Block sizes
+WAT_BLOCK_SIZES = {
+    "5": "5",
+    "10": "10",
+    "20": "20",
+    "50": "50",
+    "100": "100"
+};
+WAT_BLOCK_SIZES_ADMIN = $.extend({
+    "0": "Default"
+}, WAT_BLOCK_SIZES);

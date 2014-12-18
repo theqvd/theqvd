@@ -53,7 +53,9 @@ Wat.Views.ProfileView = Wat.Views.DetailsView.extend({
             this.templateProfile, {
                 login: Wat.C.login,
                 language: Wat.C.language,
-                tenantLanguage: Wat.C.tenantLanguage
+                block: Wat.C.block,
+                tenantLanguage: Wat.C.tenantLanguage,
+                tenantBlock: Wat.C.tenantBlock
             }
         );
 
@@ -74,6 +76,7 @@ Wat.Views.ProfileView = Wat.Views.DetailsView.extend({
         
         Wat.I.chosenConfiguration();
         Wat.I.chosenElement('select[name="language"]', 'single');
+        Wat.I.chosenElement('select[name="block"]', 'single');
     },
     
     updateElement: function (dialog) {
@@ -99,18 +102,28 @@ Wat.Views.ProfileView = Wat.Views.DetailsView.extend({
         
         // Set language
         var language = context.find('select[name="language"]').val();
-        arguments['language'] = language;
+        arguments['language'] = language;  
+        
+        // Set block size
+        var block = context.find('select[name="block"]').val();
+        arguments['block'] = block;
         
         // Store new language to make things after update
         this.newLanguage = language;
+        this.newBlock = block;
         
         this.updateModel(arguments, filters, this.afterUpdateElement);
     },
     
     afterUpdateElement: function (that) {
         // If change is made succesfully check new language to ender again and translate
-        if (that.retrievedData.status == STATUS_SUCCESS && Wat.C.language != that.newLanguage) {
-            Wat.C.language = that.newLanguage;
+        if (that.retrievedData.status == STATUS_SUCCESS) {
+            if (Wat.C.language != that.newLanguage) {
+                Wat.C.language = that.newLanguage;
+            }
+            if (Wat.C.block != that.newBlock) {
+                Wat.C.block = that.newBlock;
+            }
             that.render();
             Wat.T.initTranslate();
         }
