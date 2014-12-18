@@ -244,12 +244,17 @@ sub forze_filtering_by_tenant
 sub forze_filtering_tenants_by_tenant
 {
     my $self = shift;
+
+    return unless $self->qvd_object_model->available_filter('id');
     my %scoop = map { $_ => 1 } @{$ADMIN->tenants_scoop};
     my $ids = $self->json_wrapper->has_filter('id') ?
 	$self->json_wrapper->get_filter_value('id') :
 	$ADMIN->tenants_scoop;
     $ids = [$ids] unless ref($ids);
     my @ids = grep { exists $scoop{$_} } @$ids;
+
+    @ids = grep { $_ ne 0 } @ids if 
+	$self->qvd_object_model->type_of_action =~ /^delete|list$/;
 
     $self->json_wrapper->forze_filter_deletion('id')
 	if $self->json_wrapper->has_filter('id');

@@ -9,6 +9,7 @@ __PACKAGE__->add_columns( tenant_id  => { data_type         => 'integer' },
 					  is_auto_increment => 1 },
 			  name      => { data_type         => 'varchar(64)' },
 			  language      => { data_type         => 'varchar(64)' },
+			  block      => { data_type         => 'integer' },
 			  # FIXME: get passwords out of this table!
                           # FIXME: omg encrypt passwords!!
 			  password   => { data_type         => 'varchar(64)',
@@ -48,9 +49,15 @@ sub acls
 sub adjust_acls_with_overwrite_lists
 {
     my ($self,$acls) = @_;
+    my @lists_names;
+    push @lists_names,'tenant_admin_acls_restrictions'
+	unless $self->is_superadmin;
+
+    push @lists_names,'recovery_admin_acls'
+	if $self->is_recovery_admin;
 
     my @lists; push @lists,QVD::Admin4::AclsOverwriteList->new(name => $_)
-	for qw(tenant_admin_acls_restrictions recovery_admin_acls);
+	for @lists_names;
 
     for my $list (@lists)
     {
@@ -61,6 +68,12 @@ sub adjust_acls_with_overwrite_lists
     {
        delete $acls->{$_} for $list->get_negative_acls_list;
     }
+}
+
+sub is_recovery_admin
+{
+    my $self = shift;
+    $self->id eq 0 ? return 1 : return 0;
 }
 
 sub is_superadmin
@@ -148,6 +161,12 @@ sub tenant_language
 {
     my $self = shift;
     $self->tenant->language;
+}
+
+sub tenant_block
+{
+    my $self = shift;
+    $self->tenant->block;
 }
 
 1;

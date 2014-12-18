@@ -289,11 +289,11 @@ my $AVAILABLE_FILTERS =
 
 	      ACL => [qw(id name role_id admin_id)],
 
-	      Tenant => [qw(id name language)],
+	      Tenant => [qw(id name language block)],
 
 	      Role => [qw(name id fixed internal)],
 
-	      Administrator => [qw(name tenant_id tenant_name id language)],
+	      Administrator => [qw(name tenant_id tenant_name id language block)],
 
 	      Tenant_Views_Setup => [qw(id tenant_id tenant_name field visible view_type device_type qvd_object property)],
 
@@ -322,9 +322,9 @@ my $AVAILABLE_FILTERS =
 
 		 Role => [qw(name id fixed internal)],
 
-		 Tenant => [qw(id name language)],
+		 Tenant => [qw(id name language block)],
 
-		 Administrator => [qw(name tenant_id tenant_name role_id acl_id id role_name acl_name language)],
+		 Administrator => [qw(name tenant_id tenant_name role_id acl_id id role_name acl_name language block)],
 
 		 Tenant_Views_Setup => [qw(id tenant_id tenant_name field visible view_type device_type qvd_object property)],
 
@@ -362,9 +362,9 @@ my $AVAILABLE_FIELDS =
 
 	      ACL => [qw(id name)],
 
-	      Administrator => [qw(name roles id language)],
+	      Administrator => [qw(name roles id language block)],
 
-	      Tenant => [qw(id name language)],
+	      Tenant => [qw(id name language block)],
 				   
 	      User => [qw(id name  blocked creation_admin creation_date number_of_vms number_of_vms_connected  properties )],
 
@@ -393,9 +393,9 @@ my $AVAILABLE_FIELDS =
 
 		 ACL => [qw(id name)],
 
-		 Administrator => [qw(name roles id language)],
+		 Administrator => [qw(name roles id language block)],
 
-		 Tenant => [qw(id name language)],
+		 Tenant => [qw(id name language block)],
 
 		 User => [qw(id name  blocked creation_admin creation_date number_of_vms number_of_vms_connected  properties )],
 
@@ -554,9 +554,9 @@ my $AVAILABLE_ARGUMENTS = { Config => [qw(value)],
                             Host => [qw(name address blocked)],
                             OSF => [qw(name memory user_storage overlay)],
                             DI => [qw(blocked disk_image)],
-			    Tenant => [qw(name language)],
+			    Tenant => [qw(name language block)],
 			    Role => [qw(name)],
-			    Administrator => [qw(name password language)],
+			    Administrator => [qw(name password language block)],
 			    Tenant_Views_Setup => [qw(visible)],
 			    Administrator_Views_Setup => [qw(visible)]};
 
@@ -598,7 +598,11 @@ my $DEFAULT_ARGUMENT_VALUES =
 
     Tenant => { language => 'auto'},
 
+    Tenant => { block => '10'},
+
     Administrator => { language => 'auto'},
+
+    Administrator => { block => '0'},
 
     Tenant_Views_Setup => { visible => 0, property => 0 },
 
@@ -630,6 +634,7 @@ my $FILTERS_TO_DBIX_FORMAT_MAPPER =
     Administrator => {
 	'name' => 'me.name',
 	'language' => 'me.language',
+	'block' => 'me.block',
 	'password' => 'me.password',
 	'tenant_id' => 'me.tenant_id',
 	'tenant_name' => 'tenant.name',
@@ -727,7 +732,8 @@ my $FILTERS_TO_DBIX_FORMAT_MAPPER =
     Tenant => {
 	'name' => 'me.name',
 	'id' => 'me.id',
-	'language' => 'me.language'
+	'language' => 'me.language',
+	'block' => 'me.block'
     },
     
     Tenant_Views_Setup => { 	
@@ -885,6 +891,7 @@ my $FIELDS_TO_DBIX_FORMAT_MAPPER =
     Administrator => {
 	'name' => 'me.name',
 	'language' => 'me.language',
+	'block' => 'me.block',
 	'password' => 'me.password',
 	'tenant_id' => 'me.tenant_id',
 	'tenant_name' => 'me.tenant_name',
@@ -894,7 +901,8 @@ my $FIELDS_TO_DBIX_FORMAT_MAPPER =
     Tenant => {
 	'name' => 'me.name',
 	'id' => 'me.id',
-	'language' => 'me.language'
+	'language' => 'me.language',
+	'block' => 'me.block'
     },
 
     Tenant_Views_Setup => { 	

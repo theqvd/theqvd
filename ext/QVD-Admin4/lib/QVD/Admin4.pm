@@ -743,11 +743,13 @@ sub current_admin_setup
 
     { admin_language => $administrator->language,
       tenant_language => $administrator->tenant_language,
+      admin_block => $administrator->block,
+      tenant_block => $administrator->tenant_block,
       admin_id => $administrator->id,
-     tenant_id => $administrator->tenant_id,
-     acls => [ $administrator->acls ],
+      tenant_id => $administrator->tenant_id,
+      acls => [ $administrator->acls ],
       views => [ sort { $a->{property} <=> $b->{property} || $a->{field} cmp $b->{field} }
-			map { { $_->get_columns } } values %views ]};
+		 map { { $_->get_columns } } values %views ]};
 }
 
 sub get_acls_in_admins

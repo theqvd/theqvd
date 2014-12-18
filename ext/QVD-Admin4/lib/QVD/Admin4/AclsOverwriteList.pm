@@ -11,6 +11,8 @@ has 'name', is => 'ro', isa => sub { my $name = shift; die "Invalid type for att
 # where name ~ 'tenant\..*' FIX ME ADD DB ACCESS
 my $TENANT_ADMIN_RESTRICTIONS =
 {
+    'tenant.see.block' => 0,
+    'tenant.update.block' => 0,
     'tenant.create.'  => 0,
     'tenant.delete-massive.' => 0,
     'tenant.see-main.' => 0,
@@ -61,6 +63,8 @@ my $RECOVERY_ADMIN_ACLS =
     'tenant.update.language'  => 1,
     'tenant.update.name'  => 1,
     'tenant.see-details.'  => 1,
+    'tenant.see.block' => 1,
+    'tenant.update.block' => 1,
     'config.wat.'  => 1,
     'config.qvd.'  => 1,
 };
