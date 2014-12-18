@@ -134,7 +134,7 @@ Wat.Views.MainView = Backbone.View.extend({
             var params = {
                 'action': 'tenant_tiny_list',
                 'selectedId': 0,
-                'controlName': 'tenant_id'
+                'controlId': 'tenant_editor',
             };
 
             Wat.A.fillSelect(params);

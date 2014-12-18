@@ -53,18 +53,20 @@ Wat.Views.AdminListView = Wat.Views.ListView.extend({
         this.dialogConf.title = $.i18n.t('New Administrator');
         Wat.Views.ListView.prototype.openNewElementDialog.apply(this, [e]);
                 
+        var context = $('.' + this.cid + '.editor-container');
+
         // Fill DI Tags select on virtual machines creation form
         var params = {
             'action': 'tenant_tiny_list',
             'selectedId': '0',
-            'controlName': 'tenant',
+            'controlId': 'tenant_editor',
             'filters': {
             }
         };
         
         Wat.A.fillSelect(params);
         
-        Wat.I.chosenElement('[name="tenant"]', 'single100');
+        Wat.I.chosenElement('select#tenant_editor', 'single100');
     },
     
     createElement: function () {

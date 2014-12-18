@@ -8,7 +8,7 @@
                     <tr>
                         <td data-i18n="Tenant"></td>
                         <td>
-                            <select class="" name="tenant_id"></select>
+                            <select class="" name="tenant_id" id="tenant_editor"></select>
                         </td>
                     </tr>
                 </tbody>

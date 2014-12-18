@@ -111,9 +111,22 @@ Wat.A = {
     
     // Fill filter selects 
     fillSelect: function (params) {
+        if (params.controlSelector) {
+            var controlSelector = params.controlSelector;
+        }
+        else if (params.controlId) {
+            var controlSelector = 'select#' + params.controlId;
+        }
+        else if (params.controlName) {
+            var controlSelector = 'select[name="' + params.controlName + '"]';
+        }
+        else {
+            return;
+        }
+            
         // Some starting options can be added as first options
         if (params.startingOptions) {
-            $.each($('select[name="' + params.controlName + '"]'), function () {
+            $.each($(controlSelector), function () {
                 var combo = $(this);
                 
                 $.each(params.startingOptions, function (id, name) {
@@ -158,7 +171,7 @@ Wat.A = {
                     if (Wat.C.sessionExpired(data)) {
                         return;
                     }
-                    $.each($('select[name="' + params.controlName + '"]'), function () {
+                    $.each($(controlSelector), function () {
                         var combo = $(this);
                         
                         var options = '';

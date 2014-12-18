@@ -262,28 +262,6 @@ Wat.Views.AdminDetailsView = Wat.Views.DetailsView.extend({
     },
     
     renderSide: function () {
-/*        if (this.checkSide({'administrator.see.acl-list': '.js-side-component1'}) === false) {
-            return;
-        }
-        
-        var sideContainer = '.' + this.cid + ' .bb-details-side1';
-
-        // Render ACLs list on side
-        var params = {};
-        params.whatRender = 'list';
-        params.listContainer = sideContainer;
-        params.forceListColumns = {name: true};
-        // If Administrator has permission and more than one role assigned, show origin of ACLs
-        if (Wat.C.checkACL('administrator.see.acl-list-roles')) {
-            params.forceListColumns.roles = true;
-        }
-        params.forceSelectedActions = {};
-        params.forceListActionButton = null;
-        params.block = 10;
-        params.filters = {"admin_id": this.elementId};
-        params.action = 'get_acls_in_admins';
-        
-        this.sideView = new Wat.Views.ACLListView(params);*/
     },
     
     updateElement: function (dialog) {

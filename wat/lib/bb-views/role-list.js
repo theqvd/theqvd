@@ -53,19 +53,6 @@ Wat.Views.RoleListView = Wat.Views.ListView.extend({
         
         this.dialogConf.title = $.i18n.t('New Role');
         Wat.Views.ListView.prototype.openNewElementDialog.apply(this, [e]);
-                
-        // Fill DI Tags select on virtual machines creation form
-        /*var params = {
-            'action': 'tenant_tiny_list',
-            'selectedId': '0',
-            'controlName': 'tenant',
-            'filters': {
-            }
-        };
-        
-        Wat.A.fillSelect(params);
-        
-        Wat.I.chosenElement('[name="tenant"]', 'single100');*/
     },
     
     createElement: function () {
