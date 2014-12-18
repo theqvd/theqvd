@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="utf-8"?>
 <manifest xmlns:android="http://schemas.android.com/apk/res/android"
     package="com.theqvd.android.client"
-    android:versionCode="253131"
+    android:versionCode="255580"
     android:versionName="@string/version" >
 
     <uses-sdk android:minSdkVersion="8" android:targetSdkVersion="12"/>
