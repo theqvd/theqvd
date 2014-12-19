@@ -144,7 +144,7 @@
             Wat.Router.app_router.performRoute('views', Wat.Views.SetupCustomizeView);
         });    
         Wat.Router.app_router.on('route:setupConfig', function () {
-            Wat.Router.app_router.performRoute('config', Wat.Views.SetupConfigView);
+            Wat.Router.app_router.performRoute('config', Wat.Views.ConfigQvdView);
         });       
         Wat.Router.app_router.on('route:watConfig', function () {
             Wat.Router.app_router.performRoute('watconfig', Wat.Views.ConfigWatView);

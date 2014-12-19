@@ -1,4 +1,4 @@
-Wat.Views.SetupConfigView = Wat.Views.MainView.extend({  
+Wat.Views.ConfigQvdView = Wat.Views.MainView.extend({  
     setupCommonTemplateName: 'setup-common',
     setupOption: 'admins',
     secondaryContainer: '.bb-setup',

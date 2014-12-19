@@ -636,7 +636,7 @@ Wat.I = {
             var expandedMessage = '';
         }
         
-        var summaryMessage = '<summary data-i18n="' + msg.message + '"></summary>';
+        var summaryMessage = '<summary>' + $.i18n.t(msg.message) + '</summary>';
         
         $('.message').html(expandIcon + summaryMessage + expandedMessage);
         Wat.T.translate();

@@ -378,7 +378,7 @@ Wat.B = {
             var acls = $('select[name="acl_' + type + '_on_role"]').val();
             
             if (!acls) {
-                Wat.I.showMessage({message: i18n.t('No items were selected') + '. ' + i18n.t('Nothing to do'), messageType: 'info'});
+                Wat.I.showMessage({message: 'No items were selected - Nothing to do', messageType: 'info'});
                 return;
             }
             
@@ -408,7 +408,7 @@ Wat.B = {
             var acls = $('select[name="acl_available"]').val();
             
             if (!acls) {
-                Wat.I.showMessage({message: i18n.t('No items were selected') + '. ' + i18n.t('Nothing to do'), messageType: 'info'});
+                Wat.I.showMessage({message: 'No items were selected - Nothing to do', messageType: 'info'});
                 return;
             }
             

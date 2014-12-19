@@ -44,7 +44,7 @@ var Wat = {
         
         // Setup
         SetupCustomizeView: {},
-        SetupConfigView: {},
+        ConfigQvdView: {},
         TenantListView: {},
         AdminListView: {},
         RoleListView: {},
