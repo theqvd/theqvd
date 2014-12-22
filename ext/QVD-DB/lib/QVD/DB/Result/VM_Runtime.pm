@@ -77,7 +77,8 @@ __PACKAGE__->set_primary_key('vm_id');
 __PACKAGE__->belongs_to(host => 'QVD::DB::Result::Host', 'host_id', { join_type => 'LEFT' });
 __PACKAGE__->belongs_to(l7r_host => 'QVD::DB::Result::Host', 'l7r_host_id', { join_type => 'LEFT' });
 __PACKAGE__->belongs_to(vm   => 'QVD::DB::Result::VM', 	 'vm_id',   { cascade_delete => 1 });
-__PACKAGE__->belongs_to(real_user => 'QVD::DB::Result::User', 'real_user_id', { cascade_delete => 0 });
+__PACKAGE__->belongs_to(real_user => 'QVD::DB::Result::User', 'real_user_id', { cascade_delete => 0,
+                                                                                join_type => 'LEFT' });
 
 __PACKAGE__->belongs_to('rel_vm_state' => 'QVD::DB::Result::VM_State', 'vm_state');
 __PACKAGE__->belongs_to('rel_user_state' => 'QVD::DB::Result::User_State', 'user_state');
