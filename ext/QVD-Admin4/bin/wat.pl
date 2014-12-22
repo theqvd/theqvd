@@ -1,6 +1,6 @@
-#!/usr/lib/qvd/bin/perl                                                                                                                                                                                                                                                                                                                                                                     
+#!/usr/lib/qvd/bin/perl
 use Mojolicious::Lite;
-use lib::glob '/home/ubuntu/wat/*/lib/';
+use lib::glob '/home/benjamin/wat/*/lib/';
 use QVD::Admin4::REST;
 use Mojo::JSON qw(encode_json decode_json);
 use QVD::Admin4::Exception;
@@ -11,7 +11,6 @@ use Mojo::IOLoop::ForkCall;
 use AnyEvent::Pg::Pool;
 use Mojo::Log;
 
-app->log( Mojo::Log->new( path => '/var/log/wat.log', level => 'debug' ) );
 
 # MojoX::Session::Transport::WAT Package 
 
@@ -48,7 +47,7 @@ package MojoX::Session::Transport::WAT
 
 # GENERAL CONFIG AND PLUGINS
 
-app->config(hypnotoad => {listen => ['http://192.168.3.7:3000']});
+app->config(hypnotoad => {listen => ['http://localhost:3000']});
 my $QVD_ADMIN4_API = QVD::Admin4::REST->new();
 
 # HELPERS
@@ -97,9 +96,6 @@ any '/' => sub {
 
     $c->render(json => $response);
 };
-
-
-get '/proofs' => 'proofs';
 
 websocket '/ws' => sub {
     my $c = shift;
@@ -174,7 +170,6 @@ app->start;
 #################
 ### FUNCTIONS ###
 #################
-
 
 sub get_input_json
 {
@@ -275,49 +270,3 @@ sub reject_access
 {
   (0,QVD::Admin4::Exception->new(code => 3100));
 }
-
-
-__DATA__                                                                                                                                                                                      
-                                                                                                                                                                                              
-@@ proofs.html.ep                                                                                                                                                                              
-<html>                                                                                                                                                                                        
-<head>                                                                                                                                                                                        
-<title>Web Sockets Proofs</title>                                                                                                                                                             
-<script type="text/javascript">                                                                                                                                                               
-
-      var staging = new WebSocket('ws://172.20.126.16:8080/staging?login=superadmin&password=superadmin&action=di_create&arguments={"disk_image":"ubuntu-13.04-i386-qvd.tar.gz","osf_id":"14"}');                     
-      staging.onopen =                                                                                                                                                                          
-        function (event)                                                                                                                                                                      
-        { 
-            staging.send('Hola');
-        };
-                               
-      staging.onmessage =                                                                                                                                                                          
-        function (event)                                                                                                                                                                      
-        {                                                                                                                                                                                   
-                obj = JSON.parse(event.data);
-                
-                if (obj.status == 1000) 
-                { 
-                   document.getElementById("dis_copy_progress").innerHTML = obj.copy_size ;
-                   staging.send('Hola');
-                }
-                else
-                {
-                   document.getElementById("dis_copy_status").innerHTML = obj.status ;
-                   staging.close();
-                }
-        };                                                                                                                                                                                    
-
- 
-</script>                                                                                                                                                                                     
-</head>                                                                                                                                                                                       
-<body>                                                                                                                                                                                        
-<div>DI Copy Progress: <span id="dis_copy_progress"></span></div><br/>
-<div>DI Copy Status: <span id="dis_copy_status"></span></div><br/>
-
-</body>                                                                                                                                                                                       
-</html>                                                                                                                                                                                       
-
-
-

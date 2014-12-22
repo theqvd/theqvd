@@ -29,6 +29,7 @@ sub validate_user
     my ($self,%params) = @_;
 
     $params{name} = delete $params{login}; # FIX ME IN DB!!!
+
     my $admin = eval { $QVD_ADMIN->_db->resultset('Administrator')->find(\%params) };
     return undef unless $admin;
     return undef if $admin->is_superadmin && (not cfg('wat.multitenant'));

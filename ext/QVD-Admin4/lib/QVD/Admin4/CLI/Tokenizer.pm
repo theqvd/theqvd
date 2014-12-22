@@ -18,10 +18,9 @@ sub parse
 
     my @TOKENS;
 
-    while ($string)
+    while ($string ne '')
     { 
 	$string =~ s/^\s*($TOKEN)\s*//;
-
 	my $token = QVD::Admin4::CLI::Tokenizer::Token->new(
 	    string => $1, from => $position);
 	push @TOKENS, $token;

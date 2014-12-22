@@ -725,21 +725,26 @@ sub di_no_head_default_tags
 ## GENERAL FUNCTIONS; WITHOUT REQUEST
 ######################################
 
+sub tenant_view_get_list
+{
+    my ($self,$request) = @_;
+
+    my @rows;
+    my $rs;
+
+    eval { $rs = $DB->resultset($request->table)->search()->search($request->filters,$request->modifiers);
+	   @rows = $rs->all };
+
+    QVD::Admin4::Exception->throw(exception => $@, query => 'select') if $@;
+
+    { total => ($rs->is_paged ? $rs->pager->total_entries : $rs->count), 
+      rows => \@rows};
+}
+
+
 sub current_admin_setup
 {
     my ($self,$administrator,$json_wrapper) = @_;
-
-    my $f =
-        sub { my $obj = shift;
-              my @methods = qw(field qvd_object view_type device_type property);
-              my $out; $out .= $obj->$_ for @methods; $out; };
-
-    my @tenant_views = $DB->resultset('Tenant_Views_Setup')->search(
-        {tenant_id => $administrator->tenant_id})->all;
-    my @admin_views = $DB->resultset('Administrator_Views_Setup')->search(
-        {administrator_id => $administrator->id})->all;
-    my %views = map { $f->($_) => $_ } @tenant_views;
-    $views{$f->($_)} = $_ for  @admin_views;
 
     { admin_language => $administrator->language,
       tenant_language => $administrator->tenant_language,
@@ -748,8 +753,9 @@ sub current_admin_setup
       admin_id => $administrator->id,
       tenant_id => $administrator->tenant_id,
       acls => [ $administrator->acls ],
-      views => [ sort { $a->{property} <=> $b->{property} || $a->{field} cmp $b->{field} }
-		 map { { $_->get_columns } } values %views ]};
+      views => [ map { { $_->get_columns } }
+		 $DB->resultset('Operative_Views_In_Administrator')->search(
+		     {administrator_id => $administrator->id})->all ]};
 }
 
 sub get_acls_in_admins

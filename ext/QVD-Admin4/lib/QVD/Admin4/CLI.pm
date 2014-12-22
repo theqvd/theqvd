@@ -24,16 +24,18 @@ sub query
     my ($self,$raw_string) = @_;
 
     my $tokens_list = $self->tokenizer->parse($raw_string);
-    my $api_query = $self->parser->parse($tokens_list);
-    $api_query->{login} = 'superadmin';
-    $api_query->{password} = 'superadmin';
-    my $qvd_object = delete $api_query->{qvd_object};
-    my $type_of_action = delete $api_query->{command};
-    $api_query->{action} = $qvd_object."_".$type_of_action;
+    my $parser_response = $self->parser->parse($tokens_list);
+    if ($parser_response->status)
+    {
+	return $parser_response->api_query;
+    }
+    else
+    {
+	my $res = $ua->post($url, json => $parser_response->api_query);
 
-     my $res = $ua->post($url, json => $api_query);
-    $res ? return $res->res : 
-    { status => 1100, message => 'No output from API'};
+	$res->res->code ? return $res->res : 
+	{ status => 1100, message => 'No output from API'};
+    }
 }
 
 

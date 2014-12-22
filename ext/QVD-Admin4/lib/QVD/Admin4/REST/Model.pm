@@ -197,7 +197,9 @@ my $ACLS_FOR_ARGUMENTS_IN_UPDATE =
 		       __roles_changes__unassign_roles => [qr/^administrator\.update\.assign-role$/] },
 
     Tenant_Views_Setup => { visible => [qr/^views\.update\.columns$/] },  
-    Administrator_Views_Setup => { visible => [qr/^views\.update\.columns$/] }
+    Operative_Views_In_Tenant => { visible => [qr/^views\.update\.columns$/] },  
+    Administrator_Views_Setup => { visible => [qr/^views\.update\.columns$/] },
+    Operative_Views_In_Administrator => { visible => [qr/^views\.update\.columns$/] }
 
 };
 
@@ -297,8 +299,12 @@ my $AVAILABLE_FILTERS =
 
 	      Tenant_Views_Setup => [qw(id tenant_id tenant_name field visible view_type device_type qvd_object property)],
 
+	      Operative_Views_In_Tenant => [qw(tenant_id field visible view_type device_type qvd_object property)],
+
 	      Administrator_Views_Setup => [qw(id admin_id admin_name field tenant_id tenant_name visible 
-                                               view_type device_type qvd_object property)]},
+                                               view_type device_type qvd_object property)],
+	      Operative_Views_In_Administrator => [qw(tenant_id field visible view_type device_type qvd_object property)]},
+
 
     all_ids => { default => [],
 
@@ -328,8 +334,11 @@ my $AVAILABLE_FILTERS =
 
 		 Tenant_Views_Setup => [qw(id tenant_id tenant_name field visible view_type device_type qvd_object property)],
 
+		 Operative_Views_In_Tenant => [qw(tenant_id field visible view_type device_type qvd_object property)],
+
 		 Administrator_Views_Setup => [qw(id tenant_id tenant_name field admin_id admin_name visible view_type 
-                                                  device_type qvd_object property)]},
+                                                  device_type qvd_object property)],
+		 Operative_Views_In_Administrator => [qw(tenant_id field visible view_type device_type qvd_object property)],},
 
     details => { Config => [qw(key value)], default => [qw(id tenant_id)], Host => [qw(id)], Role => [qw(id)], ACL => [qw(id)], Tenant => [qw(id)] },
 		
@@ -374,8 +383,11 @@ my $AVAILABLE_FIELDS =
 
 	      Tenant_Views_Setup => [qw(id tenant_id tenant_name field visible view_type device_type qvd_object property)],
 
+	      Operative_Views_In_Tenant => [qw(tenant_id field visible view_type device_type qvd_object property)],
+
 	      Administrator_Views_Setup => [qw(id tenant_id tenant_name admin_id admin_name field visible view_type 
-                                               device_type qvd_object property)] },
+                                               device_type qvd_object property)],
+	      Operative_Views_In_Administrator => [qw(tenant_id field visible view_type device_type qvd_object property)] },
 
     details => { default => [],
 		 
@@ -406,8 +418,11 @@ my $AVAILABLE_FIELDS =
 
 		 Tenant_Views_Setup => [qw(id tenant_id tenant_name field visible view_type device_type qvd_object property)],
 
+		 Operative_Views_In_Tenant => [qw(tenant_id field visible view_type device_type qvd_object property)],
+
 		 Administrator_Views_Setup => [qw(id admin_id admin_name tenant_id tenant_name field visible view_type 
-                                                  device_type qvd_object property)] },
+                                                  device_type qvd_object property)],
+		 Operative_Views_In_Administrators => [qw(tenant_id field visible view_type device_type qvd_object property)], },
 
     tiny => { default => [qw(id name)],
 
@@ -472,7 +487,9 @@ my $DEFAULT_ORDER_CRITERIA =
 
     list => { default =>  [qw()],
 	      Tenant_Views_Setup => [qw(field)],
+	      Operative_Views_In_Tenant => [qw(field)],
 	      Administrator_Views_Setup => [qw(field)],
+	      Operative_Views_In_Administrator => [qw(field)],
               Config => [qw(key)] }
 
 };
@@ -488,7 +505,9 @@ my $AVAILABLE_NESTED_QUERIES =
 		Role => [qw(__acls__ __roles__)],
 		Administrator => [qw(__roles__)],
 		Tenant_Views_Setup => [qw()],
-		Administrator_Views_Setup => [qw()]},
+		Operative_Views_In_Tenant => [qw()],
+		Administrator_Views_Setup => [qw()],
+		Operative_Views_In_Administrator => [qw()]},
 
     update => { User => [qw(__properties_changes__set __properties_changes__delete)],
 		VM => [qw(__properties_changes__set __properties_changes__delete)],
@@ -503,7 +522,9 @@ my $AVAILABLE_NESTED_QUERIES =
                             __roles_changes__unassign_roles)],
 		Administrator => [qw(__roles_changes__assign_roles __roles_changes__unassign_roles)],
 		Tenant_Views_Setup => [qw()],
-		Administrator_Views_Setup => [qw()]}
+		Operative_Views_In_Tenant => [qw()],
+		Administrator_Views_Setup => [qw()],
+		Operative_Views_In_Administrator => [qw()]}
 };
 
 
@@ -545,7 +566,9 @@ my $NESTED_QUERIES_TO_ADMIN4_MAPPER =
 		       __roles_changes__assign_roles => 'add_roles_to_admin',
 		       __roles_changes__unassign_roles => 'del_roles_to_admin' },
     Tenant_Views_Setup => {},
-    Administrator_Views_Setup => {}
+    Operative_Views_In_Tenant => {},
+    Administrator_Views_Setup => {},
+    Operative_Views_In_Administrator => {},
 };
 
 my $AVAILABLE_ARGUMENTS = { Config => [qw(value)],
@@ -748,6 +771,16 @@ my $FILTERS_TO_DBIX_FORMAT_MAPPER =
 	'property' => 'me.property'
     },
 
+    Operative_Views_In_Tenant => { 	
+	'tenant_id' => 'me.tenant_id', 
+	'field' => 'me.field', 
+	'visible' => 'me.visible',
+	'view_type' => 'me.view_type',
+	'device_type' => 'me.device_type',
+	'qvd_object' => 'me.qvd_object',
+	'property' => 'me.property'
+    },
+
     Administrator_Views_Setup =>  {
 	'id' => 'me.id',  
 	'tenant_id' => 'tenant.id', 
@@ -760,7 +793,18 @@ my $FILTERS_TO_DBIX_FORMAT_MAPPER =
 	'device_type' => 'me.device_type',
 	'qvd_object' => 'me.qvd_object',
 	'property' => 'me.property' 
- }
+ },
+
+    Operative_Views_In_Administrator => { 	
+	'tenant_id' => 'me.tenant_id', 
+	'field' => 'me.field', 
+	'visible' => 'me.visible',
+	'view_type' => 'me.view_type',
+	'device_type' => 'me.device_type',
+	'qvd_object' => 'me.qvd_object',
+	'property' => 'me.property'
+    },
+
 
 };
 
@@ -917,6 +961,16 @@ my $FIELDS_TO_DBIX_FORMAT_MAPPER =
 	'property' => 'me.property'  
     },
 
+    Operative_Views_In_Tenant => { 	
+	'tenant_id' => 'me.tenant_id', 
+	'field' => 'me.field', 
+	'visible' => 'me.visible',
+	'view_type' => 'me.view_type',
+	'device_type' => 'me.device_type',
+	'qvd_object' => 'me.qvd_object',
+	'property' => 'me.property'  
+    },
+
     Administrator_Views_Setup =>  {
 	'id' => 'me.id',  
 	'tenant_id' => 'administrator.tenant_id', 
@@ -929,7 +983,18 @@ my $FIELDS_TO_DBIX_FORMAT_MAPPER =
 	'device_type' => 'me.device_type',
 	'qvd_object' => 'me.qvd_object',
 	'property' => 'me.property'  
- }
+ },
+
+    Operative_Views_In_Administrator => { 	
+	'tenant_id' => 'me.tenant_id', 
+	'field' => 'me.field', 
+	'visible' => 'me.visible',
+	'view_type' => 'me.view_type',
+	'device_type' => 'me.device_type',
+	'qvd_object' => 'me.qvd_object',
+	'property' => 'me.property'  
+    },
+
 };
 
 my $VALUES_NORMALIZATOR = 

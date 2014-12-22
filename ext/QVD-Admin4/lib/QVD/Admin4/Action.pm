@@ -391,8 +391,8 @@ role_delete => { type_of_action => 'delete',
 		 qvd_object => 'Role'},
 
 tenant_view_get_list => { type_of_action => 'list',
-			    admin4method => 'select',
-			 qvd_object => 'Tenant_Views_Setup',
+			  admin4method => 'tenant_view_get_list',
+			  qvd_object => 'Operative_Views_In_Tenant',
 			  acls => [qr/^views\.see-main\./]},
 
 tenant_view_set => { type_of_action => 'create',

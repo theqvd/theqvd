@@ -1,5 +1,6 @@
 #!/usr/lib/qvd/bin/perl
 use strict;
+use 5.010;
 use warnings;
 use lib::glob '/home/benjamin/wat/*/lib/';
 use QVD::Admin4::CLI;
@@ -22,7 +23,15 @@ while (my $query = <>)
 {
     chomp $query;
     $res = $CLI->query($query);
-    print_rows_table();
+
+    if (ref($res) eq 'HASH')
+    {
+	say $res->{status} . ": ".$res->{message};
+    }
+    else
+    { 
+	print_rows_table();
+    }
 
     print 'cli > ';
 }
