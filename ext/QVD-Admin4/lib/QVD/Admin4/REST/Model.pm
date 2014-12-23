@@ -299,6 +299,12 @@ my $AVAILABLE_FILTERS =
 
 	      Tenant_Views_Setup => [qw(id tenant_id tenant_name field visible view_type device_type qvd_object property)],
 
+	      Acls_Tree_For_Role => [qw(inheritor_id)],
+
+	      Operative_Acls_In_Role => [qw(acl_name role_id)],
+
+	      Operative_Acls_In_Administrator => [qw(acl_name admin_id)],
+
 	      Operative_Views_In_Tenant => [qw(tenant_id field visible view_type device_type qvd_object property)],
 
 	      Administrator_Views_Setup => [qw(id admin_id admin_name field tenant_id tenant_name visible 
@@ -333,6 +339,12 @@ my $AVAILABLE_FILTERS =
 		 Administrator => [qw(name tenant_id tenant_name role_id acl_id id role_name acl_name language block)],
 
 		 Tenant_Views_Setup => [qw(id tenant_id tenant_name field visible view_type device_type qvd_object property)],
+
+		 Acls_Tree_For_Role => [qw(inheritor_id)],
+
+	         Operative_Acls_In_Role => [qw(acl_name role_id)],
+			   
+	         Operative_Acls_In_Administrator => [qw(acl_name admin_id)],
 
 		 Operative_Views_In_Tenant => [qw(tenant_id field visible view_type device_type qvd_object property)],
 
@@ -382,6 +394,12 @@ my $AVAILABLE_FIELDS =
 	      DI_Tag => [qw(osf_id name id )],
 
 	      Tenant_Views_Setup => [qw(id tenant_id tenant_name field visible view_type device_type qvd_object property)],
+	      
+	      Acls_Tree_For_Role => [qw(tree)],
+
+	      Operative_Acls_In_Role => [qw(id name roles)],
+
+	      Operative_Acls_In_Administrator => [qw(id name roles)],
 
 	      Operative_Views_In_Tenant => [qw(tenant_id field visible view_type device_type qvd_object property)],
 
@@ -418,6 +436,12 @@ my $AVAILABLE_FIELDS =
 
 		 Tenant_Views_Setup => [qw(id tenant_id tenant_name field visible view_type device_type qvd_object property)],
 
+		 Acls_Tree_For_Role => [qw(tree)],
+
+        	 Operative_Acls_In_Role => [qw(id name roles)],
+
+	         Operative_Acls_In_Administrator => [qw(id name roles)],
+
 		 Operative_Views_In_Tenant => [qw(tenant_id field visible view_type device_type qvd_object property)],
 
 		 Administrator_Views_Setup => [qw(id admin_id admin_name tenant_id tenant_name field visible view_type 
@@ -446,9 +470,11 @@ my $AVAILABLE_FIELDS =
 
 my $MANDATORY_FILTERS = 
 { 
-    list => { default => [qw(tenant_id)], Host => [qw()], ACL => [qw()], Role => [qw()], Tenant => [qw()], Config => [qw()]},
+    list => { default => [qw(tenant_id)], Host => [qw()], ACL => [qw()], Role => [qw()], Tenant => [qw()], Config => [qw()], 
+              Acls_Tree_For_Role => [qw(inheritor_id)], Operative_Acls_In_Role => [qw(role_id)], Operative_Acls_In_Administrator => [qw(admin_id)]},
 
-    details => { default => [qw(id tenant_id)], Host => [qw(id)], ACL => [qw(id)], Role => [qw(id)], Tenant => [qw(id)]}, 
+    details => { default => [qw(id tenant_id)], Host => [qw(id)], ACL => [qw(id)], Role => [qw(id)], Tenant => [qw(id)], Acls_Tree_For_Role => [qw(inheritor_id)],
+		 Operative_Acls_In_Role => [qw(role_id)], Operative_Acls_In_Administrator => [qw(admin_id)]}, 
 
     tiny => { default => [qw(tenant_id)], Host => [qw()], ACL => [qw()], Role => [qw()], Tenant => [qw()]},
 
@@ -460,7 +486,8 @@ my $MANDATORY_FILTERS =
 
     state => { default => [qw(id tenant_id)], Host => [qw(id)], ACL => [qw(id)], Role => [qw(id)], Tenant => [qw(id)]}, 
 
-    all_ids => { default => [qw(tenant_id)], Host => [qw()], ACL => [qw()], Role => [qw()], Tenant => [qw()], Config => [qw()]}, 
+    all_ids => { default => [qw(tenant_id)], Host => [qw()], ACL => [qw()], Role => [qw()], Tenant => [qw()], Config => [qw()], Acls_Tree_For_Role => [qw(inheritor_id)],
+		 Operative_Acls_In_Role => [qw(role_id)], Operative_Acls_In_Administrator => [qw(admin_id)]}, 
 };
 
 my $SUBCHAIN_FILTERS = 
@@ -474,7 +501,7 @@ my $SUBCHAIN_FILTERS =
 my $COMMODIN_FILTERS = 
 { 
 tiny => { ACL => [qw(name)]},
-list => {Config => [qw(key value)]}
+list => {Config => [qw(key value)], Operative_Acls_In_Role => [qw(acl_name)], Operative_Acls_In_Administrator => [qw(admin_id)]}
 };
 
 my $DEFAULT_ORDER_CRITERIA = 
@@ -771,6 +798,30 @@ my $FILTERS_TO_DBIX_FORMAT_MAPPER =
 	'property' => 'me.property'
     },
 
+    Acls_Tree_For_Role => { 	
+	'inheritor_id' => 'me.inheritor_id', 
+	'inheritor_name' =>  'me.inheritor_name',
+	'inheritor_fixed' => 'me.inheritor_fixed',
+	'inheritor_internal' => 'me.inheritor_internal',
+	'inherited_id' => 'me.inherited_id',
+	'inherited_name' => 'me.inherited_name',
+	'inherited_fixed' => 'me.inherited_fixed',
+	'inherited_internal' => 'me.inherited_internal',
+	'acl_id' => 'me.acl_id',
+	'acl_name' => 'me.acl_name',
+	'acl_positive' => 'me.acl_positive'
+    },
+    
+    Operative_Acls_In_Role => { 
+	'acl_name' => 'me.acl_name',
+        'role_id' =>  'me.role_id'
+    },
+
+    Operative_Acls_In_Administrator => { 
+	'acl_name' => 'me.acl_name',
+        'admin_id' =>  'me.admin_id'
+    },
+
     Operative_Views_In_Tenant => { 	
 	'tenant_id' => 'me.tenant_id', 
 	'field' => 'me.field', 
@@ -804,7 +855,6 @@ my $FILTERS_TO_DBIX_FORMAT_MAPPER =
 	'qvd_object' => 'me.qvd_object',
 	'property' => 'me.property'
     },
-
 
 };
 
@@ -993,6 +1043,22 @@ my $FIELDS_TO_DBIX_FORMAT_MAPPER =
 	'device_type' => 'me.device_type',
 	'qvd_object' => 'me.qvd_object',
 	'property' => 'me.property'  
+    },
+
+    Acls_Tree_For_Role => { 	
+	'tree' =>  'me.tree',
+    },
+
+    Operative_Acls_In_Role => { 
+	'name' => 'me.acl_name',
+        'id' =>  'me.acl_id',
+        'roles' =>  'me.roles'
+    },
+
+    Operative_Acls_In_Administrator => { 
+	'name' => 'me.acl_name',
+        'id' =>  'me.acl_id',
+        'roles' =>  'me.roles'
     },
 
 };
@@ -1302,6 +1368,7 @@ sub nested_queries_to_admin4_mapper
 sub filters_to_dbix_format_mapper
 {
     my $self = shift;
+
     return $self->{model_info}->{filters_to_dbix_format_mapper} || {};
 }
 

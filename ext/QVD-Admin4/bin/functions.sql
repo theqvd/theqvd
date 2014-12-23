@@ -150,8 +150,51 @@ $$ LANGUAGE plpgsql;
 ----- TRIGGERS TO TRIGGER THE CREATION/DELETION OF RELATED VIEWS WHEN CREATING/DELETING PROPERTIES -----
 --------------------------------------------------------------------------------------------------------
 
-CREATE TRIGGER delete_views_for_removed_vm_property AFTER DELETE ON vm_properties FOR EACH ROW EXECUTE PROCEDURE delete_tenant_views_for_removed_property(vm);
-CREATE TRIGGER delete_views_for_removed_user_property AFTER DELETE ON user_properties FOR EACH ROW EXECUTE PROCEDURE delete_tenant_views_for_removed_property(user);
-CREATE TRIGGER delete_views_for_removed_host_property AFTER DELETE ON host_properties FOR EACH ROW EXECUTE PROCEDURE delete_tenant_views_for_removed_property(host);
-CREATE TRIGGER delete_views_for_removed_osf_property AFTER DELETE ON osf_properties FOR EACH ROW EXECUTE PROCEDURE delete_tenant_views_for_removed_property(osf);
-CREATE TRIGGER delete_views_for_removed_di_property AFTER DELETE ON di_properties FOR EACH ROW EXECUTE PROCEDURE delete_tenant_views_for_removed_property(di);
+CREATE TRIGGER delete_views_for_removed_vm_property AFTER DELETE ON vm_properties FOR EACH ROW EXECUTE PROCEDURE delete_views_for_removed_property(vm);
+CREATE TRIGGER delete_views_for_removed_user_property AFTER DELETE ON user_properties FOR EACH ROW EXECUTE PROCEDURE delete_views_for_removed_property(user);
+CREATE TRIGGER delete_views_for_removed_host_property AFTER DELETE ON host_properties FOR EACH ROW EXECUTE PROCEDURE delete_views_for_removed_property(host);
+CREATE TRIGGER delete_views_for_removed_osf_property AFTER DELETE ON osf_properties FOR EACH ROW EXECUTE PROCEDURE delete_views_for_removed_property(osf);
+CREATE TRIGGER delete_views_for_removed_di_property AFTER DELETE ON di_properties FOR EACH ROW EXECUTE PROCEDURE delete_views_for_removed_property(di);
+
+
+
+create or replace function acls_in_role_recursive(role_id integer)
+  returns table (inheritor_id integer, inherited_id integer, inheritor_name text, inherited_name text, 
+                 acl_id integer, acl_name text, acl_positive boolean, 
+		 inheritor_fixed boolean, inheritor_internal boolean,  inherited_fixed boolean, inherited_internal boolean)
+as
+$body$
+
+      with recursive all_role_role_relations(inheritor_id, inherited_id) as ( 
+        
+          select inheritor_id, inherited_id 
+          from role_role_relations 
+          where inheritor_id in ( $1 ) 
+
+          union 
+
+          select p.inheritor_id, p.inherited_id 
+          from all_role_role_relations pr, role_role_relations p 
+          where pr.inherited_id=p.inheritor_id  ) 
+
+      select a.inheritor_id as inheritor_id, a.inherited_id as inherited_id, d.name as inheritor_name, e.name as inherited_name, 
+             b.acl_id as acl_id, c.name as acl_name, b.positive as acl_positive, d.fixed as inheritor_fixed, d.internal as inheritor_internal, 
+             e.fixed as inherited_fixed, e.internal as inherited_internal 
+      from all_role_role_relations a 
+      left join acl_role_relations b on (a.inherited_id=b.role_id) 
+      left join acls c on (c.id=b.acl_id) 
+      join roles d on (d.id=a.inheritor_id) 
+      join roles e on (e.id=a.inherited_id) 
+
+      union 
+
+      select f.id as inheritor_id, f.id as inherited_id, f.name as inheritor_name, f.name as inherited_name, g.acl_id as acl_id, h.name as acl_name, 
+             g.positive as acl_positive, f.fixed as inheritor_fixed, f.internal as inheritor_internal, f.fixed as inherited_fixed, f.internal as inherited_internal  
+      from roles f 
+      join acl_role_relations g on (f.id=g.role_id) 
+      join acls h on (h.id=g.acl_id) 
+
+      where f.id in ( $1 )
+
+$body$
+language sql;

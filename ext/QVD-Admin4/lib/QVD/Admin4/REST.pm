@@ -31,6 +31,7 @@ sub validate_user
     $params{name} = delete $params{login}; # FIX ME IN DB!!!
 
     my $admin = eval { $QVD_ADMIN->_db->resultset('Administrator')->find(\%params) };
+    print $@ if $@;
     return undef unless $admin;
     return undef if $admin->is_superadmin && (not cfg('wat.multitenant'));
     return $admin;
@@ -71,6 +72,7 @@ sub process_query
 	   if $action->qvd_object;
 
        my $restmethod = $action->restmethod;
+
        my $result = $self->$restmethod($action,$json_wrapper,$qvd_object_model);
 
        my %args = (status => 0, result => $result);
@@ -112,7 +114,6 @@ sub process_standard_query
 sub process_general_query
 {
     my ($self,$action,$json_wrapper) = @_;
-
     my $admin4method = $action->admin4method;
     my $result = $QVD_ADMIN->$admin4method($self->administrator,$json_wrapper);
 }

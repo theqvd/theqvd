@@ -725,6 +725,7 @@ sub di_no_head_default_tags
 ## GENERAL FUNCTIONS; WITHOUT REQUEST
 ######################################
 
+
 sub tenant_view_get_list
 {
     my ($self,$request) = @_;
@@ -769,15 +770,11 @@ sub get_acls_in_admins
 
     for my $role (map { $_->role } $DB->resultset('Role_Administrator_Relation')->search(
 		      {administrator_id => $admin_id})->all)
-    {
-	my $inherited_acls_tree = $role->get_full_acls_inheritance_tree;
-
-	for my $acl_id (keys %{$inherited_acls_tree->{$role->id}->{iacls}})
+    {	
+	for my $acl_info ($role->acls_tree->get_all_acl_names_ids($role->id))
 	{
-	    $acls_info->{$acl_id}->{name} = $inherited_acls_tree->{$role->id}->{iacls}->{$acl_id}->{name};
-	    $acls_info->{$acl_id}->{id} = $acl_id;
-            $acls_info->{$acl_id}->{roles}->{$role->id} =
-                $inherited_acls_tree->{$role->id}->{name};
+	    $acls_info->{$acl_info->{id}} = clone $acl_info;
+            $acls_info->{$acl_info->{id}}->{roles}->{$role->id} = $role->name;
 	}
     }
 
@@ -795,38 +792,20 @@ sub get_acls_in_admins
 
 sub get_acls_in_roles
 {
-    my ($self,$admin,$json_wrapper) = @_;
-    my $role_id = $json_wrapper->get_filter_value('role_id') //
-	QVD::Admin4::Exception->throw(code=>'6220', object => 'role_id');
-    $role_id = [$role_id] unless ref($role_id);
-    
-    my $acls_info;
+    my ($self,$request) = @_;
+    my $role_id = delete $request->filters->{'me.role_id'};
+    my $role = $DB->resultset('Role')->search({id => $role_id})->first;
+    my $roles_info = $role->acls_tree->get_acls_direct_inheritance($role->id);
+    $request->filters->{'me.acl_id'} = [keys %$roles_info];
+    my (@rows, $rs);
+    eval { $rs = $DB->resultset($request->table)->search()->search($request->filters, $request->modifiers);
+	   @rows = $rs->all };
+    QVD::Admin4::Exception->throw(exception => $@, query => 'select') if $@;
 
-    for my $role ($DB->resultset('Role')->search({id => $role_id})->all)
-    {
-	my $inherited_acls_tree = $role->get_full_acls_inheritance_tree;
-	for my $acl_id (keys %{$inherited_acls_tree->{$role->id}->{iacls}})
-	{
-	    $acls_info->{$acl_id} = $inherited_acls_tree->{$role->id}->{iacls}->{$acl_id};
-	    $acls_info->{$acl_id}->{roles}->{$role->id} = $role->name if
-                defined $inherited_acls_tree->{$role->id}->{acls}->{1}->{$acl_id};
+    $_->roles($roles_info->{$_->acl_id}) for @rows;
 
-            $acls_info->{$acl_id}->{roles}->{$_->{id}} = $_->{name}
-                for grep { defined $_->{iacls}->{$acl_id} }
-                    values %{$inherited_acls_tree->{$role->id}->{roles}};
-	}
-    }
-
-    my $acls_name = $json_wrapper->get_filter_value('acl_name') // '%';
-    my $acls_rs = $DB->resultset('ACL')->search({id => [keys %$acls_info], 
-						 name => { like => $acls_name }},
-	{ order_by => { ($json_wrapper->order_direction || '-asc') => 
-			($json_wrapper->order_criteria || []) },
-	  page => ($json_wrapper->offset || 1),
-	  rows => ($json_wrapper->block || 10000) });
-
-   { total => ($acls_rs->is_paged ? $acls_rs->pager->total_entries : $acls_rs->count), 
-     rows => [map { $acls_info->{$_->id} } $acls_rs->all] };
+    { total => ($rs->is_paged ? $rs->pager->total_entries : $rs->count), 
+      rows => \@rows};
 }
 
 sub get_number_of_acls_in_role

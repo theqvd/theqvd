@@ -358,7 +358,8 @@ acl_tiny_list => { type_of_action => 'tiny',
 		   acls => [qr/^(role|administrator)\.see\.acl-list$/],
 		   qvd_object => 'ACL'},
 
-get_acls_in_roles => { type_of_action => 'general',
+get_acls_in_roles => { type_of_action => 'list',
+		       qvd_object => 'Operative_Acls_In_Role',
 		       acls => [qr/^administrator\.see\.acl-list$/],
 		       admin4method => 'get_acls_in_roles'},
 
