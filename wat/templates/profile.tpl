@@ -29,6 +29,7 @@
         <td>
             <% if (block == 0) { %>
                 <span data-i18n="Default"></span>
+                <div class="second_row" data-i18n="The default block size of the system"></div>
             <% } else { %>
                 <span><%= block %></span>
             <% } %>

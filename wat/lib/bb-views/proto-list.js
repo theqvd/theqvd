@@ -241,25 +241,25 @@ Wat.Views.ListView = Wat.Views.MainView.extend({
                     switch (filterField) {
                         case 'di_id':
                             filterNotes['di_id'] = {
-                                'label': 'Disk image',
+                                'label': $.i18n.t('Disk image'),
                                 'type': 'filter'
                             };
                             break;
                         case 'host_id':
                             filterNotes['host_id'] = {
-                                'label': 'Node',
+                                'label': $.i18n.t('Node'),
                                 'type': 'filter'
                             };
                             break;
                         case 'osf_id':
                             filterNotes['osf_id'] = {
-                                'label': 'OS Flavour',
+                                'label': $.i18n.t('OS Flavour'),
                                 'type': 'filter'
                             };
                             break;
                         case 'user_id':
                             filterNotes['user_id'] = {
-                                'label': 'User',
+                                'label': $.i18n.t('User'),
                                 'type': 'filter'
                             };
                             break;
