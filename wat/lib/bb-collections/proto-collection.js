@@ -31,6 +31,10 @@ Wat.Collections.Collection = Backbone.Collection.extend({
     setFilters: function (filters) {
         this.filters = filters;
     }, 
+        
+    deleteFilter: function (filterDelete) {
+        delete this.filters[filterDelete];
+    }, 
     
     setSort: function (sort) {
         this.sort = sort;

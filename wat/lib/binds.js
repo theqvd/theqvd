@@ -187,11 +187,19 @@ Wat.B = {
                 case 'select':
                     $('[name="' + name + '"]').val(-1);
                     $('[name="' + name + '"]').trigger('chosen:updated');
+                    
+                    Wat.CurrentView.cleanFilter($('[name="' + name + '"]').attr('data-filter-field'));
+                    
                     $('[name="' + name + '"]:not(.mobile-filter)').trigger('change');
                     break;
                 case 'text':
                     $('[name="' + name + '"]').val('');
                     $('[name="' + name + '"]:not(.mobile-filter)').trigger('input');
+                    break;
+                case 'filter':
+                    Wat.CurrentView.cleanFilter(name);
+                    
+                    Wat.CurrentView.fetchList();
                     break;
             }           
         }

@@ -182,7 +182,7 @@
                             case 'osf':
                 %>
                                 <td class="desktop">
-                                    <%= Wat.C.ifACL('<a href="#/osf/' + model.get('id') + '">', 'osf.see-details.') %>
+                                    <%= Wat.C.ifACL('<a href="#/osf/' + model.get('osf_id') + '">', 'osf.see-details.') %>
                                         <%= model.get('osf_name') %>
                                     <%= Wat.C.ifACL('</a>', 'osf.see-details.') %>
                                 </td>

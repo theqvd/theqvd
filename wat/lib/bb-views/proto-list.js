@@ -17,6 +17,7 @@ Wat.Views.ListView = Wat.Views.MainView.extend({
     massiveEditorTemplateName: '',
     customCollection: false,
     infoRestrictions: false,
+    initFilters: {},
     
     viewKind: 'list',
     
@@ -68,6 +69,8 @@ Wat.Views.ListView = Wat.Views.MainView.extend({
         params = params || {};
         
         this.filters = params.filters || {};
+        this.initFilters = $.extend({}, this.filters);
+        
         this.block = params.block || this.block;
         this.offset = params.offset || {};
               
@@ -173,6 +176,7 @@ Wat.Views.ListView = Wat.Views.MainView.extend({
         }
         
         var filters = {};
+        
         $.each(this.formFilters, function(name, filter) {
             var filterControl = $(filtersContainer + ' [name="' + name + '"]');
             // If input text box is empty or selected option in a select is All (-1) skip filter control
@@ -192,6 +196,9 @@ Wat.Views.ListView = Wat.Views.MainView.extend({
             filters[filterControl.attr('data-filter-field')] = filterControl.val();
         });
         
+        // Add the init filters to filters
+        filters = $.extend({}, this.initFilters, filters);
+        
         this.collection.setFilters(filters);
 
         // When we came from a view without elements pagination doesnt exist
@@ -209,12 +216,33 @@ Wat.Views.ListView = Wat.Views.MainView.extend({
         }
     },
     
+    /* Clean filter from object memory and collection */
+    cleanFilter: function (fKey) {
+        delete Wat.CurrentView.filters[fKey];
+        delete Wat.CurrentView.initFilters[fKey];
+        Wat.CurrentView.collection.deleteFilter(fKey);
+    },
+    
     updateFilterNotes: function () {
         // Show-Hide filter notes only when view is not embeded
         if (this.cid == Wat.CurrentView.cid) {
             var filtersContainer = '.' + this.cid + ' .filter';
             
             var filterNotes = {};
+            
+            if ($.isEmptyObject(filterNotes) && !$.isEmptyObject(this.initFilters)) {
+                $.each(this.initFilters, function (filterField, filterValue) {
+                    switch (filterField) {
+                        case 'di_id':
+                            filterNotes['di_id'] = {
+                                'label': 'Disk image',
+                                'type': 'filter'
+                            };
+                            break;
+                    }
+                });
+            }
+            
             $.each(this.formFilters, function(name, filter) {
                 var filterControl = $(filtersContainer + ' [name="' + name + '"]');
                 // If input text box is empty or selected option in a select is All (-1) skip filter control
@@ -241,17 +269,27 @@ Wat.Views.ListView = Wat.Views.MainView.extend({
                         break;
                 }
             });
-        
-            if ($.isEmptyObject(filterNotes)) {
-                $('.js-filter-notes').hide();
-            }
-            else {
-                $('.filter-notes-list li').remove();
-                $.each(filterNotes, function(fNoteName, fNote) {
-                    $('.js-filter-notes-list').append('<li><a href="javascript:" class="js-delete-filter-note fa fa-trash" data-filter-name="' + fNoteName + '" data-filter-type="' + fNote.type + '"></a>' + fNote.label + ': ' + fNote.value + '</li>');
-                });
-                $('.js-filter-notes').show();
-            }
+            
+            this.drawFilterNotes(filterNotes);
+        }
+    },
+    
+    drawFilterNotes: function(filterNotes) {
+        if ($.isEmptyObject(filterNotes)) {
+            $('.js-filter-notes').hide();
+        }
+        else {
+            $('.filter-notes-list li').remove();
+            $.each(filterNotes, function(fNoteName, fNote) {
+                var note = '<li><a href="javascript:" class="js-delete-filter-note fa fa-trash" data-filter-name="' + fNoteName + '" data-filter-type="' + fNote.type + '"></a>' + fNote.label;
+                if (fNote.value != undefined) {
+                    note += ': ' + fNote.value;
+                }
+                
+                note += '</li>';
+                $('.js-filter-notes-list').append(note);
+            });
+            $('.js-filter-notes').show();
         }
     },
     
