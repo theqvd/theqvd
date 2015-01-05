@@ -232,10 +232,34 @@ Wat.Views.ListView = Wat.Views.MainView.extend({
             
             if ($.isEmptyObject(filterNotes) && !$.isEmptyObject(this.initFilters)) {
                 $.each(this.initFilters, function (filterField, filterValue) {
+                    // If the filtered field has not filter control, show generic filter note
+                    
+                    if ($('.filter [data-filter-field="' + filterField + '"]').length > 0) {
+                        return;
+                    }
+                    
                     switch (filterField) {
                         case 'di_id':
                             filterNotes['di_id'] = {
                                 'label': 'Disk image',
+                                'type': 'filter'
+                            };
+                            break;
+                        case 'host_id':
+                            filterNotes['host_id'] = {
+                                'label': 'Node',
+                                'type': 'filter'
+                            };
+                            break;
+                        case 'osf_id':
+                            filterNotes['osf_id'] = {
+                                'label': 'OS Flavour',
+                                'type': 'filter'
+                            };
+                            break;
+                        case 'user_id':
+                            filterNotes['user_id'] = {
+                                'label': 'User',
                                 'type': 'filter'
                             };
                             break;
