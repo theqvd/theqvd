@@ -733,9 +733,37 @@ sub tenant_view_get_list
     my @rows;
     my $rs;
 
-    eval { $rs = $DB->resultset($request->table)->search()->search($request->filters,$request->modifiers);
+    eval { $rs = $DB->resultset($request->table)->search()->search(
+	       $request->filters,$request->modifiers);
 	   @rows = $rs->all };
 
+    QVD::Admin4::Exception->throw(exception => $@, query => 'select') if $@;
+
+    { total => ($rs->is_paged ? $rs->pager->total_entries : $rs->count), 
+      rows => \@rows};
+}
+
+sub get_acls_in_admins
+{
+    my ($self,$request) = @_;
+    my (@rows, $rs);
+    eval { $rs = $DB->resultset($request->table)->search()->search(
+	       $request->filters, $request->modifiers);
+	   @rows = $rs->all };
+    QVD::Admin4::Exception->throw(exception => $@, query => 'select') if $@;
+
+    { total => ($rs->is_paged ? $rs->pager->total_entries : $rs->count), 
+      rows => \@rows};
+}
+
+
+sub get_acls_in_roles
+{
+    my ($self,$request) = @_;
+    my (@rows, $rs);
+    eval { $rs = $DB->resultset($request->table)->search()->search(
+	       $request->filters, $request->modifiers);
+	   @rows = $rs->all };
     QVD::Admin4::Exception->throw(exception => $@, query => 'select') if $@;
 
     { total => ($rs->is_paged ? $rs->pager->total_entries : $rs->count), 
@@ -759,54 +787,6 @@ sub current_admin_setup
 		     {administrator_id => $administrator->id})->all ]};
 }
 
-sub get_acls_in_admins
-{
-    my ($self,$admin,$json_wrapper) = @_;
-    my $admin_id = $json_wrapper->get_filter_value('admin_id') //
-	QVD::Admin4::Exception->throw(code=>'6220', object => 'admin_id');
-    $admin_id = [$admin_id] unless ref($admin_id);
-    
-    my $acls_info;
-
-    for my $role (map { $_->role } $DB->resultset('Role_Administrator_Relation')->search(
-		      {administrator_id => $admin_id})->all)
-    {	
-	for my $acl_info ($role->acls_tree->get_all_acl_names_ids($role->id))
-	{
-	    $acls_info->{$acl_info->{id}} = clone $acl_info;
-            $acls_info->{$acl_info->{id}}->{roles}->{$role->id} = $role->name;
-	}
-    }
-
-    my $acls_name = $json_wrapper->get_filter_value('acl_name') // '%';
-    my $acls_rs = $DB->resultset('ACL')->search({id => [keys %$acls_info], 
-						 name => { like => $acls_name }},
-	{ order_by => { ($json_wrapper->order_direction || '-asc') => 
-			($json_wrapper->order_criteria || []) },
-	  page => ($json_wrapper->offset || 1),
-	  rows => ($json_wrapper->block || 10000) });
-
-   { total => ($acls_rs->is_paged ? $acls_rs->pager->total_entries : $acls_rs->count), 
-     rows => [map { $acls_info->{$_->id} } $acls_rs->all] };
-}
-
-sub get_acls_in_roles
-{
-    my ($self,$request) = @_;
-    my $role_id = delete $request->filters->{'me.role_id'};
-    my $role = $DB->resultset('Role')->search({id => $role_id})->first;
-    my $roles_info = $role->acls_tree->get_acls_direct_inheritance($role->id);
-    $request->filters->{'me.acl_id'} = [keys %$roles_info];
-    my (@rows, $rs);
-    eval { $rs = $DB->resultset($request->table)->search()->search($request->filters, $request->modifiers);
-	   @rows = $rs->all };
-    QVD::Admin4::Exception->throw(exception => $@, query => 'select') if $@;
-
-    $_->roles($roles_info->{$_->acl_id}) for @rows;
-
-    { total => ($rs->is_paged ? $rs->pager->total_entries : $rs->count), 
-      rows => \@rows};
-}
 
 sub get_number_of_acls_in_role
 {

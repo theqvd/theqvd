@@ -8,9 +8,38 @@ __PACKAGE__->table('operative_acls_in_roles');
 __PACKAGE__->result_source_instance->is_virtual(1);
 __PACKAGE__->result_source_instance->view_definition(
 
-
 "
-SELECT  json_agg(a.*) as tree_json from acls_in_role_recursive( ? ) a
+WITH direct_inherited_roles AS
+
+ ( SELECT json_agg(a.name)::text  as acls, r.* 
+   FROM   all_acl_role_relations i JOIN roles r ON i.inheritor_id=r.id JOIN acls a ON i.acl_id=a.id 
+   WHERE  r.id IN (SELECT inherited_id FROM role_role_relations WHERE inheritor_id = ? )
+   GROUP BY r.id
+ )  
+
+SELECT json_agg(j.*) AS roles_json, json_agg(w.*) as acls_json, json_agg(y.name) as operative_acls_json 
+FROM direct_inherited_roles j, all_acl_role_relations k
+JOIN acl_role_relations w ON w.role_id = ?,
+JOIN acl 
+
+
+
+
+SELECT a.id           as acl_id, 
+       a.name         as acl_name,
+       json_agg(.*)::text  as roles_json,
+       i.inheritor_id as role_id 
+
+FROM   all_acl_role_relations i 
+JOIN   acls a on a.id=i.acl_id
+JOIN   roles r on r.id=i.inherited_id
+
+GROUP BY i.inheritor_id, a.id
+
+
+
+
+
 "
 
 );
@@ -113,7 +142,7 @@ sub get_all_acl_ids
     my $self = shift;
     my $role_id = shift // $self->id;
 
-    map { $_->{name}} values %{$self->tree->{$role_id}->{iacls}};
+    map { $_->{id}} values %{$self->tree->{$role_id}->{iacls}};
 }
 
 sub get_all_acl_names_ids

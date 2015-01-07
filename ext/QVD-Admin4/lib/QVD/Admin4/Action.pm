@@ -363,7 +363,8 @@ get_acls_in_roles => { type_of_action => 'list',
 		       acls => [qr/^administrator\.see\.acl-list$/],
 		       admin4method => 'get_acls_in_roles'},
 
-get_acls_in_admins => { type_of_action => 'general',
+get_acls_in_admins => { type_of_action => 'list',
+		       qvd_object => 'Operative_Acls_In_Administrator',
 			acls => [qr/^administrator\.see\.acl-list$/],
 		      admin4method => 'get_acls_in_admins'},
 

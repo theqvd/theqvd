@@ -25,6 +25,8 @@ sub query
 
     my $tokens_list = $self->tokenizer->parse($raw_string);
     my $parser_response = $self->parser->parse($tokens_list);
+
+    use Data::Dumper; print Dumper $parser_response->json;
     if ($parser_response->status)
     {
 	return $parser_response->api_query;

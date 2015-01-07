@@ -183,6 +183,26 @@ my $RULES =
    cb   => sub { my ($ls,$rs) = @_; 
 		 $ls->set_api({});}},
 
+ { left_side => 'LOGICAL', 
+   right_side => [ 'and' ],
+   cb   => sub { my ($ls,$rs) = @_; 
+		 $ls->set_api('-and');}},
+
+ { left_side => 'LOGICAL', 
+   right_side => [ 'or' ],
+   cb   => sub { my ($ls,$rs) = @_; 
+		 $ls->set_api('-or');}},
+
+ { left_side => 'OP', 
+   right_side => [ '(' ],
+   cb   => sub { my ($ls,$rs) = @_; 
+		 $ls->set_api();}},
+
+ { left_side => 'CP', 
+   right_side => [ ')' ],
+   cb   => sub { my ($ls,$rs) = @_; 
+		 $ls->set_api();}},
+
 # FILTERS AND ARGUMENTS
 
 # A token that is not a reserved word
@@ -211,6 +231,37 @@ my $RULES =
    cb   => sub { my ($ls,$rs) = @_; 
 		 $ls->set_api(
 		     { %{@{$rs}[0]->get_api}, %{@{$rs}[2]->get_api} });}},
+
+ { left_side => "KEY_VALUE'", 
+   right_side => [ "KEY_VALUE", 'LOGICAL', "KEY_VALUE'" ],
+   cb   => sub { my ($ls,$rs) = @_; 
+		 $ls->set_api({ @{$rs}[1]->get_api  => [@{$rs}[0]->get_api,@{$rs}[2]->get_api] });}},
+
+ { left_side => "KEY_VALUE'", 
+   right_side => [ "KEY_VALUE", 'LOGICAL', "PARENTHESIS" ],
+   cb   => sub { my ($ls,$rs) = @_; 
+		 $ls->set_api({ @{$rs}[1]->get_api  => [@{$rs}[0]->get_api,@{$rs}[2]->get_api] });}},
+
+ { left_side => "KEY_VALUE'", 
+   right_side => [ "PARENTHESIS", 'LOGICAL', "KEY_VALUE'" ],
+   cb   => sub { my ($ls,$rs) = @_; 
+		 $ls->set_api({ @{$rs}[1]->get_api  => [@{$rs}[0]->get_api,@{$rs}[2]->get_api] });}},
+
+ { left_side => "KEY_VALUE'", 
+   right_side => [ "PARENTHESIS", 'LOGICAL', "PARENTHESIS" ],
+   cb   => sub { my ($ls,$rs) = @_; 
+		 $ls->set_api({ @{$rs}[1]->get_api  => [@{$rs}[0]->get_api,@{$rs}[2]->get_api] });}},
+
+ { left_side => "KEY_VALUE'", 
+   right_side => [ 'KEY_VALUE' ],
+   cb   => sub { my ($ls,$rs) = @_; 
+		 $ls->set_api(@{$rs}[0]->get_api);}},
+
+ { left_side => "PARENTHESIS", 
+   right_side => [ 'OP', "KEY_VALUE'", 'CP' ],
+   cb   => sub { my ($ls,$rs) = @_; 
+		 $ls->set_api(@{$rs}[1]->get_api);}},
+
 
 # PHRASES
 
@@ -293,10 +344,11 @@ my $RULES =
 # QVD_OBJECT specified with key/value filters
 
  { left_side => "QVD_OBJECT'", 
-   right_side => [ 'QVD_OBJECT', 'KEY_VALUE' ],
+   right_side => [ 'QVD_OBJECT', "KEY_VALUE'" ],
    cb   => sub { my ($ls,$rs) = @_; 
 		 $ls->set_api({ qvd_object => @{$rs}[0]->get_api->{qvd_object},
                             filters => @{$rs}[1]->get_api });}},
+
 
 # QVD_OBJECT specified with a list of possible value filters
 # The key of this filters must be a default one (typically id or name)

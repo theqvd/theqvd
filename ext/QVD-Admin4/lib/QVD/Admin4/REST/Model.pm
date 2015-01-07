@@ -501,7 +501,7 @@ my $SUBCHAIN_FILTERS =
 my $COMMODIN_FILTERS = 
 { 
 tiny => { ACL => [qw(name)]},
-list => {Config => [qw(key value)], Operative_Acls_In_Role => [qw(acl_name)], Operative_Acls_In_Administrator => [qw(admin_id)]}
+list => {Config => [qw(key value)], Operative_Acls_In_Role => [qw(acl_name)], Operative_Acls_In_Administrator => [qw(admin_name)]}
 };
 
 my $DEFAULT_ORDER_CRITERIA = 

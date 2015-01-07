@@ -1261,7 +1261,57 @@ my %TEST_SUITE = (
     'untag di 1,2 as default' => { qvd_object => 'di', command => 'unassign', arguments => { qvd_object => 'di_tag',  filters => ['default']}, filters => [1,2] },
     'untag di 1,2 as default, head' => { qvd_object => 'di', command => 'unassign', arguments => { qvd_object => 'di_tag',  filters => ['default','head']}, filters => [1,2] },
 
+# Logical operators in filters
 
+    'get vm id=1 or id=2' => { qvd_object => 'vm', command => 'get_list', filters => { -or => [ { id => 1 }, { id => 2 } ] }},
+
+    'get vm id=1 or id=2 and name=benjaVM or name=anaVM' => { qvd_object => 'vm', command => 'get_list', 
+							      filters => { -or => [ { id => 1 }, { -and => [ { id => 2 }, { -or => [ { name => 'benjaVM' }, { name => 'anaVM' }]}]}]}},
+
+    'get vm blocked=1 or id=1 or id=2 and name=benjaVM or name=anaVM' => { qvd_object => 'vm', command => 'get_list', 
+									   filters => { -or => [ { blocked => 1 }, 
+												 { -or =>  [ { id => 1 }, 
+													     { -and => [ { id => 2 }, { -or => [ { name => 'benjaVM' }, { name => 'anaVM' } ] } ] } ] } ] }},
+
+    'get vm (id=1 or id=2) and (name=benjaVM or name=anaVM)' => { qvd_object => 'vm', command => 'get_list', 
+								  filters => { -and => [ { -or =>  [ { id => 1 }, { id => 2 }] }, { -or => [ { name => 'benjaVM' }, { name => 'anaVM' } ] } ] }},
+
+
+    'get vm blocked=1 or ((id=1 or id=2) and (name=benjaVM or name=anaVM))' => { qvd_object => 'vm', command => 'get_list', 
+										 filters => { -or => [ { blocked => 1 }, { -and => [ { -or =>  [ { id => 1 }, { id => 2 }] }, 
+																     {-or => [ { name => 'benjaVM' }, { name => 'anaVM' } ] } ] } ] }},
+
+
+    'get vm (blocked=1 or (id=1 or id=2)) and (name=benjaVM or name=anaVM)' => { qvd_object => 'vm', command => 'get_list', 
+										 filters => { -and => [ { -or => [ { blocked => 1 }, 
+														   { -or =>  [ { id => 1 }, { id => 2 } ]}]}, 
+													{ -or =>  [ { name => 'benjaVM' }, { name => 'anaVM' } ] } ] }},
+
+
+
+    'get vm id=1, name=benjaVM or id=2, name=anaVM' => { qvd_object => 'vm', command => 'get_list', filters => { -or => [ { id => 1, name => 'benjaVM' }, { id => 2, name => 'anaVM' } ] }},
+
+    'get vm id=1, name=anaVM or id=2 and name=benjaVM or name=anaVM' => { qvd_object => 'vm', command => 'get_list', 
+							      filters => { -or => [ { id => 1, name =>'anaVM' }, { -and => [ { id => 2 }, { -or => [ { name => 'benjaVM' }, { name => 'anaVM' }]}]}]}},
+
+    'get vm blocked=1,state=running or id=1 or id=2 and name=benjaVM or name=anaVM' => { qvd_object => 'vm', command => 'get_list', 
+											 filters => { -or => [ { blocked => 1, state => 'running' }, 
+												 { -or =>  [ { id => 1 }, 
+													     { -and => [ { id => 2 }, { -or => [ { name => 'benjaVM' }, { name => 'anaVM' } ] } ] } ] } ] }},
+
+    'get vm (id=1 or id=2) and (name=benjaVM or name=anaVM, blocked=1)' => { qvd_object => 'vm', command => 'get_list', 
+								  filters => { -and => [ { -or =>  [ { id => 1 }, { id => 2 }] }, { -or => [ { name => 'benjaVM' }, { name => 'anaVM', blocked => 1 } ] } ] }},
+
+
+    'get vm blocked=1 or ((id=1 or id=2,blocked=0) and (name=benjaVM or name=anaVM))' => { qvd_object => 'vm', command => 'get_list', 
+										 filters => { -or => [ { blocked => 1 }, { -and => [ { -or =>  [ { id => 1 }, { id => 2, blocked => 0 }] }, 
+																     {-or => [ { name => 'benjaVM' }, { name => 'anaVM' } ] } ] } ] }},
+
+
+    'get vm (blocked=1 or (id=1,blocked=1 or id=2)) and (name=benjaVM, state=running or name=anaVM)' => { qvd_object => 'vm', command => 'get_list', 
+										 filters => { -and => [ { -or => [ { blocked => 1 }, 
+														   { -or =>  [ { id => 1, blocked => 1 }, { id => 2 } ]}]}, 
+													{ -or =>  [ { name => 'benjaVM', state => 'running' }, { name => 'anaVM' } ] } ] }}
 
     );
 
@@ -1270,7 +1320,7 @@ for my $query (sort keys %TEST_SUITE)
 {
     my $res = $CLI->parser->parse(
 	$CLI->tokenizer->parse($query));
-
+    $res = $res->cli_query;
     is_deeply($res,$TEST_SUITE{$query},$query);
 }
 

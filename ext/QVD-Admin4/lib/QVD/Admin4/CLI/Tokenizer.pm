@@ -4,7 +4,7 @@ use warnings;
 use Moo;
 use QVD::Admin4::CLI::Tokenizer::Token;
 
-my $TOKEN = qr/([a-z]|[A-Z]|_|[0-9]|\*)+|[=,!~]/;
+my $TOKEN = qr/([a-z]|[A-Z]|_|[0-9]|\*)+|[=,)(]/;
 
 sub BUILD
 {
@@ -26,6 +26,7 @@ sub parse
 	push @TOKENS, $token;
 	$position = $token->to + 1;
     }
+
     return \@TOKENS;
 }
 

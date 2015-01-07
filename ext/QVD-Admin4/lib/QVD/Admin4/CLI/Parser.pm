@@ -38,15 +38,14 @@ sub parse
     my $edges = $self->get_edges_from_initial_tokens($tokens_list);
     $self->parse_recursive($edges);
 
-    my $response;
+    my $response = { analysis => []};
     for my $edge (@{$self->chart->inactive_edges})
     {
 	if ($edge->node->label eq 'ROOT'
 	    && $edge->from eq 0 && $edge->to eq $LAST)
-	{ $response = $edge->node->api; last; }
+	{ push @{$response->{analysis}}, $edge->node->api; }
     } 
 
-    $response //= { status => 1100, message => 'Unable to parse input query'};
     QVD::Admin4::CLI::Parser::Response->new(json => $response);
 }
 
