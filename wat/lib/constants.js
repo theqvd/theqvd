@@ -178,6 +178,10 @@ QVD_OBJS_USERAREA = ['profile', 'myviews'];
 QVD_OBJS_HELP = ['about', 'documentation'];
 QVD_OBJS_QVDCONFIG = ['config'];
 
+// Recover user
+RECOVER_USER_ID = 0;
+SUPERTENANT_ID = 0;
+
 // Default values
 DEFAULT_OSF_MEMORY = 256;
 

@@ -36,7 +36,11 @@ Wat.C = {
     },
     
     isSuperadmin: function () {
-        return this.tenantID == 0;
+        return this.tenantID == SUPERTENANT_ID;
+    },    
+    
+    isRecoveradmin: function () {
+        return this.adminID == RECOVER_USER_ID;
     },
     
     logOut: function () {
@@ -126,14 +130,14 @@ Wat.C = {
         // Store views configuration
         Wat.C.storeViewsConfiguration(that.retrievedData.views);
         
-        // Configure visability
-        Wat.C.configureVisibility();
-        
         // Store tenant ID
         Wat.C.tenantID = that.retrievedData.tenant_id;
         
         // Store admin ID
         Wat.C.adminID = that.retrievedData.admin_id;
+        
+        // Configure visability
+        Wat.C.configureVisibility();
         
         if (Wat.CurrentView.qvdObj == 'login') {
             Wat.C.logIn(that.sid, that.login);
@@ -309,14 +313,24 @@ Wat.C = {
             }
         });
         
+        // Recover user will has not profile section
+        if (Wat.C.isRecoveradmin()) {
+            delete Wat.I.userMenu['profile'];
+            delete Wat.I.cornerMenu.user.subMenu['profile'];
+        }
+        
+        // Set to the menu option the link of its first sub-option link
         if (Wat.I.cornerMenu.wat && !$.isEmptyObject(Wat.I.cornerMenu.wat.subMenu)) {
             Wat.I.cornerMenu.wat.link = Wat.I.cornerMenu.wat.subMenu[Object.keys(Wat.I.cornerMenu.wat.subMenu)[0]].link;
+        }         
+        if (Wat.I.cornerMenu.user && !$.isEmptyObject(Wat.I.cornerMenu.user.subMenu)) {
+            Wat.I.cornerMenu.user.link = Wat.I.cornerMenu.user.subMenu[Object.keys(Wat.I.cornerMenu.user.subMenu)[0]].link;
         }        
-        
         if (Wat.I.cornerMenu.platform && !$.isEmptyObject(Wat.I.cornerMenu.platform.subMenu)) {
             Wat.I.cornerMenu.platform.link = Wat.I.cornerMenu.platform.subMenu[Object.keys(Wat.I.cornerMenu.platform.subMenu)[0]].link;
         }
-
+        
+        // Hide help option if there are not acls given (not logged)
         if (Wat.C.acls.length == 0) {
             delete Wat.I.cornerMenu.help;
         }
