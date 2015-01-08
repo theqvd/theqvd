@@ -727,7 +727,6 @@ sub di_no_head_default_tags
 ## GENERAL FUNCTIONS; WITHOUT REQUEST
 ######################################
 
-
 sub tenant_view_get_list
 {
     my ($self,$request) = @_;
