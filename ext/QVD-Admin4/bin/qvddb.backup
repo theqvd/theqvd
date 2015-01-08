@@ -83,6 +83,40 @@ ALTER TYPE public.view_types_enum OWNER TO postgres;
 
 
 --
+-- Name: role_role_relations; Type: TABLE; Schema: public; Owner: qvd; Tablespace: 
+--
+
+CREATE TABLE role_role_relations (
+    id integer NOT NULL,
+    inheritor_id integer NOT NULL,
+    inherited_id integer NOT NULL
+);
+
+
+ALTER TABLE public.role_role_relations OWNER TO qvd;
+
+--
+-- Name: role_role_relations_id_seq; Type: SEQUENCE; Schema: public; Owner: qvd
+--
+
+CREATE SEQUENCE role_role_relations_id_seq
+    START WITH 1
+    INCREMENT BY 1
+    NO MINVALUE
+    NO MAXVALUE
+    CACHE 1;
+
+
+ALTER TABLE public.role_role_relations_id_seq OWNER TO qvd;
+
+--
+-- Name: role_role_relations_id_seq; Type: SEQUENCE OWNED BY; Schema: public; Owner: qvd
+--
+
+ALTER SEQUENCE role_role_relations_id_seq OWNED BY role_role_relations.id;
+
+
+--
 -- Name: acls_in_role_recursive(integer); Type: FUNCTION; Schema: public; Owner: postgres
 --
 
@@ -921,40 +955,6 @@ ALTER SEQUENCE role_administrator_relations_id_seq OWNED BY role_administrator_r
 
 
 --
--- Name: role_role_relations; Type: TABLE; Schema: public; Owner: qvd; Tablespace: 
---
-
-CREATE TABLE role_role_relations (
-    id integer NOT NULL,
-    inheritor_id integer NOT NULL,
-    inherited_id integer NOT NULL
-);
-
-
-ALTER TABLE public.role_role_relations OWNER TO qvd;
-
---
--- Name: role_role_relations_id_seq; Type: SEQUENCE; Schema: public; Owner: qvd
---
-
-CREATE SEQUENCE role_role_relations_id_seq
-    START WITH 1
-    INCREMENT BY 1
-    NO MINVALUE
-    NO MAXVALUE
-    CACHE 1;
-
-
-ALTER TABLE public.role_role_relations_id_seq OWNER TO qvd;
-
---
--- Name: role_role_relations_id_seq; Type: SEQUENCE OWNED BY; Schema: public; Owner: qvd
---
-
-ALTER SEQUENCE role_role_relations_id_seq OWNED BY role_role_relations.id;
-
-
---
 -- Name: roles; Type: TABLE; Schema: public; Owner: qvd; Tablespace: 
 --
 
@@ -1200,6 +1200,127 @@ CREATE TABLE vms (
 
 
 ALTER TABLE public.vms OWNER TO qvd;
+
+
+
+--
+-- Name: operative_views_in_tenants; Type: VIEW; Schema: public; Owner: qvd
+--
+
+CREATE VIEW operative_views_in_tenants AS
+ SELECT DISTINCT dt.dt AS device_type,
+    vt.vt AS view_type,
+    t.id AS tenant_id,
+    p.key AS field,
+        CASE
+            WHEN (r.visible IS NULL) THEN false
+            ELSE r.visible
+        END AS visible,
+    true AS property,
+    'vm'::qvd_objects_enum AS qvd_object
+   FROM ((((((unnest(enum_range(NULL::device_types_enum)) dt(dt)
+     CROSS JOIN unnest(enum_range(NULL::view_types_enum)) vt(vt))
+     CROSS JOIN ( SELECT tenants.id
+           FROM tenants) t)
+     CROSS JOIN ( SELECT vm_properties.key,
+            vm_properties.vm_id
+           FROM vm_properties) p)
+     JOIN vms v ON ((p.vm_id = v.id)))
+     JOIN users u ON (((u.id = v.user_id) AND ((u.tenant_id = t.id) OR (t.id = 0)))))
+     LEFT JOIN tenant_views_setups r ON (((((((r.device_type = dt.dt) AND (r.view_type = vt.vt)) AND (r.tenant_id = t.id)) AND ((r.field)::text = (p.key)::text)) AND (r.property = true)) AND (r.qvd_object = 'vm'::qvd_objects_enum))))
+UNION
+ SELECT DISTINCT dt.dt AS device_type,
+    vt.vt AS view_type,
+    t.id AS tenant_id,
+    p.key AS field,
+        CASE
+            WHEN (r.visible IS NULL) THEN false
+            ELSE r.visible
+        END AS visible,
+    true AS property,
+    'user'::qvd_objects_enum AS qvd_object
+   FROM (((((unnest(enum_range(NULL::device_types_enum)) dt(dt)
+     CROSS JOIN unnest(enum_range(NULL::view_types_enum)) vt(vt))
+     CROSS JOIN ( SELECT tenants.id
+           FROM tenants) t)
+     CROSS JOIN ( SELECT user_properties.key,
+            user_properties.user_id
+           FROM user_properties) p)
+     JOIN users u ON (((p.user_id = u.id) AND ((u.tenant_id = t.id) OR (t.id = 0)))))
+     LEFT JOIN tenant_views_setups r ON (((((((r.device_type = dt.dt) AND (r.view_type = vt.vt)) AND (r.tenant_id = t.id)) AND ((r.field)::text = (p.key)::text)) AND (r.property = true)) AND (r.qvd_object = 'user'::qvd_objects_enum))))
+UNION
+ SELECT DISTINCT dt.dt AS device_type,
+    vt.vt AS view_type,
+    t.id AS tenant_id,
+    p.key AS field,
+        CASE
+            WHEN (r.visible IS NULL) THEN false
+            ELSE r.visible
+        END AS visible,
+    true AS property,
+    'host'::qvd_objects_enum AS qvd_object
+   FROM ((((unnest(enum_range(NULL::device_types_enum)) dt(dt)
+     CROSS JOIN unnest(enum_range(NULL::view_types_enum)) vt(vt))
+     CROSS JOIN ( SELECT tenants.id
+           FROM tenants) t)
+     CROSS JOIN ( SELECT host_properties.key
+           FROM host_properties) p)
+     LEFT JOIN tenant_views_setups r ON (((((((r.device_type = dt.dt) AND (r.view_type = vt.vt)) AND (r.tenant_id = t.id)) AND ((r.field)::text = (p.key)::text)) AND (r.property = true)) AND (r.qvd_object = 'host'::qvd_objects_enum))))
+UNION
+ SELECT DISTINCT dt.dt AS device_type,
+    vt.vt AS view_type,
+    t.id AS tenant_id,
+    p.key AS field,
+        CASE
+            WHEN (r.visible IS NULL) THEN false
+            ELSE r.visible
+        END AS visible,
+    true AS property,
+    'osf'::qvd_objects_enum AS qvd_object
+   FROM (((((unnest(enum_range(NULL::device_types_enum)) dt(dt)
+     CROSS JOIN unnest(enum_range(NULL::view_types_enum)) vt(vt))
+     CROSS JOIN ( SELECT tenants.id
+           FROM tenants) t)
+     CROSS JOIN ( SELECT osf_properties.key,
+            osf_properties.osf_id
+           FROM osf_properties) p)
+     JOIN osfs o ON (((p.osf_id = o.id) AND ((o.tenant_id = t.id) OR (t.id = 0)))))
+     LEFT JOIN tenant_views_setups r ON (((((((r.device_type = dt.dt) AND (r.view_type = vt.vt)) AND (r.tenant_id = t.id)) AND ((r.field)::text = (p.key)::text)) AND (r.property = true)) AND (r.qvd_object = 'osf'::qvd_objects_enum))))
+UNION
+ SELECT DISTINCT dt.dt AS device_type,
+    vt.vt AS view_type,
+    t.id AS tenant_id,
+    p.key AS field,
+        CASE
+            WHEN (r.visible IS NULL) THEN false
+            ELSE r.visible
+        END AS visible,
+    true AS property,
+    'di'::qvd_objects_enum AS qvd_object
+   FROM ((((((unnest(enum_range(NULL::device_types_enum)) dt(dt)
+     CROSS JOIN unnest(enum_range(NULL::view_types_enum)) vt(vt))
+     CROSS JOIN ( SELECT tenants.id
+           FROM tenants) t)
+     CROSS JOIN ( SELECT di_properties.key,
+            di_properties.di_id
+           FROM di_properties) p)
+     JOIN dis d ON ((p.di_id = d.id)))
+     JOIN osfs o ON (((o.id = d.osf_id) AND ((o.tenant_id = t.id) OR (t.id = 0)))))
+     LEFT JOIN tenant_views_setups r ON (((((((r.device_type = dt.dt) AND (r.view_type = vt.vt)) AND (r.tenant_id = t.id)) AND ((r.field)::text = (p.key)::text)) AND (r.property = true)) AND (r.qvd_object = 'di'::qvd_objects_enum))))
+UNION
+ SELECT tenant_views_setups.device_type,
+    tenant_views_setups.view_type,
+    tenant_views_setups.tenant_id,
+    tenant_views_setups.field,
+    tenant_views_setups.visible,
+    tenant_views_setups.property,
+    tenant_views_setups.qvd_object
+   FROM tenant_views_setups
+  WHERE (tenant_views_setups.property = false);
+
+
+ALTER TABLE public.operative_views_in_tenants OWNER TO qvd;
+
 
 
 --
