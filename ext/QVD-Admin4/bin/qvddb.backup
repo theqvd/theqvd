@@ -81,11 +81,56 @@ CREATE TYPE view_types_enum AS ENUM (
 
 ALTER TYPE public.view_types_enum OWNER TO postgres;
 
+
 --
--- Name: delete_tenant_views_for_removed_property(); Type: FUNCTION; Schema: public; Owner: postgres
+-- Name: acls_in_role_recursive(integer); Type: FUNCTION; Schema: public; Owner: postgres
 --
 
-CREATE FUNCTION delete_tenant_views_for_removed_property() RETURNS trigger
+CREATE FUNCTION acls_in_role_recursive(role_id integer) RETURNS TABLE(inheritor_id integer, inherited_id integer, inheritor_name text, inherited_name text, acl_id integer, acl_name text, acl_positive boolean, inheritor_fixed boolean, inheritor_internal boolean, inherited_fixed boolean, inherited_internal boolean)
+    LANGUAGE sql
+    AS $_$
+
+      with recursive all_role_role_relations(inheritor_id, inherited_id) as ( 
+        
+          select inheritor_id, inherited_id 
+          from role_role_relations 
+          where inheritor_id in ( $1 ) 
+
+          union 
+
+          select p.inheritor_id, p.inherited_id 
+          from all_role_role_relations pr, role_role_relations p 
+          where pr.inherited_id=p.inheritor_id  ) 
+
+      select a.inheritor_id as inheritor_id, a.inherited_id as inherited_id, d.name as inheritor_name, e.name as inherited_name, 
+             b.acl_id as acl_id, c.name as acl_name, b.positive as acl_positive, d.fixed as inheritor_fixed, d.internal as inheritor_internal, 
+             e.fixed as inherited_fixed, e.internal as inherited_internal 
+      from all_role_role_relations a 
+      left join acl_role_relations b on (a.inherited_id=b.role_id) 
+      left join acls c on (c.id=b.acl_id) 
+      join roles d on (d.id=a.inheritor_id) 
+      join roles e on (e.id=a.inherited_id) 
+
+      union 
+
+      select f.id as inheritor_id, f.id as inherited_id, f.name as inheritor_name, f.name as inherited_name, g.acl_id as acl_id, h.name as acl_name, 
+             g.positive as acl_positive, f.fixed as inheritor_fixed, f.internal as inheritor_internal, f.fixed as inherited_fixed, f.internal as inherited_internal  
+      from roles f 
+      join acl_role_relations g on (f.id=g.role_id) 
+      join acls h on (h.id=g.acl_id) 
+
+      where f.id in ( $1 )
+
+$_$;
+
+
+ALTER FUNCTION public.acls_in_role_recursive(role_id integer) OWNER TO postgres;
+
+--
+-- Name: delete_views_for_removed_property(); Type: FUNCTION; Schema: public; Owner: postgres
+--
+
+CREATE FUNCTION delete_views_for_removed_property() RETURNS trigger
     LANGUAGE plpgsql
     AS $_$
 
@@ -231,7 +276,8 @@ END;
 $_$;
 
 
-ALTER FUNCTION public.delete_tenant_views_for_removed_property() OWNER TO postgres;
+ALTER FUNCTION public.delete_views_for_removed_property() OWNER TO postgres;
+
 
 --
 -- Name: di_blocked_or_unblocked_notify(); Type: FUNCTION; Schema: public; Owner: postgres
@@ -288,124 +334,6 @@ CREATE FUNCTION host_state_changed_notify() RETURNS trigger
 
 ALTER FUNCTION public.host_state_changed_notify() OWNER TO postgres;
 
---
--- Name: insert_default_tenant_views_for_property(); Type: FUNCTION; Schema: public; Owner: postgres
---
-
-CREATE FUNCTION insert_default_tenant_views_for_property() RETURNS trigger
-    LANGUAGE plpgsql
-    AS $_$
-
--- Variable for rows retrieved by queries
-
-DECLARE i record;
-
--- Variable for tenant_id involved
-
-DECLARE tid int;
-
--- Variable for qvd_object involved 
-
-DECLARE qo qvd_objects_enum;
-BEGIN
-qo := TG_ARGV[0];
-
-
--- Hosts are not related to any tenant, so they have the following specific behaviour
-
-IF qo = 'host' THEN
-
-  FOR i IN SELECT * FROM unnest(enum_range(NULL::device_types_enum)) device_type 
-                    CROSS JOIN unnest(enum_range(NULL::view_types_enum)) view_type 
-                    CROSS JOIN (SELECT id as tenant_id FROM tenants) tenant_id LOOP                                                                                                                                              
-    IF EXISTS (SELECT 1 FROM tenant_views_setups v WHERE v.tenant_id=i.tenant_id     AND 
-                                                         v.field=NEW.key             AND 
-                                                         v.view_type=i.view_type     AND 
-                                                         v.device_type=i.device_type AND 
-                                                         v.qvd_object=qo             AND 
-                                                         v.property='t') THEN                                                                                                                                                            
-    --                                                                                                                                                              
-    ELSE
-
-    EXECUTE 'INSERT INTO tenant_views_setups (tenant_id,field,view_type,device_type,qvd_object,property,visible) VALUES ($1,$2,$3,$4,$5,$6,$7)' 
-             USING i.tenant_id, NEW.key, i.view_type, i.device_type, qo, TRUE, FALSE;
-    RAISE NOTICE 'Inserted row in tenant_views_setups by procedure insert_default_tenant_views_for_property'; END IF;
-
-    END LOOP;
-
--- For the rest of qvd objects
-
-ELSE                                                                                                            
-
--- Tenant id is found in different ways according to qvd objects
-
-  IF qo = 'vm' THEN                                                                                                                                                            
-
-  SELECT u.tenant_id INTO tid FROM users u JOIN vms vm ON vm.user_id=u.id WHERE vm.id=NEW.vm_id;                                                                                                                       
-  ELSIF qo = 'user' THEN
-
-  SELECT u.tenant_id INTO tid FROM users u WHERE u.id=NEW.user_id;                                                                                                                       
-
-  ELSIF qo = 'osf' THEN
-
-  SELECT o.tenant_id INTO tid FROM osfs o WHERE o.id=NEW.osf_id;                                                                                                                       
-
-  ELSIF qo = 'di' THEN
-
-  SELECT o.tenant_id INTO tid FROM osfs o JOIN dis di ON di.osf_id=o.id WHERE di.id=NEW.di_id;                                                                                                     
-  ELSE                
-
-  RAISE EXCEPTION 'Invalid qvd_object provided to insert_default_tenant_view_for_property()';	
-
-  END IF;
-
--- Main process for qvd objects with tenant id for every possible kind of view
-
-  FOR i IN SELECT * FROM unnest(enum_range(NULL::device_types_enum)) device_type CROSS JOIN unnest(enum_range(NULL::view_types_enum)) view_type LOOP                                  
-
--- Default views are created in qvd object's tenant
-
-    IF EXISTS (SELECT 1 FROM tenant_views_setups v WHERE v.tenant_id=tid             AND 
-                                                         v.field=NEW.key             AND 
-                                                         v.view_type=i.view_type     AND 
-                                                         v.device_type=i.device_type AND
-                                                         v.qvd_object=qo             AND 
-                                                         v.property='t') THEN                                                                                                                                                            
-      --                                                                                                                                                              
-
-    ELSE
-
-      EXECUTE 'INSERT INTO tenant_views_setups (tenant_id,field,view_type,device_type,qvd_object,property,visible) VALUES ($1,$2,$3,$4,$5,$6,$7)' 
-               USING tid, NEW.key, i.view_type, i.device_type, qo, TRUE, FALSE;
-      RAISE NOTICE 'Inserted row in tenant_views_setups by procedure '; 
-    END IF;
-
--- Default views are created in superadmin's tenant (0)
-
-    IF EXISTS (SELECT 1 FROM tenant_views_setups v WHERE v.tenant_id='0'             AND 
-                                                         v.field=NEW.key             AND 
-                                                         v.view_type=i.view_type     AND 
-                                                         v.device_type=i.device_type AND 
-                                                         v.qvd_object=qo             AND 
-                                                         v.property='t') THEN                                                                                                                                                            
-      --                                                                                                                                                              
-
-    ELSE
-
-      EXECUTE 'INSERT INTO tenant_views_setups (tenant_id,field,view_type,device_type,qvd_object,property,visible) VALUES ($1,$2,$3,$4,$5,$6,$7)' 
-               USING 0, NEW.key, i.view_type, i.device_type, qo, TRUE, FALSE;
-      RAISE NOTICE 'Tenant View Inserted by procedure'; 
-    END IF;
-
-  END LOOP; 
-END IF;
-
-RETURN NEW;
-END;
-$_$;
-
-
-ALTER FUNCTION public.insert_default_tenant_views_for_property() OWNER TO postgres;
 
 --
 -- Name: osf_created_or_removed_notify(); Type: FUNCTION; Schema: public; Owner: postgres
@@ -641,6 +569,69 @@ ALTER TABLE public.administrators_id_seq OWNER TO qvd;
 --
 
 ALTER SEQUENCE administrators_id_seq OWNED BY administrators.id;
+
+
+
+--
+-- Name: all_role_role_relations; Type: VIEW; Schema: public; Owner: qvd
+--
+
+CREATE VIEW all_role_role_relations AS
+ WITH RECURSIVE all_role_role_relations(inheritor_id, inherited_id) AS (
+         SELECT role_role_relations.inheritor_id,
+            role_role_relations.inherited_id
+           FROM role_role_relations
+        UNION
+         SELECT p.inheritor_id,
+            p.inherited_id
+           FROM all_role_role_relations pr,
+            role_role_relations p
+          WHERE (pr.inherited_id = p.inheritor_id)
+        )
+ SELECT a.inheritor_id,
+    a.inherited_id
+   FROM all_role_role_relations a;
+
+
+ALTER TABLE public.all_role_role_relations OWNER TO qvd;
+
+--
+-- Name: all_acl_role_relations; Type: VIEW; Schema: public; Owner: qvd
+--
+
+CREATE VIEW all_acl_role_relations AS
+ WITH RECURSIVE all_acls_role_relations(inheritor_id, inherited_id, acl_id) AS (
+         SELECT a.inheritor_id,
+            a.inherited_id,
+            b.acl_id
+           FROM (all_role_role_relations a
+             JOIN acl_role_relations b ON ((b.role_id = a.inherited_id)))
+          WHERE ((b.positive = true) AND (NOT (b.acl_id IN ( SELECT c.acl_id
+                   FROM acl_role_relations c
+                  WHERE ((c.positive = false) AND (c.role_id = a.inheritor_id))))))
+        UNION
+         SELECT d.inheritor_id,
+            d.inherited_id,
+            e.acl_id
+           FROM (all_role_role_relations d
+             JOIN all_acls_role_relations e ON ((d.inherited_id = e.inheritor_id)))
+          WHERE (NOT (e.acl_id IN ( SELECT f.acl_id
+                   FROM acl_role_relations f
+                  WHERE ((f.positive = false) AND (f.role_id = e.inheritor_id)))))
+        )
+ SELECT all_acls_role_relations.inheritor_id,
+    all_acls_role_relations.inherited_id,
+    all_acls_role_relations.acl_id
+   FROM all_acls_role_relations
+UNION
+ SELECT acl_role_relations.role_id AS inheritor_id,
+    acl_role_relations.role_id AS inherited_id,
+    acl_role_relations.acl_id
+   FROM acl_role_relations
+  WHERE (acl_role_relations.positive = true);
+
+
+ALTER TABLE public.all_acl_role_relations OWNER TO qvd;
 
 
 --
@@ -1181,90 +1172,6 @@ CREATE TABLE versions (
 ALTER TABLE public.versions OWNER TO qvd;
 
 --
--- Name: virtual_di_property_views; Type: VIEW; Schema: public; Owner: qvd
---
-
-CREATE VIEW virtual_di_property_views AS
- SELECT o.tenant_id,
-    view.view AS view_type,
-    device.device AS device_type,
-    'di' AS qvd_object,
-    property.key AS field,
-    v.visible,
-    true AS property
-   FROM (((((di_properties property
-     JOIN dis di ON ((di.id = property.di_id)))
-     JOIN osfs o ON ((di.osf_id = di.id)))
-     CROSS JOIN unnest(enum_range(NULL::device_types_enum)) device(device))
-     CROSS JOIN unnest(enum_range(NULL::view_types_enum)) view(view))
-     LEFT JOIN tenant_views_setups v ON ((((((o.tenant_id = v.tenant_id) AND (v.property = true)) AND ((v.field)::text = (property.key)::text)) AND (v.device_type = device.device)) AND (v.view_type = view.view))));
-
-
-ALTER TABLE public.virtual_di_property_views OWNER TO qvd;
-
---
--- Name: virtual_host_property_views; Type: VIEW; Schema: public; Owner: qvd
---
-
-CREATE VIEW virtual_host_property_views AS
- SELECT NULL::unknown AS tenant_id,
-    view.view AS view_type,
-    device.device AS device_type,
-    'host' AS qvd_object,
-    property.key AS field,
-    v.visible,
-    true AS property
-   FROM (((host_properties property
-     CROSS JOIN unnest(enum_range(NULL::device_types_enum)) device(device))
-     CROSS JOIN unnest(enum_range(NULL::view_types_enum)) view(view))
-     LEFT JOIN tenant_views_setups v ON (((((v.property = true) AND ((v.field)::text = (property.key)::text)) AND (v.device_type = device.device)) AND (v.view_type = view.view))));
-
-
-ALTER TABLE public.virtual_host_property_views OWNER TO qvd;
-
---
--- Name: virtual_osf_property_views; Type: VIEW; Schema: public; Owner: qvd
---
-
-CREATE VIEW virtual_osf_property_views AS
- SELECT o.tenant_id,
-    view.view AS view_type,
-    device.device AS device_type,
-    'osf' AS qvd_object,
-    property.key AS field,
-    v.visible,
-    true AS property
-   FROM ((((osf_properties property
-     JOIN osfs o ON ((o.id = property.osf_id)))
-     CROSS JOIN unnest(enum_range(NULL::device_types_enum)) device(device))
-     CROSS JOIN unnest(enum_range(NULL::view_types_enum)) view(view))
-     LEFT JOIN tenant_views_setups v ON ((((((v.tenant_id = o.tenant_id) AND (v.property = true)) AND ((v.field)::text = (property.key)::text)) AND (v.device_type = device.device)) AND (v.view_type = view.view))));
-
-
-ALTER TABLE public.virtual_osf_property_views OWNER TO qvd;
-
---
--- Name: virtual_user_property_views; Type: VIEW; Schema: public; Owner: qvd
---
-
-CREATE VIEW virtual_user_property_views AS
- SELECT u.tenant_id,
-    view.view AS view_type,
-    device.device AS device_type,
-    'user' AS qvd_object,
-    property.key AS field,
-    v.visible,
-    true AS property
-   FROM ((((user_properties property
-     JOIN users u ON ((u.id = property.user_id)))
-     CROSS JOIN unnest(enum_range(NULL::device_types_enum)) device(device))
-     CROSS JOIN unnest(enum_range(NULL::view_types_enum)) view(view))
-     LEFT JOIN tenant_views_setups v ON ((((((v.tenant_id = u.tenant_id) AND (v.property = true)) AND ((v.field)::text = (property.key)::text)) AND (v.device_type = device.device)) AND (v.view_type = view.view))));
-
-
-ALTER TABLE public.virtual_user_property_views OWNER TO qvd;
-
---
 -- Name: vm_properties; Type: TABLE; Schema: public; Owner: qvd; Tablespace: 
 --
 
@@ -1294,27 +1201,6 @@ CREATE TABLE vms (
 
 ALTER TABLE public.vms OWNER TO qvd;
 
---
--- Name: virtual_vm_property_views; Type: VIEW; Schema: public; Owner: qvd
---
-
-CREATE VIEW virtual_vm_property_views AS
- SELECT u.tenant_id,
-    view.view AS view_type,
-    device.device AS device_type,
-    'vm' AS qvd_object,
-    property.key AS field,
-    v.visible,
-    true AS property
-   FROM (((((vm_properties property
-     JOIN vms vm ON ((vm.id = property.vm_id)))
-     JOIN users u ON ((vm.user_id = u.id)))
-     CROSS JOIN unnest(enum_range(NULL::device_types_enum)) device(device))
-     CROSS JOIN unnest(enum_range(NULL::view_types_enum)) view(view))
-     LEFT JOIN tenant_views_setups v ON ((((((u.tenant_id = v.tenant_id) AND (v.property = true)) AND ((v.field)::text = (property.key)::text)) AND (v.device_type = device.device)) AND (v.view_type = view.view))));
-
-
-ALTER TABLE public.virtual_vm_property_views OWNER TO qvd;
 
 --
 -- Name: vm_cmds; Type: TABLE; Schema: public; Owner: qvd; Tablespace: 
@@ -5150,74 +5036,38 @@ CREATE INDEX vms_idx_user_id ON vms USING btree (user_id);
 
 
 --
--- Name: create_default_tenant_views_for_di_property; Type: TRIGGER; Schema: public; Owner: qvd
+-- Name: delete_views_for_removed_di_property; Type: TRIGGER; Schema: public; Owner: qvd
 --
 
-CREATE TRIGGER create_default_tenant_views_for_di_property AFTER INSERT ON di_properties FOR EACH ROW EXECUTE PROCEDURE insert_default_tenant_views_for_property('di');
-
-
---
--- Name: create_default_tenant_views_for_host_property; Type: TRIGGER; Schema: public; Owner: qvd
---
-
-CREATE TRIGGER create_default_tenant_views_for_host_property AFTER INSERT ON host_properties FOR EACH ROW EXECUTE PROCEDURE insert_default_tenant_views_for_property('host');
+CREATE TRIGGER delete_views_for_removed_di_property AFTER DELETE ON di_properties FOR EACH ROW EXECUTE PROCEDURE delete_views_for_removed_property('di');
 
 
 --
--- Name: create_default_tenant_views_for_osf_property; Type: TRIGGER; Schema: public; Owner: qvd
+-- Name: delete_views_for_removed_host_property; Type: TRIGGER; Schema: public; Owner: qvd
 --
 
-CREATE TRIGGER create_default_tenant_views_for_osf_property AFTER INSERT ON osf_properties FOR EACH ROW EXECUTE PROCEDURE insert_default_tenant_views_for_property('osf');
-
-
---
--- Name: create_default_tenant_views_for_user_property; Type: TRIGGER; Schema: public; Owner: qvd
---
-
-CREATE TRIGGER create_default_tenant_views_for_user_property AFTER INSERT ON user_properties FOR EACH ROW EXECUTE PROCEDURE insert_default_tenant_views_for_property('user');
+CREATE TRIGGER delete_views_for_removed_host_property AFTER DELETE ON host_properties FOR EACH ROW EXECUTE PROCEDURE delete_views_for_removed_property('host');
 
 
 --
--- Name: create_default_tenant_views_for_vm_property; Type: TRIGGER; Schema: public; Owner: qvd
+-- Name: delete_views_for_removed_osf_property; Type: TRIGGER; Schema: public; Owner: qvd
 --
 
-CREATE TRIGGER create_default_tenant_views_for_vm_property AFTER INSERT ON vm_properties FOR EACH ROW EXECUTE PROCEDURE insert_default_tenant_views_for_property('vm');
-
-
---
--- Name: delete_tenant_views_for_removed_di_property; Type: TRIGGER; Schema: public; Owner: qvd
---
-
-CREATE TRIGGER delete_tenant_views_for_removed_di_property AFTER DELETE ON di_properties FOR EACH ROW EXECUTE PROCEDURE delete_tenant_views_for_removed_property('di');
+CREATE TRIGGER delete_views_for_removed_osf_property AFTER DELETE ON osf_properties FOR EACH ROW EXECUTE PROCEDURE delete_views_for_removed_property('osf');
 
 
 --
--- Name: delete_tenant_views_for_removed_host_property; Type: TRIGGER; Schema: public; Owner: qvd
+-- Name: delete_views_for_removed_user_property; Type: TRIGGER; Schema: public; Owner: qvd
 --
 
-CREATE TRIGGER delete_tenant_views_for_removed_host_property AFTER DELETE ON host_properties FOR EACH ROW EXECUTE PROCEDURE delete_tenant_views_for_removed_property('host');
-
-
---
--- Name: delete_tenant_views_for_removed_osf_property; Type: TRIGGER; Schema: public; Owner: qvd
---
-
-CREATE TRIGGER delete_tenant_views_for_removed_osf_property AFTER DELETE ON osf_properties FOR EACH ROW EXECUTE PROCEDURE delete_tenant_views_for_removed_property('osf');
+CREATE TRIGGER delete_views_for_removed_user_property AFTER DELETE ON user_properties FOR EACH ROW EXECUTE PROCEDURE delete_views_for_removed_property('user');
 
 
 --
--- Name: delete_tenant_views_for_removed_user_property; Type: TRIGGER; Schema: public; Owner: qvd
+-- Name: delete_views_for_removed_vm_property; Type: TRIGGER; Schema: public; Owner: qvd
 --
 
-CREATE TRIGGER delete_tenant_views_for_removed_user_property AFTER DELETE ON user_properties FOR EACH ROW EXECUTE PROCEDURE delete_tenant_views_for_removed_property('user');
-
-
---
--- Name: delete_tenant_views_for_removed_vm_property; Type: TRIGGER; Schema: public; Owner: qvd
---
-
-CREATE TRIGGER delete_tenant_views_for_removed_vm_property AFTER DELETE ON vm_properties FOR EACH ROW EXECUTE PROCEDURE delete_tenant_views_for_removed_property('vm');
-
+CREATE TRIGGER delete_views_for_removed_vm_property AFTER DELETE ON vm_properties FOR EACH ROW EXECUTE PROCEDURE delete_views_for_removed_property('vm');
 
 --
 -- Name: di_blocked_or_unblocked_trigger; Type: TRIGGER; Schema: public; Owner: qvd

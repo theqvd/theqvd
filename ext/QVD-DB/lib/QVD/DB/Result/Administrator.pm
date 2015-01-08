@@ -36,7 +36,7 @@ sub acls
 
     for my $role ($self->roles)
     {
-	$acls->{$_} = 1 for $role->get_all_acl_names;
+	$acls->{$_} = 1 for $role->acls;
     }
 
     $self->adjust_acls_with_overwrite_lists($acls);

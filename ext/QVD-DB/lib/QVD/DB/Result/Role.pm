@@ -21,89 +21,45 @@ my $DB;
 
 #################
 
-sub get_roles_with_its_acls_info
-{
-    my $self = shift;    
-    my $out = {};
-
-    for ($self->acls_tree->get_role_names_ids)
-    {
-	$out->{$_->{id}}->{fixed} = $_->{fixed};
-	$out->{$_->{id}}->{internal} = $_->{internal};
-	$out->{$_->{id}}->{name} = $_->{name};
-	$out->{$_->{id}}->{acls} = [ sort $self->acls_tree->get_all_acl_names($_->{id}) ];
-    }
-
-    $out; 
-}
-
-sub number_of_acls
-{
-    my $self = shift;
-    my $roles_with_its_acls = $self->acls_tree->get_roles_with_its_acls_info;
-    my %acls;
-
-    while (my ($role_id,$role_info) = each %$roles_with_its_acls)
-    {
-	@acls{@{$role_info->{acls}}} = @{$role_info->{acls}};
-    }
-
-    my @acls = keys %acls;
-    my $acls = @acls;
-}
-
-sub get_positive_and_negative_acls_info
-{
-    my $self = shift;
-    my $out = { positive => [], negative => []};
-    $out->{positive} = [ sort $self->acls_tree->get_positive_own_acl_names ];
-    $out->{negative} = [ sort $self->acls_tree->get_negative_own_acl_names ];
-    $out; 
-}
-
-
 sub is_allowed_to
 {
     my ($self,$acl_name) = @_;
-    my %acls = map { $_ => 1 } $self->acls_tree->get_all_acl_names($self->id);
+    my %acls = map { $_ => 1 } $self->acls;
     defined $acls{$acl_name} ? return 1 : return 0;
-}
-
-sub get_all_acl_names
-{
-    my $self = shift;
-    $self->acls_tree->get_all_acl_names($self->id);
 }
 
 ######
 
-sub reload_acls_tree
+sub reload_acls
 {
     my $self = shift;
 
-    $self->{acls_tree} = 
-	$self->load_acls_tree;
+    $self->{acls} = 
+	$self->load_acls;
 
-    $self->{acls_tree};
+    $self->{acls};
 }
 
-sub acls_tree
+sub acls
 {
     my $self = shift;
 
-    $self->{acls_tree} //= 
-	$self->load_acls_tree;
+    $self->{acls} //= 
+	$self->load_acls;
 
-    $self->{acls_tree};
+    @{$self->{acls}};
 }
 
-sub load_acls_tree
+sub load_acls
 {
     my $self = shift;
 
     $DB //= QVD::DB->new();
-    my $tree_obj = $DB->resultset('Acls_Tree_For_Role')->search(
-	{},{bind => [$self->id]})->first;
+    my $rs = $DB->resultset('Operative_Acls_In_Role')->search()->search(
+	{'me.role_id' => $self->id});
+
+    my @acls = map { $_->acl_name } $rs->all; 
+    \@acls;
 }
 
 1;

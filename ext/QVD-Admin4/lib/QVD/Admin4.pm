@@ -73,6 +73,8 @@ sub get_extra_info_from_related_views
     return $extra unless $view_name;
 
     my $vrs = $DB->resultset($view_name)->search();
+    $vrs = $vrs->search($request->filters)
+	if $request->qvd_object_model->type_of_action eq 'details';
     $extra->{$_->id} = $_ for $vrs->all;
 
     $extra;
