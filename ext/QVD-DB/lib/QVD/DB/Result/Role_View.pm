@@ -9,7 +9,9 @@ __PACKAGE__->result_source_instance->is_virtual(1);
 __PACKAGE__->result_source_instance->view_definition(
 
 "
-WITH roles_with_all_acls AS
+WITH roles_with_inheritance AS
+(
+WITH inherited_roles_with_all_acls AS
 
  ( SELECT DISTINCT json_agg(a.name)::text as acls, r.* 
    FROM   all_acl_role_relations i JOIN roles r ON i.inheritor_id=r.id JOIN acls a ON i.acl_id=a.id 
@@ -19,14 +21,20 @@ WITH roles_with_all_acls AS
 SELECT DISTINCT i.inheritor_id as id, json_agg(DISTINCT(r.*))::text AS roles_json, 
        json_agg(DISTINCT(pa.name))::text as positive_acls_json,
        json_agg(DISTINCT(na.name))::text as negative_acls_json
-FROM roles_with_all_acls r 
+FROM inherited_roles_with_all_acls r 
 JOIN role_role_relations i ON i.inherited_id=r.id
-JOIN acl_role_relations pj ON i.inheritor_id=pj.role_id AND pj.positive='1'
-JOIN acls pa ON pa.id=pj.acl_id
-JOIN acl_role_relations nj ON i.inheritor_id=nj.role_id AND nj.positive='0'
-JOIN acls na ON na.id=nj.acl_id
+LEFT JOIN acl_role_relations pj ON i.inheritor_id=pj.role_id AND pj.positive='1'
+LEFT JOIN acls pa ON pa.id=pj.acl_id
+LEFT JOIN acl_role_relations nj ON i.inheritor_id=nj.role_id AND nj.positive='0'
+LEFT JOIN acls na ON na.id=nj.acl_id
 
 GROUP BY i.inheritor_id
+)
+SELECT r.id as id, 
+       CASE WHEN (i.roles_json IS NULL) THEN '[]' ELSE i.roles_json END AS roles_json,
+       CASE WHEN (i.positive_acls_json IS NULL) THEN '[]' ELSE i.positive_acls_json END AS positive_acls_json,
+       CASE WHEN (i.negative_acls_json IS NULL) THEN '[]' ELSE i.negative_acls_json END AS negative_acls_json
+FROM roles r LEFT JOIN roles_with_inheritance i ON i.id=r.id
 
 "
 
@@ -55,7 +63,7 @@ sub roles
     {
 	my $id = delete $role->{id};
 	my $acls = decode_json $role->{acls};
-	my @acls = sort @$acls;
+	my @acls = sort grep { defined $_ } @$acls;
 	$role->{acls} = \@acls;
 	$out->{$id} = $role;
     }
@@ -69,8 +77,8 @@ sub acls
     my $posotive_acls = decode_json $self->positive_acls_json;
     my $negative_acls = decode_json $self->negative_acls_json;
     my $out = { positive => [], negative => []};
-    $out->{positive} = [ sort @$posotive_acls  ];
-    $out->{negative} = [ sort @$negative_acls  ];
+    $out->{positive} = [ sort grep { defined $_ } @$posotive_acls  ];
+    $out->{negative} = [ sort grep { defined $_ } @$negative_acls  ];
     $out; 
 }
 
