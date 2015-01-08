@@ -81,7 +81,6 @@ CREATE TYPE view_types_enum AS ENUM (
 
 ALTER TYPE public.view_types_enum OWNER TO postgres;
 
-
 --
 -- Name: role_role_relations; Type: TABLE; Schema: public; Owner: qvd; Tablespace: 
 --
@@ -539,7 +538,7 @@ CREATE TABLE administrator_views_setups (
     field character varying(64) NOT NULL,
     visible boolean NOT NULL,
     device_type device_types_enum NOT NULL,
-    view_type character varying(64) NOT NULL,
+    view_type view_types_enum NOT NULL,
     property boolean NOT NULL,
     qvd_object qvd_objects_enum NOT NULL
 );
