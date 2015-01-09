@@ -346,6 +346,12 @@ Wat.C = {
         if (!that.checkACL('config.qvd.')) {
             delete Wat.I.cornerMenu.config;
         }
+        
+        // For tenant admins (not superadmins) the acl section tenant will not exist
+        if (Wat.C.tenantID != SUPERTENANT_ID && Wat.C.adminID != RECOVER_USER_ID) {
+            delete ACL_SECTIONS['tenant'];
+            delete ACL_SECTIONS_PATTERNS['tenant'];
+        }
     },
     
     sessionExpired: function (response) {

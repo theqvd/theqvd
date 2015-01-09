@@ -22,7 +22,8 @@ Wat.Views.AdminDetailsView = Wat.Views.DetailsView.extend({
 
         this.renderManagerRoles();
         
-        this.aclPatterns = $.extend(ACL_SECTIONS_PATTERNS, ACL_ACTIONS_PATTERNS);
+        this.aclPatterns = $.extend({}, ACL_SECTIONS_PATTERNS, ACL_ACTIONS_PATTERNS);
+
         var aclPatternsArray = _.toArray(this.aclPatterns);
         
         Wat.A.performAction('number_of_acls_in_admin', {}, {"admin_id": this.id, "acl_pattern": aclPatternsArray}, {}, this.renderACLsTree, this);
