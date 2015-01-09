@@ -177,6 +177,8 @@ client.slave.command =
 client.slave.client = bin/qvd-slaveclient
 ## enable making slave connections to VM
 client.slave.enable = 1
+## force locale, ignoring system LC_* and LANG environment variables
+client.locale =
 
 ## On OSX the window is hard to resize if it's too large, so
 ## we check whether we should default to a lower window size

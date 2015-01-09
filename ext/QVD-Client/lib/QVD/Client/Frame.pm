@@ -11,6 +11,7 @@ use QVD::Log;
 use Locale::gettext;
 use FindBin;
 use Encode;
+use POSIX qw(setlocale);
 
 use constant EVT_LIST_OF_VM_LOADED => Wx::NewEventType;
 use constant EVT_CONNECTION_ERROR  => Wx::NewEventType;
@@ -78,11 +79,15 @@ sub new {
 
 
 	
-    
+    if ( core_cfg('client.locale') ) {
+		my $loc = core_cfg('client.locale');
+		INFO "Overriding system locale with config file setting: $loc";
+		setlocale(&POSIX::LC_ALL, $loc);	
+	}
     
     $self->{domain} = Locale::gettext->domain("qvd-gui-client");
-
-    my $rootdir = "$FindBin::Bin/..";
+	my $bin = $FindBin::RealBin;
+	my $rootdir = "$bin/..";
 	my $localepath = "$rootdir/share/locale";
 
 	if ( -f "$rootdir/Build.PL" ) {
