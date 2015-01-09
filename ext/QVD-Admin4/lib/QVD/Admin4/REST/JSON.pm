@@ -9,6 +9,8 @@ our $VERSION = '0.01';
 has 'json', is => 'ro', isa => sub { die "Invalid type for attribute json" 
 					 unless ref(+shift) eq 'HASH'; }, required => '1';
 
+my $LOGICAL_OPERATORS = { -and => 1,  -or => 1 };
+
 sub BUILD
 {
     my $self = shift;
@@ -81,8 +83,28 @@ sub arguments
 sub filters_list
 {
     my $self = shift;
-    keys %{$self->filters};
+    $self->filters_list_rec($self->filters);
 }
+
+sub filters_list_rec
+{
+    my ($self,$filters) = @_;
+    my @filters;
+    while (my ($key,$value) = each %$filters)
+    {
+	if (exists $LOGICAL_OPERATORS->{$key})
+	{
+	    push @filters, $self->filters_list_rec({@$value});
+	}
+	else
+	{
+	    push @filters, $key;
+	}
+    }
+    return @filters;
+}
+
+
 
 sub parameters_list
 {
@@ -173,7 +195,7 @@ sub has_filter
     my ($self,$filter) = @_;
 
     $_ eq $filter && return 1
-	for keys %{$self->filters};
+	for $self->filters_list;
     return 0;
 }
 

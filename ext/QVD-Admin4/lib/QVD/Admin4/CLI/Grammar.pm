@@ -13,20 +13,8 @@ my $RULES =
 
 ## COMMANDS
 
- { left_side => 'ROOT', 
-   right_side => [ 'get', "QVD_OBJECT''" ],
-   cb   => sub { my ($ls,$rs) = @_; 
-		 $ls->set_api({ command => 'get_list', %{@{$rs}[1]->get_api} });}},
-
- { left_side => 'ROOT', 
-   right_side => [ 'get', "QVD_OBJECT''", 'ORDER_BY' ],
-   cb   => sub { my ($ls,$rs) = @_; 
-		 $ls->set_api({ command => 'get_list', %{@{$rs}[1]->get_api}, %{@{$rs}[2]->get_api}});}},
-
- { left_side => 'ROOT', 
-   right_side => [ 'set', "QVD_OBJECT'", 'WITH' ],
-   cb   => sub { my ($ls,$rs) = @_; 
-		 $ls->set_api({ command => 'update', %{@{$rs}[1]->get_api}, %{@{$rs}[2]->get_api}});}},
+# GET & SET COMMANDS have been implemented as bare words
+# at the beginning of ROOT rules (see the end of the grammar)
 
  { left_side => 'CMD', 
    right_side => [ 'del' ],
@@ -111,7 +99,6 @@ my $RULES =
 		 $ls->set_api({ command => 'unassign'});}},
 
 # INDIVIDUALS (OBJECTS IN QVD UNIVERSE)
-
 
  { left_side => 'QVD_OBJECT', 
    right_side => [ 'tenant' ],
@@ -210,16 +197,29 @@ my $RULES =
 # This unknown tokens can be combined with identification or
 # coordination operators in order to build key/value sets or keys (or values) lists
 
+
  { left_side => 'KEY', 
    right_side => [ $UNKNOWN_TAG ],
    cb   => sub { my ($ls,$rs) = @_; 
 		 $ls->set_api([ @{$rs}[0]->get_api ])}},
 
- { left_side => 'KEY', 
-   right_side => [ 'KEY', 'COORD', 'KEY'],
+ { left_side => "KEY'", 
+   right_side => [ 'COORD', 'KEY'],
    cb   => sub { my ($ls,$rs) = @_; 
 		 $ls->set_api(
-		     [ @{@{$rs}[0]->get_api}, @{@{$rs}[2]->get_api} ]);}},
+		     [ @{@{$rs}[1]->get_api} ]);}},
+
+ { left_side => "KEY'", 
+   right_side => [ 'COORD', "KEY''"],
+   cb   => sub { my ($ls,$rs) = @_; 
+		 $ls->set_api(
+		     [ @{@{$rs}[1]->get_api} ]);}},
+
+ { left_side => "KEY''", 
+   right_side => [ 'KEY', "KEY'" ],
+   cb   => sub { my ($ls,$rs) = @_; 
+		 $ls->set_api(
+		     [ @{@{$rs}[0]->get_api}, @{@{$rs}[1]->get_api} ]);}},
 
  { left_side => 'KEY_VALUE', 
    right_side => [ $UNKNOWN_TAG, 'EQUAL', $UNKNOWN_TAG],
@@ -227,41 +227,86 @@ my $RULES =
 		 $ls->set_api({ @{$rs}[0]->get_api => @{$rs}[2]->get_api })}},
 
  { left_side => 'KEY_VALUE', 
-   right_side => [ 'KEY_VALUE', 'COORD', 'KEY_VALUE'],
+   right_side => [ $UNKNOWN_TAG, 'EQUAL', "KEY''"],
    cb   => sub { my ($ls,$rs) = @_; 
-		 $ls->set_api(
-		     { %{@{$rs}[0]->get_api}, %{@{$rs}[2]->get_api} });}},
+		 $ls->set_api({ @{$rs}[0]->get_api => @{$rs}[2]->get_api })}},
 
  { left_side => "KEY_VALUE'", 
-   right_side => [ "KEY_VALUE", 'LOGICAL', "KEY_VALUE'" ],
-   cb   => sub { my ($ls,$rs) = @_; 
-		 $ls->set_api({ @{$rs}[1]->get_api  => [@{$rs}[0]->get_api,@{$rs}[2]->get_api] });}},
-
- { left_side => "KEY_VALUE'", 
-   right_side => [ "KEY_VALUE", 'LOGICAL', "PARENTHESIS" ],
-   cb   => sub { my ($ls,$rs) = @_; 
-		 $ls->set_api({ @{$rs}[1]->get_api  => [@{$rs}[0]->get_api,@{$rs}[2]->get_api] });}},
-
- { left_side => "KEY_VALUE'", 
-   right_side => [ "PARENTHESIS", 'LOGICAL', "KEY_VALUE'" ],
-   cb   => sub { my ($ls,$rs) = @_; 
-		 $ls->set_api({ @{$rs}[1]->get_api  => [@{$rs}[0]->get_api,@{$rs}[2]->get_api] });}},
-
- { left_side => "KEY_VALUE'", 
-   right_side => [ "PARENTHESIS", 'LOGICAL', "PARENTHESIS" ],
-   cb   => sub { my ($ls,$rs) = @_; 
-		 $ls->set_api({ @{$rs}[1]->get_api  => [@{$rs}[0]->get_api,@{$rs}[2]->get_api] });}},
-
- { left_side => "KEY_VALUE'", 
-   right_side => [ 'KEY_VALUE' ],
-   cb   => sub { my ($ls,$rs) = @_; 
-		 $ls->set_api(@{$rs}[0]->get_api);}},
-
- { left_side => "PARENTHESIS", 
-   right_side => [ 'OP', "KEY_VALUE'", 'CP' ],
+   right_side => [ 'COORD', 'KEY_VALUE'],
    cb   => sub { my ($ls,$rs) = @_; 
 		 $ls->set_api(@{$rs}[1]->get_api);}},
 
+ { left_side => "KEY_VALUE'", 
+   right_side => [ 'COORD', "KEY_VALUE''"],
+   cb   => sub { my ($ls,$rs) = @_; 
+		 $ls->set_api(@{$rs}[1]->get_api);}},
+
+ { left_side => "KEY_VALUE''", 
+   right_side => [ 'KEY_VALUE', "KEY_VALUE'" ],
+   cb   => sub { my ($ls,$rs) = @_; 
+		 $ls->set_api({%{@{$rs}[0]->get_api}, %{@{$rs}[1]->get_api} });}},
+
+ { left_side => "PARENTHESIS", 
+   right_side => [ 'OP', "KEY_VALUE", 'CP' ],
+   cb   => sub { my ($ls,$rs) = @_; 
+		 $ls->set_api(@{$rs}[1]->get_api);}},
+
+ { left_side => "PARENTHESIS", 
+   right_side => [ 'OP', "KEY_VALUE''", 'CP' ],
+   cb   => sub { my ($ls,$rs) = @_; 
+		 $ls->set_api(@{$rs}[1]->get_api);}},
+
+ { left_side => "PARENTHESIS", 
+   right_side => [ 'OP', "LOGICAL''", 'CP' ],
+   cb   => sub { my ($ls,$rs) = @_; 
+		 $ls->set_api(@{$rs}[1]->get_api);}},
+
+ { left_side => "LOGICAL'", 
+   right_side => [ 'LOGICAL', "KEY_VALUE" ],
+   cb   => sub { my ($ls,$rs) = @_; 
+		 $ls->set_api({ @{$rs}[0]->get_api  => [%{@{$rs}[1]->get_api}] });}},
+
+ { left_side => "LOGICAL'", 
+   right_side => [ 'LOGICAL', "KEY_VALUE''" ],
+   cb   => sub { my ($ls,$rs) = @_; 
+		 $ls->set_api({ @{$rs}[0]->get_api  => ['-and' => [%{@{$rs}[1]->get_api}]] });}},
+
+ { left_side => "LOGICAL'", 
+   right_side => [ 'LOGICAL', "PARENTHESIS" ],
+   cb   => sub { my ($ls,$rs) = @_; 
+		 $ls->set_api({ @{$rs}[0]->get_api  => [%{@{$rs}[1]->get_api}] });}},
+
+ { left_side => "LOGICAL'", 
+   right_side => [ 'LOGICAL', "LOGICAL''" ],
+   cb   => sub { my ($ls,$rs) = @_; 
+		 $ls->set_api({ @{$rs}[0]->get_api  => [%{@{$rs}[1]->get_api}] });}},
+
+ { left_side => "LOGICAL''", 
+   right_side => [ "KEY_VALUE", "LOGICAL'" ],
+   cb   => sub { my ($ls,$rs) = @_; 
+		 my @ops = keys  %{@{$rs}[1]->get_api};
+		 my $op = $ops[0];
+		 my $api = @{$rs}[1]->get_api;
+		 unshift @{$api->{$op}}, %{@{$rs}[0]->get_api};
+		 $ls->set_api($api);}},
+
+ { left_side => "LOGICAL''", 
+   right_side => [ "KEY_VALUE''", "LOGICAL'" ],
+   cb   => sub { my ($ls,$rs) = @_; 
+		 my @ops = keys  %{@{$rs}[1]->get_api};
+		 my $op = $ops[0];
+		 my $api = @{$rs}[1]->get_api;
+		 unshift @{$api->{$op}}, %{@{$rs}[0]->get_api};
+		 $ls->set_api($api);}},
+
+ { left_side => "LOGICAL''", 
+   right_side => [ "PARENTHESIS", "LOGICAL'" ],
+   cb   => sub { my ($ls,$rs) = @_; 
+		 my @ops = keys  %{@{$rs}[1]->get_api};
+		 my $op = $ops[0];
+		 my $api = @{$rs}[1]->get_api;
+		 unshift @{$api->{$op}}, %{@{$rs}[0]->get_api};
+		 $ls->set_api($api);}},
 
 # PHRASES
 
@@ -275,11 +320,21 @@ my $RULES =
    cb   => sub { my ($ls,$rs) = @_; 
 		 $ls->set_api({ arguments => @{$rs}[1]->get_api });}},
 
+ { left_side => 'WITH', 
+   right_side => [ 'with', "KEY_VALUE''" ],
+   cb   => sub { my ($ls,$rs) = @_; 
+		 $ls->set_api({ arguments => @{$rs}[1]->get_api });}},
+
 # AS introduces a list of keys to be assigned as tags
 # Ex: TAG dis 2 AS default
 
  { left_side => 'AS', 
    right_side => [ 'as', 'KEY' ],
+   cb   => sub { my ($ls,$rs) = @_; 
+		 $ls->set_api(@{$rs}[1]->get_api);}},
+
+ { left_side => 'AS', 
+   right_side => [ 'as', "KEY''" ],
    cb   => sub { my ($ls,$rs) = @_; 
 		 $ls->set_api(@{$rs}[1]->get_api);}},
 
@@ -296,6 +351,11 @@ my $RULES =
 
  { left_side => 'BY', 
    right_side => [ 'by', 'KEY' ],
+   cb   => sub { my ($ls,$rs) = @_; 
+		 $ls->set_api(@{$rs}[1]->get_api);}},
+
+ { left_side => 'BY', 
+   right_side => [ 'by', "KEY''" ],
    cb   => sub { my ($ls,$rs) = @_; 
 		 $ls->set_api(@{$rs}[1]->get_api);}},
 
@@ -344,23 +404,30 @@ my $RULES =
 # QVD_OBJECT specified with key/value filters
 
  { left_side => "QVD_OBJECT'", 
-   right_side => [ 'QVD_OBJECT', "KEY_VALUE'" ],
+   right_side => [ 'QVD_OBJECT', "KEY_VALUE" ],
    cb   => sub { my ($ls,$rs) = @_; 
 		 $ls->set_api({ qvd_object => @{$rs}[0]->get_api->{qvd_object},
                             filters => @{$rs}[1]->get_api });}},
 
-
-# QVD_OBJECT specified with a list of possible value filters
-# The key of this filters must be a default one (typically id or name)
+ { left_side => "QVD_OBJECT'", 
+   right_side => [ 'QVD_OBJECT', "KEY_VALUE''" ],
+   cb   => sub { my ($ls,$rs) = @_; 
+		 $ls->set_api({ qvd_object => @{$rs}[0]->get_api->{qvd_object},
+                            filters => @{$rs}[1]->get_api });}},
 
  { left_side => "QVD_OBJECT'", 
-   right_side => [ 'QVD_OBJECT', 'KEY' ],
+   right_side => [ 'QVD_OBJECT', "LOGICAL''" ],
    cb   => sub { my ($ls,$rs) = @_; 
 		 $ls->set_api({ qvd_object => @{$rs}[0]->get_api->{qvd_object},
                             filters => @{$rs}[1]->get_api });}},
 
  { left_side => "QVD_OBJECT''", 
    right_side => ['KEY', 'OF', "QVD_OBJECT'"],
+   cb   => sub { my ($ls,$rs) = @_; 
+		 $ls->set_api({ fields => @{$rs}[0]->get_api, %{@{$rs}[2]->get_api}});}},
+
+ { left_side => "QVD_OBJECT''", 
+   right_side => ["KEY''", 'OF', "LOGICAL''"],
    cb   => sub { my ($ls,$rs) = @_; 
 		 $ls->set_api({ fields => @{$rs}[0]->get_api, %{@{$rs}[2]->get_api}});}},
 
@@ -377,7 +444,6 @@ my $RULES =
    cb   => sub { my ($ls,$rs) = @_; 
 		 $ls->set_api(@{$rs}[0]->get_api);}},
 
-
 # TOP PHRASES (ROOT)
 
  { left_side => 'ROOT', 
@@ -385,7 +451,6 @@ my $RULES =
    cb   => sub { my ($ls,$rs) = @_; 
 		 $ls->set_api({ %{@{$rs}[0]->get_api},
                             %{@{$rs}[1]->get_api}});}},
-
 
  { left_side => 'ROOT', 
    right_side => [ 'IND_CMD', "QVD_OBJECT'", 'TO' ],
@@ -399,9 +464,24 @@ my $RULES =
 		 $ls->set_api({ %{@{$rs}[0]->get_api}, %{@{$rs}[1]->get_api},
 				arguments => { qvd_object => 'di_tag', 
 					       filters => @{$rs}[2]->get_api }});}},
+ { left_side => 'ROOT', 
+   right_side => [ 'get', "QVD_OBJECT''" ],
+   cb   => sub { my ($ls,$rs) = @_; 
+		 $ls->set_api({ command => 'get_list', %{@{$rs}[1]->get_api} });}},
 
+ { left_side => 'ROOT', 
+   right_side => [ 'get', "QVD_OBJECT''", 'ORDER_BY' ],
+   cb   => sub { my ($ls,$rs) = @_; 
+		 $ls->set_api({ command => 'get_list', %{@{$rs}[1]->get_api}, %{@{$rs}[2]->get_api}});}},
+
+ { left_side => 'ROOT', 
+   right_side => [ 'set', "QVD_OBJECT'", 'WITH' ],
+   cb   => sub { my ($ls,$rs) = @_; 
+		 $ls->set_api({ command => 'update', %{@{$rs}[1]->get_api}, %{@{$rs}[2]->get_api}});}},
 
 ];
+
+
 
 
 my ($RULES_BY_LEFT_SIDE,$RULES_BY_FIRST_RIGHT_SIDE) = ({},{});
@@ -451,3 +531,4 @@ sub unknown_tag
 }
 
 1;
+

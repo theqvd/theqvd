@@ -320,6 +320,7 @@ sub check_filters_validity_in_json
 	for $self->qvd_object_model->mandatory_filters;
 }
 
+
 sub check_fields_validity_in_json
 {
     my $self = shift;
@@ -413,28 +414,89 @@ sub check_order_by_validity_in_json
     my $self = shift;
 }
 
+############################################################
+############################################################
+### MAPPING OF FILTERS WITH SUPPORT TO LOGICAL OPERATORS ###
+############################################################
+############################################################
+
+
 sub set_filters_in_request
 {
     my $self = shift;
-    for my $key ($self->json_wrapper->filters_list)
+    my $filters = $self->json_wrapper->filters;
+
+    while (my ($key,$value) = each %$filters)
     {
-	my $key_dbix_format = 
-	    $self->qvd_object_model->map_filter_to_dbix_format($key);
-	my $value = $self->json_wrapper->get_filter_value($key);
-	my $value_normalized = $self->qvd_object_model->normalize_value($key,$value);
-
-	if ($self->qvd_object_model->subchain_filter($key))
+	my ($key_dbix_format,$value_normalized);
+	if (exists $LOGICAL_OPERATORS->{$key})
 	{
-	    $value_normalized = { ILIKE => "%".$value_normalized."%"};
+	    ($key_dbix_format,$value_normalized) = 
+		($key,$self->map_logical_operator_filter_value($value));
 	}
-	elsif ($self->qvd_object_model->commodin_filter($key))
+	else
 	{
-	    $value_normalized = { ILIKE => $value_normalized }; 
+	    ($key_dbix_format,$value_normalized) = $self->map_key_value_filter($key,$value);
 	}
-
 	$self->set_filter($key_dbix_format,$value_normalized);
     }
 }
+
+sub map_logical_operator_filter_value
+{
+    my ($self,$filters) = @_;  
+    my $position = 0;
+    my ($key,$value,$out);
+    my $odd = sub { my $n = shift; return $n % 2; };
+    my $set_value = sub { $value = shift; };
+    my $set_key = sub { ($key,$value) = (shift,undef); };
+
+    for my $item (@$filters)
+    {
+	$odd->($position++) ? 
+	    $set_value->($item) : $set_key->($item);
+
+	if (defined $value)
+	{
+	    if (exists $LOGICAL_OPERATORS->{$key})
+	    {
+		$value = $self->map_logical_operator_filter_value($value);
+		push @$out, ($key,$value);
+	    }
+	    else
+	    {
+		push @$out, $self->map_key_value_filter($key,$value);
+	    }
+	}
+    }
+    return $out;
+}
+
+
+sub map_key_value_filter
+{
+    my ($self,$key,$value) = @_;
+
+    my $key_dbix_format = 
+	$self->qvd_object_model->map_filter_to_dbix_format($key);
+
+    my $value_normalized = $self->qvd_object_model->normalize_value($key,$value);
+
+    if ($self->qvd_object_model->subchain_filter($key))
+    {
+	$value_normalized = { ILIKE => "%".$value_normalized."%"};
+    }
+    elsif ($self->qvd_object_model->commodin_filter($key))
+    {
+	$value_normalized = { ILIKE => $value_normalized }; 
+    }
+    return ($key_dbix_format,$value_normalized);
+}
+
+
+######################
+######################
+######################
 
 sub set_arguments_in_request
 {
@@ -538,5 +600,6 @@ sub related_view
     my $self = shift;
     $self->qvd_object_model->related_view;
 }
+
 
 1;

@@ -8,16 +8,46 @@ use QVD::Admin4::CLI::Grammar;
 use QVD::Admin4::CLI::Parser;
 use QVD::Admin4::CLI::Parser::Unificator;
 use QVD::Admin4::CLI::Tokenizer;
-use Text::Table;
+use Text::SimpleTable::AutoWidth;
+use Mojo::UserAgent;
+
+my $res;
+my $head = "cli > ";
+
+print "$head Address: ";
+my $address = <>;
+chomp $address;
+
+print "$head Login: ";
+my $login = <>;
+chomp $login;
+
+print "$head Password: ";
+my $password = <>;
+chomp $password;
+
+my $ua = Mojo::UserAgent->new;
+
+my $sid =  eval { $ua->post($address, 
+			    json => { login => $login, password => $password, 
+				      action => "current_admin_setup"})->res->json->{sid} };
+
 
 my $unificator = QVD::Admin4::CLI::Parser::Unificator->new();
 my $grammar = QVD::Admin4::CLI::Grammar->new();
 my $parser = QVD::Admin4::CLI::Parser->new( grammar => $grammar, unificator => $unificator);
 my $tokenizer = QVD::Admin4::CLI::Tokenizer->new();
-my $CLI = QVD::Admin4::CLI->new( parser => $parser, tokenizer => $tokenizer);
-my $res;
 
-print 'cli > ';
+my $CLI = QVD::Admin4::CLI->new( 
+    sid => $sid,
+    ua => $ua, 
+    url => $address, 
+    parser => $parser, 
+    tokenizer => $tokenizer);
+
+
+$head = "cli.$login\@$address> ";
+print $head;
 
 while (my $query = <>)
 {
@@ -30,92 +60,34 @@ while (my $query = <>)
     }
     else
     { 
-	print_rows_table();
+	print_table();
     }
 
-    print 'cli > ';
+    print $head;
 }
-
-
-#### OUTPUT MODEL FOR Text::Table
-
-my @model = ( 
-{ is_sep => 1,
-  title  => '|',
-  body   => '|' },
-
-{ title   => "Key",
-  align   => 'left',
-  align_title => 'center',
-  align_title_lines => 'center' },
-
-{ is_sep => 1,
-  title  => '|',
-  body   => '|' },
-
-{ title   => "Value",
-  align   => 'left',
-  align_title => 'center',
-  align_title_lines => 'center' },
-
-{ is_sep => 1,
-  title  => '|',
-  body   => '|' }
-
-);
 
 #### PARSE THE RESPONSE AND PRINT IT
 	      
-sub print_rows_table
+sub print_table
 {
     my $n = 0;
     my $status     = $res->json('/status') // '';
     my $message    = $res->json('/message') // '';
     my $properties = $res->json("/rows/$n");
 
+    my $tb = Text::SimpleTable::AutoWidth->new();
+    $tb->max_width(500);
+    my $first = $res->json("/rows/0") // {};
+    my @keys = sort keys %$first;
+    $tb->captions(\@keys);
+
     while ($properties = $res->json("/rows/$n")) 
     {
-	my $tb = Text::Table->new(@model);
-	$tb->add("Status $status","$message");
+	my @values = map {  defined $_ ? $_ : 'undef' } 
+	map { ref($_) ? 'ref' : $_ } @{$properties}{@keys};
 
-	while (my ($k,$v) = each %$properties)
-	{
-	    $tb->add($k,$v);
-	}
-
+	$tb->row(@values);
 	$n++;
-	print_table($tb);
     }
-    
-    print_status_table() unless $n;
-}
-
-sub print_status_table
-{
-    my $status     = $res->json('/status') // '';
-    my $message    = $res->json('/message') // '';
-
-    my $tb = Text::Table->new(@model);
-    $tb->add("Status $status","$message");
-    print_table($tb);
-}
-
-sub print_table
-{
-    my $tb = shift;
-    my $rule = $tb->rule(qw(- +));
-    my @body = $tb->body;
-    my $title = $tb->title;
-
-    print "\n";
-    print $rule;
-    print $tb->title;
-    print $rule;
-    
-    for my $row (@body)
-    {
-	print $row;
-	print $rule;
-    }
-    print "\n";
+    print $tb->draw; 
 }

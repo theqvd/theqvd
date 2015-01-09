@@ -36,6 +36,7 @@ sub parse
     $self->{chart} = QVD::Admin4::CLI::Parser::Chart->new();
 
     my $edges = $self->get_edges_from_initial_tokens($tokens_list);
+
     $self->parse_recursive($edges);
 
     my $response = { analysis => []};
