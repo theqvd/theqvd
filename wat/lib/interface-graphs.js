@@ -33,7 +33,7 @@ Wat.I.G = {
                 hoverable: false,
                 clickable: false
             };
-
+        
         var pieData = [
             { label: "",  data: 0, color: COL_BRAND},
             { label: "",  data: 0, color: '#DDD'}
@@ -41,7 +41,8 @@ Wat.I.G = {
 
         // First data start from 0 and second one from total to make grow effect
         pieData[0].data = 0;
-        pieData[1].data = dataTotal;
+        // When no data, graph looks ugly. Hack to fix it is change dataTotal to 1
+        pieData[1].data = dataTotal || 1;
 
         $(dataStatSelector).html('0/' + dataTotal);
         $(percentStatSelector).html('0%');
@@ -123,13 +124,26 @@ Wat.I.G = {
                 clickable: false
             };
 
+        // When no data, graph looks ugly. Hack to fix it is change data2 to 1
+        if (data2 == 0 ){
+            data2 = 1;
+        }
+        
         var pieData = [
             { label: "",  data: data1, color: COL_BRAND},
             { label: "",  data: data2, color: '#DDD'}
         ];
 
         $(dataStatSelector).html(data1 + '/' + dataTotal);
-        $(percentStatSelector).html(parseInt((data1 / dataTotal) * 100) + '%');
+        
+        if (dataTotal == 0) {
+            var percentData = 0;
+        }
+        else {
+            var percentData = parseInt((data1 / dataTotal) * 100);
+        }
+        
+        $(percentStatSelector).html(percentData + '%');
 
         var plot = $.plot(plotSelector, pieData, {
             series: series,

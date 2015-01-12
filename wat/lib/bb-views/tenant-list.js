@@ -64,9 +64,13 @@ Wat.Views.TenantListView = Wat.Views.ListView.extend({
         var context = $('.' + this.cid + '.editor-container');
 
         var name = context.find('input[name="name"]').val();
+        var language = context.find('select[name="language"]').val(); 
+        var block = context.find('select[name="block"]').val();
         
         var arguments = {
-            "name": name
+            "name": name,
+            "block": block,
+            "language": language
         };
                                 
         this.createModel(arguments, this.fetchList);

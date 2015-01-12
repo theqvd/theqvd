@@ -288,6 +288,9 @@ Wat.Views.AdminDetailsView = Wat.Views.DetailsView.extend({
             }
         }
         
+        var language = context.find('select[name="language"]').val();
+        arguments['language'] = language;
+        
         this.updateModel(arguments, filters, this.fetchDetails);
     },
     

@@ -81,11 +81,13 @@ Wat.Views.AdminListView = Wat.Views.ListView.extend({
         var name = context.find('input[name="name"]').val();
         var tenant = context.find('select[name="tenant"]').val();
         var password = context.find('input[name="password"]').val();
-        
+        var language = context.find('select[name="language"]').val();
+
         var arguments = {
             "name": name,
             "password": password,
-            "tenant": tenant
+            "tenant": tenant,
+            "language": language
         };
                    
         
