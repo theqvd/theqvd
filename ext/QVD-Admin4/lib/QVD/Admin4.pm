@@ -21,7 +21,7 @@ use DBIx::Error;
 use TryCatch;
 use Data::Page;
 use Clone qw(clone);
-
+use QVD::Admin4::AclsOverwriteList;
 our $VERSION = '0.01';
 
 my $DB;
@@ -746,7 +746,14 @@ sub get_acls_in_admins
 {
     my ($self,$request) = @_;
     my (@rows, $rs);
-    eval { $rs = $DB->resultset($request->table)->search()->search(
+
+    my $admin = $request->get_parameter_value('administrator');
+    my $acls_overwrite_list = QVD::Admin4::AclsOverwriteList->new(admin => $admin, admin_id => $admin->id);
+    my $bind = [$acls_overwrite_list->acls_to_close_re,
+		$acls_overwrite_list->acls_to_open_re,
+		$acls_overwrite_list->acls_to_hide_re];
+
+    eval { $rs = $DB->resultset($request->table)->search({},{bind => $bind})->search(
 	       $request->filters, $request->modifiers);
 	   @rows = $rs->all };
     QVD::Admin4::Exception->throw(exception => $@, query => 'select') if $@;
@@ -755,12 +762,18 @@ sub get_acls_in_admins
       rows => \@rows};
 }
 
-
 sub get_acls_in_roles
 {
     my ($self,$request) = @_;
     my (@rows, $rs);
-    eval { $rs = $DB->resultset($request->table)->search()->search(
+
+    my $admin = $request->get_parameter_value('administrator');
+    my $acls_overwrite_list = QVD::Admin4::AclsOverwriteList->new(admin => $admin, admin_id => $admin->id);
+    my $bind = [$acls_overwrite_list->acls_to_close_re,
+		$acls_overwrite_list->acls_to_open_re,
+		$acls_overwrite_list->acls_to_hide_re];
+
+    eval { $rs = $DB->resultset($request->table)->search({},{bind => $bind})->search(
 	       $request->filters, $request->modifiers);
 	   @rows = $rs->all };
     QVD::Admin4::Exception->throw(exception => $@, query => 'select') if $@;
@@ -790,13 +803,13 @@ sub current_admin_setup
 sub get_number_of_acls_in_role
 {
     my ($self,$admin,$json_wrapper) = @_;
-    $self->get_number_of_acls_in_role_or_admin('Role',$json_wrapper);
+    $self->get_number_of_acls_in_role_or_admin('Operative_Acls_In_Role',$admin,$json_wrapper);
 }
 
 sub get_number_of_acls_in_admin
 {
     my ($self,$admin,$json_wrapper) = @_;
-    $self->get_number_of_acls_in_role_or_admin('Administrator',$json_wrapper);
+    $self->get_number_of_acls_in_role_or_admin('Operative_Acls_In_Administrator',$admin,$json_wrapper);
 }
 
 sub get_number_of_acls_in_role_or_admin
@@ -806,15 +819,22 @@ sub get_number_of_acls_in_role_or_admin
     my $acl_patterns = $json_wrapper->get_filter_value('acl_pattern') //
 	QVD::Admin4::Exception->throw(code=>'6220', object => 'acl_pattern');
     $acl_patterns = ref($acl_patterns) ? $acl_patterns : [$acl_patterns];
-    my $id = $json_wrapper->get_filter_value($table eq 'Role' ? 'role_id' : 'admin_id') // 
-	QVD::Admin4::Exception->throw(code=>'6220', object => $table eq 'Role' ? 'role_id' : 'admin_id'); 
-
-    my $object = $DB->resultset($table)->find({ id => $id }) //
-	QVD::Admin4::Exception->throw(code=>  $table eq 'Role' ? 6370 : 6360);
+    my $id = $json_wrapper->get_filter_value($table eq 'Operative_Acls_In_Role' ? 'role_id' : 'admin_id') // 
+	QVD::Admin4::Exception->throw(code=>'6220', object => $table eq 'Operative_Acls_In_Role' ? 'role_id' : 'admin_id'); 
 
     my $output;
     for my $acl_pattern (@$acl_patterns)
     {
+	my $admin = $request->get_parameter_value('administrator');
+	my $acls_overwrite_list = QVD::Admin4::AclsOverwriteList->new(admin => $admin, admin_id => $admin->id);
+	my $bind = [$acls_overwrite_list->acls_to_close_re,
+		    $acls_overwrite_list->acls_to_open_re,
+		    $acls_overwrite_list->acls_to_hide_re];
+
+
+	my $rs = $DB->resultset($table)->search({},{bind => $bind})->search();
+
+
 	my $rs = $DB->resultset('ACL')->search({ name => { ilike => $acl_pattern }});
 	my $total_number_of_acls = $rs->count;
 	my @available_acls_in_role = grep { $object->is_allowed_to($_->name) } $rs->all;

@@ -1,5 +1,6 @@
 package QVD::DB::Result::Administrator;
 use base qw/DBIx::Class/;
+use QVD::DB;
 use QVD::Admin4::AclsOverwriteList;
 
 __PACKAGE__->load_components(qw/Core/);
@@ -21,6 +22,8 @@ __PACKAGE__->has_many(role_rels => 'QVD::DB::Result::Role_Administrator_Relation
 __PACKAGE__->has_many(views => 'QVD::DB::Result::Administrator_Views_Setup', 'administrator_id');
 __PACKAGE__->belongs_to(tenant => 'QVD::DB::Result::Tenant',  'tenant_id', { cascade_delete => 0 });
 
+my $DB;
+
 sub roles
 {
     my $self = shift;
@@ -34,40 +37,20 @@ sub acls
 	defined $self->{acls_cache};
     my $acls = {};
 
-    for my $role ($self->roles)
-    {
-	$acls->{$_} = 1 for $role->acls;
-    }
+    $DB //= QVD::DB->new();
+ 
+    my $acls_overwrite_list = QVD::Admin4::AclsOverwriteList->new(admin => $self,admin_id => $self->id);
+    my $bind = [$acls_overwrite_list->acls_to_close_re,
+		$acls_overwrite_list->acls_to_open_re,
+		$acls_overwrite_list->acls_to_hide_re];
 
-    $self->adjust_acls_with_overwrite_lists($acls);
+   my $rs = $DB->resultset('Operative_Acls_In_Administrator')->search({},{ bind => $bind })->search(
+	{'me.admin_id' => $self->id, 'me.operative' => 1});
 
-    $self->{acls_cache} = [keys %$acls];
+    my @operative_acls = map { $_->acl_name } $rs->all; 
 
-    keys %$acls;
-}
-
-sub adjust_acls_with_overwrite_lists
-{
-    my ($self,$acls) = @_;
-    my @lists_names;
-    push @lists_names,'tenant_admin_acls_restrictions'
-	unless $self->is_superadmin;
-
-    push @lists_names,'recovery_admin_acls'
-	if $self->is_recovery_admin;
-
-    my @lists; push @lists,QVD::Admin4::AclsOverwriteList->new(name => $_)
-	for @lists_names;
-
-    for my $list (@lists)
-    {
-	$acls->{$_} = 1 for $list->get_positive_acls_list;
-    }
-
-    for my $list (@lists)
-    {
-       delete $acls->{$_} for $list->get_negative_acls_list;
-    }
+    $self->{acls_cache} = \@operative_acls;
+    @operative_acls;
 }
 
 sub is_recovery_admin

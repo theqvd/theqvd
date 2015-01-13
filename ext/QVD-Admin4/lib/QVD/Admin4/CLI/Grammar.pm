@@ -482,7 +482,84 @@ my $RULES =
 ];
 
 
+my $COMMAND_TO_API_ACTION_MAPPER =
+{
+    get_list => { vm => 'vm_get_list', 
+		  user => 'user_get_list', 
+		  host => 'host_get_list', 
+		  osf => 'osf_get_list', 
+		  di => 'di_get_list', 
+		  tenant => 'tenant_get_list',
+		  role => 'role_get_list',
+		  acl => 'acl_tiny_list',
+		  admin => 'admin_get_list' },
 
+    update => { vm => 'vm_update', 
+		user => 'user_update', 
+		host => 'host_update', 
+		osf => 'osf_update', 
+		di => 'di_update', 
+		tenant => 'tenant_update',
+		role => 'role_update',
+		admin => 'admin_update' },
+
+    create => { vm => 'vm_create', 
+		user => 'user_create', 
+		host => 'host_create', 
+		osf => 'osf_create', 
+		di => 'di_create', 
+		tenant => 'tenant_create',
+		role => 'role_create',
+		admin => 'admin_create' },
+	   
+    delete => { vm => 'vm_delete', 
+		user => 'user_delete', 
+		host => 'host_delete', 
+		osf => 'osf_delete', 
+		di => 'di_delete', 
+		tenant => 'tenant_delete',
+		role => 'role_delete',
+		admin => 'admin_delete' },
+	   
+    start => { vm => 'vm_start'}, 
+
+    stop => { vm => 'vm_stop'}, 
+
+    disconnect => { vm => 'vm_user_disconnect'}, 
+
+    assign => { vm => 'vm_update', 
+		user => 'user_update', 
+		host => 'host_update', 
+		osf => 'osf_update', 
+		di => 'di_update', 
+		tenant => 'tenant_update',
+		role => 'role_update',
+		admin => 'admin_update' },
+
+    unassign => { vm => 'vm_update', 
+		  user => 'user_update', 
+		  host => 'host_update', 
+		  osf => 'osf_update', 
+		  di => 'di_update', 
+		  tenant => 'tenant_update',
+		  role => 'role_update',
+		  admin => 'admin_update' },
+};
+
+
+my $NESTED_COMMAND_TO_API_ACTION_MAPPER = {
+
+    assign => { property => { __properties_changes__ => { set => {}}}, 
+		di_tag => { __tags_changes__ => { create => []}}, 
+		role => __roles_changes__ => { assign_roles => []}}, 
+		acl => { __acls_changes__ => { assign_acls => []}} },
+
+    unassign => { property => { __properties_changes__ => { delete => []}}, 
+		  di_tag => { __tags_changes__ => { delete => []}}, 
+		  role => { __roles_changes__ => { unassign_roles => []}}, 
+		  acl => { __acls_changes__ => { unassign_acls => []}} },
+
+};
 
 my ($RULES_BY_LEFT_SIDE,$RULES_BY_FIRST_RIGHT_SIDE) = ({},{});
 

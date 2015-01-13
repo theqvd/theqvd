@@ -3,6 +3,7 @@ package QVD::Admin4::REST::JSON;
 use strict;
 use warnings;
 use Moo;
+use Clone qw(clone);
 use 5.010;
 our $VERSION = '0.01';
 
@@ -14,6 +15,8 @@ my $LOGICAL_OPERATORS = { -and => 1,  -or => 1 };
 sub BUILD
 {
     my $self = shift;
+    my $json = $self->json;
+    $self->{json} = clone $json;
     $self->get_flatten_nested_queries;	
 }
 

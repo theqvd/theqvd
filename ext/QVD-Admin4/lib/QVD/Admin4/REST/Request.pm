@@ -14,6 +14,8 @@ has 'modifiers', is => 'ro', isa => sub { die "Invalid type for attribute modifi
                              default => sub { { distinct => 1, join => [], order_by => { '-asc' => []}  }};
 has 'filters', is => 'ro', isa => sub { die "Invalid type for attribute failures" 
 					    unless ref(+shift) eq 'HASH'; }, default => sub { {}; };
+has 'parameters', is => 'ro', isa => sub { die "Invalid type for attribute parameters" 
+					    unless ref(+shift) eq 'HASH'; }, default => sub { {}; };
 has 'arguments', is => 'ro', isa => sub { die "Invalid type for attribute arguments" 
 					      unless ref(+shift) eq 'HASH'; }, default => sub { {}; };
 has 'related_objects_arguments', is => 'ro', isa => sub { die "Invalid type for attribute related_objects_arguments" 
@@ -62,6 +64,7 @@ sub BUILD
 	$self->qvd_object_model->type_of_action =~ /^(cre|upd)ate$/;
     $self->check_order_by_validity_in_json;
 
+    $self->set_parameters_in_request;
     $self->set_pagination_in_request;
     $self->set_filters_in_request;
     $self->set_arguments_in_request;
@@ -108,12 +111,6 @@ sub forze_default_version_in_json_for_di
     $self->json_wrapper->forze_argument_addition('version',$version);
 }
 
-sub parameters
-{
-    my $self = shift;
-    $self->json_wrapper->parameters;
-}
-
 sub fields
 {
     my $self = shift;
@@ -123,7 +120,13 @@ sub fields
 sub get_parameter_value
 {
     my ($self,$p) = @_;
-    $self->json_wrapper->get_parameter_value($p);
+    $self->parameters->{$p};
+}
+
+sub set_parameter
+{
+    my ($self,$k,$v) = @_;
+    $self->parameters->{$k} = $v;
 }
 
 sub action 
@@ -497,6 +500,18 @@ sub map_key_value_filter
 ######################
 ######################
 ######################
+
+sub set_parameters_in_request
+{
+    my $self = shift;
+    for my $key ($self->json_wrapper->parameters_list)
+    {
+	my $value = $self->json_wrapper->get_parameter_value($key);
+	$self->set_parameter($key,$value);
+    }
+    $self->set_parameter('administrator',$ADMIN);
+}
+
 
 sub set_arguments_in_request
 {

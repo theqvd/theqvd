@@ -11,18 +11,6 @@ my $AVAILABLE_ACTION_SIZES = { default => 'normal', normal => 'normal', heavy =>
 my $ACTIONS =
 {
 
-get_di_location_in_fs => {type_of_action =>  'general',
-			  acls => [qr/^di\.create\./],
-			  admin4method => 'get_di_location_in_fs'},
-
-copy_di_to_images_path => {type_of_action =>  'general',
-			  acls => [qr/^di\.create\./],
-			  admin4method => 'copy_di_to_images_path'},
-
-normalize_di_path => {type_of_action =>  'general',
-		      acls => [qr/^di\.create\./],
-		      admin4method => 'normalize_di_path'},
-
 dis_in_staging => { type_of_action =>  'general',
 		    acls => [qr/^di\.create\./],
 		    admin4method => 'dis_in_staging'},
@@ -370,10 +358,12 @@ get_acls_in_admins => { type_of_action => 'list',
 
 
 number_of_acls_in_role => { type_of_action =>  'general',
+			    qvd_object => 'Operative_Acls_In_Role',
 			    acls => [qr/^administrator\.see\.acl-list$/],
 			    admin4method => 'get_number_of_acls_in_role'},
 
 number_of_acls_in_admin => { type_of_action =>  'general',
+			     qvd_object => 'Operative_Acls_In_Administrator',
 			     acls => [qr/^administrator\.see\.acl-list$/],
 			     admin4method => 'get_number_of_acls_in_admin'},
 
@@ -424,12 +414,6 @@ admin_view_delete => { type_of_action => 'delete',
 
 current_admin_setup => {type_of_action => 'general',
 		       admin4method => 'current_admin_setup'},
-
-
-properties_by_qvd_object => { type_of_action =>  'general',
-			      acls => [qr/^views\.see-main\./],
-			      admin4method => 'get_properties_by_qvd_object'},
-
 
 qvd_objects_statistics => { type_of_action =>  'multiple',
 			    channels => [qw(vm_created_or_removed vm_blocked_or_unblocked vm_state_changed vm_expiration_date_changed

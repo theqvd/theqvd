@@ -2,6 +2,8 @@ package QVD::DB::Result::Operative_Acls_In_Role;
 
 use base qw/DBIx::Class::Core/;
 use Mojo::JSON qw(decode_json);
+use QVD::Admin4::AclsOverwriteList;
+
 __PACKAGE__->table_class('DBIx::Class::ResultSource::View');
 
 __PACKAGE__->table('operative_acls_in_roles');
@@ -9,21 +11,19 @@ __PACKAGE__->result_source_instance->is_virtual(1);
 __PACKAGE__->result_source_instance->view_definition(
 
 "
-SELECT a.id           as acl_id, 
-       a.name         as acl_name,
-       json_agg(r.*)::text  as roles_json,
-       i.inheritor_id as role_id 
 
-FROM   all_acl_role_relations i 
-JOIN   acls a on a.id=i.acl_id
-JOIN   roles r on r.id=i.inherited_id
+SELECT op.acl_id, op.role_id, op.roles_json, ac.name as acl_name,
+       CASE WHEN ac.name ~ ? THEN FALSE ELSE CASE WHEN ac.name ~ ? THEN TRUE ELSE op.operative END END
+FROM operative_acls_in_roles_with_inheritance_info op
+JOIN acls ac ON  op.acl_id=ac.id
+WHERE ac.name !~ ?
 
-GROUP BY i.inheritor_id, a.id
 "
 );
 
 __PACKAGE__->add_columns(
 
+    operative  => { data_type => 'boolean' },
     role_id  => { data_type => 'integer' },
     acl_id  => { data_type => 'integer' },
     acl_name  => { data_type => 'varchar(64)' },

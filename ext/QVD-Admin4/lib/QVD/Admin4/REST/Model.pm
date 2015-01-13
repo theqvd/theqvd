@@ -28,15 +28,13 @@ my $RELATED_VIEWS_IN_DB =
 	      VM => [qw(VM_View)],
 	      Host => [qw(Host_View)],
 	      OSF => [qw(OSF_View)],
-	      DI => [qw(DI_View)] ,
-	      Role => [qw(Role_View)] },
+	      DI => [qw(DI_View)]},
 
     details => { User => [qw(User_View)],
 		 VM => [qw(VM_View)],
 		 Host => [qw(Host_View)],
 		 OSF => [qw(OSF_View)],
-		 DI => [qw(DI_View)], 
-		 Role => [qw(Role_View)]  },		 
+		 DI => [qw(DI_View)]},		 
 };
 
 my $ACLS_FOR_FILTERS = 
@@ -298,9 +296,9 @@ my $AVAILABLE_FILTERS =
 
 	      Tenant_Views_Setup => [qw(id tenant_id tenant_name field visible view_type device_type qvd_object property)],
 
-	      Operative_Acls_In_Role => [qw(acl_name role_id)],
+	      Operative_Acls_In_Role => [qw(acl_name role_id operative acl_pattern)],
 
-	      Operative_Acls_In_Administrator => [qw(acl_name admin_id)],
+	      Operative_Acls_In_Administrator => [qw(acl_name admin_id operative acl_pattern)],
 
 	      Operative_Views_In_Tenant => [qw(tenant_id field visible view_type device_type qvd_object property)],
 
@@ -337,9 +335,9 @@ my $AVAILABLE_FILTERS =
 
 		 Tenant_Views_Setup => [qw(id tenant_id tenant_name field visible view_type device_type qvd_object property)],
 
-	         Operative_Acls_In_Role => [qw(acl_name role_id)],
+	         Operative_Acls_In_Role => [qw(acl_name role_id operative acl_pattern)],
 			   
-	         Operative_Acls_In_Administrator => [qw(acl_name admin_id)],
+	         Operative_Acls_In_Administrator => [qw(acl_name admin_id operative acl_pattern)],
 
 		 Operative_Views_In_Tenant => [qw(tenant_id field visible view_type device_type qvd_object property)],
 
@@ -368,7 +366,7 @@ my $AVAILABLE_FIELDS =
 
 	      OSF => [qw(id name overlay user_storage memory  number_of_vms number_of_dis properties )],
 
-	      Role => [qw(name roles acls id number_of_acls fixed internal)],
+	      Role => [qw(name id fixed internal)],
 
 	      DI => [qw(id disk_image version osf_id osf_name blocked tags  properties )],
 
@@ -390,9 +388,9 @@ my $AVAILABLE_FIELDS =
 
 	      Tenant_Views_Setup => [qw(id tenant_id tenant_name field visible view_type device_type qvd_object property)],
 
-	      Operative_Acls_In_Role => [qw(id name roles)],
+	      Operative_Acls_In_Role => [qw(id name roles operative)],
 
-	      Operative_Acls_In_Administrator => [qw(id name roles)],
+	      Operative_Acls_In_Administrator => [qw(id name roles operative)],
 
 	      Operative_Views_In_Tenant => [qw(tenant_id field visible view_type device_type qvd_object property)],
 
@@ -406,7 +404,7 @@ my $AVAILABLE_FIELDS =
 
 		 OSF => [qw(id name overlay user_storage memory  number_of_vms number_of_dis properties )],
 		 
-		 Role => [qw(name acls roles id number_of_acls fixed internal)],
+		 Role => [qw(name id fixed internal)],
 		
 		 DI => [qw(id disk_image version osf_id osf_name  blocked tags  properties )],
 		
@@ -429,9 +427,9 @@ my $AVAILABLE_FIELDS =
 
 		 Tenant_Views_Setup => [qw(id tenant_id tenant_name field visible view_type device_type qvd_object property)],
 
-        	 Operative_Acls_In_Role => [qw(id name roles)],
+        	 Operative_Acls_In_Role => [qw(id name roles operative)],
 
-	         Operative_Acls_In_Administrator => [qw(id name roles)],
+	         Operative_Acls_In_Administrator => [qw(id name roles operative)],
 
 		 Operative_Views_In_Tenant => [qw(tenant_id field visible view_type device_type qvd_object property)],
 
@@ -484,15 +482,13 @@ my $MANDATORY_FILTERS =
 my $SUBCHAIN_FILTERS = 
 { 
     list => { default => [qw(name)],
-	      DI => [qw(disk_image)],
-	      Administrator => [qw(name role_name acl_name)],
-	      Role => [qw(name nested_role_name acl_name)]}
+	      DI => [qw(disk_image)]}
 };
 
 my $COMMODIN_FILTERS = 
 { 
 tiny => { ACL => [qw(name)]},
-list => {Config => [qw(key value)], Operative_Acls_In_Role => [qw(acl_name)], Operative_Acls_In_Administrator => [qw(admin_name)]}
+list => {Config => [qw(key value)], Operative_Acls_In_Role => [qw(acl_name acl_pattern)], Operative_Acls_In_Administrator => [qw(admin_name acl_pattern)]}
 };
 
 my $DEFAULT_ORDER_CRITERIA = 
@@ -791,12 +787,16 @@ my $FILTERS_TO_DBIX_FORMAT_MAPPER =
     
     Operative_Acls_In_Role => { 
 	'acl_name' => 'me.acl_name',
-        'role_id' =>  'me.role_id'
+	'acl_pattern' => 'me.acl_name',
+        'role_id' =>  'me.role_id',
+	'operative' => 'me.operative',
     },
 
     Operative_Acls_In_Administrator => { 
 	'acl_name' => 'me.acl_name',
-        'admin_id' =>  'me.admin_id'
+	'acl_pattern' => 'me.acl_name',
+        'admin_id' =>  'me.admin_id',
+	'operative' => 'me.operative',
     },
 
     Operative_Views_In_Tenant => { 	
@@ -872,10 +872,7 @@ my $FIELDS_TO_DBIX_FORMAT_MAPPER =
 	'name' => 'me.name',
 	'fixed' => 'me.fixed',
 	'internal' => 'me.internal',
-	'acls' => 'view.acls',
-	'roles' => 'view.roles',
-	'id' => 'me.id',
-	'number_of_acls' => 'view.number_of_inherited_acls'
+	'id' => 'me.id'
     },
 
     User => {
@@ -1025,13 +1022,16 @@ my $FIELDS_TO_DBIX_FORMAT_MAPPER =
     Operative_Acls_In_Role => { 
 	'name' => 'me.acl_name',
         'id' =>  'me.acl_id',
-        'roles' =>  'me.roles'
+        'roles' =>  'me.roles',
+	'operative' => 'me.operative',
     },
 
     Operative_Acls_In_Administrator => { 
 	'name' => 'me.acl_name',
         'id' =>  'me.acl_id',
-        'roles' =>  'me.roles'
+        'roles' =>  'me.roles',
+	'operative' => 'me.operative',
+
     },
 
 };
