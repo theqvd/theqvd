@@ -110,8 +110,8 @@
                                 break;
                             case 'acls':
                 %>
-                                <td class="desktop">
-                                    <%= model.get('number_of_acls') + model.get('acls').positive.length %>
+                                <td class="desktop js-role-acls" data-id="<%= model.get('id') %>">
+                                    <i class="fa fa-gear fa-spin second_row"></i>
                                 </td>
                 <%
                                 break;

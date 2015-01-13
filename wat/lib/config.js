@@ -56,6 +56,7 @@ Wat.C = {
         this.loggedIn = true;
         $.cookie('qvdWatSid', sid, { expires: this.loginExpirationDays, path: '/' });
         $.cookie('qvdWatLogin', login, { expires: this.loginExpirationDays, path: '/' });
+        Wat.T.initTranslate();
         window.location = '#';
     },
     

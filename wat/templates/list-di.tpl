@@ -56,8 +56,8 @@
                             break;
                         case 'default':
             %>
-                            <th class="desktop col-width-12">
-                                <i class="fa sort-icon" data-i18n="Default"><%= i18n.t('Default') %></i>
+                            <th class="desktop max-1-icons">
+                                <i class="fa fa-home"></i>
                             </th>
             <%
                             break;

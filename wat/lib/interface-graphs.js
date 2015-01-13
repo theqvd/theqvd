@@ -125,7 +125,7 @@ Wat.I.G = {
             };
 
         // When no data, graph looks ugly. Hack to fix it is change data2 to 1
-        if (data2 == 0 ){
+        if (data1 == 0 ){
             data2 = 1;
         }
         

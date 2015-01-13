@@ -41,6 +41,20 @@ Wat.Views.RoleListView = Wat.Views.ListView.extend({
         this.embedContent();
     },
     
+    renderList: function () {
+        Wat.Views.ListView.prototype.renderList.apply(this, []);
+
+        var that = this;
+        
+        $.each($('.js-role-acls'), function (iCell, cell) {
+            var roleID = $(cell).attr('data-id');
+            Wat.A.performAction('number_of_acls_in_role', {}, {"role_id": roleID, "acl_pattern": ["%"]}, {}, function (that) {
+                var numberOfAcls = that.retrievedData['%']['effective'];
+                $(cell).html(numberOfAcls);
+            }, that);
+        });
+    },
+    
     embedContent: function () {
         $(this.secondaryContainer).html('<div class="bb-content-secondary"></div>');
 

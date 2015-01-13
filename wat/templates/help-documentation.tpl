@@ -1,1 +1,1 @@
-Read the <a href="http://docs.theqvd.com/">QVD online documentation</a>.
+Read the <a href="http://docs.theqvd.com/" target="_blank">QVD online documentation</a>.
