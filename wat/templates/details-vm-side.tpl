@@ -54,7 +54,7 @@
         </div>
     </div>
     <% if (Wat.C.checkGroupACL('vmRemoteAdminDetails')) { %>
-        <table class="details fixed">
+        <table class="details">
         <tbody>
             <% if (Wat.C.checkACL('vm.see.host')) { %>
             <tr>

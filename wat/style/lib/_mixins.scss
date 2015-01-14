@@ -225,6 +225,16 @@
             }
         }
     }
+    
+    >tbody:nth-child(2) tr:first-child {
+        td:first-child {
+            border-right: dotted 1px darken($col_whiter, 10);
+        }
+        
+        td {
+            border-top: dotted 1px darken($col_whiter, 10);
+        }
+    }
 
     >tbody>tr {
         @if $alternate == alternate-rows {

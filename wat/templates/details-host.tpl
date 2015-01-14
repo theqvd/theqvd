@@ -105,4 +105,5 @@
     <% 
     }
     %>
+    <tbody class="bb-properties"></tbody>
 </table>

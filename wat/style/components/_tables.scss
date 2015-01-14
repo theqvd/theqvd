@@ -37,6 +37,8 @@ table.custom-props {
 table.details, table.custom-props {
     td:first-child {
         vertical-align: top;
+        white-space: nowrap;
+        
         i.fa {
             @include in(mobile) {                
                 display: none;
@@ -45,11 +47,16 @@ table.details, table.custom-props {
     }
     td:last-child {
         font-weight: bold;
+        width: 100%;
     }
 }
 
 table.expiration-table {
     table-layout: auto;
+    
+    td:nth-child(2) {
+        width: 100%;
+    }
 }
 
 table.roles-inherit-table {

@@ -29,6 +29,7 @@ Wat.Views.DetailsView = Wat.Views.MainView.extend({
         this.setDetailsFields();
 
         this.templateDetailsCommon = Wat.A.getTemplate('details-common');
+        this.templateDetailsCommonProperties = Wat.A.getTemplate('details-common-properties');
         this.templateDetails = Wat.A.getTemplate(this.detailsTemplateName);
         this.template404 = Wat.A.getTemplate('404');
 
@@ -148,6 +149,17 @@ Wat.Views.DetailsView = Wat.Views.MainView.extend({
             );
 
             $(this.sideContainer).html(this.template);
+            
+            if (enabledProperties) {
+                // Fill the html with the template and the model
+                this.template = _.template(
+                    this.templateDetailsCommonProperties, {
+                        properties: this.model.get('properties'),
+                    }
+                );
+
+                $('.bb-properties').html(this.template);
+            }
         }
         
         Wat.T.translate();

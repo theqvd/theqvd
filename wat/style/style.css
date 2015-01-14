@@ -938,6 +938,10 @@ body {
           border-right: 0px; }
       .wrapper .content .home-wrapper tr:last-child td {
         border-bottom: 0; }
+      .wrapper .content .home-wrapper > tbody:nth-child(2) tr:first-child td:first-child {
+        border-right: dotted 1px #e4e4e4; }
+      .wrapper .content .home-wrapper > tbody:nth-child(2) tr:first-child td {
+        border-top: dotted 1px #e4e4e4; }
       .wrapper .content .home-wrapper > tbody > tr:nth-child(even) {
         background-color: #fdfdfd; }
       .wrapper .content .home-wrapper > tbody > tr:nth-child(odd) {
@@ -1008,6 +1012,10 @@ body {
                 border-right: 0px; }
             .wrapper .content .home-wrapper .home-row .home-cell .summary-table tr:last-child td {
               border-bottom: 0; }
+            .wrapper .content .home-wrapper .home-row .home-cell .summary-table > tbody:nth-child(2) tr:first-child td:first-child {
+              border-right: dotted 1px #e4e4e4; }
+            .wrapper .content .home-wrapper .home-row .home-cell .summary-table > tbody:nth-child(2) tr:first-child td {
+              border-top: dotted 1px #e4e4e4; }
             .wrapper .content .home-wrapper .home-row .home-cell .summary-table > tbody > tr:nth-child(even) {
               background-color: #fdfdfd; }
             .wrapper .content .home-wrapper .home-row .home-cell .summary-table > tbody > tr:nth-child(odd) {
@@ -1084,6 +1092,10 @@ body {
             border-right: 0px; }
         .wrapper .content .home-wrapper .log-table tr:last-child td {
           border-bottom: 0; }
+        .wrapper .content .home-wrapper .log-table > tbody:nth-child(2) tr:first-child td:first-child {
+          border-right: dotted 1px #e4e4e4; }
+        .wrapper .content .home-wrapper .log-table > tbody:nth-child(2) tr:first-child td {
+          border-top: dotted 1px #e4e4e4; }
         .wrapper .content .home-wrapper .log-table > tbody > tr:nth-child(even) {
           background-color: #fdfdfd; }
         .wrapper .content .home-wrapper .log-table > tbody > tr:nth-child(odd) {
@@ -1239,7 +1251,7 @@ body {
           width: 60%; } }
       @media screen and (min-width: 40em) {
         .wrapper .content .details-block .details-list {
-          width: 60%;
+          width: 100%;
           margin: 0;
           margin-bottom: 25px; } }
       .wrapper .content .details-block .custom-props-container {
@@ -1650,6 +1662,10 @@ table.list, table.customize-fields {
       border-right: 0px; }
   table.list tr:last-child td, table.customize-fields tr:last-child td {
     border-bottom: 0; }
+  table.list > tbody:nth-child(2) tr:first-child td:first-child, table.customize-fields > tbody:nth-child(2) tr:first-child td:first-child {
+    border-right: dotted 1px #e4e4e4; }
+  table.list > tbody:nth-child(2) tr:first-child td, table.customize-fields > tbody:nth-child(2) tr:first-child td {
+    border-top: dotted 1px #e4e4e4; }
   table.list > tbody > tr:nth-child(even), table.customize-fields > tbody > tr:nth-child(even) {
     background-color: #fdfdfd; }
   table.list > tbody > tr:nth-child(odd), table.customize-fields > tbody > tr:nth-child(odd) {
@@ -1699,6 +1715,10 @@ table.custom-props, table.details {
       border-right: 0px; }
   table.custom-props tr:last-child td, table.details tr:last-child td {
     border-bottom: 0; }
+  table.custom-props > tbody:nth-child(2) tr:first-child td:first-child, table.details > tbody:nth-child(2) tr:first-child td:first-child {
+    border-right: dotted 1px #e4e4e4; }
+  table.custom-props > tbody:nth-child(2) tr:first-child td, table.details > tbody:nth-child(2) tr:first-child td {
+    border-top: dotted 1px #e4e4e4; }
   table.custom-props > tbody > tr > td:nth-child(even), table.details > tbody > tr > td:nth-child(even) {
     background-color: #fdfdfd; }
   table.custom-props > tbody > tr > td:nth-child(odd), table.details > tbody > tr > td:nth-child(odd) {
@@ -1721,15 +1741,19 @@ table.manage-roles, table.manage-acls {
     table-layout: fixed; } }
 
 table.details td:first-child, table.custom-props td:first-child {
-  vertical-align: top; }
+  vertical-align: top;
+  white-space: nowrap; }
   @media only screen and (max-width: 40em) {
     table.details td:first-child i.fa, table.custom-props td:first-child i.fa {
       display: none; } }
 table.details td:last-child, table.custom-props td:last-child {
-  font-weight: bold; }
+  font-weight: bold;
+  width: 100%; }
 
 table.expiration-table {
   table-layout: auto; }
+  table.expiration-table td:nth-child(2) {
+    width: 100%; }
 
 table.roles-inherit-table {
   width: 100%; }
