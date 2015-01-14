@@ -1,6 +1,6 @@
 #!/usr/lib/qvd/bin/perl
 use Mojolicious::Lite;
-use lib::glob '/home/benjamin/wat/*/lib/';
+use lib::glob '/home/qindel/WAT/*/lib/';
 use QVD::Admin4::REST;
 use Mojo::JSON qw(encode_json decode_json);
 use QVD::Admin4::Exception;
@@ -47,7 +47,7 @@ package MojoX::Session::Transport::WAT
 
 # GENERAL CONFIG AND PLUGINS
 
-app->config(hypnotoad => {listen => ['http://localhost:3000']});
+app->config(hypnotoad => {listen => ['http://192.168.3.5:3000']});
 my $QVD_ADMIN4_API = QVD::Admin4::REST->new();
 
 # HELPERS

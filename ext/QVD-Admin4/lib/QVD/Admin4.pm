@@ -305,6 +305,7 @@ sub del_acls_to_role
     for my $acl_name (@$acl_names)
     { 	
 	$acl_name = undef if defined $acl_name && $acl_name eq '';
+	use Data::Dumper; print Dumper $acl_name, $role->is_allowed_to($acl_name);
 	next unless $role->is_allowed_to($acl_name);
 	
 	if ($role->has_own_positive_acl($acl_name)) 
@@ -328,6 +329,7 @@ sub add_roles_to_role
 	$role_to_assign_id = undef if defined $role_to_assign_id && $role_to_assign_id eq '';
 	$self->assign_role_to_role($this_role,$role_to_assign_id);
 	my $nested_role;
+
 	for my $own_acl_name ($this_role->get_negative_own_acl_names,
 			      $this_role->get_positive_own_acl_names)
 	{
@@ -556,7 +558,8 @@ sub di_delete {
 
     $self->delete($request,conditions => [qw(di_no_vm_runtimes 
                                              di_no_dependant_vms
-                                             di_no_head_default_tags)]);
+                                             di_no_head_default_tags
+                                             di_delete_disk_image)]);
 }
 
 sub vm_user_disconnect
@@ -719,6 +722,14 @@ sub di_no_head_default_tags
     return 1;
 }
 
+sub di_delete_disk_image
+{
+    my ($self,$di) = @_;
+
+    my $images_path  = eval { cfg('path.storage.images') } // return 1;
+    my $images_file = $di->path;
+    eval { unlink "$images_path/$images_file" };
+}
 
 ######################################
 ## GENERAL FUNCTIONS; WITHOUT REQUEST
@@ -799,8 +810,7 @@ sub get_number_of_acls_in_admin
 {
     my ($self,$administrator,$json_wrapper) = @_;
 
-    my $acl_patterns = $json_wrapper->get_filter_value('acl_pattern') //
-        QVD::Admin4::Exception->throw(code=>'6220', object => 'acl_pattern');
+    my $acl_patterns = $json_wrapper->get_filter_value('acl_pattern') // '%';
     $acl_patterns = ref($acl_patterns) ? $acl_patterns : [$acl_patterns];
     my $admin_id = $json_wrapper->get_filter_value('admin_id') //
         QVD::Admin4::Exception->throw(code=>'6220', object => 'admin_id');
@@ -825,8 +835,7 @@ sub get_number_of_acls_in_role
 {
     my ($self,$administrator,$json_wrapper) = @_;
 
-    my $acl_patterns = $json_wrapper->get_filter_value('acl_pattern') //
-        QVD::Admin4::Exception->throw(code=>'6220', object => 'acl_pattern');
+    my $acl_patterns = $json_wrapper->get_filter_value('acl_pattern') // '%';
     $acl_patterns = ref($acl_patterns) ? $acl_patterns : [$acl_patterns];
     my $role_id = $json_wrapper->get_filter_value('role_id') //
         QVD::Admin4::Exception->throw(code=>'6220', object => 'role_id');

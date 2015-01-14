@@ -38,8 +38,9 @@ sub roles
     my ($self,$roles) = @_;
 
     my $roles_list = decode_json $self->roles_json;
+    my @roles_list = grep { defined $_ } @$roles_list;
     my $roles = {};
-    $roles->{$_->{id}} = $_->{name} for @$roles_list; 
+    $roles->{$_->{id}} = $_->{name} for @roles_list; 
     $roles;
 }
 

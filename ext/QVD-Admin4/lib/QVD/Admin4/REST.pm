@@ -33,6 +33,7 @@ sub validate_user
     my $admin = eval { $QVD_ADMIN->_db->resultset('Administrator')->find(\%params) };
     print $@ if $@;
     return undef unless $admin;
+    return $admin if $admin->is_recovery_admin;
     return undef if $admin->is_superadmin && (not cfg('wat.multitenant'));
     return $admin;
 }
