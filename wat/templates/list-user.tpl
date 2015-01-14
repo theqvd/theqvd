@@ -29,40 +29,44 @@
                         case 'id':
             %>
                             <th class="sortable desktop col-width-8" data-sortby="id">
-                                <i class="fa fa-sort sort-icon" data-i18n="Id"><%= i18n.t('Id') %></i>
+                                <i class="fa fa-sort sort-icon"></i>
+                                <span data-i18n="Id"><%= i18n.t('Id') %></span>
                             </th>
             <%
                             break;
                         case 'name':
             %>
                             <th class="sortable" data-sortby="name">
-                                <i class="fa fa-sort sort-icon" data-i18n="Name"><%= i18n.t('Name') %></i>
+                                <i class="fa fa-sort sort-icon"></i>
+                                <span data-i18n="Name"><%= i18n.t('Name') %></span>
                             </th>
             <%
                             break;
                         case 'connected_vms':
             %>
                             <th class="desktop">
-                                <i data-i18n="Connected VMs"><%= i18n.t('Connected VMs') %></i>
+                                <span data-i18n="Connected VMs"><%= i18n.t('Connected VMs') %></span>
                             </th>
             <%
                             break;
                         case 'tenant':
             %>
                             <th class="sortable desktop" data-sortby="tenant_name">
-                                <i class="fa fa-sort sort-icon" data-i18n="Tenant"><%= i18n.t('Tenant') %></i>
+                                <i class="fa fa-sort sort-icon"></i>
+                                <span data-i18n="Tenant"><%= i18n.t('Tenant') %></span>
                             </th>
             <%
                             break;
                         default:
-                            var translationAttr = 'data-i18n="' + name + '"';
+                            var translationAttr = 'data-i18n="' + col.text + '"';
                             if (col.noTranslatable === true) {
                                 translationAttr = '';
                             }
                     
             %>
                             <th class="sortable desktop" data-sortby="<%= name %>">
-                                <i class="fa sort-icon"><%= name %></i>
+                                <i class="fa sort-icon"></i>
+                                <span <%= translationAttr %>><%= col.text %></span>
                             </th>
             <%
                             break;

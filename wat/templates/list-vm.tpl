@@ -21,7 +21,7 @@
                             break;
                         case 'info':
             %>
-                            <th class="max-4-icons">
+                            <th>
                                 <i class="fa fa-info-circle normal" data-i18n="[title]Info" title="<%= i18n.t('Info') %>"></i>
                             </th>
             <%
@@ -29,56 +29,69 @@
                         case 'id':
             %>
                             <th class="sortable desktop col-width-8" data-sortby="id">
-                                <i class="fa fa-sort sort-icon" data-i18n="<%= col.text %>"><%= col.text %></i>
+                                <i class="fa fa-sort sort-icon"></i>
+                                <span data-i18n="<%= col.text %>"><%= col.text %></span>
                             </th>
             <%
                             break;
                         case 'name':
             %>
                             <th class="sortable" data-sortby="name">
-                                <i class="fa fa-sort sort-icon" data-i18n="<%= col.text %>"><%= col.text %></i>
+                                <i class="fa fa-sort sort-icon"></i>
+                                <span data-i18n="<%= col.text %>"><%= col.text %></span>
                             </th>
             <%
                             break;
                         case 'host':
             %>
                             <th class="sortable desktop" data-sortby="host_id">
-                                <i class="fa fa-sort sort-icon" data-i18n="<%= col.text %>"><%= col.text %></i>
+                                <i class="fa fa-sort sort-icon"></i>
+                                <span data-i18n="<%= col.text %>"><%= col.text %></span>
                             </th>
             <%
                             break;
                         case 'user':
             %>
                             <th class="sortable desktop" data-sortby="user_name">
-                                <i class="fa fa-sort sort-icon" data-i18n="<%= col.text %>"><%= col.text %></i>
+                                <i class="fa fa-sort sort-icon"></i>
+                                <span data-i18n="<%= col.text %>"><%= col.text %></span>
                             </th>
             <%
                             break;
                         case 'osf/tag':
             %>
                             <th class="sortable desktop" data-sortby="osf_name">
-                                <i class="fa fa-sort sort-icon" data-i18n="<%= col.text %>"><%= col.text %></i>
+                                <i class="fa fa-sort sort-icon"></i>
+                                <span data-i18n="<%= col.text %>"><%= col.text %></span>
                             </th>
             <%
                             break;
                         case 'tag':
             %>
                             <th class="sortable desktop col-width-20" data-sortby="di_tag">
-                                <i class="fa fa-sort sort-icon" data-i18n="<%= col.text %>"><%= col.text %></i>
+                                <i class="fa fa-sort sort-icon"></i>
+                                <span data-i18n="<%= col.text %>"><%= col.text %></span>
                             </th>
             <%
                             break;
                         case 'tenant':
             %>
                             <th class="sortable desktop" data-sortby="tenant_name">
-                                <i class="fa fa-sort sort-icon" data-i18n="<%= col.text %>"><%= col.text %></i>
+                                <i class="fa fa-sort sort-icon"></i>
+                                <span data-i18n="<%= col.text %>"><%= col.text %></span>
                             </th>
             <%
                             break;
                         default:
+                            var translationAttr = 'data-i18n="' + col.text + '"';
+                            if (col.noTranslatable === true) {
+                                translationAttr = '';
+                            }
+                    
             %>
                             <th class="sortable desktop" data-sortby="<%= name %>">
-                                <i class="fa sort-icon"><%= col.text %></i>
+                                <i class="fa sort-icon"></i>
+                                <span <%= translationAttr %>><%= col.text %></span>
                             </th>
             <%
                             break;

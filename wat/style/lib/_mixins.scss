@@ -165,8 +165,6 @@
 
 @mixin table-base ($alternate: alternate-rows) {
     width: 100%;
-    margin-left: auto;
-    margin-right: auto;
     background-color: $col_whiter;
     border: 1px solid #ddd;
     border-radius: $table_radius;
@@ -210,8 +208,8 @@
 
     tr {
         td, th {
-            padding: 8px 8px;
-            vertical-align: middle;
+            padding: 12px 8px 8px 8px;
+            vertical-align: top;
 
             border-right: dotted 1px darken($col_whiter, 10);
             border-bottom: dotted 1px darken($col_whiter, 10);

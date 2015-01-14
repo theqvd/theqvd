@@ -28,7 +28,7 @@ table.manage-roles, table.manage-acls {
     }
 }
 
-table.list, table.custom-props {
+table.custom-props {
     @include in(desktop) {
         table-layout: fixed;
     }
@@ -116,5 +116,41 @@ $security_margin: 5;
 @for $i from 1 through 100 {
     .col-width-#{$i} {
         width: $i * 1% !important;
+    }
+}
+
+/* Table scroll */
+
+div.list-block div:first-child {
+    width: 95vw;
+    
+    .list-navigation, div.list {
+        @include in(desktop) {
+            width: 85% !important;
+        }
+    }
+    
+    .list {
+        overflow-x: auto;
+        overflow-y: hidden;
+    }   
+    
+    table.list {
+        width: 100%;
+        
+        th {
+            position: relative;
+            padding-right: 20px;
+            
+            i {
+                position: absolute;
+                right: 5px;
+                padding-left: 10px;
+            }
+        }
+    
+        td, th {
+            white-space: nowrap;
+        }     
     }
 }

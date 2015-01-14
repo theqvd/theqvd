@@ -22,28 +22,30 @@
                         case 'id':
             %>
                             <th class="sortable desktop col-width-8" data-sortby="id">
-                                <i class="fa fa-sort sort-icon" data-i18n="Id"><%= i18n.t('Id') %></i>
+                                <i class="fa fa-sort sort-icon"></i>
+                                <span data-i18n="Id"><%= i18n.t('Id') %></span>
                             </th>
             <%
                             break;
                         case 'name':
             %>
                             <th class="sortable" data-sortby="name">
-                                <i class="fa fa-sort sort-icon" data-i18n="Name"><%= i18n.t('Name') %></i>
+                                <i class="fa fa-sort sort-icon"></i>
+                                <span data-i18n="Name"><%= i18n.t('Name') %></span>
                             </th>
             <%
                             break;
                         case 'acls':
             %>
                             <th>
-                                <i data-i18n="ACLs"><%= i18n.t('ACLs') %></i>
+                                <span data-i18n="ACLs"><%= i18n.t('ACLs') %></span>
                             </th>
             <%
                             break;
                         case 'roles':
             %>
                             <th>
-                                <i data-i18n="Inherited roles"><%= i18n.t('Inherited roles') %></i>
+                                <span data-i18n="Inherited roles"><%= i18n.t('Inherited roles') %></span>
                             </th>
             <%
                             break;

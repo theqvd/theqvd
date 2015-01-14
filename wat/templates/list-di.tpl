@@ -29,28 +29,32 @@
                         case 'id':
             %>
                             <th class="sortable desktop col-width-10" data-sortby="id">
-                                <i class="fa fa-sort sort-icon" data-i18n="Id"><%= i18n.t('Id') %></i>
+                                <i class="fa fa-sort sort-icon"></i>
+                                <span data-i18n="Id"><%= i18n.t('Id') %></span>
                             </th>
             <%
                             break;
                         case 'disk_image':
             %>
                             <th class="sortable" data-sortby="disk_image">
-                                <i class="fa fa-sort sort-icon" data-i18n="Disk image"><%= i18n.t('Disk image') %></i>
+                                <i class="fa fa-sort sort-icon"></i>
+                                <span data-i18n="Disk image"><%= i18n.t('Disk image') %></span>
                             </th>
             <%
                             break;
                         case 'version':
             %>
                             <th class="desktop sortable col-width-14" data-sortby="version">
-                                <i class="fa fa-sort sort-icon" data-i18n="Version"><%= i18n.t('Version') %></i>
+                                <i class="fa fa-sort sort-icon"></i>
+                                <span data-i18n="Version"><%= i18n.t('Version') %></span>
                             </th>
             <%
                             break;
                         case 'osf':
             %>
                             <th class="desktop sortable" data-sortby="osf_name">
-                                <i class="fa fa-sort sort-icon" data-i18n="OS Flavour"><%= i18n.t('OS Flavour') %></i>
+                                <i class="fa fa-sort sort-icon"></i>
+                                <span data-i18n="OS Flavour"><%= i18n.t('OS Flavour') %></span>
                             </th>
             <%
                             break;
@@ -65,25 +69,28 @@
             %>
                             <th class="desktop col-width-12" data-sortby="head">
                                 <i class="fa sort-icon" data-i18n="Head"><%= i18n.t('Head') %></i>
+                                <span data-i18n="Head"><%= i18n.t('Head') %></i>
                             </th>
             <%
                             break;
                         case 'tenant':
             %>
                             <th class="sortable desktop" data-sortby="tenant_name">
-                                <i class="fa fa-sort sort-icon" data-i18n="Tenant"><%= i18n.t('Tenant') %></i>
+                                <i class="fa fa-sort sort-icon"></i>
+                                <span data-i18n="Tenant"><%= i18n.t('Tenant') %></span>
                             </th>
             <%
                             break;
                         default:
-                            var translationAttr = 'data-i18n="' + col.name + '"';
+                            var translationAttr = 'data-i18n="' + col.text + '"';
                             if (col.noTranslatable === true) {
                                 translationAttr = '';
                             }
                     
             %>
                             <th class="sortable desktop" data-sortby="<%= name %>">
-                                <i class="fa sort-icon"><%= name %></i>
+                                <i class="fa sort-icon"></i>
+                                <span <%= translationAttr %>><%= col.text %></span>
                             </th>
             <%
                             break;

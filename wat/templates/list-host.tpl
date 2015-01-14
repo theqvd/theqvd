@@ -29,47 +29,53 @@
                         case 'id':
             %>
                             <th class="sortable desktop col-width-8" data-sortby="id">
-                                <i class="fa fa-sort sort-icon" data-i18n="Id"><%= i18n.t('Id') %></i>
+                                <i class="fa fa-sort sort-icon"></i>
+                                <span data-i18n="Id"><%= i18n.t('Id') %></span>
                             </th>
             <%
                             break;
                         case 'name':
             %>
                             <th class="sortable" data-sortby="name">
-                                <i class="fa fa-sort sort-icon" data-i18n="Name"><%= i18n.t('Name') %></i>
+                                <i class="fa fa-sort sort-icon"></i>
+                                <span data-i18n="Name"><%= i18n.t('Name') %></span>
                             </th>
             <%
                             break;
                         case 'state':
             %>
                             <th class="desktop sortable" data-sortby="state" data-i18n="State">
-                                <i class="fa fa-sort sort-icon" data-i18n="State"><%= i18n.t('State') %></i>
+                                <i class="fa fa-sort sort-icon"></i>
+                                <span data-i18n="State"><%= i18n.t('State') %></span>
                             </th>
             <%
                             break;
                         case 'address':
             %>
                             <th class="desktop sortable" data-sortby="address">
-                                <i class="fa fa-sort sort-icon" data-i18n="IP address"><%= i18n.t('IP address') %></i>
+                                <i class="fa fa-sort sort-icon"></i>
+                                <span data-i18n="IP address"><%= i18n.t('IP address') %></span>
                             </th>
             <%
                             break;
                         case 'vms_connected':
             %>
                             <th class="desktop col-width-15" data-sortby="vms_connected">
-                                <i class="fa sort-icon" data-i18n="Running VMs"><%= i18n.t('Running VMs') %></i>
+                                <i class="fa sort-icon"></i>
+                                <span data-i18n="Running VMs"><%= i18n.t('Running VMs') %></span>
                             </th>
             <%
                             break;
                         default:
-                            var translationAttr = 'data-i18n="' + col.name + '"';
+                            var translationAttr = 'data-i18n="' + col.text + '"';
                             if (col.noTranslatable === true) {
                                 translationAttr = '';
                             }
                     
             %>
                             <th class="sortable desktop" data-sortby="<%= name %>">
-                                <i class="fa sort-icon"><%= name %></i>
+                                <i class="fa sort-icon"></i>
+                                <span <%= translationAttr %>><%= col.text %></span>
                             </th>
             <%
                             break;

@@ -9,8 +9,8 @@
 .header-wrapper .header, .wrapper {
   width: 100%;
   margin: 0 auto;
-  padding-left: 20px;
-  padding-right: 20px; }
+  padding-left: 10px;
+  padding-right: 10px; }
 
 .menu > ul .menu-option, .menu > ul .token-prefix-option, a.button, button.button, a.button2, button.button2, a.button--green, button.button--green, a.button--red, button.button--red, a.button.disabled, a.button2.disabled, button.button.disabled, button.button2.disabled, .wrapper .content .home-wrapper th, .wrapper .content .home-wrapper .home-row .home-cell .summary-table th, .wrapper .content .home-wrapper .log-table th, table.list th, table.customize-fields th, table.custom-props th, table.details th, .ui-dialog .ui-state-hover, .ui-dialog .ui-state-focus, .not-selectable {
   -webkit-touch-callout: none;
@@ -899,8 +899,6 @@ body {
 ********************************************************************/ }
     .wrapper .content .home-wrapper {
       width: 100%;
-      margin-left: auto;
-      margin-right: auto;
       background-color: #fdfdfd;
       border: 1px solid #ddd;
       border-radius: 4px;
@@ -932,8 +930,8 @@ body {
             margin-left: 5px;
             font-weight: normal; }
       .wrapper .content .home-wrapper tr td, .wrapper .content .home-wrapper tr th {
-        padding: 8px 8px;
-        vertical-align: middle;
+        padding: 12px 8px 8px 8px;
+        vertical-align: top;
         border-right: dotted 1px #e4e4e4;
         border-bottom: dotted 1px #e4e4e4; }
         .wrapper .content .home-wrapper tr td:last-child, .wrapper .content .home-wrapper tr th:last-child {
@@ -972,8 +970,6 @@ body {
             margin: 20px; }
           .wrapper .content .home-wrapper .home-row .home-cell .summary-table {
             width: 100%;
-            margin-left: auto;
-            margin-right: auto;
             background-color: #fdfdfd;
             border: 1px solid #ddd;
             border-radius: 4px;
@@ -1004,8 +1000,8 @@ body {
                   margin-left: 5px;
                   font-weight: normal; }
             .wrapper .content .home-wrapper .home-row .home-cell .summary-table tr td, .wrapper .content .home-wrapper .home-row .home-cell .summary-table tr th {
-              padding: 8px 8px;
-              vertical-align: middle;
+              padding: 12px 8px 8px 8px;
+              vertical-align: top;
               border-right: dotted 1px #e4e4e4;
               border-bottom: dotted 1px #e4e4e4; }
               .wrapper .content .home-wrapper .home-row .home-cell .summary-table tr td:last-child, .wrapper .content .home-wrapper .home-row .home-cell .summary-table tr th:last-child {
@@ -1050,8 +1046,6 @@ body {
               opacity: 0.5; }
       .wrapper .content .home-wrapper .log-table {
         width: 100%;
-        margin-left: auto;
-        margin-right: auto;
         background-color: #fdfdfd;
         border: 1px solid #ddd;
         border-radius: 4px;
@@ -1082,8 +1076,8 @@ body {
               margin-left: 5px;
               font-weight: normal; }
         .wrapper .content .home-wrapper .log-table tr td, .wrapper .content .home-wrapper .log-table tr th {
-          padding: 8px 8px;
-          vertical-align: middle;
+          padding: 12px 8px 8px 8px;
+          vertical-align: top;
           border-right: dotted 1px #e4e4e4;
           border-bottom: dotted 1px #e4e4e4; }
           .wrapper .content .home-wrapper .log-table tr td:last-child, .wrapper .content .home-wrapper .log-table tr th:last-child {
@@ -1621,8 +1615,6 @@ span.text {
 /* Table list */
 table.list, table.customize-fields {
   width: 100%;
-  margin-left: auto;
-  margin-right: auto;
   background-color: #fdfdfd;
   border: 1px solid #ddd;
   border-radius: 4px;
@@ -1650,8 +1642,8 @@ table.list, table.customize-fields {
         margin-left: 5px;
         font-weight: normal; }
   table.list tr td, table.list tr th, table.customize-fields tr td, table.customize-fields tr th {
-    padding: 8px 8px;
-    vertical-align: middle;
+    padding: 12px 8px 8px 8px;
+    vertical-align: top;
     border-right: dotted 1px #e4e4e4;
     border-bottom: dotted 1px #e4e4e4; }
     table.list tr td:last-child, table.list tr th:last-child, table.customize-fields tr td:last-child, table.customize-fields tr th:last-child {
@@ -1672,8 +1664,6 @@ table.list, table.customize-fields {
 
 table.custom-props, table.details {
   width: 100%;
-  margin-left: auto;
-  margin-right: auto;
   background-color: #fdfdfd;
   border: 1px solid #ddd;
   border-radius: 4px;
@@ -1701,8 +1691,8 @@ table.custom-props, table.details {
         margin-left: 5px;
         font-weight: normal; }
   table.custom-props tr td, table.custom-props tr th, table.details tr td, table.details tr th {
-    padding: 8px 8px;
-    vertical-align: middle;
+    padding: 12px 8px 8px 8px;
+    vertical-align: top;
     border-right: dotted 1px #e4e4e4;
     border-bottom: dotted 1px #e4e4e4; }
     table.custom-props tr td:last-child, table.custom-props tr th:last-child, table.details tr td:last-child, table.details tr th:last-child {
@@ -1727,7 +1717,7 @@ table.manage-roles, table.manage-acls {
     text-align: left; }
 
 @media screen and (min-width: 40em) {
-  table.list, table.custom-props {
+  table.custom-props {
     table-layout: fixed; } }
 
 table.details td:first-child, table.custom-props td:first-child {
@@ -2117,6 +2107,27 @@ td.inner-table {
 
 .col-width-100 {
   width: 100% !important; }
+
+/* Table scroll */
+div.list-block div:first-child {
+  width: 95vw; }
+  @media screen and (min-width: 40em) {
+    div.list-block div:first-child .list-navigation, div.list-block div:first-child div.list {
+      width: 85% !important; } }
+  div.list-block div:first-child .list {
+    overflow-x: auto;
+    overflow-y: hidden; }
+  div.list-block div:first-child table.list {
+    width: 100%; }
+    div.list-block div:first-child table.list th {
+      position: relative;
+      padding-right: 20px; }
+      div.list-block div:first-child table.list th i {
+        position: absolute;
+        right: 5px;
+        padding-left: 10px; }
+    div.list-block div:first-child table.list td, div.list-block div:first-child table.list th {
+      white-space: nowrap; }
 
 /********************************************************************
 *********************************************************************

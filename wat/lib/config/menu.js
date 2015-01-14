@@ -97,7 +97,7 @@ Wat.I.mobileMenuOriginal = _.extend({}, Wat.I.menuOriginal);
 
 Wat.I.mobileMenuOriginal.logout = {
     icon: CLASS_ICON_LOGOUT,
-    text: 'Logout'
+    text: 'Log-out'
 }
 
 // Corner menu configuration values
