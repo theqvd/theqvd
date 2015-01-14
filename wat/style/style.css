@@ -1192,7 +1192,9 @@ body {
         width: 100%; }
     .wrapper .content .list-block .shown-elements, .wrapper .content .details-side .shown-elements {
       margin-top: 9px;
-      float: right; }
+      width: 81vw;
+      position: absolute;
+      text-align: right; }
     .wrapper .content .list-block .selected-elements, .wrapper .content .details-side .selected-elements {
       margin-top: 9px;
       float: left; }

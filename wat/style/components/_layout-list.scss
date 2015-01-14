@@ -135,7 +135,9 @@
     
     .shown-elements {
         margin-top: 9px;
-        float: right;
+        width: 81vw;
+        position: absolute;
+        text-align: right;
     }    
     
     .selected-elements {
