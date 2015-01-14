@@ -13,7 +13,7 @@ __PACKAGE__->result_source_instance->view_definition(
 "
 
 SELECT op.acl_id, op.role_id, op.roles_json, ac.name as acl_name,
-       CASE WHEN ac.name ~ ? THEN FALSE ELSE CASE WHEN ac.name ~ ? THEN TRUE ELSE op.operative END END
+       CASE WHEN ac.name ~ ? THEN FALSE ELSE op.operative END
 FROM operative_acls_in_roles_with_inheritance_info op
 JOIN acls ac ON  op.acl_id=ac.id
 WHERE ac.name !~ ?
