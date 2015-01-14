@@ -67,15 +67,18 @@
             <%
                             break;
                         default:
-                            var translationAttr = 'data-i18n="' + col.text + '"';
-                            if (col.noTranslatable === true) {
-                                translationAttr = '';
+                            var translationAttr = '';
+                            var colText = col.text;
+                            
+                            if (col.noTranslatable !== true) {
+                                translationAttr = 'data-i18n="' + col.text + '"';
+                                colText = $.i18n.t(col.text);
                             }
                     
             %>
                             <th class="sortable desktop" data-sortby="<%= name %>">
                                 <i class="fa sort-icon"></i>
-                                <span <%= translationAttr %>><%= col.text %></span>
+                                <span <%= translationAttr %>><%= colText %></span>
                             </th>
             <%
                             break;
