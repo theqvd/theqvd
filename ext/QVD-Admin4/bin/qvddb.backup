@@ -82,88 +82,10 @@ CREATE TYPE view_types_enum AS ENUM (
 ALTER TYPE public.view_types_enum OWNER TO postgres;
 
 --
--- Name: role_role_relations; Type: TABLE; Schema: public; Owner: qvd; Tablespace: 
+-- Name: delete_tenant_views_for_removed_property(); Type: FUNCTION; Schema: public; Owner: postgres
 --
 
-CREATE TABLE role_role_relations (
-    id integer NOT NULL,
-    inheritor_id integer NOT NULL,
-    inherited_id integer NOT NULL
-);
-
-
-ALTER TABLE public.role_role_relations OWNER TO qvd;
-
---
--- Name: role_role_relations_id_seq; Type: SEQUENCE; Schema: public; Owner: qvd
---
-
-CREATE SEQUENCE role_role_relations_id_seq
-    START WITH 1
-    INCREMENT BY 1
-    NO MINVALUE
-    NO MAXVALUE
-    CACHE 1;
-
-
-ALTER TABLE public.role_role_relations_id_seq OWNER TO qvd;
-
---
--- Name: role_role_relations_id_seq; Type: SEQUENCE OWNED BY; Schema: public; Owner: qvd
---
-
-ALTER SEQUENCE role_role_relations_id_seq OWNED BY role_role_relations.id;
-
-
---
--- Name: acls_in_role_recursive(integer); Type: FUNCTION; Schema: public; Owner: postgres
---
-
-CREATE FUNCTION acls_in_role_recursive(role_id integer) RETURNS TABLE(inheritor_id integer, inherited_id integer, inheritor_name text, inherited_name text, acl_id integer, acl_name text, acl_positive boolean, inheritor_fixed boolean, inheritor_internal boolean, inherited_fixed boolean, inherited_internal boolean)
-    LANGUAGE sql
-    AS $_$
-
-      with recursive all_role_role_relations(inheritor_id, inherited_id) as ( 
-        
-          select inheritor_id, inherited_id 
-          from role_role_relations 
-          where inheritor_id in ( $1 ) 
-
-          union 
-
-          select p.inheritor_id, p.inherited_id 
-          from all_role_role_relations pr, role_role_relations p 
-          where pr.inherited_id=p.inheritor_id  ) 
-
-      select a.inheritor_id as inheritor_id, a.inherited_id as inherited_id, d.name as inheritor_name, e.name as inherited_name, 
-             b.acl_id as acl_id, c.name as acl_name, b.positive as acl_positive, d.fixed as inheritor_fixed, d.internal as inheritor_internal, 
-             e.fixed as inherited_fixed, e.internal as inherited_internal 
-      from all_role_role_relations a 
-      left join acl_role_relations b on (a.inherited_id=b.role_id) 
-      left join acls c on (c.id=b.acl_id) 
-      join roles d on (d.id=a.inheritor_id) 
-      join roles e on (e.id=a.inherited_id) 
-
-      union 
-
-      select f.id as inheritor_id, f.id as inherited_id, f.name as inheritor_name, f.name as inherited_name, g.acl_id as acl_id, h.name as acl_name, 
-             g.positive as acl_positive, f.fixed as inheritor_fixed, f.internal as inheritor_internal, f.fixed as inherited_fixed, f.internal as inherited_internal  
-      from roles f 
-      join acl_role_relations g on (f.id=g.role_id) 
-      join acls h on (h.id=g.acl_id) 
-
-      where f.id in ( $1 )
-
-$_$;
-
-
-ALTER FUNCTION public.acls_in_role_recursive(role_id integer) OWNER TO postgres;
-
---
--- Name: delete_views_for_removed_property(); Type: FUNCTION; Schema: public; Owner: postgres
---
-
-CREATE FUNCTION delete_views_for_removed_property() RETURNS trigger
+CREATE FUNCTION delete_tenant_views_for_removed_property() RETURNS trigger
     LANGUAGE plpgsql
     AS $_$
 
@@ -309,8 +231,7 @@ END;
 $_$;
 
 
-ALTER FUNCTION public.delete_views_for_removed_property() OWNER TO postgres;
-
+ALTER FUNCTION public.delete_tenant_views_for_removed_property() OWNER TO postgres;
 
 --
 -- Name: di_blocked_or_unblocked_notify(); Type: FUNCTION; Schema: public; Owner: postgres
@@ -367,6 +288,124 @@ CREATE FUNCTION host_state_changed_notify() RETURNS trigger
 
 ALTER FUNCTION public.host_state_changed_notify() OWNER TO postgres;
 
+--
+-- Name: insert_default_tenant_views_for_property(); Type: FUNCTION; Schema: public; Owner: postgres
+--
+
+CREATE FUNCTION insert_default_tenant_views_for_property() RETURNS trigger
+    LANGUAGE plpgsql
+    AS $_$
+
+-- Variable for rows retrieved by queries
+
+DECLARE i record;
+
+-- Variable for tenant_id involved
+
+DECLARE tid int;
+
+-- Variable for qvd_object involved 
+
+DECLARE qo qvd_objects_enum;
+BEGIN
+qo := TG_ARGV[0];
+
+
+-- Hosts are not related to any tenant, so they have the following specific behaviour
+
+IF qo = 'host' THEN
+
+  FOR i IN SELECT * FROM unnest(enum_range(NULL::device_types_enum)) device_type 
+                    CROSS JOIN unnest(enum_range(NULL::view_types_enum)) view_type 
+                    CROSS JOIN (SELECT id as tenant_id FROM tenants) tenant_id LOOP                                                                                                                                              
+    IF EXISTS (SELECT 1 FROM tenant_views_setups v WHERE v.tenant_id=i.tenant_id     AND 
+                                                         v.field=NEW.key             AND 
+                                                         v.view_type=i.view_type     AND 
+                                                         v.device_type=i.device_type AND 
+                                                         v.qvd_object=qo             AND 
+                                                         v.property='t') THEN                                                                                                                                                            
+    --                                                                                                                                                              
+    ELSE
+
+    EXECUTE 'INSERT INTO tenant_views_setups (tenant_id,field,view_type,device_type,qvd_object,property,visible) VALUES ($1,$2,$3,$4,$5,$6,$7)' 
+             USING i.tenant_id, NEW.key, i.view_type, i.device_type, qo, TRUE, FALSE;
+    RAISE NOTICE 'Inserted row in tenant_views_setups by procedure insert_default_tenant_views_for_property'; END IF;
+
+    END LOOP;
+
+-- For the rest of qvd objects
+
+ELSE                                                                                                            
+
+-- Tenant id is found in different ways according to qvd objects
+
+  IF qo = 'vm' THEN                                                                                                                                                            
+
+  SELECT u.tenant_id INTO tid FROM users u JOIN vms vm ON vm.user_id=u.id WHERE vm.id=NEW.vm_id;                                                                                                                       
+  ELSIF qo = 'user' THEN
+
+  SELECT u.tenant_id INTO tid FROM users u WHERE u.id=NEW.user_id;                                                                                                                       
+
+  ELSIF qo = 'osf' THEN
+
+  SELECT o.tenant_id INTO tid FROM osfs o WHERE o.id=NEW.osf_id;                                                                                                                       
+
+  ELSIF qo = 'di' THEN
+
+  SELECT o.tenant_id INTO tid FROM osfs o JOIN dis di ON di.osf_id=o.id WHERE di.id=NEW.di_id;                                                                                                     
+  ELSE                
+
+  RAISE EXCEPTION 'Invalid qvd_object provided to insert_default_tenant_view_for_property()';	
+
+  END IF;
+
+-- Main process for qvd objects with tenant id for every possible kind of view
+
+  FOR i IN SELECT * FROM unnest(enum_range(NULL::device_types_enum)) device_type CROSS JOIN unnest(enum_range(NULL::view_types_enum)) view_type LOOP                                  
+
+-- Default views are created in qvd object's tenant
+
+    IF EXISTS (SELECT 1 FROM tenant_views_setups v WHERE v.tenant_id=tid             AND 
+                                                         v.field=NEW.key             AND 
+                                                         v.view_type=i.view_type     AND 
+                                                         v.device_type=i.device_type AND
+                                                         v.qvd_object=qo             AND 
+                                                         v.property='t') THEN                                                                                                                                                            
+      --                                                                                                                                                              
+
+    ELSE
+
+      EXECUTE 'INSERT INTO tenant_views_setups (tenant_id,field,view_type,device_type,qvd_object,property,visible) VALUES ($1,$2,$3,$4,$5,$6,$7)' 
+               USING tid, NEW.key, i.view_type, i.device_type, qo, TRUE, FALSE;
+      RAISE NOTICE 'Inserted row in tenant_views_setups by procedure '; 
+    END IF;
+
+-- Default views are created in superadmin's tenant (0)
+
+    IF EXISTS (SELECT 1 FROM tenant_views_setups v WHERE v.tenant_id='0'             AND 
+                                                         v.field=NEW.key             AND 
+                                                         v.view_type=i.view_type     AND 
+                                                         v.device_type=i.device_type AND 
+                                                         v.qvd_object=qo             AND 
+                                                         v.property='t') THEN                                                                                                                                                            
+      --                                                                                                                                                              
+
+    ELSE
+
+      EXECUTE 'INSERT INTO tenant_views_setups (tenant_id,field,view_type,device_type,qvd_object,property,visible) VALUES ($1,$2,$3,$4,$5,$6,$7)' 
+               USING 0, NEW.key, i.view_type, i.device_type, qo, TRUE, FALSE;
+      RAISE NOTICE 'Tenant View Inserted by procedure'; 
+    END IF;
+
+  END LOOP; 
+END IF;
+
+RETURN NEW;
+END;
+$_$;
+
+
+ALTER FUNCTION public.insert_default_tenant_views_for_property() OWNER TO postgres;
 
 --
 -- Name: osf_created_or_removed_notify(); Type: FUNCTION; Schema: public; Owner: postgres
@@ -538,7 +577,7 @@ CREATE TABLE administrator_views_setups (
     field character varying(64) NOT NULL,
     visible boolean NOT NULL,
     device_type device_types_enum NOT NULL,
-    view_type view_types_enum NOT NULL,
+    view_type character varying(64) NOT NULL,
     property boolean NOT NULL,
     qvd_object qvd_objects_enum NOT NULL
 );
@@ -602,70 +641,6 @@ ALTER TABLE public.administrators_id_seq OWNER TO qvd;
 --
 
 ALTER SEQUENCE administrators_id_seq OWNED BY administrators.id;
-
-
-
---
--- Name: all_role_role_relations; Type: VIEW; Schema: public; Owner: qvd
---
-
-CREATE VIEW all_role_role_relations AS
- WITH RECURSIVE all_role_role_relations(inheritor_id, inherited_id) AS (
-         SELECT role_role_relations.inheritor_id,
-            role_role_relations.inherited_id
-           FROM role_role_relations
-        UNION
-         SELECT p.inheritor_id,
-            p.inherited_id
-           FROM all_role_role_relations pr,
-            role_role_relations p
-          WHERE (pr.inherited_id = p.inheritor_id)
-        )
- SELECT a.inheritor_id,
-    a.inherited_id
-   FROM all_role_role_relations a;
-
-
-ALTER TABLE public.all_role_role_relations OWNER TO qvd;
-
---
--- Name: all_acl_role_relations; Type: VIEW; Schema: public; Owner: qvd
---
-
-CREATE VIEW all_acl_role_relations AS
- WITH RECURSIVE all_acls_role_relations(inheritor_id, inherited_id, acl_id) AS (
-         SELECT a.inheritor_id,
-            a.inherited_id,
-            b.acl_id
-           FROM (all_role_role_relations a
-             JOIN acl_role_relations b ON ((b.role_id = a.inherited_id)))
-          WHERE ((b.positive = true) AND (NOT (b.acl_id IN ( SELECT c.acl_id
-                   FROM acl_role_relations c
-                  WHERE ((c.positive = false) AND (c.role_id = a.inheritor_id))))))
-        UNION
-         SELECT d.inheritor_id,
-            d.inherited_id,
-            e.acl_id
-           FROM (all_role_role_relations d
-             JOIN all_acls_role_relations e ON ((d.inherited_id = e.inheritor_id)))
-          WHERE (NOT (e.acl_id IN ( SELECT f.acl_id
-                   FROM acl_role_relations f
-                  WHERE ((f.positive = false) AND (f.role_id = e.inheritor_id)))))
-        )
- SELECT all_acls_role_relations.inheritor_id,
-    all_acls_role_relations.inherited_id,
-    all_acls_role_relations.acl_id
-   FROM all_acls_role_relations
-UNION
- SELECT acl_role_relations.role_id AS inheritor_id,
-    acl_role_relations.role_id AS inherited_id,
-    acl_role_relations.acl_id
-   FROM acl_role_relations
-  WHERE (acl_role_relations.positive = true);
-
-
-ALTER TABLE public.all_acl_role_relations OWNER TO qvd;
-
 
 
 --
@@ -955,6 +930,40 @@ ALTER SEQUENCE role_administrator_relations_id_seq OWNED BY role_administrator_r
 
 
 --
+-- Name: role_role_relations; Type: TABLE; Schema: public; Owner: qvd; Tablespace: 
+--
+
+CREATE TABLE role_role_relations (
+    id integer NOT NULL,
+    inheritor_id integer NOT NULL,
+    inherited_id integer NOT NULL
+);
+
+
+ALTER TABLE public.role_role_relations OWNER TO qvd;
+
+--
+-- Name: role_role_relations_id_seq; Type: SEQUENCE; Schema: public; Owner: qvd
+--
+
+CREATE SEQUENCE role_role_relations_id_seq
+    START WITH 1
+    INCREMENT BY 1
+    NO MINVALUE
+    NO MAXVALUE
+    CACHE 1;
+
+
+ALTER TABLE public.role_role_relations_id_seq OWNER TO qvd;
+
+--
+-- Name: role_role_relations_id_seq; Type: SEQUENCE OWNED BY; Schema: public; Owner: qvd
+--
+
+ALTER SEQUENCE role_role_relations_id_seq OWNED BY role_role_relations.id;
+
+
+--
 -- Name: roles; Type: TABLE; Schema: public; Owner: qvd; Tablespace: 
 --
 
@@ -1172,6 +1181,90 @@ CREATE TABLE versions (
 ALTER TABLE public.versions OWNER TO qvd;
 
 --
+-- Name: virtual_di_property_views; Type: VIEW; Schema: public; Owner: qvd
+--
+
+CREATE VIEW virtual_di_property_views AS
+ SELECT o.tenant_id,
+    view.view AS view_type,
+    device.device AS device_type,
+    'di' AS qvd_object,
+    property.key AS field,
+    v.visible,
+    true AS property
+   FROM (((((di_properties property
+     JOIN dis di ON ((di.id = property.di_id)))
+     JOIN osfs o ON ((di.osf_id = di.id)))
+     CROSS JOIN unnest(enum_range(NULL::device_types_enum)) device(device))
+     CROSS JOIN unnest(enum_range(NULL::view_types_enum)) view(view))
+     LEFT JOIN tenant_views_setups v ON ((((((o.tenant_id = v.tenant_id) AND (v.property = true)) AND ((v.field)::text = (property.key)::text)) AND (v.device_type = device.device)) AND (v.view_type = view.view))));
+
+
+ALTER TABLE public.virtual_di_property_views OWNER TO qvd;
+
+--
+-- Name: virtual_host_property_views; Type: VIEW; Schema: public; Owner: qvd
+--
+
+CREATE VIEW virtual_host_property_views AS
+ SELECT NULL::unknown AS tenant_id,
+    view.view AS view_type,
+    device.device AS device_type,
+    'host' AS qvd_object,
+    property.key AS field,
+    v.visible,
+    true AS property
+   FROM (((host_properties property
+     CROSS JOIN unnest(enum_range(NULL::device_types_enum)) device(device))
+     CROSS JOIN unnest(enum_range(NULL::view_types_enum)) view(view))
+     LEFT JOIN tenant_views_setups v ON (((((v.property = true) AND ((v.field)::text = (property.key)::text)) AND (v.device_type = device.device)) AND (v.view_type = view.view))));
+
+
+ALTER TABLE public.virtual_host_property_views OWNER TO qvd;
+
+--
+-- Name: virtual_osf_property_views; Type: VIEW; Schema: public; Owner: qvd
+--
+
+CREATE VIEW virtual_osf_property_views AS
+ SELECT o.tenant_id,
+    view.view AS view_type,
+    device.device AS device_type,
+    'osf' AS qvd_object,
+    property.key AS field,
+    v.visible,
+    true AS property
+   FROM ((((osf_properties property
+     JOIN osfs o ON ((o.id = property.osf_id)))
+     CROSS JOIN unnest(enum_range(NULL::device_types_enum)) device(device))
+     CROSS JOIN unnest(enum_range(NULL::view_types_enum)) view(view))
+     LEFT JOIN tenant_views_setups v ON ((((((v.tenant_id = o.tenant_id) AND (v.property = true)) AND ((v.field)::text = (property.key)::text)) AND (v.device_type = device.device)) AND (v.view_type = view.view))));
+
+
+ALTER TABLE public.virtual_osf_property_views OWNER TO qvd;
+
+--
+-- Name: virtual_user_property_views; Type: VIEW; Schema: public; Owner: qvd
+--
+
+CREATE VIEW virtual_user_property_views AS
+ SELECT u.tenant_id,
+    view.view AS view_type,
+    device.device AS device_type,
+    'user' AS qvd_object,
+    property.key AS field,
+    v.visible,
+    true AS property
+   FROM ((((user_properties property
+     JOIN users u ON ((u.id = property.user_id)))
+     CROSS JOIN unnest(enum_range(NULL::device_types_enum)) device(device))
+     CROSS JOIN unnest(enum_range(NULL::view_types_enum)) view(view))
+     LEFT JOIN tenant_views_setups v ON ((((((v.tenant_id = u.tenant_id) AND (v.property = true)) AND ((v.field)::text = (property.key)::text)) AND (v.device_type = device.device)) AND (v.view_type = view.view))));
+
+
+ALTER TABLE public.virtual_user_property_views OWNER TO qvd;
+
+--
 -- Name: vm_properties; Type: TABLE; Schema: public; Owner: qvd; Tablespace: 
 --
 
@@ -1201,127 +1294,27 @@ CREATE TABLE vms (
 
 ALTER TABLE public.vms OWNER TO qvd;
 
-
-
 --
--- Name: operative_views_in_tenants; Type: VIEW; Schema: public; Owner: qvd
+-- Name: virtual_vm_property_views; Type: VIEW; Schema: public; Owner: qvd
 --
 
-CREATE VIEW operative_views_in_tenants AS
- SELECT DISTINCT dt.dt AS device_type,
-    vt.vt AS view_type,
-    t.id AS tenant_id,
-    p.key AS field,
-        CASE
-            WHEN (r.visible IS NULL) THEN false
-            ELSE r.visible
-        END AS visible,
-    true AS property,
-    'vm'::qvd_objects_enum AS qvd_object
-   FROM ((((((unnest(enum_range(NULL::device_types_enum)) dt(dt)
-     CROSS JOIN unnest(enum_range(NULL::view_types_enum)) vt(vt))
-     CROSS JOIN ( SELECT tenants.id
-           FROM tenants) t)
-     CROSS JOIN ( SELECT vm_properties.key,
-            vm_properties.vm_id
-           FROM vm_properties) p)
-     JOIN vms v ON ((p.vm_id = v.id)))
-     JOIN users u ON (((u.id = v.user_id) AND ((u.tenant_id = t.id) OR (t.id = 0)))))
-     LEFT JOIN tenant_views_setups r ON (((((((r.device_type = dt.dt) AND (r.view_type = vt.vt)) AND (r.tenant_id = t.id)) AND ((r.field)::text = (p.key)::text)) AND (r.property = true)) AND (r.qvd_object = 'vm'::qvd_objects_enum))))
-UNION
- SELECT DISTINCT dt.dt AS device_type,
-    vt.vt AS view_type,
-    t.id AS tenant_id,
-    p.key AS field,
-        CASE
-            WHEN (r.visible IS NULL) THEN false
-            ELSE r.visible
-        END AS visible,
-    true AS property,
-    'user'::qvd_objects_enum AS qvd_object
-   FROM (((((unnest(enum_range(NULL::device_types_enum)) dt(dt)
-     CROSS JOIN unnest(enum_range(NULL::view_types_enum)) vt(vt))
-     CROSS JOIN ( SELECT tenants.id
-           FROM tenants) t)
-     CROSS JOIN ( SELECT user_properties.key,
-            user_properties.user_id
-           FROM user_properties) p)
-     JOIN users u ON (((p.user_id = u.id) AND ((u.tenant_id = t.id) OR (t.id = 0)))))
-     LEFT JOIN tenant_views_setups r ON (((((((r.device_type = dt.dt) AND (r.view_type = vt.vt)) AND (r.tenant_id = t.id)) AND ((r.field)::text = (p.key)::text)) AND (r.property = true)) AND (r.qvd_object = 'user'::qvd_objects_enum))))
-UNION
- SELECT DISTINCT dt.dt AS device_type,
-    vt.vt AS view_type,
-    t.id AS tenant_id,
-    p.key AS field,
-        CASE
-            WHEN (r.visible IS NULL) THEN false
-            ELSE r.visible
-        END AS visible,
-    true AS property,
-    'host'::qvd_objects_enum AS qvd_object
-   FROM ((((unnest(enum_range(NULL::device_types_enum)) dt(dt)
-     CROSS JOIN unnest(enum_range(NULL::view_types_enum)) vt(vt))
-     CROSS JOIN ( SELECT tenants.id
-           FROM tenants) t)
-     CROSS JOIN ( SELECT host_properties.key
-           FROM host_properties) p)
-     LEFT JOIN tenant_views_setups r ON (((((((r.device_type = dt.dt) AND (r.view_type = vt.vt)) AND (r.tenant_id = t.id)) AND ((r.field)::text = (p.key)::text)) AND (r.property = true)) AND (r.qvd_object = 'host'::qvd_objects_enum))))
-UNION
- SELECT DISTINCT dt.dt AS device_type,
-    vt.vt AS view_type,
-    t.id AS tenant_id,
-    p.key AS field,
-        CASE
-            WHEN (r.visible IS NULL) THEN false
-            ELSE r.visible
-        END AS visible,
-    true AS property,
-    'osf'::qvd_objects_enum AS qvd_object
-   FROM (((((unnest(enum_range(NULL::device_types_enum)) dt(dt)
-     CROSS JOIN unnest(enum_range(NULL::view_types_enum)) vt(vt))
-     CROSS JOIN ( SELECT tenants.id
-           FROM tenants) t)
-     CROSS JOIN ( SELECT osf_properties.key,
-            osf_properties.osf_id
-           FROM osf_properties) p)
-     JOIN osfs o ON (((p.osf_id = o.id) AND ((o.tenant_id = t.id) OR (t.id = 0)))))
-     LEFT JOIN tenant_views_setups r ON (((((((r.device_type = dt.dt) AND (r.view_type = vt.vt)) AND (r.tenant_id = t.id)) AND ((r.field)::text = (p.key)::text)) AND (r.property = true)) AND (r.qvd_object = 'osf'::qvd_objects_enum))))
-UNION
- SELECT DISTINCT dt.dt AS device_type,
-    vt.vt AS view_type,
-    t.id AS tenant_id,
-    p.key AS field,
-        CASE
-            WHEN (r.visible IS NULL) THEN false
-            ELSE r.visible
-        END AS visible,
-    true AS property,
-    'di'::qvd_objects_enum AS qvd_object
-   FROM ((((((unnest(enum_range(NULL::device_types_enum)) dt(dt)
-     CROSS JOIN unnest(enum_range(NULL::view_types_enum)) vt(vt))
-     CROSS JOIN ( SELECT tenants.id
-           FROM tenants) t)
-     CROSS JOIN ( SELECT di_properties.key,
-            di_properties.di_id
-           FROM di_properties) p)
-     JOIN dis d ON ((p.di_id = d.id)))
-     JOIN osfs o ON (((o.id = d.osf_id) AND ((o.tenant_id = t.id) OR (t.id = 0)))))
-     LEFT JOIN tenant_views_setups r ON (((((((r.device_type = dt.dt) AND (r.view_type = vt.vt)) AND (r.tenant_id = t.id)) AND ((r.field)::text = (p.key)::text)) AND (r.property = true)) AND (r.qvd_object = 'di'::qvd_objects_enum))))
-UNION
- SELECT tenant_views_setups.device_type,
-    tenant_views_setups.view_type,
-    tenant_views_setups.tenant_id,
-    tenant_views_setups.field,
-    tenant_views_setups.visible,
-    tenant_views_setups.property,
-    tenant_views_setups.qvd_object
-   FROM tenant_views_setups
-  WHERE (tenant_views_setups.property = false);
+CREATE VIEW virtual_vm_property_views AS
+ SELECT u.tenant_id,
+    view.view AS view_type,
+    device.device AS device_type,
+    'vm' AS qvd_object,
+    property.key AS field,
+    v.visible,
+    true AS property
+   FROM (((((vm_properties property
+     JOIN vms vm ON ((vm.id = property.vm_id)))
+     JOIN users u ON ((vm.user_id = u.id)))
+     CROSS JOIN unnest(enum_range(NULL::device_types_enum)) device(device))
+     CROSS JOIN unnest(enum_range(NULL::view_types_enum)) view(view))
+     LEFT JOIN tenant_views_setups v ON ((((((u.tenant_id = v.tenant_id) AND (v.property = true)) AND ((v.field)::text = (property.key)::text)) AND (v.device_type = device.device)) AND (v.view_type = view.view))));
 
 
-ALTER TABLE public.operative_views_in_tenants OWNER TO qvd;
-
-
+ALTER TABLE public.virtual_vm_property_views OWNER TO qvd;
 
 --
 -- Name: vm_cmds; Type: TABLE; Schema: public; Owner: qvd; Tablespace: 
@@ -1826,20 +1819,12 @@ COPY acl_role_relations (id, acl_id, role_id, positive) FROM stdin;
 1043	258	1	t
 1044	162	78	t
 1045	259	105	t
-1046	98	104	f
-1047	240	104	f
-1048	122	104	f
-1049	243	104	f
-1050	255	104	f
-1051	144	104	f
-1052	256	104	f
-1053	143	104	f
-1054	257	104	f
-1055	258	104	f
 1058	259	106	t
 1059	162	106	f
 1060	260	35	t
 1061	261	43	t
+1154	162	111	f
+1155	56	111	f
 \.
 
 
@@ -1847,7 +1832,7 @@ COPY acl_role_relations (id, acl_id, role_id, positive) FROM stdin;
 -- Name: acl_role_relations_id_seq; Type: SEQUENCE SET; Schema: public; Owner: qvd
 --
 
-SELECT pg_catalog.setval('acl_role_relations_id_seq', 1061, true);
+SELECT pg_catalog.setval('acl_role_relations_id_seq', 1155, true);
 
 
 --
@@ -2126,6 +2111,29 @@ SELECT pg_catalog.setval('acls_id_seq', 1, false);
 COPY administrator_views_setups (id, administrator_id, field, visible, device_type, view_type, property, qvd_object) FROM stdin;
 55	1	host	f	desktop	filter	f	vm
 56	1	host	t	mobile	filter	f	vm
+57	35	id	t	desktop	list_column	f	user
+60	35	id	t	desktop	list_column	f	vm
+61	35	osf	t	desktop	list_column	f	vm
+62	35	tag	t	desktop	list_column	f	vm
+63	35	di_version	t	desktop	list_column	f	vm
+64	35	di_name	t	desktop	list_column	f	vm
+65	35	ip	t	desktop	list_column	f	vm
+72	35	creation_admin	f	desktop	list_column	f	vm
+70	35	creation_date	f	desktop	list_column	f	vm
+71	35	vnc_port	f	desktop	list_column	f	vm
+69	35	ssh_port	f	desktop	list_column	f	vm
+68	35	serial_port	f	desktop	list_column	f	vm
+67	35	mac	f	desktop	list_column	f	vm
+66	35	next_boot_ip	f	desktop	list_column	f	vm
+73	35	osf/tag	f	desktop	list_column	f	vm
+59	35	creation_admin	f	desktop	list_column	f	user
+58	35	creation_date	f	desktop	list_column	f	user
+74	35	puesto	t	desktop	list_column	t	user
+75	35	tags	t	desktop	list_column	f	di
+76	35	default	t	desktop	list_column	f	di
+77	35	head	t	desktop	list_column	f	di
+78	35	torestart	t	desktop	list_column	t	di
+79	1	tags	t	desktop	list_column	f	di
 \.
 
 
@@ -2133,7 +2141,7 @@ COPY administrator_views_setups (id, administrator_id, field, visible, device_ty
 -- Name: administrator_views_setups_id_seq; Type: SEQUENCE SET; Schema: public; Owner: qvd
 --
 
-SELECT pg_catalog.setval('administrator_views_setups_id_seq', 56, true);
+SELECT pg_catalog.setval('administrator_views_setups_id_seq', 79, true);
 
 
 --
@@ -2151,11 +2159,11 @@ COPY administrators (id, name, password, tenant_id, language, block) FROM stdin;
 18	truman	truman	1	auto	0
 19	bigbro	bigbro	0	auto	0
 10	maria_root	maria_root	1	auto	0
-20	test	test	0	auto	0
 0	batman	to the rescue	0	auto	0
 3	ana	ana	1	es	0
-31	admin	admin	1	auto	0
 1	superadmin	superadmin	0	en	0
+31	admin	admin	1	en	0
+35	alicia	alicia	14	es	10
 \.
 
 
@@ -2163,7 +2171,7 @@ COPY administrators (id, name, password, tenant_id, language, block) FROM stdin;
 -- Name: administrators_id_seq; Type: SEQUENCE SET; Schema: public; Owner: qvd
 --
 
-SELECT pg_catalog.setval('administrators_id_seq', 32, true);
+SELECT pg_catalog.setval('administrators_id_seq', 37, true);
 
 
 --
@@ -2194,6 +2202,7 @@ wat.multitenant	1
 --
 
 COPY di_properties (di_id, key, value) FROM stdin;
+295	torestart	1
 \.
 
 
@@ -2226,10 +2235,22 @@ COPY di_tags (id, di_id, tag, fixed) FROM stdin;
 1521	4	Real Ubuntu	t
 1984	268	galiDI	t
 1985	268	head	f
+2314	295	2015-01-13-000	t
+2387	295	test2	f
+2316	295	default	f
+2388	295	test3	f
 2196	18	default	f
+2389	295	test4	f
+2390	295	test5	f
+2391	295	test6	f
+2392	295	test7	f
 1625	238	2014-12-09-000	t
 1626	238	head	f
 1627	238	default	f
+2331	297	alicia	f
+2332	297	2015-01-13-001	t
+2333	297	head	f
+2334	295	test	f
 1918	4	head	f
 \.
 
@@ -2238,7 +2259,7 @@ COPY di_tags (id, di_id, tag, fixed) FROM stdin;
 -- Name: di_tags_id_seq; Type: SEQUENCE SET; Schema: public; Owner: qvd
 --
 
-SELECT pg_catalog.setval('di_tags_id_seq', 2235, true);
+SELECT pg_catalog.setval('di_tags_id_seq', 2405, true);
 
 
 --
@@ -2255,8 +2276,10 @@ COPY dis (id, osf_id, path, blocked, version) FROM stdin;
 16	15	mSLES-12.tgz	f	2014-11-04-000
 14	14	mUbuntu-12.tgz	t	2014-11-04-000
 4	14	4-ubuntu-13.04-i386-qvd.tar.gz	f	Real Ubuntu
+297	221	297-ubuntu-13.04-i386-qvd.tar.gz	f	2015-01-13-001
 268	16	268-ubuntu-13.04-i386-qvd.tar.gz	f	galiDI
 238	164	238-ubuntu-13.04-i386-qvd.tar.gz	f	2014-12-09-000
+295	221	295-ubuntu-13.04-i386-qvd.tar.gz	f	2015-01-13-000
 \.
 
 
@@ -2264,7 +2287,7 @@ COPY dis (id, osf_id, path, blocked, version) FROM stdin;
 -- Name: dis_id_seq; Type: SEQUENCE SET; Schema: public; Owner: qvd
 --
 
-SELECT pg_catalog.setval('dis_id_seq', 287, true);
+SELECT pg_catalog.setval('dis_id_seq', 302, true);
 
 
 --
@@ -2283,7 +2306,7 @@ stop
 COPY host_counters (host_id, http_requests, auth_attempts, auth_ok, nx_attempts, nx_ok, short_sessions) FROM stdin;
 3	0	0	0	0	0	0
 4	0	0	0	0	0	0
-1	23	12	11	7	7	4
+1	39	21	18	14	14	7
 \.
 
 
@@ -2300,9 +2323,9 @@ COPY host_properties (host_id, key, value) FROM stdin;
 --
 
 COPY host_runtimes (host_id, pid, ok_ts, usable_ram, usable_cpu, state, blocked, cmd) FROM stdin;
-4	\N	\N	\N	\N	stopped	f	\N
+1	887	2015-01-15 15:53:49.027872	2050.1	3989.992	running	f	\N
+4	\N	\N	\N	\N	stopped	t	\N
 3	\N	\N	\N	\N	stopped	f	\N
-1	887	2015-01-08 11:39:03.227873	2050.1	3989.992	running	f	\N
 \.
 
 
@@ -2334,7 +2357,7 @@ COPY hosts (id, name, address, frontend, backend) FROM stdin;
 -- Name: hosts_id_seq; Type: SEQUENCE SET; Schema: public; Owner: qvd
 --
 
-SELECT pg_catalog.setval('hosts_id_seq', 176, true);
+SELECT pg_catalog.setval('hosts_id_seq', 189, true);
 
 
 --
@@ -2342,6 +2365,9 @@ SELECT pg_catalog.setval('hosts_id_seq', 176, true);
 --
 
 COPY osf_properties (osf_id, key, value) FROM stdin;
+214	propN	ev5m93mzpvi
+214	prop2	3k7f03323xr
+214	prop1	3r2f14te29
 \.
 
 
@@ -2353,8 +2379,10 @@ COPY osfs (id, name, memory, use_overlay, user_storage_size, tenant_id) FROM std
 15	mSLES	512	t	1024	1
 16	gUbuntu	256	t	0	7
 17	gSLES	256	t	0	7
-14	mUbuntu	85	t	81	1
+14	mUbuntu	84	t	56	1
+214	yfr06enrk9	28	t	39	1
 164	Developers	256	t	0	1
+221	My ubuntu	256	t	0	14
 \.
 
 
@@ -2362,7 +2390,7 @@ COPY osfs (id, name, memory, use_overlay, user_storage_size, tenant_id) FROM std
 -- Name: osfs_id_seq; Type: SEQUENCE SET; Schema: public; Owner: qvd
 --
 
-SELECT pg_catalog.setval('osfs_id_seq', 213, true);
+SELECT pg_catalog.setval('osfs_id_seq', 227, true);
 
 
 --
@@ -2380,10 +2408,9 @@ COPY role_administrator_relations (id, role_id, administrator_id) FROM stdin;
 42	101	11
 43	99	12
 44	101	13
-45	97	20
-46	1	20
 48	106	3
 50	1	31
+51	111	35
 \.
 
 
@@ -2391,7 +2418,7 @@ COPY role_administrator_relations (id, role_id, administrator_id) FROM stdin;
 -- Name: role_administrator_relations_id_seq; Type: SEQUENCE SET; Schema: public; Owner: qvd
 --
 
-SELECT pg_catalog.setval('role_administrator_relations_id_seq', 50, true);
+SELECT pg_catalog.setval('role_administrator_relations_id_seq', 51, true);
 
 
 --
@@ -2508,13 +2535,14 @@ COPY role_role_relations (id, inheritor_id, inherited_id) FROM stdin;
 144	103	45
 145	103	61
 146	103	43
-148	104	1
 152	94	105
 153	106	79
 154	106	81
 155	106	80
 156	106	78
 157	106	105
+161	111	93
+162	111	84
 \.
 
 
@@ -2522,7 +2550,7 @@ COPY role_role_relations (id, inheritor_id, inherited_id) FROM stdin;
 -- Name: role_role_relations_id_seq; Type: SEQUENCE SET; Schema: public; Owner: qvd
 --
 
-SELECT pg_catalog.setval('role_role_relations_id_seq', 157, true);
+SELECT pg_catalog.setval('role_role_relations_id_seq', 162, true);
 
 
 --
@@ -2606,10 +2634,10 @@ COPY roles (id, name, fixed, internal) FROM stdin;
 102	Root VMs	f	f
 99	Root Tenant	f	f
 1	Root	t	f
-104	test	f	f
 78	QVD Configuration Manager	t	t
 105	WAT Configuration Manager	t	t
 106	ninja	f	f
+111	Usability1	f	f
 \.
 
 
@@ -2617,7 +2645,7 @@ COPY roles (id, name, fixed, internal) FROM stdin;
 -- Name: roles_id_seq; Type: SEQUENCE SET; Schema: public; Owner: qvd
 --
 
-SELECT pg_catalog.setval('roles_id_seq', 106, true);
+SELECT pg_catalog.setval('roles_id_seq', 111, true);
 
 
 --
@@ -4236,8 +4264,22 @@ ca03ffc396b6423d1483893f2dcd0457fa40d47f	BQgDAAAAAQiSAAAACGFkbWluX2lk\n	14206896
 e03f0076f14f350ce598e9ca331c2336be3b70dd	BQgDAAAAAQiSAAAACGFkbWluX2lk\n	1420689664
 e1b8b4c02a5a84a719e8e756dc819c72d25cf432	BQgDAAAAAQiSAAAACGFkbWluX2lk\n	1420689665
 5750c4b581b5ec250d81a413405f1024c660d6e5	BQgDAAAAAQiSAAAACGFkbWluX2lk\n	1420689665
+c664e92e455150466f2c805fe48a029c3ed467c4	BQgDAAAAAQiBAAAACGFkbWluX2lk\n	1421056212
+5b6f021c44fa06bdb2e8aea650968efcd3187b90	BQgDAAAAAQijAAAACGFkbWluX2lk\n	1421138619
 ab729488bbc3fca969970669e25ca73bdf679034	BQgDAAAAAQiBAAAACGFkbWluX2lk\n	1420707777
+a3168d45fbcaa54a76ea1654165576bf01fe51e2	BQgDAAAAAQiBAAAACGFkbWluX2lk\n	1420732867
+e7a2cd66b1966794806142f6395d76362457e17d	BQgDAAAAAQiSAAAACGFkbWluX2lk\n	1420862457
+3c835208c2b35b8ae5a2e3d01e7430b231e4cf4b	BQgDAAAAAQiSAAAACGFkbWluX2lk\n	1420862457
+13b34f1e05cdf3c59e784e865b22117c956135e9	BQgDAAAAAQiSAAAACGFkbWluX2lk\n	1420862457
+578a35472f063fcdecb2f5c0539352212f13133f	BQgDAAAAAQiBAAAACGFkbWluX2lk\n	1420819266
+8d9b694f231cd0c09ea3e987608dc83ecd04eb2e	BQgDAAAAAQiSAAAACGFkbWluX2lk\n	1420862458
 49e2b6652c426b2133cf07926112965529be77eb	BQgDAAAAAQiBAAAACGFkbWluX2lk\n	1420710259
+89746415c07c083ab0aec4acb3fc4c79087043c5	BQgDAAAAAQiSAAAACGFkbWluX2lk\n	1420862458
+18a7e09c13cd17a2056326f2eabd1b3c3b9f6ddf	BQgDAAAAAQiSAAAACGFkbWluX2lk\n	1420862458
+a926d33bebb9ec2b3030479a27f7a4cbf7a42a55	BQgDAAAAAQifAAAACGFkbWluX2lk\n	1420733308
+7bac19d11e8b9327ee40e1c150fa41fb90878bd7	BQgDAAAAAQiBAAAACGFkbWluX2lk\n	1421074895
+98b046eba213551653ef4cbd2488e4e2d6474471	BQgDAAAAAQiBAAAACGFkbWluX2lk\n	1421079530
+71c64dd0f586f09277a605d5e42d06e00c0ccc42	BQgDAAAAAQiBAAAACGFkbWluX2lk\n	1420787734
 c452305c03155e1396e75b484cd8ca6271508228	BQgDAAAAAQifAAAACGFkbWluX2lk\n	1420710892
 4c1119693bdbd653fffc781f2476fd3263003b6d	BQgDAAAAAQiBAAAACGFkbWluX2lk\n	1420713127
 24830f68230d6b3ae860a743cfc8fb78eec902df	BQgDAAAAAQiBAAAACGFkbWluX2lk\n	1420713129
@@ -4256,12 +4298,111 @@ f708a5028a934fee676877edf2e5ed7a62e7244d	BQgDAAAAAQiBAAAACGFkbWluX2lk\n	14207147
 f2b2c1f7799a5ac20be2c95f95084f8a919a4c75	BQgDAAAAAQiBAAAACGFkbWluX2lk\n	1420714790
 1fe25a4444bab9113411305bcd23939cb795b1d2	BQgDAAAAAQiBAAAACGFkbWluX2lk\n	1420714820
 a1d9857bfb11395188b6345a9cd6673533da45b8	BQgDAAAAAQiBAAAACGFkbWluX2lk\n	1420714833
+9a435456447e685afa17c810449ea6cae00de04f	BQgDAAAAAQiBAAAACGFkbWluX2lk\n	1421079715
 240141d4c12b680bfe9e4c7e4bebc93bed91023b	BQgDAAAAAQiBAAAACGFkbWluX2lk\n	1420709455
 05445837216aea3829faf4df610ede2195181bfa	BQgDAAAAAQiBAAAACGFkbWluX2lk\n	1420720585
 39e9e4aecc22bc87a6523e98ae9f96676087985a	BQgDAAAAAQiBAAAACGFkbWluX2lk\n	1420720588
 21a39afac0df1f61d31c1abadb0348e503cc4e49	BQgDAAAAAQiBAAAACGFkbWluX2lk\n	1420720597
-28ba5f9baec3c36dddc0b0bb95310663f8aa5b7b	BQgDAAAAAQifAAAACGFkbWluX2lk\n	1420720670
+18dbfe3779f5a616b4eb8b238939c0935ef61f28	BQgDAAAAAQiBAAAACGFkbWluX2lk\n	1421074734
+f7723065041d85c505979b9d45a1dccd56308b4c	BQgDAAAAAQiBAAAACGFkbWluX2lk\n	1420810757
+bf8c69adebd434edae63c7819e5249062b78459b	BQgDAAAAAQiBAAAACGFkbWluX2lk\n	1420787610
+770f67ce1543679eafa5c2bb9fa926575d2fa492	BQgDAAAAAQijAAAACGFkbWluX2lk\n	1421074794
+a7c9c0696246165231a04146ba9b36991b461033	BQgDAAAAAQiBAAAACGFkbWluX2lk\n	1421069843
+c392e92b277651e7f28d61fead58c37785e09770	BQgDAAAAAQiBAAAACGFkbWluX2lk\n	1420787679
+28ba5f9baec3c36dddc0b0bb95310663f8aa5b7b	BQgDAAAAAQifAAAACGFkbWluX2lk\n	1420725910
 5ad8e693c1914257c3bab357da58176f8c1f757e	BQgDAAAAAQiDAAAACGFkbWluX2lk\n	1420709257
+d3728fbc61893b6e62868ac0710afcee4f944b92	BQgDAAAAAQijAAAACGFkbWluX2lk\n	1421074817
+2d4809d2fb5f23c979445c9cfa49e78e601f18e8	BQgDAAAAAQijAAAACGFkbWluX2lk\n	1421074846
+12cac23e692e9af53100061973552bb45482a588	BQgDAAAAAQifAAAACGFkbWluX2lk\n	1420793233
+15a43d1290054e104f07c53dcaf7d0e2948cf806	BQgDAAAAAQiBAAAACGFkbWluX2lk\n	1420799171
+e01fe8ac3436dd04f7b3fbbae5238a4312bfe8e7	BQgDAAAAAQiBAAAACGFkbWluX2lk\n	1420792636
+dbdec411993722d435608a652a4fca7160e121bb	BQgDAAAAAQifAAAACGFkbWluX2lk\n	1420807453
+5d74a032bd3a804f8de23d00aaedb31f0af34a02	BQgDAAAAAQifAAAACGFkbWluX2lk\n	1420801034
+847cf65e17a6649ff6622f823dddaa3b8c02bb46	BQgDAAAAAQiBAAAACGFkbWluX2lk\n	1421138595
+e7830044497daeec06e2e7dcfa4e5a8bb52b5aa6	BQgDAAAAAQiBAAAACGFkbWluX2lk\n	1421138619
+e9e8f3f2b7b6354a885adaf6f3b8c6b2fd594340	BQgDAAAAAQijAAAACGFkbWluX2lk\n	1421078461
+516f5f6e39d263845fbd13bc44daa9f3ddd320c9	BQgDAAAAAQiBAAAACGFkbWluX2lk\n	1421076833
+fd618d240018bdda30cbb0dde3b7e2f609899d82	BQgDAAAAAQijAAAACGFkbWluX2lk\n	1421076806
+3289f3871478892741fca29eca4a96c70856c00b	BQgDAAAAAQiBAAAACGFkbWluX2lk\n	1421138689
+fd804ba46dab66bb5f313ee7be0673fe09e93619	BQgDAAAAAQiSAAAACGFkbWluX2lk\n	1421121654
+ad05ebe5eefbae1ed1cfe9a349eebf9e59bdc34b	BQgDAAAAAQiSAAAACGFkbWluX2lk\n	1421121654
+b3cf3b37b9e6d01b34d450a6608e8ec9ba918879	BQgDAAAAAQiSAAAACGFkbWluX2lk\n	1421121654
+00c2407222313dd1301fd8e22a6668a629b74a63	BQgDAAAAAQiSAAAACGFkbWluX2lk\n	1421121655
+eddb6d5810dbf25e4556d0177fccae91e641e06b	BQgDAAAAAQiSAAAACGFkbWluX2lk\n	1421121655
+f6d07020f38711c172c0d6983528c30a955de333	BQgDAAAAAQiBAAAACGFkbWluX2lk\n	1421137796
+a66b8eff2b97b4a3a674f6d0e4e7b7ba1c8efae0	BQgDAAAAAQiSAAAACGFkbWluX2lk\n	1421121655
+0d6bb87d2bbf4ab5ae3a9ca7e873d15ad6f60410	BQgDAAAAAQiBAAAACGFkbWluX2lk\n	1421138639
+3f2506d5f80ea1f2755700dc5e11438a3348632f	BQgDAAAAAQijAAAACGFkbWluX2lk\n	1421138680
+2e8096c631d131a16be1c24f33ac961cd19395d4	BQgDAAAAAQijAAAACGFkbWluX2lk\n	1421138695
+ba6a56b4a4c8546f7284a345131f2a52364ea578	BQgDAAAAAQijAAAACGFkbWluX2lk\n	1421138749
+0c452217f443898f8eb1d5e4205b0defe7a85379	BQgDAAAAAQiBAAAACGFkbWluX2lk\n	1421138741
+28f683e04f1b9d554f6a44e34931bf1a0112478d	BQgDAAAAAQiBAAAACGFkbWluX2lk\n	1421138780
+74cf4592b77f73f236c03a8a4a186dad79b23ebc	BQgDAAAAAQijAAAACGFkbWluX2lk\n	1421140043
+5778b8395751e5c7618c5cbf4bc3065344686b4b	BQgDAAAAAQiBAAAACGFkbWluX2lk\n	1421164047
+0b01460b51de8e1d735aa8d6821ace14981f4621	BQgDAAAAAQiDAAAACGFkbWluX2lk\n	1421238405
+843c4df5ef24769764e5cec30924f0b84972bdcf	BQgDAAAAAQiBAAAACGFkbWluX2lk\n	1421226321
+b1e210d99a2cb2cbfa737ad26a727c0f4d5e3e65	BQgDAAAAAQiBAAAACGFkbWluX2lk\n	1421224591
+175bbdbe14c6b56afaf5871270deb3ab8041c937	BQgDAAAAAQiBAAAACGFkbWluX2lk\n	1421223751
+d98e2e2bb1d82f2ff66a2e9d682a9be91fa0878e	BQgDAAAAAQiAAAAACGFkbWluX2lk\n	1421244252
+78736a9dc0c5a9189be832043b7fe4cb075dd08f	BQgDAAAAAQiBAAAACGFkbWluX2lk\n	1421166477
+9e018fa6af03be345f2283e727b18afaada80faf	BQgDAAAAAQiBAAAACGFkbWluX2lk\n	1421142087
+3132dd75191d355bf830fa5bbd54cf9256cb30a7	BQgDAAAAAQiBAAAACGFkbWluX2lk\n	1421142091
+93da1828aa4a697318d9eb26a40d58e9d9978ca2	BQgDAAAAAQiBAAAACGFkbWluX2lk\n	1421142095
+475dd6803f28b948b6595197d58f7d1ab4c286dd	BQgDAAAAAQiBAAAACGFkbWluX2lk\n	1421142098
+51646d71bd3965494692a066845f68e65d94436c	BQgDAAAAAQijAAAACGFkbWluX2lk\n	1421158145
+02a7bd9b3fb16be8cd4189cc75835f39105a488e	BQgDAAAAAQiBAAAACGFkbWluX2lk\n	1421243364
+4fb8954876d627e40647e5ddd86e10e52093a360	BQgDAAAAAQiBAAAACGFkbWluX2lk\n	1421238423
+0fb064676693b12528558506fa0a8338121d6e4c	BQgDAAAAAQiBAAAACGFkbWluX2lk\n	1421162849
+9bc842722b37c9bcc9bd507e2f271911ca956b03	BQgDAAAAAQijAAAACGFkbWluX2lk\n	1421244800
+b0a80218ec42e9677fa5beb226c09612a69135a7	BQgDAAAAAQiBAAAACGFkbWluX2lk\n	1421169482
+52b20342fe8e9e24faa9f088cb6a6d44f2ebce6b	BQgDAAAAAQiBAAAACGFkbWluX2lk\n	1421140544
+2177adf8410b1204468c9b9f4717447991287fad	BQgDAAAAAQiBAAAACGFkbWluX2lk\n	1421242845
+066f28ff175e1ea28a40dc118e6d562db7297e17	BQgDAAAAAQijAAAACGFkbWluX2lk\n	1421229007
+bf99cb668a40f2db3cba667714681880d9e8b4c2	BQgDAAAAAQijAAAACGFkbWluX2lk\n	1421150742
+f6e35d6bd52cd84135979fd1fb420fb91c08b000	BQgDAAAAAQiSAAAACGFkbWluX2lk\n	1421208054
+1991b0e6d66f0b4a3ab31805be81a75d8f455ab2	BQgDAAAAAQiSAAAACGFkbWluX2lk\n	1421208054
+28559514b55cee735e3269fb528c6fa7ad919eb4	BQgDAAAAAQiSAAAACGFkbWluX2lk\n	1421208054
+1562a7c31fb844a3ea4d4e9fe5e870b7e9f0c2c6	BQgDAAAAAQiBAAAACGFkbWluX2lk\n	1421141322
+cb2f774f032f4167b512637f0961d1f6368366f0	BQgDAAAAAQiSAAAACGFkbWluX2lk\n	1421208054
+2bf426f80ae88054f6bcd5f811d2bb62f7b86f55	BQgDAAAAAQiSAAAACGFkbWluX2lk\n	1421208054
+be9303d2c509e3b8eb58d55f19984f2bd6afd1fa	BQgDAAAAAQiSAAAACGFkbWluX2lk\n	1421208055
+ac52605e9251ace71b81fa0193900f7fa0d1c6c1	BQgDAAAAAQiBAAAACGFkbWluX2lk\n	1421337666
+9a5f2d7104abaabaef8bc8ee41003e70491b1fe6	BQgDAAAAAQijAAAACGFkbWluX2lk\n	1421325869
+cca6fa4ab30b355c06af7c1574fcd78945db0b20	BQgDAAAAAQijAAAACGFkbWluX2lk\n	1421252723
+14f3822ce273406005d63e06ba851edc40bb2c0a	BQgDAAAAAQiBAAAACGFkbWluX2lk\n	1421251261
+71e7c6030a5d8229c3afd89067ab277a518f4385	BQgDAAAAAQiBAAAACGFkbWluX2lk\n	1421144832
+675076e72ca00feb474db5c9a9166b8f291a6f97	BQgDAAAAAQiBAAAACGFkbWluX2lk\n	1421309409
+ab5241920b1f9196b4cddbb499160760a9bac237	BQgDAAAAAQiSAAAACGFkbWluX2lk\n	1421294458
+935da640a7c79da334d9bd0ceb49bcd7c6ae6c29	BQgDAAAAAQiBAAAACGFkbWluX2lk\n	1421228182
+aa3611e34caeda4847942269cf9ab2fd17253e63	BQgDAAAAAQiSAAAACGFkbWluX2lk\n	1421294458
+a17131675dd9f8c0ad4e4abdd0965f6dc86a4d65	BQgDAAAAAQiBAAAACGFkbWluX2lk\n	1421235789
+7f2beb9d58a83ee8624d29c30920a8be2d8f98f8	BQgDAAAAAQijAAAACGFkbWluX2lk\n	1421171470
+1e2a97f0b670410406741d03f678f1d7ea7f49c0	BQgDAAAAAQijAAAACGFkbWluX2lk\n	1421140688
+3a5fa234b8a88fa77144ff137a0b7a51b7a7607d	BQgDAAAAAQiBAAAACGFkbWluX2lk\n	1421140755
+be55b3cd76b3397e6fdc5cffa75f6b451e32550f	BQgDAAAAAQiBAAAACGFkbWluX2lk\n	1421140765
+482ffc1562bd70f7d2943a29e372b04c782efa03	BQgDAAAAAQiBAAAACGFkbWluX2lk\n	1421140777
+db2047a5d44e4dbd069d2832577ab3f88c3a93a9	BQgDAAAAAQiBAAAACGFkbWluX2lk\n	1421235791
+bb463ed1df5f8b1634e8880fecc8d9ae2708dbe6	BQgDAAAAAQijAAAACGFkbWluX2lk\n	1421234985
+2ecf90e7e76eef7ca12c1f170eab0f35ea62c10d	BQgDAAAAAQiBAAAACGFkbWluX2lk\n	1421235405
+47995e27a2a0a064577fa88bf1a5c3cdf2b034e8	BQgDAAAAAQiBAAAACGFkbWluX2lk\n	1421235510
+2d056b03ff4277b57ab8f9811c4bbf2a8df5c6f6	BQgDAAAAAQiBAAAACGFkbWluX2lk\n	1421226216
+bb446ecf63c34e85fcc3b7892c993a19319eec1f	BQgDAAAAAQijAAAACGFkbWluX2lk\n	1421143990
+20f8176c945ad46578df65cd311af0373d2d68b3	BQgDAAAAAQiBAAAACGFkbWluX2lk\n	1421226218
+3b06724657c3e79801be42ae041ad36e8360ac8d	BQgDAAAAAQiBAAAACGFkbWluX2lk\n	1421226231
+0b9ebc9a87759687f5e9c73fadcc3ca659204217	BQgDAAAAAQiDAAAACGFkbWluX2lk\n	1421236674
+db3cf8d0e544f86619f6506d3d55e5262ad46422	BQgDAAAAAQiSAAAACGFkbWluX2lk\n	1421294458
+d9f4593cb3fb23e7a04bc27c74155cf053a1111d	BQgDAAAAAQijAAAACGFkbWluX2lk\n	1421234090
+60a4c2d34153a05f49cc489bd72e7996ccf8939d	BQgDAAAAAQiSAAAACGFkbWluX2lk\n	1421294458
+e59c59740ae20ce6725c304e4f4bf2107518958b	BQgDAAAAAQiBAAAACGFkbWluX2lk\n	1421242437
+f119812c6cb60fd66fb8582c746e15cfc8f67bad	BQgDAAAAAQiBAAAACGFkbWluX2lk\n	1421242446
+2eda0421b6b92023f98632ccc65f12663f3ff40b	BQgDAAAAAQiBAAAACGFkbWluX2lk\n	1421242463
+08c87f3189899d9c54c5d01f3b9a64e3789d3f4c	BQgDAAAAAQiSAAAACGFkbWluX2lk\n	1421294458
+7504c0d68ece61f8c3c63267894f92bf4c87da65	BQgDAAAAAQiBAAAACGFkbWluX2lk\n	1421242474
+ef00fd74637938a73d0f5640f2acad770315472d	BQgDAAAAAQiBAAAACGFkbWluX2lk\n	1421242559
+95ebca5d44776eb603ac2b8ce7b5f81cf0452db3	BQgDAAAAAQiBAAAACGFkbWluX2lk\n	1421242611
+866701316809405b8db08ee80c3b8a906aabe0c4	BQgDAAAAAQiSAAAACGFkbWluX2lk\n	1421294459
+b04ad4fd15b1b95792f23fe1af28b9ec3710d08b	BQgDAAAAAQiBAAAACGFkbWluX2lk\n	1421326230
+17cb8d582ea4aabb51030eeb218d51f73d5d1c54	BQgDAAAAAQiBAAAACGFkbWluX2lk\n	1421335246
 \.
 
 
@@ -4280,6 +4421,14 @@ l7r.ssl.key	-----BEGIN RSA PRIVATE KEY-----\nMIICXAIBAAKBgQDbijYwvL3532XtjzRMHC9
 --
 
 COPY tenant_views_setups (id, tenant_id, field, visible, device_type, view_type, qvd_object, property) FROM stdin;
+8235	14	puesto	f	mobile	filter	user	t
+8236	0	puesto	f	mobile	filter	user	t
+8237	14	puesto	f	mobile	list_column	user	t
+8238	0	puesto	f	mobile	list_column	user	t
+8239	14	puesto	f	desktop	filter	user	t
+8240	0	puesto	f	desktop	filter	user	t
+8241	14	puesto	f	desktop	list_column	user	t
+8242	0	puesto	f	desktop	list_column	user	t
 183	7	Autobus	f	mobile	filter	user	t
 184	0	Autobus	f	mobile	filter	user	t
 185	7	Autobus	f	mobile	list_column	user	t
@@ -4288,6 +4437,14 @@ COPY tenant_views_setups (id, tenant_id, field, visible, device_type, view_type,
 188	0	Autobus	f	desktop	filter	user	t
 189	7	Autobus	f	desktop	list_column	user	t
 190	0	Autobus	f	desktop	list_column	user	t
+8243	14	sucursal	f	mobile	filter	user	t
+8244	0	sucursal	f	mobile	filter	user	t
+8245	14	sucursal	f	mobile	list_column	user	t
+8246	0	sucursal	f	mobile	list_column	user	t
+8247	14	sucursal	f	desktop	filter	user	t
+8248	0	sucursal	f	desktop	filter	user	t
+8249	14	sucursal	f	desktop	list_column	user	t
+8250	0	sucursal	f	desktop	list_column	user	t
 199	1	propN	f	mobile	filter	user	t
 7207	1	Working group	f	mobile	filter	user	t
 201	1	propN	f	mobile	list_column	user	t
@@ -4356,10 +4513,34 @@ COPY tenant_views_setups (id, tenant_id, field, visible, device_type, view_type,
 7204	0	Company	f	desktop	filter	user	t
 7205	1	Company	f	desktop	list_column	user	t
 7206	0	Company	f	desktop	list_column	user	t
+8227	14	torestart	f	mobile	filter	di	t
+8228	0	torestart	f	mobile	filter	di	t
+8229	14	torestart	f	mobile	list_column	di	t
+8230	0	torestart	f	mobile	list_column	di	t
+8231	14	torestart	f	desktop	filter	di	t
+8232	0	torestart	f	desktop	filter	di	t
+8233	14	torestart	f	desktop	list_column	di	t
+8234	0	torestart	f	desktop	list_column	di	t
 371	1	prop3	f	mobile	filter	osf	t
 373	1	prop3	f	mobile	list_column	osf	t
 375	1	prop3	f	desktop	filter	osf	t
 377	1	prop3	f	desktop	list_column	osf	t
+7235	0	propN	f	mobile	filter	osf	t
+7236	0	propN	f	mobile	list_column	osf	t
+7237	0	propN	f	desktop	filter	osf	t
+7238	0	propN	f	desktop	list_column	osf	t
+7239	1	prop2	f	mobile	filter	osf	t
+7240	0	prop2	f	mobile	filter	osf	t
+7241	1	prop2	f	mobile	list_column	osf	t
+7242	0	prop2	f	mobile	list_column	osf	t
+7243	1	prop2	f	desktop	filter	osf	t
+7244	0	prop2	f	desktop	filter	osf	t
+7245	1	prop2	f	desktop	list_column	osf	t
+7246	0	prop2	f	desktop	list_column	osf	t
+7247	0	prop1	f	mobile	filter	osf	t
+7248	0	prop1	f	mobile	list_column	osf	t
+7249	0	prop1	f	desktop	filter	osf	t
+7250	0	prop1	f	desktop	list_column	osf	t
 \.
 
 
@@ -4367,7 +4548,7 @@ COPY tenant_views_setups (id, tenant_id, field, visible, device_type, view_type,
 -- Name: tenant_views_setups_id_seq; Type: SEQUENCE SET; Schema: public; Owner: qvd
 --
 
-SELECT pg_catalog.setval('tenant_views_setups_id_seq', 7214, true);
+SELECT pg_catalog.setval('tenant_views_setups_id_seq', 8950, true);
 
 
 --
@@ -4378,6 +4559,7 @@ COPY tenants (id, name, language, block) FROM stdin;
 7	Galicia	en	10
 1	Madrid	es	10
 0	*	en	10
+14	Qindel	en	10
 \.
 
 
@@ -4385,7 +4567,7 @@ COPY tenants (id, name, language, block) FROM stdin;
 -- Name: tenants_id_seq; Type: SEQUENCE SET; Schema: public; Owner: qvd
 --
 
-SELECT pg_catalog.setval('tenants_id_seq', 11, true);
+SELECT pg_catalog.setval('tenants_id_seq', 14, true);
 
 
 --
@@ -4405,6 +4587,8 @@ COPY user_properties (user_id, key, value) FROM stdin;
 19	Autobus	Linea 5
 17	Company	Qindel
 17	Working group	Systems
+227	puesto	01
+227	sucursal	0012
 \.
 
 
@@ -4428,7 +4612,9 @@ COPY users (id, login, password, blocked, tenant_id) FROM stdin;
 20	guser002	CRVk1wSvZuGlKkGHjMSarRcrKfiCJcQlLmJTI8RohHA	f	7
 17	muser001	9j0tRxRV5KhGECSSSUDLWb7To6OZ0qkHGqdmUokAlnk	t	1
 167	benja	T4xnZxLNRHFfT3h1mInkVCTO8aIFLbpwrBnt6UP/zOU	f	1
+225	user1	GClI+H9fT6chr3VG0Mzg4kbew+nIZQU67rEKHQeOI6w	f	14
 18	muser002	pAMpLvAmf1aL9zpFjqUP0vmnW4pxP89QOOIsgk2F+AQ	t	1
+227	alicia	c5HahnVD7sOD9qgM1442X13amj8N/bLGXV6LeszTpN0	f	14
 \.
 
 
@@ -4436,7 +4622,7 @@ COPY users (id, login, password, blocked, tenant_id) FROM stdin;
 -- Name: users_id_seq; Type: SEQUENCE SET; Schema: public; Owner: qvd
 --
 
-SELECT pg_catalog.setval('users_id_seq', 216, true);
+SELECT pg_catalog.setval('users_id_seq', 232, true);
 
 
 --
@@ -4471,8 +4657,19 @@ COPY vm_counters (vm_id, run_attempts, run_ok) FROM stdin;
 10	0	0
 111	19	11
 6	1	0
+180	8	6
 123	4	4
+183	1	1
+182	4	4
 4	1	0
+188	0	0
+189	0	0
+190	0	0
+191	0	0
+192	0	0
+193	0	0
+194	0	0
+195	0	0
 3	5	0
 151	2	2
 \.
@@ -4498,9 +4695,20 @@ COPY vm_runtimes (vm_id, host_id, current_osf_id, current_di_id, user_ip, real_u
 10	\N	\N	\N	\N	\N	stopped	\N	\N	\N	disconnected	\N	\N	\N	\N	\N	\N	\N	\N	\N	\N	\N	\N	f	\N	\N	\N
 5	\N	\N	\N	\N	\N	stopped	\N	\N	\N	disconnected	\N	\N	\N	\N	\N	\N	\N	\N	\N	\N	\N	\N	f	\N	2014-11-30 12:22:00	\N
 6	\N	\N	\N	\N	\N	stopped	\N	\N	\N	disconnected	\N	\N	\N	\N	\N	\N	\N	\N	\N	\N	\N	\N	f	\N	\N	\N
-3	\N	\N	\N	\N	\N	stopped	\N	\N	\N	disconnected	\N	\N	\N	\N	\N	\N	\N	\N	\N	\N	\N	\N	t	\N	\N	\N
+183	\N	\N	\N	\N	227	stopped	\N	\N	\N	disconnected	1421150134	\N	\N	\N	\N	\N	\N	\N	\N	\N	\N	\N	f	\N	\N	\N
 123	1	\N	238	\N	167	running	\N	\N	\N	disconnected	1418639542	\N	\N	\N	\N	10.3.15.253	3030	4100	22	0	0	2007	f	\N	\N	\N
 151	1	\N	268	\N	\N	running	\N	\N	\N	disconnected	\N	\N	\N	\N	\N	10.3.15.252	3030	4100	22	0	0	2010	f	\N	\N	\N
+182	1	\N	297	\N	227	running	\N	\N	\N	disconnected	1421148983	\N	\N	\N	\N	10.3.15.250	3030	4100	22	0	0	2023	f	\N	\N	\N
+180	1	\N	295	\N	225	running	\N	\N	\N	disconnected	1421141849	\N	\N	\N	\N	10.3.15.251	3030	4100	22	0	0	2018	t	2015-01-24 10:22:00	2015-01-31 10:22:00	\N
+188	\N	\N	\N	\N	\N	stopped	\N	\N	\N	disconnected	\N	\N	\N	\N	\N	\N	\N	\N	\N	\N	\N	\N	f	\N	\N	\N
+189	\N	\N	\N	\N	\N	stopped	\N	\N	\N	disconnected	\N	\N	\N	\N	\N	\N	\N	\N	\N	\N	\N	\N	f	\N	\N	\N
+190	\N	\N	\N	\N	\N	stopped	\N	\N	\N	disconnected	\N	\N	\N	\N	\N	\N	\N	\N	\N	\N	\N	\N	f	\N	\N	\N
+191	\N	\N	\N	\N	\N	stopped	\N	\N	\N	disconnected	\N	\N	\N	\N	\N	\N	\N	\N	\N	\N	\N	\N	f	\N	\N	\N
+192	\N	\N	\N	\N	\N	stopped	\N	\N	\N	disconnected	\N	\N	\N	\N	\N	\N	\N	\N	\N	\N	\N	\N	f	\N	\N	\N
+193	\N	\N	\N	\N	\N	stopped	\N	\N	\N	disconnected	\N	\N	\N	\N	\N	\N	\N	\N	\N	\N	\N	\N	f	\N	\N	\N
+194	\N	\N	\N	\N	\N	stopped	\N	\N	\N	disconnected	\N	\N	\N	\N	\N	\N	\N	\N	\N	\N	\N	\N	f	\N	\N	\N
+195	\N	\N	\N	\N	\N	stopped	\N	\N	\N	disconnected	\N	\N	\N	\N	\N	\N	\N	\N	\N	\N	\N	\N	f	\N	\N	\N
+3	\N	\N	\N	\N	\N	stopped	\N	\N	\N	disconnected	\N	\N	\N	\N	\N	\N	\N	\N	\N	\N	\N	\N	f	2015-01-24 13:21:00	2015-01-31 13:21:00	\N
 4	\N	\N	\N	\N	\N	stopped	\N	\N	\N	disconnected	\N	\N	\N	\N	\N	\N	\N	\N	\N	\N	\N	\N	f	\N	\N	\N
 111	1	\N	4	\N	\N	running	\N	\N	\N	disconnected	\N	\N	\N	\N	\N	10.3.15.254	3030	4100	22	0	0	2005	f	\N	\N	\N
 \.
@@ -4536,6 +4744,17 @@ COPY vms (id, name, user_id, osf_id, di_tag, ip, storage) FROM stdin;
 111	Machine REAL	17	14	default	10.3.15.254	\N
 123	benjaVM	167	164	default	10.3.15.253	\N
 151	GaliVM	19	16	galiDI	10.3.15.252	\N
+180	vm1	225	221	2015-01-13-000	10.3.15.251	\N
+183	alicia-tag-alicia	227	221	alicia	10.3.15.249	\N
+182	alicia-mv	227	221	alicia	10.3.15.250	\N
+188	a	227	221	default	10.3.15.248	\N
+189	b	227	221	default	10.3.15.247	\N
+190	c	227	221	default	10.3.15.246	\N
+191	d	227	221	default	10.3.15.245	\N
+192	e	227	221	default	10.3.15.244	\N
+193	f	227	221	default	10.3.15.243	\N
+194	g	227	221	default	10.3.15.242	\N
+195	h	227	221	default	10.3.15.241	\N
 \.
 
 
@@ -4543,7 +4762,7 @@ COPY vms (id, name, user_id, osf_id, di_tag, ip, storage) FROM stdin;
 -- Name: vms_id_seq; Type: SEQUENCE SET; Schema: public; Owner: qvd
 --
 
-SELECT pg_catalog.setval('vms_id_seq', 173, true);
+SELECT pg_catalog.setval('vms_id_seq', 196, true);
 
 
 --
@@ -5157,38 +5376,74 @@ CREATE INDEX vms_idx_user_id ON vms USING btree (user_id);
 
 
 --
--- Name: delete_views_for_removed_di_property; Type: TRIGGER; Schema: public; Owner: qvd
+-- Name: create_default_tenant_views_for_di_property; Type: TRIGGER; Schema: public; Owner: qvd
 --
 
-CREATE TRIGGER delete_views_for_removed_di_property AFTER DELETE ON di_properties FOR EACH ROW EXECUTE PROCEDURE delete_views_for_removed_property('di');
-
-
---
--- Name: delete_views_for_removed_host_property; Type: TRIGGER; Schema: public; Owner: qvd
---
-
-CREATE TRIGGER delete_views_for_removed_host_property AFTER DELETE ON host_properties FOR EACH ROW EXECUTE PROCEDURE delete_views_for_removed_property('host');
+CREATE TRIGGER create_default_tenant_views_for_di_property AFTER INSERT ON di_properties FOR EACH ROW EXECUTE PROCEDURE insert_default_tenant_views_for_property('di');
 
 
 --
--- Name: delete_views_for_removed_osf_property; Type: TRIGGER; Schema: public; Owner: qvd
+-- Name: create_default_tenant_views_for_host_property; Type: TRIGGER; Schema: public; Owner: qvd
 --
 
-CREATE TRIGGER delete_views_for_removed_osf_property AFTER DELETE ON osf_properties FOR EACH ROW EXECUTE PROCEDURE delete_views_for_removed_property('osf');
-
-
---
--- Name: delete_views_for_removed_user_property; Type: TRIGGER; Schema: public; Owner: qvd
---
-
-CREATE TRIGGER delete_views_for_removed_user_property AFTER DELETE ON user_properties FOR EACH ROW EXECUTE PROCEDURE delete_views_for_removed_property('user');
+CREATE TRIGGER create_default_tenant_views_for_host_property AFTER INSERT ON host_properties FOR EACH ROW EXECUTE PROCEDURE insert_default_tenant_views_for_property('host');
 
 
 --
--- Name: delete_views_for_removed_vm_property; Type: TRIGGER; Schema: public; Owner: qvd
+-- Name: create_default_tenant_views_for_osf_property; Type: TRIGGER; Schema: public; Owner: qvd
 --
 
-CREATE TRIGGER delete_views_for_removed_vm_property AFTER DELETE ON vm_properties FOR EACH ROW EXECUTE PROCEDURE delete_views_for_removed_property('vm');
+CREATE TRIGGER create_default_tenant_views_for_osf_property AFTER INSERT ON osf_properties FOR EACH ROW EXECUTE PROCEDURE insert_default_tenant_views_for_property('osf');
+
+
+--
+-- Name: create_default_tenant_views_for_user_property; Type: TRIGGER; Schema: public; Owner: qvd
+--
+
+CREATE TRIGGER create_default_tenant_views_for_user_property AFTER INSERT ON user_properties FOR EACH ROW EXECUTE PROCEDURE insert_default_tenant_views_for_property('user');
+
+
+--
+-- Name: create_default_tenant_views_for_vm_property; Type: TRIGGER; Schema: public; Owner: qvd
+--
+
+CREATE TRIGGER create_default_tenant_views_for_vm_property AFTER INSERT ON vm_properties FOR EACH ROW EXECUTE PROCEDURE insert_default_tenant_views_for_property('vm');
+
+
+--
+-- Name: delete_tenant_views_for_removed_di_property; Type: TRIGGER; Schema: public; Owner: qvd
+--
+
+CREATE TRIGGER delete_tenant_views_for_removed_di_property AFTER DELETE ON di_properties FOR EACH ROW EXECUTE PROCEDURE delete_tenant_views_for_removed_property('di');
+
+
+--
+-- Name: delete_tenant_views_for_removed_host_property; Type: TRIGGER; Schema: public; Owner: qvd
+--
+
+CREATE TRIGGER delete_tenant_views_for_removed_host_property AFTER DELETE ON host_properties FOR EACH ROW EXECUTE PROCEDURE delete_tenant_views_for_removed_property('host');
+
+
+--
+-- Name: delete_tenant_views_for_removed_osf_property; Type: TRIGGER; Schema: public; Owner: qvd
+--
+
+CREATE TRIGGER delete_tenant_views_for_removed_osf_property AFTER DELETE ON osf_properties FOR EACH ROW EXECUTE PROCEDURE delete_tenant_views_for_removed_property('osf');
+
+
+--
+-- Name: delete_tenant_views_for_removed_user_property; Type: TRIGGER; Schema: public; Owner: qvd
+--
+
+CREATE TRIGGER delete_tenant_views_for_removed_user_property AFTER DELETE ON user_properties FOR EACH ROW EXECUTE PROCEDURE delete_tenant_views_for_removed_property('user');
+
+
+--
+-- Name: delete_tenant_views_for_removed_vm_property; Type: TRIGGER; Schema: public; Owner: qvd
+--
+
+CREATE TRIGGER delete_tenant_views_for_removed_vm_property AFTER DELETE ON vm_properties FOR EACH ROW EXECUTE PROCEDURE delete_tenant_views_for_removed_property('vm');
+
 
 --
 -- Name: di_blocked_or_unblocked_trigger; Type: TRIGGER; Schema: public; Owner: qvd
@@ -5551,137 +5806,6 @@ ALTER TABLE ONLY vms
 
 ALTER TABLE ONLY vms
     ADD CONSTRAINT vms_user_id_fkey FOREIGN KEY (user_id) REFERENCES users(id) ON UPDATE CASCADE DEFERRABLE;
-
-
-
-
-
-
-
---
--- Name: operative_acls_in_admins_basic; Type: VIEW; Schema: public; Owner: postgres
---
-
-CREATE VIEW operative_acls_in_admins_basic AS
- SELECT DISTINCT ac.id AS acl_id,
-    ad.id AS admin_id,
-        CASE
-            WHEN (j.inheritor_id IS NOT NULL) THEN true
-            ELSE false
-        END AS operative
-   FROM ((acls ac
-     CROSS JOIN administrators ad)
-     LEFT JOIN all_acl_role_relations j ON (((j.acl_id = ac.id) AND (j.inheritor_id IN ( SELECT role_administrator_relations.role_id
-           FROM role_administrator_relations
-          WHERE (role_administrator_relations.administrator_id = ad.id))))));
-
-
-ALTER TABLE public.operative_acls_in_admins_basic OWNER TO qvd;
-
-
-
-
---
--- Name: operative_acls_in_roles_basic; Type: VIEW; Schema: public; Owner: postgres
---
-
-CREATE VIEW operative_acls_in_roles_basic AS
- SELECT DISTINCT a.id AS acl_id,
-    r.id AS role_id,
-        CASE
-            WHEN (j.inheritor_id IS NOT NULL) THEN true
-            ELSE false
-        END AS operative
-   FROM ((acls a
-     CROSS JOIN roles r)
-     LEFT JOIN all_acl_role_relations j ON (((j.acl_id = a.id) AND (j.inheritor_id = r.id))));
-
-
-ALTER TABLE public.operative_acls_in_roles_basic OWNER TO qvd;
-
---
--- Name: operative_acls_in_admins_with_inheritance_info; Type: MATERIALIZED VIEW; Schema: public; Owner: qvd; Tablespace: 
---
-
-CREATE MATERIALIZED VIEW operative_acls_in_admins_with_inheritance_info AS
-
-SELECT a.*, json_agg(DISTINCT (rr.*))::text as roles_json FROM operative_acls_in_admins_basic a 
-LEFT JOIN (operative_acls_in_roles_basic r JOIN roles rr ON rr.id=r.role_id) ON r.operative=true 
-AND a.operative=true AND r.acl_id=a.acl_id AND a.admin_id IN (SELECT administrator_id FROM role_administrator_relations WHERE role_id=r.role_id) GROUP BY a.acl_id, a.admin_id, a.operative
-
-WITH NO DATA;
-
-
-ALTER TABLE public.operative_acls_in_admins_with_inheritance_info OWNER TO qvd;
-
-REFRESH MATERIALIZED VIEW operative_acls_in_admins_with_inheritance_info;
---
--- Name: operative_acls_in_roles_with_inheritance_info; Type: MATERIALIZED VIEW; Schema: public; Owner: qvd; Tablespace: 
---
-
-CREATE MATERIALIZED VIEW operative_acls_in_roles_with_inheritance_info AS
-
-SELECT ior.*, json_agg(DISTINCT (rr.*))::text as roles_json 
-FROM operative_acls_in_roles_basic ior 
-LEFT JOIN (operative_acls_in_roles_basic ied JOIN roles rr ON rr.id=ied.role_id) ON ied.operative=true AND ior.operative=true AND ied.acl_id=ior.acl_id 
-AND ior.role_id IN (SELECT inheritor_id FROM role_role_relations WHERE inherited_id=ied.role_id) GROUP BY ior.acl_id, ior.role_id, ior.operative
-
-WITH NO DATA;
-
-
-ALTER TABLE public.operative_acls_in_roles_with_inheritance_info OWNER TO qvd;
-
-REFRESH MATERIALIZED VIEW operative_acls_in_roles_with_inheritance_info;
-
---
--- Name: refresh_operative_acls_in_admins(); Type: FUNCTION; Schema: public; Owner: postgres
---
-
-CREATE FUNCTION refresh_operative_acls() RETURNS boolean
-    LANGUAGE plpgsql
-    AS $$
-        BEGIN
-                REFRESH MATERIALIZED VIEW operative_acls_in_admins_with_inheritance_info;
-                REFRESH MATERIALIZED VIEW operative_acls_in_roles_with_inheritance_info;
-		RETURN TRUE;
-        END;
-$$;
-
-
---ALTER FUNCTION public.refresh_operative_acls() OWNER TO qvd;
-
-
---
--- Name: refresh_operative_acls_on_administrators_change; Type: TRIGGER; Schema: public; Owner: qvd
---
-
---CREATE TRIGGER refresh_operative_acls_on_administrators_change AFTER INSERT OR DELETE ON administrators FOR EACH STATEMENT EXECUTE PROCEDURE refresh_operative_acls();
-
---
--- Name: refresh_operative_acls_on_roles_change; Type: TRIGGER; Schema: public; Owner: qvd
---
-
---CREATE TRIGGER refresh_operative_acls_on_roles_change AFTER INSERT OR DELETE ON roles FOR EACH STATEMENT EXECUTE PROCEDURE refresh_operative_acls();
-
---
--- Name: refresh_operative_acls_on_acl_role_relations_change; Type: TRIGGER; Schema: public; Owner: qvd
---
-
---CREATE TRIGGER refresh_operative_acls_on_acl_role_relations_change AFTER INSERT OR DELETE OR UPDATE ON acl_role_relations FOR EACH STATEMENT EXECUTE PROCEDURE refresh_operative_acls();
-
-
---
--- Name: refresh_operative_acls_on_role_administrator_relations_change; Type: TRIGGER; Schema: public; Owner: qvd
---
-
---CREATE TRIGGER refresh_operative_acls_on_role_administrator_relations_change AFTER INSERT OR DELETE OR UPDATE ON role_administrator_relations FOR EACH STATEMENT EXECUTE PROCEDURE refresh_operative_acls();
-
-
---
--- Name: refresh_operative_acls_on_role_role_relations_change; Type: TRIGGER; Schema: public; Owner: qvd
---
-
---CREATE TRIGGER refresh_operative_acls_on_role_role_relations_change AFTER INSERT OR DELETE OR UPDATE ON role_role_relations FOR EACH STATEMENT EXECUTE PROCEDURE refresh_operative_acls();
 
 
 --
