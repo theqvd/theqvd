@@ -117,13 +117,7 @@
         background: darken($col_whiter, 3);
         border: 2px solid darken($col_whiter, 7);
         padding: 20px;
-        margin-top: 40px;
-        width: 81vw !important;
-        
-        @include in(desktop) {
-            float: left;
-            width: auto;
-        }
+        margin-top: 60px;
         
         .chosen-container {
             margin-top: -6px;
@@ -147,9 +141,7 @@
     
     .shown-elements {
         margin-top: 9px;
-        width: 81vw;
-        position: absolute;
-        text-align: right;
+        float: right;
     }    
     
     .selected-elements {
