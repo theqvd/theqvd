@@ -29,7 +29,7 @@
                             break;
                         case 'name':
             %>
-                            <th class="sortable" data-sortby="name">
+                            <th class="sortable col-width-100" data-sortby="name">
                                 <i class="fa fa-sort sort-icon"></i>
                                 <span data-i18n="Name"><%= i18n.t('Name') %></span>
                             </th>
@@ -61,7 +61,7 @@
                             break;
                         case 'dis':
             %>
-                            <th class="desktop col-width-8">
+                            <th class="desktop">
                                 <i class="fa sort-icon"></i>
                                 <span data-i18n="DIs"><%= i18n.t('DIs') %></span>
                             </th>
@@ -69,7 +69,7 @@
                             break;
                         case 'vms':
             %>
-                            <th class="desktop col-width-8">
+                            <th class="desktop">
                                 <i class="fa sort-icon"></i>
                                 <span data-i18n="VMs"><%= i18n.t('VMs') %></span>
                             </th>

@@ -80,6 +80,14 @@ Wat.I.listFields[qvdObj] = {
         'acls': 'di.see.head',
         'text': 'Head'
     },
+    'tags': {
+        'display': false,
+        'fields': [
+            'tags'
+        ],
+        'acls': 'di.see.tags',
+        'text': 'Tags'
+    },
     'creation_date': {
         'text': 'Creation date',
         'fields': [

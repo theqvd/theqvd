@@ -36,7 +36,7 @@
                             break;
                         case 'disk_image':
             %>
-                            <th class="sortable" data-sortby="disk_image">
+                            <th class="sortable col-width-100" data-sortby="disk_image">
                                 <i class="fa fa-sort sort-icon"></i>
                                 <span data-i18n="Disk image"><%= i18n.t('Disk image') %></span>
                             </th>
@@ -67,9 +67,9 @@
                             break;
                         case 'head':
             %>
-                            <th class="desktop col-width-12" data-sortby="head">
-                                <i class="fa sort-icon" data-i18n="Head"><%= i18n.t('Head') %></i>
-                                <span data-i18n="Head"><%= i18n.t('Head') %></i>
+                            <th class="desktop max-1-icons" data-sortby="head">
+                                <i class="fa sort-icon"></i>
+                                <i class="fa fa-flag"></i>
                             </th>
             <%
                             break;
@@ -211,6 +211,35 @@
                                     <% if (model.get('head')) { %>
                                         <i class="fa fa-flag-o" data-i18n="[title]Head" title="Head"></i>
                                     <% } %>
+                                </td>
+                <%
+                                break;
+                            case 'tags':
+                %>
+                                <td class="desktop">
+                                    <%
+                                    var tagsArray = model.get('tags').split(',');
+                                    var nTags = tagsArray.length;
+                                    var maxTagsShown = 3;
+                                    
+                                    if (nTags > maxTagsShown) {
+                                        var firstTags = tagsArray.slice(0, maxTagsShown).join('<br>');
+                                        var extraTags = tagsArray.slice(maxTagsShown, nTags).join('<br>');
+                                        var nExtraTags = nTags - maxTagsShown;
+                                    %>
+                                        <%= firstTags %> 
+                                        <br><a class="fa fa-eye button2 js-more-tags more-tags" data-di_id="<%= model.get('id') %>"><%= $.i18n.t('More tags') %> (<%= nExtraTags %>)</a>
+                                        <span class="extra-tags-<%= model.get('id') %>" style="display: none;">
+                                            <%= extraTags %> 
+                                        </span>
+                                    <%
+                                    }
+                                    else {
+                                    %>
+                                        <%= model.get('tags') %>
+                                    <%
+                                    }
+                                    %>
                                 </td>
                 <%
                                 break;

@@ -1203,6 +1203,8 @@ body {
     .wrapper .content .list-block .selected-elements, .wrapper .content .details-side .selected-elements {
       margin-top: 9px;
       float: left; }
+    .wrapper .content .more-tags {
+      margin-top: 8px; }
     .wrapper .content .details-side {
       display: none;
       margin-bottom: 15px;

@@ -28,7 +28,7 @@
                             break;
                         case 'id':
             %>
-                            <th class="sortable desktop col-width-8" data-sortby="id">
+                            <th class="sortable desktop" data-sortby="id">
                                 <i class="fa fa-sort sort-icon"></i>
                                 <span data-i18n="<%= col.text %>"><%= col.text %></span>
                             </th>
@@ -36,7 +36,7 @@
                             break;
                         case 'name':
             %>
-                            <th class="sortable" data-sortby="name">
+                            <th class="sortable col-width-100" data-sortby="name">
                                 <i class="fa fa-sort sort-icon"></i>
                                 <span data-i18n="<%= col.text %>"><%= col.text %></span>
                             </th>

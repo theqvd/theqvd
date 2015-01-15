@@ -36,7 +36,7 @@
                             break;
                         case 'name':
             %>
-                            <th class="sortable" data-sortby="name">
+                            <th class="sortable col-width-100" data-sortby="name">
                                 <i class="fa fa-sort sort-icon"></i>
                                 <span data-i18n="Name"><%= i18n.t('Name') %></span>
                             </th>
@@ -48,7 +48,8 @@
             
             <% if (Wat.C.isSuperadmin()) { %>
                 <th class="sortable" data-sortby="tenant_name">
-                    <i class="fa fa-sort sort-icon" data-i18n="Tenant"><%= i18n.t('Tenant') %></i>
+                    <i class="fa fa-sort sort-icon"></i>
+                    <span data-i18n="Tenant"><%= i18n.t('Tenant') %></span>
                 </th>
             <% } %>
         </tr>

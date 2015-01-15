@@ -8,7 +8,14 @@ Wat.Views.DIListView = Wat.Views.ListView.extend({
     },
     
     listEvents: {
-        'change input[name="di_default"]': 'setDefault'
+        'change input[name="di_default"]': 'setDefault',
+        'click .js-more-tags': 'showExtraTags'
+    },
+    
+    showExtraTags: function (e) {
+        var di_id = $(e.target).attr('data-di_id');
+        $('.extra-tags-' + di_id).show();
+        $(e.target).hide();
     },
     
     setDefault: function (e) {
