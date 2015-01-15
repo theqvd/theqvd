@@ -134,7 +134,7 @@ public class Config {
 		setTargetdir(context.getFilesDir().getAbsolutePath());
 		pocketvncconfigfullpath = getTargetdir() + "/" + Config.pocketvncconfig;
 		xvnc = getTargetdir() + "/usr/X11R6/bin/" + L.xvncbinary;
-		if (android.os.Build.CPU_ABI == "x86") {
+		if (android.os.Build.CPU_ABI.equals("x86")) {
 			xvnc += "i386";
 		} else if (android.os.Build.CPU_ABI.startsWith("arm")) {
 			// do not do anything
