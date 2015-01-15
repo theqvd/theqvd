@@ -296,6 +296,7 @@ sub add_acls_to_role
 	    $self->switch_acl_sign_in_role($role,$acl_name) :
 	    $self->assign_acl_to_role($role,$acl_name,1);
     }
+    $DB->resultset('Refresh_Operative_Acls')->first;
 }
 
 sub del_acls_to_role
@@ -305,7 +306,6 @@ sub del_acls_to_role
     for my $acl_name (@$acl_names)
     { 	
 	$acl_name = undef if defined $acl_name && $acl_name eq '';
-	use Data::Dumper; print Dumper $acl_name, $role->is_allowed_to($acl_name);
 	next unless $role->is_allowed_to($acl_name);
 	
 	if ($role->has_own_positive_acl($acl_name)) 
@@ -318,6 +318,7 @@ sub del_acls_to_role
 	    $self->assign_acl_to_role($role,$acl_name,0);
 	}
     }
+    $DB->resultset('Refresh_Operative_Acls')->first;
 }
 
 sub add_roles_to_role
@@ -329,15 +330,17 @@ sub add_roles_to_role
 	$role_to_assign_id = undef if defined $role_to_assign_id && $role_to_assign_id eq '';
 	$self->assign_role_to_role($this_role,$role_to_assign_id);
 	my $nested_role;
-
+	
 	for my $own_acl_name ($this_role->get_negative_own_acl_names,
 			      $this_role->get_positive_own_acl_names)
 	{
+	    print Dumper "Después";
 	    $nested_role //= $DB->resultset('Role')->find({id => $role_to_assign_id});
 	    $self->unassign_acl_to_role($this_role,$own_acl_name) 
 		if $nested_role->is_allowed_to($own_acl_name);
 	}
     }
+    $DB->resultset('Refresh_Operative_Acls')->first;
 }
 
 sub del_roles_to_role
@@ -350,6 +353,7 @@ sub del_roles_to_role
 	$self->unassign_role_to_role($this_role,$id) 
     }
 
+    $DB->resultset('Refresh_Operative_Acls')->first;
     $this_role->reload_acls_info;
     for my $neg_acl_name ($this_role->get_negative_own_acl_names)
     {
@@ -357,6 +361,8 @@ sub del_roles_to_role
 	    unless $this_role->has_inherited_acl($neg_acl_name);
 
     }
+
+    $DB->resultset('Refresh_Operative_Acls')->first;
 }
 
 #############
@@ -450,6 +456,8 @@ sub del_roles_to_admin
 		administrator_id => $admin->id})->delete_all };
     QVD::Admin4::Exception->throw(exception => $@, 
 				  query => 'roles') if $@;
+
+    $DB->resultset('Refresh_Operative_Acls')->first;
 }
 
 sub add_roles_to_admin
@@ -460,7 +468,7 @@ sub add_roles_to_admin
     {
 	eval
 	{
-	    my $role = $DB->resultset('Role')->find({id => $role_id})
+	    my $role = $DB->resultset('Role')->first({id => $role_id})
 		// QVD::Admin4::Exception->throw(code => 6370);
 
 	    $role->create_related('admin_rels', 
@@ -470,6 +478,8 @@ sub add_roles_to_admin
 	QVD::Admin4::Exception->throw(exception => $@, 
 				      query => 'roles') if $@;
     }
+
+    $DB->resultset('Refresh_Operative_Acls')->first;
 }
 
 #############################
@@ -482,6 +492,44 @@ sub vm_delete
 
     $self->delete($request,conditions => [qw(vm_is_stopped)]);
 }
+
+
+sub role_delete
+{
+    my ($self,$request) = @_;
+
+    my $out = $self->delete($request);
+    $DB->resultset('Refresh_Operative_Acls')->first;
+    $out;
+}
+
+sub admin_delete
+{
+    my ($self,$request) = @_;
+
+    my $out = $self->delete($request);
+    $DB->resultset('Refresh_Operative_Acls')->first;
+    $out;
+}
+
+sub role_create
+{
+    my ($self,$request) = @_;
+
+    my $out = $self->create($request);
+    $DB->resultset('Refresh_Operative_Acls')->first;
+    $out;
+}
+
+sub admin_create
+{
+    my ($self,$request) = @_;
+
+    my $out = $self->create($request);
+    $DB->resultset('Refresh_Operative_Acls')->first;
+    $out;
+}
+
 
 ###############################
 ###############################
@@ -776,6 +824,7 @@ sub get_acls_in_roles
     my (@rows, $rs);
 
     my $admin = $request->get_parameter_value('administrator');
+    my $role_id = $request->json_wrapper->get_filter_value('role_id');
     my $aol = QVD::Admin4::AclsOverwriteList->new(admin => $admin, admin_id => $admin->id);
     my $bind = [$aol->acls_to_close_re,$aol->acls_to_hide_re];
 

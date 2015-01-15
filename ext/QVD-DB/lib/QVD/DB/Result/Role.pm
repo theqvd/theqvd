@@ -65,7 +65,6 @@ sub get_positive_own_acl_names
 sub acls_info
 {
     my $self = shift;
-
     $self->reload_acls_info unless defined $self->{acls_info};
     $self->{acls_info};
 }
@@ -82,12 +81,17 @@ sub reload_acls_info
     my $rs = $DB->resultset('Operative_Acls_In_Role')->search(
 	{},{bind => ['^$','^$']})->search({role_id => [$self->id,@inherited_roles_ids], operative => 1});
 
-    use Data::Dumper; print Dumper $rs->count;
     my @acls = $rs->all;
-    my %operative_acls = map { $_->acl_name => 1 } grep { $_->role_id eq $self->id } @acls;
-    my %inherited_acls = map { $_->acl_name => 1 } grep { $_->role_id ne $self->id } @acls;
-    my %own_positive_acls = map { $_ => 1 } grep { not exists $inherited_acls{$_} } keys %operative_acls;
-    my %own_negative_acls = map { $_ => 1 } grep { not exists $operative_acls{$_} } keys %inherited_acls;
+    my @operative_acls = grep { $_->role_id eq $self->id } @acls;
+    my @inherited_acls = grep { $_->role_id ne $self->id } @acls;
+    my %operative_acls = map { $_->acl_name => 1 } @operative_acls;
+    my %inherited_acls = map { $_->acl_name => 1 } @inherited_acls;
+    my @own_positive_acls = keys %operative_acls;
+    @own_positive_acls = grep { not exists $inherited_acls{$_} } @own_positive_acls;
+    my %own_positive_acls = map { $_ => 1 } @own_positive_acls;
+    my @own_negative_acls = keys %inherited_acls;
+    @own_negative_acls = grep { not exists $operative_acls{$_} } @own_negative_acls;
+    my %own_negative_acls = map { $_ => 1 } @own_negative_acls;
 
     $self->{acls_info} = 
     { all_inherited_role_ids => {},
@@ -95,7 +99,6 @@ sub reload_acls_info
       inherited_acls => \%inherited_acls,
       own_positive_acls => \%own_positive_acls, 
       own_negative_acls => \%own_negative_acls };
-
 
     return $self->{acls_info};
 }

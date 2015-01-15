@@ -5605,7 +5605,9 @@ ALTER TABLE public.operative_acls_in_roles_basic OWNER TO qvd;
 
 CREATE MATERIALIZED VIEW operative_acls_in_admins_with_inheritance_info AS
 
-SELECT a.*, json_agg(DISTINCT (rr.*))::text as roles_json FROM operative_acls_in_admins_basic a LEFT JOIN (operative_acls_in_roles_basic r JOIN roles rr ON rr.id=r.role_id) ON r.operative=true AND a.operative=true AND r.acl_id=a.acl_id AND a.admin_id IN (SELECT administrator_id FROM role_administrator_relations WHERE role_id=r.role_id) GROUP BY a.acl_id, a.admin_id, a.operative
+SELECT a.*, json_agg(DISTINCT (rr.*))::text as roles_json FROM operative_acls_in_admins_basic a 
+LEFT JOIN (operative_acls_in_roles_basic r JOIN roles rr ON rr.id=r.role_id) ON r.operative=true 
+AND a.operative=true AND r.acl_id=a.acl_id AND a.admin_id IN (SELECT administrator_id FROM role_administrator_relations WHERE role_id=r.role_id) GROUP BY a.acl_id, a.admin_id, a.operative
 
 WITH NO DATA;
 
@@ -5635,51 +5637,51 @@ REFRESH MATERIALIZED VIEW operative_acls_in_roles_with_inheritance_info;
 -- Name: refresh_operative_acls_in_admins(); Type: FUNCTION; Schema: public; Owner: postgres
 --
 
-CREATE FUNCTION refresh_operative_acls() RETURNS trigger
+CREATE FUNCTION refresh_operative_acls() RETURNS boolean
     LANGUAGE plpgsql
     AS $$
         BEGIN
                 REFRESH MATERIALIZED VIEW operative_acls_in_admins_with_inheritance_info;
                 REFRESH MATERIALIZED VIEW operative_acls_in_roles_with_inheritance_info;
-		RETURN NULL;
+		RETURN TRUE;
         END;
 $$;
 
 
-ALTER FUNCTION public.refresh_operative_acls() OWNER TO qvd;
+--ALTER FUNCTION public.refresh_operative_acls() OWNER TO qvd;
 
 
 --
 -- Name: refresh_operative_acls_on_administrators_change; Type: TRIGGER; Schema: public; Owner: qvd
 --
 
-CREATE TRIGGER refresh_operative_acls_on_administrators_change AFTER INSERT OR DELETE ON administrators FOR EACH STATEMENT EXECUTE PROCEDURE refresh_operative_acls();
+--CREATE TRIGGER refresh_operative_acls_on_administrators_change AFTER INSERT OR DELETE ON administrators FOR EACH STATEMENT EXECUTE PROCEDURE refresh_operative_acls();
 
 --
 -- Name: refresh_operative_acls_on_roles_change; Type: TRIGGER; Schema: public; Owner: qvd
 --
 
-CREATE TRIGGER refresh_operative_acls_on_roles_change AFTER INSERT OR DELETE ON roles FOR EACH STATEMENT EXECUTE PROCEDURE refresh_operative_acls();
+--CREATE TRIGGER refresh_operative_acls_on_roles_change AFTER INSERT OR DELETE ON roles FOR EACH STATEMENT EXECUTE PROCEDURE refresh_operative_acls();
 
 --
 -- Name: refresh_operative_acls_on_acl_role_relations_change; Type: TRIGGER; Schema: public; Owner: qvd
 --
 
-CREATE TRIGGER refresh_operative_acls_on_acl_role_relations_change AFTER INSERT OR DELETE OR UPDATE ON acl_role_relations FOR EACH STATEMENT EXECUTE PROCEDURE refresh_operative_acls();
+--CREATE TRIGGER refresh_operative_acls_on_acl_role_relations_change AFTER INSERT OR DELETE OR UPDATE ON acl_role_relations FOR EACH STATEMENT EXECUTE PROCEDURE refresh_operative_acls();
 
 
 --
 -- Name: refresh_operative_acls_on_role_administrator_relations_change; Type: TRIGGER; Schema: public; Owner: qvd
 --
 
-CREATE TRIGGER refresh_operative_acls_on_role_administrator_relations_change AFTER INSERT OR DELETE OR UPDATE ON role_administrator_relations FOR EACH STATEMENT EXECUTE PROCEDURE refresh_operative_acls();
+--CREATE TRIGGER refresh_operative_acls_on_role_administrator_relations_change AFTER INSERT OR DELETE OR UPDATE ON role_administrator_relations FOR EACH STATEMENT EXECUTE PROCEDURE refresh_operative_acls();
 
 
 --
 -- Name: refresh_operative_acls_on_role_role_relations_change; Type: TRIGGER; Schema: public; Owner: qvd
 --
 
-CREATE TRIGGER refresh_operative_acls_on_role_role_relations_change AFTER INSERT OR DELETE OR UPDATE ON role_role_relations FOR EACH STATEMENT EXECUTE PROCEDURE refresh_operative_acls();
+--CREATE TRIGGER refresh_operative_acls_on_role_role_relations_change AFTER INSERT OR DELETE OR UPDATE ON role_role_relations FOR EACH STATEMENT EXECUTE PROCEDURE refresh_operative_acls();
 
 
 --

@@ -10,6 +10,19 @@ __PACKAGE__->table('operative_acls_in_roles');
 __PACKAGE__->result_source_instance->is_virtual(1);
 __PACKAGE__->result_source_instance->view_definition(
 
+#WITH operative_acls_in_roles_with_inheritance_info AS
+
+#(
+
+#SELECT ior.*, json_agg(DISTINCT (rr.*))::text as roles_json 
+#FROM operative_acls_in_roles_basic ior 
+#LEFT JOIN (operative_acls_in_roles_basic ied JOIN roles rr ON rr.id=ied.role_id) ON ied.operative=true AND ior.operative=true AND ied.acl_id=ior.acl_id 
+#AND ior.role_id IN (SELECT inheritor_id FROM role_role_relations WHERE inherited_id=ied.role_id) 
+#GROUP BY ior.acl_id, ior.role_id, ior.operative
+
+#)
+
+
 "
 
 SELECT op.acl_id, op.role_id, op.roles_json, ac.name as acl_name,

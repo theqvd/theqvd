@@ -273,7 +273,7 @@ admin_all_ids => { type_of_action => 'all_ids',
 		   qvd_object => 'Administrator'},
 
 admin_create => { type_of_action => 'create',
-		  admin4method => 'create',
+		  admin4method => 'admin_create',
 		  acls => [qr/^administrator\.create\./],
 		  qvd_object => 'Administrator'},
 
@@ -283,7 +283,7 @@ admin_update => { type_of_action => 'update',
 		  qvd_object => 'Administrator'},
 
 admin_delete => { type_of_action => 'delete',
-		  admin4method => 'delete',
+		  admin4method => 'admin_delete',
 		  acls => [qr/^administrator\.delete\./],
 		  qvd_object => 'Administrator'},
 
@@ -371,12 +371,12 @@ role_update => { type_of_action => 'update',
 		 qvd_object => 'Role'},
 
 role_create => { type_of_action => 'create',
-		 admin4method => 'create',
+		 admin4method => 'role_create',
 		 acls => [qr/^role\.create\./],
 		 qvd_object => 'Role'},
 
 role_delete => { type_of_action => 'delete',
-		 admin4method => 'delete',
+		 admin4method => 'role_delete',
 		 acls => [qr/^role\.delete\./],
 		 qvd_object => 'Role'},
 

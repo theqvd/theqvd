@@ -10,8 +10,18 @@ __PACKAGE__->result_source_instance->is_virtual(1);
 __PACKAGE__->result_source_instance->view_definition(
 
 
-"
+#WITH operative_acls_in_admins_with_inheritance_info AS
+#(
 
+#SELECT a.*, json_agg(DISTINCT (rr.*))::text as roles_json FROM operative_acls_in_admins_basic a 
+#LEFT JOIN (operative_acls_in_roles_basic r JOIN roles rr ON rr.id=r.role_id) ON r.operative=true 
+#AND a.operative=true AND r.acl_id=a.acl_id AND a.admin_id IN (SELECT administrator_id FROM role_administrator_relations WHERE role_id=r.role_id) 
+#GROUP BY a.acl_id, a.admin_id, a.operative
+
+#)
+
+
+"
 SELECT op.acl_id, op.admin_id, op.roles_json, ac.name as acl_name,
        CASE WHEN ac.name ~ ? THEN FALSE ELSE CASE WHEN ac.name ~ ? THEN TRUE ELSE op.operative END END
 FROM operative_acls_in_admins_with_inheritance_info op
@@ -32,7 +42,6 @@ __PACKAGE__->add_columns(
 
 __PACKAGE__->set_primary_key( qw/ acl_id admin_id / );
 
-
 sub roles
 {
     my ($self,$roles) = @_;
@@ -43,7 +52,5 @@ sub roles
     $roles->{$_->{id}} = $_->{name} for @roles_list; 
     $roles;
 }
-
-
 
 1;
