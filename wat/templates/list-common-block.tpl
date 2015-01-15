@@ -75,7 +75,9 @@
             <span data=i18n>Selected</span>:
             <span class="elements-selected">0</span>
         </div>
-        <div class="action-selected">
+        
+        <fieldset class="action-selected">
+            <legend data-i18n="Actions over selected items"></legend>
             <div class="action-selected-select">
                 <select name="selected_actions_select" class="chosen-single">
                     <% $.each(selectedActions, function(action, actionConfig) { %>
@@ -84,10 +86,10 @@
                 </select>
             </div>
             <div class="action-selected-button">
-                <a class="js-traductable_button actions_button button fa fa-check-square-o" name="selected_actions_button" data-i18n="Apply to selected items"></a>
+                <a class="js-traductable_button actions_button button fa fa-check-square-o" name="selected_actions_button" data-i18n="Apply"></a>
             </div>
             <div class="clear"></div>
-        </div>
+        </fieldset>
     <%
     }
     %>

@@ -129,17 +129,17 @@ $security_margin: 5;
 /* Table scroll */
 
 div.list-block div:first-child {
-    width: 95vw;
+    width: 100%;
     
     .list-navigation, div.list {
         @include in(desktop) {
-            width: 85% !important;
         }
     }
     
     .list {
         overflow-x: auto;
         overflow-y: hidden;
+        margin-top: 3px;
     }   
     
     table.list {
@@ -155,9 +155,11 @@ div.list-block div:first-child {
                 padding-left: 10px;
             }
         }
-    
-        td, th {
-            white-space: nowrap;
-        }     
     }
+}
+
+table.list {
+    td, th {
+        white-space: nowrap;
+    }     
 }

@@ -81,6 +81,18 @@
         </tr>
     <% 
     }
+    if (detailsFields['host'] != undefined && Wat.C.checkACL('vm.see.host')) { 
+    %>
+        <tr>
+            <td><i class="<%= CLASS_ICON_HOSTS %>"></i><span data-i18n="Node"></span></td>
+            <td>
+                <%= Wat.C.ifACL('<a href="#/host/' + model.get('host_id') + '">', 'host.see-details.') %>
+                    <%= model.get('host_name') %>
+                <%= Wat.C.ifACL('</a>', 'host.see-details.') %>
+            </td>
+        </tr>  
+    <% 
+    }
     if (detailsFields['ip'] != undefined) { 
     %>
         <tr>
@@ -191,18 +203,18 @@
                                     if (expiration_soft) {
                                 %>
                                     <tr>
-                                        <td class="warning" data-i18n="Soft"></td>
-                                        <td class="warning"><%= model.get('expiration_soft').replace('T',' ') %></td>
-                                        <td class="warning"><i class="fa fa-info-circle fa-centered"></i></td>
+                                        <td class="ok" data-i18n="Soft"></td>
+                                        <td class="ok"><%= model.get('expiration_soft').replace('T',' ') %></td>
+                                        <td class="ok"><i class="fa fa-info-circle fa-centered"></i></td>
                                     </tr>
                                 <%
                                     }
                                     if (expiration_hard) {
                                 %>
                                     <tr>
-                                        <td class="ok" data-i18n="Hard"></td>
-                                        <td class="ok"><%= model.get('expiration_hard').replace('T',' ') %></td>
-                                        <td class="ok"><i class="fa fa-info-circle fa-centered"></td>
+                                        <td class="warning" data-i18n="Hard"></td>
+                                        <td class="warning"><%= model.get('expiration_hard').replace('T',' ') %></td>
+                                        <td class="warning"><i class="fa fa-info-circle fa-centered"></td>
                                     </tr>
                                 <%
                                     }

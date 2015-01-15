@@ -219,6 +219,10 @@ body {
         @import "layout-details";
         @import "layout-setup";
         @import "layout-login";
+        
+        .wrapper-content {
+            width: 95vw;
+        }
     }
 }
 

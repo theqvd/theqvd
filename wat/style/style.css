@@ -9,8 +9,8 @@
 .header-wrapper .header, .wrapper {
   width: 100%;
   margin: 0 auto;
-  padding-left: 10px;
-  padding-right: 10px; }
+  padding-left: 20px;
+  padding-right: 20px; }
 
 .menu > ul .menu-option, .menu > ul .token-prefix-option, a.button, button.button, a.button2, button.button2, a.button--green, button.button--green, a.button--red, button.button--red, a.button.disabled, a.button2.disabled, button.button.disabled, button.button2.disabled, .wrapper .content .home-wrapper th, .wrapper .content .home-wrapper .home-row .home-cell .summary-table th, .wrapper .content .home-wrapper .log-table th, table.list th, table.customize-fields th, table.custom-props th, table.details th, .ui-dialog .ui-state-hover, .ui-dialog .ui-state-focus, .not-selectable {
   -webkit-touch-callout: none;
@@ -913,7 +913,8 @@ body {
         border-bottom: #ccc solid 1px;
         background: #d7d7d7; }
         .wrapper .content .home-wrapper th .sort-icon {
-          float: right; }
+          float: right;
+          width: auto; }
         .wrapper .content .home-wrapper th.sortable {
           cursor: pointer; }
         .wrapper .content .home-wrapper th.sorted {
@@ -987,7 +988,8 @@ body {
               border-bottom: #ccc solid 1px;
               background: #d7d7d7; }
               .wrapper .content .home-wrapper .home-row .home-cell .summary-table th .sort-icon {
-                float: right; }
+                float: right;
+                width: auto; }
               .wrapper .content .home-wrapper .home-row .home-cell .summary-table th.sortable {
                 cursor: pointer; }
               .wrapper .content .home-wrapper .home-row .home-cell .summary-table th.sorted {
@@ -1067,7 +1069,8 @@ body {
           border-bottom: #ccc solid 1px;
           background: #d7d7d7; }
           .wrapper .content .home-wrapper .log-table th .sort-icon {
-            float: right; }
+            float: right;
+            width: auto; }
           .wrapper .content .home-wrapper .log-table th.sortable {
             cursor: pointer; }
           .wrapper .content .home-wrapper .log-table th.sorted {
@@ -1137,7 +1140,7 @@ body {
         width: 100%; }
     @media screen and (min-width: 40em) {
       .wrapper .content .list-block, .wrapper .content .details-side {
-        float: right;
+        float: left;
         width: 85%; } }
     .wrapper .content .list-block .filter-mobile, .wrapper .content .details-side .filter-mobile {
       margin-bottom: 15px; }
@@ -1178,7 +1181,12 @@ body {
     .wrapper .content .list-block .action-selected, .wrapper .content .details-side .action-selected {
       margin-top: 15px;
       width: 100%;
-      clear: both; }
+      clear: both;
+      background: #f5f5f5;
+      border: 2px solid #ebebeb;
+      padding: 20px;
+      margin-top: 40px;
+      width: 81vw !important; }
       @media screen and (min-width: 40em) {
         .wrapper .content .list-block .action-selected, .wrapper .content .details-side .action-selected {
           float: left;
@@ -1188,8 +1196,12 @@ body {
       .wrapper .content .list-block .action-selected .action-selected-select, .wrapper .content .details-side .action-selected .action-selected-select {
         margin-bottom: 10px;
         width: 100%; }
-      .wrapper .content .list-block .action-selected .action-selected-button, .wrapper .content .details-side .action-selected .action-selected-button {
-        width: 100%; }
+      .wrapper .content .list-block .action-selected .action-selected-button a, .wrapper .content .details-side .action-selected .action-selected-button a {
+        float: right; }
+      .wrapper .content .list-block .action-selected legend, .wrapper .content .details-side .action-selected legend {
+        text-align: left;
+        color: #444;
+        padding: 0px 10px; }
     .wrapper .content .list-block .shown-elements, .wrapper .content .details-side .shown-elements {
       margin-top: 9px;
       width: 81vw;
@@ -1413,6 +1425,8 @@ body {
           .wrapper .content .login-box .login-main .login-form > div.login-button {
             text-align: right;
             padding-top: 5px; }
+    .wrapper .content .wrapper-content {
+      width: 95vw; }
 
 .admin-roles, .role-inherited-roles, role-acls {
   clear: both; }
@@ -1639,7 +1653,8 @@ table.list, table.customize-fields {
     border-bottom: #ccc solid 1px;
     background: #d7d7d7; }
     table.list th .sort-icon, table.customize-fields th .sort-icon {
-      float: right; }
+      float: right;
+      width: auto; }
     table.list th.sortable, table.customize-fields th.sortable {
       cursor: pointer; }
     table.list th.sorted, table.customize-fields th.sorted {
@@ -1692,7 +1707,8 @@ table.custom-props, table.details {
     border-bottom: #ccc solid 1px;
     background: #d7d7d7; }
     table.custom-props th .sort-icon, table.details th .sort-icon {
-      float: right; }
+      float: right;
+      width: auto; }
     table.custom-props th.sortable, table.details th.sortable {
       cursor: pointer; }
     table.custom-props th.sorted, table.details th.sorted {
@@ -2136,13 +2152,12 @@ td.inner-table {
 
 /* Table scroll */
 div.list-block div:first-child {
-  width: 95vw; }
-  @media screen and (min-width: 40em) {
-    div.list-block div:first-child .list-navigation, div.list-block div:first-child div.list {
-      width: 85% !important; } }
+  width: 100%; }
+  @media screen and (min-width: 40em) { }
   div.list-block div:first-child .list {
     overflow-x: auto;
-    overflow-y: hidden; }
+    overflow-y: hidden;
+    margin-top: 3px; }
   div.list-block div:first-child table.list {
     width: 100%; }
     div.list-block div:first-child table.list th {
@@ -2152,8 +2167,9 @@ div.list-block div:first-child {
         position: absolute;
         right: 5px;
         padding-left: 10px; }
-    div.list-block div:first-child table.list td, div.list-block div:first-child table.list th {
-      white-space: nowrap; }
+
+table.list td, table.list th {
+  white-space: nowrap; }
 
 /********************************************************************
 *********************************************************************

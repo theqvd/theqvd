@@ -16,7 +16,7 @@
             <td data-i18n="Memory"></td>
             <td>
                 <input type="text" class="half100" name="memory" value="<%= model.get('memory') %>"> MB
-                <div class="second_row" data-i18n>
+                <div class="second_row">
                     <%=
                         '(' + i18n.t('Leave it blank for default: __default_megabytes__ MB', {'default_megabytes': '256'}) + ')'
                     %>
