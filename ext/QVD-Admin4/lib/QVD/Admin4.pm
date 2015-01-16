@@ -293,7 +293,7 @@ sub add_acls_to_role
 	$acl_name = undef if defined $acl_name && $acl_name eq '';
 	next if $role->is_allowed_to($acl_name);
 	$role->has_own_negative_acl($acl_name) ?
-	    $self->switch_acl_sign_in_role($role,$acl_name) :
+	    $self->unassign_acl_to_role($role,$acl_name) :
 	    $self->assign_acl_to_role($role,$acl_name,1);
     }
 }
@@ -818,15 +818,12 @@ sub get_number_of_acls_in_admin
     my $aol = QVD::Admin4::AclsOverwriteList->new(admin_id => $admin_id);
     my $bind = [$aol->acls_to_close_re,$aol->acls_to_open_re,$aol->acls_to_hide_re];
 
-    my $rs = $DB->resultset('Operative_Acls_In_Administrator')->search(
-	{},{bind => $bind})->search({admin_id => $admin_id, acl_name => { ILIKE => $acl_patterns}});
-    my @acls = $rs->all;
-
     my $output;
     for my $acl_pattern (@$acl_patterns)
     {
-	my $acl_re = $acl_pattern; $acl_re =~ s/%/.*/g;
-	my @total = grep { $_->acl_name =~ /$acl_re/ } @acls;
+	my $rs = $DB->resultset('Operative_Acls_In_Administrator')->search(
+	    {},{bind => $bind})->search({admin_id => $admin_id, acl_name => { ILIKE => $acl_pattern}});
+	my @total = $rs->all;
 	my @effective = grep { $_->operative } @total;
 	$output->{$acl_pattern} = { total => scalar @total,effective => scalar @effective };
     }
@@ -844,15 +841,14 @@ sub get_number_of_acls_in_role
         QVD::Admin4::Exception->throw(code=>'6220', object => 'role_id');
     my $aol = QVD::Admin4::AclsOverwriteList->new(admin => $administrator,admin_id => $administrator->id);
     my $bind = [$aol->acls_to_close_re,$aol->acls_to_hide_re];
-    my $rs = $DB->resultset('Operative_Acls_In_Role')->search(
-	{},{bind => $bind})->search({role_id => $role_id, acl_name => { ILIKE => $acl_patterns }});
-    my @acls = $rs->all;
 
     my $output;
     for my $acl_pattern (@$acl_patterns)
     {
-	my $acl_re = $acl_pattern; $acl_re =~ s/%/.*/g;
-	my @total = grep { $_->acl_name =~ /$acl_re/ } @acls;
+	my $rs = $DB->resultset('Operative_Acls_In_Role')->search(
+	    {},{bind => $bind})->search({role_id => $role_id, acl_name => { ILIKE => $acl_pattern }});
+
+	my @total = $rs->all;
 	my @effective = grep { $_->operative } @total;
 	$output->{$acl_pattern} = { total => scalar @total,effective => scalar @effective };
     }
