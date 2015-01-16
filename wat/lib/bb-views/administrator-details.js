@@ -23,7 +23,7 @@ Wat.Views.AdminDetailsView = Wat.Views.DetailsView.extend({
         this.renderManagerRoles();
         
         this.aclPatterns = $.extend({}, ACL_SECTIONS_PATTERNS, ACL_ACTIONS_PATTERNS);
-
+        
         var aclPatternsArray = _.toArray(this.aclPatterns);
         
         Wat.A.performAction('number_of_acls_in_admin', {}, {"admin_id": this.id, "acl_pattern": aclPatternsArray}, {}, this.renderACLsTree, this);
@@ -105,68 +105,61 @@ Wat.Views.AdminDetailsView = Wat.Views.DetailsView.extend({
             var filters = {};
             switch (treeKind) {
                 case 'actions':
-                    filters = {'name': '%.' + branch + '.%'};
+                    filters = {'acl_name': '%.' + branch + '.%', 'admin_id': this.id};
                     break;
                 case 'sections':
-                    filters = {'name': branch + '.%'};
+                    filters = {'acl_name': branch + '.%', 'admin_id': this.id};
                     break;
             }
             
             this.currentBranchDiv.append(HTML_MINI_LOADING);
-            
-            Wat.A.performAction('acl_tiny_list', {}, filters, {}, this.fillBranch, this);
+
+            Wat.A.performAction('get_acls_in_admins', {}, filters, {}, this.fillBranch, this);
         }
     },
     
     // Fill branch with retreived ACLs from API
     fillBranch: function (that) {
         $.each(that.retrievedData.rows, function (iACL, acl) {
+            var disabledClass = 'disabled-branch';
+            var checkedAttr = '';
+            
+            if (acl.operative) {
+                var disabledClass = '';
+                var checkedAttr = 'checked';
+            }
+            else {
+                return;
+            }
+            
+            // Number of roles where the acl is inherited from
+            var inheritedRoles = Object.keys(acl.roles).length;
+            
             var subbranch = '';
-            subbranch += '<div class="subbranch hidden" data-acl-id="' + acl.id + '">';
+            subbranch += '<div class="subbranch ' + disabledClass + '" data-acl="' + acl.name + '" data-acl-id="' + acl.id + '">';
+                // Name of the ACL
                 subbranch += '<span class="subbranch-piece" data-i18n="' + ACLS[acl.name] + '"></span>';
-                if (Wat.C.checkACL('administrator.see.acl-list-roles')) {
+            
+                // Inheritence procendence indicator
+                if (Wat.C.checkACL('administrator.see.acl-list-roles') && inheritedRoles) {
+                    var roles = [];
+                    $.each(acl.roles, function (iRole, role) {
+                        roles.push(role); 
+                    });
+                    var titleRole = $.i18n.t('Inherited from roles') + ':<br/><br/>&raquo;' + roles.join('<br/><br/>&raquo;');
                     subbranch += '<span class="subbranch-piece">';
-                        subbranch += '<i class="' + CLASS_ICON_ROLES + ' acl-inheritance hidden" data-acl-id="' + acl.id + '" title=""></i>';
+                        subbranch += '<i class="' + CLASS_ICON_ROLES + ' acl-inheritance" data-acl-id="' + acl.id + '" title="' + titleRole + '"></i>';
                     subbranch += '</span>';
                 }
+            
             subbranch += '</div>';
             that.currentBranchDiv.append(subbranch);
         });
-        
-        Wat.T.translate();
-
-        switch (that.currentTreeKind) {
-            case 'actions':
-                filters = {'acl_name': '%.' + that.currentBranch + '.%', 'admin_id': that.id};
-                break;
-            case 'sections':
-                filters = {'acl_name': that.currentBranch + '.%', 'admin_id': that.id};
-                break;
-        }
-        
-        Wat.A.performAction('get_acls_in_admins', {}, filters, {}, that.fillEffectiveBranch, that);
-    },
-    
-    // Set as checked the effective roles and added the inherit icon with inherited roles title
-    fillEffectiveBranch: function (that) {
-        $.each(that.retrievedData.rows, function (iACL, acl) {
-            that.currentBranchDiv.find('div.subbranch[data-acl-id="' + acl.id + '"]').show();
-            
-            if (Object.keys(acl.roles).length > 0) {
-                that.currentBranchDiv.find('i[data-acl-id="' + acl.id + '"].acl-inheritance').show();
                 
-                var roles = [];
-                $.each(acl.roles, function (iRole, role) {
-                    roles.push(role); 
-                });
-                var titleRole = $.i18n.t('Defined on roles') + ':<br/><br/>&raquo;' + roles.join('<br/><br/>&raquo;');
-                that.currentBranchDiv.find('i[data-acl-id="' + acl.id + '"].acl-inheritance').attr('title', titleRole);
-            }
-        });
-        
         that.currentBranchDiv.find('.mini-loading').hide();
+
+        Wat.T.translate();
     },
-    
     
     renderManagerRoles: function () {
         if (!Wat.C.checkACL('administrator.see.roles')) { 

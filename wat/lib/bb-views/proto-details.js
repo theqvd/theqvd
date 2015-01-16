@@ -191,8 +191,10 @@ Wat.Views.DetailsView = Wat.Views.MainView.extend({
         var lastLink = '';
         var crumb = that.breadcrumbs;
         while (1) {
-            if (crumb.link != undefined) {
-                lastLink = crumb.link;
+            if (crumb.next != undefined) {
+                if (crumb.link != undefined) {
+                    lastLink = crumb.link;
+                }
                 crumb = crumb.next;
             }
             else {

@@ -53,6 +53,7 @@
             </tr>
         <%
         }
+        
         _.each(models, function(model) { %>
             <tr class="row-<%= model.get('id') %>">
                 <% 

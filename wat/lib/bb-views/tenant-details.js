@@ -3,6 +3,12 @@ Wat.Views.TenantDetailsView = Wat.Views.DetailsView.extend({
 
     initialize: function (params) {
         this.model = new Wat.Models.Tenant(params);
+        
+        this.setBreadCrumbs();
+       
+        // Clean previous item name
+        this.breadcrumbs.next.next.next.screen="";
+        
         Wat.Views.DetailsView.prototype.initialize.apply(this, [params]);
     },
     

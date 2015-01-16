@@ -28,7 +28,7 @@
                             break;
                         case 'id':
             %>
-                            <th class="sortable desktop col-width-8" data-sortby="id">
+                            <th class="sortable desktop" data-sortby="id">
                                 <i class="fa fa-sort sort-icon"></i>
                                 <span data-i18n="Id"><%= i18n.t('Id') %></span>
                             </th>

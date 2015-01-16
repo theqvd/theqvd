@@ -14,6 +14,7 @@
                             if (model.get('fixed')) {
                                 classFixed = 'invisible';
                             }
+                            
                             $.each(model.get('roles'), function (iRole, role) {
                         %>
                             <div>

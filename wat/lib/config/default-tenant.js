@@ -71,8 +71,14 @@ Wat.I.listBreadCrumbs[qvdObj]['next'] = {
 
 // Breadcrumbs configuration on details view
 $.extend(true, Wat.I.detailsBreadCrumbs[qvdObj], Wat.I.listBreadCrumbs[qvdObj]);
-Wat.I.detailsBreadCrumbs[qvdObj].next.link = '#/tenants';
-Wat.I.detailsBreadCrumbs[qvdObj].next.linkACL = 'tenant.see-main.';
-Wat.I.detailsBreadCrumbs[qvdObj].next.next = {
-            'screen': '' // Will be filled dinamically
+Wat.I.detailsBreadCrumbs[qvdObj].next = {
+            'screen': 'WAT Management',
+            'next': {
+                'screen': 'Tenants',
+                'link': '#/tenants',
+                'linkACL': 'tenant.see-main.',
+                'next': {
+                    'screen': '' // Will be filled dinamically
+                }
+            }
         };

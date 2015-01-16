@@ -27,7 +27,7 @@ Wat.I.listFields[qvdObj] = {
         'fixed': true
     },
     'acls': {
-        'display': true,
+        'display': false,
         'fields': [
             'number_of_acls',
             'acls'
