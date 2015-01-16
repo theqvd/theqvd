@@ -41,6 +41,10 @@ sub BUILD
 	if $self->qvd_object_model->qvd_object eq 'Administrator';
 
     $self->forze_filtering_by_tenant;
+
+    $self->forze_filtering_by_own_admin
+	if $self->json_wrapper->action eq 'myadmin_update';
+
     $self->forze_filtering_tenants_by_tenant
         if $self->qvd_object_model->qvd_object eq 'Tenant';
     $self->forze_tenant_assignment_in_creation
@@ -226,6 +230,17 @@ sub set_pagination_in_request
     my $self = shift;
     $self->modifiers->{page} = $self->json_wrapper->offset // 1; 
     $self->modifiers->{rows}  = $self->json_wrapper->block // 10000; 
+}
+
+sub forze_filtering_by_own_admin
+{
+    my $self = shift;
+
+    $self->json_wrapper->forze_filter_addition('id',$ADMIN->id)
+	unless defined $self->json_wrapper->get_filter_value('id');
+    
+    QVD::Admin4::Exception->throw(code => 6320, object => 'id')
+	unless $self->json_wrapper->get_filter_value('id') eq $ADMIN->id; 
 }
 
 sub forze_filtering_by_tenant

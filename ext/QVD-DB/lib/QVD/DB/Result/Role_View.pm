@@ -56,6 +56,7 @@ sub acls
     my $self = shift;
     my $posotive_acls = decode_json $self->positive_acls_json;
     my $negative_acls = decode_json $self->negative_acls_json;
+
     my $out = { positive => [], negative => []};
     $out->{positive} = [ sort grep { defined $_ } @$posotive_acls  ];
     $out->{negative} = [ sort grep { defined $_ } @$negative_acls  ];

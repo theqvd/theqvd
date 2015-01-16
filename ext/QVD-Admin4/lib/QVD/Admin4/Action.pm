@@ -282,6 +282,10 @@ admin_update => { type_of_action => 'update',
 		  acls => [qr/^administrator\.update\./],
 		  qvd_object => 'Administrator'},
 
+myadmin_update => { type_of_action => 'update',
+		  admin4method => 'update',
+		  qvd_object => 'Administrator'},
+
 admin_delete => { type_of_action => 'delete',
 		  admin4method => 'delete',
 		  acls => [qr/^administrator\.delete\./],
@@ -310,6 +314,10 @@ tenant_update => { type_of_action => 'update',
 		   admin4method => 'update',
 		   acls => [qr/^(config\.wat|tenant\.update)\./],
 		   qvd_object => 'Tenant'},
+
+mytenant_update => { type_of_action => 'update',
+		     admin4method => 'update',
+		     qvd_object => 'Tenant'},
 
 tenant_create => { type_of_action => 'create',
 		   admin4method => 'create',

@@ -374,7 +374,7 @@ my $AVAILABLE_FIELDS =
 
 	      VM => [qw(storage id name user_id user_name osf_id osf_name di_tag blocked expiration_soft expiration_hard 
                         state host_id host_name  di_id user_state ip mac next_boot_ip ssh_port vnc_port serial_port 
-                        creation_admin creation_date di_version di_name di_id properties )],
+                        creation_admin creation_date di_version di_name di_id properties ip_in_use di_in_use osf_in_use)],
 
 	      ACL => [qw(id name)],
 
@@ -412,7 +412,7 @@ my $AVAILABLE_FIELDS =
 		
 		 VM => [qw(storage id name user_id user_name osf_id osf_name di_tag blocked expiration_soft expiration_hard 
                            state host_id host_name  di_id user_state ip mac next_boot_ip ssh_port vnc_port serial_port 
-                           creation_admin creation_date di_version di_name di_id properties )],
+                           creation_admin creation_date di_version di_name di_id properties ip_in_use di_in_use osf_in_use)],
 
 		 ACL => [qw(id name)],
 
@@ -931,6 +931,7 @@ my $FIELDS_TO_DBIX_FORMAT_MAPPER =
 	'user_state' => 'vm_runtime.user_state',
 	'ip' => 'me.ip',
 	'mac' => 'me.vm_mac',
+	'ip_in_use' => 'vm_runtime.vm_address',
 	'next_boot_ip' => 'vm_runtime.vm_address',
 	'ssh_port' => 'vm_runtime.vm_ssh_port',
 	'vnc_port' => 'vm_runtime.vm_vnc_port',
@@ -942,6 +943,8 @@ my $FIELDS_TO_DBIX_FORMAT_MAPPER =
 	'di_version' => 'di.version',
 	'di_name' => 'di.path',
 	'di_id' => 'di.id',
+	'di_in_use' => 'vm_runtime.current_di_id',
+	'osf_in_use' => 'vm_runtime.current_osf_id',
 	'properties' => 'view.properties',
     },
 

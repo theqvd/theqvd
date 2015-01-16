@@ -11,7 +11,21 @@ __PACKAGE__->result_source_instance->view_definition(
 
 "
 
-SELECT DISTINCT * FROM all_role_role_relations
+ WITH RECURSIVE all_role_role_relations(inheritor_id, inherited_id) AS (
+         SELECT role_role_relations.inheritor_id,
+            role_role_relations.inherited_id
+           FROM role_role_relations
+        UNION
+         SELECT p.inheritor_id,
+            p.inherited_id
+           FROM all_role_role_relations pr,
+            role_role_relations p
+          WHERE (p.inherited_id = pr.inheritor_id)
+        )
+ SELECT DISTINCT a.inheritor_id,
+    a.inherited_id
+   FROM all_role_role_relations a
+
 
 "
 );

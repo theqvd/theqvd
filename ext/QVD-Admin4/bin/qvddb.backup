@@ -595,7 +595,7 @@ CREATE VIEW all_role_role_relations AS
             p.inherited_id
            FROM all_role_role_relations pr,
             role_role_relations p
-          WHERE (p.inherited_id = pr.inheritor_id)
+          WHERE (pr.inherited_id = p.inheritor_id)
         )
  SELECT a.inheritor_id,
     a.inherited_id
@@ -613,7 +613,7 @@ CREATE VIEW all_acl_role_relations AS
          SELECT a.inheritor_id,
             a.inherited_id,
             b.acl_id
-           FROM (all_role_role_relations a
+           FROM (role_role_relations a
              JOIN acl_role_relations b ON ((b.role_id = a.inherited_id)))
           WHERE ((b.positive = true) AND (NOT (b.acl_id IN ( SELECT c.acl_id
                    FROM acl_role_relations c
@@ -622,16 +622,19 @@ CREATE VIEW all_acl_role_relations AS
          SELECT d.inheritor_id,
             d.inherited_id,
             e.acl_id
-           FROM (all_role_role_relations d
+           FROM (role_role_relations d
              JOIN all_acls_role_relations e ON ((d.inherited_id = e.inheritor_id)))
           WHERE (NOT (e.acl_id IN ( SELECT f.acl_id
                    FROM acl_role_relations f
-                  WHERE ((f.positive = false) AND (f.role_id = e.inheritor_id)))))
+                  WHERE ((f.positive = false) AND (f.role_id = d.inheritor_id)))))
         )
  SELECT all_acls_role_relations.inheritor_id,
     all_acls_role_relations.inherited_id,
     all_acls_role_relations.acl_id
    FROM all_acls_role_relations
+ WHERE (NOT (all_acls_role_relations.acl_id IN ( SELECT c.acl_id
+                                                 FROM acl_role_relations c
+                                                 WHERE ((c.positive = false) AND (c.role_id = all_acls_role_relations.inheritor_id)))))
 UNION
  SELECT acl_role_relations.role_id AS inheritor_id,
     acl_role_relations.role_id AS inherited_id,
