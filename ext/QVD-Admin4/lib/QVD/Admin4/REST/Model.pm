@@ -28,13 +28,15 @@ my $RELATED_VIEWS_IN_DB =
 	      VM => [qw(VM_View)],
 	      Host => [qw(Host_View)],
 	      OSF => [qw(OSF_View)],
-	      DI => [qw(DI_View)]},
+	      DI => [qw(DI_View)],
+	      Role => [qw(Role_View)],},
 
     details => { User => [qw(User_View)],
 		 VM => [qw(VM_View)],
 		 Host => [qw(Host_View)],
 		 OSF => [qw(OSF_View)],
-		 DI => [qw(DI_View)]},		 
+		 DI => [qw(DI_View)],
+		 Role => [qw(Role_View)],},		 
 };
 
 my $ACLS_FOR_FILTERS = 
@@ -366,7 +368,7 @@ my $AVAILABLE_FIELDS =
 
 	      OSF => [qw(id name overlay user_storage memory  number_of_vms number_of_dis properties )],
 
-	      Role => [qw(name id fixed internal)],
+	      Role => [qw(name id fixed internal acls roles)],
 
 	      DI => [qw(id disk_image version osf_id osf_name blocked tags  properties )],
 
@@ -404,7 +406,7 @@ my $AVAILABLE_FIELDS =
 
 		 OSF => [qw(id name overlay user_storage memory  number_of_vms number_of_dis properties )],
 		 
-		 Role => [qw(name id fixed internal)],
+		 Role => [qw(name id fixed internal acls roles)],
 		
 		 DI => [qw(id disk_image version osf_id osf_name  blocked tags  properties )],
 		
@@ -870,7 +872,9 @@ my $FIELDS_TO_DBIX_FORMAT_MAPPER =
 	'name' => 'me.name',
 	'fixed' => 'me.fixed',
 	'internal' => 'me.internal',
-	'id' => 'me.id'
+	'id' => 'me.id',
+	'acls' => 'view.acls',
+	'roles' => 'view.roles',
     },
 
     User => {

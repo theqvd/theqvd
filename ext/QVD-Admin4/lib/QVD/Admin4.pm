@@ -296,7 +296,6 @@ sub add_acls_to_role
 	    $self->switch_acl_sign_in_role($role,$acl_name) :
 	    $self->assign_acl_to_role($role,$acl_name,1);
     }
-    $DB->resultset('Refresh_Operative_Acls')->first;
 }
 
 sub del_acls_to_role
@@ -318,7 +317,6 @@ sub del_acls_to_role
 	    $self->assign_acl_to_role($role,$acl_name,0);
 	}
     }
-    $DB->resultset('Refresh_Operative_Acls')->first;
 }
 
 sub add_roles_to_role
@@ -334,13 +332,11 @@ sub add_roles_to_role
 	for my $own_acl_name ($this_role->get_negative_own_acl_names,
 			      $this_role->get_positive_own_acl_names)
 	{
-	    print Dumper "Después";
 	    $nested_role //= $DB->resultset('Role')->find({id => $role_to_assign_id});
 	    $self->unassign_acl_to_role($this_role,$own_acl_name) 
 		if $nested_role->is_allowed_to($own_acl_name);
 	}
     }
-    $DB->resultset('Refresh_Operative_Acls')->first;
 }
 
 sub del_roles_to_role
@@ -353,7 +349,6 @@ sub del_roles_to_role
 	$self->unassign_role_to_role($this_role,$id) 
     }
 
-    $DB->resultset('Refresh_Operative_Acls')->first;
     $this_role->reload_acls_info;
     for my $neg_acl_name ($this_role->get_negative_own_acl_names)
     {
@@ -361,8 +356,6 @@ sub del_roles_to_role
 	    unless $this_role->has_inherited_acl($neg_acl_name);
 
     }
-
-    $DB->resultset('Refresh_Operative_Acls')->first;
 }
 
 #############
@@ -423,12 +416,12 @@ sub assign_role_to_role
     my ($self,$inheritor_role,$inherited_role_id) = @_;
 
     eval
-    {
+    { 
 	my $inherited_role = $DB->resultset('Role')->find({id => $inherited_role_id})
 	    // QVD::Admin4::Exception->throw(code => 6370);
     
 	$inheritor_role->id eq $_ && QVD::Admin4::Exception->throw(code => 7350)
-	    for $inherited_role->get_all_inherited_role_ids;
+	    for ($inherited_role->id, $inherited_role->get_all_inherited_role_ids);
 
 	$inheritor_role->create_related('role_rels', { inherited_id => $inherited_role_id });
     };
@@ -456,8 +449,6 @@ sub del_roles_to_admin
 		administrator_id => $admin->id})->delete_all };
     QVD::Admin4::Exception->throw(exception => $@, 
 				  query => 'roles') if $@;
-
-    $DB->resultset('Refresh_Operative_Acls')->first;
 }
 
 sub add_roles_to_admin
@@ -478,8 +469,6 @@ sub add_roles_to_admin
 	QVD::Admin4::Exception->throw(exception => $@, 
 				      query => 'roles') if $@;
     }
-
-    $DB->resultset('Refresh_Operative_Acls')->first;
 }
 
 #############################
@@ -491,43 +480,6 @@ sub vm_delete
     my ($self,$request) = @_;
 
     $self->delete($request,conditions => [qw(vm_is_stopped)]);
-}
-
-
-sub role_delete
-{
-    my ($self,$request) = @_;
-
-    my $out = $self->delete($request);
-    $DB->resultset('Refresh_Operative_Acls')->first;
-    $out;
-}
-
-sub admin_delete
-{
-    my ($self,$request) = @_;
-
-    my $out = $self->delete($request);
-    $DB->resultset('Refresh_Operative_Acls')->first;
-    $out;
-}
-
-sub role_create
-{
-    my ($self,$request) = @_;
-
-    my $out = $self->create($request);
-    $DB->resultset('Refresh_Operative_Acls')->first;
-    $out;
-}
-
-sub admin_create
-{
-    my ($self,$request) = @_;
-
-    my $out = $self->create($request);
-    $DB->resultset('Refresh_Operative_Acls')->first;
-    $out;
 }
 
 
@@ -866,13 +818,15 @@ sub get_number_of_acls_in_admin
     my $aol = QVD::Admin4::AclsOverwriteList->new(admin_id => $admin_id);
     my $bind = [$aol->acls_to_close_re,$aol->acls_to_open_re,$aol->acls_to_hide_re];
 
+    my $rs = $DB->resultset('Operative_Acls_In_Administrator')->search(
+	{},{bind => $bind})->search({admin_id => $admin_id, acl_name => { ILIKE => $acl_patterns}});
+    my @acls = $rs->all;
+
     my $output;
     for my $acl_pattern (@$acl_patterns)
     {
-	my $rs = $DB->resultset('Operative_Acls_In_Administrator')->search(
-	    {},{bind => $bind})->search({admin_id => $admin_id, acl_name => { ILIKE => $acl_pattern}});
-
-	my @total = $rs->all;
+	my $acl_re = $acl_pattern; $acl_re =~ s/%/.*/g;
+	my @total = grep { $_->acl_name =~ /$acl_re/ } @acls;
 	my @effective = grep { $_->operative } @total;
 	$output->{$acl_pattern} = { total => scalar @total,effective => scalar @effective };
     }
@@ -890,14 +844,15 @@ sub get_number_of_acls_in_role
         QVD::Admin4::Exception->throw(code=>'6220', object => 'role_id');
     my $aol = QVD::Admin4::AclsOverwriteList->new(admin => $administrator,admin_id => $administrator->id);
     my $bind = [$aol->acls_to_close_re,$aol->acls_to_hide_re];
+    my $rs = $DB->resultset('Operative_Acls_In_Role')->search(
+	{},{bind => $bind})->search({role_id => $role_id, acl_name => { ILIKE => $acl_patterns }});
+    my @acls = $rs->all;
 
     my $output;
     for my $acl_pattern (@$acl_patterns)
     {
-	my $rs = $DB->resultset('Operative_Acls_In_Role')->search(
-	    {},{bind => $bind})->search({role_id => $role_id, acl_name => { ILIKE => $acl_pattern }});
-
-	my @total = $rs->all;
+	my $acl_re = $acl_pattern; $acl_re =~ s/%/.*/g;
+	my @total = grep { $_->acl_name =~ /$acl_re/ } @acls;
 	my @effective = grep { $_->operative } @total;
 	$output->{$acl_pattern} = { total => scalar @total,effective => scalar @effective };
     }

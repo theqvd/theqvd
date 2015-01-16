@@ -10,26 +10,21 @@ __PACKAGE__->table('operative_acls_in_roles');
 __PACKAGE__->result_source_instance->is_virtual(1);
 __PACKAGE__->result_source_instance->view_definition(
 
-#WITH operative_acls_in_roles_with_inheritance_info AS
-
-#(
-
-#SELECT ior.*, json_agg(DISTINCT (rr.*))::text as roles_json 
-#FROM operative_acls_in_roles_basic ior 
-#LEFT JOIN (operative_acls_in_roles_basic ied JOIN roles rr ON rr.id=ied.role_id) ON ied.operative=true AND ior.operative=true AND ied.acl_id=ior.acl_id 
-#AND ior.role_id IN (SELECT inheritor_id FROM role_role_relations WHERE inherited_id=ied.role_id) 
-#GROUP BY ior.acl_id, ior.role_id, ior.operative
-
-#)
-
 
 "
 
-SELECT op.acl_id, op.role_id, op.roles_json, ac.name as acl_name,
-       CASE WHEN ac.name ~ ? THEN FALSE ELSE op.operative END
-FROM operative_acls_in_roles_with_inheritance_info op
-JOIN acls ac ON  op.acl_id=ac.id
-WHERE ac.name !~ ?
+SELECT CASE WHEN a.name ~ ? OR j.acl_id IS NULL THEN FALSE ELSE TRUE END as operative, 
+       rr.id as role_id, 
+       a.id as acl_id, 
+       json_agg(r.*)::text as roles_json, 
+       a.name as acl_name
+
+FROM acls a
+CROSS JOIN roles rr 
+LEFT JOIN (all_acl_role_relations j JOIN roles r ON r.id=j.inherited_id) ON a.id=j.acl_id  AND rr.id=j.inheritor_id
+WHERE a.name !~ ? 
+GROUP BY j.acl_id, a.name, j.inheritor_id, a.id, rr.id
+
 
 "
 );
@@ -52,7 +47,7 @@ sub roles
 
     my $roles_list = decode_json $self->roles_json;
     my $roles = {};
-    my @roles_list = grep { defined $_ } @$roles_list;
+    my @roles_list = grep { defined $_ && $_->{id} ne $self->role_id } @$roles_list;
     $roles->{$_->{id}} = $_->{name} for @roles_list; 
     $roles;
 }

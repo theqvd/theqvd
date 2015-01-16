@@ -9,24 +9,20 @@ __PACKAGE__->table('operative_acls_in_administrators');
 __PACKAGE__->result_source_instance->is_virtual(1);
 __PACKAGE__->result_source_instance->view_definition(
 
-
-#WITH operative_acls_in_admins_with_inheritance_info AS
-#(
-
-#SELECT a.*, json_agg(DISTINCT (rr.*))::text as roles_json FROM operative_acls_in_admins_basic a 
-#LEFT JOIN (operative_acls_in_roles_basic r JOIN roles rr ON rr.id=r.role_id) ON r.operative=true 
-#AND a.operative=true AND r.acl_id=a.acl_id AND a.admin_id IN (SELECT administrator_id FROM role_administrator_relations WHERE role_id=r.role_id) 
-#GROUP BY a.acl_id, a.admin_id, a.operative
-
-#)
-
-
 "
-SELECT op.acl_id, op.admin_id, op.roles_json, ac.name as acl_name,
-       CASE WHEN ac.name ~ ? THEN FALSE ELSE CASE WHEN ac.name ~ ? THEN TRUE ELSE op.operative END END
-FROM operative_acls_in_admins_with_inheritance_info op
-JOIN acls ac ON  op.acl_id=ac.id
-WHERE ac.name !~ ?
+
+SELECT ad.id as admin_id, 
+       CASE WHEN a.name ~ ? THEN FALSE ELSE CASE WHEN a.name ~ ? THEN TRUE ELSE CASE WHEN j.acl_id IS NULL THEN FALSE ELSE TRUE END END END as operative,
+       j.inheritor_id as role_id, 
+       a.id as acl_id, 
+       json_agg(r.*)::text as roles_json, 
+       a.name as acl_name
+
+FROM acls a 
+CROSS JOIN administrators ad
+LEFT JOIN (all_acl_role_relations j JOIN roles r ON r.id=j.inheritor_id JOIN role_administrator_relations i ON i.role_id=r.id) ON i.administrator_id= ad.id AND a.id=j.acl_id  
+WHERE a.name !~ ? 
+GROUP BY j.acl_id, a.name, j.inheritor_id, ad.id, a.id
 
 "
 );

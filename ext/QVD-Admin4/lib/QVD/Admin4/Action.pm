@@ -273,7 +273,7 @@ admin_all_ids => { type_of_action => 'all_ids',
 		   qvd_object => 'Administrator'},
 
 admin_create => { type_of_action => 'create',
-		  admin4method => 'admin_create',
+		  admin4method => 'create',
 		  acls => [qr/^administrator\.create\./],
 		  qvd_object => 'Administrator'},
 
@@ -283,7 +283,7 @@ admin_update => { type_of_action => 'update',
 		  qvd_object => 'Administrator'},
 
 admin_delete => { type_of_action => 'delete',
-		  admin4method => 'admin_delete',
+		  admin4method => 'delete',
 		  acls => [qr/^administrator\.delete\./],
 		  qvd_object => 'Administrator'},
 
@@ -356,7 +356,6 @@ get_acls_in_admins => { type_of_action => 'list',
 			acls => [qr/^administrator\.see\.acl-list$/],
 		      admin4method => 'get_acls_in_admins'},
 
-
 number_of_acls_in_role => { type_of_action =>  'general',
 			    acls => [qr/^administrator\.see\.acl-list$/],
 			    admin4method => 'get_number_of_acls_in_role'},
@@ -371,12 +370,12 @@ role_update => { type_of_action => 'update',
 		 qvd_object => 'Role'},
 
 role_create => { type_of_action => 'create',
-		 admin4method => 'role_create',
+		 admin4method => 'create',
 		 acls => [qr/^role\.create\./],
 		 qvd_object => 'Role'},
 
 role_delete => { type_of_action => 'delete',
-		 admin4method => 'role_delete',
+		 admin4method => 'delete',
 		 acls => [qr/^role\.delete\./],
 		 qvd_object => 'Role'},
 
