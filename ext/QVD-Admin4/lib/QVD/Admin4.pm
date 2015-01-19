@@ -291,6 +291,7 @@ sub add_acls_to_role
     for my $acl_name (@$acl_names)
     { 	
 	$acl_name = undef if defined $acl_name && $acl_name eq '';
+
 	next if $role->is_allowed_to($acl_name);
 	$role->has_own_negative_acl($acl_name) ?
 	    $self->unassign_acl_to_role($role,$acl_name) :
@@ -776,7 +777,6 @@ sub get_acls_in_roles
     my (@rows, $rs);
 
     my $admin = $request->get_parameter_value('administrator');
-    my $role_id = $request->json_wrapper->get_filter_value('role_id');
     my $aol = QVD::Admin4::AclsOverwriteList->new(admin => $admin, admin_id => $admin->id);
     my $bind = [$aol->acls_to_close_re,$aol->acls_to_hide_re];
 
