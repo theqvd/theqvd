@@ -632,9 +632,6 @@ CREATE VIEW all_acl_role_relations AS
     all_acls_role_relations.inherited_id,
     all_acls_role_relations.acl_id
    FROM all_acls_role_relations
- WHERE (NOT (all_acls_role_relations.acl_id IN ( SELECT c.acl_id
-                                                 FROM acl_role_relations c
-                                                 WHERE ((c.positive = false) AND (c.role_id = all_acls_role_relations.inheritor_id)))))
 UNION
  SELECT acl_role_relations.role_id AS inheritor_id,
     acl_role_relations.role_id AS inherited_id,
