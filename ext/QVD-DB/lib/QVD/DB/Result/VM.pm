@@ -3,6 +3,7 @@ use base qw/DBIx::Class/;
 
 use strict;
 use warnings;
+use QVD::Admin4::VMExpiration;
 
 __PACKAGE__->load_components(qw/Core/);
 __PACKAGE__->table('vms');
@@ -127,6 +128,20 @@ sub vm_mac
     my $mac_prefix = cfg('vm.network.mac.prefix');
     join(':', $mac_prefix, @hex);
 
+}
+
+sub remaining_time_until_expiration_hard
+{
+    my $self = shift;
+    my $exp = QVD::Admin4::VMExpiration->new(vm => $self);
+    return $exp->time_until_expiration_hard;
+}
+
+sub remaining_time_until_expiration_soft
+{
+    my $self = shift;
+    my $exp = QVD::Admin4::VMExpiration->new(vm => $self);
+    return $exp->time_until_expiration_soft;
 }
 
 1;

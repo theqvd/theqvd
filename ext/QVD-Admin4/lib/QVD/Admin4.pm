@@ -794,7 +794,8 @@ sub current_admin_setup
 {
     my ($self,$administrator,$json_wrapper) = @_;
 
-    { admin_language => $administrator->language,
+    { multitenant => cfg('wat.multitenant'),
+      admin_language => $administrator->language,
       tenant_language => $administrator->tenant_language,
       admin_block => $administrator->block,
       tenant_block => $administrator->tenant_block,

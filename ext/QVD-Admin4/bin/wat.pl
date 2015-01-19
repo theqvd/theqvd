@@ -2,7 +2,7 @@
 use Mojolicious::Lite;
 use lib::glob '/home/benjamin/wat/*/lib/';
 use QVD::Admin4::REST;
-use Mojo::JSON qw(encode_json decode_json);
+use Mojo::JSON qw(encode_json decode_json j);
 use QVD::Admin4::Exception;
 use QVD::Config;
 use MojoX::Session;
@@ -10,7 +10,8 @@ use File::Copy qw(copy move);
 use Mojo::IOLoop::ForkCall;
 use AnyEvent::Pg::Pool;
 use Mojo::Log;
-
+use Mojo::ByteStream 'b';
+use Deep::Encode;
 
 # MojoX::Session::Transport::WAT Package 
 
@@ -176,17 +177,19 @@ sub get_input_json
     my $c = shift;
     my $json = $c->req->json;
     return $json if $json;
-    $json =  { map { $_ => $c->param($_) } $c->param };
+
+    $json =  { map { $_ => b($c->param($_))->encode('UTF-8')->to_string } $c->param };
 
     eval
     {
-        $json->{filters} = decode_json($json->{filters}) if exists $json->{filters};
+        $json->{filters} =  decode_json($json->{filters}) if exists $json->{filters};
         $json->{arguments} = decode_json($json->{arguments}) if exists $json->{arguments};
         $json->{order_by} = decode_json($json->{order_by}) if exists $json->{order_by};
         $json->{fields} = decode_json($json->{fields}) if exists $json->{fields};
         $json->{parameters} = decode_json($json->{parameters}) if exists $json->{parameters}
     };
 
+    deep_utf8_encode($json); 
     $c->render(json => QVD::Admin4::Exception->new(code => 6100)->json) if $@;
     $json;
 }

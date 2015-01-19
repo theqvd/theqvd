@@ -209,4 +209,9 @@ sub is_ephemeral {
     return $vm->real_user_id != $vm->vm->user_id;
 }
 
+sub current_di_name {
+    my $self = shift;
+    $self->current_di->path;
+}
+
 1;
