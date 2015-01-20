@@ -57,6 +57,9 @@ sub authenticate_basic {
         $auth->{passwd} = $passwd;
         for (@{$auth->{modules}}) {
             if ($_->authenticate_basic($auth, $normalized_login, $passwd, $l7r)) {
+                # note that some backend (i.e. LDAP) may have changed
+                # $auth->{normalized_login} so we can not use our
+                # cached copy in $normalized_login
                 $auth->{params}{'qvd.vm.user.name'} = $auth->{normalized_login};
                 $auth->after_authenticate_basic($auth->{normalized_login}, $l7r);
                 return 1;
