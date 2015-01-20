@@ -7,6 +7,15 @@ Wat.Views.VMDetailsView = Wat.Views.DetailsView.extend({
         Wat.Views.DetailsView.prototype.initialize.apply(this, [params]);
     },
     
+    events: {
+        'click .js-execution-params-button': 'showExecutionParams'
+    },
+    
+    showExecutionParams: function () {
+        $('.js-execution-params-button-row').hide();
+        $('.js-execution-params').show();
+    },
+    
     openEditElementDialog: function(e) {
         this.dialogConf.title = $.i18n.t('Edit Virtual machine') + ": " + this.model.get('name');
         
@@ -28,6 +37,13 @@ Wat.Views.VMDetailsView = Wat.Views.DetailsView.extend({
         Wat.A.fillSelect(params);
         
         Wat.I.chosenElement('[name="di_tag"]', 'single100');
+    },
+    
+    renderSide: function () {
+        // No side rendered
+        if (this.checkSide({'fake.acl': '.js-side-component1'}) === false) {
+            return;
+        }
     },
     
     updateElement: function (dialog) {

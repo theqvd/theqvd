@@ -66,7 +66,7 @@
                     }
                     else if (vmState == 'running') {
                 %>
-                            <span data-i18n="Current"></span>
+                        <span data-i18n="Current"></span>
                 <%
                     }
                     else {

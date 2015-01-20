@@ -11,21 +11,27 @@ else {
 
     <% 
         $.each(vms_with_expiration_date, function (iExp, exp) {
-            var priorityClass = '';
+            var processedRemainingTime = Wat.U.processRemainingTime(exp.remaining_time);
+    
+            var priorityClass = processedRemainingTime.priorityClass;
             var remainingTime = '';
             var remainingTimeAttr = '';
-            if (exp.remaining_time.days < 1) {
-                priorityClass = 'error';
-                remainingTime = exp.remaining_time.hours + ':' + exp.remaining_time.minutes + ':' + exp.remaining_time.seconds;
+            
+            switch (processedRemainingTime.returnType) {
+                case 'exact':
+                    remainingTime = processedRemainingTime.remainingTime;
+                    break;
+                case 'days':
+                    remainingTimeAttr = 'data-days="' + processedRemainingTime.remainingTime + '"';
+                    break;
+                case 'months':
+                    remainingTimeAttr = 'data-months="' + processedRemainingTime.remainingTime + '"';
+                    break;
+                case '>year':
+                    remainingTimeAttr = 'data-years="' + processedRemainingTime.remainingTime + '"';
+                    break;
             }
-            else if(exp.remaining_time.days < 7) {
-                priorityClass = 'warning';
-                remainingTimeAttr = 'data-days="' + exp.remaining_time.days + '"';
-            }
-            else {
-                priorityClass = 'ok';
-                remainingTimeAttr = 'data-days="+7"';
-            }                    
+            
             %>
             <tr>
                 <td class="max-1-icons">

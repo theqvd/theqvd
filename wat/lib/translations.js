@@ -27,13 +27,16 @@ Wat.T = {
     // After all the translations do custom actions that need to have the content translated
     translate: function () {
         // Translate all the elements with attribute 'data-i18n'
-        
+        console.log(typeof $.i18n);
+        console.log($.i18n);
         $('[data-i18n]').i18n();
 
         // Force chosen to selects that contain any option with data-i18n attribute
         $('select[data-contain-i18n]').trigger('chosen:updated');
         
         Wat.T.translateXDays();
+        Wat.T.translateXMonths();
+        Wat.T.translateXYears();
 
         // Other chains
         $('.footer').html(i18n.t('QVD Web Administration Tool, by %s',  $('.footer').attr('data-link')));
@@ -74,6 +77,22 @@ Wat.T = {
         $.each($('[data-days]'), function (iDays, days) {
             var daysTranslated = i18n.t('__count__ days', {'count': $(days).attr('data-days')});
             $(days).html(daysTranslated);
+        });
+    },
+    
+    translateXMonths: function() {
+        // Translate the "X months" strings
+        $.each($('[data-months]'), function (iMonths, months) {
+            var monthsTranslated = i18n.t('__count__ months', {'count': $(months).attr('data-months')});
+            $(months).html(monthsTranslated);
+        });
+    },
+        
+    translateXYears: function() {
+        // Translate the "X years" strings
+        $.each($('[data-years]'), function (iYears, years) {
+            var yearsTranslated = i18n.t('__count__ years', {'count': $(years).attr('data-years')});
+            $(years).html(yearsTranslated);
         });
     }
 }

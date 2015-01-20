@@ -1,5 +1,7 @@
 {
     "__count__ days": "__count__ días",
+    "__count__ months": "__count__ meses",
+    "__count__ years": "__count__ años",
     "About": "A cerca de",
     "A column in list view": "Columna en vista listado",
     "Accept": "Aceptar",
@@ -169,6 +171,7 @@
     "Role": "Rol",
     "Roles": "Roles",
     "Running": "Corriendo",
+    "Running at __node__": "Corriendo en __node__",
     "Running VMs": "MVs corriendo",
     "Running nodes": "Nodos corriendo",
     "Running virtual machines": "Maquinas virtuales corriendo",
@@ -179,6 +182,7 @@
     "Sections": "Secciones",
     "See": "Ver",
     "See details view": "Ver vista detalle",
+    "See execution parameters": "Ver parámetros de ejecución",
     "See main section": "Ver sección principal",
     "Select all": "Seleccionar todo",
     "Select an option": "Seleccionar una opción",

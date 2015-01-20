@@ -4,7 +4,8 @@ Wat.C.aclGroups = {};
 // Administrator ACL groups
 ///////////////////////////////
 Wat.C.aclGroups.administratorEdit = [
-    'administrator.update.password'
+    'administrator.update.password',
+    'administrator.update.language'
 ];
 
 Wat.C.aclGroups.administratorMassiveEdit = [];

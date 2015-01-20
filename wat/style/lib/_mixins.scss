@@ -19,6 +19,15 @@
     }
 }
 
+@mixin first-col($col : #FFFFFF){
+    &>td {
+        background-color: $col;
+    }    
+    &>td:nth-child(1) {
+        background-color: darken($col, 4%);
+    }
+}
+
 // Layout
 @mixin width-wrapper {
     min-width: $min_width_mobile;
@@ -242,6 +251,8 @@
             @include alternate($col_whiter);
         } @else if $alternate == alternate-cols {
             @include alternate-cols($col_whiter);
+        } @else if $alternate == first-col {
+            @include first-col($col_whiter);
         }
     }
     

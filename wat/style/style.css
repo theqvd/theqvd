@@ -1263,31 +1263,41 @@ body {
           width: 100%;
           margin: 0;
           margin-bottom: 25px; } }
-      .wrapper .content .details-block .custom-props-container {
-        margin-top: 20px; }
+      .wrapper .content .details-block .details-left, .wrapper .content .details-block .details-right {
+        width: 100%;
+        margin-bottom: 20px; }
         @media screen and (min-width: 40em) {
-          .wrapper .content .details-block .custom-props-container {
-            margin-top: -25px;
-            position: absolute;
-            top: 85px;
-            right: 0;
-            width: 40%;
-            padding-left: 20px; } }
-        .wrapper .content .details-block .custom-props-container table.custom-props {
-          width: auto;
-          margin-top: 10px; }
-          .wrapper .content .details-block .custom-props-container table.custom-props td:first-child {
-            font-weight: normal;
-            white-space: nowrap;
-            width: 1%;
-            padding-right: 15px; }
-        .wrapper .content .details-block .custom-props-container .details-item {
-          border: 0;
-          display: block; }
-          .wrapper .content .details-block .custom-props-container .details-item > span {
-            width: 100%;
-            display: block;
-            background: transparent; }
+          .wrapper .content .details-block .details-left, .wrapper .content .details-block .details-right {
+            width: 49%; } }
+      @media screen and (min-width: 40em) {
+        .wrapper .content .details-block .details-left {
+          float: left; } }
+      @media screen and (min-width: 40em) {
+        .wrapper .content .details-block .details-right {
+          float: right; } }
+      @media screen and (min-width: 40em) {
+        .wrapper .content .details-block .custom-props-container {
+          margin-top: -25px;
+          position: absolute;
+          top: 85px;
+          right: 0;
+          width: 40%;
+          padding-left: 20px; } }
+      .wrapper .content .details-block .custom-props-container table.custom-props {
+        width: auto;
+        margin-top: 10px; }
+        .wrapper .content .details-block .custom-props-container table.custom-props td:first-child {
+          font-weight: normal;
+          white-space: nowrap;
+          width: 1%;
+          padding-right: 15px; }
+      .wrapper .content .details-block .custom-props-container .details-item {
+        border: 0;
+        display: block; }
+        .wrapper .content .details-block .custom-props-container .details-item > span {
+          width: 100%;
+          display: block;
+          background: transparent; }
     .wrapper .content .remote-administration-wrapper {
       width: 100%;
       margin-top: 10px;
@@ -1323,6 +1333,8 @@ body {
       display: list-item; }
       .wrapper .content ul.tags li:before {
         margin-right: 5px; }
+    .wrapper .content .execution-params {
+      display: none; }
     .wrapper .content .setup-side {
       width: 16%;
       height: auto;
@@ -1732,9 +1744,9 @@ table.custom-props, table.details {
     border-right: dotted 1px #e4e4e4; }
   table.custom-props > tbody:nth-child(2) tr:first-child td, table.details > tbody:nth-child(2) tr:first-child td {
     border-top: dotted 1px #e4e4e4; }
-  table.custom-props > tbody > tr > td:nth-child(even), table.details > tbody > tr > td:nth-child(even) {
+  table.custom-props > tbody > tr > td, table.details > tbody > tr > td {
     background-color: #fdfdfd; }
-  table.custom-props > tbody > tr > td:nth-child(odd), table.details > tbody > tr > td:nth-child(odd) {
+  table.custom-props > tbody > tr > td:nth-child(1), table.details > tbody > tr > td:nth-child(1) {
     background-color: #f3f3f3; }
   table.custom-props tr:last-child td:first-child, table.details tr:last-child td:first-child {
     border-bottom-left-radius: 4px; }
@@ -1754,7 +1766,7 @@ table.manage-roles, table.manage-acls {
     table-layout: fixed; } }
 
 table.details td:first-child, table.custom-props td:first-child {
-  vertical-align: top;
+  vertical-align: middle;
   white-space: nowrap; }
   @media only screen and (max-width: 40em) {
     table.details td:first-child i.fa, table.custom-props td:first-child i.fa {
@@ -1763,10 +1775,22 @@ table.details td:last-child, table.custom-props td:last-child {
   font-weight: bold;
   width: 100%; }
 
-table.expiration-table {
-  table-layout: auto; }
-  table.expiration-table td:nth-child(2) {
+table.expiration-table, table.state-table {
+  table-layout: auto;
+  white-space: nowrap; }
+  table.expiration-table td:nth-child(2), table.state-table td:nth-child(2) {
     width: 100%; }
+
+table.state-table tr > td {
+  background-color: #fdfdfd; }
+table.state-table tr > td:nth-child(1) {
+  background-color: #f3f3f3; }
+table.state-table tr:first-child th {
+  text-align: center; }
+table.state-table tr td {
+  font-weight: bold; }
+  table.state-table tr td:first-child {
+    font-weight: normal; }
 
 table.roles-inherit-table {
   width: 100%; }
@@ -2428,7 +2452,7 @@ th, td * {
           line-height: 1.3em; } } }
 
 @media only screen and (max-width: 40em) {
-  table.expiration-table td {
+  table.expiration-table td, table.state-table td {
     font-size: 11px; } }
 
 .h1 {
@@ -2618,6 +2642,9 @@ td {
 
 .block {
   display: block !important; }
+
+.vmiddle {
+  vertical-align: middle !important; }
 
 /* Hidden will have not important to open the possibility of use $().show() */
 .hidden {

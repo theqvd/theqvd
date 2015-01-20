@@ -97,11 +97,31 @@
         }
     }
     
+    .details-left, .details-right {
+        width: 100%;
+        margin-bottom: 20px;
+
+        @include in(desktop) {
+            width: 49%;
+        }
+    }    
+    
+    .details-left {
+        @include in(desktop) {
+            float: left;
+        }
+    }
+    
+    .details-right {
+        @include in(desktop) {
+            float: right;
+        }
+    }
+    
     display: table;
     width: 100%;
         
     .custom-props-container {
-        margin-top: 20px;
         @include in(desktop) {
             margin-top: -25px;
             position: absolute;
@@ -192,4 +212,9 @@ ul.tags li {
     &:before {
         margin-right: 5px;
     }
+}
+
+// Virtual machine's execution params
+.execution-params {
+    display: none;
 }

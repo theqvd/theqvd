@@ -81,15 +81,17 @@ Wat.Views.AdminListView = Wat.Views.ListView.extend({
         var name = context.find('input[name="name"]').val();
         var tenant = context.find('select[name="tenant"]').val();
         var password = context.find('input[name="password"]').val();
-        var language = context.find('select[name="language"]').val();
 
         var arguments = {
             "name": name,
             "password": password,
-            "tenant": tenant,
-            "language": language
+            "tenant": tenant
         };
-                   
+        
+        if (Wat.C.checkACL('administrator.create.language')) { 
+            var language = context.find('select[name="language"]').val();
+            arguments["language"] = language;
+        }           
         
         if (Wat.C.isSuperadmin) {
             var tenant_id = context.find('select[name="tenant_id"]').val();

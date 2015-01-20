@@ -3,6 +3,9 @@ Wat.WS.changeWebsocketVm = function (id, field, data) {
         case 'state':
             // Add this effect when data will be received only when change
             // $('[data-wsupdate="state"][data-id="' + id + '"]').fadeOut().fadeIn();
+            $('.js-body-state').hide();
+            $('[data-wsupdate="state-' + data + '"][data-id="' + id + '"]').show();
+            
             switch (data) {
                 case 'running':
                     $('[data-wsupdate="state"][data-id="' + id + '"]').attr('class', 'fa fa-play');
@@ -10,7 +13,10 @@ Wat.WS.changeWebsocketVm = function (id, field, data) {
                     $('[data-wsupdate="state-text"][data-id="' + id + '"]').html(i18n.t('Running'));                                
                     $('[data-wsupdate="state-button"][data-id="' + id + '"]').removeClass('js-button-start-vm fa-play').addClass('js-button-stop-vm fa-stop').attr('title', i18n.t('Stop'));                                   
                     $('[data-wsupdate="ip"][data-id="' + id + '"]').removeClass('invisible');   
-                    $('.remote-administration-buttons a').removeClass('disabled');                                       
+                    $('.remote-administration-buttons a').removeClass('disabled');   
+                    
+                    $('.js-execution-params-button-row').show();
+                    $('.js-execution-params').hide();
                     break;
                 case 'stopped':
                     $('[data-wsupdate="state"][data-id="' + id + '"]').attr('class', 'fa fa-stop');

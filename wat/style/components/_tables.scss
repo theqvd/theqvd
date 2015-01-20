@@ -17,7 +17,7 @@ table.list, table.customize-fields {
 }
 
 table.custom-props, table.details {    
-    @include table-base (alternate-cols);
+    @include table-base (first-col);
 }
 
 table.manage-roles, table.manage-acls {
@@ -36,7 +36,7 @@ table.custom-props {
 
 table.details, table.custom-props {
     td:first-child {
-        vertical-align: top;
+        vertical-align: middle;
         white-space: nowrap;
         
         i.fa {
@@ -51,12 +51,31 @@ table.details, table.custom-props {
     }
 }
 
-table.expiration-table {
+table.expiration-table, table.state-table {
     table-layout: auto;
+    white-space: nowrap;
     
     td:nth-child(2) {
         width: 100%;
     }
+}
+
+table.state-table tr {
+    @include first-col ($col_whiter);
+    
+    &:first-child th {
+        text-align: center;
+    }
+    
+    td {
+        font-weight: bold;
+        
+        &:first-child {
+            font-weight: normal;
+        }
+    }
+    
+    
 }
 
 table.roles-inherit-table {

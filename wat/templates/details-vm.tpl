@@ -48,7 +48,148 @@
     
 </div>
 
-<table class="details details-list <% if (!enabledProperties) { %> col-width-100 <% } %>">
+<% 
+var runningStyle = 'display: none;';
+var stoppedStyle = 'display: none;';
+var startingStyle = 'display: none;';
+var stoppingStyle = 'display: none;';
+
+switch (model.get('state')) {
+    case 'running':
+        var runningStyle = '';
+        break;
+    case 'stopped':
+        var stoppedStyle = '';
+        break;
+    case 'starting':
+        var startingStyle = '';
+        break;
+    case 'stopping':
+        var stoppingStyle = '';
+        break;
+}
+%>          
+
+<table class="details details-list details-right">
+    <tbody class="js-body-state" data-wsupdate="state-running" data-id="<%= model.get('id') %>" style="<%= runningStyle %>">
+        <%
+        if (Wat.C.checkACL('vm.see.host')) {
+            var hostHtml = Wat.C.ifACL('<a href="#/host/' + model.get('host_id') + '">', 'host.see-details.') + model.get('host_name') + Wat.C.ifACL('</a>', 'host.see-details.');
+        %>
+            <tr>
+                <td colspan=2 class="center" data-wsupdate="host" data-id="<%= model.get('id') %>"><i class="fa fa-play"></i><%= i18n.t('Running at __node__', {'node': hostHtml}) %></td>
+            </tr>
+        <%
+        }
+        else { 
+        %>
+            <tr>
+                <td colspan=2 class="center"><i class="fa fa-play"></i><span data-i18n="Running"></span></td>
+            </tr>
+        <%
+        }
+        %>
+        <tr class="js-execution-params-button-row">
+            <td colspan=2><a class="fa fa-eye button2 col-width-100 center js-execution-params-button" href="javascript:" data-i18n="See execution parameters"></a></td>
+        </tr>
+        <%
+        if (Wat.C.checkACL('vm.see.host')) { 
+        %>
+            <tr class="js-execution-params execution-params">
+                <td><i class="<%= CLASS_ICON_HOSTS %>"></i><span data-i18n="Node"></span></td>
+                <td data-wsupdate="host" data-id="<%= model.get('id') %>">
+                    <%= hostHtml %>
+                </td>
+            </tr>
+        <%
+        }
+        if (Wat.C.checkACL('vm.see.ip')) { 
+        %>
+            <tr class="js-execution-params execution-params">
+                <td><i class="fa fa-ellipsis-h"></i><span data-i18n="IP address"></span></td>
+                <td class="col-width-100" data-wsupdate="ip" data-id="<%= model.get('id') %>">
+                    <%= model.get('ip') %>
+                </td>
+            </tr>
+        <%
+        }
+        if (Wat.C.checkACL('vm.see.di')) { 
+        %>
+            <tr class="js-execution-params execution-params">
+                <td><i class="<%= CLASS_ICON_DIS %>"></i><span data-i18n="Disk image"></span></td>
+                <td>
+                    <a href="#/di/<%= model.get('di_id_in_use') %>">
+                        <%= model.get('di_name_in_use') %>
+                    </a>
+                </td>
+            </tr>
+        <% 
+        }
+        if (Wat.C.checkACL('vm.see.user-state')) { 
+        %>
+            <tr class="js-execution-params execution-params">
+                <td><i class="fa fa-plug"></i><span data-i18n="User state"></span></td>
+                <td>
+                    <% 
+                    if (model.get('user_state') == 'connected') {
+                    %>
+                        <span data-i18n data-wsupdate="user_state-text" data-id="<%= model.get('id') %>">Connected</span>
+                    <%
+                    }
+                    else {
+                    %>
+                        <span data-i18n data-wsupdate="user_state-text" data-id="<%= model.get('id') %>">Disconnected</span>
+                    <%
+                    }
+                    %>
+                </td>
+            </tr>
+        <% 
+        }
+        if (Wat.C.checkACL('vm.see.port-ssh')) { 
+        %>
+            <tr class="js-execution-params execution-params">
+                <td><i class="fa fa-angle-double-right"></i><span data-i18n="SSH port"></span></td>
+                <td data-wsupdate="ssh_port" data-id="<%= model.get('id') %>"><%= model.get('ssh_port') == "0" ? '-' : model.get('ssh_port') %></td>
+            </tr>
+        <% 
+        }
+        if (Wat.C.checkACL('vm.see.port-vnc')) { 
+        %>
+            <tr class="js-execution-params execution-params">
+                <td><i class="fa fa-angle-double-right"></i><span data-i18n="VNC port"></span></td>
+                <td data-wsupdate="vnc_port" data-id="<%= model.get('id') %>"><%= model.get('vnc_port') == "0" ? '-' : model.get('vnc_port') %></td>
+            </tr>
+        <% 
+        }
+        if (Wat.C.checkACL('vm.see.port-serial')) { 
+        %>
+            <tr class="js-execution-params execution-params">
+                <td><i class="fa fa-angle-double-right"></i><span data-i18n="Serial port"></span></td>
+                <td data-wsupdate="serial_port" data-id="<%= model.get('id') %>"><%= model.get('serial_port') == "0" ? '-' : model.get('serial_port') %></td>
+            </tr>
+        <% 
+        }
+        %>
+    </tbody>
+    <tbody class="js-body-state" data-wsupdate="state-stopped" data-id="<%= model.get('id') %>" style="<%= stoppedStyle %>">
+        <tr>
+            <td colspan=2 class="center"><i class="fa fa-stop"></i><span data-i18n="Stopped"></span></td>
+        </tr>
+    </tbody>
+    <tbody class="js-body-state" data-wsupdate="state-starting" data-id="<%= model.get('id') %>" style="<%= startingStyle %>">
+        <tr>
+            <td colspan=2 class="center"><i class="fa fa-spinner fa-spin"></i><span data-i18n="Starting"></span></td>
+        </tr>
+    </tbody>
+    <tbody class="js-body-state" data-wsupdate="state-stopping" data-id="<%= model.get('id') %>" style="<%= stoppingStyle %>">
+        <tr>
+            <td colspan=2 class="center"><i class="fa fa-spinner fa-spin"></i><span data-i18n="Stopping"></span></td>
+        </tr>
+    </tbody>
+</table>
+
+<table class="details details-list details-left">
     <% 
     if (detailsFields['id'] != undefined) { 
     %>
@@ -60,36 +201,27 @@
         </tr>  
     <% 
     }
-    if (detailsFields['state'] != undefined) { 
+    if (detailsFields['user'] != undefined) { 
     %>
         <tr>
-            <td><i class="fa fa-heart"></i><span data-i18n="State"></span></td>
+            <td><i class="<%= CLASS_ICON_USERS %>"></i><span data-i18n="User"></span></td>
             <td>
-                <% 
-                if (model.get('state') == 'running') {
-                %>
-                    <span data-i18n data-wsupdate="state-text" data-id="<%= model.get('id') %>">Running</span>
-                <%
-                }
-                else {
-                %>
-                    <span data-i18n data-wsupdate="state-text" data-id="<%= model.get('id') %>">Stopped</span>
-                <%
-                }
-                %>
-            </td>
-        </tr>
-    <% 
-    }
-    if (detailsFields['host'] != undefined && Wat.C.checkACL('vm.see.host')) { 
-    %>
-        <tr>
-            <td><i class="<%= CLASS_ICON_HOSTS %>"></i><span data-i18n="Node"></span></td>
-            <td>
-                <%= Wat.C.ifACL('<a href="#/host/' + model.get('host_id') + '">', 'host.see-details.') %>
-                    <%= model.get('host_name') %>
-                <%= Wat.C.ifACL('</a>', 'host.see-details.') %>
-            </td>
+                <a href="#/user/<%= model.get('user_id') %>">
+                    <%= model.get('user_name') %>
+                </a>
+                    <% 
+                    if (model.get('user_state') == 'connected') {
+                    %>
+                        (<span data-i18n data-wsupdate="user_state-text" data-id="<%= model.get('id') %>">Connected</span>)
+                    <%
+                    }
+                    else {
+                    %>
+                        (<span data-i18n data-wsupdate="user_state-text" data-id="<%= model.get('id') %>">Disconnected</span>)
+                    <%
+                    }
+                    %>
+                </td>
         </tr>  
     <% 
     }
@@ -111,39 +243,6 @@
                 <%= model.get('mac') %>
             </td>
         </tr>  
-    <% 
-    }
-    if (detailsFields['user'] != undefined) { 
-    %>
-        <tr>
-            <td><i class="<%= CLASS_ICON_USERS %>"></i><span data-i18n="User"></span></td>
-            <td>
-                <a href="#/user/<%= model.get('user_id') %>">
-                    <%= model.get('user_name') %>
-                </a>
-            </td>
-        </tr>  
-    <% 
-    }
-    if (detailsFields['user_state'] != undefined) { 
-    %>
-        <tr>
-            <td><i class="fa fa-plug"></i><span data-i18n="User state"></span></td>
-            <td>
-                <% 
-                if (model.get('user_state') == 'connected') {
-                %>
-                    <span data-i18n data-wsupdate="user_state-text" data-id="<%= model.get('id') %>">Connected</span>
-                <%
-                }
-                else {
-                %>
-                    <span data-i18n data-wsupdate="user_state-text" data-id="<%= model.get('id') %>">Disconnected</span>
-                <%
-                }
-                %>
-            </td>
-        </tr>
     <% 
     }
     if (detailsFields['osf'] != undefined) { 
@@ -195,6 +294,38 @@
                 <%
                     }
                     else {
+                        var remainingTimes = {
+                            soft: { 
+                                rawTime: model.get('time_until_expiration_soft')
+                            },
+                            hard: { 
+                                rawTime: model.get('time_until_expiration_hard')
+                            }
+                        };
+                        
+                        $.each (remainingTimes, function (iRema, rema) { 
+                            var processedRemainingTime = Wat.U.processRemainingTime(rema.rawTime);
+
+                            remainingTimes[iRema].priorityClass = processedRemainingTime.priorityClass;
+                            remainingTimes[iRema].remainingTime = '';
+                            remainingTimes[iRema].returnType = processedRemainingTime.returnType;
+                            remainingTimes[iRema].remainingTimeAttr = '';
+                            
+                            switch (processedRemainingTime.returnType) {
+                                case 'exact':
+                                    remainingTimes[iRema].remainingTime = processedRemainingTime.remainingTime;
+                                    break;
+                                case 'days':
+                                    remainingTimes[iRema].remainingTimeAttr = 'data-days="' + processedRemainingTime.remainingTime + '"';
+                                    break;
+                                case 'months':
+                                    remainingTimes[iRema].remainingTimeAttr = 'data-months="' + processedRemainingTime.remainingTime + '"';
+                                    break;
+                                case '>year':
+                                    remainingTimes[iRema].remainingTimeAttr = 'data-years="' + processedRemainingTime.remainingTime + '"';
+                                    break;
+                            }
+                        });                        
                 %>        
                     <td class="inner-table">
                         <table class="expiration-table">
@@ -203,22 +334,23 @@
                                     if (expiration_soft) {
                                 %>
                                     <tr>
-                                        <td class="ok" data-i18n="Soft"></td>
-                                        <td class="ok"><%= model.get('expiration_soft').replace('T',' ') %></td>
-                                        <td class="ok"><i class="fa fa-info-circle fa-centered"></i></td>
+                                        <td class="<%= remainingTimes.soft.priorityClass %>" data-i18n="Soft"></td>
+                                        <td class="<%= remainingTimes.soft.priorityClass %>"><%= model.get('expiration_soft').replace('T',' ') %></td>
+                                        <td class="<%= remainingTimes.soft.priorityClass %>" <%= remainingTimes.soft.remainingTimeAttr %>><%= remainingTimes.soft.remainingTime %></td>
                                     </tr>
                                 <%
                                     }
                                     if (expiration_hard) {
                                 %>
                                     <tr>
-                                        <td class="warning" data-i18n="Hard"></td>
-                                        <td class="warning"><%= model.get('expiration_hard').replace('T',' ') %></td>
-                                        <td class="warning"><i class="fa fa-info-circle fa-centered"></td>
+                                        <td class="<%= remainingTimes.hard.priorityClass %>" data-i18n="Hard"></td>
+                                        <td class="<%= remainingTimes.hard.priorityClass %>"><%= model.get('expiration_hard').replace('T',' ') %></td>
+                                        <td class="<%= remainingTimes.hard.priorityClass %>" <%= remainingTimes.hard.remainingTimeAttr %>><%= remainingTimes.hard.remainingTime %></td>
                                     </tr>
                                 <%
                                     }
                                 %>
+                            </tbody>
                         </table>
                     </td>
                 <%
@@ -255,5 +387,9 @@
     <% 
     }
     %>
-    <tbody class="bb-properties"></tbody>
+    <tbody class="bb-properties">
+        <tr>
+            <td colspan=2 class="center"><i class="fa fa-heart"></i><span data-i18n="State"></span></td>
+        </tr>
+    </tbody>
 </table>

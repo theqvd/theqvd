@@ -17,6 +17,9 @@
             <input type="password" name="password2" value="" data-required data-equal="password">
         </td>
     </tr>
+    <% 
+    if (Wat.C.checkACL('administrator.create.language')) { 
+    %>
     <tr>
         <td data-i18n="Language"></td>
         <td>
@@ -35,4 +38,7 @@
             </select>
         </td>
     </tr>
+    <% 
+    } 
+    %>
  </table>

@@ -75,6 +75,9 @@ var Wat = {
     // Binds
     B: {},
     
+    // Utilities
+    U: {},
+    
     // Web Sockets
     WS: {
         websockets: [],

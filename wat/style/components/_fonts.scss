@@ -35,7 +35,7 @@ editor-table th, editor-table td * {
     //@include font-size(2);
 }
 
-table.expiration-table td {
+table.expiration-table td, table.state-table td {
     @include in(mobile) {
         font-size: 11px;
     }

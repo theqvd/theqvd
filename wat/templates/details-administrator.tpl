@@ -30,6 +30,9 @@
         </td>
     </tr>
     <% } %>
+    <% 
+    if (Wat.C.checkACL('administrator.see.language')) { 
+    %>
     <tr>
         <td><i class="fa fa-globe"></i><span data-i18n="Language"></span></td>
         <td>
@@ -50,6 +53,9 @@
             %>
         </td>
     </tr>
+    <% 
+    }
+    %>
 </table>
 
 <div class="bb-admin-roles admin-roles"></div>

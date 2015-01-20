@@ -5,9 +5,9 @@ Wat.C = {
     password: '',
     loggedIn: false,
     // Openstack preprod
-    //apiUrl: 'http://172.20.126.12:3000/',
-    //apiWSUrl: 'ws://172.20.126.12:3000/ws',  
-    //apiAddress: '172.20.126.12:3000',  
+    apiUrl: 'http://172.20.126.12:3000/',
+    apiWSUrl: 'ws://172.20.126.12:3000/ws',  
+    apiAddress: '172.20.126.12:3000',  
     
     // Openstack
     apiUrl: 'http://172.20.126.16:3000/',
@@ -41,6 +41,10 @@ Wat.C = {
     
     isRecoveradmin: function () {
         return this.adminID == RECOVER_USER_ID;
+    }, 
+    
+    isMultitenant: function () {
+        return this.multitenant;
     },
     
     logOut: function () {
@@ -135,7 +139,10 @@ Wat.C = {
         Wat.C.tenantID = that.retrievedData.tenant_id;
         
         // Store admin ID
-        Wat.C.adminID = that.retrievedData.admin_id;
+        Wat.C.adminID = that.retrievedData.admin_id;   
+        
+        // Store tenant mode
+        Wat.C.multitenant = parseInt(that.retrievedData.multitenant);
         
         // Configure visability
         Wat.C.configureVisibility();
@@ -348,8 +355,14 @@ Wat.C = {
             delete Wat.I.cornerMenu.config;
         }
         
-        // For tenant admins (not superadmins) the acl section tenant will not exist
-        if (Wat.C.tenantID != SUPERTENANT_ID && Wat.C.adminID != RECOVER_USER_ID) {
+        // For tenant admins (not superadmins) and recover admin in monotenant mode the acl section tenant will not exist
+        var tenantsExist = false;
+        
+        if (Wat.C.isSuperadmin() && Wat.C.isMultitenant()) {
+            tenantsExist = true;
+        }
+        
+        if (!tenantsExist) {
             delete ACL_SECTIONS['tenant'];
             delete ACL_SECTIONS_PATTERNS['tenant'];
         }
