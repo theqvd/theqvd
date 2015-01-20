@@ -121,6 +121,16 @@ Wat.C.aclGroups.vmRemoteAdminDetails = [
     'vm.see.port-serial'
 ];
 
+Wat.C.aclGroups.vmStateInfoDetails = [
+    'vm.see.host',
+    'vm.see.ip',
+    'vm.see.di',
+    'vm.see.user-state',
+    'vm.see.port-ssh',
+    'vm.see.port-vnc',
+    'vm.see.port-serial'
+];
+
 // Massive actions include massive edit ACLs
 $.merge(Wat.C.aclGroups.vmMassiveActions, Wat.C.aclGroups.vmMassiveEdit);
 

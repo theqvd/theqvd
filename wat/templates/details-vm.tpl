@@ -49,6 +49,14 @@
 </div>
 
 <% 
+// Show state info fields if is granted any of contained fields. Hide it otherwise
+var showStateInfo = false;
+
+if (Wat.C.checkGroupACL('vmStateInfoDetails')) {
+    showStateInfo = true;
+}
+
+// Show vm status table depend on the returned state
 var runningStyle = 'display: none;';
 var stoppedStyle = 'display: none;';
 var startingStyle = 'display: none;';
@@ -68,9 +76,19 @@ switch (model.get('state')) {
         var stoppingStyle = '';
         break;
 }
+
+// Show state table if is granted. Hide it otherwise
+var mainTableClass = '';
+var stateTableClass = 'hidden';
+
+if (Wat.C.checkACL('vm.see.state')) {
+    mainTableClass = 'details-left';
+    stateTableClass = 'details-right';
+}
+
 %>          
 
-<table class="details details-list details-right">
+<table class="details details-list <%= stateTableClass %>">
     <tbody class="js-body-state" data-wsupdate="state-running" data-id="<%= model.get('id') %>" style="<%= runningStyle %>">
         <%
         if (Wat.C.checkACL('vm.see.host')) {
@@ -88,11 +106,13 @@ switch (model.get('state')) {
             </tr>
         <%
         }
+        if (showStateInfo) {
         %>
-        <tr class="js-execution-params-button-row">
-            <td colspan=2><a class="fa fa-eye button2 col-width-100 center js-execution-params-button" href="javascript:" data-i18n="See execution parameters"></a></td>
-        </tr>
+            <tr class="js-execution-params-button-row">
+                <td colspan=2><a class="fa fa-eye button2 col-width-100 center js-execution-params-button" href="javascript:" data-i18n="See execution parameters"></a></td>
+            </tr>
         <%
+        }
         if (Wat.C.checkACL('vm.see.host')) { 
         %>
             <tr class="js-execution-params execution-params">
@@ -189,7 +209,7 @@ switch (model.get('state')) {
     </tbody>
 </table>
 
-<table class="details details-list details-left">
+<table class="details details-list <%= mainTableClass %>">
     <% 
     if (detailsFields['id'] != undefined) { 
     %>
