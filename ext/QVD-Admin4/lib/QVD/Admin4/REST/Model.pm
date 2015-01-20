@@ -276,7 +276,7 @@ my $AVAILABLE_FILTERS =
 	      VM => [qw(storage id name user_id user_name osf_id osf_name di_tag blocked 
                         expiration_soft expiration_hard state host_id host_name di_id 
                         user_state ip next_boot_ip ssh_port vnc_port serial_port tenant_id tenant_name 
-                        creation_admin creation_date ip_in_use di_in_use_id  )],
+                        creation_admin creation_date ip_in_use di_id_in_use  )],
 
 	      DI_Tag => [qw(osf_id name id tenant_id tenant_name)],
 
@@ -315,7 +315,7 @@ my $AVAILABLE_FILTERS =
 
 		 VM => [qw(storage id name user_id user_name osf_id osf_name di_tag blocked expiration_soft 
                            expiration_hard state host_id host_name  di_id user_state ip next_boot_ip ssh_port 
-                           vnc_port serial_port tenant_id tenant_name creation_admin creation_date ip_in_use di_in_use_id )],
+                           vnc_port serial_port tenant_id tenant_name creation_admin creation_date ip_in_use di_id_in_use )],
 
 		 DI_Tag => [qw(osf_id name id tenant_id tenant_name)],
 
@@ -374,7 +374,7 @@ my $AVAILABLE_FIELDS =
 
 	      VM => [qw(storage id name user_id user_name osf_id osf_name di_tag blocked expiration_soft expiration_hard 
                         state host_id host_name  di_id user_state ip mac next_boot_ip ssh_port vnc_port serial_port 
-                        creation_admin creation_date di_version di_name di_id properties ip_in_use di_in_use_id )],
+                        creation_admin creation_date di_version di_name di_id properties ip_in_use di_id_in_use )],
 
 	      ACL => [qw(id name)],
 
@@ -411,8 +411,8 @@ my $AVAILABLE_FIELDS =
 		 DI => [qw(id disk_image version osf_id osf_name  blocked tags  properties )],
 		
 		 VM => [qw(storage id name user_id user_name osf_id osf_name di_tag blocked expiration_soft expiration_hard 
-                           state host_id host_name  di_id user_state ip mac next_boot_ip ssh_port vnc_port serial_port 
-                           creation_admin creation_date di_version di_name di_id properties ip_in_use di_in_use_id )],
+                           time_until_expiration_soft time_until_expiration_hard state host_id host_name  di_id user_state ip mac next_boot_ip ssh_port vnc_port serial_port 
+                           creation_admin creation_date di_version di_name di_id properties ip_in_use di_id_in_use di_name_in_use )],
 
 		 ACL => [qw(id name)],
 
@@ -761,7 +761,7 @@ my $FILTERS_TO_DBIX_FORMAT_MAPPER =
 	'creation_admin' => 'me.creation_admin',
 	'creation_date' => 'me.creation_date',
 	'ip_in_use' => 'vm_runtime.vm_address',
-	'di_in_use_id' => 'vm_runtime.current_di_id',
+	'di_id_in_use' => 'vm_runtime.current_di_id',
     },
 
     Role => {
@@ -927,6 +927,8 @@ my $FIELDS_TO_DBIX_FORMAT_MAPPER =
 	'blocked' => 'vm_runtime.blocked',
 	'expiration_soft' => 'vm_runtime.vm_expiration_soft',
 	'expiration_hard' => 'vm_runtime.vm_expiration_hard',
+	'time_until_expiration_soft' => 'me.remaining_time_until_expiration_soft',
+	'time_until_expiration_hard' => 'me.remaining_time_until_expiration_hard',
 	'state' => 'vm_runtime.vm_state',
 	'host_id' => 'vm_runtime.host_id',
 	'host_name' => 'me.host_name',
@@ -946,8 +948,8 @@ my $FIELDS_TO_DBIX_FORMAT_MAPPER =
 	'di_version' => 'di.version',
 	'di_name' => 'di.path',
 	'di_id' => 'di.id',
-	'di_in_use_id' => 'vm_runtime.current_di_id',
-	'di_in_use_name' => 'vm_runtime.current_di_name',
+	'di_id_in_use' => 'vm_runtime.current_di_id',
+	'di_name_in_use' => 'vm_runtime.current_di_name',
 	'properties' => 'view.properties',
     },
 

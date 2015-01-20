@@ -15,17 +15,16 @@ my @TIME_UNITS = qw(days hours minutes seconds);
 
 sub now { DateTime->now();}
 
-
 sub time_until_expiration_soft
 {
     my $self = shift;
-    $self->difference($self->now,$self->vm_expiration_soft) }}
+    $self->difference($self->now,$self->vm_expiration_soft);
 }
 
 sub time_until_expiration_hard
 {
     my $self = shift;
-    $self->difference($self->now,$self->vm_expiration_hard) }}
+    $self->difference($self->now,$self->vm_expiration_hard);
 }
 
 sub vm_expiration_hard
@@ -43,9 +42,9 @@ sub vm_expiration_soft
 
 sub difference
 {
-    my $self = shift;
+    my ($self,$now,$then) = @_;
     my %time_difference;
-    @time_difference{@TIME_UNITS} = $then->subtract_datetime($self->now)->in_units(@time_units);
+    @time_difference{@TIME_UNITS} = $then->subtract_datetime($self->now)->in_units(@TIME_UNITS);
     \%time_difference;
 }
 
