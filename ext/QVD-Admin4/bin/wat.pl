@@ -35,7 +35,8 @@ package MojoX::Session::Transport::WAT
 
     sub get {
 	my ($self) = @_;
-	my $sid = $self->tx->req->params->param('sid');
+	my $json = $self->tx->req->json;
+	my $sid = $json ? $json->{sid} : $self->tx->req->params->param('sid');
 	return $sid;
     }
 
@@ -72,7 +73,8 @@ under sub {
     my $c = shift;
     $c->res->headers->header('Access-Control-Allow-Origin' => '*');
     $c->res->headers->header('Access-Control-Expose-Headers' => 'sid');
-    
+    $c->res->headers->header('charset' => 'utf-8');
+
     my %session_args = (
 	store  => [dbi => {dbh => QVD::DB->new()->storage->dbh}],
 	transport => MojoX::Session::Transport::WAT->new(),
@@ -95,7 +97,7 @@ any '/' => sub {
     my $action_size = $c->get_action_size($json);
     my $response = $c->process_api_query($json);
 
-    $c->render(json => $response);
+    $c->render(json => $response, charset => 'utf-8');
 };
 
 websocket '/ws' => sub {

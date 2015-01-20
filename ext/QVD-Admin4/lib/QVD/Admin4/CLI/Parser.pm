@@ -47,6 +47,7 @@ sub parse
 	{ push @{$response->{analysis}}, $edge->node->api; }
     } 
 
+ #   use Data::Dumper; print Dumper $self->chart->inactive_edges;
     QVD::Admin4::CLI::Parser::Response->new(json => $response);
 }
 

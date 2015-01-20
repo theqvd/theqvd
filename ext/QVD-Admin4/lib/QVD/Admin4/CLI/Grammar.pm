@@ -21,16 +21,6 @@ my $RULES =
    cb   => sub { my ($ls,$rs) = @_; 
 		 $ls->set_api({ command => 'delete'});}},
 
- { left_side => 'ROOT', 
-   right_side => [ 'new', 'QVD_OBJECT' ],
-   cb   => sub { my ($ls,$rs) = @_; 
-		 $ls->set_api({ command => 'create', %{@{$rs}[1]->get_api}});}},
-
- { left_side => 'ROOT', 
-   right_side => [ 'new', 'QVD_OBJECT', 'WITH' ],
-   cb   => sub { my ($ls,$rs) = @_; 
-		 $ls->set_api({ command => 'create', %{@{$rs}[1]->get_api}, %{@{$rs}[2]->get_api}});}},
-
  { left_side => 'CMD', 
    right_side => [ 'block' ],
    cb   => sub { my ($ls,$rs) = @_; 
@@ -190,6 +180,7 @@ my $RULES =
    cb   => sub { my ($ls,$rs) = @_; 
 		 $ls->set_api();}},
 
+
 # FILTERS AND ARGUMENTS
 
 # A token that is not a reserved word
@@ -201,7 +192,8 @@ my $RULES =
  { left_side => 'KEY', 
    right_side => [ $UNKNOWN_TAG ],
    cb   => sub { my ($ls,$rs) = @_; 
-		 $ls->set_api([ @{$rs}[0]->get_api ])}},
+		 my $key = @{$rs}[0]->get_api; $key =~ s/^'//; $key =~ s/'$//;
+		 $ls->set_api([ $key ])}},
 
  { left_side => "KEY'", 
    right_side => [ 'COORD', 'KEY'],
@@ -224,12 +216,15 @@ my $RULES =
  { left_side => 'KEY_VALUE', 
    right_side => [ $UNKNOWN_TAG, 'EQUAL', $UNKNOWN_TAG],
    cb   => sub { my ($ls,$rs) = @_; 
-		 $ls->set_api({ @{$rs}[0]->get_api => @{$rs}[2]->get_api })}},
+		 my $key = @{$rs}[0]->get_api; $key =~ s/^'//; $key =~ s/'$//;
+		 my $value = @{$rs}[2]->get_api; $value =~ s/^'//; $value =~ s/'$//;
+		 $ls->set_api({ $key => $value })}},
 
  { left_side => 'KEY_VALUE', 
    right_side => [ $UNKNOWN_TAG, 'EQUAL', "KEY''"],
    cb   => sub { my ($ls,$rs) = @_; 
-		 $ls->set_api({ @{$rs}[0]->get_api => @{$rs}[2]->get_api })}},
+		 my $key = @{$rs}[0]->get_api; $key =~ s/^'//; $key =~ s/'$//;
+		 $ls->set_api({ $key => @{$rs}[2]->get_api })}},
 
  { left_side => "KEY_VALUE'", 
    right_side => [ 'COORD', 'KEY_VALUE'],
@@ -368,6 +363,14 @@ my $RULES =
    cb   => sub { my ($ls,$rs) = @_; 
 		 $ls->set_api(@{$rs}[0]->get_api);}},
 
+# IN
+
+ { left_side => 'IN', 
+   right_side => [ 'in', "QVD_OBJECT'" ],
+   cb   => sub { my ($ls,$rs) = @_; 
+		 $ls->set_api(@{$rs}[1]->get_api);}},
+
+
 # ORDER BY PHRASES
 # order by tenant_id,name
 # order asc by tenant_id,name
@@ -427,9 +430,20 @@ my $RULES =
 		 $ls->set_api({ fields => @{$rs}[0]->get_api, %{@{$rs}[2]->get_api}});}},
 
  { left_side => "QVD_OBJECT''", 
+   right_side => ["KEY''", 'OF', "QVD_OBJECT'"],
+   cb   => sub { my ($ls,$rs) = @_; 
+		 $ls->set_api({ fields => @{$rs}[0]->get_api, %{@{$rs}[2]->get_api}});}},
+
+ { left_side => "QVD_OBJECT''", 
+   right_side => ["KEY", 'OF', "LOGICAL''"],
+   cb   => sub { my ($ls,$rs) = @_; 
+		 $ls->set_api({ fields => @{$rs}[0]->get_api, %{@{$rs}[2]->get_api}});}},
+
+ { left_side => "QVD_OBJECT''", 
    right_side => ["KEY''", 'OF', "LOGICAL''"],
    cb   => sub { my ($ls,$rs) = @_; 
 		 $ls->set_api({ fields => @{$rs}[0]->get_api, %{@{$rs}[2]->get_api}});}},
+
 
 # Free projections of QVD_OBJECTS to bare individuals (Ex: get vm)
 
@@ -447,37 +461,68 @@ my $RULES =
 # TOP PHRASES (ROOT)
 
  { left_side => 'ROOT', 
-   right_side => [ 'CMD', "QVD_OBJECT'" ],
+   right_side => [ 'new', 'QVD_OBJECT' ],
    cb   => sub { my ($ls,$rs) = @_; 
-		 $ls->set_api({ %{@{$rs}[0]->get_api},
-                            %{@{$rs}[1]->get_api}});}},
+		 my $api = { command => 'create', %{@{$rs}[1]->get_api}};
+		 from_qvd_object_and_command_to_action($api);
+		 $ls->set_api($api);}},
+
+ { left_side => 'ROOT', 
+   right_side => [ 'new', 'QVD_OBJECT', 'WITH' ],
+   cb   => sub { my ($ls,$rs) = @_; 
+		 my $api = { command => 'create', %{@{$rs}[1]->get_api}, %{@{$rs}[2]->get_api}};
+		 from_qvd_object_and_command_to_action($api);
+		 $ls->set_api($api);}},
+
+ { left_side => 'ROOT', 
+   right_side => [ 'CMD', "QVD_OBJECT'" ],
+   cb   => sub { my ($ls,$rs) = @_;
+		 my $api = { %{@{$rs}[0]->get_api},%{@{$rs}[1]->get_api}}; 
+		 from_qvd_object_and_command_to_action($api);
+		 $ls->set_api($api);}},
+
+ { left_side => 'ROOT', 
+   right_side => [ 'get', "QVD_OBJECT''", 'IN' ],
+   cb   => sub { my ($ls,$rs) = @_;
+		 my $api = { command => 'get_list', %{@{$rs}[1]->get_api}, %{@{$rs}[2]->get_api}};
+#		 from_qvd_object_and_filters_to_nested_query($api);
+		 $ls->set_api($api);}},
+
 
  { left_side => 'ROOT', 
    right_side => [ 'IND_CMD', "QVD_OBJECT'", 'TO' ],
-   cb   => sub { my ($ls,$rs) = @_; 
-		 $ls->set_api({ %{@{$rs}[0]->get_api}, arguments => @{$rs}[1]->get_api, 
-                            %{@{$rs}[2]->get_api}});}},
+   cb   => sub { my ($ls,$rs) = @_;
+		 my $api = { %{@{$rs}[0]->get_api}, arguments => @{$rs}[1]->get_api,%{@{$rs}[2]->get_api}};
+		 from_qvd_object_and_filters_to_nested_query($api);
+		 $ls->set_api($api);}},
 
  { left_side => 'ROOT', 
    right_side => [ 'DIT_CMD', "QVD_OBJECT'", 'AS' ],
-   cb   => sub { my ($ls,$rs) = @_; 
-		 $ls->set_api({ %{@{$rs}[0]->get_api}, %{@{$rs}[1]->get_api},
-				arguments => { qvd_object => 'di_tag', 
-					       filters => @{$rs}[2]->get_api }});}},
+   cb   => sub { my ($ls,$rs) = @_;
+		 my $api = { %{@{$rs}[0]->get_api}, %{@{$rs}[1]->get_api},arguments => { qvd_object => 'di_tag', filters => @{$rs}[2]->get_api }};
+		 from_qvd_object_and_filters_to_nested_query($api);
+		 $ls->set_api($api);}},
+
  { left_side => 'ROOT', 
    right_side => [ 'get', "QVD_OBJECT''" ],
-   cb   => sub { my ($ls,$rs) = @_; 
-		 $ls->set_api({ command => 'get_list', %{@{$rs}[1]->get_api} });}},
+   cb   => sub { my ($ls,$rs) = @_;
+		 my $api = { command => 'get_list', %{@{$rs}[1]->get_api} };
+		 from_qvd_object_and_command_to_action($api);
+		 $ls->set_api($api);}},
 
  { left_side => 'ROOT', 
    right_side => [ 'get', "QVD_OBJECT''", 'ORDER_BY' ],
-   cb   => sub { my ($ls,$rs) = @_; 
-		 $ls->set_api({ command => 'get_list', %{@{$rs}[1]->get_api}, %{@{$rs}[2]->get_api}});}},
+   cb   => sub { my ($ls,$rs) = @_;
+		 my $api = { command => 'get_list', %{@{$rs}[1]->get_api}, %{@{$rs}[2]->get_api}}; 
+		 from_qvd_object_and_command_to_action($api);
+		 $ls->set_api($api);}},
 
  { left_side => 'ROOT', 
    right_side => [ 'set', "QVD_OBJECT'", 'WITH' ],
-   cb   => sub { my ($ls,$rs) = @_; 
-		 $ls->set_api({ command => 'update', %{@{$rs}[1]->get_api}, %{@{$rs}[2]->get_api}});}},
+   cb   => sub { my ($ls,$rs) = @_;
+		 my $api =  { command => 'update', %{@{$rs}[1]->get_api}, %{@{$rs}[2]->get_api}};
+		 from_qvd_object_and_command_to_action($api);
+		 $ls->set_api($api);}},
 
 ];
 
@@ -549,17 +594,66 @@ my $COMMAND_TO_API_ACTION_MAPPER =
 
 my $NESTED_COMMAND_TO_API_ACTION_MAPPER = {
 
-    assign => { property => { __properties_changes__ => { set => {}}}, 
-		di_tag => { __tags_changes__ => { create => []}}, 
-		role => __roles_changes__ => { assign_roles => []}}, 
-		acl => { __acls_changes__ => { assign_acls => []}} },
+    assign => { property => [qw(__properties_changes__ set), {}], 
+		di_tag => [qw(__tags_changes__ create), []], 
+		role => [qw(__roles_changes__ assign_roles), []], 
+		acl => [qw(__acls_changes__ assign_acls), []] },
 
-    unassign => { property => { __properties_changes__ => { delete => []}}, 
-		  di_tag => { __tags_changes__ => { delete => []}}, 
-		  role => { __roles_changes__ => { unassign_roles => []}}, 
-		  acl => { __acls_changes__ => { unassign_acls => []}} },
-
+    unassign => { property => [qw(__properties_changes__ delete), {}], 
+		  di_tag => [qw(__tags_changes__ delete), []],
+		  role => [qw(__roles_changes__ unassign_roles), []], 
+		  acl => [qw(__acls_changes__ unassign_acls), []]}
 };
+
+my $OBJECT_PAIRS_RELATORS = {
+
+    acl => { role => 'role_id',
+	     admin => 'admin_id'},
+    role => { admin => 'admin_id' },
+
+    property => { user => 'user_id',
+		  vm => 'vm_id',
+		  osf => 'osf_id',
+		  di => 'di_id',
+		  host => 'host_id'},
+
+    di_tag => { di => 'di_id' }
+};
+
+sub from_qvd_object_and_command_to_action
+{
+    my $api = shift;
+    my $qvd_object =  delete $api->{qvd_object};
+    my $type_of_action =  delete $api->{command};
+    $api->{action} = $COMMAND_TO_API_ACTION_MAPPER->{$type_of_action}->{$qvd_object};
+}
+
+sub from_qvd_object_and_filters_to_nested_query
+{
+    my $api = shift;
+    my $arguments = $api->{arguments};
+    my $nested_filters =  delete $arguments->{filters};
+    my $nested_qvd_object =  delete $arguments->{qvd_object};
+    my $type_of_action =  $api->{command};
+    my $nested_query = $NESTED_COMMAND_TO_API_ACTION_MAPPER->{$type_of_action}->{$nested_qvd_object};
+    $arguments->{$$nested_query[0]}->{$$nested_query[1]} = 
+	ref($$nested_query[2]) eq ref($nested_filters) ? $nested_filters : [values %$nested_filters]; 
+    from_qvd_object_and_command_to_action($api);
+}
+
+sub from_qvd_object_and_filters_to_indirect_query
+{
+    my $api = shift;
+    my $arguments = $api->{arguments};
+    my $nested_filters =  delete $arguments->{filters};
+    my $nested_qvd_object =  delete $arguments->{qvd_object};
+    my $type_of_action =  $api->{command};
+    my $nested_query = $NESTED_COMMAND_TO_API_ACTION_MAPPER->{$type_of_action}->{$nested_qvd_object};
+    $arguments->{$$nested_query[0]}->{$$nested_query[1]} = 
+	ref($$nested_query[2]) eq ref($nested_filters) ? $nested_filters : [values %$nested_filters]; 
+    from_qvd_object_and_command_to_action($api);
+}
+
 
 my ($RULES_BY_LEFT_SIDE,$RULES_BY_FIRST_RIGHT_SIDE) = ({},{});
 

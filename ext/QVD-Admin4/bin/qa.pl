@@ -10,24 +10,12 @@ use QVD::Admin4::CLI::Parser::Unificator;
 use QVD::Admin4::CLI::Tokenizer;
 use Text::SimpleTable::AutoWidth;
 use Mojo::UserAgent;
+use Term::ReadLine;
 
-my $res;
-my $head = "cli > ";
-
-print "$head Address: ";
-my $address = <>;
-chomp $address;
-
-print "$head Login: ";
-my $login = <>;
-chomp $login;
-
-print "$head Password: ";
-my $password = <>;
-chomp $password;
-
+my $address = "localhost:3000";
+my $login = "superadmin";
+my $password = "superadmin";
 my $ua = Mojo::UserAgent->new;
-
 my $sid =  eval { $ua->post($address, 
 			    json => { login => $login, password => $password, 
 				      action => "current_admin_setup"})->res->json->{sid} };
@@ -37,39 +25,31 @@ my $unificator = QVD::Admin4::CLI::Parser::Unificator->new();
 my $grammar = QVD::Admin4::CLI::Grammar->new();
 my $parser = QVD::Admin4::CLI::Parser->new( grammar => $grammar, unificator => $unificator);
 my $tokenizer = QVD::Admin4::CLI::Tokenizer->new();
-
-my $CLI = QVD::Admin4::CLI->new( 
-    sid => $sid,
-    ua => $ua, 
-    url => $address, 
-    parser => $parser, 
-    tokenizer => $tokenizer);
+my $CLI = QVD::Admin4::CLI->new( sid => $sid,ua => $ua, url => $address, parser => $parser, tokenizer => $tokenizer);
 
 
-$head = "cli.$login\@$address> ";
-print $head;
+my $term = Term::ReadLine->new('CLI Admin Tool For QVD');
+my $prompt = "$login\@$address> ";
+my $OUT = $term->OUT || \*STDOUT;
 
-while (my $query = <>)
-{
-    chomp $query;
-    $res = $CLI->query($query);
+while ( defined ($_ = $term->readline($prompt)) ) {
 
-    if (ref($res) eq 'HASH')
-    {
-	say $res->{status} . ": ".$res->{message};
-    }
-    else
-    { 
-	print_table();
-    }
+    my $req = $_;
+    my $res = $CLI->query($req);
 
-    print $head;
+    ref($res) && ref($res) eq 'HASH' ?
+	say $OUT $res->{status} . ": ".$res->{message} :
+	print_table($res);
+
+    $term->addhistory($_) if /\S/;
 }
+
 
 #### PARSE THE RESPONSE AND PRINT IT
 	      
 sub print_table
 {
+    my $res = shift;
     my $n = 0;
     my $status     = $res->json('/status') // '';
     my $message    = $res->json('/message') // '';
@@ -81,13 +61,17 @@ sub print_table
     my @keys = sort keys %$first;
     $tb->captions(\@keys);
 
+    my $rows;
     while ($properties = $res->json("/rows/$n")) 
     {
+	$rows //= 1;
 	my @values = map {  defined $_ ? $_ : 'undef' } 
 	map { ref($_) ? 'ref' : $_ } @{$properties}{@keys};
 
 	$tb->row(@values);
 	$n++;
     }
-    print $tb->draw; 
+
+    my $output = $rows ? $tb->draw : "$message\n";
+    print $OUT $output;
 }

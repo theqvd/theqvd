@@ -284,9 +284,29 @@ sub tags_delete
     }
 }
 
+sub acls_as_ids
+{
+    my ($self,$acls) = @_;
+    my ($as_ids_flag, $as_names_flag) = (0,0);
+  
+    $_ =~ /^[0-9]+$/ ? $as_ids_flag = 1 : $as_names_flag = 1 for @$acls;
+    QVD::Admin4::Exception->throw(code => 6360, query => 'acls') 
+	if $as_ids_flag && $as_names_flag;
+    $as_ids_flag;
+}
+
+sub get_acls_names_from_acls_ids
+{
+    my ($self,$acls_ids) = @_;
+    [ map { $_->name }  $DB->resultset('ACL')->search({id => $acls_ids})->all ]
+}
+
 sub add_acls_to_role
 {
-    my ($self,$acl_names,$role) = @_;
+    my ($self,$acls,$role) = @_;
+
+    my $acl_names = $self->acls_as_ids($acls) ? 
+	$self->get_acls_names_from_acls_ids($acls) : $acls;
 
     for my $acl_name (@$acl_names)
     { 	
@@ -301,7 +321,10 @@ sub add_acls_to_role
 
 sub del_acls_to_role
 {
-    my ($self,$acl_names,$role) = @_;
+    my ($self,$acls,$role) = @_;
+
+    my $acl_names = $self->acls_as_ids($acls) ? 
+	$self->get_acls_names_from_acls_ids($acls) : $acls;
 
     for my $acl_name (@$acl_names)
     { 	
