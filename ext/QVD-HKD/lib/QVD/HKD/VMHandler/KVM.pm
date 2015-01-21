@@ -313,8 +313,11 @@ sub _start_kvm {
         DEBUG 'No monitor port';
     }
 
-    my $hda = "file=$self->{os_image_path},index=0,media=disk";
+    my $hda = "file=$self->{os_image_path}";
+    $hda =~ s/,/,,/g;
+    $hda .= ',index=0,media=disk';
     $hda .= ',if=virtio,boot=on' if $use_virtio;
+    $hda .= ',readonly' unless $self->{use_overlay};
     push @kvm_args, -drive => $hda;
 
     if (defined $self->{user_image_path}) {
