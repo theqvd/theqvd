@@ -33,11 +33,7 @@ sub map_dbix_object_to_output_info
     my $result = {};
     my $admin = $self->qvd_object_model->current_qvd_administrator;
 
-    my @available_fields =  $self->qvd_object_model->available_fields;
-    @available_fields = grep { $self->json_wrapper->has_field($_) } @available_fields if $self->json_wrapper->fields_list;
-    @available_fields = grep  { $admin->re_is_allowed_to($self->qvd_object_model->get_acls_for_field($_)) } @available_fields;
-
-    for my $field_key (@available_fields)
+    for my $field_key ($self->calculate_fields)
     {
 	my $dbix_field_key = $self->qvd_object_model->map_field_to_dbix_format($field_key);
 	my ($info_provider,$method) = $self->get_info_provider_and_method($dbix_field_key,$dbix_object);
@@ -61,7 +57,12 @@ sub get_info_provider_and_method
     my ($table,$column) = $dbix_field_key =~ /^(.+)\.(.+)$/;
    
     return ($dbix_object,$column) if $table eq 'me';
-    return ($self->result->{extra}->{$dbix_object->id},$column) if $table eq 'view';
+
+    if ($table eq 'view')
+    {
+	if ($column =~ /^([^#]+)#([^#]+)$/) { return ($self->result->{extra}->{$dbix_object->id}->$1,$2) };
+	return ($self->result->{extra}->{$dbix_object->id},$column) 
+    }
     return ($dbix_object->$table,$column);
 }
 
@@ -71,6 +72,70 @@ sub json
     my $self = shift;
     delete $self->result->{extra};
     { status => 0,message => 'Successful completion',%{$self->result}};
+}
+
+sub is_cli
+{
+    my $self = shift;
+    my $client = $self->json_wrapper->get_parameter_value('__client__'); 
+    defined $client && $client =~ m/^cli$/i;
+}
+
+sub cli_defaults_needed
+{
+    my $self = shift;
+    $self->is_cli && (not $self->json_wrapper->fields_list);
+}
+
+sub specific_fields_asked
+{
+    my $self = shift;
+    $self->json_wrapper->fields_list;
+}
+
+sub calculate_fields
+{
+    my ($self,$dbix_obj) = @_;
+    return @{$self->{available_fields}} if defined $self->{available_fields};
+
+    my @available_fields;
+
+    if ($self->specific_fields_asked)
+    {
+	$self->check_fields_validity_in_json;
+	@available_fields = $self->json_wrapper->fields_list;
+    }
+    else
+    {
+	@available_fields = $self->cli_defaults_needed ? 
+	    $self->qvd_object_model->default_fields_for_cli :
+	    $self->qvd_object_model->available_fields;
+	
+	my $admin = $self->qvd_object_model->current_qvd_administrator;
+	@available_fields = grep  { $admin->re_is_allowed_to($self->qvd_object_model->get_acls_for_field($_)) } 
+	@available_fields;
+    }
+
+    $self->{available_fields} = \@available_fields;
+
+    @available_fields;
+}
+
+
+sub check_fields_validity_in_json
+{
+    my $self = shift;
+    my $admin = $self->qvd_object_model->current_qvd_administrator;
+
+    $self->qvd_object_model->available_field($_) || $self->qvd_object_model->has_property($_) ||
+	QVD::Admin4::Exception->throw(code => 6250, object => $_)
+	for $self->json_wrapper->fields_list;
+
+    $admin->re_is_allowed_to(
+	$self->qvd_object_model->get_acls_for_field(
+	    $self->qvd_object_model->has_property($_) ? 'properties' : $_)) || 
+	QVD::Admin4::Exception->throw(code => 4250, object => $_)
+	for $self->json_wrapper->fields_list;
 }
 
 1;

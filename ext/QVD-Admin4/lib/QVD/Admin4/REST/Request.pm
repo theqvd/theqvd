@@ -59,7 +59,6 @@ sub BUILD
     $self->check_acls_for_deleting if
 	$self->qvd_object_model->type_of_action eq 'delete';
     $self->check_filters_validity_in_json;
-    $self->check_fields_validity_in_json;
     $self->check_update_arguments_validity_in_json if
 	$self->qvd_object_model->type_of_action eq 'update';
     $self->check_create_arguments_validity_in_json if
@@ -294,8 +293,7 @@ sub switch_custom_properties_json2request
 {
     my $self = shift;
     my @custom_properties_keys = 
-	$DBConfigProvider->
-	get_custom_properties_keys($self->qvd_object_model->qvd_object);
+	$self->qvd_object_model->custom_properties_keys;
 
     my $found_properties = 0;
     my $admin = $self->qvd_object_model->current_qvd_administrator;
@@ -338,20 +336,6 @@ sub check_filters_validity_in_json
 	for $self->qvd_object_model->mandatory_filters;
 }
 
-
-sub check_fields_validity_in_json
-{
-    my $self = shift;
-    my $admin = $self->qvd_object_model->current_qvd_administrator;
-
-    $self->qvd_object_model->available_field($_) || 
-	QVD::Admin4::Exception->throw(code => 6250, object => $_)
-	for $self->json_wrapper->fields_list;
-
-    $admin->re_is_allowed_to($self->qvd_object_model->get_acls_for_field($_)) || 
-	QVD::Admin4::Exception->throw(code => 4250, object => $_)
-	for $self->json_wrapper->fields_list;
-}
 
 sub check_acls_for_deleting
 {

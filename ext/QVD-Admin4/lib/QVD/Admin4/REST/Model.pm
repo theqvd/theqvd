@@ -278,7 +278,7 @@ my $AVAILABLE_FILTERS =
                         user_state ip next_boot_ip ssh_port vnc_port serial_port tenant_id tenant_name 
                         creation_admin creation_date ip_in_use di_id_in_use  )],
 
-	      DI_Tag => [qw(osf_id name id tenant_id tenant_name)],
+	      DI_Tag => [qw(osf_id di_id name id tenant_id tenant_name)],
 
 	      User => [qw(id name blocked creation_admin creation_date tenant_id tenant_name )],
 
@@ -292,7 +292,7 @@ my $AVAILABLE_FILTERS =
 
 	      Tenant => [qw(id name language block)],
 
-	      Role => [qw(name id fixed internal)],
+	      Role => [qw(name id fixed internal admin_id)],
 
 	      Administrator => [qw(name tenant_id tenant_name id language block)],
 
@@ -317,7 +317,7 @@ my $AVAILABLE_FILTERS =
                            expiration_hard state host_id host_name  di_id user_state ip next_boot_ip ssh_port 
                            vnc_port serial_port tenant_id tenant_name creation_admin creation_date ip_in_use di_id_in_use )],
 
-		 DI_Tag => [qw(osf_id name id tenant_id tenant_name)],
+		 DI_Tag => [qw(osf_id di_id name id tenant_id tenant_name)],
 
 		 User => [qw(id name blocked creation_admin creation_date tenant_id tenant_name )],
 
@@ -329,7 +329,7 @@ my $AVAILABLE_FILTERS =
 
 		 ACL => [qw(id name role_id admin_id )],
 
-		 Role => [qw(name id fixed internal)],
+		 Role => [qw(name id fixed internal admin_id)],
 
 		 Tenant => [qw(id name language block)],
 
@@ -386,7 +386,7 @@ my $AVAILABLE_FIELDS =
 
 	      Host => [qw(id name address blocked frontend backend state  load creation_admin creation_date number_of_vms_connected properties )],
 
-	      DI_Tag => [qw(osf_id name id )],
+	      DI_Tag => [qw(osf_id di_id name id )],
 
 	      Tenant_Views_Setup => [qw(id tenant_id tenant_name field visible view_type device_type qvd_object property)],
 
@@ -425,7 +425,7 @@ my $AVAILABLE_FIELDS =
 		 Host => [qw(id name address blocked frontend backend state  load creation_admin creation_date 
                              number_of_vms_connected properties )],
 
-		 DI_Tag => [qw(osf_id name id )],
+		 DI_Tag => [qw(di_id osf_id name id )],
 
 		 Tenant_Views_Setup => [qw(id tenant_id tenant_name field visible view_type device_type qvd_object property)],
 
@@ -458,6 +458,88 @@ my $AVAILABLE_FIELDS =
     create => { 'default' => [qw(id)], Config => [qw(key)]}
 
 };
+
+
+
+my $DEFAULT_FIELDS_FOR_CLI = 
+{ 
+    list => { default => [],
+
+	      Config => [qw(key value)],
+
+	      OSF => [qw(id tenant_id name overlay user_storage memory number_of_vms number_of_dis)],
+
+	      Role => [qw(id name fixed internal)],
+
+	      DI => [qw(id tenant_id disk_image blocked version osf_id)],
+
+	      VM => [qw( id tenant_id name blocked user_id host_id di_id ip ip_in_use di_id_in_use  state user_state )],
+
+	      ACL => [qw(id name)],
+
+	      Administrator => [qw(id name language block)],
+
+	      Tenant => [qw(id name language block)],
+				   
+	      User => [qw(id name  blocked number_of_vms number_of_vms_connected   )],
+
+	      Host => [qw(id name blocked address frontend backend   number_of_vms_connected state load )],
+
+	      DI_Tag => [qw(id name osf_id di_id)],
+
+	      Operative_Acls_In_Role => [qw(id name operative)],
+
+	      Operative_Acls_In_Administrator => [qw(id name operative)] },
+
+
+    details => { default => [],
+
+	      Config => [qw(key value)],
+
+	      OSF => [qw(id tenant_id name overlay user_storage memory number_of_vms number_of_dis)],
+
+	      Role => [qw(id name fixed internal)],
+
+	      DI => [qw(id tenant_id disk_image blocked version osf_id)],
+
+	      VM => [qw( id tenant_id name blocked user_id host_id di_id ip ip_in_use di_id_in_use  state user_state )],
+
+	      ACL => [qw(id name)],
+
+	      Administrator => [qw(id name language block)],
+
+	      Tenant => [qw(id name language block)],
+				   
+	      User => [qw(id name  blocked number_of_vms number_of_vms_connected   )],
+
+	      Host => [qw(id name blocked address frontend backend   number_of_vms_connected state load )],
+
+	      DI_Tag => [qw(id name osf_id di_id )],
+
+	      Operative_Acls_In_Role => [qw(id name operative)],
+
+	      Operative_Acls_In_Administrator => [qw(id name operative)]},
+
+    tiny => { default => [qw(id name)],
+
+	      DI => [qw(id disk_image)],
+
+	      Tenant_Views_Setup => [qw(id)],
+
+	      Administrator_Views_Setup => [qw(id)]},
+
+    all_ids => { default => [qw(id)]},
+
+    state => { User => [qw(number_of_vms_connected)],
+	       
+	       VM => [qw(state user_state)],
+	       
+	       Host => [qw(number_of_vms_connected)]},
+    
+    create => { 'default' => [qw(id)], Config => [qw(key)]}
+
+};
+
 
 my $MANDATORY_FILTERS = 
 { 
@@ -665,6 +747,7 @@ my $FILTERS_TO_DBIX_FORMAT_MAPPER =
 
     DI_Tag => {
 	'osf_id' => 'di.osf_id',
+	'di_id' => 'me.di_id',
 	'name' => 'me.tag',
 	'tenant_id' => 'tenant.id',
 	'tenant_name' => 'tenant.name',
@@ -769,6 +852,7 @@ my $FILTERS_TO_DBIX_FORMAT_MAPPER =
 	'fixed' => 'me.fixed',
 	'internal' => 'me.internal',
 	'id' => 'me.id',
+	'admin_id' => 'admin_rels.administrator_id',
     },
 
     Tenant => {
@@ -896,6 +980,7 @@ my $FIELDS_TO_DBIX_FORMAT_MAPPER =
 
     DI_Tag => {
 	'osf_id' => 'di.osf_id',
+	'di_id' => 'me.di_id',
 	'tenant_id' => 'me.tenant_id',
 	'tenant_name' => 'me.tenant_name',
 	'name' => 'me.tag',
@@ -1069,7 +1154,7 @@ my $DBIX_JOIN_VALUE =
 
     DI_Tag => [{di => {osf => 'tenant'}}],
 
-    Role => [{role_rels => 'inherited'}, { acl_rels => 'acl'}],
+    Role => [ 'admin_rels',{role_rels => 'inherited'}, { acl_rels => 'acl'}],
 		
     Administrator => [qw(tenant), { role_rels => { role => { acl_rels => 'acl' }}}],
     
@@ -1117,6 +1202,8 @@ sub BUILD
 
     $self->initialize_info_model;
 
+    $self->custom_properties_keys;
+
     $self->set_info_by_type_of_action_and_qvd_object(
 	'related_views_in_db',$RELATED_VIEWS_IN_DB);
 
@@ -1128,6 +1215,9 @@ sub BUILD
 
     $self->set_info_by_type_of_action_and_qvd_object(
 	'available_fields',$AVAILABLE_FIELDS,1);
+
+    $self->set_info_by_type_of_action_and_qvd_object(
+	'default_fields_for_cli',$DEFAULT_FIELDS_FOR_CLI,1);
 
     $self->set_info_by_type_of_action_and_qvd_object(
 	'subchain_filters',$SUBCHAIN_FILTERS);
@@ -1188,6 +1278,7 @@ sub initialize_info_model
     related_views_in_db => [],
     available_filters => [],                                                                 
     available_fields => [],                                                                  
+    default_fields_for_cli => [],                                                                  
     available_arguments => [],                                                               
     available_nested_queries => [],                                                               
     subchain_filters => [],                                                                 
@@ -1206,6 +1297,23 @@ sub initialize_info_model
     dbix_prefetch_value => [],                                                                   
     dbix_has_one_relationships => []
 };
+}
+
+sub custom_properties_keys
+{
+    my $self = shift;
+    return @{$self->{custom_properties_keys}} 
+    if defined $self->{custom_properties_keys}; 
+    $self->{custom_properties_keys} =
+	[ $DBConfigProvider->get_custom_properties_keys($self->qvd_object) ];
+    @{$self->{custom_properties_keys}};
+}
+
+sub has_property
+{
+    my ($self,$prop) = @_;
+    my %props = map { $_ => 1 } $self->custom_properties_keys;
+    return exists $props{$prop};
 }
 
 sub set_tenant_fields
@@ -1317,6 +1425,14 @@ sub available_fields
     my $self = shift;
 
     my $fields = $self->{model_info}->{available_fields} // [];
+    @$fields;
+}
+
+sub default_fields_for_cli
+{
+    my $self = shift;
+
+    my $fields = $self->{model_info}->{default_fields_for_cli} // [];
     @$fields;
 }
 
@@ -1483,6 +1599,16 @@ sub available_field
     return 0;
 }
 
+sub available_default_field_for_cli
+{
+    my $self = shift;
+    my $field = shift;
+    $_ eq $field && return 1
+	for $self->default_fields_for_cli;
+
+    return 0;
+}
+
 sub mandatory_argument
 {
     my $self = shift;
@@ -1548,10 +1674,10 @@ sub map_field_to_dbix_format
     my $field = shift;
 
     my $mapped_field = $self->fields_to_dbix_format_mapper->{$field};
-    defined $mapped_field
-    || die "No mapping available for field $field";
+    return $mapped_field if defined $mapped_field;
+    return 'view.properties#'.$field if $self->has_property($field);
 
-    return $mapped_field;
+    die "No mapping available for field $field";
 }
 
 sub map_order_criteria_to_dbix_format

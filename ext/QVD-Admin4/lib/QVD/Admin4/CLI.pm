@@ -34,7 +34,7 @@ sub query
     }
     else
     {
-	my $json = $parser_response->api_query(sid => $self->sid);
+	my $json = $parser_response->api_query(sid => $self->sid, parameters => {__client__ => 'CLI'});
 	my $res = $self->ua->post($self->url, json => $json);
 
 	$res->res->code ? return $res->res : 

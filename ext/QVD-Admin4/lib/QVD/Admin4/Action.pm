@@ -34,12 +34,12 @@ config_set => { type_of_action =>  'create',
 
 config_default => { type_of_action =>  'delete',
 		   qvd_object => 'Config',
-		   acls => [qr/^config\.update\./],
+		   acls => [qr/^config\.qvd\./],
 		   admin4method => 'config_default'},
 
 config_delete => { type_of_action =>  'delete',
 		   qvd_object => 'Config',
-		   acls => [qr/^config\.update\./],
+		   acls => [qr/^config\.qvd\./],
 		   admin4method => 'config_delete'},
 
 user_get_list => {type_of_action => 'list',
@@ -254,6 +254,10 @@ di_delete => { type_of_action => 'delete',
 	       qvd_object => 'DI'},
 
 tag_tiny_list => { type_of_action => 'tiny',
+		   admin4method => 'select',
+		   qvd_object => 'DI_Tag'},
+
+tag_get_list => { type_of_action => 'list',
 		   admin4method => 'select',
 		   qvd_object => 'DI_Tag'},
 
