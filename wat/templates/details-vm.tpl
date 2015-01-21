@@ -1,4 +1,15 @@
-<div class="details-header">
+<%
+// Show state table if is granted. Hide it otherwise
+var mainTableClass = '';
+var stateTableClass = 'hidden';
+
+if (Wat.C.checkACL('vm.see.state')) {
+    mainTableClass = 'details-left';
+    stateTableClass = 'details-right';
+}
+%>
+
+<div class="details-header <%= mainTableClass %>">
     <span class="fa fa-cloud h1"><%= model.get('name') %></span>
     <% if(Wat.C.checkACL('vm.delete.')) { %>
     <a class="button fleft button-icon js-button-delete fa fa-trash" href="javascript:" data-i18n="[title]Delete"></a>
@@ -9,7 +20,8 @@
     <% } %>
     
     <% 
-    if (Wat.C.checkACL('vm.update.state')) {
+    // Start-stop button only will be shown here if state table is hidden
+    if (Wat.C.checkACL('vm.update.state') && stateTableClass == 'hidden') {
         if (model.get('state') != 'stopped') { 
     %>
             <a class="button fright button-icon js-button-stop-vm fa fa-stop fright" href="javascript:" data-i18n="[title]Stop" data-wsupdate="state-button" data-id="<%= model.get('id') %>"></a>
@@ -77,32 +89,42 @@ switch (model.get('state')) {
         break;
 }
 
-// Show state table if is granted. Hide it otherwise
-var mainTableClass = '';
-var stateTableClass = 'hidden';
-
-if (Wat.C.checkACL('vm.see.state')) {
-    mainTableClass = 'details-left';
-    stateTableClass = 'details-right';
-}
-
 %>          
 
 <table class="details details-list <%= stateTableClass %>">
     <tbody class="js-body-state" data-wsupdate="state-running" data-id="<%= model.get('id') %>" style="<%= runningStyle %>">
+        <tr>
+            <td colspan=2>
+            <span class="h1" data-i18n="Execution state"></span>
+            <% 
+            if (Wat.C.checkACL('vm.update.state')) {
+                if (model.get('state') != 'stopped') { 
+            %>
+                    <a class="button fright button-icon js-button-stop-vm fa fa-stop fright" href="javascript:" data-i18n="[title]Stop" data-wsupdate="state-button" data-id="<%= model.get('id') %>"></a>
+            <% 
+                }
+                else { 
+            %>
+                    <a class="button fright button-icon js-button-start-vm fa fa-play fright" href="javascript:" data-i18n="[title]Start" data-wsupdate="state-button" data-id="<%= model.get('id') %>"></a>
+            <% 
+                }
+            } 
+            %>
+            </td>
+        </tr>
         <%
         if (Wat.C.checkACL('vm.see.host')) {
             var hostHtml = Wat.C.ifACL('<a href="#/host/' + model.get('host_id') + '">', 'host.see-details.') + model.get('host_name') + Wat.C.ifACL('</a>', 'host.see-details.');
         %>
             <tr>
-                <td colspan=2 class="center" data-wsupdate="host" data-id="<%= model.get('id') %>"><i class="fa fa-play"></i><%= i18n.t('Running at __node__', {'node': hostHtml}) %></td>
+                <td colspan=2 class="center" data-wsupdate="host" data-id="<%= model.get('id') %>"><%= i18n.t('Running at __node__', {'node': hostHtml}) %></td>
             </tr>
         <%
         }
         else { 
         %>
             <tr>
-                <td colspan=2 class="center"><i class="fa fa-play"></i><span data-i18n="Running"></span></td>
+                <td colspan=2 class="center"><span data-i18n="Running"></span></td>
             </tr>
         <%
         }
@@ -113,6 +135,13 @@ if (Wat.C.checkACL('vm.see.state')) {
             </tr>
         <%
         }
+        %>
+            <tr class="js-execution-params execution-params">
+                <td colspan=2>
+                    <span class="h1" data-i18n="Execution parameters"></span>
+                </td>
+            </tr>
+        <%
         if (Wat.C.checkACL('vm.see.host')) { 
         %>
             <tr class="js-execution-params execution-params">
@@ -137,7 +166,7 @@ if (Wat.C.checkACL('vm.see.state')) {
         %>
             <tr class="js-execution-params execution-params">
                 <td><i class="<%= CLASS_ICON_DIS %>"></i><span data-i18n="Disk image"></span></td>
-                <td>
+                <td data-wsupdate="di" data-id="<%= model.get('id') %>">
                     <a href="#/di/<%= model.get('di_id_in_use') %>">
                         <%= model.get('di_name_in_use') %>
                     </a>
@@ -194,15 +223,40 @@ if (Wat.C.checkACL('vm.see.state')) {
     </tbody>
     <tbody class="js-body-state" data-wsupdate="state-stopped" data-id="<%= model.get('id') %>" style="<%= stoppedStyle %>">
         <tr>
-            <td colspan=2 class="center"><i class="fa fa-stop"></i><span data-i18n="Stopped"></span></td>
+            <td colspan=2>
+                <span class="h1" data-i18n="Execution state"></span>
+                <% 
+                if (Wat.C.checkACL('vm.update.state')) {
+                    if (model.get('state') != 'stopped') { 
+                %>
+                        <a class="button fright button-icon js-button-stop-vm fa fa-stop fright" href="javascript:" data-i18n="[title]Stop" data-wsupdate="state-button" data-id="<%= model.get('id') %>"></a>
+                <% 
+                    }
+                    else { 
+                %>
+                        <a class="button fright button-icon js-button-start-vm fa fa-play fright" href="javascript:" data-i18n="[title]Start" data-wsupdate="state-button" data-id="<%= model.get('id') %>"></a>
+                <% 
+                    }
+                } 
+                %>
+            </td>
+        </tr>
+        <tr>
+            <td colspan=2 class="center"><span data-i18n="Stopped"></span></td>
         </tr>
     </tbody>
     <tbody class="js-body-state" data-wsupdate="state-starting" data-id="<%= model.get('id') %>" style="<%= startingStyle %>">
+        <tr>
+            <td colspan=2><span class="h1" data-i18n="Execution state"></span></td>
+        </tr>
         <tr>
             <td colspan=2 class="center"><i class="fa fa-spinner fa-spin"></i><span data-i18n="Starting"></span></td>
         </tr>
     </tbody>
     <tbody class="js-body-state" data-wsupdate="state-stopping" data-id="<%= model.get('id') %>" style="<%= stoppingStyle %>">
+        <tr>
+            <td colspan=2><span class="h1" data-i18n="Execution state"></span></td>
+        </tr>
         <tr>
             <td colspan=2 class="center"><i class="fa fa-spinner fa-spin"></i><span data-i18n="Stopping"></span></td>
         </tr>

@@ -2,7 +2,7 @@
 Wat.WS = {
     websockets: {},
     debug: 0,
-    openWebsocket: function (qvdObj, action, filters, arguments, fields, callback, stream) {        
+    openWebsocket: function (qvdObj, action, filters, arguments, fields, callback, stream, viewType) {        
         if ("WebSocket" in window) {
             if (Wat.WS.debug) {
                 console.info("WebSocket is supported by your Browser!");
@@ -29,7 +29,7 @@ Wat.WS = {
                         console.info(action + ' : ' + filters.id + ' : ' + JSON.stringify(data));
                     }
                     
-                    callback(qvdObj, filters.id, data, ws);
+                    callback(qvdObj, filters.id, data, ws, viewType);
                 }
                 setTimeout(function () {
                     if (ws.readyState == WS_OPEN) {
@@ -97,7 +97,7 @@ Wat.WS = {
         };
         
         $.each(fields, function (iField, field) {
-            that.openWebsocket(qvdObj, 'qvd_objects_statistics', filters, {}, field, that.changeWebsocket, 'ws');
+            that.openWebsocket(qvdObj, 'qvd_objects_statistics', filters, {}, field, that.changeWebsocket, 'ws', 'stats');
         });
     },
     
@@ -107,22 +107,23 @@ Wat.WS = {
         var that = this;
                 
         $.each(models, function (iModel, model) {
-            that.openDetailsWebsockets (qvdObj, model, fields, cid);
+            that.openDetailsWebsockets (qvdObj, model, fields, cid, 'list');
         });
     },    
     
-    openDetailsWebsockets: function (qvdObj, model, fields, cid) {
+    openDetailsWebsockets: function (qvdObj, model, fields, cid, viewType) {
         this.cid = cid;
+        var viewType = viewType || 'details';
         var that = this;
                 
         var filters = {
             id: model.get('id')
         };
         
-        that.openWebsocket(qvdObj, qvdObj + '_get_details', filters, {}, fields, that.changeWebsocket, 'ws');
+        that.openWebsocket(qvdObj, qvdObj + '_get_details', filters, {}, fields, that.changeWebsocket, 'ws', viewType);
     },
     
-    changeWebsocket: function (qvdObj, id, data) { 
+    changeWebsocket: function (qvdObj, id, data, ws, viewType) { 
         if (data.rows) {
             var data = data.rows[0];
         }
@@ -133,7 +134,7 @@ Wat.WS = {
         $.each(data, function (field, value) {
             switch (qvdObj) {
                 case 'vm':
-                    Wat.WS.changeWebsocketVm(id, field, value);
+                    Wat.WS.changeWebsocketVm(id, field, value, viewType);
                     break;
                 case 'user':
                     Wat.WS.changeWebsocketUser(id, field, value);

@@ -5,9 +5,9 @@ Wat.C = {
     password: '',
     loggedIn: false,
     // Openstack preprod
-    apiUrl: 'http://172.20.126.12:3000/',
-    apiWSUrl: 'ws://172.20.126.12:3000/ws',  
-    apiAddress: '172.20.126.12:3000',  
+    //apiUrl: 'http://172.20.126.12:3000/',
+    //apiWSUrl: 'ws://172.20.126.12:3000/ws',  
+    //apiAddress: '172.20.126.12:3000',  
     
     // Openstack
     apiUrl: 'http://172.20.126.16:3000/',

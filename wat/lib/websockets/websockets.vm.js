@@ -1,10 +1,12 @@
-Wat.WS.changeWebsocketVm = function (id, field, data) {
+Wat.WS.changeWebsocketVm = function (id, field, data, viewType) {
    switch (field) {
         case 'state':
-            // Add this effect when data will be received only when change
-            // $('[data-wsupdate="state"][data-id="' + id + '"]').fadeOut().fadeIn();
-            $('.js-body-state').hide();
-            $('[data-wsupdate="state-' + data + '"][data-id="' + id + '"]').show();
+           
+            if (viewType == 'details') {
+                // Add this effect when data will be received only when change
+                $('.js-body-state').hide();
+                $('[data-wsupdate="state-' + data + '"][data-id="' + id + '"]').show();   
+            }
             
             switch (data) {
                 case 'running':
@@ -34,7 +36,8 @@ Wat.WS.changeWebsocketVm = function (id, field, data) {
                     $('[data-wsupdate="state-button"][data-id="' + id + '"]').removeClass('js-button-start-vm fa-play').addClass('js-button-stop-vm fa-stop').attr('title', i18n.t('Stop'));   
                     $('.remote-administration-buttons a').addClass('disabled');
                     
-                    $('.js-execution-params-button-row').show();
+                    $('.js-execution-params-button-show-row').show();
+                    $('.js-execution-params-button-hide-row').hide();
                     $('.js-execution-params').hide();
                     break;
             }
@@ -67,6 +70,18 @@ Wat.WS.changeWebsocketVm = function (id, field, data) {
                 var hostNameContainer = $('[data-wsupdate="host"][data-id="' + id + '"]');
             }
             hostNameContainer.html(data); 
+            break;
+        case 'di_id_in_use':
+            $('[data-wsupdate="di"][data-id="' + id + '"] a').attr('href', '#/di/' + data); 
+            break;
+        case 'di_name_in_use':
+            if ($('[data-wsupdate="di"][data-id="' + id + '"] a').length > 0) {
+                var diNameContainer = $('[data-wsupdate="di"][data-id="' + id + '"] a');
+            }
+            else {
+                var diNameContainer = $('[data-wsupdate="di"][data-id="' + id + '"]');
+            }
+            diNameContainer.html(data); 
             break;
     }
 }
