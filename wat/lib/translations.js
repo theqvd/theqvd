@@ -27,8 +27,6 @@ Wat.T = {
     // After all the translations do custom actions that need to have the content translated
     translate: function () {
         // Translate all the elements with attribute 'data-i18n'
-        console.log(typeof $.i18n);
-        console.log($.i18n);
         $('[data-i18n]').i18n();
 
         // Force chosen to selects that contain any option with data-i18n attribute
