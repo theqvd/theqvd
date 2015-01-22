@@ -14,8 +14,6 @@ has 'ua', is => 'ro', isa => sub { die "Invalid type for attribute ua"
 
 has 'url', is => 'ro', isa => sub { die "Invalid type for attribute url" if ref(+shift); };
 
-has 'sid', is => 'ro', isa => sub { die "Invalid type for attribute sid" if ref(+shift); };
-
 sub BUILD
 {
     my $self = shift;
@@ -23,7 +21,7 @@ sub BUILD
 
 sub query
 {
-    my ($self,$raw_string) = @_;
+    my ($self,$raw_string,%credentials) = @_;
 
     my $tokens_list = $self->tokenizer->parse($raw_string);
     my $parser_response = $self->parser->parse($tokens_list);
@@ -34,7 +32,7 @@ sub query
     }
     else
     {
-	my $json = $parser_response->api_query(sid => $self->sid, parameters => {__client__ => 'CLI'});
+	my $json = $parser_response->api_query(parameters => {__client__ => 'CLI'},%credentials);
 	my $res = $self->ua->post($self->url, json => $json);
 
 	$res->res->code ? return $res->res : 
