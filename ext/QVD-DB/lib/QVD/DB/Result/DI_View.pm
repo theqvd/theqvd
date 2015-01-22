@@ -37,9 +37,10 @@ __PACKAGE__->add_columns(
 sub properties
 {
     my $self = shift;
-
+    my $property = shift;
     my $properties = decode_json($self->properties_json);
     my $out = { map { $_->{key} => $_->{value} } grep { defined $_->{key}  } @$properties };
+    defined $property ? return $out->{$property} : $out; 
 }
 
 sub tags

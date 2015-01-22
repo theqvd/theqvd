@@ -56,6 +56,8 @@ sub BUILD
 	$self->qvd_object_model->type_of_action eq 'create' &&
 	 not $self->json_wrapper->has_argument('version'));
 
+    $self->check_fields_validity_in_json;
+
     $self->check_acls_for_deleting if
 	$self->qvd_object_model->type_of_action eq 'delete';
     $self->check_filters_validity_in_json;
@@ -414,6 +416,22 @@ sub check_nested_queries_validity_in_json
 sub check_order_by_validity_in_json
 {
     my $self = shift;
+}
+
+sub check_fields_validity_in_json
+{
+    my $self = shift;
+    my $admin = $self->qvd_object_model->current_qvd_administrator;
+
+    $self->qvd_object_model->available_field($_) || $self->qvd_object_model->has_property($_) ||
+	QVD::Admin4::Exception->throw(code => 6250, object => $_)
+	for $self->json_wrapper->fields_list;
+
+    $admin->re_is_allowed_to(
+	$self->qvd_object_model->get_acls_for_field(
+	    $self->qvd_object_model->has_property($_) ? 'properties' : $_)) || 
+	QVD::Admin4::Exception->throw(code => 4250, object => $_)
+	for $self->json_wrapper->fields_list;
 }
 
 ############################################################
