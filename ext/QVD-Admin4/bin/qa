@@ -1,0 +1,22 @@
+#!/usr/bin/perl
+use strict;
+use 5.010;
+use warnings;
+use lib::glob '/home/benjamin/wat/*/lib/';
+use QVD::Admin4::CLI::App;
+
+my $app = QVD::Admin4::CLI::App->new();
+$app->run_interactive();
+
+
+
+
+__END__
+
+=pod
+
+=head1 PURPOSE
+
+Demonstration of a very simple CLIF application.
+
+=cut
