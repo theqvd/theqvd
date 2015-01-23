@@ -34,13 +34,6 @@
                     <td>
         <%
 
-
-                if (field.property) {
-        %>
-                    <span class="second_row"><span data-i18n="Property"></span>:</span>
-        <%
-                }
-
                 if (field.noTranslatable) {
         %>  
                     <span>
@@ -68,8 +61,6 @@
                     </div>
                 </td>
                 <td>
-                    <span class="second_row"><span data-i18n="Property"></span>:</span>
-
                     <span class="js-prop-name">
                     </span>
                 </td>
@@ -117,12 +108,6 @@
                     <td>
         <%
 
-                if (filter.property) {
-        %>
-                    <span class="second_row"><span data-i18n="Property"></span>:</span>
-        <%
-                }
-
                 if (filter.noTranslatable) {
         %>  
                     <span>
@@ -157,9 +142,7 @@
                         <%= Wat.I.controls.CheckBox({checked: false}) %>
                     </div>
                 </td>
-                <td>
-                    <span class="second_row"><span data-i18n="Property"></span>:</span>
-                    
+                <td>                    
                     <span class="js-prop-name">
                     </span>
                     

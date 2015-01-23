@@ -63,7 +63,7 @@ ACLS = {
     "administrator.see.acl-list": "See administrator's ACLs",
     "administrator.see.acl-list-roles": "See source roles of Administrator's ACL",
     "administrator.see.id": "See administrator's ID",
-    "administrator.see.language": "administrator.see.language",
+    "administrator.see.language": "See administrator's language",
     "administrator.see.roles": "See administrator's Roles",
     "administrator.update.assign-role": "Assign-Unassign administrator's roles",
     "administrator.update.language": "Update administrator's language",

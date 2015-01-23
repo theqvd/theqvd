@@ -26,6 +26,11 @@ Wat.T = {
     
     // After all the translations do custom actions that need to have the content translated
     translate: function () {
+        // If i18n is not a function, womething went wrong, not translate. Its possible that session expired or something
+        if (!$.isFunction($('[data-i18n]').i18n)) {
+            return;
+        }
+        
         // Translate all the elements with attribute 'data-i18n'
         $('[data-i18n]').i18n();
 

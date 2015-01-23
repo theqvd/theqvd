@@ -5,7 +5,7 @@
             <select class="" name="di_tag"></select>
             <div class="second_row js-advice-various-osfs hidden">
                 <i class="fa fa-warning"></i>
-                <span data-i18n="The operation will be performed in Virtual machines with more than one associated OSF"></span>
+                <span data-i18n="The operation will be performed over Virtual machines with different associated OSFs"></span>
             </div>
         </td>
     </tr>

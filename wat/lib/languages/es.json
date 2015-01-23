@@ -223,7 +223,7 @@
     "Tenant": "Tenant",
     "Tenants": "Tenants",
     "Text input": "Caja de texto",
-    "The operation will be performed in Virtual machines with more than one associated OSF": "La operación se llevará a cabo en máquinas virtuales con más de un OSF asociado",
+    "The operation will be performed over Virtual machines with different associated OSFs": "La operación se llevará a cabo en máquinas virtuales con diferentes OSFs asociados",
     "The default block size of the system": "El tamaño de bloque predeterminado del sistema",
     "The default language of the system": "El idioma predeterminado del sistema",
     "There are more items than the visible ones on this page": "Hay más elementos que los mostrados en esta página",

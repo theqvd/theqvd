@@ -48,7 +48,7 @@
                 <option data-i18n="Administrators" value="administrator" <%= selectedSection == "administrator" ? 'selected' : '' %>></option>
             <%
             }
-            if (!limitByACLs || Wat.C.checkACL('tenant.see-main.')) {
+            if (!limitByACLs || Wat.C.checkACL('role.see-main.')) {
             %>
                 <option data-i18n="Roles" value="role" <%= selectedSection == "role" ? 'selected' : '' %>></option>
             <%
