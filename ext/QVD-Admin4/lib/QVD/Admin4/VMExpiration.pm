@@ -12,7 +12,7 @@ has 'vm', is => 'ro', isa =>
 	      unless ref(+shift) eq 'QVD::DB::Result::VM'; }, required => 1;
 
 
-my @TIME_UNITS = qw(days hours minutes seconds);
+my @TIME_UNITS = qw(months days hours minutes seconds);
 
 sub now { DateTime->now();}
 

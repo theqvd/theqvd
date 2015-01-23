@@ -7,7 +7,7 @@ use warnings;
 sub run 
 {
     my ($self, $opts, @args) = @_;
-    my $login = shift @args;
+    my $login = $args[0];
     $self->cache->set( login => $login );
 }
 

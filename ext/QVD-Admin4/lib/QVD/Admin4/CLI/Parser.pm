@@ -7,7 +7,6 @@ use QVD::Admin4::CLI::Parser::Edge;
 use QVD::Admin4::CLI::Parser::Agenda;
 use QVD::Admin4::CLI::Parser::Chart;
 use QVD::Admin4::CLI::Parser::Node;
-use QVD::Admin4::CLI::Parser::Response;
 
 has 'unificator', is => 'ro', isa => sub { die "Invalid type for attribute unificator" 
 						  unless ref(+shift) eq 'QVD::Admin4::CLI::Parser::Unificator'; };
@@ -39,17 +38,17 @@ sub parse
 
     $self->parse_recursive($edges);
 
-    my $response = { analysis => []};
+    my $response = [];
     for my $edge (@{$self->chart->inactive_edges})
     {
 	if ($edge->node->label eq 'ROOT'
 	    && $edge->from eq 0 && $edge->to eq $LAST)
-	{ push @{$response->{analysis}}, $edge->node->api; }
+	{ push @$response, $edge->node->api; }
     } 
 
- #   use Data::Dumper; print Dumper $self->chart->inactive_edges;
-    QVD::Admin4::CLI::Parser::Response->new(json => $response);
+    $response;
 }
+
 
 sub parse_recursive
 {

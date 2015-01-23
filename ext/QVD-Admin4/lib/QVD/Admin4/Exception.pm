@@ -77,7 +77,7 @@ my $code2message_mapper =
     7350 => 'Forbidden role assignment, inherited role inherits from inheritor',
     7360 => 'Incompatible expiration dates - Soft date must precede the hard one',
     7371 => 'Non core config items haven\'t default value',
-    7372 => 'Unable to remove a core config item'
+    7372 => 'Unable to remove a core config item',
 };
 
 

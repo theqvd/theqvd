@@ -27,7 +27,7 @@ sub parse
 	$position = $token->to + 1;
     }
 
-    return \@TOKENS;
+    return [\@TOKENS]; # This is a list of analysis
 }
 
 1;

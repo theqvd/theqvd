@@ -1,14 +1,16 @@
-package QVD::Admin4::CLI::Command::Login;
+package QVD::Admin4::CLI::Command::Del.pm;
 use base qw( CLI::Framework::Command );
 use strict;
 use warnings;
-
+use QVD::Admin4::CLI::Command;
 
 sub run 
 {
     my ($self, $opts, @args) = @_;
-    my $login = shift @args;
-    $self->cache->set( login => $login );
+    run_command($self,'del',@args);
 }
 
+
+
 1;
+
