@@ -755,7 +755,8 @@ sub set_api_nested_query
 
     eval { $api->{arguments}->{$nq_type}->{$nq_action} = 
 	       ref($nq_type_of_value) eq ref($ind_qvd_obj->{filters}) ? 
-	       $ind_qvd_obj->{filters} : [values %{$ind_qvd_obj->{filters}}] }; 
+	       $ind_qvd_obj->{filters} : [   map { ref($_) ? @{$_} : $_ } 
+					     values %{$ind_qvd_obj->{filters}}] }; 
 
     set_api_action_basic($api);
 }

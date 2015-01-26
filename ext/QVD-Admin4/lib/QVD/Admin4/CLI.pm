@@ -61,9 +61,8 @@ sub init {
     $password = read_password($self)
 	if $opts->password;
 
-    $self->render("\rHi, What's up!\n");
-
     my $ua = Mojo::UserAgent->new;
+
     my $unificator = QVD::Admin4::CLI::Parser::Unificator->new();
     my $grammar = QVD::Admin4::CLI::Grammar->new();
     my $parser = QVD::Admin4::CLI::Parser->new( grammar => $grammar, unificator => $unificator);
