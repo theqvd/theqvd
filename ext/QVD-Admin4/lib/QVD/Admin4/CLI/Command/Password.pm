@@ -8,8 +8,9 @@ sub run
 {
     my ($self, $opts, @args) = @_;
     my $app = $self->get_app;
-    my $password = shift @args // read_password($app);
+    my $password = read_password($app);
     $self->cache->set( password => $password );
+    print "\n";
 }
 
 1;

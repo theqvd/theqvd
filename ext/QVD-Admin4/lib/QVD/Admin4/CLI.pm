@@ -31,6 +31,21 @@ sub command_map {
         unassign    => 'QVD::Admin4::CLI::Command::Unassign',
         tag    => 'QVD::Admin4::CLI::Command::Tag',
         untag    => 'QVD::Admin4::CLI::Command::Untag',
+
+        GET    => 'QVD::Admin4::CLI::Command::Get',
+        SET    => 'QVD::Admin4::CLI::Command::Set',
+        NEW    => 'QVD::Admin4::CLI::Command::New',
+        DEL    => 'QVD::Admin4::CLI::Command::Del',
+        BLOCK    => 'QVD::Admin4::CLI::Command::Block',
+        UNBLOCK    => 'QVD::Admin4::CLI::Command::Unblock',
+        START    => 'QVD::Admin4::CLI::Command::Start',
+        STOP    => 'QVD::Admin4::CLI::Command::Stop',
+        DESCONNECT    => 'QVD::Admin4::CLI::Command::Disconnect',
+        ASSIGN    => 'QVD::Admin4::CLI::Command::Assign',
+        UNASSIGN    => 'QVD::Admin4::CLI::Command::Unassign',
+        TAG    => 'QVD::Admin4::CLI::Command::Tag',
+        UNTAG    => 'QVD::Admin4::CLI::Command::Untag',
+
         login    => 'QVD::Admin4::CLI::Command::Login',
         password    => 'QVD::Admin4::CLI::Command::Password',
         logout   => 'QVD::Admin4::CLI::Command::Logout',
@@ -41,7 +56,7 @@ sub init {
     my ($self, $opts) = @_;
 
     my ($address,$login,$password) = 
-	('http://172.20.126.16:3000/',$opts->login);
+	(($opts->api || 'http://172.20.126.16:3000/'),$opts->login);
 
     $password = read_password($self)
 	if $opts->password;
@@ -63,6 +78,37 @@ sub init {
 
 }
 
+
+sub read_cmd {
+    my ($app) = @_;
+
+    require Text::ParseWords;
+
+    my $term = $app->{_readline};
+    
+    unless( $term ) {
+        require Term::ReadLine;
+        $term = Term::ReadLine->new('CLIF Application');
+        select $term->OUT;
+        $app->{_readline} = $term;
+
+    my $command_request = $term->readline('> ');
+
+    if(! defined $command_request ) {
+        @ARGV = $app->quit_signals();
+        print "\n"; 
+    }
+    else {
+	$command_request =~ s/'/\\'/g;
+	$command_request =~ s/"/\\"/g;
+        @ARGV = Text::ParseWords::shellwords( $command_request );
+        $term->addhistory($command_request)
+            if $command_request =~ /\S/ and !$term->Features->{autohistory};
+    }
+    return 1;
+}
+
+
 sub quit_signals { qw( q quit exit ) }
 
 sub render {
@@ -73,8 +119,12 @@ sub render {
 sub handle_exception
 {
     my ($self,$e) = @_;
-    print $self->register_command($self->get_current_command)->usage_text
-	if ($e->isa('CLI::Framework::Exception::CmdRunException'));
+
+    my $m = $e->message;
+    $m =~ s/ at .+//;
+    $self->render($m);
+#    print $self->register_command($self->get_current_command)->usage_text
+#	if ($e->isa('CLI::Framework::Exception::CmdRunException'));
 }
 
 1;

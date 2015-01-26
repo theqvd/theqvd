@@ -300,7 +300,7 @@ my $AVAILABLE_FILTERS =
 
 	      Operative_Acls_In_Role => [qw(acl_name role_id operative)],
 
-	      Operative_Acls_In_Administrator => [qw(acl_name admin_id operative)],
+	      Operative_Acls_In_Administrator => [qw(acl_name admin_id operative name id)],
 
 	      Operative_Views_In_Tenant => [qw(tenant_id field visible view_type device_type qvd_object property)],
 
@@ -339,7 +339,7 @@ my $AVAILABLE_FILTERS =
 
 	         Operative_Acls_In_Role => [qw(acl_name role_id operative)],
 			   
-	         Operative_Acls_In_Administrator => [qw(acl_name admin_id operative)],
+	         Operative_Acls_In_Administrator => [qw(acl_name admin_id operative id name)],
 
 		 Operative_Views_In_Tenant => [qw(tenant_id field visible view_type device_type qvd_object property)],
 
@@ -487,9 +487,9 @@ my $DEFAULT_FIELDS_FOR_CLI =
 
 	      DI_Tag => [qw(id name osf_id di_id)],
 
-	      Operative_Acls_In_Role => [qw(id name operative)],
+	      Operative_Acls_In_Role => [qw(id name)],
 
-	      Operative_Acls_In_Administrator => [qw(id name operative)] },
+	      Operative_Acls_In_Administrator => [qw(id name)] },
 
 
     details => { default => [],
@@ -572,7 +572,7 @@ my $SUBCHAIN_FILTERS =
 my $COMMODIN_FILTERS = 
 { 
 tiny => { ACL => [qw(name)]},
-list => {Config => [qw(key value)], Operative_Acls_In_Role => [qw(acl_name)], Operative_Acls_In_Administrator => [qw(acl_name)]}
+list => {Config => [qw(key value)], Operative_Acls_In_Role => [qw(acl_name)], Operative_Acls_In_Administrator => [qw(acl_name name)]}
 };
 
 my $DEFAULT_ORDER_CRITERIA = 
@@ -882,6 +882,8 @@ my $FILTERS_TO_DBIX_FORMAT_MAPPER =
 
     Operative_Acls_In_Administrator => { 
 	'acl_name' => 'me.acl_name',
+	'name' => 'me.acl_name',
+	'id' => 'me.acl_id',
         'admin_id' =>  'me.admin_id',
 	'operative' => 'me.operative',
     },

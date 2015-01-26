@@ -40,6 +40,10 @@ sub BUILD
     $self->hide_recovery_mode_administrator
 	if $self->qvd_object_model->qvd_object eq 'Administrator';
 
+    $self->set_default_admin_id_in_acls_search
+	if $self->qvd_object_model->qvd_object 
+	eq 'Operative_Acls_In_Administrator';
+
     $self->forze_filtering_by_tenant;
 
     $self->forze_filtering_by_own_admin
@@ -231,6 +235,14 @@ sub set_pagination_in_request
     my $self = shift;
     $self->modifiers->{page} = $self->json_wrapper->offset // 1; 
     $self->modifiers->{rows}  = $self->json_wrapper->block // 10000; 
+}
+
+sub set_default_admin_id_in_acls_search
+{
+    my $self = shift;
+
+    $self->json_wrapper->forze_filter_addition('admin_id',$ADMIN->id)
+	unless defined $self->json_wrapper->get_filter_value('admin_id');
 }
 
 sub forze_filtering_by_own_admin

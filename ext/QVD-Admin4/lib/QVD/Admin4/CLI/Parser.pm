@@ -75,9 +75,10 @@ sub get_edges_from_initial_tokens
     for my $token (@$tokens)
     {
 	$LAST = $token->to if $token->to > $LAST; 
-
-	my $label = $self->grammar->get_rules_by_first_right_side($token->string) ?
-	    $token->string : $self->grammar->unknown_tag;
+	my $string =  $token->string;
+	$string =~ tr/[A-Z]/[a-z]/;
+	my $label = $self->grammar->get_rules_by_first_right_side($string) ?
+	    $string : $self->grammar->unknown_tag;
 	my $node = QVD::Admin4::CLI::Parser::Node->new(label => $label, api => $token->string); 
 	my $edge = QVD::Admin4::CLI::Parser::Edge->new(
 	    node => $node, from => $token->from, to => $token->to);

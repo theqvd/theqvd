@@ -488,9 +488,18 @@ my $RULES =
 		 $ls->set_api($api);}},
 
  { left_side => 'ROOT', 
+   right_side => [ 'get', "QVD_OBJECT''", 'IN', 'ORDER_BY' ],
+   cb   => sub { my ($ls,$rs) = @_;		 
+		 my $api = { command => 'get', %{@{$rs}[1]->get_api}, %{@{$rs}[3]->get_api}};
+		 forze_operative_filter_for_acls($api);
+		 set_api_action_for_indirect_relations($api,@{$rs}[2]->get_api);
+		 $ls->set_api($api);}},
+
+ { left_side => 'ROOT', 
    right_side => [ 'get', "QVD_OBJECT''", 'IN' ],
    cb   => sub { my ($ls,$rs) = @_;		 
 		 my $api = { command => 'get', %{@{$rs}[1]->get_api}};
+		 forze_operative_filter_for_acls($api);
 		 set_api_action_for_indirect_relations($api,@{$rs}[2]->get_api);
 		 $ls->set_api($api);}},
 
@@ -576,7 +585,7 @@ my $COMMAND_TO_API_ACTION_MAPPER =
 	     di => 'di_get_list', 
 	     tenant => 'tenant_get_list',
 	     role => 'role_get_list',
-	     acl => 'acl_tiny_list',
+	     acl => 'acl_get_list',
 	     admin => 'admin_get_list' },
     
     update => { config => 'config_set',
@@ -759,6 +768,12 @@ sub set_api_action_for_indirect_relations
 	    $api->{action} = get_api_indirect_action($qvd_object,$ind_qvd_obj->{qvd_object}) };
 }
 
+sub forze_operative_filter_for_acls
+{
+    my $api = shift;
+    return unless $api->{qvd_object} eq 'acl';
+    $api->{filters}->{operative} = 1;
+}
 
 my ($RULES_BY_LEFT_SIDE,$RULES_BY_FIRST_RIGHT_SIDE) = ({},{});
 

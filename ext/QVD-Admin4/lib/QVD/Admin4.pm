@@ -483,7 +483,7 @@ sub add_roles_to_admin
     {
 	eval
 	{
-	    my $role = $DB->resultset('Role')->first({id => $role_id})
+	    my $role = $DB->resultset('Role')->search({id => $role_id})->first
 		// QVD::Admin4::Exception->throw(code => 6370);
 
 	    $role->create_related('admin_rels', 
@@ -492,6 +492,7 @@ sub add_roles_to_admin
 
 	QVD::Admin4::Exception->throw(exception => $@, 
 				      query => 'roles') if $@;
+
     }
 }
 
@@ -775,6 +776,26 @@ sub tenant_view_get_list
     { total => ($rs->is_paged ? $rs->pager->total_entries : $rs->count), 
       rows => \@rows};
 }
+
+
+sub acl_get_list
+{
+    my ($self,$request) = @_;
+    my (@rows, $rs);
+
+    my $admin = $request->get_parameter_value('administrator');
+    my $aol = QVD::Admin4::AclsOverwriteList->new(admin_id => $admin->id);
+    my $bind = [$aol->acls_to_close_re,$aol->acls_to_open_re,$aol->acls_to_hide_re];
+
+    eval { $rs = $DB->resultset($request->table)->search({},{bind => $bind})->search(
+	       $request->filters, $request->modifiers);
+	   @rows = $rs->all };
+    QVD::Admin4::Exception->throw(exception => $@, query => 'select') if $@;
+
+    { total => ($rs->is_paged ? $rs->pager->total_entries : $rs->count), 
+      rows => \@rows};
+}
+
 
 sub get_acls_in_admins
 {

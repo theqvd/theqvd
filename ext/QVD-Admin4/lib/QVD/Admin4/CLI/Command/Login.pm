@@ -9,6 +9,7 @@ sub run
     my ($self, $opts, @args) = @_;
     my $login = shift @args;
     $self->cache->set( login => $login );
+    print "$login\n";
 }
 
 1;

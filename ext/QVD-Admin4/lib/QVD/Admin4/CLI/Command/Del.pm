@@ -1,4 +1,4 @@
-package QVD::Admin4::CLI::Command::Del.pm;
+package QVD::Admin4::CLI::Command::Del;
 use base qw( CLI::Framework::Command );
 use strict;
 use warnings;
