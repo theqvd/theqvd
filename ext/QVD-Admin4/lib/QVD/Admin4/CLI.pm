@@ -92,11 +92,20 @@ sub read_cmd {
         select $term->OUT;
         $app->{_readline} = $term;
 
+#FIXME-TODO-CMDLINE_COMPLETION:
+#        # Arrange for command-line completion...
+#        my $attribs = $term->Attribs;
+#        $attribs->{completion_function} = $app->_cmd_request_completions();
+    }
+    # Prompt for the name of a command and read input from STDIN.
+    # Store the individual tokens that are read in @ARGV.
     my $command_request = $term->readline('> ');
 
+
     if(! defined $command_request ) {
+        # Interpret CTRL-D (EOF) as a quit signal...
         @ARGV = $app->quit_signals();
-        print "\n"; 
+        print "\n"; # since EOF character is rendered as ''
     }
     else {
 	$command_request =~ s/'/\\'/g;

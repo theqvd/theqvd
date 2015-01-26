@@ -292,7 +292,7 @@ my $AVAILABLE_FILTERS =
 
 	      Tenant => [qw(id name language block)],
 
-	      Role => [qw(name id fixed internal admin_id)],
+	      Role => [qw(name id fixed internal admin_id inheritor_id)],
 
 	      Administrator => [qw(name tenant_id tenant_name id language block)],
 
@@ -329,7 +329,7 @@ my $AVAILABLE_FILTERS =
 
 		 ACL => [qw(id name role_id admin_id )],
 
-		 Role => [qw(name id fixed internal admin_id)],
+		 Role => [qw(name id fixed internal admin_id inheritor_id)],
 
 		 Tenant => [qw(id name language block)],
 
@@ -853,6 +853,7 @@ my $FILTERS_TO_DBIX_FORMAT_MAPPER =
 	'internal' => 'me.internal',
 	'id' => 'me.id',
 	'admin_id' => 'admin_rels.administrator_id',
+	'inheritor_id' => 'parent_role_rels.inheritor_id',
     },
 
     Tenant => {
@@ -1156,7 +1157,7 @@ my $DBIX_JOIN_VALUE =
 
     DI_Tag => [{di => {osf => 'tenant'}}],
 
-    Role => [ 'admin_rels',{role_rels => 'inherited'}, { acl_rels => 'acl'}],
+    Role => [ 'admin_rels', {role_rels => 'inherited'}, {parent_role_rels => 'inheritor'}, { acl_rels => 'acl'}],
 		
     Administrator => [qw(tenant), { role_rels => { role => { acl_rels => 'acl' }}}],
     

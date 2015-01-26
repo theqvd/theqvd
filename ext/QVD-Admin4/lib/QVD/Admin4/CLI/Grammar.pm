@@ -660,7 +660,8 @@ my $COMMAND_TO_API_INDIRECT_ACTION_MAPPER =
 {
     acl => { role => 'get_acls_in_roles',
 	     admin => 'get_acls_in_admins'},
-    role => { admin => 'role_get_list' },
+    role => { role => 'role_get_list',
+	      admin => 'role_get_list' },
 
     user => { tenant => 'user_get_list' },
     vm => { tenant => 'vm_get_list', 
@@ -681,7 +682,8 @@ my $OBJECT_PAIRS_RELATORS = {
 
     acl => { role => 'role_id',
 	     admin => 'admin_id'},
-    role => { admin => 'admin_id' },
+    role => { role => 'inheritor_id',
+	      admin => 'admin_id' },
 
     user => { tenant => 'tenant_id'},
     vm => { tenant => 'tenant_id',
