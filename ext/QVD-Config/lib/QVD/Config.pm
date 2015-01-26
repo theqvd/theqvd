@@ -17,34 +17,43 @@ our $USE_DB //= 1;
 my $cfg;
 
 sub reload {
-
     if ($USE_DB) {
-
 	# we load the database module on demand in order to avoid circular
 	# dependencies
 	require QVD::DB::Simple;
-	$cfg = { map { $_->key => $_->value } QVD::DB::Simple::rs('Config')->all }
+	$cfg = { map { $_->key => $_->value } QVD::DB::Simple::rs('Config')->search({tenant_id => 0}) };
     }
 }
 
 sub cfg {
     my $key = shift;
     my $mandatory = shift // 1;
+    my $tenant = shift // 0;
 
     if ($USE_DB) {
 
 	if ($key =~ /^l7r\.ssl\./) {
 	    # SSL keys are only loaded on demand.
 	    require QVD::DB::Simple;
+            $tenant and LOGDIE "Per tenant SSL properties are not supported";
 	    my $slot = QVD::DB::Simple::rs('SSL_Config')->search({ key => $key })->first;
 	    return $slot->value if defined $slot;
 	}
-	$cfg // reload;
-	my $value = $cfg->{$key};
-	if (defined $value) {
-	    $value =~ s/\$\{(.*?)\}/cfg($1)/ge;
-	    return $value;
-	}
+
+        # Values for tenant 0 are cached, others are queried dynamically.
+        my $value;
+        if ($tenant) {
+            $USE_DB and LOGDIE "Can't read per tenant configuration when DB access is disabled";
+            $value = QVD::DB::Simple::re('Config')->search({tenant_id => $tenant, key => $key});
+        }
+        unless (defined $value) {
+            $cfg || reload;
+            my $value = $cfg->{$key};
+        }
+        if (defined $value) {
+            $value =~ s/\$\{(.*?)\}/cfg($1, 1, $tenant)/ge;
+            return $value;
+        }
     }
 
     my $v = core_cfg($key, 0);
