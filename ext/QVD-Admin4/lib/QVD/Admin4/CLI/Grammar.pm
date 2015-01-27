@@ -152,6 +152,12 @@ my $RULES =
 		 $ls->set_api({ qvd_object => 'di'});}},
 
 
+ { left_side => "QVD_OBJECT'", 
+   right_side => [ 'property',  ],
+   cb   => sub { my ($ls,$rs) = @_; 
+		 $ls->set_api({ qvd_object => 'di'});}},
+
+
 # OPERATORS
 # There are operator intended to identify keys with their values '='
 # and operators intended to join sets of key/values or lists of keys or values
@@ -412,6 +418,22 @@ my $RULES =
 
 # QVD_OBJECT specified with key/value filters
 
+## AD HOC. FIX ME #################
+
+ { left_side => "QVD_OBJECT'", 
+   right_side => [ 'property', "KEY" ],
+   cb   => sub { my ($ls,$rs) = @_; 
+		 $ls->set_api({ qvd_object => 'property',
+				filters => @{$rs}[1]->get_api });}},
+
+ { left_side => "QVD_OBJECT'", 
+   right_side => [ 'property', "KEY''" ],
+   cb   => sub { my ($ls,$rs) = @_; 
+		 $ls->set_api({ qvd_object => 'property',
+                            filters => @{$rs}[1]->get_api });}},
+
+####################################
+
  { left_side => "QVD_OBJECT'", 
    right_side => [ 'QVD_OBJECT', "KEY_VALUE" ],
    cb   => sub { my ($ls,$rs) = @_; 
@@ -649,7 +671,7 @@ my $COMMAND_TO_API_NESTED_QUERY_MAPPER = {
 		role => [qw(__roles_changes__ assign_roles), []], 
 		acl => [qw(__acls_changes__ assign_acls), []] },
 
-    unassign => { property => [qw(__properties_changes__ delete), {}], 
+    unassign => { property => [qw(__properties_changes__ delete), []], 
 		  di_tag => [qw(__tags_changes__ delete), []],
 		  role => [qw(__roles_changes__ unassign_roles), []], 
 		  acl => [qw(__acls_changes__ unassign_acls), []]}
@@ -720,6 +742,7 @@ sub get_api_indirect_action
 sub get_api_nested_query
 {
     my %args = @_;
+
     my $nested_q_info = eval { 
 	$COMMAND_TO_API_NESTED_QUERY_MAPPER->{$args{command}}->{$args{qvd_object}} 
     }; 

@@ -40,7 +40,6 @@ sub map_dbix_object_to_output_info
 	my ($info_provider,$method,$argument) = $self->get_info_provider_and_method($dbix_field_key,$dbix_object);
 	if (defined $argument) 
 	{
-	    use Data::Dumper; print Dumper $info_provider->$method($argument);
 	    $result->{$field_key} = eval { $info_provider->$method($argument) } // undef;
 	    print $@ if $@;
 	}
