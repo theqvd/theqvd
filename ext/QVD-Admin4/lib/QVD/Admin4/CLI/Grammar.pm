@@ -685,6 +685,8 @@ my $COMMAND_TO_API_INDIRECT_ACTION_MAPPER =
     role => { role => 'role_get_list',
 	      admin => 'role_get_list' },
 
+    admin => { tenant => 'admin_get_list' },
+
     user => { tenant => 'user_get_list' },
     vm => { tenant => 'vm_get_list', 
 	    user => 'vm_get_list',
@@ -706,6 +708,8 @@ my $OBJECT_PAIRS_RELATORS = {
 	     admin => 'admin_id'},
     role => { role => 'inheritor_id',
 	      admin => 'admin_id' },
+
+    admin => { tenant => 'tenant_id'},
 
     user => { tenant => 'tenant_id'},
     vm => { tenant => 'tenant_id',
