@@ -3,10 +3,11 @@ use strict;
 use warnings;
 use Moo;
 use QVD::Admin4::CLI::Parser::Node;
+use Clone qw(clone);
 
 has 'left_side', is => 'ro', isa => sub { die "Invalid type for attribute left_side" if ref(+shift); }, required => 1;
 has 'right_side', is => 'ro', isa => sub { die "Invalid type for attribute right_side" unless ref(+shift) eq 'ARRAY'; }, required => 1;
-has 'cb', is => 'ro', isa => sub { die "Invalid type for attribute cb" unless ref(+shift) eq 'CODE'; }, required => 1;
+has 'meaning', is => 'ro', isa => sub { die "Invalid type for attribute meaning" unless ref(+shift) eq 'CODE';}, required => 1;
 
 sub BUILD
 {
@@ -43,5 +44,6 @@ sub rest_of_daughters
     shift @daughters;
     @daughters;
 }
+
 
 1;

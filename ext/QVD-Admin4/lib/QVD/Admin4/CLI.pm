@@ -5,8 +5,8 @@ use warnings;
 use QVD::Admin4::CLI;
 use QVD::Admin4::CLI::Command;
 use QVD::Admin4::CLI::Grammar;
+use QVD::Admin4::CLI::Grammar::Unificator;
 use QVD::Admin4::CLI::Parser;
-use QVD::Admin4::CLI::Parser::Unificator;
 use QVD::Admin4::CLI::Tokenizer;
 use Mojo::UserAgent;
 
@@ -63,7 +63,7 @@ sub init {
 
     my $ua = Mojo::UserAgent->new;
 
-    my $unificator = QVD::Admin4::CLI::Parser::Unificator->new();
+    my $unificator = QVD::Admin4::CLI::Grammar::Unificator->new();
     my $grammar = QVD::Admin4::CLI::Grammar->new();
     my $parser = QVD::Admin4::CLI::Parser->new( grammar => $grammar, unificator => $unificator);
     my $tokenizer = QVD::Admin4::CLI::Tokenizer->new();
@@ -78,43 +78,6 @@ sub init {
 }
 
 
-sub read_cmd {
-    my ($app) = @_;
-
-    require Text::ParseWords;
-
-    my $term = $app->{_readline};
-    
-    unless( $term ) {
-        require Term::ReadLine;
-        $term = Term::ReadLine->new('CLIF Application');
-        select $term->OUT;
-        $app->{_readline} = $term;
-
-#FIXME-TODO-CMDLINE_COMPLETION:
-#        # Arrange for command-line completion...
-#        my $attribs = $term->Attribs;
-#        $attribs->{completion_function} = $app->_cmd_request_completions();
-    }
-    # Prompt for the name of a command and read input from STDIN.
-    # Store the individual tokens that are read in @ARGV.
-    my $command_request = $term->readline('> ');
-
-
-    if(! defined $command_request ) {
-        # Interpret CTRL-D (EOF) as a quit signal...
-        @ARGV = $app->quit_signals();
-        print "\n"; # since EOF character is rendered as ''
-    }
-    else {
-	$command_request =~ s/'/\\'/g;
-	$command_request =~ s/"/\\"/g;
-        @ARGV = Text::ParseWords::shellwords( $command_request );
-        $term->addhistory($command_request)
-            if $command_request =~ /\S/ and !$term->Features->{autohistory};
-    }
-    return 1;
-}
 
 
 sub quit_signals { qw( q quit exit ) }

@@ -9,189 +9,190 @@ my $UNKNOWN_TAG = 'UNKNOWN';
 my $RULES =
 [
 
-# SIMPLE WORDS
+# COMMANDS
 
 ## COMMANDS
 
 # GET & SET COMMANDS have been implemented as bare words
 # at the beginning of ROOT rules (see the end of the grammar)
 
- { left_side => 'CMD', 
-   right_side => [ 'del' ],
-   cb   => sub { my ($ls,$rs) = @_; 
-		 $ls->set_api({ command => 'delete'});}},
+ { left_side => { label => 'CMD', saturated => 0 }, 
+   right_side => [ { label => 'get', saturated => 1, 
+		     order => 1, in => 1, of => 1, to => 0, with => 0  } ],
+   meaning   => sub { 'get' },
 
- { left_side => 'CMD', 
-   right_side => [ 'block' ],
-   cb   => sub { my ($ls,$rs) = @_; 
-		 $ls->set_api({ command => 'update', 
-				arguments => { blocked => 1}});}},
+ { left_side => { label => 'CMD', saturated => 0 }, 
+   right_side => [ { label => 'set', saturated => 1,
+		     order => 0, in => 0, of => 0, to => 1, with => 1  } ],
+   meaning   => sub { 'update' }},
 
- { left_side => 'CMD', 
-   right_side => [ 'unblock' ],
-   cb   => sub { my ($ls,$rs) = @_; 
-		 $ls->set_api({ command => 'update', 
-				arguments => { blocked => 0}});}},
+ { left_side => { label => 'CMD', saturated => 0 }, 
+   right_side => [ { label => 'new', saturated => 1,
+		     order => 0, in => 0, of => 0, to => 0, with => 1  } ],
+   meaning   => sub {  'new' }},
 
- { left_side => 'CMD', 
-   right_side => [ 'start' ],
-   cb   => sub { my ($ls,$rs) = @_; 
-		 $ls->set_api({ command => 'start'});}},
+ { left_side => { label => 'CMD', saturated => 0 }, 
+   right_side => [ { label => 'del', saturated => 1,
+		     order => 0, in => 0, of => 0, to => 0, with => 0  } ],
+   meaning   => sub { 'delete' }},
 
- { left_side => 'CMD', 
-   right_side => [ 'stop' ],
-   cb   => sub { my ($ls,$rs) = @_; 
-		 $ls->set_api({ command => 'stop'});}},
+ { left_side => { label => 'CMD', saturated => 0 }, 
+   right_side => [ { label => 'start', saturated => 1,
+		     order => 0, in => 0, of => 0, to => 0, with => 0  } ],
+   meaning   => sub { 'start' }},
 
- { left_side => 'CMD', 
-   right_side => [ 'disconnect' ],
-   cb   => sub { my ($ls,$rs) = @_; 
-		 $ls->set_api({ command => 'disconnect'});}},
+ { left_side => { label => 'CMD', saturated => 0 } ,
+   right_side => [ { label => 'stop', saturated => 1,
+		     order => 0, in => 0, of => 0, to => 0, with => 0  } ],
+   meaning   => sub { 'stop' }},
 
-# COMMANDS WITH INDIRECT RELATIONS:
-# Take both a direct object and an indirect object
-# and assign the first one to the second one as an argument
-# Ex: ASSIGN property TO vm
+ { left_side => { label => 'CMD', saturated => 0 } ,
+   right_side => [ { label => 'disconnect', saturated => 1,
+		     order => 0, in => 0, of => 0, to => 0, with => 0  } ],
+   meaning   => sub { 'disconnect' }},
 
- { left_side => 'IND_CMD', 
-   right_side => [ 'assign' ],
-   cb   => sub { my ($ls,$rs) = @_; 
-		 $ls->set_api({ command => 'assign'});}},
+ { left_side => { label => 'CMD', saturated => 1, order => '#order', in => '#in', 
+		  of => '#of', to => '#to', with => '#with' } ,
+   right_side => [ { label => 'QVD_OBJECT', saturated => 1 },
+		   { label => 'CMD', saturated => 0, order => '#order', in => '#in', 
+		     of => '#of', to => '#to', with => '#with' }],
+   meaning   => sub { my ($c0,$c1) = @_; { command => $c1, %$c0};}},
 
- { left_side => 'IND_CMD', 
-   right_side => [ 'unassign' ],
-   cb   => sub { my ($ls,$rs) = @_; 
-		 $ls->set_api({ command => 'unassign'});}},
+ { left_side => { label => 'CMD', saturated => 1, order => '#order', in => '#in', 
+		  of => 0, to => 0, with => 0 } ,
+   right_side => [ { label => 'QVD_OBJECT', saturated => 1 },
+		   { label => 'CMD', saturated => 0, order => '#order', in => '#in', 
+		     of => 1, to => 0, with => 0 },
+                   { label => 'ITEM', saturated => 1, feature => 0 }],
+   meaning   => sub { my ($c0,$c1,$c2) = @_; { command => $c1, fields => $c2, %$c0}}},
 
- { left_side => 'IND_CMD', 
-   right_side => [ 'set' ],
-   cb   => sub { my ($ls,$rs) = @_; 
-		 $ls->set_api({ command => 'assign'});}},
+###################
+###################
 
- { left_side => 'IND_CMD', 
-   right_side => [ 'del' ],
-   cb   => sub { my ($ls,$rs) = @_; 
-		 $ls->set_api({ command => 'unassign'});}},
+# ORDER BY
 
-# COMMANDS WITH DIRECT RELATIONS
-# Take both a direct object and an indirect object
-# and assign the second one to the first one as an argument
-# Ex: TAG di AS default
+ { left_side => { label => 'CMD', saturated => 1, order => 0, in => 0, 
+		  of => 0, to => 0, with => 0 },
+   right_side => [ { label => 'CMD', saturated => 1, order => 1, in => 0, 
+		     of => 0, to => 0, with => 0 },
+                   { label => 'ORDER', saturated => 1 } ],
+   meaning   => sub { my ($c0,$c1) = @_;  {%$c0, order_by => $c1}}},
 
- { left_side => 'DIT_CMD', 
-   right_side => [ 'tag' ],
-   cb   => sub { my ($ls,$rs) = @_; 
-		 $ls->set_api({ command => 'assign'});}},
+# GET WITH INDIRECT OBJECT 
 
- { left_side => 'DIT_CMD', 
-   right_side => [ 'untag' ],
-   cb   => sub { my ($ls,$rs) = @_; 
-		 $ls->set_api({ command => 'unassign'});}},
+ { left_side => { label => 'CMD', saturated => 1, order => '#order', in => 0, 
+		  of => 0, to => 0, with => 0 },
+   right_side => [ { label => 'CMD', saturated => 1, order => '#order', in => 1, 
+		     of => 0, to => 0, with => 0 },
+                   { label => 'IN', saturated => 1 } ],
+   meaning   => sub { my ($c0,$c1) = @_;  {%$c0, obj2 => $c1}}},
+
+# SET WITH INDIRECT OBJECT
+
+ { left_side => { label => 'CMD', saturated => 1, order => 0, in => 0, 
+		  of => 0, to => 0, with => 0 },
+   right_side => [ { label => 'CMD', saturated => 1, order => 0, in => 0, 
+		     of => 0, to => 1 },
+                   { label => 'TO', saturated => 1 } ],
+   meaning   => sub { my ($c0,$c1) = @_; {%$c0, obj2 => $c1}}},
+
+# REGULAR SET
+
+ { left_side => { label => 'CMD', saturated => 1, order => 0, in => 0, 
+		  of => 0, to => 0, with => 0 },
+   right_side => [ { label => 'CMD', saturated => 1, order => 0, in => 0, 
+		     of => 0, with => 1 },
+                   { label => 'ITEM', saturated => 1, feature => 1 } ],
+   meaning   => sub { my ($c0,$c1) = @_; {%$c0, arguments => $c1}}},
 
 # INDIVIDUALS (OBJECTS IN QVD UNIVERSE)
 
+# QVD_OBJECT specified with key/value filters
 
- { left_side => 'CONFIG', 
-   right_side => ['config'],
-   cb   => sub { my ($ls,$rs) = @_; 
-		 $ls->set_api(@{$rs}[0]->get_api);}},
+ { left_side => { label => 'CONFIG', saturated => 0 } ,
+   right_side => [{ label => 'config', saturated => 1 }],
+   meaning   => sub { 'config' }},
 
- { left_side => 'QVD_OBJECT', 
+ { left_side => { label => 'QVD_OBJECT', saturated => 0 }, 
    right_side => [ 'tenant' ],
-   cb   => sub { my ($ls,$rs) = @_; 
-		 $ls->set_api({ qvd_object => 'tenant'});}},
+   meaning   => sub { 'tenant'}},
 
- { left_side => 'QVD_OBJECT', 
-   right_side => [ 'role' ],
-   cb   => sub { my ($ls,$rs) = @_; 
-		 $ls->set_api({ qvd_object => 'role'});}},
+ { left_side => { label => 'QVD_OBJECT', saturated => 0 }, 
+   right_side => [ { label => 'role', saturated => 1 } ],
+   meaning   => sub {'role'}},
 
- { left_side => 'QVD_OBJECT', 
-   right_side => [ 'acl' ],
-   cb   => sub { my ($ls,$rs) = @_; 
-		 $ls->set_api({ qvd_object => 'acl'});}},
+ { left_side => { label => 'QVD_OBJECT', , saturated => 0 }, 
+   right_side => [ { label => 'acl', saturated => 1 } ],
+   meaning   => sub {'acl'}},
 
- { left_side => 'QVD_OBJECT', 
-   right_side => [ 'admin' ],
-   cb   => sub { my ($ls,$rs) = @_; 
-		 $ls->set_api({ qvd_object => 'admin'});}},
+ { left_side => { label => 'QVD_OBJECT', saturated => 0 } ,
+   right_side => [ { label => 'admin', saturated => 1 } ],
+   meaning   => sub { 'admin' }},
 
- { left_side => 'QVD_OBJECT', 
-   right_side => [ 'tag' ],
-   cb   => sub { my ($ls,$rs) = @_; 
-		 $ls->set_api({ qvd_object => 'di_tag'});}},
+ { left_side => { label => 'QVD_OBJECT', saturated => 0 } ,
+   right_side => [ { label => 'tag', saturated => 1 } ],
+   meaning   => sub { 'di_tag'} },
 
- { left_side => 'QVD_OBJECT', 
-   right_side => [ 'property' ],
-   cb   => sub { my ($ls,$rs) = @_; 
-		 $ls->set_api({ qvd_object => 'property'});}},
+ { left_side => { label => 'QVD_OBJECT', saturated => 0 }, 
+   right_side => [ { label => 'property', saturated => 1 } ],
+   meaning   => sub { 'property' }},
 
- { left_side => 'QVD_OBJECT', 
-   right_side => [ 'vm' ],
-   cb   => sub { my ($ls,$rs) = @_; 
-		 $ls->set_api({ qvd_object => 'vm'});}},
+ { left_side => { label => 'QVD_OBJECT', saturated => 0 }, 
+   right_side => [ { label => 'vm', saturated => 1 } ],
+   meaning   => sub { 'vm'}},
 
- { left_side => 'QVD_OBJECT', 
-   right_side => [ 'user' ],
-   cb   => sub { my ($ls,$rs) = @_; 
-		 $ls->set_api({ qvd_object => 'user'});}},
+ { left_side => { label => 'QVD_OBJECT', saturated => 0 }, 
+   right_side => [ { label => 'user', saturated => 1 } ],
+   meaning   => sub { 'user'}},
 
- { left_side => 'QVD_OBJECT', 
-   right_side => [ 'host' ],
-   cb   => sub { my ($ls,$rs) = @_; 
-		 $ls->set_api({ qvd_object => 'host'});}},
+ { left_side => { label => 'QVD_OBJECT', saturated => 0 }, 
+   right_side => [ { label => 'host', saturated => 1 } ],
+   meaning   => sub { 'host'}},
 
- { left_side => 'QVD_OBJECT', 
-   right_side => [ 'osf' ],
-   cb   => sub { my ($ls,$rs) = @_; 
-		 $ls->set_api({ qvd_object => 'osf'});}},
+ { left_side => { label => 'QVD_OBJECT', saturated => 0 }, 
+   right_side => [ { label => 'osf', saturated => 1 } ],
+   meaning   => sub {'osf'}},
 
- { left_side => 'QVD_OBJECT', 
-   right_side => [ 'di' ],
-   cb   => sub { my ($ls,$rs) = @_; 
-		 $ls->set_api({ qvd_object => 'di'});}},
+ { left_side => { label => 'QVD_OBJECT', saturated => 0 }, 
+   right_side => [ { label => 'di', saturated => 1 } ],
+   meaning   => sub {'di'}},
 
+ { left_side => { label => "QVD_OBJECT", saturated => 1 }, 
+   right_side => [ { label => 'QVD_OBJECT', saturated => 0}, 
+		   { label => "ITEM", saturated => 1, feature => 1} ],
+   meaning => sub { my ($c0,$c1) = @_; { qvd_object => $c0, filters => $c1 }}},
 
- { left_side => "QVD_OBJECT'", 
-   right_side => [ 'property',  ],
-   cb   => sub { my ($ls,$rs) = @_; 
-		 $ls->set_api({ qvd_object => 'di'});}},
-
+ { left_side => { label => "QVD_OBJECT", saturated => 1 }, 
+   right_side => [ { label => 'QVD_OBJECT', saturated => 0}],
+   meaning => sub { my $c0 = shift; { qvd_object => $c0}}},
 
 # OPERATORS
 # There are operator intended to identify keys with their values '='
 # and operators intended to join sets of key/values or lists of keys or values
 
- { left_side => 'EQUAL', 
-   right_side => [ '=' ],
-   cb   => sub { my ($ls,$rs) = @_; 
-		 $ls->set_api({});}},
+ { left_side => { label => 'EQUAL', saturated => 1 }, 
+   right_side => [ { label => '=', saturated => 1 } ],
+   meaning => sub { '=' }},
 
- { left_side => 'COORD', 
-   right_side => [ ',' ],
-   cb   => sub { my ($ls,$rs) = @_; 
-		 $ls->set_api({});}},
+ { left_side => { label => 'LOP', saturated => 1 }, 
+   right_side => [ {label => ',', saturated => 1 } ],
+   meaning => sub { 'and' }},
 
- { left_side => 'LOGICAL', 
-   right_side => [ 'and' ],
-   cb   => sub { my ($ls,$rs) = @_; 
-		 $ls->set_api('-and');}},
+ { left_side => { label => 'LOP', saturated => 1 }, 
+   right_side => [ {label => '|', saturated => 1 } ],
+   meaning => sub { 'or' }},
 
- { left_side => 'LOGICAL', 
-   right_side => [ 'or' ],
-   cb   => sub { my ($ls,$rs) = @_; 
-		 $ls->set_api('-or');}},
+ { left_side => { label => 'NOT', saturated => 1 }, 
+   right_side => [ {label => '!', saturated => 1 } ],
+   meaning => sub { 'not' }},
 
- { left_side => 'OP', 
-   right_side => [ '(' ],
-   cb   => sub { my ($ls,$rs) = @_; 
-		 $ls->set_api();}},
+ { left_side => { label => 'OP', saturated => 1 }, 
+   right_side => [ { label => '(', saturated => 1 } ],
+   meaning => sub { '(' }},
 
- { left_side => 'CP', 
-   right_side => [ ')' ],
-   cb   => sub { my ($ls,$rs) = @_; 
-		 $ls->set_api();}},
-
+ { left_side => { label => 'CP', saturated => 1 }, 
+   right_side => [ {label => ')', saturated => 1 } ],
+   meaning => sub { ')' }},
 
 # FILTERS AND ARGUMENTS
 
@@ -200,655 +201,140 @@ my $RULES =
 # This unknown tokens can be combined with identification or
 # coordination operators in order to build key/value sets or keys (or values) lists
 
+# Keys and Sets are items
 
- { left_side => 'KEY', 
-   right_side => [ $UNKNOWN_TAG ],
-   cb   => sub { my ($ls,$rs) = @_; 
-		 my $key = @{$rs}[0]->get_api; $key =~ s/^'//; $key =~ s/'$//;
-		 $ls->set_api([ $key ])}},
+ { left_side => { label => 'ITEM', saturated => 1, feature => 0, coordinated => 0}, 
+   right_side => [ { label => $UNKNOWN_TAG, saturated => 1 } ],
+   meaning => sub {my $c0 = shift;  [ $c0 ] }},
 
- { left_side => "KEY'", 
-   right_side => [ 'COORD', 'KEY'],
-   cb   => sub { my ($ls,$rs) = @_; 
-		 $ls->set_api(
-		     [ @{@{$rs}[1]->get_api} ]);}},
+ { left_side => { label => 'ITEM', saturated => 1, feature => 1, coordinated => 0 }, 
+   right_side => [ { label => $UNKNOWN_TAG, saturated => 1}, 
+		   { label => 'EQUAL', saturated => 1}, 
+		   {label =>  $UNKNOWN_TAG, saturated => 1}],
+   meaning => sub { my ($c0,$c1,$c2) = @_; { key => $c0, operator => $c1, value => $c2 } }},
 
- { left_side => "KEY'", 
-   right_side => [ 'COORD', "KEY''"],
-   cb   => sub { my ($ls,$rs) = @_; 
-		 $ls->set_api(
-		     [ @{@{$rs}[1]->get_api} ]);}},
 
- { left_side => "KEY''", 
-   right_side => [ 'KEY', "KEY'" ],
-   cb   => sub { my ($ls,$rs) = @_; 
-		 $ls->set_api(
-		     [ @{@{$rs}[0]->get_api}, @{@{$rs}[1]->get_api} ]);}},
+# Items can be coordinated
 
- { left_side => 'KEY_VALUE', 
-   right_side => [ $UNKNOWN_TAG, 'EQUAL', $UNKNOWN_TAG],
-   cb   => sub { my ($ls,$rs) = @_; 
-		 my $key = @{$rs}[0]->get_api; $key =~ s/^'//; $key =~ s/'$//;
-		 my $value = @{$rs}[2]->get_api; $value =~ s/^'//; $value =~ s/'$//;
-		 $ls->set_api({ $key => $value })}},
+ { left_side => { label => "ITEM", saturated => 1, feature => '#feature' }, 
+   right_side => [ { label => 'NOT', saturated => 1}, 
+		   { label => 'ITEM', saturated => 1, feature => '#feature'}],
+   meaning => sub { my ($c0,$c1) = @_; { operator => $c0, operands => $c1} } },
 
- { left_side => 'KEY_VALUE', 
-   right_side => [ $UNKNOWN_TAG, 'EQUAL', "KEY''"],
-   cb   => sub { my ($ls,$rs) = @_; 
-		 my $key = @{$rs}[0]->get_api; $key =~ s/^'//; $key =~ s/'$//;
-		 $ls->set_api({ $key => @{$rs}[2]->get_api })}},
+ { left_side => { label => "ITEM", saturated => 0, feature => '#feature', coordinated => 1 }, 
+   right_side => [ { label => 'LOP', saturated => 1}, 
+		   { label => 'ITEM', saturated => 1, feature => '#feature'}],
+   meaning => sub { my ($c0,$c1) = @_; { operator => $c0, operands => $c1} } },
 
- { left_side => "KEY_VALUE'", 
-   right_side => [ 'COORD', 'KEY_VALUE'],
-   cb   => sub { my ($ls,$rs) = @_; 
-		 $ls->set_api(@{$rs}[1]->get_api);}},
+ { left_side => { label => "ITEM", saturated => 1,  feature => '#feature', coordinated => 1 }, 
+   right_side => [ { label => 'ITEM', saturated => 1, feature => '#feature', coordinated => 0 }, 
+		   { label => "ITEM", saturated => 0, feature => '#feature'} ],
+   meaning => sub { my ($c0,$c1) = @_; { operands => $c0, %$c1 } } },
 
- { left_side => "KEY_VALUE'", 
-   right_side => [ 'COORD', "KEY_VALUE''"],
-   cb   => sub { my ($ls,$rs) = @_; 
-		 $ls->set_api(@{$rs}[1]->get_api);}},
+# Parenthesis
 
- { left_side => "KEY_VALUE''", 
-   right_side => [ 'KEY_VALUE', "KEY_VALUE'" ],
-   cb   => sub { my ($ls,$rs) = @_; 
-		 $ls->set_api({%{@{$rs}[0]->get_api}, %{@{$rs}[1]->get_api} });}},
+ { left_side => { label => "ITEM" saturated => 1, coordinated => 0 }, 
+   right_side => [ { label => 'OP', saturated => 1}, 
+		   { label => "ITEM", saturated => 1 }, 
+		   { label => 'CP', saturated => 1 } ],
+   meaning => sub { my ($c0,$c1,$c2) = @_; $c1 } },
 
- { left_side => "PARENTHESIS", 
-   right_side => [ 'OP', "KEY_VALUE", 'CP' ],
-   cb   => sub { my ($ls,$rs) = @_; 
-		 $ls->set_api(@{$rs}[1]->get_api);}},
-
- { left_side => "PARENTHESIS", 
-   right_side => [ 'OP', "KEY_VALUE''", 'CP' ],
-   cb   => sub { my ($ls,$rs) = @_; 
-		 $ls->set_api(@{$rs}[1]->get_api);}},
-
- { left_side => "PARENTHESIS", 
-   right_side => [ 'OP', "LOGICAL''", 'CP' ],
-   cb   => sub { my ($ls,$rs) = @_; 
-		 $ls->set_api(@{$rs}[1]->get_api);}},
-
- { left_side => "LOGICAL'", 
-   right_side => [ 'LOGICAL', "KEY_VALUE" ],
-   cb   => sub { my ($ls,$rs) = @_; 
-		 $ls->set_api({ @{$rs}[0]->get_api  => [%{@{$rs}[1]->get_api}] });}},
-
- { left_side => "LOGICAL'", 
-   right_side => [ 'LOGICAL', "KEY_VALUE''" ],
-   cb   => sub { my ($ls,$rs) = @_; 
-		 $ls->set_api({ @{$rs}[0]->get_api  => ['-and' => [%{@{$rs}[1]->get_api}]] });}},
-
- { left_side => "LOGICAL'", 
-   right_side => [ 'LOGICAL', "PARENTHESIS" ],
-   cb   => sub { my ($ls,$rs) = @_; 
-		 $ls->set_api({ @{$rs}[0]->get_api  => [%{@{$rs}[1]->get_api}] });}},
-
- { left_side => "LOGICAL'", 
-   right_side => [ 'LOGICAL', "LOGICAL''" ],
-   cb   => sub { my ($ls,$rs) = @_; 
-		 $ls->set_api({ @{$rs}[0]->get_api  => [%{@{$rs}[1]->get_api}] });}},
-
- { left_side => "LOGICAL''", 
-   right_side => [ "KEY_VALUE", "LOGICAL'" ],
-   cb   => sub { my ($ls,$rs) = @_; 
-		 my @ops = keys  %{@{$rs}[1]->get_api};
-		 my $op = $ops[0];
-		 my $api = @{$rs}[1]->get_api;
-		 unshift @{$api->{$op}}, %{@{$rs}[0]->get_api};
-		 $ls->set_api($api);}},
-
- { left_side => "LOGICAL''", 
-   right_side => [ "KEY_VALUE''", "LOGICAL'" ],
-   cb   => sub { my ($ls,$rs) = @_; 
-		 my @ops = keys  %{@{$rs}[1]->get_api};
-		 my $op = $ops[0];
-		 my $api = @{$rs}[1]->get_api;
-		 unshift @{$api->{$op}}, %{@{$rs}[0]->get_api};
-		 $ls->set_api($api);}},
-
- { left_side => "LOGICAL''", 
-   right_side => [ "PARENTHESIS", "LOGICAL'" ],
-   cb   => sub { my ($ls,$rs) = @_; 
-		 my @ops = keys  %{@{$rs}[1]->get_api};
-		 my $op = $ops[0];
-		 my $api = @{$rs}[1]->get_api;
-		 unshift @{$api->{$op}}, %{@{$rs}[0]->get_api};
-		 $ls->set_api($api);}},
 
 # PHRASES
 
-# PREPOSITIONAL PHRASES
-
-# WITH marks key/values sets as arguments
-# Ex: SET vms 1,2,3 WITH user_id=2
- 
- { left_side => 'WITH', 
-   right_side => [ 'with', 'KEY_VALUE' ],
-   cb   => sub { my ($ls,$rs) = @_; 
-		 $ls->set_api({ arguments => @{$rs}[1]->get_api });}},
-
- { left_side => 'WITH', 
-   right_side => [ 'with', "KEY_VALUE''" ],
-   cb   => sub { my ($ls,$rs) = @_; 
-		 $ls->set_api({ arguments => @{$rs}[1]->get_api });}},
-
-# AS introduces a list of keys to be assigned as tags
-# Ex: TAG dis 2 AS default
-
- { left_side => 'AS', 
-   right_side => [ 'as', 'KEY' ],
-   cb   => sub { my ($ls,$rs) = @_; 
-		 $ls->set_api(@{$rs}[1]->get_api);}},
-
- { left_side => 'AS', 
-   right_side => [ 'as', "KEY''" ],
-   cb   => sub { my ($ls,$rs) = @_; 
-		 $ls->set_api(@{$rs}[1]->get_api);}},
 
 # TO introduces the indirect object in an indirect relation
 # Ex: ASSIGN property TO vm
 
- { left_side => 'TO', 
-   right_side => [ 'to', "QVD_OBJECT'" ],
-   cb   => sub { my ($ls,$rs) = @_; 
-		 $ls->set_api(@{$rs}[1]->get_api);}},
-
-# BY introduces the list of criteria in an order by secuence
-# Ex: GET vms ORDER BY tenant_id, name
-
- { left_side => 'BY', 
-   right_side => [ 'by', 'KEY' ],
-   cb   => sub { my ($ls,$rs) = @_; 
-		 $ls->set_api(@{$rs}[1]->get_api);}},
-
- { left_side => 'BY', 
-   right_side => [ 'by', "KEY''" ],
-   cb   => sub { my ($ls,$rs) = @_; 
-		 $ls->set_api(@{$rs}[1]->get_api);}},
-
-# OF is uses as a join element that joins a qvd object with an explicit list
-# of fields to be retrieved
-# Ex: GET tenant_id, name OF vms 2,3,4
-
- { left_side => 'OF', 
-   right_side => ['of'],
-   cb   => sub { my ($ls,$rs) = @_; 
-		 $ls->set_api(@{$rs}[0]->get_api);}},
+ { left_side => { label => 'TO', saturated => 1 }, 
+   right_side => [ { label => 'to', saturated => 1 }, 
+		   { label =>  "QVD_OBJECT", saturated => 1} ],
+   meaning => sub { my ($c0,$c1) = @_; $c1 } },
 
 # IN
 
- { left_side => 'IN', 
-   right_side => [ 'in', "QVD_OBJECT'" ],
-   cb   => sub { my ($ls,$rs) = @_; 
-		 $ls->set_api(@{$rs}[1]->get_api);}},
-
+ { left_side => { label => 'IN', saturated => 1 }, 
+   right_side => [ { label => 'in', saturated => 1}, 
+		   { label =>  "QVD_OBJECT", saturated => 1} ],
+   meaning => sub { my ($c0,$c1) = @_; $c1 }  },
 
 # ORDER BY PHRASES
 # order by tenant_id,name
 # order asc by tenant_id,name
 # order desc by tenant_id,name
 
- { left_side => 'ORDER', 
-   right_side => [ 'order' ],
-   cb   => sub { my ($ls,$rs) = @_; 
-		 $ls->set_api({});}},
 
- { left_side => 'DIR', 
-   right_side => [ 'asc' ],
-   cb   => sub { my ($ls,$rs) = @_; 
-		 $ls->set_api('-asc');}},
+ { left_side => { label => 'DIR', saturated => 1 }, 
+   right_side => [ { label => 'asc', saturated => 1} ],
+   meaning => sub { '-asc' }},
 
- { left_side => 'DIR', 
-   right_side => [ 'desc' ],
-   cb   => sub { my ($ls,$rs) = @_; 
-		 $ls->set_api('-desc');}},
+ { left_side => { label => 'DIR', saturated => 1 }, 
+   right_side => [ { label => 'desc', saturated => 1} ],
+   meaning => sub { '-desc' }},
 
- { left_side => 'ORDER_BY', 
-   right_side => [ 'ORDER', 'BY' ],
-   cb   => sub { my ($ls,$rs) = @_; 
-		 $ls->set_api({order_by => { field => @{$rs}[1]->get_api }});}},
+ { left_side => { label => 'ORDER', saturated => 0, modified => 0}, 
+   right_side => [ { label => 'order', saturated => 1} ],
+   meaning => sub { 'order' }},
 
- { left_side => 'ORDER_BY', 
-   right_side => [ 'ORDER', 'DIR', 'BY' ],
-   cb   => sub { my ($ls,$rs) = @_; 
-		 $ls->set_api({order_by => { order => @{$rs}[1]->get_api, 
-					     field => @{$rs}[2]->get_api }});}},
+ { left_side => { label => 'ORDER', saturated => 0, modified => 1 }, 
+   right_side => [ { label => 'ORDER', saturated => 0, modified => 0 },
+		   { label => 'DIR', saturated => 1} ],
+   meaning => sub { my ($c0,$c1) = @_; { order => $c1 }},
 
-# NOMINAL PHRASES (INDIVIDUALS IN QVD UNIVERSE)
-
-# QVD_OBJECT specified with key/value filters
-
-## AD HOC. FIX ME #################
-
- { left_side => "QVD_OBJECT'", 
-   right_side => [ 'property', "KEY" ],
-   cb   => sub { my ($ls,$rs) = @_; 
-		 $ls->set_api({ qvd_object => 'property',
-				filters => @{$rs}[1]->get_api });}},
-
- { left_side => "QVD_OBJECT'", 
-   right_side => [ 'property', "KEY''" ],
-   cb   => sub { my ($ls,$rs) = @_; 
-		 $ls->set_api({ qvd_object => 'property',
-                            filters => @{$rs}[1]->get_api });}},
-
-####################################
-
- { left_side => "QVD_OBJECT'", 
-   right_side => [ 'QVD_OBJECT', "KEY_VALUE" ],
-   cb   => sub { my ($ls,$rs) = @_; 
-		 $ls->set_api({ qvd_object => @{$rs}[0]->get_api->{qvd_object},
-                            filters => @{$rs}[1]->get_api });}},
-
- { left_side => "QVD_OBJECT'", 
-   right_side => [ 'QVD_OBJECT', "KEY_VALUE''" ],
-   cb   => sub { my ($ls,$rs) = @_; 
-		 $ls->set_api({ qvd_object => @{$rs}[0]->get_api->{qvd_object},
-                            filters => @{$rs}[1]->get_api });}},
-
- { left_side => "QVD_OBJECT'", 
-   right_side => [ 'QVD_OBJECT', "LOGICAL''" ],
-   cb   => sub { my ($ls,$rs) = @_; 
-		 $ls->set_api({ qvd_object => @{$rs}[0]->get_api->{qvd_object},
-                            filters => @{$rs}[1]->get_api });}},
-
- { left_side => "QVD_OBJECT''", 
-   right_side => ['KEY', 'OF', "QVD_OBJECT'"],
-   cb   => sub { my ($ls,$rs) = @_; 
-		 $ls->set_api({ fields => @{$rs}[0]->get_api, %{@{$rs}[2]->get_api}});}},
-
- { left_side => "QVD_OBJECT''", 
-   right_side => ["KEY''", 'OF', "QVD_OBJECT'"],
-   cb   => sub { my ($ls,$rs) = @_; 
-		 $ls->set_api({ fields => @{$rs}[0]->get_api, %{@{$rs}[2]->get_api}});}},
-
- { left_side => "QVD_OBJECT''", 
-   right_side => ["KEY", 'OF', "LOGICAL''"],
-   cb   => sub { my ($ls,$rs) = @_; 
-		 $ls->set_api({ fields => @{$rs}[0]->get_api, %{@{$rs}[2]->get_api}});}},
-
- { left_side => "QVD_OBJECT''", 
-   right_side => ["KEY''", 'OF', "LOGICAL''"],
-   cb   => sub { my ($ls,$rs) = @_; 
-		 $ls->set_api({ fields => @{$rs}[0]->get_api, %{@{$rs}[2]->get_api}});}},
-
-
-# Free projections of QVD_OBJECTS to bare individuals (Ex: get vm)
-
- { left_side => "QVD_OBJECT'", 
-   right_side => [ 'QVD_OBJECT' ],
-   cb   => sub { my ($ls,$rs) = @_; 
-		 $ls->set_api(@{$rs}[0]->get_api);}},
-
-
- { left_side => "QVD_OBJECT''", 
-   right_side => [ "QVD_OBJECT'" ],
-   cb   => sub { my ($ls,$rs) = @_; 
-		 $ls->set_api(@{$rs}[0]->get_api);}},
+ { left_side => { label => 'ORDER', saturated => 1 }, 
+   right_side => [ { label => 'ORDER', saturated => 0 }, 
+		   { label => 'ITEM', saturated => 1, feature => 0 } ],
+   meaning => sub { my ($c0,$c1) = @_;  { %$c0, field => $c1 }} },
 
 # TOP PHRASES (ROOT)
 
- { left_side => 'ROOT', 
-   right_side => [ 'new', 'QVD_OBJECT' ],
-   cb   => sub { my ($ls,$rs) = @_; 
-		 my $api = { command => 'create', %{@{$rs}[1]->get_api}};
-		 set_api_action_basic($api);
-		 $ls->set_api($api);}},
+ { left_side => { label => 'ROOT', saturated => 1 }, 
+   right_side => [ { label => 'CMD', saturated => 1, order => 0, in => 0, of => 0, to => 0, with => 0 } ],
+   meaning => sub { my $c0 = shift; $c0 }},
 
- { left_side => 'ROOT', 
-   right_side => [ 'new', 'QVD_OBJECT', 'WITH' ],
-   cb   => sub { my ($ls,$rs) = @_; 
-		 my $api = { command => 'create', %{@{$rs}[1]->get_api}, %{@{$rs}[2]->get_api}};
-		 set_api_action_basic($api);
-		 $ls->set_api($api);}},
+# AD HOC TOP PHRASES 
 
- { left_side => 'ROOT', 
-   right_side => [ 'CMD', "QVD_OBJECT'" ],
-   cb   => sub { my ($ls,$rs) = @_;
-		 my $api = { %{@{$rs}[0]->get_api},%{@{$rs}[1]->get_api}}; 
-		 set_api_action_basic($api);
-		 $ls->set_api($api);}},
+ { left_side => { label => 'ROOT', saturated => 1 }, 
+   right_side => [  { label => "QVD_OBJECT", saturated => 1 },
+		    { label => 'block', saturated => 1 } ],
+   meaning => sub { my $c0 = shift; { command => 'update', obj1 => $c0, arguments => { blocked => 1 }}}},
 
- { left_side => 'ROOT', 
-   right_side => [ 'get', "QVD_OBJECT''", 'IN', 'ORDER_BY' ],
-   cb   => sub { my ($ls,$rs) = @_;		 
-		 my $api = { command => 'get', %{@{$rs}[1]->get_api}, %{@{$rs}[3]->get_api}};
-		 forze_operative_filter_for_acls($api);
-		 set_api_action_for_indirect_relations($api,@{$rs}[2]->get_api);
-		 $ls->set_api($api);}},
-
- { left_side => 'ROOT', 
-   right_side => [ 'get', "QVD_OBJECT''", 'IN' ],
-   cb   => sub { my ($ls,$rs) = @_;		 
-		 my $api = { command => 'get', %{@{$rs}[1]->get_api}};
-		 forze_operative_filter_for_acls($api);
-		 set_api_action_for_indirect_relations($api,@{$rs}[2]->get_api);
-		 $ls->set_api($api);}},
-
- { left_side => 'ROOT', 
-   right_side => [ 'IND_CMD', "QVD_OBJECT'", 'TO' ],
-   cb   => sub { my ($ls,$rs) = @_;
-		 my $api = { %{@{$rs}[0]->get_api}, %{@{$rs}[2]->get_api}};
-		 set_api_nested_query($api,@{$rs}[1]->get_api);
-		 $ls->set_api($api);}},
-
- { left_side => 'ROOT', 
-   right_side => [ 'DIT_CMD', "QVD_OBJECT'", 'AS' ],
-   cb   => sub { my ($ls,$rs) = @_;
-		 my $api = { %{@{$rs}[0]->get_api}, %{@{$rs}[1]->get_api}};
-		 set_api_nested_query($api,{ qvd_object => 'di_tag', filters => @{$rs}[2]->get_api });
-		 $ls->set_api($api);}},
-
- { left_side => 'ROOT', 
-   right_side => [ 'get', "QVD_OBJECT''" ],
-   cb   => sub { my ($ls,$rs) = @_;
-		 my $api = { command => 'get', %{@{$rs}[1]->get_api} };
-		 set_api_action_basic($api);
-		 $ls->set_api($api);}},
-
- { left_side => 'ROOT', 
-   right_side => [ 'get', "QVD_OBJECT''", 'ORDER_BY' ],
-   cb   => sub { my ($ls,$rs) = @_;
-		 my $api = { command => 'get', %{@{$rs}[1]->get_api}, %{@{$rs}[2]->get_api}}; 
-		 set_api_action_basic($api);
-		 $ls->set_api($api);}},
-
- { left_side => 'ROOT', 
-   right_side => [ 'set', "QVD_OBJECT'", 'WITH' ],
-   cb   => sub { my ($ls,$rs) = @_;
-		 my $api =  { command => 'update', %{@{$rs}[1]->get_api}, %{@{$rs}[2]->get_api}};
-		 set_api_action_basic($api);
-		 $ls->set_api($api);}},
-
- { left_side => 'ROOT', 
-   right_side => [ 'set', 'CONFIG', "KEY_VALUE" ],
-   cb   => sub { my ($ls,$rs) = @_;
-		 my $api =  { qvd_object => 'config', command => 'update', 
-			      arguments => { key => keys %{@{$rs}[2]->get_api}, 
-					     value => values %{@{$rs}[2]->get_api}}};
-		 set_api_action_basic($api);
-		 $ls->set_api($api);}},
-
- { left_side => 'ROOT', 
-   right_side => [ 'get', 'CONFIG' ],
-   cb   => sub { my ($ls,$rs) = @_;
-		 my $api =  { qvd_object => 'config', command => 'get'};
-		 set_api_action_basic($api);
-		 $ls->set_api($api);}},
-
- { left_side => 'ROOT', 
-   right_side => [ 'get', 'CONFIG', "KEY" ],
-   cb   => sub { my ($ls,$rs) = @_;
-		 my $api =  { qvd_object => 'config', command => 'get', 
-			      filters => { key => ${@{$rs}[2]->get_api}[0]}};
-		 set_api_action_basic($api);
-		 $ls->set_api($api);}},
-
- { left_side => 'ROOT', 
-   right_side => [ 'get', 'CONFIG', "KEY''" ],
-   cb   => sub { my ($ls,$rs) = @_;
-		 my $api =  { qvd_object => 'config', command => 'get', 
-			      filters => { key => @{$rs}[2]->get_api}};
-		 set_api_action_basic($api);
-		 $ls->set_api($api);}},
+ { left_side => { label => 'ROOT', saturated => 1 }, 
+   right_side => [ { label => "QVD_OBJECT", saturated => 1 },
+		   { label => 'unblock', saturated => 1 } ],
+   meaning => sub { my $c0 = shift; { command => 'update', obj1 => $c0, arguments => { blocked => 0 }}}},
 
 
 ];
 
-
-my $COMMAND_TO_API_ACTION_MAPPER =
-{
-    get => { di_tag => 'tag_get_list',
-	     config => 'config_get',
-	     vm => 'vm_get_list', 
-	     user => 'user_get_list', 
-	     host => 'host_get_list', 
-	     osf => 'osf_get_list', 
-	     di => 'di_get_list', 
-	     tenant => 'tenant_get_list',
-	     role => 'role_get_list',
-	     acl => 'acl_get_list',
-	     admin => 'admin_get_list' },
-    
-    update => { config => 'config_set',
-		vm => 'vm_update', 
-		user => 'user_update', 
-		host => 'host_update', 
-		osf => 'osf_update', 
-		di => 'di_update', 
-		tenant => 'tenant_update',
-		role => 'role_update',
-		admin => 'admin_update' },
-
-    create => { vm => 'vm_create', 
-		user => 'user_create', 
-		host => 'host_create', 
-		osf => 'osf_create', 
-		di => 'di_create', 
-		tenant => 'tenant_create',
-		role => 'role_create',
-		admin => 'admin_create' },
-	   
-    delete => { vm => 'vm_delete', 
-		user => 'user_delete', 
-		host => 'host_delete', 
-		osf => 'osf_delete', 
-		di => 'di_delete', 
-		tenant => 'tenant_delete',
-		role => 'role_delete',
-		admin => 'admin_delete' },
-	   
-    start => { vm => 'vm_start'}, 
-
-    stop => { vm => 'vm_stop'}, 
-
-    disconnect => { vm => 'vm_user_disconnect'}, 
-
-    assign => { vm => 'vm_update', 
-		user => 'user_update', 
-		host => 'host_update', 
-		osf => 'osf_update', 
-		di => 'di_update', 
-		tenant => 'tenant_update',
-		role => 'role_update',
-		admin => 'admin_update' },
-
-    unassign => { vm => 'vm_update', 
-		  user => 'user_update', 
-		  host => 'host_update', 
-		  osf => 'osf_update', 
-		  di => 'di_update', 
-		  tenant => 'tenant_update',
-		  role => 'role_update',
-		  admin => 'admin_update' },
-};
-
-
-my $COMMAND_TO_API_NESTED_QUERY_MAPPER = {
-
-    assign => { property => [qw(__properties_changes__ set), {}], 
-		di_tag => [qw(__tags_changes__ create), []], 
-		role => [qw(__roles_changes__ assign_roles), []], 
-		acl => [qw(__acls_changes__ assign_acls), []] },
-
-    unassign => { property => [qw(__properties_changes__ delete), []], 
-		  di_tag => [qw(__tags_changes__ delete), []],
-		  role => [qw(__roles_changes__ unassign_roles), []], 
-		  acl => [qw(__acls_changes__ unassign_acls), []]}
-};
-
-
-my $COMMAND_TO_API_INDIRECT_ACTION_MAPPER =
-{
-    acl => { role => 'get_acls_in_roles',
-	     admin => 'get_acls_in_admins'},
-    role => { role => 'role_get_list',
-	      admin => 'role_get_list' },
-
-    admin => { tenant => 'admin_get_list' },
-
-    user => { tenant => 'user_get_list' },
-    vm => { tenant => 'vm_get_list', 
-	    user => 'vm_get_list',
-	    host => 'vm_get_list',
-            osf => 'vm_get_list',
-            di => 'vm_get_list'},
-    osf => {  tenant => 'osf_get_list'},
-    di => { tenant => 'di_get_list',
-	    osf => 'di_get_list'},
-
-    di_tag => { osf => 'tag_get_list', 
-		di => 'tag_get_list'}
-
-};
-
-my $OBJECT_PAIRS_RELATORS = {
-
-    acl => { role => 'role_id',
-	     admin => 'admin_id'},
-    role => { role => 'inheritor_id',
-	      admin => 'admin_id' },
-
-    admin => { tenant => 'tenant_id'},
-
-    user => { tenant => 'tenant_id'},
-    vm => { tenant => 'tenant_id',
-	    user => 'user_id',
-	    host => 'host_id',
-            osf => 'osf_id',
-            di => 'di_id'},
-    osf => { tenant => 'tenant_id'},
-    di => { tenant => 'tenant_id',
-            osf => 'osf_id'},
-    di_tag => { osf => 'osf_id', 
-		di => 'di_id'}
-};
-
-
-sub get_api_action
-{
-    my %args = @_;
-    my $action = eval { 
-	$COMMAND_TO_API_ACTION_MAPPER->{$args{command}}->{$args{qvd_object}} 
-    }; 
-    $action;
-}
-
-sub get_api_indirect_action
-{
-    my @qvd_objects = @_;
-    my $action = eval { 
-	$COMMAND_TO_API_INDIRECT_ACTION_MAPPER->{$qvd_objects[0]}->{$qvd_objects[1]}  
-    }; 
-    $action;
-}
-
-sub get_api_nested_query
-{
-    my %args = @_;
-
-    my $nested_q_info = eval { 
-	$COMMAND_TO_API_NESTED_QUERY_MAPPER->{$args{command}}->{$args{qvd_object}} 
-    }; 
-    @$nested_q_info;
-
-}
-
-sub get_api_object_pair_relator
-{
-    my @qvd_objects = @_;
-
-    my $relator = eval { 
-	$OBJECT_PAIRS_RELATORS->{$qvd_objects[0]}->{$qvd_objects[1]} 
-    }; 
-    $relator;
-}
-
-sub set_api_action_basic
-{
-    my $api = shift;
-    $api->{action} = get_api_action( 
-	qvd_object => delete $api->{qvd_object}, 
-	command => delete $api->{command});
-}
-
-sub set_api_nested_query
-{
-    my ($api,$ind_qvd_obj) = @_;
-
-    my ($nq_type,$nq_action,$nq_type_of_value) =
-	get_api_nested_query(command => $api->{command},
-			     qvd_object => $ind_qvd_obj->{qvd_object});
-
-    eval { $api->{arguments}->{$nq_type}->{$nq_action} = 
-	       ref($nq_type_of_value) eq ref($ind_qvd_obj->{filters}) ? 
-	       $ind_qvd_obj->{filters} : [   map { ref($_) ? @{$_} : $_ } 
-					     values %{$ind_qvd_obj->{filters}}] }; 
-
-    set_api_action_basic($api);
-}
-
-sub set_api_action_for_indirect_relations
-{
-    my ($api,$ind_qvd_obj) = @_;
-    my $qvd_object =  delete $api->{qvd_object};
-    my $type_of_action =  delete $api->{command};
-    my $relator = get_api_object_pair_relator($qvd_object,$ind_qvd_obj->{qvd_object});
-    eval {  $api->{filters}->{$relator} = $ind_qvd_obj->{filters}->{id};
-	    $api->{action} = get_api_indirect_action($qvd_object,$ind_qvd_obj->{qvd_object}) };
-}
-
-sub forze_operative_filter_for_acls
-{
-    my $api = shift;
-    return unless $api->{qvd_object} eq 'acl';
-    $api->{filters}->{operative} = 1;
-}
-
-my ($RULES_BY_LEFT_SIDE,$RULES_BY_FIRST_RIGHT_SIDE) = ({},{});
-
 sub BUILD
 {
     my $self = shift;
+    $self->{rules} = [];
 
     for my $rule_args (@$RULES)
     {
 	my $rule = QVD::Admin4::CLI::Grammar::Rule->new(%$rule_args);
-	$RULES_BY_LEFT_SIDE->{$rule->left_side} //= [];
-	$RULES_BY_FIRST_RIGHT_SIDE->{$rule->first_daughter->label} //= []; 
-	push @{$RULES_BY_LEFT_SIDE->{$rule->left_side}}, $rule;
-	push @{$RULES_BY_FIRST_RIGHT_SIDE->{$rule->first_daughter->label}}, $rule; 
+	push @{$self->{rules}, $rule;
     }
 }
 
 sub get_rules
 {
     my $self = shift;
-    my @rule_list;
-
-    push  @rule_list, $self->get_rules_by_left_side($_)
-	for keys %$RULES_BY_LEFT_SIDE;
-    @rule_list;
-}
-
-
-sub get_rules_by_left_side
-{
-    my ($self,$left_side) = @_;
-    return () unless defined $RULES_BY_LEFT_SIDE->{$left_side}; 
-    @{$RULES_BY_LEFT_SIDE->{$left_side}};
-}
-
-sub get_rules_by_first_right_side
-{
-    my ($self,$first_right_side) = @_;
-    return () unless defined $RULES_BY_FIRST_RIGHT_SIDE->{$first_right_side}; 
-    @{$RULES_BY_FIRST_RIGHT_SIDE->{$first_right_side}};
+    @{$self->{rules};
 }
 
 sub unknown_tag
 {
     return $UNKNOWN_TAG;
+}
+
+sub get_labels_for_string
+{
+    my ($self,$string) = @_;
+
+    return ({ label => $string }, { label => $self->unknown_tag }); 
 }
 
 1;

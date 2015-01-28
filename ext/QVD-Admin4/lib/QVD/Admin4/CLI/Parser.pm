@@ -7,6 +7,7 @@ use QVD::Admin4::CLI::Parser::Edge;
 use QVD::Admin4::CLI::Parser::Agenda;
 use QVD::Admin4::CLI::Parser::Chart;
 use QVD::Admin4::CLI::Parser::Node;
+use QVD::Admin4::CLI::Grammar::Substitution;
 
 has 'unificator', is => 'ro', isa => sub { die "Invalid type for attribute unificator" 
 						  unless ref(+shift) eq 'QVD::Admin4::CLI::Parser::Unificator'; };
@@ -43,7 +44,7 @@ sub parse
     {
 	if ($edge->node->label eq 'ROOT'
 	    && $edge->from eq 0 && $edge->to eq $LAST)
-	{ push @$response, $edge->node->api; }
+	{ push @$response, $edge->node->meaning; }
     } 
 
     $response;
@@ -75,15 +76,15 @@ sub get_edges_from_initial_tokens
     for my $token (@$tokens)
     {
 	$LAST = $token->to if $token->to > $LAST; 
-	my $string =  $token->string;
-	$string =~ tr/[A-Z]/[a-z]/;
-	my $label = $self->grammar->get_rules_by_first_right_side($string) ?
-	    $string : $self->grammar->unknown_tag;
-	my $node = QVD::Admin4::CLI::Parser::Node->new(label => $label, api => $token->string); 
-	my $edge = QVD::Admin4::CLI::Parser::Edge->new(
-	    node => $node, from => $token->from, to => $token->to);
 
-	push @edges, $edge;
+	for my $label ($self->grammar->get_labels_for_string($token->string))
+	{
+	    my $node = QVD::Admin4::CLI::Parser::Node->new(label => $label); 
+	    my $edge = QVD::Admin4::CLI::Parser::Edge->new(
+		node => $node, from => $token->from, to => $token->to);
+
+	    push @edges, $edge;
+	}
     }
     \@edges;
 }
@@ -92,27 +93,35 @@ sub expand_edge
 {
     my ($self,$edge) = @_;
     
-    my @rules = $self->grammar->get_rules_by_first_right_side($edge->node->label);
-    
     my @new_edges;
 
-    for my $rule (@rules)
+    for my $rule ($self->grammar->get_rules)
     {
-	my $node = QVD::Admin4::CLI::Parser::Node->new(rule => $rule); 
-	my $new_edge = QVD::Admin4::CLI::Parser::Edge->new(
-	    node => $node, from => $edge->from, to => $edge->to, 
-	    to_find => [$rule->rest_of_daughters], found => [$edge->node] );
-
-	unless ($new_edge->is_active)
-	{
-	    my $cb = $new_edge->node->rule->cb;
-	    $cb->($new_edge->node,$new_edge->found);
-	}
-
+	my $new_edge = $self->expand_edge_aux($edge,$rule);
 	push @new_edges, $new_edge;
     }
 
     @new_edges;
+}
+
+sub expand_edge_aux
+{
+    my ($self,$edge,$rule) = @_;
+
+    my %args = (
+	target_structure => $rule->first_daughter,
+	source_structure => $edge->node->first_to_find->label,
+	target_substitution => QVD::Admin4::CLI::Grammar::Substitution->new(), 
+	source_substitution => $edge->node->first_to_find->substitution );
+    
+    my $substitution = $self->unificator->unify(%args) // next;
+
+    my $node = QVD::Admin4::CLI::Parser::Node->new(rule => $rule, substitution => $substitution); 
+    my $new_edge = QVD::Admin4::CLI::Parser::Edge->new(
+	node => $node, from => $edge->from, to => $edge->to, 
+	to_find => [$rule->rest_of_daughters], found => [$edge->node] );
+    $new_edge->node->percolate_meaning_from_constituents($new_edge->found);
+    return $new_edge;
 }
 
 sub combine_edge
@@ -155,22 +164,30 @@ sub combine_edge_aux
 {
     my ($self, $active_edge, $inactive_edge) = @_;
 
-    $self->unificator->unify(inactive_edge => $inactive_edge, 
-			     active_edge => $active_edge) || return undef;
+    return undef unless $self->location_condition($inactive_edge,$active_edge);
 
-    my $node = QVD::Admin4::CLI::Parser::Node->new(rule => $active_edge->node->rule); 
+    my %args = (
+	target_structure => $active_edge->node->first_to_find->label, 
+	source_structure => $inactive_edge->node->label,
+	target_substitution => $active_edge->node->first_to_find->substitution, 
+	source_substitution => $inactive_edge->node->substitution );
+    
+    my $substitution = $self->unificator->unify(%args) // return;
+
+    my $node = QVD::Admin4::CLI::Parser::Node->new(rule => $active_edge->node->rule, substitution => $substitution); 
     my $new_edge = QVD::Admin4::CLI::Parser::Edge->new(
 	node => $node, from => $active_edge->from, to => $inactive_edge->to, 
 	to_find => $active_edge->rest_to_find, found => [@{$active_edge->found}] );
     $new_edge->add_found($inactive_edge->node);
-
-    unless ($new_edge->is_active)
-    {
-	my $cb = $new_edge->node->rule->cb;
-	$cb->($new_edge->node,$new_edge->found);
-    }
+    $new_edge->node->percolate_meaning_from_constituents($new_edge->found);
 
     $new_edge;
+}
+
+sub location_condition
+{
+    my ($self,$inactive_edge,$active_edge) = @_;
+    $inactive_edge->from eq $active_edge->to + 1;
 }
 
 1;
