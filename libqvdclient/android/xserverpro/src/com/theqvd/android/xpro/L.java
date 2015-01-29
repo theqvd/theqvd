@@ -24,7 +24,7 @@ package com.theqvd.android.xpro;
  *
  */
 public final class L {
-	public final static String xvncbinary = "Xvncpro";
+	public final static String xvncbinary = "Xvncqvd";
 
 //	here is double effort by rewriting R again, 
 	public static final int r_dummylayout = R.layout.dummylayout;
