@@ -142,6 +142,9 @@ public class Config {
 			Log.e(tag, "Unknown CPU_ABI is neither x86 and not arm*");
 			// TODO throw error here?
 		}
+		//xvnc += specialAndroid22Extension;
+		
+		
 		xvnccmd = xvnc + " :0 -br -nolisten local  -pixelformat rgb888 -pixdepths 1 4 8 15 16 24 32 -PasswordFile="+getTargetdir()+"/etc/vncpasswd";
 		setHeightAndWidth();
 		load_properties();
