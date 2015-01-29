@@ -23,6 +23,7 @@ sub percolate_meaning_from_constituents
 {
     my ($self,$constituents_nodes) = @_;
     my $cb = $self->rule->meaning;
+    
     my @constituents_meaning = map { $_->meaning } @$constituents_nodes;
     $self->{meaning} = $cb->(@constituents_meaning);
 }

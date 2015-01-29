@@ -4,6 +4,8 @@ use warnings;
 use Moo;
 use QVD::Admin4::CLI::Grammar::Rule;
 
+my $ROOT_LABEL = { label => 'ROOT', saturated => 1 };
+
 my $UNKNOWN_TAG = 'UNKNOWN';
 
 my $RULES =
@@ -19,7 +21,7 @@ my $RULES =
  { left_side => { label => 'CMD', saturated => 0 }, 
    right_side => [ { label => 'get', saturated => 1, 
 		     order => 1, in => 1, of => 1, to => 0, with => 0  } ],
-   meaning   => sub { 'get' },
+   meaning   => sub { 'get' }  },
 
  { left_side => { label => 'CMD', saturated => 0 }, 
    right_side => [ { label => 'set', saturated => 1,
@@ -76,7 +78,7 @@ my $RULES =
    right_side => [ { label => 'CMD', saturated => 1, order => 1, in => 0, 
 		     of => 0, to => 0, with => 0 },
                    { label => 'ORDER', saturated => 1 } ],
-   meaning   => sub { my ($c0,$c1) = @_;  {%$c0, order_by => $c1}}},
+   meaning   => sub { my ($c0,$c1) = @_; { %$c0, order_by => $c1}}},
 
 # GET WITH INDIRECT OBJECT 
 
@@ -114,7 +116,7 @@ my $RULES =
    meaning   => sub { 'config' }},
 
  { left_side => { label => 'QVD_OBJECT', saturated => 0 }, 
-   right_side => [ 'tenant' ],
+   right_side => [ { label => 'tenant', saturated => 1 } ],
    meaning   => sub { 'tenant'}},
 
  { left_side => { label => 'QVD_OBJECT', saturated => 0 }, 
@@ -205,7 +207,7 @@ my $RULES =
 
  { left_side => { label => 'ITEM', saturated => 1, feature => 0, coordinated => 0}, 
    right_side => [ { label => $UNKNOWN_TAG, saturated => 1 } ],
-   meaning => sub {my $c0 = shift;  [ $c0 ] }},
+   meaning => sub {my $c0 = shift;  $c0 }},
 
  { left_side => { label => 'ITEM', saturated => 1, feature => 1, coordinated => 0 }, 
    right_side => [ { label => $UNKNOWN_TAG, saturated => 1}, 
@@ -219,25 +221,25 @@ my $RULES =
  { left_side => { label => "ITEM", saturated => 1, feature => '#feature' }, 
    right_side => [ { label => 'NOT', saturated => 1}, 
 		   { label => 'ITEM', saturated => 1, feature => '#feature'}],
-   meaning => sub { my ($c0,$c1) = @_; { operator => $c0, operands => $c1} } },
+   meaning => sub { my ($c0,$c1) = @_; $c1 = [$c1] unless ref($c1)  && ref($c1) eq 'ARRAY'; { operator => $c0, operands => $c1} } },
 
  { left_side => { label => "ITEM", saturated => 0, feature => '#feature', coordinated => 1 }, 
    right_side => [ { label => 'LOP', saturated => 1}, 
 		   { label => 'ITEM', saturated => 1, feature => '#feature'}],
-   meaning => sub { my ($c0,$c1) = @_; { operator => $c0, operands => $c1} } },
+   meaning => sub { my ($c0,$c1) = @_; $c1 = [$c1] unless ref($c1) && ref($c1) eq 'ARRAY'; { operator => $c0, operands => $c1} } },
 
  { left_side => { label => "ITEM", saturated => 1,  feature => '#feature', coordinated => 1 }, 
    right_side => [ { label => 'ITEM', saturated => 1, feature => '#feature', coordinated => 0 }, 
 		   { label => "ITEM", saturated => 0, feature => '#feature'} ],
-   meaning => sub { my ($c0,$c1) = @_; { operands => $c0, %$c1 } } },
+   meaning => sub { my ($c0,$c1) = @_; push @{$c1->{operands}}, $c0; $c1; }},
 
 # Parenthesis
 
- { left_side => { label => "ITEM" saturated => 1, coordinated => 0 }, 
+ { left_side => { label => "ITEM", saturated => 1, coordinated => 0 }, 
    right_side => [ { label => 'OP', saturated => 1}, 
 		   { label => "ITEM", saturated => 1 }, 
 		   { label => 'CP', saturated => 1 } ],
-   meaning => sub { my ($c0,$c1,$c2) = @_; $c1 } },
+   meaning => sub { my ($c0,$c1,$c2) = @_; $c1; }},
 
 
 # PHRASES
@@ -249,14 +251,14 @@ my $RULES =
  { left_side => { label => 'TO', saturated => 1 }, 
    right_side => [ { label => 'to', saturated => 1 }, 
 		   { label =>  "QVD_OBJECT", saturated => 1} ],
-   meaning => sub { my ($c0,$c1) = @_; $c1 } },
+   meaning => sub { my ($c0,$c1) = @_; $c1; }},
 
 # IN
 
  { left_side => { label => 'IN', saturated => 1 }, 
    right_side => [ { label => 'in', saturated => 1}, 
 		   { label =>  "QVD_OBJECT", saturated => 1} ],
-   meaning => sub { my ($c0,$c1) = @_; $c1 }  },
+   meaning => sub { my ($c0,$c1) = @_; $c1; }  },
 
 # ORDER BY PHRASES
 # order by tenant_id,name
@@ -272,19 +274,16 @@ my $RULES =
    right_side => [ { label => 'desc', saturated => 1} ],
    meaning => sub { '-desc' }},
 
- { left_side => { label => 'ORDER', saturated => 0, modified => 0}, 
-   right_side => [ { label => 'order', saturated => 1} ],
-   meaning => sub { 'order' }},
-
- { left_side => { label => 'ORDER', saturated => 0, modified => 1 }, 
-   right_side => [ { label => 'ORDER', saturated => 0, modified => 0 },
-		   { label => 'DIR', saturated => 1} ],
-   meaning => sub { my ($c0,$c1) = @_; { order => $c1 }},
+ { left_side => { label => 'ORDER', saturated => 1 }, 
+   right_side => [ { label => 'order', saturated => 0 },
+		   { label => 'ITEM', saturated => 1, feature => 0 } ],
+   meaning => sub { my ($c0,$c1) = @_;  { field => $c1 }}},
 
  { left_side => { label => 'ORDER', saturated => 1 }, 
-   right_side => [ { label => 'ORDER', saturated => 0 }, 
+   right_side => [ { label => 'order', saturated => 0 },
+		   { label => 'DIR', saturated => 1},  
 		   { label => 'ITEM', saturated => 1, feature => 0 } ],
-   meaning => sub { my ($c0,$c1) = @_;  { %$c0, field => $c1 }} },
+   meaning => sub { my ($c0,$c1,$c2) = @_;  { order => $c1, field => $c2 }}},
 
 # TOP PHRASES (ROOT)
 
@@ -302,10 +301,13 @@ my $RULES =
  { left_side => { label => 'ROOT', saturated => 1 }, 
    right_side => [ { label => "QVD_OBJECT", saturated => 1 },
 		   { label => 'unblock', saturated => 1 } ],
-   meaning => sub { my $c0 = shift; { command => 'update', obj1 => $c0, arguments => { blocked => 0 }}}},
+   meaning => sub { my $c0 = shift; { command => 'update', obj1 => $c0, arguments => { blocked => 0 }}}}
+
 
 
 ];
+
+my $KNOWN_TAGS = {};
 
 sub BUILD
 {
@@ -315,14 +317,15 @@ sub BUILD
     for my $rule_args (@$RULES)
     {
 	my $rule = QVD::Admin4::CLI::Grammar::Rule->new(%$rule_args);
-	push @{$self->{rules}, $rule;
+	$KNOWN_TAGS->{$_->{label}} = 1 for $rule->daughters;
+	push @{$self->{rules}}, $rule;
     }
 }
 
 sub get_rules
 {
     my $self = shift;
-    @{$self->{rules};
+    @{$self->{rules}};
 }
 
 sub unknown_tag
@@ -333,8 +336,29 @@ sub unknown_tag
 sub get_labels_for_string
 {
     my ($self,$string) = @_;
+    my @labels = ({ label => $self->unknown_tag });
+    push @labels, { label => $string } if $self->is_known_tag($string);
 
-    return ({ label => $string }, { label => $self->unknown_tag }); 
+    return @labels;
+}
+
+sub get_meaning_for_string
+{
+    my ($self,$string) = @_;
+    return $string;
+}
+
+sub root
+{
+    my $self = shift;
+    return $ROOT_LABEL;
+}
+
+sub is_known_tag
+{
+    my ($self,$tag) = @_;
+    exists $KNOWN_TAGS->{$tag} ? 
+	return 1 : return 0;
 }
 
 1;

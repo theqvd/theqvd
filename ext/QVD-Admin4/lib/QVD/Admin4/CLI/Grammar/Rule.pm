@@ -5,19 +5,9 @@ use Moo;
 use QVD::Admin4::CLI::Parser::Node;
 use Clone qw(clone);
 
-has 'left_side', is => 'ro', isa => sub { die "Invalid type for attribute left_side" if ref(+shift); }, required => 1;
+has 'left_side', is => 'ro', isa => sub { die "Invalid type for attribute left_side" unless ref(+shift) eq 'HASH'; }, required => 1;
 has 'right_side', is => 'ro', isa => sub { die "Invalid type for attribute right_side" unless ref(+shift) eq 'ARRAY'; }, required => 1;
 has 'meaning', is => 'ro', isa => sub { die "Invalid type for attribute meaning" unless ref(+shift) eq 'CODE';}, required => 1;
-
-sub BUILD
-{
-    my $self = shift;
-
-    my @rs_nodes = 
-	map { QVD::Admin4::CLI::Parser::Node->new(label => $_) } 
-    @{$self->right_side};
-    $self->{right_side} = \@rs_nodes;
-}
 
 sub mother
 {

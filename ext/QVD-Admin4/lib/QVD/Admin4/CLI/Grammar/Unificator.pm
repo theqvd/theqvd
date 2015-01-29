@@ -3,6 +3,7 @@ use strict;
 use warnings;
 use Moo;
 use QVD::Admin4::CLI::Grammar::Substitution;
+use Data::Dumper;
 
 my $VAR = qr/^#[^#]+$/;
 
@@ -15,32 +16,48 @@ sub unify
 
     my $s_subst = $args{source_substitution};
     my $t_subst = $args{target_substitution};
-    while (my ($key,$a_v) = each %$a_str)
+
+    $self->set_substitution($t_subst);
+
+    my $flag = 0;
+
+    while (my ($key,$t_value) = each %$target)
     {
-	my $i_v = $i_str->{$key} // next;
-	my $a_value = $a_subs->subst($a_v);
-	my $i_value = $i_subs->subst($i_v);
-	if ($self->is_var($a_value) 
-	    { $self->substitution->_set($a_value,$i_value); next;}
-	return 0 if $i_value ne $a_value;
+	my $s_value = $source->{$key} // next;
+
+	my $real_t_value = $t_subst->subst($t_value);
+	my $real_s_value = $s_subst->subst($s_value);
+
+	next if $self->is_var($real_s_value);
+
+	if ($self->is_var($real_t_value)) 
+	{ $self->substitution->_set($real_t_value,$real_s_value);  next;}
+
+	if ($real_t_value ne $real_s_value) { $flag = 1; last; }
     }
 
-
-    $self->substitution($target->substitution);
-
-    return $self->substitution;
+    $flag ? return 0 : return $self->substitution;
 }
 
-sub substitution
+sub set_substitution
 {
     my ($self, $old_substitution) = @_;
-    $self->{substitution} //= QVD::Admin4::CLI::Grammar::Substitution->new();
+    $self->{substitution} = QVD::Admin4::CLI::Grammar::Substitution->new();
     
     if ($old_substitution)
     {
 	$self->{substitution}->_set($_,$old_substitution->_get($_))
 	    for $old_substitution->_list;
     }
+    $self->{substitution};
+}
+
+
+sub substitution
+{
+    my $self = shift;
+    $self->set_substitution 
+	unless $self->{substitution}; 
     $self->{substitution};
 }
 

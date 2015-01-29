@@ -10,7 +10,7 @@ use QVD::Admin4::CLI::Parser::Node;
 use QVD::Admin4::CLI::Grammar::Substitution;
 
 has 'unificator', is => 'ro', isa => sub { die "Invalid type for attribute unificator" 
-						  unless ref(+shift) eq 'QVD::Admin4::CLI::Parser::Unificator'; };
+						  unless ref(+shift) eq 'QVD::Admin4::CLI::Grammar::Unificator'; };
 has 'grammar', is => 'ro', isa => sub { die "Invalid type for attribute grammar" 
 						  unless ref(+shift) eq 'QVD::Admin4::CLI::Grammar'; };
 
@@ -42,14 +42,27 @@ sub parse
     my $response = [];
     for my $edge (@{$self->chart->inactive_edges})
     {
-	if ($edge->node->label eq 'ROOT'
+	if ($self->is_root($edge)
 	    && $edge->from eq 0 && $edge->to eq $LAST)
-	{ push @$response, $edge->node->meaning; }
+	{ push @$response, clone $edge->node->meaning ; }
     } 
 
     $response;
 }
 
+sub is_root
+{
+    my ($self,$edge) = @_;
+
+    my %args = (
+	target_structure => clone($self->grammar->root),
+	source_structure => $edge->node->label,
+	target_substitution => QVD::Admin4::CLI::Grammar::Substitution->new(), 
+	source_substitution => $edge->node->substitution );
+
+    my $bool = $self->unificator->unify(%args);
+    $bool ? return 1 : return 0;
+}
 
 sub parse_recursive
 {
@@ -73,16 +86,21 @@ sub get_edges_from_initial_tokens
 {
     my ($self,$tokens) = @_;
     my @edges;
+
     for my $token (@$tokens)
     {
 	$LAST = $token->to if $token->to > $LAST; 
+	my $meaning = $self->grammar->get_meaning_for_string($token->string);
 
 	for my $label ($self->grammar->get_labels_for_string($token->string))
 	{
-	    my $node = QVD::Admin4::CLI::Parser::Node->new(label => $label); 
+	    my $node = QVD::Admin4::CLI::Parser::Node->new(
+		label => $label, 
+		meaning => $meaning,
+		substitution => QVD::Admin4::CLI::Grammar::Substitution->new()); 
 	    my $edge = QVD::Admin4::CLI::Parser::Edge->new(
 		node => $node, from => $token->from, to => $token->to);
-
+	    
 	    push @edges, $edge;
 	}
     }
@@ -97,32 +115,29 @@ sub expand_edge
 
     for my $rule ($self->grammar->get_rules)
     {
-	my $new_edge = $self->expand_edge_aux($edge,$rule);
+	my %args = (
+	    target_structure => clone($rule->first_daughter),
+	    source_structure => $edge->node->label,
+	    target_substitution => QVD::Admin4::CLI::Grammar::Substitution->new(), 
+	    source_substitution => $edge->node->substitution );
+
+	my $substitution = $self->unificator->unify(%args) || next; 
+
+	my $node = QVD::Admin4::CLI::Parser::Node->new(rule => $rule, substitution => $substitution); 
+
+	my $new_edge = QVD::Admin4::CLI::Parser::Edge->new(
+	    node => $node, from => $edge->from, to => $edge->to, 
+	    to_find => [$rule->rest_of_daughters], found => [$edge->node] );
+
+	$new_edge->node->percolate_meaning_from_constituents($new_edge->found) 
+	    unless $new_edge->is_active;
+
 	push @new_edges, $new_edge;
     }
 
     @new_edges;
 }
 
-sub expand_edge_aux
-{
-    my ($self,$edge,$rule) = @_;
-
-    my %args = (
-	target_structure => $rule->first_daughter,
-	source_structure => $edge->node->first_to_find->label,
-	target_substitution => QVD::Admin4::CLI::Grammar::Substitution->new(), 
-	source_substitution => $edge->node->first_to_find->substitution );
-    
-    my $substitution = $self->unificator->unify(%args) // next;
-
-    my $node = QVD::Admin4::CLI::Parser::Node->new(rule => $rule, substitution => $substitution); 
-    my $new_edge = QVD::Admin4::CLI::Parser::Edge->new(
-	node => $node, from => $edge->from, to => $edge->to, 
-	to_find => [$rule->rest_of_daughters], found => [$edge->node] );
-    $new_edge->node->percolate_meaning_from_constituents($new_edge->found);
-    return $new_edge;
-}
 
 sub combine_edge
 {
@@ -167,19 +182,22 @@ sub combine_edge_aux
     return undef unless $self->location_condition($inactive_edge,$active_edge);
 
     my %args = (
-	target_structure => $active_edge->node->first_to_find->label, 
+	target_structure => clone($active_edge->first_to_find), 
 	source_structure => $inactive_edge->node->label,
-	target_substitution => $active_edge->node->first_to_find->substitution, 
+	target_substitution => $active_edge->node->substitution, 
 	source_substitution => $inactive_edge->node->substitution );
     
-    my $substitution = $self->unificator->unify(%args) // return;
+    my $substitution = $self->unificator->unify(%args) || return;
 
     my $node = QVD::Admin4::CLI::Parser::Node->new(rule => $active_edge->node->rule, substitution => $substitution); 
     my $new_edge = QVD::Admin4::CLI::Parser::Edge->new(
 	node => $node, from => $active_edge->from, to => $inactive_edge->to, 
 	to_find => $active_edge->rest_to_find, found => [@{$active_edge->found}] );
+
     $new_edge->add_found($inactive_edge->node);
-    $new_edge->node->percolate_meaning_from_constituents($new_edge->found);
+
+    $new_edge->node->percolate_meaning_from_constituents($new_edge->found)
+	    unless $new_edge->is_active;
 
     $new_edge;
 }

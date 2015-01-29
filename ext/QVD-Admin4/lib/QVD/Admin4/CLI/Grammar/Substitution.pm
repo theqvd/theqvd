@@ -12,7 +12,7 @@ sub BUILD
 sub subst
 {
     my ($self, $k) = @_;
-    exist $self->{items}->{$k} ? 
+    exists $self->{items}->{$k} ? 
 	return $self->{items}->{$k} : $k ;
 } 
 
