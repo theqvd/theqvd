@@ -18,100 +18,83 @@ my $RULES =
 # GET & SET COMMANDS have been implemented as bare words
 # at the beginning of ROOT rules (see the end of the grammar)
 
+
  { left_side => { label => 'CMD', saturated => 0 }, 
    right_side => [ { label => 'get', saturated => 1, 
-		     order => 1, in => 1, of => 1, to => 0, with => 0  } ],
+		     order => 1, of => 1, to => 0, with => 0  } ],
    meaning   => sub { 'get' }  },
 
  { left_side => { label => 'CMD', saturated => 0 }, 
    right_side => [ { label => 'set', saturated => 1,
-		     order => 0, in => 0, of => 0, to => 1, with => 1  } ],
+		     order => 0, of => 0, to => 1, with => 1  } ],
    meaning   => sub { 'update' }},
 
  { left_side => { label => 'CMD', saturated => 0 }, 
    right_side => [ { label => 'new', saturated => 1,
-		     order => 0, in => 0, of => 0, to => 0, with => 1  } ],
+		     order => 0, of => 0, to => 0, with => 1  } ],
    meaning   => sub {  'new' }},
 
  { left_side => { label => 'CMD', saturated => 0 }, 
    right_side => [ { label => 'del', saturated => 1,
-		     order => 0, in => 0, of => 0, to => 0, with => 0  } ],
+		     order => 0, of => 0, to => 0, with => 0  } ],
    meaning   => sub { 'delete' }},
 
  { left_side => { label => 'CMD', saturated => 0 }, 
    right_side => [ { label => 'start', saturated => 1,
-		     order => 0, in => 0, of => 0, to => 0, with => 0  } ],
+		     order => 0, of => 0, to => 0, with => 0  } ],
    meaning   => sub { 'start' }},
 
  { left_side => { label => 'CMD', saturated => 0 } ,
    right_side => [ { label => 'stop', saturated => 1,
-		     order => 0, in => 0, of => 0, to => 0, with => 0  } ],
+		     order => 0, of => 0, to => 0, with => 0  } ],
    meaning   => sub { 'stop' }},
 
  { left_side => { label => 'CMD', saturated => 0 } ,
    right_side => [ { label => 'disconnect', saturated => 1,
-		     order => 0, in => 0, of => 0, to => 0, with => 0  } ],
+		     order => 0, of => 0, to => 0, with => 0  } ],
    meaning   => sub { 'disconnect' }},
 
- { left_side => { label => 'CMD', saturated => 1, order => '#order', in => '#in', 
-		  of => '#of', to => '#to', with => '#with' } ,
+ { left_side => { label => 'CMD', saturated => 1, order => '#order', of => '#of', to => '#to', with => '#with' } ,
    right_side => [ { label => 'QVD_OBJECT', saturated => 1 },
-		   { label => 'CMD', saturated => 0, order => '#order', in => '#in', 
-		     of => '#of', to => '#to', with => '#with' }],
-   meaning   => sub { my ($c0,$c1) = @_; { command => $c1, %$c0};}},
+		   { label => 'CMD', saturated => 0, order => '#order', of => '#of', to => '#to', with => '#with' }],
+   meaning   => sub { my ($c0,$c1) = @_; { command => $c1, obj1 => $c0};}},
 
- { left_side => { label => 'CMD', saturated => 1, order => '#order', in => '#in', 
-		  of => 0, to => 0, with => 0 } ,
+ { left_side => { label => 'CMD', saturated => 1, order => '#order', of => 0, to => 0, with => 0 } ,
    right_side => [ { label => 'QVD_OBJECT', saturated => 1 },
-		   { label => 'CMD', saturated => 0, order => '#order', in => '#in', 
-		     of => 1, to => 0, with => 0 },
+		   { label => 'CMD', saturated => 0, order => '#order', of => 1, to => 0, with => 0 },
                    { label => 'ITEM', saturated => 1, feature => 0 }],
-   meaning   => sub { my ($c0,$c1,$c2) = @_; { command => $c1, fields => $c2, %$c0}}},
+   meaning   => sub { my ($c0,$c1,$c2) = @_; { command => $c1, fields => $c2, obj1 => $c0}}},
+
+# WITH INDIRECT OBJECT 
+
+ { left_side => { label => 'QVD_OBJECT', saturated => 1, in => 0 },
+   right_side => [ { label => 'QVD_OBJECT', saturated => 1, in => 1 },
+                   { label => 'IN', saturated => 1 } ],
+   meaning   => sub { my ($c0,$c1) = @_;  { obj2 => $c1, %$c0}}},
+
 
 ###################
 ###################
 
 # ORDER BY
 
- { left_side => { label => 'CMD', saturated => 1, order => 0, in => 0, 
-		  of => 0, to => 0, with => 0 },
-   right_side => [ { label => 'CMD', saturated => 1, order => 1, in => 0, 
-		     of => 0, to => 0, with => 0 },
+ { left_side => { label => 'CMD', saturated => 1, order => 0, of => 0, with => 0 },
+   right_side => [ { label => 'CMD', saturated => 1, order => 1, of => 0, with => 0 },
                    { label => 'ORDER', saturated => 1 } ],
-   meaning   => sub { my ($c0,$c1) = @_; { %$c0, order_by => $c1}}},
-
-# GET WITH INDIRECT OBJECT 
-
- { left_side => { label => 'CMD', saturated => 1, order => '#order', in => 0, 
-		  of => 0, to => 0, with => 0 },
-   right_side => [ { label => 'CMD', saturated => 1, order => '#order', in => 1, 
-		     of => 0, to => 0, with => 0 },
-                   { label => 'IN', saturated => 1 } ],
-   meaning   => sub { my ($c0,$c1) = @_;  {%$c0, obj2 => $c1}}},
-
-# SET WITH INDIRECT OBJECT
-
- { left_side => { label => 'CMD', saturated => 1, order => 0, in => 0, 
-		  of => 0, to => 0, with => 0 },
-   right_side => [ { label => 'CMD', saturated => 1, order => 0, in => 0, 
-		     of => 0, to => 1 },
-                   { label => 'TO', saturated => 1 } ],
-   meaning   => sub { my ($c0,$c1) = @_; {%$c0, obj2 => $c1}}},
+   meaning   => sub { my ($c0,$c1) = @_; { order_by => $c1, %$c0}}},
 
 # REGULAR SET
 
- { left_side => { label => 'CMD', saturated => 1, order => 0, in => 0, 
-		  of => 0, to => 0, with => 0 },
-   right_side => [ { label => 'CMD', saturated => 1, order => 0, in => 0, 
-		     of => 0, with => 1 },
+ { left_side => { label => 'CMD', saturated => 1, order => 0, of => 0, with => 0 },
+   right_side => [ { label => 'CMD', saturated => 1, order => 0, of => 0, with => 1 },
                    { label => 'ITEM', saturated => 1, feature => 1 } ],
-   meaning   => sub { my ($c0,$c1) = @_; {%$c0, arguments => $c1}}},
+   meaning   => sub { my ($c0,$c1) = @_; { arguments => $c1,  %$c0}}},
 
 # INDIVIDUALS (OBJECTS IN QVD UNIVERSE)
 
 # QVD_OBJECT specified with key/value filters
 
- { left_side => { label => 'CONFIG', saturated => 0 } ,
+ { left_side => { label => 'QVD_OBJECT', saturated => 0 } ,
    right_side => [{ label => 'config', saturated => 1 }],
    meaning   => sub { 'config' }},
 
@@ -161,27 +144,48 @@ my $RULES =
 
  { left_side => { label => "QVD_OBJECT", saturated => 1 }, 
    right_side => [ { label => 'QVD_OBJECT', saturated => 0}, 
-		   { label => "ITEM", saturated => 1, feature => 1} ],
+		   { label => "ITEM", saturated => 1 } ],
    meaning => sub { my ($c0,$c1) = @_; { qvd_object => $c0, filters => $c1 }}},
 
  { left_side => { label => "QVD_OBJECT", saturated => 1 }, 
    right_side => [ { label => 'QVD_OBJECT', saturated => 0}],
    meaning => sub { my $c0 = shift; { qvd_object => $c0}}},
 
+
 # OPERATORS
 # There are operator intended to identify keys with their values '='
 # and operators intended to join sets of key/values or lists of keys or values
 
- { left_side => { label => 'EQUAL', saturated => 1 }, 
+ { left_side => { label => 'RANGE', saturated => 0 }, 
+   right_side => [ { label => '-', saturated => 1 } ],
+   meaning => sub { '-' }},
+
+ { left_side => { label => 'RANGE', saturated => 0 }, 
+   right_side => [ { label => ':', saturated => 1 } ],
+   meaning => sub { '-' }},
+
+ { left_side => { label => 'IDOP', saturated => 1 }, 
    right_side => [ { label => '=', saturated => 1 } ],
    meaning => sub { '=' }},
+
+ { left_side => { label => 'IDOP', saturated => 1 }, 
+   right_side => [ { label => '>', saturated => 1 } ],
+   meaning => sub { '>' }},
+
+ { left_side => { label => 'IDOP', saturated => 1 }, 
+   right_side => [ { label => '<', saturated => 1 } ],
+   meaning => sub { '<' }},
+
+ { left_side => { label => 'IDOP', saturated => 1 }, 
+   right_side => [ { label => '~', saturated => 1 } ],
+   meaning => sub { '~' }},
 
  { left_side => { label => 'LOP', saturated => 1 }, 
    right_side => [ {label => ',', saturated => 1 } ],
    meaning => sub { 'and' }},
 
  { left_side => { label => 'LOP', saturated => 1 }, 
-   right_side => [ {label => '|', saturated => 1 } ],
+   right_side => [ {label => ';', saturated => 1 } ],
    meaning => sub { 'or' }},
 
  { left_side => { label => 'NOT', saturated => 1 }, 
@@ -195,6 +199,14 @@ my $RULES =
  { left_side => { label => 'CP', saturated => 1 }, 
    right_side => [ {label => ')', saturated => 1 } ],
    meaning => sub { ')' }},
+
+ { left_side => { label => 'OB', saturated => 1 }, 
+   right_side => [ { label => '[', saturated => 1 } ],
+   meaning => sub { '[' }},
+
+ { left_side => { label => 'CB', saturated => 1 }, 
+   right_side => [ {label => ']', saturated => 1 } ],
+   meaning => sub { ']' }},
 
 # FILTERS AND ARGUMENTS
 
@@ -211,14 +223,14 @@ my $RULES =
 
  { left_side => { label => 'ITEM', saturated => 1, feature => 1, coordinated => 0 }, 
    right_side => [ { label => $UNKNOWN_TAG, saturated => 1}, 
-		   { label => 'EQUAL', saturated => 1}, 
-		   {label =>  $UNKNOWN_TAG, saturated => 1}],
+		   { label => 'IDOP', saturated => 1}, 
+		   {label => 'ITEM', saturated => 1, feature => 0, coordinated => 0}],
    meaning => sub { my ($c0,$c1,$c2) = @_; { key => $c0, operator => $c1, value => $c2 } }},
 
 
 # Items can be coordinated
 
- { left_side => { label => "ITEM", saturated => 1, feature => '#feature' }, 
+ { left_side => { label => "ITEM", saturated => 1, feature => '#feature', coordinated => 1 }, 
    right_side => [ { label => 'NOT', saturated => 1}, 
 		   { label => 'ITEM', saturated => 1, feature => '#feature'}],
    meaning => sub { my ($c0,$c1) = @_; $c1 = [$c1] unless ref($c1)  && ref($c1) eq 'ARRAY'; { operator => $c0, operands => $c1} } },
@@ -240,6 +252,28 @@ my $RULES =
 		   { label => "ITEM", saturated => 1 }, 
 		   { label => 'CP', saturated => 1 } ],
    meaning => sub { my ($c0,$c1,$c2) = @_; $c1; }},
+
+# Brackets
+
+ { left_side => { label => "ITEM", saturated => 1, coordinated => 0, brackets => 1 }, 
+   right_side => [ { label => 'OB', saturated => 1}, 
+		   { label => "ITEM", saturated => 1, feature => 0, brackets => 0 }, 
+		   { label => 'CB', saturated => 1 } ],
+   meaning => sub { my ($c0,$c1,$c2) = @_; $c1; }},
+
+
+ { left_side => { label => "ITEM", saturated => 1, coordinated => 0, brackets => 1 }, 
+   right_side => [ { label => 'OB', saturated => 1}, 
+		   { label => "RANGE", saturated => 1 }, 
+		   { label => 'CB', saturated => 1 } ],
+   meaning => sub { my ($c0,$c1,$c2) = @_; $c1; }},
+
+ { left_side => { label => "RANGE", saturated => 1 }, 
+   right_side => [ { label => 'ITEM', saturated => 1, feature => 0, coordinated => 0, brackets => 0 },
+		   { label => 'RANGE', saturated => 0}, 
+		   { label => 'ITEM', saturated => 1, feature => 0, coordinated => 0, brackets => 0 }],
+   meaning => sub { my ($c0,$c1,$c2) = @_;  [$c0,$c1,$c2]; }},
+
 
 
 # PHRASES
@@ -301,9 +335,43 @@ my $RULES =
  { left_side => { label => 'ROOT', saturated => 1 }, 
    right_side => [ { label => "QVD_OBJECT", saturated => 1 },
 		   { label => 'unblock', saturated => 1 } ],
-   meaning => sub { my $c0 = shift; { command => 'update', obj1 => $c0, arguments => { blocked => 0 }}}}
+   meaning => sub { my $c0 = shift; { command => 'update', obj1 => $c0, arguments => { blocked => 0 }}}},
 
+ { left_side => { label => 'ROOT', saturated => 1 }, 
+   right_side => [ { label => "QVD_OBJECT", saturated => 1 },
+		   { label => 'set', saturated => 1 },
+		   { label => "QVD_OBJECT", saturated => 1 }],
+   meaning => sub { my ($c0,$c1,$c2) = @_; { command => 'assign', obj1 => $c0, obj2 => $c2}}},
 
+ { left_side => { label => 'ROOT', saturated => 1 }, 
+   right_side => [ { label => "QVD_OBJECT", saturated => 1 },
+		   { label => 'del', saturated => 1 },
+		   { label => "QVD_OBJECT", saturated => 1 }],
+   meaning => sub { my ($c0,$c1,$c2) = @_; { command => 'unassign', obj1 => $c0, obj2 => $c2}}},
+
+ { left_side => { label => 'ROOT', saturated => 1 }, 
+   right_side => [ { label => "QVD_OBJECT", saturated => 1 },
+		   { label => 'assign', saturated => 1 },
+		   { label => "QVD_OBJECT", saturated => 1 }],
+   meaning => sub { my ($c0,$c1,$c2) = @_; { command => 'assign', obj1 => $c0, obj2 => $c2}}},
+
+ { left_side => { label => 'ROOT', saturated => 1 }, 
+   right_side => [ { label => "QVD_OBJECT", saturated => 1 },
+		   { label => 'unassign', saturated => 1 },
+		   { label => "QVD_OBJECT", saturated => 1 }],
+   meaning => sub { my ($c0,$c1,$c2) = @_; { command => 'unassign', obj1 => $c0, obj2 => $c2}}},
+
+ { left_side => { label => 'ROOT', saturated => 1 }, 
+   right_side => [ { label => "QVD_OBJECT", saturated => 1 },
+		   { label => 'tag', saturated => 1 },
+		   { label => "QVD_OBJECT", saturated => 1 }],
+   meaning => sub { my ($c0,$c1,$c2) = @_; { command => 'assign', obj1 => $c0, obj2 => $c2}}},
+
+ { left_side => { label => 'ROOT', saturated => 1 }, 
+   right_side => [ { label => "QVD_OBJECT", saturated => 1 },
+		   { label => 'untag', saturated => 1 },
+		   { label => "QVD_OBJECT", saturated => 1 }],
+   meaning => sub { my ($c0,$c1,$c2) = @_; { command => 'unassign', obj1 => $c0, obj2 => $c2}}}
 
 ];
 

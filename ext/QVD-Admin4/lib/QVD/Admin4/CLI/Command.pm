@@ -3,7 +3,7 @@ use strict;
 use warnings;
 use Text::SimpleTable::AutoWidth;
 use Term::ReadKey;
-
+use Data::Dumper;
 use Exporter qw(import);
 our @EXPORT = qw(run_command read_password);
 
@@ -107,17 +107,31 @@ sub run_command
     my %parsing_args = (
 	tokenizer => $app->cache->get('tokenizer'), 
 	parser => $app->cache->get('parser'));
-
-    my %api_req_args = (
-	login => $app->cache->get('login'), 
-	password => $app->cache->get('password'),
-	sid => $app->cache->get('sid'),
-	url => $app->cache->get('api'),
-	ua =>  $app->cache->get('ua'));
-
     my $query = parse_string($req,%parsing_args);
-    my $res = ask_api($query,%api_req_args);
-    my $sid = $res->json('/sid');
-    $app->cache->set(sid => $sid);
-    print_table($res);
+    print Dumper $query;
 }
+
+#
+#sub run_command 
+#{
+#    my ($app,@args) = @_;
+#    my $req = join(' ',@args);
+#
+#    my %parsing_args = (
+#	tokenizer => $app->cache->get('tokenizer'), 
+#	parser => $app->cache->get('parser'));
+#
+#    my %api_req_args = (
+#	login => $app->cache->get('login'), 
+#	password => $app->cache->get('password'),
+#	sid => $app->cache->get('sid'),
+#	url => $app->cache->get('api'),
+#	ua =>  $app->cache->get('ua'));
+#
+#    my $query = parse_string($req,%parsing_args);
+#    my $res = ask_api($query,%api_req_args);
+#    my $sid = $res->json('/sid');
+#    $app->cache->set(sid => $sid);
+#    print_table($res);
+#}
+#
