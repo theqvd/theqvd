@@ -83,6 +83,7 @@ my $RULES =
                    { label => 'ORDER', saturated => 1 } ],
    meaning   => sub { my ($c0,$c1) = @_; { order_by => $c1, %$c0}}},
 
+
 # REGULAR SET
 
  { left_side => { label => 'CMD', saturated => 1, order => 0, of => 0, with => 0 },
@@ -158,11 +159,11 @@ my $RULES =
 
  { left_side => { label => 'RANGE', saturated => 0 }, 
    right_side => [ { label => '-', saturated => 1 } ],
-   meaning => sub { '-' }},
+   meaning => sub { '-between' }},
 
  { left_side => { label => 'RANGE', saturated => 0 }, 
    right_side => [ { label => ':', saturated => 1 } ],
-   meaning => sub { '-' }},
+   meaning => sub { '-between' }},
 
  { left_side => { label => 'IDOP', saturated => 1 }, 
    right_side => [ { label => '=', saturated => 1 } ],
@@ -177,16 +178,25 @@ my $RULES =
    meaning => sub { '<' }},
 
  { left_side => { label => 'IDOP', saturated => 1 }, 
+   right_side => [ { label => '>=', saturated => 1 } ],
+   meaning => sub { '>=' }},
+
+ { left_side => { label => 'IDOP', saturated => 1 }, 
+   right_side => [ { label => '<=', saturated => 1 } ],
+   meaning => sub { '<=' }},
+
+
+ { left_side => { label => 'IDOP', saturated => 1 }, 
    right_side => [ { label => '~', saturated => 1 } ],
-   meaning => sub { '~' }},
+   meaning => sub { 'LIKE' }},
 
  { left_side => { label => 'LOP', saturated => 1 }, 
    right_side => [ {label => ',', saturated => 1 } ],
-   meaning => sub { 'and' }},
+   meaning => sub { '-and' }},
 
  { left_side => { label => 'LOP', saturated => 1 }, 
    right_side => [ {label => ';', saturated => 1 } ],
-   meaning => sub { 'or' }},
+   meaning => sub { '-or' }},
 
  { left_side => { label => 'NOT', saturated => 1 }, 
    right_side => [ {label => '!', saturated => 1 } ],
@@ -225,15 +235,15 @@ my $RULES =
    right_side => [ { label => $UNKNOWN_TAG, saturated => 1}, 
 		   { label => 'IDOP', saturated => 1}, 
 		   {label => 'ITEM', saturated => 1, feature => 0, coordinated => 0}],
-   meaning => sub { my ($c0,$c1,$c2) = @_; { key => $c0, operator => $c1, value => $c2 } }},
-
+   meaning => sub { my ($c0,$c1,$c2) = @_; return { $c0 =>  { $c1 =>  $c2 }}; }},
 
 # Items can be coordinated
 
  { left_side => { label => "ITEM", saturated => 1, feature => '#feature', coordinated => 1 }, 
    right_side => [ { label => 'NOT', saturated => 1}, 
 		   { label => 'ITEM', saturated => 1, feature => '#feature'}],
-   meaning => sub { my ($c0,$c1) = @_; $c1 = [$c1] unless ref($c1)  && ref($c1) eq 'ARRAY'; { operator => $c0, operands => $c1} } },
+   meaning => sub { no strict; my ($c0,$c1) = @_; $c1 = [$c1] unless ref($c1)  && ref($c1) eq 'ARRAY'; 
+		    return  { $c0 => [ map { ref($_) ? each %$_ : $_ } @$c1 ] }}},
 
  { left_side => { label => "ITEM", saturated => 0, feature => '#feature', coordinated => 1 }, 
    right_side => [ { label => 'LOP', saturated => 1}, 
@@ -243,7 +253,8 @@ my $RULES =
  { left_side => { label => "ITEM", saturated => 1,  feature => '#feature', coordinated => 1 }, 
    right_side => [ { label => 'ITEM', saturated => 1, feature => '#feature', coordinated => 0 }, 
 		   { label => "ITEM", saturated => 0, feature => '#feature'} ],
-   meaning => sub { my ($c0,$c1) = @_; push @{$c1->{operands}}, $c0; $c1; }},
+   meaning => sub { no strict; my ($c0,$c1) = @_; push @{$c1->{operands}}, $c0; 
+		    return { $c1->{operator} => [ map { ref($_) ? each %$_ : $_  } @{$c1->{operands}} ] }; }},
 
 # Parenthesis
 
@@ -264,15 +275,15 @@ my $RULES =
 
  { left_side => { label => "ITEM", saturated => 1, coordinated => 0, brackets => 1 }, 
    right_side => [ { label => 'OB', saturated => 1}, 
-		   { label => "RANGE", saturated => 1 }, 
+		   { label => "RANGE", saturated => 0 }, 
 		   { label => 'CB', saturated => 1 } ],
    meaning => sub { my ($c0,$c1,$c2) = @_; $c1; }},
 
- { left_side => { label => "RANGE", saturated => 1 }, 
+ { left_side => { label => "RANGE", saturated => 0 }, 
    right_side => [ { label => 'ITEM', saturated => 1, feature => 0, coordinated => 0, brackets => 0 },
 		   { label => 'RANGE', saturated => 0}, 
 		   { label => 'ITEM', saturated => 1, feature => 0, coordinated => 0, brackets => 0 }],
-   meaning => sub { my ($c0,$c1,$c2) = @_;  [$c0,$c1,$c2]; }},
+   meaning => sub { my ($c0,$c1,$c2) = @_;  return { $c1 => [$c0,$c2] }}},
 
 
 

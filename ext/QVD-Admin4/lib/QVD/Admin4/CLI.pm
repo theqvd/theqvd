@@ -75,8 +75,7 @@ sub handle_exception
     my ($self,$e) = @_;
 
     my $m = $e->message;
-    $m =~ s/ at .+//;
-    $self->render($m);
+    print $m;
 #    print $self->register_command($self->get_current_command)->usage_text
 #	if ($e->isa('CLI::Framework::Exception::CmdRunException'));
 }
