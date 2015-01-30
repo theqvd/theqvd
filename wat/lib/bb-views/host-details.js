@@ -80,7 +80,7 @@ Wat.Views.HostDetailsView = Wat.Views.DetailsView.extend({
     },
     
     openEditElementDialog: function() {
-        this.dialogConf.title = $.i18n.t('Edit host') + ": " + this.model.get('name');
+        this.dialogConf.title = $.i18n.t('Edit node') + ": " + this.model.get('name');
         
         Wat.Views.DetailsView.prototype.openEditElementDialog.apply(this);
     },

@@ -265,7 +265,7 @@ switch (model.get('state')) {
 
 <table class="details details-list <%= mainTableClass %>">
     <% 
-    if (detailsFields['id'] != undefined) { 
+    if (Wat.C.checkACL('vm.see.id')) {
     %>
         <tr>
             <td><i class="fa fa-male"></i><span data-i18n="Id"></span></td>
@@ -275,7 +275,7 @@ switch (model.get('state')) {
         </tr>  
     <% 
     }
-    if (detailsFields['user'] != undefined) { 
+    if (Wat.C.checkACL('vm.see.user')) {
     %>
         <tr>
             <td><i class="<%= CLASS_ICON_USERS %>"></i><span data-i18n="User"></span></td>
@@ -283,23 +283,47 @@ switch (model.get('state')) {
                 <a href="#/user/<%= model.get('user_id') %>">
                     <%= model.get('user_name') %>
                 </a>
-                    <% 
+                
+                <% 
+                if (Wat.C.checkACL('vm.see.user-state')) { 
                     if (model.get('user_state') == 'connected') {
-                    %>
+                %>
                         (<span data-i18n data-wsupdate="user_state-text" data-id="<%= model.get('id') %>">Connected</span>)
-                    <%
+                <%
                     }
                     else {
-                    %>
+                %>
                         (<span data-i18n data-wsupdate="user_state-text" data-id="<%= model.get('id') %>">Disconnected</span>)
-                    <%
+                <%
                     }
-                    %>
+                }
+                %>
                 </td>
         </tr>  
     <% 
     }
-    if (detailsFields['ip'] != undefined) { 
+    if (!Wat.C.checkACL('vm.see.user') && Wat.C.checkACL('vm.see.user-state')) {
+    %>
+        <tr>
+            <td><i class="fa fa-plug"></i><span data-i18n="User state"></span></td>
+            <td>
+                <% 
+                if (model.get('user_state') == 'connected') {
+                %>
+                    <span data-i18n data-wsupdate="user_state-text" data-id="<%= model.get('id') %>">Connected</span>
+                <%
+                }
+                else {
+                %>
+                    <span data-i18n data-wsupdate="user_state-text" data-id="<%= model.get('id') %>">Disconnected</span>
+                <%
+                }
+                %>
+                </td>
+        </tr>  
+    <% 
+    }
+    if (Wat.C.checkACL('vm.see.ip')) {
     %>
         <tr>
             <td><i class="fa fa-ellipsis-h"></i><span data-i18n="IP address"></span></td>
@@ -309,7 +333,7 @@ switch (model.get('state')) {
         </tr>  
     <% 
     }
-    if (detailsFields['mac'] != undefined) { 
+    if (Wat.C.checkACL('vm.see.mac')) {
     %>
         <tr>
             <td><i class="fa fa-ellipsis-h"></i><span data-i18n="MAC address"></span></td>
@@ -319,7 +343,7 @@ switch (model.get('state')) {
         </tr>  
     <% 
     }
-    if (detailsFields['osf'] != undefined) { 
+    if (Wat.C.checkACL('vm.see.osf')) {
     %>
         <tr>
             <td><i class="<%= CLASS_ICON_OSFS %>"></i><span data-i18n="OS Flavour"></span></td>
@@ -331,7 +355,7 @@ switch (model.get('state')) {
         </tr>
     <% 
     }
-    if (detailsFields['tag'] != undefined) { 
+    if (Wat.C.checkACL('vm.see.di-tag')) {
     %>
         <tr>
             <td><i class="fa fa-tag"></i><span data-i18n="Image tag"></span></td>
@@ -341,7 +365,7 @@ switch (model.get('state')) {
         </tr>
     <% 
     }
-    if (detailsFields['disk_image'] != undefined) { 
+    if (Wat.C.checkACL('vm.see.di')) {
     %>
         <tr>
             <td><i class="<%= CLASS_ICON_DIS %>"></i><span data-i18n="Disk image"></span></td>
@@ -349,11 +373,18 @@ switch (model.get('state')) {
                 <a href="#/di/<%= model.get('di_id') %>">
                     <%= model.get('di_name') %>
                 </a>
+                <%
+                    if (model.get('state') == 'running' && model.get('di_id') != model.get('di_id_in_use')) {
+                %>
+                        <i class="fa fa-warning warning" data-i18n="[title]The virtual machine is running with different image. Restart it to update it to new image"></i>
+                <%
+                    }
+                %>
             </td>
         </tr>
     <% 
     }
-    if (detailsFields['expiration'] != undefined) { 
+    if (Wat.C.checkACL('vm.see.expiration')) {
     %>
         <tr>
             <td><i class="fa fa-warning"></i><span data-i18n="Expiration"></span></td>
@@ -379,11 +410,12 @@ switch (model.get('state')) {
                         
                         $.each (remainingTimes, function (iRema, rema) { 
                             var processedRemainingTime = Wat.U.processRemainingTime(rema.rawTime);
-
+                            
                             remainingTimes[iRema].priorityClass = processedRemainingTime.priorityClass;
                             remainingTimes[iRema].remainingTime = '';
                             remainingTimes[iRema].returnType = processedRemainingTime.returnType;
                             remainingTimes[iRema].remainingTimeAttr = '';
+                            remainingTimes[iRema].expired = processedRemainingTime.expired;
                             
                             switch (processedRemainingTime.returnType) {
                                 case 'exact':
@@ -399,41 +431,60 @@ switch (model.get('state')) {
                                     remainingTimes[iRema].remainingTimeAttr = 'data-years="' + processedRemainingTime.remainingTime + '"';
                                     break;
                             }
-                        });                        
-                %>        
-                    <td class="inner-table">
-                        <table class="expiration-table">
-                            <tbody>
-                                <%
-                                    if (expiration_soft) {
-                                %>
-                                    <tr>
-                                        <td class="<%= remainingTimes.soft.priorityClass %>" data-i18n="Soft"></td>
-                                        <td class="<%= remainingTimes.soft.priorityClass %>"><%= model.get('expiration_soft').replace('T',' ') %></td>
-                                        <td class="<%= remainingTimes.soft.priorityClass %>" <%= remainingTimes.soft.remainingTimeAttr %>><%= remainingTimes.soft.remainingTime %></td>
-                                    </tr>
-                                <%
-                                    }
-                                    if (expiration_hard) {
-                                %>
-                                    <tr>
-                                        <td class="<%= remainingTimes.hard.priorityClass %>" data-i18n="Hard"></td>
-                                        <td class="<%= remainingTimes.hard.priorityClass %>"><%= model.get('expiration_hard').replace('T',' ') %></td>
-                                        <td class="<%= remainingTimes.hard.priorityClass %>" <%= remainingTimes.hard.remainingTimeAttr %>><%= remainingTimes.hard.remainingTime %></td>
-                                    </tr>
-                                <%
-                                    }
-                                %>
-                            </tbody>
-                        </table>
-                    </td>
+                        });
+
+                        if (remainingTimes.hard.expired) {
+                %>
+                            <td><span class="error" data-i18n="Expired"></span></td>
                 <%
+                        }
+                        else {
+                %>
+                            <td class="inner-table">
+                                <table class="expiration-table">
+                                    <tbody>
+                                        <%
+                                            if (expiration_soft) {
+                                        %>
+                                            <tr>
+                                                <td class="<%= remainingTimes.soft.priorityClass %>" data-i18n="Soft"></td>
+                                                <td class="<%= remainingTimes.soft.priorityClass %>"><%= model.get('expiration_soft').replace('T',' ') %></td>
+                                                <%
+                                                if (remainingTimes.soft.expired) {
+                                                %>
+                                                    <td class="<%= remainingTimes.soft.priorityClass %>" <%= remainingTimes.soft.remainingTimeAttr %>><span data-i18n="Expired"></span></td>
+                                                <%
+                                                }
+                                                else {
+                                                %>
+                                                    <td class="<%= remainingTimes.soft.priorityClass %>" <%= remainingTimes.soft.remainingTimeAttr %>><%= remainingTimes.soft.remainingTime %></td>
+                                                <%    
+                                                }
+                                                %>
+                                            </tr>
+                                        <%
+                                            }
+                                            if (expiration_hard) {
+                                        %>
+                                            <tr>
+                                                <td class="<%= remainingTimes.hard.priorityClass %>" data-i18n="Hard"></td>
+                                                <td class="<%= remainingTimes.hard.priorityClass %>"><%= model.get('expiration_hard').replace('T',' ') %></td>
+                                                <td class="<%= remainingTimes.hard.priorityClass %>" <%= remainingTimes.hard.remainingTimeAttr %>><%= remainingTimes.hard.remainingTime %></td>
+                                            </tr>
+                                        <%
+                                            }
+                                        %>
+                                    </tbody>
+                                </table>
+                            </td>
+                <%
+                        }
                     }
                 %>
         </tr>
     <% 
     }
-    if (detailsFields['block'] != undefined) { 
+    if (Wat.C.checkACL('vm.see.block')) {
     %>
         <tr>
             <td><i class="fa fa-lock"></i><span data-i18n="Blocking"></span></td>

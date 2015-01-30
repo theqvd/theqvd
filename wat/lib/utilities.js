@@ -4,6 +4,10 @@ Wat.U = {
             return {};
         }
         
+        if (rawRemainingTime.months == undefined) {
+            rawRemainingTime.months = 0;
+        }
+        
         var priorityClass = '';
         var remainingTime = '';
         var remainingTimeAttr = '';
@@ -33,7 +37,8 @@ Wat.U = {
         return {
             returnType: returnType,
             remainingTime: remainingTime,
-            priorityClass: priorityClass
+            priorityClass: priorityClass,
+            expired: rawRemainingTime.expired
         };
     }
 }

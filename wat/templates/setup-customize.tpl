@@ -38,7 +38,7 @@
                 <option data-i18n="Disk images" value="di" <%= selectedSection == "di" ? 'selected' : '' %>></option>
             <%
             }
-            if (!limitByACLs || Wat.C.checkACL('tenant.see-main.')) {
+            if (Wat.C.isMultitenant() && (Wat.C.isSuperadmin() || Wat.C.isRecoveradmin()) && (!limitByACLs || Wat.C.checkACL('tenant.see-main.'))) {
             %>
                 <option data-i18n="Tenants" value="tenant" <%= selectedSection == "tenant" ? 'selected' : '' %>></option>
             <%

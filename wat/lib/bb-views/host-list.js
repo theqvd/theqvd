@@ -13,7 +13,7 @@ Wat.Views.HostListView = Wat.Views.ListView.extend({
     
     openNewElementDialog: function (e) {
         this.model = new Wat.Models.Host();
-        this.dialogConf.title = $.i18n.t('New host');
+        this.dialogConf.title = $.i18n.t('New Node');
         
         Wat.Views.ListView.prototype.openNewElementDialog.apply(this, [e]);
     },
