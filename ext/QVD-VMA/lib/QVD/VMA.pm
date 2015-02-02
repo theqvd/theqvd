@@ -409,9 +409,9 @@ my %props2nx = ( 'qvd.client.keyboard'   => 'keyboard',
 
 sub _fill_props {
     my (%props) = @_;
-    my $user = $props{'qvd.vm.user.name'}   //= $default_user_name;
+    my $user = $props{'qvd.vm.user.name'} //= $default_user_name;
     $props{'qvd.vm.user.groups'} //= $default_user_groups;
-    $props{'qvd.vm.user.home'} = "$home_path/$user";
+    $props{'qvd.vm.user.home'} //= "$home_path/$user";
     return %props;
 }
 
