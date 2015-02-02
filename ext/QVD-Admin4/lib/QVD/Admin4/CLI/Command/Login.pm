@@ -17,6 +17,7 @@ sub run
     my $login = shift @args;
     $self->cache->set( login => $login );
     my $app = $self->get_app;
+
     my $password = read_password($app);
     $self->cache->set( password => $password );
     $self->cache->set( sid => undef );

@@ -351,11 +351,61 @@ my $AVAILABLE_FILTERS =
 		
     tiny => { default => [qw(tenant_id)], Host => [qw()], Role => [qw(internal fixed)], ACL => [qw(name)], Tenant => [qw(id)], DI_Tag => [qw(tenant_id osf_id)]},
 
-    delete => { default => [qw(id tenant_id)], Host => [qw(id)], ACL => [qw(id)], Role => [qw(id)], Tenant => [qw(id)], Config => [qw(key)]},
+    delete => { default => [qw(id tenant_id)],
 
-    update => { default => [qw(id tenant_id)], Host => [qw(id)], ACL => [qw(id)], Role => [qw(id)], Tenant => [qw(id)], Config => [qw(key)]},
+		Config => [qw(key value)],
 
-    exec => { default => [qw(id tenant_id)], VM => [qw(id tenant_id host_id user_id)]},
+		VM => [qw(storage id name user_id user_name osf_id osf_name di_tag blocked expiration_soft 
+                           expiration_hard state host_id host_name  di_id user_state ip next_boot_ip ssh_port 
+                           vnc_port serial_port tenant_id tenant_name creation_admin creation_date ip_in_use di_id_in_use )],
+
+		 DI_Tag => [qw(osf_id di_id name id tenant_id tenant_name)],
+
+		 User => [qw(id name blocked creation_admin creation_date tenant_id tenant_name )],
+
+		 Host => [qw(id name address blocked frontend backend state vm_id creation_admin creation_date )],
+
+		 DI => [qw(id disk_image version osf_id osf_name tenant_id blocked tenant_name tag)],
+
+		 OSF => [qw(id name overlay user_storage memory vm_id di_id tenant_id tenant_name )],
+
+		 ACL => [qw(id name role_id admin_id )],
+
+		 Role => [qw(name id fixed internal admin_id inheritor_id)],
+
+		 Tenant => [qw(id name language block)],
+
+		 Administrator => [qw(name tenant_id tenant_name role_id acl_id id role_name acl_name language block)] },
+
+    update => { default => [qw(id tenant_id)],
+
+		Config => [qw(key value)],
+
+		VM => [qw(storage id name user_id user_name osf_id osf_name di_tag blocked expiration_soft 
+                           expiration_hard state host_id host_name  di_id user_state ip next_boot_ip ssh_port 
+                           vnc_port serial_port tenant_id tenant_name creation_admin creation_date ip_in_use di_id_in_use )],
+			   
+		DI_Tag => [qw(osf_id di_id name id tenant_id tenant_name)],
+
+		User => [qw(id name blocked creation_admin creation_date tenant_id tenant_name )],
+
+		Host => [qw(id name address blocked frontend backend state vm_id creation_admin creation_date )],
+
+		DI => [qw(id disk_image version osf_id osf_name tenant_id blocked tenant_name tag)],
+
+		OSF => [qw(id name overlay user_storage memory vm_id di_id tenant_id tenant_name )],
+
+		ACL => [qw(id name role_id admin_id )],
+
+		Role => [qw(name id fixed internal admin_id inheritor_id)],
+
+		Tenant => [qw(id name language block)],
+
+		Administrator => [qw(name tenant_id tenant_name role_id acl_id id role_name acl_name language block)]},
+
+    exec => { default => [qw(id tenant_id)], VM => [qw(storage id name user_id user_name osf_id osf_name di_tag blocked expiration_soft 
+                           expiration_hard state host_id host_name  di_id user_state ip next_boot_ip ssh_port 
+                           vnc_port serial_port tenant_id tenant_name creation_admin creation_date ip_in_use di_id_in_use)]},
 
     state => { default => [qw(id tenant_id)], Host => [qw(id)], ACL => [qw(id)], Role => [qw(id)], Tenant => [qw(id)]},
 };
@@ -553,7 +603,7 @@ my $MANDATORY_FILTERS =
 
     delete => { default => [qw(id tenant_id)], Host => [qw(id)], ACL => [qw(id)], Role => [qw(id)], Tenant => [qw(id)], Config => [qw(key)]},
 
-    update=> { default => [qw(id tenant_id)], Host => [qw(id)], ACL => [qw(id)], Role => [qw(id)], Tenant => [qw(id)], Config => [qw(key)]}, 
+    update=> { default => [qw(id tenant_id)], Host => [qw(id)], ACL => [qw(id)], Role => [qw(id)], Tenant => [qw(id)], Config => [qw(key)],VM => [qw()]}, 
 
     exec => { default => [qw(id tenant_id)], VM => [qw()]}, 
 

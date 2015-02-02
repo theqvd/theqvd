@@ -2,6 +2,7 @@ package QVD::Admin4::CLI::Parser::Node;
 use strict;
 use warnings;
 use Moo;
+use Clone qw(clone);
 
 has 'rule',  is => 'ro', isa => sub { die "Invalid type for attribute rule" 
 					  unless ref(+shift) eq 'QVD::Admin4::CLI::Grammar::Rule'; };
@@ -24,7 +25,7 @@ sub percolate_meaning_from_constituents
     my ($self,$constituents_nodes) = @_;
     my $cb = $self->rule->meaning;
     
-    my @constituents_meaning = map { $_->meaning } @$constituents_nodes;
+    my @constituents_meaning = map { clone $_->meaning } @$constituents_nodes;
     $self->{meaning} = $cb->(@constituents_meaning);
 }
 

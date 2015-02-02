@@ -84,19 +84,6 @@ sub json
     { status => 0,message => 'Successful completion',%{$self->result}};
 }
 
-sub is_cli
-{
-    my $self = shift;
-    my $client = $self->json_wrapper->get_parameter_value('__client__'); 
-    defined $client && $client =~ m/^cli$/i;
-}
-
-sub cli_defaults_needed
-{
-    my $self = shift;
-    $self->is_cli && (not $self->json_wrapper->fields_list);
-}
-
 sub specific_fields_asked
 {
     my $self = shift;
@@ -116,9 +103,7 @@ sub calculate_fields
     }
     else
     {
-	@available_fields = $self->cli_defaults_needed ? 
-	    $self->qvd_object_model->default_fields_for_cli :
-	    $self->qvd_object_model->available_fields;
+	@available_fields = $self->qvd_object_model->available_fields;
 	
 	my $admin = $self->qvd_object_model->current_qvd_administrator;
 	@available_fields = grep  { $admin->re_is_allowed_to($self->qvd_object_model->get_acls_for_field($_)) } 

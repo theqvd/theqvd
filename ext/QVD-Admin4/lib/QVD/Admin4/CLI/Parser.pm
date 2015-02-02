@@ -44,7 +44,7 @@ sub parse
     {
 	if ($self->is_root($edge)
 	    && $edge->from eq 0 && $edge->to eq $LAST)
-	{ push @$response, clone $edge->node->meaning ; }
+	{ push @$response, $self->grammar->response(clone $edge->node->meaning) ; }
     } 
 
     $response;
