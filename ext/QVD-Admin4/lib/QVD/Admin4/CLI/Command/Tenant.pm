@@ -6,15 +6,11 @@ use QVD::Admin4::CLI::Command;
 
 sub usage_text { "Wrong syntax my friend!\n" }
 
-
-
 sub run 
 {
     my ($self, $opts, @args) = @_;
-    run_command($self,'tenant',@args);
+    run_cmd($self,'tenant',@args);
 }
-
-
 
 1;
 

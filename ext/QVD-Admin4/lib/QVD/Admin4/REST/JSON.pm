@@ -10,7 +10,7 @@ our $VERSION = '0.01';
 has 'json', is => 'ro', isa => sub { die "Invalid type for attribute json" 
 					 unless ref(+shift) eq 'HASH'; }, required => '1';
 
-my $LOGICAL_OPERATORS = { -and => 1,  -or => 1 };
+my $LOGICAL_OPERATORS = { -and => 1,  -or => 1, -not => 1 };
 
 sub BUILD
 {

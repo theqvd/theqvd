@@ -11,7 +11,7 @@ sub usage_text { "Wrong syntax my friend!\n" }
 sub run 
 {
     my ($self, $opts, @args) = @_;
-    run_command($self,'osf',@args);
+    run_cmd($self,'osf',@args);
 }
 
 

@@ -601,9 +601,9 @@ my $MANDATORY_FILTERS =
 
     tiny => { default => [qw(tenant_id)], Host => [qw()], ACL => [qw()], Role => [qw()], Tenant => [qw()]},
 
-    delete => { default => [qw(id tenant_id)], Host => [qw(id)], ACL => [qw(id)], Role => [qw(id)], Tenant => [qw(id)], Config => [qw(key)]},
+    delete => { default => [qw(id tenant_id)], Host => [qw(id)], ACL => [qw(id)], Role => [qw(id)], Tenant => [qw(id)], Config => [qw(key)], VM => [qw()], DI => [qw()], Role => [qw()], Administrator => [qw()]},
 
-    update=> { default => [qw(id tenant_id)], Host => [qw(id)], ACL => [qw(id)], Role => [qw(id)], Tenant => [qw(id)], Config => [qw(key)],VM => [qw()]}, 
+    update=> { default => [qw(id tenant_id)], Host => [qw(id)], ACL => [qw(id)], Role => [qw(id)], Tenant => [qw(id)], Config => [qw(key)],VM => [qw()], DI => [qw()], Role => [qw()], Administrator => [qw()]}, 
 
     exec => { default => [qw(id tenant_id)], VM => [qw()]}, 
 

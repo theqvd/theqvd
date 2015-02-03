@@ -12,103 +12,99 @@ my $UNKNOWN_TAG = 'UNKNOWN';
 my $RULES =
 [
 
- { left_side => { label => $UNKNOWN_TAG, saturated => 0 }, 
+ { left_side => { label => $UNKNOWN_TAG, saturated => 1 }, 
    right_side => [ { label => 'get', saturated => 1 } ],
    meaning   => sub { 'get' }  },
 
- { left_side => { label => $UNKNOWN_TAG, saturated => 0 }, 
+ { left_side => { label => $UNKNOWN_TAG, saturated => 1 }, 
    right_side => [ { label => 'set', saturated => 1  } ],
    meaning   => sub { 'update' }},
 
- { left_side => { label => $UNKNOWN_TAG, saturated => 0 }, 
+ { left_side => { label => $UNKNOWN_TAG, saturated => 1 }, 
    right_side => [ { label => 'new', saturated => 1  } ],
    meaning   => sub {  'new' }},
 
- { left_side => { label => $UNKNOWN_TAG, saturated => 0 }, 
+ { left_side => { label => $UNKNOWN_TAG, saturated => 1 }, 
    right_side => [ { label => 'del', saturated => 1  } ],
    meaning   => sub { 'delete' }},
 
- { left_side => { label => $UNKNOWN_TAG, saturated => 0 }, 
+ { left_side => { label => $UNKNOWN_TAG, saturated => 1 }, 
    right_side => [ { label => 'start', saturated => 1  } ],
    meaning   => sub { 'start' }},
 
- { left_side => { label => $UNKNOWN_TAG, saturated => 0 } ,
+ { left_side => { label => $UNKNOWN_TAG, saturated => 1 } ,
    right_side => [ { label => 'stop', saturated => 1  } ],
    meaning   => sub { 'stop' }},
 
- { left_side => { label => $UNKNOWN_TAG, saturated => 0 } ,
+ { left_side => { label => $UNKNOWN_TAG, saturated => 1 } ,
    right_side => [ { label => 'disconnect', saturated => 1  } ],
    meaning   => sub { 'disconnect' }},
 
- { left_side => { label => $UNKNOWN_TAG, saturated => 0 }, 
+ { left_side => { label => $UNKNOWN_TAG, saturated => 1 }, 
    right_side => [ { label => 'block', saturated => 1 } ],
    meaning   => sub { 'block' }  },
 
- { left_side => { label => $UNKNOWN_TAG, saturated => 0 }, 
+ { left_side => { label => $UNKNOWN_TAG, saturated => 1 }, 
    right_side => [ { label => 'unblock', saturated => 1 } ],
    meaning   => sub { 'unblock' }  },
 
- { left_side => { label => $UNKNOWN_TAG, saturated => 0 }, 
+ { left_side => { label => $UNKNOWN_TAG, saturated => 1 }, 
    right_side => [ { label => 'assign', saturated => 1 } ],
    meaning   => sub { 'assign' }  },
 
- { left_side => { label => $UNKNOWN_TAG, saturated => 0 }, 
+ { left_side => { label => $UNKNOWN_TAG, saturated => 1 }, 
    right_side => [ { label => 'unassign', saturated => 1 } ],
    meaning   => sub { 'unassign' }  },
 
- { left_side => { label => $UNKNOWN_TAG, saturated => 0 }, 
+ { left_side => { label => $UNKNOWN_TAG, saturated => 1 }, 
    right_side => [ { label => 'tag', saturated => 1 } ],
    meaning   => sub { 'tag' }  },
 
- { left_side => { label => $UNKNOWN_TAG, saturated => 0 }, 
+ { left_side => { label => $UNKNOWN_TAG, saturated => 1 }, 
    right_side => [ { label => 'untag', saturated => 1 } ],
    meaning   => sub { 'untag' }  },
 
- { left_side => { label => $UNKNOWN_TAG, saturated => 0 } ,
+ { left_side => { label => $UNKNOWN_TAG, saturated => 1 } ,
    right_side => [{ label => 'config', saturated => 1 }],
    meaning   => sub { 'config' }},
 
- { left_side => { label => $UNKNOWN_TAG, saturated => 0 }, 
+ { left_side => { label => $UNKNOWN_TAG, saturated => 1 }, 
    right_side => [ { label => 'tenant', saturated => 1 } ],
    meaning   => sub { 'tenant'}},
 
- { left_side => { label => $UNKNOWN_TAG, saturated => 0 }, 
+ { left_side => { label => $UNKNOWN_TAG, saturated => 1 }, 
    right_side => [ { label => 'role', saturated => 1 } ],
    meaning   => sub {'role'}},
 
- { left_side => { label => $UNKNOWN_TAG, , saturated => 0 }, 
+ { left_side => { label => $UNKNOWN_TAG, , saturated => 1 }, 
    right_side => [ { label => 'acl', saturated => 1 } ],
    meaning   => sub {'acl'}},
 
- { left_side => { label => $UNKNOWN_TAG, saturated => 0 } ,
+ { left_side => { label => $UNKNOWN_TAG, saturated => 1 } ,
    right_side => [ { label => 'admin', saturated => 1 } ],
    meaning   => sub { 'admin' }},
 
- { left_side => { label => $UNKNOWN_TAG, saturated => 0 } ,
-   right_side => [ { label => 'tag', saturated => 1 } ],
-   meaning   => sub { 'di_tag'} },
-
- { left_side => { label => $UNKNOWN_TAG, saturated => 0 }, 
+ { left_side => { label => $UNKNOWN_TAG, saturated => 1 }, 
    right_side => [ { label => 'property', saturated => 1 } ],
    meaning   => sub { 'property' }},
 
- { left_side => { label => $UNKNOWN_TAG, saturated => 0 }, 
+ { left_side => { label => $UNKNOWN_TAG, saturated => 1 }, 
    right_side => [ { label => 'vm', saturated => 1 } ],
    meaning   => sub { 'vm'}},
 
- { left_side => { label => $UNKNOWN_TAG, saturated => 0 }, 
+ { left_side => { label => $UNKNOWN_TAG, saturated => 1 }, 
    right_side => [ { label => 'user', saturated => 1 } ],
    meaning   => sub { 'user'}},
 
- { left_side => { label => $UNKNOWN_TAG, saturated => 0 }, 
+ { left_side => { label => $UNKNOWN_TAG, saturated => 1 }, 
    right_side => [ { label => 'host', saturated => 1 } ],
    meaning   => sub { 'host'}},
 
- { left_side => { label => $UNKNOWN_TAG, saturated => 0 }, 
+ { left_side => { label => $UNKNOWN_TAG, saturated => 1 }, 
    right_side => [ { label => 'osf', saturated => 1 } ],
    meaning   => sub {'osf'}},
 
- { left_side => { label => $UNKNOWN_TAG, saturated => 0 }, 
+ { left_side => { label => $UNKNOWN_TAG, saturated => 1 }, 
    right_side => [ { label => 'di', saturated => 1 } ],
    meaning   => sub {'di'}},
 
@@ -133,7 +129,7 @@ my $RULES =
  { left_side => { label => 'CMD', saturated => 0 }, 
    right_side => [ { label => 'new', saturated => 1,
 		     order => 0, of => 0, to => 0, with => 1  } ],
-   meaning   => sub {  'new' }},
+   meaning   => sub {  'create' }},
 
  { left_side => { label => 'CMD', saturated => 0 }, 
    right_side => [ { label => 'del', saturated => 1,
@@ -216,14 +212,6 @@ my $RULES =
    right_side => [ { label => 'admin', saturated => 1 } ],
    meaning   => sub { 'admin' }},
 
- { left_side => { label => 'QVD_OBJECT', saturated => 0 } ,
-   right_side => [ { label => 'tag', saturated => 1 } ],
-   meaning   => sub { 'di_tag'} },
-
- { left_side => { label => 'QVD_OBJECT', saturated => 0 }, 
-   right_side => [ { label => 'property', saturated => 1 } ],
-   meaning   => sub { 'property' }},
-
  { left_side => { label => 'QVD_OBJECT', saturated => 0 }, 
    right_side => [ { label => 'vm', saturated => 1 } ],
    meaning   => sub { 'vm'}},
@@ -252,7 +240,7 @@ my $RULES =
  { left_side => { label => "QVD_OBJECT", saturated => 1 }, 
    right_side => [ { label => 'QVD_OBJECT', saturated => 0}, 
 		   { label => "ITEM", saturated => 1, feature => 0 } ],
-   meaning => sub { my ($c0,$c1) = @_; { qvd_object => $c0, filters => { name => [ fields($c1,'-and') ] } }}},
+   meaning => sub { my ($c0,$c1) = @_; { qvd_object => $c0, filters => { name => { '=' => [ fields($c1,'-and') ] }} }}},
 
  { left_side => { label => "QVD_OBJECT", saturated => 1 }, 
    right_side => [ { label => 'QVD_OBJECT', saturated => 0}],
@@ -291,7 +279,6 @@ my $RULES =
    right_side => [ { label => '<=', saturated => 1 } ],
    meaning => sub { '<=' }},
 
-
  { left_side => { label => 'IDOP', saturated => 1 }, 
    right_side => [ { label => '~', saturated => 1 } ],
    meaning => sub { 'LIKE' }},
@@ -306,7 +293,7 @@ my $RULES =
 
  { left_side => { label => 'NOT', saturated => 1 }, 
    right_side => [ {label => '!', saturated => 1 } ],
-   meaning => sub { 'not' }},
+   meaning => sub { '-not' }},
 
  { left_side => { label => 'OP', saturated => 1 }, 
    right_side => [ { label => '(', saturated => 1 } ],
@@ -363,7 +350,7 @@ my $RULES =
    right_side => [ { label => 'ITEM', saturated => 1, feature => '#feature', coordinated => 0 }, 
 		   { label => "ITEM", saturated => 0, feature => '#feature'} ],
    meaning => sub { no strict; my ($c0,$c1) = @_; push @{$c1->{operands}}, $c0; 
-		    return { $c1->{operator} => [ map { ref($_) ? each %$_ : $_  } @{$c1->{operands}} ] }; }},
+		    return { $c1->{operator} => [ map { ref($_) && ref($_) eq 'HASH' ? each %$_ : $_  } @{$c1->{operands}} ] }; }},
 
 # Parenthesis
 
@@ -431,13 +418,13 @@ my $RULES =
  { left_side => { label => 'ORDER', saturated => 1 }, 
    right_side => [ { label => 'order', saturated => 0 },
 		   { label => 'ITEM', saturated => 1, feature => 0 } ],
-   meaning => sub { my ($c0,$c1) = @_;  { field => [ fields($c1,'-and') ] }}},
+   meaning => sub { my ($c0,$c1) = @_;  { field => [ reverse fields($c1,'-and') ] }}},
 
  { left_side => { label => 'ORDER', saturated => 1 }, 
    right_side => [ { label => 'order', saturated => 0 },
 		   { label => 'DIR', saturated => 1},  
 		   { label => 'ITEM', saturated => 1, feature => 0 } ],
-   meaning => sub { my ($c0,$c1,$c2) = @_;  { order => $c1, field => $c2 }}},
+   meaning => sub { my ($c0,$c1,$c2) = @_;  { order => $c1, field => [ reverse fields($c2,'-and') ] }}},
 
 # TOP PHRASES (ROOT)
 
@@ -460,38 +447,59 @@ my $RULES =
  { left_side => { label => 'ROOT', saturated => 1 }, 
    right_side => [ { label => "QVD_OBJECT", saturated => 1 },
 		   { label => 'set', saturated => 1 },
-		   { label => "QVD_OBJECT", saturated => 1 }],
-   meaning => sub { my ($c0,$c1,$c2) = @_; { command => 'assign', obj1 => $c0, obj2 => $c2}}},
+		   { label => "property", saturated => 1 },
+                   { label => "ITEM", saturated => 1, feature => 1 }],
+   meaning => sub { my ($c0,$c1,$c2,$c3) = @_; { command => 'update', obj1 => $c0, arguments => { __properties_changes__ => { set => { arguments($c3,'-and','=') } }}}}},
 
  { left_side => { label => 'ROOT', saturated => 1 }, 
    right_side => [ { label => "QVD_OBJECT", saturated => 1 },
 		   { label => 'del', saturated => 1 },
-		   { label => "QVD_OBJECT", saturated => 1 }],
-   meaning => sub { my ($c0,$c1,$c2) = @_; { command => 'unassign', obj1 => $c0, obj2 => $c2}}},
-
- { left_side => { label => 'ROOT', saturated => 1 }, 
-   right_side => [ { label => "QVD_OBJECT", saturated => 1 },
-		   { label => 'assign', saturated => 1 },
-		   { label => "QVD_OBJECT", saturated => 1 }],
-   meaning => sub { my ($c0,$c1,$c2) = @_; { command => 'assign', obj1 => $c0, obj2 => $c2}}},
-
- { left_side => { label => 'ROOT', saturated => 1 }, 
-   right_side => [ { label => "QVD_OBJECT", saturated => 1 },
-		   { label => 'unassign', saturated => 1 },
-		   { label => "QVD_OBJECT", saturated => 1 }],
-   meaning => sub { my ($c0,$c1,$c2) = @_; { command => 'unassign', obj1 => $c0, obj2 => $c2}}},
+		   { label => "property", saturated => 1 },
+                   { label => "ITEM", saturated => 1, feature => 0 }],
+   meaning => sub { my ($c0,$c1,$c2,$c3) = @_; { command => 'update', obj1 => $c0, arguments => { __properties_changes__ => { delete => [ fields($c3,'-and') ] }}}}},
 
  { left_side => { label => 'ROOT', saturated => 1 }, 
    right_side => [ { label => "QVD_OBJECT", saturated => 1 },
 		   { label => 'tag', saturated => 1 },
-		   { label => "QVD_OBJECT", saturated => 1 }],
-   meaning => sub { my ($c0,$c1,$c2) = @_; { command => 'assign', obj1 => $c0, obj2 => $c2}}},
+                   { label => "ITEM", saturated => 1, feature => 0 }],
+   meaning => sub { my ($c0,$c1,$c2) = @_; { command => 'update', obj1 => $c0, arguments => { __tags_changes__ => { create => [fields($c2,'-and')] }}}}},
 
  { left_side => { label => 'ROOT', saturated => 1 }, 
    right_side => [ { label => "QVD_OBJECT", saturated => 1 },
 		   { label => 'untag', saturated => 1 },
-		   { label => "QVD_OBJECT", saturated => 1 }],
-   meaning => sub { my ($c0,$c1,$c2) = @_; { command => 'unassign', obj1 => $c0, obj2 => $c2}}}
+                   { label => "ITEM", saturated => 1, feature => 0 }],
+   meaning => sub { my ($c0,$c1,$c2) = @_; { command => 'update', obj1 => $c0, arguments => { __tags_changes__ => { delete => [ fields($c2,'-and') ] }}}}},
+
+################
+
+ { left_side => { label => 'ROOT', saturated => 1 }, 
+   right_side => [ { label => "QVD_OBJECT", saturated => 1 },
+		   { label => 'assign', saturated => 1 },
+		   { label => "acl", saturated => 1 },
+                   { label => "ITEM", saturated => 1, feature => 0 }],
+   meaning => sub { my ($c0,$c1,$c2,$c3) = @_; { command => 'update', obj1 => $c0, arguments => { __acls_changes__ => { assign_acls => [ fields($c3,'-and') ] }}}}},
+
+ { left_side => { label => 'ROOT', saturated => 1 }, 
+   right_side => [ { label => "QVD_OBJECT", saturated => 1 },
+		   { label => 'unassign', saturated => 1 },
+		   { label => "acl", saturated => 1 },
+                   { label => "ITEM", saturated => 1, feature => 0 }],
+   meaning => sub { my ($c0,$c1,$c2,$c3) = @_; { command => 'update', obj1 => $c0, arguments => { __acls_changes__ => { unassign_acls => [ fields($c3,'-and') ] }}}}},
+
+ { left_side => { label => 'ROOT', saturated => 1 }, 
+   right_side => [ { label => "QVD_OBJECT", saturated => 1 },
+		   { label => 'assign', saturated => 1 },
+		   { label => "role", saturated => 1 },
+                   { label => "ITEM", saturated => 1, feature => 0 }],
+   meaning => sub { my ($c0,$c1,$c2,$c3) = @_; { command => 'update', obj1 => $c0, arguments => { __roles_changes__ => { assign_roles => [ fields($c3,'-and') ] }}}}},
+
+ { left_side => { label => 'ROOT', saturated => 1 }, 
+   right_side => [ { label => "QVD_OBJECT", saturated => 1 },
+		   { label => 'unassign', saturated => 1 },
+		   { label => "role", saturated => 1 },
+                   { label => "ITEM", saturated => 1, feature => 0 }],
+   meaning => sub { my ($c0,$c1,$c2,$c3) = @_; { command => 'update', obj1 => $c0, arguments => { __roles_changes__ => { unassign_roles => [ fields($c3,'-and') ] }}}}},
+
 
 ];
 
@@ -554,7 +562,8 @@ sub fields
 {
     my ($item,$OPERATOR) = @_;
     return $item unless ref($item);
-    die "Bad item in fields"  if ref($item) eq 'HASH' && 
+
+    return ()  if ref($item) eq 'HASH' && 
 	(not exists $item->{$OPERATOR});
     return fields($item->{$OPERATOR},$OPERATOR) if ref($item) eq 'HASH' 
 	&& (exists $item->{$OPERATOR});
@@ -584,7 +593,7 @@ sub arguments
 	return map { arguments($_,$AND,$EQUAL) } @$item;
     }
 
-    die "Bad item in arguments";
+    return ();
 }
 
 sub response

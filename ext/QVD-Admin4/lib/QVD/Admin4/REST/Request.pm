@@ -28,7 +28,7 @@ has 'related_views', is => 'ro', isa => sub { die "Invalid type for attribute re
 
 my $ADMIN;
 my $DBConfigProvider;
-my $LOGICAL_OPERATORS = { -and => 1,  -or => 1 };
+my $LOGICAL_OPERATORS = { -and => 1,  -or => 1, -not => 1 };
 
 sub BUILD 
 {
@@ -373,7 +373,7 @@ sub check_update_arguments_validity_in_json
 	for $self->json_wrapper->arguments_list;
 
     my $id = $self->json_wrapper->get_filter_value('id');
-    my ($method,$code) = ref($id) && scalar @$id > 1 ? 
+    my ($method,$code) = ref($id) && ref($id) eq 'ARRAY' && scalar @$id > 1 ? 
 	('get_acls_for_argument_in_massive_update',4240) : 
 	('get_acls_for_argument_in_update',4230) ;
 
@@ -411,7 +411,7 @@ sub check_nested_queries_validity_in_json
     elsif ($type_of_action eq 'update')
     {
 	my $id = $self->json_wrapper->get_filter_value('id');
-	($method,$code) = ref($id) && scalar @$id > 1 ? 
+	($method,$code) = ref($id) && ref($id) eq 'ARRAY' && scalar @$id > 1 ? 
 	    ('get_acls_for_nested_query_in_massive_update',4240) : 
 	    ('get_acls_for_nested_query_in_update',4230) ;
     }
@@ -511,17 +511,27 @@ sub map_key_value_filter
 
     my $key_dbix_format = 
 	$self->qvd_object_model->map_filter_to_dbix_format($key);
+    my $value_normalized;
 
-    my $value_normalized = $self->qvd_object_model->normalize_value($key,$value);
+    if (ref($value) && ref($value) eq 'HASH') #Ad Hoc identitity operators allowed
+    {
+	my ($operator,$real_value) = each %$value; #FIX ME: Operator availability checking needed!!
+	$value_normalized = 
+	{ $operator => $self->qvd_object_model->normalize_value($key,$real_value) };
+    }
+    else 
+    {
+	$value_normalized = $self->qvd_object_model->normalize_value($key,$value);
+	if ($self->qvd_object_model->subchain_filter($key))
+	{
+	    $value_normalized = { ILIKE => "%".$value_normalized."%"};
+	}
+	elsif ($self->qvd_object_model->commodin_filter($key))
+	{
+	    $value_normalized = { ILIKE => $value_normalized }; 
+	}
+    }
 
-    if ($self->qvd_object_model->subchain_filter($key))
-    {
-	$value_normalized = { ILIKE => "%".$value_normalized."%"};
-    }
-    elsif ($self->qvd_object_model->commodin_filter($key))
-    {
-	$value_normalized = { ILIKE => $value_normalized }; 
-    }
     return ($key_dbix_format,$value_normalized);
 }
 

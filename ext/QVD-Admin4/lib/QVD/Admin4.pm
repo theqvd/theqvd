@@ -284,13 +284,25 @@ sub tags_delete
     }
 }
 
+sub roles_as_ids
+{
+    my ($self,$roles) = @_;
+    return $self->as_ids($roles,'roles');
+}
+
 sub acls_as_ids
 {
     my ($self,$acls) = @_;
+    return $self->as_ids($acls,'acls');
+}
+
+sub as_ids
+{
+    my ($self,$ids_or_names,$qvd_object) = @_;
     my ($as_ids_flag, $as_names_flag) = (0,0);
   
-    $_ =~ /^[0-9]+$/ ? $as_ids_flag = 1 : $as_names_flag = 1 for @$acls;
-    QVD::Admin4::Exception->throw(code => 6360, query => 'acls') 
+    $_ =~ /^[0-9]+$/ ? $as_ids_flag = 1 : $as_names_flag = 1 for @$ids_or_names;
+    QVD::Admin4::Exception->throw(code => 6360, query => $qvd_object) 
 	if $as_ids_flag && $as_names_flag;
     $as_ids_flag;
 }
@@ -299,6 +311,12 @@ sub get_acls_names_from_acls_ids
 {
     my ($self,$acls_ids) = @_;
     [ map { $_->name }  $DB->resultset('ACL')->search({id => $acls_ids})->all ]
+}
+
+sub get_roles_ids_from_roles_names
+{
+    my ($self,$roles_names) = @_;
+    [ map { $_->id }  $DB->resultset('Role')->search({name => $roles_names})->all ]
 }
 
 sub add_acls_to_role
@@ -347,7 +365,10 @@ sub add_roles_to_role
 {
     my ($self,$roles_to_assign,$this_role) = @_;
 
-    for my $role_to_assign_id (@$roles_to_assign)
+    my $roles_ids = $self->roles_as_ids($roles_to_assign) ? 
+	$roles_to_assign : $self->get_roles_ids_from_roles_names($roles_to_assign);
+
+    for my $role_to_assign_id (@$roles_ids)
     {
 	$role_to_assign_id = undef if defined $role_to_assign_id && $role_to_assign_id eq '';
 	$self->assign_role_to_role($this_role,$role_to_assign_id);
@@ -468,8 +489,11 @@ sub del_roles_to_admin
 {
     my ($self,$role_ids,$admin) = @_;
 
+    my $ids = $self->roles_as_ids($role_ids) ? 
+	$role_ids : $self->get_roles_ids_from_roles_names($role_ids);
+
     eval { $DB->resultset('Role_Administrator_Relation')->search(
-	       {role_id => $role_ids,
+	       {role_id => $ids,
 		administrator_id => $admin->id})->delete_all };
     QVD::Admin4::Exception->throw(exception => $@, 
 				  query => 'roles') if $@;
@@ -479,7 +503,11 @@ sub add_roles_to_admin
 {
     my ($self,$role_ids,$admin) = @_;
 
-    for my $role_id (@$role_ids)
+    my $ids = $self->roles_as_ids($role_ids) ? 
+	$role_ids : $self->get_roles_ids_from_roles_names($role_ids);
+
+
+    for my $role_id (@$ids)
     {
 	eval
 	{

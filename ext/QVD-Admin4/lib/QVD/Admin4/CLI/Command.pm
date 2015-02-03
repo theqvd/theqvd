@@ -7,123 +7,6 @@ use Exporter qw(import);
 our @EXPORT = qw(parse_string read_password print_table ask_api
                  related_qvd_object default_fields action fields nested_queryx);
 
-my $NESTED_QUERIES =
-{
-    vm =>  {  assign => { property => sub { my $prop = shift; 
-					    return { __property_changes__ => { set => $prop }}}},
-	      unassign => { property => sub { my $prop = shift; 
-					      return { __property_changes__ => { delete => $prop }}}}
-    },
-};
-
-my $RELATED_QVD_OBJECTS =
-{
-    vm =>  {  tenant => 'tenant_id',
-	      di_tag => 'di_tag',
-	      user => 'user_id',
-	      host => 'host_id',
-	      osf => 'osf_id',
-	      di => 'di_id' },
-};
-
-my $CLI_RESPONSE_TO_API_REQUEST =
-{
-    vm => {  ids => 'vm_all_ids',
-	     get => 'vm_get_list',
-	     update => 'vm_update',
-	     create => 'vm_create',
-	     delete => 'vm_delete',
-	     start => 'vm_start',
-	     stop => 'vm_stop',
-	     disconnect => 'vm_user_disconnect',
-	     block => 'vm_update',
-	     unblock => 'vm_update',
-	     assign => 'vm_update',
-	     unassign => 'vm_update'},
-
-    tenant => {  ids => 'tenant_all_ids',
-		 get => 'tenant_get_list' },
-    di_tag => {  ids => 'tag_all_ids',
-		 get => 'tag_get_list' },
-    user => {  ids => 'user_all_ids',
-	       get => 'user_get_list' },
-    host => {  ids => 'host_all_ids',
-	       get => 'host_get_list' },
-    osf => {  ids => 'osf_all_ids',
-	    get => 'osf_get_list' },
-    di => {  ids => 'di_all_ids',
-	     get => 'di_get_list' },
-};
-
-my $API_RESPONSE_TO_CLI_RESPONSE =
-{
-    default => sub { my ($res,$field) = @_; return $res->{$field}},
-
-    vm => { id => sub { my $res = shift; return $res->{id}; },
-	    tenant => sub { my $res = shift; return $res->{tenant_name}; },
-	    name => sub { my $res = shift; return $res->{name}; },
-	    blocked => sub { my $res = shift; return $res->{blocked}; },
-	    user => sub { my $res = shift; return $res->{user_name}; },
-	    host => sub { my $res = shift; return $res->{host_name}; },
-	    di => sub { my $res = shift; return $res->{di_name}; },
-	    ip => sub { my $res = shift; return $res->{ip}; },
-	    "ip in use" => sub { my $res = shift; return $res->{ip_in_use}; },
-	    "di in use" => sub { my $res = shift; return $res->{di_name_in_use}; },
-	    state => sub { my $res = shift; return $res->{state}; },
-	    "user state" => sub { my $res = shift; return $res->{user_state}; }
-    },
-};
-
-
-my $DEFAULT_FIELDS = 
-{
-    vm => [ qw( id tenant name blocked user host di ip ),  "ip in use", "di in use", "state", "user state" ]
-};
-
-#####################
-## VARS MANAGEMENT ##
-#####################
-
-sub related_qvd_object
-{
-    my ($obj1,$obj2) = @_;
-    my $link_filter = eval { $RELATED_QVD_OBJECTS->{$obj1}->{$obj2} } 
-    // undef;
-}
-
-sub default_fields
-{
-    my ($obj) = @_;
-    my $fields = eval { $DEFAULT_FIELDS->{$obj} } // []; 
-    @$fields;
-}
-
-sub action
-{
-    my ($obj,$cmd) = @_;
-    my $action = eval { $CLI_RESPONSE_TO_API_REQUEST->{$obj}->{$cmd} } 
-    // undef; 
-}
-
-sub fields
-{
-    my ($res,$obj,@fields) = @_;
-
-    for my $field (@fields)
-    {
-	my $cb =  eval { $API_RESPONSE_TO_CLI_RESPONSE->{$obj}->{$field} } //
-	    $API_RESPONSE_TO_CLI_RESPONSE->{default};
-	$field = eval { $cb->($res,$field) } // '';
-    }
-    @fields;
-}
-
-sub nested_query
-{
-    my ($obj1,$cmd,$obj2,$value) = @_;
-    my $cb = eval { $NESTED_QUERIES->{$obj1}->{$cmd}->{$obj2} } // return undef;
-    my $nq = eval { $cb->($value) } // undef;
-} 
 
 ###############
 ## UTILITIES ##
@@ -139,35 +22,71 @@ sub read_password
     $pass;
 }
 
-sub print_table
+sub run_cmd 
+{
+    my ($self, $opts, @args) = @_;
+
+    my $parsing = parse_string($self,@args);
+
+    my $query = 
+    { action => $parsing->action,
+      filters => $parsing->filters, 
+      order_by => $parsing->order, 
+      arguments => $parsing->arguments};
+
+    if ($parsing->has_indirect_object)
+    {
+	my $related_query = 
+	{ action => $parsing->action_to_get_indirect_object,
+	  filters => $parsing->indirect_object->filters };
+
+	my $related_res = ask_api($self,$related_query);
+	my $ids = $related_res->json('/rows');
+	$query->{filters}->{$self->link_to_indirect_object} = $ids;
+    }
+
+    my $res = ask_api($self,$query);
+  
+    $parsing->fields && $res->json('/total') ?
+	print_table($res,$parsing) : print_count($res);
+}
+
+sub print_count
 {
     my $res = shift;
-    my $obj = shift;
-    my $time = shift;
-    my @keys = @_;
+    print  "Total: ".$res->json('/total')."\n";
+}
 
-    my $n = 0;
-    my $status     = $res->json('/status') // '';
-    my $message    = $res->json('/message') // '';
-    my $properties = $res->json("/rows/$n");
-    
+sub print_table
+{
+    my ($res,$parsing) = @_;
+    my $n = 0;    
+    my @fields = $parsing->fields;
+    my @cbs = map { $parsing->cb_to_get_field_value($_) } @fields;
+
     my $tb = Text::SimpleTable::AutoWidth->new();
     $tb->max_width(500);
-    $tb->captions(\@keys);
-    use Data::Dumper; print Dumper \@keys;
+    $tb->captions(@fields);
+    
     my $rows;
     while ($properties = $res->json("/rows/$n")) 
     {	
-	$tb->row(fields($properties,$obj,@keys));
+	$tb->row( map { $_->($properties) } @cbs );
 	$n++;
     }
-    
-    print  $tb->draw . "Total: ".$res->json('/total') . "\n$time\n";
+
+    print  $tb->draw . "Total: ".$res->json('/total')."\n";
 }
 
 sub parse_string
 {
     my ($app,@args) = @_;
+
+    for my $arg (@args)
+    {
+	next unless $arg =~ /\s/;
+	$arg = "'".$arg."'";
+    }
 
     my $req = join(' ',@args);
     my ($tokenizer,$parser) = 
