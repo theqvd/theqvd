@@ -161,5 +161,15 @@ Wat.Views.DIListView = Wat.Views.ListView.extend({
             Wat.CurrentView.fetchList();
             Wat.I.showMessage({message: i18n.t('Successfully created'), messageType: 'success'});
         }
+        
+        if (data.status == STATUS_ELEMENT_ALREADY_EXISTS) {
+            if (ws.readyState == WS_OPEN) {
+                ws.close();
+            }   
+            
+            Wat.I.loadingUnblock();
+            $(".ui-dialog-buttonset button:first-child").trigger('click');
+            Wat.I.showMessage({message: i18n.t('This element already exists'), messageType: 'error'});
+        }
     }
 });
