@@ -4,8 +4,7 @@ use warnings;
 use Text::SimpleTable::AutoWidth;
 use Term::ReadKey;
 use Exporter qw(import);
-our @EXPORT = qw(parse_string read_password print_table ask_api
-                 related_qvd_object default_fields action fields nested_queryx);
+our @EXPORT = qw(read_password run_cmd);
 
 
 ###############
@@ -24,7 +23,7 @@ sub read_password
 
 sub run_cmd 
 {
-    my ($self, $opts, @args) = @_;
+    my ($self,@args) = @_;
 
     my $parsing = parse_string($self,@args);
 
@@ -34,17 +33,23 @@ sub run_cmd
       order_by => $parsing->order, 
       arguments => $parsing->arguments};
 
-    if ($parsing->has_indirect_object)
+    for my $io ($parsing->indirect_objects)
     {
 	my $related_query = 
-	{ action => $parsing->action_to_get_indirect_object,
-	  filters => $parsing->indirect_object->filters };
-
+	{ action => $parsing->action_to_get_indirect_object($io->name),
+	  filters => $io->filters };
 	my $related_res = ask_api($self,$related_query);
 	my $ids = $related_res->json('/rows');
-	$query->{filters}->{$self->link_to_indirect_object} = $ids;
-    }
 
+	if ($parsing->command eq 'create')
+	{ 
+	    $query->{arguments}->{$parsing->id_link_to_indirect_object($io->name)} = shift @$ids;
+	}
+	else
+	{
+	    $query->{filters}->{$parsing->id_link_to_indirect_object($io->name)} = $ids;
+	}
+    }
     my $res = ask_api($self,$query);
   
     $parsing->fields && $res->json('/total') ?
@@ -66,12 +71,12 @@ sub print_table
 
     my $tb = Text::SimpleTable::AutoWidth->new();
     $tb->max_width(500);
-    $tb->captions(@fields);
+    $tb->captions(\@fields);
     
     my $rows;
-    while ($properties = $res->json("/rows/$n")) 
+    while (my $properties = $res->json("/rows/$n")) 
     {	
-	$tb->row( map { $_->($properties) } @cbs );
+	$tb->row( map { $_->($properties) // '' } @cbs );
 	$n++;
     }
 
@@ -81,14 +86,8 @@ sub print_table
 sub parse_string
 {
     my ($app,@args) = @_;
-
-    for my $arg (@args)
-    {
-	next unless $arg =~ /\s/;
-	$arg = "'".$arg."'";
-    }
-
     my $req = join(' ',@args);
+
     my ($tokenizer,$parser) = 
 	($app->cache->get('tokenizer'), 
 	 $app->cache->get('parser'));
@@ -119,7 +118,6 @@ sub ambiguous
     my $response = shift;
     scalar @$response > 1 ? return 1 : 0; 
 }
-
 
 sub ask_api
 {

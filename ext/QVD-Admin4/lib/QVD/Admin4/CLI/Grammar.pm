@@ -204,7 +204,7 @@ my $RULES =
    right_side => [ { label => 'role', saturated => 1 } ],
    meaning   => sub {'role'}},
 
- { left_side => { label => 'QVD_OBJECT', , saturated => 0 }, 
+ { left_side => { label => 'QVD_OBJECT', saturated => 0 }, 
    right_side => [ { label => 'acl', saturated => 1 } ],
    meaning   => sub {'acl'}},
 
@@ -240,7 +240,7 @@ my $RULES =
  { left_side => { label => "QVD_OBJECT", saturated => 1 }, 
    right_side => [ { label => 'QVD_OBJECT', saturated => 0}, 
 		   { label => "ITEM", saturated => 1, feature => 0 } ],
-   meaning => sub { my ($c0,$c1) = @_; { qvd_object => $c0, filters => { name => { '=' => [ fields($c1,'-and') ] }} }}},
+   meaning => sub { my ($c0,$c1) = @_; { qvd_object => $c0, filters => { name => [ fields($c1,'-and') ] }}}},
 
  { left_side => { label => "QVD_OBJECT", saturated => 1 }, 
    right_side => [ { label => 'QVD_OBJECT', saturated => 0}],
@@ -250,10 +250,6 @@ my $RULES =
 # OPERATORS
 # There are operator intended to identify keys with their values '='
 # and operators intended to join sets of key/values or lists of keys or values
-
- { left_side => { label => 'RANGE', saturated => 0 }, 
-   right_side => [ { label => '-', saturated => 1 } ],
-   meaning => sub { '-between' }},
 
  { left_side => { label => 'RANGE', saturated => 0 }, 
    right_side => [ { label => ':', saturated => 1 } ],
@@ -329,8 +325,8 @@ my $RULES =
 		   { label => 'IDOP', saturated => 1}, 
 		   {label => 'ITEM', saturated => 1, feature => 0, coordinated => 0}],
    meaning => sub { my ($c0,$c1,$c2) = @_; 
-		    ($c1,$c2) = ('-between',$c2->{'-between'}) 
-			if eval { $c2->{'-between'}}; 
+		    ($c1,$c2) = ('-between',$c2->{'-between'}) if eval { $c2->{'-between'}}; 
+		    return { $c0 => $c2 } if ref($c2) && ref($c2) eq 'ARRAY';
 		    return { $c0 =>  { $c1 =>  $c2 }}; }},
 
 # Items can be coordinated
@@ -499,7 +495,6 @@ my $RULES =
 		   { label => "role", saturated => 1 },
                    { label => "ITEM", saturated => 1, feature => 0 }],
    meaning => sub { my ($c0,$c1,$c2,$c3) = @_; { command => 'update', obj1 => $c0, arguments => { __roles_changes__ => { unassign_roles => [ fields($c3,'-and') ] }}}}},
-
 
 ];
 

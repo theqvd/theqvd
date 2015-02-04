@@ -21,7 +21,7 @@ sub command_map {
     config => 'QVD::Admin4::CLI::Command::Config',
     tenant => 'QVD::Admin4::CLI::Command::Tenant',
     role => 'QVD::Admin4::CLI::Command::Role',
-    acl => 'QVD::Admin4::CLI::Command::Acl',
+    acl => 'QVD::Admin4::CLI::Command::ACL',
     admin => 'QVD::Admin4::CLI::Command::Admin',
     tag => 'QVD::Admin4::CLI::Command::Tag',
     property => 'QVD::Admin4::CLI::Command::Property',
@@ -78,6 +78,44 @@ sub handle_exception
     print $m;
 #    print $self->register_command($self->get_current_command)->usage_text
 #	if ($e->isa('CLI::Framework::Exception::CmdRunException'));
+}
+
+sub read_cmd {
+    my ($app) = @_;
+
+    require Text::ParseWords;
+
+    my $term = $app->{_readline};
+    
+    unless( $term ) {
+        require Term::ReadLine;
+        $term = Term::ReadLine->new('CLIF Application');
+        select $term->OUT;
+        $app->{_readline} = $term;
+
+#FIXME-TODO-CMDLINE_COMPLETION:
+#        # Arrange for command-line completion...
+#        my $attribs = $term->Attribs;
+#        $attribs->{completion_function} = $app->_cmd_request_completions();
+    }
+    # Prompt for the name of a command and read input from STDIN.
+    # Store the individual tokens that are read in @ARGV.
+    my $command_request = $term->readline('> ');
+
+
+    if(! defined $command_request ) {
+        # Interpret CTRL-D (EOF) as a quit signal...
+        @ARGV = $app->quit_signals();
+        print "\n"; # since EOF character is rendered as ''
+    }
+    else {
+	$command_request =~ s/'/\\'/g;
+	$command_request =~ s/"/\\"/g;
+        @ARGV = Text::ParseWords::shellwords( $command_request );
+        $term->addhistory($command_request)
+            if $command_request =~ /\S/ and !$term->Features->{autohistory};
+    }
+    return 1;
 }
 
 1;

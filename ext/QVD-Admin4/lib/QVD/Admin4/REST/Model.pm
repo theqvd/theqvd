@@ -45,12 +45,15 @@ my $ACLS_FOR_FILTERS =
 	    name => [qr/^vm\.filter\.name$/],
 	    user_id => [qr/^vm\.filter\.user|user\.see\.vm-list$/],
 	    user_name => [qr/^vm\.filter\.user$/],
+	    user => [qr/^vm\.filter\.user$/],
 	    osf_id => [qr/^vm\.filter\.osf|osf\.see\.vm-list$/],
 	    osf_name => [qr/^vm\.filter\.osf$/],
+	    osf => [qr/^vm\.filter\.osf$/],
 	    di_id => [qr/^vm\.filter\.di|di\.see\.vm-list$/],
 	    state => [qr/^vm\.filter\.state$/],
 	    host_id => [qr/^vm\.filter\.host|host\.see\.vm-list$/],
-	    host_name => [qr/^vm\.filter\.host$/]},
+	    host_name => [qr/^vm\.filter\.host$/],
+	    host => [qr/^vm\.filter\.host$/]},
 
     User => { properties => [qr/^user\.filter\.properties$/], 
 	      name => [qr/^user\.filter\.name$/]},
@@ -62,7 +65,8 @@ my $ACLS_FOR_FILTERS =
     DI => { properties => [qr/^di\.filter\.properties$/],
 	    disk_image => [qr/^di\.filter\.disk-image$/],
 	    osf_id => [qr/^di\.filter\.osf|osf\.see\.di-list$/],
-	    osf_name => [qr/^di\.filter\.osf$/]},
+	    osf_name => [qr/^di\.filter\.osf$/],
+	    osf => [qr/^di\.filter\.osf$/]},
 
     OSF => { properties => [qr/^osf\.filter\.properties$/],
 	     name => [qr/^osf\.filter\.name$/],
@@ -273,20 +277,20 @@ my $AVAILABLE_FILTERS =
 
 	      Config => [qw(key value)],
 	      
-	      VM => [qw(storage id name user_id user_name osf_id osf_name di_tag blocked 
-                        expiration_soft expiration_hard state host_id host_name di_id 
-                        user_state ip next_boot_ip ssh_port vnc_port serial_port tenant_id tenant_name 
+	      VM => [qw(storage id name user user_id user_name osf osf_id osf_name di_tag blocked 
+                        expiration_soft expiration_hard state host host_id host_name di di_id 
+                        user_state ip next_boot_ip ssh_port vnc_port serial_port tenant tenant_id tenant_name 
                         creation_admin creation_date ip_in_use di_id_in_use  )],
 
 	      DI_Tag => [qw(osf_id di_id name id tenant_id tenant_name)],
 
-	      User => [qw(id name blocked creation_admin creation_date tenant_id tenant_name )],
+	      User => [qw(id name blocked creation_admin creation_date tenant tenant_id tenant_name )],
 
 	      Host => [qw(id name address blocked frontend backend state vm_id creation_admin creation_date )],
 
-	      DI => [qw(id disk_image version osf_id osf_name tenant_id blocked tenant_name tag)],
+	      DI => [qw(id disk_image version osf osf_id osf_name tenant tenant_id blocked tenant_name tag)],
 
-	      OSF => [qw(id name overlay user_storage memory vm_id di_id tenant_id tenant_name )],
+	      OSF => [qw(id name overlay user_storage memory vm_id di_id tenant tenant_id tenant_name )],
 
 	      ACL => [qw(id name role_id admin_id)],
 
@@ -294,7 +298,7 @@ my $AVAILABLE_FILTERS =
 
 	      Role => [qw(name id fixed internal admin_id inheritor_id)],
 
-	      Administrator => [qw(name tenant_id tenant_name id language block)],
+	      Administrator => [qw(name tenant tenant_id tenant_name id language block)],
 
 	      Tenant_Views_Setup => [qw(id tenant_id tenant_name field visible view_type device_type qvd_object property)],
 
@@ -313,19 +317,19 @@ my $AVAILABLE_FILTERS =
 
 		 Config => [qw(key value)],
 
-		 VM => [qw(storage id name user_id user_name osf_id osf_name di_tag blocked expiration_soft 
-                           expiration_hard state host_id host_name  di_id user_state ip next_boot_ip ssh_port 
-                           vnc_port serial_port tenant_id tenant_name creation_admin creation_date ip_in_use di_id_in_use )],
+		 VM => [qw(storage id name user user_id user_name osf osf_id osf_name di_tag blocked expiration_soft 
+                           expiration_hard state host host_id host_name di di_id user_state ip next_boot_ip ssh_port 
+                           vnc_port serial_port tenant tenant_id tenant_name creation_admin creation_date ip_in_use di_id_in_use )],
 
 		 DI_Tag => [qw(osf_id di_id name id tenant_id tenant_name)],
 
-		 User => [qw(id name blocked creation_admin creation_date tenant_id tenant_name )],
+		 User => [qw(id name blocked creation_admin creation_date tenant tenant_id tenant_name )],
 
 		 Host => [qw(id name address blocked frontend backend state vm_id creation_admin creation_date )],
 
-		 DI => [qw(id disk_image version osf_id osf_name tenant_id blocked tenant_name tag)],
+		 DI => [qw(id disk_image version osf osf_id osf_name tenant tenant_id blocked tenant_name tag)],
 
-		 OSF => [qw(id name overlay user_storage memory vm_id di_id tenant_id tenant_name )],
+		 OSF => [qw(id name overlay user_storage memory vm_id di_id tenant tenant_id tenant_name )],
 
 		 ACL => [qw(id name role_id admin_id )],
 
@@ -333,7 +337,7 @@ my $AVAILABLE_FILTERS =
 
 		 Tenant => [qw(id name language block)],
 
-		 Administrator => [qw(name tenant_id tenant_name role_id acl_id id role_name acl_name language block)],
+		 Administrator => [qw(name tenant tenant_id tenant_name role_id acl_id id role_name acl_name language block)],
 
 		 Tenant_Views_Setup => [qw(id tenant_id tenant_name field visible view_type device_type qvd_object property)],
 
@@ -355,19 +359,19 @@ my $AVAILABLE_FILTERS =
 
 		Config => [qw(key value)],
 
-		VM => [qw(storage id name user_id user_name osf_id osf_name di_tag blocked expiration_soft 
-                           expiration_hard state host_id host_name  di_id user_state ip next_boot_ip ssh_port 
-                           vnc_port serial_port tenant_id tenant_name creation_admin creation_date ip_in_use di_id_in_use )],
+		VM => [qw(storage id name user user_id user_name osf osf_id osf_name di_tag blocked expiration_soft 
+                           expiration_hard state host host_id host_name  di di_id user_state ip next_boot_ip ssh_port 
+                           vnc_port serial_port tenant tenant_id tenant_name creation_admin creation_date ip_in_use di_id_in_use )],
 
 		 DI_Tag => [qw(osf_id di_id name id tenant_id tenant_name)],
 
-		 User => [qw(id name blocked creation_admin creation_date tenant_id tenant_name )],
+		 User => [qw(id name blocked creation_admin creation_date tenant tenant_id tenant_name )],
 
 		 Host => [qw(id name address blocked frontend backend state vm_id creation_admin creation_date )],
 
-		 DI => [qw(id disk_image version osf_id osf_name tenant_id blocked tenant_name tag)],
+		 DI => [qw(id disk_image version osf osf_id osf_name tenant tenant_id blocked tenant_name tag)],
 
-		 OSF => [qw(id name overlay user_storage memory vm_id di_id tenant_id tenant_name )],
+		 OSF => [qw(id name overlay user_storage memory vm_id di_id tenant tenant_id tenant_name )],
 
 		 ACL => [qw(id name role_id admin_id )],
 
@@ -375,25 +379,25 @@ my $AVAILABLE_FILTERS =
 
 		 Tenant => [qw(id name language block)],
 
-		 Administrator => [qw(name tenant_id tenant_name role_id acl_id id role_name acl_name language block)] },
+		 Administrator => [qw(name tenant tenant_id tenant_name role_id acl_id id role_name acl_name language block)] },
 
     update => { default => [qw(id tenant_id)],
 
 		Config => [qw(key value)],
 
-		VM => [qw(storage id name user_id user_name osf_id osf_name di_tag blocked expiration_soft 
-                           expiration_hard state host_id host_name  di_id user_state ip next_boot_ip ssh_port 
-                           vnc_port serial_port tenant_id tenant_name creation_admin creation_date ip_in_use di_id_in_use )],
+		VM => [qw(storage id name user user_id user_name osf osf_id osf_name di_tag blocked expiration_soft 
+                           expiration_hard state host host_id host_name  di di_id user_state ip next_boot_ip ssh_port 
+                           vnc_port serial_port tenant tenant_id tenant_name creation_admin creation_date ip_in_use di_id_in_use )],
 			   
 		DI_Tag => [qw(osf_id di_id name id tenant_id tenant_name)],
 
-		User => [qw(id name blocked creation_admin creation_date tenant_id tenant_name )],
+		User => [qw(id name blocked creation_admin creation_date tenant tenant_id tenant_name )],
 
 		Host => [qw(id name address blocked frontend backend state vm_id creation_admin creation_date )],
 
-		DI => [qw(id disk_image version osf_id osf_name tenant_id blocked tenant_name tag)],
+		DI => [qw(id disk_image version osf osf_id osf_name tenant tenant_id blocked tenant_name tag)],
 
-		OSF => [qw(id name overlay user_storage memory vm_id di_id tenant_id tenant_name )],
+		OSF => [qw(id name overlay user_storage memory vm_id di_id tenant tenant_id tenant_name )],
 
 		ACL => [qw(id name role_id admin_id )],
 
@@ -401,11 +405,11 @@ my $AVAILABLE_FILTERS =
 
 		Tenant => [qw(id name language block)],
 
-		Administrator => [qw(name tenant_id tenant_name role_id acl_id id role_name acl_name language block)]},
+		Administrator => [qw(name tenant tenant_id tenant_name role_id acl_id id role_name acl_name language block)]},
 
-    exec => { default => [qw(id tenant_id)], VM => [qw(storage id name user_id user_name osf_id osf_name di_tag blocked expiration_soft 
-                           expiration_hard state host_id host_name  di_id user_state ip next_boot_ip ssh_port 
-                           vnc_port serial_port tenant_id tenant_name creation_admin creation_date ip_in_use di_id_in_use)]},
+    exec => { default => [qw(id tenant_id)], VM => [qw(storage id name user user_id user_name osf osf_id osf_name di_tag blocked expiration_soft 
+                           expiration_hard state host host_id host_name di di_id user_state ip next_boot_ip ssh_port 
+                           vnc_port serial_port tenant tenant_id tenant_name creation_admin creation_date ip_in_use di_id_in_use)]},
 
     state => { default => [qw(id tenant_id)], Host => [qw(id)], ACL => [qw(id)], Role => [qw(id)], Tenant => [qw(id)]},
 };
@@ -511,86 +515,6 @@ my $AVAILABLE_FIELDS =
 
 
 
-my $DEFAULT_FIELDS_FOR_CLI = 
-{ 
-    list => { default => [],
-
-	      Config => [qw(key value)],
-
-	      OSF => [qw(id tenant_id name overlay user_storage memory number_of_vms number_of_dis)],
-
-	      Role => [qw(id name fixed internal)],
-
-	      DI => [qw(id tenant_id disk_image blocked version osf_id)],
-
-	      VM => [qw( id tenant_id name blocked user_id host_id di_id ip ip_in_use di_id_in_use  state user_state )],
-
-	      ACL => [qw(id name)],
-
-	      Administrator => [qw(id name language block)],
-
-	      Tenant => [qw(id name language block)],
-				   
-	      User => [qw(id name  blocked number_of_vms number_of_vms_connected   )],
-
-	      Host => [qw(id name blocked address frontend backend   number_of_vms_connected state load )],
-
-	      DI_Tag => [qw(id name osf_id di_id)],
-
-	      Operative_Acls_In_Role => [qw(id name)],
-
-	      Operative_Acls_In_Administrator => [qw(id name)] },
-
-
-    details => { default => [],
-
-	      Config => [qw(key value)],
-
-	      OSF => [qw(id tenant_id name overlay user_storage memory number_of_vms number_of_dis)],
-
-	      Role => [qw(id name fixed internal)],
-
-	      DI => [qw(id tenant_id disk_image blocked version osf_id)],
-
-	      VM => [qw( id tenant_id name blocked user_id host_id di_id ip ip_in_use di_id_in_use  state user_state )],
-
-	      ACL => [qw(id name)],
-
-	      Administrator => [qw(id name language block)],
-
-	      Tenant => [qw(id name language block)],
-				   
-	      User => [qw(id name  blocked number_of_vms number_of_vms_connected   )],
-
-	      Host => [qw(id name blocked address frontend backend   number_of_vms_connected state load )],
-
-	      DI_Tag => [qw(id name osf_id di_id )],
-
-	      Operative_Acls_In_Role => [qw(id name operative)],
-
-	      Operative_Acls_In_Administrator => [qw(id name operative)]},
-
-    tiny => { default => [qw(id name)],
-
-	      DI => [qw(id disk_image)],
-
-	      Tenant_Views_Setup => [qw(id)],
-
-	      Administrator_Views_Setup => [qw(id)]},
-
-    all_ids => { default => [qw(id)]},
-
-    state => { User => [qw(number_of_vms_connected)],
-	       
-	       VM => [qw(state user_state)],
-	       
-	       Host => [qw(number_of_vms_connected)]},
-    
-    create => { 'default' => [qw(id)], Config => [qw(key)]}
-
-};
-
-
 my $MANDATORY_FILTERS = 
 { 
     list => { default => [qw(tenant_id)], Host => [qw()], ACL => [qw()], Role => [qw()], Tenant => [qw()], Config => [qw()], 
@@ -601,11 +525,11 @@ my $MANDATORY_FILTERS =
 
     tiny => { default => [qw(tenant_id)], Host => [qw()], ACL => [qw()], Role => [qw()], Tenant => [qw()]},
 
-    delete => { default => [qw(id tenant_id)], Host => [qw(id)], ACL => [qw(id)], Role => [qw(id)], Tenant => [qw(id)], Config => [qw(key)], VM => [qw()], DI => [qw()], Role => [qw()], Administrator => [qw()]},
+    delete => { default => [qw(tenant_id)], Host => [qw()], ACL => [qw()], Role => [qw()], Tenant => [qw()], Config => [qw()]},
 
-    update=> { default => [qw(id tenant_id)], Host => [qw(id)], ACL => [qw(id)], Role => [qw(id)], Tenant => [qw(id)], Config => [qw(key)],VM => [qw()], DI => [qw()], Role => [qw()], Administrator => [qw()]}, 
+    update=> { default => [qw(tenant_id)], Host => [qw()], ACL => [qw()], Role => [qw()], Tenant => [qw()], Config => [qw()]}, 
 
-    exec => { default => [qw(id tenant_id)], VM => [qw()]}, 
+    exec => { default => [qw(tenant_id)]}, 
 
     state => { default => [qw(id tenant_id)], Host => [qw(id)], ACL => [qw(id)], Role => [qw(id)], Tenant => [qw(id)]}, 
 
@@ -811,6 +735,7 @@ my $FILTERS_TO_DBIX_FORMAT_MAPPER =
 	'password' => 'me.password',
 	'tenant_id' => 'me.tenant_id',
 	'tenant_name' => 'tenant.name',
+	'tenant' => 'tenant.name',
 	'role_id' => 'role.id',
 	'acl_id' => 'acl.id',
 	'role_name' => 'role.name',
@@ -828,6 +753,7 @@ my $FILTERS_TO_DBIX_FORMAT_MAPPER =
 	'di_id' => 'dis.id',
 	'tenant_id' => 'me.tenant_id',
 	'tenant_name' => 'tenant.name',
+	'tenant' => 'tenant.name',
     },
 
     Host => {
@@ -849,10 +775,12 @@ my $FILTERS_TO_DBIX_FORMAT_MAPPER =
 	'version' => 'me.version',
 	'osf_id' => 'me.osf_id',
 	'osf_name' => 'osf.name',
+	'osf' => 'osf.name',
 	'tag' => 'tags.tag',
 	'tenant_id' => 'osf.tenant_id',
 	'blocked' => 'me.blocked',
 	'tenant_name' => 'tenant.name',
+	'tenant' => 'tenant.name',
     },
     User => {
 	'id' => 'me.id',
@@ -863,6 +791,7 @@ my $FILTERS_TO_DBIX_FORMAT_MAPPER =
 	'creation_date' => 'me.creation_date',
 	'tenant_id' => 'me.tenant_id',
 	'tenant_name' => 'tenant.name',
+	'tenant' => 'tenant.name',
     },
 
     VM => {
@@ -871,8 +800,10 @@ my $FILTERS_TO_DBIX_FORMAT_MAPPER =
 	'name' => 'me.name',
 	'user_id' => 'me.user_id',
 	'user_name' => 'user.login',
+	'user' => 'user.login',
 	'osf_id' => 'me.osf_id',
 	'osf_name' => 'osf.name',
+	'osf' => 'osf.name',
 	'di_tag' => 'me.di_tag',
 	'blocked' => 'vm_runtime.blocked',
 	'expiration_soft' => 'vm_runtime.vm_expiration_soft',
@@ -880,9 +811,11 @@ my $FILTERS_TO_DBIX_FORMAT_MAPPER =
 	'state' => 'vm_runtime.vm_state',
 	'host_id' => 'vm_runtime.host_id',
 	'host_name' => 'host.name',
+	'host' => 'host.name',
 	'di_id' => 'di.id',
 	'di_version' => 'di.version',
 	'di_name' => 'di.path',
+	'di' => 'di.path',
 	'user_state' => 'vm_runtime.user_state',
 	'ip' => 'me.ip',
 	'next_boot_ip' => 'vm_runtime.vm_address',
@@ -891,6 +824,7 @@ my $FILTERS_TO_DBIX_FORMAT_MAPPER =
 	'serial_port' => 'vm_runtime.vm_serial_port',
 	'tenant_id' => 'user.tenant_id',
 	'tenant_name' => 'tenant.name',
+	'tenant' => 'tenant.name',
 	'creation_admin' => 'me.creation_admin',
 	'creation_date' => 'me.creation_date',
 	'ip_in_use' => 'vm_runtime.vm_address',
@@ -1270,9 +1204,6 @@ sub BUILD
 	'available_fields',$AVAILABLE_FIELDS,1);
 
     $self->set_info_by_type_of_action_and_qvd_object(
-	'default_fields_for_cli',$DEFAULT_FIELDS_FOR_CLI,1);
-
-    $self->set_info_by_type_of_action_and_qvd_object(
 	'subchain_filters',$SUBCHAIN_FILTERS);
 
     $self->set_info_by_type_of_action_and_qvd_object(
@@ -1331,7 +1262,6 @@ sub initialize_info_model
     related_views_in_db => [],
     available_filters => [],                                                                 
     available_fields => [],                                                                  
-    default_fields_for_cli => [],                                                                  
     available_arguments => [],                                                               
     available_nested_queries => [],                                                               
     subchain_filters => [],                                                                 
@@ -1481,13 +1411,6 @@ sub available_fields
     @$fields;
 }
 
-sub default_fields_for_cli
-{
-    my $self = shift;
-
-    my $fields = $self->{model_info}->{default_fields_for_cli} // [];
-    @$fields;
-}
 
 sub mandatory_arguments
 {
@@ -1652,15 +1575,6 @@ sub available_field
     return 0;
 }
 
-sub available_default_field_for_cli
-{
-    my $self = shift;
-    my $field = shift;
-    $_ eq $field && return 1
-	for $self->default_fields_for_cli;
-
-    return 0;
-}
 
 sub mandatory_argument
 {

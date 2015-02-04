@@ -284,18 +284,6 @@ sub tags_delete
     }
 }
 
-sub roles_as_ids
-{
-    my ($self,$roles) = @_;
-    return $self->as_ids($roles,'roles');
-}
-
-sub acls_as_ids
-{
-    my ($self,$acls) = @_;
-    return $self->as_ids($acls,'acls');
-}
-
 sub as_ids
 {
     my ($self,$ids_or_names,$qvd_object) = @_;
@@ -307,24 +295,24 @@ sub as_ids
     $as_ids_flag;
 }
 
-sub get_acls_names_from_acls_ids
+sub switch_ids_to_names
 {
-    my ($self,$acls_ids) = @_;
-    [ map { $_->name }  $DB->resultset('ACL')->search({id => $acls_ids})->all ]
+    my ($self,$table,$ids) = @_;
+    [ map { $_->name }  $DB->resultset($table)->search({id => $ids})->all ]
 }
 
-sub get_roles_ids_from_roles_names
+sub switch_names_to_ids
 {
-    my ($self,$roles_names) = @_;
-    [ map { $_->id }  $DB->resultset('Role')->search({name => $roles_names})->all ]
+    my ($self,$table,$names) = @_;
+    [ map { $_->id }  $DB->resultset($table)->search({name => $names})->all ]
 }
 
 sub add_acls_to_role
 {
     my ($self,$acls,$role) = @_;
 
-    my $acl_names = $self->acls_as_ids($acls) ? 
-	$self->get_acls_names_from_acls_ids($acls) : $acls;
+    my $acl_names = $self->as_ids($acls,'acls') ? 
+	$self->switch_ids_to_names('ACL',$acls) : $acls;
 
     for my $acl_name (@$acl_names)
     { 	
@@ -341,8 +329,8 @@ sub del_acls_to_role
 {
     my ($self,$acls,$role) = @_;
 
-    my $acl_names = $self->acls_as_ids($acls) ? 
-	$self->get_acls_names_from_acls_ids($acls) : $acls;
+    my $acl_names = $self->as_ids($acls,'acls') ? 
+	$self->switch_ids_to_names('ACL',$acls) : $acls;
 
     for my $acl_name (@$acl_names)
     { 	
@@ -365,8 +353,8 @@ sub add_roles_to_role
 {
     my ($self,$roles_to_assign,$this_role) = @_;
 
-    my $roles_ids = $self->roles_as_ids($roles_to_assign) ? 
-	$roles_to_assign : $self->get_roles_ids_from_roles_names($roles_to_assign);
+    my $roles_ids = $self->as_ids($roles_to_assign,'roles') ? 
+	$roles_to_assign : $self->switch_names_to_ids('Role',$roles_to_assign);
 
     for my $role_to_assign_id (@$roles_ids)
     {
@@ -489,8 +477,8 @@ sub del_roles_to_admin
 {
     my ($self,$role_ids,$admin) = @_;
 
-    my $ids = $self->roles_as_ids($role_ids) ? 
-	$role_ids : $self->get_roles_ids_from_roles_names($role_ids);
+    my $ids = $self->as_ids($role_ids,'roles') ? 
+	$role_ids : $self->switch_names_to_ids('Role',$role_ids);
 
     eval { $DB->resultset('Role_Administrator_Relation')->search(
 	       {role_id => $ids,
@@ -503,7 +491,7 @@ sub add_roles_to_admin
 {
     my ($self,$role_ids,$admin) = @_;
 
-    my $ids = $self->roles_as_ids($role_ids) ? 
+    my $ids = $self->as_ids($role_ids,'roles') ? 
 	$role_ids : $self->get_roles_ids_from_roles_names($role_ids);
 
 

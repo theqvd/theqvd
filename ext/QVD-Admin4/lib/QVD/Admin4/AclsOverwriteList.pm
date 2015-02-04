@@ -7,7 +7,7 @@ use Moo;
 use QVD::DB;
 use QVD::Config;
 
-has 'admin_id', is => 'ro', isa => sub { my $name = shift; die "Invalid type for attribute admin_id" if ref($name) || (not defined $name) || $name eq ''; }, required => 1;
+has 'admin_id', is => 'ro', isa => sub { my $name = shift; die "Invalid type for attribute admin_id" if ref($name) &&  (not ref($name) eq 'ARRAY'); }, required => 1;
 has 'admin', is => 'ro', isa => sub { my $name = shift; die "Invalid type for attribute admin" unless ref($name) eq 'QVD::DB::Result::Administrator'; };
 
 my $FOR_NON_SUPERADMINS_RE = 'tenant\..*';

@@ -509,15 +509,17 @@ sub map_key_value_filter
 {
     my ($self,$key,$value) = @_;
 
-    my $key_dbix_format = 
-	$self->qvd_object_model->map_filter_to_dbix_format($key);
+    my $key_dbix_format = $self->qvd_object_model->map_filter_to_dbix_format($key);
     my $value_normalized;
 
-    if (ref($value) && ref($value) eq 'HASH') #Ad Hoc identitity operators allowed
+    if (my ($op, $v) = $self->value_with_operator($value)) #Ad Hoc identitity operators allowed
     {
-	my ($operator,$real_value) = each %$value; #FIX ME: Operator availability checking needed!!
-	$value_normalized = 
-	{ $operator => $self->qvd_object_model->normalize_value($key,$real_value) };
+	$value_normalized = { $op => ref($v) && ref($v) eq 'ARRAY' ? 
+				  [ map { $self->qvd_object_model->normalize_value($key,$_) } @$v ] : $v };
+    }
+    elsif (ref($value) && ref($value) eq 'ARRAY')
+    {
+	$value_normalized = [ map { $self->qvd_object_model->normalize_value($key,$_) } @$value ] ;
     }
     else 
     {
@@ -535,6 +537,12 @@ sub map_key_value_filter
     return ($key_dbix_format,$value_normalized);
 }
 
+sub value_with_operator
+{
+    my ($self,$value) = @_;
+    return unless ref($value) && ref($value) eq 'HASH';
+    my ($operator,$real_value) = each %$value; #FIX ME: Operator availability checking needed!!
+} 
 
 ######################
 ######################
