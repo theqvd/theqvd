@@ -227,3 +227,8 @@ WAT_BLOCK_SIZES = {
 WAT_BLOCK_SIZES_ADMIN = $.extend({
     "0": "Default"
 }, WAT_BLOCK_SIZES);
+
+
+// Documentation
+DOC_AVAILABLE_LANGUAGES = ['es'];
+DOC_DEFAULT_LANGUAGES = 'en';

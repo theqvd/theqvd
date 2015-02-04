@@ -103,6 +103,9 @@ Wat.B = {
         // Documentation menu option (workaround because backbone events dont work)
         this.bindEvent('click', '.js-doc-option', this.navigationBinds.clickDocOption);
         this.bindEvent('click', '#toc a', this.navigationBinds.clickToc);
+        
+        // Screen help button
+        this.bindEvent('click', '.js-screen-help', this.navigationBinds.clickScreenHelp);
                 
     },
     
@@ -198,6 +201,52 @@ Wat.B = {
             $('html,body').animate({
                 scrollTop: $(targetId).offset().top
             });
+        },
+        
+        clickScreenHelp: function () {
+            var currentQvdObj = Wat.CurrentView.qvdObj;
+            
+            switch(currentQvdObj) {
+                case 'user':   
+                    var section = '_usuarios';
+                    break;
+                case 'vm':   
+                    var section = '_máquinas_virtuales';
+                    break;
+                case 'host':   
+                    var section = '_nodos';
+                    break;
+                case 'osf':   
+                    var section = '_os_flavours';
+                    break;
+                case 'di':   
+                    var section = '_imágenes_de_disco';
+                    break;
+            }
+            
+
+            var dialogConf = {};
+
+            dialogConf.title ="Screen information";
+
+            dialogConf.buttons = {
+                "Read full documentation": function (e) {
+                    $(this).dialog('close');
+                    window.location = '#documentation';
+                },
+                OK: function (e) {
+                    $(this).dialog('close');
+                }
+            };
+
+            dialogConf.button1Class = 'fa fa-plus-circle';
+            dialogConf.button2Class = 'fa fa-check';
+            
+            dialogConf.fillCallback = function (target, that) {
+                target.html(Wat.A.getDocSection('stepbystep', section));
+            };
+
+            Wat.I.dialog(dialogConf, this);
         },
         
         clickDeleteFilterNote: function (e) {

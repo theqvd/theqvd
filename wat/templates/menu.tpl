@@ -1,4 +1,5 @@
 <div class="desktop">
+    <a class="screen-help js-screen-help button2 fa fa-info-circle"></a>
     <div class="js-platform-menu menu">
         <ul>
             <%

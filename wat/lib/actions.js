@@ -232,5 +232,46 @@ Wat.A = {
                 }
             });
         }
+    },
+    
+    getDocBody: function (selectedGuide) {
+        // Load language
+        var lan = $.i18n.options.lng;
+        
+        if ($.inArray(lan, DOC_AVAILABLE_LANGUAGES) === -1) {
+            lan = DOC_DEFAULT_LANGUAGES;
+        }
+            
+        var templateDoc = Wat.A.getTemplate('documentation-' + lan + '-' + selectedGuide, false);
+
+        var pattern = /<body[^>]*>((.|[\n\r])*)<\/body>/im
+        var array_matches = pattern.exec(templateDoc);
+        
+        return array_matches[1];
+    },
+    
+    getDocSection: function (guide, sectionId, toc) {
+        if (toc == undefined) {
+            toc = false;
+        }
+        
+        var docBody = Wat.A.getDocBody(guide);
+        
+        if (toc) {
+            var guideHeader = $.parseHTML(docBody)[1].outerHTML;
+            var guideToc = $.parseHTML(guideHeader)[1].childNodes[3].outerHTML;
+        }
+        
+        var pattern = new RegExp('(<h[1|2|3|4] id="' + sectionId + '"[^>]*>((.|[\n\r])*))', 'im');
+        var array_matches2 = pattern.exec(docBody); 
+        
+        var secBody = $.parseHTML('<div>' + array_matches2[1])[0].innerHTML;
+        
+        if (toc) {
+            return '<div id="content">' + guideToc + secTitle + secBody + '</div>';
+        }
+        else {
+            return '<div class="doc-text" style="height: 50vh;">' + secBody + '</div>';
+        }
     }
 };

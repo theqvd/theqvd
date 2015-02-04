@@ -186,3 +186,14 @@ fieldset {
         }
     }
 }
+
+.screen-help {
+    float: right;
+    margin-right: 10px;
+    height: 2.0em;
+    
+    &:before {
+        margin: 0 !important;
+        font-size: x-large;
+    }
+}

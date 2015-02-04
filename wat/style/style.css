@@ -225,6 +225,14 @@ fieldset {
       background: #FFF;
       border-radius: 3px; }
 
+.screen-help {
+  float: right;
+  margin-right: 10px;
+  height: 2em; }
+  .screen-help:before {
+    margin: 0 !important;
+    font-size: x-large; }
+
 /********************************************************************
 *********************************************************************
 *********************************************************************
