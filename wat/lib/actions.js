@@ -1,6 +1,10 @@
 Wat.A = {
-    getTemplate: function(templateName) {
-        if ($('#template_' + templateName).html() == undefined) {
+    getTemplate: function(templateName, cache) {
+        if (cache == undefined) {
+            cache = true;
+        }
+        
+        if ($('#template_' + templateName).html() == undefined || !cache) {
             var tmplDir = APP_PATH + 'templates';
             var tmplUrl = tmplDir + '/' + templateName + '.tpl';
             var tmplString = '';
@@ -15,11 +19,18 @@ Wat.A = {
                     tmplString = data;
                 }
             });
-
-            $('head').append('<script id="template_' + templateName + '" type="text/template">' + tmplString + '<\/script>');
+            
+            if (cache) {
+                $('head').append('<script id="template_' + templateName + '" type="text/template">' + tmplString + '<\/script>');
+            }
         }
 
-        return $('#template_' + templateName).html();
+        if (cache) {
+            return $('#template_' + templateName).html();
+        }
+        else {
+            return tmplString;
+        }
     },
     
     performAction: function (action, arguments, filters, messages, successCallback, that, async) {

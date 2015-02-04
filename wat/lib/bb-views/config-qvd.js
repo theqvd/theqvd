@@ -107,7 +107,7 @@ Wat.Views.ConfigQvdView = Wat.Views.MainView.extend({
     
     events: {
         'click .js-token-header': 'clickTokenHeader',
-        'click .token-prefix-option': 'clickPrefixOption',
+        'click .lateral-menu-option': 'clickPrefixOption',
         'click .js-button-new': 'openNewElementDialog',
         'click .actions_button': 'performTokenAction',
         'input [name="config_search"]': 'filter'
@@ -116,10 +116,10 @@ Wat.Views.ConfigQvdView = Wat.Views.MainView.extend({
     filter: function (e) {
         var search = $(e.target).val();
         if (search == '') {
-            $('.token-prefix-option').eq(0).trigger('click');
+            $('.lateral-menu-option').eq(0).trigger('click');
         }
         else {
-            $('.token-prefix-option').removeClass('token-prefix-option--selected');
+            $('.lateral-menu-option').removeClass('lateral-menu-option--selected');
             Wat.A.performAction('config_get', {}, {'key': search}, {}, this.processTokensRenderTokens, this);
         }
     },
@@ -139,8 +139,8 @@ Wat.Views.ConfigQvdView = Wat.Views.MainView.extend({
     },
     
     selectPrefixMenu: function (prefix) {
-        $('.token-prefix-option').removeClass('token-prefix-option--selected');
-        $('.token-prefix-option[data-prefix="' + prefix + '"]').addClass('token-prefix-option--selected');
+        $('.lateral-menu-option').removeClass('lateral-menu-option--selected');
+        $('.lateral-menu-option[data-prefix="' + prefix + '"]').addClass('lateral-menu-option--selected');
         
         // Go to start of the page
         $('html, body').animate({ scrollTop: 0 }, 'slow');

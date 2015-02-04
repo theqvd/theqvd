@@ -1,5 +1,6 @@
 // Translation setup and utilities
 Wat.T = {
+    lan: '',
     // Translation configuration and actions to be done when language file is loaded
     initTranslate: function(lan) {        
         lan = lan || Wat.C.language;
@@ -22,6 +23,8 @@ Wat.T = {
             debug: false,
             fallbackLng: 'en',
         }, this.translate);
+        
+        this.lan = lan;
     },
     
     // After all the translations do custom actions that need to have the content translated

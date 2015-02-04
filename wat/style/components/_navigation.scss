@@ -17,7 +17,7 @@
     }
     
     &>ul {    
-        .menu-option, .token-prefix-option {
+        .menu-option, .lateral-menu-option {
             @extend %not-selectable;
             display: block;
 
@@ -80,19 +80,19 @@
 
         }
         
-        .token-prefix-option, .token-prefix-option:active {
+        .lateral-menu-option, .lateral-menu-option:active {
             float: left;
             margin-bottom: 10px;
             width: 100%;
         }
 
-            .menu-option--selected, .menu-option:hover, .token-prefix-option--selected, .token-prefix-option:hover {
+            .menu-option--selected, .menu-option:hover, .lateral-menu-option--selected, .lateral-menu-option:hover {
                 background: $col_brand;
                 color: $col_whiter;
                 border: 1px solid transparent;
             }
 
-            .menu-option--selected, .token-prefix-option--selected {
+            .menu-option--selected, .lateral-menu-option--selected {
                 font-weight: bold;
 
                 span {

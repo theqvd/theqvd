@@ -12,3 +12,4 @@ Used libraries on QVD Wat and their version, licenses and source sites:
 - i18next v1.7.3 (MIT License) http://i18next.com/
 - Flot charts v0.8.3 (Unrestricted license explained at README.txt) http://www.flotcharts.org/
 - Flot axislabels v2.0.1 (GPLv3) http://people.mozilla.org/~mcote/flot-axislabels/
+- ASCII Doc - Tabe Of Content generator v0.4 (GPL) http://students.infoiasi.ro/~mishoo

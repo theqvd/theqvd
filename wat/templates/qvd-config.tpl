@@ -8,11 +8,11 @@
         $.each(prefixes, function (iprefix, prefix) {
         var currentClass = '';
         if (selectedPrefix == prefix) {
-            currentClass = 'token-prefix-option--selected';
+            currentClass = 'lateral-menu-option--selected';
         }
     %>
             <ul>
-                    <li class="token-prefix-option <%= currentClass %>" data-prefix="<%= prefix %>">
+                    <li class="lateral-menu-option <%= currentClass %>" data-prefix="<%= prefix %>">
                         <%= prefix %>
                     </li>
             </ul>

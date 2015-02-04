@@ -99,6 +99,10 @@ Wat.B = {
         this.bindEvent('mouseenter', '.js-menu-corner li:has(ul)', this.navigationBinds.cornerMenuHoverIn);
         
         this.bindEvent('mouseleave', '.js-menu-corner li:has(ul)', this.navigationBinds.cornerMenuHoverOut);
+        
+        // Documentation menu option (workaround because backbone events dont work)
+        this.bindEvent('click', '.js-doc-option', this.navigationBinds.clickDocOption);
+        this.bindEvent('click', '#toc a', this.navigationBinds.clickToc);
                 
     },
     
@@ -177,6 +181,23 @@ Wat.B = {
         
         cornerMenuHoverOut: function (e) {
             $(this).find('ul').css({display: "none"});
+        },
+        
+        clickDocOption: function (e) {
+            var guideKey = $(e.target).attr('data-guide');
+            
+            Wat.CurrentView.setSelectedGuide(guideKey);
+            Wat.CurrentView.render();
+        },
+        
+        clickToc: function (e) {
+            e.preventDefault();
+            
+            var targetId = $(e.target).attr('href');
+            
+            $('html,body').animate({
+                scrollTop: $(targetId).offset().top
+            });
         },
         
         clickDeleteFilterNote: function (e) {
