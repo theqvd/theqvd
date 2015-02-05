@@ -923,10 +923,7 @@ Wat.I = {
     
     loadingUnblock: function () {
         $('.loading-big').hide();
-        $('html, body').css({
-            'overflow': 'auto',
-            'height': 'auto'
-        });
+        $('html, body').attr('style', '');
     },
     
     loadDialogDoc: function (guide, section) {
@@ -937,14 +934,14 @@ Wat.I = {
         dialogConf.buttons = {
             "Read full documentation": function (e) {
                 $(this).dialog('close');
-                window.location = '#documentation';
+                window.location = '#documentation/' + guide;
             },
-            OK: function (e) {
+            Close: function (e) {
                 $(this).dialog('close');
             }
         };
 
-        dialogConf.button1Class = 'fa fa-plus-circle';
+        dialogConf.button1Class = 'fa fa-book';
         dialogConf.button2Class = 'fa fa-check';
 
         dialogConf.fillCallback = function (target, that) {

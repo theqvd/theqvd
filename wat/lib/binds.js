@@ -106,7 +106,13 @@ Wat.B = {
         
         // Screen help button
         this.bindEvent('click', '.js-screen-help', this.navigationBinds.clickScreenHelp);
-                
+        
+        // Back to top button
+        this.bindEvent('click', '.js-back-top-button', this.navigationBinds.goTop);
+        
+        // On any scroll
+        $(window).off('scroll');
+        $(window).on('scroll', this.navigationBinds.onScroll);
     },
     
     bindLoginEvents: function () {
@@ -199,7 +205,25 @@ Wat.B = {
             
             $('html,body').animate({
                 scrollTop: $(targetId).offset().top
-            });
+            }, 'fast');
+        },
+        
+        goTop: function () {
+            $('html,body').animate({
+                scrollTop: 0
+            }, 'fast');
+                    
+        },
+        
+        onScroll: function () {
+            if ($('.js-back-top-button').length) {
+                if ($(window).scrollTop() > ($(window).height() / 2)) {
+                    $('.js-back-top-button').show();
+                }
+                else {
+                    $('.js-back-top-button').hide();
+                }
+            }
         },
         
         clickScreenHelp: function () {

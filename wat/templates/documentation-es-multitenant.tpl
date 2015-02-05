@@ -887,7 +887,12 @@ Cuando creamos un elemento en QVD así como un administrador del WAT, habrá un 
 </li>
 <li>
 <p>
-Existe algún permiso adicional como son los de gestión de tenants. De ese modo, podrá aparecer (si el superadministrador posee dichos permisos) <strong>un apartado más: Tenants</strong>.
+En la sección <em>Vistas por defecto</em> que se encuentra en el apartado <em>Gestión del WAT</em> aparece un nuevo control de Tenant. Se pueden configurar las vistas del mismo modo que en Monotenant pero por cada Tenant.
+</p>
+</li>
+<li>
+<p>
+Existen <strong>permisos adicionales</strong> como son los de gestión de tenants. De ese modo, podrá aparecer (si el superadministrador posee dichos permisos) <strong>un apartado más: Tenants</strong>.
 </p>
 </li>
 </ul></div>
@@ -1112,7 +1117,7 @@ Contraseña: to the rescue</code></pre>
 <div id="footnotes"><hr /></div>
 <div id="footer">
 <div id="footer-text">
-Last updated 2015-02-04 11:24:48 CET
+Last updated 2015-02-05 11:57:09 CET
 </div>
 </div>
 </body>

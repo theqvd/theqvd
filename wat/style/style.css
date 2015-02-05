@@ -381,6 +381,11 @@ fieldset {
   visibility: visible !important;
   margin-top: 0px !important; }
 
+.back-top-button {
+  position: fixed;
+  left: 50px;
+  bottom: 50px; }
+
 /********************************************************************
 *********************************************************************
 *********************************************************************
@@ -2751,7 +2756,8 @@ td {
     font-size: small;
     border-top: 2px solid silver;
     padding-top: 0.5em;
-    margin-top: 4em; }
+    margin-top: 4em;
+    display: none; }
   .doc-text #footer-text {
     float: left;
     padding-bottom: 0.5em; }
@@ -2876,7 +2882,8 @@ td {
   .doc-text div.hdlist tr {
     padding-bottom: 15px; }
   .doc-text dt.hdlist1 {
-    margin-top: 15px; }
+    margin-top: 15px;
+    font-weight: bold; }
   .doc-text dt.hdlist1.strong, .doc-text td.hdlist1.strong {
     font-weight: bold; }
   .doc-text td.hdlist1 {

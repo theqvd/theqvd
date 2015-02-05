@@ -115,6 +115,7 @@
       border-top: 2px solid silver;
       padding-top: 0.5em;
       margin-top: 4.0em;
+      display: none;
     }
     #footer-text {
       float: left;
@@ -297,6 +298,7 @@
     }
     dt.hdlist1 {
       margin-top: 15px;
+      font-weight: bold;
     }
     dt.hdlist1.strong, td.hdlist1.strong {
       font-weight: bold;
