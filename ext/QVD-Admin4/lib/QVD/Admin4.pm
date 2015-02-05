@@ -492,8 +492,7 @@ sub add_roles_to_admin
     my ($self,$role_ids,$admin) = @_;
 
     my $ids = $self->as_ids($role_ids,'roles') ? 
-	$role_ids : $self->get_roles_ids_from_roles_names($role_ids);
-
+	$role_ids : $self->switch_names_to_ids('Role',$role_ids);
 
     for my $role_id (@$ids)
     {

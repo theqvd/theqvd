@@ -64,9 +64,10 @@ my $RULES =
    right_side => [ { label => 'untag', saturated => 1 } ],
    meaning   => sub { 'untag' }  },
 
- { left_side => { label => $UNKNOWN_TAG, saturated => 1 } ,
-   right_side => [{ label => 'config', saturated => 1 }],
-   meaning   => sub { 'config' }},
+
+ { left_side => { label => $UNKNOWN_TAG, saturated => 1 }, 
+   right_side => [ { label => 'config', saturated => 1 } ],
+   meaning   => sub { 'config'}},
 
  { left_side => { label => $UNKNOWN_TAG, saturated => 1 }, 
    right_side => [ { label => 'tenant', saturated => 1 } ],
@@ -191,10 +192,6 @@ my $RULES =
 # INDIVIDUALS (OBJECTS IN QVD UNIVERSE)
 
 # QVD_OBJECT specified with key/value filters
-
- { left_side => { label => 'QVD_OBJECT', saturated => 0 } ,
-   right_side => [{ label => 'config', saturated => 1 }],
-   meaning   => sub { 'config' }},
 
  { left_side => { label => 'QVD_OBJECT', saturated => 0 }, 
    right_side => [ { label => 'tenant', saturated => 1 } ],
@@ -496,6 +493,31 @@ my $RULES =
                    { label => "ITEM", saturated => 1, feature => 0 }],
    meaning => sub { my ($c0,$c1,$c2,$c3) = @_; { command => 'update', obj1 => $c0, arguments => { __roles_changes__ => { unassign_roles => [ fields($c3,'-and') ] }}}}},
 
+
+ { left_side => { label => 'ROOT', saturated => 1 }, 
+   right_side => [ { label => "config", saturated => 1 },
+		   { label => "set", saturated => 1 },
+                   { label => "ITEM", saturated => 1, feature => 1, coordinated => 0 }],
+   meaning => sub { my ($c0,$c1,$c2) = @_; my %args; @args{qw(key value)} =  arguments($c2,'-and','=');
+		    return { command => 'update', obj1 => { qvd_object => 'config'}, arguments => \%args }}},
+
+ { left_side => { label => 'ROOT', saturated => 1 }, 
+   right_side => [ { label => "config", saturated => 1 },
+		   { label => "get", saturated => 1 },
+                   { label => "ITEM", saturated => 1, feature => 0, coordinated => 0 }],
+   meaning => sub { my ($c0,$c1,$c2) = @_; { command => 'get', obj1 => { qvd_object => 'config', filters => { key_re => ref($c2) ? shift @$c2 : $c2 }}}}},
+
+ { left_side => { label => 'ROOT', saturated => 1 }, 
+   right_side => [ { label => "config", saturated => 1 },
+		   { label => "del", saturated => 1 },
+                   { label => "ITEM", saturated => 1, feature => 0, coordinated => 0 }],
+   meaning => sub { my ($c0,$c1,$c2) = @_; { command => 'delete', obj1 => { qvd_object => 'config', filters => { key => ref($c2) ? shift @$c2 : $c2 }}}}},
+
+ { left_side => { label => 'ROOT', saturated => 1 }, 
+   right_side => [ { label => "config", saturated => 1 },
+		   { label => "get", saturated => 1 }],
+   meaning => sub { return { command => 'get', obj1 => { qvd_object => 'config' }}}},
+
 ];
 
 my $KNOWN_TAGS = {};
@@ -550,8 +572,6 @@ sub is_known_tag
     exists $KNOWN_TAGS->{$tag} ? 
 	return 1 : return 0;
 }
-
-
 
 sub fields
 {

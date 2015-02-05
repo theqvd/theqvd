@@ -42,7 +42,7 @@ sub roles
     my $roles = decode_json $self->roles_json;
     my $out = {};
 
-    for my $role (@$roles)
+    for my $role ( grep { defined $_ } @$roles )
     {
 	my $id = delete $role->{id};
 	$out->{$id} = $role;

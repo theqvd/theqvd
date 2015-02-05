@@ -9,11 +9,13 @@ use QVD::Admin4::CLI::Grammar::Unificator;
 use QVD::Admin4::CLI::Parser;
 use QVD::Admin4::CLI::Tokenizer;
 use Mojo::UserAgent;
+use Mojo::URL;
 
 sub option_spec {
         [ 'login|l=s'      => 'Administrator name' ],
-        [ 'password|p'   => 'Administrator\'s password' ],
-        [ 'api|a=s'   => 'API address' ],
+        [ 'password|psw'   => 'Administrator\'s password' ],
+        [ 'host|h=s'   => 'API host' ],
+        [ 'port|p=s'   => 'API port' ],
     }
 
 sub command_map {
@@ -38,12 +40,15 @@ sub command_map {
 sub init {
     my ($self, $opts) = @_;
 
-    my ($address,$login,$password) = 
-	(($opts->api || 'http://172.20.126.16:3000/'),$opts->login);
+    my ($host,$port,$login,$password) = 
+	(($opts->host || '172.20.126.16'), ($opts->port || 3000), 
+	 ($opts->login || 'superadmin'), ($opts->password || 'superadmin' ));
 
     $password = read_password($self)
 	if $opts->password;
 
+    my $api = Mojo::URL->new(); $api->scheme('http'); $api->host($host); $api->port($port); 
+    my $ws = Mojo::URL->new(); $ws->scheme('ws'); $ws->host($host); $ws->port($port); $ws->path('/staging');
     my $ua = Mojo::UserAgent->new;
 
     my $unificator = QVD::Admin4::CLI::Grammar::Unificator->new();
@@ -54,13 +59,12 @@ sub init {
     $self->cache->set( ua => $ua ); 
     $self->cache->set( parser => $parser);
     $self->cache->set( tokenizer => $tokenizer );
-    $self->cache->set( api => $address ); 
+    $self->cache->set( api => $api ); 
+    $self->cache->set( ws => $ws ); 
     $self->cache->set( login => $login ); 
     $self->cache->set( password => $password ); 
 
 }
-
-
 
 
 sub quit_signals { qw( q quit exit ) }

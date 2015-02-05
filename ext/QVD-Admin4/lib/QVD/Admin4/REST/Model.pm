@@ -861,6 +861,8 @@ my $FILTERS_TO_DBIX_FORMAT_MAPPER =
     
     Operative_Acls_In_Role => { 
 	'acl_name' => 'me.acl_name',
+	'id' => 'me.acl_id',
+	'name' => 'me.acl_name',
         'role_id' =>  'me.role_id',
 	'operative' => 'me.operative',
     },
