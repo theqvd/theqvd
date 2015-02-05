@@ -23,3 +23,6 @@ vmTestReal();
 hostTestReal();
 osfTestReal();
 diTestReal();
+
+// Tests switching language and loading each embeded documentation
+languageDocTest();

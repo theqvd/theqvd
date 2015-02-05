@@ -239,7 +239,7 @@ Wat.A = {
         var lan = $.i18n.options.lng;
         
         if ($.inArray(lan, DOC_AVAILABLE_LANGUAGES) === -1) {
-            lan = DOC_DEFAULT_LANGUAGES;
+            lan = DOC_DEFAULT_LANGUAGE;
         }
             
         var templateDoc = Wat.A.getTemplate('documentation-' + lan + '-' + selectedGuide, false);
@@ -250,7 +250,7 @@ Wat.A = {
         return array_matches[1];
     },
     
-    getDocSection: function (guide, sectionId, toc) {
+    getDocSection: function (guide, sectionId, toc, imagesPrefix) {
         if (toc == undefined) {
             toc = false;
         }
@@ -264,6 +264,15 @@ Wat.A = {
         
         var pattern = new RegExp('(<h[1|2|3|4] id="' + sectionId + '"[^>]*>((.|[\n\r])*))', 'im');
         var array_matches2 = pattern.exec(docBody); 
+        
+        if (!array_matches2) {
+            return null;
+        }
+        
+        // When doc sections are retrieved from different path than standard (i.e. tests), we can add a prefix to the images path
+        if (imagesPrefix) {
+            array_matches2[1] = array_matches2[1].replace(/src="images/g, 'src="../images');
+        }
         
         var secBody = $.parseHTML('<div>' + array_matches2[1])[0].innerHTML;
         

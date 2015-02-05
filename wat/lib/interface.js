@@ -927,5 +927,36 @@ Wat.I = {
             'overflow': 'auto',
             'height': 'auto'
         });
-    }
+    },
+    
+    loadDialogDoc: function (guide, section) {
+        var dialogConf = {};
+
+        dialogConf.title ="Screen information";
+
+        dialogConf.buttons = {
+            "Read full documentation": function (e) {
+                $(this).dialog('close');
+                window.location = '#documentation';
+            },
+            OK: function (e) {
+                $(this).dialog('close');
+            }
+        };
+
+        dialogConf.button1Class = 'fa fa-plus-circle';
+        dialogConf.button2Class = 'fa fa-check';
+
+        dialogConf.fillCallback = function (target, that) {
+            // Back scroll of the div to top position
+            target.html('');
+            $('.js-dialog-container').animate({scrollTop:0});
+
+            // Fill div with section documentation
+            target.html(Wat.A.getDocSection(guide, section));
+        };
+
+
+        Wat.I.dialog(dialogConf, this);
+    },
 }

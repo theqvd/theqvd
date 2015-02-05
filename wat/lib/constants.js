@@ -231,4 +231,4 @@ WAT_BLOCK_SIZES_ADMIN = $.extend({
 
 // Documentation
 DOC_AVAILABLE_LANGUAGES = ['es'];
-DOC_DEFAULT_LANGUAGES = 'en';
+DOC_DEFAULT_LANGUAGE = 'es';

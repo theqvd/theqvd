@@ -761,7 +761,7 @@ Contraseña: admin</code></pre>
 <div class="paragraph"><p>El primer paso que debemos hacer, por seguridad, es <strong>cambiar la contraseña</strong> de nuestra cuenta de administrador.</p></div>
 <div class="sect2">
 <h3 id="_cambiar_la_contraseña">1.1. Cambiar la contraseña</h3>
-<div class="paragraph"><p>Para cambiar la contraseña iremos al <strong>área de nuestro administrador</strong>, situada en el <strong>menú general</strong> arriba a la derecha.</p></div>
+<div class="paragraph"><p>Para cambiar la contraseña iremos al <strong>área de administrador</strong>, situada en el <strong>menú general</strong> arriba a la derecha.</p></div>
 <div class="ulist"><ul>
 <li>
 <p>
@@ -1832,7 +1832,7 @@ En la vista detalle tenemos <strong>dos herramientas</strong> disponibles:
 <div id="footnotes"><hr /></div>
 <div id="footer">
 <div id="footer-text">
-Last updated 2015-02-05 08:49:48 CET
+Last updated 2015-02-05 09:30:30 CET
 </div>
 </div>
 </body>
