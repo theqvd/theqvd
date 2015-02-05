@@ -188,12 +188,11 @@ fieldset {
 }
 
 .screen-help {
-    float: right;
-    margin-right: 10px;
-    height: 2.0em;
+    margin-left: 5px;
+    height: 1.2em;
     
     &:before {
         margin: 0 !important;
-        font-size: x-large;
+        font-size: 1.2em;
     }
 }

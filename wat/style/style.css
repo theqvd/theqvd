@@ -226,12 +226,11 @@ fieldset {
       border-radius: 3px; }
 
 .screen-help {
-  float: right;
-  margin-right: 10px;
-  height: 2em; }
+  margin-left: 5px;
+  height: 1.2em; }
   .screen-help:before {
     margin: 0 !important;
-    font-size: x-large; }
+    font-size: 1.2em; }
 
 /********************************************************************
 *********************************************************************
@@ -2829,12 +2828,14 @@ td {
     text-decoration: underline;
     color: #527bbd;
     padding-right: 0.5em; }
+    .doc-text div.admonitionblock .icon img {
+      width: 35px; }
   .doc-text div.admonitionblock td.content {
     padding-left: 0.5em;
-    border-left: 3px solid #dddddd;
+    border-left: 2px solid #dddddd;
     margin: 0; }
   .doc-text div.exampleblock > div.content {
-    border-left: 3px solid #dddddd;
+    border-left: 2px solid #dddddd;
     padding-left: 0.5em;
     margin: 0; }
   .doc-text div.imageblock div.content {
@@ -2858,7 +2859,8 @@ td {
   .doc-text dd > *:first-child {
     margin-top: 0.1em; }
   .doc-text ul, .doc-text ol {
-    list-style-position: outside; }
+    list-style-position: outside;
+    margin-left: 30px; }
   .doc-text ol.arabic {
     list-style-type: decimal; }
   .doc-text ol.loweralpha {

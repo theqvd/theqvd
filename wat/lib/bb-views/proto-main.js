@@ -70,6 +70,7 @@ Wat.Views.MainView = Backbone.View.extend({
             this.printBreadcrumbs (bc.next, bcHTML);
         }
         else {
+            bcHTML += '<a href="javascript:" class="fa fa-question-circle js-screen-help screen-help" data-i18n="[title]Help me" data-docsection="' + this.qvdObj + '"></a>'
             $('#breadcrumbs').html(bcHTML);
         }
     },

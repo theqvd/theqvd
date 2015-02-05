@@ -758,22 +758,24 @@ asciidoc.install(2);
 <p>
 Captura
 </p>
-</li>
-</ul></div>
+<div class="openblock">
+<div class="content">
 <div class="paragraph"><p><span class="image">
 <img src="images/doc_images/screenshot_vm_list.png" alt="screenshot_vm_list.png" width="960px" />
 </span></p></div>
-<div class="ulist"><ul>
+</div></div>
+</li>
 <li>
 <p>
 Captura por componentes
 </p>
-</li>
-</ul></div>
+<div class="openblock">
+<div class="content">
 <div class="paragraph"><p><span class="image">
 <img src="images/doc_images/interface_structure.png" alt="interface_structure.png" width="960px" />
 </span></p></div>
-<div class="ulist"><ul>
+</div></div>
+</li>
 <li>
 <p>
 Componentes detallados
@@ -1174,7 +1176,7 @@ Gestionar sus propios ACLs, pudiendo llegar a tener permisos totales o incluso p
 <div id="footnotes"><hr /></div>
 <div id="footer">
 <div id="footer-text">
-Last updated 2015-02-04 08:38:48 CET
+Last updated 2015-02-05 15:57:41 CET
 </div>
 </div>
 </body>

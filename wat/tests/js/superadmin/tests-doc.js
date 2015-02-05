@@ -16,11 +16,10 @@ function languageDocTest() {
 
             expect(assertions);
             
-            var guide = 'stepbystep';
             $.each(DOC_AVAILABLE_LANGUAGES, function (iLan, lan) {
                 $.each (Wat.I.docSections[lan], function (qvdObj, section) {
-                    var docHTML = Wat.A.getDocSection(guide, section, false, '../');
-                    notEqual(docHTML, null, 'Documentation section "' + section + '" was found in guide "' + guide + '"');
+                    var docHTML = Wat.A.getDocSection(section.guide, section.section, false, '../');
+                    notEqual(docHTML, null, 'Documentation section "' + section.section + '" was found in guide "' + section.guide + '"');
                 });
             });
         });

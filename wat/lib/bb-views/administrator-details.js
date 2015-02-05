@@ -235,24 +235,7 @@ Wat.Views.AdminDetailsView = Wat.Views.DetailsView.extend({
         
         Wat.Views.DetailsView.prototype.openEditElementDialog.apply(this, [e]);
         
-        // Virtual machine form include a date time picker control, so we need enable it
-        Wat.I.enableDataPickers();
-                
-        var params = {
-            'action': 'role_tiny_list',
-            'selectedId': '',
-            'controlName': 'role',
-            'filters': {
-            }
-        };
-
-        Wat.A.fillSelect(params);
-        
-        $.each(this.model.get('roles'), function (iRole, role) {
-            $('select[name="role"] option[value="' + iRole + '"]').remove();
-        });
-        
-        Wat.I.chosenElement('[name="role"]', 'single100');
+        Wat.I.chosenElement('[name="language"]', 'single');
     },
     
     renderSide: function () {

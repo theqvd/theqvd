@@ -226,12 +226,13 @@ Wat.B = {
             }
         },
         
-        clickScreenHelp: function () {
-            var currentQvdObj = Wat.CurrentView.qvdObj;
+        clickScreenHelp: function (e) {
+            var docSection = $(e.target).attr('data-docsection');
             
-            var section = Wat.I.docSections.es[currentQvdObj];
+            var section = Wat.I.docSections.es[docSection].section;
+            var guide = Wat.I.docSections.es[docSection].guide;
             
-            Wat.I.loadDialogDoc('stepbystep', section);
+            Wat.I.loadDialogDoc(guide, section);
         },
         
         clickDeleteFilterNote: function (e) {
