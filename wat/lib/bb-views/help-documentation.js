@@ -16,7 +16,12 @@ Wat.Views.DocView = Wat.Views.MainView.extend({
     
     initialize: function (params) {
         Wat.Views.MainView.prototype.initialize.apply(this, [params]);
-        this.setSelectedGuide('introduction');
+        
+        if (params.guide) {
+            this.selectedGuide = params.guide;
+        }
+        
+        this.setSelectedGuide(this.selectedGuide);
         this.render();
     },
     

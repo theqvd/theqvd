@@ -189,8 +189,7 @@ Wat.B = {
         clickDocOption: function (e) {
             var guideKey = $(e.target).attr('data-guide');
             
-            Wat.CurrentView.setSelectedGuide(guideKey);
-            Wat.CurrentView.render();
+            window.location = '#documentation/' + guideKey;
         },
         
         clickToc: function (e) {
