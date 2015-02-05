@@ -206,24 +206,7 @@ Wat.B = {
         clickScreenHelp: function () {
             var currentQvdObj = Wat.CurrentView.qvdObj;
             
-            switch(currentQvdObj) {
-                case 'user':   
-                    var section = '_usuarios';
-                    break;
-                case 'vm':   
-                    var section = '_máquinas_virtuales';
-                    break;
-                case 'host':   
-                    var section = '_nodos';
-                    break;
-                case 'osf':   
-                    var section = '_os_flavours';
-                    break;
-                case 'di':   
-                    var section = '_imágenes_de_disco';
-                    break;
-            }
-            
+            var section = Wat.I.docSections.es[currentQvdObj];
 
             var dialogConf = {};
 
@@ -243,8 +226,14 @@ Wat.B = {
             dialogConf.button2Class = 'fa fa-check';
             
             dialogConf.fillCallback = function (target, that) {
+                // Back scroll of the div to top position
+                target.html('');
+                $('.js-dialog-container').animate({scrollTop:0});
+                
+                // Fill div with section documentation
                 target.html(Wat.A.getDocSection('stepbystep', section));
             };
+            
 
             Wat.I.dialog(dialogConf, this);
         },

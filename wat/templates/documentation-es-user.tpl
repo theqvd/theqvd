@@ -915,7 +915,7 @@ OSF
 <div class="sect2">
 <h3 id="_creación_de_un_nodo">2.1. Creación de un Nodo</h3>
 <div class="paragraph"><p>Un nodo en el WAT corresponde con un <em>servidor QVD</em>, por lo cual tendremos que tener configurado y corriendo un servidor QVD.</p></div>
-<div class="paragraph"><p>Además debe ser <em>accesible</em> y debemos <em>conocer su dirección IP</em>.</p></div>
+<div class="paragraph"><p>Además debe ser <em>accesible</em>, debemos <em>conocer su dirección IP</em>.</p></div>
 <div class="paragraph"><p>Para crear un nodo seguiremos los siguientes pasos:</p></div>
 <div class="ulist"><ul>
 <li>
@@ -1832,7 +1832,7 @@ En la vista detalle tenemos <strong>dos herramientas</strong> disponibles:
 <div id="footnotes"><hr /></div>
 <div id="footer">
 <div id="footer-text">
-Last updated 2015-02-03 13:40:16 CET
+Last updated 2015-02-05 08:49:48 CET
 </div>
 </div>
 </body>

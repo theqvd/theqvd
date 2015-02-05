@@ -2875,6 +2875,8 @@ td {
     margin-bottom: 0.8em; }
   .doc-text div.hdlist tr {
     padding-bottom: 15px; }
+  .doc-text dt.hdlist1 {
+    margin-top: 15px; }
   .doc-text dt.hdlist1.strong, .doc-text td.hdlist1.strong {
     font-weight: bold; }
   .doc-text td.hdlist1 {

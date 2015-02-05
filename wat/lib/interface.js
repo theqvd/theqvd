@@ -294,6 +294,9 @@ Wat.I = {
         di: {}
     },
     
+    docSections: {
+    },
+    
     getListActionButton: function (qvdObj) {
         return $.extend(true, [], this.listActionButton[qvdObj]);
     },
