@@ -9,6 +9,12 @@ sub usage_text { "Wrong syntax my friend!\n" }
 sub run 
 {
     my ($self, $opts, @args) = @_;
+	if (my $s = $self->object->{filters}->{key_re})
+	{
+	    $s =~ s/%/.*/g;
+	    $self->object->{filters}->{key_re} = qr/^$s$/;
+	} 
+
     run_cmd($self,'config',@args);
 }
 

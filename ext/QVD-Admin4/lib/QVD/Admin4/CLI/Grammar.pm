@@ -163,12 +163,6 @@ my $RULES =
                    { label => 'ITEM', saturated => 1, feature => 0 }],
    meaning   => sub { my ($c0,$c1,$c2) = @_; { command => $c1, fields => [ reverse fields($c2,'-and') ], obj1 => $c0}}},
 
-# WITH INDIRECT OBJECT 
-
- { left_side => { label => 'QVD_OBJECT', saturated => 1, in => 0 },
-   right_side => [ { label => 'QVD_OBJECT', saturated => 1, in => 1 },
-                   { label => 'IN', saturated => 1 } ],
-   meaning   => sub { my ($c0,$c1) = @_;  { obj2 => $c1, %$c0}}},
 
 
 ###################
@@ -374,25 +368,6 @@ my $RULES =
 		   { label => 'ITEM', saturated => 1, feature => 0, coordinated => 0, brackets => 0 }],
    meaning => sub { my ($c0,$c1,$c2) = @_;  return { $c1 => [$c0,$c2] }}},
 
-
-
-# PHRASES
-
-
-# TO introduces the indirect object in an indirect relation
-# Ex: ASSIGN property TO vm
-
- { left_side => { label => 'TO', saturated => 1 }, 
-   right_side => [ { label => 'to', saturated => 1 }, 
-		   { label =>  "QVD_OBJECT", saturated => 1} ],
-   meaning => sub { my ($c0,$c1) = @_; $c1; }},
-
-# IN
-
- { left_side => { label => 'IN', saturated => 1 }, 
-   right_side => [ { label => 'in', saturated => 1}, 
-		   { label =>  "QVD_OBJECT", saturated => 1} ],
-   meaning => sub { my ($c0,$c1) = @_; $c1; }  },
 
 # ORDER BY PHRASES
 # order by tenant_id,name
