@@ -1,5 +1,6 @@
 package QVD::Admin4::CLI::Command::Login;
 use base qw( CLI::Framework::Command::Meta );
+use Term::ReadKey;
 use strict;
 use warnings;
 

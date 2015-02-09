@@ -818,6 +818,7 @@ sub get_acls_in_admins
     my (@rows, $rs);
 
     my $admin_id = $request->json_wrapper->get_filter_value('admin_id');
+
     my $aol = QVD::Admin4::AclsOverwriteList->new(admin_id => $admin_id);
     my $bind = [$aol->acls_to_close_re,$aol->acls_to_open_re,$aol->acls_to_hide_re];
 
@@ -847,7 +848,6 @@ sub get_acls_in_roles
     { total => ($rs->is_paged ? $rs->pager->total_entries : $rs->count), 
       rows => \@rows};
 }
-
 
 sub current_admin_setup
 {
