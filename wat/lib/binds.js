@@ -233,6 +233,10 @@ Wat.B = {
             var guide = Wat.I.docSections.es[docSection].guide;
             
             Wat.I.loadDialogDoc(guide, section);
+            
+            $('html,body').animate({
+                scrollTop: 0
+            }, 'fast');
         },
         
         clickDeleteFilterNote: function (e) {

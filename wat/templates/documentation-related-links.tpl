@@ -1,9 +1,11 @@
-<div style="font-weight: bold; margin-bottom: 10px; clear: both;">Related documentation</div>
+<div class="related-doc">
+    <div class="related-doc-title">Related documentation</div>
 
-<%
-$.each(relatedDoc, function (docSection, docName) {
-%>
-    <a href="javascript:" class="fa fa-book button2" data-docsection="<%= docSection %>" data-i18n="<%= docName %>"></a>
-<%
-});
-%>
+    <%
+    $.each(relatedDoc, function (docSection, docName) {
+    %>
+        <a href="javascript:" class="fa fa-book button2" data-docsection="<%= docSection %>" data-i18n="<%= docName %>"></a>
+    <%
+    });
+    %>
+</div>
