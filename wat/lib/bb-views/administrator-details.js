@@ -3,6 +3,11 @@ Wat.Views.AdminDetailsView = Wat.Views.DetailsView.extend({
     setupOption: 'admins',
     secondaryContainer: '.bb-setup',
     qvdObj: 'administrator',
+    
+    relatedDoc: {
+        permissions_introduction: "Permissions introduction",
+        permissions_guide: "Permissions guide"
+    },
 
     initialize: function (params) {
         this.model = new Wat.Models.Admin(params);
@@ -27,6 +32,8 @@ Wat.Views.AdminDetailsView = Wat.Views.DetailsView.extend({
         var aclPatternsArray = _.toArray(this.aclPatterns);
         
         Wat.A.performAction('number_of_acls_in_admin', {}, {"admin_id": this.id, "acl_pattern": aclPatternsArray}, {}, this.renderACLsTree, this);
+        
+        Wat.T.translate();
     },
     
     renderACLsTree: function (that) {

@@ -6,6 +6,11 @@ Wat.Views.RoleDetailsView = Wat.Views.DetailsView.extend({
     
     filterSection: '-1',
     filterAction: '-1',
+    
+    relatedDoc: {
+        permissions_introduction: "Permissions introduction",
+        permissions_guide: "Permissions guide"
+    },
 
     initialize: function (params) {
         this.model = new Wat.Models.Role(params);
@@ -318,6 +323,8 @@ Wat.Views.RoleDetailsView = Wat.Views.DetailsView.extend({
         
         // Trigger click on first menu option by default
         $('[data-show-submenu="acls-management-acls"]').trigger('click');
+        
+        Wat.T.translate();
     },
     
     renderManagerInheritedRoles: function () {

@@ -70,7 +70,7 @@ Wat.Views.MainView = Backbone.View.extend({
             this.printBreadcrumbs (bc.next, bcHTML);
         }
         else {
-            bcHTML += '<a href="javascript:" class="fa fa-question-circle js-screen-help screen-help" data-i18n="[title]Help me" data-docsection="' + this.qvdObj + '"></a>'
+            bcHTML += '<a href="javascript:" class="fa fa-book js-screen-help screen-help" data-i18n="[title]This section step by step" data-docsection="' + this.qvdObj + '"></a>'
             $('#breadcrumbs').html(bcHTML);
         }
     },
@@ -355,5 +355,23 @@ Wat.Views.MainView = Backbone.View.extend({
         };
         
         Wat.A.performAction ('vm_user_disconnect', {}, filters, messages, this.fetchList, this);
+    },
+    
+    renderRelatedDocs: function () {
+        var sectionDoc = [];
+        sectionDoc[this.qvdObj] = "This section step by step";
+        this.relatedDoc = $.extend({}, sectionDoc, this.relatedDoc);
+        
+        if (this.relatedDoc) {
+            this.relatedDocTemplate = Wat.A.getTemplate('documentation-related-links');
+            
+            this.template = _.template(
+                    this.relatedDocTemplate, {
+                        relatedDoc: this.relatedDoc,
+                    }
+                );
+            
+            $(this.el).html($(this.el).html() + this.template);
+        }
     }
 });

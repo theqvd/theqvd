@@ -616,6 +616,8 @@ Wat.Views.ListView = Wat.Views.MainView.extend({
         }
         
         this.updateFilterNotes();
+        
+        this.renderRelatedDocs();
     },
     
     // Fill filter selects 

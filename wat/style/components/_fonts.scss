@@ -146,6 +146,10 @@ td {
 .welcome-message {
     @include font-size(4);
     text-align: center;
+    
+    .welcome-help a {
+        font-size: 0.8em;
+    }
 }
 
 .home-wrapper {

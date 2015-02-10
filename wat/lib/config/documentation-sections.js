@@ -64,6 +64,14 @@ Wat.I.docSections = {
         tenant: { 
             section: '_tenants',
             guide: 'multitenant'
-        }
+        },
+        permissions_guide: { 
+            section: '_gestionar_administradores_y_permisos',
+            guide: 'user'
+        },
+        permissions_introduction: { 
+            section: '_permisos_administrador_rol_acl',
+            guide: 'introduction'
+        },
     }
 }

@@ -1,5 +1,8 @@
 <div class="welcome-message">
     <span class="welcome" data-i18n="Welcome to QVD's Web Administration Tool"></span>
+    <div class="welcome-help">
+        <a href="#documentation/introduction" data-i18n="Do you need help?"></a>
+    </div>
 </div>
 
 <% if (Wat.C.checkGroupACL('statisticsSummaryObjects') || Wat.C.checkACL('vm.stats.running-vms')) { %>

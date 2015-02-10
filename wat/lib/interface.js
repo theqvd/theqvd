@@ -381,7 +381,7 @@ Wat.I = {
 
     showContent: function () {
         // Set to the side box the same height of the content box
-        $('.js-side').css('min-height', $('.content').height());
+        $('.js-side').css('min-height', $('.content').height() - 100);
 
         $('.breadcrumbs').css('visibility','visible').hide().show();
         $('.content').css('visibility','visible').hide().show();
@@ -929,7 +929,7 @@ Wat.I = {
     loadDialogDoc: function (guide, section) {
         var dialogConf = {};
 
-        dialogConf.title ="Screen information";
+        dialogConf.title ="Documentation";
 
         dialogConf.buttons = {
             "Read full documentation": function (e) {

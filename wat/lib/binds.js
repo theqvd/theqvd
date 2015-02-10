@@ -105,7 +105,7 @@ Wat.B = {
         this.bindEvent('click', '#toc a', this.navigationBinds.clickToc);
         
         // Screen help button
-        this.bindEvent('click', '.js-screen-help', this.navigationBinds.clickScreenHelp);
+        this.bindEvent('click', 'a[data-docsection]', this.navigationBinds.clickScreenHelp);
         
         // Back to top button
         this.bindEvent('click', '.js-back-top-button', this.navigationBinds.goTop);

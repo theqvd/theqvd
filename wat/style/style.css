@@ -2597,6 +2597,8 @@ td {
     .welcome-message {
       font-size: 1.4em;
       line-height: 1.7em; } }
+  .welcome-message .welcome-help a {
+    font-size: 0.8em; }
 
 .home-wrapper .home-cell .home-title {
   font-size: 20px;
