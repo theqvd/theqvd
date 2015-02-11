@@ -18,7 +18,7 @@ my $RULES =
 
  { left_side => { label => $UNKNOWN_TAG, saturated => 1 }, 
    right_side => [ { label => 'set', saturated => 1  } ],
-   meaning   => sub { 'update' }},
+   meaning   => sub { 'set' }},
 
  { left_side => { label => $UNKNOWN_TAG, saturated => 1 }, 
    right_side => [ { label => 'new', saturated => 1  } ],
@@ -26,7 +26,7 @@ my $RULES =
 
  { left_side => { label => $UNKNOWN_TAG, saturated => 1 }, 
    right_side => [ { label => 'del', saturated => 1  } ],
-   meaning   => sub { 'delete' }},
+   meaning   => sub { 'del' }},
 
  { left_side => { label => $UNKNOWN_TAG, saturated => 1 }, 
    right_side => [ { label => 'start', saturated => 1  } ],
@@ -492,7 +492,6 @@ my $RULES =
    right_side => [ { label => "config", saturated => 1 },
 		   { label => "get", saturated => 1 }],
    meaning => sub { return { command => 'get', obj1 => { qvd_object => 'config' }}}},
-
 ];
 
 my $KNOWN_TAGS = {};

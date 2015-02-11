@@ -94,6 +94,7 @@ any '/' => sub {
     my $c = shift;
     $c->inactivity_timeout(30000);     
     my $json = $c->get_input_json;
+
     my $action_size = $c->get_action_size($json);
     my $response = $c->process_api_query($json);
 

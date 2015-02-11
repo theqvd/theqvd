@@ -792,7 +792,6 @@ sub tenant_view_get_list
       rows => \@rows};
 }
 
-
 sub acl_get_list
 {
     my ($self,$request) = @_;
@@ -811,13 +810,12 @@ sub acl_get_list
       rows => \@rows};
 }
 
-
 sub get_acls_in_admins
 {
     my ($self,$request) = @_;
     my (@rows, $rs);
 
-    my $admin_id = $request->json_wrapper->get_filter_value('admin_id');
+    my ($admin_id) = $request->json_wrapper->get_filter_value('admin_id');
 
     my $aol = QVD::Admin4::AclsOverwriteList->new(admin_id => $admin_id);
     my $bind = [$aol->acls_to_close_re,$aol->acls_to_open_re,$aol->acls_to_hide_re];

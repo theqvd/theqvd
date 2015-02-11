@@ -81,7 +81,8 @@ my $FILTERS =
     acl => { id => 'id',
 	     name => 'name',
              role => 'role_id',
-             admin => 'admin_id' },
+             admin => 'admin_id',
+	     operative => 'operative'},
 };
 
 
@@ -305,87 +306,76 @@ my $ARGUMENTS =
 };
 
 my $related_tenant_cb = sub { 
-
     my ($self,$name) = @_; 
-    $self->ask_api(
-	{ action => 'tenant_all_ids', 
-	  filters =>  { name => $name }}
-	)->json('/rows');
+    $self->ask_api({ action => 'tenant_all_ids', 
+		     filters =>  { name => $name }})->json('/rows');
 };
 
 my $related_user_cb = sub { 
     my ($self,$name,$tenant_id) = @_; 
-    $self->ask_api(
-	{ action => 'user_all_ids', 
-	  filters =>  { name => $name, 
-			tenant_id => $tenant_id }}
-	)->json('/rows');
+    my $filters = { name => $name };
+    $filters->{tenant_id} = $tenant_id if $tenant_id;
+    $self->ask_api( { action => 'user_all_ids', 
+		      filters =>  $filters })->json('/rows');
 };
 
 my $related_host_cb = sub { 
     my ($self,$name) = @_; 
-    $self->ask_api(
-	{ action => 'host_all_ids', 
-	  filters =>  { name => $name }}
-	)->json('/rows');
+    $self->ask_api({ action => 'host_all_ids', 
+		     filters =>  { name => $name }})->json('/rows');
 };
 
 my $related_osf_cb = sub { 
     my ($self,$name,$tenant_id) = @_; 
-    $self->ask_api(
-	{ action => 'osf_all_ids', 
-	  filters =>  { name => $name, 
-			tenant_id => $tenant_id }}
-	)->json('/rows');
+    my $filters = { name => $name };
+    $filters->{tenant_id} = $tenant_id if $tenant_id;
+    $self->ask_api( { action => 'osf_all_ids', 
+		      filters =>  $filters })->json('/rows');
 };
 
 my $related_di_cb = sub { 
-    my ($self,$disk_image,$tenant_id) = @_; 
-    $self->ask_api(
-	{ action => 'di_all_ids', 
-	  filters =>  { disk_image => $disk_image, 
-			tenant_id => $tenant_id }}
-	)->json('/rows');
-};
-
-
-my $related_role_cb = sub { 
-    my ($self,$name) = @_; 
-    $self->ask_api(
-	{ action => 'role_all_ids', 
-	  filters =>  { name => $name }}
-	)->json('/rows');
+    my ($self,$name,$tenant_id) = @_; 
+    my $filters = { name => $name };
+    $filters->{tenant_id} = $tenant_id if $tenant_id;
+    $self->ask_api( { action => 'di_all_ids', 
+		      filters =>  $filters })->json('/rows');
 };
 
 my $related_admin_cb = sub { 
+    my ($self,$name,$tenant_id) = @_; 
+    my $filters = { name => $name };
+    $filters->{tenant_id} = $tenant_id if $tenant_id;
+    $self->ask_api( { action => 'admin_all_ids', 
+		      filters =>  $filters })->json('/rows');
+};
+
+my $related_role_cb = sub { 
     my ($self,$name) = @_; 
-    $self->ask_api(
-	{ action => 'admin_all_ids', 
-	  filters =>  { name => $name }}
-	)->json('/rows');
+    $self->ask_api({ action => 'role_all_ids', 
+		     filters =>  { name => $name }})->json('/rows');
 };
 
 my $CBS_TO_GET_RELATED_OBJECTS_IDS =
 {
-    vm => { tenant => $related_tenant_cb, 
-	    user => $related_user_cb,
-	    host => $related_host_cb,
-	    osf => $related_osf_cb,
-	    di => $related_di_cb },
+    vm => { argument =>  { tenant => $related_tenant_cb, 
+			   user => $related_user_cb,
+			   host => $related_host_cb,
+			   osf => $related_osf_cb,
+			   di => $related_di_cb }},
 
-    user => { tenant => $related_tenant_cb },
+    user => { argument => { tenant => $related_tenant_cb }},
 
     host => {},
 
-    osf => { tenant => $related_tenant_cb },
+    osf => { argument => { tenant => $related_tenant_cb }},
 
-    di => { tenant => $related_tenant_cb,
-	    osf => $related_osf_cb },
+    di => { argument => { tenant => $related_tenant_cb,
+			  osf => $related_osf_cb }},
 
-    admin => { tenant => $related_tenant_cb },
+    admin => { argument => { tenant => $related_tenant_cb }},
 
-    acl => { role => $related_role_cb,
-	     admin => $related_admin_cb },
+    acl => { filter => { admin => $related_admin_cb,
+			 role => $related_role_cb }}
 };
 
 my $CLI_CMD2API_ACTION =
@@ -472,8 +462,6 @@ my $DEFAULT_FIELDS =
     acl => [ qw(id name) ],
 };
 
-
-
 ###############
 ## UTILITIES ##
 ###############
@@ -482,11 +470,26 @@ sub run
 {
     my ($self, $opts, @args) = @_;
 
-    my $parsing = $self->parse_string(@args);
+    my ($parsing,$res) = ($self->parse_string(@args), undef);
 
-    my $query = $self->make_api_query($parsing); 
+    if ($parsing->command eq 'get')
+    {
+	my $query = $self->make_api_query($parsing); 
+	$res = $self->ask_api($query);
+    }
+    else
+    {
+	my $ids = $self->ask_api(
+	    { action => $self->get_all_ids_action($parsing),
+	      filters => $self->get_filters($parsing) })->json('/rows');
+    
+	$res = $self->ask_api(
+	    { action => $self->get_action($parsing),
+	      filters => { id => { '=' => $ids }}, 
+	      order_by => $self->get_order($parsing), 
+	      arguments => $self->get_arguments($parsing)});
+    }
 
-    my $res = $self->ask_api($query);
     $self->print_table($res,$parsing);
 }
 
@@ -689,65 +692,34 @@ sub get_action
     } // die "No API action available"; 
 }
 
+sub get_all_ids_action
+{
+    my ($self,$parsing) = @_;
+    return eval { 
+	$CLI_CMD2API_ACTION->{$parsing->qvd_object}->{'ids'} 
+    } // die "No API action available"; 
+}
+
 sub get_filters
 {
     my ($self,$parsing) = @_;
     my $filters = $parsing->filters // {};
-    my $out = {};
-    my $tenant_id = 1;
-    while (my ($k,$v) = each %$filters)
+
+    for my $k ($parsing->filters->list_filters)
     {
-	if (exists $LOGICAL_OPERATORS->{$k})
+	my $normalized_k = $FILTERS->{$parsing->qvd_object}->{$k} 
+	// die 'Unknown filter';
+
+	for my $ref_v ($parsing->filters->get_filter_ref_value($k))
 	{
-	    $v = $self->normalize_filters_rec($parsing,$v);
-	}
-	else
-	{
-	    ($k,$v) = $self->normalize_filter($parsing,$k,$v);
-	}
+	    my $op = $parsing->filters->get_operator($ref_v);
+	    my $v = $parsing->filters->get_value($ref_v);
+	    $v = $self->get_value($parsing,$k,$v,'filter');
 
-	$out->{$k} = $v;
-    }
-    $out;
-}
-
-sub normalize_filter
-{
-    my ($self,$parsing,$k,$v) = @_;
-
-    $k = $FILTERS->{$parsing->qvd_object}->{$k} // die 'Unknown filter';
-    return ($k,$v);
-}
-
-sub normalize_filters_rec
-{
-    my ($self,$parsing,$filters) = @_;  
-    my $position = 0;
-    my ($key,$value,$out);
-    my $odd = sub { my $n = shift; return $n % 2; };
-    my $set_value = sub { $value = shift; };
-    my $set_key = sub { ($key,$value) = (shift,undef); };
-
-    for my $item (@$filters)
-    {
-	$odd->($position++) ? 
-	    $set_value->($item) : $set_key->($item);
-
-	if (defined $value)
-	{
-	    if (exists $LOGICAL_OPERATORS->{$key})
-	    {
-		$value = $self->normalize_filters_rec($parsing,$value);
-		push @$out, ($key,$value);
-	    }
-	    else
-	    {
-		push @$out, $self->normalize_filter($parsing,$key,$value);
-	    }
+	    $parsing->filters->set_filter($ref_v,$normalized_k, {$op => $v});
 	}
     }
-
-    return $out;
+    $parsing->filters->hash;
 }
 
 sub get_arguments
@@ -760,7 +732,7 @@ sub get_arguments
     while (my ($k,$v) = each %$arguments)
     {
 	$k = $ARGUMENTS->{$parsing->qvd_object}->{$k} // die 'Unknown argument';
-	$v = $self->get_value($parsing,$k,$v);
+	$v = $self->get_value($parsing,$k,$v,'argument');
 	$out->{$k} = $v;
     }
     $out;
@@ -796,7 +768,6 @@ sub get_fields
     my @asked_fields = @{$parsing->fields} ? 
 	@{$parsing->fields}  : @{$DEFAULT_FIELDS->{$parsing->qvd_object}};
 
-
     my @retrieved_fields;
     for my $asked_field (@asked_fields)
     {
@@ -830,12 +801,11 @@ sub get_field_value
 
 sub get_value
 {
-    my ($self,$parsing,$key,$value) = @_;
-    my $tenant_id = 1;
+    my ($self,$parsing,$key,$value,$filter_or_argument) = @_;
 
-    if ( my $cb = eval { $CBS_TO_GET_RELATED_OBJECTS_IDS->{$parsing->qvd_object}->{$key}})
+    if ( my $cb = eval { $CBS_TO_GET_RELATED_OBJECTS_IDS->{$parsing->qvd_object}->{$filter_or_argument}->{$key}})
     {
-	my $ids = $cb->($self,$value,$tenant_id);
+	my $ids = $cb->($self,$value);
 	$value = shift @$ids // die 'Unknown related object in filters';	    
 	die 'Amgiguous reference to object in filters' if @$ids;	    
     }

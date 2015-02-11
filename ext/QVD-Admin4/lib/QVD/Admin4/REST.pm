@@ -58,6 +58,7 @@ sub process_query
    my $response;
 
    try {
+
        my $json_wrapper = QVD::Admin4::REST::JSON->new(json => $json);
 
        my $action = eval { QVD::Admin4::Action->new(name => $json_wrapper->action ) }

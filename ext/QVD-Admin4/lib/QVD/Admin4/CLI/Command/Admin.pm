@@ -3,6 +3,7 @@ use base qw( QVD::Admin4::CLI::Command );
 use strict;
 use warnings;
 use QVD::Admin4::CLI::Command;
+use QVD::Admin4::CLI::Grammar::Response;
 
 sub usage_text { 
 
@@ -19,7 +20,6 @@ admin new argument1=value1, argument2=value2(, argument3=value3, ...)
 sub run 
 {
     my ($self, $opts, @args) = @_;
-
     $self->SUPER::run($opts,'admin',@args);
 }
 

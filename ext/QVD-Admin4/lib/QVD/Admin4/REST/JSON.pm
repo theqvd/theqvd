@@ -1,5 +1,5 @@
 package QVD::Admin4::REST::JSON;
-
+use QVD::Admin4::REST::Filter;
 use strict;
 use warnings;
 use Moo;
@@ -10,14 +10,21 @@ our $VERSION = '0.01';
 has 'json', is => 'ro', isa => sub { die "Invalid type for attribute json" 
 					 unless ref(+shift) eq 'HASH'; }, required => '1';
 
-my $LOGICAL_OPERATORS = { -and => 1,  -or => 1, -not => 1 };
-
 sub BUILD
 {
     my $self = shift;
     my $json = $self->json;
     $self->{json} = clone $json;
     $self->get_flatten_nested_queries;	
+
+    $self->{filters_obj} = QVD::Admin4::REST::Filter->new(
+	hash => $self->{json}->{filters} // {} );
+}
+
+sub filters_obj
+{
+    my $self = shift;
+    $self->{filters_obj};
 }
 
 sub get_flatten_nested_queries
@@ -66,47 +73,28 @@ sub action
 
 sub filters
 {
-	my $self = shift;
-	return $self->json->{filters} || {};
+    my $self = shift;
+    return $self->{filters_obj}->hash;
 }
 
 
 sub parameters
 {
-	my $self = shift;
-	return $self->json->{parameters} || {};
+    my $self = shift;
+    return $self->json->{parameters} || {};
 }
 
 sub arguments
 {
-	my $self = shift;
-	return $self->json->{arguments} || {};
+    my $self = shift;
+    return $self->json->{arguments} || {};
 }
 
 sub filters_list
 {
     my $self = shift;
-    $self->filters_list_rec($self->filters);
+    return $self->{filters_obj}->list_filters;
 }
-
-sub filters_list_rec
-{
-    my ($self,$filters) = @_;
-    my @filters;
-    while (my ($key,$value) = each %$filters)
-    {
-	if (exists $LOGICAL_OPERATORS->{$key})
-	{
-	    push @filters, $self->filters_list_rec({@$value});
-	}
-	else
-	{
-	    push @filters, $key;
-	}
-    }
-    return @filters;
-}
-
 
 
 sub parameters_list
@@ -123,18 +111,18 @@ sub arguments_list
 
 sub order_criteria
 {
-	my $self = shift;
-	if (defined $self->json->{order_by} &&
-	    defined $self->json->{order_by}->{field})
-	{
-		ref($self->json->{order_by}->{field}) ?
-		    return $self->json->{order_by}->{field} :
-		    return [$self->json->{order_by}->{field}];
-	} 
-	else
-	{
-		return [];
-	}			 
+    my $self = shift;
+    if (defined $self->json->{order_by} &&
+	defined $self->json->{order_by}->{field})
+    {
+	ref($self->json->{order_by}->{field}) ?
+	    return $self->json->{order_by}->{field} :
+	    return [$self->json->{order_by}->{field}];
+    } 
+    else
+    {
+	return [];
+    }			 
 }
 
 
@@ -241,7 +229,7 @@ sub has_order_criterium
 sub get_filter_value
 {
     my ($self,$filter) = @_;
-    return $self->filters->{$filter};
+    return $self->{filters_obj}->get_filter_value($filter);
 }
 
 sub get_parameter_value

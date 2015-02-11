@@ -302,7 +302,7 @@ my $AVAILABLE_FILTERS =
 
 	      Tenant_Views_Setup => [qw(id tenant_id tenant_name field visible view_type device_type qvd_object property)],
 
-	      Operative_Acls_In_Role => [qw(acl_name role_id operative)],
+	      Operative_Acls_In_Role => [qw(acl_name role_id operative name id)],
 
 	      Operative_Acls_In_Administrator => [qw(acl_name admin_id operative name id)],
 
@@ -341,7 +341,7 @@ my $AVAILABLE_FILTERS =
 
 		 Tenant_Views_Setup => [qw(id tenant_id tenant_name field visible view_type device_type qvd_object property)],
 
-	         Operative_Acls_In_Role => [qw(acl_name role_id operative)],
+	         Operative_Acls_In_Role => [qw(acl_name role_id operative id name)],
 			   
 	         Operative_Acls_In_Administrator => [qw(acl_name admin_id operative id name)],
 
@@ -355,61 +355,11 @@ my $AVAILABLE_FILTERS =
 		
     tiny => { default => [qw(tenant_id)], Host => [qw()], Role => [qw(internal fixed)], ACL => [qw(name)], Tenant => [qw(id)], DI_Tag => [qw(tenant_id osf_id)]},
 
-    delete => { default => [qw(id tenant_id)],
+    delete => { default => [qw(id tenant_id)], Config => [qw(key value)], Host => [qw(id)], Role => [qw(id)],Tenant => [qw(id)]},
 
-		Config => [qw(key value)],
+    update => { default => [qw(id tenant_id)],Config => [qw(key value)],Host => [qw(id)],Role => [qw(id)],Tenant => [qw(id)]},
 
-		VM => [qw(storage id name user user_id user_name osf osf_id osf_name di_tag blocked expiration_soft 
-                           expiration_hard state host host_id host_name  di di_id user_state ip next_boot_ip ssh_port 
-                           vnc_port serial_port tenant tenant_id tenant_name creation_admin creation_date ip_in_use di_id_in_use )],
-
-		 DI_Tag => [qw(osf_id di_id name id tenant_id tenant_name)],
-
-		 User => [qw(id name blocked creation_admin creation_date tenant tenant_id tenant_name )],
-
-		 Host => [qw(id name address blocked frontend backend state vm_id creation_admin creation_date )],
-
-		 DI => [qw(id disk_image version osf osf_id osf_name tenant tenant_id blocked tenant_name tag)],
-
-		 OSF => [qw(id name overlay user_storage memory vm_id di_id tenant tenant_id tenant_name )],
-
-		 ACL => [qw(id name role_id admin_id )],
-
-		 Role => [qw(name id fixed internal admin_id inheritor_id)],
-
-		 Tenant => [qw(id name language block)],
-
-		 Administrator => [qw(name tenant tenant_id tenant_name role_id acl_id id role_name acl_name language block)] },
-
-    update => { default => [qw(id tenant_id)],
-
-		Config => [qw(key value)],
-
-		VM => [qw(storage id name user user_id user_name osf osf_id osf_name di_tag blocked expiration_soft 
-                           expiration_hard state host host_id host_name  di di_id user_state ip next_boot_ip ssh_port 
-                           vnc_port serial_port tenant tenant_id tenant_name creation_admin creation_date ip_in_use di_id_in_use )],
-			   
-		DI_Tag => [qw(osf_id di_id name id tenant_id tenant_name)],
-
-		User => [qw(id name blocked creation_admin creation_date tenant tenant_id tenant_name )],
-
-		Host => [qw(id name address blocked frontend backend state vm_id creation_admin creation_date )],
-
-		DI => [qw(id disk_image version osf osf_id osf_name tenant tenant_id blocked tenant_name tag)],
-
-		OSF => [qw(id name overlay user_storage memory vm_id di_id tenant tenant_id tenant_name )],
-
-		ACL => [qw(id name role_id admin_id )],
-
-		Role => [qw(name id fixed internal admin_id inheritor_id)],
-
-		Tenant => [qw(id name language block)],
-
-		Administrator => [qw(name tenant tenant_id tenant_name role_id acl_id id role_name acl_name language block)]},
-
-    exec => { default => [qw(id tenant_id)], VM => [qw(storage id name user user_id user_name osf osf_id osf_name di_tag blocked expiration_soft 
-                           expiration_hard state host host_id host_name di di_id user_state ip next_boot_ip ssh_port 
-                           vnc_port serial_port tenant tenant_id tenant_name creation_admin creation_date ip_in_use di_id_in_use)]},
+    exec => { default => [qw(id tenant_id)]},
 
     state => { default => [qw(id tenant_id)], Host => [qw(id)], ACL => [qw(id)], Role => [qw(id)], Tenant => [qw(id)]},
 };
@@ -517,23 +467,23 @@ my $AVAILABLE_FIELDS =
 
 my $MANDATORY_FILTERS = 
 { 
-    list => { default => [qw(tenant_id)], Host => [qw()], ACL => [qw()], Role => [qw()], Tenant => [qw()], Config => [qw()], 
+    list => { default => [qw()],  
               Operative_Acls_In_Role => [qw(role_id)], Operative_Acls_In_Administrator => [qw(admin_id)]},
 
-    details => { default => [qw(id tenant_id)], Host => [qw(id)], ACL => [qw(id)], Role => [qw(id)], Tenant => [qw(id)], 
+    details => { default => [qw(id)], 
 		 Operative_Acls_In_Role => [qw(role_id)], Operative_Acls_In_Administrator => [qw(admin_id)]}, 
 
-    tiny => { default => [qw(tenant_id)], Host => [qw()], ACL => [qw()], Role => [qw()], Tenant => [qw()]},
+    tiny => { default => [qw()]},
 
-    delete => { default => [qw(tenant_id)], Host => [qw()], ACL => [qw()], Role => [qw()], Tenant => [qw()], Config => [qw()]},
+    delete => { default => [qw(id)], Config => [qw(key)]},
 
-    update=> { default => [qw(tenant_id)], Host => [qw()], ACL => [qw()], Role => [qw()], Tenant => [qw()], Config => [qw()]}, 
+    update=> { default => [qw(id)], Config => [qw(key)]}, 
 
-    exec => { default => [qw(tenant_id)]}, 
+    exec => { default => [qw(id)]}, 
 
-    state => { default => [qw(id tenant_id)], Host => [qw(id)], ACL => [qw(id)], Role => [qw(id)], Tenant => [qw(id)]}, 
+    state => { default => [qw(id)]}, 
 
-    all_ids => { default => [qw(tenant_id)], Host => [qw()], ACL => [qw()], Role => [qw()], Tenant => [qw()], Config => [qw()], 
+    all_ids => { default => [qw()],
 		 Operative_Acls_In_Role => [qw(role_id)], Operative_Acls_In_Administrator => [qw(admin_id)]}, 
 };
 
@@ -546,7 +496,7 @@ my $SUBCHAIN_FILTERS =
 my $COMMODIN_FILTERS = 
 { 
 tiny => { ACL => [qw(name)]},
-list => {Config => [qw(key value)], Operative_Acls_In_Role => [qw(acl_name)], Operative_Acls_In_Administrator => [qw(acl_name name)]}
+list => {Config => [qw(key value)], Operative_Acls_In_Role => [qw(acl_name name)], Operative_Acls_In_Administrator => [qw(acl_name name)]}
 };
 
 my $DEFAULT_ORDER_CRITERIA = 

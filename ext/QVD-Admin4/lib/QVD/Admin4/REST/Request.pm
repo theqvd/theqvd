@@ -4,6 +4,7 @@ use warnings;
 use Moo;
 use QVD::Admin4::Exception;
 use QVD::Admin4::DBConfigProvider;
+use QVD::Admin4::REST::Filter;
 
 has 'json_wrapper', is => 'ro', isa => sub { die "Invalid type for attribute json_wrapper" 
 						 unless ref(+shift) eq 'QVD::Admin4::REST::JSON'; }, required => 1;
@@ -37,12 +38,15 @@ sub BUILD
     $ADMIN = $self->qvd_object_model->current_qvd_administrator;
     $DBConfigProvider = QVD::Admin4::DBConfigProvider->new();
 
+    $self->{filters} = QVD::Admin4::REST::Filter->new(
+	hash => $self->json_wrapper->filters_obj->hash);
+
     $self->hide_recovery_mode_administrator
 	if $self->qvd_object_model->qvd_object eq 'Administrator';
 
     $self->set_default_admin_id_in_acls_search
-	if $self->qvd_object_model->qvd_object 
-	eq 'Operative_Acls_In_Administrator';
+	if $self->qvd_object_model->qvd_object eq 
+	'Operative_Acls_In_Administrator';
 
     $self->forze_filtering_by_tenant;
 
@@ -53,7 +57,6 @@ sub BUILD
         if $self->qvd_object_model->qvd_object eq 'Tenant';
     $self->forze_tenant_assignment_in_creation
 	if $self->qvd_object_model->type_of_action eq 'create';
-    $self->switch_custom_properties_json2request;
 
     $self->forze_default_version_in_json_for_di if
 	($self->qvd_object_model->qvd_object eq 'DI' &&
@@ -64,7 +67,9 @@ sub BUILD
 
     $self->check_acls_for_deleting if
 	$self->qvd_object_model->type_of_action eq 'delete';
+
     $self->check_filters_validity_in_json;
+
     $self->check_update_arguments_validity_in_json if
 	$self->qvd_object_model->type_of_action eq 'update';
     $self->check_create_arguments_validity_in_json if
@@ -76,6 +81,7 @@ sub BUILD
     $self->set_parameters_in_request;
     $self->set_pagination_in_request;
     $self->set_filters_in_request;
+
     $self->set_arguments_in_request;
     $self->set_nested_queries_in_request;
     $self->set_related_views_in_request;
@@ -84,18 +90,12 @@ sub BUILD
 }
 
 
-sub hide_recovery_mode_administrator
+sub set_default_admin_id_in_acls_search
 {
     my $self = shift;
 
-    my $ids = $self->json_wrapper->has_filter('id') ?
-	$self->json_wrapper->get_filter_value('id') : [];
-    $ids = [$ids] unless ref($ids);
-
-    my $sql = 'NOT IN (0)';
-    my $key = @$ids ? '-and' : 'me.id';
-    my $value = @$ids ? ['me.id' => \$sql, 'me.id' => $ids ] : \$sql;
-    $self->set_filter($key,$value);
+    $self->filters->add_filter('admin_id',{ '=' => $ADMIN->id})
+	unless $self->filters->get_filter_value('admin_id');
 }
 
 sub forze_default_version_in_json_for_di
@@ -156,32 +156,6 @@ sub dependencies
     $self->qvd_object_model->dbix_has_one_relationships;
 }
 
-sub set_filter
-{
-    my ($self,$key,$val) = @_;
-    $val = undef if defined $val && $val eq '';
-    $key = undef if defined $key && $key eq '';
-
-    if (exists $LOGICAL_OPERATORS->{$key})
-    {
-	$self->add_term_to_logical_filter(
-	    $key,$val);
-    }
-    else
-    {
-	$self->filters->{$key} = $val;
-    }
-}
-
-sub add_term_to_logical_filter
-{
-    my ($self,$operator,$val) = @_;
-
-    my $list = $self->filters->{$operator} // [];
-    push @$list, @$val;
-    $self->filters->{$operator} = $list;
-}
-
 sub set_nested_query
 {
     my ($self,$nq,$val) = @_;
@@ -237,23 +211,28 @@ sub set_pagination_in_request
     $self->modifiers->{rows}  = $self->json_wrapper->block // 10000; 
 }
 
-sub set_default_admin_id_in_acls_search
+
+sub hide_recovery_mode_administrator
 {
     my $self = shift;
-
-    $self->json_wrapper->forze_filter_addition('admin_id',$ADMIN->id)
-	unless defined $self->json_wrapper->get_filter_value('admin_id');
+    
+    $self->filters->add_filter('id',{ '!=' => 0 });
 }
+
 
 sub forze_filtering_by_own_admin
 {
     my $self = shift;
 
-    $self->json_wrapper->forze_filter_addition('id',$ADMIN->id)
-	unless defined $self->json_wrapper->get_filter_value('id');
-    
-    QVD::Admin4::Exception->throw(code => 6320, object => 'id')
-	unless $self->json_wrapper->get_filter_value('id') eq $ADMIN->id; 
+    my $has_id;
+    for my $id ($self->json_wrapper->get_filter_value('id'))
+    {
+	QVD::Admin4::Exception->throw(code => 6320, object => 'id')
+	    unless $id  eq $ADMIN->id;
+	$has_id = 1;
+    } 
+
+    $self->filters->add_filter('id',$ADMIN->id);
 }
 
 sub forze_filtering_by_tenant
@@ -261,14 +240,15 @@ sub forze_filtering_by_tenant
     my $self = shift;
 
     return unless $self->qvd_object_model->available_filter('tenant_id');
-    if ($self->json_wrapper->has_filter('tenant_id'))
+    if ($self->json_wrapper->has_filter('tenant_id') ||
+	$self->json_wrapper->has_filter('tenant_name'))
     {
 	QVD::Admin4::Exception->throw(code => 4220, object => 'tenant_id') 
 	    unless $ADMIN->is_superadmin;
     }
     else
     {
-	$self->json_wrapper->forze_filter_addition('tenant_id',$ADMIN->tenants_scoop);
+	$self->filters->add_filter('tenant_id',$ADMIN->tenants_scoop);
     }
 }
 
@@ -276,22 +256,12 @@ sub forze_filtering_tenants_by_tenant
 {
     my $self = shift;
 
-    return unless $self->qvd_object_model->available_filter('id');
-    my %scoop = map { $_ => 1 } @{$ADMIN->tenants_scoop};
-    my $ids = $self->json_wrapper->has_filter('id') ?
-	$self->json_wrapper->get_filter_value('id') :
-	$ADMIN->tenants_scoop;
-    $ids = [$ids] unless ref($ids);
-    my @ids = grep { exists $scoop{$_} } @$ids;
+    my @ids = @{$ADMIN->tenants_scoop};
 
     @ids = grep { $_ ne 0 } @ids if 
 	$self->qvd_object_model->type_of_action =~ /^delete|list$/;
 
-    $self->json_wrapper->forze_filter_deletion('id')
-	if $self->json_wrapper->has_filter('id');
-    
-    $self->json_wrapper->forze_filter_addition(
-	'id',\@ids);
+    $self->filters->add_filter('id',\@ids);
 }
 
 sub forze_tenant_assignment_in_creation
@@ -301,34 +271,6 @@ sub forze_tenant_assignment_in_creation
     return if $ADMIN->is_superadmin; # It must be provided in the input
     return unless $self->qvd_object_model->mandatory_argument('tenant_id');
     $self->json_wrapper->forze_argument_addition('tenant_id',$ADMIN->tenant_id);
-}
-
-sub switch_custom_properties_json2request
-{
-    my $self = shift;
-    my @custom_properties_keys = 
-	$self->qvd_object_model->custom_properties_keys;
-
-    my $found_properties = 0;
-    my $admin = $self->qvd_object_model->current_qvd_administrator;
-
-    for my $property_key (@custom_properties_keys)
-    {
-	next unless $self->json_wrapper->has_filter($property_key);
-
-	$admin->re_is_allowed_to($self->qvd_object_model->get_acls_for_filter('properties')) # PROVISIONAL
-	    || QVD::Admin4::Exception->throw(code => 4220, object => 'properties');
-
-	$found_properties++;
-	my $property_value = $self->json_wrapper->get_filter_value($property_key);
-	$property_value = { ILIKE => "%".$property_value."%"};
-	my $property_dbix_key = $found_properties > 1 ?
-	    "properties_$found_properties" : 'properties';
-	$self->json_wrapper->forze_filter_deletion($property_key);
-        $self->set_filter($property_dbix_key.".key",$property_key);
-        $self->set_filter($property_dbix_key.".value",$property_value);
-        $self->add_to_join('properties');
-    }
 }
 
 sub check_filters_validity_in_json
@@ -345,7 +287,7 @@ sub check_filters_validity_in_json
 	QVD::Admin4::Exception->throw(code => 4220, object => $_)
 	for $self->json_wrapper->filters_list;
 
-    $self->json_wrapper->has_filter($_) ||
+    $self->filters->has_filter($_) ||
 	QVD::Admin4::Exception->throw(code => 6220, object => $_)
 	for $self->qvd_object_model->mandatory_filters;
 }
@@ -373,7 +315,7 @@ sub check_update_arguments_validity_in_json
 	for $self->json_wrapper->arguments_list;
 
     my $id = $self->json_wrapper->get_filter_value('id');
-    my ($method,$code) = ref($id) && ref($id) eq 'ARRAY' && scalar @$id > 1 ? 
+    my ($method,$code) = ref($id) && scalar @$id > 1 ? 
 	('get_acls_for_argument_in_massive_update',4240) : 
 	('get_acls_for_argument_in_update',4230) ;
 
@@ -411,7 +353,7 @@ sub check_nested_queries_validity_in_json
     elsif ($type_of_action eq 'update')
     {
 	my $id = $self->json_wrapper->get_filter_value('id');
-	($method,$code) = ref($id) && ref($id) eq 'ARRAY' && scalar @$id > 1 ? 
+	($method,$code) = ref($id) && scalar @$id > 1 ? 
 	    ('get_acls_for_nested_query_in_massive_update',4240) : 
 	    ('get_acls_for_nested_query_in_update',4230) ;
     }
@@ -452,97 +394,27 @@ sub check_fields_validity_in_json
 ############################################################
 ############################################################
 
-
 sub set_filters_in_request
 {
     my $self = shift;
     my $filters = $self->json_wrapper->filters;
 
-    while (my ($key,$value) = each %$filters)
+    for my $k ($self->filters->list_filters)
     {
-	my ($key_dbix_format,$value_normalized);
-	if (exists $LOGICAL_OPERATORS->{$key})
+	my $key_dbix_format = $self->qvd_object_model->map_filter_to_dbix_format($k);
+	for my $ref_v ($self->filters->get_filter_ref_value($k))
 	{
-	    ($key_dbix_format,$value_normalized) = 
-		($key,$self->map_logical_operator_filter_value($value));
+	    my $v = $self->filters->get_value($ref_v);
+	    $v = $self->qvd_object_model->normalize_value($k,$v);
+	    my $op = $self->filters->get_operator($ref_v);
+	    my $value_normalized = { $op => $v } ;
+
+	    $self->filters->set_filter($ref_v,$key_dbix_format,$value_normalized);
 	}
-	else
-	{
-	    ($key_dbix_format,$value_normalized) = $self->map_key_value_filter($key,$value);
-	}
-	$self->set_filter($key_dbix_format,$value_normalized);
     }
+
+    $self->{filters} = $self->filters->hash;
 }
-
-sub map_logical_operator_filter_value
-{
-    my ($self,$filters) = @_;  
-    my $position = 0;
-    my ($key,$value,$out);
-    my $odd = sub { my $n = shift; return $n % 2; };
-    my $set_value = sub { $value = shift; };
-    my $set_key = sub { ($key,$value) = (shift,undef); };
-
-    for my $item (@$filters)
-    {
-	$odd->($position++) ? 
-	    $set_value->($item) : $set_key->($item);
-
-	if (defined $value)
-	{
-	    if (exists $LOGICAL_OPERATORS->{$key})
-	    {
-		$value = $self->map_logical_operator_filter_value($value);
-		push @$out, ($key,$value);
-	    }
-	    else
-	    {
-		push @$out, $self->map_key_value_filter($key,$value);
-	    }
-	}
-    }
-    return $out;
-}
-
-
-sub map_key_value_filter
-{
-    my ($self,$key,$value) = @_;
-
-    my $key_dbix_format = $self->qvd_object_model->map_filter_to_dbix_format($key);
-    my $value_normalized;
-
-    if (my ($op, $v) = $self->value_with_operator($value)) #Ad Hoc identitity operators allowed
-    {
-	$value_normalized = { $op => ref($v) && ref($v) eq 'ARRAY' ? 
-				  [ map { $self->qvd_object_model->normalize_value($key,$_) } @$v ] : $v };
-    }
-    elsif (ref($value) && ref($value) eq 'ARRAY')
-    {
-	$value_normalized = [ map { $self->qvd_object_model->normalize_value($key,$_) } @$value ] ;
-    }
-    else 
-    {
-	$value_normalized = $self->qvd_object_model->normalize_value($key,$value);
-	if ($self->qvd_object_model->subchain_filter($key))
-	{
-	    $value_normalized = { ILIKE => "%".$value_normalized."%"};
-	}
-	elsif ($self->qvd_object_model->commodin_filter($key))
-	{
-	    $value_normalized = { ILIKE => $value_normalized }; 
-	}
-    }
-
-    return ($key_dbix_format,$value_normalized);
-}
-
-sub value_with_operator
-{
-    my ($self,$value) = @_;
-    return unless ref($value) && ref($value) eq 'HASH';
-    my ($operator,$real_value) = each %$value; #FIX ME: Operator availability checking needed!!
-} 
 
 ######################
 ######################
@@ -662,6 +534,5 @@ sub related_view
     my $self = shift;
     $self->qvd_object_model->related_view;
 }
-
 
 1;
