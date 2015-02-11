@@ -2,6 +2,10 @@ Wat.Views.VMDetailsView = Wat.Views.DetailsView.extend({
     qvdObj: 'vm',
     liveFields: ['state', 'user_state', 'ip', 'host_id', 'host_name', 'ssh_port', 'vnc_port', 'serial_port'],
 
+    relatedDoc: {
+        image_update: "Images update guide"
+    },
+    
     initialize: function (params) {
         this.model = new Wat.Models.VM(params);
         Wat.Views.DetailsView.prototype.initialize.apply(this, [params]);

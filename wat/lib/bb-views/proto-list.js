@@ -582,6 +582,8 @@ Wat.Views.ListView = Wat.Views.MainView.extend({
 
         that.renderList();
         
+        this.renderRelatedDocs();
+        
         // Translate the strings rendered. 
         // This translation is only done here, in the first charge. 
         // When the list were rendered in actions such as sorting, filtering or pagination, 
@@ -615,9 +617,7 @@ Wat.Views.ListView = Wat.Views.MainView.extend({
             Wat.WS.openListWebsockets(this.qvdObj, this.collection.models, this.liveFields, this.cid);
         }
         
-        this.updateFilterNotes();
-        
-        this.renderRelatedDocs();
+        this.updateFilterNotes();        
     },
     
     // Fill filter selects 

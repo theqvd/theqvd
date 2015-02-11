@@ -26,6 +26,7 @@ Wat.C = {
     tenantID: -1,
     adminID: -1,
 
+    // Get the base URL for API calls using credentials or session ID
     getBaseUrl: function () {
         if (this.login && this.password) {
             return this.apiUrl + "?login=" + this.login + "&password=" + this.password;
@@ -35,18 +36,22 @@ Wat.C = {
         }
     },
     
+    // Return if current admin is superadmin
     isSuperadmin: function () {
         return this.tenantID == SUPERTENANT_ID;
     },    
     
+    // Return if current admin is recover admin
     isRecoveradmin: function () {
         return this.adminID == RECOVER_USER_ID;
-    }, 
+    },
     
+    // Return if system is configured as multitenant WAT
     isMultitenant: function () {
         return this.multitenant;
     },
     
+    // Process log out including cookies removement
     logOut: function () {
         $.removeCookie('qvdWatSid', { path: '/' });
         $.removeCookie('qvdWatLogin', { path: '/' });
@@ -56,6 +61,10 @@ Wat.C = {
         this.acls = [];
     },
     
+    // Process login including cookies creation
+    // Params:
+    //      sid: session ID
+    //      login: administrator username
     logIn: function (sid, login) {
         this.loggedIn = true;
         $.cookie('qvdWatSid', sid, { expires: this.loginExpirationDays, path: '/' });
@@ -64,6 +73,7 @@ Wat.C = {
         window.location = '#';
     },
     
+    // Check if current admin is properly logged in
     isLogged: function () {
         if (this.loggedIn && this.sid != '' && $.cookie('qvdWatSid') && $.cookie('qvdWatSid') == this.sid && this.login != '' && $.cookie('qvdWatLogin') && $.cookie('qvdWatLogin') == this.login) {
             return true;
@@ -74,6 +84,7 @@ Wat.C = {
         }
     },
     
+    // Recover login cookies if exist and call to API to check if credentials are correct
     rememberLogin: function () {
         if ($.cookie('qvdWatSid') && $.cookie('qvdWatLogin')) {
             this.loggedIn = true;
@@ -91,6 +102,11 @@ Wat.C = {
         }
     },
     
+    // Call to API with user and password retrieved to check if credentials are correct.
+    // Params:
+    //      user: administrator username
+    //      password: administrator password
+    // If credentials not retrieved, get it from login form
     tryLogin: function (user, password) {
         var user = $('input[name="admin_user"]').val() || user;
         var password = $('input[name="admin_password"]').val() || password;
@@ -106,6 +122,11 @@ Wat.C = {
         Wat.A.performAction('current_admin_setup', {}, VIEWS_COMBINATION, {}, this.checkLogin, this, false);
     },
     
+    // After call to API to get admin setup, check response
+    // - Showing message if error. 
+    // - Storing useful parameters, perform configuration and rendering main if success.
+    // Params:
+    //      that: Current context where will be stored API call return
     checkLogin: function (that) {   
         that.password = '';
         
@@ -156,6 +177,9 @@ Wat.C = {
         }
     },
     
+    // Stored views configuration retrieved from database to the inner data structure
+    // Params:
+    //      viewsConfiguration: Hash with each view configured on DB for current admin.
     storeViewsConfiguration: function (viewsConfiguration) {
         $.each (viewsConfiguration, function (iView, view) {
             switch (view.view_type) {
@@ -200,7 +224,7 @@ Wat.C = {
         });
     },
     
-    // Given an ACL or an array of ACLs, check if it pass or not due the user configuration
+    // Given an ACL or an array of ACLs, check if the current admin is granted to it
     // Params:
     //      acl: string or array of acls
     //      logic: OR/AND to calculate the pass condition if is array
@@ -236,6 +260,8 @@ Wat.C = {
     },
     
     // Check all the ACLs of predifened groups. If any of them is available, return true
+    // Params:
+    //      group: ACls group name associted to groups of ACLs defined on configuration file
     checkGroupACL: function (group) {
         var aclGranted = false;
         
@@ -250,6 +276,10 @@ Wat.C = {
         return aclGranted;
     },
     
+    // Return a given string if an acl is granted. Empty string will be returned otherwise
+    // Params:
+    //      string: string that will be returned if pass
+    //      acl: acl that will be checked
     ifACL: function (string, acl) {
         if (this.checkACL(acl)) {
             return string;
@@ -259,6 +289,9 @@ Wat.C = {
         }
     },
     
+    // Given configuration data (fields, filters, columns...) Delete those which specified ACLs doesnt pass
+    // Params:
+    //      data: Structure of data for any purpose where is specified ACL or ACL group to be checked for each element.
     purgeConfigData: function (data) {
         var that = this;
         
@@ -277,6 +310,8 @@ Wat.C = {
         return data;
     },
     
+    // Set different parameters to correct menu and sections visibility. 
+    // These settings will be performed depending on ACL checks, mono/multi tenant configurations, or administrators tenants type
     configureVisibility: function () {        
         Wat.I.menu = $.extend(true, {}, Wat.I.menuOriginal);
         Wat.I.userMenu = $.extend(true, {}, Wat.I.menuUserOriginal);
@@ -362,12 +397,26 @@ Wat.C = {
             tenantsExist = true;
         }
         
+        // For monotenant  enviroments, multitenant documentation will not be shown
+        if (!Wat.C.isMultitenant()) {
+            $.each(Wat.I.docSections, function (lan, sections) {
+                $.each(sections, function (iSec, sec) {
+                    if (sec.guide == 'multitenant') {
+                        delete Wat.I.docSections[lan][iSec];
+                    }
+                });
+            });
+        }
+        
         if (!tenantsExist) {
             delete ACL_SECTIONS['tenant'];
             delete ACL_SECTIONS_PATTERNS['tenant'];
         }
     },
     
+    // Check if administrator session is expired
+    // Params:
+    //      response: API call response
     sessionExpired: function (response) {
         if (!Wat.Router.app_router) {
             return false;
@@ -381,6 +430,7 @@ Wat.C = {
         return false;
     },
     
+    // Retrieve the block size for this administrator
     getBlock: function () {
         if (this.block == 0) {
             return this.tenantBlock;

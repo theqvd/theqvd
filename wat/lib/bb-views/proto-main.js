@@ -358,6 +358,10 @@ Wat.Views.MainView = Backbone.View.extend({
     },
     
     renderRelatedDocs: function () {
+        if ($('.related-doc').length > 0) {
+            return;
+        }
+        
         var sectionDoc = [];
         sectionDoc[this.qvdObj] = "This section step by step";
         this.relatedDoc = $.extend({}, sectionDoc, this.relatedDoc);

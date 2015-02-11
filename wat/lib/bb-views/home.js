@@ -2,6 +2,11 @@ Wat.Views.HomeView = Wat.Views.MainView.extend({
     homeTemplateName: 'home',
     homeTemplateVmsExpireName: 'home-vms-expire',
     qvdObj: 'home',
+    
+    relatedDoc: {
+        first_steps: "First steps",
+    },
+    
     liveFields: [
         'users_count', 
         'vms_count', 
@@ -77,6 +82,8 @@ Wat.Views.HomeView = Wat.Views.MainView.extend({
         this.renderVmsExpire ();
                 
         this.loadData(this.stats);
+        
+        this.renderRelatedDocs();
         
         // Open websockets for live fields
         Wat.WS.openStatsWebsockets(this.qvdObj, this.liveFields, this.cid);

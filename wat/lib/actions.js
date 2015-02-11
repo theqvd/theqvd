@@ -1,4 +1,8 @@
 Wat.A = {
+    // Get template from template file caching if specified to avoid future loadings
+    // Params:
+    //      templateName: name of the template file to be loaded without extension.
+    //      cache: boolean that specify if template will be cached in code or not (it will be cached if not provided).
     getTemplate: function(templateName, cache) {
         if (cache == undefined) {
             cache = true;
@@ -33,6 +37,15 @@ Wat.A = {
         }
     },
     
+    // Perform any action of the API
+    // Params:
+    //      action: action name.
+    //      arguments: hash to be passed in JSON format as arguments to the call API.
+    //      filters: hash to be passed in JSON format as filters to the call API.
+    //      messages: hash with messages to be showed in success and error cases.
+    //      successCallback: function that will be executed after action execution.
+    //      that: current context where will be stored retrieved response and passed as parameter to successCallback function.
+    //      async: boolean that specify if API call will be asynchronous or not (Default: Asynchronous).
     performAction: function (action, arguments, filters, messages, successCallback, that, async) {
         if (async == undefined) {
             async = true;
@@ -120,7 +133,20 @@ Wat.A = {
         $.ajax(params);
     },
     
-    // Fill filter selects 
+    // Fill select combo with API call, passed values or both
+    // Params:
+    //      params: hash with parameters.
+    //          - params.controlSelector: CSS selector for the select combo
+    //          - params.controlId: select combo's ID (used if controlSelector is not retrieved)
+    //          - params.controlName: select combo's name (used if controlSelector and controlId are not retrieved)
+    //          - params.params.startingOptions: hash with pairs id-name of elements to fill the select combo
+    //          - params.selectedId: Id of the element that will be selected
+    //          - params.translateOptions: Array of ids of those elements that will be translated
+    //          - params.action: API action that will be used to fill select combo
+    //          - params.filters: API filters that will be used to fill select combo
+    //          - params.order_by: API order by that will be used to fill select combo
+    //          - params.nameAsId: Boolean that specifies if name of the options will be taken as Id too
+    //          - params.group: HTML native optgroup where the options will be grouped
     fillSelect: function (params) {
         if (params.controlSelector) {
             var controlSelector = params.controlSelector;
@@ -186,10 +212,6 @@ Wat.A = {
                         var combo = $(this);
                         
                         var options = '';
-                        
-                        if (params.group) {
-                            //combo.append('<optgroup label="' + params.group + '">');
-                        }
 
                         var optGroup = '';
                         $(data.rows).each(function(i,option) {
@@ -234,6 +256,9 @@ Wat.A = {
         }
     },
     
+    // Get a documentation guide from template and return <body> of this document to be ebeded in WAT
+    // Params:
+    //      selectedGuide: guide name.
     getDocBody: function (selectedGuide) {
         // Load language
         var lan = $.i18n.options.lng;
@@ -250,6 +275,12 @@ Wat.A = {
         return array_matches[1];
     },
     
+    // Get a documentation guide´s section from guide
+    // Params:
+    //      guide: guide name.
+    //      sectionId: Id of the section of the guide to be parsed.
+    //      toc: boolean to specify if include or not Table of Contents (Default: False).
+    //      imagesPrefix: prefix to be added to each src attribute in images.
     getDocSection: function (guide, sectionId, toc, imagesPrefix) {
         if (toc == undefined) {
             toc = false;

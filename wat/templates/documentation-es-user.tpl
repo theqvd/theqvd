@@ -864,7 +864,7 @@ OSF
 </div>
 </div>
 <div class="sect1">
-<h2 id="_proceso_qvd_completo">2. Proceso QVD completo</h2>
+<h2 id="_crear_una_máquina_virtual_de_cero">2. Crear una máquina virtual de cero</h2>
 <div class="sectionbody">
 <div class="paragraph"><p>Aprenderemos los pasos para realizar el proceso completo de la creación de una máquina virtual y dejarla a punto para ser utilizada.</p></div>
 <div class="paragraph"><p>Las máquinas virtuales utilizan otros elementos, que deberemos crear antes en cierto orden. Para saber más sobre este orden veremos la sección del manual <em>Dependencias entre elementos de QVD</em>.</p></div>
@@ -1832,7 +1832,7 @@ En la vista detalle tenemos <strong>dos herramientas</strong> disponibles:
 <div id="footnotes"><hr /></div>
 <div id="footer">
 <div id="footer-text">
-Last updated 2015-02-05 09:30:30 CET
+Last updated 2015-02-10 15:40:39 CET
 </div>
 </div>
 </body>

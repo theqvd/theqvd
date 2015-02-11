@@ -69,9 +69,25 @@ Wat.I.docSections = {
             section: '_gestionar_administradores_y_permisos',
             guide: 'user'
         },
+        permissions_guide_multitenant: { 
+            section: '_gestionar_administradores_y_permisos_multitenant',
+            guide: 'multitenant'
+        },
         permissions_introduction: { 
             section: '_permisos_administrador_rol_acl',
             guide: 'introduction'
+        },
+        image_update: { 
+            section: '_actualización_de_imagen',
+            guide: 'user'
+        },
+        full_vm_creation: { 
+            section: '_crear_una_máquina_virtual_de_cero',
+            guide: 'user'
+        },
+        first_steps: { 
+            section: '_primeros_pasos',
+            guide: 'user'
         },
     }
 }

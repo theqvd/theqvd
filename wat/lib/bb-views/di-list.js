@@ -1,6 +1,9 @@
 Wat.Views.DIListView = Wat.Views.ListView.extend({
     qvdObj: 'di',
-
+    relatedDoc: {
+        image_update: "Images update guide"
+    },
+    
     initialize: function (params) {
         this.collection = new Wat.Collections.DIs(params);
 

@@ -1,5 +1,8 @@
 Wat.Views.DIDetailsView = Wat.Views.DetailsView.extend({  
     qvdObj: 'di',
+    relatedDoc: {
+        image_update: "Images update guide"
+    },
     
     initialize: function (params) {
         this.model = new Wat.Models.DI(params);

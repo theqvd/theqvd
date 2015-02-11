@@ -1,7 +1,12 @@
 Wat.Views.VMListView = Wat.Views.ListView.extend({  
     qvdObj: 'vm',
     liveFields: ['state', 'user_state', 'ip', 'host_id', 'host_name', 'ssh_port', 'vnc_port', 'serial_port'],
-
+    
+    relatedDoc: {
+        image_update: "Images update guide",
+        full_vm_creation: "Create a virtual machine from scratch",
+    },
+    
     initialize: function (params) {   
         this.collection = new Wat.Collections.VMs(params);
         
