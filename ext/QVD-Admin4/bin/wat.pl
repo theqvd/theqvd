@@ -150,12 +150,15 @@ websocket '/staging' => sub {
     my $images_file = $staging_file . '-tmp'. rand;
     $json->{parameters}->{tmp_file_name} = $images_file;
 
+    my $accomplished=0;
+
     $c->on(message => sub { my ($c,$msg) = @_;
                             my $sf_size = eval { -s "$staging_path/$staging_file" } // 0;
                             my $if_size = eval { -s "$images_path/$images_file" } // 0;
                             $c->send(encode_json({ status => 1000,
                                                    total_size => $sf_size,
-                                                   copy_size => $if_size }));});
+                                                   copy_size => $if_size }))
+				unless $accomplished;});
 
     my $fc = Mojo::IOLoop::ForkCall->new;
     $fc->run(
@@ -165,6 +168,7 @@ websocket '/staging' => sub {
         sub { my ($fc, $err, $response) = @_;
 	      $err //= 'no error signals';
               $c->app->log->debug("Copy finished: $err");
+	      $accomplished=1;
               $c->send(encode_json($response)); }
         );
 };

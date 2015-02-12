@@ -3,10 +3,13 @@ use strict;
 use warnings;
 use Moo;
 use Clone qw(clone);
+use QVD::Admin4::Exception;
 
 has 'hash', is => 'ro', isa => sub { die "Invalid type for attribute hash" unless ref(+shift) eq 'HASH'; }, required => 1;
+has 'unambiguous_filters', is => 'ro', isa => sub { my $f = shift; die "Invalid type for attribute unambiguous_filter" 
+						       unless ( ref($f) && ref($f) eq 'ARRAY') ;};
 
-my $LOGICAL_OPERATORS = { -and => 1, -or => 1, -nor => 1 };
+my $LOGICAL_OPERATORS = { -and => 1, -or => 1, -not => 1 };
 
 sub BUILD
 {
@@ -19,7 +22,59 @@ sub BUILD
 	unless $self->filter_with_logical_operator;
 
     $self->flatten_filters;
+    $self->{unambiguous_filters} //= [];
+    $self->check_unambiguous_filters;
 }
+
+sub check_unambiguous_filters
+{
+    my $self = shift;
+
+    for my $f (@{$self->unambiguous_filters})
+    {
+	my $n = scalar $self->get_filter_ref_value($f) // next;
+
+        QVD::Admin4::Exception->throw(code => 6321, object => $f)  if 
+	    ( $n > 1 || (not $self->is_obligatory($f)) );
+    }
+}
+
+sub is_obligatory
+{
+    my ($self,$f) = @_;
+    my $first_level = eval { $self->hash->{-and}} // return 0;
+    return $self->is_obligatory_rec($first_level,$f);
+}
+
+
+sub is_obligatory_rec
+{
+    my ($self,$list_of_key_values,$searched_key) = @_;
+
+    my $position = 0;
+    my ($key,$value);
+    my $odd = sub { my $n = shift; return $n % 2; };
+    my $set_value = sub { $value = shift; };
+    my $set_key = sub { ($key,$value) = (shift,undef); };
+
+    for my $item (@$list_of_key_values)
+    {
+	$odd->($position++) ? 
+	    $set_value->($item) : $set_key->($item);
+
+	return 1 if $key eq $searched_key;
+	return 1 if defined $value && $key eq '-and' &&
+	    $self->is_obligatory_rec($value,$searched_key);
+    }
+
+    return 0;
+} 
+
+
+
+
+
+
 
 sub filter_with_logical_operator
 {
@@ -80,7 +135,7 @@ sub flatten_filters_rec
 	{
 	    if (exists $LOGICAL_OPERATORS->{$key})
 	    {
-		$value = $self->flatten_filters($value);
+		$self->flatten_filters_rec($value);
 	    }
 	    else
 	    {
@@ -125,7 +180,9 @@ sub get_filter_value
 {
     my ($self,$f) = @_;
 
-    map {$self->get_value($_)} $self->get_filter_ref_value($f);
+    my @vals = map {$self->get_value($_)} $self->get_filter_ref_value($f);
+
+    scalar @vals > 1 ? return @vals : return $vals[0];
 }
 
 sub get_value

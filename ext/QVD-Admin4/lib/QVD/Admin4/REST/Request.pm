@@ -29,7 +29,6 @@ has 'related_views', is => 'ro', isa => sub { die "Invalid type for attribute re
 
 my $ADMIN;
 my $DBConfigProvider;
-my $LOGICAL_OPERATORS = { -and => 1,  -or => 1, -not => 1 };
 
 sub BUILD 
 {
@@ -39,12 +38,21 @@ sub BUILD
     $DBConfigProvider = QVD::Admin4::DBConfigProvider->new();
 
     $self->{filters} = QVD::Admin4::REST::Filter->new(
-	hash => $self->json_wrapper->filters_obj->hash);
+	hash => $self->json_wrapper->filters_obj->hash,
+	unambiguous_filters => [$self->qvd_object_model->unambiguous_filters]);
 
     $self->hide_recovery_mode_administrator
 	if $self->qvd_object_model->qvd_object eq 'Administrator';
 
     $self->set_default_admin_id_in_acls_search
+	if $self->qvd_object_model->qvd_object eq 
+	'Operative_Acls_In_Administrator';
+
+    $self->check_unique_role_in_acls_search
+	if $self->qvd_object_model->qvd_object eq 
+	'Operative_Acls_In_Role';
+
+    $self->check_unique_admin_in_acls_search
 	if $self->qvd_object_model->qvd_object eq 
 	'Operative_Acls_In_Administrator';
 
@@ -57,6 +65,8 @@ sub BUILD
         if $self->qvd_object_model->qvd_object eq 'Tenant';
     $self->forze_tenant_assignment_in_creation
 	if $self->qvd_object_model->type_of_action eq 'create';
+
+    $self->switch_custom_properties_json2request;
 
     $self->forze_default_version_in_json_for_di if
 	($self->qvd_object_model->qvd_object eq 'DI' &&
@@ -89,6 +99,21 @@ sub BUILD
     $self->set_tables_to_join_in_request;
 }
 
+sub check_unique_admin_in_acls_search
+{
+    my $self = shift;
+    my @admin_id = ($self->filters->get_filter_value('admin_id'));
+    QVD::Admin4::Exception->throw(code => 6322, object => 'admin_id') 
+	if scalar @admin_id > 1;     
+}
+
+sub check_unique_role_in_acls_search
+{
+    my $self = shift;
+    my @role_id = ($self->filters->get_filter_value('role_id'));
+    QVD::Admin4::Exception->throw(code => 6322, object => 'role_id') 
+	if scalar @role_id > 1; 
+}
 
 sub set_default_admin_id_in_acls_search
 {
@@ -272,6 +297,42 @@ sub forze_tenant_assignment_in_creation
     return unless $self->qvd_object_model->mandatory_argument('tenant_id');
     $self->json_wrapper->forze_argument_addition('tenant_id',$ADMIN->tenant_id);
 }
+
+
+sub switch_custom_properties_json2request
+{
+    my $self = shift;
+    my @custom_properties_keys = 
+	$self->qvd_object_model->custom_properties_keys;
+
+    my $found_properties = 0;
+    my $admin = $self->qvd_object_model->current_qvd_administrator;
+
+    for my $property_key (@custom_properties_keys)
+    {
+	next unless $self->filters->has_filter($property_key);
+
+	$admin->re_is_allowed_to($self->qvd_object_model->get_acls_for_filter('properties')) # PROVISIONAL
+	    || QVD::Admin4::Exception->throw(code => 4220, object => 'properties');
+
+	$found_properties++;
+
+	for my $ref_v ($self->filters->get_filter_ref_value($property_key))
+	{
+	    my $property_value = $self->filters->get_value($ref_v);
+	    my $operator = $self->filters->get_operator($ref_v);
+	    my $property_dbix_key = $found_properties > 1 ?
+		"properties_$found_properties" : 'properties';
+
+	    my $value = [$property_dbix_key.".key" => { $operator => $property_key },
+			 $property_dbix_key.".value" => { $operator => $property_value } ];
+	    $self->set_filter($ref_v,'-and',$value);
+	}
+
+        $self->add_to_join('properties');
+    }
+}
+
 
 sub check_filters_validity_in_json
 {

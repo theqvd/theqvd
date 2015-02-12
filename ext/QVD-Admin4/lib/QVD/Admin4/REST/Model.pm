@@ -22,6 +22,19 @@ has 'model_info', is => 'ro', isa => sub {die "Invalid type for attribute model_
 
 my $DBConfigProvider;
 
+my $UNAMBIGUOUS_FILTERS = 
+{   
+    list => { Operative_Acls_In_Role => [qw(role_id)],
+	      Operative_Acls_In_Administrator => [qw(admin_id)] },
+
+    details => { default => [qw(id)] },
+
+    update => { default => [qw(id)] },
+
+    delete => { default => [qw(id)] },
+};
+
+
 my $RELATED_VIEWS_IN_DB = 
 {   
     list => { User => [qw(User_View)],
@@ -277,20 +290,20 @@ my $AVAILABLE_FILTERS =
 
 	      Config => [qw(key value)],
 	      
-	      VM => [qw(storage id name user user_id user_name osf osf_id osf_name di_tag blocked 
-                        expiration_soft expiration_hard state host host_id host_name di di_id 
+	      VM => [qw(storage id name user_id user_name osf_id osf_name di_tag blocked 
+                        expiration_soft expiration_hard state host host_id host_name di_name di_id 
                         user_state ip next_boot_ip ssh_port vnc_port serial_port tenant tenant_id tenant_name 
                         creation_admin creation_date ip_in_use di_id_in_use  )],
 
 	      DI_Tag => [qw(osf_id di_id name id tenant_id tenant_name)],
 
-	      User => [qw(id name blocked creation_admin creation_date tenant tenant_id tenant_name )],
+	      User => [qw(id name blocked creation_admin creation_date  tenant_id tenant_name )],
 
 	      Host => [qw(id name address blocked frontend backend state vm_id creation_admin creation_date )],
 
-	      DI => [qw(id disk_image version osf osf_id osf_name tenant tenant_id blocked tenant_name tag)],
+	      DI => [qw(id disk_image version  osf_id osf_name  tenant_id blocked tenant_name tag)],
 
-	      OSF => [qw(id name overlay user_storage memory vm_id di_id tenant tenant_id tenant_name )],
+	      OSF => [qw(id name overlay user_storage memory vm_id di_id  tenant_id tenant_name )],
 
 	      ACL => [qw(id name role_id admin_id)],
 
@@ -298,7 +311,7 @@ my $AVAILABLE_FILTERS =
 
 	      Role => [qw(name id fixed internal admin_id inheritor_id)],
 
-	      Administrator => [qw(name tenant tenant_id tenant_name id language block)],
+	      Administrator => [qw(name  tenant_id tenant_name id language block)],
 
 	      Tenant_Views_Setup => [qw(id tenant_id tenant_name field visible view_type device_type qvd_object property)],
 
@@ -317,19 +330,19 @@ my $AVAILABLE_FILTERS =
 
 		 Config => [qw(key value)],
 
-		 VM => [qw(storage id name user user_id user_name osf osf_id osf_name di_tag blocked expiration_soft 
-                           expiration_hard state host host_id host_name di di_id user_state ip next_boot_ip ssh_port 
-                           vnc_port serial_port tenant tenant_id tenant_name creation_admin creation_date ip_in_use di_id_in_use )],
+		 VM => [qw(storage id name  user_id user_name  osf_id osf_name di_tag blocked expiration_soft 
+                           expiration_hard state host_id host_name di_name di_id user_state ip next_boot_ip ssh_port 
+                           vnc_port serial_port tenant_id tenant_name creation_admin creation_date ip_in_use di_id_in_use )],
 
 		 DI_Tag => [qw(osf_id di_id name id tenant_id tenant_name)],
 
-		 User => [qw(id name blocked creation_admin creation_date tenant tenant_id tenant_name )],
+		 User => [qw(id name blocked creation_admin creation_date tenant_id tenant_name )],
 
 		 Host => [qw(id name address blocked frontend backend state vm_id creation_admin creation_date )],
 
-		 DI => [qw(id disk_image version osf osf_id osf_name tenant tenant_id blocked tenant_name tag)],
+		 DI => [qw(id disk_image version osf osf_id osf_name tenant_id blocked tenant_name tag)],
 
-		 OSF => [qw(id name overlay user_storage memory vm_id di_id tenant tenant_id tenant_name )],
+		 OSF => [qw(id name overlay user_storage memory vm_id di_id  tenant_id tenant_name )],
 
 		 ACL => [qw(id name role_id admin_id )],
 
@@ -337,7 +350,7 @@ my $AVAILABLE_FILTERS =
 
 		 Tenant => [qw(id name language block)],
 
-		 Administrator => [qw(name tenant tenant_id tenant_name role_id acl_id id role_name acl_name language block)],
+		 Administrator => [qw(name  tenant_id tenant_name role_id acl_id id role_name acl_name language block)],
 
 		 Tenant_Views_Setup => [qw(id tenant_id tenant_name field visible view_type device_type qvd_object property)],
 
@@ -685,7 +698,6 @@ my $FILTERS_TO_DBIX_FORMAT_MAPPER =
 	'password' => 'me.password',
 	'tenant_id' => 'me.tenant_id',
 	'tenant_name' => 'tenant.name',
-	'tenant' => 'tenant.name',
 	'role_id' => 'role.id',
 	'acl_id' => 'acl.id',
 	'role_name' => 'role.name',
@@ -703,7 +715,6 @@ my $FILTERS_TO_DBIX_FORMAT_MAPPER =
 	'di_id' => 'dis.id',
 	'tenant_id' => 'me.tenant_id',
 	'tenant_name' => 'tenant.name',
-	'tenant' => 'tenant.name',
     },
 
     Host => {
@@ -725,12 +736,10 @@ my $FILTERS_TO_DBIX_FORMAT_MAPPER =
 	'version' => 'me.version',
 	'osf_id' => 'me.osf_id',
 	'osf_name' => 'osf.name',
-	'osf' => 'osf.name',
 	'tag' => 'tags.tag',
 	'tenant_id' => 'osf.tenant_id',
 	'blocked' => 'me.blocked',
 	'tenant_name' => 'tenant.name',
-	'tenant' => 'tenant.name',
     },
     User => {
 	'id' => 'me.id',
@@ -741,7 +750,6 @@ my $FILTERS_TO_DBIX_FORMAT_MAPPER =
 	'creation_date' => 'me.creation_date',
 	'tenant_id' => 'me.tenant_id',
 	'tenant_name' => 'tenant.name',
-	'tenant' => 'tenant.name',
     },
 
     VM => {
@@ -750,10 +758,8 @@ my $FILTERS_TO_DBIX_FORMAT_MAPPER =
 	'name' => 'me.name',
 	'user_id' => 'me.user_id',
 	'user_name' => 'user.login',
-	'user' => 'user.login',
 	'osf_id' => 'me.osf_id',
 	'osf_name' => 'osf.name',
-	'osf' => 'osf.name',
 	'di_tag' => 'me.di_tag',
 	'blocked' => 'vm_runtime.blocked',
 	'expiration_soft' => 'vm_runtime.vm_expiration_soft',
@@ -761,11 +767,9 @@ my $FILTERS_TO_DBIX_FORMAT_MAPPER =
 	'state' => 'vm_runtime.vm_state',
 	'host_id' => 'vm_runtime.host_id',
 	'host_name' => 'host.name',
-	'host' => 'host.name',
 	'di_id' => 'di.id',
 	'di_version' => 'di.version',
 	'di_name' => 'di.path',
-	'di' => 'di.path',
 	'user_state' => 'vm_runtime.user_state',
 	'ip' => 'me.ip',
 	'next_boot_ip' => 'vm_runtime.vm_address',
@@ -774,7 +778,6 @@ my $FILTERS_TO_DBIX_FORMAT_MAPPER =
 	'serial_port' => 'vm_runtime.vm_serial_port',
 	'tenant_id' => 'user.tenant_id',
 	'tenant_name' => 'tenant.name',
-	'tenant' => 'tenant.name',
 	'creation_admin' => 'me.creation_admin',
 	'creation_date' => 'me.creation_date',
 	'ip_in_use' => 'vm_runtime.vm_address',
@@ -1144,6 +1147,9 @@ sub BUILD
     $self->custom_properties_keys;
 
     $self->set_info_by_type_of_action_and_qvd_object(
+	'unambiguous_filters',$UNAMBIGUOUS_FILTERS);
+
+    $self->set_info_by_type_of_action_and_qvd_object(
 	'related_views_in_db',$RELATED_VIEWS_IN_DB);
 
     $self->set_info_by_type_of_action_and_qvd_object(
@@ -1211,6 +1217,7 @@ sub initialize_info_model
     my $self = shift;
     $self->{model_info} =
 { 
+    unambiguous_filters => [],                                                                 
     related_views_in_db => [],
     available_filters => [],                                                                 
     available_fields => [],                                                                  
@@ -1322,6 +1329,13 @@ sub available_filters
 {
     my $self = shift;
     my $filters =  $self->{model_info}->{available_filters} // [];
+    @$filters;
+}
+
+sub unambiguous_filters
+{
+    my $self = shift;
+    my $filters =  $self->{model_info}->{unambiguous_filters} // [];
     @$filters;
 }
 

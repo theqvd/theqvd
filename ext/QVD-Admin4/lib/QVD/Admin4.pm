@@ -271,9 +271,9 @@ sub tags_delete
     for my $tag (@$tags)
     {
 	$tag = undef if defined $tag && $tag eq ''; # FIX ME
+	$tag = $di->search_related('tags',{tag => $tag})->first // next;	    
 	eval 
 	{ 
-	    $tag = $di->search_related('tags',{tag => $tag})->first // next;	    
 	    ($tag->fixed || $tag->tag eq 'head' || $tag->tag eq 'default') 
 		&& QVD::Admin4::Exception->throw(code => 7340);
 	    $tag->delete;
@@ -815,7 +815,7 @@ sub get_acls_in_admins
     my ($self,$request) = @_;
     my (@rows, $rs);
 
-    my ($admin_id) = $request->json_wrapper->get_filter_value('admin_id');
+    my $admin_id = $request->json_wrapper->get_filter_value('admin_id');
 
     my $aol = QVD::Admin4::AclsOverwriteList->new(admin_id => $admin_id);
     my $bind = [$aol->acls_to_close_re,$aol->acls_to_open_re,$aol->acls_to_hide_re];

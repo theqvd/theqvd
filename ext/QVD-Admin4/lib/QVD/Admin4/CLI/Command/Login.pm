@@ -1,5 +1,5 @@
 package QVD::Admin4::CLI::Command::Login;
-use base qw( CLI::Framework::Command::Meta );
+use base qw( QVD::Admin4::CLI::Command );
 use Term::ReadKey;
 use strict;
 use warnings;
@@ -15,12 +15,25 @@ sub run
 {
     my ($self, $opts, @args) = @_;
     my $login = shift @args;
-    $self->cache->set( login => $login );
+    my $password = $self->read_password;
     my $app = $self->get_app;
 
-    my $password = $self->read_password;
+    $app->cache->set( login => $login );
     $self->cache->set( password => $password );
     $self->cache->set( sid => undef );
+
+    my $res = $self->ask_api(
+	{ action => 'admin_get_list', 
+	  filters => { name => $login }});
+
+    my $sid = $res->json('/sid');
+    my $aid = $res->json('/rows/0/id');
+    my $tid = $res->json('/rows/0/tenant_id');
+
+    $self->cache->set( sid => $sid );
+    $self->cache->set( aid => $aid );
+    $self->cache->set( tid => $tid );
+
     $app->render("Hello $login\n");
 }
 

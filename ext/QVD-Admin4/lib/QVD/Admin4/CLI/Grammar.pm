@@ -317,7 +317,7 @@ my $RULES =
 		   {label => 'ITEM', saturated => 1, feature => 0, coordinated => 0}],
    meaning => sub { my ($c0,$c1,$c2) = @_; 
 		    ($c1,$c2) = ('-between',$c2->{'-between'}) if eval { $c2->{'-between'}}; 
-		    return { $c0 => $c2 } if ref($c2) && ref($c2) eq 'ARRAY';
+		    return { $c0 => $c2 } if ref($c2) && ref($c2) eq 'ARRAY' && $c1 ne '-between';
 		    return { $c0 =>  { $c1 =>  $c2 }}; }},
 
 # Items can be coordinated

@@ -11,233 +11,79 @@ my $LOGICAL_OPERATORS = { -and => 1, -or => 1, -not => 1 };
 
 my $FILTERS =
 {
-    vm => { storage => 'storage',
-	    id => 'id',
-	    name => 'name',
-	    user => 'user_name',
-	    osf => 'osf_name',
-	    tag => 'di_tag',
-	    blocked => 'blocked', 
-	    expiration_soft => 'expiration_soft',
-	    expiration_hard => 'expiration_hard',
-	    state => 'state',
-	    host =>  'host_name',
-	    di => 'di_name', 
-	    user_state => 'user_state',
-	    ip => 'ip',
-	    ssh_port => 'ssh_port',
-	    vnc_port => 'vnv_port',
-	    serial_port => 'serial_port',
-	    tenant =>  'tenant_name',
-	    ip_in_use => 'ip_in_use',
-	    di_in_use => 'di_name_in_use' },
+    vm => { storage => 'storage', id => 'id', name => 'name', user => 'user_name', osf => 'osf_name', tag => 'di_tag', blocked => 'blocked', 
+	    expiration_soft => 'expiration_soft', expiration_hard => 'expiration_hard', state => 'state', host =>  'host_name', di => 'di_name', 
+	    user_state => 'user_state', ip => 'ip', ssh_port => 'ssh_port', vnc_port => 'vnv_port', serial_port => 'serial_port',
+	    tenant =>  'tenant_name', ip_in_use => 'ip_in_use', di_in_use => 'di_name_in_use' },
 
-    user => { id => 'id', 
-	      name => 'name',
-	      blocked => 'blocked',
-	      tenant => 'tenant_name'},
+    user => { id => 'id', name => 'name', blocked => 'blocked', tenant => 'tenant_name'},
 
-    host => { id => 'id',
-	      name => 'name',
-	      address => 'address',
-	      blocked => 'blocked',
-	      frontend => 'frontend',
-	      backend => 'backend',
-	      state => 'state'},
+    host => { id => 'id', name => 'name', address => 'address', blocked => 'blocked', frontend => 'frontend', backend => 'backend', state => 'state'},
 
-    osf => { id => 'id',
-	     name => 'name',
-	     overlay => 'overlay',
-	     user_storage => 'user_storage',
-	     memory => 'memory',
-	     tenant =>  'tenant_name' },
+    osf => { id => 'id', name => 'name', overlay => 'overlay', user_storage => 'user_storage', memory => 'memory', tenant =>  'tenant_name' },
 
-    di => { id => 'id',
-	    name => 'disk_image',
-	    version => 'version',
-	    osf => 'osf_name',
-	    tenant => ' tenant_name',
-	    blocked => 'blocked',
-	    tag => 'tag' },
+    di => { id => 'id', name => 'disk_image', version => 'version', osf => 'osf_name', tenant => 'tenant_name', blocked => 'blocked', tag => 'tag' },
 
-    tenant => { id => 'id',
-		name => 'name',
-		language => 'language',
-		block => 'block' },
+    tenant => { id => 'id', name => 'name', language => 'language', block => 'block' },
 
     config => { key_re => 'key_re' },
 
-    admin => { id => 'id',
-	       name => 'name',
-	       tenant => 'tenant_name',
-	       language => 'language',
-	       block => 'block' },
+    admin => { id => 'id', name => 'name', tenant => 'tenant_name', language => 'language', block => 'block' },
 
-    role => { id => 'id',
-	      name => 'name',
-	      fixed => 'fixed',
-	      internal => 'internal' },
+    role => { id => 'id', name => 'name', fixed => 'fixed', internal => 'internal' },
 
-    acl => { id => 'id',
-	     name => 'name',
-             role => 'role_id',
-             admin => 'admin_id',
-	     operative => 'operative'},
+    acl => { id => 'id', name => 'name', role => 'role_id', admin => 'admin_id', operative => 'operative'},
 };
 
 
 my $ORDER =
 {
-    vm => { storage => 'storage',
-	    id => 'id',
-	    name => 'name',
-	    user => 'user_name',
-	    osf => 'osf_name',
-	    tag => 'di_tag',
-	    blocked => 'blocked', 
-	    expiration_soft => 'expiration_soft',
-	    expiration_hard => 'expiration_hard',
-	    state => 'state',
-	    host =>  'host_name',
-	    di => 'di_name', 
-	    user_state => 'user_state',
-	    ip => 'ip',
-	    ssh_port => 'ssh_port',
-	    vnc_port => 'vnv_port',
-	    serial_port => 'serial_port',
-	    tenant =>  'tenant_name',
-	    ip_in_use => 'ip_in_use'},
+    vm => { storage => 'storage', id => 'id', name => 'name', user => 'user_name', osf => 'osf_name', tag => 'di_tag', blocked => 'blocked', 
+	    expiration_soft => 'expiration_soft', expiration_hard => 'expiration_hard', state => 'state', host =>  'host_name', di => 'di_name', 
+	    user_state => 'user_state', ip => 'ip', ssh_port => 'ssh_port', vnc_port => 'vnv_port', serial_port => 'serial_port',
+	    tenant =>  'tenant_name', ip_in_use => 'ip_in_use'},
 
-    user => { id => 'id', 
-	      name => 'name',
-	      blocked => 'blocked',
-	      tenant => 'tenant_name'},
+    user => { id => 'id', name => 'name', blocked => 'blocked', tenant => 'tenant_name'},
 
-    host => { id => 'id',
-	      name => 'name',
-	      address => 'address',
-	      blocked => 'blocked',
-	      frontend => 'frontend',
-	      backend => 'backend',
-	      state => 'state'},
+    host => { id => 'id', name => 'name', address => 'address', blocked => 'blocked', frontend => 'frontend', backend => 'backend',state => 'state'},
 
-    osf => { id => 'id',
-	     name => 'name',
-	     overlay => 'overlay',
-	     user_storage => 'user_storage',
-	     memory => 'memory',
-	     tenant =>  'tenant_name' },
+    osf => { id => 'id', name => 'name', overlay => 'overlay', user_storage => 'user_storage', memory => 'memory', tenant =>  'tenant_name' },
 
-    di => { id => 'id',
-	    name => 'disk_image',
-	    version => 'version',
-	    osf => 'osf_name',
-	    tenant => ' tenant_name',
-	    blocked => 'blocked',
-	    tag => 'tag' },
+    di => { id => 'id', name => 'disk_image', version => 'version', osf => 'osf_name', tenant => ' tenant_name', blocked => 'blocked', tag => 'tag' },
 
-    tenant => { id => 'id',
-		name => 'name',
-		language => 'language',
-		block => 'block' },
+    tenant => { id => 'id', name => 'name', language => 'language', block => 'block' },
 
-    admin => { id => 'id',
-	       name => 'name',
-	       tenant => 'tenant_name',
-	       language => 'language',
-	       block => 'block' },
+    admin => { id => 'id', name => 'name', tenant => 'tenant_name', language => 'language', block => 'block' },
 
-    role => { id => 'id',
-	      name => 'name',
-	      fixed => 'fixed',
-	      internal => 'internal' },
+    role => { id => 'id', name => 'name', fixed => 'fixed', internal => 'internal' },
 
-    acl => { id => 'id',
-	     name => 'name' }
+    acl => { id => 'id', name => 'name' }
 };
 
 my $FIELDS =
 {
-    vm => { storage => 'storage',
-	    id => 'id',
-	    name => 'name',
-	    user => 'user_name',
-	    osf => 'osf_name',
-	    tag => 'di_tag',
-	    blocked => 'blocked', 
-	    expiration_soft => 'expiration_soft',
-	    expiration_hard => 'expiration_hard',
-	    state => 'state',
-	    host =>  'host_name',
-	    di => 'di_name', 
-	    user_state => 'user_state',
-	    ip => 'ip',
-	    mac => 'mac',
-	    ssh_port => 'ssh_port',
-	    vnc_port => 'vnv_port',
-	    serial_port => 'serial_port',
-	    tenant =>  'tenant_name',
-	    ip_in_use => 'ip_in_use',
-	    di_in_use => 'di_name_in_use' },
+    vm => { storage => 'storage', id => 'id', name => 'name', user => 'user_name', osf => 'osf_name', tag => 'di_tag', blocked => 'blocked', 
+	    expiration_soft => 'expiration_soft', expiration_hard => 'expiration_hard', state => 'state', host =>  'host_name', di => 'di_name', 
+	    user_state => 'user_state', ip => 'ip', mac => 'mac', ssh_port => 'ssh_port', vnc_port => 'vnv_port', serial_port => 'serial_port', 
+	    tenant =>  'tenant_name', ip_in_use => 'ip_in_use', di_in_use => 'di_name_in_use' },
 
-    user => { id => 'id',
-	      name => 'name',
-	      tenant => 'tenant_name',
-	      blocked => 'blocked',
-	      number_of_vms => 'number_of_vms',
-	      number_of_vms_connected => 'number_of_vms_connected'},
+    user => { id => 'id', name => 'name', tenant => 'tenant_name', blocked => 'blocked', number_of_vms => 'number_of_vms', number_of_vms_connected => 'number_of_vms_connected'},
 
-    host => { id => 'id',
-	      name => 'name',
-	      address => 'address',
-	      blocked => 'blocked',
-	      frontend => 'frontend',
-	      backend => 'backend',
-	      state => 'state',
-	      number_of_vms_connected => 'number_of_vms_connected'},
+    host => { id => 'id', name => 'name', address => 'address', blocked => 'blocked', frontend => 'frontend', backend => 'backend', state => 'state', number_of_vms_connected => 'number_of_vms_connected'},
 
-    osf => { id => 'id',
-	     name => 'name',
-	     overlay => 'overlay',
-	     user_storage => 'user_storage',
-	     memory => 'memory',
-	     tenant =>  'tenant_name',
-	     number_of_vms => 'number_of_vms',
-	     number_of_dis => 'number_of_dis'},
+    osf => { id => 'id', name => 'name', overlay => 'overlay', user_storage => 'user_storage', memory => 'memory', tenant =>  'tenant_name', number_of_vms => 'number_of_vms', number_of_dis => 'number_of_dis'},
 
-    di => { id => 'id',
-	    name => 'disk_image',
-	    tenant => 'tenant_name',
-	    version => 'version',
-	    osf => 'osf_name',
-	    blocked => 'blocked',
-	    tags => 'tags'},
+    di => { id => 'id', name => 'disk_image', tenant => 'tenant_name', version => 'version', osf => 'osf_name', blocked => 'blocked', tags => 'tags'},
 
-    tenant => { id => 'id',
-		name => 'name',
-		language => 'language',
-		block => 'block' },
+    tenant => { id => 'id', name => 'name', language => 'language', block => 'block' },
 
-    config => { key => 'key',
-                value => 'operative_value' },
+    config => { key => 'key', value => 'operative_value' },
 
-    admin => { id => 'id',
-	       name => 'name',
-	       roles => 'roles',
-	       tenant => 'tenant_name',
-	       language => 'language',
-	       block => 'block' },
+    admin => { id => 'id', name => 'name', roles => 'roles', tenant => 'tenant_name', language => 'language', block => 'block' },
 
-    role => { id => 'id',
-	      name => 'name',
-	      fixed => 'fixed',
-	      internal => 'internal',
-              inherited_roles => 'roles',
-              positive_acls => 'acls',
-              negative_acls => 'acls'},
+    role => { id => 'id', name => 'name', fixed => 'fixed', internal => 'internal', inherited_roles => 'roles', positive_acls => 'acls', negative_acls => 'acls'},
 
-    acl => { id => 'id',
-	     name => 'name' }
+    acl => { id => 'id', name => 'name' }
 };
 
 my $FIELDS_CBS =
@@ -254,55 +100,31 @@ my $FIELDS_CBS =
 
 my $ARGUMENTS =
 {
-    vm => { name => 'name',
-	    ip => 'ip',
-	    tenant => 'tenant_id',
-	    blocked => 'blocked',
-	    expiration_soft => 'expiration_soft',
-	    expiration_hard => 'expiration_hard',
-	    storage => 'storage',
-	    tag => 'di_tag',
-	    user => 'user_id',
-	    osf => 'osf_id' },
+    vm => { name => 'name', ip => 'ip', tenant => 'tenant_id', blocked => 'blocked', expiration_soft => 'expiration_soft',
+	    expiration_hard => 'expiration_hard', storage => 'storage', tag => 'di_tag', user => 'user_id', osf => 'osf_id', 
+	    __properties_changes__ => '__properties_changes__' },
 
-    user => { name => 'name',
-	      password => 'password',
-	      blocked => 'blocked',
-	      tenant => 'tenant_id' },
+    user => { name => 'name', password => 'password', blocked => 'blocked', tenant => 'tenant_id',
+	      __properties_changes__ => '__properties_changes__' },
 
-    host => { name => 'name',
-	      address => 'address',
-	      frontend => 'frontend',
-	      backend => 'backend',
-	      blocked => 'blocked' },
+    host => { name => 'name', address => 'address', frontend => 'frontend', backend => 'backend', blocked => 'blocked',
+	      __properties_changes__ => '__properties_changes__' },
 
-    osf => { name => 'name',
-	     memory => 'memory',
-	     user_storage => 'user_storage',
-	     overlay => 'overlay',
-	     tenant => 'tenant_id' },
+    osf => { name => 'name', memory => 'memory', user_storage => 'user_storage', overlay => 'overlay', tenant => 'tenant_id',
+	     __properties_changes__ => '__properties_changes__' },
 
-    di => { blocked => 'blocked',  
-	    name => 'disk_image',  
-	    version => 'version', 
-	    osf => 'osf_id'},
+    di => { blocked => 'blocked',  name => 'disk_image',  version => 'version', osf => 'osf_id',
+	    __properties_changes__ => '__properties_changes__', __tags_changes__ => '__tags_changes__'},
 
-    tenant => { name => 'name',
-		language => 'language',
-		block => 'block' },
+    tenant => { name => 'name', language => 'language', block => 'block' },
 
-    config => { key => 'key',
-		value => 'value' },
+    config => { key => 'key', value => 'value' },
 
-    admin => { name => 'name',
-	       password => 'password',
-	       tenant => 'tenant_name',
-	       language => 'language',
-	       block => 'block' },
+    admin => { name => 'name', password => 'password', tenant => 'tenant_id', language => 'language', block => 'block',
+	       __roles_changes__ => '__roles_changes__' },
 
-    role => { name => 'name',
-	      fixed => 'fixed',
-	      internal => 'internal' },
+    role => { name => 'name', fixed => 'fixed', internal => 'internal',
+	      __roles_changes__ => '__roles_changes__', __acls_changes__ => '__acls_changes__' },
 };
 
 my $related_tenant_cb = sub { 
@@ -357,15 +179,10 @@ my $related_role_cb = sub {
 
 my $CBS_TO_GET_RELATED_OBJECTS_IDS =
 {
-    vm => { argument =>  { tenant => $related_tenant_cb, 
-			   user => $related_user_cb,
-			   host => $related_host_cb,
-			   osf => $related_osf_cb,
-			   di => $related_di_cb }},
+    vm => { argument =>  { tenant => $related_tenant_cb, user => $related_user_cb,host => $related_host_cb,
+			   osf => $related_osf_cb, di => $related_di_cb }},
 
     user => { argument => { tenant => $related_tenant_cb }},
-
-    host => {},
 
     osf => { argument => { tenant => $related_tenant_cb }},
 
@@ -374,66 +191,31 @@ my $CBS_TO_GET_RELATED_OBJECTS_IDS =
 
     admin => { argument => { tenant => $related_tenant_cb }},
 
-    acl => { filter => { admin => $related_admin_cb,
-			 role => $related_role_cb }}
+    acl => { filter => { admin => $related_admin_cb, role => $related_role_cb }},
+
+    host => {},
 };
 
 my $CLI_CMD2API_ACTION =
 {
-    vm => { ids => 'vm_all_ids', 
-	    get => 'vm_get_list', 
-	    update => 'vm_update', 
-	    create => 'vm_create', 
-	    delete => 'vm_delete', 
-	    start => 'vm_start', 
-	    stop => 'vm_stop',
-	    disconnect => 'vm_user_disconnect' },
+    vm => { ids => 'vm_all_ids',  get => 'vm_get_list', update => 'vm_update', create => 'vm_create', delete => 'vm_delete', 
+	    start => 'vm_start', stop => 'vm_stop', disconnect => 'vm_user_disconnect' },
 
-    user => { ids => 'user_all_ids', 
-	      get => 'user_get_list', 
-	      update => 'user_update', 
-	      create => 'user_create', 
-	      delete => 'user_delete' },
+    user => { ids => 'user_all_ids', get => 'user_get_list', update => 'user_update', create => 'user_create', delete => 'user_delete' },
 
-    host => { ids => 'host_all_ids', 
-	      get => 'host_get_list', 
-	      update => 'host_update', 
-	      create => 'host_create', 
-	      delete => 'host_delete'},
+    host => { ids => 'host_all_ids', get => 'host_get_list', update => 'host_update', create => 'host_create', delete => 'host_delete'},
 
-    osf => { ids => 'osf_all_ids', 
-	     get => 'osf_get_list', 
-	     update => 'osf_update', 
-	     create => 'osf_create', 
-	     delete => 'osf_delete'},
+    osf => { ids => 'osf_all_ids', get => 'osf_get_list', update => 'osf_update', create => 'osf_create', delete => 'osf_delete'},
 
-    di => { ids => 'di_all_ids', 
-	    get => 'di_get_list', 
-	    update => 'di_update', 
-	    create => 'di_create', 
-	    delete => 'di_delete'},
+    di => { ids => 'di_all_ids', get => 'di_get_list', update => 'di_update', create => 'di_create', delete => 'di_delete'},
 
-    tenant => { ids => 'tenant_all_ids', 
-		get => 'tenant_get_list', 
-		update => 'tenant_update', 
-		create => 'tenant_create', 
-		delete => 'tenant_delete' },
+    tenant => { ids => 'tenant_all_ids', get => 'tenant_get_list', update => 'tenant_update', create => 'tenant_create', delete => 'tenant_delete' },
 
-    config => { get => 'config_get', 
-		update => 'config_set', 
-		delete => 'config_delete' },
+    config => { get => 'config_get', update => 'config_set', delete => 'config_delete' },
 
-    admin => { ids => 'admin_all_ids', 
-	       get => 'admin_get_list', 
-	       update => 'admin_update', 
-	       create => 'admin_create', 
-	       delete => 'admin_delete' },
+    admin => { ids => 'admin_all_ids', get => 'admin_get_list', update => 'admin_update', create => 'admin_create', delete => 'admin_delete' },
 
-    role => { ids => 'role_all_ids', 
-	       get => 'role_get_list', 
-	       update => 'role_update', 
-	       create => 'role_create', 
-	       delete => 'role_delete' },
+    role => { ids => 'role_all_ids', get => 'role_get_list', update => 'role_update', create => 'role_create', delete => 'role_delete' },
 
     acl => { get => 'acl_get_list' }, 
 };
@@ -472,9 +254,9 @@ sub run
 
     my ($parsing,$res) = ($self->parse_string(@args), undef);
 
-    if ($parsing->command eq 'get')
+    if ($parsing->command =~ /^get|create$/)
     {
-	my $query = $self->make_api_query($parsing); 
+	my $query = $self->make_api_query($parsing);
 	$res = $self->ask_api($query);
     }
     else
@@ -482,7 +264,7 @@ sub run
 	my $ids = $self->ask_api(
 	    { action => $self->get_all_ids_action($parsing),
 	      filters => $self->get_filters($parsing) })->json('/rows');
-    
+
 	$res = $self->ask_api(
 	    { action => $self->get_action($parsing),
 	      filters => { id => { '=' => $ids }}, 
@@ -594,11 +376,27 @@ sub ask_api
     die 'API returns bad status' 
 	unless $res->code;
 
-
-    die $res->json('/message') 
-	if $res->json('/status');
+    $self->check_api_result($res);
     return $res;
 }
+
+sub check_api_result
+{
+    my ($self,$res) = @_;
+
+    return 1 unless $res->json('/status');
+    die $res->json('/message') unless 
+	$res->json('/status') eq 1200;
+
+    my ($message,$failures) = ('',$res->json('/failures'));
+
+    while (my ($id,$failure) = each %$failures)
+    {
+	$message .= "$id: " . $failure->{message} . "\n";
+    } 
+    die $message;
+}
+
 
 sub ask_api_ws
 {
@@ -630,18 +428,16 @@ sub ask_api_ws
     my $res = {}; 
     my $on_message_cb =
 	sub {my ($tx, $msg) = @_; 
+	     
 	     $res = decode_json($msg);
 	     if ($res->{status} eq 1000)
 	     {  
 		 my $total = $res->{total_size} // 0;
 		 my $partial = $res->{copy_size} // 0;
 		 my $percentage = ($partial * 100) / $total;
-		 if ($percentage > 0)
-		 {
-		     print STDERR "\r";
-		     printf STDERR '%.2f%%', $percentage;
-		     $tx->send('Ale');
-		 }
+		 print STDERR "\r";
+		 printf STDERR '%.2f%%', $percentage;
+		 $tx->send('Ale');
 	     }
 	     else
 	     {
@@ -708,7 +504,7 @@ sub get_filters
     for my $k ($parsing->filters->list_filters)
     {
 	my $normalized_k = $FILTERS->{$parsing->qvd_object}->{$k} 
-	// die 'Unknown filter';
+	// die "Unknown filter $k";
 
 	for my $ref_v ($parsing->filters->get_filter_ref_value($k))
 	{
@@ -727,15 +523,21 @@ sub get_arguments
     my ($self,$parsing) = @_;
     my $arguments = $parsing->arguments // {};
     my $out = {};
-    my $tenant_id = 1;
 
     while (my ($k,$v) = each %$arguments)
     {
-	$k = $ARGUMENTS->{$parsing->qvd_object}->{$k} // die 'Unknown argument';
+	my $normalized_k = $ARGUMENTS->{$parsing->qvd_object}->{$k} // die "Unknown argument $k";
 	$v = $self->get_value($parsing,$k,$v,'argument');
-	$out->{$k} = $v;
+	$out->{$normalized_k} = $v;
     }
     $out;
+}
+
+sub superadmin
+{
+    my $self = shift;
+    my $app = $self->get_app;
+    $app->cache->get('tid') ? return 1 : return 0;
 }
 
 sub get_order
@@ -748,7 +550,7 @@ sub get_order
 
     for my $criteria (@$criteria)
     {
-	$criteria = eval { $ORDER->{$parsing->qvd_object}->{$_} } 
+	$criteria = eval { $ORDER->{$parsing->qvd_object}->{$criteria} } 
 	// die 'Unknown order criteria';
 	push @$out, $criteria;
     }
@@ -773,7 +575,7 @@ sub get_fields
     {
 	my $api_field = eval {
 	    $FIELDS->{$parsing->qvd_object}->{$asked_field} 
-	} // die "Unknown field";
+	} // die "Unknown field $asked_field";
 
 	push @retrieved_fields, $asked_field
 	    if exists $first->{$api_field};
@@ -786,7 +588,7 @@ sub get_field_value
     my ($self,$parsing,$api_res_obj,$cli_field) = @_;
 
     my $api_field = eval { $FIELDS->{$parsing->qvd_object}->{$cli_field} }
-    // die "Unknown field";
+    // die "Unknown field $cli_field";
     my $v = $api_res_obj->{$api_field};
 
     if (ref($v)) 
@@ -805,11 +607,33 @@ sub get_value
 
     if ( my $cb = eval { $CBS_TO_GET_RELATED_OBJECTS_IDS->{$parsing->qvd_object}->{$filter_or_argument}->{$key}})
     {
-	my $ids = $cb->($self,$value);
-	$value = shift @$ids // die 'Unknown related object in filters';	    
-	die 'Amgiguous reference to object in filters' if @$ids;	    
+	$value = $cb->($self,$value,$self->tenant_scoop);
+	die "Unknown related object $key in filters" unless defined $$value[0];
+
+	if ($filter_or_argument eq 'argument')
+	{ 
+	    die 'Amgiguous reference to object in filters' if 
+		defined $$value[1];	    
+	    $value = shift @$value;
+	}
     }
     $value;
+}
+
+sub tenant_scoop
+{
+    my ($self,$tenant_scoop) = @_;
+
+    $self->{tenant_scoop} = $tenant_scoop
+	if $tenant_scoop;
+
+    unless ($self->{tenant_scoop})
+    {
+	my $app = $self->get_app;
+	$self->{tenant_scoop} = $app->cache->get('tid');
+    }
+
+    $self->{tenant_scoop};
 }
 
 1;
