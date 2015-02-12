@@ -563,7 +563,7 @@ Wat.Views.ListView = Wat.Views.MainView.extend({
         }
         
         clearInterval(that.interval);
-
+        
         // Fill the list
         var template = _.template(
             that.templateListCommonBlock, {

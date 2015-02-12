@@ -56,27 +56,50 @@ Wat.Views.DIListView = Wat.Views.ListView.extend({
         
         Wat.I.chosenElement('[name="disk_image"]', 'advanced100');
 
-        // Fill OSF select on virtual machines creation form
-        var params = {
-            'action': 'osf_tiny_list',
-            'selectedId': $('.' + this.cid + ' .filter select[name="osf"]').val(),
-            'controlName': 'osf_id'
-        };
-        
-        // If exist tenant control (in superadmin cases) show osfs of selected tenant
-        if ($('[name="tenant_id"]').val() != undefined) {
-            // Add the tenant id to the osf select filling
-            params.filters = {
-                'tenant_id': $('[name="tenant_id"]').val()
-            };
-            
-            // Add an event to the tenant select change
-            Wat.B.bindEvent('change', '[name="tenant_id"]', Wat.B.editorBinds.filterTenantOSFs);
+        // If main view is osf view, we are creating a disk image from osf details view. 
+        // OSF and tenant (if exists) controls will be removed
+        if (Wat.CurrentView.qvdObj == 'osf') {
+            $('[name="osf_id"]').parent().parent().remove();
+
+            var userHidden = document.createElement('input');
+            userHidden.type = "hidden";
+            userHidden.name = "osf_id";
+            userHidden.value = Wat.CurrentView.model.get('id');
+            $('.editor-container').append(userHidden);
+                        
+            if ($('[name="tenant_id"]').val() != undefined) {
+                $('[name="tenant_id"]').parent().parent().remove();
+                
+                var tenantHidden = document.createElement('input');
+                tenantHidden.type = "hidden";
+                tenantHidden.name = "tenant_id";
+                tenantHidden.value = Wat.CurrentView.model.get('tenant_id');
+                $('.editor-container').append(tenantHidden);
+            }
         }
-        
-        Wat.A.fillSelect(params);  
-        
-        Wat.I.chosenElement('[name="osf_id"]', 'single100');
+        else {
+            // Fill OSF select on virtual machines creation form
+            var params = {
+                'action': 'osf_tiny_list',
+                'selectedId': $('.' + this.cid + ' .filter select[name="osf"]').val(),
+                'controlName': 'osf_id'
+            };
+
+            // If exist tenant control (in superadmin cases) show osfs of selected tenant
+            if ($('[name="tenant_id"]').val() != undefined) {
+                // Add the tenant id to the osf select filling
+                params.filters = {
+                    'tenant_id': $('[name="tenant_id"]').val()
+                };
+
+                // Add an event to the tenant select change
+                Wat.B.bindEvent('change', '[name="tenant_id"]', Wat.B.editorBinds.filterTenantOSFs);
+            }
+
+            Wat.A.fillSelect(params);  
+
+            Wat.I.chosenElement('[name="osf_id"]', 'single100');
+        }
     },
     
     createElement: function () {
@@ -92,7 +115,7 @@ Wat.Views.DIListView = Wat.Views.ListView.extend({
         var context = $('.' + this.cid + '.editor-container');
 
         var blocked = context.find('input[name="blocked"][value=1]').is(':checked');
-        var osf_id = context.find('select[name="osf_id"]').val();
+        var osf_id = context.find('[name="osf_id"]').val();
         
         var arguments = {
             "blocked": blocked ? 1 : 0,
@@ -152,16 +175,23 @@ Wat.Views.DIListView = Wat.Views.ListView.extend({
             var progressData = [data.copy_size, data.total_size - data.copy_size];
             Wat.I.G.drawPieChartSimple('loading-block', progressData);
             
-            $('.loading-little-message').html(parseInt(data.copy_size/(1024*1024)) + 'MB / ' + parseInt(data.total_size/(1024*1024)) + 'MB');
+            $('.loading-little-message').html($.i18n.t('Copying image to server') + '<br><br>' + parseInt(data.copy_size/(1024*1024)) + 'MB / ' + parseInt(data.total_size/(1024*1024)) + 'MB');
         }
-        
+                
         if (data.status == STATUS_SUCCESS) {
             if (ws.readyState == WS_OPEN) {
                 ws.close();
             }           
             Wat.I.loadingUnblock();
             $(".ui-dialog-buttonset button:first-child").trigger('click');
-            Wat.CurrentView.fetchList();
+            
+            if (qvdObj == Wat.CurrentView.qvdObj) {
+                Wat.CurrentView.fetchList();
+            }
+            else if (qvdObj == Wat.CurrentView.sideView2.qvdObj) {
+                Wat.CurrentView.sideView2.fetchList();
+            }
+            
             Wat.I.showMessage({message: i18n.t('Successfully created'), messageType: 'success'});
         }
         

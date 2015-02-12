@@ -83,7 +83,6 @@ Wat.Views.OSFDetailsView = Wat.Views.DetailsView.extend({
             }
             
             params.forceSelectedActions = {};
-            params.forceListActionButton = null;
             params.block = 5;
             params.filters = {"osf_id": this.elementId};
             this.sideView2 = new Wat.Views.DIListView(params);  

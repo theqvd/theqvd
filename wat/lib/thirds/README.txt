@@ -13,3 +13,6 @@ Used libraries on QVD Wat and their version, licenses and source sites:
 - Flot charts v0.8.3 (Unrestricted license explained at README.txt) http://www.flotcharts.org/
 - Flot axislabels v2.0.1 (GPLv3) http://people.mozilla.org/~mcote/flot-axislabels/
 - ASCII Doc - Tabe Of Content generator v0.4 (GPL) http://students.infoiasi.ro/~mishoo
+- Lato font v11 (SIL Open Font License, 1.1) https://www.google.com/fonts/attribution
+- Droid Sans font v6 (Apache License, version 2.0) https://www.google.com/fonts/attribution
+- Open Sans font v10 (Apache License, version 2.0) https://www.google.com/fonts/attribution
