@@ -168,6 +168,8 @@ Wat.Views.ListView = Wat.Views.MainView.extend({
     
     // Get filter parameters of the form, set in collection, fetch list and render it
     filter: function (e) {
+        var that = this;
+        
         if ($(e.target).hasClass('mobile-filter')) {
             var filtersContainer = '.' + this.cid + ' .filter-mobile';
         }
@@ -176,9 +178,14 @@ Wat.Views.ListView = Wat.Views.MainView.extend({
         }
         
         var filters = {};
-        
         $.each(this.formFilters, function(name, filter) {
             var filterControl = $(filtersContainer + ' [name="' + name + '"]');
+            
+            // If current field exist in initFilters, delete it to avoid use it when "All" option is selected
+            if (that.initFilters && that.initFilters[filterControl.attr('data-filter-field')]) {
+                delete that.initFilters[filterControl.attr('data-filter-field')];
+            }
+            
             // If input text box is empty or selected option in a select is All (-1) skip filter control
             switch(filter.type) {
                 case 'select':
@@ -799,7 +806,7 @@ Wat.Views.ListView = Wat.Views.MainView.extend({
         that.dialogConf.button2Class = 'fa fa-save';
         
         that.dialogConf.fillCallback = that.fillMassiveEditor;
-        that.dialogConf.title = i18n.t('Massive changes over __counter__ elements', {counter: that.selectedItems.length});
+        that.dialogConf.title = i18n.t('Massive changes over __counter__ elements', {counter: that.selectedItems.length}) + '<i class="fa fa-warning" title="' + i18n.t('Some fields could not be able in the massive editor') + '"></i>';
 
         that.editorElement();
     },

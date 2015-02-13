@@ -62,6 +62,7 @@ Wat.Views.ProfileView = Wat.Views.DetailsView.extend({
         $('.bb-setup').html(this.template);
         
         this.printBreadcrumbs(this.breadcrumbs, '');
+        this.renderRelatedDocs();
 
         Wat.T.translate();
 
