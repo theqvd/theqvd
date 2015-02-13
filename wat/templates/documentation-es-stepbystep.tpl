@@ -1702,12 +1702,12 @@ Vista detalle
 <div class="ulist"><ul>
 <li>
 <p>
-<strong>Las máquinas virtuales</strong> que están utilizando una imagen de este OSF, solamente a modo informativo. Si quisiéramos más acciones sobre ellas, con el botón de vista extendida iremos a la vista listado de las máquinas virtuales filtradas por este OSF.
+<strong>Las imágenes de este OSF</strong>. En este caso, a parte de ver los nombres de las imágenes y su columna informativa, podremos cambiar la imagen definida como imágen por defecto con una columna destinada al efecto. Además, como en el caso de las máquinas virtuales desde la vista de usuarios, también disponemos de un <strong>botón para crear una imagen de disco asociada al OSF</strong> actual, donde aparecerá el mismo formulario de creación de imágenes de disco salvo el OSF al que se asociará la imagen, que va implícito al estar creándola desde aquí.
 </p>
 </li>
 <li>
 <p>
-<strong>Las imágenes de este OSF</strong>. En este caso, a parte de ver los nombres de las imágenes y su columna informativa, podremos cambiar la imagen definida como imágen por defecto con una columna destinada al efecto.
+<strong>Las máquinas virtuales</strong> que están utilizando una imagen de este OSF, solamente a modo informativo. Si quisiéramos más acciones sobre ellas, con el botón de vista extendida iremos a la vista listado de las máquinas virtuales filtradas por este OSF.
 </p>
 </li>
 </ul></div>

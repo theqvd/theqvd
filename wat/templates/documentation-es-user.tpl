@@ -1064,6 +1064,20 @@ Nos situaremos en la <em>sección Plataforma</em>. Esta es la sección activa po
 </li>
 <li>
 <p>
+La creación de la imagen se puede realizar por <em>dos vias</em>:
+</p>
+<div class="openblock">
+<div class="content">
+<div class="dlist"><dl>
+<dt class="hdlist1">
+Desde la sección <em>Imágenes de disco</em>
+</dt>
+<dd>
+<div class="openblock">
+<div class="content">
+<div class="ulist"><ul>
+<li>
+<p>
 Accederemos al <em>apartado Imágenes de disco del menú</em>.
 </p>
 </li>
@@ -1113,6 +1127,74 @@ Opcionalmente podremos crearle <em>otras propiedades</em> a la imagen para gesti
 <p>
 Comprobaremos que la imagen se ha creado correctamente viendo que aparece en la vista listado.
 </p>
+</li>
+</ul></div>
+</div></div>
+</dd>
+<dt class="hdlist1">
+Desde la sección <em>OS Flavours</em>
+</dt>
+<dd>
+<div class="openblock">
+<div class="content">
+<div class="ulist"><ul>
+<li>
+<p>
+Accederemos al <em>apartado OS Flavours del menú</em>.
+</p>
+</li>
+<li>
+<p>
+Escogemos el OSF al que queremos asociar la nueva imagen de disco y hacemos click en su nombre para acceder a su vista detalle.
+</p>
+</li>
+<li>
+<p>
+En la parte derecha de la vista, encontramos un cuadro con las imágenes de disco asociadas al OS Flavour. Haremos click en el botón Nueva Imagen de disco situado en ese cuadro.
+</p>
+</li>
+<li>
+<p>
+Rellenaremos el formulario de creación.
+</p>
+<div class="ulist"><ul>
+<li>
+<p>
+Seleccionaremos <em>la imagen de disco</em>. En este menú desplegable aparecerán las imágenes previamente subidas al directorio <em>staging</em> del servidor del WAT.
+</p>
+</li>
+<li>
+<p>
+Podemos definir una <em>versión de la imagen</em>. Si dejamos este campo en blanco se generará una versión automática basada en la fecha de creación (Ej.: 2015-05-03-000).
+</p>
+</li>
+<li>
+<p>
+Se puede definir que la imagen sea la <em>imagen por defecto</em> del OSF. Si es la primera imagen que se crea en un OSF, este campo no tendrá relevancia, ya que si solo hay una imagen en un OSF, ésta será la imagen por defecto.
+</p>
+</li>
+<li>
+<p>
+Opcionalmente se le pueden asignar <em>tags</em> a la imagen para poder identificarla desde el gestor de máquinas virtuales. Estos tags son únicos por OSF. Si asignamos un tag que ya tiene otra imagen del mismo OSF, el tag será cambiado de imagen, evitando la duplicidad.
+</p>
+</li>
+<li>
+<p>
+Opcionalmente podremos crearle <em>otras propiedades</em> a la imagen para gestión interna de nuestros scripts o simplemente añadir información.
+</p>
+</li>
+</ul></div>
+</li>
+<li>
+<p>
+Comprobaremos que la imagen se ha creado correctamente viendo que aparece en el cuadro de Imágenes de disco dentro de la vista detalle en la que nos encontramos.
+</p>
+</li>
+</ul></div>
+</div></div>
+</dd>
+</dl></div>
+</div></div>
 </li>
 </ul></div>
 </div>
@@ -1832,7 +1914,7 @@ En la vista detalle tenemos <strong>dos herramientas</strong> disponibles:
 <div id="footnotes"><hr /></div>
 <div id="footer">
 <div id="footer-text">
-Last updated 2015-02-10 15:40:39 CET
+Last updated 2015-02-13 09:13:28 CET
 </div>
 </div>
 </body>
