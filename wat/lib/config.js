@@ -72,7 +72,9 @@ Wat.C = {
         Wat.T.initTranslate();
         
         // Reload screen after login
-        window.location.reload();
+        //window.location = window.location.hash;
+        window.location = '#';
+
     },
     
     // Check if current admin is properly logged in
