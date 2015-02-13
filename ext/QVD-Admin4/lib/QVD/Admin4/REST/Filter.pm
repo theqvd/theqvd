@@ -70,12 +70,6 @@ sub is_obligatory_rec
     return 0;
 } 
 
-
-
-
-
-
-
 sub filter_with_logical_operator
 {
     my $self = shift;
@@ -221,7 +215,6 @@ sub get_operator
     $op;
 }
 
-
 sub set_filter
 {
     my ($self,$ref_and_index,$key,$val) = @_;
@@ -233,6 +226,21 @@ sub set_filter
     $$ref[$val_i] = $val;
     $self->{flatten_filters}->{$key} =
 	delete $self->{flatten_filters}->{$old_key};
+}
+
+
+sub del_filter
+{
+    my ($self,$f) = @_;
+
+    for my $ref_and_index ($self->filters->get_filter_ref_value($f))
+    {
+	my $ref = $ref_and_index->{ref};
+	my $key_i = $ref_and_index->{index};
+	splice @$ref,  $key_i, 2;
+    }
+
+    $self->flatten_filters;
 }
 
 sub add_filter

@@ -81,7 +81,7 @@ my $FIELDS =
 
     admin => { id => 'id', name => 'name', roles => 'roles', tenant => 'tenant_name', language => 'language', block => 'block' },
 
-    role => { id => 'id', name => 'name', fixed => 'fixed', internal => 'internal', inherited_roles => 'roles', positive_acls => 'acls', negative_acls => 'acls'},
+    role => { id => 'id', name => 'name', fixed => 'fixed', internal => 'internal', roles => 'roles', acls => 'acls'},
 
     acl => { id => 'id', name => 'name' }
 };
@@ -92,9 +92,8 @@ my $FIELDS_CBS =
 
     admin => { roles => sub { my $roles = shift; my @roles =  values %$roles; return join "\n", @roles }},
 
-    role => { inherited_roles => sub { my $roles = shift; my @roles = map { $_->{name} } values %$roles; return join "\n", @roles},
-	      positive_acls =>  sub { my $acls = shift; my @acls = sort @{$acls->{positive}}; return join "\n", @acls},
-	      negative_acls =>  sub { my $acls = shift; my @acls = sort @{$acls->{negative}}; return join "\n", @acls}},
+    role => { roles => sub { my $roles = shift; my @roles = map { $_->{name} } values %$roles; return join "\n", @roles},
+	      acls =>  sub { my $acls = shift; my @acls = sort ( (map { "$_ (+)" } @{$acls->{positive}}), (map { "$_ (-)" } @{$acls->{negative}})); return join "\n", @acls}},
 
 };
 
@@ -179,21 +178,10 @@ my $related_role_cb = sub {
 
 my $CBS_TO_GET_RELATED_OBJECTS_IDS =
 {
-    vm => { argument =>  { tenant => $related_tenant_cb, user => $related_user_cb,host => $related_host_cb,
+    vm => { argument =>  { user => $related_user_cb,host => $related_host_cb,
 			   osf => $related_osf_cb, di => $related_di_cb }},
 
-    user => { argument => { tenant => $related_tenant_cb }},
-
-    osf => { argument => { tenant => $related_tenant_cb }},
-
-    di => { argument => { tenant => $related_tenant_cb,
-			  osf => $related_osf_cb }},
-
-    admin => { argument => { tenant => $related_tenant_cb }},
-
-    acl => { filter => { admin => $related_admin_cb, role => $related_role_cb }},
-
-    host => {},
+    di => { argument => {osf => $related_osf_cb }}
 };
 
 my $CLI_CMD2API_ACTION =
@@ -248,31 +236,88 @@ my $DEFAULT_FIELDS =
 ## UTILITIES ##
 ###############
 
+sub _get 
+{
+    my ($self,$parsing) = @_;
+    my $query = $self->make_api_query($parsing);
+    my $res = $self->ask_api($query);
+    $self->print_table($res,$parsing);
+}
+
+sub _create 
+{
+    my ($self,$parsing) = @_;
+
+    if (my $tenant_name = $parsing->arguments->{tenant})
+    {
+	my $tenant_ids = $related_tenant_cb->($self,$tenant_name);
+	$self->tenant_scoop(shift @$tenant_ids);
+	$parsing->arguments->{tenant} = $self->tenant_scoop; 
+    }
+  
+    my $query = $self->make_api_query($parsing);
+
+    my $res = $self->ask_api($query);
+    $self->print_table($res,$parsing);
+}
+
+sub _can
+{
+    my ($self,$parsing) = @_;
+
+    my $ids = $self->ask_api({ action => $self->get_all_ids_action($parsing),
+			       filters => $self->get_filters($parsing) })->json('/rows');
+
+    my $acl_name = $parsing->parameters->{acl_name}; 
+    my $id_key = $parsing->qvd_object eq 'admin' ? 'admin_id' : 'role_id';
+    my $filters = { $id_key => $ids, operative => 1 }; 
+    $filters->{acl_name} = { 'LIKE' => $acl_name } if defined $acl_name;
+    my $action = $parsing->qvd_object eq 'admin' ? 'get_acls_in_admins' : 'get_acls_in_roles';
+
+    my $res = $self->ask_api({ action => $action,filters => $filters,order_by => $self->get_order($parsing)});
+    $self->print_table($res,QVD::Admin4::CLI::Grammar::Response->new(
+			   response => { command => 'get', obj1 => { qvd_object => 'acl' }}));
+}
+
+sub _cmd
+{
+    my ($self,$parsing) = @_;
+
+    my $ids = $self->ask_api(
+	{ action => $self->get_all_ids_action($parsing),
+	  filters => $self->get_filters($parsing) })->json('/rows');
+    
+    my $res = $self->ask_api(
+	{ action => $self->get_action($parsing),
+	  filters => { id => { '=' => $ids }}, 
+	  order_by => $self->get_order($parsing), 
+	  arguments => $self->get_arguments($parsing)});
+
+    $self->print_table($res,$parsing);
+}
+
 sub run 
 {
     my ($self, $opts, @args) = @_;
 
-    my ($parsing,$res) = ($self->parse_string(@args), undef);
+    my $parsing = $self->parse_string(@args);
 
-    if ($parsing->command =~ /^get|create$/)
+    if ($parsing->command eq 'get')
     {
-	my $query = $self->make_api_query($parsing);
-	$res = $self->ask_api($query);
+	$self->_get($parsing);
+    }
+    elsif ($parsing->command eq 'create')
+    {
+	$self->_create($parsing);
+    }
+    elsif ($parsing->command eq 'can')
+    {
+	$self->_can($parsing);
     }
     else
     {
-	my $ids = $self->ask_api(
-	    { action => $self->get_all_ids_action($parsing),
-	      filters => $self->get_filters($parsing) })->json('/rows');
-
-	$res = $self->ask_api(
-	    { action => $self->get_action($parsing),
-	      filters => { id => { '=' => $ids }}, 
-	      order_by => $self->get_order($parsing), 
-	      arguments => $self->get_arguments($parsing)});
+	$self->_cmd($parsing);
     }
-
-    $self->print_table($res,$parsing);
 }
 
 sub make_api_query
@@ -281,6 +326,7 @@ sub make_api_query
 
     return { action => $self->get_action($parsing),
 	     filters => $self->get_filters($parsing), 
+	     fields => $self->get_fields_for_api($parsing), 
 	     order_by => $self->get_order($parsing), 
 	     arguments => $self->get_arguments($parsing)};
 }
@@ -503,8 +549,7 @@ sub get_filters
 
     for my $k ($parsing->filters->list_filters)
     {
-	my $normalized_k = $FILTERS->{$parsing->qvd_object}->{$k} 
-	// die "Unknown filter $k";
+	my $normalized_k = $FILTERS->{$parsing->qvd_object}->{$k} // $k;
 
 	for my $ref_v ($parsing->filters->get_filter_ref_value($k))
 	{
@@ -526,10 +571,11 @@ sub get_arguments
 
     while (my ($k,$v) = each %$arguments)
     {
-	my $normalized_k = $ARGUMENTS->{$parsing->qvd_object}->{$k} // die "Unknown argument $k";
+	my $normalized_k = $ARGUMENTS->{$parsing->qvd_object}->{$k} // $k;
 	$v = $self->get_value($parsing,$k,$v,'argument');
 	$out->{$normalized_k} = $v;
     }
+
     $out;
 }
 
@@ -550,8 +596,7 @@ sub get_order
 
     for my $criteria (@$criteria)
     {
-	$criteria = eval { $ORDER->{$parsing->qvd_object}->{$criteria} } 
-	// die 'Unknown order criteria';
+	$criteria = eval { $ORDER->{$parsing->qvd_object}->{$criteria} } // $criteria;
 	push @$out, $criteria;
     }
     my $direction = $order->{order} // '-asc';
@@ -575,7 +620,7 @@ sub get_fields
     {
 	my $api_field = eval {
 	    $FIELDS->{$parsing->qvd_object}->{$asked_field} 
-	} // die "Unknown field $asked_field";
+	} // $asked_field;
 
 	push @retrieved_fields, $asked_field
 	    if exists $first->{$api_field};
@@ -583,12 +628,26 @@ sub get_fields
     @retrieved_fields;
 }
 
+
+sub get_fields_for_api
+{
+    my ($self,$parsing,$api_res) = @_;
+
+    my @asked_fields = @{$parsing->fields};
+    for my $asked_field (@asked_fields)
+    {
+	$asked_field = eval {
+	    $FIELDS->{$parsing->qvd_object}->{$asked_field} 
+	} // $asked_field;
+    } 
+    \@asked_fields;
+}
+
 sub get_field_value
 {
     my ($self,$parsing,$api_res_obj,$cli_field) = @_;
 
-    my $api_field = eval { $FIELDS->{$parsing->qvd_object}->{$cli_field} }
-    // die "Unknown field $cli_field";
+    my $api_field = eval { $FIELDS->{$parsing->qvd_object}->{$cli_field} } // $cli_field;
     my $v = $api_res_obj->{$api_field};
 
     if (ref($v)) 

@@ -36,17 +36,24 @@ sub map_dbix_object_to_output_info
 
     for my $field_key ($self->calculate_fields)
     {
-	my $dbix_field_key = $self->qvd_object_model->map_field_to_dbix_format($field_key);
-	my ($info_provider,$method,$argument) = $self->get_info_provider_and_method($dbix_field_key,$dbix_object);
-	if (defined $argument) 
+	if ($self->qvd_object_model->has_property($field_key))
 	{
-	    $result->{$field_key} = eval { $info_provider->$method($argument) } // undef;
-	    print $@ if $@;
+	    $result->{$field_key} = $self->get_property_value($dbix_object,$field_key);
 	}
 	else
-	{
-	    $result->{$field_key} = eval { $info_provider->$method } // undef;
-	    print $@ if $@;
+	{	    
+	    my $dbix_field_key = $self->qvd_object_model->map_field_to_dbix_format($field_key);
+	    my ($info_provider,$method,$argument) = $self->get_info_provider_and_method($dbix_field_key,$dbix_object);
+	    if (defined $argument) 
+	    {
+		$result->{$field_key} = eval { $info_provider->$method($argument) } // undef;
+		print $@ if $@;
+	    }
+	    else
+	    {
+		$result->{$field_key} = eval { $info_provider->$method } // undef;
+		print $@ if $@;
+	    }
 	}
     }
 
@@ -76,6 +83,14 @@ sub get_info_provider_and_method
     return ($dbix_object->$table,$column);
 }
 
+
+sub get_property_value
+{
+    my ($self,$dbix_object,$property) = @_;
+
+    my $val = eval { $self->result->{extra}->{$dbix_object->id}->properties->{$property} }
+    // undef;
+}
 
 sub json
 {

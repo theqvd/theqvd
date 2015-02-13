@@ -620,15 +620,15 @@ my $AVAILABLE_ARGUMENTS = { Config => [qw(value)],
 
 
 my $MANDATORY_ARGUMENTS = { Config => [qw(key value)],
-			    User => [qw(name password tenant_id blocked)],
+			    User => [qw(name password  blocked)],
 			    VM => [qw(name user_id ip osf_id di_tag state user_state blocked)],
 			    Host => [qw(name address frontend backend blocked state)],
-			    OSF => [qw(name memory overlay user_storage tenant_id)],
+			    OSF => [qw(name memory overlay user_storage )],
                             DI => [qw(version disk_image osf_id blocked)],
 			    Tenant => [qw(name)],
 			    Role => [qw(name fixed internal)],
-                            Administrator => [qw(name password tenant_id)],
-			    Tenant_Views_Setup => [qw(tenant_id field visible view_type device_type qvd_object property)],
+                            Administrator => [qw(name password )],
+			    Tenant_Views_Setup => [qw( tenant_id field visible view_type device_type qvd_object property)],
 			    Administrator_Views_Setup => [qw(admin_id field visible view_type device_type qvd_object property)]}; 
 
 my $DEFAULT_ARGUMENT_VALUES = 
@@ -650,7 +650,7 @@ my $DEFAULT_ARGUMENT_VALUES =
 	     overlay => \&get_default_overlay,
 	     user_storage => 0 },
 
-    DI => { blocked => 'false' },
+    DI => { blocked => 'false', version => \&get_default_di_version },
 
     Role => { fixed => 'false', internal => 'false' },
 
@@ -1255,7 +1255,8 @@ sub has_property
 {
     my ($self,$prop) = @_;
     my %props = map { $_ => 1 } $self->custom_properties_keys;
-    return exists $props{$prop};
+
+    return exists $props{$prop} ? return 1 : return 0;
 }
 
 sub set_tenant_fields
@@ -1485,6 +1486,7 @@ sub available_filter
 {
     my $self = shift;
     my $filter = shift;
+
     $_ eq $filter && return 1
 	for $self->available_filters;
 
@@ -1565,9 +1567,9 @@ sub get_default_argument_value
 {
     my $self = shift;
     my $arg = shift;
-
+    my $json_wrapper = shift;
     my $def = $self->default_argument_values->{$arg} // return; 
-    return ref($def) ? $def->() : $def;
+    return ref($def) ? $def->($json_wrapper) : $def;
 }
 
 sub map_filter_to_dbix_format
@@ -1669,6 +1671,27 @@ sub get_free_ip {
     }
     die "No free IP addresses";
 }
+
+sub get_default_di_version
+{
+    my $self = shift;
+    my $json_wrapper = shift;
+
+    my $osf_id = $json_wrapper->get_argument_value('osf_id') // return;
+    my ($y, $m, $d) = (localtime)[5, 4, 3]; $m ++; $y += 1900;
+    my $osf = $DBConfigProvider->db->resultset('OSF')->search({id => $osf_id})->first;
+    QVD::Admin4::Exception->throw(code => 7100, object => 'osf_id') unless $osf; 
+    my $version;
+
+    for (0..999) 
+    {
+	$version = sprintf("%04d-%02d-%02d-%03d", $y, $m, $d, $_);
+	last unless $osf->di_by_tag($version);
+    }
+    
+    $version;
+}
+
 
 ##################
 ######## ACLS

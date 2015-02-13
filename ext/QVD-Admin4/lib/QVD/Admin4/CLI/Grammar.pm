@@ -17,6 +17,10 @@ my $RULES =
    meaning   => sub { 'get' }  },
 
  { left_side => { label => $UNKNOWN_TAG, saturated => 1 }, 
+   right_side => [ { label => 'can', saturated => 1 } ],
+   meaning   => sub { 'can' }  },
+
+ { left_side => { label => $UNKNOWN_TAG, saturated => 1 }, 
    right_side => [ { label => 'set', saturated => 1  } ],
    meaning   => sub { 'set' }},
 
@@ -492,6 +496,18 @@ my $RULES =
    right_side => [ { label => "config", saturated => 1 },
 		   { label => "get", saturated => 1 }],
    meaning => sub { return { command => 'get', obj1 => { qvd_object => 'config' }}}},
+
+ { left_side => { label => 'ROOT', saturated => 1 }, 
+   right_side => [ { label => "QVD_OBJECT", saturated => 1 },
+		   { label => "can", saturated => 1 },
+		   { label => "ITEM", saturated => 1, feature => 0, coordinated => 0 }],
+   meaning => sub { my ($c0,$c1,$c2) = @_; return { command => 'can', obj1 => $c0, parameters => { acl_name => $c2 }}}},
+
+ { left_side => { label => 'ROOT', saturated => 1 }, 
+   right_side => [ { label => "QVD_OBJECT", saturated => 1 },
+		   { label => "can", saturated => 1 }],
+   meaning => sub { my ($c0,$c1) = @_; return { command => 'can', obj1 => $c0}}},
+
 ];
 
 my $KNOWN_TAGS = {};
