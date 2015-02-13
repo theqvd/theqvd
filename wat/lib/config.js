@@ -70,7 +70,9 @@ Wat.C = {
         $.cookie('qvdWatSid', sid, { expires: this.loginExpirationDays, path: '/' });
         $.cookie('qvdWatLogin', login, { expires: this.loginExpirationDays, path: '/' });
         Wat.T.initTranslate();
-        window.location = '#';
+        
+        // Reload screen after login
+        window.location.reload();
     },
     
     // Check if current admin is properly logged in
