@@ -15,7 +15,7 @@ Wat.WS.changeWebsocketVm = function (id, field, data, viewType) {
                     $('[data-wsupdate="state-text"][data-id="' + id + '"]').html(i18n.t('Running'));                                
                     $('[data-wsupdate="state-button"][data-id="' + id + '"]').removeClass('js-button-start-vm fa-play').addClass('js-button-stop-vm fa-stop').attr('title', i18n.t('Stop'));                                   
                     $('[data-wsupdate="ip"][data-id="' + id + '"]').removeClass('invisible');   
-                    $('.remote-administration-buttons a').removeClass('disabled');   
+                    $('.remote-administration-buttons a').removeClass('disabled');  
                     break;
                 case 'stopped':
                     $('[data-wsupdate="state"][data-id="' + id + '"]').attr('class', 'fa fa-stop');
@@ -36,8 +36,8 @@ Wat.WS.changeWebsocketVm = function (id, field, data, viewType) {
                     $('[data-wsupdate="state-button"][data-id="' + id + '"]').removeClass('js-button-start-vm fa-play').addClass('js-button-stop-vm fa-stop').attr('title', i18n.t('Stop'));   
                     $('.remote-administration-buttons a').addClass('disabled');
                     
-                    $('.js-execution-params-button-show-row').show();
-                    $('.js-execution-params-button-hide-row').hide();
+                    $('[data-wsupdate="state-running"]').hide();
+                    $('.js-execution-params-button-row').show();
                     $('.js-execution-params').hide();
                     break;
             }

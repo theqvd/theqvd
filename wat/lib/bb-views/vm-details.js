@@ -1,6 +1,6 @@
 Wat.Views.VMDetailsView = Wat.Views.DetailsView.extend({  
     qvdObj: 'vm',
-    liveFields: ['state', 'user_state', 'ip', 'host_id', 'host_name', 'ssh_port', 'vnc_port', 'serial_port'],
+    liveFields: ['state', 'user_state', 'ip', 'host_id', 'host_name', 'ssh_port', 'vnc_port', 'serial_port', 'di_id_in_use', 'di_name_in_use'],
 
     relatedDoc: {
         image_update: "Images update guide"
