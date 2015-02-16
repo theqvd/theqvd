@@ -23,12 +23,12 @@ sub run
     $self->cache->set( sid => undef );
 
     my $res = $self->ask_api(
-	{ action => 'admin_get_list', 
+	{ action => 'current_admin_setup', 
 	  filters => { name => $login }});
 
     my $sid = $res->json('/sid');
-    my $aid = $res->json('/rows/0/id');
-    my $tid = $res->json('/rows/0/tenant_id');
+    my $aid = $res->json('/admin_id');
+    my $tid = $res->json('/tenant_id');
 
     $self->cache->set( sid => $sid );
     $self->cache->set( aid => $aid );

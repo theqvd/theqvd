@@ -22,6 +22,8 @@ has 'model_info', is => 'ro', isa => sub {die "Invalid type for attribute model_
 
 my $DBConfigProvider;
 
+my $DIRECTLY_TENANT_RELATED = [qw(User Administrator OSF Tenant_Views_Setup)];
+
 my $UNAMBIGUOUS_FILTERS = 
 {   
     list => { Operative_Acls_In_Role => [qw(role_id)],
@@ -481,10 +483,12 @@ my $AVAILABLE_FIELDS =
 my $MANDATORY_FILTERS = 
 { 
     list => { default => [qw()],  
-              Operative_Acls_In_Role => [qw(role_id)], Operative_Acls_In_Administrator => [qw(admin_id)]},
+              Operative_Acls_In_Role => [qw(role_id)], 
+	      Operative_Acls_In_Administrator => [qw()]}, # FIX ME. HAS DEFAULT VALUE IN Request.pm. DEFAULT SYSTEM FOR FILTERS NEEDED
 
     details => { default => [qw(id)], 
-		 Operative_Acls_In_Role => [qw(role_id)], Operative_Acls_In_Administrator => [qw(admin_id)]}, 
+		 Operative_Acls_In_Role => [qw(role_id)], 
+		 Operative_Acls_In_Administrator => [qw()]}, # FIX ME. HAS DEFAULT VALUE IN Request.pm. DEFAULT SYSTEM FOR FILTERS NEEDED
 
     tiny => { default => [qw()]},
 
@@ -497,7 +501,8 @@ my $MANDATORY_FILTERS =
     state => { default => [qw(id)]}, 
 
     all_ids => { default => [qw()],
-		 Operative_Acls_In_Role => [qw(role_id)], Operative_Acls_In_Administrator => [qw(admin_id)]}, 
+		 Operative_Acls_In_Role => [qw(role_id)], 
+		 Operative_Acls_In_Administrator => [qw()]}, # FIX ME. HAS DEFAULT VALUE IN Request.pm. DEFAULT SYSTEM FOR FILTERS NEEDED
 };
 
 my $SUBCHAIN_FILTERS = 
@@ -1493,6 +1498,18 @@ sub available_filter
     return 0;
 }
 
+sub directly_tenant_related
+{
+    my $self = shift;
+    my $qvd_object = $self->qvd_object;
+
+    $_ eq $qvd_object && return 1
+	for @$DIRECTLY_TENANT_RELATED;
+
+    return 0;
+}
+
+
 sub subchain_filter
 {
     my $self = shift;
@@ -1568,8 +1585,9 @@ sub get_default_argument_value
     my $self = shift;
     my $arg = shift;
     my $json_wrapper = shift;
+
     my $def = $self->default_argument_values->{$arg} // return; 
-    return ref($def) ? $def->($json_wrapper) : $def;
+    return ref($def) ? $self->$def($json_wrapper) : $def;
 }
 
 sub map_filter_to_dbix_format
@@ -1660,6 +1678,7 @@ sub normalize_name
 
 sub get_free_ip {
 
+    my $self = shift;
     my $nettop = nettop_n;
     my $netstart = netstart_n;
 

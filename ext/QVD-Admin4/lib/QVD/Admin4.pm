@@ -815,7 +815,8 @@ sub get_acls_in_admins
     my ($self,$request) = @_;
     my (@rows, $rs);
 
-    my $admin_id = $request->json_wrapper->get_filter_value('admin_id');
+    my $admin_id = $request->json_wrapper->get_filter_value('admin_id')
+	// $request->get_parameter_value('administrator')->id;
 
     my $aol = QVD::Admin4::AclsOverwriteList->new(admin_id => $admin_id);
     my $bind = [$aol->acls_to_close_re,$aol->acls_to_open_re,$aol->acls_to_hide_re];
@@ -1081,7 +1082,7 @@ sub config_preffix_get
 sub config_get
 {
     my ($self,$admin,$json_wrapper) = @_;
-
+    QVD::Config::reload();
     my $cp = $json_wrapper->get_filter_value('key');
     my $cp_re = $json_wrapper->get_filter_value('key_re');
     my @keys = cfg_keys;

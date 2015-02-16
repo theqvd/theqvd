@@ -56,6 +56,7 @@ sub BUILD
 
     $self->check_update_arguments_validity_in_json if
 	$self->qvd_object_model->type_of_action eq 'update';
+
     $self->check_create_arguments_validity_in_json if
 	$self->qvd_object_model->type_of_action eq 'create';
 
@@ -94,7 +95,8 @@ sub BUILD
         if $self->qvd_object_model->qvd_object eq 'Tenant';
 
     $self->forze_tenant_assignment_in_creation
-	if $self->qvd_object_model->type_of_action eq 'create';
+	if $self->qvd_object_model->type_of_action eq 'create' &&
+	$self->qvd_object_model->directly_tenant_related;
 
 # After check and changes, filters are retrieved as a simple hash
 
@@ -180,7 +182,7 @@ sub check_create_arguments_validity_in_json
     my $admin = $self->qvd_object_model->current_qvd_administrator;
 
     $self->json_wrapper->has_argument($_) || 
-	defined $self->qvd_object_model->get_default_argument_value($_) ||
+	defined $self->qvd_object_model->get_default_argument_value($_,$self->json_wrapper) ||
 	QVD::Admin4::Exception->throw(code => 6240 , object => $_)
 	for $self->qvd_object_model->mandatory_arguments;
     
@@ -192,6 +194,7 @@ sub check_create_arguments_validity_in_json
 sub check_nested_queries_validity_in_json
 {
     my $self = shift;
+
     my $admin = $self->qvd_object_model->current_qvd_administrator;
     my $type_of_action = $self->qvd_object_model->type_of_action;
     my ($method,$code);
@@ -312,13 +315,16 @@ sub forze_tenant_assignment_in_creation
 {
     my $self = shift;
 
-    my $tenant_id = $self->qvd_object_model->map_filter_to_dbix_format('tenant_id');
-	
-    QVD::Admin4::Exception->throw(code => 6240 , object => 'tenant_id') if 
-	($ADMIN->is_superadmin && (not $self->json_wrapper->has_argument('tenant_id') )); 
-    return unless $self->qvd_object_model->mandatory_argument('tenant_id');
-
-    $self->set_argument($tenant_id,$ADMIN->tenant_id);
+    if ($ADMIN->is_superadmin)
+    {
+	QVD::Admin4::Exception->throw(code => 6240 , object => 'tenant_id')
+	    unless $self->json_wrapper->has_argument('tenant_id');
+    }
+    else
+    {
+	my $tenant_id = $self->qvd_object_model->map_argument_to_dbix_format('tenant_id');
+	$self->set_argument($tenant_id,$ADMIN->tenant_id);
+    }
 }
 
 
@@ -406,14 +412,18 @@ sub set_parameters_in_request
 sub set_arguments_in_request
 {
     my $self = shift;
+
     for my $key ($self->json_wrapper->arguments_list)
     {
 	my $key_dbix_format = 
 	    $self->qvd_object_model->map_argument_to_dbix_format($key);
+
 	my $value = $self->json_wrapper->get_argument_value($key);
-	my $value_normalized = $self->qvd_object_model->normalize_value($key,$value);
+	my $value_normalized =  $self->qvd_object_model->normalize_value($key,$value);
+
 	$self->instantiate_argument($key_dbix_format,$value_normalized);
     }
+
     $self->set_arguments_in_request_with_defaults if 
 	$self->qvd_object_model->type_of_action eq 'create';
 }
@@ -427,8 +437,9 @@ sub set_arguments_in_request_with_defaults
 	next if $self->json_wrapper->has_argument($key);
 
 	my $key_dbix_format = 
-	    $self->qvd_object_model->map_argument_to_dbix_format($key,$self->json_wrapper);
-	my $value = $self->qvd_object_model->get_default_argument_value($key);
+	    $self->qvd_object_model->map_argument_to_dbix_format($key);
+
+	my $value = $self->qvd_object_model->get_default_argument_value($key,$self->json_wrapper);
 	$self->instantiate_argument($key_dbix_format,$value);
     }
 }

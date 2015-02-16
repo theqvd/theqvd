@@ -19,11 +19,15 @@ sub run
     my ($self, $opts, @args) = @_;
     my $parsing = $self->parse_string('config',@args);
 
-    if (my $s = $parsing->filters->{key_re})
+    for my $ref_v ($parsing->filters->get_filter_ref_value('key_re'))
     {
-	$s =~ s/%/.*/g;
-	$parsing->filters->{key_re} = qr/^$s$/;
-    } 
+	my $v = $parsing->filters->get_value($ref_v);
+
+	$v =~ s/\./[.]/g;
+	$v =~ s/%/.*/g;
+	$v = qr/^$v$/;
+	$parsing->filters->set_filter($ref_v,'key_re', $v);
+    }
 
     my $query = $self->make_api_query($parsing); 
     my $res = $self->ask_api($query);

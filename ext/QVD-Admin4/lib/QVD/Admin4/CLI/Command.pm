@@ -7,8 +7,6 @@ use Mojo::JSON qw(encode_json decode_json j);
 use Mojo::IOLoop;
 use Mojo::Message::Response;
 
-my $LOGICAL_OPERATORS = { -and => 1, -or => 1, -not => 1 };
-
 my $FILTERS =
 {
     vm => { storage => 'storage', id => 'id', name => 'name', user => 'user_name', osf => 'osf_name', tag => 'di_tag', blocked => 'blocked', 
@@ -256,7 +254,6 @@ sub _create
     }
   
     my $query = $self->make_api_query($parsing);
-
     my $res = $self->ask_api($query);
     $self->print_table($res,$parsing);
 }

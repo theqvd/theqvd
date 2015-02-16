@@ -54,7 +54,7 @@ user_tiny_list => {type_of_action => 'tiny',
 
 user_all_ids => { type_of_action => 'all_ids',
 		  admin4method => 'select',
-		  acls => [qr/^user\.[^.]+-massive\./],
+		  acls => [qr/^user\.[^.]+-massive\.|user\.see-main\./],
 		  qvd_object => 'User'},
 
 user_get_details => { type_of_action => 'details',
@@ -90,7 +90,7 @@ vm_get_list => { type_of_action => 'list',
 
 vm_all_ids => { type_of_action => 'all_ids',
 		admin4method => 'select',
-		acls => [qr/^vm\.[^.]+-massive\./],
+		acls => [qr/^vm\.[^.]+-massive\.|(vm\.see-main\.|[^.]+\.see\.vm-list)/],
 		qvd_object => 'VM'},
 
 vm_tiny_list => { type_of_action => 'tiny',
@@ -146,7 +146,7 @@ host_get_list => { type_of_action => 'list',
 
 host_all_ids => { type_of_action => 'all_ids',
 		  admin4method => 'select',
-		  acls => [qr/^host\.[^.]+-massive\./],
+		  acls => [qr/^host\.[^.]+-massive\.|host\.see-main\./],
 		  qvd_object => 'Host'},
 
 host_tiny_list => { type_of_action => 'tiny',
@@ -187,7 +187,7 @@ osf_get_list => { type_of_action => 'list',
 
 osf_all_ids => { type_of_action => 'all_ids',
 		 admin4method => 'select',
-		 acls => [qr/^osf\.[^.]+-massive\./],
+		 acls => [qr/^osf\.[^.]+-massive\.|osf\.see-main\./],
 		 qvd_object => 'OSF'},
 
 osf_tiny_list => { type_of_action => 'tiny',
@@ -223,7 +223,7 @@ di_get_list => { type_of_action => 'list',
 
 di_all_ids => { type_of_action => 'all_ids',
 		admin4method => 'select',
-		acls => [qr/^di\.[^.]+-massive\./],
+		acls => [qr/^di\.[^.]+-massive\.|(di\.see-main\.|[^.]+\.see\.di-list)/],
 		qvd_object => 'DI'},
 
 di_tiny_list => { type_of_action => 'tiny',
@@ -273,7 +273,7 @@ admin_get_details => { type_of_action => 'details',
 
 admin_all_ids => { type_of_action => 'all_ids',
 		   admin4method => 'select',
-		   acls => [qr/^administrator\.[^.]+-massive\./],
+		   acls => [qr/^administrator\.[^.]+-massive\.|administrator\.see-details\./],
 		   qvd_object => 'Administrator'},
 
 admin_create => { type_of_action => 'create',
@@ -311,7 +311,7 @@ tenant_get_details => { type_of_action => 'details',
 
 tenant_all_ids => { type_of_action => 'all_ids',
 		    admin4method => 'select',
-		    acls => [qr/^tenant\.[^.]+-massive\./],
+		    acls => [qr/^tenant\.[^.]+-massive\.|tenant\.see-main\./],
 		    qvd_object => 'Tenant'},
 
 tenant_update => { type_of_action => 'update',
@@ -350,7 +350,7 @@ role_get_details => { type_of_action => 'details',
 
 role_all_ids => { type_of_action => 'all_ids',
 		  admin4method => 'select',
-		  acls => [qr/^role\.[^.]+-massive\./],
+		  acls => [qr/^role\.[^.]+-massive\.|role\.see-main\./],
 		  qvd_object => 'Role'},
 
 acl_tiny_list => { type_of_action => 'tiny',
