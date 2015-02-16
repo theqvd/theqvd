@@ -72,8 +72,14 @@ Wat.C = {
         Wat.T.initTranslate();
         
         // Reload screen after login
-        //window.location = window.location.hash;
-        window.location = '#';
+        var locationHash = window.location.hash;
+        
+        if (locationHash == '#/login' || locationHash == '#/logout' || typeof WatTests != 'undefined') {
+            window.location = '#';
+        }
+        else {
+            window.location.reload();
+        }
 
     },
     
