@@ -1,4 +1,6 @@
 QVD_CONFIG_HELP = {
+    'admin.ssh.opt.StrictHostKeyChecking': 'Unused',
+    'admin.ssh.opt.UserKnownHostsFile': 'Unused',
     'auth.ldap.host':  '(Required). Can be a host or an LDAP uri as specified in Net::LDAP',
     'auth.ldap.base':  '(Required). The search base where to find the users with the auth.ldap.filter (see below)',
     'auth.ldap.filter':  '(Optional by default (uid=%u)). The string %u will be substituted with the login name',
@@ -24,18 +26,6 @@ QVD_CONFIG_HELP = {
     'client.remember_password': 'Controls whether or not the client remembers the password used for the previous connection',
     'client.show.remember_password': 'Controls whether or not the option to Remember Password is displayed within the GUI.',
     'client.show.settings': 'Shows the settings tab on the client',
-    'database.host': 'Where the QVD database is found',
-    'database.name': 'The name of the QVD database',
-    'database.user': 'The user account needed to connect',
-    'database.password': 'The password needed to connect',
-    'l7r.auth.plugins': '(Required). Set to "ldap" to enable.',
-    'nodename': 'Name of this node in QVD. Usually the machine\'s hostname.',
-    'path.run': 'Directory where several configuration, state, pid and certificate files are stored',
-    'path.log': 'Where QVD logs are stored',
-    'path.tmp': 'Temporary files',
-    'path.storage.root': 'Main storage location for OS images (both KVM and LXC)',
-    'path.storage.staging': 'OS images ready to be used',
-    'path.storage.images': 'OS images in use by some VM',
     'client.remember_password': 'Whether to remember password after successful connection',
     'client.remember_username': 'Whether to remember the username after a successful connection',
     'client.show.remember_password': 'Whether to show the previous checkbox or not',
@@ -58,62 +48,53 @@ QVD_CONFIG_HELP = {
     'client.slave.enable': 'Enable making slave connections to VM',
     'client.locale': 'Force locale, ignoring system LC_* and LANG environment variables',
     'client.darwin.screen_resolution.verified': 'Check whether we should default to a lower window size on OSX.',
+    'client.darwin.screen_resolution.min': 'When the screen resolution is this or less, use the low geometry setting',
+    'client.darwin.screen_resolution.low_res_geometry': 'Geometry to use when the screen is low resolution',
+    'client.usb.enable': 'Enable USB sharing',
+    'client.usb.share_all': 'Share all USB devices automatically (most of the time not a good idea)',
+    'client.usb.share_list': 'List of USB devices to share with the VM. Syntax: VID:PID, comma separated. Spaces are allowed. For example: 0441:0012, 1234:5678',
+    'database.host': 'Where the QVD database is found',
+    'database.name': 'The name of the QVD database',
+    'database.user': 'The user account needed to connect',
+    'database.password': 'The password needed to connect',
+    'hkd.user.umask': 'Umask for the HKD process',
+    'hkd.as_user': 'User to run hkd as',
+    'hkd.pid_file': 'Path to the hkd PID file',
+    'l7r.user.umask': 'Umask for the L7R process',
+    'l7r.use_ssl': 'Whether L7R accepts SSL incoming connections or not',
+    'l7r.port': 'Port the L7R should listen to',
+    'l7r.address': 'IP addresses L7R should bind to/listen at',
+    'l7r.auth.plugins': 'Authentication plugins to use. Comma-separated list of alphanumeric words. Example: "ldap, foo_43,default"',    
+    'l7r.loadbalancer.plugin': 'Load balancing plugins to use. Similar to auth plugins',
+    'l7r.as_user': 'Actually usused in the code',
+    'l7r.pid_file': 'Unused',
+    'log.filename': 'Path to the log file',
+    'log.level': 'Log verbosity (FATAL, ERROR, WARN, INFO, DEBUG or TRACE)',
+    'nodename': 'Name of this node in QVD. Usually the machine\'s hostname.',
+    'path.run': 'Directory where several configuration, state, pid and certificate files are stored',
+    'path.log': 'Where QVD logs are stored',
+    'path.tmp': 'Temporary files',
+    'path.storage.root': 'Main storage location for OS images (both KVM and LXC)',
+    'path.storage.staging': 'OS images ready to be used',
+    'path.storage.images': 'OS images in use by some VM',
+    'wat.admin.login': 'Username of the WAT administrator',
+    'vm.hypervisor': 'virtualization engine to use, either kvm or lxc',
+    'vm.lxc.unionfs.type': 'COW fs to use with LXC',
+    'vm.overlay.persistent': 'Whether to keep overlay images from one session to the next',
+    'vm.kvm.virtio': 'Use KVM\'s virtio capabilities',
+    'vm.vnc.redirect': 'Specify the VNC availability for KVM\'s VNC support',
+    'vm.vnc.opts': 'Specify the VNC options for KVM\'s VNC support',
+    'vm.serial.redirect': 'Whether to use KVM\'s serial support or not',
+    'vm.serial.capture': 'Capture serial port traffic to a file<br><br>- in KVM it is ignored if serial port is redirected (ie if vm.serial.redirect is set to 1)<br>- in LXC it saves the capture under the directory specified in path.serial.captures',
+    'vm.network.bridge': 'All VMs will be attached to this interface, which must be a bridg. The DHCP server uses this setting too',
+    'vm.network.domain': 'Default search domain for virtual machines',
+    'wat.admin.password': 'Password of the WAT administrator',
+    'wat.log.filename': 'WAT logs go into its own file to avoid permission issues as the process is not run as root',
 }
 
-/*
-## On OSX the window is hard to resize if it's too large, so
-## we check whether we should default to a lower window size
-
-## Only do the check on the first start, and don't mess
-## with it afterwards. Also saves startup time.
-client.darwin.screen_resolution.verified = 0
-## When the screen resolution is this or less, use the low geometry setting
-client.darwin.screen_resolution.min=1440x900
-## Geometry to use when the screen is low resolution
-client.darwin.screen_resolution.low_res_geometry=800x600
-
-# Enable USB sharing
-client.usb.enable = 0
-
-# Share all USB devices automatically (most of the time not a good idea)
-client.usb.share_all = 0
-
-# List of USB devices to share with the VM. 
-# Syntax: VID:PID, comma separated. Spaces are allowed. For example:
-# 0441:0012, 1234:5678
-client.usb.share_list =
-
-
-## umask for the L7R process
-l7r.user.umask = 0022
-## whether L7R accepts SSL incoming connections or not
-l7r.use_ssl = 1
-## port the L7R should listen to
-l7r.port = 8443
-## IP addresses L7R should bind to/listen at
-l7r.address = *
-## actually usused in the code
-# l7r.as_user = root
-## unused!
-l7r.pid_file = ${path.run}/l7r.pid
-## authentication plugins to use. Comma-separated list of alphanumeric words. Example: "ldap, foo_43,default"
-l7r.auth.plugins = default
-l7r.auth.plugin.default.salt=qvd1234
-
-## load balancing plugins to use. Similar to auth plugins
-l7r.loadbalancer.plugin = default
-## each plugin should document its own parameters
-l7r.loadbalancer.plugin.default.weight.ram = 1
-l7r.loadbalancer.plugin.default.weight.cpu = 1
-l7r.loadbalancer.plugin.default.weight.random = 1
-
-l7r.client.cert.require = 0
-
-*/
-
+// TODO: Continues from line #293 of Defaults.pm
 
 /*
-
 # storage directories for KVM
 path.storage.overlays = ${path.storage.root}/overlays
 path.storage.homes = ${path.storage.root}/homes
