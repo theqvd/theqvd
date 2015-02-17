@@ -10,7 +10,10 @@ use QVD::Admin4::REST::JSON;
 use QVD::Admin4::Exception;
 use QVD::Admin4::Action;
 use TryCatch;
+use AnyEvent::Pg::Pool;
 use QVD::Config;
+
+use base qw(Mojolicious::Plugin);
 
 has 'administrator', is => 'ro', isa => sub { die "Invalid type for attribute administrator" 
 						  unless ref(+shift) eq 'QVD::DB::Result::Administrator'; };
@@ -22,21 +25,39 @@ sub BUILD
     $QVD_ADMIN = QVD::Admin4->new();
 }
 
+sub register
+{ 
+    my ($self,$app) = @_;
+    $app->helper(qvd_admin4_api => sub { $self });
+}
+
 sub _db { $QVD_ADMIN->_db; };
 
 sub validate_user
 {
     my ($self,%params) = @_;
+    my $multitenant = cfg('wat.multitenant');
 
-    $params{name} = delete $params{login}; # FIX ME IN DB!!!
+    return undef if (not defined $params{id}) && 
+	$multitenant && (not defined $params{tenant});
 
-    my $admin = eval { $QVD_ADMIN->_db->resultset('Administrator')->find(\%params) };
+    $params{name} = delete $params{login} if defined $params{login};
+    $params{tenant_id} = eval { $QVD_ADMIN->_db->resultset('Tenant')->search(
+				    { name => delete $params{tenant} })->first->id } 
+    if exists $params{tenant}; 
+
+    my $rs = eval { $QVD_ADMIN->_db->resultset('Administrator')->search(\%params) };
     print $@ if $@;
-    return undef unless $admin;
-    return $admin if $admin->is_recovery_admin;
-    return undef if $admin->is_superadmin && (not cfg('wat.multitenant'));
+    
+    my @admins = grep { $multitenant || $_->is_recovery_admin || 
+			    (not $_->is_superadmin) } $rs->all;
+    return undef unless @admins;
+
+    my $admin = shift @admins;
+    die "More than one administrators found for these credentials" if @admins;
     return $admin;
 }
+
 
 sub load_user
 {
@@ -153,6 +174,32 @@ sub get_request
 				    json_wrapper => $json_wrapper);
 }
 
+
+sub _cfg
+{
+    my ($self,$key) = @_;
+    return cfg($key);
+}
+
+sub pool
+{
+    my $self = shift;
+    $self->{pool} //=
+	AnyEvent::Pg::Pool->new( {host     => cfg('database.host'),
+				  dbname   => cfg('database.name'),
+				  user     => cfg('database.user'),
+				  password => cfg('database.password') },
+				 timeout            => cfg('internal.database.pool.connection.timeout'),
+				 global_timeout     => cfg('internal.database.pool.connection.global_timeout'),
+				 connection_delay   => cfg('internal.database.pool.connection.delay'),
+				 connection_retries => cfg('internal.database.pool.connection.retries'),
+				 size               => cfg('internal.database.pool.size'),
+				    on_connect_error   => sub {},
+				 on_transient_error => sub {},
+	);
+
+    return $self->{pool};
+}
 
 
 1;

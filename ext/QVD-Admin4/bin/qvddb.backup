@@ -5005,11 +5005,11 @@ ALTER TABLE ONLY administrator_views_setups
 
 
 --
--- Name: administrators_name; Type: CONSTRAINT; Schema: public; Owner: qvd; Tablespace: 
+-- Name: administrators_name_tenant_id; Type: CONSTRAINT; Schema: public; Owner: qvd; Tablespace: 
 --
 
 ALTER TABLE ONLY administrators
-    ADD CONSTRAINT administrators_name UNIQUE (name);
+    ADD CONSTRAINT administrators_name_tenant_id UNIQUE (name,tenant_id);
 
 
 --

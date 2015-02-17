@@ -1082,7 +1082,7 @@ sub config_preffix_get
 sub config_get
 {
     my ($self,$admin,$json_wrapper) = @_;
-    QVD::Config::reload();
+
     my $cp = $json_wrapper->get_filter_value('key');
     my $cp_re = $json_wrapper->get_filter_value('key_re');
     my @keys = cfg_keys;
@@ -1190,5 +1190,6 @@ sub config_ssl {
      rows => [ ] };
 }
 
+####################
 
 1;

@@ -479,6 +479,7 @@ sub size
 	$AVAILABLE_ACTION_SIZES->{default};
 }
 
+
 sub type
 {
     my $self = shift;

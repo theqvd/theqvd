@@ -395,7 +395,7 @@ sub ambiguous
 
 sub ask_api
 {
-    my ($self,$query) = @_;
+    my ($self,$query,$no_credentials) = @_;
  
     return $self->ask_api_ws($query)
 	if $query->{action} eq 'di_create';
@@ -404,22 +404,28 @@ sub ask_api
     my %args = (
 	login => $app->cache->get('login'), 
 	password => $app->cache->get('password'),
+	tenant => $app->cache->get('tenant'),
 	sid => $app->cache->get('sid'),
 	url => $app->cache->get('api'),
 	ua =>  $app->cache->get('ua'));
 
-    my ($sid,$login,$password,$url,$ua) = 
-	@args{qw(sid login password url ua)};
+    my ($sid,$login,$password,$tenant,$url,$ua) = 
+	@args{qw(sid login password tenant url ua)};
 
     my %credentials = defined $sid ? (sid => $sid) : 
-	( login => $login, password => $password );
+	( login => $login, password => $password);
+    $credentials{tenant} = $tenant if 
+	defined $tenant && defined $credentials{login};
 
-    my $res = $ua->post("$url", json => {%$query,%credentials})->res;
+    my $json = $no_credentials ? $query : {%$query,%credentials};
+ 
+    my $res = $ua->post("$url", json => $json )->res;
 
     die 'API returns bad status' 
 	unless $res->code;
 
     $self->check_api_result($res);
+
     return $res;
 }
 

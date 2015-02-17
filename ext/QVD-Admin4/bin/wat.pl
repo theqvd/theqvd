@@ -1,33 +1,19 @@
 #!/usr/bin/perl
 use Mojolicious::Lite;
 use lib::glob '/home/benjamin/wat/*/lib/';
-use QVD::Admin4::REST;
 use Mojo::JSON qw(encode_json decode_json j);
 use QVD::Admin4::Exception;
 use QVD::Config;
 use MojoX::Session;
 use File::Copy qw(copy move);
 use Mojo::IOLoop::ForkCall;
-use AnyEvent::Pg::Pool;
 use Mojo::Log;
 use Mojo::ByteStream 'b';
 use Deep::Encode;
 
+plugin 'QVD::Admin4::REST';
+
 # MojoX::Session::Transport::WAT Package 
-
-my $pool = AnyEvent::Pg::Pool->new( {host     => cfg('database.host'),
-				     dbname   => cfg('database.name'),
-				     user     => cfg('database.user'),
-				     password => cfg('database.password') },
-				    timeout            => cfg('internal.database.pool.connection.timeout'),
-				    global_timeout     => cfg('internal.database.pool.connection.global_timeout'),
-				    connection_delay   => cfg('internal.database.pool.connection.delay'),
-				    connection_retries => cfg('internal.database.pool.connection.retries'),
-				    size               => cfg('internal.database.pool.size'),
-				    on_connect_error   => sub {},
-				    on_transient_error => sub {},
-                                    );
-
 
 package MojoX::Session::Transport::WAT
 {
@@ -50,15 +36,13 @@ package MojoX::Session::Transport::WAT
 # GENERAL CONFIG AND PLUGINS
 
 app->config(hypnotoad => {listen => ['http://localhost:3000']});
-my $QVD_ADMIN4_API = QVD::Admin4::REST->new();
 
 # HELPERS
 
-helper (qvd_admin4_api => sub { $QVD_ADMIN4_API; });
+helper (api_info => \&api_info);
 helper (get_input_json => \&get_input_json);
 helper (process_api_query => \&process_api_query);
 helper (get_action_channels => \&get_action_channels);
-helper (get_action_size => \&get_action_size);
 helper (get_auth_method => \&get_auth_method);
 helper (create_session => \&create_session);
 helper (update_session => \&update_session);
@@ -75,17 +59,21 @@ under sub {
     $c->res->headers->header('Access-Control-Expose-Headers' => 'sid');
     $c->res->headers->header('charset' => 'utf-8');
 
+    my $json = $c->req->json // { map { $_ => $c->param($_) } $c->param };
+    
+    return 1 if $json->{action} && $json->{action} eq 'api_info';
+
     my %session_args = (
 	store  => [dbi => {dbh => QVD::DB->new()->storage->dbh}],
 	transport => MojoX::Session::Transport::WAT->new(),
 	tx => $c->tx);
 
     my $session = MojoX::Session->new(%session_args);
-    my $json = $c->req->json // { map { $_ => $c->param($_) } $c->param };
     my $auth_method = $c->get_auth_method($session,$json);
 
     my ($bool,$exception) = $c->$auth_method($session,$json);
     $c->render(json => $exception->json) if $exception;
+
     return $bool;
 };
 
@@ -95,8 +83,8 @@ any '/' => sub {
     $c->inactivity_timeout(30000);     
     my $json = $c->get_input_json;
 
-    my $action_size = $c->get_action_size($json);
-    my $response = $c->process_api_query($json);
+    my $response = $json->{action} && $json->{action} eq 'api_info' ? 
+	$c->api_info : $c->process_api_query($json);
 
     $c->render(json => $response, charset => 'utf-8');
 };
@@ -113,7 +101,7 @@ websocket '/ws' => sub {
 
     for my $channel ($c->get_action_channels($json))
     {
-	$pool->listen($channel,on_notify => sub { $notification = 1; });
+	$c->qvd_admin4_api->_pool->listen($channel,on_notify => sub { $notification = 1; });
     }
 
     my $recurring = Mojo::IOLoop->recurring(
@@ -135,7 +123,6 @@ websocket '/ws' => sub {
         Mojo::IOLoop->remove($timer) if $timer;
         Mojo::IOLoop->remove($recurring) if $recurring;
         $c->app->log->debug("WebSocket closed with status $code");});
-
 };
 
 
@@ -144,8 +131,8 @@ websocket '/staging' => sub {
     $c->inactivity_timeout(3000);
     $c->app->log->debug("Staging WebSocket opened");
     my $json = $c->get_input_json;
-    my $images_path  = cfg('path.storage.images');
-    my $staging_path = cfg('path.storage.staging');
+    my $images_path  = $c->qvd_admin4_api->_cfg('path.storage.images');
+    my $staging_path = $c->qvd_admin4_api->_cfg('path.storage.staging');
     my $staging_file = eval { $json->{arguments}->{disk_image} } // '';
     my $images_file = $staging_file . '-tmp'. rand;
     $json->{parameters}->{tmp_file_name} = $images_file;
@@ -217,13 +204,6 @@ sub get_action_channels
     @$channels;
 }
 
-sub get_action_size
-{
-    my ($c,$json) = @_;
-    my $size = $c->qvd_admin4_api->get_size($json->{action}) 
-	// 'normal';
-}
-
 sub get_auth_method
 {
     my ($c,$session,$json) = @_;   
@@ -239,7 +219,9 @@ sub get_auth_method
 sub create_session
 {
     my ($c,$session,$json) = @_;
-    my %args = (login => $json->{login}, password => $json->{password});
+    my %args = (login => $json->{login}, 
+		password => $json->{password});
+    $args{tenant} = $json->{tenant} if defined $json->{tenant};
     my $admin = $c->qvd_admin4_api->validate_user(%args);
 
     return (0,QVD::Admin4::Exception->new(code =>3200)) 
@@ -279,4 +261,12 @@ sub update_session
 sub reject_access
 {
   (0,QVD::Admin4::Exception->new(code => 3100));
+}
+
+
+sub api_info
+{
+    my $c = shift;
+    { status => 0,
+      multitenant => $c->qvd_admin4_api->_cfg('wat.multitenant') };
 }

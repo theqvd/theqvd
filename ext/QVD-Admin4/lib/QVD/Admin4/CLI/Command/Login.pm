@@ -4,27 +4,28 @@ use Term::ReadKey;
 use strict;
 use warnings;
 
-sub validate
-{
-    my ($self, $opts, @args) = @_;
-    die "No admin name provided" 
-	unless defined $args[0];
-}
 
 sub run 
 {
     my ($self, $opts, @args) = @_;
-    my $login = shift @args;
-    my $password = $self->read_password;
-    my $app = $self->get_app;
+    my $no_credentials = 1;
+    my $multitenant = eval {
+	$self->ask_api({ action => 'api_info'},
+		       $no_credentials)->json('/multitenant')
+    };
 
+    my $login = $self->_read('Name');
+    my $tenant = $multitenant ? $self->_read('Tenant') : undef;
+    my $password = $self->read_password;
+
+    my $app = $self->get_app;
     $app->cache->set( login => $login );
+    $app->cache->set( tenant => $tenant );
     $self->cache->set( password => $password );
     $self->cache->set( sid => undef );
 
     my $res = $self->ask_api(
-	{ action => 'current_admin_setup', 
-	  filters => { name => $login }});
+	{ action => 'current_admin_setup'});
 
     my $sid = $res->json('/sid');
     my $aid = $res->json('/admin_id');
@@ -48,6 +49,17 @@ sub read_password
     ReadMode 'normal';
     print STDERR "\r";
     $pass;
+}
+
+
+sub _read
+{
+    my ($self,$msg) = @_;
+    print STDERR "$msg: ";
+    my $read = <>; 
+    chomp $read;
+    print STDERR "\r";
+    $read;
 }
 
 1;
