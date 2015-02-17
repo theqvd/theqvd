@@ -37,7 +37,15 @@ Wat.Views.MainView = Backbone.View.extend({
     },
     
     events:  {
-        'input .filter-control>input': 'filter'
+        'input .filter-control>input': 'filterBySubstring'
+    },
+    
+    filterBySubstring: function(e) {
+        // Store typed search to mantain the order in filter task avoiding 
+        // filtering if current typed search doesnt match with stored one
+        Wat.CurrentView.typedSearch = $(e.target).val();
+        
+        this.filter(e);
     },
     
     extendEvents: function (ev) {

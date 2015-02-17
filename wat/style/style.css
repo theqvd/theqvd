@@ -1388,10 +1388,15 @@ body {
     .wrapper .content .config-table {
       margin-bottom: 3px;
       table-layout: fixed; }
+      .wrapper .content .config-table td {
+        text-align: left;
+        vertical-align: middle; }
       .wrapper .content .config-table th {
         cursor: pointer; }
       .wrapper .content .config-table .fa:before {
         margin-right: 5px; }
+      .wrapper .content .config-table .token_description {
+        white-space: normal; }
     .wrapper .content .action-new-token {
       margin-bottom: 10px; }
     .wrapper .content .config-search-box {

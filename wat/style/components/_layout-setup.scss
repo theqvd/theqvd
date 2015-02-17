@@ -79,12 +79,21 @@ a.button-update-customize {
     margin-bottom: 3px;
     table-layout: fixed;
     
+    td {
+        text-align: left; 
+        vertical-align: middle;
+    }
+    
     th {
         cursor: pointer;
     }
     
     .fa:before {
         margin-right: 5px;
+    }
+    
+    .token_description {
+        white-space: normal;
     }
 }
 

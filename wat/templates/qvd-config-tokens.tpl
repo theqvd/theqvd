@@ -6,7 +6,9 @@ var miscTokens = [];
 
 if (configTokens.length == 0) {
 %>
-    <td data-i18n="No elements found"></td>
+    <tr>
+        <td data-i18n="No elements found"></td>
+    </tr>
 <%
 }
 
@@ -20,8 +22,16 @@ $.each(configTokens, function (iTok, tok) {
     var prefix = tokenSplitted[0];
 %>
     <tr class="js-token-row" data-prefix="<%= prefix %>">
-        <td style="text-align: left; vertical-align: middle;">
+        <td>
             <%= token %>
+            
+            <%
+            if (QVD_CONFIG_HELP[token] != undefined) {
+            %>
+                <div class="second_row token_description"><%= QVD_CONFIG_HELP[token] %></div>
+            <%
+            }
+            %>
         </td>
         <td style="width: 250px;">
             <input type="text" value="<%= value %>" style="width:100%" class="token-value" data-token="<%= token %>">

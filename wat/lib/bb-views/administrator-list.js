@@ -67,6 +67,7 @@ Wat.Views.AdminListView = Wat.Views.ListView.extend({
         Wat.A.fillSelect(params);
         
         Wat.I.chosenElement('select#tenant_editor', 'single100');
+        Wat.I.chosenElement('[name="language"]', 'single');
     },
     
     createElement: function () {

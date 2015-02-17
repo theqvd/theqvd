@@ -72,6 +72,11 @@ Wat.Views.ConfigQvdView = Wat.Views.MainView.extend({
     },
     
     processTokensRenderTokens: function (that) {
+        // If search typed when searching was started is different to the current search in text box, do nothing
+        if (that.typedSearch != undefined && that.typedSearch != $('input[name="config_search"]').val()) {
+            return;
+        }
+        
         that.configTokens = that.retrievedData.rows
         
         // If there are not tokens in this prefix, render everything again selecting first prefix
@@ -120,7 +125,9 @@ Wat.Views.ConfigQvdView = Wat.Views.MainView.extend({
         }
         else {
             $('.lateral-menu-option').removeClass('lateral-menu-option--selected');
-            Wat.A.performAction('config_get', {}, {'key': search}, {}, this.processTokensRenderTokens, this);
+            
+            // Pass typed search with context to avoid concurrency problems 
+            Wat.A.performAction('config_get', {}, {'key': search}, {}, this.processTokensRenderTokens, $.extend({}, this, {typedSearch: $('input[name="config_search"]').val()}));
         }
     },
     

@@ -889,7 +889,7 @@ Wat.I = {
         $('.elements-selected').html(selectedItems);
     },
     
-    confirm: function (templateName, successCallback, that) {        
+    confirm: function (templateName, successCallback, that, loadingBlock) {        
         var dialogConf = {
             title: '<i class="fa fa-question"></i>',
             buttons : {
@@ -898,6 +898,9 @@ Wat.I = {
                 },
                 "Accept": function () {
                     $(this).dialog('close');
+                    if (loadingBlock) {
+                        Wat.I.loadingBlock($.i18n.t('Please, wait while action is performed') + '<br><br>' + $.i18n.t('Do not close or refresh the window'));
+                    }
                     successCallback(that);
                 }
             },
