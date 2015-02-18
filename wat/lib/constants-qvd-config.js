@@ -57,10 +57,16 @@ QVD_CONFIG_HELP = {
     'database.name': 'The name of the QVD database',
     'database.user': 'The user account needed to connect',
     'database.password': 'The password needed to connect',
-    'hkd.user.umask': 'Umask for the HKD process',
+    'hkd.user.umask': 'umask for the HKD process',
     'hkd.as_user': 'User to run hkd as',
     'hkd.pid_file': 'Path to the hkd PID file',
-    'l7r.user.umask': 'Umask for the L7R process',
+    'hkd.vm.starting.max': 'Unused',
+    'internal.vm.network.device.prefix': 'For LXC\'s lxc.network.veth.pair parameter',
+    'internal.vm.network.dhcp-hostsfile': 'File to pass to dnsmasq at its --dhcp-hostsfile parameter',
+    'internal.vm.network.firewall.enable': 'Enable firewall rules',
+    'internal.hkd.cluster.node.timeout': 'This value should ba adjusted in accordance to internal.database.pool.connection.global_timeout and internal.hkd.agent.ticker.timeout',
+    'internal.hkd.agent.ticker.timeout': 'If the ticker agent is not able to tick the database for the following time, it aborts the HKD',
+    'l7r.user.umask': 'umask for the L7R process',
     'l7r.use_ssl': 'Whether L7R accepts SSL incoming connections or not',
     'l7r.port': 'Port the L7R should listen to',
     'l7r.address': 'IP addresses L7R should bind to/listen at',
@@ -68,8 +74,10 @@ QVD_CONFIG_HELP = {
     'l7r.loadbalancer.plugin': 'Load balancing plugins to use. Similar to auth plugins',
     'l7r.as_user': 'Actually usused in the code',
     'l7r.pid_file': 'Unused',
+    'osf.default.memory': 'Default memory for newly created OSFs',
+    'osf.default.overlay': 'Default overlay for newly created OSFs',
     'log.filename': 'Path to the log file',
-    'log.level': 'Log verbosity (FATAL, ERROR, WARN, INFO, DEBUG or TRACE)',
+    'log.level': 'Log verbosity (FATAL, ERROR, WARN, INFO, DEBUG, TRACE or ALL)',
     'nodename': 'Name of this node in QVD. Usually the machine\'s hostname.',
     'path.run': 'Directory where several configuration, state, pid and certificate files are stored',
     'path.log': 'Where QVD logs are stored',
@@ -77,6 +85,18 @@ QVD_CONFIG_HELP = {
     'path.storage.root': 'Main storage location for OS images (both KVM and LXC)',
     'path.storage.staging': 'OS images ready to be used',
     'path.storage.images': 'OS images in use by some VM',
+    'path.storage.overlays': 'overlay storage directory for KVM',
+    'path.storage.homes': 'homes storage directory for KVM',
+    'path.storage.check': 'check storage directory for KVM',
+    'path.storage.basefs': 'basefs storage directory for LXC',
+    'path.storage.homefs': 'homefs storage directory for LXC',
+    'path.storage.btrfs.root': 'btrfs storage directory for LXC',
+    'path.l7r.ssl': 'Path for SSL certificates and CAs',
+    'path.l7r.ssl.key': 'Path for SSL key',
+    'path.l7r.ssl.cert': 'Path for SSL certificates',
+    'path.l7r.ssl.ca': 'Path for SSL CAs',
+    'path.l7r.ssl.crl': 'Path for SSL CRLs',
+    'path.serial.captures': 'KVM serial port captures or LXC console output',
     'wat.admin.login': 'Username of the WAT administrator',
     'vm.hypervisor': 'virtualization engine to use, either kvm or lxc',
     'vm.lxc.unionfs.type': 'COW fs to use with LXC',
@@ -88,50 +108,44 @@ QVD_CONFIG_HELP = {
     'vm.serial.capture': 'Capture serial port traffic to a file<br><br>- in KVM it is ignored if serial port is redirected (ie if vm.serial.redirect is set to 1)<br>- in LXC it saves the capture under the directory specified in path.serial.captures',
     'vm.network.bridge': 'All VMs will be attached to this interface, which must be a bridg. The DHCP server uses this setting too',
     'vm.network.domain': 'Default search domain for virtual machines',
+    'vm.network.ip.start': 'Start of DHCP range. There\'s no sensible default value',
+    'vm.network.ip.netmask': 'QVD private network netmask. There\'s no sensible default value',
+    'vm.network.mac.prefix': 'High bytes of the MAC address, the IP is used for the low bytes',
+    'vm.kvm.home.drive.index': 'KVM: disk drive will be visible as: 0=hda, 1=hdb, 2=hdc... (parameter \'index\' within -drive in KVM)',
+    'vm.lxc.home.per.user': 'When using LXC if this flag is set, QVD will assume that the home directories are not per virtual machine but per user and that they follow the typical NFS home structure.<br><br> Note that in order for this schema to work, the user ids used on the containers and in the directories shouls match. This is usually atained using an that is the same used on the NFS.',
+    'vma.audio.enable': 'So that the VMA exports PULSE_SERVER before xinit invocation and passes the \'media=1\' parameter to nxagent',
+    'vma.slave.enable': 'Enables "slave channel" in nxagent',
+    'vma.slave.command': 'Slave shell to execute to client requests',
+    'vma.printing.enable': 'Enables the printing channel in nxagent',
+    'vma.pid_file': 'Path to the VMA PID file',
+    'vma.user.home.drive': 'Optional: device that contains the homes, as seen from within the VM',
+    'vma.user.home.fs': 'When autoprovisioning homes, filesystem type to create in the device',
+    'vma.user.home.path': 'Where to mount the homes device',
+    'vma.user.default.name': 'Default user name',
+    'vma.user.default.groups': 'Default groups user will belong to',
+    'vma.default.lan': 'Default language',
+    'vma.user.umask': 'umask for the VMA',
+    'vma.user.shell': 'Shell for user',
+    'vma.on_action.pre-connect': 'External executables the VMA calls when \'pre-connect\' event happens',
+    'vma.on_action.connect': 'External executables the VMA calls when \'connect\' event happens',
+    'vma.on_action.stop': 'External executables the VMA calls when \'stop\' event happens',
+    'vma.on_action.disconnect': 'External executables the VMA calls when \'disconnect\' event happens',
+    'vma.on_action.suspend': 'External executables the VMA calls when \'suspend\' event happens',
+    'vma.on_action.poweroff': 'External executables the VMA calls when \'poweroff\' event happens',
+    'vma.on_action.expire': 'External executables the VMA calls when \'expire\' event happens',
+    'vma.on_state.connected': 'External executables the VMA calls just before \'connected\' state is entered',
+    'vma.on_state.suspended': 'External executables the VMA calls just before \'suspended\' state is entered',
+    'vma.on_state.disconnected': 'External executables the VMA calls just before \'disconnected\' state is entered',
+    'vma.on_provisioning.mount_home': 'External executables the VMA call during user provisioning',
+    'vma.on_provisioning.add_user': 'External executables the VMA call during user provisioning',
+    'vma.on_provisioning.after_add_user': 'External executables the VMA call during user provisioning',
+    'vma.default.client.keyboard': 'Unused',
+    'vma.default.client.link': 'Unused',
     'wat.admin.password': 'Password of the WAT administrator',
     'wat.log.filename': 'WAT logs go into its own file to avoid permission issues as the process is not run as root',
 }
 
-// TODO: Continues from line #293 of Defaults.pm
 
-/*
-# storage directories for KVM
-path.storage.overlays = ${path.storage.root}/overlays
-path.storage.homes = ${path.storage.root}/homes
-path.storage.check = ${path.storage.homes}/.rw_check
-
-# storage directories for LXC
-path.storage.basefs = ${path.storage.root}/basefs
-path.storage.homefs = ${path.storage.root}/homefs
-path.storage.btrfs.root = ${path.storage.root}
-
-path.run.lxc = ${path.run}/lxc
-
-path.storage.overlayfs = ${path.storage.btrfs.root}/overlayfs
-path.storage.rootfs = ${path.storage.btrfs.root}/rootfs
-
-## paths for SSL certificates and CAs
-path.l7r.ssl = ${path.run}/l7r/ssl
-path.l7r.ssl.key = ${path.l7r.ssl}/key.pem
-path.l7r.ssl.cert = ${path.l7r.ssl}/cert.pem
-path.l7r.ssl.ca = ${path.l7r.ssl}/ca.pem
-path.l7r.ssl.crl = ${path.l7r.ssl}/crl.pem
-
-path.ssl.ca.system = /etc/ssl/certs
-path.ssl.ca.personal = certs
-
-path.darwin.ssl.ca.system = /System/Library/OpenSSL/certs/
-
-## KVM serial port captures or LXC console output
-path.serial.captures = ${path.tmp}/qvd
-path.hypervisor.captures = ${path.tmp}/qvd
-
-path.cgroup = /sys/fs/cgroup
-path.cgroup.cpu.lxc = ${path.cgroup}/cpu/lxc
-
-path.client.pixmaps = pixmaps
-path.client.pixmaps.alt = /usr/share/pixmaps
-
-path.qvd.bin = /usr/lib/qvd/bin
-
-*/
+QVD_CONFIG_PREFIX_HELP = {
+    'internal': 'Internal parameters, do not change!!!',
+}
