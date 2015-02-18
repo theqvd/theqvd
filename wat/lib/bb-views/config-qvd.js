@@ -29,6 +29,9 @@ Wat.Views.ConfigQvdView = Wat.Views.MainView.extend({
         
         params.id = Wat.C.adminID;
         this.id = Wat.C.adminID;
+        if (params.currentTokensPrefix != undefined) {
+            this.currentTokensPrefix = params.currentTokensPrefix;
+        }
         
         this.model = new Wat.Models.Admin(params);
         
@@ -42,7 +45,8 @@ Wat.Views.ConfigQvdView = Wat.Views.MainView.extend({
         
         that.prefixes.push(UNCLASSIFIED_CONFIG_CATEGORY);
         
-        if (that.currentTokensPrefix == '') {
+        // If current Token is not among the recovered fixes, set first one
+        if ($.inArray(that.currentTokensPrefix, that.prefixes) == -1) {
             that.currentTokensPrefix = that.prefixes[0];
         }
         
@@ -108,6 +112,11 @@ Wat.Views.ConfigQvdView = Wat.Views.MainView.extend({
         Wat.I.chosenElement('.token-action-select', 'single');
         
         Wat.T.translate();
+        
+        // If pushState is avaiable in browser, modify hash with current token
+        if (history.pushState) {
+            history.pushState(null, null, '#/config/' + this.currentTokensPrefix);
+        }
     },
     
     events: {
@@ -126,12 +135,27 @@ Wat.Views.ConfigQvdView = Wat.Views.MainView.extend({
         else {
             $('.lateral-menu-option').removeClass('lateral-menu-option--selected');
             
+            // If pushState is avaiable in browser, modify hash with current token
+            if (history.pushState) {
+                history.pushState(null, null, '#/config');
+            }
+            
             // Pass typed search with context to avoid concurrency problems 
             Wat.A.performAction('config_get', {}, {'key': search}, {}, this.processTokensRenderTokens, $.extend({}, this, {typedSearch: $('input[name="config_search"]').val()}));
         }
     },
     
     clickPrefixOption: function (e) {
+        var newHash = '#/config/' + $(e.target).attr('data-prefix');
+        
+        // If pushState is not avaiable in browser, redirect to new hash reloading page
+        if (!history.pushState) {
+            window.location.hash = newHash;
+            return;
+        }
+        
+        history.pushState(null, null, newHash);
+        
         this.selectPrefixMenu($(e.target).attr('data-prefix'));
         
         this.currentTokensPrefix = $(e.target).attr('data-prefix');

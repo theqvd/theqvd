@@ -143,8 +143,12 @@
         Wat.Router.app_router.on('route:setupCustomize', function () {
             Wat.Router.app_router.performRoute('views', Wat.Views.SetupCustomizeView);
         });    
-        Wat.Router.app_router.on('route:setupConfig', function () {
-            Wat.Router.app_router.performRoute('config', Wat.Views.ConfigQvdView);
+        Wat.Router.app_router.on('route:setupConfig', function (token) {
+            var params = {};
+            if (token) {
+                params.currentTokensPrefix = token;
+            }
+            Wat.Router.app_router.performRoute('config', Wat.Views.ConfigQvdView, params);
         });       
         Wat.Router.app_router.on('route:watConfig', function () {
             Wat.Router.app_router.performRoute('watconfig', Wat.Views.ConfigWatView);

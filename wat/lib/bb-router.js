@@ -23,6 +23,7 @@ Wat.Router = Backbone.Router.extend({
         "roles": "listRole",
         "role/:id": "detailsRole",
         "config": "setupConfig",
+        "config/:token": "setupConfig",
         "watconfig": "watConfig",
         "about": "about",
         "documentation": "documentation",
