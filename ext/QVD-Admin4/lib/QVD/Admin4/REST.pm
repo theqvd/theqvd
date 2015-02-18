@@ -201,6 +201,14 @@ sub pool
     return $self->{pool};
 }
 
+sub database_version
+{
+    my $self = shift;
+    my $version = eval { 
+	$QVD_ADMIN->_db->resultset('Version')->search(
+	    { component => 'schema' })->first->version
+    } // undef;
+}
 
 1;
 

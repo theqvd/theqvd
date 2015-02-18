@@ -51,7 +51,6 @@ sub select
 
     my @rows;
     my $rs;
-
     eval { $rs = $DB->resultset($request->table)->search($request->filters,$request->modifiers);
 	   @rows = $rs->all };
 
@@ -507,7 +506,6 @@ sub add_roles_to_admin
 
 	QVD::Admin4::Exception->throw(exception => $@, 
 				      query => 'roles') if $@;
-
     }
 }
 
@@ -1014,8 +1012,9 @@ sub vms_with_expiration_date
 
     my $is_not_null = 'IS NOT NULL';
     my $rs = $DB->resultset('VM')->search(
-	{ 'vm_runtime.vm_expiration_hard'  => \$is_not_null },
-	{ join => [qw(vm_runtime)],
+	{ 'osf.tenant_id' => $admin->tenants_scoop,
+	  'vm_runtime.vm_expiration_hard'  => \$is_not_null },
+	{ join => [qw(vm_runtime osf)],
 	  prefetch => [qw(vm_runtime)]});
 
     my $now = DateTime->now();

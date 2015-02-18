@@ -15,6 +15,18 @@ plugin 'QVD::Admin4::REST';
 
 # MojoX::Session::Transport::WAT Package 
 
+
+get '/info' => sub {
+  my $c = shift;
+  my $json = { status => 0,
+	       multitenant => $c->qvd_admin4_api->_cfg('wat.multitenant'),
+               version => { database => $c->qvd_admin4_api->database_version }};
+
+
+  $c->render(json => $json );
+};
+
+
 package MojoX::Session::Transport::WAT
 {
     use base qw(MojoX::Session::Transport);
@@ -57,7 +69,6 @@ under sub {
     my $c = shift;
     $c->res->headers->header('Access-Control-Allow-Origin' => '*');
     $c->res->headers->header('Access-Control-Expose-Headers' => 'sid');
-    $c->res->headers->header('charset' => 'utf-8');
 
     my $json = $c->req->json // { map { $_ => $c->param($_) } $c->param };
     
@@ -82,11 +93,9 @@ any '/' => sub {
     my $c = shift;
     $c->inactivity_timeout(30000);     
     my $json = $c->get_input_json;
-
-    my $response = $json->{action} && $json->{action} eq 'api_info' ? 
-	$c->api_info : $c->process_api_query($json);
-
-    $c->render(json => $response, charset => 'utf-8');
+    my $response = $c->process_api_query($json);
+    deep_utf8_decode($response);
+    $c->render(text => b(encode_json($response))->decode('UTF-8'));
 };
 
 websocket '/ws' => sub {
@@ -97,7 +106,7 @@ websocket '/ws' => sub {
     my $notification = 0;
 
     my $res = $c->process_api_query($json);
-    $c->send(encode_json($res));
+    $c->send(b(encode_json($res))->decode('UTF-8'));
 
     for my $channel ($c->get_action_channels($json))
     {
@@ -108,7 +117,7 @@ websocket '/ws' => sub {
 	2 => sub { return 1 unless $notification;
 		   $c->app->log->debug("WebSocket refreshing information");
 		   my $res = $c->process_api_query($json);
-		   $c->send(encode_json($res));
+		   $c->send(b(encode_json($res))->decode('UTF-8'));
 		   $notification = 0;});
 
     my $timer;
@@ -126,6 +135,24 @@ websocket '/ws' => sub {
 };
 
 
+$ENV{MOJO_MAX_MESSAGE_SIZE} = 0;
+
+app->hook(after_build_tx => sub {
+    my ($tx, $app) = @_;
+    $tx->req->on(progress => sub{
+        my $message = shift;
+        return unless my $len = $message->headers->content_length;
+        my $size = $message->content->progress;
+        say 'Progress: ', $size == $len ? 100 : int($size / ($len / 100)), '%', " size: $size";
+    })
+});
+
+post '/di/upload' => sub {
+
+    my $c = shift;
+    my $file = $c->req->upload('file');
+};
+
 websocket '/staging' => sub {
     my $c = shift;
     $c->inactivity_timeout(3000);
@@ -142,9 +169,9 @@ websocket '/staging' => sub {
     $c->on(message => sub { my ($c,$msg) = @_;
                             my $sf_size = eval { -s "$staging_path/$staging_file" } // 0;
                             my $if_size = eval { -s "$images_path/$images_file" } // 0;
-                            $c->send(encode_json({ status => 1000,
-                                                   total_size => $sf_size,
-                                                   copy_size => $if_size }))
+                            $c->send(b(encode_json({ status => 1000,
+						     total_size => $sf_size,
+						     copy_size => $if_size }))->decode('UTF-8'))
 				unless $accomplished;});
 
     my $fc = Mojo::IOLoop::ForkCall->new;
@@ -156,7 +183,7 @@ websocket '/staging' => sub {
 	      $err //= 'no error signals';
               $c->app->log->debug("Copy finished: $err");
 	      $accomplished=1;
-              $c->send(encode_json($response)); }
+              $c->send(b(encode_json($response))->decode('UTF-8')); }
         );
 };
 
@@ -183,7 +210,6 @@ sub get_input_json
         $json->{parameters} = decode_json($json->{parameters}) if exists $json->{parameters}
     };
 
-    deep_utf8_encode($json); 
     $c->render(json => QVD::Admin4::Exception->new(code => 6100)->json) if $@;
     $json;
 }
@@ -263,10 +289,3 @@ sub reject_access
   (0,QVD::Admin4::Exception->new(code => 3100));
 }
 
-
-sub api_info
-{
-    my $c = shift;
-    { status => 0,
-      multitenant => $c->qvd_admin4_api->_cfg('wat.multitenant') };
-}

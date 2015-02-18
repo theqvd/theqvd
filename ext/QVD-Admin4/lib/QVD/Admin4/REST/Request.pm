@@ -12,7 +12,9 @@ has 'qvd_object_model', is => 'ro', isa => sub { die "Invalid type for attribute
 						     unless ref(+shift) eq 'QVD::Admin4::REST::Model'; } , required => 1;
 has 'modifiers', is => 'ro', isa => sub { die "Invalid type for attribute modifiers" 
 					      unless ref(+shift) eq 'HASH'; }, 
-                             default => sub { { distinct => 1, join => [], order_by => { '-asc' => []}  }};
+                             default => sub { { group_by => [], # TO DO: default dbix grouping fails for ordering in related tables. This avoids 
+						                # grouping, but turns off distinct...
+						join => [], order_by => { '-asc' => []}  }};
 has 'filters', is => 'ro', isa => sub { die "Invalid type for attribute failures" 
 					    unless ref(+shift) eq 'HASH'; }, default => sub { {}; };
 has 'parameters', is => 'ro', isa => sub { die "Invalid type for attribute parameters" 

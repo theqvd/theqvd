@@ -6,6 +6,7 @@ use Text::SimpleTable::AutoWidth;
 use Mojo::JSON qw(encode_json decode_json j);
 use Mojo::IOLoop;
 use Mojo::Message::Response;
+use Encode;
 
 my $FILTERS =
 {
@@ -346,11 +347,11 @@ sub print_table
     my $tb = Text::SimpleTable::AutoWidth->new();
     $tb->max_width(500);
     $tb->captions(\@fields);
-    
+
     my $rows;
     while (my $properties = $res->json("/rows/$n")) 
-    {	
-	$tb->row( map { $self->get_field_value($parsing,$properties,$_) // '' } @fields );
+    { 
+	$tb->row( map {  $self->get_field_value($parsing,$properties,$_) // '' } @fields );
 	$n++;
     }
 
@@ -395,7 +396,7 @@ sub ambiguous
 
 sub ask_api
 {
-    my ($self,$query,$no_credentials) = @_;
+    my ($self,$query) = @_;
  
     return $self->ask_api_ws($query)
 	if $query->{action} eq 'di_create';
@@ -416,10 +417,8 @@ sub ask_api
 	( login => $login, password => $password);
     $credentials{tenant} = $tenant if 
 	defined $tenant && defined $credentials{login};
-
-    my $json = $no_credentials ? $query : {%$query,%credentials};
  
-    my $res = $ua->post("$url", json => $json )->res;
+    my $res = $ua->post("$url", json => {%$query,%credentials} )->res;
 
     die 'API returns bad status' 
 	unless $res->code;
@@ -659,8 +658,7 @@ sub get_field_value
 	// die "No method available to parse complex field in API output";
 	$v = $cb->($v);
     }
-
-    return $v;
+    return encode('utf-8',$v);
 }
 
 sub get_value

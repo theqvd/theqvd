@@ -4,7 +4,8 @@ use warnings;
 use Moo;
 use QVD::Admin4::CLI::Tokenizer::Token;
 
-my $TOKEN = qr/<=|>=|([a-z]|[A-Z]|_|[0-9]|[\/@*.%+-])+|[=,;)([\]!<>\-~:]|["'][^'"]*["']/;
+my $SPECIAL_TOKEN = qr/<=|>=|[=,;)([\]!<>~:]|["'][^'"]*["']/;
+my $TOKEN = qr/[^\s<=>,;)(\][!~:'"]+/;
 
 sub BUILD
 {
@@ -20,7 +21,8 @@ sub parse
 
     while ($string ne '')
     { 
-	$string =~ s/^\s*($TOKEN)\s*// || last;
+	$string =~ s/^\s*($TOKEN)\s*// || 
+	    $string =~ s/^\s*($SPECIAL_TOKEN)\s*// || last;
 	my $form = $1; $form =~ s/['"]//g;
 
 	my $token = QVD::Admin4::CLI::Tokenizer::Token->new(

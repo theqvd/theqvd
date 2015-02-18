@@ -20,6 +20,7 @@ sub option_spec {
 
 sub command_map {
 
+    version => 'QVD::Admin4::CLI::Command::Version',
     config => 'QVD::Admin4::CLI::Command::Config',
     tenant => 'QVD::Admin4::CLI::Command::Tenant',
     role => 'QVD::Admin4::CLI::Command::Role',
@@ -48,6 +49,7 @@ sub init {
 	if $opts->password;
 
     my $api = Mojo::URL->new(); $api->scheme('http'); $api->host($host); $api->port($port); 
+    my $api_info = Mojo::URL->new(); $api_info->scheme('http'); $api_info->host($host); $api_info->port($port); $api_info->path('/info');
     my $ws = Mojo::URL->new(); $ws->scheme('ws'); $ws->host($host); $ws->port($port); $ws->path('/staging');
     my $ua = Mojo::UserAgent->new;
 
@@ -60,6 +62,7 @@ sub init {
     $self->cache->set( parser => $parser);
     $self->cache->set( tokenizer => $tokenizer );
     $self->cache->set( api => $api ); 
+    $self->cache->set( api_info => $api_info ); 
     $self->cache->set( ws => $ws ); 
     $self->cache->set( login => $login ); 
     $self->cache->set( password => $password ); 

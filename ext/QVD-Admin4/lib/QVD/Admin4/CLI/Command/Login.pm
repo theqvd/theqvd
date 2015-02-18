@@ -8,21 +8,23 @@ use warnings;
 sub run 
 {
     my ($self, $opts, @args) = @_;
-    my $no_credentials = 1;
+
+    my $app = $self->get_app;
+    my $ua  = $app->cache->get('ua'); 
+    my $url  = $app->cache->get('api_info'); 
+
     my $multitenant = eval {
-	$self->ask_api({ action => 'api_info'},
-		       $no_credentials)->json('/multitenant')
+	$ua->get("$url")->res->json('/multitenant')
     };
 
     my $login = $self->_read('Name');
     my $tenant = $multitenant ? $self->_read('Tenant') : undef;
     my $password = $self->read_password;
 
-    my $app = $self->get_app;
     $app->cache->set( login => $login );
     $app->cache->set( tenant => $tenant );
-    $self->cache->set( password => $password );
-    $self->cache->set( sid => undef );
+    $app->cache->set( password => $password );
+    $app->cache->set( sid => undef );
 
     my $res = $self->ask_api(
 	{ action => 'current_admin_setup'});
@@ -31,11 +33,9 @@ sub run
     my $aid = $res->json('/admin_id');
     my $tid = $res->json('/tenant_id');
 
-    $self->cache->set( sid => $sid );
-    $self->cache->set( aid => $aid );
-    $self->cache->set( tid => $tid );
-
-    $app->render("Hello $login\n");
+    $app->cache->set( sid => $sid );
+    $app->cache->set( aid => $aid );
+    $app->cache->set( tid => $tid );
 }
 
 
@@ -47,7 +47,7 @@ sub read_password
     my $pass = ReadLine 0; 
     chomp $pass;
     ReadMode 'normal';
-    print STDERR "\r";
+    print STDERR "\n";
     $pass;
 }
 
