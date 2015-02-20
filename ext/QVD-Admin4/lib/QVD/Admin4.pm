@@ -56,11 +56,12 @@ sub select
 
     QVD::Admin4::Exception->throw(exception => $@, query => 'select') if $@;
 
+    use Data::Dumper; print Dumper $rs->as_query;
+
     { total => ($rs->is_paged ? $rs->pager->total_entries : $rs->count), 
       rows => \@rows,
       extra => $self->get_extra_info_from_related_views($request) };
 }
-
 
 sub get_extra_info_from_related_views
 {
@@ -520,11 +521,36 @@ sub vm_delete
     $self->delete($request,conditions => [qw(vm_is_stopped)]);
 }
 
-
+###############################
 ###############################
 ###############################
 
 sub di_create
+{
+    my ($self,$request) = @_;
+
+    my $result = $self->create($request);
+    my $di = @{$result->{rows}}[0];
+
+    eval
+    {
+	$di->osf->delete_tag('head');
+	$di->osf->delete_tag($di->version);
+	$DB->resultset('DI_Tag')->create({di_id => $di->id, tag => $di->version, fixed => 1});
+	$DB->resultset('DI_Tag')->create({di_id => $di->id, tag => 'head'});
+	$DB->resultset('DI_Tag')->create({di_id => $di->id, tag => 'default'})
+	    unless $di->osf->di_by_tag('default');
+    };
+
+    QVD::Admin4::Exception->throw(exception => $@,
+				  query => 'tags') if $@;
+
+    $di->update({path => $di->id . '-' . $di->path});
+    
+    $result;
+}
+
+sub di_create_from_staging
 {
     my ($self,$request) = @_;
 

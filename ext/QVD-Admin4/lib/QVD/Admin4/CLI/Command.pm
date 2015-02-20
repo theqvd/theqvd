@@ -7,6 +7,7 @@ use Mojo::JSON qw(encode_json decode_json j);
 use Mojo::IOLoop;
 use Mojo::Message::Response;
 use Encode;
+use File::Basename qw(basename dirname);
 
 my $FILTERS =
 {
@@ -398,17 +399,17 @@ sub ask_api
 {
     my ($self,$query) = @_;
  
-    return $self->ask_api_ws($query)
+    return $self->ask_api_staging($query)
 	if $query->{action} eq 'di_create';
 
     my $app = $self->get_app;
     my %args = (
 	login => $app->cache->get('login'), 
 	password => $app->cache->get('password'),
-	tenant => $app->cache->get('tenant'),
+	tenant => $app->cache->get('tenant_name'),
 	sid => $app->cache->get('sid'),
-	url => $app->cache->get('api'),
-	ua =>  $app->cache->get('ua'));
+	url => $app->cache->get('api_url'),
+	ua =>  $app->cache->get('user_agent'));
 
     my ($sid,$login,$password,$tenant,$url,$ua) = 
 	@args{qw(sid login password tenant url ua)};
@@ -446,7 +447,7 @@ sub check_api_result
 }
 
 
-sub ask_api_ws
+sub ask_api_staging
 {
     my ($self,$query) = @_;
 
@@ -455,8 +456,8 @@ sub ask_api_ws
 	login => $app->cache->get('login'), 
 	password => $app->cache->get('password'),
 	sid => $app->cache->get('sid'),
-	url => $app->cache->get('ws'),
-	ua =>  $app->cache->get('ua'));
+	url => $app->cache->get('api_staging_url'),
+	ua =>  $app->cache->get('user_agent'));
 
     my ($sid,$login,$password,$url,$ua) = 
 	@args{qw(sid login password url ua)};
@@ -498,6 +499,41 @@ sub ask_api_ws
 
     Mojo::IOLoop->start;
     Mojo::Message::Response->new(json => $res);
+}
+
+sub ask_api_di_upload
+{
+    my ($self,$query) = @_;
+
+    my $app = $self->get_app;
+    my %args = (
+	login => $app->cache->get('login'), 
+	password => $app->cache->get('password'),
+	sid => $app->cache->get('sid'),
+	url => $app->cache->get('api_di_upload_url'),
+	ua =>  $app->cache->get('user_agent'));
+
+    my ($sid,$login,$password,$url,$ua) = 
+	@args{qw(sid login password url ua)};
+
+    my %credentials = defined $sid ? (sid => $sid) : 
+	( login => $login, password => $password );
+
+    my $file = $query->{arguments}->{disk_image};
+    $query->{arguments}->{disk_image} = basename($file);
+    $query->{arguments} = encode_json($query->{arguments});
+    delete $query->{filters};
+    delete $query->{fields};
+    delete $query->{order_by};
+
+    my $res = $ua->post("$url", form => { %credentials, %$query, file => { file => $file }})->res;
+
+    die 'API returns bad status' 
+	unless $res->code;
+
+    $self->check_api_result($res);
+
+    return $res;
 }
 
 sub print_filters
@@ -585,7 +621,7 @@ sub superadmin
 {
     my $self = shift;
     my $app = $self->get_app;
-    $app->cache->get('tid') ? return 1 : return 0;
+    $app->cache->get('tenant_id') ? return 1 : return 0;
 }
 
 sub get_order
@@ -690,10 +726,11 @@ sub tenant_scoop
     unless ($self->{tenant_scoop})
     {
 	my $app = $self->get_app;
-	$self->{tenant_scoop} = $app->cache->get('tid');
+	$self->{tenant_scoop} = $app->cache->get('tenant_id');
     }
 
     $self->{tenant_scoop};
 }
+
 
 1;

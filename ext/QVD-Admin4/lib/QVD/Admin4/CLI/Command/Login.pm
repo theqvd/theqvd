@@ -10,8 +10,8 @@ sub run
     my ($self, $opts, @args) = @_;
 
     my $app = $self->get_app;
-    my $ua  = $app->cache->get('ua'); 
-    my $url  = $app->cache->get('api_info'); 
+    my $ua  = $app->cache->get('user_agent'); 
+    my $url  = $app->cache->get('api_info_url'); 
 
     my $multitenant = eval {
 	$ua->get("$url")->res->json('/multitenant')
@@ -22,7 +22,7 @@ sub run
     my $password = $self->read_password;
 
     $app->cache->set( login => $login );
-    $app->cache->set( tenant => $tenant );
+    $app->cache->set( tenant_name => $tenant );
     $app->cache->set( password => $password );
     $app->cache->set( sid => undef );
 
@@ -30,12 +30,12 @@ sub run
 	{ action => 'current_admin_setup'});
 
     my $sid = $res->json('/sid');
-    my $aid = $res->json('/admin_id');
-    my $tid = $res->json('/tenant_id');
+    my $admin_id = $res->json('/admin_id');
+    my $tenant_id = $res->json('/tenant_id');
 
     $app->cache->set( sid => $sid );
-    $app->cache->set( aid => $aid );
-    $app->cache->set( tid => $tid );
+    $app->cache->set( admin_id => $admin_id );
+    $app->cache->set( tenant_id => $tenant_id );
 }
 
 

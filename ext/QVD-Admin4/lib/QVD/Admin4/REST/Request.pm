@@ -395,7 +395,6 @@ sub set_filters_in_request
 	    }
 	}
     }
-
     $self->filters->flatten_filters if $found_properties;
 }
 
@@ -458,6 +457,8 @@ sub instantiate_argument
     $self->set_argument($column,$value)                       :
     $self->set_related_object_argument($table,$column,$value);
 }
+
+
 
 sub set_order_by_in_request
 {

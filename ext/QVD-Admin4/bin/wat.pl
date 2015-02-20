@@ -15,6 +15,19 @@ plugin 'QVD::Admin4::REST';
 
 # MojoX::Session::Transport::WAT Package 
 
+$ENV{MOJO_MAX_MESSAGE_SIZE} = 0;
+
+app->hook(after_build_tx => sub {
+    my ($tx, $app) = @_;
+
+    $tx->req->on(progress => sub{
+        my $message = shift;
+        return unless my $len = $message->headers->content_length;
+        my $size = $message->content->progress;
+	my $percent = $size == $len ? 100 : int($size / ($len / 100));
+        print 'Progress: ', $percent , '%', " size: $size","\r";
+    })
+});
 
 get '/info' => sub {
   my $c = shift;
@@ -22,10 +35,8 @@ get '/info' => sub {
 	       multitenant => $c->qvd_admin4_api->_cfg('wat.multitenant'),
                version => { database => $c->qvd_admin4_api->database_version }};
 
-
   $c->render(json => $json );
 };
-
 
 package MojoX::Session::Transport::WAT
 {
@@ -80,6 +91,7 @@ under sub {
 	tx => $c->tx);
 
     my $session = MojoX::Session->new(%session_args);
+
     my $auth_method = $c->get_auth_method($session,$json);
 
     my ($bool,$exception) = $c->$auth_method($session,$json);
@@ -91,6 +103,7 @@ under sub {
 any '/' => sub {
 
     my $c = shift;
+
     $c->inactivity_timeout(30000);     
     my $json = $c->get_input_json;
     my $response = $c->process_api_query($json);
@@ -135,24 +148,6 @@ websocket '/ws' => sub {
 };
 
 
-$ENV{MOJO_MAX_MESSAGE_SIZE} = 0;
-
-app->hook(after_build_tx => sub {
-    my ($tx, $app) = @_;
-    $tx->req->on(progress => sub{
-        my $message = shift;
-        return unless my $len = $message->headers->content_length;
-        my $size = $message->content->progress;
-        say 'Progress: ', $size == $len ? 100 : int($size / ($len / 100)), '%', " size: $size";
-    })
-});
-
-post '/di/upload' => sub {
-
-    my $c = shift;
-    my $file = $c->req->upload('file');
-};
-
 websocket '/staging' => sub {
     my $c = shift;
     $c->inactivity_timeout(3000);
@@ -186,6 +181,30 @@ websocket '/staging' => sub {
               $c->send(b(encode_json($response))->decode('UTF-8')); }
         );
 };
+
+post '/di/upload' => sub {
+
+    my $c = shift;
+    my $json = $c->get_input_json;
+    my $response = $c->process_api_query($json);
+   
+    if ($response->{status} eq 0)
+    {
+	eval 
+	{ 
+	    my $file = $c->req->upload('file');
+	    my $images_path  = $c->qvd_admin4_api->_cfg('path.storage.images');
+	    my $di_id = ${$response->{rows}}[0]->{id};
+	    $file->move_to($images_path .'/'. $di_id . '-'. $file->filename)
+	}; 
+	print $@ if $@;
+	$c->render(json => QVD::Admin4::Exception->new(code => 2210)->json) if $@;
+    }
+
+    deep_utf8_decode($response);
+    $c->render(text => b(encode_json($response))->decode('UTF-8'));
+};
+
 
 app->start;
 
