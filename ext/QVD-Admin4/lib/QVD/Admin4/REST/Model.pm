@@ -24,6 +24,13 @@ my $DBConfigProvider;
 
 my $DIRECTLY_TENANT_RELATED = [qw(User Administrator OSF Tenant_Views_Setup)];
 
+
+my $OPERATORS_MAPPER = 
+{
+    '~' => 'LIKE'
+
+};
+
 my $UNAMBIGUOUS_FILTERS = 
 {   
     list => { Operative_Acls_In_Role => [qw(role_id)],
@@ -1655,6 +1662,18 @@ sub normalize_value
 
     return ref($norm) ? $self->$norm($value) : $norm;
 }
+
+
+sub normalize_operator
+{
+    my $self = shift;
+    my $op = shift;
+
+    my $nop = $OPERATORS_MAPPER->{$op} // $op;
+
+    return $nop;
+}
+
 
 sub get_default_memory { cfg('osf.default.memory'); }
 sub get_default_overlay { cfg('osf.default.overlay'); }

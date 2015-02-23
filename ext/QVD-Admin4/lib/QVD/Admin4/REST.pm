@@ -181,7 +181,7 @@ sub _cfg
     return cfg($key);
 }
 
-sub pool
+sub _pool
 {
     my $self = shift;
     $self->{pool} //=

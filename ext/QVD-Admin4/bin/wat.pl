@@ -3,7 +3,6 @@ use Mojolicious::Lite;
 use lib::glob '/home/benjamin/wat/*/lib/';
 use Mojo::JSON qw(encode_json decode_json j);
 use QVD::Admin4::Exception;
-use QVD::Config;
 use MojoX::Session;
 use File::Copy qw(copy move);
 use Mojo::IOLoop::ForkCall;
@@ -29,8 +28,11 @@ app->hook(after_build_tx => sub {
     })
 });
 
-get '/info' => sub {
+any '/info' => sub {
   my $c = shift;
+
+  $c->res->headers->header('Access-Control-Allow-Origin' => '*');
+
   my $json = { status => 0,
 	       multitenant => $c->qvd_admin4_api->_cfg('wat.multitenant'),
                version => { database => $c->qvd_admin4_api->database_version }};
@@ -83,8 +85,6 @@ under sub {
 
     my $json = $c->req->json // { map { $_ => $c->param($_) } $c->param };
     
-    return 1 if $json->{action} && $json->{action} eq 'api_info';
-
     my %session_args = (
 	store  => [dbi => {dbh => QVD::DB->new()->storage->dbh}],
 	transport => MojoX::Session::Transport::WAT->new(),

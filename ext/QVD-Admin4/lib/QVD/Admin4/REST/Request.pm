@@ -379,8 +379,10 @@ sub set_filters_in_request
 		    $v = $self->qvd_object_model->normalize_value($k,$v) 		    
 		}
 	    }
-	    my $op = $self->filters->get_operator($ref_v);
 
+	    my $op = $self->filters->get_operator($ref_v);
+	    $op = $self->qvd_object_model->normalize_operator($op);
+ 		    
 	    my $value_normalized = $is_property ?  
 		[$key_dbix_format.".key" => { $op => $k },
 		 $key_dbix_format.".value" => { $op => $v } ] : { $op => $v };
