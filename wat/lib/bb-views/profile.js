@@ -1,5 +1,4 @@
 Wat.Views.ProfileView = Wat.Views.DetailsView.extend({  
-    setupCommonTemplateName: 'setup-common',
     setupOption: 'admins',
     secondaryContainer: '.bb-setup',
     qvdObj: 'profile',
@@ -33,11 +32,9 @@ Wat.Views.ProfileView = Wat.Views.DetailsView.extend({
         this.render();
     },
     
-    render: function () {
-        this.templateProfile = Wat.A.getTemplate(this.setupCommonTemplateName);
-        
+    render: function () {        
         this.template = _.template(
-            this.templateProfile, {
+            Wat.TPL.setupCommon, {
                 model: this.model,
                 cid: this.cid,
                 selectedOption: this.setupOption,
@@ -46,11 +43,9 @@ Wat.Views.ProfileView = Wat.Views.DetailsView.extend({
         );
 
         $('.bb-content').html(this.template);
-        
-        this.templateProfile = Wat.A.getTemplate('profile');
-        
+                
         this.template = _.template(
-            this.templateProfile, {
+            Wat.TPL.profile, {
                 login: Wat.C.login,
                 language: Wat.C.language,
                 block: Wat.C.block,

@@ -1,5 +1,4 @@
 Wat.Views.ACLListView = Wat.Views.ListView.extend({
-    setupCommonTemplateName: 'setup-common',
     sideContainer: '.bb-setup-side',
     secondaryContainer: '.bb-setup',
     qvdObj: 'acl',

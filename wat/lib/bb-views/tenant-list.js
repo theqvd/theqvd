@@ -1,5 +1,4 @@
 Wat.Views.TenantListView = Wat.Views.ListView.extend({
-    setupCommonTemplateName: 'setup-common',
     listTemplateName: 'setup-tenants',
     sideContainer: '.bb-setup-side',
     secondaryContainer: '.bb-setup',
@@ -20,13 +19,11 @@ Wat.Views.TenantListView = Wat.Views.ListView.extend({
     },
     
     renderTenants: function () {
-
-        this.templateSetupCommon = Wat.A.getTemplate(this.setupCommonTemplateName);
         var cornerMenu = Wat.I.getCornerMenu();
         
         // Fill the html with the template and the model
         this.template = _.template(
-            this.templateSetupCommon, {
+            Wat.TPL.setupCommon, {
                 model: this.model,
                 cid: this.cid,
                 selectedOption: this.setupOption,

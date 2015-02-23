@@ -864,11 +864,9 @@ body {
         margin-bottom: 20px;
         display: block; } }
   .wrapper .content {
-    margin-bottom: 180px;
     display: table;
     width: 100%;
     margin: 0 auto;
-    margin-bottom: 80px;
     /********************************************************************
 *********************************************************************
 *********************************************************************
@@ -1174,7 +1172,8 @@ body {
             padding: 0px;
             height: auto;
             float: right;
-            text-align: right; } }
+            text-align: right;
+            margin-top: 6px; } }
         .wrapper .content .list-block .list-navigation .pagination a, .wrapper .content .details-side .list-navigation .pagination a {
           padding: 3px 10px;
           line-height: 30px; }
@@ -1187,9 +1186,7 @@ body {
         @media screen and (min-width: 40em) {
           .wrapper .content .list-block .list-navigation .action-new-item, .wrapper .content .details-side .list-navigation .action-new-item {
             width: 45%;
-            float: left;
-            margin: 0px;
-            margin-left: -4px; } }
+            float: left; } }
     .wrapper .content .list-block .action-selected, .wrapper .content .details-side .action-selected {
       margin-top: 15px;
       width: 100%;
@@ -1451,6 +1448,8 @@ body {
             padding-top: 5px; }
     .wrapper .content .wrapper-content {
       width: 95vw; }
+  .wrapper .related-docs {
+    margin-bottom: 80px; }
 
 .admin-roles, .role-inherited-roles, role-acls {
   clear: both; }
@@ -1604,7 +1603,7 @@ select[name="role"] {
       .editor-container .editor-table .custom-properties td .property-help {
         position: absolute;
         left: 12px;
-        top: 14px;
+        top: 11px;
         color: #c4c4c4;
         font-weight: normal; }
 

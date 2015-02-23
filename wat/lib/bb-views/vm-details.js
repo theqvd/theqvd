@@ -35,12 +35,11 @@ Wat.Views.VMDetailsView = Wat.Views.DetailsView.extend({
             'filters': {
                 'osf_id': this.model.get('osf_id')
             },
-            'nameAsId': true
+            'nameAsId': true,
+            'chosenType': 'single100'
         };
 
         Wat.A.fillSelect(params);
-        
-        Wat.I.chosenElement('[name="di_tag"]', 'single100');
     },
     
     renderSide: function () {

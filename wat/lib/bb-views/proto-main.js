@@ -15,9 +15,7 @@ Wat.Views.MainView = Backbone.View.extend({
     
     initialize: function () {
         _.bindAll(this, 'render');
-                
-        this.templateEditorCommon = Wat.A.getTemplate('editor-common');
-        
+                        
         // Add to the view events the parent class of this view to avoid collisions with other views events
         this.events = this.restrictEventsScope(this.events);
 
@@ -122,7 +120,7 @@ Wat.Views.MainView = Backbone.View.extend({
         
         // Add common parts of editor to dialog
         that.template = _.template(
-                    that.templateEditorCommon, {
+                    Wat.TPL.editorCommon, {
                         classifiedByTenant: classifiedByTenant,
                         isSuperadmin: isSuperadmin,
                         editorMode: editorMode,
@@ -144,18 +142,20 @@ Wat.Views.MainView = Backbone.View.extend({
                 'action': 'tenant_tiny_list',
                 'selectedId': 0,
                 'controlId': 'tenant_editor',
+                'chosenType': 'single100'
             };
 
-            Wat.A.fillSelect(params);
-            
-            // Remove supertenant from tenant selector
-            var existsInSupertenant = $.inArray(that.qvdObj, QVD_OBJS_EXIST_IN_SUPERTENANT) != -1;
+            Wat.A.fillSelect(params, function () {
+                // Remove supertenant from tenant selector
+                var existsInSupertenant = $.inArray(that.qvdObj, QVD_OBJS_EXIST_IN_SUPERTENANT) != -1;
 
-            if (!existsInSupertenant) {
-                $('select[name="tenant_id"] option[value="0"]').remove();
-            }
-            
-            Wat.I.chosenElement('[name="tenant_id"]', 'single100');
+                if (!existsInSupertenant) {
+                    $('select[name="tenant_id"] option[value="0"]').remove();
+                    
+                    Wat.I.updateChosenControls('[name="tenant_id"]');
+                    $('[name="tenant_id"]').trigger('change');
+                }
+            });
         }
 
         // Add specific parts of editor to dialog
@@ -375,15 +375,17 @@ Wat.Views.MainView = Backbone.View.extend({
         this.relatedDoc = $.extend({}, sectionDoc, this.relatedDoc);
         
         if (this.relatedDoc) {
-            this.relatedDocTemplate = Wat.A.getTemplate('documentation-related-links');
+            var that = this;
             
-            this.template = _.template(
-                    this.relatedDocTemplate, {
-                        relatedDoc: this.relatedDoc,
+            that.template = _.template(
+                    Wat.TPL.relatedDoc, {
+                        relatedDoc: that.relatedDoc,
                     }
                 );
-            
-            $(this.el).html($(this.el).html() + this.template);
+
+            $('.bb-related-docs').html(that.template);
+
+            Wat.T.translate();
         }
     }
 });

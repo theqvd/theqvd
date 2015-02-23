@@ -1,5 +1,4 @@
 Wat.Views.RoleDetailsView = Wat.Views.DetailsView.extend({  
-    setupCommonTemplateName: 'setup-common',
     setupOption: 'roles',
     secondaryContainer: '.bb-setup',
     qvdObj: 'role',
@@ -24,7 +23,16 @@ Wat.Views.RoleDetailsView = Wat.Views.DetailsView.extend({
         
         Wat.I.chosenConfiguration();
         
-        this.renderSetupCommon();
+        var templates = {
+            inheritedRoles: {
+                name: 'details-role-inherited-roles'
+            },
+            aclsRoles: {
+                name: 'details-role-acls-tree'
+            }
+        }
+        
+        Wat.A.getTemplates(templates, this.renderSetupCommon, this); 
     },
     
     events: {
@@ -279,28 +287,28 @@ Wat.Views.RoleDetailsView = Wat.Views.DetailsView.extend({
         }
     },
     
-    renderSetupCommon: function () {
-
-        this.templateSetupCommon = Wat.A.getTemplate(this.setupCommonTemplateName);
+    renderSetupCommon: function (that) {
+        var that = that || this;
+        
         var cornerMenu = Wat.I.getCornerMenu();
         
         // Fill the html with the template and the model
-        this.template = _.template(
-            this.templateSetupCommon, {
-                model: this.model,
-                cid: this.cid,
-                selectedOption: this.setupOption,
+        that.template = _.template(
+            Wat.TPL.setupCommon, {
+                model: that.model,
+                cid: that.cid,
+                selectedOption: that.setupOption,
                 setupMenu: null,
                 //setupMenu: cornerMenu.wat.subMenu
             }
         );
         
-        $(this.el).html(this.template);
+        $(that.el).html(that.template);
         
-        this.printBreadcrumbs(this.breadcrumbs, '');
+        that.printBreadcrumbs(that.breadcrumbs, '');
 
         // After render the side menu, embed the content of the view in secondary container
-        this.embedContent();
+        that.embedContent();
     },
     
     renderSide: function () {
@@ -328,10 +336,9 @@ Wat.Views.RoleDetailsView = Wat.Views.DetailsView.extend({
     },
     
     renderManagerInheritedRoles: function () {
-        var inheritedRolesTemplate = Wat.A.getTemplate('details-role-inherited-roles');
         // Fill the html with the template and the model
         this.template = _.template(
-            inheritedRolesTemplate, {
+            Wat.TPL.inheritedRoles, {
                 model: this.model
             }
         );
@@ -348,24 +355,32 @@ Wat.Views.RoleDetailsView = Wat.Views.DetailsView.extend({
                 "field": ["internal","name"],
                 "order": "-asc"
             },
-            'group': $.i18n.t("Roles")
+            'group': $.i18n.t("Roles"),
+            'chosenType': 'advanced100'
         };
+        
+        var that = this;
+        Wat.A.fillSelect(params, function () {
+            // Remove from inherited roles selector, current role and already inherited ones (for standard roles)
+            $('select[name="role"] option[value="' + that.elementId + '"]').remove();
 
-        Wat.A.fillSelect(params);
-        
-        params.filters.internal = true;
-        params.group = $.i18n.t("Internal roles");
-        
-        Wat.A.fillSelect(params);
-        
-        // Remove from inherited roles selector, current role and already inherited ones
-        $('select[name="role"] option[value="' + this.elementId + '"]').remove();
- 
-        $.each(this.model.get('roles'), function (iRole, role) {
-            $('select[name="role"] option[value="' + iRole + '"]').remove();
+            $.each(that.model.get('roles'), function (iRole, role) {
+                $('select[name="role"] option[value="' + iRole + '"]').remove();
+            });    
+            
+            params.filters.internal = true;
+            params.group = $.i18n.t("Internal roles");
+
+            Wat.A.fillSelect(params, function () {
+                // Remove from inherited roles selector, current role and already inherited ones (for internal roles)
+                $('select[name="role"] option[value="' + that.elementId + '"]').remove();
+
+                $.each(that.model.get('roles'), function (iRole, role) {
+                    $('select[name="role"] option[value="' + iRole + '"]').remove();
+                });           
+            }); 
         });
-                   
-        Wat.I.chosenElement('[name="role"]', 'advanced100');
+
     },    
     
     renderACLsTree: function (that) {
@@ -377,12 +392,10 @@ Wat.Views.RoleDetailsView = Wat.Views.DetailsView.extend({
             $('.details-block').addClass('col-width-100');
             return;
         }
-
-        var aclsRolesTemplate = Wat.A.getTemplate('details-role-acls-tree');
         
         // Fill the html with the template and the model
         that.template = _.template(
-            aclsRolesTemplate, {
+            Wat.TPL.aclsRoles, {
                 sections: ACL_SECTIONS,
                 actions: ACL_ACTIONS,
                 aclPatterns: that.aclPatterns,

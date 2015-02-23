@@ -82,6 +82,7 @@
                 //width: 49%;
                 float: right;
                 text-align: right;
+                margin-top: 6px;
             }
             
             a {
@@ -101,8 +102,6 @@
             @include in(desktop) {
                 width: 45%;
                 float: left;
-                margin: 0px;
-                margin-left: -4px;
             }
         }
 

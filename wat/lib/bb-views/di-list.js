@@ -49,12 +49,11 @@ Wat.Views.DIListView = Wat.Views.ListView.extend({
         var params = {
             'action': 'dis_in_staging',
             'controlName': 'disk_image',
-            'nameAsId': true
+            'nameAsId': true,
+            'chosenType': 'advanced100'
         };
         
         Wat.A.fillSelect(params); 
-        
-        Wat.I.chosenElement('[name="disk_image"]', 'advanced100');
 
         // If main view is osf view, we are creating a disk image from osf details view. 
         // OSF and tenant (if exists) controls will be removed
@@ -82,23 +81,17 @@ Wat.Views.DIListView = Wat.Views.ListView.extend({
             var params = {
                 'action': 'osf_tiny_list',
                 'selectedId': $('.' + this.cid + ' .filter select[name="osf"]').val(),
-                'controlName': 'osf_id'
+                'controlName': 'osf_id',
+                'chosenType': 'advanced100'
             };
 
             // If exist tenant control (in superadmin cases) show osfs of selected tenant
-            if ($('[name="tenant_id"]').val() != undefined) {
-                // Add the tenant id to the osf select filling
-                params.filters = {
-                    'tenant_id': $('[name="tenant_id"]').val()
-                };
-
+            if ($('[name="tenant_id"]').length > 0) {
                 // Add an event to the tenant select change
                 Wat.B.bindEvent('change', '[name="tenant_id"]', Wat.B.editorBinds.filterTenantOSFs);
             }
 
             Wat.A.fillSelect(params);  
-
-            Wat.I.chosenElement('[name="osf_id"]', 'single100');
         }
     },
     

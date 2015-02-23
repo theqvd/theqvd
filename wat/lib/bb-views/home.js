@@ -1,6 +1,4 @@
 Wat.Views.HomeView = Wat.Views.MainView.extend({
-    homeTemplateName: 'home',
-    homeTemplateVmsExpireName: 'home-vms-expire',
     qvdObj: 'home',
     
     relatedDoc: {
@@ -65,12 +63,10 @@ Wat.Views.HomeView = Wat.Views.MainView.extend({
 
         this.stats = stats;
         delete this.stats.message;
-        
-        this.templateHome = Wat.A.getTemplate(this.homeTemplateName);
-        
+                
         // Fill the html with the template and the model
         this.template = _.template(
-            this.templateHome, {
+            Wat.TPL.home, {
                 stats: this.stats
             }
         );
@@ -93,10 +89,10 @@ Wat.Views.HomeView = Wat.Views.MainView.extend({
         if (!this.stats.vms_with_expiration_date) {
             return;
         }
-        this.templateHomeVmsExpire = Wat.A.getTemplate(this.homeTemplateVmsExpireName);
+        
         // Fill the html with the template and the model
         this.template = _.template(
-            this.templateHomeVmsExpire, {
+            Wat.TPL.homeVMsExpire, {
                 vms_with_expiration_date: this.stats.vms_with_expiration_date
             }
         );

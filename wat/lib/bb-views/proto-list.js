@@ -33,11 +33,6 @@ Wat.Views.ListView = Wat.Views.MainView.extend({
     
     initialize: function (params) {
         Wat.Views.MainView.prototype.initialize.apply(this);
-
-        // Define template names from qvd Object type
-        this.listTemplateName = 'list-' + this.qvdObj;
-        this.editorTemplateName = 'creator-' + this.qvdObj;
-        this.massiveEditorTemplateName = 'massive-editor-' + this.qvdObj;
         
         this.setFilters();
         this.setColumns();
@@ -47,23 +42,47 @@ Wat.Views.ListView = Wat.Views.MainView.extend({
                 
         this.resetSelectedItems();
         
-        // Templates
-        this.templateListCommonList = Wat.A.getTemplate('list-common');
-        this.templateListCommonBlock = Wat.A.getTemplate('list-common-block');
-        this.listTemplate = Wat.A.getTemplate(this.listTemplateName);
-        this.templateSelectChecks = Wat.A.getTemplate('dialog-select-checks');
-        
         this.context = $('.' + this.cid);
         
         this.readParams(params);
-        
-        this.render();
-        
+    
         // Extend the common events with the list events and events of the specific view
         this.extendEvents(this.commonListEvents);
         this.extendEvents(this.listEvents);
+
+        // Define template names from qvd Object type
+        this.listTemplateName = 'list-' + this.qvdObj;
+        this.editorTemplateName = 'creator-' + this.qvdObj;
+        this.massiveEditorTemplateName = 'massive-editor-' + this.qvdObj;
         
+        var templates = {
+            listCommonList: {
+                name: 'list-common'
+            },
+            listCommonBlock: {
+                name: 'list-common-block'
+            },
+            list: {
+                name: this.listTemplateName
+            },
+            selectChecks: {
+                name: 'dialog-select-checks'
+            },
+            editorNew: {
+                name: this.editorTemplateName
+            }
+        }
+        
+        // If qvd object is massive-editable, get massive editor template
+        if ($.inArray(this.qvdObj, QVD_OBJS_MASSIVE_EDITABLE) != -1) {
+            templates.editorMassive = {
+                name: this.massiveEditorTemplateName
+            };
+        }
+        
+        Wat.A.getTemplates(templates, this.render); 
     },
+
     
     readParams: function (params) {
         params = params || {};
@@ -239,7 +258,7 @@ Wat.Views.ListView = Wat.Views.MainView.extend({
         Wat.CurrentView.collection.deleteFilter(fKey);
     },
     
-    updateFilterNotes: function () {
+    updateFilterNotes: function () {        
         // Show-Hide filter notes only when view is not embeded
         if (this.cid == Wat.CurrentView.cid) {
             var filtersContainer = '.' + this.cid + ' .filter';
@@ -249,7 +268,6 @@ Wat.Views.ListView = Wat.Views.MainView.extend({
             if ($.isEmptyObject(filterNotes) && !$.isEmptyObject(this.initFilters)) {
                 $.each(this.initFilters, function (filterField, filterValue) {
                     // If the filtered field has not filter control, show generic filter note
-                    
                     if ($('.filter [data-filter-field="' + filterField + '"]').length > 0) {
                         return;
                     }
@@ -282,7 +300,7 @@ Wat.Views.ListView = Wat.Views.MainView.extend({
                     }
                 });
             }
-            
+
             $.each(this.formFilters, function(name, filter) {
                 var filterControl = $(filtersContainer + ' [name="' + name + '"]');
                 // If input text box is empty or selected option in a select is All (-1) skip filter control
@@ -309,7 +327,7 @@ Wat.Views.ListView = Wat.Views.MainView.extend({
                         break;
                 }
             });
-            
+
             this.drawFilterNotes(filterNotes);
         }
     },
@@ -421,7 +439,7 @@ Wat.Views.ListView = Wat.Views.MainView.extend({
         
         // Add common parts of editor to dialog
         that.template = _.template(
-                    that.templateSelectChecks, {
+                    Wat.TPL.selectChecks, {
                     }
                 );
 
@@ -565,7 +583,7 @@ Wat.Views.ListView = Wat.Views.MainView.extend({
     renderAll: function () {
         // Fill the html with the template and the collection
         var template = _.template(
-            this.templateListCommonList, {
+            Wat.TPL.listCommonList, {
                 formFilters: this.formFilters,
                 cid: this.cid
             });
@@ -592,7 +610,7 @@ Wat.Views.ListView = Wat.Views.MainView.extend({
         
         // Fill the list
         var template = _.template(
-            that.templateListCommonBlock, {
+            Wat.TPL.listCommonBlock, {
                 formFilters: that.formFilters,
                 selectedActions: that.selectedActions,
                 listActionButton: that.listActionButton,
@@ -601,12 +619,11 @@ Wat.Views.ListView = Wat.Views.MainView.extend({
         );
 
         $(that.listBlockContainer).html(template);
-        $(that.listBlockContainer).html(template);
-        $(that.listBlockContainer).html(template);
                         
         this.fetchFilters();
 
         that.renderList();
+        
         
         this.renderRelatedDocs();
         
@@ -621,7 +638,7 @@ Wat.Views.ListView = Wat.Views.MainView.extend({
     renderList: function () {
         // Fill the list
         var template = _.template(
-            this.listTemplate, {
+            Wat.TPL.list, {
                 models: this.collection.models,
                 filters: this.collection.filters,
                 columns: this.columns,
@@ -643,7 +660,7 @@ Wat.Views.ListView = Wat.Views.MainView.extend({
             Wat.WS.openListWebsockets(this.qvdObj, this.collection.models, this.liveFields, this.cid);
         }
         
-        this.updateFilterNotes();        
+        this.updateFilterNotes();
     },
     
     // Fill filter selects 
@@ -651,30 +668,39 @@ Wat.Views.ListView = Wat.Views.MainView.extend({
         var that = this;
                 
         var existsInSupertenant = $.inArray(that.qvdObj, QVD_OBJS_EXIST_IN_SUPERTENANT) != -1;
-
+        
         $.each(this.formFilters, function(name, filter) {
             if (filter.fillable) {
                 if (filter.type == 'select') {
                     var params = {
                         'action': name + '_tiny_list',
-                        'selectedId': that.filters[filter.filterField],
-                        'controlName': name
+                        'selectedId': that.filters[filter.filterField] || Wat.I.getFilterSelectedId(filter.options),
+                        'controlName': name,
+                        'startingOptions': Wat.I.getFilterStartingOptions(filter.options),
                     };
 
-                    Wat.A.fillSelect(params);
-
-                    // In tenant case (except in admins list) has not sense show supertenant in filters
-                    if (!existsInSupertenant && name == 'tenant') {
-                        // Remove supertenant from tenant selector
-                        $('select[name="tenant"] option[value="0"]').remove();
-                    }
+                    Wat.A.fillSelect(params, function () {
+                        // In tenant case (except in admins list) has not sense show supertenant in filters
+                        if (!existsInSupertenant && name == 'tenant') {
+                            // Remove supertenant from tenant selector
+                            $('select[name="tenant"] option[value="0"]').remove();
+                        }
+                                                
+                        Wat.I.updateChosenControls('[name="' + name + '"]');
+                        
+                        if (that.filters[filter.filterField] != undefined) {      
+                            that.updateFilterNotes();
+                        }
+                    });
                 }
             }
             else {
                 // If any field setted as not fillable is filtered, update it on control
-                if (that.filters[filter.filterField] != undefined) {         
+                if (that.filters[filter.filterField] != undefined) {      
                     $('.filter-control').find('[name="' + name + '"] option[value="' + that.filters[filter.filterField] + '"]').prop('selected', true);
                     $('.filter-control').find('[name="' + name + '"]').trigger('chosen:updated');
+                    
+                    that.updateFilterNotes();
                 }
             }
         });
@@ -788,7 +814,7 @@ Wat.Views.ListView = Wat.Views.MainView.extend({
     openNewElementDialog: function (e) {
         var that = this;
         
-        this.templateEditor = Wat.A.getTemplate(this.editorTemplateName);
+        this.templateEditor = Wat.TPL.editorNew;
         
         this.dialogConf.buttons = {
             Cancel: function (e) {
@@ -809,7 +835,7 @@ Wat.Views.ListView = Wat.Views.MainView.extend({
     },
     
     openMassiveChangesDialog: function (that) {        
-        that.templateEditor = Wat.A.getTemplate(that.massiveEditorTemplateName);
+        that.templateEditor = Wat.TPL.editorMassive;
         
         that.dialogConf.buttons = {
             Cancel: function () {
@@ -840,7 +866,7 @@ Wat.Views.ListView = Wat.Views.MainView.extend({
         
         // Add common parts of editor to dialog
         that.template = _.template(
-                    that.templateEditorCommon, {
+                    Wat.TPL.editorCommon, {
                         classifiedByTenant: 0,
                         editorMode: 'massive_edit',
                         isSuperadmin: Wat.C.isSuperadmin(), 
@@ -856,11 +882,9 @@ Wat.Views.ListView = Wat.Views.MainView.extend({
         
         target.html(that.template);
 
-        this.templateEditorCommon = Wat.A.getTemplate('editor-common');
-
         // Add specific parts of editor to dialog
         that.template = _.template(
-                    that.templateEditor, {
+                    Wat.TPL.editor, {
                         model: that.model
                     }
                 );

@@ -108,7 +108,10 @@ Wat.C = {
         }
         
         if (this.sid) {
-            Wat.A.performAction('current_admin_setup', {}, VIEWS_COMBINATION, {}, this.checkLogin, this, false);
+            Wat.A.performAction('current_admin_setup', {}, VIEWS_COMBINATION, {}, this.checkLogin, this, true);
+        }
+        else {
+            Wat.C.afterLogin ();
         }
     },
     
@@ -128,8 +131,8 @@ Wat.C = {
 
         this.login = user;
         this.password = password;
-
-        Wat.A.performAction('current_admin_setup', {}, VIEWS_COMBINATION, {}, this.checkLogin, this, false);
+        
+        Wat.A.performAction('current_admin_setup', {}, VIEWS_COMBINATION, {}, this.checkLogin, this, true);
     },
     
     // After call to API to get admin setup, check response
@@ -185,6 +188,8 @@ Wat.C = {
 
             Wat.Router.app_router.performRoute('', Wat.Views.HomeView);
         }
+                
+        Wat.C.afterLogin ();
     },
     
     // Stored views configuration retrieved from database to the inner data structure

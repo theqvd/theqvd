@@ -74,11 +74,10 @@ QVD_CONFIG_HELP = {
     'l7r.loadbalancer.plugin': 'Load balancing plugins to use. Similar to auth plugins',
     'l7r.as_user': 'Actually usused in the code',
     'l7r.pid_file': 'Unused',
-    'osf.default.memory': 'Default memory for newly created OSFs',
-    'osf.default.overlay': 'Default overlay for newly created OSFs',
     'log.filename': 'Path to the log file',
     'log.level': 'Log verbosity (FATAL, ERROR, WARN, INFO, DEBUG, TRACE or ALL)',
-    'nodename': 'Name of this node in QVD. Usually the machine\'s hostname.',
+    'osf.default.memory': 'Default memory for newly created OSFs',
+    'osf.default.overlay': 'Default overlay for newly created OSFs',
     'path.run': 'Directory where several configuration, state, pid and certificate files are stored',
     'path.log': 'Where QVD logs are stored',
     'path.tmp': 'Temporary files',
@@ -97,7 +96,6 @@ QVD_CONFIG_HELP = {
     'path.l7r.ssl.ca': 'Path for SSL CAs',
     'path.l7r.ssl.crl': 'Path for SSL CRLs',
     'path.serial.captures': 'KVM serial port captures or LXC console output',
-    'wat.admin.login': 'Username of the WAT administrator',
     'vm.hypervisor': 'virtualization engine to use, either kvm or lxc',
     'vm.lxc.unionfs.type': 'COW fs to use with LXC',
     'vm.overlay.persistent': 'Whether to keep overlay images from one session to the next',
@@ -141,8 +139,10 @@ QVD_CONFIG_HELP = {
     'vma.on_provisioning.after_add_user': 'External executables the VMA call during user provisioning',
     'vma.default.client.keyboard': 'Unused',
     'vma.default.client.link': 'Unused',
+    'wat.admin.login': 'Username of the WAT administrator',
     'wat.admin.password': 'Password of the WAT administrator',
     'wat.log.filename': 'WAT logs go into its own file to avoid permission issues as the process is not run as root',
+    'nodename': 'Name of this node in QVD. Usually the machine\'s hostname.',
 }
 
 

@@ -27,16 +27,35 @@ Wat.Views.DetailsView = Wat.Views.MainView.extend({
         this.setBreadCrumbs();
         this.setViewACL();
         this.setDetailsFields();
-
-        this.templateDetailsCommon = Wat.A.getTemplate('details-common');
-        this.templateDetailsCommonProperties = Wat.A.getTemplate('details-common-properties');
-        this.templateDetails = Wat.A.getTemplate(this.detailsTemplateName);
-        this.template404 = Wat.A.getTemplate('404');
-
-        this.fetchDetails();
         
         // Extend the common events
         this.extendEvents(this.eventsDetails);
+                
+        var templates = {
+            detailsCommon: {
+                name: 'details-common'
+            },
+            detailsCommonProperties: {
+                name: 'details-common-properties'
+            },
+            details: {
+                name: this.detailsTemplateName
+            },
+            detailsSide: {
+                name: this.detailsSideTemplateName
+            },
+            warn404: {
+                name: '404'
+            },
+            detailsSide: {
+                name: this.detailsSideTemplateName
+            },
+            warn404: {
+                name: '404'
+            }
+        }
+        
+        Wat.A.getTemplates(templates, this.fetchDetails, this); 
     },
     
     setBreadCrumbs: function () {
@@ -104,7 +123,7 @@ Wat.Views.DetailsView = Wat.Views.MainView.extend({
         
         if (this.notFound) {
             this.template = _.template(
-                this.template404, {
+                Wat.TPL.warn404, {
                 }
             );
 
@@ -119,7 +138,7 @@ Wat.Views.DetailsView = Wat.Views.MainView.extend({
             
             // Fill the html with the template and the model
             this.template = _.template(
-                this.templateDetailsCommon, {
+                Wat.TPL.detailsCommon, {
                     model: this.model,
                     enabledProperties: enabledProperties,
                     cid: this.cid
@@ -131,7 +150,7 @@ Wat.Views.DetailsView = Wat.Views.MainView.extend({
             this.printBreadcrumbs(this.breadcrumbs, '');
 
             this.template = _.template(
-                this.templateDetails, {
+                Wat.TPL.details, {
                     model: this.model,
                     detailsFields: this.detailsFields,
                     enabledProperties: enabledProperties
@@ -140,10 +159,8 @@ Wat.Views.DetailsView = Wat.Views.MainView.extend({
 
             $(this.detailsContainer).html(this.template);
         
-            this.templateDetailsSide = Wat.A.getTemplate(this.detailsSideTemplateName);
-
             this.template = _.template(
-                this.templateDetailsSide, {
+                Wat.TPL.detailsSide, {
                     model: this.model
                 }
             );
@@ -153,7 +170,7 @@ Wat.Views.DetailsView = Wat.Views.MainView.extend({
             if (enabledProperties) {
                 // Fill the html with the template and the model
                 this.template = _.template(
-                    this.templateDetailsCommonProperties, {
+                    Wat.TPL.detailsCommonProperties, {
                         properties: this.model.get('properties'),
                     }
                 );

@@ -36,7 +36,7 @@ function userTestFake () {
                     JSON.stringify(fakeResponse)
                 ]
            );
-
+            
             Wat.Router.app_router.trigger('route:detailsUser', [fakeValues.id]);
 
             // Bind to the change event on the model

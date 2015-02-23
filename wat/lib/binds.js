@@ -379,12 +379,11 @@ Wat.B = {
                 'filters': {
                     'osf_id': $('[name="osf_id"]').val()
                 },
-                'nameAsId': true
+                'nameAsId': true,
+                'chosenType': 'advanced100'
             };
 
             Wat.A.fillSelect(params);
-
-            Wat.I.updateChosenControls('[name="di_tag"]');
         },
         
         filterTenantOSFs: function () {
@@ -392,38 +391,47 @@ Wat.B = {
                 'action': 'osf_tiny_list',
                 'selectedId': '',
                 'controlName': 'osf_id',
-                'filters': {
-                    'tenant_id': $(this).val()
-                }
+                
             };
+            
+            if ($(this).val() > 0) {
+                params.filters =  {
+                    'tenant_id': $(this).val()
+                };
+            }
 
             // Remove all osf options and fill filtering with new selected tenant
             $('[name="osf_id"] option').remove();
-            Wat.A.fillSelect(params); 
+            
+            Wat.A.fillSelect(params, function () {
+                // Update chosen control for osf
+                Wat.I.updateChosenControls('[name="osf_id"]');
 
-            // Update chosen control for osf
-            $('[name="osf_id"]').trigger('chosen:updated');
-
-            // Trigger change event to update tags
-            $('[name="osf_id"]').trigger('change');
+                // Trigger change event to update tags
+                $('[name="osf_id"]').trigger('change');
+            }); 
         },
         
         filterTenantUsers: function () {
             var params = {
                 'action': 'user_tiny_list',
                 'selectedId': '',
-                'controlName': 'user_id',
-                'filters': {
-                    'tenant_id': $(this).val()
-                }
+                'controlName': 'user_id'
             };
 
+            if ($(this).val() > 0) {
+                params.filters =  {
+                    'tenant_id': $(this).val()
+                };
+            }
+            
             // Remove all osf options and fill filtering with new selected tenant
             $('[name="user_id"] option').remove();
-            Wat.A.fillSelect(params); 
-
-            // Update chosen control for user
-            $('[name="user_id"]').trigger('chosen:updated');
+            
+            Wat.A.fillSelect(params, function () {
+                // Update chosen control for user
+                Wat.I.updateChosenControls('[name="user_id"]');
+            }); 
         }
     },
     

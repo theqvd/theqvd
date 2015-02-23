@@ -1,5 +1,4 @@
 Wat.Views.AdminListView = Wat.Views.ListView.extend({
-    setupCommonTemplateName: 'setup-common',
     sideContainer: '.bb-setup-side',
     secondaryContainer: '.bb-setup',
     setupOption: 'admins',
@@ -17,13 +16,11 @@ Wat.Views.AdminListView = Wat.Views.ListView.extend({
     },
     
     renderSetupCommon: function () {
-
-        this.templateSetupCommon = Wat.A.getTemplate(this.setupCommonTemplateName);
         var cornerMenu = Wat.I.getCornerMenu();
         
         // Fill the html with the template and the model
         this.template = _.template(
-            this.templateSetupCommon, {
+            Wat.TPL.setupCommon, {
                 model: this.model,
                 cid: this.cid,
                 selectedOption: this.setupOption,
@@ -52,22 +49,8 @@ Wat.Views.AdminListView = Wat.Views.ListView.extend({
         
         this.dialogConf.title = $.i18n.t('New Administrator');
         Wat.Views.ListView.prototype.openNewElementDialog.apply(this, [e]);
-                
-        var context = $('.' + this.cid + '.editor-container');
-
-        // Fill DI Tags select on virtual machines creation form
-        var params = {
-            'action': 'tenant_tiny_list',
-            'selectedId': '0',
-            'controlId': 'tenant_editor',
-            'filters': {
-            }
-        };
         
-        Wat.A.fillSelect(params);
-        
-        Wat.I.chosenElement('select#tenant_editor', 'single100');
-        Wat.I.chosenElement('[name="language"]', 'single');
+        Wat.I.chosenElement('[name="language"]', 'single100');
     },
     
     createElement: function () {

@@ -1,6 +1,4 @@
 Wat.Views.ViewsView = Wat.Views.MainView.extend({
-    setupCommonTemplateName: 'setup-common',
-    setupCustomizeTemplateName: 'setup-customize',
     setupCustomizeFormTemplateName: 'setup-customize-form',
     sideContainer: '.bb-setup-side',
     setupContainer: '.bb-setup',
@@ -185,11 +183,9 @@ Wat.Views.ViewsView = Wat.Views.MainView.extend({
     },
     
     render: function () {
-        this.templateSetupCommon = Wat.A.getTemplate(this.setupCommonTemplateName);
-        
         // Fill the html with the template and the model
         this.template = _.template(
-            this.templateSetupCommon, {
+            Wat.TPL.setupCommon, {
                 model: this.model,
                 cid: this.cid,
                 selectedOption: this.setupOption,
@@ -203,10 +199,8 @@ Wat.Views.ViewsView = Wat.Views.MainView.extend({
     },
     
     renderBlock: function () {
-        this.templateSetupCustomize = Wat.A.getTemplate(this.setupCustomizeTemplateName);
-        
         this.template = _.template(
-            this.templateSetupCustomize, {
+            Wat.TPL.setupCustomize, {
                 selectedSection: this.selectedSection,
                 limitByACLs: this.limitByACLs,
                 viewKind: this.viewKind,
@@ -221,19 +215,19 @@ Wat.Views.ViewsView = Wat.Views.MainView.extend({
         // Fill OSF select on virtual machines creation form
         var params = {
             'action': 'tenant_tiny_list',
-            'controlName': 'tenant-select'
+            'controlName': 'tenant-select',
         };
-        
-        Wat.A.fillSelect(params);  
+                
+        Wat.A.fillSelect(params, function () {
+            Wat.I.updateChosenControls('[name="tenant-select"]');
+        });  
         
         this.renderForm();
     },
     
-    renderForm: function () {
-        this.templateSetupFormCustomize = Wat.A.getTemplate(this.setupCustomizeFormTemplateName);
-        
+    renderForm: function () {        
         this.template = _.template(
-            this.templateSetupFormCustomize, {
+            Wat.TPL.setupFormCustomize, {
                 filters: this.currentFilters,
                 columns: this.currentColumns,
                 limitByACLs: this.limitByACLs

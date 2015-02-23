@@ -52,15 +52,21 @@
                             <span class="filter-control desktop">
                                 <label for="<%= name %>" <%= translationAttr %>><%= filter.text %></label>
                                 <select name="<%= name %>" class="<%= filter.class %>" data-filter-field="<%= filter.filterField %>">
-                                    <% _.each(filter.options, function(option) { %>
-                                        <% 
-                                            var selectedAttr = '';
-                                            if(option.selected) { 
-                                                selectedAttr = 'selected="selected"';
-                                            }
-                                        %>
-                                        <option value="<%= option.value %>" <%= selectedAttr %> <%= translationAttr %>><%= option.text %></option>
-                                    <% }); %>
+                                    <% 
+                                    if (!filter.fillable) {
+                                        _.each(filter.options, function(option) { 
+                                    %>
+                                            <% 
+                                                var selectedAttr = '';
+                                                if(option.selected) { 
+                                                    selectedAttr = 'selected="selected"';
+                                                }
+                                            %>
+                                            <option value="<%= option.value %>" <%= selectedAttr %> <%= translationAttr %>><%= option.text %></option>
+                                    <% 
+                                        }); 
+                                    }
+                                    %>
                                 </select>
                             </span>
                         <%

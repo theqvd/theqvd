@@ -205,13 +205,10 @@ body {
         @extend %invisible;
 
         @extend %clearfix;
-
-        margin-bottom: 180px;
         
         display: table;
         width: 100%;
         margin: 0 auto;
-        margin-bottom: 80px;
         
         // Different view layouts
         @import "layout-home";
@@ -223,6 +220,10 @@ body {
         .wrapper-content {
             width: 95vw;
         }
+    }
+    
+    .related-docs {
+        margin-bottom: 80px;
     }
 }
 

@@ -1,5 +1,4 @@
 Wat.Views.LoginView = Wat.Views.MainView.extend({
-    loginTemplateName: 'login',
     qvdObj: 'login',
 
     initialize: function (params) {
@@ -16,12 +15,10 @@ Wat.Views.LoginView = Wat.Views.MainView.extend({
     events: {
     },
     
-    render: function () {
-        this.templateLogin = Wat.A.getTemplate(this.loginTemplateName);
-        
+    render: function () {        
         // Fill the html with the template
         this.template = _.template(
-            this.templateLogin, {
+            Wat.TPL.login, {
             }
         );
         

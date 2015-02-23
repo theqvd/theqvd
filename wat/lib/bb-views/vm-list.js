@@ -33,7 +33,7 @@ Wat.Views.VMListView = Wat.Views.ListView.extend({
             userHidden.value = Wat.CurrentView.model.get('id');
             $('.editor-container').append(userHidden);
                         
-            if ($('[name="tenant_id"]').val() != undefined) {
+            if ($('[name="tenant_id"]').length > 0) {
                 $('[name="tenant_id"]').parent().parent().remove();
                 
                 var tenantHidden = document.createElement('input');
@@ -48,61 +48,54 @@ Wat.Views.VMListView = Wat.Views.ListView.extend({
             var params = {
                 'action': 'user_tiny_list',
                 'selectedId': '',
-                'controlName': 'user_id'
+                'controlName': 'user_id',
+                'chosenType': 'advanced100'
             };
-
+            
             // If exist tenant control (in superadmin cases) show users of selected tenant
-            if ($('[name="tenant_id"]').val() != undefined) {
-                // Add the tenant id to the osf select filling
-                params.filters = {
-                    'tenant_id': $('[name="tenant_id"]').val()
-                };
-
+            if ($('[name="tenant_id"]').length > 0) {
                 // Add an event to the tenant select change
                 Wat.B.bindEvent('change', 'select[name="tenant_id"]', Wat.B.editorBinds.filterTenantUsers);
             }
             
-            Wat.A.fillSelect(params);  
+            Wat.A.fillSelect(params, function () {
+                $('[name="tenant_id"]').trigger('change');
+            });  
 
-            Wat.I.chosenElement('[name="user_id"]', 'advanced100');
         }
         
         // Fill OSF select on virtual machines creation form
         var params = {
             'action': 'osf_tiny_list',
             'selectedId': '',
-            'controlName': 'osf_id'
+            'controlName': 'osf_id',
+            'chosenType': 'advanced100'
         };
         
         // If exist tenant control (in superadmin cases) show osfs of selected tenant
-        if ($('[name="tenant_id"]').val() != undefined) {
-            // Add the tenant id to the osf select filling
-            params.filters = {
-                'tenant_id': $('[name="tenant_id"]').val()
-            };
-            
+        if ($('[name="tenant_id"]').length > 0) {
             // Add an event to the tenant select change
             Wat.B.bindEvent('change', '[name="tenant_id"]', Wat.B.editorBinds.filterTenantOSFs);
         }
-
-        Wat.A.fillSelect(params); 
-                
-        Wat.I.chosenElement('[name="osf_id"]', 'single100');
         
-        // Fill DI Tags select on virtual machines creation form
-        var params = {
-            'action': 'tag_tiny_list',
-            'selectedId': 'default',
-            'controlName': 'di_tag',
-            'filters': {
-                'osf_id': $('[name="osf_id"]').val()
-            },
-            'nameAsId': true
-        };
-
-        Wat.A.fillSelect(params);
+        Wat.I.chosenElement('[name="di_tag"]', 'advanced100');
         
-        Wat.I.chosenElement('[name="di_tag"]', 'single100');
+        Wat.A.fillSelect(params, function () {
+            // Fill DI Tags select on virtual machines creation form after fill OSF combo
+            var params = {
+                'action': 'tag_tiny_list',
+                'selectedId': 'default',
+                'controlName': 'di_tag',
+                'filters': {
+                    'osf_id': $('[name="osf_id"]').val()
+                },
+                'nameAsId': true,
+                'chosenType': 'advanced100'
+            };
+
+            Wat.A.fillSelect(params); 
+        });  
+         
     },
     
     createElement: function () {
@@ -204,14 +197,11 @@ Wat.Views.VMListView = Wat.Views.ListView.extend({
             'filters': {
                 'osf_id': osfId
             },
-            'nameAsId': true
+            'nameAsId': true,
+            'chosenType': 'advanced100'
         };
-
-
-        Wat.A.fillSelect(params);
-
-        Wat.I.chosenElement('[name="di_tag"]', 'single100');
         
+        Wat.A.fillSelect(params);
     },
     
     updateMassiveElement: function (dialog, id) {

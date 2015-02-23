@@ -451,7 +451,7 @@ Wat.I = {
         // Convert the filter selects to library chosen style
             var chosenOptions = {};
             chosenOptions.no_results_text = i18n.t('No results match');
-            chosenOptions.placeholder_text_single = i18n.t('Select an option');
+            chosenOptions.placeholder_text_single = i18n.t('Loading');
             chosenOptions.placeholder_text_multiple = i18n.t('Select some options');
             chosenOptions.search_contains = true;
 
@@ -508,11 +508,12 @@ Wat.I = {
         $('.js-' + menu + '-menu').show();
     },
     
-    renderMain: function () {        
-        var templateMain = Wat.A.getTemplate('main');
+    renderMain: function () { 
+        var that = this;
+        
         // Fill the html with the template and the collection
         var template = _.template(
-            templateMain, {
+            Wat.TPL.main, {
                 loggedIn: Wat.C.loggedIn,
                 cornerMenu: this.cornerMenu
             });
@@ -527,11 +528,9 @@ Wat.I = {
     },
     
     renderMenu: function () {
-        var templateMenu = Wat.A.getTemplate('menu');
-
         // Fill the html with the template and the collection
         var template = _.template(
-            templateMenu, {
+            Wat.TPL.menu, {
                 userMenu: Wat.I.userMenu,
                 helpMenu: Wat.I.helpMenu,
                 configMenu: Wat.I.configMenu,
@@ -965,4 +964,35 @@ Wat.I = {
 
         Wat.I.dialog(dialogConf, this);
     },
+    
+    getFilterStartingOptions: function (options) {
+        if (!options) {
+            return undefined;
+        }
+        
+        var returnedOptions = {};
+        
+        $.each (options, function (iOption, option) {
+            returnedOptions[option.value] = option.text;
+        });
+        
+        return returnedOptions;
+    },
+    
+    getFilterSelectedId: function (options) {
+        if (!options) {
+            return undefined;
+        }
+        
+        var selectedId = -1;
+        
+        $.each (options, function (iOption, option) {
+            if (option.selected) {
+                selectedId = option.value;
+                return false;
+            }
+        });
+        
+        return selectedId;
+    }
 }

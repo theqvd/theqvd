@@ -1,5 +1,4 @@
 Wat.Views.AdminDetailsView = Wat.Views.DetailsView.extend({  
-    setupCommonTemplateName: 'setup-common',
     setupOption: 'admins',
     secondaryContainer: '.bb-setup',
     qvdObj: 'administrator',
@@ -19,8 +18,20 @@ Wat.Views.AdminDetailsView = Wat.Views.DetailsView.extend({
         this.breadcrumbs.next.next.next.screen="";
         
         this.params = params;
+                
+        var templates = {
+            aclsAdmins: {
+                name: 'details-administrator-acls-tree'
+            },
+            inheritedRoles: {
+                name: 'details-administrator-roles'
+            },
+            setupCommon: {
+                name: 'setup-common'
+            }
+        }
         
-        this.renderSetupCommon();
+        Wat.A.getTemplates(templates, this.renderSetupCommon, this); 
     },
     
     render: function () {
@@ -45,12 +56,10 @@ Wat.Views.AdminDetailsView = Wat.Views.DetailsView.extend({
             $('.details-block').addClass('col-width-100');
             return;
         }
-        
-        var aclsAdminsTemplate = Wat.A.getTemplate('details-administrator-acls-tree');
-        
+
         // Fill the html with the template and the model
         that.template = _.template(
-            aclsAdminsTemplate, {
+            Wat.TPL.aclsAdmins, {
                 sections: ACL_SECTIONS,
                 actions: ACL_ACTIONS,
                 aclPatterns: that.aclPatterns,
@@ -173,11 +182,10 @@ Wat.Views.AdminDetailsView = Wat.Views.DetailsView.extend({
         if (!Wat.C.checkACL('administrator.see.roles')) { 
             return;
         }
-
-        var inheritedRolesTemplate = Wat.A.getTemplate('details-administrator-roles');
+        
         // Fill the html with the template and the model
         this.template = _.template(
-            inheritedRolesTemplate, {
+            Wat.TPL.inheritedRoles, {
                 model: this.model
             }
         );
@@ -189,28 +197,27 @@ Wat.Views.AdminDetailsView = Wat.Views.DetailsView.extend({
             'controlName': 'role',
             'filters': {
                 'internal': false
-            }
+            },
+            'chosenType': 'advanced100'
         };
-
-        Wat.A.fillSelect(params);
         
-        $.each(this.model.get('roles'), function (iRole, role) {
-            $('select[name="role"] option[value="' + iRole + '"]').remove();
+        var that = this;
+        
+        Wat.A.fillSelect(params, function () {
+            $.each(that.model.get('roles'), function (iRole, role) {
+                $('select[name="role"] option[value="' + iRole + '"]').remove();
+            });
         });
-        
-        Wat.I.chosenConfiguration();
-        
-        Wat.I.chosenElement('[name="role"]', 'advanced100');
     },    
     
-    renderSetupCommon: function () {
-
-        this.templateSetupCommon = Wat.A.getTemplate(this.setupCommonTemplateName);
+    renderSetupCommon: function (that) {
+        var that = that || this;
+        
         var cornerMenu = Wat.I.getCornerMenu();
         
         // Fill the html with the template and the model
-        this.template = _.template(
-            this.templateSetupCommon, {
+        that.template = _.template(
+            Wat.TPL.setupCommon, {
                 model: this.model,
                 cid: this.cid,
                 selectedOption: this.setupOption,
@@ -219,12 +226,12 @@ Wat.Views.AdminDetailsView = Wat.Views.DetailsView.extend({
             }
         );
         
-        $(this.el).html(this.template);
+        $(that.el).html(that.template);
         
-        this.printBreadcrumbs(this.breadcrumbs, '');
+        that.printBreadcrumbs(this.breadcrumbs, '');
 
         // After render the side menu, embed the content of the view in secondary container
-        this.embedContent();
+        that.embedContent();
     },
     
     embedContent: function () {

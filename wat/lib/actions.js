@@ -7,6 +7,7 @@ Wat.A = {
         if (cache == undefined) {
             cache = true;
         }
+        //console.info('Loading Template (sync): ' + templateName);
         
         if ($('#template_' + templateName).html() == undefined || !cache) {
             var tmplDir = APP_PATH + 'templates';
@@ -37,6 +38,66 @@ Wat.A = {
         }
     },
     
+    // Get templates from template files caching if specified to avoid future loadings
+    // Params:
+    //      templateName: name of the template file to be loaded without extension.
+    //      cache: boolean that specify if template will be cached in code or not (it will be cached if not provided).
+    getTemplates: function(templates, afterCallback, that) {
+        
+        var templatesCount = 0;
+        var templatesMax = Object.keys(templates).length;
+        
+        $.each (templates, function (storing, template) {
+            var templateName = template.name;
+            var cache = template.cache;
+            
+            if (cache == undefined) {
+                cache = true;
+            }
+            
+            //console.info('Loading Template (async): ' + templateName);
+
+            if ($('#template_' + templateName).html() == undefined || !cache) {
+                var tmplDir = APP_PATH + 'templates';
+                var tmplUrl = tmplDir + '/' + templateName + '.tpl';
+                var tmplString = '';
+
+                $.ajax({
+                    url: tmplUrl,
+                    method: 'GET',
+                    async: true,
+                    contentType: 'text',
+                    cache: false,
+                    success: function (tmplString) {
+                        if (cache) {
+                            $('head').append('<script id="template_' + templateName + '" type="text/template">' + tmplString + '<\/script>');
+                        }
+                        
+                        Wat.TPL[storing] = tmplString;
+                            
+                        templatesCount++;
+                        if (templatesCount >= templatesMax) {
+                            afterCallback(that);
+                        }                    
+                    }
+                });
+            }
+            else {
+                if (cache) {
+                    Wat.TPL[storing] = $('#template_' + templateName).html();
+                }
+                else {
+                    Wat.TPL[storing] = tmplString;
+                }
+                
+                templatesCount++;
+                if (templatesCount >= templatesMax) {
+                    afterCallback(that);
+                }    
+            }
+        });
+    },
+    
     // Perform any action of the API
     // Params:
     //      action: action name.
@@ -49,6 +110,10 @@ Wat.A = {
     performAction: function (action, arguments, filters, messages, successCallback, that, async) {
         if (async == undefined) {
             async = true;
+        }
+        
+        if (!async) {
+            //console.warn('SYNC CALL: ' + action);
         }
         
         var url = Wat.C.getBaseUrl() + 
@@ -139,7 +204,7 @@ Wat.A = {
     //          - params.controlSelector: CSS selector for the select combo
     //          - params.controlId: select combo's ID (used if controlSelector is not retrieved)
     //          - params.controlName: select combo's name (used if controlSelector and controlId are not retrieved)
-    //          - params.params.startingOptions: hash with pairs id-name of elements to fill the select combo
+    //          - params.startingOptions: hash with pairs id-name of elements to fill the select combo
     //          - params.selectedId: Id of the element that will be selected
     //          - params.translateOptions: Array of ids of those elements that will be translated
     //          - params.action: API action that will be used to fill select combo
@@ -147,7 +212,8 @@ Wat.A = {
     //          - params.order_by: API order by that will be used to fill select combo
     //          - params.nameAsId: Boolean that specifies if name of the options will be taken as Id too
     //          - params.group: HTML native optgroup where the options will be grouped
-    fillSelect: function (params) {
+    //      afterCallBack: Function to be executed after filling
+    fillSelect: function (params, afterCallBack) {
         if (params.controlSelector) {
             var controlSelector = params.controlSelector;
         }
@@ -160,7 +226,11 @@ Wat.A = {
         else {
             return;
         }
-            
+        
+        if (params.chosenType) {
+            Wat.I.chosenElement(controlSelector, params.chosenType);
+        }
+
         // Some starting options can be added as first options
         if (params.startingOptions) {
             $.each($(controlSelector), function () {
@@ -178,7 +248,9 @@ Wat.A = {
                         combo.attr('data-contain-i18n', '');
                     }
                     
-                    combo.append('<option ' + additionalAttributes + ' value="' + id + '" ' + selected + '>' + 
+                    var translateAttr = 'data-i18n'
+                    
+                    combo.append('<option ' + additionalAttributes + ' value="' + id + '" ' + selected + ' ' + translateAttr + '>' + 
                                                                name + 
                                                                '<\/option>');
                 });
@@ -196,11 +268,11 @@ Wat.A = {
             if (params.order_by) {
                 jsonUrl += '&order_by=' + JSON.stringify(params.order_by);
             }
-
+            
             $.ajax({
                 url: jsonUrl,
                 type: 'POST',
-                async: false,
+                async: true,
                 dataType: 'json',
                 processData: false,
                 parse: true,
@@ -251,8 +323,30 @@ Wat.A = {
                         }
 
                     });
+
+                    if (params.chosenType) {
+                        Wat.I.updateChosenControls(controlSelector);
+                    }
+                    
+                    // If no elements found, set label of chosen select as Empty
+                    if ($(controlSelector).find('option').length == 0) {
+                        $(controlSelector + '+.chosen-container span').html($.i18n.t('Empty'));
+                    }
+                    
+                    if (afterCallBack != undefined) {
+                        afterCallBack ();
+                    }
                 }
             });
+        }
+        else {
+            if (params.chosenType) {
+                Wat.I.updateChosenControls(controlSelector);
+            }
+                    
+            if (afterCallBack != undefined) {
+                afterCallBack ();
+            }
         }
     },
     

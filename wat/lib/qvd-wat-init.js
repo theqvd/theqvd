@@ -88,5 +88,9 @@ var Wat = {
         openListWebsockets: function () {},    
         openDetailsWebsockets: function () {},
         changeWebsocket: function () {}
-    }
+    },
+    
+    // Templates
+    TPL: {},
 };
+

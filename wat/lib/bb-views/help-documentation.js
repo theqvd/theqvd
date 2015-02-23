@@ -1,5 +1,4 @@
 Wat.Views.DocView = Wat.Views.MainView.extend({
-    docTemplateName: 'help-documentation',
     qvdObj: 'documentation',
     selectedGuide: 'introduction',
     
@@ -22,7 +21,14 @@ Wat.Views.DocView = Wat.Views.MainView.extend({
         }
         
         this.setSelectedGuide(this.selectedGuide);
-        this.render();
+        
+        var templates = {
+            doc: {
+                name: 'help-documentation'
+            }
+        }
+        
+        Wat.A.getTemplates(templates, this.render); 
     },
     
     events: {
@@ -32,12 +38,10 @@ Wat.Views.DocView = Wat.Views.MainView.extend({
         this.selectedGuide = guideKey;
     },
     
-    render: function () {
-        this.templateDoc = Wat.A.getTemplate(this.docTemplateName);
-        
+    render: function () {        
         // Fill the html with the template
         this.template = _.template(
-            this.templateDoc, {
+            Wat.TPL.doc, {
                 selectedGuide: this.selectedGuide
             }
         );

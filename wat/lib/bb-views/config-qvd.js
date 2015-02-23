@@ -1,5 +1,4 @@
 Wat.Views.ConfigQvdView = Wat.Views.MainView.extend({  
-    setupCommonTemplateName: 'setup-common',
     setupOption: 'admins',
     secondaryContainer: '.bb-setup',
     qvdObj: 'config',
@@ -59,10 +58,8 @@ Wat.Views.ConfigQvdView = Wat.Views.MainView.extend({
     },  
     
     render: function () {
-        this.templateProfile = Wat.A.getTemplate('qvd-config');
-        
         this.template = _.template(
-            this.templateProfile, {
+            Wat.TPL.qvdConfig, {
                 cid: this.cid,
                 configTokens: this.configTokens,
                 prefixes: this.prefixes,
@@ -93,11 +90,9 @@ Wat.Views.ConfigQvdView = Wat.Views.MainView.extend({
         that.renderConfigurationTokens();
     },
     
-    renderConfigurationTokens: function () {
-        this.templateProfile = Wat.A.getTemplate('qvd-config-tokens');
-        
+    renderConfigurationTokens: function () {        
         this.template = _.template(
-            this.templateProfile, {
+            Wat.TPL.qvdConfigTokens, {
                 configTokens: this.configTokens,
                 selectedPrefix: this.currentTokensPrefix
             }

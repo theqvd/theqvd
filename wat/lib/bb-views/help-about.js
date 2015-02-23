@@ -1,5 +1,4 @@
 Wat.Views.AboutView = Wat.Views.MainView.extend({
-    aboutTemplateName: 'help-about',
     qvdObj: 'about',
     
     breadcrumbs: {
@@ -15,18 +14,23 @@ Wat.Views.AboutView = Wat.Views.MainView.extend({
     
     initialize: function (params) {
         Wat.Views.MainView.prototype.initialize.apply(this, [params]);
-        this.render();
+        
+        var templates = {
+            about: {
+                name: 'help-about'
+            }
+        }
+        
+        Wat.A.getTemplates(templates, this.render); 
     },
     
     events: {
     },
     
-    render: function () {
-        this.templateAbout = Wat.A.getTemplate(this.aboutTemplateName);
-        
+    render: function () {        
         // Fill the html with the template
         this.template = _.template(
-            this.templateAbout, { 
+            Wat.TPL.about, { 
                 version: Wat.C.version
             }
         );
