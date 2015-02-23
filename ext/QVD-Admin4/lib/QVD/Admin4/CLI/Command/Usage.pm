@@ -9,7 +9,11 @@ sub run
     my ($self, $opts, @args) = @_;
 
     my $app = $self->get_app;
-    print $app->usage(@args);
+    my $usage = $app->usage(@args);
+
+    system("more <<DELIM
+$usage
+DELIM");
 }
 
 1;

@@ -13,24 +13,37 @@ sub usage_text {
                                   VM COMMAND USAGE
 ==================================================================================
 
-  (<FILTERS> are optional. For a description of <FILTERS>, <FIELDS TO RETRIEVE>, etc.
-   run the 'usage' command without arguments )
+  (<FILTERS> are optional. See also 'usage filters', usage fields', 'usage order' 
+   and 'usage arguments')
+
+== CREATING A NEW VM
+
+  vm new <ARGUMENTS>
+
+== GETTING VMs
 
   vm <FILTERS> get
   vm <FILTERS> get <FIELDS TO RETRIEVE>
   vm <FILTERS> get <FIELDS TO RETRIEVE> order <ORDER CRITERIA>
   vm <FILTERS> get <FIELDS TO RETRIEVE> order <ORDER DIRECTION> <ORDER CRITERIA>
 
+== UPDATING VMs
+
   vm <FILTERS> set <ARGUMENTS>
+
+  Adding custom properties:
+
   vm <FILTERS> set property key=value  
   vm <FILTERS> set property key=value, key=value, ...  
-  
-  vm new <ARGUMENTS>
-  
-  vm <FILTERS> del
+
+  Deleting custom properties:
 
   vm <FILTERS> del property key
   vm <FILTERS> del property key, key, ...
+
+== REMOVING VMs
+  
+  vm <FILTERS> del
 
   vm <FILTERS> block
   vm <FILTERS> unblock

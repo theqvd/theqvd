@@ -153,6 +153,7 @@ websocket '/staging' => sub {
     $c->inactivity_timeout(3000);
     $c->app->log->debug("Staging WebSocket opened");
     my $json = $c->get_input_json;
+    $json->{action} = 'di_create_from_staging';
     my $images_path  = $c->qvd_admin4_api->_cfg('path.storage.images');
     my $staging_path = $c->qvd_admin4_api->_cfg('path.storage.staging');
     my $staging_file = eval { $json->{arguments}->{disk_image} } // '';
@@ -186,6 +187,7 @@ post '/di/upload' => sub {
 
     my $c = shift;
     my $json = $c->get_input_json;
+    $json->{action} = 'di_create_from_upload';
     my $response = $c->process_api_query($json);
    
     if ($response->{status} eq 0)

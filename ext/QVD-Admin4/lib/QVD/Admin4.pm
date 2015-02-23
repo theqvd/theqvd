@@ -56,8 +56,6 @@ sub select
 
     QVD::Admin4::Exception->throw(exception => $@, query => 'select') if $@;
 
-    use Data::Dumper; print Dumper $rs->as_query;
-
     { total => ($rs->is_paged ? $rs->pager->total_entries : $rs->count), 
       rows => \@rows,
       extra => $self->get_extra_info_from_related_views($request) };
@@ -525,7 +523,7 @@ sub vm_delete
 ###############################
 ###############################
 
-sub di_create
+sub di_create_from_upload
 {
     my ($self,$request) = @_;
 
