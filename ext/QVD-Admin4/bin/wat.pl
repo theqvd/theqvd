@@ -9,6 +9,7 @@ use Mojo::IOLoop::ForkCall;
 use Mojo::Log;
 use Mojo::ByteStream 'b';
 use Deep::Encode;
+use QVD::Config;
 
 plugin 'QVD::Admin4::REST';
 
@@ -33,6 +34,7 @@ any '/info' => sub {
 
   $c->res->headers->header('Access-Control-Allow-Origin' => '*');
 
+  QVD::Config::reload();
   my $json = { status => 0,
 	       multitenant => $c->qvd_admin4_api->_cfg('wat.multitenant'),
                version => { database => $c->qvd_admin4_api->database_version }};
@@ -82,7 +84,7 @@ under sub {
     my $c = shift;
     $c->res->headers->header('Access-Control-Allow-Origin' => '*');
     $c->res->headers->header('Access-Control-Expose-Headers' => 'sid');
-
+    QVD::Config::reload();
     my $json = $c->req->json // { map { $_ => $c->param($_) } $c->param };
     
     my %session_args = (
@@ -221,7 +223,7 @@ sub get_input_json
     return $json if $json;
 
     $json =  { map { $_ => b($c->param($_))->encode('UTF-8')->to_string } $c->param };
-
+ 
     eval
     {
         $json->{filters} =  decode_json($json->{filters}) if exists $json->{filters};

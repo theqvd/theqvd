@@ -1090,7 +1090,11 @@ my $VALUES_NORMALIZATOR =
     DI => { disk_image => \&basename_disk_image},
 
     User => { name => \&normalize_name, 
-	      password => \&password_to_token }
+	      password => \&password_to_token },
+
+    Administrator => { name => \&normalize_name },
+
+    Tenant => { name => \&normalize_name }
 };
 
 
