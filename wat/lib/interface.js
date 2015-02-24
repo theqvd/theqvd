@@ -382,7 +382,8 @@ Wat.I = {
 
     showContent: function () {
         // Set to the side box the same height of the content box
-        $('.js-side').css('min-height', $('.content').height());
+        console.info($('.content').height());
+        $('.js-side').css('min-height', $('.list-block').height());
 
         $('.breadcrumbs').css('visibility','visible').hide().show();
         $('.content').css('visibility','visible').hide().show();
