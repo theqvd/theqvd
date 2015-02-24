@@ -128,7 +128,6 @@ Wat.A = {
         }
 
         messages = messages || {};
-        var that2 = that;
 
         successCallback = successCallback || function () {};   
         var params = {
@@ -169,6 +168,71 @@ Wat.A = {
                     //console.log('NO SID FOUND');
                 }
                 
+                if (that) {
+                    that.retrievedData = response;
+                }
+
+                successCallback(that);
+                
+                if (!$.isEmptyObject(messages)) {
+                    if (response.status == 0) {
+                        that.message = messages.success;
+                        that.messageType = 'success';
+                    }
+                    else {
+                        that.message = messages.error;
+                        that.messageType = 'error';
+                    }
+
+                    var messageParams = {
+                        message: that.message,
+                        messageType: that.messageType
+                    };
+
+                    Wat.I.showMessage(messageParams, response);
+                }                
+            }
+        };
+        
+        $.ajax(params);
+    },
+        
+    // Get API info calling un-auth 'info' url
+    // Params:
+    //      successCallback: function that will be executed after action execution.
+    //      that: current context where will be stored retrieved response and passed as parameter to successCallback function.
+    apiInfo: function (successCallback, that) {
+        var url = Wat.C.getApiUrl() + 'info';
+
+        messages = {};
+
+        successCallback = successCallback || function () {};   
+        var params = {
+            url: url,
+            type: 'POST',
+            dataType: 'json',
+            processData: false,
+            parse: true,
+            error: function (response) {
+                if (that) {
+                    that.retrievedData = response;
+                }
+                
+                successCallback(that);
+
+                if (!$.isEmptyObject(messages)) {
+                    that.message = messages.error;
+                    that.messageType = 'error';
+
+                    var messageParams = {
+                        message: that.message,
+                        messageType: that.messageType
+                    };
+
+                    Wat.I.showMessage(messageParams, response);
+                }                   
+            },
+            success: function (response, result, raw) {
                 if (that) {
                     that.retrievedData = response;
                 }

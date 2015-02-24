@@ -29,11 +29,27 @@ Wat.C = {
     // Get the base URL for API calls using credentials or session ID
     getBaseUrl: function () {
         if (this.login && this.password) {
-            return this.apiUrl + "?login=" + this.login + "&password=" + this.password;
+            var baseUrl = this.getApiUrl() + "?login=" + this.login + "&password=" + this.password;
+            
+            if (this.multitenant && this.tenant != undefined) {
+                baseUrl += "&tenant=" + this.tenant;
+            }
+            
+            return baseUrl;
         }
         else {
-            return this.apiUrl + "?sid=" + this.sid;
+            return this.getApiUrl() + "?sid=" + this.sid;
         }
+    },
+    
+    // Get the API URL
+    getApiUrl: function () {
+        return this.apiUrl;
+    },   
+    
+    // Get the API URL
+    getUpdateDiUrl: function () {
+        return this.getApiUrl() + "di/upload?sid=" + this.sid;
     },
     
     // Return if current admin is superadmin
@@ -123,6 +139,7 @@ Wat.C = {
     tryLogin: function (user, password) {
         var user = $('input[name="admin_user"]').val() || user;
         var password = $('input[name="admin_password"]').val() || password;
+        var tenant = $('input[name="admin_tenant"]').val() || tenant;
         
         if (!user) {
             Wat.I.showMessage({message: "Empty user", messageType: "error"});
@@ -131,6 +148,7 @@ Wat.C = {
 
         this.login = user;
         this.password = password;
+        this.tenant = tenant;
         
         Wat.A.performAction('current_admin_setup', {}, VIEWS_COMBINATION, {}, this.checkLogin, this, true);
     },

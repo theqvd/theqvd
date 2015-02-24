@@ -9,16 +9,21 @@ Wat.Views.LoginView = Wat.Views.MainView.extend({
         Wat.C.language = 'auto';
         Wat.T.initTranslate();
 
-        this.render();
+        Wat.A.apiInfo(this.render, this);
     },
     
     events: {
     },
     
-    render: function () {        
+    render: function () {  
+        if (this.retrievedData.status == STATUS_SUCCESS) {
+            Wat.C.multitenant = this.retrievedData.multitenant;
+        }
+        
         // Fill the html with the template
         this.template = _.template(
             Wat.TPL.login, {
+                multitenant: Wat.C.multitenant
             }
         );
         

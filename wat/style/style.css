@@ -199,6 +199,7 @@ fieldset {
     border-radius: 15px;
     width: 70vw;
     height: 70vh;
+    min-height: 400px;
     margin: 70px auto;
     text-align: center;
     padding: 50px; }
@@ -1436,20 +1437,18 @@ body {
             .wrapper .content .login-box .login-main .login-form {
               width: 220px;
               font-size: 1.2em; } }
-          .wrapper .content .login-box .login-main .login-form > div.login-user, .wrapper .content .login-box .login-main .login-form > div.login-password {
+          .wrapper .content .login-box .login-main .login-form > div.login-control {
             padding-bottom: 20px; }
-            .wrapper .content .login-box .login-main .login-form > div.login-user > div:first-child, .wrapper .content .login-box .login-main .login-form > div.login-password > div:first-child {
+            .wrapper .content .login-box .login-main .login-form > div.login-control > div:first-child {
               padding-bottom: 5px;
               padding-left: 5px; }
-            .wrapper .content .login-box .login-main .login-form > div.login-user input, .wrapper .content .login-box .login-main .login-form > div.login-password input {
+            .wrapper .content .login-box .login-main .login-form > div.login-control input {
               width: 100%; }
           .wrapper .content .login-box .login-main .login-form > div.login-button {
             text-align: right;
             padding-top: 5px; }
     .wrapper .content .wrapper-content {
       width: 95vw; }
-  .wrapper .related-docs {
-    margin-bottom: 80px; }
 
 .admin-roles, .role-inherited-roles, role-acls {
   clear: both; }
@@ -1654,7 +1653,9 @@ span.text {
   line-height: 1.4; }
 
 .related-doc {
-  display: inline-table; }
+  display: inline-table;
+  margin-bottom: 80px;
+  padding-left: 20px; }
   .related-doc .related-doc-title {
     font-weight: bold;
     margin-bottom: 10px;

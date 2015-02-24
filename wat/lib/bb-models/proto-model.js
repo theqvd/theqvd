@@ -74,6 +74,7 @@ Wat.Models.Model = Backbone.Model.extend({
                 "&filters=" + JSON.stringify(options.filters) + 
                 "&arguments=" + JSON.stringify(attributes)
         };
+        
         return Backbone.Model.prototype.save.call(this, attributes, options);
     }
 });

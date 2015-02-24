@@ -211,15 +211,20 @@ Wat.Views.ListView = Wat.Views.MainView.extend({
                     if (filterControl.val() == '-1' || filterControl.val() == undefined) {
                         return true;
                     }
+                    
+                    filters[filterControl.attr('data-filter-field')] = filterControl.val();
                     break;
                 case 'text':
                     if (filterControl.val() == '' || filterControl.val() == undefined) {
                         return true;
                     }
+                    
+                    // Substring search syntax
+                    filters[filterControl.attr('data-filter-field')] = {
+                        "~" : '%25' + filterControl.val() + '%25'
+                    };
                     break;
             }
-            
-            filters[filterControl.attr('data-filter-field')] = filterControl.val();
         });
         
         // Add the init filters to filters

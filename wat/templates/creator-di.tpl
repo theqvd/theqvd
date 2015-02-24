@@ -5,6 +5,16 @@
             <select class="" name="disk_image" data-any-selected></select>
         </td>
     </tr>
+    <!--
+    <tr>
+        <td data-i18n="Disk image"></td>
+        <td>
+            <form id="form_file_update">
+            <input type="file" name="disk_image_file" data-any-selected></select>
+            </form>
+        </td>
+    </tr>
+    -->
     <% 
     if (Wat.C.checkACL('di.create.version')) { 
     %>

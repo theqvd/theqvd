@@ -47,7 +47,8 @@
     <div class="bb-menu"></div>
     <div class="loading"><i class="fa fa-gear fa-spin"></i></div>
 
-    <div class="content bb-content"></div>                        
+    <div class="content bb-content"></div>
+</div>                        
     <div class="related-docs bb-related-docs"></div>                        
 </div>
 <div class="footer" data-link="<a href='http://qindel.com'>Qindel Group</a>"></div>

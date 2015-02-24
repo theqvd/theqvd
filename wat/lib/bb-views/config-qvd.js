@@ -34,7 +34,17 @@ Wat.Views.ConfigQvdView = Wat.Views.MainView.extend({
         
         this.model = new Wat.Models.Admin(params);
         
-        this.editorTemplateName = 'creator-conf-token',
+        this.editorTemplateName = 'creator-conf-token';
+            
+        var templates = {
+            editorNew: {
+                name: this.editorTemplateName
+            }
+        };
+        
+        // The templates will be charged asynchronously. 
+        // This template is not charged until user click on "New" button, so it should not be problematic
+        Wat.A.getTemplates(templates, function () {}); 
         
         Wat.A.performAction('config_preffix_get', {}, {}, {}, this.processPrefixes, this);
     },

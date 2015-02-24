@@ -251,9 +251,11 @@ Wat.Views.MainView = Backbone.View.extend({
     },
     
     updateModel: function (arguments, filters, successCallback, model) {
+        console.warn(model);
         // If not model is passed, use this.model
         var model = model || this.model;
-        
+        console.warn(model);
+
         model.setOperation('update');
         
         var messages = {
@@ -325,7 +327,7 @@ Wat.Views.MainView = Backbone.View.extend({
      
     openEditElementDialog: function (e) {
         var that = this;
-                    
+        
         this.templateEditor = Wat.A.getTemplate(this.editorTemplateName);
         
         this.dialogConf.buttons = {
@@ -367,7 +369,7 @@ Wat.Views.MainView = Backbone.View.extend({
     
     renderRelatedDocs: function () {
         if ($('.related-doc').length > 0) {
-            return;
+            //$('.related-doc').html('');
         }
         
         var sectionDoc = [];

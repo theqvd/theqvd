@@ -118,7 +118,7 @@ Wat.B = {
     bindLoginEvents: function () {
         this.bindEvent('click', '.js-login-button', this.loginBinds.tryLogIn);
         
-        this.bindEvent('keydown', 'input[name="admin_user"], input[name="admin_password"]', this.loginBinds.pushKeyOnLoginInput);
+        this.bindEvent('keydown', 'input[name="admin_user"], input[name="admin_password"], input[name="admin_tenant"]', this.loginBinds.pushKeyOnLoginInput);
     },
     
     loginBinds: {

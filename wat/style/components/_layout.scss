@@ -221,10 +221,6 @@ body {
             width: 95vw;
         }
     }
-    
-    .related-docs {
-        margin-bottom: 80px;
-    }
 }
 
 @import "layout-roles";
@@ -305,6 +301,8 @@ span.text {
 
 .related-doc {
     display: inline-table;
+    margin-bottom: 80px;
+    padding-left: 20px;
     
     .related-doc-title {
         font-weight: bold; 

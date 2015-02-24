@@ -124,6 +124,8 @@ Wat.Views.DIListView = Wat.Views.ListView.extend({
             arguments["disk_image"] = disk_image;
         }   
         
+        var disk_image_file = context.find('input[name="disk_image_file"]');
+        
         var version = context.find('input[name="version"]').val();
         if (version && Wat.C.checkACL('di.create.version')) {
             arguments["version"] = version;
@@ -148,6 +150,144 @@ Wat.Views.DIListView = Wat.Views.ListView.extend({
         
         //this.createModel(arguments, this.fetchList);
         this.heavyCreate(arguments);
+        //this.createDI(arguments, file, this.fetchList);
+        
+        //this.saveFile(arguments, disk_image_file);
+    },
+    
+    saveFilePlugin: function(arguments, disk_image_file) {    
+        // Get Url for the API call
+        var url = Wat.C.getUpdateDiUrl() + '&action=di_create&arguments=' + JSON.stringify(arguments);
+
+        console.log(url);
+        
+        disk_image_file.fileupload({
+            url: url,
+            dateType: 'json',
+            replaceFileInput: false,
+            done: function (e, data) {
+                console.info(data);
+
+/*                $.each(data.result.files, function (index, file) {
+                    console.log(file.name + ' Uploaded');
+                });*/
+            },
+            fail: function (e, data) {
+                console.error(data);
+            },
+            always: function (e, data) {
+                console.warn(data);
+            }
+        });
+    },
+    
+    saveFile: function(arguments, disk_image_file) {
+        var that = this;
+        var file = disk_image_file[0].files[0];
+        var data = new FormData();
+        data.append('file', file);
+        
+        // Set as disk_image the basename of the file
+        arguments.disk_image = file.name;
+        
+        // Get Url for the API call
+        var url = Wat.C.getUpdateDiUrl() + '&action=di_create&arguments=' + JSON.stringify(arguments);
+
+        $.ajax({
+            url: url, 
+            data: data,
+            type: 'POST',
+            xhr: function() {  // Custom XMLHttpRequest
+                var myXhr = $.ajaxSettings.xhr();
+                if(myXhr.upload){ // Check if upload property exists
+                    //myXhr.upload.addEventListener('progress', that.updateProgress, false); // For handling the progress of the upload
+                    myXhr.upload.addEventListener('progress', that.updateProgress, false); // For handling the progress of the upload
+                }
+                return myXhr;
+            },
+            processData: false,
+            contentType: false, // Setting contentType as false 'multipart/form-data' and boundary will be sent
+
+        }).success(function(){
+            console.info("Success: Files sent!");
+        }).fail(function(data){
+            console.error("An error occurred, the files couldn't be sent!");
+            console.error(data);
+        });
+        
+        return;
+        
+        $.ajax({
+            url: url,
+            data: data,
+            cache: false,
+            contentType: false,
+            processData: false,
+            type: 'POST',
+            success: function(data){
+                console.info('sucess uploading');
+            },
+            error: function(data){
+                console.error('error uploading');
+            }
+        });
+    },
+    
+    updateProgress: function (e, e2)  {
+        console.warn(e);
+        console.warn(e2);
+    },
+                                                 
+   createDI: function (arguments, file, successCallback) {
+        this.model.setOperation('create');
+        
+        var messages = {
+            'success': 'Successfully created',
+            'error': 'Error creating'
+        };
+        
+        var model = this.model;
+        var filters = {};
+
+        var that = this;
+        model.save(arguments, {filters: filters, file: '/tmp/test'}).complete(function(e, a, b) {
+            Wat.I.loadingUnblock();
+
+            var callResponse = e.status;
+            var response = {status: e.status};
+            
+            if (e.responseText) {
+                try {
+                    response = JSON.parse(e.responseText);
+                }
+                catch (err) {
+                    //console.log (e.responseText);
+                }
+            }
+            
+            that.retrievedData = response;
+            successCallback(that);
+            
+            if (callResponse == 200 && response.status == STATUS_SUCCESS) {
+                that.message = messages.success;
+                that.messageType = 'success';
+            }
+            else {
+                that.message = messages.error;
+                that.messageType = 'error';
+            }
+
+            if (that.dialog) {
+                that.dialog.dialog('close');
+            }
+                        
+            var messageParams = {
+                message: that.message,
+                messageType: that.messageType
+            };
+            
+            Wat.I.showMessage(messageParams, response);
+        });
     },
     
     heavyCreate: function (args) {

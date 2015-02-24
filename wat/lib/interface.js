@@ -376,6 +376,7 @@ Wat.I = {
             $('.content').css('visibility','visible').hide().fadeIn('fast');
             $('.breadcrumbs').css('visibility','visible').hide().fadeIn('fast');
             $('.menu-corner').css('visibility','visible');
+            $('.related-doc').css('visibility','visible');
         }
     },
 
@@ -387,6 +388,7 @@ Wat.I = {
         $('.content').css('visibility','visible').hide().show();
         $('.footer').css('visibility','visible').hide().show();
         $('.loading').hide();
+        $('.related-doc').css('visibility','visible').hide().show();
     },
 
     showLoading: function () {
@@ -397,6 +399,7 @@ Wat.I = {
             $('.content').hide();
             $('.footer').hide();
             $('.loading').show();
+            $('.related-doc').hide();
         }
     },
     
