@@ -58,7 +58,8 @@ SOFTWARE.
 #ifdef CRAY
 #define WORD64				/* 64-bit architecture */
 #endif
-#if defined(__alpha) || defined(__alpha__) || \
+#if defined (__aarch64__) || \
+    defined(__alpha) || defined(__alpha__) || \
     defined(__ia64__) || defined(ia64) || \
     defined(__sparc64__) || defined(__powerpc64__) || \
     defined(__s390x__) || \

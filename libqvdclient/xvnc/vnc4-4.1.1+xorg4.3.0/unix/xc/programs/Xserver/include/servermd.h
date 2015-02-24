@@ -132,6 +132,28 @@ SOFTWARE.
 
 #endif /* vax */
 
+#ifdef __aarch64__
+/* Heavily cargo-culted from arm32 */
+#define IMAGE_BYTE_ORDER        LSBFirst
+
+# if defined(XF86MONOVGA) || defined(XF86VGA16) || defined(XF86MONO)
+#  define BITMAP_BIT_ORDER      MSBFirst
+# else
+#  define BITMAP_BIT_ORDER      LSBFirst
+# endif
+
+# if defined(XF86MONOVGA) || defined(XF86VGA16)
+#  define BITMAP_SCANLINE_UNIT  8
+# endif
+
+#define GLYPHPADBYTES           4
+#define GETLEFTBITS_ALIGNMENT   1
+#define LARGE_INSTRUCTION_CACHE
+#define AVOID_MEMORY_READ
+#define PLENTIFUL_REGISTERS
+
+#endif /* __aarch64__ */
+
 #ifdef __arm32__
 
 #define IMAGE_BYTE_ORDER        LSBFirst
