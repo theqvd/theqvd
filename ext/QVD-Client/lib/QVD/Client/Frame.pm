@@ -743,7 +743,7 @@ sub start_file_sharing {
                 my $client = QVD::Client::SlaveClient->new();
                 eval { $client->handle_share($share) };
                 if ($@) {
-                    if ($@ =~ 'ECONNREFUSED') {
+                    if ($@ =~ 'ECONNREFUSED' || $@ =~ 'EPIPE' ) {
                         sleep 1;
                         next;
                     }
@@ -782,7 +782,7 @@ sub start_remote_mounts {
 			my $client = QVD::Client::SlaveClient->new();
 			eval { $client->handle_mount($remote_dir, $local_dir) };
 			if ($@) {
-				if ($@ =~ 'ECONNREFUSED') {
+				if ($@ =~ 'ECONNREFUSED' || $@ =~ 'EPIPE' ) {
 					sleep 1;
 					next;
 				}

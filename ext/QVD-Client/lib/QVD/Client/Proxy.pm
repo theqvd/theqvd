@@ -504,6 +504,11 @@ sub _run {
         die "nxproxy failed to start";
     }
 
+    if ( $DARWIN ) {
+        $self->{client_delegate}->proxy_set_environment( DYLD_LIBRARY_PATH => "" );
+        DEBUG "Running on Darwin, unssetting DYLD_LIBRARY_PATH";
+    }
+
     DEBUG("Listening on 4040\n");
     my $ll = IO::Socket::INET->new(
         LocalPort => 4040,
