@@ -242,6 +242,11 @@ di_update => { type_of_action => 'update',
 	       acls => [qr/^di\.update\./],
 	       qvd_object => 'DI'},
 
+di_create => { type_of_action => 'create',
+	       admin4method => 'di_create_from_staging',
+	       acls => [qr/^di\.create\./],
+	       qvd_object => 'DI'},
+
 di_create_from_staging => { type_of_action => 'create',
 			    admin4method => 'di_create_from_staging',
 			    acls => [qr/^di\.create\./],
@@ -287,7 +292,7 @@ admin_create => { type_of_action => 'create',
 
 admin_update => { type_of_action => 'update',
 		  admin4method => 'update',
-		  acls => [qr/^administrator\.update\./],
+#		  acls => [qr/^administrator\.update\./],
 		  qvd_object => 'Administrator'},
 
 myadmin_update => { type_of_action => 'update',

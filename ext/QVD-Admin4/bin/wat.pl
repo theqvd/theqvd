@@ -1,6 +1,6 @@
 #!/usr/bin/perl
 use Mojolicious::Lite;
-use lib::glob '/home/benjamin/wat/*/lib/';
+use lib::glob '/home/ubuntu/wat/*/lib/';
 use Mojo::JSON qw(encode_json decode_json j);
 use QVD::Admin4::Exception;
 use MojoX::Session;
@@ -62,7 +62,7 @@ package MojoX::Session::Transport::WAT
 
 # GENERAL CONFIG AND PLUGINS
 
-app->config(hypnotoad => {listen => ['http://localhost:3000']});
+app->config(hypnotoad => {listen => ['http://192.168.3.7:3000']});
 
 # HELPERS
 
@@ -185,21 +185,23 @@ websocket '/staging' => sub {
         );
 };
 
-post '/di/upload' => sub {
+any '/di/upload' => sub {
 
     my $c = shift;
     my $json = $c->get_input_json;
     $json->{action} = 'di_create_from_upload';
+
     my $response = $c->process_api_query($json);
    
     if ($response->{status} eq 0)
     {
 	eval 
 	{ 
+	    my $disk_image = $json->{arguments}->{disk_image};
 	    my $file = $c->req->upload('file');
 	    my $images_path  = $c->qvd_admin4_api->_cfg('path.storage.images');
 	    my $di_id = ${$response->{rows}}[0]->{id};
-	    $file->move_to($images_path .'/'. $di_id . '-'. $file->filename)
+	    $file->move_to($images_path .'/'. $di_id . '-'. $disk_image)
 	}; 
 	print $@ if $@;
 	$c->render(json => QVD::Admin4::Exception->new(code => 2210)->json) if $@;
