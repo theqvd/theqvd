@@ -381,6 +381,8 @@ my $AVAILABLE_FILTERS =
 
     update => { default => [qw(id tenant_id)],Config => [qw(key value)],Host => [qw(id)],Role => [qw(id)],Tenant => [qw(id)]},
 
+    create_or_update => { Tenant_Views_Setup => [qw(tenant_id)]},
+
     exec => { default => [qw(id tenant_id)]},
 
     state => { default => [qw(id tenant_id)], Host => [qw(id)], ACL => [qw(id)], Role => [qw(id)], Tenant => [qw(id)]},
@@ -481,7 +483,9 @@ my $AVAILABLE_FIELDS =
 	       
 	       Host => [qw(number_of_vms_connected)]},
     
-    create => { 'default' => [qw(id)], Config => [qw(key)]}
+    create => { 'default' => [qw(id)], Config => [qw(key)]},
+
+    create_or_update => { 'default' => [qw(id)]}
 
 };
 

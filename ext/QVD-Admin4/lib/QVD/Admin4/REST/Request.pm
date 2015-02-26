@@ -60,7 +60,7 @@ sub BUILD
 	$self->qvd_object_model->type_of_action eq 'update';
 
     $self->check_create_arguments_validity_in_json if
-	$self->qvd_object_model->type_of_action eq 'create';
+	$self->qvd_object_model->type_of_action =~ /^(cre|upd)ate$/;
 
     $self->check_nested_queries_validity_in_json if
 	$self->qvd_object_model->type_of_action =~ /^(cre|upd)ate$/;
@@ -97,7 +97,7 @@ sub BUILD
         if $self->qvd_object_model->qvd_object eq 'Tenant';
 
     $self->forze_tenant_assignment_in_creation
-	if $self->qvd_object_model->type_of_action eq 'create' &&
+	if $self->qvd_object_model->type_of_action =~ /^create(_or_update)?$/ &&
 	$self->qvd_object_model->directly_tenant_related;
 
 # After check and changes, filters are retrieved as a simple hash
@@ -201,7 +201,7 @@ sub check_nested_queries_validity_in_json
     my $type_of_action = $self->qvd_object_model->type_of_action;
     my ($method,$code);
 
-    if ($type_of_action eq 'create')
+    if ($type_of_action =~ /^(cre|upd)ate$/)
     {
 	$method = 'get_acls_for_nested_query_in_creation';
     }
@@ -284,13 +284,12 @@ sub forze_filtering_by_own_admin
 sub forze_filtering_by_tenant
 {
     my $self = shift;
+
     return unless $self->qvd_object_model->available_filter('tenant_id');
 
     my $tenant_id = $self->qvd_object_model->map_filter_to_dbix_format('tenant_id');
-    my $tenant_name = $self->qvd_object_model->map_filter_to_dbix_format('tenant_name');
 
-    if ($self->json_wrapper->has_filter($tenant_id) ||
-	$self->json_wrapper->has_filter($tenant_name))
+    if ($self->json_wrapper->has_filter($tenant_id))
     {
 	QVD::Admin4::Exception->throw(code => 4220, object => 'tenant_id') 
 	    unless $ADMIN->is_superadmin;
@@ -428,7 +427,7 @@ sub set_arguments_in_request
     }
 
     $self->set_arguments_in_request_with_defaults if 
-	$self->qvd_object_model->type_of_action eq 'create';
+	$self->qvd_object_model->type_of_action =~ /^create(_or_update)?$/;
 }
 
 sub set_arguments_in_request_with_defaults
@@ -586,6 +585,7 @@ sub set_argument
     my ($self,$key,$val) = @_;
     $val = undef if defined $val && $val eq '';
     $key = undef if defined $key && $key eq '';
+
     $self->arguments->{$key} = $val;
 }
 

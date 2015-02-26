@@ -51,6 +51,7 @@ sub select
 
     my @rows;
     my $rs;
+
     eval { $rs = $DB->resultset($request->table)->search($request->filters,$request->modifiers);
 	   @rows = $rs->all };
 
@@ -147,6 +148,8 @@ sub create_or_update
 {
     my ($self,$request) = @_;
     my $result;
+
+    use Data::Dumper; print Dumper $request->arguments;
 
     eval
     {

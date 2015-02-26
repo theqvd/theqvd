@@ -251,7 +251,9 @@ sub _create
     if (my $tenant_name = $parsing->arguments->{tenant})
     {
 	my $tenant_ids = $related_tenant_cb->($self,$tenant_name);
-	$self->tenant_scoop(shift @$tenant_ids);
+	my $tenant_id = shift @$tenant_ids //
+	    die "Unknown related object tenant in filters";
+	$self->tenant_scoop($tenant_id);
 	$parsing->arguments->{tenant} = $self->tenant_scoop; 
     }
   
@@ -398,7 +400,7 @@ sub ambiguous
 sub ask_api
 {
     my ($self,$query) = @_;
- 
+
     return $self->ask_api_staging($query)
 	if $query->{action} eq 'di_create';
 
