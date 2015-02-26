@@ -1,6 +1,6 @@
 #!/usr/bin/perl
 use Mojolicious::Lite;
-use lib::glob '/home/benjamin/wat/*/lib/';
+use lib::glob '/home/ubuntu/wat/*/lib/';
 use Mojo::JSON qw(encode_json decode_json j);
 use QVD::Admin4::Exception;
 use MojoX::Session;
@@ -29,7 +29,7 @@ app->hook(after_build_tx => sub {
     })
 });
 
-any '/info' => sub {
+any [qw(POST GET)] => '/info' => sub {
   my $c = shift;
 
   $c->res->headers->header('Access-Control-Allow-Origin' => '*');
@@ -102,7 +102,7 @@ under sub {
     return $bool;
 };
 
-any '/' => sub {
+any [qw(POST GET)] => '/' => sub {
 
     my $c = shift;
 
@@ -185,28 +185,37 @@ websocket '/staging' => sub {
         );
 };
 
-any '/di/upload' => sub {
+any [qw(POST OPTIONS)] => '/di/upload' => sub {
 
     my $c = shift;
-    my $json = $c->get_input_json;
-    $json->{action} = 'di_create_from_upload';
+    $c->inactivity_timeout(30000);     
 
-    my $response = $c->process_api_query($json);
-   
-    if ($response->{status} eq 0)
+    my $response;
+
+    if ($c->req->method eq 'POST')
     {
-	eval 
-	{ 
-	    my $disk_image = $json->{arguments}->{disk_image};
-	    my $file = $c->req->upload('file');
-	    my $images_path  = $c->qvd_admin4_api->_cfg('path.storage.images');
-	    my $di_id = ${$response->{rows}}[0]->{id};
-	    $file->move_to($images_path .'/'. $di_id . '-'. $disk_image)
-	}; 
-	print $@ if $@;
-	$c->render(json => QVD::Admin4::Exception->new(code => 2210)->json) if $@;
-    }
+	my $json = $c->get_input_json;
+	$json->{action} = 'di_create_from_upload';
+	$response = $c->process_api_query($json);
 
+	if ($response->{status} eq 0)
+	{
+	    eval 
+	    { 
+		my $disk_image = $json->{arguments}->{disk_image};
+		my $file = $c->req->upload('file');
+		my $images_path  = $c->qvd_admin4_api->_cfg('path.storage.images');
+		my $di_id = ${$response->{rows}}[0]->{id};
+		$file->move_to($images_path .'/'. $di_id . '-'. $disk_image)
+	    }; 
+	    print $@ if $@;
+	    $c->render(json => QVD::Admin4::Exception->new(code => 2210)->json) if $@;
+	}
+    }
+    else
+    {
+	$response = {status => 0};
+    }
     deep_utf8_decode($response);
     $c->render(text => b(encode_json($response))->decode('UTF-8'));
 };
