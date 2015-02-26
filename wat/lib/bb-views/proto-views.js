@@ -25,8 +25,10 @@ Wat.Views.ViewsView = Wat.Views.MainView.extend({
     },
     
     checkDesktopFilter: function (e) {
-        var checked = $(e.target).is(':checked');
-        var fieldName = $(e.target).parent().attr('data-name');
+        this.targetClicked = e.target;
+
+        var checked = $(this.targetClicked).is(':checked');
+        var fieldName = $(this.targetClicked).parent().attr('data-name');
         
         var qvdObj = this.selectedSection;
 
@@ -42,40 +44,48 @@ Wat.Views.ViewsView = Wat.Views.MainView.extend({
             
             this.addIDToArgs(args);
 
-            Wat.A.performAction(this.setAction, args, {}, {'error': i18n.t('Error updating'), 'success': i18n.t('Successfully updated')}, function () {}, this, false);
-            
-            if (this.retrievedData.status == STATUS_SUCCESS) {
-                // If update is performed successfuly, update in memory
-                if (this.currentFilters[fieldName]) {
-                    this.currentFilters[fieldName].displayDesktop = checked;
-                }
-                else {
-                    this.currentFilters[fieldName] = {
-                        acls: qvdObj + ".see.properties",
-                        displayDesktop: checked,
-                        displayMobile: 0,
-                        filterField: fieldName,
-                        noTranslatable: true,
-                        property: true,
-                        text: fieldName,
-                        type: "text",
-                    };
-                }
-                
-                if (this.viewKind == 'admin') {
-                    Wat.I.formFilters[qvdObj][fieldName] = this.currentFilters[fieldName];
-                }
+            Wat.A.performAction(this.setAction, args, {}, {'error': i18n.t('Error updating'), 'success': i18n.t('Successfully updated')}, this.processCheckDesktopFilter, this);
+        }
+    },
+    
+    processCheckDesktopFilter: function (that) {  
+        var checked = $(that.targetClicked).is(':checked');
+        var fieldName = $(that.targetClicked).parent().attr('data-name');
+        var qvdObj = that.selectedSection;
+
+        if (that.retrievedData.status == STATUS_SUCCESS) {
+            // If update is performed successfuly, update in memory
+            if (that.currentFilters[fieldName]) {
+                that.currentFilters[fieldName].displayDesktop = checked;
             }
             else {
-                // If update fails, change ckeckbox to previous state
-                $(e.target).prop('checked', !checked);
+                that.currentFilters[fieldName] = {
+                    acls: qvdObj + ".see.properties",
+                    displayDesktop: checked,
+                    displayMobile: 0,
+                    filterField: fieldName,
+                    noTranslatable: true,
+                    property: true,
+                    text: fieldName,
+                    type: "text",
+                };
             }
+
+            if (that.viewKind == 'admin') {
+                Wat.I.formFilters[qvdObj][fieldName] = that.currentFilters[fieldName];
+            }
+        }
+        else {
+            // If update fails, change ckeckbox to previous state
+            $(e.target).prop('checked', !checked);
         }
     },
     
     checkMobileFilter: function (e) {
-        var checked = $(e.target).is(':checked');
-        var fieldName = $(e.target).parent().attr('data-name');
+        this.targetClicked = e.target;
+
+        var checked = $(this.targetClicked).is(':checked');
+        var fieldName = $(this.targetClicked).parent().attr('data-name');
         
         var qvdObj = this.selectedSection;
         
@@ -91,40 +101,48 @@ Wat.Views.ViewsView = Wat.Views.MainView.extend({
             
             this.addIDToArgs(args);
 
-            Wat.A.performAction(this.setAction, args, {}, {'error': i18n.t('Error updating'), 'success': i18n.t('Successfully updated')}, function () {}, this, false);
-            
-            if (this.retrievedData.status == STATUS_SUCCESS) {
-                // If update is perfermed successfuly, update in memory
-                if (this.currentFilters[fieldName]) {
-                    this.currentFilters[fieldName].displayMobile = checked;
-                }
-                else {
-                    this.currentFilters[fieldName] = {
-                        acls: qvdObj + ".see.properties",
-                        displayDesktop: 0,
-                        displayMobile: checked,
-                        filterField: fieldName,
-                        noTranslatable: true,
-                        property: true,
-                        text: fieldName,
-                        type: "text",
-                    };
-                }
-                
-                if (this.viewKind == 'admin') {
-                    Wat.I.formFilters[qvdObj][fieldName] = this.currentFilters[fieldName];
-                }
+            Wat.A.performAction(this.setAction, args, {}, {'error': i18n.t('Error updating'), 'success': i18n.t('Successfully updated')}, this.processCheckMobileFilter, this);
+        }
+    },
+
+    processCheckMobileFilter: function (that) { 
+        var checked = $(that.targetClicked).is(':checked');
+        var fieldName = $(that.targetClicked).parent().attr('data-name');
+        var qvdObj = that.selectedSection;
+
+        if (that.retrievedData.status == STATUS_SUCCESS) {
+            // If update is perfermed successfuly, update in memory
+            if (that.currentFilters[fieldName]) {
+                that.currentFilters[fieldName].displayMobile = checked;
             }
             else {
-                // If update fails, change ckeckbox to previous state
-                $(e.target).prop('checked', !checked);
+                that.currentFilters[fieldName] = {
+                    acls: qvdObj + ".see.properties",
+                    displayDesktop: 0,
+                    displayMobile: checked,
+                    filterField: fieldName,
+                    noTranslatable: true,
+                    property: true,
+                    text: fieldName,
+                    type: "text",
+                };
             }
+
+            if (that.viewKind == 'admin') {
+                Wat.I.formFilters[qvdObj][fieldName] = that.currentFilters[fieldName];
+            }
+        }
+        else {
+            // If update fails, change ckeckbox to previous state
+            $(e.target).prop('checked', !checked);
         }
     },
     
     checkListColumn: function (e) {
-        var checked = $(e.target).is(':checked');
-        var fieldName = $(e.target).parent().attr('data-name');
+        this.targetClicked = e.target;
+
+        var checked = $(this.targetClicked).is(':checked');
+        var fieldName = $(this.targetClicked).parent().attr('data-name');
         
         var qvdObj = this.selectedSection;
         
@@ -140,32 +158,43 @@ Wat.Views.ViewsView = Wat.Views.MainView.extend({
             
             this.addIDToArgs(args);
 
-            Wat.A.performAction(this.setAction, args, {}, {'error': i18n.t('Error updating'), 'success': i18n.t('Successfully updated')}, function () {}, this, false);
-            
-            if (this.retrievedData.status == STATUS_SUCCESS) {
-                // If update is perfermed successfuly, update in memory
-                if (this.currentColumns[fieldName]) {
-                    this.currentColumns[fieldName].display = checked;
-                }
-                else {
-                    this.currentColumns[fieldName] = {
-                        acls: qvdObj + ".see.properties",
-                        display: checked,
-                        fields: [fieldName],
-                        noTranslatable: true,
-                        property: true,
-                        text: fieldName,
-                    };
-                }
-                
-                if (this.viewKind == 'admin') {
-                    Wat.I.listFields[qvdObj][fieldName] = this.currentColumns[fieldName];
-                }
+            Wat.A.performAction(this.setAction, args, {}, {'error': i18n.t('Error updating'), 'success': i18n.t('Successfully updated')}, this.processCheckListColumn, this);
+        }
+    },
+    
+    processCheckListColumn: function (that) { 
+        var checked = $(that.targetClicked).is(':checked');
+        var fieldName = $(that.targetClicked).parent().attr('data-name');
+        var qvdObj = that.selectedSection;
+
+        if (that.retrievedData.status == STATUS_SUCCESS) {
+            // If update is perfermed successfuly, update in memory
+            if (that.currentColumns[fieldName]) {
+                that.currentColumns[fieldName].display = checked;
             }
             else {
-                // If update fails, change ckeckbox to previous state
-                $(e.target).prop('checked', !checked);
+                that.currentColumns[fieldName] = {
+                    acls: qvdObj + ".see.properties",
+                    display: checked,
+                    fields: [fieldName],
+                    noTranslatable: true,
+                    property: true,
+                    text: fieldName,
+                };
             }
+            
+            if (that.viewKind == 'admin') {
+                Wat.I.listFields[qvdObj][fieldName] = that.currentColumns[fieldName];
+            }
+            
+            console.log(that.currentColumns.id.display);
+            console.log(Wat.I.listFields.user.id.display);
+            console.log(Wat.I.listFields[qvdObj][fieldName].display);
+            console.log(qvdObj);
+        }
+        else {
+            // If update fails, change ckeckbox to previous state
+            $(e.target).prop('checked', !checked);
         }
     },
     
@@ -179,7 +208,7 @@ Wat.Views.ViewsView = Wat.Views.MainView.extend({
             this.selectedTenant = undefined;
         }
         
-        this.renderForm();
+        this.getDataAndRender();
     },
     
     render: function () {
@@ -222,7 +251,7 @@ Wat.Views.ViewsView = Wat.Views.MainView.extend({
             Wat.I.updateChosenControls('[name="tenant-select"]');
         });  
         
-        this.renderForm();
+        this.getDataAndRender();
     },
     
     renderForm: function () {        

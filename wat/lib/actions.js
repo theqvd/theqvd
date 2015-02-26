@@ -65,16 +65,7 @@ Wat.A = {
     //      messages: hash with messages to be showed in success and error cases.
     //      successCallback: function that will be executed after action execution.
     //      that: current context where will be stored retrieved response and passed as parameter to successCallback function.
-    //      async: boolean that specify if API call will be asynchronous or not (Default: Asynchronous).
-    performAction: function (action, arguments, filters, messages, successCallback, that, async) {
-        if (async == undefined) {
-            async = true;
-        }
-        
-        if (!async) {
-            //console.warn('SYNC CALL: ' + action);
-        }
-        
+    performAction: function (action, arguments, filters, messages, successCallback, that) {
         var url = Wat.C.getBaseUrl() + 
             '&action=' + action;
         
@@ -95,7 +86,6 @@ Wat.A = {
             dataType: 'json',
             processData: false,
             parse: true,
-            async: async,
             error: function (response) {
                 if (that) {
                     that.retrievedData = response;

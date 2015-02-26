@@ -23,12 +23,12 @@ Wat.Views.MyViewsView = Wat.Views.ViewsView.extend({
         this.render();
     },
     
-    renderForm: function (params) {
+    getDataAndRender: function () {
         // Get filters and columns
         this.currentFilters = Wat.I.getFormFilters(this.selectedSection);
         this.currentColumns = Wat.I.getListColumns(this.selectedSection);
         
-        Wat.Views.ViewsView.prototype.renderForm.apply(this, [params]);
+        this.renderForm();
 
     }
 });

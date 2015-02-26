@@ -59,47 +59,6 @@ Wat.I = {
         acl: {}
     }, 
     
-    storeTenantListColumns: function (qvdObj, tenantId, that) {
-        var defaultListColumns = this.getListDefaultColumns(qvdObj);
-        
-        var args = {
-            "view_type": "list_column", 
-            "qvd_object": qvdObj
-        };
-        
-        if (tenantId != undefined && tenantId != 0) {
-            args.tenant_id = tenantId;
-        }
-        
-        Wat.A.performAction('tenant_view_get_list', {}, args, {}, function () {}, this, false);
-        
-        if (this.retrievedData.status != STATUS_SUCCESS) {
-            return {};
-        }
-        
-        $.each(this.retrievedData.rows, function (iRegister, register) {
-            if (defaultListColumns[register.field]) {
-                defaultListColumns[register.field].display = register.visible;
-            }
-            else {
-                defaultListColumns[register.field] = {
-                    'display': register.visible,
-                    'noTranslatable': true,
-                    'fields': [
-                        register.field
-                    ],
-                    'acls': qvdObj + '.see.properties',
-                    'property': true,
-                    'text': register.field
-                };
-            }            
-        });
-              
-        that.currentListColumns = defaultListColumns;
-        
-        that.currentColumns = defaultListColumns;
-    }, 
-    
     getListColumns: function (qvdObj) {
         return $.extend(true, {}, this.listFields[qvdObj]);
     },
@@ -127,49 +86,6 @@ Wat.I = {
         osf: {},
         di: {}
     },
-    
-    storeTenantFormFilters: function (qvdObj, tenantId, that) {
-        var defaultFormFilters = this.getFormDefaultFilters(qvdObj);
-        
-        var args = {
-            "view_type": "filter", 
-            "qvd_object": qvdObj
-        };
-        
-        if (tenantId != undefined && tenantId != 0) {
-            args.tenant_id = tenantId;
-        }
-        
-        Wat.A.performAction('tenant_view_get_list', {}, args, {}, function () {}, this, false);
-        
-        if (this.retrievedData.status != STATUS_SUCCESS) {
-            return {};
-        }
-               
-        $.each(this.retrievedData.rows, function (iRegister, register) {
-            if (!defaultFormFilters[register.field]) {
-                defaultFormFilters[register.field] = {
-                    'filterField': register.field,
-                    'type': 'text',
-                    'text': register.field,
-                    'noTranslatable': true,
-                    'property': true,
-                    'acls': qvdObj + '.filter.properties',
-                };
-            }     
-            
-            switch (register.device_type) {
-                case 'mobile':
-                    defaultFormFilters[register.field].displayMobile = register.visible;
-                    break;
-                case 'desktop':
-                    defaultFormFilters[register.field].displayDesktop = register.visible;
-                    break;
-            }
-        });
-        
-        that.currentFilters = defaultFormFilters;
-    }, 
     
     getFormFilters: function (qvdObj) {
         return $.extend(true, {}, this.formFilters[qvdObj]);
@@ -227,8 +143,8 @@ Wat.I = {
         if (qvdObj) {
             filters.qvd_obj = qvdObj;
         }
-        
-        Wat.A.performAction('config_field_get_list', {}, filters, {}, this.setCustomizationFieldsCallback, this, false);
+
+        Wat.A.performAction('config_field_get_list', {}, filters, {}, this.setCustomizationFieldsCallback, this);
     },
     
     setCustomizationFieldsCallback: function (that) {
@@ -693,7 +609,7 @@ Wat.I = {
                 msg.expandedMessage = msg.expandedMessage || '';
                 
                 if (response.message != msg.message && response.message) {
-                    msg.expandedMessage += '<strong data-i18n="' + response.message + '"></strong> <br/><br/>';
+                    msg.expandedMessage += '<strong data-i18n="' + response.message + '">' + response.message + '</strong> <br/><br/>';
                 }
             
                 if (response.failures && !$.isEmptyObject(response.failures)) {

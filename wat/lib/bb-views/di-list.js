@@ -183,6 +183,7 @@ Wat.Views.DIListView = Wat.Views.ListView.extend({
                 if(myXhr.upload){ // Check if upload property exists
                     myXhr.upload.addEventListener('progress', that.updateProgress, false); // For handling the progress of the upload
                 }
+                
                 return myXhr;
             },
             processData: false,
