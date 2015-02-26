@@ -186,11 +186,6 @@ Wat.Views.ViewsView = Wat.Views.MainView.extend({
             if (that.viewKind == 'admin') {
                 Wat.I.listFields[qvdObj][fieldName] = that.currentColumns[fieldName];
             }
-            
-            console.log(that.currentColumns.id.display);
-            console.log(Wat.I.listFields.user.id.display);
-            console.log(Wat.I.listFields[qvdObj][fieldName].display);
-            console.log(qvdObj);
         }
         else {
             // If update fails, change ckeckbox to previous state

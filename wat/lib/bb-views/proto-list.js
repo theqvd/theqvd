@@ -508,8 +508,6 @@ Wat.Views.ListView = Wat.Views.MainView.extend({
                 'noTranslatable': true
             };
         }
-        
-        console.log(this.columns);
     },
     
     setSelectedActions: function () {
