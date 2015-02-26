@@ -644,7 +644,7 @@ my $MANDATORY_ARGUMENTS = { Config => [qw(key value)],
 			    Tenant => [qw(name)],
 			    Role => [qw(name fixed internal)],
                             Administrator => [qw(name password )],
-			    Tenant_Views_Setup => [qw( tenant_id field visible view_type device_type qvd_object property)],
+			    Tenant_Views_Setup => [qw(field visible view_type device_type qvd_object property)],
 			    Administrator_Views_Setup => [qw(admin_id field visible view_type device_type qvd_object property)]}; 
 
 my $DEFAULT_ARGUMENT_VALUES = 

@@ -149,8 +149,6 @@ sub create_or_update
     my ($self,$request) = @_;
     my $result;
 
-    use Data::Dumper; print Dumper $request->arguments;
-
     eval
     {
 	$DB->txn_do( sub { my $obj = $DB->resultset($request->table)->update_or_create($request->arguments);

@@ -60,7 +60,7 @@ sub BUILD
 	$self->qvd_object_model->type_of_action eq 'update';
 
     $self->check_create_arguments_validity_in_json if
-	$self->qvd_object_model->type_of_action =~ /^(cre|upd)ate$/;
+	$self->qvd_object_model->type_of_action =~ /^create(_or_update)?$/;
 
     $self->check_nested_queries_validity_in_json if
 	$self->qvd_object_model->type_of_action =~ /^(cre|upd)ate$/;
@@ -324,7 +324,7 @@ sub forze_tenant_assignment_in_creation
     else
     {
 	my $tenant_id = $self->qvd_object_model->map_argument_to_dbix_format('tenant_id');
-	$self->set_argument($tenant_id,$ADMIN->tenant_id);
+	$self->instantiate_argument($tenant_id,$ADMIN->tenant_id);
     }
 }
 
