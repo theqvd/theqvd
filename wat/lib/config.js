@@ -124,7 +124,7 @@ Wat.C = {
         }
         
         if (this.sid) {
-            Wat.A.performAction('current_admin_setup', {}, VIEWS_COMBINATION, {}, this.checkLogin, this, true);
+            Wat.A.performAction('current_admin_setup', {}, VIEWS_COMBINATION, {}, this.checkLogin, this);
         }
         else {
             Wat.C.afterLogin ();
@@ -136,7 +136,7 @@ Wat.C = {
     //      user: administrator username
     //      password: administrator password
     // If credentials not retrieved, get it from login form
-    tryLogin: function (user, password) {
+    tryLogin: function (user, password, tenant) {
         var user = $('input[name="admin_user"]').val() || user;
         var password = $('input[name="admin_password"]').val() || password;
         var tenant = $('input[name="admin_tenant"]').val() || tenant;
@@ -150,7 +150,7 @@ Wat.C = {
         this.password = password;
         this.tenant = tenant;
         
-        Wat.A.performAction('current_admin_setup', {}, VIEWS_COMBINATION, {}, this.checkLogin, this, true);
+        Wat.A.performAction('current_admin_setup', {}, VIEWS_COMBINATION, {}, this.checkLogin, this);
     },
     
     // After call to API to get admin setup, check response

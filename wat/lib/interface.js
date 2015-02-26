@@ -59,7 +59,7 @@ Wat.I = {
         acl: {}
     }, 
     
-    getTenantListColumns: function (qvdObj, tenantId, that) {
+    storeTenantListColumns: function (qvdObj, tenantId, that) {
         var defaultListColumns = this.getListDefaultColumns(qvdObj);
         
         var args = {
@@ -97,7 +97,7 @@ Wat.I = {
               
         that.currentListColumns = defaultListColumns;
         
-        return defaultListColumns;
+        that.currentColumns = defaultListColumns;
     }, 
     
     getListColumns: function (qvdObj) {
@@ -128,7 +128,7 @@ Wat.I = {
         di: {}
     },
     
-    getTenantFormFilters: function (qvdObj, tenantId, that) {
+    storeTenantFormFilters: function (qvdObj, tenantId, that) {
         var defaultFormFilters = this.getFormDefaultFilters(qvdObj);
         
         var args = {
@@ -168,9 +168,7 @@ Wat.I = {
             }
         });
         
-        that.currentFormFilters = defaultFormFilters;
-
-        return defaultFormFilters;
+        that.currentFilters = defaultFormFilters;
     }, 
     
     getFormFilters: function (qvdObj) {
@@ -379,10 +377,9 @@ Wat.I = {
             $('.related-doc').css('visibility','visible');
         }
     },
-
+    
     showContent: function () {
-        // Set to the side box the same height of the content box
-        $('.js-side').css('min-height', $('.list-block').height());
+        this.adaptSideSize();
 
         $('.breadcrumbs').css('visibility','visible').hide().show();
         $('.content').css('visibility','visible').hide().show();
@@ -401,6 +398,12 @@ Wat.I = {
             $('.loading').show();
             $('.related-doc').hide();
         }
+    },
+    
+    // Adapt size of the side layer to the content to show separator line from top to bottom
+    adaptSideSize: function () {
+        // Set to the side box the same height of the content box
+        $('.js-side').css('min-height', $('.list-block').height());
     },
     
     updateSortIcons: function (view) {
@@ -908,8 +911,18 @@ Wat.I = {
             },
             button1Class : 'fa fa-ban',
             button2Class : 'fa fa-check',
-            fillCallback : function(target) {
-                target.html(Wat.A.getTemplate(templateName));
+            fillCallback : function(target) {                
+                var templates = {
+                    confirmTemplate: {
+                        name: templateName,
+                        cache: false
+                    }
+                }
+
+                Wat.A.getTemplates(templates, Wat.A.fillTemplate, {
+                    target: target,
+                    templateName: 'confirmTemplate'
+                });
             }
         }
         
@@ -961,7 +974,7 @@ Wat.I = {
             $('.js-dialog-container').animate({scrollTop:0});
 
             // Fill div with section documentation
-            target.html(Wat.A.getDocSection(guide, section));
+            Wat.A.fillDocSection(guide, section, undefined, undefined, target)
         };
 
 

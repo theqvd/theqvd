@@ -31,8 +31,8 @@ Wat.Views.SetupCustomizeView = Wat.Views.ViewsView.extend({
     
     renderForm: function () {
         // Get filters and columns
-        this.currentFilters = Wat.I.getTenantFormFilters (this.selectedSection, this.selectedTenant, this);
-        this.currentColumns = Wat.I.getTenantListColumns (this.selectedSection, this.selectedTenant, this);
+        Wat.I.storeTenantFormFilters (this.selectedSection, this.selectedTenant, this);
+        Wat.I.storeTenantListColumns (this.selectedSection, this.selectedTenant, this);
         
         Wat.Views.ViewsView.prototype.renderForm.apply(this);
     }

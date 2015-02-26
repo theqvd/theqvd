@@ -28,7 +28,7 @@
             if (Wat.C.isLogged()) {
                 Wat.I.setCustomizationFields();
             }
-
+            
             if (!Wat.C.routerHistoryStarted) {
                 // Instantiate the router
                 Wat.Router.app_router = new Wat.Router;

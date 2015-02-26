@@ -2,10 +2,6 @@ Wat.Views.DetailsView = Wat.Views.MainView.extend({
     elementId: 0,
     detailsContainer: '.bb-details',
     sideContainer: '.bb-details-side',
-
-    editorTemplateName: '',
-    detailsTemplateName: '',
-    detailsSideTemplateName: '',
     
     viewKind: 'details',
     
@@ -18,11 +14,6 @@ Wat.Views.DetailsView = Wat.Views.MainView.extend({
         Wat.Views.MainView.prototype.initialize.apply(this);
 
         this.elementId = params.id;
-        
-        // Define template names from qvd Object type
-        this.editorTemplateName = 'editor-' + this.qvdObj,
-        this.detailsTemplateName = 'details-' + this.qvdObj,
-        this.detailsSideTemplateName = 'details-' + this.qvdObj + '-side',
         
         this.setBreadCrumbs();
         this.setViewACL();
@@ -39,19 +30,19 @@ Wat.Views.DetailsView = Wat.Views.MainView.extend({
                 name: 'details-common-properties'
             },
             details: {
-                name: this.detailsTemplateName
+                name: 'details-' + this.qvdObj
             },
             detailsSide: {
-                name: this.detailsSideTemplateName
+                name: 'details-' + this.qvdObj + '-side'
             },
             warn404: {
                 name: '404'
             },
-            detailsSide: {
-                name: this.detailsSideTemplateName
-            },
             warn404: {
                 name: '404'
+            },
+            editor: {
+                name: 'editor-' + this.qvdObj
             }
         }
         

@@ -2,7 +2,7 @@ function diTestReal () {
     module( "Real tests", {
         setup: function() {
             // prepare something for all following tests
-            loginTest();
+            
             // Truman will not receive tenant info
             delete WatTests.fakeValues.di.tenant_name;
             delete WatTests.fakeValues.di.tenant_id;

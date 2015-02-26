@@ -2,7 +2,6 @@ function vmTestReal () {
     module( "Real tests", {
         setup: function() {
             // prepare something for all following tests
-            loginTest();
             
             // Truman will not receive tenant info
             delete WatTests.fakeValues.vm.tenant_name;

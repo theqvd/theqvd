@@ -2,7 +2,6 @@ function hostTestReal () {
     module( "Real tests", {
         setup: function() {
             // prepare something for all following tests
-            loginTest();
         },
         teardown: function() {
             // clean up after each test
@@ -57,7 +56,7 @@ function hostTestReal () {
                             equal(e.retrievedData.status, STATUS_FORBIDDEN_ACTION, "Host cannot be updated due ACLs restriction (" + JSON.stringify(WatTests.updateValues.host) + ")");
 
                             start();
-                        }, Wat.CurrentView.model);
+                        }, WatTests.models.host);
                     }
                 });
             });

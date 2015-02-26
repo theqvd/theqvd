@@ -243,15 +243,15 @@ Wat.Views.ConfigQvdView = Wat.Views.MainView.extend({
     },
     
     applySave: function (that) {
-        Wat.A.performAction('config_set', that.configActionArguments, {}, {'error': i18n.t('Error updating'), 'success': 'Successfully updated'}, that.afterChangeToken, that, false);
+        Wat.A.performAction('config_set', that.configActionArguments, {}, {'error': i18n.t('Error updating'), 'success': 'Successfully updated'}, that.afterChangeToken, that);
     },
         
     applySetDefault: function (that) {
-        Wat.A.performAction('config_default', {}, that.configActionFilters, {'error': i18n.t('Error updating'), 'success': 'Successfully updated'}, that.afterChangeToken, that, false);
+        Wat.A.performAction('config_default', {}, that.configActionFilters, {'error': i18n.t('Error updating'), 'success': 'Successfully updated'}, that.afterChangeToken, that);
     },
         
     applyDelete: function (that) {
-        Wat.A.performAction('config_delete', {}, that.configActionFilters, {'error': i18n.t('Error deleting'), 'success': 'Successfully deleted'}, that.afterChangeToken, that, false);
+        Wat.A.performAction('config_delete', {}, that.configActionFilters, {'error': i18n.t('Error deleting'), 'success': 'Successfully deleted'}, that.afterChangeToken, that);
     },
     
     openNewElementDialog: function (e) {
@@ -284,7 +284,7 @@ Wat.Views.ConfigQvdView = Wat.Views.MainView.extend({
         
         this.createdKey = key;
         
-        Wat.A.performAction('config_set', arguments, {}, {'error': i18n.t('Error creating'), 'success': i18n.t('Successfully created')}, this.afterCreateToken, this, false);
+        Wat.A.performAction('config_set', arguments, {}, {'error': i18n.t('Error creating'), 'success': i18n.t('Successfully created')}, this.afterCreateToken, this);
     },
     
     afterCreateToken: function (that) {

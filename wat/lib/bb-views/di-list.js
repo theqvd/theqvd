@@ -93,6 +93,8 @@ Wat.Views.DIListView = Wat.Views.ListView.extend({
 
             Wat.A.fillSelect(params);  
         }
+        
+        Wat.I.chosenElement('select[name="images_source"]', 'single100');
     },
     
     createElement: function () {
@@ -119,13 +121,6 @@ Wat.Views.DIListView = Wat.Views.ListView.extend({
             arguments["__properties__"] = properties.set;
         }
         
-        var disk_image = context.find('select[name="disk_image"]').val();
-        if (disk_image) {
-            arguments["disk_image"] = disk_image;
-        }   
-        
-        var disk_image_file = context.find('input[name="disk_image_file"]');
-        
         var version = context.find('input[name="version"]').val();
         if (version && Wat.C.checkACL('di.create.version')) {
             arguments["version"] = version;
@@ -148,37 +143,21 @@ Wat.Views.DIListView = Wat.Views.ListView.extend({
             arguments['tenant_id'] = tenant_id;
         }
         
-        //this.createModel(arguments, this.fetchList);
-        this.heavyCreate(arguments);
-        //this.createDI(arguments, file, this.fetchList);
+        var image_source = context.find('select[name="images_source"]').val();
         
-        //this.saveFile(arguments, disk_image_file);
-    },
-    
-    saveFilePlugin: function(arguments, disk_image_file) {    
-        // Get Url for the API call
-        var url = Wat.C.getUpdateDiUrl() + '&action=di_create&arguments=' + JSON.stringify(arguments);
-
-        console.log(url);
-        
-        disk_image_file.fileupload({
-            url: url,
-            dateType: 'json',
-            replaceFileInput: false,
-            done: function (e, data) {
-                console.info(data);
-
-/*                $.each(data.result.files, function (index, file) {
-                    console.log(file.name + ' Uploaded');
-                });*/
-            },
-            fail: function (e, data) {
-                console.error(data);
-            },
-            always: function (e, data) {
-                console.warn(data);
-            }
-        });
+        switch (image_source) {
+            case 'staging':
+                var disk_image = context.find('select[name="disk_image"]').val();
+                if (disk_image) {
+                    arguments["disk_image"] = disk_image;
+                }
+                this.heavyCreate(arguments);
+                break;
+            case 'computer':
+                var disk_image_file = context.find('input[name="disk_image_file"]');
+                this.saveFile(arguments, disk_image_file);
+                break;
+        }
     },
     
     saveFile: function(arguments, disk_image_file) {
@@ -192,6 +171,8 @@ Wat.Views.DIListView = Wat.Views.ListView.extend({
         
         // Get Url for the API call
         var url = Wat.C.getUpdateDiUrl() + '&action=di_create&arguments=' + JSON.stringify(arguments);
+        
+        Wat.I.loadingBlock($.i18n.t('Please, wait while action is performed') + '<br><br>' + $.i18n.t('Do not close or refresh the window'));
 
         $.ajax({
             url: url, 
@@ -200,7 +181,6 @@ Wat.Views.DIListView = Wat.Views.ListView.extend({
             xhr: function() {  // Custom XMLHttpRequest
                 var myXhr = $.ajaxSettings.xhr();
                 if(myXhr.upload){ // Check if upload property exists
-                    //myXhr.upload.addEventListener('progress', that.updateProgress, false); // For handling the progress of the upload
                     myXhr.upload.addEventListener('progress', that.updateProgress, false); // For handling the progress of the upload
                 }
                 return myXhr;
@@ -208,86 +188,40 @@ Wat.Views.DIListView = Wat.Views.ListView.extend({
             processData: false,
             contentType: false, // Setting contentType as false 'multipart/form-data' and boundary will be sent
 
-        }).success(function(){
-            console.info("Success: Files sent!");
-        }).fail(function(data){
-            console.error("An error occurred, the files couldn't be sent!");
-            console.error(data);
-        });
-        
-        return;
-        
-        $.ajax({
-            url: url,
-            data: data,
-            cache: false,
-            contentType: false,
-            processData: false,
-            type: 'POST',
-            success: function(data){
-                console.info('sucess uploading');
-            },
-            error: function(data){
-                console.error('error uploading');
+        }).success(function(){            
+            that.dialog.dialog('close');
+            Wat.I.loadingUnblock();
+            
+            switch (Wat.CurrentView.qvdObj) {
+                case 'di':
+                    Wat.CurrentView.fetchList();
+                    break;
+                default:
+                    Wat.CurrentView.sideView2.fetchList();
+                    break;
             }
+            
+            Wat.I.showMessage({message: i18n.t('Successfully created'), messageType: 'success'});
+            
+        }).fail(function(data){
+            that.dialog.dialog('close');
+            Wat.I.loadingUnblock();
+            Wat.I.showMessage({message: i18n.t('Error creating'), messageType: 'error'});
         });
     },
     
-    updateProgress: function (e, e2)  {
-        console.warn(e);
-        console.warn(e2);
-    },
-                                                 
-   createDI: function (arguments, file, successCallback) {
-        this.model.setOperation('create');
-        
-        var messages = {
-            'success': 'Successfully created',
-            'error': 'Error creating'
-        };
-        
-        var model = this.model;
-        var filters = {};
+    updateProgress: function (e)  {        
+        if (e.total == 0) {
+            var percent = 100;
+        }
+        else {
+            var percent = parseInt((e.loaded / e.total) * 100);
+        }
 
-        var that = this;
-        model.save(arguments, {filters: filters, file: '/tmp/test'}).complete(function(e, a, b) {
-            Wat.I.loadingUnblock();
+        var progressData = [e.loaded, e.total - e.loaded];
+        Wat.I.G.drawPieChartSimple('loading-block', progressData);
 
-            var callResponse = e.status;
-            var response = {status: e.status};
-            
-            if (e.responseText) {
-                try {
-                    response = JSON.parse(e.responseText);
-                }
-                catch (err) {
-                    //console.log (e.responseText);
-                }
-            }
-            
-            that.retrievedData = response;
-            successCallback(that);
-            
-            if (callResponse == 200 && response.status == STATUS_SUCCESS) {
-                that.message = messages.success;
-                that.messageType = 'success';
-            }
-            else {
-                that.message = messages.error;
-                that.messageType = 'error';
-            }
-
-            if (that.dialog) {
-                that.dialog.dialog('close');
-            }
-                        
-            var messageParams = {
-                message: that.message,
-                messageType: that.messageType
-            };
-            
-            Wat.I.showMessage(messageParams, response);
-        });
+        $('.loading-little-message').html($.i18n.t('Copying image to server') + '<br><br>' + parseInt(e.loaded/(1024*1024)) + 'MB / ' + parseInt(e.total/(1024*1024)) + 'MB');
     },
     
     heavyCreate: function (args) {

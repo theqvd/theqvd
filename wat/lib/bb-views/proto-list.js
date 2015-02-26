@@ -399,10 +399,8 @@ Wat.Views.ListView = Wat.Views.MainView.extend({
                         },
                         "Select all": function () {
                             $('.js-check-it').prop("checked", true);
-                            Wat.A.performAction(that.qvdObj + '_all_ids', {}, that.collection.filters, {}, that.storeAllSelectedIds, that, false);
-                            $(this).dialog('close');
-                            Wat.I.updateSelectedItems(that.selectedItems.length);
-                            that.selectedAll = true;
+                            that.dialog = $(this);
+                            Wat.A.performAction(that.qvdObj + '_all_ids', {}, that.collection.filters, {}, that.storeAllSelectedIds, that);
                         }
                     },
                     button1Class : 'fa fa-eye',
@@ -437,6 +435,10 @@ Wat.Views.ListView = Wat.Views.MainView.extend({
         else {
             that.selectedItems = that.retrievedData.rows;
         }
+        
+        that.dialog.dialog('close');
+        Wat.I.updateSelectedItems(that.selectedItems.length);
+        that.selectedAll = true;
     },
     
     fillCheckSelector: function (target) {
@@ -666,6 +668,7 @@ Wat.Views.ListView = Wat.Views.MainView.extend({
         }
         
         this.updateFilterNotes();
+        Wat.I.adaptSideSize();
     },
     
     // Fill filter selects 

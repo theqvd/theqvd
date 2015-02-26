@@ -1,43 +1,4 @@
 Wat.A = {
-    // Get template from template file caching if specified to avoid future loadings
-    // Params:
-    //      templateName: name of the template file to be loaded without extension.
-    //      cache: boolean that specify if template will be cached in code or not (it will be cached if not provided).
-    getTemplate: function(templateName, cache) {
-        if (cache == undefined) {
-            cache = true;
-        }
-        //console.info('Loading Template (sync): ' + templateName);
-        
-        if ($('#template_' + templateName).html() == undefined || !cache) {
-            var tmplDir = APP_PATH + 'templates';
-            var tmplUrl = tmplDir + '/' + templateName + '.tpl';
-            var tmplString = '';
-
-            $.ajax({
-                url: tmplUrl,
-                method: 'GET',
-                async: false,
-                contentType: 'text',
-                cache: false,
-                success: function (data) {
-                    tmplString = data;
-                }
-            });
-            
-            if (cache) {
-                $('head').append('<script id="template_' + templateName + '" type="text/template">' + tmplString + '<\/script>');
-            }
-        }
-
-        if (cache) {
-            return $('#template_' + templateName).html();
-        }
-        else {
-            return tmplString;
-        }
-    },
-    
     // Get templates from template files caching if specified to avoid future loadings
     // Params:
     //      templateName: name of the template file to be loaded without extension.
@@ -55,8 +16,6 @@ Wat.A = {
                 cache = true;
             }
             
-            //console.info('Loading Template (async): ' + templateName);
-
             if ($('#template_' + templateName).html() == undefined || !cache) {
                 var tmplDir = APP_PATH + 'templates';
                 var tmplUrl = tmplDir + '/' + templateName + '.tpl';
@@ -417,20 +376,54 @@ Wat.A = {
     // Get a documentation guide from template and return <body> of this document to be ebeded in WAT
     // Params:
     //      selectedGuide: guide name.
-    getDocBody: function (selectedGuide) {
+    getDocBody: function (docParams, callBack) {        
         // Load language
         var lan = $.i18n.options.lng;
         
         if ($.inArray(lan, DOC_AVAILABLE_LANGUAGES) === -1) {
             lan = DOC_DEFAULT_LANGUAGE;
         }
-            
-        var templateDoc = Wat.A.getTemplate('documentation-' + lan + '-' + selectedGuide, false);
-
-        var pattern = /<body[^>]*>((.|[\n\r])*)<\/body>/im
-        var array_matches = pattern.exec(templateDoc);
         
-        return array_matches[1];
+        var templates = {
+            docSection: {
+                name: 'documentation-' + lan + '-' + docParams.guide,
+                cache: false
+            }
+        }
+        
+        Wat.A.getTemplates(templates, callBack, docParams);
+    },
+    
+    processDocBody: function (docParams) {
+        var pattern = /<body[^>]*>((.|[\n\r])*)<\/body>/im
+        var array_matches = pattern.exec(Wat.TPL.docSection);
+        
+        docParams.docBody = array_matches[1];
+        
+        Wat.A.processDocSection(docParams);
+    }, 
+    
+    fillDocBody: function (docParams) {
+        var pattern = /<body[^>]*>((.|[\n\r])*)<\/body>/im
+        var array_matches = pattern.exec(Wat.TPL.docSection);
+        
+        docParams.docBody = array_matches[1];
+        
+        Wat.A.fillTemplateString(docParams.docBody, docParams.target, true);
+    },
+    
+    fillTemplateString: function (string, target, toc, sectionId) {
+        target.html(string);  
+
+        if (toc) {
+            asciidoc.toc(3);
+        }
+    },
+    
+    fillTemplate: function (docParams) {
+        docParams.target.html(Wat.TPL[docParams.templateName]);
+        
+        Wat.T.translate();
     },
     
     // Get a documentation guide´s section from guide
@@ -439,37 +432,53 @@ Wat.A = {
     //      sectionId: Id of the section of the guide to be parsed.
     //      toc: boolean to specify if include or not Table of Contents (Default: False).
     //      imagesPrefix: prefix to be added to each src attribute in images.
-    getDocSection: function (guide, sectionId, toc, imagesPrefix) {
+    //      target: target where the doc section will be load.
+    fillDocSection: function (guide, sectionId, toc, imagesPrefix, target) {
+        var docParams = {
+            guide: guide,
+            sectionId: sectionId,
+            toc: toc,
+            imagesPrefix: imagesPrefix,
+            target: target
+        };
+        
+        Wat.A.getDocBody(docParams, this.processDocBody);
+    },
+    
+    processDocSection: function (docParams) {  
+        var toc = docParams.toc;
+        
         if (toc == undefined) {
             toc = false;
         }
         
-        var docBody = Wat.A.getDocBody(guide);
-        
         if (toc) {
-            var guideHeader = $.parseHTML(docBody)[1].outerHTML;
+            var guideHeader = $.parseHTML(docParams.docBody)[1].outerHTML;
             var guideToc = $.parseHTML(guideHeader)[1].childNodes[3].outerHTML;
         }
         
-        var pattern = new RegExp('(<h[1|2|3|4] id="' + sectionId + '"[^>]*>((.|[\n\r])*))', 'im');
-        var array_matches2 = pattern.exec(docBody); 
+        var pattern = new RegExp('(<h[1|2|3|4] id="' + docParams.sectionId + '"[^>]*>((.|[\n\r])*))', 'im');
+        var array_matches2 = pattern.exec(docParams.docBody); 
         
         if (!array_matches2) {
             return null;
         }
         
         // When doc sections are retrieved from different path than standard (i.e. tests), we can add a prefix to the images path
-        if (imagesPrefix) {
+        if (docParams.imagesPrefix) {
             array_matches2[1] = array_matches2[1].replace(/src="images/g, 'src="../images');
         }
         
         var secBody = $.parseHTML('<div>' + array_matches2[1])[0].innerHTML;
+        var secTitle = '';
         
         if (toc) {
-            return '<div id="content">' + guideToc + secTitle + secBody + '</div>';
+            var content = '<div id="content">' + guideToc + secTitle + secBody + '</div>';
         }
         else {
-            return '<div class="doc-text" style="height: 50vh;">' + secBody + '</div>';
+            var content = '<div class="doc-text" style="height: 50vh;">' + secBody + '</div>';
         }
+        
+        Wat.A.fillTemplateString(content, docParams.target, false, docParams.sectionId)
     }
 };

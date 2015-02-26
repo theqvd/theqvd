@@ -23,7 +23,7 @@ Wat.Views.DocView = Wat.Views.MainView.extend({
         this.setSelectedGuide(this.selectedGuide);
         
         var templates = {
-            doc: {
+            docSection: {
                 name: 'help-documentation'
             }
         }
@@ -41,7 +41,7 @@ Wat.Views.DocView = Wat.Views.MainView.extend({
     render: function () {        
         // Fill the html with the template
         this.template = _.template(
-            Wat.TPL.doc, {
+            Wat.TPL.docSection, {
                 selectedGuide: this.selectedGuide
             }
         );
@@ -56,8 +56,9 @@ Wat.Views.DocView = Wat.Views.MainView.extend({
     },
     
     fillDocumentation: function () {    
-        $('.bb-doc-text').html(Wat.A.getDocBody(this.selectedGuide));
-        
-        asciidoc.toc(3);
+        Wat.A.getDocBody({
+            guide: this.selectedGuide,
+            target: $('.bb-doc-text')
+        }, Wat.A.fillDocBody);
     },
 });

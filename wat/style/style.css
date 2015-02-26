@@ -169,7 +169,8 @@ fieldset {
 .dialog-advice {
   padding: 10px; }
   .dialog-advice div {
-    margin-bottom: 12px; }
+    margin-bottom: 12px;
+    line-height: 1.3em; }
 
 .loading-big {
   position: absolute;
@@ -1186,7 +1187,6 @@ body {
         margin-top: -10px; }
         @media screen and (min-width: 40em) {
           .wrapper .content .list-block .list-navigation .action-new-item, .wrapper .content .details-side .list-navigation .action-new-item {
-            width: 45%;
             float: left; } }
     .wrapper .content .list-block .action-selected, .wrapper .content .details-side .action-selected {
       margin-top: 15px;

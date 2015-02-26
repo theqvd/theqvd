@@ -113,6 +113,9 @@ Wat.B = {
         // On any scroll
         $(window).off('scroll');
         $(window).on('scroll', this.navigationBinds.onScroll);
+        
+        // Kind of image source in DI creation
+        this.bindEvent('change', 'select[name="images_source"]', this.navigationBinds.toggleImagesource);
     },
     
     bindLoginEvents: function () {
@@ -213,6 +216,21 @@ Wat.B = {
                 scrollTop: 0
             }, 'fast');
                     
+        },
+        
+        toggleImagesource: function (e) {
+            var selectedSource = $(e.target).val();
+            
+            switch (selectedSource) {
+                case 'computer':
+                    $('.image_computer_row').show();
+                    $('.image_staging_row').hide();
+                    break;
+                case 'staging':
+                    $('.image_computer_row').hide();
+                    $('.image_staging_row').show();
+                    break;
+            }
         },
         
         onScroll: function () {

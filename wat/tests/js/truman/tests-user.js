@@ -2,7 +2,6 @@ function userTestReal () {
     module( "Real tests", {
         setup: function() {
             // prepare something for all following tests
-            loginTest();
         },
         teardown: function() {
             // clean up after each test
@@ -57,7 +56,7 @@ function userTestReal () {
                             equal(e.retrievedData.status, STATUS_FORBIDDEN_ACTION, "User cannot be updated due ACLs restriction (" + JSON.stringify(WatTests.updateValues.user) + ")");
 
                             start();
-                        }, Wat.CurrentView.model);
+                        }, WatTests.models.user);
                     }
                 });
             });

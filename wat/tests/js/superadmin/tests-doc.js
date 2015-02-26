@@ -8,7 +8,7 @@ function languageDocTest() {
         }
     });
     
-        test("Screens Info modal doc", function() {
+        asyncTest("Screens Info modal doc", function() {
             // Number of Assertions we Expect
             var assertions = 0;
             
@@ -16,10 +16,16 @@ function languageDocTest() {
 
             expect(assertions);
             
+            stop(assertions-1);
+            
             $.each(DOC_AVAILABLE_LANGUAGES, function (iLan, lan) {
                 $.each (Wat.I.docSections[lan], function (qvdObj, section) {
-                    var docHTML = Wat.A.getDocSection(section.guide, section.section, false, '../');
-                    notEqual(docHTML, null, 'Documentation section "' + section.section + '" was found in guide "' + section.guide + '"');
+                    Wat.A.fillTemplateString = function (string, target, toc, section) {
+                        notEqual(string, null, 'Documentation section "' + section + '" was found in guide "' + section.guide + '"');
+                        start();
+                    };
+                    
+                    Wat.A.fillDocSection(section.guide, section.section + '', false, '../');
                 });
             });
         });

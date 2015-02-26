@@ -2,7 +2,7 @@ function osfTestReal () {
     module( "Real tests", {
         setup: function() {
             // prepare something for all following tests
-            loginTest();
+
             // Truman will not receive tenant info
             delete WatTests.fakeValues.osf.tenant_name;
             delete WatTests.fakeValues.osf.tenant_id;
