@@ -20,7 +20,15 @@ use QVD::Log;
 my $LINUX = ($^O eq 'linux');
 my $WINDOWS = ($^O eq 'MSWin32');
 my $DARWIN = ($^O eq 'darwin');
-my $NX_OS = $WINDOWS ? 'windows' : 'linux';
+my $NX_OS = "unknown";
+
+if ( $LINUX ) {
+	$NX_OS = "linux";
+} elsif ( $WINDOWS ) {
+	$NX_OS = "windows";
+} elsif ( $DARWIN ) {
+	$NX_OS = "darwin";
+}
 
 sub new {
     my $class = shift;
