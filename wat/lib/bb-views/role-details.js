@@ -85,10 +85,10 @@ Wat.Views.RoleDetailsView = Wat.Views.DetailsView.extend({
             var filters = {};
             switch (treeKind) {
                 case 'actions':
-                    filters = {'acl_name': '%.' + branch + '.%', 'role_id': this.id};
+                    filters = {'acl_name': { '~' : '%.' + branch + '.%' }, 'role_id': this.id};
                     break;
                 case 'sections':
-                    filters = {'acl_name': branch + '.%', 'role_id': this.id};
+                    filters = {'acl_name': { '~' : branch + '.%' }, 'role_id': this.id};
                     break;
             }
             
