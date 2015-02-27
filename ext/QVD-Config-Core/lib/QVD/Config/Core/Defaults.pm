@@ -140,7 +140,7 @@ client.remember_username = 1
 client.show.remember_password = 0
 
 ## whether to show the settings tab
-client.show.settings = 0
+client.show.settings = 1
 
 ## nxproxy's link parameter, can be: modem, isdn, adsl, wan, lan, local or a bandwidth specification (56k, 1m, 100m...)
 client.link = adsl
@@ -162,7 +162,7 @@ client.fullscreen =
 ## enable the Pulse audio server in the client
 client.audio.enable =
 ## something regarding an NX channel
-client.printing.enable =
+client.printing.enable = 1
 ## L7R port the client should connect to
 client.host.port = 8443
 ## L7R host the client should connect to
