@@ -94,10 +94,10 @@ Wat.Views.ConfigQvdView = Wat.Views.MainView.extend({
         if (that.configTokens.length == 0 && $('input[name="config_search"]').val() == '') {
             that.currentTokensPrefix = '';
             Wat.A.performAction('config_preffix_get', {}, {}, {}, that.processPrefixes, that);
-            return;
         }
-        
-        that.renderConfigurationTokens();
+        else {
+            that.renderConfigurationTokens();
+        }
     },
     
     renderConfigurationTokens: function () {        
@@ -118,7 +118,7 @@ Wat.Views.ConfigQvdView = Wat.Views.MainView.extend({
         
         Wat.T.translate();
         
-        // If pushState is avaiable in browser, modify hash with current token
+        // If pushState is available in browser, modify hash with current token
         if (history.pushState) {
             history.pushState(null, null, '#/config/' + this.currentTokensPrefix);
         }
@@ -133,6 +133,8 @@ Wat.Views.ConfigQvdView = Wat.Views.MainView.extend({
     },
     
     filter: function (e) {
+        $('.bb-config-tokens').html(HTML_MINI_LOADING);
+
         var search = $(e.target).val();
         if (search == '') {
             $('.lateral-menu-option').eq(0).trigger('click');
@@ -140,7 +142,7 @@ Wat.Views.ConfigQvdView = Wat.Views.MainView.extend({
         else {
             $('.lateral-menu-option').removeClass('lateral-menu-option--selected');
             
-            // If pushState is avaiable in browser, modify hash with current token
+            // If pushState is available in browser, modify hash with current token
             if (history.pushState) {
                 history.pushState(null, null, '#/config');
             }
@@ -153,7 +155,7 @@ Wat.Views.ConfigQvdView = Wat.Views.MainView.extend({
     clickPrefixOption: function (e) {
         var newHash = '#/config/' + $(e.target).attr('data-prefix');
         
-        // If pushState is not avaiable in browser, redirect to new hash reloading page
+        // If pushState is not available in browser, redirect to new hash reloading page
         if (!history.pushState) {
             window.location.hash = newHash;
             return;

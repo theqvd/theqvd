@@ -860,8 +860,8 @@ Cambios según tipo de administrador
 <div class="sect1">
 <h2 id="_supertenant">3. Supertenant</h2>
 <div class="sectionbody">
-<div class="paragraph"><p>Al cambiar el modo a multitenant (Ver sección <em>Cambio de modo</em> en el manual), podremos iniciar sesión con un superadministrador. De este modo gestionaremos el supertenant “*” que es el ámbito de los superadministradores, así como todos los tenants del sistema.</p></div>
-<div class="paragraph"><p>El supertenant “<strong>” es como si fuera un tenant más a efectos de configuración del WAT. Se pueden crear administradores en él con permisos más o menos restringidos. Pero a diferencia de los tenants, *no podrá albergar elementos de QVD</strong> (Máquinas virtuales, usuarios, imágenes de disco&#8230;).</p></div>
+<div class="paragraph"><p>Al cambiar el modo a multitenant (Ver sección <em>Cambio de modo</em> en el manual), podremos iniciar sesión con un superadministrador. De este modo gestionaremos el supertenant * que es el ámbito de los superadministradores, así como todos los tenants del sistema.</p></div>
+<div class="paragraph"><p>El supertenant * es como si fuera un tenant más a efectos de configuración del WAT. Se pueden crear administradores en él con permisos más o menos restringidos. Pero a diferencia de los tenants, <strong>no podrá albergar elementos de QVD</strong> (Máquinas virtuales, usuarios, imágenes de disco&#8230;).</p></div>
 <div class="paragraph"><p>La otra diferencia principal respecto a los tenants es que los administradores del supertenant o superadministradores, tienen como <strong>ámbito</strong>, no solo el supertenant, sino <strong>todos los tenants del sistema</strong>.</p></div>
 </div>
 </div>
@@ -872,7 +872,7 @@ Cambios según tipo de administrador
 <div class="ulist"><ul>
 <li>
 <p>
-En los elementos que son contenidos en los tenants, aparecerá una <strong>columna extra indicando el tenant</strong> al que pertenecen. En el caso del listado de administradores, como caso particular, el tenant al que pertenece puede ser además el supertenant “*”.
+En los elementos que son contenidos en los tenants, aparecerá una <strong>columna extra indicando el tenant</strong> al que pertenecen. En el caso del listado de administradores, como caso particular, el tenant al que pertenece puede ser además el supertenant *.
 </p>
 </li>
 <li>
@@ -882,7 +882,7 @@ En las vistas de listado de elementos clasificados por tenant, aparece un <stron
 </li>
 <li>
 <p>
-Cuando creamos un elemento en QVD así como un administrador del WAT, habrá un <strong>campo extra en el formulario de creación</strong> para especificar su tenant. Al igual que dijimos antes, en el caso de los administradores podremos escoger, además de los tenants, el supertenant “*”. Esta posibilidad solo está en la creación de elementos, y no en la edición. Una vez creado un elemento en un tenant, no podrá moverse.
+Cuando creamos un elemento en QVD así como un administrador del WAT, habrá un <strong>campo extra en el formulario de creación</strong> para especificar su tenant. Al igual que dijimos antes, en el caso de los administradores podremos escoger, además de los tenants, el supertenant *. Esta posibilidad solo está en la creación de elementos, y no en la edición. Una vez creado un elemento en un tenant, no podrá moverse.
 </p>
 </li>
 <li>
@@ -901,9 +901,17 @@ Existen <strong>permisos adicionales</strong> como son los de gestión de tenant
 <div class="sect1">
 <h2 id="_wat_multitenant_paso_a_paso">5. WAT multitenant paso a paso</h2>
 <div class="sectionbody">
-<div class="paragraph"><p>Veremos paso a paso las secciones o <strong>componentes que se añaden al WAT cuando activamos el modo multitenant</strong>. Estos cambios aparecerán <strong>solo para superadministradores</strong> que tengan los permisos adecuados para ello. <strong>Los administradores de tenant no verán ninguna diferencia</strong> con el modo monotenant.</p></div>
+<div class="paragraph"><p>Veremos paso a paso las secciones o <strong>componentes que se añaden al WAT cuando activamos el modo multitenant</strong>. Estos cambios van desde la pantalla de inicio de sesión hasta pequeñas modificaciones en las vistas genéricas de listado o creación de elementos. También podrá aparecer alguna sección nueva si estamos en este modo.</p></div>
+<div class="paragraph"><p>Estos cambios aparecerán <strong>solo para superadministradores</strong> que tengan los permisos adecuados para ello. <strong>Los administradores de tenant no verán ninguna diferencia</strong> con el modo monotenant, salvo una pantalla de inicio de sesión diferente.</p></div>
 <div class="sect2">
-<h3 id="_tenants">5.1. Tenants</h3>
+<h3 id="_página_de_inicio_de_sesión">5.1. Página de inicio de sesión</h3>
+<div class="paragraph"><p>Cuando cargamos el WAT, si está configurado en modo multitenant, la pantalla de inicio de sesión tendrá el campo <em>tenant</em> además de <em>usuario y contraseña</em>. Esto es debido a que el nombre de un administrador puede repetirse en diferentes Tenants. En el caso de los superadministradores, se pondrá * en el campo Tenant.</p></div>
+<div class="paragraph"><p><span class="image">
+<img src="images/doc_images/login_multitenant.png" alt="login_multitenant.png" width="960px" />
+</span></p></div>
+</div>
+<div class="sect2">
+<h3 id="_tenants">5.2. Tenants</h3>
 <div class="paragraph"><p>En la sección <strong>Gestionar WAT</strong> aparecer un apartado más: Tenants. Este apartado se gestionan los tenants del WAT.</p></div>
 <div class="dlist"><dl>
 <dt class="hdlist1">
@@ -1117,7 +1125,7 @@ Contraseña: to the rescue</code></pre>
 <div id="footnotes"><hr /></div>
 <div id="footer">
 <div id="footer-text">
-Last updated 2015-02-05 11:57:09 CET
+Last updated 2015-02-27 11:35:19 CET
 </div>
 </div>
 </body>

@@ -1865,10 +1865,32 @@ Creación
 <dd>
 <div class="openblock">
 <div class="content">
+<div class="paragraph"><p>Al crear una imagen escogeremos el <strong>fichero de imagen</strong>, <strong>la versión</strong> (si la dejamos en blanco se establecerá una versión automática basada en la fecha de creación) y <strong>el OSF</strong> donde queremos asociar la imagen. De forma opcional podemos marcarla como imagen <strong>por defecto</strong> para su OSF, añadirle <strong>tags</strong> y crearle <strong>propiedades</strong>.</p></div>
+<div class="paragraph"><p>El fichero de imagen se puede configurar de dos formas:</p></div>
+<div class="ulist"><ul>
+<li>
+<p>
+Seleccionando una imagen de entre las disponibles en el directorio <em>staging</em> del servidor:
+</p>
+<div class="openblock">
+<div class="content">
 <div class="paragraph"><p><span class="image">
-<img src="images/doc_images/screenshot_di_create.png" alt="screenshot_di_create.png" width="960px" />
+<img src="images/doc_images/screenshot_di_create_staging.png" alt="screenshot_di_create_staging.png" width="960px" />
 </span></p></div>
-<div class="paragraph"><p>Al crear una imagen escogeremos el <strong>fichero de imagen</strong> de entre los disponibles en el sistema, <strong>la versión</strong> (si la dejamos en blanco se establecerá una versión automática basada en la fecha de creación) y <strong>el OSF</strong> donde queremos asociar la imagen. De forma opcional podemos marcarla como imagen <strong>por defecto</strong> para su OSF, añadirle <strong>tags</strong> y crearle <strong>propiedades</strong>.</p></div>
+</div></div>
+</li>
+<li>
+<p>
+Subiendo una imagen desde nuestra computadora:
+</p>
+<div class="openblock">
+<div class="content">
+<div class="paragraph"><p><span class="image">
+<img src="images/doc_images/screenshot_di_create_upload.png" alt="screenshot_di_create_upload.png" width="960px" />
+</span></p></div>
+</div></div>
+</li>
+</ul></div>
 <div class="paragraph"><p>A diferencia de la creación del resto de elementos, la de las imágenes de disco requieren tiempo al suponer la copia física de ficheros de gran tamaño.</p></div>
 <div class="paragraph"><p>Por ello, al crear una imagen de disco aparecerá una pantalla de carga con una gráfica de progreso de creación.</p></div>
 <div class="paragraph"><p><span class="image">

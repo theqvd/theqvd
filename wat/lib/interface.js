@@ -445,6 +445,9 @@ Wat.I = {
         if (Wat.C.loggedIn) {
             this.renderMenu();
         }
+        else {
+            $('.menu-corner').hide();
+        }
         
         this.updateLoginOnMenu();
     },

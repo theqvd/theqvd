@@ -87,7 +87,7 @@ Wat.Views.ConfigWatView = Wat.Views.DetailsView.extend({
         
         Wat.Views.DetailsView.prototype.openEditElementDialog.apply(this, [e]);
         
-        Wat.I.chosenElement('select[name="language"]', 'single');
-        Wat.I.chosenElement('select[name="block"]', 'single');
+        Wat.I.chosenElement('select[name="language"]', 'single100');
+        Wat.I.chosenElement('select[name="block"]', 'single100');
     }
 });
