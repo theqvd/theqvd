@@ -222,7 +222,7 @@ Wat.Views.DIListView = Wat.Views.ListView.extend({
         var progressData = [e.loaded, e.total - e.loaded];
         Wat.I.G.drawPieChartSimple('loading-block', progressData);
 
-        $('.loading-little-message').html($.i18n.t('Copying image to server') + '<br><br>' + parseInt(e.loaded/(1024*1024)) + 'MB / ' + parseInt(e.total/(1024*1024)) + 'MB');
+        $('.loading-little-message').html($.i18n.t('Uploading image to server') + '<br><br>' + parseInt(e.loaded/(BYTES_ON_KB*BYTES_ON_KB)) + 'MB / ' + parseInt(e.total/(BYTES_ON_KB*BYTES_ON_KB)) + 'MB');
     },
     
     heavyCreate: function (args) {
@@ -243,7 +243,7 @@ Wat.Views.DIListView = Wat.Views.ListView.extend({
             var progressData = [data.copy_size, data.total_size - data.copy_size];
             Wat.I.G.drawPieChartSimple('loading-block', progressData);
             
-            $('.loading-little-message').html($.i18n.t('Copying image to server') + '<br><br>' + parseInt(data.copy_size/(1024*1024)) + 'MB / ' + parseInt(data.total_size/(1024*1024)) + 'MB');
+            $('.loading-little-message').html($.i18n.t('Copying image from staging to images folder in server') + '<br><br>' + parseInt(data.copy_size/(BYTES_ON_KB*BYTES_ON_KB)) + 'MB / ' + parseInt(data.total_size/(BYTES_ON_KB*BYTES_ON_KB)) + 'MB');
         }
                 
         if (data.status == STATUS_SUCCESS) {

@@ -233,3 +233,6 @@ WAT_BLOCK_SIZES_ADMIN = $.extend({
 // Documentation
 DOC_AVAILABLE_LANGUAGES = ['es'];
 DOC_DEFAULT_LANGUAGE = 'es';
+
+// Number of bytes on a KiloByte
+BYTES_ON_KB = 1000;
