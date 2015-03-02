@@ -1,5 +1,4 @@
 Wat.Views.TenantListView = Wat.Views.ListView.extend({
-    listTemplateName: 'setup-tenants',
     sideContainer: '.bb-setup-side',
     secondaryContainer: '.bb-setup',
     setupOption: 'tenants',

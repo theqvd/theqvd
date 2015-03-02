@@ -47,11 +47,21 @@ Wat.Views.HomeView = Wat.Views.MainView.extend({
     initialize: function (params) {
         Wat.Views.MainView.prototype.initialize.apply(this, [params]);
         Wat.B.bindHomeEvents();
+                
+        var templates = {
+            home: {
+                name: 'home'
+            },
+            homeVMsExpire: {
+                name: 'home-vms-expire'
+            }
+        }
         
-        Wat.A.performAction('qvd_objects_statistics', {}, {}, {}, this.render, this);
+        Wat.A.getTemplates(templates, this.getStatistics, this); 
     },
     
-    events: {
+    getStatistics: function (that) {
+        Wat.A.performAction('qvd_objects_statistics', {}, {}, {}, that.render, that);
     },
     
     render: function () {

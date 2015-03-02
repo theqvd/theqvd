@@ -12,9 +12,6 @@ Wat.Views.ListView = Wat.Views.MainView.extend({
     filters: {},
     selectedItems: [],
     selectedAll: false,
-    listTemplateName: '',
-    editorTemplateName: '',
-    massiveEditorTemplateName: '',
     customCollection: false,
     infoRestrictions: false,
     initFilters: {},
@@ -49,11 +46,6 @@ Wat.Views.ListView = Wat.Views.MainView.extend({
         // Extend the common events with the list events and events of the specific view
         this.extendEvents(this.commonListEvents);
         this.extendEvents(this.listEvents);
-
-        // Define template names from qvd Object type
-        this.listTemplateName = 'list-' + this.qvdObj;
-        this.editorTemplateName = 'creator-' + this.qvdObj;
-        this.massiveEditorTemplateName = 'massive-editor-' + this.qvdObj;
         
         var templates = {
             listCommonList: {
@@ -63,20 +55,20 @@ Wat.Views.ListView = Wat.Views.MainView.extend({
                 name: 'list-common-block'
             },
             list: {
-                name: this.listTemplateName
+                name: 'list-' + this.qvdObj
             },
             selectChecks: {
                 name: 'dialog-select-checks'
             },
             editorNew: {
-                name: this.editorTemplateName
+                name: 'creator-' + this.qvdObj
             }
         }
         
         // If qvd object is massive-editable, get massive editor template
         if ($.inArray(this.qvdObj, QVD_OBJS_MASSIVE_EDITABLE) != -1) {
             templates.editorMassive = {
-                name: this.massiveEditorTemplateName
+                name: 'massive-editor-' + this.qvdObj
             };
         }
         

@@ -1,5 +1,4 @@
 Wat.Views.ViewsView = Wat.Views.MainView.extend({
-    setupCustomizeFormTemplateName: 'setup-customize-form',
     sideContainer: '.bb-setup-side',
     setupContainer: '.bb-setup',
     setupFormContainer: '.bb-customize-form',

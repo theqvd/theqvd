@@ -33,6 +33,9 @@ Wat.Views.ProfileView = Wat.Views.DetailsView.extend({
         var templates = {
             editor: {
                 name: 'editor-' + this.qvdObj
+            },
+            profile: {
+                name: 'profile'
             }
         }
         

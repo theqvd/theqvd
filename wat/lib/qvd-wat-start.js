@@ -232,15 +232,6 @@
             relatedDoc: {
                 name: 'documentation-related-links'
             },
-            login: {
-                name: 'login'
-            },
-            home: {
-                name: 'home'
-            },
-            homeVMsExpire: {
-                name: 'home-vms-expire'
-            },
             setupCommon: {
                 name: 'setup-common'
             },
@@ -249,15 +240,6 @@
             },
             setupFormCustomize: {
                 name: 'setup-customize-form'
-            },
-            qvdConfig: {
-                name: 'qvd-config'
-            },
-            qvdConfigTokens: {
-                name: 'qvd-config-tokens'
-            },
-            profile: {
-                name: 'profile'
             }
         }
 
