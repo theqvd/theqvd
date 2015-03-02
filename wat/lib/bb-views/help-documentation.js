@@ -42,7 +42,8 @@ Wat.Views.DocView = Wat.Views.MainView.extend({
         // Fill the html with the template
         this.template = _.template(
             Wat.TPL.docSection, {
-                selectedGuide: this.selectedGuide
+                selectedGuide: this.selectedGuide,
+                guides: Wat.C.getDocGuides()
             }
         );
         

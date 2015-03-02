@@ -67,6 +67,34 @@ Wat.C = {
         return this.multitenant;
     },
     
+    // Return if WAT administrator should know about multitenant enviroment
+    knowMultitenant: function () {
+        return this.isMultitenant() && (this.isRecoveradmin() || this.isSuperadmin());
+    },
+    
+    getDocGuides: function () {
+        guides = {
+            'introduction': 'Introduction',
+            'stepbystep': 'WAT Step by step', 
+            'user': 'User guide'
+        };
+        
+        if (this.knowMultitenant()) {
+            guides.multitenant = 'Multitenant guide'
+        }
+        
+        return guides;
+    },
+    
+    // Return a boolean value depending on if the retrieved guide name is valid or not for current administrator
+    // Params:
+    //      guide: guide name that will be checked as valid or not
+    isValidDocGuide: function (guide) {
+        var guides = this.getDocGuides ();
+        
+        return $.inArray(guide, Object.keys(guides)) != -1;
+    },
+    
     // Process log out including cookies removement
     logOut: function () {
         $.removeCookie('qvdWatSid', { path: '/' });
@@ -432,12 +460,10 @@ Wat.C = {
         
         // For monotenant  enviroments, multitenant documentation will not be shown
         if (!Wat.C.isMultitenant()) {
-            $.each(Wat.I.docSections, function (lan, sections) {
-                $.each(sections, function (iSec, sec) {
-                    if (sec.guide == 'multitenant') {
-                        delete Wat.I.docSections[lan][iSec];
-                    }
-                });
+            $.each(Wat.I.docSections, function (iSec, sec) {
+                if (sec.guide == 'multitenant') {
+                    delete Wat.I.docSections[iSec][lan];
+                }
             });
         }
         

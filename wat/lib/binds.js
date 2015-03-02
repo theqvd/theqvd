@@ -247,8 +247,8 @@ Wat.B = {
         clickScreenHelp: function (e) {
             var docSection = $(e.target).attr('data-docsection');
             
-            var section = Wat.I.docSections.es[docSection].section;
-            var guide = Wat.I.docSections.es[docSection].guide;
+            var section = Wat.I.docSections[docSection].es;
+            var guide = Wat.I.docSections[docSection].guide;
             
             Wat.I.loadDialogDoc(guide, section);
             
