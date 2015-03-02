@@ -221,7 +221,7 @@
                                 break;
                             default:
                 %>
-                                <td class="desktop">
+                                <td class="desktop" data-wsupdate="<%= name %>" data-id="<%= model.get('id') %>">
                                     <% 
                                         if (model.get(name) !== undefined) {
                                             print(model.get(name));

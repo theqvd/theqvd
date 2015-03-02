@@ -288,7 +288,15 @@
                             default:
                 %>
                                 <td class="desktop" data-wsupdate="<%= name %>" data-id="<%= model.get('id') %>">
-                                    <%= model.get(name) %>
+                                    <% 
+                                        if (model.get(name) !== undefined) {
+                                            print(model.get(name));
+                                        }
+                                        else if (model.get('properties') !== undefined && model.get('properties')[name] !== undefined) {
+                                            print(model.get('properties')[name]);
+                                        }
+                                    
+                                    %>
                                 </td>
                 <%
                                 break;

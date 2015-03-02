@@ -263,12 +263,7 @@ Wat.Views.ListView = Wat.Views.MainView.extend({
             var filterNotes = {};
             
             if ($.isEmptyObject(filterNotes) && !$.isEmptyObject(this.initFilters)) {
-                $.each(this.initFilters, function (filterField, filterValue) {
-                    // If the filtered field has not filter control, show generic filter note
-                    if ($('.filter [data-filter-field="' + filterField + '"]').length > 0) {
-                        return;
-                    }
-                    
+                $.each(this.initFilters, function (filterField, filterValue) {                    
                     switch (filterField) {
                         case 'di_id':
                             filterNotes['di_id'] = {
@@ -294,6 +289,16 @@ Wat.Views.ListView = Wat.Views.MainView.extend({
                                 'type': 'filter'
                             };
                             break;
+                    }
+                    
+                    // If the filtered field has not filter control, show generic filter note
+                    if ($('.filter [data-filter-field="' + filterField + '"]').length > 0) {
+                        if ($('.filter [data-filter-field="' + filterField + '"] option[value="' + filterValue + '"]').val() == undefined) {
+                            filterNotes[filterField].value = '<i class="fa fa-spin fa-gear"></i>';
+                        }
+                        else {
+                            delete filterNotes[filterField];
+                        }
                     }
                 });
             }

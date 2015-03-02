@@ -290,7 +290,8 @@ Wat.I = {
             $('.content').css('visibility','visible').hide().fadeIn('fast');
             $('.breadcrumbs').css('visibility','visible').hide().fadeIn('fast');
             $('.menu-corner').css('visibility','visible');
-            $('.related-doc').css('visibility','visible');
+            $('.related-doc').css('visibility','visible');                
+            $('.loading').show();
         }
     },
     
