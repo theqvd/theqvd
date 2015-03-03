@@ -16,6 +16,7 @@ plugin 'QVD::Admin4::REST';
 # MojoX::Session::Transport::WAT Package 
 
 $ENV{MOJO_MAX_MESSAGE_SIZE} = 0;
+$ENV{MOJO_TMPDIR} = app->qvd_admin4_api->_cfg('path.storage.images');
 
 app->hook(after_build_tx => sub {
     my ($tx, $app) = @_;

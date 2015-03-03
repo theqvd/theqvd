@@ -28,7 +28,6 @@ my $DIRECTLY_TENANT_RELATED = [qw(User Administrator OSF Tenant_Views_Setup)];
 my $OPERATORS_MAPPER = 
 {
     '~' => 'LIKE'
-
 };
 
 my $UNAMBIGUOUS_FILTERS = 

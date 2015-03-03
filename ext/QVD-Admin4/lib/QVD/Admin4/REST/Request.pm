@@ -201,7 +201,7 @@ sub check_nested_queries_validity_in_json
     my $type_of_action = $self->qvd_object_model->type_of_action;
     my ($method,$code);
 
-    if ($type_of_action =~ /^(cre|upd)ate$/)
+    if ($type_of_action =~ /^create(_or_update)?$/)
     {
 	$method = 'get_acls_for_nested_query_in_creation';
     }
