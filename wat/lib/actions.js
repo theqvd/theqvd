@@ -399,10 +399,10 @@ Wat.A = {
         
         docParams.docBody = array_matches[1];
         
-        Wat.A.fillTemplateString(docParams.docBody, docParams.target, true);
+        Wat.A.fillTemplateString(docParams.docBody, docParams.target, true, docParams);
     },
     
-    fillTemplateString: function (string, target, toc, sectionId) {
+    fillTemplateString: function (string, target, toc) {
         target.html(string);  
 
         if (toc) {
@@ -431,6 +431,11 @@ Wat.A = {
             imagesPrefix: imagesPrefix,
             target: target
         };
+        
+        if (guide == 'multitenant' && !Wat.C.isSuperadmin()) {
+            Wat.A.fillTemplateString (null, target, toc, docParams);
+            return;
+        }
         
         Wat.A.getDocBody(docParams, this.processDocBody);
     },
@@ -469,6 +474,6 @@ Wat.A = {
             var content = '<div class="doc-text" style="height: 50vh;">' + secBody + '</div>';
         }
         
-        Wat.A.fillTemplateString(content, docParams.target, false, docParams.sectionId)
+        Wat.A.fillTemplateString(content, docParams.target, false, docParams)
     }
 };

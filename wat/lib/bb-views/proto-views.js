@@ -235,15 +235,17 @@ Wat.Views.ViewsView = Wat.Views.MainView.extend({
         // Store as selected the current selected section
         this.selectedSection = $('select[name="obj-qvd-select"]').val();
         
-        // Fill OSF select on virtual machines creation form
-        var params = {
-            'action': 'tenant_tiny_list',
-            'controlName': 'tenant-select',
-        };
-                
-        Wat.A.fillSelect(params, function () {
-            Wat.I.updateChosenControls('[name="tenant-select"]');
-        });  
+        if (Wat.C.isSuperadmin()) {
+            // Fill Tenant select on viees customization view
+            var params = {
+                'action': 'tenant_tiny_list',
+                'controlName': 'tenant-select',
+            };
+
+            Wat.A.fillSelect(params, function () {
+                Wat.I.updateChosenControls('[name="tenant-select"]');
+            });  
+        }
         
         this.getDataAndRender();
     },

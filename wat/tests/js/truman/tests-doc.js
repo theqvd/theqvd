@@ -21,7 +21,12 @@ function languageDocTest() {
             $.each(DOC_AVAILABLE_LANGUAGES, function (iLan, lan) {
                 $.each (Wat.I.docSections, function (iSection, section) {
                     Wat.A.fillTemplateString = function (string, target, toc, docParams) {
-                        notEqual(string, null, 'Documentation section "' + docParams.sectionId + '" was found in guide "' + docParams.guide + '"');
+                        if (docParams.guide == 'multitenant') {
+                            equal(string, null, 'Documentation section "' + docParams.sectionId + '" was not found in guide "' + docParams.guide + '" due the administrator has not permissions');
+                        }
+                        else {
+                            notEqual(string, null, 'Documentation section "' + docParams.sectionId + '" was found in guide "' + docParams.guide + '"');
+                        }
                         start();
                     };
                     
