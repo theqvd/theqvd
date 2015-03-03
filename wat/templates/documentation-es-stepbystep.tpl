@@ -1004,7 +1004,7 @@ Vista listado
 <div class="content">
 <div class="paragraph"><p>La vista principal es un listado con las máquinas virtuales de QVD.
 <span class="image">
-<img src="images/doc_images/screenshot_vm_list.png" alt="screenshot_vm_list.png" width="960px" />
+<img src="images/doc_images/screenshot_vm_list2.png" alt="screenshot_vm_list2.png" width="960px" />
 </span></p></div>
 </div></div>
 </dd>

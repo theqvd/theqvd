@@ -876,12 +876,34 @@ Captura
 </div></div>
 </li>
 </ul></div>
+<div class="paragraph"><p>Tras las migas de pan, aparecerá un icono de libro enlazado a una ventana modal con la documentación general de la sección actual.</p></div>
 </div></div>
 </li>
 <li>
 <p>
 <strong>Contenido</strong>: La mayor parte de la pantalla, bajo el menú de sección y las migas de pan, será dedicada a mostrar el contenido de cada página.
 </p>
+</li>
+<li>
+<p>
+<strong>Documentación relacionada</strong>: En la parte inferior de cada pantalla se encuentran una serie de enlaces a partes de la documentación relacionados con la sección en la que nos encontramos. Estos enlaces abrirán una ventana modal sin salir de la pantalla donde consultar esta documentación específica.
+</p>
+<div class="openblock">
+<div class="content">
+<div class="ulist"><ul>
+<li>
+<p>
+Captura
+</p>
+<div class="openblock">
+<div class="content">
+<div class="paragraph"><p><span class="image">
+<img src="images/doc_images/related_documentation.png" alt="related_documentation.png" width="600px" />
+</span></p></div>
+</div></div>
+</li>
+</ul></div>
+</div></div>
 </li>
 <li>
 <p>
@@ -1176,7 +1198,7 @@ Gestionar sus propios ACLs, pudiendo llegar a tener permisos totales o incluso p
 <div id="footnotes"><hr /></div>
 <div id="footer">
 <div id="footer-text">
-Last updated 2015-02-09 15:22:45 CET
+Last updated 2015-03-03 10:30:52 CET
 </div>
 </div>
 </body>

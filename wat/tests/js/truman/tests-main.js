@@ -1,6 +1,6 @@
 var login = 'truman';
 var password = 'truman';
-var tenant = 'Madrid';
+var tenant = 'qvd';
 var tenantUserId = 17;
 var tenantVMId = 3;
 var tenantOSFId = 14;
@@ -11,6 +11,9 @@ var tenantHostId = 1;
 backboneTest();
 
 loggedTests = function () {
+    // Render views tests. Just render view by view
+    viewTest();
+    
     // Tests calling API
     userTestReal();
     vmTestReal();
@@ -25,5 +28,3 @@ loggedTests = function () {
 // Login tests
 loginTest();
 
-// Render views tests. Just render view by view
-//viewTest();

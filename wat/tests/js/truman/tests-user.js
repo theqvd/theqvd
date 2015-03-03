@@ -16,7 +16,7 @@ function userTestReal () {
             expect(assertions);
 
             Wat.Router.app_router.trigger('route:listUser');
-
+            
             Wat.CurrentView.model = new Wat.Models.User();
 
             //////////////////////////////////////////////////////////////////

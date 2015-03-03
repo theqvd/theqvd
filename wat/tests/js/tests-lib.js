@@ -22,6 +22,27 @@ function performUpdation (values, updateValues) {
             
             values['__tags__'] = _.union(values['__tags__'], fieldValue.create);
         }
+        else if (fieldName == '__roles_changes__') {
+            values['roles'] = _.difference(values['roles'], fieldValue.unassign_roles);
+            
+            values['roles'] = _.union(values['roles'], fieldValue.assign_roles);
+        }
+        else if (fieldName == '__acls_changes__') {
+            if (values['acls'] != undefined) {
+                values['acls'] = {
+                    "negative": [],
+                    "positive": []
+                };
+            }
+            
+            if (fieldValue.assign_acls != undefined) {
+                values['acls']['negative'] = _.union(values['acls']['negative'], fieldValue.unassign_acls);
+            }
+            
+            if (fieldValue.assign_acls != undefined) {
+                values['acls']['positive'] = _.union(values['acls']['positive'], fieldValue.assign_acls);
+            }
+        }
         else {
             values[fieldName] = fieldValue;
         }

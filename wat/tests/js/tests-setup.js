@@ -109,9 +109,21 @@ WatTests.values = {
             "tenant_id": 1,
             "osf_id": 0
         },
-        tenant: {},
-        admin: {},
-        role: {},
+        tenant: {
+            "name": getRandomStr(),
+            "language": "auto",
+            "block": getRandomInt()
+        },
+        admin: {
+            "name": getRandomStr(),
+            "language": "default",
+            "block": getRandomInt(),
+            "password": getRandomStr(),
+            "tenant_id": null,
+        },
+        role: {
+            "name": getRandomStr()
+        },
         acl: {}
     };
 WatTests.updateValues = {
@@ -177,9 +189,29 @@ WatTests.updateValues = {
             },
             "blocked": WatTests.values.di.blocked ? 0 : 1 // Change blocked status
         },
-        tenant: {},
-        admin: {},
-        role: {},
+        tenant: {
+            "name": getRandomStr(),
+            "language": "en",
+            "block": getRandomInt()
+        },
+        admin: {
+            "name": getRandomStr(),
+            "language": "en",
+            "password": getRandomStr(),
+            "block": getRandomInt(),
+            "__roles_changes__": {
+                "assign_roles": ["1"]
+            }
+        },
+        role: {
+            "name": getRandomStr(),
+            "__acls_changes__": {
+                "unassign_acls": ["user.delete.", "vm.delete"]
+            },
+            "__roles_changes__": {
+                "assign_roles": ["1"]
+            }
+        },
         acl: {}
     };
 
@@ -305,9 +337,29 @@ WatTests.fakeValues = {
                 'property N': getRandomStr()
             }
         },
-        tenant: {},
-        admin: {},
-        role: {},
+        tenant: {
+            "id": getRandomInt(),
+            "name": getRandomStr(),
+            "language": "es",
+            "block": getRandomInt()
+        },
+        admin: {
+            "id": getRandomInt(),
+            "name": getRandomStr(),
+            "language": "en",
+            "block": getRandomInt(),
+            "tenant_id": null,
+            "tenant_name": null,
+            "roles": {}
+        },
+        role: {
+            "name": getRandomStr(),
+            "acls": {
+                "positive": [],
+                "negative": []
+            },
+            "roles": {}
+        },
         acl: {}
     };
 
