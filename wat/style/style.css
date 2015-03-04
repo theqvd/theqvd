@@ -1357,7 +1357,8 @@ body {
       height: auto;
       float: right;
       padding-right: 2%;
-      margin-right: 2%; }
+      margin-right: 2%;
+      margin-bottom: 60px; }
     .wrapper .content .customize-section-selectors {
       display: table;
       table-layout: fixed;

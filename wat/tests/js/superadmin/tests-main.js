@@ -24,6 +24,7 @@ loggedTests = function () {
     tenantTestReal();
     roleTestReal();
     adminTestReal();
+    qvdConfigTestReal();
 
     // Tests switching language and loading each embeded documentation
     languageDocTest();
