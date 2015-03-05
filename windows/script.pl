@@ -3,12 +3,17 @@
 use strict;
 use warnings;
 use 5.010;
+use Getopt::Long;
 
+my $suffix = "";
 my ($revision) = `svn info .` =~ /^Revision:\s*(\d+)/m;
 
+GetOptions("suffix|s=s" => \$suffix) or die "Getopt failed";
+
 my %pl = ( me       => $0,
-		   version  => '3.4.1',
-		   revision => $revision );
+		   version  => '3.5.0',
+		   revision => $revision,
+           suffix   => $suffix );
 
 while (<DATA>) {
 	s|{pl:(\w+)}|$pl{$1} // warn "unknown variable {pl:$1}"|ge;
@@ -26,7 +31,7 @@ __DATA__
 ; (To generate a new GUID, click Tools | Generate GUID inside the IDE.)
 AppId={{DD625C30-A6B1-4C48-A3C2-19B39771028F}
 AppName=QVD Client
-AppVerName=QVD Client {pl:version}-{pl:revision}
+AppVerName=QVD Client {pl:version}-{pl:revision}{pl:suffix}
 AppVersion={pl:version}-{pl:revision}
 AppPublisher=QindelGroup
 AppPublisherURL=http://theqvd.com/
@@ -36,10 +41,11 @@ DefaultDirName={pf}\QVD
 DisableDirPage=yes
 DefaultGroupName=QVD Client
 DisableProgramGroupPage=yes
-OutputBaseFilename=qvd-client-setup-{pl:version}-{pl:revision}
+OutputBaseFilename=qvd-client-setup-{pl:version}-{pl:revision}{pl:suffix}
 Compression=lzma
 SolidCompression=yes
 SetupIconFile=installer\pixmaps\qvd.ico
+AlwaysRestart=yes
 
 [Languages]
 Name: "english"; MessagesFile: "compiler:Default.isl"
@@ -65,5 +71,5 @@ Name: "{commondesktop}\QVD Client"; Filename: "{app}\bin\qvd-client.exe"; Workin
 
 [Registry]
 ; Make LanmanServer accept 127.0.0.1 as its netbios name 
-; REQUIRED for printing to work on Windows 7
-Root: HKLM; Subkey: "System\CurrentControlSet\Services\LanmanServer\Parameters"; ValueType: string; ValueName: "OptionalNames"; ValueData: "127.0.0.1"; Flags: preservestringtype
+; REQUIRED for printing to work on Windows 7 
+Root: HKLM; Subkey: "System\CurrentControlSet\Control\Lsa\MSV1_0"; ValueType: multisz; ValueName: "BackConnectionHostNames"; ValueData: "127.0.0.1{break}localhost"; 

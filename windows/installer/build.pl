@@ -3,7 +3,14 @@ use strict;
 use Cwd;
 use Win32::Console::ANSI;
 use Term::ANSIColor;
+use File::Copy;
 use File::Copy::Recursive qw(dircopy);
+use File::Basename;
+use Getopt::Long;
+
+my $no_debug_installer;
+
+GetOptions("--no-debug-installer" => \$no_debug_installer);
 
 $| = 1;
 
@@ -95,27 +102,59 @@ chdir($installer_dir);
 
 run("exetype", "NX\\nxproxy.exe", "WINDOWS");
 
-run("pp", "-vvv", "-x", "-gui", 
+my @pp_args = ("-vvv", "-x", 
     mklist('-I', 'dir', @includes),
  	mklist('-l', 'file', @dlls),
-	'-o', 'qvd-client-1.exe',
+	'-o', 'qvd-client-1.exe', '-log', 'pp.log',
 	'..\..\ext\QVD-Client\bin\qvd-gui-client.pl');
-	
 
-
-
-
+run("pp", "-gui", @pp_args);
 
 run("reshacker -addoverwrite qvd-client-1.exe, qvd-client.exe, pixmaps\\qvd.ico,icongroup,WINEXE,");
 unlink('qvd-client-1.exe');
 unlink glob('..\Output\*');
+mkdir "..\\archive";
 
-run("perl ..\\script.pl >..\\script.iss");
-run("ISCC.exe ..\\script.iss");
+
+build_installer();
+
+msg("Preparing debug version\n");
+
+
+unless( $no_debug_installer ) {
+	msg("Generating debug installer\n");
+	run("pp", @pp_args);
+	run("exetype", "NX\\nxproxy.exe", "CONSOLE");
+
+	build_installer("--suffix -debug");
+} else {
+	msg("Debug installer disabled, skipping");
+}
+
+	
+msg("Undoing changes to nxproxy");
+run("svn", "revert", "NX\\nxproxy.exe");
 
 msg("Done!\n");
 
-
+sub build_installer {
+	my ($extra_opts) = @_;
+	
+	unlink glob('..\Output\*');
+	
+	run("perl ..\\script.pl $extra_opts >..\\script.iss");
+	run("ISCC.exe ..\\script.iss");
+	
+	my ($filename) = glob("..\\Output\\*");
+	$filename = basename($filename);
+	$filename =~ s/\.exe$//;
+	
+	rename("pp.log", "..\\Output\\${filename}.log");
+	
+	for my $file ( glob("..\\Output\\*" )) {
+		copy($file, "..\\archive\\" . basename($file));
+	}
+}
 
 sub mklist {
 	my ($arg, $type, @paths) = @_;

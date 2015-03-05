@@ -290,6 +290,14 @@ sub connect_to_vm {
         'qvd.client.printing.enabled'   => $self->{printing},
         'qvd.client.usb.enabled'        => $self->{usb},
     );
+	
+	if ( $WINDOWS ) {
+		DEBUG "Sending Windows version and host info";
+		require Win32;
+		$o{'qvd.client.os.name'}    = join('; ' , Win32::GetOSName());
+		$o{'qvd.client.os.version'} = join('; ', Win32::GetOSVersion());
+		$o{'qvd.client.hostname'}   = Win32::NodeName();
+	}
 
     $q = join '&', map { uri_escape($_) .'='. uri_escape($o{$_}) } keys %o;
 
@@ -452,7 +460,7 @@ sub _run {
 
     if ($self->{printing}) {
         if ($WINDOWS) {
-            $o{smb} = 139;
+            $o{smb} = 445;
         } else {
             $o{cups} = 631;
         }
