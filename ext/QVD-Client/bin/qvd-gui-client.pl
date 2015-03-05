@@ -12,6 +12,8 @@ use Proc::Background;
 
 our ($WINDOWS, $DARWIN, $user_dir, $app_dir, $user_config_filename, $user_certs_dir, $pixmaps_dir);
 
+my $prev_bad_log_level;
+
 BEGIN {
     $WINDOWS = ($^O eq 'MSWin32');
     $DARWIN = ($^O eq 'darwin');
@@ -55,9 +57,21 @@ BEGIN {
         $app_dir = File::Spec->catdir( @dirs[0..$#dirs-1] ); 
     }
 
+	
+	if ( core_cfg('log.level') !~ /^(DEBUG|INFO|WARN|ERROR|FATAL|TRACE|ALL|OFF)$/ ) {
+		$prev_bad_log_level = core_cfg('log.level');
+
+		warn "Bad log.level '$prev_bad_log_level', changing to DEBUG";
+		set_core_cfg('log.level', 'DEBUG');
+	}
 }
 
 use QVD::Log;
+
+if ( $prev_bad_log_level ) {
+	WARN "Bad log.level in config file: '$prev_bad_log_level'";
+	WARN "Changed to " . core_cfg('log.level');
+}
 
 INFO "user_dir: $user_dir";
 INFO "app_dir: $app_dir";
