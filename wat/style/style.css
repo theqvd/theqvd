@@ -151,14 +151,19 @@ fieldset {
 .error {
   color: #cc0000; }
 
-.error-404 {
+.error-404, .error-refresh {
   text-align: center; }
-  .error-404 i.fa {
+  .error-404 i.fa, .error-refresh i.fa {
     font-size: 90px;
     color: #c4c4c4; }
-  .error-404 div {
+  .error-404 div, .error-refresh div {
     font-size: 50px;
     color: #c4c4c4; }
+
+.error-refresh {
+  margin-top: 30px; }
+  .error-refresh a {
+    margin-top: 20px; }
 
 .no-elements {
   font-style: italic;

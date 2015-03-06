@@ -88,7 +88,7 @@ fieldset {
     color: darken($col_red, 10);
 }
 
-.error-404 {
+.error-404, .error-refresh {
     text-align: center;
     i.fa {
         font-size: 90px;
@@ -100,6 +100,13 @@ fieldset {
     }
 }
 
+.error-refresh {
+    margin-top: 30px;
+    
+    a {
+        margin-top: 20px;
+    }
+}
 
 .no-elements {
     font-style: italic;

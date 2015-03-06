@@ -12,6 +12,9 @@ Wat.Views.LoginView = Wat.Views.MainView.extend({
         var templates = {
             login: {
                 name: 'login'
+            },
+            errorRefresh: {
+                name: 'error-refresh'
             }
         }
 
@@ -30,9 +33,15 @@ Wat.Views.LoginView = Wat.Views.MainView.extend({
             Wat.C.multitenant = this.retrievedData.multitenant;
         }
         
+        var template = Wat.TPL.login;
+        
+        if (this.retrievedData.readyState == 0) {
+            template = Wat.TPL.errorRefresh;
+        }
+        
         // Fill the html with the template
         this.template = _.template(
-            Wat.TPL.login, {
+            template, {
                 multitenant: Wat.C.multitenant
             }
         );
