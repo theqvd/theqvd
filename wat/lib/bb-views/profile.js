@@ -27,6 +27,9 @@ Wat.Views.ProfileView = Wat.Views.DetailsView.extend({
         
         this.model = new Wat.Models.Admin(params);
         
+        // The profile action to update current admin data is 'myadmin_update'
+        this.model.setActionPrefix('myadmin');
+        
         // Extend the common events
         this.extendEvents(this.eventsDetails);
         

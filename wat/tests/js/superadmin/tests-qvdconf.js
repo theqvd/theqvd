@@ -257,4 +257,70 @@ function qvdConfigTestReal () {
 
             }, this);
         });
+    
+
+/* STRESS TEST
+
+        QUnit.asyncTest("QVD Config stress test", function() {
+            var testedKeys = 100;
+            
+            assertions = testedKeys * 4; // Creation + 2 Updates + Delete
+            expect(assertions);
+
+            stop(assertions-1);
+            
+            var customBranch = getRandomStr();
+            
+            var deleteAction = 'config_delete';
+            var updateAction = 'config_set';
+            var getAction = 'config_get';
+            
+            // Create keys
+            for(i=1;i<=testedKeys;i++) {
+                var createArguments = {
+                    'key': customBranch + '.key' + i,
+                    'value': 1
+                };
+                
+                Wat.A.performAction(updateAction, createArguments, {}, {}, function (that) {
+                    equal(that.retrievedData.status, STATUS_SUCCESS, "QVD config custom key '" + that.key + "' created successfully");
+                    start();
+
+                    var updateArguments = {
+                        "key": that.key,
+                        "value": "0"
+                    };
+                    
+                    Wat.A.performAction(updateAction, updateArguments, {}, {}, function (that) {
+                        equal(that.retrievedData.status, STATUS_SUCCESS, "Config key '" + that.key + "' update successfully to '" + that.value + "' (" + that.retrievedData.message + ")");
+
+                        var updateArguments = {
+                            "key": that.key,
+                            "value": "1"
+                        };
+                        start();
+
+                        Wat.A.performAction(updateAction, updateArguments, {}, {}, function (that) {
+                            equal(that.retrievedData.status, STATUS_SUCCESS, "Config key '" + that.key + "' update successfully to '" + that.value + "' (" + that.retrievedData.message + ")");
+                            start();
+                            
+                            var deleteFilters = {
+                                "key": that.key
+                            };
+                            
+                            // Delete another custom key
+                            Wat.A.performAction(deleteAction, {}, deleteFilters, {}, function (that) {
+                                equal(that.retrievedData.status, STATUS_SUCCESS, "Deleted key successfully (" + that.key + ")");
+                                start();
+                            }, deleteFilters);
+                            
+                        }, updateArguments);
+                        
+                    }, updateArguments);
+                    
+                }, createArguments);
+            }
+        });
+*/
+
 }

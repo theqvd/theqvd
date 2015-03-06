@@ -10,7 +10,7 @@ var tenantHostId = 1;
 // Backbone's Models and Collections instantiation
 backboneTest();
 
-loggedTests = function () {
+afterProfileTests = function () {
     // Render views tests. Just render view by view
     viewTest();
     
@@ -20,11 +20,17 @@ loggedTests = function () {
     hostTestReal();
     osfTestReal();
     diTestReal();
-    
+    qvdViewsAdminReal();
+
     // Tests switching language and loading each embeded documentation
     languageDocTest();
 }
 
+
+loggedTests = function () {
+    profileTest();
+}
+
 // Login tests
-loginTest();
+loginTest(login, password, tenant, loggedTests);
 

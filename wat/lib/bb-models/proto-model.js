@@ -41,6 +41,10 @@ Wat.Models.Model = Backbone.Model.extend({
             "&filters={\"id\":" + this.id + "}";
     },
     
+    setActionPrefix: function (newActionPrefix) {
+        this.actionPrefix = newActionPrefix;
+    },
+    
     setOperation: function (operation) {
         switch (operation) {
             case 'create':

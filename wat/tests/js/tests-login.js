@@ -1,4 +1,4 @@
-function loginTest () {
+function loginTest (login, password, tenant, callback) {
     module( "Login tests", {
         setup: function() {
             Wat.C.logOut();
@@ -21,6 +21,7 @@ function loginTest () {
                 if (Wat.Router.app_router != undefined) {
                     Wat.C.afterLogin = function () {
                         if (Wat.Router.app_router == undefined) {
+                            callback();
                             return;
                         }
                         Wat.Router.app_router.trigger('route:defaultRoute');        
@@ -31,7 +32,7 @@ function loginTest () {
                         equal($.cookie('qvdWatLogin'), Wat.C.login, "User stored in cookies");
 
                         start();
-                        loggedTests();
+                        callback();
                     }
 
                     afterGetApiInfo = function (ret) {  
@@ -50,7 +51,7 @@ function loginTest () {
                     Wat.A.apiInfo(afterGetApiInfo, {});
                     clearInterval(waitingRouter);
                 }
-            }, 1000);
+            }, 300);
             
         });
 }

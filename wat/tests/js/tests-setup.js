@@ -11,8 +11,7 @@ WatTests.models = {
         di: {},
         tenant: {},
         admin: {},
-        role: {},
-        acl: {}
+        role: {}
     };
 WatTests.collections = {
         user: {},
@@ -22,8 +21,7 @@ WatTests.collections = {
         di: {},
         tenant: {},
         admin: {},
-        role: {},
-        acl: {}
+        role: {}
     };
 WatTests.listViews = {
         user: {},
@@ -33,8 +31,7 @@ WatTests.listViews = {
         di: {},
         tenant: {},
         admin: {},
-        role: {},
-        acl: {}
+        role: {}
     };
 WatTests.detailViews = {
         user: {},
@@ -44,8 +41,7 @@ WatTests.detailViews = {
         di: {},
         tenant: {},
         admin: {},
-        role: {},
-        acl: {}
+        role: {}
     };
 WatTests.values = {
         user: {
@@ -123,8 +119,7 @@ WatTests.values = {
         },
         role: {
             "name": getRandomStr()
-        },
-        acl: {}
+        }
     };
 WatTests.updateValues = {
         user: {
@@ -211,8 +206,7 @@ WatTests.updateValues = {
             "__roles_changes__": {
                 "assign_roles": ["1"]
             }
-        },
-        acl: {}
+        }
     };
 
 // Calculate random string for DI version here because will be assigned to two fields
@@ -359,8 +353,7 @@ WatTests.fakeValues = {
                 "negative": []
             },
             "roles": {}
-        },
-        acl: {}
+        }
     };
 
 

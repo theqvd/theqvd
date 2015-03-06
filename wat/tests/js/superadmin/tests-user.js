@@ -164,4 +164,82 @@ function userTestReal () {
                 });
             });
         });
+            
+    /* STRESS TEST
+
+        QUnit.asyncTest("Users stress test", function() {
+            var testedKeys = 100;
+            
+            assertions = testedKeys * 4; // Creation + 2 Updates + Delete
+            expect(assertions);
+
+            stop(assertions-1);
+            
+            var customBranch = getRandomStr();
+            
+            var deleteAction = 'user_delete';
+            var updateAction = 'user_update';
+            var createAction = 'user_create';
+            var getAction = 'config_get';
+            
+            // Create keys
+            for(i=1;i<=testedKeys;i++) {
+                var createArguments = {
+                    'name': 'userX' + i,
+                    'blocked': 0,
+                    'password': 'x',
+                    'tenant_id': 0
+                };
+                
+                Wat.A.performAction(createAction, createArguments, {}, {}, function (that) {
+                    var id = that.retrievedData.rows[0].id;
+
+                    equal(that.retrievedData.status, STATUS_SUCCESS, "User '" + that.name + "' created successfully with ID " + id);
+                    start();
+                    
+                    var updateArguments = {
+                        "password": "y"
+                    };
+                    
+                    var updateFilters = {
+                        id: id
+                    }
+                    
+                    Wat.A.performAction(updateAction, updateArguments, updateFilters, {}, function (that) {
+                        equal(that.retrievedData.status, STATUS_SUCCESS, "User '" + that.id + "' update successfully (" + that.retrievedData.message + ")");
+                    
+                        var updateArguments = {
+                            "password": "x"
+                        };
+
+                        var updateFilters = {
+                            id: that.id
+                        }
+                        
+                        start();
+
+                        Wat.A.performAction(updateAction, updateArguments, updateFilters, {}, function (that) {
+                            equal(that.retrievedData.status, STATUS_SUCCESS, "User '" + that.id + "' update successfully (" + that.retrievedData.message + ")");
+                            start();
+                            
+                            var deleteFilters = {
+                                id: that.id
+                            }
+                            
+                            // Delete another custom key
+                            Wat.A.performAction(deleteAction, {}, deleteFilters, {}, function (that) {
+                                equal(that.retrievedData.status, STATUS_SUCCESS, "Deleted user '" + that.id + "' successfully (" + that.retrievedData.message + ")");
+                                start();
+                            }, deleteFilters);
+                            
+                        }, $.extend({}, updateArguments, updateFilters));
+                        
+                    }, $.extend({}, updateArguments, updateFilters));
+                    
+                }, createArguments);
+            }
+        });
+
+    */
+
 }
