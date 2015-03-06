@@ -9,6 +9,62 @@ use Mojo::Message::Response;
 use Encode;
 use File::Basename qw(basename dirname);
 
+our $COMMON_USAGE_TEXT =
+"
+======================================================================================================
+                                             COMPLEX FILTERS
+======================================================================================================
+
+  A filter is a key/value pair. Key and value can be related by means of different kinds of 
+  IDENTITY OPERATORS (=, >, <, etc.). Different operators allow different kinds of values 
+  (numeric, alphanumeric, arrays, ranges...). Morover, two or more filters can be joined by means 
+  of LOGICAL OPERATORS (coordination, disjunction and negation operators).
+
+  DIFFERENT IDENTITY OPERATORS:
+  Supported operators:
+
+  =  (equal)
+  <  (less than)
+  >  (greater that)
+  <= (less or equal than)
+  >= (greater or equal than)
+  ~  (matches with a commodins expression: the SQL LIKE operator)
+
+  For example:
+  key1 = 1, 
+  key1 < 3, 
+  key1 > 3, 
+  key1 <= 3, 
+  key1 >= 3
+  key1 = [1,2,3] (key1 must be in (1, 2, 3))
+  key1 = [1:3] (key1 must be between 1 and 3)
+  key1 = This_is_a_chain
+  key1 = 'This is a chain' (A value with blanks must be quoted)
+  key1 = \"This is a chain\" (A value with blanks must be quoted)
+  key1 ~ %s_is_a_ch% (key1 must match the SQL commodins expression %s_is_a_ch%)
+  key1 ~ '%s is a ch%' (key1 must match the SQL commodins expression %s_is_a_ch%)
+  key1 ~ \"%s is a ch%\" (key1 must match the SQL commodins expression %s_is_a_ch%)
+
+  LOGICAL OPERATORS
+  Supported operators
+
+  , (the AND operator)
+  ; (the OR operator)
+  ! (the NOT operator)
+
+  (These operators have left precedence. In order to override this behaviour you must 
+   grup filters with '(' and ')')
+
+  For example:
+  key1=value, key2=value, key3=value (key1 AND key2 AND key3)
+  (key1=value; key2=value), key3=value ((key1 OR key2) AND key3))
+  !key1=value (This expresion means: NOT key1)
+  !key1=value, key2=value, key3=value (NOT ( key1 AND key2 AND key3))
+  (! key1=value), key2=value, key3=value ((NOT key1) AND key2 AND key3))
+
+======================================================================================================
+";
+
 my $FILTERS =
 {
     vm => { storage => 'storage', id => 'id', name => 'name', user => 'user_name', osf => 'osf_name', tag => 'di_tag', blocked => 'blocked', 
@@ -401,7 +457,7 @@ sub ask_api
 {
     my ($self,$query) = @_;
 
-    return $self->ask_api_staging($query)
+    return $self->ask_api_di_upload($query)
 	if $query->{action} eq 'di_create';
 
     my $app = $self->get_app;
@@ -500,6 +556,12 @@ sub ask_api_staging
 				    $tx->on(message => $on_message_cb); $tx->send('Ale');} );
 
     Mojo::IOLoop->start;
+
+    die 'API returns bad status' 
+	unless $res->code;
+
+    $self->check_api_result($res);
+
     Mojo::Message::Response->new(json => $res);
 }
 
@@ -527,14 +589,14 @@ sub ask_api_di_upload
     delete $query->{filters};
     delete $query->{fields};
     delete $query->{order_by};
-
-    my $res = $ua->post("$url", form => { %credentials, %$query, file => { file => $file }})->res;
-
-    die 'API returns bad status' 
-	unless $res->code;
-
-    $self->check_api_result($res);
-
+    
+    my $res; 
+    Mojo::IOLoop->delay(
+	sub { my $delay = shift;
+	      $ua->post("$url", form => { %credentials,%$query, file => { file => $file }}, $delay->begin); },
+	
+	sub { my ($delay,$tx) = @_; $res = $tx->res; })->wait;
+    
     return $res;
 }
 

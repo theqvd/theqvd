@@ -4,18 +4,65 @@ use strict;
 use warnings;
 use QVD::Admin4::CLI::Command;
 
+
 sub usage_text { 
 
+"======================================================================================================
+                                             TENANT COMMAND USAGE
+======================================================================================================
+
+== CREATING A NEW TENANT
+
+  tenant new <ARGUMENTS>
+  
+  For example: 
+  tenant name=mytenant (Creates a TENANT with name 'mytenant') 
+
+== GETTING TENANTs
+
+  tenant get
+  tenant <FILTERS> get
+  tenant <FILTERS> get <FIELDS TO RETRIEVE>
+
+  For example: 
+  tenant get (retrieves default fields of all TENANTs)
+  tenant name=mytenant get (retrieves default fields of all TENANTs with name 'mytenant')
+  tenant name=mytenant get name, id (retrieves 'name', 'id' of TENANTs with name 'mytenant') 
+
+  Ordering:
+
+  tenant ... order <ORDER CRITERIA>
+  tenant ... order <ORDER DIRECTION> <ORDER CRITERIA>
+
+  For example: 
+  tenant get order name (Ordering by 'name' in default ascendent order)
+  tenant get order asc name, id (Ordering by 'name' and 'id' in ascendent order)
+  tenant get order desc name, id (Ordering by 'name' and 'id' in descendent order)
+
+== UPDATING TENANTs
+
+  tenant set <ARGUMENTS>
+  tenant <FILTERS> set <ARGUMENTS>
+
+  For example: 
+  tenant set language=en (Sets new value for language in all TENANTs)
+  tenant name=mytenant set language=en, block=10 (Sets new values for language and block in TENANT with name mytenant)
+
+== REMOVING TENANTs
+  
+  tenant del
+  tenant <FILTERS> del
+
+  For example: 
+  tenant del (Removes all TENANTs) 
+  tenant name=mytenant del (Removes TENANT with name mytenant)
+
+$QVD::Admin4::CLI::Command::COMMON_USAGE_TEXT
 "
-tenant get
-tenant filter1=value1, filter2=value2 (, filter3=value3, ...) get
-tenant (filters) get field1, field2(, field3, ...)
-tenant ... get ... order (asc|desc) criteria1, criteria2(, criteria 3, ...)
-tenant (filters) set argument1=value1, argument2=value2(, argument3=value3, ...)
-tenant new argument1=value1, argument2=value2(, argument3=value3, ...)
-tenant (filters) block|unblock
-" 
+
 }
+
+
 
 sub run 
 {

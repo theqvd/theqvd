@@ -1,6 +1,6 @@
 #!/usr/bin/perl
 use Mojolicious::Lite;
-use lib::glob '/home/ubuntu/wat/*/lib/';
+use lib::glob '/home/benjamin/wat/*/lib/';
 use Mojo::JSON qw(encode_json decode_json j);
 use QVD::Admin4::Exception;
 use MojoX::Session;
@@ -9,7 +9,6 @@ use Mojo::IOLoop::ForkCall;
 use Mojo::Log;
 use Mojo::ByteStream 'b';
 use Deep::Encode;
-use QVD::Config;
 
 plugin 'QVD::Admin4::REST';
 
@@ -27,7 +26,7 @@ app->hook(after_build_tx => sub {
         my $size = $message->content->progress;
 	my $percent = $size == $len ? 100 : int($size / ($len / 100));
         print 'Progress: ', $percent , '%', " size: $size","\r";
-    })
+		 })
 });
 
 any [qw(POST GET)] => '/info' => sub {
@@ -51,6 +50,7 @@ package MojoX::Session::Transport::WAT
 	my ($self) = @_;
 	my $json = $self->tx->req->json;
 	my $sid = $json ? $json->{sid} : $self->tx->req->params->param('sid');
+
 	return $sid;
     }
 
@@ -63,7 +63,7 @@ package MojoX::Session::Transport::WAT
 
 # GENERAL CONFIG AND PLUGINS
 
-app->config(hypnotoad => {listen => ['http://192.168.3.7:3000']});
+app->config(hypnotoad => {listen => ['http://localhost:3000']});
 
 # HELPERS
 
@@ -83,6 +83,7 @@ helper (reject_access => \&reject_access);
 under sub {
 
     my $c = shift;
+
     $c->res->headers->header('Access-Control-Allow-Origin' => '*');
     $c->res->headers->header('Access-Control-Expose-Headers' => 'sid');
     QVD::Config::reload();
@@ -186,11 +187,13 @@ websocket '/staging' => sub {
         );
 };
 
+#$controller->tx->connection
+
+
 any [qw(POST OPTIONS)] => '/di/upload' => sub {
 
     my $c = shift;
     $c->inactivity_timeout(30000);     
-
     my $response;
 
     if ($c->req->method eq 'POST')
@@ -204,10 +207,11 @@ any [qw(POST OPTIONS)] => '/di/upload' => sub {
 	    eval 
 	    { 
 		my $disk_image = $json->{arguments}->{disk_image};
-		my $file = $c->req->upload('file');
 		my $images_path  = $c->qvd_admin4_api->_cfg('path.storage.images');
 		my $di_id = ${$response->{rows}}[0]->{id};
-		$file->move_to($images_path .'/'. $di_id . '-'. $disk_image)
+
+		my $file = $c->req->upload('file');
+		$file->move_to($images_path .'/'. $di_id . '-'. $disk_image);
 	    }; 
 	    print $@ if $@;
 	    $c->render(json => QVD::Admin4::Exception->new(code => 2210)->json) if $@;
@@ -221,7 +225,6 @@ any [qw(POST OPTIONS)] => '/di/upload' => sub {
     $c->render(text => b(encode_json($response))->decode('UTF-8'));
 };
 
-
 app->start;
 
 #################
@@ -232,6 +235,7 @@ sub get_input_json
 {
     my $c = shift;
     my $json = $c->req->json;
+
     return $json if $json;
 
     $json =  { map { $_ => b($c->param($_))->encode('UTF-8')->to_string } $c->param };

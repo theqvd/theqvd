@@ -4,15 +4,34 @@ use strict;
 use warnings;
 use QVD::Admin4::CLI::Command;
 
+
 sub usage_text { 
 
+"======================================================================================================
+                                             CONFIG COMMAND USAGE
+======================================================================================================
+
+== GETTING CONFIG TOKENS
+
+  config get <CONFIG TOKEN NAME>
+
+== SETTING CONFIG TOKENS
+
+  Ordering:
+
+  acl ... order <ORDER CRITERIA>
+  acl ... order <ORDER DIRECTION> <ORDER CRITERIA>
+
+  For example: 
+  acl get order name (Ordering by 'name' in default ascendent order)
+  acl get order asc name, id (Ordering by 'name' and 'id' in ascendent order)
+  acl get order desc name, id (Ordering by 'name' and 'id' in descendent order)
+
+$QVD::Admin4::CLI::Command::COMMON_USAGE_TEXT
 "
-config get
-config get parameter
-config del parameter
-config set parameter_key=parameter_value
-" 
+
 }
+
 
 sub run 
 {

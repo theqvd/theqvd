@@ -11,7 +11,7 @@ sub run
     my $app = $self->get_app;
     my $usage = $app->usage(@args);
 
-    system("more <<DELIM
+    system("less <<DELIM
 $usage
 DELIM");
 }
