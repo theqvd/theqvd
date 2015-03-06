@@ -462,7 +462,7 @@ Wat.C = {
         if (!Wat.C.isMultitenant()) {
             $.each(Wat.I.docSections, function (iSec, sec) {
                 if (sec.guide == 'multitenant') {
-                    delete Wat.I.docSections[iSec][lan];
+                    delete Wat.I.docSections[iSec];
                 }
             });
         }
