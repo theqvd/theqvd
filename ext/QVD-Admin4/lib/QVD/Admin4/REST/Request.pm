@@ -57,7 +57,8 @@ sub BUILD
     $self->check_filters_validity_in_json;
 
     $self->check_update_arguments_validity_in_json if
-	$self->qvd_object_model->type_of_action eq 'update';
+	$self->qvd_object_model->type_of_action eq 'update' &&
+	(not $self->json_wrapper->action eq 'myadmin_update');
 
     $self->check_create_arguments_validity_in_json if
 	$self->qvd_object_model->type_of_action =~ /^create(_or_update)?$/;
@@ -269,15 +270,13 @@ sub forze_filtering_by_own_admin
 {
     my $self = shift;
 
-    my $has_id;
-    my $id = $self->qvd_object_model->map_filter_to_dbix_format('id');
-    for my $id ($self->json_wrapper->get_filter_value($id))
+    for my $id ($self->json_wrapper->get_filter_value('id'))
     {
 	QVD::Admin4::Exception->throw(code => 6320, object => 'id')
 	    unless $id  eq $ADMIN->id;
-	$has_id = 1;
     } 
 
+    my $id = $self->qvd_object_model->map_filter_to_dbix_format('id');
     $self->filters->add_filter($id,$ADMIN->id);
 }
 

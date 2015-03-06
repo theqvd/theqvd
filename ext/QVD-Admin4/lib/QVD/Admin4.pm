@@ -149,11 +149,16 @@ sub create_or_update
     my ($self,$request) = @_;
     my $result;
 
-    eval
+    for (1 ..5)
     {
-	$DB->txn_do( sub { my $obj = $DB->resultset($request->table)->update_or_create($request->arguments);
-			   $result->{rows} = [ $obj ] } )
-    };
+	eval
+	{
+	    $DB->txn_do( sub { my $obj = $DB->resultset($request->table)->update_or_create($request->arguments);
+			       $result->{rows} = [ $obj ] } )
+	};
+    
+	last unless $@;
+    }
 
     QVD::Admin4::Exception->throw(exception => $@, query => 'set') if $@;
 

@@ -12,7 +12,7 @@ __PACKAGE__->add_columns(
 	}
 	);
 __PACKAGE__->set_primary_key('key');
-
+__PACKAGE__->add_unique_constraint([qw(key)]);
 sub get_has_many { qw(); }
 sub get_has_one { qw(); }
 sub get_belongs_to { qw(); }
