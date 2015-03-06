@@ -454,9 +454,21 @@ sub _run {
             }
         }
     }
-   
-    
-    $o{media} = 4713 if $self->{audio};
+
+    if ($self->{audio}) {
+	if (defined(my $ps = $ENV{PULSE_SERVER})) {
+	    # FIXME: we should read /etc/pulseaudio/client.conf and
+	    # honor it and also be able to forward media to a UNIX
+	    # socket!!!
+	    if ($ps =~ /^(?:tcp:localhost:)?(\d+)$ /) {
+		$o{media} = $1;
+	    }
+	    else {
+		WARN "Unable to detect PulseAudio configuration from \$PULSE_SERVER ($ps)";
+	    }
+	}
+	$o{media} //= 4713;
+    }
 
     if ($self->{printing}) {
         if ($WINDOWS) {
