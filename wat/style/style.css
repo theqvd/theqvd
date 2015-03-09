@@ -823,17 +823,30 @@ body {
         float: left;
         margin-right: 15px; }
 
-.loading {
-  font-size: 75px;
+.loading, .loading-mid {
   width: 75px;
   top: 25vh;
   color: #e4e4e4;
   margin: 50px auto; }
   @media screen and (min-width: 40em) {
-    .loading {
+    .loading, .loading-mid {
       font-size: 200px;
       width: 200px;
       top: 25vh; } }
+
+.loading {
+  font-size: 75px; }
+  @media screen and (min-width: 40em) {
+    .loading {
+      font-size: 200px; } }
+
+.loading-mid {
+  text-align: center;
+  width: 100%;
+  font-size: 45px; }
+  @media screen and (min-width: 40em) {
+    .loading-mid {
+      font-size: 150px; } }
 
 .mini-loading {
   font-size: 45px;

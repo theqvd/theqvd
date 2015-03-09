@@ -138,8 +138,7 @@ body {
     }
 }
 
-.loading {
-    @include icon-size(75px);
+.loading, .loading-mid {
     width: 75px;
     top: 25vh;
     @include in(desktop) {
@@ -150,6 +149,22 @@ body {
     color: darken($col_whiter, 10);
     
     margin: 50px auto;
+}
+
+.loading {
+    @include icon-size(75px);
+    @include in(desktop) {
+        @include icon-size(200px);
+    }
+}
+
+.loading-mid {
+    text-align: center;
+    width: 100%;
+    @include icon-size(45px);
+    @include in(desktop) {
+        @include icon-size(150px);
+    }
 }
 
 .mini-loading {
