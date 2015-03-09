@@ -992,6 +992,15 @@ Edición
 </dd>
 </dl></div>
 </div>
+<div class="sect2">
+<h3 id="_vistas_por_defecto">5.3. Vistas por defecto</h3>
+<div class="paragraph"><p>Detro de la sección <em>Gestión del WAT</em>, está el apartado de <em>Vistas por defecto</em> donde podremos configurar las columnas y filtros que se mostrarán por defecto en cada una de las vistas en el WAT.</p></div>
+<div class="paragraph"><p>Si estamos en modo multitenant, en este apartado podremos no solo configurar estos elementos en el supertenant, sino que también podremos hacerlo para cada uno de los tenants del sistema.</p></div>
+<div class="paragraph"><p>Para ello, además de un combo selector con la sección que queremos personalizar, aparecerá otro combo de selección con el tenant al que afectará esta configuración.</p></div>
+<div class="paragraph"><p><span class="image">
+<img src="images/doc_images/default_views_multitenant.png" alt="default_views_multitenant.png" width="960px" />
+</span></p></div>
+</div>
 </div>
 </div>
 <div class="sect1">
@@ -1125,7 +1134,7 @@ Contraseña: to the rescue</code></pre>
 <div id="footnotes"><hr /></div>
 <div id="footer">
 <div id="footer-text">
-Last updated 2015-02-27 11:35:19 CET
+Last updated 2015-03-09 16:14:44 CET
 </div>
 </div>
 </body>

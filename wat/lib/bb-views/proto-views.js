@@ -193,6 +193,8 @@ Wat.Views.ViewsView = Wat.Views.MainView.extend({
     },
     
     changeSection: function (e) {
+        $('.js-customize-columns').html('<i class="fa fa-spin fa-gear loading-mid"></i>');
+        $('.js-customize-filters').html('<i class="fa fa-spin fa-gear loading-mid"></i>');
         this.selectedSection = $('select[name="obj-qvd-select"]').val();
 
         if (Wat.C.isSuperadmin()) {

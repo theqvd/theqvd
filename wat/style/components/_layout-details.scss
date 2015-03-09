@@ -62,7 +62,7 @@
     }
 }
 
-.details-header {
+.details-header, .info-header {
     border: 1px solid darken($col_whiter, 7);
     border-radius: 2px;
     background: darken($col_whiter, 5);
@@ -72,6 +72,15 @@
     padding-top: 10px;
     padding-left: 5px;
     padding-right: 5px;
+    line-height: 1.2em;
+}
+
+.info-header {
+    height: auto;
+    padding: 10px;
+    .fa:before {
+        margin-right: 5px;    
+    }
 }
 
 .details-list, .custom-props-container {

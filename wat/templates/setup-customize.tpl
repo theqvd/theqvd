@@ -1,8 +1,8 @@
  <%
  if (viewKind == 'tenant') {
  %>
-    <div class="details-header">
-        <span data-i18n class="fa fa-info-circle">Definition of default elements shown in WAT's sections</span>. 
+    <div class="info-header">
+        <span data-i18n class="fa fa-info-circle">Definition of default elements shown in WAT's sections</span>.<br> 
         <span data-i18n class="fa fa-info-circle">Each administrator will be able to customize his own views overriding this configuration</span>.
     </div>
  <%

@@ -7,7 +7,11 @@ Wat.Views.SetupCustomizeView = Wat.Views.ViewsView.extend({
     setAction: 'tenant_view_set',
     
     viewKind: 'tenant',
-
+    
+    relatedDoc: {
+        views_multitenant: "Default views (multitenant)",
+    },
+    
     breadcrumbs: {
         'screen': 'Home',
         'link': '#',
