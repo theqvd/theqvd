@@ -18,7 +18,11 @@ sub allow_access_to_vm {
     return $auth->user_id == $vm->user_id;
 }
 
-sub normalize_login { $_[1] }
+sub normalize_tenant { $_[2] }
+
+sub normalize_login { $_[2] }
+
+sub find_tenant {}
 
 1;
 
