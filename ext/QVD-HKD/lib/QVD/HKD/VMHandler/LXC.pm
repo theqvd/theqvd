@@ -423,6 +423,10 @@ EOC
 sub _start_lxc {
     my $self = shift;
 
+    my $lxc_version = $self->_cfg('command.version.lxc');
+    my @lxc_cmd = ('lxc-start', -n => $self->{lxc_name}, -P => $self->_cfg('path.run.lxc'));
+    push @lxc_cmd, '-F' if $lxc_version >= 1.1;
+
     my $hv_out = $self->_hypervisor_output_redirection;
 
     $self->_run_cmd( { save_pid_to => 'vm_pid',
@@ -433,7 +437,7 @@ sub _start_lxc {
                        '>' => $hv_out,
                        '2>' => $hv_out,
                      },
-                     'lxc-start', -n => $self->{lxc_name}, -P => $self->_cfg('path.run.lxc'));
+                     @lxc_cmd);
     $self->_on_done;
 }
 
