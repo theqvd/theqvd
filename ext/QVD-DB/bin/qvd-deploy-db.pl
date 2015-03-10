@@ -16,3 +16,5 @@ unless ($force) {
 
 db->deploy({add_drop_table => 1});
 
+rs(Tenant)->create({id => 0, name => '*'});
+rs(Tenant)->create({id => 1, name => 'default'});
