@@ -70,6 +70,10 @@ sub reset_filter {
     shift->{filter} = {}
 }
 
+sub debug {
+    db->storage->debug(1);
+}
+
 sub get_resultset {
     my ($self, $obj) = @_;
     my $db_object = $self->{objects}{$obj};
@@ -630,8 +634,8 @@ sub cmd_osf_add {
     my $id;
     txn_do {
         my $rs = $self->get_resultset('osf');
-        use Data::Dumper;
-        print Dumper $self;
+        # use Data::Dumper;
+        # print Dumper $self;
         my $row = $rs->create(\%params);
         $id = $row->id;
     };

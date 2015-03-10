@@ -111,6 +111,10 @@ sub set_filter {
     $self->{admin}->set_filter(%conditions);
 }
 
+sub debug {
+    shift->{admin}->debug;
+}
+
 sub get_resultset {
     shift->{admin}->get_resultset(@_);
 }
