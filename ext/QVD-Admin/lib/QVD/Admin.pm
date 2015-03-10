@@ -53,7 +53,7 @@ sub set_filter {
     }
 }
 
-my %tenant_aware = map { $_ => 1 } qw(vm osf user config);
+my %tenant_aware = map { $_ => 1 } qw(osf user config);
 my %tenant_zero  = map { $_ => 1 } qw(config);
 
 sub set_tenant_id {
@@ -85,8 +85,8 @@ sub get_resultset {
         return $self->$method;
     }
     my $rs = rs($db_object);
-    if (grep $_ eq $obj, qw(osf)) {
-        $self->{tenant_id} // ($tenant_zero{$obj} ? 0 : 1);
+    if ($tenant_aware{$obj}) {
+        $self->{tenant_id} //= ($tenant_zero{$obj} ? 0 : 1);
         $self->{filter}{tenant_id} //= $self->{tenant_id};
     }
     $rs = $rs->search($self->{filter})
