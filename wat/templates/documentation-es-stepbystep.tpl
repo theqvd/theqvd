@@ -825,6 +825,24 @@ asciidoc.install(2);
 <div class="sect2">
 <h3 id="_documentación">3.2. Documentación</h3>
 <div class="paragraph"><p>En esta sección podremos consultar la documentación del WAT.</p></div>
+<div class="paragraph"><p>La documentación está distribuida en varias guías, entre las cuales se encuentran:</p></div>
+<div class="ulist"><ul>
+<li>
+<p>
+Una guía <strong>Introducción</strong> con la descripción general de los elementos de la interfaz WAT así como claves para entender funcionalidades algo complejas
+</p>
+</li>
+<li>
+<p>
+Una descripción del <strong>WAT paso a paso</strong> donde se recorren los diferentes menus describiendo cada pantalla a través de capturas.
+</p>
+</li>
+<li>
+<p>
+Una <strong>Guía de usuario</strong> con indicaciones para realizar tareas frecuentes como enfrentas los primeros pasos, cambiar la contraseña, creación de una máquina virtual de cero, actualizar una imagen o gestionar los permisos de otros administradores.
+</p>
+</li>
+</ul></div>
 </div>
 </div>
 </div>

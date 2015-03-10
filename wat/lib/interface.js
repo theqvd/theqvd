@@ -537,9 +537,17 @@ Wat.I = {
                 
                 // Focus on first text input
                     $(this).find('input[type="text"]').eq(0).trigger('focus');
+                
+                // Disable scrolling in window to improve dialog experience
+                    $('html, body').css({
+                        'overflow': 'hidden',
+                        'height': '100%'
+                    });
             },
             
             close: function () {
+                // Enable scrolling in window when close
+                    $('html, body').attr('style', '');
             }
         });     
     },
@@ -864,7 +872,7 @@ Wat.I = {
         $('html, body').attr('style', '');
     },
     
-    loadDialogDoc: function (guide, section) {
+    loadDialogDoc: function (guideSection) {
         $('html, body').css({
             'overflow': 'hidden',
             'height': '100%'
@@ -877,7 +885,7 @@ Wat.I = {
         dialogConf.buttons = {
             "Read full documentation": function (e) {
                 $(this).dialog('close');
-                window.location = '#documentation/' + guide;
+                window.location = '#documentation/' + guideSection[0].guide;
             },
             Close: function (e) {
                 $('html, body').attr('style', '');
@@ -894,7 +902,9 @@ Wat.I = {
             $('.js-dialog-container').animate({scrollTop:0});
 
             // Fill div with section documentation
-            Wat.A.fillDocSection(guide, section, undefined, undefined, target)
+            $.each (guideSection, function (iGS, gS) {
+                Wat.A.fillDocSection(gS.guide, gS.section, undefined, undefined, target);
+            });
         };
 
 

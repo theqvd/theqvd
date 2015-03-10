@@ -144,7 +144,7 @@ Wat.Views.MainView = Backbone.View.extend({
                 'controlId': 'tenant_editor',
                 'chosenType': 'single100'
             };
-
+            
             Wat.A.fillSelect(params, function () {
                 // Remove supertenant from tenant selector
                 var existsInSupertenant = $.inArray(that.qvdObj, QVD_OBJS_EXIST_IN_SUPERTENANT) != -1;

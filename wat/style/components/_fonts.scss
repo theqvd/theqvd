@@ -31,6 +31,10 @@ th, td * {
     }
 }
 
+.doc-text {
+    @include font-size(1);
+}
+
 editor-table th, editor-table td * {
     //@include font-size(2);
 }

@@ -41,7 +41,7 @@ Wat.I.docSections = {
         guide: 'stepbystep'
     },
     views_multitenant: { 
-        es: '_vistas_por_defecto',
+        es: '_vistas_por_defecto_multitenant',
         guide: 'multitenant'
     },
     config: { 
@@ -63,6 +63,10 @@ Wat.I.docSections = {
     documentation: { 
         es: '_documentación',
         guide: 'stepbystep'
+    },
+    documentation_multitenant: { 
+        es: '_documentación_multitenant',
+        guide: 'multitenant'
     },
     tenant: { 
         es: '_tenants',

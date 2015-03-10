@@ -904,8 +904,8 @@ Existen <strong>permisos adicionales</strong> como son los de gestión de tenant
 <div class="paragraph"><p>Veremos paso a paso las secciones o <strong>componentes que se añaden al WAT cuando activamos el modo multitenant</strong>. Estos cambios van desde la pantalla de inicio de sesión hasta pequeñas modificaciones en las vistas genéricas de listado o creación de elementos. También podrá aparecer alguna sección nueva si estamos en este modo.</p></div>
 <div class="paragraph"><p>Estos cambios aparecerán <strong>solo para superadministradores</strong> que tengan los permisos adecuados para ello. <strong>Los administradores de tenant no verán ninguna diferencia</strong> con el modo monotenant, salvo una pantalla de inicio de sesión diferente.</p></div>
 <div class="sect2">
-<h3 id="_página_de_inicio_de_sesión">5.1. Página de inicio de sesión</h3>
-<div class="paragraph"><p>Cuando cargamos el WAT, si está configurado en modo multitenant, la pantalla de inicio de sesión tendrá el campo <em>tenant</em> además de <em>usuario y contraseña</em>. Esto es debido a que el nombre de un administrador puede repetirse en diferentes Tenants. En el caso de los superadministradores, se pondrá * en el campo Tenant.</p></div>
+<h3 id="_página_de_inicio_de_sesión_multitenant">5.1. Página de inicio de sesión (multitenant)</h3>
+<div class="paragraph"><p>Cuando cargamos el WAT, está configurado en modo multitenant, la pantalla de inicio de sesión tendrá el campo <em>tenant</em> además de <em>usuario y contraseña</em>. Esto es debido a que el nombre de un administrador puede repetirse en diferentes Tenants. En el caso de los superadministradores, se pondrá * en el campo Tenant.</p></div>
 <div class="paragraph"><p><span class="image">
 <img src="images/doc_images/login_multitenant.png" alt="login_multitenant.png" width="960px" />
 </span></p></div>
@@ -993,13 +993,24 @@ Edición
 </dl></div>
 </div>
 <div class="sect2">
-<h3 id="_vistas_por_defecto">5.3. Vistas por defecto</h3>
-<div class="paragraph"><p>Detro de la sección <em>Gestión del WAT</em>, está el apartado de <em>Vistas por defecto</em> donde podremos configurar las columnas y filtros que se mostrarán por defecto en cada una de las vistas en el WAT.</p></div>
-<div class="paragraph"><p>Si estamos en modo multitenant, en este apartado podremos no solo configurar estos elementos en el supertenant, sino que también podremos hacerlo para cada uno de los tenants del sistema.</p></div>
+<h3 id="_vistas_por_defecto_multitenant">5.3. Vistas por defecto (multitenant)</h3>
+<div class="paragraph"><p>Si estamos en modo multitenant y somos superadministrador, en <em>Vistas por defecto</em> podremos no solo configurar estos elementos en el supertenant, sino que también podremos hacerlo para cada uno de los tenants del sistema.</p></div>
 <div class="paragraph"><p>Para ello, además de un combo selector con la sección que queremos personalizar, aparecerá otro combo de selección con el tenant al que afectará esta configuración.</p></div>
 <div class="paragraph"><p><span class="image">
 <img src="images/doc_images/default_views_multitenant.png" alt="default_views_multitenant.png" width="960px" />
 </span></p></div>
+</div>
+<div class="sect2">
+<h3 id="_documentación_multitenant">5.4. Documentación (multitenant)</h3>
+<div class="paragraph"><p>Si estamos en modo multitenant y somos superadministrador, en <em>Documentación</em> encontraremos una guía más:</p></div>
+<div class="ulist"><ul>
+<li>
+<p>
+La <strong>guía multitenant</strong> donde encontraremos, por una parte una descripción teórica del funcionamiento del sistema multitenant y por otro las diferencias tanto funcionales como de interfaz respecto al modo monotenant.
+</p>
+</li>
+</ul></div>
+<div class="paragraph"><p>Además, en los enlaces de documentación relacionada situados bajo las diferentes secciones, podremos encontrar enlaces adicionales con acceso a la parte correspondiente de dicha sección desde el punto de vista multitenant.</p></div>
 </div>
 </div>
 </div>
@@ -1134,7 +1145,7 @@ Contraseña: to the rescue</code></pre>
 <div id="footnotes"><hr /></div>
 <div id="footer">
 <div id="footer-text">
-Last updated 2015-03-09 16:14:44 CET
+Last updated 2015-03-10 09:52:07 CET
 </div>
 </div>
 </body>

@@ -403,7 +403,7 @@ Wat.A = {
     },
     
     fillTemplateString: function (string, target, toc) {
-        target.html(string);  
+        target.html(target.html() + string);  
 
         if (toc) {
             asciidoc.toc(3);
@@ -471,7 +471,7 @@ Wat.A = {
             var content = '<div id="content">' + guideToc + secTitle + secBody + '</div>';
         }
         else {
-            var content = '<div class="doc-text" style="height: 50vh;">' + secBody + '</div>';
+            var content = '<div class="doc-text">' + secBody + '</div>';
         }
         
         Wat.A.fillTemplateString(content, docParams.target, false, docParams)

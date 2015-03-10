@@ -250,7 +250,22 @@ Wat.B = {
             var section = Wat.I.docSections[docSection].es;
             var guide = Wat.I.docSections[docSection].guide;
             
-            Wat.I.loadDialogDoc(guide, section);
+            var guideSection = [
+                {
+                    section: section,
+                    guide: guide
+                }
+            ];
+            
+            var docSectionMultitenant = docSection + '_multitenant';
+            if (Wat.I.docSections[docSectionMultitenant] != undefined) {
+                guideSection.push({
+                    section: Wat.I.docSections[docSectionMultitenant].es,
+                    guide: Wat.I.docSections[docSectionMultitenant].guide
+                });
+            }
+            
+            Wat.I.loadDialogDoc(guideSection);
             
             $('html,body').animate({
                 scrollTop: 0

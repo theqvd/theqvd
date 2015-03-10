@@ -2379,7 +2379,8 @@ table.list td, table.list th {
 
 .dialog-container, .dialog-container-template {
   display: none;
-  padding: 0; }
+  padding: 0;
+  height: 50vh !important; }
 
 .dialog-container-template {
   width: 100%;
@@ -2502,6 +2503,14 @@ th, td * {
         th, td * {
           font-size: 1em;
           line-height: 1.3em; } } }
+
+.doc-text {
+  font-size: 0.9em;
+  line-height: 0.9em; }
+  @media screen and (min-width: 40em) {
+    .doc-text {
+      font-size: 0.9em;
+      line-height: 1.2em; } }
 
 @media only screen and (max-width: 40em) {
   table.expiration-table td, table.state-table td {

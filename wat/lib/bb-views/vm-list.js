@@ -22,79 +22,97 @@ Wat.Views.VMListView = Wat.Views.ListView.extend({
         this.dialogConf.title = $.i18n.t('New Virtual machine');
         Wat.Views.ListView.prototype.openNewElementDialog.apply(this, [e]);
         
-        // If main view is user view, we are creating a virtual machine from user details view. 
-        // User and tenant (if exists) controls will be removed
-        if (Wat.CurrentView.qvdObj == 'user') {
-            $('[name="user_id"]').parent().parent().remove();
+        var fillFields = function (tenantId) {
+            var tenantId = tenantId || 0;
+            
+            // If main view is user view, we are creating a virtual machine from user details view. 
+            // User and tenant (if exists) controls will be removed
+            if (Wat.CurrentView.qvdObj == 'user') {
+                $('[name="user_id"]').parent().parent().remove();
 
-            var userHidden = document.createElement('input');
-            userHidden.type = "hidden";
-            userHidden.name = "user_id";
-            userHidden.value = Wat.CurrentView.model.get('id');
-            $('.editor-container').append(userHidden);
-                        
-            if ($('[name="tenant_id"]').length > 0) {
-                $('[name="tenant_id"]').parent().parent().remove();
-                
-                var tenantHidden = document.createElement('input');
-                tenantHidden.type = "hidden";
-                tenantHidden.name = "tenant_id";
-                tenantHidden.value = Wat.CurrentView.model.get('tenant_id');
-                $('.editor-container').append(tenantHidden);
+                var userHidden = document.createElement('input');
+                userHidden.type = "hidden";
+                userHidden.name = "user_id";
+                userHidden.value = Wat.CurrentView.model.get('id');
+                $('.editor-container').append(userHidden);
+
+                if ($('[name="tenant_id"]').length > 0) {
+                    $('[name="tenant_id"]').parent().parent().remove();
+
+                    var tenantHidden = document.createElement('input');
+                    tenantHidden.type = "hidden";
+                    tenantHidden.name = "tenant_id";
+                    tenantHidden.value = Wat.CurrentView.model.get('tenant_id');
+                    $('.editor-container').append(tenantHidden);
+                }
             }
-        }
-        else {
-            // Fill Users select on virtual machines creation form
+            else if (!tenantId) {
+                // Fill Users select on virtual machines creation form
+                var params = {
+                    'action': 'user_tiny_list',
+                    'selectedId': '',
+                    'controlName': 'user_id',
+                    'chosenType': 'advanced100'
+                };
+                
+                if (tenantId) {
+                    params.filters = {
+                        tenant_id: tenantId
+                    };
+                }
+
+                Wat.A.fillSelect(params, function () {}); 
+            }
+
+            // Fill OSF select on virtual machines creation form
             var params = {
-                'action': 'user_tiny_list',
+                'action': 'osf_tiny_list',
                 'selectedId': '',
-                'controlName': 'user_id',
+                'controlName': 'osf_id',
                 'chosenType': 'advanced100'
             };
             
-            // If exist tenant control (in superadmin cases) show users of selected tenant
-            if ($('[name="tenant_id"]').length > 0) {
-                // Add an event to the tenant select change
-                Wat.B.bindEvent('change', 'select[name="tenant_id"]', Wat.B.editorBinds.filterTenantUsers);
+            if (tenantId) {
+                params.filters = {
+                    tenant_id: tenantId
+                };
             }
+
+            Wat.I.chosenElement('[name="di_tag"]', 'advanced100');
+            
+            $('[name="osf_id"] option').remove();
             
             Wat.A.fillSelect(params, function () {
-                $('[name="tenant_id"]').trigger('change');
+                
+                // Fill DI Tags select on virtual machines creation form after fill OSF combo
+                var params = {
+                    'action': 'tag_tiny_list',
+                    'selectedId': 'default',
+                    'controlName': 'di_tag',
+                    'filters': {
+                        'osf_id': $('[name="osf_id"]').val()
+                    },
+                    'nameAsId': true,
+                    'chosenType': 'advanced100'
+                };
+
+                Wat.A.fillSelect(params); 
             });  
-
         }
-        
-        // Fill OSF select on virtual machines creation form
-        var params = {
-            'action': 'osf_tiny_list',
-            'selectedId': '',
-            'controlName': 'osf_id',
-            'chosenType': 'advanced100'
-        };
-        
-        // If exist tenant control (in superadmin cases) show osfs of selected tenant
-        if ($('[name="tenant_id"]').length > 0) {
-            // Add an event to the tenant select change
-            Wat.B.bindEvent('change', '[name="tenant_id"]', Wat.B.editorBinds.filterTenantOSFs);
+                    
+        if ($('[name="tenant_id"]').length == 0) {
+            fillFields();
         }
-        
-        Wat.I.chosenElement('[name="di_tag"]', 'advanced100');
-        
-        Wat.A.fillSelect(params, function () {
-            // Fill DI Tags select on virtual machines creation form after fill OSF combo
-            var params = {
-                'action': 'tag_tiny_list',
-                'selectedId': 'default',
-                'controlName': 'di_tag',
-                'filters': {
-                    'osf_id': $('[name="osf_id"]').val()
-                },
-                'nameAsId': true,
-                'chosenType': 'advanced100'
-            };
+        else {
+            Wat.B.bindEvent('change', 'select[name="tenant_id"]', Wat.B.editorBinds.filterTenantOSFs);
+            Wat.B.bindEvent('change', '[name="tenant_id"]', Wat.B.editorBinds.filterTenantUsers);
+            Wat.I.chosenElement('[name="user_id"]', 'advanced100');
+            Wat.I.chosenElement('[name="osf_id"]', 'advanced100');
+            Wat.I.chosenElement('[name="di_tag"]', 'advanced100');
 
-            Wat.A.fillSelect(params); 
-        });  
+            $('[name="tenant_id"]').change(function () {
+            });
+        }
          
     },
     
