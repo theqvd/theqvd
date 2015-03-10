@@ -304,18 +304,23 @@ sub _authenticate_user {
 		    INFO "Accepted connection from user $login from ip:port ".
 			$l7r->{server}->{client}->peerhost().":".$l7r->{server}->{client}->peerport();
 		    $l7r->{_auth} = $auth;
-		    $this_host->counters->incr_auth_ok;
-
                     $user = rs(User)->find($auth->user_id);
-                    return $auth unless $user->blocked;
-
-                    ERROR "User is blocked";
+                    unless ($user->blocked) {
+                        $this_host->counters->incr_auth_ok;
+                        return $auth
+                    }
+                    ERROR "User $login is blocked";
                 }
-                INFO "Failed login attempt from user $login";
+                else {
+                    ERROR "Failed login attempt from user $login";
+                }
+            }
+            else {
+                ERROR "Unable to decode authentication credentials";
             }
         }
         else {
-            WARN "unimplemented authentication mechanism";
+            ERROR "unimplemented authentication mechanism";
         }
     }
     $l7r->throw_http_error(HTTP_UNAUTHORIZED, ['WWW-Authenticate: Basic realm="QVD"']);
