@@ -216,6 +216,7 @@ l7r.auth.plugins.head=
 l7r.auth.plugins.tail=default
 l7r.auth.plugin.default.salt=qvd1234
 l7r.auth.plugin.default.separators=@\#
+l7r.auth.plugin.default.tenant=default
 
 ## load balancing plugins to use. Similar to auth plugins
 l7r.loadbalancer.plugin = default
