@@ -8,8 +8,10 @@ __PACKAGE__->load_components(qw/Core/);
 __PACKAGE__->table('tenants');
 __PACKAGE__->add_columns( id          => { data_type => 'integer',
                                            is_auto_increment => 1 },
-			  block      => { data_type         => 'integer' },
-			  language      => { data_type         => 'varchar(64)' },
+			  block      => { data_type         => 'integer',
+                                          default_value     => 0 },
+			  language      => { data_type         => 'varchar(64)',
+                                             default_value => 'EN' },
                           name        => { data_type => 'varchar(80)' });
 
 __PACKAGE__->set_primary_key('id');
