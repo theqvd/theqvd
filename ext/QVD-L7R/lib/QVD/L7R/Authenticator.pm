@@ -16,11 +16,10 @@ sub _split_plugin_list {
         s/\s+$//;
         /^\w+$/ or croak "bad plugin name $_";
         s/^(.)/uc $1/e;
-        my $module = "QVD::L7R::Authenticator::Plugin::$_";
-        eval "require $module; 1"
-            or croak "unable to load $module: $@";
-        push @plugins, $module;
+        push @plugins, "QVD::L7R::Authenticator::Plugin::$_";
     }
+    DEBUG "split_plugin_list($list) => @plugins";
+    DEBUG "wantarray => ".wantarray;
     @plugins
 }
 
@@ -43,7 +42,11 @@ sub _reload_plugins {
                     $auth->_split_plugin_list(cfg('l7r.auth.plugins', 1, $tenant_id)),
                     $auth->_split_plugin_list(cfg('l7r.auth.plugins.tail')) );
     DEBUG "loading authenticaion plugins for tenant id $tenant_id: @plugins";
-    $self->{plugins} = \@plugins;
+    for (@plugins) {
+        eval "require $_; 1"
+            or croak "unable to load $_: $@";
+    }
+    $auth->{plugins} = \@plugins;
     $_->init($auth) for @plugins;
     1;
 }
@@ -98,7 +101,13 @@ sub _validate_tenant {
     # Tenant autoprovisioning? not yet!
     # Just check that the tenant exists on the database
     if (defined (my $tenant = rs('Tenant')->search({name => $name})->first)) {
-        $auth->{tenant_id} = $tenant->id;
+        my $id = $tenant->id;
+        if ($id == 0) {
+            ERROR "tenant lookup for '$name' returned reserved id 0";
+            return;
+        }
+        $auth->{tenant_id} = $id;
+        DEBUG "tenant '$name' found, id: $id";
         return 1;
     }
     ERROR "tenant '$name' not found in database";
@@ -125,7 +134,7 @@ sub authenticate_basic {
 
                 # Now, go for the user authentication...
                 if ($auth->_normalize_login($login1)) {
-                    DEBUG "authenticating user $login1 ($normalized_login) at $tenant ($normalized_tenant) ".
+                    DEBUG "authenticating user $login1 ($auth->{normalized_login}) at $tenant ($auth->{normalized_tenant}) ".
                         " with plugins @{$auth->{plugins}}";
                     for (@{$auth->{plugins}}) {
                         if ($_->authenticate_basic($auth, $auth->{normalized_login}, $passwd, $l7r)) {
