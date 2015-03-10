@@ -86,8 +86,7 @@ sub get_resultset {
     }
     my $rs = rs($db_object);
     if ($tenant_aware{$obj}) {
-        $self->{tenant_id} //= ($tenant_zero{$obj} ? 0 : 1);
-        $self->{filter}{tenant_id} //= $self->{tenant_id};
+        $self->{filter}{tenant_id} //= $self->_tenant_id($obj);
     }
     $rs = $rs->search($self->{filter})
         if defined $self->{filter};
@@ -112,6 +111,7 @@ sub get_result_set_for_vm {
                      host => 'host.name',
                      state => 'vm_runtime.vm_state' );
     my $filter = $self->_filter_obj(\%term_map);
+    $filter->{'osf.tenant_id'} //= $self->_tenant_id('vm');
 
     # Be able to filter VMs by properties - #1354
     my @joins = ('osf', 'user', { vm_runtime => 'host'});
@@ -124,8 +124,7 @@ sub get_result_set_for_vm {
         }
     }
     rs(VM)->search($filter,
-                   { tenant => $self->{tenant_id},
-                     join => \@joins,
+                   { join => \@joins,
                      columns => [qw(id name user_id ip osf_id di_tag)],
                      distinct => 1 })
 }
@@ -136,7 +135,7 @@ sub get_result_set_for_di {
                      osf => 'osf.name',
 		     tag => 'tags.tag' );
     my $filter = $self->_filter_obj(\%term_map);
-    $filter->{'osf.tenant_id'} = $self->{tenant_id};
+    $filter->{'osf.tenant_id'} //= $self->_tenant_id('di');
 
     # Be able to filter VMs by properties - #1354
     my @joins = ('osf', 'tags');
@@ -320,7 +319,7 @@ sub cmd_config_set {
             }
             else {
                 $rs->update_or_create({ key => $key,
-                                        tenant_id => $self->{tenant_id},
+                                        tenant_id => $self->_tenant_id('config'),
                                         value => $args{$key}
                                       });
                 notify(qvd_config_changed);
