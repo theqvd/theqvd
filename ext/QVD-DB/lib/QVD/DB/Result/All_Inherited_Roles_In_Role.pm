@@ -1,7 +1,6 @@
 package QVD::DB::Result::All_Inherited_Roles_In_Role;
 
 use base qw/DBIx::Class::Core/;
-use Mojo::JSON qw(decode_json);
 
 __PACKAGE__->table_class('DBIx::Class::ResultSource::View');
 
