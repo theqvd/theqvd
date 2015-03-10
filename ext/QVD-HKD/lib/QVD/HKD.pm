@@ -378,7 +378,8 @@ sub _check_cgroups {
     while (@parts) {
         my $dir = File::Spec->join(@parts);
         if (defined(my $mie = $mi->at($dir))) {
-            if ($mie->fs_type eq 'cgroup') {
+            my $fs_type = $mie->fs_type;
+            if ($fs_type eq 'cgroup' or $fs_type eq 'fuse.lxcfs') {
                 INFO "cgroup found at $dir";
                 return $self->_on_done;
             }
