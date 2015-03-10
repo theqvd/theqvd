@@ -125,7 +125,7 @@ sub authenticate_basic {
 
                 # Now, go for the user authentication...
                 if ($auth->_normalize_login($login1)) {
-                    DEBUG "authenticating user $login ($normalized_login) at $tenant ($normalized_tenant) ".
+                    DEBUG "authenticating user $login1 ($normalized_login) at $tenant ($normalized_tenant) ".
                         " with plugins @{$auth->{plugins}}";
                     for (@{$auth->{plugins}}) {
                         if ($_->authenticate_basic($auth, $auth->{normalized_login}, $passwd, $l7r)) {
