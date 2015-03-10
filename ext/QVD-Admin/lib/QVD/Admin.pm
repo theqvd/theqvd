@@ -183,6 +183,9 @@ sub _obj_add {
             join(", ", @$required_params), " (you supplied ",
             join(", ", keys %$params), ")";
     }
+    if ($tenant_aware{$obj}) {
+        $params->{tenant_id} = $self->_tenant_id($obj);
+    }
     my $rs = $self->get_resultset($obj);
     $rs->create($params);
 }
