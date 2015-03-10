@@ -27,8 +27,8 @@ my $command = shift @ARGV;
 my @args = @ARGV;
 
 my $admin = QVD::AdminCLI->new($quiet, $force);
-$admin->set_tenant_id($tenant_id) if length $tenant_id;
 $admin->set_filter($filter) if $filter;
+$admin->set_tenant_id($tenant_id) if length $tenant_id;
 $admin->dispatch_command($object, $command, $help, @args);
 
 __END__

@@ -53,9 +53,17 @@ sub set_filter {
     }
 }
 
+my %tenant_aware = map { $_ => 1 } qw(vm osf user config);
+my %tenant_zero  = map { $_ => 1 } qw(config);
+
 sub set_tenant_id {
     my ($self, $tenant_id) = @_;
     $self->{tenant_id} = $tenant_id;
+}
+
+sub _tenant_id {
+    my ($self, $obj) = @_;
+    $self->{tenant_id} // ($tenant_zero{$obj} ? 0 : 1);
 }
 
 sub reset_filter {
@@ -73,6 +81,10 @@ sub get_resultset {
         return $self->$method;
     }
     my $rs = rs($db_object);
+    if (grep $_ eq $obj, qw(osf)) {
+        $self->{tenant_id} // ($tenant_zero{$obj} ? 0 : 1);
+        $self->{filter}{tenant_id} //= $self->{tenant_id};
+    }
     $rs = $rs->search($self->{filter})
         if defined $self->{filter};
 
@@ -607,6 +619,7 @@ sub cmd_osf_add {
     # FIXME: detect type of image and set use_overlay accordingly, iso => no overlay
     $params{memory}      //= $osf_default_memory;
     $params{use_overlay} //= $osf_default_overlay;
+    $params{tenant_id}   //= $self->_tenant_id('osf');
 
     #die "The required parameters are ".join(", ", @required_params)
     #    unless _set_equals([keys %params], \@required_params);
@@ -614,6 +627,8 @@ sub cmd_osf_add {
     my $id;
     txn_do {
         my $rs = $self->get_resultset('osf');
+        use Data::Dumper;
+        print Dumper $self;
         my $row = $rs->create(\%params);
         $id = $row->id;
     };
