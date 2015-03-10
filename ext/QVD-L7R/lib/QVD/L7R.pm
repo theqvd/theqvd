@@ -304,7 +304,7 @@ sub _authenticate_user {
 		    INFO "Accepted connection from user $login from ip:port ".
 			$l7r->{server}->{client}->peerhost().":".$l7r->{server}->{client}->peerport();
 		    $l7r->{_auth} = $auth;
-                    $user = rs(User)->find($auth->user_id);
+                    my $user = rs(User)->find($auth->user_id);
                     unless ($user->blocked) {
                         $this_host->counters->incr_auth_ok;
                         return $auth
