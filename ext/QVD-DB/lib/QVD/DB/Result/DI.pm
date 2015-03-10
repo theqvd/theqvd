@@ -3,10 +3,11 @@ use base qw/DBIx::Class/;
 
 __PACKAGE__->load_components(qw/Core/);
 __PACKAGE__->table('dis');
-__PACKAGE__->add_columns( blocked      => { data_type         => 'boolean' },
-			  id     => { data_type => 'integer',
+__PACKAGE__->add_columns( id     => { data_type => 'integer',
                                       is_auto_increment => 1 },
                           osf_id => { data_type => 'integer' },
+                          blocked => { data_type         => 'boolean',
+                                       default_value => 0 },
 
                           # Valor tomado de la variable PATH_MAX de
                           # /usr/src/linux-headers-2.6.28-15/include/linux/limits.h:
