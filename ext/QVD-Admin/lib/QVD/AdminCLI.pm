@@ -86,15 +86,20 @@ my %syntax_check_cbs = (
     },
 );
 
+
+my %tenant_zero = map { $_ => 1 } qw(config);
+
 sub new {
     my ($class, $quiet, $force) = @_;
     my $admin = QVD::Admin->new;
-    my $self = {
-        admin => $admin,
-        quiet => $quiet,
-        force => $force,
-    };
+    my $self = { admin => $admin,
+                 quiet => $quiet,
+                 force => $force };
     bless $self, $class;
+}
+
+sub set_tenant_id {
+    shift->{admin}->set_tenant_id;
 }
 
 sub _split_on_equals {
@@ -117,6 +122,7 @@ sub dispatch_command {
     my ($self, $object, $command, $help, @args) = @_;
     $self->die_and_help ("Valid command expected") unless defined $object;
     $self->die_and_help ("$object: Valid command expected", $object) unless defined $command;
+    $self->{tenant_id} //= ($tenant_zero{$object} ? 0 : 1);
     my $method = $self->can($help ? "help_${object}_${command}" : "cmd_${object}_${command}");
     if (defined $method) {
         $help or $self->_syntax_check ($object, $command, @args);

@@ -25,6 +25,7 @@ sub new {
     my $quiet = shift;
     my $self = { filter => {},
                  quiet => $quiet,
+                 tenant_id => undef,
                  objects => { host => 'Host',
                               vm => 'VM',
                               user => 'User',
@@ -50,6 +51,11 @@ sub set_filter {
             }
         }
     }
+}
+
+sub set_tenant_id {
+    my ($self, $tenant_id) = @_;
+    $self->{tenant_id} = $tenant_id;
 }
 
 sub reset_filter {
@@ -102,7 +108,8 @@ sub get_result_set_for_vm {
         }
     }
     rs(VM)->search($filter,
-                   { join => \@joins,
+                   { tenant => $self->{tenant_id},
+                     join => \@joins,
                      columns => [qw(id name user_id ip osf_id di_tag)],
                      distinct => 1 })
 }
@@ -113,6 +120,7 @@ sub get_result_set_for_di {
                      osf => 'osf.name',
 		     tag => 'tags.tag' );
     my $filter = $self->_filter_obj(\%term_map);
+    $filter->{'osf.tenant_id'} = $self->{tenant_id};
 
     # Be able to filter VMs by properties - #1354
     my @joins = ('osf', 'tags');
@@ -293,6 +301,7 @@ sub cmd_config_set {
             }
             else {
                 $rs->update_or_create({ key => $key,
+                                        tenant_id => $self->{tenant_id},
                                         value => $args{$key}
                                       });
                 notify(qvd_config_changed);
