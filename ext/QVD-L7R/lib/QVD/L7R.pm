@@ -287,8 +287,6 @@ sub stop_vm_processor {
 
 }
 
-
-
 sub _authenticate_user {
     my ($l7r, $headers) = @_;
     my $this_host = this_host; $this_host // $l7r->throw_http_error(HTTP_SERVICE_UNAVAILABLE, 'Host is not registered in the database');
@@ -307,7 +305,11 @@ sub _authenticate_user {
 			$l7r->{server}->{client}->peerhost().":".$l7r->{server}->{client}->peerport();
 		    $l7r->{_auth} = $auth;
 		    $this_host->counters->incr_auth_ok;
-                    return $auth;
+
+                    $user = rs(User)->find($auth->user_id);
+                    return $auth unless $user->blocked;
+
+                    ERROR "User is blocked";
                 }
                 INFO "Failed login attempt from user $login";
             }
