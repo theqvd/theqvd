@@ -8,7 +8,8 @@ __PACKAGE__->add_columns( id         => { data_type         => 'integer',
 					  is_auto_increment => 1 },
 			  tenant_id  => { data_type         => 'integer' },
 			  login      => { data_type         => 'varchar(64)' },
-                          blocked    => { data_type         => 'boolean' },
+                          blocked    => { data_type         => 'boolean',
+                                          default_value     => 0 },
                           # FIXME: get passwords out of this table!
                           # FIXME: omg encrypt passwords!!
 			  password   => { data_type         => 'varchar(64)',
