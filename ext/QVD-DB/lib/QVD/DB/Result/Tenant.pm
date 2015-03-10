@@ -17,4 +17,6 @@ __PACKAGE__->add_unique_constraint(['name']);
 __PACKAGE__->has_many(users => 'QVD::DB::Result::User', 'tenant_id', { cascade_delete => 0 } );
 __PACKAGE__->has_many(osfs => 'QVD::DB::Result::OSF', 'tenant_id', { cascade_delete => 0 } );
 __PACKAGE__->has_many(views => 'QVD::DB::Result::Tenant_Views_Setup', 'tenant_id');
+__PACKAGE__->has_many(configs => 'QVD::DB::Result::Tenant_Configs', 'tenant_id');
+
 1;
