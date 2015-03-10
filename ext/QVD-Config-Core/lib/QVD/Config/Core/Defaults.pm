@@ -211,8 +211,11 @@ l7r.address = *
 ## unused!
 l7r.pid_file = ${path.run}/l7r.pid
 ## authentication plugins to use. Comma-separated list of alphanumeric words. Example: "ldap, foo_43,default"
-l7r.auth.plugins = default
+l7r.auth.plugins=
+l7r.auth.plugins.head=
+l7r.auth.plugins.tail=default
 l7r.auth.plugin.default.salt=qvd1234
+l7r.auth.plugin.default.separators=@\#
 
 ## load balancing plugins to use. Similar to auth plugins
 l7r.loadbalancer.plugin = default
