@@ -94,8 +94,8 @@ sub BUILD
     $self->forze_filtering_by_own_admin
 	if $self->json_wrapper->action eq 'myadmin_update';
 
-    $self->forze_filtering_by_own_admin_views
-	if $self->qvd_object_model->qvd_object eq 'Adminstrator_Views_Setup';
+    $self->forze_own_admin_id_in_admin_views
+	if $self->qvd_object_model->qvd_object eq 'Administrator_Views_Setup';
 
     $self->forze_filtering_tenants_by_tenant
         if $self->qvd_object_model->qvd_object eq 'Tenant';
@@ -284,12 +284,20 @@ sub forze_filtering_by_own_admin
 }
 
 
-sub forze_filtering_by_own_admin_views
+sub forze_own_admin_id_in_admin_views
 {
     my $self = shift;
 
-    my $admin_id = $self->qvd_object_model->map_filter_to_dbix_format('admin_id');
-    $self->filters->add_filter($admin_id,$ADMIN->id);
+    if ($self->qvd_object_model->type_of_action eq 'create_or_update')
+    {
+	my $admin_id = $self->qvd_object_model->map_argument_to_dbix_format('admin_id');
+	$self->instantiate_argument($admin_id,$ADMIN->id);
+    }
+    else
+    {
+	my $admin_id = $self->qvd_object_model->map_filter_to_dbix_format('admin_id');
+	$self->filters->add_filter($admin_id,$ADMIN->id);
+    }
 }
 
 sub forze_filtering_by_tenant

@@ -50,6 +50,8 @@ sub select
 {
     my ($self,$request) = @_;
 
+    use Data::Dumper; print Dumper $request->filters;
+
     my @rows;
     my $rs;
 

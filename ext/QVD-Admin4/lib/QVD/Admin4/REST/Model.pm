@@ -329,8 +329,8 @@ my $AVAILABLE_FILTERS =
 
 	      Operative_Views_In_Tenant => [qw(tenant_id field visible view_type device_type qvd_object property)],
 
-	      Administrator_Views_Setup => [qw(id admin_id admin_name field tenant_id tenant_name visible 
-                                               view_type device_type qvd_object property)],
+	      Administrator_Views_Setup => [qw(field tenant_id tenant_name visible view_type device_type qvd_object property)], # Every admin is able to see just its own views, 
+                                                                                                                                # so you cannot filter by admin or id. Suitable admin_id forzed in Request.pm
 	      Operative_Views_In_Administrator => [qw(tenant_id field visible view_type device_type qvd_object property)]},
 
 
@@ -368,8 +368,8 @@ my $AVAILABLE_FILTERS =
 
 		 Operative_Views_In_Tenant => [qw(tenant_id field visible view_type device_type qvd_object property)],
 
-		 Administrator_Views_Setup => [qw(id tenant_id tenant_name field admin_id admin_name visible view_type 
-                                                  device_type qvd_object property)],
+		 Administrator_Views_Setup => [qw(field admin_id admin_name visible view_type device_type qvd_object property)],# Every admin is able to see just its own views, 
+                                                                                                                                # so you cannot filter by admin or id. Suitable admin_id forzed in Request.pm
 		 Operative_Views_In_Administrator => [qw(tenant_id field visible view_type device_type qvd_object property)],},
 
     details => { Config => [qw(key value)], default => [qw(id tenant_id)], Host => [qw(id)], Role => [qw(id)], ACL => [qw(id)], Tenant => [qw(id)] },
@@ -377,7 +377,7 @@ my $AVAILABLE_FILTERS =
     tiny => { default => [qw(tenant_id)], Host => [qw()], Role => [qw(internal fixed)], ACL => [qw(name)], Tenant => [qw(id)], DI_Tag => [qw(tenant_id osf_id)]},
 
     delete => { default => [qw(id tenant_id)], Config => [qw(key value)], Host => [qw(id)], Role => [qw(id)],Tenant => [qw(id)],
-                Administrator_Views_Setup => [qw(admin_id)]},
+                Administrator_Views_Setup => [qw(qvd_object)]}, # Every admin is able to delete just its own views, so you cannot filter by admin or id. Suitable admin_id forzed in Request.pm
 
     update => { default => [qw(id tenant_id)],Config => [qw(key value)],Host => [qw(id)],Role => [qw(id)],Tenant => [qw(id)]},
 
@@ -503,7 +503,7 @@ my $MANDATORY_FILTERS =
 
     tiny => { default => [qw()]},
 
-    delete => { default => [qw(id)], Config => [qw(key)], Administrator_Views_Setup => [qw(admin_id)]},
+    delete => { default => [qw(id)], Config => [qw(key)], Administrator_Views_Setup => [qw()]},
 
     update=> { default => [qw(id)], Config => [qw(key)]}, 
 
@@ -645,7 +645,8 @@ my $MANDATORY_ARGUMENTS = { Config => [qw(key value)],
 			    Role => [qw(name fixed internal)],
                             Administrator => [qw(name password )],
 			    Tenant_Views_Setup => [qw(field visible view_type device_type qvd_object property)],
-			    Administrator_Views_Setup => [qw(admin_id field visible view_type device_type qvd_object property)]}; 
+			    Administrator_Views_Setup => [qw(field visible view_type device_type qvd_object property)]}; # Every admin is able to set just its own views, 
+                                                                                                                         # Suitable admin_id forzed in Request.pm
 
 my $DEFAULT_ARGUMENT_VALUES = 
 {
