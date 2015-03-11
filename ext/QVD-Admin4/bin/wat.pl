@@ -235,7 +235,7 @@ sub get_input_json
 {
     my $c = shift;
     my $json = $c->req->json;
-
+    deep_utf8_decode($json) if $json;
     return $json if $json;
 
     $json =  { map { $_ => b($c->param($_))->encode('UTF-8')->to_string } $c->param };
@@ -250,6 +250,7 @@ sub get_input_json
     };
 
     $c->render(json => QVD::Admin4::Exception->new(code => 6100)->json) if $@;
+
     $json;
 }
 

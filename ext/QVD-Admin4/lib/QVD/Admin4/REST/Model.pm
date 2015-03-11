@@ -376,7 +376,8 @@ my $AVAILABLE_FILTERS =
 		
     tiny => { default => [qw(tenant_id)], Host => [qw()], Role => [qw(internal fixed)], ACL => [qw(name)], Tenant => [qw(id)], DI_Tag => [qw(tenant_id osf_id)]},
 
-    delete => { default => [qw(id tenant_id)], Config => [qw(key value)], Host => [qw(id)], Role => [qw(id)],Tenant => [qw(id)]},
+    delete => { default => [qw(id tenant_id)], Config => [qw(key value)], Host => [qw(id)], Role => [qw(id)],Tenant => [qw(id)],
+                Administrator_Views_Setup => [qw(admin_id)]},
 
     update => { default => [qw(id tenant_id)],Config => [qw(key value)],Host => [qw(id)],Role => [qw(id)],Tenant => [qw(id)]},
 
@@ -502,7 +503,7 @@ my $MANDATORY_FILTERS =
 
     tiny => { default => [qw()]},
 
-    delete => { default => [qw(id)], Config => [qw(key)]},
+    delete => { default => [qw(id)], Config => [qw(key)], Administrator_Views_Setup => [qw(admin_id)]},
 
     update=> { default => [qw(id)], Config => [qw(key)]}, 
 

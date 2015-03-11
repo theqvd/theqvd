@@ -94,6 +94,9 @@ sub BUILD
     $self->forze_filtering_by_own_admin
 	if $self->json_wrapper->action eq 'myadmin_update';
 
+    $self->forze_filtering_by_own_admin_views
+	if $self->qvd_object_model->qvd_object eq 'Adminstrator_Views_Setup';
+
     $self->forze_filtering_tenants_by_tenant
         if $self->qvd_object_model->qvd_object eq 'Tenant';
 
@@ -280,6 +283,15 @@ sub forze_filtering_by_own_admin
     $self->filters->add_filter($id,$ADMIN->id);
 }
 
+
+sub forze_filtering_by_own_admin_views
+{
+    my $self = shift;
+
+    my $admin_id = $self->qvd_object_model->map_filter_to_dbix_format('admin_id');
+    $self->filters->add_filter($admin_id,$ADMIN->id);
+}
+
 sub forze_filtering_by_tenant
 {
     my $self = shift;
@@ -380,7 +392,7 @@ sub set_filters_in_request
 
 	    my $op = $self->filters->get_operator($ref_v);
 	    $op = $self->qvd_object_model->normalize_operator($op);
- 		    
+
 	    my $value_normalized = $is_property ?  
 		[$key_dbix_format.".key" => { $op => $k },
 		 $key_dbix_format.".value" => { $op => $v } ] : { $op => $v };

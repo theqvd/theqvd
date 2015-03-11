@@ -51,13 +51,16 @@ sub cfg {
             $cfg || reload;
             my $value = $cfg->{$key};
         }
-        if (defined $value) {
+
+	if (defined $value) {
             $value =~ s/\$\{(.*?)\}/cfg($1, 1, $tenant)/ge;
             return $value;
         }
+    
     }
 
     my $v = core_cfg($key, 0);
+
     if ($mandatory and not defined $v) {
         LOGDIE "mandatory configuration entry $key missing";
     }

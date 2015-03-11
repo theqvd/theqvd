@@ -2,7 +2,7 @@
 
 use strict;
 use warnings;
-
+use lib::glob '/home/benjamin/wat/*/lib/';
 use Getopt::Long;
 my $force;
 GetOptions("force|f" => \$force) or exit (1);

@@ -13,21 +13,28 @@ sub usage_text {
 
 == GETTING CONFIG TOKENS
 
+  config get
   config get <CONFIG TOKEN NAME>
+
+  For example: 
+  config get (retrieves all configuration tokens in the system)
+  config get wat.multitenant (retrieves the 'wat.multitenant' configuration token)
 
 == SETTING CONFIG TOKENS
 
-  Ordering:
-
-  acl ... order <ORDER CRITERIA>
-  acl ... order <ORDER DIRECTION> <ORDER CRITERIA>
-
+  config set <CONFIG TOKEN NAME> = <CONFIG TOKEN VALUE>
   For example: 
-  acl get order name (Ordering by 'name' in default ascendent order)
-  acl get order asc name, id (Ordering by 'name' and 'id' in ascendent order)
-  acl get order desc name, id (Ordering by 'name' and 'id' in descendent order)
+  config set wat.multitenant=1 (Sets the 'wat.multitenant' configuration token to 1)
 
-$QVD::Admin4::CLI::Command::COMMON_USAGE_TEXT
+== REMOVING CONFIG TOKENS
+
+  config del <CONFIG TOKEN NAME>
+  (Only for custom config tokens: default tokens in the system, or tokens codified in
+   configuration files cannot be removed)
+ 
+  For example: 
+  config del myconfig (Deletes the 'myconfig' configuration token)
+
 "
 
 }

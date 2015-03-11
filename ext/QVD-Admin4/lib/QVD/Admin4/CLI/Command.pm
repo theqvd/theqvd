@@ -8,6 +8,7 @@ use Mojo::IOLoop;
 use Mojo::Message::Response;
 use Encode;
 use File::Basename qw(basename dirname);
+use utf8;
 
 our $COMMON_USAGE_TEXT =
 "
@@ -408,13 +409,14 @@ sub print_table
     $tb->captions(\@fields);
 
     my $rows;
+
     while (my $properties = $res->json("/rows/$n")) 
     { 
 	$tb->row( map {  $self->get_field_value($parsing,$properties,$_) // '' } @fields );
 	$n++;
     }
 
-    print  $tb->draw . "Total: ".$res->json('/total')."\n";
+    print $tb->draw . "Total: ".$res->json('/total')."\n";
 }
 
 sub parse_string
