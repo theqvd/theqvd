@@ -192,6 +192,11 @@ sub check_create_arguments_validity_in_json
 	QVD::Admin4::Exception->throw(code => 6240 , object => $_)
 	for $self->qvd_object_model->mandatory_arguments;
     
+    $self->qvd_object_model->available_argument($_) || 
+	$self->qvd_object_model->mandatory_argument($_) ||
+	QVD::Admin4::Exception->throw(code => 6230, object => $_)
+	for $self->json_wrapper->arguments_list;
+
     $admin->re_is_allowed_to($self->qvd_object_model->get_acls_for_argument_in_creation($_)) || 
 	QVD::Admin4::Exception->throw(code => 4230, object => $_)
 	for $self->json_wrapper->arguments_list;
