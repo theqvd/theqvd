@@ -19,8 +19,14 @@ Wat.Views.MyViewsView = Wat.Views.ViewsView.extend({
     
     initialize: function (params) {
         Wat.Views.ViewsView.prototype.initialize.apply(this, [params]);
+                
+        var templates = {
+            resetViewsMine: {
+                name: 'editor-reset-views-mine'
+            }
+        }
         
-        this.render();
+        Wat.A.getTemplates(templates, this.render); 
     },
     
     getDataAndRender: function () {
@@ -30,5 +36,52 @@ Wat.Views.MyViewsView = Wat.Views.ViewsView.extend({
         
         this.renderForm();
 
-    }
+    },
+    
+    // Perform the reset action on DB and update interface
+    performResetViews: function () {
+        var sectionReset = $('[name="section_reset"]:checked').val();
+        
+        var filter = {};
+        
+        if (sectionReset) {
+            filter.qvd_object = sectionReset;
+        }
+        
+        Wat.A.performAction('admin_view_reset',{},filter,{}, function (that) {
+            // Show message with result
+            that.showViewsMessage(that.retrievedData);
+            
+            // Get admin setup configuration to get the views updated
+            Wat.A.performAction('current_admin_setup', {}, VIEWS_COMBINATION, {}, function () {
+                // Restore possible residous views configuration to default values
+                Wat.I.restoreListColumns();
+                Wat.I.restoreFormFilters();
+
+                // Store views configuration
+                Wat.C.storeViewsConfiguration(that.retrievedData.views);
+
+                that.getDataAndRender();
+            }, that);
+        }, this);
+    },
+    
+    fillResetViewsEditor: function (target) {
+        var qvdObj = $('[name="obj-qvd-select"]').val();
+        var qvdObjName = $('[name="obj-qvd-select"] option:selected').html();
+        
+        var that = Wat.CurrentView;
+        
+        // Add common parts of editor to dialog
+        var template = _.template(
+                    Wat.TPL.resetViewsMine, {
+                        qvdObj: qvdObj,
+                        qvdObjName: qvdObjName,
+                    }
+                );
+        
+        target.html(template);  
+        
+        Wat.I.chosenElement('[name="section_reset"]', 'single100');
+    },
 });

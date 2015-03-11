@@ -21,7 +21,7 @@
     <tr>
         <td data-i18n="Image tag"></td>
         <td>
-            <select class="" name="di_tag"></select>
+            <select class="" name="di_tag" data-any-selected></select>
         </td>
     </tr>
     <% } %>

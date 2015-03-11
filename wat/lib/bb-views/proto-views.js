@@ -21,6 +21,54 @@ Wat.Views.ViewsView = Wat.Views.MainView.extend({
         'change .js-desktop-fields>input': 'checkDesktopFilter',
         'change .js-mobile-fields>input': 'checkMobileFilter',
         'change .js-field-check>input': 'checkListColumn',
+        'click .js-reset-views': 'resetViews'
+    },
+    
+    resetViews: function () {
+        var that = this;
+        
+        var dialogConf = {};
+
+        dialogConf.title = "Reset views to default configuration";
+
+        dialogConf.buttons = {
+            Cancel: function (e) {
+                $(this).dialog('close');
+            },
+            "Reset": function (e) {
+                that.performResetViews ();
+                $(this).dialog('close');
+            }
+        };
+        
+        dialogConf.button1Class = 'fa fa-ban';
+        dialogConf.button2Class = 'fa fa-eraser';
+
+        dialogConf.fillCallback = that.fillResetViewsEditor;
+
+
+        Wat.I.dialog(dialogConf, this);
+    },
+    
+    showViewsMessage: function (response) {
+        var messageParams = {};
+
+        switch (this.retrievedData.status) {
+            case STATUS_SUCCESS:
+                messageParams.message = $.i18n.t("Successfully resetted");
+                messageParams.messageType = 'success';
+                break;
+            case STATUS_ZERO_SELECTED:
+                messageParams.message = $.i18n.t("Nothing to do");
+                messageParams.messageType = 'info';
+                break;
+            default:
+                messageParams.message = $.i18n.t("Error resetting");
+                messageParams.messageType = 'error';
+                break;
+        }
+
+        Wat.I.showMessage(messageParams, response);
     },
     
     checkDesktopFilter: function (e) {
@@ -265,7 +313,9 @@ Wat.Views.ViewsView = Wat.Views.MainView.extend({
                 
         this.printBreadcrumbs(this.breadcrumbs, '');
         this.renderRelatedDocs();
-
+        
+        $('.js-custom-views-container').show();
+        
         Wat.T.translate();
     },
     

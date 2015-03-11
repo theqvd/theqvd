@@ -403,6 +403,10 @@ Wat.A = {
     },
     
     fillTemplateString: function (string, target, toc) {
+        if (!string) {
+            return;
+        }
+        
         target.html(target.html() + string);  
 
         if (toc) {

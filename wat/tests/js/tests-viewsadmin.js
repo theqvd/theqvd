@@ -39,7 +39,7 @@ function qvdViewsAdminReal () {
                         "device_type": "desktop",
                         "visible": !attrs.display,
                         "qvd_object": qvdObj,
-                        "admin_id": Wat.C.adminID
+                        "property": attrs.property
                     };
 
 
@@ -78,11 +78,11 @@ function qvdViewsAdminReal () {
 
                     var argsDesktop = {
                         "field": fieldName,
-                        "view_type": "list_column",
+                        "view_type": "filter",
                         "device_type": "desktop",
                         "visible": !attrs.displayDesktop,
                         "qvd_object": qvdObj,
-                        "admin_id": Wat.C.adminID
+                        "property": attrs.property
                     };
 
 
@@ -108,7 +108,7 @@ function qvdViewsAdminReal () {
                         "device_type": "mobile",
                         "visible": !attrs.displayMobile,
                         "qvd_object": qvdObj,
-                        "admin_id": Wat.C.adminID
+                        "property": attrs.property
                     };
 
                     Wat.A.performAction('admin_view_set', argsMobile, {}, {}, function (that) {

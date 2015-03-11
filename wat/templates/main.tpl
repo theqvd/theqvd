@@ -45,9 +45,8 @@
 </div>
 <div class="wrapper">
     <div class="bb-menu"></div>
-    <div class="loading"><i class="fa fa-gear fa-spin"></i></div>
-
     <div class="content bb-content"></div>
+    <div class="loading"><i class="fa fa-gear fa-spin"></i></div>
 </div>                        
     <div class="related-docs bb-related-docs"></div>                        
 </div>

@@ -873,11 +873,6 @@ Wat.I = {
     },
     
     loadDialogDoc: function (guideSection) {
-        $('html, body').css({
-            'overflow': 'hidden',
-            'height': '100%'
-        });
-        
         var dialogConf = {};
 
         dialogConf.title ="Documentation";
@@ -888,7 +883,6 @@ Wat.I = {
                 window.location = '#documentation/' + guideSection[0].guide;
             },
             Close: function (e) {
-                $('html, body').attr('style', '');
                 $(this).dialog('close');
             }
         };

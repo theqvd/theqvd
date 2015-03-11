@@ -38,12 +38,12 @@
 .customize-section-selectors {
     display: table;
     table-layout: fixed;
-    min-width: 500px;
+    width: 100%;
     margin-bottom: 10px;
     .customize-section-selector {
         margin-bottom: 20px;
         display: table-cell;
-        width: 50%;
+        width: 32%;
         
         &:first-child {
             padding-right: 20px;
@@ -51,6 +51,8 @@
         
         &:last-child {
             padding-left: 20px;
+            text-align: right;
+            vertical-align: bottom;
         }
     }
 }

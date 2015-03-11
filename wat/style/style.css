@@ -1386,16 +1386,18 @@ body {
     .wrapper .content .customize-section-selectors {
       display: table;
       table-layout: fixed;
-      min-width: 500px;
+      width: 100%;
       margin-bottom: 10px; }
       .wrapper .content .customize-section-selectors .customize-section-selector {
         margin-bottom: 20px;
         display: table-cell;
-        width: 50%; }
+        width: 32%; }
         .wrapper .content .customize-section-selectors .customize-section-selector:first-child {
           padding-right: 20px; }
         .wrapper .content .customize-section-selectors .customize-section-selector:last-child {
-          padding-left: 20px; }
+          padding-left: 20px;
+          text-align: right;
+          vertical-align: bottom; }
     .wrapper .content .customize-options .customize-block {
       width: 49%;
       display: inline-block;
