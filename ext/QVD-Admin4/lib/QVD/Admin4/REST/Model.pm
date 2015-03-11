@@ -329,8 +329,6 @@ my $AVAILABLE_FILTERS =
 
 	      Operative_Views_In_Tenant => [qw(tenant_id field visible view_type device_type qvd_object property)],
 
-	      Administrator_Views_Setup => [qw(field tenant_id tenant_name visible view_type device_type qvd_object property)], # Every admin is able to see just its own views, 
-                                                                                                                                # so you cannot filter by admin or id. Suitable admin_id forzed in Request.pm
 	      Operative_Views_In_Administrator => [qw(tenant_id field visible view_type device_type qvd_object property)]},
 
 
@@ -368,8 +366,6 @@ my $AVAILABLE_FILTERS =
 
 		 Operative_Views_In_Tenant => [qw(tenant_id field visible view_type device_type qvd_object property)],
 
-		 Administrator_Views_Setup => [qw(field admin_id admin_name visible view_type device_type qvd_object property)],# Every admin is able to see just its own views, 
-                                                                                                                                # so you cannot filter by admin or id. Suitable admin_id forzed in Request.pm
 		 Operative_Views_In_Administrator => [qw(tenant_id field visible view_type device_type qvd_object property)],},
 
     details => { Config => [qw(key value)], default => [qw(id tenant_id)], Host => [qw(id)], Role => [qw(id)], ACL => [qw(id)], Tenant => [qw(id)] },

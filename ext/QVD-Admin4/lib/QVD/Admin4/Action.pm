@@ -423,11 +423,6 @@ tenant_view_reset => { type_of_action => 'delete',
 			acls => [qr/^views\.update\./],
 		       qvd_object => 'Tenant_Views_Setup'},
 
-admin_view_get_list => { type_of_action => 'list',
-			 admin4method => 'select',
-			 acls => [qr/^views\.see-main\./],
-			 qvd_object => 'Administrator_Views_Setup'},
-
 admin_view_set => { type_of_action => 'create_or_update',
 		    admin4method => 'create_or_update',
 		    acls => [],
