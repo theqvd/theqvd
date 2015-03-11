@@ -377,6 +377,7 @@ my $AVAILABLE_FILTERS =
     tiny => { default => [qw(tenant_id)], Host => [qw()], Role => [qw(internal fixed)], ACL => [qw(name)], Tenant => [qw(id)], DI_Tag => [qw(tenant_id osf_id)]},
 
     delete => { default => [qw(id tenant_id)], Config => [qw(key value)], Host => [qw(id)], Role => [qw(id)],Tenant => [qw(id)],
+                Tenant_Views_Setup => [qw(tenant_id qvd_object)],
                 Administrator_Views_Setup => [qw(qvd_object)]}, # Every admin is able to delete just its own views, so you cannot filter by admin or id. Suitable admin_id forzed in Request.pm
 
     update => { default => [qw(id tenant_id)],Config => [qw(key value)],Host => [qw(id)],Role => [qw(id)],Tenant => [qw(id)]},
@@ -503,7 +504,7 @@ my $MANDATORY_FILTERS =
 
     tiny => { default => [qw()]},
 
-    delete => { default => [qw(id)], Config => [qw(key)], Administrator_Views_Setup => [qw()]},
+    delete => { default => [qw(id)], Config => [qw(key)], Administrator_Views_Setup => [qw()], Tenant_Views_Setup => [qw()]},
 
     update=> { default => [qw(id)], Config => [qw(key)]}, 
 
