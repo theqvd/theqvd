@@ -5,6 +5,8 @@ function qvdViewsAdminReal () {
         },
         teardown: function() {
             // clean up after each test
+
+            Wat.A.performAction('admin_view_reset',{},{},{}, function () {}, this);
         }
     });
 

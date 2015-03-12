@@ -110,7 +110,9 @@ Wat.Views.SetupCustomizeView = Wat.Views.ViewsView.extend({
         if (that.retrievedData.status != STATUS_SUCCESS) {
             return {};
         }
-               
+        
+        var qvdObj = that.selectedSection;
+
         var defaultFormFilters = Wat.I.getFormDefaultFilters(qvdObj);
 
         $.each(that.retrievedData.rows, function (iRegister, register) {
@@ -160,6 +162,8 @@ Wat.Views.SetupCustomizeView = Wat.Views.ViewsView.extend({
         if (that.retrievedData.status != STATUS_SUCCESS) {
             return {};
         }
+        
+        var qvdObj = that.selectedSection;
         
         var defaultListColumns = Wat.I.getListDefaultColumns(qvdObj);
 

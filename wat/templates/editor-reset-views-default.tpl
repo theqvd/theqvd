@@ -12,16 +12,18 @@
                 </select>
             </td>
         </tr>
-        <tr>
-            <td>
-                Tenant
-            </td>
-            <td>
-                <select name="tenant_reset">
-                    <option value="<%= tenantId %>"><%= tenantName %></option>
-                    <option value="">All tenants</option>
-                </select>
-            </td>
-        </tr>
+        <% if (Wat.C.isSuperadmin()) { %>
+            <tr>
+                <td>
+                    Tenant
+                </td>
+                <td>
+                    <select name="tenant_reset">
+                        <option value="<%= tenantId %>"><%= tenantName %></option>
+                        <option value="">All tenants</option>
+                    </select>
+                </td>
+            </tr>
+        <% } %>
     </table>
 </div>
