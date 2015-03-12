@@ -143,7 +143,7 @@
       color: #606060;
     }
 
-    div.content { /* Block element content. */
+    div.content, td.content { /* Block element content. */
       padding: 0;
       margin: 0;
       visibility: visible;

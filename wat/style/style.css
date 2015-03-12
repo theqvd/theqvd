@@ -2827,7 +2827,7 @@ td {
     margin-bottom: 2em;
     margin-right: 10%;
     color: #606060; }
-  .doc-text div.content {
+  .doc-text div.content, .doc-text td.content {
     /* Block element content. */
     padding: 0;
     margin: 0;

@@ -2301,18 +2301,22 @@ Edición
 </div>
 <div class="sect2">
 <h3 id="_vistas_por_defecto">5.4. Vistas por defecto</h3>
-<div class="paragraph"><p>En las vistas listado del WAT se muestran varias columnas con diferentes datos de los elementos existentes y algunos controles de filtrado. Qué columnas y filtros son mostrados y cuales no, se puede configurar en el sistema, y luego cada usuario podrá personalizar sus vistas.</p></div>
-<div class="paragraph"><p>En este apartado se realizará la configuración general.</p></div>
+<div class="paragraph"><p>Como hemos visto en el análisis de cada sección, las vistas listado muestran varias columnas con diferentes datos de los elementos existentes y además disponen de algunos controles de filtrado.</p></div>
+<div class="paragraph"><p>Estas columnas y filtros se puede configurar globalmente en el sistema, y luego cada administrador podrá personalizar estos valores sólamente para él.</p></div>
 <div class="paragraph"><p><span class="image">
 <img src="images/doc_images/screenshot_watconfig_defaultviews.png" alt="screenshot_watconfig_defaultviews.png" width="960px" />
 </span></p></div>
-<div class="paragraph"><p>Tras un aviso aclaratorio vemos un menú desplegable con la sección que queremos personalizar.</p></div>
+<div class="paragraph"><p>En este apartado se realizará la configuración general de estos parámetros marcando una serie de casillas de verificación. Por un lado se configuran las columnas mostradas y por otro los filtros disponibles.</p></div>
+<div class="paragraph"><p>En el caso de las <strong>columnas</strong> es una configuración válida para la <strong>versión escritorio</strong>, ya que en la versión móvil se mostrará una versión siempre simplificada. Por otro lado, los <strong>filtros</strong> se configuran independientemente para <strong>escritorio y móvil</strong>. Esta diferenciación se hace para poder hacer la versión móvil más o menos simple según nuestras necesidades.</p></div>
+<div class="paragraph"><p>Tras un aviso informativo vemos un menú desplegable con la sección que queremos personalizar y un botón para restaurar las vistas por defecto.</p></div>
 <div class="paragraph"><p><span class="image">
-<img src="images/doc_images/screenshot_watconfig_defaultviews_sections.png" alt="screenshot_watconfig_defaultviews_sections.png" width="600px" />
+<img src="images/doc_images/screenshot_watconfig_defaultviews_sections.png" alt="screenshot_watconfig_defaultviews_sections.png" width="960px" />
 </span></p></div>
-<div class="paragraph"><p>Según seleccionemos una u otra nos aparecerán dos tablas con las columnas y filtros disponibles en dicha sección. Cada fila de dichas columnas tiene casillas de verificación que nos indican cuales están activadas y cuales no. Solo con hacer click sobre ellas, se guardará el cambio.</p></div>
-<div class="paragraph"><p>En el caso de los <strong>filtros hay dos columnas</strong> independientes de casillas de verificación. La primera corresponde a la <strong>versión escritorio</strong> y la segunda para la <strong>versión móvil</strong>. Esta diferenciación se hace para poder hacer la versión móvil más o menos simple según nuestras necesidades.</p></div>
-<div class="paragraph"><p>Las columnas en la versión móvil siempre serán las mínimas por una cuestión de espacio, por lo que <strong>la personalización de columnas hará referencia únicamente a la versión de escritorio</strong>.</p></div>
+<div class="paragraph"><p>Según seleccionemos una u otra sección se cargarán las columnas y filtros de dicha sección. Solamente con hacer click sobre las diferentes casillas de verificación, se guardará el cambio.</p></div>
+<div class="paragraph"><p>Si deseamos <strong>volver a la configuración inicial</strong> utilizaremos el botón de <strong>restaurar vistas por defecto</strong>. Esta acción puede realizarse sobre la sección cargada actualmente o sobre todo el sistema, escogiendo una u otra opción en el diálogo que aparece antes de llevarse a cabo la restauración.</p></div>
+<div class="paragraph"><p><span class="image">
+<img src="images/doc_images/screenshot_watconfig_defaultviews_reset.png" alt="screenshot_watconfig_defaultviews_reset.png" width="960px" />
+</span></p></div>
 </div>
 </div>
 </div>
@@ -2394,17 +2398,37 @@ Ambos parámetros se pueden definir como <em>por defecto</em> adoptando así la 
 <div class="sect2">
 <h3 id="_personalizar_vistas">7.2. Personalizar vistas</h3>
 <div class="paragraph"><p>Como vimos en la sección de gestión del WAT, se pueden personalizar qué columnas o filtros se muestran en las diferentes vistas del WAT. Esa es una configuración global del sistema.</p></div>
-<div class="paragraph"><p>En este apartado, el administrador, puede personalizar estas vistas del mismo modo, adaptándolas a sus preferencias.</p></div>
+<div class="paragraph"><p>En base a esta configuración, cada administrador puede personalizar sus vistas de un modo muy similar, adaptándolas a sus preferencias.</p></div>
+<div class="admonitionblock">
+<table><tr>
+<td class="icon">
+<img src="images/doc_images/icons/important.png" alt="Important" />
+</td>
+<td class="content">Si un administrador no cambia la configuración de sus vistas, estas podrían variar si la configuración global fuese modificada. Por otro lado, si un administrador cambia un parámetro, éste quedará fijado en el valor establecido, sin ser alterado por los cambios en la configuración global.</td>
+</tr></table>
+</div>
 <div class="paragraph"><p><span class="image">
 <img src="images/doc_images/screenshot_userarea_customize.png" alt="screenshot_userarea_customize.png" width="960px" />
 </span></p></div>
-<div class="paragraph"><p>En el apartado de personalización de vistas podemos encontrar un menú desplegable con la sección que queremos personalizar solamente para el administrador actual.</p></div>
+<div class="paragraph"><p>En este apartado se realizará la configuración <strong>para el administrador actual</strong> de estos parámetros marcando una serie de casillas de verificación. Por un lado se configuran las columnas mostradas y por otro los filtros disponibles.</p></div>
+<div class="paragraph"><p>En el caso de las <strong>columnas</strong> es una configuración válida para la <strong>versión escritorio</strong>, ya que en la versión móvil se mostrará una versión siempre simplificada. Por otro lado, los <strong>filtros</strong> se configuran independientemente para <strong>escritorio y móvil</strong>. Esta diferenciación se hace para poder hacer la versión móvil más o menos simple según nuestras necesidades.</p></div>
+<div class="paragraph"><p>En la sección encontramos un menú desplegable con la sección que queremos personalizar y un botón para restaurar las vistas por defecto.</p></div>
 <div class="paragraph"><p><span class="image">
 <img src="images/doc_images/screenshot_watconfig_defaultviews_sections.png" alt="screenshot_watconfig_defaultviews_sections.png" width="960px" />
 </span></p></div>
-<div class="paragraph"><p>Según seleccionemos una u otra nos aparecerán dos tablas con las columnas y filtros disponibles en dicha sección. Cada fila de dichas columnas tiene casillas de verificación que nos indican cuales están activadas y cuales no. Solo con hacer click sobre ellas, se guardará el cambio.</p></div>
-<div class="paragraph"><p>En el caso de los <strong>filtros hay dos columnas</strong> independientes de casillas de verificación. La primera corresponde a la <strong>versión escritorio</strong> y la segunda para la <strong>versión móvil</strong>. Esta diferenciación se hace para poder hacer la versión móvil más o menos simple según nuestras necesidades.</p></div>
-<div class="paragraph"><p>Las columnas en la versión móvil siempre serán las mínimas por una cuestión de espacio, por lo que <strong>la personalización de columnas hará referencia únicamente a la versión de escritorio</strong>.</p></div>
+<div class="paragraph"><p>Según seleccionemos una u otra sección se cargarán las columnas y filtros de dicha sección. Solamente con hacer click sobre las diferentes casillas de verificación, se guardará el cambio.</p></div>
+<div class="paragraph"><p>Si deseamos <strong>volver a la configuración del sistema</strong> utilizaremos el botón de <strong>restaurar vistas por defecto</strong>. Esta acción puede realizarse sobre la sección cargada actualmente o sobre todo el sistema, escogiendo una u otra opción en el diálogo que aparece antes de llevarse a cabo la restauración.</p></div>
+<div class="admonitionblock">
+<table><tr>
+<td class="icon">
+<img src="images/doc_images/icons/important.png" alt="Important" />
+</td>
+<td class="content">Las vistas que reestablezcamos a la configuración del sistema, volverán a ser susceptibles de los cambios que pueda sufrir la configuración global.</td>
+</tr></table>
+</div>
+<div class="paragraph"><p><span class="image">
+<img src="images/doc_images/screenshot_userarea_customize_reset.png" alt="screenshot_userarea_customize_reset.png" width="960px" />
+</span></p></div>
 </div>
 <div class="sect2">
 <h3 id="_cerrar_sesión">7.3. Cerrar sesión</h3>

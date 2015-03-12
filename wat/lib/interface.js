@@ -287,7 +287,7 @@ Wat.I = {
             $('.wrapper').css('visibility','visible').hide().fadeIn('fast');
             $('.menu').css('visibility','visible');
             $('.header-wrapper').css('visibility','visible').hide().fadeIn('fast');
-            $('.content').css('visibility','visible').hide().fadeIn('fast');
+            $('.js-content').css('visibility','visible').hide().fadeIn('fast');
             $('.breadcrumbs').css('visibility','visible').hide().fadeIn('fast');
             $('.menu-corner').css('visibility','visible');
             $('.related-doc').css('visibility','visible');                
@@ -299,7 +299,7 @@ Wat.I = {
         this.adaptSideSize();
 
         $('.breadcrumbs').css('visibility','visible').hide().show();
-        $('.content').css('visibility','visible').hide().show();
+        $('.js-content').css('visibility','visible').hide().show();
         $('.footer').css('visibility','visible').hide().show();
         $('.loading').hide();
         $('.related-doc').css('visibility','visible').hide().show();
@@ -310,7 +310,7 @@ Wat.I = {
 
         if (!firstLoad) {
             $('.breadcrumbs').hide();
-            $('.content').hide();
+            $('.js-content').hide();
             $('.footer').hide();
             $('.loading').show();
             $('.related-doc').hide();

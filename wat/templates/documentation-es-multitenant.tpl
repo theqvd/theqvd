@@ -753,7 +753,7 @@ asciidoc.install(2);
 <div class="ulist"><ul>
 <li>
 <p>
-<strong>Monotenant</strong>: Todos los administradores del sistema conviven en un mismo ámbito o tenant. Este modo de funcionamiento sería el equivalente a cómo funcionaba el WAT en versiones antiguas.
+<strong>Monotenant</strong>: Todos los administradores del sistema conviven en un mismo ámbito o tenant. Este modo de funcionamiento sería el equivalente a cómo funcionaba el WAT en versiones anteriores a QVD 4.
 </p>
 <div class="openblock">
 <div class="content">
@@ -999,6 +999,33 @@ Edición
 <div class="paragraph"><p><span class="image">
 <img src="images/doc_images/default_views_multitenant.png" alt="default_views_multitenant.png" width="960px" />
 </span></p></div>
+<div class="paragraph"><p>A la hora de reestablecer las vistas por defecto, también podremos escoger si queremos aplicar esta acción sobre el tenant cargado en ese momento en la sección o bien sobre todos los tenants del sistema, incluyendo el supertenant *.</p></div>
+<div class="paragraph"><p><span class="image">
+<img src="images/doc_images/default_views_multitenant_reset.png" alt="default_views_multitenant_reset.png" width="960px" />
+</span></p></div>
+<div class="paragraph"><p>Combinando esta opción con el control en el que elegimos si aplicar la acción sobre la sección actual o todas, tenemos diferentes posibilidades:</p></div>
+<div class="ulist"><ul>
+<li>
+<p>
+Reestablecer las vistas de la sección y tenant cargados en ese momento
+</p>
+</li>
+<li>
+<p>
+Reestablecer las vistas de la sección cargada en todos los tenants del sistema
+</p>
+</li>
+<li>
+<p>
+Reestablecer las vistas del tenant cargado para todas las secciones
+</p>
+</li>
+<li>
+<p>
+Reestablecer las vistas de todas las secciones en todos los tenants del sistema
+</p>
+</li>
+</ul></div>
 </div>
 <div class="sect2">
 <h3 id="_documentación_multitenant">5.4. Documentación (multitenant)</h3>
@@ -1145,7 +1172,7 @@ Contraseña: to the rescue</code></pre>
 <div id="footnotes"><hr /></div>
 <div id="footer">
 <div id="footer-text">
-Last updated 2015-03-10 09:52:07 CET
+Last updated 2015-03-12 10:43:29 CET
 </div>
 </div>
 </body>
