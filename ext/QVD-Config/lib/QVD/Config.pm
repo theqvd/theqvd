@@ -42,17 +42,20 @@ sub cfg {
 
         # Values for tenant 0 are cached, others are queried dynamically.
         my $value;
+
         if ($tenant) {
             $USE_DB or LOGDIE "Can't read per tenant configuration when DB access is disabled";
             my $row = QVD::DB::Simple::rs('Config')->search({tenant_id => $tenant, key => $key})->first;
             $value = $row->value if defined $row;
         }
+
         unless (defined $value) {
             $cfg || reload;
-            my $value = $cfg->{$key};
+            $value = $cfg->{$key};
         }
 
 	if (defined $value) {
+
             $value =~ s/\$\{(.*?)\}/cfg($1, 1, $tenant)/ge;
             return $value;
         }

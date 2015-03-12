@@ -11,7 +11,7 @@ __PACKAGE__->result_source_instance->view_definition(
 
 "SELECT me.id            as id, 
         json_agg(properties)   as properties_json,
-        json_agg(tags) as tags_json 
+        json_agg(DISTINCT tags) as tags_json 
 
  FROM      dis me 
  LEFT JOIN di_properties properties ON(properties.di_id=me.id) 

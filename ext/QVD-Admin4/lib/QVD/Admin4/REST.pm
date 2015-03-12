@@ -178,6 +178,7 @@ sub get_request
 sub _cfg
 {
     my ($self,$key) = @_;
+
     return cfg($key);
 }
 

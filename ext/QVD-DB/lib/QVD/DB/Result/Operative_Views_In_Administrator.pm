@@ -26,7 +26,8 @@ FROM (administrator_views_setups JOIN administrators ON administrators.id=admini
      TV.view_type=AV.view_type AND
      TV.qvd_object=AV.qvd_object AND
      TV.field=AV.field AND
-     TV.property=AV.property) M
+     TV.property=AV.property AND 
+     TV.administrator_id=AV.administrator_id) M
 
 "
 
