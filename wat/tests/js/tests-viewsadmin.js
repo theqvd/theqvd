@@ -5,8 +5,6 @@ function qvdViewsAdminReal () {
         },
         teardown: function() {
             // clean up after each test
-
-            Wat.A.performAction('admin_view_reset',{},{},{}, function () {}, this);
         }
     });
 
@@ -128,4 +126,26 @@ function qvdViewsAdminReal () {
                 });
             });
         });
+    
+    QUnit.moduleDone(function( details ) {
+        // Reset views after done of the Customize administrator views module
+        if (details.name == 'Customize administrator views') {
+            module( "Reset administrator views", {
+                setup: function() {
+                    // prepare something for all following tests
+                },
+                teardown: function() {
+                    // clean up after each test
+                }
+            });
+                QUnit.asyncTest("Reset views", function() {
+                    expect(1);
+
+                    Wat.A.performAction('admin_view_reset',{},{},{}, function (that) {
+                        equal(that.retrievedData.status, STATUS_SUCCESS, "Views resetted to default configuration successfully");
+                        start();
+                    }, this);
+                });
+        }
+    });
 }

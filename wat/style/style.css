@@ -2398,6 +2398,7 @@ table.list td, table.list th {
   overflow-y: auto;
   padding: 1px;
   margin-bottom: 50px;
+  position: fixed;
   width: 100% !important;
   height: 100vh !important; }
   @media only screen and (max-width: 40em) {

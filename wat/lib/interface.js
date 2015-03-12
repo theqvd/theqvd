@@ -934,5 +934,11 @@ Wat.I = {
         });
         
         return selectedId;
+    },
+    
+    goTop: function () {
+        $('html,body').animate({
+            scrollTop: 0
+        }, 'fast');
     }
 }
