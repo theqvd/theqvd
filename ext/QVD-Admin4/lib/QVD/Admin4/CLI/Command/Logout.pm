@@ -3,6 +3,16 @@ use base qw( CLI::Framework::Command );
 use strict;
 use warnings;
 
+sub usage_text { 
+"======================================================================================================
+                                             LOGOUT COMMAND USAGE
+======================================================================================================
+
+  logout (Removes the current QVD administrator session)
+
+"
+}
+
 sub run 
 {
     my ($self, $opts, @args) = @_;

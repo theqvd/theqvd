@@ -12,30 +12,48 @@ use Mojo::UserAgent;
 use Mojo::URL;
 
 sub usage_text { 
-"=======================================================================================================================
-                                                      CLI COMMANDS USAGE
-=======================================================================================================================
+"
+==============================================================================
+                           AVAILABLE COMMANDS
+==============================================================================
 
-  vm|user|osf|host|di|tenant|admin|role|acl get
-  vm|user|osf|host|di|tenant|admin|role|acl <FILTERS> get
-  vm|user|osf|host|di|tenant|admin|role|acl <FILTERS> get <FIELDS TO RETRIEVE>
-  vm|user|osf|host|di|tenant|admin|role|acl <FILTERS> get <FIELDS TO RETRIEVE> order <ORDER CRITERIA>
-  vm|user|osf|host|di|tenant|admin|role|acl <FILTERS> get <FIELDS TO RETRIEVE> order <ORDER DIRECTION> <ORDER CRITERIA>
+   For a specific explanation of the following commands run:
+   usage <COMMAND>
+   i.e. usage login
 
-  vm|user|osf|host|di|tenant|admin|role set <ARGUMENTS>
-  
-  vm|user|osf|host|di|tenant|admin|role new <ARGUMENTS>
-  
-  vm|user|osf|host|di|tenant|admin|role del
-  vm|user|osf|host|di|tenant|admin|role <FILTERS> del
+== CLI GENERAL MANAGEMENT COMMANDS
 
-  vm|user|osf|host|di <FILTERS> block
-  vm|user|osf|host|di <FILTERS> unblock
+   usage (retrieves instructions about the usage of the app) 
+   
+   login (Intended to log in as a QVD administrator)
+   
+   logout (Intended to log out)
+   
+   password (Intended to change current QVD administrator password)
+   
+   version (Retrieves information about the QVD version the app is connected to)
+      
+== QVD OBJECTS COMMANDS
 
-  vm <FILTERS> start
-  vm <FILTERS> stop
-  vm <FILTERS> disconnect
+    vm (Intended to QVD virtual machines management)
 
+    user (Intended to QVD users management)
+
+    host (Intended to QVD hosts management)
+
+    osf (Intended to QVD OSFs management)
+
+    di (Intended to QVD disk images management)
+
+    tenant (Intended to QVD tenants management)
+
+    role (Intended to QVD roles management)
+
+    acl (Intended to QVD acls management)
+
+    admin (Intended to QVD administrators management)
+
+    config (Intended to QVD configuration management)
 ";
 }
 
@@ -63,6 +81,7 @@ sub command_map {
     di => 'QVD::Admin4::CLI::Command::DI',
     login    => 'QVD::Admin4::CLI::Command::Login',
     logout   => 'QVD::Admin4::CLI::Command::Logout',
+    password => 'QVD::Admin4::CLI::Command::Password',
     menu    => 'QVD::Admin4::CLI::Command::Menu',
     }
 
@@ -110,8 +129,7 @@ sub handle_exception
 
     my $m = $e->message;
     print $m;
-#    print $self->register_command($self->get_current_command)->usage_text
-#	if ($e->isa('CLI::Framework::Exception::CmdRunException'));
+
 }
 
 sub read_cmd {

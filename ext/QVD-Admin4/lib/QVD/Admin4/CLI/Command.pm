@@ -8,6 +8,7 @@ use Mojo::IOLoop;
 use Mojo::Message::Response;
 use Encode;
 use File::Basename qw(basename dirname);
+use Term::ReadKey;
 use utf8;
 
 our $COMMON_USAGE_TEXT =
@@ -798,5 +799,28 @@ sub tenant_scoop
     $self->{tenant_scoop};
 }
 
+
+sub read_password
+{
+    my $self = shift;
+    print STDERR "Password: ";
+    ReadMode 'noecho'; 
+    my $pass = ReadLine 0; 
+    chomp $pass;
+    ReadMode 'normal';
+    print STDERR "\n";
+    $pass;
+}
+
+
+sub _read
+{
+    my ($self,$msg) = @_;
+    print STDERR "$msg: ";
+    my $read = <>; 
+    chomp $read;
+    print STDERR "\r";
+    $read;
+}
 
 1;

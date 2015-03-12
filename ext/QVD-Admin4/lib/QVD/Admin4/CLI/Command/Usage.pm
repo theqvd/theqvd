@@ -3,6 +3,16 @@ use base qw( CLI::Framework::Command::Meta );
 use strict;
 use warnings;
 
+sub usage_text { 
+"======================================================================================================
+                                             USAGE COMMAND USAGE
+======================================================================================================
+
+  usage (Retrieves general instructions about the app)
+  usage <COMMAND> (Retrieves specific instructions about the <COMMAND> command)
+
+"
+}
 
 sub run 
 {

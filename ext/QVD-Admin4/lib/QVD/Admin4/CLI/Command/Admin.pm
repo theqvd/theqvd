@@ -24,10 +24,10 @@ sub usage_text {
   admin <FILTERS> get
   admin <FILTERS> get <FIELDS TO RETRIEVE>
 
-  For example: 
+  For example:
   admin get (retrieves default fields of all ADMINs)
   admin name=myadmin get (retrieves default fields of all ADMINs with name 'myadmin')
-  admin name=myadmin get name, id (retrieves 'name', 'id' of ADMINs with name 'myadmin') 
+  admin name=myadmin get name, id (retrieves 'name', 'id' of ADMINs with name 'myadmin')
 
   Ordering:
 
@@ -95,7 +95,6 @@ sub run
     my ($self, $opts, @args) = @_;
     $self->SUPER::run($opts,'admin',@args);
 }
-
 
 1;
 
