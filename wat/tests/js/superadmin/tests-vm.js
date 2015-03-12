@@ -84,6 +84,7 @@ function vmTestReal () {
             Wat.Router.app_router.trigger('route:listOSF');
 
             Wat.CurrentView.model = new Wat.Models.OSF();
+            delete WatTests.values.osf.id;
 
             //////////////////////////////////////////////////////////////////
             // Create dependency OSF
@@ -106,6 +107,7 @@ function vmTestReal () {
 
                 // Create DI associated to the created OSF
                 WatTests.values.di.osf_id = WatTests.values.osf.id;
+                delete WatTests.values.di.id;
 
                 //////////////////////////////////////////////////////////////////
                 // Create dependency DI
@@ -125,6 +127,7 @@ function vmTestReal () {
                     Wat.Router.app_router.trigger('route:listUser');
 
                     Wat.CurrentView.model = new Wat.Models.User();
+                    delete WatTests.values.user.id;
 
                     //////////////////////////////////////////////////////////////////
                     // Create Dependency User
@@ -149,6 +152,7 @@ function vmTestReal () {
                         WatTests.values.vm.osf_id = WatTests.values.osf.id;
                         WatTests.values.vm.di_tag = WatTests.values.di.version;
                         WatTests.values.vm.user_id = WatTests.values.user.id;
+                        delete WatTests.values.vm.id;
 
                         //////////////////////////////////////////////////////////////////
                         // Create Virtual machine

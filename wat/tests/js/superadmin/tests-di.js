@@ -94,6 +94,8 @@ function diTestReal () {
             Wat.Router.app_router.trigger('route:listOSF');
 
             Wat.CurrentView.model = new Wat.Models.OSF();
+                        
+            delete WatTests.values.osf.id;
 
             //////////////////////////////////////////////////////////////////
             // Create dependency OSF
@@ -115,6 +117,7 @@ function diTestReal () {
 
                 // Create DI associated to the created OSF
                 WatTests.values.di.osf_id = WatTests.values.osf.id;
+                delete WatTests.values.di.id;
 
                 //////////////////////////////////////////////////////////////////
                 // Create DI

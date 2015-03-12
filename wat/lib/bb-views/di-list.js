@@ -66,14 +66,8 @@ Wat.Views.DIListView = Wat.Views.ListView.extend({
             userHidden.value = Wat.CurrentView.model.get('id');
             $('.editor-container').append(userHidden);
                         
-            if ($('[name="tenant_id"]').val() != undefined) {
+            if ($('[name="tenant_id"]').length > 0) {
                 $('[name="tenant_id"]').parent().parent().remove();
-                
-                var tenantHidden = document.createElement('input');
-                tenantHidden.type = "hidden";
-                tenantHidden.name = "tenant_id";
-                tenantHidden.value = Wat.CurrentView.model.get('tenant_id');
-                $('.editor-container').append(tenantHidden);
             }
         }
         else {
@@ -137,11 +131,6 @@ Wat.Views.DIListView = Wat.Views.ListView.extend({
         }
         
         arguments['__tags__'] = tags;
-             
-        if (Wat.C.isSuperadmin) {
-            var tenant_id = context.find('select[name="tenant_id"]').val();
-            arguments['tenant_id'] = tenant_id;
-        }
         
         var image_source = context.find('select[name="images_source"]').val();
         

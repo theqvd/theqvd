@@ -102,7 +102,6 @@ WatTests.values = {
             "disk_image": 'fake.tgz',
             "version": getRandomStr(),
             "blocked": getRandomStr() > 127 ? 1 : 0,
-            "tenant_id": 1,
             "osf_id": 0
         },
         tenant: {

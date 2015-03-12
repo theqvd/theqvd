@@ -82,6 +82,8 @@ function osfTestReal () {
             Wat.Router.app_router.trigger('route:listOSF');
 
             Wat.CurrentView.model = new Wat.Models.OSF();
+            
+            delete WatTests.values.osf.id;
 
             //////////////////////////////////////////////////////////////////
             // Create OSF

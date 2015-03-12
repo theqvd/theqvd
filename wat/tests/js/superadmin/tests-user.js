@@ -81,6 +81,8 @@ function userTestReal () {
 
             Wat.CurrentView.model = new Wat.Models.User();
 
+            delete WatTests.values.user.id;
+            
             //////////////////////////////////////////////////////////////////
             // Create User
             //////////////////////////////////////////////////////////////////
