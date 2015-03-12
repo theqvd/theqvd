@@ -633,15 +633,15 @@ my $AVAILABLE_ARGUMENTS = { Config => [qw(value)],
 
 
 my $MANDATORY_ARGUMENTS = { Config => [qw(key value)],
-			    User => [qw(name password  blocked)],
+			    User => [qw(tenant_id name password  blocked)],
 			    VM => [qw(name user_id ip osf_id di_tag state user_state blocked)],
 			    Host => [qw(name address frontend backend blocked state)],
-			    OSF => [qw(name memory overlay user_storage )],
+			    OSF => [qw(tenant_id name memory overlay user_storage )],
                             DI => [qw(version disk_image osf_id blocked)],
-			    Tenant => [qw(name)],
+			    Tenant => [qw(name language block)],
 			    Role => [qw(name fixed internal)],
-                            Administrator => [qw(name password )],
-			    Tenant_Views_Setup => [qw(field visible view_type device_type qvd_object property)],
+                            Administrator => [qw(tenant_id name password language block)],
+			    Tenant_Views_Setup => [qw(tenant_id field visible view_type device_type qvd_object property)],
 			    Administrator_Views_Setup => [qw(field visible view_type device_type qvd_object property)]}; # Every admin is able to set just its own views, 
                                                                                                                          # Suitable admin_id forzed in Request.pm
 
@@ -668,13 +668,9 @@ my $DEFAULT_ARGUMENT_VALUES =
 
     Role => { fixed => 'false', internal => 'false' },
 
-    Tenant => { language => 'auto'},
+    Tenant => { language => 'auto',block => '10'},
 
-    Tenant => { block => '10'},
-
-    Administrator => { language => 'auto'},
-
-    Administrator => { block => '0'},
+    Administrator => { language => 'auto',block => '10'},
 
     Tenant_Views_Setup => { visible => 0, property => 0 },
 
@@ -707,8 +703,8 @@ my $FILTERS_TO_DBIX_FORMAT_MAPPER =
     
     Administrator => {
 	'name' => 'me.name',
-	'language' => 'me.language',
-	'block' => 'me.block',
+	'language' => 'wat_setups.language',
+	'block' => 'wat_setups.block',
 	'password' => 'me.password',
 	'tenant_id' => 'me.tenant_id',
 	'tenant_name' => 'tenant.name',
@@ -810,8 +806,8 @@ my $FILTERS_TO_DBIX_FORMAT_MAPPER =
     Tenant => {
 	'name' => 'me.name',
 	'id' => 'me.id',
-	'language' => 'me.language',
-	'block' => 'me.block'
+	'language' => 'wat_setups.language',
+	'block' => 'wat_setups.block'
     },
     
     Tenant_Views_Setup => { 	
@@ -1009,8 +1005,8 @@ my $FIELDS_TO_DBIX_FORMAT_MAPPER =
 
     Administrator => {
 	'name' => 'me.name',
-	'language' => 'me.language',
-	'block' => 'me.block',
+	'language' => 'wat_setups.language',
+	'block' => 'wat_setups.block',
 	'password' => 'me.password',
 	'tenant_id' => 'me.tenant_id',
 	'tenant_name' => 'me.tenant_name',
@@ -1020,8 +1016,8 @@ my $FIELDS_TO_DBIX_FORMAT_MAPPER =
     Tenant => {
 	'name' => 'me.name',
 	'id' => 'me.id',
-	'language' => 'me.language',
-	'block' => 'me.block'
+	'language' => 'wat_setups.language',
+	'block' => 'wat_setups.block'
     },
 
     Tenant_Views_Setup => { 	
@@ -1116,7 +1112,9 @@ my $DBIX_JOIN_VALUE =
 
     Role => [ 'admin_rels', {role_rels => 'inherited'}, {parent_role_rels => 'inheritor'}, { acl_rels => 'acl'}],
 		
-    Administrator => [qw(tenant), { role_rels => { role => { acl_rels => 'acl' }}}],
+    Administrator => [qw(tenant wat_setups), { role_rels => { role => { acl_rels => 'acl' }}}],
+
+    Tenant => [qw(wat_setups)],
     
     ACL => [{ role_rels => { role => { admin_rels => 'admin' }}}],
     
@@ -1133,7 +1131,8 @@ my $DBIX_PREFETCH_VALUE =
 	      OSF => [ qw(tenant)],
 	      DI => [{osf => 'tenant'}],
 	      DI_Tag => [{di => {osf => 'tenant'}}],
-	      Administrator => [qw(tenant)],
+	      Administrator => [qw(tenant wat_setups)],
+	      Tenant => [qw(wat_setups)],
 	      Tenant_Views_Setup => [ qw(tenant)],
 	      Administrator_Views_Setup => [ { administrator => 'tenant' }] },
 
@@ -1143,7 +1142,8 @@ my $DBIX_PREFETCH_VALUE =
 		OSF => [ qw(tenant)],
 		DI => [{osf => 'tenant'}],
 		DI_Tag => [{di => {osf => 'tenant'}}],
-		Administrator => [qw(tenant)],
+		Administrator => [qw(tenant wat_setups)],
+		Tenant => [qw(wat_setups)],
 		Tenant_Views_Setup => [ qw(tenant)],
 		Administrator_Views_Setup => [ { administrator => 'tenant' }]}
 };
@@ -1151,7 +1151,9 @@ my $DBIX_PREFETCH_VALUE =
 my $DBIX_HAS_ONE_RELATIONSHIPS = 
 { 
     VM => [qw(vm_runtime counters)],
-    Host => [qw(runtime counters)]
+    Host => [qw(runtime counters)],
+    Tenant => [qw(wat_setups)],
+    Administrator => [qw(wat_setups)],
 };
 
 sub BUILD

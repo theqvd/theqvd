@@ -8,10 +8,6 @@ __PACKAGE__->load_components(qw/Core/);
 __PACKAGE__->table('tenants');
 __PACKAGE__->add_columns( id          => { data_type => 'integer',
                                            is_auto_increment => 1 },
-			  block      => { data_type         => 'integer',
-                                          default_value     => 0 },
-			  language      => { data_type         => 'varchar(64)',
-                                             default_value => 'EN' },
                           name        => { data_type => 'varchar(80)' });
 
 __PACKAGE__->set_primary_key('id');
@@ -19,5 +15,6 @@ __PACKAGE__->add_unique_constraint(['name']);
 __PACKAGE__->has_many(users => 'QVD::DB::Result::User', 'tenant_id', { cascade_delete => 0 } );
 __PACKAGE__->has_many(osfs => 'QVD::DB::Result::OSF', 'tenant_id', { cascade_delete => 0 } );
 __PACKAGE__->has_many(views => 'QVD::DB::Result::Tenant_Views_Setup', 'tenant_id');
+__PACKAGE__->has_one (wat_setups   => 'QVD::DB::Result::Wat_Setups_By_Tenant',  'tenant_id');
 
 1;

@@ -9,8 +9,6 @@ __PACKAGE__->add_columns( tenant_id  => { data_type         => 'integer' },
                           id         => { data_type         => 'integer',
 					  is_auto_increment => 1 },
 			  name      => { data_type         => 'varchar(64)' },
-			  language      => { data_type         => 'varchar(64)' },
-			  block      => { data_type         => 'integer' },
 			  # FIXME: get passwords out of this table!
                           # FIXME: omg encrypt passwords!!
 			  password   => { data_type         => 'varchar(64)',
@@ -21,6 +19,7 @@ __PACKAGE__->add_unique_constraint([qw(name tenant_id)]);
 __PACKAGE__->has_many(role_rels => 'QVD::DB::Result::Role_Administrator_Relation', 'administrator_id');
 __PACKAGE__->has_many(views => 'QVD::DB::Result::Administrator_Views_Setup', 'administrator_id');
 __PACKAGE__->belongs_to(tenant => 'QVD::DB::Result::Tenant',  'tenant_id', { cascade_delete => 0 });
+__PACKAGE__->has_one (wat_setups   => 'QVD::DB::Result::Wat_Setups_By_Administrator',  'administrator_id');
 
 my $DB;
 
@@ -129,27 +128,6 @@ sub tenants_scoop
 	unless defined $self->{tenants_scoop};
 
     return $self->{tenants_scoop};
-}
-
-sub required_language
-{
-    my $self = shift;
-
-    $self->language eq 'default' ? 
-	return $self->tenant->language : 
-	return $self->language; 
-}
-
-sub tenant_language
-{
-    my $self = shift;
-    $self->tenant->language;
-}
-
-sub tenant_block
-{
-    my $self = shift;
-    $self->tenant->block;
 }
 
 1;

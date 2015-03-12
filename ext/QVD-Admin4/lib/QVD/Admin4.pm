@@ -138,6 +138,7 @@ sub create
 			   $result->{rows} = [ $obj ] } )
     };
     
+    print $@ if $@;
     QVD::Admin4::Exception->throw(exception => $@, query => 'create') if $@;
 
     $result->{total} = 1;
@@ -150,7 +151,7 @@ sub create_or_update
     my ($self,$request) = @_;
     my $result;
 
-    for (1 ..5)
+    for (1 .. 5)
     {
 	eval
 	{
@@ -882,10 +883,10 @@ sub current_admin_setup
     my ($self,$administrator,$json_wrapper) = @_;
 
     { multitenant => cfg('wat.multitenant'),
-      admin_language => $administrator->language,
-      tenant_language => $administrator->tenant_language,
-      admin_block => $administrator->block,
-      tenant_block => $administrator->tenant_block,
+      admin_language => $administrator->wat_setups->language,
+      tenant_language => $administrator->tenant->wat_setups->language,
+      admin_block => $administrator->wat_setups->block,
+      tenant_block => $administrator->tenant->wat_setups->block,
       admin_id => $administrator->id,
       tenant_id => $administrator->tenant_id,
       acls => [ $administrator->acls ],

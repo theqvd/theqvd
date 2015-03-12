@@ -189,6 +189,7 @@ sub check_create_arguments_validity_in_json
 
     $self->json_wrapper->has_argument($_) || 
 	defined $self->qvd_object_model->get_default_argument_value($_,$self->json_wrapper) ||
+        ($_ eq 'tenant_id' && (not $ADMIN->is_superadmin)) || 
 	QVD::Admin4::Exception->throw(code => 6240 , object => $_)
 	for $self->qvd_object_model->mandatory_arguments;
     
@@ -466,6 +467,7 @@ sub set_arguments_in_request_with_defaults
 	    $self->qvd_object_model->map_argument_to_dbix_format($key);
 
 	my $value = $self->qvd_object_model->get_default_argument_value($key,$self->json_wrapper);
+
 	$self->instantiate_argument($key_dbix_format,$value);
     }
 }
