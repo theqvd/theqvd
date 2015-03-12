@@ -129,7 +129,7 @@ function qvdViewsAdminReal () {
     
     QUnit.moduleDone(function( details ) {
         // Reset views after done of the Customize administrator views module
-        if (details.name == 'Customize administrator views') {
+        if (details.name == 'Customize administrator views' && tenant == 'superadmin') {
             module( "Reset administrator views", {
                 setup: function() {
                     // prepare something for all following tests
