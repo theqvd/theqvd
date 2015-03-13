@@ -430,7 +430,7 @@ admin_view_set => { type_of_action => 'create_or_update',
 
 admin_view_reset => { type_of_action => 'delete',
 		       admin4method => 'delete',
-		       acls => [qr/^views\.update\./],
+		       acls => [],
 		       qvd_object => 'Administrator_Views_Setup'},
 
 current_admin_setup => {type_of_action => 'general',
