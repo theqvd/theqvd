@@ -321,9 +321,6 @@ Wat.Views.ViewsView = Wat.Views.MainView.extend({
     
     addIDToArgs: function (args) {
         switch (this.viewKind) {
-            case 'admin':
-                args['admin_id'] = Wat.C.adminID;
-                break;
             case 'tenant':
                 // If administrator is superadmin, use selected tenant. Otherwise, no tenant filter will be used
                 if (Wat.C.isSuperadmin()) {
