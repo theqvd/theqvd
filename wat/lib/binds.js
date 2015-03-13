@@ -108,7 +108,7 @@ Wat.B = {
         this.bindEvent('click', 'a[data-docsection]', this.navigationBinds.clickScreenHelp);
         
         // Back to top button
-        this.bindEvent('click', '.js-back-top-button', this.navigationBinds.goTop);
+        this.bindEvent('click', '.js-back-top-button', this.navigationBinds.goDocTop);
         
         // On any scroll
         $(window).off('scroll');
@@ -209,11 +209,27 @@ Wat.B = {
             $('html,body').animate({
                 scrollTop: $(targetId).offset().top
             }, 'fast');
+            
+            // Remove prefix '#_' from id
+            targetId = targetId.substring(2, targetId.length+1);
+            
+            var currentHash = '#documentation/' + Wat.CurrentView.selectedGuide + '/' + targetId;
+
+            // If pushState is available in browser, modify hash with current section
+            if (history.pushState) {
+                history.pushState(null, null, currentHash);
+            }
         },
         
-        goTop: function () {
-            Wat.I.goTop();
-                    
+        goDocTop: function () {
+            Wat.I.goTop();    
+            
+            var currentHash = '#documentation/' + Wat.CurrentView.selectedGuide;
+
+            // If pushState is available in browser, modify hash with current section
+            if (history.pushState) {
+                history.pushState(null, null, currentHash);
+            }
         },
         
         toggleImagesource: function (e) {

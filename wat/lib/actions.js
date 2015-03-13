@@ -402,7 +402,7 @@ Wat.A = {
         Wat.A.fillTemplateString(docParams.docBody, docParams.target, true, docParams);
     },
     
-    fillTemplateString: function (string, target, toc) {
+    fillTemplateString: function (string, target, toc, docParams) {
         if (!string) {
             return;
         }
@@ -411,6 +411,10 @@ Wat.A = {
 
         if (toc) {
             asciidoc.toc(3);
+        }
+        
+        if (docParams.callback) {
+            docParams.callback();
         }
     },
     

@@ -178,8 +178,11 @@
                 Wat.Router.app_router.on('route:documentation', function (actions) {
                     Wat.Router.app_router.performRoute('documentation', Wat.Views.DocView);
                 });
-                Wat.Router.app_router.on('route:documentationGuide', function (guide) {
-                    Wat.Router.app_router.performRoute('documentation', Wat.Views.DocView, {"guide": guide});
+                Wat.Router.app_router.on('route:documentationGuide', function (guide, section) {
+                    Wat.Router.app_router.performRoute('documentation', Wat.Views.DocView, {
+                        "guide": guide,
+                        "section": section
+                    });
                 });
 
 

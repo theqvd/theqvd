@@ -1,5 +1,11 @@
-<div class="wrapper-content <%= 'cid' %>"> 
+<div class="wrapper-content <%= cid %>"> 
     <div class="menu secondary-menu setup-side">
+    <!--
+    <div class="doc-search-box">
+        <label for="doc_search" data-i18n="Search"></label>
+        <input name="doc_search" class="js-doc-search"/>
+    </div>
+    -->
     <%
         $.each(guides, function (guideKey, guideText) {
         var currentClass = '';

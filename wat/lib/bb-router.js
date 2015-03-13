@@ -28,6 +28,7 @@ Wat.Router = Backbone.Router.extend({
         "about": "about",
         "documentation": "documentation",
         "documentation/:guide": "documentationGuide",
+        "documentation/:guide/:section": "documentationGuide",
         "profile": "profile",
         "myviews": "myviews",
         "*actions": "defaultRoute" // Backbone will try match the route above first

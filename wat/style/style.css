@@ -1424,11 +1424,11 @@ body {
         white-space: normal; }
     .wrapper .content .action-new-token {
       margin-bottom: 10px; }
-    .wrapper .content .config-search-box {
+    .wrapper .content .config-search-box, .wrapper .content .doc-search-box {
       padding-bottom: 10px;
       margin-bottom: 10px;
       border-bottom: 1px dotted #d7d7d7; }
-      .wrapper .content .config-search-box input {
+      .wrapper .content .config-search-box input, .wrapper .content .doc-search-box input {
         width: 100%; }
     .wrapper .content .login-box {
       width: 90%;
