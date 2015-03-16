@@ -73,16 +73,52 @@ sub load_user
 	if $admin->is_superadmin;
 }
 
+my $MAPPER = { User => 'user', VM => 'vm', DI => 'di', OSF => 'osf', Host => 'host', Administrator => 'admin', Tenant => 'tenant', 
+               Role => 'role'  };
+
+sub record_log_traces_for_request
+{
+    my ($self,$action,$json_wrapper,$json_response) = @_; 
+    
+    return unless $action->needs_log_trace;
+
+    my $ids = ($action->type eq 'create' ?
+	[ ${$json_response->{rows}}[0]->{id} ] :
+	$json_wrapper->get_filter_value('id')) // [];
+
+    my %arguments = ( action => $action->name, 
+                      type_of_action => $action->type,
+                      qvd_object => $MAPPER->{$action->qvd_object},
+		      administrator_id => $self->administrator->id,
+                      ip => $json_wrapper->get_parameter_value('__remote_address__'),
+		      source => $json_wrapper->get_parameter_value('__source__') );
+
+    my $general_status = $json_response->{status}; 
+
+    for my $id (@$ids)
+    {
+	my $status = $general_status;
+	if ($general_status eq 1200)
+	{
+	    $status = defined $json_response->{failures}->{$id} ?
+		$json_response->{failures}->{$id}->{status} : 0;
+	}
+
+	my $arguments = {%arguments,object_id => $id,status => $status};
+	$self->_db->resultset('Wat_Log')->create($arguments);
+    }
+}
+
 sub process_query
 {
    my ($self,$json) = @_;
-   my $response;
+   my ($response,$action,$json_wrapper);
 
    try {
 
-       my $json_wrapper = QVD::Admin4::REST::JSON->new(json => $json);
+       $json_wrapper = QVD::Admin4::REST::JSON->new(json => $json);
 
-       my $action = eval { QVD::Admin4::Action->new(name => $json_wrapper->action ) }
+       $action = eval { QVD::Admin4::Action->new(name => $json_wrapper->action ) }
        // QVD::Admin4::Exception->throw(code => 4110);
 
        QVD::Admin4::Exception->throw(code => 4100) 
@@ -112,7 +148,9 @@ sub process_query
        $response = QVD::Admin4::Exception->new(code => 1100);
    }
 
-   $response->json;
+   my $response_json = $response->json;
+   $self->record_log_traces_for_request($action,$json_wrapper,$response_json);
+   return $response_json;
 }
 
 sub get_channels

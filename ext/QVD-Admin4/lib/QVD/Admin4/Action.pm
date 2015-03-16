@@ -8,8 +8,15 @@ has 'name', is => 'ro', isa => sub { my $name = shift; die "Invalid type for att
 
 my $AVAILABLE_ACTION_SIZES = { default => 'normal', normal => 'normal', heavy => 'heavy' };
 
+my $NEEDS_LOG_TRACE  = { create => 1, update => 1, exec => 1, delete => 1 };
+
 my $ACTIONS =
 {
+
+log_get_list => {type_of_action => 'list',
+		  admin4method => 'select',
+#		  acls => [qr/^log\.see-main\./],
+		  qvd_object => 'Wat_Log'},
 
 dis_in_staging => { type_of_action =>  'general',
 		    acls => [qr/^di\.create\./],
@@ -463,7 +470,6 @@ sub available
 {
     my $self = shift;
 
-    defined 
     exists $ACTIONS->{$self->name} ? 
 	return 1 : 
 	return 0;
@@ -544,6 +550,12 @@ sub available_nested_action_for_admin
 {
     my ($self,$admin,$na) = @_;
     $admin->re_is_allowed_to($self->acls_for_nested_action($na));
+}
+
+sub needs_log_trace
+{
+    my $self = shift;
+    $NEEDS_LOG_TRACE->{$self->type} // 0;
 }
 
 1;

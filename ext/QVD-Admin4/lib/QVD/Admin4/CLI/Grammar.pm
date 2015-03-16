@@ -494,6 +494,13 @@ my $RULES =
 
  { left_side => { label => 'ROOT', saturated => 1 }, 
    right_side => [ { label => "config", saturated => 1 },
+		   { label => "default", saturated => 1 },
+                   { label => "ITEM", saturated => 1, feature => 0, coordinated => 0 }],
+   meaning => sub { my ($c0,$c1,$c2) = @_; { command => 'default', obj1 => { qvd_object => 'config', filters => { key => ref($c2) ? shift @$c2 : $c2 }}}}},
+
+
+ { left_side => { label => 'ROOT', saturated => 1 }, 
+   right_side => [ { label => "config", saturated => 1 },
 		   { label => "get", saturated => 1 }],
    meaning => sub { return { command => 'get', obj1 => { qvd_object => 'config' }}}},
 

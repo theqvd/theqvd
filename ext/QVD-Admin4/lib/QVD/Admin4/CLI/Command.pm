@@ -3,16 +3,31 @@ use strict;
 use warnings;
 use base qw( CLI::Framework::Command::Meta );
 use Text::SimpleTable::AutoWidth;
+use Text::UnicodeTable::Simple;
 use Mojo::JSON qw(encode_json decode_json j);
 use Mojo::IOLoop;
 use Mojo::Message::Response;
 use Encode;
 use File::Basename qw(basename dirname);
 use Term::ReadKey;
-use utf8;
+use CLI::Framework::Exceptions;
+use utf8::all;
 
 our $COMMON_USAGE_TEXT =
 "
+======================================================================================================
+                                             DEFAULT FILTERS
+======================================================================================================
+
+  The filter key 'name', and the operator '=' are consirered as defaults. So the following is a right 
+  syntax: 
+  
+  <QVD OBJECT COMMAND> <QVD OBJECT NAME> <ACTION COMMAND>
+
+  For example:
+  vm myVM get (Equal to vm name=myVM get)  
+  vm myVM set name=yourVM (Equal to vm name=myVM set name=yourVM)   
+
 ======================================================================================================
                                              COMPLEX FILTERS
 ======================================================================================================
@@ -135,7 +150,7 @@ my $FIELDS =
 
     tenant => { id => 'id', name => 'name', language => 'language', block => 'block' },
 
-    config => { key => 'key', value => 'operative_value' },
+    config => { key => 'key', value => 'operative_value', default => 'default_value'  },
 
     admin => { id => 'id', name => 'name', roles => 'roles', tenant => 'tenant_name', language => 'language', block => 'block' },
 
@@ -257,7 +272,7 @@ my $CLI_CMD2API_ACTION =
 
     tenant => { ids => 'tenant_all_ids', get => 'tenant_get_list', update => 'tenant_update', create => 'tenant_create', delete => 'tenant_delete' },
 
-    config => { get => 'config_get', update => 'config_set', delete => 'config_delete' },
+    config => { get => 'config_get', update => 'config_set', delete => 'config_delete', default => 'config_default' },
 
     admin => { ids => 'admin_all_ids', get => 'admin_get_list', update => 'admin_update', create => 'admin_create', delete => 'admin_delete' },
 
@@ -281,7 +296,7 @@ my $DEFAULT_FIELDS =
 
     tenant => [ qw( id name language block ) ],
 
-    config => [ qw( key value ) ],
+    config => [ qw( key value default) ],
 
     admin => [ qw(id tenant name language block) ],
 
@@ -310,7 +325,7 @@ sub _create
     {
 	my $tenant_ids = $related_tenant_cb->($self,$tenant_name);
 	my $tenant_id = shift @$tenant_ids //
-	    die "Unknown related object tenant in filters";
+	    CLI::Framework::Exception->throw("Unknown related object tenant in filters");
 	$self->tenant_scoop($tenant_id);
 	$parsing->arguments->{tenant} = $self->tenant_scoop; 
     }
@@ -405,19 +420,18 @@ sub print_table
 
     unless (@fields) { $self->print_count($res); return; }
 
-    my $tb = Text::SimpleTable::AutoWidth->new();
-    $tb->max_width(500);
-    $tb->captions(\@fields);
+    my $tb = Text::UnicodeTable::Simple->new();
+    $tb->set_header(@fields);
 
     my $rows;
 
     while (my $properties = $res->json("/rows/$n")) 
     { 
-	$tb->row( map {  $self->get_field_value($parsing,$properties,$_) // '' } @fields );
+	$tb->add_row( map {  $self->get_field_value($parsing,$properties,$_) // '' } @fields );
 	$n++;
     }
 
-    print $tb->draw . "Total: ".$res->json('/total')."\n";
+    print STDOUT "$tb" . "Total: ".$res->json('/total')."\n";
 }
 
 sub parse_string
@@ -432,14 +446,14 @@ sub parse_string
     my $tokenization = $tokenizer->parse($req);
 
     $self->unrecognized($tokenization) &&
-	die 'Unable to tokenize request';
+	CLI::Framework::Exception->throw('Unable to tokenize request');
 
     my $parsing = $parser->parse( shift @$tokenization );
 
     $self->unrecognized($parsing) &&
-	die 'Unable to parse request';
+	CLI::Framework::Exception->throw('Unable to parse request');
     $self->ambiguous($parsing) &&
-	die 'Ambiguos request';
+	CLI::Framework::Exception->throw('Ambiguos request');
     
     shift @$parsing;
 }
@@ -482,7 +496,7 @@ sub ask_api
  
     my $res = $ua->post("$url", json => {%$query,%credentials} )->res;
 
-    die 'API returns bad status' 
+    CLI::Framework::Exception->throw('API returns bad status')
 	unless $res->code;
 
     $self->check_api_result($res);
@@ -495,16 +509,32 @@ sub check_api_result
     my ($self,$res) = @_;
 
     return 1 unless $res->json('/status');
-    die $res->json('/message') unless 
+
+    my $API_INTERNAL_PROBLEMS_MSG = 'Internal problems in API';
+    my %SERVER_INTERNAL_ERRORS = qw(1100 1 4100 1 4110 1 6100 1);
+
+    CLI::Framework::Exception->throw($API_INTERNAL_PROBLEMS_MSG) if 
+	$SERVER_INTERNAL_ERRORS{$res->json('/status')};
+
+    CLI::Framework::Exception->throw($res->json('/message')) unless 
 	$res->json('/status') eq 1200;
 
-    my ($message,$failures) = ('',$res->json('/failures'));
+    my ($message,$failures) = ($res->json('/message') . ":\n",$res->json('/failures'));
+
+    my %seen_msgs;
 
     while (my ($id,$failure) = each %$failures)
     {
-	$message .= "$id: " . $failure->{message} . "\n";
+	my $msg = $SERVER_INTERNAL_ERRORS{$failure->{status}} ? 
+	    $API_INTERNAL_PROBLEMS_MSG : 
+	    $failure->{message};
+	next if exists $seen_msgs{$msg};
+	$seen_msgs{$msg} = 1;
+	$message .= "$msg\n"; 
     } 
-    die $message;
+
+    $message =~ s/\n$//;
+    CLI::Framework::Exception->throw($message);
 }
 
 
@@ -560,7 +590,7 @@ sub ask_api_staging
 
     Mojo::IOLoop->start;
 
-    die 'API returns bad status' 
+    CLI::Framework::Exception->throw('API returns bad status') 
 	unless $res->code;
 
     $self->check_api_result($res);
@@ -761,7 +791,7 @@ sub get_field_value
 	// die "No method available to parse complex field in API output";
 	$v = $cb->($v);
     }
-    return encode('utf-8',$v);
+    return $v;
 }
 
 sub get_value
@@ -771,11 +801,11 @@ sub get_value
     if ( my $cb = eval { $CBS_TO_GET_RELATED_OBJECTS_IDS->{$parsing->qvd_object}->{$filter_or_argument}->{$key}})
     {
 	$value = $cb->($self,$value,$self->tenant_scoop);
-	die "Unknown related object $key in filters" unless defined $$value[0];
+	CLI::Framework::Exception->throw("Unknown related object $key in filters") unless defined $$value[0];
 
 	if ($filter_or_argument eq 'argument')
 	{ 
-	    die 'Amgiguous reference to object in filters' if 
+	    CLI::Framework::Exception->throw('Amgiguous reference to object in filters') if 
 		defined $$value[1];	    
 	    $value = shift @$value;
 	}

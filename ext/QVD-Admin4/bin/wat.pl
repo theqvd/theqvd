@@ -112,6 +112,7 @@ any [qw(POST GET)] => '/' => sub {
     my $json = $c->get_input_json;
     my $response = $c->process_api_query($json);
     deep_utf8_decode($response);
+
     $c->render(text => b(encode_json($response))->decode('UTF-8'));
 };
 
@@ -257,7 +258,7 @@ sub get_input_json
 sub process_api_query
 {
     my ($c,$json) = @_;
-
+    $json->{parameters}->{__remote_address__} = $c->tx->remote_address; # For Log purposes
     my $response = $c->qvd_admin4_api->process_query($json);
     $response->{sid} = $c->res->headers->header('sid');
     return $response;

@@ -101,6 +101,24 @@ my $ACLS_FOR_FILTERS =
     Tenant => { name => [qr/^tenant\.filter\.name$/] }
 };
 
+
+my $ACLS_FOR_FILTER_VALUES = 
+{
+    Wat_Log => { get_list => { qvd_object => { vm => [qr/^vm\.see-main\.$/],
+					   user => [qr/^user\.see-main\.$/],
+					   osf => [qr/^osf\.see-main\.$/],
+					   di => [qr/^di\.see-main\.$/],
+					   host => [qr/^host\.see-main\.$/],
+					   tenant => [qr/^tenant\.see-main\.$/],
+					   admin => [qr/^administrator\.see-main\.$/], 
+					   role => [qr/^role\.see-main\.$/],
+					   acl => [qr/^administrator\.see\.acl-list$/],
+					   config => [qr/^config\.qvd\.$/],
+					   tenant_view => [qr/^views\.see-main\.$/],
+					   admin_view => [qr/^views\.see-main\.$/],}}}
+};
+
+
 my $ACLS_FOR_FIELDS = 
 {
     OSF => { creation_admin => [qr/^osf\.see\.created-by$/],
@@ -296,6 +314,8 @@ my $AVAILABLE_FILTERS =
 { 
     list => { default => [],
 
+	      Wat_Log => [qw(id admin_id action arguments object_id time status source ip type_of_action qvd_object)],
+	      
 	      Config => [qw(key value)],
 	      
 	      VM => [qw(storage id name user_id user_name osf_id osf_name di_tag blocked 
@@ -388,6 +408,8 @@ my $AVAILABLE_FILTERS =
 my $AVAILABLE_FIELDS = 
 { 
     list => { default => [],
+
+	      Wat_Log => [qw(id admin_id action arguments object_id time status source ip type_of_action qvd_object)],
 
 	      Config => [qw(key value)],
 
@@ -680,6 +702,20 @@ my $DEFAULT_ARGUMENT_VALUES =
 
 my $FILTERS_TO_DBIX_FORMAT_MAPPER = 
 {
+    Wat_Log => { 
+	id => 'me.id',
+	admin_id => 'me.administrator_id',
+	action => 'me.action',
+	arguments => 'me.arguments',
+	object_id => 'me.object_id',
+	time => 'me.time',
+	status => 'me.status',
+	source => 'me.source',
+	ip => 'me.ip',
+	type_of_action => 'me.type_of_action',
+	qvd_object => 'me.qvd_object'
+    },
+
     Config => {
 	'key' => 'me.key',
 	'value' => 'me.value'
@@ -882,6 +918,20 @@ my $ORDER_CRITERIA_TO_DBIX_FORMAT_MAPPER =
 
 my $FIELDS_TO_DBIX_FORMAT_MAPPER = 
 {
+    Wat_Log => { 
+	id => 'me.id',
+	admin_id => 'me.administrator_id',
+	action => 'me.action',
+	arguments => 'me.arguments',
+	object_id => 'me.object_id',
+	time => 'me.time',
+	status => 'me.status',
+	source => 'me.source',
+	ip => 'me.ip',
+	type_of_action => 'me.type_of_action',
+	qvd_object => 'me.qvd_object'
+    },
+
     Config => {
 	'key' => 'me.key',
 	'value' => 'me.value'
@@ -1749,6 +1799,28 @@ sub get_acls_for_filter
     $self->get_acls($ACLS_FOR_FILTERS,$filter);
 }
 
+sub get_acls_for_filter_value
+{
+    my ($self,$filter,$value) = @_;
+    $self->get_acls($ACLS_FOR_FILTER_VALUES,$filter,$value);
+}
+
+sub get_filters_with_acls_for_values
+{
+    my $self = @_;
+    return () unless defined $ACLS_FOR_FILTER_VALUES->{$self->qvd_object};
+    return () unless defined $ACLS_FOR_FILTER_VALUES->{$self->qvd_object}->{$self->type_of_action};
+    return keys %{$ACLS_FOR_FILTER_VALUES->{$self->qvd_object}->{$self->type_of_action}}; 
+}
+
+sub get_filter_values_with_acls
+{
+    my ($self,$filter) = @_;
+    return () unless defined $ACLS_FOR_FILTER_VALUES->{$self->qvd_object};
+    return () unless defined $ACLS_FOR_FILTER_VALUES->{$self->qvd_object}->{$self->type_of_action};
+    return keys %{$ACLS_FOR_FILTER_VALUES->{$self->qvd_object}->{$filter}->{$self->type_of_action}}; 
+}
+
 sub get_acls_for_field
 {
     my ($self,$field) = @_;
@@ -1804,10 +1876,24 @@ sub get_acls_for_delete_massive
 
 sub get_acls
 {
-    my ($self,$REPO,$filter) = @_;
+    my ($self,$REPO,$filter,$value) = @_;
     return () unless defined $REPO->{$self->qvd_object};
-    return () unless defined $REPO->{$self->qvd_object}->{$filter};
-    my @acls = @{$REPO->{$self->qvd_object}->{$filter}};
+
+    my @acls;
+
+    if (defined $value) 
+    {
+	return () unless defined $REPO->{$self->qvd_object}->{$self->type_of_action};
+	return () unless defined $REPO->{$self->qvd_object}->{$self->type_of_action}->{$filter};
+	return () unless defined $REPO->{$self->qvd_object}->{$self->type_of_action}->{$filter}->{$value};
+	@acls = @{$REPO->{$self->qvd_object}->{$self->type_of_action}->{$filter}->{$value}};
+    }
+    else
+    {
+	return () unless defined $REPO->{$self->qvd_object}->{$filter};
+	@acls = @{$REPO->{$self->qvd_object}->{$filter}};
+    }
+    return @acls;
 }
 
 1;

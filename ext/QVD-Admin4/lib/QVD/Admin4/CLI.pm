@@ -127,9 +127,7 @@ sub handle_exception
 {
     my ($self,$e) = @_;
 
-    my $m = $e->message;
-    print $m;
-
+    print $e->message, "\n";
 }
 
 sub read_cmd {

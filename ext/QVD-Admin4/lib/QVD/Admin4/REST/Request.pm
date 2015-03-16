@@ -337,6 +337,28 @@ sub forze_filtering_tenants_by_tenant
     $self->filters->add_filter($id,\@ids);
 }
 
+sub forze_filtering_by_acls_for_filter_values
+{
+    my $self = shift;
+    
+    for my $filter ($self->qvd_object_model->get_filters_with_acls_for_values)
+    {
+	my @forbidden_values;
+
+	for my $value ($self->qvd_object_model->get_filter_values_with_acls($filter))
+	{
+	    my @acls = $self->qvd_object_model->get_acls_for_filter_value($filter,$value);
+	    push @forbidden_values, $value unless $ADMIN->re_is_allowed_to(@acls);
+	}
+    
+	my $filter_dbix = $self->qvd_object_model->map_filter_to_dbix_format($filter); 
+	$self->filters->add_filter('-not',{ $filter_dbix => \@forbidden_values });
+    }
+}
+
+
+
+
 sub forze_tenant_assignment_in_creation
 {
     my $self = shift;

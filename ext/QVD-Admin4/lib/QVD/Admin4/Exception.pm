@@ -149,15 +149,27 @@ sub message
 {
     my $self = shift;
     my $message = $code2message_mapper->{$self->code};
-    $message .= " (".$self->object.")" if defined $self->object;
+#    $message .= " (".$self->object.")" if defined $self->object;
     $message; 
 }
 
 sub figure_out_code_from_exception
 {
     my $self = shift;
-    my $e = ref($self->exception) // 'default';
-    $e = 'default' unless exists $exception2code_mapper->{$e}; 
+    
+    my $e = 'default';
+
+    if (my $exception = $self->exception)
+    {
+	for my $class (keys %$exception2code_mapper)
+	{
+	    if (eval { $exception->isa($class) })
+	    {
+		$e = $class;
+		last;
+	    }
+	}
+    }
 
     my ($q) = $e eq 'DBIx::Error::CheckViolation' ?
 	$self->exception->message  =~ /^.+?violates check constraint "([^"]+)"/ :
@@ -167,6 +179,7 @@ sub figure_out_code_from_exception
     
     $self->{code} = $exception2code_mapper->{$e}->{$q}; 
 }
+
 
 sub figure_out_code_from_failures
 {
