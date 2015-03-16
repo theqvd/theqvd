@@ -184,6 +184,11 @@
                         "section": section
                     });
                 });
+                Wat.Router.app_router.on('route:documentationSearch', function (searchKey) {
+                    Wat.Router.app_router.performRoute('documentation', Wat.Views.DocView, {
+                        "searchKey": searchKey
+                    });
+                });
 
 
 

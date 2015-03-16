@@ -1,14 +1,13 @@
 <div class="wrapper-content <%= cid %>"> 
     <div class="menu secondary-menu setup-side">
-    <!--
     <div class="doc-search-box">
         <label for="doc_search" data-i18n="Search"></label>
-        <input name="doc_search" class="js-doc-search"/>
+        <input name="doc_search" class="js-doc-search" value="<%= searchKey %>"/>
     </div>
-    -->
     <%
         $.each(guides, function (guideKey, guideText) {
         var currentClass = '';
+        
         if (selectedGuide == guideKey) {
             currentClass = 'lateral-menu-option--selected';
         }

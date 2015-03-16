@@ -192,6 +192,7 @@ UNCLASSIFIED_CONFIG_REGEXP = '^((?!\\.).)*$';
 
 // Html pieces
 HTML_MINI_LOADING = '<div class="mini-loading"><i class="fa fa-gear fa-spin"></i></div>';
+HTML_LOADING = '<div class="loading"><i class="fa fa-gear fa-spin"></i></div>';
 
 // Views combination for current_admin_setup return values
 VIEWS_COMBINATION = {

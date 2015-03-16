@@ -24,9 +24,20 @@ Wat.Views.DocView = Wat.Views.MainView.extend({
             this.setSelectedSection(params.section);
         }
         
+        if (params.searchKey) {
+            this.setCurrentSearchKey(params.searchKey);
+            this.setSelectedGuide('');
+        }
+        
         var templates = {
             docSection: {
                 name: 'help-documentation'
+            },
+            docSearch: {
+                name: 'help-documentation-search'
+            },
+            docSearchResult: {
+                name: 'help-documentation-search-result'
             }
         }
         
@@ -53,6 +64,10 @@ Wat.Views.DocView = Wat.Views.MainView.extend({
     
     setSelectedSection: function (sectionKey) {
         this.selectedSection = sectionKey;
+    },    
+    
+    setCurrentSearchKey: function (searchKey) {
+        this.currentSearchKey = searchKey;
     },
     
     render: function () {        
@@ -61,6 +76,7 @@ Wat.Views.DocView = Wat.Views.MainView.extend({
             Wat.TPL.docSection, {
                 selectedGuide: this.selectedGuide,
                 guides: Wat.C.getDocGuides(),
+                searchKey: this.currentSearchKey,
                 cid: this.cid
             }
         );
@@ -69,7 +85,17 @@ Wat.Views.DocView = Wat.Views.MainView.extend({
         
         this.printBreadcrumbs(this.breadcrumbs, '');
         
-        this.fillDocumentation();
+        if (this.currentSearchKey) {
+            var that = this;
+            
+            // Little delay to give time to render interface
+            setTimeout(function () {
+                that.searchDoc(that.currentSearchKey);
+            }, 300);
+        }
+        else {
+            this.fillDocumentation();
+        }
 
         Wat.T.translate();       
     },
@@ -99,11 +125,29 @@ Wat.Views.DocView = Wat.Views.MainView.extend({
     searchDoc: function (searchKey) {
         var that = this;
         
+        // If pushState is available in browser, modify hash with current section
+        if (history.pushState) {
+            history.pushState(null, null, '#documentation/search/' + searchKey);
+        }
+        
         var guides = Wat.C.getDocGuides ();
         
         var target = $('.setup-block');
         
-        target.html('');
+        // Fill the html with the template
+        var template = _.template(
+            Wat.TPL.docSearch, {
+                guides: guides,
+                searchKey: searchKey,
+            }
+        );
+
+        target.html(template);
+                            
+        Wat.T.translate();       
+
+        var totalMatches = 0;
+        var guidesCompleted = 0;
         
         $.each(guides, function (guideKey, guideName) {
             Wat.A.getDocBody({
@@ -122,6 +166,8 @@ Wat.Views.DocView = Wat.Views.MainView.extend({
                 var sectionh2 = '';
 
                 var matchsTree = {};
+                var matchsDictionary = {};
+                var guideMatches = 0;
                 
                 $.each($($.parseHTML(docParams.docBody)[3])[0].childNodes, function (iElement, element) {
                     if (element.nodeName == '#text') {
@@ -146,19 +192,15 @@ Wat.Views.DocView = Wat.Views.MainView.extend({
                             var content = $(child)[0].innerHTML;
                             var array_matches = pattern.exec(content);
                             if (array_matches) {
-                                var matchHTML = '<a href="#documentation/' + docParams.guide + '">' + guideName + '</a>';
-                                matchHTML += ' -> ';
-                                matchHTML += '<a href="#documentation/' + docParams.guide + '/' + sectionh2 + '">' + sectionh2Text + '</a>';
+                                matchsTree[sectionh2] = {
+                                    'nmatches': 1,
+                                    'name': 1
+                                };
+                                     
+                                guideMatches++;
                                 
-                                target.html(target.html() + matchHTML + '<br>');
-                                
-                                if (matchsTree[docParams.guide] == undefined) {
-                                    matchsTree[docParams.guide] = {};
-                                }
-                                
-                                if (matchsTree[docParams.guide][sectionh2] == undefined) {
-                                    matchsTree[docParams.guide][sectionh2] = ['_name'];
-                                }
+                                // Store pairs key-text to rendering process
+                                matchsDictionary[sectionh2] = sectionh2Text;
                             }
                         }
                         else {
@@ -184,24 +226,19 @@ Wat.Views.DocView = Wat.Views.MainView.extend({
                                             var content = $(child3)[0].innerHTML;
                                             var array_matches = pattern.exec(content);
                                             if (array_matches) {
-                                                var matchHTML = '<a href="#documentation/' + docParams.guide + '">' + guideName + '</a>';
-                                                matchHTML += ' -> ';
-                                                matchHTML += '<a href="#documentation/' + docParams.guide + '/' + sectionh2 + '">' + sectionh2Text + '</a>';
-                                                matchHTML += ' -> ';
-                                                matchHTML += '<a href="#documentation/' + docParams.guide + '/' + sectionh3 + '">' + sectionh3Text + '</a>';
-                                                
-                                                target.html(target.html() + matchHTML + '<br>');
-                                                
-                                                if (matchsTree[docParams.guide] == undefined) {
-                                                    matchsTree[docParams.guide] = {};
-                                                }
-
-                                                if (matchsTree[docParams.guide][sectionh2] == undefined) {
-                                                    matchsTree[docParams.guide][sectionh2] = [sectionh3];
+                                                if (matchsTree[sectionh3] == undefined) {
+                                                    matchsTree[sectionh3] = {
+                                                        'nmatches': 1
+                                                    };
                                                 }
                                                 else {
-                                                    matchsTree[docParams.guide][sectionh2].push(sectionh3);
+                                                    matchsTree[sectionh3].nmatches++;
                                                 }
+                                                
+                                                guideMatches++;
+                                                
+                                                // Store pairs key-text to rendering process
+                                                matchsDictionary[sectionh3] = sectionh3Text;
                                                 
                                             }
                                         }
@@ -209,24 +246,19 @@ Wat.Views.DocView = Wat.Views.MainView.extend({
                                             var content = $(child3)[0].innerHTML;
                                             var array_matches = pattern.exec(content);
                                             if (array_matches) {
-                                                var matchHTML = '<a href="#documentation/' + docParams.guide + '">' + guideName + '</a>';
-                                                matchHTML += ' -> ';
-                                                matchHTML += '<a href="#documentation/' + docParams.guide + '/' + sectionh2 + '">' + sectionh2Text + '</a>';
-                                                matchHTML += ' -> ';
-                                                matchHTML += '<a href="#documentation/' + docParams.guide + '/' + sectionh3 + '">' + sectionh3Text + '</a>';
-
-                                                target.html(target.html() + matchHTML + '<br>');
-                                                
-                                                if (matchsTree[docParams.guide] == undefined) {
-                                                    matchsTree[docParams.guide] = {};
-                                                }
-                                                
-                                                if (matchsTree[docParams.guide][sectionh2] == undefined) {
-                                                    matchsTree[docParams.guide][sectionh2] = [sectionh3];
+                                                if (matchsTree[sectionh3] == undefined) {
+                                                    matchsTree[sectionh3] = {
+                                                        'nmatches': 1
+                                                    };
                                                 }
                                                 else {
-                                                    matchsTree[docParams.guide][sectionh2].push(sectionh3);
+                                                    matchsTree[sectionh3].nmatches++;
                                                 }
+                                                
+                                                guideMatches++;
+
+                                                // Store pairs key-text to rendering process
+                                                matchsDictionary[sectionh3] = sectionh3Text;
                                             }
                                         }
                                     });
@@ -235,19 +267,38 @@ Wat.Views.DocView = Wat.Views.MainView.extend({
                                     var content = $(child2)[0].innerHTML;
                                     var array_matches = pattern.exec(content);
                                     if (array_matches) {
-                                        var matchHTML = '<a href="#documentation/' + docParams.guide + '">' + guideName + '</a>';
-                                        matchHTML += ' -> ';
-                                        matchHTML += '<a href="#documentation/' + docParams.guide + '/' + sectionh2 + '">' + sectionh2Text + '</a>';
-                                        
-                                        target.html(target.html() + matchHTML + '<br>'); 
-                                        
-                                        if (matchsTree[docParams.guide] == undefined) {
-                                            matchsTree[docParams.guide] = {};
+                                        if (sectionh2 == '') {
+                                            if (matchsTree['guide_' + docParams.guide] == undefined) {
+                                                matchsTree['guide_' + docParams.guide] = {
+                                                    'nmatches': 1,
+                                                    'guide_introduction': 1
+                                                };
+                                            }
+                                            else {
+                                                matchsTree['guide_' + docParams.guide].nmatches++;
+                                            }   
+                                            
+                                            var dictKey = 'guide_' + docParams.guide;
+                                            var dictVal = $.i18n.t('Guide introduction');
                                         }
+                                        else {
+                                            var dictKey = sectionh2;
+                                            var dictVal = sectionh2Text;
+                                            
+                                            if (matchsTree[sectionh2] == undefined) {
+                                                matchsTree[sectionh2] = {
+                                                    'nmatches': 1
+                                                };
+                                            }
+                                            else {
+                                                matchsTree[sectionh2].nmatches++;
+                                            }
+                                        }
+                                        
+                                        guideMatches++;
 
-                                        if (matchsTree[docParams.guide][sectionh2] == undefined) {
-                                            matchsTree[docParams.guide][sectionh2] = ['_self'];
-                                        }
+                                        // Store pairs key-text to rendering process
+                                        matchsDictionary[dictKey] = dictVal;
                                     }
                                 }
                             });
@@ -255,9 +306,28 @@ Wat.Views.DocView = Wat.Views.MainView.extend({
                     });
                 });
                 
-                //console.info(matchsTree);
-                //target.html(target.html() + '<br><br>' + JSON.stringify(matchsTree) + '<br><br>');
-                // TODO: Create a template that will receive matchsTree structure and draw results
+                // Fill the html with the template
+                var template = _.template(
+                    Wat.TPL.docSearchResult, {
+                        matchsTree: matchsTree,
+                        matchsDictionary: matchsDictionary,
+                        guide: docParams.guide,
+                        guideName: docParams.guideName,
+                        guideMatches: guideMatches
+                    }
+                );
+
+                $('.bb-' + guideKey).html(template);
+                
+                guidesCompleted++;
+                totalMatches += guideMatches;
+                
+                if (guidesCompleted == Object.keys(guides).length) {
+                    Wat.T.translate();       
+                    $('.js-search-summary').html(i18n.t('__count__ matches found for', {'count': totalMatches}));
+                    target.find('.loading').remove();
+                    $('.js-guide-search').show();
+                }
             });
         });
     },

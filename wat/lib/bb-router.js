@@ -27,6 +27,7 @@ Wat.Router = Backbone.Router.extend({
         "watconfig": "watConfig",
         "about": "about",
         "documentation": "documentation",
+        "documentation/search/:token": "documentationSearch",
         "documentation/:guide": "documentationGuide",
         "documentation/:guide/:section": "documentationGuide",
         "profile": "profile",
