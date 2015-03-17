@@ -12,7 +12,7 @@
                     if (col.sortable == true) {
                         sortAttr = 'sortable';
                     }
-                    
+
                     printedColumns++;
                     
                     switch(name) {
@@ -50,7 +50,7 @@
             %>
             
             <% if (Wat.C.isSuperadmin()) { %>
-                <th class="<%= sortAttr %>" data-sortby="tenant_name">
+                <th data-sortby="tenant_name">
                     <span data-i18n="Tenant"><%= i18n.t('Tenant') %></span>
                 </th>
             <% } %>
