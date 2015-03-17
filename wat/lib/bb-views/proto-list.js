@@ -182,7 +182,7 @@ Wat.Views.ListView = Wat.Views.MainView.extend({
         var that = this;
         
         // Show loading animation while loading
-        $('.list').html('<i class="fa fa-spin fa-gear loading-mid"></i>');
+        $('.list').html(HTML_MID_LOADING);
         
         if ($(e.target).hasClass('mobile-filter')) {
             var filtersContainer = '.' + this.cid + ' .filter-mobile';

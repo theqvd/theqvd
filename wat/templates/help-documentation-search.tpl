@@ -1,5 +1,5 @@
 <div class="h1"><span class="js-search-summary" data-i18n="Searching matches for"></span>: "<%= searchKey %>"</div>
-<%= HTML_LOADING %>
+<%= HTML_MID_LOADING %>
 
 <%
     $.each(guides, function (guideKey, guideName) {  

@@ -100,6 +100,7 @@ Wat.Views.DocView = Wat.Views.MainView.extend({
         Wat.T.translate();       
     },
     
+    // Fill guide doc content
     fillDocumentation: function () {    
         Wat.A.getDocBody({
             guide: this.selectedGuide,
@@ -108,6 +109,7 @@ Wat.Views.DocView = Wat.Views.MainView.extend({
         }, Wat.A.fillDocBody);
     },
     
+    // Simulate click on guide that is stored as selected
     goSelectedSection: function () {
         var currentHash = '#documentation/' + Wat.CurrentView.selectedGuide;
         
@@ -122,19 +124,21 @@ Wat.Views.DocView = Wat.Views.MainView.extend({
         }
     },
     
+    // Search a given string on each documentation guide and print it on screen
     searchDoc: function (searchKey) {
         var that = this;
         
-        // If pushState is available in browser, modify hash with current section
+        // If pushState is available in browser, modify hash with current search
         if (history.pushState) {
             history.pushState(null, null, '#documentation/search/' + searchKey);
         }
         
+        // Get available guides
         var guides = Wat.C.getDocGuides ();
         
         var target = $('.setup-block');
         
-        // Fill the html with the template
+        // Fill the html with the general search template with layer for each guide results
         var template = _.template(
             Wat.TPL.docSearch, {
                 guides: guides,
@@ -143,18 +147,23 @@ Wat.Views.DocView = Wat.Views.MainView.extend({
         );
 
         target.html(template);
-                            
+                           
+        // Translate rendered strings
         Wat.T.translate();       
 
+        // Initialize counters for global search
         var totalMatches = 0;
         var guidesCompleted = 0;
         
+        // Go over each guide to get it and perform searching
         $.each(guides, function (guideKey, guideName) {
+            // Get guide file content
             Wat.A.getDocBody({
                 guide: guideKey,
                 guideName: guideName,
                 target: $('.bb-doc-text'),
             }, function (docParams) {
+                // Get body content of the guide document
                 var pattern = /<body[^>]*>((.|[\n\r])*)<\/body>/im
                 var array_matches = pattern.exec(Wat.TPL.docSection);
 
@@ -162,129 +171,211 @@ Wat.Views.DocView = Wat.Views.MainView.extend({
 
                 // Search key
                 var pattern = new RegExp('((.|[\n\r])*)' + searchKey + '((.|[\n\r])*)', 'im');
+                
+                // Initialize variables for guide searching
                 var sectionh3 = '';
                 var sectionh2 = '';
-
                 var matchsTree = {};
                 var matchsDictionary = {};
                 var guideMatches = 0;
                 
-                $.each($($.parseHTML(docParams.docBody)[3])[0].childNodes, function (iElement, element) {
-                    if (element.nodeName == '#text') {
+                // Convert HTML to js object
+                var parsedDocBody = $.parseHTML(docParams.docBody);
+
+                // We go over ASCIIDOC structure to retrieve each section and subsections
+                // IMPORTANT: If we change asciidoc generation script, this search process may fail
+                
+                // Get content from parsed doc body.
+                // This doc have structure #text,#header,#text,#content,#text,#footnotes,#text,#footer,#text
+                // #text represent carriage returns and other empty html fragments
+                // Position 3 is content, so we get this position directly
+                var level0 = parsedDocBody[3];
+                var level0Data = $(level0)[0];
+                
+                // The structure of #content branch is:
+                
+                //  #content                        LEVEL 0
+                //      #preamble (opt)
+                //      .sect1                      LEVEL 1    
+                //          h2                      LEVEL 2
+                //          .sectionbody            
+                //              .paragraph (opt)    LEVEL 3
+                //              .sect2
+                //                  h3              LEVEL 4
+                //                  [other tags]    LEVEL N
+                
+                // Get child nodes of the doc content
+                var level1Nodes = level0Data.childNodes;
+                
+                // ////////////////////
+                // LEVEL 1
+                // ////////////////////
+
+                // Go over content child nodes to search keysearch on each section/subsection
+                $.each(level1Nodes, function (iL1, level1) {
+                    // #text are empty fragments of the html code, so we avoid them
+                    if (level1.nodeName == '#text') {
                         return;
                     }
                     
-                    $.each($(element)[0].childNodes, function (iChild, child) {
-                        if (child.nodeName == '#text') {
-                            return;
-                        }
-                        
-                        if ($(child)[0].localName == 'h2') {
-                            // Store section id removing initial underscore
-                            sectionh2 = $(child)[0].id;
-                            sectionh2 = sectionh2.substring(1, sectionh2.length);
-                            
-                            sectionh2Text = $(child)[0].innerHTML;
-                            sectionh3 = '';
-                            sectionh3Text = '';
-                            
-                            // Check if searchkey is into the name of the section
-                            var content = $(child)[0].innerHTML;
-                            var array_matches = pattern.exec(content);
-                            if (array_matches) {
-                                matchsTree[sectionh2] = {
+                    var level1Data = $(level1)[0];
+                    var level2Nodes = level1Data.childNodes;
+                    
+                    // If element id is preamble, it is the guide introduction before any section
+                    if (level1.id == 'preamble') {
+                        var content = level1Data.innerHTML;
+                        var array_matches = pattern.exec(content);
+                        if (array_matches) {                             
+                            if (matchsTree['guide_' + docParams.guide] == undefined) {
+                                matchsTree['guide_' + docParams.guide] = {
                                     'nmatches': 1,
-                                    'name': 1
+                                    'guide_introduction': 1
                                 };
-                                     
-                                guideMatches++;
-                                
-                                // Store pairs key-text to rendering process
-                                matchsDictionary[sectionh2] = sectionh2Text;
                             }
+                            else {
+                                matchsTree['guide_' + docParams.guide].nmatches++;
+                            }   
+
+                            var dictKey = 'guide_' + docParams.guide;
+                            var dictVal = $.i18n.t('Guide introduction');
+
+                            guideMatches++;
+
+                            // Store pairs key-text to rendering process
+                            matchsDictionary[dictKey] = dictVal;
                         }
-                        else {
-                            $.each($(child)[0].childNodes, function (iChild2, child2) {
-                                if (child2.nodeName == '#text') {
-                                    return;
-                                }
-                                
-                                if ($(child2)[0].localName == 'div' && $(child2)[0].className == 'sect2') {
-                                    $.each($(child2)[0].childNodes, function (iChild3, child3) {
-                                        if (child3.nodeName == '#text') {
-                                            return;
-                                        }
-                                        
-                                        if ($(child3)[0].localName == 'h3') {
-                                            // Store section id removing initial underscore
-                                            sectionh3 = $($(child3)[0])[0].id;
-                                            sectionh3 = sectionh3.substring(1, sectionh3.length);
-                                            
-                                            sectionh3Text = $(child3)[0].innerHTML;
+                    }
+                    // If element is not preamble, go to next level
+                    else {
+                        // ////////////////////
+                        // LEVEL 2 (H2)
+                        // ////////////////////
 
-                                            // Check if searchkey is into the name of the section
-                                            var content = $(child3)[0].innerHTML;
-                                            var array_matches = pattern.exec(content);
-                                            if (array_matches) {
-                                                if (matchsTree[sectionh3] == undefined) {
-                                                    matchsTree[sectionh3] = {
-                                                        'nmatches': 1
-                                                    };
-                                                }
-                                                else {
-                                                    matchsTree[sectionh3].nmatches++;
-                                                }
-                                                
-                                                guideMatches++;
-                                                
-                                                // Store pairs key-text to rendering process
-                                                matchsDictionary[sectionh3] = sectionh3Text;
-                                                
-                                            }
-                                        }
-                                        else {
-                                            var content = $(child3)[0].innerHTML;
-                                            var array_matches = pattern.exec(content);
-                                            if (array_matches) {
-                                                if (matchsTree[sectionh3] == undefined) {
-                                                    matchsTree[sectionh3] = {
-                                                        'nmatches': 1
-                                                    };
-                                                }
-                                                else {
-                                                    matchsTree[sectionh3].nmatches++;
-                                                }
-                                                
-                                                guideMatches++;
+                        $.each(level2Nodes, function (iL2, level2) {
+                            // #text are empty fragments of the html code, so we avoid them
+                            if (level2.nodeName == '#text') {
+                                return;
+                            }
+                            
+                            var level2Data = $(level2)[0];
+                            var level3Nodes = level2Data.childNodes;
 
-                                                // Store pairs key-text to rendering process
-                                                matchsDictionary[sectionh3] = sectionh3Text;
-                                            }
-                                        }
-                                    });
+                            // In level 2 we can found H2 and other contents
+                            // If element is H2 tag, store for know where we are and check search on section name
+                            
+                            if (level2Data.localName == 'h2') {
+                                // Store section id removing initial underscore
+                                sectionh2 = level2Data.id;
+                                sectionh2 = sectionh2.substring(1, sectionh2.length);
+                                sectionh2Text = level2Data.innerHTML;
+
+                                // For each new h2, reset h3 to initial values
+                                sectionh3 = '';
+                                sectionh3Text = '';
+
+                                // Check if searchkey is into the name of the section
+                                var content = level2Data.innerHTML;
+                                var array_matches = pattern.exec(content);
+                                if (array_matches) {
+                                    matchsTree[sectionh2] = {
+                                        'nmatches': 1,
+                                        'name': 1
+                                    };
+
+                                    guideMatches++;
+
+                                    // Store pairs key-text to rendering process
+                                    matchsDictionary[sectionh2] = sectionh2Text;
                                 }
-                                else {
-                                    var content = $(child2)[0].innerHTML;
-                                    var array_matches = pattern.exec(content);
-                                    if (array_matches) {
-                                        if (sectionh2 == '') {
-                                            if (matchsTree['guide_' + docParams.guide] == undefined) {
-                                                matchsTree['guide_' + docParams.guide] = {
-                                                    'nmatches': 1,
-                                                    'guide_introduction': 1
-                                                };
+                            }
+                            // If element is not H2 tag, go to next level
+                            else {
+                                // ////////////////////
+                                // LEVEL 3
+                                // ////////////////////
+
+                                $.each(level3Nodes, function (iL3, level3) {
+                                    // #text are empty fragments of the html code, so we avoid them
+                                    if (level3.nodeName == '#text') {
+                                        return;
+                                    }
+
+                                    var level3Data = $(level3)[0];
+                                    var level4Nodes = level3Data.childNodes;
+
+                                    // If element is sect2, go to next level
+                                    if (level3Data.localName == 'div' && level3Data.className == 'sect2') {
+
+                                        // ////////////////////
+                                        // LEVEL 4 (H3)
+                                        // ////////////////////
+
+                                        $.each(level4Nodes, function (iL4, level4) {
+                                            // #text are empty fragments of the html code, so we avoid them
+                                            if (level4.nodeName == '#text') {
+                                                return;
                                             }
+
+                                            var level4Data = $(level4)[0];
+
+                                            // In level 4 we can found H3 and other contents
+                                            // If element is H3 tag, store for know where we are and check search on section name
+                                            if (level4Data.localName == 'h3') {
+                                                // Store section id removing initial underscore
+                                                sectionh3 = $(level4Data)[0].id;
+                                                sectionh3 = sectionh3.substring(1, sectionh3.length);
+                                                sectionh3Text = level4Data.innerHTML;
+
+                                                // Check if searchkey is into the name of the section
+                                                var content = level4Data.innerHTML;
+                                                var array_matches = pattern.exec(content);
+                                                if (array_matches) {
+                                                    if (matchsTree[sectionh3] == undefined) {
+                                                        matchsTree[sectionh3] = {
+                                                            'nmatches': 1
+                                                        };
+                                                    }
+                                                    else {
+                                                        matchsTree[sectionh3].nmatches++;
+                                                    }
+
+                                                    guideMatches++;
+
+                                                    // Store pairs key-text to rendering process
+                                                    matchsDictionary[sectionh3] = sectionh3Text;
+                                                }
+                                            }
+                                            // If element is not H3, this is the content of the subsection
                                             else {
-                                                matchsTree['guide_' + docParams.guide].nmatches++;
-                                            }   
-                                            
-                                            var dictKey = 'guide_' + docParams.guide;
-                                            var dictVal = $.i18n.t('Guide introduction');
-                                        }
-                                        else {
+                                                // Check if searchkey is into the content of the subsection
+                                                var content = level4Data.innerHTML;
+                                                var array_matches = pattern.exec(content);
+                                                if (array_matches) {
+                                                    if (matchsTree[sectionh3] == undefined) {
+                                                        matchsTree[sectionh3] = {
+                                                            'nmatches': 1
+                                                        };
+                                                    }
+                                                    else {
+                                                        matchsTree[sectionh3].nmatches++;
+                                                    }
+
+                                                    guideMatches++;
+
+                                                    // Store pairs key-text to rendering process
+                                                    matchsDictionary[sectionh3] = sectionh3Text;
+                                                }
+                                            }
+                                        });
+                                    }
+                                    // If element is not sect2, this is the content of the section
+                                    else {
+                                        var content = level3Data.innerHTML;
+                                        var array_matches = pattern.exec(content);
+                                        if (array_matches) {
                                             var dictKey = sectionh2;
                                             var dictVal = sectionh2Text;
-                                            
+
                                             if (matchsTree[sectionh2] == undefined) {
                                                 matchsTree[sectionh2] = {
                                                     'nmatches': 1
@@ -293,17 +384,17 @@ Wat.Views.DocView = Wat.Views.MainView.extend({
                                             else {
                                                 matchsTree[sectionh2].nmatches++;
                                             }
-                                        }
-                                        
-                                        guideMatches++;
 
-                                        // Store pairs key-text to rendering process
-                                        matchsDictionary[dictKey] = dictVal;
+                                            guideMatches++;
+
+                                            // Store pairs key-text to rendering process
+                                            matchsDictionary[dictKey] = dictVal;
+                                        }
                                     }
-                                }
-                            });
-                        }
-                    });
+                                });
+                            }
+                        });
+                    }
                 });
                 
                 // Fill the html with the template
@@ -322,10 +413,11 @@ Wat.Views.DocView = Wat.Views.MainView.extend({
                 guidesCompleted++;
                 totalMatches += guideMatches;
                 
+                // Hide loading animation and show results
                 if (guidesCompleted == Object.keys(guides).length) {
                     Wat.T.translate();       
                     $('.js-search-summary').html(i18n.t('__count__ matches found for', {'count': totalMatches}));
-                    target.find('.loading').remove();
+                    target.find('.loading-mid').remove();
                     $('.js-guide-search').show();
                 }
             });
