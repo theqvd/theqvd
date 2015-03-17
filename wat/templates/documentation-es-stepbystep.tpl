@@ -843,6 +843,7 @@ Una <strong>Guía de usuario</strong> con indicaciones para realizar tareas frec
 </p>
 </li>
 </ul></div>
+<div class="paragraph"><p>Además, la documentación dispone de una caja de búsqueda para encontrar rápidamente resultados en cualquiera de las guías disponibles.</p></div>
 </div>
 </div>
 </div>

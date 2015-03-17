@@ -17,7 +17,7 @@
     }
     
     &>ul {    
-        .menu-option, .lateral-menu-option {
+        .menu-option, .lateral-menu-option, .lateral-menu-option-discrete {
             @extend %not-selectable;
             display: block;
 
@@ -80,10 +80,14 @@
 
         }
         
-        .lateral-menu-option, .lateral-menu-option:active {
+        .lateral-menu-option, .lateral-menu-option:active, .lateral-menu-option-discrete {
             float: left;
             margin-bottom: 10px;
             width: 100%;
+        }
+        
+        .lateral-menu-option-discrete {
+            border: 0;
         }
 
             .menu-option--selected, .menu-option:hover, .lateral-menu-option--selected, .lateral-menu-option:hover {

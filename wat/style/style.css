@@ -12,7 +12,7 @@
   padding-left: 20px;
   padding-right: 20px; }
 
-.menu > ul .menu-option, .menu > ul .lateral-menu-option, a.button, button.button, a.button2, button.button2, a.button--green, button.button--green, a.button--red, button.button--red, a.button.disabled, a.button2.disabled, button.button.disabled, button.button2.disabled, .wrapper .content .home-wrapper th, .wrapper .content .home-wrapper .home-row .home-cell .summary-table th, .wrapper .content .home-wrapper .log-table th, table.list th, table.customize-fields th, table.custom-props th, table.details th, .ui-dialog .ui-state-hover, .ui-dialog .ui-state-focus, .not-selectable {
+.menu > ul .menu-option, .menu > ul .lateral-menu-option, .menu > ul .lateral-menu-option-discrete, a.button, button.button, a.button2, button.button2, a.button--green, button.button--green, a.button--red, button.button--red, a.button.disabled, a.button2.disabled, button.button.disabled, button.button2.disabled, .wrapper .content .home-wrapper th, .wrapper .content .home-wrapper .home-row .home-cell .summary-table th, .wrapper .content .home-wrapper .log-table th, table.list th, table.customize-fields th, table.custom-props th, table.details th, .ui-dialog .ui-state-hover, .ui-dialog .ui-state-focus, .not-selectable {
   -webkit-touch-callout: none;
   -webkit-user-select: none;
   -khtml-user-select: none;
@@ -254,7 +254,7 @@ fieldset {
   @media screen and (min-width: 40em) {
     .menu {
       display: block; } }
-  .menu > ul .menu-option, .menu > ul .lateral-menu-option {
+  .menu > ul .menu-option, .menu > ul .lateral-menu-option, .menu > ul .lateral-menu-option-discrete {
     display: block;
     min-width: 100px;
     padding: 8px 12px 8px 12px;
@@ -263,38 +263,40 @@ fieldset {
     border: 1px solid #f7985e;
     cursor: pointer; }
     @media screen and (min-width: 40em) {
-      .menu > ul .menu-option, .menu > ul .lateral-menu-option {
+      .menu > ul .menu-option, .menu > ul .lateral-menu-option, .menu > ul .lateral-menu-option-discrete {
         display: inline; } }
-    .menu > ul .menu-option:last-child, .menu > ul .lateral-menu-option:last-child {
+    .menu > ul .menu-option:last-child, .menu > ul .lateral-menu-option:last-child, .menu > ul .lateral-menu-option-discrete:last-child {
       border-bottom-left-radius: 7px;
       border-bottom-right-radius: 7px; }
-    .menu > ul .menu-option:first-child, .menu > ul .lateral-menu-option:first-child {
+    .menu > ul .menu-option:first-child, .menu > ul .lateral-menu-option:first-child, .menu > ul .lateral-menu-option-discrete:first-child {
       border-top-left-radius: 7px;
       border-top-right-radius: 7px; }
     @media screen and (min-width: 40em) {
-      .menu > ul .menu-option:last-child, .menu > ul .lateral-menu-option:last-child {
+      .menu > ul .menu-option:last-child, .menu > ul .lateral-menu-option:last-child, .menu > ul .lateral-menu-option-discrete:last-child {
         border-bottom-left-radius: 0;
         border-top-right-radius: 7px;
         border-bottom-right-radius: 7px; }
-      .menu > ul .menu-option:first-child, .menu > ul .lateral-menu-option:first-child {
+      .menu > ul .menu-option:first-child, .menu > ul .lateral-menu-option:first-child, .menu > ul .lateral-menu-option-discrete:first-child {
         border-top-right-radius: 0;
         border-top-left-radius: 7px;
         border-bottom-left-radius: 7px; }
-      .menu > ul .menu-option:first-child:last-child, .menu > ul .lateral-menu-option:first-child:last-child {
+      .menu > ul .menu-option:first-child:last-child, .menu > ul .lateral-menu-option:first-child:last-child, .menu > ul .lateral-menu-option-discrete:first-child:last-child {
         border-radius: 7px; } }
-    .menu > ul .menu-option .fa, .menu > ul .lateral-menu-option .fa {
+    .menu > ul .menu-option .fa, .menu > ul .lateral-menu-option .fa, .menu > ul .lateral-menu-option-discrete .fa {
       font-size: 18px;
       margin-right: 10px; }
-    .menu > ul .menu-option span, .menu > ul .lateral-menu-option span {
+    .menu > ul .menu-option span, .menu > ul .lateral-menu-option span, .menu > ul .lateral-menu-option-discrete span {
       vertical-align: bottom; }
     @media screen and (min-width: 40em) {
-      .menu > ul .menu-option:active, .menu > ul .lateral-menu-option:active {
+      .menu > ul .menu-option:active, .menu > ul .lateral-menu-option:active, .menu > ul .lateral-menu-option-discrete:active {
         margin-bottom: -2px;
         margin-top: 1px; } }
-  .menu > ul .lateral-menu-option, .menu > ul .lateral-menu-option:active {
+  .menu > ul .lateral-menu-option, .menu > ul .lateral-menu-option:active, .menu > ul .lateral-menu-option-discrete {
     float: left;
     margin-bottom: 10px;
     width: 100%; }
+  .menu > ul .lateral-menu-option-discrete {
+    border: 0; }
   .menu > ul .menu-option--selected, .menu > ul .menu-option:hover, .menu > ul .lateral-menu-option--selected, .menu > ul .lateral-menu-option:hover {
     background: #e35e0c;
     color: #fdfdfd;
