@@ -7,7 +7,8 @@ Wat.I.listFields[qvdObj] = {
         'fields': [],
         'acls': 'role.delete-massive.',
         'fixed': true,
-        'text': ''
+        'text': '',
+        'sortable': false,
     },
     'id': {
         'display': false,
@@ -15,7 +16,8 @@ Wat.I.listFields[qvdObj] = {
             'id'
         ],
         'acls': 'role.see.id',
-        'text': 'Id'
+        'text': 'Id',
+        'sortable': true,
     },
     'name': {
         'display': true,
@@ -24,7 +26,8 @@ Wat.I.listFields[qvdObj] = {
             'name'
         ],
         'text': 'Name',
-        'fixed': true
+        'fixed': true,
+        'sortable': true,
     },
     'acls': {
         'display': false,
@@ -34,6 +37,7 @@ Wat.I.listFields[qvdObj] = {
         ],
         'acls': 'role.see.acl-list',
         'text': 'ACLs',
+        'sortable': false,
     },
     'roles': {
         'display': true,
@@ -42,6 +46,7 @@ Wat.I.listFields[qvdObj] = {
         ],
         'acls': 'role.see.acl-list-roles',
         'text': 'Inherited roles',
+        'sortable': false,
     }
 };
 

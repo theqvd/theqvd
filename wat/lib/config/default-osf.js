@@ -14,7 +14,8 @@ Wat.I.listFields[qvdObj] = {
             'osf.update-massive.properties-delete'
         ],
         'aclsLogic': 'OR',
-        'fixed': true
+        'fixed': true,
+        'sortable': false,
     },
     'id': {
         'display': false,
@@ -22,7 +23,8 @@ Wat.I.listFields[qvdObj] = {
             'id'
         ],
         'acls': 'osf.see.id',
-        'text': 'Id'
+        'text': 'Id',
+        'sortable': true,
     },
     'name': {
         'display': true,
@@ -31,7 +33,8 @@ Wat.I.listFields[qvdObj] = {
             'name'
         ],
         'text': 'Name',
-        'fixed': true
+        'fixed': true,
+        'sortable': true,
     },
     'overlay': {
         'display': true,
@@ -39,7 +42,8 @@ Wat.I.listFields[qvdObj] = {
             'overlay'
         ],
         'acls': 'osf.see.overlay',
-        'text': 'Overlay'
+        'text': 'Overlay',
+        'sortable': true,
     },
     'memory': {
         'display': true,
@@ -47,7 +51,8 @@ Wat.I.listFields[qvdObj] = {
             'memory'
         ],
         'acls': 'osf.see.memory',
-        'text': 'Memory'
+        'text': 'Memory',
+        'sortable': true,
     },
     'user_storage': {
         'display': true,
@@ -55,7 +60,8 @@ Wat.I.listFields[qvdObj] = {
             'user_storage'
         ],
         'acls': 'osf.see.user-storage',
-        'text': 'User storage'
+        'text': 'User storage',
+        'sortable': true,
     },
     'dis': {
         'display': true,
@@ -64,7 +70,8 @@ Wat.I.listFields[qvdObj] = {
             'dis'
         ],
         'acls': 'osf.see.dis-info',
-        'text': 'DIs'
+        'text': 'DIs',
+        'sortable': false,
     },
     'vms': {
         'display': true,
@@ -73,7 +80,8 @@ Wat.I.listFields[qvdObj] = {
             'vms'
         ],
         'acls': 'osf.see.vms-info',
-        'text': 'VMs'
+        'text': 'VMs',
+        'sortable': false,
     },
     'creation_date': {
         'text': 'Creation date',
@@ -81,7 +89,8 @@ Wat.I.listFields[qvdObj] = {
             'creation_date'
         ],
         'acls': 'osf.see.creation-date',
-        'display': false
+        'display': false,
+        'sortable': false,
     },
     'creation_admin': {
         'text': 'Created by',
@@ -89,7 +98,8 @@ Wat.I.listFields[qvdObj] = {
             'creation_admin'
         ],
         'acls': 'osf.see.created-by',
-        'display': false
+        'display': false,
+        'sortable': false,
     }
 };
 

@@ -8,75 +8,74 @@
                         return;
                     }
                     
+                    var sortAttr = '';
+                    if (col.sortable == true) {
+                        sortAttr = 'sortable';
+                    }
+                    
                     printedColumns++;
                     
                     switch(name) {
                         case 'checks':
                             var checkedAttr = selectedAll ? 'checked' : '';
             %>
-                            <th class="max-1-icons">
+                            <th class="<%= sortAttr %> max-1-icons">
                                 <input type="checkbox" class="check_all" <%= checkedAttr %>>
                             </th>
             <%
                             break;
                         case 'info':
             %>
-                            <th class="desktop">
+                            <th class="<%= sortAttr %> desktop">
                                 <i class="fa fa-info-circle normal" data-i18n="[title]Info" title="<%= i18n.t('Info') %>"></i>
                             </th>
             <%
                             break;
                         case 'id':
             %>
-                            <th class="sortable desktop col-width-10" data-sortby="id">
-                                <i class="fa fa-sort sort-icon"></i>
+                            <th class="<%= sortAttr %> desktop col-width-10" data-sortby="id">
                                 <span data-i18n="Id"><%= i18n.t('Id') %></span>
                             </th>
             <%
                             break;
                         case 'disk_image':
             %>
-                            <th class="sortable col-width-100" data-sortby="disk_image">
-                                <i class="fa fa-sort sort-icon"></i>
+                            <th class="<%= sortAttr %> col-width-100" data-sortby="disk_image">
                                 <span data-i18n="Disk image"><%= i18n.t('Disk image') %></span>
                             </th>
             <%
                             break;
                         case 'version':
             %>
-                            <th class="desktop sortable col-width-14" data-sortby="version">
-                                <i class="fa fa-sort sort-icon"></i>
+                            <th class="<%= sortAttr %> desktop col-width-14" data-sortby="version">
                                 <span data-i18n="Version"><%= i18n.t('Version') %></span>
                             </th>
             <%
                             break;
                         case 'osf':
             %>
-                            <th class="desktop sortable" data-sortby="osf_name">
-                                <i class="fa fa-sort sort-icon"></i>
+                            <th class="<%= sortAttr %> desktop" data-sortby="osf_name">
                                 <span data-i18n="OS Flavour"><%= i18n.t('OS Flavour') %></span>
                             </th>
             <%
                             break;
                         case 'default':
             %>
-                            <th class="desktop max-1-icons">
+                            <th class="<%= sortAttr %> desktop max-1-icons">
                                 <i class="fa fa-home"></i>
                             </th>
             <%
                             break;
                         case 'head':
             %>
-                            <th class="desktop max-1-icons" data-sortby="head">
-                                <i class="fa sort-icon"></i>
+                            <th class="<%= sortAttr %> desktop max-1-icons" data-sortby="head">
                                 <i class="fa fa-flag"></i>
                             </th>
             <%
                             break;
                         case 'tenant':
             %>
-                            <th class="sortable desktop" data-sortby="tenant_name">
-                                <i class="fa fa-sort sort-icon"></i>
+                            <th class="<%= sortAttr %> desktop" data-sortby="tenant_name">
                                 <span data-i18n="Tenant"><%= i18n.t('Tenant') %></span>
                             </th>
             <%
@@ -91,8 +90,7 @@
                             }
                     
             %>
-                            <th class="sortable desktop" data-sortby="<%= name %>">
-                                <i class="fa sort-icon"></i>
+                            <th class="<%= sortAttr %> desktop" data-sortby="<%= name %>">
                                 <span <%= translationAttr %>><%= colText %></span>
                             </th>
             <%
@@ -201,7 +199,7 @@
                             case 'default':
                 %>
                                 <td class="desktop center">
-                                    <input type="radio" data-di_id="<%= model.get('id') %>" name="di_default" <%= model.get('default') ? 'checked': '' %> value="0">
+                                    <input type="radio" data-di_id="<%= model.get('id') %>" data-name="di_default" name="di_default-<%= model.get('id') %>" <%= model.get('default') ? 'checked': '' %> value="0">
                                 </td>
                 <%
                                 break;

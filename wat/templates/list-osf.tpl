@@ -8,77 +8,74 @@
                         return;
                     }
                     
+                    var sortAttr = '';
+                    if (col.sortable == true) {
+                        sortAttr = 'sortable';
+                    }
+                    
                     printedColumns++;
                     
                     switch(name) {
                         case 'checks':
                             var checkedAttr = selectedAll ? 'checked' : '';
             %>
-                            <th class="max-1-icons">
+                            <th class="<%= sortAttr %> max-1-icons">
                                 <input type="checkbox" class="check_all" <%= checkedAttr %>>
                             </th>
             <%
                             break;
                         case 'id':
             %>
-                            <th class="sortable desktop col-width-10" data-sortby="id">
-                                <i class="fa fa-sort sort-icon"></i>
+                            <th class="<%= sortAttr %> desktop col-width-10" data-sortby="id">
                                 <span data-i18n="Id"><%= i18n.t('Id') %></span>
                             </th>
             <%
                             break;
                         case 'name':
             %>
-                            <th class="sortable col-width-100" data-sortby="name">
-                                <i class="fa fa-sort sort-icon"></i>
+                            <th class="<%= sortAttr %> col-width-100" data-sortby="name">
                                 <span data-i18n="Name"><%= i18n.t('Name') %></span>
                             </th>
             <%
                             break;
                         case 'overlay':
             %>
-                            <th class="desktop sortable col-width-10" data-sortby="overlay">
-                                <i class="fa fa-sort sort-icon"></i>
+                            <th class="<%= sortAttr %> desktop col-width-10" data-sortby="overlay">
                                 <span data-i18n="Overlay"><%= i18n.t('Overlay') %></span>
                             </th>
             <%
                             break;
                         case 'memory':
             %>
-                            <th class="desktop sortable col-width-10" data-sortby="memory">
-                                <i class="fa fa-sort sort-icon"></i>
+                            <th class="<%= sortAttr %> desktop col-width-10" data-sortby="memory">
                                 <span data-i18n="Memory"><%= i18n.t('Memory') %></span>
                             </th>
             <%
                             break;
                         case 'user_storage':
             %>
-                            <th class="desktop sortable col-width-13" data-sortby="user_storage">
-                                <i class="fa fa-sort sort-icon"></i>
+                            <th class="<%= sortAttr %> desktop col-width-13" data-sortby="user_storage">
                                 <span data-i18n="User storage"><%= i18n.t('User storage') %></span>
                             </th>
             <%
                             break;
                         case 'dis':
             %>
-                            <th class="desktop">
-                                <i class="fa sort-icon"></i>
+                            <th class="<%= sortAttr %> desktop">
                                 <span data-i18n="DIs"><%= i18n.t('DIs') %></span>
                             </th>
             <%
                             break;
                         case 'vms':
             %>
-                            <th class="desktop">
-                                <i class="fa sort-icon"></i>
+                            <th class="<%= sortAttr %> desktop">
                                 <span data-i18n="VMs"><%= i18n.t('VMs') %></span>
                             </th>
             <%
                             break;
                         case 'tenant':
             %>
-                            <th class="sortable desktop" data-sortby="tenant_name">
-                                <i class="fa fa-sort sort-icon"></i>
+                            <th class="<%= sortAttr %> desktop" data-sortby="tenant_name">
                                 <span data-i18n="Tenant"><%= i18n.t('Tenant') %></span>
                             </th>
             <%
@@ -93,8 +90,7 @@
                             }
                     
             %>
-                            <th class="sortable desktop" data-sortby="<%= name %>">
-                                <i class="fa sort-icon"></i>
+                            <th class="<%= sortAttr %> desktop" data-sortby="<%= name %>">
                                 <span <%= translationAttr %>><%= colText %></span>
                             </th>
             <%

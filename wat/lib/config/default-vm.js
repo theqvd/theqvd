@@ -8,7 +8,8 @@ Wat.I.listFields[qvdObj] = {
         'groupAcls': 'vmMassiveActions',
         'aclsLogic': 'OR',
         'display': true,
-        'fixed': true
+        'fixed': true,
+        'sortable': false,
     },
     'info': {
         'text': 'Info',
@@ -21,7 +22,8 @@ Wat.I.listFields[qvdObj] = {
         ],
         'groupAcls': 'vmInfo',
         'aclsLogic': 'OR',
-        'display': true
+        'display': true,
+        'sortable': false,
     },
     'id': {
         'text': 'Id',
@@ -30,6 +32,7 @@ Wat.I.listFields[qvdObj] = {
         ],
         'acls': 'vm.see.id',
         'display': false,
+        'sortable': true,
     },
     'name': {
         'text': 'Name',
@@ -38,7 +41,8 @@ Wat.I.listFields[qvdObj] = {
             'name'
         ],
         'display': true,
-        'fixed': true
+        'fixed': true,
+        'sortable': true,
     },
     'host': {
         'text': 'Node',
@@ -47,7 +51,8 @@ Wat.I.listFields[qvdObj] = {
             'host_name'
         ],
         'acls': 'vm.see.host',
-        'display': true
+        'display': true,
+        'sortable': true,
     },
     'user': {
         'text': 'User',
@@ -56,7 +61,8 @@ Wat.I.listFields[qvdObj] = {
             'user_name'
         ],
         'acls': 'vm.see.user',
-        'display': true
+        'display': true,
+        'sortable': true,
     },
     'osf': {
         'text': 'OS Flavour',
@@ -65,7 +71,8 @@ Wat.I.listFields[qvdObj] = {
             'osf_name'
         ],
         'acls': 'vm.see.osf',
-        'display': false
+        'display': false,
+        'sortable': true,
     },
     'osf\/tag': {
         'text': 'OSF / Tag',
@@ -80,7 +87,8 @@ Wat.I.listFields[qvdObj] = {
             'vm.see.di-tag'
         ],
         'aclsLogic': 'AND',
-        'display': true
+        'display': true,
+        'sortable': true,
     },
     'tag': {
         'text': 'Tag',
@@ -88,7 +96,8 @@ Wat.I.listFields[qvdObj] = {
             'di_tag'
         ],
         'acls': 'vm.see.di-tag',
-        'display': false
+        'display': false,
+        'sortable': true,
     },
     'di_version': {
         'text': 'DI version',
@@ -96,7 +105,8 @@ Wat.I.listFields[qvdObj] = {
             'di_version'
         ],
         'acls': 'vm.see.di-version',
-        'display': false
+        'display': false,
+        'sortable': true,
     },
     'di_name': {
         'text': 'Disk image',
@@ -105,7 +115,8 @@ Wat.I.listFields[qvdObj] = {
             'di_id'
         ],
         'acls': 'vm.see.di',
-        'display': false
+        'display': false,
+        'sortable': true,
     },
     'ip': {
         'text': 'IP address',
@@ -113,7 +124,8 @@ Wat.I.listFields[qvdObj] = {
             'ip'
         ],
         'acls': 'vm.see.ip',
-        'display': false
+        'display': false,
+        'sortable': true,
     },
     'next_boot_ip': {
         'text': 'Next boot IP',
@@ -121,7 +133,8 @@ Wat.I.listFields[qvdObj] = {
             'next_boot_ip'
         ],
         'acls': 'vm.see.next-boot-ip',
-        'display': false
+        'display': false,
+        'sortable': true,
     },
     'mac': {
         'text': 'MAC address',
@@ -129,7 +142,8 @@ Wat.I.listFields[qvdObj] = {
             'mac'
         ],
         'acls': 'vm.see.mac',
-        'display': false
+        'display': false,
+        'sortable': false,
     },
     'serial_port': {
         'text': 'Serial port',
@@ -137,7 +151,8 @@ Wat.I.listFields[qvdObj] = {
             'serial_port'
         ],
         'acls': 'vm.see.port-serial',
-        'display': false
+        'display': false,
+        'sortable': true,
     },
     'ssh_port': {
         'text': 'SSH port',
@@ -145,7 +160,8 @@ Wat.I.listFields[qvdObj] = {
             'ssh_port'
         ],
         'acls': 'vm.see.port-ssh',
-        'display': false
+        'display': false,
+        'sortable': true,
     },
     'vnc_port': {
         'text': 'VNC port',
@@ -153,7 +169,8 @@ Wat.I.listFields[qvdObj] = {
             'vnc_port'
         ],
         'acls': 'vm.see.port-vnc',
-        'display': false
+        'display': false,
+        'sortable': true,
     },
     'creation_date': {
         'text': 'Creation date',
@@ -161,7 +178,8 @@ Wat.I.listFields[qvdObj] = {
             'creation_date'
         ],
         'acls': 'vm.see.creation-date',
-        'display': false
+        'display': false,
+        'sortable': false,
     },
     'creation_admin': {
         'text': 'Created by',
@@ -169,7 +187,8 @@ Wat.I.listFields[qvdObj] = {
             'creation_admin'
         ],
         'acls': 'vm.see.created-by',
-        'display': false
+        'display': false,
+        'sortable': false,
     }
 };
 

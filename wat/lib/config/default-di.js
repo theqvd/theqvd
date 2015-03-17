@@ -16,7 +16,8 @@ Wat.I.listFields[qvdObj] = {
         ],
         'aclsLogic': 'OR',
         'fixed': true,
-        'text': 'checks'
+        'text': 'checks',
+        'sortable': false,
     },
     'info': {
         'display': true,
@@ -29,7 +30,8 @@ Wat.I.listFields[qvdObj] = {
             'di.see.tags'
         ],
         'aclsLogic': 'OR',
-        'text': 'Info'
+        'text': 'Info',
+        'sortable': false,
     },
     'id': {
         'display': false,
@@ -37,7 +39,8 @@ Wat.I.listFields[qvdObj] = {
             'id'
         ],
         'acls': 'di.see.id',
-        'text': 'Id'
+        'text': 'Id',
+        'sortable': true,
     },
     'disk_image': {
         'display': true,
@@ -45,7 +48,8 @@ Wat.I.listFields[qvdObj] = {
             'id',
             'disk_image'
         ],
-        'text': 'Disk image'
+        'text': 'Disk image',
+        'sortable': true,
     },
     'osf': {
         'display': true,
@@ -54,7 +58,8 @@ Wat.I.listFields[qvdObj] = {
             'osf_name'
         ],
         'acls': 'di.see.osf',
-        'text': 'OSF'
+        'text': 'OSF',
+        'sortable': true,
     },
     'version': {
         'display': true,
@@ -62,7 +67,8 @@ Wat.I.listFields[qvdObj] = {
             'version'
         ],
         'acls': 'di.see.version',
-        'text': 'Version'
+        'text': 'Version',
+        'sortable': true,
     },
     'default': {
         'display': false,
@@ -70,7 +76,8 @@ Wat.I.listFields[qvdObj] = {
             'tags'
         ],
         'acls': 'di.see.default',
-        'text': 'Default'
+        'text': 'Default',
+        'sortable': false,
     },
     'head': {
         'display': false,
@@ -78,7 +85,8 @@ Wat.I.listFields[qvdObj] = {
             'tags'
         ],
         'acls': 'di.see.head',
-        'text': 'Head'
+        'text': 'Head',
+        'sortable': false,
     },
     'tags': {
         'display': false,
@@ -86,7 +94,8 @@ Wat.I.listFields[qvdObj] = {
             'tags'
         ],
         'acls': 'di.see.tags',
-        'text': 'Tags'
+        'text': 'Tags',
+        'sortable': false,
     },
     'creation_date': {
         'text': 'Creation date',
@@ -94,7 +103,8 @@ Wat.I.listFields[qvdObj] = {
             'creation_date'
         ],
         'acls': 'di.see.creation-date',
-        'display': false
+        'display': false,
+        'sortable': false,
     },
     'creation_admin': {
         'text': 'Created by',
@@ -102,7 +112,8 @@ Wat.I.listFields[qvdObj] = {
             'creation_admin'
         ],
         'acls': 'di.see.created-by',
-        'display': false
+        'display': false,
+        'sortable': false,
     }
 };
 

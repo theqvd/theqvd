@@ -9,7 +9,8 @@ Wat.I.listFields[qvdObj] = {
         'groupAcls': 'userMassiveActions',
         'aclsLogic': 'OR',
         'text': '',
-        'fixed': true
+        'fixed': true,
+        'sortable': false,
     },
     'info': {
         'display': true,
@@ -17,7 +18,8 @@ Wat.I.listFields[qvdObj] = {
             'blocked'
         ],
         'acls': 'user.see.block',
-        'text': 'Info'
+        'text': 'Info',
+        'sortable': false,
     },
     'id': {
         'display': false,
@@ -25,7 +27,8 @@ Wat.I.listFields[qvdObj] = {
             'id'
         ],
         'acls': 'user.see.id',
-        'text': 'Id'
+        'text': 'Id',
+        'sortable': true,
     },
     'name': {
         'display': true,
@@ -34,7 +37,8 @@ Wat.I.listFields[qvdObj] = {
             'name'
         ],
         'text': 'Name',
-        'fixed': true
+        'fixed': true,
+        'sortable': true,
     },
     'connected_vms': {
         'display': true,
@@ -44,7 +48,8 @@ Wat.I.listFields[qvdObj] = {
             'number_of_vms_connected'
         ],
         'acls': 'user.see.vms-info',
-        'text': 'Connected VMs'
+        'text': 'Connected VMs',
+        'sortable': false,
     },
     'creation_date': {
         'text': 'Creation date',
@@ -52,7 +57,8 @@ Wat.I.listFields[qvdObj] = {
             'creation_date'
         ],
         'acls': 'user.see.creation-date',
-        'display': false
+        'display': false,
+        'sortable': false,
     },
     'creation_admin': {
         'text': 'Created by',
@@ -60,7 +66,8 @@ Wat.I.listFields[qvdObj] = {
             'creation_admin'
         ],
         'acls': 'user.see.created-by',
-        'display': false
+        'display': false,
+        'sortable': false,
     }
 };
 

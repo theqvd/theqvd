@@ -323,6 +323,10 @@ Wat.I = {
         $('.js-side').css('min-height', $('.list-block').height());
     },
     
+    addSortIcons: function () {
+        $('th.sortable').prepend(HTML_SORT_ICON);
+    },
+    
     updateSortIcons: function (view) {
         // If not view is passed, use currentView
             if (view === undefined) {
@@ -351,8 +355,8 @@ Wat.I = {
                 }
             }
 
-            context.find('th.sortable i').removeClass(sortClassDefault + ' ' + sortClassAsc + ' ' + sortClassDesc);
-            context.find('th.sortable i').addClass(sortClassDefault);
+            context.find('th.sortable i.sort-icon').removeClass(sortClassDefault + ' ' + sortClassAsc + ' ' + sortClassDesc);
+            context.find('th.sortable i.sort-icon').addClass(sortClassDefault);
 
             if (view.sortedBy != '') {
                 context.find('[data-sortby="' + view.sortedBy + '"]').addClass('sorted');

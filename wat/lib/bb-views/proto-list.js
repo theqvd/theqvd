@@ -505,7 +505,8 @@ Wat.Views.ListView = Wat.Views.MainView.extend({
                 'text': 'Tenant',
                 'displayDesktop': true,
                 'displayMobile': false,
-                'noTranslatable': true
+                'noTranslatable': true,
+                'sortable': true
             };
         }
     },
@@ -668,6 +669,8 @@ Wat.Views.ListView = Wat.Views.MainView.extend({
         }
         
         this.updateFilterNotes();
+        Wat.I.addSortIcons();
+        
         Wat.I.adaptSideSize();
     },
     

@@ -11,7 +11,7 @@ Wat.Views.DIListView = Wat.Views.ListView.extend({
     },
     
     listEvents: {
-        'change input[name="di_default"]': 'setDefault',
+        'change input[data-name="di_default"]': 'setDefault',
         'click .js-more-tags': 'showExtraTags'
     },
     

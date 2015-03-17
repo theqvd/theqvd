@@ -14,7 +14,8 @@ Wat.I.listFields[qvdObj] = {
             'host.update-massive.properties-delete'
         ],
         'aclsLogic': 'OR',
-        'fixed': true
+        'fixed': true,
+        'sortable': false,
     },
     'info': {
         'display': true,
@@ -27,7 +28,8 @@ Wat.I.listFields[qvdObj] = {
             'host.see.state'
         ],
         'aclsLogic': 'OR',
-        'text': 'Info'
+        'text': 'Info',
+        'sortable': false,
     },
     'id': {
         'display': false,
@@ -35,7 +37,8 @@ Wat.I.listFields[qvdObj] = {
             'id'
         ],
         'acls': 'host.see.id',
-        'text': 'Id'
+        'text': 'Id',
+        'sortable': true,
     },
     'name': {
         'display': true,
@@ -44,7 +47,8 @@ Wat.I.listFields[qvdObj] = {
             'name'
         ],
         'text': 'Name',
-        'fixed': true
+        'fixed': true,
+        'sortable': true,
     },
     'state': {
         'display': false,
@@ -52,7 +56,8 @@ Wat.I.listFields[qvdObj] = {
             'state'
         ],
         'acls': 'host.see.state',
-        'text': 'State'
+        'text': 'State',
+        'sortable': true,
     },
     'address': {
         'display': true,
@@ -60,7 +65,8 @@ Wat.I.listFields[qvdObj] = {
             'address'
         ],
         'acls': 'host.see.address',
-        'text': 'IP address'
+        'text': 'IP address',
+        'sortable': true,
     },
     'vms_connected': {
         'display': true,
@@ -69,7 +75,8 @@ Wat.I.listFields[qvdObj] = {
             'vms_connected'
         ],
         'acls': 'host.see.vms-info',
-        'text': 'Running VMs'
+        'text': 'Running VMs',
+        'sortable': false,
     },
     'creation_date': {
         'text': 'Creation date',
@@ -77,7 +84,8 @@ Wat.I.listFields[qvdObj] = {
             'creation_date'
         ],
         'acls': 'host.see.creation-date',
-        'display': false
+        'display': false,
+        'sortable': false,
     },
     'creation_admin': {
         'text': 'Created by',
@@ -85,7 +93,8 @@ Wat.I.listFields[qvdObj] = {
             'creation_admin'
         ],
         'acls': 'host.see.created-by',
-        'display': false
+        'display': false,
+        'sortable': false,
     }
 };
 

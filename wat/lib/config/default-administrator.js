@@ -8,7 +8,8 @@ Wat.I.listFields[qvdObj] = {
         'acls': 'administrator.delete-massive.',
         'fixed': true,
         'text': '',
-        'fixed': true
+        'fixed': true,
+        'sortable': false,
     },
     'info': {
         'text': 'Info',
@@ -16,7 +17,8 @@ Wat.I.listFields[qvdObj] = {
             'roles'
         ],
         'acls': 'administrator.see.roles',
-        'display': true
+        'display': true,
+        'sortable': false,
     },
     'id': {
         'display': false,
@@ -24,7 +26,8 @@ Wat.I.listFields[qvdObj] = {
             'id'
         ],
         'acls': 'administrator.see.id',
-        'text': 'Id'
+        'text': 'Id',
+        'sortable': true,
     },
     'name': {
         'display': true,
@@ -33,7 +36,8 @@ Wat.I.listFields[qvdObj] = {
             'name'
         ],
         'text': 'Name',
-        'fixed': true
+        'fixed': true,
+        'sortable': true,
     }
 };
 
