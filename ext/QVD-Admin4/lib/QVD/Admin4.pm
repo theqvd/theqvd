@@ -21,6 +21,7 @@ use TryCatch;
 use Data::Page;
 use Clone qw(clone);
 use QVD::Admin4::AclsOverwriteList;
+use Mojo::JSON qw(encode_json);
 
 our $VERSION = '0.01';
 
@@ -90,8 +91,10 @@ sub update
 	eval { $DB->txn_do( sub { $self->$_($obj) for @$conditions;
 				  $obj->update($request->arguments);
 				  $self->update_related_objects($request,$obj);
-				  $self->exec_nested_queries($request,$obj);} ) };
+				  $self->exec_nested_queries($request,$obj); } ) };
 	$failures->{$obj->id} = QVD::Admin4::Exception->new(exception => $@, query => 'update')->json if $@; 
+	
+	$self->report_in_log($request,$obj,$failures && exists $failures->{$obj->id} ? $failures->{$obj->id}->{status} : 0);
     }
 
     QVD::Admin4::Exception->throw(failures => $failures) 
@@ -112,9 +115,10 @@ sub delete
     for my $obj (@{$result->{rows}})
     {
 	eval { $self->$_($obj) for @$conditions; 
-	       $obj->delete };
+	       $obj->delete;};
 
 	$failures->{$obj->id} = QVD::Admin4::Exception->new(exception => $@,query => 'delete')->json if $@;
+    	$self->report_in_log($request,$obj,$failures && exists $failures->{$obj->id} ? $failures->{$obj->id}->{status} : 0);
     }
     QVD::Admin4::Exception->throw(failures => $failures) 
 	if defined $failures; 
@@ -128,23 +132,46 @@ sub create
     my ($self,$request,%modifiers) = @_;
     my $result;
     my $conditions = $modifiers{conditions} // [];
-
+    my $obj;
     eval 
     {
 	$DB->txn_do( sub { $self->$_($request) for @$conditions;
-			   my $obj = $DB->resultset($request->table)->create($request->arguments); 
+			   $obj = $DB->resultset($request->table)->create($request->arguments); 
 			   $self->create_related_objects($request,$obj);
 			   $self->exec_nested_queries($request,$obj);
 			   $result->{rows} = [ $obj ] } )
     };
     
     print $@ if $@;
-    QVD::Admin4::Exception->throw(exception => $@, query => 'create') if $@;
-
+    my $e = $@ ? QVD::Admin4::Exception->new(exception => $@, query => 'create') : undef;
+    $self->report_in_log($request,$obj, $e ? $e->code : 0);
+    $e->throw if $e;
     $result->{total} = 1;
     $result->{extra} = {};
+    
     $result;
 }
+
+sub report_in_log
+{
+   my ($self,$request,$obj,$status) = @_; 
+
+   my $localtime = localtime;
+   my $arguments = { time => $localtime,
+		     action => $request->json_wrapper->action, 
+		     type_of_action => $request->qvd_object_model->type_of_action, 
+		     qvd_object => $request->qvd_object_model->qvd_object_log_style,
+		     tenant_id => eval { $obj->tenant_id } // undef,
+		     object_id => eval { $obj->id } // undef,
+		     object_name => eval { $obj->name } // undef,
+		     administrator_id => $request->get_parameter_value('administrator')->id,
+		     ip => $request->get_parameter_value('remote_address'),
+		     source => $request->get_parameter_value('source'),
+		     arguments => encode_json($request->json_wrapper->arguments),
+		     status => $status };
+   $DB->resultset('Wat_Log')->create($arguments);
+}
+
 
 sub create_or_update
 {
@@ -640,10 +667,12 @@ sub vm_user_disconnect
     my $failures;
     for my $vm (@{$result->{rows}})
     {
-	eval { $vm->vm_runtime->send_user_abort  };      
-	next unless $@;
-	my %args = (code => 5110, object => $vm->vm_runtime->user_state);
-	$failures->{$vm->id} = QVD::Admin4::Exception->new(%args)->json; 
+	eval { $vm->vm_runtime->send_user_abort  };   
+	
+	$failures->{$vm->id} = QVD::Admin4::Exception->new(
+	    code => 5110, object => $vm->vm_runtime->user_state)->json if $@; 
+
+	$self->report_in_log($request,$vm,$failures && exists $failures->{$vm->id} ? $failures->{$vm->id}->{status} : 0);
     }
     QVD::Admin4::Exception->throw(failures => $failures) 
 	if defined $failures;  
@@ -668,11 +697,12 @@ sub vm_start
 					      object => $vm->vm_runtime->vm_state);
 		  $self->vm_assign_host($vm->vm_runtime);
 		  $vm->vm_runtime->send_vm_start;
-		  $host{$vm->vm_runtime->host_id}++; }
+		  $host{$vm->vm_runtime->host_id}++;}
 
 				  ) }; $@ or last; } 
-	next unless $@;
-	$failures->{$vm->id} = QVD::Admin4::Exception->new(exception => $@)->json; 
+
+	$failures->{$vm->id} = QVD::Admin4::Exception->new(exception => $@)->json if $@; 
+	$self->report_in_log($request,$vm,$failures && exists $failures->{$vm->id} ? $failures->{$vm->id}->{status} : 0);
     }
 
     notify("qvd_admin4_vm_start");
@@ -699,10 +729,10 @@ sub vm_stop
 		  $host{$vm->vm_runtime->host_id}++; }
 
 				  ) }; $@ or last; } 
-	next unless $@;
-	my %args = (code => 5120, object => $vm->vm_runtime->vm_state);
-	$failures->{$vm->id} = QVD::Admin4::Exception->new(%args)->json; 
-
+       
+	$failures->{$vm->id} = QVD::Admin4::Exception->new(
+	    code => 5120, object => $vm->vm_runtime->vm_state)->json if $@; 
+	$self->report_in_log($request,$vm,$failures && exists $failures->{$vm->id} ? $failures->{$vm->id}->{status} : 0);
 	$vm->vm_runtime->update({ vm_cmd => undef })
 	    if $vm->vm_runtime->vm_state eq 'stopped' &&
 	    $vm->vm_runtime->vm_cmd                   &&

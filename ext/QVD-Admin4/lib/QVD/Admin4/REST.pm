@@ -12,7 +12,7 @@ use QVD::Admin4::Action;
 use TryCatch;
 use AnyEvent::Pg::Pool;
 use QVD::Config;
-
+use Mojo::JSON qw(encode_json);
 use base qw(Mojolicious::Plugin);
 
 has 'administrator', is => 'ro', isa => sub { die "Invalid type for attribute administrator" 
@@ -73,46 +73,12 @@ sub load_user
 	if $admin->is_superadmin;
 }
 
-my $MAPPER = { User => 'user', VM => 'vm', DI => 'di', OSF => 'osf', Host => 'host', Administrator => 'admin', Tenant => 'tenant', 
-               Role => 'role'  };
 
-sub record_log_traces_for_request
-{
-    my ($self,$action,$json_wrapper,$json_response) = @_; 
-    
-    return unless $action->needs_log_trace;
-
-    my $ids = ($action->type eq 'create' ?
-	[ ${$json_response->{rows}}[0]->{id} ] :
-	$json_wrapper->get_filter_value('id')) // [];
-
-    my %arguments = ( action => $action->name, 
-                      type_of_action => $action->type,
-                      qvd_object => $MAPPER->{$action->qvd_object},
-		      administrator_id => $self->administrator->id,
-                      ip => $json_wrapper->get_parameter_value('__remote_address__'),
-		      source => $json_wrapper->get_parameter_value('__source__') );
-
-    my $general_status = $json_response->{status}; 
-
-    for my $id (@$ids)
-    {
-	my $status = $general_status;
-	if ($general_status eq 1200)
-	{
-	    $status = defined $json_response->{failures}->{$id} ?
-		$json_response->{failures}->{$id}->{status} : 0;
-	}
-
-	my $arguments = {%arguments,object_id => $id,status => $status};
-	$self->_db->resultset('Wat_Log')->create($arguments);
-    }
-}
 
 sub process_query
 {
    my ($self,$json) = @_;
-   my ($response,$action,$json_wrapper);
+   my ($response,$json_wrapper,$action);
 
    try {
 
@@ -121,25 +87,28 @@ sub process_query
        $action = eval { QVD::Admin4::Action->new(name => $json_wrapper->action ) }
        // QVD::Admin4::Exception->throw(code => 4110);
 
-       QVD::Admin4::Exception->throw(code => 4100) 
+       $response = QVD::Admin4::Exception->new(code => 4100) 
 	   unless $action->available;
 
-       QVD::Admin4::Exception->throw(code => 4210) 
+       $response = QVD::Admin4::Exception->new(code => 4210) 
 	   unless $action->available_for_admin($self->administrator);
 
-       my $qvd_object_model = $self->get_qvd_object_model($action) 
-	   if $action->qvd_object;
+       unless ($response)
+       {
+	   my $qvd_object_model = $self->get_qvd_object_model($action) 
+	       if $action->qvd_object;
 
-       my $restmethod = $action->restmethod;
+	   my $restmethod = $action->restmethod;
+	
+	   my $result = $self->$restmethod($action,$json_wrapper,$qvd_object_model);
 
-       my $result = $self->$restmethod($action,$json_wrapper,$qvd_object_model);
+	   my %args = (status => 0, result => $result);
+	   $args{json_wrapper} = $json_wrapper;
+	   $args{qvd_object_model} = $qvd_object_model
+	       if $qvd_object_model;
 
-       my %args = (status => 0, result => $result);
-       $args{json_wrapper} = $json_wrapper;
-       $args{qvd_object_model} = $qvd_object_model
-	   if $qvd_object_model;
-
-       $response = QVD::Admin4::REST::Response->new(%args);
+	   $response = QVD::Admin4::REST::Response->new(%args);
+       }
 
    } catch ( QVD::Admin4::Exception $err ) {
        $response = $err;
@@ -148,9 +117,7 @@ sub process_query
        $response = QVD::Admin4::Exception->new(code => 1100);
    }
 
-   my $response_json = $response->json;
-   $self->record_log_traces_for_request($action,$json_wrapper,$response_json);
-   return $response_json;
+   $response->json;
 }
 
 sub get_channels

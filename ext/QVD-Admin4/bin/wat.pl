@@ -1,6 +1,6 @@
 #!/usr/bin/perl
 use Mojolicious::Lite;
-use lib::glob '/home/ubuntu/wat/*/lib/';
+use lib::glob '/home/benjamin/wat/*/lib/';
 use Mojo::JSON qw(encode_json decode_json j);
 use QVD::Admin4::Exception;
 use MojoX::Session;
@@ -63,7 +63,7 @@ package MojoX::Session::Transport::WAT
 
 # GENERAL CONFIG AND PLUGINS
 
-app->config(hypnotoad => {listen => ['http://192.168.3.7:3000']});
+app->config(hypnotoad => {listen => ['http://localhost:3000']});
 
 # HELPERS
 
@@ -258,7 +258,7 @@ sub get_input_json
 sub process_api_query
 {
     my ($c,$json) = @_;
-    $json->{parameters}->{__remote_address__} = $c->tx->remote_address; # For Log purposes
+    $json->{parameters}->{remote_address} = $c->tx->remote_address; # For Log purposes
     my $response = $c->qvd_admin4_api->process_query($json);
     $response->{sid} = $c->res->headers->header('sid');
     return $response;

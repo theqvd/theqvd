@@ -22,6 +22,9 @@ has 'model_info', is => 'ro', isa => sub {die "Invalid type for attribute model_
 
 my $DBConfigProvider;
 
+my $QVD_OBJECTS_TO_LOG_MAPPER = { User => 'user', VM => 'vm', DI => 'di', OSF => 'osf', Host => 'host', Administrator => 'admin', Tenant => 'tenant', 
+				  Role => 'role', Config => 'config', Tenant_Views_Setup => 'tenant_view', Administrator_Views_Setup => 'admin_view',  };
+
 my $DIRECTLY_TENANT_RELATED = [qw(User Administrator OSF Tenant_Views_Setup)];
 
 
@@ -504,7 +507,7 @@ my $AVAILABLE_FIELDS =
     
     create => { 'default' => [qw(id)], Config => [qw(key)]},
 
-    create_or_update => { 'default' => [qw(id)]}
+    create_or_update => { 'default' => [qw(id)], 'Config' => [qw(key)] }
 
 };
 
@@ -1894,6 +1897,14 @@ sub get_acls
 	@acls = @{$REPO->{$self->qvd_object}->{$filter}};
     }
     return @acls;
+}
+
+
+
+sub qvd_object_log_style
+{
+    my $self = shift;
+    $QVD_OBJECTS_TO_LOG_MAPPER->{$self->qvd_object};    
 }
 
 1;

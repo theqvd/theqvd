@@ -8,7 +8,6 @@ has 'name', is => 'ro', isa => sub { my $name = shift; die "Invalid type for att
 
 my $AVAILABLE_ACTION_SIZES = { default => 'normal', normal => 'normal', heavy => 'heavy' };
 
-my $NEEDS_LOG_TRACE  = { create => 1, update => 1, exec => 1, delete => 1 };
 
 my $ACTIONS =
 {
@@ -34,7 +33,7 @@ config_preffix_get => { type_of_action =>  'general',
 			acls => [qr/^config\.qvd\./],
 			admin4method => 'config_preffix_get'},
 
-config_set => { type_of_action =>  'create',
+config_set => { type_of_action =>  'create_or_update',
 		qvd_object => 'Config',
 		acls => [qr/^config\.qvd\./],
 		admin4method => 'config_set'},
@@ -550,12 +549,6 @@ sub available_nested_action_for_admin
 {
     my ($self,$admin,$na) = @_;
     $admin->re_is_allowed_to($self->acls_for_nested_action($na));
-}
-
-sub needs_log_trace
-{
-    my $self = shift;
-    $NEEDS_LOG_TRACE->{$self->type} // 0;
 }
 
 1;
