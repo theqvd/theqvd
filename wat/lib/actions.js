@@ -76,6 +76,9 @@ Wat.A = {
         if (arguments && !$.isEmptyObject(arguments)) {
             url += '&arguments=' + JSON.stringify(arguments);
         }
+        
+        // Add source argument to all queries to be stored by API log
+        url += '&parameters=' + JSON.stringify({source: Wat.C.source});
 
         messages = messages || {};
 

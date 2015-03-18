@@ -71,12 +71,13 @@ Wat.Models.Model = Backbone.Model.extend({
         return $.ajax(params);
     },
     
-    save: function(attributes, options) {  
+    save: function(attributes, options) { 
         options = {
             url: Wat.C.getBaseUrl() + 
                 "&action=" + this.operation +
                 "&filters=" + JSON.stringify(options.filters) + 
-                "&arguments=" + JSON.stringify(attributes)
+                "&arguments=" + JSON.stringify(attributes) +
+                "&parameters=" + JSON.stringify({source: Wat.C.source})
         };
         
         return Backbone.Model.prototype.save.call(this, attributes, options);

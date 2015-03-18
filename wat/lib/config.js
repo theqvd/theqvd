@@ -19,6 +19,8 @@ Wat.C = {
     //apiWSUrl: 'ws://172.26.9.42/ws',
     //apiAddress: '172.26.9.42',  
 
+    // Source to be stored by API log
+    source: 'WAT',
     loginExpirationDays: 1,
     acls: [],
     aclGroups: {},
@@ -65,6 +67,11 @@ Wat.C = {
     // Return if system is configured as multitenant WAT
     isMultitenant: function () {
         return this.multitenant;
+    },
+    
+    // Set calls source
+    setSource: function (newSource) {
+        this.source = newSource;
     },
     
     // Return if WAT administrator should know about multitenant enviroment

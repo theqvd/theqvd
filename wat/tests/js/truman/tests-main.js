@@ -7,6 +7,8 @@ var tenantOSFId = 14;
 var tenantDIId = 14;
 var tenantHostId = 1;
 
+Wat.C.setSource('QUnit testing: truman');
+
 // Backbone's Models and Collections instantiation
 backboneTest();
 

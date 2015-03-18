@@ -159,7 +159,7 @@ Wat.Views.DIListView = Wat.Views.ListView.extend({
         arguments.disk_image = file.name;
         
         // Get Url for the API call
-        var url = Wat.C.getUpdateDiUrl() + '&action=di_create&arguments=' + JSON.stringify(arguments);
+        var url = Wat.C.getUpdateDiUrl() + '&action=di_create&arguments=' + JSON.stringify(arguments) + '&parameters=' + JSON.stringify({source: Wat.C.source});
         
         Wat.I.loadingBlock($.i18n.t('Please, wait while action is performed') + '<br><br>' + $.i18n.t('Do not close or refresh the window'));
 
