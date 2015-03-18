@@ -177,19 +177,21 @@ sub create_or_update
 {
     my ($self,$request) = @_;
     my $result;
-
+    my $obj;
     for (1 .. 5)
     {
 	eval
 	{
-	    $DB->txn_do( sub { my $obj = $DB->resultset($request->table)->update_or_create($request->arguments);
+	    $DB->txn_do( sub { $obj = $DB->resultset($request->table)->update_or_create($request->arguments);
 			       $result->{rows} = [ $obj ] } )
 	};
     
 	last unless $@;
     }
 
-    QVD::Admin4::Exception->throw(exception => $@, query => 'set') if $@;
+    my $e = $@ ? QVD::Admin4::Exception->new(exception => $@, query => 'set') : undef;
+    $self->report_in_log($request,$obj, $e ? $e->code : 0);
+    $e->throw if $e;
 
     $result->{total} = 1;
     $result->{extra} = {};

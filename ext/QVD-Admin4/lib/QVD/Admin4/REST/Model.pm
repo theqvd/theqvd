@@ -118,7 +118,7 @@ my $ACLS_FOR_FILTER_VALUES =
 					   acl => [qr/^administrator\.see\.acl-list$/],
 					   config => [qr/^config\.qvd\.$/],
 					   tenant_view => [qr/^views\.see-main\.$/],
-					   admin_view => [qr/^views\.see-main\.$/],}}}
+					   admin_view => [qr/^views\.see-main\.$/],}}},
 };
 
 

@@ -292,7 +292,7 @@ my $CLI_CMD2API_ACTION =
 
     acl => { get => 'acl_get_list' }, 
 
-    log => { get => 'wat_log_get_list' },
+    log => { get => 'log_get_list' },
 
 };
 
@@ -319,7 +319,7 @@ my $DEFAULT_FIELDS =
 
     acl => [ qw(id name) ],
 
-    log => [qw(time admin_id type_of_action qvd_object object_name status)]
+    log => [qw(time admin_id tenant_id type_of_action qvd_object object_name arguments status)]
 };
 
 ###############

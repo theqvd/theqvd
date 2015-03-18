@@ -12,15 +12,19 @@ my $AVAILABLE_ACTION_SIZES = { default => 'normal', normal => 'normal', heavy =>
 my $ACTIONS =
 {
 
-sources_in_wat_log => {type_of_action => 'general',
+sources_in_log => {type_of_action => 'general',
 		       admin4method => 'sources_in_wat_log',
-#		  acls => [qr/^log\.see-main\./],
-},
+		  acls => [qr/^log\.see-main\./],},
 
-wat_log_get_list => {type_of_action => 'list',
+log_get_list => {type_of_action => 'list',
 		  admin4method => 'select',
-#		  acls => [qr/^log\.see-main\./],
+		  acls => [qr/^log\.see-main\./],
 		  qvd_object => 'Wat_Log'},
+
+log_get_details => {type_of_action => 'list',
+		    admin4method => 'select',
+		    acls => [qr/^log\.see-details\./],
+		    qvd_object => 'Wat_Log'},
 
 dis_in_staging => { type_of_action =>  'general',
 		    acls => [qr/^di\.create\./],
