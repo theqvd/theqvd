@@ -163,6 +163,7 @@ CLASS_ICON_WATCONFIG = 'fa fa-dashboard';
 CLASS_ICON_LOGOUT = 'fa fa-power-off';
 CLASS_ICON_PERSONALAREA = 'fa fa-archive';
 CLASS_ICON_USER = 'fa fa-user';
+CLASS_ICON_LOG = 'fa fa-file-text-o';
 
 // Colours
 COL_BRAND = '#cb540a';

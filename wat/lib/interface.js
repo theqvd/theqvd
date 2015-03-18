@@ -232,7 +232,8 @@ Wat.I = {
         administrator: {},
         tenant: {},
         role: {},
-        acl: {}
+        acl: {},
+        log: {}
     },   
         
     getListBreadCrumbs: function (qvdObj) {
@@ -251,7 +252,8 @@ Wat.I = {
         administrator: {},
         tenant: {},
         role: {},
-        acl: {}
+        acl: {},
+        log: {}
     },   
         
     getDetailsBreadCrumbs: function (qvdObj) {

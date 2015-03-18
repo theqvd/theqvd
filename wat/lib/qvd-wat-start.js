@@ -168,6 +168,9 @@
                 });        
                 Wat.Router.app_router.on('route:detailsRole', function (id) {
                     Wat.Router.app_router.performRoute('roles', Wat.Views.RoleDetailsView, {"id": id});
+                });         
+                Wat.Router.app_router.on('route:listLog', function () {
+                    Wat.Router.app_router.performRoute('log', Wat.Views.LogListView);
                 });    
 
 

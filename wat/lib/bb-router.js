@@ -32,6 +32,8 @@ Wat.Router = Backbone.Router.extend({
         "documentation/:guide/:section": "documentationGuide",
         "profile": "profile",
         "myviews": "myviews",
+        "log": "listLog",
+        "log/:id": "detailsLog",
         "*actions": "defaultRoute" // Backbone will try match the route above first
     },
     

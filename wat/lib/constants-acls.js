@@ -10,7 +10,8 @@ ACL_SECTIONS = {
     "tenant": "Tenants",
     "user": "Users",
     "views": "Views",
-    "vm": "Virtual machines"
+    "vm": "Virtual machines",
+    "log": "Log"
 };
 
 ACL_SECTIONS_PATTERNS = {
@@ -23,7 +24,8 @@ ACL_SECTIONS_PATTERNS = {
     "tenant": "tenant.%",
     "user": "user.%",
     "views": "views.%",
-    "vm": "vm.%"
+    "vm": "vm.%",
+    "log": "log.%"
 };
 
 ACL_ACTIONS = {
@@ -111,6 +113,8 @@ ACLS = {
     "di.update.properties-delete": "Delete properties when update disk images",
     "di.update.properties-update": "Change properties when update disk images",
     "di.update.tags": "Update disk image's tags",
+    "log.see-details.": "Access to log's details view",
+    "log.see-main.": "Access to log's main section",
     "host.create.": "Create nodes",
     "host.create.properties": "Set properties on nodes in creation",
     "host.delete-massive.": "Delete nodes (massive)",

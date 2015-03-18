@@ -560,7 +560,7 @@ Wat.Views.ListView = Wat.Views.MainView.extend({
             }
         });
     },
-
+    
     // Render view with two options: all and only list with controls (list block)
     render: function () {
         var that = this;
@@ -631,7 +631,6 @@ Wat.Views.ListView = Wat.Views.MainView.extend({
         this.fetchFilters();
 
         that.renderList();
-        
         
         this.renderRelatedDocs();
         

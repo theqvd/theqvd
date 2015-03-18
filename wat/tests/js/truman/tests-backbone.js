@@ -10,11 +10,11 @@ function backboneTest () {
         test("Models instantiation", function() {
             // Instantiate Local Contact Backbone Model Object
             WatTests.models = {
-                acl: new Wat.Models.ACL(),
                 admin: new Wat.Models.Admin(),
                 di: new Wat.Models.DI(),
                 host: new Wat.Models.Host(),
                 osf: new Wat.Models.OSF(),
+                log: new Wat.Models.Log(),
                 role: new Wat.Models.Role(),
                 tenant: new Wat.Models.Tenant(),
                 user: new Wat.Models.User(),
@@ -33,11 +33,11 @@ function backboneTest () {
         test("Collections instantiation", function() {
             // Instantiate Local Contact Backbone Collection Object
             WatTests.collections = {
-                acl: new Wat.Collections.ACLs(),
                 admin: new Wat.Collections.Admins(),
                 di: new Wat.Collections.DIs(),
                 host: new Wat.Collections.Hosts(),
                 osf: new Wat.Collections.OSFs(),
+                log: new Wat.Collections.Logs(),
                 role: new Wat.Collections.Roles(),
                 tenant: new Wat.Collections.Tenants(),
                 user: new Wat.Collections.Users(),
