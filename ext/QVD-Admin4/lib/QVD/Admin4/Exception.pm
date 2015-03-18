@@ -35,6 +35,7 @@ my $code2message_mapper =
     4110 => 'Invalid or null action name provided',
     4210 => 'Forbidden action for this administrator',
     4220 => 'Forbidden filter for this administrator',
+    4221 => 'Forbidden filter value for this administrator',
     4230 => 'Forbidden argument for this administrator',
     4240 => 'Forbidden massive action for this administrator',
     4250 => 'Forbidden field for this administrator',

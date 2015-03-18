@@ -358,6 +358,17 @@ sub forze_filtering_by_acls_for_filter_values
 	    push @forbidden_values, $value unless $ADMIN->re_is_allowed_to(@acls);
 	}
     
+	my @requested_values = ($self->json_wrapper->get_filter_value($filter)) // ();
+
+	for my $requested_value (@requested_values)
+	{
+	    for my $forbidden_value (@forbidden_values)
+	    {
+		QVD::Admin4::Exception->throw(code => 4221, object => $requested_value) 
+		    if $requested_value eq $forbidden_value;
+	    }
+	}
+
 	my $filter_dbix = $self->qvd_object_model->map_filter_to_dbix_format($filter); 
 	$self->filters->add_filter('-not',{ $filter_dbix => \@forbidden_values });
     }
