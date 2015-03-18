@@ -104,6 +104,8 @@ sub BUILD
 	if $self->qvd_object_model->type_of_action =~ /^create(_or_update)?$/ &&
 	$self->qvd_object_model->directly_tenant_related;
 
+    $self->forze_filtering_by_acls_for_filter_values;
+
 # After check and changes, filters are retrieved as a simple hash
 
     $self->{filters} = $self->filters->hash;
@@ -340,7 +342,7 @@ sub forze_filtering_tenants_by_tenant
 sub forze_filtering_by_acls_for_filter_values
 {
     my $self = shift;
-    
+
     for my $filter ($self->qvd_object_model->get_filters_with_acls_for_values)
     {
 	my @forbidden_values;

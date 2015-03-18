@@ -33,6 +33,8 @@ sub usage_text {
    
    version (Retrieves information about the QVD version the app is connected to)
       
+   log (retrieves log entries about the QVD server activity) 
+
 == QVD OBJECTS COMMANDS
 
     vm (Intended to QVD virtual machines management)
@@ -54,6 +56,8 @@ sub usage_text {
     admin (Intended to QVD administrators management)
 
     config (Intended to QVD configuration management)
+
+    config (Intended to QVD configuration management)
 ";
 }
 
@@ -65,6 +69,7 @@ sub option_spec {
 
 sub command_map {
 
+    log => 'QVD::Admin4::CLI::Command::Log',
     usage => 'QVD::Admin4::CLI::Command::Usage',
     version => 'QVD::Admin4::CLI::Command::Version',
     config => 'QVD::Admin4::CLI::Command::Config',

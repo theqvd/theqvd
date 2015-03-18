@@ -70,6 +70,10 @@ my $RULES =
 
 
  { left_side => { label => $UNKNOWN_TAG, saturated => 1 }, 
+   right_side => [ { label => 'log', saturated => 1 } ],
+   meaning   => sub { 'log'}},
+
+ { left_side => { label => $UNKNOWN_TAG, saturated => 1 }, 
    right_side => [ { label => 'config', saturated => 1 } ],
    meaning   => sub { 'config'}},
 
@@ -190,6 +194,10 @@ my $RULES =
 # INDIVIDUALS (OBJECTS IN QVD UNIVERSE)
 
 # QVD_OBJECT specified with key/value filters
+
+ { left_side => { label => 'QVD_OBJECT', saturated => 0 }, 
+   right_side => [ { label => 'log', saturated => 1 } ],
+   meaning   => sub { 'log'}},
 
  { left_side => { label => 'QVD_OBJECT', saturated => 0 }, 
    right_side => [ { label => 'tenant', saturated => 1 } ],

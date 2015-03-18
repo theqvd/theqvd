@@ -81,4 +81,10 @@ sub get_properties_key_value
     ( properties => { map {  $_->key => $_->value  } $self->properties->all });
 } 
 
+sub name
+{
+    my $self = shift;
+    $self->path;
+}
+
 1;

@@ -107,18 +107,18 @@ my $ACLS_FOR_FILTERS =
 
 my $ACLS_FOR_FILTER_VALUES = 
 {
-    Wat_Log => { get_list => { qvd_object => { vm => [qr/^vm\.see-main\.$/],
-					       user => [qr/^user\.see-main\.$/],
-					       osf => [qr/^osf\.see-main\.$/],
-					       di => [qr/^di\.see-main\.$/],
-					       host => [qr/^host\.see-main\.$/],
-					       tenant => [qr/^tenant\.see-main\.$/],
-					       admin => [qr/^administrator\.see-main\.$/], 
-					       role => [qr/^role\.see-main\.$/],
-					       acl => [qr/^administrator\.see\.acl-list$/],
-					       config => [qr/^config\.qvd\.$/],
-					       tenant_view => [qr/^views\.see-main\.$/],
-					       admin_view => [qr/^views\.see-main\.$/],}}}
+    list => { Wat_Log => { qvd_object => { vm => [qr/^vm\.see-main\.$/],
+					   user => [qr/^user\.see-main\.$/],
+					   osf => [qr/^osf\.see-main\.$/],
+					   di => [qr/^di\.see-main\.$/],
+					   host => [qr/^host\.see-main\.$/],
+					   tenant => [qr/^tenant\.see-main\.$/],
+					   admin => [qr/^administrator\.see-main\.$/], 
+					   role => [qr/^role\.see-main\.$/],
+					   acl => [qr/^administrator\.see\.acl-list$/],
+					   config => [qr/^config\.qvd\.$/],
+					   tenant_view => [qr/^views\.see-main\.$/],
+					   admin_view => [qr/^views\.see-main\.$/],}}}
 };
 
 
@@ -1814,18 +1814,19 @@ sub get_acls_for_filter_value
 
 sub get_filters_with_acls_for_values
 {
-    my $self = @_;
-    return () unless defined $ACLS_FOR_FILTER_VALUES->{$self->qvd_object};
-    return () unless defined $ACLS_FOR_FILTER_VALUES->{$self->qvd_object}->{$self->type_of_action};
-    return keys %{$ACLS_FOR_FILTER_VALUES->{$self->qvd_object}->{$self->type_of_action}}; 
+    my $self = shift;
+
+    return () unless defined $ACLS_FOR_FILTER_VALUES->{$self->type_of_action};
+    return () unless defined $ACLS_FOR_FILTER_VALUES->{$self->type_of_action}->{$self->qvd_object};
+    return keys %{$ACLS_FOR_FILTER_VALUES->{$self->type_of_action}->{$self->qvd_object}}; 
 }
 
 sub get_filter_values_with_acls
 {
     my ($self,$filter) = @_;
-    return () unless defined $ACLS_FOR_FILTER_VALUES->{$self->qvd_object};
-    return () unless defined $ACLS_FOR_FILTER_VALUES->{$self->qvd_object}->{$self->type_of_action};
-    return keys %{$ACLS_FOR_FILTER_VALUES->{$self->qvd_object}->{$filter}->{$self->type_of_action}}; 
+    return () unless defined $ACLS_FOR_FILTER_VALUES->{$self->type_of_action};
+    return () unless defined $ACLS_FOR_FILTER_VALUES->{$self->type_of_action}->{$self->qvd_object};
+    return keys %{$ACLS_FOR_FILTER_VALUES->{$self->type_of_action}->{$self->qvd_object}->{$filter}}; 
 }
 
 sub get_acls_for_field
@@ -1884,19 +1885,19 @@ sub get_acls_for_delete_massive
 sub get_acls
 {
     my ($self,$REPO,$filter,$value) = @_;
-    return () unless defined $REPO->{$self->qvd_object};
 
     my @acls;
 
     if (defined $value) 
     {
-	return () unless defined $REPO->{$self->qvd_object}->{$self->type_of_action};
-	return () unless defined $REPO->{$self->qvd_object}->{$self->type_of_action}->{$filter};
-	return () unless defined $REPO->{$self->qvd_object}->{$self->type_of_action}->{$filter}->{$value};
-	@acls = @{$REPO->{$self->qvd_object}->{$self->type_of_action}->{$filter}->{$value}};
+	return () unless defined $REPO->{$self->type_of_action}->{$self->qvd_object};
+	return () unless defined $REPO->{$self->type_of_action}->{$self->qvd_object}->{$filter};
+	return () unless defined $REPO->{$self->type_of_action}->{$self->qvd_object}->{$filter}->{$value};
+	@acls = @{$REPO->{$self->type_of_action}->{$self->qvd_object}->{$filter}->{$value}};
     }
     else
     {
+	return () unless defined $REPO->{$self->qvd_object};
 	return () unless defined $REPO->{$self->qvd_object}->{$filter};
 	@acls = @{$REPO->{$self->qvd_object}->{$filter}};
     }

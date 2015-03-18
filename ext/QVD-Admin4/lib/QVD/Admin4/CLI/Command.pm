@@ -106,6 +106,10 @@ my $FILTERS =
     role => { id => 'id', name => 'name', fixed => 'fixed', internal => 'internal' },
 
     acl => { id => 'id', name => 'name', role => 'role_id', admin => 'admin_id', operative => 'operative'},
+
+    log => { id => 'id', admin_id => 'admin_id', tenant_id => 'tenant_id', action => 'action',  arguments => 'arguments',  object_id => 'object_id', 
+	     object_name => 'object_name', time => 'time', status => 'status', source => 'source', ip => 'ip', type_of_action => 'type_of_action', qvd_object => 'qvd_object' },
+
 };
 
 
@@ -130,7 +134,11 @@ my $ORDER =
 
     role => { id => 'id', name => 'name', fixed => 'fixed', internal => 'internal' },
 
-    acl => { id => 'id', name => 'name' }
+    acl => { id => 'id', name => 'name' },
+
+    log => { id => 'id', admin_id => 'admin_id', tenant_id => 'tenant_id', action => 'action',  arguments => 'arguments',  object_id => 'object_id', 
+	     object_name => 'object_name', time => 'time', status => 'status', source => 'source', ip => 'ip', type_of_action => 'type_of_action', qvd_object => 'qvd_object' },
+
 };
 
 my $FIELDS =
@@ -156,7 +164,11 @@ my $FIELDS =
 
     role => { id => 'id', name => 'name', fixed => 'fixed', internal => 'internal', roles => 'roles', acls => 'acls'},
 
-    acl => { id => 'id', name => 'name' }
+    acl => { id => 'id', name => 'name' },
+
+    log => { id => 'id', admin_id => 'admin_id', tenant_id => 'tenant_id', action => 'action',  arguments => 'arguments',  object_id => 'object_id', 
+	     object_name => 'object_name', time => 'time', status => 'status', source => 'source', ip => 'ip', type_of_action => 'type_of_action', qvd_object => 'qvd_object' },
+
 };
 
 my $FIELDS_CBS =
@@ -279,6 +291,9 @@ my $CLI_CMD2API_ACTION =
     role => { ids => 'role_all_ids', get => 'role_get_list', update => 'role_update', create => 'role_create', delete => 'role_delete' },
 
     acl => { get => 'acl_get_list' }, 
+
+    log => { get => 'wat_log_get_list' },
+
 };
 
 
@@ -303,6 +318,8 @@ my $DEFAULT_FIELDS =
     role => [ qw(id name fixed internal) ],
 
     acl => [ qw(id name) ],
+
+    log => [qw(time admin_id type_of_action qvd_object object_name status)]
 };
 
 ###############
@@ -494,7 +511,7 @@ sub ask_api
     $credentials{tenant} = $tenant if 
 	defined $tenant && defined $credentials{login};
  
-    my $res = $ua->post("$url", json => {%$query,%credentials} )->res;
+    my $res = $ua->post("$url", json => {%$query,%credentials,parameters => { source => 'CLI'}} )->res;
 
     CLI::Framework::Exception->throw('API returns bad status')
 	unless $res->code;
