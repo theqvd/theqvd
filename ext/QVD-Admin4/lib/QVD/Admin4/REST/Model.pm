@@ -108,17 +108,17 @@ my $ACLS_FOR_FILTERS =
 my $ACLS_FOR_FILTER_VALUES = 
 {
     Wat_Log => { get_list => { qvd_object => { vm => [qr/^vm\.see-main\.$/],
-					   user => [qr/^user\.see-main\.$/],
-					   osf => [qr/^osf\.see-main\.$/],
-					   di => [qr/^di\.see-main\.$/],
-					   host => [qr/^host\.see-main\.$/],
-					   tenant => [qr/^tenant\.see-main\.$/],
-					   admin => [qr/^administrator\.see-main\.$/], 
-					   role => [qr/^role\.see-main\.$/],
-					   acl => [qr/^administrator\.see\.acl-list$/],
-					   config => [qr/^config\.qvd\.$/],
-					   tenant_view => [qr/^views\.see-main\.$/],
-					   admin_view => [qr/^views\.see-main\.$/],}}}
+					       user => [qr/^user\.see-main\.$/],
+					       osf => [qr/^osf\.see-main\.$/],
+					       di => [qr/^di\.see-main\.$/],
+					       host => [qr/^host\.see-main\.$/],
+					       tenant => [qr/^tenant\.see-main\.$/],
+					       admin => [qr/^administrator\.see-main\.$/], 
+					       role => [qr/^role\.see-main\.$/],
+					       acl => [qr/^administrator\.see\.acl-list$/],
+					       config => [qr/^config\.qvd\.$/],
+					       tenant_view => [qr/^views\.see-main\.$/],
+					       admin_view => [qr/^views\.see-main\.$/],}}}
 };
 
 
@@ -317,7 +317,7 @@ my $AVAILABLE_FILTERS =
 { 
     list => { default => [],
 
-	      Wat_Log => [qw(id admin_id action arguments object_id time status source ip type_of_action qvd_object)],
+	      Wat_Log => [qw(id admin_id tenant_id action arguments object_id object_name time status source ip type_of_action qvd_object)],
 	      
 	      Config => [qw(key value)],
 	      
@@ -412,7 +412,7 @@ my $AVAILABLE_FIELDS =
 { 
     list => { default => [],
 
-	      Wat_Log => [qw(id admin_id action arguments object_id time status source ip type_of_action qvd_object)],
+	      Wat_Log => [qw(id admin_id tenant_id action arguments object_id object_name time status source ip type_of_action qvd_object)],
 
 	      Config => [qw(key value)],
 
@@ -708,9 +708,11 @@ my $FILTERS_TO_DBIX_FORMAT_MAPPER =
     Wat_Log => { 
 	id => 'me.id',
 	admin_id => 'me.administrator_id',
+	tenant_id => 'me.tenant_id',
 	action => 'me.action',
 	arguments => 'me.arguments',
 	object_id => 'me.object_id',
+	object_name => 'me.object_name',
 	time => 'me.time',
 	status => 'me.status',
 	source => 'me.source',
@@ -924,9 +926,11 @@ my $FIELDS_TO_DBIX_FORMAT_MAPPER =
     Wat_Log => { 
 	id => 'me.id',
 	admin_id => 'me.administrator_id',
+	tenant_id => 'me.tenant_id',
 	action => 'me.action',
 	arguments => 'me.arguments',
 	object_id => 'me.object_id',
+	object_name => 'me.object_name',
 	time => 'me.time',
 	status => 'me.status',
 	source => 'me.source',
