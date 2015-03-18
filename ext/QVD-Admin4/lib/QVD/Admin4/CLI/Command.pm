@@ -107,7 +107,7 @@ my $FILTERS =
 
     acl => { id => 'id', name => 'name', role => 'role_id', admin => 'admin_id', operative => 'operative'},
 
-    log => { id => 'id', admin_id => 'admin_id', tenant_id => 'tenant_id', action => 'action',  arguments => 'arguments',  object_id => 'object_id', 
+    log => { id => 'id', admin_id => 'admin_id', admin_name => 'admin_name', tenant_id => 'tenant_id', action => 'action',  arguments => 'arguments',  object_id => 'object_id', 
 	     object_name => 'object_name', time => 'time', status => 'status', source => 'source', ip => 'ip', type_of_action => 'type_of_action', qvd_object => 'qvd_object' },
 
 };
@@ -136,7 +136,7 @@ my $ORDER =
 
     acl => { id => 'id', name => 'name' },
 
-    log => { id => 'id', admin_id => 'admin_id', tenant_id => 'tenant_id', action => 'action',  arguments => 'arguments',  object_id => 'object_id', 
+    log => { id => 'id', admin_id => 'admin_id', admin_id => 'admin_name', tenant_id => 'tenant_id', action => 'action',  arguments => 'arguments',  object_id => 'object_id', 
 	     object_name => 'object_name', time => 'time', status => 'status', source => 'source', ip => 'ip', type_of_action => 'type_of_action', qvd_object => 'qvd_object' },
 
 };
@@ -166,7 +166,7 @@ my $FIELDS =
 
     acl => { id => 'id', name => 'name' },
 
-    log => { id => 'id', admin_id => 'admin_id', tenant_id => 'tenant_id', action => 'action',  arguments => 'arguments',  object_id => 'object_id', 
+    log => { id => 'id', admin_id => 'admin_id', admin_id => 'admin_name', tenant_id => 'tenant_id', action => 'action',  arguments => 'arguments',  object_id => 'object_id', 
 	     object_name => 'object_name', time => 'time', status => 'status', source => 'source', ip => 'ip', type_of_action => 'type_of_action', qvd_object => 'qvd_object' },
 
 };
@@ -319,7 +319,7 @@ my $DEFAULT_FIELDS =
 
     acl => [ qw(id name) ],
 
-    log => [qw(time admin_id tenant_id type_of_action qvd_object object_name arguments status)]
+    log => [qw(time admin_name type_of_action qvd_object object_name arguments status)]
 };
 
 ###############

@@ -165,6 +165,7 @@ sub report_in_log
 		     object_id => eval { $obj->id } // undef,
 		     object_name => eval { $obj->name } // undef,
 		     administrator_id => $request->get_parameter_value('administrator')->id,
+		     administrator_name => $request->get_parameter_value('administrator')->name,
 		     ip => $request->get_parameter_value('remote_address'),
 		     source => $request->get_parameter_value('source'),
 		     arguments => encode_json($request->json_wrapper->arguments),

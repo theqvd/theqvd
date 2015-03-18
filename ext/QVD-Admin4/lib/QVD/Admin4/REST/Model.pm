@@ -317,7 +317,7 @@ my $AVAILABLE_FILTERS =
 { 
     list => { default => [],
 
-	      Wat_Log => [qw(id admin_id tenant_id action arguments object_id object_name time status source ip type_of_action qvd_object)],
+	      Wat_Log => [qw(id admin_id admin_name tenant_id action arguments object_id object_name time status source ip type_of_action qvd_object)],
 	      
 	      Config => [qw(key value)],
 	      
@@ -412,7 +412,7 @@ my $AVAILABLE_FIELDS =
 { 
     list => { default => [],
 
-	      Wat_Log => [qw(id admin_id tenant_id action arguments object_id object_name time status source ip type_of_action qvd_object)],
+	      Wat_Log => [qw(id admin_id admin_name tenant_id action arguments object_id object_name time status source ip type_of_action qvd_object)],
 
 	      Config => [qw(key value)],
 
@@ -708,6 +708,7 @@ my $FILTERS_TO_DBIX_FORMAT_MAPPER =
     Wat_Log => { 
 	id => 'me.id',
 	admin_id => 'me.administrator_id',
+	admin_name => 'me.administrator_name',
 	tenant_id => 'me.tenant_id',
 	action => 'me.action',
 	arguments => 'me.arguments',
@@ -926,6 +927,7 @@ my $FIELDS_TO_DBIX_FORMAT_MAPPER =
     Wat_Log => { 
 	id => 'me.id',
 	admin_id => 'me.administrator_id',
+	admin_name => 'me.administrator_name',
 	tenant_id => 'me.tenant_id',
 	action => 'me.action',
 	arguments => 'me.arguments',

@@ -9,6 +9,7 @@ __PACKAGE__->table('wat_log');
 __PACKAGE__->add_columns( id                      => { data_type => 'integer', 
 						       is_auto_increment => 1 },
                           administrator_id        => { data_type => 'integer' },
+                          administrator_name      => { data_type => 'varchar(80)', is_nullable => 1 },
                           tenant_id               => { data_type => 'integer' },
                           action                  => { data_type => 'varchar(80)' },
                           type_of_action          => { data_type => 'varchar(80)', 					      
