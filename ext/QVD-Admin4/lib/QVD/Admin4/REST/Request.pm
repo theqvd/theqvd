@@ -321,6 +321,11 @@ sub forze_filtering_by_tenant
 	QVD::Admin4::Exception->throw(code => 4220, object => 'tenant_id') 
 	    unless $ADMIN->is_superadmin;
     }
+    elsif ($self->qvd_object_model->qvd_object eq 'Wat_Log')
+    {
+	my $IS_NULL = "$tenant_id IS NULL";
+	$self->filters->add_filter('-or', [$tenant_id,$ADMIN->tenants_scoop,\$IS_NULL]);
+    }
     else
     {
 	$self->filters->add_filter($tenant_id,$ADMIN->tenants_scoop);

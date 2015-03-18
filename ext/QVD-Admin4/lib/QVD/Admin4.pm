@@ -748,10 +748,22 @@ sub vm_stop
     $result;
 }
 
-
 ##########################
 ### AUXILIAR FUNCTIONS ###
 ##########################
+
+sub sources_in_wat_log
+{
+    my $self = shift;
+
+    my @sources = 
+    grep { defined $_ }
+    map { $_->source }  
+    $DB->resultset('Wat_Log')->search(
+	{},{ distinct => 1, select => [qw(source)]})->all;
+
+    { rows => \@sources , total => scalar @sources };
+}
 
 sub dis_in_staging
 {

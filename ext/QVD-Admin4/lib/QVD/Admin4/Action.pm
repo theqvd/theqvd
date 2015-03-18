@@ -12,6 +12,11 @@ my $AVAILABLE_ACTION_SIZES = { default => 'normal', normal => 'normal', heavy =>
 my $ACTIONS =
 {
 
+sources_in_wat_log => {type_of_action => 'general',
+		       admin4method => 'sources_in_wat_log',
+#		  acls => [qr/^log\.see-main\./],
+},
+
 wat_log_get_list => {type_of_action => 'list',
 		  admin4method => 'select',
 #		  acls => [qr/^log\.see-main\./],
