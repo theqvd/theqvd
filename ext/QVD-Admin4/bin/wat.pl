@@ -291,6 +291,24 @@ sub create_session
     $args{tenant} = $json->{tenant} if defined $json->{tenant};
     my $admin = $c->qvd_admin4_api->validate_user(%args);
 
+   my $localtime = localtime;
+    delete $args{password};
+    eval {
+    $c->qvd_admin4_api->_db->resultset('Wat_Log')->create(
+	{ time => $localtime,
+	  action => 'login', 
+	  type_of_action => 'login',
+	  qvd_object => 'admin',
+	  tenant_id => eval { $admin->tenant_id } // undef,
+	  administrator_id => eval { $admin->id } // undef,
+	  administrator_name => eval { $admin->name } // undef,
+	  ip => $c->tx->remote_address,
+	  source => eval { $json->{parameters}->{source} } // undef,
+	  arguments => encode_json(\%args),
+	  status => ($admin ? 0 : 3200) }) };
+
+    print $@ if $@;
+
     return (0,QVD::Admin4::Exception->new(code =>3200)) 
 	unless $admin;
 

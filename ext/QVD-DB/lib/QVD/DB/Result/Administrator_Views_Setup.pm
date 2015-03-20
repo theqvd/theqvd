@@ -20,4 +20,10 @@ __PACKAGE__->set_primary_key('id');
 __PACKAGE__->add_unique_constraint([qw(administrator_id field view_type device_type qvd_object property)]);
 __PACKAGE__->belongs_to(administrator => 'QVD::DB::Result::Administrator', 'administrator_id');
 
+sub tenant_id
+{
+    my $self = shift;
+    $self->administrator->tenant_id;
+}
+
 1;

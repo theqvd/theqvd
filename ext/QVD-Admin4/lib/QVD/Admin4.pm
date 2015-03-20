@@ -157,10 +157,27 @@ sub report_in_log
    my ($self,$request,$obj,$status) = @_; 
 
    my $localtime = localtime;
+   my $request_args = $request->json_wrapper->arguments;
+   delete $request_args->{password};
+   my $qvd_object = $request->qvd_object_model->qvd_object_log_style;
+   my $type_of_action = $request->qvd_object_model->type_of_action;
+
+   if ($qvd_object eq 'config' && $type_of_action eq 'delete')
+   {
+       @{$request_args}{qw(key value)} = ($obj->key,$obj->value);
+   }
+
+   if ($qvd_object =~ /^(tenant|admin)_view$/ && $type_of_action eq 'delete')
+   {
+       @{$request_args}{qw(field visible view_type device_type qvd_object property)} = 
+	   ($obj->field, $obj->visible, $obj->view_type, $obj->device_type, 
+	    $obj->qvd_object, $obj->property);
+   }
+
    my $arguments = { time => $localtime,
 		     action => $request->json_wrapper->action, 
-		     type_of_action => $request->qvd_object_model->type_of_action, 
-		     qvd_object => $request->qvd_object_model->qvd_object_log_style,
+		     type_of_action => $type_of_action, 
+		     qvd_object => $qvd_object,
 		     tenant_id => eval { $obj->tenant_id } // undef,
 		     object_id => eval { $obj->id } // undef,
 		     object_name => eval { $obj->name } // undef,
@@ -168,7 +185,7 @@ sub report_in_log
 		     administrator_name => $request->get_parameter_value('administrator')->name,
 		     ip => $request->get_parameter_value('remote_address'),
 		     source => $request->get_parameter_value('source'),
-		     arguments => encode_json($request->json_wrapper->arguments),
+		     arguments => encode_json($request_args),
 		     status => $status };
    $DB->resultset('Wat_Log')->create($arguments);
 }
