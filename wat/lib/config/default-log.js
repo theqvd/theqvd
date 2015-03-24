@@ -29,7 +29,7 @@ Wat.I.listFields[qvdObj] = {
         'sortable': true,
     },
     'qvd_object': {
-        'display': true,
+        'display': false,
         'fields': [
             'qvd_object'
         ],
@@ -40,6 +40,7 @@ Wat.I.listFields[qvdObj] = {
     'object_name': {
         'display': true,
         'fields': [
+            'qvd_object',
             'object_id',
             'object_name'
         ],
@@ -73,7 +74,26 @@ Wat.I.listDefaultFields[qvdObj] = $.extend({}, Wat.I.listFields[qvdObj]);
         
 // Filters configuration on list view
 Wat.I.formFilters[qvdObj] = {
-    'administrator': {
+    'source': {
+        'filterField': 'source',
+        'type': 'select',
+        'text': 'Source',
+        'class': 'chosen-single',
+        'fillable': true,
+        'fillAction': 'sources_in_log',
+        'nameAsId': true,
+        'options': [
+            {
+                'value': -1,
+                'text': 'All',
+                'selected': true
+            }
+                    ],
+        'displayMobile': false,
+        'displayDesktop': true,
+        'acls': 'log.see-main.'
+    },
+    'admin': {
         'filterField': 'admin_id',
         'type': 'select',
         'text': 'Administrator',
@@ -89,8 +109,59 @@ Wat.I.formFilters[qvdObj] = {
         'displayMobile': false,
         'displayDesktop': true,
         'acls': 'log.see-main.'
-    }
+    },
+    'action': {
+        'filterField': 'type_of_action',
+        'type': 'select',
+        'text': 'Action',
+        'class': 'chosen-single',
+        'fillable': true,
+        'options': [
+            {
+                'value': -1,
+                'text': 'All',
+                'selected': true
+            }
+                    ],
+        'displayMobile': false,
+        'displayDesktop': true,
+        'acls': 'log.see-main.'
+    },
+    'object': {
+        'filterField': 'qvd_object',
+        'type': 'select',
+        'text': 'Object',
+        'class': 'chosen-single',
+        'fillable': true,
+        'options': [
+            {
+                'value': -1,
+                'text': 'All',
+                'selected': true
+            }
+                    ],
+        'displayMobile': false,
+        'displayDesktop': true,
+        'acls': 'log.see-main.'
+    },
 };
+
+$.each(LOG_TYPE_OBJECTS, function(typeObject, typeObjectName) {
+    Wat.I.formFilters[qvdObj]['object']['options'].push({
+        'value': typeObject,
+        'text': typeObjectName,
+        'selected': false
+    });
+});
+
+$.each(LOG_TYPE_ACTIONS, function(typeAction, typeActionName) {
+    Wat.I.formFilters[qvdObj]['action']['options'].push({
+        'value': typeAction,
+        'text': typeActionName,
+        'selected': false
+    });
+});
+
 
 Wat.I.formDefaultFilters[qvdObj] = $.extend({}, Wat.I.formFilters[qvdObj]);
 
@@ -99,7 +170,7 @@ $.extend(Wat.I.listBreadCrumbs[qvdObj], Wat.I.homeBreadCrumbs);
 Wat.I.listBreadCrumbs[qvdObj]['next'] = {
             'screen': 'WAT Management',
             'next': {
-                'screen': 'Logs'
+                'screen': 'Log registers'
             }
         };
 
@@ -109,9 +180,9 @@ $.extend(true, Wat.I.detailsBreadCrumbs[qvdObj], Wat.I.listBreadCrumbs[qvdObj]);
 Wat.I.detailsBreadCrumbs[qvdObj].next = {
             'screen': 'WAT Management',
             'next': {
-                'screen': 'Logs',
+                'screen': 'Log registers',
                 'link': '#/log',
-                'linkACL': 'tenant.see-main.',
+                'linkACL': 'log.see-main.',
                 'next': {
                     'screen': '' // Will be filled dinamically
                 }

@@ -169,8 +169,24 @@
                 Wat.Router.app_router.on('route:detailsRole', function (id) {
                     Wat.Router.app_router.performRoute('roles', Wat.Views.RoleDetailsView, {"id": id});
                 });         
-                Wat.Router.app_router.on('route:listLog', function () {
-                    Wat.Router.app_router.performRoute('log', Wat.Views.LogListView);
+                Wat.Router.app_router.on('route:listLog', function (field, value) {
+                    var params = {};
+                    
+                    if (field != null) {
+                        switch(field) {
+                            case 'object':
+                                params.filters = {
+                                    "qvd_object": value.split('-')[0],
+                                    "object_id": value.split('-')[1]
+                                };
+                                break;
+                        }
+                    }
+                    
+                    Wat.Router.app_router.performRoute('log', Wat.Views.LogListView, params);
+                });             
+                Wat.Router.app_router.on('route:detailsLog', function (id) {
+                    Wat.Router.app_router.performRoute('log', Wat.Views.LogDetailsView, {"id": id});
                 });    
 
 

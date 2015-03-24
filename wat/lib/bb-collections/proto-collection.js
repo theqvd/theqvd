@@ -15,6 +15,7 @@ Wat.Collections.Collection = Backbone.Collection.extend({
         this.offset = params.offset || this.offset;
         this.filters = params.filters || this.filters;
         this.action = params.action || this.actionPrefix + '_get_list';
+        this.sort = params.sort || this.sort;
     },
     
     getListUrl: function () {

@@ -302,6 +302,7 @@ Wat.A = {
                         var options = '';
 
                         var optGroup = '';
+                        
                         $(data.rows).each(function(i,option) {
                             var selected = '';
 

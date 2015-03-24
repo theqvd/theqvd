@@ -240,3 +240,42 @@ DOC_DEFAULT_LANGUAGE = 'es';
 
 // Number of bytes on a KiloByte
 BYTES_ON_KB = 1000;
+
+// Log constants
+
+LOG_TYPE_ACTIONS = {
+    create: 'Created',
+    update: 'Updated',
+    create_or_update: 'Setted',
+    delete: 'Deleted',
+    exec: 'Executed',
+    login: 'Logged-in',
+};
+
+LOG_TYPE_OBJECTS = {
+    user: 'User',
+    vm: 'Virtual machine',
+    host: 'Node',
+    osf: 'OS Flavour',
+    di: 'Disk image',
+    role: 'Role',
+    tenant: 'Tenant',
+    admin: 'Administrator',
+    admin_view: 'View',
+    tenant_view: 'View',
+    config: 'Configuration',
+};
+
+LOG_TYPE_OBJECTS_ICONS = {
+    user: CLASS_ICON_USERS,
+    vm: CLASS_ICON_VMS,
+    host: CLASS_ICON_HOSTS,
+    osf: CLASS_ICON_OSFS,
+    di: CLASS_ICON_DIS,
+    role: CLASS_ICON_ROLES,
+    tenant: CLASS_ICON_TENANTS,
+    admin: CLASS_ICON_ADMINS,
+    admin_view: CLASS_ICON_VIEWS,
+    tenant_view: CLASS_ICON_VIEWS,
+    config: CLASS_ICON_QVDCONFIG,
+};

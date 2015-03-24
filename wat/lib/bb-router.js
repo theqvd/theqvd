@@ -33,6 +33,7 @@ Wat.Router = Backbone.Router.extend({
         "profile": "profile",
         "myviews": "myviews",
         "log": "listLog",
+        "log/:field/:value": "listLog",
         "log/:id": "detailsLog",
         "*actions": "defaultRoute" // Backbone will try match the route above first
     },

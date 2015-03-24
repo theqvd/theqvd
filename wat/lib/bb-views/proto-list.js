@@ -625,7 +625,7 @@ Wat.Views.ListView = Wat.Views.MainView.extend({
                 cid: this.cid
             }
         );
-
+        
         $(that.listBlockContainer).html(template);
                         
         this.fetchFilters();
@@ -682,11 +682,22 @@ Wat.Views.ListView = Wat.Views.MainView.extend({
         $.each(this.formFilters, function(name, filter) {
             if (filter.fillable) {
                 if (filter.type == 'select') {
+                    var fillAction = name + '_tiny_list';
+                    if (filter.fillAction) {
+                        fillAction = filter.fillAction;
+                    }
+                    
+                    var nameAsId = false;
+                    if (filter.nameAsId) {
+                        nameAsId = filter.nameAsId;
+                    }
+                    
                     var params = {
-                        'action': name + '_tiny_list',
+                        'action': fillAction,
                         'selectedId': that.filters[filter.filterField] || Wat.I.getFilterSelectedId(filter.options),
                         'controlName': name,
                         'startingOptions': Wat.I.getFilterStartingOptions(filter.options),
+                        'nameAsId': nameAsId
                     };
 
                     Wat.A.fillSelect(params, function () {

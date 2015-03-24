@@ -91,8 +91,9 @@ Wat.Views.DetailsView = Wat.Views.MainView.extend({
             return;
         }
         
+        // If only id is stored in model means that it wasnt found
         if (this.notFound == undefined) {
-            this.notFound = this.model.attributes.name == undefined;
+            this.notFound = Object.keys(this.model.attributes).length <= 1;
         }
         
         // If screen attribute of last breadcrumb is not defined, element wasnt found
@@ -107,7 +108,7 @@ Wat.Views.DetailsView = Wat.Views.MainView.extend({
             nextBread = nextBread.next;
         }
         
-        if (this.qvdObj != 'di' && this.qvdObj != 'configwat') {
+        if (this.qvdObj != 'log' && this.qvdObj != 'di' && this.qvdObj != 'configwat') {
             // Add name of the model to breadcrumbs if not exist
             nextBread.screen = this.model.get('name');
         }

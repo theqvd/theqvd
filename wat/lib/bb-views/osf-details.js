@@ -14,44 +14,8 @@ Wat.Views.OSFDetailsView = Wat.Views.DetailsView.extend({
             return;
         }
         
-        if (sideCheck['osf.see.vm-list']) { 
-            var sideContainer1 = '.' + this.cid + ' .bb-details-side1';
-
-            // Render Virtual Machines list on side
-            var params = {};
-            params.whatRender = 'list';
-            params.listContainer = sideContainer1;
-            params.forceListColumns = {name: true, tag: true};
-            
-            if (Wat.C.checkGroupACL('osfVmEmbeddedInfo')) {
-                params.forceListColumns['info'] = true;
-            }
-                
-            // Check ACLs to show or not info icons in OSFs list
-            params.forceInfoRestrictions = {};
-            if (Wat.C.checkACL('osf.see.vm-list-block')) {
-                params.forceInfoRestrictions.block = true;
-            }
-            if (Wat.C.checkACL('osf.see.vm-list-expiration')) {
-                params.forceInfoRestrictions.expiration = true;
-            }
-            if (Wat.C.checkACL('osf.see.vm-list-state')) {
-                params.forceInfoRestrictions.state = true;
-            }
-            if (Wat.C.checkACL('osf.see.vm-list-user-state')) {
-                params.forceInfoRestrictions.user_state = true;
-            }
-            
-            params.forceSelectedActions = {};
-            params.forceListActionButton = null;
-            params.block = 5;
-            params.filters = {"osf_id": this.elementId};
-            this.sideView2 = new Wat.Views.VMListView(params);
-        }
-        
-        
         if (sideCheck['osf.see.di-list']) { 
-            var sideContainer2 = '.' + this.cid + ' .bb-details-side2';
+            var sideContainer2 = '.' + this.cid + ' .bb-details-side1';
 
             // Render Disk images list on side
             var params = {};
@@ -87,6 +51,42 @@ Wat.Views.OSFDetailsView = Wat.Views.DetailsView.extend({
             params.filters = {"osf_id": this.elementId};
             this.sideView2 = new Wat.Views.DIListView(params);  
         }
+        
+        if (sideCheck['osf.see.vm-list']) { 
+            var sideContainer1 = '.' + this.cid + ' .bb-details-side2';
+
+            // Render Virtual Machines list on side
+            var params = {};
+            params.whatRender = 'list';
+            params.listContainer = sideContainer1;
+            params.forceListColumns = {name: true, tag: true};
+            
+            if (Wat.C.checkGroupACL('osfVmEmbeddedInfo')) {
+                params.forceListColumns['info'] = true;
+            }
+                
+            // Check ACLs to show or not info icons in OSFs list
+            params.forceInfoRestrictions = {};
+            if (Wat.C.checkACL('osf.see.vm-list-block')) {
+                params.forceInfoRestrictions.block = true;
+            }
+            if (Wat.C.checkACL('osf.see.vm-list-expiration')) {
+                params.forceInfoRestrictions.expiration = true;
+            }
+            if (Wat.C.checkACL('osf.see.vm-list-state')) {
+                params.forceInfoRestrictions.state = true;
+            }
+            if (Wat.C.checkACL('osf.see.vm-list-user-state')) {
+                params.forceInfoRestrictions.user_state = true;
+            }
+            
+            params.forceSelectedActions = {};
+            params.forceListActionButton = null;
+            params.block = 5;
+            params.filters = {"osf_id": this.elementId};
+            this.sideView2 = new Wat.Views.VMListView(params);
+        }
+
     },
     
     updateElement: function (dialog) {

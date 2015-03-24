@@ -18,15 +18,19 @@ Wat.Models.Model = Backbone.Model.extend({
         
         switch (view) {
             case 'detail':
-                return response.rows[0];
+                return this.processResponse(response.rows[0]);
                 break;
             case 'list':
-                return response;
+                return this.processResponse(response);
                 break;
             case 'error':
                 Wat.I.showMessage({messageType: 'error'}, response);
                 break;
         }
+    },
+    
+    processResponse: function (response) {
+        return response;
     },
     
     initialize: function (params) {
