@@ -26,4 +26,10 @@ sub tenant_id
     $self->administrator->tenant_id;
 }
 
+sub tenant_name
+{
+    my $self = shift;
+    $self->administrator->tenant_name;
+}
+
 1;

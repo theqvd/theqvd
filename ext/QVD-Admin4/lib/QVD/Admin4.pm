@@ -179,6 +179,7 @@ sub report_in_log
 		     type_of_action => $type_of_action, 
 		     qvd_object => $qvd_object,
 		     tenant_id => eval { $obj->tenant_id } // undef,
+		     tenant_name => eval { $obj->tenant_name } // undef,
 		     object_id => eval { $obj->id } // undef,
 		     object_name => eval { $obj->name } // undef,
 		     administrator_id => $request->get_parameter_value('administrator')->id,
@@ -187,7 +188,10 @@ sub report_in_log
 		     source => $request->get_parameter_value('source'),
 		     arguments => encode_json($request_args),
 		     status => $status };
-   $DB->resultset('Wat_Log')->create($arguments);
+
+
+   eval { $DB->resultset('Wat_Log')->create($arguments) };
+   print $@ if $@;
 }
 
 
@@ -777,8 +781,8 @@ sub sources_in_wat_log
     my $self = shift;
 
     my @sources = 
-    grep { defined $_ }
-    map { $_->source }  
+    grep { defined $_->{name} }
+    map { { name => $_->source } }  
     $DB->resultset('Wat_Log')->search(
 	{},{ distinct => 1, select => [qw(source)]})->all;
 

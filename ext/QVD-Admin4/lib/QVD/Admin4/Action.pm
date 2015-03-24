@@ -290,6 +290,11 @@ admin_get_list => { type_of_action => 'list',
 		    acls => [qr/^administrator\.see-main\./],
 		    qvd_object => 'Administrator' },
 
+admin_tiny_list => { type_of_action => 'tiny',
+		    admin4method => 'select',
+#		    acls => [qr/^log\.filter\.administrator/],
+		    qvd_object => 'Administrator' },
+
 admin_get_details => { type_of_action => 'details',
 		       admin4method => 'select',
 		       acls => [qr/^administrator\.see-details\./],

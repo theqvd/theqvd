@@ -20,5 +20,11 @@ __PACKAGE__->set_primary_key('id');
 __PACKAGE__->add_unique_constraint([qw(tenant_id field view_type device_type qvd_object property)]);
 __PACKAGE__->belongs_to(tenant => 'QVD::DB::Result::Tenant', 'tenant_id');
 
+sub tenant_name
+{
+    my $self = shift;
+    $self->tenant->name;
+}
+
 1;
 
