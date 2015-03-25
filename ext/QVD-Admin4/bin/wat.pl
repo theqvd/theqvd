@@ -292,7 +292,7 @@ sub create_session
     my $admin = $c->qvd_admin4_api->validate_user(%args);
 
    my $localtime = localtime;
-    delete $args{password};
+    $args{password} = '**********' if exists $args{password};
     eval {
     $c->qvd_admin4_api->_db->resultset('Wat_Log')->create(
 	{ time => $localtime,
@@ -300,6 +300,7 @@ sub create_session
 	  type_of_action => 'login',
 	  qvd_object => 'admin',
 	  tenant_id => eval { $admin->tenant_id } // undef,
+	  tenant_name => eval { $admin->tenant_name } // undef,
 	  administrator_id => eval { $admin->id } // undef,
 	  administrator_name => eval { $admin->name } // undef,
 	  ip => $c->tx->remote_address,

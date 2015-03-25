@@ -6,6 +6,8 @@ use warnings;
 
 __PACKAGE__->load_components(qw/Core/);
 __PACKAGE__->table('wat_log');
+
+
 __PACKAGE__->add_columns( id                      => { data_type => 'integer', 
 						       is_auto_increment => 1 },
                           administrator_id        => { data_type => 'integer', is_nullable => 1 },
@@ -13,12 +15,12 @@ __PACKAGE__->add_columns( id                      => { data_type => 'integer',
                           tenant_id               => { data_type => 'integer' },
                           tenant_name             => { data_type => 'varchar(80)' },
                           action                  => { data_type => 'varchar(80)' },
-                          type_of_action          => { data_type => 'varchar(80)', 					      
-						       is_enum     => 1,
+                          type_of_action          => { data_type => 'varchar(80)',       
+						              is_enum     => 1,
 						       extra       => { list => [qw(vm user osf di host tenant admin role acl config tenant_view admin_view)] } },
                           arguments               => { data_type => 'text', is_nullable => 1 },
                           qvd_object              => { data_type => 'varchar(80)',
-						       is_enum     => 1,
+						              is_enum     => 1,
 						       extra       => { list => [qw(create delete update exec)] } },
                           object_id               => { data_type => 'integer', is_nullable => 1 },
                           object_name             => { data_type => 'varchar(80)', is_nullable => 1 },
@@ -26,7 +28,7 @@ __PACKAGE__->add_columns( id                      => { data_type => 'integer',
                           status                  => { data_type => 'integer' },
                           source                  => { data_type => 'varchar(80)', is_nullable => 1 },
                           ip                      => { data_type => 'varchar(80)', is_nullable => 1 },
-);
+    );
 
 __PACKAGE__->set_primary_key('id');
 __PACKAGE__->belongs_to(administrator => 'QVD::DB::Result::Administrator', 'administrator_id');

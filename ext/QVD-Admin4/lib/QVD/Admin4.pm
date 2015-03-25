@@ -157,8 +157,8 @@ sub report_in_log
    my ($self,$request,$obj,$status) = @_; 
 
    my $localtime = localtime;
-   my $request_args = $request->json_wrapper->arguments;
-   delete $request_args->{password};
+   my $request_args = eval { $request->json_wrapper->original_request->{arguments} } // {};
+   $request_args->{password} = '**********' if exists $request_args->{password};
    my $qvd_object = $request->qvd_object_model->qvd_object_log_style;
    my $type_of_action = $request->qvd_object_model->type_of_action;
 
@@ -870,6 +870,7 @@ sub di_delete_disk_image
 ######################################
 ## GENERAL FUNCTIONS; WITHOUT REQUEST
 ######################################
+
 
 sub tenant_view_get_list
 {

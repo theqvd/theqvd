@@ -53,6 +53,7 @@ my $RELATED_VIEWS_IN_DB =
 	      Host => [qw(Host_View)],
 	      OSF => [qw(OSF_View)],
 	      DI => [qw(DI_View)],
+	      Wat_Log => [qw(Wat_Log_View)],
 	      Role => [qw(Role_View)],},
 
     details => { User => [qw(User_View)],
@@ -60,6 +61,7 @@ my $RELATED_VIEWS_IN_DB =
 		 Host => [qw(Host_View)],
 		 OSF => [qw(OSF_View)],
 		 DI => [qw(DI_View)],
+		 Wat_Log => [qw(Wat_Log_View)],
 		 Role => [qw(Role_View)],},		 
 };
 
@@ -412,7 +414,7 @@ my $AVAILABLE_FIELDS =
 { 
     list => { default => [],
 
-	      Wat_Log => [qw(id admin_id admin_name tenant_id tenant_name action arguments object_id object_name time status source ip type_of_action qvd_object)],
+	      Wat_Log => [qw(id admin_id admin_name tenant_id tenant_name action arguments object_id object_name time status source ip type_of_action qvd_object object_deleted admin_deleted)],
 
 	      Config => [qw(key value)],
 
@@ -451,7 +453,8 @@ my $AVAILABLE_FIELDS =
 	      Operative_Views_In_Administrator => [qw(tenant_id field visible view_type device_type qvd_object property)] },
 
     details => { default => [],
-		 
+
+		 Wat_Log => [qw(id admin_id admin_name tenant_id tenant_name action arguments object_id object_name time status source ip type_of_action qvd_object object_deleted admin_deleted)],
 		 Config => [qw(key value)],
 
 		 OSF => [qw(id name overlay user_storage memory  number_of_vms number_of_dis properties )],
@@ -940,7 +943,9 @@ my $FIELDS_TO_DBIX_FORMAT_MAPPER =
 	source => 'me.source',
 	ip => 'me.ip',
 	type_of_action => 'me.type_of_action',
-	qvd_object => 'me.qvd_object'
+	qvd_object => 'me.qvd_object',
+	object_deleted => 'view.object_deleted',
+	admin_deleted => 'view.administrator_deleted',
     },
 
     Config => {

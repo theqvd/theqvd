@@ -167,7 +167,7 @@ my $FIELDS =
     acl => { id => 'id', name => 'name' },
 
     log => { id => 'id', admin_id => 'admin_id', admin_id => 'admin_name', tenant_id => 'tenant_id', tenant_name => 'tenant_name', action => 'action',  arguments => 'arguments',  object_id => 'object_id', 
-	     object_name => 'object_name', time => 'time', status => 'status', source => 'source', ip => 'ip', type_of_action => 'type_of_action', qvd_object => 'qvd_object' },
+	     object_name => 'object_name', time => 'time', status => 'status', source => 'source', ip => 'ip', type_of_action => 'type_of_action', qvd_object => 'qvd_object', deleted_object => 'deleted_object', deleted_admin => 'deleted_admin' },
 
 };
 

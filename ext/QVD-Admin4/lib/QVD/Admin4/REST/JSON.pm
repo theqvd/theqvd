@@ -5,6 +5,7 @@ use warnings;
 use Moo;
 use Clone qw(clone);
 use 5.010;
+use Mojo::JSON qw(encode_json);
 our $VERSION = '0.01';
 
 has 'json', is => 'ro', isa => sub { die "Invalid type for attribute json" 
@@ -13,12 +14,20 @@ has 'json', is => 'ro', isa => sub { die "Invalid type for attribute json"
 sub BUILD
 {
     my $self = shift;
+
     my $json = $self->json;
+    $self->{original_request} = clone $json;
     $self->{json} = clone $json;
     $self->get_flatten_nested_queries;	
 
     $self->{filters_obj} = QVD::Admin4::REST::Filter->new(
 	hash => $self->{json}->{filters} // {} );
+}
+
+sub original_request
+{
+    my $self = shift;
+    return $self->{original_request};
 }
 
 sub filters_obj
