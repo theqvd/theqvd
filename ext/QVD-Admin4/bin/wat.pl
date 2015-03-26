@@ -1,6 +1,6 @@
 #!/usr/bin/perl
 use Mojolicious::Lite;
-use lib::glob '/home/ubuntu/wat/*/lib/';
+use lib::glob '/home/benjamin/wat/*/lib/';
 use Mojo::JSON qw(encode_json decode_json j);
 use QVD::Admin4::Exception;
 use MojoX::Session;
@@ -63,7 +63,7 @@ package MojoX::Session::Transport::WAT
 
 # GENERAL CONFIG AND PLUGINS
 
-app->config(hypnotoad => {listen => ['http://192.168.3.7:3000']});
+app->config(hypnotoad => {listen => ['http://localhost:3000']});
 
 # HELPERS
 
@@ -104,10 +104,11 @@ under sub {
     return $bool;
 };
 
+
 any [qw(POST GET)] => '/' => sub {
 
     my $c = shift;
-
+    
     $c->inactivity_timeout(30000);     
     my $json = $c->get_input_json;
     my $response = $c->process_api_query($json);
@@ -188,9 +189,6 @@ websocket '/staging' => sub {
         );
 };
 
-#$controller->tx->connection
-
-
 any [qw(POST OPTIONS)] => '/di/upload' => sub {
 
     my $c = shift;
@@ -224,6 +222,58 @@ any [qw(POST OPTIONS)] => '/di/upload' => sub {
     }
     deep_utf8_decode($response);
     $c->render(text => b(encode_json($response))->decode('UTF-8'));
+};
+
+
+websocket '/di/download' => sub {
+    
+    my $c = shift;
+    $c->inactivity_timeout(30000);     
+
+    my $response;
+    my $percent = 0;
+
+    my $json = $c->get_input_json;
+    $json->{action} = 'di_create_from_upload';
+    $response = $c->process_api_query($json);
+
+    $c->ua->on(start => sub {
+	my ($ua, $tx) = @_;
+	$tx->req->once(finish => sub {
+	    $tx->res->on(progress => sub {
+		my $msg = shift;
+		return unless my $len = $msg->headers->content_length;
+	      
+		my $size = $msg->content->progress;
+		$percent = $size == $len ? 100 : int($size / ($len / 100));
+		print "\rProgress: ", $size == $len ? 100 : int($size / ($len / 100)), '%';
+			 });
+		       });
+	    }); 
+    
+    my $url = decode_json($json->{url});
+    my $tx2 = $c->ua->build_tx(GET => $url);
+
+    if ($response->{status} eq 0)
+    {
+	eval 
+	{ 
+	    my $disk_image = $json->{arguments}->{disk_image};
+	    my $images_path  = $c->qvd_admin4_api->_cfg('path.storage.images');
+	    my $di_id = ${$response->{rows}}[0]->{id};
+	    my $image_name = $images_path .'/'. $di_id . '-'. $disk_image;
+
+	    $c->ua->start($tx2, sub { my ($ua,$tx) = @_;
+				      $response = QVD::Admin4::Exception->new(code => 2210)->json
+					  unless eval { $tx->res->code eq 200 && $tx->res->content->asset->move_to($image_name) };
+                                      $c->send(encode_json($response))}); 
+	}; 
+	print $@ if $@;
+	$c->render(json => QVD::Admin4::Exception->new(code => 2210)->json) if $@;
+    }
+
+    $c->on(message => sub { my ($c,$msg) = @_; $c->send($percent); });
+    $c->send($percent);
 };
 
 app->start;
@@ -293,6 +343,7 @@ sub create_session
 
    my $localtime = localtime;
     $args{password} = '**********' if exists $args{password};
+
     eval {
     $c->qvd_admin4_api->_db->resultset('Wat_Log')->create(
 	{ time => $localtime,
@@ -348,4 +399,3 @@ sub reject_access
 {
   (0,QVD::Admin4::Exception->new(code => 3100));
 }
-
