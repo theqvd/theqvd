@@ -65,6 +65,11 @@ Wat.Views.MainView = Backbone.View.extend({
     },
     
     printBreadcrumbs: function (bc, bcHTML) {
+        // If no bradcrumbs are given, do nothing
+        if ($.isEmptyObject(bc)) {
+            return;
+        }
+        
         if (bc.link != undefined) {
             bcHTML += '<a href="' + bc.link + '" data-i18n="' + bc.screen + '"></a>';
         }

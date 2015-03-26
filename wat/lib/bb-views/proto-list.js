@@ -541,12 +541,11 @@ Wat.Views.ListView = Wat.Views.MainView.extend({
     // Fetch collection and render list
     fetchList: function (that) {
         var that = that || this;        
-        
+
         that.collection.fetch({      
             complete: function () {
-                
                 // If typed search is defined, check if typedSearch matchs with currentSearch. If not, do nothing
-                if (that.typedSearch != undefined) {
+                if (that.typedSearch) {
                     var currentSearch = $(that.filtersContainer).find('.filter-control>input[type="text"]').val();
                     
                     if (that.typedSearch != currentSearch) {
@@ -806,6 +805,14 @@ Wat.Views.ListView = Wat.Views.MainView.extend({
     },
     
     paginationMove: function (context, dir, render) {
+        // If pressed button is disabled do nothing
+        if (context.hasClass('disabled')) {
+            return;
+        }
+        
+        // Show loading animation while loading
+        $('.list').html(HTML_MID_LOADING);
+        
         var totalPages = Math.ceil(this.collection.elementsTotal/this.collection.block);
         var currentPage = this.collection.offset;
         
@@ -841,7 +848,7 @@ Wat.Views.ListView = Wat.Views.MainView.extend({
                 this.collection.offset = totalPages;
                 break;
         }
-                             
+        
         this.fetchList();        
     },
     

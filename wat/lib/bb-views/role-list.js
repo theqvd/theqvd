@@ -13,9 +13,6 @@ Wat.Views.RoleListView = Wat.Views.ListView.extend({
         this.renderSetupCommon();
     },
     
-    events: {
-    },
-    
     renderSetupCommon: function () {
         var cornerMenu = Wat.I.getCornerMenu();
         

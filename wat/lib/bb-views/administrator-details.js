@@ -1,5 +1,5 @@
 Wat.Views.AdminDetailsView = Wat.Views.DetailsView.extend({  
-    setupOption: 'admins',
+    setupOption: 'administrators',
     secondaryContainer: '.bb-setup',
     qvdObj: 'administrator',
     
@@ -139,10 +139,10 @@ Wat.Views.AdminDetailsView = Wat.Views.DetailsView.extend({
             var filters = {};
             switch (treeKind) {
                 case 'actions':
-                    filters = {'acl_name': '%.' + branch + '.%', 'admin_id': this.id};
+                    filters = {'acl_name': { '~' : '%.' + branch + '.%' }, 'admin_id': this.id};
                     break;
                 case 'sections':
-                    filters = {'acl_name': branch + '.%', 'admin_id': this.id};
+                    filters = {'acl_name': { '~' : branch + '.%' }, 'admin_id': this.id};
                     break;
             }
             
