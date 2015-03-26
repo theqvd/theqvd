@@ -54,9 +54,6 @@ Wat.Views.ListView = Wat.Views.MainView.extend({
             listCommonBlock: {
                 name: 'list-common-block'
             },
-            list: {
-                name: 'list-' + this.qvdObj
-            },
             selectChecks: {
                 name: 'dialog-select-checks'
             },
@@ -64,6 +61,10 @@ Wat.Views.ListView = Wat.Views.MainView.extend({
                 name: 'creator-' + this.qvdObj
             }
         }
+        
+        templates["list_" + this.qvdObj] = {
+            name: 'list-' + this.qvdObj
+        };
         
         // If qvd object is massive-editable, get massive editor template
         if ($.inArray(this.qvdObj, QVD_OBJS_MASSIVE_EDITABLE) != -1) {
@@ -264,7 +265,6 @@ Wat.Views.ListView = Wat.Views.MainView.extend({
             var filtersContainer = '.' + this.cid + ' .filter';
             
             var filterNotes = {};
-            
             if ($.isEmptyObject(filterNotes) && !$.isEmptyObject(this.initFilters)) {
                 $.each(this.initFilters, function (filterField, filterValue) {                    
                     switch (filterField) {
@@ -290,6 +290,13 @@ Wat.Views.ListView = Wat.Views.MainView.extend({
                             filterNotes['user_id'] = {
                                 'label': $.i18n.t('User'),
                                 'type': 'filter'
+                            };
+                            break;
+                        case 'object_id':
+                            filterNotes['object_id'] = {
+                                'label': $.i18n.t('Id'),
+                                'type': 'filter',
+                                'value': filterValue
                             };
                             break;
                     }
@@ -332,7 +339,7 @@ Wat.Views.ListView = Wat.Views.MainView.extend({
                         break;
                 }
             });
-
+            
             this.drawFilterNotes(filterNotes);
         }
     },
@@ -628,7 +635,10 @@ Wat.Views.ListView = Wat.Views.MainView.extend({
         
         $(that.listBlockContainer).html(template);
                         
-        this.fetchFilters();
+        // Only fetch filters if view is not embeded
+        if (Wat.CurrentView.cid == this.cid) {
+            this.fetchFilters();
+        }
 
         that.renderList();
         
@@ -645,7 +655,7 @@ Wat.Views.ListView = Wat.Views.MainView.extend({
     renderList: function () {
         // Fill the list
         var template = _.template(
-            Wat.TPL.list, {
+            Wat.TPL['list_' + this.qvdObj], {
                 models: this.collection.models,
                 filters: this.collection.filters,
                 columns: this.columns,
@@ -667,8 +677,11 @@ Wat.Views.ListView = Wat.Views.MainView.extend({
             Wat.WS.openListWebsockets(this.qvdObj, this.collection.models, this.liveFields, this.cid);
         }
         
+        Wat.T.translate();
+        
         this.updateFilterNotes();
-        Wat.I.addSortIcons();
+        
+        Wat.I.addSortIcons(this.cid);
         
         Wat.I.adaptSideSize();
     },

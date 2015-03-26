@@ -19,21 +19,21 @@ Wat.I.listFields[qvdObj] = {
         'text': 'Id',
         'sortable': true,
     },
-    'action': {
-        'display': true,
-        'fields': [
-            'type_of_action'
-        ],
-        'text': 'Action',
-        'fixed': true,
-        'sortable': true,
-    },
     'qvd_object': {
         'display': false,
         'fields': [
             'qvd_object'
         ],
         'text': 'Object',
+        'fixed': true,
+        'sortable': true,
+    },
+    'action': {
+        'display': true,
+        'fields': [
+            'type_of_action'
+        ],
+        'text': 'Action',
         'fixed': true,
         'sortable': true,
     },
@@ -64,6 +64,15 @@ Wat.I.listFields[qvdObj] = {
             'time'
         ],
         'text': 'Datetime',
+        'fixed': true,
+        'sortable': true,
+    },
+    'source': {
+        'display': true,
+        'fields': [
+            'source'
+        ],
+        'text': 'Source',
         'fixed': true,
         'sortable': true,
     }

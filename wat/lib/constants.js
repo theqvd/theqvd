@@ -260,9 +260,9 @@ LOG_TYPE_OBJECTS = {
     di: 'Disk image',
     role: 'Role',
     tenant: 'Tenant',
-    admin: 'Administrator',
-    admin_view: 'View',
-    tenant_view: 'View',
+    administrator: 'Administrator',
+    admin_view: 'Administrator view',
+    tenant_view: 'Default view',
     config: 'Configuration',
 };
 
@@ -274,7 +274,7 @@ LOG_TYPE_OBJECTS_ICONS = {
     di: CLASS_ICON_DIS,
     role: CLASS_ICON_ROLES,
     tenant: CLASS_ICON_TENANTS,
-    admin: CLASS_ICON_ADMINS,
+    administrator: CLASS_ICON_ADMINS,
     admin_view: CLASS_ICON_VIEWS,
     tenant_view: CLASS_ICON_VIEWS,
     config: CLASS_ICON_QVDCONFIG,

@@ -3,6 +3,7 @@
         <tr>    
             <% 
                 var printedColumns = 0;
+                
                 $.each(columns, function(name, col) {
                     if (col.display == false) {
                         return;

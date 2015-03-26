@@ -17,6 +17,9 @@ Wat.Views.AdminDetailsView = Wat.Views.DetailsView.extend({
         // Clean previous item name
         this.breadcrumbs.next.next.next.screen="";
         
+        // Extend the common events
+        this.extendEvents(this.eventsDetails);
+        
         this.params = params;
                 
         var templates = {
@@ -72,6 +75,20 @@ Wat.Views.AdminDetailsView = Wat.Views.DetailsView.extend({
         Wat.I.chosenElement('select.js-acl-tree-selector', 'single');
 
         Wat.T.translate();
+    },
+    
+    renderSide: function () {
+        // No side rendered
+        if (this.checkSide({'log.see-main.': '.js-side-component2'}) === false) {
+            return;
+        }
+        
+        var sideContainer = '.' + this.cid + ' .bb-details-side2';
+
+        // Render Related log list on side
+        var params = this.getSideLogParams(sideContainer);
+
+        this.sideView = new Wat.Views.LogListView(params);
     },
     
     events: {
@@ -251,9 +268,6 @@ Wat.Views.AdminDetailsView = Wat.Views.DetailsView.extend({
         Wat.Views.DetailsView.prototype.openEditElementDialog.apply(this, [e]);
         
         Wat.I.chosenElement('[name="language"]', 'single');
-    },
-    
-    renderSide: function () {
     },
     
     updateElement: function (dialog) {

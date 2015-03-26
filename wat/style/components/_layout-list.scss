@@ -45,6 +45,11 @@
         background: darken($col_whiter, 15);
         width: 100%;
     }
+    
+    .chosen-results li {
+        line-height: 1.4em;
+        font-size: 12px;
+    }
 }
 
 .list-block, .details-side {        

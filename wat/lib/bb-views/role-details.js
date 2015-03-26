@@ -21,6 +21,9 @@ Wat.Views.RoleDetailsView = Wat.Views.DetailsView.extend({
 
         this.params = params;
         
+        // Extend the common events
+        this.extendEvents(this.eventsDetails);
+        
         Wat.I.chosenConfiguration();
         
         var templates = {
@@ -312,6 +315,17 @@ Wat.Views.RoleDetailsView = Wat.Views.DetailsView.extend({
     },
     
     renderSide: function () {
+        // No side rendered
+        if (this.checkSide({'log.see-main.': '.js-side-component2'}) === false) {
+            return;
+        }
+        
+        var sideContainer = '.' + this.cid + ' .bb-details-side2';
+
+        // Render Related log list on side
+        var params = this.getSideLogParams(sideContainer);
+
+        this.sideView = new Wat.Views.LogListView(params);
     },
     
     render: function () {

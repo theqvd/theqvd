@@ -124,7 +124,7 @@
                             case 'name':
                 %>
                                 <td class="js-name">
-                                    <%= Wat.C.ifACL('<a href="#/admin/' + model.get('id') + '" data-i18n="[title]Click for details">', 'administrator.see-details.') %>
+                                    <%= Wat.C.ifACL('<a href="#/administrator/' + model.get('id') + '" data-i18n="[title]Click for details">', 'administrator.see-details.') %>
                                     <%= Wat.C.ifACL('<i class="fa fa-search"></i>', 'administrator.see-details.') %>
                                         <span class="text"><%= model.get('name') %></span>
                                     <%= Wat.C.ifACL('</a>', 'administrator.see-details.') %>

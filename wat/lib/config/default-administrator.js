@@ -87,7 +87,7 @@ Wat.I.detailsBreadCrumbs[qvdObj].next = {
             'screen': 'WAT Management',
             'next': {
                 'screen': 'Administrators',
-                'link': '#/admins',
+                'link': '#/administrators',
                 'linkACL': 'administrator.see-main.',
                 'next': {
                     'screen': '' // Will be filled dinamically

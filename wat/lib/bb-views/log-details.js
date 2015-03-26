@@ -17,6 +17,7 @@ Wat.Views.LogDetailsView = Wat.Views.DetailsView.extend({
         params.whatRender = 'list';
         params.listContainer = sideContainer;
         params.forceListColumns = {
+            see_details: true, 
             action: true, 
             datetime: true
         };

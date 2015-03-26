@@ -4,12 +4,11 @@ var mainTableClass = '';
 var stateTableClass = 'hidden';
 
 if (Wat.C.checkACL('vm.see.state')) {
-    mainTableClass = 'details-left';
     stateTableClass = 'details-right';
 }
 %>
 
-<div class="details-header <%= mainTableClass %>">
+<div class="details-header">
     <span class="fa fa-cloud h1"><%= model.get('name') %></span>
     <% if(Wat.C.checkACL('vm.delete.')) { %>
     <a class="button fleft button-icon js-button-delete fa fa-trash" href="javascript:" data-i18n="[title]Delete"></a>
@@ -91,6 +90,7 @@ switch (model.get('state')) {
 
 %>          
 
+<!--
 <table class="details details-list <%= stateTableClass %>">
     <tbody class="js-body-state" data-wsupdate="state-running" data-id="<%= model.get('id') %>" style="<%= runningStyle %>">
         <tr>
@@ -117,14 +117,14 @@ switch (model.get('state')) {
             var hostHtml = Wat.C.ifACL('<a href="#/host/' + model.get('host_id') + '">', 'host.see-details.') + model.get('host_name') + Wat.C.ifACL('</a>', 'host.see-details.');
         %>
             <tr>
-                <td colspan=2 class="center" data-wsupdate="host" data-id="<%= model.get('id') %>"><%= i18n.t('Running at __node__', {'node': hostHtml}) %></td>
+                <td colspan=2 class="center padded" data-wsupdate="host" data-id="<%= model.get('id') %>"><%= i18n.t('Running at __node__', {'node': hostHtml}) %></td>
             </tr>
         <%
         }
         else { 
         %>
             <tr>
-                <td colspan=2 class="center"><span data-i18n="Running"></span></td>
+                <td colspan=2 class="center padded"><span data-i18n="Running"></span></td>
             </tr>
         <%
         }
@@ -262,6 +262,7 @@ switch (model.get('state')) {
         </tr>
     </tbody>
 </table>
+-->
 
 <table class="details details-list <%= mainTableClass %>">
     <% 

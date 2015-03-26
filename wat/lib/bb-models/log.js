@@ -24,11 +24,6 @@ Wat.Models.Log = Wat.Models.Model.extend({
 
                 }
 
-                // qvd object in vies for admins is administrator, but in the rest of the system is admin
-                if (qvdObject == 'administrator') {
-                    qvdObject = 'admin';
-                }
-
                 var qvdObjectName = LOG_TYPE_OBJECTS[qvdObject];
 
                 response.viewTypeName = viewTypeName;

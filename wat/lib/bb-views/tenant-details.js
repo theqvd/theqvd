@@ -53,9 +53,16 @@ Wat.Views.TenantDetailsView = Wat.Views.DetailsView.extend({
     
     renderSide: function () {
         // No side rendered
-        if (this.checkSide({'fake.acl': '.js-side-component1'}) === false) {
+        if (this.checkSide({'log.see-main.': '.js-side-component1'}) === false) {
             return;
         }
+        
+        var sideContainer = '.' + this.cid + ' .bb-details-side1';
+
+        // Render Related log list on side
+        var params = this.getSideLogParams(sideContainer);
+
+        this.sideView = new Wat.Views.LogListView(params);
     },
     
     afterUpdateElement: function (that) {

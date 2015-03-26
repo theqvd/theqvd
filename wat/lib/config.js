@@ -412,7 +412,7 @@ Wat.C = {
         var aclSetupMenu = {
             'config.wat.' : 'watconfig',
             'role.see-main.' : 'roles',
-            'administrator.see-main.' : 'admins',
+            'administrator.see-main.' : 'administrators',
             'tenant.see-main.' : 'tenants',
             'views.see-main.' : 'views',
             'log.see-main.' : 'log',

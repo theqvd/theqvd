@@ -44,9 +44,16 @@ Wat.Views.VMDetailsView = Wat.Views.DetailsView.extend({
     
     renderSide: function () {
         // No side rendered
-        if (this.checkSide({'fake.acl': '.js-side-component1'}) === false) {
+        if (this.checkSide({'log.see-main.': '.js-side-component2'}) === false) {
             return;
         }
+        
+        var sideContainer = '.' + this.cid + ' .bb-details-side2';
+
+        // Render Related log list on side
+        var params = this.getSideLogParams(sideContainer);
+
+        this.sideView = new Wat.Views.LogListView(params);
     },
     
     updateElement: function (dialog) {
@@ -122,7 +129,10 @@ Wat.Views.VMDetailsView = Wat.Views.DetailsView.extend({
             'error': 'Error starting VM'
         }
         
-        Wat.A.performAction ('vm_start', {}, {id: this.elementId}, messages, function(){}, this);
+        Wat.A.performAction ('vm_start', {}, {id: this.elementId}, messages, function(){
+            // After start/stop VM render side to update log
+            Wat.CurrentView.renderSide();
+        }, this);
     },
     
     stopVM: function () {
@@ -131,6 +141,9 @@ Wat.Views.VMDetailsView = Wat.Views.DetailsView.extend({
             'error': 'Error stopping VM'
         }
         
-        Wat.A.performAction ('vm_stop', {}, {id: this.elementId}, messages, function(){}, this);
+        Wat.A.performAction ('vm_stop', {}, {id: this.elementId}, messages, function(){
+            // After start/stop VM render side to update log
+            Wat.CurrentView.renderSide();
+        }, this);
     }
 });

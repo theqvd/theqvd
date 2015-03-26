@@ -1,7 +1,7 @@
 Wat.Views.AdminListView = Wat.Views.ListView.extend({
     sideContainer: '.bb-setup-side',
     secondaryContainer: '.bb-setup',
-    setupOption: 'admins',
+    setupOption: 'administrators',
     qvdObj: 'administrator',
     
     initialize: function (params) {

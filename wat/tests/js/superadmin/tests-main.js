@@ -9,7 +9,7 @@ var roleLong = {"1": {
     }
 };
 
-Wat.C.setSource('QUnit testing: superadmin');
+Wat.C.setSource('TESTING superadmin');
 
 // Backbone's Models and Collections instantiation
 backboneTest();

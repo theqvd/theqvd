@@ -1170,6 +1170,9 @@ body {
         height: 1px;
         background: #d7d7d7;
         width: 100%; }
+      .wrapper .content .filter .chosen-results li {
+        line-height: 1.4em;
+        font-size: 12px; }
     @media screen and (min-width: 40em) {
       .wrapper .content .list-block, .wrapper .content .details-side {
         float: left;
@@ -1334,6 +1337,8 @@ body {
           width: 100%;
           display: block;
           background: transparent; }
+    .wrapper .content td.padded {
+      padding: 10px; }
     .wrapper .content .remote-administration-wrapper {
       width: 100%;
       margin-top: 10px;

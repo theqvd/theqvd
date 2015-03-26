@@ -1,7 +1,7 @@
 <table class="list">
     <thead>
         <tr>
-            <%                
+            <%     
                 var printedColumns = 0;
                 $.each(columns, function(name, col) {
                     if (col.display == false) {
@@ -62,6 +62,13 @@
             %>
                             <th class="<%= sortAttr %>" data-sortby="time">
                                 <span data-i18n="Date time"><%= i18n.t('Date time') %></span>
+                            </th>
+            <%
+                            break;
+                        case 'source':
+            %>
+                            <th class="<%= sortAttr %>" data-sortby="time">
+                                <span data-i18n="Source"><%= i18n.t('Source') %></span>
                             </th>
             <%
                             break;
@@ -133,9 +140,13 @@
                                 <td class="">
                                     <i class="<%= LOG_TYPE_OBJECTS_ICONS[model.get('qvd_object')] %>" data-i18n="[title]<%= LOG_TYPE_OBJECTS[model.get('qvd_object')] %>" title="<%=  i18n.t(LOG_TYPE_OBJECTS[model.get('qvd_object')]) %>"></i>
                                     <% if (model.get('object_name')) { %>
-                                        <%= Wat.C.ifACL('<a href="#/' + model.get('qvd_object') + '/' + model.get('object_id') + '" data-i18n="[title]Click for details" title="' + i18n.t('Click for details') + '">', 'log.see-details.') %>
+                                        <%= 
+                                        model.get('object_deleted') ? '' : Wat.C.ifACL('<a href="#/' + model.get('qvd_object') + '/' + model.get('object_id') + '" data-i18n="[title]Click for details" title="' + i18n.t('Click for details') + '">', 'log.see-details.') 
+                                        %>
                                             <span class="text"><%= model.get('object_name') %></span>
-                                        <%= Wat.C.ifACL('</a>', 'log.see-details.') %>
+                                        <%= 
+                                        model.get('object_deleted') ? '' : Wat.C.ifACL('</a>', 'log.see-details.') 
+                                        %>
                                     <% 
                                     } 
                                     else { 
@@ -144,9 +155,13 @@
                                         switch (model.get('qvd_object')) {
                                             case 'login':
                                                 %>
-                                                <%= Wat.C.ifACL('<a href="#/admin/' + model.get('admin_id') + '" data-i18n="[title]Click for details" title="' + i18n.t('Click for details') + '">', 'administrator.see-details.') %>
+                                                <%= 
+                                                model.get('admin_deleted') ? '' : Wat.C.ifACL('<a href="#/administrator/' + model.get('admin_id') + '" data-i18n="[title]Click for details" title="' + i18n.t('Click for details') + '">', 'administrator.see-details.') 
+                                                %>
                                                 <span class="text"><%= model.get('admin_name') %></span>
-                                                <%= Wat.C.ifACL('</a>', 'administrator.see-details.') %>
+                                                <%= 
+                                                model.get('admin_deleted') ? '' : Wat.C.ifACL('</a>', 'administrator.see-details.') 
+                                                %>
                                                 <%
                                                 break;
                                             case 'config':
@@ -169,7 +184,7 @@
                             case 'administrator':
                 %>
                                 <td class="desktop">
-                                    <%= Wat.C.ifACL('<a href="#/admin/' + model.get('admin_id') + '" data-i18n="[title]Click for details" title="' + i18n.t('Click for details') + '">', 'administrator.see-details.') %>
+                                    <%= Wat.C.ifACL('<a href="#/administrator/' + model.get('admin_id') + '" data-i18n="[title]Click for details" title="' + i18n.t('Click for details') + '">', 'administrator.see-details.') %>
                                         <span class="text"><%= model.get('admin_name') %></span>
                                     <%= Wat.C.ifACL('</a>', 'administrator.see-details.') %>
                                 </td>
@@ -179,6 +194,13 @@
                 %>
                                 <td class="desktop">
                                         <span class="text"><%= model.get('time') %></span>
+                                </td>
+                <%
+                                break;
+                            case 'source':
+                %>
+                                <td class="desktop">
+                                        <span class="text"><%= model.get('source') %></span>
                                 </td>
                 <%
                                 break;

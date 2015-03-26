@@ -153,7 +153,8 @@ Wat.Views.DetailsView = Wat.Views.MainView.extend({
         
             this.template = _.template(
                 Wat.TPL.detailsSide, {
-                    model: this.model
+                    model: this.model,
+                    qvdObj: this.qvdObj
                 }
             );
 
@@ -261,5 +262,26 @@ Wat.Views.DetailsView = Wat.Views.MainView.extend({
         //$('.js-details-side').show();
         //$('.js-details-block').removeClass('col-width-100');
         return result;
-    }
+    },
+    
+    // Return the params to render a embeded side list with object log registers
+    getSideLogParams: function (sideContainer) {
+        var params = {};
+        params.whatRender = 'list';
+        params.listContainer = sideContainer;
+        params.forceListColumns = {
+            see_details: true, 
+            action: true, 
+            datetime: true
+        };
+
+        params.forceSelectedActions = {};
+        params.block = 5;
+        params.filters = {
+            qvd_object: this.qvdObj, 
+            object_id: this.elementId
+        };
+        
+        return params;
+    },
 });

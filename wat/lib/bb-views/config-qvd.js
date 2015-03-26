@@ -1,5 +1,5 @@
 Wat.Views.ConfigQvdView = Wat.Views.MainView.extend({  
-    setupOption: 'admins',
+    setupOption: 'administrators',
     secondaryContainer: '.bb-setup',
     qvdObj: 'config',
     

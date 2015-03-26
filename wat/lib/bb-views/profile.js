@@ -1,5 +1,5 @@
 Wat.Views.ProfileView = Wat.Views.DetailsView.extend({  
-    setupOption: 'admins',
+    setupOption: 'administrators',
     secondaryContainer: '.bb-setup',
     qvdObj: 'profile',
     

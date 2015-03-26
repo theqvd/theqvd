@@ -8,7 +8,11 @@ Wat.Views.OSFDetailsView = Wat.Views.DetailsView.extend({
     },
     
     renderSide: function () {
-        var sideCheck = this.checkSide({'osf.see.vm-list': '.js-side-component1', 'osf.see.di-list': '.js-side-component2'});
+        var sideCheck = this.checkSide({
+            'osf.see.vm-list': '.js-side-component1', 
+            'osf.see.di-list': '.js-side-component2', 
+            'log.see-main.': '.js-side-component3'
+        });
 
         if (sideCheck === false) {
             return;
@@ -86,7 +90,16 @@ Wat.Views.OSFDetailsView = Wat.Views.DetailsView.extend({
             params.filters = {"osf_id": this.elementId};
             this.sideView2 = new Wat.Views.VMListView(params);
         }
+        
+        
+        if (sideCheck['log.see-main.']) { 
+            var sideContainer = '.' + this.cid + ' .bb-details-side3';
 
+            // Render Related log list on side
+            var params = this.getSideLogParams(sideContainer);
+
+            this.sideView3 = new Wat.Views.LogListView(params);
+        }
     },
     
     updateElement: function (dialog) {

@@ -325,8 +325,8 @@ Wat.I = {
         $('.js-side').css('min-height', $('.list-block').height());
     },
     
-    addSortIcons: function () {
-        $('th.sortable').prepend(HTML_SORT_ICON);
+    addSortIcons: function (cid) {
+        $('.' + cid + ' th.sortable').prepend(HTML_SORT_ICON);
     },
     
     updateSortIcons: function (view) {

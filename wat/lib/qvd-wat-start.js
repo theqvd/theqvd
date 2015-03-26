@@ -158,10 +158,10 @@
                     Wat.Router.app_router.performRoute('tenants', Wat.Views.TenantDetailsView, {"id": id});
                 });    
                 Wat.Router.app_router.on('route:listAdmin', function () {
-                    Wat.Router.app_router.performRoute('admins', Wat.Views.AdminListView);
+                    Wat.Router.app_router.performRoute('administrators', Wat.Views.AdminListView);
                 });
                 Wat.Router.app_router.on('route:detailsAdmin', function (id) {
-                    Wat.Router.app_router.performRoute('admins', Wat.Views.AdminDetailsView, {"id": id});
+                    Wat.Router.app_router.performRoute('administrators', Wat.Views.AdminDetailsView, {"id": id});
                 });    
                 Wat.Router.app_router.on('route:listRole', function () {
                     Wat.Router.app_router.performRoute('roles', Wat.Views.RoleListView);

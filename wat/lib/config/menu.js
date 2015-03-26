@@ -43,9 +43,9 @@ Wat.I.menuSetupOriginal = {
         link: '#/watconfig',
         icon: CLASS_ICON_WATCONFIG
     },
-    admins: {
+    administrators: {
         text: 'Administrators',
-        link: '#/admins',
+        link: '#/administrators',
         icon: CLASS_ICON_ADMINS
     },
     roles: {
