@@ -78,12 +78,15 @@ public class QvdclientWrapper {
 		progressHandler = null;
 	}
 
-	public void qvd_list_of_vm() throws QvdException {
+	public void qvd_list_of_vm() throws QvdException, QvdPaymentException {
 		if (qvd_c_pointer == 0) {
 			throw new QvdException("Error in qvd_list_of_vm. qvd_c_pointer is 0 and it should not be, have you called qvd_init?");
 		}
 		Vm v[] = qvd_c_list_of_vm(this.qvd_c_pointer);
 		if (v == null) {
+			if (qvd_payment_required()) {
+				throw new QvdPaymentException("You have run out of subscriptions. Please check with support");
+			}
 			throw new QvdException("Error in qvd_list_of_vm no vm list data has been returned: " + qvd_c_get_last_error_message(qvd_c_pointer));
 		}
 		qvdclient.setVmlist(v);
@@ -91,14 +94,18 @@ public class QvdclientWrapper {
 			throw new QvdException(qvd_c_get_last_error_message(qvd_c_pointer));
 	}
 
-	public void qvd_connect_to_vm(int vm_id) throws QvdException {
+	public void qvd_connect_to_vm(int vm_id) throws QvdException, QvdPaymentException {
 		if (qvd_c_pointer == 0) {
 			throw new QvdException("Error in qvd_connect_to_vm. qvd_c_pointer is 0 and it should not be, have you called qvd_init?");
 		}
 		if (qvdclient.getVmlist() == null) {
+			if (qvd_payment_required()) {
+					throw new QvdPaymentException("You have run out of subscriptions. Please check with support");
+			}
 			throw new QvdException("You are trying to connect to a vm but no list of vms is available." +
 					"Have you called qvd_list_of_vm, or does the user has any vm?");
 		}
+		
 		if (vm_id < 0) {
 			throw new QvdException("You are trying to connect to a vm not available vm_id="+ vm_id);
 		}

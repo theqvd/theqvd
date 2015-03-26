@@ -40,7 +40,7 @@ public class TestSslClientVmList {
 		qvd.qvd_free();
 	}
 	@Test
-	public void test() throws QvdException {
+	public void test() throws QvdException, QvdPaymentException {
 		assertNotNull("Library loaded", qvd);
 		Qvdclient q = qvd.getQvdclient();
 		assertNotNull("Qvdclient is not null", q);

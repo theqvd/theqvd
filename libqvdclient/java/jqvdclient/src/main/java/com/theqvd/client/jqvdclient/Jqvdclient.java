@@ -12,6 +12,7 @@ import org.kohsuke.args4j.spi.BooleanOptionHandler;
 import org.kohsuke.args4j.spi.IntOptionHandler;
 
 import com.theqvd.client.jni.QvdException;
+import com.theqvd.client.jni.QvdPaymentException;
 import com.theqvd.client.jni.QvdProgressHandler;
 import com.theqvd.client.jni.QvdclientWrapper;
 import com.theqvd.client.jni.Vm;
@@ -52,15 +53,16 @@ public class Jqvdclient {
 	/**
 	 * @param args
 	 * @throws IOException 
+	 * @throws QvdPaymentException 
 	 */
 //	@Argument
 //    private List<String> arguments = new ArrayList<String>();
 
-	public static void main(String[] args) throws IOException, QvdException {
+	public static void main(String[] args) throws IOException, QvdException, QvdPaymentException {
 		new Jqvdclient().doMain(args);
 	}
 
-	public void doMain(String[] args) throws IOException, QvdException {
+	public void doMain(String[] args) throws IOException, QvdException, QvdPaymentException {
 		CmdLineParser parser = new CmdLineParser(this);
 		try {
             // parse the arguments.
@@ -98,7 +100,7 @@ public class Jqvdclient {
 		return ;
 	}
 	
-	void connect() throws QvdException, IOException {
+	void connect() throws QvdException, QvdPaymentException, IOException {
 		int i;
 		AcceptUnknownCertHandler unknown_cert_handler = new AcceptUnknownCertHandler();
 		QvdProgressHandler progress_handler = new PrintProgress();
