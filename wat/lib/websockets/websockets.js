@@ -9,7 +9,7 @@ Wat.WS = {
             }
 
             // Let us open a web socket
-            var ws = new WebSocket('ws://' + Wat.C.apiAddress + '/' + stream + '?sid=' + Wat.C.sid + '&action=' + action + '&filters=' + JSON.stringify(filters) + '&arguments=' + JSON.stringify(arguments) + '&fields=' + JSON.stringify(fields));
+            var ws = new WebSocket('ws://' + Wat.C.apiAddress + '/' + stream + '?sid=' + Wat.C.sid + '&action=' + action + '&filters=' + JSON.stringify(filters) + '&arguments=' + JSON.stringify(arguments) + '&fields=' + JSON.stringify(fields) + '&parameters=' + JSON.stringify({source: Wat.C.source}));
             
             ws.onopen = function() {
                 // Web Socket is connected, send data using send()

@@ -108,9 +108,18 @@ Wat.Views.DetailsView = Wat.Views.MainView.extend({
             nextBread = nextBread.next;
         }
         
-        if (this.qvdObj != 'log' && this.qvdObj != 'di' && this.qvdObj != 'configwat') {
-            // Add name of the model to breadcrumbs if not exist
-            nextBread.screen = this.model.get('name');
+        // Add name of the model to breadcrumbs. Some cases will have another fields
+        switch (this.qvdObj) {
+            case 'di':
+                nextBread.screen = this.model.get('disk_image');
+                break;
+            case 'configwat':
+                break;
+            case 'log':
+                nextBread.screen = this.model.get('time');
+                break;
+            default:
+                nextBread.screen = this.model.get('name');
         }
         
         if (this.notFound) {

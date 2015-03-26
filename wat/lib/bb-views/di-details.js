@@ -121,8 +121,6 @@ Wat.Views.DIDetailsView = Wat.Views.DetailsView.extend({
     },
     
     render: function () {
-        // Add name of the image disk to breadcrumbs because in this case is not 'name'
-        this.breadcrumbs.next.next.screen = this.model.get('disk_image');
         this.notFound = this.model.attributes.disk_image == undefined;
         
         Wat.Views.DetailsView.prototype.render.apply(this);        
