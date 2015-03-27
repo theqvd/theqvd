@@ -13,6 +13,10 @@ my $RULES =
 [
 
  { left_side => { label => $UNKNOWN_TAG, saturated => 1 }, 
+   right_side => [ { label => 'default', saturated => 1 } ],
+   meaning   => sub { 'default' }  },
+
+ { left_side => { label => $UNKNOWN_TAG, saturated => 1 }, 
    right_side => [ { label => 'get', saturated => 1 } ],
    meaning   => sub { 'get' }  },
 
@@ -261,6 +265,10 @@ my $RULES =
  { left_side => { label => 'IDOP', saturated => 1 }, 
    right_side => [ { label => '=', saturated => 1 } ],
    meaning => sub { '=' }},
+
+ { left_side => { label => 'IDOP', saturated => 1 }, 
+   right_side => [ { label => '!=', saturated => 1 } ],
+   meaning => sub { '!=' }},
 
  { left_side => { label => 'IDOP', saturated => 1 }, 
    right_side => [ { label => '>', saturated => 1 } ],

@@ -41,6 +41,7 @@ our $COMMON_USAGE_TEXT =
   Supported operators:
 
   =  (equal)
+  != (not equal)
   <  (less than)
   >  (greater that)
   <= (less or equal than)
@@ -580,7 +581,7 @@ sub ask_api_staging
 	    encode_json($v) : $v;
     }
 
-    $url->query(%$query,%credentials);
+    $url->query(%$query,%credentials,parameters => '{ "source" :  "CLI" }');
 
     my $res = {}; 
     my $on_message_cb =
@@ -636,6 +637,7 @@ sub ask_api_di_upload
     my $file = $query->{arguments}->{disk_image};
     $query->{arguments}->{disk_image} = basename($file);
     $query->{arguments} = encode_json($query->{arguments});
+    $query->{parameters} = encode_json({ source => 'CLI' });
     delete $query->{filters};
     delete $query->{fields};
     delete $query->{order_by};
@@ -643,7 +645,8 @@ sub ask_api_di_upload
     my $res; 
     Mojo::IOLoop->delay(
 	sub { my $delay = shift;
-	      $ua->post("$url", form => { %credentials,%$query, file => { file => $file }}, $delay->begin); },
+	      $ua->post("$url", form => { %credentials,%$query, 
+					  file => { file => $file }}, $delay->begin); },
 	
 	sub { my ($delay,$tx) = @_; $res = $tx->res; })->wait;
     

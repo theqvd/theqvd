@@ -3,7 +3,6 @@ use base qw( QVD::Admin4::CLI::Command );
 use strict;
 use warnings;
 use QVD::Admin4::CLI::Command;
-use QVD::Admin4::CLI::Grammar::Response;
 
 sub usage_text { 
 

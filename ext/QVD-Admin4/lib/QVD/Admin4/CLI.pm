@@ -56,8 +56,6 @@ sub usage_text {
     admin (Intended to QVD administrators management)
 
     config (Intended to QVD configuration management)
-
-    config (Intended to QVD configuration management)
 ";
 }
 

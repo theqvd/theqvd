@@ -4,7 +4,7 @@ use warnings;
 use Moo;
 use QVD::Admin4::CLI::Tokenizer::Token;
 
-my $SPECIAL_TOKEN = qr/<=|>=|[=,;)([\]!<>~:]|["'][^'"]*["']/;
+my $SPECIAL_TOKEN = qr/<=|>=|!=|[=,;)([\]!<>~:]|["'][^'"]*["']/;
 my $TOKEN = qr/[^\s<=>,;)(\][!~:'"]+/;
 
 sub BUILD
