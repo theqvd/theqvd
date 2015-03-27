@@ -203,7 +203,7 @@ sub create_or_update
     my ($self,$request) = @_;
     my $result;
     my $obj;
-    for (1 .. 5)
+    for (1 .. 20)
     {
 	eval
 	{
