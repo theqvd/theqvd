@@ -1,5 +1,5 @@
 package QVD::DB::Result::Wat_Log;
-
+use Time::Stamp;
 use base qw/DBIx::Class::Core/;
 
 __PACKAGE__->table_class('DBIx::Class::ResultSource::View');
@@ -38,9 +38,8 @@ sub datetime
     my $self = shift;
     my $time = $self->time;
     use Data::Dumper; 
-    my %time;
-    @time{qw(seconds minutes hour day month year)} = localtime($time);
-
+    my $t  = Time::Stamp::parsegm($time);
+    print Dumper $t;
 
     return $time;
 }
