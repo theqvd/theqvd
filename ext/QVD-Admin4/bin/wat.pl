@@ -1,6 +1,6 @@
 #!/usr/bin/perl
 use Mojolicious::Lite;
-use lib::glob '/home/benjamin/wat/*/lib/';
+use lib::glob '/home/ubuntu/wat/*/lib/';
 use Mojo::JSON qw(encode_json decode_json j);
 use QVD::Admin4::Exception;
 use MojoX::Session;
@@ -63,7 +63,7 @@ package MojoX::Session::Transport::WAT
 
 # GENERAL CONFIG AND PLUGINS
 
-app->config(hypnotoad => {listen => ['http://localhost:3000']});
+app->config(hypnotoad => {listen => ['http://192.168.3.7:3000']});
 
 # HELPERS
 
@@ -349,12 +349,14 @@ sub create_session
 	{ time => $localtime,
 	  action => 'login', 
 	  type_of_action => 'login',
-	  qvd_object => 'admin',
+	  qvd_object => 'administrator',
 	  tenant_id => eval { $admin->tenant_id } // undef,
 	  tenant_name => eval { $admin->tenant_name } // undef,
 	  administrator_id => eval { $admin->id } // undef,
 	  administrator_name => eval { $admin->name } // undef,
 	  superadmin => eval { $admin->is_superadmin } // undef,
+	  object_id => eval { $admin->id } // undef,
+	  object_name => eval { $admin->name } // undef,
 	  ip => $c->tx->remote_address,
 	  source => eval { $json->{parameters}->{source} } // undef,
 	  arguments => encode_json(\%args),

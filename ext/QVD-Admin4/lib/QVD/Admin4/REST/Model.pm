@@ -22,7 +22,7 @@ has 'model_info', is => 'ro', isa => sub {die "Invalid type for attribute model_
 
 my $DBConfigProvider;
 
-my $QVD_OBJECTS_TO_LOG_MAPPER = { User => 'user', VM => 'vm', DI => 'di', OSF => 'osf', Host => 'host', Administrator => 'admin', Tenant => 'tenant', 
+my $QVD_OBJECTS_TO_LOG_MAPPER = { User => 'user', VM => 'vm', DI => 'di', OSF => 'osf', Host => 'host', Administrator => 'administrator', Tenant => 'tenant', 
 				  Role => 'role', Config => 'config', Tenant_Views_Setup => 'tenant_view', Administrator_Views_Setup => 'admin_view',  };
 
 my $DIRECTLY_TENANT_RELATED = [qw(User Administrator OSF Tenant_Views_Setup)];
@@ -414,7 +414,7 @@ my $AVAILABLE_FIELDS =
 { 
     list => { default => [],
 
-	      Wat_Log => [qw(id admin_id admin_name tenant_id tenant_name action arguments object_id object_name time status source ip type_of_action qvd_object object_deleted admin_deleted superadmin)],
+	      Wat_Log => [qw(id admin_id admin_name tenant_id tenant_name action arguments object_id object_name time timestamp status source ip type_of_action qvd_object object_deleted admin_deleted superadmin)],
 
 	      Config => [qw(key value)],
 
@@ -939,7 +939,8 @@ my $FIELDS_TO_DBIX_FORMAT_MAPPER =
 	arguments => 'me.arguments',
 	object_id => 'me.object_id',
 	object_name => 'me.object_name',
-	time => 'me.datetime',
+	time => 'me.time_info',
+	timestamp => 'me.time',
 	status => 'me.status',
 	source => 'me.source',
 	ip => 'me.ip',

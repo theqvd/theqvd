@@ -1,5 +1,4 @@
 package QVD::DB::Result::Wat_Log;
-use Time::Stamp;
 use base qw/DBIx::Class::Core/;
 
 __PACKAGE__->table_class('DBIx::Class::ResultSource::View');
@@ -33,15 +32,14 @@ __PACKAGE__->add_columns( id                      => { data_type => 'integer',
 __PACKAGE__->set_primary_key('id');
 
 
-sub datetime
+sub time_info
 {
     my $self = shift;
     my $time = $self->time;
-    use Data::Dumper; 
-    my $t  = Time::Stamp::parsegm($time);
-    print Dumper $t;
 
-    return $time;
+    $time =~ /^(?<year>[0-9]+)-(?<month>[0-9]+)-(?<day>[0-9]+) (?<hour>[0-9]+):(?<minutes>[0-9]+):(?<seconds>[0-9]+)$/;
+    my %time = %+;
+    return \%time;
 }
 
 1;

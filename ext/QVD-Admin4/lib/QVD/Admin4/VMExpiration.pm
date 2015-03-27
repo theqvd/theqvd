@@ -44,6 +44,7 @@ sub vm_expiration_soft
 sub difference
 {
     my ($self,$now,$then) = @_;
+
     my %time_difference;
     @time_difference{@TIME_UNITS} = $then->subtract_datetime($self->now)->in_units(@TIME_UNITS);
     $time_difference{expired} = sum(values %time_difference) > 0 ? 0 : 1;

@@ -191,7 +191,6 @@ sub report_in_log
 		     arguments => encode_json($request_args),
 		     status => $status };
 
-
    eval { $DB->resultset('Wat_Log')->create($arguments) };
    print $@ if $@;
 }
@@ -919,8 +918,6 @@ sub get_acls_in_admins
 
     my $aol = QVD::Admin4::AclsOverwriteList->new(admin_id => $admin_id);
     my $bind = [$aol->acls_to_close_re,$aol->acls_to_open_re,$aol->acls_to_hide_re];
-
-    use Data::Dumper; print Dumper $request->filters;
 
     eval { $rs = $DB->resultset($request->table)->search({},{bind => $bind})->search(
 	       $request->filters, $request->modifiers);
