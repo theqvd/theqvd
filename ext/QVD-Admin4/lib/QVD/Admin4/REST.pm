@@ -78,40 +78,32 @@ sub load_user
 sub process_query
 {
    my ($self,$json) = @_;
-   my ($response,$json_wrapper,$action);
+   my ($response,$json_wrapper,$action,$qvd_object_model);
 
    try {
 
        $json_wrapper = QVD::Admin4::REST::JSON->new(json => $json);
-
-       $action = eval { QVD::Admin4::Action->new(name => $json_wrapper->action ) }
-       // QVD::Admin4::Exception->throw(code => 4110);
-
-       $response = QVD::Admin4::Exception->new(code => 4100) 
-	   unless $action->available;
-
-       $response = QVD::Admin4::Exception->new(code => 4210) 
+       $action = QVD::Admin4::Action->new(name => $json_wrapper->action );
+       QVD::Admin4::Exception->throw(code => 4210) 
 	   unless $action->available_for_admin($self->administrator);
 
-       unless ($response)
-       {
-	   my $qvd_object_model = $self->get_qvd_object_model($action) 
-	       if $action->qvd_object;
+       $qvd_object_model = $self->get_qvd_object_model($action) 
+	   if $action->qvd_object;
 
-	   my $restmethod = $action->restmethod;
+       my $restmethod = $action->restmethod;
 	
-	   my $result = $self->$restmethod($action,$json_wrapper,$qvd_object_model);
+       my $result = $self->$restmethod($action,$json_wrapper,$qvd_object_model);
 
-	   my %args = (status => 0, result => $result);
-	   $args{json_wrapper} = $json_wrapper;
-	   $args{qvd_object_model} = $qvd_object_model
-	       if $qvd_object_model;
+       my %args = (status => 0, result => $result);
+       $args{json_wrapper} = $json_wrapper;
+       $args{qvd_object_model} = $qvd_object_model
+	   if $qvd_object_model;
 
-	   $response = QVD::Admin4::REST::Response->new(%args);
-       }
+       $response = QVD::Admin4::REST::Response->new(%args);
 
    } catch ( QVD::Admin4::Exception $err ) {
        $response = $err;
+
    } catch ($err) {
        print $err;
        $response = QVD::Admin4::Exception->new(code => 1100);

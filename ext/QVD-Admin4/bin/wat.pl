@@ -354,6 +354,7 @@ sub create_session
 	  tenant_name => eval { $admin->tenant_name } // undef,
 	  administrator_id => eval { $admin->id } // undef,
 	  administrator_name => eval { $admin->name } // undef,
+	  superadmin => eval { $admin->is_superadmin } // undef,
 	  ip => $c->tx->remote_address,
 	  source => eval { $json->{parameters}->{source} } // undef,
 	  arguments => encode_json(\%args),

@@ -4,7 +4,7 @@ use warnings;
 use Moo;
 use QVD::Admin4::Exception;
 
-has 'name', is => 'ro', isa => sub { my $name = shift; die "Invalid type for attribute name" if ref($name) || (not defined $name) || $name eq ''; }, required => 1;
+has 'name', is => 'ro', isa => sub {};
 
 my $AVAILABLE_ACTION_SIZES = { default => 'normal', normal => 'normal', heavy => 'heavy' };
 
@@ -478,6 +478,18 @@ qvd_objects_statistics => { type_of_action =>  'multiple',
 			    acls => [qr/^[^.]+\.stats\./]},
 };
 
+
+sub BUILD
+{
+    my $self = shift;
+
+    my $name = $self->name;
+    QVD::Admin4::Exception->throw(code => 4110) if
+	ref($name) || (not defined $name) || $name eq '';
+
+    QVD::Admin4::Exception->throw(code => 4100) 
+	unless $self->available;
+}
 
 sub available
 {

@@ -226,7 +226,7 @@ sub check_nested_queries_validity_in_json
     }
 
     $self->qvd_object_model->available_nested_query($_) || 
-	QVD::Admin4::Exception->throw(code => 34, object => $_)
+	QVD::Admin4::Exception->throw(code => 6230, object => $_)
 	for $self->json_wrapper->nested_queries_list;
 
     $admin->re_is_allowed_to($self->qvd_object_model->$method($_)) || 

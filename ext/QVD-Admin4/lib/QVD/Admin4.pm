@@ -157,6 +157,7 @@ sub report_in_log
    my ($self,$request,$obj,$status) = @_; 
 
    my $localtime = localtime;
+   
    my $request_args = eval { $request->json_wrapper->original_request->{arguments} } // {};
    $request_args->{password} = '**********' if exists $request_args->{password};
    my $qvd_object = $request->qvd_object_model->qvd_object_log_style;
@@ -184,6 +185,7 @@ sub report_in_log
 		     object_name => eval { $obj->name } // undef,
 		     administrator_id => $request->get_parameter_value('administrator')->id,
 		     administrator_name => $request->get_parameter_value('administrator')->name,
+		     superadmin => $request->get_parameter_value('administrator')->is_superadmin,
 		     ip => $request->get_parameter_value('remote_address'),
 		     source => $request->get_parameter_value('source'),
 		     arguments => encode_json($request_args),
@@ -917,6 +919,8 @@ sub get_acls_in_admins
 
     my $aol = QVD::Admin4::AclsOverwriteList->new(admin_id => $admin_id);
     my $bind = [$aol->acls_to_close_re,$aol->acls_to_open_re,$aol->acls_to_hide_re];
+
+    use Data::Dumper; print Dumper $request->filters;
 
     eval { $rs = $DB->resultset($request->table)->search({},{bind => $bind})->search(
 	       $request->filters, $request->modifiers);

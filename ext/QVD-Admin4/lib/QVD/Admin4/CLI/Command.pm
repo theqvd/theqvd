@@ -108,7 +108,7 @@ my $FILTERS =
     acl => { id => 'id', name => 'name', role => 'role_id', admin => 'admin_id', operative => 'operative'},
 
     log => { id => 'id', admin_id => 'admin_id', admin_name => 'admin_name', tenant_id => 'tenant_id', tenant_name => 'tenant_name', action => 'action',  arguments => 'arguments',  object_id => 'object_id', 
-	     object_name => 'object_name', time => 'time', status => 'status', source => 'source', ip => 'ip', type_of_action => 'type_of_action', qvd_object => 'qvd_object' },
+	     object_name => 'object_name', time => 'time', status => 'status', source => 'source', ip => 'ip', type_of_action => 'type_of_action', qvd_object => 'qvd_object', superadmin => 'superadmin' },
 
 };
 
@@ -137,7 +137,7 @@ my $ORDER =
     acl => { id => 'id', name => 'name' },
 
     log => { id => 'id', admin_id => 'admin_id', admin_id => 'admin_name', tenant_id => 'tenant_id', tenant_name => 'tenant_name', action => 'action',  arguments => 'arguments',  object_id => 'object_id', 
-	     object_name => 'object_name', time => 'time', status => 'status', source => 'source', ip => 'ip', type_of_action => 'type_of_action', qvd_object => 'qvd_object' },
+	     object_name => 'object_name', time => 'time', status => 'status', source => 'source', ip => 'ip', type_of_action => 'type_of_action', qvd_object => 'qvd_object', superadmin => 'superadmin' },
 
 };
 
@@ -167,7 +167,7 @@ my $FIELDS =
     acl => { id => 'id', name => 'name' },
 
     log => { id => 'id', admin_id => 'admin_id', admin_id => 'admin_name', tenant_id => 'tenant_id', tenant_name => 'tenant_name', action => 'action',  arguments => 'arguments',  object_id => 'object_id', 
-	     object_name => 'object_name', time => 'time', status => 'status', source => 'source', ip => 'ip', type_of_action => 'type_of_action', qvd_object => 'qvd_object', deleted_object => 'deleted_object', deleted_admin => 'deleted_admin' },
+	     object_name => 'object_name', time => 'time', status => 'status', source => 'source', ip => 'ip', type_of_action => 'type_of_action', qvd_object => 'qvd_object', deleted_object => 'deleted_object', deleted_admin => 'deleted_admin', superadmin => 'superadmin' },
 
 };
 
@@ -319,7 +319,7 @@ my $DEFAULT_FIELDS =
 
     acl => [ qw(id name) ],
 
-    log => [qw(time admin_name type_of_action qvd_object object_name arguments status)]
+    log => [qw(time admin_name type_of_action qvd_object object_name status)]
 };
 
 ###############
@@ -683,7 +683,7 @@ sub get_action
     my ($self,$parsing) = @_;
     return eval { 
 	$CLI_CMD2API_ACTION->{$parsing->qvd_object}->{$parsing->command} 
-    } // die "No API action available"; 
+    } // CLI::Framework::Exception->throw("No API action available for request"); 
 }
 
 sub get_all_ids_action
@@ -691,7 +691,7 @@ sub get_all_ids_action
     my ($self,$parsing) = @_;
     return eval { 
 	$CLI_CMD2API_ACTION->{$parsing->qvd_object}->{'ids'} 
-    } // die "No API action available"; 
+    } // CLI::Framework::Exception->throw("No API action available for getting related object"); 
 }
 
 sub get_filters
