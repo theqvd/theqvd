@@ -10,7 +10,7 @@ __PACKAGE__->result_source_instance->view_definition(
 
 "
 
-SELECT A.id, 
+SELECT DISTINCT A.id, 
        CASE WHEN (B.id IS NULL) THEN false ELSE true END as object_deleted,
        CASE WHEN (C.id IS NULL) THEN true ELSE false END as administrator_deleted                                                                           
  FROM wat_log A

@@ -32,7 +32,7 @@ __PACKAGE__->add_columns( id                      => { data_type => 'integer',
 __PACKAGE__->set_primary_key('id');
 
 
-sub time_info
+sub antiquity
 {
     my $self = shift;
     my $time = $self->time;

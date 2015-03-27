@@ -414,7 +414,7 @@ my $AVAILABLE_FIELDS =
 { 
     list => { default => [],
 
-	      Wat_Log => [qw(id admin_id admin_name tenant_id tenant_name action arguments object_id object_name time timestamp status source ip type_of_action qvd_object object_deleted admin_deleted superadmin)],
+	      Wat_Log => [qw(id admin_id admin_name tenant_id tenant_name action arguments object_id object_name time antiquity status source ip type_of_action qvd_object object_deleted admin_deleted superadmin)],
 
 	      Config => [qw(key value)],
 
@@ -454,7 +454,7 @@ my $AVAILABLE_FIELDS =
 
     details => { default => [],
 
-		 Wat_Log => [qw(id admin_id admin_name tenant_id tenant_name action arguments object_id object_name time status source ip type_of_action qvd_object object_deleted admin_deleted superadmin)],
+		 Wat_Log => [qw(id admin_id admin_name tenant_id tenant_name action arguments object_id object_name time antiquity status source ip type_of_action qvd_object object_deleted admin_deleted superadmin)],
 		 Config => [qw(key value)],
 
 		 OSF => [qw(id name overlay user_storage memory  number_of_vms number_of_dis properties )],
@@ -939,8 +939,8 @@ my $FIELDS_TO_DBIX_FORMAT_MAPPER =
 	arguments => 'me.arguments',
 	object_id => 'me.object_id',
 	object_name => 'me.object_name',
-	time => 'me.time_info',
-	timestamp => 'me.time',
+	time => 'me.time',
+	antiquity => 'me.antiquity',
 	status => 'me.status',
 	source => 'me.source',
 	ip => 'me.ip',
